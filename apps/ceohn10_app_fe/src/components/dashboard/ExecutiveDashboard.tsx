@@ -401,13 +401,13 @@ export function ExecutiveDashboard({ authReady }: { authReady: boolean }) {
     const members = statusFilter === "all"
       ? nonDeletedMembers
       : nonDeletedMembers.filter((m: any) => {
-          const st = String(m.status || "").toLowerCase();
-          if (statusFilter === "active") return st === "active" || st === "approved";
-          if (statusFilter === "pending") return st === "pending" || st === "pending_approval";
-          if (statusFilter === "completed") return st === "active" || st === "approved";
-          if (statusFilter === "expired") return st === "expired" || st === "inactive" || st === "rejected";
-          return true;
-        });
+        const st = String(m.status || "").toLowerCase();
+        if (statusFilter === "active") return st === "active" || st === "approved";
+        if (statusFilter === "pending") return st === "pending" || st === "pending_approval";
+        if (statusFilter === "completed") return st === "active" || st === "approved";
+        if (statusFilter === "expired") return st === "expired" || st === "inactive" || st === "rejected";
+        return true;
+      });
 
     const totalMembers = members.length > 0 ? members.length : DEFAULT_MEMBERS.length;
     const activeMembers = members.length > 0 ? members.filter((m: any) => m.status === "active" || m.status === "approved").length : DEFAULT_MEMBERS.length;
@@ -433,12 +433,12 @@ export function ExecutiveDashboard({ authReady }: { authReady: boolean }) {
     const invoices = statusFilter === "all"
       ? nonDeletedInvoices
       : nonDeletedInvoices.filter((i: any) => {
-          const st = String(i.status || "").toLowerCase();
-          if (statusFilter === "active" || statusFilter === "completed") return st === "paid" || st === "completed";
-          if (statusFilter === "pending") return st === "pending" || st === "unpaid" || st === "overdue";
-          if (statusFilter === "expired") return st === "cancelled" || st === "failed";
-          return true;
-        });
+        const st = String(i.status || "").toLowerCase();
+        if (statusFilter === "active" || statusFilter === "completed") return st === "paid" || st === "completed";
+        if (statusFilter === "pending") return st === "pending" || st === "unpaid" || st === "overdue";
+        if (statusFilter === "expired") return st === "cancelled" || st === "failed";
+        return true;
+      });
 
     const paidInvs = invoices.filter((i: any) => i.status === "paid" || i.status === "completed");
     const unpaidInvs = invoices.filter((i: any) => i.status === "pending" || i.status === "unpaid" || i.status === "overdue");
@@ -560,19 +560,17 @@ export function ExecutiveDashboard({ authReady }: { authReady: boolean }) {
               key={tab.key}
               type="button"
               onClick={() => setStatusFilter(tab.key)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
-                statusFilter === tab.key
-                  ? "bg-[#003B95] text-white shadow-xs"
-                  : "bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground"
-              }`}
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${statusFilter === tab.key
+                ? "bg-[#003B95] text-white shadow-xs"
+                : "bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground"
+                }`}
             >
               <span>{tab.label}</span>
               <span
-                className={`text-[10px] px-1.5 py-0.2 rounded-full ${
-                  statusFilter === tab.key
-                    ? "bg-white/20 text-white"
-                    : "bg-background text-muted-foreground border border-border"
-                }`}
+                className={`text-[10px] px-1.5 py-0.2 rounded-full ${statusFilter === tab.key
+                  ? "bg-white/20 text-white"
+                  : "bg-background text-muted-foreground border border-border"
+                  }`}
               >
                 {tab.count}
               </span>
@@ -990,32 +988,32 @@ export function ExecutiveDashboard({ authReady }: { authReady: boolean }) {
                 task.priority === "CRITICAL"
                   ? "bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20"
                   : task.priority === "HIGH"
-                  ? "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20"
-                  : "bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20";
+                    ? "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20"
+                    : "bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20";
               const priorityText =
                 task.priority === "CRITICAL"
                   ? "Khẩn cấp"
                   : task.priority === "HIGH"
-                  ? "Ưu tiên cao"
-                  : task.priority === "MEDIUM"
-                  ? "Trung bình"
-                  : "Thấp";
+                    ? "Ưu tiên cao"
+                    : task.priority === "MEDIUM"
+                      ? "Trung bình"
+                      : "Thấp";
               const statusText =
                 task.status === "DONE"
                   ? "Hoàn thành"
                   : task.status === "REVIEW"
-                  ? "Chờ duyệt"
-                  : task.status === "IN_PROGRESS"
-                  ? "Đang làm"
-                  : "Chưa bắt đầu";
+                    ? "Chờ duyệt"
+                    : task.status === "IN_PROGRESS"
+                      ? "Đang làm"
+                      : "Chưa bắt đầu";
               const statusColor =
                 task.status === "DONE"
                   ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
                   : task.status === "REVIEW"
-                  ? "bg-amber-500/10 text-amber-600 dark:text-amber-400"
-                  : task.status === "IN_PROGRESS"
-                  ? "bg-blue-500/10 text-blue-600 dark:text-blue-400"
-                  : "bg-slate-500/10 text-slate-600 dark:text-slate-400";
+                    ? "bg-amber-500/10 text-amber-600 dark:text-amber-400"
+                    : task.status === "IN_PROGRESS"
+                      ? "bg-blue-500/10 text-blue-600 dark:text-blue-400"
+                      : "bg-slate-500/10 text-slate-600 dark:text-slate-400";
 
               return (
                 <li key={task.id}>

@@ -51,34 +51,36 @@
   --color-chart-4: var(--chart-4);
   --color-chart-5: var(--chart-5);
 
-  --shadow-card: 0 1px 3px 0 rgba(124, 45, 130, 0.06), 0 1px 2px 0 rgba(0, 0, 0, 0.04);
-  --shadow-elevated:
-    0 4px 16px -2px rgba(124, 45, 130, 0.12), 0 2px 6px -1px rgba(0, 0, 0, 0.05);
-  --shadow-glow: 0 8px 32px -8px rgba(124, 45, 130, 0.4);
+  --shadow-card: 0 1px 3px 0 rgba(0, 0, 0, 0.4);
+  --shadow-elevated: 0 4px 16px -2px rgba(124, 45, 130, 0.25);
+  --shadow-glow: 0 8px 32px -8px rgba(214, 31, 105, 0.35);
 
-  --gradient-primary: linear-gradient(135deg, #7C2D82 0%, #9333EA 50%, #4A1C6E 100%);
-  --gradient-sidebar: linear-gradient(180deg, #FFFFFF 0%, #FAF5FF 60%, #F3E8FF 100%);
-  --gradient-card: linear-gradient(135deg, #7C2D82 0%, #581C87 100%);
-  --gradient-ceohn10: linear-gradient(135deg, #7C2D82 0%, #D61F69 50%, #4A1C6E 100%);
-  --gradient-purple-white: linear-gradient(180deg, #FFFFFF 0%, #FAF5FF 50%, #F5EEFD 100%);
+  --gradient-primary: linear-gradient(135deg, #7C2D82 0%, #D61F69 100%);
+  --gradient-sidebar: linear-gradient(180deg, #000000 0%, #18181B 100%);
+  --gradient-card: linear-gradient(135deg, #7C2D82 0%, #D61F69 100%);
+  --gradient-ceohn10: linear-gradient(135deg, #7C2D82 0%, #D61F69 100%);
+  --gradient-purple-white: linear-gradient(135deg, #7C2D82 0%, #D61F69 100%);
 
-  --color-Backgrounds-Primary: #FFFFFF;
-  --color-Backgrounds-Secondary: #FAF5FF;
-  --color-Fills-Secondary: #F3E8FF;
-  --color-Grays-Black: #0F172A;
+  --color-Backgrounds-Primary: #000000;
+  --color-Backgrounds-Secondary: #18181B;
+  --color-Fills-Secondary: #18181B;
+  --color-Grays-Black: #000000;
   --color-Grays-White: #FFFFFF;
-  --color-Grays-Gray: #64748B;
-  --color-Accents-Red: #EF4444;
-  --color-Accents-Orange: #FF8A00;
-  --color-Accents-Mint: #10B981;
+  --color-Grays-Gray: #FFFFFF;
+  --color-Accents-Red: #D61F69;
+  --color-Accents-Orange: #D61F69;
+  --color-Accents-Mint: #7C2D82;
   --color-Primary: #7C2D82;
-  --color-Labels-Secondary: #64748B;
+  --color-Labels-Secondary: #FFFFFF;
 }
 
 @keyframes subtle-bounce {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translateY(0);
   }
+
   50% {
     transform: translateY(-5px);
   }
@@ -93,12 +95,15 @@
     top: 6px;
     opacity: 0;
   }
+
   15% {
     opacity: 1;
   }
+
   85% {
     opacity: 1;
   }
+
   100% {
     top: calc(100% - 8px);
     opacity: 0;
@@ -106,179 +111,238 @@
 }
 
 @keyframes momoLaserPulse {
-  0%, 100% {
+
+  0%,
+  100% {
     opacity: 0.1;
   }
+
   50% {
     opacity: 0.4;
   }
 }
 
 .bg-crm-system {
-  background: radial-gradient(at 0% 0%, rgba(124, 45, 130, 0.07) 0px, transparent 50%),
-              radial-gradient(at 100% 0%, rgba(214, 31, 105, 0.05) 0px, transparent 50%),
-              radial-gradient(at 50% 100%, rgba(147, 51, 234, 0.04) 0px, transparent 50%),
-              linear-gradient(180deg, #FFFFFF 0%, #FAF5FF 40%, #F5EEFD 100%);
+  background: #000000;
+  background-image: 
+    radial-gradient(at 0% 0%, rgba(124, 45, 130, 0.25) 0px, transparent 55%),
+    radial-gradient(at 100% 0%, rgba(214, 31, 105, 0.20) 0px, transparent 50%),
+    radial-gradient(at 50% 100%, rgba(124, 45, 130, 0.15) 0px, transparent 50%),
+    linear-gradient(180deg, #000000 0%, #000000 100%);
   background-repeat: no-repeat;
   background-position: top center;
   background-size: cover;
   background-attachment: fixed;
+  color: #FFFFFF;
 }
 
 .dark .bg-crm-system,
 html.dark .bg-crm-system,
 [data-theme="dark"] .bg-crm-system {
-  background-image: none !important;
-  background-color: var(--vba-bg, #070D1A) !important;
+  background-color: #000000 !important;
+  color: #FFFFFF !important;
 }
 
 /* Figma Brand Design Tokens for CEO HN10 Mobile App */
-.bg-Primary-2-50 { background-color: #FAF5FF !important; }
-.dark .bg-Primary-2-50 { background-color: rgba(124, 45, 130, 0.15) !important; }
-.bg-Primary-2-brand { background-color: #7C2D82 !important; }
-.bg-Primary-1-50 { background-color: #FAF5FF !important; }
-.dark .bg-Primary-1-50 { background-color: rgba(124, 45, 130, 0.25) !important; }
-.bg-Primary-1-brand { background-color: #7C2D82 !important; }
-.bg-Dark-blue-700 { background-color: #150B21 !important; }
-.bg-Surface-badge { background-color: #D61F69 !important; }
-.bg-Neutral-white { background-color: #FFFFFF !important; }
-.dark .bg-Neutral-white { background-color: #150B21 !important; }
-.bg-Surface-default { background-color: #FFFFFF !important; }
-.dark .bg-Surface-default { background-color: #150B21 !important; }
-.bg-Surface-action { background-color: #7C2D82 !important; }
-.bg-Primary-2-100 { background-color: #F3E8FF !important; }
-.dark .bg-Primary-2-100 { background-color: rgba(147, 51, 234, 0.25) !important; }
+.bg-Primary-2-50 {
+  background-color: #FAF5FF !important;
+}
 
-.text-Text-default { color: #1E1B4B !important; }
-.dark .text-Text-default { color: #F5EEFD !important; }
-.text-Text-active { color: #7C2D82 !important; }
-.dark .text-Text-active { color: #C084FC !important; }
-.text-Text-description { color: #64748B !important; }
-.dark .text-Text-description { color: #94A3B8 !important; }
-.text-Primary-2-brand { color: #7C2D82 !important; }
+.dark .bg-Primary-2-50 {
+  background-color: rgba(124, 45, 130, 0.15) !important;
+}
 
-.outline-Primary-2-brand { outline-color: #7C2D82 !important; }
-.outline-Icon-default { outline-color: #64748B !important; }
-.outline-Icon-active { outline-color: #7C2D82 !important; }
-.outline-Icon-information { outline-color: #7C2D82 !important; }
-.outline-Icon-inactive { outline-color: #94A3B8 !important; }
-.outline-Border-on-action { outline-color: #FFFFFF !important; }
-.outline-Border-default { outline-color: #F3E8FF !important; }
-.dark .outline-Border-default { outline-color: rgba(168, 85, 247, 0.25) !important; }
-.border-Border-default { border-color: #F3E8FF !important; }
-.dark .border-Border-default { border-color: rgba(168, 85, 247, 0.25) !important; }
-.outline-Border-action { outline-color: #7C2D82 !important; }
-.border-Border-action { border-color: #7C2D82 !important; }
-.outline-Orange-700 { outline-color: #581C87 !important; }
+.bg-Primary-2-brand {
+  background-color: #7C2D82 !important;
+}
 
-:root {
+.bg-Primary-1-50 {
+  background-color: #FAF5FF !important;
+}
+
+.dark .bg-Primary-1-50 {
+  background-color: rgba(124, 45, 130, 0.25) !important;
+}
+
+.bg-Primary-1-brand {
+  background-color: #7C2D82 !important;
+}
+
+.bg-Dark-blue-700 {
+  background-color: #150B21 !important;
+}
+
+.bg-Surface-badge {
+  background-color: #D61F69 !important;
+}
+
+.bg-Neutral-white {
+  background-color: #FFFFFF !important;
+}
+
+.dark .bg-Neutral-white {
+  background-color: #150B21 !important;
+}
+
+.bg-Surface-default {
+  background-color: #FFFFFF !important;
+}
+
+.dark .bg-Surface-default {
+  background-color: #150B21 !important;
+}
+
+.bg-Surface-action {
+  background-color: #7C2D82 !important;
+}
+
+.bg-Primary-2-100 {
+  background-color: #F3E8FF !important;
+}
+
+.dark .bg-Primary-2-100 {
+  background-color: rgba(147, 51, 234, 0.25) !important;
+}
+
+.text-Text-default {
+  color: #1E1B4B !important;
+}
+
+.dark .text-Text-default {
+  color: #F5EEFD !important;
+}
+
+.text-Text-active {
+  color: #7C2D82 !important;
+}
+
+.dark .text-Text-active {
+  color: #C084FC !important;
+}
+
+.text-Text-description {
+  color: #64748B !important;
+}
+
+.dark .text-Text-description {
+  color: #94A3B8 !important;
+}
+
+.text-Primary-2-brand {
+  color: #7C2D82 !important;
+}
+
+.outline-Primary-2-brand {
+  outline-color: #7C2D82 !important;
+}
+
+.outline-Icon-default {
+  outline-color: #64748B !important;
+}
+
+.outline-Icon-active {
+  outline-color: #7C2D82 !important;
+}
+
+.outline-Icon-information {
+  outline-color: #7C2D82 !important;
+}
+
+.outline-Icon-inactive {
+  outline-color: #94A3B8 !important;
+}
+
+.outline-Border-on-action {
+  outline-color: #FFFFFF !important;
+}
+
+.outline-Border-default {
+  outline-color: #F3E8FF !important;
+}
+
+.dark .outline-Border-default {
+  outline-color: rgba(168, 85, 247, 0.25) !important;
+}
+
+.border-Border-default {
+  border-color: #F3E8FF !important;
+}
+
+.dark .border-Border-default {
+  border-color: rgba(168, 85, 247, 0.25) !important;
+}
+
+.outline-Border-action {
+  outline-color: #7C2D82 !important;
+}
+
+.border-Border-action {
+  border-color: #7C2D82 !important;
+}
+
+.outline-Orange-700 {
+  outline-color: #581C87 !important;
+}
+
+:root,
+.dark {
   --radius: 0.75rem;
 
-  --background: #FFFFFF;
-  --foreground: #1E1B4B;
+  --background: #000000;
+  --foreground: #FFFFFF;
 
-  --card: #FFFFFF;
-  --card-foreground: #1E1B4B;
+  --card: #000000;
+  --card-foreground: #FFFFFF;
 
-  --popover: #FFFFFF;
-  --popover-foreground: #1E1B4B;
+  --popover: #000000;
+  --popover-foreground: #FFFFFF;
 
-  /* CEO HN10 Royal Purple & White Identity (Canva Extraction) */
+  /* CEO HN10 Strict 5-Color System: Tím (#7C2D82), Hồng (#D61F69), Đen (#000000), Trắng (#FFFFFF), Đen xám viền (#18181B) */
   --primary: #7C2D82;
   --primary-foreground: #FFFFFF;
-  --primary-glow: #A855F7;
+  --primary-glow: #D61F69;
 
-  --secondary: #FAF5FF;
-  --secondary-foreground: #4A1C6E;
+  --secondary: #18181B;
+  --secondary-foreground: #FFFFFF;
 
-  --muted: #FAF5FF;
-  --muted-foreground: #6B7280;
+  --muted: #18181B;
+  --muted-foreground: #FFFFFF;
 
-  --accent: #F3E8FF;
-  --accent-foreground: #581C87;
+  --accent: #D61F69;
+  --accent-foreground: #FFFFFF;
 
-  --destructive: #EF4444;
+  --destructive: #D61F69;
   --destructive-foreground: #FFFFFF;
 
-  --success: #10B981;
+  --success: #7C2D82;
   --success-foreground: #FFFFFF;
 
-  --warning: #F59E0B;
-  --warning-foreground: #1E1B4B;
+  --warning: #D61F69;
+  --warning-foreground: #FFFFFF;
 
-  --info: #0284C7;
+  --info: #7C2D82;
   --info-foreground: #FFFFFF;
 
-  --border: #F3E8FF;
-  --input: #E9D5FF;
-  --ring: #7C2D82;
+  --border: #18181B;
+  --input: #18181B;
+  --ring: #D61F69;
 
-  /* Sidebar — Light mode: White with soft purple-white gradient */
-  --sidebar: #FFFFFF;
-  --sidebar-foreground: #1E1B4B;
+  /* Sidebar — Đen tuyền với viền đen xám & chữ trắng */
+  --sidebar: #000000;
+  --sidebar-foreground: #FFFFFF;
   --sidebar-primary: #7C2D82;
   --sidebar-primary-foreground: #FFFFFF;
-  --sidebar-accent: #FAF5FF;
-  --sidebar-accent-foreground: #7C2D82;
-  --sidebar-border: #F3E8FF;
-  --sidebar-ring: #7C2D82;
-  --gradient-sidebar: linear-gradient(180deg, #FFFFFF 0%, #FAF5FF 60%, #F3E8FF 100%);
+  --sidebar-accent: #18181B;
+  --sidebar-accent-foreground: #FFFFFF;
+  --sidebar-border: #18181B;
+  --sidebar-ring: #D61F69;
+  --gradient-sidebar: linear-gradient(180deg, #000000 0%, #18181B 100%);
 
   --chart-1: #7C2D82;
   --chart-2: #D61F69;
-  --chart-3: #10B981;
-  --chart-4: #F59E0B;
-  --chart-5: #6B21A8;
-}
-
-.dark {
-  /* ============================================================
-     CEO HN10 OFFICIAL DARK MODE: Deep Royal Obsidian Purple & White
-     ============================================================ */
-  --background: #0B0612;
-  --foreground: #FFFFFF;
-  --card: #150B21;
-  --card-foreground: #FFFFFF;
-  --popover: #150B21;
-  --popover-foreground: #FFFFFF;
-  --primary: #A855F7;
-  --primary-foreground: #FFFFFF;
-  --primary-glow: #D61F69;
-  --secondary: #221235;
-  --secondary-foreground: #E9D5FF;
-  --muted: #1E1030;
-  --muted-foreground: #C084FC;
-  --accent: #7C2D82;
-  --accent-foreground: #FFFFFF;
-  --border: rgba(168, 85, 247, 0.25);
-  --input: rgba(168, 85, 247, 0.3);
-  --ring: #A855F7;
-
-  /* State colours tuned for CEO HN10 dark surfaces */
-  --destructive: #EF4444;
-  --destructive-foreground: #FFFFFF;
-  --success: #10B981;
-  --success-foreground: #FFFFFF;
-  --warning: #F59E0B;
-  --warning-foreground: #0B0612;
-  --info: #38BDF8;
-  --info-foreground: #0B0612;
-
-  --sidebar: #0D0715;
-  --sidebar-foreground: #E9D5FF;
-  --sidebar-primary: #F59E0B;
-  --sidebar-primary-foreground: #070D1A;
-  --sidebar-accent: #0E172A;
-  --sidebar-accent-foreground: #FFFFFF;
-  --sidebar-border: rgba(245, 158, 11, 0.16);
-  --sidebar-ring: #F59E0B;
-  --gradient-sidebar: linear-gradient(180deg, #070D1A 0%, #050912 100%);
-
-  --chart-1: #7C2D82;
-  --chart-2: #F59E0B;
-  --chart-3: #10B981;
-  --chart-4: #EF4444;
-  --chart-5: #38BDF8;
+  --chart-3: #FFFFFF;
+  --chart-4: #18181B;
+  --chart-5: #7C2D82;
 }
 
 /* ============================================================
@@ -404,10 +468,12 @@ html.dark [class*="bg-card"] {
 .hc *::after {
   text-shadow: none !important;
 }
+
 .hc :focus-visible {
   outline: 3px solid var(--ring);
   outline-offset: 2px;
 }
+
 .hc .vba-app {
   background: var(--background);
 }
@@ -416,14 +482,25 @@ html.dark [class*="bg-card"] {
   * {
     border-color: var(--color-border);
   }
-  html, body {
+
+  html,
+  body {
     touch-action: manipulation;
     -webkit-tap-highlight-color: transparent;
   }
-  button, a, input, select, textarea, [role="button"], [role="tab"], .cursor-pointer {
+
+  button,
+  a,
+  input,
+  select,
+  textarea,
+  [role="button"],
+  [role="tab"],
+  .cursor-pointer {
     touch-action: manipulation;
     -webkit-tap-highlight-color: transparent;
   }
+
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
@@ -446,17 +523,21 @@ html.dark [class*="bg-card"] {
   color-scheme: dark;
 
   /* ── Base surfaces ── */
-  --background: #08091a;          /* deep slate-navy */
+  --background: #08091a;
+  /* deep slate-navy */
   --foreground: #eeedf5;
-  --card: #0d0e23;                /* midnight card */
+  --card: #0d0e23;
+  /* midnight card */
   --card-foreground: #eeedf5;
   --popover: #11122a;
   --popover-foreground: #eeedf5;
 
   /* ── Brand: electric indigo + purple ── */
-  --primary: #7C6FE0;             /* indigo-violet */
+  --primary: #7C6FE0;
+  /* indigo-violet */
   --primary-foreground: #ffffff;
-  --primary-glow: #a393f5;        /* lighter purple glow */
+  --primary-glow: #a393f5;
+  /* lighter purple glow */
 
   /* ── Gradient accents (CSS variables for use in inline styles) ── */
   --grad-hero: linear-gradient(135deg, #7C6FE0 0%, #a855f7 50%, #6366f1 100%);
@@ -465,7 +546,8 @@ html.dark [class*="bg-card"] {
   --secondary: #11132a;
   --secondary-foreground: #eeedf5;
   --muted: #11132a;
-  --muted-foreground: #8a8eb5;    /* cool slate muted */
+  --muted-foreground: #8a8eb5;
+  /* cool slate muted */
   --accent: #1a1d40;
   --accent-foreground: #a393f5;
 
@@ -478,7 +560,8 @@ html.dark [class*="bg-card"] {
   --destructive: #f87171;
   --destructive-foreground: #eeedf5;
 
-  --border: #1e2048;              /* indigo-tinted border */
+  --border: #1e2048;
+  /* indigo-tinted border */
   --input: #1e2048;
   --ring: #7C6FE0;
 
@@ -498,171 +581,77 @@ html.dark [class*="bg-card"] {
 /* ============================================================
    CEO HN10 Official Theme: Royal Purple & Crisp White (Canva Brandbook)
    ============================================================ */
-.vba-app {
-  --vba-bg: #0B0612;
-  --vba-bg-2: #07030C;
-  --vba-surface: #150B21;
-  --vba-surface-2: #221235;
-  --vba-border: rgba(168, 85, 247, 0.32);
-  --vba-border-soft: rgba(168, 85, 247, 0.22);
-  --vba-border-accent: rgba(214, 31, 105, 0.65);
-  --vba-gold: #D61F69;
-  --vba-gold-2: #C084FC;
-  --vba-gold-soft: rgba(168, 85, 247, 0.18);
-  --vba-gold-glow: 0 6px 24px -4px rgba(124, 45, 130, 0.5);
-  --vba-navy: #7C2D82;
-  --vba-navy-deep: #4A1C6E;
-  --vba-navy-light: #A855F7;
-  --vba-brand-orange: #D61F69;
-  --vba-text: #FFFFFF;
-  --vba-text-muted: #E9D5FF;
-  --vba-text-dim: #C084FC;
-  --vba-success: #10B981;
-  --vba-danger: #EF4444;
-
-  background: var(--vba-bg, #0B0612);
-  color: var(--vba-text);
-  min-height: 100dvh;
-  font-family: var(--font-sans);
-}
-
-.vba-card {
-  background: var(--vba-surface, #150B21);
-  color: var(--vba-text, #FFFFFF);
-  border: 1px solid rgba(168, 85, 247, 0.28);
-  box-shadow: 0 4px 20px -3px rgba(124, 45, 130, 0.2), 0 2px 8px -2px rgba(74, 28, 110, 0.25);
-}
-
-/* High-contrast: strengthen borders and text separation */
-@media (prefers-contrast: more) {
-  .vba-app {
-    --vba-gold-glow: none;
-    --vba-text-muted: #FFFFFF;
-    --vba-border: #FBBF24;
-  }
-}
-
-/* Light mode tokens for .vba-app — Clean Executive White & Deep Navy with Royal Amber Accents */
-html:not(.dark) .vba-app {
-  --vba-bg: #FFFFFF;
-  --vba-bg-2: #F8FAFC;
-  --vba-surface: #FFFFFF;
-  --vba-surface-2: #F8FAFC;
-  --vba-border: rgba(217, 119, 6, 0.28);
-  --vba-border-soft: rgba(217, 119, 6, 0.18);
-  --vba-border-accent: rgba(217, 119, 6, 0.55);
-  --vba-gold: #D97706;
-  --vba-gold-2: #F59E0B;
-  --vba-gold-soft: rgba(217, 119, 6, 0.14);
-  --vba-gold-glow: 0 4px 16px -2px rgba(217, 119, 6, 0.35);
-  --vba-navy: #7C2D82;
-  --vba-navy-deep: #4A1C6E;
-  --vba-navy-light: #9333EA;
-  --vba-brand-orange: #D61F69;
-  --vba-text: #0F172A;
-  --vba-text-muted: #334155;
-  --vba-text-dim: #64748B;
-  --vba-success: #10B981;
-  --vba-danger: #EF4444;
-  --popover: #FFFFFF;
-  --popover-foreground: #0F172A;
-  --card: #FFFFFF;
-  --card-foreground: #0F172A;
-  background: #FFFFFF;
-  color: #0F172A;
-}
-
-html:not(.dark) .vba-card {
-  background: #FFFFFF;
-  color: #0F172A;
-  border: 1.5px solid rgba(124, 45, 130, 0.25);
-  box-shadow: 0 4px 20px -2px rgba(124, 45, 130, 0.12), 0 2px 8px -2px rgba(124, 45, 130, 0.08);
-}
-
-.vba-gold-text {
-  background: linear-gradient(135deg, #9333EA 0%, #7C2D82 60%, #4A1C6E 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-
-.vba-gold-grad {
-  background: linear-gradient(135deg, #7C2D82 0%, #9333EA 100%);
-  color: #FFFFFF !important;
-  font-weight: 700;
-  box-shadow: 0 3px 14px -2px rgba(124, 45, 130, 0.4);
-}
-
-.vba-navy-gold-btn {
-  background: linear-gradient(135deg, #4A1C6E 0%, #7C2D82 50%, #9333EA 100%);
-  border: 1px solid rgba(168, 85, 247, 0.45);
-  color: #FFFFFF;
-  box-shadow: 0 4px 14px -2px rgba(124, 45, 130, 0.35);
-}
-
-/* High-contrast mode tokens for .vba-app — Pure Solid Black, Pure White, & Electric Gold */
+/* ============================================================
+   CEO HN10 OFFICIAL THEME: STRICT 5-COLOR SYSTEM
+   1. Tím (Royal Purple): #7C2D82
+   2. Hồng (Vibrant Magenta): #D61F69
+      => Gradient chính: linear-gradient(135deg, #7C2D82 0%, #D61F69 100%)
+   3. Đen (Carbon Black): #000000 (Nền chính, thẻ tối, thanh bên)
+   4. Trắng (Crisp Pure White): #FFFFFF (Toàn bộ chữ hiển thị, icon tương phản)
+   5. Đen xám viền (Dark Slate Border): #18181B (Đường viền biên giới, bề mặt phân cách)
+   TUYỆT ĐỐI KHÔNG DÙNG BẤT KỲ MÀU NÀO KHÁC!
+   ============================================================ */
+.vba-app,
+html:not(.dark) .vba-app,
+html.dark .vba-app,
 html.hc .vba-app {
   --vba-bg: #000000;
   --vba-bg-2: #000000;
   --vba-surface: #000000;
-  --vba-surface-2: #0D0D0D;
-  --vba-border: #FACC15;
-  --vba-border-soft: #FFFFFF;
-  --vba-border-accent: #FEF08A;
-  --vba-gold: #FACC15;
-  --vba-gold-2: #FEF08A;
-  --vba-gold-soft: rgba(250, 204, 21, 0.20);
-  --vba-gold-glow: none;
+  --vba-surface-2: #18181B;
+  --vba-border: #18181B;
+  --vba-border-soft: #18181B;
+  --vba-border-accent: #7C2D82;
+  --vba-gold: #D61F69;
+  --vba-gold-2: #7C2D82;
+  --vba-gold-soft: rgba(214, 31, 105, 0.15);
+  --vba-gold-glow: 0 4px 16px -2px rgba(214, 31, 105, 0.35);
+  --vba-navy: #7C2D82;
+  --vba-navy-deep: #000000;
+  --vba-navy-light: #D61F69;
+  --vba-brand-orange: #D61F69;
   --vba-text: #FFFFFF;
   --vba-text-muted: #FFFFFF;
-  --vba-text-dim: #E2E8F0;
-  color: #FFFFFF;
+  --vba-text-dim: #FFFFFF;
+  --vba-success: #7C2D82;
+  --vba-danger: #D61F69;
+  --popover: #000000;
+  --popover-foreground: #FFFFFF;
+  --card: #000000;
+  --card-foreground: #FFFFFF;
+
+  background: #000000 !important;
+  color: #FFFFFF !important;
+  min-height: 100dvh;
+  font-family: var(--font-sans);
 }
 
+.vba-card,
+html:not(.dark) .vba-card,
+html.dark .vba-card,
 html.hc .vba-card {
-  background: #000000;
-  color: #FFFFFF;
-  border: 2px solid #FACC15;
-  box-shadow: none;
-}
-
-html.hc .vba-gold-text {
-  background: none;
-  -webkit-text-fill-color: #FACC15;
-  color: #FACC15;
-  font-weight: 700;
-}
-
-html.hc .vba-gold-grad {
-  background: #FACC15;
-  color: #000000 !important;
-  font-weight: 800;
-  border: 2px solid #FFFFFF;
-  box-shadow: none;
+  background: #000000 !important;
+  color: #FFFFFF !important;
+  border: 1px solid #18181B !important;
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.6) !important;
+  border-radius: 0.75rem;
 }
 
 .vba-gold-text {
-  background: linear-gradient(135deg, #FFFFFF 0%, #FDE68A 45%, #F59E0B 100%);
+  background: linear-gradient(135deg, #7C2D82 0%, #D61F69 100%);
   -webkit-background-clip: text;
   background-clip: text;
-  color: transparent;
-}
-
-.vba-card {
-  background: linear-gradient(165deg, rgba(14, 23, 42, 0.95) 0%, rgba(10, 17, 34, 0.98) 100%);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  color: #FFFFFF;
-  border: 1.5px solid rgba(245, 158, 11, 0.22);
-  border-radius: 1rem;
-  box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(0, 59, 149, 0.25);
-}
-
-.vba-gold-grad {
-  background: linear-gradient(135deg, #FBBF24 0%, #D97706 100%);
-  color: #071322 !important;
+  color: transparent !important;
   font-weight: 700;
-  box-shadow: 0 4px 14px -2px rgba(245, 158, 11, 0.40);
+}
+
+.vba-gold-grad,
+.vba-navy-gold-btn {
+  background: linear-gradient(135deg, #7C2D82 0%, #D61F69 100%) !important;
+  color: #FFFFFF !important;
+  border: 1px solid #7C2D82 !important;
+  font-weight: 700;
+  box-shadow: 0 4px 14px -2px rgba(214, 31, 105, 0.4) !important;
 }
 
 /* ============================================================
@@ -721,108 +710,58 @@ html:not(.dark) button.bg-white * {
   stroke: #FFFFFF !important;
 }
 
-/* Nút Đăng nhập CRM: luôn nền Tím gradient đặc + chữ trắng đậm */
+/* Nút Đăng nhập CRM: luôn nền Tím - Hồng gradient đặc + chữ trắng đậm */
 button.ceo-login-submit {
-  background: linear-gradient(135deg, #7C2D82 0%, #9333EA 50%, #6B21A8 100%) !important;
-  color: #ffffff !important;
-  border: 1px solid #9333EA !important;
-  box-shadow: 0 4px 14px -2px rgba(124, 45, 130, 0.45) !important;
+  background: linear-gradient(135deg, #7C2D82 0%, #D61F69 100%) !important;
+  color: #FFFFFF !important;
+  border: 1px solid #7C2D82 !important;
+  box-shadow: 0 4px 14px -2px rgba(214, 31, 105, 0.45) !important;
 }
+
 button.ceo-login-submit:hover:not(:disabled) {
-  background: linear-gradient(135deg, #6B21A8 0%, #7C2D82 50%, #4A1C6E 100%) !important;
-  border-color: #A855F7 !important;
+  background: linear-gradient(135deg, #D61F69 0%, #7C2D82 100%) !important;
+  border-color: #D61F69 !important;
 }
+
 button.ceo-login-submit *,
 button.ceo-login-submit span,
 button.ceo-login-submit svg {
-  color: #ffffff !important;
-  stroke: #ffffff !important;
+  color: #FFFFFF !important;
+  stroke: #FFFFFF !important;
   opacity: 1 !important;
   visibility: visible !important;
 }
 
 /* ============================================================
-   4 DẠNG MÀU TIÊU CHUẨN CEO HN10 (BRANDBOOK GUIDELINES)
+   QUY CHUẨN 5 MÀU ĐỘC QUYỀN CEO HN10 (BRANDBOOK GUIDELINES)
+   Tím (#7C2D82), Hồng (#D61F69), Đen (#000000), Trắng (#FFFFFF), Đen xám viền (#18181B)
    ============================================================ */
 
-/* 1. Royal Purple & Soft Violet (Mặc định cốt lõi CEOHN10) */
+[data-app-color-theme],
+.dark[data-app-color-theme],
 [data-app-color-theme="royal-gold"],
-.dark[data-app-color-theme="royal-gold"] {
-  --vba-bg: #0F0A1A;
-  --vba-bg-2: #080510;
-  --vba-surface: #1E1233;
-  --vba-surface-2: #2A1847;
-  --vba-navy: #7C2D82;
-  --vba-navy-deep: #4A1C6E;
-  --vba-gold: #D61F69;
-  --vba-gold-2: #F43F5E;
-  --vba-border: rgba(168, 85, 247, 0.35);
-  --vba-border-soft: rgba(168, 85, 247, 0.20);
-  --theme-icon-color: #C084FC;
-  --theme-primary-gradient: linear-gradient(135deg, #7C2D82 0%, #9333EA 50%, #4A1C6E 100%);
-  --theme-card-gradient: linear-gradient(135deg, #1E1233 0%, #2A1847 100%);
-  --bc-mobile-accent: #7C2D82;
-  --bc-mobile-accent-grad: linear-gradient(135deg, #7C2D82 0%, #9333EA 50%, #4A1C6E 100%);
-}
-
-/* 2. Heritage Navy & Dynamic Brand Orange (Chuẩn Logo Brandbook) */
+.dark[data-app-color-theme="royal-gold"],
 [data-app-color-theme="heritage-orange"],
-.dark[data-app-color-theme="heritage-orange"] {
-  --vba-bg: #0A0D24;
-  --vba-bg-2: #060818;
-  --vba-surface: #121638;
-  --vba-surface-2: #1B1E4A;
-  --vba-navy: #2E3192;
-  --vba-navy-deep: #19194D;
-  --vba-gold: #F7941D;
-  --vba-gold-2: #F8A74B;
-  --vba-border: rgba(247, 148, 29, 0.35);
-  --vba-border-soft: rgba(247, 148, 29, 0.20);
-  --theme-icon-color: #F7941D;
-  --theme-primary-gradient: linear-gradient(135deg, #2E3192 0%, #1E206A 60%, #19194D 100%);
-  --theme-card-gradient: linear-gradient(135deg, #121638 0%, #1B1E4A 100%);
-  --bc-mobile-accent: #2E3192;
-  --bc-mobile-accent-grad: linear-gradient(135deg, #2E3192 0%, #1E206A 60%, #19194D 100%);
-}
-
-/* 3. Obsidian Black & Champagne Gold (Dạ Tiệc Thượng Lưu) */
+.dark[data-app-color-theme="heritage-orange"],
 [data-app-color-theme="obsidian-gold"],
-.dark[data-app-color-theme="obsidian-gold"] {
-  --vba-bg: #05070D;
-  --vba-bg-2: #020306;
-  --vba-surface: #0F1420;
-  --vba-surface-2: #171E30;
-  --vba-navy: #1E293B;
-  --vba-navy-deep: #0B0F19;
-  --vba-gold: #D4AF37;
-  --vba-gold-2: #E5C07B;
-  --vba-border: rgba(212, 175, 55, 0.35);
-  --vba-border-soft: rgba(212, 175, 55, 0.18);
-  --theme-icon-color: #D4AF37;
-  --theme-primary-gradient: linear-gradient(135deg, #1A1F2C 0%, #10141E 60%, #05070D 100%);
-  --theme-card-gradient: linear-gradient(135deg, #0F1420 0%, #171E30 100%);
-  --bc-mobile-accent: #D4AF37;
-  --bc-mobile-accent-grad: linear-gradient(135deg, #1A1F2C 0%, #10141E 60%, #05070D 100%);
-}
-
-/* 4. Prestige Ruby Red & Imperial Gold (Đột Phá Khởi Sắc) */
+.dark[data-app-color-theme="obsidian-gold"],
 [data-app-color-theme="ruby-gold"],
 .dark[data-app-color-theme="ruby-gold"] {
-  --vba-bg: #140707;
-  --vba-bg-2: #0B0303;
-  --vba-surface: #200D0D;
-  --vba-surface-2: #301414;
-  --vba-navy: #991B1B;
-  --vba-navy-deep: #450A0A;
-  --vba-gold: #EAB308;
-  --vba-gold-2: #FDE047;
-  --vba-border: rgba(234, 179, 8, 0.35);
-  --vba-border-soft: rgba(234, 179, 8, 0.20);
-  --theme-icon-color: #EAB308;
-  --theme-primary-gradient: linear-gradient(135deg, #DC2626 0%, #991B1B 60%, #450A0A 100%);
-  --theme-card-gradient: linear-gradient(135deg, #200D0D 0%, #301414 100%);
-  --bc-mobile-accent: #991B1B;
-  --bc-mobile-accent-grad: linear-gradient(135deg, #DC2626 0%, #991B1B 60%, #450A0A 100%);
+  --vba-bg: #000000;
+  --vba-bg-2: #000000;
+  --vba-surface: #000000;
+  --vba-surface-2: #18181B;
+  --vba-navy: #7C2D82;
+  --vba-navy-deep: #000000;
+  --vba-gold: #D61F69;
+  --vba-gold-2: #7C2D82;
+  --vba-border: #18181B;
+  --vba-border-soft: #18181B;
+  --theme-icon-color: #D61F69;
+  --theme-primary-gradient: linear-gradient(135deg, #7C2D82 0%, #D61F69 100%);
+  --theme-card-gradient: linear-gradient(135deg, #7C2D82 0%, #D61F69 100%);
+  --bc-mobile-accent: #7C2D82;
+  --bc-mobile-accent-grad: linear-gradient(135deg, #7C2D82 0%, #D61F69 100%);
 }
 
 /* ============================================================
@@ -940,7 +879,7 @@ a.bg-sky-600 * {
   color: #FFFFFF !important;
 }
 
-/* All badge and tag spans (matching Image 3): text must be sharp black */
+/* All badge and tag spans: text must be crisp white on dark/purple surface */
 span[class*="px-1.5"][class*="text-[10px]"],
 span[class*="px-1.5"][class*="text-[9px]"],
 span[class*="px-1.5"][class*="text-[9.5px]"],
@@ -950,7 +889,7 @@ span[class*="bg-sky-500/"],
 span[class*="bg-amber-500/"],
 span[class*="bg-zinc-500/"],
 span[class*="bg-orange-500/"] {
-  color: #000000 !important;
+  color: #FFFFFF !important;
   font-weight: 700 !important;
 }
 
@@ -959,8 +898,8 @@ span[class*="px-1.5"][class*="text-[9px]"] *,
 span[class*="px-1.5"][class*="text-[9.5px]"] *,
 span[class*="py-0.2"] *,
 span.inline-flex[class*="px-1.5"] * {
-  color: #000000 !important;
-  stroke: #000000 !important;
+  color: #FFFFFF !important;
+  stroke: #FFFFFF !important;
 }
 
 /* High-contrast: flatten gradients to solid, remove glows for clarity */
@@ -971,6 +910,7 @@ span.inline-flex[class*="px-1.5"] * {
     color: var(--primary);
     filter: none;
   }
+
   .vba-gold-grad {
     background: var(--primary);
     box-shadow: none;
@@ -1004,6 +944,7 @@ span.inline-flex[class*="px-1.5"] * {
     transform 0.12s ease-out,
     filter 0.12s ease-out;
 }
+
 .vba-app a:active .vba-gold-grad,
 .vba-app button:active .vba-gold-grad,
 .vba-gold-grad:active {
@@ -1012,6 +953,7 @@ span.inline-flex[class*="px-1.5"] * {
 }
 
 @media (prefers-contrast: more) {
+
   .vba-app a:focus-visible,
   .vba-app button:focus-visible,
   .vba-app [role="button"]:focus-visible,
@@ -1026,6 +968,7 @@ span.inline-flex[class*="px-1.5"] * {
 }
 
 @media (prefers-reduced-motion: reduce) {
+
   .vba-gold-grad,
   .vba-app a:active .vba-gold-grad,
   .vba-gold-grad:active {
@@ -1039,19 +982,23 @@ span.inline-flex[class*="px-1.5"] * {
     opacity: 0;
     transform: translateY(8px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
   }
 }
+
 @keyframes vba-fade-in {
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
 }
+
 .vba-animate {
   animation: vba-fade-in 0.15s cubic-bezier(0.16, 1, 0.3, 1) both;
   will-change: opacity;
@@ -1072,11 +1019,13 @@ span.inline-flex[class*="px-1.5"] * {
     opacity: 0;
     transform: scale(0.96) translateY(-4px);
   }
+
   100% {
     opacity: 1;
     transform: scale(1) translateY(0);
   }
 }
+
 .vba-pop-in {
   animation: vba-pop-in var(--motion-base) var(--motion-ease) both;
 }
@@ -1085,13 +1034,16 @@ span.inline-flex[class*="px-1.5"] * {
   0% {
     transform: scale(0);
   }
+
   60% {
     transform: scale(1.25);
   }
+
   100% {
     transform: scale(1);
   }
 }
+
 .vba-badge-pop {
   animation: vba-badge-pop var(--motion-base) var(--motion-ease) both;
 }
@@ -1106,6 +1058,7 @@ span.inline-flex[class*="px-1.5"] * {
   0% {
     background-position: 200% 0;
   }
+
   60%,
   100% {
     background-position: -60% 0;
@@ -1113,6 +1066,7 @@ span.inline-flex[class*="px-1.5"] * {
 }
 
 @media (prefers-reduced-motion: reduce) {
+
   .vba-pop-in,
   .vba-badge-pop {
     animation: none;
@@ -1122,6 +1076,7 @@ span.inline-flex[class*="px-1.5"] * {
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
+
 .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
@@ -1132,16 +1087,20 @@ span.inline-flex[class*="px-1.5"] * {
   scrollbar-width: thin;
   scrollbar-color: color-mix(in oklab, var(--sidebar-foreground) 22%, transparent) transparent;
 }
+
 .sidebar-scroll::-webkit-scrollbar {
   width: 6px;
 }
+
 .sidebar-scroll::-webkit-scrollbar-track {
   background: transparent;
 }
+
 .sidebar-scroll::-webkit-scrollbar-thumb {
   background: color-mix(in oklab, var(--sidebar-foreground) 22%, transparent);
   border-radius: 9999px;
 }
+
 .sidebar-scroll::-webkit-scrollbar-thumb:hover {
   background: color-mix(in oklab, var(--sidebar-foreground) 38%, transparent);
 }
@@ -1150,6 +1109,7 @@ span.inline-flex[class*="px-1.5"] * {
    by keeping form controls at >=16px on touch devices, while leaving the
    user free to pinch/browser-zoom intentionally. */
 @media (max-width: 768px) {
+
   input,
   select,
   textarea {
@@ -1162,20 +1122,25 @@ span.inline-flex[class*="px-1.5"] * {
    - Remove only the inconsistent double-tap-zoom delay on tappable controls,
      not on the whole document, so pinch-to-zoom and text zoom stay intact. */
 html {
-  -webkit-text-size-adjust: 100%; /* stop iOS auto text inflation on rotate */
+  -webkit-text-size-adjust: 100%;
+  /* stop iOS auto text inflation on rotate */
   text-size-adjust: 100%;
 }
 
 @media (max-width: 768px) {
   html {
-    font-size: 16px; /* Chuẩn hóa về 16px để tránh iOS tự động zoom input và giữ form mobile đều nhau */
+    font-size: 16px;
+    /* Chuẩn hóa về 16px để tránh iOS tự động zoom input và giữ form mobile đều nhau */
   }
 }
 
 body {
-  overscroll-behavior-y: contain; /* avoid stray scroll-chaining bounce */
-  -webkit-tap-highlight-color: transparent; /* consistent tap feedback */
+  overscroll-behavior-y: contain;
+  /* avoid stray scroll-chaining bounce */
+  -webkit-tap-highlight-color: transparent;
+  /* consistent tap feedback */
 }
+
 button,
 a,
 [role="button"],
@@ -1183,7 +1148,8 @@ label,
 summary,
 input[type="checkbox"],
 input[type="radio"] {
-  touch-action: manipulation; /* kills 300ms/double-tap-zoom on controls only */
+  touch-action: manipulation;
+  /* kills 300ms/double-tap-zoom on controls only */
 }
 
 /* ============================================================
@@ -1368,7 +1334,8 @@ html:not(.dark) .bc-app .text-zinc-300,
 html:not(.dark) .bc-app .text-neutral-100,
 html:not(.dark) .bc-app .text-neutral-200,
 html:not(.dark) .bc-app .text-neutral-300 {
-  color: #000000 !important; /* Pure Crisp Black */
+  color: #000000 !important;
+  /* Pure Crisp Black */
 }
 
 /* STRICT EXCEPTION: [data-dark-card] inside .bc-app MUST preserve crisp white text */
@@ -1390,7 +1357,8 @@ html:not(.dark) .bc-app .text-gray-500,
 html:not(.dark) .bc-app .text-neutral-400,
 html:not(.dark) .bc-app .text-neutral-500,
 html:not(.dark) .bc-app .text-muted-foreground {
-  color: #475569 !important; /* Crisp Slate Gray */
+  color: #475569 !important;
+  /* Crisp Slate Gray */
 }
 
 /* Gold/amber/yellow in light mode → bright gold & warm amber accents */
@@ -1400,7 +1368,8 @@ html:not(.dark) .bc-app .text-amber-300,
 html:not(.dark) .bc-app .text-yellow-100,
 html:not(.dark) .bc-app .text-yellow-200,
 html:not(.dark) .bc-app .text-yellow-300 {
-  color: #D97706 !important; /* Bright Gold Amber */
+  color: #D97706 !important;
+  /* Bright Gold Amber */
 }
 
 /* vba-app light mode text */
@@ -1412,9 +1381,9 @@ html:not(.dark) .vba-app {
 }
 
 /* Light mode text overrides: ONLY apply for faint slate text on plain white backgrounds, NEVER touch .text-white */
-html:not(.dark) .vba-app :not([data-dark-card]):not([data-dark-card] *):not(.vba-member-card):not(.vba-member-card *):not(.dark-surface):not(.dark-surface *):not([class*="bg-"]):not(button):not(button *):not([class*="red"]):not([class*="blue"]) > .text-slate-50,
-html:not(.dark) .vba-app :not([data-dark-card]):not([data-dark-card] *):not(.vba-member-card):not(.vba-member-card *):not(.dark-surface):not(.dark-surface *):not([class*="bg-"]):not(button):not(button *):not([class*="red"]):not([class*="blue"]) > .text-slate-100,
-html:not(.dark) .vba-app :not([data-dark-card]):not([data-dark-card] *):not(.vba-member-card):not(.vba-member-card *):not(.dark-surface):not(.dark-surface *):not([class*="bg-"]):not(button):not(button *):not([class*="red"]):not([class*="blue"]) > .text-slate-200 {
+html:not(.dark) .vba-app :not([data-dark-card]):not([data-dark-card] *):not(.vba-member-card):not(.vba-member-card *):not(.dark-surface):not(.dark-surface *):not([class*="bg-"]):not(button):not(button *):not([class*="red"]):not([class*="blue"])>.text-slate-50,
+html:not(.dark) .vba-app :not([data-dark-card]):not([data-dark-card] *):not(.vba-member-card):not(.vba-member-card *):not(.dark-surface):not(.dark-surface *):not([class*="bg-"]):not(button):not(button *):not([class*="red"]):not([class*="blue"])>.text-slate-100,
+html:not(.dark) .vba-app :not([data-dark-card]):not([data-dark-card] *):not(.vba-member-card):not(.vba-member-card *):not(.dark-surface):not(.dark-surface *):not([class*="bg-"]):not(button):not(button *):not([class*="red"]):not([class*="blue"])>.text-slate-200 {
   color: #0F172A;
 }
 
@@ -1454,9 +1423,9 @@ html:not(.dark) .vba-app [data-dark-card] .text-white\/60 {
   color: rgba(255, 255, 255, 0.6) !important;
 }
 
-html:not(.dark) .vba-app :not([data-dark-card]):not([data-dark-card] *):not(.vba-member-card):not(.vba-member-card *) > .text-slate-400,
-html:not(.dark) .vba-app :not([data-dark-card]):not([data-dark-card] *):not(.vba-member-card):not(.vba-member-card *) > .text-slate-500,
-html:not(.dark) .vba-app :not([data-dark-card]):not([data-dark-card] *):not(.vba-member-card):not(.vba-member-card *) > .text-muted-foreground {
+html:not(.dark) .vba-app :not([data-dark-card]):not([data-dark-card] *):not(.vba-member-card):not(.vba-member-card *)>.text-slate-400,
+html:not(.dark) .vba-app :not([data-dark-card]):not([data-dark-card] *):not(.vba-member-card):not(.vba-member-card *)>.text-slate-500,
+html:not(.dark) .vba-app :not([data-dark-card]):not([data-dark-card] *):not(.vba-member-card):not(.vba-member-card *)>.text-muted-foreground {
   color: #64748B;
 }
 
@@ -1466,14 +1435,17 @@ html:not(.dark) .vba-app :not([data-dark-card]):not([data-dark-card] *):not(.vba
     opacity: 0;
     transform: translateY(-8px) scale(0.6) rotate(0deg);
   }
+
   20% {
     opacity: 0.9;
     transform: translateY(-2px) scale(1) rotate(45deg);
   }
+
   80% {
     opacity: 0.8;
     transform: translateY(12px) scale(0.9) rotate(120deg);
   }
+
   100% {
     opacity: 0;
     transform: translateY(22px) scale(0.4) rotate(180deg);
@@ -1481,10 +1453,13 @@ html:not(.dark) .vba-app :not([data-dark-card]):not([data-dark-card] *):not(.vba
 }
 
 @keyframes vba-bling-twinkle {
-  0%, 100% {
+
+  0%,
+  100% {
     opacity: 0.2;
     transform: scale(0.7) rotate(0deg);
   }
+
   50% {
     opacity: 1;
     transform: scale(1.25) rotate(180deg);
@@ -1494,22 +1469,36 @@ html:not(.dark) .vba-app :not([data-dark-card]):not([data-dark-card] *):not(.vba
 
 /* Member Perks 2s Glow & Shake Gift Box Animation */
 @keyframes vba-gift-glow {
-  0%, 100% {
+
+  0%,
+  100% {
     box-shadow: 0 0 15px rgba(251, 191, 36, 0.3), inset 0 0 10px rgba(251, 191, 36, 0.2);
   }
+
   50% {
     box-shadow: 0 0 35px rgba(251, 191, 36, 0.7), 0 0 60px rgba(245, 158, 11, 0.4), inset 0 0 20px rgba(255, 255, 255, 0.6);
   }
 }
 
 @keyframes vba-gift-shake {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translate(0, 0) rotate(0deg) scale(1);
   }
-  10%, 30%, 50%, 70%, 90% {
+
+  10%,
+  30%,
+  50%,
+  70%,
+  90% {
     transform: translate(-3px, -2px) rotate(-3deg) scale(1.03);
   }
-  20%, 40%, 60%, 80% {
+
+  20%,
+  40%,
+  60%,
+  80% {
     transform: translate(3px, 1px) rotate(3deg) scale(1.03);
   }
 }
@@ -1519,10 +1508,12 @@ html:not(.dark) .vba-app :not([data-dark-card]):not([data-dark-card] *):not(.vba
     opacity: 0;
     transform: scale(0.8) rotate(0deg);
   }
+
   50% {
     opacity: 0.9;
     transform: scale(1.3) rotate(90deg);
   }
+
   100% {
     opacity: 0;
     transform: scale(1.7) rotate(180deg);
@@ -1532,12 +1523,15 @@ html:not(.dark) .vba-app :not([data-dark-card]):not([data-dark-card] *):not(.vba
 .animate-pollen-1 {
   animation: vba-pollen-fall 2.2s cubic-bezier(0.25, 1, 0.5, 1) infinite;
 }
+
 .animate-pollen-2 {
   animation: vba-pollen-fall 2.8s cubic-bezier(0.25, 1, 0.5, 1) infinite 0.7s;
 }
+
 .animate-pollen-3 {
   animation: vba-pollen-fall 3.2s cubic-bezier(0.25, 1, 0.5, 1) infinite 1.4s;
 }
+
 .animate-bling {
   animation: vba-bling-twinkle 1.8s ease-in-out infinite;
 }
@@ -1548,12 +1542,15 @@ html:not(.dark) .vba-app :not([data-dark-card]):not([data-dark-card] *):not(.vba
     opacity: 0;
     transform: translateY(-8px) translateX(0px) scale(0.6) rotate(0deg);
   }
+
   20% {
     opacity: 0.95;
   }
+
   80% {
     opacity: 0.85;
   }
+
   100% {
     opacity: 0;
     transform: translateY(18px) translateX(6px) scale(1.1) rotate(120deg);
@@ -1565,12 +1562,15 @@ html:not(.dark) .vba-app :not([data-dark-card]):not([data-dark-card] *):not(.vba
     opacity: 0;
     transform: translateY(-10px) translateX(4px) scale(0.5) rotate(0deg);
   }
+
   25% {
     opacity: 0.9;
   }
+
   85% {
     opacity: 0.8;
   }
+
   100% {
     opacity: 0;
     transform: translateY(16px) translateX(-6px) scale(1) rotate(-140deg);
@@ -1582,12 +1582,15 @@ html:not(.dark) .vba-app :not([data-dark-card]):not([data-dark-card] *):not(.vba
     opacity: 0;
     transform: translateY(-6px) translateX(-3px) scale(0.4) rotate(0deg);
   }
+
   30% {
     opacity: 0.95;
   }
+
   75% {
     opacity: 0.75;
   }
+
   100% {
     opacity: 0;
     transform: translateY(20px) translateX(4px) scale(1.15) rotate(180deg);
@@ -1595,11 +1598,14 @@ html:not(.dark) .vba-app :not([data-dark-card]):not([data-dark-card] *):not(.vba
 }
 
 @keyframes blue-sparkle-glow {
-  0%, 100% {
+
+  0%,
+  100% {
     opacity: 0.35;
     transform: scale(0.8);
     filter: drop-shadow(0 0 2px rgba(56, 189, 248, 0.4));
   }
+
   50% {
     opacity: 1;
     transform: scale(1.3);
@@ -1610,12 +1616,15 @@ html:not(.dark) .vba-app :not([data-dark-card]):not([data-dark-card] *):not(.vba
 .animate-blue-snow-1 {
   animation: blue-snow-fall-1 2.4s ease-in-out infinite;
 }
+
 .animate-blue-snow-2 {
   animation: blue-snow-fall-2 2.9s ease-in-out infinite 0.8s;
 }
+
 .animate-blue-snow-3 {
   animation: blue-snow-fall-3 3.3s ease-in-out infinite 1.5s;
 }
+
 .animate-blue-sparkle {
   animation: blue-sparkle-glow 1.6s ease-in-out infinite;
 }
@@ -1716,6 +1725,7 @@ html:not(.dark) .bc-app {
   overscroll-behavior-y: contain;
   touch-action: pan-y;
 }
+
 .bc-app ::-webkit-scrollbar,
 .bc-app::-webkit-scrollbar {
   display: none;
@@ -1788,6 +1798,7 @@ body:has(.bc-app-viewport) {
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
+
 html:has(.bc-app-viewport)::-webkit-scrollbar,
 body:has(.bc-app-viewport)::-webkit-scrollbar {
   width: 0;
@@ -1796,7 +1807,7 @@ body:has(.bc-app-viewport)::-webkit-scrollbar {
 }
 
 /* Content wider than the viewport must wrap/clip instead of pushing layout. */
-.bc-app-viewport > * {
+.bc-app-viewport>* {
   min-width: 0;
 }
 
@@ -1838,8 +1849,8 @@ body:has(.bc-app-viewport)::-webkit-scrollbar {
 .bc-app a[class*="border"],
 .bc-app [role="button"],
 .bc-app .bc-card-interactive,
-.bc-app li[class*="border"] > a,
-.bc-app li[class*="border"] > button {
+.bc-app li[class*="border"]>a,
+.bc-app li[class*="border"]>button {
   transition: border-color 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease, transform 0.1s ease;
 }
 
@@ -1961,15 +1972,15 @@ html.dark [role="menu"],
 html.dark [role="listbox"],
 html.dark [data-vaul-drawer],
 html.dark [vaul-drawer],
-html.dark [data-radix-popper-content-wrapper] > [role="menu"],
-html.dark [data-radix-popper-content-wrapper] > div,
+html.dark [data-radix-popper-content-wrapper]>[role="menu"],
+html.dark [data-radix-popper-content-wrapper]>div,
 html.dark .radix-dialog-content,
 html.dark .radix-dropdown-content,
-html.dark body > [data-radix-portal] [role="dialog"]:not([class*="fixed inset-0"]):not([class*="bg-black"]),
-html.dark body > [data-radix-portal] [role="menu"],
-html.dark body > [data-radix-portal] [role="listbox"],
-html.dark body > div[role="dialog"]:not([class*="fixed inset-0"]):not([class*="bg-black"]),
-html.dark body > div[role="menu"] {
+html.dark body>[data-radix-portal] [role="dialog"]:not([class*="fixed inset-0"]):not([class*="bg-black"]),
+html.dark body>[data-radix-portal] [role="menu"],
+html.dark body>[data-radix-portal] [role="listbox"],
+html.dark body>div[role="dialog"]:not([class*="fixed inset-0"]):not([class*="bg-black"]),
+html.dark body>div[role="menu"] {
   background: linear-gradient(165deg, rgba(19, 27, 41, 0.80) 0%, rgba(14, 21, 34, 0.88) 50%, rgba(11, 15, 23, 0.90) 100%) !important;
   backdrop-filter: blur(24px) !important;
   -webkit-backdrop-filter: blur(24px) !important;
@@ -1981,15 +1992,15 @@ html.hc [role="menu"],
 html.hc [role="listbox"],
 html.hc [data-vaul-drawer],
 html.hc [vaul-drawer],
-html.hc [data-radix-popper-content-wrapper] > [role="menu"],
-html.hc [data-radix-popper-content-wrapper] > div,
+html.hc [data-radix-popper-content-wrapper]>[role="menu"],
+html.hc [data-radix-popper-content-wrapper]>div,
 html.hc .radix-dialog-content,
 html.hc .radix-dropdown-content,
-html.hc body > [data-radix-portal] [role="dialog"]:not([class*="fixed inset-0"]):not([class*="bg-black"]),
-html.hc body > [data-radix-portal] [role="menu"],
-html.hc body > [data-radix-portal] [role="listbox"],
-html.hc body > div[role="dialog"]:not([class*="fixed inset-0"]):not([class*="bg-black"]),
-html.hc body > div[role="menu"] {
+html.hc body>[data-radix-portal] [role="dialog"]:not([class*="fixed inset-0"]):not([class*="bg-black"]),
+html.hc body>[data-radix-portal] [role="menu"],
+html.hc body>[data-radix-portal] [role="listbox"],
+html.hc body>div[role="dialog"]:not([class*="fixed inset-0"]):not([class*="bg-black"]),
+html.hc body>div[role="menu"] {
   background: rgb(0, 0, 0) !important;
   color: #FFFFFF !important;
   border: 2px solid #FACC15 !important;
@@ -2001,15 +2012,15 @@ html:not(.dark) [role="menu"],
 html:not(.dark) [role="listbox"],
 html:not(.dark) [data-vaul-drawer],
 html:not(.dark) [vaul-drawer],
-html:not(.dark) [data-radix-popper-content-wrapper] > [role="menu"],
-html:not(.dark) [data-radix-popper-content-wrapper] > div,
+html:not(.dark) [data-radix-popper-content-wrapper]>[role="menu"],
+html:not(.dark) [data-radix-popper-content-wrapper]>div,
 html:not(.dark) .radix-dialog-content,
 html:not(.dark) .radix-dropdown-content,
-html:not(.dark) body > [data-radix-portal] [role="dialog"]:not([class*="fixed inset-0"]):not([class*="bg-black"]),
-html:not(.dark) body > [data-radix-portal] [role="menu"],
-html:not(.dark) body > [data-radix-portal] [role="listbox"],
-html:not(.dark) body > div[role="dialog"]:not([class*="fixed inset-0"]):not([class*="bg-black"]),
-html:not(.dark) body > div[role="menu"] {
+html:not(.dark) body>[data-radix-portal] [role="dialog"]:not([class*="fixed inset-0"]):not([class*="bg-black"]),
+html:not(.dark) body>[data-radix-portal] [role="menu"],
+html:not(.dark) body>[data-radix-portal] [role="listbox"],
+html:not(.dark) body>div[role="dialog"]:not([class*="fixed inset-0"]):not([class*="bg-black"]),
+html:not(.dark) body>div[role="menu"] {
   background: #FFFFFF !important;
   color: #0F172A !important;
   backdrop-filter: blur(20px) !important;
@@ -2113,6 +2124,7 @@ html:not(.dark) body > div[role="menu"] {
   .bc-cta-gold {
     transition: none;
   }
+
   .bc-cta-gold:active:not(:disabled) {
     transform: none;
   }
@@ -2125,14 +2137,17 @@ html:not(.dark) body > div[role="menu"] {
     opacity: 0;
     transform: translateY(4px);
   }
+
   to {
     opacity: 1;
     transform: none;
   }
 }
+
 .bc-home-enter {
   animation: bc-home-enter 160ms ease-out;
 }
+
 @media (prefers-reduced-motion: reduce) {
   .bc-home-enter {
     animation: none;
@@ -2158,10 +2173,12 @@ html:not(.dark) body > div[role="menu"] {
     text-decoration-color 150ms ease-out;
   text-underline-offset: 3px;
 }
+
 .bc-app a:not(.bc-cta-gold):not(.bc-cta-gold-soft):hover {
   color: var(--bc-mobile-accent-strong);
   text-decoration-color: color-mix(in oklab, var(--bc-mobile-accent) 70%, transparent);
 }
+
 .bc-app a:not(.bc-cta-gold):not(.bc-cta-gold-soft):active {
   color: var(--bc-mobile-accent);
 }
@@ -2174,11 +2191,13 @@ html:not(.dark) body > div[role="menu"] {
   border-color: color-mix(in oklab, var(--bc-mobile-accent) 35%, transparent);
   color: var(--bc-mobile-accent-strong);
 }
+
 .bc-app button:not(.bc-cta-gold):not(.bc-cta-gold-soft):not(:disabled):active,
 .bc-app [role="button"]:not(.bc-cta-gold):not(.bc-cta-gold-soft):not([aria-disabled="true"]):active {
   background-color: color-mix(in oklab, var(--bc-mobile-accent) 18%, transparent);
   transform: translateY(1px);
 }
+
 .bc-app button:disabled,
 .bc-app [role="button"][aria-disabled="true"] {
   color: var(--bc-mobile-muted);
@@ -2213,12 +2232,14 @@ html:not(.dark) body > div[role="menu"] {
 .bc-app :is(input:not(.chat-input):not(.no-focus-outline), select, textarea:not(.chat-input):not(.no-focus-outline)):focus-visible {
   border-color: var(--bc-mobile-accent);
 }
+
 .bc-app :is(input, textarea)::placeholder,
 input::placeholder,
 textarea::placeholder {
   color: #64748b !important;
   opacity: 1 !important;
 }
+
 .dark .bc-app :is(input, textarea)::placeholder,
 .dark input::placeholder,
 .dark textarea::placeholder {
@@ -2242,6 +2263,7 @@ textarea::placeholder {
 
 /* Reduced motion: kill drawer/sheet animation inside the BC mobile shell. */
 @media (prefers-reduced-motion: reduce) {
+
   .bc-app [data-vaul-drawer],
   .bc-app [data-vaul-overlay],
   .bc-app [data-vaul-drawer] *,
@@ -2260,17 +2282,20 @@ textarea::placeholder {
 }
 
 .bg-grid-pattern {
-  background-image: linear-gradient(to right, rgba(255,255,255,0.02) 1px, transparent 1px),
-                    linear-gradient(to bottom, rgba(255,255,255,0.02) 1px, transparent 1px);
+  background-image: linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
   background-size: 24px 24px;
 }
 
 @keyframes pulse-dot {
-  0%, 100% {
+
+  0%,
+  100% {
     opacity: 0.2;
     transform: scale(0.8);
     box-shadow: 0 0 0px #D8B282;
   }
+
   50% {
     opacity: 1;
     transform: scale(1.2);
@@ -2319,6 +2344,7 @@ textarea::placeholder {
 .force-motion {
   scroll-behavior: smooth !important;
 }
+
 .force-motion *,
 .force-motion *::before,
 .force-motion *::after {
@@ -2335,12 +2361,15 @@ textarea::placeholder {
 .force-motion .vba-badge-pop {
   animation: vba-pop-in var(--motion-base) var(--motion-ease) both !important;
 }
+
 .force-motion .bc-home-enter {
   animation: bc-home-enter 160ms ease-out !important;
 }
+
 .force-motion .vba-animate {
   animation: vba-fade-in 0.15s cubic-bezier(0.16, 1, 0.3, 1) both !important;
 }
+
 .force-motion .vba-shimmer,
 .force-motion .vba-shine,
 .force-motion .data-dot,
@@ -2369,6 +2398,7 @@ textarea::placeholder {
   0% {
     transform: translateX(-100%) skewX(-15deg);
   }
+
   100% {
     transform: translateX(250%) skewX(-15deg);
   }
@@ -2381,14 +2411,12 @@ textarea::placeholder {
   left: 0;
   width: 50%;
   height: 100%;
-  background: linear-gradient(
-    to right,
-    rgba(255, 255, 255, 0) 0%,
-    rgba(255, 255, 255, 0.12) 30%,
-    rgba(255, 255, 255, 0.25) 50%,
-    rgba(255, 255, 255, 0.12) 70%,
-    rgba(255, 255, 255, 0) 100%
-  );
+  background: linear-gradient(to right,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.12) 30%,
+      rgba(255, 255, 255, 0.25) 50%,
+      rgba(255, 255, 255, 0.12) 70%,
+      rgba(255, 255, 255, 0) 100%);
   transform: translateX(-100%) skewX(-15deg);
 }
 
@@ -2419,10 +2447,12 @@ textarea::placeholder {
     transform: translate(-50%, -15%) scale(1) rotate(0deg);
     opacity: 0.55;
   }
+
   50% {
     transform: translate(-45%, -10%) scale(1.1) rotate(5deg);
     opacity: 0.75;
   }
+
   100% {
     transform: translate(-50%, -15%) scale(1) rotate(0deg);
     opacity: 0.55;
@@ -2434,10 +2464,12 @@ textarea::placeholder {
     transform: translate(15%, 15%) scale(1) rotate(0deg);
     opacity: 0.25;
   }
+
   50% {
     transform: translate(10%, 10%) scale(1.06) rotate(-5deg);
     opacity: 0.4;
   }
+
   100% {
     transform: translate(15%, 15%) scale(1) rotate(0deg);
     opacity: 0.25;
@@ -2451,11 +2483,9 @@ textarea::placeholder {
   transform: translate(-50%, 0);
   width: 100vw;
   height: 60vh;
-  background: radial-gradient(
-    ellipse at center,
-    color-mix(in oklab, var(--primary) 10%, transparent) 0%,
-    transparent 70%
-  );
+  background: radial-gradient(ellipse at center,
+      color-mix(in oklab, var(--primary) 10%, transparent) 0%,
+      transparent 70%);
   pointer-events: none;
   z-index: 0;
 }
@@ -2466,11 +2496,9 @@ textarea::placeholder {
   right: -5%;
   width: 70vw;
   height: 60vh;
-  background: radial-gradient(
-    ellipse at center,
-    color-mix(in oklab, var(--primary) 6%, transparent) 0%,
-    transparent 70%
-  );
+  background: radial-gradient(ellipse at center,
+      color-mix(in oklab, var(--primary) 6%, transparent) 0%,
+      transparent 70%);
   pointer-events: none;
   z-index: 0;
 }
@@ -2502,10 +2530,12 @@ textarea::placeholder {
     top: 5%;
     opacity: 0.8;
   }
+
   50% {
     top: 90%;
     opacity: 1;
   }
+
   100% {
     top: 5%;
     opacity: 0.8;
@@ -2528,6 +2558,7 @@ textarea::placeholder {
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }
@@ -2537,15 +2568,19 @@ textarea::placeholder {
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(-360deg);
   }
 }
 
 @keyframes floatingWave {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translateY(0px);
   }
+
   50% {
     transform: translateY(-12px);
   }
@@ -2605,7 +2640,8 @@ textarea::placeholder {
 .ceohn10-landing[data-theme="light"] .text-\[\#F6E1C3\],
 .ceohn10-landing[data-theme="light"] .text-\[\#D8B282\],
 .ceohn10-landing[data-theme="light"] .text-\[\#C4A07A\] {
-  color: #B45309 !important; /* Radiant Royal Amber Gold */
+  color: #B45309 !important;
+  /* Radiant Royal Amber Gold */
   font-weight: 700 !important;
 }
 
@@ -2614,7 +2650,8 @@ textarea::placeholder {
 .ceohn10-landing[data-theme="light"] .text-slate-200,
 .ceohn10-landing[data-theme="light"] .text-slate-300,
 .ceohn10-landing[data-theme="light"] .text-slate-400 {
-  color: #334155 !important; /* Crisp Slate for Subtitles */
+  color: #334155 !important;
+  /* Crisp Slate for Subtitles */
 }
 
 .ceohn10-landing[data-theme="light"] .text-amber-300,
@@ -2694,6 +2731,7 @@ input[placeholder*="Search"]:active,
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(-360deg);
   }
@@ -2703,6 +2741,7 @@ input[placeholder*="Search"]:active,
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }
@@ -2734,13 +2773,24 @@ input[placeholder*="Search"]:active,
 
 /* QR Ticket Floating Icon Vibration Animation */
 @keyframes qr-vibrate {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: rotate(0deg) scale(1);
   }
-  10%, 30%, 50%, 70%, 90% {
+
+  10%,
+  30%,
+  50%,
+  70%,
+  90% {
     transform: rotate(-7deg) scale(1.06);
   }
-  20%, 40%, 60%, 80% {
+
+  20%,
+  40%,
+  60%,
+  80% {
     transform: rotate(7deg) scale(1.06);
   }
 }
@@ -2752,24 +2802,32 @@ input[placeholder*="Search"]:active,
 
 /* AI Voice Assistant Robot Wobble Animation */
 @keyframes robot-wobble {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translateY(0) rotate(0deg) scale(1);
   }
+
   15% {
     transform: translateY(-5px) rotate(-8deg) scale(1.05);
   }
+
   30% {
     transform: translateY(-2px) rotate(8deg) scale(1.05);
   }
+
   45% {
     transform: translateY(-6px) rotate(-6deg) scale(1.04);
   }
+
   60% {
     transform: translateY(-1px) rotate(6deg) scale(1.03);
   }
+
   75% {
     transform: translateY(-3px) rotate(-3deg) scale(1.02);
   }
+
   90% {
     transform: translateY(0) rotate(2deg) scale(1);
   }
@@ -2785,10 +2843,12 @@ input[placeholder*="Search"]:active,
     box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7), 0 0 15px rgba(59, 130, 246, 0.5);
     transform: scale(1);
   }
+
   50% {
     box-shadow: 0 0 0 16px rgba(245, 158, 11, 0), 0 0 35px rgba(239, 68, 68, 0.8);
     transform: scale(1.08);
   }
+
   100% {
     box-shadow: 0 0 0 0 rgba(245, 158, 11, 0), 0 0 15px rgba(59, 130, 246, 0.5);
     transform: scale(1);
@@ -2803,40 +2863,54 @@ input[placeholder*="Search"]:active,
 .bg-Secondary-600 {
   background-color: #2563eb;
 }
+
 .text-Secondary-600 {
   color: #2563eb;
 }
+
 .outline-Secondary-600 {
   outline-color: #2563eb;
 }
+
 .border-Secondary-600 {
   border-color: #2563eb;
 }
+
 .bg-Primary-400 {
   background-color: #38bdf8;
 }
+
 .text-Primary-400 {
   color: #38bdf8;
 }
+
 .outline-Primary-400 {
   outline-color: #38bdf8;
 }
+
 .border-Primary-400 {
   border-color: #38bdf8;
 }
 
 /* ── Mobile Web App & PWA Performance Optimization ── */
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   -webkit-tap-highlight-color: transparent;
 }
 
-html, body {
+html,
+body {
   -webkit-text-size-adjust: 100%;
   overscroll-behavior-y: none;
 }
 
 /* Native App-like controls & buttons */
-button, a, [role="button"], input[type="button"], input[type="submit"] {
+button,
+a,
+[role="button"],
+input[type="button"],
+input[type="submit"] {
   touch-action: manipulation;
   user-select: none;
   -webkit-user-select: none;
@@ -2984,7 +3058,8 @@ body:has(.vba-app),
 /* ═══════════════════════════════════════════════════════════════════════════
    MOMO NATIVE APP PERFORMANCE (60-120FPS GPU ACCELERATION & ZERO DELAY TOUCH)
    ═══════════════════════════════════════════════════════════════════════════ */
-html, body {
+html,
+body {
   -webkit-touch-callout: none;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -2996,7 +3071,13 @@ html, body {
   -webkit-tap-highlight-color: transparent;
 }
 
-button, a, input, select, textarea, [role="button"], [role="tab"] {
+button,
+a,
+input,
+select,
+textarea,
+[role="button"],
+[role="tab"] {
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
 }
@@ -3038,13 +3119,16 @@ td[title] {
 html {
   background-color: #ffffff;
 }
+
 html.dark {
   background-color: var(--vba-bg, #070D1A);
 }
+
 body {
   min-height: 100dvh;
   background-color: #ffffff;
 }
+
 .dark body,
 body.dark {
   background-color: var(--vba-bg, #070D1A);
@@ -3054,9 +3138,11 @@ body.dark {
   html {
     background-color: #ffffff;
   }
+
   html.dark {
     background-color: var(--vba-bg, #070D1A);
   }
+
   body {
     min-height: 100dvh;
   }
@@ -3100,7 +3186,10 @@ body.dark {
   }
 
   /* Reset all background colors and text for ink-saving crisp contrast */
-  html, body, #root, .bg-crm-system {
+  html,
+  body,
+  #root,
+  .bg-crm-system {
     background: #ffffff !important;
     background-color: #ffffff !important;
     background-image: none !important;
@@ -3156,7 +3245,8 @@ body.dark {
     display: table-header-group !important;
   }
 
-  th, td {
+  th,
+  td {
     border: 1px solid #cbd5e1 !important;
     padding: 6px 10px !important;
     color: #0f172a !important;
@@ -3168,7 +3258,9 @@ body.dark {
   }
 
   /* Ensure card borders print neatly without dark backgrounds */
-  .rounded-2xl, .rounded-3xl, .rounded-xl {
+  .rounded-2xl,
+  .rounded-3xl,
+  .rounded-xl {
     border-radius: 4px !important;
     border-color: #e2e8f0 !important;
     background: #ffffff !important;
@@ -3258,12 +3350,15 @@ html.dark .dark\:bg-\[\#003B95\] *,
     top: 15%;
     opacity: 0;
   }
+
   15% {
     opacity: 1;
   }
+
   85% {
     opacity: 1;
   }
+
   100% {
     top: 85%;
     opacity: 0;
@@ -3271,9 +3366,12 @@ html.dark .dark\:bg-\[\#003B95\] *,
 }
 
 @keyframes momoLaserPulse {
-  0%, 100% {
+
+  0%,
+  100% {
     opacity: 0.05;
   }
+
   50% {
     opacity: 0.22;
   }
@@ -3321,14 +3419,37 @@ button.bg-\[\#003b95\] *:not([class*="bg-"]) {
 }
 
 /* Custom poster & typography font families */
-.font-cinzel { font-family: 'Cinzel', serif; }
-.font-playfair { font-family: 'Playfair Display', Georgia, serif; }
-.font-cormorant { font-family: 'Cormorant Garamond', Georgia, serif; }
-.font-montserrat { font-family: 'Montserrat', sans-serif; }
-.font-orbitron { font-family: 'Orbitron', monospace, sans-serif; }
-.font-dancing { font-family: 'Dancing Script', cursive; }
-.font-great-vibes { font-family: 'Great Vibes', cursive; }
-.font-vietnam { font-family: 'Be Vietnam Pro', sans-serif; }
+.font-cinzel {
+  font-family: 'Cinzel', serif;
+}
+
+.font-playfair {
+  font-family: 'Playfair Display', Georgia, serif;
+}
+
+.font-cormorant {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+}
+
+.font-montserrat {
+  font-family: 'Montserrat', sans-serif;
+}
+
+.font-orbitron {
+  font-family: 'Orbitron', monospace, sans-serif;
+}
+
+.font-dancing {
+  font-family: 'Dancing Script', cursive;
+}
+
+.font-great-vibes {
+  font-family: 'Great Vibes', cursive;
+}
+
+.font-vietnam {
+  font-family: 'Be Vietnam Pro', sans-serif;
+}
 
 /* Fix Footer App CEO HN10 luôn bám sát đáy thiết bị mobile */
 .vba-bottom-bar {
@@ -3336,5 +3457,3 @@ button.bg-\[\#003b95\] *:not([class*="bg-"]) {
   margin-bottom: 0px !important;
   transform: translateZ(0);
 }
-
-

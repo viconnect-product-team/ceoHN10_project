@@ -19,16 +19,16 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   return (
     <CommandPaletteProvider>
-      <div className="flex min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors duration-300 relative">
+      <div className="flex min-h-screen bg-[#000000] text-[#FFFFFF] transition-colors duration-300 relative">
         {/* Desktop sidebar */}
         <Sidebar />
 
         {/* Mobile drawer (swipe + tap-outside to close) */}
         <MobileMenuDrawer open={mobileOpen} onOpenChange={setMobileOpen} />
 
-        <div className="flex min-w-0 flex-1 flex-col bg-slate-50 dark:bg-slate-950">
+        <div className="flex min-w-0 flex-1 flex-col bg-[#000000] text-[#FFFFFF]">
           <Topbar onMenuClick={() => setMobileOpen(true)} />
-          <main className="flex-1 min-w-0 bg-crm-system px-4 py-6 lg:px-8">{children}</main>
+          <main className="flex-1 min-w-0 bg-crm-system px-4 py-6 lg:px-8 text-[#FFFFFF]">{children}</main>
           <BottomNav onMenuClick={() => setMobileOpen(true)} />
         </div>
 

@@ -346,7 +346,7 @@ export function AdminThemeManagementPage() {
           }
         }
       })
-      .catch(() => {});
+      .catch(() => { });
 
     // Khởi tạo dynamic theme ngay khi tải trang
     const initialTheme = isEventThemeEnabled() ? getEffectiveThemeOption() : null;
@@ -701,11 +701,10 @@ export function AdminThemeManagementPage() {
           <button
             type="button"
             onClick={() => setActiveTab("catalog")}
-            className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-              activeTab === "catalog"
-                ? "bg-amber-500 text-white shadow-sm"
-                : "bg-muted text-muted-foreground hover:text-foreground"
-            }`}
+            className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${activeTab === "catalog"
+              ? "bg-amber-500 text-white shadow-sm"
+              : "bg-muted text-muted-foreground hover:text-foreground"
+              }`}
           >
             <Palette className="w-4 h-4" />
             <span>Kho Chủ Đề Lễ Hội Mẫu (Presets)</span>
@@ -714,11 +713,10 @@ export function AdminThemeManagementPage() {
           <button
             type="button"
             onClick={() => setActiveTab("studio")}
-            className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-              activeTab === "studio"
-                ? "bg-amber-500 text-white shadow-sm"
-                : "bg-muted text-muted-foreground hover:text-foreground"
-            }`}
+            className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${activeTab === "studio"
+              ? "bg-amber-500 text-white shadow-sm"
+              : "bg-muted text-muted-foreground hover:text-foreground"
+              }`}
           >
             <Sliders className="w-4 h-4" />
             <span>Bộ Studio Tùy Biến Bố Cục, Giao Diện & Icon (Tùy Chỉnh)</span>
@@ -750,11 +748,10 @@ export function AdminThemeManagementPage() {
                 return (
                   <div
                     key={theme.id}
-                    className={`group relative flex flex-col rounded-2xl border transition-all duration-200 overflow-hidden bg-card ${
-                      isActive
-                        ? "border-amber-500 shadow-md ring-2 ring-amber-500/20"
-                        : "border-border hover:border-amber-500/50 hover:shadow-sm"
-                    }`}
+                    className={`group relative flex flex-col rounded-2xl border transition-all duration-200 overflow-hidden bg-card ${isActive
+                      ? "border-amber-500 shadow-md ring-2 ring-amber-500/20"
+                      : "border-border hover:border-amber-500/50 hover:shadow-sm"
+                      }`}
                   >
                     {/* Visual Card Header */}
                     <div
@@ -825,11 +822,10 @@ export function AdminThemeManagementPage() {
                             type="button"
                             onClick={() => handleApplyPresetTheme(theme)}
                             disabled={isActive}
-                            className={`flex-1 rounded-xl py-2 text-xs font-bold transition text-center shadow-xs cursor-pointer ${
-                              isActive
-                                ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 cursor-default"
-                                : "bg-amber-500 hover:bg-amber-600 text-white"
-                            }`}
+                            className={`flex-1 rounded-xl py-2 text-xs font-bold transition text-center shadow-xs cursor-pointer ${isActive
+                              ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 cursor-default"
+                              : "bg-amber-500 hover:bg-amber-600 text-white"
+                              }`}
                           >
                             {isActive ? "Đang áp dụng" : "Áp dụng ngay"}
                           </button>
@@ -913,11 +909,10 @@ export function AdminThemeManagementPage() {
                           key={c.val}
                           type="button"
                           onClick={() => setCustomLayoutGrid(c.val as LayoutGridCols)}
-                          className={`p-2.5 rounded-xl border text-xs font-semibold transition cursor-pointer text-center ${
-                            customLayoutGrid === c.val
-                              ? "border-amber-500 bg-amber-500/10 text-amber-600 dark:text-amber-400 font-bold"
-                              : "border-border bg-background text-muted-foreground hover:bg-muted"
-                          }`}
+                          className={`p-2.5 rounded-xl border text-xs font-semibold transition cursor-pointer text-center ${customLayoutGrid === c.val
+                            ? "border-amber-500 bg-amber-500/10 text-amber-600 dark:text-amber-400 font-bold"
+                            : "border-border bg-background text-muted-foreground hover:bg-muted"
+                            }`}
                         >
                           {c.label}
                         </button>
@@ -940,11 +935,10 @@ export function AdminThemeManagementPage() {
                           key={r.val}
                           type="button"
                           onClick={() => setCustomBorderRadius(r.val as BorderRadiusStyle)}
-                          className={`p-2.5 rounded-xl border text-xs font-semibold transition cursor-pointer text-center ${
-                            customBorderRadius === r.val
-                              ? "border-amber-500 bg-amber-500/10 text-amber-600 dark:text-amber-400 font-bold"
-                              : "border-border bg-background text-muted-foreground hover:bg-muted"
-                          }`}
+                          className={`p-2.5 rounded-xl border text-xs font-semibold transition cursor-pointer text-center ${customBorderRadius === r.val
+                            ? "border-amber-500 bg-amber-500/10 text-amber-600 dark:text-amber-400 font-bold"
+                            : "border-border bg-background text-muted-foreground hover:bg-muted"
+                            }`}
                         >
                           {r.label}
                         </button>
@@ -1090,9 +1084,8 @@ export function AdminThemeManagementPage() {
                             setCustomAppBackgroundStyle("custom-image");
                             toast.success(`Đã chọn mẫu nền "${bg.name}"!`);
                           }}
-                          className={`relative h-14 rounded-xl overflow-hidden border text-left p-1.5 transition hover:scale-102 cursor-pointer ${
-                            customBackgroundUrl === bg.url ? "border-amber-500 ring-2 ring-amber-500/40" : "border-border"
-                          }`}
+                          className={`relative h-14 rounded-xl overflow-hidden border text-left p-1.5 transition hover:scale-102 cursor-pointer ${customBackgroundUrl === bg.url ? "border-amber-500 ring-2 ring-amber-500/40" : "border-border"
+                            }`}
                         >
                           <img src={bg.url} alt={bg.name} className="absolute inset-0 h-full w-full object-cover" />
                           <div className="absolute inset-0 bg-black/50 hover:bg-black/30 transition" />
@@ -1151,11 +1144,10 @@ export function AdminThemeManagementPage() {
                     return (
                       <div
                         key={item.key}
-                        className={`p-2.5 rounded-xl border transition ${
-                          isEditing
-                            ? "border-amber-500 bg-amber-500/10 shadow-xs"
-                            : "border-border bg-background hover:bg-muted/40"
-                        }`}
+                        className={`p-2.5 rounded-xl border transition ${isEditing
+                          ? "border-amber-500 bg-amber-500/10 shadow-xs"
+                          : "border-border bg-background hover:bg-muted/40"
+                          }`}
                       >
                         <div className="flex items-center justify-between mb-1.5">
                           <span className="text-xs font-bold text-foreground truncate">{item.name}</span>
@@ -1238,11 +1230,10 @@ export function AdminThemeManagementPage() {
                         key={st.id}
                         type="button"
                         onClick={() => setCustomIconStyle(st.id as IconStyleType)}
-                        className={`p-2.5 rounded-xl border text-left transition cursor-pointer ${
-                          customIconStyle === st.id
-                            ? "border-amber-500 bg-amber-500/10 text-amber-600 dark:text-amber-400 font-bold"
-                            : "border-border bg-background text-muted-foreground hover:bg-muted"
-                        }`}
+                        className={`p-2.5 rounded-xl border text-left transition cursor-pointer ${customIconStyle === st.id
+                          ? "border-amber-500 bg-amber-500/10 text-amber-600 dark:text-amber-400 font-bold"
+                          : "border-border bg-background text-muted-foreground hover:bg-muted"
+                          }`}
                       >
                         <div className="text-xs font-bold leading-tight">{st.label}</div>
                         <div className="text-[10px] text-muted-foreground mt-0.5">{st.desc}</div>
@@ -1266,11 +1257,10 @@ export function AdminThemeManagementPage() {
                         key={eff.id}
                         type="button"
                         onClick={() => setCustomEffectType(eff.id as EffectType)}
-                        className={`p-2 rounded-xl border text-center transition cursor-pointer ${
-                          customEffectType === eff.id
-                            ? "border-amber-500 bg-amber-500/10 text-amber-600 dark:text-amber-400 font-bold"
-                            : "border-border bg-background text-muted-foreground hover:bg-muted"
-                        }`}
+                        className={`p-2 rounded-xl border text-center transition cursor-pointer ${customEffectType === eff.id
+                          ? "border-amber-500 bg-amber-500/10 text-amber-600 dark:text-amber-400 font-bold"
+                          : "border-border bg-background text-muted-foreground hover:bg-muted"
+                          }`}
                       >
                         <div className="text-base">{eff.emoji}</div>
                         <div className="text-[11px] font-semibold mt-0.5">{eff.label}</div>
@@ -1346,13 +1336,12 @@ export function AdminThemeManagementPage() {
 
                   {/* Quick Actions Grid Preview */}
                   <div
-                    className={`p-3 bg-slate-900/90 border transition-all duration-300 ${
-                      customBorderRadius === "rounded-3xl"
-                        ? "rounded-3xl"
-                        : customBorderRadius === "rounded-xl"
+                    className={`p-3 bg-slate-900/90 border transition-all duration-300 ${customBorderRadius === "rounded-3xl"
+                      ? "rounded-3xl"
+                      : customBorderRadius === "rounded-xl"
                         ? "rounded-xl"
                         : "rounded-2xl"
-                    }`}
+                      }`}
                     style={{ borderColor: `${customPrimaryColor}40` }}
                   >
                     <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-2 flex items-center justify-between">
@@ -1367,13 +1356,12 @@ export function AdminThemeManagementPage() {
                       {ALL_ACTION_ITEMS.slice(0, customLayoutGrid === "3" ? 9 : 8).map((item) => (
                         <div key={item.key} className="flex flex-col items-center gap-1 p-1">
                           <div
-                            className={`h-10 w-10 flex items-center justify-center text-lg transition-all duration-200 ${
-                              customBorderRadius === "rounded-3xl"
-                                ? "rounded-2xl"
-                                : customBorderRadius === "rounded-xl"
+                            className={`h-10 w-10 flex items-center justify-center text-lg transition-all duration-200 ${customBorderRadius === "rounded-3xl"
+                              ? "rounded-2xl"
+                              : customBorderRadius === "rounded-xl"
                                 ? "rounded-lg"
                                 : "rounded-xl"
-                            }`}
+                              }`}
                             style={{
                               backgroundColor: `${customPrimaryColor}25`,
                               borderColor: `${customPrimaryColor}50`,

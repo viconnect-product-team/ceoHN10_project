@@ -256,9 +256,9 @@ function NavItem({
     }`;
   const badgeEl = showBadge ? (
     collapsed ? (
-      <span className="vba-badge-pop absolute right-1.5 top-1.5 h-2.5 w-2.5 rounded-full bg-rose-600 ring-2 ring-sidebar" />
+      <span className="vba-badge-pop absolute right-1.5 top-1.5 h-2.5 w-2.5 rounded-full bg-[#D61F69] ring-2 ring-sidebar" />
     ) : (
-      <span className="vba-badge-pop inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-rose-600 px-1.5 text-[10px] font-black text-white !text-white shadow-xs select-none">
+      <span className="vba-badge-pop inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-gradient-to-r from-[#7C2D82] to-[#D61F69] px-1.5 text-[10px] font-black text-white !text-white shadow-xs select-none">
         {badgeText}
       </span>
     )
@@ -356,7 +356,7 @@ function NavItem({
                   <span className="truncate">{child.label}</span>
                 </div>
                 {hasChildBadge && (
-                  <span className="vba-badge-pop shrink-0 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-rose-600 px-1 text-[9px] font-black text-white !text-white shadow-xs select-none">
+                  <span className="vba-badge-pop shrink-0 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-gradient-to-r from-[#7C2D82] to-[#D61F69] px-1 text-[9px] font-black text-white !text-white shadow-xs select-none">
                     {childBadge > 99 ? "99+" : childBadge}
                   </span>
                 )}
