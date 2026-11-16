@@ -428,7 +428,7 @@ function UnifiedCheckinManagementPage() {
                   {currentSession.location}
                 </span>
                 {currentSession.isOnline && (
-                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300 font-bold text-[11px]">
+                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-blue-100 text-[#003B95] font-bold text-[11px]">
                     <Video className="size-3.5" /> Online
                   </span>
                 )}

@@ -51,6 +51,21 @@
     * Đạt chuẩn 0 lỗi TypeScript (`tsc --noEmit`) trên cả Backend và Frontend.
     * Tuyệt đối không tự ý chạy `git push` hay `git commit`.
 
+- **Bản cập nhật ngày 17/11/2026 (v12.7): Loại Bỏ Triệt Để Dark Mode & Cố Định Light Theme, Chuẩn Hóa Mã Màu Nút Đơn Sắc, Mở Rộng Danh Xưng Lớp Trưởng / Lớp Phó, & Tối Ưu Kết Nối Dev Server 10443 ([NODE-CORE-001], [NODE-CORE-005], [NODE-CRM-001] -> [NODE-CRM-017], [NODE-APP-001] -> [NODE-APP-014])**:
+  - **1. Loại bỏ 100% Theme Tối (Dark Mode) trên toàn hệ thống**:
+    * Toàn bộ Web CRM và Mobile App cố định `theme = "light"`, xóa bỏ ThemeSwitcher, khóa setTheme chỉ trả về "light", gán cố định `html class="light" data-theme="light"`.
+  - **2. Chuẩn hóa nút bấm đơn sắc (Solid Color Buttons)**:
+    * Loại bỏ triệt để màu tím (`#7C2D82`, `bg-purple-*`, `bg-violet-*`) và dải màu gradient (`bg-gradient-*`).
+    * Quy về các mã màu đơn sắc: Primary (Xanh doanh nhân `#003B95` hoặc Đỏ `#DC2626`), Success (Xanh lá `#16A34A`), Danger (Đỏ `#DC2626`), Secondary (Trắng `#FFFFFF` viền xám `#E2E8F0`), Warning/Remind (Vàng hổ phách `#D97706`), Excel/Report (Xanh ngọc lục bảo `#059669`).
+  - **3. Hỗ trợ tài khoản Quản trị `admini@connect.vn` & Danh xưng Lớp trưởng, Lớp phó**:
+    * Backend: Bổ sung nhận diện `admini@connect.vn` là superadmin song hành cùng `admin@connect.vn` và `admin@viconnect.vn`.
+    * Frontend: Bổ sung `pho_chu_tich` vào `SystemRoleKey`, cập nhật tên chức vụ: `Chủ tịch (Lớp trưởng)` và `Phó Chủ tịch (Lớp phó)`.
+  - **4. Sửa lỗi cú pháp PowerShell & Tối ưu hóa Nginx Proxy trên Dev Server**:
+    * Sửa lỗi `TerminatorExpectedAtEndOfString` trong `deploy-crm.ps1`, `deploy-mobile.ps1`, và `deploy-ssl.ps1`.
+    * Cập nhật `setup-ssl.sh`: Bổ sung `ufw reload` sau khi allow các cổng `10443, 10444, 10445, 5020..5023`, kiểm tra port binding `ss -tulpn`.
+  - **5. Kiểm tra chất lượng mã nguồn (Type Check)**:
+    * Cả `apps/ceohn10_app_fe` và `apps/ceohn10_app_be` đều vượt qua `tsc --noEmit` với **0 lỗi (Exit Code 0)**.
+
 - **Bản cập nhật ngày 16/11/2026 (v12.6): Chuẩn Hóa Cổng Quản Trị Web CRM Cho Môi Trường Dev IP Trực Tiếp (`https://14.225.217.232:10443`) & Cổng Đăng Nhập (`https://14.225.217.232:10443/auth`) ([NODE-CORE-005], [NODE-CRM-001])**:
   - **1. Đáp ứng yêu cầu triển khai tạm thời qua IP Dev Server**:
     * Do tên miền `https://crm_ceohn10.viconnect.vn` chưa hoàn tất cấu hình DNS subdomain, toàn bộ luồng Web CRM hiện tại được định tuyến và phục vụ trực tiếp qua:
@@ -1675,6 +1690,21 @@
     * CSDL duy nhất: `113.20.107.184:6432` (`ceohn10_project`). Không mock/fake data.
     * Đạt chuẩn 0 lỗi TypeScript (`tsc --noEmit`) trên cả Backend và Frontend.
     * Tuyệt đối không tự ý chạy `git push` hay `git commit`.
+
+- **Bản cập nhật ngày 17/11/2026 (v12.7): Loại Bỏ Triệt Để Dark Mode & Cố Định Light Theme, Chuẩn Hóa Mã Màu Nút Đơn Sắc, Mở Rộng Danh Xưng Lớp Trưởng / Lớp Phó, & Tối Ưu Kết Nối Dev Server 10443 ([NODE-CORE-001], [NODE-CORE-005], [NODE-CRM-001] -> [NODE-CRM-017], [NODE-APP-001] -> [NODE-APP-014])**:
+  - **1. Loại bỏ 100% Theme Tối (Dark Mode) trên toàn hệ thống**:
+    * Toàn bộ Web CRM và Mobile App cố định `theme = "light"`, xóa bỏ ThemeSwitcher, khóa setTheme chỉ trả về "light", gán cố định `html class="light" data-theme="light"`.
+  - **2. Chuẩn hóa nút bấm đơn sắc (Solid Color Buttons)**:
+    * Loại bỏ triệt để màu tím (`#7C2D82`, `bg-purple-*`, `bg-violet-*`) và dải màu gradient (`bg-gradient-*`).
+    * Quy về các mã màu đơn sắc: Primary (Xanh doanh nhân `#003B95` hoặc Đỏ `#DC2626`), Success (Xanh lá `#16A34A`), Danger (Đỏ `#DC2626`), Secondary (Trắng `#FFFFFF` viền xám `#E2E8F0`), Warning/Remind (Vàng hổ phách `#D97706`), Excel/Report (Xanh ngọc lục bảo `#059669`).
+  - **3. Hỗ trợ tài khoản Quản trị `admini@connect.vn` & Danh xưng Lớp trưởng, Lớp phó**:
+    * Backend: Bổ sung nhận diện `admini@connect.vn` là superadmin song hành cùng `admin@connect.vn` và `admin@viconnect.vn`.
+    * Frontend: Bổ sung `pho_chu_tich` vào `SystemRoleKey`, cập nhật tên chức vụ: `Chủ tịch (Lớp trưởng)` và `Phó Chủ tịch (Lớp phó)`.
+  - **4. Sửa lỗi cú pháp PowerShell & Tối ưu hóa Nginx Proxy trên Dev Server**:
+    * Sửa lỗi `TerminatorExpectedAtEndOfString` trong `deploy-crm.ps1`, `deploy-mobile.ps1`, và `deploy-ssl.ps1`.
+    * Cập nhật `setup-ssl.sh`: Bổ sung `ufw reload` sau khi allow các cổng `10443, 10444, 10445, 5020..5023`, kiểm tra port binding `ss -tulpn`.
+  - **5. Kiểm tra chất lượng mã nguồn (Type Check)**:
+    * Cả `apps/ceohn10_app_fe` và `apps/ceohn10_app_be` đều vượt qua `tsc --noEmit` với **0 lỗi (Exit Code 0)**.
 
 - **Bản cập nhật ngày 16/11/2026 (v12.6): Chuẩn Hóa Cổng Quản Trị Web CRM Cho Môi Trường Dev IP Trực Tiếp (`https://14.225.217.232:10443`) & Cổng Đăng Nhập (`https://14.225.217.232:10443/auth`) ([NODE-CORE-005], [NODE-CRM-001])**:
   - **1. Đáp ứng yêu cầu triển khai tạm thời qua IP Dev Server**:
@@ -4464,6 +4494,21 @@
     * CSDL duy nhất: `113.20.107.184:6432` (`ceohn10_project`). Không mock/fake data.
     * Đạt chuẩn 0 lỗi TypeScript (`tsc --noEmit`) trên cả Backend và Frontend.
     * Tuyệt đối không tự ý chạy `git push` hay `git commit`.
+
+- **Bản cập nhật ngày 17/11/2026 (v12.7): Loại Bỏ Triệt Để Dark Mode & Cố Định Light Theme, Chuẩn Hóa Mã Màu Nút Đơn Sắc, Mở Rộng Danh Xưng Lớp Trưởng / Lớp Phó, & Tối Ưu Kết Nối Dev Server 10443 ([NODE-CORE-001], [NODE-CORE-005], [NODE-CRM-001] -> [NODE-CRM-017], [NODE-APP-001] -> [NODE-APP-014])**:
+  - **1. Loại bỏ 100% Theme Tối (Dark Mode) trên toàn hệ thống**:
+    * Toàn bộ Web CRM và Mobile App cố định `theme = "light"`, xóa bỏ ThemeSwitcher, khóa setTheme chỉ trả về "light", gán cố định `html class="light" data-theme="light"`.
+  - **2. Chuẩn hóa nút bấm đơn sắc (Solid Color Buttons)**:
+    * Loại bỏ triệt để màu tím (`#7C2D82`, `bg-purple-*`, `bg-violet-*`) và dải màu gradient (`bg-gradient-*`).
+    * Quy về các mã màu đơn sắc: Primary (Xanh doanh nhân `#003B95` hoặc Đỏ `#DC2626`), Success (Xanh lá `#16A34A`), Danger (Đỏ `#DC2626`), Secondary (Trắng `#FFFFFF` viền xám `#E2E8F0`), Warning/Remind (Vàng hổ phách `#D97706`), Excel/Report (Xanh ngọc lục bảo `#059669`).
+  - **3. Hỗ trợ tài khoản Quản trị `admini@connect.vn` & Danh xưng Lớp trưởng, Lớp phó**:
+    * Backend: Bổ sung nhận diện `admini@connect.vn` là superadmin song hành cùng `admin@connect.vn` và `admin@viconnect.vn`.
+    * Frontend: Bổ sung `pho_chu_tich` vào `SystemRoleKey`, cập nhật tên chức vụ: `Chủ tịch (Lớp trưởng)` và `Phó Chủ tịch (Lớp phó)`.
+  - **4. Sửa lỗi cú pháp PowerShell & Tối ưu hóa Nginx Proxy trên Dev Server**:
+    * Sửa lỗi `TerminatorExpectedAtEndOfString` trong `deploy-crm.ps1`, `deploy-mobile.ps1`, và `deploy-ssl.ps1`.
+    * Cập nhật `setup-ssl.sh`: Bổ sung `ufw reload` sau khi allow các cổng `10443, 10444, 10445, 5020..5023`, kiểm tra port binding `ss -tulpn`.
+  - **5. Kiểm tra chất lượng mã nguồn (Type Check)**:
+    * Cả `apps/ceohn10_app_fe` và `apps/ceohn10_app_be` đều vượt qua `tsc --noEmit` với **0 lỗi (Exit Code 0)**.
 
 - **Bản cập nhật ngày 16/11/2026 (v12.6): Chuẩn Hóa Cổng Quản Trị Web CRM Cho Môi Trường Dev IP Trực Tiếp (`https://14.225.217.232:10443`) & Cổng Đăng Nhập (`https://14.225.217.232:10443/auth`) ([NODE-CORE-005], [NODE-CRM-001])**:
   - **1. Đáp ứng yêu cầu triển khai tạm thời qua IP Dev Server**:

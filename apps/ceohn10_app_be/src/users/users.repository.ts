@@ -12,7 +12,12 @@ export class UsersRepository {
 
     const inputLower = input.toLowerCase();
     const isMediaAccount = inputLower === 'info@viconnect.vn' || inputLower === 'infor@viconnect.vn';
-    const queryVariants = isMediaAccount ? ['infor@viconnect.vn', 'info@viconnect.vn'] : [input];
+    const isAdminAccount = inputLower === 'admin@connect.vn' || inputLower === 'admini@connect.vn' || inputLower === 'admin@viconnect.vn';
+    const queryVariants = isMediaAccount
+      ? ['infor@viconnect.vn', 'info@viconnect.vn']
+      : isAdminAccount
+      ? ['admin@connect.vn', 'admini@connect.vn', 'admin@viconnect.vn']
+      : [input];
 
     // 1. Direct match on username or email
     const user = await this.prisma.vione_users

@@ -767,8 +767,8 @@ function DocsPage() {
                     : d.shareScope === "internal"
                       ? "bg-blue-500/15 text-blue-700 dark:text-blue-400"
                       : d.shareScope === "specific"
-                        ? "bg-purple-500/15 text-purple-700 dark:text-purple-400"
-                        : "bg-slate-500/15 text-slate-700 dark:text-slate-400"
+                        ? "bg-amber-500/15 text-amber-700"
+                        : "bg-slate-500/15 text-slate-700"
                   }`}
               >
                 {d.shareScope === "public" && "🌐 Công khai"}

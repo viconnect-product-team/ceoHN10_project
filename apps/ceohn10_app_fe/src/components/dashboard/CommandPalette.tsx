@@ -8,7 +8,6 @@ import {
   type ReactNode,
 } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { Contrast, Moon, Sun } from "lucide-react";
 import {
   CommandDialog,
   CommandInput,
@@ -21,7 +20,6 @@ import {
 import { navGroups } from "@/lib/nav-items";
 import { useT } from "@/lib/i18n";
 import { useRole } from "@/hooks/use-role";
-import { useTheme } from "@/lib/theme";
 
 type Ctx = { open: boolean; setOpen: (v: boolean) => void; toggle: () => void };
 const CommandPaletteContext = createContext<Ctx | null>(null);
@@ -82,7 +80,6 @@ function CommandPalette() {
   const t = useT();
   const navigate = useNavigate();
   const { isPlatformAdmin } = useRole();
-  const { theme, toggle: toggleTheme } = useTheme();
   const [recent, setRecent] = useState<string[]>([]);
 
   useEffect(() => {
@@ -131,24 +128,7 @@ function CommandPalette() {
           </CommandGroup>
         )}
 
-        <CommandGroup heading={t("cmd.actions")}>
-          <CommandItem
-            value="theme toggle dark light contrast tuong phan"
-            onSelect={() => {
-              toggleTheme();
-              setOpen(false);
-            }}
-          >
-            {theme === "light" ? <Moon /> : theme === "dark" ? <Contrast /> : <Sun />}
-            <span>
-              {theme === "light"
-                ? t("theme.dark")
-                : theme === "dark"
-                  ? t("theme.contrast")
-                  : t("theme.light")}
-            </span>
-          </CommandItem>
-        </CommandGroup>
+
 
         {groups.map((group, i) => (
           <CommandGroup key={i} heading={group.label ? t(group.label) : t("cmd.navigation")}>

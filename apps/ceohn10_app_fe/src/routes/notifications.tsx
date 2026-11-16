@@ -98,7 +98,7 @@ const AUDIENCE_KEY: Record<Notification["audience"], TKey> = {
 const SCOPE_CONFIG: Record<string, { label: string; bg: string; text: string; border: string }> = {
   crm: { label: "CRM Quản trị", bg: "bg-blue-500/10", text: "text-blue-600 dark:text-blue-400", border: "border-blue-500/20" },
   association_app: { label: "App Hiệp Hội CEO HN10", bg: "bg-emerald-500/10", text: "text-emerald-600 dark:text-emerald-400", border: "border-emerald-500/20" },
-  all: { label: "Toàn hệ thống", bg: "bg-purple-500/10", text: "text-purple-600 dark:text-purple-400", border: "border-purple-500/20" },
+  all: { label: "Toàn hệ thống", bg: "bg-blue-500/10", text: "text-[#003B95]", border: "border-blue-500/20" },
 };
 
 type SubFilterType = "all" | "new_members" | "fee_alerts" | "admin_system" | "events_meetings";
@@ -152,9 +152,9 @@ function getNotificationCategory(n: Notification): {
     return {
       id: "new_members",
       label: "Hội viên mới",
-      badgeBg: "bg-purple-500/10",
-      badgeText: "text-purple-600 dark:text-purple-400",
-      badgeBorder: "border-purple-500/25",
+      badgeBg: "bg-blue-500/10",
+      badgeText: "text-[#003B95]",
+      badgeBorder: "border-blue-500/25",
       icon: UserCheck,
       actionUrl: "/members?status=pending",
       actionLabel: "Duyệt hồ sơ",
@@ -1564,7 +1564,7 @@ function NotifyPage() {
               <div className="p-5 rounded-2xl border border-border bg-card shadow-xs space-y-3 hover:shadow-md transition">
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-2.5">
-                    <div className="size-9 rounded-xl bg-purple-500/10 text-purple-600 dark:text-purple-400 flex items-center justify-center">
+                    <div className="size-9 rounded-xl bg-amber-500/10 text-amber-600 flex items-center justify-center">
                       <Sparkles className="size-5" />
                     </div>
                     <div>
@@ -1576,7 +1576,7 @@ function NotifyPage() {
                       </span>
                     </div>
                   </div>
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-100 text-purple-800 dark:bg-purple-950 dark:text-purple-300">
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800">
                     Bản tin ngày
                   </span>
                 </div>

@@ -350,11 +350,11 @@ function TasksPage() {
             <button
               type="button"
               onClick={() => setAiExtractorOpen(true)}
-              className="inline-flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-gradient-to-r from-blue-700 via-indigo-600 to-[#003B95] hover:opacity-95 text-white text-xs font-bold shadow-md shadow-blue-500/20 transition cursor-pointer"
+              className="inline-flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-[#003B95] hover:bg-[#002B70] text-white text-xs font-bold shadow-sm transition cursor-pointer"
               title="Tự động bóc tách task, gợi ý giải pháp và phân công nhân sự các Ban từ file Word/Excel/văn bản họp"
             >
-              <Sparkles className="w-4 h-4 text-amber-300 animate-pulse" />
-              <span>✨ AI Bóc Tách Task (Word/Excel)</span>
+              <Sparkles className="w-4 h-4 text-amber-300" />
+              <span>AI Bóc Tách Task (Word/Excel)</span>
             </button>
 
             <button
@@ -402,9 +402,9 @@ function TasksPage() {
             <button
               type="button"
               onClick={() => handleOpenCreate('TODO')}
-              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 hover:from-amber-400 hover:to-amber-500 text-slate-950 text-xs font-black shadow-md shadow-amber-500/20 transition"
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#DC2626] hover:bg-[#B91C1C] text-white text-xs font-bold shadow-sm transition cursor-pointer"
             >
-              <Plus className="w-4 h-4 text-slate-950" />
+              <Plus className="w-4 h-4 text-white" />
               Thêm công việc mới
             </button>
           </div>

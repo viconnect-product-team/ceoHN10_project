@@ -715,8 +715,8 @@ function MeetingsPage() {
           </div>
         </div>
 
-        {/* Card 2: Chờ Quản Trị Duyệt (Violet gradient - Indigo) */}
-        <div className="h-32 p-4 bg-gradient-to-b from-violet-100 to-violet-50 dark:from-violet-950/40 dark:to-slate-900 rounded-[20px] outline outline-[0.50px] outline-slate-200 dark:outline-slate-800 flex flex-col justify-start items-start gap-2.5 overflow-hidden shadow-xs">
+        {/* Card 2: Chờ Quản Trị Duyệt */}
+        <div className="h-32 p-4 bg-white rounded-[20px] outline outline-[0.50px] outline-slate-200 flex flex-col justify-start items-start gap-2.5 overflow-hidden shadow-xs">
           <div className="h-8 flex items-center gap-2">
             <img src="/icons/ceohn10_icon_2/shield-check.svg" className="h-4 w-4" alt="pending" onError={(e) => { (e.currentTarget as HTMLElement).style.display = 'none'; }} />
             <div className="text-indigo-500 dark:text-indigo-400 text-xs font-semibold font-['Inter']">CHỜ QUẢN TRỊ DUYỆT</div>

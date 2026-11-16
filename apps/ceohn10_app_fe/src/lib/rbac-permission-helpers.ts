@@ -8,6 +8,7 @@ export const RBAC_MATRIX_STORAGE_KEY = "ceohn10_rbac_tree_matrix_v7_sidebar_menu
 export type SystemRoleKey =
   | "quan_tri"
   | "chu_tich"
+  | "pho_chu_tich"
   | "admin"
   | "tong_thu_ky"
   | "truong_ban_dieu_hanh"
@@ -46,10 +47,17 @@ export const SYSTEM_5_ROLES: SystemRoleDef[] = [
   },
   {
     key: "chu_tich",
-    name: "Chủ tịch",
-    shortName: "Chủ tịch",
+    name: "Chủ tịch (Lớp trưởng)",
+    shortName: "Chủ tịch / Lớp trưởng",
     color: "text-amber-800 bg-amber-100 border-amber-300 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-700",
-    desc: "Chủ tịch Hiệp hội, quyền phê duyệt tối cao toàn hệ thống",
+    desc: "Chủ tịch Hiệp hội / Lớp trưởng CEO HN10, quyền phê duyệt tối cao toàn hệ thống",
+  },
+  {
+    key: "pho_chu_tich",
+    name: "Phó Chủ tịch (Lớp phó)",
+    shortName: "Phó Chủ tịch / Lớp phó",
+    color: "text-blue-800 bg-blue-100 border-blue-300",
+    desc: "Phó Chủ tịch / Lớp phó phụ trách điều hành & hỗ trợ lớp trưởng",
   },
   {
     key: "admin",
@@ -188,7 +196,8 @@ export const SYSTEM_5_ROLES: SystemRoleDef[] = [
 
 export const ROLE_OPTIONS = [
   { value: "quan_tri", label: "Quản trị" },
-  { value: "chu_tich", label: "Chủ tịch" },
+  { value: "chu_tich", label: "Chủ tịch (Lớp trưởng)" },
+  { value: "pho_chu_tich", label: "Phó Chủ tịch (Lớp phó)" },
   { value: "truong_ban_dieu_hanh", label: "Trưởng ban Điều hành" },
   { value: "admin", label: "Admin" },
   { value: "thanh_vien_ban_dieu_hanh", label: "Thành viên ban điều hành" },
@@ -271,7 +280,8 @@ export function normalizeRole(r?: string): SystemRoleKey {
 
   // 1. Exact system/admin keys
   if (s === "quan_tri" || s === "platform_admin" || s === "superadmin" || s.includes("hệ thống") || s === "quản trị") return "quan_tri";
-  if (s === "chu_tich" || s === "president" || s.includes("chủ tịch")) return "chu_tich";
+  if (s === "chu_tich" || s === "president" || s.includes("chủ tịch") || s.includes("lớp trưởng")) return "chu_tich";
+  if (s === "pho_chu_tich" || s.includes("phó chủ tịch") || s.includes("lớp phó")) return "pho_chu_tich";
   if (s === "admin" || s === "adm") return "admin";
   if (s === "tong_thu_ky" || s === "ttk" || s.includes("tổng thư ký")) return "tong_thu_ky";
   if (s === "ban_thu_ky" || s === "thu_ky" || s === "btk") return "tong_thu_ky";
@@ -353,7 +363,8 @@ export function getRolesForDepartment(
   if (norm === "Ban Điều Hành" || deptName.toLowerCase().includes("điều hành") || deptName.toLowerCase().includes("quản trị")) {
     roles = [
       { value: "quan_tri", label: "Quản trị", desc: "Toàn quyền quản trị hệ thống" },
-      { value: "chu_tich", label: "Chủ tịch", desc: "Chủ tịch Hiệp hội" },
+      { value: "chu_tich", label: "Chủ tịch (Lớp trưởng)", desc: "Chủ tịch Hiệp hội / Lớp trưởng CEO HN10" },
+      { value: "pho_chu_tich", label: "Phó Chủ tịch (Lớp phó)", desc: "Phó Chủ tịch / Lớp phó phụ trách điều hành" },
       { value: "truong_ban_dieu_hanh", label: "Trưởng ban Điều hành", desc: "Điều hành quản lý nội bộ" },
       { value: "admin", label: "Admin", desc: "Quản trị viên kỹ thuật & dữ liệu" },
       { value: "thanh_vien_ban_dieu_hanh", label: "Thành viên ban điều hành", desc: "Thành viên Ban Điều Hành" },

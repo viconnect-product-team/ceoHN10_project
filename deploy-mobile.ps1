@@ -1,9 +1,9 @@
 # =========================================================================
-# SCRIPT DEPLOY ĐỘC LẬP: CEO HN10 MOBILE PWA HỘI VIÊN (1 LỆNH DUY NHẤT)
-# Tên miền chính thức: https://ceohn10.viconnect.vn
-# Cổng IP trực tiếp:   https://14.225.217.232:10444
-# Bắt buộc:            HTTPS / SSL (cổng 443 & 10444)
-# Cơ sở dữ liệu chuẩn: PostgreSQL 113.20.107.184:6432 (ceohn10_project)
+# SCRIPT DEPLOY DOC LAP: CEO HN10 MOBILE PWA HOI VIEN (1 LENH DUY NHAT)
+# Ten mien chinh thuc: https://ceohn10.viconnect.vn
+# Cong IP truc tiep:   https://14.225.217.232:10444
+# Bat buoc:            HTTPS / SSL (cong 443 & 10444)
+# Co so du lieu chuan: PostgreSQL 113.20.107.184:6432 (ceohn10_project)
 # =========================================================================
 
 param (
@@ -25,14 +25,14 @@ $mobileDeployScript = Join-Path $PSScriptRootCurrent "deploy/ceohn10/fast-deploy
 $sslDeployScript    = Join-Path $PSScriptRootCurrent "deploy/ssl/deploy-ssl.ps1"
 
 Write-Host "=============================================================================" -ForegroundColor Green
-Write-Host "  TRIỂN KHAI MOBILE PWA HỘI VIÊN CEO HN10 (BẮT BUỘC HTTPS)" -ForegroundColor Green
-Write-Host "  - Domain: https://ceohn10.viconnect.vn" -ForegroundColor White
+Write-Host "  TRIEN KHAI MOBILE PWA HOI VIEN CEO HN10 (BAT BUOC HTTPS)" -ForegroundColor Green
+Write-Host "  - Domain : https://ceohn10.viconnect.vn" -ForegroundColor White
 Write-Host "  - Port IP: https://14.225.217.232:10444" -ForegroundColor Yellow
 Write-Host "=============================================================================" -ForegroundColor Green
 
 & $mobileDeployScript @PSBoundParameters -EnableHttps
 if ($LASTEXITCODE -ne 0) {
-    throw "Triển khai Mobile PWA thất bại với mã lỗi $LASTEXITCODE"
+    throw "Trien khai Mobile PWA that bai voi ma loi $LASTEXITCODE"
 }
 
 Write-Host "`n=============================================================================" -ForegroundColor Green

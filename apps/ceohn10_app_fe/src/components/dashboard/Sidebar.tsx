@@ -65,8 +65,6 @@ import {
 } from "lucide-react";
 import type { TKey } from "@/lib/i18n";
 import type { LucideIcon } from "lucide-react";
-import { ThemeSwitcher } from "@/components/ThemeSwitcher";
-import { useTheme } from "@/lib/theme";
 
 type SubItem = { to: string; label: string; icon?: LucideIcon };
 type Item = { key: TKey; icon: LucideIcon; to?: string; label?: string; children?: SubItem[] };
@@ -959,97 +957,24 @@ export function Sidebar({
         )}
       </div>
 
-      {/* Theme switcher & Enterprise bar — có thể thu nhỏ cố định hoặc phóng to */}
-      {isCollapsed ? (
-        <div className="flex items-center justify-center border-t border-sidebar-border pb-2 pt-3 px-2">
-          <ThemeToggleIconBtn />
-        </div>
-      ) : !bottomExpanded ? (
-        /* Cố định thu nhỏ: thanh ngang nhỏ gọn, tiết kiệm diện tích tối đa */
+      {/* Enterprise Bar — có thể thu nhỏ cố định hoặc phóng to (Đã loại bỏ Theme Switcher theo quy chuẩn Light Theme) */}
+      {!isCollapsed && (
         <div className="border-t border-sidebar-border px-3 py-2.5">
           <div className="flex w-full items-center justify-between gap-2">
-            <ThemeSwitcher />
+            <span className="text-[11px] font-semibold text-slate-500">CEO HN10 CRM</span>
             <button
               type="button"
-              onClick={() => setBottomExpanded(true)}
+              onClick={() => setBottomExpanded(!bottomExpanded)}
               className="flex items-center gap-1.5 rounded-lg bg-primary/10 px-2 py-1 text-[11px] font-bold text-primary transition hover:bg-primary/20 cursor-pointer"
-              title="Mở rộng xem gói Enterprise"
+              title="Xem thông tin phiên bản"
             >
               <Sparkles className="h-3.5 w-3.5" />
               <span className="truncate max-w-[68px]">Enterprise</span>
-              <ChevronUp className="h-3.5 w-3.5 opacity-70" />
+              {bottomExpanded ? <ChevronDown className="h-3.5 w-3.5 opacity-70" /> : <ChevronUp className="h-3.5 w-3.5 opacity-70" />}
             </button>
           </div>
         </div>
-      ) : (
-        /* Trạng thái mở rộng: hiển thị đầy đủ Theme Switcher và Card Enterprise với nút thu nhỏ */
-        <>
-          <div className="flex items-center border-t border-sidebar-border px-4 pb-2 pt-3">
-            <div className="flex w-full items-center justify-between">
-              <span className="text-[11px] font-medium text-sidebar-foreground/60">
-                {t("theme.label")}
-              </span>
-              <div className="flex items-center gap-2">
-                <ThemeSwitcher />
-                <button
-                  type="button"
-                  onClick={() => setBottomExpanded(false)}
-                  className="rounded-lg p-1 text-sidebar-foreground/60 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground cursor-pointer"
-                  title="Thu nhỏ cố định"
-                >
-                  <ChevronDown className="h-4 w-4" />
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <div className="p-4 pt-1">
-            <div
-              className="relative overflow-hidden rounded-xl border border-border/10 p-4 text-primary-foreground shadow-[var(--shadow-card)]"
-              style={{ background: "var(--gradient-card)" }}
-            >
-              <div className="mb-2 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Sparkles className="h-4 w-4" />
-                  <div className="text-[13px] font-semibold">{t("upgrade.title")}</div>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setBottomExpanded(false)}
-                  className="rounded-md p-1 text-primary-foreground/70 transition hover:bg-white/10 hover:text-white cursor-pointer"
-                  title="Thu nhỏ cố định"
-                >
-                  <ChevronDown className="h-3.5 w-3.5" />
-                </button>
-              </div>
-              <p className="mb-3 text-[11px] leading-relaxed text-primary-foreground/85">
-                {t("upgrade.body")}
-              </p>
-              <button className="w-full rounded-lg bg-card/15 py-2 text-xs font-semibold backdrop-blur transition hover:bg-card/25 cursor-pointer">
-                {t("upgrade.cta")}
-              </button>
-            </div>
-          </div>
-        </>
       )}
     </aside>
-  );
-}
-
-/** Mini cycling icon button dùng khi sidebar thu gọn. */
-function ThemeToggleIconBtn() {
-  const { theme, toggle } = useTheme();
-  const icons = { light: Sun, dark: Moon, contrast: Contrast };
-  const Icon = icons[theme];
-  return (
-    <button
-      type="button"
-      onClick={toggle}
-      aria-label="Đổi giao diện"
-      title="Đổi giao diện"
-      className="flex h-9 w-9 items-center justify-center rounded-full text-sidebar-foreground/70 transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
-    >
-      <Icon className="h-4 w-4" />
-    </button>
   );
 }

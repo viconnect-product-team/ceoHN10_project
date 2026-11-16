@@ -463,7 +463,7 @@ function SponsorsPage() {
                   <td className="px-3 py-3">
                     {s.packageType === "in_kind" ? (
                       <div className="flex flex-col gap-0.5 max-w-[160px]">
-                        <span className="inline-flex items-center gap-1 w-fit rounded-full border border-purple-500/30 bg-purple-500/10 px-2 py-0.5 text-[10px] font-bold text-purple-700 dark:text-purple-300 whitespace-nowrap">
+                        <span className="inline-flex items-center gap-1 w-fit rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-[10px] font-bold text-amber-700 whitespace-nowrap">
                           🎁 Hiện vật
                         </span>
                         {s.inKindDescription && (

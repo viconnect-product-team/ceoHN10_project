@@ -6,7 +6,6 @@ import { ProfileMenu } from "@/components/dashboard/ProfileMenu";
 import { NotificationCenter } from "@/components/dashboard/NotificationCenter";
 import { TopbarBreadcrumb } from "@/components/dashboard/TopbarBreadcrumb";
 import { useCommandPalette } from "@/components/dashboard/CommandPalette";
-import { ThemeSwitcher } from "@/components/ThemeSwitcher";
 
 export function Topbar({ onMenuClick }: { onMenuClick?: () => void }) {
   const t = useT();
@@ -55,7 +54,6 @@ export function Topbar({ onMenuClick }: { onMenuClick?: () => void }) {
 
         <AssociationSwitcher />
         <LangSwitcher />
-        <ThemeSwitcher className="hidden sm:inline-flex" />
         <NotificationCenter />
 
         <button className="hidden rounded-full p-2 text-muted-foreground hover:bg-muted hover:text-foreground xl:inline-flex">

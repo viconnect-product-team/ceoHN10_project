@@ -332,7 +332,7 @@ function PackagesPage() {
                       <span
                         className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider ${
                           p.packageType === "in_kind"
-                            ? "bg-purple-950/50 text-purple-200 border border-purple-400/40"
+                            ? "bg-amber-950/50 text-amber-200 border border-amber-400/40"
                             : p.packageType === "cash"
                             ? "bg-emerald-950/50 text-emerald-200 border border-emerald-400/40"
                             : "bg-blue-950/50 text-blue-200 border border-blue-400/40"
@@ -377,8 +377,8 @@ function PackagesPage() {
 
                     {/* In-Kind Description */}
                     {p.inKindDescription && (
-                      <div className="mb-4 rounded-xl p-3 bg-purple-500/10 border border-purple-500/20 text-xs">
-                        <span className="font-bold text-purple-700 dark:text-purple-300 block mb-0.5">
+                      <div className="mb-4 rounded-xl p-3 bg-amber-500/10 border border-amber-500/20 text-xs">
+                        <span className="font-bold text-amber-700 block mb-0.5">
                           Mô tả hiện vật tài trợ:
                         </span>
                         <p className="text-muted-foreground italic text-[11.5px] leading-relaxed">

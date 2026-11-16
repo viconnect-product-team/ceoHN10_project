@@ -1125,7 +1125,7 @@ function RegPage() {
                         {/* Xem khảo sát Google Form */}
                         <button
                           onClick={() => handleOpenFormSurvey(r)}
-                          className="inline-flex items-center shrink-0 gap-1 rounded-lg border border-purple-500/30 bg-purple-500/10 px-2 py-1 text-xs font-semibold text-purple-700 hover:bg-purple-500/20 dark:text-purple-300 cursor-pointer transition-colors"
+                          className="inline-flex items-center shrink-0 gap-1 rounded-lg border border-blue-500/30 bg-blue-500/10 px-2 py-1 text-xs font-semibold text-[#003B95] hover:bg-blue-500/20 cursor-pointer transition-colors"
                           title="Xem phiếu thông tin & khảo sát Google Form"
                         >
                           <FileText className="h-3.5 w-3.5" />
@@ -1398,7 +1398,7 @@ function RegPage() {
             </div>
 
             <div className="space-y-3.5 text-xs">
-              <div className="rounded-xl bg-purple-500/10 border border-purple-500/20 p-3.5">
+              <div className="rounded-xl bg-blue-500/10 border border-blue-500/20 p-3.5">
                 <p className="text-sm font-bold text-foreground">{selectedSurveyReg.memberName}</p>
                 <p className="text-muted-foreground mt-0.5">
                   Email: {selectedSurveyReg.email} · Mã: {selectedSurveyReg.id}

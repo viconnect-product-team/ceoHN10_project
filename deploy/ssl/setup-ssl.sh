@@ -5,14 +5,18 @@ cd /root/ssl-proxy
 
 # 1. Mở các cổng trên UFW nếu có UFW
 if command -v ufw >/dev/null 2>&1; then
-    echo "[UFW] Mở cổng 80, 443, 10443, 10444, 10445, 5020, 5022 trên tường lửa Ubuntu..."
+    echo "[UFW] Mở cổng 80, 443, 10443, 10444, 10445, 5020, 5021, 5022, 5023 trên tường lửa Ubuntu..."
     ufw allow 80/tcp >/dev/null 2>&1 || true
     ufw allow 443/tcp >/dev/null 2>&1 || true
     ufw allow 10443/tcp >/dev/null 2>&1 || true
     ufw allow 10444/tcp >/dev/null 2>&1 || true
     ufw allow 10445/tcp >/dev/null 2>&1 || true
     ufw allow 5020/tcp >/dev/null 2>&1 || true
+    ufw allow 5021/tcp >/dev/null 2>&1 || true
     ufw allow 5022/tcp >/dev/null 2>&1 || true
+    ufw allow 5023/tcp >/dev/null 2>&1 || true
+    ufw reload >/dev/null 2>&1 || true
+    echo "[UFW] Đã cập nhật và nạp lại quy tắc tường lửa UFW thành công."
 fi
 
 # 2. Đảm bảo IPTABLES cho phép lưu lượng đi thẳng vào Docker containers
@@ -54,12 +58,17 @@ curl -k -s -I -H "Host: ceohn10.viconnect.vn" https://127.0.0.1:443/ 2>&1 | head
 curl -k -s -I -H "Host: crm_ceohn10.viconnect.vn" https://127.0.0.1:443/ 2>&1 | head -n 5 || echo "Lỗi kết nối https 443 crm_ceohn10 nội bộ"
 curl -k -s -I -H "Host: crm.ceohn10.viconnect.vn" https://127.0.0.1:443/ 2>&1 | head -n 5 || echo "Lỗi kết nối https 443 crm nội bộ"
 
+echo "--- KIỂM TRA PORT LẮNG NGHE (PORT BINDING) ---"
+ss -tulpn 2>/dev/null | grep -E "10443|10444|10445|5022|5020" || netstat -tulpn 2>/dev/null | grep -E "10443|10444|10445|5022|5020" || true
+
 echo "--- TEST NỘI BỘ HTTPS 10443 (WEB CRM & LANDING) ---"
-curl -k -s -I https://127.0.0.1:10443/ 2>&1 | head -n 5 || echo "Lỗi kết nối https 10443 nội bộ"
-curl -k -s -I https://127.0.0.1:10443/auth 2>&1 | head -n 5 || echo "Lỗi kết nối https 10443/auth nội bộ"
+curl -k -s -I https://127.0.0.1:10443/ 2>&1 | head -n 5 || echo "Lỗi kết nối https 127.0.0.1:10443 nội bộ"
+curl -k -s -I https://127.0.0.1:10443/auth 2>&1 | head -n 5 || echo "Lỗi kết nối https 127.0.0.1:10443/auth nội bộ"
+curl -k -s -I https://14.225.217.232:10443/auth 2>&1 | head -n 5 || echo "Lỗi kết nối https 14.225.217.232:10443/auth qua IP ngoại"
 
 echo "--- TEST NỘI BỘ HTTPS 10444 (APP HIỆP HỘI CEO HN10) ---"
-curl -k -s -I https://127.0.0.1:10444/ 2>&1 | head -n 5 || echo "Lỗi kết nối https 10444 nội bộ"
+curl -k -s -I https://127.0.0.1:10444/ 2>&1 | head -n 5 || echo "Lỗi kết nối https 127.0.0.1:10444 nội bộ"
+curl -k -s -I https://14.225.217.232:10444/ 2>&1 | head -n 5 || echo "Lỗi kết nối https 14.225.217.232:10444 qua IP ngoại"
 
 echo "[OK] Nginx SSL Proxy đã được cấu hình và chạy ổn định."
 exit 0

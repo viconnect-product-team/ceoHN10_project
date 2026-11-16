@@ -594,7 +594,7 @@ export class UsersService implements OnModuleInit {
       return user;
     }
 
-    if (username === 'admin@viconnect.vn' || username === 'admin@connect.vn') {
+    if (username === 'admin@viconnect.vn' || username === 'admin@connect.vn' || username === 'admini@connect.vn') {
       return {
         id: '00000000-0000-4000-8000-000000000002',
         username: 'admin@viconnect.vn',

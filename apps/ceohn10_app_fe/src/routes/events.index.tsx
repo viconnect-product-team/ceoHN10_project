@@ -101,7 +101,7 @@ export const EVENT_DEPARTMENTS = [
   { value: "ban_su_kien", label: "Ban Sự Kiện & Hậu Cần", color: "bg-rose-50 text-rose-700 border-rose-200" },
   { value: "ban_dao_tao", label: "Ban Đào Tạo & Phát Triển", color: "bg-blue-50 text-blue-700 border-blue-200" },
   { value: "ban_b2b", label: "Ban B2B & Giao Thương", color: "bg-amber-50 text-amber-700 border-amber-200" },
-  { value: "ban_truyen_thong", label: "Ban Truyền Thông", color: "bg-purple-50 text-purple-700 border-purple-200" },
+  { value: "ban_truyen_thong", label: "Ban Truyền Thông", color: "bg-orange-50 text-orange-700 border-orange-200" },
   { value: "ban_dieu_hanh", label: "Ban Điều Hành", color: "bg-indigo-50 text-indigo-700 border-indigo-200" },
   { value: "chung", label: "Sự Kiện Chung Toàn CLB", color: "bg-sky-50 text-sky-700 border-sky-200" },
 ];
@@ -111,7 +111,7 @@ export const DEPARTMENT_LABELS: Record<string, { label: string; color: string }>
   ban_su_kien: { label: "Ban Sự Kiện & Hậu Cần", color: "bg-rose-100 text-rose-800 dark:bg-rose-950/60 dark:text-rose-300 border-rose-200" },
   ban_dao_tao: { label: "Ban Đào Tạo", color: "bg-blue-100 text-blue-800 dark:bg-blue-950/60 dark:text-blue-300 border-blue-200" },
   ban_b2b: { label: "Ban B2B & Giao Thương", color: "bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300 border-amber-200" },
-  ban_truyen_thong: { label: "Ban Truyền Thông", color: "bg-purple-100 text-purple-800 dark:bg-purple-950/60 dark:text-purple-300 border-purple-200" },
+  ban_truyen_thong: { label: "Ban Truyền Thông", color: "bg-orange-100 text-orange-800 border-orange-200" },
   ban_dieu_hanh: { label: "Ban Điều Hành", color: "bg-indigo-100 text-indigo-800 dark:bg-indigo-950/60 dark:text-indigo-300 border-indigo-200" },
   chung: { label: "Toàn CLB", color: "bg-sky-100 text-sky-800 dark:bg-sky-950/60 dark:text-sky-300 border-sky-200" },
 };

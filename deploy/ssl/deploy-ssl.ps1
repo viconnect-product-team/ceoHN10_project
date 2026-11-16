@@ -54,7 +54,7 @@ Write-Host "1. Subdomain Mobile App CEO HN10       : https://ceohn10.viconnect.v
 Write-Host "2. Subdomain Web CRM Hiep Hoi CEO HN10 : https://crm_ceohn10.viconnect.vn (khi co DNS)" -ForegroundColor Yellow
 Write-Host "3. Dev Link Mobile CEO HN10 (HTTPS)    : https://${ServerIp}:10444" -ForegroundColor Yellow
 Write-Host "4. Dev Link Web CRM Hiep Hoi (HTTPS)   : https://${ServerIp}:10443" -ForegroundColor Green
-Write-Host "   👉 Cong Dang Nhap Web CRM            : https://${ServerIp}:10443/auth" -ForegroundColor Green
+Write-Host "   [*] Cong Dang Nhap Web CRM            : https://${ServerIp}:10443/auth" -ForegroundColor Green
 Write-Host "5. Dev Link Frontend Truc Tiep (HTTP)  : http://${ServerIp}:5022" -ForegroundColor DarkGray
 Write-Host "=================================================================" -ForegroundColor Green
 $global:LASTEXITCODE = 0

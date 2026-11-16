@@ -1011,11 +1011,11 @@ export function CalendarScreen() {
                 onClick={() => setFilterType(filterType === "TRAINING" ? "ALL" : "TRAINING")}
                 className={`p-2 rounded-xl border text-center transition cursor-pointer ${
                   filterType === "TRAINING"
-                    ? "bg-purple-500/15 border-purple-500/60 text-purple-600 dark:text-purple-400 font-black"
-                    : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300"
+                    ? "bg-blue-500/15 border-blue-500/60 text-[#003B95] font-black"
+                    : "bg-white border-slate-200 text-slate-600"
                 }`}
               >
-                <GraduationCap className="size-3.5 mx-auto text-purple-500" />
+                <GraduationCap className="size-3.5 mx-auto text-[#003B95]" />
                 <span className="text-[9px] font-bold block mt-1">Đào tạo</span>
                 <span className="text-xs font-black block">
                   {calendarItems.filter((i) => i.type === "training").length}
@@ -1160,7 +1160,7 @@ export function CalendarScreen() {
                             {cell.hasOpportunity && <span className="size-1 rounded-full bg-emerald-500" title="Cơ hội" />}
                             {cell.has1on1 && <span className="size-1 rounded-full bg-blue-500" title="B2B" />}
                             {cell.hasCommittee && <span className="size-1 rounded-full bg-amber-500" title="Họp ban" />}
-                            {cell.hasTraining && <span className="size-1 rounded-full bg-purple-500" title="Đào tạo" />}
+                            {cell.hasTraining && <span className="size-1 rounded-full bg-indigo-600" title="Đào tạo" />}
                           </div>
                         </button>
                       );
@@ -1182,7 +1182,7 @@ export function CalendarScreen() {
                       <span className="size-1.5 rounded-full bg-amber-500" /> Họp ban
                     </span>
                     <span className="flex items-center gap-1">
-                      <span className="size-1.5 rounded-full bg-purple-500" /> Đào tạo
+                      <span className="size-1.5 rounded-full bg-indigo-600" /> Đào tạo
                     </span>
                   </div>
 
@@ -1232,7 +1232,7 @@ export function CalendarScreen() {
                             {day.hasOpportunity && <span className="size-1 rounded-full bg-emerald-500" />}
                             {day.has1on1 && <span className="size-1 rounded-full bg-blue-500" />}
                             {day.hasCommittee && <span className="size-1 rounded-full bg-amber-500" />}
-                            {day.hasTraining && <span className="size-1 rounded-full bg-purple-500" />}
+                            {day.hasTraining && <span className="size-1 rounded-full bg-indigo-600" />}
                           </div>
                         </button>
                       );
@@ -1705,7 +1705,7 @@ export function CalendarScreen() {
                   : item.type === "opportunity"
                   ? "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-300/40"
                   : item.type === "training"
-                  ? "bg-purple-50 dark:bg-purple-950/40 text-purple-700 dark:text-purple-300 border border-purple-300/40"
+                  ? "bg-blue-50 text-[#003B95] border border-blue-300/40"
                   : item.type === "meeting_committee"
                   ? "bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border border-amber-300/40"
                   : "bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border border-blue-300/40"
@@ -2046,7 +2046,7 @@ export function CalendarScreen() {
                     : item.type === "opportunity"
                     ? "bg-emerald-50 text-emerald-700 border border-emerald-300/40"
                     : item.type === "training"
-                    ? "bg-purple-50 text-purple-700 border border-purple-300/40"
+                    ? "bg-blue-50 text-[#003B95] border border-blue-300/40"
                     : item.type === "meeting_committee"
                     ? "bg-amber-50 text-amber-700 border border-amber-300/40"
                     : "bg-blue-50 text-blue-700 border border-blue-300/40"

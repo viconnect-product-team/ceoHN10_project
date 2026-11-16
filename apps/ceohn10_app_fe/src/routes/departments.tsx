@@ -52,10 +52,10 @@ const COLOR_MAP: Record<string, { bg: string; text: string; border: string; badg
     badge: "bg-blue-100 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300",
   },
   purple: {
-    bg: "bg-purple-500/10",
-    text: "text-purple-600 dark:text-purple-400",
-    border: "border-purple-200 dark:border-purple-800/60",
-    badge: "bg-purple-100 text-purple-700 dark:bg-purple-950/60 dark:text-purple-300",
+    bg: "bg-red-500/10",
+    text: "text-red-600",
+    border: "border-red-200",
+    badge: "bg-red-100 text-red-700",
   },
   emerald: {
     bg: "bg-emerald-500/10",

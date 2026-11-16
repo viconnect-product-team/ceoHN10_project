@@ -28,7 +28,6 @@ import {
 } from "lucide-react";
 import { UserGuideModal } from "@/components/member/UserGuideModal";
 import { useT, useLang } from "@/lib/i18n";
-import { useTheme } from "@/lib/theme";
 import { useAuth } from "@/context/AuthContext";
 import { signOutSession } from "@/lib/business-connect/mobile/auth-session";
 import { fetchNestApi, uploadFileToNest, resolveMediaUrl } from "@/lib/api-client";
@@ -164,39 +163,9 @@ function SectionCard({
   );
 }
 
-/** Inline theme-picker row — light / dark. */
+/** Inline theme-picker row — Light mode mặc định. */
 function ThemeSettingRow() {
-  const { theme, setTheme } = useTheme();
-  const t = useT();
-
-  const MODES = [
-    { mode: "light" as const, emoji: "☀️", label: t("theme.light") },
-    { mode: "dark" as const, emoji: "🌙", label: t("theme.dark") },
-  ];
-
-  return (
-    <div role="group" aria-label={t("theme.label")} className="grid grid-cols-2 gap-2 py-1">
-      {MODES.map(({ mode, emoji, label }) => {
-        const active = theme === mode;
-        return (
-          <button
-            key={mode}
-            type="button"
-            onClick={() => setTheme(mode)}
-            aria-pressed={active}
-            className={`flex flex-col items-center gap-1.5 rounded-2xl border px-2 py-3 text-[12px] font-semibold transition text-center ${
-              active
-                ? "bg-[linear-gradient(135deg,#F6E1C3_0%,#D8B282_45%,#C29B69_70%,#8C653B_100%)] text-[#050c15] border-transparent font-bold shadow-sm"
-                : "border-[var(--bc-mobile-border)] text-[var(--bc-mobile-muted)] hover:border-[#D8B282]/40"
-            }`}
-          >
-            <span className="text-lg leading-none">{emoji}</span>
-            <span>{label}</span>
-          </button>
-        );
-      })}
-    </div>
-  );
+  return null;
 }
 
 function ConnectAppMePage() {

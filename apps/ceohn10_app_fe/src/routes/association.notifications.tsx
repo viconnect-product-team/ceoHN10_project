@@ -1379,8 +1379,8 @@ function NotificationsScreen() {
               label: "Cơ hội B2B",
             },
             lead: {
-              iconBg: "bg-purple-600 text-white border-purple-700 shadow-xs",
-              badge: "bg-purple-50 text-purple-800 dark:bg-purple-950/80 dark:text-purple-300 border-purple-300 dark:border-purple-700 font-bold",
+              iconBg: "bg-blue-600 text-white border-blue-700 shadow-xs",
+              badge: "bg-blue-50 text-blue-800 border-blue-300 font-bold",
               label: "Khách hàng B2B",
             },
             event: {

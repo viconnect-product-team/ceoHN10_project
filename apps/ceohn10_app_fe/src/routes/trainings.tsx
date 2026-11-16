@@ -749,7 +749,7 @@ function TrainingsPage() {
                   <button
                     type="button"
                     onClick={() => setActiveFeedbackModal(t)}
-                    className="p-1.5 rounded-lg bg-purple-50 text-[#7C2D82] dark:bg-purple-950 dark:text-purple-300 hover:bg-purple-100 transition cursor-pointer"
+                    className="p-1.5 rounded-lg bg-blue-50 text-[#003B95] hover:bg-blue-100 transition cursor-pointer"
                     title="Xem & gửi đánh giá phản hồi sau buổi học"
                   >
                     <MessageSquare className="h-4 w-4" />
@@ -1010,7 +1010,7 @@ function TrainingsPage() {
                             <button
                               type="button"
                               onClick={() => setActiveFeedbackModal(t)}
-                              className="p-1.5 rounded-lg bg-purple-50 text-[#7C2D82] dark:bg-purple-950 dark:text-purple-300 hover:bg-purple-100 transition cursor-pointer"
+                              className="p-1.5 rounded-lg bg-blue-50 text-[#003B95] hover:bg-blue-100 transition cursor-pointer"
                               title="Ý kiến phản hồi"
                             >
                               <MessageSquare className="h-4 w-4" />
