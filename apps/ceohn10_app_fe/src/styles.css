@@ -128,7 +128,7 @@
     radial-gradient(at 0% 0%, rgba(124, 45, 130, 0.08) 0px, transparent 55%),
     radial-gradient(at 100% 0%, rgba(214, 31, 105, 0.06) 0px, transparent 50%),
     radial-gradient(at 50% 100%, rgba(124, 45, 130, 0.04) 0px, transparent 50%),
-    linear-gradient(180deg, #FFFFFF 0%, #FAF5FF 60%, #F5EEFD 100%);
+    linear-gradient(180deg, #FAF5FF 0%, #F5EEFD 100%);
   background-repeat: no-repeat;
   background-position: top center;
   background-size: cover;
@@ -348,7 +348,7 @@ html.dark .bg-crm-system,
   --sidebar-accent-foreground: #7C2D82;
   --sidebar-border: #E4E4E7;
   --sidebar-ring: #7C2D82;
-  --gradient-sidebar: linear-gradient(180deg, #FFFFFF 0%, #FAF5FF 100%);
+  --gradient-sidebar: #FFFFFF;
 
   --chart-1: #7C2D82;
   --chart-2: #D61F69;

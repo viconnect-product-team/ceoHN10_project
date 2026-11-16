@@ -12,16 +12,19 @@ export type SystemRoleKey =
   | "tong_thu_ky"
   | "truong_ban_dieu_hanh"
   | "thanh_vien_ban_dieu_hanh"
-  | "truong_ban_truyen_thong"
-  | "truong_ban_thanh_vien"
-  | "truong_ban_xuc_tien"
-  | "truong_ban_tai_chinh"
-  | "truong_ban_thien_nguyen"
+  | "truong_ban_su_kien"
   | "thanh_vien_ban_su_kien"
-  | "thanh_vien_ban_xuc_tien"
-  | "thanh_vien_ban_thanh_vien"
+  | "truong_ban_dao_tao"
+  | "thanh_vien_ban_dao_tao"
+  | "truong_ban_truyen_thong"
   | "thanh_vien_ban_truyen_thong"
+  | "truong_ban_thanh_vien"
+  | "thanh_vien_ban_thanh_vien"
+  | "truong_ban_xuc_tien"
+  | "thanh_vien_ban_xuc_tien"
+  | "truong_ban_tai_chinh"
   | "thanh_vien_ban_tai_chinh"
+  | "truong_ban_thien_nguyen"
   | "thanh_vien_ban_thien_nguyen"
   | "member";
 
@@ -75,6 +78,27 @@ export const SYSTEM_5_ROLES: SystemRoleDef[] = [
     shortName: "TV Ban Điều Hành",
     color: "text-blue-700 bg-blue-50 border-blue-200 dark:bg-blue-950/50 dark:text-blue-300 dark:border-blue-800",
     desc: "Thành viên trực thuộc Ban Điều Hành Hiệp Hội",
+  },
+  {
+    key: "truong_ban_su_kien",
+    name: "Trưởng ban Sự kiện & Hậu cần",
+    shortName: "TB Sự Kiện",
+    color: "text-rose-700 bg-rose-50 border-rose-200 dark:bg-rose-950/50 dark:text-rose-300 dark:border-rose-800",
+    desc: "Tổ chức sự kiện, khai báo vật dụng hỗ trợ, e-ticket & check-in",
+  },
+  {
+    key: "truong_ban_dao_tao",
+    name: "Trưởng ban Đào tạo & Phát triển",
+    shortName: "TB Đào Tạo",
+    color: "text-blue-700 bg-blue-50 border-blue-200 dark:bg-blue-950/50 dark:text-blue-300 dark:border-blue-800",
+    desc: "Quản lý khóa đào tạo doanh nhân, lớp học thứ 7 và học liệu",
+  },
+  {
+    key: "thanh_vien_ban_dao_tao",
+    name: "Thành viên Ban Đào Tạo",
+    shortName: "TV Đào Tạo",
+    color: "text-blue-600 bg-blue-50 border-blue-200 dark:bg-blue-950/50 dark:text-blue-300 dark:border-blue-800",
+    desc: "Hỗ trợ tổ chức lớp học, điểm danh và quản lý học viên",
   },
   {
     key: "truong_ban_truyen_thong",
@@ -169,6 +193,9 @@ export const ROLE_OPTIONS = [
   { value: "admin", label: "Admin" },
   { value: "thanh_vien_ban_dieu_hanh", label: "Thành viên ban điều hành" },
   { value: "tong_thu_ky", label: "Tổng thư ký" },
+  { value: "truong_ban_su_kien", label: "Trưởng ban Sự kiện & Hậu cần" },
+  { value: "truong_ban_dao_tao", label: "Trưởng ban Đào tạo & Phát triển" },
+  { value: "thanh_vien_ban_dao_tao", label: "Thành viên Ban Đào Tạo" },
   { value: "truong_ban_truyen_thong", label: "Trưởng ban Truyền thông" },
   { value: "truong_ban_thanh_vien", label: "Trưởng ban Thành viên" },
   { value: "truong_ban_xuc_tien", label: "Trưởng ban Xúc tiến thương mại" },

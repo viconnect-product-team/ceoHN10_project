@@ -1,6 +1,35 @@
 # ==============================================================================
 # BỘ LUẬT DỰ ÁN (PROJECT RULES & AI CODEGEN STANDARDS) - CEO HN10 PROJECT
 # Vai trò: Tech Lead | Định dạng: .cursorrules
+# 16/11/2026 (v12.7) — HOÀN TẤT 11 LUỒNG NGHIỆP VỤ KICKOFF HN10, SỬA LỖI CRLF NGINX SSL PROXY PORT 10443 & KIỂM ĐỊNH 0 LỖI CODE:
+#   * [SỬA LỖI PORT 10443 ERR_CONNECTION_REFUSED]: setup-ssl.sh bị dính CRLF (\r) khiến bash trên Linux dừng ngay dòng 2. Đã xử lý tr -d '\r' trong deploy-ssl.ps1, kích hoạt Nginx reverse proxy port 10443 và 10444 thông suốt. Cổng đăng nhập chuẩn: https://14.225.217.232:10443/auth.
+#   * [11 LUỒNG NGHIỆP VỤ KICKOFF HN10]:
+#     1. Phân quyền 4 ban cho Đào tạo: Ban Học Tập tạo -> Ban Sự Kiện - Hậu Cần lập dự trù -> Ban Tài Chính duyệt chi -> Duyệt tiền mặt/hiện vật -> Sinh mã chứng từ CT-2026-xxx -> Bắn thông báo Ban Truyền Thông & Ban Đối Ngoại đăng bài PR.
+#     2. Phân quyền 4 ban cho Sự kiện: Cơ chế duyệt dòng tiền & hiện vật tương tự Đào tạo.
+#     3. Lớp học riêng & Sự kiện riêng: Khai báo totalCost & expectedAttendees -> Tự động chia đều phí tham gia vé. Quét QR vé hiển thị địa điểm, nội dung, phí tham dự. Dòng tiền tính vào Quỹ cá nhân riêng biệt (personal_pool), tách biệt Quỹ chung CEO HN10.
+#     4. Biểu quyết theo Sự kiện / Buổi học: Chọn gắn sự kiện/buổi học, tự động gửi thông báo app và gửi email qua MailService.sendDirectEmail.
+#     5. Quản lý tài liệu theo Ban: Tải slide, link media, link ảnh tự động lưu vào public.documents và phân loại đúng thư mục Ban chức năng.
+#     6. Quản lý phản ánh: Hội viên góp ý kèm upload ảnh/tài liệu, dữ liệu tập trung tại trang Quản lý Phản ánh.
+#     7. Lưu trữ tập trung MinIO S3: Tất cả media, tài liệu lưu tại MinIO S3 14.225.217.232:9000.
+#     8. Báo cáo & Xuất chứng từ PDF: Hỗ trợ in mẫu chứng từ vật tư 02-VT/CEOHN10 và import Excel đối soát chi phí.
+#     9. Phân quyền 7 Ban chức năng chuẩn KICKOFF.
+#     10. Chat nhóm 10.0 - 10.9 & Quản trị công việc Kanban (todo -> in_progress -> review -> done).
+#     11. Nhật ký hoạt động hội viên (/activity) ghi vết đầy đủ.
+#   * [TUÂN THỦ CSDL & GIT]: CSDL duy nhất 113.20.107.184:6432 (ceohn10_project). Không fake/mock data, không git commit/push. Exit code 0 tsc --noEmit cả FE và BE.
+# 16/11/2026 (v12.3) — SỬA DOCKER BUILD, TÁCH BIỆT DOCKER CEOHN10, PHÂN LOẠI SỰ KIỆN THEO BAN, BỔ SUNG LƯỚI & LỊCH LỚP HỌC, TÁI THIẾT PHÂN QUYỀN RBAC, BỎ GÓI TÀI TRỢ & TRIỆT TIÊU GRADIENT MỜ TRẮNG, DỌN SẠCH DỮ LIỆU DEMO CSDL:
+#   * [SỬA DOCKER BUILD & CÔ LẬP CONTAINER]: Đổi @ceo1983/app_be sang @ceohn10/app_be trong Dockerfile.backend. Thêm name: ceohn10 và name: ceohn10-crm vào docker-compose.yml để các container hiển thị trong nhóm riêng biệt trên Docker Desktop.
+#   * [PHÂN LOẠI SỰ KIỆN THEO BAN]: Thêm cột department & category vào bảng events. Tích hợp bộ lọc ban (Ban Thiện Nguyện & Đời Sống, Ban Sự Kiện & Hậu Cần, Ban Đào Tạo, Ban B2B, Ban Truyền Thông, Ban Điều Hành) trên Web CRM và Mobile App.
+#   * [BỔ SUNG LƯỚI & LỊCH LỚP HỌC]: Tại /trainings thêm toggle 3 chế độ Bảng, Lưới (Grid Card với đầy đủ nút tác vụ), Lịch (Calendar tháng tương tác, đánh dấu nổi bật thứ 7 hàng tuần).
+#   * [CHUẨN HÓA & LÀM MỚI PHÂN QUYỀN RBAC]: Bổ sung vai trò Ban Sự Kiện & Hậu Cần, Ban Đào Tạo. Thêm nút "Lưu Cấu Hình" nổi bật tại đầu trang /permissions, gán quyền 1 chạm theo vai trò hoặc theo ban, 100% tiếng Việt chuẩn.
+#   * [XÓA BỎ GÓI TÀI TRỢ, KHEN THƯỞNG, DANH HIỆU]: Xóa /sponsor-packages và /benefits khỏi Sidebar. Redirect tự động về /sponsors và /news. Tài trợ chỉ còn 2 hình thức trực tiếp: Tiền mặt -> Quỹ Tiền Mặt, Hiện vật -> Quỹ Hiện Vật.
+#   * [TRIỆT TIÊU GRADIENT PHA TRẮNG]: Xóa bỏ hoàn toàn via-white, to-white, from-white trong theme, Sidebar, thẻ 2 túi quỹ, cuộc họp, profile và tin tức để hình ảnh sắc nét, không bị lóa mờ.
+#   * [DỌN SẠCH DỮ LIỆU DEMO TRONG CSDL]: Đã chạy script dọn dẹp kết nối CSDL 113.20.107.184:6432 ceohn10_project, xóa sạch các bản ghi demo/test trong events (4), trainings (30), sponsors (3), transactions (4), documents (4), bảo lưu tài khoản và phân quyền.
+#   * [TUÂN THỦ 100%]: Exit code 0 cho tsc --noEmit ở cả FE và BE, tuyệt đối không tự ý git push / git commit.
+# 16/11/2026 (v12.2) — KỊCH BẢN DEPLOY 1 LỆNH (DEV SERVER 14.225.217.232), CẤU HÌNH DOMAIN crm_ceohn10.viconnect.vn, ĐỔI CỔNG IP TRỰC TIẾP TRÁNH XUNG ĐỘT (5443/5444 -> 10443/10444) & CÀI ĐẶT PWA LÊN MÀN HÌNH CHÍNH:
+#   * [DEPLOY 1 LỆNH TỔNG THỂ]: Tạo deploy.ps1 & deploy/deploy-all.ps1 triển khai đồng thời cả Mobile PWA (ceohn10.viconnect.vn) và Web CRM (crm_ceohn10.viconnect.vn), đồng bộ Nginx SSL reverse proxy tự động trong 1 lệnh duy nhất. Shortcut: npm run deploy hoặc .\deploy.ps1.
+#   * [CẤU HÌNH DOMAIN CRM crm_ceohn10.viconnect.vn & ĐỔI CỔNG IP 10443/10444]: Tránh xung đột cổng 5443/5444 bị dự án khác chiếm, chuyển cổng IP trực tiếp sang 10443 (Web CRM) và 10444 (Mobile PWA) kèm 10445 (backup). Cập nhật deploy/ssl/nginx.conf, deploy/ssl/docker-compose.ssl.yml, deploy/ssl/setup-ssl.sh, apps/ceohn10_app_be/src/main.ts (CORS), apps/ceohn10_app_fe/src/routes/index.tsx (giữ nguyên CRM dashboard, không redirect nhầm /association), deploy/crm/.env.crm, deploy/crm/fast-deploy.ps1.
+#   * [TỰ ĐỘNG CÀI ĐẶT PWA LÊN MÀN HÌNH CHÍNH (A2HS)]: Thêm PwaInstallBanner vào MemberShell.tsx; tích hợp IosInstallPrompt: 1 chạm tự động trên Android qua beforeinstallprompt, hướng dẫn trực quan Safari trên iOS (Chia sẻ -> Thêm vào MH chính), cảnh báo trình duyệt Zalo/Facebook; tự động ẩn khi app chạy standalone. Bản Mobile là ứng dụng hội viên chuyên biệt (/association), hoàn toàn tách biệt độc lập với Web CRM.
+#   * [TUÂN THỦ CSDL & GIT]: CSDL duy nhất 113.20.107.184:6432 (ceohn10_project), không fake/mock data, không git commit/push.
 # 16/11/2026 (v12.1) — HOÀN THÀNH 6 CA SỬ DỤNG (UC-1 -> UC-6), GIAO DIỆN TỔNG QUAN 2 TÚI QUỸ & RBAC 100% TIẾNG VIỆT:
 #   * [TỔNG QUAN DASHBOARD]: Hiển thị mặc định 4 sự kiện, 30 khóa học. Widget "Ví 2 Túi Quỹ CEO HN10" kết nối realtime CSDL 113.20.107.184:6432 (/admin/funds-overview) gồm Túi Quỹ Chung và Túi Quỹ Tài Trợ (Tiền mặt + Kho hiện vật). Widget "Khóa Học & Sự Kiện Tôi Tham Gia" cho hội viên kèm nút "Tải Slide" và "Góp ý / Đánh giá".
 #   * [UC-1 ĐĂNG NHẬP JWT]: RESTful API chuẩn mực, refresh token, giải mã RBAC bảo mật cao.

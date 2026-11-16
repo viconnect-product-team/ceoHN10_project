@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { Star, MessageSquare, X, Send, User, ThumbsUp } from "lucide-react";
+import { Star, MessageSquare, X, Send, User, ThumbsUp, Paperclip, FileText } from "lucide-react";
 import { toast } from "sonner";
-import { fetchNestApi } from "@/lib/api-client";
+import { fetchNestApi, uploadFileToNest } from "@/lib/api-client";
 import { useAuth } from "@/context/AuthContext";
 
 export interface EventFeedback {
@@ -34,8 +34,28 @@ export function EventFeedbackModal({
 
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState("");
+  const [fileUrl, setFileUrl] = useState("");
+  const [fileName, setFileName] = useState("");
+  const [uploadingFile, setUploadingFile] = useState(false);
   const [userName, setUserName] = useState(user?.name || user?.fullName || "");
   const [email, setEmail] = useState(user?.email || "");
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingFile(true);
+    const toastId = toast.loading("Đang tải tệp đính kèm lên...");
+    try {
+      const url = await uploadFileToNest(file, `event_feedback_${Date.now()}_${file.name}`);
+      setFileUrl(url);
+      setFileName(file.name);
+      toast.success("Đã đính kèm tệp thành công!", { id: toastId });
+    } catch {
+      toast.error("Không thể tải tệp lên lúc này", { id: toastId });
+    } finally {
+      setUploadingFile(false);
+    }
+  };
 
   const loadFeedbacks = async () => {
     if (!eventId) return;
@@ -71,6 +91,8 @@ export function EventFeedbackModal({
         body: JSON.stringify({
           rating,
           comment: comment.trim(),
+          fileUrl,
+          fileName,
           userName: userName.trim() || user?.name || "Hội viên CEO HN10",
           email: email.trim() || user?.email || "",
           phone: user?.phone || "",
@@ -175,7 +197,15 @@ export function EventFeedbackModal({
               className="w-full p-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-background text-xs text-foreground outline-none focus:border-[#003B95]"
             />
 
-            <div className="flex items-center justify-end">
+            <div className="flex items-center justify-between gap-2">
+              <div>
+                <label className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-background text-[11px] font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer">
+                  <Paperclip className="h-3.5 w-3.5 text-[#003B95]" />
+                  <span>{uploadingFile ? "Đang tải tệp..." : fileName ? fileName : "Đính kèm ảnh / tài liệu"}</span>
+                  <input type="file" onChange={handleFileUpload} className="hidden" disabled={uploadingFile} />
+                </label>
+              </div>
+              <div className="flex items-center justify-end">
               <button
                 type="submit"
                 disabled={submitting}
@@ -188,6 +218,7 @@ export function EventFeedbackModal({
                 )}
                 <span>Gửi Đánh Giá</span>
               </button>
+            </div>
             </div>
           </form>
 

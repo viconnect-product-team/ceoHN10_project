@@ -735,7 +735,7 @@ export function ExecutiveDashboard({ authReady }: { authReady: boolean }) {
       >
         <div className="grid gap-4 md:grid-cols-2">
           {/* TÚI QUỸ 1: QUỸ CHUNG CLB */}
-          <div className="rounded-2xl border border-purple-200 dark:border-purple-900/50 bg-gradient-to-br from-purple-50/50 via-white to-purple-50/30 dark:from-purple-950/20 dark:via-background dark:to-purple-950/10 p-5 space-y-4 shadow-xs">
+          <div className="rounded-2xl border border-purple-200 dark:border-purple-900/50 bg-purple-50/40 dark:bg-purple-950/20 p-5 space-y-4 shadow-xs">
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-purple-600/10 text-purple-700 dark:text-purple-300 flex items-center justify-center">
@@ -779,7 +779,7 @@ export function ExecutiveDashboard({ authReady }: { authReady: boolean }) {
           </div>
 
           {/* TÚI QUỸ 2: QUỸ TÀI TRỢ */}
-          <div className="rounded-2xl border border-pink-200 dark:border-pink-900/50 bg-gradient-to-br from-pink-50/50 via-white to-pink-50/30 dark:from-pink-950/20 dark:via-background dark:to-pink-950/10 p-5 space-y-4 shadow-xs">
+          <div className="rounded-2xl border border-pink-200 dark:border-pink-900/50 bg-pink-50/40 dark:bg-pink-950/20 p-5 space-y-4 shadow-xs">
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-pink-600/10 text-pink-700 dark:text-pink-300 flex items-center justify-center">

@@ -61,7 +61,7 @@ export function BirthdayPromoManager() {
   };
 
   return (
-    <div className="mb-6 rounded-2xl border border-amber-300/60 dark:border-amber-700/60 bg-gradient-to-br from-amber-50/80 via-white to-orange-50/50 dark:from-slate-900 dark:via-slate-900/95 dark:to-amber-950/20 p-5 sm:p-6 shadow-sm">
+    <div className="mb-6 rounded-2xl border border-amber-300/60 dark:border-amber-700/60 bg-gradient-to-br from-amber-50/80 to-orange-50/70 dark:from-slate-900 dark:via-slate-900/95 dark:to-amber-950/20 p-5 sm:p-6 shadow-sm">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-amber-200/60 dark:border-amber-800/40">
         <div className="flex items-center gap-3">
           <div className="h-11 w-11 rounded-2xl bg-gradient-to-tr from-amber-500 to-orange-400 flex items-center justify-center text-white shadow-md">

@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import {
   Award,
   Pencil,
@@ -33,6 +33,9 @@ import { useT } from "@/lib/i18n";
 import { CreateRewardModal } from "@/components/benefits/CreateRewardModal";
 
 export const Route = createFileRoute("/benefits")({
+  beforeLoad: () => {
+    throw redirect({ to: "/news" });
+  },
   component: BenefitsAdminPage,
 });
 

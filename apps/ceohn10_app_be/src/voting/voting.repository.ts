@@ -240,6 +240,14 @@ export class VotingRepository {
     `.catch(() => []);
   }
 
+  async findTrainingDate(trainingId: string): Promise<any[]> {
+    const validId = toValidUuid(trainingId);
+    if (!validId) return [];
+    return this.prisma.$queryRaw<any[]>`
+      SELECT start_time FROM public.trainings WHERE id = ${validId}::uuid LIMIT 1
+    `.catch(() => []);
+  }
+
   async insertPoll(
     pollId: string,
     title: string,
@@ -247,13 +255,37 @@ export class VotingRepository {
     startDt: Date,
     endDt: Date,
     eventId: string | null,
+    trainingId?: string | null,
+    targetType?: string | null,
+    targetId?: string | null,
   ): Promise<void> {
     const safePollId = toValidUuid(pollId) || crypto.randomUUID();
     const validEventId = toValidUuid(eventId);
-    await this.prisma.$executeRaw`
-      INSERT INTO public.polls (id, title, description, status, start_date, end_date, event_id, created_at, updated_at)
-      VALUES (${safePollId}::uuid, ${title}, ${description}, 'open', ${startDt}, ${endDt}, ${validEventId}::uuid, now(), now())
-    `;
+    const validTrainingId = toValidUuid(trainingId);
+
+    await this.prisma.$executeRawUnsafe(`
+      ALTER TABLE public.polls ADD COLUMN IF NOT EXISTS training_id UUID;
+      ALTER TABLE public.polls ADD COLUMN IF NOT EXISTS target_type TEXT;
+      ALTER TABLE public.polls ADD COLUMN IF NOT EXISTS target_id TEXT;
+    `).catch(() => {});
+
+    await this.prisma.$executeRawUnsafe(`
+      INSERT INTO public.polls (
+        id, title, description, status, start_date, end_date, event_id, training_id, target_type, target_id, created_at, updated_at
+      ) VALUES (
+        $1::uuid, $2, $3, 'open', $4, $5, $6::uuid, $7::uuid, $8, $9, now(), now()
+      );
+    `,
+      safePollId,
+      title,
+      description,
+      startDt,
+      endDt,
+      validEventId,
+      validTrainingId,
+      targetType || (validTrainingId ? 'training' : (validEventId ? 'event' : null)),
+      targetId || trainingId || eventId,
+    );
   }
 
   async insertPollOption(
@@ -273,23 +305,23 @@ export class VotingRepository {
   async findAudienceUsers(audience: string): Promise<any[]> {
     if (audience === 'members') {
       return this.prisma.$queryRaw<any[]>`
-        SELECT DISTINCT user_id as id FROM public.members WHERE user_id IS NOT NULL
+        SELECT DISTINCT user_id as id, email FROM public.members WHERE user_id IS NOT NULL
       `.catch(() => [] as any[]);
     } else if (audience === 'non_members') {
       return this.prisma.$queryRaw<any[]>`
-        SELECT id FROM public.vione_users 
+        SELECT id, email FROM public.vione_users 
         WHERE id NOT IN (SELECT user_id FROM public.members WHERE user_id IS NOT NULL)
       `.catch(async () => {
         return this.prisma.$queryRaw<
           any[]
-        >`SELECT id FROM public.vione_users LIMIT 50`.catch(() => [] as any[]);
+        >`SELECT id, email FROM public.vione_users LIMIT 50`.catch(() => [] as any[]);
       });
     } else {
       return this.prisma.$queryRaw<any[]>`
-        SELECT DISTINCT u.id FROM (
-          SELECT id FROM public.vione_users
+        SELECT DISTINCT u.id, u.email FROM (
+          SELECT id, email FROM public.vione_users
           UNION
-          SELECT user_id as id FROM public.members WHERE user_id IS NOT NULL
+          SELECT user_id as id, email FROM public.members WHERE user_id IS NOT NULL
         ) u
       `.catch(() => [] as any[]);
     }

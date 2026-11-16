@@ -278,7 +278,7 @@ export function CreateConnectionModal({
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="shrink-0 flex items-center justify-between px-4 py-3.5 border-b border-slate-100 dark:border-slate-800 bg-gradient-to-r from-slate-50 via-white to-amber-50/20 dark:from-slate-900 dark:via-[#0B132B] dark:to-amber-950/20">
+        <div className="shrink-0 flex items-center justify-between px-4 py-3.5 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900">
           <div className="flex items-center gap-2">
             <span className="p-1.5 rounded-xl bg-[#003B95] text-amber-300 shadow-xs">
               <Handshake className="size-4.5" />

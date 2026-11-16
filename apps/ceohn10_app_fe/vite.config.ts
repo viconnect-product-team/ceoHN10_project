@@ -18,10 +18,48 @@ export default defineConfig({
     build: {
       sourcemap: false,
       chunkSizeWarningLimit: 2500,
+      rollupOptions: {
+        output: {
+          manualChunks(id) {
+            if (id.includes('node_modules')) {
+              if (id.includes('jspdf') || id.includes('html2canvas') || id.includes('pdf-lib')) {
+                return 'vendor-pdf';
+              }
+              if (id.includes('xlsx') || id.includes('docx') || id.includes('pptxgenjs') || id.includes('exceljs')) {
+                return 'vendor-docs';
+              }
+              if (id.includes('recharts') || id.includes('d3')) {
+                return 'vendor-charts';
+              }
+              if (id.includes('lucide-react')) {
+                return 'vendor-icons';
+              }
+              if (id.includes('@capacitor')) {
+                return 'vendor-capacitor';
+              }
+            }
+          },
+        },
+      },
+    },
+    ssr: {
+      external: [
+        'jspdf',
+        'html2canvas',
+        'html2canvas-pro',
+        'docx',
+        'exceljs',
+        'pdf-lib',
+        'pptxgenjs',
+        'xlsx',
+        '@capacitor/core',
+        '@capacitor/android',
+        '@capacitor/ios',
+      ],
     },
     server: {
       host: true,
-      port: 5137,
+      port: 5173,
       strictPort: false,
       watch: {
         ignored: [

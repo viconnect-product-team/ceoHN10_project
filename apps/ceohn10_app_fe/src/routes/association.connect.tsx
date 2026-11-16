@@ -27,6 +27,7 @@ import { toast } from "sonner";
 import { fetchNestApi, resolveMediaUrl } from "@/lib/api-client";
 import { useAuth } from "@/context/AuthContext";
 import { MemberHeader } from "@/components/member/MemberShell";
+import { FeedView } from "@/components/feed/FeedView";
 
 export const Route = createFileRoute("/association/connect")({
   component: AssociationConnectScreen,
@@ -63,6 +64,7 @@ export function AssociationConnectScreen() {
   const navigate = useNavigate();
   const { user } = useAuth();
 
+  const [mainSection, setMainSection] = useState<"feed" | "meetings">("feed");
   const [activeTab, setActiveTab] = useState<"my_meetings" | "sent_meetings" | "cancelled">("my_meetings");
   const [loading, setLoading] = useState(false);
   const [meetings, setMeetings] = useState<ConnectionMeeting[]>([]);
@@ -386,7 +388,43 @@ export function AssociationConnectScreen() {
     <div className="vba-animate pb-6 min-h-screen bg-stone-50 dark:bg-slate-950 font-sans">
       <MemberHeader title="Gặp Gỡ &amp; Kết Nối B2B" back />
 
-      {/* Top Banner & Quick KPI */}
+      {/* ── TOP SECTION TOGGLE: BẢNG TIN MẠNG XÃ HỘI B2B / HẸN GẶP 1-1 ── */}
+      <div className="px-4 pt-2.5 max-w-2xl mx-auto">
+        <div className="p-1 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs flex items-center gap-1">
+          <button
+            type="button"
+            onClick={() => setMainSection("feed")}
+            className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer ${
+              mainSection === "feed"
+                ? "bg-[#003B95] text-white shadow-xs"
+                : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+            }`}
+          >
+            <MessageSquare className="size-3.5" />
+            <span>📢 Bảng Tin Kết Nối B2B</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setMainSection("meetings")}
+            className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer ${
+              mainSection === "meetings"
+                ? "bg-[#003B95] text-white shadow-xs"
+                : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+            }`}
+          >
+            <Handshake className="size-3.5" />
+            <span>🤝 Hẹn Gặp 1-1 ({myMeetingsList.length})</span>
+          </button>
+        </div>
+      </div>
+
+      {mainSection === "feed" ? (
+        <div className="px-2 pt-2 max-w-2xl mx-auto">
+          <FeedView />
+        </div>
+      ) : (
+        <>
+          {/* Top Banner & Quick KPI */}
       <div className="px-4 pt-3 space-y-3 max-w-2xl mx-auto">
         <div className="p-4 rounded-3xl bg-gradient-to-r from-[#003B95] via-[#002766] to-[#001433] text-white shadow-xl border border-amber-400/40 flex items-center justify-between">
           <div>
@@ -702,6 +740,8 @@ export function AssociationConnectScreen() {
           )}
         </div>
       </div>
+      </>
+      )}
 
       {/* ── CREATE 1-ON-1 MEETING MODAL ── */}
       {createModalOpen && (

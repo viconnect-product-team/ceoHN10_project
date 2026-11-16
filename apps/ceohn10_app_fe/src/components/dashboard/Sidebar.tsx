@@ -90,7 +90,6 @@ const events: Item[] = [
 ];
 const sponsors: Item[] = [
   { key: "nav.sponsors", icon: Handshake, to: "/sponsors" },
-  { key: "nav.sponsorPkg", icon: Package, to: "/sponsor-packages" },
   { key: "nav.sponsorReport", icon: FileBarChart, to: "/sponsor-report" },
 ];
 const finance: Item[] = [
@@ -125,7 +124,7 @@ const comm: Item[] = [
   },
   { key: "nav.news", icon: Newspaper, to: "/news" },
   { key: "nav.perks", icon: Gift, to: "/perks" },
-  { key: "nav.benefits", icon: Award, to: "/benefits" },
+  { key: "nav.feedback" as TKey, icon: MessageSquare, to: "/feedback", label: "Phản ánh & Đóng góp ý kiến" },
 ];
 const network: Item[] = [
   { key: "nav.network", icon: MessageSquare, to: "/network", label: "Tin nhắn & Trao đổi công việc" },

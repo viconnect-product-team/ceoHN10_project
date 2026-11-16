@@ -40,7 +40,7 @@ function PerkDetailScreen() {
         {perk && (
           <div className="space-y-4">
             {/* Hero Card with Navy & Amber Gold Theme */}
-            <div className="relative overflow-hidden rounded-3xl border border-amber-300/80 dark:border-amber-500/30 bg-gradient-to-br from-amber-50/80 via-white to-orange-50/40 dark:from-[#003B95]/15 dark:via-amber-500/5 dark:to-transparent p-6 shadow-sm">
+            <div className="relative overflow-hidden rounded-3xl border border-amber-300/80 dark:border-amber-500/30 bg-gradient-to-br from-amber-50/80 to-orange-50/60 dark:from-[#003B95]/15 dark:via-amber-500/5 dark:to-transparent p-6 shadow-sm">
               <div className="pointer-events-none absolute -right-8 -top-8 h-36 w-36 rounded-full bg-amber-400/15 blur-2xl" />
               <div className="pointer-events-none absolute -left-8 -bottom-8 h-32 w-32 rounded-full bg-[#003B95]/10 blur-xl" />
 

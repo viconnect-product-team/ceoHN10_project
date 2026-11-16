@@ -149,6 +149,35 @@ export class AdminController {
     return this.adminService.sendNotification(id);
   }
 
+  // ── NHẮC NHỞ HỘI VIÊN QUA APP & EMAIL (YÊU CẦU 1) ──
+  @Post('notifications/:id/remind')
+  @UseGuards(JwtAuthGuard)
+  async remindNotification(@Param('id') id: string) {
+    return this.adminService.remindNotification(id);
+  }
+
+  @Post('notifications/daily-sync-and-dispatch')
+  @UseGuards(JwtAuthGuard)
+  async dailySyncAndDispatchNotifications(@Query('associationId') associationId?: string) {
+    await this.adminService.syncSystemAlertNotifications(associationId);
+    return {
+      success: true,
+      message: 'Đã hoàn tất quét và đồng bộ các thông báo nhắc nhở đầu ngày',
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+  // ── TỔNG HỢP PHẢN ÁNH & GÓP Ý (YÊU CẦU 4) ──
+  @Get('feedbacks')
+  @UseGuards(JwtAuthGuard)
+  async listFeedbacks(
+    @Query('category') category?: string,
+    @Query('search') search?: string,
+    @Query('minRating') minRating?: number,
+  ) {
+    return this.adminService.listAllFeedbacks({ category, search, minRating });
+  }
+
   @Post('notifications/:id/push-messages')
   @UseGuards(JwtAuthGuard)
   async pushNotificationToMessages(

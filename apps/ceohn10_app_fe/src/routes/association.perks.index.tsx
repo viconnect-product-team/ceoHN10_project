@@ -316,7 +316,7 @@ export function PerksScreen() {
       <div className="px-4 pt-3">
         <div
           onClick={() => setGiftModalOpen(true)}
-          className="self-stretch px-4 py-3.5 bg-gradient-to-r from-amber-50/90 via-white to-amber-50/50 dark:from-[#1c1810] dark:via-[#131a26] dark:to-[#17130c] rounded-2xl border border-amber-300/80 dark:border-amber-500/40 inline-flex flex-col justify-center items-start gap-3 w-full shadow-sm hover:shadow-md hover:border-amber-400 transition active:scale-[0.99] cursor-pointer group"
+          className="self-stretch px-4 py-3.5 bg-gradient-to-r from-amber-50 to-amber-100/60 dark:from-[#1c1810] dark:via-[#131a26] dark:to-[#17130c] rounded-2xl border border-amber-300/80 dark:border-amber-500/40 inline-flex flex-col justify-center items-start gap-3 w-full shadow-sm hover:shadow-md hover:border-amber-400 transition active:scale-[0.99] cursor-pointer group"
         >
           <div className="self-stretch inline-flex justify-between items-center w-full">
             <div className="flex justify-start items-center gap-3">

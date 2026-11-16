@@ -64,7 +64,7 @@ interface AttendeeItem {
   role?: string;
 }
 
-export function UnifiedCheckinManagementPage() {
+function UnifiedCheckinManagementPage() {
   const router = useRouter();
   const { user } = useAuth();
   const { isAdmin, isSuperAdmin, isPresident, isChuTich, isBQT, isBTT } = useRole();

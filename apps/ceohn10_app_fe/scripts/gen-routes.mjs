@@ -17,6 +17,7 @@ const config = getConfig(
   {
     routesDirectory: routesDir,
     generatedRouteTree: routeTreeFile,
+    autoCodeSplitting: true,
   },
   root,
 );

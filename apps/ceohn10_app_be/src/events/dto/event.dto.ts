@@ -1,6 +1,8 @@
 export class CreateEventDto {
   name!: string;
   tagline?: string;
+  department?: string;
+  category?: string;
   date!: string;
   location?: string;
   capacity?: number;
@@ -33,6 +35,8 @@ export class CreateEventDto {
 export class UpdateEventDto {
   name?: string;
   tagline?: string;
+  department?: string;
+  category?: string;
   date?: string;
   location?: string;
   capacity?: number;

@@ -43,6 +43,7 @@ import { Route as IncomeRouteImport } from './routes/income'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as FinanceReportRouteImport } from './routes/finance-report'
 import { Route as FeesRouteImport } from './routes/fees'
+import { Route as FeedbackRouteImport } from './routes/feedback'
 import { Route as ExpensesRouteImport } from './routes/expenses'
 import { Route as EventsOverviewRouteImport } from './routes/events-overview'
 import { Route as EventsRouteImport } from './routes/events'
@@ -426,6 +427,11 @@ const FinanceReportRoute = FinanceReportRouteImport.update({
 const FeesRoute = FeesRouteImport.update({
   id: '/fees',
   path: '/fees',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FeedbackRoute = FeedbackRouteImport.update({
+  id: '/feedback',
+  path: '/feedback',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ExpensesRoute = ExpensesRouteImport.update({
@@ -1577,6 +1583,7 @@ export interface FileRoutesByFullPath {
   '/events': typeof EventsRouteWithChildren
   '/events-overview': typeof EventsOverviewRoute
   '/expenses': typeof ExpensesRoute
+  '/feedback': typeof FeedbackRoute
   '/fees': typeof FeesRouteWithChildren
   '/finance-report': typeof FinanceReportRoute
   '/forgot-password': typeof ForgotPasswordRoute
@@ -1820,6 +1827,7 @@ export interface FileRoutesByTo {
   '/event-registrations': typeof EventRegistrationsRoute
   '/events-overview': typeof EventsOverviewRoute
   '/expenses': typeof ExpensesRoute
+  '/feedback': typeof FeedbackRoute
   '/finance-report': typeof FinanceReportRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/income': typeof IncomeRoute
@@ -2047,6 +2055,7 @@ export interface FileRoutesById {
   '/events': typeof EventsRouteWithChildren
   '/events-overview': typeof EventsOverviewRoute
   '/expenses': typeof ExpensesRoute
+  '/feedback': typeof FeedbackRoute
   '/fees': typeof FeesRouteWithChildren
   '/finance-report': typeof FinanceReportRoute
   '/forgot-password': typeof ForgotPasswordRoute
@@ -2299,6 +2308,7 @@ export interface FileRouteTypes {
     | '/events'
     | '/events-overview'
     | '/expenses'
+    | '/feedback'
     | '/fees'
     | '/finance-report'
     | '/forgot-password'
@@ -2542,6 +2552,7 @@ export interface FileRouteTypes {
     | '/event-registrations'
     | '/events-overview'
     | '/expenses'
+    | '/feedback'
     | '/finance-report'
     | '/forgot-password'
     | '/income'
@@ -2768,6 +2779,7 @@ export interface FileRouteTypes {
     | '/events'
     | '/events-overview'
     | '/expenses'
+    | '/feedback'
     | '/fees'
     | '/finance-report'
     | '/forgot-password'
@@ -3019,6 +3031,7 @@ export interface RootRouteChildren {
   EventsRoute: typeof EventsRouteWithChildren
   EventsOverviewRoute: typeof EventsOverviewRoute
   ExpensesRoute: typeof ExpensesRoute
+  FeedbackRoute: typeof FeedbackRoute
   FeesRoute: typeof FeesRouteWithChildren
   FinanceReportRoute: typeof FinanceReportRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
@@ -3323,6 +3336,13 @@ declare module '@tanstack/react-router' {
       path: '/fees'
       fullPath: '/fees'
       preLoaderRoute: typeof FeesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/feedback': {
+      id: '/feedback'
+      path: '/feedback'
+      fullPath: '/feedback'
+      preLoaderRoute: typeof FeedbackRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/expenses': {
@@ -5541,6 +5561,7 @@ const rootRouteChildren: RootRouteChildren = {
   EventsRoute: EventsRouteWithChildren,
   EventsOverviewRoute: EventsOverviewRoute,
   ExpensesRoute: ExpensesRoute,
+  FeedbackRoute: FeedbackRoute,
   FeesRoute: FeesRouteWithChildren,
   FinanceReportRoute: FinanceReportRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,

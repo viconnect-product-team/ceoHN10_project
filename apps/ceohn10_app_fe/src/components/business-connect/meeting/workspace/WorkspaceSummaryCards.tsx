@@ -41,7 +41,7 @@ export function WorkspaceSummaryCards({ meetings = [] }: { meetings?: MeetingIte
       </div>
 
       {/* 2. Sắp diễn ra (Violet gradient - Indigo) */}
-      <div className="h-32 p-4 bg-gradient-to-b from-violet-100 to-white dark:from-violet-950/40 dark:to-slate-900 rounded-[20px] outline outline-[0.50px] outline-slate-200 dark:outline-slate-800 flex flex-col justify-start items-start gap-2.5 overflow-hidden shadow-xs">
+      <div className="h-32 p-4 bg-gradient-to-b from-violet-100 to-violet-50 dark:from-violet-950/40 dark:to-slate-900 rounded-[20px] outline outline-[0.50px] outline-slate-200 dark:outline-slate-800 flex flex-col justify-start items-start gap-2.5 overflow-hidden shadow-xs">
         <div className="h-8 flex items-center gap-2">
           <img src="/icons/ceohn10_icon_2/shield-check.svg" className="h-4 w-4" alt="clock" onError={(e) => { (e.currentTarget as HTMLElement).style.display = 'none'; }} />
           <div className="text-indigo-500 dark:text-indigo-400 text-xs font-semibold font-['Inter']">SẮP DIỄN RA</div>
@@ -55,7 +55,7 @@ export function WorkspaceSummaryCards({ meetings = [] }: { meetings?: MeetingIte
       </div>
 
       {/* 3. Phân bổ hình thức (Orange gradient - Orange) */}
-      <div className="h-32 p-4 bg-gradient-to-b from-orange-100 to-white dark:from-orange-950/40 dark:to-slate-900 rounded-[20px] outline outline-[0.50px] outline-slate-200 dark:outline-slate-800 flex flex-col justify-start items-start gap-2.5 overflow-hidden shadow-xs">
+      <div className="h-32 p-4 bg-gradient-to-b from-orange-100 to-orange-50 dark:from-orange-950/40 dark:to-slate-900 rounded-[20px] outline outline-[0.50px] outline-slate-200 dark:outline-slate-800 flex flex-col justify-start items-start gap-2.5 overflow-hidden shadow-xs">
         <div className="h-8 flex items-center gap-2">
           <img src="/icons/ceohn10_icon_2/building-2-1.svg" className="h-4 w-4" alt="venue" onError={(e) => { (e.currentTarget as HTMLElement).style.display = 'none'; }} />
           <div className="text-orange-500 dark:text-orange-400 text-xs font-semibold font-['Inter']">HÌNH THỨC GẶP</div>
@@ -69,7 +69,7 @@ export function WorkspaceSummaryCards({ meetings = [] }: { meetings?: MeetingIte
       </div>
 
       {/* 4. Đã hoàn thành (Green gradient - Emerald) */}
-      <div className="h-32 p-4 bg-gradient-to-b from-green-100 to-white dark:from-green-950/40 dark:to-slate-900 rounded-[20px] outline outline-[0.50px] outline-slate-200 dark:outline-slate-800 flex flex-col justify-start items-start gap-2.5 overflow-hidden shadow-xs">
+      <div className="h-32 p-4 bg-gradient-to-b from-green-100 to-emerald-50 dark:from-green-950/40 dark:to-slate-900 rounded-[20px] outline outline-[0.50px] outline-slate-200 dark:outline-slate-800 flex flex-col justify-start items-start gap-2.5 overflow-hidden shadow-xs">
         <div className="h-8 flex items-center gap-2">
           <img src="/icons/ceohn10_icon_2/circle-check.svg" className="h-4 w-4" alt="check" onError={(e) => { (e.currentTarget as HTMLElement).style.display = 'none'; }} />
           <div className="text-emerald-500 dark:text-emerald-400 text-xs font-semibold font-['Inter']">ĐÃ HOÀN THÀNH</div>

@@ -19,7 +19,8 @@ export function TrainingMediaModal({
   onUpdated?: (newUrl: string) => void;
 }) {
   const [mediaUrl, setMediaUrl] = useState(existingMediaUrl || "");
-  const [mediaType, setMediaType] = useState<"video" | "gallery" | "photo">("video");
+  const [mediaType, setMediaType] = useState<"video" | "gallery" | "photo" | "slide">("slide");
+  const [department, setDepartment] = useState<string>("Ban Học Tập");
   const [title, setTitle] = useState(`Khoảnh khắc & Ghi hình buổi học: ${trainingTitle}`);
   const [description, setDescription] = useState("Video bài giảng và hình ảnh lưu niệm được ghi lại trong suốt buổi đào tạo CEO HN10");
   const [submitting, setSubmitting] = useState(false);
@@ -39,6 +40,8 @@ export function TrainingMediaModal({
         body: JSON.stringify({
           mediaUrl: mediaUrl.trim(),
           mediaType,
+          department,
+          docType: mediaType === "slide" ? "slide" : "media",
           title: title.trim(),
           description: description.trim(),
         }),
@@ -89,13 +92,32 @@ export function TrainingMediaModal({
 
           <div>
             <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+              Ban Chức Năng Tải Lên (Tự động lưu vào thư mục Ban)
+            </label>
+            <select
+              value={department}
+              onChange={(e) => setDepartment(e.target.value)}
+              className="w-full h-9 rounded-xl border border-slate-300 dark:border-slate-700 bg-background px-3 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+            >
+              <option value="Ban Học Tập">Ban Học Tập (Lớp phó Nguyễn Thành Luân - Slide bài giảng)</option>
+              <option value="Ban Truyền Thông">Ban Truyền Thông (Lớp phó Phạm Hồng Anh - Ảnh, Video ghi hình)</option>
+              <option value="Ban Sự Kiện – Hậu Cần">Ban Sự Kiện – Hậu Cần (Lớp phó Đàm Thị Hương - Vật tư)</option>
+              <option value="Ban Tài Chính – Tài Trợ">Ban Tài Chính – Tài Trợ (Lớp phó Lê Thị Thủy - Báo cáo tài trợ)</option>
+              <option value="Ban Công Nghệ">Ban Công Nghệ (Lớp phó Ngô Văn Tuấn)</option>
+              <option value="Ban Đối Ngoại & Giao Thương">Ban Đối Ngoại & Giao Thương (Lớp phó Dương Văn Hiệu)</option>
+              <option value="Ban Đời Sống & Gắn Kết">Ban Đời Sống & Gắn Kết (Lớp phó Bùi Thị Phương Dinh)</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
               Phân Loại Tư Liệu Buổi Học
             </label>
             <div className="grid grid-cols-3 gap-2">
               {[
+                { key: "slide", label: "Slide Bài Giảng", icon: LinkIcon },
                 { key: "video", label: "Video Ghi Hình", icon: Video },
                 { key: "gallery", label: "Album Ảnh Drive", icon: Camera },
-                { key: "photo", label: "Khoảnh Khắc Đẹp", icon: LinkIcon },
               ].map((m) => {
                 const Icon = m.icon;
                 const isSelected = mediaType === m.key;

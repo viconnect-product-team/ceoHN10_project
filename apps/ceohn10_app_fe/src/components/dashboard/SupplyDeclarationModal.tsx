@@ -12,6 +12,7 @@ import {
   X,
   AlertCircle,
   Gift,
+  FileText,
 } from "lucide-react";
 import { toast } from "sonner";
 import { fetchNestApi } from "@/lib/api-client";
@@ -195,40 +196,159 @@ export function SupplyDeclarationModal({
   };
 
   const handleSendExpenseProposal = async () => {
-    const neededItems = items.filter((i) => !i.isFromSponsor && i.estimatedCost > 0);
-    if (neededItems.length === 0) {
-      toast.info("Không có vật dụng nào phát sinh kinh phí cần gửi duyệt chi");
+    if (items.length === 0) {
+      toast.info("Chưa có vật dụng nào trong danh sách để gửi duyệt");
       return;
     }
 
-    const totalCost = neededItems.reduce((acc, cur) => acc + cur.estimatedCost * cur.quantity, 0);
+    const cashItems = items.filter((i) => !i.isFromSponsor && i.estimatedCost > 0);
+    const inKindItems = items.filter((i) => i.isFromSponsor);
+    const totalCash = cashItems.reduce((acc, cur) => acc + cur.estimatedCost * cur.quantity, 0);
+
+    let fundType = "general";
+    if (cashItems.length > 0 && inKindItems.length > 0) fundType = "hybrid";
+    else if (inKindItems.length > 0 && cashItems.length === 0) fundType = "sponsor_in_kind";
 
     try {
       await fetchNestApi("/admin/expense-requests", {
         method: "POST",
         body: JSON.stringify({
-          title: `Đề xuất cấp kinh phí vật tư & thiết yếu phẩm: ${targetName}`,
-          fundType: "general",
+          title: `Đề xuất cấp kinh phí & xuất kho hiện vật: ${targetName}`,
+          fundType,
           targetType,
           targetId,
           targetName,
-          department: department || (targetType === "training" ? "Ban Đào tạo & Sự kiện" : "Ban Sự kiện & Hậu cần"),
+          department: department || (targetType === "training" ? "Ban Học Tập" : "Ban Sự Kiện – Hậu Cần"),
           recipientName: "Trưởng Ban Hậu Cần",
-          amount: totalCost,
-          reason: `Ban Hậu cần đề xuất duyệt chi mua sắm thiết bị, vật phẩm phục vụ ${targetType === "event" ? "sự kiện" : "buổi học"} "${targetName}"`,
-          items: neededItems.map((i) => ({
+          amount: totalCash,
+          reason: `Ban Sự Kiện – Hậu Cần lập dự trù vật tư, thiết bị và xuất kho phục vụ ${targetType === "event" ? "sự kiện" : "buổi học"} "${targetName}"`,
+          items: items.map((i) => ({
             itemName: i.itemName,
             quantity: i.quantity,
             unit: i.unit,
             cost: i.estimatedCost,
+            isFromSponsor: i.isFromSponsor,
+            sponsorId: i.sponsorId || null,
+            sponsorName: i.sponsorName || "",
           })),
         }),
       });
 
-      toast.success("Đã gửi đề xuất duyệt chi tới Trưởng Ban Tài Chính & Ban Điều Hành!");
+      toast.success("Đã gửi yêu cầu duyệt kinh phí & xuất kho tới Ban Tài Chính – Tài Trợ thành công!");
     } catch {
-      toast.error("Không thể gửi đề xuất duyệt chi");
+      toast.error("Không thể gửi đề xuất duyệt chi lúc này");
     }
+  };
+
+  const handlePrintVoucherPdf = () => {
+    if (items.length === 0) {
+      toast.info("Chưa có dữ liệu vật phẩm để xuất chứng từ PDF");
+      return;
+    }
+
+    const printWin = window.open("", "_blank");
+    if (!printWin) return;
+
+    const cashTotal = items.filter(i => !i.isFromSponsor).reduce((sum, i) => sum + i.estimatedCost * i.quantity, 0);
+    const inKindTotal = items.filter(i => i.isFromSponsor).length;
+
+    printWin.document.write(`
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Phiếu Xuất Kho Hiện Vật & Chứng Từ Quyết Toán - CEO HN10</title>
+        <style>
+          body { font-family: 'Times New Roman', Times, serif; padding: 40px; color: #111; line-height: 1.5; }
+          .header { display: flex; justify-content: space-between; border-bottom: 2px solid #003B95; padding-bottom: 12px; margin-bottom: 24px; }
+          .title { text-align: center; margin: 20px 0; }
+          .title h1 { margin: 0; font-size: 20px; color: #003B95; text-transform: uppercase; }
+          .title p { margin: 4px 0 0 0; font-size: 13px; font-style: italic; }
+          table { width: 100%; border-collapse: collapse; margin-top: 16px; font-size: 13px; }
+          th, td { border: 1px solid #333; padding: 8px 10px; text-align: left; }
+          th { background: #f0f4f8; font-weight: bold; }
+          .text-right { text-align: right; }
+          .text-center { text-align: center; }
+          .signatures { display: flex; justify-content: space-between; margin-top: 48px; text-align: center; font-size: 13px; }
+          .signatures div { width: 30%; }
+          .signatures p.name { margin-top: 60px; font-weight: bold; }
+        </style>
+      </head>
+      <body>
+        <div class="header">
+          <div>
+            <strong>HIỆP HỘI DOANH NGHIỆP TRẺ HÀ NỘI (HANOIBA)</strong><br/>
+            <strong>CLB DOANH NHÂN CEO HN10</strong><br/>
+            <span>Ban Sự Kiện – Hậu Cần & Ban Tài Chính</span>
+          </div>
+          <div style="text-align: right;">
+            <strong>Mẫu số: 02-VT/CEOHN10</strong><br/>
+            <span>Mã chứng từ: CT-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}</span><br/>
+            <span>Ngày in: ${new Date().toLocaleDateString('vi-VN')}</span>
+          </div>
+        </div>
+
+        <div class="title">
+          <h1>BẢNG KÊ DỰ TRÙ VẬT TƯ & PHIẾU XUẤT KHO HIỆN VẬT TÀI TRỢ</h1>
+          <p>Áp dụng cho: <strong>${targetName}</strong> (${targetType === 'event' ? 'Sự Kiện' : 'Buổi Học'})</p>
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th class="text-center" style="width: 40px;">STT</th>
+              <th>Tên vật dụng / Hiện vật</th>
+              <th class="text-center" style="width: 90px;">Số lượng</th>
+              <th>Nguồn cấp phát</th>
+              <th class="text-right" style="width: 120px;">Dự toán chi phí</th>
+              <th>Ghi chú</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${items.map((it, idx) => `
+              <tr>
+                <td class="text-center">${idx + 1}</td>
+                <td><strong>${it.itemName}</strong></td>
+                <td class="text-center">${it.quantity} ${it.unit}</td>
+                <td>${it.isFromSponsor ? 'Kho Tài Trợ (NTT: ' + (it.sponsorName || 'Nhà tài trợ') + ')' : 'Ban Hậu cần mua mới'}</td>
+                <td class="text-right">${it.estimatedCost ? (it.estimatedCost * it.quantity).toLocaleString('vi-VN') + ' đ' : '0 đ'}</td>
+                <td>${it.note || '-'}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+          <tfoot>
+            <tr style="font-weight: bold; background: #fafafa;">
+              <td colspan="4" class="text-right">Tổng kinh phí mua mới dự kiến:</td>
+              <td class="text-right">${cashTotal.toLocaleString('vi-VN')} đ</td>
+              <td>${inKindTotal} hạng mục từ kho tài trợ</td>
+            </tr>
+          </tfoot>
+        </table>
+
+        <div class="signatures">
+          <div>
+            <strong>NGƯỜI LẬP BÁO CÁO</strong><br/>
+            <em>(Ký, ghi rõ họ tên)</em><br/>
+            <p class="name">Ban Sự Kiện – Hậu Cần</p>
+          </div>
+          <div>
+            <strong>TRƯỞNG BAN TÀI CHÍNH</strong><br/>
+            <em>(Ký, ghi rõ họ tên)</em><br/>
+            <p class="name">Lê Thị Thủy</p>
+          </div>
+          <div>
+            <strong>CHỦ TỊCH / LỚP TRƯỞNG</strong><br/>
+            <em>(Ký, ghi rõ họ tên)</em><br/>
+            <p class="name">Trần Xuân Thắng</p>
+          </div>
+        </div>
+
+        <script>
+          window.onload = function() { window.print(); }
+        </script>
+      </body>
+      </html>
+    `);
+    printWin.document.close();
   };
 
   if (!open) return null;
@@ -400,13 +520,22 @@ export function SupplyDeclarationModal({
                 Danh sách vật tư đã khai báo ({items.length})
               </h3>
               {items.length > 0 && (
-                <button
-                  type="button"
-                  onClick={handleSendExpenseProposal}
-                  className="flex items-center gap-1.5 rounded-xl border border-primary/30 bg-primary/10 px-3 py-1.5 text-xs font-semibold text-primary hover:bg-primary/20 transition"
-                >
-                  <Send className="h-3.5 w-3.5" /> Gửi Yêu Cầu Duyệt Chi Hậu Cần
-                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={handleSendExpenseProposal}
+                    className="flex items-center gap-1.5 rounded-xl border border-primary/30 bg-primary/10 px-3 py-1.5 text-xs font-semibold text-primary hover:bg-primary/20 transition"
+                  >
+                    <Send className="h-3.5 w-3.5" /> Gửi Yêu Cầu Duyệt Chi
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handlePrintVoucherPdf}
+                    className="flex items-center gap-1.5 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-3 py-1.5 text-xs font-semibold text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/20 transition"
+                  >
+                    <FileText className="h-3.5 w-3.5" /> Xuất Chứng Từ PDF
+                  </button>
+                </div>
               )}
             </div>
 

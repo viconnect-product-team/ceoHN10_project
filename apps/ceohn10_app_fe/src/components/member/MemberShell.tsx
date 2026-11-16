@@ -2,7 +2,8 @@ import { type ReactNode, useEffect, useState, useMemo } from "react";
 import { Link, useRouterState, useNavigate } from "@tanstack/react-router";
 import {
   Home, Calendar, MessageSquare, User, QrCode,
-  Scan, ChevronLeft, WifiOff, BarChart3
+  Scan, ChevronLeft, WifiOff, BarChart3,
+  Smartphone, Download, X
 } from "lucide-react";
 import { useT, useLang, type TKey } from "@/lib/i18n";
 import { useTheme } from "@/lib/theme";
@@ -387,6 +388,7 @@ export function MemberScreen({ children }: { children: ReactNode }) {
           } shadow-[0_0_50px_-10px_rgba(0,0,0,0.5)]`}
       >
         <OfflineBanner />
+        <PwaInstallBanner />
         <SeasonalThemeAmbientOverlay />
         {/* Vùng nội dung cuộn chiếm trọn không gian phía trên thanh TabBar */}
         <div className="flex-1 min-h-0 relative overflow-hidden flex flex-col">
@@ -442,6 +444,68 @@ function OfflineBanner() {
     <div className="ceo-safe-sticky sticky top-0 z-40 flex items-center justify-center gap-2 bg-slate-800 px-4 py-1.5 text-[11px] font-semibold text-white">
       <WifiOff className="h-3.5 w-3.5" />
       {t("m.shell.offline")}
+    </div>
+  );
+}
+
+/** Banner gợi ý cài đặt PWA lên màn hình chính điện thoại khi chưa chạy ở chế độ standalone */
+function PwaInstallBanner() {
+  const [showBanner, setShowBanner] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const ua = window.navigator.userAgent.toLowerCase();
+    const isMobile = /iphone|ipad|ipod|android/.test(ua) || (window.navigator.platform === "MacIntel" && window.navigator.maxTouchPoints > 1);
+    const standalone = window.matchMedia("(display-mode: standalone)").matches || (window.navigator as any).standalone === true;
+    const dismissed = sessionStorage.getItem("ceohn10_pwa_banner_dismissed");
+
+    if (isMobile && !standalone && !dismissed) {
+      setShowBanner(true);
+    }
+  }, []);
+
+  if (!showBanner) return null;
+
+  return (
+    <div className="relative z-30 flex items-center justify-between gap-2.5 bg-gradient-to-r from-[#001D4A] via-[#003B95] to-[#001D4A] px-3.5 py-2 text-white shadow-md border-b border-amber-400/30 shrink-0 select-none">
+      <div className="flex items-center gap-2 min-w-0">
+        <div className="grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-amber-500/20 text-amber-400 border border-amber-400/40">
+          <Smartphone className="h-4 w-4" />
+        </div>
+        <div className="min-w-0">
+          <p className="text-[11px] font-bold text-amber-300 leading-tight truncate">
+            Cài đặt App CEO HN10
+          </p>
+          <p className="text-[10px] text-slate-200 leading-tight truncate">
+            Thêm vào màn hình chính dùng như app gốc
+          </p>
+        </div>
+      </div>
+      <div className="flex items-center gap-1.5 shrink-0">
+        <button
+          type="button"
+          onClick={() => {
+            window.dispatchEvent(new CustomEvent("open-install-prompt"));
+          }}
+          className="rounded-lg bg-gradient-to-r from-amber-500 to-amber-600 px-2.5 py-1 text-[11px] font-bold text-slate-950 shadow-sm hover:from-amber-400 hover:to-amber-500 active:scale-95 transition cursor-pointer flex items-center gap-1"
+        >
+          <Download className="h-3 w-3" />
+          <span>Cài ngay</span>
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            setShowBanner(false);
+            try {
+              sessionStorage.setItem("ceohn10_pwa_banner_dismissed", "true");
+            } catch {}
+          }}
+          className="grid h-6 w-6 place-items-center rounded-full text-slate-400 hover:text-white transition cursor-pointer"
+          aria-label="Đóng"
+        >
+          <X className="h-3.5 w-3.5" />
+        </button>
+      </div>
     </div>
   );
 }
@@ -519,23 +583,31 @@ function FooterHomeIcon({ active, brandColor }: { active: boolean; brandColor?: 
   );
 }
 
-function FooterAnalyticsIcon({ active, brandColor }: { active: boolean; brandColor?: string }) {
+function FooterEventsIcon({ active, brandColor }: { active: boolean; brandColor?: string }) {
   const activeColor = brandColor || "var(--vba-navy)";
   return (
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="size-6 transition-all duration-200">
-      <path d="M8.05653 3.5C2.04493 6.12883 0.629484 14.3347 5.20143 18.8641C9.86407 23.4835 17.9985 21.756 20.5 15.8278" stroke={active ? activeColor : "#8F8F8F"} strokeWidth={active ? "2" : "1.5"} strokeLinecap="round" />
-      <path d="M20.9063 8.60378C20.3946 7.36853 19.6447 6.24615 18.6993 5.30073C17.7538 4.35531 16.6315 3.60536 15.3962 3.0937C14.034 2.52946 13.3529 2.24733 12.4664 2.79477C12.4333 2.81523 12.3766 2.85309 12.345 2.87587C11.5 3.4854 11.5 4.42922 11.5 6.31686V8.42748C11.5 10.3473 11.5 11.3072 12.0964 11.9036C12.6928 12.5 13.6527 12.5 15.5725 12.5H17.6831C19.5708 12.5 20.5146 12.5 21.1241 11.655C21.1469 11.6234 21.1848 11.5667 21.2052 11.5336C21.7527 10.6471 21.4705 9.966 20.9063 8.60378Z" stroke={active ? activeColor : "#8F8F8F"} strokeWidth={active ? "2" : "1.5"} />
+      <rect x="3" y="4" width="18" height="18" rx="3" stroke={active ? activeColor : "#8F8F8F"} strokeWidth={active ? "2" : "1.5"} />
+      <path d="M16 2V6" stroke={active ? activeColor : "#8F8F8F"} strokeWidth={active ? "2" : "1.5"} strokeLinecap="round" />
+      <path d="M8 2V6" stroke={active ? activeColor : "#8F8F8F"} strokeWidth={active ? "2" : "1.5"} strokeLinecap="round" />
+      <path d="M3 10H21" stroke={active ? activeColor : "#8F8F8F"} strokeWidth={active ? "2" : "1.5"} />
+      <circle cx="8" cy="14" r="1.2" fill={active ? activeColor : "#8F8F8F"} />
+      <circle cx="12" cy="14" r="1.2" fill={active ? activeColor : "#8F8F8F"} />
+      <circle cx="16" cy="14" r="1.2" fill={active ? activeColor : "#8F8F8F"} />
+      <circle cx="8" cy="18" r="1.2" fill={active ? activeColor : "#8F8F8F"} />
+      <circle cx="12" cy="18" r="1.2" fill={active ? activeColor : "#8F8F8F"} />
+      <circle cx="16" cy="18" r="1.2" fill={active ? activeColor : "#8F8F8F"} />
     </svg>
   );
 }
 
-function FooterSocialNetworkIcon({ active, brandColor }: { active: boolean; brandColor?: string }) {
+function FooterConnectIcon({ active, brandColor }: { active: boolean; brandColor?: string }) {
   const activeColor = brandColor || "var(--vba-navy)";
   return (
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="size-6 transition-all duration-200">
-      <circle cx="12" cy="12" r="10" stroke={active ? activeColor : "#8F8F8F"} strokeWidth={active ? "2" : "1.5"} />
-      <path d="M12 22C12 22 8 18 8 12C8 6 12 2 12 2C12 2 16 6 16 12C16 18 12 22 12 22Z" stroke={active ? activeColor : "#8F8F8F"} strokeWidth={active ? "2" : "1.5"} strokeLinejoin="round" />
-      <path d="M22 12L2 12" stroke={active ? activeColor : "#8F8F8F"} strokeWidth={active ? "2" : "1.5"} strokeLinecap="round" strokeLinejoin="round" />
+      <circle cx="9" cy="7" r="4" stroke={active ? activeColor : "#8F8F8F"} strokeWidth={active ? "2" : "1.5"} />
+      <path d="M2 21V19C2 15.6863 4.68629 13 8 13H10C13.3137 13 16 15.6863 16 19V21" stroke={active ? activeColor : "#8F8F8F"} strokeWidth={active ? "2" : "1.5"} strokeLinecap="round" />
+      <path d="M16 11L18 13L22 9" stroke={active ? activeColor : "#8F8F8F"} strokeWidth={active ? "2" : "1.5"} strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
@@ -553,11 +625,11 @@ function FooterUserIcon({ active, brandColor }: { active: boolean; brandColor?: 
 
 const tabs = [
   { to: "/association", label: "m.shell.tab_home", icon: FooterHomeIcon, exact: true },
-  { to: "/association/analytics", label: "m.shell.tab_analytics" as any, icon: FooterAnalyticsIcon },
+  { to: "/association/events", label: "m.shell.tab_events" as any, icon: FooterEventsIcon },
   { to: "/association/card", label: "m.shell.tab_qr", icon: null, center: true },
-  { to: "/association/messages", label: "m.shell.tab_messages", icon: FooterSocialNetworkIcon },
+  { to: "/association/connect", label: "m.shell.tab_connect" as any, icon: FooterConnectIcon },
   { to: "/association/profile", label: "m.shell.tab_profile", icon: FooterUserIcon },
-] satisfies { to: string; label: TKey; icon: any; exact?: boolean; center?: boolean }[];
+] satisfies { to: string; label: any; icon: any; exact?: boolean; center?: boolean }[];
 
 function useVirtualKeyboard() {
   const [keyboardOpen, setKeyboardOpen] = useState(false);
@@ -679,10 +751,10 @@ function MemberTabBar() {
 
   const tabLabels: Record<string, { vi: string; en: string }> = {
     "/association": { vi: "Trang chủ", en: "Home" },
-    "/association/analytics": { vi: "Thống kê", en: "Analytics" },
-    "/association/events": { vi: "Thống kê", en: "Analytics" },
+    "/association/events": { vi: "Hoạt động", en: "Activities" },
     "/association/card": { vi: "Quét QR", en: "Scan QR" },
-    "/association/messages": { vi: "Mạng lưới", en: "Network" },
+    "/association/connect": { vi: "Kết nối", en: "Connect" },
+    "/association/messages": { vi: "Kết nối", en: "Connect" },
     "/association/profile": { vi: "Cá nhân", en: "Profile" },
   };
 
@@ -1083,7 +1155,7 @@ function MemberTabBar() {
                   <span className="relative z-10">{newEventCount > 9 ? "9+" : newEventCount}</span>
                 </span>
               );
-            } else if (tab.to === "/association/messages" && unreadMessageCount > 0) {
+            } else if ((tab.to === "/association/connect" || tab.to === "/association/messages") && unreadMessageCount > 0) {
               notificationBadge = (
                 <span
                   className="absolute -top-1.5 -right-2.5 z-20 flex h-4 min-w-4 items-center justify-center rounded-full bg-gradient-to-r from-amber-500 to-[#B8860B] px-1 text-[9px] font-black text-white shadow-xs ring-1 ring-white/80 select-none animate-pulse"

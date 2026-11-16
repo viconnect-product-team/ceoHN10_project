@@ -58,6 +58,11 @@ export class TrainingsService implements OnModuleInit {
       const columnsToAdd = [
         `ALTER TABLE public.trainings ADD COLUMN IF NOT EXISTS is_fixed BOOLEAN DEFAULT false;`,
         `ALTER TABLE public.trainings ADD COLUMN IF NOT EXISTS schedule_type TEXT DEFAULT 'non_fixed';`,
+        `ALTER TABLE public.trainings ADD COLUMN IF NOT EXISTS is_custom_session BOOLEAN DEFAULT false;`,
+        `ALTER TABLE public.trainings ADD COLUMN IF NOT EXISTS total_cost NUMERIC DEFAULT 0;`,
+        `ALTER TABLE public.trainings ADD COLUMN IF NOT EXISTS expected_attendees INTEGER DEFAULT 1;`,
+        `ALTER TABLE public.trainings ADD COLUMN IF NOT EXISTS ticket_fee NUMERIC DEFAULT 0;`,
+        `ALTER TABLE public.trainings ADD COLUMN IF NOT EXISTS fund_type TEXT DEFAULT 'personal_pool';`,
         `ALTER TABLE public.trainings ADD COLUMN IF NOT EXISTS agenda JSONB DEFAULT '[]'::jsonb;`,
         `ALTER TABLE public.trainings ADD COLUMN IF NOT EXISTS slide_url TEXT;`,
         `ALTER TABLE public.trainings ADD COLUMN IF NOT EXISTS media_url TEXT;`,
@@ -130,6 +135,11 @@ export class TrainingsService implements OnModuleInit {
       status: r.status || 'upcoming',
       isFixed: Boolean(r.is_fixed),
       scheduleType: r.schedule_type || (r.is_fixed ? 'fixed_saturday' : 'non_fixed'),
+      isCustomSession: Boolean(r.is_custom_session),
+      totalCost: Number(r.total_cost || 0),
+      expectedAttendees: Number(r.expected_attendees || 1),
+      ticketFee: Number(r.ticket_fee || 0),
+      fundType: r.fund_type || 'personal_pool',
       agenda,
       startTime: r.start_time,
       endTime: r.end_time,
@@ -171,23 +181,41 @@ export class TrainingsService implements OnModuleInit {
     const scheduleType = data.scheduleType || (isFixed ? 'fixed_saturday' : 'non_fixed');
     const agendaJson = JSON.stringify(Array.isArray(data.agenda) ? data.agenda : []);
     const materialsJson = JSON.stringify(Array.isArray(data.materials) ? data.materials : []);
-    const tiersJson = JSON.stringify(Array.isArray(data.ticketTiers) ? data.ticketTiers : []);
     const maxAtt = parseInt(data.maxAttendees || 100, 10);
     const safeCreatedBy = createdByUserId && createdByUserId.length === 36 ? `'${createdByUserId}'::uuid` : 'NULL';
+
+    const isCustomSession = Boolean(data.isCustomSession || scheduleType === 'custom' || scheduleType === 'custom_session');
+    const totalCost = Math.max(0, Number(data.totalCost || 0));
+    const expectedAttendees = Math.max(1, Number(data.expectedAttendees || data.maxAttendees || 1));
+    const calculatedFee = isCustomSession && totalCost > 0 ? Math.round(totalCost / expectedAttendees) : Number(data.ticketFee || 0);
+    const fundType = data.fundType || (isCustomSession ? 'personal_pool' : 'general');
+
+    let finalTiers = Array.isArray(data.ticketTiers) && data.ticketTiers.length > 0 ? data.ticketTiers : [];
+    if (isCustomSession && finalTiers.length === 0) {
+      finalTiers = [{
+        name: 'Vé Buổi Học Riêng (Quỹ cá nhân)',
+        price: calculatedFee,
+        quantity: expectedAttendees,
+        description: `Phí tự động chia đều: ${calculatedFee.toLocaleString('vi-VN')} đ/người. Quỹ cá nhân riêng biệt.`
+      }];
+    }
+    const tiersJson = JSON.stringify(finalTiers);
 
     const insertSql = `
       INSERT INTO public.trainings (
         title, tagline, instructor_name, instructor_title, instructor_company,
-        description, category, format, status, is_fixed, schedule_type, agenda,
-        start_time, end_time, location, address, max_attendees, attendee_count,
+        description, category, format, status, is_fixed, schedule_type,
+        is_custom_session, total_cost, expected_attendees, ticket_fee, fund_type,
+        agenda, start_time, end_time, location, address, max_attendees, attendee_count,
         ticket_tiers, materials, slide_url, media_url, cover_image, registration_url,
         open_registration, created_by, created_at, updated_at
       ) VALUES (
         $1, $2, $3, $4, $5,
-        $6, $7, $8, $9, $10, $11, $12::jsonb,
-        $13, $14, $15, $16, $17, 0,
-        $18::jsonb, $19::jsonb, $20, $21, $22, $23,
-        $24, ${safeCreatedBy}, now(), now()
+        $6, $7, $8, $9, $10, $11,
+        $12, $13, $14, $15, $16,
+        $17::jsonb, $18, $19, $20, $21, $22, 0,
+        $23::jsonb, $24::jsonb, $25, $26, $27, $28,
+        $29, ${safeCreatedBy}, now(), now()
       ) RETURNING id;
     `;
 
@@ -204,6 +232,11 @@ export class TrainingsService implements OnModuleInit {
       data.status || 'upcoming',
       isFixed,
       scheduleType,
+      isCustomSession,
+      totalCost,
+      expectedAttendees,
+      calculatedFee,
+      fundType,
       agendaJson,
       data.startTime ? new Date(data.startTime) : null,
       data.endTime ? new Date(data.endTime) : null,
@@ -220,6 +253,30 @@ export class TrainingsService implements OnModuleInit {
     );
 
     const newId = res[0]?.id;
+
+    // Tự động bắn thông báo cho Ban Sự Kiện & Hậu Cần chuẩn bị trang thiết bị/vật phẩm
+    if (newId) {
+      await this.prisma.$executeRawUnsafe(`
+        INSERT INTO public.business_notifications (
+          id, source_domain, source_record_id, event_kind, notification_kind,
+          title_key, body_key, safe_display_data, priority, status, app_scope, target_app, created_at, updated_at
+        ) VALUES (
+          gen_random_uuid(), 'trainings', $1, 'training_created', 'task_request',
+          $2, $3, $4::jsonb, 'high', 'delivered', 'crm_platform', 'crm_platform', now(), now()
+        );
+      `,
+        String(newId),
+        `Ban Học Tập vừa tạo buổi học mới: ${data.title.trim()}`,
+        `Kính mời Ban Sự Kiện & Hậu Cần lập dự trù vật tư, thiết bị cần thiết và lên báo cáo chuẩn bị cho buổi học.`,
+        JSON.stringify({
+          targetRoute: '/association/trainings',
+          trainingId: String(newId),
+          trainingTitle: data.title.trim(),
+          department: 'Ban Sự Kiện – Hậu Cần'
+        })
+      ).catch(() => {});
+    }
+
     return this.getTrainingById(newId);
   }
 
@@ -429,39 +486,63 @@ export class TrainingsService implements OnModuleInit {
 
   // ── ATTACH MEDIA & ARCHIVE TO DOCUMENTS (UC-3) ──────────────────────────
 
-  async attachMedia(trainingId: string, mediaUrl: string, description?: string) {
+  async attachMedia(
+    trainingId: string,
+    mediaUrl: string,
+    description?: string,
+    department?: string,
+    uploaderName?: string,
+    docType?: 'slide' | 'video' | 'photo' | 'media',
+  ) {
     if (!mediaUrl?.trim()) {
-      throw new BadRequestException('Vui lòng cung cấp link hình ảnh hoặc video ghi hình');
+      throw new BadRequestException('Vui lòng cung cấp link hình ảnh, video hoặc slide bài giảng');
     }
 
     const training = await this.getTrainingById(trainingId);
+    const assignedDept = department?.trim() || (docType === 'slide' ? 'Ban Học Tập' : 'Ban Truyền Thông');
+    const uploader = uploaderName?.trim() || assignedDept;
+    const isSlide = docType === 'slide' || mediaUrl.includes('drive.google.com') && description?.toLowerCase().includes('slide');
 
-    // 1. Cập nhật media_url trong trainings
-    await this.prisma.$executeRawUnsafe(`
-      UPDATE public.trainings SET media_url = $1, updated_at = now() WHERE id = $2::uuid;
-    `, mediaUrl.trim(), trainingId);
+    // 1. Cập nhật media_url hoặc slide_url trong trainings
+    if (isSlide) {
+      await this.prisma.$executeRawUnsafe(`
+        UPDATE public.trainings SET slide_url = $1, updated_at = now() WHERE id = $2::uuid;
+      `, mediaUrl.trim(), trainingId);
+    } else {
+      await this.prisma.$executeRawUnsafe(`
+        UPDATE public.trainings SET media_url = $1, updated_at = now() WHERE id = $2::uuid;
+      `, mediaUrl.trim(), trainingId);
+    }
 
-    // 2. Quản lý lưu trữ đúng vào Kho Tài Liệu (public.documents)
+    // 2. Quản lý lưu trữ tự động chia theo Thư mục từng Ban vào Kho Tài Liệu (public.documents)
+    const docTitle = isSlide
+      ? `[Slide Bài Giảng - ${assignedDept}] ${training.title}`
+      : `[Media & Ảnh - ${assignedDept}] ${training.title}`;
+
     await this.prisma.$executeRawUnsafe(`
       INSERT INTO public.documents (
         title, name, code, category, file_url, file_path, file_type, type,
         training_id, description, uploaded_by_name, uploaded_by, uploaded_at
       ) VALUES (
-        $1, $1, $2, 'event_media', $3, $3, 'media_link', 'media_link',
-        $4::uuid, $5, 'Ban Truyền Thông & Quay Phim', 'Ban Truyền Thông & Quay Phim', now()
+        $1, $1, $2, $3, $4, $4, $5, $5,
+        $6::uuid, $7, $8, $8, now()
       );
     `,
-      `[Media Ghi Hình] ${training.title}`,
-      `MEDIA-${Math.random().toString(36).slice(2, 8).toUpperCase()}`,
+      docTitle,
+      `DOC-${Math.random().toString(36).slice(2, 8).toUpperCase()}`,
+      assignedDept, // Thư mục tự động phân loại đúng Ban
       mediaUrl.trim(),
+      isSlide ? 'slide_presentation' : 'event_media',
       trainingId,
-      description || `Tư liệu quay phim chụp ảnh trong suốt quá trình diễn ra buổi học "${training.title}".`,
+      description || `Tài liệu lưu trữ được cập nhật bởi ${assignedDept} cho buổi đào tạo "${training.title}".`,
+      uploader,
     ).catch(() => {});
 
     return {
       success: true,
-      message: 'Đã đính kèm link tư liệu media và lưu trữ đồng bộ vào Kho Tài Liệu CLB!',
+      message: `Đã lưu trữ thành công và tự động phân loại vào thư mục [${assignedDept}] trong Quản Lý Tài Liệu!`,
       mediaUrl: mediaUrl.trim(),
+      department: assignedDept,
     };
   }
 

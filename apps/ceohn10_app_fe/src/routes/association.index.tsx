@@ -1535,8 +1535,8 @@ function Home() {
             </button>
           </div>
 
-          <div className="self-stretch px-4 pt-3.5 pb-2 grid grid-cols-4 gap-2">
-            {activeShortcutIds.slice(0, 4).map((id) => {
+          <div className="self-stretch px-4 pt-3.5 pb-2 grid grid-cols-4 gap-y-3.5 gap-x-2">
+            {activeShortcutIds.slice(0, 8).map((id) => {
               const item = ALL_SHORTCUT_OPTIONS.find((s) => s.id === id) || {
                 id,
                 name: "Tính năng",

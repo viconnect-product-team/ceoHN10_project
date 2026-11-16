@@ -146,7 +146,10 @@ export class TrainingsController {
     @Param('id') id: string,
     @Body('mediaUrl') mediaUrl: string,
     @Body('description') description?: string,
+    @Body('department') department?: string,
+    @Body('uploaderName') uploaderName?: string,
+    @Body('docType') docType?: 'slide' | 'video' | 'photo' | 'media',
   ) {
-    return this.trainingsService.attachMedia(id, mediaUrl, description);
+    return this.trainingsService.attachMedia(id, mediaUrl, description, department, uploaderName, docType);
   }
 }

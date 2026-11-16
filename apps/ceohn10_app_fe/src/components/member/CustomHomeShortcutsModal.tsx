@@ -184,7 +184,7 @@ export const ALL_SHORTCUT_OPTIONS: ShortcutItem[] = [
   },
 ];
 
-export const DEFAULT_SHORTCUT_IDS = ["members", "messages", "connect", "events"];
+export const DEFAULT_SHORTCUT_IDS = ["members", "events", "calendar", "connect", "opportunities", "marketplace", "training", "analytics"];
 
 export function getShortcutIcon(iconName: string, className = "size-6", color?: string) {
   const style = color ? { color } : undefined;

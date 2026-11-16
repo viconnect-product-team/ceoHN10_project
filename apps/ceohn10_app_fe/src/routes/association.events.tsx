@@ -1324,7 +1324,7 @@ function EventsScreen() {
 
 // Category & bookmark state
 const [eventCategory, setEventCategory] = useState<
-  "all" | "upcoming" | "free" | "paid" | "registered" | "bookmarked" | "history" | "b2b" | "gala" | "training" | "caravan"
+  "all" | "upcoming" | "free" | "paid" | "registered" | "bookmarked" | "history" | "b2b" | "gala" | "training" | "caravan" | "ban_thien_nguyen" | "ban_su_kien" | "ban_dao_tao" | "ban_b2b" | "ban_truyen_thong"
 >("all");
 const [activityFilter, setActivityFilter] = useState<"all" | "b2b_connect" | "trainings" | "fixed_committee" | "extraordinary">("all");
 const [recapModalEvent, setRecapModalEvent] = useState<MyEvent | any | null>(null);
@@ -1553,6 +1553,16 @@ const filteredEvents = useMemo(() => {
       return allList.filter((e: any) => ((e.category || e.type || "").toLowerCase().includes("đào tạo") || (e.category || e.type || "").toLowerCase().includes("tọa đàm") || (e.category || e.type || "").toLowerCase().includes("workshop")));
     case "caravan":
       return allList.filter((e: any) => ((e.category || e.type || "").toLowerCase().includes("caravan") || (e.category || e.type || "").toLowerCase().includes("xúc tiến")));
+    case "ban_thien_nguyen":
+      return allList.filter((e: any) => (e.department === "ban_thien_nguyen" || (e.description || e.name || "").toLowerCase().includes("thiện nguyện") || (e.description || e.name || "").toLowerCase().includes("từ thiện")));
+    case "ban_su_kien":
+      return allList.filter((e: any) => (!e.department || e.department === "ban_su_kien"));
+    case "ban_dao_tao":
+      return allList.filter((e: any) => (e.department === "ban_dao_tao" || (e.category || e.type || "").toLowerCase().includes("đào tạo")));
+    case "ban_b2b":
+      return allList.filter((e: any) => (e.department === "ban_b2b" || (e.category || e.type || "").toLowerCase().includes("b2b") || (e.category || e.type || "").toLowerCase().includes("giao thương")));
+    case "ban_truyen_thong":
+      return allList.filter((e: any) => (e.department === "ban_truyen_thong"));
     default:
       return allList;
   }
@@ -2122,8 +2132,42 @@ const filteredEvents = useMemo(() => {
                 </div>
               </div>
 
+              {/* Shortcut Danh Mục Lịch Hoạt Động CLB */}
+              <Link
+                to="/association/calendar"
+                className="w-full p-3 rounded-2xl bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-slate-900 dark:to-blue-950/40 border border-blue-200 dark:border-blue-800/60 shadow-xs flex items-center justify-between group hover:border-[#003B95] transition"
+              >
+                <div className="flex items-center gap-2.5">
+                  <div className="size-9 rounded-xl bg-[#003B95] text-white flex items-center justify-center font-bold shadow-xs">
+                    <Calendar className="size-5" />
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
+                      <span>Danh Mục Lịch Hoạt Động &amp; Cuộc Họp CLB</span>
+                      <span className="px-1.5 py-0.2 rounded-full bg-amber-400 text-slate-950 text-[9px] font-black uppercase">Lịch</span>
+                    </h4>
+                    <p className="text-[10.5px] text-slate-500 dark:text-slate-400">
+                      Xem lịch sự kiện theo ngày/tháng, lịch họp các ban và cài đặt chuông báo
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-1 text-xs font-bold text-[#003B95] dark:text-blue-400 group-hover:translate-x-0.5 transition-transform shrink-0">
+                  <span>Mở lịch</span>
+                  <ChevronRight className="size-4" />
+                </div>
+              </Link>
+
               {/* Filter Pills Đa Danh Mục */}
               <div className="self-stretch inline-flex justify-start items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
+                {/* 0. Danh mục Lịch */}
+                <Link
+                  to="/association/calendar"
+                  className="px-3 py-1.5 rounded-full border border-amber-300 dark:border-amber-700 bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 flex justify-center items-center gap-1.5 text-xs font-bold hover:bg-amber-100 transition shrink-0"
+                >
+                  <Calendar className="size-3.5 text-amber-600 dark:text-amber-400" />
+                  <span>🗓️ Danh mục Lịch</span>
+                </Link>
+
                 {/* 1. Tất cả */}
                 <button
                   type="button"
@@ -2220,6 +2264,54 @@ const filteredEvents = useMemo(() => {
                     }`}>
                     {pastCount}
                   </span>
+                </button>
+
+                {/* 10. Ban Thiện Nguyện */}
+                <button
+                  type="button"
+                  onClick={() => setEventCategory("ban_thien_nguyen")}
+                  className={`px-3 py-1.5 rounded-full border flex justify-center items-center gap-1.5 text-xs font-medium cursor-pointer transition shrink-0 ${eventCategory === "ban_thien_nguyen"
+                      ? "bg-teal-700 border-teal-700 text-white shadow-xs font-semibold"
+                      : "border-teal-200 dark:border-teal-800 text-teal-800 dark:text-teal-300 bg-teal-50/50 hover:bg-teal-100/50"
+                    }`}
+                >
+                  <span>🤝 Ban Thiện Nguyện</span>
+                </button>
+
+                {/* 11. Ban Sự Kiện */}
+                <button
+                  type="button"
+                  onClick={() => setEventCategory("ban_su_kien")}
+                  className={`px-3 py-1.5 rounded-full border flex justify-center items-center gap-1.5 text-xs font-medium cursor-pointer transition shrink-0 ${eventCategory === "ban_su_kien"
+                      ? "bg-rose-700 border-rose-700 text-white shadow-xs font-semibold"
+                      : "border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-300 bg-rose-50/50 hover:bg-rose-100/50"
+                    }`}
+                >
+                  <span>🎉 Ban Sự Kiện</span>
+                </button>
+
+                {/* 12. Ban Đào Tạo */}
+                <button
+                  type="button"
+                  onClick={() => setEventCategory("ban_dao_tao")}
+                  className={`px-3 py-1.5 rounded-full border flex justify-center items-center gap-1.5 text-xs font-medium cursor-pointer transition shrink-0 ${eventCategory === "ban_dao_tao"
+                      ? "bg-blue-700 border-blue-700 text-white shadow-xs font-semibold"
+                      : "border-blue-200 dark:border-blue-800 text-blue-800 dark:text-blue-300 bg-blue-50/50 hover:bg-blue-100/50"
+                    }`}
+                >
+                  <span>🎓 Ban Đào Tạo</span>
+                </button>
+
+                {/* 13. Ban B2B */}
+                <button
+                  type="button"
+                  onClick={() => setEventCategory("ban_b2b")}
+                  className={`px-3 py-1.5 rounded-full border flex justify-center items-center gap-1.5 text-xs font-medium cursor-pointer transition shrink-0 ${eventCategory === "ban_b2b"
+                      ? "bg-amber-700 border-amber-700 text-white shadow-xs font-semibold"
+                      : "border-amber-200 dark:border-amber-800 text-amber-800 dark:text-amber-300 bg-amber-50/50 hover:bg-amber-100/50"
+                    }`}
+                >
+                  <span>💼 Ban B2B</span>
                 </button>
               </div>
             </div>

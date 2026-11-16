@@ -113,11 +113,13 @@ export interface CommitteeRole {
 export const COMMITTEES: CommitteeRole[] = [
   { key: "dieu_hanh", name: "Ban Điều Hành", shortName: "Ban Điều Hành", color: "text-blue-700 bg-blue-50 border-blue-200 dark:bg-blue-950/50 dark:text-blue-300 dark:border-blue-800" },
   { key: "thu_ky", name: "Ban Thư Ký", shortName: "Ban Thư Ký", color: "text-purple-700 bg-purple-50 border-purple-200 dark:bg-purple-950/50 dark:text-purple-300 dark:border-purple-800" },
-  { key: "thanh_vien", name: "Ban Thành Viên", shortName: "Ban Thành Viên", color: "text-emerald-700 bg-emerald-50 border-emerald-200 dark:bg-emerald-950/50 dark:text-emerald-300 dark:border-emerald-800" },
-  { key: "xuc_tien", name: "Ban Xúc Tiến Thương Mại", shortName: "Ban Xúc Tiến TM", color: "text-amber-700 bg-amber-50 border-amber-200 dark:bg-amber-950/50 dark:text-amber-300 dark:border-amber-800" },
-  { key: "truyen_thong", name: "Ban Truyền Thông", shortName: "Ban Truyền Thông", color: "text-rose-700 bg-rose-50 border-rose-200 dark:bg-rose-950/50 dark:text-rose-300 dark:border-rose-800" },
   { key: "tai_chinh", name: "Ban Tài Chính", shortName: "Ban Tài Chính", color: "text-yellow-700 bg-yellow-50 border-yellow-200 dark:bg-yellow-950/50 dark:text-yellow-300 dark:border-yellow-800" },
-  { key: "thien_nguyen", name: "Ban Thiện Nguyện", shortName: "Ban Thiện Nguyện", color: "text-teal-700 bg-teal-50 border-teal-200 dark:bg-teal-950/50 dark:text-teal-300 dark:border-teal-800" },
+  { key: "su_kien", name: "Ban Sự Kiện & Hậu Cần", shortName: "Ban Sự Kiện", color: "text-rose-700 bg-rose-50 border-rose-200 dark:bg-rose-950/50 dark:text-rose-300 dark:border-rose-800" },
+  { key: "dao_tao", name: "Ban Đào Tạo & Phát Triển", shortName: "Ban Đào Tạo", color: "text-blue-700 bg-blue-50 border-blue-200 dark:bg-blue-950/50 dark:text-blue-300 dark:border-blue-800" },
+  { key: "thien_nguyen", name: "Ban Thiện Nguyện & Đời Sống", shortName: "Ban Thiện Nguyện", color: "text-teal-700 bg-teal-50 border-teal-200 dark:bg-teal-950/50 dark:text-teal-300 dark:border-teal-800" },
+  { key: "truyen_thong", name: "Ban Truyền Thông", shortName: "Ban Truyền Thông", color: "text-rose-700 bg-rose-50 border-rose-200 dark:bg-rose-950/50 dark:text-rose-300 dark:border-rose-800" },
+  { key: "xuc_tien", name: "Ban B2B & Xúc Tiến Thương Mại", shortName: "Ban B2B", color: "text-amber-700 bg-amber-50 border-amber-200 dark:bg-amber-950/50 dark:text-amber-300 dark:border-amber-800" },
+  { key: "thanh_vien", name: "Ban Thành Viên", shortName: "Ban Thành Viên", color: "text-emerald-700 bg-emerald-50 border-emerald-200 dark:bg-emerald-950/50 dark:text-emerald-300 dark:border-emerald-800" },
 ];
 
 // ── HỆ THỐNG ROLE: CHỦ TỊCH -> ADMIN -> BAN ĐIỀU HÀNH -> TỔNG THƯ KÝ -> TRƯỞNG BAN ──
@@ -136,6 +138,9 @@ export const SYSTEM_ROLES: SystemRole[] = [
   { key: "truong_ban_dieu_hanh", name: "Trưởng ban điều hành", shortName: "Trưởng ban Điều Hành", color: "text-blue-700 bg-blue-50 border-blue-200 dark:bg-blue-950/50 dark:text-blue-300 dark:border-blue-800", desc: "Điều hành quản lý nội bộ, quy chế & điều phối các ban" },
   { key: "thanh_vien_ban_dieu_hanh", name: "Thành viên ban điều hành", shortName: "TV Ban Điều Hành", color: "text-blue-700 bg-blue-50 border-blue-200 dark:bg-blue-950/50 dark:text-blue-300 dark:border-blue-800", desc: "Thành viên Ban Điều Hành Hiệp Hội" },
   { key: "tong_thu_ky", name: "Tổng thư ký", shortName: "Tổng thư ký", color: "text-amber-700 bg-amber-50 border-amber-200 dark:bg-amber-950/50 dark:text-amber-300 dark:border-amber-800", desc: "Điều phối thư ký, sự kiện, cuộc họp & công văn" },
+  { key: "truong_ban_su_kien", name: "Trưởng ban Sự kiện & Hậu cần", shortName: "Trưởng ban Sự Kiện", color: "text-rose-700 bg-rose-50 border-rose-200 dark:bg-rose-950/50 dark:text-rose-300 dark:border-rose-800", desc: "Tổ chức sự kiện, khai báo vật dụng hỗ trợ, e-ticket & check-in" },
+  { key: "truong_ban_dao_tao", name: "Trưởng ban Đào tạo & Phát triển", shortName: "Trưởng ban Đào Tạo", color: "text-blue-700 bg-blue-50 border-blue-200 dark:bg-blue-950/50 dark:text-blue-300 dark:border-blue-800", desc: "Quản lý khóa đào tạo doanh nhân, lớp học thứ 7 và học liệu" },
+  { key: "thanh_vien_ban_dao_tao", name: "Thành viên ban đào tạo", shortName: "Thành viên Ban Đào Tạo", color: "text-blue-600 bg-blue-50 border-blue-200 dark:bg-blue-950/50 dark:text-blue-300 dark:border-blue-800", desc: "Hỗ trợ tổ chức lớp học, điểm danh và quản lý học viên" },
   { key: "truong_ban_truyen_thong", name: "Trưởng ban truyền thông", shortName: "Trưởng ban Truyền Thông", color: "text-rose-700 bg-rose-50 border-rose-200 dark:bg-rose-950/50 dark:text-rose-300 dark:border-rose-800", desc: "Quản lý truyền thông, tin tức, hình ảnh & thương hiệu" },
   { key: "truong_ban_thanh_vien", name: "Trưởng ban thành viên", shortName: "Trưởng ban Thành Viên", color: "text-emerald-700 bg-emerald-50 border-emerald-200 dark:bg-emerald-950/50 dark:text-emerald-300 dark:border-emerald-800", desc: "Phát triển hội viên, kết nạp & chăm sóc hội viên mới" },
   { key: "truong_ban_xuc_tien", name: "Trưởng ban xúc tiến TM", shortName: "Trưởng ban Xúc Tiến TM", color: "text-orange-700 bg-orange-50 border-orange-200 dark:bg-orange-950/50 dark:text-orange-300 dark:border-orange-800", desc: "Điều phối cơ hội giao thương, kết nối B2B & kinh doanh" },
@@ -345,18 +350,6 @@ export const INITIAL_CATEGORIES: TreeCategory[] = [
         ],
       },
       {
-        id: "feat_sponsor_packages",
-        name: "Gói tài trợ",
-        route: "/sponsor-packages",
-        description: "Cấu hình danh mục các gói tài trợ và quyền lợi đối ứng",
-        actions: [
-          { id: "act_spk_view", name: "Xem danh mục gói tài trợ", code: "SPK_VIEW", description: "Xem giá trị định mức và quyền lợi các gói", apiEndpoint: "GET /api/sponsor-packages", roles: { bqt: true, thu_ky: true, xuc_tien: true, truyen_thong: true, quan_tri: true, admin: true, tong_thu_ky: true, ban_thu_ky: true } },
-          { id: "act_spk_add", name: "Tạo gói tài trợ mới", code: "SPK_ADD", description: "Thiết lập gói tài trợ kèm danh mục quyền lợi", apiEndpoint: "POST /api/sponsor-packages", roles: { bqt: true, thu_ky: true, xuc_tien: true, quan_tri: true, admin: true } },
-          { id: "act_spk_edit", name: "Chỉnh sửa gói tài trợ", code: "SPK_EDIT", description: "Điều chỉnh mức phí và quyền lợi đối ứng", apiEndpoint: "PUT /api/sponsor-packages/:id", roles: { bqt: true, thu_ky: true, xuc_tien: true, quan_tri: true, admin: true } },
-          { id: "act_spk_delete", name: "Xóa gói tài trợ", code: "SPK_DELETE", description: "Xóa gói tài trợ không còn áp dụng", apiEndpoint: "DELETE /api/sponsor-packages/:id", roles: { bqt: true, quan_tri: true, admin: true } },
-        ],
-      },
-      {
         id: "feat_sponsor_report",
         name: "Báo cáo tài trợ",
         route: "/sponsor-report",
@@ -481,18 +474,6 @@ export const INITIAL_CATEGORIES: TreeCategory[] = [
           { id: "act_prk_add", name: "Thêm đặc quyền mới", code: "PRK_ADD", description: "Tạo dịch vụ đặc quyền mới cho hiệp hội", apiEndpoint: "POST /api/perks", roles: { bqt: true, thu_ky: true, thanh_vien: true, quan_tri: true, admin: true } },
           { id: "act_prk_edit", name: "Chỉnh sửa đặc quyền", code: "PRK_EDIT", description: "Cập nhật điều kiện sử dụng đặc quyền", apiEndpoint: "PUT /api/perks/:id", roles: { bqt: true, thu_ky: true, thanh_vien: true, quan_tri: true, admin: true } },
           { id: "act_prk_delete", name: "Xóa đặc quyền", code: "PRK_DELETE", description: "Xóa đặc quyền không còn hiệu lực", apiEndpoint: "DELETE /api/perks/:id", roles: { bqt: true, quan_tri: true, admin: true } },
-        ],
-      },
-      {
-        id: "feat_benefits",
-        name: "Quyền lợi hội viên",
-        route: "/benefits",
-        description: "Quản lý chính sách quyền lợi các hạng thẻ hội viên",
-        actions: [
-          { id: "act_bnf_view", name: "Xem danh sách quyền lợi", code: "BNF_VIEW", description: "Tra cứu quyền lợi theo từng hạng thẻ hội viên", apiEndpoint: "GET /api/benefits", roles: { bqt: true, thu_ky: true, thanh_vien: true, xuc_tien: true, truyen_thong: true, thien_nguyen: true, quan_tri: true, admin: true, tong_thu_ky: true, ban_thu_ky: true, member: true } },
-          { id: "act_bnf_add", name: "Thêm quyền lợi mới", code: "BNF_ADD", description: "Bổ sung chính sách quyền lợi mới", apiEndpoint: "POST /api/benefits", roles: { bqt: true, thu_ky: true, thanh_vien: true, quan_tri: true, admin: true } },
-          { id: "act_bnf_edit", name: "Chỉnh sửa quyền lợi", code: "BNF_EDIT", description: "Điều chỉnh nội dung quyền lợi", apiEndpoint: "PUT /api/benefits/:id", roles: { bqt: true, thu_ky: true, thanh_vien: true, quan_tri: true, admin: true } },
-          { id: "act_bnf_delete", name: "Xóa quyền lợi", code: "BNF_DELETE", description: "Xóa chính sách quyền lợi", apiEndpoint: "DELETE /api/benefits/:id", roles: { bqt: true, quan_tri: true, admin: true } },
         ],
       },
     ],
@@ -1779,6 +1760,16 @@ export function RbacPermissionMatrix({
         <div className="flex justify-start items-center gap-2">
           <button
             type="button"
+            onClick={handleSaveAll}
+            disabled={saving}
+            className="h-9 px-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl flex justify-center items-center gap-1.5 cursor-pointer transition shadow-sm font-bold text-xs disabled:opacity-50"
+          >
+            <Save className="size-4" />
+            <span>{saving ? "Đang Lưu..." : "Lưu Cấu Hình"}</span>
+          </button>
+
+          <button
+            type="button"
             onClick={() => setAddFeatureOpen(true)}
             className="h-9 px-4 bg-gradient-to-r from-[#7C2D82] via-[#9333EA] to-[#6B21A8] hover:opacity-95 text-white rounded-xl flex justify-center items-center gap-1.5 cursor-pointer transition shadow-sm font-bold text-xs"
           >
@@ -1977,7 +1968,7 @@ export function RbacPermissionMatrix({
                       onClick={() => setSelectedRoleKey(role.key)}
                       className={`w-full text-left p-3 rounded-xl border transition-all cursor-pointer flex flex-col gap-1.5 ${
                         isSelected
-                          ? "border-[#7C2D82] bg-gradient-to-r from-purple-50 via-white to-purple-50/40 dark:from-purple-950/40 dark:via-slate-850 dark:to-purple-950/20 shadow-xs ring-1 ring-[#7C2D82]/30"
+                          ? "border-[#7C2D82] bg-purple-50 dark:bg-purple-950/40 shadow-xs ring-1 ring-[#7C2D82]/30"
                           : "border-border/60 bg-card hover:bg-muted/40 hover:border-purple-200"
                       }`}
                     >
@@ -2037,7 +2028,7 @@ export function RbacPermissionMatrix({
               return (
                 <>
                   {/* Card thông tin vai trò & Bộ gán nhanh */}
-                  <div className="rounded-2xl border border-purple-200/80 dark:border-purple-900/50 bg-gradient-to-r from-purple-50/60 via-white to-pink-50/40 dark:from-purple-950/20 dark:via-slate-900 dark:to-pink-950/10 p-5 space-y-4 shadow-xs">
+                  <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 p-5 space-y-4 shadow-xs">
                     <div className="flex flex-wrap items-center justify-between gap-3">
                       <div className="flex items-center gap-3">
                         <div className="size-11 rounded-2xl bg-gradient-to-r from-[#7C2D82] via-[#9333EA] to-[#D61F69] text-white flex items-center justify-center font-black text-lg shadow-sm">

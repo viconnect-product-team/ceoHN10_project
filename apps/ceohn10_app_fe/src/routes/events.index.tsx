@@ -31,7 +31,6 @@ import { EventCheckinGatekeeperModal } from "@/components/events/EventCheckinGat
 import { SupplyDeclarationModal } from "@/components/dashboard/SupplyDeclarationModal";
 import { EventFeedbackModal } from "@/components/events/EventFeedbackModal";
 import { EventMediaModal } from "@/components/events/EventMediaModal";
-import { EventSponsorPackageSelector } from "@/components/events/EventSponsorPackageSelector";
 import { EventQrStaffSelector } from "@/components/events/EventQrStaffSelector";
 import { useRole, PERMISSIONS } from "@/hooks/use-role";
 import { useAuth } from "@/context/AuthContext";
@@ -96,6 +95,27 @@ const TYPE_COVER: Record<EventItem["type"], string> = {
   training: "linear-gradient(135deg, oklch(0.55 0.15 155), oklch(0.60 0.14 195))",
 };
 
+export const EVENT_DEPARTMENTS = [
+  { value: "all", label: "Tất cả các Ban", color: "bg-slate-100 text-slate-700 border-slate-200" },
+  { value: "ban_thien_nguyen", label: "Ban Thiện Nguyện & Đời Sống", color: "bg-teal-50 text-teal-700 border-teal-200" },
+  { value: "ban_su_kien", label: "Ban Sự Kiện & Hậu Cần", color: "bg-rose-50 text-rose-700 border-rose-200" },
+  { value: "ban_dao_tao", label: "Ban Đào Tạo & Phát Triển", color: "bg-blue-50 text-blue-700 border-blue-200" },
+  { value: "ban_b2b", label: "Ban B2B & Giao Thương", color: "bg-amber-50 text-amber-700 border-amber-200" },
+  { value: "ban_truyen_thong", label: "Ban Truyền Thông", color: "bg-purple-50 text-purple-700 border-purple-200" },
+  { value: "ban_dieu_hanh", label: "Ban Điều Hành", color: "bg-indigo-50 text-indigo-700 border-indigo-200" },
+  { value: "chung", label: "Sự Kiện Chung Toàn CLB", color: "bg-sky-50 text-sky-700 border-sky-200" },
+];
+
+export const DEPARTMENT_LABELS: Record<string, { label: string; color: string }> = {
+  ban_thien_nguyen: { label: "Ban Thiện Nguyện & Đời Sống", color: "bg-teal-100 text-teal-800 dark:bg-teal-950/60 dark:text-teal-300 border-teal-200" },
+  ban_su_kien: { label: "Ban Sự Kiện & Hậu Cần", color: "bg-rose-100 text-rose-800 dark:bg-rose-950/60 dark:text-rose-300 border-rose-200" },
+  ban_dao_tao: { label: "Ban Đào Tạo", color: "bg-blue-100 text-blue-800 dark:bg-blue-950/60 dark:text-blue-300 border-blue-200" },
+  ban_b2b: { label: "Ban B2B & Giao Thương", color: "bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300 border-amber-200" },
+  ban_truyen_thong: { label: "Ban Truyền Thông", color: "bg-purple-100 text-purple-800 dark:bg-purple-950/60 dark:text-purple-300 border-purple-200" },
+  ban_dieu_hanh: { label: "Ban Điều Hành", color: "bg-indigo-100 text-indigo-800 dark:bg-indigo-950/60 dark:text-indigo-300 border-indigo-200" },
+  chung: { label: "Toàn CLB", color: "bg-sky-100 text-sky-800 dark:bg-sky-950/60 dark:text-sky-300 border-sky-200" },
+};
+
 function startOfDay(d: Date) {
   const x = new Date(d);
   x.setHours(0, 0, 0, 0);
@@ -136,6 +156,7 @@ function EventsPage() {
   const [q, setQ] = useState("");
   const [status, setStatus] = useState<EventItem["status"] | "all">("all");
   const [type, setType] = useState<EventItem["type"] | "all">("all");
+  const [departmentFilter, setDepartmentFilter] = useState<string>("all");
   const [bucket, setBucket] = useState<Bucket>("all");
   const [view, setView] = useState<EventView>("cards");
   const [savedFilters, setSavedFilters] = useState<EventSavedFilter[]>([]);
@@ -182,12 +203,18 @@ function EventsPage() {
       type: "text",
     },
     {
-      name: "sponsors",
-      label: "Nhà tài trợ & Gói đồng hành",
-      type: "custom",
-      render: (val, onChange) => (
-        <EventSponsorPackageSelector eventId={editing?.id} value={val || []} onChange={onChange} />
-      ),
+      name: "department",
+      label: "Ban Phụ Trách / Đơn Vị Tổ Chức",
+      type: "select",
+      options: [
+        { value: "ban_thien_nguyen", label: "Ban Thiện Nguyện & Đời Sống" },
+        { value: "ban_su_kien", label: "Ban Sự Kiện & Hậu Cần" },
+        { value: "ban_dao_tao", label: "Ban Đào Tạo & Phát Triển" },
+        { value: "ban_b2b", label: "Ban B2B & Giao Thương" },
+        { value: "ban_truyen_thong", label: "Ban Truyền Thông" },
+        { value: "ban_dieu_hanh", label: "Ban Điều Hành" },
+        { value: "chung", label: "Sự Kiện Chung Toàn CLB" },
+      ],
     },
     {
       name: "ticketPrice",
@@ -329,12 +356,17 @@ function EventsPage() {
         return eff === status || e.status === status;
       })
       .filter((e: any) => (type === "all" ? true : e.type === type))
+      .filter((e: any) => {
+        if (departmentFilter === "all") return true;
+        const dept = e.department || "ban_su_kien";
+        return dept === departmentFilter;
+      })
       .filter((e: any) => (bucket === "all" ? true : bucketOf(e.date) === bucket))
       .filter(
         (e) => !ql || e.name.toLowerCase().includes(ql) || e.location.toLowerCase().includes(ql),
       )
       .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-  }, [q, status, type, bucket, events]);
+  }, [q, status, type, departmentFilter, bucket, events]);
 
   const accessors = useMemo(
     () => ({
@@ -590,6 +622,17 @@ ${(e as any).description ? `📝 Chi tiết: ${(e as any).description}\n\n` : ""
           </div>
           <div className="grid grid-cols-2 gap-3 sm:flex sm:items-center">
             <select
+              value={departmentFilter}
+              onChange={(e) => setDepartmentFilter(e.target.value)}
+              className="h-11 min-w-0 rounded-lg border border-border bg-background px-3 text-sm font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/30 sm:h-10 text-slate-800 dark:text-slate-200"
+            >
+              {EVENT_DEPARTMENTS.map((d) => (
+                <option key={d.value} value={d.value}>
+                  {d.label}
+                </option>
+              ))}
+            </select>
+            <select
               value={type}
               onChange={(e) => setType(e.target.value as EventItem["type"] | "all")}
               className="h-11 min-w-0 rounded-lg border border-border bg-background px-3 text-sm font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/30 sm:h-10"
@@ -658,6 +701,25 @@ ${(e as any).description ? `📝 Chi tiết: ${(e as any).description}\n\n` : ""
               </button>
             </div>
           </div>
+        </div>
+
+        {/* Department quick filter bar */}
+        <div className="mt-3 flex items-center gap-1.5 overflow-x-auto pb-1 pt-1.5 border-t border-border/50 no-scrollbar">
+          <span className="text-xs font-bold text-muted-foreground shrink-0 mr-1">Ban phụ trách:</span>
+          {EVENT_DEPARTMENTS.map((d) => (
+            <button
+              key={d.value}
+              type="button"
+              onClick={() => setDepartmentFilter(d.value)}
+              className={`px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition cursor-pointer border ${
+                departmentFilter === d.value
+                  ? "bg-[#003B95] text-white border-[#003B95] shadow-xs"
+                  : "bg-muted/50 hover:bg-muted text-muted-foreground border-border"
+              }`}
+            >
+              {d.label}
+            </button>
+          ))}
         </div>
 
         {/* Time buckets */}
@@ -792,6 +854,9 @@ ${(e as any).description ? `📝 Chi tiết: ${(e as any).description}\n\n` : ""
                     width={130}
                     className="border-r border-slate-200 dark:border-slate-800"
                   />
+                  <th className="px-4 py-3 border-r border-b border-slate-200 dark:border-slate-800 text-left min-w-[150px]">
+                    Ban phụ trách
+                  </th>
                   <SortHeader
                     label="Giá vé / Phí"
                     columnKey="ticketPrice"
@@ -860,6 +925,17 @@ ${(e as any).description ? `📝 Chi tiết: ${(e as any).description}\n\n` : ""
                         <span className="inline-flex rounded-md bg-secondary px-2 py-0.5 text-xs font-medium text-muted-foreground">
                           {t(TYPE_KEY[e.type as EventItem["type"]] ?? "events.type.forum")}
                         </span>
+                      </td>
+                      <td className="px-4 py-3.5 border-r border-b border-slate-200 dark:border-slate-800 whitespace-nowrap">
+                        {(() => {
+                          const dept = e.department || "ban_su_kien";
+                          const deptInfo = DEPARTMENT_LABELS[dept] || { label: "Ban Sự Kiện", color: "bg-rose-100 text-rose-800 border-rose-200" };
+                          return (
+                            <span className={`inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-xs font-semibold border ${deptInfo.color}`}>
+                              {deptInfo.label}
+                            </span>
+                          );
+                        })()}
                       </td>
                       <td className="px-4 py-3.5 border-r border-b border-slate-200 dark:border-slate-800 whitespace-nowrap">
                         {e.ticketPrice && Number(e.ticketPrice) > 0 ? (
@@ -1245,6 +1321,18 @@ function EventCard({
         </div>
       </div>
       <div className="flex flex-1 flex-col p-5">
+        {/* Department Badge */}
+        {(() => {
+          const dept = e.department || "ban_su_kien";
+          const deptInfo = DEPARTMENT_LABELS[dept] || { label: "Ban Sự Kiện & Hậu Cần", color: "bg-rose-100 text-rose-800 border-rose-200" };
+          return (
+            <div className="mb-2">
+              <span className={`inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[11px] font-bold border ${deptInfo.color}`}>
+                🏛️ {deptInfo.label}
+              </span>
+            </div>
+          );
+        })()}
         <div className="mb-3 flex items-start justify-between gap-2">
           <Link
             to="/events/$eventId"

@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useState, useMemo, useEffect } from "react";
 import {
   Check,
@@ -31,6 +31,9 @@ import {
 import { useFmt, useT, type TKey } from "@/lib/i18n";
 
 export const Route = createFileRoute("/sponsor-packages")({
+  beforeLoad: () => {
+    throw redirect({ to: "/sponsors" });
+  },
   component: PackagesPage,
 });
 

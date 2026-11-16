@@ -447,7 +447,7 @@ export default function NewsScreen() {
         {canManageNews && (
           <div
             onClick={() => setPostModalOpen(true)}
-            className="flex items-center justify-between gap-3 p-3 rounded-2xl border border-amber-500/30 bg-gradient-to-r from-amber-50/70 via-blue-50/30 to-white dark:from-[#001D4A]/50 dark:to-[#002B70]/30 text-slate-900 dark:text-white shadow-xs hover:border-amber-400/60 transition cursor-pointer"
+            className="flex items-center justify-between gap-3 p-3 rounded-2xl border border-amber-500/30 bg-gradient-to-r from-amber-50/70 to-blue-50/40 dark:from-[#001D4A]/50 dark:to-[#002B70]/30 text-slate-900 dark:text-white shadow-xs hover:border-amber-400/60 transition cursor-pointer"
           >
             <div className="flex items-center gap-2.5 min-w-0">
               <div className="h-8.5 w-8.5 rounded-xl bg-amber-400/20 text-[#003B95] dark:text-amber-400 grid place-items-center shrink-0 border border-amber-400/40">
