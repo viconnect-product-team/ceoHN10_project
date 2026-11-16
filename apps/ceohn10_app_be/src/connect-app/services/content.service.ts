@@ -498,7 +498,11 @@ export class ConnectContentService {
     };
   }
 
-  async syncNewsFromCeo1983Web(): Promise<{
+  syncNewsFromCeo1983Web() {
+    return this.syncNewsFromCeoHn10Web();
+  }
+
+  async syncNewsFromCeoHn10Web(): Promise<{
     ok: boolean;
     count: number;
     message: string;

@@ -288,3 +288,5 @@ export function Ceo1983BusinessCardVisit({
     </div>
   );
 }
+
+export const CeoHn10BusinessCardVisit = Ceo1983BusinessCardVisit;

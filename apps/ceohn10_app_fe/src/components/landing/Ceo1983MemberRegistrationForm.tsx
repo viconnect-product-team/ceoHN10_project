@@ -819,17 +819,17 @@ export function Ceo1983MemberRegistrationForm({
 
         {/* Footer info */}
         <div className="text-center text-xs text-slate-400 pt-6 pb-12 space-y-1">
-          <p className="font-semibold text-slate-600">CLB DOANH NHÂN 1983</p>
+          <p className="font-semibold text-slate-600">CLB DOANH NHÂN CEO HN10</p>
           <p>Ban Thư Ký · Hotline: 0983 1010 10 · Email: btk@ceohn10.com</p>
           <p>
             Cổng thông tin chính thức:{" "}
             <a
-              href="https://ceohn10.com"
+              href="https://ceohn10.viconnect.vn"
               target="_blank"
               rel="noreferrer"
               className="text-[#003B95] hover:underline"
             >
-              ceohn10.com
+              ceohn10.viconnect.vn
             </a>
           </p>
         </div>
@@ -838,3 +838,5 @@ export function Ceo1983MemberRegistrationForm({
     </div>
   );
 }
+
+export const CeoHn10MemberRegistrationForm = Ceo1983MemberRegistrationForm;

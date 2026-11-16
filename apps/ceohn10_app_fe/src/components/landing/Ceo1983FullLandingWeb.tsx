@@ -481,3 +481,5 @@ export function Ceo1983FullLandingWeb() {
   );
 }
 
+export const CeoHn10FullLandingWeb = Ceo1983FullLandingWeb;
+

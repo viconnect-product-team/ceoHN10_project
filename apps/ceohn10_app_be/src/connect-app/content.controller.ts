@@ -26,7 +26,7 @@ export class ContentController {
   @Post('admin/news/sync-from-web')
   @UseGuards(OptionalJwtAuthGuard)
   async syncNewsFromWeb() {
-    return this.connectAppService.syncNewsFromCeo1983Web();
+    return this.connectAppService.syncNewsFromCeoHn10Web();
   }
 
   @Get('admin/news')

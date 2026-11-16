@@ -3822,7 +3822,7 @@ model business_card_interactions {
   card member_business_cards @relation(fields: [card_id], references: [id], onDelete: Cascade)
 }
 
-model ceo1983_users {
+model ceohn10_users {
   id                  String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   username            String   @unique
   password            String
@@ -3836,7 +3836,7 @@ model ceo1983_users {
   created_at          DateTime @default(now()) @db.Timestamptz(6)
   updated_at          DateTime @default(now()) @db.Timestamptz(6)
 
-  @@map("ceo1983_users")
+  @@map("ceohn10_users")
 }
 
 model vione_users {

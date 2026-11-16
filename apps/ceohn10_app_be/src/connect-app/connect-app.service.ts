@@ -2516,8 +2516,11 @@ export class ConnectAppService implements OnModuleInit {
   deleteNewsAdmin(id: string) {
     return this.contentService.deleteNewsAdmin(id);
   }
+  syncNewsFromCeoHn10Web() {
+    return this.contentService.syncNewsFromCeoHn10Web();
+  }
   syncNewsFromCeo1983Web() {
-    return this.contentService.syncNewsFromCeo1983Web();
+    return this.syncNewsFromCeoHn10Web();
   }
 
   // ==========================================

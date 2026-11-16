@@ -76,7 +76,7 @@ function readInitial(): Theme {
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setThemeState] = useState<Theme>("light");
-  const [colorTheme, setColorThemeState] = useState<Ceo1983ColorThemeId>("royal-gold");
+  const [colorTheme, setColorThemeState] = useState<Ceo1983ColorThemeId>("classic-navy");
 
   useEffect(() => {
     const initial = readInitial();

@@ -416,3 +416,9 @@ export function applyCeo1983ColorTheme(themeId: Ceo1983ColorThemeId): void {
 
 export const CEO1983_COLOR_THEMES = CEOHN10_COLOR_THEMES;
 
+export type CeoHn10ColorThemeId = Ceo1983ColorThemeId;
+export type CeoHn10ColorTheme = Ceo1983ColorTheme;
+export const applyCeoHn10ColorTheme = applyCeo1983ColorTheme;
+export const getActiveCeoHn10ColorThemeId = getActiveCeo1983ColorThemeId;
+export const getActiveCeoHn10ColorTheme = getActiveCeo1983ColorTheme;
+
