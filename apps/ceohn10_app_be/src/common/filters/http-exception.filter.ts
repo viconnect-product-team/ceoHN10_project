@@ -54,9 +54,15 @@ export class AllExceptionsFilter implements ExceptionFilter {
       'Hệ thống đang bận hoặc xảy ra lỗi không xác định. Vui lòng thử lại sau!';
     let errors: Record<string, string> | undefined = undefined;
 
-    if (exception instanceof HttpException) {
-      status = exception.getStatus();
-      const resObj = exception.getResponse();
+    const isHttpException =
+      exception instanceof HttpException ||
+      (typeof (exception as any)?.getStatus === 'function' &&
+        typeof (exception as any)?.getResponse === 'function');
+
+    if (isHttpException) {
+      const httpEx = exception as HttpException;
+      status = httpEx.getStatus();
+      const resObj = httpEx.getResponse();
 
       if (typeof resObj === 'string') {
         message = this.translateEnglishMessage(resObj, status, request.url);
@@ -85,6 +91,13 @@ export class AllExceptionsFilter implements ExceptionFilter {
           errors = anyRes.errors;
         }
       }
+    } else if (
+      typeof (exception as any)?.status === 'number' ||
+      typeof (exception as any)?.statusCode === 'number'
+    ) {
+      status = (exception as any).status || (exception as any).statusCode;
+      const rawMsg = (exception as any).message;
+      message = this.translateEnglishMessage(rawMsg, status, request.url);
     } else if (exception instanceof Error) {
       console.error('[UnhandledException]', exception.message, exception.stack);
       message =

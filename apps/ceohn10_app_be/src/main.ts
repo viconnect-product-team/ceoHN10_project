@@ -175,14 +175,19 @@ async function bootstrap() {
     exclude: ['share', 'share/(.*)', 'api/share', 'api/share/(.*)'],
   });
   // VULN-11 Fix: Khóa chặt chính sách CORS Whitelist theo các tên miền chính thức, ngăn ngừa CSRF & rò rỉ dữ liệu
+  const isDev = process.env.NODE_ENV !== 'production';
   const allowedOrigins = [
     'https://ceohn10.viconnect.vn',
     'https://crm.ceohn10.viconnect.vn',
     'http://localhost:3000',
+    'http://localhost:5137',
     'http://localhost:5173',
+    'http://localhost:5003',
     'http://localhost:8080',
     'http://127.0.0.1:3000',
+    'http://127.0.0.1:5137',
     'http://127.0.0.1:5173',
+    'http://127.0.0.1:5003',
     'http://127.0.0.1:8080',
     'capacitor://localhost',
   ];
@@ -194,7 +199,8 @@ async function bootstrap() {
       if (
         !origin ||
         allowedOrigins.includes(origin) ||
-        origin.endsWith('.viconnect.vn')
+        origin.endsWith('.viconnect.vn') ||
+        (isDev && (origin.includes('localhost') || origin.includes('127.0.0.1')))
       ) {
         callback(null, true);
       } else {
