@@ -1,5 +1,21 @@
 # System Memory & Architecture
 
+- **Bản cập nhật ngày 16/11/2026 (v12.0): CHỈ THỊ TỐI CAO DÀNH CHO CEOHN10 — KHÔNG FAKE DỮ LIỆU, BIẾN ĐỘNG TÀI CHÍNH REALTIME, KHÁC BIỆT CỐT LÕI VỀ RBAC - LỚP HỌC - TÀI LIỆU**:
+  - **1. NGHIÊM CẤM TUYỆT ĐỐI FAKE / MOCK DỮ LIỆU**:
+    * Mọi thông tin, số liệu, danh sách hiển thị trên Web CRM và Mobile App của CEOHN10 BẮT BUỘC phải truy vấn 100% từ Cơ sở dữ liệu PostgreSQL `ceohn10_project` (`113.20.107.184:6432`).
+    * Nghiêm cấm tạo mock array, mock object, fake chart data để che giấu trạng thái rỗng hoặc lỗi API.
+  - **2. BÁO CÁO TÀI CHÍNH BIẾN ĐỘNG REALTIME**:
+    * Số dư sổ quỹ (Quỹ CLB, Quỹ Thiện nguyện), thu hội phí niên liễm, các khoản chi hoạt động phải phản ánh trực tiếp theo thời gian thực từ bảng `public.transactions`, `public.member_dues`, `public.expenses`.
+    * Mỗi giao dịch phát sinh qua VietQR, chuyển khoản hoặc tiền mặt phải được ghi nhận và cập nhật ngay lập tức vào tổng số dư và biểu đồ dòng tiền.
+  - **3. KHÁC BIỆT CỐT LÕI CỦA CEOHN10 SO VỚI CEO1983**:
+    * **Chức năng Sự kiện (Events)**: Giữ tính năng kế thừa (Check-in QR, vé mời điện tử, sơ đồ chỗ ngồi, quay số may mắn).
+    * **Phân quyền (RBAC)**: Hoàn toàn khác biệt, thiết lập nghiêm ngặt theo đúng cơ cấu Ban Điều Hành & các Ban chuyên môn của CLB Doanh Nhân CEO HN10.
+    * **Luồng chức năng Lớp học (Trainings / Khóa học CEO HN10)**: Hoàn toàn khác biệt so với sự kiện thông thường — quản lý khóa học, chuyên đề đào tạo, danh sách học viên theo lớp, tài liệu bài giảng/slide đào tạo đính kèm, điểm danh từng buổi học.
+    * **Chức năng Lưu trữ tài liệu (Documents Vault)**: Quản trị phân quyền 2 tầng rõ rệt: Kho Tài liệu CLB (Điều lệ, nghị quyết, quy chế) và Kho Tài liệu Doanh nghiệp (Profile năng lực, catalog sản phẩm).
+  - **4. QUY CHUẨN NGÔN TỪ**:
+    * Bám sát 100% câu từ, thuật ngữ trong bộ tài liệu đặc tả của CEOHN10 (`BRD`, `SRS`, `BANG_MA_TRAN_CHOT_CHUC_NANG_HE_THONG_CEOHN10.md`, `TEST_CASES_TONG_THE_CEOHN10.md`).
+    * Nghiêm cấm thêm thắt bất kỳ câu từ linh tinh, suy đoán hoặc thuật ngữ ngoài phạm vi tài liệu.
+
 - **Bản cập nhật ngày 16/11/2026 (v11.55): Sửa Lỗi Gốc Phân Quyền RBAC Tài Khoản vumikasa6@gmail.com, Khắc Phục Trigger CSDL fn_enforce_lookup_table_write_guard Nuốt Lệnh DELETE, Gia Cố Đa Tầng Backend & Frontend ([NODE-CRM-005], [NODE-CRM-006], [NODE-CORE-001])**:
   - **1. Phát Hiện & Xử Lý Lỗi Gốc Tầng CSDL (113.20.107.184:6432)**:
     * **Nguyên nhân cốt lõi trong PostgreSQL**: Bảng `public.user_roles` gắn trigger `trg_guard_user_roles` gọi hàm `fn_enforce_lookup_table_write_guard()`. Hàm này có lỗi lập trình nghiêm trọng: kết thúc bằng `RETURN NEW;`. Trong PostgreSQL, đối với trigger `BEFORE DELETE`, biến `NEW` luôn có giá trị `NULL`. Do trigger trả về `NULL`, PostgreSQL tự động hủy (bỏ qua) mọi thao tác `DELETE` trên bảng `user_roles`.
@@ -1413,6 +1429,22 @@
      - Tuân thủ nghiêm ngặt STRICT RULE 1: Tuyệt đối không tự động chạy `git push` hay `git commit`.
 
 # System Memory & Architecture
+
+- **Bản cập nhật ngày 16/11/2026 (v12.0): CHỈ THỊ TỐI CAO DÀNH CHO CEOHN10 — KHÔNG FAKE DỮ LIỆU, BIẾN ĐỘNG TÀI CHÍNH REALTIME, KHÁC BIỆT CỐT LÕI VỀ RBAC - LỚP HỌC - TÀI LIỆU**:
+  - **1. NGHIÊM CẤM TUYỆT ĐỐI FAKE / MOCK DỮ LIỆU**:
+    * Mọi thông tin, số liệu, danh sách hiển thị trên Web CRM và Mobile App của CEOHN10 BẮT BUỘC phải truy vấn 100% từ Cơ sở dữ liệu PostgreSQL `ceohn10_project` (`113.20.107.184:6432`).
+    * Nghiêm cấm tạo mock array, mock object, fake chart data để che giấu trạng thái rỗng hoặc lỗi API.
+  - **2. BÁO CÁO TÀI CHÍNH BIẾN ĐỘNG REALTIME**:
+    * Số dư sổ quỹ (Quỹ CLB, Quỹ Thiện nguyện), thu hội phí niên liễm, các khoản chi hoạt động phải phản ánh trực tiếp theo thời gian thực từ bảng `public.transactions`, `public.member_dues`, `public.expenses`.
+    * Mỗi giao dịch phát sinh qua VietQR, chuyển khoản hoặc tiền mặt phải được ghi nhận và cập nhật ngay lập tức vào tổng số dư và biểu đồ dòng tiền.
+  - **3. KHÁC BIỆT CỐT LÕI CỦA CEOHN10 SO VỚI CEO1983**:
+    * **Chức năng Sự kiện (Events)**: Giữ tính năng kế thừa (Check-in QR, vé mời điện tử, sơ đồ chỗ ngồi, quay số may mắn).
+    * **Phân quyền (RBAC)**: Hoàn toàn khác biệt, thiết lập nghiêm ngặt theo đúng cơ cấu Ban Điều Hành & các Ban chuyên môn của CLB Doanh Nhân CEO HN10.
+    * **Luồng chức năng Lớp học (Trainings / Khóa học CEO HN10)**: Hoàn toàn khác biệt so với sự kiện thông thường — quản lý khóa học, chuyên đề đào tạo, danh sách học viên theo lớp, tài liệu bài giảng/slide đào tạo đính kèm, điểm danh từng buổi học.
+    * **Chức năng Lưu trữ tài liệu (Documents Vault)**: Quản trị phân quyền 2 tầng rõ rệt: Kho Tài liệu CLB (Điều lệ, nghị quyết, quy chế) và Kho Tài liệu Doanh nghiệp (Profile năng lực, catalog sản phẩm).
+  - **4. QUY CHUẨN NGÔN TỪ**:
+    * Bám sát 100% câu từ, thuật ngữ trong bộ tài liệu đặc tả của CEOHN10 (`BRD`, `SRS`, `BANG_MA_TRAN_CHOT_CHUC_NANG_HE_THONG_CEOHN10.md`, `TEST_CASES_TONG_THE_CEOHN10.md`).
+    * Nghiêm cấm thêm thắt bất kỳ câu từ linh tinh, suy đoán hoặc thuật ngữ ngoài phạm vi tài liệu.
 
 - **Bản cập nhật ngày 16/11/2026 (v11.55): Sửa Lỗi Gốc Phân Quyền RBAC Tài Khoản vumikasa6@gmail.com, Khắc Phục Trigger CSDL fn_enforce_lookup_table_write_guard Nuốt Lệnh DELETE, Gia Cố Đa Tầng Backend & Frontend ([NODE-CRM-005], [NODE-CRM-006], [NODE-CORE-001])**:
   - **1. Phát Hiện & Xử Lý Lỗi Gốc Tầng CSDL (113.20.107.184:6432)**:
@@ -4069,6 +4101,22 @@
      - Tuân thủ nghiêm ngặt STRICT RULE 1: Tuyệt đối không tự động chạy `git push` hay `git commit`.
 
 # System Memory & Architecture
+
+- **Bản cập nhật ngày 16/11/2026 (v12.0): CHỈ THỊ TỐI CAO DÀNH CHO CEOHN10 — KHÔNG FAKE DỮ LIỆU, BIẾN ĐỘNG TÀI CHÍNH REALTIME, KHÁC BIỆT CỐT LÕI VỀ RBAC - LỚP HỌC - TÀI LIỆU**:
+  - **1. NGHIÊM CẤM TUYỆT ĐỐI FAKE / MOCK DỮ LIỆU**:
+    * Mọi thông tin, số liệu, danh sách hiển thị trên Web CRM và Mobile App của CEOHN10 BẮT BUỘC phải truy vấn 100% từ Cơ sở dữ liệu PostgreSQL `ceohn10_project` (`113.20.107.184:6432`).
+    * Nghiêm cấm tạo mock array, mock object, fake chart data để che giấu trạng thái rỗng hoặc lỗi API.
+  - **2. BÁO CÁO TÀI CHÍNH BIẾN ĐỘNG REALTIME**:
+    * Số dư sổ quỹ (Quỹ CLB, Quỹ Thiện nguyện), thu hội phí niên liễm, các khoản chi hoạt động phải phản ánh trực tiếp theo thời gian thực từ bảng `public.transactions`, `public.member_dues`, `public.expenses`.
+    * Mỗi giao dịch phát sinh qua VietQR, chuyển khoản hoặc tiền mặt phải được ghi nhận và cập nhật ngay lập tức vào tổng số dư và biểu đồ dòng tiền.
+  - **3. KHÁC BIỆT CỐT LÕI CỦA CEOHN10 SO VỚI CEO1983**:
+    * **Chức năng Sự kiện (Events)**: Giữ tính năng kế thừa (Check-in QR, vé mời điện tử, sơ đồ chỗ ngồi, quay số may mắn).
+    * **Phân quyền (RBAC)**: Hoàn toàn khác biệt, thiết lập nghiêm ngặt theo đúng cơ cấu Ban Điều Hành & các Ban chuyên môn của CLB Doanh Nhân CEO HN10.
+    * **Luồng chức năng Lớp học (Trainings / Khóa học CEO HN10)**: Hoàn toàn khác biệt so với sự kiện thông thường — quản lý khóa học, chuyên đề đào tạo, danh sách học viên theo lớp, tài liệu bài giảng/slide đào tạo đính kèm, điểm danh từng buổi học.
+    * **Chức năng Lưu trữ tài liệu (Documents Vault)**: Quản trị phân quyền 2 tầng rõ rệt: Kho Tài liệu CLB (Điều lệ, nghị quyết, quy chế) và Kho Tài liệu Doanh nghiệp (Profile năng lực, catalog sản phẩm).
+  - **4. QUY CHUẨN NGÔN TỪ**:
+    * Bám sát 100% câu từ, thuật ngữ trong bộ tài liệu đặc tả của CEOHN10 (`BRD`, `SRS`, `BANG_MA_TRAN_CHOT_CHUC_NANG_HE_THONG_CEOHN10.md`, `TEST_CASES_TONG_THE_CEOHN10.md`).
+    * Nghiêm cấm thêm thắt bất kỳ câu từ linh tinh, suy đoán hoặc thuật ngữ ngoài phạm vi tài liệu.
 
 - **Bản cập nhật ngày 16/11/2026 (v11.55): Sửa Lỗi Gốc Phân Quyền RBAC Tài Khoản vumikasa6@gmail.com, Khắc Phục Trigger CSDL fn_enforce_lookup_table_write_guard Nuốt Lệnh DELETE, Gia Cố Đa Tầng Backend & Frontend ([NODE-CRM-005], [NODE-CRM-006], [NODE-CORE-001])**:
   - **1. Phát Hiện & Xử Lý Lỗi Gốc Tầng CSDL (113.20.107.184:6432)**:
