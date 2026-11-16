@@ -1,0 +1,44 @@
+{
+  "name": "ceohn10-crm-app-monorepo",
+  "private": true,
+  "engines": {
+    "node": ">=18"
+  },
+  "packageManager": "npm@10.8.2",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "dev:fe": "npm run dev --prefix apps/ceohn10_app_fe",
+    "dev:be": "npm run dev --prefix apps/ceohn10_app_be",
+    "lint": "turbo run lint",
+    "save": "git add -A && git commit -m \"chore(save): auto-save checkpoint\"",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "mobile:ceohn10:apk": "npm run build:apk --prefix apps/mobile_ceohn10",
+    "mobile:ceohn10:apk:local": "npm run build:apk:fast --prefix apps/mobile_ceohn10",
+    "mobile:ceohn10:ipa": "npm run build:ipa --prefix apps/mobile_ceohn10",
+    "mobile:ceohn10:submit": "npm run submit:ios --prefix apps/mobile_ceohn10",
+    "mobile:ceohn10:testflight": "npm run build:ios:submit --prefix apps/mobile_ceohn10",
+    "build:ceohn10": "npm run build --prefix apps/ceohn10_app_fe && npm run build --prefix apps/ceohn10_app_be",
+    "build:crm": "npm run build --prefix apps/ceohn10_app_fe && npm run build --prefix apps/ceohn10_app_be",
+    "deploy:association": "powershell -ExecutionPolicy Bypass -File ./deploy/ceohn10/fast-deploy.ps1",
+    "deploy:ceohn10": "powershell -ExecutionPolicy Bypass -File ./deploy/ceohn10/fast-deploy.ps1",
+    "deploy:ceohn10:fe": "powershell -ExecutionPolicy Bypass -File ./deploy/ceohn10/fast-deploy.ps1 -FrontendOnly -SkipWebBuild",
+    "deploy:mobile": "powershell -ExecutionPolicy Bypass -File ./deploy/ceohn10/fast-deploy.ps1 -FrontendOnly",
+    "deploy:mobile:fast": "powershell -ExecutionPolicy Bypass -File ./deploy/ceohn10/fast-deploy.ps1 -FrontendOnly -SkipWebBuild",
+    "deploy:crm": "powershell -ExecutionPolicy Bypass -File ./deploy/crm/fast-deploy.ps1",
+    "deploy:crm:fe": "powershell -ExecutionPolicy Bypass -File ./deploy/crm/fast-deploy.ps1 -FrontendOnly -SkipWebBuild"
+  },
+  "devDependencies": {
+    "docx": "^9.7.1",
+    "exceljs": "^4.4.0",
+    "pdf-lib": "^1.17.1",
+    "pptxgenjs": "^4.0.1",
+    "prettier": "^3.2.5",
+    "turbo": "^2.1.2",
+    "typescript": "^5.8.3"
+  }
+}

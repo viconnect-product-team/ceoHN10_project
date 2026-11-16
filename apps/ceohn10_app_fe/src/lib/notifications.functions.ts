@@ -1,0 +1,157 @@
+/**
+ * notifications.functions.ts
+ * Server functions cho thông báo quản trị CRM — gọi NestJS REST API, hỗ trợ realtime & routing.
+ */
+import { createServerFn } from "@tanstack/react-start";
+import { z } from "zod";
+import type { Notification } from "@/lib/extra-data";
+import { optionalNestAuth, requireNestAuth } from "@/integrations/supabase/nest-auth-middleware";
+import { fetchNestApiFromServer } from "./api-client";
+
+export const listNotificationsFn = createServerFn({ method: "GET" })
+  .middleware([optionalNestAuth])
+  .inputValidator((d: unknown) => (d ? z.object({ appScope: z.string().optional(), associationId: z.string().optional() }).optional().parse(d) : undefined))
+  .handler(async ({ data, context }): Promise<Notification[]> => {
+    try {
+      const params = new URLSearchParams();
+      if (data?.appScope) params.set("appScope", data.appScope);
+      if (data?.associationId) params.set("associationId", data.associationId);
+      const query = params.toString() ? `?${params.toString()}` : "";
+      const res = await fetchNestApiFromServer<Notification[]>(`/admin/notifications${query}`, (context as any)?.token);
+      return Array.isArray(res) ? res : [];
+    } catch (err) {
+      console.warn("[listNotificationsFn] Error fetching notifications from Nest API:", err);
+      return [];
+    }
+  });
+
+const notifInput = z.object({
+  title: z.string().min(1).max(300),
+  body: z.string().max(2000).default(""),
+  audience: z.enum(["all", "members", "sponsors", "staff"]).default("all"),
+  channel: z.enum(["inapp", "email", "sms"]).default("inapp"),
+  appScope: z.enum(["crm", "association_app", "all"]).default("all"),
+  targetApp: z.enum(["crm", "association_app", "all"]).default("all"),
+  status: z.enum(["sent", "scheduled", "draft"]).default("sent"),
+  associationId: z.string().optional(),
+});
+
+export const createNotificationFn = createServerFn({ method: "POST" })
+  .middleware([requireNestAuth])
+  .inputValidator((d: unknown) => notifInput.parse(d))
+  .handler(async ({ data, context }): Promise<Notification> => {
+    return fetchNestApiFromServer<Notification>("/admin/notifications", context.token, {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+  });
+
+export const updateNotificationFn = createServerFn({ method: "POST" })
+  .middleware([requireNestAuth])
+  .inputValidator((d: unknown) => notifInput.extend({ id: z.string().min(1).max(128) }).parse(d))
+  .handler(async ({ data, context }): Promise<Notification> => {
+    return fetchNestApiFromServer<Notification>(`/admin/notifications/${encodeURIComponent(data.id)}`, context.token, {
+      method: "PATCH",
+      body: JSON.stringify(data),
+    });
+  });
+
+// Mark a draft/scheduled notification as sent.
+export const sendNotificationFn = createServerFn({ method: "POST" })
+  .middleware([requireNestAuth])
+  .inputValidator((d: unknown) => z.object({ id: z.string().min(1).max(128) }).parse(d))
+  .handler(async ({ data, context }): Promise<Notification> => {
+    return fetchNestApiFromServer<Notification>(`/admin/notifications/${encodeURIComponent(data.id)}/send`, context.token, {
+      method: "POST",
+    });
+  });
+
+export const deleteNotificationFn = createServerFn({ method: "POST" })
+  .middleware([requireNestAuth])
+  .inputValidator((d: unknown) => z.object({ id: z.string().min(1).max(128) }).parse(d))
+  .handler(async ({ data, context }): Promise<{ ok: boolean }> => {
+    return fetchNestApiFromServer<{ ok: boolean }>(`/admin/notifications/${encodeURIComponent(data.id)}`, context.token, {
+      method: "DELETE",
+    });
+  });
+
+export const pushNotificationToMessagesFn = createServerFn({ method: "POST" })
+  .middleware([requireNestAuth])
+  .inputValidator((d: unknown) => z.object({ id: z.string().min(1).max(128), channel: z.string().optional() }).parse(d))
+  .handler(async ({ data, context }): Promise<{ ok: boolean; id: string; pushedToMessages: boolean; targetChannel: string }> => {
+    return fetchNestApiFromServer<{ ok: boolean; id: string; pushedToMessages: boolean; targetChannel: string }>(
+      `/admin/notifications/${encodeURIComponent(data.id)}/push-messages`,
+      context.token,
+      {
+        method: "POST",
+        body: JSON.stringify({ channel: data.channel }),
+      },
+    );
+  });
+
+export const getEventAttendeesPreviewFn = createServerFn({ method: "GET" })
+  .middleware([requireNestAuth])
+  .inputValidator((d: unknown) => z.object({ eventId: z.string().min(1) }).parse(d))
+  .handler(async ({ data, context }): Promise<{
+    event: {
+      id: string;
+      name: string;
+      date: string;
+      location: string;
+      bannerUrl?: string;
+      posterUrl?: string;
+      capacity?: number;
+      ticketPrice?: number;
+    } | null;
+    attendees: Array<{
+      id: string;
+      name: string;
+      code: string;
+      email: string;
+      phone: string;
+      company: string;
+      seat: string;
+      ticketCode: string;
+      status: string;
+      paymentStatus: string;
+      avatarUrl?: string;
+      userId?: string;
+      registeredAt?: string;
+    }>;
+    totalCount: number;
+    confirmedCount: number;
+  }> => {
+    return fetchNestApiFromServer(`/admin/events/${encodeURIComponent(data.eventId)}/attendees-preview`, context.token);
+  });
+
+const eventReminderInput = z.object({
+  eventId: z.string().min(1),
+  title: z.string().min(1).max(300),
+  body: z.string().min(1).max(4000),
+  posterUrl: z.string().optional(),
+  targetFilter: z.enum(["all_registered", "confirmed_only", "unpaid_only"]).default("all_registered"),
+  channel: z.string().optional(),
+});
+
+export const sendEventAttendeeReminderFn = createServerFn({ method: "POST" })
+  .middleware([requireNestAuth])
+  .inputValidator((d: unknown) => eventReminderInput.parse(d))
+  .handler(async ({ data, context }): Promise<{
+    ok: boolean;
+    notifCode: string;
+    eventName: string;
+    eventDate: string;
+    posterUrl?: string;
+    recipientCount: number;
+    recipients: Array<{
+      name: string;
+      code: string;
+      phone: string;
+      seat: string;
+    }>;
+  }> => {
+    return fetchNestApiFromServer("/admin/events/send-attendee-reminder", context.token, {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+  });

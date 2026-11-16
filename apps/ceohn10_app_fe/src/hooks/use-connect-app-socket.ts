@@ -1,0 +1,105 @@
+// BC-Mobile WebSocket Real-time Client (Socket.IO)
+// Manages real-time connection for Moments, Comments, DM, NFC Touch, and Notifications.
+
+import { useEffect, useRef } from "react";
+import { io, Socket } from "socket.io-client";
+import { NEST_API_URL } from "@/lib/api-client";
+import { useViewerUserId } from "./use-viewer-user-id";
+import { useAuth } from "@/context/AuthContext";
+
+let globalSocket: Socket | null = null;
+
+export function getConnectAppSocket(): Socket {
+  if (typeof window === "undefined") {
+    return {
+      connected: false,
+      connect: () => {},
+      disconnect: () => {},
+      emit: () => {},
+      on: () => {},
+      off: () => {},
+      once: () => {},
+    } as any;
+  }
+  if (!globalSocket) {
+    globalSocket = io(NEST_API_URL || undefined, {
+      transports: ["websocket"],
+      autoConnect: false,
+      reconnection: true,
+      reconnectionAttempts: 2,
+      reconnectionDelay: 15000,
+      reconnectionDelayMax: 30000,
+      timeout: 8000,
+    });
+
+    // Gracefully handle connection errors to avoid flooding console with uncaught red errors
+    globalSocket.on("connect_error", () => {
+      // Backend WebSocket is temporarily unreachable or offline — quiet fallback, do not spam console
+    });
+
+    // Auto-reconnect immediately when mobile user returns to app, turns on screen, or reconnects WiFi/4G
+    if (typeof window !== "undefined" && typeof document !== "undefined") {
+      const handleWakeup = () => {
+        if (globalSocket && !globalSocket.connected) {
+          globalSocket.connect();
+        }
+      };
+      document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === "visible") {
+          handleWakeup();
+        }
+      });
+      window.addEventListener("focus", handleWakeup);
+      window.addEventListener("online", handleWakeup);
+      window.addEventListener("pageshow", handleWakeup);
+    }
+  }
+  return globalSocket;
+}
+
+export function useConnectAppSocket(room?: string) {
+  const socketRef = useRef<Socket | null>(null);
+  const viewerUserId = useViewerUserId();
+  const { user } = useAuth();
+
+  useEffect(() => {
+    // Only connect if there is an authenticated user or a specific room requested
+    if (!viewerUserId && !room) return;
+
+    const socket = getConnectAppSocket();
+    socketRef.current = socket;
+
+    if (!socket.connected) {
+      socket.connect();
+    }
+
+    const joinRooms = () => {
+      // Join personal user room for targeted notifications, NFC tap alerts, DMs, WebRTC calls
+      if (viewerUserId) {
+        socket.emit("join:room", `user:${viewerUserId}`);
+      }
+      const code = user?.code || (user as any)?.memberCode;
+      if (code) {
+        socket.emit("join:room", `user:${code}`);
+      }
+      // Join specific room if provided (e.g. `moment:${momentId}`, `thread:${threadId}`)
+      if (room) {
+        socket.emit("join:room", room);
+      }
+    };
+
+    if (socket.connected) {
+      joinRooms();
+    }
+    socket.on("connect", joinRooms);
+
+    return () => {
+      socket.off("connect", joinRooms);
+      if (room) {
+        socket.emit("leave:room", room);
+      }
+    };
+  }, [room, viewerUserId]);
+
+  return socketRef.current || getConnectAppSocket();
+}

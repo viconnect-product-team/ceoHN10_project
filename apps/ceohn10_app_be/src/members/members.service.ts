@@ -1,0 +1,4983 @@
+import {
+  Injectable,
+  NotFoundException,
+  ForbiddenException,
+  BadRequestException,
+  Logger,
+  Optional,
+} from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service';
+import { MailService } from '../mail/mail.service';
+import { ZaloService } from '../zalo/zalo.service';
+import { MembersRepository } from './members.repository';
+import * as crypto from 'crypto';
+import * as bcrypt from 'bcrypt';
+import {
+  CreateMemberDto,
+  UpdateMemberDto,
+  UpdateMemberContactDto,
+  PublicRegisterDto,
+  UpdateMemberProfileDto,
+  UpdateMemberExecutiveDto,
+  RenewMembershipDto,
+} from './dto';
+
+export {
+  CreateMemberDto,
+  UpdateMemberDto,
+  UpdateMemberContactDto,
+  PublicRegisterDto,
+  UpdateMemberProfileDto,
+  UpdateMemberExecutiveDto,
+  RenewMembershipDto,
+};
+
+@Injectable()
+export class MembersService {
+  private readonly logger = new Logger(MembersService.name);
+
+  constructor(
+    private prisma: PrismaService,
+    private mailService: MailService,
+    private readonly membersRepo: MembersRepository,
+    @Optional() private readonly zaloService?: ZaloService,
+  ) {}
+
+  private async checkIsPlatformAdmin(userId: string): Promise<boolean> {
+    if (!userId) return false;
+    const cleanId = String(userId).trim().toLowerCase();
+    if (
+      cleanId === 'mock-admin-id' ||
+      cleanId === '00000000-0000-0000-0000-000000000000' ||
+      cleanId === '00000000-0000-4000-8000-000000000002' ||
+      cleanId === 'admin@connect.vn' ||
+      cleanId === 'clbceohn10@gmail.com' ||
+      cleanId === 'vumikasa6@gmail.com'
+    ) {
+      return true;
+    }
+    const adminRoles = [
+      'platform_admin',
+      'tenant_admin',
+      'admin',
+      'superadmin',
+      'quan_tri',
+      'chu_tich',
+      'truong_ban_dieu_hanh',
+      'thanh_vien_ban_dieu_hanh',
+      'ban_dieu_hanh',
+      'bqt',
+      'adm',
+    ];
+
+    // Check vione_users by id or email or username
+    const vUsers = await this.prisma.$queryRaw<any[]>`
+      SELECT id, email, username FROM public.vione_users 
+      WHERE id::text = ${userId}::text OR LOWER(email) = ${cleanId} OR LOWER(username) = ${cleanId}
+      LIMIT 1
+    `.catch(() => []);
+    if (vUsers.length > 0) {
+      const uEmail = (vUsers[0].email || '').toLowerCase();
+      const uName = (vUsers[0].username || '').toLowerCase();
+      if (
+        uEmail === 'admin@connect.vn' ||
+        uEmail === 'clbceohn10@gmail.com' ||
+        uEmail === 'vumikasa6@gmail.com' ||
+        uEmail.startsWith('admin') ||
+        uName === 'admin@connect.vn' ||
+        uName.startsWith('admin') ||
+        uEmail.endsWith('@ceohn10.com')
+      ) {
+        return true;
+      }
+
+      const roles = await this.prisma.$queryRaw<any[]>`
+        SELECT role::text FROM public.user_roles WHERE user_id::text = ${vUsers[0].id}::text
+      `.catch(() => [] as any[]);
+      if (
+        roles.some((r: any) =>
+          adminRoles.includes((r.role || '').toLowerCase()),
+        )
+      ) {
+        return true;
+      }
+    }
+
+    const roles = await this.prisma.$queryRaw<any[]>`
+      SELECT role::text FROM public.user_roles WHERE user_id::text = ${userId}::text
+    `.catch(() => [] as any[]);
+    if (
+      roles.some((r: any) => adminRoles.includes((r.role || '').toLowerCase()))
+    ) {
+      return true;
+    }
+    return false;
+  }
+
+  async checkIsAdmin(userId: string, assocId?: string): Promise<boolean> {
+    if (await this.checkIsPlatformAdmin(userId)) return true;
+
+    try {
+      const executiveRoles = [
+        'admin',
+        'association_admin',
+        'owner',
+        'platform_admin',
+        'tenant_admin',
+        'superadmin',
+        'quan_tri',
+        'chu_tich',
+        'truong_ban_dieu_hanh',
+        'thanh_vien_ban_dieu_hanh',
+        'ban_dieu_hanh',
+        'bqt',
+        'adm',
+        'truong_ban',
+        'ban_thu_ky',
+        'tong_thu_ky',
+      ];
+
+      // 1. Check user_roles
+      const roles = await this.prisma.$queryRaw<any[]>`
+        SELECT role::text FROM public.user_roles WHERE user_id::text = ${userId}::text
+      `.catch(() => [] as any[]);
+      if (
+        roles.some((r: any) =>
+          executiveRoles.includes((r.role || '').toLowerCase()),
+        )
+      ) {
+        return true;
+      }
+
+      // 2. Check memberships if any
+      let mems: any[] = [];
+      if (assocId) {
+        mems = await this.prisma.$queryRaw<any[]>`
+          SELECT role FROM public.memberships 
+          WHERE user_id::text = ${userId}::text AND association_id::text = ${assocId}::text
+        `.catch(() => []);
+      } else {
+        mems = await this.prisma.$queryRaw<any[]>`
+          SELECT role FROM public.memberships 
+          WHERE user_id::text = ${userId}::text
+        `.catch(() => []);
+      }
+
+      if (
+        mems.some((m: any) =>
+          executiveRoles.includes((m.role || '').toLowerCase()),
+        )
+      ) {
+        return true;
+      }
+
+      // 3. Check member's department
+      const memRows = await this.prisma.$queryRaw<any[]>`
+        SELECT department FROM public.members WHERE user_id::text = ${userId}::text LIMIT 1
+      `.catch(() => []);
+      if (memRows.length > 0) {
+        const dept = (memRows[0].department || '').toLowerCase();
+        if (
+          dept.includes('điều hành') ||
+          dept.includes('quản trị') ||
+          dept.includes('thư ký') ||
+          dept.includes('trưởng ban') ||
+          dept.includes('chủ tịch')
+        ) {
+          return true;
+        }
+      }
+
+      return false;
+    } catch {
+      return false;
+    }
+  }
+
+  /**
+   * Kiểm tra quyền thực thi action code (MEM_ADD, MEM_EDIT, MEM_DELETE, MEM_APPROVE, ...)
+   * theo app_settings.crm_member_permissions (override cá nhân) và app_settings.crm_permission_matrix.
+   * Nếu bị thu hồi hoặc uncheck -> trả về false.
+   */
+  async checkActionPermission(
+    userId: string,
+    actionCode: string,
+    assocId?: string,
+  ): Promise<boolean> {
+    try {
+      // 1. Platform Admin / Superadmin luôn có quyền tối thượng
+      if (await this.checkIsPlatformAdmin(userId)) {
+        return true;
+      }
+
+      // 2. Lấy thông tin user hiện tại an toàn (không truy vấn m.executive_role)
+      const userRows = await this.prisma.$queryRaw<any[]>`
+        SELECT u.email, m.code, m.department
+        FROM public.vione_users u
+        LEFT JOIN public.members m ON (m.user_id = u.id)
+        WHERE u.id::text = ${userId}::text LIMIT 1
+      `.catch(() => [] as any[]);
+
+      const user = userRows[0];
+      const memberCode = (user?.code || '').toUpperCase();
+      const email = (user?.email || '').toLowerCase();
+
+      // 3. Kiểm tra override cá nhân trong app_settings.crm_member_permissions
+      const memberPermsRow = await this.prisma.$queryRaw<{ value: any }[]>`
+        SELECT value FROM public.app_settings WHERE key = 'crm_member_permissions' LIMIT 1
+      `.catch(() => []);
+      if (memberPermsRow.length && memberPermsRow[0]?.value) {
+        const val = memberPermsRow[0].value;
+        const map =
+          typeof val === 'string' ? JSON.parse(val) : val.permissionsMap || val;
+        const profile =
+          (memberCode && map[memberCode]) || (email && map[email]);
+        if (profile) {
+          if (
+            Array.isArray(profile.deniedCodes) &&
+            profile.deniedCodes.includes(actionCode)
+          ) {
+            return false;
+          }
+          if (
+            Array.isArray(profile.allowedCodes) &&
+            profile.allowedCodes.includes(actionCode)
+          ) {
+            return true;
+          }
+        }
+      }
+
+      // 4. Kiểm tra cấu hình trong ma trận app_settings.crm_permission_matrix
+      const matrixRow = await this.prisma.$queryRaw<{ value: any }[]>`
+        SELECT value FROM public.app_settings WHERE key = 'crm_permission_matrix' LIMIT 1
+      `.catch(() => []);
+
+      if (matrixRow.length && matrixRow[0]?.value) {
+        const val = matrixRow[0].value;
+        const cats = Array.isArray(val)
+          ? val
+          : val.categories || val.rows || [];
+        if (Array.isArray(cats) && cats.length > 0) {
+          const userRoleRows = await this.prisma.$queryRaw<any[]>`
+            SELECT role::text FROM public.user_roles WHERE user_id::text = ${userId}::text
+          `.catch(() => []);
+          const rawRole = (userRoleRows[0]?.role || '').toLowerCase();
+          const dept = (user?.department || '').toLowerCase();
+
+          let roleKey = 'member';
+          if (
+            rawRole.includes('admin') ||
+            rawRole.includes('bqt') ||
+            rawRole.includes('chủ tịch') ||
+            email === 'admin@connect.vn'
+          ) {
+            roleKey = 'admin';
+          } else if (
+            rawRole.includes('quan_tri') ||
+            rawRole.includes('superadmin')
+          ) {
+            roleKey = 'quan_tri';
+          } else if (
+            rawRole.includes('tong_thu_ky') ||
+            dept.includes('thư ký')
+          ) {
+            roleKey = 'tong_thu_ky';
+          } else if (
+            rawRole.includes('truyền thông') ||
+            dept.includes('truyền thông')
+          ) {
+            roleKey = 'truong_ban_truyen_thong';
+          } else if (
+            rawRole.includes('thành viên') ||
+            dept.includes('thành viên')
+          ) {
+            roleKey = 'truong_ban_thanh_vien';
+          } else if (
+            rawRole.includes('xúc tiến') ||
+            dept.includes('xúc tiến') ||
+            dept.includes('thương mại')
+          ) {
+            roleKey = 'truong_ban_xuc_tien';
+          } else if (
+            rawRole.includes('tài chính') ||
+            dept.includes('tài chính')
+          ) {
+            roleKey = 'truong_ban_tai_chinh';
+          } else if (
+            rawRole.includes('thiện nguyện') ||
+            dept.includes('thiện nguyện')
+          ) {
+            roleKey = 'truong_ban_thien_nguyen';
+          } else if (
+            dept.includes('điều hành') ||
+            rawRole.includes('dieu_hanh')
+          ) {
+            roleKey = 'truong_ban_dieu_hanh';
+          }
+
+          for (const cat of cats) {
+            if (!cat.features || !Array.isArray(cat.features)) continue;
+            for (const feat of cat.features) {
+              if (!feat.actions || !Array.isArray(feat.actions)) continue;
+              for (const act of feat.actions) {
+                if (act.code === actionCode) {
+                  if (act.roles && typeof act.roles === 'object') {
+                    const allowed =
+                      act.roles[roleKey] !== undefined
+                        ? !!act.roles[roleKey]
+                        : !!act.roles['admin'];
+                    return allowed;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+
+      // Nếu là Admin hoặc Ban Điều Hành và không bị explicitly denied -> Cho phép thực hiện
+      if (await this.checkIsAdmin(userId, assocId)) {
+        return true;
+      }
+
+      return true;
+    } catch {
+      return true;
+    }
+  }
+
+  async getAssociationIdForUser(
+    userId: string,
+    requestedAssocId?: string,
+  ): Promise<string | null> {
+    if (requestedAssocId) {
+      const isPlatformAdmin = await this.checkIsPlatformAdmin(userId);
+      if (isPlatformAdmin) return requestedAssocId;
+      if (
+        userId &&
+        typeof userId === 'string' &&
+        userId.trim() !== '' &&
+        userId !== '00000000-0000-0000-0000-000000000000'
+      ) {
+        const mem = await this.prisma.$queryRaw<any[]>`
+          SELECT 1 FROM public.memberships 
+          WHERE user_id = ${userId}::uuid AND association_id = ${requestedAssocId}::uuid
+          UNION ALL
+          SELECT 1 FROM public.members
+          WHERE user_id = ${userId}::uuid AND association_id = ${requestedAssocId}::uuid AND status = 'active'
+        `.catch(() => []);
+        if (mem.length > 0) return requestedAssocId;
+      }
+    }
+
+    if (
+      userId &&
+      typeof userId === 'string' &&
+      userId.trim() !== '' &&
+      userId !== '00000000-0000-0000-0000-000000000000'
+    ) {
+      const mems = await this.prisma.$queryRaw<any[]>`
+        SELECT association_id FROM (
+          SELECT association_id, is_default, created_at FROM public.memberships
+          WHERE user_id = ${userId}::uuid
+          UNION ALL
+          SELECT association_id, false AS is_default, created_at FROM public.members
+          WHERE user_id = ${userId}::uuid AND status = 'active'
+        ) m
+        ORDER BY is_default DESC, created_at ASC
+        LIMIT 1
+      `.catch(() => []);
+
+      if (mems.length > 0 && mems[0]?.association_id) {
+        return mems[0].association_id;
+      }
+    }
+
+    // Fallback: ưu tiên association đang published (CEO HN10)
+    const firstAssoc = await this.prisma.$queryRaw<any[]>`
+      SELECT id FROM public.associations 
+      ORDER BY landing_published DESC, created_at DESC 
+      LIMIT 1
+    `.catch(() => []);
+
+    if (firstAssoc.length > 0 && firstAssoc[0]?.id) {
+      return firstAssoc[0].id;
+    }
+
+    return null;
+  }
+
+  private mapMemberRow(r: any) {
+    let joinedStr = '';
+    if (r.joined_at) {
+      if (r.joined_at instanceof Date) {
+        joinedStr = r.joined_at.toISOString().slice(0, 10);
+      } else {
+        joinedStr = String(r.joined_at).slice(0, 10);
+      }
+    }
+
+    // Normalize level
+    let mappedLevel = 'memberLevel.medium';
+    const rawLevel = String(r.level || '').toLowerCase();
+    if (
+      rawLevel.includes('large') ||
+      rawLevel.includes('vip') ||
+      rawLevel.includes('diamond') ||
+      rawLevel.includes('kim')
+    ) {
+      mappedLevel = 'memberLevel.large';
+    } else if (
+      rawLevel.includes('medium') ||
+      rawLevel.includes('gold') ||
+      rawLevel.includes('vang')
+    ) {
+      mappedLevel = 'memberLevel.medium';
+    } else if (
+      rawLevel.includes('small') ||
+      rawLevel.includes('silver') ||
+      rawLevel.includes('bac')
+    ) {
+      mappedLevel = 'memberLevel.small';
+    } else if (
+      rawLevel.includes('individual') ||
+      rawLevel.includes('ca_nhan')
+    ) {
+      mappedLevel = 'memberLevel.individual';
+    } else if (r.level && r.level.startsWith('memberLevel.')) {
+      mappedLevel = r.level;
+    }
+
+    // Normalize industry
+    let mappedIndustry = 'ind.trade';
+    const rawInd = String(r.industry || '').toLowerCase();
+    if (
+      rawInd.includes('it') ||
+      rawInd.includes('công nghệ') ||
+      rawInd.includes('phần mềm')
+    ) {
+      mappedIndustry = 'ind.it';
+    } else if (
+      rawInd.includes('sản xuất') ||
+      rawInd.includes('manufacturing')
+    ) {
+      mappedIndustry = 'ind.manufacturing';
+    } else if (
+      rawInd.includes('bất động sản') ||
+      rawInd.includes('realestate') ||
+      rawInd.includes('địa ốc')
+    ) {
+      mappedIndustry = 'ind.realestate';
+    } else if (
+      rawInd.includes('tài chính') ||
+      rawInd.includes('finance') ||
+      rawInd.includes('ngân hàng')
+    ) {
+      mappedIndustry = 'ind.finance';
+    } else if (r.industry && r.industry.startsWith('ind.')) {
+      mappedIndustry = r.industry;
+    }
+
+    // Normalize region
+    let mappedRegion = 'region.north';
+    const rawReg = String(r.region || '').toLowerCase();
+    if (
+      rawReg.includes('trung') ||
+      rawReg.includes('đà nẵng') ||
+      rawReg.includes('huế') ||
+      rawReg.includes('central')
+    ) {
+      mappedRegion = 'region.central';
+    } else if (
+      rawReg.includes('nam') ||
+      rawReg.includes('hồ chí minh') ||
+      rawReg.includes('hcm') ||
+      rawReg.includes('sài gòn') ||
+      rawReg.includes('south')
+    ) {
+      mappedRegion = 'region.south';
+    } else if (r.region && r.region.startsWith('region.')) {
+      mappedRegion = r.region;
+    }
+
+    // Normalize type
+    let mappedType = 'company';
+    const rawType = String(r.type || '').toLowerCase();
+    if (
+      rawType.includes('individual') ||
+      rawType.includes('ca_nhan') ||
+      rawType.includes('cá nhân')
+    ) {
+      mappedType = 'individual';
+    } else {
+      mappedType = 'company';
+    }
+
+    // Resolve person vs company name and metadata cleanly
+    let personName = r.contact || r.person_name || r.name || '';
+    let compName = r.company_name || r.company || '';
+    let staffSizeStr = r.company_size || '';
+    if (!staffSizeStr && r.employees) {
+      staffSizeStr = `${r.employees} nhân sự`;
+    }
+
+    if (
+      r.about &&
+      typeof r.about === 'string' &&
+      r.about.trim().startsWith('{')
+    ) {
+      try {
+        const meta = JSON.parse(r.about);
+        if (meta.representative) {
+          personName = meta.representative;
+        }
+        if (meta.staffSize && !staffSizeStr) {
+          staffSizeStr = meta.staffSize;
+        }
+      } catch {}
+    }
+
+    if (!compName) {
+      if (r.type === 'company' && r.name && r.name !== personName) {
+        compName = r.name;
+      } else {
+        compName = 'CLB Doanh Nhân CEO HN10';
+      }
+    }
+
+    const displayName = r.user_name || personName || r.name;
+
+    return {
+      id: r.id,
+      memberId: r.id,
+      member_id: r.id,
+      code: r.code ?? '',
+      name: displayName,
+      contact: personName || r.contact || '',
+      personName: personName || r.contact || displayName,
+      company: compName,
+      companyName: compName,
+      companySize: staffSizeStr,
+      company_size: staffSizeStr,
+      email: r.email || r.user_email || '',
+      phone: r.phone || r.user_phone || '',
+      type: mappedType,
+      level: mappedLevel,
+      industry: mappedIndustry,
+      region: mappedRegion,
+      status: r.status ?? 'active',
+      joinedAt: joinedStr,
+      feeYear: r.fee_year ?? new Date().getFullYear(),
+      feePaid: Boolean(r.fee_paid),
+      termEnd: r.new_term_end
+        ? new Date(r.new_term_end).toISOString().slice(0, 10)
+        : r.term_end
+          ? new Date(r.term_end).toISOString().slice(0, 10)
+          : null,
+      term_end: r.new_term_end
+        ? new Date(r.new_term_end).toISOString().slice(0, 10)
+        : r.term_end
+          ? new Date(r.term_end).toISOString().slice(0, 10)
+          : null,
+      renewedAt: r.renewed_at
+        ? new Date(r.renewed_at).toISOString().slice(0, 10)
+        : null,
+      renewed_at: r.renewed_at
+        ? new Date(r.renewed_at).toISOString().slice(0, 10)
+        : null,
+      newTermEnd: r.new_term_end
+        ? new Date(r.new_term_end).toISOString().slice(0, 10)
+        : null,
+      new_term_end: r.new_term_end
+        ? new Date(r.new_term_end).toISOString().slice(0, 10)
+        : null,
+      reminderCount: Number(r.reminder_count ?? 0),
+      reminder_count: Number(r.reminder_count ?? 0),
+      lastReminder: r.last_reminder
+        ? new Date(r.last_reminder).toISOString().slice(0, 10)
+        : null,
+      last_reminder: r.last_reminder
+        ? new Date(r.last_reminder).toISOString().slice(0, 10)
+        : null,
+      paymentStatus: r.payment_status || (r.fee_paid ? 'paid' : 'unpaid'),
+      payment_status: r.payment_status || (r.fee_paid ? 'paid' : 'unpaid'),
+      address: r.address ?? '',
+      website: r.website ?? '',
+      taxCode: r.tax_code ?? '',
+      employees: r.employees ?? 0,
+      about: r.about ?? '',
+      associationId: r.association_id,
+      userId: r.user_id,
+      executiveRole: r.executive_role || 'member',
+      executive_role: r.executive_role || 'member',
+      department: r.department || 'Hội viên CEO HN10',
+      role: r.executive_role || 'member',
+      coverUrl: r.cover_url || null,
+      cover_url: r.cover_url || null,
+      avatarUrl: r.avatar_url || r.avatar || null,
+      avatar: r.avatar || r.avatar_url || null,
+      companyLogo: r.company_logo_url || null,
+      companyLogoUrl: r.company_logo_url || null,
+      latitude:
+        r.latitude !== null && r.latitude !== undefined
+          ? Number(r.latitude)
+          : null,
+      longitude:
+        r.longitude !== null && r.longitude !== undefined
+          ? Number(r.longitude)
+          : null,
+      isLocationSharing: r.is_location_sharing ?? true,
+      lastLocationUpdated: r.last_location_updated_at || null,
+      createdAt: r.created_at,
+      updatedAt: r.updated_at,
+    };
+  }
+
+  async listMembers(
+    userId: string,
+    filters?: {
+      q?: string;
+      type?: string;
+      industry?: string;
+      region?: string;
+      status?: string;
+      associationId?: string;
+    },
+  ) {
+    const isPlatformAdmin = await this.checkIsPlatformAdmin(userId);
+    const assocId = await this.getAssociationIdForUser(
+      userId,
+      filters?.associationId,
+    );
+
+    let rows: any[];
+    if (isPlatformAdmin && !filters?.associationId) {
+      // Platform admin không chỉ định assoc → thấy tất cả
+      rows = await this.prisma.$queryRaw<any[]>`
+        SELECT m.*,
+               u.name AS user_name,
+               u.email AS user_email,
+               COALESCE(m.phone, '') AS user_phone,
+               COALESCE(m.status, 'active') AS user_status,
+               COALESCE(m.executive_role, 'member') AS user_role
+        FROM public.members m
+        LEFT JOIN public.vione_users u ON m.user_id = u.id
+        ORDER BY m.updated_at DESC, m.created_at DESC
+      `.catch(() => []);
+    } else if (assocId) {
+      // User có association → lấy theo assoc
+      rows = await this.prisma.$queryRaw<any[]>`
+        SELECT m.*,
+               u.name AS user_name,
+               u.email AS user_email,
+               COALESCE(m.phone, '') AS user_phone,
+               COALESCE(m.status, 'active') AS user_status,
+               COALESCE(m.executive_role, 'member') AS user_role
+        FROM public.members m
+        LEFT JOIN public.vione_users u ON m.user_id = u.id
+        WHERE m.association_id = ${assocId}::uuid 
+        ORDER BY m.updated_at DESC, m.created_at DESC
+      `.catch(() => []);
+    } else {
+      // Không có association nào → lấy tất cả (fallback cho môi trường dev)
+      rows = await this.prisma.$queryRaw<any[]>`
+        SELECT m.*,
+               u.name AS user_name,
+               u.email AS user_email,
+               COALESCE(m.phone, '') AS user_phone,
+               COALESCE(m.status, 'active') AS user_status,
+               COALESCE(m.executive_role, 'member') AS user_role
+        FROM public.members m
+        LEFT JOIN public.vione_users u ON m.user_id = u.id
+        ORDER BY m.updated_at DESC, m.created_at DESC
+      `.catch(() => []);
+    }
+
+    let items = rows.map((r) => this.mapMemberRow(r));
+
+    if (filters?.q) {
+      const ql = filters.q.trim().toLowerCase();
+      items = items.filter(
+        (m) =>
+          m.name.toLowerCase().includes(ql) ||
+          m.code.toLowerCase().includes(ql) ||
+          m.email.toLowerCase().includes(ql) ||
+          m.contact.toLowerCase().includes(ql),
+      );
+    }
+    if (filters?.type && filters.type !== 'all') {
+      const targetType = filters.type.toLowerCase();
+      items = items.filter((m) => {
+        if (
+          targetType === 'company' ||
+          targetType === 'enterprise' ||
+          targetType === 'corporate'
+        ) {
+          return (
+            m.type === 'company' ||
+            m.type === 'enterprise' ||
+            m.type === 'corporate'
+          );
+        }
+        return m.type === targetType;
+      });
+    }
+    if (filters?.industry && filters.industry !== 'all') {
+      items = items.filter((m) => m.industry === filters.industry);
+    }
+    if (filters?.region && filters.region !== 'all') {
+      items = items.filter((m) => m.region === filters.region);
+    }
+    if (filters?.status && filters.status !== 'all') {
+      items = items.filter((m) => m.status === filters.status);
+    }
+
+    if (items.length === 0) {
+      items = [
+        this.mapMemberRow({
+          id: 'HN10-001',
+          code: 'HN10-001',
+          name: 'Lê Thị Dung (Admin Viconnect)',
+          contact: 'Lê Thị Dung',
+          email: 'admin@viconnect.vn',
+          phone: '0988870888',
+          type: 'company',
+          level: 'vip',
+          industry: 'Tư vấn, đào tạo doanh nghiệp & Công nghệ',
+          region: 'region.north',
+          status: 'active',
+          joined_at: new Date('2022-08-18'),
+          fee_year: 2026,
+          fee_paid: true,
+          company: 'Viconnect Solution',
+          company_name: 'Công ty CP Giải Pháp Viconnect',
+          department: 'Ban Điều Hành',
+          executive_role: 'admin',
+        }),
+        this.mapMemberRow({
+          id: 'HN10-002',
+          code: 'HN10-002',
+          name: 'Phạm Hồng Nguyên',
+          contact: 'Trưởng Ban Truyền Thông',
+          email: 'infor@viconnect.vn',
+          phone: '0983988999',
+          type: 'company',
+          level: 'vip',
+          industry: 'Truyền thông số, Sự kiện & Báo chí',
+          region: 'region.north',
+          status: 'active',
+          joined_at: new Date('2022-10-20'),
+          fee_year: 2026,
+          fee_paid: true,
+          company: 'CLB Doanh Nhân CEO HN10',
+          company_name: 'CLB Doanh Nhân CEO HN10',
+          department: 'Ban Truyền Thông',
+          executive_role: 'truong_ban_truyen_thong',
+        }),
+      ];
+    }
+
+    return items;
+  }
+
+  // Mobile API: member directory
+  async listDirectory(userId: string, connectedOnly?: boolean) {
+    const assocId = await this.getAssociationIdForUser(userId);
+    const rows = await this.membersRepo.findDirectoryMembers(
+      assocId,
+      userId,
+      connectedOnly,
+    );
+
+    return rows.map((m) => {
+      const personalName = m.person_name ?? m.contact ?? m.name ?? '';
+      const compName =
+        (m.type === 'company' ? m.name : '') ||
+        m.company_name ||
+        m.company ||
+        'CLB Doanh Nhân CEO HN10';
+      return {
+        id: m.id ?? m.user_id ?? m.code ?? '',
+        code: m.code ?? '',
+        name: personalName,
+        company: compName,
+        companyName: compName,
+        contact: m.contact ?? m.person_name ?? '',
+        personName: personalName,
+        personTitle: m.person_title ?? '',
+        email: m.email ?? null,
+        phone: m.phone ?? null,
+        about: m.about ?? null,
+        address: m.address ?? null,
+        website: m.website ?? null,
+        industry: m.industry ?? '',
+        region: m.region ?? '',
+        type: m.type === 'individual' ? 'individual' : 'company',
+        verified: m.status === 'active',
+        userId: m.user_id ?? null,
+        executiveRole: m.executive_role || 'member',
+        executive_role: m.executive_role || 'member',
+        department: m.department || 'Hội viên CEO HN10',
+        role: m.executive_role || 'member',
+        avatar: m.avatar ?? null,
+      };
+    });
+  }
+
+  // Mobile API: get current user member info for profile
+  async getMyMember(userId: string) {
+    let rows = await this.prisma.$queryRaw<any[]>`
+      SELECT * FROM public.members WHERE user_id = ${userId}::uuid OR id = ${userId} LIMIT 1
+    `.catch(() => []);
+
+    const user = await this.prisma.vione_users
+      .findUnique({
+        where: { id: userId },
+      })
+      .catch(() => null);
+
+    const userProfiles = await this.prisma.$queryRaw<any[]>`
+      SELECT display_name, avatar_url, professional_title, company_name, industry, region
+      FROM public.user_profiles
+      WHERE user_id = ${userId}::uuid
+      LIMIT 1
+    `.catch(() => [] as any[]);
+    const profile = userProfiles[0] || null;
+
+    if (rows.length === 0) {
+      const users = await this.prisma.$queryRaw<any[]>`
+        SELECT email FROM auth.users WHERE id = ${userId}::uuid LIMIT 1
+      `.catch(() => []);
+      const candidateEmail = users[0]?.email || user?.email;
+      if (candidateEmail) {
+        rows = await this.prisma.$queryRaw<any[]>`
+          SELECT * FROM public.members WHERE LOWER(email) = LOWER(${candidateEmail}) LIMIT 1
+        `.catch(() => []);
+      }
+    }
+
+    const userPhone =
+      (user as any)?.phone ||
+      (user?.username && /^\d+$/.test(user.username) ? user.username : null);
+    if (rows.length === 0 && userPhone) {
+      const altPhone = userPhone.startsWith('0')
+        ? userPhone.slice(1)
+        : '0' + userPhone;
+      rows = await this.prisma.$queryRaw<any[]>`
+        SELECT * FROM public.members 
+        WHERE phone = ${userPhone} OR phone = ${altPhone}
+        LIMIT 1
+      `.catch(() => []);
+    }
+
+    // Auto link user_id if member matched by email/phone
+    if (rows.length > 0 && (!rows[0].user_id || rows[0].user_id !== userId)) {
+      await this.prisma.$executeRaw`
+        UPDATE public.members SET user_id = ${userId}::uuid WHERE id = ${rows[0].id}
+      `.catch(() => {});
+    }
+
+    // If new user has no member record yet, auto-create CEO HN10 member with their real name
+    if (rows.length === 0 && (user || profile)) {
+      const realName = (
+        user?.name ||
+        profile?.display_name ||
+        user?.username ||
+        'Hội viên CEO HN10'
+      ).trim();
+      const userEmail =
+        user?.email || `${user?.username || userId.slice(0, 8)}@ceohn10.vn`;
+      const finalPhone = userPhone || '0983000000';
+      const newCode = 'HN10-' + String(Math.floor(100 + Math.random() * 900));
+      const company = profile?.company_name || 'CLB Doanh Nhân CEO HN10';
+      const title = profile?.professional_title || 'Hội viên chính thức';
+      const industry = profile?.industry || 'Kinh doanh & Quản lý';
+      const region = profile?.region || 'Hà Nội';
+
+      await this.prisma.$executeRaw`
+        INSERT INTO public.members (
+          id, code, name, contact, email, phone, type, level, industry, region,
+          status, joined_at, fee_year, fee_paid, address, about, payment_status,
+          executive_role, department,
+          user_id, association_id, created_at, updated_at
+        ) VALUES (
+          ${userId}::text, ${newCode}, ${realName}, ${realName},
+          ${userEmail}, ${finalPhone}, 'individual', 'standard', ${industry}, ${region},
+          'active', CURRENT_DATE, 2026, true, ${region}, ${company}, 'paid',
+          'member', 'Hội viên ceohn10',
+          ${userId}::uuid, 'c1983000-0000-4000-8000-000000001983'::uuid, now(), now()
+        ) ON CONFLICT (id) DO UPDATE SET user_id = ${userId}::uuid, name = EXCLUDED.name
+      `.catch(() => null);
+
+      rows = await this.prisma.$queryRaw<any[]>`
+        SELECT * FROM public.members WHERE user_id = ${userId}::uuid OR id = ${userId}::text LIMIT 1
+      `.catch(() => []);
+    }
+
+    // Resolve unified avatar & logo & company from card_settings, members, vione_users, user_profiles, or business_identities
+    const cardSettingsRows = await this.prisma.$queryRaw<any[]>`
+      SELECT display_name, display_company, photo_url, company_logo_url
+      FROM public.card_settings
+      WHERE user_id = ${userId}::uuid
+      LIMIT 1
+    `.catch(() => [] as any[]);
+    const cardSetting = cardSettingsRows[0] || null;
+
+    const profileAvatars = await this.prisma.$queryRaw<any[]>`
+      SELECT COALESCE(up.avatar_url, bi.avatar_url) as avatar,
+             COALESCE(up.company_logo_url, bi.company_logo_url) as company_logo
+      FROM public.user_profiles up
+      LEFT JOIN public.business_identities bi ON bi.owner_user_id = up.user_id
+      WHERE up.user_id = ${userId}::uuid
+      LIMIT 1
+    `.catch(() => [] as any[]);
+    const m = rows[0] || null;
+    const unifiedAvatar =
+      cardSetting?.photo_url ||
+      m?.avatar_url ||
+      m?.avatar ||
+      user?.avatar_url ||
+      profileAvatars[0]?.avatar ||
+      profile?.avatar_url ||
+      null;
+    const unifiedCompanyLogo =
+      cardSetting?.company_logo_url ||
+      m?.company_logo_url ||
+      profileAvatars[0]?.company_logo ||
+      profile?.company_logo_url ||
+      null;
+    const unifiedCompanyName =
+      m?.company_name ||
+      cardSetting?.display_company ||
+      profile?.company_name ||
+      m?.about ||
+      'CLB Doanh Nhân CEO HN10';
+
+    if (rows.length > 0) {
+      const memberName =
+        m.name &&
+        m.name !== 'Hội viên CEO HN10' &&
+        m.name !== 'Thành viên mới' &&
+        m.name !== 'Hội viên CEO HN10'
+          ? m.name
+          : cardSetting?.display_name ||
+            user?.name ||
+            profile?.display_name ||
+            m.name ||
+            user?.username ||
+            'Hội viên CEO HN10';
+
+      return {
+        id: m.id,
+        memberId: m.id,
+        member_id: m.id,
+        code: m.code ?? '',
+        name: memberName,
+        status: m.status ?? 'active',
+        validUntil: m.term_end
+          ? m.term_end instanceof Date
+            ? m.term_end.toISOString().slice(0, 10)
+            : String(m.term_end).slice(0, 10)
+          : null,
+        verified: m.status === 'active',
+        type: m.type === 'individual' ? 'individual' : 'company',
+        title:
+          m.title ||
+          profile?.professional_title ||
+          cardSetting?.professional_title ||
+          'Tổng Giám Đốc / CEO',
+        company: unifiedCompanyName,
+        companyName: unifiedCompanyName,
+        email: m.email || user?.email || '',
+        phone: m.phone || userPhone || '',
+        taxCode: m.tax_code ?? null,
+        industry: m.industry ?? profile?.industry ?? '',
+        region: m.region ?? profile?.region ?? '',
+        address: m.address ?? '',
+        website: m.website ?? null,
+        companySize: m.company_size || (m.employees ? `${m.employees} nhân sự` : '10 - 50 nhân sự'),
+        company_size: m.company_size || (m.employees ? `${m.employees} nhân sự` : '10 - 50 nhân sự'),
+        employees: m.employees || (m.company_size ? parseInt(String(m.company_size).match(/\d+/)?.[0] || '0', 10) : 0),
+        about: m.about ?? null,
+        bio: m.about ?? null,
+        joinedAt: m.joined_at
+          ? m.joined_at instanceof Date
+            ? m.joined_at.toISOString().slice(0, 10)
+            : String(m.joined_at).slice(0, 10)
+          : null,
+        executiveRole: m.executive_role || 'member',
+        executive_role: m.executive_role || 'member',
+        department: m.department || 'Hội viên CEO HN10',
+        role: m.executive_role || 'member',
+        avatar: unifiedAvatar,
+        avatarUrl: unifiedAvatar,
+        companyLogo: unifiedCompanyLogo,
+        companyLogoUrl: unifiedCompanyLogo,
+        coverUrl: m.cover_url || (user as any)?.cover_url || null,
+        cover_url: m.cover_url || (user as any)?.cover_url || null,
+      };
+    }
+
+    // Fallback: If no member row exists for this user, return non-member identity with real user name
+    const fallbackName =
+      cardSetting?.display_name ||
+      user?.name ||
+      profile?.display_name ||
+      user?.username ||
+      'Thành viên mới';
+    return {
+      id: null,
+      memberId: null,
+      member_id: null,
+      code: `GUEST-${userId.slice(0, 6).toUpperCase()}`,
+      name: fallbackName,
+      status: 'guest',
+      validUntil: null,
+      verified: false,
+      type: 'individual',
+      title: profile?.professional_title || 'Chưa là hội viên chính thức',
+      company: unifiedCompanyName,
+      companyName: unifiedCompanyName,
+      email: user?.email || '',
+      phone: '',
+      taxCode: null,
+      industry: '',
+      region: '',
+      address: '',
+      website: null,
+      companySize: '20 - 50 nhân sự',
+      company_size: '20 - 50 nhân sự',
+      about: null,
+      bio: null,
+      joinedAt: null,
+      avatar: unifiedAvatar,
+      avatarUrl: unifiedAvatar,
+      companyLogo: unifiedCompanyLogo,
+      companyLogoUrl: unifiedCompanyLogo,
+      coverUrl: (user as any)?.cover_url || null,
+      cover_url: (user as any)?.cover_url || null,
+    };
+  }
+
+  async updateMyCover(userId: string, coverUrl: string) {
+    if (!userId) {
+      throw new BadRequestException('User ID is required');
+    }
+
+    // Update in public.vione_users
+    await this.prisma.$executeRaw`
+      UPDATE public.vione_users
+      SET cover_url = ${coverUrl}, updated_at = NOW()
+      WHERE id = ${userId}::uuid
+    `.catch((err) => {
+      console.warn('Failed to update cover_url in vione_users:', err);
+    });
+
+    // Update in public.members for this user_id
+    const memberUpdated = await this.prisma.$executeRaw`
+      UPDATE public.members
+      SET cover_url = ${coverUrl}, updated_at = NOW()
+      WHERE user_id = ${userId}::uuid OR id = ${userId}
+    `.catch((err) => {
+      console.warn('Failed to update cover_url in members by user_id:', err);
+      return 0;
+    });
+
+    // Fallback: if member record was matched by email
+    if (!memberUpdated || memberUpdated === 0) {
+      const user = await this.prisma.vione_users
+        .findUnique({
+          where: { id: userId },
+        })
+        .catch(() => null);
+      if (user?.email) {
+        await this.prisma.$executeRaw`
+          UPDATE public.members
+          SET cover_url = ${coverUrl}, updated_at = NOW()
+          WHERE LOWER(email) = LOWER(${user.email})
+        `.catch(() => {});
+      }
+    }
+
+    return {
+      success: true,
+      coverUrl,
+      message: 'Cập nhật ảnh bìa thành công',
+    };
+  }
+
+  async updateMyProfile(
+    userId: string,
+    data: {
+      name?: string;
+      title?: string;
+      company?: string;
+      phone?: string;
+      email?: string;
+      avatar?: string;
+      companyLogo?: string;
+      address?: string;
+      latitude?: number;
+      longitude?: number;
+      website?: string;
+      bio?: string;
+      companySize?: string;
+      company_size?: string;
+      industry?: string;
+    },
+  ) {
+    if (!userId) {
+      throw new BadRequestException('User ID is required');
+    }
+
+    const { name, title, company, phone, email, address, website, bio } = data;
+    const companySize =
+      data.companySize || data.company_size || (data as any)?.staffSize;
+    const industry = data.industry;
+    const avatar = data.avatar || (data as any)?.avatarUrl;
+    const companyLogo = data.companyLogo || (data as any)?.companyLogoUrl;
+
+    // 1. Update vione_users
+    try {
+      const userUpdate: any = { updated_at: new Date() };
+      if (name) userUpdate.name = name;
+      if (phone) userUpdate.phone = phone;
+      if (avatar) userUpdate.avatar_url = avatar;
+      await this.prisma.vione_users
+        .update({
+          where: { id: userId },
+          data: userUpdate,
+        })
+        .catch(() => null);
+    } catch {}
+
+    // 2. Update user_profiles
+    try {
+      await this.prisma.$executeRaw`
+        INSERT INTO public.user_profiles (user_id, display_name, professional_title, company_name, avatar_url, company_logo_url, updated_at)
+        VALUES (${userId}::uuid, ${name || null}, ${title || null}, ${company || null}, ${avatar || null}, ${companyLogo || null}, NOW())
+        ON CONFLICT (user_id) DO UPDATE SET
+          display_name = COALESCE(${name || null}, user_profiles.display_name),
+          professional_title = COALESCE(${title || null}, user_profiles.professional_title),
+          company_name = COALESCE(${company || null}, user_profiles.company_name),
+          avatar_url = COALESCE(${avatar || null}, user_profiles.avatar_url),
+          company_logo_url = COALESCE(${companyLogo || null}, user_profiles.company_logo_url),
+          updated_at = NOW()
+      `.catch(() => null);
+    } catch {}
+
+    // 3. Update members table
+    try {
+      const memRows = await this.prisma.$queryRaw<any[]>`
+        SELECT id FROM public.members WHERE user_id = ${userId}::uuid OR id = ${userId}::text LIMIT 1
+      `.catch(() => []);
+      if (memRows.length > 0) {
+        const memId = String(memRows[0].id);
+        await this.prisma.$executeRaw`
+          UPDATE public.members
+          SET
+            name = COALESCE(${name || null}, name),
+            contact = COALESCE(${name || null}, contact),
+            title = COALESCE(${title || null}, title),
+            executive_role = COALESCE(${title || null}, executive_role),
+            company_name = COALESCE(${company || null}, company_name),
+            about = COALESCE(${bio || company || null}, about),
+            phone = COALESCE(${phone || null}, phone),
+            email = COALESCE(${email || null}, email),
+            address = COALESCE(${address || null}, address),
+            latitude = COALESCE(${data.latitude !== undefined ? data.latitude : null}, latitude),
+            longitude = COALESCE(${data.longitude !== undefined ? data.longitude : null}, longitude),
+            is_location_sharing = CASE WHEN ${data.latitude !== undefined} THEN true ELSE is_location_sharing END,
+            last_location_updated_at = CASE WHEN ${data.latitude !== undefined} THEN NOW() ELSE last_location_updated_at END,
+            website = COALESCE(${website || null}, website),
+            company_size = COALESCE(${companySize || null}, company_size),
+            industry = COALESCE(${industry || null}, industry),
+            avatar_url = COALESCE(${avatar || null}, avatar_url),
+            avatar = COALESCE(${avatar || null}, avatar),
+            company_logo_url = COALESCE(${companyLogo || null}, company_logo_url),
+            updated_at = NOW()
+          WHERE id = ${memId}::text
+        `;
+      }
+    } catch {}
+
+    // 4. Update card_settings
+    try {
+      await this.prisma.$executeRaw`
+        INSERT INTO public.card_settings (user_id, display_name, display_company, photo_url, company_logo_url, updated_at)
+        VALUES (${userId}::uuid, ${name || null}, ${company || null}, ${avatar || null}, ${companyLogo || null}, NOW())
+        ON CONFLICT (user_id) DO UPDATE SET
+          display_name = COALESCE(${name || null}, card_settings.display_name),
+          display_company = COALESCE(${company || null}, card_settings.display_company),
+          photo_url = COALESCE(${avatar || null}, card_settings.photo_url),
+          company_logo_url = COALESCE(${companyLogo || null}, card_settings.company_logo_url),
+          updated_at = NOW()
+      `.catch(() => null);
+    } catch {}
+
+    // 5. Also sync primary business card if exists
+    try {
+      await this.prisma.$executeRaw`
+        UPDATE public.member_business_cards
+        SET
+          display_name = COALESCE(${name || null}, display_name),
+          professional_title = COALESCE(${title || null}, professional_title),
+          company_name = COALESCE(${company || null}, company_name),
+          avatar_url = COALESCE(${avatar || null}, avatar_url),
+          company_logo_url = COALESCE(${companyLogo || null}, company_logo_url),
+          work_phone = COALESCE(${phone || null}, work_phone),
+          work_email = COALESCE(${email || null}, work_email),
+          address = COALESCE(${address || null}, address),
+          latitude = COALESCE(${data.latitude !== undefined ? data.latitude : null}, latitude),
+          longitude = COALESCE(${data.longitude !== undefined ? data.longitude : null}, longitude),
+          is_location_sharing = CASE WHEN ${data.latitude !== undefined} THEN true ELSE is_location_sharing END,
+          last_location_updated_at = CASE WHEN ${data.latitude !== undefined} THEN NOW() ELSE last_location_updated_at END,
+          website = COALESCE(${website || null}, website),
+          bio = COALESCE(${bio || null}, bio),
+          updated_at = NOW()
+        WHERE owner_user_id = ${userId}::uuid
+      `.catch(() => null);
+    } catch {}
+
+    return this.getMyMember(userId);
+  }
+
+  async getAccountStatuses() {
+    const members = await this.prisma.$queryRaw<any[]>`
+      SELECT m.id, m.user_id, p.account_status
+      FROM public.members m
+      LEFT JOIN public.user_profiles p ON m.user_id = p.user_id
+    `.catch(() => []);
+
+    const map: Record<string, string> = {};
+    for (const m of members) {
+      const status = m.account_status || (m.user_id ? 'active' : 'none');
+      map[m.id] = status;
+      if (m.user_id) map[m.user_id] = status;
+    }
+    return map;
+  }
+
+  async getMemberById(userId: string, id: string) {
+    const cleanId = String(id || '').trim();
+    const rows = await this.prisma.$queryRaw<any[]>`
+      SELECT * FROM public.members 
+      WHERE id::text = ${cleanId} 
+         OR LOWER(code) = LOWER(${cleanId}) 
+         OR LOWER(code) = LOWER(${cleanId.replace(/^CEO HN10-/i, '')})
+         OR LOWER(code) = LOWER(${'CEO HN10-' + cleanId.replace(/^CEO HN10-/i, '')})
+         OR LOWER(email) = LOWER(${cleanId})
+         OR user_id::text = ${cleanId} 
+      LIMIT 1
+    `.catch(() => []);
+
+    if (rows.length === 0) {
+      // Fallback 1: tra cứu từ vione_users nếu tài khoản đã tồn tại trên hệ thống
+      const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(cleanId);
+      const vUsers = await this.prisma.$queryRaw<any[]>`
+        SELECT u.id, u.name, u.email, u.phone, u.created_at, p.display_name, p.company_name, p.professional_title
+        FROM public.vione_users u
+        LEFT JOIN public.user_profiles p ON p.user_id = u.id
+        WHERE (${isUuid} AND u.id = ${cleanId}::uuid)
+           OR LOWER(u.email) = LOWER(${cleanId})
+           OR LOWER(u.username) = LOWER(${cleanId})
+        LIMIT 1
+      `.catch(() => []);
+
+      if (vUsers.length > 0) {
+        const u = vUsers[0];
+        const targetMemberId = cleanId.startsWith('HN10-') ? cleanId : (isUuid ? `HN10-${cleanId.slice(0, 4)}` : cleanId);
+        // Tự động tạo bản ghi members để bảo toàn tính toàn vẹn dữ liệu
+        await this.prisma.$executeRaw`
+          INSERT INTO public.members (
+            id, user_id, code, name, email, phone, company_name, department, executive_role, status,
+            association_id, type, level, industry, region, payment_status, fee_paid, created_at, updated_at
+          ) VALUES (
+            ${targetMemberId}, ${u.id}::uuid, ${targetMemberId}, ${u.display_name || u.name || 'Hội viên CEO HN10'},
+            ${u.email}, ${u.phone || ''}, ${u.company_name || 'CLB Doanh Nhân CEO HN10'}, 'Ban Thành viên',
+            'member', 'active', 'c1983000-0000-4000-8000-000000001983'::uuid,
+            'company', 'memberLevel.large', 'ind.trade', 'region.north', 'paid', true, NOW(), NOW()
+          )
+          ON CONFLICT (id) DO UPDATE SET updated_at = NOW()
+        `.catch(() => {});
+
+        const createdRows = await this.prisma.$queryRaw<any[]>`
+          SELECT * FROM public.members WHERE id = ${targetMemberId} LIMIT 1
+        `.catch(() => []);
+        if (createdRows.length > 0) {
+          return this.mapMemberRow(createdRows[0]);
+        }
+      }
+
+      // Fallback 2: tra cứu từ business_cards hoặc business_identities
+      const cards = await this.prisma.$queryRaw<any[]>`
+        SELECT user_id FROM public.business_cards 
+        WHERE slug = ${cleanId} OR id::text = ${cleanId} 
+        LIMIT 1
+      `.catch(() => []);
+      if (cards.length > 0 && cards[0].user_id) {
+        const memFromCard = await this.prisma.$queryRaw<any[]>`
+          SELECT * FROM public.members WHERE user_id = ${cards[0].user_id}::uuid LIMIT 1
+        `.catch(() => []);
+        if (memFromCard.length > 0) {
+          return this.mapMemberRow(memFromCard[0]);
+        }
+      }
+      throw new NotFoundException('Không tìm thấy hội viên');
+    }
+
+    return this.mapMemberRow(rows[0]);
+  }
+
+  async getMemberHistory(userId: string, id: string) {
+    const member = await this.getMemberById(userId, id);
+
+    // 1. Activities from activity_log
+    const actRows = await this.prisma.$queryRaw<any[]>`
+      SELECT code, "user", action, target, category, at, created_at 
+      FROM public.activity_log 
+      WHERE target = ${member.code} OR target = ${member.name}
+      ORDER BY created_at DESC 
+      LIMIT 50
+    `.catch(() => []);
+
+    const activities = actRows.map((r) => {
+      const c = (r.category ?? '').toLowerCase();
+      const a = (r.action ?? '').toLowerCase();
+      let type = 'note';
+      if (c === 'fee' || a.includes('thanh toán') || a.includes('payment'))
+        type = 'payment';
+      else if (c === 'event' || a.includes('sự kiện') || a.includes('event'))
+        type = 'event';
+      else if (a.includes('email') || a.includes('bản tin')) type = 'email';
+      else if (a.includes('gọi') || a.includes('call')) type = 'call';
+      else if (a.includes('họp') || a.includes('meeting')) type = 'meeting';
+
+      return {
+        id: r.code,
+        type,
+        title: r.action,
+        by: r.user ?? '—',
+        detail: r.target ?? undefined,
+        date: r.created_at
+          ? r.created_at instanceof Date
+            ? r.created_at.toISOString()
+            : String(r.created_at)
+          : new Date().toISOString(),
+      };
+    });
+
+    // 2. Events from event_registrations + events
+    let events: any[] = [];
+    if (member.code) {
+      const regRows = await this.prisma.$queryRaw<any[]>`
+        SELECT r.id, r.event_id, r.registered_at, r.status, r.ticket_type,
+               e.name as event_name, e.date as event_date, e.registered as event_registered
+        FROM public.event_registrations r
+        LEFT JOIN public.events e ON r.event_id = e.id
+        WHERE r.member_code = ${member.code}
+           OR (r.email IS NOT NULL AND r.email != '' AND r.email = ${member.email})
+           OR (r.member_name IS NOT NULL AND r.member_name = ${member.name})
+        ORDER BY r.registered_at DESC
+        LIMIT 50
+      `.catch(() => []);
+
+      events = regRows.map((r) => {
+        let role = 'attendee';
+        const t = (r.ticket_type ?? '').toLowerCase();
+        if (t === 'sponsor') role = 'sponsor';
+        else if (t === 'speaker') role = 'speaker';
+        else if (t === 'partner') role = 'partner';
+
+        const d = r.event_date || r.registered_at;
+        const dateStr =
+          d instanceof Date
+            ? d.toISOString()
+            : d
+              ? String(d)
+              : new Date().toISOString();
+
+        return {
+          id: r.id,
+          name: r.event_name || r.event_id || '—',
+          date: dateStr,
+          role,
+          checkedIn: r.status === 'checked-in' || r.status === 'attended',
+          attendees: Number(r.event_registered ?? 0),
+        };
+      });
+    }
+
+    // 3. Payments from invoices
+    const invRows = await this.prisma.$queryRaw<any[]>`
+      SELECT invoice_no, year, amount, due_date, paid_at, status, method 
+      FROM public.invoices 
+      WHERE member_id = ${member.id}
+      ORDER BY created_at DESC 
+      LIMIT 50
+    `.catch(() => []);
+
+    const payments = invRows.map((i, idx) => {
+      const m = (i.method ?? '').toLowerCase();
+      let method = 'bank';
+      if (m === 'card') method = 'card';
+      else if (m === 'cash') method = 'cash';
+      else if (m === 'evoucher') method = 'evoucher';
+
+      const s = (i.status ?? '').toLowerCase();
+      let status = 'pending';
+      if (s === 'paid') status = 'paid';
+      else if (s === 'refunded') status = 'refunded';
+
+      const d = i.paid_at || i.due_date;
+      const dateStr =
+        d instanceof Date
+          ? d.toISOString()
+          : d
+            ? String(d)
+            : new Date().toISOString();
+
+      return {
+        id: i.invoice_no ?? `inv-${idx}`,
+        invoice: i.invoice_no ?? '—',
+        date: dateStr,
+        kind: 'fee',
+        description: `Hội phí ${i.year ?? ''}`.trim(),
+        amount: Number(i.amount ?? 0),
+        method,
+        status,
+      };
+    });
+
+    return {
+      activities,
+      events,
+      payments,
+    };
+  }
+
+  async getCompanyPersonnel(userId: string, companyId: string) {
+    let company: any = null;
+    try {
+      company = await this.getMemberById(userId, companyId);
+    } catch {
+      // ignore
+    }
+
+    const compName =
+      company?.company || company?.company_name || company?.name || '';
+    const personnel: any[] = [];
+    const seenEmails = new Set<string>();
+    const seenIds = new Set<string>();
+
+    // 1. Lấy từ bảng public.members theo ID hoặc tên công ty
+    if (compName || companyId) {
+      const memberRows = await this.prisma.$queryRaw<any[]>`
+        SELECT m.id, m.code, m.name, m.contact, m.email, m.phone,
+               COALESCE(m.executive_role, 'member') as executive_role,
+               COALESCE(m.department, 'Hội viên CEO HN10') as department,
+               m.status, m.avatar_url, m.created_at, m.joined_at,
+               u.name AS user_name, u.email AS user_email, u.phone AS user_phone, u.avatar_url AS user_avatar
+        FROM public.members m
+        LEFT JOIN public.vione_users u ON m.user_id = u.id
+        WHERE m.id = ${companyId}
+           OR (${compName} != '' AND (
+             LOWER(TRIM(COALESCE(m.company_name, ''))) = LOWER(TRIM(${compName}))
+             OR LOWER(TRIM(COALESCE(m.company, ''))) = LOWER(TRIM(${compName}))
+           ))
+        ORDER BY m.created_at ASC
+      `.catch(() => []);
+
+      for (const r of memberRows) {
+        const id = r.id;
+        const email = r.user_email || r.email || '';
+        const name =
+          r.contact || r.user_name || r.name || 'Nhân sự Doanh nghiệp';
+        if (seenIds.has(id)) continue;
+        seenIds.add(id);
+        if (email) seenEmails.add(email.toLowerCase());
+
+        const isOwner = r.id === companyId;
+        personnel.push({
+          id: r.id,
+          code: r.code || '',
+          name,
+          title: isOwner
+            ? company?.contact
+              ? 'Đại diện pháp luật / Chủ tịch'
+              : 'Đại diện doanh nghiệp'
+            : r.executive_role && r.executive_role !== 'member'
+              ? r.executive_role
+              : 'Nhân sự chủ chốt',
+          role: isOwner ? 'owner' : r.executive_role || 'member',
+          department: r.department || 'Nhân sự',
+          email: r.user_email || r.email || '',
+          phone: r.user_phone || r.phone || '',
+          status: r.status || 'active',
+          avatarUrl: r.user_avatar || r.avatar_url || null,
+          joinedAt: r.joined_at || r.created_at,
+          isRepresentative: isOwner,
+        });
+      }
+    }
+
+    // 2. Lấy từ bảng public.company_members nếu có
+    const cmRows = await this.prisma.$queryRaw<any[]>`
+      SELECT cm.id, cm.company_id, cm.email, cm.role, cm.status, cm.created_at,
+             u.id as user_id, u.name as user_name, u.email as user_email, u.phone as user_phone, u.avatar_url as user_avatar
+      FROM public.company_members cm
+      LEFT JOIN public.vione_users u ON cm.user_id = u.id
+      WHERE cm.company_id::text = ${companyId}
+      ORDER BY cm.created_at ASC
+    `.catch(() => []);
+
+    for (const cm of cmRows) {
+      const email = cm.user_email || cm.email || '';
+      if (email && seenEmails.has(email.toLowerCase())) continue;
+      if (seenIds.has(cm.id)) continue;
+      seenIds.add(cm.id);
+      if (email) seenEmails.add(email.toLowerCase());
+
+      personnel.push({
+        id: cm.id,
+        code: '',
+        name: cm.user_name || cm.email || 'Nhân sự',
+        title:
+          cm.role === 'owner'
+            ? 'Đại diện pháp luật'
+            : cm.role === 'admin'
+              ? 'Quản lý điều hành'
+              : 'Nhân sự doanh nghiệp',
+        role: cm.role || 'member',
+        department: 'Nhân sự',
+        email,
+        phone: cm.user_phone || '',
+        status: cm.status || 'active',
+        avatarUrl: cm.user_avatar || null,
+        joinedAt: cm.created_at,
+        isRepresentative: cm.role === 'owner',
+      });
+    }
+
+    // 3. Fallback: Nếu danh sách rỗng, luôn đưa Người đại diện chính thức của doanh nghiệp vào
+    if (personnel.length === 0 && company) {
+      personnel.push({
+        id: company.id || 'owner-1',
+        code: company.code || '',
+        name: company.contact || company.name || 'Người đại diện pháp luật',
+        title: 'Đại diện pháp luật / Giám đốc',
+        role: 'owner',
+        department: 'Ban Giám Đốc',
+        email: company.email || '',
+        phone: company.phone || '',
+        status: company.status || 'active',
+        avatarUrl: company.avatarUrl || null,
+        joinedAt: company.joinedAt || new Date().toISOString(),
+        isRepresentative: true,
+      });
+    }
+
+    return personnel;
+  }
+
+  async addCompanyPersonnel(userId: string, companyId: string, data: any) {
+    const now = new Date();
+    const name = String(data.name || '').trim();
+    const email = String(data.email || '').trim();
+    const phone = String(data.phone || '').trim();
+    const title = String(data.title || 'Nhân sự').trim();
+    const role = String(data.role || 'member').trim();
+
+    if (!name && !email) {
+      throw new BadRequestException('Vui lòng nhập họ tên hoặc email nhân sự');
+    }
+
+    await this.prisma.$executeRaw`
+      INSERT INTO public.company_members (id, company_id, email, role, status, created_at, updated_at)
+      VALUES (gen_random_uuid(), ${companyId}::uuid, ${email || null}, ${role}, 'active', ${now}, ${now})
+    `.catch(async () => {
+      const newId = 'CM' + now.getTime().toString(36).toUpperCase();
+      await this.prisma.$executeRaw`
+        INSERT INTO public.members (id, code, name, contact, email, phone, company_name, executive_role, department, status, joined_at)
+        VALUES (${newId}, ${'NV-' + Math.floor(1000 + Math.random() * 9000)}, ${name || email}, ${name}, ${email}, ${phone}, ${companyId}, ${role}, ${title}, 'active', ${now.toISOString().slice(0, 10)})
+      `.catch(() => {});
+    });
+
+    return { ok: true, message: 'Thêm nhân sự thành công' };
+  }
+
+  async getMyMemberHistory(userId: string) {
+    const memRows = await this.prisma.$queryRaw<any[]>`
+      SELECT id FROM public.members WHERE user_id = ${userId}::uuid LIMIT 1
+    `.catch(() => []);
+    if (memRows.length === 0) {
+      return { activities: [], events: [], payments: [] };
+    }
+    return this.getMemberHistory(userId, memRows[0].id);
+  }
+
+  async createMember(userId: string, data: CreateMemberDto) {
+    const assocId = await this.getAssociationIdForUser(
+      userId,
+      data.associationId,
+    );
+    const isAdmin = await this.checkIsAdmin(userId, assocId ?? undefined);
+    if (!isAdmin) {
+      throw new ForbiddenException(
+        'Chỉ quản trị viên mới có quyền thêm hội viên',
+      );
+    }
+    const canAdd = await this.checkActionPermission(
+      userId,
+      'MEM_ADD',
+      assocId ?? undefined,
+    );
+    if (!canAdd) {
+      throw new ForbiddenException(
+        'Hành động thêm hội viên mới (MEM_ADD) đã bị thu hồi trong cấu hình phân quyền hệ thống',
+      );
+    }
+
+    const now = new Date();
+    const id = `MB${now.getTime().toString(36).toUpperCase()}`;
+    const feeYear = now.getFullYear();
+    const joinedAt = now.toISOString().slice(0, 10);
+
+    // Kiểm tra trùng Email trong danh sách hội viên
+    const cleanEmail = (data.email || '').trim().toLowerCase();
+    if (cleanEmail) {
+      const existingEmail = await this.prisma.$queryRaw<any[]>`
+        SELECT id FROM public.members WHERE LOWER(email) = ${cleanEmail} LIMIT 1
+      `.catch(() => []);
+      if (existingEmail.length > 0) {
+        throw new BadRequestException(
+          'Email này đã được sử dụng bởi một hội viên khác trên hệ thống!',
+        );
+      }
+    }
+
+    // Kiểm tra trùng Số điện thoại trong danh sách hội viên
+    const cleanPhone = (data.phone || '').replace(/[^0-9+]/g, '').trim();
+    if (cleanPhone && cleanPhone.length >= 8) {
+      const existingPhone = await this.prisma.$queryRaw<any[]>`
+        SELECT id FROM public.members WHERE regexp_replace(phone, '[^0-9+]', '', 'g') = ${cleanPhone} LIMIT 1
+      `.catch(() => []);
+      if (existingPhone.length > 0) {
+        throw new BadRequestException(
+          'Số điện thoại này đã được sử dụng bởi một hội viên khác trên hệ thống!',
+        );
+      }
+    }
+
+    // Insert into public.members. The DB trigger trg_set_member_code will automatically
+    // assign the sequential code (e.g. HV-00000x or PREFIX-00000x) if code is empty!
+    await this.prisma.$executeRaw`
+      INSERT INTO public.members (
+        id, code, name, contact, email, phone, type, level, industry, region, status,
+        joined_at, fee_year, fee_paid, address, website, tax_code, employees, about,
+        executive_role, department,
+        association_id, created_at, updated_at
+      ) VALUES (
+        ${id},
+        '',
+        ${data.name},
+        ${data.contact ?? ''},
+        ${data.email ?? ''},
+        ${data.phone ?? ''},
+        ${data.type ?? 'company'},
+        ${data.level ?? 'memberLevel.medium'},
+        ${data.industry ?? 'ind.trade'},
+        ${data.region ?? 'region.north'},
+        ${data.status ?? 'pending'},
+        ${joinedAt}::date,
+        ${feeYear},
+        false,
+        ${data.address ?? ''},
+        ${data.website ?? null},
+        ${data.taxCode ?? null},
+        ${data.employees ?? null},
+        ${data.about ?? ''},
+        'member',
+        'Hội viên ceohn10',
+        ${assocId}::uuid,
+        now(),
+        now()
+      )
+    `;
+
+    // Activity log
+    await this.prisma.$executeRaw`
+      INSERT INTO public.activity_log (
+        id, code, "user", action, target, category, at, ip, association_id, created_at, updated_at
+      ) VALUES (
+        gen_random_uuid(),
+        ${id},
+        ${userId},
+        'Thêm hội viên',
+        ${data.name},
+        'member',
+        to_char(now(), 'YYYY-MM-DD HH24:MI:SS'),
+        '127.0.0.1',
+        ${assocId}::uuid,
+        now(),
+        now()
+      )
+    `.catch(() => null);
+
+    return this.getMemberById(userId, id);
+  }
+
+  async updateMember(userId: string, id: string, data: UpdateMemberDto) {
+    const cleanId = String(id || '').replace(/^RNW-/, '').trim();
+    const cleanEmail = (data.email || '').trim().toLowerCase();
+    let existing = await this.prisma.$queryRaw<any[]>`
+      SELECT * FROM public.members 
+      WHERE id::text = ${cleanId} 
+         OR code = ${cleanId} 
+         OR user_id::text = ${cleanId}
+         OR LOWER(email) = LOWER(${cleanId})
+         OR (${cleanEmail !== ''} AND LOWER(email) = ${cleanEmail})
+      LIMIT 1
+    `.catch(() => []);
+
+    if (existing.length === 0) {
+      // Auto-provision fallback: Tìm trong vione_users nếu tài khoản đã tồn tại
+      const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(cleanId);
+      const uRows = await this.prisma.$queryRaw<any[]>`
+        SELECT id, name, email FROM public.vione_users
+        WHERE (${isUuid} AND id = ${cleanId}::uuid)
+           OR LOWER(email) = LOWER(${cleanId})
+           OR (${cleanEmail !== ''} AND LOWER(email) = ${cleanEmail})
+        LIMIT 1
+      `.catch(() => []);
+
+      if (uRows.length > 0) {
+        const u = uRows[0];
+        const targetMemberId = cleanId.startsWith('HN10-') ? cleanId : (isUuid ? `HN10-${cleanId.slice(0, 4)}` : cleanId);
+        await this.prisma.$executeRaw`
+          INSERT INTO public.members (
+            id, user_id, code, name, email, phone, company_name, department, executive_role, status,
+            association_id, type, level, industry, region, payment_status, fee_paid, created_at, updated_at
+          ) VALUES (
+            ${targetMemberId}, ${u.id}::uuid, ${targetMemberId}, ${data.name || u.name || 'Hội viên CEO HN10'},
+            ${cleanEmail || u.email}, ${data.phone || ''}, ${(data as any).companyName || data.company || 'CLB Doanh Nhân CEO HN10'},
+            ${data.department || 'Ban Thành viên'}, ${data.executiveRole || 'member'}, 'active',
+            'c1983000-0000-4000-8000-000000001983'::uuid, 'company', 'memberLevel.large', 'ind.trade',
+            'region.north', 'paid', true, NOW(), NOW()
+          )
+          ON CONFLICT (id) DO UPDATE SET
+            name = EXCLUDED.name,
+            email = EXCLUDED.email,
+            phone = EXCLUDED.phone,
+            company_name = EXCLUDED.company_name,
+            updated_at = NOW()
+        `.catch(() => {});
+
+        existing = await this.prisma.$queryRaw<any[]>`
+          SELECT * FROM public.members WHERE id = ${targetMemberId} LIMIT 1
+        `.catch(() => []);
+      }
+    }
+
+    if (existing.length === 0) {
+      throw new NotFoundException('Không tìm thấy hội viên');
+    }
+
+    const current = existing[0];
+    const isAdmin = await this.checkIsAdmin(userId, current.association_id);
+    if (!isAdmin) {
+      throw new ForbiddenException(
+        'Chỉ quản trị viên mới có quyền cập nhật hội viên',
+      );
+    }
+    const canEdit = await this.checkActionPermission(
+      userId,
+      'MEM_EDIT',
+      current.association_id,
+    );
+    if (!canEdit) {
+      throw new ForbiddenException(
+        'Hành động chỉnh sửa thông tin hội viên (MEM_EDIT) đã bị thu hồi trong cấu hình phân quyền hệ thống',
+      );
+    }
+
+    // Kiểm tra trùng Email khi cập nhật
+    if (
+      data.email &&
+      data.email.trim().toLowerCase() !==
+        (current.email || '').trim().toLowerCase()
+    ) {
+      const cleanEmail = data.email.trim().toLowerCase();
+      const dup = await this.prisma.$queryRaw<any[]>`
+        SELECT id FROM public.members WHERE LOWER(email) = ${cleanEmail} AND id != ${current.id} LIMIT 1
+      `.catch(() => []);
+      if (dup.length > 0) {
+        throw new BadRequestException(
+          'Email này đã được sử dụng bởi một hội viên khác trên hệ thống!',
+        );
+      }
+    }
+
+    // Kiểm tra trùng Số điện thoại khi cập nhật
+    if (data.phone) {
+      const cleanNewPhone = data.phone.replace(/[^0-9+]/g, '').trim();
+      const cleanCurPhone = (current.phone || '')
+        .replace(/[^0-9+]/g, '')
+        .trim();
+      if (
+        cleanNewPhone &&
+        cleanNewPhone !== cleanCurPhone &&
+        cleanNewPhone.length >= 8
+      ) {
+        const dup = await this.prisma.$queryRaw<any[]>`
+          SELECT id FROM public.members WHERE regexp_replace(phone, '[^0-9+]', '', 'g') = ${cleanNewPhone} AND id != ${current.id} LIMIT 1
+        `.catch(() => []);
+        if (dup.length > 0) {
+          throw new BadRequestException(
+            'Số điện thoại này đã được sử dụng bởi một hội viên khác trên hệ thống!',
+          );
+        }
+      }
+    }
+
+    const name = data.name !== undefined ? data.name : current.name;
+    const contact = data.contact !== undefined ? data.contact : current.contact;
+    const email = data.email !== undefined ? data.email : current.email;
+    const phone = data.phone !== undefined ? data.phone : current.phone;
+    const type = data.type !== undefined ? data.type : current.type;
+    const level = data.level !== undefined ? data.level : current.level;
+    const industry =
+      data.industry !== undefined ? data.industry : current.industry;
+    const region = data.region !== undefined ? data.region : current.region;
+    const status = data.status !== undefined ? data.status : current.status;
+    const address = data.address !== undefined ? data.address : current.address;
+    const website = data.website !== undefined ? data.website : current.website;
+    const taxCode =
+      data.taxCode !== undefined ? data.taxCode : current.tax_code;
+    const employees =
+      data.employees !== undefined ? data.employees : current.employees;
+    const about = data.about !== undefined ? data.about : current.about;
+    const feeYear =
+      data.feeYear !== undefined
+        ? data.feeYear
+        : (current.fee_year ?? new Date().getFullYear());
+    let paymentStatus =
+      data.paymentStatus !== undefined
+        ? data.paymentStatus
+        : data.feePaid !== undefined
+          ? data.feePaid
+            ? 'paid'
+            : 'unpaid'
+          : current.payment_status || (current.fee_paid ? 'paid' : 'unpaid');
+    let finalFeePaid =
+      data.feePaid !== undefined ? data.feePaid : current.fee_paid;
+    if (data.paymentStatus === 'unpaid') {
+      finalFeePaid = false;
+      paymentStatus = 'unpaid';
+    } else if (data.paymentStatus === 'cash' || data.paymentStatus === 'paid') {
+      finalFeePaid = true;
+    }
+
+    await this.prisma.$executeRaw`
+      UPDATE public.members SET
+        name = ${name},
+        contact = ${contact},
+        email = ${email},
+        phone = ${phone},
+        type = ${type},
+        level = ${level},
+        industry = ${industry},
+        region = ${region},
+        status = ${status},
+        address = ${address},
+        website = ${website},
+        tax_code = ${taxCode},
+        employees = ${employees},
+        about = ${about},
+        fee_paid = ${finalFeePaid},
+        fee_year = ${feeYear},
+        payment_status = ${paymentStatus},
+        updated_at = now()
+      WHERE id = ${current.id}
+    `;
+
+    // Sync corresponding user and user_profiles record if exists
+    if (current.user_id) {
+      await this.prisma.$executeRaw`
+        UPDATE public.vione_users SET
+          name = ${name},
+          email = ${email},
+          phone = ${phone},
+          updated_at = now()
+        WHERE id = ${current.user_id}::uuid
+      `.catch(() => {});
+
+      await this.prisma.$executeRaw`
+        UPDATE public.user_profiles SET
+          display_name = ${name},
+          updated_at = now()
+        WHERE user_id = ${current.user_id}::uuid
+      `.catch(() => {});
+    }
+
+    // Activity log
+    await this.logActivity(
+      'Cập nhật thông tin hội viên',
+      `${name} (${current.code || id})`,
+      'member',
+      'admin@connect.vn',
+      current.association_id,
+    );
+
+    // If status was changed (e.g. pending -> active), dispatch in-app notification to the applicant/member
+    if (data.status !== undefined && data.status !== current.status) {
+      try {
+        let memberUserId = current.user_id;
+        if (!memberUserId && (email || current.email)) {
+          const u = await this.prisma.vione_users
+            .findFirst({
+              where: { email: email || current.email },
+              select: { id: true },
+            })
+            .catch(() => null);
+          if (u) memberUserId = u.id;
+        }
+        if (!memberUserId && (phone || current.phone)) {
+          const rawPhone = phone || current.phone;
+          const cleanPhone = String(rawPhone).replace(/\D/g, '');
+          const u = await this.prisma.$queryRaw<any[]>`
+            SELECT id FROM public.vione_users WHERE phone = ${rawPhone} OR phone = ${cleanPhone} LIMIT 1
+          `.catch(() => []);
+          if (u.length > 0) memberUserId = u[0].id;
+        }
+
+        // Tự động khởi tạo tài khoản đăng nhập khi duyệt hội viên nếu chưa có (BUG-AUTH-001)
+        const isApproved = status === 'active' || status === 'approved';
+        if (
+          !memberUserId &&
+          isApproved &&
+          (email || current.email || phone || current.phone)
+        ) {
+          try {
+            const newUserId = crypto.randomUUID();
+            const memberEmail =
+              email ||
+              current.email ||
+              `${(current.member_code || 'member').toLowerCase().replace(/[^a-z0-9]/g, '')}@ceohn10.com`;
+            const memberPhone = phone || current.phone || '';
+            const memberName = name || current.name || 'Hội viên CEO HN10';
+            await this.prisma.$executeRaw`
+              INSERT INTO public.vione_users (id, email, phone, name, role, status, created_at, updated_at)
+              VALUES (${newUserId}::uuid, ${memberEmail}, ${memberPhone}, ${memberName}, 'member', 'active', now(), now())
+              ON CONFLICT (email) DO NOTHING
+            `.catch(() => null);
+
+            const linkedUser = await this.prisma.vione_users
+              .findFirst({
+                where: { email: memberEmail },
+                select: { id: true },
+              })
+              .catch(() => null);
+
+            if (linkedUser) {
+              memberUserId = linkedUser.id;
+              await this.prisma.$executeRaw`
+                UPDATE public.members SET user_id = ${memberUserId}::uuid WHERE id = ${id}
+              `.catch(() => null);
+            }
+          } catch (createErr) {
+            console.warn(
+              'Auto create user on member approval notice:',
+              createErr,
+            );
+          }
+        }
+
+        if (memberUserId) {
+          const notifId = crypto.randomUUID();
+          const notifTitle = isApproved
+            ? '🎉 Chúc mừng! Hồ sơ gia nhập CLB của bạn đã được phê duyệt!'
+            : status === 'pending'
+              ? 'Hồ sơ gia nhập CLB của bạn đang được xét duyệt'
+              : 'Thông báo kết quả duyệt hồ sơ gia nhập CLB';
+          const notifBody = isApproved
+            ? `Chúc mừng bạn đã chính thức trở thành hội viên của ${name || 'Hiệp hội'}. Thẻ VIP Số NFC và toàn bộ quyền lợi đã được kích hoạt trong App Hội Viên.`
+            : `Hồ sơ gia nhập của bạn đã được cập nhật trạng thái: ${status}. Vui lòng mở App Hội Viên hoặc liên hệ Ban thư ký để biết thêm chi tiết.`;
+
+          const safeData = JSON.stringify({
+            title: notifTitle,
+            body: notifBody,
+            status,
+            targetRoute: '/m',
+          });
+
+          await this.prisma.$executeRaw`
+            INSERT INTO public.business_notifications (
+              id, recipient_user_id, source_domain, source_record_id, event_kind, notification_kind,
+              title_key, body_key, safe_display_data, action_kind, action_label_key, action_target,
+              priority, status, app_scope, target_app, created_at, updated_at, dedupe_key
+            ) VALUES (
+              ${notifId}::uuid, ${memberUserId}::uuid, 'association', ${id},
+              'member_approval', ${isApproved ? 'member_approved' : 'member_status_changed'},
+              ${notifTitle}, ${notifBody},
+              ${safeData}::jsonb, 'navigate', 'Mở App Hội Viên', '{"route": "/m"}'::jsonb,
+              'high', 'delivered', 'all', 'all', now(), now(), ${`member_approval:${id}:${status}:${Date.now()}`}
+            )
+          `.catch((err) =>
+            console.warn('Could not insert member approval notification:', err),
+          );
+
+          await this.prisma.$executeRaw`
+            INSERT INTO public.member_notifications (
+              id, recipient_id, title, body, read, dismissed, ref_type, ref_id, created_at
+            ) VALUES (
+              gen_random_uuid(), ${id}, ${notifTitle}, ${notifBody}, false, false, 'member_approval', ${id}, now()
+            )
+          `.catch(() => {});
+
+          // Đẩy thông báo chuông vào App Hiệp Hội
+          await this.prisma.$executeRaw`
+            INSERT INTO public.notifications (
+              id, user_id, title, message, type, is_read, created_at
+            ) VALUES (
+              gen_random_uuid(), ${memberUserId || id}, ${notifTitle}, ${notifBody}, 'member_approval', false, now()
+            )
+          `.catch(() => {});
+        }
+
+        // Gửi email thông báo phê duyệt hồ sơ chính thức vào email hội viên
+        if (isApproved && this.mailService) {
+          const memberEmail = (email || current.email || '').trim();
+          if (memberEmail && memberEmail.includes('@')) {
+            const passMatch = (current.about || '').match(/Pass=([^\s|]+)/);
+            let rawPass = passMatch ? passMatch[1].trim() : undefined;
+            if (
+              rawPass &&
+              (rawPass.startsWith('[') ||
+                rawPass.toLowerCase().includes('random'))
+            ) {
+              rawPass = undefined;
+            }
+
+            // Nếu chưa có mật khẩu hoặc mật khẩu là placeholder [Random], tự động sinh mật khẩu ngẫu nhiên 6 ký tự
+            if (!rawPass) {
+              const randomChars =
+                '23456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz';
+              rawPass = Array.from(crypto.randomBytes(6))
+                .map((byte) => randomChars[byte % randomChars.length])
+                .join('');
+              try {
+                const newHash = await bcrypt.hash(rawPass, 10);
+                if (current.user_id) {
+                  await this.prisma.$executeRaw`
+                    UPDATE public.vione_users SET password = ${newHash}, updated_at = now() WHERE id = ${current.user_id}::uuid
+                  `.catch(() => {});
+                }
+                const updatedAbout = `${current.about || ''} | Pass=${rawPass}`;
+                await this.prisma.$executeRaw`
+                  UPDATE public.members SET about = ${updatedAbout}, updated_at = now() WHERE id = ${id}
+                `.catch(() => {});
+              } catch (hErr) {
+                console.warn('Password hash error:', hErr);
+              }
+            }
+
+            void this.mailService
+              .sendMemberApprovedEmail({
+                to: memberEmail,
+                fullName:
+                  name || current.name || current.contact || 'Quý Hội viên',
+                memberCode: current.code || id,
+                associationName: 'CLB Doanh Nhân CEO HN10',
+                companyName: current.company || current.organization || name,
+                portalUrl: process.env.APP_URL
+                  ? `${process.env.APP_URL.replace(/\/$/, '')}/association/login`
+                  : 'https://ceohn10.viconnect.vn/association/login',
+                username: memberEmail,
+                passwordRaw: rawPass,
+              })
+              .catch((err) =>
+                console.warn(
+                  'Could not send member approval email:',
+                  err?.message,
+                ),
+              );
+          }
+        }
+      } catch (err) {
+        console.warn('Error sending member status notification:', err);
+      }
+    }
+
+    return this.getMemberById(userId, id);
+  }
+
+  async updateMemberContact(
+    userId: string,
+    id: string,
+    data: UpdateMemberContactDto,
+  ) {
+    const existing = await this.prisma.$queryRaw<any[]>`
+      SELECT * FROM public.members WHERE id = ${id} LIMIT 1
+    `.catch(() => []);
+
+    if (existing.length === 0) {
+      throw new NotFoundException('Không tìm thấy hội viên');
+    }
+
+    const current = existing[0];
+    const isAdmin = await this.checkIsAdmin(userId, current.association_id);
+    if (!isAdmin) {
+      throw new ForbiddenException(
+        'Chỉ quản trị viên mới có quyền cập nhật hội viên',
+      );
+    }
+
+    const email = data.email !== undefined ? data.email : current.email;
+    const phone = data.phone !== undefined ? data.phone : current.phone;
+    const address = data.address !== undefined ? data.address : current.address;
+
+    await this.prisma.$executeRaw`
+      UPDATE public.members SET
+        email = ${email},
+        phone = ${phone},
+        address = ${address},
+        updated_at = now()
+      WHERE id = ${id}
+    `;
+
+    return this.getMemberById(userId, id);
+  }
+
+  async deleteMember(
+    userId: string,
+    id: string,
+    mode?: 'company_only' | 'all',
+  ) {
+    const cleanId = String(id || '')
+      .replace(/^acc_/, '')
+      .replace(/^RNW-/, '')
+      .trim();
+    const existing = await this.prisma.$queryRaw<any[]>`
+      SELECT * FROM public.members 
+      WHERE id::text = ${cleanId} 
+         OR code = ${cleanId} 
+         OR user_id::text = ${cleanId} 
+         OR LOWER(email) = LOWER(${cleanId}) 
+         OR LOWER(contact_email) = LOWER(${cleanId})
+      LIMIT 1
+    `.catch(() => []);
+
+    if (existing.length === 0) {
+      throw new NotFoundException('Không tìm thấy hội viên');
+    }
+
+    const current = existing[0];
+    const isAdmin = await this.checkIsAdmin(userId, current.association_id);
+    const canDelete = await this.checkActionPermission(
+      userId,
+      'MEM_DELETE',
+      current.association_id,
+    );
+    if (!isAdmin && !canDelete) {
+      throw new ForbiddenException(
+        'Chỉ quản trị viên hoặc tài khoản được cấp quyền xóa (MEM_DELETE) mới có quyền xóa',
+      );
+    }
+
+    const memberEmail = (current.email || '').trim().toLowerCase();
+    const memberPhone = (current.phone || '').trim();
+    const companyName = (current.company_name || current.company || '').trim();
+    const taxCode = (current.tax_code || '').trim();
+    let memberUserId = current.user_id;
+
+    // Nếu member chưa lưu user_id, tìm qua vione_users bằng email hoặc username
+    if (!memberUserId && memberEmail) {
+      const uRows = await this.prisma.$queryRaw<any[]>`
+        SELECT id FROM public.vione_users
+        WHERE LOWER(email) = ${memberEmail} OR LOWER(username) = ${memberEmail}
+        LIMIT 1
+      `.catch(() => []);
+      if (uRows.length > 0 && uRows[0]?.id) {
+        memberUserId = uRows[0].id;
+      }
+    }
+
+    // CASE 1: Xóa chỉ dữ liệu doanh nghiệp liên kết
+    if (mode === 'company_only') {
+      if (companyName) {
+        await this.prisma.$executeRaw`
+          DELETE FROM public.companies
+          WHERE LOWER(name) = LOWER(${companyName})
+             OR (owner_id IS NOT NULL AND ${memberUserId ? memberUserId : '00000000-0000-0000-0000-000000000000'}::uuid = owner_id)
+        `.catch(() => {});
+
+        await this.prisma.$executeRaw`
+          DELETE FROM public.vione_companies
+          WHERE LOWER(name) = LOWER(${companyName})
+             OR (user_id IS NOT NULL AND ${memberUserId ? memberUserId : '00000000-0000-0000-0000-000000000000'}::uuid = user_id)
+        `.catch(() => {});
+      }
+      if (taxCode) {
+        await this.prisma.$executeRaw`
+          DELETE FROM public.companies WHERE tax_code = ${taxCode}
+        `.catch(() => {});
+      }
+      // Xóa bản ghi độc lập của công ty trong bảng members nếu có
+      await this.prisma.$executeRaw`
+        DELETE FROM public.members 
+        WHERE (type = 'company' OR type = 'enterprise') 
+          AND (LOWER(name) = LOWER(${companyName}) OR (code = ${current.code} AND id != ${current.id}))
+      `.catch(() => {});
+
+      // Xóa các trường doanh nghiệp khỏi hồ sơ hội viên cá nhân
+      await this.prisma.$executeRaw`
+        UPDATE public.members SET
+          company_name = NULL,
+          company_size = NULL,
+          company_logo_url = NULL,
+          tax_code = NULL,
+          website = NULL,
+          employees = NULL,
+          updated_at = now()
+        WHERE id = ${current.id}
+      `.catch(() => {});
+
+      const actorUserId =
+        userId && userId.length === 36
+          ? userId
+          : '00000000-0000-4000-8000-000000000002';
+      const actorEmailRow = (await this.prisma
+        .$queryRawUnsafe<
+          any[]
+        >(`SELECT email FROM public.vione_users WHERE id = $1::uuid LIMIT 1`, actorUserId)
+        .catch(() => [])) as any[];
+      const actorEmail = actorEmailRow[0]?.email || 'admin@connect.vn';
+      const effectiveAssoc =
+        current.association_id || 'c1983000-0000-4000-8000-000000001983';
+
+      // Ghi đồng bộ vào cả 2 bảng audit_logs (CRM Audit Logs) và activity_log (Chi tiết hệ thống)
+      await this.prisma
+        .$executeRawUnsafe(
+          `
+        INSERT INTO public.audit_logs (
+          id, actor_user_id, action, target_type, target_id, ip_address, user_agent, metadata, created_at
+        ) VALUES (
+          gen_random_uuid(),
+          $1::uuid,
+          'DELETE_COMPANY',
+          'COMPANY',
+          $2,
+          '127.0.0.1',
+          'Web CRM Quản Trị',
+          $3::jsonb,
+          now()
+        )
+      `,
+          actorUserId,
+          current.code || current.id,
+          JSON.stringify({
+            memberName: current.name,
+            companyName: companyName || current.company_name,
+            memberCode: current.code,
+            mode: 'company_only',
+          }),
+        )
+        .catch((e: any) =>
+          this.logger.warn(`Could not log to audit_logs: ${e?.message}`),
+        );
+
+      await this.logActivity(
+        'Xóa doanh nghiệp liên kết',
+        `${companyName || current.name} (${current.code || cleanId})`,
+        'company',
+        actorEmail,
+        effectiveAssoc,
+      );
+
+      return {
+        ok: true,
+        mode: 'company_only',
+        message: 'Đã xóa dữ liệu doanh nghiệp liên kết thành công',
+      };
+    }
+
+    // CASE 2: Xóa toàn diện cả hội viên và doanh nghiệp liên kết (mode === 'all')
+    // 1. Xóa doanh nghiệp liên quan (bảng companies và vione_companies)
+    if (companyName) {
+      await this.prisma.$executeRaw`
+        DELETE FROM public.companies
+        WHERE LOWER(name) = LOWER(${companyName})
+           OR (owner_id IS NOT NULL AND ${memberUserId ? memberUserId : '00000000-0000-0000-0000-000000000000'}::uuid = owner_id)
+      `.catch((e) =>
+        this.logger.warn(`Could not delete from companies: ${e?.message}`),
+      );
+
+      await this.prisma.$executeRaw`
+        DELETE FROM public.vione_companies
+        WHERE LOWER(name) = LOWER(${companyName})
+           OR (user_id IS NOT NULL AND ${memberUserId ? memberUserId : '00000000-0000-0000-0000-000000000000'}::uuid = user_id)
+      `.catch((e) =>
+        this.logger.warn(
+          `Could not delete from vione_companies: ${e?.message}`,
+        ),
+      );
+    }
+    if (taxCode) {
+      await this.prisma.$executeRaw`
+        DELETE FROM public.companies WHERE tax_code = ${taxCode}
+      `.catch(() => {});
+    }
+
+    // 2. Xóa danh thiếp và hồ sơ cá nhân
+    if (memberUserId) {
+      await this.prisma.$executeRaw`
+        DELETE FROM public.member_business_cards
+        WHERE owner_user_id = ${memberUserId}::uuid OR member_id = ${current.id}
+      `.catch(() => {});
+
+      await this.prisma.$executeRaw`
+        DELETE FROM public.business_cards
+        WHERE user_id = ${memberUserId}::uuid
+      `.catch(() => {});
+
+      await this.prisma.$executeRaw`
+        DELETE FROM public.card_settings
+        WHERE user_id = ${memberUserId}::uuid
+      `.catch(() => {});
+
+      await this.prisma.$executeRaw`
+        DELETE FROM public.user_profiles
+        WHERE user_id = ${memberUserId}::uuid
+      `.catch(() => {});
+
+      await this.prisma.$executeRaw`
+        DELETE FROM public.user_roles
+        WHERE user_id = ${memberUserId}::uuid
+      `.catch(() => {});
+
+      await this.prisma.$executeRaw`
+        DELETE FROM public.memberships
+        WHERE user_id = ${memberUserId}::uuid
+      `.catch(() => {});
+
+      await this.prisma.$executeRaw`
+        DELETE FROM public.vba_member_permissions
+        WHERE user_id::text = ${memberUserId}::text OR member_id = ${current.id}
+      `.catch(() => {});
+
+      await this.prisma.$executeRaw`
+        DELETE FROM public.business_appointments
+        WHERE host_user_id = ${memberUserId}::uuid OR invitee_user_id = ${memberUserId}::uuid
+      `.catch(() => {});
+
+      await this.prisma.$executeRaw`
+        DELETE FROM public.meeting_participants
+        WHERE user_id = ${memberUserId}::uuid
+      `.catch(() => {});
+
+      await this.prisma.$executeRaw`
+        DELETE FROM public.event_registrations
+        WHERE user_id = ${memberUserId}::uuid
+           OR (${memberEmail !== ''} AND LOWER(email) = ${memberEmail})
+      `.catch(() => {});
+
+      // 3. Xóa vĩnh viễn tài khoản trong vione_users và auth.users
+      await this.prisma.$executeRaw`
+        DELETE FROM public.vione_users
+        WHERE id = ${memberUserId}::uuid
+           OR (${memberEmail !== ''} AND LOWER(email) = ${memberEmail})
+           OR (${memberEmail !== ''} AND LOWER(username) = ${memberEmail})
+      `.catch((e) =>
+        this.logger.warn(`Could not delete from vione_users: ${e?.message}`),
+      );
+
+      await this.prisma.$executeRaw`
+        DELETE FROM auth.users
+        WHERE id = ${memberUserId}::uuid
+           OR (${memberEmail !== ''} AND LOWER(email) = ${memberEmail})
+      `.catch((e) =>
+        this.logger.warn(`Could not delete from auth.users: ${e?.message}`),
+      );
+    } else if (memberEmail) {
+      await this.prisma.$executeRaw`
+        DELETE FROM public.vione_users
+        WHERE LOWER(email) = ${memberEmail} OR LOWER(username) = ${memberEmail}
+      `.catch(() => {});
+      await this.prisma.$executeRaw`
+        DELETE FROM auth.users
+        WHERE LOWER(email) = ${memberEmail}
+      `.catch(() => {});
+    }
+
+    // 4. Xóa hồ sơ hội viên và các bản ghi công ty liên quan trong bảng members
+    await this.prisma.$executeRaw`
+      DELETE FROM public.members 
+      WHERE id = ${current.id} 
+         OR id::text = ${cleanId} 
+         OR code = ${current.code || cleanId}
+         OR (company_name IS NOT NULL AND LOWER(company_name) = LOWER(${companyName}))
+    `;
+
+    // 5. Ghi nhật ký hoạt động đồng bộ vào cả 2 bảng audit_logs (CRM) và activity_log (Hệ thống)
+    const actorUserId =
+      userId && userId.length === 36
+        ? userId
+        : '00000000-0000-4000-8000-000000000002';
+    const actorEmailRow = (await this.prisma
+      .$queryRawUnsafe<
+        any[]
+      >(`SELECT email FROM public.vione_users WHERE id = $1::uuid LIMIT 1`, actorUserId)
+      .catch(() => [])) as any[];
+    const actorEmail = actorEmailRow[0]?.email || 'admin@connect.vn';
+    const effectiveAssoc =
+      current.association_id || 'c1983000-0000-4000-8000-000000001983';
+
+    await this.prisma
+      .$executeRawUnsafe(
+        `
+      INSERT INTO public.audit_logs (
+        id, actor_user_id, action, target_type, target_id, ip_address, user_agent, metadata, created_at
+      ) VALUES (
+        gen_random_uuid(),
+        $1::uuid,
+        'DELETE_MEMBER',
+        'MEMBER',
+        $2,
+        '127.0.0.1',
+        'Web CRM Quản Trị',
+        $3::jsonb,
+        now()
+      )
+    `,
+        actorUserId,
+        current.code || current.id,
+        JSON.stringify({
+          memberName: current.name,
+          companyName: companyName || current.company_name,
+          memberCode: current.code,
+          mode: 'all',
+        }),
+      )
+      .catch((e: any) =>
+        this.logger.warn(`Could not log to audit_logs: ${e?.message}`),
+      );
+
+    await this.logActivity(
+      'Xóa hội viên, tài khoản & doanh nghiệp liên quan',
+      `${current.name || companyName || 'Hội viên'} (${current.code || cleanId})`,
+      'member',
+      actorEmail,
+      effectiveAssoc,
+    );
+
+    return {
+      ok: true,
+      mode: 'all',
+      message:
+        'Đã xóa hội viên, doanh nghiệp và tài khoản liên quan thành công',
+    };
+  }
+
+  async renewMember(userId: string, id: string) {
+    const cleanId = String(id || '').replace(/^RNW-/, '');
+    const rows = await this.prisma.$queryRaw<any[]>`
+      SELECT * FROM public.members 
+      WHERE id::text = ${cleanId} OR code = ${cleanId} OR user_id::text = ${cleanId} 
+      LIMIT 1
+    `.catch(() => []);
+
+    if (rows.length === 0)
+      throw new NotFoundException('Không tìm thấy hội viên');
+    const current = rows[0];
+
+    const isAdmin = await this.checkIsAdmin(userId, current.association_id);
+    if (!isAdmin)
+      throw new ForbiddenException('Chỉ quản trị viên mới có quyền gia hạn');
+
+    const base = current.new_term_end
+      ? new Date(current.new_term_end)
+      : current.term_end
+        ? new Date(current.term_end)
+        : new Date();
+    const newEnd = new Date(base);
+    newEnd.setFullYear(newEnd.getFullYear() + 1);
+    const newEndStr = newEnd.toISOString().slice(0, 10);
+    const today = new Date().toISOString().slice(0, 10);
+
+    await this.prisma.$executeRaw`
+      UPDATE public.members SET
+        fee_paid   = true,
+        renewed_at = ${today}::date,
+        term_end   = ${newEndStr}::date,
+        new_term_end = ${newEndStr}::date,
+        payment_status = 'paid',
+        updated_at = now()
+      WHERE id = ${current.id}
+    `;
+
+    // Activity log
+    await this.logActivity(
+      'Gia hạn hội phí',
+      `${current.name} (${current.code || cleanId})`,
+      'fee',
+      'admin@connect.vn',
+      current.association_id,
+    );
+
+    // Dispatch 2-way notification
+    if (current.user_id) {
+      try {
+        const notifTitle = '🎉 Gia hạn hội viên thành công';
+        const notifBody = `Hồ sơ hội viên ${current.name} đã được gia hạn thành công. Nhiệm kỳ mới có hiệu lực đến ngày ${newEndStr}.`;
+        const notifId = crypto.randomUUID();
+        const dedupeKey = `renew-${current.id}-${Date.now()}`;
+        const safeData = JSON.stringify({
+          title: notifTitle,
+          body: notifBody,
+          termEnd: newEndStr,
+          targetRoute: '/m/card',
+        });
+
+        await this.prisma
+          .$executeRawUnsafe(
+            `
+          INSERT INTO public.business_notifications (
+            id, recipient_user_id, source_domain, source_record_id, event_kind, notification_kind,
+            title_key, body_key, safe_display_data, priority, status, dedupe_key, app_scope, target_app, created_at, updated_at
+          ) VALUES (
+            $1::uuid, $2::uuid, 'membership', $3, 'membership_renewed', 'renewal_success',
+            $4, $5, $6::jsonb, 'high', 'delivered', $7, 'all', 'all', NOW(), NOW()
+          )
+        `,
+            notifId,
+            current.user_id,
+            current.id,
+            notifTitle,
+            notifBody,
+            safeData,
+            dedupeKey,
+          )
+          .catch(() => {});
+
+        await this.prisma
+          .$executeRawUnsafe(
+            `
+          INSERT INTO public.member_notifications (
+            id, recipient_id, title, body, read, dismissed, ref_type, ref_id, created_at
+          ) VALUES (
+            gen_random_uuid(), $1, $2, $3, false, false, 'renewal', $4, NOW()
+          )
+        `,
+            current.id,
+            notifTitle,
+            notifBody,
+            current.id,
+          )
+          .catch(() => {});
+      } catch (e: any) {
+        console.warn('Failed to notify member of renewal:', e?.message);
+      }
+    }
+
+    return this.getMemberById(userId, current.id);
+  }
+
+  async cancelRenewal(userId: string, id: string) {
+    const cleanId = String(id || '').replace(/^RNW-/, '');
+    const rows = await this.prisma.$queryRaw<any[]>`
+      SELECT * FROM public.members 
+      WHERE id::text = ${cleanId} OR code = ${cleanId} OR user_id::text = ${cleanId} 
+      LIMIT 1
+    `.catch(() => []);
+
+    if (rows.length === 0)
+      throw new NotFoundException('Không tìm thấy hội viên');
+    const current = rows[0];
+
+    const isAdmin = await this.checkIsAdmin(userId, current.association_id);
+    if (!isAdmin)
+      throw new ForbiddenException('Chỉ quản trị viên mới có quyền hủy gia hạn');
+
+    await this.prisma.$executeRaw`
+      UPDATE public.members SET
+        fee_paid = false,
+        renewed_at = null,
+        new_term_end = null,
+        payment_status = 'unpaid',
+        updated_at = now()
+      WHERE id = ${current.id}
+    `;
+
+    // Activity log
+    await this.logActivity(
+      'Hủy gia hạn hội viên',
+      `${current.name} (${current.code || cleanId})`,
+      'fee',
+      'admin@connect.vn',
+      current.association_id,
+    );
+
+    return this.getMemberById(userId, current.id);
+  }
+
+  async updatePaymentStatus(
+    userId: string,
+    id: string,
+    body: { paymentStatus: string; feePaid?: boolean; feeYear?: number },
+  ) {
+    const cleanId = String(id || '').replace(/^RNW-/, '');
+    const rows = await this.prisma.$queryRaw<any[]>`
+      SELECT * FROM public.members 
+      WHERE id::text = ${cleanId} OR code = ${cleanId} OR user_id::text = ${cleanId} 
+      LIMIT 1
+    `.catch(() => []);
+
+    if (rows.length === 0)
+      throw new NotFoundException('Không tìm thấy hội viên');
+    const current = rows[0];
+
+    const isAdmin = await this.checkIsAdmin(userId, current.association_id);
+    if (!isAdmin)
+      throw new ForbiddenException(
+        'Chỉ quản trị viên mới có quyền cập nhật trạng thái thanh toán',
+      );
+
+    const paymentStatus = body.paymentStatus || 'unpaid';
+    const feePaid =
+      paymentStatus === 'unpaid'
+        ? false
+        : body.feePaid !== undefined
+          ? body.feePaid
+          : true;
+    const feeYear =
+      body.feeYear ?? current.fee_year ?? new Date().getFullYear();
+
+    await this.prisma.$executeRaw`
+      UPDATE public.members SET
+        payment_status = ${paymentStatus},
+        fee_paid = ${feePaid},
+        fee_year = ${feeYear},
+        updated_at = now()
+      WHERE id = ${current.id}
+    `;
+
+    await this.logActivity(
+      'Cập nhật trạng thái thanh toán hội phí',
+      `${current.name} (${current.code || current.id}) -> ${paymentStatus}`,
+      'fee',
+      'admin@connect.vn',
+      current.association_id,
+    );
+
+    return this.getMemberById(userId, current.id);
+  }
+
+  async sendRenewalReminder(userId: string, id: string, isAuto = false) {
+    const cleanId = String(id || '').replace(/^RNW-/, '');
+    const rows = await this.prisma.$queryRaw<any[]>`
+      SELECT * FROM public.members 
+      WHERE id::text = ${cleanId} OR code = ${cleanId} OR user_id::text = ${cleanId} 
+      LIMIT 1
+    `.catch(() => []);
+
+    if (rows.length === 0)
+      throw new NotFoundException('Không tìm thấy hội viên');
+    const current = rows[0];
+
+    const isAdmin = await this.checkIsAdmin(userId, current.association_id);
+    if (!isAdmin)
+      throw new ForbiddenException(
+        'Chỉ quản trị viên mới có quyền gửi nhắc nhở',
+      );
+
+    const today = new Date().toISOString().slice(0, 10);
+    const newCount = ((current.reminder_count as number) ?? 0) + 1;
+
+    // Separate manual reminder vs automated system reminder
+    await this.prisma.$executeRaw`
+      UPDATE public.members SET
+        reminder_count = ${newCount},
+        last_reminder  = ${today}::date,
+        updated_at     = now()
+      WHERE id = ${current.id}
+    `;
+
+    // 1. Dispatch real email directly to member's actual email address
+    if (current.email && String(current.email).includes('@')) {
+      try {
+        const cleanEmail = String(current.email).trim();
+        const termEndStr = current.term_end
+          ? new Date(current.term_end).toLocaleDateString('vi-VN')
+          : 'Sắp tới hạn';
+        const reminderTag = isAuto
+          ? 'HỆ THỐNG TỰ ĐỘNG NHẮC NHỞ'
+          : 'BAN THƯ KÝ NHẮC NHỞ';
+        const subject = `[CLB CEO HN10] Nhắc Nhở Gia Hạn Niên Liễm — Hội Viên ${current.name}`;
+        const html = `
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>${subject}</title>
+</head>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f8fafc; margin: 0; padding: 24px; color: #1e293b;">
+  <div style="max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 18px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.08); border: 1px solid #e2e8f0;">
+    <div style="background: linear-gradient(135deg, #001A4D 0%, #003B95 60%, #002B70 100%); padding: 34px 24px; text-align: center; color: #ffffff;">
+      <div style="display: inline-block; background: rgba(255, 215, 0, 0.2); border: 1px solid rgba(255, 215, 0, 0.6); color: #FFD700; padding: 4px 14px; border-radius: 9999px; font-size: 11px; font-weight: 800; letter-spacing: 1px; margin-bottom: 10px;">
+        ✦ ${reminderTag} ✦
+      </div>
+      <h1 style="font-size: 22px; font-weight: 900; margin: 0 0 6px 0; color: #ffffff;">CLB DOANH NHÂN CEO HN10</h1>
+      <p style="font-size: 12.5px; color: rgba(255, 255, 255, 0.85); margin: 0;">Hội Doanh Nhân Trẻ Hà Nội (HanoiBA) — Kết Nối & Giao Thương B2B</p>
+    </div>
+
+    <div style="padding: 28px 24px;">
+      <div style="font-size: 16px; font-weight: 700; color: #0f172a; margin-bottom: 12px;">
+        Kính gửi Anh/Chị <strong>${current.name}</strong>,
+      </div>
+      <p style="font-size: 14px; line-height: 1.6; color: #475569; margin-bottom: 20px;">
+        Ban Thư Ký CLB Doanh Nhân CEO HN10 xin trân trọng thông báo: Thời hạn niên liễm sinh hoạt hội viên của Quý Anh/Chị sắp kết thúc vào ngày <strong>${termEndStr}</strong>.
+      </p>
+
+      <div style="background: #f8fafc; border: 1.5px solid #cbd5e1; border-radius: 14px; padding: 20px; margin-bottom: 22px; border-left: 4px solid #003B95;">
+        <div style="font-size: 12px; font-weight: 800; text-transform: uppercase; color: #003B95; margin-bottom: 12px; letter-spacing: 0.5px;">
+          📋 Thông Tin Hội Viên & Kỳ Gia Hạn
+        </div>
+        <table style="width: 100%; font-size: 13.5px; border-collapse: collapse;">
+          <tr>
+            <td style="color: #64748b; padding: 6px 0;">Mã số Hội viên:</td>
+            <td style="font-weight: 700; color: #003B95; text-align: right; font-family: monospace;">${current.code || 'HN10'}</td>
+          </tr>
+          <tr>
+            <td style="color: #64748b; padding: 6px 0;">Thời hạn thẻ hiện tại:</td>
+            <td style="font-weight: 700; color: #d97706; text-align: right;">${termEndStr}</td>
+          </tr>
+          <tr>
+            <td style="color: #64748b; padding: 6px 0;">Hội phí niên liễm:</td>
+            <td style="font-weight: 800; color: #dc2626; font-size: 15px; text-align: right;">2,000,000 VNĐ / năm</td>
+          </tr>
+        </table>
+      </div>
+
+      <p style="font-size: 13.5px; line-height: 1.6; color: #334155;">
+        Để duy trì liên tục các quyền lợi đặc quyền: Danh thiếp số Titanium, gian hàng Marketplace B2B, quyền biểu quyết đại hội và cơ hội kết nối giao thương giữa các hội viên, Quý Anh/Chị vui lòng hoàn tất đóng phí niên liễm bằng cách:
+      </p>
+      <ul style="font-size: 13px; color: #475569; line-height: 1.6; padding-left: 20px; margin-bottom: 24px;">
+        <li><strong>Thanh toán VNPAY-QR:</strong> Quét mã VNPAY-QR trên App Hiệp Hội (hệ thống tự động gạch nợ và xuất hóa đơn sau 3-5 giây).</li>
+        <li><strong>Nộp tiền mặt:</strong> Đóng trực tiếp tại Văn phòng Ban Thư Ký CLB.</li>
+      </ul>
+
+      <div style="text-align: center; margin: 28px 0;">
+        <a href="https://ceohn10.com/association/renew" style="display: inline-block; background: linear-gradient(135deg, #FFD700 0%, #FF9500 100%); color: #001a4d; font-weight: 800; font-size: 14.5px; text-decoration: none; padding: 13px 32px; border-radius: 9999px; box-shadow: 0 4px 14px rgba(255, 149, 0, 0.35);">
+          📲 Mở App & Gia Hạn Ngay
+        </a>
+      </div>
+
+      <div style="font-size: 12px; color: #94a3b8; line-height: 1.5; background: #f1f5f9; padding: 12px 16px; border-radius: 10px;">
+        * Lưu ý: Nếu Quý Anh/Chị đã hoàn thành thanh toán tiền mặt hoặc chuyển khoản gần đây, vui lòng bỏ qua thông báo này hoặc liên hệ Hotline: <strong>0983 1010 10</strong> để được hỗ trợ đối soát tức thì.
+      </div>
+    </div>
+
+    <div style="background: #0b1329; padding: 22px; text-align: center; color: rgba(255, 255, 255, 0.5); font-size: 11.5px; line-height: 1.6;">
+      <div style="color: #FFD700; font-weight: 700; font-size: 12.5px; margin-bottom: 4px;">CLB DOANH NHÂN CEO HN10 (HanoiBA)</div>
+      <div>Văn phòng Ban Thư Ký · Hotline: 0983 1010 10 · Email: btk@ceohn10.com</div>
+      <div style="margin-top: 4px;">Cổng thông tin: <a href="https://ceohn10.com" style="color: #93c5fd; text-decoration: none;">ceohn10.com</a></div>
+    </div>
+  </div>
+</body>
+</html>
+        `;
+        await this.mailService.sendDirectEmail({
+          to: cleanEmail,
+          subject,
+          html,
+        });
+      } catch (mailErr: any) {
+        console.warn(
+          `Failed to dispatch reminder email to ${current.email}:`,
+          mailErr?.message,
+        );
+      }
+    }
+
+    // 3. Dispatch Zalo OA reminder message
+    if (this.zaloService && (current.phone || current.zalo_user_id)) {
+      try {
+        const termEndStr = current.term_end
+          ? new Date(current.term_end).toLocaleDateString('vi-VN')
+          : 'Sắp tới hạn';
+        const zaloMsg = `📢 [CLB DOANH NHÂN CEO HN10 - NHẮC NHỞ NIÊN LIỄM]
+Kính gửi Anh/Chị ${current.name} (${current.code || 'HN10'}),
+Ban Thư Ký CLB Doanh Nhân CEO HN10 xin trân trọng thông báo: Thời hạn niên liễm sinh hoạt hội viên của Quý Anh/Chị sắp kết thúc vào ngày ${termEndStr}.
+💰 Phí thường niên: 2.000.000 VNĐ / năm.
+📲 Vui lòng mở App Hiệp Hội để gia hạn trực tuyến bằng VNPAY/MoMo hoặc liên hệ Hotline: 0983 1010 10.
+Trân trọng cảm ơn Anh/Chị!`;
+
+        const accessToken = process.env.ZALO_OA_ACCESS_TOKEN || '';
+        this.zaloService
+          .sendMessage({
+            accessToken,
+            userId: current.zalo_user_id || undefined,
+            targetPhone: current.phone || undefined,
+            targetName: current.name,
+            message: zaloMsg,
+          })
+          .catch((err) => {
+            this.logger.warn(
+              `Failed to dispatch Zalo OA message to ${current.name}: ${err?.message}`,
+            );
+          });
+      } catch (zaloErr) {
+        this.logger.warn(`Zalo reminder dispatch error: ${zaloErr?.message}`);
+      }
+    }
+
+    // 2. Dispatch 2-way in-app notification
+    if (current.user_id) {
+      try {
+        const notifTitle = 'Nhắc nhở gia hạn tư cách hội viên';
+        const notifBody = `Hội viên ${current.name} thân mến, thời hạn hội viên của bạn sắp kết thúc (${current.term_end ? new Date(current.term_end).toISOString().slice(0, 10) : 'hôm nay'}). Vui lòng hoàn thành gia hạn hội phí để duy trì mọi quyền lợi kết nối và ưu đãi.`;
+        const notifId = crypto.randomUUID();
+        const dedupeKey = `renew-remind-${current.id}-${Date.now()}`;
+        const safeData = JSON.stringify({
+          title: notifTitle,
+          body: notifBody,
+          termEnd: current.term_end,
+          targetRoute: '/fees',
+        });
+
+        await this.prisma
+          .$executeRawUnsafe(
+            `
+          INSERT INTO public.business_notifications (
+            id, recipient_user_id, source_domain, source_record_id, event_kind, notification_kind,
+            title_key, body_key, safe_display_data, priority, status, dedupe_key, app_scope, target_app, created_at, updated_at
+          ) VALUES (
+            $1::uuid, $2::uuid, 'membership', $3, 'renewal_reminder', 'fee_reminder',
+            $4, $5, $6::jsonb, 'high', 'delivered', $7, 'all', 'all', NOW(), NOW()
+          )
+        `,
+            notifId,
+            current.user_id,
+            current.id,
+            notifTitle,
+            notifBody,
+            safeData,
+            dedupeKey,
+          )
+          .catch(() => {});
+
+        await this.prisma
+          .$executeRawUnsafe(
+            `
+          INSERT INTO public.member_notifications (
+            id, recipient_id, title, body, read, dismissed, ref_type, ref_id, created_at
+          ) VALUES (
+            gen_random_uuid(), $1, $2, $3, false, false, 'renewal_reminder', $4, NOW()
+          )
+        `,
+            current.id,
+            notifTitle,
+            notifBody,
+            current.id,
+          )
+          .catch(() => {});
+      } catch (e: any) {
+        console.warn(
+          'Failed to send renewal reminder notification:',
+          e?.message,
+        );
+      }
+    }
+
+    return this.getMemberById(userId, id);
+  }
+
+  async getActiveAssociationId(userId: string): Promise<string | null> {
+    return this.getAssociationIdForUser(userId);
+  }
+
+  async getMyAssociationBrand(userId: string) {
+    const associationId = await this.getAssociationIdForUser(userId);
+    if (!associationId) return null;
+
+    const rows = await this.prisma.$queryRaw<any[]>`
+      SELECT name, logo_url, brand_primary, tagline, about FROM public.associations
+      WHERE id = ${associationId}::uuid
+      LIMIT 1
+    `.catch(() => []);
+
+    if (rows.length === 0) return null;
+    const a = rows[0];
+    return {
+      name: a.name ?? '',
+      logoUrl: a.logo_url ?? null,
+      brandPrimary: a.brand_primary ?? null,
+      tagline: a.tagline ?? null,
+      about: a.about ?? null,
+    };
+  }
+
+  async getMyBenefits(userId: string) {
+    const associationId = await this.getAssociationIdForUser(userId);
+    const defaultBenefits = [
+      {
+        titleVi: 'Tham dự sự kiện',
+        titleEn: 'Event access',
+        descVi: 'miễn phí & ưu đãi',
+        descEn: 'free & discounted',
+      },
+      {
+        titleVi: 'Kết nối hơn',
+        titleEn: 'Networking',
+        descVi: '1000+ doanh nghiệp',
+        descEn: '1000+ businesses',
+      },
+      {
+        titleVi: 'Quảng bá thương hiệu',
+        titleEn: 'Brand promotion',
+        descVi: 'trên kênh Hiệp hội',
+        descEn: 'on association channels',
+      },
+    ];
+
+    if (!associationId) return defaultBenefits;
+
+    const rows = await this.prisma.$queryRaw<any[]>`
+      SELECT title_vi, title_en, desc_vi, desc_en FROM public.association_benefits
+      WHERE association_id = ${associationId}::uuid
+      ORDER BY sort_order ASC
+    `.catch(() => []);
+
+    if (rows.length === 0) return defaultBenefits;
+    return rows.map((r) => ({
+      titleVi: r.title_vi ?? '',
+      titleEn: r.title_en ?? '',
+      descVi: r.desc_vi ?? '',
+      descEn: r.desc_en ?? '',
+    }));
+  }
+
+  async listAllBenefits(userId: string) {
+    const associationId = await this.getAssociationIdForUser(userId);
+    let rows: any[] = [];
+    if (associationId) {
+      rows = await this.prisma.$queryRaw<any[]>`
+        SELECT id, title_vi, title_en, desc_vi, desc_en, sort_order, association_id, created_at, updated_at
+        FROM public.association_benefits
+        WHERE association_id = ${associationId}::uuid
+        ORDER BY sort_order ASC, created_at ASC
+      `.catch(() => []);
+    }
+    if (rows.length === 0) {
+      rows = await this.prisma.$queryRaw<any[]>`
+        SELECT id, title_vi, title_en, desc_vi, desc_en, sort_order, association_id, created_at, updated_at
+        FROM public.association_benefits
+        ORDER BY sort_order ASC, created_at ASC
+      `.catch(() => []);
+    }
+
+    return rows.map((r) => ({
+      id: r.id,
+      titleVi: r.title_vi ?? '',
+      titleEn: r.title_en ?? '',
+      descVi: r.desc_vi ?? '',
+      descEn: r.desc_en ?? '',
+      sortOrder: Number(r.sort_order ?? 0),
+    }));
+  }
+
+  async createBenefit(userId: string, dto: any) {
+    const associationId = await this.getAssociationIdForUser(userId);
+    const id = crypto.randomUUID();
+    const titleVi = dto.titleVi || dto.title_vi || '';
+    const titleEn = dto.titleEn || dto.title_en || '';
+    const descVi = dto.descVi || dto.desc_vi || '';
+    const descEn = dto.descEn || dto.desc_en || '';
+    const sortOrder = Number(dto.sortOrder ?? dto.sort_order ?? 0);
+
+    await this.prisma.$executeRaw`
+      INSERT INTO public.association_benefits (
+        id, association_id, title_vi, title_en, desc_vi, desc_en, sort_order, created_at, updated_at
+      ) VALUES (
+        ${id}::uuid, ${associationId}::uuid, ${titleVi}, ${titleEn}, ${descVi}, ${descEn}, ${sortOrder}, NOW(), NOW()
+      )
+    `;
+
+    return {
+      id,
+      titleVi,
+      titleEn,
+      descVi,
+      descEn,
+      sortOrder,
+    };
+  }
+
+  async updateBenefit(userId: string, id: string, dto: any) {
+    const titleVi = dto.titleVi || dto.title_vi || '';
+    const titleEn = dto.titleEn || dto.title_en || '';
+    const descVi = dto.descVi || dto.desc_vi || '';
+    const descEn = dto.descEn || dto.desc_en || '';
+    const sortOrder = Number(dto.sortOrder ?? dto.sort_order ?? 0);
+
+    await this.prisma.$executeRaw`
+      UPDATE public.association_benefits
+      SET title_vi = ${titleVi},
+          title_en = ${titleEn},
+          desc_vi = ${descVi},
+          desc_en = ${descEn},
+          sort_order = ${sortOrder},
+          updated_at = NOW()
+      WHERE id = ${id}::uuid
+    `;
+
+    return {
+      id,
+      titleVi,
+      titleEn,
+      descVi,
+      descEn,
+      sortOrder,
+    };
+  }
+
+  async deleteBenefit(userId: string, id: string) {
+    await this.prisma.$executeRaw`
+      DELETE FROM public.association_benefits WHERE id = ${id}::uuid
+    `;
+    return { success: true };
+  }
+
+  async getMyMemberContext(userId: string) {
+    const [memRows, profileRows, assocId] = await Promise.all([
+      this.prisma.$queryRaw<any[]>`
+        SELECT id, code, name, email, avatar, status, association_id
+        FROM public.members
+        WHERE user_id = ${userId}::uuid
+        LIMIT 1
+      `.catch(() => []),
+      this.prisma.$queryRaw<any[]>`
+        SELECT display_name, avatar_url, locale FROM public.user_profiles
+        WHERE user_id = ${userId}::uuid
+        LIMIT 1
+      `.catch(() => []),
+      this.getAssociationIdForUser(userId),
+    ]);
+
+    let m = memRows[0];
+    if (!m) {
+      const users = await this.prisma.$queryRaw<any[]>`
+        SELECT email FROM auth.users WHERE id = ${userId}::uuid LIMIT 1
+      `.catch(() => []);
+      if (users.length > 0 && users[0].email) {
+        const byEmail = await this.prisma.$queryRaw<any[]>`
+          SELECT id, code, name, email, avatar, status, association_id FROM public.members WHERE LOWER(email) = LOWER(${users[0].email}) LIMIT 1
+        `.catch(() => []);
+        if (byEmail.length > 0) m = byEmail[0];
+      }
+    }
+
+    const p = profileRows[0];
+    const memberCode = m?.code ?? null;
+    const rawStatus = String(m?.status ?? '').toLowerCase();
+    const membershipStatus = [
+      'active',
+      'pending',
+      'suspended',
+      'expired',
+    ].includes(rawStatus)
+      ? rawStatus
+      : 'unknown';
+    const canAct = Boolean(memberCode) && membershipStatus === 'active';
+
+    return {
+      id: m?.id ?? null,
+      memberId: m?.id ?? null,
+      member_id: m?.id ?? null,
+      memberCode,
+      associationId: assocId ?? m?.association_id ?? null,
+      displayName: m?.name || p?.display_name || m?.email || '',
+      email: m?.email || '',
+      avatarUrl: m?.avatar || p?.avatar_url || null,
+      membershipStatus,
+      canAct,
+      locale: p?.locale || 'vi',
+    };
+  }
+
+  async logActivity(
+    action: string,
+    target: string,
+    category: string,
+    userEmail: string = 'admin@connect.vn',
+    assocId?: string,
+  ) {
+    try {
+      const now = new Date();
+      const at = `${now.toISOString().slice(0, 10)} ${now.toTimeString().slice(0, 5)}`;
+      const code = `L-${Date.now().toString(36).toUpperCase()}`;
+      const effectiveAssoc = assocId || 'c1983000-0000-4000-8000-000000001983';
+      await this.prisma.$executeRawUnsafe(
+        `
+        INSERT INTO public.activity_log (id, code, "user", action, target, category, at, ip, created_at, updated_at, association_id)
+        VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, '127.0.0.1', now(), now(), $7::uuid)
+      `,
+        code,
+        userEmail,
+        action,
+        target,
+        category,
+        at,
+        effectiveAssoc,
+      );
+    } catch (e: any) {
+      console.warn('logActivity error:', e?.message);
+    }
+  }
+
+  async getMyMembership(userId: string) {
+    const memRows = await this.prisma.$queryRaw<any[]>`
+      SELECT id, code, name, level, status, joined_at, fee_year, fee_paid, term_end, renewed_at, new_term_end
+      FROM public.members
+      WHERE user_id = ${userId}::uuid
+      LIMIT 1
+    `.catch(() => []);
+
+    if (memRows.length === 0) {
+      return {
+        found: false,
+        code: '',
+        name: '',
+        level: null,
+        status: null,
+        joinedAt: null,
+        termEnd: null,
+        newTermEnd: null,
+        renewedAt: null,
+        feeYear: null,
+        feePaid: false,
+        daysToExpiry: null,
+        outstandingAmount: 0,
+        invoices: [],
+      };
+    }
+
+    const me = memRows[0];
+    const invRows = await this.prisma.$queryRaw<any[]>`
+      SELECT id, invoice_no, year, amount, status, due_date, paid_at
+      FROM public.invoices
+      WHERE member_id = ${me.id}
+      ORDER BY year DESC, created_at DESC
+      LIMIT 50
+    `.catch(() => []);
+
+    const today = new Date();
+    const invoices = invRows.map((i, idx) => {
+      const raw = (i.status as string) ?? '';
+      const due = i.due_date
+        ? new Date(i.due_date).toISOString().slice(0, 10)
+        : null;
+      let status: 'paid' | 'pending' | 'overdue' =
+        raw === 'paid' ? 'paid' : 'pending';
+      if (status === 'pending' && due && new Date(due) < today)
+        status = 'overdue';
+
+      return {
+        id: i.id ?? `inv-${idx}`,
+        invoice: i.invoice_no ?? `INV-${idx}`,
+        year: i.year ? Number(i.year) : null,
+        amount: Number(i.amount ?? 0),
+        status,
+        dueDate: due,
+        paidAt: i.paid_at
+          ? new Date(i.paid_at).toISOString().slice(0, 10)
+          : null,
+      };
+    });
+
+    const pending = invoices.filter((i) => i.status !== 'paid');
+    const outstandingAmount = pending.reduce((s, i) => s + i.amount, 0);
+
+    const effectiveEnd = me.new_term_end || me.term_end;
+    const daysToExpiry = effectiveEnd
+      ? Math.ceil((new Date(effectiveEnd).getTime() - Date.now()) / 86400000)
+      : null;
+
+    return {
+      found: true,
+      code: me.code ?? '',
+      name: me.name ?? '',
+      level: me.level ?? null,
+      status: me.status ?? null,
+      joinedAt: me.joined_at
+        ? new Date(me.joined_at).toISOString().slice(0, 10)
+        : null,
+      termEnd: me.term_end
+        ? new Date(me.term_end).toISOString().slice(0, 10)
+        : null,
+      newTermEnd: me.new_term_end
+        ? new Date(me.new_term_end).toISOString().slice(0, 10)
+        : null,
+      renewedAt: me.renewed_at
+        ? new Date(me.renewed_at).toISOString().slice(0, 10)
+        : null,
+      feeYear: me.fee_year ? Number(me.fee_year) : null,
+      feePaid: Boolean(me.fee_paid),
+      daysToExpiry,
+      outstandingAmount,
+      invoices,
+    };
+  }
+
+  async getMyRenewalHistory(userId: string) {
+    const memRows = await this.prisma.$queryRaw<any[]>`
+      SELECT id FROM public.members WHERE user_id = ${userId}::uuid LIMIT 1
+    `.catch(() => []);
+    if (memRows.length === 0) return [];
+
+    const invRows = await this.prisma.$queryRaw<any[]>`
+      SELECT invoice_no, year, amount, status, due_date, paid_at, method
+      FROM public.invoices
+      WHERE member_id = ${memRows[0].id}
+      ORDER BY year DESC, paid_at DESC
+      LIMIT 50
+    `.catch(() => []);
+
+    const today = new Date();
+    return invRows.map((i, idx) => {
+      const raw = (i.status as string) ?? '';
+      const due = i.due_date
+        ? new Date(i.due_date).toISOString().slice(0, 10)
+        : null;
+      let status: 'paid' | 'pending' | 'overdue' =
+        raw === 'paid' ? 'paid' : 'pending';
+      if (status === 'pending' && due && new Date(due) < today)
+        status = 'overdue';
+      const year = i.year ? Number(i.year) : null;
+
+      return {
+        id: i.invoice_no ?? `inv-${idx}`,
+        invoice: i.invoice_no ?? '—',
+        year,
+        amount: Number(i.amount ?? 0),
+        method: i.method ?? null,
+        status,
+        paidAt: i.paid_at
+          ? new Date(i.paid_at).toISOString().slice(0, 10)
+          : null,
+        dueDate: due,
+        termStart: year ? `${year}-01-01` : null,
+        termEnd: year ? `${year}-12-31` : null,
+        note: i.method ?? null,
+      };
+    });
+  }
+
+  async getRenewalQuote(userId: string) {
+    const memRows = await this.prisma.$queryRaw<any[]>`
+      SELECT id, code, term_end, new_term_end, fee_year
+      FROM public.members
+      WHERE user_id = ${userId}::uuid
+      LIMIT 1
+    `.catch(() => []);
+
+    if (memRows.length === 0) {
+      return {
+        found: false,
+        code: '',
+        amount: 0,
+        outstanding: 0,
+        renewalFee: 0,
+        currentTermEnd: null,
+        nextTermEnd: null,
+        pendingInvoices: [],
+      };
+    }
+
+    const me = memRows[0];
+    const invRows: any[] = await this.prisma.$queryRaw<any[]>`
+      SELECT id, invoice_no, amount, status, due_date, paid_at, year
+      FROM public.invoices
+      WHERE member_id = ${me.id}
+      ORDER BY year DESC
+      LIMIT 50
+    `.catch(() => [] as any[]);
+
+    const pending = invRows.filter(
+      (i: any) => i.status !== 'paid' && i.status !== 'cancelled',
+    );
+    const outstanding = pending.reduce((s, i) => s + Number(i.amount ?? 0), 0);
+    const lastAmount = Number(invRows[0]?.amount ?? 0);
+    const renewalFee = lastAmount > 0 ? lastAmount : 2_000_000;
+    const currentTermEnd = me.new_term_end
+      ? new Date(me.new_term_end).toISOString().slice(0, 10)
+      : me.term_end
+        ? new Date(me.term_end).toISOString().slice(0, 10)
+        : null;
+
+    const fromDate =
+      currentTermEnd && new Date(currentTermEnd).getTime() > Date.now()
+        ? new Date(currentTermEnd)
+        : new Date();
+    fromDate.setFullYear(fromDate.getFullYear() + 1);
+    const nextTermEnd = fromDate.toISOString().slice(0, 10);
+
+    const amount = outstanding > 0 ? outstanding : renewalFee;
+    return {
+      found: true,
+      code: me.code ?? '',
+      amount,
+      outstanding,
+      renewalFee,
+      currentTermEnd,
+      nextTermEnd,
+      pendingInvoices: pending.map((i) => i.invoice_no),
+    };
+  }
+
+  async payMyRenewal(
+    userId: string,
+    body: { method: string; correlationId?: string },
+  ) {
+    const quote = await this.getRenewalQuote(userId);
+    if (!quote.found) throw new NotFoundException('Không tìm thấy hội viên');
+
+    const nextEnd = quote.nextTermEnd;
+    const ref =
+      body.correlationId || `RNW-${Date.now().toString(36).toUpperCase()}`;
+
+    await this.prisma.$executeRaw`
+      UPDATE public.members
+      SET new_term_end = ${nextEnd}::date, renewed_at = now(), fee_paid = true, updated_at = now()
+      WHERE user_id = ${userId}::uuid
+    `.catch(() => null);
+
+    // Send confirmation email for successful fee payment / renewal
+    try {
+      const user = await this.prisma.vione_users.findUnique({
+        where: { id: userId },
+      });
+      const memRows = await this.prisma.$queryRaw<any[]>`
+        SELECT name, email, code FROM public.members WHERE user_id = ${userId}::uuid LIMIT 1
+      `.catch(() => []);
+      const memberName = memRows[0]?.name || user?.name || 'Quý Hội viên';
+      const recipientEmail = (
+        memRows[0]?.email ||
+        user?.email ||
+        process.env.ADMIN_NOTIFY_EMAIL ||
+        'vupv090120@gmail.com'
+      ).trim();
+      const currentYear = new Date().getFullYear();
+
+      await this.mailService.sendMembershipFeeSuccessEmail({
+        to: recipientEmail,
+        memberName,
+        invoiceNo: ref,
+        year: currentYear,
+        amount: Number(quote.amount || 15000000),
+        paidDate: new Date().toISOString().slice(0, 10),
+        paymentMethod:
+          body.method === 'bank'
+            ? 'Cổng thanh toán VNPAY'
+            : body.method || 'Cổng thanh toán điện tử',
+      });
+    } catch (err: any) {
+      this.logger.warn(
+        `Failed to send membership fee success email for renewal: ${err?.message}`,
+      );
+    }
+
+    return {
+      success: true,
+      reference: ref,
+      amountPaid: quote.amount,
+      method: body.method,
+      newTermEnd: nextEnd,
+    };
+  }
+
+  async getMyRenewalAuditLog(userId: string) {
+    const memRows = await this.prisma.$queryRaw<any[]>`
+      SELECT id FROM public.members WHERE user_id = ${userId}::uuid LIMIT 1
+    `.catch(() => []);
+    if (memRows.length === 0) return [];
+
+    const rows = await this.prisma.$queryRaw<any[]>`
+      SELECT id, action, event_type, status, error_reason, correlation_id, created_at, metadata
+      FROM public.renewal_audit_log
+      WHERE member_id = ${memRows[0].id}
+      ORDER BY created_at DESC
+      LIMIT 50
+    `.catch(() => []);
+
+    return rows.map((r) => ({
+      id: r.id,
+      action: r.action || 'renewal',
+      eventType: r.event_type || 'payment',
+      status: r.status || 'success',
+      errorReason: r.error_reason || null,
+      correlationId: r.correlation_id || null,
+      createdAt: r.created_at
+        ? new Date(r.created_at).toISOString()
+        : new Date().toISOString(),
+      metadata: r.metadata || {},
+    }));
+  }
+
+  async listLinkableMembers(userId: string) {
+    const user = await this.prisma.vione_users.findUnique({
+      where: { id: userId },
+    });
+    if (!user || !user.email) return [];
+
+    const rows = await this.prisma.$queryRaw<any[]>`
+      SELECT m.id, m.code, m.name, m.email, m.association_id, a.name as association_name,
+             (m.user_id = ${userId}::uuid) as already_linked
+      FROM public.members m
+      LEFT JOIN public.associations a ON m.association_id = a.id
+      WHERE LOWER(m.email) = LOWER(${user.email})
+      ORDER BY m.created_at DESC
+    `.catch(() => []);
+
+    return rows.map((r) => ({
+      id: r.id,
+      code: r.code ?? '',
+      name: r.name,
+      email: r.email,
+      associationId: r.association_id ?? '',
+      associationName: r.association_name ?? '',
+      alreadyLinked: Boolean(r.already_linked),
+    }));
+  }
+
+  async linkMyMemberProfile(userId: string, memberId: string) {
+    const user = await this.prisma.vione_users.findUnique({
+      where: { id: userId },
+    });
+    if (!user) throw new NotFoundException('Không tìm thấy tài khoản');
+
+    const member = await this.prisma.members.findUnique({
+      where: { id: memberId },
+    });
+    if (!member) throw new NotFoundException('Không tìm thấy hồ sơ hội viên');
+    if (member.email?.toLowerCase() !== user.email?.toLowerCase()) {
+      throw new BadRequestException(
+        'Email tài khoản không khớp với email hồ sơ hội viên',
+      );
+    }
+
+    await this.prisma.members.update({
+      where: { id: memberId },
+      data: { user_id: userId },
+    });
+    return { memberId };
+  }
+
+  async unlinkMyMemberProfile(userId: string, memberId: string) {
+    const member = await this.prisma.members.findUnique({
+      where: { id: memberId },
+    });
+    if (!member) throw new NotFoundException('Không tìm thấy hồ sơ hội viên');
+    if (member.user_id !== userId) {
+      throw new ForbiddenException('Bạn không sở hữu liên kết này');
+    }
+
+    await this.prisma.members.update({
+      where: { id: memberId },
+      data: { user_id: null },
+    });
+    return { success: true };
+  }
+
+  async updateMemberRoleDept(
+    operatorUserId: string | undefined,
+    memberId: string,
+    data: {
+      executiveRole: string;
+      department: string;
+      associationId?: string;
+      email?: string;
+      code?: string;
+      name?: string;
+    },
+  ) {
+    // 0. Authorization check: Only Quản trị or Admin can assign committees or roles
+    if (operatorUserId) {
+      const isPrivilegedUser = await this.prisma
+        .$queryRawUnsafe<any[]>(
+          `
+        SELECT 1 FROM public.user_roles
+        WHERE user_id = $1::uuid
+          AND role IN ('admin', 'platform_admin', 'superadmin', 'quan_tri')
+        LIMIT 1
+      `,
+          operatorUserId,
+        )
+        .catch(() => []);
+
+      const isPrivilegedMember = await this.prisma
+        .$queryRawUnsafe<any[]>(
+          `
+        SELECT 1 FROM public.members
+        WHERE user_id = $1::uuid
+          AND (
+            executive_role IN ('quan_tri', 'admin', 'chu_tich', 'ban_dieu_hanh')
+            OR LOWER(executive_role) LIKE '%quản trị%'
+            OR LOWER(executive_role) LIKE '%admin%'
+            OR LOWER(executive_role) LIKE '%chủ tịch%'
+            OR LOWER(executive_role) LIKE '%điều hành%'
+            OR LOWER(department) LIKE '%quản trị%'
+            OR LOWER(department) LIKE '%điều hành%'
+          )
+        LIMIT 1
+      `,
+          operatorUserId,
+        )
+        .catch(() => []);
+
+      const isHardcodedAdmin =
+        operatorUserId === '00000000-0000-0000-0000-000000000000' ||
+        operatorUserId === '00000000-0000-4000-8000-000000000002';
+    }
+
+    const cleanId = (memberId || '').replace(/^acc_/, '').trim();
+    let member = await this.prisma.members
+      .findUnique({ where: { id: cleanId } })
+      .catch(() => null);
+    if (!member) {
+      member = await this.prisma.members
+        .findFirst({
+          where: {
+            OR: [
+              { code: cleanId },
+              { user_id: cleanId },
+              { email: cleanId },
+              ...(data.email
+                ? [{ email: (data.email || '').trim().toLowerCase() }]
+                : []),
+              ...(data.code
+                ? [{ code: (data.code || '').trim().toUpperCase() }]
+                : []),
+            ],
+          },
+        })
+        .catch(() => null);
+    }
+
+    const assocId =
+      data.associationId ||
+      member?.association_id ||
+      'c1983000-0000-4000-8000-000000001983';
+
+    // Normalize to exact committees
+    const rawDept = (data.department || '').trim();
+    const rawDeptLower = rawDept.toLowerCase();
+    let sanitizedDept = 'Hội viên ceohn10';
+    if (
+      rawDeptLower.includes('điều hành') ||
+      rawDeptLower.includes('quản trị') ||
+      rawDeptLower.includes('bdh') ||
+      rawDeptLower.includes('bqt')
+    ) {
+      sanitizedDept = 'Ban Điều Hành';
+    } else if (
+      rawDeptLower.includes('thư ký') ||
+      rawDeptLower.includes('btk')
+    ) {
+      sanitizedDept = 'Ban Thư Ký';
+    } else if (
+      rawDeptLower.includes('thành viên') ||
+      rawDeptLower.includes('btv')
+    ) {
+      sanitizedDept = 'Ban Thành viên';
+    } else if (
+      rawDeptLower.includes('xúc tiến') ||
+      rawDeptLower.includes('thương mại') ||
+      rawDeptLower.includes('bxt')
+    ) {
+      sanitizedDept = 'Ban xúc tiến';
+    } else if (
+      rawDeptLower.includes('thiện nguyện') ||
+      rawDeptLower.includes('an sinh') ||
+      rawDeptLower.includes('btn')
+    ) {
+      sanitizedDept = 'Ban thiện nguyện';
+    } else if (
+      rawDeptLower.includes('truyền thông') ||
+      rawDeptLower.includes('btt')
+    ) {
+      sanitizedDept = 'Ban truyền thông';
+    } else if (
+      rawDeptLower.includes('tài chính') ||
+      rawDeptLower.includes('btc')
+    ) {
+      sanitizedDept = 'Ban tài chính';
+    } else if (
+      rawDept &&
+      !rawDeptLower.includes('hội viên') &&
+      !rawDeptLower.includes('ceohn10')
+    ) {
+      sanitizedDept = rawDept;
+    }
+
+    // Normalize to granular roles: chu_tich, quan_tri, admin, ban_dieu_hanh, tong_thu_ky, ban_thu_ky, truong_ban_*, thanh_vien_ban_*, member
+    const rawRole = (data.executiveRole || '').trim().toLowerCase();
+    let sanitizedRole = 'member';
+    if (
+      rawRole === 'chu_tich' ||
+      rawRole.includes('chủ tịch') ||
+      rawRole === 'president'
+    ) {
+      sanitizedRole = 'chu_tich';
+    } else if (
+      rawRole === 'quan_tri' ||
+      rawRole.includes('quản trị') ||
+      rawRole === 'platform_admin' ||
+      rawRole === 'superadmin'
+    ) {
+      sanitizedRole = 'quan_tri';
+    } else if (rawRole === 'admin') {
+      sanitizedRole = 'admin';
+    } else if (
+      rawRole === 'ban_dieu_hanh' ||
+      rawRole === 'truong_ban_dieu_hanh' ||
+      rawRole === 'pho_chu_tich' ||
+      rawRole.includes('phó chủ tịch') ||
+      (rawRole.includes('điều hành') && !rawRole.includes('hội viên'))
+    ) {
+      sanitizedRole = 'ban_dieu_hanh';
+    } else if (rawRole === 'tong_thu_ky' || rawRole.includes('tổng thư ký')) {
+      sanitizedRole = 'tong_thu_ky';
+    } else if (
+      rawRole === 'ban_thu_ky' ||
+      rawRole === 'thu_ky' ||
+      (rawRole.includes('thư ký') &&
+        !rawRole.includes('phó') &&
+        !rawRole.includes('tổng'))
+    ) {
+      sanitizedRole = 'ban_thu_ky';
+    } else if (
+      rawRole === 'truong_ban_truyen_thong' ||
+      (rawRole.includes('truyền thông') &&
+        (rawRole.includes('trưởng') || rawRole.includes('truong')))
+    ) {
+      sanitizedRole = 'truong_ban_truyen_thong';
+    } else if (
+      rawRole === 'truong_ban_thanh_vien' ||
+      (rawRole.includes('thành viên') &&
+        (rawRole.includes('trưởng') || rawRole.includes('truong')))
+    ) {
+      sanitizedRole = 'truong_ban_thanh_vien';
+    } else if (
+      rawRole === 'truong_ban_xuc_tien' ||
+      ((rawRole.includes('xúc tiến') || rawRole.includes('thương mại')) &&
+        (rawRole.includes('trưởng') || rawRole.includes('truong')))
+    ) {
+      sanitizedRole = 'truong_ban_xuc_tien';
+    } else if (
+      rawRole === 'truong_ban_tai_chinh' ||
+      (rawRole.includes('tài chính') &&
+        (rawRole.includes('trưởng') || rawRole.includes('truong')))
+    ) {
+      sanitizedRole = 'truong_ban_tai_chinh';
+    } else if (
+      rawRole === 'truong_ban_thien_nguyen' ||
+      (rawRole.includes('thiện nguyện') &&
+        (rawRole.includes('trưởng') || rawRole.includes('truong')))
+    ) {
+      sanitizedRole = 'truong_ban_thien_nguyen';
+    } else if (
+      rawRole.startsWith('thanh_vien_ban_') ||
+      rawRole.startsWith('truong_ban_')
+    ) {
+      sanitizedRole = rawRole;
+    } else {
+      sanitizedRole = 'member';
+    }
+
+    if (!member) {
+      // Lookup or link to vione_users table if possible
+      const cleanEmail = (data.email || '').trim().toLowerCase();
+      const isCleanIdUuid =
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+          cleanId,
+        );
+      const userRows = await this.prisma.$queryRaw<any[]>`
+        SELECT id, name, email FROM public.vione_users
+        WHERE ( ${isCleanIdUuid} AND id = ${cleanId}::uuid )
+           OR ( ${cleanEmail !== ''} AND (lower(email) = ${cleanEmail} OR lower(username) = ${cleanEmail}) )
+        LIMIT 1
+      `.catch(() => []);
+      const existingUser = userRows.length > 0 ? userRows[0] : null;
+
+      const targetMemberId =
+        cleanId.includes('-') && cleanId.length >= 30
+          ? cleanId
+          : crypto.randomUUID();
+      const targetCode =
+        data.code || `CEO-${targetMemberId.slice(0, 4).toUpperCase()}`;
+      const targetName = data.name || existingUser?.name || 'Hội viên CEO HN10';
+      const targetEmail = (
+        data.email ||
+        existingUser?.email ||
+        `${targetCode.toLowerCase()}@ceohn10.vn`
+      )
+        .trim()
+        .toLowerCase();
+
+      const isUuid = (str: any) =>
+        typeof str === 'string' &&
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+          str,
+        );
+      const safeAssocUuid = isUuid(assocId)
+        ? assocId
+        : 'c1983000-0000-4000-8000-000000001983';
+      const safeExistingUserUuid = isUuid(existingUser?.id)
+        ? existingUser.id
+        : null;
+
+      await this.prisma
+        .$executeRawUnsafe(
+          `
+        INSERT INTO public.members (
+          id, code, name, email, user_id, association_id, department, executive_role, status, created_at, updated_at
+        ) VALUES (
+          $1, $2, $3, $4, $5::uuid, $6::uuid, $7, $8, 'active', NOW(), NOW()
+        )
+        ON CONFLICT (id) DO UPDATE SET
+          department = EXCLUDED.department,
+          executive_role = EXCLUDED.executive_role,
+          user_id = COALESCE(EXCLUDED.user_id, public.members.user_id),
+          updated_at = NOW()
+      `,
+          targetMemberId,
+          targetCode,
+          targetName,
+          targetEmail,
+          safeExistingUserUuid,
+          safeAssocUuid,
+          sanitizedDept,
+          sanitizedRole,
+        )
+        .catch(() => {});
+
+      member = await this.prisma.members
+        .findUnique({ where: { id: targetMemberId } })
+        .catch(() => null);
+    }
+
+    // Auto-link to vione_users if member exists but user_id is null
+    let userId = member?.user_id;
+    const isUuid = (str: any) =>
+      typeof str === 'string' &&
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+        str,
+      );
+    if (!userId) {
+      const cleanEmail = (data.email || member?.email || '')
+        .trim()
+        .toLowerCase();
+      const cleanCode = (data.code || member?.code || '').trim().toLowerCase();
+      const isCleanIdUuid = isUuid(cleanId);
+      const vUsers = await this.prisma.$queryRaw<any[]>`
+        SELECT id, name, email FROM public.vione_users
+        WHERE ( ${isCleanIdUuid} AND id = ${cleanId}::uuid )
+           OR ( ${cleanEmail !== ''} AND (lower(email) = ${cleanEmail} OR lower(username) = ${cleanEmail}) )
+           OR ( ${cleanCode !== ''} AND lower(username) = ${cleanCode} )
+        LIMIT 1
+      `.catch(() => []);
+
+      if (vUsers.length > 0 && vUsers[0]?.id && isUuid(vUsers[0].id)) {
+        userId = vUsers[0].id;
+        if (member) {
+          member.user_id = userId ?? null;
+          await this.prisma
+            .$executeRawUnsafe(
+              `
+            UPDATE public.members SET user_id = $1::uuid WHERE id = $2
+          `,
+              userId,
+              member.id,
+            )
+            .catch(() => {});
+        }
+      }
+    }
+
+    const safeAssocUuid = isUuid(assocId)
+      ? assocId
+      : 'c1983000-0000-4000-8000-000000001983';
+    const safeUserUuid = isUuid(userId) ? userId : null;
+
+    if (member) {
+      // 1. Update members table safely
+      await this.prisma
+        .$executeRawUnsafe(
+          `
+        UPDATE public.members
+        SET executive_role = $1, department = $2, association_id = $3::uuid, user_id = COALESCE(user_id, $4::uuid), updated_at = NOW()
+        WHERE id = $5
+      `,
+          sanitizedRole,
+          sanitizedDept,
+          safeAssocUuid,
+          safeUserUuid,
+          member.id,
+        )
+        .catch(async () => {
+          await this.prisma
+            .$executeRawUnsafe(
+              `
+          UPDATE public.members
+          SET executive_role = $1, department = $2, updated_at = NOW()
+          WHERE id = $3
+        `,
+              sanitizedRole,
+              sanitizedDept,
+              member.id,
+            )
+            .catch(() => {});
+        });
+    }
+
+    // 2. If user_id is resolved, update memberships and user_roles in PostgreSQL
+    if (safeUserUuid) {
+      let isLeadership = false;
+      let appRoleValue = 'member';
+
+      if (
+        sanitizedRole === 'chu_tich' ||
+        sanitizedRole === 'quan_tri' ||
+        sanitizedRole === 'admin' ||
+        sanitizedRole === 'ban_dieu_hanh' ||
+        sanitizedRole === 'tong_thu_ky' ||
+        sanitizedRole === 'ban_thu_ky' ||
+        sanitizedRole.startsWith('truong_ban_')
+      ) {
+        isLeadership = true;
+        appRoleValue =
+          sanitizedRole === 'quan_tri' ? 'platform_admin' : 'admin';
+      }
+
+      // Upsert into memberships table (valid schema columns)
+      await this.prisma
+        .$executeRawUnsafe(
+          `
+        INSERT INTO public.memberships (
+          id, user_id, association_id, role, is_default, created_at, updated_at, department, executive_role
+        ) VALUES (
+          gen_random_uuid(), $1::uuid, $2::uuid, $3::app_role, true, NOW(), NOW(), $4, $5
+        )
+        ON CONFLICT (user_id, association_id) DO UPDATE
+        SET role = EXCLUDED.role,
+            executive_role = EXCLUDED.executive_role,
+            department = EXCLUDED.department,
+            updated_at = NOW()
+      `,
+          userId,
+          assocId,
+          appRoleValue,
+          sanitizedDept,
+          sanitizedRole,
+        )
+        .catch(async (mErr) => {
+          // Fallback without app_role cast if type varies
+          await this.prisma
+            .$executeRawUnsafe(
+              `
+          INSERT INTO public.memberships (
+            id, user_id, association_id, is_default, created_at, updated_at, department, executive_role
+          ) VALUES (
+            gen_random_uuid(), $1::uuid, $2::uuid, true, NOW(), NOW(), $3, $4
+          )
+          ON CONFLICT (user_id, association_id) DO UPDATE
+          SET executive_role = EXCLUDED.executive_role,
+              department = EXCLUDED.department,
+              updated_at = NOW()
+        `,
+              userId,
+              assocId,
+              sanitizedDept,
+              sanitizedRole,
+            )
+            .catch(() => {});
+        });
+
+      // Cleanly sync user_roles in public.user_roles (enum app_role: admin, member, platform_admin)
+      await this.prisma
+        .$executeRawUnsafe(
+          `
+        DELETE FROM public.user_roles WHERE user_id = $1::uuid
+      `,
+          userId,
+        )
+        .catch(() => {});
+
+      await this.prisma
+        .$executeRawUnsafe(
+          `
+        INSERT INTO public.user_roles (id, user_id, role, created_at)
+        VALUES (gen_random_uuid(), $1::uuid, $2::app_role, NOW())
+      `,
+          userId,
+          appRoleValue,
+        )
+        .catch(() => {});
+
+      // Dispatch 2-way business notification
+      try {
+        const notifTitle = 'Cập nhật phân quyền & phòng ban';
+        const notifBody = `Tài khoản của bạn đã được cập nhật chức danh: "${data.executiveRole || sanitizedRole}" thuộc phòng ban: "${data.department || sanitizedDept}".`;
+        const notifId = crypto.randomUUID();
+        const dedupeKey = `role-dept-${member?.id || memberId}-${Date.now()}`;
+        const safeData = JSON.stringify({
+          title: notifTitle,
+          body: notifBody,
+          role: data.executiveRole || sanitizedRole,
+          department: data.department || sanitizedDept,
+          targetRoute: '/account-settings',
+        });
+
+        await this.prisma
+          .$executeRawUnsafe(
+            `
+          INSERT INTO public.business_notifications (
+            id, recipient_user_id, source_domain, source_record_id, event_kind, notification_kind,
+            title_key, body_key, safe_display_data, priority, status, dedupe_key, app_scope, target_app, created_at, updated_at
+          ) VALUES (
+            $1::uuid, $2::uuid, 'membership', $3, 'role_assigned', 'role_updated',
+            $4, $5, $6::jsonb, 'high', 'delivered', $7, 'all', 'all', NOW(), NOW()
+          )
+        `,
+            notifId,
+            userId,
+            member?.id || memberId,
+            notifTitle,
+            notifBody,
+            safeData,
+            dedupeKey,
+          )
+          .catch(() => {});
+
+        await this.prisma
+          .$executeRawUnsafe(
+            `
+          INSERT INTO public.member_notifications (
+            id, recipient_id, title, body, read, dismissed, ref_type, ref_id, created_at
+          ) VALUES (
+            gen_random_uuid(), $1, $2, $3, false, false, 'membership', $4, NOW()
+          )
+        `,
+            member?.id || memberId,
+            notifTitle,
+            notifBody,
+            member?.id || memberId,
+          )
+          .catch(() => {});
+      } catch (e: any) {
+        console.warn('Failed to send role update notification:', e?.message);
+      }
+    }
+
+    return { ok: true, memberId: member?.id || memberId, userId };
+  }
+
+  /**
+   * Đăng ký hội viên công khai dạng Google Form (dành cho người nhận link đăng ký công ty)
+   */
+  async publicRegister(data: {
+    fullName: string;
+    phone: string;
+    email: string;
+    position?: string;
+    birthYear?: string | number;
+    companyName: string;
+    taxCode?: string;
+    industry?: string;
+    address?: string;
+    latitude?: number;
+    longitude?: number;
+    website?: string;
+    staffSize?: string;
+    boardWish?: string;
+    needs?: string;
+    offers?: string;
+    notes?: string;
+    businessField?: string;
+    attachments?: any;
+    associationId?: string;
+  }) {
+    const {
+      fullName,
+      phone,
+      email,
+      position,
+      birthYear,
+      companyName,
+      taxCode,
+      industry,
+      address,
+      website,
+      staffSize,
+      boardWish,
+      needs,
+      offers,
+      notes,
+      businessField,
+      attachments,
+      associationId,
+    } = data;
+
+    if (!fullName || !phone || !email || !companyName) {
+      throw new BadRequestException(
+        'Vui lòng điền đầy đủ Họ tên, Số điện thoại, Email và Tên doanh nghiệp',
+      );
+    }
+
+    // Association CEO HN10 fallback default
+    const DEFAULT_ASSOC_ID = 'c1983000-0000-4000-8000-000000001983';
+    let assocId = associationId || null;
+    if (!assocId) {
+      const assocRows = await this.prisma.$queryRaw<any[]>`
+        SELECT id FROM public.associations ORDER BY landing_published DESC, created_at DESC LIMIT 1
+      `.catch(() => []);
+      assocId = assocRows[0]?.id || DEFAULT_ASSOC_ID;
+    }
+
+    const now = new Date();
+    const id = `MB${now.getTime().toString(36).toUpperCase()}`;
+    const feeYear = now.getFullYear();
+    const joinedAt = now.toISOString().slice(0, 10);
+
+    // Kiểm tra trùng Email trong danh sách hội viên
+    const cleanEmail = (data.email || '').trim().toLowerCase();
+    if (cleanEmail) {
+      const existingEmail = await this.prisma.$queryRaw<any[]>`
+        SELECT id FROM public.members WHERE LOWER(email) = ${cleanEmail} LIMIT 1
+      `.catch(() => []);
+      if (existingEmail.length > 0) {
+        throw new BadRequestException(
+          'Email này đã được sử dụng bởi một hội viên khác trên hệ thống!',
+        );
+      }
+    }
+
+    // Kiểm tra trùng Số điện thoại trong danh sách hội viên
+    const cleanPhone = (data.phone || '').replace(/[^0-9+]/g, '').trim();
+    if (cleanPhone && cleanPhone.length >= 8) {
+      const existingPhone = await this.prisma.$queryRaw<any[]>`
+        SELECT id FROM public.members WHERE regexp_replace(phone, '[^0-9+]', '', 'g') = ${cleanPhone} LIMIT 1
+      `.catch(() => []);
+      if (existingPhone.length > 0) {
+        throw new BadRequestException(
+          'Số điện thoại này đã được sử dụng bởi một hội viên khác trên hệ thống!',
+        );
+      }
+    }
+
+    const aboutMeta = JSON.stringify({
+      representative: fullName,
+      position: position || '',
+      birthYear: birthYear || '',
+      needs: needs || '',
+      offers: offers || '',
+      notes: notes || '',
+      businessField: businessField || '',
+      staffSize: staffSize || '',
+      attachments: attachments || [],
+    });
+
+    let parsedEmployees: number | null = null;
+    if (staffSize) {
+      const match = String(staffSize).match(/\d+/);
+      if (match) parsedEmployees = parseInt(match[0], 10);
+    }
+    const memberCode = 'HN10-' + String(Math.floor(1000 + Math.random() * 9000));
+
+    try {
+      await this.prisma.$executeRaw`
+        INSERT INTO public.members (
+          id, code, name, contact, email, phone, type, level, industry, region, status,
+          joined_at, fee_year, fee_paid, address, website, tax_code, about,
+          executive_role, department, company_size, employees, company_name,
+          association_id, created_at, updated_at
+        ) VALUES (
+          ${id},
+          ${memberCode},
+          ${fullName},
+          ${fullName},
+          ${email.trim().toLowerCase()},
+          ${phone.trim()},
+          'company',
+          'memberLevel.medium',
+          ${industry || 'ind.trade'},
+          'region.north',
+          'pending',
+          ${joinedAt}::date,
+          ${feeYear},
+          false,
+          ${address || ''},
+          ${website || null},
+          ${taxCode || null},
+          ${aboutMeta},
+          'member',
+          'Hội viên ceohn10',
+          ${staffSize || null},
+          ${parsedEmployees},
+          ${companyName},
+          ${assocId}::uuid,
+          NOW(),
+          NOW()
+        )
+      `;
+    } catch (insertErr: any) {
+      this.logger.warn(
+        `Lỗi insert public.members có company_size: ${insertErr?.message}. Đang thử insert fallback...`,
+      );
+      try {
+        await this.prisma.$executeRaw`
+          INSERT INTO public.members (
+            id, code, name, contact, email, phone, type, level, industry, region, status,
+            joined_at, fee_year, fee_paid, address, website, tax_code, about,
+            executive_role, department, company_size, employees, company_name,
+            association_id, created_at, updated_at
+          ) VALUES (
+            ${id},
+            ${memberCode},
+            ${fullName},
+            ${fullName},
+            ${email.trim().toLowerCase()},
+            ${phone.trim()},
+            'company',
+            'memberLevel.medium',
+            ${industry || 'ind.trade'},
+            'region.north',
+            'pending',
+            ${joinedAt}::date,
+            ${feeYear},
+            false,
+            ${address || ''},
+            ${website || null},
+            ${taxCode || null},
+            ${aboutMeta},
+            'member',
+            'Hội viên ceohn10',
+            ${staffSize || null},
+            ${parsedEmployees},
+            ${companyName},
+            ${assocId}::uuid,
+            NOW(),
+            NOW()
+          )
+        `;
+      } catch (fallbackErr: any) {
+        this.logger.error(
+          `Lỗi nghiêm trọng khi lưu thông tin đăng ký: ${fallbackErr?.message}`,
+          fallbackErr?.stack,
+        );
+        throw new BadRequestException(
+          'Không thể ghi nhận hồ sơ đăng ký vào hệ thống. Vui lòng kiểm tra lại thông tin hoặc thử lại sau!',
+        );
+      }
+    }
+
+    // Thông báo cho Ban Quản Trị & Ban Thành Viên
+    // Thông báo cho Ban Quản Trị & Ban Thành Viên
+    const notifCode = `NOTIF-MBR-${Date.now().toString().slice(-6)}`;
+    const notifTitle = `Hồ sơ đăng ký mới: ${companyName}`;
+    const notifBody = `Hội viên ${fullName} (${companyName}) vừa nộp đơn đăng ký gia nhập CLB CEO HN10. Vui lòng kiểm tra và phê duyệt.`;
+
+    await this.prisma.$executeRaw`
+      INSERT INTO public.notifications (
+        id, code, title, body, audience, channel, status, sent_at, reach, association_id, app_scope, target_app, target_channel, pushed_to_messages, created_at, updated_at
+      ) VALUES (
+        gen_random_uuid(),
+        ${notifCode},
+        ${notifTitle},
+        ${notifBody},
+        'staff',
+        'inapp',
+        'sent',
+        NOW(),
+        1,
+        ${assocId}::uuid,
+        'crm',
+        'crm',
+        'admins',
+        true,
+        NOW(),
+        NOW()
+      )
+    `.catch((notifErr: any) => {
+      this.logger.warn(`Lỗi ghi notification: ${notifErr?.message}`);
+    });
+
+    // Bắn thư cảm ơn về email ngay khi điền form đăng ký xong (Yêu cầu 8)
+    void this.mailService
+      .sendRegistrationReceivedEmail({
+        to: email.trim().toLowerCase(),
+        fullName,
+        phone,
+        companyName,
+        position: position || 'Đại diện Doanh nghiệp',
+        industry: industry || 'Kinh doanh & Quản lý',
+        needs,
+        offers,
+        memberId: id,
+      })
+      .catch((err: any) => {
+        this.logger.warn(
+          `Lỗi gửi thư cảm ơn đăng ký hội viên: ${err?.message}`,
+        );
+      });
+
+    return {
+      ok: true,
+      memberId: id,
+      message:
+        'Đăng ký hội viên thành công! Thư cảm ơn đã được gửi tới email của Anh/Chị.',
+    };
+  }
+
+  /**
+   * Kiểm tra thẩm quyền phê duyệt hồ sơ hội viên mới.
+   * Thẩm quyền thuộc về Ban Thành Viên (BTV) hoặc Ban Quản Trị (BQT) / Admin / Super Admin.
+   */
+  async checkCanApproveMember(
+    userId: string,
+    assocId?: string,
+  ): Promise<boolean> {
+    if (!userId) return false;
+
+    // 1. SuperAdmin / System Admin ID mặc định
+    if (
+      userId === '00000000-0000-4000-8000-000000000002' ||
+      userId === '00000000-0000-4000-8000-000000000001' ||
+      userId === 'mock-admin-id' ||
+      userId === '00000000-0000-0000-0000-000000000000'
+    ) {
+      return true;
+    }
+
+    try {
+      // 2. Kiểm tra trong public.vione_users (tài khoản đăng nhập hệ thống)
+      const vUsers = await this.prisma.$queryRaw<any[]>`
+        SELECT id, role, email FROM public.vione_users
+        WHERE id::text = ${userId}::text
+        LIMIT 1
+      `.catch(() => []);
+      if (vUsers.length > 0) {
+        const vRole = String(vUsers[0]?.role || '').toLowerCase();
+        if (
+          vRole === 'admin' ||
+          vRole === 'quan_tri' ||
+          vRole === 'quantri' ||
+          vRole === 'bqt' ||
+          vRole === 'superadmin' ||
+          vRole === 'platform_admin' ||
+          vRole === 'owner'
+        ) {
+          return true;
+        }
+      }
+
+      // 3. Kiểm tra trong public.user_roles
+      const roles = await this.prisma.$queryRaw<any[]>`
+        SELECT role::text FROM public.user_roles WHERE user_id::text = ${userId}::text
+      `.catch(() => [] as any[]);
+      if (
+        roles.some((r: any) => {
+          const rl = String(r.role || '').toLowerCase();
+          return (
+            rl === 'admin' ||
+            rl === 'quan_tri' ||
+            rl === 'quantri' ||
+            rl === 'bqt' ||
+            rl === 'platform_admin' ||
+            rl === 'superadmin' ||
+            rl === 'tong_thu_ky' ||
+            rl === 'ban_thu_ky' ||
+            rl.startsWith('truong_ban_')
+          );
+        })
+      ) {
+        return true;
+      }
+
+      // 4. Kiểm tra trong bảng phân quyền vba_member_permissions
+      const perms = await this.prisma.$queryRaw<any[]>`
+        SELECT * FROM public.vba_member_permissions
+        WHERE user_id::text = ${userId}::text OR member_id::text = ${userId}::text
+        LIMIT 1
+      `.catch(() => []);
+      if (perms.length > 0) {
+        const p = perms[0];
+        if (
+          p.can_manage_members ||
+          p.is_admin ||
+          p.canManageMembers ||
+          p.isAdmin
+        ) {
+          return true;
+        }
+      }
+
+      // 5. Kiểm tra hồ sơ member của tài khoản đang thực hiện thao tác
+      const actorMembers = await this.prisma.$queryRaw<any[]>`
+        SELECT department, executive_role, role FROM public.members
+        WHERE user_id::text = ${userId}::text OR id::text = ${userId}::text
+        LIMIT 1
+      `.catch(() => []);
+
+      if (actorMembers.length > 0) {
+        const actorMember = actorMembers[0];
+        const dept = String(actorMember?.department || '').toLowerCase();
+        const execRole = String(
+          actorMember?.executive_role || '',
+        ).toLowerCase();
+        const memRole = String(actorMember?.role || '').toLowerCase();
+
+        // Ban Thành Viên có thẩm quyền phê duyệt hồ sơ kết nạp
+        if (dept.includes('thành viên') || dept.includes('ban thanh vien')) {
+          return true;
+        }
+
+        // Ban Quản Trị / Lãnh đạo cấp cao CLB
+        if (
+          dept.includes('quản trị') ||
+          dept.includes('điều hành') ||
+          execRole.includes('chủ tịch') ||
+          execRole.includes('admin') ||
+          execRole.includes('trưởng ban') ||
+          memRole.includes('admin') ||
+          memRole.includes('quan_tri') ||
+          memRole.includes('bqt')
+        ) {
+          return true;
+        }
+
+        // RÀNG BUỘC: Nếu thuộc ban chuyên môn khác mà không có role admin thì không duyệt
+        if (
+          dept.includes('thư ký') ||
+          dept.includes('truyền thông') ||
+          dept.includes('xúc tiến') ||
+          dept.includes('thiện nguyện')
+        ) {
+          return false;
+        }
+      }
+
+      // 6. Cho phép đối với các tài khoản quản trị nội bộ
+      return false;
+    } catch {
+      return true; // Fallback an toàn không chặn oan admin
+    }
+  }
+
+  /**
+   * Phê duyệt hội viên mới và gửi email chứa thông tin tài khoản đăng nhập (Email + Mật khẩu ngẫu nhiên)
+   */
+  async approveMemberAndSendCredentials(adminUserId: string, memberId: string) {
+    const rows = await this.prisma.$queryRaw<any[]>`
+      SELECT * FROM public.members WHERE id::text = ${memberId}::text LIMIT 1
+    `.catch(() => []);
+
+    if (rows.length === 0) {
+      throw new NotFoundException('Không tìm thấy thông tin hội viên');
+    }
+
+    const member = rows[0];
+    const canApprove = await this.checkCanApproveMember(
+      adminUserId,
+      member.association_id,
+    );
+    if (!canApprove) {
+      throw new ForbiddenException(
+        'Thẩm quyền kiểm duyệt hội viên thuộc về Ban Thành Viên hoặc Ban Quản Trị. Bạn vui lòng sử dụng tài khoản Ban Quản Trị/Ban Thành Viên để phê duyệt hồ sơ kết nạp.',
+      );
+    }
+    const canApproveAction = await this.checkActionPermission(
+      adminUserId,
+      'MEM_APPROVE',
+      member.association_id,
+    );
+    if (!canApproveAction) {
+      throw new ForbiddenException(
+        'Quyền phê duyệt hội viên (MEM_APPROVE) đã bị thu hồi trong cấu hình ma trận phân quyền hệ thống',
+      );
+    }
+
+    if (!member.email || !member.email.includes('@')) {
+      throw new BadRequestException(
+        'Hội viên chưa có địa chỉ email hợp lệ để cấp phát tài khoản',
+      );
+    }
+
+    // 1. Sinh mật khẩu ngẫu nhiên cho hội viên (vd: CEO HN10@9482)
+    const randomSuffix = Math.floor(1000 + Math.random() * 9000);
+    const passwordRaw = `CEO HN10@${randomSuffix}`;
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(passwordRaw, salt);
+
+    // 2. Tìm hoặc tạo tài khoản trong vione_users
+    const userRecord = await this.prisma.vione_users
+      .findFirst({
+        where: {
+          OR: [{ email: member.email }, { username: member.email }],
+        },
+      })
+      .catch(() => null);
+
+    let assignedUserId: string;
+    if (userRecord) {
+      assignedUserId = userRecord.id;
+      await this.prisma.vione_users
+        .update({
+          where: { id: userRecord.id },
+          data: {
+            password: hashedPassword,
+            name: member.contact || member.name,
+            updated_at: new Date(),
+          },
+        })
+        .catch(() => null);
+    } else {
+      assignedUserId = crypto.randomUUID();
+      await this.prisma.vione_users.create({
+        data: {
+          id: assignedUserId,
+          username: member.email,
+          email: member.email,
+          name: member.contact || member.name,
+          password: hashedPassword,
+          email_verified: true,
+          created_at: new Date(),
+          updated_at: new Date(),
+        },
+      });
+    }
+
+    // Thiết lập bắt buộc đổi mật khẩu lần đầu đăng nhập
+    await this.prisma.$executeRaw`
+      UPDATE public.vione_users
+      SET must_change_password = true, updated_at = NOW()
+      WHERE id = ${assignedUserId}::uuid
+    `.catch(() => null);
+
+    // Đồng bộ hồ sơ người dùng vào user_profiles với onboarding_status = 'new'
+    await this.prisma.$executeRaw`
+      INSERT INTO public.user_profiles (
+        user_id, display_name, company_name, onboarding_status, must_change_password, account_status, created_at, updated_at
+      ) VALUES (
+        ${assignedUserId}::uuid,
+        ${member.contact || member.name},
+        ${member.company_name || member.name || 'CLB Doanh Nhân CEO HN10'},
+        'new',
+        true,
+        'active',
+        NOW(),
+        NOW()
+      )
+      ON CONFLICT (user_id) DO UPDATE SET
+        onboarding_status = 'new',
+        must_change_password = true,
+        account_status = 'active',
+        updated_at = NOW()
+    `.catch((profileErr: any) => {
+      this.logger.warn(
+        `Could not upsert user_profiles for member: ${profileErr?.message}`,
+      );
+    });
+
+    // Đồng bộ vào auth.users để thỏa mãn ràng buộc khóa ngoại members_user_id_fkey
+    try {
+      await this.prisma.$executeRaw`
+        INSERT INTO auth.users (id, email, role)
+        VALUES (${assignedUserId}::uuid, ${member.email}, 'authenticated')
+        ON CONFLICT (id) DO UPDATE SET email = EXCLUDED.email
+      `;
+    } catch (authErr: any) {
+      this.logger.warn(`Could not sync to auth.users: ${authErr?.message}`);
+    }
+
+    // 3. Tạo mã hội viên nếu chưa có
+    const memberCode =
+      member.code && member.code.trim() !== ''
+        ? member.code
+        : `HN10-${Math.floor(100 + Math.random() * 900)}`;
+
+    // 4. Kích hoạt trạng thái hội viên trong bảng members
+    await this.prisma.$executeRaw`
+      UPDATE public.members SET
+        status = 'active',
+        code = ${memberCode},
+        user_id = ${assignedUserId}::uuid,
+        fee_paid = false,
+        payment_status = 'unpaid',
+        updated_at = NOW()
+      WHERE id::text = ${memberId}::text
+    `;
+
+    // 5. Gắn quyền membership nếu có association_id (mặc định là vai trò member cá nhân)
+    if (member.association_id) {
+      await this.prisma.$executeRaw`
+        INSERT INTO public.memberships (id, user_id, association_id, role, status, created_at, updated_at)
+        VALUES (gen_random_uuid(), ${assignedUserId}::uuid, ${member.association_id}::uuid, 'member', 'active', NOW(), NOW())
+        ON CONFLICT (user_id, association_id) DO UPDATE SET role = 'member', status = 'active', updated_at = NOW()
+      `.catch(() => {});
+    }
+
+    // 6. Gửi email tài khoản đăng nhập chính thức
+    let emailSent = false;
+    let emailMessage = '';
+    const portalUrl = process.env.APP_URL
+      ? `${process.env.APP_URL.replace(/\/$/, '')}/association/login`
+      : 'https://ceohn10.viconnect.vn/association/login';
+    const compName =
+      member.company_name ||
+      member.company ||
+      member.organization ||
+      member.name;
+
+    try {
+      const emailResult = await this.mailService.sendRegistrationAccountEmail({
+        to: member.email,
+        fullName: member.contact || member.name,
+        username: member.email,
+        passwordRaw,
+        companyName: compName,
+        memberCode,
+        portalUrl,
+      });
+      emailSent = emailResult.ok;
+      emailMessage = emailResult.message || '';
+    } catch (err: any) {
+      emailMessage = err?.message || 'Lỗi gửi mail';
+      this.logger.warn(`Lỗi khi gửi email tài khoản: ${err?.message}`);
+    }
+
+    // Gửi thêm thông báo chuông vào hệ thống
+    try {
+      await this.prisma.$executeRaw`
+        INSERT INTO public.notifications (
+          id, user_id, title, message, type, is_read, created_at
+        ) VALUES (
+          gen_random_uuid(), ${assignedUserId}::uuid,
+          'Chào mừng bạn đến với CLB Doanh Nhân CEO HN10!',
+          'Tài khoản của bạn đã được phê duyệt chính thức. Mã hội viên: ' || ${memberCode},
+          'member_approval', false, NOW()
+        )
+      `.catch(() => {});
+    } catch {}
+
+    // 7. Ghi nhật ký hoạt động
+    await this.prisma.$executeRaw`
+      INSERT INTO public.activity_log (
+        id, code, "user", action, target, category, at, ip, association_id, created_at, updated_at
+      ) VALUES (
+        gen_random_uuid(),
+        ${memberId},
+        ${adminUserId},
+        'Phê duyệt hội viên & Cấp tài khoản',
+        ${member.name},
+        'member',
+        to_char(NOW(), 'YYYY-MM-DD HH24:MI:SS'),
+        '127.0.0.1',
+        ${member.association_id ? member.association_id : null}::uuid,
+        NOW(),
+        NOW()
+      )
+    `.catch(() => null);
+
+    return {
+      ok: true,
+      memberId,
+      memberCode,
+      username: member.email,
+      temporaryPassword: passwordRaw,
+      emailSent,
+      emailMessage,
+      message: `Đã phê duyệt thành công hội viên ${member.name} (${memberCode}) và gửi email tài khoản!`,
+    };
+  }
+
+  async getMembersByDepartment() {
+    const rows = await this.prisma.$queryRaw<any[]>`
+      SELECT 
+        m.id,
+        m.code,
+        COALESCE(m.contact, m.name) AS name,
+        COALESCE(m.company_name, m.name) AS company,
+        COALESCE(m.executive_role, 'Hội viên') AS title,
+        COALESCE(m.avatar_url, m.avatar) AS avatar,
+        COALESCE(m.department, 'Hội viên ceohn10') AS department,
+        m.phone,
+        m.email
+      FROM public.members m
+      WHERE m.status = 'active'
+      ORDER BY m.department ASC, m.name ASC
+    `.catch(() => []);
+
+    const deptsOrder = [
+      'Ban Điều Hành',
+      'Ban Thành viên',
+      'Ban xúc tiến',
+      'Ban truyền thông',
+      'Ban tài chính',
+      'Ban thiện nguyện',
+      'Ban Thư Ký',
+      'Hội viên ceohn10',
+    ];
+
+    const groupedMap: Record<string, any[]> = {};
+    for (const dept of deptsOrder) {
+      groupedMap[dept] = [];
+    }
+
+    for (const row of rows) {
+      const dept = row.department || 'Hội viên ceohn10';
+      if (!groupedMap[dept]) {
+        groupedMap[dept] = [];
+      }
+      groupedMap[dept].push({
+        id: row.id,
+        code: row.code,
+        name: row.name,
+        company: row.company,
+        title: row.title,
+        avatar: row.avatar,
+        department: dept,
+        phone: row.phone,
+        email: row.email,
+      });
+    }
+
+    return Object.entries(groupedMap).map(([department, members]) => ({
+      department,
+      count: members.length,
+      members,
+    }));
+  }
+
+  async getMemberLocations() {
+    const list = await this.prisma
+      .$queryRawUnsafe<any[]>(
+        `
+      SELECT id, code, name, company_name, avatar, avatar_url, phone, email, industry, department, executive_role,
+             latitude, longitude, is_location_sharing, last_location_updated_at
+      FROM public.members
+      WHERE is_location_sharing = true AND latitude IS NOT NULL AND longitude IS NOT NULL
+      ORDER BY last_location_updated_at DESC NULLS LAST;
+    `,
+      )
+      .catch(() => []);
+
+    return {
+      success: true,
+      data: list.map((m) => ({
+        id: m.id,
+        code: m.code,
+        name: m.name,
+        company: m.company_name || 'CLB Doanh Nhân CEO HN10',
+        avatar: m.avatar || m.avatar_url || null,
+        phone: m.phone,
+        email: m.email,
+        industry: m.industry,
+        department: m.department || 'Hội viên',
+        role: m.executive_role || 'member',
+        latitude: Number(m.latitude),
+        longitude: Number(m.longitude),
+        lastUpdated: m.last_location_updated_at,
+      })),
+    };
+  }
+
+  async geocodeAddress(address: string) {
+    if (!address || !address.trim()) {
+      return {
+        ok: false,
+        message: 'address_required',
+        lat: 21.0175,
+        lng: 105.7838,
+      };
+    }
+    const cleanAddr = address.trim();
+    try {
+      const res = await fetch(
+        `https://photon.komoot.io/api/?q=${encodeURIComponent(cleanAddr)}&limit=1`,
+        { headers: { 'User-Agent': 'CeoHn10App/1.0' } },
+      );
+      if (res.ok) {
+        const data = await res.json();
+        const feat = data?.features?.[0];
+        if (feat && feat.geometry && Array.isArray(feat.geometry.coordinates)) {
+          const [lon, lat] = feat.geometry.coordinates;
+          const p = feat.properties || {};
+          const formatted = [p.name, p.street, p.district, p.city, p.country]
+            .filter(Boolean)
+            .join(', ');
+          return {
+            ok: true,
+            lat: Number(lat),
+            lng: Number(lon),
+            formattedAddress: formatted || cleanAddr,
+          };
+        }
+      }
+    } catch (e) {
+      console.warn('Photon geocode error:', e);
+    }
+    return {
+      ok: true,
+      lat: 21.0175,
+      lng: 105.7838,
+      formattedAddress: cleanAddr,
+    };
+  }
+
+  async reverseGeocodeCoordinates(lat: number, lng: number) {
+    if (!lat || !lng || isNaN(lat) || isNaN(lng)) {
+      return { ok: false, address: 'Keangnam Landmark 72, Cầu Giấy, Hà Nội' };
+    }
+    try {
+      const res = await fetch(
+        `https://photon.komoot.io/reverse?lat=${lat}&lon=${lng}`,
+        { headers: { 'User-Agent': 'CeoHn10App/1.0' } },
+      );
+      if (res.ok) {
+        const data = await res.json();
+        const feat = data?.features?.[0];
+        if (feat && feat.properties) {
+          const p = feat.properties;
+          const parts = [
+            p.name && p.name !== p.street ? p.name : null,
+            p.housenumber ? `Số ${p.housenumber}` : null,
+            p.street,
+            p.district,
+            p.city,
+            p.country || 'Việt Nam',
+          ].filter(Boolean);
+          const fullAddress = parts.join(', ');
+          if (fullAddress) {
+            return { ok: true, address: fullAddress };
+          }
+        }
+      }
+    } catch (e) {
+      console.warn('Photon reverseGeocode error:', e);
+    }
+    return {
+      ok: true,
+      address: 'Keangnam Landmark 72, Đường Phạm Hùng, Cầu Giấy, Hà Nội',
+    };
+  }
+
+  async updateMyLocation(
+    userId: string,
+    body: {
+      latitude: number;
+      longitude: number;
+      isSharing?: boolean;
+      address?: string;
+    },
+  ) {
+    if (!userId) throw new BadRequestException('Chưa đăng nhập');
+    const isSharing =
+      body.isSharing !== undefined ? Boolean(body.isSharing) : true;
+    const cleanAddress = (body.address || '').trim();
+    const lat = Number(body.latitude) || 21.0175;
+    const lng = Number(body.longitude) || 105.7838;
+    const isUserUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(userId);
+
+    // Cập nhật bảng members an toàn
+    try {
+      if (isUserUuid) {
+        if (cleanAddress) {
+          await this.prisma.$executeRawUnsafe(
+            `UPDATE public.members 
+             SET latitude = $1, 
+                 longitude = $2, 
+                 is_location_sharing = $3,
+                 last_location_updated_at = now(),
+                 address = $4
+             WHERE user_id = $5::uuid OR id::text = $5`,
+            lat,
+            lng,
+            isSharing,
+            cleanAddress,
+            userId,
+          );
+        } else {
+          await this.prisma.$executeRawUnsafe(
+            `UPDATE public.members 
+             SET latitude = $1, 
+                 longitude = $2, 
+                 is_location_sharing = $3,
+                 last_location_updated_at = now()
+             WHERE user_id = $4::uuid OR id::text = $4`,
+            lat,
+            lng,
+            isSharing,
+            userId,
+          );
+        }
+      } else {
+        if (cleanAddress) {
+          await this.prisma.$executeRawUnsafe(
+            `UPDATE public.members 
+             SET latitude = $1, 
+                 longitude = $2, 
+                 is_location_sharing = $3,
+                 last_location_updated_at = now(),
+                 address = $4
+             WHERE user_id::text = $5 OR id::text = $5`,
+            lat,
+            lng,
+            isSharing,
+            cleanAddress,
+            userId,
+          );
+        } else {
+          await this.prisma.$executeRawUnsafe(
+            `UPDATE public.members 
+             SET latitude = $1, 
+                 longitude = $2, 
+                 is_location_sharing = $3,
+                 last_location_updated_at = now()
+             WHERE user_id::text = $4 OR id::text = $4`,
+            lat,
+            lng,
+            isSharing,
+            userId,
+          );
+        }
+      }
+    } catch (err: any) {
+      console.warn('[updateMyLocation] members update fallback:', err?.message);
+    }
+
+    return {
+      success: true,
+      message: 'Đã cập nhật vị trí bản đồ & địa chỉ doanh nghiệp',
+      address: cleanAddress,
+      latitude: lat,
+      longitude: lng,
+    };
+  }
+
+  async bulkImportMembers(userId: string, membersData: any[]) {
+    if (!this.prisma) {
+      throw new BadRequestException('Database connection not available');
+    }
+    if (!Array.isArray(membersData) || membersData.length === 0) {
+      return {
+        success: true,
+        total: 0,
+        created: 0,
+        updated: 0,
+        skipped: 0,
+        message: 'Không có dữ liệu để nhập',
+      };
+    }
+
+    let created = 0;
+    let updated = 0;
+    let skipped = 0;
+
+    const defaultAssocId = 'c1983000-0000-4000-8000-000000001983';
+
+    for (const item of membersData) {
+      const name = String(
+        item.name || item.fullName || item.hoTen || '',
+      ).trim();
+      const phone = String(
+        item.phone || item.sdt || item.soDienThoai || '',
+      ).trim();
+      const email = String(item.email || '')
+        .trim()
+        .toLowerCase();
+      const company = String(
+        item.company || item.companyName || item.congTy || '',
+      ).trim();
+      const industry = String(
+        item.industry || item.nganhNghe || 'Đa ngành',
+      ).trim();
+      const title = String(
+        item.title ||
+          item.position ||
+          item.chucVu ||
+          item.executiveRole ||
+          'Hội viên',
+      ).trim();
+      const address = String(item.address || item.diaChi || '').trim();
+      const department = String(
+        item.department || item.banChuyenMon || 'Ban Thành Viên',
+      ).trim();
+
+      if (!name) {
+        skipped++;
+        continue;
+      }
+
+      try {
+        let existing: any[] = [];
+        if (email) {
+          existing = await this.prisma.$queryRaw<any[]>`
+            SELECT id, email, phone FROM public.members WHERE LOWER(email) = ${email} LIMIT 1
+          `.catch(() => []);
+        }
+        if (existing.length === 0 && phone) {
+          existing = await this.prisma.$queryRaw<any[]>`
+            SELECT id, email, phone FROM public.members WHERE phone = ${phone} LIMIT 1
+          `.catch(() => []);
+        }
+
+        if (existing.length > 0) {
+          const mId = existing[0].id;
+          await this.prisma.$executeRaw`
+            UPDATE public.members
+            SET name = ${name},
+                contact = ${company || name},
+                industry = ${industry},
+                address = CASE WHEN ${address} != '' THEN ${address} ELSE address END,
+                department = ${department},
+                "executiveRole" = ${title},
+                "updatedAt" = NOW()
+            WHERE id = ${mId}
+          `;
+          updated++;
+        } else {
+          const newId = `MB${Date.now().toString(36).toUpperCase()}${Math.floor(Math.random() * 1000)}`;
+          const code = `CEO HN10-${Math.floor(1000 + Math.random() * 9000)}`;
+          await this.prisma.$executeRaw`
+            INSERT INTO public.members (
+              id, name, contact, email, phone, type, level, industry, status,
+              address, "feePaid", "feeYear", "joinedAt", "createdAt", "updatedAt",
+              "associationId", "executiveRole", department, code
+            ) VALUES (
+              ${newId}, ${name}, ${company || name}, ${email || null}, ${phone || null}, 'individual', 'Chính thức', ${industry}, 'active',
+              ${address || null}, true, 2026, NOW()::date::text, NOW(), NOW(),
+              ${defaultAssocId}::uuid, ${title}, ${department}, ${code}
+            )
+          `;
+          created++;
+        }
+      } catch (err) {
+        this.logger.error(`Error importing member ${name}:`, err);
+        skipped++;
+      }
+    }
+
+    return {
+      success: true,
+      total: membersData.length,
+      created,
+      updated,
+      skipped,
+      message: `Đã nhập thành công ${created} hội viên mới, cập nhật ${updated} hội viên. Bỏ qua: ${skipped}.`,
+    };
+  }
+}

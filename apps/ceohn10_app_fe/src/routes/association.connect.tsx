@@ -1,0 +1,1306 @@
+import { useState, useEffect, useMemo } from "react";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import {
+  Handshake,
+  Calendar,
+  Clock,
+  MapPin,
+  Video,
+  Plus,
+  CheckCircle2,
+  XCircle,
+  Phone,
+  MessageSquare,
+  Sparkles,
+  ChevronRight,
+  ExternalLink,
+  Users,
+  Search,
+  Filter,
+  DollarSign,
+  TrendingUp,
+  X,
+  Loader2,
+  Navigation,
+} from "lucide-react";
+import { toast } from "sonner";
+import { fetchNestApi, resolveMediaUrl } from "@/lib/api-client";
+import { useAuth } from "@/context/AuthContext";
+import { MemberHeader } from "@/components/member/MemberShell";
+
+export const Route = createFileRoute("/association/connect")({
+  component: AssociationConnectScreen,
+});
+
+export interface ConnectionMeeting {
+  id: string;
+  title: string;
+  hostName?: string;
+  hostCompany?: string;
+  hostPhone?: string;
+  hostCode?: string;
+  hostAvatar?: string;
+  partnerName: string;
+  partnerCompany?: string;
+  partnerPhone?: string;
+  partnerCode?: string;
+  partnerAvatar?: string;
+  date: string;
+  time: string;
+  venueType?: "online" | "offline";
+  venue?: string;
+  onlineUrl?: string;
+  notes?: string;
+  status: "scheduled" | "completed" | "cancelled" | "pending" | "confirmed" | "declined" | string;
+  createdAt?: string;
+  isUserHost?: boolean;
+  isUserInvitee?: boolean;
+  dealValue?: number;
+  dealTitle?: string;
+}
+
+export function AssociationConnectScreen() {
+  const navigate = useNavigate();
+  const { user } = useAuth();
+
+  const [activeTab, setActiveTab] = useState<"my_meetings" | "sent_meetings" | "cancelled">("my_meetings");
+  const [loading, setLoading] = useState(false);
+  const [meetings, setMeetings] = useState<ConnectionMeeting[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  // Modals state
+  const [createModalOpen, setCreateModalOpen] = useState(false);
+  const [dealModalMeeting, setDealModalMeeting] = useState<ConnectionMeeting | null>(null);
+  const [videoCallMeeting, setVideoCallMeeting] = useState<ConnectionMeeting | null>(null);
+  const [acceptedSuccessMeeting, setAcceptedSuccessMeeting] = useState<ConnectionMeeting | null>(null);
+
+  // Cancel Appointment Modal State
+  const [cancellingMeeting, setCancellingMeeting] = useState<ConnectionMeeting | null>(null);
+  const [cancelReasonText, setCancelReasonText] = useState("");
+  const [submittingCancel, setSubmittingCancel] = useState(false);
+
+  // New Meeting Form State
+  const [formPartnerName, setFormPartnerName] = useState("");
+  const [formPartnerCompany, setFormPartnerCompany] = useState("");
+  const [formPartnerPhone, setFormPartnerPhone] = useState("");
+  const [formDate, setFormDate] = useState(() => new Date().toISOString().slice(0, 10));
+  const [formTime, setFormTime] = useState("09:30");
+  const [formVenueType, setFormVenueType] = useState<"online" | "offline">("online");
+  const [formVenue, setFormVenue] = useState("");
+  const [formNotes, setFormNotes] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+
+  // Prefill from Deal URL params (Case 3 & 4)
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const sp = new URLSearchParams(window.location.search);
+      const pName = sp.get("partnerName");
+      const pComp = sp.get("partnerCompany");
+      const notes = sp.get("notes");
+      if (pName) {
+        setFormPartnerName(pName);
+        if (pComp) setFormPartnerCompany(pComp);
+        if (notes) setFormNotes(notes);
+        setCreateModalOpen(true);
+      }
+    }
+  }, []);
+
+  // Deal Form State
+  const [dealValueInput, setDealValueInput] = useState("");
+  const [dealTitleInput, setDealTitleInput] = useState("");
+  const [dealNotesInput, setDealNotesInput] = useState("");
+  const [savingDeal, setSavingDeal] = useState(false);
+
+  const fetchMeetings = async () => {
+    setLoading(true);
+    try {
+      const res = await fetchNestApi<any>("/meetings/connection-appointments").catch(() => null);
+      const list = Array.isArray(res) ? res : res?.items || [];
+      setMeetings(list);
+    } catch {
+      /* ignore */
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchMeetings();
+  }, []);
+
+  const handleRespond = async (meetingId: string, action: "accept" | "decline") => {
+    try {
+      await fetchNestApi(`/meetings/connection-appointments/${meetingId}/respond`, {
+        method: "POST",
+        body: JSON.stringify({ action }),
+      }).catch(() => null);
+
+      const found = meetings.find((m) => m.id === meetingId);
+      const targetMeeting: ConnectionMeeting | null = found
+        ? { ...found, status: action === "accept" ? "confirmed" : "declined" }
+        : null;
+
+      setMeetings((prev) =>
+        prev.map((m) => {
+          if (m.id === meetingId) {
+            return targetMeeting || { ...m, status: action === "accept" ? "confirmed" : "declined" };
+          }
+          return m;
+        }),
+      );
+
+      // Cập nhật localStorage vba_connection_appointments để các tab, Lịch và Màn sự kiện đồng bộ tức thì
+      try {
+        const stored = localStorage.getItem("vba_connection_appointments");
+        let list = stored ? JSON.parse(stored) : [];
+        if (!Array.isArray(list)) list = [];
+        const idx = list.findIndex((x: any) => x.id === meetingId);
+        if (idx >= 0) {
+          list[idx].status = action === "accept" ? "confirmed" : "declined";
+          if (targetMeeting) {
+            list[idx] = { ...(list[idx] as object), ...(targetMeeting as object), status: action === "accept" ? "confirmed" : "declined" };
+          }
+        } else if (targetMeeting) {
+          list.unshift(targetMeeting);
+        }
+        localStorage.setItem("vba_connection_appointments", JSON.stringify(list));
+      } catch {}
+
+      // Bắn event đồng bộ tức thì sang Lịch trình và Màn Sự kiện & Hoạt động
+      window.dispatchEvent(new Event("vba.connection.changed"));
+      window.dispatchEvent(new Event("vba.meeting.changed"));
+      window.dispatchEvent(new Event("vba.calendar.changed"));
+
+      if (action === "accept") {
+        if (targetMeeting) {
+          setAcceptedSuccessMeeting(targetMeeting);
+        }
+        toast.success("Đã đồng ý cuộc hẹn kết nối B2B thành công! Lịch hẹn đã được lưu vào Lịch trình & Hoạt động.");
+      } else {
+        toast.info("Đã từ chối cuộc hẹn.");
+      }
+    } catch {
+      toast.error("Không thể xử lý phản hồi cuộc hẹn.");
+    }
+  };
+
+  const handleOpenCancelModal = (meeting: ConnectionMeeting) => {
+    setCancellingMeeting(meeting);
+    setCancelReasonText("");
+  };
+
+  const handleConfirmCancelMeeting = async () => {
+    if (!cancellingMeeting) return;
+    const reason = cancelReasonText.trim() || "Hội viên bận công tác đột xuất";
+    setSubmittingCancel(true);
+    try {
+      await fetchNestApi(`/meetings/connection-appointments/${cancellingMeeting.id}/cancel`, {
+        method: "POST",
+        body: JSON.stringify({ reason }),
+      }).catch(() => null);
+
+      setMeetings((prev) =>
+        prev.map((m) =>
+          m.id === cancellingMeeting.id ? { ...m, status: "cancelled", cancelReason: reason } : m,
+        ),
+      );
+
+      // Cập nhật localStorage vba_connection_appointments để các tab và Lịch trình đồng bộ tức thì
+      try {
+        const stored = localStorage.getItem("vba_connection_appointments");
+        if (stored) {
+          const list = JSON.parse(stored);
+          const updated = list.map((item: any) =>
+            item.id === cancellingMeeting.id
+              ? { ...item, status: "cancelled", cancelReason: reason }
+              : item,
+          );
+          localStorage.setItem("vba_connection_appointments", JSON.stringify(updated));
+        }
+      } catch {}
+
+      window.dispatchEvent(new Event("vba.connection.changed"));
+      window.dispatchEvent(new Event("vba.meeting.changed"));
+      toast.info("Đã hủy lịch hẹn kết nối thành công.");
+      setCancellingMeeting(null);
+      setCancelReasonText("");
+    } catch {
+      toast.error("Không thể hủy lịch hẹn.");
+    } finally {
+      setSubmittingCancel(false);
+    }
+  };
+
+  const handleCreateMeeting = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!formPartnerName.trim()) {
+      toast.error("Vui lòng nhập tên đối tác CEO muốn gặp");
+      return;
+    }
+    setSubmitting(true);
+    try {
+      const generatedOnlineUrl =
+        formVenueType === "online"
+          ? `https://meet.jit.si/CEOHN10_B2B_${Date.now()}`
+          : undefined;
+
+      const newAppointment: ConnectionMeeting = {
+        id: `meet-${Date.now()}`,
+        title: formNotes ? formNotes.slice(0, 40) : `Lịch gặp gỡ kết nối với ${formPartnerName}`,
+        partnerName: formPartnerName,
+        partnerCompany: formPartnerCompany || "Doanh nghiệp CLB",
+        partnerPhone: formPartnerPhone,
+        date: formDate,
+        time: formTime,
+        venueType: formVenueType,
+        venue: formVenueType === "offline" ? formVenue || "Văn phòng đối tác" : "Phòng họp trực tuyến Jitsi",
+        onlineUrl: generatedOnlineUrl,
+        notes: formNotes,
+        status: "pending", // CHỈ SET UP THÀNH CÔNG KHI ĐỐI PHƯƠNG BẤM ĐỒNG Ý
+        isUserHost: true,
+        createdAt: new Date().toISOString(),
+      };
+
+      await fetchNestApi("/meetings/connection-appointments", {
+        method: "POST",
+        body: JSON.stringify(newAppointment),
+      }).catch(() => null);
+
+      setMeetings((prev) => [newAppointment, ...prev]);
+
+      // Lưu vào localStorage vba_connection_appointments
+      try {
+        const stored = localStorage.getItem("vba_connection_appointments");
+        let list = stored ? JSON.parse(stored) : [];
+        if (!Array.isArray(list)) list = [];
+        list.unshift(newAppointment);
+        localStorage.setItem("vba_connection_appointments", JSON.stringify(list));
+      } catch {}
+
+      window.dispatchEvent(new Event("vba.connection.changed"));
+      window.dispatchEvent(new Event("vba.meeting.changed"));
+
+      toast.success("Đã gửi lời mời gặp gỡ kết nối B2B! Cuộc hẹn sẽ được lên lịch chính thức khi đối tác bấm đồng ý.");
+      setCreateModalOpen(false);
+      // Reset form
+      setFormPartnerName("");
+      setFormPartnerCompany("");
+      setFormPartnerPhone("");
+      setFormVenue("");
+      setFormNotes("");
+    } catch {
+      toast.error("Không thể lưu lịch hẹn.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleSaveDeal = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!dealModalMeeting) return;
+    setSavingDeal(true);
+    try {
+      const valNumber = Number(dealValueInput) || 0;
+      await fetchNestApi("/opportunities", {
+        method: "POST",
+        body: JSON.stringify({
+          title: `[Chốt Deal 1-1] ${dealTitleInput}`,
+          budgetMax: valNumber,
+          budgetMin: valNumber,
+          status: "won",
+          type: "deal_won",
+          description: dealNotesInput,
+          partnerName: dealModalMeeting.partnerName,
+        }),
+      }).catch(() => null);
+
+      setMeetings((prev) =>
+        prev.map((m) =>
+          m.id === dealModalMeeting.id
+            ? { ...m, status: "completed", dealValue: valNumber, dealTitle: dealTitleInput }
+            : m,
+        ),
+      );
+
+      toast.success(`Đã ghi nhận Deal thành công trị giá ${(valNumber / 1000000).toLocaleString()} triệu VNĐ!`);
+      setDealModalMeeting(null);
+    } catch {
+      toast.error("Không thể ghi nhận deal.");
+    } finally {
+      setSavingDeal(false);
+    }
+  };
+
+  const myMeetingsList = useMemo(() => {
+    return meetings.filter(
+      (m) =>
+        m.status !== "cancelled" &&
+        m.status !== "declined" &&
+        (m.status === "confirmed" ||
+          m.status === "scheduled" ||
+          m.status === "accepted" ||
+          (!m.isUserHost && m.status === "pending")),
+    );
+  }, [meetings]);
+
+  const sentMeetingsList = useMemo(() => {
+    return meetings.filter(
+      (m) =>
+        m.status !== "cancelled" &&
+        (m.isUserHost ||
+          (m.status === "pending" && !m.isUserInvitee) ||
+          m.status === "draft"),
+    );
+  }, [meetings]);
+
+  const cancelledMeetingsList = useMemo(() => {
+    return meetings.filter(
+      (m) =>
+        m.status === "cancelled" ||
+        m.status === "declined",
+    );
+  }, [meetings]);
+
+  const filteredCurrentList = useMemo(() => {
+    let list =
+      activeTab === "my_meetings"
+        ? myMeetingsList
+        : activeTab === "sent_meetings"
+        ? sentMeetingsList
+        : cancelledMeetingsList;
+
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      list = list.filter(
+        (m) =>
+          (m.partnerName && m.partnerName.toLowerCase().includes(q)) ||
+          (m.partnerCompany && m.partnerCompany.toLowerCase().includes(q)) ||
+          (m.title && m.title.toLowerCase().includes(q)),
+      );
+    }
+    return list;
+  }, [activeTab, myMeetingsList, sentMeetingsList, cancelledMeetingsList, searchQuery]);
+
+  return (
+    <div className="vba-animate pb-6 min-h-screen bg-stone-50 dark:bg-slate-950 font-sans">
+      <MemberHeader title="Gặp Gỡ &amp; Kết Nối B2B" back />
+
+      {/* Top Banner & Quick KPI */}
+      <div className="px-4 pt-3 space-y-3 max-w-2xl mx-auto">
+        <div className="p-4 rounded-3xl bg-gradient-to-r from-[#003B95] via-[#002766] to-[#001433] text-white shadow-xl border border-amber-400/40 flex items-center justify-between">
+          <div>
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-400/20 text-amber-300 text-[10.5px] font-bold border border-amber-400/30 mb-1">
+              <Sparkles className="size-3.5 text-amber-400" />
+              <span>Giao Thương 1-on-1 Nội Khối</span>
+            </div>
+            <h2 className="text-base font-black">Đặt Lịch &amp; Ghi Nhận Deal B2B</h2>
+            <p className="text-xs text-slate-300 mt-0.5">
+              Kết nối trực tiếp giữa các nhà lãnh đạo doanh nghiệp CEO HN10
+            </p>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => setCreateModalOpen(true)}
+            className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white text-xs font-black inline-flex items-center gap-1.5 shadow-md active:scale-95 transition cursor-pointer shrink-0"
+          >
+            <Plus className="size-4" />
+            <span>Hẹn gặp 1-1</span>
+          </button>
+        </div>
+
+        {/* 3 Metric Cards */}
+        <div className="grid grid-cols-3 gap-2 text-center">
+          <div className="p-3 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs">
+            <span className="text-[10px] font-bold text-slate-400 uppercase">Cuộc gặp của tôi</span>
+            <div className="text-base font-black text-[#003B95] dark:text-blue-400 mt-0.5">
+              {myMeetingsList.length}
+            </div>
+          </div>
+          <div className="p-3 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs">
+            <span className="text-[10px] font-bold text-slate-400 uppercase">Cuộc gặp đã gửi</span>
+            <div className="text-base font-black text-amber-600 mt-0.5">
+              {sentMeetingsList.length}
+            </div>
+          </div>
+          <div className="p-3 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs">
+            <span className="text-[10px] font-bold text-slate-400 uppercase">Cuộc gặp đã hủy</span>
+            <div className="text-base font-black text-rose-600 mt-0.5">
+              {cancelledMeetingsList.length}
+            </div>
+          </div>
+        </div>
+
+        {/* Search bar */}
+        <div className="relative">
+          <Search className="size-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+          <input
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Tìm theo tên đối tác, doanh nghiệp, nội dung gặp..."
+            className="w-full pl-8 pr-3 py-2 text-xs rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 outline-none focus:border-[#003B95] text-slate-800 dark:text-slate-100 shadow-2xs"
+          />
+        </div>
+
+        {/* 3 Danh Mục Chuẩn Case 3: Cuộc gặp của tôi | Cuộc gặp đã gửi | Lịch sử cuộc gặp */}
+        <div className="p-1 bg-slate-200/80 dark:bg-slate-800/80 rounded-2xl flex items-center gap-1 shadow-inner">
+          <button
+            type="button"
+            onClick={() => setActiveTab("my_meetings")}
+            className={`flex-1 py-2 px-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+              activeTab === "my_meetings"
+                ? "bg-[#003B95] text-white shadow-md shadow-blue-900/20"
+                : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+            }`}
+          >
+            <Calendar className="size-3.5" />
+            <span>Cuộc gặp của tôi ({myMeetingsList.length})</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveTab("sent_meetings")}
+            className={`flex-1 py-2 px-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+              activeTab === "sent_meetings"
+                ? "bg-amber-500 text-white shadow-md shadow-amber-900/20"
+                : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+            }`}
+          >
+            <Users className="size-3.5" />
+            <span>Cuộc gặp đã gửi ({sentMeetingsList.length})</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveTab("cancelled")}
+            className={`flex-1 py-2 px-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+              activeTab === "cancelled"
+                ? "bg-rose-600 text-white shadow-md shadow-rose-900/20"
+                : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+            }`}
+          >
+            <Clock className="size-3.5" />
+            <span>Cuộc gặp đã hủy ({cancelledMeetingsList.length})</span>
+          </button>
+        </div>
+
+        {/* Meeting Cards List */}
+        <div className="space-y-3 pt-1">
+          {loading ? (
+            <div className="py-12 flex flex-col items-center justify-center gap-2 text-slate-400">
+              <Loader2 className="size-6 animate-spin text-[#003B95]" />
+              <span className="text-xs">Đang tải danh sách gặp gỡ...</span>
+            </div>
+          ) : filteredCurrentList.length === 0 ? (
+            <div className="p-8 text-center bg-white dark:bg-slate-900 rounded-3xl border border-dashed border-slate-200 dark:border-slate-800 text-xs text-slate-400 space-y-2">
+              <Handshake className="size-8 mx-auto text-slate-300 dark:text-slate-600" />
+              <p>Chưa có cuộc hẹn kết nối nào trong danh mục này.</p>
+              <button
+                type="button"
+                onClick={() => setCreateModalOpen(true)}
+                className="px-4 py-2 rounded-xl bg-[#003B95] text-white font-bold text-xs inline-flex items-center gap-1.5 shadow-xs"
+              >
+                <Plus className="size-3.5" />
+                <span>Thiết lập cuộc hẹn đầu tiên</span>
+              </button>
+            </div>
+          ) : (
+            filteredCurrentList.map((m) => (
+              <div
+                key={m.id}
+                className="p-4 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col gap-3 hover:border-amber-400 transition"
+              >
+                {/* Header: Partner Info & Status */}
+                <div className="flex items-start justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="size-12 rounded-2xl bg-[#003B95] text-amber-300 font-black flex items-center justify-center text-sm shadow-xs shrink-0 ring-1 ring-amber-400/40">
+                      {m.partnerAvatar ? (
+                        <img
+                          src={resolveMediaUrl(m.partnerAvatar) || m.partnerAvatar}
+                          alt={m.partnerName}
+                          className="size-full object-cover rounded-2xl"
+                        />
+                      ) : (
+                        (m.partnerName || "CEO")[0]
+                      )}
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-extrabold text-slate-900 dark:text-white">
+                        {m.partnerName}
+                      </h4>
+                      <p className="text-xs text-slate-500 dark:text-slate-400">
+                        {m.partnerCompany || "Doanh nghiệp CEO HN10"}
+                      </p>
+                    </div>
+                  </div>
+
+                  <span
+                    className={`px-2.5 py-0.5 rounded-full text-[10.5px] font-bold ${
+                      m.status === "completed"
+                        ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-300"
+                        : m.status === "confirmed"
+                        ? "bg-blue-50 text-[#003B95] dark:bg-blue-950/60 dark:text-blue-300 border border-blue-200"
+                        : "bg-amber-50 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-300"
+                    }`}
+                  >
+                    {m.status === "completed"
+                      ? "✓ Đã hoàn thành"
+                      : m.status === "confirmed"
+                      ? "Đã xác nhận"
+                      : "Chờ phản hồi"}
+                  </span>
+                </div>
+
+                {/* Meeting Title & Notes */}
+                <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 text-xs space-y-1.5">
+                  <div className="font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
+                    <Handshake className="size-3.5 text-amber-500" />
+                    <span>{m.title}</span>
+                  </div>
+                  {m.notes && <p className="text-[11px] text-slate-500 dark:text-slate-400">{m.notes}</p>}
+
+                  {/* Time & Venue */}
+                  <div className="flex flex-wrap items-center gap-3 pt-1 text-[11px] text-slate-600 dark:text-slate-300 font-semibold border-t border-slate-200/60 dark:border-slate-700">
+                    <span className="flex items-center gap-1">
+                      <Calendar className="size-3 text-[#003B95] dark:text-blue-400" />
+                      <span>{m.date}</span>
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <Clock className="size-3 text-amber-500" />
+                      <span>{m.time}</span>
+                    </span>
+                    <span className="flex items-center gap-1">
+                      {m.venueType === "online" ? (
+                        <>
+                          <Video className="size-3 text-emerald-600" />
+                          <span>Họp Online Jitsi</span>
+                        </>
+                      ) : (
+                        <>
+                          <MapPin className="size-3 text-emerald-600" />
+                          <span className="truncate max-w-[160px]">{m.venue || "Hà Nội"}</span>
+                        </>
+                      )}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Action Buttons for Confirmed / Active Meeting in My Meetings */}
+                {activeTab === "my_meetings" && m.status === "confirmed" && (
+                  <div className="flex flex-wrap items-center gap-2 pt-1">
+                    {/* Call Online Video Call Button */}
+                    {m.venueType === "online" && (
+                      <button
+                        type="button"
+                        onClick={() => setVideoCallMeeting(m)}
+                        className="py-2 px-3 rounded-xl bg-[#003B95] hover:bg-[#002f77] text-white text-xs font-bold inline-flex items-center gap-1.5 shadow-xs transition cursor-pointer"
+                      >
+                        <Video className="size-3.5 text-amber-300" />
+                        <span>Vào phòng họp</span>
+                      </button>
+                    )}
+
+                    {/* Offline Map Navigation Link */}
+                    {m.venueType === "offline" && m.venue && (
+                      <a
+                        href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(m.venue)}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold inline-flex items-center gap-1.5 shadow-xs transition"
+                      >
+                        <Navigation className="size-3.5" />
+                        <span>Chỉ đường</span>
+                      </a>
+                    )}
+
+                    {/* Hotline Phone call */}
+                    {m.partnerPhone && (
+                      <a
+                        href={`tel:${m.partnerPhone}`}
+                        className="py-2 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-200 text-xs font-bold inline-flex items-center gap-1 transition"
+                      >
+                        <Phone className="size-3.5" />
+                        <span>Gọi điện</span>
+                      </a>
+                    )}
+
+                    {/* Log Won Deal Button */}
+                    <button
+                      type="button"
+                      onClick={() => setDealModalMeeting(m)}
+                      className="py-2 px-3 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white text-xs font-bold inline-flex items-center gap-1 shadow-xs transition cursor-pointer"
+                    >
+                      <DollarSign className="size-3.5" />
+                      <span>Ghi nhận Deal</span>
+                    </button>
+
+                    {/* Nút Hủy Hẹn khi đã lên lịch giữa 2 tài khoản */}
+                    <button
+                      type="button"
+                      onClick={() => handleOpenCancelModal(m)}
+                      className="py-2 px-3 rounded-xl border border-rose-200 dark:border-rose-900/60 bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/60 text-rose-600 dark:text-rose-400 text-xs font-bold inline-flex items-center gap-1 transition cursor-pointer"
+                    >
+                      <XCircle className="size-3.5" />
+                      <span>Hủy hẹn</span>
+                    </button>
+                  </div>
+                )}
+
+                {/* Action Buttons for Incoming Invitation in My Meetings */}
+                {activeTab === "my_meetings" && m.status === "pending" && (
+                  <div className="flex items-center gap-2 pt-1">
+                    <button
+                      type="button"
+                      onClick={() => handleRespond(m.id, "accept")}
+                      className="flex-1 py-2 px-3 rounded-xl bg-[#003B95] hover:bg-[#002f77] text-white text-xs font-bold shadow-xs transition cursor-pointer flex items-center justify-center gap-1.5"
+                    >
+                      <CheckCircle2 className="size-3.5 text-emerald-400" />
+                      <span>Đồng ý lịch hẹn</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleOpenCancelModal(m)}
+                      className="py-2 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-bold transition cursor-pointer"
+                    >
+                      Từ chối / Hủy
+                    </button>
+                  </div>
+                )}
+
+                {/* Notice for Cancelled Meeting */}
+                {activeTab === "cancelled" && (
+                  <div className="pt-2 text-[11px] text-rose-600 dark:text-rose-400 font-semibold space-y-1 border-t border-rose-100 dark:border-rose-950">
+                    <div className="flex items-center gap-1.5">
+                      <XCircle className="size-3.5 shrink-0" />
+                      <span>{m.status === "declined" ? "Lời mời đã bị từ chối" : "Cuộc gặp đã bị hủy"}</span>
+                    </div>
+                    {((m as any).cancelReason || (m as any).cancel_reason) && (
+                      <p className="text-slate-600 dark:text-slate-300 text-[11px] pl-5 font-normal">
+                        Lý do: <span className="italic font-medium">{(m as any).cancelReason || (m as any).cancel_reason}</span>
+                      </p>
+                    )}
+                  </div>
+                )}
+
+                {/* Action Buttons for Sent Invitation */}
+                {activeTab === "sent_meetings" && m.status === "pending" && (
+                  <div className="flex items-center justify-between pt-1 text-xs">
+                    <span className="text-slate-400">Đang đợi đối tác CEO phản hồi</span>
+                    <button
+                      type="button"
+                      onClick={() => handleOpenCancelModal(m)}
+                      className="px-3 py-1.5 rounded-xl border border-rose-200 dark:border-rose-900/60 bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/60 text-rose-600 dark:text-rose-400 font-bold transition cursor-pointer inline-flex items-center gap-1"
+                    >
+                      <XCircle className="size-3" />
+                      <span>Hủy lời mời</span>
+                    </button>
+                  </div>
+                )}
+              </div>
+            ))
+          )}
+        </div>
+      </div>
+
+      {/* ── CREATE 1-ON-1 MEETING MODAL ── */}
+      {createModalOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-xs animate-in fade-in duration-200"
+          onClick={() => setCreateModalOpen(false)}
+        >
+          <div
+            className="w-full max-w-md bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border-2 border-amber-400 p-5 space-y-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+              <div className="flex items-center gap-2">
+                <span className="p-2 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-600">
+                  <Handshake className="size-5" />
+                </span>
+                <div>
+                  <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase">
+                    Đặt Lịch Hẹn Gặp 1-on-1
+                  </h3>
+                  <p className="text-[11px] text-slate-400">Kết nối B2B với hội viên CEO HN10</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setCreateModalOpen(false)}
+                className="p-1 rounded-full text-slate-400 hover:text-slate-600 dark:hover:text-white"
+              >
+                <X className="size-4" />
+              </button>
+            </div>
+
+            <form onSubmit={handleCreateMeeting} className="space-y-3 text-xs">
+              <div>
+                <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                  Tên Hội Viên / Đối Tác CEO *
+                </label>
+                <input
+                  required
+                  value={formPartnerName}
+                  onChange={(e) => setFormPartnerName(e.target.value)}
+                  placeholder="Ví dụ: Nguyễn Văn Tuấn"
+                  className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white outline-none focus:border-[#003B95]"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                    Doanh nghiệp
+                  </label>
+                  <input
+                    value={formPartnerCompany}
+                    onChange={(e) => setFormPartnerCompany(e.target.value)}
+                    placeholder="Tên công ty đối tác"
+                    className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white outline-none focus:border-[#003B95]"
+                  />
+                </div>
+                <div>
+                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                    Số điện thoại
+                  </label>
+                  <input
+                    value={formPartnerPhone}
+                    onChange={(e) => setFormPartnerPhone(e.target.value)}
+                    placeholder="0901..."
+                    className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white outline-none focus:border-[#003B95]"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                    Ngày gặp *
+                  </label>
+                  <input
+                    type="date"
+                    required
+                    value={formDate}
+                    onChange={(e) => setFormDate(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                    Giờ gặp *
+                  </label>
+                  <input
+                    type="time"
+                    required
+                    value={formTime}
+                    onChange={(e) => setFormTime(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white outline-none"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                  Hình thức gặp gỡ
+                </label>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setFormVenueType("online")}
+                    className={`py-2 px-3 rounded-xl font-bold flex items-center justify-center gap-1.5 border transition cursor-pointer ${
+                      formVenueType === "online"
+                        ? "bg-[#003B95] text-white border-[#003B95]"
+                        : "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-transparent"
+                    }`}
+                  >
+                    <Video className="size-3.5 text-amber-300" />
+                    <span>Online (Jitsi Call)</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setFormVenueType("offline")}
+                    className={`py-2 px-3 rounded-xl font-bold flex items-center justify-center gap-1.5 border transition cursor-pointer ${
+                      formVenueType === "offline"
+                        ? "bg-[#003B95] text-white border-[#003B95]"
+                        : "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-transparent"
+                    }`}
+                  >
+                    <MapPin className="size-3.5 text-emerald-400" />
+                    <span>Offline (Cafe/VP)</span>
+                  </button>
+                </div>
+              </div>
+
+              {formVenueType === "offline" && (
+                <div>
+                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                    Địa điểm cụ thể
+                  </label>
+                  <input
+                    value={formVenue}
+                    onChange={(e) => setFormVenue(e.target.value)}
+                    placeholder="Ví dụ: Highlands Coffee Keangnam, Hà Nội"
+                    className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white outline-none"
+                  />
+                </div>
+              )}
+
+              <div>
+                <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                  Mục tiêu trao đổi &amp; Ghi chú
+                </label>
+                <textarea
+                  rows={2}
+                  value={formNotes}
+                  onChange={(e) => setFormNotes(e.target.value)}
+                  placeholder="Ví dụ: Bàn về hợp tác liên danh dự thầu gói thầu xây dựng..."
+                  className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white outline-none"
+                />
+              </div>
+
+              {/* Action Buttons (Strictly No Red) */}
+              <div className="flex items-center gap-2 pt-2 border-t border-slate-100 dark:border-slate-800">
+                <button
+                  type="button"
+                  onClick={() => setCreateModalOpen(false)}
+                  className="py-2.5 px-4 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold"
+                >
+                  Hủy bỏ
+                </button>
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  className="flex-1 py-2.5 px-4 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold inline-flex items-center justify-center gap-1.5 shadow-md active:scale-95 transition cursor-pointer"
+                >
+                  {submitting && <Loader2 className="size-3.5 animate-spin" />}
+                  <span>Xác nhận đặt lịch hẹn</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ── LOG WON DEAL MODAL ── */}
+      {dealModalMeeting && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4 backdrop-blur-xs animate-in fade-in duration-200"
+          onClick={() => setDealModalMeeting(null)}
+        >
+          <div
+            className="w-full max-w-md bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border-2 border-amber-400 p-5 space-y-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+              <div className="flex items-center gap-2">
+                <span className="p-2 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600">
+                  <DollarSign className="size-5" />
+                </span>
+                <div>
+                  <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase">
+                    Ghi Nhận Deal B2B Thành Công
+                  </h3>
+                  <p className="text-[11px] text-slate-400">
+                    Đối tác: {dealModalMeeting.partnerName} ({dealModalMeeting.partnerCompany})
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setDealModalMeeting(null)}
+                className="p-1 rounded-full text-slate-400 hover:text-slate-600 dark:hover:text-white"
+              >
+                <X className="size-4" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveDeal} className="space-y-3 text-xs">
+              <div>
+                <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                  Giá Trị Deal Đạt Được (VNĐ) *
+                </label>
+                <input
+                  required
+                  type="number"
+                  placeholder="500000000"
+                  value={dealValueInput}
+                  onChange={(e) => setDealValueInput(e.target.value)}
+                  className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-mono font-bold text-base outline-none focus:border-emerald-500"
+                />
+                <span className="text-[10.5px] text-emerald-600 font-bold mt-0.5 block">
+                  Quy đổi: {dealValueInput && Number(dealValueInput) > 0 ? (Number(dealValueInput) / 1000000).toLocaleString() + " Triệu VNĐ" : "0 VNĐ"}
+                </span>
+              </div>
+
+              <div>
+                <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                  Tiêu Đề Deal Hợp Tác *
+                </label>
+                <input
+                  required
+                  placeholder="Ví dụ: Hợp tác cung ứng nội khối CEO HN10"
+                  value={dealTitleInput}
+                  onChange={(e) => setDealTitleInput(e.target.value)}
+                  className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                  Chi Tiết Thỏa Thuận &amp; Hợp Đồng
+                </label>
+                <textarea
+                  rows={3}
+                  placeholder="Ví dụ: Hợp đồng nguyên tắc đã được hai bên ký kết sau buổi gặp 1-1"
+                  value={dealNotesInput}
+                  onChange={(e) => setDealNotesInput(e.target.value)}
+                  className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white outline-none"
+                />
+              </div>
+
+              {/* Action Buttons (Strictly No Red) */}
+              <div className="flex items-center gap-2 pt-2 border-t border-slate-100 dark:border-slate-800">
+                <button
+                  type="button"
+                  onClick={() => setDealModalMeeting(null)}
+                  className="py-2.5 px-4 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold"
+                >
+                  Đóng
+                </button>
+                <button
+                  type="submit"
+                  disabled={savingDeal}
+                  className="flex-1 py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold inline-flex items-center justify-center gap-1.5 shadow-md active:scale-95 transition cursor-pointer"
+                >
+                  {savingDeal && <Loader2 className="size-3.5 animate-spin" />}
+                  <span>Xác nhận &amp; Cập nhật doanh số CLB</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ── JITSI MEET VIDEO CALL MODAL ── */}
+      {videoCallMeeting && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-2 sm:p-4 backdrop-blur-md animate-in fade-in duration-200">
+          <div className="w-full max-w-4xl h-[90vh] bg-slate-950 rounded-3xl overflow-hidden border-2 border-amber-400 flex flex-col shadow-2xl">
+            {/* Call Header */}
+            <div className="px-4 py-3 bg-[#003B95] text-white flex items-center justify-between border-b border-amber-400/40">
+              <div className="flex items-center gap-2">
+                <span className="size-3 rounded-full bg-emerald-500 animate-ping" />
+                <h3 className="text-sm font-black truncate">
+                  Phòng Họp 1-on-1: {videoCallMeeting.partnerName} &amp; Tôi
+                </h3>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setVideoCallMeeting(null)}
+                className="px-3 py-1 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-white transition cursor-pointer"
+              >
+                Rời phòng họp
+              </button>
+            </div>
+
+            {/* Embedded Jitsi Iframe */}
+            <iframe
+              src={videoCallMeeting.onlineUrl || `https://meet.jit.si/CEOHN10_B2B_${videoCallMeeting.id}`}
+              allow="camera; microphone; fullscreen; display-capture; autoplay"
+              className="w-full flex-1 border-0"
+              title="Jitsi Video Meeting"
+            />
+          </div>
+        </div>
+      )}
+
+      {/* ── MODAL HỦY LỊCH HẸN KẾT NỐI B2B CÓ TRƯỜNG LÝ DO HỦY ── */}
+      {cancellingMeeting && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4 backdrop-blur-xs animate-in fade-in duration-200"
+          onClick={() => !submittingCancel && setCancellingMeeting(null)}
+        >
+          <div
+            className="w-full max-w-sm bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-rose-200 dark:border-rose-900/50 p-5 space-y-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+              <div className="flex items-center gap-2">
+                <span className="p-2 rounded-xl bg-rose-50 dark:bg-rose-950/60 text-rose-600">
+                  <XCircle className="size-5" />
+                </span>
+                <div>
+                  <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase">
+                    Hủy Lịch Hẹn Kết Nối B2B
+                  </h3>
+                  <p className="text-[11px] text-slate-400">Thông báo kèm lý do sẽ gửi tới đối tác</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                disabled={submittingCancel}
+                onClick={() => setCancellingMeeting(null)}
+                className="p-1 rounded-full text-slate-400 hover:text-slate-600 dark:hover:text-white cursor-pointer"
+              >
+                <X className="size-5" />
+              </button>
+            </div>
+
+            <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 text-xs space-y-1">
+              <div className="font-bold text-slate-900 dark:text-white line-clamp-1">
+                {cancellingMeeting.title}
+              </div>
+              <div className="text-[11px] text-slate-500 dark:text-slate-400">
+                Đối tác: <strong className="text-slate-700 dark:text-slate-200">{cancellingMeeting.partnerName}</strong>
+                {cancellingMeeting.partnerCompany ? ` (${cancellingMeeting.partnerCompany})` : ""}
+              </div>
+              <div className="text-[11px] text-slate-500 dark:text-slate-400 flex items-center gap-2">
+                <span>Ngày: {cancellingMeeting.date}</span>
+                <span>•</span>
+                <span>Giờ: {cancellingMeeting.time}</span>
+              </div>
+            </div>
+
+            <div>
+              <label className="text-[11.5px] font-bold text-slate-700 dark:text-slate-300 block mb-1.5">
+                Lý do hủy lịch hẹn <span className="text-rose-500">*</span>
+              </label>
+              <textarea
+                value={cancelReasonText}
+                onChange={(e) => setCancelReasonText(e.target.value)}
+                placeholder="Nhập chi tiết lý do hủy cuộc hẹn để đối tác nắm được..."
+                rows={3}
+                className="w-full p-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs text-slate-900 dark:text-white focus:outline-hidden focus:border-rose-500"
+              />
+
+              {/* Gợi ý lý do nhanh (One-tap chips) */}
+              <div className="flex flex-wrap gap-1.5 mt-2">
+                {[
+                  "Bận công tác đột xuất",
+                  "Trùng lịch họp đối tác",
+                  "Thay đổi kế hoạch",
+                  "Hẹn lại vào dịp khác",
+                ].map((chip) => (
+                  <button
+                    key={chip}
+                    type="button"
+                    onClick={() => setCancelReasonText(chip)}
+                    className={`px-2.5 py-1 rounded-full text-[10.5px] font-semibold transition cursor-pointer border ${
+                      cancelReasonText === chip
+                        ? "bg-rose-500 text-white border-rose-500"
+                        : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-slate-300"
+                    }`}
+                  >
+                    {chip}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2 pt-2 border-t border-slate-100 dark:border-slate-800">
+              <button
+                type="button"
+                disabled={submittingCancel}
+                onClick={() => setCancellingMeeting(null)}
+                className="flex-1 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-xs font-bold hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+              >
+                Giữ lịch hẹn
+              </button>
+              <button
+                type="button"
+                disabled={submittingCancel}
+                onClick={handleConfirmCancelMeeting}
+                className="flex-1 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer shadow-xs disabled:opacity-50"
+              >
+                {submittingCancel ? (
+                  <Loader2 className="size-4 animate-spin" />
+                ) : (
+                  <XCircle className="size-4" />
+                )}
+                <span>Xác nhận hủy</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── MODAL HIỆN THÔNG TIN CỤ THỂ KHI ĐỒNG Ý KẾT NỐI B2B THÀNH CÔNG (YÊU CẦU 1) ── */}
+      {acceptedSuccessMeeting && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4 backdrop-blur-xs animate-in fade-in duration-200"
+          onClick={() => setAcceptedSuccessMeeting(null)}
+        >
+          <div
+            className="w-full max-w-md bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-emerald-500/30 p-5 space-y-4 animate-in zoom-in-95 duration-150"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header Success */}
+            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+              <div className="flex items-center gap-2.5">
+                <div className="p-2 rounded-2xl bg-emerald-500/15 text-emerald-600 dark:text-emerald-400">
+                  <CheckCircle2 className="size-6" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wide">
+                    Kết Nối B2B Thành Công!
+                  </h3>
+                  <p className="text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold">
+                    Đã lưu vào Lịch &amp; Hoạt động sự kiện
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setAcceptedSuccessMeeting(null)}
+                className="p-1 rounded-full text-slate-400 hover:text-slate-600 dark:hover:text-white cursor-pointer"
+              >
+                <X className="size-5" />
+              </button>
+            </div>
+
+            {/* Partner Info Details */}
+            <div className="p-4 rounded-2xl bg-gradient-to-br from-emerald-50/50 via-slate-50 to-blue-50/40 dark:from-slate-800/80 dark:to-slate-900 border border-emerald-500/20 space-y-3">
+              <div className="flex items-center gap-3">
+                <div className="size-12 rounded-2xl bg-[#003B95] text-white flex items-center justify-center font-bold text-base shadow-sm shrink-0 overflow-hidden">
+                  {acceptedSuccessMeeting.partnerAvatar ? (
+                    <img
+                      src={resolveMediaUrl(acceptedSuccessMeeting.partnerAvatar) || acceptedSuccessMeeting.partnerAvatar}
+                      alt={acceptedSuccessMeeting.partnerName}
+                      className="size-full object-cover"
+                    />
+                  ) : (
+                    (acceptedSuccessMeeting.partnerName || "C").charAt(0).toUpperCase()
+                  )}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <h4 className="text-sm font-bold text-slate-900 dark:text-white truncate">
+                    {acceptedSuccessMeeting.partnerName}
+                  </h4>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
+                    {acceptedSuccessMeeting.partnerCompany || "Doanh nghiệp CLB CEO HN10"}
+                  </p>
+                  <span className="inline-flex items-center gap-1 mt-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/10 text-blue-600 dark:text-blue-400">
+                    <Handshake className="size-3" /> Đối tác kết nối 1-on-1
+                  </span>
+                </div>
+              </div>
+
+              {/* Time & Venue */}
+              <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-200/60 dark:border-slate-700/60 text-xs">
+                <div className="space-y-0.5">
+                  <span className="text-[10px] font-bold uppercase text-slate-400">Thời gian</span>
+                  <div className="font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1">
+                    <Clock className="size-3.5 text-amber-500" />
+                    <span>{acceptedSuccessMeeting.time}</span>
+                  </div>
+                  <div className="text-[11px] text-slate-500">{acceptedSuccessMeeting.date}</div>
+                </div>
+
+                <div className="space-y-0.5">
+                  <span className="text-[10px] font-bold uppercase text-slate-400">Hình thức</span>
+                  <div className="font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1">
+                    {acceptedSuccessMeeting.venueType === "online" ? (
+                      <>
+                        <Video className="size-3.5 text-blue-500" />
+                        <span>Trực tuyến</span>
+                      </>
+                    ) : (
+                      <>
+                        <MapPin className="size-3.5 text-rose-500" />
+                        <span>Gặp trực tiếp</span>
+                      </>
+                    )}
+                  </div>
+                  <div className="text-[11px] text-slate-500 truncate" title={acceptedSuccessMeeting.venue}>
+                    {acceptedSuccessMeeting.venue || "Văn phòng đối tác"}
+                  </div>
+                </div>
+              </div>
+
+              {/* Contact Phone & Actions */}
+              {acceptedSuccessMeeting.partnerPhone && (
+                <div className="pt-2 border-t border-slate-200/60 dark:border-slate-700/60 flex items-center justify-between">
+                  <div className="text-xs text-slate-600 dark:text-slate-300">
+                    Điện thoại: <strong className="text-slate-900 dark:text-white font-mono">{acceptedSuccessMeeting.partnerPhone}</strong>
+                  </div>
+                  <a
+                    href={`tel:${acceptedSuccessMeeting.partnerPhone}`}
+                    className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition flex items-center gap-1 shadow-xs"
+                  >
+                    <Phone className="size-3" />
+                    <span>Gọi điện</span>
+                  </a>
+                </div>
+              )}
+
+              {/* Venue Directions or Online URL */}
+              {acceptedSuccessMeeting.venueType === "online" && acceptedSuccessMeeting.onlineUrl && (
+                <div className="pt-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setVideoCallMeeting(acceptedSuccessMeeting);
+                      setAcceptedSuccessMeeting(null);
+                    }}
+                    className="w-full py-2 rounded-xl bg-[#003B95] text-white text-xs font-bold flex items-center justify-center gap-1.5 shadow-xs"
+                  >
+                    <Video className="size-3.5" />
+                    <span>Vào phòng họp trực tuyến ngay</span>
+                  </button>
+                </div>
+              )}
+
+              {acceptedSuccessMeeting.venueType !== "online" && acceptedSuccessMeeting.venue && (
+                <div className="pt-2">
+                  <a
+                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(acceptedSuccessMeeting.venue)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-white text-xs font-bold flex items-center justify-center gap-1.5 transition"
+                  >
+                    <Navigation className="size-3.5 text-rose-500" />
+                    <span>Chỉ đường trên Google Maps</span>
+                  </a>
+                </div>
+              )}
+
+              {/* Notes */}
+              {acceptedSuccessMeeting.notes && (
+                <div className="p-2.5 rounded-xl bg-white/80 dark:bg-slate-800/60 border border-slate-200/50 dark:border-slate-700/50 text-[11.5px] text-slate-600 dark:text-slate-300">
+                  <span className="font-bold text-slate-700 dark:text-slate-200">Ghi chú: </span>
+                  {acceptedSuccessMeeting.notes}
+                </div>
+              )}
+            </div>
+
+            {/* Bottom Nav Actions */}
+            <div className="grid grid-cols-2 gap-2 pt-1 border-t border-slate-100 dark:border-slate-800">
+              <Link
+                to="/association/calendar"
+                onClick={() => setAcceptedSuccessMeeting(null)}
+                className="py-2.5 px-3 rounded-xl bg-[#003B95] hover:bg-[#002b70] text-white text-xs font-bold text-center flex items-center justify-center gap-1.5 shadow-xs transition"
+              >
+                <Calendar className="size-3.5" />
+                <span>Xem trên Lịch</span>
+              </Link>
+              <Link
+                to="/association/events"
+                onClick={() => {
+                  try {
+                    sessionStorage.setItem("vba_events_active_tab", "activities");
+                  } catch {}
+                  setAcceptedSuccessMeeting(null);
+                }}
+                className="py-2.5 px-3 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 text-xs font-bold text-center flex items-center justify-center gap-1.5 shadow-xs transition"
+              >
+                <Sparkles className="size-3.5" />
+                <span>Mục Hoạt động</span>
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

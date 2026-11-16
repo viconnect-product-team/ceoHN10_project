@@ -1,0 +1,10 @@
+{
+	"appId": "vn.ceohn10.app",
+	"appName": "CEO HN10",
+	"webDir": "www",
+	"server": {
+		"url": "http://14.225.217.232:5000/association",
+		"cleartext": true
+	},
+	"packageClassList": []
+}

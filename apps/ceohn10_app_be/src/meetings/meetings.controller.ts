@@ -1,0 +1,237 @@
+import {
+  Controller,
+  Get,
+  Post,
+  Patch,
+  Delete,
+  Body,
+  Param,
+  Query,
+  UseGuards,
+  Request,
+} from '@nestjs/common';
+import { AuthGuard } from '../auth/auth.guard';
+import { MeetingsService } from './meetings.service';
+import {
+  CreateMeetingDto,
+  ConnectionAppointmentDto,
+  ListWorkspaceMeetingsDto,
+  SaveOutcomeDto,
+  CreateFollowUpDto,
+  CreateTimeProposalDto,
+  CancelMeetingDto,
+} from './dto';
+
+@Controller(['meetings', 'business-connect/meetings'])
+@UseGuards(AuthGuard)
+export class MeetingsController {
+  constructor(private readonly meetingsService: MeetingsService) {}
+
+  @Get()
+  async getAllMeetings(@Request() req: any) {
+    const userId = req.user.id || req.user.sub;
+    return this.meetingsService.getAllUnifiedMeetings(userId);
+  }
+
+  @Post()
+  async createMeeting(@Request() req: any, @Body() data: CreateMeetingDto) {
+    const userId = req.user.id || req.user.sub;
+    return this.meetingsService.createMeeting(userId, data);
+  }
+
+  @Get('workspace/summary')
+  async getWorkspaceSummary(@Request() req: any) {
+    const userId = req.user.id || req.user.sub;
+    return this.meetingsService.getWorkspaceSummary(userId);
+  }
+
+  @Get('connection-appointments')
+  async getConnectionAppointments(@Request() req: any) {
+    const userId = req.user.id || req.user.sub;
+    return this.meetingsService.getConnectionAppointments(userId);
+  }
+
+  @Post('connection-appointments')
+  async createConnectionAppointment(
+    @Request() req: any,
+    @Body() data: ConnectionAppointmentDto,
+  ) {
+    const userId = req.user.id || req.user.sub;
+    return this.meetingsService.createConnectionAppointment(userId, data);
+  }
+
+  @Post('connection-appointments/:id/respond')
+  async respondConnectionAppointment(
+    @Request() req: any,
+    @Param('id') id: string,
+    @Body() body: any,
+  ) {
+    const userId = req.user.id || req.user.sub;
+    const status =
+      body?.status || (body?.action === 'accept' ? 'confirmed' : 'declined');
+    return this.meetingsService.respondConnectionAppointment(
+      userId,
+      id,
+      status,
+    );
+  }
+
+  @Post('connection-appointments/:id/cancel')
+  async cancelConnectionAppointment(
+    @Request() req: any,
+    @Param('id') id: string,
+    @Body() body: any,
+  ) {
+    const userId = req.user.id || req.user.sub;
+    return this.meetingsService.cancelConnectionAppointment(
+      userId,
+      id,
+      body?.reason,
+    );
+  }
+
+  @Post('workspace/list')
+  async listWorkspaceMeetings(
+    @Request() req: any,
+    @Body() filters: ListWorkspaceMeetingsDto,
+  ) {
+    const userId = req.user.id || req.user.sub;
+    return this.meetingsService.listWorkspaceMeetings(userId, filters);
+  }
+
+  @Get(':id/workspace-detail')
+  async getMeetingWorkspaceDetail(
+    @Request() req: any,
+    @Param('id') id: string,
+  ) {
+    const userId = req.user.id || req.user.sub;
+    return this.meetingsService.getMeetingWorkspaceDetail(userId, id);
+  }
+
+  @Get(':id/outcome')
+  async getOutcome(@Param('id') id: string) {
+    return this.meetingsService.getOutcome(id);
+  }
+
+  @Post(':id/outcome')
+  async saveOutcome(
+    @Request() req: any,
+    @Param('id') id: string,
+    @Body() data: SaveOutcomeDto,
+  ) {
+    const userId = req.user.id || req.user.sub;
+    return this.meetingsService.saveOutcome(userId, id, data);
+  }
+
+  @Get(':id/follow-ups')
+  async listFollowUps(@Param('id') id: string) {
+    return this.meetingsService.listFollowUps(id);
+  }
+
+  @Post(':id/follow-ups')
+  async createFollowUp(
+    @Request() req: any,
+    @Param('id') id: string,
+    @Body() data: CreateFollowUpDto,
+  ) {
+    const userId = req.user.id || req.user.sub;
+    return this.meetingsService.createFollowUp(userId, id, data);
+  }
+
+  @Patch('follow-ups/:followUpId/status')
+  async updateFollowUpStatus(
+    @Request() req: any,
+    @Param('followUpId') followUpId: string,
+    @Body('status') status: string,
+  ) {
+    const userId = req.user.id || req.user.sub;
+    return this.meetingsService.updateFollowUpStatus(
+      userId,
+      followUpId,
+      status,
+    );
+  }
+
+  @Get('availability/preferences')
+  async getAvailabilityPreferences(@Request() req: any) {
+    const userId = req.user.id || req.user.sub;
+    return this.meetingsService.getAvailabilityPreferences(userId);
+  }
+
+  @Post('availability/preferences')
+  async updateAvailabilityPreferences(@Request() req: any, @Body() data: any) {
+    const userId = req.user.id || req.user.sub;
+    return this.meetingsService.updateAvailabilityPreferences(userId, data);
+  }
+
+  @Get(':id/time-proposals')
+  async listTimeProposals(@Param('id') id: string) {
+    return this.meetingsService.listTimeProposals(id);
+  }
+
+  @Get(':id/projections')
+  async listProjections(@Param('id') id: string) {
+    return this.meetingsService.listProjections(id);
+  }
+
+  @Post('time-proposals')
+  async createTimeProposals(
+    @Request() req: any,
+    @Body() data: CreateTimeProposalDto,
+  ) {
+    const userId = req.user.id || req.user.sub;
+    return this.meetingsService.createTimeProposals(userId, data);
+  }
+
+  @Post('time-proposals/:id/respond')
+  async respondToTimeProposal(
+    @Request() req: any,
+    @Param('id') id: string,
+    @Body('response') response: string,
+  ) {
+    const userId = req.user.id || req.user.sub;
+    return this.meetingsService.respondToTimeProposal(userId, id, response);
+  }
+
+  @Post('time-proposals/:id/select')
+  async selectTimeProposal(@Request() req: any, @Param('id') id: string) {
+    const userId = req.user.id || req.user.sub;
+    return this.meetingsService.selectTimeProposal(userId, id);
+  }
+
+  @Post(':id/cancel')
+  async cancelMeeting(
+    @Request() req: any,
+    @Param('id') id: string,
+    @Body() body: CancelMeetingDto,
+  ) {
+    const userId = req.user.id || req.user.sub;
+    return this.meetingsService.cancelMeeting(userId, id, body);
+  }
+
+  @Delete(':id')
+  async deleteMeeting(@Request() req: any, @Param('id') id: string) {
+    const userId = req.user.id || req.user.sub;
+    return this.meetingsService.deleteMeeting(userId, id);
+  }
+
+  @Patch(':id')
+  async updateMeeting(
+    @Request() req: any,
+    @Param('id') id: string,
+    @Body() data: any,
+  ) {
+    const userId = req.user.id || req.user.sub;
+    return this.meetingsService.updateMeeting(userId, id, data);
+  }
+
+  @Patch('connection-appointments/:id')
+  async updateConnectionAppointment(
+    @Request() req: any,
+    @Param('id') id: string,
+    @Body() data: any,
+  ) {
+    const userId = req.user.id || req.user.sub;
+    return this.meetingsService.updateMeeting(userId, id, data);
+  }
+}

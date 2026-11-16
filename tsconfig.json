@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "jsx": "react-jsx",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "skipLibCheck": true,
+    "noEmit": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./apps/ceohn10_app_fe/src/*"],
+      "@ceohn10/db": ["./packages/db/index.ts"],
+      "@ceohn10/db/*": ["./packages/db/*"],
+      "@vibe/shared": ["./packages/shared/index.ts"],
+      "@vibe/shared/*": ["./packages/shared/*"]
+    }
+  },
+  "include": ["apps/ceohn10_app_fe/src/**/*"]
+}

@@ -1,0 +1,177 @@
+import { useMemo } from "react";
+import { Handshake, Phone } from "lucide-react";
+import { useFmt, useT } from "@/lib/i18n";
+import type { Sponsor } from "@/lib/sponsors.functions";
+
+const TIER_META: Record<
+  Sponsor["tier"],
+  { label: string; icon: string; border: string; bg: string; text: string }
+> = {
+  platinum: {
+    label: "Nhà Tài Trợ Kim Cương / Bạch Kim",
+    icon: "💎",
+    border: "border-sky-500/30",
+    bg: "bg-card dark:bg-slate-900",
+    text: "text-sky-600 dark:text-sky-400",
+  },
+  gold: {
+    label: "Nhà Tài Trợ Vàng",
+    icon: "🥇",
+    border: "border-amber-500/30",
+    bg: "bg-card dark:bg-slate-900",
+    text: "text-amber-600 dark:text-amber-400",
+  },
+  silver: {
+    label: "Nhà Tài Trợ Bạc",
+    icon: "🥈",
+    border: "border-slate-400/30",
+    bg: "bg-card dark:bg-slate-900",
+    text: "text-slate-600 dark:text-slate-300",
+  },
+  bronze: {
+    label: "Nhà Tài Trợ Đồng",
+    icon: "🥉",
+    border: "border-orange-600/30",
+    bg: "bg-card dark:bg-slate-900",
+    text: "text-orange-700 dark:text-orange-400",
+  },
+};
+
+/**
+ * Sponsors / partners showcase section for the event detail page.
+ */
+export function EventSponsors({ sponsors: propSponsors }: { sponsors?: any[] }) {
+  const t = useT();
+  const fmt = useFmt();
+
+  const allSponsors = useMemo(() => {
+    let parsedList = propSponsors;
+    if (typeof parsedList === "string") {
+      try {
+        parsedList = JSON.parse(parsedList);
+      } catch {
+        parsedList = [];
+      }
+    }
+    if (Array.isArray(parsedList) && parsedList.length > 0) {
+      return parsedList.map((s: any) => ({
+        id: s.id || s.sponsorId || "",
+        name: s.name || s.sponsorName || "",
+        tier: s.tier || "bronze",
+        sponsorType: s.sponsorType || "regular",
+        packageType: s.packageType || "cash",
+        inKindDescription: s.inKindDescription || "",
+        contact: s.contact || "Đại diện Doanh nghiệp",
+        email: s.email || "",
+        phone: s.phone || "",
+        amount: Number(s.amount || 0),
+        events: s.events || 1,
+        since: s.since || "",
+        status: s.status || "active",
+      })) as Sponsor[];
+    }
+    return [] as Sponsor[];
+  }, [propSponsors]);
+
+  if (allSponsors.length === 0) {
+    return null;
+  }
+
+  const tiers: Sponsor["tier"][] = ["platinum", "gold", "silver", "bronze"];
+
+  return (
+    <section className="rounded-2xl border border-border bg-card p-6 shadow-[var(--shadow-card)]">
+      <div className="mb-5 flex items-center justify-between gap-2">
+        <h2 className="inline-flex items-center gap-2 text-base font-semibold text-foreground">
+          <Handshake className="h-4 w-4 text-primary" aria-hidden="true" />
+          <span>Đơn Vị Đồng Hành & Nhà Tài Trợ Sự Kiện ({allSponsors.length})</span>
+        </h2>
+        <span className="text-xs text-muted-foreground">
+          Được tài trợ bởi các doanh nghiệp hội viên tiên phong
+        </span>
+      </div>
+
+      <div className="space-y-4">
+        {tiers.map((tier) => {
+          const tierSponsors = allSponsors.filter((s) => s.tier === tier);
+          if (tierSponsors.length === 0) return null;
+          const meta = TIER_META[tier];
+
+          return (
+            <div
+              key={tier}
+              className={`rounded-2xl border ${meta.border} ${meta.bg} p-4 transition-all`}
+            >
+              <div className="flex items-center justify-between mb-3">
+                <span
+                  className={`inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-wider ${meta.text}`}
+                >
+                  <span>{meta.icon}</span>
+                  <span>{meta.label}</span>
+                </span>
+                <span className="text-[11px] font-bold text-muted-foreground">
+                  {tierSponsors.length} doanh nghiệp
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {tierSponsors.map((sp) => (
+                  <div
+                    key={sp.id}
+                    className="flex flex-col justify-between rounded-xl border border-border bg-card/90 p-3.5 shadow-xs backdrop-blur-xs hover:border-primary/40 transition-colors"
+                  >
+                    <div>
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="flex items-center gap-2.5 min-w-0">
+                          <div className="h-9 w-9 rounded-xl bg-primary/10 text-primary flex items-center justify-center font-black text-xs shrink-0">
+                            {sp.name.slice(0, 2).toUpperCase()}
+                          </div>
+                          <div className="min-w-0">
+                            <h4 className="text-sm font-bold text-foreground truncate">
+                              {sp.name}
+                            </h4>
+                            <p className="text-[11px] text-muted-foreground truncate">
+                              {sp.contact}
+                            </p>
+                          </div>
+                        </div>
+
+                        {sp.packageType === "in_kind" ? (
+                          <span className="shrink-0 px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-500/15 text-purple-700 dark:text-purple-300">
+                            🎁 Hiện vật
+                          </span>
+                        ) : (
+                          <span className="shrink-0 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/15 text-emerald-700 dark:text-emerald-300">
+                            💵 Tiền mặt
+                          </span>
+                        )}
+                      </div>
+
+                      {sp.inKindDescription && (
+                        <p className="mt-2 text-[11px] italic text-purple-800 dark:text-purple-300 bg-purple-500/10 p-2 rounded-lg leading-relaxed">
+                          🎁 {sp.inKindDescription}
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="mt-3 pt-2.5 border-t border-border flex items-center justify-between text-xs">
+                      <div className="flex items-center gap-3 text-muted-foreground text-[11px]">
+                        <span className="flex items-center gap-1">
+                          <Phone className="h-3 w-3" />
+                          <span>{sp.phone}</span>
+                        </span>
+                      </div>
+                      <span className="font-mono font-black text-foreground">
+                        {fmt.money(sp.amount)}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </section>
+  );
+}

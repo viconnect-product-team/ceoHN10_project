@@ -1,0 +1,750 @@
+import { KY_NIEM_4_NAM_BANNER_URL } from "@/assets/ky_niem_4_nam_banner";
+
+export function getAuthToken(): string | null {
+  if (typeof window === "undefined") return null;
+  return (
+    localStorage.getItem("vibe_token") ||
+    localStorage.getItem("access_token") ||
+    localStorage.getItem("token") ||
+    localStorage.getItem("sb-access-token") ||
+    null
+  );
+}
+
+export function getBaseApiUrl(): string {
+  if (typeof window !== "undefined") {
+    // 0. Khi chạy trên môi trường Native Capacitor với local assets (localhost / capacitor://):
+    // window.location là 'https://localhost' hoặc 'capacitor://localhost'.
+    // Cần trỏ đích danh tới IP/Domain máy chủ backend CEO HN10 thay vì relative URL!
+    const isCapacitorLocal = Boolean(
+      window.location.protocol === "capacitor:" ||
+      ((window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") &&
+        (!window.location.port || window.location.port === "80" || window.location.port === "443"))
+    );
+    if (isCapacitorLocal) {
+      return "https://14.225.217.232:5444";
+    }
+
+    // 1. Khi chạy trên trình duyệt (Web / PWA) với HTTPS hoặc qua Reverse Proxy (5443, 5444, 5445)
+    // hoặc khi Capacitor mở trực tiếp server URL (hostname = 14.225.217.232 hoặc sslip.io):
+    // Dùng chuỗi rỗng "" để mọi lệnh fetch đều là relative URL (/api/...) trên cùng Origin HTTPS.
+    // Điều này TRÁNH TRIỆT ĐỂ lỗi Mixed Content (blocked:mixed-content) và lỗi CORS!
+    if (
+      window.location.protocol === "https:" ||
+      window.location.port === "5443" ||
+      window.location.port === "5444" ||
+      window.location.port === "5445" ||
+      (window.location.hostname !== "localhost" && window.location.hostname !== "127.0.0.1")
+    ) {
+      return "";
+    }
+    // 2. Localhost phát triển (Vite Dev Server đã cấu hình proxy /api sang localhost:4000)
+    return "";
+  }
+  // 3. Phía Server-Side Rendering (SSR / Nitro server function chạy trong container)
+  return (
+    (typeof process !== "undefined" && (process.env?.NEST_API_URL || process.env?.VITE_API_URL)) ||
+    (import.meta.env?.VITE_API_URL as string) ||
+    "http://127.0.0.1:4000"
+  );
+}
+
+export const NEST_API_URL = getBaseApiUrl();
+
+function mapEndpoint(endpoint: string): string {
+  let mapped = endpoint;
+
+  if (mapped === "/profile") {
+    mapped = "/me/profile";
+  }
+  if (mapped === "/app-settings/invitation-templates") {
+    mapped = "/admin/invitation-templates";
+  }
+
+  const clean = mapped.startsWith("/") ? mapped : `/${mapped}`;
+  return clean.startsWith("/api") ? clean : `/api${clean}`;
+}
+
+export function getNestApiUrl(endpoint: string): string {
+  return `${getBaseApiUrl()}${mapEndpoint(endpoint)}`;
+}
+
+export function getPublicBackendUrl(): string {
+  if (typeof window !== "undefined") {
+    if (
+      window.location.protocol === "https:" ||
+      window.location.port === "5443" ||
+      window.location.port === "5444" ||
+      window.location.port === "5445" ||
+      (window.location.hostname !== "localhost" && window.location.hostname !== "127.0.0.1")
+    ) {
+      return window.location.origin;
+    }
+    return "http://127.0.0.1:4000";
+  }
+  return (
+    (typeof process !== "undefined" &&
+      (process.env?.VITE_PUBLIC_API_URL || process.env?.VITE_API_URL)) ||
+    ""
+  );
+}
+
+export function isDeadAvatarUrl(url: string | null | undefined): boolean {
+  if (!url) return true;
+  const deadMarkers = [
+    "i5o6ez",
+    "d9ut5z",
+    "4qjy8i",
+    "j01t7w",
+    "undefined",
+    "null",
+    "placeholder",
+    "mock",
+    "test.jpg",
+    "example.com",
+  ];
+  if (deadMarkers.some((m) => url.includes(m))) return true;
+
+  // Reject malformed or truncated data URIs that trigger ERR_INVALID_URL
+  if (url.startsWith("data:")) {
+    if (url.length < 150 || url.includes("..") || !url.includes(",")) return true;
+  }
+  return false;
+}
+
+export function resolveMediaUrl(url: string | null | undefined): string | null {
+  if (!url) return null;
+  const trimmed = url.trim();
+  if (!trimmed || isDeadAvatarUrl(trimmed)) return null;
+
+  // Banner kỷ niệm 4 năm Viện Doanh Trí (đảm bảo không bao giờ bị 404)
+  if (trimmed.includes("ky_niem_4_nam_vien_doanh_tri")) {
+    return KY_NIEM_4_NAM_BANNER_URL;
+  }
+
+  // Trực tiếp trả về data URI hợp lệ hoặc blob URL, không parse qua new URL để tránh ERR_INVALID_URL
+  if (trimmed.startsWith("data:") || trimmed.startsWith("blob:")) {
+    return trimmed;
+  }
+  if (trimmed.startsWith("uploads/data:") || trimmed.startsWith("/uploads/data:")) {
+    return trimmed.replace(/^\/?uploads\//, "");
+  }
+
+  // Tệp tĩnh nội bộ thuộc Frontend (public folder): Không bao giờ chuyển đổi sang MinIO backend!
+  if (
+    trimmed.startsWith("/avatars/avatar-default") ||
+    trimmed.startsWith("avatars/avatar-default") ||
+    trimmed.includes("avatar-default") ||
+    trimmed.startsWith("/assets/") ||
+    trimmed.startsWith("/icons/") ||
+    trimmed.startsWith("/images/") ||
+    trimmed.startsWith("/landing/") ||
+    trimmed.startsWith("/landing_web_vione") ||
+    trimmed.includes("landing_web_vione") ||
+    trimmed.startsWith("/templates/") ||
+    trimmed.startsWith("/posters/") ||
+    trimmed.startsWith("posters/") ||
+    trimmed.includes("pinterest-pin") ||
+    trimmed.startsWith("/favicon") ||
+    trimmed.startsWith("/app-icon") ||
+    trimmed.startsWith("/ceohn10") ||
+    trimmed.startsWith("/ceo-portrait") ||
+    trimmed.startsWith("ceo-portrait") ||
+    trimmed.includes("ceo-portrait") ||
+    trimmed.startsWith("/brand-") ||
+    trimmed.startsWith("/vione-") ||
+    trimmed.startsWith("/Background.png") ||
+    trimmed.startsWith("/bg-crm.png") ||
+    trimmed.startsWith("/skyline") ||
+    trimmed.startsWith("/business_connect") ||
+    trimmed.toLowerCase().includes("vietnamese") ||
+    trimmed.startsWith("/vietnamese") ||
+    trimmed.startsWith("/Vietnamese") ||
+    trimmed.startsWith("/user-check")
+  ) {
+    return trimmed.startsWith("/") ? trimmed : `/${trimmed}`;
+  }
+
+  // Tự động chuyển đổi sang Origin hiện tại để tránh lỗi Mixed Content hoặc vỡ ảnh khi mang cổng nội bộ khác
+  if (typeof window !== "undefined") {
+    if (
+      trimmed.startsWith("http://14.225.217.232") ||
+      trimmed.startsWith("https://14.225.217.232") ||
+      trimmed.includes(":5001") ||
+      trimmed.includes(":5002") ||
+      trimmed.includes(":5003") ||
+      trimmed.includes(":5004") ||
+      trimmed.includes(":5005") ||
+      trimmed.includes(":4000") ||
+      trimmed.includes("localhost:") ||
+      trimmed.includes("127.0.0.1:")
+    ) {
+      try {
+        const parsed = new URL(trimmed.startsWith("http") ? trimmed : `http://${trimmed}`);
+        if (
+          parsed.pathname.startsWith("/api/upload/") ||
+          parsed.pathname.startsWith("/upload/") ||
+          parsed.pathname.startsWith("/api/")
+        ) {
+          return `${window.location.origin}${parsed.pathname}${parsed.search}`;
+        }
+      } catch {
+        // fallback bên dưới
+      }
+    }
+  }
+
+  const publicBase = getPublicBackendUrl();
+
+  // If URL contains internal Docker host backend:4000
+  if (trimmed.includes("backend:4000")) {
+    const after = trimmed.split("backend:4000")[1];
+    return publicBase ? `${publicBase}${after}` : after;
+  }
+
+  // If remote browser receives localhost:4000 or 127.0.0.1:4000, rewrite to publicBase
+  if (
+    typeof window !== "undefined" &&
+    window.location.hostname !== "localhost" &&
+    window.location.hostname !== "127.0.0.1"
+  ) {
+    if (trimmed.includes("localhost:4000")) {
+      const after = trimmed.split("localhost:4000")[1];
+      return `${publicBase}${after}`;
+    }
+    if (trimmed.includes("127.0.0.1:4000")) {
+      const after = trimmed.split("127.0.0.1:4000")[1];
+      return `${publicBase}${after}`;
+    }
+    if (trimmed.includes("minio:9000") || trimmed.includes("localhost:9000")) {
+      const parts = trimmed.split(/\/[a-zA-Z0-9_-]*bucket\//);
+      if (parts[1]) {
+        return publicBase
+          ? `${publicBase}/api/upload/file/${parts[1]}`
+          : `/api/upload/file/${parts[1]}`;
+      }
+    }
+  }
+
+  // 4. Nếu là đường dẫn /api/upload/...
+  if (trimmed.startsWith("/api/upload/")) {
+    return publicBase ? `${publicBase}${trimmed}` : trimmed;
+  }
+  if (trimmed.startsWith("api/upload/")) {
+    return publicBase ? `${publicBase}/${trimmed}` : `/${trimmed}`;
+  }
+
+  // 5. Nếu là đường dẫn /upload/... -> Nâng cấp thành /api/upload/...
+  if (trimmed.startsWith("/upload/")) {
+    return publicBase ? `${publicBase}/api${trimmed}` : `/api${trimmed}`;
+  }
+  if (trimmed.startsWith("upload/")) {
+    return publicBase ? `${publicBase}/api/${trimmed}` : `/api/${trimmed}`;
+  }
+
+  // 6. Nếu là đường dẫn /uploads/... -> Phục vụ tĩnh từ backend
+  if (trimmed.startsWith("/uploads/")) {
+    return publicBase ? `${publicBase}${trimmed}` : trimmed;
+  }
+  if (trimmed.startsWith("uploads/")) {
+    return publicBase ? `${publicBase}/${trimmed}` : `/${trimmed}`;
+  }
+
+  // 7. Nếu là file trong avatars/ hoặc documents/ hoặc products/ hoặc events/ hoặc association-logos/ hoặc trainings/ hoặc meetings/
+  if (
+    ((trimmed.startsWith("avatars/") || trimmed.startsWith("/avatars/")) && !trimmed.includes("default")) ||
+    trimmed.startsWith("association-logos/") ||
+    trimmed.startsWith("/association-logos/") ||
+    trimmed.startsWith("logos/") ||
+    trimmed.startsWith("/logos/") ||
+    trimmed.startsWith("opportunities/") ||
+    trimmed.startsWith("/opportunities/") ||
+    trimmed.startsWith("documents/") ||
+    trimmed.startsWith("/documents/") ||
+    trimmed.startsWith("products/") ||
+    trimmed.startsWith("/products/") ||
+    trimmed.startsWith("events/") ||
+    trimmed.startsWith("/events/") ||
+    trimmed.startsWith("trainings/") ||
+    trimmed.startsWith("/trainings/") ||
+    trimmed.startsWith("meetings/") ||
+    trimmed.startsWith("/meetings/")
+  ) {
+    const cleanPath = trimmed.startsWith("/") ? trimmed.slice(1) : trimmed;
+    return publicBase ? `${publicBase}/api/upload/file/${cleanPath}` : `/api/upload/file/${cleanPath}`;
+  }
+
+  // 8. Nếu là bare filename (không chứa /) có đuôi file ảnh/tài liệu/video
+  if (!trimmed.includes("/") && /\.(jpg|jpeg|png|webp|gif|svg|pdf|docx|xlsx|mp4|webm|mov|m4v|ogg)$/i.test(trimmed)) {
+    return publicBase ? `${publicBase}/api/upload/file/avatars/${trimmed}` : `/api/upload/file/avatars/${trimmed}`;
+  }
+
+  return trimmed;
+}
+
+const MEDIA_EXT_REGEX = /\.(jpg|jpeg|png|webp|gif|svg|pdf|docx|xlsx|mp4|webm|mov|m4v|ogg)$/i;
+
+function transformUrls(obj: any, parentKey?: string): any {
+  if (obj === null || obj === undefined) return obj;
+
+  // Bảo vệ không biến đổi các trường mã định danh (ID, UUID, slug, code, role, v.v.)
+  if (parentKey && /^(id|.*Id|.*Ref|.*Code|.*Slug|.*Status|.*Type|.*Role|.*Token|.*Key)$/i.test(parentKey)) {
+    if (!/(url|photo|avatar|image|banner|logo|cover|file|attachment|media)/i.test(parentKey)) {
+      return obj;
+    }
+  }
+
+  if (typeof obj === "string") {
+    // If it's already a media URL or upload path, resolve it cleanly
+    if (
+      obj.startsWith("/upload/") ||
+      obj.startsWith("/uploads/") ||
+      obj.startsWith("upload/") ||
+      obj.startsWith("uploads/") ||
+      obj.startsWith("/api/upload/") ||
+      obj.startsWith("api/upload/") ||
+      ((obj.startsWith("avatars/") || obj.startsWith("/avatars/")) && !obj.includes("default")) ||
+      (!obj.includes("/") && MEDIA_EXT_REGEX.test(obj)) ||
+      obj.includes("backend:4000") ||
+      obj.includes("127.0.0.1:4000") ||
+      obj.includes("127.0.0.1:") ||
+      obj.includes("localhost:4000") ||
+      obj.includes("localhost:") ||
+      (typeof window !== "undefined" &&
+        window.location.hostname !== "localhost" &&
+        (obj.includes("localhost") || obj.includes("127.0.0.1")))
+    ) {
+      return resolveMediaUrl(obj) || obj;
+    }
+    return obj;
+  }
+
+  if (Array.isArray(obj)) {
+    return obj.map((item) => transformUrls(item, parentKey));
+  }
+
+  if (typeof obj === "object") {
+    const res: any = {};
+    for (const key of Object.keys(obj)) {
+      res[key] = transformUrls(obj[key], key);
+    }
+    return res;
+  }
+
+  return obj;
+}
+
+function cleanUrls(body: any): any {
+  if (body === null || body === undefined) return body;
+
+  if (typeof body === "string") {
+    if (/^https?:\/\/(localhost|127\.0\.0\.1|14\.225\.217\.232)(:[0-9]+)?\/(api\/)?(upload|uploads)\//.test(body)) {
+      return body.replace(/^https?:\/\/(localhost|127\.0\.0\.1|14\.225\.217\.232)(:[0-9]+)?(\/api)?/, "");
+    }
+    const apiPrefix = `${NEST_API_URL}/api/upload/`;
+    const cleanPrefix = `${NEST_API_URL}/upload/`;
+    const uploadsPrefix = `${NEST_API_URL}/uploads/`;
+    if (body.startsWith(apiPrefix)) {
+      return body.substring(NEST_API_URL.length + 4);
+    }
+    if (body.startsWith(cleanPrefix)) {
+      return body.substring(NEST_API_URL.length);
+    }
+    if (body.startsWith(uploadsPrefix)) {
+      return body.substring(NEST_API_URL.length);
+    }
+    return body;
+  }
+
+  if (Array.isArray(body)) {
+    return body.map(cleanUrls);
+  }
+
+  if (typeof body === "object") {
+    const res: any = {};
+    for (const key of Object.keys(body)) {
+      res[key] = cleanUrls(body[key]);
+    }
+    return res;
+  }
+
+  return body;
+}
+
+let refreshInProgress: Promise<string | null> | null = null;
+
+async function trySilentRefresh(): Promise<string | null> {
+  if (typeof window === "undefined") return null;
+  const refreshToken = localStorage.getItem("vibe_refresh_token");
+  if (!refreshToken) return null;
+
+  if (refreshInProgress) {
+    return refreshInProgress;
+  }
+
+  refreshInProgress = (async () => {
+    try {
+      const baseUrl = getBaseApiUrl();
+      const res = await fetch(`${baseUrl}/api/auth/refresh`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ refresh_token: refreshToken }),
+      });
+      if (!res.ok) {
+        return null;
+      }
+      const data = await res.json();
+      if (!data?.access_token) return null;
+
+      localStorage.setItem("vibe_token", data.access_token);
+      if (data.refresh_token) {
+        localStorage.setItem("vibe_refresh_token", data.refresh_token);
+      }
+      const maxAge = data.expires_in ?? 3600;
+      const isHttps = window.location.protocol === "https:";
+      const secure = isHttps ? "; secure" : "";
+      document.cookie = `sb-access-token=${data.access_token}; path=/; max-age=${maxAge}; SameSite=Lax${secure}`;
+      document.cookie = `vibe_token=${data.access_token}; path=/; max-age=${maxAge}; SameSite=Lax${secure}`;
+      document.cookie = `access_token=${data.access_token}; path=/; max-age=${maxAge}; SameSite=Lax${secure}`;
+      if (data.refresh_token) {
+        document.cookie = `sb-refresh-token=${data.refresh_token}; path=/; max-age=604800; SameSite=Lax${secure}`;
+      }
+      return data.access_token;
+    } catch {
+      return null;
+    } finally {
+      refreshInProgress = null;
+    }
+  })();
+
+  return refreshInProgress;
+}
+
+async function handleResponse(response: Response, endpoint = "") {
+  if (response.status === 401) {
+    const isAuthEndpoint =
+      endpoint.includes("/auth/login") ||
+      endpoint.includes("/auth/register") ||
+      endpoint.includes("/auth/reset-password") ||
+      endpoint.includes("/auth/forgot-password");
+
+    let errMsg = "Unauthorized";
+    try {
+      const errText = await response.text();
+      if (errText) {
+        const errJson = JSON.parse(errText);
+        errMsg = errJson?.message || errMsg;
+      }
+    } catch {
+      // ignore
+    }
+
+    if (typeof window !== "undefined") {
+      const pathname = window.location.pathname;
+      const isLoginPage =
+        pathname === "/auth" ||
+        pathname === "/association/login" ||
+        pathname.startsWith("/association/login");
+
+      // NẾU LỖI XẢY RA KHI ĐANG Ở TRANG ĐĂNG NHẬP HOẶC KHI GỌI ENDPOINT ĐĂNG NHẬP:
+      // TUYỆT ĐỐI KHÔNG REDIRECT, để màn hình login hiển thị thông báo lỗi cho người dùng nhập lại!
+      if (isAuthEndpoint || isLoginPage) {
+        throw new Error(errMsg === "Unauthorized" ? "Thông tin đăng nhập hoặc mật khẩu không chính xác." : errMsg);
+      }
+
+      // Xóa phiên đăng nhập hết hạn
+      localStorage.removeItem("vibe_token");
+      localStorage.removeItem("vibe_refresh_token");
+      document.cookie = `sb-access-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT`;
+      document.cookie = `sb-refresh-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT`;
+
+      // Nếu token hết hạn ở App Hiệp hội -> về /association/login
+      if (pathname.startsWith("/association")) {
+        window.location.href = `/association/login?reason=expired&redirect=${encodeURIComponent(pathname + window.location.search)}`;
+      } else {
+        window.location.href = `/auth?reason=expired&redirect=${encodeURIComponent(pathname + window.location.search)}`;
+      }
+    }
+    throw new Error(errMsg);
+  }
+  if (response.status === 403) {
+    let errDetail = "";
+    try {
+      const errText = await response.text();
+      if (errText) {
+        const errJson = JSON.parse(errText);
+        errDetail = errJson?.message || "";
+      }
+    } catch {
+      // ignore
+    }
+
+    const alertMsg =
+      errDetail && errDetail.length > 0
+        ? errDetail
+        : "Quyền hạn của bạn đã bị thay đổi bởi Quản trị viên. Hệ thống sẽ tải lại để áp dụng đúng quyền mới.";
+
+    if (typeof window !== "undefined") {
+      // Hiển thị Popup Modal thông báo chính giữa màn hình và chuẩn bị reload trang
+      window.dispatchEvent(
+        new CustomEvent("vba:permission_revoked", {
+          detail: { message: alertMsg },
+        })
+      );
+    }
+    throw new Error(alertMsg);
+  }
+  if (!response.ok) {
+    let errDetail = response.statusText;
+    let errorPayload: any = null;
+    try {
+      const errText = await response.text();
+      if (errText) {
+        const errJson = JSON.parse(errText);
+        errorPayload = errJson;
+        if (Array.isArray(errJson?.message)) {
+          errDetail = errJson.message.join("; ");
+        } else if (errJson?.errors && typeof errJson.errors === "object") {
+          errDetail = Object.values(errJson.errors).join("; ");
+        } else if (errJson?.message) {
+          errDetail = errJson.message;
+        }
+      }
+    } catch {
+      // ignore
+    }
+
+    // Khi gặp lỗi Validate API (400 Bad Request hoặc 422 Unprocessable Entity)
+    if (response.status === 400 || response.status === 422) {
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(
+          new CustomEvent("vba:api_validation_error", {
+            detail: {
+              status: response.status,
+              message: errDetail || "Dữ liệu nhập vào chưa đúng hoặc chưa đầy đủ. Vui lòng kiểm tra lại!",
+              errors: errorPayload?.errors,
+              endpoint,
+            },
+          })
+        );
+      }
+    }
+
+    throw new Error(errDetail || `API request failed: ${response.status}`);
+  }
+  const text = await response.text();
+  if (!text || text === "null") {
+    return null;
+  }
+  try {
+    const parsed = JSON.parse(text);
+    return transformUrls(parsed);
+  } catch (e) {
+    return null;
+  }
+}
+
+export async function fetchNestApi<T = any>(
+  endpoint: string,
+  options: Omit<RequestInit, "body"> & { body?: any } = {},
+): Promise<T> {
+  const token = getAuthToken();
+  const headers = new Headers(options.headers);
+  headers.set("Content-Type", "application/json");
+  if (token) {
+    headers.set("Authorization", `Bearer ${token}`);
+  }
+
+  const mappedEndpoint = mapEndpoint(endpoint);
+  let requestBody = options.body;
+  if (
+    requestBody &&
+    typeof requestBody === "object" &&
+    !(requestBody instanceof FormData) &&
+    !(typeof Blob !== "undefined" && requestBody instanceof Blob) &&
+    !(typeof ArrayBuffer !== "undefined" && requestBody instanceof ArrayBuffer)
+  ) {
+    requestBody = JSON.stringify(cleanUrls(requestBody));
+  } else if (requestBody && typeof requestBody === "string") {
+    try {
+      const parsedBody = JSON.parse(requestBody);
+      requestBody = JSON.stringify(cleanUrls(parsedBody));
+    } catch (e) {
+      // Ignore if not JSON
+    }
+  }
+
+  const baseUrl = getBaseApiUrl();
+  const signal =
+    options.signal ||
+    (typeof AbortSignal !== "undefined" && "timeout" in AbortSignal
+      ? AbortSignal.timeout(15000)
+      : undefined);
+  let response = await fetch(`${baseUrl}${mappedEndpoint}`, {
+    ...options,
+    signal,
+    body: requestBody,
+    headers,
+  });
+
+  const isAuthEndpoint =
+    endpoint.includes("/auth/login") ||
+    endpoint.includes("/auth/register") ||
+    endpoint.includes("/auth/refresh") ||
+    endpoint.includes("/auth/reset-password") ||
+    endpoint.includes("/auth/forgot-password");
+
+  if (response.status === 401 && !isAuthEndpoint) {
+    const newAccessToken = await trySilentRefresh();
+    if (newAccessToken) {
+      headers.set("Authorization", `Bearer ${newAccessToken}`);
+      response = await fetch(`${baseUrl}${mappedEndpoint}`, {
+        ...options,
+        signal,
+        body: requestBody,
+        headers,
+      });
+    }
+  }
+
+  return handleResponse(response, endpoint);
+}
+
+export async function fetchNestApiFromServer<T = any>(
+  endpoint: string,
+  token?: string | null,
+  options: Omit<RequestInit, "body"> & { body?: any } = {},
+): Promise<T> {
+  const headers = new Headers(options.headers);
+  headers.set("Content-Type", "application/json");
+  if (token) {
+    headers.set("Authorization", `Bearer ${token}`);
+  }
+
+  const mappedEndpoint = mapEndpoint(endpoint);
+  let requestBody = options.body;
+  if (
+    requestBody &&
+    typeof requestBody === "object" &&
+    !(requestBody instanceof FormData) &&
+    !(typeof Blob !== "undefined" && requestBody instanceof Blob) &&
+    !(typeof ArrayBuffer !== "undefined" && requestBody instanceof ArrayBuffer)
+  ) {
+    requestBody = JSON.stringify(cleanUrls(requestBody));
+  } else if (requestBody && typeof requestBody === "string") {
+    try {
+      const parsedBody = JSON.parse(requestBody);
+      requestBody = JSON.stringify(cleanUrls(parsedBody));
+    } catch (e) {
+      // Ignore if not JSON
+    }
+  }
+
+  const baseUrl = getBaseApiUrl();
+  const signal =
+    options.signal ||
+    (typeof AbortSignal !== "undefined" && "timeout" in AbortSignal
+      ? AbortSignal.timeout(15000)
+      : undefined);
+  const response = await fetch(`${baseUrl}${mappedEndpoint}`, {
+    ...options,
+    signal,
+    body: requestBody,
+    headers,
+  });
+
+  return handleResponse(response, endpoint);
+}
+
+export async function uploadFileToNest(
+  file: File | Blob,
+  folderOrFilename?: string
+): Promise<string & { url: string; filePath: string; fileUrl: string }> {
+  const token =
+    typeof window !== "undefined"
+      ? localStorage.getItem("vibe_token") ||
+        localStorage.getItem("token") ||
+        localStorage.getItem("access_token") ||
+        localStorage.getItem("sb-access-token") ||
+        localStorage.getItem("ceohn10_auth_token") ||
+        localStorage.getItem("ceohn10_token")
+      : null;
+  const headers = new Headers();
+  if (token) {
+    headers.set("Authorization", `Bearer ${token}`);
+  }
+  if (typeof window !== "undefined") {
+    try {
+      const userStr =
+        localStorage.getItem("vibe_user") ||
+        localStorage.getItem("ceohn10_user") ||
+        localStorage.getItem("user");
+      if (userStr) {
+        const u = JSON.parse(userStr);
+        if (u.id) headers.set("x-user-id", u.id);
+      }
+    } catch {}
+  }
+
+  let folder = "documents";
+  let filename = "file.bin";
+
+  if (folderOrFilename) {
+    if (folderOrFilename.includes(".")) {
+      filename = folderOrFilename;
+    } else {
+      folder = folderOrFilename;
+      if (file instanceof File && file.name) {
+        filename = file.name;
+      } else {
+        filename = `${folder}_${Date.now()}.bin`;
+      }
+    }
+  } else if (file instanceof File && file.name) {
+    filename = file.name;
+  }
+
+  const formData = new FormData();
+  formData.append("file", file, filename);
+
+  try {
+    const response = await fetch(
+      `${NEST_API_URL}/api/upload/file?folder=${encodeURIComponent(folder)}`,
+      {
+        method: "POST",
+        body: formData,
+        headers,
+      }
+    );
+
+    if (response.ok) {
+      const text = await response.text();
+      const data = JSON.parse(text);
+      const transformed = transformUrls(data);
+      const finalUrl: string = String(transformed?.url || data.url || "");
+      if (finalUrl) return finalUrl as any;
+    }
+  } catch (netErr) {
+    console.warn("uploadFileToNest network/fetch error, falling back to data URL for images:", netErr);
+  }
+
+  // Client-side fallback for images if API upload is unreachable
+  if (typeof FileReader !== "undefined" && file.type && file.type.startsWith("image/")) {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        resolve(reader.result as any);
+      };
+      reader.onerror = () => {
+        resolve(URL.createObjectURL(file) as any);
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  throw new Error("Không thể tải tệp lên máy chủ. Vui lòng thử lại!");
+}
+
+export const uploadFile = uploadFileToNest;
+
+

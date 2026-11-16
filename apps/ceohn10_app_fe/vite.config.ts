@@ -1,0 +1,53 @@
+import { defineConfig } from '@lovable.dev/vite-tanstack-config';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const emptyMock = path.resolve(__dirname, 'src/mock-empty.js');
+
+export default defineConfig({
+  vite: {
+    resolve: {
+      alias: {
+        'xmlhttprequest-ssl': emptyMock,
+        https: 'node:https',
+        http: 'node:http',
+      },
+    },
+    build: {
+      sourcemap: false,
+      chunkSizeWarningLimit: 2500,
+    },
+    server: {
+      port: 5003,
+      watch: {
+        ignored: [
+          '**/.output/**',
+          '**/.tanstack/**',
+          '**/release_apk/**',
+          '**/android/**',
+          '**/ios/**',
+          '**/.turbo/**',
+          '**/*.log',
+        ],
+      },
+      proxy: {
+        '/upload': {
+          target: 'http://127.0.0.1:4003',
+          changeOrigin: true,
+          rewrite: (path: string) => '/api' + path,
+        },
+        '/api': {
+          target: 'http://127.0.0.1:4003',
+          changeOrigin: true,
+        },
+        '/socket.io': {
+          target: 'http://127.0.0.1:4003',
+          ws: true,
+          changeOrigin: true,
+        },
+      },
+    },
+  },
+});

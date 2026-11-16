@@ -1,0 +1,448 @@
+/* eslint-disable */
+import {
+  Controller,
+  Post,
+  Get,
+  Delete,
+  UseInterceptors,
+  UploadedFile,
+  UseGuards,
+  Request,
+  Res,
+  Param,
+  BadRequestException,
+} from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { AuthGuard } from '../auth/auth.guard';
+import { UploadService } from './upload.service';
+import * as path from 'path';
+
+function getContentType(filename: string): string {
+  const ext = path.extname(filename).toLowerCase();
+  const map: Record<string, string> = {
+    '.jpg': 'image/jpeg',
+    '.jpeg': 'image/jpeg',
+    '.png': 'image/png',
+    '.gif': 'image/gif',
+    '.webp': 'image/webp',
+    '.pdf': 'application/pdf',
+    '.svg': 'image/svg+xml',
+    '.txt': 'text/plain',
+    '.json': 'application/json',
+    '.mp4': 'video/mp4',
+    '.webm': 'video/webm',
+    '.ogg': 'video/ogg',
+    '.mov': 'video/quicktime',
+    '.m4v': 'video/x-m4v',
+  };
+  return map[ext] || 'application/octet-stream';
+}
+
+@Controller('upload')
+export class UploadController {
+  constructor(private readonly uploadService: UploadService) {}
+
+  @UseGuards(AuthGuard)
+  @Post('avatar')
+  @UseInterceptors(FileInterceptor('file'))
+  async uploadAvatar(
+    @UploadedFile() file: any,
+    @Request() req: any,
+  ) {
+    if (!file) {
+      throw new BadRequestException('No file uploaded');
+    }
+    const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+    if (!allowedMimeTypes.includes(file.mimetype)) {
+      throw new BadRequestException('Invalid file type. Only images are allowed.');
+    }
+
+    const userId = req.user?.id || req.user?.sub;
+    if (!userId) {
+      throw new BadRequestException('User ID not identified in auth session');
+    }
+
+    const isStandalone =
+      req.query?.standalone === 'true' ||
+      req.query?.card === 'true' ||
+      req.headers?.['x-standalone-avatar'] === 'true';
+
+    try {
+      const url = await this.uploadService.saveAvatar(file, userId, isStandalone);
+      return { url };
+    } catch (err: any) {
+      console.error('uploadAvatar error:', err);
+      throw new BadRequestException(err?.message || 'Failed to process avatar upload');
+    }
+  }
+
+  @UseGuards(AuthGuard)
+  @Post('company-logo')
+  @UseInterceptors(FileInterceptor('file'))
+  async uploadCompanyLogo(
+    @UploadedFile() file: any,
+    @Request() req: any,
+  ) {
+    if (!file) {
+      throw new BadRequestException('No file uploaded');
+    }
+    const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/svg+xml'];
+    if (!allowedMimeTypes.includes(file.mimetype)) {
+      throw new BadRequestException('Invalid file type. Only images are allowed.');
+    }
+    const userId = req.user?.id || req.user?.sub;
+    if (!userId) {
+      throw new BadRequestException('User ID not identified in auth session');
+    }
+
+    try {
+      const url = await this.uploadService.saveCompanyLogo(file, userId);
+      return { url };
+    } catch (err: any) {
+      console.error('uploadCompanyLogo error:', err);
+      throw new BadRequestException(err?.message || 'Failed to process logo upload');
+    }
+  }
+
+  @UseGuards(AuthGuard)
+  @Post('association-logo')
+  @UseInterceptors(FileInterceptor('file'))
+  async uploadAssociationLogo(
+    @UploadedFile() file: any,
+    @Request() req: any,
+  ) {
+    if (!file) {
+      throw new BadRequestException('No file uploaded');
+    }
+    const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/svg+xml'];
+    if (!allowedMimeTypes.includes(file.mimetype)) {
+      throw new BadRequestException('Invalid file type. Only images are allowed.');
+    }
+    const userId = req.user?.id || req.user?.sub;
+    if (!userId) {
+      throw new BadRequestException('User ID not identified in auth session');
+    }
+    const associationId = req.body?.associationId || req.query?.associationId;
+
+    try {
+      const url = await this.uploadService.saveAssociationLogo(file, userId, associationId);
+      return { url };
+    } catch (err: any) {
+      console.error('uploadAssociationLogo error:', err);
+      throw new BadRequestException(err?.message || 'Failed to process association logo upload');
+    }
+  }
+
+  @Post('file')
+  @UseInterceptors(FileInterceptor('file'))
+  async uploadFile(
+    @UploadedFile() file: any,
+    @Request() req: any,
+  ) {
+    if (!file) {
+      throw new BadRequestException('No file uploaded');
+    }
+    // Giới hạn tối đa 500MB với mỗi file tải lên để bảo vệ server
+    if (file.size && file.size > 500 * 1024 * 1024) {
+      throw new BadRequestException('Tệp tải lên vượt quá giới hạn tối đa cho phép (500MB)');
+    }
+    let userId = req.user?.id || req.user?.sub || req.headers?.['x-user-id'] || req.query?.userId || req.body?.userId;
+    if (!userId || typeof userId !== 'string' || !/^[0-9a-fA-F-]{36}$/.test(userId)) {
+      userId = '00000000-0000-4000-8000-000000000001';
+    }
+
+    const folder = (req.query?.folder as string) || 'documents';
+
+    try {
+      const url = await this.uploadService.saveFile(file, userId, folder);
+      return { url };
+    } catch (err: any) {
+      console.error('uploadFile error:', err);
+      throw new BadRequestException(err?.message || 'Failed to process file upload');
+    }
+  }
+
+  @Get('file/:folder/:file')
+  async getFileWithFolder(
+    @Param('folder') folder: string,
+    @Param('file') file: string,
+    @Res() res: any,
+    @Request() req: any,
+  ) {
+    return this.serveFile(`${folder}/${file}`, res, req);
+  }
+
+  @Get('file/:file')
+  async getFileSingle(
+    @Param('file') file: string,
+    @Res() res: any,
+    @Request() req: any,
+  ) {
+    return this.serveFile(file, res, req);
+  }
+
+  @Get('file/*')
+  async getFile(
+    @Request() req: any,
+    @Res() res: any,
+  ) {
+    let filePathStr = req.params?.[0] || req.params?.['0'] || req.params?.path;
+    if (!filePathStr && req.url) {
+      filePathStr = req.url.replace(/^.*\/file\//, '').split('?')[0];
+    }
+    return this.serveFile(filePathStr, res, req);
+  }
+
+  @Get(':folder/:file')
+  async getFileDirectFolder(
+    @Param('folder') folder: string,
+    @Param('file') file: string,
+    @Res() res: any,
+    @Request() req: any,
+  ) {
+    if (folder === 'file') {
+      return this.serveFile(file, res, req);
+    }
+    return this.serveFile(`${folder}/${file}`, res, req);
+  }
+
+  @Get(':file')
+  async getFileDirectSingle(
+    @Param('file') file: string,
+    @Res() res: any,
+    @Request() req: any,
+  ) {
+    if (file === 'file') {
+      return res.status(404).send('Filename is missing');
+    }
+    return this.serveFile(file, res, req);
+  }
+
+  private async serveFile(rawPath: any, res: any, req?: any) {
+    let filePathStr = Array.isArray(rawPath) ? rawPath.join('/') : String(rawPath || '');
+    if (!filePathStr) {
+      return res.status(404).send('Filename is missing');
+    }
+    try {
+      filePathStr = decodeURIComponent(filePathStr);
+    } catch {}
+    filePathStr = filePathStr.replace(/^\/+/, '');
+
+    // VULN-04 Fix: Chặn đứng Path Traversal & truy cập tệp ẩn (.env, ..)
+    if (
+      filePathStr.includes('..') ||
+      filePathStr.includes('\\') ||
+      filePathStr.includes('\0') ||
+      filePathStr.includes('://') ||
+      path.isAbsolute(filePathStr)
+    ) {
+      return res.status(403).send('Forbidden: Invalid or malicious file path');
+    }
+
+    const filenameOnly = path.basename(filePathStr);
+    if (filenameOnly.startsWith('.') || filePathStr.startsWith('.')) {
+      return res.status(403).send('Forbidden: Access to hidden files is denied');
+    }
+
+    const contentType = getContentType(filePathStr);
+    const isPeerSync = req?.headers?.['x-peer-sync'] === 'true';
+
+    try {
+      // 1. Thử tìm tệp trên ổ đĩa cục bộ (disk fallback)
+      const fs = await import('fs');
+      const os = await import('os');
+      const tmpCeoUploads = path.join(os.tmpdir(), 'ceohn10_uploads');
+      const candidates = [
+        path.join(tmpCeoUploads, filePathStr),
+        path.join(tmpCeoUploads, 'association-logos', filenameOnly),
+        path.join(tmpCeoUploads, 'avatars', filenameOnly),
+        path.join(tmpCeoUploads, 'logos', filenameOnly),
+        path.join(tmpCeoUploads, 'documents', filenameOnly),
+        path.join(tmpCeoUploads, 'opportunities', filenameOnly),
+        path.join(tmpCeoUploads, 'products', filenameOnly),
+        path.join(tmpCeoUploads, 'events', filenameOnly),
+        path.join('/app', 'uploads', filePathStr),
+        path.join('/app', 'uploads', 'association-logos', filenameOnly),
+        path.join('/app', 'uploads', 'avatars', filenameOnly),
+        path.join('/app', 'uploads', 'logos', filenameOnly),
+        path.join('/app', 'uploads', 'documents', filenameOnly),
+        path.join('/app', 'uploads', 'opportunities', filenameOnly),
+        path.join('/app', 'uploads', 'products', filenameOnly),
+        path.join('/app', 'uploads', 'events', filenameOnly),
+        path.join(process.cwd(), 'uploads', filePathStr),
+        path.join(process.cwd(), 'uploads', 'association-logos', filenameOnly),
+        path.join(process.cwd(), 'uploads', 'avatars', filenameOnly),
+        path.join(process.cwd(), 'uploads', 'logos', filenameOnly),
+        path.join(process.cwd(), 'uploads', 'documents', filenameOnly),
+        path.join('/tmp', 'uploads', filePathStr),
+        path.join('/tmp', 'uploads', 'association-logos', filenameOnly),
+        path.join('/tmp', 'uploads', 'avatars', filenameOnly),
+        path.join('/tmp', 'uploads', 'logos', filenameOnly),
+        path.join('/tmp', 'uploads', 'documents', filenameOnly),
+        path.join(process.cwd(), 'dist', 'uploads', filePathStr),
+      ];
+
+      for (const cand of candidates) {
+        try {
+          if (fs.existsSync(cand) && fs.statSync(cand).isFile()) {
+            const fileBuf = fs.readFileSync(cand);
+            res.setHeader('Content-Type', contentType);
+            res.setHeader('Cache-Control', 'public, max-age=86400');
+            // VULN-13 Fix: Chống Stored XSS khi xem tệp SVG
+            if (contentType === 'image/svg+xml') {
+              res.setHeader('Content-Security-Policy', "default-src 'none'; style-src 'unsafe-inline'");
+              res.setHeader('X-Content-Type-Options', 'nosniff');
+            }
+            return res.status(200).send(fileBuf);
+          }
+        } catch {}
+      }
+
+      // 2. Thử tìm trên MinIO với timeout an toàn và buffer dữ liệu trước khi gửi response
+      const minioKeys = [
+        filePathStr,
+        filenameOnly,
+        `association-logos/${filenameOnly}`,
+        `avatars/${filenameOnly}`,
+        `logos/${filenameOnly}`,
+        `documents/${filenameOnly}`,
+        `opportunities/${filenameOnly}`,
+        `products/${filenameOnly}`,
+        `events/${filenameOnly}`,
+      ];
+
+      for (const key of minioKeys) {
+        try {
+          const timeoutPromise = new Promise((_, reject) =>
+            setTimeout(() => reject(new Error('MinIO stream timeout')), 800),
+          );
+          const stream: any = await Promise.race([
+            this.uploadService.getFileStream(key),
+            timeoutPromise,
+          ]);
+          if (stream) {
+            try { stream.on('error', () => {}); } catch {}
+            const buf = await new Promise<Buffer>((resolve, reject) => {
+              const chunks: Buffer[] = [];
+              stream.on('data', (c: any) => chunks.push(Buffer.isBuffer(c) ? c : Buffer.from(c)));
+              stream.once('end', () => resolve(Buffer.concat(chunks)));
+              stream.once('error', (e: any) => reject(e));
+              setTimeout(() => reject(new Error('Stream read timeout')), 1200);
+            });
+            if (buf && buf.length > 0) {
+              res.setHeader('Content-Type', contentType);
+              res.setHeader('Cache-Control', 'public, max-age=86400');
+              return res.status(200).send(buf);
+            }
+          }
+        } catch {}
+      }
+
+      // 2.5. Đồng bộ ảnh chéo giữa các container / phân hệ (CRM & CEO HN10 Mobile App)
+      // Khi CRM tải ảnh lên (sự kiện, cơ hội, sản phẩm, cuộc họp, đào tạo), container Mobile App
+      // có thể kéo trực tiếp file thật về lưu vào disk cache cục bộ rồi trả về cho client.
+      if (!isPeerSync) {
+        const peerCandidates = [
+          `http://crm-backend:4000/api/upload/file/${filePathStr}`,
+          `http://crm-backend-prod:4000/api/upload/file/${filePathStr}`,
+          `http://127.0.0.1:5005/api/upload/file/${filePathStr}`,
+          `http://127.0.0.1:5003/api/upload/file/${filePathStr}`,
+          `https://crm.ceohn10.viconnect.vn/api/upload/file/${filePathStr}`,
+          `https://ceohn10.viconnect.vn/api/upload/file/${filePathStr}`,
+        ];
+
+        for (const peerUrl of peerCandidates) {
+          try {
+            const controller = new AbortController();
+            const timer = setTimeout(() => controller.abort(), 1800);
+            const peerRes = await fetch(peerUrl, {
+              signal: controller.signal,
+              headers: { 'x-peer-sync': 'true' },
+            });
+            clearTimeout(timer);
+
+            if (peerRes.ok) {
+              const peerType = peerRes.headers.get('content-type') || '';
+              // Chỉ chấp nhận file thật, bỏ qua nếu peer trả về SVG fallback
+              if (!peerType.includes('image/svg+xml')) {
+                const arrayBuf = await peerRes.arrayBuffer();
+                const peerBuf = Buffer.from(arrayBuf);
+                if (peerBuf && peerBuf.length > 500) {
+                  // Lưu ngay vào disk cache /app/uploads để các lần gọi tiếp theo là tức thì
+                  try {
+                    const fs = await import('fs');
+                    const targetDir = path.join('/app', 'uploads', path.dirname(filePathStr));
+                    if (!fs.existsSync(targetDir)) {
+                      fs.mkdirSync(targetDir, { recursive: true });
+                    }
+                    fs.writeFileSync(path.join('/app', 'uploads', filePathStr), peerBuf);
+                  } catch {}
+
+                  res.setHeader('Content-Type', peerType || contentType);
+                  res.setHeader('Cache-Control', 'public, max-age=86400');
+                  return res.status(200).send(peerBuf);
+                }
+              }
+            }
+          } catch {}
+        }
+      }
+
+      // 3. Fallback an toàn tuyệt đối: Nếu là tệp hình ảnh, không bao giờ trả 500 hoặc 404 làm vỡ web
+      if (contentType.startsWith('image/')) {
+        const isAvatar = filePathStr.includes('avatar');
+        const fallbackSvg = isAvatar
+          ? `<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200"><defs><linearGradient id="av" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#003B95"/><stop offset="100%" stop-color="#0A1A3A"/></linearGradient></defs><rect width="200" height="200" rx="36" fill="url(#av)"/><circle cx="100" cy="75" r="38" fill="#F59E0B" opacity="0.9"/><path d="M40 170 C40 125, 70 115, 100 115 C130 115, 160 125, 160 170 Z" fill="#F59E0B" opacity="0.9"/><text x="100" y="190" text-anchor="middle" fill="#FFFFFF" font-family="sans-serif" font-size="11" font-weight="700">CEO HN10</text></svg>`
+          : `<svg xmlns="http://www.w3.org/2000/svg" width="800" height="400" viewBox="0 0 800 400"><defs><linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#071228"/><stop offset="50%" stop-color="#003B95"/><stop offset="100%" stop-color="#0A1A3A"/></linearGradient></defs><rect width="100%" height="100%" fill="url(#bg)"/><text x="50%" y="46%" dominant-baseline="middle" text-anchor="middle" fill="#F59E0B" font-family="sans-serif" font-size="24" font-weight="800" letter-spacing="3">CLB DOANH NHÂN CEO HN10</text><text x="50%" y="58%" dominant-baseline="middle" text-anchor="middle" fill="#E2E8F0" font-family="sans-serif" font-size="13" font-weight="500" letter-spacing="1">HỆ SINH THÁI SỐ &amp; KẾT NỐI GIAO THƯƠNG B2B</text></svg>`;
+
+        res.setHeader('Content-Type', 'image/svg+xml');
+        res.setHeader('Cache-Control', 'public, max-age=3600');
+        return res.status(200).send(fallbackSvg);
+      }
+
+      return res.status(404).send('File not found');
+    } catch (err) {
+      if (!res.headersSent) {
+        if (contentType.startsWith('image/')) {
+          const fallbackSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="200" viewBox="0 0 400 200"><rect width="100%" height="100%" fill="#0A1A3A"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#F59E0B" font-family="sans-serif" font-size="16" font-weight="bold">CEO HN10</text></svg>`;
+          res.setHeader('Content-Type', 'image/svg+xml');
+          return res.status(200).send(fallbackSvg);
+        }
+        return res.status(404).send('File not found');
+      } else {
+        res.end();
+      }
+    }
+  }
+
+  @UseGuards(AuthGuard)
+  @Delete('file/:folder/:file')
+  async deleteFileFolder(
+    @Param('folder') folder: string,
+    @Param('file') file: string,
+    @Request() req: any,
+  ) {
+    const userId = req.user?.id || req.user?.sub;
+    await this.uploadService.deleteFile(`${folder}/${file}`, userId);
+    return { success: true };
+  }
+
+  @UseGuards(AuthGuard)
+  @Delete('file/*')
+  async deleteFile(
+    @Request() req: any,
+  ) {
+    let filePathStr = req.params?.[0] || req.params?.['0'] || req.params?.path;
+    if (!filePathStr && req.url) {
+      filePathStr = req.url.replace(/^.*\/file\//, '').split('?')[0];
+    }
+    if (!filePathStr) {
+      throw new BadRequestException('Filename is missing');
+    }
+
+    const userId = req.user?.id || req.user?.sub;
+    await this.uploadService.deleteFile(filePathStr, userId);
+    return { success: true };
+  }
+}
+

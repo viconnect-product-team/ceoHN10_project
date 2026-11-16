@@ -1,0 +1,54 @@
+services:
+  ceohn10-crm-frontend:
+    image: ${ASSOCIATION_FE_IMAGE:-ceohn10-crm-frontend}:latest
+    container_name: ceohn10-crm-frontend-prod
+    restart: always
+    env_file:
+      - .env.crm
+    environment:
+      - PORT=8080
+      - HOST=0.0.0.0
+      - NITRO_HOST=0.0.0.0
+      - NEST_API_URL=http://ceohn10-crm-backend:4003
+      - VITE_APP_SCOPE=crm_platform
+      - VITE_APP_NAME="CEO HN10 CRM Admin"
+      - VITE_APP_DEFAULT_ROUTE=/association
+    ports:
+      - "${ASSOCIATION_PORT_FRONTEND:-5022}:8080"
+    depends_on:
+      - ceohn10-crm-backend
+    networks:
+      - ceohn10-network
+
+  ceohn10-crm-backend:
+    image: ${ASSOCIATION_BE_IMAGE:-ceohn10-crm-backend}:latest
+    container_name: ceohn10-crm-backend-prod
+    restart: always
+    env_file:
+      - .env.crm
+    environment:
+      - NODE_ENV=production
+      - PORT=4003
+      - APP_SCOPE=crm_platform
+      - DOCKER_CONTAINER=true
+    user: "0:0"
+    volumes:
+      - ceohn10-uploads-data:/app/uploads
+    ports:
+      - "${ASSOCIATION_PORT_BACKEND:-5023}:4003"
+    networks:
+      ceohn10-network:
+        aliases:
+          - ceohn10-crm-backend
+
+volumes:
+  ceohn10-uploads-data:
+    name: ceohn10-uploads-data
+
+networks:
+  ceohn10-network:
+    name: ceohn10-network
+    external: true
+  vione-network:
+    name: vione-network
+    external: true

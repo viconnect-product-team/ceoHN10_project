@@ -1,0 +1,1603 @@
+import { createFileRoute, Link, useNavigate, useRouter } from "@tanstack/react-router";
+import { REVIEW_SEARCH_RESET } from "@/lib/review-search";
+import { useMemo, useState, useRef, useEffect } from "react";
+import { useServerFn } from "@tanstack/react-start";
+import {
+  CalendarClock,
+  CheckCircle2,
+  Clock,
+  Eye,
+  ImagePlus,
+  LayoutGrid,
+  Lightbulb,
+  MapPin,
+  MessageSquare,
+  Pencil,
+  Plus,
+  Search,
+  Send,
+  Sparkles,
+  Table as TableIcon,
+  Trash2,
+  UserCheck,
+  Users,
+  X,
+  TrendingUp,
+  Award,
+} from "lucide-react";
+import { resolveMediaUrl, uploadFileToNest, fetchNestApi } from "@/lib/api-client";
+import { toast } from "sonner";
+import { AppShell } from "@/components/dashboard/AppShell";
+import { PageHeader, StatCard, Card, Pill } from "@/components/dashboard/PageKit";
+import { useFmt, useT, type TKey } from "@/lib/i18n";
+import { useRole, PERMISSIONS } from "@/hooks/use-role";
+import { TruncatedText } from "@/components/dashboard/TruncatedText";
+import {
+  OPPORTUNITY_TYPES,
+  ICON_OPTIONS,
+  getPoster,
+  type Opportunity,
+  type OpportunityInterest,
+  type OpportunityStatus,
+  type OpportunityTypeKey,
+} from "@/lib/opportunities-data";
+import {
+  listOpportunitiesFn,
+  createOpportunityFn,
+  deleteOpportunityFn,
+  expressInterestFn,
+  toggleOpportunityStatusFn,
+} from "@/lib/opportunities.functions";
+import { StandardDateInput } from "@/components/common/StandardDateInput";
+import { FormattedCurrencyInput } from "@/components/common/FormattedCurrencyInput";
+import { StandardCurrencyInput } from "@/components/common/StandardCurrencyInput";
+import { CURRENT_USER_ID } from "@/lib/networking-data";
+import { useAuth } from "@/context/AuthContext";
+import { useTableControls } from "@/hooks/use-table-controls";
+import { useUrlState } from "@/hooks/use-url-state";
+import { Pagination, SortHeader } from "@/components/dashboard/DataTablePagination";
+import { formatDisplayDate, formatDisplayDateTime } from "@/lib/date-format";
+
+function formatCurrencyInput(val: string): string {
+  const digits = val.replace(/\D/g, "");
+  if (!digits) return "";
+  return Number(digits).toLocaleString("vi-VN");
+}
+
+export const Route = createFileRoute("/opportunities/")({
+  ssr: false,
+  loader: () => listOpportunitiesFn(),
+  component: OpportunitiesPage,
+});
+
+const STATUS_COLOR: Record<OpportunityStatus, "success" | "neutral"> = {
+  open: "success",
+  closed: "neutral",
+};
+const STATUS_KEY: Record<OpportunityStatus, TKey> = {
+  open: "opp.status.open",
+  closed: "opp.status.closed",
+};
+
+function OpportunityCard({
+  opp,
+  interestCount,
+  onInterest,
+  onDelete,
+  onToggle,
+  canManage,
+}: {
+  opp: Opportunity;
+  interestCount: number;
+  onInterest: () => void;
+  onDelete: () => void;
+  onToggle: () => void;
+  canManage?: boolean;
+}) {
+  const t = useT();
+  const fmt = useFmt();
+  const poster = getPoster(opp.posterId);
+  const isOwner = canManage ?? false;
+
+  const budget =
+    opp.budgetMin && opp.budgetMax
+      ? `${fmt.money(opp.budgetMin)} – ${fmt.money(opp.budgetMax)}`
+      : opp.budgetMin
+        ? `${t("opp.fromLabel")} ${fmt.money(opp.budgetMin)}`
+        : t("opp.budgetOpen");
+
+  return (
+    <Card className="flex flex-col overflow-hidden transition hover:shadow-lg">
+      <Link
+        to="/opportunities/$id"
+        params={{ id: opp.id }}
+        className="relative flex h-48 w-full aspect-[16/9] items-center justify-center overflow-hidden text-5xl bg-secondary/30"
+        style={{ background: "var(--gradient-primary)" }}
+        aria-label={opp.title}
+      >
+        {(() => {
+          const typeFallbacks: Record<string, string> = {
+            "opp.type.partnership": "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&w=800&q=80",
+            "opp.type.investment": "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&q=80",
+            "opp.type.supply": "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=800&q=80",
+            "opp.type.demand": "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=800&q=80",
+            "opp.type.distribution": "https://images.unsplash.com/photo-1578575437130-527eed3abbec?auto=format&fit=crop&w=800&q=80",
+          };
+          const raw = opp.image || (opp as any).imageUrl || (opp as any).imageUrls?.[0];
+          const fallback = typeFallbacks[opp.type] || "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=800&q=80";
+          const resolved = resolveMediaUrl(raw) || fallback;
+          return (
+            <img
+              src={resolved}
+              alt={opp.title}
+              className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+              onError={(e) => {
+                const target = e.target as HTMLImageElement;
+                if (target.src !== fallback) {
+                  target.src = fallback;
+                }
+              }}
+            />
+          );
+        })()}
+        <span className="relative z-10 drop-shadow-md">{opp.emoji}</span>
+      </Link>
+      <div className="flex flex-1 flex-col gap-3 p-4">
+        <div className="flex items-start justify-between gap-2">
+          <Pill color="primary">{t(opp.type)}</Pill>
+          <Pill color={STATUS_COLOR[opp.status]}>{t(STATUS_KEY[opp.status])}</Pill>
+        </div>
+        <Link
+          to="/opportunities/$id"
+          params={{ id: opp.id }}
+          className="line-clamp-2 text-[15px] font-semibold leading-snug text-foreground hover:text-primary hover:underline"
+        >
+          {opp.title}
+        </Link>
+        <p className="line-clamp-2 text-xs text-muted-foreground">{opp.description}</p>
+
+        <div className="grid grid-cols-1 gap-1.5 text-[11px] text-muted-foreground">
+          <div className="flex items-center gap-1.5">
+            <MapPin className="h-3 w-3" />
+            <span>
+              {opp.region} · {opp.industry}
+            </span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <CalendarClock className="h-3 w-3" />
+            <span>
+              {t("opp.deadline")}: {fmt.date(opp.deadline)}
+            </span>
+          </div>
+        </div>
+
+        <div className="rounded-lg bg-secondary/50 p-2 text-[11px]">
+          <div className="text-muted-foreground">{t("opp.budget")}</div>
+          <div className="font-semibold text-foreground">{budget}</div>
+        </div>
+
+        {(opp.contactName || opp.contactPhone || opp.company) && (
+          <div className="rounded-lg border border-primary/20 bg-primary/5 p-2 text-[11px] text-foreground">
+            <div className="font-semibold text-primary flex items-center gap-1">
+              <span>Liên hệ:</span>
+              <span>{opp.contactName || "Người liên hệ"}</span>
+              {opp.contactTitle && <span className="font-normal text-muted-foreground">({opp.contactTitle})</span>}
+            </div>
+            {(opp.company || opp.contactPhone) && (
+              <div className="mt-0.5 text-muted-foreground text-[10.5px]">
+                {[opp.company, opp.contactPhone].filter(Boolean).join(" · ")}
+              </div>
+            )}
+          </div>
+        )}
+
+        {opp.claimedByName && (
+          <div className="rounded-lg border border-emerald-500/30 bg-emerald-500/10 p-2 text-[11px] text-emerald-400">
+            <div className="flex items-center gap-1 font-semibold text-emerald-300">
+              <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              Đã nhận kết nối: {opp.claimedByName}
+            </div>
+            {(opp.claimedCompany || opp.claimedPhone) && (
+              <div className="mt-0.5 text-emerald-300/80 truncate text-[10.5px]">
+                {[opp.claimedCompany, opp.claimedPhone].filter(Boolean).join(" · ")}
+              </div>
+            )}
+          </div>
+        )}
+
+        <div className="mt-auto flex items-center justify-between border-t border-border pt-3 text-[11px] text-muted-foreground">
+          <Link
+            to="/members/$memberId"
+            params={{ memberId: opp.posterId }}
+            search={REVIEW_SEARCH_RESET}
+            className="truncate font-medium text-primary hover:underline"
+          >
+            {opp.posterName || opp.contactName || poster?.name || opp.company || "Hội viên CLB"}
+          </Link>
+          <div className="flex items-center gap-2.5">
+            <span className="flex items-center gap-1">
+              <Eye className="h-3 w-3" />
+              {opp.views}
+            </span>
+            <span className="flex items-center gap-1">
+              <Users className="h-3 w-3" />
+              {interestCount}
+            </span>
+          </div>
+        </div>
+
+        <div className="flex gap-2">
+          {isOwner ? (
+            <>
+              <Link
+                to="/opportunities/$id/edit"
+                params={{ id: opp.id }}
+                className="inline-flex items-center justify-center rounded-lg border border-border bg-background px-3 py-2 text-xs font-medium text-foreground hover:bg-secondary transition"
+                title={t("opp.action.edit") || "Chỉnh sửa"}
+              >
+                <Pencil className="h-3.5 w-3.5" />
+              </Link>
+              <button
+                onClick={onToggle}
+                className="flex-1 rounded-lg border border-border bg-background py-2 text-xs font-medium hover:bg-secondary transition"
+              >
+                {opp.status === "open" ? t("opp.action.close") : t("opp.action.reopen")}
+              </button>
+              <button
+                onClick={onDelete}
+                className="rounded-lg border border-destructive/30 px-3 py-2 text-xs font-medium text-destructive hover:bg-destructive/10 transition"
+                aria-label={t("opp.action.delete")}
+              >
+                <Trash2 className="h-3.5 w-3.5" />
+              </button>
+            </>
+          ) : (
+            <button
+              onClick={onInterest}
+              disabled={opp.status === "closed"}
+              className="flex-1 rounded-lg py-2 text-xs font-semibold text-primary-foreground shadow-[var(--shadow-glow)] transition disabled:cursor-not-allowed disabled:opacity-50"
+              style={{ background: "var(--gradient-primary)" }}
+            >
+              <span className="inline-flex items-center gap-1.5">
+                <Send className="h-3.5 w-3.5" />
+                {t("opp.action.interest")}
+              </span>
+            </button>
+          )}
+        </div>
+      </div>
+    </Card>
+  );
+}
+
+function NewOpportunityModal({ onClose }: { onClose: () => void }) {
+  const t = useT();
+  const router = useRouter();
+  const { user } = useAuth();
+  const createOpp = useServerFn(createOpportunityFn);
+  const [title, setTitle] = useState("");
+  const [desc, setDesc] = useState("");
+  const [type, setType] = useState<OpportunityTypeKey>("opp.type.partnership");
+  const [budgetMin, setBudgetMin] = useState("");
+  const [budgetMax, setBudgetMax] = useState("");
+  const [region, setRegion] = useState("");
+  const [industry, setIndustry] = useState("");
+  const [deadline, setDeadline] = useState(
+    new Date(Date.now() + 86400000 * 30).toISOString().slice(0, 10),
+  );
+  const [emoji, setEmoji] = useState("💡");
+  const [imageUrl, setImageUrl] = useState("");
+  const [company, setCompany] = useState("");
+  const [contactName, setContactName] = useState(user?.user_metadata?.full_name || "");
+  const [contactPhone, setContactPhone] = useState(
+    (user as any)?.phone || (user?.username && /^\d+$/.test(user.username) ? user.username : ""),
+  );
+  const [contactTitle, setContactTitle] = useState("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [uploadingImage, setUploadingImage] = useState(false);
+
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingImage(true);
+    const toastId = toast.loading("Đang tải ảnh cơ hội lên MinIO...");
+    try {
+      const uploadedUrl = await uploadFileToNest(file, `opp_${Date.now()}_${file.name}`);
+      setImageUrl(uploadedUrl);
+      toast.success("Đã tải ảnh lên hệ thống thành công!", { id: toastId });
+    } catch (err: any) {
+      toast.error(err?.message || "Lỗi tải ảnh lên hệ thống", { id: toastId });
+    } finally {
+      setUploadingImage(false);
+      if (e.target) e.target.value = "";
+    }
+  };
+
+  const { can } = useRole();
+
+  async function submit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!can(PERMISSIONS.OPPORTUNITY_MANAGE)) {
+      toast.error("Bạn không có quyền đăng cơ hội giao thương mới!");
+      return;
+    }
+
+    const errMap: Record<string, string> = {};
+    if (!title.trim()) errMap.title = "Vui lòng nhập tiêu đề cơ hội";
+    if (!desc.trim()) errMap.desc = "Vui lòng nhập mô tả chi tiết cơ hội";
+    if (!region.trim()) errMap.region = "Vui lòng nhập khu vực";
+    if (!industry.trim()) errMap.industry = "Vui lòng nhập ngành nghề";
+    if (!deadline) errMap.deadline = "Vui lòng chọn hạn chót";
+
+    const numMin = budgetMin ? Number(budgetMin.replace(/\D/g, "")) : undefined;
+    const numMax = budgetMax ? Number(budgetMax.replace(/\D/g, "")) : undefined;
+    if (numMin && numMax && numMax < numMin) {
+      errMap.budgetMax = "Ngân sách tối đa phải lớn hơn hoặc bằng ngân sách tối thiểu";
+    }
+
+    if (Object.keys(errMap).length > 0) {
+      setErrors(errMap);
+      toast.error("Vui lòng điền đầy đủ các thông tin bắt buộc (*)");
+      return;
+    }
+    setErrors({});
+
+    await createOpp({
+      data: {
+        title: title.trim(),
+        description: desc.trim(),
+        type,
+        budgetMin: numMin,
+        budgetMax: numMax,
+        region: region.trim(),
+        industry: industry.trim(),
+        deadline: new Date(deadline).toISOString(),
+        emoji,
+        contactName: contactName.trim() || undefined,
+        contactPhone: contactPhone.trim() || undefined,
+        contactTitle: contactTitle.trim() || undefined,
+        company: company.trim() || undefined,
+        image: imageUrl || undefined,
+        imageUrl: imageUrl || undefined,
+      },
+    });
+    await router.invalidate();
+    toast.success(t("opp.toast.created"));
+    onClose();
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/50 p-4 backdrop-blur-sm">
+      <div className="w-full max-w-xl rounded-2xl bg-card shadow-2xl">
+        <div className="flex items-center justify-between border-b border-border p-5">
+          <h3 className="flex items-center gap-2 text-lg font-bold">
+            <Sparkles className="h-5 w-5 text-primary" />
+            {t("opp.form.title")}
+          </h3>
+          <button onClick={onClose} className="rounded-lg p-1.5 hover:bg-secondary">
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+        <form onSubmit={submit} className="space-y-4 p-5 max-h-[70vh] overflow-y-auto">
+          <div>
+            <label className="mb-1.5 block text-xs font-semibold">Hình ảnh minh họa / Poster cơ hội</label>
+            <input
+              type="file"
+              ref={fileInputRef}
+              accept="image/*"
+              className="hidden"
+              disabled={uploadingImage}
+              onChange={handleImageChange}
+            />
+            {imageUrl ? (
+              <div className="relative rounded-xl overflow-hidden border border-border max-h-40 bg-muted/20">
+                <img src={resolveMediaUrl(imageUrl) || imageUrl} alt="Poster" className="w-full h-40 object-cover" />
+                <button
+                  type="button"
+                  onClick={() => setImageUrl("")}
+                  className="absolute top-2 right-2 p-1.5 rounded-full bg-rose-600 text-white hover:bg-rose-700 shadow cursor-pointer transition"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploadingImage}
+                className="w-full rounded-xl border-2 border-dashed border-border p-4 text-center hover:border-primary/50 hover:bg-muted/20 transition cursor-pointer flex flex-col items-center justify-center gap-1.5"
+              >
+                <ImagePlus className="h-6 w-6 text-muted-foreground" />
+                <span className="text-xs font-semibold text-muted-foreground">
+                  {uploadingImage ? "Đang tải ảnh lên MinIO..." : "Chọn ảnh tải lên từ thiết bị (JPG, PNG, WebP)"}
+                </span>
+              </button>
+            )}
+          </div>
+
+          <div>
+            <label className="mb-1.5 block text-xs font-semibold">
+              {t("opp.form.titleField")} <span className="text-destructive">*</span>
+            </label>
+            <input
+              value={title}
+              onChange={(e) => {
+                setTitle(e.target.value);
+                if (errors.title) setErrors((prev) => ({ ...prev, title: "" }));
+              }}
+              placeholder={t("opp.form.titlePh")}
+              className={`w-full rounded-lg border bg-background px-3 py-2 text-sm outline-none transition ${
+                errors.title
+                  ? "border-destructive ring-1 ring-destructive/30 focus:border-destructive"
+                  : "border-border focus:border-primary"
+              }`}
+            />
+            {errors.title && (
+              <p className="mt-1 text-xs font-semibold text-destructive animate-in fade-in duration-150">
+                {errors.title}
+              </p>
+            )}
+          </div>
+          <div>
+            <label className="mb-1.5 block text-xs font-semibold">
+              {t("opp.form.desc")} <span className="text-destructive">*</span>
+            </label>
+            <textarea
+              value={desc}
+              onChange={(e) => {
+                setDesc(e.target.value);
+                if (errors.desc) setErrors((prev) => ({ ...prev, desc: "" }));
+              }}
+              rows={4}
+              placeholder={t("opp.form.descPh")}
+              className={`w-full resize-none rounded-lg border bg-background px-3 py-2 text-sm outline-none transition ${
+                errors.desc
+                  ? "border-destructive ring-1 ring-destructive/30 focus:border-destructive"
+                  : "border-border focus:border-primary"
+              }`}
+            />
+            {errors.desc && (
+              <p className="mt-1 text-xs font-semibold text-destructive animate-in fade-in duration-150">
+                {errors.desc}
+              </p>
+            )}
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="mb-1.5 block text-xs font-semibold">{t("opp.form.type")}</label>
+              <select
+                value={type}
+                onChange={(e) => setType(e.target.value as OpportunityTypeKey)}
+                className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary"
+              >
+                {OPPORTUNITY_TYPES.map((c: any) => (
+                  <option key={c} value={c}>
+                    {t(c)}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="mb-1.5 block text-xs font-semibold">
+                {t("opp.form.deadline")} (dd/mm/yyyy) <span className="text-destructive">*</span>
+              </label>
+              <StandardDateInput
+                value={deadline}
+                placeholder="dd/mm/yyyy (VD: 31/12/2026)"
+                onChange={(iso) => {
+                  setDeadline(iso);
+                  if (errors.deadline) setErrors((prev) => ({ ...prev, deadline: "" }));
+                }}
+                className={`w-full rounded-lg border bg-background px-3 py-2 text-sm outline-none transition ${
+                  errors.deadline
+                    ? "border-destructive ring-1 ring-destructive/30 focus:border-destructive"
+                    : "border-border focus:border-primary"
+                }`}
+              />
+              {errors.deadline && (
+                <p className="mt-1 text-xs font-semibold text-destructive animate-in fade-in duration-150">
+                  {errors.deadline}
+                </p>
+              )}
+              {deadline && !errors.deadline && (
+                <p className="mt-1 text-xs text-muted-foreground flex items-center gap-1">
+                  <span>Hạn chót: {formatDisplayDate(deadline, { withWeekday: true })}</span>
+                </p>
+              )}
+            </div>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label className="mb-1.5 block text-xs font-semibold">Doanh nghiệp / Tổ chức</label>
+              <input
+                value={company}
+                onChange={(e) => setCompany(e.target.value)}
+                placeholder="VD: Tập đoàn ViConnect"
+                className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary"
+              />
+            </div>
+            <div>
+              <label className="mb-1.5 block text-xs font-semibold">Người liên hệ</label>
+              <input
+                value={contactName}
+                onChange={(e) => setContactName(e.target.value)}
+                placeholder="VD: Nguyễn Văn A"
+                className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary"
+              />
+            </div>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label className="mb-1.5 block text-xs font-semibold">Chức vụ người liên hệ</label>
+              <input
+                value={contactTitle}
+                onChange={(e) => setContactTitle(e.target.value)}
+                placeholder="VD: Giám đốc Kinh doanh"
+                className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary"
+              />
+            </div>
+            <div>
+              <label className="mb-1.5 block text-xs font-semibold">Số điện thoại liên hệ</label>
+              <input
+                value={contactPhone}
+                onChange={(e) => setContactPhone(e.target.value)}
+                placeholder="VD: 0912345678"
+                className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary"
+              />
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="mb-1.5 block text-xs font-semibold">
+                {t("opp.form.region")} <span className="text-destructive">*</span>
+              </label>
+              <input
+                value={region}
+                onChange={(e) => {
+                  setRegion(e.target.value);
+                  if (errors.region) setErrors((prev) => ({ ...prev, region: "" }));
+                }}
+                placeholder="VD: TP. Hồ Chí Minh"
+                className={`w-full rounded-lg border bg-background px-3 py-2 text-sm outline-none transition ${
+                  errors.region
+                    ? "border-destructive ring-1 ring-destructive/30 focus:border-destructive"
+                    : "border-border focus:border-primary"
+                }`}
+              />
+              {errors.region && (
+                <p className="mt-1 text-xs font-semibold text-destructive animate-in fade-in duration-150">
+                  {errors.region}
+                </p>
+              )}
+            </div>
+            <div>
+              <label className="mb-1.5 block text-xs font-semibold">
+                {t("opp.form.industry")} <span className="text-destructive">*</span>
+              </label>
+              <input
+                value={industry}
+                onChange={(e) => {
+                  setIndustry(e.target.value);
+                  if (errors.industry) setErrors((prev) => ({ ...prev, industry: "" }));
+                }}
+                placeholder="VD: Sản xuất"
+                className={`w-full rounded-lg border bg-background px-3 py-2 text-sm outline-none transition ${
+                  errors.industry
+                    ? "border-destructive ring-1 ring-destructive/30 focus:border-destructive"
+                    : "border-border focus:border-primary"
+                }`}
+              />
+              {errors.industry && (
+                <p className="mt-1 text-xs font-semibold text-destructive animate-in fade-in duration-150">
+                  {errors.industry}
+                </p>
+              )}
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="mb-1.5 block text-xs font-semibold">
+                {t("opp.form.budgetMin")} (VNĐ)
+              </label>
+              <StandardCurrencyInput
+                value={budgetMin}
+                onChange={(formatted) => {
+                  setBudgetMin(formatted);
+                  if (errors.budgetMax) setErrors((prev) => ({ ...prev, budgetMax: "" }));
+                }}
+                placeholder="VD: 50.000.000"
+                unit="VNĐ"
+                className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary font-medium"
+              />
+            </div>
+            <div>
+              <label className="mb-1.5 block text-xs font-semibold">
+                {t("opp.form.budgetMax")} (VNĐ)
+              </label>
+              <StandardCurrencyInput
+                value={budgetMax}
+                onChange={(formatted) => {
+                  setBudgetMax(formatted);
+                  if (errors.budgetMax) setErrors((prev) => ({ ...prev, budgetMax: "" }));
+                }}
+                placeholder="VD: 200.000.000"
+                unit="VNĐ"
+                className={`w-full rounded-lg border bg-background px-3 py-2 text-sm outline-none font-medium transition ${
+                  errors.budgetMax ? "border-destructive ring-1 ring-destructive/30" : "border-border focus:border-primary"
+                }`}
+              />
+              {errors.budgetMax && (
+                <p className="mt-1 text-xs font-semibold text-destructive animate-in fade-in duration-150">
+                  {errors.budgetMax}
+                </p>
+              )}
+            </div>
+          </div>
+          <div>
+            <label className="mb-1.5 block text-xs font-semibold">{t("opp.form.icon")}</label>
+            <div className="flex flex-wrap gap-2">
+              {ICON_OPTIONS.map((i) => (
+                <button
+                  type="button"
+                  key={i}
+                  onClick={() => setEmoji(i)}
+                  className={`h-9 w-9 rounded-lg border text-lg transition ${
+                    emoji === i
+                      ? "border-primary bg-primary/10"
+                      : "border-border hover:bg-secondary"
+                  }`}
+                >
+                  {i}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="flex justify-end gap-2 border-t border-border pt-4">
+            <button
+              type="button"
+              onClick={onClose}
+              className="rounded-lg border border-border px-4 py-2 text-sm font-medium hover:bg-secondary"
+            >
+              {t("opp.form.cancel")}
+            </button>
+            <button
+              type="submit"
+              className="rounded-lg px-4 py-2 text-sm font-semibold text-primary-foreground"
+              style={{ background: "var(--gradient-primary)" }}
+            >
+              {t("opp.form.submit")}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+function InterestModal({ opp, onClose }: { opp: Opportunity; onClose: () => void }) {
+  const t = useT();
+  const navigate = useNavigate();
+  const router = useRouter();
+  const express = useServerFn(expressInterestFn);
+  const [message, setMessage] = useState("");
+  const [contact, setContact] = useState("");
+  const [dealValueStr, setDealValueStr] = useState(opp.budgetMax ? String(opp.budgetMax) : "");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const numericDealValue = dealValueStr.replace(/\D/g, "") ? Number(dealValueStr.replace(/\D/g, "")) : undefined;
+  const budgetRef = opp.budgetMax || opp.budgetMin || 0;
+  const dealPercent = budgetRef > 0 && numericDealValue ? Math.round((numericDealValue / budgetRef) * 100) : null;
+
+  async function submit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!contact.trim()) return;
+    setIsSubmitting(true);
+    try {
+      const finalMsg = message.trim() || (numericDealValue ? `Đề xuất deal: ${new Intl.NumberFormat('vi-VN').format(numericDealValue)} VNĐ (${dealPercent || 100}% ngân sách)` : "Quan tâm hợp tác cơ hội này");
+      await express({ data: { opportunityId: opp.id, message: finalMsg, contact, dealValue: numericDealValue } });
+      await router.invalidate();
+      toast.success("Đã gửi đề xuất deal cơ hội thành công!");
+      onClose();
+      // Open chat with poster
+      navigate({ to: "/network", search: { peer: opp.posterId } });
+    } catch (err: any) {
+      toast.error("Không thể gửi yêu cầu deal: " + (err?.message || "Vui lòng thử lại"));
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/50 p-4 backdrop-blur-sm">
+      <div className="w-full max-w-md rounded-2xl bg-card shadow-2xl border border-border">
+        <div className="flex items-center justify-between border-b border-border p-5">
+          <h3 className="flex items-center gap-2 text-lg font-bold text-foreground">
+            <Send className="h-5 w-5 text-primary" />
+            Bày tỏ quan tâm & Đề xuất Deal
+          </h3>
+          <button onClick={onClose} className="rounded-lg p-1.5 hover:bg-secondary">
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+        <form onSubmit={submit} className="space-y-4 p-5">
+          <div className="rounded-xl bg-secondary/50 p-3.5 text-xs border border-border/50">
+            <div className="text-muted-foreground font-medium">Cơ hội mục tiêu:</div>
+            <div className="font-bold text-foreground text-sm mt-0.5">{opp.title}</div>
+            {budgetRef > 0 && (
+              <div className="mt-1 flex items-center gap-1.5 text-amber-600 dark:text-amber-400 font-semibold">
+                <span>Ngân sách kỳ vọng:</span>
+                <span>{new Intl.NumberFormat('vi-VN').format(budgetRef)} VNĐ</span>
+              </div>
+            )}
+          </div>
+
+          <div>
+            <label className="mb-1.5 flex items-center justify-between text-xs font-semibold text-foreground">
+              <span>Giá trị Deal đề xuất (VNĐ)</span>
+              {dealPercent !== null && (
+                <span className={`px-2 py-0.5 rounded-full text-[11px] font-bold ${
+                  dealPercent >= 100 
+                    ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300"
+                    : "bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300"
+                }`}>
+                  {dealPercent}% ngân sách ({dealPercent >= 100 ? `+${dealPercent - 100}% lời` : `${dealPercent - 100}%`})
+                </span>
+              )}
+            </label>
+            <input
+              type="text"
+              value={dealValueStr ? new Intl.NumberFormat('vi-VN').format(Number(dealValueStr.replace(/\D/g, ""))) : ""}
+              onChange={(e) => setDealValueStr(e.target.value.replace(/\D/g, ""))}
+              placeholder="Nhập số tiền deal (VNĐ) ví dụ: 50.000.000"
+              className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm font-semibold text-foreground outline-none focus:border-primary"
+            />
+            <p className="mt-1 text-[11px] text-muted-foreground">
+              * Mức deal này sẽ được xếp hạng theo tỷ lệ sinh lời tốt nhất cho người đăng cơ hội.
+            </p>
+          </div>
+
+          <div>
+            <label className="mb-1.5 block text-xs font-semibold text-foreground">
+              {t("opp.interest.contact")} <span className="text-destructive">*</span>
+            </label>
+            <input
+              value={contact}
+              onChange={(e) => setContact(e.target.value)}
+              required
+              placeholder="email@congty.vn / 0901..."
+              className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary"
+            />
+          </div>
+
+          <div>
+            <label className="mb-1.5 block text-xs font-semibold text-foreground">
+              {t("opp.interest.message")}
+            </label>
+            <textarea
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              rows={3}
+              placeholder="Mô tả phương án hợp tác, đề xuất giá hoặc năng lực thực thi..."
+              className="w-full resize-none rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary"
+            />
+          </div>
+
+          <div className="flex justify-end gap-2 border-t border-border pt-4">
+            <button
+              type="button"
+              onClick={onClose}
+              disabled={isSubmitting}
+              className="rounded-lg border border-border px-4 py-2 text-sm font-medium hover:bg-secondary cursor-pointer"
+            >
+              {t("opp.form.cancel")}
+            </button>
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="rounded-lg px-4 py-2 text-sm font-semibold text-primary-foreground shadow-sm cursor-pointer disabled:opacity-50"
+              style={{ background: "var(--gradient-primary)" }}
+            >
+              {isSubmitting ? "Đang gửi..." : "Gửi Đề Xuất Deal"}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+type Tab = "browse" | "mine" | "my_interests" | "closed" | "interests";
+
+function OpportunitiesPage() {
+  const t = useT();
+  const fmt = useFmt();
+  const router = useRouter();
+  const { user } = useAuth();
+  const member = (user as any)?.member || user;
+  const { can, isAdmin, isSuperAdmin, isPresident, isChuTich, isPlatformAdmin } = useRole();
+  const isMasterAdmin = isPlatformAdmin || isAdmin || isPresident || isChuTich || isSuperAdmin;
+  const currentUserId = user?.id || member?.id || CURRENT_USER_ID;
+
+  const loaderData = Route.useLoaderData() as {
+    opportunities: Opportunity[];
+    interests: OpportunityInterest[];
+    interestCounts: Record<string, number>;
+  };
+  const [dataState, setDataState] = useState(loaderData);
+  const all = dataState?.opportunities || [];
+  const interests = dataState?.interests || [];
+  const interestCounts = dataState?.interestCounts || {};
+
+  // Client-side fallback fetch nếu SSR loader trả về mảng rỗng
+  useEffect(() => {
+    fetchNestApi<{ opportunities: Opportunity[]; interests: OpportunityInterest[]; interestCounts: Record<string, number> }>("/opportunities")
+      .then((res) => {
+        if (res && Array.isArray(res.opportunities)) {
+          setDataState({
+            opportunities: res.opportunities,
+            interests: res.interests || [],
+            interestCounts: res.interestCounts || {},
+          });
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  const deleteOpp = useServerFn(deleteOpportunityFn);
+  const toggleOpp = useServerFn(toggleOpportunityStatusFn);
+  const [tab, setTab] = useState<Tab>("browse");
+  const [view, setView] = useUrlState<"table" | "grid">("view", "table");
+  const [q, setQ] = useUrlState<string>("q", "");
+  const [typeFilter, setTypeFilter] = useState<OpportunityTypeKey | "all">("all");
+  const [statusFilter, setStatusFilter] = useState<"all" | "open" | "closed">("all");
+  const [showCreate, setShowCreate] = useState(false);
+  const [interestOpp, setInterestOpp] = useState<Opportunity | null>(null);
+
+  const countFor = (id: string) => interestCounts[id] ?? 0;
+
+  const isOwnerOpp = (o: Opportunity) =>
+    o.posterId === currentUserId ||
+    (member?.id && o.posterId === member.id) ||
+    (user?.id && o.posterId === user.id) ||
+    o.posterId === CURRENT_USER_ID;
+
+  const filtered = useMemo(() => {
+    const ql = q.trim().toLowerCase();
+    let base = all;
+    if (tab === "mine") {
+      base = base.filter((o) => isOwnerOpp(o));
+    } else if (tab === "my_interests") {
+      base = base.filter((o) => (o as any).interested || countFor(o.id) > 0);
+    } else if (tab === "closed") {
+      base = base.filter((o) => o.status === "closed");
+    }
+    if (statusFilter !== "all") {
+      base = base.filter((o) => o.status === statusFilter);
+    }
+    if (typeFilter !== "all") base = base.filter((o) => o.type === typeFilter);
+    if (ql) {
+      base = base.filter(
+        (o) =>
+          o.title.toLowerCase().includes(ql) ||
+          o.description.toLowerCase().includes(ql) ||
+          o.industry.toLowerCase().includes(ql) ||
+          o.region.toLowerCase().includes(ql),
+      );
+    }
+    return base;
+  }, [all, q, tab, typeFilter, statusFilter, currentUserId, member?.id, user?.id]);
+
+  const tc = useTableControls<Opportunity>(
+    filtered,
+    {
+      title: (o) => o.title,
+      type: (o) => o.type,
+      region: (o) => o.region,
+      deadline: (o) => o.deadline,
+      createdAt: (o) => o.createdAt,
+    },
+    { initialSortKey: "createdAt", initialSortDir: "desc", initialPageSize: 9 },
+  );
+
+  const myOpps = useMemo(() => all.filter((o) => isOwnerOpp(o)), [all, currentUserId, member?.id, user?.id]);
+  const closedOpps = useMemo(() => all.filter((o) => o.status === "closed"), [all]);
+  
+  // Sắp xếp các đề xuất deal theo giá trị lời nhất cho người đăng cơ hội (deal_value cao nhất lên đầu)
+  const myInterests = useMemo(
+    () =>
+      myOpps
+        .map((o) => {
+          const rawItems = interests.filter((it) => it.opportunityId === o.id);
+          const sortedItems = [...rawItems].sort((a, b) => {
+            const valA = Number(a.dealValue || 0);
+            const valB = Number(b.dealValue || 0);
+            if (valB !== valA) return valB - valA; // Xếp deal lời nhất lên đầu
+            return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+          });
+          return {
+            opp: o,
+            items: sortedItems,
+          };
+        })
+        .filter((x: any) => x.items.length > 0),
+    [myOpps, interests],
+  );
+
+  const totalOpen = all.filter((o) => o.status === "open").length;
+  const totalInterestsOnMine = myOpps.reduce((s, o) => s + countFor(o.id), 0);
+
+  return (
+    <AppShell>
+      <PageHeader
+        title={t("opp.title")}
+        subtitle={t("opp.subtitle")}
+        actions={
+          can(PERMISSIONS.OPPORTUNITY_MANAGE) ? (
+            <button
+              onClick={() => setShowCreate(true)}
+              className="inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold text-primary-foreground shadow-[var(--shadow-glow)] cursor-pointer"
+              style={{ background: "var(--gradient-primary)" }}
+            >
+              <Plus className="h-4 w-4" />
+              {t("opp.action.new")}
+            </button>
+          ) : undefined
+        }
+      />
+
+      <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <StatCard
+          label={t("opp.kpi.total")}
+          value={all.length}
+          icon={<Lightbulb className="h-4 w-4" />}
+        />
+        <StatCard
+          label={t("opp.kpi.open")}
+          value={totalOpen}
+          tone="success"
+          icon={<Sparkles className="h-4 w-4" />}
+        />
+        <StatCard
+          label="Đã đóng"
+          value={closedOpps.length}
+          tone="info"
+          icon={<CheckCircle2 className="h-4 w-4" />}
+        />
+        <StatCard
+          label={t("opp.kpi.interests")}
+          value={totalInterestsOnMine}
+          tone="warning"
+          icon={<MessageSquare className="h-4 w-4" />}
+        />
+      </div>
+
+      {/* Tabs */}
+      <div className="mb-4 flex flex-wrap items-center gap-2">
+        <button
+          onClick={() => setTab("browse")}
+          className={`rounded-lg px-4 py-2 text-sm font-medium transition cursor-pointer ${
+            tab === "browse"
+              ? "bg-primary text-primary-foreground shadow-[var(--shadow-glow)]"
+              : "border border-border bg-card hover:bg-secondary"
+          }`}
+        >
+          {t("opp.tab.browse")}
+        </button>
+        <button
+          onClick={() => setTab("mine")}
+          className={`rounded-lg px-4 py-2 text-sm font-medium transition cursor-pointer ${
+            tab === "mine"
+              ? "bg-primary text-primary-foreground shadow-[var(--shadow-glow)]"
+              : "border border-border bg-card hover:bg-secondary"
+          }`}
+        >
+          {t("opp.tab.mine")} ({myOpps.length})
+        </button>
+        <button
+          onClick={() => setTab("my_interests")}
+          className={`rounded-lg px-4 py-2 text-sm font-medium transition cursor-pointer ${
+            tab === "my_interests"
+              ? "bg-primary text-primary-foreground shadow-[var(--shadow-glow)]"
+              : "border border-border bg-card hover:bg-secondary"
+          }`}
+        >
+          Cơ hội tôi quan tâm
+        </button>
+        <button
+          onClick={() => setTab("closed")}
+          className={`rounded-lg px-4 py-2 text-sm font-medium transition cursor-pointer ${
+            tab === "closed"
+              ? "bg-primary text-primary-foreground shadow-[var(--shadow-glow)]"
+              : "border border-border bg-card hover:bg-secondary"
+          }`}
+        >
+          Đã đóng ({closedOpps.length})
+        </button>
+        <button
+          onClick={() => setTab("interests")}
+          className={`rounded-lg px-4 py-2 text-sm font-medium transition cursor-pointer ${
+            tab === "interests"
+              ? "bg-primary text-primary-foreground shadow-[var(--shadow-glow)]"
+              : "border border-border bg-card hover:bg-secondary"
+          }`}
+        >
+          {t("opp.tab.interests")}
+        </button>
+      </div>
+
+      {tab !== "interests" && (
+        <Card className="mb-6 p-4">
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="relative min-w-[260px] flex-1">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <input
+                value={q}
+                onChange={(e) => setQ(e.target.value)}
+                placeholder={t("opp.search")}
+                className="w-full rounded-lg border border-border bg-background py-2 pl-9 pr-3 text-sm outline-none focus:border-primary"
+              />
+            </div>
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value as "all" | "open" | "closed")}
+              className="rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary"
+            >
+              <option value="all">Tất cả trạng thái</option>
+              <option value="open">Đang mở</option>
+              <option value="closed">Đã đóng</option>
+            </select>
+            <select
+              value={typeFilter}
+              onChange={(e) => setTypeFilter(e.target.value as OpportunityTypeKey | "all")}
+              className="rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary"
+            >
+              <option value="all">{t("opp.filter.all")}</option>
+              {OPPORTUNITY_TYPES.map((c: any) => (
+                <option key={c} value={c}>
+                  {t(c)}
+                </option>
+              ))}
+            </select>
+            <div className="flex items-center rounded-lg border border-border bg-background p-1">
+              <button
+                type="button"
+                onClick={() => setView("table")}
+                className={`rounded-md p-1.5 transition-colors ${
+                  view === "table"
+                    ? "bg-primary text-primary-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+                title="Dạng bảng"
+              >
+                <TableIcon className="h-4 w-4" />
+              </button>
+              <button
+                type="button"
+                onClick={() => setView("grid")}
+                className={`rounded-md p-1.5 transition-colors ${
+                  view === "grid"
+                    ? "bg-primary text-primary-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+                title="Dạng lưới"
+              >
+                <LayoutGrid className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
+        </Card>
+      )}
+
+      {tab === "interests" ? (
+        <div className="space-y-6">
+          {myInterests.length === 0 ? (
+            <Card className="p-12 text-center text-sm text-muted-foreground">
+              {t("opp.empty.interests")}
+            </Card>
+          ) : (
+            myInterests.map(({ opp, items }) => (
+              <Card key={opp.id} className="p-6 border border-border shadow-sm">
+                <div className="mb-5 flex flex-wrap items-start justify-between gap-3 border-b border-border pb-4">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <Pill color="primary">{t(opp.type)}</Pill>
+                      {opp.budgetMax ? (
+                        <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-800 dark:bg-amber-950 dark:text-amber-300 border border-amber-200">
+                          Ngân sách kỳ vọng: {new Intl.NumberFormat('vi-VN').format(opp.budgetMax)} VNĐ
+                        </span>
+                      ) : null}
+                    </div>
+                    <h4 className="mt-2 text-lg font-bold text-foreground">{opp.title}</h4>
+                    {opp.description && (
+                      <p className="mt-1 text-xs text-muted-foreground line-clamp-1">{opp.description}</p>
+                    )}
+                  </div>
+                  <span className="text-xs font-bold text-primary bg-primary/10 px-3 py-1.5 rounded-full">
+                    {items.length} đối tác đang quan tâm / đề xuất deal
+                  </span>
+                </div>
+
+                <div className="space-y-3.5">
+                  <div className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+                    <TrendingUp className="h-3.5 w-3.5 text-primary" />
+                    Bảng xếp hạng đề xuất Deal (Sắp xếp theo giá trị lời nhất cho bạn):
+                  </div>
+
+                  {items.map((it, idx) => {
+                    const m = getPoster(it.memberId);
+                    const isTop1 = idx === 0 && (it.dealValue || 0) > 0;
+                    return (
+                      <div
+                        key={it.id}
+                        className={`rounded-xl border p-4 text-sm transition-all ${
+                          isTop1
+                            ? "border-amber-300 bg-amber-50/50 dark:border-amber-700/60 dark:bg-amber-950/20 shadow-xs"
+                            : "border-border bg-card hover:bg-secondary/40"
+                        }`}
+                      >
+                        <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
+                          <div className="flex items-center gap-2">
+                            <span className={`inline-flex items-center justify-center h-6 min-w-6 px-1.5 rounded-full text-xs font-extrabold ${
+                              isTop1
+                                ? "bg-amber-500 text-white shadow-xs"
+                                : idx === 1
+                                ? "bg-slate-400 text-white"
+                                : "bg-secondary text-muted-foreground"
+                            }`}>
+                              #{idx + 1}
+                            </span>
+                            <Link
+                              to="/members/$memberId"
+                              params={{ memberId: it.memberId }}
+                              search={REVIEW_SEARCH_RESET}
+                              className="font-bold text-foreground hover:text-primary hover:underline text-sm flex items-center gap-1.5"
+                            >
+                              {(it as any).memberName || (it as any).name || m?.name || it.contact || it.memberId}
+                              {(it as any).memberCompany && (
+                                <span className="text-xs font-normal text-muted-foreground">({(it as any).memberCompany})</span>
+                              )}
+                            </Link>
+                            {isTop1 && (
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-bold bg-amber-100 text-amber-900 dark:bg-amber-900/60 dark:text-amber-200">
+                                <Award className="h-3 w-3 text-amber-600 dark:text-amber-300" />
+                                Deal Lời Nhất
+                              </span>
+                            )}
+                          </div>
+
+                          <div className="flex items-center gap-3">
+                            {it.dealValue && it.dealValue > 0 ? (
+                              <div className="text-right">
+                                <div className="text-sm font-extrabold text-emerald-600 dark:text-emerald-400">
+                                  {new Intl.NumberFormat('vi-VN').format(it.dealValue)} VNĐ
+                                </div>
+                                {it.dealPercent ? (
+                                  <div className="text-[11px] font-bold text-muted-foreground">
+                                    Tỷ lệ: {it.dealPercent}% ngân sách {it.dealPercent >= 100 ? `(+${it.dealPercent - 100}% lời)` : ''}
+                                  </div>
+                                ) : null}
+                              </div>
+                            ) : (
+                              <span className="text-xs font-semibold text-muted-foreground">Quan tâm kết nối</span>
+                            )}
+
+                            <span className="text-[11px] text-muted-foreground">
+                              {fmt.date(it.createdAt)}
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="rounded-lg bg-secondary/50 p-2.5 text-xs text-foreground mb-3 flex items-start justify-between gap-3">
+                          <p className="flex-1 font-medium">{it.message}</p>
+                          <span className="text-muted-foreground font-mono shrink-0">{it.contact}</span>
+                        </div>
+
+                        <div className="flex justify-end">
+                          <Link
+                            to="/network"
+                            search={{ peer: it.memberId }}
+                            className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold text-white shadow-xs hover:opacity-95 cursor-pointer"
+                            style={{ background: "var(--gradient-primary)" }}
+                          >
+                            <MessageSquare className="h-3.5 w-3.5" />
+                            Nhắn tin chốt Deal B2B
+                          </Link>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </Card>
+            ))
+          )}
+        </div>
+      ) : tc.total === 0 ? (
+        <Card className="p-12 text-center text-sm text-muted-foreground">
+          {tab === "mine" ? t("opp.empty.mine") : t("opp.empty.browse")}
+        </Card>
+      ) : view === "table" ? (
+        <div className="self-stretch relative bg-white dark:bg-card rounded-[20px] outline outline-1 outline-offset-[-1px] outline-slate-200 dark:outline-slate-800 flex flex-col justify-start items-start overflow-hidden shadow-xs">
+          <div className="relative overflow-x-auto w-full">
+            <table className="w-full min-w-[1300px] whitespace-nowrap border-collapse text-sm">
+              <thead>
+                <tr className="h-16 bg-blue-50/70 dark:bg-blue-950/40 border-b border-slate-200 dark:border-slate-800 text-xs font-bold text-slate-900 dark:text-slate-100">
+                  <th className="sticky left-0 z-20 w-14 min-w-[56px] bg-blue-50/90 dark:bg-blue-950/90 px-3 py-3 text-center text-xs font-bold border-b border-r border-slate-200 dark:border-slate-800 select-none">
+                    STT
+                  </th>
+                  <th className="sticky left-[56px] z-20 min-w-[90px] bg-blue-50/90 dark:bg-blue-950/90 px-3 py-3 border-b border-r border-slate-200 dark:border-slate-800 shadow-[4px_0_6px_-2px_rgba(0,0,0,0.05)] text-left">
+                    Mã
+                  </th>
+                  <SortHeader
+                    label="Cơ hội / Tiêu đề"
+                    columnKey="title"
+                    sortKey={tc.sortKey}
+                    sortDir={tc.sortDir}
+                    onSort={tc.toggleSort}
+                    width={260}
+                    className="border-r border-slate-200 dark:border-slate-800"
+                  />
+                  <SortHeader
+                    label="Người tạo cơ hội"
+                    columnKey="poster"
+                    sortKey={tc.sortKey}
+                    sortDir={tc.sortDir}
+                    onSort={tc.toggleSort}
+                    width={180}
+                    className="border-r border-slate-200 dark:border-slate-800"
+                  />
+                  <th className="px-4 py-3 border-r border-b border-slate-200 dark:border-slate-800 text-left min-w-[150px]">
+                    Người liên hệ
+                  </th>
+                  <th className="px-4 py-3 border-r border-b border-slate-200 dark:border-slate-800 text-left min-w-[150px]">
+                    Người nhận cơ hội
+                  </th>
+                  <SortHeader
+                    label="Phân loại"
+                    columnKey="type"
+                    sortKey={tc.sortKey}
+                    sortDir={tc.sortDir}
+                    onSort={tc.toggleSort}
+                    width={130}
+                    className="border-r border-slate-200 dark:border-slate-800"
+                  />
+                  <th className="px-4 py-3 border-r border-b border-slate-200 dark:border-slate-800 text-left min-w-[140px]">
+                    Ngành & Khu vực
+                  </th>
+                  <SortHeader
+                    label="Ngân sách"
+                    columnKey="budget"
+                    sortKey={tc.sortKey}
+                    sortDir={tc.sortDir}
+                    onSort={tc.toggleSort}
+                    width={140}
+                    className="border-r border-slate-200 dark:border-slate-800"
+                  />
+                  <SortHeader
+                    label="Hạn chót"
+                    columnKey="deadline"
+                    sortKey={tc.sortKey}
+                    sortDir={tc.sortDir}
+                    onSort={tc.toggleSort}
+                    width={130}
+                    className="border-r border-slate-200 dark:border-slate-800"
+                  />
+                  <SortHeader
+                    label="Trạng thái"
+                    columnKey="status"
+                    sortKey={tc.sortKey}
+                    sortDir={tc.sortDir}
+                    onSort={tc.toggleSort}
+                    width={130}
+                    className="border-r border-slate-200 dark:border-slate-800"
+                  />
+                  <th className="sticky right-0 z-20 min-w-[150px] bg-blue-50/90 dark:bg-blue-950/90 px-4 py-3 text-right font-bold border-b border-l border-slate-200 dark:border-slate-800 shadow-[-4px_0_6px_-2px_rgba(0,0,0,0.08)]">
+                    Thao tác
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-200 dark:divide-slate-800 text-xs">
+                {tc.pageRows.map((opp, idx) => {
+                  const poster = getPoster(opp.posterId);
+                  const isOwner = isOwnerOpp(opp);
+                  const canManage = isOwner || isMasterAdmin || can(PERMISSIONS.OPPORTUNITY_MANAGE);
+                  const budget =
+                    opp.budgetMin && opp.budgetMax
+                      ? `${fmt.money(opp.budgetMin)} – ${fmt.money(opp.budgetMax)}`
+                      : opp.budgetMin
+                        ? `${t("opp.fromLabel")} ${fmt.money(opp.budgetMin)}`
+                        : t("opp.budgetOpen");
+
+                  return (
+                    <tr
+                      key={opp.id}
+                      className="group border-b border-slate-200 dark:border-slate-800 transition-colors hover:bg-slate-50/80 dark:hover:bg-slate-800/40"
+                    >
+                      {/* Sticky STT */}
+                      <td className="sticky left-0 z-10 w-14 min-w-[56px] bg-card group-hover:bg-muted/70 px-3 py-3.5 text-center text-xs font-medium text-muted-foreground border-b border-r border-slate-200 dark:border-slate-800 transition-colors">
+                        {(tc.page - 1) * tc.pageSize + idx + 1}
+                      </td>
+
+                      {/* Sticky Code */}
+                      <td className="sticky left-[56px] z-10 min-w-[100px] bg-card group-hover:bg-muted/70 px-3 py-3.5 font-mono text-[12px] font-semibold text-primary border-b border-r border-slate-200 dark:border-slate-800 shadow-[4px_0_6px_-2px_rgba(0,0,0,0.05)] transition-colors">
+                        <div className="flex items-center gap-1.5">
+                          <div className="relative h-6 w-6 shrink-0 overflow-hidden rounded bg-secondary/40 flex items-center justify-center text-sm">
+                            {(() => {
+                              const img = opp.image || (opp as any).imageUrl;
+                              const resolved = resolveMediaUrl(img);
+                              if (resolved) {
+                                return (
+                                  <img
+                                    src={resolved}
+                                    alt={opp.title}
+                                    className="absolute inset-0 h-full w-full object-cover"
+                                    onError={(e) => {
+                                      (e.target as HTMLElement).style.display = "none";
+                                    }}
+                                  />
+                                );
+                              }
+                              return null;
+                            })()}
+                            <span className="relative z-10 text-xs">{opp.emoji}</span>
+                          </div>
+                          <span>OPP-{opp.id.slice(0, 6).toUpperCase()}</span>
+                        </div>
+                      </td>
+
+                      {/* Title & Description with Tooltip */}
+                      <td className="px-4 py-3.5 border-r border-b border-slate-200 dark:border-slate-800 whitespace-nowrap">
+                        <Link
+                          to="/opportunities/$id"
+                          params={{ id: opp.id }}
+                          className="font-semibold text-foreground text-xs hover:text-primary hover:underline block"
+                        >
+                          <TruncatedText text={opp.title} maxWidth="max-w-[300px]" />
+                        </Link>
+                        <TruncatedText
+                          text={opp.description}
+                          maxWidth="max-w-[300px]"
+                          className="text-[11px] text-muted-foreground"
+                        />
+                      </td>
+
+                      {/* Người tạo cơ hội */}
+                      <td className="px-4 py-3.5 border-r border-b border-slate-200 dark:border-slate-800 whitespace-nowrap">
+                        <Link
+                          to="/members/$memberId"
+                          params={{ memberId: opp.posterId }}
+                          search={REVIEW_SEARCH_RESET}
+                          className="font-semibold text-primary hover:underline text-xs block"
+                        >
+                          <TruncatedText
+                            text={opp.posterName || poster?.name || `Hội viên #${opp.posterId.slice(0, 6)}`}
+                            maxWidth="max-w-[300px]"
+                          />
+                        </Link>
+                        <div className="text-[11px] text-muted-foreground">
+                          <TruncatedText
+                            text={poster?.email || poster?.contact || "Hội viên"}
+                            maxWidth="max-w-[300px]"
+                          />
+                        </div>
+                      </td>
+
+                      {/* Người liên hệ */}
+                      <td className="px-4 py-3.5 border-r border-b border-slate-200 dark:border-slate-800 whitespace-nowrap">
+                        {opp.contactName || opp.contactPhone || opp.company ? (
+                          <div>
+                            <div className="font-semibold text-foreground text-xs">
+                              <TruncatedText
+                                text={`${opp.contactName || "Người liên hệ"}${opp.contactTitle ? ` (${opp.contactTitle})` : ""}`}
+                                maxWidth="max-w-[300px]"
+                              />
+                            </div>
+                            {opp.company && (
+                              <div className="text-[11px] text-muted-foreground">
+                                <TruncatedText text={opp.company} maxWidth="max-w-[300px]" />
+                              </div>
+                            )}
+                            {opp.contactPhone && (
+                              <div className="text-[11px] text-primary font-mono">
+                                {opp.contactPhone}
+                              </div>
+                            )}
+                          </div>
+                        ) : (
+                          <span className="text-xs text-muted-foreground/60">—</span>
+                        )}
+                      </td>
+
+                      {/* Người nhận cơ hội */}
+                      <td className="px-4 py-3.5 border-r border-b border-slate-200 dark:border-slate-800 whitespace-nowrap">
+                        {opp.claimedByName ? (
+                          <div>
+                            <div className="flex items-center gap-1 text-xs font-semibold text-emerald-500">
+                              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+                              <TruncatedText text={opp.claimedByName} maxWidth="max-w-[300px]" />
+                            </div>
+                            {(opp.claimedCompany || opp.claimedPhone) && (
+                              <div className="text-[11px] text-muted-foreground">
+                                <TruncatedText
+                                  text={[opp.claimedCompany, opp.claimedPhone].filter(Boolean).join(" • ")}
+                                  maxWidth="max-w-[300px]"
+                                />
+                              </div>
+                            )}
+                          </div>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 rounded-full bg-secondary px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
+                            <Clock className="h-3 w-3" />
+                            Chưa tiếp nhận
+                          </span>
+                        )}
+                      </td>
+
+                      {/* Phân loại */}
+                      <td className="px-4 py-3.5 border-r border-b border-slate-200 dark:border-slate-800 whitespace-nowrap">
+                        <Pill color="primary">{t(opp.type)}</Pill>
+                      </td>
+
+                      {/* Ngành & Khu vực */}
+                      <td className="px-4 py-3.5 border-r border-b border-slate-200 dark:border-slate-800 text-xs whitespace-nowrap">
+                        <div className="font-medium text-foreground">
+                          <TruncatedText text={opp.industry} maxWidth="max-w-[300px]" />
+                        </div>
+                        <div className="text-[11px] text-muted-foreground">
+                          <TruncatedText text={opp.region} maxWidth="max-w-[300px]" />
+                        </div>
+                      </td>
+
+                      {/* Ngân sách */}
+                      <td className="px-4 py-3.5 border-r border-b border-slate-200 dark:border-slate-800 font-semibold text-xs text-foreground whitespace-nowrap">
+                        {budget}
+                      </td>
+
+                      {/* Hạn chót */}
+                      <td className="px-4 py-3.5 border-r border-b border-slate-200 dark:border-slate-800 text-xs text-muted-foreground whitespace-nowrap">
+                        {fmt.date(opp.deadline)}
+                      </td>
+
+                      {/* Trạng thái */}
+                      <td className="px-4 py-3.5 border-r border-b border-slate-200 dark:border-slate-800 whitespace-nowrap">
+                        <Pill color={STATUS_COLOR[opp.status]}>{t(STATUS_KEY[opp.status])}</Pill>
+                      </td>
+
+                      {/* Sticky Thao tác */}
+                      <td className="sticky right-0 z-10 min-w-[150px] bg-card group-hover:bg-muted/70 px-4 py-3.5 text-right border-b border-l border-slate-200 dark:border-slate-800 shadow-[-4px_0_6px_-2px_rgba(0,0,0,0.08)] transition-colors">
+                        <div className="inline-flex items-center gap-1.5 justify-end">
+                          <Link
+                            to="/opportunities/$id"
+                            params={{ id: opp.id }}
+                            className="inline-flex items-center gap-1 rounded-lg border border-border bg-background px-2.5 py-1.5 text-xs font-semibold text-foreground hover:bg-muted"
+                            title={t("tbl.view")}
+                          >
+                            <Eye className="h-3.5 w-3.5" />
+                          </Link>
+                          {canManage && (
+                            <Link
+                              to="/opportunities/$id/edit"
+                              params={{ id: opp.id }}
+                              className="rounded-lg border border-border bg-background px-2 py-1.5 text-xs font-medium text-foreground hover:bg-secondary"
+                              title={t("opp.action.edit")}
+                            >
+                              <Pencil className="h-3.5 w-3.5" />
+                            </Link>
+                          )}
+                          {canManage ? (
+                            <>
+                              <button
+                                onClick={async () => {
+                                  const isClosing = opp.status === "open";
+                                  await toggleOpp({ data: { id: opp.id } });
+                                  await router.invalidate();
+                                  toast.success(
+                                    isClosing
+                                      ? "Đã đóng cơ hội giao thương thành công!"
+                                      : "Đã mở lại cơ hội giao thương thành công!",
+                                  );
+                                }}
+                                className="rounded-lg border border-border bg-background px-2 py-1.5 text-xs font-medium hover:bg-secondary cursor-pointer"
+                                title={opp.status === "open" ? t("opp.action.close") : t("opp.action.reopen")}
+                              >
+                                {opp.status === "open" ? "Đóng" : "Mở lại"}
+                              </button>
+                              <button
+                                onClick={async () => {
+                                  if (confirm(t("opp.confirmDelete"))) {
+                                    await deleteOpp({ data: { id: opp.id } });
+                                    await router.invalidate();
+                                    toast.success("Đã xóa cơ hội giao thương thành công!");
+                                  }
+                                }}
+                                className="rounded-lg border border-destructive/30 p-1.5 text-xs font-medium text-destructive hover:bg-destructive/10 cursor-pointer"
+                                title={t("opp.action.delete")}
+                              >
+                                <Trash2 className="h-3.5 w-3.5" />
+                              </button>
+                            </>
+                          ) : (
+                            <button
+                              onClick={() => setInterestOpp(opp)}
+                              disabled={opp.status === "closed"}
+                              className="inline-flex items-center gap-1 rounded-lg bg-primary px-2.5 py-1.5 text-xs font-semibold text-primary-foreground hover:bg-primary/90 disabled:opacity-50 cursor-pointer"
+                              title={t("opp.action.interest")}
+                            >
+                              <Send className="h-3 w-3" />
+                              Kết nối
+                            </button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+          <div className="border-t border-border bg-card">
+            <Pagination
+              page={tc.page}
+              pageCount={tc.pageCount}
+              pageSize={tc.pageSize}
+              total={tc.total}
+              from={tc.from}
+              to={tc.to}
+              onPage={tc.setPage}
+              onPageSize={tc.setPageSize}
+              pageSizeOptions={[9, 18, 36, 72]}
+            />
+          </div>
+        </div>
+      ) : (
+        <>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {tc.pageRows.map((opp) => (
+              <OpportunityCard
+                key={opp.id}
+                opp={opp}
+                interestCount={countFor(opp.id)}
+                canManage={isOwnerOpp(opp) || isMasterAdmin || can(PERMISSIONS.OPPORTUNITY_MANAGE)}
+                onInterest={() => setInterestOpp(opp)}
+                onDelete={async () => {
+                  if (confirm(t("opp.confirmDelete"))) {
+                    await deleteOpp({ data: { id: opp.id } });
+                    await router.invalidate();
+                    toast.success("Đã xóa cơ hội giao thương thành công!");
+                  }
+                }}
+                onToggle={async () => {
+                  const isClosing = opp.status === "open";
+                  await toggleOpp({ data: { id: opp.id } });
+                  await router.invalidate();
+                  toast.success(
+                    isClosing
+                      ? "Đã đóng cơ hội giao thương thành công!"
+                      : "Đã mở lại cơ hội giao thương thành công!",
+                  );
+                }}
+              />
+            ))}
+          </div>
+          <div className="mt-4 overflow-hidden rounded-2xl border border-border bg-card">
+            <Pagination
+              page={tc.page}
+              pageCount={tc.pageCount}
+              pageSize={tc.pageSize}
+              total={tc.total}
+              from={tc.from}
+              to={tc.to}
+              onPage={tc.setPage}
+              onPageSize={tc.setPageSize}
+              pageSizeOptions={[9, 18, 36, 72]}
+            />
+          </div>
+        </>
+      )}
+
+      {showCreate && <NewOpportunityModal onClose={() => setShowCreate(false)} />}
+      {interestOpp && <InterestModal opp={interestOpp} onClose={() => setInterestOpp(null)} />}
+    </AppShell>
+  );
+}

@@ -1,0 +1,663 @@
+import "@/lib/utils";
+import {
+  Outlet,
+  Link,
+  createRootRoute,
+  HeadContent,
+  Scripts,
+  useRouterState,
+  useNavigate,
+  useRouter,
+} from "@tanstack/react-router";
+
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import {
+  enforceEphemeralSession,
+  ensureFreshSession,
+  startSessionResume,
+  rememberLastMobileRoute,
+  getLastMobileRoute,
+  isStandalonePwa,
+  signOutSession,
+} from "@/lib/business-connect/mobile/auth-session";
+import { bcDeviceSessionTouchFn } from "@/lib/business-connect/mobile/device-session.functions";
+import { describeCurrentDevice } from "@/lib/business-connect/mobile/device-session.client-info";
+import { useEffect, useState } from "react";
+import { LangContext, isLang, type Lang } from "@/lib/i18n";
+import { ThemeProvider } from "@/lib/theme";
+import { AuthProvider, useAuth } from "@/context/AuthContext";
+import { registerServiceWorker } from "@/lib/register-sw";
+import { isTenantHost } from "@/lib/tenant";
+import { setupGlobalInputTrimmer } from "@/lib/input-trim-helper";
+
+const LANG_STORAGE_KEY = "vba.lang";
+
+function makeQueryClient() {
+  return new QueryClient({
+    defaultOptions: {
+      queries: {
+        staleTime: 30_000,
+        gcTime: 5 * 60_000,
+        refetchOnWindowFocus: false,
+        retry: 1,
+      },
+    },
+  });
+}
+import { Toaster } from "@/components/ui/sonner";
+import { MockModeBanner } from "@/components/MockModeBanner";
+import { VoiceNavAssistant } from "@/components/ai/VoiceNavAssistant";
+import { ViOneVoiceAssistant } from "@/components/ai/ViOneVoiceAssistant";
+import { IosInstallPrompt } from "@/components/member/IosInstallPrompt";
+import { GlobalPermissionRevokedModal } from "@/components/common/GlobalPermissionRevokedModal";
+
+import appCss from "../styles.css?url";
+
+function NotFoundComponent() {
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-background px-4">
+      <div className="max-w-md text-center">
+        <h1 className="text-7xl font-bold text-foreground">404</h1>
+        <h2 className="mt-4 text-xl font-semibold text-foreground">Page not found</h2>
+        <p className="mt-2 text-sm text-muted-foreground">
+          The page you're looking for doesn't exist or has been moved.
+        </p>
+        <div className="mt-6">
+          <Link
+            to="/"
+            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+          >
+            Go home
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function RootErrorComponent({ error, reset }: { error: unknown; reset: () => void }) {
+  const router = useRouter();
+  useEffect(() => {
+    // Log the raw thrown value: some throws are non-Error (undefined/null),
+    // which otherwise surface as an opaque "Uncaught undefined".
+    console.error("[root-error]", error);
+  }, [error]);
+
+  const message = error instanceof Error ? error.message : String(error ?? "Unknown error");
+
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-background px-4">
+      <div className="max-w-md text-center">
+        <h1 className="text-xl font-semibold text-foreground">Đã xảy ra lỗi</h1>
+        <p className="mt-2 break-words text-sm text-muted-foreground">{message}</p>
+        <div className="mt-6 flex justify-center gap-3">
+          <button
+            type="button"
+            onClick={() => {
+              reset();
+              void router.invalidate();
+            }}
+            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+          >
+            Thử lại
+          </button>
+          <Link
+            to="/"
+            className="inline-flex items-center justify-center rounded-md border border-border px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted"
+          >
+            Về trang chủ
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export const Route = createRootRoute({
+  head: () => ({
+    meta: [
+      { charSet: "utf-8" },
+      // Security Meta Tags
+      { httpEquiv: "X-Content-Type-Options", content: "nosniff" },
+      { httpEquiv: "X-XSS-Protection", content: "1; mode=block" },
+      { name: "referrer", content: "strict-origin-when-cross-origin" },
+      // PWA: lock scale to prevent pinch/double-tap zoom in the installed app.
+      {
+        name: "viewport",
+        content:
+          "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover",
+      },
+      { title: "CEO HN10 — Nền tảng Quản trị Hiệp hội & App Hội viên" },
+      {
+        name: "description",
+        content:
+          "Quản lý hội viên, tổ chức sự kiện, kết nối doanh nghiệp và số hoá vận hành hiệp hội.",
+      },
+      { name: "author", content: "CLB Doanh Nhân CEO HN10" },
+      { name: "theme-color", content: "#001D4A" },
+      { name: "mobile-web-app-capable", content: "yes" },
+      { name: "apple-mobile-web-app-capable", content: "yes" },
+      { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
+      { name: "apple-mobile-web-app-title", content: "CEO HN10" },
+      { name: "application-name", content: "CEO HN10" },
+      { property: "og:title", content: "CEO HN10 — Nền tảng Quản trị Hiệp hội & App Hội viên" },
+      {
+        property: "og:description",
+        content:
+          "Quản lý hội viên, tổ chức sự kiện, kết nối doanh nghiệp và số hoá vận hành hiệp hội.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+      { name: "twitter:site", content: "@ceohn10" },
+      { name: "twitter:title", content: "CEO HN10 — Nền tảng Quản trị Hiệp hội & App Hội viên" },
+      {
+        name: "twitter:description",
+        content:
+          "Quản lý hội viên, tổ chức sự kiện, tăng doanh thu tài trợ và số hoá vận hành hiệp hội.",
+      },
+      {
+        property: "og:image",
+        content:
+          "https://ceohn10.viconnect.vn/ceohn10_hero_daylight_skyline.jpg",
+      },
+      {
+        name: "twitter:image",
+        content:
+          "https://ceohn10.viconnect.vn/ceohn10_hero_daylight_skyline.jpg",
+      },
+    ],
+    links: [
+      {
+        rel: "stylesheet",
+        href: appCss,
+      },
+      { rel: "manifest", href: "/manifest.webmanifest?v=2026-10-14.1" },
+      { rel: "apple-touch-icon", href: "/apple-touch-icon.png?v=ceohn10_v4w" },
+      {
+        rel: "apple-touch-icon",
+        sizes: "180x180",
+        href: "/apple-touch-icon-180x180.png?v=ceohn10_v4w",
+      },
+      {
+        rel: "apple-touch-icon",
+        sizes: "152x152",
+        href: "/apple-touch-icon-152x152.png?v=ceohn10_v4w",
+      },
+      {
+        rel: "apple-touch-icon",
+        sizes: "167x167",
+        href: "/apple-touch-icon-167x167.png?v=ceohn10_v4w",
+      },
+      { rel: "apple-touch-icon-precomposed", href: "/apple-touch-icon.png?v=ceohn10_v4w" },
+      { rel: "icon", type: "image/png", sizes: "64x64", href: "/ceohn10-favicon.png?v=ceohn10_v4w" },
+      { rel: "icon", type: "image/png", sizes: "192x192", href: "/app-icon-192.png?v=ceohn10_v4w" },
+      { rel: "icon", type: "image/png", sizes: "512x512", href: "/app-icon.png?v=ceohn10_v4w" },
+      { rel: "shortcut icon", href: "/ceohn10-favicon.png?v=ceohn10_v4w" },
+      // Web fonts for Business Card industry templates.
+      { rel: "preconnect", href: "https://fonts.googleapis.com" },
+      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
+      {
+        rel: "stylesheet",
+        href:
+          "https://fonts.googleapis.com/css2?" +
+          "family=Be+Vietnam+Pro:wght@400;500;600;700;800;900&" +
+          "family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&" +
+          "family=Inter:wght@400;500;600;700;800&" +
+          "family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400;1,700&" +
+          "family=Cinzel:wght@400;600;700;800;900&" +
+          "family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,700&" +
+          "family=Montserrat:ital,wght@0,400;0,600;0,700;0,800;0,900;1,400;1,700&" +
+          "family=Orbitron:wght@400;600;700;800;900&" +
+          "family=Dancing+Script:wght@400;600;700&" +
+          "family=Great+Vibes&" +
+          "family=DM+Serif+Display&" +
+          "family=Instrument+Serif&" +
+          "family=Space+Grotesk:wght@400;500;600;700&" +
+          "family=Manrope:wght@400;500;600;700&" +
+          "family=JetBrains+Mono:wght@400;500;700&" +
+          "display=swap&subset=vietnamese,latin-ext",
+      },
+    ],
+  }),
+  shellComponent: RootShell,
+  component: RootComponent,
+  notFoundComponent: NotFoundComponent,
+  errorComponent: RootErrorComponent,
+});
+
+function RootShell({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="vi" suppressHydrationWarning>
+      <head>
+        <HeadContent />
+      </head>
+      <body suppressHydrationWarning>
+        {children}
+        <Scripts />
+      </body>
+    </html>
+  );
+}
+
+import { useConnectAppRealtimeNotifications } from "@/hooks/use-connect-app-realtime-notifications";
+import { GlobalIncomingCallModal } from "@/components/business-connect/mobile/inbox/GlobalIncomingCallModal";
+
+function GlobalRealtimeNotifications() {
+  const { status } = useAuth();
+  const [isMounted, setIsMounted] = useState(false);
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  if (!isMounted || status !== "in") return null;
+  return <AuthenticatedRealtimeNotifications />;
+}
+
+function AuthenticatedRealtimeNotifications() {
+  useConnectAppRealtimeNotifications();
+  return <GlobalIncomingCallModal />;
+}
+
+function GlobalVoiceNavAssistant() {
+  const { status, user } = useAuth();
+  const routerState = useRouterState();
+  const [isMounted, setIsMounted] = useState(false);
+  const pathname =
+    routerState?.location?.pathname ||
+    (typeof window !== "undefined" ? window.location.pathname : "");
+
+  const [aiEnabled, setAiEnabled] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+    const isPermanentlyDisabled = localStorage.getItem("ceohn10_ai_disabled_permanently") === "true";
+    if (!isPermanentlyDisabled) {
+      setAiEnabled(localStorage.getItem("ceohn10_ai_assistant_enabled") !== "false");
+    }
+
+    const handleToggle = () => {
+      const isPermanentlyDisabled = localStorage.getItem("ceohn10_ai_disabled_permanently") === "true";
+      if (isPermanentlyDisabled) {
+        setAiEnabled(false);
+        return;
+      }
+      setAiEnabled(localStorage.getItem("ceohn10_ai_assistant_enabled") !== "false");
+    };
+    window.addEventListener("ceohn10_ai_toggle", handleToggle);
+    window.addEventListener("storage", handleToggle);
+    return () => {
+      window.removeEventListener("ceohn10_ai_toggle", handleToggle);
+      window.removeEventListener("storage", handleToggle);
+    };
+  }, []);
+
+  if (!isMounted || status !== "in" || !user) return null;
+  if (!aiEnabled) return null;
+
+  // Robot chỉ xuất hiện trong mỗi app hiệp hội (/association/* hoặc /m/*), không xuất hiện ở CRM hệ thống hay app ViOne
+  const isAssociationApp = pathname.startsWith("/association") || pathname.startsWith("/m");
+  if (!isAssociationApp) return null;
+
+  const lowerPath = pathname.toLowerCase();
+  const isAuthOrPublicPage =
+    lowerPath.includes("/login") ||
+    lowerPath === "/auth" ||
+    lowerPath === "/register" ||
+    lowerPath === "/forgot-password" ||
+    lowerPath === "/terms" ||
+    lowerPath === "/privacy";
+  if (isAuthOrPublicPage) return null;
+
+  return <VoiceNavAssistant />;
+}
+
+function GlobalViOneVoiceAssistant() {
+  const { status, user } = useAuth();
+  const routerState = useRouterState();
+  const [isMounted, setIsMounted] = useState(false);
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  const pathname =
+    routerState?.location?.pathname ||
+    (typeof window !== "undefined" ? window.location.pathname : "");
+
+  // Con AI ViOne CHỈ xuất hiện khi ĐÃ ĐĂNG NHẬP ở app ViOne (/connect-app/*), TUYỆT ĐỐI KHÔNG xuất hiện ở bất kỳ chỗ khác
+  if (!isMounted || status !== "in" || !user) return null;
+  if (!pathname.startsWith("/connect-app")) return null;
+
+  return <ViOneVoiceAssistant />;
+}
+
+function RootComponent() {
+  const [lang, setLangState] = useState<Lang>("vi");
+  const [queryClient] = useState(makeQueryClient);
+
+  // Register service worker for offline support (guarded: prod only).
+  useEffect(() => {
+    registerServiceWorker();
+  }, []);
+
+  // Auto-trim whitespace (stream space) across all inputs and textareas in CRM and Mobile app
+  useEffect(() => {
+    return setupGlobalInputTrimmer();
+  }, []);
+
+  // Stale-deploy recovery: when a new build ships, cached HTML/JS can point at
+  // chunk URLs that no longer exist. The dynamic import rejects and the page
+  // dies with a blank/error screen. Reload once (guarded) to pick up the new
+  // asset manifest instead of leaving the user stuck.
+  useEffect(() => {
+    const isChunkError = (value: unknown) => {
+      const msg = value instanceof Error ? value.message : String(value ?? "");
+      return /dynamically imported module|Importing a module script failed|ChunkLoadError|Loading chunk .* failed/i.test(
+        msg,
+      );
+    };
+    const recover = (value: unknown) => {
+      if (!isChunkError(value)) return;
+      try {
+        if (sessionStorage.getItem("app:chunk-reload") === "1") return;
+        sessionStorage.setItem("app:chunk-reload", "1");
+      } catch {
+        return;
+      }
+      window.location.reload();
+    };
+    const onError = (e: ErrorEvent) => recover(e.error ?? e.message);
+    const onRejection = (e: PromiseRejectionEvent) => recover(e.reason);
+    window.addEventListener("error", onError);
+    window.addEventListener("unhandledrejection", onRejection);
+    // A clean load means the app is healthy again — clear the guard.
+    const clear = window.setTimeout(() => {
+      try {
+        sessionStorage.removeItem("app:chunk-reload");
+      } catch {
+        /* storage unavailable */
+      }
+    }, 5000);
+    return () => {
+      window.removeEventListener("error", onError);
+      window.removeEventListener("unhandledrejection", onRejection);
+      window.clearTimeout(clear);
+    };
+  }, []);
+
+  // PWA: block multi-touch pinch zoom without intercepting or delaying single-tap clicks
+  useEffect(() => {
+    const preventGesture = (e: Event) => e.preventDefault();
+    const onTouchMove = (e: TouchEvent) => {
+      // Chỉ chặn cử chỉ pinch zoom từ 2 ngón tay trở lên, tuyệt đối không can thiệp vào chạm 1 ngón
+      if (e.touches.length > 1) {
+        e.preventDefault();
+      }
+    };
+
+    document.addEventListener("gesturestart", preventGesture);
+    document.addEventListener("gesturechange", preventGesture);
+    document.addEventListener("gestureend", preventGesture);
+    document.addEventListener("touchmove", onTouchMove, { passive: false });
+
+    return () => {
+      document.removeEventListener("gesturestart", preventGesture);
+      document.removeEventListener("gesturechange", preventGesture);
+      document.removeEventListener("gestureend", preventGesture);
+      document.removeEventListener("touchmove", onTouchMove);
+    };
+  }, []);
+
+  // Capture beforeinstallprompt early so it's always ready for 1-tap fast app install
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const handleBeforeInstall = (e: Event) => {
+      e.preventDefault();
+      (window as any).__pwaInstallPrompt = e;
+    };
+    window.addEventListener("beforeinstallprompt", handleBeforeInstall);
+    return () => {
+      window.removeEventListener("beforeinstallprompt", handleBeforeInstall);
+    };
+  }, []);
+
+  // Hydrate from localStorage on mount
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(LANG_STORAGE_KEY);
+      if (isLang(saved)) {
+        setLangState(saved);
+      }
+    } catch {
+      /* ignore */
+    }
+  }, []);
+
+  // Reflect on <html lang> + persist on change
+  useEffect(() => {
+    try {
+      localStorage.setItem(LANG_STORAGE_KEY, lang);
+    } catch {
+      /* ignore */
+    }
+    if (typeof document !== "undefined") {
+      document.documentElement.lang = lang;
+    }
+  }, [lang]);
+
+  const setLang = (l: Lang) => {
+    setLangState(l);
+    try {
+      localStorage.setItem(LANG_STORAGE_KEY, l);
+    } catch {
+      /* ignore */
+    }
+    if (typeof document !== "undefined") {
+      document.documentElement.lang = l;
+    }
+  };
+
+  // Dynamic Favicon Switcher: CEO HN10
+  const routerState = useRouterState();
+  const currentPath = routerState.location.pathname;
+
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    const targetFavicon = "/ceohn10-favicon.png?v=ceohn10_v4w";
+    const targetApple = "/apple-touch-icon.png?v=ceohn10_v4w";
+
+    const iconLinks = document.querySelectorAll<HTMLLinkElement>("link[rel~='icon']");
+    if (iconLinks.length > 0) {
+      iconLinks.forEach((l) => {
+        l.href = targetFavicon;
+      });
+    } else {
+      const link = document.createElement("link");
+      link.rel = "icon";
+      link.href = targetFavicon;
+      document.head.appendChild(link);
+    }
+
+    const appleLink = document.querySelector<HTMLLinkElement>("link[rel='apple-touch-icon']");
+    if (appleLink) {
+      appleLink.href = targetApple;
+    }
+  }, [currentPath]);
+
+  return (
+    <LangContext.Provider value={{ lang, setLang }}>
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider>
+          {/* Global Luxury Ambient Glowing Backgrounds */}
+          <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden" aria-hidden="true">
+            <div className="luxury-glow-1" />
+            <div className="luxury-glow-2" />
+          </div>
+          <MockModeBanner />
+          <AuthProvider>
+            <GlobalRealtimeNotifications />
+            <GlobalVoiceNavAssistant />
+            <GlobalViOneVoiceAssistant />
+            <GlobalPermissionRevokedModal />
+            <AuthGate>
+              <Outlet />
+            </AuthGate>
+            <IosInstallPrompt />
+          </AuthProvider>
+          <Toaster position="top-right" />
+        </ThemeProvider>
+      </QueryClientProvider>
+    </LangContext.Provider>
+  );
+}
+
+function AuthGate({ children }: { children: React.ReactNode }) {
+  const navigate = useNavigate();
+  const { status, user, logout } = useAuth();
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const [expired, setExpired] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  useEffect(() => {
+    const stopResume = startSessionResume(() => {
+      setExpired(true);
+      // Removed status="out" set here since AuthContext handles it, but could trigger a logout.
+    });
+    return stopResume;
+  }, []);
+
+  // Phiên & thiết bị: ghi nhận thiết bị hiện tại và tự đăng xuất khi bị ngắt từ xa.
+  useEffect(() => {
+    if (status !== "in") return;
+    let active = true;
+    async function beat() {
+      const device = describeCurrentDevice();
+      if (!device) return;
+      try {
+        const result = await bcDeviceSessionTouchFn({ data: device });
+        if (active && result.revoked) {
+          await signOutSession();
+          logout();
+        }
+      } catch {
+        /* nhịp ghi nhận thiết bị không được chặn ứng dụng */
+      }
+    }
+    void beat();
+    const timer = window.setInterval(() => void beat(), 60_000);
+    return () => {
+      active = false;
+      window.clearInterval(timer);
+    };
+  }, [status]);
+
+  // Ghi nhớ màn hình cuối trong PWA và khôi phục khi mở lại app từ start_url.
+  useEffect(() => {
+    if (status !== "in") return;
+    rememberLastMobileRoute(pathname + window.location.search);
+  }, [status, pathname]);
+
+  const [resumed, setResumed] = useState(false);
+  useEffect(() => {
+    if (resumed) return;
+    if (status !== "in") return;
+    setResumed(true);
+    if (pathname !== "/connect-app") return;
+    if (!isStandalonePwa()) return;
+    const last = getLastMobileRoute();
+    if (!last || last === pathname) return;
+    navigate({ to: last, replace: true });
+  }, [status, pathname, resumed, navigate]);
+
+  // On a tenant custom domain/subdomain, the home route shows a public landing.
+  const [tenantHost, setTenantHost] = useState(false);
+  useEffect(() => {
+    setTenantHost(isTenantHost(window.location.hostname));
+  }, []);
+
+  // Public routes: auth screen, the member PWA, the install landing page,
+  // the marketing landing page, and the QR-opened membership card.
+  const isPublic =
+    pathname === "/" ||
+    pathname === "/auth" ||
+    pathname === "/register" ||
+    pathname === "/forgot-password" ||
+    pathname === "/reset-password" ||
+    pathname === "/install" ||
+    pathname.startsWith("/landing") ||
+    pathname.includes("/register") ||
+    pathname.startsWith("/guest-event-register") ||
+    (pathname.startsWith("/events/") && pathname.includes("/register")) ||
+    pathname === "/demo" ||
+    pathname.startsWith("/h/") ||
+    pathname === "/m" ||
+    pathname.startsWith("/m/") ||
+    pathname.startsWith("/card/") ||
+    pathname === "/verify" ||
+    pathname.startsWith("/association") ||
+    pathname.startsWith("/connect-app") ||
+    pathname.startsWith("/vione") ||
+    pathname.startsWith("/business-connect") ||
+    (pathname === "/" && tenantHost);
+
+  useEffect(() => {
+    // CHẶN HOÀN TOÀN: Tuyệt đối không bao giờ redirect nếu người dùng đang truy cập cổng đăng ký hoặc đăng nhập
+    const isRegisterOrAuthRoute =
+      pathname === "/register" ||
+      pathname.startsWith("/register") ||
+      pathname.includes("/register") ||
+      pathname === "/association/register" ||
+      pathname.startsWith("/association/register") ||
+      pathname === "/association/login" ||
+      pathname.startsWith("/association/login") ||
+      pathname === "/auth" ||
+      pathname.startsWith("/auth");
+
+    if (isRegisterOrAuthRoute) {
+      return;
+    }
+
+    if (status === "out" && !isPublic) {
+      const search = window.location.pathname + window.location.search;
+      if (
+        pathname.startsWith("/association") &&
+        !pathname.startsWith("/association/login") &&
+        !pathname.startsWith("/association/register")
+      ) {
+        navigate({
+          to: "/association/login" as any,
+          search: {
+            redirect: search,
+          } as any,
+          replace: true,
+        });
+      } else if (!pathname.startsWith("/association/login") && !pathname.startsWith("/association/register")) {
+        navigate({
+          to: "/auth",
+          search: {
+            redirect: search,
+            portal: "crm" as const,
+            ...(expired ? { reason: "expired" as const } : {}),
+          },
+          replace: true,
+        });
+      }
+    }
+  }, [status, isPublic, navigate, expired, pathname]);
+
+  if (isPublic) return <>{children}</>;
+
+  if (isMounted && status === "loading") {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+      </div>
+    );
+  }
+
+  if (isMounted && status === "out") return null;
+  return <>{children}</>;
+}

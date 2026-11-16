@@ -1,0 +1,1980 @@
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { REVIEW_SEARCH_RESET } from "@/lib/review-search";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useEffect, useMemo, useState } from "react";
+import {
+  AlertTriangle,
+  Building2,
+  CheckCircle2,
+  ChevronDown,
+  Download,
+  Eye,
+  Filter,
+  LayoutGrid,
+  List,
+  MapPin,
+  Pencil,
+  Pin,
+  Search,
+  Shield,
+  Star,
+  Trash2,
+  UserCog,
+  User,
+  X,
+} from "lucide-react";
+import { toast } from "sonner";
+import { AppShell } from "@/components/dashboard/AppShell";
+import { CrudModal, type CrudField, type CrudValues } from "@/components/dashboard/CrudModal";
+import { MemberAccountModal } from "@/components/dashboard/MemberAccountModal";
+import { EmptyState, NoSearchResult, ListSkeleton } from "@/components/dashboard/StateKit";
+import { useT, type TKey } from "@/lib/i18n";
+import { useRole, PERMISSIONS } from "@/hooks/use-role";
+import { exportToExcel, formatDisplayDate } from "@/lib/excel-export";
+import { useUrlState } from "@/hooks/use-url-state";
+import { resolveMediaUrl } from "@/lib/api-client";
+import { Pagination, SortHeader } from "@/components/dashboard/DataTablePagination";
+import { useTableControls } from "@/hooks/use-table-controls";
+import { TruncatedText } from "@/components/dashboard/TruncatedText";
+import {
+  type IndustryKey,
+  type Member,
+  type MemberStatus,
+  type MemberType,
+  type RegionKey,
+} from "@/lib/members-data";
+import { fetchNestApi } from "@/lib/api-client";
+import {
+  type MemberAccountStatus,
+} from "@/lib/member-account.functions";
+import {
+  getFavorites,
+  getPinned,
+  getRecent,
+  getSavedFilters,
+  toggleFavorite,
+  togglePinned,
+  pushRecent,
+  saveFilter,
+  deleteSavedFilter,
+  type SavedFilter,
+} from "@/lib/member-prefs";
+
+export const Route = createFileRoute("/members/")({
+  component: MembersPage,
+});
+
+const INDUSTRIES: IndustryKey[] = [
+  "ind.trade",
+  "ind.it",
+  "ind.manufacturing",
+  "ind.realestate",
+  "ind.finance",
+];
+const REGIONS: RegionKey[] = ["region.north", "region.central", "region.south"];
+const TYPES: MemberType[] = ["company", "individual"];
+const STATUSES: MemberStatus[] = ["active", "pending", "expired"];
+
+export function getMemberDepartment(m: any): string {
+  const d = m?.department || m?.boardWish || m?.board || "";
+  const s = String(d).toLowerCase().trim();
+  if (s.includes("quản trị") || s.includes("điều hành") || s.includes("công nghệ")) return "Ban Quản trị";
+  if (s.includes("thư ký") || s.includes("điều phối")) return "Ban Thư ký";
+  if (s.includes("truyền thông") || s.includes("sự kiện")) return "Ban Truyền thông";
+  if (s.includes("xúc tiến") || s.includes("thương mại") || s.includes("b2b")) return "Ban Xúc tiến";
+  if (s.includes("thành viên") && !s.includes("hội viên") && !s.includes("ceo")) return "Ban Thành viên";
+  if (s.includes("thiện nguyện") || s.includes("tài chính") || s.includes("an sinh")) return "Ban Thiện nguyện";
+  if (d && d !== "—" && d !== "undefined" && d !== "null") return String(d);
+  if (m?.industry === "ind.it") return "Ban Quản trị";
+  if (m?.industry === "ind.finance") return "Ban Thiện nguyện";
+  if (m?.industry === "ind.trade") return "Ban Xúc tiến";
+  return "Ban Thành viên";
+}
+
+/* ----------------------------- badges ----------------------------- */
+
+function StatusBadge({ status }: { status: MemberStatus }) {
+  const t = useT();
+  const map: Record<MemberStatus, { label: TKey; bg: string; fg: string }> = {
+    active: { label: "status.active", bg: "oklch(0.93 0.07 155)", fg: "oklch(0.40 0.16 155)" },
+    pending: { label: "status.pending", bg: "oklch(0.94 0.09 75)", fg: "oklch(0.45 0.14 65)" },
+    expired: { label: "status.expired", bg: "oklch(0.93 0.06 25)", fg: "oklch(0.50 0.20 25)" },
+  };
+  const s = map[status];
+  return (
+    <span
+      className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold"
+      style={{ background: s.bg, color: s.fg }}
+    >
+      <span className="h-1.5 w-1.5 rounded-full" style={{ background: s.fg }} />
+      {t(s.label)}
+    </span>
+  );
+}
+
+export function AccountStatusBadge({ status }: { status: MemberAccountStatus }) {
+  const t = useT();
+  const map: Record<MemberAccountStatus, { label: TKey; bg: string; fg: string }> = {
+    active: { label: "acctStatus.active", bg: "oklch(0.93 0.07 155)", fg: "oklch(0.40 0.16 155)" },
+    invited: { label: "acctStatus.invited", bg: "oklch(0.94 0.09 75)", fg: "oklch(0.45 0.14 65)" },
+    none: { label: "acctStatus.none", bg: "oklch(0.95 0 0)", fg: "oklch(0.50 0 0)" },
+  };
+  const s = map[status];
+  return (
+    <span
+      className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold"
+      style={{ background: s.bg, color: s.fg }}
+    >
+      <span className="h-1.5 w-1.5 rounded-full" style={{ background: s.fg }} />
+      {t(s.label)}
+    </span>
+  );
+}
+
+function TypeChip({ type }: { type: MemberType }) {
+  const t = useT();
+  const Icon = type === "company" ? Building2 : User;
+  return (
+    <span className="inline-flex items-center gap-1.5 rounded-md border border-border bg-secondary px-2 py-0.5 text-[11px] font-medium text-foreground">
+      <Icon className="h-3 w-3 text-muted-foreground" />
+      {t(type === "company" ? "type.company" : "type.individual")}
+    </span>
+  );
+}
+
+type RenewalState = { kind: "ok" | "soon" | "overdue" | "none"; days: number | null };
+
+function renewalOf(m: Member): RenewalState {
+  if (!m.termEnd) return { kind: "none", days: null };
+  const days = Math.ceil((new Date(m.termEnd).getTime() - Date.now()) / 86_400_000);
+  if (Number.isNaN(days)) return { kind: "none", days: null };
+  if (days < 0) return { kind: "overdue", days };
+  if (days <= 30) return { kind: "soon", days };
+  return { kind: "ok", days };
+}
+
+function RenewalBadge({ m }: { m: Member }) {
+  const t = useT();
+  const r = renewalOf(m);
+  const map = {
+    ok: { label: "mlist.renewal.ok", bg: "oklch(0.94 0.05 155)", fg: "oklch(0.44 0.14 155)" },
+    soon: { label: "mlist.renewal.soon", bg: "oklch(0.95 0.08 75)", fg: "oklch(0.48 0.14 65)" },
+    overdue: {
+      label: "mlist.renewal.overdue",
+      bg: "oklch(0.94 0.06 25)",
+      fg: "oklch(0.52 0.20 25)",
+    },
+    none: { label: "mlist.renewal.none", bg: "oklch(0.96 0 0)", fg: "oklch(0.52 0 0)" },
+  } as const;
+  const s = map[r.kind];
+  return (
+    <span
+      className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10.5px] font-semibold"
+      style={{ background: s.bg, color: s.fg }}
+      title={r.days != null ? `${r.days}d` : undefined}
+    >
+      {t(s.label as TKey)}
+    </span>
+  );
+}
+
+export function MemberPaymentSelect({
+  member,
+  onChange,
+  disabled,
+}: {
+  member: Member;
+  onChange: (status: "paid" | "cash" | "unpaid") => Promise<void> | void;
+  disabled?: boolean;
+}) {
+  const rawStatus = (member as any).payment_status || (member as any).paymentStatus;
+  const currentStatus: "paid" | "cash" | "unpaid" =
+    rawStatus === "cash"
+      ? "cash"
+      : member.feePaid || rawStatus === "paid"
+        ? "paid"
+        : "unpaid";
+
+  const getStyle = () => {
+    switch (currentStatus) {
+      case "paid":
+        return "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border-emerald-300 dark:border-emerald-700";
+      case "cash":
+        return "bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border-amber-300 dark:border-amber-700";
+      case "unpaid":
+      default:
+        return "bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 border-rose-300 dark:border-rose-700";
+    }
+  };
+
+  return (
+    <div className="relative inline-flex items-center" onClick={(e) => e.stopPropagation()}>
+      <select
+        value={currentStatus}
+        disabled={disabled}
+        onChange={(e) => onChange(e.target.value as "paid" | "cash" | "unpaid")}
+        aria-label="Trạng thái thanh toán"
+        className={`h-7 appearance-none rounded-lg border pl-2 pr-6 text-xs font-semibold shadow-xs focus:outline-none focus:ring-1 focus:ring-primary cursor-pointer transition-colors ${getStyle()}`}
+      >
+        <option value="paid">✓ Đã TT (QR/CK)</option>
+        <option value="cash">💵 Đã TT (Tiền mặt)</option>
+        <option value="unpaid">✗ Chưa thanh toán</option>
+      </select>
+      <ChevronDown className="pointer-events-none absolute right-1.5 h-3.5 w-3.5 opacity-60" />
+    </div>
+  );
+}
+
+function initials(name: string) {
+  return name
+    .trim()
+    .split(/\s+/)
+    .slice(-2)
+    .map((p) => p[0])
+    .join("")
+    .toUpperCase();
+}
+
+/* ----------------------------- filter select ----------------------------- */
+
+function FilterSelect<T extends string>({
+  label,
+  value,
+  onChange,
+  options,
+  renderOption,
+}: {
+  label: string;
+  value: T | "all";
+  onChange: (v: T | "all") => void;
+  options: T[];
+  renderOption: (v: T) => string;
+}) {
+  const t = useT();
+  return (
+    <label className="relative inline-flex min-w-[150px] flex-1 items-center">
+      <select
+        value={value}
+        onChange={(e) => onChange(e.target.value as T | "all")}
+        className="h-10 w-full appearance-none rounded-lg border border-border bg-card pl-3 pr-9 text-sm font-medium text-foreground shadow-[var(--shadow-card)] focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/20"
+        aria-label={label}
+      >
+        <option value="all">
+          {label}: {t("members.filter.all")}
+        </option>
+        {options.map((o) => (
+          <option key={o} value={o}>
+            {renderOption(o)}
+          </option>
+        ))}
+      </select>
+      <ChevronDown className="pointer-events-none absolute right-3 h-4 w-4 text-muted-foreground" />
+    </label>
+  );
+}
+
+/* ----------------------------- prefs hook ----------------------------- */
+
+function useMemberPrefs() {
+  const [favorites, setFavorites] = useState<string[]>([]);
+  const [pinned, setPinned] = useState<string[]>([]);
+  const [recent, setRecent] = useState<string[]>([]);
+  const [saved, setSaved] = useState<SavedFilter[]>([]);
+
+  useEffect(() => {
+    const sync = () => {
+      setFavorites(getFavorites());
+      setPinned(getPinned());
+      setRecent(getRecent());
+      setSaved(getSavedFilters());
+    };
+    sync();
+    window.addEventListener("member-prefs-changed", sync);
+    return () => window.removeEventListener("member-prefs-changed", sync);
+  }, []);
+
+  return { favorites, pinned, recent, saved };
+}
+
+/* ============================== page ============================== */
+
+function MembersPage() {
+  const t = useT();
+  const navigate = useNavigate();
+  const qc = useQueryClient();
+  const {
+    data: rawMembers = [],
+    refetch,
+    isLoading,
+  } = useQuery({
+    queryKey: ["members"],
+    queryFn: async () => {
+      try {
+        const res = await fetchNestApi<Member[]>("/members");
+        if (Array.isArray(res) && res.length > 0) {
+          return res;
+        }
+      } catch (err) {
+        console.error("[Members] Failed to load members:", err);
+      }
+      const { DEFAULT_MEMBERS } = await import("@/lib/members-data");
+      return DEFAULT_MEMBERS;
+    },
+  });
+
+  const [deletedIds, setDeletedIds] = useState<Set<string>>(new Set());
+
+  const members = useMemo(() => {
+    return rawMembers.filter((m) => {
+      const idStr = String(m.id);
+      const codeStr = String(m.code || "");
+      return !deletedIds.has(idStr) && (!codeStr || !deletedIds.has(codeStr));
+    });
+  }, [rawMembers, deletedIds]);
+  const { isAdmin, canApproveMembers, isBTV, isBQT, isPlatformAdmin, can, loading: roleLoading } = useRole();
+  const canApprove = can(PERMISSIONS.MEMBER_APPROVE);
+  const canEdit = can(PERMISSIONS.MEMBER_EDIT);
+  const canDelete = can(PERMISSIONS.MEMBER_DELETE);
+  const canAccount = can(PERMISSIONS.SYSTEM_MANAGE) || can("PRM_EDIT");
+  const { data: acctStatuses = {} } = useQuery({
+    queryKey: ["member-account-statuses"],
+    queryFn: async () => {
+      const res = await fetchNestApi<Record<string, string>>("/members/account-statuses");
+      return res || {};
+    },
+    enabled: isAdmin,
+  });
+  const denyPermission = () =>
+    toast.error(t("perm.denied.title"), { description: t("perm.denied.adminOnly") });
+
+  const { favorites, pinned, recent, saved } = useMemberPrefs();
+
+  const [view, setView] = useUrlState<"cards" | "table">("view", "cards");
+  const [q, setQ] = useUrlState<string>("q", "");
+  const [industry, setIndustry] = useUrlState<IndustryKey | "all">("industry", "all");
+  const [region, setRegion] = useUrlState<RegionKey | "all">("region", "all");
+  const [type, setType] = useUrlState<MemberType | "all">("type", "all");
+  const [status, setStatus] = useUrlState<MemberStatus | "all">("status", "all");
+  const [paymentFilter, setPaymentFilter] = useUrlState<"all" | "paid" | "unpaid">("payment", "all");
+  const [favOnly, setFavOnly] = useState(false);
+  const [sort, setSort] = useState<"name" | "newest" | "code" | "renewal">("newest");
+  const [sel, setSel] = useState<Set<string>>(new Set());
+
+  const paidCount = useMemo(() => {
+    return members.filter((m) => {
+      const rawStatus = (m as any).payment_status || (m as any).paymentStatus;
+      return m.feePaid || rawStatus === "paid" || rawStatus === "cash";
+    }).length;
+  }, [members]);
+  const unpaidCount = members.length - paidCount;
+
+  const [editing, setEditing] = useState<Member | null>(null);
+  const [deleting, setDeleting] = useState<Member | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+  const [accountFor, setAccountFor] = useState<Member | null>(null);
+
+  const [deleteMode, setDeleteMode] = useState<"choose" | "confirm_member_only">("choose");
+
+  const fields: CrudField[] = [
+    { name: "name", label: t("members.f.name"), type: "text", required: true },
+    { name: "phone", label: t("members.f.phone"), type: "text" },
+    { name: "email", label: t("members.f.email"), type: "text" },
+    { name: "contact", label: "Chức vụ / Chức danh", type: "text" },
+    {
+      name: "level",
+      label: t("members.f.level"),
+      type: "select",
+      options: [
+        { value: "memberLevel.large", label: t("memberLevel.large") },
+        { value: "memberLevel.medium", label: t("memberLevel.medium") },
+        { value: "memberLevel.small", label: t("memberLevel.small") },
+        { value: "memberLevel.individual", label: t("memberLevel.individual") },
+      ],
+    },
+    {
+      name: "region",
+      label: t("members.f.region"),
+      type: "select",
+      options: [
+        { value: "region.north", label: t("region.north") },
+        { value: "region.central", label: t("region.central") },
+        { value: "region.south", label: t("region.south") },
+      ],
+    },
+    {
+      name: "status",
+      label: t("members.f.status"),
+      type: "select",
+      options: [
+        { value: "pending", label: t("status.pending") },
+        { value: "active", label: t("status.active") },
+        { value: "expired", label: t("status.expired") },
+      ],
+    },
+    {
+      name: "paymentStatus",
+      label: "Trạng thái thanh toán phí",
+      type: "select",
+      options: [
+        { value: "unpaid", label: "Chưa thanh toán" },
+        { value: "paid", label: "Đã thanh toán (QR/Chuyển khoản)" },
+        { value: "cash", label: "Đã thanh toán (Tiền mặt)" },
+      ],
+    },
+    { name: "address", label: t("members.f.address"), type: "text" },
+    { name: "about", label: "Giới thiệu / Ghi chú", type: "textarea" },
+  ];
+
+  const onSubmit = async (v: CrudValues) => {
+    setSubmitting(true);
+    try {
+      const pStatus = (v.paymentStatus as string) || "unpaid";
+      const payload = {
+        name: String(v.name || "").trim(),
+        contact: v.contact ? String(v.contact).trim() : undefined,
+        email: v.email ? String(v.email).trim() : undefined,
+        phone: v.phone ? String(v.phone).trim() : undefined,
+        level: (v.level as any) || "memberLevel.individual",
+        region: (v.region as any) || "region.north",
+        status: (v.status as any) || "active",
+        paymentStatus: pStatus,
+        feePaid: pStatus === "paid" || pStatus === "cash",
+        address: v.address ? String(v.address).trim() : undefined,
+        about: v.about ? String(v.about).trim() : undefined,
+        department: (v as any).department ? String((v as any).department).trim() : (editing?.department || undefined),
+      };
+
+      if (editing) {
+        if (!can(PERMISSIONS.MEMBER_EDIT)) {
+          toast.error("Bạn không có quyền chỉnh sửa thông tin hội viên!");
+          return;
+        }
+        await fetchNestApi(`/members/${editing.id}`, {
+          method: "PUT",
+          body: JSON.stringify(payload),
+        });
+
+        // 1. Khi được thay đổi quyền add vào 1 Ban: Gửi thông báo về App CEO HN10
+        const targetDept = payload.department;
+        if (targetDept && targetDept !== editing.department) {
+          const deptName = targetDept;
+          try {
+            await fetchNestApi("/notifications", {
+              method: "POST",
+              body: JSON.stringify({
+                memberId: editing.id,
+                userId: (editing as any).userId || editing.id,
+                memberCode: editing.code,
+                title: "Thông báo phân công Ban chuyên môn",
+                body: `Bạn đã được thêm vào ${deptName} của CLB Doanh Nhân CEO HN10.`,
+                type: "DEPARTMENT_ASSIGNED",
+                data: {
+                  department: deptName,
+                  memberCode: editing.code,
+                },
+              }),
+            });
+          } catch {}
+
+          // 2. Đặc biệt nếu ở Ban Truyền Thông khi được gán quyền quét mã checkin sự kiện
+          const isMedia = /truyền thông|media|btt/i.test(deptName);
+          if (isMedia) {
+            try {
+              localStorage.setItem("vba_assigned_event_scanner", "true");
+              localStorage.setItem(`vba_media_scanner_${editing.id}`, "true");
+              localStorage.setItem(`vba_media_scanner_${editing.code}`, "true");
+              await fetchNestApi(`/members/${editing.id}/roles`, {
+                method: "POST",
+                body: JSON.stringify({
+                  role: "MEDIA_SCANNER",
+                  canScanCheckin: true,
+                  department: deptName,
+                }),
+              }).catch(() => null);
+            } catch {}
+          }
+        }
+
+        toast.success(t("members.updated") || "Cập nhật thông tin hội viên thành công");
+        setEditing(null);
+      }
+      await qc.invalidateQueries({ queryKey: ["members"] });
+      await qc.invalidateQueries({ queryKey: ["renewals"] });
+      await refetch();
+    } catch (err: any) {
+      console.error("[Members] Submit error:", err);
+      toast.error(err?.message || t("common.saveError"));
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const onConfirmDeleteAll = async () => {
+    if (!deleting) return;
+    const targetId = String(deleting.id);
+    const targetCode = String(deleting.code || "");
+    setDeletedIds((prev) => {
+      const next = new Set(prev);
+      if (targetId) next.add(targetId);
+      if (targetCode) next.add(targetCode);
+      return next;
+    });
+    setSubmitting(true);
+    try {
+      await fetchNestApi(`/members/${targetId}?mode=all`, { method: "DELETE" });
+      toast.success(`Đã xóa vĩnh viễn hội viên "${deleting.name}", doanh nghiệp và tài khoản.`);
+      setDeleting(null);
+      setDeleteMode("choose");
+      qc.setQueryData(["members"], (old: Member[] | undefined) =>
+        old ? old.filter((item) => String(item.id) !== targetId && (!targetCode || String(item.code) !== targetCode)) : [],
+      );
+      await qc.invalidateQueries({ queryKey: ["members"] });
+      await qc.invalidateQueries({ queryKey: ["renewals"] });
+      await refetch();
+    } catch (err: any) {
+      toast.error(err?.message || t("common.deleteError"));
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const onConfirmDeleteCompanyFirst = async () => {
+    if (!deleting) return;
+    const targetId = String(deleting.id);
+    setSubmitting(true);
+    try {
+      await fetchNestApi(`/members/${targetId}?mode=company_only`, { method: "DELETE" });
+      toast.success(`Đã xóa thông tin doanh nghiệp của hội viên "${deleting.name}".`);
+      setDeleteMode("confirm_member_only");
+      await qc.invalidateQueries({ queryKey: ["members"] });
+      await refetch();
+    } catch (err: any) {
+      toast.error(err?.message || "Không thể xóa doanh nghiệp");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const onConfirmDeleteMemberOnly = async () => {
+    if (!deleting) return;
+    const targetId = String(deleting.id);
+    const targetCode = String(deleting.code || "");
+    setDeletedIds((prev) => {
+      const next = new Set(prev);
+      if (targetId) next.add(targetId);
+      if (targetCode) next.add(targetCode);
+      return next;
+    });
+    setSubmitting(true);
+    try {
+      await fetchNestApi(`/members/${targetId}?mode=all`, { method: "DELETE" });
+      toast.success(`Đã xóa hồ sơ hội viên và tài khoản "${deleting.name}" thành công.`);
+      setDeleting(null);
+      setDeleteMode("choose");
+      qc.setQueryData(["members"], (old: Member[] | undefined) =>
+        old ? old.filter((item) => String(item.id) !== targetId && (!targetCode || String(item.code) !== targetCode)) : [],
+      );
+      await qc.invalidateQueries({ queryKey: ["members"] });
+      await qc.invalidateQueries({ queryKey: ["renewals"] });
+      await refetch();
+    } catch (err: any) {
+      toast.error(err?.message || t("common.deleteError"));
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleUpdatePaymentStatus = async (m: Member, newStatus: "paid" | "cash" | "unpaid") => {
+    try {
+      toast.loading("Đang cập nhật trạng thái thanh toán...", { id: `pay-${m.id}` });
+      await fetchNestApi(`/members/${m.id}/payment-status`, {
+        method: "POST",
+        body: JSON.stringify({
+          paymentStatus: newStatus,
+          feePaid: newStatus !== "unpaid",
+        }),
+      });
+      qc.setQueryData(["members"], (old: Member[] | undefined) => {
+        if (!old) return [];
+        const target = old.find((item) => item.id === m.id);
+        const updatedItem = target
+          ? {
+              ...target,
+              feePaid: newStatus !== "unpaid",
+              payment_status: newStatus,
+              paymentStatus: newStatus,
+              updatedAt: new Date().toISOString(),
+              updated_at: new Date().toISOString(),
+            }
+          : null;
+        if (!updatedItem) return old;
+        // Đưa bản ghi vừa cập nhật lên đầu danh sách (STT 1)
+        return [updatedItem, ...old.filter((item) => item.id !== m.id)];
+      });
+      await qc.invalidateQueries({ queryKey: ["members"] });
+      await qc.invalidateQueries({ queryKey: ["renewals"] });
+      await refetch();
+      toast.success(
+        newStatus === "unpaid"
+          ? `Đã cập nhật: "${m.name}" thành CHƯA THANH TOÁN (khôi phục phí chưa nộp)`
+          : newStatus === "cash"
+            ? `Đã cập nhật: "${m.name}" ĐÃ THANH TOÁN (Tiền mặt)`
+            : `Đã cập nhật: "${m.name}" ĐÃ THANH TOÁN (QR/Chuyển khoản)`,
+        { id: `pay-${m.id}` },
+      );
+    } catch (err: any) {
+      toast.error(err?.message || "Cập nhật thanh toán thất bại", { id: `pay-${m.id}` });
+    }
+  };
+
+  const pendingCount = useMemo(() => members.filter((m) => m.status === "pending").length, [members]);
+
+  const handleApproveAndSendCredentials = async (m: Member) => {
+    if (!canApprove) {
+      toast.error("Thẩm quyền hạn chế: Chỉ Ban Thành Viên hoặc Ban Quản Trị mới có thẩm quyền kiểm duyệt và phê duyệt hội viên!");
+      return;
+    }
+    if (
+      !confirm(
+        `[Ban Thành Viên Thẩm Định]\n\nXác nhận phê duyệt kết nạp hội viên "${m.name}"?\n\nHệ thống sẽ cấp mã hội viên chính thức, kích hoạt tài khoản và tự động gửi email thông tin đăng nhập đến: ${m.email || "email hội viên"}`
+      )
+    ) {
+      return;
+    }
+
+    try {
+      toast.loading("Đang phê duyệt và gửi email tài khoản...", { id: "approve-member" });
+      const res = await fetchNestApi<any>(`/members/${m.id}/approve-and-send-credentials`, {
+        method: "POST",
+      });
+      toast.success(
+        `Đã phê duyệt thành công! Mã: ${res.memberCode} · Mật khẩu tạm: ${res.temporaryPassword}. Đã gửi email tới ${res.username}`,
+        { id: "approve-member", duration: 8000 }
+      );
+      await refetch();
+      qc.invalidateQueries({ queryKey: ["member-account-statuses"] });
+    } catch (err: any) {
+      toast.error(err?.message || "Phê duyệt thất bại", { id: "approve-member" });
+    }
+  };
+
+  const editInitial = (m: Member): CrudValues => ({
+    name: m.name,
+    contact: m.contact,
+    email: m.email,
+    phone: m.phone,
+    level: m.level,
+    region: m.region,
+    status: m.status,
+    paymentStatus: (m as any).payment_status || (m as any).paymentStatus || (m.feePaid ? "paid" : "unpaid"),
+    address: m.address,
+    about: m.about,
+  });
+
+  const anyFilterActive =
+    !!q ||
+    industry !== "all" ||
+    region !== "all" ||
+    type !== "all" ||
+    status !== "all" ||
+    paymentFilter !== "all" ||
+    favOnly;
+
+  const filtered = useMemo<Member[]>(() => {
+    const ql = q.trim().toLowerCase();
+    const favSet = new Set(favorites);
+    return members.filter((m: Member) => {
+      if (industry !== "all" && m.industry !== industry) return false;
+      if (region !== "all" && m.region !== region) return false;
+      if (type !== "all" && m.type !== type) return false;
+      if (status !== "all" && m.status !== status) return false;
+      if (paymentFilter !== "all") {
+        const rawStatus = (m as any).payment_status || (m as any).paymentStatus;
+        const isPaid = m.feePaid || rawStatus === "paid" || rawStatus === "cash";
+        if (paymentFilter === "paid" && !isPaid) return false;
+        if (paymentFilter === "unpaid" && isPaid) return false;
+      }
+      if (favOnly && !favSet.has(m.id)) return false;
+      if (
+        ql &&
+        !m.name.toLowerCase().includes(ql) &&
+        !m.code.toLowerCase().includes(ql) &&
+        !m.email.toLowerCase().includes(ql) &&
+        !m.contact.toLowerCase().includes(ql)
+      )
+        return false;
+      return true;
+    });
+  }, [members, q, industry, region, type, status, paymentFilter, favOnly, favorites]);
+
+  const ordered = useMemo<Member[]>(() => {
+    const copy = [...filtered];
+    copy.sort((a, b) => {
+      switch (sort) {
+        case "newest": {
+          const timeA = (a as any).updatedAt || (a as any).updated_at
+            ? new Date((a as any).updatedAt || (a as any).updated_at).getTime()
+            : (a.createdAt ? new Date(a.createdAt).getTime() : (a.joinedAt ? new Date(a.joinedAt).getTime() : 0));
+          const timeB = (b as any).updatedAt || (b as any).updated_at
+            ? new Date((b as any).updatedAt || (b as any).updated_at).getTime()
+            : (b.createdAt ? new Date(b.createdAt).getTime() : (b.joinedAt ? new Date(b.joinedAt).getTime() : 0));
+          if (timeB !== timeA) return timeB - timeA;
+          return (b.joinedAt || "").localeCompare(a.joinedAt || "");
+        }
+        case "code":
+          return a.code.localeCompare(b.code, undefined, { numeric: true });
+        case "renewal": {
+          const da = renewalOf(a).days ?? Infinity;
+          const db = renewalOf(b).days ?? Infinity;
+          return da - db;
+        }
+        default:
+          return a.name.localeCompare(b.name);
+      }
+    });
+    return copy;
+  }, [filtered, sort]);
+
+  // In cards view we control ordering ourselves (sort dropdown), so we hand the
+  // pre-ordered list to the table-controls with no active sort key. In table
+  // view the sortable column headers drive the sort.
+  const tc = useTableControls<Member>(
+    ordered,
+    {
+      code: (m) => m.code,
+      name: (m) => m.name,
+      department: (m) => getMemberDepartment(m),
+      industry: (m) => t(m.industry as TKey),
+      region: (m) => t(m.region as TKey),
+      type: (m) => m.type,
+      status: (m) => m.status,
+      payment: (m) => (m as any).payment_status || (m as any).paymentStatus || (m.feePaid ? "paid" : "unpaid"),
+      joined: (m) => (m as any).updatedAt || (m as any).updated_at || m.createdAt || m.joinedAt,
+    },
+    { initialPageSize: 24, initialSortKey: "joined", initialSortDir: "desc" },
+  );
+
+  const reset = () => {
+    setQ("");
+    setIndustry("all");
+    setRegion("all");
+    setType("all");
+    setStatus("all");
+    setPaymentFilter("all");
+    setFavOnly(false);
+  };
+
+  const memberExcelColumns = [
+    { header: "Mã hội viên", key: "code", width: 16, value: (m: Member) => m.code },
+    { header: "Họ và tên", key: "name", width: 28, value: (m: Member) => m.name },
+    { header: "Ban chuyên môn", key: "department", width: 24, value: (m: Member) => getMemberDepartment(m) },
+    { header: "Doanh nghiệp / Liên hệ", key: "contact", width: 30, value: (m: Member) => m.contact },
+    { header: "Email", key: "email", width: 26, value: (m: Member) => m.email },
+    { header: "Số điện thoại", key: "phone", width: 16, value: (m: Member) => m.phone },
+    { header: "Phân loại", key: "type", width: 16, value: (m: Member) => m.type },
+    { header: "Hạng hội viên", key: "level", width: 18, value: (m: Member) => m.level },
+    { header: "Ngành nghề", key: "industry", width: 22, value: (m: Member) => m.industry },
+    { header: "Khu vực", key: "region", width: 16, value: (m: Member) => m.region },
+    { header: "Trạng thái", key: "status", width: 16, value: (m: Member) => (m.status === "active" ? "Đang hoạt động" : "Chờ duyệt") },
+    { header: "Ngày gia nhập", key: "joinedAt", width: 16, value: (m: Member) => formatDisplayDate(m.joinedAt) },
+    { header: "Niên khóa phí", key: "feeYear", width: 14, value: (m: Member) => String(m.feeYear) },
+    { header: "Đã đóng phí", key: "feePaid", width: 16, value: (m: Member) => (m.feePaid ? "Đã nộp" : "Chưa nộp") },
+  ];
+
+  const handleExport = () => {
+    exportToExcel<Member>({
+      title: "DANH BẠ HỘI VIÊN CHÍNH THỨC CLB DOANH NHÂN CEO HN10",
+      subtitle: "Trực thuộc Hội Doanh Nhân Trẻ Hà Nội (HanoiBA)",
+      filename: "danh-ba-hoi-vien-ceohn10",
+      sheetName: "Danh_Ba_Hoi_Vien",
+      data: tc.sorted,
+      columns: memberExcelColumns,
+      summaryRows: [
+        ["TỔNG SỐ HỘI VIÊN:", "", "", "", "", "", "", "", "", "", "", `${tc.sorted.length} hội viên`],
+      ],
+      signerTitles: ["NGƯỜI LẬP BIỂU", "TRƯỞNG BAN HỘI VIÊN", "CHỦ TỊCH CLB CEO HN10"],
+    });
+    toast.success("Đã xuất danh bạ hội viên chuẩn doanh nghiệp CEO HN10 (.xlsx)!");
+  };
+
+  const handleExportSelected = () => {
+    const rows = members.filter((m) => sel.has(m.id));
+    if (rows.length === 0) return;
+    exportToExcel<Member>({
+      title: "DANH SÁCH HỘI VIÊN ĐƯỢC CHỌN - CEO HN10",
+      subtitle: "Trực thuộc Hội Doanh Nhân Trẻ Hà Nội (HanoiBA)",
+      filename: "hoi-vien-duoc-chon",
+      sheetName: "Hoi_Vien_Chon_Loc",
+      data: rows,
+      columns: memberExcelColumns,
+      summaryRows: [
+        ["TỔNG SỐ HỘI VIÊN ĐƯỢC CHỌN:", "", "", "", "", "", "", "", "", "", "", `${rows.length} hội viên`],
+      ],
+      signerTitles: ["NGƯỜI LẬP BIỂU", "TRƯỞNG BAN HỘI VIÊN", "CHỦ TỊCH CLB CEO HN10"],
+    });
+    toast.success("Đã xuất danh sách hội viên được chọn ra file Excel (.xlsx)!");
+  };
+
+  const toggleSel = (id: string) =>
+    setSel((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  const selectAllPage = () =>
+    setSel((prev) => {
+      const next = new Set(prev);
+      const allSelected = tc.pageRows.every((m) => next.has(m.id));
+      tc.pageRows.forEach((m) => (allSelected ? next.delete(m.id) : next.add(m.id)));
+      return next;
+    });
+
+  const openMember = (m: Member) => {
+    pushRecent(m.id);
+    navigate({ to: "/members/$memberId", params: { memberId: m.id }, search: REVIEW_SEARCH_RESET });
+  };
+
+  const doSaveFilter = () => {
+    const name = window.prompt(t("mlist.saveFilterName"));
+    if (!name) return;
+    saveFilter({
+      id: `sf-${Date.now()}`,
+      name,
+      q,
+      industry,
+      region,
+      type,
+      status,
+    });
+    toast.success(t("mlist.saveFilter"));
+  };
+
+  const applySaved = (f: SavedFilter) => {
+    setQ(f.q);
+    setIndustry(f.industry as IndustryKey | "all");
+    setRegion(f.region as RegionKey | "all");
+    setType(f.type as MemberType | "all");
+    setStatus(f.status as MemberStatus | "all");
+  };
+
+  const pinnedMembers = pinned
+    .map((id: any) => members.find((m) => m.id === id))
+    .filter((m): m is Member => !!m);
+  const recentMembers = recent
+    .map((id: any) => members.find((m) => m.id === id))
+    .filter((m): m is Member => !!m)
+    .slice(0, 8);
+
+  return (
+    <AppShell>
+      {/* Hero */}
+      <div className="mb-5 flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <h2 className="text-[26px] font-bold tracking-tight text-foreground">
+            {t("members.title")}
+          </h2>
+          <p className="mt-1 text-sm text-muted-foreground">{t("members.subtitle")}</p>
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="inline-flex rounded-xl border border-border bg-card p-0.5 shadow-[var(--shadow-card)]">
+            <button
+              onClick={() => setView("cards")}
+              aria-pressed={view === "cards"}
+              className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${
+                view === "cards"
+                  ? "bg-secondary text-foreground"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <LayoutGrid className="h-4 w-4" /> {t("mlist.viewCards")}
+            </button>
+            <button
+              onClick={() => setView("table")}
+              aria-pressed={view === "table"}
+              className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${
+                view === "table"
+                  ? "bg-secondary text-foreground"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <List className="h-4 w-4" /> {t("mlist.viewTable")}
+            </button>
+          </div>
+          {can("MEM_EXPORT") && (
+            <button
+              onClick={handleExport}
+              className="inline-flex items-center gap-2 rounded-xl border border-border bg-card px-4 py-2 text-sm font-medium text-foreground shadow-[var(--shadow-card)] hover:bg-muted cursor-pointer"
+            >
+              <Download className="h-4 w-4 text-muted-foreground" />
+              {t("members.export")}
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* 4 Thẻ Dashboard KPI Metric Chuẩn Toàn Hệ Thống */}
+      <div className="mb-5 grid grid-cols-2 gap-3 lg:grid-cols-4">
+        <div className="flex h-32 flex-col justify-between rounded-2xl border border-border/80 bg-card p-4 shadow-[var(--shadow-card)] transition-all hover:border-primary/40 hover:shadow-sm">
+          <div className="flex items-center justify-between gap-2">
+            <span className="truncate text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              Tổng Hội Viên
+            </span>
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+              <User className="h-4 w-4" />
+            </div>
+          </div>
+          <div>
+            <div className="truncate text-2xl font-bold tracking-tight text-foreground">{members.length}</div>
+            <div className="mt-1 truncate text-[11px] text-muted-foreground">
+              {members.filter((m) => m.type === "company").length} doanh nghiệp · {members.filter((m) => m.type !== "company").length} cá nhân
+            </div>
+          </div>
+        </div>
+
+        <div className="flex h-32 flex-col justify-between rounded-2xl border border-border/80 bg-card p-4 shadow-[var(--shadow-card)] transition-all hover:border-emerald-500/40 hover:shadow-sm">
+          <div className="flex items-center justify-between gap-2">
+            <span className="truncate text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              Đang Hoạt Động
+            </span>
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-600">
+              <CheckCircle2 className="h-4 w-4" />
+            </div>
+          </div>
+          <div>
+            <div className="truncate text-2xl font-bold tracking-tight text-emerald-600 dark:text-emerald-400">
+              {members.filter((m) => m.status === "active").length}
+            </div>
+            <div className="mt-1 truncate text-[11px] text-muted-foreground">
+              Tài khoản &amp; thẻ định danh khả dụng
+            </div>
+          </div>
+        </div>
+
+        <div className="flex h-32 flex-col justify-between rounded-2xl border border-border/80 bg-card p-4 shadow-[var(--shadow-card)] transition-all hover:border-amber-500/40 hover:shadow-sm">
+          <div className="flex items-center justify-between gap-2">
+            <span className="truncate text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              Chờ Phê Duyệt
+            </span>
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-amber-500/10 text-amber-600">
+              <Shield className="h-4 w-4" />
+            </div>
+          </div>
+          <div>
+            <div className="truncate text-2xl font-bold tracking-tight text-amber-600 dark:text-amber-400">
+              {pendingCount}
+            </div>
+            <div className="mt-1 truncate text-[11px] text-muted-foreground">
+              Hồ sơ mới nộp chờ Ban Thành Viên duyệt
+            </div>
+          </div>
+        </div>
+
+        <div className="flex h-32 flex-col justify-between rounded-2xl border border-border/80 bg-card p-4 shadow-[var(--shadow-card)] transition-all hover:border-blue-500/40 hover:shadow-sm">
+          <div className="flex items-center justify-between gap-2">
+            <span className="truncate text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              Đã Thu Hội Phí
+            </span>
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-blue-500/10 text-blue-600">
+              <Building2 className="h-4 w-4" />
+            </div>
+          </div>
+          <div>
+            <div className="truncate text-2xl font-bold tracking-tight text-blue-600 dark:text-blue-400">
+              {paidCount} / {members.length}
+            </div>
+            <div className="mt-1 truncate text-[11px] text-muted-foreground">
+              Còn {unpaidCount} hội viên chưa hoàn tất phí
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Pinned + recently viewed rails */}
+      {(pinnedMembers.length > 0 || recentMembers.length > 0) && (
+        <div className="mb-4 grid gap-3 lg:grid-cols-2">
+          {pinnedMembers.length > 0 && (
+            <QuickRail title={t("mlist.pinned")} icon={<Pin className="h-3.5 w-3.5" />}>
+              {pinnedMembers.map((m) => (
+                <MemberChip key={m.id} m={m} onClick={() => openMember(m)} />
+              ))}
+            </QuickRail>
+          )}
+          {recentMembers.length > 0 && (
+            <QuickRail title={t("mlist.recent")} icon={<Eye className="h-3.5 w-3.5" />}>
+              {recentMembers.map((m) => (
+                <MemberChip key={m.id} m={m} onClick={() => openMember(m)} />
+              ))}
+            </QuickRail>
+          )}
+        </div>
+      )}
+
+      {/* Quick status tabs */}
+      <div className="flex items-center gap-2 mb-4 overflow-x-auto pb-1">
+        <button
+          onClick={() => setStatus("all")}
+          className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors cursor-pointer ${
+            status === "all"
+              ? "bg-[#003B95] text-white shadow-sm"
+              : "bg-card border border-border text-foreground hover:bg-muted"
+          }`}
+        >
+          Tất cả ({members.length})
+        </button>
+        <button
+          onClick={() => setStatus("pending")}
+          className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap flex items-center gap-1.5 transition-colors cursor-pointer ${
+            status === "pending"
+              ? "bg-amber-600 text-white shadow-sm"
+              : "bg-amber-50 text-amber-800 border border-amber-200 hover:bg-amber-100"
+          }`}
+        >
+          <span>Chờ phê duyệt</span>
+          {pendingCount > 0 && (
+            <span className="px-1.5 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-500 text-white">
+              {pendingCount}
+            </span>
+          )}
+        </button>
+        <button
+          onClick={() => setStatus("active")}
+          className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors cursor-pointer ${
+            status === "active"
+              ? "bg-emerald-600 text-white shadow-sm"
+              : "bg-card border border-border text-foreground hover:bg-muted"
+          }`}
+        >
+          Đang hoạt động ({members.filter((m) => m.status === "active").length})
+        </button>
+        <button
+          onClick={() => setStatus("expired")}
+          className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors cursor-pointer ${
+            status === "expired"
+              ? "bg-rose-600 text-white shadow-sm"
+              : "bg-card border border-border text-foreground hover:bg-muted"
+          }`}
+        >
+          Hết hạn ({members.filter((m) => m.status === "expired").length})
+        </button>
+        <div className="h-5 w-px bg-border mx-1 shrink-0" />
+        <button
+          onClick={() => setPaymentFilter(paymentFilter === "paid" ? "all" : "paid")}
+          className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors cursor-pointer ${
+            paymentFilter === "paid"
+              ? "bg-emerald-600 text-white shadow-sm"
+              : "bg-emerald-50 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 hover:bg-emerald-100"
+          }`}
+        >
+          ✓ Đã thanh toán ({paidCount})
+        </button>
+        <button
+          onClick={() => setPaymentFilter(paymentFilter === "unpaid" ? "all" : "unpaid")}
+          className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors cursor-pointer ${
+            paymentFilter === "unpaid"
+              ? "bg-rose-600 text-white shadow-sm"
+              : "bg-rose-50 text-rose-800 dark:bg-rose-950/40 dark:text-rose-300 border border-rose-200 dark:border-rose-800 hover:bg-rose-100"
+          }`}
+        >
+          ✗ Chưa thanh toán ({unpaidCount})
+        </button>
+      </div>
+
+      {/* Sticky search + filters */}
+      <div className="sm:sticky sm:top-18 z-20 mb-5 rounded-2xl border border-border bg-card/95 p-4 shadow-[var(--shadow-card)] backdrop-blur">
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="relative min-w-[220px] flex-1">
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <input
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              placeholder={t("members.search")}
+              className="h-10 w-full rounded-lg border border-border bg-background pl-9 pr-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/20"
+            />
+          </div>
+          <FilterSelect
+            label={t("members.filter.industry")}
+            value={industry}
+            onChange={setIndustry}
+            options={INDUSTRIES}
+            renderOption={(v) => t(v)}
+          />
+          <FilterSelect
+            label={t("members.filter.region")}
+            value={region}
+            onChange={setRegion}
+            options={REGIONS}
+            renderOption={(v) => t(v)}
+          />
+          <FilterSelect
+            label={t("members.filter.type")}
+            value={type}
+            onChange={setType}
+            options={TYPES}
+            renderOption={(v) => t(v === "company" ? "type.company" : "type.individual")}
+          />
+          <FilterSelect
+            label={t("mlist.filter.status")}
+            value={status}
+            onChange={setStatus}
+            options={STATUSES}
+            renderOption={(v) => t(`status.${v}` as TKey)}
+          />
+          <FilterSelect
+            label="Thanh toán"
+            value={paymentFilter}
+            onChange={setPaymentFilter}
+            options={["paid", "unpaid"]}
+            renderOption={(v) => (v === "paid" ? "Đã thanh toán" : "Chưa thanh toán")}
+          />
+        </div>
+
+        <div className="mt-3 flex flex-wrap items-center gap-2">
+          <button
+            onClick={() => setFavOnly((v) => !v)}
+            aria-pressed={favOnly}
+            className={`inline-flex h-9 items-center gap-1.5 rounded-lg border px-3 text-sm font-medium transition-colors ${
+              favOnly
+                ? "border-primary/40 bg-primary/10 text-primary"
+                : "border-border bg-background text-foreground hover:bg-muted"
+            }`}
+          >
+            <Star className={`h-4 w-4 ${favOnly ? "fill-current" : ""}`} />{" "}
+            {t("mlist.onlyFavorites")}
+          </button>
+
+          {view === "cards" && (
+            <label className="relative inline-flex items-center">
+              <select
+                value={sort}
+                onChange={(e) => setSort(e.target.value as typeof sort)}
+                className="h-9 appearance-none rounded-lg border border-border bg-background pl-3 pr-8 text-sm font-medium text-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/20"
+                aria-label={t("mlist.sortBy")}
+              >
+                <option value="name">{t("mlist.sort.name")}</option>
+                <option value="newest">{t("mlist.sort.newest")}</option>
+                <option value="code">{t("mlist.sort.code")}</option>
+                <option value="renewal">{t("mlist.sort.renewal")}</option>
+              </select>
+              <ChevronDown className="pointer-events-none absolute right-2.5 h-4 w-4 text-muted-foreground" />
+            </label>
+          )}
+
+          <button
+            onClick={doSaveFilter}
+            disabled={!anyFilterActive}
+            className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-border bg-background px-3 text-sm font-medium text-foreground hover:bg-muted disabled:opacity-50"
+          >
+            <Star className="h-4 w-4 text-muted-foreground" /> {t("mlist.saveFilter")}
+          </button>
+
+          {anyFilterActive && (
+            <button
+              onClick={reset}
+              className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-border bg-background px-3 text-sm font-medium text-foreground hover:bg-muted"
+            >
+              <Filter className="h-4 w-4 text-muted-foreground" /> {t("members.filter.reset")}
+            </button>
+          )}
+
+          <span className="ml-auto text-xs text-muted-foreground">
+            <span className="font-semibold text-foreground">{tc.total}</span> {t("members.count")}
+          </span>
+        </div>
+
+        {/* Saved filters */}
+        {saved.length > 0 && (
+          <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-border pt-3">
+            <span className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+              {t("mlist.savedFilters")}
+            </span>
+            {saved.map((f) => (
+              <span
+                key={f.id}
+                className="group inline-flex items-center gap-1 rounded-full border border-border bg-background py-1 pl-3 pr-1.5 text-xs font-medium text-foreground"
+              >
+                <button onClick={() => applySaved(f)} className="hover:text-primary">
+                  {f.name}
+                </button>
+                <button
+                  onClick={() => deleteSavedFilter(f.id)}
+                  aria-label={t("common.delete")}
+                  className="grid h-4 w-4 place-items-center rounded-full text-muted-foreground hover:bg-muted hover:text-destructive"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </span>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Bulk action bar */}
+      {sel.size > 0 && (
+        <div className="vba-pop-in mb-4 flex flex-wrap items-center gap-3 rounded-xl border border-primary/30 bg-primary/5 px-4 py-2.5">
+          <span className="text-sm font-semibold text-foreground">
+            {sel.size} {t("mlist.selected")}
+          </span>
+          <button
+            onClick={handleExportSelected}
+            className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-card px-3 py-1.5 text-xs font-semibold text-foreground hover:bg-muted"
+          >
+            <Download className="h-3.5 w-3.5" /> {t("mlist.exportSelected")}
+          </button>
+          <button
+            onClick={() => setSel(new Set())}
+            className="ml-auto inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold text-muted-foreground hover:text-foreground"
+          >
+            <X className="h-3.5 w-3.5" /> {t("mlist.clearSelection")}
+          </button>
+        </div>
+      )}
+
+      {/* Content */}
+      {isLoading ? (
+        <div className="rounded-2xl border border-border bg-card p-5 shadow-[var(--shadow-card)]">
+          <ListSkeleton rows={6} />
+        </div>
+      ) : tc.total === 0 ? (
+        anyFilterActive ? (
+          <NoSearchResult />
+        ) : (
+          <EmptyState />
+        )
+      ) : view === "cards" ? (
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+          {tc.pageRows.map((m) => (
+            <MemberCard
+              key={m.id}
+              m={m}
+              t={t}
+              isAdmin={isAdmin}
+              roleLoading={roleLoading}
+              selected={sel.has(m.id)}
+              favorite={favorites.includes(m.id)}
+              pinned={pinned.includes(m.id)}
+              accountStatus={isAdmin ? ((acctStatuses[m.id] as MemberAccountStatus) ?? "none") : undefined}
+              onOpen={() => openMember(m)}
+              onToggleSel={() => toggleSel(m.id)}
+              onToggleFav={() => setFavoriteAndSync(m.id)}
+              onTogglePin={() => setPinnedAndSync(m.id)}
+              onEdit={canEdit ? () => setEditing(m) : undefined}
+              onAccount={canAccount ? () => setAccountFor(m) : undefined}
+              onDelete={canDelete ? () => setDeleting(m) : undefined}
+              onApprove={canApprove ? () => handleApproveAndSendCredentials(m) : undefined}
+              onPaymentChange={(s) => handleUpdatePaymentStatus(m, s)}
+            />
+          ))}
+        </div>
+      ) : (
+        <div className="self-stretch relative bg-white dark:bg-card rounded-[20px] outline outline-1 outline-offset-[-1px] outline-slate-200 dark:outline-slate-800 flex flex-col justify-start items-start overflow-hidden shadow-xs">
+          <div className="overflow-x-auto relative w-full">
+            <table className="w-full text-sm border-collapse min-w-[1350px]">
+              <thead>
+                <tr className="h-16 bg-blue-50/70 dark:bg-blue-950/40 border-b border-slate-200 dark:border-slate-800 text-xs font-bold text-slate-900 dark:text-slate-100">
+                  <th className="sticky left-0 z-20 w-[72px] min-w-[72px] max-w-[72px] bg-blue-50/90 dark:bg-blue-950/90 px-2 py-3 text-center border-r border-b border-slate-200 dark:border-slate-800 select-none">
+                    <div className="inline-flex items-center gap-1.5 justify-center">
+                      <input
+                        type="checkbox"
+                        aria-label={t("mlist.selectAll")}
+                        checked={tc.pageRows.length > 0 && tc.pageRows.every((m) => sel.has(m.id))}
+                        onChange={selectAllPage}
+                        className="h-4 w-4 rounded border-border accent-[var(--primary)]"
+                      />
+                      <span>STT</span>
+                    </div>
+                  </th>
+                  <th className="sticky left-[72px] z-20 min-w-[110px] bg-blue-50/90 dark:bg-blue-950/90 px-4 py-3 border-r border-b border-slate-200 dark:border-slate-800 shadow-[4px_0_6px_-2px_rgba(0,0,0,0.05)] text-left">
+                    <button
+                      type="button"
+                      onClick={() => tc.toggleSort("code")}
+                      className="inline-flex items-center gap-1 font-bold uppercase tracking-wider transition-colors hover:text-foreground text-left"
+                      aria-label={t("tbl.code")}
+                    >
+                      {t("tbl.code")}
+                    </button>
+                  </th>
+                  <SortHeader
+                    label={t("tbl.name")}
+                    columnKey="name"
+                    sortKey={tc.sortKey}
+                    sortDir={tc.sortDir}
+                    onSort={tc.toggleSort}
+                    width={220}
+                    className="border-r border-slate-200 dark:border-slate-800"
+                  />
+                  <SortHeader
+                    label="Ban chuyên môn"
+                    columnKey="department"
+                    sortKey={tc.sortKey}
+                    sortDir={tc.sortDir}
+                    onSort={tc.toggleSort}
+                    width={170}
+                    className="border-r border-slate-200 dark:border-slate-800"
+                  />
+                  <SortHeader
+                    label={t("tbl.industry")}
+                    columnKey="industry"
+                    sortKey={tc.sortKey}
+                    sortDir={tc.sortDir}
+                    onSort={tc.toggleSort}
+                    width={160}
+                    className="border-r border-slate-200 dark:border-slate-800"
+                  />
+                  <SortHeader
+                    label={t("tbl.region")}
+                    columnKey="region"
+                    sortKey={tc.sortKey}
+                    sortDir={tc.sortDir}
+                    onSort={tc.toggleSort}
+                    width={140}
+                    className="border-r border-slate-200 dark:border-slate-800"
+                  />
+                  <SortHeader
+                    label={t("tbl.type")}
+                    columnKey="type"
+                    sortKey={tc.sortKey}
+                    sortDir={tc.sortDir}
+                    onSort={tc.toggleSort}
+                    width={130}
+                    className="border-r border-slate-200 dark:border-slate-800"
+                  />
+                  <SortHeader
+                    label={t("tbl.status")}
+                    columnKey="status"
+                    sortKey={tc.sortKey}
+                    sortDir={tc.sortDir}
+                    onSort={tc.toggleSort}
+                    width={130}
+                    className="border-r border-slate-200 dark:border-slate-800"
+                  />
+                  <th className="px-4 py-3 border-r border-b border-slate-200 dark:border-slate-800 text-left min-w-[130px]">
+                    <div className="flex items-center gap-1.5 whitespace-nowrap">
+                      <button
+                        type="button"
+                        onClick={() => tc.toggleSort("payment")}
+                        className="inline-flex items-center gap-1 text-[11px] font-bold uppercase tracking-wider text-muted-foreground hover:text-foreground transition-colors"
+                      >
+                        <span>Thanh toán</span>
+                      </button>
+                      <select
+                        aria-label="Lọc trạng thái thanh toán"
+                        value={paymentFilter}
+                        onChange={(e) => setPaymentFilter(e.target.value as any)}
+                        className={`text-[11px] font-semibold rounded px-1.5 py-0.5 border cursor-pointer ${
+                          paymentFilter !== "all"
+                            ? "bg-primary text-primary-foreground border-primary"
+                            : "bg-background/80 text-muted-foreground border-border"
+                        }`}
+                        title="Lọc trạng thái thanh toán"
+                      >
+                        <option value="all">Tất cả</option>
+                        <option value="paid">✓ Đã TT</option>
+                        <option value="unpaid">✗ Chưa TT</option>
+                      </select>
+                    </div>
+                  </th>
+                  <th className="px-4 py-3 border-r border-b border-slate-200 dark:border-slate-800 text-right min-w-[130px] font-bold uppercase tracking-wider text-muted-foreground whitespace-nowrap">
+                    Số tiền hội phí
+                  </th>
+                  <SortHeader
+                    label={t("tbl.joined")}
+                    columnKey="joined"
+                    sortKey={tc.sortKey}
+                    sortDir={tc.sortDir}
+                    onSort={tc.toggleSort}
+                    width={130}
+                    className="border-r border-slate-200 dark:border-slate-800"
+                  />
+                  <th className="px-4 py-3 text-left border-r border-b border-slate-200 dark:border-slate-800 font-bold uppercase tracking-wider text-muted-foreground whitespace-nowrap min-w-[170px]">
+                    Tài khoản
+                  </th>
+                  <th className="sticky right-0 z-20 min-w-[140px] bg-blue-50/90 dark:bg-blue-950/90 px-4 py-3 text-right border-l border-b border-slate-200 dark:border-slate-800 shadow-[-4px_0_6px_-2px_rgba(0,0,0,0.08)]">{t("tbl.actions")}</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-200 dark:divide-slate-800 text-xs">
+                {tc.pageRows.map((m, idx) => (
+                  <tr
+                    key={m.id}
+                    onClick={(e) => {
+                      if ((e.target as HTMLElement).closest("a,button,input")) return;
+                      openMember(m);
+                    }}
+                    className="group cursor-pointer border-b border-slate-200 dark:border-slate-800 transition-colors hover:bg-slate-50/80 dark:hover:bg-slate-800/40"
+                  >
+                    <td className="sticky left-0 z-10 w-[72px] min-w-[72px] max-w-[72px] bg-card group-hover:bg-muted/70 px-2 py-3.5 text-center border-r border-b border-slate-200 dark:border-slate-800 transition-colors">
+                      <div className="inline-flex items-center gap-1.5 justify-center">
+                        <input
+                          type="checkbox"
+                          checked={sel.has(m.id)}
+                          onChange={() => toggleSel(m.id)}
+                          aria-label={m.name}
+                          className="h-4 w-4 rounded border-border accent-[var(--primary)]"
+                        />
+                        <span className="font-medium text-muted-foreground text-xs">{(tc.page - 1) * tc.pageSize + idx + 1}</span>
+                      </div>
+                    </td>
+                    <td className="sticky left-[72px] z-10 min-w-[110px] bg-card group-hover:bg-muted/70 px-4 py-3.5 font-mono text-[12px] font-semibold text-primary border-r border-b border-slate-200 dark:border-slate-800 shadow-[4px_0_6px_-2px_rgba(0,0,0,0.05)] transition-colors whitespace-nowrap">
+                      {m.code}
+                    </td>
+                    <td className="px-4 py-3.5 border-r border-b border-slate-200 dark:border-slate-800 whitespace-nowrap">
+                      <div className="flex items-center gap-3">
+                        <Avatar m={m} className="h-9 w-9 text-[11px]" />
+                        <div className="min-w-0">
+                          <TruncatedText text={m.name} maxWidth="max-w-[240px]" className="font-semibold text-foreground text-sm" />
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-4 py-3.5 border-r border-b border-slate-200 dark:border-slate-800 whitespace-nowrap">
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold bg-blue-50 dark:bg-blue-950/40 text-[#003B95] dark:text-blue-300 border border-blue-200/60 dark:border-blue-800/40 shadow-2xs">
+                        <Shield className="h-3.5 w-3.5 text-amber-500 shrink-0" />
+                        <span>{getMemberDepartment(m)}</span>
+                      </span>
+                    </td>
+                    <td className="px-4 py-3.5 text-foreground border-r border-b border-slate-200 dark:border-slate-800 whitespace-nowrap">
+                      <TruncatedText text={t(m.industry as TKey)} maxWidth="max-w-[160px]" />
+                    </td>
+                    <td className="px-4 py-3.5 text-foreground border-r border-b border-slate-200 dark:border-slate-800 whitespace-nowrap">
+                      <TruncatedText text={t(m.region as TKey)} maxWidth="max-w-[140px]" />
+                    </td>
+                    <td className="px-4 py-3.5 border-r border-b border-slate-200 dark:border-slate-800 whitespace-nowrap">
+                      <TypeChip type={m.type} />
+                    </td>
+                    <td className="px-4 py-3.5 border-r border-b border-slate-200 dark:border-slate-800 whitespace-nowrap">
+                      <StatusBadge status={m.status} />
+                    </td>
+                    <td className="px-4 py-3.5 border-r border-b border-slate-200 dark:border-slate-800 whitespace-nowrap">
+                      <MemberPaymentSelect
+                        member={m}
+                        onChange={(s) => handleUpdatePaymentStatus(m, s)}
+                        disabled={!can(PERMISSIONS.FINANCE_MANAGE) && !can("FEE_EDIT")}
+                      />
+                    </td>
+                    <td className="px-4 py-3.5 border-r border-b border-slate-200 dark:border-slate-800 text-right font-mono font-bold whitespace-nowrap text-emerald-600 dark:text-emerald-400">
+                      {new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(
+                        (m as any).feeAmount || (m as any).fee_amount || (m.level === "vip" ? 15000000 : 10000000)
+                      )}
+                    </td>
+                    <td className="px-4 py-3.5 text-muted-foreground border-r border-b border-slate-200 dark:border-slate-800 whitespace-nowrap">
+                      {m.joinedAt ? new Date(m.joinedAt).toLocaleDateString("vi-VN") : "—"}
+                    </td>
+                    <td className="px-4 py-3.5 border-r border-b border-slate-200 dark:border-slate-800 whitespace-nowrap">
+                      <div className="flex flex-col gap-0.5">
+                        <span className="font-mono text-xs font-semibold text-foreground">
+                          {m.email || m.phone || "—"}
+                        </span>
+                        {m.status === "pending" ? (
+                          <span className="inline-flex items-center gap-1 text-[11px] font-medium text-amber-600 dark:text-amber-400">
+                            <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />
+                            Chờ kích hoạt
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 text-[11px] font-medium text-emerald-600 dark:text-emerald-400">
+                            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                            Đã kích hoạt app
+                          </span>
+                        )}
+                      </div>
+                    </td>
+                    <td className="sticky right-0 z-10 min-w-[140px] bg-card group-hover:bg-muted/70 px-4 py-3.5 text-right border-l border-b border-slate-200 dark:border-slate-800 shadow-[-4px_0_6px_-2px_rgba(0,0,0,0.08)] transition-colors">
+                      <div className="inline-flex items-center gap-1.5">
+                        {m.status === "pending" && canApprove && (
+                          <button
+                            onClick={() => handleApproveAndSendCredentials(m)}
+                            title="Ban Thành Viên thẩm định: Phê duyệt hồ sơ & Gửi email tài khoản"
+                            className="inline-flex items-center gap-1 rounded-lg bg-[#003B95] hover:bg-[#002B70] text-white px-2.5 py-1.5 text-xs font-black shadow-sm transition-all whitespace-nowrap cursor-pointer"
+                          >
+                            <CheckCircle2 className="h-3.5 w-3.5 text-slate-950" />
+                            <span>Duyệt & Gửi Email</span>
+                          </button>
+                        )}
+                        {m.status === "pending" && !canApprove && (
+                          <span
+                            title="Hồ sơ đang chờ Ban Thành Viên kiểm duyệt"
+                            className="inline-flex items-center gap-1 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-700 dark:text-amber-400 px-2 py-1 text-[11px] font-semibold whitespace-nowrap"
+                          >
+                            <span>Chờ BTV duyệt</span>
+                          </span>
+                        )}
+                        <Link
+                          to="/members/$memberId"
+                          params={{ memberId: m.id }}
+                          search={REVIEW_SEARCH_RESET}
+                          onClick={() => pushRecent(m.id)}
+                          className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-background px-2.5 py-1.5 text-xs font-semibold text-foreground hover:bg-muted"
+                        >
+                          <Eye className="h-3.5 w-3.5" />
+                          {t("tbl.view")}
+                        </Link>
+                        {canEdit && (
+                          <button
+                            onClick={() => setEditing(m)}
+                            aria-label={t("common.edit")}
+                            title={t("common.edit")}
+                            className="inline-flex items-center justify-center rounded-lg border border-border bg-background p-1.5 text-foreground hover:border-primary/50 hover:bg-primary/5 hover:text-primary cursor-pointer transition-colors"
+                          >
+                            <Pencil className="h-3.5 w-3.5" />
+                          </button>
+                        )}
+                        {canAccount && (
+                          <button
+                            onClick={() => setAccountFor(m)}
+                            aria-label={t("macct.manage")}
+                            title={t("macct.manage")}
+                            className="inline-flex items-center justify-center rounded-lg border border-border bg-background p-1.5 text-foreground hover:bg-muted cursor-pointer transition-colors"
+                          >
+                            <UserCog className="h-3.5 w-3.5" />
+                          </button>
+                        )}
+                        {canDelete && (
+                          <button
+                            onClick={() => setDeleting(m)}
+                            aria-label={t("common.delete")}
+                            title={t("common.delete")}
+                            className="inline-flex items-center justify-center rounded-lg border border-border bg-background p-1.5 text-destructive hover:bg-destructive/10 cursor-pointer transition-colors"
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <Pagination
+            page={tc.page}
+            pageCount={tc.pageCount}
+            pageSize={tc.pageSize}
+            total={tc.total}
+            from={tc.from}
+            to={tc.to}
+            onPage={tc.setPage}
+            onPageSize={tc.setPageSize}
+          />
+        </div>
+      )}
+
+      {/* Card view pagination */}
+      {view === "cards" && tc.total > 0 && (
+        <div className="mt-4 rounded-2xl border border-border bg-card shadow-[var(--shadow-card)]">
+          <Pagination
+            page={tc.page}
+            pageCount={tc.pageCount}
+            pageSize={tc.pageSize}
+            total={tc.total}
+            from={tc.from}
+            to={tc.to}
+            onPage={tc.setPage}
+            onPageSize={tc.setPageSize}
+          />
+        </div>
+      )}
+
+
+      <CrudModal
+        open={!!editing}
+        title={t("members.edit")}
+        fields={fields}
+        initial={editing ? editInitial(editing) : undefined}
+        submitting={submitting}
+        submitLabel={t("common.save")}
+        cancelLabel={t("common.cancel")}
+        onSubmit={onSubmit}
+        onClose={() => setEditing(null)}
+      />
+
+      {accountFor && (
+        <MemberAccountModal
+          memberId={accountFor.id}
+          memberName={accountFor.name}
+          memberEmail={accountFor.email}
+          onClose={() => {
+            setAccountFor(null);
+            qc.invalidateQueries({ queryKey: ["member-account-statuses"] });
+          }}
+        />
+      )}
+
+      {deleting && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div
+            className="absolute inset-0 bg-foreground/40 backdrop-blur-sm"
+            onClick={() => {
+              if (!submitting) {
+                setDeleting(null);
+                setDeleteMode("choose");
+              }
+            }}
+          />
+          <div className="relative z-10 w-full max-w-lg rounded-2xl border border-border bg-card p-6 shadow-[var(--shadow-glow)] animate-in fade-in zoom-in-95">
+            {deleteMode === "choose" ? (
+              <>
+                <div className="flex items-center gap-3 text-destructive">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-destructive/10">
+                    <AlertTriangle className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <h3 className="text-base font-bold text-foreground">Xác nhận xóa hội viên</h3>
+                    <p className="text-xs text-muted-foreground">Lựa chọn phương án xóa hồ sơ và dữ liệu liên kết</p>
+                  </div>
+                </div>
+
+                <div className="mt-4 rounded-xl border border-border/80 bg-muted/30 p-3.5 space-y-2 text-xs">
+                  <div className="flex justify-between items-center">
+                    <span className="text-muted-foreground">Hội viên:</span>
+                    <strong className="text-foreground font-semibold">{deleting.name} ({deleting.code})</strong>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-muted-foreground">Doanh nghiệp liên kết:</span>
+                    <span className="text-foreground font-medium">{deleting.companyName || deleting.company || deleting.name}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-muted-foreground">Tài khoản đăng nhập:</span>
+                    <span className="text-foreground font-medium">{deleting.email || deleting.phone || "Có tài khoản liên kết"}</span>
+                  </div>
+                </div>
+
+                <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
+                  Hội viên này đang gắn liền với dữ liệu doanh nghiệp và tài khoản quản trị/thành viên.
+                  Bạn có thể chọn <strong>xóa riêng doanh nghiệp trước</strong> (sau đó quay lại xóa hội viên) hoặc <strong>xóa toàn diện cả hội viên và doanh nghiệp</strong> ở cả 2 bảng.
+                </p>
+
+                <div className="mt-5 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-end">
+                  <button
+                    onClick={() => {
+                      setDeleting(null);
+                      setDeleteMode("choose");
+                    }}
+                    disabled={submitting}
+                    className="order-3 sm:order-1 rounded-xl border border-border bg-card px-3.5 py-2 text-xs font-medium text-foreground hover:bg-muted disabled:opacity-50 cursor-pointer"
+                  >
+                    Hủy bỏ
+                  </button>
+                  <button
+                    onClick={onConfirmDeleteCompanyFirst}
+                    disabled={submitting}
+                    className="order-2 rounded-xl border border-amber-500/30 bg-amber-500/10 px-3.5 py-2 text-xs font-semibold text-amber-700 dark:text-amber-300 hover:bg-amber-500/20 disabled:opacity-50 cursor-pointer transition-colors"
+                  >
+                    1. Xóa doanh nghiệp trước
+                  </button>
+                  <button
+                    onClick={onConfirmDeleteAll}
+                    disabled={submitting}
+                    className="order-1 sm:order-3 rounded-xl bg-destructive px-3.5 py-2 text-xs font-semibold text-destructive-foreground hover:bg-destructive/90 disabled:opacity-50 cursor-pointer shadow-sm transition-colors"
+                  >
+                    2. Xóa cả hội viên và doanh nghiệp
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="flex items-center gap-3 text-emerald-600">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500/10">
+                    <CheckCircle2 className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <h3 className="text-base font-bold text-foreground">Đã xóa doanh nghiệp liên kết</h3>
+                    <p className="text-xs text-muted-foreground">Tiến hành xóa hồ sơ hội viên và tài khoản</p>
+                  </div>
+                </div>
+
+                <div className="mt-4 rounded-xl border border-emerald-200 dark:border-emerald-900/50 bg-emerald-50/50 dark:bg-emerald-950/20 p-3.5 text-xs text-emerald-800 dark:text-emerald-200">
+                  Dữ liệu doanh nghiệp của hội viên <strong>{deleting.name}</strong> đã được gỡ bỏ khỏi bảng doanh nghiệp.
+                  Bạn có muốn tiếp tục xóa vĩnh viễn hồ sơ hội viên và tài khoản đăng nhập không?
+                </div>
+
+                <div className="mt-5 flex items-center justify-end gap-2">
+                  <button
+                    onClick={() => {
+                      setDeleting(null);
+                      setDeleteMode("choose");
+                    }}
+                    disabled={submitting}
+                    className="rounded-xl border border-border bg-card px-4 py-2 text-xs font-medium text-foreground hover:bg-muted disabled:opacity-50 cursor-pointer"
+                  >
+                    Giữ lại hồ sơ hội viên
+                  </button>
+                  <button
+                    onClick={onConfirmDeleteMemberOnly}
+                    disabled={submitting}
+                    className="rounded-xl bg-destructive px-4 py-2 text-xs font-semibold text-destructive-foreground hover:bg-destructive/90 disabled:opacity-50 cursor-pointer shadow-sm"
+                  >
+                    Xác nhận xóa hội viên &amp; tài khoản
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+    </AppShell>
+  );
+
+  function setFavoriteAndSync(id: string) {
+    toggleFavorite(id);
+  }
+  function setPinnedAndSync(id: string) {
+    togglePinned(id);
+  }
+}
+
+/* ----------------------------- sub components ----------------------------- */
+
+function Avatar({ m, className = "" }: { m: Member; className?: string }) {
+  const avatarSrc = (m as any).avatar || (m as any).avatarUrl || (m as any).photo;
+  if (avatarSrc) {
+    return (
+      <img
+        src={resolveMediaUrl(avatarSrc) || avatarSrc}
+        alt={m.name}
+        className={`shrink-0 rounded-full object-cover border border-slate-200 dark:border-slate-700 ${className}`}
+        onError={(e) => {
+          (e.currentTarget as HTMLElement).style.display = "none";
+        }}
+      />
+    );
+  }
+  return (
+    <div
+      className={`flex shrink-0 items-center justify-center rounded-full font-bold text-white bg-[#003B95] ${className}`}
+    >
+      {m.type === "company" ? <Building2 className="h-1/2 w-1/2" /> : initials(m.name)}
+    </div>
+  );
+}
+
+function QuickRail({
+  title,
+  icon,
+  children,
+}: {
+  title: string;
+  icon: React.ReactNode;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="rounded-2xl border border-border bg-card p-3 shadow-[var(--shadow-card)]">
+      <div className="mb-2 flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+        {icon} {title}
+      </div>
+      <div className="flex flex-wrap gap-2">{children}</div>
+    </div>
+  );
+}
+
+function MemberChip({ m, onClick }: { m: Member; onClick: () => void }) {
+  return (
+    <button
+      onClick={onClick}
+      className="inline-flex max-w-full items-center gap-2 rounded-full border border-border bg-background py-1 pl-1 pr-3 text-xs font-medium text-foreground transition-colors hover:border-primary/40 hover:bg-muted"
+    >
+      <Avatar m={m} className="h-6 w-6 text-[9px]" />
+      <span className="truncate">{m.name}</span>
+    </button>
+  );
+}
+
+function MemberCard({
+  m,
+  t,
+  isAdmin,
+  roleLoading,
+  selected,
+  favorite,
+  pinned,
+  accountStatus,
+  onOpen,
+  onToggleSel,
+  onToggleFav,
+  onTogglePin,
+  onEdit,
+  onAccount,
+  onDelete,
+  onApprove,
+  onPaymentChange,
+}: {
+  m: Member;
+  t: ReturnType<typeof useT>;
+  isAdmin: boolean;
+  roleLoading: boolean;
+  selected: boolean;
+  favorite: boolean;
+  pinned: boolean;
+  accountStatus?: MemberAccountStatus;
+  onOpen: () => void;
+  onToggleSel: () => void;
+  onToggleFav: () => void;
+  onTogglePin: () => void;
+  onEdit?: () => void;
+  onAccount?: () => void;
+  onDelete?: () => void;
+  onApprove?: () => void;
+  onPaymentChange?: (status: "paid" | "cash" | "unpaid") => void;
+}) {
+  return (
+    <div
+      className={`vba-pop-in group relative flex flex-col rounded-2xl border bg-card p-5 shadow-[var(--shadow-card)] transition-all duration-[var(--motion-base)] hover:-translate-y-0.5 hover:shadow-[var(--shadow-elevated)] ${
+        selected ? "border-primary ring-1 ring-primary/30" : "border-border"
+      }`}
+    >
+      {/* top row: checkbox + fav/pin */}
+      <div className="mb-3 flex items-start justify-between">
+        <input
+          type="checkbox"
+          checked={selected}
+          onChange={onToggleSel}
+          aria-label={m.name}
+          className="mt-1 h-4 w-4 rounded border-border accent-[var(--primary)]"
+        />
+        <div className="flex items-center gap-1">
+          <button
+            onClick={onToggleFav}
+            aria-label={t("mlist.addToFavorites")}
+            aria-pressed={favorite}
+            className={`grid h-7 w-7 place-items-center rounded-lg transition-colors ${
+              favorite ? "text-warning" : "text-muted-foreground hover:bg-muted"
+            }`}
+          >
+            <Star className={`h-4 w-4 ${favorite ? "fill-current" : ""}`} />
+          </button>
+          <button
+            onClick={onTogglePin}
+            aria-label={pinned ? t("mlist.unpin") : t("mlist.pin")}
+            aria-pressed={pinned}
+            className={`grid h-7 w-7 place-items-center rounded-lg transition-colors ${
+              pinned ? "text-primary" : "text-muted-foreground hover:bg-muted"
+            }`}
+          >
+            <Pin className={`h-4 w-4 ${pinned ? "fill-current" : ""}`} />
+          </button>
+        </div>
+      </div>
+
+      {/* identity */}
+      <button onClick={onOpen} className="flex items-center gap-3 text-left">
+        <Avatar m={m} className="h-14 w-14 text-[16px]" />
+        <div className="min-w-0">
+          <div className="truncate text-[15px] font-bold text-foreground group-hover:text-primary">
+            {m.name}
+          </div>
+          <div className="mt-0.5 flex items-center gap-1.5 text-[11px] text-muted-foreground">
+            <span className="font-mono font-semibold text-primary">{m.code}</span>
+            <span aria-hidden>·</span>
+            <span className="truncate">{t(m.level as TKey)}</span>
+          </div>
+        </div>
+      </button>
+
+      {/* meta */}
+      <div className="mt-4 grid grid-cols-2 gap-2 text-[12px]">
+        <MetaRow
+          icon={<Building2 className="h-3.5 w-3.5" />}
+          value={m.type === "company" ? m.name : m.contact || "—"}
+        />
+        <MetaRow icon={<MapPin className="h-3.5 w-3.5" />} value={t(m.region as TKey)} />
+        <MetaRow icon={<Filter className="h-3.5 w-3.5" />} value={t(m.industry as TKey)} />
+        <MetaRow
+          value={m.joinedAt ? new Date(m.joinedAt).toLocaleDateString("vi-VN") : "—"}
+          icon={<Eye className="h-3.5 w-3.5" />}
+        />
+      </div>
+
+      {/* badges */}
+      <div className="mt-4 flex flex-wrap items-center gap-1.5">
+        <StatusBadge status={m.status} />
+        <RenewalBadge m={m} />
+        <TypeChip type={m.type} />
+        <MemberPaymentSelect
+          member={m}
+          onChange={(s) => onPaymentChange?.(s)}
+          disabled={!isAdmin}
+        />
+        {m.status === "pending" ? (
+          <span className="inline-flex items-center gap-1 text-[10.5px] font-semibold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/50 px-2 py-0.5 rounded-full border border-amber-200">
+            <span className="h-1.5 w-1.5 rounded-full bg-amber-500" /> Chờ kích hoạt
+          </span>
+        ) : (
+          <span className="inline-flex items-center gap-1 text-[10.5px] font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50 px-2 py-0.5 rounded-full border border-emerald-200">
+            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" /> Đã kích hoạt app
+          </span>
+        )}
+      </div>
+
+      {/* account pill */}
+      <div className="mt-3 flex items-center justify-between rounded-xl bg-secondary/50 border border-border/60 px-3 py-1.5 text-xs">
+        <span className="text-muted-foreground text-[11px] font-medium">Tài khoản:</span>
+        <span className="font-mono font-semibold text-foreground text-[11px] truncate max-w-[180px]">{m.email || m.phone || "—"}</span>
+      </div>
+
+      {/* pending approval action banner */}
+      {m.status === "pending" && onApprove && (
+        <button
+          onClick={onApprove}
+          className="mt-3 w-full inline-flex items-center justify-center gap-1.5 rounded-xl bg-[#003B95] hover:bg-[#002B70] text-white px-3 py-2 text-xs font-black shadow-sm transition-all cursor-pointer"
+        >
+          <CheckCircle2 className="h-4 w-4 text-slate-950" />
+          Ban Thành Viên: Phê duyệt & Gửi Email Tài Khoản
+        </button>
+      )}
+      {m.status === "pending" && !onApprove && (
+        <div className="mt-3 w-full rounded-xl bg-amber-500/10 border border-amber-500/20 px-3 py-2 text-xs text-amber-800 dark:text-amber-300 font-medium text-center">
+          ⏳ Hồ sơ đang chờ Ban Thành Viên kiểm duyệt & phê duyệt kết nạp
+        </div>
+      )}
+
+      {/* actions */}
+      <div className="mt-4 flex items-center gap-1.5 border-t border-border pt-3">
+        <Link
+          to="/members/$memberId"
+          params={{ memberId: m.id }}
+          search={REVIEW_SEARCH_RESET}
+          onClick={onOpen}
+          className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-border bg-background px-3 py-1.5 text-xs font-semibold text-foreground hover:bg-muted"
+        >
+          <Eye className="h-3.5 w-3.5" /> {t("tbl.view")}
+        </Link>
+        {onEdit && (
+          <button
+            onClick={onEdit}
+            aria-label={t("common.edit")}
+            title={t("common.edit")}
+            className="grid h-8 w-8 place-items-center rounded-lg border border-border bg-background text-foreground hover:bg-muted cursor-pointer transition-colors"
+          >
+            <Pencil className="h-3.5 w-3.5" />
+          </button>
+        )}
+        {onAccount && (
+          <button
+            onClick={onAccount}
+            aria-label={t("macct.manage")}
+            title={t("macct.manage")}
+            className="grid h-8 w-8 place-items-center rounded-lg border border-border bg-background text-foreground hover:bg-muted cursor-pointer transition-colors"
+          >
+            <UserCog className="h-3.5 w-3.5" />
+          </button>
+        )}
+        {onDelete && (
+          <button
+            onClick={onDelete}
+            aria-label={t("common.delete")}
+            title={t("common.delete")}
+            className="grid h-8 w-8 place-items-center rounded-lg border border-border bg-background text-destructive hover:bg-destructive/10 cursor-pointer transition-colors"
+          >
+            <Trash2 className="h-3.5 w-3.5" />
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function MetaRow({ icon, value }: { icon: React.ReactNode; value: string }) {
+  return (
+    <div className="flex min-w-0 items-center gap-1.5 text-muted-foreground">
+      <span className="shrink-0 text-muted-foreground/70">{icon}</span>
+      <span className="truncate text-foreground">{value}</span>
+    </div>
+  );
+}

@@ -1,0 +1,3269 @@
+import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
+import { useState, useEffect, useMemo, useRef, useCallback } from "react";
+import { createPortal } from "react-dom";
+import {
+  Search,
+  Eye,
+  Plus,
+  FileText,
+  Heart,
+  ImagePlus,
+  Trash2,
+  X,
+  PackageCheck,
+  Building2,
+  Phone,
+  Send,
+  CheckCircle2,
+  Calendar,
+  Pencil,
+  MoreVertical,
+  Store,
+  BadgeCheck,
+  Globe,
+  Users,
+  LayoutGrid,
+  SlidersHorizontal,
+  ChevronLeft,
+  ChevronRight,
+  TrendingUp,
+  Flame,
+  Award,
+  Sparkles,
+  Check,
+  MessageSquare,
+  ShoppingCart,
+  Play,
+  Pause,
+  Volume2,
+  VolumeX,
+  Share2,
+  ArrowRight,
+  Download,
+  FileSpreadsheet,
+  ArrowLeft,
+  ShieldCheck,
+  Mail,
+  Package,
+  Megaphone,
+  QrCode,
+  Star,
+  Menu,
+  ArrowUpDown,
+  Handshake,
+} from "lucide-react";
+import { exportProductsToExcel, type ParsedProductItem } from "@/lib/marketplace-excel";
+import { ProductExcelModal } from "@/components/dashboard/ProductExcelModal";
+import { ShopeeProductDetailModal } from "@/components/marketplace/ShopeeProductDetailModal";
+import { BusinessConnectBottomSheet, type BusinessConnectTarget } from "@/components/common/BusinessConnectBottomSheet";
+import {
+  ProductPostModal,
+  ProductQuoteModal,
+  ProductQuotesListModal,
+  ProductEditModal,
+  ProductAdRegistrationModal,
+} from "@/components/marketplace/modals";
+import { useServerFn } from "@tanstack/react-start";
+import { toast } from "sonner";
+import { MemberHeader } from "@/components/member/MemberShell";
+import { useServerData } from "@/hooks/use-server-data";
+import { listMyProducts, requestQuote, getMyMember, type MyProduct, type MyMember } from "@/lib/member-app.functions";
+import { fetchNestApi, resolveMediaUrl, uploadFileToNest } from "@/lib/api-client";
+import { isUserProductOwner } from "@/lib/marketplace-data";
+import { useT, useFmt, useLang } from "@/lib/i18n";
+import { useAuth } from "@/context/AuthContext";
+import { isVideoMedia } from "@/components/marketplace/MarketplaceAdsManager";
+import { MarketplaceAdSlider } from "@/components/marketplace/MarketplaceAdSlider";
+import { StandardCurrencyInput } from "@/components/common/StandardCurrencyInput";
+import { MobilePagination } from "@/components/common/MobilePagination";
+import { getDynamicMarketplaceCategories, matchProductCategory } from "@/lib/marketplace-categories";
+
+function normalizeCategory(str: string): string {
+  return str
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/đ/g, "d")
+    .replace(/&/g, "va")
+    .replace(/[^a-z0-9]/g, "");
+}
+
+function matchCategory(productCat: string, filterCat: string): boolean {
+  if (!productCat || !filterCat) return false;
+  if (matchProductCategory(productCat, filterCat)) return true;
+  const pNorm = normalizeCategory(productCat);
+  const fNorm = normalizeCategory(filterCat);
+  if (pNorm.includes(fNorm) || fNorm.includes(pNorm)) return true;
+
+  const CATEGORY_MAP: Record<string, string[]> = {
+    media_event: ["truyenthong", "sukien", "media", "event", "pr", "quangcao", "marketing", "tochucsukien", "quayphim"],
+    services_training: ["dichvu", "daotao", "giaoduc", "education", "training", "tuvan", "huanluyen", "consulting", "service", "phaply"],
+    finance_banking: ["taichinh", "nganhang", "finance", "banking", "dautu", "investment", "baohiem", "chungkhoan", "ketoan", "tindung"],
+    construction_realestate: ["xaydung", "batdongsan", "construction", "realestate", "property", "kientruc", "noithat", "thicong", "vatlieuxaydung"],
+    tourism_hospitality: ["dulich", "khachsan", "tourism", "travel", "hospitality", "resort", "tour", "vemaybay", "nghiduong"],
+    tech: ["congnghe", "chuyendoiso", "phanmem", "it", "tech", "technology", "software", "sohoa", "ai"],
+    manufacturing: ["sanxuat", "congnghiep", "manufacturing", "industry", "production", "chebien", "giacong", "cokhi"],
+    retail_commerce: ["thuongmai", "banle", "retail", "consumer", "fmcg", "commerce", "trade", "hangtieudung", "thoitrang"],
+    healthcare: ["yte", "suckhoe", "health", "healthcare", "duocpham", "thammy", "spa", "phongkham"],
+    logistics: ["logistics", "vantai", "khovan", "giaonhan", "supplychain", "xuatnhapkhau"],
+    agriculture_food: ["nongnghiep", "thucpham", "f&b", "amthuc", "douong", "nongsan", "food"],
+  };
+
+  for (const group of Object.values(CATEGORY_MAP)) {
+    const matchesFilter = group.some((keyword) => fNorm.includes(keyword) || keyword.includes(fNorm));
+    const matchesProduct = group.some((keyword) => pNorm.includes(keyword) || keyword.includes(pNorm));
+    if (matchesFilter && matchesProduct) return true;
+  }
+  return false;
+}
+
+function formatCurrencyInput(val: string | number): string {
+  if (val === undefined || val === null) return "";
+  const digits = String(val).replace(/\D/g, "");
+  if (!digits) return "";
+  const clean = digits.replace(/^0+(?=\d)/, "");
+  return clean.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+}
+
+function parseVnProductNumber(val: string | number | undefined | null): number {
+  if (val === undefined || val === null || val === "") return 0;
+  if (typeof val === "number") return val;
+  const s = String(val).trim().toLowerCase();
+  if (s === "liên hệ" || s === "thương lượng" || s === "thỏa thuận") return 0;
+  const hasTy = s.includes("tỷ") || s.includes("ty");
+  const hasTr = s.includes("tr") || s.includes("trieu") || s.includes("triệu");
+  let clean = s.replace(/[^\d.,]/g, "");
+  if (clean.includes(".") && clean.includes(",")) {
+    clean = clean.replace(/\./g, "").replace(",", ".");
+  } else if (clean.includes(".")) {
+    const parts = clean.split(".");
+    if (parts.length > 2 || (parts.length === 2 && parts[1].length === 3)) {
+      clean = clean.replace(/\./g, "");
+    }
+  } else if (clean.includes(",")) {
+    const parts = clean.split(",");
+    if (parts.length > 2 || (parts.length === 2 && parts[1].length === 3 && !hasTy && !hasTr)) {
+      clean = clean.replace(/,/g, "");
+    } else {
+      clean = clean.replace(",", ".");
+    }
+  }
+  const n = parseFloat(clean);
+  if (isNaN(n) || n <= 0) return 0;
+  if (hasTy) return n * 1_000_000_000;
+  if (hasTr) return n * 1_000_000;
+  if (n <= 100 && !s.includes("đ") && !s.includes("vnd")) {
+    return n * 1_000_000_000;
+  }
+  return n;
+}
+
+function formatSmartProductPrice(rawPrice: string | number | undefined | null): string {
+  if (!rawPrice) return "Liên hệ";
+  if (typeof rawPrice === "string") {
+    const s = rawPrice.trim();
+    if (s.toLowerCase().includes("thương lượng") || s.toLowerCase().includes("liên hệ") || s.toLowerCase().includes("thỏa thuận")) {
+      return "Liên hệ";
+    }
+    if (s.includes(" - ")) {
+      const parts = s.split(" - ");
+      const p1 = parseVnProductNumber(parts[0]);
+      const p2 = parseVnProductNumber(parts[1]);
+      if (p1 > 0 && p2 > 0) {
+        return `${formatSmartProductPrice(p1)} - ${formatSmartProductPrice(p2)}`;
+      }
+      return s;
+    }
+  }
+  const num = typeof rawPrice === "number" ? rawPrice : parseVnProductNumber(rawPrice);
+  if (isNaN(num) || num <= 0) return "Liên hệ";
+  if (num > 0 && num <= 100) {
+    return `${num} Tỷ đ`;
+  }
+  if (num >= 1_000_000_000) {
+    const billions = num / 1_000_000_000;
+    return `${billions % 1 === 0 ? billions : billions.toFixed(1).replace(/\.0$/, "")} Tỷ đ`;
+  }
+  if (num >= 1_000_000) {
+    const millions = num / 1_000_000;
+    return `${millions % 1 === 0 ? millions : millions.toFixed(1).replace(/\.0$/, "")} Tr đ`;
+  }
+  return `${num.toLocaleString("vi-VN")} đ`;
+}
+
+type ProductsSearch = {
+  action?: string;
+};
+
+export const Route = createFileRoute("/association/products")({
+  validateSearch: (search: Record<string, unknown>): ProductsSearch => {
+    return {
+      action: typeof search.action === "string" ? search.action : undefined,
+    };
+  },
+  component: ProductsScreen,
+});
+
+function ProductsScreen() {
+  const t = useT();
+  const fmt = useFmt();
+  const { lang } = useLang();
+  const isEn = lang === "en";
+  const search = Route.useSearch();
+  const { user } = useAuth();
+  const navigate = useNavigate();
+
+  const fetchProducts = useServerFn(listMyProducts);
+  const doQuote = useServerFn(requestQuote);
+  const fetchMember = useServerFn(getMyMember);
+  const { data: initialProducts, loading, reload } = useServerData<MyProduct[]>(() => fetchProducts(), []);
+  const { data: member } = useServerData<MyMember | null>(() => fetchMember(), null);
+
+  const [localProducts, setLocalProducts] = useState<MyProduct[] | null>(null);
+
+  useEffect(() => {
+    if (initialProducts) {
+      setLocalProducts(initialProducts);
+    }
+  }, [initialProducts]);
+
+  const activeProductsSource = localProducts !== null ? localProducts : (initialProducts || []);
+
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const [q, setQ] = useState("");
+  const [busy, setBusy] = useState<string | null>(null);
+  const [marketplaceTab, setMarketplaceTab] = useState<"market" | "my_store">(() => (search?.action === "manage" || search?.action === "create") ? "my_store" : "market");
+  const [postModalOpen, setPostModalOpen] = useState(() => search?.action === "create");
+  const [editingProduct, setEditingProduct] = useState<MyProduct | null>(null);
+  const [activeProductMenuId, setActiveProductMenuId] = useState<string | null>(null);
+  const editImageInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (search?.action === "create") {
+      setPostModalOpen(true);
+    }
+  }, [search?.action]);
+
+  // Category & User-isolated Interested state (prevents new accounts from inheriting old favorites)
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [showAllProducts, setShowAllProducts] = useState(false);
+  const [selectedDetailProduct, setSelectedDetailProduct] = useState<MyProduct | null>(null);
+  const [meetingTarget, setMeetingTarget] = useState<BusinessConnectTarget | null>(null);
+
+  // Deep Link xử lý khi nhấp từ link chia sẻ bên ngoài vào app (?id=... hoặc ?productId=...)
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      const sp = new URLSearchParams(window.location.search);
+      const targetProdId = sp.get("id") || sp.get("productId") || sp.get("prodId");
+      if (!targetProdId) return;
+
+      const found = activeProductsSource.find((p) => String(p.id) === String(targetProdId));
+      if (found) {
+        setSelectedDetailProduct(found);
+      } else {
+        fetchNestApi<any>(`/products/${targetProdId}`)
+          .then((res) => {
+            if (res && res.id) {
+              setSelectedDetailProduct(res);
+            }
+          })
+          .catch(() => {});
+      }
+    } catch {}
+  }, [activeProductsSource]);
+
+  const handleScheduleMeetingWithSeller = (p: MyProduct) => {
+    setMeetingTarget({
+      code: p.sellerId || (p as any).userId || "seller",
+      name: p.sellerName || p.company || "Chủ gian hàng",
+      company: p.company || "CLB Doanh Nhân CEO HN10",
+      avatar: p.sellerAvatar || "/ceohn10-emblem-8.png",
+      title: "Chủ gian hàng",
+      userId: p.sellerId || (p as any).userId,
+    });
+  };
+
+  // Recent Categories (Shopee style - dưới tìm kiếm là danh mục gần đây đã chọn)
+  const [recentCategories, setRecentCategories] = useState<string[]>(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const raw = localStorage.getItem("ceohn10_recent_categories");
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        }
+      } catch {}
+    }
+    return [
+      "Truyền thông & Sự kiện",
+      "Dịch vụ & Đào tạo",
+      "Tài chính & Ngân hàng",
+      "Xây dựng & Bất động sản",
+      "Du lịch & Khách sạn",
+      "Công nghệ & Chuyển đổi số",
+    ];
+  });
+
+  const handleSelectCategory = (cat: string) => {
+    setSelectedCategory(cat);
+    if (cat && cat !== "all" && cat !== "my_products" && cat !== "interested") {
+      setRecentCategories((prev) => {
+        const filtered = prev.filter((c) => c !== cat);
+        const updated = [cat, ...filtered].slice(0, 6);
+        try {
+          localStorage.setItem("ceohn10_recent_categories", JSON.stringify(updated));
+        } catch {}
+        return updated;
+      });
+    }
+  };
+
+  const resolvedUserId = user?.id || (member as any)?.userId || (member as any)?.user_id || (member as any)?.id || member?.code || null;
+  const userStorageKey = resolvedUserId ? `vba_interested_products_${resolvedUserId}` : null;
+  const [interestedIds, setInterestedIds] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    // Clear legacy unisolated keys that may contain mock/seed data
+    try {
+      localStorage.removeItem("vba_interested_products_user");
+    } catch {}
+
+    if (!userStorageKey) {
+      setInterestedIds([]);
+      return;
+    }
+    try {
+      const stored = localStorage.getItem(userStorageKey);
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        setInterestedIds(Array.isArray(parsed) ? parsed : []);
+      } else {
+        setInterestedIds([]);
+      }
+    } catch {
+      setInterestedIds([]);
+    }
+  }, [userStorageKey]);
+
+  const toggleInterest = (id: string, e?: React.MouseEvent) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    if (!userStorageKey) {
+      toast.error(isEn ? "Please log in to save products" : "Vui lòng đăng nhập để lưu sản phẩm quan tâm");
+      return;
+    }
+    const isAdding = !interestedIds.includes(id);
+    setInterestedIds((prev) => {
+      const next = prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id];
+      try {
+        localStorage.setItem(userStorageKey, JSON.stringify(next));
+      } catch {}
+      return next;
+    });
+
+    if (isAdding) {
+      const targetProduct =
+        (allProducts && allProducts.find((p) => p.id === id)) ||
+        (selectedDetailProduct?.id === id ? selectedDetailProduct : null);
+
+      if (targetProduct) {
+        toast.success(isEn ? "Added to interested list & connecting to seller chat..." : "Đã quan tâm sản phẩm! Đang mở tin nhắn trao đổi với doanh nghiệp...");
+        handleMessageSeller(targetProduct);
+      } else {
+        toast.success(isEn ? "Added to interested list" : "Đã thêm vào danh mục Đã quan tâm");
+      }
+    } else {
+      toast.info(isEn ? "Removed from interested list" : "Đã bỏ khỏi danh mục Đã quan tâm");
+    }
+  };
+
+  // Marketplace Ads & Affiliate Registration Flow (CRM Sync)
+  const [adRegistrationModalOpen, setAdRegistrationModalOpen] = useState(false);
+  const [activeMarketplaceAds, setActiveMarketplaceAds] = useState<any[]>([]);
+  const [currentAdIndex, setCurrentAdIndex] = useState(0);
+
+  const [adCompany, setAdCompany] = useState("");
+  const [adContactPerson, setAdContactPerson] = useState("");
+  const [adPhone, setAdPhone] = useState("");
+  const [adEmail, setAdEmail] = useState("");
+  const [adGoal, setAdGoal] = useState("Quảng bá sản phẩm / dịch vụ nổi bật tới toàn thể hội viên");
+  const [adDurationMonths, setAdDurationMonths] = useState(3);
+  const [adBudget, setAdBudget] = useState("10,000,000 đ");
+  const [adProductLink, setAdProductLink] = useState("");
+  const [adNotes, setAdNotes] = useState("");
+  const [adSubmitting, setAdSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (member) {
+      const memberCompany = (member as any).companyName || (member as any).company || "";
+      const memberName = (member as any).fullName || (member as any).name || "";
+      if (memberCompany && !adCompany) setAdCompany(memberCompany);
+      if (memberName && !adContactPerson) setAdContactPerson(memberName);
+      if (member.phone && !adPhone) setAdPhone(member.phone);
+      if (member.email && !adEmail) setAdEmail(member.email);
+    }
+  }, [member, adCompany, adContactPerson, adPhone, adEmail]);
+
+  const loadMarketplaceAds = () => {
+    try {
+      const raw = localStorage.getItem("ceohn10_marketplace_ads");
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) {
+          const now = new Date().toISOString().split("T")[0];
+          const activeOnly = parsed.filter(
+            (c: any) => c.status === "active" && (!c.endDate || c.endDate >= now)
+          );
+          setActiveMarketplaceAds(activeOnly);
+        }
+      }
+    } catch {
+      setActiveMarketplaceAds([]);
+    }
+  };
+
+  useEffect(() => {
+    loadMarketplaceAds();
+    const handleAdsChanged = () => loadMarketplaceAds();
+    window.addEventListener("ceohn10-ads-changed", handleAdsChanged);
+    window.addEventListener("storage", handleAdsChanged);
+    return () => {
+      window.removeEventListener("ceohn10-ads-changed", handleAdsChanged);
+      window.removeEventListener("storage", handleAdsChanged);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (activeMarketplaceAds.length <= 1) return;
+    const interval = setInterval(() => {
+      setCurrentAdIndex((prev) => (prev + 1) % activeMarketplaceAds.length);
+    }, 5500);
+    return () => clearInterval(interval);
+  }, [activeMarketplaceAds.length]);
+
+  const handleSubmitAdRequest = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!adCompany.trim() || !adContactPerson.trim() || !adPhone.trim()) {
+      toast.error("Vui lòng điền đầy đủ tên công ty, người liên hệ và số điện thoại!");
+      return;
+    }
+    setAdSubmitting(true);
+    try {
+      const newReq = {
+        id: `adreq-${Date.now()}`,
+        companyName: adCompany.trim(),
+        contactPerson: adContactPerson.trim(),
+        phone: adPhone.trim(),
+        email: adEmail.trim() || (member?.email || ""),
+        goal: adGoal,
+        durationMonths: adDurationMonths,
+        budgetEst: adBudget,
+        productLink: adProductLink.trim() || undefined,
+        notes: adNotes.trim() || undefined,
+        status: "pending" as const,
+        createdAt: new Date().toISOString(),
+      };
+      const raw = localStorage.getItem("ceohn10_ad_requests");
+      const list = raw ? JSON.parse(raw) : [];
+      list.unshift(newReq);
+      localStorage.setItem("ceohn10_ad_requests", JSON.stringify(list));
+      window.dispatchEvent(new Event("ceohn10-ad-requests-changed"));
+      
+      toast.success("Đã gửi yêu cầu đăng ký quảng cáo thành công tới Quản trị viên hệ thống!");
+      setAdRegistrationModalOpen(false);
+      setAdNotes("");
+    } catch {
+      toast.error("Không thể gửi yêu cầu. Vui lòng thử lại!");
+    } finally {
+      setAdSubmitting(false);
+    }
+  };
+
+  // Quote Request Modal state
+  const [quoteProduct, setQuoteProduct] = useState<MyProduct | null>(null);
+  const [quoteQty, setQuoteQty] = useState("1");
+  const [quotePhone, setQuotePhone] = useState("0988 123 456");
+  const [quoteNote, setQuoteNote] = useState("");
+  const [quoteSubmitting, setQuoteSubmitting] = useState(false);
+
+  // Case 4 Deal B2B state
+  const [agreedProductDeals, setAgreedProductDeals] = useState<Record<string, boolean>>(() => {
+    if (typeof window === "undefined") return {};
+    try {
+      const stored = localStorage.getItem("vba_agreed_product_deals");
+      return stored ? JSON.parse(stored) : {};
+    } catch {
+      return {};
+    }
+  });
+
+  const handleApproveProductDeal = (p: MyProduct) => {
+    const next = { ...agreedProductDeals, [p.id]: true };
+    setAgreedProductDeals(next);
+    try {
+      localStorage.setItem("vba_agreed_product_deals", JSON.stringify(next));
+      const rawNotifs = localStorage.getItem("vba_notifications");
+      const notifs = rawNotifs ? JSON.parse(rawNotifs) : [];
+      notifs.unshift({
+        id: `prod_deal_${Date.now()}`,
+        title: "Deal chào giá sản phẩm đã được đồng ý!",
+        body: `Người bán sản phẩm "${p.name}" đã đồng ý với đề xuất deal của bạn. Nhấn để thiết lập cuộc gặp B2B ngay!`,
+        createdAt: new Date().toISOString(),
+        unread: true,
+        type: "deal",
+        actionUrl: `/association/connect?partnerName=${encodeURIComponent(p.sellerName || p.company || "Người bán")}&partnerCompany=${encodeURIComponent(p.company || "CLB CEO HN10")}&notes=${encodeURIComponent(`Gặp gỡ 1-1 xúc tiến thương vụ sản phẩm: ${p.name}`)}`,
+      });
+      localStorage.setItem("vba_notifications", JSON.stringify(notifs.slice(0, 50)));
+      window.dispatchEvent(new CustomEvent("notifications-updated"));
+    } catch {}
+    toast.success("Đã đồng ý deal chào giá! Hệ thống đã gửi thông báo đến đối tác để kết nối cuộc gặp B2B.");
+  };
+
+  // Author/Admin Quotes Inspection state
+  const [viewingQuotesProduct, setViewingQuotesProduct] = useState<MyProduct | null>(null);
+  const [productQuotes, setProductQuotes] = useState<any[]>([]);
+  const [loadingProductQuotes, setLoadingProductQuotes] = useState(false);
+
+  // Recently viewed products tracking
+  const [recentlyViewed, setRecentlyViewed] = useState<any[]>(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const stored = localStorage.getItem("ceohn10_recent_products");
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        }
+      } catch {}
+    }
+    return [];
+  });
+
+  const trackRecentlyViewed = (p: any) => {
+    if (!p) return;
+    setRecentlyViewed((prev) => {
+      const filtered = prev.filter((x) => (x.id || x._id) !== (p.id || p._id));
+      const updated = [p, ...filtered].slice(0, 10);
+      try {
+        localStorage.setItem("ceohn10_recent_products", JSON.stringify(updated));
+      } catch {}
+      return updated;
+    });
+  };
+
+  // Tự động loại bỏ sản phẩm đã xóa khỏi danh sách lịch sử xem
+  const removeDeletedProductFromHistory = (id: string) => {
+    if (!id) return;
+    const targetId = String(id).trim();
+    setRecentlyViewed((prev) => {
+      const updated = prev.filter((x) => String(x.id || x._id || "").trim() !== targetId);
+      try {
+        localStorage.setItem("ceohn10_recent_products", JSON.stringify(updated));
+      } catch {}
+      return updated;
+    });
+  };
+
+  const isAdmin = Boolean(
+    (user as any)?.role === "admin" ||
+    (user as any)?.role === "platform_admin" ||
+    (user as any)?.role === "superadmin" ||
+    (member as any)?.role === "admin" ||
+    (member as any)?.role === "association_admin"
+  );
+
+  // Check if current user is the actual creator/author of this product
+  const checkIsProductAuthor = (p: MyProduct) => {
+    if (!p) return false;
+    if (isUserProductOwner(p as any, user, member)) return true;
+    if (!member && !user) return false;
+    const currentUserId = String(user?.id || (member as any)?.userId || (member as any)?.user_id || (member as any)?.id || "").trim().toLowerCase();
+    const prodSellerId = String(p.sellerId || (p as any).seller_id || (p as any).userId || (p as any).user_id || "").trim().toLowerCase();
+    if (currentUserId && prodSellerId && currentUserId === prodSellerId) return true;
+    if (member?.code && prodSellerId && String(member.code).toLowerCase() === prodSellerId) return true;
+    return false;
+  };
+
+  const normalizeCompanyName = (name: string): string => {
+    if (!name) return "";
+    let str = name.toLowerCase().trim();
+    str = str
+      .replace(/\b(công ty|cong ty|cty|cổ phần|co phan|tnhh|cp|holding|holdings|group|tập đoàn|tap doan|jsc|ltd|co\., ltd|co ltd)\b/gi, " ")
+      .replace(/[^a-zA-Z0-9\u00C0-\u1EF9]/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+    return str;
+  };
+
+  const isGenericClubName = (name: string): boolean => {
+    if (!name) return true;
+    const lower = name.toLowerCase().trim();
+    const genericKeywords = [
+      "clb",
+      "ceo 1983",
+      "ceohn10",
+      "hanoiba",
+      "hanoi ba",
+      "hiệp hội",
+      "hội doanh nhân",
+      "ban chấp hành",
+      "vione",
+      "viconnect",
+    ];
+    const cleaned = normalizeCompanyName(name);
+    if (!cleaned || cleaned.length < 3) return true;
+    if (genericKeywords.some((kw) => lower === kw || lower.replace(/\s+/g, "") === kw.replace(/\s+/g, ""))) return true;
+    if (lower === "clb doanh nhân ceo 1983" || lower === "clb ceo 1983" || lower === "hiệp hội ceo 1983") return true;
+    return false;
+  };
+
+  const isProductFromUserCompany = (p: MyProduct) => {
+    if (!p) return false;
+    const userCompanyRaw = String(resolvedProfileCompany || (member as any)?.company || (member as any)?.companyName || "").trim();
+    const prodCompanyRaw = String(p.company || "").trim();
+    if (!userCompanyRaw || !prodCompanyRaw) return false;
+    if (isGenericClubName(userCompanyRaw) || isGenericClubName(prodCompanyRaw)) return false;
+
+    const normUser = normalizeCompanyName(userCompanyRaw);
+    const normProd = normalizeCompanyName(prodCompanyRaw);
+    if (!normUser || !normProd || normUser.length < 3 || normProd.length < 3) return false;
+
+    return normUser === normProd;
+  };
+
+  const checkCanManageProduct = (p: MyProduct) => {
+    if (!p) return false;
+    if (checkIsProductAuthor(p)) return true;
+    if (isProductFromUserCompany(p)) return true;
+    return false;
+  };
+
+  const checkIsProductOwner = checkCanManageProduct;
+
+  const handleOpenQuoteModal = (p: MyProduct) => {
+    if (checkIsProductOwner(p)) {
+      toast.info(isEn ? "This is your product. Opening received quote requests." : "Đây là sản phẩm của bạn. Đang mở danh sách yêu cầu báo giá từ khách hàng.");
+      handleOpenProductQuotes(p);
+      return;
+    }
+    trackRecentlyViewed(p);
+    setQuoteProduct(p);
+    setQuoteQty("1");
+    setQuoteNote("");
+    if (member?.phone || (user as any)?.phone) {
+      setQuotePhone(member?.phone || (user as any)?.phone);
+    }
+  };
+
+  const handleOpenProductDetail = (p: MyProduct) => {
+    trackRecentlyViewed(p);
+    setSelectedDetailProduct(p);
+  };
+
+  const handleMessageSeller = (p: MyProduct) => {
+    const targetCode = (p as any).sellerCode || (p as any).sellerId || (p as any).userId || (p as any).code || "admin";
+    const targetName = p.company || p.sellerName || "Doanh nghiệp thành viên";
+    const mediaImg = resolveMediaUrl(p.imageUrl) || p.imageUrl || "";
+    const inquiry = {
+      itemType: "product",
+      id: p.id,
+      title: p.name || (p as any).title,
+      price: p.memberPrice || p.price,
+      originalPrice: p.originalPrice,
+      image: mediaImg,
+      company: p.company || "",
+      category: p.category || "Sản phẩm B2B",
+      sellerName: p.sellerName || p.company,
+      unit: (p as any).unit || "Gói",
+      targetCode,
+      targetName,
+      autoSend: true,
+    };
+    try {
+      localStorage.setItem("vba_pending_chat_inquiry", JSON.stringify(inquiry));
+    } catch {}
+    toast.success("Đang kết nối tin nhắn hỏi shop về sản phẩm này...");
+    navigate({
+      to: "/association/messages" as any,
+      search: { peerCode: targetCode, peerName: targetName } as any,
+    });
+  };
+
+  const handleOpenProductQuotes = async (p: MyProduct) => {
+    setViewingQuotesProduct(p);
+    setLoadingProductQuotes(true);
+    try {
+      const res = await fetchNestApi<any>(`/marketplace/products/${p.id}`);
+      if (res && res.quotes) {
+        setProductQuotes(Array.isArray(res.quotes) ? res.quotes : []);
+      } else {
+        setProductQuotes([]);
+      }
+    } catch {
+      setProductQuotes([]);
+    } finally {
+      setLoadingProductQuotes(false);
+    }
+  };
+
+  const handleSubmitQuote = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!quoteProduct) return;
+    setQuoteSubmitting(true);
+    try {
+      await fetchNestApi(`/marketplace/quotes`, {
+        method: "POST",
+        body: JSON.stringify({
+          productId: quoteProduct.id,
+          quantity: parseInt(quoteQty, 10) || 1,
+          phone: quotePhone,
+          message: quoteNote || "Hội viên yêu cầu báo giá VIP",
+        }),
+      });
+      toast.success(isEn ? "Quote request sent successfully!" : "Đã gửi yêu cầu báo giá thành công!");
+      setQuoteProduct(null);
+    } catch (err: any) {
+      toast.error(err?.message || "Không thể gửi yêu cầu báo giá, vui lòng thử lại sau!");
+    } finally {
+      setQuoteSubmitting(false);
+    }
+  };
+
+  // Company Storefront state (Full-screen B2B Storefront, not a popup modal)
+  const [viewingCompany, setViewingCompany] = useState<{
+    name: string;
+    avatarUrl?: string | null;
+    bio?: string;
+    industry?: string;
+    phone?: string;
+    website?: string;
+  } | null>(null);
+  const [companyCatFilter, setCompanyCatFilter] = useState<string>("all");
+  const [companySearch, setCompanySearch] = useState<string>("");
+  const [excelImportOpen, setExcelImportOpen] = useState(false);
+
+  const handleImportExcelProducts = async (importedItems: ParsedProductItem[]) => {
+    for (const item of importedItems) {
+      const payload = {
+        name: item.title,
+        title: item.title,
+        description: item.description || item.title,
+        price: item.price,
+        originalPrice: item.originalPrice || item.price,
+        memberPrice: item.memberPrice || item.price,
+        unit: item.unit || "Gói",
+        currency: "VND",
+        category: item.categoryName || "Dịch vụ",
+        status: "active",
+        imageUrl: item.imageUrl || null,
+        imageUrls: item.imageUrl ? [item.imageUrl] : [],
+        company: item.company || (viewingCompany ? viewingCompany.name : resolvedProfileCompany) || "CLB Doanh Nhân CEO HN10",
+        sellerId: user?.id || (member as any)?.userId || (member as any)?.id || "ceohn10",
+      };
+      try {
+        await fetchNestApi("/products", { method: "POST", body: JSON.stringify(payload) });
+      } catch {
+        await fetchNestApi("/marketplace/products", { method: "POST", body: JSON.stringify(payload) }).catch(() => {});
+      }
+    }
+    reload();
+  };
+
+  // Lock body scroll when modal is open to ensure 100% stable centering on mobile
+  useEffect(() => {
+    if (quoteProduct || postModalOpen || editingProduct || viewingQuotesProduct || excelImportOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [quoteProduct, postModalOpen, editingProduct, viewingQuotesProduct, excelImportOpen]);
+
+  // Form states for posting product with full CRM pricing fields & Company storefront
+  const [customProfile, setCustomProfile] = useState<any>(() => {
+    if (typeof window === "undefined") return null;
+    try {
+      return JSON.parse(localStorage.getItem("ceohn10_custom_profile") || "null");
+    } catch {
+      return null;
+    }
+  });
+
+  const resolvedProfileCompany = useMemo(() => {
+    const fromCustom = customProfile?.company?.trim() || customProfile?.companyName?.trim();
+    if (fromCustom) return fromCustom;
+    const fromMember = (member as any)?.company?.trim() || (member as any)?.companyName?.trim();
+    if (fromMember) return fromMember;
+    if (typeof window !== "undefined") {
+      try {
+        const mem = JSON.parse(localStorage.getItem("vba_my_member") || "null");
+        if (mem?.company?.trim()) return mem.company.trim();
+        if (mem?.companyName?.trim()) return mem.companyName.trim();
+      } catch {}
+    }
+    return "CLB Doanh Nhân CEO HN10";
+  }, [customProfile, member]);
+
+  useEffect(() => {
+    const handleProfileUpdate = () => {
+      try {
+        setCustomProfile(JSON.parse(localStorage.getItem("ceohn10_custom_profile") || "null"));
+      } catch {}
+      reload();
+    };
+    window.addEventListener("profile-updated", handleProfileUpdate);
+    window.addEventListener("ceohn10_profile_updated", handleProfileUpdate);
+    window.addEventListener("storage", handleProfileUpdate);
+    return () => {
+      window.removeEventListener("profile-updated", handleProfileUpdate);
+      window.removeEventListener("ceohn10_profile_updated", handleProfileUpdate);
+      window.removeEventListener("storage", handleProfileUpdate);
+    };
+  }, [reload]);
+
+  const [formPhoto, setFormPhoto] = useState("");
+  const [formPhotos, setFormPhotos] = useState<string[]>([]);
+  const [formVideoUrl, setFormVideoUrl] = useState("");
+  const [formName, setFormName] = useState("");
+  const [formCompany, setFormCompany] = useState(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const cp = JSON.parse(localStorage.getItem("ceohn10_custom_profile") || "{}");
+        if (cp?.company?.trim()) return cp.company.trim();
+      } catch {}
+    }
+    return "";
+  });
+  const [formCompanyIntro, setFormCompanyIntro] = useState("");
+  const [formCompanySize, setFormCompanySize] = useState("10 - 50 nhân sự");
+  const [formCategory, setFormCategory] = useState("Công nghệ & Phần mềm");
+  const [formOriginalPrice, setFormOriginalPrice] = useState("");
+  const [formPrice, setFormPrice] = useState("");
+  const [formUnit, setFormUnit] = useState("Gói");
+  const [formCurrency, setFormCurrency] = useState("VND");
+  const [formDesc, setFormDesc] = useState("");
+  const [creatingProduct, setCreatingProduct] = useState(false);
+
+  useEffect(() => {
+    if (resolvedProfileCompany && resolvedProfileCompany !== "CLB Doanh Nhân CEO HN10" && (!formCompany || formCompany === "CLB Doanh Nhân CEO HN10")) {
+      setFormCompany(resolvedProfileCompany);
+    }
+  }, [resolvedProfileCompany, formCompany]);
+
+  useEffect(() => {
+    if (postModalOpen && resolvedProfileCompany && resolvedProfileCompany !== "CLB Doanh Nhân CEO HN10") {
+      setFormCompany(resolvedProfileCompany);
+    }
+  }, [postModalOpen, resolvedProfileCompany]);
+
+  // Form states for editing product
+  const [editPhoto, setEditPhoto] = useState("");
+  const [editPhotos, setEditPhotos] = useState<string[]>([]);
+  const [editVideoUrl, setEditVideoUrl] = useState("");
+  const [editName, setEditName] = useState("");
+  const [editCompany, setEditCompany] = useState("");
+  const [editCategory, setEditCategory] = useState("Công nghệ & Phần mềm");
+  const [editOriginalPrice, setEditOriginalPrice] = useState("");
+  const [editPrice, setEditPrice] = useState("");
+  const [editUnit, setEditUnit] = useState("Gói");
+  const [editCurrency, setEditCurrency] = useState("VND");
+  const [editDesc, setEditDesc] = useState("");
+  const [updatingProduct, setUpdatingProduct] = useState(false);
+
+  const allProducts = useMemo(() => {
+    const arr = (activeProductsSource || []).map((p) => {
+      if (checkIsProductOwner(p) && resolvedProfileCompany && resolvedProfileCompany !== "CLB Doanh Nhân CEO HN10") {
+        return { ...p, company: resolvedProfileCompany };
+      }
+      return p;
+    });
+    arr.sort((a, b) => {
+      const timeA = a.time ? new Date(a.time).getTime() : 0;
+      const timeB = b.time ? new Date(b.time).getTime() : 0;
+      return timeB - timeA;
+    });
+    return arr;
+  }, [initialProducts, resolvedProfileCompany, user, member]);
+
+  // Tự động kiểm tra và thanh lọc: Sản phẩm nào đã xóa trên hệ thống thì loại bỏ ngay khỏi lịch sử xem
+  useEffect(() => {
+    if (!allProducts || allProducts.length === 0) return;
+    const activeIds = new Set(allProducts.map((p) => String(p.id || (p as any)._id).trim()));
+    setRecentlyViewed((prev) => {
+      const valid = prev.filter((p) => {
+        const id = String(p.id || p._id || "").trim();
+        return activeIds.has(id) && p.status !== "deleted";
+      });
+      if (valid.length !== prev.length) {
+        try {
+          localStorage.setItem("ceohn10_recent_products", JSON.stringify(valid));
+        } catch {}
+        return valid;
+      }
+      return prev;
+    });
+  }, [allProducts]);
+
+  const dynamicCategories = useMemo(() => {
+    return getDynamicMarketplaceCategories(allProducts);
+  }, [allProducts]);
+
+  const totalProducts = allProducts.length;
+  const totalInterested = interestedIds.length;
+  const totalViews = useMemo(() => {
+    return allProducts.reduce((sum, p) => sum + (p.views || 1), 0);
+  }, [allProducts]);
+  const totalMarketplaceValue = useMemo(() => {
+    return allProducts.reduce((sum, p) => {
+      const num =
+        p.priceNumber ??
+        (parseInt(String(p.memberPrice || p.price || "").replace(/\D/g, ""), 10) || 0);
+      return sum + num;
+    }, 0);
+  }, [allProducts]);
+
+  const formattedMarketplaceValue = useMemo(() => {
+    if (totalMarketplaceValue >= 1_000_000_000) {
+      const billions = (totalMarketplaceValue / 1_000_000_000).toFixed(2).replace(/\.?0+$/, "");
+      return `${billions} Tỷ VNĐ`;
+    }
+    if (totalMarketplaceValue >= 1_000_000) {
+      const millions = (totalMarketplaceValue / 1_000_000).toFixed(1).replace(/\.?0+$/, "");
+      return `${millions} Triệu VNĐ`;
+    }
+    return `${totalMarketplaceValue.toLocaleString("vi-VN")} đ`;
+  }, [totalMarketplaceValue]);
+
+  const featuredCompanyProduct = useMemo(() => {
+    return allProducts.find((p) => p.company && p.company.trim().length > 0) || null;
+  }, [allProducts]);
+
+  // B2B Company Storefront derived states
+  const companyProducts = useMemo(() => {
+    if (!viewingCompany) return [];
+    const targetComp = viewingCompany.name.toLowerCase().trim();
+    return allProducts.filter(
+      (p) => (p.company || "").toLowerCase().trim() === targetComp
+    );
+  }, [allProducts, viewingCompany]);
+
+  const isCompanyOwner = useMemo(() => {
+    if (!viewingCompany) return false;
+    const targetComp = viewingCompany.name.trim();
+    if (isGenericClubName(targetComp)) return false;
+    const userComp = String(resolvedProfileCompany || (member as any)?.company || (member as any)?.companyName || "").trim();
+    if (!userComp || isGenericClubName(userComp)) return false;
+    const normUser = normalizeCompanyName(userComp);
+    const normTarget = normalizeCompanyName(targetComp);
+    if (normUser && normTarget && normUser.length >= 3 && normUser === normTarget) return true;
+    return companyProducts.some((p) => checkIsProductAuthor(p));
+  }, [viewingCompany, member, resolvedProfileCompany, companyProducts]);
+
+  const companyCategories = useMemo(() => {
+    const cats = Array.from(new Set(companyProducts.map((p) => p.category).filter(Boolean))) as string[];
+    return cats;
+  }, [companyProducts]);
+
+  const filteredCompanyProducts = useMemo(() => {
+    return companyProducts.filter((p) => {
+      if (companyCatFilter !== "all" && p.category !== companyCatFilter) return false;
+      if (companySearch.trim()) {
+        const qLower = companySearch.toLowerCase().trim();
+        const matchesName = p.name.toLowerCase().includes(qLower);
+        const matchesDesc = (p.description || "").toLowerCase().includes(qLower);
+        if (!matchesName && !matchesDesc) return false;
+      }
+      return true;
+    });
+  }, [companyProducts, companyCatFilter, companySearch]);
+
+  const list = useMemo(() => {
+    return allProducts.filter((p) => {
+      const matchesSearch = !q || (p.name + p.company + p.category).toLowerCase().includes(q.toLowerCase());
+      if (!matchesSearch) return false;
+      if (selectedCategory === "all") return true;
+      if (selectedCategory === "my_products") {
+        return checkIsProductOwner(p);
+      }
+      if (selectedCategory === "sold") {
+        return p.status === "sold" || (p as any).isSold === true;
+      }
+      return matchCategory(p.category, selectedCategory);
+    });
+  }, [allProducts, q, selectedCategory, member]);
+
+  const myProductsCount = useMemo(() => {
+    return allProducts.filter((p) => checkIsProductOwner(p)).length;
+  }, [allProducts, member]);
+
+  const categoriesList = useMemo(() => [
+    { id: "all", label: isEn ? "All" : "Tất cả", count: allProducts.length },
+    { id: "my_products", label: isEn ? "My Products" : "Của tôi", count: myProductsCount },
+    { id: "sold", label: isEn ? "Sold" : "Đã bán", count: allProducts.filter((p) => p.status === "sold").length },
+    ...dynamicCategories.map((cat) => ({
+      id: cat,
+      label: cat,
+      count: allProducts.filter((p) => matchCategory(p.category, cat)).length,
+    })),
+  ], [isEn, allProducts, myProductsCount, dynamicCategories]);
+
+  const [categoryMenuOpen, setCategoryMenuOpen] = useState(false);
+  const [filterMenuOpen, setFilterMenuOpen] = useState(false);
+  const [sortMode, setSortMode] = useState<"newest" | "most_viewed" | "price_asc" | "price_desc" | "rating_desc">("newest");
+  const [isVideoMuted, setIsVideoMuted] = useState(true);
+
+  // Refs for smooth scrolling on pagination change
+  const filteredProductsRef = useRef<HTMLDivElement>(null);
+  const allProductsSectionRef = useRef<HTMLDivElement>(null);
+  const myStoreSectionRef = useRef<HTMLDivElement>(null);
+
+  // Sorted list based on active sortMode
+  const sortedList = useMemo(() => {
+    const arr = [...list];
+    if (sortMode === "newest") {
+      return arr.sort((a, b) => {
+        const tA = a.time ? new Date(a.time).getTime() : 0;
+        const tB = b.time ? new Date(b.time).getTime() : 0;
+        return tB - tA;
+      });
+    }
+    if (sortMode === "most_viewed") {
+      return arr.sort((a, b) => (b.views || 0) - (a.views || 0));
+    }
+    if (sortMode === "price_asc") {
+      return arr.sort((a, b) => (a.priceNumber || 0) - (b.priceNumber || 0));
+    }
+    if (sortMode === "price_desc") {
+      return arr.sort((a, b) => (b.priceNumber || 0) - (a.priceNumber || 0));
+    }
+    if (sortMode === "rating_desc") {
+      return arr.sort((a, b) => ((b as any).rating || 5) - ((a as any).rating || 5));
+    }
+    return arr;
+  }, [list, sortMode]);
+
+  // Pagination for Filtered / Searched Products
+  const [pageFilter, setPageFilter] = useState(1);
+  const [filterPageSize, setFilterPageSize] = useState(8);
+  const totalFilterPages = Math.max(1, Math.ceil(sortedList.length / filterPageSize));
+
+  useEffect(() => {
+    setPageFilter(1);
+  }, [q, selectedCategory, sortMode]);
+
+  const paginatedList = useMemo(() => {
+    const start = (pageFilter - 1) * filterPageSize;
+    return sortedList.slice(start, start + filterPageSize);
+  }, [sortedList, pageFilter, filterPageSize]);
+
+  // Pagination for "Gian hàng của tôi" (My Store)
+  // ── MY STORE 3-DOTS & INTERESTED LEADS STATES ──
+  const [activeMenuProductId, setActiveMenuProductId] = useState<string | null>(null);
+  const [myStoreSubTab, setMyStoreSubTab] = useState<"products" | "interested">("products");
+  const [interestedLeads, setInterestedLeads] = useState<any[]>([]);
+  const [loadingInterested, setLoadingInterested] = useState(false);
+
+  const loadInterestedLeads = useCallback(async () => {
+    setLoadingInterested(true);
+    try {
+      const res = await fetchNestApi<any[]>("/marketplace/my-products/interested");
+      if (Array.isArray(res)) setInterestedLeads(res);
+      else setInterestedLeads([]);
+    } catch {
+      setInterestedLeads([]);
+    } finally {
+      setLoadingInterested(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (marketplaceTab === "my_store") {
+      void loadInterestedLeads();
+    }
+  }, [marketplaceTab, loadInterestedLeads]);
+
+  const handleShareProduct = (p: MyProduct) => {
+    const url = `${window.location.origin}/association/products?highlight=${p.id}`;
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(url);
+      toast.success("Đã sao chép liên kết sản phẩm vào bộ nhớ tạm!");
+    } else {
+      toast.info(`Link sản phẩm: ${url}`);
+    }
+  };
+  const [myStorePage, setMyStorePage] = useState(1);
+  const [myStorePageSize, setMyStorePageSize] = useState(6);
+  const mineProducts = useMemo(() => allProducts.filter((p) => checkIsProductOwner(p)), [allProducts, member, user]);
+  const totalMyStorePages = Math.max(1, Math.ceil(mineProducts.length / myStorePageSize));
+
+  useEffect(() => {
+    if (myStorePage > totalMyStorePages && totalMyStorePages > 0) {
+      setMyStorePage(totalMyStorePages);
+    }
+  }, [totalMyStorePages, myStorePage]);
+
+  const paginatedMine = useMemo(() => {
+    const start = (myStorePage - 1) * myStorePageSize;
+    return mineProducts.slice(start, start + myStorePageSize);
+  }, [mineProducts, myStorePage, myStorePageSize]);
+
+  // Giới hạn tối đa 5 sản phẩm/doanh nghiệp trên sàn B2B CEO HN10 (Ý kiến cuộc họp)
+  const handleOpenPostModal = (targetCompany?: string) => {
+    if (mineProducts.length >= 5) {
+      toast.warning(
+        isEn
+          ? "Your enterprise has reached the maximum 5 products limit on the CEO HN10 B2B marketplace. Please remove an existing product to post a new one."
+          : `Doanh nghiệp của bạn đã đăng tối đa 5/5 sản phẩm tiêu biểu trên sàn B2B CEO HN10. Vui lòng quản lý hoặc xóa sản phẩm cũ để đăng mới!`
+      );
+      setMarketplaceTab("my_store");
+      return;
+    }
+    if (targetCompany) {
+      setFormCompany(targetCompany);
+    }
+    setPostModalOpen(true);
+  };
+
+  // Section 1: Sản phẩm mới đăng & Pagination for View All
+  const [pageNew, setPageNew] = useState(1);
+  const [allNewPageSize, setAllNewPageSize] = useState(8);
+  const newestProducts = useMemo(() => {
+    return [...allProducts].sort((a, b) => {
+      const tA = a.time ? new Date(a.time).getTime() : 0;
+      const tB = b.time ? new Date(b.time).getTime() : 0;
+      return tB - tA;
+    });
+  }, [allProducts]);
+  const totalNewPages = Math.max(1, Math.ceil(newestProducts.length / allNewPageSize));
+  const paginatedNewest = useMemo(() => {
+    const start = (pageNew - 1) * allNewPageSize;
+    return newestProducts.slice(start, start + allNewPageSize);
+  }, [newestProducts, pageNew, allNewPageSize]);
+
+  // Section 2: Sản phẩm được xem nhiều nhất
+  const [pagePopular, setPagePopular] = useState(1);
+  const popularProducts = useMemo(() => {
+    return [...allProducts].sort((a, b) => {
+      const vA = a.views || 0;
+      const vB = b.views || 0;
+      return vB - vA;
+    });
+  }, [allProducts]);
+
+  // Section 3: Doanh nghiệp / Công ty nổi bật nhất (1 hội viên đại diện cho 1 công ty)
+  const featuredCompanies = useMemo(() => {
+    const map = new Map<string, { company: string; repName: string; category: string; count: number; totalViews: number; avatar: string; sampleProduct: MyProduct }>();
+    for (const p of allProducts) {
+      const key = (p.company || "CLB Doanh Nhân CEO HN10").trim();
+      if (!map.has(key)) {
+        map.set(key, {
+          company: key,
+          repName: (p as any).contactName || (p as any).sellerName || "Hội viên CLB CEO HN10",
+          category: p.category || "Doanh nghiệp thành viên",
+          count: 1,
+          totalViews: p.views || 1,
+          avatar: p.imageUrl || "",
+          sampleProduct: p,
+        });
+      } else {
+        const curr = map.get(key)!;
+        curr.count += 1;
+        curr.totalViews += (p.views || 1);
+      }
+    }
+    return Array.from(map.values()).sort((a, b) => b.count - a.count || b.totalViews - a.totalViews);
+  }, [allProducts]);
+
+
+
+  // Quảng cáo sản phẩm công ty lung linh sang trọng (Requirement 4)
+  const [sponsoredAdIdx, setSponsoredAdIdx] = useState(0);
+  const [sponsoredAdHovered, setSponsoredAdHovered] = useState(false);
+
+  const sponsoredProducts = useMemo(() => {
+    if (allProducts.length > 0) {
+      return allProducts.slice(0, 5);
+    }
+    return [] as unknown as MyProduct[];
+  }, [allProducts]);
+
+  useEffect(() => {
+    if (sponsoredAdHovered || sponsoredProducts.length <= 1) return;
+    const timer = setInterval(() => {
+      setSponsoredAdIdx((prev) => (prev + 1) % sponsoredProducts.length);
+    }, 4000);
+    return () => clearInterval(timer);
+  }, [sponsoredAdHovered, sponsoredProducts.length]);
+
+  const startEditProduct = (p: MyProduct, e?: React.MouseEvent) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    if (!checkCanManageProduct(p)) {
+      toast.error("Bạn không thuộc công ty này nên không có quyền chỉnh sửa sản phẩm!");
+      return;
+    }
+    setEditingProduct(p);
+    const pPhotos = p.imageUrls && p.imageUrls.length > 0 ? p.imageUrls : (p.imageUrl ? [p.imageUrl] : []);
+    setEditPhoto(p.imageUrl || pPhotos[0] || "");
+    setEditPhotos(pPhotos);
+    setEditVideoUrl(p.videoUrl || "");
+    setEditName(p.name || "");
+    setEditCompany(p.company || member?.title || "");
+    setEditCategory(p.category || "Công nghệ & Phần mềm");
+    setEditPrice(p.memberPrice || p.price || "");
+    setEditOriginalPrice(p.originalPrice || "");
+    setEditUnit(p.unit || "Gói");
+    setEditCurrency(p.currency || "VND");
+    setEditDesc(p.description || "");
+  };
+
+  const handleDeleteProduct = async (id: string, e?: React.MouseEvent) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    const targetProd = allProducts.find((x) => x.id === id);
+    if (targetProd && !checkCanManageProduct(targetProd)) {
+      toast.error("Bạn không thuộc công ty này nên không có quyền xóa sản phẩm!");
+      return;
+    }
+    if (!window.confirm("Bạn có chắc chắn muốn xóa sản phẩm này khỏi sàn giao thương không?")) return;
+    try {
+      await fetchNestApi(`/products/${id}`, { method: "DELETE" }).catch(() =>
+        fetchNestApi(`/marketplace/products/${id}`, { method: "DELETE" })
+      );
+      toast.success("Đã xóa sản phẩm thành công!");
+      removeDeletedProductFromHistory(id);
+      setLocalProducts((prev) => (prev || []).filter((p) => p.id !== id));
+      if (editingProduct?.id === id) setEditingProduct(null);
+      reload();
+    } catch {
+      toast.error("Không thể xóa sản phẩm. Vui lòng thử lại!");
+    }
+  };
+
+  const handleToggleSold = async (id: string, e?: React.MouseEvent) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    const targetProd = allProducts.find((x) => x.id === id);
+    if (targetProd && !checkCanManageProduct(targetProd)) {
+      toast.error("Bạn không thuộc công ty này nên không có quyền thay đổi trạng thái sản phẩm!");
+      return;
+    }
+    const isSoldNow = targetProd?.status !== "sold";
+    try {
+      await fetchNestApi(`/marketplace/products/${id}/toggle-sold`, { method: "PATCH" });
+      toast.success(isSoldNow ? "Đã đánh dấu sản phẩm là đã bán!" : "Đã mở bán lại sản phẩm thành công!");
+      setLocalProducts((prev) =>
+        (prev || []).map((p) => (p.id === id ? { ...p, status: isSoldNow ? "sold" : "active" } : p))
+      );
+      reload();
+    } catch {
+      toast.error("Không thể cập nhật trạng thái sản phẩm. Vui lòng thử lại!");
+    }
+  };
+
+  const handleUpdateProduct = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingProduct) return;
+    if (!editName.trim()) {
+      toast.error("Vui lòng nhập tên sản phẩm!");
+      return;
+    }
+    setUpdatingProduct(true);
+    const cleanPrice = Number(editPrice.replace(/\D/g, "")) || 0;
+    const cleanOriginalPrice = Number(editOriginalPrice.replace(/\D/g, "")) || cleanPrice;
+
+    const finalPhotos = editPhotos.length > 0 ? editPhotos : (editPhoto ? [editPhoto] : []);
+    const updatePayload = {
+      name: editName.trim(),
+      title: editName.trim(),
+      description: editDesc.trim(),
+      price: cleanPrice,
+      originalPrice: cleanOriginalPrice,
+      memberPrice: cleanPrice,
+      category: editCategory,
+      imageUrl: finalPhotos[0] || editPhoto || null,
+      imageUrls: finalPhotos,
+      videoUrl: editVideoUrl.trim() || null,
+      company: editCompany.trim(),
+      unit: editUnit,
+      currency: editCurrency,
+    };
+
+    try {
+      await fetchNestApi(`/products/${editingProduct.id}`, {
+        method: "PATCH",
+        body: JSON.stringify(updatePayload),
+      }).catch(() =>
+        fetchNestApi(`/marketplace/products/${editingProduct.id}`, {
+          method: "PATCH",
+          body: JSON.stringify(updatePayload),
+        })
+      );
+
+      const formattedP = cleanPrice > 0 ? `${cleanPrice.toLocaleString("vi-VN")} đ` : "Thỏa thuận";
+      const formattedOrigP = cleanOriginalPrice > 0 ? `${cleanOriginalPrice.toLocaleString("vi-VN")} đ` : undefined;
+
+      setLocalProducts((prev) =>
+        (prev || []).map((p) =>
+          p.id === editingProduct.id
+            ? {
+                ...p,
+                name: editName.trim(),
+                title: editName.trim(),
+                description: editDesc.trim(),
+                price: formattedP,
+                priceNumber: cleanPrice,
+                originalPrice: formattedOrigP,
+                memberPrice: formattedP,
+                category: editCategory,
+                imageUrl: finalPhotos[0] || editPhoto || undefined,
+                imageUrls: finalPhotos,
+                videoUrl: editVideoUrl.trim() || undefined,
+                company: editCompany.trim() || p.company,
+                unit: editUnit,
+                currency: editCurrency,
+              }
+            : p
+        )
+      );
+
+      toast.success("Đã cập nhật thông tin sản phẩm thành công!");
+      setEditingProduct(null);
+      reload();
+    } catch {
+      toast.error("Không thể cập nhật sản phẩm. Vui lòng thử lại!");
+    } finally {
+      setUpdatingProduct(false);
+    }
+  };
+
+  const handleCreateProduct = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (mineProducts.length >= 5) {
+      toast.error(
+        isEn
+          ? "Limit reached: Each enterprise can only post up to 5 featured products/services on CEO HN10 B2B marketplace!"
+          : "Mỗi doanh nghiệp chỉ được đăng tối đa 5 sản phẩm/dịch vụ tiêu biểu trên sàn B2B CEO HN10 (chống spam & đảm bảo chất lượng sàn)!"
+      );
+      return;
+    }
+    if (!formName.trim()) {
+      toast.error(isEn ? "Please enter product name!" : "Vui lòng nhập tên sản phẩm!");
+      return;
+    }
+    setCreatingProduct(true);
+    const cleanPrice = Number(formPrice.replace(/\D/g, "")) || 0;
+    const cleanOriginalPrice = Number(formOriginalPrice.replace(/\D/g, "")) || cleanPrice;
+
+    const finalPhotos = formPhotos.length > 0 ? formPhotos : (formPhoto ? [formPhoto] : []);
+
+    const payload = {
+      name: formName.trim(),
+      title: formName.trim(),
+      description: formDesc.trim(),
+      price: cleanPrice,
+      originalPrice: cleanOriginalPrice,
+      memberPrice: cleanPrice,
+      unit: formUnit,
+      currency: formCurrency,
+      category: formCategory,
+      status: "active",
+      imageUrl: finalPhotos[0] || formPhoto || null,
+      imageUrls: finalPhotos,
+      videoUrl: formVideoUrl.trim() || null,
+      company: formCompany.trim() || resolvedProfileCompany || "CLB Doanh Nhân CEO HN10",
+      companyIntro: formCompanyIntro.trim(),
+      companySize: formCompanySize,
+      sellerId: user?.id || (member as any)?.userId || (member as any)?.id || "ceohn10",
+    };
+
+    try {
+      let createdRes: any = null;
+      try {
+        createdRes = await fetchNestApi("/products", {
+          method: "POST",
+          body: JSON.stringify(payload),
+        });
+      } catch (err1: any) {
+        console.warn("POST /products error, trying /marketplace/products fallback:", err1?.message);
+        createdRes = await fetchNestApi("/marketplace/products", {
+          method: "POST",
+          body: JSON.stringify(payload),
+        });
+      }
+
+      const formattedP = cleanPrice > 0 ? `${cleanPrice.toLocaleString("vi-VN")} đ` : "Thỏa thuận";
+      const formattedOrigP = cleanOriginalPrice > 0 ? `${cleanOriginalPrice.toLocaleString("vi-VN")} đ` : undefined;
+
+      const newProd: any = {
+        id: String(createdRes?.id || `prod_${Date.now()}`),
+        name: formName.trim(),
+        title: formName.trim(),
+        description: formDesc.trim(),
+        price: formattedP,
+        priceNumber: cleanPrice,
+        originalPrice: formattedOrigP,
+        memberPrice: formattedP,
+        unit: formUnit,
+        currency: formCurrency,
+        category: formCategory,
+        status: "active",
+        imageUrl: finalPhotos[0] || formPhoto || null,
+        imageUrls: finalPhotos,
+        videoUrl: formVideoUrl.trim() || undefined,
+        company: formCompany.trim() || resolvedProfileCompany || "CLB Doanh Nhân CEO HN10",
+        time: new Date().toISOString(),
+        views: 0,
+        likes: 0,
+        sellerId: user?.id || "ceohn10",
+      };
+
+      setLocalProducts((prev) => [newProd, ...(prev || [])]);
+
+      toast.success(isEn ? "Product posted successfully!" : "Đã đăng sản phẩm thành công lên sàn!");
+      setPostModalOpen(false);
+      setFormPhoto("");
+      setFormPhotos([]);
+      setFormVideoUrl("");
+      setFormName("");
+      setFormCompany(resolvedProfileCompany || "");
+      setFormCompanyIntro("");
+      setFormCompanySize("10 - 50 nhân sự");
+      setFormOriginalPrice("");
+      setFormPrice("");
+      setFormUnit("Gói");
+      setFormCurrency("VND");
+      setFormDesc("");
+      reload();
+    } catch (err: any) {
+      console.error("handleCreateProduct error:", err);
+      toast.error(err?.message || (isEn ? "Could not post product" : "Không thể đăng sản phẩm. Vui lòng thử lại!"));
+    } finally {
+      setCreatingProduct(false);
+    }
+  };
+
+  const renderCard = (p: MyProduct, index: number = 0) => {
+    const isAuthor = checkIsProductAuthor(p);
+    const canManage = checkCanManageProduct(p);
+    const isInterested = interestedIds.includes(p.id);
+    const menuOpen = activeProductMenuId === p.id;
+    const mediaImg = resolveMediaUrl(p.imageUrl) || p.imageUrl || "";
+    const isStaggered = index % 2 === 1;
+
+    return (
+      <div
+        key={p.id}
+        className="group relative flex flex-col justify-between rounded-2xl sm:rounded-3xl border border-slate-200/80 dark:border-slate-800/80 bg-white dark:bg-slate-900/90 overflow-hidden shadow-xs hover:shadow-xl hover:border-amber-400/50 transition-all duration-300 break-inside-avoid mb-3"
+      >
+        <div>
+          {/* Product Image Box - Click to open Shopee Detail Modal */}
+          <div
+            onClick={() => handleOpenProductDetail(p)}
+            className={`relative ${isStaggered ? "aspect-[4/5]" : "aspect-square sm:aspect-[4/3]"} w-full overflow-hidden bg-slate-100 dark:bg-slate-800 cursor-pointer`}
+          >
+            {mediaImg ? (
+              <img
+                src={mediaImg}
+                alt={p.name}
+                className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                loading="lazy"
+                onError={(e) => {
+                  (e.target as HTMLElement).style.display = "none";
+                }}
+              />
+            ) : (
+              <div className="h-full w-full flex items-center justify-center bg-slate-100 dark:bg-slate-800 text-3xl">
+                💼
+              </div>
+            )}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
+
+            {/* Sold Status Overlay */}
+            {p.status === "sold" && (
+              <div className="absolute inset-0 bg-slate-950/60 backdrop-blur-[1px] flex items-center justify-center z-10 pointer-events-none">
+                <span className="px-3 py-1 rounded-full bg-slate-900/90 border border-white/20 text-white text-xs font-black tracking-wider uppercase shadow-lg">
+                  ĐÃ BÁN
+                </span>
+              </div>
+            )}
+
+            {/* Category Tag */}
+            <span className="absolute left-2.5 top-2.5 rounded-full bg-slate-950/60 backdrop-blur-md px-2.5 py-0.5 text-[9.5px] font-semibold text-white tracking-wide border border-white/10 shadow-xs">
+              {p.category || "Dịch vụ"}
+            </span>
+
+            {/* Top Right Actions: Share & Wishlist Heart */}
+            <div className="absolute right-2.5 top-2.5 flex items-center gap-1.5 z-10">
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const shareUrl = typeof window !== "undefined" ? window.location.href : "https://ceohn10.viconnect.vn";
+                  if (navigator.share) {
+                    navigator.share({
+                      title: p.name,
+                      text: `Sản phẩm & Dịch vụ CEO HN10: ${p.name} - ${p.company || "CLB CEO HN10"}`,
+                      url: shareUrl,
+                    }).catch(() => {});
+                  } else {
+                    navigator.clipboard.writeText(`${p.name} - ${shareUrl}`);
+                    toast.success("Đã sao chép liên kết sản phẩm!");
+                  }
+                }}
+                className="grid h-7 w-7 place-items-center rounded-full bg-white/80 dark:bg-slate-900/80 backdrop-blur-md text-slate-600 dark:text-slate-300 hover:text-[#003B95] hover:bg-white transition-all active:scale-90 cursor-pointer shadow-xs"
+                title="Chia sẻ sản phẩm"
+              >
+                <Share2 className="h-3.5 w-3.5" />
+              </button>
+
+              <button
+                type="button"
+                onClick={(e) => toggleInterest(p.id, e)}
+                className={`grid h-7 w-7 place-items-center rounded-full backdrop-blur-md transition-all active:scale-90 cursor-pointer shadow-xs ${
+                  isInterested
+                    ? "bg-rose-500 text-white shadow-rose-500/30"
+                    : "bg-white/80 dark:bg-slate-900/80 text-slate-500 hover:text-rose-500 hover:bg-white"
+                }`}
+                title={isInterested ? "Đã lưu quan tâm" : "Lưu quan tâm"}
+              >
+                <Heart className={`h-3.5 w-3.5 ${isInterested ? "fill-white" : ""}`} />
+              </button>
+            </div>
+
+            {/* Owner/Admin Action Menu */}
+            {canManage && (
+              <div className="absolute left-2.5 bottom-2.5">
+                <div className="relative">
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setActiveProductMenuId(menuOpen ? null : p.id);
+                    }}
+                    className="grid h-7 w-7 place-items-center rounded-full bg-slate-950/70 backdrop-blur-md text-white hover:bg-slate-900 transition-all cursor-pointer shadow-xs border border-white/15"
+                    title="Tùy chọn quản trị"
+                  >
+                    <MoreVertical className="h-3.5 w-3.5" />
+                  </button>
+                  {menuOpen && (
+                    <div
+                      className="absolute left-0 bottom-8 w-36 rounded-2xl bg-white dark:bg-slate-900 shadow-2xl border border-slate-200 dark:border-slate-800 py-1.5 z-30 animate-scale-in"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          setActiveProductMenuId(null);
+                          handleToggleSold(p.id, e);
+                        }}
+                        className="w-full flex items-center gap-2 px-3 py-1.5 text-xs text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer font-medium"
+                      >
+                        <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />
+                        <span>{p.status === "sold" ? "Mở bán lại" : "Đã bán"}</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          setActiveProductMenuId(null);
+                          startEditProduct(p, e);
+                        }}
+                        className="w-full flex items-center gap-2 px-3 py-1.5 text-xs text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer font-medium"
+                      >
+                        <Pencil className="h-3.5 w-3.5 text-blue-500" />
+                        <span>Sửa thông tin</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          setActiveProductMenuId(null);
+                          handleDeleteProduct(p.id, e);
+                        }}
+                        className="w-full flex items-center gap-2 px-3 py-1.5 text-xs text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 cursor-pointer font-medium"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                        <span>Xóa bài đăng</span>
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* VIP Perk Badge */}
+            <Link
+              to="/association/perks"
+              onClick={(e) => e.stopPropagation()}
+              className="absolute right-2.5 bottom-2.5 z-10 flex items-center gap-1 rounded-full bg-[#003B95] text-white px-2.5 py-0.5 text-[9.5px] font-bold shadow-xs transition-transform hover:scale-105 border border-white/20"
+              title="Ưu đãi độc quyền liên kết App Hiệp Hội"
+            >
+              <span>ƯU ĐÃI VIP</span>
+            </Link>
+          </div>
+
+          {/* Product Details Info */}
+          <div className="p-3.5">
+            {/* Company & Seller Subtitle */}
+            <div className="flex items-center justify-between gap-2 text-[10.5px] text-slate-400 dark:text-slate-500 font-medium truncate mb-1">
+              <span
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setViewingCompany({
+                    name: p.company || "CLB CEO HN10",
+                    avatarUrl: (p as any).companyAvatar || null,
+                    industry: p.category,
+                  });
+                }}
+                className="truncate uppercase tracking-wider font-semibold text-slate-600 dark:text-slate-400 hover:text-[#003B95] dark:hover:text-blue-400 cursor-pointer transition-colors"
+                title={`Xem gian hàng ${p.company || "CLB CEO HN10"}`}
+              >
+                {p.company || "CLB CEO HN10"}
+              </span>
+              <span className="shrink-0 text-[#003B95] dark:text-blue-400 font-medium">
+                {p.sellerName || "Hội viên"}
+              </span>
+            </div>
+
+            {/* Product Title - Click to open Shopee Detail Modal */}
+            <h4
+              onClick={() => handleOpenProductDetail(p)}
+              className="text-[13px] font-bold text-slate-900 dark:text-white line-clamp-2 leading-snug group-hover:text-[#003B95] dark:group-hover:text-blue-400 transition-colors mb-2 min-h-[34px] cursor-pointer"
+            >
+              {p.name}
+            </h4>
+
+            {/* Price Section */}
+            <div className="space-y-0.5 mb-2">
+              <div className="flex items-baseline gap-2 flex-wrap">
+                <span className="text-sm sm:text-base font-black text-rose-600 dark:text-rose-400">
+                  {formatSmartProductPrice(p.memberPrice || p.price)}
+                </span>
+                {p.originalPrice && p.originalPrice !== p.memberPrice && (
+                  <span className="text-[11px] text-slate-400 line-through">
+                    {formatSmartProductPrice(p.originalPrice)}
+                  </span>
+                )}
+              </div>
+              <span className="inline-block text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">
+                Đặc quyền Hội viên CEO HN10
+              </span>
+            </div>
+
+            {/* Shopee-style Product Rating & Sales info */}
+            <div className="flex items-center justify-between text-[11px] mb-2 pt-2 border-t border-slate-100 dark:border-slate-800">
+              <div className="flex items-center gap-1 text-[#EE4D2D] font-bold">
+                <Star className="size-3 fill-[#EE4D2D] text-[#EE4D2D]" />
+                <span>4.9</span>
+                <span className="text-[10px] text-slate-400 font-normal">({(p.views ? Math.floor(p.views / 2) + 8 : 28)})</span>
+              </div>
+              <div className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">
+                98% Hài lòng
+              </div>
+            </div>
+
+            {/* Meta Strip */}
+            <div className="flex items-center justify-between text-[10.5px] text-slate-400 dark:text-slate-500 pt-1.5 border-t border-slate-100 dark:border-slate-800">
+              <span>{p.views || 1} lượt xem</span>
+              <span>{(p as any).unit ? `ĐVT: ${(p as any).unit}` : "Báo giá VIP"}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Action Button */}
+        <div className="p-3 pt-0">
+          {canManage ? (
+            <div className="grid grid-cols-2 gap-1.5">
+              <button
+                type="button"
+                onClick={(e) => startEditProduct(p, e)}
+                className="h-8.5 px-3 rounded-xl border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-xs font-bold text-slate-700 dark:text-slate-200 transition active:scale-95 cursor-pointer flex items-center justify-center gap-1 shadow-2xs"
+                title="Chỉnh sửa sản phẩm"
+              >
+                <Pencil className="size-3" />
+                <span>Sửa</span>
+              </button>
+              <button
+                type="button"
+                onClick={(e) => handleDeleteProduct(p.id, e)}
+                className="h-8.5 px-3 rounded-xl border border-rose-200 dark:border-rose-900 bg-rose-50 dark:bg-rose-950/40 text-xs font-bold text-rose-600 dark:text-rose-400 hover:bg-rose-100 transition active:scale-95 cursor-pointer flex items-center justify-center gap-1 shadow-2xs"
+                title="Xóa sản phẩm"
+              >
+                <Trash2 className="size-3" />
+                <span>Xóa</span>
+              </button>
+            </div>
+          ) : (
+            <div className="flex items-center gap-1.5">
+              {agreedProductDeals[p.id] ? (
+                <div className="flex items-center gap-1.5 w-full">
+                  <span className="px-2 py-1 bg-emerald-100 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 rounded-md text-[10.5px] font-bold flex items-center gap-1">
+                    <Check className="size-3" /> Deal đã duyệt
+                  </span>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate({
+                        to: "/association/connect" as any,
+                        search: {
+                          partnerName: p.sellerName || p.company || "Người bán",
+                          partnerCompany: p.company || "CLB CEO HN10",
+                          notes: `Gặp gỡ 1-1 xúc tiến thương vụ sản phẩm: ${p.name}`,
+                        } as any,
+                      });
+                    }}
+                    className="flex-1 h-8.5 px-3 rounded-xl bg-[#003B95] hover:bg-[#002B70] text-white text-xs font-bold shadow-xs transition active:scale-95 cursor-pointer flex items-center justify-center gap-1"
+                  >
+                    <Calendar className="size-3.5" />
+                    <span>Kết nối cuộc gặp</span>
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleInterest(p.id);
+                    }}
+                    className={`h-8.5 px-3 rounded-xl border text-xs font-bold transition active:scale-95 cursor-pointer flex items-center justify-center gap-1 shadow-2xs ${
+                      interestedIds.includes(p.id)
+                        ? "bg-emerald-50 dark:bg-emerald-950/40 border-emerald-300 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400"
+                        : "bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-100"
+                    }`}
+                    title="Quan tâm sản phẩm"
+                  >
+                    <Heart className={`size-3.5 ${interestedIds.includes(p.id) ? "fill-emerald-600 text-emerald-600" : ""}`} />
+                    <span>{interestedIds.includes(p.id) ? "Đã quan tâm" : "Quan tâm"}</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleOpenQuoteModal(p)}
+                    className="flex-1 h-8.5 px-3 rounded-xl bg-[#003B95] hover:bg-[#002b6e] text-white text-xs font-bold shadow-xs transition active:scale-[0.98] cursor-pointer flex items-center justify-center gap-1.5"
+                  >
+                    <Handshake className="size-3.5 text-amber-300 shrink-0" />
+                    <span>Deal chào giá</span>
+                  </button>
+                </>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  const renderCompanyStorefront = () => {
+    if (!viewingCompany) return null;
+    return (
+      <div className="min-h-screen bg-slate-50/60 dark:bg-slate-950 pb-20">
+
+        {/* Sticky Nav with Back Button */}
+        <div className="ceo-safe-sticky sticky top-0 z-30 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800 px-4 py-3 flex items-center justify-between gap-3 shadow-xs">
+          <button
+            type="button"
+            onClick={() => {
+              setViewingCompany(null);
+              setCompanyCatFilter("all");
+              setCompanySearch("");
+            }}
+            className="inline-flex items-center gap-2 text-xs font-bold text-slate-700 dark:text-slate-200 hover:text-[#003B95] dark:hover:text-amber-400 transition cursor-pointer group"
+          >
+            <ArrowLeft className="h-4 w-4 group-hover:-translate-x-0.5 transition-transform" />
+            <span>Quay lại Giao thương</span>
+          </button>
+          <div className="flex items-center gap-2 text-xs text-slate-500">
+            <span className="truncate max-w-[160px] sm:max-w-xs font-semibold text-slate-700 dark:text-slate-300">
+              {viewingCompany.name}
+            </span>
+            <span className="text-slate-300 dark:text-slate-700">•</span>
+            <span className="text-amber-600 dark:text-amber-400 font-bold">Gian hàng B2B</span>
+          </div>
+        </div>
+
+        {/* Hero Storefront Banner */}
+        <div className="relative bg-gradient-to-br from-[#001D4A] via-[#003B95] to-[#002B70] border-b-2 border-amber-400/40 text-white p-5 sm:p-8 shadow-md">
+          <div className="absolute top-0 right-0 w-80 h-80 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+          <div className="relative z-10 max-w-5xl mx-auto">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6">
+              <div className="relative h-20 w-20 sm:h-24 sm:w-24 rounded-2xl overflow-hidden bg-white/10 border-2 border-white/30 shadow-xl shrink-0">
+                <img
+                  src={viewingCompany.avatarUrl || "/ceohn10-official-logo.png"}
+                  alt={viewingCompany.name}
+                  className="h-full w-full object-cover"
+                />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <h1 className="text-lg sm:text-2xl font-black text-white truncate">
+                    {viewingCompany.name}
+                  </h1>
+                  <span className="inline-flex items-center gap-1 rounded-full bg-amber-400/20 border border-amber-300/40 px-2.5 py-0.5 text-[10px] font-bold text-amber-300 shadow-xs">
+                    <BadgeCheck className="h-3.5 w-3.5 text-amber-400" />
+                    Xác thực CEO HN10
+                  </span>
+                  {isCompanyOwner && (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/20 border border-emerald-400/40 px-2.5 py-0.5 text-[10px] font-bold text-emerald-300">
+                      <ShieldCheck className="h-3.5 w-3.5" />
+                      Chủ sở hữu gian hàng
+                    </span>
+                  )}
+                </div>
+                <p className="text-xs sm:text-sm text-blue-100/90 mt-1 flex items-center gap-2 flex-wrap font-medium">
+                  <span>{viewingCompany.industry || "Doanh nghiệp thành viên"}</span>
+                  <span>•</span>
+                  <span>Hội viên chính thức CLB CEO HN10</span>
+                </p>
+                <p className="mt-2.5 text-xs text-white/85 leading-relaxed max-w-2xl">
+                  {viewingCompany.bio ||
+                    "Doanh nghiệp thành viên chính thức CLB Doanh Nhân CEO HN10. Cam kết cung ứng giải pháp và sản phẩm chất lượng cao với chính sách ưu đãi đặc quyền cho các hội viên."}
+                </p>
+              </div>
+            </div>
+
+            {/* Action Toolbar Inside Company Storefront */}
+            <div className="mt-5 pt-4 border-t border-white/15 flex flex-wrap items-center justify-between gap-3">
+              <div className="flex items-center gap-4 text-xs">
+                <div className="flex items-center gap-1.5">
+                  <Package className="h-4 w-4 text-amber-400" />
+                  <span className="font-bold text-white">{companyProducts.length}</span>
+                  <span className="text-blue-200 text-[11px]">Sản phẩm & Dịch vụ</span>
+                </div>
+                <div className="h-3 w-px bg-white/20" />
+                <div className="flex items-center gap-1.5">
+                  <ShieldCheck className="h-4 w-4 text-emerald-400" />
+                  <span className="text-blue-200 text-[11px]">Cam kết bảo trợ CLB</span>
+                </div>
+              </div>
+
+              {/* Company Owner controls: Excel Import/Export and Add Product */}
+              <div className="flex items-center gap-2 flex-wrap">
+                {isCompanyOwner ? (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => setExcelImportOpen(true)}
+                      className="h-9 px-3 rounded-xl bg-white/10 hover:bg-white/20 border border-white/25 text-white text-xs font-bold flex items-center gap-1.5 transition active:scale-95 cursor-pointer"
+                      title="Nhập danh sách sản phẩm từ file Excel"
+                    >
+                      <FileSpreadsheet className="h-4 w-4 text-emerald-400" />
+                      <span>Nhập Excel</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => exportProductsToExcel(companyProducts)}
+                      className="h-9 px-3 rounded-xl bg-white/10 hover:bg-white/20 border border-white/25 text-white text-xs font-bold flex items-center gap-1.5 transition active:scale-95 cursor-pointer"
+                      title="Xuất danh sách sản phẩm ra file Excel"
+                    >
+                      <Download className="h-4 w-4 text-emerald-400" />
+                      <span>Xuất Excel</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => handleOpenPostModal(viewingCompany.name)}
+                      className="h-9 px-3.5 rounded-xl bg-[#003B95] hover:bg-[#002b6e] text-white text-xs font-bold flex items-center gap-1.5 shadow-xs transition active:scale-95 cursor-pointer"
+                    >
+                      <Plus className="h-4 w-4 text-white" />
+                      <span>Thêm sản phẩm</span>
+                    </button>
+                  </>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (companyProducts[0]) {
+                        handleOpenQuoteModal(companyProducts[0]);
+                      } else {
+                        toast.info("Gian hàng hiện chưa có sản phẩm để báo giá.");
+                      }
+                    }}
+                    className="h-9 px-4 rounded-xl bg-[#003B95] hover:bg-[#002b6e] text-white text-xs font-bold flex items-center gap-1.5 shadow-xs transition active:scale-95 cursor-pointer"
+                  >
+                    <Mail className="h-4 w-4 text-white" />
+                    <span>Báo giá</span>
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Filter Bar & Products Catalog */}
+        <div className="max-w-5xl mx-auto px-4 py-5 space-y-4">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+            {/* Category tabs */}
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 [scrollbar-width:none]">
+              <button
+                type="button"
+                onClick={() => setCompanyCatFilter("all")}
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition cursor-pointer ${
+                  companyCatFilter === "all"
+                    ? "bg-[#003B95] text-white shadow-xs border border-amber-400/40"
+                    : "bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800"
+                }`}
+              >
+                Tất cả ({companyProducts.length})
+              </button>
+              {companyCategories.map((cat) => {
+                const count = companyProducts.filter((p) => p.category === cat).length;
+                return (
+                  <button
+                    key={cat}
+                    type="button"
+                    onClick={() => setCompanyCatFilter(cat)}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition cursor-pointer ${
+                      companyCatFilter === cat
+                        ? "bg-[#003B95] text-white shadow-xs border border-amber-400/40"
+                        : "bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800"
+                    }`}
+                  >
+                    {cat} ({count})
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Search input in Storefront */}
+            <div className="relative min-w-[220px]">
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" />
+              <input
+                type="text"
+                value={companySearch}
+                onChange={(e) => setCompanySearch(e.target.value)}
+                placeholder="Tìm kiếm trong gian hàng..."
+                className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 py-1.5 pl-8.5 pr-8 text-xs text-slate-900 dark:text-white placeholder:text-slate-400 outline-none focus:border-[#003B95] focus:ring-1 focus:ring-amber-400/30"
+              />
+              {companySearch && (
+                <button
+                  type="button"
+                  onClick={() => setCompanySearch("")}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Product Grid */}
+          {filteredCompanyProducts.length === 0 ? (
+            <div className="py-16 text-center rounded-2xl border border-dashed border-slate-300 dark:border-slate-800 bg-white/50 dark:bg-slate-900/50 p-6">
+              <Package className="h-12 w-12 text-slate-300 dark:text-slate-600 mx-auto mb-3" />
+              <h3 className="text-sm font-bold text-slate-700 dark:text-slate-300">
+                {companySearch ? "Không tìm thấy sản phẩm phù hợp" : "Gian hàng chưa có sản phẩm thuộc danh mục này"}
+              </h3>
+              <p className="text-xs text-slate-400 mt-1 max-w-sm mx-auto">
+                {isCompanyOwner
+                  ? "Hãy nhấn 'Thêm sản phẩm' hoặc 'Nhập Excel' để đưa sản phẩm của doanh nghiệp bạn lên sàn giao thương."
+                  : "Vui lòng chọn danh mục khác hoặc quay lại sau."}
+              </p>
+              {isCompanyOwner && (
+                <button
+                  type="button"
+                  onClick={() => handleOpenPostModal(viewingCompany.name)}
+                  className="mt-4 inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#003B95] hover:bg-[#002B70] text-white text-xs font-bold shadow-xs border border-amber-400/40 transition cursor-pointer"
+                >
+                  <Plus className="h-4 w-4" />
+                  <span>Đăng sản phẩm ngay</span>
+                </button>
+              )}
+            </div>
+          ) : (
+            <div className="columns-2 sm:columns-3 gap-3 [&>*]:break-inside-avoid [&>*]:mb-3">
+              {filteredCompanyProducts.map((p, idx) => {
+                const canManage = isCompanyOwner || checkCanManageProduct(p);
+                const isInterested = interestedIds.includes(p.id);
+                const isStaggered = idx % 2 === 1;
+                return (
+                  <div
+                    key={p.id}
+                    className="group relative flex flex-col justify-between rounded-2xl sm:rounded-3xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-hidden shadow-xs hover:shadow-xl hover:border-amber-400/50 dark:hover:border-amber-400/50 transition-all duration-200 break-inside-avoid mb-3"
+                  >
+                    <div className={`relative ${isStaggered ? "aspect-[4/5]" : "aspect-square sm:aspect-4/3"} w-full bg-slate-100 dark:bg-slate-800 overflow-hidden`}>
+                      {resolveMediaUrl(p.imageUrl) || p.imageUrl ? (
+                        <img
+                          src={resolveMediaUrl(p.imageUrl) || p.imageUrl}
+                          alt={p.name}
+                          className="w-full h-full object-cover group-hover:scale-103 transition-transform duration-300"
+                          loading="lazy"
+                          onError={(e) => {
+                            (e.target as HTMLElement).style.display = "none";
+                          }}
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center bg-slate-100 dark:bg-slate-800 text-3xl">
+                          💼
+                        </div>
+                      )}
+                      {p.status === "sold" && (
+                        <div className="absolute inset-0 bg-slate-950/60 backdrop-blur-[1px] flex items-center justify-center z-10 pointer-events-none">
+                          <span className="px-3 py-1 rounded-full bg-slate-900/90 border border-white/20 text-white text-xs font-black tracking-wider uppercase shadow-lg">
+                            ĐÃ BÁN
+                          </span>
+                        </div>
+                      )}
+                      {canManage && (
+                        <div className="absolute top-2.5 right-2.5 z-20 flex items-center gap-1">
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleToggleSold(p.id, e);
+                            }}
+                            className={`h-7 px-2 rounded-lg ${p.status === "sold" ? "bg-emerald-600 hover:bg-emerald-700" : "bg-black/60 hover:bg-emerald-600"} text-white flex items-center gap-1 text-[11px] font-semibold transition cursor-pointer backdrop-blur-xs`}
+                            title={p.status === "sold" ? "Mở bán lại" : "Đánh dấu đã bán"}
+                          >
+                            <CheckCircle2 className="h-3.5 w-3.5" />
+                            <span>{p.status === "sold" ? "Mở bán" : "Đã bán"}</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              startEditProduct(p, e);
+                            }}
+                            className="h-7 w-7 rounded-lg bg-black/60 hover:bg-blue-600 text-white grid place-items-center transition cursor-pointer backdrop-blur-xs"
+                            title="Sửa sản phẩm"
+                          >
+                            <Pencil className="h-3.5 w-3.5" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDeleteProduct(p.id, e);
+                            }}
+                            className="h-7 w-7 rounded-lg bg-black/60 hover:bg-rose-600 text-white grid place-items-center transition cursor-pointer backdrop-blur-xs"
+                            title="Xóa sản phẩm"
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </button>
+                        </div>
+                      )}
+                      <span className="absolute bottom-2.5 left-2.5 z-10 flex items-center gap-1 rounded-full bg-amber-400/95 text-slate-950 px-2 py-0.5 text-[9px] font-black shadow-xs">
+                        ƯU ĐÃI VIP B2B
+                      </span>
+                    </div>
+
+                    <div className="p-4 flex-1 flex flex-col justify-between">
+                      <div>
+                        {p.category && (
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                            {p.category}
+                          </span>
+                        )}
+                        <h4 className="text-sm font-bold text-slate-900 dark:text-white line-clamp-2 leading-snug mt-0.5 mb-1.5 group-hover:text-[#003B95] dark:group-hover:text-amber-400 transition-colors">
+                          {p.name}
+                        </h4>
+                        {p.description && (
+                          <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed mb-3">
+                            {p.description}
+                          </p>
+                        )}
+                      </div>
+
+                      <div className="pt-3 border-t border-slate-100 dark:border-slate-800">
+                        <div className="flex items-baseline justify-between gap-2 mb-3">
+                          <div>
+                            <span className="text-[10px] text-slate-400 uppercase font-semibold">Giá Hội Viên</span>
+                            <div className="text-base font-black text-rose-600 dark:text-amber-400">
+                              {formatSmartProductPrice(p.memberPrice || p.price)}
+                            </div>
+                          </div>
+                          {Boolean(p.originalPrice && (p.memberPrice || p.price) && Number(p.originalPrice) > Number(p.memberPrice || p.price)) && (
+                            <span className="text-xs text-slate-400 line-through">
+                              {formatSmartProductPrice(p.originalPrice)}
+                            </span>
+                          )}
+                        </div>
+
+                        {canManage ? (
+                          <div className="flex items-center gap-2">
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                startEditProduct(p, e);
+                              }}
+                              className="flex-1 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold transition flex items-center justify-center gap-1 cursor-pointer"
+                            >
+                              <Pencil className="h-3.5 w-3.5" />
+                              <span>Sửa thông tin</span>
+                            </button>
+                            {p.quoteRequestsCount !== undefined && p.quoteRequestsCount > 0 && (
+                              <button
+                                type="button"
+                                onClick={() => setViewingQuotesProduct(p)}
+                                className="px-2.5 py-2 rounded-xl bg-amber-500/15 text-amber-600 dark:text-amber-400 text-xs font-bold transition flex items-center gap-1 cursor-pointer"
+                                title="Xem các yêu cầu báo giá"
+                              >
+                                <Mail className="h-3.5 w-3.5" />
+                                <span>{p.quoteRequestsCount}</span>
+                              </button>
+                            )}
+                          </div>
+                        ) : (
+                          <div className="flex items-center gap-2">
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleScheduleMeetingWithSeller(p);
+                              }}
+                              className="h-9 px-2.5 rounded-xl bg-blue-50 dark:bg-blue-950/60 hover:bg-[#003B95] text-[#003B95] hover:text-white dark:text-blue-300 dark:hover:text-white flex items-center justify-center gap-1 transition active:scale-95 cursor-pointer border border-blue-200 dark:border-blue-800 text-xs font-bold shrink-0"
+                              title="Lên lịch hẹn 1-1 B2B với người bán"
+                            >
+                              <Calendar className="h-3.5 w-3.5" />
+                              <span>Lên lịch</span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleMessageSeller(p);
+                              }}
+                              className="h-9 px-3 rounded-xl bg-slate-100 hover:bg-[#003B95] hover:text-white dark:bg-slate-800 dark:hover:bg-[#003B95] dark:hover:text-white text-slate-700 dark:text-slate-200 flex items-center justify-center gap-1.5 transition active:scale-95 cursor-pointer border border-slate-200 dark:border-slate-700 text-xs font-bold shrink-0"
+                              title="Nhắn tin cho công ty / người bán"
+                            >
+                              <MessageSquare className="h-4 w-4" />
+                              <span>Nhắn tin</span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleOpenQuoteModal(p)}
+                              className="flex-1 h-9 rounded-xl bg-[#003B95] hover:bg-[#002B70] text-white text-xs font-bold flex items-center justify-center gap-1.5 shadow-xs transition active:scale-95 cursor-pointer"
+                            >
+                              <Mail className="h-3.5 w-3.5 text-amber-300" />
+                              <span>Báo giá</span>
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <div className="vba-animate pb-24 text-slate-900 dark:text-white">
+      {viewingCompany ? (
+        renderCompanyStorefront()
+      ) : (
+        <>
+          {/* ── TOP HEADER (Chợ Marketplace & Icon Gian Hàng Góc Phải) ── */}
+          <div className="ceo-safe-sticky sticky top-0 z-30 self-stretch px-4 py-3.5 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center shadow-xs">
+            <div className="flex justify-start items-center gap-2.5">
+              <button 
+                type="button" 
+                onClick={() => {
+                  if (marketplaceTab === "my_store") {
+                    setMarketplaceTab("market");
+                  } else {
+                    window.history.back();
+                  }
+                }}
+                className="p-1 -ml-1 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white transition cursor-pointer"
+                aria-label="Quay lại"
+              >
+                <ChevronLeft className="size-5 text-sky-950 dark:text-white" />
+              </button>
+              <div className="justify-start text-sky-950 dark:text-white text-base font-bold font-['Inter']">
+                {marketplaceTab === "my_store" ? "Gian Hàng Của Tôi" : "Giao thương"}
+              </div>
+            </div>
+
+            {/* Icon Góc Phải: Gian Hàng Của Tôi (Chỉ hiện trong Sàn Thương Mại) */}
+            <button
+              type="button"
+              id="tour-market-tabs"
+              onClick={() => setMarketplaceTab(marketplaceTab === "my_store" ? "market" : "my_store")}
+              className={`relative px-3 py-1.5 rounded-xl border text-xs font-bold transition-all active:scale-95 cursor-pointer flex items-center gap-1.5 ${
+                marketplaceTab === "my_store"
+                  ? "bg-amber-500 text-white border-amber-600 shadow-sm"
+                  : "bg-slate-50 dark:bg-slate-800 text-[#003B95] dark:text-amber-400 border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700"
+              }`}
+              title={marketplaceTab === "my_store" ? "Quay lại Giao thương" : "Gian hàng của tôi"}
+              aria-label="Gian hàng của tôi"
+            >
+              <Store className="size-4" />
+              <span className="hidden xs:inline">{marketplaceTab === "my_store" ? "Giao thương" : "Gian hàng"}</span>
+              {myProductsCount > 0 && (
+                <span className="size-4.5 rounded-full bg-emerald-600 text-white text-[10px] font-bold flex items-center justify-center ring-1.5 ring-white dark:ring-slate-900">
+                  {myProductsCount}
+                </span>
+              )}
+            </button>
+          </div>
+
+          {marketplaceTab === "my_store" ? (
+            <div className="self-stretch px-4 pt-4 pb-6 flex flex-col justify-start items-start gap-4">
+              {/* Action Banner for Companies */}
+              <div className="w-full bg-gradient-to-br from-slate-900 via-[#003B95] to-blue-950 text-white rounded-2xl p-4 shadow-md">
+                <div className="flex items-center justify-between gap-3 mb-2">
+                  <div className="flex items-center gap-2">
+                    <div className="size-9 rounded-xl bg-white/10 flex items-center justify-center">
+                      <Building2 className="size-5 text-blue-200" />
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-bold text-white">Gian Hàng & Tiếp Thị Doanh Nghiệp</h4>
+                      <p className="text-[11px] text-blue-200">Quản lý sản phẩm và quảng bá thương hiệu B2B</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2 mt-3 pt-3 border-t border-white/15">
+                  <button
+                    type="button"
+                    onClick={() => handleOpenPostModal()}
+                    className={`py-2.5 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition cursor-pointer shadow-xs active:scale-95 ${
+                      mineProducts.length >= 5
+                        ? "bg-white/90 text-amber-900 border border-amber-300"
+                        : "bg-white text-[#003B95] hover:bg-blue-50"
+                    }`}
+                  >
+                    <Plus className="size-4" />
+                    <span>{mineProducts.length >= 5 ? "Tối đa (5/5 sp)" : "Đăng sản phẩm mới"}</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setAdRegistrationModalOpen(true)}
+                    className="py-2.5 px-3 bg-blue-500/30 hover:bg-blue-500/40 border border-blue-400/30 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition cursor-pointer shadow-xs active:scale-95"
+                  >
+                    <Megaphone className="size-4 text-amber-300" />
+                    <span>Liên hệ quảng cáo</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Excel and Quick tools */}
+              <div className="w-full flex items-center justify-between gap-2 px-1">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
+                    Sản phẩm của tôi
+                  </span>
+                  <span
+                    className={`px-2 py-0.5 rounded-full text-[10.5px] font-extrabold ${
+                      mineProducts.length >= 5
+                        ? "bg-rose-100 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300 border border-rose-300"
+                        : "bg-blue-100 text-[#003B95] dark:bg-blue-900/60 dark:text-blue-300 border border-blue-200"
+                    }`}
+                  >
+                    {myProductsCount}/5 sản phẩm
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setExcelImportOpen(true)}
+                    className="px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-[11px] font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-50 flex items-center gap-1 transition cursor-pointer"
+                  >
+                    <Download className="size-3" />
+                    <span>Nhập Excel</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const mine = allProducts.filter((p) => checkIsProductOwner(p));
+                      exportProductsToExcel(mine);
+                    }}
+                    className="px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-[11px] font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-50 flex items-center gap-1 transition cursor-pointer"
+                  >
+                    <FileSpreadsheet className="size-3 text-emerald-600" />
+                    <span>Xuất Excel</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* List of user's products */}
+              {mineProducts.length === 0 ? (
+                <div className="w-full py-12 px-4 rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-700 flex flex-col items-center justify-center text-center gap-3">
+                  <div className="size-14 rounded-2xl bg-blue-50 dark:bg-slate-800 grid place-items-center">
+                    <Package className="size-7 text-[#003B95] dark:text-blue-400" />
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-bold text-slate-900 dark:text-white">Bạn chưa đăng sản phẩm nào</h4>
+                    <p className="text-xs text-slate-500 max-w-xs mt-1">
+                      Đăng ngay sản phẩm hoặc dịch vụ để tiếp cận 1983+ lãnh đạo doanh nghiệp và nhận chào giá trực tiếp.
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => handleOpenPostModal()}
+                    className="mt-2 px-4 py-2 bg-[#003B95] hover:bg-[#002B70] text-white rounded-xl text-xs font-bold flex items-center gap-1.5 transition cursor-pointer shadow-xs active:scale-95"
+                  >
+                    <Plus className="size-4 text-white" />
+                    <span>Đăng sản phẩm ngay</span>
+                  </button>
+                </div>
+              ) : (
+                <div ref={myStoreSectionRef} className="w-full space-y-3">
+                  {paginatedMine.map((p) => (
+                      <div
+                        key={p.id}
+                        className="p-3 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 flex items-center gap-3 shadow-xs"
+                      >
+                        {resolveMediaUrl(p.imageUrl) || p.imageUrl ? (
+                          <img
+                            src={resolveMediaUrl(p.imageUrl) || p.imageUrl}
+                            alt={p.name}
+                            className="size-16 rounded-xl object-cover shrink-0 border border-slate-100 dark:border-slate-700"
+                            onError={(e) => {
+                              (e.target as HTMLElement).style.display = "none";
+                            }}
+                          />
+                        ) : (
+                          <div className="size-16 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-xl shrink-0">
+                            💼
+                          </div>
+                        )}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            <span className="text-[10px] font-semibold text-blue-700 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/60 px-1.5 py-0.5 rounded">
+                              {p.category || "Dịch vụ"}
+                            </span>
+                            {p.status === "sold" ? (
+                              <span className="text-[9px] font-bold text-slate-700 dark:text-slate-300 bg-slate-200 dark:bg-slate-700 px-1.5 py-0.5 rounded">
+                                ĐÃ BÁN
+                              </span>
+                            ) : (
+                              <span className="text-[9px] font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-950/60 px-1.5 py-0.5 rounded">
+                                Đang bán
+                              </span>
+                            )}
+                            {(p as any).isVip && (
+                              <span className="text-[9px] font-bold text-amber-600 bg-amber-50 px-1 py-0.5 rounded">
+                                VIP
+                              </span>
+                            )}
+                          </div>
+                          <h4 className="text-xs font-bold text-slate-900 dark:text-white truncate mt-0.5">
+                            {p.name}
+                          </h4>
+                          <div className="text-xs font-bold text-[#003B95] dark:text-blue-400 mt-0.5">
+                            {formatSmartProductPrice(p.memberPrice || p.price)}
+                          </div>
+                        </div>
+                        <div className="flex flex-col gap-1.5 shrink-0">
+                          <button
+                            type="button"
+                            onClick={(e) => handleToggleSold(p.id, e)}
+                            className={`px-2.5 py-1 ${p.status === "sold" ? "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100" : "bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-200"} rounded-lg text-[11px] font-semibold flex items-center gap-1 transition cursor-pointer`}
+                          >
+                            <CheckCircle2 className="size-3" />
+                            <span>{p.status === "sold" ? "Mở bán lại" : "Đã bán"}</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => startEditProduct(p)}
+                            className="px-2.5 py-1 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 text-slate-700 dark:text-slate-200 rounded-lg text-[11px] font-semibold flex items-center gap-1 transition cursor-pointer"
+                          >
+                            <Pencil className="size-3" />
+                            <span>Sửa</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleOpenProductQuotes(p)}
+                            className="px-2.5 py-1 bg-amber-50 dark:bg-amber-950/40 hover:bg-amber-100 text-amber-700 dark:text-amber-300 rounded-lg text-[11px] font-semibold flex items-center gap-1 transition cursor-pointer"
+                            title="Xem các yêu cầu báo giá từ khách hàng"
+                          >
+                            <Users className="size-3" />
+                            <span>Yêu cầu báo giá ({p.quoteRequestsCount || 0})</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={(e) => handleDeleteProduct(p.id, e)}
+                            className="px-2.5 py-1 bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 text-rose-600 dark:text-rose-300 rounded-lg text-[11px] font-semibold flex items-center gap-1 transition cursor-pointer"
+                          >
+                            <Trash2 className="size-3" />
+                            <span>Xóa</span>
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+
+                  {totalMyStorePages > 1 && (
+                    <MobilePagination
+                      currentPage={myStorePage}
+                      totalPages={totalMyStorePages}
+                      totalItems={mineProducts.length}
+                      pageSize={myStorePageSize}
+                      onPageChange={(page) => {
+                        setMyStorePage(page);
+                        myStoreSectionRef.current?.scrollIntoView({ behavior: "smooth" });
+                      }}
+                      onPageSizeChange={(sz) => {
+                        setMyStorePageSize(sz);
+                        setMyStorePage(1);
+                      }}
+                      pageSizeOptions={[4, 6, 10, 20]}
+                      itemLabel="sản phẩm của bạn"
+                    />
+                  )}
+                </div>
+              )}
+            </div>
+          ) : (
+            <>
+              {/* ── SCROLLABLE CONTENT (390px spec according to Figma) ── */}
+              <div className="self-stretch px-4 pt-4 pb-6 flex flex-col justify-start items-start gap-5">
+
+            {/* 0. MARKETPLACE OVERVIEW STATS BANNER */}
+            <div className="w-full bg-gradient-to-r from-[#002B70] via-[#003B95] to-[#0A4DB0] rounded-2xl p-4 text-white shadow-md border border-amber-400/30 relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-48 h-48 bg-amber-400/10 rounded-full blur-2xl pointer-events-none" />
+              <div className="flex items-center justify-between gap-2 mb-3">
+                <div className="flex items-center gap-2">
+                  <span className="p-1.5 bg-amber-400 text-slate-950 rounded-lg text-xs font-black shadow-xs">
+                    83
+                  </span>
+                  <div>
+                    <h3 className="text-xs font-black uppercase tracking-wider text-amber-300">
+                      Sàn Giao Thương B2B CEO HN10
+                    </h3>
+                    <p className="text-[10px] text-blue-100">Hệ sinh thái sản phẩm & dịch vụ doanh nghiệp hội viên</p>
+                  </div>
+                </div>
+                <span className="text-[11px] font-bold text-amber-300 bg-amber-400/20 px-2 py-0.5 rounded-full border border-amber-400/40">
+                  Nội Bộ CLB
+                </span>
+              </div>
+
+              <div className="grid grid-cols-3 gap-2 pt-2 border-t border-white/15 text-center">
+                <div className="bg-white/10 rounded-xl p-2 backdrop-blur-xs">
+                  <div className="text-[10px] text-blue-200 font-medium">Tổng sản phẩm</div>
+                  <div className="text-sm sm:text-base font-black text-white mt-0.5">{totalProducts}</div>
+                </div>
+                <div className="bg-white/10 rounded-xl p-2 backdrop-blur-xs">
+                  <div className="text-[10px] text-amber-200 font-medium">Giá trị niêm yết</div>
+                  <div className="text-sm sm:text-base font-black text-amber-300 mt-0.5">{formattedMarketplaceValue}</div>
+                </div>
+                <div className="bg-white/10 rounded-xl p-2 backdrop-blur-xs">
+                  <div className="text-[10px] text-blue-200 font-medium">Đã kết nối</div>
+                  <div className="text-sm sm:text-base font-black text-emerald-300 mt-0.5">{totalInterested} đối tác</div>
+                </div>
+              </div>
+            </div>
+            
+            {/* 1. SEARCH ROW (Bên trái thanh tìm kiếm là icon dạng menu có sắp xếp giá, dưới tìm kiếm là danh mục gần đây đã chọn) */}
+            <div className="self-stretch flex flex-col gap-2.5">
+              <div className="self-stretch inline-flex justify-start items-center gap-2">
+                {/* Icon menu sắp xếp nằm BÊN TRÁI thanh tìm kiếm */}
+                <div className="relative">
+                  <button
+                    type="button"
+                    onClick={() => setFilterMenuOpen(!filterMenuOpen)}
+                    className="size-10 p-2.5 bg-[#003B95] dark:bg-slate-800 border border-blue-900/30 dark:border-slate-700 rounded-xl flex justify-center items-center text-white cursor-pointer hover:bg-blue-900 transition active:scale-95 shadow-xs shrink-0"
+                    title="Menu sắp xếp giá & tiêu chí lọc"
+                  >
+                    <SlidersHorizontal className="size-4 text-white" />
+                  </button>
+
+                  {/* Filter Menu Dropdown */}
+                  {filterMenuOpen && (
+                    <div className="absolute left-0 top-12 w-64 p-3 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-2xl text-xs space-y-2 z-40 animate-scale-in">
+                      <div className="font-bold text-[#003B95] dark:text-blue-400 flex items-center justify-between">
+                        <span>Sắp xếp theo tiêu chí:</span>
+                        <button
+                          type="button"
+                          onClick={() => setFilterMenuOpen(false)}
+                          className="text-slate-400 hover:text-slate-600"
+                        >
+                          <X className="size-3.5" />
+                        </button>
+                      </div>
+                      <div className="flex flex-col gap-1">
+                        {[
+                          { id: "newest", label: "Mới đăng nhất" },
+                          { id: "price_asc", label: "Giá: Thấp đến cao (Tiết kiệm)" },
+                          { id: "price_desc", label: "Giá: Cao đến thấp (Cao cấp)" },
+                          { id: "rating_desc", label: "Đánh giá cao nhất (Số sao tốt nhất)" },
+                          { id: "most_viewed", label: "Xem nhiều nhất (Phổ biến)" },
+                        ].map((s) => (
+                          <button
+                            key={s.id}
+                            type="button"
+                            onClick={() => {
+                              setSortMode(s.id as any);
+                              setFilterMenuOpen(false);
+                            }}
+                            className={`w-full text-left px-3 py-2 rounded-xl text-xs font-semibold cursor-pointer transition flex items-center justify-between ${
+                              sortMode === s.id
+                                ? "bg-[#003B95] text-white"
+                                : "text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700/60"
+                            }`}
+                          >
+                            <span>{s.label}</span>
+                            {sortMode === s.id && <Check className="size-3.5" />}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Input Search nằm ở giữa */}
+                <div className="flex-1 px-3 py-2.5 bg-white dark:bg-slate-800 rounded-xl outline outline-1 outline-offset-[-1px] outline-slate-200 dark:outline-slate-700 flex justify-start items-center gap-2 shadow-2xs">
+                  <Search className="size-4 text-slate-500 shrink-0" />
+                  <input
+                    type="text"
+                    value={q}
+                    onChange={(e) => setQ(e.target.value)}
+                    placeholder="Tìm kiếm sản phẩm, đối tác, doanh nghiệp..."
+                    className="flex-1 justify-start text-slate-700 dark:text-slate-200 placeholder:text-slate-500 text-xs font-normal font-['Inter'] bg-transparent outline-none border-none"
+                  />
+                  {q && (
+                    <button onClick={() => setQ("")} className="text-slate-400 hover:text-slate-600 cursor-pointer">
+                      <X className="size-3.5" />
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* Dưới tìm kiếm là danh mục gần đây đã chọn (Shopee Style recent categories chips) */}
+              <div className="self-stretch flex flex-col gap-1.5 pt-0.5">
+                <div className="flex items-center justify-between text-[11px]">
+                  <span className="font-semibold text-slate-500 dark:text-slate-400 flex items-center gap-1">
+                    <Sparkles className="size-3 text-amber-500" />
+                    <span>Danh mục gần đây đã chọn:</span>
+                  </span>
+                  {recentCategories.length > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setRecentCategories([]);
+                        try {
+                          localStorage.removeItem("ceohn10_recent_categories");
+                        } catch {}
+                      }}
+                      className="text-[10px] text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 cursor-pointer"
+                    >
+                      Xóa
+                    </button>
+                  )}
+                </div>
+                <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
+                  {recentCategories.map((catName) => {
+                    const isSelected = selectedCategory === catName;
+                    return (
+                      <button
+                        key={catName}
+                        type="button"
+                        onClick={() => handleSelectCategory(catName)}
+                        className={`px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition cursor-pointer shrink-0 border ${
+                          isSelected
+                            ? "bg-[#003B95] text-white border-[#003B95] shadow-xs"
+                            : "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-200"
+                        }`}
+                      >
+                        {catName}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+
+            {/* 2. INDUSTRY CHIPS */}
+            <div className="self-stretch inline-flex justify-start items-start gap-2 overflow-x-auto no-scrollbar pb-1">
+              <button
+                type="button"
+                onClick={() => setSelectedCategory("all")}
+                className={`px-3.5 py-2 rounded-[100px] flex justify-start items-start cursor-pointer transition shrink-0 ${
+                  selectedCategory === "all"
+                    ? "bg-[#003B95] text-white shadow-xs"
+                    : "bg-white dark:bg-slate-800 outline outline-1 outline-offset-[-1px] outline-slate-200 dark:outline-slate-700 text-slate-500 hover:bg-slate-50"
+                }`}
+              >
+                <span className={`text-xs font-['Inter'] ${selectedCategory === "all" ? "text-white font-bold" : "text-slate-500 font-semibold"}`}>
+                  Tất cả
+                </span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setSelectedCategory("sold")}
+                className={`px-3.5 py-2 rounded-[100px] flex justify-start items-start cursor-pointer transition shrink-0 ${
+                  selectedCategory === "sold"
+                    ? "bg-[#003B95] text-white shadow-xs"
+                    : "bg-white dark:bg-slate-800 outline outline-1 outline-offset-[-1px] outline-slate-200 dark:outline-slate-700 text-slate-500 hover:bg-slate-50"
+                }`}
+              >
+                <span className={`text-xs font-['Inter'] ${selectedCategory === "sold" ? "text-white font-bold" : "text-slate-500 font-semibold"}`}>
+                  Đã bán
+                </span>
+              </button>
+              {dynamicCategories.map((catName) => {
+                const isActive = selectedCategory === catName || matchCategory(catName, selectedCategory);
+                return (
+                  <button
+                    key={catName}
+                    type="button"
+                    onClick={() => setSelectedCategory(catName)}
+                    className={`px-3.5 py-2 rounded-[100px] flex justify-start items-start cursor-pointer transition shrink-0 ${
+                      isActive
+                        ? "bg-[#003B95] text-white shadow-xs"
+                        : "bg-white dark:bg-slate-800 outline outline-1 outline-offset-[-1px] outline-slate-200 dark:outline-slate-700 text-slate-500 hover:bg-slate-50"
+                    }`}
+                  >
+                    <span className={`text-xs font-['Inter'] ${isActive ? "text-white font-bold" : "text-slate-500 font-semibold"}`}>
+                      {catName}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* 3. DYNAMIC SPONSORED ADS SLIDER (CRM Sync) */}
+            <div className="self-stretch px-1">
+              <MarketplaceAdSlider onSelectCompany={(comp) => setViewingCompany(comp)} />
+            </div>
+
+            {/* 4. SẢN PHẨM MỚI ĐĂNG (HORIZONTAL CAROUSEL) */}
+            <div className="self-stretch flex flex-col justify-start items-start gap-3">
+              <div className="self-stretch flex flex-col justify-start items-start gap-3">
+                <div className="self-stretch px-4 inline-flex justify-between items-center">
+                  <div className="justify-start text-blue-900 dark:text-blue-400 text-base font-bold font-['Inter'] uppercase tracking-tight">
+                    SẢN PHẨM MỚI ĐĂNG
+                  </div>
+                  <button 
+                    type="button"
+                    onClick={() => setShowAllProducts(!showAllProducts)}
+                    className="justify-start text-blue-600 dark:text-blue-400 text-xs font-semibold font-['Inter'] hover:underline cursor-pointer"
+                  >
+                    {showAllProducts ? "Thu gọn" : "Xem tất cả"}
+                  </button>
+                </div>
+
+                {showAllProducts ? (
+                  <div ref={allProductsSectionRef} className="self-stretch px-4 flex flex-col gap-3">
+                    <div className="grid grid-cols-2 gap-3">
+                      {paginatedNewest.map((p) => (
+                        <div
+                          key={p.id}
+                          onClick={() => handleOpenProductDetail(p)}
+                          className="w-full bg-white dark:bg-slate-800 rounded-xl outline outline-1 outline-offset-[-1px] outline-slate-200 dark:outline-slate-700 flex flex-col justify-start items-start overflow-hidden shadow-xs hover:shadow-md transition cursor-pointer relative"
+                        >
+                          <div className="relative self-stretch h-24 bg-slate-100 dark:bg-slate-800 overflow-hidden">
+                            {resolveMediaUrl(p.imageUrl) || p.imageUrl ? (
+                              <img
+                                className="self-stretch h-24 w-full object-cover"
+                                src={resolveMediaUrl(p.imageUrl) || p.imageUrl}
+                                alt={p.name}
+                                onError={(e) => {
+                                  (e.target as HTMLElement).style.display = "none";
+                                }}
+                              />
+                            ) : (
+                              <div className="h-24 w-full flex items-center justify-center text-2xl">
+                                💼
+                              </div>
+                            )}
+                            {p.status === "sold" && (
+                              <div className="absolute inset-0 bg-slate-950/60 backdrop-blur-[1px] flex items-center justify-center z-10 pointer-events-none">
+                                <span className="px-2.5 py-0.5 rounded-full bg-slate-900/90 border border-white/20 text-white text-[10px] font-black tracking-wider uppercase shadow-md">
+                                  ĐÃ BÁN
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                          <div className="self-stretch p-3 flex flex-col justify-start items-start gap-2">
+                            <div className="self-stretch inline-flex justify-between items-center">
+                              <div className="justify-start text-slate-500 text-xs font-normal font-['Inter'] truncate max-w-[100px]">
+                                {p.category || "Doanh nghiệp"}
+                              </div>
+                              <div className="px-1 py-0.5 bg-amber-100 rounded-[3px] flex justify-start items-start shrink-0">
+                                <div className="justify-start text-amber-600 text-[9px] font-bold font-['Inter']">VIP</div>
+                              </div>
+                            </div>
+                            <div className="self-stretch justify-start text-slate-900 dark:text-white text-xs font-semibold font-['Inter'] line-clamp-2 h-8 leading-4">
+                              {p.name}
+                            </div>
+                            <div className="self-stretch justify-start text-slate-500 text-xs font-normal font-['Inter'] truncate">
+                              {p.company || "Hội viên CEO HN10"}
+                            </div>
+                            <div className="self-stretch inline-flex justify-between items-center pt-0.5">
+                              <div className="justify-start text-blue-900 dark:text-blue-400 text-xs font-bold font-['Inter']">
+                                {formatSmartProductPrice(p.memberPrice || p.price)}
+                              </div>
+                              <span className="text-[10px] font-bold text-[#003B95] dark:text-blue-400">
+                                Báo giá →
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    {totalNewPages > 1 && (
+                      <MobilePagination
+                        currentPage={pageNew}
+                        totalPages={totalNewPages}
+                        totalItems={newestProducts.length}
+                        pageSize={allNewPageSize}
+                        onPageChange={(page) => {
+                          setPageNew(page);
+                          allProductsSectionRef.current?.scrollIntoView({ behavior: "smooth" });
+                        }}
+                        onPageSizeChange={(sz) => {
+                          setAllNewPageSize(sz);
+                          setPageNew(1);
+                        }}
+                        pageSizeOptions={[6, 8, 12, 24]}
+                        itemLabel="sản phẩm mới"
+                      />
+                    )}
+                  </div>
+                ) : (
+                /* Horizontal carousel */
+                <div id="tour-market-grid" className="self-stretch pl-4 inline-flex justify-start items-start gap-3 overflow-x-auto no-scrollbar pb-2">
+                  {/* Dynamic Products from Database */}
+                  {allProducts.length === 0 ? (
+                    <div className="py-6 px-4 text-center w-full">
+                      <p className="text-xs text-slate-400">Chưa có sản phẩm nào trên hệ thống</p>
+                    </div>
+                  ) : null}
+
+                  {/* Dynamic Products from Database */}
+                  {allProducts.slice(0, 8).map((p, pIdx) => {
+                    const isLiked = interestedIds.includes(p.id);
+                    return (
+                      <div
+                        key={p.id}
+                        id={pIdx === 0 ? "tour-market-detail-quote" : undefined}
+                        onClick={() => handleOpenProductDetail(p)}
+                        className="w-44 bg-white dark:bg-slate-800 rounded-xl outline outline-1 outline-offset-[-1px] outline-slate-200 dark:outline-slate-700 inline-flex flex-col justify-start items-start overflow-hidden shrink-0 shadow-xs hover:shadow-md transition cursor-pointer relative"
+                      >
+                        <div className="relative self-stretch h-24 bg-slate-100 dark:bg-slate-800 overflow-hidden">
+                          {resolveMediaUrl(p.imageUrl) || p.imageUrl ? (
+                            <img
+                              className="self-stretch h-24 w-full object-cover"
+                              src={resolveMediaUrl(p.imageUrl) || p.imageUrl}
+                              alt={p.name}
+                              onError={(e) => {
+                                (e.target as HTMLElement).style.display = "none";
+                              }}
+                            />
+                          ) : (
+                            <div className="h-24 w-full flex items-center justify-center text-2xl">
+                              💼
+                            </div>
+                          )}
+                          {p.status === "sold" && (
+                            <div className="absolute inset-0 bg-slate-950/60 backdrop-blur-[1px] flex items-center justify-center z-10 pointer-events-none">
+                              <span className="px-2.5 py-0.5 rounded-full bg-slate-900/90 border border-white/20 text-white text-[10px] font-black tracking-wider uppercase shadow-md">
+                                ĐÃ BÁN
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                        <div className="self-stretch p-3 flex flex-col justify-start items-start gap-2">
+                          <div className="self-stretch inline-flex justify-between items-center">
+                            <div className="justify-start text-slate-500 text-xs font-normal font-['Inter'] truncate max-w-[100px]">
+                              {p.category || "Doanh nghiệp"}
+                            </div>
+                            <div className="px-1 py-0.5 bg-amber-100 rounded-[3px] flex justify-start items-start shrink-0">
+                              <div className="justify-start text-amber-600 text-[9px] font-bold font-['Inter']">VIP</div>
+                            </div>
+                          </div>
+                          <div className="self-stretch justify-start text-slate-900 dark:text-white text-xs font-semibold font-['Inter'] line-clamp-2 h-8 leading-4">
+                            {p.name}
+                          </div>
+                          <div className="self-stretch justify-start text-slate-500 text-xs font-normal font-['Inter'] truncate">
+                            {p.company || "Hội viên CEO HN10"}
+                          </div>
+                          <div className="self-stretch inline-flex justify-between items-center pt-0.5">
+                            <div className="justify-start text-blue-900 dark:text-blue-400 text-xs font-bold font-['Inter']">
+                              {formatSmartProductPrice(p.memberPrice || p.price)}
+                            </div>
+                            <span className="text-[10px] font-bold text-[#003B95] dark:text-blue-400">
+                              Báo giá →
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+                )}
+              </div>
+            </div>
+
+            
+            {/* 5. SẢN PHẨM MỚI XEM (RECENTLY VIEWED PRODUCTS CAROUSEL) */}
+            {(() => {
+              const activeRecentProducts = recentlyViewed.filter((p) =>
+                allProducts.some(
+                  (ap) =>
+                    String(ap.id || (ap as any)._id).trim() === String(p.id || p._id).trim() &&
+                    p.status !== "deleted"
+                )
+              );
+              if (activeRecentProducts.length === 0) return null;
+
+              return (
+                <div className="self-stretch flex flex-col justify-start items-start gap-3">
+                  <div className="self-stretch px-4 inline-flex justify-between items-center">
+                    <div className="justify-start text-sky-950 dark:text-white text-base font-bold font-['Inter'] uppercase tracking-tight flex items-center gap-2">
+                      <Eye className="size-4 text-[#003B95] dark:text-blue-400" />
+                      <span>SẢN PHẨM MỚI XEM</span>
+                    </div>
+                    <span className="text-xs text-slate-500 font-medium font-mono">
+                      {activeRecentProducts.length} sản phẩm
+                    </span>
+                  </div>
+
+                  {/* Horizontal scroll carousel */}
+                  <div className="self-stretch pl-4 inline-flex justify-start items-start gap-3 overflow-x-auto no-scrollbar pb-2">
+                    {activeRecentProducts.map((p) => {
+                      const isLiked = interestedIds.includes(p.id);
+                    return (
+                      <div
+                        key={p.id || p._id}
+                        onClick={() => handleOpenProductDetail(p)}
+                        className="w-44 bg-white dark:bg-slate-800 rounded-xl outline outline-1 outline-offset-[-1px] outline-slate-200 dark:outline-slate-700 inline-flex flex-col justify-start items-start overflow-hidden shrink-0 shadow-xs hover:shadow-md transition cursor-pointer relative"
+                      >
+                        <div className="relative self-stretch h-24 bg-slate-100 dark:bg-slate-800 overflow-hidden">
+                          {resolveMediaUrl(p.imageUrl) || p.imageUrl ? (
+                            <img
+                              className="self-stretch h-24 w-full object-cover"
+                              src={resolveMediaUrl(p.imageUrl) || p.imageUrl}
+                              alt={p.name}
+                              onError={(e) => {
+                                (e.target as HTMLElement).style.display = "none";
+                              }}
+                            />
+                          ) : (
+                            <div className="h-24 w-full flex items-center justify-center text-2xl">
+                              💼
+                            </div>
+                          )}
+                          {p.status === "sold" && (
+                            <div className="absolute inset-0 bg-slate-950/60 backdrop-blur-[1px] flex items-center justify-center z-10 pointer-events-none">
+                              <span className="px-2.5 py-0.5 rounded-full bg-slate-900/90 border border-white/20 text-white text-[10px] font-black tracking-wider uppercase shadow-md">
+                                ĐÃ BÁN
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                        <div className="self-stretch p-3 flex flex-col justify-start items-start gap-2">
+                          <div className="self-stretch inline-flex justify-between items-center">
+                            <div className="justify-start text-slate-500 text-xs font-normal font-['Inter'] truncate max-w-[100px]">
+                              {p.category || "Hội viên"}
+                            </div>
+                            {p.isVip && (
+                              <div className="px-1 py-0.5 bg-amber-100 rounded-[3px] flex justify-start items-start shrink-0">
+                                <div className="justify-start text-amber-600 text-[9px] font-bold font-['Inter']">VIP</div>
+                              </div>
+                            )}
+                          </div>
+                          <div className="self-stretch justify-start text-slate-900 dark:text-white text-xs font-semibold font-['Inter'] line-clamp-2 h-8 leading-4">
+                            {p.name}
+                          </div>
+                          <div className="self-stretch justify-start text-slate-500 text-xs font-normal font-['Inter'] truncate">
+                            {p.company || "CEO HN10"}
+                          </div>
+                          <div className="self-stretch inline-flex justify-between items-center pt-0.5">
+                            <div className="justify-start text-blue-900 dark:text-blue-400 text-xs font-bold font-['Inter']">
+                              {p.priceDisplay || formatSmartProductPrice(p.memberPrice || p.price)}
+                            </div>
+                            <span className="text-[10px] font-bold text-[#003B95] dark:text-blue-400">
+                              Báo giá →
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })()}
+
+            {/* 6. DOANH NGHIỆP NỔI BẬT */}
+            {featuredCompanyProduct && (
+              <div className="self-stretch flex flex-col justify-start items-start gap-3">
+                <div className="justify-start text-sky-950 dark:text-white text-sm font-bold font-['Inter']">
+                  DOANH NGHIỆP NỔI BẬT
+                </div>
+                <div className="self-stretch p-4 bg-white dark:bg-slate-800 rounded-2xl outline outline-1 outline-offset-[-1px] outline-slate-200 dark:outline-slate-700 flex flex-col justify-start items-start gap-3 shadow-xs">
+                  <div className="self-stretch inline-flex justify-start items-center gap-3">
+                    <div className="size-11 bg-sky-950 rounded-full flex justify-center items-center text-amber-400 font-bold overflow-hidden shrink-0 shadow-inner">
+                      <Building2 className="size-5 text-amber-400" />
+                    </div>
+                    <div className="flex-1 inline-flex flex-col justify-start items-start gap-0.5">
+                      <div className="self-stretch justify-start text-sky-950 dark:text-white text-sm font-bold font-['Inter'] line-clamp-1">
+                        {featuredCompanyProduct.company}
+                      </div>
+                      <div className="self-stretch justify-start text-slate-500 text-xs font-normal font-['Inter']">
+                        {featuredCompanyProduct.category || "Hội viên CLB CEO HN10"}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="self-stretch inline-flex justify-between items-start">
+                    <div className="justify-start text-slate-500 text-xs font-normal font-['Inter']">Xếp hạng:</div>
+                    <div className="justify-start text-emerald-500 text-xs font-bold font-['Inter']">
+                      ★★★★★ Elite Partner
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setViewingCompany({
+                      name: featuredCompanyProduct.company || "Hội viên CLB CEO HN10",
+                      bio: featuredCompanyProduct.description || "Doanh nghiệp hội viên trực thuộc CLB CEO HN10.",
+                      avatarUrl: resolveMediaUrl(featuredCompanyProduct.imageUrl) || featuredCompanyProduct.imageUrl || "",
+                      industry: featuredCompanyProduct.category || "Doanh nghiệp",
+                    })}
+                    className="self-stretch px-4 py-2.5 bg-sky-950 rounded-[100px] inline-flex justify-center items-center cursor-pointer hover:bg-sky-900 transition active:scale-[0.98] shadow-xs"
+                  >
+                    <div className="justify-start text-white text-xs font-bold font-['Inter']">
+                      Ghé thăm gian hàng
+                    </div>
+                  </button>
+                </div>
+              </div>
+            )}
+
+          </div>
+
+      
+      {/* TRƯỜNG HỢP CÓ TÌM KIẾM HOẶC LỌC DANH MỤC RIÊNG */}
+      {(q || selectedCategory !== "all") && (
+        <div ref={filteredProductsRef} className="mt-2 mb-4 px-4 space-y-3">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
+                <Search className="h-4 w-4 text-[#003B95] dark:text-blue-400" />
+                <span>
+                  {q ? `Kết quả tìm kiếm cho "${q}"` : `Danh mục: ${categoriesList.find((c) => c.id === selectedCategory)?.label || selectedCategory}`}
+                </span>
+              </h3>
+              <p className="text-[11px] text-slate-500">
+                Tìm thấy {sortedList.length} sản phẩm phù hợp
+                {sortMode !== "newest" && (
+                  <span className="ml-1 text-blue-600 dark:text-blue-400 font-semibold">
+                    (Đã sắp xếp)
+                  </span>
+                )}
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                setQ("");
+                setSelectedCategory("all");
+              }}
+              className="text-xs font-semibold text-[#003B95] dark:text-blue-400 hover:underline cursor-pointer"
+            >
+              Xóa lọc
+            </button>
+          </div>
+
+          {sortedList.length === 0 ? (
+            <div className="py-8 text-center rounded-2xl border border-dashed border-slate-200 dark:border-slate-800 p-6">
+              <p className="text-xs text-slate-400">Không tìm thấy sản phẩm nào phù hợp</p>
+            </div>
+          ) : (
+            <>
+              <div className="grid grid-cols-2 gap-3">
+                {paginatedList.map((p) => {
+                  return (
+                    <div
+                      key={p.id}
+                      onClick={() => handleOpenProductDetail(p)}
+                      className="w-full bg-white dark:bg-slate-800 rounded-xl outline outline-1 outline-offset-[-1px] outline-slate-200 dark:outline-slate-700 flex flex-col justify-start items-start overflow-hidden shadow-xs hover:shadow-md transition cursor-pointer relative"
+                    >
+                      <div className="relative self-stretch h-24 bg-slate-100 dark:bg-slate-800 overflow-hidden">
+                        {resolveMediaUrl(p.imageUrl) || p.imageUrl ? (
+                          <img
+                            className="self-stretch h-24 w-full object-cover"
+                            src={resolveMediaUrl(p.imageUrl) || p.imageUrl}
+                            alt={p.name}
+                            onError={(e) => {
+                              (e.target as HTMLElement).style.display = "none";
+                            }}
+                          />
+                        ) : (
+                          <div className="h-24 w-full flex items-center justify-center text-2xl">
+                            💼
+                          </div>
+                        )}
+                        {p.status === "sold" && (
+                          <div className="absolute inset-0 bg-slate-950/60 backdrop-blur-[1px] flex items-center justify-center z-10 pointer-events-none">
+                            <span className="px-2.5 py-0.5 rounded-full bg-slate-900/90 border border-white/20 text-white text-[10px] font-black tracking-wider uppercase shadow-md">
+                              ĐÃ BÁN
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                      <div className="self-stretch p-3 flex flex-col justify-start items-start gap-2">
+                        <div className="self-stretch inline-flex justify-between items-center">
+                          <div className="justify-start text-slate-500 text-xs font-normal font-['Inter'] truncate max-w-[100px]">
+                            {p.category || "Hội viên"}
+                          </div>
+                        </div>
+                        <div className="self-stretch justify-start text-slate-900 dark:text-white text-xs font-semibold font-['Inter'] line-clamp-2 h-8 leading-4">
+                          {p.name}
+                        </div>
+                        <div className="self-stretch justify-start text-slate-500 text-xs font-normal font-['Inter'] truncate">
+                          {p.company || "CEO HN10"}
+                        </div>
+                        <div className="self-stretch inline-flex justify-between items-center pt-0.5">
+                          <div className="justify-start text-blue-900 dark:text-blue-400 text-xs font-bold font-['Inter']">
+                            {formatSmartProductPrice(p.memberPrice || p.price)}
+                          </div>
+                          <span className="text-[10px] font-bold text-[#003B95] dark:text-blue-400">
+                            Báo giá →
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {totalFilterPages > 1 && (
+                <div className="pt-2">
+                  <MobilePagination
+                    currentPage={pageFilter}
+                    totalPages={totalFilterPages}
+                    totalItems={sortedList.length}
+                    pageSize={filterPageSize}
+                    onPageChange={(page) => {
+                      setPageFilter(page);
+                      filteredProductsRef.current?.scrollIntoView({ behavior: "smooth" });
+                    }}
+                    onPageSizeChange={(sz) => {
+                      setFilterPageSize(sz);
+                      setPageFilter(1);
+                    }}
+                    pageSizeOptions={[6, 8, 12, 24]}
+                    itemLabel="sản phẩm"
+                  />
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      )}
+            </>
+          )}
+
+      {/* ── FOOTER BANNER: COMPACT MODERN STRIP ── */}
+      <div className="mt-6 mb-4 px-4">
+        <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md px-4 py-3 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
+          <div className="flex items-center gap-2.5">
+            <div className="h-8 w-8 rounded-xl bg-amber-400/15 border border-amber-400/30 grid place-items-center shrink-0">
+              <Store className="h-4 w-4 text-[#003B95] dark:text-amber-400" />
+            </div>
+            <div>
+              <div className="text-xs font-black text-slate-800 dark:text-slate-100 flex items-center justify-center sm:justify-start gap-1.5">
+                <span>CEO HN10 Marketplace</span>
+                <span className="px-1.5 py-0.2 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 text-[9px] font-bold">5.0</span>
+              </div>
+              <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                Sàn giao thương B2B & liên kết giá trị doanh nghiệp hội viên
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            <Link
+              to="/association/perks"
+              className="h-8 px-3 rounded-xl bg-[#003B95] hover:bg-[#002B70] text-white text-xs font-bold flex items-center gap-1.5 shadow-xs border border-amber-400/40 transition active:scale-95"
+            >
+              <Sparkles className="h-3.5 w-3.5 text-amber-300" />
+              <span>Ưu đãi VIP</span>
+            </Link>
+          </div>
+        </div>
+      </div>
+        </>
+      )}
+
+      {/* ── MODALS EXTRACTED ── */}
+      <ProductPostModal
+        isOpen={mounted && postModalOpen}
+        availableCategories={dynamicCategories}
+        onClose={() => setPostModalOpen(false)}
+        onSubmit={handleCreateProduct}
+        isEn={isEn}
+        formCompany={formCompany}
+        setFormCompany={setFormCompany}
+        formCompanySize={formCompanySize}
+        setFormCompanySize={setFormCompanySize}
+        formCategory={formCategory}
+        setFormCategory={setFormCategory}
+        formCompanyIntro={formCompanyIntro}
+        setFormCompanyIntro={setFormCompanyIntro}
+        formPhoto={formPhoto}
+        setFormPhoto={setFormPhoto}
+        formPhotos={formPhotos}
+        setFormPhotos={setFormPhotos}
+        formVideoUrl={formVideoUrl}
+        setFormVideoUrl={setFormVideoUrl}
+        formName={formName}
+        setFormName={setFormName}
+        formOriginalPrice={formOriginalPrice}
+        setFormOriginalPrice={setFormOriginalPrice}
+        formPrice={formPrice}
+        setFormPrice={setFormPrice}
+        formUnit={formUnit}
+        setFormUnit={setFormUnit}
+        formCurrency={formCurrency}
+        setFormCurrency={setFormCurrency}
+        formDesc={formDesc}
+        setFormDesc={setFormDesc}
+      />
+
+      <ProductQuoteModal
+        isOpen={mounted && !!quoteProduct}
+        quoteProduct={quoteProduct}
+        onClose={() => setQuoteProduct(null)}
+        onSubmit={handleSubmitQuote}
+        isEn={isEn}
+        quoteQty={quoteQty}
+        setQuoteQty={setQuoteQty}
+        quotePhone={quotePhone}
+        setQuotePhone={setQuotePhone}
+        quoteNote={quoteNote}
+        setQuoteNote={setQuoteNote}
+        quoteSubmitting={quoteSubmitting}
+      />
+
+      <ProductQuotesListModal
+        isOpen={mounted && !!viewingQuotesProduct}
+        viewingQuotesProduct={viewingQuotesProduct}
+        onClose={() => setViewingQuotesProduct(null)}
+        loadingProductQuotes={loadingProductQuotes}
+        productQuotes={productQuotes}
+        fmt={fmt}
+        onMessage={(peerCode) => {
+          setViewingQuotesProduct(null);
+          navigate({ to: "/association/messages", search: { peerCode } });
+        }}
+      />
+
+      <ProductEditModal
+        isOpen={mounted && !!editingProduct}
+        availableCategories={dynamicCategories}
+        editingProduct={editingProduct}
+        onClose={() => setEditingProduct(null)}
+        onSubmit={handleUpdateProduct}
+        isEn={isEn}
+        editPhoto={editPhoto}
+        setEditPhoto={setEditPhoto}
+        editPhotos={editPhotos}
+        setEditPhotos={setEditPhotos}
+        editVideoUrl={editVideoUrl}
+        setEditVideoUrl={setEditVideoUrl}
+        editName={editName}
+        setEditName={setEditName}
+        editCompany={editCompany}
+        setEditCompany={setEditCompany}
+        editCategory={editCategory}
+        setEditCategory={setEditCategory}
+        editOriginalPrice={editOriginalPrice}
+        setEditOriginalPrice={setEditOriginalPrice}
+        editPrice={editPrice}
+        setEditPrice={setEditPrice}
+        editDesc={editDesc}
+        setEditDesc={setEditDesc}
+        updatingProduct={updatingProduct}
+      />
+
+      {/* ── MODAL GIAN HÀNG DOANH NGHIỆP: ĐÃ CHUYỂN SANG GIAO DIỆN TOÀN MÀN HÌNH B2B STOREFRONT ── */}
+
+
+
+      <ProductExcelModal
+        open={excelImportOpen}
+        onClose={() => setExcelImportOpen(false)}
+        onImportProducts={handleImportExcelProducts}
+      />
+
+      {/* Modal Đăng Ký Chạy Quảng Cáo & Affiliate B2B */}
+      <ProductAdRegistrationModal
+        isOpen={adRegistrationModalOpen}
+        onClose={() => setAdRegistrationModalOpen(false)}
+        onSubmit={handleSubmitAdRequest}
+        adCompany={adCompany}
+        setAdCompany={setAdCompany}
+        adContactPerson={adContactPerson}
+        setAdContactPerson={setAdContactPerson}
+        adPhone={adPhone}
+        setAdPhone={setAdPhone}
+        adEmail={adEmail}
+        setAdEmail={setAdEmail}
+        adDurationMonths={adDurationMonths}
+        setAdDurationMonths={setAdDurationMonths}
+        adGoal={adGoal}
+        setAdGoal={setAdGoal}
+        adBudget={adBudget}
+        setAdBudget={setAdBudget}
+        adProductLink={adProductLink}
+        setAdProductLink={setAdProductLink}
+        adNotes={adNotes}
+        setAdNotes={setAdNotes}
+        adSubmitting={adSubmitting}
+      />
+
+      {/* ── MODAL CHI TIẾT SẢN PHẨM & ĐÁNH GIÁ SHOPEE STYLE ── */}
+      {selectedDetailProduct && (
+        <ShopeeProductDetailModal
+          isOpen={!!selectedDetailProduct}
+          onClose={() => setSelectedDetailProduct(null)}
+          product={selectedDetailProduct}
+          onOpenQuote={(p) => {
+            setSelectedDetailProduct(null);
+            handleOpenQuoteModal(p);
+          }}
+          onMessageSeller={(p) => {
+            setSelectedDetailProduct(null);
+            handleMessageSeller(p);
+          }}
+          onViewStore={(compName) => {
+            setSelectedDetailProduct(null);
+            setViewingCompany({
+              name: compName,
+              avatarUrl: (selectedDetailProduct as any).imageUrl || null,
+              industry: selectedDetailProduct.category,
+            });
+          }}
+          isInterested={interestedIds.includes(selectedDetailProduct.id)}
+          onToggleInterest={() => toggleInterest(selectedDetailProduct.id)}
+          onScheduleMeeting={handleScheduleMeetingWithSeller}
+        />
+      )}
+
+      {/* ── BOTTOM SHEET LÊN LỊCH HẸN 1-1 B2B VỚI CHỦ GIAN HÀNG SÀN THƯƠNG MẠI (CASE 3) ── */}
+      {meetingTarget && (
+        <BusinessConnectBottomSheet
+          target={meetingTarget}
+          isOpen={Boolean(meetingTarget)}
+          onClose={() => setMeetingTarget(null)}
+          initialPurpose={`Hẹn gặp 1-1 xúc tiến thương vụ sản phẩm: ${selectedDetailProduct?.name || "Sản phẩm"}`}
+        />
+      )}
+    </div>
+  );
+}

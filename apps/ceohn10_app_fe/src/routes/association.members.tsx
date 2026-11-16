@@ -1,0 +1,2445 @@
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useMemo, useState, useEffect, useRef } from "react";
+import {
+  BadgeCheck,
+  Briefcase,
+  Building2,
+  Check,
+  Clock,
+  ExternalLink,
+  Globe,
+  Mail,
+  MapPin,
+  MessageSquare,
+  Phone,
+  PhoneCall,
+  Search,
+  User,
+  UserCheck,
+  UserMinus,
+  UserPlus,
+  UserX,
+  Users,
+  X,
+  XCircle,
+  CheckCircle2,
+  Handshake,
+  Calendar,
+  Video,
+  CreditCard,
+  Sparkles,
+  ChevronRight,
+  Compass,
+  QrCode,
+  Navigation,
+  Trash2,
+} from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import { MemberHeader } from "@/components/member/MemberShell";
+import { useServerData } from "@/hooks/use-server-data";
+import {
+  listMembers,
+  getMyMember,
+  type DirectoryMember,
+  type MyMember,
+} from "@/lib/member-app.functions";
+import { useT } from "@/lib/i18n";
+import {
+  useConnectedPeople,
+  useOutgoingRequests,
+  useIncomingRequests,
+  useSendConnectionRequest,
+  useCancelRequest,
+  useAcceptRequest,
+  useDisconnect,
+} from "@/hooks/use-connection";
+import { fetchNestApi, resolveMediaUrl } from "@/lib/api-client";
+import { getConnectAppSocket } from "@/hooks/use-connect-app-socket";
+import { toast } from "sonner";
+import { MemberProfileModal } from "@/components/member/MemberProfileModal";
+import { InviteMemberModal } from "@/components/member/InviteMemberModal";
+import { AssociationQrScanModal } from "@/components/member/AssociationQrScanModal";
+import {
+  BusinessConnectBottomSheet,
+  type BusinessConnectTarget,
+} from "@/components/common/BusinessConnectBottomSheet";
+
+export const Route = createFileRoute("/association/members")({
+  component: MembersScreen,
+});
+
+export type FilterTab = "all" | "invitations" | "sent" | "friends" | "scanned_cards";
+
+export interface MemberMeetingItem {
+  id: string;
+  title: string;
+  hostName?: string;
+  hostCompany?: string;
+  hostPhone?: string;
+  hostCode?: string;
+  hostAvatar?: string;
+  partnerName: string;
+  partnerCompany?: string;
+  partnerPhone?: string;
+  partnerCode?: string;
+  partnerAvatar?: string;
+  date: string;
+  time: string;
+  venueType?: "online" | "offline";
+  venue?: string;
+  onlineUrl?: string;
+  notes?: string;
+  status: "scheduled" | "completed" | "cancelled" | "pending" | "confirmed" | "declined" | string;
+  createdAt?: string;
+  isUserHost?: boolean;
+  isUserInvitee?: boolean;
+}
+
+function normalizeSearchText(str: any): string {
+  if (!str) return "";
+  return String(str)
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/đ/g, "d")
+    .replace(/Đ/g, "d")
+    .trim();
+}
+
+/**
+ * Trích xuất chữ cái đầu của Tên (hoặc từ cuối cùng của Họ Tên)
+ * để sắp xếp danh bạ điện thoại chuẩn A-Z theo phong cách người Việt.
+ */
+function getVietnameseSortKey(fullName: string): string {
+  if (!fullName) return "#";
+  const parts = fullName.trim().split(/\s+/);
+  const firstName = parts[parts.length - 1] || fullName;
+  const firstChar = firstName.charAt(0).toUpperCase();
+  const normalized = firstChar.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  if (firstChar === "Đ" || firstChar === "đ") return "Đ";
+  if (/^[A-Z]$/.test(normalized)) return normalized;
+  return "#";
+}
+
+function compareVietnameseNames(a: string, b: string): number {
+  const partsA = a.trim().split(/\s+/);
+  const partsB = b.trim().split(/\s+/);
+  const nameA = partsA[partsA.length - 1] || a;
+  const nameB = partsB[partsB.length - 1] || b;
+  const cmp = nameA.localeCompare(nameB, "vi", { sensitivity: "base" });
+  if (cmp !== 0) return cmp;
+  return a.localeCompare(b, "vi", { sensitivity: "base" });
+}
+
+const ALPHABET_INDEX = [
+  "A",
+  "B",
+  "C",
+  "D",
+  "Đ",
+  "E",
+  "G",
+  "H",
+  "I",
+  "K",
+  "L",
+  "M",
+  "N",
+  "O",
+  "P",
+  "Q",
+  "R",
+  "S",
+  "T",
+  "U",
+  "V",
+  "X",
+  "Y",
+  "#",
+];
+
+function MembersScreen() {
+  const t = useT();
+  const navigate = useNavigate();
+  const fetchMembers = useServerFn(listMembers);
+  const fetchMyMember = useServerFn(getMyMember);
+  const {
+    data: members,
+    loading,
+    reload: reloadMembers,
+  } = useServerData<DirectoryMember[]>(() => fetchMembers(), []);
+  const { data: myMember } = useServerData<MyMember | null>(() => fetchMyMember(), null);
+
+  const [q, setQ] = useState(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      return params.get("q") || params.get("company") || "";
+    }
+    return "";
+  });
+
+  // Yêu cầu 2: Bộ lọc Cấp 1 (Đã kết nối) | (Chưa kết nối)
+  const [connectionFilter, setConnectionFilter] = useState<"connected" | "unconnected">(() => {
+    if (typeof window !== "undefined") {
+      const t = new URLSearchParams(window.location.search).get("tab");
+      const f = new URLSearchParams(window.location.search).get("filter");
+      if (f === "unconnected" || t === "unconnected" || t === "all" || t === "discover") {
+        return "unconnected";
+      }
+    }
+    return "connected";
+  });
+
+  // Yêu cầu 2: Thứ tự danh mục trong Đã kết nối: Bạn bè (lên đầu) -> Lời mời -> Đã gửi -> Danh thiếp đã lưu
+  const [connectedSubTab, setConnectedSubTab] = useState<"friends" | "invitations" | "sent" | "scanned_cards">(() => {
+    if (typeof window !== "undefined") {
+      const t = new URLSearchParams(window.location.search).get("tab");
+      if (t === "invitations" || t === "sent" || t === "scanned_cards") {
+        return t;
+      }
+    }
+    return "friends";
+  });
+
+  // Yêu cầu 1: Lưu trữ và phát hiện người kết nối mới nhất
+  const [latestConnectedId, setLatestConnectedId] = useState<string | null>(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("vba_latest_connected_id") || null;
+    }
+    return null;
+  });
+
+  // 4 Danh mục chuẩn: Tất cả hội viên | Bạn bè | Lịch hẹn | Danh thiếp đã quét
+  const [tab, setTab] = useState<FilterTab>(() => {
+    if (typeof window !== "undefined") {
+      const t = new URLSearchParams(window.location.search).get("tab");
+      if (t === "all" || t === "invitations" || t === "sent" || t === "friends" || t === "scanned_cards") {
+        return t as FilterTab;
+      }
+      if (t === "meetings") {
+        navigate({ to: "/association/connect" as any });
+        return "friends";
+      }
+      if (t === "connected") return "friends";
+      if (t === "scanned" || t === "cards") return "scanned_cards";
+      if (t === "discover") return "all";
+    }
+    return "friends";
+  });
+
+  const handleSelectTab = (newTab: FilterTab) => {
+    setTab(newTab);
+    if (newTab === "all") {
+      setConnectionFilter("unconnected");
+    } else {
+      setConnectionFilter("connected");
+      if (newTab === "friends" || newTab === "invitations" || newTab === "sent" || newTab === "scanned_cards") {
+        setConnectedSubTab(newTab);
+      }
+    }
+    if (typeof window !== "undefined") {
+      const url = new URL(window.location.href);
+      url.searchParams.set("tab", newTab);
+      window.history.replaceState({}, "", url.toString());
+    }
+  };
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const syncTabFromUrl = () => {
+      const t = new URLSearchParams(window.location.search).get("tab");
+      if (t === "all" || t === "friends" || t === "meetings" || t === "scanned_cards") {
+        setTab(t as FilterTab);
+      } else if (t === "connected") {
+        setTab("friends");
+      } else if (t === "scanned" || t === "cards") {
+        setTab("scanned_cards");
+      } else if (t === "discover" || t === "sent") {
+        setTab("all");
+      }
+    };
+    window.addEventListener("popstate", syncTabFromUrl);
+    return () => window.removeEventListener("popstate", syncTabFromUrl);
+  }, []);
+
+  const [selectedMember, setSelectedMember] = useState<DirectoryMember | null>(null);
+  const [connectTarget, setConnectTarget] = useState<BusinessConnectTarget | null>(null);
+  const [localPending, setLocalPending] = useState<Set<string>>(new Set());
+  const [inviteModalOpen, setInviteModalOpen] = useState(false);
+  const [backendConnectedUserIds, setBackendConnectedUserIds] = useState<Set<string>>(new Set());
+  const [activeAlphabet, setActiveAlphabet] = useState<string | null>(null);
+
+  // Lịch sử cuộc gặp 1-on-1 state
+  const [meetingsList, setMeetingsList] = useState<MemberMeetingItem[]>(() => {
+    if (typeof window === "undefined") return [];
+    try {
+      const stored = localStorage.getItem("vba_connection_appointments");
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+      return [];
+    } catch {
+      return [];
+    }
+  });
+  // Danh thiếp đã quét state (Req 10)
+  const [scannedCards, setScannedCards] = useState<any[]>(() => {
+    if (typeof window === "undefined") return [];
+    try {
+      const raw = localStorage.getItem("ceohn10_scanned_business_cards");
+      return raw ? JSON.parse(raw) : [];
+    } catch {
+      return [];
+    }
+  });
+  const [scanModalOpen, setScanModalOpen] = useState(false);
+
+  const reloadScannedCards = () => {
+    try {
+      const raw = localStorage.getItem("ceohn10_scanned_business_cards");
+      setScannedCards(raw ? JSON.parse(raw) : []);
+    } catch {
+      setScannedCards([]);
+    }
+  };
+
+  const handleRemoveScannedCard = (code: string, name: string) => {
+    try {
+      const raw = localStorage.getItem("ceohn10_scanned_business_cards");
+      const list = raw ? JSON.parse(raw) : [];
+      const updated = list.filter((item: any) => item.code !== code);
+      localStorage.setItem("ceohn10_scanned_business_cards", JSON.stringify(updated));
+      setScannedCards(updated);
+      toast.success(`Đã xóa danh thiếp của ${name} khỏi danh mục đã quét`);
+    } catch (err) {
+      toast.error("Không thể xóa danh thiếp");
+    }
+  };
+
+  useEffect(() => {
+    const handleStorage = (e: StorageEvent) => {
+      if (e.key === "ceohn10_scanned_business_cards") {
+        reloadScannedCards();
+      }
+    };
+    window.addEventListener("storage", handleStorage);
+    return () => window.removeEventListener("storage", handleStorage);
+  }, []);
+
+  const [loadingMeetings, setLoadingMeetings] = useState(false);
+  const [meetingSubTab, setMeetingSubTab] = useState<"confirmed" | "pending" | "all">("confirmed");
+
+  const pendingInvitesCount = useMemo(() => {
+    return meetingsList.filter((m) => m.status === "pending" || m.status === "draft").length;
+  }, [meetingsList]);
+
+  const confirmedMeetingsCount = useMemo(() => {
+    return meetingsList.filter((m) => m.status === "confirmed" || m.status === "accepted" || m.status === "scheduled" || m.status === "upcoming" || m.status === "active").length;
+  }, [meetingsList]);
+
+  const fetchMeetings = async () => {
+    try {
+      setLoadingMeetings(true);
+      const res = await fetchNestApi<any>("/meetings/connection-appointments").catch(() => null);
+      const items = Array.isArray(res) ? res : res?.items || [];
+      setMeetingsList(items);
+      try {
+        localStorage.setItem("vba_connection_appointments", JSON.stringify(items));
+      } catch {
+        /* ignore */
+      }
+    } catch (err) {
+      console.warn("fetchMeetings error:", err);
+    } finally {
+      setLoadingMeetings(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchMeetings();
+    const handleMeetingChanged = () => {
+      fetchMeetings();
+    };
+    window.addEventListener("vba.meeting.changed", handleMeetingChanged);
+    return () => {
+      window.removeEventListener("vba.meeting.changed", handleMeetingChanged);
+    };
+  }, []);
+
+  const handleRespondMeeting = async (
+    meetingId: string,
+    action: "accept" | "decline",
+    partnerName: string,
+  ) => {
+    try {
+      await fetchNestApi(`/meetings/connection-appointments/${meetingId}/respond`, {
+        method: "POST",
+        body: JSON.stringify({ action }),
+      });
+      const newStatus = action === "accept" ? "confirmed" : "declined";
+      setMeetingsList((prev) =>
+        prev.map((item) => (item.id === meetingId ? { ...item, status: newStatus } : item)),
+      );
+      if (action === "accept") {
+        toast.success(`Đã đồng ý lịch hẹn gặp kết nối với ${partnerName || "đối tác"}!`);
+      } else {
+        toast.info("Đã từ chối lịch hẹn gặp kết nối.");
+      }
+      try {
+        window.dispatchEvent(new Event("vba.meeting.changed"));
+      } catch {
+        /* ignore */
+      }
+    } catch (err: any) {
+      toast.error(err?.message || "Không thể phản hồi lịch hẹn kết nối");
+    }
+  };
+
+  const [cancelMeetingTarget, setCancelMeetingTarget] = useState<any | null>(null);
+  const [meetingCancelReason, setMeetingCancelReason] = useState("");
+  const [cancellingMeeting, setCancellingMeeting] = useState(false);
+
+  const handleConfirmCancelMeeting = async () => {
+    if (!cancelMeetingTarget) return;
+    setCancellingMeeting(true);
+    try {
+      await fetchNestApi(`/meetings/connection-appointments/${cancelMeetingTarget.id}/cancel`, {
+        method: "POST",
+        body: JSON.stringify({ reason: meetingCancelReason || "Hủy theo yêu cầu hội viên" }),
+      });
+      setMeetingsList((prev) =>
+        prev.map((item) =>
+          item.id === cancelMeetingTarget.id ? { ...item, status: "cancelled" } : item,
+        ),
+      );
+      // Cập nhật localStorage vba_connection_appointments
+      try {
+        const stored = localStorage.getItem("vba_connection_appointments");
+        if (stored) {
+          const list = JSON.parse(stored);
+          const updated = list.map((item: any) =>
+            item.id === cancelMeetingTarget.id
+              ? { ...item, status: "cancelled", cancelReason: meetingCancelReason || "Hủy theo yêu cầu hội viên" }
+              : item,
+          );
+          localStorage.setItem("vba_connection_appointments", JSON.stringify(updated));
+        }
+      } catch {}
+
+      toast.success("Đã hủy lịch hẹn gặp gỡ thành công!");
+      setCancelMeetingTarget(null);
+      setMeetingCancelReason("");
+      try {
+        window.dispatchEvent(new Event("vba.meeting.changed"));
+        window.dispatchEvent(new Event("vba.connection.changed"));
+      } catch {
+        /* ignore */
+      }
+    } catch (err: any) {
+      toast.error(err?.message || "Lỗi khi hủy lịch hẹn");
+    } finally {
+      setCancellingMeeting(false);
+    }
+  };
+
+  // Tự động mở hồ sơ công ty khi được điều hướng từ banner quảng cáo Marketplace
+  useEffect(() => {
+    if (typeof window === "undefined" || !members || members.length === 0) return;
+    const params = new URLSearchParams(window.location.search);
+    const searchTarget = params.get("q") || params.get("company");
+    if (searchTarget) {
+      const targetLower = searchTarget.toLowerCase().trim();
+      const matched = members.find(
+        (m) =>
+          (m.name && m.name.toLowerCase().includes(targetLower)) ||
+          ((m as any).companyName && (m as any).companyName.toLowerCase().includes(targetLower)) ||
+          ((m as any).company && (m as any).company.toLowerCase().includes(targetLower)) ||
+          (m.code && m.code.toLowerCase() === targetLower),
+      );
+      if (matched) {
+        setSelectedMember(matched);
+      }
+    }
+  }, [members]);
+
+  // Local storage connection synchronization
+  const [disconnectedSet, setDisconnectedSet] = useState<Set<string>>(() => {
+    if (typeof window === "undefined") return new Set();
+    try {
+      const stored = localStorage.getItem("vba.disconnected_members");
+      return stored
+        ? new Set(JSON.parse(stored).map((s: string) => String(s).toLowerCase()))
+        : new Set();
+    } catch {
+      return new Set();
+    }
+  });
+
+  const [connectedSet, setConnectedSet] = useState<Set<string>>(() => {
+    if (typeof window === "undefined") return new Set();
+    try {
+      const s1 = localStorage.getItem("vba.connected_members");
+      const s2 = localStorage.getItem("vba_connected_members");
+      const a1: string[] = s1 ? JSON.parse(s1) : [];
+      const a2: string[] = s2 ? JSON.parse(s2) : [];
+      const combined = [...a1, ...a2].map((s) => String(s).toLowerCase());
+      return new Set(combined);
+    } catch {
+      return new Set();
+    }
+  });
+
+  useEffect(() => {
+    let active = true;
+    void (async () => {
+      try {
+        const res =
+          await fetchNestApi<Array<{ id: string; counterpartUserId: string }>>(
+            "/network/connections",
+          );
+        if (active && Array.isArray(res)) {
+          const uids = new Set<string>();
+          for (const item of res) {
+            if (item?.counterpartUserId) {
+              uids.add(String(item.counterpartUserId).toLowerCase());
+            }
+          }
+          setBackendConnectedUserIds(uids);
+        }
+      } catch {
+        /* ignore */
+      }
+    })();
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const [localSentRequests, setLocalSentRequests] = useState<
+    Array<{
+      id: string;
+      targetUserId?: string | null;
+      targetCode: string;
+      status: "pending" | "accepted" | "rejected";
+      createdAt: string;
+    }>
+  >(() => {
+    if (typeof window === "undefined") return [];
+    try {
+      const stored = localStorage.getItem("vba_sent_connection_requests");
+      return stored ? JSON.parse(stored) : [];
+    } catch {
+      return new Set();
+    }
+  });
+
+  const saveLocalSentRequests = (list: typeof localSentRequests) => {
+    setLocalSentRequests(list);
+    try {
+      localStorage.setItem("vba_sent_connection_requests", JSON.stringify(list));
+    } catch {
+      /* ignore */
+    }
+  };
+
+  useEffect(() => {
+    const handleConnChange = () => {
+      try {
+        const storedD = localStorage.getItem("vba.disconnected_members");
+        setDisconnectedSet(
+          storedD
+            ? new Set(JSON.parse(storedD).map((s: string) => String(s).toLowerCase()))
+            : new Set(),
+        );
+        const s1 = localStorage.getItem("vba.connected_members");
+        const s2 = localStorage.getItem("vba_connected_members");
+        const a1: string[] = s1 ? JSON.parse(s1) : [];
+        const a2: string[] = s2 ? JSON.parse(s2) : [];
+        const combined = [...a1, ...a2].map((s) => String(s).toLowerCase());
+        setConnectedSet(new Set(combined));
+        const storedSent = localStorage.getItem("vba_sent_connection_requests");
+        if (storedSent) {
+          setLocalSentRequests(JSON.parse(storedSent));
+        }
+      } catch {
+        /* ignore */
+      }
+    };
+    window.addEventListener("vba.connection.changed", handleConnChange);
+    window.addEventListener("vba:connection_accepted", handleConnChange);
+    window.addEventListener("storage", handleConnChange);
+    return () => {
+      window.removeEventListener("vba.connection.changed", handleConnChange);
+      window.removeEventListener("vba:connection_accepted", handleConnChange);
+      window.removeEventListener("storage", handleConnChange);
+    };
+  }, []);
+
+  // Connection data hooks from canonical CEO HN10 connection system
+  const { data: connected = [] } = useConnectedPeople(100);
+  const { data: outgoing = [] } = useOutgoingRequests(100);
+  const { data: incoming = [] } = useIncomingRequests(100);
+
+  const sendRequest = useSendConnectionRequest();
+  const cancelRequest = useCancelRequest();
+  const acceptRequest = useAcceptRequest();
+  const disconnect = useDisconnect();
+
+  // Maps for fast connection lookup by target userId
+  const connectedMap = useMemo(() => {
+    const map = new Map<string, string>(); // userId -> connectionId
+    for (const c of connected) {
+      const pid = (c as any).counterpartUserId || c.person?.personNodeId;
+      if (pid) map.set(String(pid).replace(/^u:/, "").toLowerCase(), c.connectionId);
+    }
+    return map;
+  }, [connected]);
+
+  const outgoingMap = useMemo(() => {
+    const map = new Map<string, string>(); // userId -> requestId
+    for (const req of outgoing) {
+      const tid = (req as any).recipientUserId || (req as any).targetPersonNodeId;
+      if (tid) map.set(String(tid).replace(/^u:/, "").toLowerCase(), req.id);
+    }
+    return map;
+  }, [outgoing]);
+
+  const incomingMap = useMemo(() => {
+    const map = new Map<string, string>(); // userId -> requestId
+    for (const req of incoming) {
+      const sid = (req as any).requesterUserId || (req as any).counterpartUserId;
+      if (sid) map.set(String(sid).toLowerCase(), req.id);
+    }
+    return map;
+  }, [incoming]);
+
+  const incomingList = useMemo(() => {
+    return incoming.map((req) => {
+      const uid = (req as any).requesterUserId || (req as any).counterpartUserId;
+      const uidClean = String(uid || "").replace(/^u:/, "").toLowerCase();
+      const m = members.find(
+        (x) =>
+          (x.userId && x.userId.toLowerCase() === uidClean) ||
+          (x.code && x.code.toLowerCase() === uidClean),
+      );
+      return {
+        id: req.id,
+        member: m || null,
+        code: m?.code || uidClean,
+        name: m?.contact || m?.personName || m?.name || "Hội viên CEO HN10",
+        company: (m?.type === "company" ? m?.name : m?.company) || "CLB Doanh Nhân CEO HN10",
+        title: m?.personTitle || m?.industry || "Doanh nhân",
+        avatar: m?.avatar ? resolveMediaUrl(m.avatar) : null,
+        message: (req as any).message || "Rất mong được kết nối giao thương cùng bạn!",
+        createdAt: req.createdAt || new Date().toISOString(),
+        counterpartUserId: uidClean,
+      };
+    });
+  }, [incoming, members]);
+
+  const handleAcceptIncoming = async (item: { id: string; counterpartUserId?: string; code?: string; name: string }) => {
+    try {
+      await fetchNestApi(`/network/connections/${encodeURIComponent(item.id)}`, {
+        method: "PATCH",
+        body: JSON.stringify({
+          status: "accepted",
+          connectionId: item.id,
+          requesterUserId: item.counterpartUserId,
+          memberCode: item.code,
+        }),
+      });
+
+      const idsToAdd = [item.code, item.counterpartUserId, item.id].filter(Boolean) as string[];
+      try {
+        const raw1 = localStorage.getItem("vba_connected_members");
+        const list1 = raw1 ? JSON.parse(raw1) : [];
+        for (const id of idsToAdd) {
+          if (!list1.includes(id)) list1.push(id);
+        }
+        localStorage.setItem("vba_connected_members", JSON.stringify(list1));
+
+        // Yêu cầu 1: Lưu thông tin người mới kết nối nhất
+        const latestId = item.code || item.counterpartUserId || "";
+        if (latestId) {
+          localStorage.setItem("vba_latest_connected_id", latestId);
+        }
+      } catch {}
+
+      setConnectedSet((prev) => {
+        const next = new Set(prev);
+        if (item.code) next.add(item.code.toLowerCase());
+        if (item.counterpartUserId) next.add(item.counterpartUserId.toLowerCase());
+        return next;
+      });
+
+      if (item.code || item.counterpartUserId) {
+        setLatestConnectedId(item.code || item.counterpartUserId || "");
+      }
+
+      toast.success(`Đã đồng ý kết nối với ${item.name}!`);
+      window.dispatchEvent(new CustomEvent("vba:connection_accepted", { detail: item }));
+      window.dispatchEvent(new CustomEvent("vba.connection.changed"));
+      window.dispatchEvent(new CustomEvent("vba:conversation_updated"));
+    } catch (err: any) {
+      toast.error(err?.message || "Không thể đồng ý kết nối");
+    }
+  };
+
+  const handleDeclineIncoming = async (item: { id: string; name: string }) => {
+    try {
+      await fetchNestApi(`/network/connections/${encodeURIComponent(item.id)}`, {
+        method: "PATCH",
+        body: JSON.stringify({ status: "declined", connectionId: item.id }),
+      });
+      toast.success(`Đã từ chối lời mời của ${item.name}`);
+    } catch (err: any) {
+      toast.error(err?.message || "Không thể từ chối lời mời");
+    }
+  };
+
+  const checkIsFriend = (m: DirectoryMember) => {
+    const mCode = m.code.toLowerCase();
+    const mUserId = (m.userId || "").toLowerCase();
+    const isExplicitlyDisconnected =
+      disconnectedSet.has(mCode) || (mUserId && disconnectedSet.has(mUserId));
+    if (isExplicitlyDisconnected) return false;
+    const isExplicitlyConnected = connectedSet.has(mCode) || (mUserId && connectedSet.has(mUserId));
+    if (isExplicitlyConnected) return true;
+    if (mUserId && backendConnectedUserIds.has(mUserId)) return true;
+    return Boolean(m.userId && connectedMap.has(mUserId));
+  };
+
+  // 0. Tất cả hội viên (Danh mục Tất cả hội viên - Yêu cầu 4)
+  const allMembers = useMemo(() => {
+    return members.filter((m) => {
+      if (myMember?.code && m.code.toLowerCase() === myMember.code.toLowerCase()) return false;
+      return true;
+    });
+  }, [members, myMember]);
+
+  const filteredAllMembers = useMemo(() => {
+    const normTerm = normalizeSearchText(q);
+    const list = allMembers.filter((m) => {
+      if (!normTerm) return true;
+      const searchable = normalizeSearchText(
+        [
+          m.name,
+          m.contact,
+          (m as any).personName,
+          (m as any).companyName,
+          (m as any).company,
+          m.industry,
+          m.region,
+          m.code,
+          (m as any).personTitle,
+          (m as any).phone,
+          (m as any).email,
+        ]
+          .filter(Boolean)
+          .join(" "),
+      );
+      return searchable.includes(normTerm);
+    });
+
+    return list.sort((a, b) =>
+      compareVietnameseNames(
+        a.contact || a.personName || a.name || "",
+        b.contact || b.personName || b.name || "",
+      ),
+    );
+  }, [allMembers, q]);
+
+  // 1. Danh sách những người ĐÃ KẾT NỐI (Chỉ xuất hiện trong Danh bạ chính thức)
+  const connectedMembers = useMemo(() => {
+    return members.filter((m) => {
+      if (myMember?.code && m.code.toLowerCase() === myMember.code.toLowerCase()) return false;
+      return checkIsFriend(m);
+    });
+  }, [members, myMember, disconnectedSet, connectedSet, backendConnectedUserIds, connectedMap]);
+
+  // 2. Danh sách hội viên CHƯA KẾT NỐI (Hiển thị ở Tab Khám phá / Tìm kiếm để gửi kết nối)
+  const discoverMembers = useMemo(() => {
+    return members.filter((m) => {
+      if (myMember?.code && m.code.toLowerCase() === myMember.code.toLowerCase()) return false;
+      return !checkIsFriend(m);
+    });
+  }, [members, myMember, disconnectedSet, connectedSet, backendConnectedUserIds, connectedMap]);
+
+  // Lọc và sắp xếp A-Z cho Danh bạ chính
+  const filteredConnected = useMemo(() => {
+    const normTerm = normalizeSearchText(q);
+    const list = connectedMembers.filter((m) => {
+      if (!normTerm) return true;
+      const searchable = normalizeSearchText(
+        [
+          m.name,
+          m.contact,
+          (m as any).personName,
+          (m as any).companyName,
+          (m as any).company,
+          m.industry,
+          m.region,
+          m.code,
+          (m as any).personTitle,
+          (m as any).phone,
+          (m as any).email,
+        ]
+          .filter(Boolean)
+          .join(" "),
+      );
+      return searchable.includes(normTerm);
+    });
+
+    // Sắp xếp A-Z theo phong cách danh bạ Việt Nam (theo tên gọi)
+    return list.sort((a, b) =>
+      compareVietnameseNames(
+        a.contact || a.personName || a.name || "",
+        b.contact || b.personName || b.name || "",
+      ),
+    );
+  }, [connectedMembers, q]);
+
+  // Nhóm liên hệ đã kết nối theo chữ cái A-Z
+  const groupedConnected = useMemo(() => {
+    const groups: Record<string, DirectoryMember[]> = {};
+    for (const m of filteredConnected) {
+      const key = getVietnameseSortKey(m.contact || m.personName || m.name || "");
+      if (!groups[key]) groups[key] = [];
+      groups[key].push(m);
+    }
+    return groups;
+  }, [filteredConnected]);
+
+  // Yêu cầu 1: Tìm người kết nối mới nhất để hiển thị nổi bật ngay trên giao diện
+  const latestConnectedMember = useMemo(() => {
+    if (!latestConnectedId) return null;
+    const l = latestConnectedId.toLowerCase().trim();
+    return (
+      members.find(
+        (m) =>
+          (m.code && m.code.toLowerCase().trim() === l) ||
+          (m.userId && m.userId.toLowerCase().trim() === l),
+      ) || null
+    );
+  }, [members, latestConnectedId]);
+
+  // Các chữ cái thực tế có hội viên trong danh bạ
+  const existingLetters = useMemo(() => {
+    return Object.keys(groupedConnected).sort((a, b) => {
+      if (a === "#") return 1;
+      if (b === "#") return -1;
+      return a.localeCompare(b, "vi");
+    });
+  }, [groupedConnected]);
+
+  // Lọc cho tab Khám phá
+  const filteredDiscover = useMemo(() => {
+    const normTerm = normalizeSearchText(q);
+    const list = discoverMembers.filter((m) => {
+      if (!normTerm) return true;
+      const searchable = normalizeSearchText(
+        [
+          m.name,
+          m.contact,
+          (m as any).personName,
+          (m as any).companyName,
+          (m as any).company,
+          m.industry,
+          m.region,
+          m.code,
+          (m as any).personTitle,
+          (m as any).phone,
+          (m as any).email,
+        ]
+          .filter(Boolean)
+          .join(" "),
+      );
+      return searchable.includes(normTerm);
+    });
+    return list.sort((a, b) =>
+      compareVietnameseNames(
+        a.contact || a.personName || a.name || "",
+        b.contact || b.personName || b.name || "",
+      ),
+    );
+  }, [discoverMembers, q]);
+
+  const filteredMeetings = useMemo(() => {
+    let list = meetingsList;
+    if (meetingSubTab === "confirmed") {
+      list = list.filter((m) => m.status === "confirmed" || m.status === "accepted" || m.status === "scheduled" || m.status === "upcoming" || m.status === "active");
+    } else if (meetingSubTab === "pending") {
+      list = list.filter((m) => m.status === "pending" || m.status === "draft");
+    }
+
+    const normTerm = normalizeSearchText(q);
+    if (!normTerm) return list;
+    return list.filter((m) => {
+      const searchable = normalizeSearchText(
+        [
+          m.title,
+          m.partnerName,
+          m.partnerCompany,
+          m.partnerCode,
+          m.partnerPhone,
+          m.hostName,
+          m.hostCompany,
+          m.venue,
+          m.notes,
+        ]
+          .filter(Boolean)
+          .join(" "),
+      );
+      return searchable.includes(normTerm);
+    });
+  }, [meetingsList, meetingSubTab, q]);
+
+  // Lọc danh thiếp đã quét theo từ khóa tìm kiếm (Req 10)
+  const filteredScannedCards = useMemo(() => {
+    if (!q.trim()) return scannedCards;
+    const normTerm = normalizeSearchText(q);
+    return scannedCards.filter((c: any) => {
+      const searchable = normalizeSearchText(
+        [c.name, c.company, c.title, c.phone, c.email, c.industry, c.code]
+          .filter(Boolean)
+          .join(" "),
+      );
+      return searchable.includes(normTerm);
+    });
+  }, [scannedCards, q]);
+
+  type SentRequestItem = {
+    id: string;
+    member: DirectoryMember | null;
+    code: string;
+    name: string;
+    company: string;
+    title: string;
+    avatar: string | null;
+    purpose?: string;
+    opportunityTitle?: string;
+    status: "pending" | "accepted" | "rejected";
+    createdAt: string;
+    userId?: string | null;
+  };
+
+  const sentList: SentRequestItem[] = useMemo(() => {
+    const map = new Map<string, SentRequestItem>();
+
+    // 1. Process server outgoing requests
+    for (const req of outgoing) {
+      const tid =
+        (req as any).recipientUserId ||
+        (req as any).targetPersonNodeId ||
+        req.recipient?.userId ||
+        req.recipient?.personNodeId;
+      const tidClean = String(tid || "")
+        .replace(/^u:/, "")
+        .toLowerCase();
+      const m = members.find(
+        (x) =>
+          (x.userId && x.userId.toLowerCase() === tidClean) ||
+          (x.code && x.code.toLowerCase() === tidClean),
+      );
+
+      const isConn = m ? checkIsFriend(m) : false;
+      const reqStatus: "pending" | "accepted" | "rejected" = isConn
+        ? "accepted"
+        : req.status === "accepted"
+          ? "accepted"
+          : req.status === "declined" || (req.status as any) === "rejected"
+            ? "rejected"
+            : "pending";
+
+      const itemKey = m?.code || tidClean || req.id;
+      map.set(itemKey.toLowerCase(), {
+        id: req.id,
+        member: m || null,
+        code: m?.code || tidClean,
+        name: m?.contact || m?.personName || m?.name || "Hội viên CEO HN10",
+        company: (m?.type === "company" ? m?.name : m?.company) || "CLB Doanh Nhân CEO HN10",
+        title: m?.personTitle || m?.industry || "Doanh nhân",
+        avatar: m?.avatar ? resolveMediaUrl(m.avatar) : null,
+        purpose: (req as any).message || (req as any).notes,
+        status: reqStatus,
+        createdAt: req.createdAt || new Date().toISOString(),
+        userId: m?.userId || tidClean,
+      });
+    }
+
+    // 2. Process localSentRequests
+    for (const l of localSentRequests) {
+      const key = (l.targetCode || l.targetUserId || l.id).toLowerCase();
+      const m = members.find(
+        (x) =>
+          (x.code && x.code.toLowerCase() === key) || (x.userId && x.userId.toLowerCase() === key),
+      );
+      const isConn = m ? checkIsFriend(m) : false;
+      const finalStatus: "pending" | "accepted" | "rejected" = isConn ? "accepted" : l.status;
+
+      if (!map.has(key)) {
+        map.set(key, {
+          id: l.id,
+          member: m || null,
+          code: m?.code || l.targetCode,
+          name:
+            m?.contact || m?.personName || m?.name || (l as any).targetName || "Hội viên CEO HN10",
+          company:
+            (m?.type === "company" ? m?.name : m?.company) ||
+            (l as any).targetCompany ||
+            "CLB Doanh Nhân CEO HN10",
+          title: m?.personTitle || m?.industry || (l as any).targetTitle || "Doanh nhân",
+          avatar: m?.avatar
+            ? resolveMediaUrl(m.avatar)
+            : (l as any).targetAvatar
+              ? resolveMediaUrl((l as any).targetAvatar)
+              : null,
+          purpose: (l as any).purpose || (l as any).message,
+          opportunityTitle: (l as any).opportunityTitle,
+          status: finalStatus,
+          createdAt: l.createdAt,
+          userId: m?.userId || l.targetUserId,
+        });
+      } else {
+        const existing = map.get(key)!;
+        if (isConn) existing.status = "accepted";
+        if ((l as any).purpose && !existing.purpose) existing.purpose = (l as any).purpose;
+        if ((l as any).opportunityTitle && !existing.opportunityTitle)
+          existing.opportunityTitle = (l as any).opportunityTitle;
+      }
+    }
+
+    // 3. Process localPending
+    for (const p of localPending) {
+      const key = p.toLowerCase();
+      if (!map.has(key)) {
+        const m = members.find(
+          (x) =>
+            (x.code && x.code.toLowerCase() === key) ||
+            (x.userId && x.userId.toLowerCase() === key),
+        );
+        if (m) {
+          map.set(key, {
+            id: `pending-${m.code}`,
+            member: m,
+            code: m.code,
+            name: m.contact || m.personName || m.name,
+            company: (m.type === "company" ? m.name : m.company) || "CLB Doanh Nhân CEO HN10",
+            title: m.personTitle || m.industry || "Doanh nhân",
+            avatar: m.avatar ? resolveMediaUrl(m.avatar) : null,
+            status: "pending",
+            createdAt: new Date().toISOString(),
+            userId: m.userId,
+          });
+        }
+      }
+    }
+
+    const term = q.trim().toLowerCase();
+    const allItems = Array.from(map.values()).sort(
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+    );
+    if (!term) return allItems;
+    return allItems.filter(
+      (i) =>
+        i.name.toLowerCase().includes(term) ||
+        i.company.toLowerCase().includes(term) ||
+        i.code.toLowerCase().includes(term),
+    );
+  }, [
+    outgoing,
+    localSentRequests,
+    localPending,
+    members,
+    connectedSet,
+    disconnectedSet,
+    connectedMap,
+    q,
+  ]);
+
+  const handleCancelSentRequest = async (item: SentRequestItem) => {
+    try {
+      if (item.id && !item.id.startsWith("pending-") && !item.id.startsWith("sent-")) {
+        await cancelRequest.mutateAsync({ requestId: item.id });
+      }
+      setLocalPending((prev) => {
+        const next = new Set(prev);
+        next.delete(item.code.toLowerCase());
+        if (item.userId) next.delete(item.userId.toLowerCase());
+        return next;
+      });
+
+      const nextLocal = localSentRequests.filter(
+        (r) =>
+          r.id !== item.id &&
+          r.targetCode?.toLowerCase() !== item.code.toLowerCase() &&
+          (!item.userId || r.targetUserId?.toLowerCase() !== item.userId.toLowerCase()),
+      );
+      saveLocalSentRequests(nextLocal);
+
+      toast.success(`Đã hủy lời mời kết nối gửi tới ${item.name}`);
+    } catch {
+      setLocalPending((prev) => {
+        const next = new Set(prev);
+        next.delete(item.code.toLowerCase());
+        if (item.userId) next.delete(item.userId.toLowerCase());
+        return next;
+      });
+      const nextLocal = localSentRequests.filter((r) => r.id !== item.id);
+      saveLocalSentRequests(nextLocal);
+      toast.success(`Đã hủy lời mời kết nối gửi tới ${item.name}`);
+    }
+  };
+
+  const handleConnect = async (m: DirectoryMember) => {
+    const target = m.userId || m.code;
+    const displayName = m.contact || m.personName || m.name;
+    const mCode = m.code.toLowerCase();
+    const mUserId = (m.userId || "").toLowerCase();
+
+    try {
+      const storedD = localStorage.getItem("vba.disconnected_members");
+      const dList: string[] = storedD ? JSON.parse(storedD) : [];
+      const nextD = dList.filter(
+        (c) => String(c).toLowerCase() !== mCode && String(c).toLowerCase() !== mUserId,
+      );
+      localStorage.setItem("vba.disconnected_members", JSON.stringify(nextD));
+    } catch {}
+
+    setDisconnectedSet((prev) => {
+      const next = new Set(prev);
+      next.delete(mCode);
+      if (mUserId) next.delete(mUserId);
+      return next;
+    });
+
+    const reqId =
+      typeof crypto !== "undefined" && crypto.randomUUID
+        ? crypto.randomUUID()
+        : "00000000-0000-4000-8000-" + Date.now().toString(16).padStart(12, "0");
+
+    const registerSent = () => {
+      const newSent = {
+        id: reqId,
+        targetCode: m.code,
+        targetUserId: m.userId,
+        targetName: displayName,
+        targetCompany: m.company || m.name,
+        targetTitle: m.personTitle || m.industry,
+        targetAvatar: m.avatar,
+        status: "pending" as const,
+        createdAt: new Date().toISOString(),
+      };
+      saveLocalSentRequests([newSent, ...localSentRequests.filter((r) => r.targetCode !== m.code)]);
+    };
+
+    setLocalPending((prev) => {
+      const next = new Set(prev);
+      next.add(target.toLowerCase());
+      next.add(mCode);
+      if (mUserId) next.add(mUserId);
+      return next;
+    });
+    registerSent();
+
+    // Emit real-time connection:request event over socket
+    try {
+      const socket = getConnectAppSocket();
+      socket.emit("connection:request", {
+        targetUserId: m.userId || m.code,
+        targetMemberCode: m.code,
+        requesterProfile: {
+          display_name: myMember?.name || "Hội viên CEO HN10",
+          name: myMember?.name || "Hội viên CEO HN10",
+          avatar_url: myMember?.avatar,
+          memberCode: myMember?.code,
+          userId: myMember?.userId,
+          company_name: (myMember as any)?.company || "CLB Doanh Nhân CEO HN10",
+          job_title: (myMember as any)?.title || "Hội viên Chính thức",
+          targetMemberCode: m.code,
+          targetMemberId: m.userId,
+        },
+        connectionId: reqId,
+      });
+    } catch {}
+
+    const messageText = `Xin chào, tôi là ${myMember?.name || "Hội viên"} thuộc Hiệp hội Doanh nhân CEO HN10. Rất mong được kết nối cùng bạn!`;
+
+    try {
+      await fetchNestApi<any>("/network/requests", {
+        method: "POST",
+        body: JSON.stringify({
+          connectionId: reqId,
+          targetUserId: m.userId || null,
+          targetMemberCode: m.code,
+          memberCode: m.code,
+          message: messageText,
+        }),
+      });
+      toast.success(`Đã gửi lời mời kết nối tới ${displayName}`);
+    } catch {
+      toast.success(`Đã gửi lời mời kết nối tới ${displayName}`);
+    }
+  };
+
+  const handleDisconnect = async (m: DirectoryMember) => {
+    const personDisplayName = m.contact || m.personName || m.name;
+    if (!window.confirm(`Bạn có chắc chắn muốn xóa ${personDisplayName} khỏi danh bạ liên hệ?`))
+      return;
+
+    const mCode = m.code.toLowerCase();
+    const mUserId = (m.userId || "").toLowerCase();
+
+    try {
+      const storedD = localStorage.getItem("vba.disconnected_members");
+      const dList: string[] = storedD ? JSON.parse(storedD) : [];
+      if (!dList.includes(mCode)) dList.push(mCode);
+      if (mUserId && !dList.includes(mUserId)) dList.push(mUserId);
+      localStorage.setItem("vba.disconnected_members", JSON.stringify(dList));
+
+      const storedC = localStorage.getItem("vba.connected_members");
+      const cList: string[] = storedC ? JSON.parse(storedC) : [];
+      const nextC = cList.filter(
+        (x) => String(x).toLowerCase() !== mCode && String(x).toLowerCase() !== mUserId,
+      );
+      localStorage.setItem("vba.connected_members", JSON.stringify(nextC));
+
+      window.dispatchEvent(
+        new CustomEvent("vba.connection.changed", {
+          detail: { memberCode: m.code, userId: m.userId, connected: false },
+        }),
+      );
+    } catch {
+      /* ignore */
+    }
+
+    setDisconnectedSet((prev) => {
+      const next = new Set(prev);
+      next.add(mCode);
+      if (mUserId) next.add(mUserId);
+      return next;
+    });
+    setConnectedSet((prev) => {
+      const next = new Set(prev);
+      next.delete(mCode);
+      if (mUserId) next.delete(mUserId);
+      return next;
+    });
+
+    toast.success(`Đã xóa ${personDisplayName} khỏi danh bạ`);
+
+    if (m.userId) {
+      try {
+        await disconnect.mutateAsync({ targetPersonNodeId: m.userId });
+      } catch (err) {
+        console.warn("Backend disconnect notice:", err);
+      }
+    }
+  };
+
+  const handleOpenChat = (peerCode: string, peerName: string) => {
+    void navigate({
+      to: "/association/messages",
+      search: { peerCode, peerName },
+    });
+  };
+
+  const handleCallPhone = (phone?: string | null, name?: string) => {
+    if (!phone) {
+      toast.info(`Hội viên ${name || ""} chưa công khai số điện thoại`);
+      return;
+    }
+    window.location.href = `tel:${phone.replace(/\s+/g, "")}`;
+  };
+
+  const scrollToLetter = (letter: string) => {
+    setActiveAlphabet(letter);
+    const targetElement = document.getElementById(`section-letter-${letter}`);
+    if (targetElement) {
+      targetElement.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+    setTimeout(() => setActiveAlphabet(null), 1000);
+  };
+
+  return (
+    <div className="vba-animate pb-24 relative min-h-screen">
+      <MemberHeader title="Danh bạ CEO HN10" back />
+
+      {/* Thanh tìm kiếm phong cách Danh bạ điện thoại */}
+      <div className="px-3 sm:px-4 pt-3 flex items-center gap-2 w-full max-w-full overflow-hidden">
+        <div
+          id="tour-members-search"
+          className="flex-1 min-w-0 flex items-center gap-2.5 rounded-2xl bg-slate-100 dark:bg-white/[0.06] border border-slate-200/60 dark:border-white/10 px-3.5 py-2.5 shadow-xs focus-within:border-[#003B95] dark:focus-within:border-amber-400/80 transition-all"
+        >
+          <Search className="h-4 w-4 text-slate-400 shrink-0" />
+          <input
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            placeholder={
+              tab === "friends"
+                ? "Tìm theo tên CEO, công ty, SĐT trong danh bạ bạn bè..."
+                : tab === "scanned_cards"
+                  ? "Tìm danh thiếp CEO đã quét theo tên, công ty, SĐT..."
+                  : "Tìm kiếm hội viên, ngành nghề..."
+            }
+            className="w-full min-w-0 bg-transparent text-[13px] text-slate-900 dark:text-white border-0 outline-none ring-0 placeholder:text-slate-400 whitespace-normal break-words"
+          />
+          {q && (
+            <button
+              onClick={() => setQ("")}
+              className="text-slate-400 hover:text-slate-600 dark:hover:text-white shrink-0 p-0.5 cursor-pointer"
+              title="Xóa tìm kiếm"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* ── BỘ LỌC CẤP 1: (ĐÃ KẾT NỐI) | (CHƯA KẾT NỐI) (Yêu cầu 2) ── */}
+      <div id="tour-members-filter" className="px-3 sm:px-4 pt-3 select-none">
+        <div className="grid grid-cols-2 p-1 rounded-2xl bg-slate-100 dark:bg-slate-800/80 border border-slate-200/80 dark:border-white/10 gap-1">
+          <button
+            type="button"
+            onClick={() => {
+              setConnectionFilter("connected");
+              handleSelectTab(connectedSubTab);
+            }}
+            className={`py-2 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer ${
+              connectionFilter === "connected"
+                ? "bg-[#003B95] text-white shadow-xs font-black"
+                : "text-slate-600 dark:text-slate-400 hover:text-slate-900"
+            }`}
+          >
+            <UserCheck className="size-3.5" />
+            <span>Đã kết nối ({connectedMembers.length})</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setConnectionFilter("unconnected");
+              handleSelectTab("all");
+            }}
+            className={`py-2 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer ${
+              connectionFilter === "unconnected"
+                ? "bg-[#003B95] text-white shadow-xs font-black"
+                : "text-slate-600 dark:text-slate-400 hover:text-slate-900"
+            }`}
+          >
+            <Users className="size-3.5" />
+            <span>Chưa kết nối ({discoverMembers.length})</span>
+          </button>
+        </div>
+      </div>
+
+      {/* ── BỘ LỌC CẤP 2 (KHI CHỌN ĐÃ KẾT NỐI): BẠN BÈ (LÊN ĐẦU) -> LỜI MỜI -> ĐÃ GỬI -> DANH THIẾP ĐÃ LƯU (Yêu cầu 2) ── */}
+      {connectionFilter === "connected" && (
+        <div className="flex gap-2 px-3 sm:px-4 pt-2.5 overflow-x-auto no-scrollbar select-none">
+          {/* 1. Bạn bè (Đưa lên đầu danh mục theo Yêu cầu 2) */}
+          <button
+            type="button"
+            onClick={() => handleSelectTab("friends")}
+            className={`shrink-0 whitespace-nowrap rounded-xl px-3.5 py-1.5 text-[12px] font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+              tab === "friends"
+                ? "bg-[#003B95] text-white font-black shadow-md shadow-blue-900/25"
+                : "bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-white/10"
+            }`}
+          >
+            <UserCheck className={`h-3.5 w-3.5 ${tab === "friends" ? "text-white" : "text-[#003B95] dark:text-blue-400"}`} />
+            <span>Bạn bè ({connectedMembers.length})</span>
+          </button>
+
+          {/* 2. Lời mời */}
+          <button
+            type="button"
+            onClick={() => handleSelectTab("invitations")}
+            className={`shrink-0 whitespace-nowrap rounded-xl px-3.5 py-1.5 text-[12px] font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+              tab === "invitations"
+                ? "bg-[#003B95] text-white font-black shadow-md shadow-blue-900/25"
+                : "bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-white/10"
+            }`}
+          >
+            <UserPlus className={`h-3.5 w-3.5 ${tab === "invitations" ? "text-white" : "text-[#003B95] dark:text-blue-400"}`} />
+            <span>Lời mời</span>
+            {incomingList.length > 0 && (
+              <span className="px-1.5 py-0.5 rounded-full text-[9px] font-black bg-rose-500 text-white leading-none">
+                {incomingList.length}
+              </span>
+            )}
+          </button>
+
+          {/* 3. Đã gửi */}
+          <button
+            type="button"
+            onClick={() => handleSelectTab("sent")}
+            className={`shrink-0 whitespace-nowrap rounded-xl px-3.5 py-1.5 text-[12px] font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+              tab === "sent"
+                ? "bg-[#003B95] text-white font-black shadow-md shadow-blue-900/25"
+                : "bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-white/10"
+            }`}
+          >
+            <Clock className={`h-3.5 w-3.5 ${tab === "sent" ? "text-white" : "text-[#003B95] dark:text-blue-400"}`} />
+            <span>Đã gửi</span>
+            {sentList.filter((s) => s.status === "pending").length > 0 && (
+              <span className="px-1.5 py-0.5 rounded-full text-[9px] font-black bg-amber-500 text-slate-950 leading-none font-bold">
+                {sentList.filter((s) => s.status === "pending").length}
+              </span>
+            )}
+          </button>
+
+          {/* 4. Danh thiếp đã lưu */}
+          <button
+            type="button"
+            onClick={() => handleSelectTab("scanned_cards")}
+            className={`shrink-0 whitespace-nowrap rounded-xl px-3.5 py-1.5 text-[12px] font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+              tab === "scanned_cards"
+                ? "bg-[#003B95] text-white font-bold shadow-xs ring-1 ring-blue-600"
+                : "bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-white/10"
+            }`}
+          >
+            <QrCode className={`h-3.5 w-3.5 ${tab === "scanned_cards" ? "text-white" : "text-[#003B95] dark:text-blue-400"}`} />
+            <span>Danh thiếp đã lưu ({scannedCards.length})</span>
+          </button>
+        </div>
+      )}
+
+      {/* Nội dung danh bạ chính */}
+      <div className="mt-3 px-3 sm:px-4">
+        {loading && (
+          <div className="py-12 text-center text-[13px] text-slate-400 space-y-2">
+            <div className="h-6 w-6 border-2 border-[#003B95] border-t-transparent rounded-full animate-spin mx-auto" />
+            <p>Đang tải danh bạ CEO HN10...</p>
+          </div>
+        )}
+
+
+
+        {/* ── TAB CHƯA KẾT NỐI / TẤT CẢ HỘI VIÊN (Yêu cầu 2: Chưa kết nối sẽ có danh mục tất cả tài khoản chưa kết nối) ── */}
+        {tab === "all" && !loading && (
+          <div className="space-y-3">
+            {(connectionFilter === "unconnected" ? filteredDiscover.length : filteredAllMembers.length) === 0 ? (
+              <div className="py-12 text-center text-slate-400">
+                <Users className="h-10 w-10 mx-auto text-slate-300 dark:text-slate-600 mb-2" />
+                <p className="text-[13px] font-medium text-slate-500">
+                  {q
+                    ? "Không tìm thấy hội viên phù hợp với từ khóa."
+                    : "Chưa có dữ liệu hội viên."}
+                </p>
+              </div>
+            ) : (
+              (connectionFilter === "unconnected" ? filteredDiscover : filteredAllMembers).map((m) => {
+                const avatarResolved = m.avatar ? resolveMediaUrl(m.avatar) : null;
+                const personDisplayName =
+                  m.contact ||
+                  m.personName ||
+                  (m.type === "individual" ? m.name : "Đại diện Doanh nghiệp");
+                const rawCompany = m.type === "company" ? m.name : (m as any).companyName || m.company || "";
+                // Yêu cầu 2: Khắc phục triệt để lỗi double tên hội viên trong danh bạ
+                const companyDisplayName =
+                  rawCompany && rawCompany.trim().toLowerCase() !== personDisplayName.trim().toLowerCase()
+                    ? rawCompany
+                    : "";
+                const targetId = (m.userId || m.code).toLowerCase();
+                const isFriend = checkIsFriend(m);
+                const isOutgoing = Boolean(
+                  (m.userId && outgoingMap.has(m.userId.toLowerCase())) ||
+                  localPending.has(targetId),
+                );
+
+                return (
+                  <div
+                    key={m.code}
+                    className="rounded-2xl border border-slate-200/80 dark:border-white/10 p-3.5 bg-white dark:bg-[#131a26] shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:border-[#003B95]/40 transition"
+                  >
+                    <div className="flex items-center gap-3 min-w-0 w-full sm:w-auto flex-1">
+                      <button
+                        type="button"
+                        onClick={() => setSelectedMember(m)}
+                        className="relative shrink-0 block cursor-pointer"
+                      >
+                        {avatarResolved ? (
+                          <img
+                            src={avatarResolved}
+                            alt={personDisplayName}
+                            className="h-12 w-12 rounded-full object-cover ring-2 ring-[#003B95]/20"
+                            onError={(e) => {
+                              e.currentTarget.src = "/ceohn10-logo.png";
+                            }}
+                          />
+                        ) : (
+                          <span className="grid h-12 w-12 place-items-center rounded-full bg-blue-50 dark:bg-blue-950/40 text-[#003B95] dark:text-blue-300 ring-2 ring-[#003B95]/20 font-bold text-sm">
+                            {personDisplayName.slice(0, 2).toUpperCase()}
+                          </span>
+                        )}
+                      </button>
+
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <button
+                            type="button"
+                            onClick={() => setSelectedMember(m)}
+                            className="whitespace-normal break-words text-[14px] font-bold text-slate-900 dark:text-white hover:text-[#003B95] dark:hover:text-amber-400 transition-colors text-left cursor-pointer"
+                          >
+                            {personDisplayName}
+                          </button>
+                          {isFriend && (
+                            <span className="rounded-md bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 px-1.5 py-0.2 text-[9px] font-bold">
+                              Bạn bè
+                            </span>
+                          )}
+                        </div>
+                        {companyDisplayName && (
+                          <p className="whitespace-normal break-words text-[11.5px] font-semibold text-slate-600 dark:text-slate-300 mt-0.5">
+                            {companyDisplayName}
+                          </p>
+                        )}
+                        <p className="whitespace-normal break-words text-[11px] text-slate-400 mt-0.5">
+                          {m.personTitle || m.industry || "Hội viên CEO HN10"}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Các nút thao tác */}
+                    <div className="shrink-0 w-full sm:w-auto flex items-center justify-end gap-1.5 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-100 dark:border-white/5">
+                      {isFriend ? (
+                        <div className="flex items-center gap-1.5 w-full sm:w-auto justify-end">
+                          <button
+                            type="button"
+                            onClick={() => handleCallPhone(m.phone, personDisplayName)}
+                            className="h-8 w-8 rounded-full bg-blue-50 dark:bg-blue-950/50 text-[#003B95] dark:text-blue-300 border border-blue-200 dark:border-blue-800 flex items-center justify-center hover:bg-[#003B95] hover:text-white transition cursor-pointer"
+                            title="Gọi điện"
+                          >
+                            <PhoneCall className="h-3.5 w-3.5" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleOpenChat(m.code, personDisplayName)}
+                            className="h-8 w-8 rounded-full bg-blue-100 dark:bg-blue-950/80 text-blue-700 dark:text-blue-300 border border-blue-600 dark:border-blue-400 flex items-center justify-center hover:bg-blue-600 hover:text-white transition cursor-pointer"
+                            title="Nhắn tin"
+                          >
+                            <MessageSquare className="h-3.5 w-3.5" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setSelectedMember(m)}
+                            className="h-8 w-8 rounded-full bg-sky-50 dark:bg-sky-950/50 text-[#003B95] dark:text-sky-300 border border-sky-300 dark:border-sky-800 flex items-center justify-center hover:bg-[#003B95] hover:text-white transition cursor-pointer"
+                            title="Xem Thẻ 83"
+                          >
+                            <CreditCard className="h-3.5 w-3.5" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setConnectTarget({
+                                code: m.code,
+                                name: personDisplayName,
+                                company: (companyDisplayName || m.company) ?? undefined,
+                                title: (m.personTitle || m.industry) ?? undefined,
+                                avatar: m.avatar ?? undefined,
+                                industry: m.industry ?? undefined,
+                                userId: m.userId ?? undefined,
+                              })
+                            }
+                            className="h-8 w-8 rounded-full bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 flex items-center justify-center hover:bg-[#003B95] hover:text-white transition cursor-pointer"
+                            title="Hẹn gặp 1-1"
+                          >
+                            <Handshake className="h-3.5 w-3.5" />
+                          </button>
+                        </div>
+                      ) : isOutgoing ? (
+                        <div className="flex items-center gap-1.5">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const sentItem = sentList.find(
+                                (s) =>
+                                  s.code.toLowerCase() === m.code.toLowerCase() ||
+                                  (m.userId && s.userId?.toLowerCase() === m.userId.toLowerCase()),
+                              );
+                              handleCancelSentRequest(
+                                sentItem || {
+                                  id: `pending-${m.code}`,
+                                  member: m,
+                                  code: m.code,
+                                  name: m.contact || m.personName || m.name,
+                                  company: (m.type === "company" ? m.name : m.company) || "CLB Doanh Nhân CEO HN10",
+                                  title: m.personTitle || m.industry || "Doanh nhân",
+                                  avatar: m.avatar ? resolveMediaUrl(m.avatar) : null,
+                                  status: "pending",
+                                  createdAt: new Date().toISOString(),
+                                  userId: m.userId,
+                                },
+                              );
+                            }}
+                            className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl border border-rose-300 dark:border-rose-700 bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 text-[11px] font-bold hover:bg-rose-100 dark:hover:bg-rose-900/60 transition cursor-pointer shadow-xs active:scale-95"
+                            title="Hủy lời mời kết nối"
+                          >
+                            <X className="h-3 w-3 text-rose-600 dark:text-rose-400" />
+                            <span>Hủy</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setSelectedMember(m)}
+                            className="px-2.5 py-1.5 rounded-xl border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 text-[11px] font-bold hover:bg-slate-100 transition cursor-pointer"
+                          >
+                            Xem thẻ
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-1.5 w-full sm:w-auto justify-end">
+                          <button
+                            type="button"
+                            onClick={() => setSelectedMember(m)}
+                            className="px-3 py-1.5 rounded-xl border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 text-[11px] font-bold hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+                          >
+                            Xem thẻ
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleConnect(m)}
+                            className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-[#003B95] hover:bg-[#002b70] text-white px-3.5 py-1.5 text-[11px] font-black shadow-xs active:scale-95 transition cursor-pointer"
+                          >
+                            <UserPlus className="h-3.5 w-3.5 text-white" />
+                            <span>Kết nối</span>
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })
+            )}
+          </div>
+        )}
+
+        {/* ── TAB INVITATIONS: LỜI MỜI KẾT NỐI NHẬN ĐƯỢC ── */}
+        {tab === "invitations" && !loading && (
+          <div className="space-y-3">
+            {incomingList.length === 0 ? (
+              <div className="py-12 px-4 rounded-2xl border border-dashed border-slate-200 dark:border-white/10 text-center space-y-3 bg-slate-50/50 dark:bg-white/[0.02]">
+                <div className="h-14 w-14 mx-auto rounded-full bg-blue-50 dark:bg-blue-950/40 text-[#003B95] dark:text-blue-400 flex items-center justify-center border border-blue-100 dark:border-blue-900/40 shadow-xs">
+                  <UserPlus className="h-7 w-7" />
+                </div>
+                <div className="space-y-1">
+                  <p className="text-sm font-bold text-slate-800 dark:text-white">Chưa có lời mời kết nối nào</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto">
+                    Khi các doanh nhân trong CLB gửi lời mời hoặc quét mã QR của bạn, danh sách sẽ hiển thị tại đây để bạn đồng ý kết nối.
+                  </p>
+                </div>
+              </div>
+            ) : (
+              incomingList.map((item) => (
+                <div
+                  key={item.id}
+                  className="rounded-2xl border border-slate-200/80 dark:border-white/10 p-3.5 bg-white dark:bg-[#131a26] shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:border-[#003B95]/40 transition"
+                >
+                  <div className="flex items-center gap-3 min-w-0 flex-1">
+                    <div className="relative shrink-0">
+                      {item.avatar ? (
+                        <img
+                          src={item.avatar}
+                          alt={item.name}
+                          className="h-12 w-12 rounded-full object-cover border border-slate-200 dark:border-white/10"
+                        />
+                      ) : (
+                        <div className="h-12 w-12 rounded-full bg-[#003B95] text-white font-bold flex items-center justify-center text-sm">
+                          {item.name.slice(0, 2).toUpperCase()}
+                        </div>
+                      )}
+                      <span className="absolute -bottom-0.5 -right-0.5 size-3.5 rounded-full bg-emerald-500 border-2 border-white dark:border-slate-900" />
+                    </div>
+
+                    <div className="min-w-0 flex-1 space-y-0.5">
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <span className="font-black text-[13px] text-slate-900 dark:text-white truncate">
+                          {item.name}
+                        </span>
+                      </div>
+                      <p className="text-xs text-slate-600 dark:text-slate-300 font-medium truncate">
+                        {item.title} • {item.company}
+                      </p>
+                      <p className="text-[11px] text-slate-400 italic line-clamp-1">
+                        "{item.message}"
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2 shrink-0 justify-end">
+                    <button
+                      type="button"
+                      onClick={() => handleDeclineIncoming(item)}
+                      className="px-3 py-1.5 rounded-xl border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-400 text-xs font-bold hover:bg-slate-100 dark:hover:bg-white/5 transition cursor-pointer"
+                    >
+                      Từ chối
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleAcceptIncoming(item)}
+                      className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-xl bg-[#003B95] hover:bg-[#002b70] text-white text-xs font-black shadow-xs transition cursor-pointer active:scale-95"
+                    >
+                      <Check className="h-3.5 w-3.5 text-white" />
+                      <span>Đồng ý</span>
+                    </button>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        )}
+
+        {/* ── TAB SENT: LỜI MỜI ĐÃ GỬI (CHỜ XÁC NHẬN) ── */}
+        {tab === "sent" && !loading && (
+          <div className="space-y-3">
+            {sentList.length === 0 ? (
+              <div className="py-12 px-4 rounded-2xl border border-dashed border-slate-200 dark:border-white/10 text-center space-y-3 bg-slate-50/50 dark:bg-white/[0.02]">
+                <div className="h-14 w-14 mx-auto rounded-full bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 flex items-center justify-center border border-amber-200/50 shadow-xs">
+                  <Clock className="h-7 w-7" />
+                </div>
+                <div className="space-y-1">
+                  <p className="text-sm font-bold text-slate-800 dark:text-white">Chưa có lời mời nào đang chờ</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto">
+                    Khi bạn gửi lời mời kết nối tới các hội viên khác, yêu cầu đang chờ xác nhận sẽ hiển thị tại đây để bạn có thể xem lại hoặc hủy khi cần.
+                  </p>
+                </div>
+              </div>
+            ) : (
+              sentList.map((item) => (
+                <div
+                  key={item.id}
+                  className="rounded-2xl border border-slate-200/80 dark:border-white/10 p-3.5 bg-white dark:bg-[#131a26] shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:border-amber-400/40 transition"
+                >
+                  <div className="flex items-center gap-3 min-w-0 flex-1">
+                    <div className="relative shrink-0">
+                      {item.avatar ? (
+                        <img
+                          src={item.avatar}
+                          alt={item.name}
+                          className="h-12 w-12 rounded-full object-cover border border-slate-200 dark:border-white/10"
+                        />
+                      ) : (
+                        <div className="h-12 w-12 rounded-full bg-slate-700 text-white font-bold flex items-center justify-center text-sm">
+                          {item.name.slice(0, 2).toUpperCase()}
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="min-w-0 flex-1 space-y-0.5">
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <span className="font-black text-[13px] text-slate-900 dark:text-white truncate">
+                          {item.name}
+                        </span>
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/15 text-amber-700 dark:text-amber-400 border border-amber-500/30">
+                          <Clock className="h-2.5 w-2.5" />
+                          <span>Chờ xác nhận</span>
+                        </span>
+                      </div>
+                      <p className="text-xs text-slate-600 dark:text-slate-300 font-medium truncate">
+                        {item.title} • {item.company}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2 shrink-0 justify-end">
+                    <button
+                      type="button"
+                      onClick={() => handleCancelSentRequest(item)}
+                      className="inline-flex items-center gap-1 px-3.5 py-1.5 rounded-xl border border-rose-300 dark:border-rose-700 bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 text-xs font-bold hover:bg-rose-100 dark:hover:bg-rose-900/60 transition cursor-pointer shadow-xs active:scale-95"
+                    >
+                      <X className="h-3.5 w-3.5" />
+                      <span>Hủy yêu cầu</span>
+                    </button>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        )}
+
+                {/* ── TAB 2: BẠN BÈ CEO (CHỈ HIỆN NGƯỜI ĐÃ KẾT NỐI, NHÓM A-Z) ── */}
+        {tab === "friends" && !loading && (
+          <div className="relative">
+            {/* ── KHỐI NỔI BẬT: NGƯỜI VỪA KẾT NỐI MỚI NHẤT (Yêu cầu 1) ── */}
+            {latestConnectedMember && (
+              <div className="p-3.5 rounded-2xl bg-gradient-to-r from-blue-50/90 to-sky-50/70 dark:from-[#0B1E48]/60 dark:to-[#0A1A3A]/80 border-2 border-[#003B95]/30 dark:border-blue-500/30 shadow-xs mb-3 space-y-2.5 animate-in fade-in">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1.5">
+                    <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-ping" />
+                    <span className="text-[11px] font-black text-[#003B95] dark:text-amber-400 uppercase tracking-wider">
+                      ✨ Vừa kết nối mới nhất
+                    </span>
+                  </div>
+                  <span className="text-[10px] font-semibold text-slate-500 dark:text-slate-400">
+                    Bạn bè mới
+                  </span>
+                </div>
+
+                {(() => {
+                  const m = latestConnectedMember;
+                  const avatarResolved = m.avatar ? resolveMediaUrl(m.avatar) : null;
+                  const personDisplayName =
+                    m.contact ||
+                    m.personName ||
+                    (m.type === "individual" ? m.name : "Đại diện Doanh nghiệp");
+                  const rawCompany = m.type === "company" ? m.name : (m as any).companyName || m.company || "";
+                  const companyDisplayName =
+                    rawCompany && rawCompany.trim().toLowerCase() !== personDisplayName.trim().toLowerCase()
+                      ? rawCompany
+                      : "";
+
+                  return (
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                      <div className="flex items-center gap-3 min-w-0">
+                        <button
+                          type="button"
+                          onClick={() => setSelectedMember(m)}
+                          className="relative shrink-0 block cursor-pointer"
+                        >
+                          {avatarResolved ? (
+                            <img
+                              src={avatarResolved}
+                              alt={personDisplayName}
+                              className="h-12 w-12 rounded-full object-cover ring-2 ring-[#003B95]"
+                              onError={(e) => {
+                                e.currentTarget.src = "/ceohn10-logo.png";
+                              }}
+                            />
+                          ) : (
+                            <span className="grid h-12 w-12 place-items-center rounded-full bg-[#003B95] text-white font-bold text-sm ring-2 ring-[#003B95]/30">
+                              {personDisplayName.slice(0, 2).toUpperCase()}
+                            </span>
+                          )}
+                          <span className="absolute -bottom-0.5 -right-0.5 h-3.5 w-3.5 rounded-full bg-emerald-500 border-2 border-white dark:border-slate-900" />
+                        </button>
+
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            <button
+                              type="button"
+                              onClick={() => setSelectedMember(m)}
+                              className="text-[14px] font-black text-slate-900 dark:text-white hover:text-[#003B95] text-left cursor-pointer"
+                            >
+                              {personDisplayName}
+                            </button>
+                            <span className="rounded-full bg-emerald-500/15 border border-emerald-500/30 px-2 py-0.5 text-[9.5px] font-bold text-emerald-600 dark:text-emerald-400">
+                              Mới kết nối
+                            </span>
+                          </div>
+                          {companyDisplayName ? (
+                            <p className="text-[11.5px] font-semibold text-slate-600 dark:text-slate-300 flex items-center gap-1 mt-0.5">
+                              <Building2 className="h-3 w-3 text-[#003B95] dark:text-amber-400 shrink-0" />
+                              <span>{companyDisplayName}</span>
+                            </p>
+                          ) : null}
+                          <p className="text-[11px] text-slate-400 mt-0.5">
+                            {m.personTitle || m.industry || "Hội viên CEO HN10"}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Bộ 4 icon: 3 nút tối giản 1 màu đồng nhất + 1 nút hủy kết nối rose (Yêu cầu 1) */}
+                      <div className="grid grid-cols-4 sm:flex items-center sm:justify-end gap-1.5 sm:gap-2 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-200/60 dark:border-white/5 w-full sm:w-auto shrink-0">
+                        <button
+                          type="button"
+                          onClick={() => handleOpenChat(m.code, personDisplayName)}
+                          className="flex sm:grid h-9 w-full sm:w-9 items-center justify-center rounded-xl bg-slate-100 dark:bg-white/10 text-slate-700 dark:text-slate-200 border border-slate-200/80 dark:border-white/10 hover:bg-[#003B95] hover:text-white transition active:scale-95 cursor-pointer shadow-2xs"
+                          title="Nhắn tin giao thương"
+                        >
+                          <MessageSquare className="h-4 w-4 stroke-[2.2]" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setSelectedMember(m)}
+                          className="flex sm:grid h-9 w-full sm:w-9 items-center justify-center rounded-xl bg-slate-100 dark:bg-white/10 text-slate-700 dark:text-slate-200 border border-slate-200/80 dark:border-white/10 hover:bg-[#003B95] hover:text-white transition active:scale-95 cursor-pointer shadow-2xs"
+                          title="Xem hồ sơ profile"
+                        >
+                          <User className="h-4 w-4 stroke-[2.2]" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleCallPhone(m.phone, personDisplayName)}
+                          className="flex sm:grid h-9 w-full sm:w-9 items-center justify-center rounded-xl bg-slate-100 dark:bg-white/10 text-slate-700 dark:text-slate-200 border border-slate-200/80 dark:border-white/10 hover:bg-[#003B95] hover:text-white transition active:scale-95 cursor-pointer shadow-2xs"
+                          title={`Gọi điện: ${m.phone || "Chưa có số"}`}
+                        >
+                          <PhoneCall className="h-4 w-4 stroke-[2.2]" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleDisconnect(m)}
+                          className="flex sm:grid h-9 w-full sm:w-9 items-center justify-center rounded-xl bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-900/60 hover:bg-rose-600 hover:text-white transition active:scale-95 cursor-pointer shadow-2xs"
+                          title={`Hủy kết nối với ${personDisplayName}`}
+                        >
+                          <UserX className="h-4 w-4 stroke-[2.2]" />
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })()}
+              </div>
+            )}
+            {/* Thanh Chọn Nhanh Chữ Cái A-Z Dành Cho Điện Thoại Di Động (Mobile-friendly, không đè thẻ, không che khuất thao tác) */}
+            {connectedMembers.length > 0 && existingLetters.length > 0 && (
+              <div className="flex sm:hidden items-center gap-1.5 overflow-x-auto no-scrollbar py-2 px-1 mb-2 select-none border-b border-slate-100 dark:border-white/5">
+                <span className="text-[10px] font-bold text-slate-400 shrink-0 uppercase tracking-wider pl-1">
+                  A-Z:
+                </span>
+                {existingLetters.map((char) => (
+                  <button
+                    key={char}
+                    type="button"
+                    onClick={() => scrollToLetter(char)}
+                    className={`h-7 min-w-[28px] px-1.5 rounded-lg text-[11px] font-black transition-all flex items-center justify-center shrink-0 cursor-pointer active:scale-95 ${
+                      activeAlphabet === char
+                        ? "bg-amber-400 text-slate-950 shadow-xs scale-105"
+                        : "bg-slate-100 dark:bg-white/5 text-[#003B95] dark:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-950/40"
+                    }`}
+                  >
+                    {char}
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {connectedMembers.length === 0 ? (
+              <div className="py-12 px-4 rounded-2xl border border-dashed border-slate-200 dark:border-white/10 text-center space-y-4 bg-slate-50/50 dark:bg-white/[0.02]">
+                <div className="h-16 w-16 mx-auto rounded-full bg-blue-50 dark:bg-blue-950/40 text-[#003B95] dark:text-amber-400 flex items-center justify-center border border-blue-100 dark:border-blue-900/40 shadow-xs">
+                  <Phone className="h-8 w-8" />
+                </div>
+                <div className="max-w-xs mx-auto space-y-1.5">
+                  <h3 className="text-[15px] font-bold text-slate-900 dark:text-white">
+                    Danh bạ CEO chưa có liên hệ nào
+                  </h3>
+                  <p className="text-[12px] text-slate-500 dark:text-slate-400 leading-relaxed">
+                    Chỉ những CEO đã được kết nối với tài khoản mới xuất hiện trong danh bạ cá nhân
+                    của bạn để bảo mật và tối ưu giao thương.
+                  </p>
+                </div>
+                <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => handleSelectTab("all")}
+                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-[#003B95] hover:bg-[#002B70] text-white font-bold px-4 py-2.5 text-[12px] shadow-sm transition active:scale-95 cursor-pointer"
+                  >
+                    <Users className="h-4 w-4 text-white" />
+                    <span>Tìm CEO để kết nối ngay</span>
+                  </button>
+                </div>
+              </div>
+            ) : filteredConnected.length === 0 ? (
+              <div className="py-12 text-center text-slate-400 space-y-2">
+                <Search className="h-8 w-8 mx-auto text-slate-300 dark:text-slate-600" />
+                <p className="text-[13px] font-medium text-slate-500">
+                  Không tìm thấy liên hệ nào khớp với từ khóa "{q}" trong danh bạ.
+                </p>
+              </div>
+            ) : (
+              <div className="sm:pr-10 space-y-4">
+                {existingLetters.map((letter) => {
+                  const letterMembers = groupedConnected[letter] || [];
+                  return (
+                    <div
+                      key={letter}
+                      id={`section-letter-${letter}`}
+                      className="scroll-mt-14 space-y-2"
+                    >
+                      {/* Tiêu đề nhóm chữ cái A-Z kiểu Danh bạ điện thoại */}
+                      <div className="sticky top-12 z-10 flex items-center gap-2 py-1 bg-white/95 dark:bg-[#0A1A3A]/95 backdrop-blur-md">
+                        <span className="grid h-6 w-6 place-items-center rounded-md bg-[#003B95] text-white text-[12px] font-black shadow-xs">
+                          {letter}
+                        </span>
+                        <div className="h-px flex-1 bg-slate-200/80 dark:bg-white/10" />
+                        <span className="text-[11px] font-semibold text-slate-400">
+                          {letterMembers.length} liên hệ
+                        </span>
+                      </div>
+
+                      {/* Danh sách thẻ liên hệ trong chữ cái này */}
+                      <div className="space-y-2.5">
+                        {letterMembers.map((m) => {
+                          const avatarResolved = m.avatar ? resolveMediaUrl(m.avatar) : null;
+                          const personDisplayName =
+                            m.contact ||
+                            m.personName ||
+                            (m.type === "individual" ? m.name : "Đại diện Doanh nghiệp");
+                          const rawCompany = m.type === "company" ? m.name : m.company || "";
+                          // Yêu cầu 2: Khắc phục triệt để lỗi double tên hội viên trong danh bạ
+                          const companyDisplayName =
+                            rawCompany && rawCompany.trim().toLowerCase() !== personDisplayName.trim().toLowerCase()
+                              ? rawCompany
+                              : "";
+
+                          return (
+                            <div
+                              key={m.code}
+                              className="rounded-2xl border border-slate-200/80 dark:border-white/10 p-3 sm:p-3.5 bg-white dark:bg-[#131a26] shadow-xs hover:border-[#003B95]/40 dark:hover:border-amber-400/40 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                            >
+                              {/* Thông tin CEO bên trái */}
+                              <div className="flex items-center gap-3 min-w-0">
+                                <button
+                                  type="button"
+                                  onClick={() => setSelectedMember(m)}
+                                  className="relative shrink-0 block cursor-pointer"
+                                  title="Xem hồ sơ CEO"
+                                >
+                                  {avatarResolved ? (
+                                    <img
+                                      src={avatarResolved}
+                                      alt={personDisplayName}
+                                      className="h-12 w-12 rounded-full object-cover ring-2 ring-[#003B95]/20 dark:ring-amber-400/30"
+                                      onError={(e) => {
+                                        e.currentTarget.src = "/ceohn10-logo.png";
+                                      }}
+                                    />
+                                  ) : (
+                                    <span className="grid h-12 w-12 place-items-center rounded-full bg-blue-50 dark:bg-blue-950/40 text-[#003B95] dark:text-blue-300 ring-2 ring-[#003B95]/20 font-bold text-sm">
+                                      {personDisplayName.slice(0, 2).toUpperCase()}
+                                    </span>
+                                  )}
+                                  <span
+                                    className="absolute -bottom-0.5 -right-0.5 h-3.5 w-3.5 rounded-full bg-emerald-500 border-2 border-white dark:border-[#131a26]"
+                                    title="Đã kết nối"
+                                  />
+                                </button>
+
+                                <div className="min-w-0 flex-1">
+                                  <div className="flex items-center gap-1.5 flex-wrap">
+                                    <button
+                                      type="button"
+                                      onClick={() => setSelectedMember(m)}
+                                      className="whitespace-normal break-words max-w-[170px] sm:max-w-none text-[14px] font-bold text-slate-900 dark:text-white hover:text-[#003B95] dark:hover:text-amber-400 transition-colors text-left cursor-pointer"
+                                    >
+                                      {personDisplayName}
+                                    </button>
+                                    <span className="inline-flex items-center gap-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 px-2 py-0.5 text-[10px] font-bold text-emerald-600 dark:text-emerald-400">
+                                      <CheckCircle2 className="h-2.5 w-2.5" />
+                                      <span>Đã kết nối</span>
+                                    </span>
+                                  </div>
+
+                                  {companyDisplayName ? (
+                                    <p className="whitespace-normal break-words text-[11.5px] font-semibold text-slate-600 dark:text-slate-300 flex items-center gap-1 mt-0.5">
+                                      <Building2 className="h-3 w-3 text-[#003B95] dark:text-amber-400 shrink-0" />
+                                      <span>{companyDisplayName}</span>
+                                    </p>
+                                  ) : null}
+
+                                  <div className="flex items-center gap-2 mt-0.5 text-[11px] text-slate-400">
+                                    <span className="whitespace-normal break-words">
+                                      {m.personTitle || m.industry || "Hội viên CEO HN10"}
+                                    </span>
+                                    {m.phone && (
+                                      <>
+                                        <span>•</span>
+                                        <span className="font-mono text-emerald-600 dark:text-emerald-400 font-semibold">
+                                          {m.phone}
+                                        </span>
+                                      </>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+
+                              {/* Bộ nút thao tác bạn bè: Chỉ có Nhắn tin, Xem profile, Gọi điện (1 màu tối giản) + Hủy kết nối (Yêu cầu 1) */}
+                              <div className="grid grid-cols-4 sm:flex items-center sm:justify-end gap-1.5 sm:gap-2 pt-2.5 sm:pt-0 border-t sm:border-t-0 border-slate-100 dark:border-white/5 w-full sm:w-auto shrink-0">
+                                {/* 1. Nút Nhắn tin trao đổi */}
+                                <button
+                                  type="button"
+                                  onClick={() => handleOpenChat(m.code, personDisplayName)}
+                                  className="flex sm:grid h-9 w-full sm:w-9 items-center justify-center rounded-xl bg-slate-100 dark:bg-white/10 text-slate-700 dark:text-slate-200 border border-slate-200/80 dark:border-white/10 hover:bg-[#003B95] hover:text-white transition active:scale-95 cursor-pointer shadow-2xs"
+                                  title="Nhắn tin giao thương"
+                                >
+                                  <MessageSquare className="h-4 w-4 stroke-[2.2]" />
+                                </button>
+
+                                {/* 2. Nút Xem Profile */}
+                                <button
+                                  type="button"
+                                  onClick={() => setSelectedMember(m)}
+                                  className="flex sm:grid h-9 w-full sm:w-9 items-center justify-center rounded-xl bg-slate-100 dark:bg-white/10 text-slate-700 dark:text-slate-200 border border-slate-200/80 dark:border-white/10 hover:bg-[#003B95] hover:text-white transition active:scale-95 cursor-pointer shadow-2xs"
+                                  title="Xem hồ sơ profile"
+                                >
+                                  <User className="h-4 w-4 stroke-[2.2]" />
+                                </button>
+
+                                {/* 3. Nút Gọi điện thoại */}
+                                <button
+                                  type="button"
+                                  onClick={() => handleCallPhone(m.phone, personDisplayName)}
+                                  className="flex sm:grid h-9 w-full sm:w-9 items-center justify-center rounded-xl bg-slate-100 dark:bg-white/10 text-slate-700 dark:text-slate-200 border border-slate-200/80 dark:border-white/10 hover:bg-[#003B95] hover:text-white transition active:scale-95 cursor-pointer shadow-2xs"
+                                  title={`Gọi điện: ${m.phone || "Chưa có số"}`}
+                                >
+                                  <PhoneCall className="h-4 w-4 stroke-[2.2]" />
+                                </button>
+
+                                {/* 4. Nút Hủy kết nối (Mang màu rose riêng biệt) */}
+                                <button
+                                  type="button"
+                                  onClick={() => handleDisconnect(m)}
+                                  className="flex sm:grid h-9 w-full sm:w-9 items-center justify-center rounded-xl bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-900/60 hover:bg-rose-600 hover:text-white transition active:scale-95 cursor-pointer shadow-2xs"
+                                  title={`Hủy kết nối với ${personDisplayName}`}
+                                >
+                                  <UserX className="h-4 w-4 stroke-[2.2]" />
+                                </button>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  );
+                })}
+
+                {/* Chân danh bạ: Tổng kết số lượng liên hệ */}
+                <div className="pt-6 pb-2 text-center">
+                  <div className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-slate-100 dark:bg-white/5 border border-slate-200/60 dark:border-white/10 text-[11px] font-semibold text-slate-500 dark:text-slate-400 shadow-2xs">
+                    <UserCheck className="h-3.5 w-3.5 text-emerald-500" />
+                    <span>Tổng cộng {filteredConnected.length} CEO đã lưu trong danh bạ</span>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Thanh Chỉ Mục A-Z Cuộn Nhanh Chỉ Hiển Thị Trên Màn Hình Lớn/Tablet (Tránh đè thẻ hoặc chạm nhầm trên điện thoại) */}
+            {connectedMembers.length > 0 && (
+              <div className="hidden sm:flex fixed right-1 sm:right-2 top-1/2 -translate-y-1/2 z-30 flex-col items-center justify-center select-none py-1.5 px-0.5 rounded-full bg-white/80 dark:bg-[#001B54]/80 backdrop-blur-md border border-slate-200/60 dark:border-white/10 shadow-md text-[9px] font-black max-h-[calc(100vh-160px)] overflow-y-auto no-scrollbar">
+                {ALPHABET_INDEX.map((char) => {
+                  const hasEntries = existingLetters.includes(char);
+                  return (
+                    <button
+                      key={char}
+                      type="button"
+                      disabled={!hasEntries}
+                      onClick={() => scrollToLetter(char)}
+                      className={`h-4.5 w-4.5 rounded-full flex items-center justify-center transition-all cursor-pointer ${
+                        activeAlphabet === char
+                          ? "bg-amber-400 text-slate-950 font-bold scale-125"
+                          : hasEntries
+                            ? "text-[#003B95] dark:text-amber-300 hover:scale-115 font-bold"
+                            : "text-slate-300 dark:text-slate-600 opacity-40 cursor-default"
+                      }`}
+                    >
+                      {char}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        )}
+
+        
+        {/* ── TAB 4: DANH THIẾP ĐÃ QUÉT (Yêu cầu 10) ── */}
+        {tab === "scanned_cards" && !loading && (
+          <div className="space-y-3">
+            {/* Thanh công cụ và thống kê danh thiếp đã quét */}
+            <div className="flex items-center justify-between p-3 rounded-2xl bg-gradient-to-r from-sky-900/10 via-[#003B95]/10 to-amber-500/10 border border-[#003B95]/20 dark:border-white/10">
+              <div className="flex items-center gap-2">
+                <div className="size-8 rounded-xl bg-[#003B95] text-white flex items-center justify-center shadow-xs">
+                  <QrCode className="size-4" />
+                </div>
+                <div>
+                  <h4 className="text-[13px] font-bold text-slate-900 dark:text-white leading-tight">
+                    Danh thiếp CEO HN10 đã quét
+                  </h4>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                    {filteredScannedCards.length} danh thiếp được xác thực chính thức
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setScanModalOpen(true)}
+                className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#003B95] hover:bg-[#002B70] text-white font-bold text-xs shadow-xs active:scale-95 transition cursor-pointer"
+              >
+                <QrCode className="size-3.5" />
+                <span>Quét mới</span>
+              </button>
+            </div>
+
+            {filteredScannedCards.length === 0 ? (
+              <div className="py-12 px-4 text-center rounded-3xl border border-dashed border-slate-200 dark:border-white/10 bg-slate-50/50 dark:bg-white/[0.02]">
+                <div className="size-14 rounded-2xl bg-blue-50 dark:bg-blue-950/40 text-[#003B95] dark:text-blue-400 flex items-center justify-center mx-auto mb-3 ring-8 ring-blue-500/10">
+                  <QrCode className="size-7" />
+                </div>
+                <h4 className="text-[14px] font-bold text-slate-900 dark:text-white">
+                  {q ? "Không tìm thấy danh thiếp phù hợp" : "Chưa có danh thiếp đã quét"}
+                </h4>
+                <p className="text-xs text-slate-500 dark:text-slate-400 max-w-xs mx-auto mt-1 mb-4 leading-relaxed whitespace-normal break-words">
+                  {q
+                    ? `Không tìm thấy danh thiếp nào khớp với từ khóa "${q}".`
+                    : "Quét mã QR Thẻ 83 của các hội viên CEO HN10 để tự động lưu vào danh mục này. Danh thiếp không thuộc CEO HN10 sẽ được gợi ý lưu vào danh bạ thiết bị hoặc kết nối Zalo."}
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setScanModalOpen(true)}
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#003B95] hover:bg-[#002B70] text-white font-bold text-xs shadow-xs active:scale-95 transition cursor-pointer"
+                >
+                  <QrCode className="size-4" />
+                  <span>Quét danh thiếp ngay</span>
+                </button>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 gap-3">
+                {filteredScannedCards.map((card: any) => {
+                  const avatarResolved = card.avatar ? resolveMediaUrl(card.avatar) : null;
+                  const formattedDate = card.scannedAt
+                    ? new Date(card.scannedAt).toLocaleDateString("vi-VN", {
+                        day: "2-digit",
+                        month: "2-digit",
+                        year: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })
+                    : "";
+
+                  return (
+                    <div
+                      key={card.code}
+                      className="rounded-2xl border border-slate-200/80 dark:border-white/10 p-3.5 bg-white dark:bg-[#131a26] shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:border-[#003B95]/40 transition"
+                    >
+                      <div className="flex items-start sm:items-center gap-3 min-w-0 flex-1">
+                        <div className="relative shrink-0">
+                          {avatarResolved ? (
+                            <img
+                              src={avatarResolved}
+                              alt={card.name}
+                              className="size-12 rounded-full object-cover ring-2 ring-[#003B95]/20"
+                              onError={(e) => {
+                                e.currentTarget.src = "/ceohn10-logo.png";
+                              }}
+                            />
+                          ) : (
+                            <span className="grid size-12 place-items-center rounded-full bg-blue-50 dark:bg-blue-950/40 text-[#003B95] dark:text-blue-300 ring-2 ring-[#003B95]/20 font-bold text-sm">
+                              {(card.name || "CEO").slice(0, 2).toUpperCase()}
+                            </span>
+                          )}
+                        </div>
+
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            <span className="text-[14px] font-bold text-slate-900 dark:text-white whitespace-normal break-words">
+                              {card.name}
+                            </span>
+                            <span className="inline-flex items-center gap-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 px-2 py-0.5 text-[10px] font-bold text-emerald-600 dark:text-emerald-400">
+                              <BadgeCheck className="size-2.5" />
+                              <span>Hội viên CEO HN10</span>
+                            </span>
+                          </div>
+
+                          {card.company && (
+                            <p className="text-[11.5px] font-semibold text-slate-600 dark:text-slate-300 flex items-center gap-1 mt-0.5 whitespace-normal break-words">
+                              <Building2 className="size-3 text-[#003B95] dark:text-amber-400 shrink-0" />
+                              <span>{card.company}</span>
+                            </p>
+                          )}
+
+                          <div className="flex items-center gap-2 mt-0.5 text-[11px] text-slate-400 flex-wrap">
+                            <span className="whitespace-normal break-words">
+                              {card.title || card.industry || "Doanh nhân CEO HN10"}
+                            </span>
+                            {card.phone && (
+                              <>
+                                <span>•</span>
+                                <span className="font-mono text-emerald-600 dark:text-emerald-400 font-semibold">
+                                  {card.phone}
+                                </span>
+                              </>
+                            )}
+                            {formattedDate && (
+                              <>
+                                <span>•</span>
+                                <span className="text-[10px] text-slate-400 flex items-center gap-0.5">
+                                  <Clock className="size-2.5" />
+                                  <span>Quét lúc: {formattedDate}</span>
+                                </span>
+                              </>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Các nút hành động */}
+                      <div className="shrink-0 flex items-center gap-1.5 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-100 dark:border-white/5 flex-wrap justify-end">
+                        {/* Xem thẻ điện tử */}
+                        <Link
+                          to="/card/$code"
+                          params={{ code: card.code }}
+                          className="px-2.5 py-1.5 rounded-xl bg-sky-50 dark:bg-sky-950/50 text-[#003B95] dark:text-sky-300 border border-sky-300 dark:border-sky-800 hover:bg-[#003B95] hover:text-white text-[11px] font-bold transition active:scale-95 cursor-pointer flex items-center gap-1 shadow-2xs"
+                          title="Xem Thẻ 83 điện tử"
+                        >
+                          <CreditCard className="size-3.5" />
+                          <span>Xem Thẻ 83</span>
+                        </Link>
+
+                        {/* Nhắn tin */}
+                        <button
+                          type="button"
+                          onClick={() => handleOpenChat(card.code, card.name)}
+                          className="px-2.5 py-1.5 rounded-xl bg-[#003B95] hover:bg-[#002B70] text-white text-[11px] font-bold shadow-xs active:scale-95 transition cursor-pointer flex items-center gap-1"
+                          title="Nhắn tin trực tiếp"
+                        >
+                          <MessageSquare className="size-3.5 text-white" />
+                          <span>Nhắn tin</span>
+                        </button>
+
+                        {/* Gọi điện */}
+                        {card.phone && (
+                          <button
+                            type="button"
+                            onClick={() => handleCallPhone(card.phone, card.name)}
+                            className="px-2.5 py-1.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800 hover:bg-emerald-600 hover:text-white text-[11px] font-bold transition active:scale-95 cursor-pointer flex items-center gap-1"
+                            title="Gọi điện thoại"
+                          >
+                            <PhoneCall className="size-3.5" />
+                            <span>Gọi điện</span>
+                          </button>
+                        )}
+
+                        {/* Xóa danh thiếp */}
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveScannedCard(card.code, card.name)}
+                          className="p-1.5 rounded-xl border border-rose-200 dark:border-rose-900/40 bg-rose-50 dark:bg-rose-950/20 text-rose-600 dark:text-rose-400 hover:bg-rose-100 transition cursor-pointer"
+                          title="Xóa khỏi danh bạ đã quét"
+                        >
+                          <Trash2 className="size-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* Modal Hủy Lịch Hẹn Gặp Gỡ Kết Nối 1-on-1 */}
+      {cancelMeetingTarget && (
+        <div className="fixed inset-0 z-[99999] grid place-items-center w-full h-[100dvh] bg-black/70 backdrop-blur-xs p-4">
+          <div className="w-full max-w-sm rounded-3xl bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/10 p-5 shadow-2xl space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-100 dark:border-white/10 pb-3">
+              <div className="flex items-center gap-2">
+                <span className="grid h-8 w-8 place-items-center rounded-xl bg-rose-500/10 text-rose-600">
+                  <XCircle className="h-4 w-4" />
+                </span>
+                <h3 className="text-sm font-bold text-slate-900 dark:text-white">
+                  Hủy Lịch Hẹn Kết Nối
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setCancelMeetingTarget(null)}
+                className="grid h-7 w-7 place-items-center rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-slate-600 cursor-pointer"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+
+            <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+              Bạn có chắc chắn muốn hủy cuộc hẹn <strong>"{cancelMeetingTarget.title}"</strong> với {cancelMeetingTarget.partnerName}?
+            </p>
+
+            <div>
+              <label className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 block mb-1">
+                Lý do hủy cuộc hẹn:
+              </label>
+              <textarea
+                value={meetingCancelReason}
+                onChange={(e) => setMeetingCancelReason(e.target.value)}
+                placeholder="Nhập lý do bận đột xuất, dời lịch..."
+                className="w-full rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-900/60 p-2.5 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-rose-500/40 resize-none h-20"
+              />
+            </div>
+
+            <div className="flex items-center gap-2 pt-1">
+              <button
+                type="button"
+                onClick={() => setCancelMeetingTarget(null)}
+                className="flex-1 py-2.5 rounded-xl border border-slate-200 dark:border-white/10 text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+              >
+                Giữ lịch hẹn
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmCancelMeeting}
+                disabled={cancellingMeeting}
+                className="flex-1 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-md shadow-rose-600/20 active:scale-95 transition cursor-pointer disabled:opacity-50"
+              >
+                {cancellingMeeting ? "Đang hủy..." : "Xác nhận hủy"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Footer Cố Định: Nút Giới Thiệu Hội Viên (Yêu cầu 4) */}
+      <div className="sticky bottom-0 z-20 bg-white/95 dark:bg-[#001B54]/95 backdrop-blur-md border-t border-slate-200 dark:border-white/10 px-4 py-3 shadow-lg flex items-center justify-between gap-3">
+        <div className="min-w-0">
+          <p className="text-xs font-bold text-slate-800 dark:text-white truncate">
+            CLB Doanh Nhân CEO HN10
+          </p>
+          <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate">
+            Mời bạn bè và đối tác doanh nhân gia nhập
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={() => setInviteModalOpen(true)}
+          className="shrink-0 flex items-center gap-1.5 rounded-xl bg-[#003B95] hover:bg-[#002B70] text-white font-bold px-4 py-2 text-xs shadow-sm active:scale-95 transition cursor-pointer"
+        >
+          <UserPlus className="h-4 w-4" />
+          <span>Giới thiệu hội viên</span>
+        </button>
+      </div>
+
+      {/* Member Profile Modal */}
+      <MemberProfileModal
+        member={selectedMember}
+        initialConnected={selectedMember ? checkIsFriend(selectedMember) : false}
+        isPending={
+          selectedMember
+            ? Boolean(
+                (selectedMember.userId && outgoingMap.has(selectedMember.userId.toLowerCase())) ||
+                  localPending.has((selectedMember.userId || selectedMember.code).toLowerCase()),
+              )
+            : false
+        }
+        onClose={() => setSelectedMember(null)}
+        onMessage={(m) => {
+          const pName = m.contact || m.personName || m.name;
+          setSelectedMember(null);
+          handleOpenChat(m.code, pName);
+        }}
+        onConnect={(m) => handleConnect(m)}
+        onDisconnect={(m) => handleDisconnect(m)}
+      />
+
+      {/* Invite New Member Modal */}
+      <InviteMemberModal
+        isOpen={inviteModalOpen}
+        onClose={() => setInviteModalOpen(false)}
+        memberCode={myMember?.code || "HN10-292"}
+        memberName={myMember?.name || "Lãnh đạo Doanh nghiệp"}
+        memberEmail={myMember?.email || "admin@connect.vn"}
+      />
+
+      {/* Business Meeting Connection Bottom Sheet */}
+      <BusinessConnectBottomSheet
+        isOpen={Boolean(connectTarget)}
+        target={connectTarget}
+        onClose={() => setConnectTarget(null)}
+        onSuccess={() => void reloadMembers()}
+      />
+
+      {/* Association QR Code Scanner Modal (Req 10) */}
+      <AssociationQrScanModal
+        open={scanModalOpen}
+        onClose={() => {
+          setScanModalOpen(false);
+          reloadScannedCards();
+        }}
+      />
+    </div>
+  );
+}

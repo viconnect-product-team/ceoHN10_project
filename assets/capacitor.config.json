@@ -1,0 +1,9 @@
+{
+	"appId": "vn.ceohn10.app",
+	"appName": "CEO HN10",
+	"webDir": "www",
+	"server": {
+		"url": "http://14.225.217.232:5002",
+		"cleartext": true
+	}
+}

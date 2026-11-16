@@ -1,0 +1,139 @@
+const ts = require('typescript');
+const fs = require('fs');
+const path = require('path');
+
+const filesToVerify = [
+  path.resolve(__dirname, '../apps/ceohn10_app_fe/src/components/common/DepartmentMemberTreeSelect.tsx'),
+  path.resolve(__dirname, '../apps/ceohn10_app_fe/src/routes/meetings.tsx'),
+  path.resolve(__dirname, '../apps/ceohn10_app_fe/src/components/meetings/Create1on1MeetingModal.tsx'),
+  path.resolve(__dirname, '../apps/ceohn10_app_fe/src/routes/association.profile.tsx'),
+  path.resolve(__dirname, '../apps/ceohn10_app_fe/src/components/member/CardPreviewModal.tsx'),
+  path.resolve(__dirname, '../apps/ceohn10_app_fe/src/routes/register.tsx'),
+  path.resolve(__dirname, '../apps/ceohn10_app_fe/src/components/member/AssociationCardCaptureModal.tsx'),
+  path.resolve(__dirname, '../apps/ceohn10_app_fe/src/routes/association.profile.tsx'),
+  path.resolve(__dirname, '../apps/ceohn10_app_fe/src/routes/events.$eventId.register.tsx'),
+  path.resolve(__dirname, '../apps/ceohn10_app_fe/src/routes/guest-event-register.$eventId.tsx'),
+  path.resolve(__dirname, '../apps/ceohn10_app_fe/src/components/events/modals/EventSuccessNoticeModal.tsx'),
+  path.resolve(__dirname, '../apps/ceohn10_app_be/src/events/events.service.ts'),
+  path.resolve(__dirname, '../apps/ceohn10_app_be/src/main.ts'),
+  path.resolve(__dirname, '../apps/ceohn10_app_fe/src/components/landing/Ceo1983MemberRegistrationForm.tsx'),
+  path.resolve(__dirname, '../apps/ceohn10_app_fe/src/components/marketplace/MarketplaceAdSlider.tsx'),
+  path.resolve(__dirname, '../apps/ceohn10_app_fe/src/routes/association.members.tsx'),
+  path.resolve(__dirname, '../apps/ceohn10_app_fe/src/components/common/QuickProfileEditModal.tsx'),
+  path.resolve(__dirname, '../apps/ceohn10_app_fe/src/routes/association.index.tsx'),
+  path.resolve(__dirname, '../apps/ceohn10_app_fe/src/routes/meetings.tsx'),
+  path.resolve(__dirname, '../apps/ceohn10_app_fe/src/components/dashboard/RbacPermissionMatrix.tsx'),
+  path.resolve(__dirname, '../apps/ceohn10_app_fe/src/components/marketplace/ShopeeProductDetailModal.tsx'),
+  path.resolve(__dirname, '../apps/ceohn10_app_fe/src/routes/association.products.tsx'),
+  path.resolve(__dirname, '../apps/ceohn10_app_fe/src/routes/marketplace.index.tsx'),
+  path.resolve(__dirname, '../apps/ceohn10_app_fe/src/constants/permissions.ts'),
+  path.resolve(__dirname, '../apps/ceohn10_app_fe/src/hooks/use-role.ts'),
+  path.resolve(__dirname, '../apps/ceohn10_app_fe/src/routes/association.permissions.tsx'),
+  path.resolve(__dirname, '../apps/ceohn10_app_fe/src/components/dashboard/Sidebar.tsx'),
+  path.resolve(__dirname, '../apps/ceohn10_app_fe/src/lib/rbac-permission-helpers.ts'),
+  path.resolve(__dirname, '../apps/ceohn10_app_fe/src/routes/permissions.tsx'),
+  path.resolve(__dirname, '../apps/ceohn10_app_be/src/upload/upload.service.ts'),
+  path.resolve(__dirname, '../apps/ceohn10_app_be/src/users/users.module.ts'),
+  path.resolve(__dirname, '../apps/ceohn10_app_be/src/users/users.service.ts'),
+  path.resolve(__dirname, '../apps/ceohn10_app_be/src/users/users.controller.ts'),
+  path.resolve(__dirname, '../apps/ceohn10_app_be/src/connect-app/me.controller.ts'),
+  path.resolve(__dirname, '../apps/ceohn10_app_be/src/connect-app/connect-app.module.ts'),
+  path.resolve(__dirname, '../apps/ceohn10_app_fe/src/lib/api-client.ts'),
+  path.resolve(__dirname, '../apps/ceohn10_app_fe/src/routes/profile.tsx'),
+  path.resolve(__dirname, '../apps/ceohn10_app_fe/src/routes/account-settings.index.tsx'),
+  path.resolve(__dirname, '../apps/ceohn10_app_fe/src/components/dashboard/ProfileMenu.tsx'),
+  path.resolve(__dirname, '../apps/ceohn10_app_fe/src/components/dashboard/AssociationSwitcher.tsx'),
+  path.resolve(__dirname, '../apps/ceohn10_app_fe/src/components/dashboard/Sidebar.tsx'),
+  path.resolve(__dirname, '../apps/ceohn10_app_be/src/mail/mail.service.ts'),
+  path.resolve(__dirname, '../apps/ceohn10_app_be/src/members/members.service.ts'),
+  path.resolve(__dirname, '../apps/ceohn10_app_fe/src/components/common/FormattedCurrencyInput.tsx'),
+  path.resolve(__dirname, '../apps/ceohn10_app_fe/src/components/common/StandardDateInput.tsx'),
+  path.resolve(__dirname, '../apps/ceohn10_app_fe/src/lib/date-format.ts'),
+  path.resolve(__dirname, '../apps/ceohn10_app_fe/src/routes/association.profile.tsx'),
+  path.resolve(__dirname, 'build_master_user_guide_pdf.js'),
+  path.resolve(__dirname, 'build_master_srs_word_and_md.js'),
+  path.resolve(__dirname, 'build_master_brd_word_and_md.js'),
+  path.resolve(__dirname, 'build_master_hdsd_word.js'),
+  path.resolve(__dirname, 'build_all_master_slides.js'),
+  path.resolve(__dirname, 'test_live_smtp_dispatch.js'),
+  // Files edited for CEO HN10 CRM & Mobile bugfixes
+  path.resolve(__dirname, '../apps/ceohn10_app_be/src/auth/auth.service.ts'),
+  path.resolve(__dirname, '../apps/ceohn10_app_be/src/connect-app/services/community.service.ts'),
+  path.resolve(__dirname, '../apps/ceohn10_app_be/src/connect-app/services/content.service.ts'),
+  path.resolve(__dirname, '../apps/ceohn10_app_be/src/connect-app/services/network.service.ts'),
+  path.resolve(__dirname, '../apps/ceohn10_app_be/src/members/members.service.ts'),
+  path.resolve(__dirname, '../apps/ceohn10_app_be/src/sponsors/sponsors.repository.ts'),
+  path.resolve(__dirname, '../apps/ceohn10_app_be/src/sponsors/sponsors.service.ts'),
+  path.resolve(__dirname, '../apps/ceohn10_app_be/src/users/users.service.ts'),
+  path.resolve(__dirname, '../apps/ceohn10_app_fe/src/components/dashboard/CrudModal.tsx'),
+  path.resolve(__dirname, '../apps/ceohn10_app_fe/src/hooks/use-connect-app-realtime-notifications.tsx'),
+  path.resolve(__dirname, '../apps/ceohn10_app_fe/src/lib/documents.functions.ts'),
+  path.resolve(__dirname, '../apps/ceohn10_app_fe/src/lib/marketplace.functions.ts'),
+  path.resolve(__dirname, '../apps/ceohn10_app_fe/src/lib/meetings.functions.ts'),
+  path.resolve(__dirname, '../apps/ceohn10_app_fe/src/lib/news.functions.ts'),
+  path.resolve(__dirname, '../apps/ceohn10_app_fe/src/lib/opportunities.functions.ts'),
+  path.resolve(__dirname, '../apps/ceohn10_app_fe/src/routes/association.login.tsx'),
+  path.resolve(__dirname, '../apps/ceohn10_app_fe/src/routes/association.tsx'),
+  path.resolve(__dirname, '../apps/ceohn10_app_fe/src/routes/documents.index.tsx'),
+  path.resolve(__dirname, '../apps/ceohn10_app_fe/src/routes/marketplace.index.tsx'),
+  path.resolve(__dirname, '../apps/ceohn10_app_fe/src/routes/news.tsx'),
+  path.resolve(__dirname, '../apps/ceohn10_app_be/src/meetings/meetings.service.ts'),
+  path.resolve(__dirname, '../apps/ceohn10_app_be/src/connect-app/services/marketplace.service.ts'),
+  path.resolve(__dirname, '../apps/ceohn10_app_be/src/connect-app/connect-app.service.ts'),
+  path.resolve(__dirname, '../apps/ceohn10_app_be/src/connect-app/marketplace.controller.ts'),
+  path.resolve(__dirname, '../apps/ceohn10_app_fe/src/lib/events.functions.ts'),
+  path.resolve(__dirname, '../apps/ceohn10_app_fe/src/lib/dashboard.functions.ts'),
+];
+
+let hasErrors = false;
+
+console.log('=== KIỂM TRA AST CÚ PHÁP & TRANSPILE CÁC FILE CHỈNH SỬA ===\n');
+
+filesToVerify.forEach(filePath => {
+  const relPath = path.relative(path.resolve(__dirname, '..'), filePath);
+  if (!fs.existsSync(filePath)) {
+    console.error(`[ERROR] File không tồn tại: ${relPath}`);
+    hasErrors = true;
+    return;
+  }
+
+  const content = fs.readFileSync(filePath, 'utf8');
+
+  if (filePath.endsWith('.ts') || filePath.endsWith('.tsx')) {
+    const result = ts.transpileModule(content, {
+      compilerOptions: {
+        target: ts.ScriptTarget.ES2022,
+        jsx: ts.JsxEmit.ReactJSX,
+        module: ts.ModuleKind.ESNext
+      },
+      reportDiagnostics: true
+    });
+
+    if (result.diagnostics && result.diagnostics.length > 0) {
+      console.error(`[SYNTAX ERROR] ${relPath}:`);
+      result.diagnostics.forEach(diag => {
+        const message = ts.flattenDiagnosticMessageText(diag.messageText, '\n');
+        console.error(`  -> Lỗi: ${message}`);
+      });
+      hasErrors = true;
+    } else {
+      console.log(`[PASS] ${relPath} (0 syntax errors)`);
+    }
+  } else if (filePath.endsWith('.js')) {
+    try {
+      require(filePath);
+      console.log(`[PASS] ${relPath} (0 syntax errors)`);
+    } catch (err) {
+      console.error(`[ERROR] ${relPath}: ${err.message}`);
+      hasErrors = true;
+    }
+  }
+});
+
+if (hasErrors) {
+  console.error('\n=> PHÁT HIỆN LỖI TRONG FILE CHỈNH SỬA!');
+  process.exit(1);
+} else {
+  console.log('\n=> TẤT CẢ FILE ĐÃ ĐẠT 100% CHUẨN CÚ PHÁP, 0 ERRORS!');
+  process.exit(0);
+}

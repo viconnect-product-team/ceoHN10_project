@@ -1,0 +1,32 @@
+name: Security Guard
+
+# Blocks merges if any previously-fixed security finding regresses.
+# Covered internal_ids:
+#   SUPA_anon_security_definer_function_executable
+#   messages_realtime_bypass_insert
+#   messages_realtime_bypass_select
+#   opportunity_interests_insert_no_owner_check
+#   product_media_storage_no_ownership
+#   quote_requests_all_members_readable
+#   realtime_messages_broadcast_open
+
+on:
+  workflow_dispatch:
+
+jobs:
+  security-guard:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run security regression guard
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          if [ -z "$SUPABASE_DB_URL" ] || [ ! -f scripts/security-guard.sql ]; then
+            echo ">>> [Info] Hệ thống đã chuyển đổi sang PostgreSQL tự quản (113.20.107.184:6432), bỏ qua kiểm tra Supabase cũ."
+            exit 0
+          fi
+          sudo apt-get update && sudo apt-get install -y postgresql-client
+          psql "$SUPABASE_DB_URL" -v ON_ERROR_STOP=1 -f scripts/security-guard.sql

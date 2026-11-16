@@ -1,0 +1,848 @@
+import { type ReactNode, useEffect, useState, useMemo } from "react";
+import { X, ImagePlus, Trash2, Loader2, Check, FileText, UploadCloud } from "lucide-react";
+import { uploadFile, resolveMediaUrl } from "@/lib/api-client";
+import { KY_NIEM_4_NAM_BANNER_URL } from "@/assets/ky_niem_4_nam_banner";
+import { toast } from "sonner";
+
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+
+export type CrudFieldOption = {
+  value: string;
+  label: string;
+  subtitle?: string;
+  avatar?: string;
+};
+
+export type CrudField =
+  | {
+      name: string;
+      label: string;
+      type: "text" | "number" | "date";
+      required?: boolean;
+      placeholder?: string;
+    }
+  | { name: string; label: string; type: "textarea"; required?: boolean; placeholder?: string }
+  | {
+      name: string;
+      label: string;
+      type: "select";
+      options: { value: string; label: string }[];
+      required?: boolean;
+      placeholder?: string;
+    }
+  | {
+      name: string;
+      label: string;
+      type: "multi-select";
+      options: CrudFieldOption[];
+      required?: boolean;
+      placeholder?: string;
+    }
+  | { name: string; label: string; type: "custom"; render: (value: any, onChange: (val: any) => void) => ReactNode; required?: boolean }
+  | { name: string; label: string; type: "image"; required?: boolean; placeholder?: string }
+  | { name: string; label: string; type: "multi-image"; required?: boolean; placeholder?: string }
+  | { name: string; label: string; type: "file"; required?: boolean; placeholder?: string; accept?: string };
+
+export type CrudValues = Record<string, any>;
+
+const inputCls =
+  "h-10 w-full rounded-lg border border-border bg-card px-3 text-sm shadow-[var(--shadow-card)] focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/20";
+
+function MultiSelectField({
+  options = [],
+  selected = [],
+  placeholder,
+  onChange,
+}: {
+  options: CrudFieldOption[];
+  selected: string[];
+  placeholder?: string;
+  onChange: (selected: string[]) => void;
+}) {
+  const [query, setQuery] = useState("");
+
+  const safeSelected = Array.isArray(selected) ? selected : [];
+
+  const filteredOptions = useMemo(() => {
+    if (!query.trim()) return options;
+    const q = query.toLowerCase();
+    return options.filter(
+      (o) =>
+        o.label.toLowerCase().includes(q) ||
+        (o.subtitle && o.subtitle.toLowerCase().includes(q)) ||
+        o.value.toLowerCase().includes(q)
+    );
+  }, [options, query]);
+
+  const toggle = (val: string) => {
+    if (safeSelected.includes(val)) {
+      onChange(safeSelected.filter((x) => x !== val));
+    } else {
+      onChange([...safeSelected, val]);
+    }
+  };
+
+  const remove = (val: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    onChange(safeSelected.filter((x) => x !== val));
+  };
+
+  return (
+    <div className="space-y-2">
+      {/* Selected tags */}
+      <div className="flex flex-wrap items-center gap-1.5 min-h-[42px] p-2 rounded-xl border border-border bg-muted/20">
+        {safeSelected.length === 0 ? (
+          <span className="text-xs text-muted-foreground italic px-1">
+            {placeholder || "Chưa chọn mục nào (Chọn từ danh sách bên dưới)..."}
+          </span>
+        ) : (
+          <>
+            {safeSelected.map((val) => {
+              const opt = options.find((o) => o.value === val);
+              const label = opt ? opt.label : val;
+              return (
+                <span
+                  key={val}
+                  className="inline-flex items-center gap-1.5 rounded-lg bg-primary/10 border border-primary/20 px-2.5 py-1 text-xs font-semibold text-primary shadow-xs"
+                >
+                  <span className="max-w-[200px] truncate">{label}</span>
+                  <button
+                    type="button"
+                    onClick={(e) => remove(val, e)}
+                    className="rounded-full p-0.5 hover:bg-primary/20 transition cursor-pointer text-primary"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </span>
+              );
+            })}
+
+            {safeSelected.length > 1 && (
+              <TooltipProvider delayDuration={100}>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <span className="inline-flex items-center gap-1 rounded-md bg-primary/15 text-primary border border-primary/30 px-2 py-0.5 text-[11px] font-bold cursor-help shadow-xs hover:bg-primary/25 transition">
+                      +{safeSelected.length - 1} mục (Rê chuột xem tất cả)
+                    </span>
+                  </TooltipTrigger>
+                  <TooltipContent
+                    side="top"
+                    align="start"
+                    className="z-50 max-w-xs rounded-xl border border-border bg-popover p-3 text-popover-foreground shadow-2xl"
+                  >
+                    <div className="text-[11px] font-bold text-foreground mb-1.5 pb-1 border-b border-border">
+                      Danh sách đã chọn ({safeSelected.length} mục):
+                    </div>
+                    <ul className="text-xs space-y-1.5 max-h-48 overflow-y-auto">
+                      {safeSelected.map((val, idx) => {
+                        const opt = options.find((o) => o.value === val);
+                        return (
+                          <li key={val} className="flex items-start gap-1.5">
+                            <span className="text-primary font-bold shrink-0">{idx + 1}.</span>
+                            <div className="min-w-0">
+                              <span className="font-semibold text-foreground">{opt?.label || val}</span>
+                              {opt?.subtitle && (
+                                <div className="text-[10px] text-muted-foreground">{opt.subtitle}</div>
+                              )}
+                            </div>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            )}
+          </>
+        )}
+      </div>
+
+      {/* Search & List */}
+      <div className="rounded-xl border border-border bg-card overflow-hidden shadow-xs">
+        <div className="p-2 border-b border-border bg-muted/30">
+          <input
+            type="text"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder={placeholder ? `Tìm kiếm ${placeholder.toLowerCase()}...` : "Tìm kiếm để chọn..."}
+            className="h-8 w-full rounded-lg border border-border bg-background px-3 text-xs focus:outline-none focus:ring-1 focus:ring-primary"
+          />
+        </div>
+
+        <div className="max-h-48 overflow-y-auto divide-y divide-border/40 p-1">
+          {filteredOptions.length === 0 ? (
+            <div className="p-3 text-center text-xs text-muted-foreground">
+              Không tìm thấy mục phù hợp
+            </div>
+          ) : (
+            filteredOptions.map((opt) => {
+              const isChecked = safeSelected.includes(opt.value);
+              return (
+                <div
+                  key={opt.value}
+                  onClick={() => toggle(opt.value)}
+                  className={`flex items-center gap-2.5 p-2 rounded-lg text-xs cursor-pointer transition ${
+                    isChecked
+                      ? "bg-primary/10 text-primary font-medium"
+                      : "hover:bg-muted text-foreground"
+                  }`}
+                >
+                  <input
+                    type="checkbox"
+                    checked={isChecked}
+                    onChange={() => {}}
+                    className="h-4 w-4 rounded text-primary border-border focus:ring-primary cursor-pointer shrink-0"
+                  />
+                  <div className="min-w-0 flex-1">
+                    <div className="font-semibold truncate">{opt.label}</div>
+                    {opt.subtitle && (
+                      <div className="text-[11px] text-muted-foreground truncate">{opt.subtitle}</div>
+                    )}
+                  </div>
+                  {isChecked && <Check className="h-3.5 w-3.5 text-primary shrink-0" />}
+                </div>
+              );
+            })
+          )}
+        </div>
+      </div>
+      <div className="flex justify-between items-center px-1 text-[11px] text-muted-foreground">
+        {safeSelected.length > 1 ? (
+          <TooltipProvider delayDuration={100}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span className="cursor-help font-semibold text-primary underline decoration-dotted">
+                  Đã chọn: <strong className="text-foreground">{safeSelected.length}</strong> mục (Rê chuột xem danh sách)
+                </span>
+              </TooltipTrigger>
+              <TooltipContent side="top" className="z-50 max-w-xs rounded-xl border border-border bg-popover p-3 text-popover-foreground shadow-2xl">
+                <div className="text-[11px] font-bold text-foreground mb-1 pb-1 border-b border-border">
+                  Tất cả {safeSelected.length} mục đã chọn:
+                </div>
+                <div className="text-xs space-y-1 max-h-44 overflow-y-auto">
+                  {safeSelected.map((val, idx) => {
+                    const opt = options.find((o) => o.value === val);
+                    return (
+                      <div key={val} className="truncate">
+                        {idx + 1}. {opt?.label || val}
+                      </div>
+                    );
+                  })}
+                </div>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        ) : (
+          <span>Đã chọn: <strong className="text-foreground">{safeSelected.length}</strong></span>
+        )}
+        {safeSelected.length > 0 && (
+          <button
+            type="button"
+            onClick={() => onChange([])}
+            className="text-xs text-rose-500 hover:underline cursor-pointer"
+          >
+            Bỏ chọn tất cả
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+export function CrudModal({
+  open,
+  title,
+  fields,
+  initial,
+  submitting,
+  submitLabel,
+  cancelLabel,
+  onSubmit,
+  onClose,
+  onDelete,
+  deleteLabel = "Xóa bài viết",
+  isDeleting,
+}: {
+  open: boolean;
+  title: string;
+  fields: CrudField[];
+  initial?: CrudValues;
+  submitting?: boolean;
+  submitLabel: string;
+  cancelLabel: string;
+  onSubmit: (values: CrudValues) => void;
+  onClose: () => void;
+  onDelete?: () => void;
+  deleteLabel?: string;
+  isDeleting?: boolean;
+}) {
+  const [values, setValues] = useState<CrudValues>({});
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [uploadingImage, setUploadingImage] = useState<Record<string, boolean>>({});
+  const [uploadingFile, setUploadingFile] = useState<Record<string, boolean>>({});
+
+  useEffect(() => {
+    if (open) {
+      setErrors({});
+      const base: CrudValues = {};
+      for (const f of fields) {
+        if (f.type === "multi-select" || f.type === "multi-image") {
+          const raw = initial?.[f.name];
+          if (Array.isArray(raw)) {
+            base[f.name] = raw;
+          } else if (typeof raw === "string" && raw.startsWith("[")) {
+            try {
+              base[f.name] = JSON.parse(raw);
+            } catch {
+              base[f.name] = [];
+            }
+          } else if (raw) {
+            base[f.name] = [String(raw)];
+          } else {
+            base[f.name] = [];
+          }
+        } else if (f.type === "custom") {
+          base[f.name] = initial?.[f.name] ?? [];
+        } else {
+          base[f.name] =
+            initial?.[f.name] ??
+            (f.type === "number" ? "" : f.type === "select" ? (f.placeholder ? "" : (f.options[0]?.value ?? "")) : "");
+        }
+      }
+      setValues(base);
+    }
+  }, [open, initial, fields]);
+
+  if (!open) return null;
+
+  const set = (name: string, v: any) => {
+    setValues((s) => ({ ...s, [name]: v }));
+    if (errors[name]) {
+      setErrors((prev) => {
+        const next = { ...prev };
+        delete next[name];
+        return next;
+      });
+    }
+  };
+
+  const submit = () => {
+    // Validate all required fields
+    const validationErrors: Record<string, string> = {};
+    for (const f of fields) {
+      if (f.required) {
+        const raw = values[f.name];
+        if (f.type === "number") {
+          if (raw === "" || raw === null || raw === undefined || isNaN(Number(raw))) {
+            validationErrors[f.name] = `Vui lòng nhập giá trị hợp lệ cho ${f.label}`;
+          }
+        } else if (f.type === "multi-select") {
+          if (!Array.isArray(raw) || raw.length === 0) {
+            validationErrors[f.name] = `Vui lòng chọn ít nhất một mục cho ${f.label}`;
+          }
+        } else if (f.type === "multi-image") {
+          if (!Array.isArray(raw) || raw.length === 0) {
+            validationErrors[f.name] = `Vui lòng tải lên ít nhất một ảnh cho ${f.label}`;
+          }
+        } else if (f.type === "image") {
+          if (!raw || String(raw).trim() === "") {
+            validationErrors[f.name] = `Vui lòng tải lên ảnh cho ${f.label}`;
+          }
+        } else if (f.type === "file") {
+          if (!raw || String(raw).trim() === "") {
+            validationErrors[f.name] = `Vui lòng tải lên tệp cho ${f.label}`;
+          }
+        } else if (f.type === "custom") {
+          if (
+            raw === undefined ||
+            raw === null ||
+            (Array.isArray(raw) && raw.length === 0) ||
+            (typeof raw === "string" && raw.trim() === "")
+          ) {
+            validationErrors[f.name] = `Vui lòng nhập/chọn thông tin cho ${f.label}`;
+          }
+        } else {
+          // text, textarea, select, date
+          if (raw === undefined || raw === null || String(raw).trim() === "") {
+            validationErrors[f.name] = `Vui lòng nhập/chọn ${f.label}`;
+          }
+        }
+      }
+    }
+
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      const firstErr = Object.values(validationErrors)[0];
+      toast.error(firstErr || "Vui lòng điền đầy đủ các trường thông tin bắt buộc (*)");
+      return;
+    }
+
+    const out: CrudValues = {};
+    for (const f of fields) {
+      const raw = values[f.name];
+      if (f.type === "number") {
+        out[f.name] = Number(raw) || 0;
+      } else if (f.type === "multi-select" || f.type === "multi-image") {
+        out[f.name] = Array.isArray(raw) ? raw : [];
+      } else if (f.type === "custom") {
+        out[f.name] = raw !== undefined ? raw : [];
+      } else {
+        out[f.name] = String(raw ?? "");
+      }
+    }
+    onSubmit(out);
+  };
+
+  if (!open) return null;
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
+      <div className="w-full max-w-lg sm:max-w-2xl rounded-2xl border border-border bg-card shadow-[var(--shadow-modal)] flex flex-col max-h-[90vh]">
+        <div className="flex items-center justify-between border-b border-border px-5 py-4 shrink-0">
+          <h3 className="text-base font-semibold text-foreground">{title}</h3>
+          <button
+            type="button"
+            onClick={onClose}
+            className="grid h-8 w-8 place-items-center rounded-lg text-muted-foreground hover:bg-muted cursor-pointer"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+        <div className="space-y-4 overflow-y-auto p-5 flex-1 scrollbar-thin scrollbar-thumb-slate-300 dark:scrollbar-thumb-slate-600 hover:scrollbar-thumb-slate-400" data-modal-body>
+          {fields.map((f) => {
+            const hasErr = !!errors[f.name];
+            const stateInputCls = `${inputCls} ${
+              hasErr ? "!border-destructive !ring-2 !ring-destructive/20 focus:!border-destructive" : ""
+            }`;
+
+            return (
+              <Labeled key={f.name} label={f.label} required={f.required} error={errors[f.name]}>
+                {f.type === "image" ? (
+                  <div className="space-y-2">
+                    {values[f.name] ? (
+                      <div className="relative overflow-hidden rounded-xl border border-border">
+                        <img
+                          src={resolveMediaUrl(String(values[f.name])) || String(values[f.name])}
+                          alt="Preview"
+                          className="h-40 w-full object-cover"
+                          onError={(e) => {
+                            const target = e.currentTarget as HTMLImageElement;
+                            if (String(values[f.name]).includes("ky_niem_4_nam_vien_doanh_tri")) {
+                              target.src = KY_NIEM_4_NAM_BANNER_URL;
+                              return;
+                            }
+                            const step = Number(target.dataset.fallbackStep || 0);
+                            const fallbacks = [
+                              KY_NIEM_4_NAM_BANNER_URL,
+                              "/ky_niem_4_nam_vien_doanh_tri.jpg",
+                              "/images/event/ky_niem_4_nam_vien_doanh_tri.jpg",
+                              "/images/events/ky_niem_4_nam_vien_doanh_tri.jpg",
+                              "/uploads/ky_niem_4_nam_vien_doanh_tri.jpg"
+                            ];
+                            if (step < fallbacks.length) {
+                              target.dataset.fallbackStep = String(step + 1);
+                              target.src = fallbacks[step];
+                            }
+                          }}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => set(f.name, "")}
+                          className="absolute right-2 top-2 grid h-8 w-8 place-items-center rounded-lg bg-black/70 text-white hover:bg-rose-600 transition cursor-pointer"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </div>
+                    ) : (
+                      <label
+                        className={`flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed p-6 transition ${
+                          hasErr
+                            ? "border-destructive bg-destructive/5 hover:border-destructive"
+                            : "border-border hover:border-primary/50 hover:bg-muted/40"
+                        }`}
+                      >
+                        {uploadingImage[f.name] ? (
+                          <>
+                            <Loader2 className="h-8 w-8 text-primary animate-spin mb-2" />
+                            <span className="text-xs font-semibold text-foreground">Đang tải ảnh lên MinIO...</span>
+                          </>
+                        ) : (
+                          <>
+                            <ImagePlus className="h-8 w-8 text-muted-foreground mb-2" />
+                            <span className="text-xs font-semibold text-foreground">Chọn ảnh tải lên</span>
+                            <span className="text-[11px] text-muted-foreground mt-0.5">PNG, JPG hoặc WEBP</span>
+                          </>
+                        )}
+                        <input
+                          type="file"
+                          accept="image/*"
+                          disabled={uploadingImage[f.name]}
+                          className="hidden"
+                          onChange={async (e) => {
+                            const file = e.target.files?.[0];
+                            if (!file) return;
+                            setUploadingImage((prev) => ({ ...prev, [f.name]: true }));
+                            try {
+                              const uploadedUrl = await uploadFile(file, file.name);
+                              if (uploadedUrl) {
+                                set(f.name, uploadedUrl);
+                              }
+                            } catch (err: any) {
+                              console.error("CrudModal upload error:", err);
+                              toast.error("Không thể tải ảnh lên hệ thống MinIO: " + (err?.message || "Lỗi kết nối"));
+                            } finally {
+                              setUploadingImage((prev) => ({ ...prev, [f.name]: false }));
+                            }
+                          }}
+                        />
+                      </label>
+                    )}
+                    <input
+                      type="text"
+                      value={String(values[f.name] ?? "")}
+                      placeholder={f.placeholder || "Hoặc dán URL ảnh trực tiếp..."}
+                      onChange={(e) => set(f.name, e.target.value)}
+                      className={`${stateInputCls} text-xs`}
+                    />
+                  </div>
+                ) : f.type === "multi-image" ? (
+                  <div className="space-y-3">
+                    {/* Danh sách ảnh hiện tại */}
+                    {Array.isArray(values[f.name]) && values[f.name].length > 0 && (
+                      <div className="grid grid-cols-3 sm:grid-cols-4 gap-2.5">
+                        {values[f.name].map((url: string, idx: number) => (
+                          <div key={idx} className="group relative aspect-square rounded-xl overflow-hidden border border-border bg-muted/40 shadow-xs">
+                            <img
+                              src={resolveMediaUrl(url) || url}
+                              alt={`Ảnh ${idx + 1}`}
+                              className="w-full h-full object-cover"
+                            />
+                            {idx === 0 && (
+                              <span className="absolute top-1.5 left-1.5 bg-primary/90 text-white text-[10px] font-bold px-1.5 py-0.5 rounded shadow-xs">
+                                Ảnh chính
+                              </span>
+                            )}
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const next = (values[f.name] as string[]).filter((_, i) => i !== idx);
+                                set(f.name, next);
+                                if (idx === 0 && values.image === url) {
+                                  set("image", next[0] || "");
+                                }
+                              }}
+                              className="absolute top-1.5 right-1.5 grid h-6 w-6 place-items-center rounded-md bg-black/70 text-white hover:bg-rose-600 transition cursor-pointer opacity-90 group-hover:opacity-100"
+                            >
+                              <Trash2 className="h-3 w-3" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Khu vực upload nhiều ảnh */}
+                    <label
+                      className={`flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed p-4 transition ${
+                        hasErr
+                          ? "border-destructive bg-destructive/5 hover:border-destructive"
+                          : "border-border hover:border-primary/50 hover:bg-muted/40"
+                      }`}
+                    >
+                      {uploadingImage[f.name] ? (
+                        <>
+                          <Loader2 className="h-7 w-7 text-primary animate-spin mb-1.5" />
+                          <span className="text-xs font-semibold text-foreground">Đang tải các ảnh lên MinIO...</span>
+                        </>
+                      ) : (
+                        <>
+                          <ImagePlus className="h-7 w-7 text-muted-foreground mb-1.5" />
+                          <span className="text-xs font-semibold text-foreground">Chọn nhiều ảnh tải lên (Click để chọn hoặc kéo thả)</span>
+                          <span className="text-[11px] text-muted-foreground mt-0.5">Hỗ trợ chọn cùng lúc nhiều file PNG, JPG, WEBP</span>
+                        </>
+                      )}
+                      <input
+                        type="file"
+                        multiple
+                        accept="image/*"
+                        disabled={uploadingImage[f.name]}
+                        className="hidden"
+                        onChange={async (e) => {
+                          const files = Array.from(e.target.files || []);
+                          if (!files.length) return;
+                          setUploadingImage((prev) => ({ ...prev, [f.name]: true }));
+                          try {
+                            const urls = await Promise.all(files.map((file) => uploadFile(file, file.name)));
+                            const valid = urls.filter(Boolean) as string[];
+                            const current = Array.isArray(values[f.name]) ? values[f.name] : [];
+                            const combined = [...current, ...valid];
+                            set(f.name, combined);
+                            if (!values.image && combined[0]) {
+                              set("image", combined[0]);
+                            }
+                            toast.success(`Đã tải lên thành công ${valid.length} ảnh!`);
+                          } catch (err: any) {
+                            console.error("CrudModal multi-image upload error:", err);
+                            toast.error("Không thể tải ảnh: " + (err?.message || "Lỗi tải tệp"));
+                          } finally {
+                            setUploadingImage((prev) => ({ ...prev, [f.name]: false }));
+                          }
+                        }}
+                      />
+                    </label>
+
+                    {/* Dán URL ảnh trực tiếp nếu cần */}
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        placeholder="Hoặc dán URL ảnh bổ sung..."
+                        id={`input-add-url-${f.name}`}
+                        className={`${stateInputCls} text-xs flex-1`}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            e.preventDefault();
+                            const input = e.currentTarget;
+                            const val = input.value.trim();
+                            if (val) {
+                              const current = Array.isArray(values[f.name]) ? values[f.name] : [];
+                              const combined = [...current, val];
+                              set(f.name, combined);
+                              if (!values.image) set("image", combined[0]);
+                              input.value = "";
+                            }
+                          }
+                        }}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const input = document.getElementById(`input-add-url-${f.name}`) as HTMLInputElement | null;
+                          const val = input?.value.trim();
+                          if (val) {
+                            const current = Array.isArray(values[f.name]) ? values[f.name] : [];
+                            const combined = [...current, val];
+                            set(f.name, combined);
+                            if (!values.image) set("image", combined[0]);
+                            if (input) input.value = "";
+                          }
+                        }}
+                        className="px-3 py-2 rounded-lg bg-muted text-xs font-semibold text-foreground hover:bg-muted/80 transition cursor-pointer"
+                      >
+                        Thêm URL
+                      </button>
+                    </div>
+                  </div>
+                ) : f.type === "file" ? (
+                  <div className="space-y-2">
+                    {values[f.name] ? (
+                      <div className="flex items-center justify-between gap-3 rounded-xl border border-border bg-muted/30 p-3">
+                        <div className="flex items-center gap-2.5 min-w-0">
+                          <div className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-primary/10 text-primary">
+                            <FileText className="h-5 w-5" />
+                          </div>
+                          <div className="min-w-0">
+                            <div className="text-xs font-semibold text-foreground truncate">
+                              {values.name || "Tệp tài liệu đã tải lên"}
+                            </div>
+                            <div className="text-[11px] text-muted-foreground truncate">
+                              {String(values[f.name])}
+                            </div>
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => set(f.name, "")}
+                          className="grid h-8 w-8 shrink-0 place-items-center rounded-lg text-destructive hover:bg-destructive/10 transition cursor-pointer"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </div>
+                    ) : (
+                      <label
+                        className={`flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed p-6 transition ${
+                          hasErr
+                            ? "border-destructive bg-destructive/5 hover:border-destructive"
+                            : "border-border hover:border-primary/50 hover:bg-muted/40"
+                        }`}
+                      >
+                        {uploadingFile[f.name] ? (
+                          <>
+                            <Loader2 className="h-8 w-8 text-primary animate-spin mb-2" />
+                            <span className="text-xs font-semibold text-foreground">Đang tải tệp lên hệ thống...</span>
+                          </>
+                        ) : (
+                          <>
+                            <UploadCloud className="h-8 w-8 text-muted-foreground mb-2" />
+                            <span className="text-xs font-semibold text-foreground">Chọn tệp tài liệu để tải lên</span>
+                            <span className="text-[11px] text-muted-foreground mt-0.5">PDF, DOCX, XLSX, PPTX, ZIP, RAR...</span>
+                          </>
+                        )}
+                        <input
+                          type="file"
+                          accept={f.accept || ".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv,.zip,.rar,.png,.jpg,.jpeg"}
+                          disabled={uploadingFile[f.name]}
+                          className="hidden"
+                          onChange={async (e) => {
+                            const file = e.target.files?.[0];
+                            if (!file) return;
+                            setUploadingFile((prev) => ({ ...prev, [f.name]: true }));
+                            try {
+                              const uploadedUrl = await uploadFile(file, file.name);
+                              if (uploadedUrl) {
+                                set(f.name, uploadedUrl);
+                                if (!values.name || values.name === "") {
+                                  set("name", file.name.replace(/\.[^/.]+$/, ""));
+                                }
+                                const ext = (file.name.split(".").pop() ?? "").toLowerCase();
+                                const validTypes = ["pdf", "doc", "docx", "xls", "xlsx", "ppt", "pptx", "txt", "csv", "zip", "rar", "png", "jpg", "jpeg"];
+                                if (validTypes.includes(ext)) {
+                                  set("type", ext);
+                                }
+                                const sizeStr = file.size >= 1048576
+                                  ? `${(file.size / 1048576).toFixed(1)} MB`
+                                  : `${Math.max(1, Math.round(file.size / 1024))} KB`;
+                                set("size", sizeStr);
+                              }
+                            } catch (err: any) {
+                              console.error("CrudModal file upload error:", err);
+                              toast.error("Không thể tải tệp lên hệ thống: " + (err?.message || "Lỗi kết nối"));
+                            } finally {
+                              setUploadingFile((prev) => ({ ...prev, [f.name]: false }));
+                            }
+                          }}
+                        />
+                      </label>
+                    )}
+                    <input
+                      type="text"
+                      value={String(values[f.name] ?? "")}
+                      placeholder={f.placeholder || "Hoặc dán đường dẫn tệp (URL) đính kèm..."}
+                      onChange={(e) => set(f.name, e.target.value)}
+                      className={`${stateInputCls} text-xs`}
+                    />
+                  </div>
+                ) : f.type === "textarea" ? (
+                  <textarea
+                    value={String(values[f.name] ?? "")}
+                    placeholder={f.placeholder || `Nhập ${typeof f.label === "string" ? f.label.toLowerCase() : "nội dung"}...`}
+                    onChange={(e) => set(f.name, e.target.value)}
+                    className={`${stateInputCls} h-24 py-2`}
+                  />
+                ) : f.type === "select" ? (
+                  <select
+                    value={String(values[f.name] ?? "")}
+                    onChange={(e) => set(f.name, e.target.value)}
+                    className={`${stateInputCls} font-medium`}
+                  >
+                    {f.placeholder && (
+                      <option value="" disabled hidden={f.required}>
+                        {f.placeholder}
+                      </option>
+                    )}
+                    {f.options.map((o) => (
+                      <option key={o.value} value={o.value}>
+                        {o.label}
+                      </option>
+                    ))}
+                  </select>
+                ) : f.type === "custom" ? (
+                  <div className={hasErr ? "rounded-xl border border-destructive p-1" : ""}>
+                    {f.render(values[f.name], (val) => set(f.name, val))}
+                  </div>
+                ) : f.type === "multi-select" ? (
+                  <div className={hasErr ? "rounded-xl border border-destructive p-1" : ""}>
+                    <MultiSelectField
+                      options={f.options}
+                      selected={values[f.name] || []}
+                      placeholder={f.placeholder}
+                      onChange={(sel) => set(f.name, sel)}
+                    />
+                  </div>
+                ) : (
+                  <input
+                    type={f.type}
+                    value={String(values[f.name] ?? "")}
+                    placeholder={f.placeholder || `Nhập ${typeof f.label === "string" ? f.label.toLowerCase() : ""}...`}
+                    onFocus={(e) => {
+                      if (f.type === "number") {
+                        e.currentTarget.select();
+                      }
+                    }}
+                    onChange={(e) => set(f.name, e.target.value)}
+                    className={stateInputCls}
+                  />
+                )}
+              </Labeled>
+            );
+          })}
+        </div>
+        <div className="flex items-center justify-between border-t border-border px-5 py-4 shrink-0">
+          <div>
+            {onDelete && (
+              <button
+                type="button"
+                onClick={onDelete}
+                disabled={isDeleting || submitting}
+                className="inline-flex items-center gap-1.5 rounded-xl border border-destructive/30 bg-destructive/10 px-3.5 py-2 text-sm font-semibold text-destructive hover:bg-destructive/20 disabled:opacity-50 cursor-pointer transition"
+              >
+                <Trash2 className="h-4 w-4" />
+                {isDeleting ? "Đang xóa..." : deleteLabel}
+              </button>
+            )}
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={onClose}
+              disabled={submitting || isDeleting}
+              className="rounded-xl border border-border bg-card px-4 py-2 text-sm font-medium text-foreground hover:bg-muted disabled:opacity-50 cursor-pointer"
+            >
+              {cancelLabel}
+            </button>
+            <button
+              type="button"
+              onClick={submit}
+              disabled={submitting || isDeleting}
+              className="rounded-xl px-4 py-2 text-sm font-semibold text-primary-foreground shadow-[var(--shadow-glow)] disabled:opacity-50 cursor-pointer"
+              style={{ background: "var(--gradient-primary)" }}
+            >
+              {submitLabel}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Labeled({
+  label,
+  required,
+  error,
+  children,
+}: {
+  label: string;
+  required?: boolean;
+  error?: string;
+  children: ReactNode;
+}) {
+  return (
+    <div className="space-y-1.5">
+      <div className="flex items-center justify-between">
+        <span className="block text-xs font-semibold text-foreground">
+          {label} {required && <span className="text-destructive font-bold">*</span>}
+        </span>
+        {error && (
+          <span className="text-[11px] font-medium text-destructive animate-in fade-in">
+            {error}
+          </span>
+        )}
+      </div>
+      {children}
+    </div>
+  );
+}

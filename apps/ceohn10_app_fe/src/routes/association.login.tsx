@@ -1,0 +1,285 @@
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useEffect, useState, useRef } from "react";
+import { useAuth, clearUserSessionData } from "@/context/AuthContext";
+import { fetchNestApi } from "@/lib/api-client";
+import { toast } from "sonner";
+import { classifyAuthError, type AuthErrorInfo } from "@/lib/business-connect/mobile/auth-error";
+import { AssociationAppSignIn } from "@/components/member/AssociationAppSignIn";
+import { AuthCardScanSheet } from "@/components/business-connect/mobile/AuthCardScanSheet";
+import { rememberScannedCard } from "@/lib/business-connect/mobile/auth-scan";
+import {
+  applyRememberPreference,
+  getRememberPreference,
+  getRememberedEmail,
+} from "@/lib/business-connect/mobile/auth-session";
+
+export const Route = createFileRoute("/association/login")({
+  ssr: false,
+  validateSearch: (search: Record<string, unknown>): {
+    redirect?: string;
+    reason?: "expired";
+    username?: string;
+    email?: string;
+    registered?: string;
+    reset?: string;
+  } => ({
+    ...(typeof search.redirect === "string" ? { redirect: search.redirect } : {}),
+    ...(search.reason === "expired" ? { reason: "expired" as const } : {}),
+    ...(typeof search.username === "string" ? { username: search.username } : {}),
+    ...(typeof search.email === "string" ? { email: search.email } : {}),
+    ...(typeof search.registered === "string" ? { registered: search.registered } : {}),
+    ...(typeof search.reset === "string" ? { reset: search.reset } : {}),
+  }),
+  head: () => ({
+    meta: [
+      { name: "apple-mobile-web-app-capable", content: "yes" },
+      { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
+      { name: "theme-color", content: "#001D4A" },
+      { name: "apple-mobile-web-app-title", content: "CEO HN10" },
+      { title: "Đăng nhập — Hiệp hội Doanh nhân CEO HN10" },
+    ],
+    links: [
+      { rel: "apple-touch-icon", href: "/apple-touch-icon.png?v=ceohn10_v4w" },
+      { rel: "apple-touch-icon", sizes: "180x180", href: "/apple-touch-icon-180x180.png?v=ceohn10_v4w" },
+      { rel: "apple-touch-icon", sizes: "152x152", href: "/apple-touch-icon-152x152.png?v=ceohn10_v4w" },
+      { rel: "apple-touch-icon", sizes: "167x167", href: "/apple-touch-icon-167x167.png?v=ceohn10_v4w" },
+      { rel: "apple-touch-icon-precomposed", href: "/apple-touch-icon.png?v=ceohn10_v4w" },
+      { rel: "icon", type: "image/png", sizes: "64x64", href: "/ceohn10-favicon.png?v=ceohn10_v4w" },
+      { rel: "icon", type: "image/png", sizes: "192x192", href: "/app-icon-192.png?v=ceohn10_v4w" },
+      { rel: "icon", type: "image/png", sizes: "512x512", href: "/app-icon.png?v=ceohn10_v4w" },
+      { rel: "shortcut icon", href: "/ceohn10-favicon.png?v=ceohn10_v4w" },
+    ],
+  }),
+  component: AssociationLoginPage,
+});
+
+function safeRedirect(target?: string): string | null {
+  if (!target) return null;
+  try {
+    const url = new URL(target, window.location.origin);
+    if (url.origin !== window.location.origin) return null;
+    const path = url.pathname + url.search + url.hash;
+    if (path.includes("/login") || path.startsWith("/auth")) return null;
+    return path.startsWith("/") && !path.startsWith("//") ? path : null;
+  } catch {
+    return null;
+  }
+}
+
+function AssociationLoginPage() {
+  const navigate = useNavigate();
+  const { redirect: redirectTo, reason, username, email: searchEmail, registered, reset } = Route.useSearch();
+  const { user, logout, setAuthData } = useAuth();
+
+  const [identifier, setIdentifier] = useState(""); // Email or Member Code
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [authError, setAuthError] = useState<string | null>(null);
+  const [authErrorInfo, setAuthErrorInfo] = useState<AuthErrorInfo | null>(null);
+  const [scanOpen, setScanOpen] = useState(false);
+  const [remember, setRemember] = useState(true);
+
+  useEffect(() => {
+    if (username) {
+      setIdentifier(username);
+    } else if (searchEmail) {
+      setIdentifier(searchEmail);
+    } else {
+      setRemember(getRememberPreference());
+      const saved = getRememberedEmail();
+      if (saved) setIdentifier((v) => v || saved);
+    }
+  }, [username, searchEmail]);
+
+  useEffect(() => {
+    if (registered === "true") {
+      toast.success("🎉 Đăng ký thành công! Quý CEO vui lòng nhập mật khẩu để đăng nhập vào App Hiệp Hội.");
+    }
+  }, [registered]);
+
+  useEffect(() => {
+    if (reset === "success") {
+      toast.success("✓ Đổi mật khẩu thành công! Quý CEO vui lòng đăng nhập lại bằng mật khẩu mới vừa tạo.", {
+        duration: 7000,
+      });
+    }
+  }, [reset]);
+
+  const justLoggedInRef = useRef(false);
+
+  useEffect(() => {
+    if (reason === "expired" && !justLoggedInRef.current) {
+      setAuthError("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.");
+    }
+  }, [reason]);
+
+  // Nếu đã có phiên đăng nhập hợp lệ và token tồn tại, tự động chuyển ngay vào App
+  useEffect(() => {
+    if (justLoggedInRef.current) return;
+    if (reason === "expired") return;
+
+    const hasToken =
+      typeof window !== "undefined" &&
+      Boolean(
+        localStorage.getItem("vibe_token") ||
+        localStorage.getItem("token") ||
+        localStorage.getItem("access_token"),
+      );
+    if (user && hasToken) {
+      const target = safeRedirect(redirectTo) || "/association";
+      if (target !== "/association/login" && !target.startsWith("/association/login")) {
+        navigate({ to: target as any, replace: true });
+      }
+    }
+  }, [user, reason, redirectTo, navigate]);
+
+  const handleSubmit = async () => {
+    const cleanId = identifier.trim();
+    if (!cleanId || !password) {
+      setAuthError("Vui lòng nhập email hoặc số điện thoại và mật khẩu");
+      return;
+    }
+
+    setLoading(true);
+    setAuthError(null);
+    setAuthErrorInfo(null);
+
+    try {
+      const res = await fetchNestApi<any>("/auth/login", {
+        method: "POST",
+        body: JSON.stringify({
+          email: cleanId,
+          password,
+        }),
+      });
+
+      if (res?.access_token && res?.user) {
+        justLoggedInRef.current = true;
+        // Dọn dẹp sạch toàn bộ cache và storage của phiên trước đó
+        clearUserSessionData();
+        setAuthData(res);
+        applyRememberPreference(remember, cleanId);
+
+        const isSystemAdmin =
+          cleanId.toLowerCase() === "admin@viconnect.vn" ||
+          cleanId.toLowerCase() === "admin@connect.vn" ||
+          cleanId.toLowerCase() === "admin@ceohn10.com" ||
+          cleanId.toLowerCase() === "ceo.tongthuky@ceohn10.com" ||
+          res.user?.role === "admin" ||
+          res.user?.role === "quan_tri" ||
+          res.user?.role === "platform_admin";
+
+        const isMustChange =
+          !isSystemAdmin &&
+          Boolean(
+            res.mustChangePassword ||
+            res.must_change_password ||
+            res.user?.mustChangePassword ||
+            res.user?.must_change_password ||
+            res.user?.isFirstLogin ||
+            res.user?.is_first_login ||
+            res.user?.firstLogin ||
+            res.user?.onboarding_status === "new" ||
+            res.user?.profile?.onboarding_status === "new"
+          );
+
+        if (isMustChange) {
+          try {
+            localStorage.setItem("vba_must_change_password", "true");
+          } catch {}
+          toast.warning("Hội viên mới bắt buộc phải thay đổi mật khẩu khởi tạo trước khi sử dụng ứng dụng.", {
+            duration: 6000,
+          });
+          navigate({
+            to: "/association/settings" as any,
+            search: { action: "change_password", required: "true" } as any,
+            replace: true,
+          });
+          return;
+        } else {
+          try {
+            localStorage.removeItem("vba_must_change_password");
+          } catch {}
+        }
+
+        const memberWelcomeName = res.user?.name || res.user?.user_metadata?.full_name || cleanId;
+        toast.success(`Chào mừng hội viên ${memberWelcomeName} trở lại!`);
+        const target = safeRedirect(redirectTo) || "/association";
+        if (typeof window !== "undefined") {
+          window.location.replace(target);
+        } else {
+          navigate({ to: target as any, replace: true });
+        }
+        return;
+      }
+
+      throw new Error("Không nhận được phiên đăng nhập hợp lệ.");
+    } catch (err: any) {
+      const info = classifyAuthError(err);
+      setAuthErrorInfo(info);
+      const rawMsg = String(err?.message || info.raw || "");
+      const isAuthFail =
+        rawMsg.toLowerCase().includes("unauthorized") ||
+        rawMsg.toLowerCase().includes("không chính xác") ||
+        rawMsg.toLowerCase().includes("đã bị xóa") ||
+        rawMsg.toLowerCase().includes("credentials") ||
+        info.kind === "credentials";
+      setAuthError(
+        isAuthFail
+          ? "Tài khoản hoặc mật khẩu không chính xác"
+          : (info.raw || err?.message || "Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.")
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  async function handleCardScanned(result: any) {
+    setScanOpen(false);
+    if (result.kind === "email") {
+      setIdentifier(result.email);
+      rememberScannedCard(result.card);
+      toast.success(`Đã nhận diện thẻ của ${result.card?.fullName || "hội viên"}`);
+    }
+  }
+
+  if (user && reason !== "expired") {
+    return (
+      <div className="min-h-screen bg-[#001D4A] flex flex-col items-center justify-center text-white p-4">
+        <div className="h-10 w-10 border-4 border-amber-400 border-t-transparent rounded-full animate-spin mb-4" />
+        <p className="text-sm font-semibold tracking-wide text-slate-200">Đang chuyển tiếp vào ứng dụng CEO HN10...</p>
+      </div>
+    );
+  }
+
+  return (
+    <>
+      <AssociationAppSignIn
+        identifier={identifier}
+        password={password}
+        loading={loading}
+        errorMessage={authError}
+        errorHint={authErrorInfo?.hintKey}
+        onDismissError={() => setAuthError(null)}
+        onIdentifierChange={setIdentifier}
+        onPasswordChange={setPassword}
+        onSubmit={() => void handleSubmit()}
+        onScanCard={() => setScanOpen(true)}
+        remember={remember}
+        onRememberChange={setRemember}
+        currentSessionUser={null}
+        onSwitchAccount={() => {
+          clearUserSessionData();
+          logout?.();
+          toast.info("Đã xóa phiên làm việc cũ. Quý CEO vui lòng nhập tài khoản mới.");
+        }}
+      />
+
+      <AuthCardScanSheet
+        open={scanOpen}
+        onClose={() => setScanOpen(false)}
+        onResult={handleCardScanned}
+      />
+    </>
+  );
+}

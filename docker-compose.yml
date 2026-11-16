@@ -1,0 +1,76 @@
+version: '3.8'
+
+services:
+  # ── 1. Cơ sở dữ liệu PostgreSQL Độc Lập cho CEOHN10 ─────────────────────────
+  ceohn10-db:
+    image: postgres:16-alpine
+    container_name: ceohn10-db-local
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-app1}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-ceohn10_secure_pass_2026}
+      POSTGRES_DB: ${POSTGRES_DB:-ceohn10_project}
+    ports:
+      - "${LOCAL_DB_PORT:-6434}:5432"
+    volumes:
+      - ceohn10-postgres-data:/var/lib/postgresql/data
+    networks:
+      - ceohn10-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U app1 -d ceohn10_project"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # ── 2. Dịch Vụ Backend NestJS API (Port 4003) ──────────────────────────────
+  ceohn10-backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: ceohn10-backend-prod
+    restart: always
+    environment:
+      NODE_ENV: production
+      PORT: 4003
+      DATABASE_URL: ${DATABASE_URL:-postgresql://app1:ceohn10_secure_pass_2026@ceohn10-db:5432/ceohn10_project}
+      JWT_SECRET: ${JWT_SECRET:-super-secret-jwt-key-ceohn10}
+      MINIO_ENDPOINT: ${MINIO_ENDPOINT:-minio}
+      MINIO_PORT: ${MINIO_PORT:-9000}
+      APP_URL: ${APP_URL:-https://ceohn10.viconnect.vn}
+      CRM_URL: ${CRM_URL:-https://crm.ceohn10.viconnect.vn}
+    ports:
+      - "${BACKEND_PORT:-4003}:4003"
+    depends_on:
+      ceohn10-db:
+        condition: service_healthy
+    networks:
+      - ceohn10-network
+
+  # ── 3. Dịch Vụ Frontend Web CRM & PWA App (Port 5003) ──────────────────────
+  ceohn10-frontend:
+    build:
+      context: .
+      dockerfile: deploy/ceohn10/Dockerfile.frontend
+    container_name: ceohn10-frontend-prod
+    restart: always
+    environment:
+      PORT: 5003
+      HOST: 0.0.0.0
+      VITE_API_URL: http://ceohn10-backend:4003
+      VITE_APP_NAME: "CLB Doanh Nhân CEO HN10"
+      VITE_APP_DEFAULT_ROUTE: /association
+    ports:
+      - "${FRONTEND_PORT:-5003}:5003"
+    depends_on:
+      - ceohn10-backend
+    networks:
+      - ceohn10-network
+
+volumes:
+  ceohn10-postgres-data:
+    name: ceohn10-postgres-data
+
+networks:
+  ceohn10-network:
+    name: ceohn10-network
+    driver: bridge

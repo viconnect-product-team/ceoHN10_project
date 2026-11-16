@@ -1,0 +1,19 @@
+services:
+  ssl-reverse-proxy:
+    image: nginx:alpine
+    container_name: ceohn10-ssl-proxy
+    restart: always
+    ports:
+      - "5443:5443"
+      - "5444:5444"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./server.crt:/etc/nginx/ssl/server.crt:ro
+      - ./server.key:/etc/nginx/ssl/server.key:ro
+    networks:
+      - ceohn10-network
+
+networks:
+  ceohn10-network:
+    external: true
+    name: ceohn10-network
