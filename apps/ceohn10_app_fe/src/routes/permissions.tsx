@@ -154,9 +154,9 @@ function PermissionsPage() {
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div>
               <div className="flex items-center gap-2">
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#003B95]/10 text-[#003B95] dark:bg-blue-950/60 dark:text-blue-300">
-                  <ShieldCheck className="w-3.5 h-3.5" />
-                  RBAC V2 &amp; BAN CHUYÊN MÔN
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-black tracking-wide bg-gradient-to-r from-purple-100 to-purple-50 text-[#7C2D82] dark:from-purple-950/80 dark:to-purple-900/40 dark:text-purple-300 border border-purple-200 dark:border-purple-800">
+                  <ShieldCheck className="w-3.5 h-3.5 text-[#7C2D82] dark:text-purple-400" />
+                  RBAC V2 &amp; BAN CHUYÊN MÔN CEOHN10
                 </span>
                 {matrixDirty && (
                   <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/15 text-amber-700 dark:text-amber-400 animate-pulse">

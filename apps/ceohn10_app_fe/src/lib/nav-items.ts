@@ -63,7 +63,6 @@ export const navGroups: NavGroup[] = [
     items: [
       { key: "nav.events", icon: Calendar, to: "/events" },
       { key: "eventsOverview.title", icon: Calendar, to: "/events-overview" },
-      { key: "nav.meeting", icon: Users2, to: "/meetings" },
       { key: "nav.governance", icon: Vote, to: "/voting" },
       { key: "nav.eventReg", icon: ClipboardList, to: "/event-registrations" },
       { key: "nav.checkin", icon: ScanLine, to: "/checkin" },
@@ -114,10 +113,7 @@ export const navGroups: NavGroup[] = [
     label: "nav.group.network",
     items: [
       { key: "nav.network", icon: MessageSquare, to: "/network" },
-      { key: "nav.bc.meetings" as TKey, icon: Users2, to: "/business-connect/meetings" },
       { key: "nav.bc.saved" as TKey, icon: Bookmark, to: "/business-connect/saved-cards" },
-      { key: "nav.marketplace", icon: Store, to: "/marketplace" },
-      { key: "nav.opportunities", icon: Sparkles, to: "/opportunities" },
     ],
   },
   {

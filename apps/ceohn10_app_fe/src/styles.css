@@ -51,25 +51,27 @@
   --color-chart-4: var(--chart-4);
   --color-chart-5: var(--chart-5);
 
-  --shadow-card: 0 1px 3px 0 rgba(0, 59, 149, 0.05), 0 1px 2px 0 rgba(0, 0, 0, 0.04);
+  --shadow-card: 0 1px 3px 0 rgba(124, 45, 130, 0.06), 0 1px 2px 0 rgba(0, 0, 0, 0.04);
   --shadow-elevated:
-    0 4px 12px -2px rgba(0, 59, 149, 0.1), 0 2px 6px -1px rgba(0, 0, 0, 0.05);
-  --shadow-glow: 0 8px 32px -8px rgba(0, 59, 149, 0.35);
+    0 4px 16px -2px rgba(124, 45, 130, 0.12), 0 2px 6px -1px rgba(0, 0, 0, 0.05);
+  --shadow-glow: 0 8px 32px -8px rgba(124, 45, 130, 0.4);
 
-  --gradient-primary: linear-gradient(135deg, #0052CC 0%, #003B95 100%);
-  --gradient-sidebar: linear-gradient(180deg, #FFFFFF 0%, #EFF6FF 100%);
-  --gradient-card: linear-gradient(135deg, #1E40AF 0%, #003B95 100%);
+  --gradient-primary: linear-gradient(135deg, #7C2D82 0%, #9333EA 50%, #4A1C6E 100%);
+  --gradient-sidebar: linear-gradient(180deg, #FFFFFF 0%, #FAF5FF 60%, #F3E8FF 100%);
+  --gradient-card: linear-gradient(135deg, #7C2D82 0%, #581C87 100%);
+  --gradient-ceohn10: linear-gradient(135deg, #7C2D82 0%, #D61F69 50%, #4A1C6E 100%);
+  --gradient-purple-white: linear-gradient(180deg, #FFFFFF 0%, #FAF5FF 50%, #F5EEFD 100%);
 
   --color-Backgrounds-Primary: #FFFFFF;
-  --color-Backgrounds-Secondary: #E2E8F0;
-  --color-Fills-Secondary: #F1F5F9;
+  --color-Backgrounds-Secondary: #FAF5FF;
+  --color-Fills-Secondary: #F3E8FF;
   --color-Grays-Black: #0F172A;
   --color-Grays-White: #FFFFFF;
   --color-Grays-Gray: #64748B;
   --color-Accents-Red: #EF4444;
   --color-Accents-Orange: #FF8A00;
   --color-Accents-Mint: #10B981;
-  --color-Primary: #003B95;
+  --color-Primary: #7C2D82;
   --color-Labels-Secondary: #64748B;
 }
 
@@ -113,10 +115,14 @@
 }
 
 .bg-crm-system {
-  background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0.02), rgba(248, 250, 252, 0.05)), url('/Background.png');
+  background: radial-gradient(at 0% 0%, rgba(124, 45, 130, 0.07) 0px, transparent 50%),
+              radial-gradient(at 100% 0%, rgba(214, 31, 105, 0.05) 0px, transparent 50%),
+              radial-gradient(at 50% 100%, rgba(147, 51, 234, 0.04) 0px, transparent 50%),
+              linear-gradient(180deg, #FFFFFF 0%, #FAF5FF 40%, #F5EEFD 100%);
   background-repeat: no-repeat;
   background-position: top center;
   background-size: cover;
+  background-attachment: fixed;
 }
 
 .dark .bg-crm-system,
@@ -127,127 +133,126 @@ html.dark .bg-crm-system,
 }
 
 /* Figma Brand Design Tokens for CEO HN10 Mobile App */
-.bg-Primary-2-50 { background-color: #FFF7ED !important; }
-.dark .bg-Primary-2-50 { background-color: rgba(234, 88, 12, 0.15) !important; }
-.bg-Primary-2-brand { background-color: #EA580C !important; }
-.bg-Primary-1-50 { background-color: #EFF6FF !important; }
-.dark .bg-Primary-1-50 { background-color: rgba(0, 59, 149, 0.25) !important; }
-.bg-Primary-1-brand { background-color: #003B95 !important; }
-.bg-Dark-blue-700 { background-color: #0F172A !important; }
-.bg-Surface-badge { background-color: #EF4444 !important; }
+.bg-Primary-2-50 { background-color: #FAF5FF !important; }
+.dark .bg-Primary-2-50 { background-color: rgba(124, 45, 130, 0.15) !important; }
+.bg-Primary-2-brand { background-color: #7C2D82 !important; }
+.bg-Primary-1-50 { background-color: #FAF5FF !important; }
+.dark .bg-Primary-1-50 { background-color: rgba(124, 45, 130, 0.25) !important; }
+.bg-Primary-1-brand { background-color: #7C2D82 !important; }
+.bg-Dark-blue-700 { background-color: #150B21 !important; }
+.bg-Surface-badge { background-color: #D61F69 !important; }
 .bg-Neutral-white { background-color: #FFFFFF !important; }
-.dark .bg-Neutral-white { background-color: #0F172A !important; }
+.dark .bg-Neutral-white { background-color: #150B21 !important; }
 .bg-Surface-default { background-color: #FFFFFF !important; }
-.dark .bg-Surface-default { background-color: #0F172A !important; }
-.bg-Surface-action { background-color: #EA580C !important; }
-.bg-Primary-2-100 { background-color: #FFEDD5 !important; }
-.dark .bg-Primary-2-100 { background-color: rgba(234, 88, 12, 0.25) !important; }
+.dark .bg-Surface-default { background-color: #150B21 !important; }
+.bg-Surface-action { background-color: #7C2D82 !important; }
+.bg-Primary-2-100 { background-color: #F3E8FF !important; }
+.dark .bg-Primary-2-100 { background-color: rgba(147, 51, 234, 0.25) !important; }
 
-.text-Text-default { color: #1E293B !important; }
-.dark .text-Text-default { color: #F1F5F9 !important; }
-.text-Text-active { color: #EA580C !important; }
-.dark .text-Text-active { color: #FB923C !important; }
+.text-Text-default { color: #1E1B4B !important; }
+.dark .text-Text-default { color: #F5EEFD !important; }
+.text-Text-active { color: #7C2D82 !important; }
+.dark .text-Text-active { color: #C084FC !important; }
 .text-Text-description { color: #64748B !important; }
 .dark .text-Text-description { color: #94A3B8 !important; }
-.text-Primary-2-brand { color: #EA580C !important; }
+.text-Primary-2-brand { color: #7C2D82 !important; }
 
-.outline-Primary-2-brand { outline-color: #EA580C !important; }
+.outline-Primary-2-brand { outline-color: #7C2D82 !important; }
 .outline-Icon-default { outline-color: #64748B !important; }
-.outline-Icon-active { outline-color: #EA580C !important; }
-.outline-Icon-information { outline-color: #EA580C !important; }
+.outline-Icon-active { outline-color: #7C2D82 !important; }
+.outline-Icon-information { outline-color: #7C2D82 !important; }
 .outline-Icon-inactive { outline-color: #94A3B8 !important; }
 .outline-Border-on-action { outline-color: #FFFFFF !important; }
-.outline-Border-default { outline-color: #E2E8F0 !important; }
-.dark .outline-Border-default { outline-color: #334155 !important; }
-.border-Border-default { border-color: #E2E8F0 !important; }
-.dark .border-Border-default { border-color: #334155 !important; }
-.outline-Border-action { outline-color: #EA580C !important; }
-.border-Border-action { border-color: #EA580C !important; }
-.outline-Orange-700 { outline-color: #C2410C !important; }
+.outline-Border-default { outline-color: #F3E8FF !important; }
+.dark .outline-Border-default { outline-color: rgba(168, 85, 247, 0.25) !important; }
+.border-Border-default { border-color: #F3E8FF !important; }
+.dark .border-Border-default { border-color: rgba(168, 85, 247, 0.25) !important; }
+.outline-Border-action { outline-color: #7C2D82 !important; }
+.border-Border-action { border-color: #7C2D82 !important; }
+.outline-Orange-700 { outline-color: #581C87 !important; }
 
 :root {
   --radius: 0.75rem;
 
   --background: #FFFFFF;
-  --foreground: oklch(0.2 0.04 265);
+  --foreground: #1E1B4B;
 
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.2 0.04 265);
+  --card: #FFFFFF;
+  --card-foreground: #1E1B4B;
 
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.2 0.04 265);
+  --popover: #FFFFFF;
+  --popover-foreground: #1E1B4B;
 
-  /* CEO HN10 & ViOne Association Blue Identity */
-  --primary: #003B95;
+  /* CEO HN10 Royal Purple & White Identity (Canva Extraction) */
+  --primary: #7C2D82;
   --primary-foreground: #FFFFFF;
-  --primary-glow: #2563EB;
+  --primary-glow: #A855F7;
 
-  --secondary: oklch(0.96 0.01 260);
-  --secondary-foreground: oklch(0.25 0.05 265);
+  --secondary: #FAF5FF;
+  --secondary-foreground: #4A1C6E;
 
-  --muted: oklch(0.965 0.008 260);
-  --muted-foreground: oklch(0.5 0.03 260);
+  --muted: #FAF5FF;
+  --muted-foreground: #6B7280;
 
-  --accent: oklch(0.95 0.03 285);
-  --accent-foreground: oklch(0.3 0.1 280);
+  --accent: #F3E8FF;
+  --accent-foreground: #581C87;
 
-  --destructive: oklch(0.6 0.22 25);
-  --destructive-foreground: oklch(0.99 0 0);
+  --destructive: #EF4444;
+  --destructive-foreground: #FFFFFF;
 
-  --success: oklch(0.65 0.16 155);
-  --success-foreground: oklch(0.99 0 0);
+  --success: #10B981;
+  --success-foreground: #FFFFFF;
 
-  --warning: oklch(0.74 0.16 65);
-  --warning-foreground: oklch(0.2 0.04 265);
+  --warning: #F59E0B;
+  --warning-foreground: #1E1B4B;
 
-  --info: oklch(0.65 0.15 240);
-  --info-foreground: oklch(0.99 0 0);
+  --info: #0284C7;
+  --info-foreground: #FFFFFF;
 
-  --border: oklch(0.92 0.01 260);
-  --input: oklch(0.92 0.01 260);
-  --ring: oklch(0.45 0.22 270);
+  --border: #F3E8FF;
+  --input: #E9D5FF;
+  --ring: #7C2D82;
 
-  /* Sidebar — Light mode */
-  --sidebar: #ffffff;
-  --sidebar-foreground: #0f172a;
-  --sidebar-primary: oklch(0.55 0.2 285);
-  --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #f1f5f9;
-  --sidebar-accent-foreground: #0f172a;
-  --sidebar-border: #e2e8f0;
-  --sidebar-ring: oklch(0.55 0.2 285);
-  --gradient-sidebar: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+  /* Sidebar — Light mode: White with soft purple-white gradient */
+  --sidebar: #FFFFFF;
+  --sidebar-foreground: #1E1B4B;
+  --sidebar-primary: #7C2D82;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #FAF5FF;
+  --sidebar-accent-foreground: #7C2D82;
+  --sidebar-border: #F3E8FF;
+  --sidebar-ring: #7C2D82;
+  --gradient-sidebar: linear-gradient(180deg, #FFFFFF 0%, #FAF5FF 60%, #F3E8FF 100%);
 
-  --chart-1: oklch(0.55 0.2 270);
-  --chart-2: oklch(0.65 0.18 340);
-  --chart-3: oklch(0.65 0.16 155);
-  --chart-4: oklch(0.74 0.16 65);
-  --chart-5: oklch(0.62 0.18 220);
+  --chart-1: #7C2D82;
+  --chart-2: #D61F69;
+  --chart-3: #10B981;
+  --chart-4: #F59E0B;
+  --chart-5: #6B21A8;
 }
 
 .dark {
   /* ============================================================
-     CEO HN10 OFFICIAL DARK MODE IDENTITY (Brandbook HanoiBA CEO HN10)
-     Deep Obsidian Cobalt Navy, Warm Amber Gold Accents, Zero Purple
+     CEO HN10 OFFICIAL DARK MODE: Deep Royal Obsidian Purple & White
      ============================================================ */
-  --background: var(--vba-bg, #070D1A);
+  --background: #0B0612;
   --foreground: #FFFFFF;
-  --card: var(--vba-surface, #0E172A);
+  --card: #150B21;
   --card-foreground: #FFFFFF;
-  --popover: var(--vba-surface, #0E172A);
+  --popover: #150B21;
   --popover-foreground: #FFFFFF;
-  --primary: var(--vba-navy, #003B95);
+  --primary: #A855F7;
   --primary-foreground: #FFFFFF;
-  --primary-glow: var(--vba-gold-2, #FBBF24);
-  --secondary: var(--vba-surface-2, #14223E);
-  --secondary-foreground: #CBD5E1;
-  --muted: var(--vba-surface-2, #14223E);
-  --muted-foreground: #94A3B8;
-  --accent: var(--vba-gold, #F59E0B);
+  --primary-glow: #D61F69;
+  --secondary: #221235;
+  --secondary-foreground: #E9D5FF;
+  --muted: #1E1030;
+  --muted-foreground: #C084FC;
+  --accent: #7C2D82;
   --accent-foreground: #FFFFFF;
-  --border: var(--vba-border, rgba(245, 158, 11, 0.22));
-  --input: var(--vba-border-soft, rgba(245, 158, 11, 0.25));
-  --ring: var(--vba-navy, #003B95);
+  --border: rgba(168, 85, 247, 0.25);
+  --input: rgba(168, 85, 247, 0.3);
+  --ring: #A855F7;
 
   /* State colours tuned for CEO HN10 dark surfaces */
   --destructive: #EF4444;
@@ -255,12 +260,12 @@ html.dark .bg-crm-system,
   --success: #10B981;
   --success-foreground: #FFFFFF;
   --warning: #F59E0B;
-  --warning-foreground: #070D1A;
+  --warning-foreground: #0B0612;
   --info: #38BDF8;
-  --info-foreground: #070D1A;
+  --info-foreground: #0B0612;
 
-  --sidebar: #050912;
-  --sidebar-foreground: #CBD5E1;
+  --sidebar: #0D0715;
+  --sidebar-foreground: #E9D5FF;
   --sidebar-primary: #F59E0B;
   --sidebar-primary-foreground: #070D1A;
   --sidebar-accent: #0E172A;
@@ -269,7 +274,7 @@ html.dark .bg-crm-system,
   --sidebar-ring: #F59E0B;
   --gradient-sidebar: linear-gradient(180deg, #070D1A 0%, #050912 100%);
 
-  --chart-1: #003B95;
+  --chart-1: #7C2D82;
   --chart-2: #F59E0B;
   --chart-3: #10B981;
   --chart-4: #EF4444;
@@ -491,43 +496,41 @@ html.dark [class*="bg-card"] {
    Unified enterprise theme (navy / warm gold) for the member app.
    Legacy .vba-* class names are kept as aliases so every screen
 /* ============================================================
-   CEO HN10 Official Enterprise Theme (Classic Navy & Warm Amber Gold)
-   Standardized 3-dominant-color system for Dark, Light, & Contrast.
-   Brand Colors: Cobalt Navy (#003B95 / #0A1128) & Warm Amber/Gold (#F59E0B / #D97706 / #EA580C)
+   CEO HN10 Official Theme: Royal Purple & Crisp White (Canva Brandbook)
    ============================================================ */
 .vba-app {
-  --vba-bg: #070D1A;
-  --vba-bg-2: #050912;
-  --vba-surface: #0E172A;
-  --vba-surface-2: #14223E;
-  --vba-border: rgba(245, 158, 11, 0.32);
-  --vba-border-soft: rgba(245, 158, 11, 0.22);
-  --vba-border-accent: rgba(245, 158, 11, 0.65);
-  --vba-gold: #F59E0B;
-  --vba-gold-2: #FBBF24;
-  --vba-gold-soft: rgba(245, 158, 11, 0.18);
-  --vba-gold-glow: 0 6px 24px -4px rgba(245, 158, 11, 0.5);
-  --vba-navy: #003B95;
-  --vba-navy-deep: #002B70;
-  --vba-navy-light: #1E60C6;
-  --vba-brand-orange: #F7941D;
+  --vba-bg: #0B0612;
+  --vba-bg-2: #07030C;
+  --vba-surface: #150B21;
+  --vba-surface-2: #221235;
+  --vba-border: rgba(168, 85, 247, 0.32);
+  --vba-border-soft: rgba(168, 85, 247, 0.22);
+  --vba-border-accent: rgba(214, 31, 105, 0.65);
+  --vba-gold: #D61F69;
+  --vba-gold-2: #C084FC;
+  --vba-gold-soft: rgba(168, 85, 247, 0.18);
+  --vba-gold-glow: 0 6px 24px -4px rgba(124, 45, 130, 0.5);
+  --vba-navy: #7C2D82;
+  --vba-navy-deep: #4A1C6E;
+  --vba-navy-light: #A855F7;
+  --vba-brand-orange: #D61F69;
   --vba-text: #FFFFFF;
-  --vba-text-muted: #CBD5E1;
-  --vba-text-dim: #94A3B8;
+  --vba-text-muted: #E9D5FF;
+  --vba-text-dim: #C084FC;
   --vba-success: #10B981;
   --vba-danger: #EF4444;
 
-  background: var(--vba-bg, #070D1A);
+  background: var(--vba-bg, #0B0612);
   color: var(--vba-text);
   min-height: 100dvh;
   font-family: var(--font-sans);
 }
 
 .vba-card {
-  background: var(--vba-surface, #0E172A);
+  background: var(--vba-surface, #150B21);
   color: var(--vba-text, #FFFFFF);
-  border: 1px solid rgba(245, 158, 11, 0.28);
-  box-shadow: 0 4px 20px -3px rgba(245, 158, 11, 0.12), 0 2px 8px -2px rgba(0, 59, 149, 0.15);
+  border: 1px solid rgba(168, 85, 247, 0.28);
+  box-shadow: 0 4px 20px -3px rgba(124, 45, 130, 0.2), 0 2px 8px -2px rgba(74, 28, 110, 0.25);
 }
 
 /* High-contrast: strengthen borders and text separation */
@@ -552,10 +555,10 @@ html:not(.dark) .vba-app {
   --vba-gold-2: #F59E0B;
   --vba-gold-soft: rgba(217, 119, 6, 0.14);
   --vba-gold-glow: 0 4px 16px -2px rgba(217, 119, 6, 0.35);
-  --vba-navy: #003B95;
-  --vba-navy-deep: #002B70;
-  --vba-navy-light: #1E60C6;
-  --vba-brand-orange: #F7941D;
+  --vba-navy: #7C2D82;
+  --vba-navy-deep: #4A1C6E;
+  --vba-navy-light: #9333EA;
+  --vba-brand-orange: #D61F69;
   --vba-text: #0F172A;
   --vba-text-muted: #334155;
   --vba-text-dim: #64748B;
@@ -572,29 +575,29 @@ html:not(.dark) .vba-app {
 html:not(.dark) .vba-card {
   background: #FFFFFF;
   color: #0F172A;
-  border: 1.5px solid rgba(217, 119, 6, 0.25);
-  box-shadow: 0 4px 20px -2px rgba(217, 119, 6, 0.12), 0 2px 8px -2px rgba(0, 59, 149, 0.08);
+  border: 1.5px solid rgba(124, 45, 130, 0.25);
+  box-shadow: 0 4px 20px -2px rgba(124, 45, 130, 0.12), 0 2px 8px -2px rgba(124, 45, 130, 0.08);
 }
 
 .vba-gold-text {
-  background: linear-gradient(135deg, #F59E0B 0%, #D97706 60%, #B45309 100%);
+  background: linear-gradient(135deg, #9333EA 0%, #7C2D82 60%, #4A1C6E 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
 }
 
 .vba-gold-grad {
-  background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+  background: linear-gradient(135deg, #7C2D82 0%, #9333EA 100%);
   color: #FFFFFF !important;
   font-weight: 700;
-  box-shadow: 0 3px 14px -2px rgba(217, 119, 6, 0.4);
+  box-shadow: 0 3px 14px -2px rgba(124, 45, 130, 0.4);
 }
 
 .vba-navy-gold-btn {
-  background: linear-gradient(135deg, #002B70 0%, #003B95 100%);
-  border: 1px solid rgba(245, 158, 11, 0.45);
-  color: #FEF3C7;
-  box-shadow: 0 4px 14px -2px rgba(0, 59, 149, 0.35);
+  background: linear-gradient(135deg, #4A1C6E 0%, #7C2D82 50%, #9333EA 100%);
+  border: 1px solid rgba(168, 85, 247, 0.45);
+  color: #FFFFFF;
+  box-shadow: 0 4px 14px -2px rgba(124, 45, 130, 0.35);
 }
 
 /* High-contrast mode tokens for .vba-app — Pure Solid Black, Pure White, & Electric Gold */
@@ -665,28 +668,36 @@ html.hc .vba-gold-grad {
 /* ============================================================
    CEO HN10 COLOR STANDARDS & CONTRAST (Light & Dark Mode)
    ============================================================ */
-/* Navy brand buttons & highlights in Light Mode */
+/* Purple brand buttons & highlights in Light Mode */
+html:not(.dark) [class*="bg-[#7C2D82]"],
 html:not(.dark) [class*="bg-[#003B95]"],
+html:not(.dark) [class*="hover:bg-[#7C2D82]"]:hover,
 html:not(.dark) [class*="hover:bg-[#003B95]"]:hover {
-  background-color: #003B95;
+  background-color: #7C2D82;
   color: #ffffff;
 }
 
+html:not(.dark) [class*="bg-[#7C2D82]"] *,
 html:not(.dark) [class*="bg-[#003B95]"] *,
+html:not(.dark) [class*="hover:bg-[#7C2D82]"]:hover *,
 html:not(.dark) [class*="hover:bg-[#003B95]"]:hover * {
   color: #ffffff;
   stroke: #ffffff;
 }
 
-/* Navy brand buttons & highlights in Dark Mode: Deep Navy with Amber Gold border */
+/* Purple brand buttons & highlights in Dark Mode */
+.dark [class*="bg-[#7C2D82]"],
 .dark [class*="bg-[#003B95]"],
+.dark [class*="hover:bg-[#7C2D82]"]:hover,
 .dark [class*="hover:bg-[#003B95]"]:hover {
-  background-color: #003B95 !important;
+  background-color: #7C2D82 !important;
   color: #ffffff !important;
-  border-color: rgba(245, 158, 11, 0.35) !important;
+  border-color: rgba(168, 85, 247, 0.45) !important;
 }
 
+.dark [class*="bg-[#7C2D82]"] *,
 .dark [class*="bg-[#003B95]"] *,
+.dark [class*="hover:bg-[#7C2D82]"]:hover *,
 .dark [class*="hover:bg-[#003B95]"]:hover * {
   color: #ffffff !important;
   stroke: #ffffff !important;
@@ -710,15 +721,16 @@ html:not(.dark) button.bg-white * {
   stroke: #FFFFFF !important;
 }
 
-/* Nút Đăng nhập CRM: luôn nền Navy đặc + chữ trắng đậm */
+/* Nút Đăng nhập CRM: luôn nền Tím gradient đặc + chữ trắng đậm */
 button.ceo-login-submit {
-  background-color: #003B95 !important;
+  background: linear-gradient(135deg, #7C2D82 0%, #9333EA 50%, #6B21A8 100%) !important;
   color: #ffffff !important;
-  border: 1px solid #003B95 !important;
+  border: 1px solid #9333EA !important;
+  box-shadow: 0 4px 14px -2px rgba(124, 45, 130, 0.45) !important;
 }
 button.ceo-login-submit:hover:not(:disabled) {
-  background-color: #002B70 !important;
-  border-color: #002B70 !important;
+  background: linear-gradient(135deg, #6B21A8 0%, #7C2D82 50%, #4A1C6E 100%) !important;
+  border-color: #A855F7 !important;
 }
 button.ceo-login-submit *,
 button.ceo-login-submit span,
@@ -733,24 +745,24 @@ button.ceo-login-submit svg {
    4 DẠNG MÀU TIÊU CHUẨN CEO HN10 (BRANDBOOK GUIDELINES)
    ============================================================ */
 
-/* 1. Royal Cobalt Navy & Amber Gold (Mặc định cốt lõi) */
+/* 1. Royal Purple & Soft Violet (Mặc định cốt lõi CEOHN10) */
 [data-app-color-theme="royal-gold"],
 .dark[data-app-color-theme="royal-gold"] {
-  --vba-bg: #070D1A;
-  --vba-bg-2: #050912;
-  --vba-surface: #0E172A;
-  --vba-surface-2: #14223E;
-  --vba-navy: #003B95;
-  --vba-navy-deep: #001D4A;
-  --vba-gold: #F59E0B;
-  --vba-gold-2: #FBBF24;
-  --vba-border: rgba(245, 158, 11, 0.32);
-  --vba-border-soft: rgba(245, 158, 11, 0.18);
-  --theme-icon-color: #F59E0B;
-  --theme-primary-gradient: linear-gradient(135deg, #0052CC 0%, #003B95 60%, #001D4A 100%);
-  --theme-card-gradient: linear-gradient(135deg, #0E172A 0%, #14223E 100%);
-  --bc-mobile-accent: #003B95;
-  --bc-mobile-accent-grad: linear-gradient(135deg, #0052CC 0%, #003B95 60%, #001D4A 100%);
+  --vba-bg: #0F0A1A;
+  --vba-bg-2: #080510;
+  --vba-surface: #1E1233;
+  --vba-surface-2: #2A1847;
+  --vba-navy: #7C2D82;
+  --vba-navy-deep: #4A1C6E;
+  --vba-gold: #D61F69;
+  --vba-gold-2: #F43F5E;
+  --vba-border: rgba(168, 85, 247, 0.35);
+  --vba-border-soft: rgba(168, 85, 247, 0.20);
+  --theme-icon-color: #C084FC;
+  --theme-primary-gradient: linear-gradient(135deg, #7C2D82 0%, #9333EA 50%, #4A1C6E 100%);
+  --theme-card-gradient: linear-gradient(135deg, #1E1233 0%, #2A1847 100%);
+  --bc-mobile-accent: #7C2D82;
+  --bc-mobile-accent-grad: linear-gradient(135deg, #7C2D82 0%, #9333EA 50%, #4A1C6E 100%);
 }
 
 /* 2. Heritage Navy & Dynamic Brand Orange (Chuẩn Logo Brandbook) */
@@ -3177,44 +3189,60 @@ body.dark {
    ============================================================ */
 
 /* 1. Recolor elements based on active brand theme across entire application */
+[data-app-color-theme] .bg-\[\#7C2D82\],
 [data-app-color-theme] .bg-\[\#003B95\],
 [data-app-color-theme] .vba-btn-primary,
 [data-app-color-theme] .vba-active-tab {
   background-color: var(--vba-navy) !important;
 }
 
+[data-app-color-theme] .text-\[\#7C2D82\],
 [data-app-color-theme] .text-\[\#003B95\] {
   color: var(--vba-navy) !important;
 }
 
+[data-app-color-theme] .border-\[\#7C2D82\],
 [data-app-color-theme] .border-\[\#003B95\] {
   border-color: var(--vba-navy) !important;
 }
 
+[data-app-color-theme] .from-\[\#7C2D82\],
 [data-app-color-theme] .from-\[\#003B95\] {
   --tw-gradient-from: var(--vba-navy) var(--tw-gradient-from-position) !important;
 }
 
-/* 2. Text TRẮNG TUYỆT ĐỐI trên toàn bộ nền xanh / màu chính */
+/* 2. Text TRẮNG TUYỆT ĐỐI trên toàn bộ nền tím / màu chính */
+.bg-\[\#7C2D82\],
+.bg-\[\#6B21A8\],
+.bg-\[\#581C87\],
+.bg-\[\#4A1C6E\],
 .bg-\[\#003B95\],
 .bg-\[\#002B66\],
 .bg-\[\#1E3A8A\],
 .bg-\[\#1F3864\],
 .bg-\[\#2E3192\],
 .bg-\[\#991B1B\],
+html.dark .dark\:bg-\[\#7C2D82\],
 html.dark .dark\:bg-\[\#003B95\],
+[data-app-color-theme] .bg-\[\#7C2D82\],
 [data-app-color-theme] .bg-\[\#003B95\],
 [data-app-color-theme] .vba-btn-primary {
   color: #FFFFFF !important;
 }
 
+.bg-\[\#7C2D82\] *,
+.bg-\[\#6B21A8\] *,
+.bg-\[\#581C87\] *,
+.bg-\[\#4A1C6E\] *,
 .bg-\[\#003B95\] *,
 .bg-\[\#002B66\] *,
 .bg-\[\#1E3A8A\] *,
 .bg-\[\#1F3864\] *,
 .bg-\[\#2E3192\] *,
 .bg-\[\#991B1B\] *,
+html.dark .dark\:bg-\[\#7C2D82\] *,
 html.dark .dark\:bg-\[\#003B95\] *,
+[data-app-color-theme] .bg-\[\#7C2D82\] *,
 [data-app-color-theme] .bg-\[\#003B95\] *,
 [data-app-color-theme] .vba-btn-primary * {
   color: #FFFFFF !important;

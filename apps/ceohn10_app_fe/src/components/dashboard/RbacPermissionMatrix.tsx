@@ -63,7 +63,6 @@ export const SIDEBAR_ROUTE_NAMES: Record<string, string> = {
   "/account-settings?tab=users": "Quản trị người dùng",
   "/events": "Sự kiện",
   "/events-overview": "Tổng quan sự kiện",
-  "/meetings": "Cuộc họp",
   "/voting": "Biểu quyết",
   "/event-registrations": "Đăng ký sự kiện",
   "/lucky-draw": "Bốc thăm trúng thưởng",
@@ -76,21 +75,19 @@ export const SIDEBAR_ROUTE_NAMES: Record<string, string> = {
   "/finance-report": "Báo cáo tài chính",
   "/news": "Bản tin & Hoạt động",
   "/media": "Thư viện truyền thông",
-  "/marketplace": "Gian hàng & Sản phẩm",
-  "/business-connect": "Cơ hội hợp tác",
-  "/trainings": "Đào tạo & Họp trực tuyến",
+  "/trainings": "Lớp học & Khóa đào tạo",
   "/tasks": "Quản lý công việc",
   "/settings": "Cài đặt hệ thống",
   "/activity": "Lịch sử hoạt động",
   "/activity-logs": "Lịch sử hoạt động",
   "/notifications": "Quản lý thông báo",
   "/permissions": "Phân quyền hệ thống",
+  "/documents": "Quản lý tài liệu & Học liệu",
   "/association/card": "Thẻ Hội Viên & Danh Thiếp Số",
   "/association/feed": "Mạng Lưới Hội Viên (Feed)",
   "/association/members": "Danh Bạ Hội Viên Trên App",
-  "/association/messages": "Kết Nối Giao Thương B2B & Tin Nhắn",
-  "/association/opportunities": "Cơ Hội Giao Thương",
-  "/association/products": "Giao thương",
+  "/association/messages": "Tin Nhắn & Trao Đổi Lãnh Đạo",
+  "/association/trainings": "Khóa Đào Tạo Trên App",
   "/association/events": "Sự Kiện & Vé Điện Tử E-Ticket",
   "/association/voting": "Biểu Quyết & Bầu Cử Trực Tuyến",
   "/association/profile": "Hội Phí Cá Nhân & Hồ Sơ Lãnh Đạo",
@@ -285,19 +282,6 @@ export const INITIAL_CATEGORIES: TreeCategory[] = [
         actions: [
           { id: "act_evto_view", name: "Xem tổng quan & chỉ số sự kiện", code: "EVTO_VIEW", description: "Xem biểu đồ số lượng người tham dự, tỷ lệ tham gia", apiEndpoint: "GET /api/events/overview", roles: { bqt: true, thu_ky: true, thanh_vien: true, truyen_thong: true, quan_tri: true, admin: true, tong_thu_ky: true, ban_thu_ky: true } },
           { id: "act_evto_export", name: "Xuất báo cáo tổng quan sự kiện", code: "EVTO_EXPORT", description: "Xuất file thống kê sự kiện theo quý/năm", apiEndpoint: "GET /api/events/overview/export", roles: { bqt: true, thu_ky: true, quan_tri: true, admin: true, tong_thu_ky: true } },
-        ],
-      },
-      {
-        id: "feat_meetings",
-        name: "Cuộc họp",
-        route: "/meetings",
-        description: "Quản lý cuộc họp ban, họp BCH trực tuyến/trực tiếp và đặt phòng họp",
-        actions: [
-          { id: "act_meet_view", name: "Xem danh sách cuộc họp", code: "MEET_VIEW", description: "Tra cứu lịch họp, phòng họp Sapphire, Zoom/Meet", apiEndpoint: "GET /api/meetings", roles: { bqt: true, thu_ky: true, thanh_vien: true, xuc_tien: true, truyen_thong: true, thien_nguyen: true, quan_tri: true, admin: true, tong_thu_ky: true, ban_thu_ky: true, member: true } },
-          { id: "act_meet_add", name: "Tạo cuộc họp mới", code: "MEET_ADD", description: "Khởi tạo cuộc họp ban kèm đăng ký phòng họp", apiEndpoint: "POST /api/meetings", roles: { bqt: true, thu_ky: true, thanh_vien: true, xuc_tien: true, truyen_thong: true, thien_nguyen: true, quan_tri: true, admin: true, tong_thu_ky: true, ban_thu_ky: true } },
-          { id: "act_meet_edit", name: "Chỉnh sửa thông tin cuộc họp", code: "MEET_EDIT", description: "Điều chỉnh thời gian, đường link, đại biểu tham dự", apiEndpoint: "PUT /api/meetings/:id", roles: { bqt: true, thu_ky: true, quan_tri: true, admin: true, tong_thu_ky: true, ban_thu_ky: true } },
-          { id: "act_meet_delete", name: "Xóa / Hủy cuộc họp", code: "MEET_DELETE", description: "Hủy bỏ lịch họp và giải phóng phòng", apiEndpoint: "DELETE /api/meetings/:id", roles: { bqt: true, thu_ky: true, quan_tri: true, admin: true } },
-          { id: "act_meet_approve", name: "Phê duyệt cuộc họp", code: "MEET_APPROVE", description: "Duyệt cuộc họp của ban đề xuất gửi lên Quản trị", apiEndpoint: "PATCH /api/meetings/:id/approve", roles: { bqt: true, quan_tri: true, admin: true } },
         ],
       },
       {
@@ -513,59 +497,34 @@ export const INITIAL_CATEGORIES: TreeCategory[] = [
     ],
   },
 
-  // NHÓM 6: KẾT NỐI
+  // NHÓM 6: KẾT NỐI & ĐÀO TẠO
   {
     id: "cat_network",
-    name: "KẾT NỐI",
+    name: "KẾT NỐI & ĐÀO TẠO",
     iconName: "Store",
     features: [
       {
         id: "feat_network",
         name: "Kết nối hội viên",
         route: "/network",
-        description: "Mạng lưới kết nối giao lưu giữa các doanh nhân đồng niên 1983",
+        description: "Mạng lưới kết nối giao lưu giữa các doanh nhân CEO HN10",
         actions: [
           { id: "act_net_view", name: "Xem mạng lưới kết nối", code: "NET_VIEW", description: "Tra cứu kết nối và sơ đồ quan hệ hội viên", apiEndpoint: "GET /api/network", roles: { bqt: true, thu_ky: true, thanh_vien: true, xuc_tien: true, truyen_thong: true, thien_nguyen: true, quan_tri: true, admin: true, tong_thu_ky: true, ban_thu_ky: true, member: true } },
-          { id: "act_net_connect", name: "Khởi tạo kết nối & Nhắn tin B2B", code: "NET_CONNECT", description: "Gửi lời mời kết nối trực tiếp đến doanh nghiệp", apiEndpoint: "POST /api/network/connect", roles: { bqt: true, thu_ky: true, thanh_vien: true, xuc_tien: true, truyen_thong: true, thien_nguyen: true, quan_tri: true, admin: true, tong_thu_ky: true, ban_thu_ky: true, member: true } },
+          { id: "act_net_connect", name: "Khởi tạo kết nối & Nhắn tin", code: "NET_CONNECT", description: "Gửi lời mời kết nối trực tiếp đến doanh nghiệp", apiEndpoint: "POST /api/network/connect", roles: { bqt: true, thu_ky: true, thanh_vien: true, xuc_tien: true, truyen_thong: true, thien_nguyen: true, quan_tri: true, admin: true, tong_thu_ky: true, ban_thu_ky: true, member: true } },
           { id: "act_net_export", name: "Xuất dữ liệu kết nối", code: "NET_EXPORT", description: "Xuất file danh bạ mạng lưới kết nối", apiEndpoint: "GET /api/network/export", roles: { bqt: true, thu_ky: true, xuc_tien: true, quan_tri: true, admin: true, tong_thu_ky: true } },
         ],
       },
       {
-        id: "feat_bc_meetings",
-        name: "Cuộc gặp",
-        route: "/business-connect/meetings",
-        description: "Quản lý các cuộc hẹn gặp kết nối 1-on-1 Business Connect giữa các CEO",
+        id: "feat_trainings",
+        name: "Lớp học & Khóa đào tạo",
+        route: "/trainings",
+        description: "Quản lý chương trình đào tạo quản trị doanh nghiệp và các khóa học CEOHN10",
         actions: [
-          { id: "act_bcm_view", name: "Xem danh sách cuộc hẹn gặp", code: "BCM_VIEW", description: "Tra cứu lịch hẹn gặp 1-1 giữa các hội viên", apiEndpoint: "GET /api/business-connect/meetings", roles: { bqt: true, thu_ky: true, thanh_vien: true, xuc_tien: true, truyen_thong: true, thien_nguyen: true, quan_tri: true, admin: true, tong_thu_ky: true, ban_thu_ky: true, member: true } },
-          { id: "act_bcm_add", name: "Tạo lịch hẹn gặp mới", code: "BCM_ADD", description: "Đặt lịch hẹn gặp giao lưu trực tiếp", apiEndpoint: "POST /api/business-connect/meetings", roles: { bqt: true, thu_ky: true, thanh_vien: true, xuc_tien: true, truyen_thong: true, thien_nguyen: true, quan_tri: true, admin: true, tong_thu_ky: true, ban_thu_ky: true, member: true } },
-          { id: "act_bcm_edit", name: "Chỉnh sửa lịch hẹn gặp", code: "BCM_EDIT", description: "Đổi thời gian hoặc địa điểm hẹn gặp", apiEndpoint: "PUT /api/business-connect/meetings/:id", roles: { bqt: true, thu_ky: true, quan_tri: true, admin: true, tong_thu_ky: true, ban_thu_ky: true, member: true } },
-          { id: "act_bcm_delete", name: "Hủy cuộc hẹn gặp", code: "BCM_DELETE", description: "Hủy lịch hẹn gặp", apiEndpoint: "DELETE /api/business-connect/meetings/:id", roles: { bqt: true, thu_ky: true, quan_tri: true, admin: true, tong_thu_ky: true, ban_thu_ky: true, member: true } },
-        ],
-      },
-      {
-        id: "feat_marketplace",
-        name: "Marketplace",
-        route: "/marketplace",
-        description: "Sàn giao dịch sản phẩm dịch vụ ưu đãi nội bộ của các doanh nghiệp hội viên",
-        actions: [
-          { id: "act_mkt_view", name: "Xem sản phẩm gian hàng", code: "MKT_VIEW", description: "Tra cứu sản phẩm, giá bán, chính sách chiết khấu", apiEndpoint: "GET /api/marketplace", roles: { bqt: true, thu_ky: true, thanh_vien: true, xuc_tien: true, truyen_thong: true, thien_nguyen: true, quan_tri: true, admin: true, tong_thu_ky: true, ban_thu_ky: true, member: true } },
-          { id: "act_mkt_add", name: "Đăng sản phẩm mới", code: "MKT_ADD", description: "Đưa sản phẩm lên gian hàng sàn Marketplace", apiEndpoint: "POST /api/marketplace", roles: { bqt: true, thu_ky: true, thanh_vien: true, xuc_tien: true, quan_tri: true, admin: true, tong_thu_ky: true, ban_thu_ky: true, member: true } },
-          { id: "act_mkt_edit", name: "Chỉnh sửa thông tin sản phẩm", code: "MKT_EDIT", description: "Cập nhật hình ảnh, giá bán, chiết khấu", apiEndpoint: "PUT /api/marketplace/:id", roles: { bqt: true, thu_ky: true, xuc_tien: true, quan_tri: true, admin: true, tong_thu_ky: true, ban_thu_ky: true, member: true } },
-          { id: "act_mkt_delete", name: "Xóa sản phẩm", code: "MKT_DELETE", description: "Gỡ bỏ sản phẩm khỏi sàn", apiEndpoint: "DELETE /api/marketplace/:id", roles: { bqt: true, xuc_tien: true, quan_tri: true, admin: true } },
-          { id: "act_mkt_approve", name: "Thẩm định & Phê duyệt sản phẩm", code: "MKT_APPROVE", description: "Kiểm duyệt xuất bản sản phẩm lên Marketplace", apiEndpoint: "PATCH /api/marketplace/:id/approve", roles: { bqt: true, xuc_tien: true, quan_tri: true, admin: true } },
-        ],
-      },
-      {
-        id: "feat_opportunities",
-        name: "Chia sẻ cơ hội",
-        route: "/opportunities",
-        description: "Sàn giao thương B2B, trao đổi nhu cầu hợp tác kinh doanh và tìm đối tác",
-        actions: [
-          { id: "act_opp_view", name: "Xem sàn cơ hội giao thương", code: "OPP_VIEW", description: "Xem nhu cầu chào mua, chào bán của các doanh nghiệp", apiEndpoint: "GET /api/opportunities", roles: { bqt: true, thu_ky: true, thanh_vien: true, xuc_tien: true, truyen_thong: true, thien_nguyen: true, quan_tri: true, admin: true, tong_thu_ky: true, ban_thu_ky: true, member: true } },
-          { id: "act_opp_add", name: "Đăng cơ hội hợp tác mới", code: "OPP_ADD", description: "Tạo tin đăng nhu cầu hợp tác kinh doanh", apiEndpoint: "POST /api/opportunities", roles: { bqt: true, thu_ky: true, thanh_vien: true, xuc_tien: true, truyen_thong: true, thien_nguyen: true, quan_tri: true, admin: true, tong_thu_ky: true, ban_thu_ky: true, member: true } },
-          { id: "act_opp_edit", name: "Chỉnh sửa cơ hội", code: "OPP_EDIT", description: "Cập nhật yêu cầu hoặc thời hạn cơ hội", apiEndpoint: "PUT /api/opportunities/:id", roles: { bqt: true, thu_ky: true, xuc_tien: true, quan_tri: true, admin: true, tong_thu_ky: true, ban_thu_ky: true, member: true } },
-          { id: "act_opp_delete", name: "Xóa / Đóng cơ hội", code: "OPP_DELETE", description: "Đóng cơ hội khi đã hoàn thành giao dịch", apiEndpoint: "DELETE /api/opportunities/:id", roles: { bqt: true, xuc_tien: true, quan_tri: true, admin: true } },
-          { id: "act_opp_approve", name: "Duyệt & Gán nhãn cơ hội tiêu biểu", code: "OPP_APPROVE", description: "Xác thực và đưa cơ hội lên trang nhất", apiEndpoint: "PATCH /api/opportunities/:id/approve", roles: { bqt: true, xuc_tien: true, quan_tri: true, admin: true } },
+          { id: "act_trn_view", name: "Xem danh sách lớp học & khóa đào tạo", code: "TRN_VIEW", description: "Tra cứu chương trình học, lịch học và giảng viên", apiEndpoint: "GET /api/trainings", roles: { bqt: true, thu_ky: true, thanh_vien: true, xuc_tien: true, truyen_thong: true, thien_nguyen: true, quan_tri: true, admin: true, tong_thu_ky: true, ban_thu_ky: true, member: true } },
+          { id: "act_trn_add", name: "Tạo khóa đào tạo mới", code: "TRN_ADD", description: "Thiết lập chương trình đào tạo mới", apiEndpoint: "POST /api/trainings", roles: { bqt: true, thu_ky: true, quan_tri: true, admin: true, tong_thu_ky: true } },
+          { id: "act_trn_edit", name: "Chỉnh sửa nội dung & giảng viên", code: "TRN_EDIT", description: "Cập nhật tài liệu giảng dạy, lịch học và giảng viên", apiEndpoint: "PUT /api/trainings/:id", roles: { bqt: true, thu_ky: true, quan_tri: true, admin: true, tong_thu_ky: true } },
+          { id: "act_trn_delete", name: "Xóa khóa đào tạo", code: "TRN_DELETE", description: "Gỡ bỏ khóa đào tạo", apiEndpoint: "DELETE /api/trainings/:id", roles: { bqt: true, quan_tri: true, admin: true } },
+          { id: "act_trn_join", name: "Đăng ký tham gia lớp học", code: "TRN_JOIN", description: "Ghi danh học viên tham dự khóa đào tạo", apiEndpoint: "POST /api/trainings/:id/join", roles: { bqt: true, thu_ky: true, thanh_vien: true, xuc_tien: true, truyen_thong: true, thien_nguyen: true, quan_tri: true, admin: true, tong_thu_ky: true, ban_thu_ky: true, member: true } },
         ],
       },
     ],
@@ -607,16 +566,6 @@ export const INITIAL_CATEGORIES: TreeCategory[] = [
         actions: [
           { id: "act_act_view", name: "Xem nhật ký hoạt động", code: "ACT_VIEW", description: "Theo dõi thao tác đăng nhập, sửa đổi dữ liệu", apiEndpoint: "GET /api/activities", roles: { bqt: true, thu_ky: true, quan_tri: true, admin: true, tong_thu_ky: true } },
           { id: "act_act_export", name: "Xuất dữ liệu nhật ký", code: "ACT_EXPORT", description: "Trích xuất file log kiểm toán hệ thống", apiEndpoint: "GET /api/activities/export", roles: { bqt: true, quan_tri: true, admin: true } },
-        ],
-      },
-      {
-        id: "feat_landing_templates",
-        name: "Quản lý chủ đề",
-        route: "/admin/landing-templates",
-        description: "Quản trị giao diện chủ đề, bộ nhận diện thương hiệu và màu sắc",
-        actions: [
-          { id: "act_thm_view", name: "Xem danh sách chủ đề", code: "THM_VIEW", description: "Xem các mẫu template và màu sắc thương hiệu", apiEndpoint: "GET /api/landing-templates", roles: { bqt: true, thu_ky: true, truyen_thong: true, quan_tri: true, admin: true } },
-          { id: "act_thm_edit", name: "Chỉnh sửa & Áp dụng chủ đề", code: "THM_EDIT", description: "Tùy biến màu sắc, banner giao diện", apiEndpoint: "PUT /api/landing-templates", roles: { bqt: true, truyen_thong: true, quan_tri: true, admin: true } },
         ],
       },
     ],
@@ -730,23 +679,13 @@ export const INITIAL_CATEGORIES: TreeCategory[] = [
         ],
       },
       {
-        id: "feat_app_opportunities",
-        name: "Sàn Cơ Hội Giao Thương B2B",
-        route: "/association/opportunities",
-        description: "Đăng tải và tìm kiếm cơ hội hợp tác kinh doanh",
+        id: "feat_app_trainings",
+        name: "Khóa Đào Tạo & Lớp Học Trên App",
+        route: "/association/trainings",
+        description: "Tham gia các khóa đào tạo chuyên môn và lớp học trực tuyến trên App CEOHN10",
         actions: [
-          { id: "act_app_opp_view", name: "Xem danh sách Cơ hội kinh doanh", code: "APP_OPP_VIEW", description: "Tra cứu nhu cầu mua, bán và hợp tác đầu tư", apiEndpoint: "GET /api/app/opportunities", roles: { bqt: true, thu_ky: true, thanh_vien: true, xuc_tien: true, truyen_thong: true, thien_nguyen: true, quan_tri: true, admin: true, tong_thu_ky: true, ban_thu_ky: true, member: true } },
-          { id: "act_app_opp_create", name: "Đăng cơ hội kinh doanh mới", code: "APP_OPP_CREATE", description: "Đăng bài chia sẻ nhu cầu giao thương của doanh nghiệp", apiEndpoint: "POST /api/app/opportunities", roles: { bqt: true, thu_ky: true, thanh_vien: true, xuc_tien: true, truyen_thong: true, thien_nguyen: true, quan_tri: true, admin: true, tong_thu_ky: true, ban_thu_ky: true, member: true } },
-        ],
-      },
-      {
-        id: "feat_app_products",
-        name: "Gian Hàng Doanh Nghiệp (Marketplace)",
-        route: "/association/products",
-        description: "Quảng bá sản phẩm, dịch vụ và giải pháp doanh nghiệp",
-        actions: [
-          { id: "act_app_prd_view", name: "Xem danh mục Sản phẩm / Dịch vụ", code: "APP_PRD_VIEW", description: "Xem sản phẩm của các doanh nghiệp hội viên", apiEndpoint: "GET /api/app/products", roles: { bqt: true, thu_ky: true, thanh_vien: true, xuc_tien: true, truyen_thong: true, thien_nguyen: true, quan_tri: true, admin: true, tong_thu_ky: true, ban_thu_ky: true, member: true } },
-          { id: "act_app_prd_create", name: "Đăng bán Sản phẩm / Dịch vụ mới", code: "APP_PRD_CREATE", description: "Đưa sản phẩm dịch vụ lên gian hàng App", apiEndpoint: "POST /api/app/products", roles: { bqt: true, thu_ky: true, thanh_vien: true, xuc_tien: true, truyen_thong: true, thien_nguyen: true, quan_tri: true, admin: true, tong_thu_ky: true, ban_thu_ky: true, member: true } },
+          { id: "act_app_trn_view", name: "Xem danh sách Khóa học & Lớp đào tạo", code: "APP_TRN_VIEW", description: "Tra cứu chương trình đào tạo và học liệu trên App", apiEndpoint: "GET /api/app/trainings", roles: { bqt: true, thu_ky: true, thanh_vien: true, xuc_tien: true, truyen_thong: true, thien_nguyen: true, quan_tri: true, admin: true, tong_thu_ky: true, ban_thu_ky: true, member: true } },
+          { id: "act_app_trn_join", name: "Đăng ký tham gia lớp đào tạo", code: "APP_TRN_JOIN", description: "Ghi danh khóa đào tạo trên App", apiEndpoint: "POST /api/app/trainings/:id/join", roles: { bqt: true, thu_ky: true, thanh_vien: true, xuc_tien: true, truyen_thong: true, thien_nguyen: true, quan_tri: true, admin: true, tong_thu_ky: true, ban_thu_ky: true, member: true } },
         ],
       },
       {
@@ -1656,31 +1595,39 @@ export function RbacPermissionMatrix({
 
   return (
     <div className="self-stretch min-h-[739px] pl-4 sm:pl-10 lg:pl-14 pr-4 sm:pr-8 lg:pr-12 pt-8 sm:pt-10 flex flex-col justify-start items-start gap-4">
-      {/* ── TIÊU ĐỀ TRANG VÀ ICON LOGO (FIGMA SNIPPET 1) ── */}
-      <div className="self-stretch h-16 inline-flex justify-start items-center gap-1.5 overflow-hidden">
-        <img className="size-16 object-contain" src="/icons/ceohn10_icon_1/image 6.png" alt="logo" />
-        <div className="flex-1 inline-flex flex-col justify-start items-start gap-1.5">
-          <div className="justify-start text-slate-900 dark:text-white text-2xl font-bold font-['Inter'] leading-8">
-            Ma Trận Phân Quyền &amp; Ban Chuyên Môn
-          </div>
-          <div className="justify-start text-slate-500 text-sm font-normal font-['Inter'] leading-5">
-            Quản lý ban chuyên môn và cấu hình quyền hạn vai trò hệ thống CEO HN10
+      {/* ── TIÊU ĐỀ TRANG VÀ ICON LOGO CEO HN10 ── */}
+      <div className="self-stretch p-5 bg-gradient-to-r from-purple-900/10 via-purple-500/5 to-transparent rounded-2xl border border-purple-200/60 dark:border-purple-900/40 inline-flex flex-wrap justify-between items-center gap-4 overflow-hidden backdrop-blur-sm">
+        <div className="inline-flex items-center gap-4">
+          <img className="h-12 w-auto object-contain drop-shadow-sm" src="/ceohn10-official-logo.png" alt="CEOHN10 logo" />
+          <div className="inline-flex flex-col justify-start items-start gap-1">
+            <div className="flex items-center gap-2">
+              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black tracking-wider uppercase bg-[#7C2D82] text-white">
+                CEOHN10 GOVERNANCE
+              </span>
+              <span className="text-xs text-purple-700 dark:text-purple-300 font-semibold">
+                Group Quản Trị &amp; Khởi Nghiệp
+              </span>
+            </div>
+            <div className="justify-start text-slate-900 dark:text-white text-xl sm:text-2xl font-black font-['Inter'] tracking-tight">
+              Phân Quyền Vai Trò &amp; Ban Chuyên Môn CEOHN10
+            </div>
+            <div className="justify-start text-slate-600 dark:text-slate-300 text-xs font-normal font-['Inter']">
+              Kiểm soát phân quyền phân hệ CRM và ứng dụng di động theo 4 Ban chuyên môn &amp; Hội viên
+            </div>
           </div>
         </div>
       </div>
 
-      {/* ── THANH TÌM KIẾM VÀ CÁC NÚT THAO TÁC (FIGMA SNIPPET 1) ── */}
-      <div className="self-stretch rounded-[20px] shadow-[0px_2px_2px_0px_rgba(24,43,76,0.03)] outline outline-1 outline-offset-[-1px] outline-slate-200 dark:outline-slate-800 bg-white dark:bg-slate-900 inline-flex flex-wrap justify-between items-center overflow-hidden p-1.5 gap-2">
-        <div className="w-[460px] max-w-full h-8 px-3 bg-white dark:bg-slate-900 rounded-[20px] outline outline-1 outline-offset-[-1px] outline-slate-200 dark:outline-slate-800 flex justify-start items-center gap-2 overflow-hidden">
-          <div className="size-4 relative overflow-hidden flex items-center justify-center">
-            <img src="/icons/ceohn10_icon_1/search.svg" className="size-3.5" alt="search" />
-          </div>
+      {/* ── THANH TÌM KIẾM VÀ CÁC NÚT THAO TÁC ── */}
+      <div className="self-stretch rounded-[20px] shadow-[0px_2px_4px_0px_rgba(124,45,130,0.04)] border border-purple-100 dark:border-purple-900/40 bg-white dark:bg-slate-900 inline-flex flex-wrap justify-between items-center overflow-hidden p-2 gap-2">
+        <div className="w-[460px] max-w-full h-9 px-3 bg-[#FAF5FF] dark:bg-slate-800/80 rounded-xl border border-purple-200/60 dark:border-purple-900/40 flex justify-start items-center gap-2 overflow-hidden">
+          <Search className="size-4 text-purple-700 dark:text-purple-400 shrink-0" />
           <input
             type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Tìm theo tên chức năng, thao tác con"
-            className="flex-1 text-slate-700 dark:text-slate-200 text-xs font-normal font-['Inter'] bg-transparent border-none outline-none placeholder:text-slate-500"
+            placeholder="Tìm theo tên chức năng, thao tác con..."
+            className="flex-1 text-slate-800 dark:text-slate-100 text-xs font-medium bg-transparent border-none outline-none placeholder:text-slate-400"
           />
           {searchTerm && (
             <button onClick={() => setSearchTerm("")} className="text-slate-400 hover:text-slate-600">
@@ -1693,10 +1640,10 @@ export function RbacPermissionMatrix({
           <button
             type="button"
             onClick={() => setAddFeatureOpen(true)}
-            className="w-40 h-8 px-3 bg-blue-800 hover:bg-blue-900 rounded-[20px] flex justify-center items-center gap-1.5 overflow-hidden cursor-pointer transition shadow-xs"
+            className="h-9 px-4 bg-gradient-to-r from-[#7C2D82] via-[#9333EA] to-[#6B21A8] hover:opacity-95 text-white rounded-xl flex justify-center items-center gap-1.5 cursor-pointer transition shadow-sm font-bold text-xs"
           >
-            <img src="/icons/ceohn10_icon_1/folder-plus.svg" className="size-3.5 invert brightness-0" alt="add" />
-            <span className="justify-start text-white text-xs font-semibold font-['Inter']">Thêm Chức Năng</span>
+            <FolderPlus className="size-4" />
+            <span>Thêm Chức Năng</span>
           </button>
 
           <button
@@ -1707,38 +1654,38 @@ export function RbacPermissionMatrix({
               }
               setAddActionOpen(true);
             }}
-            className="w-36 h-8 px-3 bg-blue-800 hover:bg-blue-900 rounded-[20px] flex justify-center items-center gap-1.5 overflow-hidden cursor-pointer transition shadow-xs"
+            className="h-9 px-4 bg-gradient-to-r from-[#7C2D82] via-[#9333EA] to-[#6B21A8] hover:opacity-95 text-white rounded-xl flex justify-center items-center gap-1.5 cursor-pointer transition shadow-sm font-bold text-xs"
           >
-            <img src="/icons/ceohn10_icon_1/key-round.svg" className="size-3.5 invert brightness-0" alt="key" />
-            <span className="justify-start text-white text-xs font-semibold font-['Inter']">Thêm Quyền</span>
+            <KeyRound className="size-4" />
+            <span>Thêm Quyền</span>
           </button>
 
           <button
             type="button"
             onClick={handleResetDefault}
             title="Khôi phục mặc định ban đầu"
-            className="size-8 bg-white dark:bg-slate-800 rounded-3xl outline outline-1 outline-offset-[-1px] outline-slate-200 dark:outline-slate-700 flex justify-center items-center overflow-hidden hover:bg-slate-100 dark:hover:bg-slate-700 transition cursor-pointer"
+            className="size-9 bg-[#FAF5FF] dark:bg-slate-800 rounded-xl border border-purple-200/60 dark:border-purple-800 text-purple-700 dark:text-purple-300 flex justify-center items-center hover:bg-purple-100 dark:hover:bg-slate-700 transition cursor-pointer"
           >
-            <img src="/icons/ceohn10_icon_1/rotate-ccw.svg" className="size-4" alt="reset" />
+            <RotateCcw className="size-4" />
           </button>
         </div>
       </div>
 
       {/* ── 2 TAB PHÂN QUYỀN CHUYÊN BIỆT: CRM RIÊNG & APP CEO HN10 RIÊNG ── */}
-      <div className="self-stretch flex items-center gap-2 border-b border-slate-200 dark:border-slate-800 pb-2">
+      <div className="self-stretch flex items-center gap-2 border-b border-purple-100 dark:border-purple-900/40 pb-3">
         <button
           type="button"
           onClick={() => setMatrixTab("crm")}
           className={`px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm flex items-center gap-2 transition cursor-pointer ${
             matrixTab === "crm"
-              ? "bg-[#003B95] text-white shadow-md shadow-blue-900/20"
-              : "bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-750 border border-slate-200 dark:border-slate-700"
+              ? "bg-gradient-to-r from-[#7C2D82] to-[#9333EA] text-white shadow-md shadow-purple-900/25"
+              : "bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-purple-50 dark:hover:bg-slate-750 border border-purple-100 dark:border-purple-900/40"
           }`}
         >
           <Monitor className="size-4" />
           <span>PHÂN QUYỀN HỆ THỐNG CRM</span>
           <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${
-            matrixTab === "crm" ? "bg-white/20 text-white" : "bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300"
+            matrixTab === "crm" ? "bg-white/20 text-white" : "bg-purple-100/60 dark:bg-slate-700 text-purple-800 dark:text-purple-300"
           }`}>
             {crmCategories.reduce((acc, c) => acc + c.features.length, 0)} phân hệ
           </span>
@@ -1749,14 +1696,14 @@ export function RbacPermissionMatrix({
           onClick={() => setMatrixTab("app")}
           className={`px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm flex items-center gap-2 transition cursor-pointer ${
             matrixTab === "app"
-              ? "bg-amber-600 text-white shadow-md shadow-amber-900/20"
-              : "bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-750 border border-slate-200 dark:border-slate-700"
+              ? "bg-gradient-to-r from-[#D61F69] to-[#9333EA] text-white shadow-md shadow-pink-900/25"
+              : "bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-pink-50 dark:hover:bg-slate-750 border border-purple-100 dark:border-purple-900/40"
           }`}
         >
           <Smartphone className="size-4" />
           <span>PHÂN QUYỀN APP CEO HN10</span>
           <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${
-            matrixTab === "app" ? "bg-white/20 text-white" : "bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300"
+            matrixTab === "app" ? "bg-white/20 text-white" : "bg-pink-100/60 dark:bg-slate-700 text-pink-800 dark:text-pink-300"
           }`}>
             {appCategories.reduce((acc, c) => acc + c.features.length, 0)} chức năng
           </span>
@@ -1791,7 +1738,7 @@ export function RbacPermissionMatrix({
               type="button"
               onClick={handleSaveAll}
               disabled={saving}
-              className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-xl bg-blue-800 hover:bg-blue-900 text-white font-bold text-xs transition shadow-xs cursor-pointer disabled:opacity-50"
+              className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-xl bg-gradient-to-r from-[#7C2D82] via-[#9333EA] to-[#6B21A8] hover:opacity-95 text-white font-bold text-xs transition shadow-xs cursor-pointer disabled:opacity-50"
             >
               <Save className="h-3.5 w-3.5 text-white" />
               <span>{saving ? "Đang lưu..." : "Lưu Thay Đổi"}</span>
@@ -1801,11 +1748,11 @@ export function RbacPermissionMatrix({
       )}
 
       {/* ── BẢNG MA TRẬN PHÂN QUYỀN (FIGMA SNIPPET 1) ── */}
-      <div className="self-stretch relative bg-white dark:bg-slate-900 rounded-[20px] outline outline-1 outline-offset-[-1px] outline-slate-200 dark:outline-slate-800 flex flex-col justify-start items-start overflow-x-auto shadow-xs">
+      <div className="self-stretch relative bg-white dark:bg-slate-900 rounded-[20px] border border-purple-100 dark:border-purple-900/40 flex flex-col justify-start items-start overflow-x-auto shadow-xs">
         {/* Hàng Header Bảng */}
-        <div className="w-full min-w-max h-24 bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-800 inline-flex justify-start items-start">
-          <div className="sticky left-0 z-30 w-60 min-w-[240px] self-stretch pl-4 border-l border-r border-slate-200 dark:border-slate-800 flex justify-start items-center bg-slate-100 dark:bg-slate-800 shadow-[2px_0_5px_rgba(0,0,0,0.08)]">
-            <div className="justify-start text-slate-900 dark:text-white text-xs font-bold font-['Inter']">QUYỀN THAO TÁC</div>
+        <div className="w-full min-w-max h-24 bg-gradient-to-r from-[#FAF5FF] via-[#F3E8FF]/60 to-[#FAF5FF] dark:from-slate-800/80 dark:to-slate-800/40 border-b border-purple-100 dark:border-purple-900/40 inline-flex justify-start items-start">
+          <div className="sticky left-0 z-30 w-60 min-w-[240px] self-stretch pl-4 border-l border-r border-purple-100 dark:border-purple-900/40 flex justify-start items-center bg-[#FAF5FF] dark:bg-slate-800 shadow-[2px_0_5px_rgba(124,45,130,0.05)]">
+            <div className="justify-start text-purple-950 dark:text-purple-200 text-xs font-bold font-['Inter']">QUYỀN THAO TÁC</div>
           </div>
 
           {orderedRoles.map((col) => {
@@ -1825,11 +1772,11 @@ export function RbacPermissionMatrix({
             return (
               <div
                 key={col.key}
-                className={`${colWidth} h-24 pt-2.5 pb-3 inline-flex flex-col justify-center items-center gap-4 overflow-hidden border-r border-slate-200 dark:border-slate-800`}
+                className={`${colWidth} h-24 pt-2.5 pb-3 inline-flex flex-col justify-center items-center gap-4 overflow-hidden border-r border-purple-100 dark:border-purple-900/40`}
               >
                 <div className="h-7 flex flex-col justify-center items-center gap-2.5">
                   <div className="px-2.5 py-0.5 rounded-2xl inline-flex justify-center items-center">
-                    <div className="text-center text-blue-800 dark:text-blue-400 text-xs font-bold font-['Inter'] leading-tight">
+                    <div className="text-center text-[#7C2D82] dark:text-purple-300 text-xs font-bold font-['Inter'] leading-tight">
                       {getRoleHeaderDisplay(col)}
                     </div>
                   </div>
@@ -1842,7 +1789,7 @@ export function RbacPermissionMatrix({
                   <img src="/icons/ceohn10_icon_1/square-check.svg" className="size-2.5" alt="check" />
                   <div
                     className={`${
-                      isAllChecked ? "text-blue-800 dark:text-blue-400" : "text-slate-800 dark:text-slate-300"
+                      isAllChecked ? "text-[#7C2D82] dark:text-purple-300" : "text-slate-800 dark:text-slate-300"
                     } text-[10px] font-semibold font-['Inter']`}
                   >
                     {isAllChecked ? "Bỏ chọn hết" : "Chọn tất cả"}
@@ -1852,8 +1799,8 @@ export function RbacPermissionMatrix({
             );
           })}
 
-          <div className="sticky right-0 z-30 min-w-[130px] self-stretch flex justify-center items-center bg-slate-100 dark:bg-slate-800 border-l border-slate-200 dark:border-slate-800 shadow-[-2px_0_5px_rgba(0,0,0,0.08)]">
-            <div className="justify-start text-slate-900 dark:text-white text-xs font-bold font-['Inter']">THAO TÁC</div>
+          <div className="sticky right-0 z-30 min-w-[130px] self-stretch flex justify-center items-center bg-[#FAF5FF] dark:bg-slate-800 border-l border-purple-100 dark:border-purple-900/40 shadow-[-2px_0_5px_rgba(124,45,130,0.05)]">
+            <div className="justify-start text-purple-950 dark:text-purple-200 text-xs font-bold font-['Inter']">THAO TÁC</div>
           </div>
         </div>
 
@@ -1863,20 +1810,20 @@ export function RbacPermissionMatrix({
 
           return (
             <React.Fragment key={cat.id}>
-              {/* Tiêu đề Danh mục Sidebar (Category Group Banner) */}
-              <div className="w-full min-w-max h-12 bg-slate-900 text-white border-y border-slate-700/80 inline-flex justify-between items-center px-4">
-                <div className="sticky left-0 z-20 flex items-center gap-2.5 bg-slate-900/95 pr-6">
+              {/* Tiêu đề Danh mục Sidebar (Category Group Banner: Royal Purple Gradient) */}
+              <div className="w-full min-w-max h-12 bg-gradient-to-r from-[#240E3E] via-[#3B1560] to-[#1E0B35] text-white border-y border-purple-800/60 inline-flex justify-between items-center px-4">
+                <div className="sticky left-0 z-20 flex items-center gap-2.5 bg-transparent pr-6">
                   <button
                     type="button"
                     onClick={() => toggleExpand(cat.id)}
-                    className="flex items-center gap-2 cursor-pointer text-white hover:text-amber-300 font-bold transition"
+                    className="flex items-center gap-2 cursor-pointer text-white hover:text-purple-200 font-bold transition"
                   >
                     <ChevronDown className={`size-4 transition-transform ${isCatExpanded ? "" : "-rotate-90"}`} />
                     <span className="text-xs font-black tracking-wider uppercase font-['Inter']">
                       {cat.name}
                     </span>
                   </button>
-                  <span className="rounded-full bg-amber-400/20 text-amber-300 text-[10px] font-bold px-2 py-0.5 border border-amber-400/40">
+                  <span className="rounded-full bg-purple-400/20 text-purple-200 text-[10px] font-bold px-2 py-0.5 border border-purple-400/40">
                     {(cat.features || []).length} phân hệ
                   </span>
                 </div>
@@ -1889,12 +1836,12 @@ export function RbacPermissionMatrix({
                   return (
                     <React.Fragment key={feat.id}>
                       {/* Tiêu đề Chức năng (Nhóm nghiệp vụ) */}
-                      <div className="w-full min-w-max h-11 bg-slate-50 dark:bg-slate-800/40 border-b border-slate-200 dark:border-slate-800 inline-flex justify-start items-center">
-                        <div className="sticky left-0 z-10 w-fit self-stretch pl-6 flex justify-start items-center gap-2.5 bg-slate-50/95 dark:bg-slate-800/95 pr-6">
+                      <div className="w-full min-w-max h-11 bg-[#FAF5FF]/70 dark:bg-slate-800/40 border-b border-purple-100 dark:border-purple-900/40 inline-flex justify-start items-center">
+                        <div className="sticky left-0 z-10 w-fit self-stretch pl-6 flex justify-start items-center gap-2.5 bg-[#FAF5FF]/95 dark:bg-slate-800/95 pr-6">
                           <button
                             type="button"
                             onClick={() => toggleExpand(feat.id)}
-                            className="flex items-center gap-2 cursor-pointer hover:text-blue-800 transition"
+                            className="flex items-center gap-2 cursor-pointer hover:text-[#7C2D82] transition"
                           >
                             <img
                               src="/icons/ceohn10_icon_1/chevron-down.svg"
@@ -1916,9 +1863,9 @@ export function RbacPermissionMatrix({
                         (feat.actions || []).map((action) => (
                           <div
                             key={action.id}
-                            className="w-full min-w-max h-10 border-b border-zinc-200 dark:border-slate-800 inline-flex justify-start items-start hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors"
+                            className="w-full min-w-max h-10 border-b border-purple-50 dark:border-slate-800 inline-flex justify-start items-start hover:bg-purple-50/40 dark:hover:bg-slate-800/30 transition-colors"
                           >
-                            <div className="sticky left-0 z-20 w-60 min-w-[240px] self-stretch pl-8 pr-4 border-r border-gray-200 dark:border-slate-800 flex justify-start items-center bg-white dark:bg-slate-900 shadow-[2px_0_5px_rgba(0,0,0,0.06)]">
+                            <div className="sticky left-0 z-20 w-60 min-w-[240px] self-stretch pl-8 pr-4 border-r border-purple-100 dark:border-slate-800 flex justify-start items-center bg-white dark:bg-slate-900 shadow-[2px_0_5px_rgba(124,45,130,0.03)]">
                               <div
                                 className="flex-1 justify-start text-slate-900 dark:text-slate-200 text-xs font-semibold font-['Inter'] leading-4 truncate"
                                 title={action.name}
@@ -1934,7 +1881,7 @@ export function RbacPermissionMatrix({
                               return (
                                 <div
                                   key={col.key}
-                                  className={`${colWidth} self-stretch bg-slate-50/30 dark:bg-slate-900/30 flex justify-center items-center border-r border-slate-100 dark:border-slate-800/50`}
+                                  className={`${colWidth} self-stretch bg-[#FAF5FF]/20 dark:bg-slate-900/30 flex justify-center items-center border-r border-purple-50 dark:border-slate-800/50`}
                                 >
                                   <button
                                     type="button"
@@ -1943,25 +1890,25 @@ export function RbacPermissionMatrix({
                                     title={`${isChecked ? "Bỏ quyền" : "Cấp quyền"} cho ${col.name}`}
                                   >
                                     {isChecked ? (
-                                      <div className="size-5 bg-blue-800 rounded-sm outline outline-1 outline-offset-[-1px] outline-blue-800 flex justify-center items-center overflow-hidden">
-                                        <img src="/icons/ceohn10_icon_1/check.svg" className="size-3 invert brightness-0" alt="check" />
+                                      <div className="size-5 bg-gradient-to-r from-[#7C2D82] to-[#9333EA] rounded-md shadow-xs flex justify-center items-center overflow-hidden">
+                                        <Check className="size-3 text-white stroke-[2.5]" />
                                       </div>
                                     ) : (
-                                      <div className="size-5 bg-white/0 rounded-sm border border-slate-200 dark:border-slate-700" />
+                                      <div className="size-5 bg-white dark:bg-slate-800 rounded-md border border-purple-200 dark:border-slate-700" />
                                     )}
                                   </button>
                                 </div>
                               );
                             })}
 
-                            <div className="sticky right-0 z-20 min-w-[130px] self-stretch flex justify-center items-center gap-1.5 bg-white dark:bg-slate-900 border-l border-gray-200 dark:border-slate-800 shadow-[-2px_0_5px_rgba(0,0,0,0.06)] px-2">
+                            <div className="sticky right-0 z-20 min-w-[130px] self-stretch flex justify-center items-center gap-1.5 bg-white dark:bg-slate-900 border-l border-purple-100 dark:border-slate-800 shadow-[-2px_0_5px_rgba(124,45,130,0.03)] px-2">
                               <button
                                 type="button"
                                 onClick={() => {
                                   setSelectedDetail({ action, featureName: getSynchronizedFeatureName(feat.route, feat.name), categoryName: cat.name });
                                   setDetailModalOpen(true);
                                 }}
-                                className="inline-flex h-7 w-7 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-600 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-800 transition cursor-pointer dark:bg-slate-900 dark:border-slate-700 dark:text-slate-300"
+                                className="inline-flex h-7 w-7 items-center justify-center rounded-lg border border-purple-200 bg-white text-purple-700 hover:border-purple-300 hover:bg-purple-50 hover:text-purple-900 transition cursor-pointer dark:bg-slate-900 dark:border-slate-700 dark:text-purple-300"
                                 title="Xem chi tiết"
                                 aria-label="Xem chi tiết"
                               >
@@ -1970,7 +1917,7 @@ export function RbacPermissionMatrix({
                               <button
                                 type="button"
                                 onClick={() => handleStartEditAction(cat.id, feat.id, action)}
-                                className="inline-flex h-7 w-7 items-center justify-center rounded-lg border border-blue-200 bg-blue-50 text-blue-800 hover:bg-blue-100 hover:text-blue-900 transition cursor-pointer dark:bg-blue-950/50 dark:border-blue-800 dark:text-blue-300"
+                                className="inline-flex h-7 w-7 items-center justify-center rounded-lg border border-purple-200 bg-purple-50 text-[#7C2D82] hover:bg-purple-100 transition cursor-pointer dark:bg-purple-950/50 dark:border-purple-800 dark:text-purple-300"
                                 title="Chỉnh sửa thao tác"
                                 aria-label="Chỉnh sửa thao tác"
                               >

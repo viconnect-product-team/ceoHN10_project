@@ -1,5 +1,5 @@
 import { LiveActivityMediaSection } from "@/components/common/LiveActivityMediaSection";
-import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
+import { createFileRoute, Link, useRouter, redirect } from "@tanstack/react-router";
 import { useMemo, useState, useEffect } from "react";
 import {
   Activity,
@@ -76,6 +76,9 @@ import {
 } from "@/lib/room-booking.functions";
 
 export const Route = createFileRoute("/meetings")({
+  beforeLoad: () => {
+    throw redirect({ to: "/" });
+  },
   ssr: false,
   loader: () => listMeetingsFn(),
   component: MeetingsPage,

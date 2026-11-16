@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { useState, useMemo, useRef } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
@@ -336,6 +336,9 @@ function LandingImageUploadField({
 
 export const Route = createFileRoute("/admin/landing-webs")({
   ssr: false,
+  beforeLoad: () => {
+    throw redirect({ to: "/" });
+  },
   component: AdminLandingWebsPage,
 });
 

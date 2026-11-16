@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useState, useEffect, useRef } from "react";
 import {
   Palette,
@@ -49,6 +49,9 @@ import {
 import { fetchNestApi, uploadFileToNest } from "@/lib/api-client";
 
 export const Route = createFileRoute("/admin/landing-templates")({
+  beforeLoad: () => {
+    throw redirect({ to: "/" });
+  },
   component: AdminThemeManagementPage,
 });
 

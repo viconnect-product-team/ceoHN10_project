@@ -34,15 +34,15 @@ import {
   Sparkles,
   ClipboardList,
   Building2,
+  GraduationCap,
+  FolderOpen,
   type LucideIcon,
 } from "lucide-react";
 import { useT, type TKey } from "@/lib/i18n";
 import { getDashboardStatsFn, type DashboardStats } from "@/lib/dashboard.functions";
 import type { EventItem } from "@/lib/events.functions";
 import { fetchNestApi } from "@/lib/api-client";
-import { listOpportunitiesFn } from "@/lib/opportunities.functions";
 import { listActivityLogFn } from "@/lib/activity.functions";
-import type { Opportunity } from "@/lib/opportunities-data";
 import { REVIEW_SEARCH_RESET } from "@/lib/review-search";
 import type { ActivityLog } from "@/lib/extra-data";
 import { EmptyState, ErrorState, ListSkeleton, Skeleton } from "@/components/dashboard/StateKit";
@@ -75,32 +75,32 @@ type Tone = "navy" | "gold" | "green" | "amber" | "rose" | "blue";
 
 const gradientCardStyles: Record<Tone, { bg: string; textTitle: string; iconBg: string }> = {
   navy: {
-    bg: "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800",
-    textTitle: "text-[#003B95] dark:text-blue-400",
-    iconBg: "bg-blue-600/10 text-[#003B95]",
+    bg: "bg-white dark:bg-slate-900 border border-purple-100 dark:border-purple-900/40",
+    textTitle: "text-[#7C2D82] dark:text-purple-400",
+    iconBg: "bg-purple-600/10 text-[#7C2D82]",
   },
   blue: {
-    bg: "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800",
-    textTitle: "text-[#003B95] dark:text-blue-400",
-    iconBg: "bg-blue-600/10 text-[#003B95]",
+    bg: "bg-white dark:bg-slate-900 border border-purple-100 dark:border-purple-900/40",
+    textTitle: "text-[#7C2D82] dark:text-purple-400",
+    iconBg: "bg-purple-600/10 text-[#7C2D82]",
   },
   gold: {
-    bg: "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800",
-    textTitle: "text-amber-600 dark:text-amber-400",
-    iconBg: "bg-amber-500/10 text-amber-600",
+    bg: "bg-white dark:bg-slate-900 border border-pink-100 dark:border-pink-900/40",
+    textTitle: "text-[#D61F69] dark:text-pink-400",
+    iconBg: "bg-pink-500/10 text-[#D61F69]",
   },
   green: {
-    bg: "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800",
+    bg: "bg-white dark:bg-slate-900 border border-emerald-100 dark:border-emerald-900/40",
     textTitle: "text-emerald-600 dark:text-emerald-400",
     iconBg: "bg-emerald-500/10 text-emerald-600",
   },
   amber: {
-    bg: "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800",
+    bg: "bg-white dark:bg-slate-900 border border-amber-100 dark:border-amber-900/40",
     textTitle: "text-amber-600 dark:text-amber-400",
     iconBg: "bg-amber-500/10 text-amber-600",
   },
   rose: {
-    bg: "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800",
+    bg: "bg-white dark:bg-slate-900 border border-red-100 dark:border-red-900/40",
     textTitle: "text-red-600 dark:text-red-400",
     iconBg: "bg-red-500/10 text-red-600",
   },
@@ -257,7 +257,6 @@ export function ExecutiveDashboard({ authReady }: { authReady: boolean }) {
   const roleState = useRole();
   const { canManageFinance, canManageMembers, canManageEvents, canManageMedia, isBQT, isPlatformAdmin } = roleState;
   const getStats = useServerFn(getDashboardStatsFn);
-  const getOpps = useServerFn(listOpportunitiesFn);
   const getActivity = useServerFn(listActivityLogFn);
   const { count: unread } = useUnreadNotifications();
   const [statusFilter, setStatusFilter] = useState<string>("all");
@@ -309,11 +308,6 @@ export function ExecutiveDashboard({ authReady }: { authReady: boolean }) {
     },
     enabled: authReady,
   });
-  const oppsQ = useQuery({
-    queryKey: ["dashboard-opps"],
-    queryFn: () => getOpps({}),
-    enabled: authReady,
-  });
   const activityQ = useQuery({
     queryKey: ["dashboard-activity"],
     queryFn: () => getActivity({}),
@@ -328,26 +322,11 @@ export function ExecutiveDashboard({ authReady }: { authReady: boolean }) {
       .slice(0, 4);
   }, [eventsQ.data]);
 
-  const topOpps = useMemo<{ opp: Opportunity; interests: number }[]>(() => {
-    const d = oppsQ.data;
-    if (!d) return [];
-    return d.opportunities
-      .filter((o) => o.status === "open")
-      .map((opp) => ({ opp, interests: d.interestCounts[opp.id] ?? 0 }))
-      .sort((a, b) => {
-        const timeA = a.opp.createdAt ? new Date(a.opp.createdAt).getTime() : 0;
-        const timeB = b.opp.createdAt ? new Date(b.opp.createdAt).getTime() : 0;
-        if (timeB !== timeA) return timeB - timeA;
-        return b.interests - a.interests || b.opp.views - a.opp.views;
-      })
-      .slice(0, 4);
-  }, [oppsQ.data]);
-
-  const productsQ = useQuery({
-    queryKey: ["dashboard-products-client"],
+  const trainingsQ = useQuery({
+    queryKey: ["dashboard-trainings-client"],
     queryFn: async () => {
       try {
-        const res = await fetchNestApi<any[]>("/marketplace/products");
+        const res = await fetchNestApi<any[]>("/trainings");
         return Array.isArray(res) ? res : [];
       } catch {
         return [];
@@ -355,6 +334,29 @@ export function ExecutiveDashboard({ authReady }: { authReady: boolean }) {
     },
     enabled: authReady,
   });
+
+  const recentTrainings = useMemo(() => {
+    const list = [...(trainingsQ.data ?? [])];
+    return list.slice(0, 4);
+  }, [trainingsQ.data]);
+
+  const docsQ = useQuery({
+    queryKey: ["dashboard-documents-client"],
+    queryFn: async () => {
+      try {
+        const res = await fetchNestApi<any[]>("/documents");
+        return Array.isArray(res) ? res : [];
+      } catch {
+        return [];
+      }
+    },
+    enabled: authReady,
+  });
+
+  const recentDocs = useMemo(() => {
+    const list = [...(docsQ.data ?? [])];
+    return list.slice(0, 4);
+  }, [docsQ.data]);
 
   const tasksQ = useQuery({
     queryKey: ["dashboard-my-tasks"],
@@ -368,17 +370,6 @@ export function ExecutiveDashboard({ authReady }: { authReady: boolean }) {
     },
     enabled: authReady,
   });
-
-  const recentProducts = useMemo(() => {
-    const list = [...(productsQ.data ?? [])];
-    return list
-      .sort((a, b) => {
-        const timeA = a.createdAt || a.created_at ? new Date(a.createdAt || a.created_at).getTime() : 0;
-        const timeB = b.createdAt || b.created_at ? new Date(b.createdAt || b.created_at).getTime() : 0;
-        return timeB - timeA;
-      })
-      .slice(0, 4);
-  }, [productsQ.data]);
 
   const recentMembers = useMemo(() => {
     const list = [...(membersQ.data ?? [])];
@@ -455,10 +446,10 @@ export function ExecutiveDashboard({ authReady }: { authReady: boolean }) {
     const paidInvoices = paidInvs.length;
     const unpaidInvoices = unpaidInvs.length;
 
-    // Dữ liệu sự kiện và cơ hội lấy đúng số lượng thực tế
+    // Dữ liệu sự kiện và đào tạo lấy đúng số lượng thực tế
     const events = (eventsQ.data ?? []).length;
     const upcomingEvents = upcoming.length;
-    const openOpportunities = topOpps.length;
+    const openOpportunities = recentTrainings.length;
 
     // Biểu đồ tăng trưởng thực tế thể hiện quy mô hội viên qua các tháng
     const gList: { month: string; count: number }[] = [];
@@ -495,7 +486,7 @@ export function ExecutiveDashboard({ authReady }: { authReady: boolean }) {
       regions: base?.regions ?? [],
       growth: gList,
     };
-  }, [statsQ.data, membersQ.data, invoicesQ.data, eventsQ.data, upcoming.length, topOpps.length, statusFilter]);
+  }, [statsQ.data, membersQ.data, invoicesQ.data, eventsQ.data, upcoming.length, recentTrainings.length, statusFilter]);
 
   /* ---- loading / error for the KPI + chart core (stats) ---- */
   if (!authReady || statsQ.isLoading) {
@@ -646,11 +637,11 @@ export function ExecutiveDashboard({ authReady }: { authReady: boolean }) {
           to="/events"
         />
         <ExecKpi
-          label={t("exec.kpi.openOpportunities")}
-          value={s.openOpportunities.toLocaleString("vi-VN")}
-          icon={Handshake}
-          tone="gold"
-          to="/opportunities"
+          label="Lớp học & Đào tạo"
+          value={recentTrainings.length.toLocaleString("vi-VN")}
+          icon={GraduationCap}
+          tone="navy"
+          to="/trainings"
         />
         <ExecKpi
           label={t("exec.kpi.unreadNotifs")}
@@ -846,38 +837,37 @@ export function ExecutiveDashboard({ authReady }: { authReady: boolean }) {
         </Panel>
 
         <Panel
-          title="Sản phẩm & Dịch vụ mới lên sàn"
-          action={<ViewAll to="/marketplace" label={t("exec.viewAll")} />}
+          title="Lớp học & Khóa đào tạo CEOHN10"
+          action={<ViewAll to="/trainings" label={t("exec.viewAll")} />}
         >
-          {productsQ.isLoading ? (
+          {trainingsQ.isLoading ? (
             <ListSkeleton rows={4} />
-          ) : recentProducts.length === 0 ? (
+          ) : recentTrainings.length === 0 ? (
             <EmptyState />
           ) : (
             <ul className="space-y-2.5">
-              {recentProducts.map((p: any) => (
+              {recentTrainings.map((p: any) => (
                 <li key={p.id}>
                   <Link
-                    to="/marketplace/$productId"
-                    params={{ productId: p.id }}
+                    to="/trainings"
                     className="flex items-center justify-between gap-3 rounded-xl border border-border bg-background p-3 transition-colors hover:border-primary/40 hover:bg-muted/40"
                   >
                     <div className="flex items-center gap-3 min-w-0">
-                      <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-amber-500/10 text-base">
-                        {p.emoji || "🛍️"}
+                      <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-purple-500/10 text-base text-[#7C2D82]">
+                        <GraduationCap className="h-5 w-5" />
                       </span>
                       <div className="min-w-0">
                         <div className="truncate text-[13px] font-semibold text-foreground">
-                          {p.title || p.name}
+                          {p.title || p.name || "Khóa đào tạo quản trị"}
                         </div>
                         <div className="truncate text-[11px] text-muted-foreground">
-                          {p.sellerName || p.company || "Hội viên CLB"}
+                          {p.instructor || p.trainer || "Ban Đào tạo CEOHN10"}
                         </div>
                       </div>
                     </div>
                     <div className="shrink-0 text-right">
                       <div className="text-[12px] font-bold text-primary">
-                        {p.price ? fmtMoney(Number(p.price)) : "Liên hệ"}
+                        {p.status === "open" ? "Đang mở" : "Sắp diễn ra"}
                       </div>
                       <div className="text-[10px] text-muted-foreground mt-0.5">
                         {relTime(p.createdAt || p.created_at, t)}
@@ -891,40 +881,35 @@ export function ExecutiveDashboard({ authReady }: { authReady: boolean }) {
         </Panel>
       </div>
 
-      {/* Opportunities + Action queue */}
+      {/* Documents + Action queue */}
       <div className="grid gap-5 lg:grid-cols-3">
         <Panel
-          title={t("exec.opps.title")}
-          action={<ViewAll to="/opportunities" label={t("exec.viewAll")} />}
+          title="Tài liệu & Học liệu số CEOHN10"
+          action={<ViewAll to="/documents" label={t("exec.viewAll")} />}
           className="lg:col-span-2"
         >
-          {oppsQ.isLoading ? (
+          {docsQ.isLoading ? (
             <ListSkeleton rows={3} />
-          ) : topOpps.length === 0 ? (
+          ) : recentDocs.length === 0 ? (
             <EmptyState />
           ) : (
             <ul className="grid gap-2.5 sm:grid-cols-2">
-              {topOpps.map(({ opp, interests }) => (
-                <li key={opp.id}>
+              {recentDocs.map((doc: any) => (
+                <li key={doc.id}>
                   <Link
-                    to="/opportunities/$id"
-                    params={{ id: opp.id }}
+                    to="/documents"
                     className="flex h-full items-start gap-3 rounded-xl border border-border bg-background p-3 transition-colors hover:border-primary/40 hover:bg-muted/40"
                   >
-                    <span className="text-[22px] leading-none">{opp.emoji}</span>
+                    <span className="p-2 rounded-lg bg-purple-500/10 text-[#7C2D82]">
+                      <FolderOpen className="h-5 w-5" />
+                    </span>
                     <div className="min-w-0 flex-1">
                       <div className="line-clamp-2 text-[13px] font-semibold text-foreground">
-                        {opp.title}
+                        {doc.title || doc.name || "Tài liệu chuyên môn"}
                       </div>
                       <div className="mt-1.5 flex items-center gap-3 text-[11px] text-muted-foreground">
-                        <span className="inline-flex items-center gap-1">
-                          <Handshake className="h-3.5 w-3.5" />
-                          {interests} {t("exec.opps.interests")}
-                        </span>
-                        <span className="inline-flex items-center gap-1">
-                          <TrendingUp className="h-3.5 w-3.5" />
-                          {opp.views}
-                        </span>
+                        <span>{doc.category || "Học liệu đào tạo"}</span>
+                        <span>{relTime(doc.createdAt || doc.created_at, t)}</span>
                       </div>
                     </div>
                   </Link>
@@ -955,18 +940,18 @@ export function ExecutiveDashboard({ authReady }: { authReady: boolean }) {
               />
             )}
             <QueueRow
-              to="/marketplace/my-quotes"
-              icon={DollarSign}
+              to="/trainings"
+              icon={GraduationCap}
               tone="blue"
-              label={t("exec.queue.quotes")}
-              count={s.pendingQuotes}
+              label="Khóa đào tạo đang mở"
+              count={recentTrainings.length}
             />
             <QueueRow
-              to="/opportunities"
-              icon={Handshake}
+              to="/documents"
+              icon={FolderOpen}
               tone="gold"
-              label={t("exec.queue.opps")}
-              count={s.openOpportunities}
+              label="Tài liệu chuyên môn"
+              count={recentDocs.length}
             />
           </ul>
         </Panel>
@@ -1088,8 +1073,8 @@ export function ExecutiveDashboard({ authReady }: { authReady: boolean }) {
           {(canManageMedia || isBQT || isPlatformAdmin) && (
             <QuickAction to="/notifications" icon={Send} label={t("exec.quick.sendNotif")} />
           )}
-          <QuickAction to="/opportunities" icon={Handshake} label="Cơ hội kết nối" />
-          <QuickAction to="/marketplace" icon={DollarSign} label="Sàn giao thương" />
+          <QuickAction to="/trainings" icon={GraduationCap} label="Khóa đào tạo" />
+          <QuickAction to="/documents" icon={FolderOpen} label="Tài liệu & Học liệu" />
         </div>
       </Panel>
     </div>

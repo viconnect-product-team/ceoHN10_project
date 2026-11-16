@@ -84,7 +84,6 @@ const members: Item[] = [
 const events: Item[] = [
   { key: "nav.events", icon: Calendar, to: "/events" },
   { key: "eventsOverview.title", icon: Calendar, to: "/events-overview" },
-  { key: "nav.meeting", icon: Users2, to: "/meetings" },
   { key: "nav.governance", icon: Vote, to: "/voting" },
   { key: "nav.eventReg", icon: ClipboardList, to: "/event-registrations" },
   { key: "nav.luckyDraw" as TKey, icon: Gift, to: "/lucky-draw", label: "Bốc thăm trúng thưởng" },
@@ -102,9 +101,7 @@ const finance: Item[] = [
     label: "Thống kê & Báo cáo",
     children: [
       { to: "/analytics?category=member_activities", label: "Hoạt động hội viên" },
-      { to: "/analytics?category=top_connections", label: "Kết nối giao thương" },
-      { to: "/analytics?category=top_opportunities", label: "Cơ hội kinh doanh" },
-      { to: "/analytics?category=top_events_meetings", label: "Sự kiện & cuộc họp" },
+      { to: "/analytics?category=top_events_meetings", label: "Hoạt động sự kiện" },
     ],
   },
   { key: "nav.fee", icon: Wallet, to: "/fees" },
@@ -123,7 +120,7 @@ const comm: Item[] = [
       { to: "/notifications?filter=new_members", label: "Hội viên mới nộp hồ sơ" },
       { to: "/notifications?filter=fee_alerts", label: "Nhắc hạn & quá hạn hội phí" },
       { to: "/notifications?filter=admin_system", label: "Ban Điều hành & Quản trị" },
-      { to: "/notifications?filter=events_meetings", label: "Sự kiện & Cuộc họp" },
+      { to: "/notifications?filter=events_meetings", label: "Sự kiện" },
     ],
   },
   { key: "nav.news", icon: Newspaper, to: "/news" },
@@ -132,10 +129,7 @@ const comm: Item[] = [
 ];
 const network: Item[] = [
   { key: "nav.network", icon: MessageSquare, to: "/network", label: "Tin nhắn & Trao đổi công việc" },
-  { key: "nav.bc.meetings" as TKey, icon: Users2, to: "/business-connect/meetings", label: "Cuộc gặp" },
-  { key: "nav.marketplace", icon: Store, to: "/marketplace", label: "Marketplace & Giao thương B2B" },
-  { key: "nav.opportunities", icon: Sparkles, to: "/opportunities", label: "Cơ hội hợp tác" },
-  { key: "nav.trainings" as TKey, icon: GraduationCap, to: "/trainings", label: "Đào tạo & Họp trực tuyến" },
+  { key: "nav.trainings" as TKey, icon: GraduationCap, to: "/trainings", label: "Lớp học & Khóa đào tạo" },
 ];
 const system: Item[] = [
   {
@@ -153,12 +147,6 @@ const system: Item[] = [
   },
   { key: "nav.settings", icon: Settings, to: "/settings" },
   { key: "nav.activity" as TKey, icon: Activity, to: "/activity", label: "Nhật ký hoạt động" },
-  {
-    key: "nav.themeManagement" as TKey,
-    icon: Palette,
-    to: "/admin/landing-templates",
-    label: "Quản lý chủ đề",
-  },
 ];
 const permissionsGroup: Item[] = [
   {
@@ -180,14 +168,7 @@ const permissionsGroup: Item[] = [
     label: "Quản trị người dùng",
   },
 ];
-const pageTemplates: Item[] = [
-  {
-    key: "nav.pageTemplates" as TKey,
-    icon: LayoutTemplate,
-    to: "/templates?tab=invitation-setup",
-    label: "Quản lý Thư Mời",
-  },
-];
+const pageTemplates: Item[] = [];
 const admin: Item[] = [
   { key: "nav.documents", icon: FolderOpen, to: "/documents" },
 ];
