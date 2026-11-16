@@ -70,7 +70,7 @@ try {
                 } else {
                     $env:VITE_PUBLIC_APP_URL = "http://14.225.217.232:5002"
                 }
-                $env:NEST_API_URL = "http://ceohn10-backend:4000"
+                $env:NEST_API_URL = "http://ceohn10-backend:4003"
                 
                 if ($InstallDeps -or (-not (Test-Path "node_modules"))) {
                     Invoke-CheckedCommand -Description "NPM Install" -Action { npm install }

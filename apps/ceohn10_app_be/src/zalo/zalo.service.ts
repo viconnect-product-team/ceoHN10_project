@@ -85,32 +85,34 @@ export class ZaloService implements OnModuleInit, OnModuleDestroy {
       'Khởi chạy tiến trình Zalo OA Auto-Token Manager (chu kỳ quét 15 phút, tự động gia hạn mỗi 4 tiếng)...',
     );
     if (this.prisma) {
-      await this.prisma
-        .$executeRawUnsafe(`
-        CREATE TABLE IF NOT EXISTS public.zalo_webhook_logs (
-          id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-          event_name text,
-          sender_id text,
-          recipient_id text,
-          message_text text,
-          raw_payload jsonb,
-          created_at timestamptz DEFAULT now()
-        );
-        CREATE TABLE IF NOT EXISTS public.zalo_subscribers (
-          zalo_user_id text PRIMARY KEY,
-          display_name text,
-          avatar_url text,
-          phone text,
-          member_id uuid,
-          last_message text,
-          last_interacted_at timestamptz DEFAULT now(),
-          created_at timestamptz DEFAULT now(),
-          updated_at timestamptz DEFAULT now()
-        );
-      `)
-        .catch((err: any) => {
-          this.logger.warn(`Could not ensure Zalo tables: ${err?.message}`);
-        });
+      try {
+        await this.prisma.$executeRawUnsafe(`
+          CREATE TABLE IF NOT EXISTS public.zalo_webhook_logs (
+            id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+            event_name text,
+            sender_id text,
+            recipient_id text,
+            message_text text,
+            raw_payload jsonb,
+            created_at timestamptz DEFAULT now()
+          );
+        `);
+        await this.prisma.$executeRawUnsafe(`
+          CREATE TABLE IF NOT EXISTS public.zalo_subscribers (
+            zalo_user_id text PRIMARY KEY,
+            display_name text,
+            avatar_url text,
+            phone text,
+            member_id uuid,
+            last_message text,
+            last_interacted_at timestamptz DEFAULT now(),
+            created_at timestamptz DEFAULT now(),
+            updated_at timestamptz DEFAULT now()
+          );
+        `);
+      } catch (err: any) {
+        this.logger.warn(`Could not ensure Zalo tables: ${err?.message}`);
+      }
     }
 
     // Chạy kiểm tra sau 10 giây khi server sẵn sàng

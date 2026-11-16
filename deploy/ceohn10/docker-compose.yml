@@ -9,7 +9,7 @@ services:
       - PORT=8080
       - HOST=0.0.0.0
       - NITRO_HOST=0.0.0.0
-      - NEST_API_URL=http://ceohn10-backend:4000
+      - NEST_API_URL=http://ceohn10-backend:4003
       - VITE_APP_SCOPE=association_app
       - VITE_APP_NAME="CLB Doanh Nhân CEO HN10"
       - VITE_APP_DEFAULT_ROUTE=/association
