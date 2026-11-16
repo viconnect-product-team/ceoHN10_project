@@ -1,5 +1,48 @@
 # System Memory & Architecture
 
+- **Bản cập nhật ngày 16/11/2026 (v12.1): Hoàn Thành 6 Ca Sử Dụng (UC-1 -> UC-6), Giao Diện Tổng Quan Dashboard Với 2 Túi Quỹ & Sự Kiện/Khóa Học Tham Gia, Làm Mới Nhóm Phân Quyền RBAC 100% Tiếng Việt Chuẩn Theme & Không Mock Dữ Liệu ([NODE-CRM-001], [NODE-CRM-002], [NODE-CRM-003], [NODE-CRM-004], [NODE-CRM-005], [NODE-CRM-006], [NODE-CRM-010], [NODE-CORE-001])**:
+  - **1. Tổng Quan Dashboard (Mục I.1)**:
+    * Hiển thị thông tin nhanh: Mặc định 4 sự kiện và 30 khóa học CEO HN10.
+    * Thêm widget "Ví 2 Túi Quỹ CEO HN10": Phản ánh Realtime từ CSDL 113.20.107.184:6432 (/api/admin/funds-overview) gồm Túi Quỹ Chung (tổng từ phí hội viên) và Túi Quỹ Tài Trợ (Mục 1: Tiền mặt tài trợ, Mục 2: Kho hiện vật tài trợ).
+    * Thêm widget "Khóa Học & Sự Kiện Tôi Tham Gia (Hội Viên)": Khi hội viên tham gia khóa học/sự kiện sẽ hiện lên giao diện tổng quan, có nút "Tải Slide" (cho khóa học), nút "Góp ý / Đánh giá" mở Modal phản hồi trực tiếp.
+  - **2. UC-1: Đăng nhập chuẩn JWT (RESTful API)**:
+    * Xác thực đầy đủ JWT token, cơ chế refresh token, phân giải quyền hạn người dùng theo chuẩn RBAC bảo mật cao.
+  - **3. UC-2: Luồng Sự Kiện (Events)**:
+    * Tạo sự kiện cố định & không cố định, có phí hoặc miễn phí.
+    * Thiết lập mã QR check-in & link form đăng ký public cho người ngoài / hội viên.
+    * Kiểm tra giới hạn số lượng: Tự động khóa và hiển thị "Sự kiện đã đủ chỗ" khi vượt quá số lượng đăng ký tối đa (capacity).
+    * Tải link album ảnh / media sự kiện đang diễn ra hoặc đã kết thúc, tự động liên kết và lưu trữ sang phân hệ Quản lý tài liệu (public.documents).
+    * Đánh giá phản hồi sự kiện (chấm điểm sao 1-5 và đóng góp ý kiến).
+  - **4. UC-3: Luồng Tạo Buổi Học / Khóa Học (Trainings)**:
+    * Buổi học cố định (vào Thứ 7 hàng tuần) và không cố định, lịch trình chi tiết (agenda slots) từng buổi học.
+    * Đăng ký tham gia trước buổi học, điểm danh trong buổi học.
+    * Nút "Gửi Slide cho học viên" tự động gửi tài liệu và đồng bộ lưu trữ vào Quản lý tài liệu (public.documents category training_materials).
+    * Học viên đóng góp ý kiến sau buổi học (bằng văn bản text hoặc đính kèm tệp file).
+    * Đính kèm link video/ảnh buổi học và tự động lưu trữ tại Quản lý tài liệu (event_media).
+  - **5. UC-4: Khai Báo Vật Dụng Hỗ Trợ (Ban Sự Kiện & Hậu Cần)**:
+    * Khai báo vật tư dụng cụ cho từng sự kiện hoặc buổi học (/api/supplies).
+    * Tích hợp lấy dữ liệu từ Kho hiện vật nhà tài trợ (/api/supplies/sponsor-inventory).
+  - **6. UC-5: Quản Lý 2 Túi Quỹ & Đề Xuất Chi Phí**:
+    * Túi Quỹ Chung: Tổng hợp từ hội phí hội viên. Dành cho chi tiêu sự kiện, cuộc họp các ban (như sự kiện hiếu hỷ của Ban Đời sống, vật dụng Ban Hậu cần).
+    * Báo cáo chi rõ ràng: Sự kiện nào, thuộc ban nào, ai là người nhận tiền, có nút "Xuất Phiếu Chi PDF" chuẩn quy cách kèm chữ ký Người lập phiếu, Người nhận tiền, Kế toán, Trưởng ban Tài chính, Chủ tịch CLB.
+    * Ban Hậu cần gửi đề xuất chi phí / xin cấp vật phẩm tới Trưởng ban Tài chính và Chủ tịch CLB phê duyệt.
+    * Túi Quỹ Tài Trợ: Phân chia 2 mục rõ ràng: Mục 1 - Tiền mặt tài trợ, Mục 2 - Kho hiện vật tài trợ.
+  - **7. UC-6: Chức Năng Nhà Tài Trợ (Sponsors)**:
+    * Phân loại rõ ràng: Tài trợ bằng tiền mặt hoặc tài trợ bằng hiện vật.
+    * Biểu mẫu tạo nhà tài trợ đầy đủ: Họ tên, ngày sinh / tuổi, số điện thoại, email, website, tên công ty, hình thức tài trợ.
+    * Tài trợ tiền mặt -> tự động cộng thẳng vào Túi Quỹ Tài Trợ (Tiền mặt) và ghi nhận giao dịch tài chính.
+    * Tài trợ hiện vật -> tự động đẩy thẳng vào Kho hiện vật của Túi Quỹ Tài Trợ để Ban Sự kiện & Hậu cần xin cấp phát.
+    * Tự động gửi email cảm ơn đến email nhà tài trợ sau khi tiếp nhận.
+  - **8. Làm Mới Nhóm Phân Quyền RBAC**:
+    * Giao diện hoàn toàn mới: Chuyển đổi linh hoạt giữa 2 chế độ: "Theo Từng Vai Trò (Chuẩn RBAC)" và "Bảng Ma Trận Đối Chiếu".
+    * Chế độ Theo Từng Vai Trò hiển thị danh sách vai trò bên trái kèm huy hiệu tiến độ cấp quyền (VD: 34/38 quyền), bên phải là thẻ phân nhóm chức năng dạng lưới trực quan với các công tắc bật/tắt hành vi (Xem, Thêm mới, Chỉnh sửa, Xóa, Phê duyệt, Xuất Excel).
+    * Bộ cấu hình nhanh (Quick Presets): "Cấp toàn quyền", "Chỉ xem", "Quản lý chuẩn", "Thu hồi tất cả".
+    * 100% tiếng Việt chuẩn mực, không bỏ sót bất kỳ từ tiếng Anh nào.
+  - **9. Tuân Thủ Tuyệt Đối Luật CSDL & Git**:
+    * Kết nối 100% CSDL PostgreSQL 113.20.107.184:6432, DB ceohn10_project. Tuyệt đối không mock hay fake dữ liệu.
+    * Không thực hiện bất kỳ lệnh git commit hay git push nào.
+    * Đạt chuẩn 0 lỗi type-check trên cả Frontend (apps/ceohn10_app_fe) và Backend (apps/ceohn10_app_be).
+
 - **Bản cập nhật ngày 16/11/2026 (v12.0): CHỈ THỊ TỐI CAO DÀNH CHO CEOHN10 — KHÔNG FAKE DỮ LIỆU, BIẾN ĐỘNG TÀI CHÍNH REALTIME, KHÁC BIỆT CỐT LÕI VỀ RBAC - LỚP HỌC - TÀI LIỆU**:
   - **1. NGHIÊM CẤM TUYỆT ĐỐI FAKE / MOCK DỮ LIỆU**:
     * Mọi thông tin, số liệu, danh sách hiển thị trên Web CRM và Mobile App của CEOHN10 BẮT BUỘC phải truy vấn 100% từ Cơ sở dữ liệu PostgreSQL `ceohn10_project` (`113.20.107.184:6432`).

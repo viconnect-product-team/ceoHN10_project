@@ -33,10 +33,16 @@ import {
   Ticket,
   Award,
   Building2,
+  Package,
+  MessageSquare,
 } from "lucide-react";
 import { toast } from "sonner";
 import { fetchNestApi } from "@/lib/api-client";
 import { AppShell } from "@/components/dashboard/AppShell";
+import { SupplyDeclarationModal } from "@/components/dashboard/SupplyDeclarationModal";
+import { TrainingFeedbackModal } from "@/components/trainings/TrainingFeedbackModal";
+import { TrainingAttendeesModal } from "@/components/trainings/TrainingAttendeesModal";
+import { TrainingMediaModal } from "@/components/trainings/TrainingMediaModal";
 import {
   CustomTable,
   useCustomTableSort,
@@ -117,6 +123,20 @@ export function TrainingsPage() {
   const [activeCallRoom, setActiveCallRoom] = useState<{ id: string; title: string; link: string } | null>(null);
   const [activeMediaModal, setActiveMediaModal] = useState<TrainingItem | null>(null);
   const [activeQrModal, setActiveQrModal] = useState<TrainingItem | null>(null);
+  const [activeAttendeesModal, setActiveAttendeesModal] = useState<TrainingItem | null>(null);
+  const [activeFeedbackModal, setActiveFeedbackModal] = useState<TrainingItem | null>(null);
+  const [activeSupplyModal, setActiveSupplyModal] = useState<TrainingItem | null>(null);
+  const [activeMediaRecordingModal, setActiveMediaRecordingModal] = useState<TrainingItem | null>(null);
+
+  // Form State cho Khai Báo Khóa Đào Tạo (Chuẩn như Sự Kiện, có số lượng & hạng vé, KHÔNG xếp chỗ)
+  const [formIsFixed, setFormIsFixed] = useState(true);
+  const [formScheduleType, setFormScheduleType] = useState<"saturday_weekly" | "periodic" | "custom">("saturday_weekly");
+  const [formAgenda, setFormAgenda] = useState([
+    { time: "08:30 - 09:00", activity: "Đón tiếp học viên & check-in điện tử" },
+    { time: "09:00 - 10:30", activity: "Chuyên đề 1: Lý thuyết & Case study thực chiến" },
+    { time: "10:30 - 10:45", activity: "Giải lao kết nối & Tea break doanh nhân" },
+    { time: "10:45 - 11:30", activity: "Chuyên đề 2: Thảo luận nhóm & Hỏi đáp cùng Chuyên gia" },
+  ]);
 
   // Form State cho Khai Báo Khóa Đào Tạo (Chuẩn như Sự Kiện, có số lượng & hạng vé, KHÔNG xếp chỗ)
   const [formTitle, setFormTitle] = useState("");
@@ -250,6 +270,14 @@ export function TrainingsPage() {
     setFormMaterialsUrl("");
     setFormCoverImage("");
     setFormRegistrationUrl("");
+    setFormIsFixed(true);
+    setFormScheduleType("saturday_weekly");
+    setFormAgenda([
+      { time: "08:30 - 09:00", activity: "Đón tiếp học viên & check-in điện tử" },
+      { time: "09:00 - 10:30", activity: "Chuyên đề 1: Lý thuyết & Case study thực chiến" },
+      { time: "10:30 - 10:45", activity: "Giải lao kết nối & Tea break doanh nhân" },
+      { time: "10:45 - 11:30", activity: "Chuyên đề 2: Thảo luận nhóm & Hỏi đáp cùng Chuyên gia" },
+    ]);
     setFormTicketTiers([
       {
         name: "Vé Hội Viên CEO HN10",
@@ -297,6 +325,11 @@ export function TrainingsPage() {
     setFormMaterialsUrl(t.materials && t.materials[0] ? t.materials[0].url : "");
     setFormCoverImage(t.cover_image || "");
     setFormRegistrationUrl(t.registration_url || "");
+    setFormIsFixed((t as any).is_fixed ?? (t as any).isFixed ?? true);
+    setFormScheduleType((t as any).schedule_type ?? (t as any).scheduleType ?? "saturday_weekly");
+    if (Array.isArray((t as any).agenda) && (t as any).agenda.length > 0) {
+      setFormAgenda((t as any).agenda);
+    }
     setFormTicketTiers(
       t.ticket_tiers && t.ticket_tiers.length > 0
         ? t.ticket_tiers
@@ -339,6 +372,9 @@ export function TrainingsPage() {
         category: formCategory,
         format: formFormat,
         status: formStatus,
+        isFixed: formIsFixed,
+        scheduleType: formScheduleType,
+        agenda: formAgenda,
         startTime: startIso,
         endTime: endIso,
         location: formLocation.trim() || "Keangnam Landmark 72, Hà Nội",
@@ -641,9 +677,49 @@ export function TrainingsPage() {
           }}
           actionColumn={{
             title: "THAO TÁC",
-            width: 220,
+            width: 320,
             render: (t) => (
               <div className="flex items-center justify-center gap-1.5">
+                {/* Quản lý danh sách học viên, điểm danh & gửi slide */}
+                <button
+                  type="button"
+                  onClick={() => setActiveAttendeesModal(t)}
+                  className="p-1.5 rounded-lg bg-indigo-50 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300 hover:bg-indigo-100 transition cursor-pointer"
+                  title="Danh sách học viên, điểm danh & gửi slide bài giảng"
+                >
+                  <Users className="h-4 w-4" />
+                </button>
+
+                {/* Phản hồi & Đóng góp ý kiến sau buổi học */}
+                <button
+                  type="button"
+                  onClick={() => setActiveFeedbackModal(t)}
+                  className="p-1.5 rounded-lg bg-purple-50 text-[#7C2D82] dark:bg-purple-950 dark:text-purple-300 hover:bg-purple-100 transition cursor-pointer"
+                  title="Xem & gửi đánh giá phản hồi sau buổi học"
+                >
+                  <MessageSquare className="h-4 w-4" />
+                </button>
+
+                {/* Khai báo vật dụng hỗ trợ (Ban Sự Kiện & Hậu Cần) */}
+                <button
+                  type="button"
+                  onClick={() => setActiveSupplyModal(t)}
+                  className="p-1.5 rounded-lg bg-amber-50 text-amber-700 dark:bg-amber-950 dark:text-amber-300 hover:bg-amber-100 transition cursor-pointer"
+                  title="Khai báo vật dụng hỗ trợ buổi học (Ban Sự Kiện & Hậu Cần)"
+                >
+                  <Package className="h-4 w-4" />
+                </button>
+
+                {/* Tư liệu quay phim chụp ảnh (Lưu vào Quản Lý Tài Liệu) */}
+                <button
+                  type="button"
+                  onClick={() => setActiveMediaRecordingModal(t)}
+                  className="p-1.5 rounded-lg bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 hover:bg-emerald-100 transition cursor-pointer"
+                  title="Quay phim & chụp ảnh - Tự động đồng bộ vào Quản Lý Tài Liệu"
+                >
+                  <Camera className="h-4 w-4" />
+                </button>
+
                 {/* Vào phòng Video Call */}
                 {t.room_url && (
                   <button
@@ -661,16 +737,6 @@ export function TrainingsPage() {
                     <Video className="h-4 w-4" />
                   </button>
                 )}
-
-                {/* Tư liệu & Khoảnh khắc đào tạo trực tiếp (User Directive 9) */}
-                <button
-                  type="button"
-                  onClick={() => setActiveMediaModal(t)}
-                  className="p-1.5 rounded-lg bg-amber-50 text-amber-700 dark:bg-amber-950 dark:text-amber-300 hover:bg-amber-100 transition cursor-pointer"
-                  title="Chụp ảnh trực tiếp hoặc tải ảnh/video khoảnh khắc đào tạo lưu vào lịch sử và đẩy lên mạng lưới"
-                >
-                  <Camera className="h-4 w-4" />
-                </button>
 
                 {/* Điểm danh QR */}
                 <button
@@ -910,6 +976,110 @@ export function TrainingsPage() {
                         <option value="completed">Đã kết thúc</option>
                         <option value="cancelled">Đã hủy</option>
                       </select>
+                    </div>
+                  </div>
+
+                  {/* UC-3: Tính chất buổi học (Cố định thứ 7 hàng tuần vs Không cố định) */}
+                  <div className="p-3 rounded-xl border border-blue-200 dark:border-blue-900/60 bg-blue-50/50 dark:bg-blue-950/20 space-y-2">
+                    <label className="block text-xs font-bold text-blue-900 dark:text-blue-200">
+                      Tính Chất Khóa Đào Tạo (UC-3)
+                    </label>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setFormIsFixed(true);
+                          setFormScheduleType("saturday_weekly");
+                        }}
+                        className={`py-2 px-3 rounded-xl border text-xs font-bold text-left transition cursor-pointer ${
+                          formIsFixed && formScheduleType === "saturday_weekly"
+                            ? "border-[#003B95] bg-blue-100/70 dark:bg-blue-900/50 text-[#003B95] dark:text-blue-300 ring-2 ring-[#003B95]/20"
+                            : "border-slate-300 dark:border-slate-700 bg-background text-slate-600 dark:text-slate-400"
+                        }`}
+                      >
+                        <div>📅 Cố Định (Thứ 7 Hàng Tuần)</div>
+                        <div className="text-[10.5px] font-normal text-slate-500 mt-0.5">
+                          Định kỳ sinh hoạt nâng cao năng lực hội viên mỗi sáng Thứ 7
+                        </div>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setFormIsFixed(false);
+                          setFormScheduleType("custom");
+                        }}
+                        className={`py-2 px-3 rounded-xl border text-xs font-bold text-left transition cursor-pointer ${
+                          !formIsFixed
+                            ? "border-[#003B95] bg-blue-100/70 dark:bg-blue-900/50 text-[#003B95] dark:text-blue-300 ring-2 ring-[#003B95]/20"
+                            : "border-slate-300 dark:border-slate-700 bg-background text-slate-600 dark:text-slate-400"
+                        }`}
+                      >
+                        <div>⚡ Không Cố Định (Chuyên Đề)</div>
+                        <div className="text-[10.5px] font-normal text-slate-500 mt-0.5">
+                          Chuyên đề đào tạo đột xuất hoặc khóa học ngắn hạn theo dự án
+                        </div>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* UC-3: Phân rã mốc thời gian trong 1 buổi học (Agenda Timetable) */}
+                  <div className="p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-background space-y-2">
+                    <div className="flex items-center justify-between">
+                      <label className="text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+                        <Clock className="h-3.5 w-3.5 text-[#003B95]" />
+                        <span>Khung Thời Gian Chi Tiết Trong Buổi Học (Agenda Slots)</span>
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setFormAgenda([
+                            ...formAgenda,
+                            { time: "11:30 - 12:00", activity: "Hoạt động mới" },
+                          ])
+                        }
+                        className="text-[11px] font-bold text-[#003B95] dark:text-blue-400 hover:underline inline-flex items-center gap-1"
+                      >
+                        <Plus className="h-3 w-3" /> Thêm mốc giờ
+                      </button>
+                    </div>
+                    <div className="space-y-1.5">
+                      {formAgenda.map((slot, sIdx) => (
+                        <div key={sIdx} className="flex items-center gap-2">
+                          <input
+                            type="text"
+                            value={slot.time}
+                            onChange={(e) => {
+                              const next = [...formAgenda];
+                              next[sIdx].time = e.target.value;
+                              setFormAgenda(next);
+                            }}
+                            placeholder="08:30 - 09:00"
+                            className="w-28 h-8 px-2.5 rounded-lg border border-slate-300 dark:border-slate-700 text-xs font-mono font-semibold"
+                          />
+                          <input
+                            type="text"
+                            value={slot.activity}
+                            onChange={(e) => {
+                              const next = [...formAgenda];
+                              next[sIdx].activity = e.target.value;
+                              setFormAgenda(next);
+                            }}
+                            placeholder="Nội dung hoạt động chi tiết..."
+                            className="flex-1 h-8 px-2.5 rounded-lg border border-slate-300 dark:border-slate-700 text-xs"
+                          />
+                          {formAgenda.length > 1 && (
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setFormAgenda(formAgenda.filter((_, i) => i !== sIdx))
+                              }
+                              className="p-1 text-slate-400 hover:text-rose-500"
+                            >
+                              <X className="h-3.5 w-3.5" />
+                            </button>
+                          )}
+                        </div>
+                      ))}
                     </div>
                   </div>
 
@@ -1328,6 +1498,56 @@ export function TrainingsPage() {
               </button>
             </div>
           </div>
+        )}
+
+        {/* Modal Quản lý Học Viên, Điểm danh & Gửi slide bài giảng (UC-3) */}
+        {activeAttendeesModal && (
+          <TrainingAttendeesModal
+            open={!!activeAttendeesModal}
+            trainingId={activeAttendeesModal.id}
+            trainingTitle={activeAttendeesModal.title}
+            initialSlideUrl={(activeAttendeesModal as any).slide_url || (activeAttendeesModal as any).materials?.[0]?.url}
+            onClose={() => setActiveAttendeesModal(null)}
+            onUpdateCount={(count) => {
+              setTrainings((prev) =>
+                prev.map((tr) => (tr.id === activeAttendeesModal.id ? { ...tr, attendee_count: count } : tr))
+              );
+            }}
+          />
+        )}
+
+        {/* Modal Phản Hồi & Đóng Góp Ý Kiến Sau Buổi Học (UC-3) */}
+        {activeFeedbackModal && (
+          <TrainingFeedbackModal
+            open={!!activeFeedbackModal}
+            trainingId={activeFeedbackModal.id}
+            trainingTitle={activeFeedbackModal.title}
+            onClose={() => setActiveFeedbackModal(null)}
+          />
+        )}
+
+        {/* Modal Khai Báo Vật Dụng Hậu Cần Buổi Học (UC-4) */}
+        {activeSupplyModal && (
+          <SupplyDeclarationModal
+            open={!!activeSupplyModal}
+            targetType="training"
+            targetId={activeSupplyModal.id}
+            targetName={activeSupplyModal.title}
+            department="Ban Đào Tạo & Ban Hậu Cần"
+            onClose={() => setActiveSupplyModal(null)}
+          />
+        )}
+
+        {/* Modal Quay Phim & Chụp Ảnh Tư Liệu Buổi Học (UC-3: Tự động lưu Quản lý tài liệu) */}
+        {activeMediaRecordingModal && (
+          <TrainingMediaModal
+            open={!!activeMediaRecordingModal}
+            trainingId={activeMediaRecordingModal.id}
+            trainingTitle={activeMediaRecordingModal.title}
+            existingMediaUrl={(activeMediaRecordingModal as any).media_url}
+            onClose={() => setActiveMediaRecordingModal(null)}
+            onUpdated={() => fetchTrainings()}
+          />
         )}
 
         {/* ── MODAL PHÒNG HỌP TRỰC TUYẾN (IFRAME VIDEO CALL JITSI) ── */}

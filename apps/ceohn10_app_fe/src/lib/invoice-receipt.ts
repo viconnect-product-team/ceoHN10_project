@@ -7,9 +7,9 @@ export function formatVND(amount: number): string {
   }).format(amount);
 }
 
-export function downloadInvoiceVoucher(tx: Transaction) {
+export function generateInvoiceVoucherHtml(tx: Transaction): string {
   const isThu = tx.type === "income";
-  const title = isThu ? "PHIẾU THU TIỀN" : "PHIẾU CHI TIỀN";
+  const title = isThu ? "PHIẾU THU TIỀN" : "PHIẾU CHI TIỀN (BÁO CÁO CHI)";
   const voucherCode = tx.id;
   const dateStr = tx.date || new Date().toISOString().slice(0, 10);
   const methodLabel =
@@ -24,7 +24,15 @@ export function downloadInvoiceVoucher(tx: Transaction) {
       ? (tx.advanceAmount || 0) - (tx.refundAmount || 0)
       : tx.amount;
 
-  const htmlContent = `<!DOCTYPE html>
+  const fundLabel =
+    tx.fundType === "sponsorship_cash" || tx.fundType === "sponsorship"
+      ? "Túi Quỹ Tài Trợ CEO HN10 (Nguồn Đối Tác / NTT)"
+      : "Túi Quỹ Chung CLB (Nguồn Hội Phí Hội Viên)";
+
+  const deptLabel = tx.targetDepartment || tx.department || "Ban Điều Hành / Chung CLB";
+  const eventLabel = tx.targetEventName || tx.eventName || (tx.targetEventId ? `Mã sự kiện: ${tx.targetEventId}` : "Hoạt động & Chi tiêu định kỳ");
+
+  return `<!DOCTYPE html>
 <html lang="vi">
 <head>
   <meta charset="UTF-8" />
@@ -33,29 +41,30 @@ export function downloadInvoiceVoucher(tx: Transaction) {
     * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
     body { background: #f8fafc; padding: 40px 20px; color: #1e293b; margin: 0; }
     .voucher-card {
-      max-width: 720px; margin: 0 auto; background: #ffffff; border-radius: 16px;
+      max-width: 760px; margin: 0 auto; background: #ffffff; border-radius: 16px;
       padding: 40px; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08); border: 1px solid #e2e8f0;
     }
     .header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #cbd5e1; padding-bottom: 20px; margin-bottom: 24px; }
-    .brand { font-size: 20px; font-weight: 800; color: #004b91; letter-spacing: -0.5px; }
+    .brand { font-size: 20px; font-weight: 800; color: #7C2D82; letter-spacing: -0.5px; }
     .sub-brand { font-size: 12px; color: #64748b; margin-top: 4px; }
     .voucher-meta { text-align: right; }
     .voucher-no { font-size: 16px; font-weight: 700; color: ${isThu ? "#059669" : "#dc2626"}; font-family: monospace; }
     .voucher-date { font-size: 12px; color: #64748b; margin-top: 4px; }
-    .title { text-align: center; font-size: 24px; font-weight: 800; color: #0f172a; margin: 20px 0 30px; letter-spacing: 0.5px; }
+    .title { text-align: center; font-size: 22px; font-weight: 800; color: #0f172a; margin: 20px 0 25px; letter-spacing: 0.5px; text-transform: uppercase; }
+    .fund-badge { display: inline-block; padding: 4px 12px; border-radius: 9999px; background: #FAF5FF; color: #7C2D82; font-size: 12px; font-weight: 700; border: 1px solid #E9D5FF; margin-bottom: 15px; }
     .detail-table { width: 100%; border-collapse: collapse; margin-bottom: 24px; }
-    .detail-table td { padding: 10px 12px; border-bottom: 1px solid #f1f5f9; font-size: 14px; }
-    .detail-table td.label { width: 35%; font-weight: 600; color: #475569; background: #f8fafc; }
+    .detail-table td { padding: 10px 12px; border-bottom: 1px solid #f1f5f9; font-size: 13.5px; }
+    .detail-table td.label { width: 34%; font-weight: 600; color: #475569; background: #f8fafc; }
     .detail-table td.val { font-weight: 500; color: #0f172a; }
-    .highlight-amount { font-size: 20px; font-weight: 800; color: ${isThu ? "#059669" : "#dc2626"}; }
-    .signatures { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; text-align: center; margin-top: 48px; padding-top: 20px; }
+    .highlight-amount { font-size: 19px; font-weight: 800; color: ${isThu ? "#059669" : "#dc2626"}; }
+    .signatures { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; text-align: center; margin-top: 40px; padding-top: 20px; border-top: 1px solid #f1f5f9; }
     .sig-title { font-size: 13px; font-weight: 700; color: #334155; }
     .sig-hint { font-size: 11px; color: #94a3b8; margin-top: 4px; }
-    .sig-space { height: 70px; }
-    .footer { text-align: center; font-size: 11px; color: #94a3b8; margin-top: 40px; border-top: 1px dashed #e2e8f0; padding-top: 16px; }
+    .sig-space { height: 75px; }
+    .footer { text-align: center; font-size: 11px; color: #94a3b8; margin-top: 35px; border-top: 1px dashed #e2e8f0; padding-top: 16px; }
     @media print {
       body { background: transparent; padding: 0; }
-      .voucher-card { box-shadow: none; border: none; padding: 20px; }
+      .voucher-card { box-shadow: none; border: none; padding: 20px; max-width: 100%; }
       .no-print { display: none; }
     }
   </style>
@@ -64,21 +73,36 @@ export function downloadInvoiceVoucher(tx: Transaction) {
   <div class="voucher-card">
     <div class="header">
       <div>
-        <div class="brand">HIỆP HỘI DOANH NGHIỆP CEO HN10</div>
-        <div class="sub-brand">Hệ thống Quản trị Tài chính & Kế toán CEO HN10 CRM</div>
+        <div class="brand">CLB DOANH NHÂN CEO HN10</div>
+        <div class="sub-brand">Hệ thống Quản trị Tài chính & 2 Túi Quỹ (Hội Phí & Tài Trợ)</div>
       </div>
       <div class="voucher-meta">
         <div class="voucher-no">Số: ${voucherCode}</div>
-        <div class="voucher-date">Ngày: ${dateStr}</div>
+        <div class="voucher-date">Ngày lập: ${dateStr}</div>
       </div>
     </div>
 
+    <div style="text-align: center;">
+      <div class="fund-badge">${fundLabel}</div>
+    </div>
     <div class="title">${title}</div>
 
     <table class="detail-table">
       <tr>
-        <td class="label">${isThu ? "Người nộp tiền:" : "Người nhận tiền:"}</td>
-        <td class="val"><strong>${tx.recipient || (isThu ? "Hội viên / Khách hàng" : "Cán bộ / Đơn vị thụ hưởng")}</strong></td>
+        <td class="label">Nguồn xuất chi / Túi quỹ:</td>
+        <td class="val"><strong style="color: #7C2D82;">${fundLabel}</strong></td>
+      </tr>
+      <tr>
+        <td class="label">Ban phụ trách / Đề xuất:</td>
+        <td class="val"><strong>${deptLabel}</strong> (Ví dụ: Ban Đời Sống / Ban Hậu Cần / Ban Sự Kiện)</td>
+      </tr>
+      <tr>
+        <td class="label">Sự kiện / Cuộc họp chi:</td>
+        <td class="val"><strong>${eventLabel}</strong></td>
+      </tr>
+      <tr>
+        <td class="label">${isThu ? "Người nộp tiền:" : "Người nhận tiền / Đơn vị thụ hưởng:"}</td>
+        <td class="val"><strong style="color: #0284c7;">${tx.recipient || (isThu ? "Hội viên / Khách hàng" : "Cán bộ / Đơn vị thụ hưởng")}</strong></td>
       </tr>
       <tr>
         <td class="label">Nội dung ${isThu ? "thu:" : "chi:"}</td>
@@ -114,47 +138,69 @@ export function downloadInvoiceVoucher(tx: Transaction) {
       <tr>
         <td class="label">Trạng thái giao dịch:</td>
         <td class="val" style="color: ${tx.status === "completed" ? "#059669" : "#d97706"}; font-weight: 700;">
-          ${tx.status === "completed" ? "ĐÃ HOÀN TẤT (HỢP LỆ)" : "CHỜ DUYỆT / TẠM THỜI"}
+          ${tx.status === "completed" ? "ĐÃ HOÀN TẤT & PHÊ DUYỆT (HỢP LỆ)" : "CHỜ DUYỆT / TẠM THỜI"}
         </td>
       </tr>
     </table>
 
     <div class="signatures">
       <div>
-        <div class="sig-title">Người lập phiếu</div>
-        <div class="sig-hint">(Ký, họ tên)</div>
+        <div class="sig-title">Người lập đề xuất chi</div>
+        <div class="sig-hint">(Ban Hậu cần / Ban chuyên môn)</div>
         <div class="sig-space"></div>
-        <div style="font-size:12px; font-weight:600;">Ban Kế Toán</div>
+        <div style="font-size:12px; font-weight:600;">${tx.recipient || "Ban chuyên môn"}</div>
       </div>
       <div>
-        <div class="sig-title">Thủ quỹ / Kế toán trưởng</div>
-        <div class="sig-hint">(Ký, họ tên)</div>
+        <div class="sig-title">Trưởng Ban Tài Chính</div>
+        <div class="sig-hint">(Kiểm soát & phê duyệt cấp quỹ)</div>
         <div class="sig-space"></div>
-        <div style="font-size:12px; font-weight:600;">Trưởng Ban Tài Chính</div>
+        <div style="font-size:12px; font-weight:600;">Ban Tài Chính CEO HN10</div>
       </div>
       <div>
-        <div class="sig-title">${isThu ? "Người nộp tiền" : "Chủ tịch / Tổng thư ký duyệt"}</div>
-        <div class="sig-hint">(Ký, họ tên)</div>
+        <div class="sig-title">Chủ Tịch CLB CEO HN10</div>
+        <div class="sig-hint">(Ký duyệt xuất chi chính thức)</div>
         <div class="sig-space"></div>
-        <div style="font-size:12px; font-weight:600;">Xác nhận số hóa</div>
+        <div style="font-size:12px; font-weight:600;">Chủ Tịch Duyệt</div>
       </div>
     </div>
 
     <div class="footer">
-      Chứng từ điện tử được khởi tạo tự động từ hệ thống CEO HN10 CRM. Mã tra cứu: ${voucherCode}
+      Chứng từ điện tử báo cáo chi tiêu được khởi tạo tự động từ hệ thống CEO HN10 CRM. Mã tra cứu: ${voucherCode}
     </div>
   </div>
   <div class="no-print" style="text-align: center; margin-top: 20px;">
-    <button onclick="window.print()" style="padding: 10px 24px; background: #004b91; color: #fff; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">In hoặc Lưu file PDF</button>
+    <button onclick="window.print()" style="padding: 10px 24px; background: #7C2D82; color: #fff; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 13px;">In Báo Cáo hoặc Lưu Thành File PDF</button>
   </div>
 </body>
 </html>`;
+}
 
+export function printOrExportExpensePdf(tx: Transaction) {
+  if (typeof window === "undefined") return;
+  const htmlContent = generateInvoiceVoucherHtml(tx);
+  const printWindow = window.open("", "_blank");
+  if (printWindow) {
+    printWindow.document.write(htmlContent);
+    printWindow.document.close();
+    printWindow.focus();
+    setTimeout(() => {
+      try {
+        printWindow.print();
+      } catch {}
+    }, 400);
+  } else {
+    downloadInvoiceVoucher(tx);
+  }
+}
+
+export function downloadInvoiceVoucher(tx: Transaction) {
+  const voucherCode = tx.id;
+  const htmlContent = generateInvoiceVoucherHtml(tx);
   const blob = new Blob([htmlContent], { type: "text/html;charset=utf-8" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = `HOA_DON_${voucherCode}.html`;
+  a.download = `BAO_CAO_CHI_${voucherCode}.html`;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);

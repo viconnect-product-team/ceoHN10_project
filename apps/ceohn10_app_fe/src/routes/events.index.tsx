@@ -16,6 +16,9 @@ import {
   Users,
   X,
   Send,
+  Package,
+  MessageSquare,
+  Camera,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -25,6 +28,9 @@ import { EmptyState, NoSearchResult } from "@/components/dashboard/StateKit";
 import { CrudModal, type CrudField, type CrudValues } from "@/components/dashboard/CrudModal";
 import { EventWizard } from "@/components/dashboard/EventWizard";
 import { EventCheckinGatekeeperModal } from "@/components/events/EventCheckinGatekeeperModal";
+import { SupplyDeclarationModal } from "@/components/dashboard/SupplyDeclarationModal";
+import { EventFeedbackModal } from "@/components/events/EventFeedbackModal";
+import { EventMediaModal } from "@/components/events/EventMediaModal";
 import { EventSponsorPackageSelector } from "@/components/events/EventSponsorPackageSelector";
 import { EventQrStaffSelector } from "@/components/events/EventQrStaffSelector";
 import { useRole, PERMISSIONS } from "@/hooks/use-role";
@@ -139,6 +145,9 @@ function EventsPage() {
   const [wizardOpen, setWizardOpen] = useState(false);
   const [editing, setEditing] = useState<EventItem | null>(null);
   const [qrGatekeeperEvent, setQrGatekeeperEvent] = useState<EventItem | null>(null);
+  const [selectedSupplyEvent, setSelectedSupplyEvent] = useState<EventItem | null>(null);
+  const [feedbackModalEvent, setFeedbackModalEvent] = useState<EventItem | null>(null);
+  const [mediaModalEvent, setMediaModalEvent] = useState<EventItem | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
@@ -918,6 +927,42 @@ ${(e as any).description ? `📝 Chi tiết: ${(e as any).description}\n\n` : ""
                               <span className="hidden xl:inline text-[11px]">QR Gate</span>
                             </button>
                           )}
+                          <button
+                            type="button"
+                            title="Khai báo vật dụng hỗ trợ sự kiện - Ban Hậu Cần & Sự Kiện"
+                            onClick={(evt) => {
+                              evt.stopPropagation();
+                              setSelectedSupplyEvent(e);
+                            }}
+                            className="inline-flex items-center gap-1 rounded-lg border border-indigo-500/40 bg-indigo-500/10 px-2 py-1.5 text-xs font-semibold text-indigo-600 hover:bg-indigo-500/20 transition"
+                          >
+                            <Package className="h-3.5 w-3.5" />
+                            <span className="hidden xl:inline text-[11px]">Hậu cần</span>
+                          </button>
+                          <button
+                            type="button"
+                            title="Đánh giá & phản hồi sự kiện"
+                            onClick={(evt) => {
+                              evt.stopPropagation();
+                              setFeedbackModalEvent(e);
+                            }}
+                            className="inline-flex items-center gap-1 rounded-lg border border-amber-500/40 bg-amber-500/10 px-2 py-1.5 text-xs font-semibold text-amber-600 hover:bg-amber-500/20 transition"
+                          >
+                            <MessageSquare className="h-3.5 w-3.5" />
+                            <span className="hidden xl:inline text-[11px]">Đánh giá</span>
+                          </button>
+                          <button
+                            type="button"
+                            title="Tư liệu & media sự kiện - Tự động đồng bộ Quản lý tài liệu"
+                            onClick={(evt) => {
+                              evt.stopPropagation();
+                              setMediaModalEvent(e);
+                            }}
+                            className="inline-flex items-center gap-1 rounded-lg border border-emerald-500/40 bg-emerald-500/10 px-2 py-1.5 text-xs font-semibold text-emerald-600 hover:bg-emerald-500/20 transition"
+                          >
+                            <Camera className="h-3.5 w-3.5" />
+                            <span className="hidden xl:inline text-[11px]">Ảnh/Media</span>
+                          </button>
                           <Link
                             to="/events/$eventId"
                             params={{ eventId: e.id }}
@@ -979,6 +1024,9 @@ ${(e as any).description ? `📝 Chi tiết: ${(e as any).description}\n\n` : ""
                 onDelete={() => onDelete(e)}
                 onQrGatekeeper={() => setQrGatekeeperEvent(e)}
                 onBroadcastToFeed={() => handleBroadcastEventToFeed(e)}
+                onSupply={() => setSelectedSupplyEvent(e)}
+                onFeedback={() => setFeedbackModalEvent(e)}
+                onMedia={() => setMediaModalEvent(e)}
               />
             ))}
           </div>
@@ -1036,6 +1084,37 @@ ${(e as any).description ? `📝 Chi tiết: ${(e as any).description}\n\n` : ""
         onClose={() => setQrGatekeeperEvent(null)}
         onUpdateEvent={() => router.invalidate()}
       />
+
+      {selectedSupplyEvent && (
+        <SupplyDeclarationModal
+          open={!!selectedSupplyEvent}
+          targetType="event"
+          targetId={selectedSupplyEvent.id}
+          targetName={selectedSupplyEvent.name}
+          department="Ban Sự Kiện & Hậu Cần"
+          onClose={() => setSelectedSupplyEvent(null)}
+        />
+      )}
+
+      {feedbackModalEvent && (
+        <EventFeedbackModal
+          open={!!feedbackModalEvent}
+          eventId={feedbackModalEvent.id}
+          eventName={feedbackModalEvent.name}
+          onClose={() => setFeedbackModalEvent(null)}
+        />
+      )}
+
+      {mediaModalEvent && (
+        <EventMediaModal
+          open={!!mediaModalEvent}
+          eventId={mediaModalEvent.id}
+          eventName={mediaModalEvent.name}
+          existingGalleryUrl={(mediaModalEvent as any).photoGalleryUrl || (mediaModalEvent as any).photo_gallery_url}
+          onClose={() => setMediaModalEvent(null)}
+          onUpdated={() => router.invalidate()}
+        />
+      )}
       </div>
     </AppShell>
   );
@@ -1093,6 +1172,9 @@ function EventCard({
   onDelete,
   onQrGatekeeper,
   onBroadcastToFeed,
+  onSupply,
+  onFeedback,
+  onMedia,
 }: {
   event: EventItem;
   deleting: boolean;
@@ -1100,6 +1182,9 @@ function EventCard({
   onDelete: () => void;
   onQrGatekeeper?: () => void;
   onBroadcastToFeed?: () => void;
+  onSupply?: () => void;
+  onFeedback?: () => void;
+  onMedia?: () => void;
 }) {
   const t = useT();
   const fmt = useFmt();
@@ -1189,6 +1274,39 @@ function EventCard({
                 className="rounded-lg p-1.5 text-amber-600 transition hover:bg-amber-500/15 hover:text-amber-700"
               >
                 <QrCode className="h-4 w-4" aria-hidden="true" />
+              </button>
+            )}
+            {onSupply && (
+              <button
+                type="button"
+                onClick={onSupply}
+                aria-label="Khai báo vật dụng hậu cần"
+                title="Khai báo vật dụng hỗ trợ sự kiện - Ban Hậu Cần"
+                className="rounded-lg p-1.5 text-indigo-600 transition hover:bg-indigo-500/15 hover:text-indigo-700"
+              >
+                <Package className="h-4 w-4" aria-hidden="true" />
+              </button>
+            )}
+            {onFeedback && (
+              <button
+                type="button"
+                onClick={onFeedback}
+                aria-label="Đánh giá phản hồi"
+                title="Đánh giá & phản hồi sự kiện"
+                className="rounded-lg p-1.5 text-amber-600 transition hover:bg-amber-500/15 hover:text-amber-700"
+              >
+                <MessageSquare className="h-4 w-4" aria-hidden="true" />
+              </button>
+            )}
+            {onMedia && (
+              <button
+                type="button"
+                onClick={onMedia}
+                aria-label="Tư liệu media"
+                title="Tư liệu & media sự kiện - Tự động đồng bộ Quản lý tài liệu"
+                className="rounded-lg p-1.5 text-emerald-600 transition hover:bg-emerald-500/15 hover:text-emerald-700"
+              >
+                <Camera className="h-4 w-4" aria-hidden="true" />
               </button>
             )}
             {can(PERMISSIONS.EVENT_EDIT) && (

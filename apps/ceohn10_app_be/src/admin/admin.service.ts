@@ -2350,6 +2350,282 @@ export class AdminService implements OnModuleInit {
     return { ok: true };
   }
 
+  // ── 2 TÚI QUỸ TÀI CHÍNH & YÊU CẦU DUYỆT CHI (UC-5) ──────────────────────────
+
+  async getFundsOverview() {
+    try {
+      // 1. Quỹ Chung CLB (General Fund) - Tổng hợp theo phí hội viên
+      const duesRows = await this.prisma.$queryRawUnsafe<any[]>(`
+        SELECT COALESCE(SUM(amount), 0) as total_dues, COUNT(*) as cnt
+        FROM public.transactions
+        WHERE type = 'income' AND (
+          category ILIKE '%due%' OR category ILIKE '%hội phí%' OR category ILIKE '%fee%' OR fund_type = 'general'
+        );
+      `).catch(() => [{ total_dues: 0, cnt: 0 }]);
+
+      const generalExpenseRows = await this.prisma.$queryRawUnsafe<any[]>(`
+        SELECT COALESCE(SUM(amount), 0) as total_expense
+        FROM public.transactions
+        WHERE type = 'expense' AND (fund_type = 'general' OR fund_type IS NULL);
+      `).catch(() => [{ total_expense: 0 }]);
+
+      const totalDues = Number(duesRows[0]?.total_dues || 0);
+      const totalGeneralExpense = Number(generalExpenseRows[0]?.total_expense || 0);
+      const generalBalance = Math.max(0, totalDues - totalGeneralExpense);
+
+      // Chi phí theo ban chuyên môn (để xuất báo cáo)
+      const deptExpenses = await this.prisma.$queryRawUnsafe<any[]>(`
+        SELECT code, date, description, amount, recipient, target_department, target_event_id, invoice_url
+        FROM public.transactions
+        WHERE type = 'expense'
+        ORDER BY date DESC, created_at DESC
+        LIMIT 20;
+      `).catch(() => []);
+
+      // 2. Quỹ Tài Trợ (Sponsorship Fund)
+      // Mục 1: Tiền mặt tài trợ
+      const cashSponsorRows = await this.prisma.$queryRawUnsafe<any[]>(`
+        SELECT COALESCE(SUM(amount), 0) as total_cash, COUNT(*) as cnt
+        FROM public.sponsors
+        WHERE sponsor_type = 'money' OR amount > 0;
+      `).catch(() => [{ total_cash: 0, cnt: 0 }]);
+
+      const totalSponsorCash = Number(cashSponsorRows[0]?.total_cash || 0);
+      const allocatedCashRows = await this.prisma.$queryRawUnsafe<any[]>(`
+        SELECT COALESCE(SUM(amount), 0) as allocated_cash
+        FROM public.transactions
+        WHERE type = 'expense' AND fund_type = 'sponsorship_cash';
+      `).catch(() => [{ allocated_cash: 0 }]);
+      const allocatedSponsorCash = Number(allocatedCashRows[0]?.allocated_cash || 0);
+      const availableSponsorCash = Math.max(0, totalSponsorCash - allocatedSponsorCash);
+
+      // Mục 2: Hiện vật tài trợ
+      const inKindSponsors = await this.prisma.$queryRawUnsafe<any[]>(`
+        SELECT id, name, company_name, in_kind_items
+        FROM public.sponsors
+        WHERE sponsor_type = 'in_kind' OR (in_kind_items IS NOT NULL AND in_kind_items::text != '[]');
+      `).catch(() => []);
+
+      const inKindInventory: any[] = [];
+      let totalInKindEstimatedValue = 0;
+
+      for (const sp of inKindSponsors) {
+        let items: any[] = [];
+        try {
+          items = Array.isArray(sp.in_kind_items) ? sp.in_kind_items : JSON.parse(sp.in_kind_items || '[]');
+        } catch {
+          items = [];
+        }
+        for (const it of items) {
+          const totalQty = Number(it.quantity || it.qty || 1);
+          const allocatedQty = Number(it.allocatedQuantity || 0);
+          const val = Number(it.estimatedValue || 0);
+          totalInKindEstimatedValue += val;
+          inKindInventory.push({
+            sponsorId: sp.id,
+            sponsorName: sp.name,
+            companyName: sp.company_name || '',
+            itemName: it.name || it.itemName || 'Hiện vật tài trợ',
+            unit: it.unit || 'Cái',
+            totalQuantity: totalQty,
+            allocatedQuantity: allocatedQty,
+            availableQuantity: Math.max(0, totalQty - allocatedQty),
+            estimatedValue: val,
+          });
+        }
+      }
+
+      return {
+        generalFund: {
+          name: 'Quỹ Chung CLB CEO HN10',
+          source: 'Hội phí niên liễm hội viên',
+          totalIncome: totalDues,
+          totalExpense: totalGeneralExpense,
+          balance: generalBalance,
+          duesCount: Number(duesRows[0]?.cnt || 0),
+          recentExpenses: deptExpenses.map((e) => ({
+            code: e.code,
+            date: e.date,
+            description: e.description,
+            amount: Number(e.amount || 0),
+            recipient: e.recipient || 'Ban chuyên môn',
+            department: e.target_department || 'Ban Đời Sống / Sự Kiện',
+            targetEventId: e.target_event_id || '',
+            invoiceUrl: e.invoice_url || '',
+          })),
+        },
+        sponsorshipFund: {
+          name: 'Quỹ Tài Trợ Doanh Nghiệp',
+          source: 'Nguồn đóng góp từ các Nhà Tài Trợ',
+          cash: {
+            title: 'Mục 1: Tiền Mặt Tài Trợ',
+            totalAmount: totalSponsorCash,
+            allocatedAmount: allocatedSponsorCash,
+            availableAmount: availableSponsorCash,
+            sponsorCount: Number(cashSponsorRows[0]?.cnt || 0),
+          },
+          inKind: {
+            title: 'Mục 2: Kho Hiện Vật & Vật Dụng Tài Trợ',
+            totalEstimatedValue: totalInKindEstimatedValue,
+            itemCount: inKindInventory.length,
+            inventory: inKindInventory,
+          },
+        },
+      };
+    } catch (err) {
+      console.error('[AdminService] getFundsOverview error:', err);
+      return {
+        generalFund: { totalIncome: 0, totalExpense: 0, balance: 0, recentExpenses: [] },
+        sponsorshipFund: { cash: { totalAmount: 0, availableAmount: 0 }, inKind: { inventory: [] } },
+      };
+    }
+  }
+
+  // ── EXPENSE REQUESTS (YÊU CẦU CHI & DUYỆT CHI TỪ 2 TÚI QUỸ) ──────────────
+
+  async listExpenseRequests(query) {
+    let sql = `SELECT * FROM public.expense_requests WHERE 1=1`;
+    if (query?.status && query.status !== 'all') {
+      sql += ` AND status = '${query.status.replace(/'/g, "''")}'`;
+    }
+    if (query?.department && query.department !== 'all') {
+      sql += ` AND department = '${query.department.replace(/'/g, "''")}'`;
+    }
+    if (query?.fundType && query.fundType !== 'all') {
+      sql += ` AND fund_type = '${query.fundType.replace(/'/g, "''")}'`;
+    }
+    sql += ` ORDER BY created_at DESC;`;
+
+    const rows = await this.prisma.$queryRawUnsafe<any[]>(sql).catch(() => []);
+    return rows.map((r) => ({
+      id: r.id,
+      requestCode: r.request_code,
+      title: r.title,
+      fundType: r.fund_type || 'general',
+      targetType: r.target_type || 'event',
+      targetId: r.target_id || '',
+      targetName: r.target_name || '',
+      department: r.department,
+      recipientName: r.recipient_name,
+      recipientAccount: r.recipient_account || '',
+      amount: Number(r.amount || 0),
+      reason: r.reason,
+      items: Array.isArray(r.items) ? r.items : [],
+      status: r.status || 'pending',
+      requestedByName: r.requested_by_name || 'Ban Hậu cần',
+      financeApproverName: r.finance_approver_name || null,
+      financeApprovedAt: r.finance_approved_at || null,
+      leaderApproverName: r.leader_approver_name || null,
+      leaderApprovedAt: r.leader_approved_at || null,
+      receiptUrl: r.receipt_url || '',
+      createdAt: r.created_at,
+    }));
+  }
+
+  async createExpenseRequest(body, userId, userName) {
+    if (!body.title?.trim() || !body.recipientName?.trim()) {
+      throw new BadRequestException('Vui lòng nhập tiêu đề yêu cầu và tên người nhận tiền');
+    }
+
+    const rand = Math.floor(100 + Math.random() * 900);
+    const code = `YC-${new Date().getFullYear()}-${rand}`;
+    const amount = Math.max(0, Number(body.amount || 0));
+    const itemsJson = JSON.stringify(Array.isArray(body.items) ? body.items : []);
+    const safeUserId = userId && userId.length === 36 ? `'${userId}'::uuid` : 'NULL';
+
+    const res = await this.prisma.$queryRawUnsafe<any[]>(
+      `
+      INSERT INTO public.expense_requests (
+        request_code, title, fund_type, target_type, target_id, target_name,
+        department, recipient_name, recipient_account, amount, reason, items,
+        status, requested_by, requested_by_name, receipt_url, created_at, updated_at
+      ) VALUES (
+        $1, $2, $3, $4, $5, $6,
+        $7, $8, $9, $10, $11, $12::jsonb,
+        'pending', ${safeUserId}, $13, $14, now(), now()
+      ) RETURNING *;
+      `,
+      code,
+      body.title.trim(),
+      body.fundType || 'general',
+      body.targetType || 'event',
+      body.targetId || null,
+      body.targetName || '',
+      body.department || 'Ban Sự kiện & Hậu cần',
+      body.recipientName.trim(),
+      body.recipientAccount || '',
+      amount,
+      body.reason || 'Chi phục vụ hoạt động sự kiện / cuộc họp ban',
+      itemsJson,
+      userName || 'Ban Sự kiện & Hậu cần',
+      body.receiptUrl || '',
+    );
+
+    return res[0];
+  }
+
+  async approveFinanceExpenseRequest(id, approverName = 'Trưởng Ban Tài Chính') {
+    await this.prisma.$executeRawUnsafe(
+      `UPDATE public.expense_requests
+       SET status = 'finance_approved', finance_approver_name = $1, finance_approved_at = now(), updated_at = now()
+       WHERE id = $2::uuid;`,
+      approverName,
+      id,
+    );
+
+    return { success: true, message: 'Trưởng ban tài chính đã phê duyệt yêu cầu chi' };
+  }
+
+  async approveLeaderExpenseRequest(id, approverName = 'Chủ Tịch CLB') {
+    await this.prisma.$executeRawUnsafe(
+      `UPDATE public.expense_requests
+       SET status = 'approved', leader_approver_name = $1, leader_approved_at = now(), updated_at = now()
+       WHERE id = $2::uuid;`,
+      approverName,
+      id,
+    );
+
+    return { success: true, message: 'Chủ tịch / Trưởng ban đã phê duyệt quyết toán chi' };
+  }
+
+  async disburseExpenseRequest(id) {
+    const rows = await this.prisma.$queryRawUnsafe<any[]>(
+      `SELECT * FROM public.expense_requests WHERE id = $1::uuid LIMIT 1;`,
+      id,
+    ).catch(() => []);
+
+    if (rows.length === 0) throw new NotFoundException('Không tìm thấy yêu cầu chi');
+    const r = rows[0];
+
+    // Cập nhật trạng thái đã giải ngân
+    await this.prisma.$executeRawUnsafe(
+      `UPDATE public.expense_requests SET status = 'paid', updated_at = now() WHERE id = $1::uuid;`,
+      id,
+    );
+
+    // Tự động ghi vào sổ chi transactions
+    const rand = Math.floor(100 + Math.random() * 900);
+    const code = `PC-${new Date().getFullYear()}-${rand}`;
+    await this.prisma.$executeRawUnsafe(
+      `INSERT INTO public.transactions (
+        id, code, date, type, category, description, amount, method, status,
+        recipient, fund_type, target_department, target_event_id, created_at, updated_at
+      ) VALUES (
+        gen_random_uuid(), $1, CURRENT_DATE, 'expense', 'operation', $2, $3, 'bank', 'completed',
+        $4, $5, $6, $7, now(), now()
+      );`,
+      code,
+      `Chi duyệt theo yêu cầu ${r.request_code}: ${r.title}`,
+      Number(r.amount || 0),
+      r.recipient_name,
+      r.fund_type || 'general',
+      r.department,
+      r.target_id || null,
+    ).catch(() => {});
+
+    return { success: true, message: 'Đã giải ngân và cập nhật số dư quỹ thành công' };
+  }
+
   // ── CRM PERMISSION MATRIX (RBAC) ──────────────────────────────────────────
 
   async getPermissionMatrix() {

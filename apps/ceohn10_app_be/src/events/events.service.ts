@@ -3807,4 +3807,95 @@ export class EventsService implements OnModuleInit {
 
     return { ok: true, deleted: true, id: registrationId };
   }
+
+  // ── EVENT FEEDBACK & RATINGS (UC-2) ──────────────────────────────────────
+
+  async listEventFeedbacks(eventId: string) {
+    const rows = await this.prisma.$queryRawUnsafe<any[]>(`
+      SELECT * FROM public.event_feedbacks
+      WHERE event_id = $1
+      ORDER BY created_at DESC;
+    `, eventId).catch(() => []);
+
+    return rows.map((r) => ({
+      id: r.id,
+      eventId: r.event_id,
+      memberId: r.member_id,
+      userName: r.user_name,
+      userEmail: r.user_email || '',
+      userPhone: r.user_phone || '',
+      rating: Number(r.rating || 5),
+      comment: r.comment || '',
+      createdAt: r.created_at,
+    }));
+  }
+
+  async submitEventFeedback(eventId: string, data: any) {
+    if (!data.comment?.trim()) {
+      throw new BadRequestException('Vui lòng nhập nội dung đánh giá / phản hồi cho sự kiện');
+    }
+
+    const userName = (data.userName || data.name || 'Đại biểu CEO HN10').trim();
+    const userEmail = (data.userEmail || data.email || '').trim().toLowerCase();
+    const userPhone = (data.userPhone || data.phone || '').trim();
+    const rating = Math.min(5, Math.max(1, Number(data.rating) || 5));
+    const memberId = data.memberId && data.memberId.length === 36 ? `'${data.memberId}'::uuid` : 'NULL';
+
+    await this.prisma.$executeRawUnsafe(`
+      INSERT INTO public.event_feedbacks (
+        event_id, member_id, user_name, user_email, user_phone, rating, comment, created_at
+      ) VALUES (
+        $1, ${memberId}, $2, $3, $4, $5, $6, now()
+      );
+    `, eventId, userName, userEmail, userPhone, rating, data.comment.trim());
+
+    return {
+      success: true,
+      message: 'Cảm ơn Anh/Chị đã gửi đánh giá phản hồi về sự kiện!',
+    };
+  }
+
+  // ── ATTACH MEDIA & ARCHIVE TO DOCUMENTS (UC-2) ──────────────────────────
+
+  async attachEventMedia(eventId: string, mediaUrl: string, description?: string) {
+    if (!mediaUrl?.trim()) {
+      throw new BadRequestException('Vui lòng cung cấp link hình ảnh hoặc video sự kiện');
+    }
+
+    const event = await this.prisma.$queryRawUnsafe<any[]>(`
+      SELECT * FROM public.events WHERE id = $1 LIMIT 1;
+    `, eventId).catch(() => []);
+
+    const evTitle = event[0]?.name || 'Sự kiện CEO HN10';
+
+    // 1. Cập nhật photo_gallery_url trong events
+    await this.prisma.$executeRawUnsafe(`
+      UPDATE public.events 
+      SET photo_gallery_url = $1, updated_at = now() 
+      WHERE id = $2;
+    `, mediaUrl.trim(), eventId);
+
+    // 2. Lưu link media vào Kho Tài Liệu CLB (public.documents)
+    await this.prisma.$executeRawUnsafe(`
+      INSERT INTO public.documents (
+        title, name, code, category, file_url, file_path, file_type, type,
+        event_id, description, uploaded_by_name, uploaded_by, uploaded_at
+      ) VALUES (
+        $1, $1, $2, 'event_media', $3, $3, 'media_link', 'media_link',
+        $4, $5, 'Ban Truyền Thông & Sự Kiện', 'Ban Truyền Thông & Sự Kiện', now()
+      );
+    `,
+      `[Media Sự Kiện] ${evTitle}`,
+      `EV-MEDIA-${Math.random().toString(36).slice(2, 8).toUpperCase()}`,
+      mediaUrl.trim(),
+      eventId,
+      description || `Bộ ảnh và media tư liệu ghi hình sự kiện "${evTitle}".`,
+    ).catch(() => {});
+
+    return {
+      success: true,
+      message: 'Đã đính kèm link tư liệu ảnh/media sự kiện và lưu trữ vào Kho Tài Liệu CLB!',
+      mediaUrl: mediaUrl.trim(),
+    };
+  }
 }

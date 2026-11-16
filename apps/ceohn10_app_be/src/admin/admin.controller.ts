@@ -235,6 +235,50 @@ export class AdminController {
     return this.adminService.deleteTransaction(id);
   }
 
+  // ── 2 TÚI QUỸ TÀI CHÍNH & YÊU CẦU CHI (UC-5) ──
+
+  @Get('funds-overview')
+  async getFundsOverview() {
+    return this.adminService.getFundsOverview();
+  }
+
+  @Get('expense-requests')
+  async listExpenseRequests(
+    @Query('status') status?: string,
+    @Query('department') department?: string,
+    @Query('fundType') fundType?: string,
+  ) {
+    return this.adminService.listExpenseRequests({ status, department, fundType });
+  }
+
+  @Post('expense-requests')
+  @UseGuards(JwtAuthGuard)
+  async createExpenseRequest(@Body() body: any, @Request() req: any) {
+    const userId = req.user?.id || req.user?.sub;
+    const userName = req.user?.name || req.user?.username || 'Ban Hậu cần';
+    return this.adminService.createExpenseRequest(body, userId, userName);
+  }
+
+  @Patch('expense-requests/:id/approve-finance')
+  @UseGuards(JwtAuthGuard)
+  async approveFinanceExpenseRequest(@Param('id') id: string, @Request() req: any) {
+    const approverName = req.user?.name || 'Trưởng Ban Tài Chính';
+    return this.adminService.approveFinanceExpenseRequest(id, approverName);
+  }
+
+  @Patch('expense-requests/:id/approve-leader')
+  @UseGuards(JwtAuthGuard)
+  async approveLeaderExpenseRequest(@Param('id') id: string, @Request() req: any) {
+    const approverName = req.user?.name || 'Chủ Tịch CLB';
+    return this.adminService.approveLeaderExpenseRequest(id, approverName);
+  }
+
+  @Post('expense-requests/:id/pay')
+  @UseGuards(JwtAuthGuard)
+  async disburseExpenseRequest(@Param('id') id: string) {
+    return this.adminService.disburseExpenseRequest(id);
+  }
+
   // ── CRM PERMISSION MATRIX (RBAC) ──────────────────────────────────────────
 
   @Get('permission-matrix')

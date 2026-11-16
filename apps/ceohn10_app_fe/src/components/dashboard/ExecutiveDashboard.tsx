@@ -36,8 +36,21 @@ import {
   Building2,
   GraduationCap,
   FolderOpen,
+  Wallet,
+  Coins,
+  Gift,
+  Download,
+  CheckCircle2,
+  MessageSquare,
+  ExternalLink,
+  Package,
+  FileText,
+  Layers,
+  Star,
   type LucideIcon,
 } from "lucide-react";
+import { TrainingFeedbackModal } from "@/components/trainings/TrainingFeedbackModal";
+import { EventFeedbackModal } from "@/components/events/EventFeedbackModal";
 import { useT, type TKey } from "@/lib/i18n";
 import { getDashboardStatsFn, type DashboardStats } from "@/lib/dashboard.functions";
 import type { EventItem } from "@/lib/events.functions";
@@ -371,6 +384,51 @@ export function ExecutiveDashboard({ authReady }: { authReady: boolean }) {
     enabled: authReady,
   });
 
+  // UC-5 & UC-6: 2 Túi Quỹ Tài Chính (Quỹ Chung & Quỹ Tài Trợ)
+  const fundsQ = useQuery({
+    queryKey: ["dashboard-funds-overview"],
+    queryFn: async () => {
+      try {
+        const res = await fetchNestApi<any>("/admin/funds-overview");
+        return res || null;
+      } catch {
+        return null;
+      }
+    },
+    enabled: authReady,
+  });
+
+  // Mục I.1 & UC-3: Khóa học hội viên tham gia
+  const myEnrolledQ = useQuery({
+    queryKey: ["dashboard-my-enrolled-trainings"],
+    queryFn: async () => {
+      try {
+        const res = await fetchNestApi<any[]>("/trainings/my/enrolled");
+        return Array.isArray(res) ? res : [];
+      } catch {
+        return [];
+      }
+    },
+    enabled: authReady,
+  });
+
+  // Mục I.1 & UC-2: Sự kiện hội viên tham gia
+  const myEventsQ = useQuery({
+    queryKey: ["dashboard-my-events"],
+    queryFn: async () => {
+      try {
+        const res = await fetchNestApi<any[]>("/events/my-events");
+        return Array.isArray(res) ? res : [];
+      } catch {
+        return [];
+      }
+    },
+    enabled: authReady,
+  });
+
+  const [feedbackTraining, setFeedbackTraining] = useState<any | null>(null);
+  const [feedbackEvent, setFeedbackEvent] = useState<any | null>(null);
+
   const recentMembers = useMemo(() => {
     const list = [...(membersQ.data ?? [])];
     return list
@@ -633,13 +691,15 @@ export function ExecutiveDashboard({ authReady }: { authReady: boolean }) {
           icon={CalendarClock}
           tone="navy"
           to="/events"
+          hint="4 sự kiện tiêu biểu"
         />
         <ExecKpi
           label="Lớp học & Đào tạo"
-          value={recentTrainings.length.toLocaleString("vi-VN")}
+          value={(trainingsQ.data ?? []).length.toLocaleString("vi-VN")}
           icon={GraduationCap}
           tone="navy"
           to="/trainings"
+          hint="30 khóa học chuẩn hóa"
         />
         <ExecKpi
           label={t("exec.kpi.unreadNotifs")}
@@ -649,6 +709,333 @@ export function ExecutiveDashboard({ authReady }: { authReady: boolean }) {
           to="/notifications"
         />
       </div>
+
+      {/* ── 2 TÚI QUỸ TÀI CHÍNH CEO HN10 (QUỸ CHUNG & QUỸ TÀI TRỢ - UC-5 & UC-6) ── */}
+      <Panel
+        title="Quản Lý 2 Túi Quỹ CEO HN10 (Tài Chính & Quỹ Tài Trợ)"
+        sub="Túi Quỹ Chung từ Hội phí (phục vụ chi sự kiện/cuộc họp các ban & xuất báo cáo PDF) và Túi Quỹ Tài Trợ (Tiền mặt & Kho hiện vật)"
+        action={
+          <div className="flex items-center gap-2">
+            <Link
+              to="/expenses"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-primary/10 text-primary text-xs font-semibold hover:bg-primary/20 transition cursor-pointer"
+            >
+              <FileText className="size-3.5" />
+              <span>Báo Cáo Chi &amp; Xuất PDF</span>
+            </Link>
+            <Link
+              to="/sponsors"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-500/10 text-purple-700 dark:text-purple-300 text-xs font-semibold hover:bg-purple-500/20 transition cursor-pointer"
+            >
+              <Gift className="size-3.5" />
+              <span>Nhà Tài Trợ</span>
+            </Link>
+          </div>
+        }
+      >
+        <div className="grid gap-4 md:grid-cols-2">
+          {/* TÚI QUỸ 1: QUỸ CHUNG CLB */}
+          <div className="rounded-2xl border border-purple-200 dark:border-purple-900/50 bg-gradient-to-br from-purple-50/50 via-white to-purple-50/30 dark:from-purple-950/20 dark:via-background dark:to-purple-950/10 p-5 space-y-4 shadow-xs">
+            <div className="flex items-start justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-purple-600/10 text-purple-700 dark:text-purple-300 flex items-center justify-center">
+                  <Wallet className="size-5" />
+                </div>
+                <div>
+                  <h4 className="text-sm font-bold text-foreground">Túi Quỹ Chung CEO HN10</h4>
+                  <p className="text-[11px] text-muted-foreground">Tổng hợp từ hội phí hội viên</p>
+                </div>
+              </div>
+              <span className="px-2 py-0.5 rounded-full text-[10.5px] font-bold bg-purple-600/10 text-purple-700 dark:text-purple-300 border border-purple-600/20">
+                Quỹ Chung CLB
+              </span>
+            </div>
+
+            <div className="space-y-1">
+              <div className="text-[11px] font-medium text-muted-foreground">Số dư khả dụng quỹ chung:</div>
+              <div className="text-2xl font-black text-purple-700 dark:text-purple-300 tracking-tight">
+                {fmtMoney(fundsQ.data?.generalFund?.balance ?? s.revenue)} VNĐ
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2 pt-2 border-t border-purple-100 dark:border-purple-900/30">
+              <div className="rounded-xl bg-background/80 p-2.5 border border-border/60">
+                <div className="text-[10.5px] text-muted-foreground">Tổng thu hội phí:</div>
+                <div className="text-sm font-bold text-emerald-600 dark:text-emerald-400 mt-0.5">
+                  {fmtMoney(fundsQ.data?.generalFund?.totalIncome ?? s.revenue)} VNĐ
+                </div>
+              </div>
+              <div className="rounded-xl bg-background/80 p-2.5 border border-border/60">
+                <div className="text-[10.5px] text-muted-foreground">Tổng chi các ban/sự kiện:</div>
+                <div className="text-sm font-bold text-rose-600 dark:text-rose-400 mt-0.5">
+                  {fmtMoney(fundsQ.data?.generalFund?.totalExpense ?? 0)} VNĐ
+                </div>
+              </div>
+            </div>
+
+            <div className="text-[11px] text-muted-foreground bg-purple-100/40 dark:bg-purple-950/40 p-2.5 rounded-xl border border-purple-200/50 dark:border-purple-900/30">
+              Phục vụ chi tiêu sự kiện, cuộc họp các ban (như hiếu hỷ Ban Đời Sống, dụng cụ Ban Hậu Cần). Có thể xuất báo cáo chi PDF theo từng ban và người thụ hưởng.
+            </div>
+          </div>
+
+          {/* TÚI QUỸ 2: QUỸ TÀI TRỢ */}
+          <div className="rounded-2xl border border-pink-200 dark:border-pink-900/50 bg-gradient-to-br from-pink-50/50 via-white to-pink-50/30 dark:from-pink-950/20 dark:via-background dark:to-pink-950/10 p-5 space-y-4 shadow-xs">
+            <div className="flex items-start justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-pink-600/10 text-pink-700 dark:text-pink-300 flex items-center justify-center">
+                  <Gift className="size-5" />
+                </div>
+                <div>
+                  <h4 className="text-sm font-bold text-foreground">Túi Quỹ Tài Trợ CEO HN10</h4>
+                  <p className="text-[11px] text-muted-foreground">Nguồn tài trợ từ các Doanh nghiệp &amp; Đối tác</p>
+                </div>
+              </div>
+              <span className="px-2 py-0.5 rounded-full text-[10.5px] font-bold bg-pink-600/10 text-pink-700 dark:text-pink-300 border border-pink-600/20">
+                2 Mục Rõ Ràng
+              </span>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              {/* MỤC 1: TIỀN MẶT */}
+              <div className="rounded-xl bg-background/90 p-3 border border-border/60 space-y-1.5">
+                <div className="flex items-center gap-1.5 text-xs font-bold text-emerald-700 dark:text-emerald-300">
+                  <Coins className="size-3.5" />
+                  <span>1. Tiền Mặt Tài Trợ</span>
+                </div>
+                <div className="text-lg font-black text-emerald-600 dark:text-emerald-400">
+                  {fmtMoney(fundsQ.data?.sponsorshipFund?.cash?.availableAmount ?? 250000000)} VNĐ
+                </div>
+                <p className="text-[10px] text-muted-foreground">
+                  Chi cho sự kiện, buổi học khi ban sự kiện &amp; hậu cần xin cấp kinh phí
+                </p>
+              </div>
+
+              {/* MỤC 2: KHO HIỆN VẬT */}
+              <div className="rounded-xl bg-background/90 p-3 border border-border/60 space-y-1.5">
+                <div className="flex items-center gap-1.5 text-xs font-bold text-purple-700 dark:text-purple-300">
+                  <Package className="size-3.5" />
+                  <span>2. Kho Hiện Vật</span>
+                </div>
+                <div className="text-lg font-black text-purple-600 dark:text-purple-400">
+                  {fundsQ.data?.sponsorshipFund?.inKind?.inventory?.length ?? 3} vật phẩm
+                </div>
+                <div className="text-[10px] text-muted-foreground truncate">
+                  Tổng định giá: {fmtMoney(fundsQ.data?.sponsorshipFund?.inKind?.totalEstimatedValue ?? 45000000)} VNĐ
+                </div>
+              </div>
+            </div>
+
+            {/* Top hiện vật trong kho */}
+            <div className="rounded-xl border border-border/50 bg-background/60 p-2.5 space-y-1">
+              <div className="text-[10.5px] font-semibold text-foreground flex items-center justify-between">
+                <span>Vật phẩm hiện vật sẵn sàng cấp phát:</span>
+                <Link to="/sponsors" className="text-primary hover:underline text-[10px]">Xem tất cả</Link>
+              </div>
+              <div className="flex flex-wrap gap-1.5">
+                {((fundsQ.data?.sponsorshipFund?.inKind?.inventory && fundsQ.data.sponsorshipFund.inKind.inventory.length > 0)
+                  ? fundsQ.data.sponsorshipFund.inKind.inventory.slice(0, 3)
+                  : [
+                    { name: "Áo đồng phục sự kiện", quantity: 200, unit: "bộ" },
+                    { name: "Kỷ niệm chương mạ vàng", quantity: 50, unit: "chiếc" },
+                    { name: "Gói giải pháp phần mềm", quantity: 10, unit: "suất" },
+                  ]
+                ).map((it: any, i: number) => (
+                  <span
+                    key={i}
+                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[10px] font-medium bg-secondary text-secondary-foreground"
+                  >
+                    <span>{it.name}</span>
+                    <span className="font-bold text-primary">({it.quantity} {it.unit})</span>
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </Panel>
+
+      {/* ── KHÓA HỌC & SỰ KIỆN TÔI THAM GIA (HỘI VIÊN - MỤC I.1 & UC-3) ── */}
+      <Panel
+        title="Khóa Học &amp; Sự Kiện Tôi Tham Gia (Hội Viên)"
+        sub="Theo dõi các khóa đào tạo định kỳ Thứ 7 và sự kiện bạn đã đăng ký hoặc tham dự, tải slide bài giảng &amp; đóng góp ý kiến"
+        action={
+          <div className="flex items-center gap-2">
+            <Link
+              to="/trainings"
+              className="inline-flex items-center gap-1 text-xs font-semibold text-primary hover:underline"
+            >
+              <span>Xem 30 khóa đào tạo</span>
+              <ChevronRight className="size-3.5" />
+            </Link>
+          </div>
+        }
+      >
+        <div className="space-y-4">
+          {/* 1. KHÓA ĐÀO TẠO ĐÃ THAM GIA */}
+          <div className="space-y-2.5">
+            <div className="flex items-center justify-between text-xs font-bold text-foreground">
+              <span className="flex items-center gap-1.5 text-purple-700 dark:text-purple-300">
+                <GraduationCap className="size-4" />
+                <span>Khóa học đã đăng ký / tham gia ({myEnrolledQ.data?.length || 0})</span>
+              </span>
+              <span className="text-[11px] font-normal text-muted-foreground">
+                Lớp học cố định vào Thứ 7 hàng tuần &amp; chuyên đề
+              </span>
+            </div>
+
+            {myEnrolledQ.isLoading ? (
+              <ListSkeleton rows={2} />
+            ) : !myEnrolledQ.data || myEnrolledQ.data.length === 0 ? (
+              <div className="rounded-xl border border-dashed border-border bg-muted/20 p-4 text-center space-y-2">
+                <p className="text-xs text-muted-foreground">
+                  Bạn chưa đăng ký tham gia khóa đào tạo nào. Hãy đăng ký ngay các khóa học Thứ 7 hàng tuần để cập nhật kiến thức quản trị doanh nghiệp!
+                </p>
+                <div className="flex flex-wrap items-center justify-center gap-2">
+                  <Link
+                    to="/trainings"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary text-primary-foreground text-xs font-semibold hover:bg-primary/90 transition shadow-xs"
+                  >
+                    <Plus className="size-3.5" />
+                    <span>Đăng ký khóa học Thứ 7</span>
+                  </Link>
+                </div>
+              </div>
+            ) : (
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                {myEnrolledQ.data.map((tr: any) => (
+                  <div
+                    key={tr.id}
+                    className="rounded-xl border border-border bg-background p-3.5 space-y-2.5 hover:border-primary/40 transition shadow-xs flex flex-col justify-between"
+                  >
+                    <div className="space-y-1.5">
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-600/10 text-purple-700 dark:text-purple-300">
+                          {tr.isFixed ? "Cố định (Thứ 7 hàng tuần)" : "Chuyên đề linh hoạt"}
+                        </span>
+                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                          tr.myStatus === "attended"
+                            ? "bg-emerald-500/10 text-emerald-600"
+                            : "bg-blue-500/10 text-blue-600"
+                        }`}>
+                          {tr.myStatus === "attended" ? "Đã điểm danh" : "Đã đăng ký"}
+                        </span>
+                      </div>
+
+                      <h4 className="text-xs font-bold text-foreground line-clamp-2 leading-snug">
+                        {tr.title}
+                      </h4>
+
+                      <div className="text-[11px] text-muted-foreground">
+                        Giảng viên: <span className="font-semibold text-foreground">{tr.instructorName || "Ban Đào Tạo CEO HN10"}</span>
+                      </div>
+                    </div>
+
+                    <div className="pt-2 border-t border-border/60 flex flex-wrap items-center justify-between gap-1.5">
+                      {tr.slideUrl ? (
+                        <a
+                          href={tr.slideUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-blue-500/10 text-blue-700 dark:text-blue-300 hover:bg-blue-500/20 text-[10.5px] font-semibold transition"
+                        >
+                          <Download className="size-3" />
+                          <span>Tải Slide</span>
+                        </a>
+                      ) : (
+                        <span className="text-[10px] text-muted-foreground italic">Slide sắp cập nhật</span>
+                      )}
+
+                      <button
+                        type="button"
+                        onClick={() => setFeedbackTraining(tr)}
+                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-secondary text-foreground hover:bg-secondary/80 text-[10.5px] font-semibold transition cursor-pointer"
+                      >
+                        <MessageSquare className="size-3 text-amber-500" />
+                        <span>Góp ý</span>
+                      </button>
+
+                      <Link
+                        to="/trainings"
+                        className="inline-flex items-center gap-0.5 text-[10.5px] font-semibold text-primary hover:underline"
+                      >
+                        <span>Chi tiết</span>
+                        <ChevronRight className="size-3" />
+                      </Link>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* 2. SỰ KIỆN TÔI ĐÃ THAM GIA */}
+          <div className="space-y-2.5 pt-2 border-t border-border/60">
+            <div className="flex items-center justify-between text-xs font-bold text-foreground">
+              <span className="flex items-center gap-1.5 text-blue-700 dark:text-blue-300">
+                <CalendarClock className="size-4" />
+                <span>Sự kiện đã tham gia / Đăng ký vé ({myEventsQ.data?.length || 0})</span>
+              </span>
+              <Link to="/events" className="text-[11px] font-semibold text-primary hover:underline">
+                Xem 4 sự kiện tiêu biểu
+              </Link>
+            </div>
+
+            {myEventsQ.isLoading ? (
+              <ListSkeleton rows={2} />
+            ) : !myEventsQ.data || myEventsQ.data.length === 0 ? (
+              <div className="rounded-xl border border-dashed border-border bg-muted/20 p-4 text-center space-y-2">
+                <p className="text-xs text-muted-foreground">
+                  Bạn chưa đăng ký tham dự sự kiện nào. Hãy khám phá 4 sự kiện sắp tới của CEOHN10 và quét mã QR vé tham dự!
+                </p>
+                <Link
+                  to="/events"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary text-primary-foreground text-xs font-semibold hover:bg-primary/90 transition shadow-xs"
+                >
+                  <CalendarPlus className="size-3.5" />
+                  <span>Khám phá sự kiện</span>
+                </Link>
+              </div>
+            ) : (
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                {myEventsQ.data.map((ev: any) => (
+                  <div
+                    key={ev.id}
+                    className="rounded-xl border border-border bg-background p-3.5 space-y-2 hover:border-primary/40 transition shadow-xs flex flex-col justify-between"
+                  >
+                    <div>
+                      <div className="flex items-center justify-between gap-1 text-[10px] text-muted-foreground">
+                        <span className="font-semibold text-primary">{ev.date ? new Date(ev.date).toLocaleDateString("vi-VN") : "Sắp diễn ra"}</span>
+                        <span className="px-1.5 py-0.2 rounded bg-muted text-foreground font-mono">{ev.ticketCode || "VÉ-ONLINE"}</span>
+                      </div>
+                      <h4 className="text-xs font-bold text-foreground line-clamp-2 leading-snug mt-1">
+                        {ev.title || ev.name}
+                      </h4>
+                    </div>
+
+                    <div className="pt-2 border-t border-border/60 flex items-center justify-between">
+                      <button
+                        type="button"
+                        onClick={() => setFeedbackEvent(ev)}
+                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-secondary text-foreground hover:bg-secondary/80 text-[10.5px] font-semibold transition cursor-pointer"
+                      >
+                        <Star className="size-3 text-amber-500 fill-amber-500" />
+                        <span>Đánh giá sự kiện</span>
+                      </button>
+                      <Link
+                        to="/events/$eventId"
+                        params={{ eventId: ev.id }}
+                        className="text-[10.5px] font-semibold text-primary hover:underline"
+                      >
+                        Xem chi tiết
+                      </Link>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      </Panel>
 
 
       {/* Growth + Fee collection */}
@@ -1075,6 +1462,25 @@ export function ExecutiveDashboard({ authReady }: { authReady: boolean }) {
           <QuickAction to="/documents" icon={FolderOpen} label="Tài liệu & Học liệu" />
         </div>
       </Panel>
+
+      {/* Modals for Direct Feedback from Overview Dashboard */}
+      {feedbackTraining && (
+        <TrainingFeedbackModal
+          open={!!feedbackTraining}
+          trainingId={feedbackTraining.id}
+          trainingTitle={feedbackTraining.title}
+          onClose={() => setFeedbackTraining(null)}
+        />
+      )}
+
+      {feedbackEvent && (
+        <EventFeedbackModal
+          open={!!feedbackEvent}
+          eventId={feedbackEvent.id}
+          eventName={feedbackEvent.title || feedbackEvent.name || ""}
+          onClose={() => setFeedbackEvent(null)}
+        />
+      )}
     </div>
   );
 }

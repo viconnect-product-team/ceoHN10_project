@@ -1,6 +1,16 @@
 # ==============================================================================
 # BỘ LUẬT DỰ ÁN (PROJECT RULES & AI CODEGEN STANDARDS) - CEO HN10 PROJECT
 # Vai trò: Tech Lead | Định dạng: .cursorrules
+# 16/11/2026 (v12.1) — HOÀN THÀNH 6 CA SỬ DỤNG (UC-1 -> UC-6), GIAO DIỆN TỔNG QUAN 2 TÚI QUỸ & RBAC 100% TIẾNG VIỆT:
+#   * [TỔNG QUAN DASHBOARD]: Hiển thị mặc định 4 sự kiện, 30 khóa học. Widget "Ví 2 Túi Quỹ CEO HN10" kết nối realtime CSDL 113.20.107.184:6432 (/admin/funds-overview) gồm Túi Quỹ Chung và Túi Quỹ Tài Trợ (Tiền mặt + Kho hiện vật). Widget "Khóa Học & Sự Kiện Tôi Tham Gia" cho hội viên kèm nút "Tải Slide" và "Góp ý / Đánh giá".
+#   * [UC-1 ĐĂNG NHẬP JWT]: RESTful API chuẩn mực, refresh token, giải mã RBAC bảo mật cao.
+#   * [UC-2 SỰ KIỆN]: Cố định & không cố định, có phí hoặc miễn phí, mã QR check-in & link public, tự động báo "Sự kiện đã đủ chỗ" khi vượt capacity, tải link media gắn vào Quản lý tài liệu (public.documents), đánh giá sao 1-5 & ý kiến phản hồi.
+#   * [UC-3 KHÓA HỌC / BUỔI HỌC]: Buổi học cố định (Thứ 7 hàng tuần) & không cố định, timetable/agenda slots, đăng ký trước & điểm danh trong buổi học, nút "Gửi Slide" tự động lưu vào Quản lý tài liệu (training_materials), học viên góp ý (text + file), link media lưu trữ tại Quản lý tài liệu (event_media).
+#   * [UC-4 KHAI BÁO VẬT DỤNG HẬU CẦN]: Ban Sự kiện & Hậu cần khai báo vật tư hỗ trợ từng sự kiện/khóa học (/supplies), tích hợp lấy dữ liệu từ Kho hiện vật nhà tài trợ (/supplies/sponsor-inventory).
+#   * [UC-5 QUẢN LÝ 2 TÚI QUỸ & PHIẾU CHI]: Túi Quỹ Chung (phí hội viên) chi cho sự kiện/cuộc họp các ban (Hiếu hỷ Ban Đời sống, dụng cụ Ban Hậu cần) -> Báo cáo chi rõ sự kiện, ban, người nhận tiền và XUẤT PHIẾU CHI PDF chuẩn quy cách ký duyệt. Ban Hậu cần gửi đề xuất tới Trưởng ban Tài chính & Chủ tịch. Túi Quỹ Tài Trợ chia 2 mục: Tiền mặt tài trợ và Kho hiện vật tài trợ.
+#   * [UC-6 NHÀ TÀI TRỢ]: Tài trợ bằng tiền mặt hoặc hiện vật. Form nhập đầy đủ họ tên, tuổi/ngày sinh, SĐT, website, công ty, hình thức. Tiền mặt cộng thẳng vào Quỹ Tài Trợ (tiền mặt), hiện vật đẩy thẳng vào Kho Hiện Vật. Tự động gửi email cảm ơn.
+#   * [LÀM MỚI PHÂN QUYỀN RBAC]: Giao diện kép chuyển đổi linh hoạt: "Theo Từng Vai Trò (Chuẩn RBAC)" và "Bảng Ma Trận Đối Chiếu". Cột trái chọn vai trò kèm tiến độ (34/38 quyền), cột phải thẻ phân nhóm bật/tắt hành vi (Xem, Thêm, Sửa, Xóa, Duyệt, Xuất Excel). Bộ cấu hình nhanh (Cấp toàn quyền, Chỉ xem, Quản lý chuẩn, Thu hồi tất cả). 100% tiếng Việt chuẩn mực.
+#   * [TUYỆT ĐỐI TUÂN THỦ LUẬT]: Không mock/fake data, CSDL 113.20.107.184:6432, không git commit/push, type-check đạt 0 lỗi (exit code 0).
 # 16/11/2026 (v12.0) — CHỈ THỊ TỐI CAO DÀNH CHO CEOHN10 — KHÔNG FAKE DỮ LIỆU, TÀI CHÍNH REALTIME, KHÁC BIỆT CỐT LÕI RBAC - LỚP HỌC - TÀI LIỆU:
 #   * [NGHIÊM CẤM FAKE DỮ LIỆU, MOCK DỮ LIỆU]: Mọi dữ liệu hiển thị trên Web CRM và Mobile App BẮT BUỘC phải truy vấn 100% từ CSDL PostgreSQL ceohn10_project (113.20.107.184:6432/6434). Tuyệt đối cấm tạo mock arrays, fake chart data để che giấu trạng thái API.
 #   * [BÁO CÁO TÀI CHÍNH BIẾN ĐỘNG REALTIME]: Dữ liệu số dư sổ quỹ, thu hội phí niên đợt, phiếu chi phải biến động thời gian thực từ bảng transactions, member_dues, expenses.

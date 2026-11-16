@@ -28,11 +28,23 @@ import {
   type PackageDraft,
 } from "@/components/dashboard/SponsorPackageModal";
 
+export interface InKindItemDraft {
+  name: string;
+  quantity: number;
+  unit: string;
+  estimatedValue: number;
+}
+
 export interface SponsorDraft {
   name: string;
+  companyName?: string;
+  website?: string;
+  birthDate?: string;
+  age?: number;
   sponsorType: "regular" | "new";
   packageType: PackageType;
   inKindDescription?: string;
+  inKindItems?: InKindItemDraft[];
   tier: Sponsor["tier"];
   contact: string;
   email: string;
@@ -75,9 +87,14 @@ export function SponsorModal({
 
   const [draft, setDraft] = useState<SponsorDraft>({
     name: "",
+    companyName: "",
+    website: "",
+    birthDate: "",
+    age: undefined,
     sponsorType: "regular",
     packageType: "bank_transfer",
     inKindDescription: "",
+    inKindItems: [],
     tier: "gold",
     contact: "",
     email: "",
@@ -105,9 +122,14 @@ export function SponsorModal({
       if (initial) {
         setDraft({
           name: initial.name || "",
+          companyName: initial.companyName || "",
+          website: initial.website || "",
+          birthDate: initial.birthDate || "",
+          age: initial.age,
           sponsorType: initial.sponsorType || "regular",
           packageType: initial.packageType || "bank_transfer",
           inKindDescription: initial.inKindDescription || "",
+          inKindItems: initial.inKindItems || [],
           tier: initial.tier || "gold",
           contact: initial.contact || "",
           email: initial.email || "",
@@ -120,9 +142,14 @@ export function SponsorModal({
       } else {
         setDraft({
           name: "",
+          companyName: "",
+          website: "",
+          birthDate: "",
+          age: undefined,
           sponsorType: "regular",
           packageType: "bank_transfer",
           inKindDescription: "",
+          inKindItems: [{ name: "", quantity: 1, unit: "chiếc", estimatedValue: 0 }],
           tier: "gold",
           contact: "",
           email: "",
@@ -422,88 +449,243 @@ export function SponsorModal({
               </div>
             </div>
 
-            {/* Chi tiết hiện vật tài trợ nếu chọn Hình thức Hiện vật */}
+            {/* Chi tiết hiện vật tài trợ nếu chọn Hình thức Hiện vật (UC-6) */}
             {draft.packageType === "in_kind" && (
-              <div>
-                <label className={labelCls} htmlFor="sp-inkind">
-                  Mô tả chi tiết hiện vật tài trợ <span className="text-rose-500">*</span>
-                </label>
-                <textarea
-                  id="sp-inkind"
-                  rows={2}
-                  required
-                  value={draft.inKindDescription}
-                  onChange={(e) => setDraft({ ...draft, inKindDescription: e.target.value })}
-                  placeholder="Ví dụ: 200 bộ quà tặng Yến sào & Trầm hương cao cấp, hoặc 1 gói giải pháp ERP chuyển đổi số trị giá 100 triệu..."
-                  className="w-full rounded-xl border border-border bg-background p-3 text-xs text-foreground focus-visible:border-ring focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/30"
-                />
-              </div>
-            )}
+              <div className="space-y-2.5 rounded-xl border border-purple-200 dark:border-purple-800 bg-purple-50/40 dark:bg-purple-950/20 p-3.5">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-bold text-purple-900 dark:text-purple-300 flex items-center gap-1.5">
+                    <Gift className="h-4 w-4 text-purple-600" />
+                    <span>Danh Mục Vật Phẩm Hiện Vật Tài Trợ (Kho Hiện Vật Quỹ)</span>
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const current = draft.inKindItems || [];
+                      setDraft({
+                        ...draft,
+                        inKindItems: [
+                          ...current,
+                          { name: "", quantity: 1, unit: "chiếc", estimatedValue: 0 },
+                        ],
+                      });
+                    }}
+                    className="inline-flex items-center gap-1 text-[11px] font-bold text-purple-700 dark:text-purple-300 hover:underline cursor-pointer"
+                  >
+                    <Plus className="h-3.5 w-3.5" />
+                    <span>Thêm vật phẩm</span>
+                  </button>
+                </div>
 
-            {/* Tên Doanh Nghiệp Nhà Tài Trợ */}
-            <div>
-              <label className={labelCls} htmlFor="sp-name">
-                Tên Doanh nghiệp / Tổ chức <span className="text-rose-500">*</span>
-              </label>
-              <input
-                id="sp-name"
-                type="text"
-                required
-                value={draft.name}
-                onChange={(e) => setDraft({ ...draft, name: e.target.value })}
-                placeholder="Ví dụ: Tập đoàn Công nghệ SunTech Global"
-                className={inputCls}
-              />
-            </div>
+                <div className="space-y-2">
+                  {(draft.inKindItems || []).map((item, idx) => (
+                    <div
+                      key={idx}
+                      className="grid grid-cols-12 gap-2 items-center bg-background p-2 rounded-lg border border-border"
+                    >
+                      <div className="col-span-5">
+                        <input
+                          type="text"
+                          required
+                          value={item.name}
+                          onChange={(e) => {
+                            const updated = [...(draft.inKindItems || [])];
+                            updated[idx].name = e.target.value;
+                            setDraft({ ...draft, inKindItems: updated });
+                          }}
+                          placeholder="Tên hiện vật (VD: 200 Áo đồng phục)"
+                          className="h-8 w-full rounded-lg border border-border px-2 text-xs bg-background text-foreground"
+                        />
+                      </div>
+                      <div className="col-span-2">
+                        <input
+                          type="number"
+                          min={1}
+                          required
+                          value={item.quantity}
+                          onChange={(e) => {
+                            const val = Math.max(1, Number(e.target.value) || 1);
+                            const updated = [...(draft.inKindItems || [])];
+                            updated[idx].quantity = val;
+                            const total = updated.reduce(
+                              (sum, it) => sum + (Number(it.estimatedValue) || 0) * (Number(it.quantity) || 1),
+                              0
+                            );
+                            setDraft({ ...draft, inKindItems: updated, amount: total > 0 ? total : draft.amount });
+                          }}
+                          placeholder="SL"
+                          className="h-8 w-full rounded-lg border border-border px-2 text-xs bg-background text-foreground"
+                        />
+                      </div>
+                      <div className="col-span-2">
+                        <input
+                          type="text"
+                          value={item.unit}
+                          onChange={(e) => {
+                            const updated = [...(draft.inKindItems || [])];
+                            updated[idx].unit = e.target.value;
+                            setDraft({ ...draft, inKindItems: updated });
+                          }}
+                          placeholder="ĐVT"
+                          className="h-8 w-full rounded-lg border border-border px-2 text-xs bg-background text-foreground"
+                        />
+                      </div>
+                      <div className="col-span-2">
+                        <input
+                          type="number"
+                          min={0}
+                          value={item.estimatedValue}
+                          onChange={(e) => {
+                            const val = Math.max(0, Number(e.target.value) || 0);
+                            const updated = [...(draft.inKindItems || [])];
+                            updated[idx].estimatedValue = val;
+                            const total = updated.reduce(
+                              (sum, it) => sum + (Number(it.estimatedValue) || 0) * (Number(it.quantity) || 1),
+                              0
+                            );
+                            setDraft({ ...draft, inKindItems: updated, amount: total > 0 ? total : draft.amount });
+                          }}
+                          placeholder="Giá trị"
+                          className="h-8 w-full rounded-lg border border-border px-2 text-xs bg-background text-foreground"
+                        />
+                      </div>
+                      <div className="col-span-1 flex justify-center">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const updated = (draft.inKindItems || []).filter((_, i) => i !== idx);
+                            const total = updated.reduce(
+                              (sum, it) => sum + (Number(it.estimatedValue) || 0) * (Number(it.quantity) || 1),
+                              0
+                            );
+                            setDraft({ ...draft, inKindItems: updated, amount: total > 0 ? total : draft.amount });
+                          }}
+                          className="text-rose-500 hover:text-rose-700 p-1"
+                          title="Xóa vật phẩm"
+                        >
+                          <X className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
 
-            {/* Email & Phone */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-              <div>
-                <label className={labelCls} htmlFor="sp-email">
-                  Email nhận mã QR & Thư tri ân <span className="text-rose-500">*</span>
-                </label>
-                <div className="relative">
-                  <Mail className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
-                  <input
-                    id="sp-email"
-                    type="email"
-                    required
-                    value={draft.email}
-                    onChange={(e) => setDraft({ ...draft, email: e.target.value })}
-                    placeholder="sponsor@company.vn"
-                    className={`${inputCls} pl-9`}
+                <div>
+                  <label className="block text-[11px] font-semibold text-muted-foreground mb-1" htmlFor="sp-inkind">
+                    Mô tả tổng quát hoặc ghi chú bàn giao hiện vật
+                  </label>
+                  <textarea
+                    id="sp-inkind"
+                    rows={2}
+                    value={draft.inKindDescription}
+                    onChange={(e) => setDraft({ ...draft, inKindDescription: e.target.value })}
+                    placeholder="Ghi chú thêm về quy cách đóng gói, địa điểm bàn giao hoặc đối tượng thụ hưởng..."
+                    className="w-full rounded-xl border border-border bg-background p-2.5 text-xs text-foreground focus-visible:border-ring focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/30"
                   />
                 </div>
               </div>
+            )}
 
+            {/* Tên Doanh Nghiệp Nhà Tài Trợ & Website */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
               <div>
-                <label className={labelCls} htmlFor="sp-phone">
-                  Số điện thoại liên hệ
+                <label className={labelCls} htmlFor="sp-name">
+                  Tên Doanh nghiệp / Tổ chức <span className="text-rose-500">*</span>
                 </label>
                 <input
-                  id="sp-phone"
-                  type="tel"
-                  value={draft.phone}
-                  onChange={(e) => setDraft({ ...draft, phone: e.target.value })}
-                  placeholder="0908 123 456"
+                  id="sp-name"
+                  type="text"
+                  required
+                  value={draft.name}
+                  onChange={(e) =>
+                    setDraft({
+                      ...draft,
+                      name: e.target.value,
+                      companyName: draft.companyName || e.target.value,
+                    })
+                  }
+                  placeholder="Ví dụ: Tập đoàn SunTech Global"
+                  className={inputCls}
+                />
+              </div>
+
+              <div>
+                <label className={labelCls} htmlFor="sp-website">
+                  Website công ty / Cổng thông tin
+                </label>
+                <input
+                  id="sp-website"
+                  type="url"
+                  value={draft.website || ""}
+                  onChange={(e) => setDraft({ ...draft, website: e.target.value })}
+                  placeholder="https://suntech.vn"
                   className={inputCls}
                 />
               </div>
             </div>
 
-            {/* Người đại diện liên hệ */}
-            <div>
-              <label className={labelCls} htmlFor="sp-contact">
-                Người liên hệ / Chức vụ đại diện
-              </label>
-              <input
-                id="sp-contact"
-                type="text"
-                value={draft.contact}
-                onChange={(e) => setDraft({ ...draft, contact: e.target.value })}
-                placeholder="Ví dụ: Nguyễn Văn Hùng (Tổng Giám Đốc)"
-                className={inputCls}
-              />
+            {/* Người đại diện liên hệ, Ngày sinh & Tuổi (UC-6) */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+              <div className="sm:col-span-1">
+                <label className={labelCls} htmlFor="sp-contact">
+                  Họ tên người đại diện
+                </label>
+                <input
+                  id="sp-contact"
+                  type="text"
+                  value={draft.contact}
+                  onChange={(e) => setDraft({ ...draft, contact: e.target.value })}
+                  placeholder="Nguyễn Văn A"
+                  className={inputCls}
+                />
+              </div>
+
+              <div className="sm:col-span-1">
+                <label className={labelCls} htmlFor="sp-birthDate">
+                  Ngày sinh
+                </label>
+                <input
+                  id="sp-birthDate"
+                  type="date"
+                  value={draft.birthDate || ""}
+                  onChange={(e) => {
+                    const dateVal = e.target.value;
+                    let computedAge: number | undefined = undefined;
+                    if (dateVal) {
+                      const bDate = new Date(dateVal);
+                      if (!isNaN(bDate.getTime())) {
+                        const today = new Date();
+                        computedAge = today.getFullYear() - bDate.getFullYear();
+                        const m = today.getMonth() - bDate.getMonth();
+                        if (m < 0 || (m === 0 && today.getDate() < bDate.getDate())) {
+                          computedAge--;
+                        }
+                      }
+                    }
+                    setDraft({
+                      ...draft,
+                      birthDate: dateVal,
+                      age: computedAge !== undefined ? computedAge : draft.age,
+                    });
+                  }}
+                  className={inputCls}
+                />
+              </div>
+
+              <div className="sm:col-span-1">
+                <label className={labelCls} htmlFor="sp-age">
+                  Tuổi
+                </label>
+                <input
+                  id="sp-age"
+                  type="number"
+                  min={18}
+                  max={120}
+                  value={draft.age || ""}
+                  onChange={(e) => setDraft({ ...draft, age: Number(e.target.value) || undefined })}
+                  placeholder="Tự tính theo ngày sinh"
+                  className={inputCls}
+                />
+              </div>
             </div>
 
             {/* Phân loại đối tác & Hạng tài trợ */}
@@ -583,7 +765,7 @@ export function SponsorModal({
           <div className="flex items-center justify-between gap-2.5 border-t border-border px-5 py-3.5 bg-muted/20 shrink-0">
             <span className="text-[11px] text-muted-foreground flex items-center gap-1">
               <Sparkles className="h-3.5 w-3.5 text-amber-500" />
-              <span>Tự động bắn email VietQR ngay khi lưu</span>
+              <span>Tự động cộng vào Túi Quỹ Tài Trợ &amp; gửi Email tri ân</span>
             </span>
             <div className="flex items-center gap-2">
               <button
@@ -600,7 +782,7 @@ export function SponsorModal({
                 className="rounded-xl px-5 py-2 text-xs font-bold text-primary-foreground shadow-md transition cursor-pointer disabled:opacity-60"
                 style={{ background: "var(--gradient-primary)" }}
               >
-                {submitting ? "Đang lưu & gửi email..." : initial ? "Lưu thay đổi" : "Tạo & Bắn Email QR"}
+                {submitting ? "Đang lưu & gửi email..." : initial ? "Lưu thay đổi" : "Tạo & Bắn Email Tri Ân"}
               </button>
             </div>
           </div>

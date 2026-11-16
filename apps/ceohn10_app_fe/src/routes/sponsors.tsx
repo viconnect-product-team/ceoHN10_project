@@ -429,9 +429,24 @@ function SponsorsPage() {
                     {s.id}
                   </td>
                   <td className="px-4 py-3">
-                    <div className="font-bold text-foreground text-xs leading-snug line-clamp-2" title={s.name}>
+                    <div className="font-bold text-foreground text-xs leading-snug line-clamp-1" title={s.name}>
                       {s.name}
                     </div>
+                    {s.companyName && s.companyName !== s.name && (
+                      <div className="text-[11px] text-muted-foreground truncate font-medium">
+                        {s.companyName}
+                      </div>
+                    )}
+                    {s.website && (
+                      <a
+                        href={s.website.startsWith("http") ? s.website : `https://${s.website}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-[10px] text-primary hover:underline flex items-center gap-1 mt-0.5"
+                      >
+                        {s.website.replace(/^https?:\/\//, "")}
+                      </a>
+                    )}
                   </td>
                   <td className="px-3 py-3 whitespace-nowrap">
                     {s.sponsorType === "regular" ? (
@@ -480,11 +495,17 @@ function SponsorsPage() {
                   </td>
                   <td className="px-4 py-3">
                     <div className="font-semibold text-foreground text-xs leading-snug line-clamp-1" title={s.contact}>
-                      {s.contact}
+                      {s.contact || "Đại diện đối tác"}
+                      {s.age ? <span className="ml-1 text-[10px] text-muted-foreground font-normal">({s.age} tuổi)</span> : null}
                     </div>
                     <div className="text-[11px] text-muted-foreground truncate" title={s.email}>
                       {s.email}
                     </div>
+                    {s.phone && (
+                      <div className="text-[10px] text-muted-foreground font-mono">
+                        {s.phone}
+                      </div>
+                    )}
                   </td>
                   <td className="px-4 py-3 font-mono font-bold text-foreground text-xs whitespace-nowrap text-right">
                     {fmt.money(s.amount)}

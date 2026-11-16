@@ -228,6 +228,11 @@ export class SponsorsService {
           status: r.status || 'active',
           assignedEvent,
           isAssigned: Boolean(assignedEvent),
+          birthDate: r.birth_date ? (r.birth_date instanceof Date ? r.birth_date.toISOString().slice(0, 10) : String(r.birth_date).slice(0, 10)) : null,
+          age: Number(r.age || 0),
+          website: r.website || '',
+          companyName: r.company_name || '',
+          inKindItems: Array.isArray(r.in_kind_items) ? r.in_kind_items : (r.in_kind_items ? JSON.parse(r.in_kind_items) : []),
           createdAt: r.created_at,
           updatedAt: r.updated_at,
         };
@@ -261,6 +266,11 @@ export class SponsorsService {
           ? r.since.toISOString().slice(0, 10)
           : String(r.since || ''),
       status: r.status || 'active',
+      birthDate: r.birth_date ? (r.birth_date instanceof Date ? r.birth_date.toISOString().slice(0, 10) : String(r.birth_date).slice(0, 10)) : null,
+      age: Number(r.age || 0),
+      website: r.website || '',
+      companyName: r.company_name || '',
+      inKindItems: Array.isArray(r.in_kind_items) ? r.in_kind_items : (r.in_kind_items ? JSON.parse(r.in_kind_items) : []),
       createdAt: r.created_at,
       updatedAt: r.updated_at,
     };
@@ -291,6 +301,12 @@ export class SponsorsService {
       (dto as any).associationId,
     );
 
+    const birthDate = (dto as any).birthDate || (dto as any).birth_date || null;
+    const age = (dto as any).age ? Number((dto as any).age) : null;
+    const website = (dto as any).website || null;
+    const companyName = (dto as any).companyName || (dto as any).company_name || null;
+    const inKindItems = (dto as any).inKindItems || (dto as any).in_kind_items || [];
+
     await this.sponsorsRepo.insertSponsor(
       id,
       name,
@@ -306,7 +322,32 @@ export class SponsorsService {
       safeSince,
       status,
       associationId,
+      birthDate,
+      age,
+      website,
+      companyName,
+      inKindItems,
     );
+
+    // Nếu là tài trợ bằng tiền (amount > 0), tự động cộng thẳng vào ví Quỹ Tài Trợ qua bảng transactions
+    if (Number(amount) > 0 && (packageType !== 'in_kind')) {
+      const txCode = `PT-SP-${id}`;
+      await this.sponsorsRepo['prisma'].$executeRawUnsafe(
+        `INSERT INTO public.transactions (
+          id, code, date, type, category, description, amount, method, status,
+          recipient, fund_type, association_id, created_at, updated_at
+        ) VALUES (
+          gen_random_uuid(), $1, $2::date, 'income', 'sponsorship_cash', $3, $4::bigint, 'bank', 'completed',
+          $5, 'sponsorship_cash', $6::uuid, NOW(), NOW()
+        ) ON CONFLICT DO NOTHING;`,
+        txCode,
+        safeSince,
+        `Thu tài trợ kinh phí từ Nhà tài trợ ${name}${companyName ? ' (' + companyName + ')' : ''}`,
+        amount,
+        name,
+        associationId,
+      ).catch((err: any) => console.warn('[SponsorsService] auto record transaction warn:', err?.message));
+    }
 
     const createdSponsor = await this.getSponsorById(id);
 

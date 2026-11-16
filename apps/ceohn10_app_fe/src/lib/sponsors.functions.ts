@@ -17,13 +17,25 @@ export type AssignedEvent = {
 
 export type PackageType = "bank_transfer" | "cash" | "in_kind";
 
+export type InKindItem = {
+  name: string;
+  quantity: number;
+  unit: string;
+  estimatedValue: number;
+};
+
 export type Sponsor = {
   id: string;
   name: string;
+  birthDate?: string;
+  age?: number;
+  website?: string;
+  companyName?: string;
   tier: "platinum" | "gold" | "silver" | "bronze";
   sponsorType: "regular" | "new";
   packageType: PackageType;
   inKindDescription?: string;
+  inKindItems?: InKindItem[];
   contact: string;
   email: string;
   phone: string;
@@ -76,10 +88,24 @@ export const listSponsorPackagesFn = createServerFn({ method: "GET" })
 
 const sponsorInput = z.object({
   name: z.string().min(1).max(200),
+  birthDate: z.string().optional(),
+  age: z.number().optional(),
+  website: z.string().optional(),
+  companyName: z.string().optional(),
   tier: z.enum(["platinum", "gold", "silver", "bronze"]).default("bronze"),
   sponsorType: z.enum(["regular", "new"]).default("new"),
   packageType: z.enum(["bank_transfer", "cash", "in_kind"]).default("bank_transfer"),
   inKindDescription: z.string().max(1000).optional().default(""),
+  inKindItems: z
+    .array(
+      z.object({
+        name: z.string(),
+        quantity: z.number(),
+        unit: z.string(),
+        estimatedValue: z.number(),
+      })
+    )
+    .optional(),
   contact: z.string().max(120).default(""),
   email: z.string().max(160).default(""),
   phone: z.string().max(40).default(""),

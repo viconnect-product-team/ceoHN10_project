@@ -4,13 +4,19 @@
 // route tree never goes stale after a route is added, renamed, or deleted.
 
 import fs from "node:fs/promises";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { Generator, getConfig } from "@tanstack/router-generator";
 
-const root = process.cwd();
+const scriptDir = path.dirname(fileURLToPath(import.meta.url));
+const root = path.resolve(scriptDir, "..");
+const routesDir = path.join(root, "src", "routes");
+const routeTreeFile = path.join(root, "src", "routeTree.gen.ts");
+
 const config = getConfig(
   {
-    routesDirectory: "./src/routes",
-    generatedRouteTree: "./src/routeTree.gen.ts",
+    routesDirectory: routesDir,
+    generatedRouteTree: routeTreeFile,
   },
   root,
 );
@@ -22,7 +28,7 @@ try {
   if (generator.crawlingResult) {
     const res = generator.buildRouteTree(generator.crawlingResult);
     if (res?.routeTreeContent) {
-      await fs.writeFile("./src/routeTree.gen.ts", res.routeTreeContent, "utf-8");
+      await fs.writeFile(routeTreeFile, res.routeTreeContent, "utf-8");
       console.log("[gen-routes] routeTree.gen.ts successfully written to disk with all routes.");
     }
   }
