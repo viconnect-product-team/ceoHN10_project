@@ -75,34 +75,34 @@ type Tone = "navy" | "gold" | "green" | "amber" | "rose" | "blue";
 
 const gradientCardStyles: Record<Tone, { bg: string; textTitle: string; iconBg: string }> = {
   navy: {
-    bg: "bg-white dark:bg-slate-900 border border-purple-100 dark:border-purple-900/40",
-    textTitle: "text-[#7C2D82] dark:text-purple-400",
+    bg: "bg-white dark:bg-[#000000] border border-purple-100 dark:border-[#18181B]",
+    textTitle: "text-[#7C2D82] dark:text-[#FFFFFF]",
     iconBg: "bg-purple-600/10 text-[#7C2D82]",
   },
   blue: {
-    bg: "bg-white dark:bg-slate-900 border border-purple-100 dark:border-purple-900/40",
-    textTitle: "text-[#7C2D82] dark:text-purple-400",
+    bg: "bg-white dark:bg-[#000000] border border-purple-100 dark:border-[#18181B]",
+    textTitle: "text-[#7C2D82] dark:text-[#FFFFFF]",
     iconBg: "bg-purple-600/10 text-[#7C2D82]",
   },
   gold: {
-    bg: "bg-white dark:bg-slate-900 border border-pink-100 dark:border-pink-900/40",
-    textTitle: "text-[#D61F69] dark:text-pink-400",
+    bg: "bg-white dark:bg-[#000000] border border-pink-100 dark:border-[#18181B]",
+    textTitle: "text-[#D61F69] dark:text-[#FFFFFF]",
     iconBg: "bg-pink-500/10 text-[#D61F69]",
   },
   green: {
-    bg: "bg-white dark:bg-slate-900 border border-emerald-100 dark:border-emerald-900/40",
-    textTitle: "text-emerald-600 dark:text-emerald-400",
-    iconBg: "bg-emerald-500/10 text-emerald-600",
+    bg: "bg-white dark:bg-[#000000] border border-purple-100 dark:border-[#18181B]",
+    textTitle: "text-[#7C2D82] dark:text-[#FFFFFF]",
+    iconBg: "bg-purple-600/10 text-[#7C2D82]",
   },
   amber: {
-    bg: "bg-white dark:bg-slate-900 border border-amber-100 dark:border-amber-900/40",
-    textTitle: "text-amber-600 dark:text-amber-400",
-    iconBg: "bg-amber-500/10 text-amber-600",
+    bg: "bg-white dark:bg-[#000000] border border-pink-100 dark:border-[#18181B]",
+    textTitle: "text-[#D61F69] dark:text-[#FFFFFF]",
+    iconBg: "bg-pink-500/10 text-[#D61F69]",
   },
   rose: {
-    bg: "bg-white dark:bg-slate-900 border border-red-100 dark:border-red-900/40",
-    textTitle: "text-red-600 dark:text-red-400",
-    iconBg: "bg-red-500/10 text-red-600",
+    bg: "bg-white dark:bg-[#000000] border border-pink-100 dark:border-[#18181B]",
+    textTitle: "text-[#D61F69] dark:text-[#FFFFFF]",
+    iconBg: "bg-pink-500/10 text-[#D61F69]",
   },
 };
 
@@ -177,7 +177,7 @@ function Panel({
 }) {
   return (
     <section
-      className={`vba-pop-in rounded-[20px] outline outline-1 outline-offset-[-1px] outline-slate-200 dark:outline-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs ${className}`}
+      className={`vba-pop-in rounded-[20px] outline outline-1 outline-offset-[-1px] outline-slate-200 dark:outline-[#18181B] bg-white dark:bg-[#000000] p-5 shadow-xs ${className}`}
     >
       <div className="mb-4 flex items-start justify-between gap-3">
         <div className="min-w-0">
@@ -529,7 +529,7 @@ export function ExecutiveDashboard({ authReady }: { authReady: boolean }) {
       {/* Bộ lọc trạng thái trực tiếp theo cơ sở dữ liệu */}
       <div className="flex flex-wrap items-center justify-between gap-3 p-3.5 rounded-2xl border border-border bg-card shadow-xs">
         <div className="flex items-center gap-2 text-xs font-semibold text-foreground">
-          <Filter className="h-4 w-4 text-[#003B95]" />
+          <Filter className="h-4 w-4 text-[#7C2D82]" />
           <span>Lọc Trạng Thái Dashboard:</span>
         </div>
         <div className="flex flex-wrap items-center gap-1.5">
@@ -561,7 +561,7 @@ export function ExecutiveDashboard({ authReady }: { authReady: boolean }) {
               type="button"
               onClick={() => setStatusFilter(tab.key)}
               className={`px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${statusFilter === tab.key
-                ? "bg-[#003B95] text-white shadow-xs"
+                ? "bg-gradient-to-r from-[#7C2D82] to-[#D61F69] text-white shadow-xs"
                 : "bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground"
                 }`}
             >

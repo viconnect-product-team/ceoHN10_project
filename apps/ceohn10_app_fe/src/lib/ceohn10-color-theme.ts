@@ -39,66 +39,66 @@ export interface Ceo1983ColorTheme {
 export const CEOHN10_COLOR_THEMES: Ceo1983ColorTheme[] = [
   {
     id: "classic-navy",
-    name: "Xanh Doanh Nhân",
-    subtitle: "Navy Cổ Điển & Hổ Phách",
-    threeColors: ["#003B95", "#0A1128", "#F59E0B"],
-    primaryColor: "#003B95",
-    primaryDeep: "#001D4A",
-    accentColor: "#F59E0B",
-    accentLight: "#FBBF24",
-    lightBg: "#EBF3FF",
-    lightBorder: "#BFDBFE",
-    badgeBg: "bg-blue-600/15 text-blue-600 dark:text-amber-400 border-blue-500/30",
-    gradientPrimary: "linear-gradient(135deg, #0052CC 0%, #003B95 60%, #001D4A 100%)",
-    gradientCard: "linear-gradient(135deg, #0A1128 0%, #14223E 100%)",
-    darkSurface: "#0E172A",
-    darkSurface2: "#14223E",
-    darkBorder: "rgba(245, 158, 11, 0.35)",
-    darkBorderSoft: "rgba(245, 158, 11, 0.20)",
-    iconColor: "#003B95",
-    swatches: ["#003B95", "#0A1128", "#F59E0B"],
+    name: "Tím Hoàng Gia & Hồng Năng Động",
+    subtitle: "Nhận diện thương hiệu cốt lõi CEO HN10",
+    threeColors: ["#7C2D82", "#D61F69", "#000000"],
+    primaryColor: "#7C2D82",
+    primaryDeep: "#4A1C6E",
+    accentColor: "#D61F69",
+    accentLight: "#F43F5E",
+    lightBg: "#FAF5FF",
+    lightBorder: "#E9D5FF",
+    badgeBg: "bg-[#7C2D82]/15 text-[#7C2D82] dark:text-[#FFFFFF] border-[#7C2D82]/30",
+    gradientPrimary: "linear-gradient(135deg, #7C2D82 0%, #D61F69 100%)",
+    gradientCard: "linear-gradient(135deg, #7C2D82 0%, #D61F69 100%)",
+    darkSurface: "#000000",
+    darkSurface2: "#18181B",
+    darkBorder: "#18181B",
+    darkBorderSoft: "#18181B",
+    iconColor: "#7C2D82",
+    swatches: ["#7C2D82", "#D61F69", "#000000"],
   },
   {
     id: "dynamic-orange",
-    name: "Cam Tiên Phong",
-    subtitle: "Cam Năng Động & Lam Thẫm",
-    threeColors: ["#EA580C", "#1E1B4B", "#3B82F6"],
-    primaryColor: "#EA580C",
-    primaryDeep: "#9A3412",
-    accentColor: "#3B82F6",
-    accentLight: "#60A5FA",
-    lightBg: "#FFF7ED",
-    lightBorder: "#FED7AA",
-    badgeBg: "bg-orange-500/15 text-orange-600 dark:text-orange-400 border-orange-400/40",
-    gradientPrimary: "linear-gradient(135deg, #EA580C 0%, #C2410C 60%, #9A3412 100%)",
-    gradientCard: "linear-gradient(135deg, #181126 0%, #251B3D 100%)",
-    darkSurface: "#181126",
-    darkSurface2: "#251B3D",
-    darkBorder: "rgba(234, 88, 12, 0.35)",
-    darkBorderSoft: "rgba(234, 88, 12, 0.20)",
-    iconColor: "#EA580C",
-    swatches: ["#EA580C", "#1E1B4B", "#3B82F6"],
+    name: "Tím Hồng Sang Trọng",
+    subtitle: "Biến thể tinh hoa quản trị số",
+    threeColors: ["#7C2D82", "#D61F69", "#000000"],
+    primaryColor: "#7C2D82",
+    primaryDeep: "#4A1C6E",
+    accentColor: "#D61F69",
+    accentLight: "#F43F5E",
+    lightBg: "#FAF5FF",
+    lightBorder: "#E9D5FF",
+    badgeBg: "bg-[#D61F69]/15 text-[#D61F69] dark:text-[#FFFFFF] border-[#D61F69]/40",
+    gradientPrimary: "linear-gradient(135deg, #7C2D82 0%, #D61F69 100%)",
+    gradientCard: "linear-gradient(135deg, #7C2D82 0%, #D61F69 100%)",
+    darkSurface: "#000000",
+    darkSurface2: "#18181B",
+    darkBorder: "#18181B",
+    darkBorderSoft: "#18181B",
+    iconColor: "#7C2D82",
+    swatches: ["#7C2D82", "#D61F69", "#000000"],
   },
   {
     id: "crimson-red",
-    name: "Đỏ Nhiệt Huyết",
-    subtitle: "Đỏ Bứt Phá & Vàng Kim",
-    threeColors: ["#DC2626", "#18181B", "#FBBF24"],
-    primaryColor: "#DC2626",
-    primaryDeep: "#7F1D1D",
-    accentColor: "#FBBF24",
-    accentLight: "#FDE047",
-    lightBg: "#FEF2F2",
-    lightBorder: "#FECACA",
-    badgeBg: "bg-red-500/15 text-red-600 dark:text-amber-400 border-red-400/40",
-    gradientPrimary: "linear-gradient(135deg, #EF4444 0%, #DC2626 60%, #7F1D1D 100%)",
-    gradientCard: "linear-gradient(135deg, #1C1113 0%, #2A171B 100%)",
-    darkSurface: "#18181B",
-    darkSurface2: "#27272A",
-    darkBorder: "rgba(251, 191, 36, 0.35)",
-    darkBorderSoft: "rgba(251, 191, 36, 0.20)",
-    iconColor: "#DC2626",
-    swatches: ["#DC2626", "#18181B", "#FBBF24"],
+    name: "Tím Đen Huyền Bí",
+    subtitle: "Dạ tiệc doanh nhân & Vinh danh",
+    threeColors: ["#7C2D82", "#D61F69", "#000000"],
+    primaryColor: "#7C2D82",
+    primaryDeep: "#4A1C6E",
+    accentColor: "#D61F69",
+    accentLight: "#F43F5E",
+    lightBg: "#FAF5FF",
+    lightBorder: "#E9D5FF",
+    badgeBg: "bg-[#7C2D82]/15 text-[#7C2D82] dark:text-[#FFFFFF] border-[#7C2D82]/40",
+    gradientPrimary: "linear-gradient(135deg, #7C2D82 0%, #D61F69 100%)",
+    gradientCard: "linear-gradient(135deg, #7C2D82 0%, #D61F69 100%)",
+    darkSurface: "#000000",
+    darkSurface2: "#18181B",
+    darkBorder: "#18181B",
+    darkBorderSoft: "#18181B",
+    iconColor: "#7C2D82",
+    swatches: ["#7C2D82", "#D61F69", "#000000"],
   },
 ];
 
@@ -166,14 +166,23 @@ function injectGlobalThemeOverride(theme: Ceo1983ColorTheme): void {
     /* Theme: ${theme.name} (${theme.id})                        */
     /* ========================================================== */
     :root,
-    html,
-    body {
+    html:not(.dark),
+    body:not(.dark) {
       --primary: ${primary} !important;
       --primary-foreground: #FFFFFF !important;
       --ring: ${primary} !important;
       --accent: ${accent} !important;
       --accent-foreground: #FFFFFF !important;
+      --background: #FFFFFF !important;
+      --foreground: #0F172A !important;
+      --card: #FFFFFF !important;
+      --card-foreground: #0F172A !important;
+      --popover: #FFFFFF !important;
+      --popover-foreground: #0F172A !important;
       --border: ${lightBorder} !important;
+      --input: ${lightBorder} !important;
+      --sidebar: #FFFFFF !important;
+      --sidebar-foreground: #0F172A !important;
       --vba-navy: ${primary} !important;
       --vba-navy-deep: ${primaryDeep} !important;
       --vba-gold: ${accent} !important;
@@ -196,13 +205,20 @@ function injectGlobalThemeOverride(theme: Ceo1983ColorTheme): void {
       --ring: ${accent} !important;
       --accent: ${accent} !important;
       --accent-foreground: #FFFFFF !important;
+      --background: #000000 !important;
+      --foreground: #FFFFFF !important;
       --card: ${darkSurface} !important;
+      --card-foreground: #FFFFFF !important;
       --popover: ${darkSurface} !important;
+      --popover-foreground: #FFFFFF !important;
       --border: ${darkBorder} !important;
       --input: ${darkBorderSoft} !important;
+      --sidebar: #000000 !important;
+      --sidebar-foreground: #FFFFFF !important;
       --vba-border: ${darkBorder} !important;
       --vba-surface: ${darkSurface} !important;
       --vba-surface-2: ${darkSurface2} !important;
+      --theme-primary-gradient: ${gradientPrimary} !important;
     }
 
     /* 1. Recolor All Primary Buttons & Interactive Badges across all 3 brand colors */

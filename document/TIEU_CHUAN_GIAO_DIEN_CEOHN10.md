@@ -45,7 +45,25 @@ Mọi văn bản trong toàn bộ hệ thống đều tuân thủ nguyên tắc 
 
 ---
 
-### 4. Bảng cấm (Prohibited Colors & Anti-Patterns)
+### 4. Quy định Hiển thị Rõ Ràng Giữa Theme Sáng (Light) và Theme Tối (Dark)
+
+Hệ thống hỗ trợ chuyển đổi mượt mà giữa 2 chế độ hiển thị nhưng **tuyệt đối không bị lỗi tương phản**:
+
+| Thành phần | Theme Sáng (Light Theme) | Theme Tối (Dark Theme) |
+|:---|:---|:---|
+| **Nền tổng thể (Background)** | **Trắng `#FFFFFF`** / Dải tím hoa cà siêu nhạt `#FAF5FF` | **Đen tuyền `#000000`** |
+| **Màu chữ chính (Foreground / Text)** | **Đen `#0F172A`** (Rõ nét, tương phản cao, dễ đọc) | **Trắng `#FFFFFF`** (Sắc nét 100%) |
+| **Màu chữ phụ / Mô tả** | Xám đậm `#475569` | Trắng mờ $70\%$ (`rgba(255, 255, 255, 0.70)`) |
+| **Thẻ khối (Card / Container)** | **Trắng `#FFFFFF`**, viền `#E4E4E7`, bóng mờ tinh tế | **Đen `#000000`**, viền `#18181B` |
+| **Thanh bên (Sidebar)** | **Trắng `#FFFFFF`**, chữ đen, item active nền `#FAF5FF` chữ tím | **Đen `#000000`**, viền `#18181B`, chữ trắng |
+| **Nút bấm chính (Primary CTA)** | **Gradient Tím - Hồng (`#7C2D82` ➔ `#D61F69`)**, chữ **TRẮNG `#FFFFFF`** | **Gradient Tím - Hồng (`#7C2D82` ➔ `#D61F69`)**, chữ **TRẮNG `#FFFFFF`** |
+| **Thẻ Hội viên VIP & Danh thiếp số** | **Gradient Tím - Hồng (`#7C2D82` ➔ `#D61F69`)**, chữ **TRẮNG `#FFFFFF`** | **Gradient Tím - Hồng (`#7C2D82` ➔ `#D61F69`)**, chữ **TRẮNG `#FFFFFF`** |
+
+> 💡 **Điểm then chốt**: Bất kể ở Theme Sáng hay Theme Tối, **mọi nút bấm hành động hoặc khối nền dải Gradient Tím - Hồng đều có CHỮ TRẮNG (`#FFFFFF`)** nổi bật, tuyệt đối không bị đổi sang chữ đen.
+
+---
+
+### 5. Bảng cấm (Prohibited Colors & Anti-Patterns)
 
 - ❌ **NGHIÊM CẤM** dùng màu vàng (`#F59E0B`, `#EAB308`), màu cam (`#F97316`), màu xanh lá (`#10B981`, `#22C55E`), màu xanh dương (`#003B95`, `#3B82F6`, `#0284C7`), màu đỏ tươi (`#EF4444`).
 - ❌ **Trạng thái Thành công (Success)**: Biểu thị bằng icon màu Trắng `#FFFFFF` đặt trên nền Gradient Tím - Hồng hoặc viền Tím `#7C2D82`.

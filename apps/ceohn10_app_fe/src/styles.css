@@ -123,23 +123,32 @@
 }
 
 .bg-crm-system {
-  background: #000000;
+  background: #FAF5FF;
   background-image: 
-    radial-gradient(at 0% 0%, rgba(124, 45, 130, 0.25) 0px, transparent 55%),
-    radial-gradient(at 100% 0%, rgba(214, 31, 105, 0.20) 0px, transparent 50%),
-    radial-gradient(at 50% 100%, rgba(124, 45, 130, 0.15) 0px, transparent 50%),
-    linear-gradient(180deg, #000000 0%, #000000 100%);
+    radial-gradient(at 0% 0%, rgba(124, 45, 130, 0.08) 0px, transparent 55%),
+    radial-gradient(at 100% 0%, rgba(214, 31, 105, 0.06) 0px, transparent 50%),
+    radial-gradient(at 50% 100%, rgba(124, 45, 130, 0.04) 0px, transparent 50%),
+    linear-gradient(180deg, #FFFFFF 0%, #FAF5FF 60%, #F5EEFD 100%);
   background-repeat: no-repeat;
   background-position: top center;
   background-size: cover;
   background-attachment: fixed;
-  color: #FFFFFF;
+  color: #0F172A;
 }
 
 .dark .bg-crm-system,
 html.dark .bg-crm-system,
 [data-theme="dark"] .bg-crm-system {
-  background-color: #000000 !important;
+  background: #000000 !important;
+  background-image: 
+    radial-gradient(at 0% 0%, rgba(124, 45, 130, 0.25) 0px, transparent 55%),
+    radial-gradient(at 100% 0%, rgba(214, 31, 105, 0.20) 0px, transparent 50%),
+    radial-gradient(at 50% 100%, rgba(124, 45, 130, 0.15) 0px, transparent 50%),
+    linear-gradient(180deg, #000000 0%, #000000 100%) !important;
+  background-repeat: no-repeat;
+  background-position: top center;
+  background-size: cover;
+  background-attachment: fixed;
   color: #FFFFFF !important;
 }
 
@@ -284,10 +293,79 @@ html.dark .bg-crm-system,
   outline-color: #581C87 !important;
 }
 
-:root,
-.dark {
+:root {
   --radius: 0.75rem;
 
+  /* ============================================================
+     CEO HN10 LIGHT THEME (CHUẨN SÁNG): Nền Trắng, Card Trắng, Chữ Đen Rõ Nét
+     Điểm nhấn: Gradient Tím - Hồng & Chữ Trắng trên Gradient
+     ============================================================ */
+  --background: #FFFFFF;
+  --foreground: #0F172A;
+
+  --card: #FFFFFF;
+  --card-foreground: #0F172A;
+
+  --popover: #FFFFFF;
+  --popover-foreground: #0F172A;
+
+  /* CEO HN10 Brand Colors */
+  --primary: #7C2D82;
+  --primary-foreground: #FFFFFF;
+  --primary-glow: #D61F69;
+
+  --secondary: #FAF5FF;
+  --secondary-foreground: #7C2D82;
+
+  --muted: #F4F4F5;
+  --muted-foreground: #71717A;
+
+  --accent: #D61F69;
+  --accent-foreground: #FFFFFF;
+
+  --destructive: #D61F69;
+  --destructive-foreground: #FFFFFF;
+
+  --success: #7C2D82;
+  --success-foreground: #FFFFFF;
+
+  --warning: #D61F69;
+  --warning-foreground: #FFFFFF;
+
+  --info: #7C2D82;
+  --info-foreground: #FFFFFF;
+
+  --border: #E4E4E7;
+  --input: #E4E4E7;
+  --ring: #7C2D82;
+
+  /* Sidebar — Light mode: White with crisp light border */
+  --sidebar: #FFFFFF;
+  --sidebar-foreground: #0F172A;
+  --sidebar-primary: #7C2D82;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #FAF5FF;
+  --sidebar-accent-foreground: #7C2D82;
+  --sidebar-border: #E4E4E7;
+  --sidebar-ring: #7C2D82;
+  --gradient-sidebar: linear-gradient(180deg, #FFFFFF 0%, #FAF5FF 100%);
+
+  --chart-1: #7C2D82;
+  --chart-2: #D61F69;
+  --chart-3: #0F172A;
+  --chart-4: #E4E4E7;
+  --chart-5: #7C2D82;
+
+  --gradient-primary: linear-gradient(135deg, #7C2D82 0%, #D61F69 100%);
+  --gradient-card: linear-gradient(135deg, #7C2D82 0%, #D61F69 100%);
+  --gradient-ceohn10: linear-gradient(135deg, #7C2D82 0%, #D61F69 100%);
+}
+
+.dark {
+  /* ============================================================
+     CEO HN10 DARK THEME (CHUẨN TỐI): Nền Đen Tuyền, Card Đen, Chữ Trắng Rõ Nét
+     Điểm nhấn: Gradient Tím - Hồng & Viền Đen Xám #18181B
+     ============================================================ */
   --background: #000000;
   --foreground: #FFFFFF;
 
@@ -297,7 +375,7 @@ html.dark .bg-crm-system,
   --popover: #000000;
   --popover-foreground: #FFFFFF;
 
-  /* CEO HN10 Strict 5-Color System: Tím (#7C2D82), Hồng (#D61F69), Đen (#000000), Trắng (#FFFFFF), Đen xám viền (#18181B) */
+  /* CEO HN10 Brand Colors */
   --primary: #7C2D82;
   --primary-foreground: #FFFFFF;
   --primary-glow: #D61F69;
@@ -306,7 +384,7 @@ html.dark .bg-crm-system,
   --secondary-foreground: #FFFFFF;
 
   --muted: #18181B;
-  --muted-foreground: #FFFFFF;
+  --muted-foreground: rgba(255, 255, 255, 0.7);
 
   --accent: #D61F69;
   --accent-foreground: #FFFFFF;
@@ -327,7 +405,7 @@ html.dark .bg-crm-system,
   --input: #18181B;
   --ring: #D61F69;
 
-  /* Sidebar — Đen tuyền với viền đen xám & chữ trắng */
+  /* Sidebar — Dark mode: Pure Black with dark slate border */
   --sidebar: #000000;
   --sidebar-foreground: #FFFFFF;
   --sidebar-primary: #7C2D82;
@@ -343,6 +421,10 @@ html.dark .bg-crm-system,
   --chart-3: #FFFFFF;
   --chart-4: #18181B;
   --chart-5: #7C2D82;
+
+  --gradient-primary: linear-gradient(135deg, #7C2D82 0%, #D61F69 100%);
+  --gradient-card: linear-gradient(135deg, #7C2D82 0%, #D61F69 100%);
+  --gradient-ceohn10: linear-gradient(135deg, #7C2D82 0%, #D61F69 100%);
 }
 
 /* ============================================================
@@ -591,10 +673,57 @@ html.dark [class*="bg-card"] {
    5. Đen xám viền (Dark Slate Border): #18181B (Đường viền biên giới, bề mặt phân cách)
    TUYỆT ĐỐI KHÔNG DÙNG BẤT KỲ MÀU NÀO KHÁC!
    ============================================================ */
-.vba-app,
-html:not(.dark) .vba-app,
+/* ============================================================
+   CEO HN10 THEME: PHÂN BIỆT RÕ RÀNG THEME SÁNG & THEME TỐI
+   Theme Sáng: Nền Trắng, Card Trắng, Chữ Đen Tương Phản Rõ Nét
+   Theme Tối: Nền Đen Tuyền, Card Đen, Chữ Trắng Tinh Khôi
+   Điểm nhấn: Gradient Tím - Hồng & Chữ Trắng trên Gradient
+   ============================================================ */
+
+/* Theme Sáng: Nền Trắng / Tím hoa cà siêu nhạt, chữ đen rõ nét */
+html:not(.dark) .vba-app {
+  --vba-bg: #FFFFFF;
+  --vba-bg-2: #FAF5FF;
+  --vba-surface: #FFFFFF;
+  --vba-surface-2: #F4F4F5;
+  --vba-border: #E4E4E7;
+  --vba-border-soft: #F4F4F5;
+  --vba-border-accent: #7C2D82;
+  --vba-gold: #D61F69;
+  --vba-gold-2: #7C2D82;
+  --vba-gold-soft: rgba(214, 31, 105, 0.12);
+  --vba-gold-glow: 0 4px 16px -2px rgba(124, 45, 130, 0.15);
+  --vba-navy: #7C2D82;
+  --vba-navy-deep: #4A1C6E;
+  --vba-navy-light: #D61F69;
+  --vba-brand-orange: #D61F69;
+  --vba-text: #0F172A;
+  --vba-text-muted: #475569;
+  --vba-text-dim: #64748B;
+  --vba-success: #7C2D82;
+  --vba-danger: #D61F69;
+  --popover: #FFFFFF;
+  --popover-foreground: #0F172A;
+  --card: #FFFFFF;
+  --card-foreground: #0F172A;
+
+  background: #FFFFFF !important;
+  color: #0F172A !important;
+  min-height: 100dvh;
+  font-family: var(--font-sans);
+}
+
+html:not(.dark) .vba-card {
+  background: #FFFFFF !important;
+  color: #0F172A !important;
+  border: 1px solid #E4E4E7 !important;
+  box-shadow: 0 2px 10px -2px rgba(124, 45, 130, 0.08) !important;
+  border-radius: 0.75rem;
+}
+
+/* Theme Tối: Nền Đen tuyền, viền đen xám #18181B, chữ trắng */
 html.dark .vba-app,
-html.hc .vba-app {
+.dark .vba-app {
   --vba-bg: #000000;
   --vba-bg-2: #000000;
   --vba-surface: #000000;
@@ -626,10 +755,8 @@ html.hc .vba-app {
   font-family: var(--font-sans);
 }
 
-.vba-card,
-html:not(.dark) .vba-card,
 html.dark .vba-card,
-html.hc .vba-card {
+.dark .vba-card {
   background: #000000 !important;
   color: #FFFFFF !important;
   border: 1px solid #18181B !important;
