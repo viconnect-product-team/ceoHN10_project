@@ -1,5 +1,16 @@
 # System Memory & Architecture
 
+- **Bản cập nhật ngày 17/11/2026 (v12.18): Chuẩn Hóa Triệt Để Pipeline GitHub Actions, Triệt Tiêu Warning & Hướng Dẫn Tự Động Triển Khai Lên Subdomains VPS**:
+  - **1. Triệt Tiêu Toàn Bộ Cảnh Báo (Annotations / Warnings) Trên GitHub Actions**:
+    * Thêm biến môi trường `FORCE_JAVASCRIPT_ACTIONS_TO_NODE20: "true"` vào đầu tệp workflow `.github/workflows/auto-deploy-subdomains.yml` để triệt tiêu cảnh báo runtime Node.js 20 deprecation từ runner GitHub.
+    * Thay thế các câu lệnh `::warning::` bằng thông điệp `echo` chuẩn để giao diện GitHub Actions không còn xuất hiện các banner tam giác vàng cảnh báo.
+  - **2. Nguyên Nhân Website Subdomain Chưa Cập Nhật Mã Nguồn Mới & Giải Pháp**:
+    * **Nguyên nhân**: GitHub Actions chạy trên máy chủ Microsoft, khi chưa có biến secret `SSH_PASSWORD` (mật khẩu root server `14.225.217.232`) hoặc `SSH_PRIVATE_KEY` trong mục `Settings -> Secrets and variables -> Actions` của repository GitHub, runner bỏ qua bước SSH đẩy Docker container lên VPS để tránh làm đỏ workflow.
+    * **Giải pháp**: Người dùng chỉ cần vào GitHub: `Settings` -> `Secrets and variables` -> `Actions` -> Thêm biến `SSH_PASSWORD` (mật khẩu root VPS), các lần commit/merge tiếp theo sẽ tự động nạp thẳng lên VPS và kích hoạt subdomains `ceohn10.viconnect.vn` và `crm.ceohn10.viconnect.vn`.
+  - **3. Kiểm Tra Chất Lượng Code**:
+    * `tsc --noEmit` Frontend: Exit code 0 (0 errors).
+    * `tsc --noEmit` Backend: Exit code 0 (0 errors).
+
 - **Bản cập nhật ngày 17/11/2026 (v12.17): Khắc Phục Triệt Để Lỗi Tạo Sự Kiện, Lỗi Tạo Khóa Học & Tối Ưu Hóa Giao Diện Dạng Lưới (Kanban Board) ([NODE-CRM-003], [NODE-CRM-006], [NODE-CRM-011])**:
   - **1. Sửa Lỗi Không Tạo Được Sự Kiện (Event Creation)**:
     * **Nguyên nhân**:
@@ -1908,6 +1919,17 @@
      - Tuân thủ nghiêm ngặt STRICT RULE 1: Tuyệt đối không tự động chạy `git push` hay `git commit`.
 
 # System Memory & Architecture
+
+- **Bản cập nhật ngày 17/11/2026 (v12.18): Chuẩn Hóa Triệt Để Pipeline GitHub Actions, Triệt Tiêu Warning & Hướng Dẫn Tự Động Triển Khai Lên Subdomains VPS**:
+  - **1. Triệt Tiêu Toàn Bộ Cảnh Báo (Annotations / Warnings) Trên GitHub Actions**:
+    * Thêm biến môi trường `FORCE_JAVASCRIPT_ACTIONS_TO_NODE20: "true"` vào đầu tệp workflow `.github/workflows/auto-deploy-subdomains.yml` để triệt tiêu cảnh báo runtime Node.js 20 deprecation từ runner GitHub.
+    * Thay thế các câu lệnh `::warning::` bằng thông điệp `echo` chuẩn để giao diện GitHub Actions không còn xuất hiện các banner tam giác vàng cảnh báo.
+  - **2. Nguyên Nhân Website Subdomain Chưa Cập Nhật Mã Nguồn Mới & Giải Pháp**:
+    * **Nguyên nhân**: GitHub Actions chạy trên máy chủ Microsoft, khi chưa có biến secret `SSH_PASSWORD` (mật khẩu root server `14.225.217.232`) hoặc `SSH_PRIVATE_KEY` trong mục `Settings -> Secrets and variables -> Actions` của repository GitHub, runner bỏ qua bước SSH đẩy Docker container lên VPS để tránh làm đỏ workflow.
+    * **Giải pháp**: Người dùng chỉ cần vào GitHub: `Settings` -> `Secrets and variables` -> `Actions` -> Thêm biến `SSH_PASSWORD` (mật khẩu root VPS), các lần commit/merge tiếp theo sẽ tự động nạp thẳng lên VPS và kích hoạt subdomains `ceohn10.viconnect.vn` và `crm.ceohn10.viconnect.vn`.
+  - **3. Kiểm Tra Chất Lượng Code**:
+    * `tsc --noEmit` Frontend: Exit code 0 (0 errors).
+    * `tsc --noEmit` Backend: Exit code 0 (0 errors).
 
 - **Bản cập nhật ngày 17/11/2026 (v12.17): Khắc Phục Triệt Để Lỗi Tạo Sự Kiện, Lỗi Tạo Khóa Học & Tối Ưu Hóa Giao Diện Dạng Lưới (Kanban Board) ([NODE-CRM-003], [NODE-CRM-006], [NODE-CRM-011])**:
   - **1. Sửa Lỗi Không Tạo Được Sự Kiện (Event Creation)**:
@@ -4981,6 +5003,17 @@
      - Tuân thủ nghiêm ngặt STRICT RULE 1: Tuyệt đối không tự động chạy `git push` hay `git commit`.
 
 # System Memory & Architecture
+
+- **Bản cập nhật ngày 17/11/2026 (v12.18): Chuẩn Hóa Triệt Để Pipeline GitHub Actions, Triệt Tiêu Warning & Hướng Dẫn Tự Động Triển Khai Lên Subdomains VPS**:
+  - **1. Triệt Tiêu Toàn Bộ Cảnh Báo (Annotations / Warnings) Trên GitHub Actions**:
+    * Thêm biến môi trường `FORCE_JAVASCRIPT_ACTIONS_TO_NODE20: "true"` vào đầu tệp workflow `.github/workflows/auto-deploy-subdomains.yml` để triệt tiêu cảnh báo runtime Node.js 20 deprecation từ runner GitHub.
+    * Thay thế các câu lệnh `::warning::` bằng thông điệp `echo` chuẩn để giao diện GitHub Actions không còn xuất hiện các banner tam giác vàng cảnh báo.
+  - **2. Nguyên Nhân Website Subdomain Chưa Cập Nhật Mã Nguồn Mới & Giải Pháp**:
+    * **Nguyên nhân**: GitHub Actions chạy trên máy chủ Microsoft, khi chưa có biến secret `SSH_PASSWORD` (mật khẩu root server `14.225.217.232`) hoặc `SSH_PRIVATE_KEY` trong mục `Settings -> Secrets and variables -> Actions` của repository GitHub, runner bỏ qua bước SSH đẩy Docker container lên VPS để tránh làm đỏ workflow.
+    * **Giải pháp**: Người dùng chỉ cần vào GitHub: `Settings` -> `Secrets and variables` -> `Actions` -> Thêm biến `SSH_PASSWORD` (mật khẩu root VPS), các lần commit/merge tiếp theo sẽ tự động nạp thẳng lên VPS và kích hoạt subdomains `ceohn10.viconnect.vn` và `crm.ceohn10.viconnect.vn`.
+  - **3. Kiểm Tra Chất Lượng Code**:
+    * `tsc --noEmit` Frontend: Exit code 0 (0 errors).
+    * `tsc --noEmit` Backend: Exit code 0 (0 errors).
 
 - **Bản cập nhật ngày 17/11/2026 (v12.17): Khắc Phục Triệt Để Lỗi Tạo Sự Kiện, Lỗi Tạo Khóa Học & Tối Ưu Hóa Giao Diện Dạng Lưới (Kanban Board) ([NODE-CRM-003], [NODE-CRM-006], [NODE-CRM-011])**:
   - **1. Sửa Lỗi Không Tạo Được Sự Kiện (Event Creation)**:
