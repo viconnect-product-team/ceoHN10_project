@@ -112,7 +112,7 @@ export function TrainingFeedbackModal({
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-purple-500/15 text-[#7C2D82] dark:text-purple-300 flex items-center justify-center font-bold">
+            <div className="w-10 h-10 rounded-xl bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-200 border border-slate-200 flex items-center justify-center font-bold">
               <MessageSquare className="h-5 w-5" />
             </div>
             <div>
@@ -265,7 +265,7 @@ export function TrainingFeedbackModal({
                           href={f.file_url}
                           target="_blank"
                           rel="noreferrer"
-                          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-purple-50 text-[#7C2D82] dark:bg-purple-950/40 dark:text-purple-300 font-semibold hover:underline"
+                          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border border-slate-200 font-semibold hover:underline"
                         >
                           <Paperclip className="h-3 w-3" />
                           <span>{f.file_name || "Xem tệp đính kèm"}</span>

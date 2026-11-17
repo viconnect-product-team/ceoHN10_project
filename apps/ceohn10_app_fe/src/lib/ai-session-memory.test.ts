@@ -101,7 +101,7 @@ describe("resolveFollowUpContext", () => {
   });
 
   it("is not a follow-up for a fresh standalone question", () => {
-    const r = resolveFollowUpContext("Tìm hội viên ngành logistics", base);
+    const r = resolveFollowUpContext("Tìm Học viên ngành logistics", base);
     expect(r.isFollowUp).toBe(false);
     expect(r.clarificationNeeded).toBe(false);
   });

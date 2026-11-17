@@ -27,7 +27,7 @@ export function generateInvoiceVoucherHtml(tx: Transaction): string {
   const fundLabel =
     tx.fundType === "sponsorship_cash" || tx.fundType === "sponsorship"
       ? "Túi Quỹ Tài Trợ CEO HN10 (Nguồn Đối Tác / NTT)"
-      : "Túi Quỹ Chung CLB (Nguồn Hội Phí Hội Viên)";
+      : "Túi Quỹ Chung CLB (Nguồn Hội Phí Học viên)";
 
   const deptLabel = tx.targetDepartment || tx.department || "Ban Điều Hành / Chung CLB";
   const eventLabel = tx.targetEventName || tx.eventName || (tx.targetEventId ? `Mã sự kiện: ${tx.targetEventId}` : "Hoạt động & Chi tiêu định kỳ");
@@ -102,7 +102,7 @@ export function generateInvoiceVoucherHtml(tx: Transaction): string {
       </tr>
       <tr>
         <td class="label">${isThu ? "Người nộp tiền:" : "Người nhận tiền / Đơn vị thụ hưởng:"}</td>
-        <td class="val"><strong style="color: #0284c7;">${tx.recipient || (isThu ? "Hội viên / Khách hàng" : "Cán bộ / Đơn vị thụ hưởng")}</strong></td>
+        <td class="val"><strong style="color: #0284c7;">${tx.recipient || (isThu ? "Học viên / Khách hàng" : "Cán bộ / Đơn vị thụ hưởng")}</strong></td>
       </tr>
       <tr>
         <td class="label">Nội dung ${isThu ? "thu:" : "chi:"}</td>
@@ -116,9 +116,8 @@ export function generateInvoiceVoucherHtml(tx: Transaction): string {
         <td class="label">Hình thức thanh toán:</td>
         <td class="val"><strong>${methodLabel}</strong></td>
       </tr>
-      ${
-        tx.type === "expense" && (tx.advanceAmount || 0) > 0
-          ? `<tr>
+      ${tx.type === "expense" && (tx.advanceAmount || 0) > 0
+      ? `<tr>
               <td class="label">Số tiền tạm ứng ban đầu:</td>
               <td class="val">${formatVND(tx.advanceAmount || 0)}</td>
             </tr>
@@ -130,11 +129,11 @@ export function generateInvoiceVoucherHtml(tx: Transaction): string {
               <td class="label">Số tiền thực chi ròng:</td>
               <td class="val highlight-amount">${formatVND(netAmount)}</td>
             </tr>`
-          : `<tr>
+      : `<tr>
               <td class="label">Tổng số tiền:</td>
               <td class="val highlight-amount">${formatVND(tx.amount)}</td>
             </tr>`
-      }
+    }
       <tr>
         <td class="label">Trạng thái giao dịch:</td>
         <td class="val" style="color: ${tx.status === "completed" ? "#059669" : "#d97706"}; font-weight: 700;">
@@ -186,7 +185,7 @@ export function printOrExportExpensePdf(tx: Transaction) {
     setTimeout(() => {
       try {
         printWindow.print();
-      } catch {}
+      } catch { }
     }, 400);
   } else {
     downloadInvoiceVoucher(tx);

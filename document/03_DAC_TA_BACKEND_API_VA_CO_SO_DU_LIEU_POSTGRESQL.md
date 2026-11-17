@@ -21,7 +21,7 @@
 
 2. **PHẦN II: THIẾT KẾ CHI TIẾT CƠ SỞ DỮ LIỆU POSTGRESQL (20+ BẢNG DOANH NGHIỆP)**
    - 2.1. Bảng `ceohn10_users` & `vione_users`: Tài khoản người dùng cơ sở
-   - 2.2. Bảng `members`: Hồ sơ 360 độ Hội viên Doanh nhân CLB CEO HN10
+   - 2.2. Bảng `members`: Hồ sơ 360 độ Học viên Doanh nhân CLB CEO HN10
    - 2.3. Bảng `companies`: Hồ sơ Doanh nghiệp thành viên & Pháp nhân
    - 2.4. Bảng `company_members`: Quan hệ thành viên trong doanh nghiệp
    - 2.5. Bảng `member_business_cards`: Danh thiếp điện tử thông minh, URL slug
@@ -46,7 +46,7 @@
 
 3. **PHẦN III: ĐẶC TẢ CHI TIẾT CÁC PHÂN HỆ RESTFUL API (API SPECIFICATIONS)**
    - 3.1. Phân Hệ Xác Thực & Phân Quyền Vai Trò (Auth Controller API)
-   - 3.2. Phân Hệ Quản Trị Hội Viên 360 Độ & Xét Duyệt (Members Controller API)
+   - 3.2. Phân Hệ Quản Trị Học viên 360 Độ & Xét Duyệt (Members Controller API)
    - 3.3. Phân Hệ Doanh Nghiệp & Hồ Sơ Năng Lực (Companies Controller API)
    - 3.4. Phân Hệ Studio Thư Mời Chuẩn Pinterest & Gửi Đa Kênh (Templates & Upload API)
    - 3.5. Phân Hệ Tự Động Hóa Zalo OA & Quản Trị Token 24/7 (Zalo Controller API)
@@ -76,7 +76,7 @@
    - 100% nghiệp vụ của Cổng Quản trị Web CRM và Ứng dụng Di động CEO HN10 kết nối qua cổng API RESTful NestJS (`apps/ceohn10_app_be`).
    - Tuyệt đối loại bỏ các kết nối trực tiếp PostgREST phía client nhằm bảo toàn tính toàn vẹn nghiệp vụ, an toàn dữ liệu và tuân thủ RBAC chặt chẽ.
 2. **PostgreSQL Relational Enterprise Core:**
-   - Sử dụng PostgreSQL phiên bản 16+ với schema `public` được phân định rõ ràng giữa các phân hệ: Hội viên, Doanh nghiệp, Phân quyền RBAC, Giao thương B2B, Sự kiện & Cuộc họp, Quản trị Tài liệu, Tài chính Thu - Chi, Mạng xã hội nội bộ, và Thông báo thời gian thực.
+   - Sử dụng PostgreSQL phiên bản 16+ với schema `public` được phân định rõ ràng giữa các phân hệ: Học viên, Doanh nghiệp, Phân quyền RBAC, Giao thương B2B, Sự kiện & Cuộc họp, Quản trị Tài liệu, Tài chính Thu - Chi, Mạng xã hội nội bộ, và Thông báo thời gian thực.
    - Định danh bản ghi sử dụng chuẩn `UUIDv4` kết hợp mã định danh nghiệp vụ (VD: `CEO HN10-088`, `TIC-2026-X89`) nhằm đảm bảo bảo mật và khả năng phân tán dữ liệu.
 3. **Cơ Chế Bảo Toàn Giao Dịch ACID (Atomicity, Consistency, Isolation, Durability):**
    - Mọi thao tác gạch nợ hội phí, duyệt kết nạp, chuyển quyền quản trị đều được thực thi trong khối giao dịch (`Prisma.$transaction` hoặc PostgreSQL `BEGIN...COMMIT`), bảo đảm không xảy ra mất mát dữ liệu hoặc trạng thái không nhất quán.
@@ -120,7 +120,7 @@ Toàn bộ hệ thống Web CRM, Mobile App, Backend API và các container Dock
      ```
 3. **Mã Trạng Thái HTTP Chuẩn (Standard HTTP Status Codes):**
    - `200 OK`: Truy vấn hoặc cập nhật dữ liệu thành công.
-   - `201 Created`: Tạo mới bản ghi thành công (Hội viên, Sự kiện, Bài viết).
+   - `201 Created`: Tạo mới bản ghi thành công (Học viên, Sự kiện, Bài viết).
    - `400 Bad Request`: Lỗi tham số đầu vào (Class-validator phát hiện).
    - `401 Unauthorized`: Chưa đăng nhập hoặc JWT Token hết hạn.
    - `403 Forbidden`: Người dùng không có quyền truy cập chức năng này (RBAC chặn).
@@ -133,15 +133,15 @@ Toàn bộ hệ thống Web CRM, Mobile App, Backend API và các container Dock
 
 | Bảng Nguồn (Parent) | Khóa Chính (PK) | Bảng Đích (Child) | Khóa Ngoại (FK) | Kiểu Quan Hệ | Hành Vi Xóa (On Delete) | Ý Nghĩa Nghiệp Vụ Thực Tế |
 | :--- | :--- | :--- | :--- | :---: | :--- | :--- |
-| `ceohn10_users` | `id (UUID)` | `members` | `user_id` | **1 : 1** | `SET NULL` | Mỗi tài khoản đăng nhập gắn liền 1 hồ sơ hội viên doanh nhân. |
-| `members` | `id (TEXT)` | `companies` | `owner_user_id` | **1 : N** | `CASCADE` | Một hội viên có thể sở hữu 1 hoặc nhiều doanh nghiệp/pháp nhân. |
-| `members` | `id (TEXT)` | `member_business_cards`| `member_id` | **1 : 1** | `CASCADE` | Mỗi hội viên có 1 danh thiếp điện tử thông minh có định danh URL slug. |
-| `members` | `id (TEXT)` | `opportunities` | `poster_id` | **1 : N** | `CASCADE` | Hội viên đăng các cơ hội hợp tác kinh doanh lên sàn B2B. |
+| `ceohn10_users` | `id (UUID)` | `members` | `user_id` | **1 : 1** | `SET NULL` | Mỗi tài khoản đăng nhập gắn liền 1 hồ sơ Học viên doanh nhân. |
+| `members` | `id (TEXT)` | `companies` | `owner_user_id` | **1 : N** | `CASCADE` | Một Học viên có thể sở hữu 1 hoặc nhiều doanh nghiệp/pháp nhân. |
+| `members` | `id (TEXT)` | `member_business_cards`| `member_id` | **1 : 1** | `CASCADE` | Mỗi Học viên có 1 danh thiếp điện tử thông minh có định danh URL slug. |
+| `members` | `id (TEXT)` | `opportunities` | `poster_id` | **1 : N** | `CASCADE` | Học viên đăng các cơ hội hợp tác kinh doanh lên sàn B2B. |
 | `opportunities` | `id (TEXT)` | `opportunity_interests`| `opportunity_id` | **1 : N** | `CASCADE` | Các đối tác bày tỏ quan tâm, đàm phán hợp đồng kinh tế. |
 | `events` | `id (TEXT)` | `event_registrations` | `event_id` | **1 : N** | `CASCADE` | Danh sách vé mời và đại biểu đăng ký tham gia sự kiện Gala. |
-| `events` | `id (TEXT)` | `event_ticket_types` | `event_id` | **1 : N** | `CASCADE` | Các hạng vé sự kiện (VIP Đại biểu, Hội viên chính thức, Khách mời). |
+| `events` | `id (TEXT)` | `event_ticket_types` | `event_id` | **1 : N** | `CASCADE` | Các hạng vé sự kiện (VIP Đại biểu, Học viên chính thức, Khách mời). |
 | `meetings` | `id (TEXT)` | `business_meeting_participants`| `meeting_id` | **1 : N** | `CASCADE` | Danh sách thành viên triệu tập họp BĐH hoặc tham gia lịch hẹn 1-on-1. |
-| `members` | `id (TEXT)` | `transactions` | `association_id` | **1 : N** | `RESTRICT` | Lịch sử nộp hội phí và biến động tài chính của hội viên. |
+| `members` | `id (TEXT)` | `transactions` | `association_id` | **1 : N** | `RESTRICT` | Lịch sử nộp hội phí và biến động tài chính của Học viên. |
 | `feed_posts` | `id (UUID)` | `feed_comments` | `post_id` | **1 : N** | `CASCADE` | Cây bình luận đa tầng (cấp 1, cấp 2, cấp 3) trên bài viết bảng tin. |
 
 ---
@@ -169,19 +169,19 @@ Toàn bộ hệ thống Web CRM, Mobile App, Backend API và các container Dock
 
 ---
 
-### 2.2. Bảng `public.members` (Hồ Sơ 360 Độ Hội Viên CLB CEO HN10)
-*Mô tả nghiệp vụ:* Lưu trữ hồ sơ toàn diện của hơn 500+ doanh nhân hội viên, chức vụ, ban chuyên môn, tình trạng hội phí và mã số chuẩn hóa.
+### 2.2. Bảng `public.members` (Hồ Sơ 360 Độ Học viên CLB CEO HN10)
+*Mô tả nghiệp vụ:* Lưu trữ hồ sơ toàn diện của hơn 500+ doanh nhân Học viên, chức vụ, ban chuyên môn, tình trạng hội phí và mã số chuẩn hóa.
 
 | Tên Cột | Kiểu Dữ Liệu | Ràng Buộc | Giá Trị Mặc Định | Mô Tả Ý Nghĩa Nghiệp Vụ |
 | :--- | :--- | :--- | :--- | :--- |
 | `id` | `TEXT` | `PRIMARY KEY` | Không | Mã định danh duy nhất (UUID dạng chuỗi) |
 | `user_id` | `UUID` | `FOREIGN KEY` | `NULL` | Khóa ngoại nối với bảng `ceohn10_users(id)` |
-| `code` | `TEXT` | `UNIQUE, NOT NULL` | Không | Mã số hội viên chuẩn hóa CLB (VD: `CEO HN10-001`, `CEO HN10-088`) |
-| `name` | `TEXT` | `NOT NULL` | Không | Họ và tên đầy đủ của doanh nhân hội viên |
+| `code` | `TEXT` | `UNIQUE, NOT NULL` | Không | Mã số Học viên chuẩn hóa CLB (VD: `CEO HN10-001`, `CEO HN10-088`) |
+| `name` | `TEXT` | `NOT NULL` | Không | Họ và tên đầy đủ của doanh nhân Học viên |
 | `contact` | `TEXT` | `NOT NULL` | `''` | Tên người đại diện hoặc thư ký riêng |
 | `email` | `TEXT` | `NOT NULL` | `''` | Địa chỉ email liên hệ công việc |
 | `phone` | `TEXT` | `NOT NULL` | `''` | Số điện thoại liên lạc chính (10-11 chữ số) |
-| `type` | `TEXT` | `NOT NULL` | `'business'` | Loại hình hội viên (`business` - Doanh nhân, `individual`) |
+| `type` | `TEXT` | `NOT NULL` | `'business'` | Loại hình Học viên (`business` - Doanh nhân, `individual`) |
 | `level` | `TEXT` | `NOT NULL` | `'official'` | Cấp bậc (`official` - Chính thức, `honorary` - Danh dự, `vip`) |
 | `industry` | `TEXT` | `NOT NULL` | Không | Ngành nghề kinh doanh chủ lực (Bất động sản, IT, Xây dựng...) |
 | `region` | `TEXT` | `NOT NULL` | `'Hà Nội'` | Khu vực địa lý sinh hoạt (Hà Nội, Miền Bắc, Toàn quốc) |
@@ -242,7 +242,7 @@ Toàn bộ hệ thống Web CRM, Mobile App, Backend API và các container Dock
 | Tên Cột | Kiểu Dữ Liệu | Ràng Buộc | Giá Trị Mặc Định | Mô Tả Ý Nghĩa Nghiệp Vụ |
 | :--- | :--- | :--- | :--- | :--- |
 | `id` | `TEXT` | `PRIMARY KEY` | Không | Mã định danh cơ hội giao thương |
-| `poster_id` | `TEXT` | `FOREIGN KEY` | Không | Mã hội viên đăng bài chào mua / chào bán |
+| `poster_id` | `TEXT` | `FOREIGN KEY` | Không | Mã Học viên đăng bài chào mua / chào bán |
 | `title` | `TEXT` | `NOT NULL` | Không | Tiêu đề cơ hội (VD: Tìm đối tác cung ứng nhôm kính) |
 | `description` | `TEXT` | `NOT NULL` | `''` | Mô tả chi tiết yêu cầu kỹ thuật và điều kiện giao hàng |
 | `type` | `TEXT` | `NOT NULL` | Không | Loại cơ hội (`buy` - Chào mua, `sell` - Chào bán, `partner`) |
@@ -262,12 +262,12 @@ Toàn bộ hệ thống Web CRM, Mobile App, Backend API và các container Dock
 | :--- | :--- | :--- | :--- | :--- |
 | `id` | `TEXT` | `PRIMARY KEY` | Không | Mã định danh quan tâm |
 | `opportunity_id`| `TEXT` | `FOREIGN KEY` | Không | Khóa ngoại nối với `opportunities(id)` |
-| `member_id` | `TEXT` | `FOREIGN KEY` | Không | Khóa ngoại mã hội viên bày tỏ quan tâm |
+| `member_id` | `TEXT` | `FOREIGN KEY` | Không | Khóa ngoại mã Học viên bày tỏ quan tâm |
 | `message` | `TEXT` | `NOT NULL` | `''` | Lời nhắn giới thiệu năng lực hợp tác |
 | `contact` | `TEXT` | `NOT NULL` | `''` | Số điện thoại liên hệ trực tiếp |
 | `interest_level`| `TEXT` | `NOT NULL` | `'high'` | Mức độ quan tâm (`high`, `medium`, `exploring`) |
 | `deal_value` | `NUMERIC` | `NULLABLE` | `0` | Giá trị hợp đồng thực tế đã ký kết (VNĐ) |
-| `deal_percent` | `NUMERIC` | `NULLABLE` | `0` | Tỷ lệ chiết khấu ưu đãi dành riêng cho hội viên (%) |
+| `deal_percent` | `NUMERIC` | `NULLABLE` | `0` | Tỷ lệ chiết khấu ưu đãi dành riêng cho Học viên (%) |
 | `created_at` | `TIMESTAMPTZ`| `NOT NULL` | `now()` | Thời điểm bày tỏ quan tâm |
 
 ---
@@ -276,7 +276,7 @@ Toàn bộ hệ thống Web CRM, Mobile App, Backend API và các container Dock
 | Tên Cột | Kiểu Dữ Liệu | Ràng Buộc | Giá Trị Mặc Định | Mô Tả Ý Nghĩa Nghiệp Vụ |
 | :--- | :--- | :--- | :--- | :--- |
 | `id` | `TEXT` | `PRIMARY KEY` | Không | Mã định danh sản phẩm |
-| `seller_id` | `TEXT` | `FOREIGN KEY` | Không | Mã hội viên bán hàng |
+| `seller_id` | `TEXT` | `FOREIGN KEY` | Không | Mã Học viên bán hàng |
 | `title` | `TEXT` | `NOT NULL` | Không | Tên sản phẩm / dịch vụ |
 | `description` | `TEXT` | `NOT NULL` | `''` | Quy cách đóng gói, thông số kỹ thuật |
 | `price` | `BIGINT` | `NOT NULL` | `0` | Giá bán niêm yết (VNĐ) |
@@ -334,7 +334,7 @@ Toàn bộ hệ thống Web CRM, Mobile App, Backend API và các container Dock
 | `meeting_mode`| `TEXT` | `NOT NULL` | `'offline'` | Hình thức: `offline` (Trực tiếp), `online` (Jitsi Meet trực tuyến) |
 | `department` | `TEXT` | `NULLABLE` | Không | Ban chuyên môn tổ chức kỳ họp |
 | `zoom_url` | `TEXT` | `NULLABLE` | Không | Đường link phòng họp trực tuyến Jitsi Meet nội bộ |
-| `target_members`| `JSONB` | `NULLABLE` | `'[]'` | Danh sách mã hội viên được triệu tập tham dự |
+| `target_members`| `JSONB` | `NULLABLE` | `'[]'` | Danh sách mã Học viên được triệu tập tham dự |
 | `attendees` | `INTEGER` | `NOT NULL` | `0` | Số lượng đại biểu xác nhận tham dự |
 | `status` | `TEXT` | `NOT NULL` | `'scheduled'` | Trạng thái (`scheduled`, `completed`, `cancelled`) |
 | `created_at` | `TIMESTAMPTZ`| `NOT NULL` | `now()` | Thời điểm tạo lịch họp |
@@ -391,7 +391,7 @@ Toàn bộ hệ thống Web CRM, Mobile App, Backend API và các container Dock
 | `title` | `TEXT` | `NULLABLE` | Không | Tiêu đề bài viết |
 | `content` | `TEXT` | `NULLABLE` | Không | Nội dung văn bản chia sẻ |
 | `category` | `TEXT` | `NULLABLE` | `'general'` | Chuyên mục (`news`, `announcement`, `b2b`, `event`) |
-| `author_id` | `TEXT` | `NULLABLE` | Không | Mã hội viên tác giả |
+| `author_id` | `TEXT` | `NULLABLE` | Không | Mã Học viên tác giả |
 | `author_name` | `TEXT` | `NULLABLE` | Không | Tên hiển thị của tác giả |
 | `author_company`| `TEXT` | `NULLABLE` | Không | Doanh nghiệp của tác giả |
 | `images` | `TEXT[]` | `NULLABLE` | `'{}'` | Danh sách đường dẫn ảnh đính kèm bài viết |
@@ -406,8 +406,8 @@ Toàn bộ hệ thống Web CRM, Mobile App, Backend API và các container Dock
 | :--- | :--- | :--- | :--- | :--- |
 | `id` | `UUID` | `PRIMARY KEY` | `gen_random_uuid()` | Khóa chính bình luận |
 | `post_id` | `TEXT` | `NOT NULL` | Không | Khóa ngoại nối với `feed_posts(id)` |
-| `author_id` | `TEXT` | `NULLABLE` | Không | Mã hội viên bình luận |
-| `author_name` | `TEXT` | `NULLABLE` | Không | Tên hội viên bình luận |
+| `author_id` | `TEXT` | `NULLABLE` | Không | Mã Học viên bình luận |
+| `author_name` | `TEXT` | `NULLABLE` | Không | Tên Học viên bình luận |
 | `author_avatar`| `TEXT` | `NULLABLE` | Không | Ảnh đại diện của tác giả bình luận |
 | `content` | `TEXT` | `NULLABLE` | Không | Nội dung phản hồi |
 | `parent_id` | `TEXT` | `NULLABLE` | Không | ID bình luận cha (nếu là phản hồi cấp 2 hoặc cấp 3) |
@@ -424,7 +424,7 @@ Toàn bộ hệ thống Web CRM, Mobile App, Backend API và các container Dock
 | `title` | `TEXT` | `NOT NULL` | Không | Tên nhiệm vụ / công việc |
 | `description` | `TEXT` | `NULLABLE` | `''` | Mô tả chi tiết yêu cầu công việc |
 | `department` | `TEXT` | `NULLABLE` | Không | Ban chuyên môn chịu trách nhiệm chính |
-| `assignee_id` | `TEXT` | `NULLABLE` | Không | Mã hội viên được giao thực hiện |
+| `assignee_id` | `TEXT` | `NULLABLE` | Không | Mã Học viên được giao thực hiện |
 | `priority` | `TEXT` | `NOT NULL` | `'medium'` | Mức độ ưu tiên (`high`, `medium`, `low`) |
 | `status` | `TEXT` | `NOT NULL` | `'todo'` | Trạng thái Kanban (`todo`, `in_progress`, `review`, `done`) |
 | `deadline` | `TIMESTAMPTZ`| `NULLABLE` | Không | Thời hạn chót hoàn thành |
@@ -500,10 +500,10 @@ Toàn bộ hệ thống Web CRM, Mobile App, Backend API và các container Dock
 
 ---
 
-### 3.2. Phân Hệ Quản Trị Hội Viên 360 Độ & Xét Duyệt (Members Controller API)
+### 3.2. Phân Hệ Quản Trị Học viên 360 Độ & Xét Duyệt (Members Controller API)
 
-#### 1. `GET /api/members` (Lấy Danh Sách Hội Viên Có Phân Trang & Bộ Lọc)
-- **Mục đích:** Truy vấn danh sách 500+ doanh nhân hội viên phục vụ tra cứu trên CRM và danh bạ App.
+#### 1. `GET /api/members` (Lấy Danh Sách Học viên Có Phân Trang & Bộ Lọc)
+- **Mục đích:** Truy vấn danh sách 500+ doanh nhân Học viên phục vụ tra cứu trên CRM và danh bạ App.
 - **Quyền hạn:** `MEMBER`, `MODERATOR`, `ADMIN`.
 - **Query Parameters:** `page=1&limit=20&search=PhamVu&department=BanGiaoThuong&status=active`.
 - **Response `200 OK`:**
@@ -532,10 +532,10 @@ Toàn bộ hệ thống Web CRM, Mobile App, Backend API và các container Dock
 
 ---
 
-#### 2. `POST /api/members/approve/:id` (Phê Duyệt Kết Nạp Hội Viên Mới)
+#### 2. `POST /api/members/approve/:id` (Phê Duyệt Kết Nạp Học viên Mới)
 - **Mục đích:** Phê duyệt đơn gia nhập, tự động sinh mã số và gửi email chào mừng.
 - **Quyền hạn:** `ADMIN`, `SUPER_ADMIN`.
-- **Path Param:** `:id` — ID hồ sơ hội viên đang ở trạng thái `pending`.
+- **Path Param:** `:id` — ID hồ sơ Học viên đang ở trạng thái `pending`.
 - **Request Body:**
   ```json
   {
@@ -549,7 +549,7 @@ Toàn bộ hệ thống Web CRM, Mobile App, Backend API và các container Dock
 ---
 
 #### 3. `POST /api/members/import-excel` (Nạp Dữ Liệu Hàng Loạt Từ Bảng Tính Excel)
-- **Mục đích:** Nhập hàng trăm hội viên từ bảng tính Excel mà không bị lỗi font hoặc sai lệch cột.
+- **Mục đích:** Nhập hàng trăm Học viên từ bảng tính Excel mà không bị lỗi font hoặc sai lệch cột.
 - **Request Body (Multipart Form-data):** `file: [danh_sach_hoi_vien.xlsx]`.
 - **Response `200 OK`:** `{ "success": true, "importedCount": 150, "skippedCount": 2 }`.
 
@@ -573,7 +573,7 @@ Toàn bộ hệ thống Web CRM, Mobile App, Backend API và các container Dock
     "theme": "wyndham_heian",
     "kicker": "CLB DOANH NHÂN CEO HN10 (HANOIBA)",
     "title": "DÒNG CHẢY HẠNH PHÚC",
-    "subtitle": "TRÂN TRỌNG KÍNH MỜI QUÝ HỘI VIÊN & ĐỐI TÁC",
+    "subtitle": "TRÂN TRỌNG KÍNH MỜI QUÝ Học viên & ĐỐI TÁC",
     "capsuleBadge": "QUÀ TẶNG VOUCHER NGHỈ DƯỠNG KHOÁNG NÓNG ONSET",
     "dateText": "08:30 · THỨ BẢY",
     "dateNumbers": "06 | 04 | 24",
@@ -734,7 +734,7 @@ Toàn bộ hệ thống Web CRM, Mobile App, Backend API và các container Dock
 Để đảm bảo tốc độ phản hồi API luôn đạt mức chuẩn **dưới 50ms** với dung lượng cơ sở dữ liệu hàng trăm nghìn bản ghi, các chỉ mục (indexes) chiến lược sau đây đã được thiết lập trực tiếp trên CSDL PostgreSQL:
 
 ```sql
--- 1. Chỉ mục tối ưu hóa tìm kiếm hội viên & đăng nhập
+-- 1. Chỉ mục tối ưu hóa tìm kiếm Học viên & đăng nhập
 CREATE INDEX IF NOT EXISTS idx_members_user_id ON public.members(user_id);
 CREATE INDEX IF NOT EXISTS idx_members_phone ON public.members(phone);
 CREATE INDEX IF NOT EXISTS idx_members_code ON public.members(code);

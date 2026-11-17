@@ -130,7 +130,7 @@ export function CreateCommunityModal({ open, onClose, onCreated }: Props) {
 
       toast.success(`Đã tạo cộng đồng "${cleanName}" thành công!`);
       void queryClient.invalidateQueries({ queryKey: communityKeys.root });
-      
+
       // Reset form
       setName("");
       setTagline("");
@@ -138,7 +138,7 @@ export function CreateCommunityModal({ open, onClose, onCreated }: Props) {
       setSlug("");
       setLogoUrl("");
       setBannerUrl("");
-      
+
       onClose();
       if (onCreated) onCreated(res);
     } catch (err: any) {
@@ -150,7 +150,7 @@ export function CreateCommunityModal({ open, onClose, onCreated }: Props) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
-      <div 
+      <div
         className="bc-app relative w-full max-w-lg overflow-hidden rounded-3xl border border-[var(--bc-mobile-border)] bg-[var(--bc-mobile-surface)] shadow-2xl p-6 text-[var(--bc-mobile-text)] max-h-[90vh] flex flex-col"
         style={{ fontFamily: "'Be Vietnam Pro', system-ui, sans-serif" }}
       >
@@ -335,7 +335,7 @@ export function CreateCommunityModal({ open, onClose, onCreated }: Props) {
               rows={3}
               value={about}
               onChange={(e) => setAbout(e.target.value)}
-              placeholder="Tôn chỉ, mục tiêu kết nối, quyền lợi hội viên..."
+              placeholder="Tôn chỉ, mục tiêu kết nối, quyền lợi Học viên..."
               className="w-full rounded-2xl border border-[var(--bc-mobile-border)] bg-[var(--bc-mobile-surface-2)] px-4 py-2.5 text-sm text-[var(--bc-mobile-text)] placeholder:text-[var(--bc-mobile-muted)]/60 focus:border-[var(--bc-mobile-accent)] focus:outline-none transition-colors resize-none"
             />
           </div>

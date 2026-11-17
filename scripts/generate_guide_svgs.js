@@ -66,7 +66,7 @@ const onehandContent = `
     <!-- Shifted Down Screen Content -->
     <rect x="15" y="146" width="250" height="220" rx="16" fill="#ffffff" />
     <rect x="30" y="160" width="220" height="36" rx="10" fill="#f1f5f9" />
-    <text x="50" y="183" fill="#64748b" font-size="11">🔍 Tìm kiếm hội viên...</text>
+    <text x="50" y="183" fill="#64748b" font-size="11">🔍 Tìm kiếm Học viên...</text>
     <rect x="30" y="208" width="100" height="26" rx="8" fill="#003B95" />
     <text x="80" y="225" fill="#ffffff" font-size="11" font-weight="bold" text-anchor="middle">Hộp thư (12)</text>
     <rect x="138" y="208" width="112" height="26" rx="8" fill="#f1f5f9" />
@@ -109,7 +109,7 @@ const filterSortContent = `
     <rect x="15" y="36" width="250" height="330" rx="20" fill="#ffffff" />
     <!-- Search bar with filter icon -->
     <rect x="25" y="50" width="195" height="36" rx="10" fill="#f1f5f9" />
-    <text x="45" y="73" fill="#64748b" font-size="11">🔍 Tìm kiếm hội viên...</text>
+    <text x="45" y="73" fill="#64748b" font-size="11">🔍 Tìm kiếm Học viên...</text>
     <rect x="226" y="50" width="36" height="36" rx="10" fill="#003B95" />
     <text x="244" y="73" fill="#ffffff" font-size="13" text-anchor="middle">⚙️</text>
     <!-- Filter Popover Simulation -->
@@ -146,12 +146,12 @@ const filterSortContent = `
     <rect x="0" y="0" width="380" height="110" rx="16" fill="#142247" stroke="#253b75" stroke-width="1.5" />
     <text x="24" y="36" fill="#fbbf24" font-size="15" font-weight="bold">1. Sắp Xếp Đa Chiều &amp; Thông Minh</text>
     <text x="24" y="62" fill="#cbd5e1" font-size="12">Tùy chọn sắp xếp linh hoạt theo thời gian cập nhật,</text>
-    <text x="24" y="80" fill="#cbd5e1" font-size="12">theo tên hội viên A → Z hoặc theo số tin chưa đọc.</text>
+    <text x="24" y="80" fill="#cbd5e1" font-size="12">theo tên Học viên A → Z hoặc theo số tin chưa đọc.</text>
 
     <rect x="0" y="130" width="380" height="110" rx="16" fill="#142247" stroke="#253b75" stroke-width="1.5" />
     <text x="24" y="166" fill="#38bdf8" font-size="15" font-weight="bold">2. Lọc Theo Chữ Cái Bắt Đầu (A - Z)</text>
     <text x="24" y="192" fill="#cbd5e1" font-size="12">Bấm chọn nhanh chữ cái đầu (ví dụ: N) để lọc ngay</text>
-    <text x="24" y="210" fill="#cbd5e1" font-size="12">toàn bộ hội viên họ Nguyễn, Nam, Ninh trong 1 chạm.</text>
+    <text x="24" y="210" fill="#cbd5e1" font-size="12">toàn bộ Học viên họ Nguyễn, Nam, Ninh trong 1 chạm.</text>
 
     <rect x="0" y="260" width="380" height="95" rx="16" fill="#142247" stroke="#253b75" stroke-width="1.5" />
     <text x="24" y="296" fill="#4ade80" font-size="15" font-weight="bold">3. Lọc Trực Tuyến &amp; Tệp Đính Kèm</text>
@@ -173,7 +173,7 @@ const documentsContent = `
     <text x="82" y="104" fill="#0f172a" font-size="11" font-weight="bold">Kỷ yếu Đại Hội 2026</text>
     <text x="82" y="118" fill="#64748b" font-size="9">Ban hành: 15/09/2026 • 18.5 MB</text>
     <rect x="82" y="124" width="70" height="14" rx="3" fill="#dbeafe" />
-    <text x="117" y="134" fill="#1e40af" font-size="8" font-weight="bold" text-anchor="middle">Hội viên chính thức</text>
+    <text x="117" y="134" fill="#1e40af" font-size="8" font-weight="bold" text-anchor="middle">Học viên chính thức</text>
 
     <rect x="25" y="150" width="230" height="60" rx="10" fill="#f8fafc" stroke="#e2e8f0" />
     <rect x="35" y="160" width="38" height="40" rx="6" fill="#2563eb" />
@@ -197,7 +197,7 @@ const documentsContent = `
   <g transform="translate(380, 115)">
     <rect x="0" y="0" width="380" height="110" rx="16" fill="#142247" stroke="#253b75" stroke-width="1.5" />
     <text x="24" y="36" fill="#fbbf24" font-size="15" font-weight="bold">1. Mở Khóa Tự Động Sau Check-In</text>
-    <text x="24" y="62" fill="#cbd5e1" font-size="12">Hội viên sau khi quét QR điểm danh sự kiện sẽ được</text>
+    <text x="24" y="62" fill="#cbd5e1" font-size="12">Học viên sau khi quét QR điểm danh sự kiện sẽ được</text>
     <text x="24" y="80" fill="#cbd5e1" font-size="12">tự động mở quyền truy cập slide và tài liệu mật.</text>
 
     <rect x="0" y="130" width="380" height="110" rx="16" fill="#142247" stroke="#253b75" stroke-width="1.5" />
@@ -206,7 +206,7 @@ const documentsContent = `
     <text x="24" y="210" fill="#cbd5e1" font-size="12">hỗ trợ phóng to, thu nhỏ và bảo mật chống sao chép trái phép.</text>
 
     <rect x="0" y="260" width="380" height="95" rx="16" fill="#142247" stroke="#253b75" stroke-width="1.5" />
-    <text x="24" y="296" fill="#4ade80" font-size="15" font-weight="bold">3. Phân Quyền Đa Tầng Theo Cấp Hội Viên</text>
+    <text x="24" y="296" fill="#4ade80" font-size="15" font-weight="bold">3. Phân Quyền Đa Tầng Theo Cấp Học viên</text>
     <text x="24" y="322" fill="#cbd5e1" font-size="12">Tài liệu BCH, Nghị quyết Thường vụ &amp; Tài liệu toàn thể.</text>
   </g>
 `;
@@ -289,7 +289,7 @@ const marketplaceContent = `
   <g transform="translate(380, 115)">
     <rect x="0" y="0" width="380" height="110" rx="16" fill="#142247" stroke="#253b75" stroke-width="1.5" />
     <text x="24" y="36" fill="#fbbf24" font-size="15" font-weight="bold">1. Đăng Tin Chào Mua / Chào Bán Nội Bộ</text>
-    <text x="24" y="62" fill="#cbd5e1" font-size="12">Hội viên cam kết mức chiết khấu ưu đãi tốt hơn thị trường</text>
+    <text x="24" y="62" fill="#cbd5e1" font-size="12">Học viên cam kết mức chiết khấu ưu đãi tốt hơn thị trường</text>
     <text x="24" y="80" fill="#cbd5e1" font-size="12">dành riêng cho các thành viên CLB Doanh Nhân CEO HN10.</text>
 
     <rect x="0" y="130" width="380" height="110" rx="16" fill="#142247" stroke="#253b75" stroke-width="1.5" />
@@ -334,7 +334,7 @@ const votingContent = `
   <g transform="translate(380, 115)">
     <rect x="0" y="0" width="380" height="110" rx="16" fill="#142247" stroke="#253b75" stroke-width="1.5" />
     <text x="24" y="36" fill="#fbbf24" font-size="15" font-weight="bold">1. Bỏ Phiếu Minh Bạch 1-Hội-Viên 1-Phiếu</text>
-    <text x="24" y="62" fill="#cbd5e1" font-size="12">Mỗi hội viên chính thức được cấp 01 quyền bỏ phiếu duy nhất,</text>
+    <text x="24" y="62" fill="#cbd5e1" font-size="12">Mỗi Học viên chính thức được cấp 01 quyền bỏ phiếu duy nhất,</text>
     <text x="24" y="80" fill="#cbd5e1" font-size="12">mã hóa danh tính đảm bảo công bằng và bảo mật tuyệt đối.</text>
 
     <rect x="0" y="130" width="380" height="110" rx="16" fill="#142247" stroke="#253b75" stroke-width="1.5" />

@@ -481,7 +481,7 @@ async function generatePdf() {
       </tr>
       <tr>
         <td><strong>vupv090120@gmail.com</strong></td>
-        <td>Hội viên Doanh nhân (Active)</td>
+        <td>Học viên Doanh nhân (Active)</td>
         <td>CEO HN10 Mobile App</td>
         <td>Đăng ký sự kiện miễn phí & có phí, bày tỏ quan tâm cơ hội B2B, yêu cầu báo giá sản phẩm, xem tài liệu văn phòng, tham gia đào tạo, nhận task & cập nhật tiến độ 75%, gửi báo cáo giải trình, nhắn tin 1-1, hủy kết nối, đổi smart card.</td>
       </tr>
@@ -659,7 +659,7 @@ async function generatePdf() {
 
   <!-- REPORT FOOTER -->
   <div class="report-footer">
-    <div>Hệ thống Công nghệ Hội viên CLB Doanh Nhân CEO HN10 (HanoiBA) • Phát triển bởi ViConnect</div>
+    <div>Hệ thống Công nghệ Học viên CLB Doanh Nhân CEO HN10 (HanoiBA) • Phát triển bởi ViConnect</div>
     <div>Báo cáo kiểm thử tự động trích xuất từ Master Test Suite v2 • Ngày hoàn thành: 07/11/2026</div>
   </div>
 

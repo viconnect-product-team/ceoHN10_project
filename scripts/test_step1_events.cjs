@@ -44,7 +44,7 @@ async function run() {
   console.log("\n--- 3. CREATING PAID EVENT ---");
   const paidEventPayload = {
     name: "Gala Dinner Kết Nối Doanh Nhân CEO HN10 - HanoiBA (Có Phí)",
-    tagline: "Đêm tiệc kết nối giao thương tinh hoa & vinh danh hội viên tiêu biểu",
+    tagline: "Đêm tiệc kết nối giao thương tinh hoa & vinh danh Học viên tiêu biểu",
     date: new Date(Date.now() + 86400000 * 7).toISOString(),
     location: "Trung tâm Hội nghị Quốc gia, Mễ Trì, Nam Từ Liêm, Hà Nội",
     capacity: 150,

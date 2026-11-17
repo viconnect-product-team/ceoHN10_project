@@ -24,7 +24,7 @@ export const Route = createFileRoute("/open-app")({
       {
         name: "description",
         content:
-          "Cài đặt ứng dụng Hội viên CEO HN10 lên thiết bị di động iOS và Android chỉ với 1 chạm, kết nối trực tiếp đến Zalo Official Account chính thức của CLB.",
+          "Cài đặt ứng dụng Học viên CEO HN10 lên thiết bị di động iOS và Android chỉ với 1 chạm, kết nối trực tiếp đến Zalo Official Account chính thức của CLB.",
       },
     ],
   }),
@@ -49,7 +49,7 @@ function OpenAppLauncherPage() {
           window.location.href = ZALO_OA_URL;
         }
       }
-    } catch {}
+    } catch { }
   };
 
   useEffect(() => {
@@ -85,7 +85,7 @@ function OpenAppLauncherPage() {
       const zaloTimer = setTimeout(() => {
         try {
           window.open(ZALO_OA_URL, "_blank");
-        } catch {}
+        } catch { }
       }, 1500);
       return () => clearTimeout(zaloTimer);
     }
@@ -121,7 +121,7 @@ function OpenAppLauncherPage() {
         setTimeout(() => {
           try {
             e.prompt();
-          } catch {}
+          } catch { }
         }, 1200);
       }
     };

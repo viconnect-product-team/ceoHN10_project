@@ -102,7 +102,7 @@ export function CreateConnectionModal({
             setMembersList(filtered);
           }
         })
-        .catch(() => {})
+        .catch(() => { })
         .finally(() => setLoadingMembers(false));
     }
   }, [isOpen, user]);
@@ -117,7 +117,7 @@ export function CreateConnectionModal({
             setOpportunitiesList(items);
           }
         })
-        .catch(() => {})
+        .catch(() => { })
         .finally(() => setLoadingOpps(false));
     }
   }, [isLinkedToOpportunity, opportunitiesList.length]);
@@ -254,7 +254,7 @@ export function CreateConnectionModal({
         const list = stored ? JSON.parse(stored) : [];
         localStorage.setItem("vba_connection_appointments", JSON.stringify([newAppointment, ...list]));
         window.dispatchEvent(new Event("vba.meeting.changed"));
-      } catch {}
+      } catch { }
 
       toast.success("Đã tạo lời mời kết nối B2B thành công!");
       if (onCreated) onCreated(newAppointment);
@@ -334,10 +334,10 @@ export function CreateConnectionModal({
             </div>
           </div>
 
-          {/* 2. NGƯỜI MUỐN KẾT NỐI (CALL API HỘI VIÊN BẠN BÈ) */}
+          {/* 2. NGƯỜI MUỐN KẾT NỐI (CALL API Học viên BẠN BÈ) */}
           <div className="space-y-1.5">
             <label className="font-extrabold text-slate-700 dark:text-slate-200 uppercase tracking-wider text-[11px] flex items-center justify-between">
-              <span>Hội viên muốn kết nối <span className="text-red-500">*</span></span>
+              <span>Học viên muốn kết nối <span className="text-red-500">*</span></span>
               {selectedPartner && (
                 <button
                   type="button"
@@ -385,7 +385,7 @@ export function CreateConnectionModal({
                       setPartnerDropdownOpen(true);
                     }}
                     onFocus={() => setPartnerDropdownOpen(true)}
-                    placeholder="Tìm tên hoặc công ty hội viên..."
+                    placeholder="Tìm tên hoặc công ty Học viên..."
                     className="w-full bg-transparent text-xs text-slate-900 dark:text-white outline-hidden"
                   />
                   {loadingMembers && <Loader2 className="size-3.5 text-amber-500 animate-spin shrink-0" />}
@@ -395,7 +395,7 @@ export function CreateConnectionModal({
                   <div className="absolute top-full left-0 right-0 z-20 mt-1 max-h-48 overflow-y-auto rounded-2xl bg-white dark:bg-[#0B132B] border border-slate-200 dark:border-slate-700 shadow-xl p-1.5 space-y-1">
                     {filteredMembers.length === 0 ? (
                       <p className="p-3 text-center text-slate-400 text-[11px]">
-                        Không tìm thấy hội viên phù hợp
+                        Không tìm thấy Học viên phù hợp
                       </p>
                     ) : (
                       filteredMembers.map((m) => (
@@ -563,22 +563,20 @@ export function CreateConnectionModal({
                 <button
                   type="button"
                   onClick={() => setVenueType("online")}
-                  className={`px-3 py-1 rounded-lg text-xs font-bold transition cursor-pointer ${
-                    venueType === "online"
+                  className={`px-3 py-1 rounded-lg text-xs font-bold transition cursor-pointer ${venueType === "online"
                       ? "bg-[#003B95] text-white shadow-xs"
                       : "text-slate-600 dark:text-slate-400 hover:text-white"
-                  }`}
+                    }`}
                 >
                   Trực tuyến (Online)
                 </button>
                 <button
                   type="button"
                   onClick={() => setVenueType("offline")}
-                  className={`px-3 py-1 rounded-lg text-xs font-bold transition cursor-pointer ${
-                    venueType === "offline"
+                  className={`px-3 py-1 rounded-lg text-xs font-bold transition cursor-pointer ${venueType === "offline"
                       ? "bg-amber-600 text-white shadow-xs"
                       : "text-slate-600 dark:text-slate-400 hover:text-white"
-                  }`}
+                    }`}
                 >
                   Gặp trực tiếp (Offline)
                 </button>

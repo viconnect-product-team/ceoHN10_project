@@ -1114,7 +1114,7 @@ export class ConnectAppService implements OnModuleInit {
 
       for (const conn of missingConns) {
         const cp = cpMap.get(conn.requester_user_id) || {
-          displayName: 'Hội viên CEO HN10',
+          displayName: 'Học viên CEO HN10',
           avatarUrl: null,
           headline: null,
           companyName: null,
@@ -1132,7 +1132,7 @@ export class ConnectAppService implements OnModuleInit {
           appScope: 'ceohn10_app',
           targetApp: 'ceohn10_app',
           safeDisplayData: {
-            counterpartDisplayName: cp.displayName || 'Hội viên CEO HN10',
+            counterpartDisplayName: cp.displayName || 'Học viên CEO HN10',
             avatarUrl: cp.avatarUrl || null,
             jobTitle: cp.headline || null,
             companyName: cp.companyName || null,
@@ -1274,8 +1274,8 @@ export class ConnectAppService implements OnModuleInit {
         const invAmount = inv?.amount
           ? Number(inv.amount).toLocaleString('vi-VN') + ' đ'
           : 'Cần thanh toán';
-        const invTitle = 'Thông báo: Hội phí hội viên quá hạn chưa thanh toán';
-        const invBody = `Hội phí của hội viên ${overdueMember.name || overdueMember.full_name || 'CEO HN10'} (${invAmount}) đã quá hạn thanh toán. Vui lòng hoàn tất đóng phí để tiếp tục duy trì quyền lợi và kết nối B2B trên hệ thống.`;
+        const invTitle = 'Thông báo: Hội phí Học viên quá hạn chưa thanh toán';
+        const invBody = `Hội phí của Học viên ${overdueMember.name || overdueMember.full_name || 'CEO HN10'} (${invAmount}) đã quá hạn thanh toán. Vui lòng hoàn tất đóng phí để tiếp tục duy trì quyền lợi và kết nối B2B trên hệ thống.`;
 
         // Chỉ thêm nếu chưa có thông báo tương đương
         const alreadyHasOverdue = mapped.some(
@@ -1781,7 +1781,7 @@ export class ConnectAppService implements OnModuleInit {
         }
       }
       const counterpartName =
-        safe.counterpartDisplayName || safe.senderName || 'Hội viên CEO HN10';
+        safe.counterpartDisplayName || safe.senderName || 'Học viên CEO HN10';
 
       let title = safe.title || b.title_key || 'Thông báo mới';
       let body = safe.body || safe.message || b.body_key || '';
@@ -1857,7 +1857,7 @@ export class ConnectAppService implements OnModuleInit {
       };
     });
 
-    // Thông báo chào mừng chính thức cho hội viên mới
+    // Thông báo chào mừng chính thức cho Học viên mới
     const welcomeNotification: any = {
       id: `welcome-${userId}`,
       title: 'Chào mừng bạn đến với CLB Doanh Nhân CEO HN10!',

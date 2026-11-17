@@ -67,8 +67,8 @@ export function accountToMember(acc: UserAccountItem): Member {
 }
 
 /**
- * Gộp danh sách hội viên từ DB với toàn bộ tài khoản thuộc các Ban.
- * Khử trùng lặp theo mã hội viên (code) hoặc email; ưu tiên bản ghi DB (id thật để gửi tin qua API),
+ * Gộp danh sách Học viên từ DB với toàn bộ tài khoản thuộc các Ban.
+ * Khử trùng lặp theo mã Học viên (code) hoặc email; ưu tiên bản ghi DB (id thật để gửi tin qua API),
  * nhưng bổ sung Ban/Vai trò từ tài khoản nếu DB còn trống.
  */
 export function mergeMembersWithAccounts(

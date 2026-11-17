@@ -94,7 +94,7 @@ export const ProductEditModal: React.FC<ProductEditModalProps> = ({
     }
     const cleanPrice = Number(editPrice.replace(/\D/g, ""));
     if (!editPrice.trim() || isNaN(cleanPrice) || cleanPrice <= 0) {
-      newErrors.price = isEn ? "Please enter a valid member price (> 0)" : "Vui lòng nhập giá ưu đãi hội viên (> 0 đ)";
+      newErrors.price = isEn ? "Please enter a valid member price (> 0)" : "Vui lòng nhập giá ưu đãi Học viên (> 0 đ)";
     }
     if (!editDesc.trim()) {
       newErrors.desc = isEn ? "Please enter description / specs" : "Vui lòng nhập mô tả / thông số / ưu đãi";
@@ -263,9 +263,8 @@ export const ProductEditModal: React.FC<ProductEditModalProps> = ({
                   if (errors.name) setErrors((prev) => ({ ...prev, name: "" }));
                 }}
                 placeholder="VD: Dịch vụ tư vấn giải pháp AI..."
-                className={`w-full rounded-xl border-0 bg-slate-100 dark:bg-white/[0.06] px-3.5 py-2 text-xs text-slate-900 dark:text-white outline-none transition ${
-                  errors.name ? "ring-2 ring-rose-500" : "ring-0 focus:ring-1 focus:ring-[#003B95]"
-                }`}
+                className={`w-full rounded-xl border-0 bg-slate-100 dark:bg-white/[0.06] px-3.5 py-2 text-xs text-slate-900 dark:text-white outline-none transition ${errors.name ? "ring-2 ring-rose-500" : "ring-0 focus:ring-1 focus:ring-[#003B95]"
+                  }`}
               />
               {errors.name && (
                 <p className="mt-1 text-xs font-semibold text-rose-500 animate-in fade-in duration-150">
@@ -352,7 +351,7 @@ export const ProductEditModal: React.FC<ProductEditModalProps> = ({
               </div>
               <div>
                 <label className="mb-1 block text-xs font-semibold text-slate-700 dark:text-slate-300">
-                  {isEn ? "Member Price" : "Giá ưu đãi hội viên"} <span className="text-rose-500 font-bold">*</span>
+                  {isEn ? "Member Price" : "Giá ưu đãi Học viên"} <span className="text-rose-500 font-bold">*</span>
                 </label>
                 <StandardCurrencyInput
                   value={editPrice}
@@ -362,9 +361,8 @@ export const ProductEditModal: React.FC<ProductEditModalProps> = ({
                   }}
                   placeholder="VD: 35.000.000"
                   unit="đ"
-                  className={`w-full rounded-xl border-0 bg-slate-100 dark:bg-white/[0.06] px-3.5 py-2 text-xs text-slate-900 dark:text-white outline-none transition ${
-                    errors.price ? "ring-2 ring-rose-500" : "ring-0 focus:ring-1 focus:ring-[#003B95]"
-                  }`}
+                  className={`w-full rounded-xl border-0 bg-slate-100 dark:bg-white/[0.06] px-3.5 py-2 text-xs text-slate-900 dark:text-white outline-none transition ${errors.price ? "ring-2 ring-rose-500" : "ring-0 focus:ring-1 focus:ring-[#003B95]"
+                    }`}
                 />
                 {errors.price && (
                   <p className="mt-1 text-xs font-semibold text-rose-500 animate-in fade-in duration-150">
@@ -385,10 +383,9 @@ export const ProductEditModal: React.FC<ProductEditModalProps> = ({
                   setEditDesc(e.target.value);
                   if (errors.desc) setErrors((prev) => ({ ...prev, desc: "" }));
                 }}
-                placeholder="Giới thiệu điểm nổi bật, chính sách bảo hành, hỗ trợ hội viên..."
-                className={`w-full rounded-xl border-0 bg-slate-100 dark:bg-white/[0.06] p-3 text-xs text-slate-900 dark:text-white outline-none resize-none transition ${
-                  errors.desc ? "ring-2 ring-rose-500" : "ring-0 focus:ring-1 focus:ring-[#003B95]"
-                }`}
+                placeholder="Giới thiệu điểm nổi bật, chính sách bảo hành, hỗ trợ Học viên..."
+                className={`w-full rounded-xl border-0 bg-slate-100 dark:bg-white/[0.06] p-3 text-xs text-slate-900 dark:text-white outline-none resize-none transition ${errors.desc ? "ring-2 ring-rose-500" : "ring-0 focus:ring-1 focus:ring-[#003B95]"
+                  }`}
               />
               {errors.desc && (
                 <p className="mt-1 text-xs font-semibold text-rose-500 animate-in fade-in duration-150">

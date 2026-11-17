@@ -86,7 +86,7 @@ function PresentQrPage() {
                 {t("bc.mobile.presentQr.personaLabel")}
               </p>
               <p className="mt-1 text-[19px] font-semibold text-[var(--bc-mobile-text)]">
-                {identity.displayName || "Hội viên CEO HN10"}
+                {identity.displayName || "Học viên CEO HN10"}
               </p>
               {(identity.jobTitle || identity.headline || identity.companyName) && (
                 <p className="text-[14px] text-[var(--bc-mobile-muted)]">
@@ -146,11 +146,10 @@ function PresentQrPage() {
                       role="radio"
                       aria-checked={c.id === selectedId}
                       onClick={() => setSelectedId(c.id)}
-                      className={`inline-flex min-h-[44px] shrink-0 items-center gap-1.5 rounded-full border px-4 text-[14px] font-medium transition-colors ${
-                        c.id === selectedId
+                      className={`inline-flex min-h-[44px] shrink-0 items-center gap-1.5 rounded-full border px-4 text-[14px] font-medium transition-colors ${c.id === selectedId
                           ? "border-[var(--bc-mobile-accent)] bg-[var(--bc-mobile-accent-soft)] text-[var(--bc-mobile-text)]"
                           : "border-[var(--bc-mobile-border)] text-[var(--bc-mobile-muted)]"
-                      }`}
+                        }`}
                     >
                       {c.cardKind === "primary" && (
                         <Star className="size-3.5 text-[var(--bc-mobile-accent)]" />

@@ -1,6 +1,6 @@
 // Module sinh nội dung BRD Tổng thể hệ thống CLB Doanh Nhân CEO HN10
 function getMasterBrdMarkdown() {
-  return `# TÀI LIỆU YÊU CẦU NGHIỆP VỤ TỔNG THỂ HỆ SINH THÁI (MASTER BRD)
+   return `# TÀI LIỆU YÊU CẦU NGHIỆP VỤ TỔNG THỂ HỆ SINH THÁI (MASTER BRD)
 ## CLB DOANH NHÂN CEO HN10 (HANOIBA)
 *Phiên bản: 5.0 Hoàn thiện - Phát hành: Tháng 10/2026 - Ngôn ngữ: Văn phong Quản trị Doanh nghiệp chuẩn mực*
 
@@ -11,7 +11,7 @@ Hệ sinh thái số toàn diện **CLB Doanh Nhân CEO HN10** là nền tảng 
 
 Hệ sinh thái là sự hội tụ tinh hoa của hai công cụ cốt lõi:
 1. **Cổng Quản trị CRM Hiệp hội (Web CRM)**: Bộ não điều hành của Ban Chấp Hành.
-2. **Ứng dụng Di động Doanh nhân (Mobile App)**: Tấm Danh Thiếp Số Quyền Năng và Văn Phòng Bỏ Túi của toàn thể hội viên.
+2. **Ứng dụng Di động Doanh nhân (Mobile App)**: Tấm Danh Thiếp Số Quyền Năng và Văn Phòng Bỏ Túi của toàn thể Học viên.
 
 ---
 
@@ -28,15 +28,15 @@ Hệ sinh thái là sự hội tụ tinh hoa của hai công cụ cốt lõi:
 
 # CHƯƠNG 2: MÔ HÌNH VẬN HÀNH ĐỒNG BỘ 2 CHIỀU (CLOSED-LOOP OPERATIONS)
 Mọi quy trình nghiệp vụ trong hệ sinh thái đều vận hành theo chu trình khép kín:
-1. **Chỉ đạo & Giao việc**: Ban Điều Hành ban hành nhiệm vụ trên Web CRM -> Điện thoại hội viên đổ chuông báo việc mới -> Hội viên nộp kết quả nghiệm thu bằng ảnh hiện trường -> Ban Điều Hành bấm nghiệm thu ngay trên Web CRM hoặc Mobile App.
-2. **Hội phí & Tài chính**: Hệ thống tự động phát hành thông báo hội phí niên liễm -> Hội viên quét mã VietQR Napas 24/7 trên điện thoại -> Tiền vào tài khoản hiệp hội -> Web CRM tự động xác nhận số dư trong 10 giây và cấp thẻ thành viên điện tử mới.
-3. **Sự kiện & Khán phòng**: Ban tổ chức thiết lập sự kiện và phân bổ bàn tiệc VIP trên Web CRM -> Hội viên nhận vé mời điện tử trong Ví vé -> Đến hội trường quét mã QR 0.1 giây tại cửa lễ tân -> Màn hình lễ tân đổi màu chào đón và hướng dẫn số bàn tiệc.
-4. **Giao thương B2B**: Doanh nghiệp đăng tải sản phẩm ưu đãi -> Ban Xúc tiến thương mại kiểm duyệt -> Toàn thể hội viên nhận thông báo và đặt lịch hẹn kết nối 1-on-1.
+1. **Chỉ đạo & Giao việc**: Ban Điều Hành ban hành nhiệm vụ trên Web CRM -> Điện thoại Học viên đổ chuông báo việc mới -> Học viên nộp kết quả nghiệm thu bằng ảnh hiện trường -> Ban Điều Hành bấm nghiệm thu ngay trên Web CRM hoặc Mobile App.
+2. **Hội phí & Tài chính**: Hệ thống tự động phát hành thông báo hội phí niên liễm -> Học viên quét mã VietQR Napas 24/7 trên điện thoại -> Tiền vào tài khoản hiệp hội -> Web CRM tự động xác nhận số dư trong 10 giây và cấp thẻ thành viên điện tử mới.
+3. **Sự kiện & Khán phòng**: Ban tổ chức thiết lập sự kiện và phân bổ bàn tiệc VIP trên Web CRM -> Học viên nhận vé mời điện tử trong Ví vé -> Đến hội trường quét mã QR 0.1 giây tại cửa lễ tân -> Màn hình lễ tân đổi màu chào đón và hướng dẫn số bàn tiệc.
+4. **Giao thương B2B**: Doanh nghiệp đăng tải sản phẩm ưu đãi -> Ban Xúc tiến thương mại kiểm duyệt -> Toàn thể Học viên nhận thông báo và đặt lịch hẹn kết nối 1-on-1.
 
 ---
 
 # CHƯƠNG 3: BỘ CHỈ SỐ QUẢN TRỊ HIỆU QUẢ CỐT LÕI (KPIs)
-- **Tỷ lệ số hóa hội viên**: 100% hồ sơ hội viên và doanh nghiệp được lưu trữ tập trung.
+- **Tỷ lệ số hóa Học viên**: 100% hồ sơ Học viên và doanh nghiệp được lưu trữ tập trung.
 - **Tốc độ thu hội phí**: Giảm 95% thời gian đối soát công nợ niên liễm.
 - **Tỷ lệ tham dự sự kiện**: Tăng 40% số lượng đại biểu tham dự nhờ tính năng nhắc lịch tự động và vé mời VIP.
 - **Giá trị giao thương nội bộ**: Mục tiêu khớp nối thành công tối thiểu 100 tỷ VNĐ giá trị hợp đồng giao thương giữa các doanh nghiệp thành viên mỗi năm.
@@ -56,5 +56,5 @@ Mọi quy trình nghiệp vụ trong hệ sinh thái đều vận hành theo chu
 }
 
 module.exports = {
-  getMasterBrdMarkdown,
+   getMasterBrdMarkdown,
 };

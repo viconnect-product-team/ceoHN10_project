@@ -77,7 +77,7 @@ export function TapToConnectSheet({ onClose }: { onClose: () => void }) {
       setLoadingShareLink(true);
       getOrCreateShareLinkDirect()
         .then((sl) => setShareLink(sl))
-        .catch(() => {})
+        .catch(() => { })
         .finally(() => setLoadingShareLink(false));
     }
   }, [mode, shareLink, loadingShareLink]);
@@ -122,7 +122,7 @@ export function TapToConnectSheet({ onClose }: { onClose: () => void }) {
       setResolvedResult(result);
       if (!result.ok) {
         if (result.reason === "not_found") {
-          setError("Không tìm thấy hội viên hoặc mã QR đã hết hạn.");
+          setError("Không tìm thấy Học viên hoặc mã QR đã hết hạn.");
         } else if (result.reason === "self") {
           setError("Đây là mã QR của chính bạn.");
         }
@@ -148,7 +148,7 @@ export function TapToConnectSheet({ onClose }: { onClose: () => void }) {
       setRequestSent(true);
       reportIdentityMetric("PUBLIC_CARD_CONNECT_SENT");
       toast.success("✓ Đã gửi yêu cầu kết nối thành công!", {
-        description: `Thông báo đã được gửi tới ${result.profile?.displayName || "hội viên"}.`,
+        description: `Thông báo đã được gửi tới ${result.profile?.displayName || "Học viên"}.`,
       });
     } catch {
       setError("Không thể gửi yêu cầu kết nối. Vui lòng thử lại.");
@@ -206,7 +206,7 @@ export function TapToConnectSheet({ onClose }: { onClose: () => void }) {
 
   return (
     <MeSheet
-      title={resolvedResult?.ok ? "Thông tin Hội viên" : t("bc.mobile.tapConnect.title")}
+      title={resolvedResult?.ok ? "Thông tin Học viên" : t("bc.mobile.tapConnect.title")}
       subtitle={
         resolvedResult?.ok ? "Xác nhận kết nối danh thiếp" : t("bc.mobile.tapConnect.subtitle")
       }
@@ -221,7 +221,7 @@ export function TapToConnectSheet({ onClose }: { onClose: () => void }) {
               strokeWidth={2}
             />
             <p className="text-[15px] font-semibold text-[var(--bc-mobile-text)]">
-              Đang tìm kiếm thông tin hội viên…
+              Đang tìm kiếm thông tin Học viên…
             </p>
             <p className="text-[12.5px] text-[var(--bc-mobile-muted)]">
               Nhận diện mã QR và kiểm tra trạng thái kết nối
@@ -248,11 +248,10 @@ export function TapToConnectSheet({ onClose }: { onClose: () => void }) {
                   setMode("qr");
                   setError(null);
                 }}
-                className={`flex items-center justify-center gap-1 sm:gap-1.5 py-2 px-1 rounded-xl text-[11px] xs:text-[12px] sm:text-[13px] font-bold transition-all cursor-pointer select-none ${
-                  mode === "qr"
+                className={`flex items-center justify-center gap-1 sm:gap-1.5 py-2 px-1 rounded-xl text-[11px] xs:text-[12px] sm:text-[13px] font-bold transition-all cursor-pointer select-none ${mode === "qr"
                     ? "bg-[var(--bc-mobile-accent)] text-[#0b0c10] shadow-md"
                     : "text-[var(--bc-mobile-muted)] hover:text-[var(--bc-mobile-text)]"
-                }`}
+                  }`}
               >
                 <Camera className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0" />
                 <span className="truncate">Quét QR</span>
@@ -263,11 +262,10 @@ export function TapToConnectSheet({ onClose }: { onClose: () => void }) {
                   setMode("myQr");
                   setError(null);
                 }}
-                className={`flex items-center justify-center gap-1 sm:gap-1.5 py-2 px-1 rounded-xl text-[11px] xs:text-[12px] sm:text-[13px] font-bold transition-all cursor-pointer select-none ${
-                  mode === "myQr"
+                className={`flex items-center justify-center gap-1 sm:gap-1.5 py-2 px-1 rounded-xl text-[11px] xs:text-[12px] sm:text-[13px] font-bold transition-all cursor-pointer select-none ${mode === "myQr"
                     ? "bg-[var(--bc-mobile-accent)] text-[#0b0c10] shadow-md"
                     : "text-[var(--bc-mobile-muted)] hover:text-[var(--bc-mobile-text)]"
-                }`}
+                  }`}
               >
                 <QrCode className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0" />
                 <span className="truncate">QR của tôi</span>
@@ -278,11 +276,10 @@ export function TapToConnectSheet({ onClose }: { onClose: () => void }) {
                   setMode("nfc");
                   setError(null);
                 }}
-                className={`flex items-center justify-center gap-1 sm:gap-1.5 py-2 px-1 rounded-xl text-[11px] xs:text-[12px] sm:text-[13px] font-bold transition-all cursor-pointer select-none ${
-                  mode === "nfc"
+                className={`flex items-center justify-center gap-1 sm:gap-1.5 py-2 px-1 rounded-xl text-[11px] xs:text-[12px] sm:text-[13px] font-bold transition-all cursor-pointer select-none ${mode === "nfc"
                     ? "bg-[var(--bc-mobile-accent)] text-[#0b0c10] shadow-md"
                     : "text-[var(--bc-mobile-muted)] hover:text-[var(--bc-mobile-text)]"
-                }`}
+                  }`}
               >
                 <Nfc className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0" />
                 <span className="truncate">Thẻ NFC</span>
@@ -307,11 +304,10 @@ export function TapToConnectSheet({ onClose }: { onClose: () => void }) {
                       type="button"
                       onClick={() => setTorch((v) => !v)}
                       aria-label="Bật/Tắt đèn pin"
-                      className={`flex h-10 w-10 items-center justify-center rounded-full backdrop-blur-md transition-all cursor-pointer shadow-lg ${
-                        torch
+                      className={`flex h-10 w-10 items-center justify-center rounded-full backdrop-blur-md transition-all cursor-pointer shadow-lg ${torch
                           ? "bg-[var(--bc-mobile-accent)] text-[#0b0c10] ring-2 ring-[var(--bc-mobile-accent)]/50"
                           : "bg-black/60 text-white hover:bg-black/80"
-                      }`}
+                        }`}
                     >
                       {torch ? (
                         <Zap className="h-4.5 w-4.5 fill-current" />
@@ -392,7 +388,7 @@ export function TapToConnectSheet({ onClose }: { onClose: () => void }) {
                           </p>
                           <p className="mt-1 text-[12.5px] text-[var(--bc-mobile-muted)] leading-relaxed">
                             Bấm nút bên dưới để mở trực tiếp máy ảnh điện thoại, chụp quét mã QR và
-                            tự động kết nối hội viên.
+                            tự động kết nối Học viên.
                           </p>
                         </div>
 
@@ -457,7 +453,7 @@ export function TapToConnectSheet({ onClose }: { onClose: () => void }) {
                     )}
                   </div>
                   <h3 className="text-[17px] font-bold text-[var(--bc-mobile-text)]">
-                    {identity?.displayName || "Hội viên CEO HN10"}
+                    {identity?.displayName || "Học viên CEO HN10"}
                   </h3>
                   {(identity?.jobTitle || identity?.headline || identity?.companyName) && (
                     <p className="mt-0.5 text-[12.5px] text-[var(--bc-mobile-muted)]">
@@ -718,7 +714,7 @@ function ZaloProfilePreview({
 
           {/* Full Name with gold gradient accent */}
           <h2 className="text-[21px] font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-white via-[#F6E1C3] to-[#D8B282]">
-            {profile?.displayName ?? "Hội viên CEO HN10"}
+            {profile?.displayName ?? "Học viên CEO HN10"}
           </h2>
 
           {/* Company & Title */}
@@ -731,7 +727,7 @@ function ZaloProfilePreview({
           {/* Verified C-Level Badge */}
           <div className="mt-1.5 flex items-center justify-center gap-1.5 text-[11px] font-bold text-amber-300">
             <ShieldCheck className="h-3.5 w-3.5 text-amber-400 fill-amber-400/20" />
-            <span>{profile?.verifiedBadge || "Hội viên Doanh nhân C-Level đã xác thực"}</span>
+            <span>{profile?.verifiedBadge || "Học viên Doanh nhân C-Level đã xác thực"}</span>
           </div>
 
           {/* Bio Headline */}
@@ -776,7 +772,7 @@ function ZaloProfilePreview({
             ) : isIncomingPending ? (
               <span className="flex items-center gap-1.5 text-amber-400 font-bold">
                 <UserPlus className="h-3.5 w-3.5" />
-                <span>Hội viên này đã gửi lời mời cho bạn</span>
+                <span>Học viên này đã gửi lời mời cho bạn</span>
               </span>
             ) : isSelf ? (
               <span className="text-[var(--bc-mobile-muted)]">Mã QR của chính bạn</span>
@@ -864,7 +860,7 @@ function ZaloProfilePreview({
             const vcard = [
               "BEGIN:VCARD",
               "VERSION:3.0",
-              `FN:${profile.displayName || "Hội viên CEO HN10"}`,
+              `FN:${profile.displayName || "Học viên CEO HN10"}`,
               profile.jobTitle ? `TITLE:${profile.jobTitle}` : "",
               profile.companyName ? `ORG:${profile.companyName}` : "",
               profile.primaryPhone ? `TEL;TYPE=CELL:${profile.primaryPhone}` : "",

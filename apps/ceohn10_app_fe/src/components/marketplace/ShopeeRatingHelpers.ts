@@ -26,12 +26,12 @@ const DEFAULT_REVIEWS_SEED: ProductReviewItem[] = [
     productId: "seed-prod-1",
     companyName: "Công ty Cổ phần Giải Pháp Số VBC",
     userName: "Đặng Quang Huy",
-    userRole: "CEO - TechVina Group (Hội viên VIP)",
+    userRole: "CEO - TechVina Group (Học viên VIP)",
     userAvatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
     rating: 5,
     createdAt: "2 ngày trước",
     productVariant: "Gói Triển Khai Doanh Nghiệp 1 Năm",
-    comment: "Sản phẩm giải pháp rất chuyên nghiệp, đội ngũ kỹ thuật hỗ trợ tận tình và bàn giao đúng tiến độ. Đặc biệt chính sách ưu đãi dành riêng cho hội viên CEO HN10 cực kỳ tốt. Rất hài lòng và sẽ hợp tác lâu dài!",
+    comment: "Sản phẩm giải pháp rất chuyên nghiệp, đội ngũ kỹ thuật hỗ trợ tận tình và bàn giao đúng tiến độ. Đặc biệt chính sách ưu đãi dành riêng cho Học viên CEO HN10 cực kỳ tốt. Rất hài lòng và sẽ hợp tác lâu dài!",
     images: [
       "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&auto=format&fit=crop&q=80",
       "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&auto=format&fit=crop&q=80"
@@ -84,7 +84,7 @@ const DEFAULT_REVIEWS_SEED: ProductReviewItem[] = [
     productVariant: "Dịch vụ xúc tiến thương mại",
     comment: "Sản phẩm dùng tốt, hiệu quả thấy rõ sau 2 tuần ứng dụng. Chỉ có điều đợt cao điểm liên hệ qua tổng đài hơi bận chút, nhưng có hỗ trợ bù rất thỏa đáng.",
     sellerReply: {
-      replyText: "Dạ bên em xin ghi nhận ý kiến quý báu từ Chị Yến và đã nâng cấp thêm đường dây nóng ưu tiên riêng cho anh chị hội viên CEO HN10 rồi ạ. Em cảm ơn Chị nhiều!",
+      replyText: "Dạ bên em xin ghi nhận ý kiến quý báu từ Chị Yến và đã nâng cấp thêm đường dây nóng ưu tiên riêng cho anh chị Học viên CEO HN10 rồi ạ. Em cảm ơn Chị nhiều!",
       repliedAt: "2 tuần trước"
     },
     likesCount: 6
@@ -101,7 +101,7 @@ export function getStoredReviews(): ProductReviewItem[] {
       const parsed = JSON.parse(raw);
       if (Array.isArray(parsed) && parsed.length > 0) return parsed;
     }
-  } catch {}
+  } catch { }
   return DEFAULT_REVIEWS_SEED;
 }
 
@@ -117,7 +117,7 @@ export function saveReview(newRev: Omit<ProductReviewItem, "id" | "createdAt">):
   if (typeof window !== "undefined") {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-    } catch {}
+    } catch { }
   }
   return item;
 }

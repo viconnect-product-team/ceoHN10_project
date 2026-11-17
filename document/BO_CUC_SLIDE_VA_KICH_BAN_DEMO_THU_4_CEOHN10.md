@@ -22,7 +22,7 @@
   - [Chặng 1: Khởi động, Giới thiệu hai bên & Ấn định thời gian (09:00 - 09:10)](#chặng-1-khởi-động-giới-thiệu-hai-bên--ấn-định-thời-gian-0900---0910)
   - [Chặng 2: Trình bày sản phẩm & Thứ tự thao tác Live Demo Song Song (09:10 - 09:45)](#chặng-2-trình-bày-sản-phẩm--thứ-tự-thao-tác-live-demo-song-song-0910---0945)
     - [Quy trình 1: Đăng ký, Đăng nhập & Thẩm định tài khoản](#quy-trình-1-đăng-ký-đăng-nhập--thẩm-định-tài-khoản)
-    - [Quy trình 2: Quản trị Hội viên, Thẻ Doanh Nhân Số số & Danh thiếp thông minh QR vCard](#quy-trình-2-quản-trị-hội-viên-thẻ-vip-số--danh-thiếp-thông-minh-qr-vcard)
+    - [Quy trình 2: Quản trị Học viên, Thẻ Doanh Nhân Số số & Danh thiếp thông minh QR vCard](#quy-trình-2-quản-trị-hội-viên-thẻ-vip-số--danh-thiếp-thông-minh-qr-vcard)
     - [Quy trình 3: Quản lý Sự kiện, Đăng ký vé điện tử E-Ticket & Soát vé Check-in 1 giây](#quy-trình-3-quản-lý-sự-kiện-đăng-ký-vé-điện-tử-e-ticket--soát-vé-check-in-1-giây)
     - [Quy trình 4: Gian hàng Sản phẩm Marketplace B2B & Gói tài trợ doanh nghiệp](#quy-trình-4-gian-hàng-sản-phẩm-marketplace-b2b--gói-tài-trợ-doanh-nghiệp)
     - [Quy trình 5: Cơ hội kinh doanh & Ghép nối Deal Cung - Cầu thời gian thực](#quy-trình-5-cơ-hội-kinh-doanh--ghép-nối-deal-cung---cầu-thời-gian-thực)
@@ -67,7 +67,7 @@
 ### Slide 3: 2.1 Mở Đầu Bài Trình Bày Sản Phẩm
 - **Tiêu đề:** *"Hôm nay em sẽ trình bày với anh chị..."*
 - **Tầm nhìn:** Chuyển đổi toàn diện từ phương thức vận hành thủ công sang Hệ sinh thái số kép:
-  - **Dành cho Hội viên:** Mobile App sang trọng, đẳng cấp, tiện lợi trên từng đầu ngón tay.
+  - **Dành cho Học viên:** Mobile App sang trọng, đẳng cấp, tiện lợi trên từng đầu ngón tay.
   - **Dành cho Ban Điều Hành:** Web CRM Quản trị tháp chỉ huy tập trung, bảo mật, minh bạch 100%.
 - **Cam kết kỹ thuật:** 100% dữ liệu thật từ cơ sở dữ liệu PostgreSQL, không có dữ liệu ảo, phục vụ thực chiến giao thương.
 
@@ -81,27 +81,27 @@
 
 ### Slide 5: Tổng Quan Kiến Trúc Song Song (Mobile App vs Web CRM)
 - **Sơ đồ đối sánh 2 luồng trải nghiệm đồng bộ thời gian thực:**
-  - **Phía Hội Viên (Mobile App):** Đăng ký nhanh -> Kích hoạt Thẻ Doanh Nhân Số & QR vCard -> Đăng ký Vé sự kiện -> Đăng bán Sản phẩm -> Đăng Deal Cung/Cầu -> Đặt lịch hẹn 1-on-1.
+  - **Phía Học viên (Mobile App):** Đăng ký nhanh -> Kích hoạt Thẻ Doanh Nhân Số & QR vCard -> Đăng ký Vé sự kiện -> Đăng bán Sản phẩm -> Đăng Deal Cung/Cầu -> Đặt lịch hẹn 1-on-1.
   - **Phía Ban Điều Hành (Web CRM):** Duyệt hồ sơ & Phân ban -> Cấp mã HN10 tự động -> Cấu hình Sự kiện & Soát vé QR 1 giây -> Duyệt Gian hàng & Tài trợ -> Đo lường Giá trị Deal -> Quản trị Phân quyền RBAC 6 Ban.
 
-### Slide 6: Song Song 1 - Đăng Ký, Đăng Nhập & Quy Trình Thẩm Định Hội Viên
+### Slide 6: Song Song 1 - Đăng Ký, Đăng Nhập & Quy Trình Thẩm Định Học viên
 - **Nửa trái (Mobile App):**
   - Màn hình đăng ký thành viên mới với trường tự động định dạng ngày sinh DD/MM/YYYY chuẩn bàn phím điện thoại.
   - Đăng nhập bảo mật đa tầng, tự động kích hoạt đổi mật khẩu lần đầu với nút ẩn/hiện mật khẩu.
 - **Nửa phải (Web CRM):**
   - Màn hình duyệt đơn đăng ký tại `/accounts` và `/members`.
   - Ban Thành Viên kiểm tra thông tin, duyệt kết nạp, hệ thống tự sinh mã định danh duy nhất (HN10-xxx).
-  - Tự động kích hoạt tài khoản và gửi email thông báo kèm mã QR đăng nhập cho hội viên.
+  - Tự động kích hoạt tài khoản và gửi email thông báo kèm mã QR đăng nhập cho Học viên.
 
-### Slide 7: Song Song 2 - Quản Trị Hội Viên: Thẻ Doanh Nhân Số & QR vCard vs Quản Lý Danh Bạ 11 Ngành
+### Slide 7: Song Song 2 - Quản Trị Học viên: Thẻ Doanh Nhân Số & QR vCard vs Quản Lý Danh Bạ 11 Ngành
 - **Nửa trái (Mobile App):**
-  - **Thẻ Hội Viên Điện Tử Thông Minh:** Nền Obsidian/Cobalt Navy sang trọng, mã số HN10, mã QR cá nhân, hợp đồng hội viên.
+  - **Thẻ Học viên Điện Tử Thông Minh:** Nền Obsidian/Cobalt Navy sang trọng, mã số HN10, mã QR cá nhân, hợp đồng Học viên.
   - **Danh thiếp thông minh QR vCard:** Khách quét bằng camera thường lưu thẳng danh bạ điện thoại không cần cài app.
   - **Company Profile 2 trang:** Nền trắng thanh lịch, 2 khối ảnh hình học độc đáo, giới thiệu 8 trường năng lực cốt lõi.
 - **Nửa phải (Web CRM):**
   - Bảng quản trị danh bạ hơn 500 CEO theo 11 ngành nghề kinh doanh.
   - Bộ lọc thông minh theo Ban Chuyên Môn, xuất file Excel danh bạ chuẩn hóa chỉ bằng 1 click.
-  - Quản lý đồng bộ logo công ty, ảnh chân dung và trạng thái kích hoạt thẻ hội viên.
+  - Quản lý đồng bộ logo công ty, ảnh chân dung và trạng thái kích hoạt thẻ Học viên.
 
 ### Slide 8: Song Song 3 - Quản Lý Sự Kiện: Vé E-Ticket vs Thiết Lập Sự Kiện & Soát Vé 1 Giây
 - **Nửa trái (Mobile App):**
@@ -119,7 +119,7 @@
   - Danh mục động theo thời gian thực: Tự động trích xuất phân loại sản phẩm mới từ CSDL.
   - Chi tiết sản phẩm chuẩn nhận diện Deep Cobalt Navy (triệt tiêu màu cam Shopee), đánh giá review thực lưu PostgreSQL, nút nhắn tin/gọi điện trực tiếp tới CEO chủ hàng.
 - **Nửa phải (Web CRM):**
-  - Quản lý kiểm duyệt sản phẩm đăng tải của hội viên.
+  - Quản lý kiểm duyệt sản phẩm đăng tải của Học viên.
   - Quản trị các gói tài trợ thương hiệu (Kim Cương, Vàng, Bạc) tải 100% từ bảng `sponsor_packages`.
   - Phân tích hiệu quả hiển thị và số lượt click quan tâm của từng sản phẩm.
 
@@ -151,7 +151,7 @@
   4. Hoàn ứng tiền thừa & Tự động kết xuất Sổ Quỹ Tiền Mặt và Tiền Gửi Ngân Hàng chuẩn mẫu S07-DN / S03a-DNN theo Thông tư 200/2014/TT-BTC nộp HanoiBA.
 
 ### Slide 13: Tháp Chỉ Huy Executive Dashboard 360 Độ & Ma Trận Phân Quyền 6 Ban
-- **Executive Dashboard:** Bảng điều hành tổng quan dành cho Chủ tịch và Tổng thư ký (Hội viên, Sự kiện, Dòng tiền, Giao thương).
+- **Executive Dashboard:** Bảng điều hành tổng quan dành cho Chủ tịch và Tổng thư ký (Học viên, Sự kiện, Dòng tiền, Giao thương).
 - **Hệ thống Phân quyền 3 Phân hệ chuẩn hóa:**
   - Phân hệ 1: Ma trận phân quyền vai trò hệ thống (`RbacPermissionMatrix`).
   - Phân hệ 2: Phân quyền mặc định theo 6 Ban chuyên môn (`CommitteesPermissionManager`).
@@ -197,8 +197,8 @@
   - Ngày 1 - 2: Xử lý các điểm chỉnh sửa P0/P1.
   - Ngày 3 - 4: Đóng gói bản cài đặt APK (Android) và TestFlight (iOS); Kiểm thử bảo mật.
   - Ngày 5: Đào tạo chuyển giao quản trị Web CRM cho Ban Thư ký & Kế toán.
-  - Ngày 6: Phát động kích hoạt Thẻ hội viên số cho 100+ CEO tiên phong.
-  - Ngày 7: **CHÍNH THỨC CÔNG BỐ GO-LIVE TẠI KỲ SINH HOẠT HỘI VIÊN CLB.**
+  - Ngày 6: Phát động kích hoạt Thẻ Học viên số cho 100+ CEO tiên phong.
+  - Ngày 7: **CHÍNH THỨC CÔNG BỐ GO-LIVE TẠI KỲ SINH HOẠT Học viên CLB.**
 
 ---
 
@@ -255,13 +255,13 @@
 
 *“Kính thưa các anh chị, quay trở lại thời điểm ban đầu khi chúng em nhận bài toán từ Ban Thường Trực CLB, các anh chị đã chia sẻ rất thẳng thắn 3 bài toán lớn và đặt ra 3 yêu cầu cốt lõi:*
 
-1. **Yêu cầu thứ nhất về Quản trị thành viên:** Hơn 500 hồ sơ doanh nghiệp nhưng dữ liệu phân tán rải rác trên các file Excel cá nhân và danh sách Zalo; mỗi lần thẩm định kết nạp rất thủ công; hội viên chưa có thẻ định danh số sang trọng và danh thiếp thông minh để khẳng định thương hiệu cá nhân.
+1. **Yêu cầu thứ nhất về Quản trị thành viên:** Hơn 500 hồ sơ doanh nghiệp nhưng dữ liệu phân tán rải rác trên các file Excel cá nhân và danh sách Zalo; mỗi lần thẩm định kết nạp rất thủ công; Học viên chưa có thẻ định danh số sang trọng và danh thiếp thông minh để khẳng định thương hiệu cá nhân.
 2. **Yêu cầu thứ hai về Quản lý sự kiện:** CLB thường xuyên tổ chức các kỳ Gala, diễn đàn kinh tế hàng trăm khách; việc soát vé điểm danh bằng giấy tốn nhiều nhân sự, dễ ùn tắc cửa đón tiếp và rất khó kiểm soát chỗ ngồi của đại biểu VIP.
 3. **Yêu cầu thứ ba về Xúc tiến thương mại (Cơ hội, Marketplace):** Bài đăng mua bán, giới thiệu dịch vụ trôi rất nhanh trên nhóm chat; thiếu một sàn giao thương B2B nội bộ tập trung, thiếu bộ lọc chuẩn và Ban Điều Hành không đo lường được giá trị các thương vụ hợp tác thực tế.
 
 *Sau khi dựa trên chính các yêu cầu của anh chị, cùng với những giải pháp nền tảng của ViOne nói riêng và ViConnect nói chung đang có và không ngừng hoàn thiện, chúng em đã tạo nên giải pháp kép: **Hệ thống Web CRM Quản trị tháp chỉ huy** và **Ứng dụng Mobile App CEO HN10**.*
 
-*Sau đây, em sẽ trình bày theo đúng **quy trình sử dụng và chức năng thực tế**: từ đăng ký, đăng nhập đến các thao tác liên quan tới Hội viên, Sự kiện, Sản phẩm, Cơ hội và Kết nối. Em sẽ chia thành 2 phần riêng biệt và **trình bày song song giữa Mobile App của hội viên và Hệ thống Quản trị Web CRM của Ban Điều Hành** để các anh chị quan sát toàn bộ luồng tương tác hai chiều diễn ra như thế nào!”*
+*Sau đây, em sẽ trình bày theo đúng **quy trình sử dụng và chức năng thực tế**: từ đăng ký, đăng nhập đến các thao tác liên quan tới Học viên, Sự kiện, Sản phẩm, Cơ hội và Kết nối. Em sẽ chia thành 2 phần riêng biệt và **trình bày song song giữa Mobile App của Học viên và Hệ thống Quản trị Web CRM của Ban Điều Hành** để các anh chị quan sát toàn bộ luồng tương tác hai chiều diễn ra như thế nào!”*
 
 ---
 
@@ -269,7 +269,7 @@
 
 ```
 [BỐ TRÍ MÀN CHIẾU DEMO]
-- Màn hình bên trái (hoặc nửa trái): Chiếu màn hình Điện thoại thật (Mobile App Hội viên)
+- Màn hình bên trái (hoặc nửa trái): Chiếu màn hình Điện thoại thật (Mobile App Học viên)
 - Màn hình bên phải (hoặc nửa phải): Chiếu màn hình Máy tính Laptop (Web CRM Admin)
 ```
 
@@ -279,18 +279,18 @@
 
 | Thiết Bị | Thao Tác Thao Diễn Thực Tế (Action Steps) | Câu Văn Lời Nói Diễn Giả (Verbatim Script) |
 |---|---|---|
-| **Điện thoại (App)** | 1. Mở màn hình Đăng ký hội viên mới.<br>2. Nhập họ tên doanh nhân, tên công ty.<br>3. Chạm vào ô ngày sinh: gõ dãy số `1508HN10` -> hệ thống tự định dạng thành `15/08/HN10`.<br>4. Chạm vào biểu tượng lịch -> bật mở bánh xe chọn ngày native của điện thoại.<br>5. Bấm nút [Gửi đơn đăng ký gia nhập]. | *“Quy trình đầu tiên là Đăng ký & Đăng nhập. Trên điện thoại của một doanh nhân mới gia nhập, anh chị thấy form đăng ký được thiết kế tinh tế. Ô ngày sinh được trang bị cơ chế tự động điền dấu gạch chéo thông minh khi gõ phím số trên điện thoại; chạm vào icon lịch là mở ngay bộ chọn ngày native chuẩn mực. Mọi thông tin doanh nghiệp, đại diện pháp luật được điền nhanh chóng chỉ trong 1 phút.”* |
-| **Máy tính (CRM)** | 1. Chuyển sang màn hình Web CRM, bấm vào mục **Quản lý tài khoản (`/accounts`)** hoặc **Hội viên (`/members`)**.<br>2. Xuất hiện ngay lập tức hồ sơ vừa đăng ký với trạng thái `Chờ duyệt`.<br>3. Bấm vào nút [Thẩm định & Phê duyệt].<br>4. Chọn gán Ban Chuyên Môn (ví dụ: Ban Xúc Tiến Thương Mại).<br>5. Bấm [Xác nhận phê duyệt]. | *“Ngay lập tức, trên màn hình Web CRM của Ban Thành Viên, hồ sơ đăng ký xuất hiện theo thời gian thực. Ban Thành Viên kiểm tra thông tin, bấm Thẩm định và phân bổ về Ban Chuyên Môn phù hợp. Ngay khi bấm Phê duyệt, hệ thống tự động sinh mã số định danh chuẩn HN10 duy nhất và gửi email kích hoạt tức thì cho hội viên.”* |
-| **Điện thoại (App)** | 1. Quay lại App, mở màn hình Đăng nhập.<br>2. Nhập số điện thoại/email và mật khẩu tạm.<br>3. Bấm icon con mắt để ẩn/hiện mật khẩu trực quan.<br>4. Bấm Đăng nhập -> Màn hình Đổi mật khẩu lần đầu bật lên.<br>5. Nhập mật khẩu mới -> Đăng nhập thành công vào Trang chủ. | *“Trên điện thoại, hội viên đăng nhập bằng thông tin được cấp, có nút ẩn/hiện mật khẩu trực quan. Để đảm bảo an toàn, hệ thống yêu cầu đổi mật khẩu lần đầu và ngay lập tức đưa doanh nhân bước vào thế giới số sang trọng của CEO HN10.”* |
+| **Điện thoại (App)** | 1. Mở màn hình Đăng ký Học viên mới.<br>2. Nhập họ tên doanh nhân, tên công ty.<br>3. Chạm vào ô ngày sinh: gõ dãy số `1508HN10` -> hệ thống tự định dạng thành `15/08/HN10`.<br>4. Chạm vào biểu tượng lịch -> bật mở bánh xe chọn ngày native của điện thoại.<br>5. Bấm nút [Gửi đơn đăng ký gia nhập]. | *“Quy trình đầu tiên là Đăng ký & Đăng nhập. Trên điện thoại của một doanh nhân mới gia nhập, anh chị thấy form đăng ký được thiết kế tinh tế. Ô ngày sinh được trang bị cơ chế tự động điền dấu gạch chéo thông minh khi gõ phím số trên điện thoại; chạm vào icon lịch là mở ngay bộ chọn ngày native chuẩn mực. Mọi thông tin doanh nghiệp, đại diện pháp luật được điền nhanh chóng chỉ trong 1 phút.”* |
+| **Máy tính (CRM)** | 1. Chuyển sang màn hình Web CRM, bấm vào mục **Quản lý tài khoản (`/accounts`)** hoặc **Học viên (`/members`)**.<br>2. Xuất hiện ngay lập tức hồ sơ vừa đăng ký với trạng thái `Chờ duyệt`.<br>3. Bấm vào nút [Thẩm định & Phê duyệt].<br>4. Chọn gán Ban Chuyên Môn (ví dụ: Ban Xúc Tiến Thương Mại).<br>5. Bấm [Xác nhận phê duyệt]. | *“Ngay lập tức, trên màn hình Web CRM của Ban Thành Viên, hồ sơ đăng ký xuất hiện theo thời gian thực. Ban Thành Viên kiểm tra thông tin, bấm Thẩm định và phân bổ về Ban Chuyên Môn phù hợp. Ngay khi bấm Phê duyệt, hệ thống tự động sinh mã số định danh chuẩn HN10 duy nhất và gửi email kích hoạt tức thì cho Học viên.”* |
+| **Điện thoại (App)** | 1. Quay lại App, mở màn hình Đăng nhập.<br>2. Nhập số điện thoại/email và mật khẩu tạm.<br>3. Bấm icon con mắt để ẩn/hiện mật khẩu trực quan.<br>4. Bấm Đăng nhập -> Màn hình Đổi mật khẩu lần đầu bật lên.<br>5. Nhập mật khẩu mới -> Đăng nhập thành công vào Trang chủ. | *“Trên điện thoại, Học viên đăng nhập bằng thông tin được cấp, có nút ẩn/hiện mật khẩu trực quan. Để đảm bảo an toàn, hệ thống yêu cầu đổi mật khẩu lần đầu và ngay lập tức đưa doanh nhân bước vào thế giới số sang trọng của CEO HN10.”* |
 
 ---
 
-#### QUY TRÌNH 2: QUẢN TRỊ HỘI VIÊN, THẺ DOANH NHÂN SỐ SỐ & DANH THIẾP THÔNG MINH QR vCARD
+#### QUY TRÌNH 2: QUẢN TRỊ Học viên, THẺ DOANH NHÂN SỐ SỐ & DANH THIẾP THÔNG MINH QR vCARD
 
 | Thiết Bị | Thao Tác Thao Diễn Thực Tế (Action Steps) | Câu Văn Lời Nói Diễn Giả (Verbatim Script) |
 |---|---|---|
-| **Điện thoại (App)** | 1. Tại thanh điều hướng đáy, chạm vào biểu tượng **Thẻ hội viên (`/card`)**.<br>2. Màn hình hiện Thẻ Hội Viên Điện Tử Thông Minh nhận diện Deep Cobalt Navy & Warm Amber Gold.<br>3. Lật mặt sau thẻ: hiện hợp đồng hội viên số.<br>4. Chạm mở **Danh thiếp thông minh (vCard QR)**.<br>5. Dùng một điện thoại thứ 2 (hoặc mời 1 CEO dưới hội trường) bật camera quét mã QR này -> màn hình điện thoại quét hiện nút "Thêm vào danh bạ" chứa đầy đủ Tên, SĐT, Email, Tên Công ty, Website.<br>6. Chạm vào xem **Hồ sơ năng lực Company Profile 2 trang** (nền trắng, 2 ảnh khối hình học, 8 trường năng lực). | *“Kính thưa các anh chị, đây chính là niềm tự hào của doanh nhân CEO HN10! Thẻ hội viên số VIP mang sắc màu Deep Cobalt Navy và ánh vàng Warm Amber Gold đẳng cấp. Đặc biệt, tấm Danh thiếp số thông minh tích hợp Dynamic QR vCard: Khi anh chị đi giao lưu đối ngoại với đối tác, khách hàng, họ chỉ cần mở camera điện thoại quét 1 chạm là toàn bộ thông tin công ty, số hotline lưu thẳng vào danh bạ máy mà hoàn toàn KHÔNG CẦN CÀI APP! Đi kèm là Hồ sơ năng lực 2 trang nền trắng chuẩn mực, giúp nâng tầm hình ảnh doanh nghiệp ngay trong cuộc gặp gỡ đầu tiên.”* |
-| **Máy tính (CRM)** | 1. Trên Web CRM, bấm vào mục **Danh bạ hội viên (`/members`)**.<br>2. Trình diễn bộ lọc 11 ngành nghề (Bất động sản, Xây dựng, Tài chính, F&B, CNTT,...).<br>3. Bấm vào 1 hội viên: xem chi tiết hồ sơ, lịch sử đóng niên liễm, các sự kiện đã tham dự.<br>4. Bấm nút [Xuất danh sách Excel] -> file tải về chuẩn format, sẵn sàng in ấn kỷ yếu. | *“Song song ở phía quản trị, Ban Điều Hành sở hữu một cơ sở dữ liệu số hóa của hơn 500 CEO được phân loại khoa học theo 11 ngành nghề. Cần tìm đối tác cung ứng xây dựng hay đối tác logistics? Chỉ cần 1 thao tác lọc. Khi cần lập báo cáo cho HanoiBA, chỉ 1 click xuất Excel chuẩn hóa, xóa bỏ hoàn toàn cảnh lục tìm từng file rời rạc.”* |
+| **Điện thoại (App)** | 1. Tại thanh điều hướng đáy, chạm vào biểu tượng **Thẻ Học viên (`/card`)**.<br>2. Màn hình hiện Thẻ Học viên Điện Tử Thông Minh nhận diện Deep Cobalt Navy & Warm Amber Gold.<br>3. Lật mặt sau thẻ: hiện hợp đồng Học viên số.<br>4. Chạm mở **Danh thiếp thông minh (vCard QR)**.<br>5. Dùng một điện thoại thứ 2 (hoặc mời 1 CEO dưới hội trường) bật camera quét mã QR này -> màn hình điện thoại quét hiện nút "Thêm vào danh bạ" chứa đầy đủ Tên, SĐT, Email, Tên Công ty, Website.<br>6. Chạm vào xem **Hồ sơ năng lực Company Profile 2 trang** (nền trắng, 2 ảnh khối hình học, 8 trường năng lực). | *“Kính thưa các anh chị, đây chính là niềm tự hào của doanh nhân CEO HN10! Thẻ Học viên số VIP mang sắc màu Deep Cobalt Navy và ánh vàng Warm Amber Gold đẳng cấp. Đặc biệt, tấm Danh thiếp số thông minh tích hợp Dynamic QR vCard: Khi anh chị đi giao lưu đối ngoại với đối tác, khách hàng, họ chỉ cần mở camera điện thoại quét 1 chạm là toàn bộ thông tin công ty, số hotline lưu thẳng vào danh bạ máy mà hoàn toàn KHÔNG CẦN CÀI APP! Đi kèm là Hồ sơ năng lực 2 trang nền trắng chuẩn mực, giúp nâng tầm hình ảnh doanh nghiệp ngay trong cuộc gặp gỡ đầu tiên.”* |
+| **Máy tính (CRM)** | 1. Trên Web CRM, bấm vào mục **Danh bạ Học viên (`/members`)**.<br>2. Trình diễn bộ lọc 11 ngành nghề (Bất động sản, Xây dựng, Tài chính, F&B, CNTT,...).<br>3. Bấm vào 1 Học viên: xem chi tiết hồ sơ, lịch sử đóng niên liễm, các sự kiện đã tham dự.<br>4. Bấm nút [Xuất danh sách Excel] -> file tải về chuẩn format, sẵn sàng in ấn kỷ yếu. | *“Song song ở phía quản trị, Ban Điều Hành sở hữu một cơ sở dữ liệu số hóa của hơn 500 CEO được phân loại khoa học theo 11 ngành nghề. Cần tìm đối tác cung ứng xây dựng hay đối tác logistics? Chỉ cần 1 thao tác lọc. Khi cần lập báo cáo cho HanoiBA, chỉ 1 click xuất Excel chuẩn hóa, xóa bỏ hoàn toàn cảnh lục tìm từng file rời rạc.”* |
 
 ---
 
@@ -298,8 +298,8 @@
 
 | Thiết Bị | Thao Tác Thao Diễn Thực Tế (Action Steps) | Câu Văn Lời Nói Diễn Giả (Verbatim Script) |
 |---|---|---|
-| **Máy tính (CRM)** | 1. Trên Web CRM, bấm vào **Quản lý sự kiện (`/events`)**.<br>2. Bấm [Tạo sự kiện mới].<br>3. Nhập Tên sự kiện: *'Đêm Gala Doanh Nhân CEO HN10 - Hội Tụ Tinh Hoa'*.<br>4. Nhập Tagline khẩu hiệu banner -> Banner xem trước cập nhật ngay tức thì.<br>5. Mở bản đồ Leaflet OSM: gõ địa chỉ hoặc kéo thả điểm ghim đỏ trên bản đồ trực quan.<br>6. Thiết lập 2 hạng vé: Vé Hội viên (0đ) và Vé Khách mời VIP (500.000đ).<br>7. Bấm [Xuất bản sự kiện]. | *“Bây giờ, hãy cùng xem cách Ban Sự Kiện chuẩn bị cho một kỳ Gala. Trên Web CRM, thao tác tạo sự kiện vô cùng nhanh chóng. Bản đồ định vị hỗ trợ kéo thả ghim vị trí chuẩn xác như ứng dụng gọi xe. Tagline hiển thị trực tiếp trên banner xem trước. Ban tổ chức dễ dàng phân tách các hạng vé miễn phí cho hội viên và vé có phí cho đối tác khách mời.”* |
-| **Điện thoại (App)** | 1. Mở App, màn hình Trang chủ lập tức xuất hiện Sự kiện vừa tạo trên Banner nổi bật.<br>2. Chạm vào sự kiện, bấm [Đăng ký vé tham dự].<br>3. Chọn vé có phí -> Hệ thống hiện mã QR ngân hàng với đúng số tiền và nội dung chuyển khoản tự động.<br>4. Giả lập thanh toán thành công -> Mở mục **Ví vé của tôi (`/events`)**: Xuất hiện Vé điện tử E-Ticket với mã QR sắc nét, số ghế bàn tiệc Bàn 08 và mã số dự thưởng Lucky Draw số HN10. | *“Phía hội viên, sự kiện hiển thị ngay trên đầu ứng dụng. Khi đăng ký vé có phí, mã QR ngân hàng tự động xuất hiện với số tiền và cú pháp chuẩn. Sau khi xác nhận thanh toán, hội viên nhận ngay Vé điện tử E-Ticket hiển thị sắc nét trên điện thoại, ghi rõ vị trí ngồi bàn tiệc và số may mắn Lucky Draw. Mã vé này được lưu đệm offline, kể cả khi vào trung tâm hội nghị mất sóng 4G vẫn mở ra quét bình thường!”* |
+| **Máy tính (CRM)** | 1. Trên Web CRM, bấm vào **Quản lý sự kiện (`/events`)**.<br>2. Bấm [Tạo sự kiện mới].<br>3. Nhập Tên sự kiện: *'Đêm Gala Doanh Nhân CEO HN10 - Hội Tụ Tinh Hoa'*.<br>4. Nhập Tagline khẩu hiệu banner -> Banner xem trước cập nhật ngay tức thì.<br>5. Mở bản đồ Leaflet OSM: gõ địa chỉ hoặc kéo thả điểm ghim đỏ trên bản đồ trực quan.<br>6. Thiết lập 2 hạng vé: Vé Học viên (0đ) và Vé Khách mời VIP (500.000đ).<br>7. Bấm [Xuất bản sự kiện]. | *“Bây giờ, hãy cùng xem cách Ban Sự Kiện chuẩn bị cho một kỳ Gala. Trên Web CRM, thao tác tạo sự kiện vô cùng nhanh chóng. Bản đồ định vị hỗ trợ kéo thả ghim vị trí chuẩn xác như ứng dụng gọi xe. Tagline hiển thị trực tiếp trên banner xem trước. Ban tổ chức dễ dàng phân tách các hạng vé miễn phí cho Học viên và vé có phí cho đối tác khách mời.”* |
+| **Điện thoại (App)** | 1. Mở App, màn hình Trang chủ lập tức xuất hiện Sự kiện vừa tạo trên Banner nổi bật.<br>2. Chạm vào sự kiện, bấm [Đăng ký vé tham dự].<br>3. Chọn vé có phí -> Hệ thống hiện mã QR ngân hàng với đúng số tiền và nội dung chuyển khoản tự động.<br>4. Giả lập thanh toán thành công -> Mở mục **Ví vé của tôi (`/events`)**: Xuất hiện Vé điện tử E-Ticket với mã QR sắc nét, số ghế bàn tiệc Bàn 08 và mã số dự thưởng Lucky Draw số HN10. | *“Phía Học viên, sự kiện hiển thị ngay trên đầu ứng dụng. Khi đăng ký vé có phí, mã QR ngân hàng tự động xuất hiện với số tiền và cú pháp chuẩn. Sau khi xác nhận thanh toán, Học viên nhận ngay Vé điện tử E-Ticket hiển thị sắc nét trên điện thoại, ghi rõ vị trí ngồi bàn tiệc và số may mắn Lucky Draw. Mã vé này được lưu đệm offline, kể cả khi vào trung tâm hội nghị mất sóng 4G vẫn mở ra quét bình thường!”* |
 | **Máy tính (CRM) & Điện thoại soát vé** | 1. Mở màn hình **Quản lý đăng ký sự kiện (`event-registrations.tsx`)** trên Web CRM.<br>2. Bật camera máy quét QR (trên điện thoại ban tổ chức hoặc máy tính).<br>3. Hướng camera quét mã QR trên vé điện thoại vừa mở.<br>4. Âm thanh bíp phát ra, màn hình nhảy thông báo xanh lá: *'Check-in Thành Công: CEO Nguyễn Văn A - Bàn 08'*.<br>5. Danh sách người có mặt trên CRM tăng lên theo thời gian thực.<br>6. Mở tab **Vòng quay may mắn (Lucky Draw)** -> Danh sách người quay thưởng tự động tải 100% những người đã check-in thực tế. | *“Và đây là khoảnh khắc tại cửa đón tiếp sự kiện! Ban Tổ Chức cầm điện thoại quét mã QR trên vé của đại biểu. Tốc độ nhận diện dưới đúng 1 giây! Khách đến đâu, hệ thống điểm danh đến đó, màn hình CRM nhảy số đại biểu có mặt theo thời gian thực. Đặc biệt, danh sách quay thưởng may mắn Lucky Draw tự động đồng bộ đúng những người đã có mặt tại hội trường, tuyệt đối minh bạch, chống hoàn toàn việc người vắng mặt lại trúng giải!”* |
 
 ---
@@ -308,7 +308,7 @@
 
 | Thiết Bị | Thao Tác Thao Diễn Thực Tế (Action Steps) | Câu Văn Lời Nói Diễn Giả (Verbatim Script) |
 |---|---|---|
-| **Điện thoại (App)** | 1. Mở mục **Gian hàng (`/products`)**.<br>2. Chiêm ngưỡng băng chuyền banner các Nhà tài trợ Kim Cương/Vàng Obsidian & Amber.<br>3. Thử bộ lọc phân loại sản phẩm: lọc danh mục động được trích xuất từ database.<br>4. Chạm vào 1 sản phẩm: xem ảnh độ nét cao, thông số kỹ thuật, chính sách ưu đãi riêng cho CEO HN10.<br>5. Đọc đánh giá review chân thực lưu từ PostgreSQL.<br>6. Chạm vào icon Nhắn tin / Gọi điện: kết nối tức thì tới CEO sở hữu sản phẩm.<br>7. Thao tác bấm [+ Đăng sản phẩm mới], gõ thêm danh mục mới linh hoạt. | *“Bước sang phân hệ Xúc tiến thương mại. Thay vì các bài đăng bán hàng trôi tuột trên Zalo, hội viên có riêng một Sàn Marketplace B2B nội khối sang trọng. Giao diện tuân thủ tuyệt đối nhận diện Deep Cobalt Navy, không dùng màu cam Shopee bình dân. Các gói tài trợ Obsidian và Amber nổi bật vị thế của các nhà tài trợ lớn. Khi một CEO muốn mua lô hàng, họ chạm nút nhắn tin hoặc gọi điện trực tiếp cho chính vị chủ tịch cung ứng sản phẩm đó.”* |
+| **Điện thoại (App)** | 1. Mở mục **Gian hàng (`/products`)**.<br>2. Chiêm ngưỡng băng chuyền banner các Nhà tài trợ Kim Cương/Vàng Obsidian & Amber.<br>3. Thử bộ lọc phân loại sản phẩm: lọc danh mục động được trích xuất từ database.<br>4. Chạm vào 1 sản phẩm: xem ảnh độ nét cao, thông số kỹ thuật, chính sách ưu đãi riêng cho CEO HN10.<br>5. Đọc đánh giá review chân thực lưu từ PostgreSQL.<br>6. Chạm vào icon Nhắn tin / Gọi điện: kết nối tức thì tới CEO sở hữu sản phẩm.<br>7. Thao tác bấm [+ Đăng sản phẩm mới], gõ thêm danh mục mới linh hoạt. | *“Bước sang phân hệ Xúc tiến thương mại. Thay vì các bài đăng bán hàng trôi tuột trên Zalo, Học viên có riêng một Sàn Marketplace B2B nội khối sang trọng. Giao diện tuân thủ tuyệt đối nhận diện Deep Cobalt Navy, không dùng màu cam Shopee bình dân. Các gói tài trợ Obsidian và Amber nổi bật vị thế của các nhà tài trợ lớn. Khi một CEO muốn mua lô hàng, họ chạm nút nhắn tin hoặc gọi điện trực tiếp cho chính vị chủ tịch cung ứng sản phẩm đó.”* |
 | **Máy tính (CRM)** | 1. Trên Web CRM, mở mục **Quản lý sản phẩm & Gian hàng**.<br>2. Xem danh sách sản phẩm chờ duyệt, bấm phê duyệt nhanh.<br>3. Mở mục **Gói tài trợ (`sponsor_packages`)**: quản trị banner tài trợ hiển thị trên App. | *“Phía Ban Xúc Tiến Thương Mại có toàn quyền kiểm soát chất lượng sản phẩm đưa lên sàn, bảo đảm chỉ những sản phẩm uy tín, có nguồn gốc rõ ràng của các doanh nhân CEO HN10 mới được xuất bản, bảo vệ quyền lợi cho toàn thể thành viên.”* |
 
 ---
@@ -317,7 +317,7 @@
 
 | Thiết Bị | Thao Tác Thao Diễn Thực Tế (Action Steps) | Câu Văn Lời Nói Diễn Giả (Verbatim Script) |
 |---|---|---|
-| **Điện thoại (App)** | 1. Mở mục **Cơ hội kinh doanh (`/opportunities`)**.<br>2. Xem bảng Deal thời gian thực: phân loại thẻ Cần Mua, Cần Bán, Tìm Đối Tác Đầu Tư.<br>3. Thao tác bấm [Đăng cơ hội mới]:<br>   - Tiêu đề: *'Tìm nhà thầu cơ điện MEP cho dự án tòa nhà 15 tầng'*.<br>   - Giá trị thương vụ: *'15.000.000.000 VNĐ'*.<br>   - Hạn chót: Chọn ngày trong tuần tới.<br>4. Bấm [Đăng deal] -> Thẻ deal xuất hiện ngay trên đầu trang với thanh màu hổ phách Warm Amber Gold nổi bật.<br>5. Chạm vào nút [Quan tâm deal] để gửi tín hiệu kết nối hợp tác. | *“Đây là nơi dòng tiền thực sự luân chuyển! Bảng Cơ hội kinh doanh hiển thị các nhu cầu Cung - Cầu sát sườn: từ tìm nhà thầu xây dựng, đối tác vận tải, đến hợp tác đầu tư tài chính. Mức giá trị deal được hiển thị minh bạch. Khi một hội viên thấy cơ hội phù hợp, họ bấm 'Quan tâm deal', hệ thống ghép nối hai bên vào một phiên đàm phán trực tiếp.”* |
+| **Điện thoại (App)** | 1. Mở mục **Cơ hội kinh doanh (`/opportunities`)**.<br>2. Xem bảng Deal thời gian thực: phân loại thẻ Cần Mua, Cần Bán, Tìm Đối Tác Đầu Tư.<br>3. Thao tác bấm [Đăng cơ hội mới]:<br>   - Tiêu đề: *'Tìm nhà thầu cơ điện MEP cho dự án tòa nhà 15 tầng'*.<br>   - Giá trị thương vụ: *'15.000.000.000 VNĐ'*.<br>   - Hạn chót: Chọn ngày trong tuần tới.<br>4. Bấm [Đăng deal] -> Thẻ deal xuất hiện ngay trên đầu trang với thanh màu hổ phách Warm Amber Gold nổi bật.<br>5. Chạm vào nút [Quan tâm deal] để gửi tín hiệu kết nối hợp tác. | *“Đây là nơi dòng tiền thực sự luân chuyển! Bảng Cơ hội kinh doanh hiển thị các nhu cầu Cung - Cầu sát sườn: từ tìm nhà thầu xây dựng, đối tác vận tải, đến hợp tác đầu tư tài chính. Mức giá trị deal được hiển thị minh bạch. Khi một Học viên thấy cơ hội phù hợp, họ bấm 'Quan tâm deal', hệ thống ghép nối hai bên vào một phiên đàm phán trực tiếp.”* |
 | **Máy tính (CRM)** | 1. Mở Web CRM, vào mục **Báo cáo Xúc tiến thương mại**.<br>2. Xem biểu đồ tổng giá trị các deal đang chào trên hệ thống (đạt hàng trăm tỷ đồng).<br>3. Xem thống kê số lượng thương vụ đã kết nối thành công theo từng tháng. | *“Ở góc độ điều hành, Ban Xúc Tiến Thương Mại và Chủ tịch CLB lần đầu tiên sở hữu công cụ đo lường chính xác: CLB CEO HN10 đã tạo ra bao nhiêu tỷ đồng giá trị giao thương thực tế trong quý này. Đây là con số biết nói để báo cáo trước Đại hội và thu hút thêm các doanh nhân lớn gia nhập!”* |
 
 ---
@@ -326,7 +326,7 @@
 
 | Thiết Bị | Thao Tác Thao Diễn Thực Tế (Action Steps) | Câu Văn Lời Nói Diễn Giả (Verbatim Script) |
 |---|---|---|
-| **Điện thoại (App)** | 1. Mở mục **Danh bạ kết nối (`/association/members`)**.<br>2. Tìm một CEO đối tác, bấm nút [Kết nối] -> Trạng thái chuyển sang `Đang chờ đồng ý` kèm icon đồng hồ.<br>3. Chạm vào nút [Hẹn gặp 1-1]:<br>   - Chọn chủ đề cuộc gặp: *'Thảo luận hợp tác cung ứng vật liệu quý IV'*.<br>   - Chọn thời gian & địa điểm.<br>   - Bấm [Gửi lời mời `[B2B_CONNECT_INVITE]`].<br>4. Chuyển sang mục **Tin nhắn (`/messages`)**: Hiện thẻ lời mời họp tương tác có nút [Chấp nhận] hoặc [Đổi lịch], có nút đồng bộ vào Google Calendar. | *“Khác với mạng xã hội thông thường chỉ kết bạn vu vơ, tính năng Kết nối B2B của CEO HN10 được chuẩn hóa theo phong cách doanh nhân: Lời mời kết nối phải chờ đối phương đồng ý. Khi muốn gặp gỡ, hội viên gửi trực tiếp Lời Mời Hẹn B2B 1-on-1 kèm mục đích kinh doanh rõ ràng. Cuộc hẹn sau khi chốt sẽ đồng bộ ngay vào lịch điện thoại, giúp hai CEO không bao giờ bị quên lịch.”* |
+| **Điện thoại (App)** | 1. Mở mục **Danh bạ kết nối (`/association/members`)**.<br>2. Tìm một CEO đối tác, bấm nút [Kết nối] -> Trạng thái chuyển sang `Đang chờ đồng ý` kèm icon đồng hồ.<br>3. Chạm vào nút [Hẹn gặp 1-1]:<br>   - Chọn chủ đề cuộc gặp: *'Thảo luận hợp tác cung ứng vật liệu quý IV'*.<br>   - Chọn thời gian & địa điểm.<br>   - Bấm [Gửi lời mời `[B2B_CONNECT_INVITE]`].<br>4. Chuyển sang mục **Tin nhắn (`/messages`)**: Hiện thẻ lời mời họp tương tác có nút [Chấp nhận] hoặc [Đổi lịch], có nút đồng bộ vào Google Calendar. | *“Khác với mạng xã hội thông thường chỉ kết bạn vu vơ, tính năng Kết nối B2B của CEO HN10 được chuẩn hóa theo phong cách doanh nhân: Lời mời kết nối phải chờ đối phương đồng ý. Khi muốn gặp gỡ, Học viên gửi trực tiếp Lời Mời Hẹn B2B 1-on-1 kèm mục đích kinh doanh rõ ràng. Cuộc hẹn sau khi chốt sẽ đồng bộ ngay vào lịch điện thoại, giúp hai CEO không bao giờ bị quên lịch.”* |
 | **Máy tính (CRM)** | 1. Mở trang **Quản trị cuộc họp & Hoạt động kết nối**.<br>2. Xem chỉ số tương tác kết nối giữa các ban chuyên môn.<br>3. Xem lịch sinh hoạt ban điều hành định kỳ có mã QR điểm danh động (Sapphire Hub) đổi mã mỗi 30 giây. | *“Phía CRM, Ban Thư ký có thể theo dõi chỉ số gắn kết của từng thành viên, đồng thời tổ chức các phiên họp Ban Chấp Hành với mã QR điểm danh động chống chụp ảnh điểm danh hộ, đính kèm đầy đủ tài liệu số của cuộc họp.”* |
 
 ---
@@ -335,7 +335,7 @@
 
 | Thiết Bị | Thao Tác Thao Diễn Thực Tế (Action Steps) | Câu Văn Lời Nói Diễn Giả (Verbatim Script) |
 |---|---|---|
-| **Máy tính (CRM)** | 1. Mở phân hệ **Tài chính - Thu Chi (`/income`, `/expenses`, `/finance-report`)**.<br>2. Xem danh sách Phiếu Thu: Phí niên liễm, Vé sự kiện, Thu tài trợ.<br>3. Xem danh sách Phiếu Chi: Tạm ứng kinh phí cho Ban Sự Kiện tổ chức Gala, Hoàn ứng tiền thừa khi quyết toán thực tế.<br>4. Mở báo cáo dòng tiền, bấm nút **[Xuất Sổ Quỹ Tiền Mặt (Mẫu S07-DN)]** và **[Sổ Tiền Gửi Ngân Hàng (Mẫu S03a-DNN)]**.<br>5. Mở file Excel vừa xuất: hiển thị đầy đủ công thức Tồn đầu kỳ, Thu, Chi, Tồn cuối kỳ, đọc số tiền bằng chữ tiếng Việt chuẩn xác. | *“Kính thưa anh Chủ tịch và các anh chị! Em xin được nhấn mạnh: **Trong 3 yêu cầu ban đầu của CLB, hoàn toàn chưa có phân hệ Thu - Chi này!** Đây chính là sự trăn trở và nhìn nhận ra từ thực tiễn của đội ngũ kỹ thuật ViConnect! Bởi vì chúng em nhận thấy: Sự kiện và Hội viên không thể nào tách rời khỏi dòng tiền! Nếu không có phân hệ này, sau mỗi kỳ Gala, Ban Tài chính và Ban Sự kiện sẽ rơi vào một ma trận tạm ứng, hoàn ứng, hóa đơn chứng từ vô cùng áp lực. Nhờ phân hệ Thu Chi tích hợp cổng thanh toán QR ngân hàng Napas gạch nợ 1 giây và tự động xuất Sổ Quỹ chuẩn Thông tư 200/2014/TT-BTC có công thức sẵn, CLB có ngay báo cáo tài chính minh bạch 100% để nộp lên HanoiBA bất kỳ lúc nào!”* |
+| **Máy tính (CRM)** | 1. Mở phân hệ **Tài chính - Thu Chi (`/income`, `/expenses`, `/finance-report`)**.<br>2. Xem danh sách Phiếu Thu: Phí niên liễm, Vé sự kiện, Thu tài trợ.<br>3. Xem danh sách Phiếu Chi: Tạm ứng kinh phí cho Ban Sự Kiện tổ chức Gala, Hoàn ứng tiền thừa khi quyết toán thực tế.<br>4. Mở báo cáo dòng tiền, bấm nút **[Xuất Sổ Quỹ Tiền Mặt (Mẫu S07-DN)]** và **[Sổ Tiền Gửi Ngân Hàng (Mẫu S03a-DNN)]**.<br>5. Mở file Excel vừa xuất: hiển thị đầy đủ công thức Tồn đầu kỳ, Thu, Chi, Tồn cuối kỳ, đọc số tiền bằng chữ tiếng Việt chuẩn xác. | *“Kính thưa anh Chủ tịch và các anh chị! Em xin được nhấn mạnh: **Trong 3 yêu cầu ban đầu của CLB, hoàn toàn chưa có phân hệ Thu - Chi này!** Đây chính là sự trăn trở và nhìn nhận ra từ thực tiễn của đội ngũ kỹ thuật ViConnect! Bởi vì chúng em nhận thấy: Sự kiện và Học viên không thể nào tách rời khỏi dòng tiền! Nếu không có phân hệ này, sau mỗi kỳ Gala, Ban Tài chính và Ban Sự kiện sẽ rơi vào một ma trận tạm ứng, hoàn ứng, hóa đơn chứng từ vô cùng áp lực. Nhờ phân hệ Thu Chi tích hợp cổng thanh toán QR ngân hàng Napas gạch nợ 1 giây và tự động xuất Sổ Quỹ chuẩn Thông tư 200/2014/TT-BTC có công thức sẵn, CLB có ngay báo cáo tài chính minh bạch 100% để nộp lên HanoiBA bất kỳ lúc nào!”* |
 
 ---
 
@@ -343,7 +343,7 @@
 
 | Thiết Bị | Thao Tác Thao Diễn Thực Tế (Action Steps) | Câu Văn Lời Nói Diễn Giả (Verbatim Script) |
 |---|---|---|
-| **Máy tính (CRM)** | 1. Quay trở lại trang chủ **Executive Dashboard** của Web CRM.<br>2. Trình diễn 4 khối chỉ số nhịp đập CLB thời gian thực: Tổng hội viên kích hoạt, Sự kiện sắp diễn ra, Số dư quỹ tiền mặt, Tổng giá trị giao thương.<br>3. Mở mục **Phân quyền hệ thống (`/permissions`)**:<br>   - Tab 1: Ma trận phân quyền theo vai trò (`RbacPermissionMatrix`).<br>   - Tab 2: Phân quyền theo 6 Ban chuyên môn (`CommitteesPermissionManager`).<br>   - Tab 3: Phân quyền tài khoản theo ban (`MemberPermissionsByCommittee`) với 4 quyền Thêm - Sửa - Xóa - Duyệt và cơ chế override tùy biến.<br>4. Mở mục **Cấu hình thương hiệu (`/settings`)**: đổi logo, tên hiệp hội, phát sự kiện đồng bộ tức thì lên thanh Header Sidebar. | *“Và cuối cùng là Tháp chỉ huy Executive Dashboard 360 độ! Bất cứ lúc nào mở máy tính, anh Chủ tịch và các anh chị đều nhìn thấy trọn vẹn sức khỏe của CLB. Đi kèm là hệ thống phân quyền 3 phân hệ chặt chẽ cho 6 Ban chuyên môn: Ban Sự kiện toàn quyền quản lý sự kiện và soát vé; Ban Tài chính quản lý thu chi; Ban Thành viên quản trị hội viên; đảm bảo đúng người, đúng việc, bảo mật tuyệt đối ở tầng cơ sở dữ liệu!”* |
+| **Máy tính (CRM)** | 1. Quay trở lại trang chủ **Executive Dashboard** của Web CRM.<br>2. Trình diễn 4 khối chỉ số nhịp đập CLB thời gian thực: Tổng Học viên kích hoạt, Sự kiện sắp diễn ra, Số dư quỹ tiền mặt, Tổng giá trị giao thương.<br>3. Mở mục **Phân quyền hệ thống (`/permissions`)**:<br>   - Tab 1: Ma trận phân quyền theo vai trò (`RbacPermissionMatrix`).<br>   - Tab 2: Phân quyền theo 6 Ban chuyên môn (`CommitteesPermissionManager`).<br>   - Tab 3: Phân quyền tài khoản theo ban (`MemberPermissionsByCommittee`) với 4 quyền Thêm - Sửa - Xóa - Duyệt và cơ chế override tùy biến.<br>4. Mở mục **Cấu hình thương hiệu (`/settings`)**: đổi logo, tên hiệp hội, phát sự kiện đồng bộ tức thì lên thanh Header Sidebar. | *“Và cuối cùng là Tháp chỉ huy Executive Dashboard 360 độ! Bất cứ lúc nào mở máy tính, anh Chủ tịch và các anh chị đều nhìn thấy trọn vẹn sức khỏe của CLB. Đi kèm là hệ thống phân quyền 3 phân hệ chặt chẽ cho 6 Ban chuyên môn: Ban Sự kiện toàn quyền quản lý sự kiện và soát vé; Ban Tài chính quản lý thu chi; Ban Thành viên quản trị Học viên; đảm bảo đúng người, đúng việc, bảo mật tuyệt đối ở tầng cơ sở dữ liệu!”* |
 
 ---
 

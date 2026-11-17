@@ -43,12 +43,12 @@ async function runCrmCapture() {
   console.log('>>> [4/25] Chụp Modal Thêm Ban Chuyên Môn Mới...');
   const addDeptBtn = page.locator('button:has-text("Thêm Ban"), button:has-text("+ Thêm Ban Mới")').first();
   if (await addDeptBtn.isVisible().catch(() => false)) {
-    await addDeptBtn.click().catch(() => {});
+    await addDeptBtn.click().catch(() => { });
     await page.waitForTimeout(1000);
     await page.screenshot({ path: path.join(outputDir, '04_modal_them_ban_moi.png') });
     // Đóng modal
     const closeDept = page.locator('button:has-text("Hủy"), button[aria-label="Close"], button:has-text("Đóng")').first();
-    if (await closeDept.isVisible().catch(() => false)) await closeDept.click().catch(() => {});
+    if (await closeDept.isVisible().catch(() => false)) await closeDept.click().catch(() => { });
   }
 
   console.log('>>> [5/25] Chụp Quản Lý Tài Khoản Vận Hành...');
@@ -59,11 +59,11 @@ async function runCrmCapture() {
   console.log('>>> [6/25] Chụp Modal Thêm Tài Khoản Mới...');
   const addAccBtn = page.locator('button:has-text("Thêm Tài Khoản"), button:has-text("+ Thêm")').first();
   if (await addAccBtn.isVisible().catch(() => false)) {
-    await addAccBtn.click().catch(() => {});
+    await addAccBtn.click().catch(() => { });
     await page.waitForTimeout(1000);
     await page.screenshot({ path: path.join(outputDir, '06_modal_them_tai_khoan.png') });
     const closeAcc = page.locator('button:has-text("Hủy"), button[aria-label="Close"]').first();
-    if (await closeAcc.isVisible().catch(() => false)) await closeAcc.click().catch(() => {});
+    if (await closeAcc.isVisible().catch(() => false)) await closeAcc.click().catch(() => { });
   }
 
   console.log('>>> [7/25] Chụp Ma Trận Phân Quyền Vai Trò RBAC...');
@@ -71,15 +71,15 @@ async function runCrmCapture() {
   await page.waitForTimeout(1500);
   await page.screenshot({ path: path.join(outputDir, '07_ma_tran_phan_quyen_rbac.png') });
 
-  console.log('>>> [8/25] Chụp Quản Lý Hội Viên...');
+  console.log('>>> [8/25] Chụp Quản Lý Học viên...');
   await page.goto('https://crm.ceohn10.viconnect.vn/members', { waitUntil: 'networkidle', timeout: 30000 });
   await page.waitForTimeout(1500);
   await page.screenshot({ path: path.join(outputDir, '08_quan_ly_hoi_vien.png') });
 
-  console.log('>>> [9/25] Chụp Chi Tiết Hồ Sơ & Phê Duyệt Hội Viên...');
+  console.log('>>> [9/25] Chụp Chi Tiết Hồ Sơ & Phê Duyệt Học viên...');
   const firstMemberAction = page.locator('table tr a, table tr button[title*="Xem"], table tr button:has-text("Xem")').first();
   if (await firstMemberAction.isVisible().catch(() => false)) {
-    await firstMemberAction.click().catch(() => {});
+    await firstMemberAction.click().catch(() => { });
     await page.waitForTimeout(1500);
     await page.screenshot({ path: path.join(outputDir, '09_phe_duyet_chi_tiet_hoi_vien.png') });
   } else {
@@ -94,17 +94,17 @@ async function runCrmCapture() {
   console.log('>>> [11/25] Chụp Modal Tạo Sự Kiện Mới 3 Bước...');
   const createEventBtn = page.locator('button:has-text("+ Tạo sự kiện"), button:has-text("Tạo sự kiện mới"), button:has-text("+ Tạo")').first();
   if (await createEventBtn.isVisible().catch(() => false)) {
-    await createEventBtn.click().catch(() => {});
+    await createEventBtn.click().catch(() => { });
     await page.waitForTimeout(1200);
     await page.screenshot({ path: path.join(outputDir, '11_modal_tao_su_kien_3_buoc.png') });
     const closeEvt = page.locator('button:has-text("Hủy"), button[aria-label="Close"], button:has-text("Đóng")').first();
-    if (await closeEvt.isVisible().catch(() => false)) await closeEvt.click().catch(() => {});
+    if (await closeEvt.isVisible().catch(() => false)) await closeEvt.click().catch(() => { });
   }
 
   console.log('>>> [12/25] Chụp Sơ Đồ Khán Phòng & Bàn Tiệc...');
   const viewDetailEvt = page.locator('table tr a[href*="events/"], a:has-text("Chi tiết"), button:has-text("Chi tiết")').first();
   if (await viewDetailEvt.isVisible().catch(() => false)) {
-    await viewDetailEvt.click().catch(() => {});
+    await viewDetailEvt.click().catch(() => { });
     await page.waitForTimeout(2000);
     await page.screenshot({ path: path.join(outputDir, '12_so_do_khan_phong_ban_tiec.png') });
   } else {
@@ -129,11 +129,11 @@ async function runCrmCapture() {
   console.log('>>> [16/25] Chụp Modal Đặt Phòng Họp & Lên Lịch...');
   const addMeetingBtn = page.locator('button:has-text("Lên lịch"), button:has-text("+ Đặt phòng"), button:has-text("+ Tạo"), button:has-text("+ Lên lịch họp")').first();
   if (await addMeetingBtn.isVisible().catch(() => false)) {
-    await addMeetingBtn.click().catch(() => {});
+    await addMeetingBtn.click().catch(() => { });
     await page.waitForTimeout(1000);
     await page.screenshot({ path: path.join(outputDir, '16_modal_dat_phong_hop.png') });
     const closeMtg = page.locator('button:has-text("Hủy"), button[aria-label="Close"]').first();
-    if (await closeMtg.isVisible().catch(() => false)) await closeMtg.click().catch(() => {});
+    if (await closeMtg.isVisible().catch(() => false)) await closeMtg.click().catch(() => { });
   }
 
   console.log('>>> [17/25] Chụp Giao Việc & Quản Trị Tiến Độ Kanban...');
@@ -144,11 +144,11 @@ async function runCrmCapture() {
   console.log('>>> [18/25] Chụp Modal Giao Việc Mới...');
   const addTaskBtn = page.locator('button:has-text("+ Giao việc mới"), button:has-text("+ Tạo nhiệm vụ"), button:has-text("+ Giao việc")').first();
   if (await addTaskBtn.isVisible().catch(() => false)) {
-    await addTaskBtn.click().catch(() => {});
+    await addTaskBtn.click().catch(() => { });
     await page.waitForTimeout(1000);
     await page.screenshot({ path: path.join(outputDir, '18_modal_giao_viec_moi.png') });
     const closeTask = page.locator('button:has-text("Hủy"), button[aria-label="Close"]').first();
-    if (await closeTask.isVisible().catch(() => false)) await closeTask.click().catch(() => {});
+    if (await closeTask.isVisible().catch(() => false)) await closeTask.click().catch(() => { });
   }
 
   console.log('>>> [19/25] Chụp Quản Lý Tài Chính & Sổ Quỹ Thu Chi...');
@@ -169,7 +169,7 @@ async function runCrmCapture() {
   console.log('>>> [22/25] Chụp Quản Lý Mẫu Email Tự Động...');
   const emailTab = page.locator('button:has-text("Mẫu thư"), button:has-text("Mẫu Email"), button:has-text("Email Template")').first();
   if (await emailTab.isVisible().catch(() => false)) {
-    await emailTab.click().catch(() => {});
+    await emailTab.click().catch(() => { });
     await page.waitForTimeout(1000);
   }
   await page.screenshot({ path: path.join(outputDir, '22_mau_email_tu_dong.png') });

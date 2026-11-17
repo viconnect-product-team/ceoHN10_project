@@ -53,7 +53,7 @@ async function generateMasterExcel() {
   ws1.addRow(['CEO HN10 - TOÀN DIỆN KIỂM TOÁN HỆ THỐNG & ĐÁNH GIÁ CHẤT LƯỢNG', '']);
   ws1.mergeCells('A1:B1');
   ws1.getCell('A1').font = { name: 'Calibri', size: 14, bold: true, color: { argb: 'FF001D4A' } };
-  
+
   const overviewRows = [
     ['Tên Hệ Thống', 'Hệ Sinh Thái Số CLB Doanh Nhân CEO HN10 (Trực thuộc HanoiBA)'],
     ['Phiên Bản Hiện Hữu', 'Release v10.98 - Tách biệt độc lập Web CRM Quản trị & CEO HN10 PWA'],
@@ -91,11 +91,11 @@ async function generateMasterExcel() {
     { header: 'Trạng Thái Kiểm Thử', key: 'status', width: 20 }
   ];
   formatHeaderRow(ws2.getRow(1));
-  
+
   const modulesList = [
     { id: '[NODE-CRM-001]', subsystem: 'Web Admin', name: 'Tổng Quan & Dashboard CLB', route: '/', ui: 'src/routes/index.tsx, OverviewCards.tsx', be: 'dashboard.service.ts', db: 'members, events, meetings', status: 'PASS' },
     { id: '[NODE-CRM-002]', subsystem: 'Web Admin', name: 'Trung Tâm Thống Kê 5 Danh Mục', route: '/analytics', ui: 'src/routes/analytics.tsx, Sidebar.tsx', be: 'analytics.service.ts', db: 'members, opportunities, departments', status: 'PASS' },
-    { id: '[NODE-CRM-003]', subsystem: 'Web Admin', name: 'Quản Trị Danh Bạ Hội Viên 360°', route: '/members', ui: 'src/routes/members.tsx, MemberTable.tsx', be: 'members.service.ts', db: 'members, companies, vione_users', status: 'PASS' },
+    { id: '[NODE-CRM-003]', subsystem: 'Web Admin', name: 'Quản Trị Danh Bạ Học viên 360°', route: '/members', ui: 'src/routes/members.tsx, MemberTable.tsx', be: 'members.service.ts', db: 'members, companies, vione_users', status: 'PASS' },
     { id: '[NODE-CRM-004]', subsystem: 'Web Admin', name: 'Quản Trị Doanh Nghiệp Thành Viên', route: '/companies', ui: 'src/routes/companies.tsx, CompanyTable.tsx', be: 'members.service.ts', db: 'companies, members', status: 'PASS' },
     { id: '[NODE-CRM-005]', subsystem: 'Web Admin', name: 'Quản Lý Tài Khoản & Gán Ban Chuyên Môn', route: '/accounts', ui: 'src/routes/accounts.tsx, AccountTable.tsx', be: 'members.service.ts, auth.service.ts', db: 'members, vione_users, user_roles', status: 'PASS' },
     { id: '[NODE-CRM-006]', subsystem: 'Web Admin', name: 'Ma Trận Phân Quyền RBAC 2 Tab', route: '/permissions', ui: 'src/routes/permissions.tsx, RbacPermissionMatrix.tsx', be: 'roles.service.ts', db: 'roles, permissions, role_permissions', status: 'PASS' },
@@ -110,12 +110,12 @@ async function generateMasterExcel() {
     { id: '[NODE-CRM-015]', subsystem: 'Web Admin', name: 'Quản Trị Công Việc Ban Chuyên Môn', route: '/tasks', ui: 'src/routes/tasks.tsx, TaskKanbanBoard.tsx', be: 'tasks.service.ts', db: 'tasks, task_assignees', status: 'PASS' },
     { id: '[NODE-CRM-016]', subsystem: 'Web Admin', name: 'Nhật Ký Hoạt Động & Kiểm Toán Hệ Thống', route: '/activity-logs', ui: 'src/routes/activity-logs.tsx, AuditLogTable.tsx', be: 'admin.service.ts', db: 'audit_logs, system_events', status: 'PASS' },
     { id: '[NODE-CRM-017]', subsystem: 'Web Admin', name: 'Studio Thiết Kế Poster Thư Mời Sự Kiện', route: '/templates', ui: 'src/routes/templates.tsx, InvitationTemplateStudio.tsx', be: 'upload.service.ts', db: 'template_configs, media_assets', status: 'PASS' },
-    
+
     // PWA Nodes
     { id: '[NODE-APP-001]', subsystem: 'CEO HN10 PWA', name: 'Trang Chủ & MemberShell Di Động', route: '/association', ui: 'src/routes/association.index.tsx, MemberShell.tsx', be: 'content.service.ts, me.service.ts', db: 'members, posts, events', status: 'PASS' },
     { id: '[NODE-APP-002]', subsystem: 'CEO HN10 PWA', name: 'Thẻ Doanh Nhân Số & QR Động 60s', route: '/association/card', ui: 'src/routes/association.card.tsx, DigitalCardView.tsx', be: 'business-card.service.ts', db: 'business_cards, members', status: 'PASS' },
-    { id: '[NODE-APP-003]', subsystem: 'CEO HN10 PWA', name: 'Đóng Phí & Gia Hạn Hội Viên Trực Tuyến', route: '/association/renew', ui: 'src/routes/association.renew.tsx, RenewFlow.tsx', be: 'members.service.ts, payment.service.ts', db: 'invoices, members, transactions', status: 'PASS' },
-    { id: '[NODE-APP-004]', subsystem: 'CEO HN10 PWA', name: 'Sự Kiện Hội Viên & Vé Điện Tử', route: '/association/events', ui: 'src/routes/association.events.tsx, EventList.tsx', be: 'events.service.ts, payment.service.ts', db: 'events, event_registrations', status: 'PASS' },
+    { id: '[NODE-APP-003]', subsystem: 'CEO HN10 PWA', name: 'Đóng Phí & Gia Hạn Học viên Trực Tuyến', route: '/association/renew', ui: 'src/routes/association.renew.tsx, RenewFlow.tsx', be: 'members.service.ts, payment.service.ts', db: 'invoices, members, transactions', status: 'PASS' },
+    { id: '[NODE-APP-004]', subsystem: 'CEO HN10 PWA', name: 'Sự Kiện Học viên & Vé Điện Tử', route: '/association/events', ui: 'src/routes/association.events.tsx, EventList.tsx', be: 'events.service.ts, payment.service.ts', db: 'events, event_registrations', status: 'PASS' },
     { id: '[NODE-APP-005]', subsystem: 'CEO HN10 PWA', name: 'Quét Mã QR Check-in Điểm Danh', route: '/association/checkin', ui: 'src/routes/association.checkin.tsx, QrScanner.tsx', be: 'checkin.service.ts', db: 'event_checkins, meetings', status: 'PASS' },
     { id: '[NODE-APP-006]', subsystem: 'CEO HN10 PWA', name: 'Sàn Thương Mại Nội Khối CEO HN10', route: '/association/marketplace', ui: 'src/routes/association.marketplace.tsx, ProductGrid.tsx', be: 'marketplace.service.ts', db: 'products, orders, quotes', status: 'PASS' },
     { id: '[NODE-APP-007]', subsystem: 'CEO HN10 PWA', name: 'Cơ Hội Kinh Doanh & Đầu Tư B2B', route: '/association/opportunities', ui: 'src/routes/association.opportunities.tsx', be: 'opportunity.service.ts', db: 'opportunities, deals', status: 'PASS' },
@@ -127,7 +127,7 @@ async function generateMasterExcel() {
     { id: '[NODE-APP-013]', subsystem: 'CEO HN10 PWA', name: 'Cài Đặt Hệ Thống, Trợ Lý AI & Mật Khẩu', route: '/association/settings', ui: 'src/routes/association.settings.tsx', be: 'auth.service.ts, ai.service.ts', db: 'vione_users, ai_sessions', status: 'PASS' },
     { id: '[NODE-APP-014]', subsystem: 'CEO HN10 PWA', name: 'Danh Sách Ưu Đãi QR & Đối Tác', route: '/association/perks', ui: 'src/routes/association.perks.tsx', be: 'content.service.ts', db: 'perks, partner_merchants', status: 'PASS' },
     { id: '[NODE-APP-015]', subsystem: 'CEO HN10 PWA', name: 'Cầu Nối Native Capacitor & Service Worker', route: 'PWA / Native Bridge', ui: 'sw.js, manifest.webmanifest', be: 'notifications.service.ts', db: 'user_push_tokens', status: 'PASS' },
-    
+
     // Core Nodes
     { id: '[NODE-CORE-001]', subsystem: 'Core / Backend', name: 'Xác Thực JWT & Guard RBAC', route: '/api/auth/*', ui: 'AuthService, JwtAuthGuard, RolesGuard', be: 'auth.service.ts', db: 'vione_users, user_roles', status: 'PASS' },
     { id: '[NODE-CORE-002]', subsystem: 'Core / Backend', name: 'CSDL PostgreSQL & Prisma ORM', route: 'Database Engine', ui: 'PrismaService (packages/db)', be: 'prisma.service.ts', db: '181 Prisma Models', status: 'PASS' },
@@ -219,21 +219,21 @@ async function generateMasterExcel() {
   const sampleFunctions = [
     { id: 'FNC-CRM-001', subsystem: 'Web Admin', name: 'Đăng nhập tài khoản Quản trị', screen: '/auth', role: 'Super Admin, Admin, BQT', trigger: 'Submit form email + password', api: 'POST /api/auth/login', status: 'PASS' },
     { id: 'FNC-CRM-002', subsystem: 'Web Admin', name: 'Xem Dashboard & 4 Thẻ KPI', screen: '/', role: 'Admin, BQT, BTH', trigger: 'Mở trang chủ CRM', api: 'GET /api/admin/dashboard-stats', status: 'PASS' },
-    { id: 'FNC-CRM-003', subsystem: 'Web Admin', name: 'Tra cứu danh bạ hội viên 360°', screen: '/members', role: 'Toàn bộ Admin & BQT', trigger: 'Nhập tìm kiếm / Chọn bộ lọc', api: 'GET /api/members', status: 'PASS' },
-    { id: 'FNC-CRM-004', subsystem: 'Web Admin', name: 'Tạo mới hồ sơ hội viên', screen: '/members', role: 'Admin, Ban Thư Ký', trigger: 'Click "Thêm hội viên" & submit modal', api: 'POST /api/members', status: 'PASS' },
+    { id: 'FNC-CRM-003', subsystem: 'Web Admin', name: 'Tra cứu danh bạ Học viên 360°', screen: '/members', role: 'Toàn bộ Admin & BQT', trigger: 'Nhập tìm kiếm / Chọn bộ lọc', api: 'GET /api/members', status: 'PASS' },
+    { id: 'FNC-CRM-004', subsystem: 'Web Admin', name: 'Tạo mới hồ sơ Học viên', screen: '/members', role: 'Admin, Ban Thư Ký', trigger: 'Click "Thêm Học viên" & submit modal', api: 'POST /api/members', status: 'PASS' },
     { id: 'FNC-CRM-005', subsystem: 'Web Admin', name: 'Cập nhật phân quyền & Ban Chuyên Môn', screen: '/accounts', role: 'Chủ tịch, Admin', trigger: 'Chọn Ban & Chức vụ trong modal', api: 'PATCH /api/members/:id/role-dept', status: 'PASS' },
     { id: 'FNC-CRM-006', subsystem: 'Web Admin', name: 'Cấu hình ma trận phân quyền RBAC', screen: '/permissions', role: 'Super Admin', trigger: 'Bật/tắt switch quyền hạn', api: 'POST /api/admin/roles/permissions', status: 'PASS' },
     { id: 'FNC-CRM-007', subsystem: 'Web Admin', name: 'Xuất danh sách hội phí ra file Excel', screen: '/renewal', role: 'Ban Tài Chính, Kế Toán', trigger: 'Click "Xuất Excel"', api: 'Client-side XLSX Export', status: 'PASS' },
     { id: 'FNC-CRM-008', subsystem: 'Web Admin', name: 'Tạo sự kiện & vé tham dự có phí', screen: '/events', role: 'Ban Sự Kiện, Admin', trigger: 'Submit form tạo sự kiện', api: 'POST /api/events', status: 'PASS' },
     { id: 'FNC-CRM-009', subsystem: 'Web Admin', name: 'Xuất ảnh Poster sự kiện chuẩn 4K', screen: '/templates', role: 'Ban Truyền Thông, Admin', trigger: 'Click "Tải ảnh 4K"', api: 'html2canvas 4K Export', status: 'PASS' },
-    { id: 'FNC-APP-001', subsystem: 'CEO HN10 PWA', name: 'Xem Thẻ Doanh Nhân Số & QR Điểm Danh', screen: '/association/card', role: 'Tất cả Hội viên chính thức', trigger: 'Mở tab Thẻ hội viên', api: 'GET /api/business-card/my-card', status: 'PASS' },
-    { id: 'FNC-APP-002', subsystem: 'CEO HN10 PWA', name: 'Đóng hội phí thường niên qua Napas247 QR', screen: '/association/renew/pay', role: 'Hội viên cần đóng phí', trigger: 'Click "Thanh toán ngay"', api: 'POST /api/payment/create-fee-checkout', status: 'PASS' },
-    { id: 'FNC-APP-003', subsystem: 'CEO HN10 PWA', name: 'Đăng ký tham gia sự kiện có phí', screen: '/association/events', role: 'Hội viên & Khách mời', trigger: 'Click "Đăng ký vé"', api: 'POST /api/events/:id/register', status: 'PASS' },
+    { id: 'FNC-APP-001', subsystem: 'CEO HN10 PWA', name: 'Xem Thẻ Doanh Nhân Số & QR Điểm Danh', screen: '/association/card', role: 'Tất cả Học viên chính thức', trigger: 'Mở tab Thẻ Học viên', api: 'GET /api/business-card/my-card', status: 'PASS' },
+    { id: 'FNC-APP-002', subsystem: 'CEO HN10 PWA', name: 'Đóng hội phí thường niên qua Napas247 QR', screen: '/association/renew/pay', role: 'Học viên cần đóng phí', trigger: 'Click "Thanh toán ngay"', api: 'POST /api/payment/create-fee-checkout', status: 'PASS' },
+    { id: 'FNC-APP-003', subsystem: 'CEO HN10 PWA', name: 'Đăng ký tham gia sự kiện có phí', screen: '/association/events', role: 'Học viên & Khách mời', trigger: 'Click "Đăng ký vé"', api: 'POST /api/events/:id/register', status: 'PASS' },
     { id: 'FNC-APP-004', subsystem: 'CEO HN10 PWA', name: 'Quét QR Gate điểm danh đại biểu', screen: '/association/checkin', role: 'BQT & Ban Tổ Chức', trigger: 'Mở camera quét QR', api: 'POST /api/events/checkin/qr', status: 'PASS' },
-    { id: 'FNC-APP-005', subsystem: 'CEO HN10 PWA', name: 'Đăng sản phẩm lên Sàn Giao Thương B2B', screen: '/association/marketplace', role: 'Hội viên chính thức', trigger: 'Submit form đăng tin sản phẩm', api: 'POST /api/marketplace/products', status: 'PASS' },
-    { id: 'FNC-APP-006', subsystem: 'CEO HN10 PWA', name: 'Hỏi đáp & tra cứu qua Trợ Lý ViOne AI', screen: '/association/settings', role: 'Toàn bộ hội viên', trigger: 'Gửi tin nhắn trong chat box', api: 'POST /api/ai/chat', status: 'PASS' },
+    { id: 'FNC-APP-005', subsystem: 'CEO HN10 PWA', name: 'Đăng sản phẩm lên Sàn Giao Thương B2B', screen: '/association/marketplace', role: 'Học viên chính thức', trigger: 'Submit form đăng tin sản phẩm', api: 'POST /api/marketplace/products', status: 'PASS' },
+    { id: 'FNC-APP-006', subsystem: 'CEO HN10 PWA', name: 'Hỏi đáp & tra cứu qua Trợ Lý ViOne AI', screen: '/association/settings', role: 'Toàn bộ Học viên', trigger: 'Gửi tin nhắn trong chat box', api: 'POST /api/ai/chat', status: 'PASS' },
     { id: 'FNC-APP-007', subsystem: 'CEO HN10 PWA', name: 'Cài đặt PWA chạy chế độ Standalone', screen: 'Browser Prompt', role: 'Mọi thiết bị di động', trigger: 'Click "Thêm vào màn hình chính"', api: 'Service Worker & Web Manifest', status: 'PASS' },
-    { id: 'FNC-APP-008', subsystem: 'CEO HN10 PWA', name: 'Truy cập ngoại tuyến (Offline Mode)', screen: '/association', role: 'Toàn bộ hội viên', trigger: 'Mất mạng kết nối Internet', api: 'sw.js Cache-First / Fallback', status: 'PASS' }
+    { id: 'FNC-APP-008', subsystem: 'CEO HN10 PWA', name: 'Truy cập ngoại tuyến (Offline Mode)', screen: '/association', role: 'Toàn bộ Học viên', trigger: 'Mất mạng kết nối Internet', api: 'sw.js Cache-First / Fallback', status: 'PASS' }
   ];
 
   sampleFunctions.forEach(f => {
@@ -296,7 +296,7 @@ async function generateMasterExcel() {
     { id: 'TC-API-AUTH-001', apiId: 'API-001', endpoint: '/api/auth/login', type: 'Happy Path', pre: 'Tài khoản tồn tại trong DB', input: 'Valid email + password', expected: 'Trả về JWT accessToken hợp lệ + thông tin user', actual: 'JWT token sinh đúng chuẩn, thời hạn 7 ngày', status: 'PASS' },
     { id: 'TC-API-AUTH-002', apiId: 'API-001', endpoint: '/api/auth/login', type: 'Negative (Wrong Pass)', pre: 'Tài khoản tồn tại', input: 'Sai password', expected: 'HTTP 401 Unauthorized', actual: 'Trả về HTTP 401 Unauthorized với thông báo an toàn', status: 'PASS' },
     { id: 'TC-API-AUTH-003', apiId: 'API-002', endpoint: '/api/auth/me', type: 'Security (No Token)', pre: 'Không truyền Authorization header', input: 'Trống header', expected: 'HTTP 401 Unauthorized', actual: 'JwtAuthGuard chặn và trả về 401', status: 'PASS' },
-    { id: 'TC-API-MEM-001', apiId: 'API-015', endpoint: '/api/members', type: 'Data Retrieval', pre: 'Token Admin hợp lệ', input: 'GET query params (search, limit, page)', expected: 'Danh sách hội viên kèm tổng số trang', actual: 'Trả về 200 OK kèm payload mảng hội viên', status: 'PASS' },
+    { id: 'TC-API-MEM-001', apiId: 'API-015', endpoint: '/api/members', type: 'Data Retrieval', pre: 'Token Admin hợp lệ', input: 'GET query params (search, limit, page)', expected: 'Danh sách Học viên kèm tổng số trang', actual: 'Trả về 200 OK kèm payload mảng Học viên', status: 'PASS' },
     { id: 'TC-API-MEM-002', apiId: 'API-016', endpoint: '/api/members', type: 'Validation (Missing Name)', pre: 'Token Admin', input: 'Thiếu trường name / phone', expected: 'HTTP 400 Bad Request', actual: 'Zod validation chặn và trả về chi tiết lỗi', status: 'PASS' },
     { id: 'TC-API-PAY-001', apiId: 'API-040', endpoint: '/api/payment/vnpay-create-url', type: 'Financial (Create URL)', pre: 'Số tiền > 0', input: 'amount: 2000000, orderInfo: "Hoi phi"', expected: 'Sinh URL thanh toán có chữ ký HMAC-SHA512', actual: 'Sinh URL VNPay chuẩn v2.1.0 kèm mã QR', status: 'PASS' },
     { id: 'TC-API-PAY-002', apiId: 'API-040', endpoint: '/api/payment/vnpay-create-url', type: 'Security (Negative Amount)', pre: 'Số tiền âm hoặc bằng 0', input: 'amount: -500000', expected: 'HTTP 400 Bad Request', actual: 'Ném HttpException số tiền không hợp lệ', status: 'PASS' },
@@ -327,8 +327,8 @@ async function generateMasterExcel() {
   formatHeaderRow(ws8.getRow(1));
 
   const fnTestCases = [
-    { id: 'TC-FN-CRM-001', subsystem: 'Web Admin', feature: 'Lọc danh bạ hội viên', steps: '1. Vào /members\n2. Chọn ngành "Công nghệ"\n3. Chọn khu vực "Miền Bắc"', expected: 'Bảng hiển thị danh sách hội viên phù hợp', actual: 'Danh sách lọc chính xác, không giật lag', status: 'PASS' },
-    { id: 'TC-FN-CRM-002', subsystem: 'Web Admin', feature: 'Xóa hội viên cascade', steps: '1. Vào /members\n2. Chọn xóa hội viên\n3. Chọn "Xóa cascade cả doanh nghiệp"', expected: 'Bản ghi member và company được xóa an toàn', actual: 'Prisma transaction xóa sạch ràng buộc', status: 'PASS' },
+    { id: 'TC-FN-CRM-001', subsystem: 'Web Admin', feature: 'Lọc danh bạ Học viên', steps: '1. Vào /members\n2. Chọn ngành "Công nghệ"\n3. Chọn khu vực "Miền Bắc"', expected: 'Bảng hiển thị danh sách Học viên phù hợp', actual: 'Danh sách lọc chính xác, không giật lag', status: 'PASS' },
+    { id: 'TC-FN-CRM-002', subsystem: 'Web Admin', feature: 'Xóa Học viên cascade', steps: '1. Vào /members\n2. Chọn xóa Học viên\n3. Chọn "Xóa cascade cả doanh nghiệp"', expected: 'Bản ghi member và company được xóa an toàn', actual: 'Prisma transaction xóa sạch ràng buộc', status: 'PASS' },
     { id: 'TC-FN-CRM-003', subsystem: 'Web Admin', feature: 'Chuyển đổi 2 Tab RBAC', steps: '1. Vào /permissions\n2. Chuyển Tab 1 (Vai trò) sang Tab 2 (Ban Chuyên Môn)', expected: 'Ma trận quyền đổi tương ứng', actual: 'Chuyển tab mượt mà, lưu DB tức thì', status: 'PASS' },
     { id: 'TC-FN-PWA-001', subsystem: 'CEO HN10 PWA', feature: 'Xem Thẻ Doanh Nhân Số', steps: '1. Vào /association/card\n2. Kiểm tra thông tin & mã QR', expected: 'Thẻ hiển thị đúng thương hiệu Đỏ - Vàng - Xanh', actual: 'Hiển thị thẻ sang trọng, QR sinh động', status: 'PASS' },
     { id: 'TC-FN-PWA-002', subsystem: 'CEO HN10 PWA', feature: 'Đóng hội phí niên liễm', steps: '1. Vào /association/renew\n2. Chọn đóng phí\n3. Quét mã QR', expected: 'Sinh mã QR Napas247 đúng số tiền', actual: 'Mã QR hiển thị chính xác số tiền VNĐ', status: 'PASS' },
@@ -427,13 +427,13 @@ async function generateMasterExcel() {
     { header: 'Trưởng 6 Ban', key: 'tb', width: 16 },
     { header: 'Ban Thư Ký', key: 'btk', width: 16 },
     { header: 'Kế Toán / Thủ Quỹ', key: 'kt', width: 16 },
-    { header: 'Hội Viên Chính Thức', key: 'mem', width: 18 }
+    { header: 'Học viên Chính Thức', key: 'mem', width: 18 }
   ];
   formatHeaderRow(ws11.getRow(1));
 
   const matrix = [
     { feature: 'Xem Tổng Quan Dashboard & KPI', sa: 'FULL', ct: 'FULL', bdh: 'FULL', tb: 'VIEW', btk: 'VIEW', kt: 'VIEW', mem: 'NONE' },
-    { feature: 'Quản Lý Danh Bạ & Hồ Sơ Hội Viên', sa: 'FULL', ct: 'FULL', bdh: 'FULL', tb: 'VIEW', btk: 'EDIT', kt: 'VIEW', mem: 'VIEW_OWN' },
+    { feature: 'Quản Lý Danh Bạ & Hồ Sơ Học viên', sa: 'FULL', ct: 'FULL', bdh: 'FULL', tb: 'VIEW', btk: 'EDIT', kt: 'VIEW', mem: 'VIEW_OWN' },
     { feature: 'Gán Chức Vụ Ban & Phân Quyền', sa: 'FULL', ct: 'FULL', bdh: 'NONE', tb: 'NONE', btk: 'NONE', kt: 'NONE', mem: 'NONE' },
     { feature: 'Quản Lý Thu Phí & Hóa Đơn', sa: 'FULL', ct: 'VIEW', bdh: 'VIEW', tb: 'NONE', btk: 'VIEW', kt: 'FULL', mem: 'PAY_OWN' },
     { feature: 'Tạo Sự Kiện & Quản Lý Vé Phí', sa: 'FULL', ct: 'FULL', bdh: 'FULL', tb: 'EDIT', btk: 'EDIT', kt: 'VIEW', mem: 'REGISTER' },
@@ -473,7 +473,7 @@ async function generateMasterExcel() {
 
   const paymentTests = [
     { id: 'TC-PAY-FEE-001', flow: 'Thanh toán hội phí thường niên', method: 'VNPAY-QR / Napas247', amount: '2.000.000 VND (Integer)', hash: 'HMAC-SHA512 vnp_SecureHash', db: 'invoices.status = paid, members.fee_paid = true', status: 'PASS' },
-    { id: 'TC-PAY-FEE-002', flow: 'Gia hạn hội viên năm tiếp theo', method: 'VNPAY-QR / Napas247', amount: '2.000.000 VND (Integer)', hash: 'HMAC-SHA512 vnp_SecureHash', db: 'members.new_term_end +1 year, status = active', status: 'PASS' },
+    { id: 'TC-PAY-FEE-002', flow: 'Gia hạn Học viên năm tiếp theo', method: 'VNPAY-QR / Napas247', amount: '2.000.000 VND (Integer)', hash: 'HMAC-SHA512 vnp_SecureHash', db: 'members.new_term_end +1 year, status = active', status: 'PASS' },
     { id: 'TC-PAY-EVT-001', flow: 'Mua vé sự kiện gala đại hội', method: 'VNPAY-QR / Napas247', amount: '1.500.000 VND (Integer)', hash: 'HMAC-SHA512 vnp_SecureHash', db: 'event_registrations.payment_status = paid', status: 'PASS' },
     { id: 'TC-PAY-IDEMP-001', flow: 'Gửi callback IPN trùng lặp', method: 'VNPAY IPN', amount: '2.000.000 VND', hash: 'Trùng vnp_TxnRef', db: 'Bỏ qua không cộng dồn, không gia hạn 2 lần', status: 'PASS' },
     { id: 'TC-PAY-FAIL-001', flow: 'Giao dịch bị người dùng hủy', method: 'VNPAY Return', amount: '2.000.000 VND', hash: 'vnp_ResponseCode = 24', db: 'invoices.status giữ nguyên unpaid, không sửa member', status: 'PASS' }
@@ -504,7 +504,7 @@ async function generateMasterExcel() {
     { id: 'TC-PWA-003', title: 'Đăng ký và kích hoạt Service Worker', env: 'sw.js (Cache API)', tech: 'self.skipWaiting(), clients.claim()', result: 'Cache shell v4 thành công, quản lý request ngầm', status: 'PASS' },
     { id: 'TC-PWA-004', title: 'Chế độ hoạt động ngoại tuyến (Offline)', env: 'Offline Network Emulation', tech: 'Cache-First fallback for assets', result: 'Tải lại trang thành công từ Cache Storage', status: 'PASS' },
     { id: 'TC-PWA-005', title: 'Nhận diện an toàn Web Push Notifications', env: 'Web Push API', tech: 'safeShowNotification() permission check', result: 'Không crash khi chưa cấp quyền, nhận push khi bật', status: 'PASS' },
-    { id: 'TC-PWA-006', title: 'Duy trì phiên đăng nhập sau restart PWA', env: 'LocalStorage & Cookie', tech: 'Token persistence & auto-refresh', result: 'Hội viên vẫn duy trì trạng thái đăng nhập', status: 'PASS' }
+    { id: 'TC-PWA-006', title: 'Duy trì phiên đăng nhập sau restart PWA', env: 'LocalStorage & Cookie', tech: 'Token persistence & auto-refresh', result: 'Học viên vẫn duy trì trạng thái đăng nhập', status: 'PASS' }
   ];
 
   pwaTests.forEach(pt => {
@@ -526,7 +526,7 @@ async function generateMasterExcel() {
   formatHeaderRow(ws14.getRow(1));
 
   const secTests = [
-    { id: 'TC-SEC-001', category: 'A01: Broken Access Control', method: 'Hội viên thường gọi API gán quyền /api/members/:id/role-dept', defense: 'RolesGuard chặn ngay với HTTP 403 Forbidden', result: 'PASS - Phòng vệ vững chắc' },
+    { id: 'TC-SEC-001', category: 'A01: Broken Access Control', method: 'Học viên thường gọi API gán quyền /api/members/:id/role-dept', defense: 'RolesGuard chặn ngay với HTTP 403 Forbidden', result: 'PASS - Phòng vệ vững chắc' },
     { id: 'TC-SEC-002', category: 'A02: Cryptographic Failures', method: 'Kiểm tra lưu trữ mật khẩu & mã hóa JWT', defense: 'bcrypt (salt 10 rounds), HMAC-SHA512 cho chữ ký thanh toán', result: 'PASS - Đạt chuẩn mã hóa' },
     { id: 'TC-SEC-003', category: 'A03: Injection (SQL Injection)', method: 'Inject payload `1=1 OR drop table` vào endpoint search', defense: 'Prisma ORM tham số hóa 100% truy vấn, raw query dùng TemplateStrings', result: 'PASS - Miễn nhiễm SQLi' },
     { id: 'TC-SEC-004', category: 'A07: Identification and Auth', method: 'Brute force login / Giả mạo token JWT', defense: 'JWT ký bằng bí mật mạnh, kiểm tra trạng thái active trong CSDL thời gian thực', result: 'PASS - Ngắt phiên tức thì' },
@@ -633,10 +633,10 @@ async function generateMasterExcel() {
   formatHeaderRow(ws18.getRow(1));
 
   const regRows = [
-    { bugId: 'BUG-RENEWAL-001', radius: 'renewals-calc.ts -> daysBetween()', cross: 'Kiểm tra niên độ hội viên, nhắc nợ phí niên liễm, cảnh báo hết hạn', result: '10/10 Test PASS - 0 hồi quy' },
+    { bugId: 'BUG-RENEWAL-001', radius: 'renewals-calc.ts -> daysBetween()', cross: 'Kiểm tra niên độ Học viên, nhắc nợ phí niên liễm, cảnh báo hết hạn', result: '10/10 Test PASS - 0 hồi quy' },
     { bugId: 'BUG-RENEWAL-002', radius: 'renewals-calc.ts -> toRecord()', cross: 'Hiển thị danh sách gia hạn trên CRM, export bảng biểu Excel', result: '10/10 Test PASS - Mã gia hạn chính xác' },
     { bugId: 'BUG-AI-001', radius: 'ai-mock-answer-engine.ts', cross: 'Khung chat trợ lý ViOne AI trên cả CRM và PWA di động', result: '12/12 Test PASS - Văn phong chuẩn hoá' },
-    { bugId: 'BUG-E2E-001', radius: 'renewal.functions.ts & server fns', cross: 'Toàn bộ luồng thanh toán gia hạn tự phục vụ của hội viên trên PWA', result: '15/15 Invariant Tests PASS - Kết nối NestJS an toàn' }
+    { bugId: 'BUG-E2E-001', radius: 'renewal.functions.ts & server fns', cross: 'Toàn bộ luồng thanh toán gia hạn tự phục vụ của Học viên trên PWA', result: '15/15 Invariant Tests PASS - Kết nối NestJS an toàn' }
   ];
 
   regRows.forEach(rr => {
@@ -699,7 +699,7 @@ async function generateMasterExcel() {
     const singleWb = new ExcelJS.Workbook();
     const sourceWs = wb.getWorksheet(s.sheetName);
     const targetWs = singleWb.addWorksheet(s.sheetName);
-    
+
     // Copy columns
     targetWs.columns = sourceWs.columns.map(col => ({
       header: col.header,
@@ -900,7 +900,7 @@ async function generatePptx() {
   const verdictText = [
     `1. Độ sẵn sàng kỹ thuật: Mã nguồn sạch 100%, không còn lỗi cú pháp hoặc Type error.`,
     `2. An toàn tài chính: Số tiền xử lý dạng số nguyên VNĐ, kiểm tra chữ ký nghiêm ngặt.`,
-    `3. Trải nghiệm hội viên: PWA di động tải nhanh (<1.5s LCP), hỗ trợ Offline mượt mà.`,
+    `3. Trải nghiệm Học viên: PWA di động tải nhanh (<1.5s LCP), hỗ trợ Offline mượt mà.`,
     `4. Điều kiện khuyến nghị: Cần cấu hình chính thức Webhook Zalo OA và tài khoản VNPAY Production trước khi mở cổng diện rộng.`
   ].join('\n\n');
   slide4.addText(verdictText, {
@@ -926,17 +926,17 @@ async function generatePdf() {
   const page1 = pdfDoc.addPage([595.28, 841.89]); // A4
   page1.drawRectangle({
     x: 0, y: 0, width: 595.28, height: 841.89,
-    color: rgb(0/255, 29/255, 74/255)
+    color: rgb(0 / 255, 29 / 255, 74 / 255)
   });
 
   page1.drawText('CEO HN10 HANOIBA ECOSYSTEM', {
-    x: 50, y: 720, size: 24, font: timesRomanBold, color: rgb(212/255, 175/255, 55/255)
+    x: 50, y: 720, size: 24, font: timesRomanBold, color: rgb(212 / 255, 175 / 255, 55 / 255)
   });
   page1.drawText('SOFTWARE QUALITY AUDIT & ACCEPTANCE DOSSIER', {
     x: 50, y: 685, size: 16, font: timesRomanBold, color: rgb(1, 1, 1)
   });
   page1.drawText('INDEPENDENT SOFTWARE AUDIT & COMPLIANCE REPORT', {
-    x: 50, y: 660, size: 12, font: timesRoman, color: rgb(203/255, 213/255, 225/255)
+    x: 50, y: 660, size: 12, font: timesRoman, color: rgb(203 / 255, 213 / 255, 225 / 255)
   });
 
   const coverLines = [
@@ -962,7 +962,7 @@ async function generatePdf() {
   // Page 2: Summary & Metrics
   const page2 = pdfDoc.addPage([595.28, 841.89]);
   page2.drawText('1. EXECUTIVE SUMMARY & SYSTEM METRICS', {
-    x: 50, y: 780, size: 16, font: timesRomanBold, color: rgb(0/255, 29/255, 74/255)
+    x: 50, y: 780, size: 16, font: timesRomanBold, color: rgb(0 / 255, 29 / 255, 74 / 255)
   });
 
   const bodyParagraphs = [
@@ -989,11 +989,11 @@ async function generatePdf() {
   let pY = 740;
   for (const bp of bodyParagraphs) {
     if (bp.startsWith('2.') || bp.startsWith('3.')) {
-      page2.drawText(bp, { x: 50, y: pY, size: 13, font: timesRomanBold, color: rgb(0/255, 29/255, 74/255) });
+      page2.drawText(bp, { x: 50, y: pY, size: 13, font: timesRomanBold, color: rgb(0 / 255, 29 / 255, 74 / 255) });
     } else if (bp.startsWith('STATUS:')) {
-      page2.drawText(bp, { x: 50, y: pY, size: 14, font: timesRomanBold, color: rgb(21/255, 128/255, 61/255) });
+      page2.drawText(bp, { x: 50, y: pY, size: 14, font: timesRomanBold, color: rgb(21 / 255, 128 / 255, 61 / 255) });
     } else {
-      page2.drawText(bp, { x: 50, y: pY, size: 10, font: timesRoman, color: rgb(30/255, 41/255, 59/255) });
+      page2.drawText(bp, { x: 50, y: pY, size: 10, font: timesRoman, color: rgb(30 / 255, 41 / 255, 59 / 255) });
     }
     pY -= 20;
   }
@@ -1110,7 +1110,7 @@ function generateHtmlDashboard() {
               <tr class="hover:bg-slate-800/50">
                 <td class="py-3 px-4 font-mono font-bold text-amber-400">[NODE-CRM-003]</td>
                 <td class="py-3 px-4">Web Admin</td>
-                <td class="py-3 px-4 font-medium text-white">Quản Trị Danh Bạ Hội Viên 360°</td>
+                <td class="py-3 px-4 font-medium text-white">Quản Trị Danh Bạ Học viên 360°</td>
                 <td class="py-3 px-4 text-slate-400 font-mono">/members (MemberTable.tsx)</td>
                 <td class="py-3 px-4"><span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-semibold text-[10px]">PASS</span></td>
               </tr>
@@ -1218,8 +1218,8 @@ function generateMarkdownDeliverables() {
 ### 1. TỔNG QUAN KIẾN TRÚC HỆ THỐNG
 Hệ thống CLB Doanh Nhân CEO HN10 được thiết kế theo kiến trúc tách biệt đa phân hệ:
 1. **Web CRM Quản Trị**: Dành cho Chủ tịch, Ban Chấp Hành, Ban Điều Hành, Trưởng 6 Ban Chuyên Môn, Ban Thư Ký, Kế toán và Admin.
-   - Giao diện: Desktop Web Layout, Sidebar cố định, Bảng biểu Excel, Recharts, Quản trị hội viên 360°, Phân quyền RBAC 2 Tab.
-2. **CEO HN10 PWA (Progressive Web App)**: Dành cho toàn thể hội viên doanh nhân.
+   - Giao diện: Desktop Web Layout, Sidebar cố định, Bảng biểu Excel, Recharts, Quản trị Học viên 360°, Phân quyền RBAC 2 Tab.
+2. **CEO HN10 PWA (Progressive Web App)**: Dành cho toàn thể Học viên doanh nhân.
    - Giao diện: Mobile-first MemberShell, Bottom Navigation, Thẻ Doanh Nhân Số, QR Động 60s, Cổng thanh toán Napas247 / VNPAY-QR, Sàn giao thương B2B, Lịch hẹn 1-on-1, Trợ lý ViOne AI.
    - Chạy trên cả Trình duyệt Web và chế độ Ứng dụng Cài đặt (Standalone Display) với Service Worker Offline Cache.
 3. **Backend Core (NestJS)**: 38 Controllers, 629 API endpoints, WebSocket Gateway, SMTP Mailer, Zalo OA API & MiniApp Webhook.
@@ -1245,7 +1245,7 @@ Hệ thống CLB Doanh Nhân CEO HN10 được thiết kế theo kiến trúc t�
 
 ### 1. XÁC THỰC & PHÂN QUYỀN (AUTHENTICATION & AUTHORIZATION)
 - **JWT Protection**: 100% API nhạy cảm được bảo vệ bởi \`JwtAuthGuard\` kết hợp kiểm tra trạng thái hoạt động thực tế trong bảng \`vione_users\` và \`members\`.
-- **RBAC Realtime Enforcement**: \`RolesGuard\` đọc trực tiếp quyền hạn từ \`user_roles\`, \`memberships\` và chức vụ ban điều hành tại thời điểm gọi API. Nếu hội viên bị đình chỉ (\`status = suspended / banned\`), request bị chặn ngay lập tức.
+- **RBAC Realtime Enforcement**: \`RolesGuard\` đọc trực tiếp quyền hạn từ \`user_roles\`, \`memberships\` và chức vụ ban điều hành tại thời điểm gọi API. Nếu Học viên bị đình chỉ (\`status = suspended / banned\`), request bị chặn ngay lập tức.
 - **Phòng chống leo quyền (Privilege Escalation)**: Các endpoint gán quyền \`/api/members/:id/role-dept\` và \`/api/admin/roles/permissions\` yêu cầu vai trò tối cao (\`super_admin\` hoặc \`president\`).
 
 ### 2. PHÒNG CHỐNG TẤN CÔNG (INJECTION & XSS)

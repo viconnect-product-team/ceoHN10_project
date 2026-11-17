@@ -19,7 +19,7 @@ function generateSrsMarkdown() {
 
 ### THÔNG TIN DỰ ÁN (PROJECT METADATA)
 * **Tên dự án:** Hệ Sinh Thái Số Hóa & Quản Trị Hiệp Hội Doanh Nhân CEO HN10 (CEO HN10 Association Ecosystem).
-* **Mục tiêu cốt lõi:** Số hóa 100% hồ sơ hội viên, tự động hóa quy trình thẩm định kết nạp, quản trị sổ quỹ và thu hội phí thường niên, kiểm soát an ninh sự kiện qua mã QR Pass tốc độ cao, tổ chức biểu quyết đại hội minh bạch và thúc đẩy mạng lưới giao thương nội khối B2B.
+* **Mục tiêu cốt lõi:** Số hóa 100% hồ sơ Học viên, tự động hóa quy trình thẩm định kết nạp, quản trị sổ quỹ và thu hội phí thường niên, kiểm soát an ninh sự kiện qua mã QR Pass tốc độ cao, tổ chức biểu quyết đại hội minh bạch và thúc đẩy mạng lưới giao thương nội khối B2B.
 * **Cơ quan chủ quản:** Câu Lạc Bộ Doanh Nhân CEO HN10 (Trực thuộc Hội Doanh Nhân Trẻ Hà Nội — HanoiBA).
 * **Đơn vị tư vấn & phát triển:** ViConnect Platform & Ban Công Nghệ Chuyển Đổi Số.
 * **Mã tài liệu:** \`SRS-IEEE830-CEO HN10-MASTER-V5.0\`
@@ -38,9 +38,9 @@ Tài liệu là bản cam kết kỹ thuật duy nhất giữa Ban Thường Tr�
 
 ### 1.2. Phạm Vi Dự Án (Project Scope)
 Hệ sinh thái bao gồm 3 phân hệ cấu thành độc lập nhưng đồng bộ dữ liệu thời gian thực:
-1. **Cổng Thông Tin Công Khai (Public Landing Web):** Tiếp nhận hồ sơ đăng ký gia nhập CLB trực tuyến, tra cứu mã định danh hội viên và truyền thông giá trị cốt lõi của CLB Doanh Nhân CEO HN10.
-2. **Cổng Quản Trị Điều Hành Trung Tâm (Executive Web CRM):** Dành cho Ban Quản Trị, Ban Thư Ký và 6 Ban chuyên môn để quản lý hồ sơ hội viên 360°, thẩm định kết nạp, sơ đồ ghế sự kiện Gala (Cinema Seating Map), cổng soát vé an ninh QR Gate, điều hành cuộc họp trực tuyến/offline, sàn giao thương B2B, quản lý công việc phân cấp và sổ quỹ thu chi minh bạch.
-3. **Ứng Dụng Di Động Hội Viên (CEO HN10 Mobile App & PWA):** Dành riêng cho Hội viên chính thức với Thẻ VIP 3D Navy & Gold, Danh thiếp thông minh NFC chạm 1 chạm, Hộp thư Doanh nhân Messenger #0084FF, Gian hàng B2B Doanh nhân CEO HN10, Bảng tin cơ hội Cung - Cầu thời gian thực, Biểu quyết đại hội và Cổng thanh toán gia hạn hội phí VietQR.
+1. **Cổng Thông Tin Công Khai (Public Landing Web):** Tiếp nhận hồ sơ đăng ký gia nhập CLB trực tuyến, tra cứu mã định danh Học viên và truyền thông giá trị cốt lõi của CLB Doanh Nhân CEO HN10.
+2. **Cổng Quản Trị Điều Hành Trung Tâm (Executive Web CRM):** Dành cho Ban Quản Trị, Ban Thư Ký và 6 Ban chuyên môn để quản lý hồ sơ Học viên 360°, thẩm định kết nạp, sơ đồ ghế sự kiện Gala (Cinema Seating Map), cổng soát vé an ninh QR Gate, điều hành cuộc họp trực tuyến/offline, sàn giao thương B2B, quản lý công việc phân cấp và sổ quỹ thu chi minh bạch.
+3. **Ứng Dụng Di Động Học viên (CEO HN10 Mobile App & PWA):** Dành riêng cho Học viên chính thức với Thẻ VIP 3D Navy & Gold, Danh thiếp thông minh NFC chạm 1 chạm, Hộp thư Doanh nhân Messenger #0084FF, Gian hàng B2B Doanh nhân CEO HN10, Bảng tin cơ hội Cung - Cầu thời gian thực, Biểu quyết đại hội và Cổng thanh toán gia hạn hội phí VietQR.
 
 ### 1.3. Thuật Ngữ & Viết Tắt (Definitions, Acronyms & Abbreviations)
 * **HanoiBA:** Hội Doanh Nhân Trẻ Hà Nội (Hanoi Young Business Association).
@@ -72,15 +72,15 @@ Hệ thống thiết lập ma trận phân quyền 5 cấp bậc nghiêm ngặt 
 | :--- | :--- | :--- | :--- |
 | **Cấp 1: Quản Trị Tối Cao** | \`quan_tri\` / \`superadmin\` | Chủ tịch CLB, Ban Thường Trực | Toàn quyền cấu hình hệ thống, xem, sửa, xóa, phân bổ vai trò và phê duyệt ngân sách/sự kiện cấp cao nhất. |
 | **Cấp 2: Quản Trị Vận Hành** | \`admin\` | Giám đốc điều hành, Phó Chủ tịch phụ trách | Xem, sửa, phân quyền tài khoản chuyên ban, điều hành các hoạt động tác nghiệp hàng ngày. |
-| **Cấp 3: Tổng Thư Ký** | \`tong_thu_ky\` / \`btk\` | Tổng Thư Ký, Chánh Văn Phòng | Khởi tạo và điều phối cuộc họp, quản lý phòng họp Sapphire Hub, ban hành nghị quyết, văn bản. **Tuyệt đối KHÔNG có quyền phê duyệt kết nạp hội viên.** |
-| **Cấp 4: Trưởng Ban Chuyên Môn** | \`truong_ban\` (\`btv\`, \`btn\`, \`btt\`, \`bxt\`, \`btc\`) | Lãnh đạo 6 Ban chuyên trách | Quản lý nghiệp vụ chuyên biệt của từng ban: BTV độc quyền duyệt hội viên; BXT duyệt sàn B2B; BTT soát vé; BTN/BTC duyệt chi tiêu sổ quỹ. |
-| **Cấp 5: Hội Viên Chính Thức** | \`member\` | 500+ Doanh nhân CEO HN10 chính danh | Sử dụng App Mobile: Thẻ VIP, danh bạ, đặt vé sự kiện, đăng sản phẩm B2B, trao đổi cơ hội, bỏ phiếu biểu quyết và nộp hội phí. |
+| **Cấp 3: Tổng Thư Ký** | \`tong_thu_ky\` / \`btk\` | Tổng Thư Ký, Chánh Văn Phòng | Khởi tạo và điều phối cuộc họp, quản lý phòng họp Sapphire Hub, ban hành nghị quyết, văn bản. **Tuyệt đối KHÔNG có quyền phê duyệt kết nạp Học viên.** |
+| **Cấp 4: Trưởng Ban Chuyên Môn** | \`truong_ban\` (\`btv\`, \`btn\`, \`btt\`, \`bxt\`, \`btc\`) | Lãnh đạo 6 Ban chuyên trách | Quản lý nghiệp vụ chuyên biệt của từng ban: BTV độc quyền duyệt Học viên; BXT duyệt sàn B2B; BTT soát vé; BTN/BTC duyệt chi tiêu sổ quỹ. |
+| **Cấp 5: Học viên Chính Thức** | \`member\` | 500+ Doanh nhân CEO HN10 chính danh | Sử dụng App Mobile: Thẻ VIP, danh bạ, đặt vé sự kiện, đăng sản phẩm B2B, trao đổi cơ hội, bỏ phiếu biểu quyết và nộp hội phí. |
 | **Cấp 0: Khách Vãng Lai** | \`guest\` | Doanh nhân 1983 ứng viên, khách mời | Xem cổng thông tin công khai, gửi đơn đăng ký gia nhập CLB, đăng ký vé sự kiện mở rộng. |
 
 #### Ma Trận Trách Nhiệm RACI Trong 6 Ban Chuyên Môn:
 1. **Ban Quản Trị (BQT):** Accountable (A) toàn diện mọi quyết định tổ chức và ngân sách.
-2. **Ban Thành Viên (BTV):** Responsible (R) độc quyền tiếp nhận, thẩm định và bấm nút duyệt kết nạp hội viên (Cấp mã \`CEO-83xxx\`).
-3. **Ban Thư Ký (BTK):** Responsible (R) điều hành lịch họp, biểu quyết và văn bản hành chính; không can thiệp thẩm định hội viên.
+2. **Ban Thành Viên (BTV):** Responsible (R) độc quyền tiếp nhận, thẩm định và bấm nút duyệt kết nạp Học viên (Cấp mã \`CEO-83xxx\`).
+3. **Ban Thư Ký (BTK):** Responsible (R) điều hành lịch họp, biểu quyết và văn bản hành chính; không can thiệp thẩm định Học viên.
 4. **Ban Thiện Nguyện (BTN) & Ban Tài Chính (BTC):** Responsible (R) quản lý Sổ Quỹ Thu Chi, kiểm soát phiếu chi 3 cấp và đối soát hội phí.
 5. **Ban Truyền Thông (BTT):** Responsible (R) vận hành Cổng soát vé Gate Check-in QR tại sự kiện và quản trị bảng tin truyền thông.
 6. **Ban Xúc Tiến Thương Mại (BXT):** Responsible (R) kiểm duyệt gian hàng sản phẩm B2B và điều phối cơ hội kinh doanh Cung - Cầu.
@@ -89,31 +89,31 @@ Hệ thống thiết lập ma trận phân quyền 5 cấp bậc nghiêm ngặt 
 
 ### 2.2. Ánh Xạ Toàn Bộ Hành Trình Người Dùng (User Journeys)
 
-#### Hành Trình 1: Khách Vãng Lai ➔ Đăng Ký Trực Tuyến ➔ Thẩm Định BTV ➔ Cấp Mã Hội Viên ➔ Đăng Nhập Lần Đầu
+#### Hành Trình 1: Khách Vãng Lai ➔ Đăng Ký Trực Tuyến ➔ Thẩm Định BTV ➔ Cấp Mã Học viên ➔ Đăng Nhập Lần Đầu
 1. **Bước 1:** Ứng viên truy cập Cổng thông tin công khai, nhấn nút "Đăng Ký Gia Nhập".
 2. **Bước 2:** Điền mẫu đơn điện tử: Họ tên, Ngày sinh (xác thực năm 1983), SĐT, Email, Tên doanh nghiệp, MST, Chức vụ, Nguyện vọng chuyên ban.
 3. **Bước 3:** Nhấn gửi đơn. Hệ thống lưu hồ sơ ở trạng thái \`pending\` (Chờ thẩm định), đồng thời máy chủ SMTP tự động gửi email xác nhận tiếp nhận đến hòm thư ứng viên.
-4. **Bước 4:** Lãnh đạo Ban Thành Viên (BTV) đăng nhập CRM, mở màn hình "Duyệt Hội Viên" (\`/members\`), kiểm tra thông tin pháp nhân và nhấn nút "Phê Duyệt".
-5. **Bước 5:** Hệ thống tự động sinh Mã hội viên chuẩn (\`CEO-83xxx\`), tạo tài khoản người dùng, băm mật khẩu khởi tạo an toàn và gửi email chào mừng kèm thông tin đăng nhập.
-6. **Bước 6:** Hội viên mở App Mobile CEO HN10, đăng nhập bằng Email/SĐT và mật khẩu tạm thời, hệ thống bắt buộc đổi mật khẩu mới trong lần đầu tiên truy cập.
+4. **Bước 4:** Lãnh đạo Ban Thành Viên (BTV) đăng nhập CRM, mở màn hình "Duyệt Học viên" (\`/members\`), kiểm tra thông tin pháp nhân và nhấn nút "Phê Duyệt".
+5. **Bước 5:** Hệ thống tự động sinh Mã Học viên chuẩn (\`CEO-83xxx\`), tạo tài khoản người dùng, băm mật khẩu khởi tạo an toàn và gửi email chào mừng kèm thông tin đăng nhập.
+6. **Bước 6:** Học viên mở App Mobile CEO HN10, đăng nhập bằng Email/SĐT và mật khẩu tạm thời, hệ thống bắt buộc đổi mật khẩu mới trong lần đầu tiên truy cập.
 
 #### Hành Trình 2: Quản Lý Hội Phí ➔ Quét Mã VietQR ➔ Kế Toán Đối Soát ➔ Duyệt Gia Hạn (+1 Năm)
-1. **Bước 1:** Hội viên mở mục "Hội Phí" trên App Mobile, hệ thống hiển thị thông báo niên liễm cần đóng (5.000.000 VNĐ/năm).
+1. **Bước 1:** Học viên mở mục "Hội Phí" trên App Mobile, hệ thống hiển thị thông báo niên liễm cần đóng (5.000.000 VNĐ/năm).
 2. **Bước 2:** Bấm nút "Thanh Toán VietQR". Hệ thống hiển thị mã VietQR động chuẩn Napas 24/7 chứa sẵn Số tiền, Tên tài khoản thụ hưởng và Cú pháp chuẩn (\`HOIPHI CEO HN10 [MÃ_HỘI_VIÊN]\`).
-3. **Bước 3:** Hội viên mở ứng dụng Ngân hàng trên điện thoại, quét mã QR và xác nhận chuyển khoản.
+3. **Bước 3:** Học viên mở ứng dụng Ngân hàng trên điện thoại, quét mã QR và xác nhận chuyển khoản.
 4. **Bước 4:** Ban Kế toán / Thủ quỹ mở màn hình "Quản Lý Hội Phí" (\`/fees\`) trên Web CRM, kiểm tra giao dịch tương ứng trên sao kê ngân hàng.
-5. **Bước 5:** Bấm nút "Duyệt Gạch Nợ". Hệ thống tự động cộng thêm +365 ngày vào hạn dùng của Thẻ hội viên VIP, chuyển trạng thái sang \`paid\` và gửi hóa đơn xác nhận đến hội viên.
+5. **Bước 5:** Bấm nút "Duyệt Gạch Nợ". Hệ thống tự động cộng thêm +365 ngày vào hạn dùng của Thẻ Học viên VIP, chuyển trạng thái sang \`paid\` và gửi hóa đơn xác nhận đến Học viên.
 
 #### Hành Trình 3: Tạo Sự Kiện Gala ➔ Xếp Ghế Sân Khấu ➔ Phát Hành Vé QR ➔ Soát Vé Gate Check-in Tốc Độ Cao
 1. **Bước 1:** Ban Quản Trị / Ban Thư Ký tạo mới Sự kiện Gala trên CRM, thiết lập timeline, cấu hình vé VIP và vé Tiêu chuẩn.
 2. **Bước 2:** Mở công cụ "Cinema Seating Map", kéo thả bố trí bàn tiệc VIP 10 chỗ, dãy ghế đại biểu danh dự và khán phòng.
-3. **Bước 3:** Hội viên đăng ký tham dự qua App Mobile, chọn vị trí ngồi và nhận ngay Vé điện tử E-Ticket chứa mã QR mã hóa độc bản.
+3. **Bước 3:** Học viên đăng ký tham dự qua App Mobile, chọn vị trí ngồi và nhận ngay Vé điện tử E-Ticket chứa mã QR mã hóa độc bản.
 4. **Bước 4:** Tại cửa đón tiếp sự kiện Gala, Ban Truyền Thông mở máy quét tại Cổng An Ninh Soát Vé (\`/checkin\`).
 5. **Bước 5:** Quét mã QR trên điện thoại đại biểu. Hệ thống phản hồi < 0.2s: Màn hình xanh lục hợp lệ, hiển thị Họ tên, Doanh nghiệp và Số bàn VIP; nếu quét lại lần 2, hệ thống lập tức báo đỏ cảnh báo vé đã qua cửa.
 6. **Bước 6:** Dữ liệu check-in thực tế tự động đồng bộ vào Vòng quay số may mắn (Lucky Draw) để phục vụ quay thưởng đại hội.
 
 #### Hành Trình 4: Kết Nối Giao Thương B2B ➔ Trao Đổi Danh Thiếp NFC ➔ Nhắn Tin Hẹn Gặp 1-on-1
-1. **Bước 1:** Hai hội viên gặp gỡ tại sự kiện, chạm thẻ danh thiếp thông minh NFC vào mặt lưng điện thoại đối tác.
+1. **Bước 1:** Hai Học viên gặp gỡ tại sự kiện, chạm thẻ danh thiếp thông minh NFC vào mặt lưng điện thoại đối tác.
 2. **Bước 2:** Điện thoại tự động mở trang Danh thiếp số công khai (\`/card/:code\`) chứa đầy đủ hồ sơ năng lực, công ty và nút lưu danh bạ.
 3. **Bước 3:** Bấm nút "Kết Nối B2B", mở ngăn kéo (Bottom Sheet) chọn mục đích hợp tác và gửi lời mời gặp gỡ 1-on-1.
 4. **Bước 4:** Đối tác nhận thông báo tức thì, mở Hộp thư Messenger #0084FF và bấm "Chấp Nhận Lời Mời".
@@ -121,8 +121,8 @@ Hệ thống thiết lập ma trận phân quyền 5 cấp bậc nghiêm ngặt 
 
 #### Hành Trình 5: Đại Hội Hiệp Hội ➔ Biểu Quyết Trực Tuyến ➔ Công Bố Kết Quả Realtime
 1. **Bước 1:** Ban Thư Ký khởi tạo phiên biểu quyết trên CRM: Tiêu đề nghị quyết, danh sách phương án lựa chọn, thời gian mở và đóng hòm phiếu.
-2. **Bước 2:** Kích hoạt phiên biểu quyết. Toàn bộ hội viên chính thức nhận được thông báo đẩy trên App Mobile.
-3. **Bước 3:** Hội viên mở màn hình Biểu Quyết (\`/association/voting\`), chọn phương án và bấm "Xác Nhận Bỏ Phiếu". Hệ thống áp dụng quy tắc 1 người 1 phiếu và khóa nút sau khi đã bầu.
+2. **Bước 2:** Kích hoạt phiên biểu quyết. Toàn bộ Học viên chính thức nhận được thông báo đẩy trên App Mobile.
+3. **Bước 3:** Học viên mở màn hình Biểu Quyết (\`/association/voting\`), chọn phương án và bấm "Xác Nhận Bỏ Phiếu". Hệ thống áp dụng quy tắc 1 người 1 phiếu và khóa nút sau khi đã bầu.
 4. **Bước 4:** Máy chủ tổng hợp phiếu bầu tức thời, màn hình lớn sân khấu đại hội hiển thị biểu đồ tỷ lệ phần trăm (%) nhảy động theo thời gian thực mà không lộ danh tính người bỏ phiếu.
 
 ---
@@ -143,17 +143,17 @@ Hệ thống thiết lập ma trận phân quyền 5 cấp bậc nghiêm ngặt 
 
 ## 3. YÊU CẦU CHỨC NĂNG CHI TIẾT (FUNCTIONAL REQUIREMENTS)
 
-### 3.1. MODULE 1: CỔNG THÔNG TIN CÔNG KHAI & ĐĂNG KÝ HỘI VIÊN (PUBLIC PORTAL)
+### 3.1. MODULE 1: CỔNG THÔNG TIN CÔNG KHAI & ĐĂNG KÝ Học viên (PUBLIC PORTAL)
 
 #### [FR-PUB-01] Khám Phá Cổng Thông Tin & Giới Thiệu Tôn Chỉ CLB
 * **Actor:** Khách vãng lai, Doanh nhân ứng viên, Công chúng.
 * **Mô tả chi tiết:**
   - **Input:** Khách truy cập đường dẫn trang chủ Cổng thông tin công khai.
-  - **Xử lý logic:** Hệ thống tải trang chủ, render Banner nhận diện thương hiệu, thông điệp Chủ tịch, giới thiệu 6 Ban chuyên môn điều hành và các số liệu thống kê quy mô (500+ hội viên, tổng giá trị giao thương).
+  - **Xử lý logic:** Hệ thống tải trang chủ, render Banner nhận diện thương hiệu, thông điệp Chủ tịch, giới thiệu 6 Ban chuyên môn điều hành và các số liệu thống kê quy mô (500+ Học viên, tổng giá trị giao thương).
   - **Output:** Giao diện Cổng thông tin hiển thị sắc nét, tối ưu chuẩn Responsive trên cả máy tính và điện thoại.
 * **Ngoại lệ:** Mất kết nối internet ➔ Trình duyệt hiển thị trang thông báo Offline của Service Worker.
 
-#### [FR-PUB-02] Đăng Ký Gia Nhập Hội Viên Chính Thức Trực Tuyến
+#### [FR-PUB-02] Đăng Ký Gia Nhập Học viên Chính Thức Trực Tuyến
 * **Actor:** Doanh nhân sinh năm 1983 (Đại diện mẫu: \`vupv090120@gmail.com\`).
 * **Mô tả chi tiết:**
   - **Input:** Biểu mẫu đăng ký gồm: Họ tên, Ngày tháng năm sinh, Số điện thoại, Email doanh nghiệp, Tên công ty, Mã số thuế, Chức vụ lãnh đạo, Lĩnh vực ngành nghề, Nguyện vọng chuyên ban sinh hoạt.
@@ -165,7 +165,7 @@ Hệ thống thiết lập ma trận phân quyền 5 cấp bậc nghiêm ngặt 
     5. Kích hoạt sự kiện gửi email tự động xác nhận qua SMTP Mailer.
   - **Output:** Thông báo tiếp nhận hồ sơ thành công, hiển thị Mã tra cứu hồ sơ và thông điệp hướng dẫn bước tiếp theo.
 * **Ngoại lệ:**
-  - Năm sinh khác 1983 ➔ Báo lỗi: "CLB CEO HN10 chỉ tiếp nhận hội viên sinh năm Quý Hợi 1983".
+  - Năm sinh khác 1983 ➔ Báo lỗi: "CLB CEO HN10 chỉ tiếp nhận Học viên sinh năm Quý Hợi 1983".
   - Email/SĐT đã tồn tại ➔ Báo lỗi: "Hồ sơ với thông tin này đã được đăng ký, vui lòng liên hệ Ban Thành Viên".
 
 #### [FR-PUB-03] Tự Động Gửi Email Xác Nhận Tiếp Nhận Hồ Sơ Đăng Ký
@@ -191,7 +191,7 @@ Hệ thống thiết lập ma trận phân quyền 5 cấp bậc nghiêm ngặt 
 #### [FR-SEC-01] Đăng Nhập Cổng Quản Trị Web CRM
 * **Actor:** Ban Quản Trị, Ban Thư Ký, Trưởng các Ban chuyên môn.
 * **Mô tả chi tiết:**
-  - **Input:** Email hoặc Mã hội viên và Mật khẩu quản trị.
+  - **Input:** Email hoặc Mã Học viên và Mật khẩu quản trị.
   - **Xử lý logic:**
     1. Tìm bản ghi tài khoản trong bảng \`users\`.
     2. So khớp mật khẩu với hàm băm \`bcrypt.compare()\`.
@@ -203,16 +203,16 @@ Hệ thống thiết lập ma trận phân quyền 5 cấp bậc nghiêm ngặt 
   - Sai mật khẩu quá 5 lần ➔ Tạm khóa tài khoản trong 15 phút chống tấn công Brute-force.
   - Tài khoản không có quyền quản trị ➔ Báo lỗi: "Tài khoản không có thẩm quyền truy cập Cổng Quản Trị".
 
-#### [FR-SEC-02] Đăng Nhập Ứng Dụng Di Động Hội Viên CEO HN10
-* **Actor:** Hội viên chính thức CLB Doanh Nhân CEO HN10.
+#### [FR-SEC-02] Đăng Nhập Ứng Dụng Di Động Học viên CEO HN10
+* **Actor:** Học viên chính thức CLB Doanh Nhân CEO HN10.
 * **Mô tả chi tiết:**
-  - **Input:** Số điện thoại / Email và Mật khẩu hội viên.
-  - **Xử lý logic:** Xác thực danh tính hội viên, kiểm tra trạng thái kích hoạt hồ sơ, tạo phiên làm việc di động và tải dữ liệu Thẻ hội viên VIP.
-  - **Output:** Điều hướng vào Trang chủ Hội viên (\`/association\`), hiển thị họ tên, ảnh đại diện và thẻ danh dự.
+  - **Input:** Số điện thoại / Email và Mật khẩu Học viên.
+  - **Xử lý logic:** Xác thực danh tính Học viên, kiểm tra trạng thái kích hoạt hồ sơ, tạo phiên làm việc di động và tải dữ liệu Thẻ Học viên VIP.
+  - **Output:** Điều hướng vào Trang chủ Học viên (\`/association\`), hiển thị họ tên, ảnh đại diện và thẻ danh dự.
 * **Ngoại lệ:** Hồ sơ đang ở trạng thái Chờ thẩm định (\`pending\`) ➔ Thông báo: "Hồ sơ của Quý anh/chị đang được Ban Thành Viên thẩm định".
 
 #### [FR-SEC-03] Bắt Buộc Đổi Mật Khẩu Khởi Tạo Lần Đầu (Onboarding Password Change)
-* **Actor:** Hội viên mới đăng nhập lần đầu tiên bằng mật khẩu hệ thống cấp.
+* **Actor:** Học viên mới đăng nhập lần đầu tiên bằng mật khẩu hệ thống cấp.
 * **Mô tả chi tiết:**
   - **Input:** Mật khẩu cũ, Mật khẩu mới, Xác nhận mật khẩu mới.
   - **Xử lý logic:**
@@ -241,17 +241,17 @@ Hệ thống thiết lập ma trận phân quyền 5 cấp bậc nghiêm ngặt 
 
 ---
 
-### 3.3. MODULE 3: QUẢN TRỊ DANH BẠ HỘI VIÊN 360° & THẨM ĐỊNH KẾT NẠP
+### 3.3. MODULE 3: QUẢN TRỊ DANH BẠ Học viên 360° & THẨM ĐỊNH KẾT NẠP
 
-#### [FR-MBR-01] Quản Lý Danh Sách Hội Viên Đa Chiều
+#### [FR-MBR-01] Quản Lý Danh Sách Học viên Đa Chiều
 * **Actor:** Ban Quản Trị, Ban Thành Viên, Ban Thư Ký.
 * **Mô tả chi tiết:**
-  - **Input:** Bộ lọc theo Ban chuyên môn, Tình trạng hội phí (Đã đóng / Quá hạn), Hạng hội viên (Kim Cương / Vàng / Bạc), Từ khóa tìm kiếm.
+  - **Input:** Bộ lọc theo Ban chuyên môn, Tình trạng hội phí (Đã đóng / Quá hạn), Hạng Học viên (Kim Cương / Vàng / Bạc), Từ khóa tìm kiếm.
   - **Xử lý logic:** Truy vấn bảng \`members\`, hỗ trợ cuộn ngang bảng chuẩn với Cột STT cố định bên trái và Cột Thao tác cố định bên phải.
-  - **Output:** Bảng danh sách hội viên chuẩn xác, hiển thị Mã HV, Họ tên, Doanh nghiệp, Chức vụ, SĐT, Ban chuyên môn và Trạng thái.
+  - **Output:** Bảng danh sách Học viên chuẩn xác, hiển thị Mã HV, Họ tên, Doanh nghiệp, Chức vụ, SĐT, Ban chuyên môn và Trạng thái.
 * **Ngoại lệ:** Không có dữ liệu thỏa mãn bộ lọc ➔ Hiển thị trạng thái rỗng và nút đặt lại bộ lọc.
 
-#### [FR-MBR-02] Thẩm Định & Phê Duyệt Kết Nạp Hội Viên Mới (Độc Quyền BTV)
+#### [FR-MBR-02] Thẩm Định & Phê Duyệt Kết Nạp Học viên Mới (Độc Quyền BTV)
 * **Actor:** Trưởng Ban Thành Viên (\`ceo.thanhvien@ceohn10.com\`).
 * **Mô tả chi tiết:**
   - **Input:** Mở ngăn kéo (Drawer) chi tiết hồ sơ ứng viên đang chờ duyệt (\`pending\`).
@@ -259,11 +259,11 @@ Hệ thống thiết lập ma trận phân quyền 5 cấp bậc nghiêm ngặt 
     1. Kiểm tra tính pháp lý doanh nghiệp, năng lực điều hành và xác nhận đúng năm sinh 1983.
     2. Nhấn nút "Phê Duyệt Kết Nạp".
     3. Hệ thống kiểm tra quyền hạn của người thực hiện (Bắt buộc phải là Ban Thành Viên hoặc BQT; chặn tuyệt đối Ban Thư Ký).
-    4. Sinh mã số hội viên tự động \`CEO-83xxx\` (ví dụ: \`CEO-83007\`).
+    4. Sinh mã số Học viên tự động \`CEO-83xxx\` (ví dụ: \`CEO-83007\`).
     5. Cập nhật trạng thái sang \`active\`, tạo mật khẩu khởi tạo ngẫu nhiên.
     6. Gửi email phát hành tài khoản và mật khẩu đến email ứng viên qua SMTP Gmail.
-  - **Output:** Thông báo toast duyệt thành công, hiển thị mã hội viên mới và cập nhật bảng danh sách.
-* **Ngoại lệ:** Tài khoản Ban Thư Ký bấm duyệt ➔ Báo lỗi: "Ban Thư Ký không có thẩm quyền duyệt kết nạp hội viên, nghiệp vụ thuộc Ban Thành Viên".
+  - **Output:** Thông báo toast duyệt thành công, hiển thị mã Học viên mới và cập nhật bảng danh sách.
+* **Ngoại lệ:** Tài khoản Ban Thư Ký bấm duyệt ➔ Báo lỗi: "Ban Thư Ký không có thẩm quyền duyệt kết nạp Học viên, nghiệp vụ thuộc Ban Thành Viên".
 
 #### [FR-MBR-03] Từ Chối Hồ Sơ Gia Nhập Kèm Lý Do
 * **Actor:** Ban Thành Viên (BTV).
@@ -273,25 +273,25 @@ Hệ thống thiết lập ma trận phân quyền 5 cấp bậc nghiêm ngặt 
   - **Output:** Hồ sơ chuyển sang danh sách Từ chối, gửi email thông báo kết quả.
 * **Ngoại lệ:** Chưa nhập lý do từ chối ➔ Bắt buộc nhập lý do mới cho phép xác nhận.
 
-#### [FR-MBR-04] Hồ Sơ Hội Viên Chi Tiết 360 Độ
-* **Actor:** Quản trị viên CRM, Hội viên xem hồ sơ của mình.
+#### [FR-MBR-04] Hồ Sơ Học viên Chi Tiết 360 Độ
+* **Actor:** Quản trị viên CRM, Học viên xem hồ sơ của mình.
 * **Mô tả chi tiết:**
-  - **Input:** Nhấp vào mã hoặc tên hội viên.
+  - **Input:** Nhấp vào mã hoặc tên Học viên.
   - **Xử lý logic:** Tải toàn bộ dữ liệu liên kết: Thông tin cá nhân, Hồ sơ doanh nghiệp thành viên, Lịch sử tham gia sự kiện Gala, Lịch sử đóng hội phí thường niên, Danh sách sản phẩm B2B đang bán, Lịch sử cuộc họp và đóng góp quỹ thiện nguyện.
   - **Output:** Giao diện Hồ sơ 360 độ trực quan, phân chia theo từng Tab thông tin chuyên biệt.
-* **Ngoại lệ:** Hội viên thường xem hồ sơ hội viên khác trên CRM ➔ Bị chặn quyền truy cập.
+* **Ngoại lệ:** Học viên thường xem hồ sơ Học viên khác trên CRM ➔ Bị chặn quyền truy cập.
 
 ---
 
 ### 3.4. MODULE 4: SÀN GIAO THƯƠNG B2B MARKETPLACE & DOANH NGHIỆP THÀNH VIÊN
 
 #### [FR-MKT-01] Đăng Tải Sản Phẩm / Dịch Vụ Lên Sàn B2B Nội Khối
-* **Actor:** Hội viên chính thức (Đại diện doanh nghiệp thành viên).
+* **Actor:** Học viên chính thức (Đại diện doanh nghiệp thành viên).
 * **Mô tả chi tiết:**
-  - **Input:** Tên sản phẩm/dịch vụ, Danh mục ngành hàng, Giá niêm yết, Giá ưu đãi độc quyền cho Hội viên CEO HN10 (Ví dụ: Giảm 15%), Ảnh sản phẩm chất lượng cao (MinIO), Mô tả kỹ thuật và Chính sách bảo hành.
-  - **Xử lý logic:** Kiểm tra tài khoản hội viên có hợp lệ và đã đóng hội phí hay chưa, lưu bản ghi vào \`products\` ở trạng thái \`pending\` (Chờ duyệt).
+  - **Input:** Tên sản phẩm/dịch vụ, Danh mục ngành hàng, Giá niêm yết, Giá ưu đãi độc quyền cho Học viên CEO HN10 (Ví dụ: Giảm 15%), Ảnh sản phẩm chất lượng cao (MinIO), Mô tả kỹ thuật và Chính sách bảo hành.
+  - **Xử lý logic:** Kiểm tra tài khoản Học viên có hợp lệ và đã đóng hội phí hay chưa, lưu bản ghi vào \`products\` ở trạng thái \`pending\` (Chờ duyệt).
   - **Output:** Sản phẩm được gửi lên hệ thống và chuyển về hàng đợi kiểm duyệt của Ban Xúc Tiến Thương Mại.
-* **Ngoại lệ:** Hội viên nợ hội phí quá hạn ➔ Cảnh báo yêu cầu hoàn tất hội phí trước khi đăng bán sản phẩm.
+* **Ngoại lệ:** Học viên nợ hội phí quá hạn ➔ Cảnh báo yêu cầu hoàn tất hội phí trước khi đăng bán sản phẩm.
 
 #### [FR-MKT-02] Kiểm Duyệt & Kích Hoạt Gian Hàng B2B (Độc Quyền BXT)
 * **Actor:** Ban Xúc Tiến Thương Mại (\`ceo.xuctien@ceohn10.com\`).
@@ -302,7 +302,7 @@ Hệ thống thiết lập ma trận phân quyền 5 cấp bậc nghiêm ngặt 
 * **Ngoại lệ:** Sản phẩm vi phạm chính sách trợ giá nội bộ ➔ Bấm "Yêu Cầu Chỉnh Sửa" kèm ghi chú phản hồi.
 
 #### [FR-MKT-03] Đàm Phán & Gửi Báo Giá Trực Tiếp Giữa Hai Doanh Nhân
-* **Actor:** Hội viên mua hàng và Hội viên bán hàng.
+* **Actor:** Học viên mua hàng và Học viên bán hàng.
 * **Mô tả chi tiết:**
   - **Input:** Bấm nút "Nhắn Tin Đàm Phán B2B" tại trang chi tiết sản phẩm.
   - **Xử lý logic:** Hệ thống tự động tạo cuộc trò chuyện chuyên biệt trên Hộp thư Messenger #0084FF, ghim kèm thẻ thông tin sản phẩm và báo giá mẫu.
@@ -314,7 +314,7 @@ Hệ thống thiết lập ma trận phân quyền 5 cấp bậc nghiêm ngặt 
 ### 3.5. MODULE 5: BẢNG TIN CƠ HỘI KINH DOANH CUNG - CẦU (OPPORTUNITIES)
 
 #### [FR-OPP-01] Đăng Nhu Cầu Cung - Cầu Kinh Doanh
-* **Actor:** Hội viên chính thức CLB Doanh Nhân CEO HN10.
+* **Actor:** Học viên chính thức CLB Doanh Nhân CEO HN10.
 * **Mô tả chi tiết:**
   - **Input:** Loại nhu cầu (Cần Mua / Cần Bán / Tìm Đối Tác Đầu Tư), Tiêu đề, Giá trị thương vụ ước tính (VNĐ), Thời hạn hiệu lực, Mô tả chi tiết yêu cầu kỹ thuật và hồ sơ năng lực cần có.
   - **Xử lý logic:** Lưu vào bảng \`opportunities\`, tự động phân loại ngành nghề và kích hoạt cơ chế ghép nối AI Matcher.
@@ -337,14 +337,14 @@ Hệ thống thiết lập ma trận phân quyền 5 cấp bậc nghiêm ngặt 
 * **Actor:** Ban Quản Trị, Ban Thư Ký, Ban Truyền Thông.
 * **Mô tả chi tiết:**
   - **Input:** Tên sự kiện, Thời gian bắt đầu/kết thúc, Địa điểm tổ chức, Ảnh banner 16:9, Nội dung chương trình (Agenda), Diễn giả danh dự.
-  - **Xử lý logic:** Thiết lập trạng thái \`upcoming\`, lưu trữ bản ghi vào bảng \`events\`, đẩy thông báo đến toàn thể hội viên.
+  - **Xử lý logic:** Thiết lập trạng thái \`upcoming\`, lưu trữ bản ghi vào bảng \`events\`, đẩy thông báo đến toàn thể Học viên.
   - **Output:** Sự kiện xuất hiện trên Lịch hoạt động Web CRM và App Mobile.
 * **Ngoại lệ:** Thời gian kết thúc trước thời gian bắt đầu ➔ Báo lỗi logic thời gian.
 
 #### [FR-EVT-02] Cấu Hình Đa Hạng Vé & Biểu Phí Tham Dự
 * **Actor:** Ban Tổ Chức Sự Kiện.
 * **Mô tả chi tiết:**
-  - **Input:** Tạo các gói vé: Vé VIP Dạ Tiệc Gala (Có phí: 1.500.000 VNĐ), Vé Tiêu Chuẩn Hội Viên Chính Thức (Miễn phí: 0 VNĐ), Vé Khách Mời Doanh Nghiệp (0 VNĐ).
+  - **Input:** Tạo các gói vé: Vé VIP Dạ Tiệc Gala (Có phí: 1.500.000 VNĐ), Vé Tiêu Chuẩn Học viên Chính Thức (Miễn phí: 0 VNĐ), Vé Khách Mời Doanh Nghiệp (0 VNĐ).
   - **Xử lý logic:** Lưu cấu hình vé, liên kết mã thanh toán VietQR cho các loại vé có thu phí.
   - **Output:** Bảng biểu phí vé hiển thị rõ ràng trên cổng đăng ký sự kiện.
 * **Ngoại lệ:** Số lượng vé đăng ký vượt quá sức chứa khán phòng ➔ Tự động khóa đăng ký và báo "Hết vé".
@@ -353,9 +353,9 @@ Hệ thống thiết lập ma trận phân quyền 5 cấp bậc nghiêm ngặt 
 * **Actor:** Ban Thư Ký, Ban Tổ Chức.
 * **Mô tả chi tiết:**
   - **Input:** Giao diện đồ họa Seating Map (\`/events/seating\`), chọn loại bàn tròn Gala VIP (10 ghế) hoặc dãy ghế hội trường.
-  - **Xử lý logic:** Gán định danh bàn (\`Bàn VIP 01\`, \`Bàn VIP 02\`), gán hội viên cụ thể vào từng vị trí ghế ngồi theo thứ tự nghi lễ ngoại giao.
+  - **Xử lý logic:** Gán định danh bàn (\`Bàn VIP 01\`, \`Bàn VIP 02\`), gán Học viên cụ thể vào từng vị trí ghế ngồi theo thứ tự nghi lễ ngoại giao.
   - **Output:** Sơ đồ phòng tiệc hiển thị trực quan theo thời gian thực, đồng bộ số bàn vào vé E-Ticket của đại biểu.
-* **Ngoại lệ:** Gán trùng 1 hội viên vào 2 vị trí ghế khác nhau ➔ Hệ thống tự động cảnh báo xung đột vị trí.
+* **Ngoại lệ:** Gán trùng 1 Học viên vào 2 vị trí ghế khác nhau ➔ Hệ thống tự động cảnh báo xung đột vị trí.
 
 ---
 
@@ -430,17 +430,17 @@ Hệ thống thiết lập ma trận phân quyền 5 cấp bậc nghiêm ngặt 
 * **Mô tả chi tiết:**
   - **Input:** Tiêu đề biểu quyết, Nội dung tờ trình, Danh sách phương án lựa chọn (Hoặc danh sách ứng viên Ban Chấp Hành), Thời hạn mở/đóng biểu quyết.
   - **Xử lý logic:** Lưu vào bảng \`polls\` và \`poll_options\`, chuyển trạng thái sang \`open\`.
-  - **Output:** Phiên biểu quyết xuất hiện tức thì trên màn hình Biểu Quyết của tất cả hội viên.
+  - **Output:** Phiên biểu quyết xuất hiện tức thì trên màn hình Biểu Quyết của tất cả Học viên.
 * **Ngoại lệ:** Đóng biểu quyết thủ công ➔ Hệ thống chốt số liệu và khóa nút bỏ phiếu toàn mạng.
 
 #### [FR-VOT-02] Bỏ Phiếu Biểu Quyết Bảo Mật 1 Người 1 Phiếu
-* **Actor:** Hội viên chính thức CLB Doanh Nhân CEO HN10.
+* **Actor:** Học viên chính thức CLB Doanh Nhân CEO HN10.
 * **Mô tả chi tiết:**
   - **Input:** Chọn phương án biểu quyết (Đồng ý / Không đồng ý / Ý kiến khác), nhấn "Xác Nhận Bỏ Phiếu".
   - **Xử lý logic:**
-    1. Kiểm tra xem hội viên đã bỏ phiếu cho phiên này chưa trong bảng \`poll_votes\`.
+    1. Kiểm tra xem Học viên đã bỏ phiếu cho phiên này chưa trong bảng \`poll_votes\`.
     2. Nếu chưa: Ghi nhận phiếu bầu, tăng bộ đếm \`votes_count\` của phương án được chọn.
-    3. Đánh dấu hội viên đã hoàn thành biểu quyết và khóa nút bấm.
+    3. Đánh dấu Học viên đã hoàn thành biểu quyết và khóa nút bấm.
     4. Bắn sự kiện WebSocket cập nhật tỷ lệ % cho máy chủ hiển thị.
   - **Output:** Thông báo: "Quý anh/chị đã biểu quyết thành công!", hiển thị kết quả tổng hợp.
 * **Ngoại lệ:** Cố ý gửi nhiều request bỏ phiếu cùng lúc ➔ Database ràng buộc khóa duy nhất \`UNIQUE(poll_id, user_id)\` chặn trùng lặp tuyệt đối.
@@ -450,7 +450,7 @@ Hệ thống thiết lập ma trận phân quyền 5 cấp bậc nghiêm ngặt 
 ### 3.11. MODULE 11: TÀI CHÍNH, SỔ QUỸ THU CHI & GIA HẠN HỘI PHÍ VIETQR
 
 #### [FR-FIN-01] Tra Cứu & Thanh Toán Hội Phí VietQR Động
-* **Actor:** Hội viên chính thức CLB Doanh Nhân CEO HN10.
+* **Actor:** Học viên chính thức CLB Doanh Nhân CEO HN10.
 * **Mô tả chi tiết:**
   - **Input:** Mở mục Gia hạn hội phí trên App Mobile, chọn kỳ đóng phí thường niên (5.000.000 VNĐ).
   - **Xử lý logic:** Tạo mã VietQR động chuẩn Napas chứa số tài khoản MB Bank \`198388889999\`, chủ tài khoản \`CLB DOANH NHAN 1983\` và cú pháp chuẩn.
@@ -461,8 +461,8 @@ Hệ thống thiết lập ma trận phân quyền 5 cấp bậc nghiêm ngặt 
 * **Actor:** Ban Tài Chính, Thủ quỹ CLB.
 * **Mô tả chi tiết:**
   - **Input:** Danh sách hóa đơn hội phí chờ gạch nợ (\`/fees\`), kiểm tra khớp lệnh với sao kê ngân hàng MB Bank.
-  - **Xử lý logic:** Nhấn nút "Duyệt Gạch Nợ". Hệ thống cập nhật trạng thái hóa đơn sang \`paid\`, tự động gia hạn ngày hết hạn thẻ hội viên thêm +365 ngày.
-  - **Output:** Thẻ hội viên trên App Mobile tự động chuyển sang trạng thái "Đã Kích Hoạt", hiển thị biên lai điện tử.
+  - **Xử lý logic:** Nhấn nút "Duyệt Gạch Nợ". Hệ thống cập nhật trạng thái hóa đơn sang \`paid\`, tự động gia hạn ngày hết hạn thẻ Học viên thêm +365 ngày.
+  - **Output:** Thẻ Học viên trên App Mobile tự động chuyển sang trạng thái "Đã Kích Hoạt", hiển thị biên lai điện tử.
 * **Ngoại lệ:** Số tiền chuyển khoản thiếu ➔ Bấm "Cảnh Báo Thiếu Tiền" kèm ghi chú số tiền còn thiếu.
 
 #### [FR-FIN-03] Quản Trị Sổ Quỹ Thu Chi 3 Cấp Duyệt (Cashbook)
@@ -481,9 +481,9 @@ Hệ thống thiết lập ma trận phân quyền 5 cấp bậc nghiêm ngặt 
 * **Actor:** Quản trị viên CRM (\`/perks\`).
 * **Mô tả chi tiết:**
   - **Input:** Mẫu lời chúc sinh nhật cá nhân hóa, Mã E-Voucher độc quyền (Ví dụ: \`SINHNHAT-CEO HN10\`), Giá trị quà tặng (% giảm giá dịch vụ), Thời hạn sử dụng (30 ngày).
-  - **Xử lý logic:** Hệ thống tự động quét ngày sinh hội viên mỗi ngày vào lúc 08:00 sáng, kích hoạt Popup chúc mừng sang trọng trên App Mobile của hội viên có sinh nhật trong ngày.
-  - **Output:** Hội viên nhận được thiệp chúc mừng mạ vàng từ Chủ tịch và mã voucher quà tặng.
-* **Ngoại lệ:** Hội viên chưa cập nhật ngày sinh ➔ Hệ thống hiển thị thông báo nhắc hoàn thiện hồ sơ.
+  - **Xử lý logic:** Hệ thống tự động quét ngày sinh Học viên mỗi ngày vào lúc 08:00 sáng, kích hoạt Popup chúc mừng sang trọng trên App Mobile của Học viên có sinh nhật trong ngày.
+  - **Output:** Học viên nhận được thiệp chúc mừng mạ vàng từ Chủ tịch và mã voucher quà tặng.
+* **Ngoại lệ:** Học viên chưa cập nhật ngày sinh ➔ Hệ thống hiển thị thông báo nhắc hoàn thiện hồ sơ.
 
 #### [FR-PRK-02] Quản Trị Gói Tài Trợ & Quyền Lợi Nhà Tài Trợ
 * **Actor:** Ban Xúc Tiến Thương Mại, Ban Tài Chính.
@@ -495,10 +495,10 @@ Hệ thống thiết lập ma trận phân quyền 5 cấp bậc nghiêm ngặt 
 
 ---
 
-### 3.13. MODULE 13: THẺ HỘI VIÊN VIP 3D, DANH THIẾP NFC & PUBLIC VISIT CARD
+### 3.13. MODULE 13: THẺ Học viên VIP 3D, DANH THIẾP NFC & PUBLIC VISIT CARD
 
-#### [FR-CRD-01] Hiển Thị Thẻ Hội Viên Điện Tử VIP 3D Chìm Logo
-* **Actor:** Hội viên chính thức CLB Doanh Nhân CEO HN10.
+#### [FR-CRD-01] Hiển Thị Thẻ Học viên Điện Tử VIP 3D Chìm Logo
+* **Actor:** Học viên chính thức CLB Doanh Nhân CEO HN10.
 * **Mô tả chi tiết:**
   - **Input:** Mở màn hình Thẻ của tôi (\`/association/card\`).
   - **Xử lý logic:** Hệ thống tải Thẻ VIP hiệu ứng 3D với nền Xanh Navy hoàng gia, Logo doanh nghiệp hòa trộn chìm sang trọng (Screen blend), Mã định danh \`CEO-83xxx\`, Họ tên, Chức vụ và Mã QR cá nhân.
@@ -506,19 +506,19 @@ Hệ thống thiết lập ma trận phân quyền 5 cấp bậc nghiêm ngặt 
 * **Ngoại lệ:** Chưa có logo doanh nghiệp ➔ Hiển thị logo chuẩn CEO HN10 mặc định.
 
 #### [FR-CRD-02] Danh Thiếp Điện Tử Thông Minh Công Khai (Public Visiting Card)
-* **Actor:** Đối tác quét mã QR hoặc chạm thẻ NFC của hội viên.
+* **Actor:** Đối tác quét mã QR hoặc chạm thẻ NFC của Học viên.
 * **Mô tả chi tiết:**
   - **Input:** Trình duyệt mở đường dẫn công khai \`/card/:code\`.
   - **Xử lý logic:** Hiển thị trang Danh thiếp số tối ưu cho điện thoại: Ảnh đại diện, Họ tên, Công ty, Chức vụ, Số điện thoại, Email, Website, Bản đồ địa chỉ trụ sở và nút "Lưu Danh Bạ Vào Điện Thoại" (file \`.vcf\`).
   - **Output:** Đối tác lưu toàn bộ thông tin liên lạc vào danh bạ điện thoại chỉ sau 1 chạm.
-* **Ngoại lệ:** Hội viên bật chế độ riêng tư ẩn số điện thoại ➔ Số điện thoại được ẩn hoặc chuyển thành nút liên hệ qua ban thư ký.
+* **Ngoại lệ:** Học viên bật chế độ riêng tư ẩn số điện thoại ➔ Số điện thoại được ẩn hoặc chuyển thành nút liên hệ qua ban thư ký.
 
 ---
 
 ### 3.14. MODULE 14: HỘP THƯ DOANH NHÂN VIP MESSENGER & LỊCH HẸN 1-ON-1
 
 #### [FR-MSG-01] Nhắn Tin Doanh Nhân Thời Gian Thực Chuẩn #0084FF
-* **Actor:** Hai hội viên chính thức trong mạng lưới.
+* **Actor:** Hai Học viên chính thức trong mạng lưới.
 * **Mô tả chi tiết:**
   - **Input:** Soạn nội dung tin nhắn văn bản, hình ảnh, tài liệu báo giá hoặc ghim vị trí cuộc gặp.
   - **Xử lý logic:** Mã hóa nội dung, truyền tải qua WebSocket Socket.IO thời gian thực, lưu trữ lịch sử tin nhắn trong CSDL.
@@ -529,7 +529,7 @@ Hệ thống thiết lập ma trận phân quyền 5 cấp bậc nghiêm ngặt 
 * **Actor:** Hệ thống điều hành hiệp hội.
 * **Mô tả chi tiết:**
   - **Input:** Sự kiện thông báo mới từ Ban Chấp Hành (Hội phí thường niên, Giấy mời họp đại hội, Lịch gala).
-  - **Xử lý logic:** Tự động phát tin nhắn phong cách Zalo OA vào kênh "Ban Thư Ký CLB Doanh Nhân CEO HN10", luôn được ghim ở vị trí đầu tiên trên Hộp thư của hội viên.
+  - **Xử lý logic:** Tự động phát tin nhắn phong cách Zalo OA vào kênh "Ban Thư Ký CLB Doanh Nhân CEO HN10", luôn được ghim ở vị trí đầu tiên trên Hộp thư của Học viên.
   - **Output:** Thẻ tin nhắn giao dịch hiển thị trang trọng với số tiền, hạn đóng và nút "Thanh Toán VietQR" ngay trong khung chat.
 * **Ngoại lệ:** Không thể bỏ ghim hoặc xóa kênh Ban Thư Ký.
 
@@ -541,16 +541,16 @@ Hệ thống thiết lập ma trận phân quyền 5 cấp bậc nghiêm ngặt 
 * **Actor:** Ban Thư Ký, Ban Quản Trị.
 * **Mô tả chi tiết:**
   - **Input:** Tải lên văn bản (PDF, DOCX): Quy chế hoạt động CLB, Nghị quyết đại hội, Biên bản họp ban chấp hành, Báo cáo tài chính năm.
-  - **Xử lý logic:** Lưu trữ an toàn trên MinIO S3, phân quyền xem theo cấp bậc hội viên hoặc công khai.
-  - **Output:** Văn bản được lưu trữ khoa học, hội viên tra cứu và tải xuống dễ dàng trên App Mobile (\`/association/library\`).
+  - **Xử lý logic:** Lưu trữ an toàn trên MinIO S3, phân quyền xem theo cấp bậc Học viên hoặc công khai.
+  - **Output:** Văn bản được lưu trữ khoa học, Học viên tra cứu và tải xuống dễ dàng trên App Mobile (\`/association/library\`).
 * **Ngoại lệ:** Văn bản mật ➔ Chỉ tài khoản Ban Quản Trị mới có quyền truy cập.
 
 #### [FR-DOC-02] Chiến Dịch Gửi Email Thông Báo Tự Động Hàng Loạt
 * **Actor:** Ban Thư Ký, Ban Truyền Thông.
 * **Mô tả chi tiết:**
-  - **Input:** Soạn nội dung email theo mẫu chuẩn thương hiệu CEO HN10, chọn nhóm người nhận (Toàn thể hội viên / Ban Chấp Hành / Hội viên nợ phí).
+  - **Input:** Soạn nội dung email theo mẫu chuẩn thương hiệu CEO HN10, chọn nhóm người nhận (Toàn thể Học viên / Ban Chấp Hành / Học viên nợ phí).
   - **Xử lý logic:** Hàng đợi gửi email tự động (Email Dispatch Queue) xử lý qua SMTP Mailer với độ trễ an toàn chống spam.
-  - **Output:** Email gửi đến hòm thư tất cả hội viên, báo cáo thống kê tỷ lệ gửi thành công.
+  - **Output:** Email gửi đến hòm thư tất cả Học viên, báo cáo thống kê tỷ lệ gửi thành công.
 * **Ngoại lệ:** Địa chỉ email không tồn tại ➔ Ghi nhận vào nhật ký lỗi và gắn cờ cảnh báo trên CRM.
 
 ---
@@ -844,7 +844,7 @@ function generateHdsdHtml() {
       </h1>
       
       <p class="subtitle">
-        Tài liệu cẩm nang nghiệp vụ trực quan toàn diện dành cho Ban Quản Trị, Ban Thư Ký, 6 Ban Chuyên Môn và Toàn thể Hội viên Doanh nhân CLB CEO HN10 (Trực thuộc Hội Doanh Nhân Trẻ Hà Nội — HanoiBA). Hướng dẫn thao tác chi tiết từng bước, tích hợp minh chứng ảnh thực tế cho toàn bộ phân hệ Web CRM và App Di Động.
+        Tài liệu cẩm nang nghiệp vụ trực quan toàn diện dành cho Ban Quản Trị, Ban Thư Ký, 6 Ban Chuyên Môn và Toàn thể Học viên Doanh nhân CLB CEO HN10 (Trực thuộc Hội Doanh Nhân Trẻ Hà Nội — HanoiBA). Hướng dẫn thao tác chi tiết từng bước, tích hợp minh chứng ảnh thực tế cho toàn bộ phân hệ Web CRM và App Di Động.
       </p>
     </div>
 
@@ -865,7 +865,7 @@ function generateHdsdHtml() {
           </tr>
           <tr>
             <td class="label">Hệ thống áp dụng:</td>
-            <td><strong>Web CRM Quản Trị & App Mobile Hội Viên CEO HN10</strong></td>
+            <td><strong>Web CRM Quản Trị & App Mobile Học viên CEO HN10</strong></td>
           </tr>
           <tr>
             <td class="label">Ngày hiệu lực:</td>
@@ -886,16 +886,16 @@ function generateHdsdHtml() {
   <!-- ===================================================================== -->
   <section class="trn-section" id="toc">
     <div class="toc-title">MỤC LỤC NỘI DUNG ĐÀO TẠO</div>
-    <div class="toc-subtitle">Bao gồm 16 chương nghiệp vụ tuần tự từ Cổng thông tin, Web CRM đến App Mobile Hội viên</div>
+    <div class="toc-subtitle">Bao gồm 16 chương nghiệp vụ tuần tự từ Cổng thông tin, Web CRM đến App Mobile Học viên</div>
     
     <div class="toc-list">
       <a href="#sec-01" class="toc-item"><span class="toc-index">01</span><span class="toc-text">Cổng Thông Tin Công Khai & Nộp Đơn Đăng Ký Gia Nhập Trực Tuyến</span></a>
       <a href="#sec-02" class="toc-item"><span class="toc-index">02</span><span class="toc-text">Đăng Nhập Cổng Quản Trị CRM & Tổng Quan Bàn Làm Việc Dashboard</span></a>
-      <a href="#sec-03" class="toc-item"><span class="toc-index">03</span><span class="toc-text">Quản Trị Danh Bạ Hội Viên 360° & Quy Trình Thẩm Định Kết Nạp (BTV)</span></a>
+      <a href="#sec-03" class="toc-item"><span class="toc-index">03</span><span class="toc-text">Quản Trị Danh Bạ Học viên 360° & Quy Trình Thẩm Định Kết Nạp (BTV)</span></a>
       <a href="#sec-04" class="toc-item"><span class="toc-index">04</span><span class="toc-text">Đăng Nhập App Di Động CEO HN10 & Đổi Mật Khẩu Lần Đầu</span></a>
-      <a href="#sec-05" class="toc-item"><span class="toc-index">05</span><span class="toc-text">Trang Chủ Hội Viên, Cập Nhật Nhanh Hồ Sơ & Đếm Chỉ Số B2B</span></a>
-      <a href="#sec-06" class="toc-item"><span class="toc-index">06</span><span class="toc-text">Thẻ Hội Viên VIP 3D Chìm Logo & Danh Thiếp Số Công Khai (NFC)</span></a>
-      <a href="#sec-07" class="toc-item"><span class="toc-index">07</span><span class="toc-text">Danh Bạ Hội Viên, Mời Gặp 1-on-1 & Quản Lý Tab "Đã Gửi Kết Nối"</span></a>
+      <a href="#sec-05" class="toc-item"><span class="toc-index">05</span><span class="toc-text">Trang Chủ Học viên, Cập Nhật Nhanh Hồ Sơ & Đếm Chỉ Số B2B</span></a>
+      <a href="#sec-06" class="toc-item"><span class="toc-index">06</span><span class="toc-text">Thẻ Học viên VIP 3D Chìm Logo & Danh Thiếp Số Công Khai (NFC)</span></a>
+      <a href="#sec-07" class="toc-item"><span class="toc-index">07</span><span class="toc-text">Danh Bạ Học viên, Mời Gặp 1-on-1 & Quản Lý Tab "Đã Gửi Kết Nối"</span></a>
       <a href="#sec-08" class="toc-item"><span class="toc-index">08</span><span class="toc-text">Hộp Thư Doanh Nhân Messenger #0084FF & Kênh Ban Thư Ký Zalo OA</span></a>
       <a href="#sec-09" class="toc-item"><span class="toc-index">09</span><span class="toc-text">Tạo Sự Kiện Gala & Thiết Kế Sơ Đồ Chỗ Ngồi Cinema Seating Map</span></a>
       <a href="#sec-10" class="toc-item"><span class="toc-index">10</span><span class="toc-text">Đăng Ký Tham Dự Sự Kiện & Phát Hành Vé Mời Điện Tử E-Ticket QR</span></a>
@@ -909,12 +909,12 @@ function generateHdsdHtml() {
   </section>
 
   <!-- ===================================================================== -->
-  <!-- CHƯƠNG 1: CỔNG THÔNG TIN CÔNG KHAI & ĐĂNG KÝ HỘI VIÊN                  -->
+  <!-- CHƯƠNG 1: CỔNG THÔNG TIN CÔNG KHAI & ĐĂNG KÝ Học viên                  -->
   <!-- ===================================================================== -->
   <section class="trn-section" id="sec-01">
     <div class="trn-tag">CHƯƠNG 01 · TIẾP NHẬN ỨNG VIÊN</div>
     <h2 class="trn-h2">Cổng Thông Tin Công Khai & Nộp Đơn Đăng Ký Gia Nhập Trực Tuyến</h2>
-    <span class="trn-h3">Giới thiệu tôn chỉ CLB và quy trình nộp hồ sơ xét duyệt hội viên chính thức</span>
+    <span class="trn-h3">Giới thiệu tôn chỉ CLB và quy trình nộp hồ sơ xét duyệt Học viên chính thức</span>
 
     <div class="trn-goal">
       <strong>Mục tiêu nghiệp vụ:</strong> Giúp các doanh nhân sinh năm 1983 tìm hiểu về CLB Doanh Nhân CEO HN10 (HanoiBA), đăng ký gia nhập câu lạc bộ trực tuyến và tự động nhận email xác nhận tiếp nhận hồ sơ.
@@ -926,7 +926,7 @@ function generateHdsdHtml() {
 
     <div class="trn-sec-title">1. Quy Trình Thao Tác Chi Tiết (4 Bước)</div>
     <ol class="trn-steps">
-      <li><strong>Bước 1:</strong> Truy cập Cổng thông tin điện tử CLB Doanh Nhân CEO HN10. Xem thông điệp Chủ tịch, các số liệu thống kê hội viên và hoạt động 6 Ban chuyên môn.</li>
+      <li><strong>Bước 1:</strong> Truy cập Cổng thông tin điện tử CLB Doanh Nhân CEO HN10. Xem thông điệp Chủ tịch, các số liệu thống kê Học viên và hoạt động 6 Ban chuyên môn.</li>
       <li><strong>Bước 2:</strong> Nhấn nút <strong>"Đăng Ký Gia Nhập"</strong> màu vàng kim trên thanh điều hướng.</li>
       <li><strong>Bước 3:</strong> Điền đầy đủ thông tin vào mẫu đăng ký điện tử:
         <ul>
@@ -949,8 +949,8 @@ function generateHdsdHtml() {
 
     <div class="shot-wrap">
       <div class="shot">
-        <img src="images/evidence/live_02_member_registration_form_filled.png" alt="Mẫu đăng ký gia nhập hội viên trực tuyến">
-        <figcaption><strong>Hình 1.2:</strong> Mẫu biểu nộp hồ sơ đăng ký gia nhập hội viên CEO HN10 trực tuyến</figcaption>
+        <img src="images/evidence/live_02_member_registration_form_filled.png" alt="Mẫu đăng ký gia nhập Học viên trực tuyến">
+        <figcaption><strong>Hình 1.2:</strong> Mẫu biểu nộp hồ sơ đăng ký gia nhập Học viên CEO HN10 trực tuyến</figcaption>
       </div>
     </div>
 
@@ -968,7 +968,7 @@ function generateHdsdHtml() {
     <span class="trn-h3">Truy cập hệ thống điều hành trung tâm dành cho Ban Quản Trị và Ban Thư Ký</span>
 
     <div class="trn-goal">
-      <strong>Mục tiêu nghiệp vụ:</strong> Cung cấp cái nhìn toàn cảnh về tình hình hội viên, quỹ tài chính, tiến độ sự kiện và phễu giao thương B2B của toàn hiệp hội.
+      <strong>Mục tiêu nghiệp vụ:</strong> Cung cấp cái nhìn toàn cảnh về tình hình Học viên, quỹ tài chính, tiến độ sự kiện và phễu giao thương B2B của toàn hiệp hội.
     </div>
 
     <div class="trn-path">
@@ -981,7 +981,7 @@ function generateHdsdHtml() {
       <li><strong>Bước 2:</strong> Nhấn nút <strong>"Đăng Nhập Quản Trị"</strong>. Hệ thống kiểm tra quyền hạn và tạo phiên làm việc bảo mật.</li>
       <li><strong>Bước 3:</strong> Tại Bàn làm việc Dashboard, theo dõi 4 khối chỉ số KPI then chốt:
         <ul>
-          <li><strong>Tổng số hội viên:</strong> Số lượng hội viên chính thức và số hồ sơ đang chờ duyệt.</li>
+          <li><strong>Tổng số Học viên:</strong> Số lượng Học viên chính thức và số hồ sơ đang chờ duyệt.</li>
           <li><strong>Tài chính quỹ:</strong> Tổng thu hội phí, số dư quỹ thiện nguyện và chi phí vận hành.</li>
           <li><strong>Sự kiện Gala:</strong> Số lượng đại biểu đã đăng ký và tỷ lệ check-in thời gian thực.</li>
           <li><strong>Giao thương B2B:</strong> Tổng số sản phẩm đang niêm yết và giá trị thương vụ đã kết nối.</li>
@@ -1009,19 +1009,19 @@ function generateHdsdHtml() {
   </section>
 
   <!-- ===================================================================== -->
-  <!-- CHƯƠNG 3: QUẢN TRỊ HỘI VIÊN 360 & THẨM ĐỊNH KẾT NẠP BTV                -->
+  <!-- CHƯƠNG 3: QUẢN TRỊ Học viên 360 & THẨM ĐỊNH KẾT NẠP BTV                -->
   <!-- ===================================================================== -->
   <section class="trn-section" id="sec-03">
     <div class="trn-tag">CHƯƠNG 03 · BAN THÀNH VIÊN (BTV)</div>
-    <h2 class="trn-h2">Quản Trị Danh Bạ Hội Viên 360° & Quy Trình Thẩm Định Kết Nạp</h2>
-    <span class="trn-h3">Thẩm quyền độc quyền của Ban Thành Viên (BTV) trong việc kiểm duyệt và cấp mã hội viên</span>
+    <h2 class="trn-h2">Quản Trị Danh Bạ Học viên 360° & Quy Trình Thẩm Định Kết Nạp</h2>
+    <span class="trn-h3">Thẩm quyền độc quyền của Ban Thành Viên (BTV) trong việc kiểm duyệt và cấp mã Học viên</span>
 
     <div class="trn-goal">
-      <strong>Mục tiêu nghiệp vụ:</strong> Đảm bảo 100% hồ sơ kết nạp được thẩm định chính xác về mặt pháp lý doanh nghiệp và tiêu chuẩn sinh năm 1983; tự động cấp Mã hội viên định danh (\`CEO-83xxx\`) và gửi email thông báo mật khẩu khởi tạo.
+      <strong>Mục tiêu nghiệp vụ:</strong> Đảm bảo 100% hồ sơ kết nạp được thẩm định chính xác về mặt pháp lý doanh nghiệp và tiêu chuẩn sinh năm 1983; tự động cấp Mã Học viên định danh (\`CEO-83xxx\`) và gửi email thông báo mật khẩu khởi tạo.
     </div>
 
     <div class="trn-path">
-      <strong>Vị trí truy cập:</strong> Cổng Quản Trị CRM ➔ Menu "Hội Viên" ➔ Mục "Danh sách hội viên" (\`/members\`)
+      <strong>Vị trí truy cập:</strong> Cổng Quản Trị CRM ➔ Menu "Học viên" ➔ Mục "Danh sách Học viên" (\`/members\`)
     </div>
 
     <div class="trn-sec-title">1. Quy Trình Thẩm Định Hồ Sơ Mới (4 Bước)</div>
@@ -1041,13 +1041,13 @@ function generateHdsdHtml() {
     <div class="shot-wrap">
       <div class="shot">
         <img src="images/evidence/live_06_crm_members_pending_list.png" alt="Danh sách hồ sơ chờ thẩm định BTV">
-        <figcaption><strong>Hình 3.1:</strong> Danh sách hồ sơ hội viên chờ thẩm định tại Ban Thành Viên</figcaption>
+        <figcaption><strong>Hình 3.1:</strong> Danh sách hồ sơ Học viên chờ thẩm định tại Ban Thành Viên</figcaption>
       </div>
     </div>
 
     <div class="shot-wrap">
       <div class="shot">
-        <img src="images/evidence/live_07_crm_member_detail_drawer.png" alt="Ngăn kéo thẩm định hồ sơ hội viên 360 độ">
+        <img src="images/evidence/live_07_crm_member_detail_drawer.png" alt="Ngăn kéo thẩm định hồ sơ Học viên 360 độ">
         <figcaption><strong>Hình 3.2:</strong> Ngăn kéo Drawer thẩm định chi tiết hồ sơ ứng viên và xác minh thông tin doanh nghiệp</figcaption>
       </div>
     </div>
@@ -1055,12 +1055,12 @@ function generateHdsdHtml() {
     <div class="shot-wrap">
       <div class="shot">
         <img src="images/evidence/live_09_email_template_credentials_sent_vu.png" alt="Email tự động gửi thông tin tài khoản">
-        <figcaption><strong>Hình 3.3:</strong> Mẫu email tự động gửi thông báo kết nạp thành công và mật khẩu khởi tạo cho hội viên</figcaption>
+        <figcaption><strong>Hình 3.3:</strong> Mẫu email tự động gửi thông báo kết nạp thành công và mật khẩu khởi tạo cho Học viên</figcaption>
       </div>
     </div>
 
     <div class="box-warn">
-      <strong>RÀNG BUỘC PHÂN QUYỀN TUYỆT ĐỐI:</strong> Ban Thư Ký (BTK) KHÔNG có thẩm quyền bấm duyệt kết nạp hội viên. Nếu tài khoản thư ký cố tình thao tác, hệ thống sẽ chặn và hiển thị thông báo phân quyền an toàn.
+      <strong>RÀNG BUỘC PHÂN QUYỀN TUYỆT ĐỐI:</strong> Ban Thư Ký (BTK) KHÔNG có thẩm quyền bấm duyệt kết nạp Học viên. Nếu tài khoản thư ký cố tình thao tác, hệ thống sẽ chặn và hiển thị thông báo phân quyền an toàn.
     </div>
   </section>
 
@@ -1070,10 +1070,10 @@ function generateHdsdHtml() {
   <section class="trn-section" id="sec-04">
     <div class="trn-tag">CHƯƠNG 04 · APP DI ĐỘNG CEO HN10</div>
     <h2 class="trn-h2">Đăng Nhập App Di Động CEO HN10 & Đổi Mật Khẩu Lần Đầu</h2>
-    <span class="trn-h3">Trải nghiệm ứng dụng di động dành cho doanh nhân hội viên chính thức</span>
+    <span class="trn-h3">Trải nghiệm ứng dụng di động dành cho doanh nhân Học viên chính thức</span>
 
     <div class="trn-goal">
-      <strong>Mục tiêu nghiệp vụ:</strong> Hướng dẫn hội viên đăng nhập ứng dụng trên điện thoại thông minh bằng mật khẩu tạm thời được cấp và thiết lập mật khẩu cá nhân mới để kích hoạt bảo mật.
+      <strong>Mục tiêu nghiệp vụ:</strong> Hướng dẫn Học viên đăng nhập ứng dụng trên điện thoại thông minh bằng mật khẩu tạm thời được cấp và thiết lập mật khẩu cá nhân mới để kích hoạt bảo mật.
     </div>
 
     <div class="trn-path">
@@ -1085,7 +1085,7 @@ function generateHdsdHtml() {
       <li><strong>Bước 1:</strong> Mở ứng dụng CEO HN10. Nhập Số điện thoại/Email và Mật khẩu khởi tạo được gửi trong email chào mừng.</li>
       <li><strong>Bước 2:</strong> Nhấn nút <strong>"Đăng Nhập"</strong>.</li>
       <li><strong>Bước 3:</strong> Màn hình yêu cầu <strong>"Đổi Mật Khẩu Lần Đầu"</strong> tự động xuất hiện. Nhập mật khẩu cũ và thiết lập mật khẩu mới (tối thiểu 8 ký tự).</li>
-      <li><strong>Bước 4:</strong> Bấm <strong>"Kích Hoạt Tài Khoản"</strong> để hoàn tất và truy cập vào không gian làm việc hội viên.</li>
+      <li><strong>Bước 4:</strong> Bấm <strong>"Kích Hoạt Tài Khoản"</strong> để hoàn tất và truy cập vào không gian làm việc Học viên.</li>
     </ol>
 
     <!-- HIỂN THỊ CHUẨN PHONE MOCKUP MOBILE PORTRAIT -->
@@ -1114,15 +1114,15 @@ function generateHdsdHtml() {
   </section>
 
   <!-- ===================================================================== -->
-  <!-- CHƯƠNG 5: TRANG CHỦ HỘI VIÊN, PROFILE NHANH & CHỈ SỐ B2B              -->
+  <!-- CHƯƠNG 5: TRANG CHỦ Học viên, PROFILE NHANH & CHỈ SỐ B2B              -->
   <!-- ===================================================================== -->
   <section class="trn-section" id="sec-05">
     <div class="trn-tag">CHƯƠNG 05 · APP DI ĐỘNG CEO HN10</div>
-    <h2 class="trn-h2">Trang Chủ Hội Viên, Cập Nhật Nhanh Hồ Sơ & Đếm Chỉ Số B2B</h2>
+    <h2 class="trn-h2">Trang Chủ Học viên, Cập Nhật Nhanh Hồ Sơ & Đếm Chỉ Số B2B</h2>
     <span class="trn-h3">Trung tâm điều hành cá nhân của doanh nhân trên ứng dụng di động</span>
 
     <div class="trn-goal">
-      <strong>Mục tiêu nghiệp vụ:</strong> Giúp hội viên nắm bắt nhanh các tin tức hiệp hội, theo dõi lịch sự kiện sắp diễn ra, đếm cơ hội kinh doanh đang mở và chỉnh sửa thông tin đại diện theo phong cách Facebook tức thì.
+      <strong>Mục tiêu nghiệp vụ:</strong> Giúp Học viên nắm bắt nhanh các tin tức hiệp hội, theo dõi lịch sự kiện sắp diễn ra, đếm cơ hội kinh doanh đang mở và chỉnh sửa thông tin đại diện theo phong cách Facebook tức thì.
     </div>
 
     <div class="trn-path">
@@ -1132,7 +1132,7 @@ function generateHdsdHtml() {
     <div class="trn-sec-title">1. Các Thành Phần Trọng Tâm Tại Trang Chủ</div>
     <ul class="trn-steps">
       <li><strong>Header Nhận Diện:</strong> Hiển thị Logo CEO HN10 sắc nét, chuông thông báo cá nhân hóa và nút "Liên Hệ Trực Tiếp" mở bảng thông tin liên lạc Ban Thư Ký.</li>
-      <li><strong>Thẻ Hội Viên Tóm Tắt:</strong> Hiển thị Họ tên, Mã hội viên (ví dụ: \`CEO-83007\`), chức vụ doanh nghiệp và nút "Chỉnh sửa nhanh". Bấm vào mở modal chỉnh sửa ảnh đại diện, ảnh bìa, số điện thoại và logo công ty tức thì.</li>
+      <li><strong>Thẻ Học viên Tóm Tắt:</strong> Hiển thị Họ tên, Mã Học viên (ví dụ: \`CEO-83007\`), chức vụ doanh nghiệp và nút "Chỉnh sửa nhanh". Bấm vào mở modal chỉnh sửa ảnh đại diện, ảnh bìa, số điện thoại và logo công ty tức thì.</li>
       <li><strong>Huy Hiệu Chỉ Số B2B:</strong> Các badge thống kê cơ hội kinh doanh đang mở và sản phẩm đang bán được đóng gói gọn gàng bên trong thẻ, không tràn viền.</li>
       <li><strong>Lối Tắt Tác Vụ Nhanh (Quick Pills):</strong> Nút Quét mã QR check-in sự kiện, Đóng hội phí VietQR, Mạng lưới đối tác và Sàn B2B.</li>
     </ul>
@@ -1140,9 +1140,9 @@ function generateHdsdHtml() {
     <div class="shot-mobile-grid">
       <div class="shot-mobile-card">
         <div class="phone-mockup">
-          <img src="images/evidence/live_13_app_home_dashboard.png" alt="Trang chủ Hội viên CEO HN10">
+          <img src="images/evidence/live_13_app_home_dashboard.png" alt="Trang chủ Học viên CEO HN10">
         </div>
-        <div class="phone-caption"><strong>Hình 5.1:</strong> Trang chủ Hội viên Doanh nhân CEO HN10</div>
+        <div class="phone-caption"><strong>Hình 5.1:</strong> Trang chủ Học viên Doanh nhân CEO HN10</div>
       </div>
 
       <div class="shot-mobile-card">
@@ -1155,15 +1155,15 @@ function generateHdsdHtml() {
   </section>
 
   <!-- ===================================================================== -->
-  <!-- CHƯƠNG 6: THẺ HỘI VIÊN VIP 3D & DANH THIẾP SỐ NFC                     -->
+  <!-- CHƯƠNG 6: THẺ Học viên VIP 3D & DANH THIẾP SỐ NFC                     -->
   <!-- ===================================================================== -->
   <section class="trn-section" id="sec-06">
     <div class="trn-tag">CHƯƠNG 06 · ĐỊNH DANH SỐ VIP</div>
-    <h2 class="trn-h2">Thẻ Hội Viên VIP 3D Chìm Logo & Danh Thiếp Số Công Khai (NFC)</h2>
+    <h2 class="trn-h2">Thẻ Học viên VIP 3D Chìm Logo & Danh Thiếp Số Công Khai (NFC)</h2>
     <span class="trn-h3">Định danh doanh nhân cao cấp với công nghệ chạm NFC 1 giây và mã QR cá nhân</span>
 
     <div class="trn-goal">
-      <strong>Mục tiêu nghiệp vụ:</strong> Tạo dựng niềm tự hào hội viên qua thẻ điện tử 3D sang trọng, hỗ trợ kết nối đối tác nhanh chóng qua công nghệ chạm thẻ NFC hoặc quét mã QR danh thiếp công khai.
+      <strong>Mục tiêu nghiệp vụ:</strong> Tạo dựng niềm tự hào Học viên qua thẻ điện tử 3D sang trọng, hỗ trợ kết nối đối tác nhanh chóng qua công nghệ chạm thẻ NFC hoặc quét mã QR danh thiếp công khai.
     </div>
 
     <div class="trn-path">
@@ -1173,7 +1173,7 @@ function generateHdsdHtml() {
     <div class="trn-sec-title">1. Hướng Dẫn Sử Dụng Thẻ Điện Tử & NFC</div>
     <ol class="trn-steps">
       <li><strong>Xem Thẻ 3D:</strong> Mở tab Thẻ VIP. Thẻ được thiết kế theo tỷ lệ thẻ ngân hàng chuẩn quốc tế, nền Xanh Navy phối Vàng Amber Gold, chìm Logo doanh nghiệp với hiệu ứng Screen Blend tinh tế.</li>
-      <li><strong>Lật Mặt Sau Thẻ:</strong> Chạm nhẹ vào thẻ để lật xem mặt sau chứa Điều lệ hội viên, thời hạn thẻ và mã QR quét định danh.</li>
+      <li><strong>Lật Mặt Sau Thẻ:</strong> Chạm nhẹ vào thẻ để lật xem mặt sau chứa Điều lệ Học viên, thời hạn thẻ và mã QR quét định danh.</li>
       <li><strong>Chạm Thẻ NFC:</strong> Khi gặp đối tác tại hội thảo, đưa mặt thẻ vật lý chạm vào lưng điện thoại đối tác (hỗ trợ cả iPhone và Android), điện thoại đối tác tự động mở trang Danh thiếp số công khai.</li>
       <li><strong>Lưu Danh Bạ Tự Động:</strong> Đối tác chỉ cần bấm nút <strong>"Lưu Danh Bạ"</strong> để lưu đầy đủ Họ tên, Số điện thoại, Email, Chức vụ và Địa chỉ công ty vào danh bạ điện thoại trong 1 giây.</li>
     </ol>
@@ -1181,9 +1181,9 @@ function generateHdsdHtml() {
     <div class="shot-mobile-grid">
       <div class="shot-mobile-card">
         <div class="phone-mockup">
-          <img src="images/evidence/live_26_app_vip_3d_card.png" alt="Thẻ Hội viên VIP 3D CEO HN10">
+          <img src="images/evidence/live_26_app_vip_3d_card.png" alt="Thẻ Học viên VIP 3D CEO HN10">
         </div>
-        <div class="phone-caption"><strong>Hình 6.1:</strong> Thẻ Hội viên VIP 3D chìm logo doanh nghiệp</div>
+        <div class="phone-caption"><strong>Hình 6.1:</strong> Thẻ Học viên VIP 3D chìm logo doanh nghiệp</div>
       </div>
 
       <div class="shot-mobile-card">
@@ -1196,25 +1196,25 @@ function generateHdsdHtml() {
   </section>
 
   <!-- ===================================================================== -->
-  <!-- CHƯƠNG 7: DANH BẠ HỘI VIÊN & TAB ĐÃ GỬI KẾT NỐI                       -->
+  <!-- CHƯƠNG 7: DANH BẠ Học viên & TAB ĐÃ GỬI KẾT NỐI                       -->
   <!-- ===================================================================== -->
   <section class="trn-section" id="sec-07">
     <div class="trn-tag">CHƯƠNG 07 · KẾT NỐI B2B</div>
-    <h2 class="trn-h2">Danh Bạ Hội Viên, Mời Gặp 1-on-1 & Quản Lý Tab "Đã Gửi Kết Nối"</h2>
+    <h2 class="trn-h2">Danh Bạ Học viên, Mời Gặp 1-on-1 & Quản Lý Tab "Đã Gửi Kết Nối"</h2>
     <span class="trn-h3">Mạng lưới hơn 500+ lãnh đạo doanh nghiệp và công cụ điều phối cuộc hẹn giao thương</span>
 
     <div class="trn-goal">
-      <strong>Mục tiêu nghiệp vụ:</strong> Giúp hội viên dễ dàng tra cứu đối tác theo ngành nghề, gửi lời mời giao thương 1-on-1 và theo dõi trạng thái lời mời tại tab "Đã gửi kết nối".
+      <strong>Mục tiêu nghiệp vụ:</strong> Giúp Học viên dễ dàng tra cứu đối tác theo ngành nghề, gửi lời mời giao thương 1-on-1 và theo dõi trạng thái lời mời tại tab "Đã gửi kết nối".
     </div>
 
     <div class="trn-path">
-      <strong>Vị trí truy cập:</strong> Tab "Hội Viên" trên App Mobile (\`/association/members\`)
+      <strong>Vị trí truy cập:</strong> Tab "Học viên" trên App Mobile (\`/association/members\`)
     </div>
 
     <div class="trn-sec-title">1. Thao Tác Gửi Lời Mời & Theo Dõi Kết Nối</div>
     <ol class="trn-steps">
       <li><strong>Tìm Kiếm & Lọc:</strong> Sử dụng thanh tìm kiếm nhanh theo tên CEO hoặc chọn bộ lọc ngành nghề (Công nghệ, Bất động sản, Xây dựng, Tài chính...).</li>
-      <li><strong>Gửi Lời Mời Kết Nối:</strong> Bấm biểu tượng <strong>"Bắt Tay (Handshake)"</strong> tại thẻ hội viên. Ngăn kéo B2B Connect mở ra: chọn mục đích hợp tác, đính kèm cơ hội kinh doanh và bấm "Gửi Đề Xuất".</li>
+      <li><strong>Gửi Lời Mời Kết Nối:</strong> Bấm biểu tượng <strong>"Bắt Tay (Handshake)"</strong> tại thẻ Học viên. Ngăn kéo B2B Connect mở ra: chọn mục đích hợp tác, đính kèm cơ hội kinh doanh và bấm "Gửi Đề Xuất".</li>
       <li><strong>Quản Lý Tab "Đã Gửi Kết Nối":</strong> Mở tab "Đã gửi kết nối" để theo dõi 3 trạng thái:
         <ul>
           <li><strong>Đang chờ:</strong> Đối tác chưa phản hồi. Có sẵn nút <strong>"Hủy"</strong> để rút lại lời mời nếu bấm nhầm.</li>
@@ -1227,9 +1227,9 @@ function generateHdsdHtml() {
     <div class="shot-mobile-grid">
       <div class="shot-mobile-card">
         <div class="phone-mockup">
-          <img src="images/evidence/app1983_03_members_directory.png" alt="Danh bạ hội viên CEO HN10">
+          <img src="images/evidence/app1983_03_members_directory.png" alt="Danh bạ Học viên CEO HN10">
         </div>
-        <div class="phone-caption"><strong>Hình 7.1:</strong> Danh bạ Hội viên CLB CEO HN10</div>
+        <div class="phone-caption"><strong>Hình 7.1:</strong> Danh bạ Học viên CLB CEO HN10</div>
       </div>
 
       <div class="shot-mobile-card">
@@ -1250,7 +1250,7 @@ function generateHdsdHtml() {
     <span class="trn-h3">Không gian trao đổi bảo mật thời gian thực, thẻ mời họp B2B và kênh ghim chính thức</span>
 
     <div class="trn-goal">
-      <strong>Mục tiêu nghiệp vụ:</strong> Tạo kênh liên lạc kinh doanh tập trung giữa các hội viên và nhận các thông báo điều hành chính thức từ Ban Thư Ký với định dạng thẻ giao dịch Zalo OA chuyên nghiệp.
+      <strong>Mục tiêu nghiệp vụ:</strong> Tạo kênh liên lạc kinh doanh tập trung giữa các Học viên và nhận các thông báo điều hành chính thức từ Ban Thư Ký với định dạng thẻ giao dịch Zalo OA chuyên nghiệp.
     </div>
 
     <div class="trn-path">
@@ -1301,12 +1301,12 @@ function generateHdsdHtml() {
     <div class="trn-sec-title">1. Quy Trình Khởi Tạo & Thiết Kế Sơ Đồ Chỗ Ngồi</div>
     <ol class="trn-steps">
       <li><strong>Bước 1:</strong> Bấm nút <strong>"Tạo Sự Kiện Mới"</strong> trên CRM. Nhập tên sự kiện (ví dụ: <em>Đêm Gala Hội Ngộ Doanh Nhân CEO HN10</em>), thời gian, địa điểm khách sạn và tải banner 16:9.</li>
-      <li><strong>Bước 2:</strong> Thiết lập các loại vé: Vé VIP Dạ Tiệc (1.500.000 VNĐ) và Vé Tiêu Chuẩn Hội Viên (0 VNĐ).</li>
+      <li><strong>Bước 2:</strong> Thiết lập các loại vé: Vé VIP Dạ Tiệc (1.500.000 VNĐ) và Vé Tiêu Chuẩn Học viên (0 VNĐ).</li>
       <li><strong>Bước 3:</strong> Mở công cụ <strong>Cinema Seating Map</strong>:
         <ul>
           <li>Kéo thả bố trí các bàn tròn VIP 10 chỗ (Bàn VIP 01, Bàn VIP 02...) gần sân khấu.</li>
-          <li>Bố trí các dãy ghế đại biểu danh dự và dãy hội viên.</li>
-          <li>Gán trực tiếp từng hội viên vào vị trí ghế cụ thể.</li>
+          <li>Bố trí các dãy ghế đại biểu danh dự và dãy Học viên.</li>
+          <li>Gán trực tiếp từng Học viên vào vị trí ghế cụ thể.</li>
         </ul>
       </li>
       <li><strong>Bước 4:</strong> Bấm <strong>"Lưu & Kích Hoạt Sự Kiện"</strong>. Hệ thống tự động đồng bộ số bàn vào vé E-Ticket của từng đại biểu.</li>
@@ -1333,10 +1333,10 @@ function generateHdsdHtml() {
   <section class="trn-section" id="sec-10">
     <div class="trn-tag">CHƯƠNG 10 · VÉ ĐIỆN TỬ APP</div>
     <h2 class="trn-h2">Đăng Ký Tham Dự Sự Kiện & Phát Hành Vé Mời Điện Tử E-Ticket QR</h2>
-    <span class="trn-h3">Thao tác giữ chỗ và nhận vé điện tử an toàn ngay trên điện thoại hội viên</span>
+    <span class="trn-h3">Thao tác giữ chỗ và nhận vé điện tử an toàn ngay trên điện thoại Học viên</span>
 
     <div class="trn-goal">
-      <strong>Mục tiêu nghiệp vụ:</strong> Giúp hội viên đăng ký tham gia các chương trình của hiệp hội và nhận vé E-Ticket chứa mã QR mã hóa cùng số bàn tiệc đã được xếp sẵn.
+      <strong>Mục tiêu nghiệp vụ:</strong> Giúp Học viên đăng ký tham gia các chương trình của hiệp hội và nhận vé E-Ticket chứa mã QR mã hóa cùng số bàn tiệc đã được xếp sẵn.
     </div>
 
     <div class="trn-path">
@@ -1347,7 +1347,7 @@ function generateHdsdHtml() {
     <ol class="trn-steps">
       <li><strong>Bước 1:</strong> Mở mục Sự Kiện trên App Mobile, chọn sự kiện Gala mong muốn tham gia.</li>
       <li><strong>Bước 2:</strong> Xem chi tiết nội dung chương trình, diễn giả và thời gian biểu.</li>
-      <li><strong>Bước 3:</strong> Bấm <strong>"Đăng Ký Tham Dự"</strong>. Nếu là vé có phí, hệ thống hiển thị mã VietQR chuyển khoản nhanh; nếu là vé đặc quyền hội viên, hệ thống xác nhận ngay lập tức.</li>
+      <li><strong>Bước 3:</strong> Bấm <strong>"Đăng Ký Tham Dự"</strong>. Nếu là vé có phí, hệ thống hiển thị mã VietQR chuyển khoản nhanh; nếu là vé đặc quyền Học viên, hệ thống xác nhận ngay lập tức.</li>
       <li><strong>Bước 4:</strong> Vé mời điện tử E-Ticket QR xuất hiện trên màn hình: hiển thị Mã vé, Mã QR chống giả mạo, Họ tên đại biểu, Tên doanh nghiệp và <strong>Vị trí Bàn VIP</strong>.</li>
     </ol>
 
@@ -1428,7 +1428,7 @@ function generateHdsdHtml() {
     <span class="trn-h3">Thúc đẩy giao thương nội khối, giới thiệu sản phẩm và đàm phán hợp đồng B2B</span>
 
     <div class="trn-goal">
-      <strong>Mục tiêu nghiệp vụ:</strong> Giúp các doanh nghiệp hội viên quảng bá sản phẩm với chính sách trợ giá nội bộ, tiếp nhận đơn hàng và khớp nối các cơ hội Cung - Cầu 1-on-1 có định giá thương vụ cụ thể.
+      <strong>Mục tiêu nghiệp vụ:</strong> Giúp các doanh nghiệp Học viên quảng bá sản phẩm với chính sách trợ giá nội bộ, tiếp nhận đơn hàng và khớp nối các cơ hội Cung - Cầu 1-on-1 có định giá thương vụ cụ thể.
     </div>
 
     <div class="trn-path">
@@ -1469,7 +1469,7 @@ function generateHdsdHtml() {
     <span class="trn-h3">Quy trình nộp hội phí niên liễm và cơ chế đối soát sao kê minh bạch của Kế toán</span>
 
     <div class="trn-goal">
-      <strong>Mục tiêu nghiệp vụ:</strong> Tạo điều kiện cho hội viên nộp hội phí nhanh chóng bằng mã VietQR ngân hàng, đồng thời hỗ trợ Kế toán đối soát sao kê và gạch nợ chuẩn xác trong CRM.
+      <strong>Mục tiêu nghiệp vụ:</strong> Tạo điều kiện cho Học viên nộp hội phí nhanh chóng bằng mã VietQR ngân hàng, đồng thời hỗ trợ Kế toán đối soát sao kê và gạch nợ chuẩn xác trong CRM.
     </div>
 
     <div class="trn-path">
@@ -1478,11 +1478,11 @@ function generateHdsdHtml() {
 
     <div class="trn-sec-title">1. Quy Trình Đóng Phí & Gạch Nợ (5 Bước)</div>
     <ol class="trn-steps">
-      <li><strong>Hội viên quét mã VietQR:</strong> Hội viên mở mục Đóng Hội Phí trên App Mobile, chọn kỳ đóng phí 5.000.000 VNĐ. Hệ thống hiển thị mã VietQR động chứa sẵn số tài khoản MB Bank và nội dung chuyển khoản.</li>
-      <li><strong>Thực hiện chuyển khoản:</strong> Hội viên dùng App Ngân hàng quét mã và xác nhận chuyển khoản.</li>
+      <li><strong>Học viên quét mã VietQR:</strong> Học viên mở mục Đóng Hội Phí trên App Mobile, chọn kỳ đóng phí 5.000.000 VNĐ. Hệ thống hiển thị mã VietQR động chứa sẵn số tài khoản MB Bank và nội dung chuyển khoản.</li>
+      <li><strong>Thực hiện chuyển khoản:</strong> Học viên dùng App Ngân hàng quét mã và xác nhận chuyển khoản.</li>
       <li><strong>Kế toán kiểm tra sao kê:</strong> Ban Kế toán đăng nhập Web CRM, mở màn hình "Quản Lý Hội Phí" (\`/fees\`), đối chiếu số tiền và cú pháp chuyển khoản với sao kê ngân hàng MB Bank.</li>
-      <li><strong>Bấm nút Duyệt Gạch Nợ:</strong> Kế toán bấm "Duyệt Gạch Nợ". Hệ thống tự động gia hạn thêm +365 ngày sử dụng Thẻ VIP cho hội viên.</li>
-      <li><strong>Phát hành biên lai:</strong> Hệ thống chuyển trạng thái sang \`paid\` và gửi hóa đơn xác nhận đến hội viên.</li>
+      <li><strong>Bấm nút Duyệt Gạch Nợ:</strong> Kế toán bấm "Duyệt Gạch Nợ". Hệ thống tự động gia hạn thêm +365 ngày sử dụng Thẻ VIP cho Học viên.</li>
+      <li><strong>Phát hành biên lai:</strong> Hệ thống chuyển trạng thái sang \`paid\` và gửi hóa đơn xác nhận đến Học viên.</li>
     </ol>
 
     <div class="shot-wrap">
@@ -1587,8 +1587,8 @@ function generateHdsdHtml() {
 
     <div class="trn-sec-title">1. Các Thao Tác Nghiệp Vụ Cốt Lõi</div>
     <ol class="trn-steps">
-      <li><strong>Khởi tạo & Bỏ phiếu biểu quyết:</strong> Ban Thư Ký tạo cuộc biểu quyết trên CRM, thiết lập các phương án lựa chọn. Hội viên mở App Mobile (\`/association/voting\`) để bỏ phiếu bảo mật. Kết quả tỷ lệ % được cập nhật nhảy động thời gian thực trên màn hình lớn.</li>
-      <li><strong>Thư viện nghị quyết & Văn bản:</strong> Ban Thư Ký tải lên các văn bản quy chế, nghị quyết đại hội (PDF/DOCX) lên kho MinIO S3. Hội viên dễ dàng tra cứu trên App Mobile (\`/association/library\`).</li>
+      <li><strong>Khởi tạo & Bỏ phiếu biểu quyết:</strong> Ban Thư Ký tạo cuộc biểu quyết trên CRM, thiết lập các phương án lựa chọn. Học viên mở App Mobile (\`/association/voting\`) để bỏ phiếu bảo mật. Kết quả tỷ lệ % được cập nhật nhảy động thời gian thực trên màn hình lớn.</li>
+      <li><strong>Thư viện nghị quyết & Văn bản:</strong> Ban Thư Ký tải lên các văn bản quy chế, nghị quyết đại hội (PDF/DOCX) lên kho MinIO S3. Học viên dễ dàng tra cứu trên App Mobile (\`/association/library\`).</li>
       <li><strong>Ma trận phân quyền RBAC 5 Cấp Bậc:</strong> Ban Quản Trị cấu hình quyền hạn tại \`/permissions\`: kiểm soát quyền Xem, Sửa, Xóa, Phân quyền cho từng vị trí lãnh đạo trong 6 Ban chuyên môn.</li>
     </ol>
 
@@ -1645,10 +1645,10 @@ function generateHdsdHtml() {
 async function main() {
   console.log('1. Đang tạo nội dung Markdown SRS IEEE 830...');
   const srsContent = generateSrsMarkdown();
-  
+
   const srsDocsPath = path.resolve(__dirname, '../docs/SRS_IEEE830_CEOHN10_TOAN_DIEN.md');
   const srsPublicPath = path.resolve(__dirname, '../apps/ceohn10_app_fe/public/docs/SRS_IEEE830_CEOHN10_TOAN_DIEN.md');
-  
+
   fs.writeFileSync(srsDocsPath, srsContent, 'utf8');
   fs.writeFileSync(srsPublicPath, srsContent, 'utf8');
   console.log(`   -> Đã lưu SRS Markdown tại: ${srsDocsPath} (${Buffer.byteLength(srsContent, 'utf8')} bytes)`);
@@ -1656,7 +1656,7 @@ async function main() {
 
   console.log('2. Đang tạo nội dung HTML Hướng Dẫn Sử Dụng Chuẩn Hóa...');
   const hdsdContent = generateHdsdHtml();
-  
+
   const hdsdDocsPath = path.resolve(__dirname, '../docs/training/HDSD_HE_THONG_CEOHN10_CHUAN_HOA.html');
   const hdsdPublicPath = path.resolve(__dirname, '../apps/ceohn10_app_fe/public/docs/HDSD_HE_THONG_CEOHN10_CHUAN_HOA.html');
 

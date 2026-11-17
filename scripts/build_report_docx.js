@@ -353,27 +353,27 @@ const ITEMS_DATA = [
   {
     stt: "2",
     nhom: "A. GIAO DIỆN & TRẢI NGHIỆM ĐẲNG CẤP",
-    tieuDe: "Thẻ Hội Viên VIP Số Hóa & Khiên Bảo Mật Doanh Nhân (Privacy Shield)",
+    tieuDe: "Thẻ Học viên VIP Số Hóa & Khiên Bảo Mật Doanh Nhân (Privacy Shield)",
     trănTrở: "Nỗi e ngại lớn nhất của các Chủ tịch, CEO khi tham gia hiệp hội là bị lộ Số điện thoại và Email cá nhân, dẫn đến nguy cơ bị telesale, mời chào rác quấy rầy liên tục.",
-    giaiPhapSale: "Thẻ VIP số hóa bằng chất liệu kim loại vát cạnh sang trọng, tích hợp công nghệ 'Khiên Bảo Mật Doanh Nhân' (Privacy Shield). Hội viên toàn quyền bật/tắt ẩn SĐT và Email chỉ bằng 1 thao tác chạm. Người ngoài chỉ có thể kết nối văn minh qua tin nhắn nội bộ hoặc gửi đề xuất gặp gỡ lịch thiệp.",
+    giaiPhapSale: "Thẻ VIP số hóa bằng chất liệu kim loại vát cạnh sang trọng, tích hợp công nghệ 'Khiên Bảo Mật Doanh Nhân' (Privacy Shield). Học viên toàn quyền bật/tắt ẩn SĐT và Email chỉ bằng 1 thao tác chạm. Người ngoài chỉ có thể kết nối văn minh qua tin nhắn nội bộ hoặc gửi đề xuất gặp gỡ lịch thiệp.",
     giaTriVang: "Bảo vệ 100% không gian riêng tư cho lãnh đạo cấp cao; triệt tiêu hoàn toàn nguy cơ spam rác; tạo dựng niềm tin tuyệt đối để doanh nhân an tâm chia sẻ hồ sơ trong Hội.",
     domainTest: "https://ceohn10.viconnect.vn/association/card (HTTP 200 - Công tắc Privacy che số tự động)",
     status: "🟢 ĐÃ PASS (100%)",
     imgPath: "document/evidence_exact_15/req02_app_the_vip_baomat.png",
-    caption: "Hình 2: Thẻ hội viên VIP trên domain test https://ceohn10.viconnect.vn/association/card - Tích hợp Khiên bảo mật Ẩn/Hiện SĐT & Email cá nhân.",
+    caption: "Hình 2: Thẻ Học viên VIP trên domain test https://ceohn10.viconnect.vn/association/card - Tích hợp Khiên bảo mật Ẩn/Hiện SĐT & Email cá nhân.",
     isMobile: true
   },
   {
     stt: "3",
     nhom: "A. GIAO DIỆN & TRẢI NGHIỆM ĐẲNG CẤP",
     tieuDe: "Cổng Đặc Quyền VIP Doanh Nhân & Gian Hàng Số (Elite Member Perks)",
-    trănTrở: "Các ưu đãi nội bộ cao cấp giữa các doanh nghiệp thành viên nếu xếp lẫn lộn vào gian hàng bán lẻ đại trà sẽ làm mất đi giá trị và tính độc quyền của quyền lợi hội viên.",
-    giaiPhapSale: "Tách bạch phân hệ 'Đặc Quyền VIP Doanh Nhân' thành không gian danh giá riêng biệt. Nơi đây quy tụ các chính sách trợ giá độc quyền, voucher nghỉ dưỡng resort, dịch vụ tài chính, y tế, golf... chỉ dành riêng cho những người sở hữu thẻ hội viên CEO HN10.",
-    giaTriVang: "Gia tăng giá trị chiếc thẻ hội viên; kích thích các doanh nghiệp trong Hội ưu tiên sử dụng sản phẩm của nhau; giữ trọn dòng tiền luân chuyển mạnh mẽ trong nội bộ CLB.",
+    trănTrở: "Các ưu đãi nội bộ cao cấp giữa các doanh nghiệp thành viên nếu xếp lẫn lộn vào gian hàng bán lẻ đại trà sẽ làm mất đi giá trị và tính độc quyền của quyền lợi Học viên.",
+    giaiPhapSale: "Tách bạch phân hệ 'Đặc Quyền VIP Doanh Nhân' thành không gian danh giá riêng biệt. Nơi đây quy tụ các chính sách trợ giá độc quyền, voucher nghỉ dưỡng resort, dịch vụ tài chính, y tế, golf... chỉ dành riêng cho những người sở hữu thẻ Học viên CEO HN10.",
+    giaTriVang: "Gia tăng giá trị chiếc thẻ Học viên; kích thích các doanh nghiệp trong Hội ưu tiên sử dụng sản phẩm của nhau; giữ trọn dòng tiền luân chuyển mạnh mẽ trong nội bộ CLB.",
     domainTest: "https://ceohn10.viconnect.vn/association/perks (HTTP 200 - Kho ưu đãi VIP độc quyền)",
     status: "🟢 ĐÃ PASS (100%)",
     imgPath: "document/evidence_exact_15/req03_app_dacquyen_vip.png",
-    caption: "Hình 3: Cổng Đặc quyền VIP trên domain test https://ceohn10.viconnect.vn/association/perks - Không gian ưu đãi độc quyền dành riêng cho hội viên CEO HN10.",
+    caption: "Hình 3: Cổng Đặc quyền VIP trên domain test https://ceohn10.viconnect.vn/association/perks - Không gian ưu đãi độc quyền dành riêng cho Học viên CEO HN10.",
     isMobile: true
   },
   {
@@ -406,8 +406,8 @@ const ITEMS_DATA = [
     stt: "6",
     nhom: "B. SÀN GIAO THƯƠNG B2B & KẾT NỐI",
     tieuDe: "Quản Trị Tinh Hoa: Mô Hình Giới Thiệu Non-Affiliate & Xóa Bỏ Quảng Cáo",
-    trănTrở: "Việc áp dụng affiliate hoa hồng tiền mặt để lôi kéo hội viên sẽ làm tầm thường hóa giá trị của CLB; các banner quảng cáo làm mất đi tính trang nghiêm của cổng quản trị.",
-    giaiPhapSale: "Xóa bỏ hoàn toàn mục 'Quản lý quảng cáo' trên cả CRM và App. Triển khai 'Chính Sách Tri Ân Đối Tác Văn Minh' (Non-Affiliate Referral): Hội viên dùng mã mời trang nhã để giới thiệu bạn bè doanh nhân; khi kết nạp thành công, hệ thống vinh danh trên Bảng Vàng và tặng voucher gala tri ân, tuyệt đối không dùng tiền hoa hồng.",
+    trănTrở: "Việc áp dụng affiliate hoa hồng tiền mặt để lôi kéo Học viên sẽ làm tầm thường hóa giá trị của CLB; các banner quảng cáo làm mất đi tính trang nghiêm của cổng quản trị.",
+    giaiPhapSale: "Xóa bỏ hoàn toàn mục 'Quản lý quảng cáo' trên cả CRM và App. Triển khai 'Chính Sách Tri Ân Đối Tác Văn Minh' (Non-Affiliate Referral): Học viên dùng mã mời trang nhã để giới thiệu bạn bè doanh nhân; khi kết nạp thành công, hệ thống vinh danh trên Bảng Vàng và tặng voucher gala tri ân, tuyệt đối không dùng tiền hoa hồng.",
     giaTriVang: "Giữ vững cốt cách thanh lịch của giới doanh nhân; củng cố niềm tự hào khi là thành viên của CEO HN10; không gian số thuần khiết 100% không rác quảng cáo.",
     domainTest: "https://crm.ceohn10.viconnect.vn/members (Đã loại bỏ mục quảng cáo, menu CRM tinh gọn)",
     status: "🟢 ĐÃ PASS (100%)",
@@ -421,7 +421,7 @@ const ITEMS_DATA = [
     tieuDe: "Đặt Lịch Hẹn Gặp 1-on-1 Doanh Nhân & Đo Lường Giá Trị Giao Thương (Deal Value)",
     trănTrở: "Ban Chấp Hành rất khó đo lường phong trào kết nối của CLB có thực chất hay không, vì các cuộc hẹn cafe diễn ra tự phát và không có số liệu ghi nhận kết quả hợp tác.",
     giaiPhapSale: "Tách bạch việc đăng tin cơ hội chung với tính năng 'Hẹn Gặp 1-on-1 Doanh Nhân'. Cho phép hai CEO đặt lịch gặp chính thức, lựa chọn địa điểm, xác định mục tiêu làm việc và đặc biệt là có trường ghi nhận 'Giá trị giao dịch thực tế (Deal Value)' sau khi ký hợp đồng.",
-    giaTriVang: "Lượng hóa chính xác bằng con số hàng tỷ đồng giá trị kinh tế mà CLB mang lại cho từng hội viên; tạo động lực thi đua kết nối mạnh mẽ; có số liệu báo cáo tự hào trước Đại hội.",
+    giaTriVang: "Lượng hóa chính xác bằng con số hàng tỷ đồng giá trị kinh tế mà CLB mang lại cho từng Học viên; tạo động lực thi đua kết nối mạnh mẽ; có số liệu báo cáo tự hào trước Đại hội.",
     domainTest: "https://ceohn10.viconnect.vn/association/connect (HTTP 200 - Ghi nhận Deal Value minh bạch)",
     status: "🟢 ĐÃ PASS (100%)",
     imgPath: "document/evidence_exact_15/req07_app_ketnoi_1on1_dealvalue.png",
@@ -457,14 +457,14 @@ const ITEMS_DATA = [
   {
     stt: "10",
     nhom: "C. SỰ KIỆN, VÉ VNPAY & LỊCH HỌP",
-    tieuDe: "Quản Lý Lịch Họp Đa Tầng Thông Minh & Phễu Chăm Sóc Hội Viên Mới (Onboarding)",
-    trănTrở: "Lịch họp thường xuyên bị trùng lặp giữa Ban Chấp Hành, Ban Điều Hành và 6 Ban chuyên môn; hội viên mới sau khi nộp đơn hay bị bỏ quên, không biết lộ trình hòa nhập.",
-    giaiPhapSale: "Lịch sinh hoạt số hóa đa tầng: Phân loại rành mạch lịch họp BCH, BĐH, Toàn thể CLB và Lịch họp từng Ban chuyên môn, tích hợp tự động nhắc lịch trước 24h qua Zalo và App. Đi kèm là 'Phễu Chăm Sóc Hội Viên Mới' gồm 3 bước tự động (Tiếp nhận -> Thẩm định & Tham gia đào tạo mở đầu -> Ra mắt tại kỳ họp gần nhất).",
-    giaTriVang: "Không bao giờ bỏ sót cuộc họp chiến lược nào; giúp hội viên mới cảm nhận được sự chu đáo, ấm áp và gắn kết ngay từ những ngày đầu gia nhập.",
+    tieuDe: "Quản Lý Lịch Họp Đa Tầng Thông Minh & Phễu Chăm Sóc Học viên Mới (Onboarding)",
+    trănTrở: "Lịch họp thường xuyên bị trùng lặp giữa Ban Chấp Hành, Ban Điều Hành và 6 Ban chuyên môn; Học viên mới sau khi nộp đơn hay bị bỏ quên, không biết lộ trình hòa nhập.",
+    giaiPhapSale: "Lịch sinh hoạt số hóa đa tầng: Phân loại rành mạch lịch họp BCH, BĐH, Toàn thể CLB và Lịch họp từng Ban chuyên môn, tích hợp tự động nhắc lịch trước 24h qua Zalo và App. Đi kèm là 'Phễu Chăm Sóc Học viên Mới' gồm 3 bước tự động (Tiếp nhận -> Thẩm định & Tham gia đào tạo mở đầu -> Ra mắt tại kỳ họp gần nhất).",
+    giaTriVang: "Không bao giờ bỏ sót cuộc họp chiến lược nào; giúp Học viên mới cảm nhận được sự chu đáo, ấm áp và gắn kết ngay từ những ngày đầu gia nhập.",
     domainTest: "https://crm.ceohn10.viconnect.vn/meetings (HTTP 200 - Phân tầng lịch họp & Phễu Onboarding)",
     status: "🟢 ĐÃ PASS (100%)",
     imgPath: "document/evidence_exact_15/req10_crm_lichhop_onboarding.png",
-    caption: "Hình 10: Quản lý lịch họp đa tầng và theo dõi phễu đào tạo hội viên mới https://crm.ceohn10.viconnect.vn/meetings.",
+    caption: "Hình 10: Quản lý lịch họp đa tầng và theo dõi phễu đào tạo Học viên mới https://crm.ceohn10.viconnect.vn/meetings.",
     isMobile: false
   },
   {
@@ -472,33 +472,33 @@ const ITEMS_DATA = [
     nhom: "D. CRM QUẢN TRỊ, BI & TÀI CHÍNH",
     tieuDe: "Chuẩn Hóa Hồ Sơ Doanh Nhân 360 & Tự Động Chúc Mừng Sinh Nhật Trưởng Ban",
     trănTrở: "Dữ liệu ngày sinh lưu sai định dạng dẫn đến việc gửi lời chúc mừng sinh nhật muộn hoặc nhầm ngày, gây mất thiện cảm và cảm giác thiếu chu đáo của tổ chức.",
-    giaiPhapSale: "Chuẩn hóa 100% dữ liệu ngày sinh theo định dạng DD/MM/YYYY trong Hồ sơ doanh nhân 360. Kích hoạt 'Trợ Lý Tri Ân Sinh Nhật Tự Động': Đúng 08:00 sáng ngày sinh nhật hội viên, hệ thống tự gửi thiệp chúc mừng mang thông điệp từ Chủ tịch CLB qua thông báo App, Zalo OA và hiển thị Banner chúc mừng trên toàn hệ thống.",
+    giaiPhapSale: "Chuẩn hóa 100% dữ liệu ngày sinh theo định dạng DD/MM/YYYY trong Hồ sơ doanh nhân 360. Kích hoạt 'Trợ Lý Tri Ân Sinh Nhật Tự Động': Đúng 08:00 sáng ngày sinh nhật Học viên, hệ thống tự gửi thiệp chúc mừng mang thông điệp từ Chủ tịch CLB qua thông báo App, Zalo OA và hiển thị Banner chúc mừng trên toàn hệ thống.",
     giaTriVang: "Chăm sóc tinh tế đến từng cá nhân doanh nhân; thắt chặt tình cảm gắn kết bền chặt như người một nhà; khẳng định sự quan tâm sâu sắc của Ban Lãnh đạo.",
     domainTest: "https://crm.ceohn10.viconnect.vn/members (Chuẩn hóa ngày sinh & Drawer 360 độ)",
     status: "🟢 ĐÃ PASS (100%)",
     imgPath: "document/evidence_exact_15/req11_crm_hoivien_sinhnhat.png",
-    caption: "Hình 11: Quản trị Hồ sơ hội viên 360 & Ngày sinh chuẩn hóa https://crm.ceohn10.viconnect.vn/members.",
+    caption: "Hình 11: Quản trị Hồ sơ Học viên 360 & Ngày sinh chuẩn hóa https://crm.ceohn10.viconnect.vn/members.",
     isMobile: false
   },
   {
     stt: "12",
     nhom: "D. CRM QUẢN TRỊ, BI & TÀI CHÍNH",
-    tieuDe: "Hệ Thống Báo Cáo BI: Radar Sức Khỏe Hội Viên & Cảnh Báo Hội Viên Trầm Lắng",
-    trănTrở: "Ban Điều Hành thường chỉ biết hội viên đã chán sinh hoạt khi họ từ chối đóng phí năm tiếp theo, lúc này thì đã quá muộn để cứu vãn sự gắn kết.",
-    giaiPhapSale: "Ứng dụng 'Radar Đo Lường Sức Khỏe Hội Viên' (Member Engagement BI) với biểu đồ Recharts trực quan 4 màu sắc: Đo lường tỷ lệ tham gia sinh hoạt, tần suất kết nối giao thương và tương tác. Hệ thống tự động bật Cờ Cảnh Báo Đỏ (Hội viên trầm lắng) đối với những doanh nhân vắng mặt 3 kỳ liên tiếp để Ban Thư ký chủ động thăm hỏi.",
-    giaTriVang: "Giữ vững tỷ lệ duy trì hội viên (Retention Rate) trên 95%; kịp thời lắng nghe tâm tư nguyện vọng của hội viên; bảo đảm câu lạc bộ luôn tràn đầy sinh khí.",
+    tieuDe: "Hệ Thống Báo Cáo BI: Radar Sức Khỏe Học viên & Cảnh Báo Học viên Trầm Lắng",
+    trănTrở: "Ban Điều Hành thường chỉ biết Học viên đã chán sinh hoạt khi họ từ chối đóng phí năm tiếp theo, lúc này thì đã quá muộn để cứu vãn sự gắn kết.",
+    giaiPhapSale: "Ứng dụng 'Radar Đo Lường Sức Khỏe Học viên' (Member Engagement BI) với biểu đồ Recharts trực quan 4 màu sắc: Đo lường tỷ lệ tham gia sinh hoạt, tần suất kết nối giao thương và tương tác. Hệ thống tự động bật Cờ Cảnh Báo Đỏ (Học viên trầm lắng) đối với những doanh nhân vắng mặt 3 kỳ liên tiếp để Ban Thư ký chủ động thăm hỏi.",
+    giaTriVang: "Giữ vững tỷ lệ duy trì Học viên (Retention Rate) trên 95%; kịp thời lắng nghe tâm tư nguyện vọng của Học viên; bảo đảm câu lạc bộ luôn tràn đầy sinh khí.",
     domainTest: "https://crm.ceohn10.viconnect.vn/analytics (HTTP 200 - Biểu đồ Recharts 4 màu thông minh)",
     status: "🟢 ĐÃ PASS (100%)",
     imgPath: "document/evidence_exact_15/req12_crm_suckhoe_hoivien.png",
-    caption: "Hình 12: Radar phân tích sức khỏe hội viên Recharts trên CRM https://crm.ceohn10.viconnect.vn/analytics.",
+    caption: "Hình 12: Radar phân tích sức khỏe Học viên Recharts trên CRM https://crm.ceohn10.viconnect.vn/analytics.",
     isMobile: false
   },
   {
     stt: "13",
     nhom: "D. CRM QUẢN TRỊ, BI & TÀI CHÍNH",
     tieuDe: "Quản Trị Hội Phí Thường Niên Tự Động: Tích Hợp VNPAY & Trợ Lý Nhắc Phí Văn Minh",
-    trănTrở: "Việc kế toán phải gọi điện giục từng hội viên đóng hội phí 10.000.000 VNĐ hàng năm là công việc vô cùng nhạy cảm, dễ gây sứt mẻ tình cảm và tốn nhiều thời gian.",
-    giaiPhapSale: "Giải pháp 'Quản Trị Hội Phí Tự Động Văn Minh': Mỗi hội viên có tài khoản hội phí minh bạch với mã hóa đơn rõ ràng. Tích hợp thanh toán trực tiếp qua Cổng thanh toán VNPAY Gateway chỉ với 1 thao tác quét mã hoặc thanh toán thẻ. Nút 'Gửi Nhắc Phí Tự Động' gửi thông báo trang nhã qua Zalo OA và App kèm liên kết VNPAY để hội viên bấm thanh toán ngay.",
+    trănTrở: "Việc kế toán phải gọi điện giục từng Học viên đóng hội phí 10.000.000 VNĐ hàng năm là công việc vô cùng nhạy cảm, dễ gây sứt mẻ tình cảm và tốn nhiều thời gian.",
+    giaiPhapSale: "Giải pháp 'Quản Trị Hội Phí Tự Động Văn Minh': Mỗi Học viên có tài khoản hội phí minh bạch với mã hóa đơn rõ ràng. Tích hợp thanh toán trực tiếp qua Cổng thanh toán VNPAY Gateway chỉ với 1 thao tác quét mã hoặc thanh toán thẻ. Nút 'Gửi Nhắc Phí Tự Động' gửi thông báo trang nhã qua Zalo OA và App kèm liên kết VNPAY để Học viên bấm thanh toán ngay.",
     giaTriVang: "Xóa bỏ hoàn toàn sự ngại ngùng khi nhắc phí; tăng tốc độ thu hồi hội phí lên 300%; kế toán nhàn tênh, minh bạch tài chính tuyệt đối từng đồng.",
     domainTest: "https://crm.ceohn10.viconnect.vn/fees (HTTP 200 - Quản lý hội phí, nút Nhắc phí & Xuất Excel)",
     status: "🟢 ĐÃ PASS (100%)",
@@ -512,7 +512,7 @@ const ITEMS_DATA = [
     tieuDe: "Trung Tâm Điều Hành Tài Chính & Chỉ Số Kỳ Họp (Xuất Báo Cáo A4 & Excel)",
     trănTrở: "Trước mỗi phiên họp Ban Chấp Hành, thủ quỹ và kế toán phải mất nhiều ngày để làm slide, tổng hợp hóa đơn thu chi thủ công, rất dễ nhầm lẫn số liệu.",
     giaiPhapSale: "Xây dựng 'Trung Tâm Điều Hành Tài Chính Tức Thời': Theo dõi chi tiết Quỹ Hội, Quỹ Phát Triển, các khoản thu sự kiện và chi phí theo Tháng, Quý, Năm với biểu đồ trực quan. Hỗ trợ in ấn Biên bản tài chính định dạng chuẩn khổ A4 chỉ với 1 cú click và xuất file Excel chi tiết có đầy đủ chữ ký 3 bên phục vụ Ban Kiểm Tra.",
-    giaTriVang: "Ban Lãnh đạo nắm rõ thực trạng tài chính mọi lúc mọi nơi; minh bạch tuyệt đối trước toàn thể hội viên; giảm 95% áp lực làm báo cáo cho bộ phận tài vụ.",
+    giaTriVang: "Ban Lãnh đạo nắm rõ thực trạng tài chính mọi lúc mọi nơi; minh bạch tuyệt đối trước toàn thể Học viên; giảm 95% áp lực làm báo cáo cho bộ phận tài vụ.",
     domainTest: "https://crm.ceohn10.viconnect.vn/finance-report (HTTP 200 - In ấn A4 & Xuất Excel kiểm toán)",
     status: "🟢 ĐÃ PASS (100%)",
     imgPath: "document/evidence_exact_15/req14_crm_baocao_taichinh.png",
@@ -523,7 +523,7 @@ const ITEMS_DATA = [
     stt: "15",
     nhom: "E. HỒ SƠ DOANH NHÂN 360",
     tieuDe: "Trang Cá Nhân Doanh Nhân 360: Hồ Sơ Năng Lực, Lịch Sử Sự Kiện & Giao Thương",
-    trănTrở: "Trang cá nhân trước đây quá đơn điệu, không thể hiện được uy tín, tầm vóc doanh nghiệp và những đóng góp của hội viên trong suốt quá trình tham gia CLB.",
+    trănTrở: "Trang cá nhân trước đây quá đơn điệu, không thể hiện được uy tín, tầm vóc doanh nghiệp và những đóng góp của Học viên trong suốt quá trình tham gia CLB.",
     giaiPhapSale: "Nâng cấp thành 'Profile Doanh Nhân Thượng Lưu 360 Độ' tích hợp 3 khối dữ liệu giá trị: (1) Hồ Sơ Năng Lực Doanh Nghiệp (sản phẩm cốt lõi, lĩnh vực, Khiên bảo mật); (2) Lịch Sử Sự Kiện Đã Tham Dự (lưu vết tất cả hội nghị, caravan kèm huy hiệu điểm danh); (3) Hành Trình Giao Thương B2B (thống kê cơ hội đã trao và cuộc gặp 1-on-1 thành công).",
     giaTriVang: "Là tấm 'Danh Thiếp Số Đẳng Cấp' giúp doanh nhân tự tin quảng bá thương hiệu cá nhân và doanh nghiệp; khẳng định niềm tự hào là một mảnh ghép của cộng đồng CEO HN10.",
     domainTest: "https://ceohn10.viconnect.vn/association/profile (HTTP 200 - Đồng bộ 3 khối dữ liệu 360)",
@@ -687,7 +687,7 @@ function buildSection1ExecutiveSummary() {
   const elements = [
     createHeading("I. THÔNG ĐIỆP ĐIỀU HÀNH & TỔNG QUAN TIẾN ĐỘ NGHIỆM THU", 1),
     createParagraph(
-      "Kính gửi: **Ban Lãnh Đạo, Ban Thư Ký & Toàn Thể Hội Viên CLB Doanh Nhân CEO HN10 (HanoiBA)**,\n\n" +
+      "Kính gửi: **Ban Lãnh Đạo, Ban Thư Ký & Toàn Thể Học viên CLB Doanh Nhân CEO HN10 (HanoiBA)**,\n\n" +
       "Hệ sinh thái công nghệ **CEO HN10** do Viconnect nghiên cứu và phát triển được xây dựng trên triết lý: **'Nâng Tầm Đẳng Cấp Lãnh Đạo - Kích Hoạt Dòng Tiền Giao Thương B2B - Tự Động Hóa Quản Trị Tổ Chức'**. " +
       "Đáp ứng toàn diện các ý kiến đóng góp quý báu từ cuộc họp rà soát của CLB, đội ngũ chuyên gia và kỹ sư Viconnect đã hoàn tất nâng cấp trên môi trường kiểm thử trực tiếp (Live Test Domain) với kết quả vượt trội:",
       { spaceBefore: 80, spaceAfter: 120 }
@@ -874,8 +874,8 @@ function buildSection3ActionPlan() {
       "LỘ TRÌNH KÍCH HOẠT CHÍNH THỨC (GO-LIVE)",
       [
         "**Bước 1 - Kích Hoạt Cổng VNPAY Live (Trong 24h):** Ban Thư ký cung cấp thông tin tài khoản Merchant VNPAY của CLB để Viconnect cấu hình chuyển từ Sandbox sang Production, sẵn sàng thu hội phí và vé sự kiện tự động.",
-        "**Bước 2 - Kết Nối Zalo OA Doanh Nghiệp:** Ban Điều Hành cấp quyền kỹ thuật Zalo OA để kích hoạt luồng tin nhắn ZNS xác nhận vé và nhắc hội phí tự động vào Zalo cá nhân hội viên.",
-        "**Bước 3 - Đào Tạo Chuyển Giao & Hướng Dẫn Vận Hành:** Viconnect tổ chức buổi chuyển giao trực tiếp cho Ban Thư ký, Ban Truyền thông và Ban Tài chính; cung cấp đầy đủ bộ cẩm nang sử dụng cho toàn thể hội viên."
+        "**Bước 2 - Kết Nối Zalo OA Doanh Nghiệp:** Ban Điều Hành cấp quyền kỹ thuật Zalo OA để kích hoạt luồng tin nhắn ZNS xác nhận vé và nhắc hội phí tự động vào Zalo cá nhân Học viên.",
+        "**Bước 3 - Đào Tạo Chuyển Giao & Hướng Dẫn Vận Hành:** Viconnect tổ chức buổi chuyển giao trực tiếp cho Ban Thư ký, Ban Truyền thông và Ban Tài chính; cung cấp đầy đủ bộ cẩm nang sử dụng cho toàn thể Học viên."
       ],
       'blue'
     ),

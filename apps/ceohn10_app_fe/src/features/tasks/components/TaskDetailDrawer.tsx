@@ -122,7 +122,7 @@ export function TaskDetailDrawer({
   if (!open || !task) return null;
 
   // Current User Identification
-  const currentUserName = user?.name || user?.user_metadata?.full_name || user?.username || 'Hội viên';
+  const currentUserName = user?.name || user?.user_metadata?.full_name || user?.username || 'Học viên';
   const currentUserId = user?.id || '';
   const currentUserEmail = user?.email || '';
 
@@ -401,7 +401,7 @@ export function TaskDetailDrawer({
     <div className="fixed inset-0 z-50 flex justify-end bg-slate-950/60 backdrop-blur-xs transition-opacity">
       <div className="fixed inset-0" onClick={onClose} aria-hidden="true" />
       <div className="relative z-10 flex h-full w-full max-w-xl flex-col bg-white shadow-2xl dark:bg-slate-900 border-l border-slate-200 dark:border-slate-800 animate-in slide-in-from-right duration-300">
-        
+
         {/* Hidden File Input for Deliverables & Attachments */}
         <input
           type="file"
@@ -505,38 +505,34 @@ export function TaskDetailDrawer({
           {/* Stepper lifecycle */}
           <div className="grid grid-cols-4 gap-1 text-center text-[10px]">
             <div
-              className={`p-1.5 rounded-lg font-semibold border ${
-                task.status === 'TODO'
+              className={`p-1.5 rounded-lg font-semibold border ${task.status === 'TODO'
                   ? 'bg-blue-100 border-blue-300 text-[#003B95] dark:bg-blue-950 dark:border-blue-800 dark:text-blue-300'
                   : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-500'
-              }`}
+                }`}
             >
               1. Giao việc
             </div>
             <div
-              className={`p-1.5 rounded-lg font-semibold border ${
-                task.status === 'IN_PROGRESS'
+              className={`p-1.5 rounded-lg font-semibold border ${task.status === 'IN_PROGRESS'
                   ? 'bg-indigo-100 border-indigo-300 text-indigo-700 dark:bg-indigo-950 dark:border-indigo-800 dark:text-indigo-300'
                   : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-500'
-              }`}
+                }`}
             >
               2. Đang làm
             </div>
             <div
-              className={`p-1.5 rounded-lg font-semibold border ${
-                task.status === 'REVIEW'
+              className={`p-1.5 rounded-lg font-semibold border ${task.status === 'REVIEW'
                   ? 'bg-amber-100 border-amber-300 text-amber-800 dark:bg-amber-950 dark:border-amber-800 dark:text-amber-300'
                   : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-500'
-              }`}
+                }`}
             >
               3. Nghiệm thu
             </div>
             <div
-              className={`p-1.5 rounded-lg font-semibold border ${
-                task.status === 'DONE'
+              className={`p-1.5 rounded-lg font-semibold border ${task.status === 'DONE'
                   ? 'bg-emerald-100 border-emerald-300 text-emerald-800 dark:bg-emerald-950 dark:border-emerald-800 dark:text-emerald-300'
                   : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-500'
-              }`}
+                }`}
             >
               4. Hoàn thành
             </div>
@@ -718,11 +714,10 @@ export function TaskDetailDrawer({
                     key={stKey}
                     type="button"
                     onClick={() => onStatusChange(task.id, stKey as TaskStatus)}
-                    className={`text-[11px] font-semibold px-2 py-0.5 rounded-lg border transition-all ${
-                      active
+                    className={`text-[11px] font-semibold px-2 py-0.5 rounded-lg border transition-all ${active
                         ? `${cfg.bg} ${cfg.text} ${cfg.border} ring-1 ring-offset-1 ring-[#003B95]/30 font-bold shadow-2xs`
                         : 'border-slate-200 text-slate-600 dark:border-slate-800 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'
-                    }`}
+                      }`}
                   >
                     {cfg.label}
                   </button>
@@ -737,22 +732,20 @@ export function TaskDetailDrawer({
           <button
             type="button"
             onClick={() => setActiveTab('details')}
-            className={`py-3 px-3 text-xs font-bold border-b-2 transition-colors ${
-              activeTab === 'details'
+            className={`py-3 px-3 text-xs font-bold border-b-2 transition-colors ${activeTab === 'details'
                 ? 'border-[#003B95] text-[#003B95] dark:border-blue-400 dark:text-blue-400'
                 : 'border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400'
-            }`}
+              }`}
           >
             Chi tiết nhiệm vụ
           </button>
           <button
             type="button"
             onClick={() => setActiveTab('attachments')}
-            className={`py-3 px-3 text-xs font-bold border-b-2 transition-colors flex items-center gap-1.5 ${
-              activeTab === 'attachments'
+            className={`py-3 px-3 text-xs font-bold border-b-2 transition-colors flex items-center gap-1.5 ${activeTab === 'attachments'
                 ? 'border-[#003B95] text-[#003B95] dark:border-blue-400 dark:text-blue-400'
                 : 'border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400'
-            }`}
+              }`}
           >
             <Paperclip className="w-3.5 h-3.5" />
             Tài liệu &amp; Nộp file ({task.attachments?.length || 0})
@@ -760,11 +753,10 @@ export function TaskDetailDrawer({
           <button
             type="button"
             onClick={() => setActiveTab('comments')}
-            className={`py-3 px-3 text-xs font-bold border-b-2 transition-colors flex items-center gap-1.5 ${
-              activeTab === 'comments'
+            className={`py-3 px-3 text-xs font-bold border-b-2 transition-colors flex items-center gap-1.5 ${activeTab === 'comments'
                 ? 'border-[#003B95] text-[#003B95] dark:border-blue-400 dark:text-blue-400'
                 : 'border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400'
-            }`}
+              }`}
           >
             <MessageSquare className="w-3.5 h-3.5" />
             Thảo luận ({task.comments?.length || 0})
@@ -772,11 +764,10 @@ export function TaskDetailDrawer({
           <button
             type="button"
             onClick={() => setActiveTab('history')}
-            className={`py-3 px-3 text-xs font-bold border-b-2 transition-colors flex items-center gap-1.5 ${
-              activeTab === 'history'
+            className={`py-3 px-3 text-xs font-bold border-b-2 transition-colors flex items-center gap-1.5 ${activeTab === 'history'
                 ? 'border-[#003B95] text-[#003B95] dark:border-blue-400 dark:text-blue-400'
                 : 'border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400'
-            }`}
+              }`}
           >
             <History className="w-3.5 h-3.5" />
             Lịch sử thao tác
@@ -825,11 +816,10 @@ export function TaskDetailDrawer({
                         key={val}
                         type="button"
                         onClick={() => onProgressChange(task.id, val)}
-                        className={`px-2.5 py-1 rounded-lg text-xs font-bold transition cursor-pointer ${
-                          task.progress === val
+                        className={`px-2.5 py-1 rounded-lg text-xs font-bold transition cursor-pointer ${task.progress === val
                             ? 'bg-[#003B95] text-white shadow-xs'
                             : 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100'
-                        }`}
+                          }`}
                       >
                         {val}%
                       </button>
@@ -1068,20 +1058,17 @@ export function TaskDetailDrawer({
                             onToggleSubtask(task.id, sub.id);
                           }
                         }}
-                        className={`flex items-center gap-3 p-3 rounded-xl border transition-all ${
-                          canExecute || canSupervise ? 'cursor-pointer hover:border-[#003B95]' : 'cursor-default'
-                        } ${
-                          sub.completed
+                        className={`flex items-center gap-3 p-3 rounded-xl border transition-all ${canExecute || canSupervise ? 'cursor-pointer hover:border-[#003B95]' : 'cursor-default'
+                          } ${sub.completed
                             ? 'bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-800 text-slate-400 line-through'
                             : 'bg-white dark:bg-slate-800 border-slate-200/80 dark:border-slate-700 text-slate-800 dark:text-slate-200'
-                        }`}
+                          }`}
                       >
                         <div
-                          className={`w-4 h-4 rounded flex items-center justify-center border transition-colors ${
-                            sub.completed
+                          className={`w-4 h-4 rounded flex items-center justify-center border transition-colors ${sub.completed
                               ? 'bg-[#003B95] border-[#003B95] text-white'
                               : 'border-slate-300 dark:border-slate-600'
-                          }`}
+                            }`}
                         >
                           {sub.completed && <Check className="w-3 h-3 stroke-[3]" />}
                         </div>
@@ -1147,22 +1134,20 @@ export function TaskDetailDrawer({
                     return (
                       <div
                         key={att.id || idx}
-                        className={`p-3.5 rounded-2xl border transition-all flex items-center justify-between gap-3 ${
-                          isDeliverable
+                        className={`p-3.5 rounded-2xl border transition-all flex items-center justify-between gap-3 ${isDeliverable
                             ? 'bg-emerald-50/40 dark:bg-emerald-950/20 border-emerald-200/80 dark:border-emerald-800/60'
                             : 'bg-white dark:bg-slate-800 border-slate-200/80 dark:border-slate-700'
-                        }`}
+                          }`}
                       >
                         <div className="flex items-center gap-3 min-w-0">
                           {/* File Icon */}
                           <div
-                            className={`p-2.5 rounded-xl shrink-0 ${
-                              isXls
+                            className={`p-2.5 rounded-xl shrink-0 ${isXls
                                 ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/60 dark:text-emerald-300'
                                 : att.name.endsWith('.pdf')
-                                ? 'bg-rose-100 text-rose-700 dark:bg-rose-900/60 dark:text-rose-300'
-                                : 'bg-blue-100 text-blue-700 dark:bg-blue-900/60 dark:text-blue-300'
-                            }`}
+                                  ? 'bg-rose-100 text-rose-700 dark:bg-rose-900/60 dark:text-rose-300'
+                                  : 'bg-blue-100 text-blue-700 dark:bg-blue-900/60 dark:text-blue-300'
+                              }`}
                           >
                             {isXls ? (
                               <FileSpreadsheet className="w-5 h-5" />
@@ -1180,11 +1165,10 @@ export function TaskDetailDrawer({
                                 {att.name}
                               </span>
                               <span
-                                className={`text-[10px] font-bold px-2 py-0.5 rounded-md ${
-                                  isDeliverable
+                                className={`text-[10px] font-bold px-2 py-0.5 rounded-md ${isDeliverable
                                     ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/60 dark:text-emerald-300'
                                     : 'bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300'
-                                }`}
+                                  }`}
                               >
                                 {isDeliverable ? 'File nghiệm thu' : 'Tài liệu giao việc'}
                               </span>
@@ -1513,11 +1497,10 @@ export function TaskDetailDrawer({
                         key={opt.key}
                         type="button"
                         onClick={() => setEvalAssessment(opt.key as any)}
-                        className={`p-2 rounded-xl text-xs font-bold border transition text-center cursor-pointer ${
-                          evalAssessment === opt.key
+                        className={`p-2 rounded-xl text-xs font-bold border transition text-center cursor-pointer ${evalAssessment === opt.key
                             ? `${opt.color} ring-2 ring-purple-600`
                             : 'border-slate-200 text-slate-600 hover:bg-slate-50'
-                        }`}
+                          }`}
                       >
                         {opt.label}
                       </button>
@@ -1539,9 +1522,8 @@ export function TaskDetailDrawer({
                         className="p-1 text-amber-400 hover:scale-115 transition cursor-pointer"
                       >
                         <Star
-                          className={`w-6 h-6 ${
-                            star <= evalRating ? 'fill-amber-400 text-amber-400' : 'text-slate-300 dark:text-slate-600'
-                          }`}
+                          className={`w-6 h-6 ${star <= evalRating ? 'fill-amber-400 text-amber-400' : 'text-slate-300 dark:text-slate-600'
+                            }`}
                         />
                       </button>
                     ))}
@@ -1618,9 +1600,8 @@ export function TaskDetailDrawer({
                         className="p-1 text-amber-400 hover:scale-115 transition cursor-pointer"
                       >
                         <Star
-                          className={`w-6 h-6 ${
-                            star <= approveRating ? 'fill-amber-400 text-amber-400' : 'text-slate-300 dark:text-slate-600'
-                          }`}
+                          className={`w-6 h-6 ${star <= approveRating ? 'fill-amber-400 text-amber-400' : 'text-slate-300 dark:text-slate-600'
+                            }`}
                         />
                       </button>
                     ))}

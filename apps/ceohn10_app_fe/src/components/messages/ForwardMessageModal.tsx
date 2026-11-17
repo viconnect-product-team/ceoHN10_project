@@ -70,7 +70,7 @@ export function ForwardMessageModal({
           <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
           <input
             type="text"
-            placeholder="Tìm hội viên để chuyển tiếp..."
+            placeholder="Tìm Học viên để chuyển tiếp..."
             value={q}
             onChange={(e) => setQ(e.target.value)}
             className="w-full rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-900/80 py-2 pl-9 pr-3 text-xs text-slate-900 dark:text-white placeholder:text-slate-400 outline-none focus:border-[#0084FF]"
@@ -81,7 +81,7 @@ export function ForwardMessageModal({
         <div className="flex-1 overflow-y-auto space-y-1.5 pr-1 min-h-[220px]">
           {filtered.length === 0 ? (
             <p className="text-center py-8 text-xs text-slate-400">
-              Không tìm thấy hội viên phù hợp
+              Không tìm thấy Học viên phù hợp
             </p>
           ) : (
             filtered.map((m) => {

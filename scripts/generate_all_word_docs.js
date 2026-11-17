@@ -211,7 +211,7 @@ function getEndpointFeatureName(api) {
   if (p.includes('/events/checkin/qr') || h.includes('qr')) return 'Tạo & Cấp mã QR Check-in điểm danh sự kiện';
   if (p.includes('/events/checkin/scan') || h.includes('scan')) return 'Quét mã QR điểm danh tự động tại cổng chào';
   if (p.includes('/checkin/state') || h.includes('state')) return 'Truy vấn trạng thái phiên điểm danh sự kiện';
-  if (p.includes('/events') && p.includes('/attendees')) return 'Xem danh sách hội viên đăng ký tham gia sự kiện';
+  if (p.includes('/events') && p.includes('/attendees')) return 'Xem danh sách Học viên đăng ký tham gia sự kiện';
   if (p.includes('/events') && p.includes('/register')) return 'Đăng ký tham dự sự kiện (Đại biểu / Khách mời)';
   if (p.includes('/events') && p.includes('/cancel')) return 'Hủy đăng ký tham dự sự kiện';
   if (p.includes('/events') && p.includes('/materials')) return 'Tải tài liệu slide diễn giả mở khóa sau sự kiện';
@@ -226,7 +226,7 @@ function getEndpointFeatureName(api) {
   // Documents
   if (p.includes('/documents') && p.includes('/download')) return 'Tải file tài liệu mật đã mã hóa (PDF / DOCX)';
   if (p.includes('/documents') && p.includes('/preview')) return 'Xem trước nội dung tài liệu trực tuyến (In-app Viewer)';
-  if (p.includes('/documents') && p.includes('/permissions')) return 'Phân quyền truy cập tài liệu theo cấp hội viên';
+  if (p.includes('/documents') && p.includes('/permissions')) return 'Phân quyền truy cập tài liệu theo cấp Học viên';
   if (p === '/documents' && m === 'GET') return 'Xem danh mục tài liệu, nghị quyết, quy chế CLB';
   if (p.startsWith('/documents/') && m === 'GET') return 'Xem chi tiết tài liệu & thông tin phiên bản (Metadata)';
   if (p === '/documents' && m === 'POST') return 'Tải lên tài liệu mới (Ban Thư Ký CLB)';
@@ -253,18 +253,18 @@ function getEndpointFeatureName(api) {
   if (p.startsWith('/meetings/') && m === 'DELETE') return 'Hủy phiên họp Ban Chấp Hành';
 
   // Members
-  if (p.includes('/members') && (p.includes('/dues/generate-qr') || p.includes('/vietqr'))) return 'Tạo mã VietQR động ĐÓNG HỘI PHÍ hội viên tự động';
+  if (p.includes('/members') && (p.includes('/dues/generate-qr') || p.includes('/vietqr'))) return 'Tạo mã VietQR động ĐÓNG HỘI PHÍ Học viên tự động';
   if (p.includes('/members') && p.includes('/dues/webhook')) return 'Webhook ngân hàng tự động gạch nợ hội phí sau 3 giây';
   if (p.includes('/members') && p.includes('/dues')) return 'Tra cứu lịch sử đóng hội phí & biên lai điện tử VAT';
-  if (p.includes('/members') && p.includes('/card')) return 'Lấy thông tin Thẻ hội viên điện tử & mã định danh CRM';
-  if (p.includes('/members') && p.includes('/status')) return 'Phê duyệt kết nạp & cấp quyền Hội viên chính thức';
+  if (p.includes('/members') && p.includes('/card')) return 'Lấy thông tin Thẻ Học viên điện tử & mã định danh CRM';
+  if (p.includes('/members') && p.includes('/status')) return 'Phê duyệt kết nạp & cấp quyền Học viên chính thức';
   if (p.includes('/members') && p.includes('/verify')) return 'Xác minh hồ sơ pháp lý & năng lực doanh nghiệp';
-  if (p.includes('/members') && p.includes('/export')) return 'Xuất danh bạ hội viên định dạng Excel / vCard';
-  if (p === '/members' && m === 'GET') return 'Tra cứu Danh bạ Hội viên (Bộ lọc ngành nghề, tỉnh thành)';
+  if (p.includes('/members') && p.includes('/export')) return 'Xuất danh bạ Học viên định dạng Excel / vCard';
+  if (p === '/members' && m === 'GET') return 'Tra cứu Danh bạ Học viên (Bộ lọc ngành nghề, tỉnh thành)';
   if (p.startsWith('/members/') && m === 'GET') return 'Xem chi tiết hồ sơ Doanh nhân & Năng lực doanh nghiệp';
-  if (p === '/members' && m === 'POST') return 'Đăng ký gia nhập Hội viên CEO HN10 mới';
+  if (p === '/members' && m === 'POST') return 'Đăng ký gia nhập Học viên CEO HN10 mới';
   if (p.startsWith('/members/') && (m === 'PATCH' || m === 'PUT')) return 'Cập nhật hồ sơ doanh nhân & thông tin liên hệ';
-  if (p.startsWith('/members/') && m === 'DELETE') return 'Xóa / Đình chỉ quyền hội viên';
+  if (p.startsWith('/members/') && m === 'DELETE') return 'Xóa / Đình chỉ quyền Học viên';
 
   // DM / Messages
   if (p.includes('/dm/conversations') && p.includes('/messages') && m === 'GET') return 'Xem chi tiết lịch sử tin nhắn trong cuộc trò chuyện';
@@ -273,7 +273,7 @@ function getEndpointFeatureName(api) {
   if (p.includes('/dm/messages') && m === 'DELETE') return 'Thu hồi tin nhắn tức thời trên cả 2 phía';
   if (p.includes('/dm/messages') && m === 'POST') return 'Gửi tin nhắn mới (kèm trích dẫn Reply / Đính kèm file)';
   if (p.includes('/dm/conversations') && p.includes('/seen')) return 'Đánh dấu Đã xem (Hiển thị avatar ngoài border tin nhắn)';
-  if (p.includes('/dm/forward')) return 'Chuyển tiếp tin nhắn sang hội viên / đối tác khác';
+  if (p.includes('/dm/forward')) return 'Chuyển tiếp tin nhắn sang Học viên / đối tác khác';
   if (p.includes('/dm/unread-count')) return 'Đếm số lượng tin nhắn chưa đọc cho bộ lọc chip';
   if (p.includes('/dm/conversations') && m === 'GET') return 'Danh sách hội thoại (Hộp thư chính, Tin nhắn chờ, Hệ thống)';
   if (p.includes('/dm/conversations') && m === 'DELETE') return 'Xóa cuộc trò chuyện khỏi danh sách';
@@ -284,7 +284,7 @@ function getEndpointFeatureName(api) {
   if (p.includes('/network/requests') && m === 'POST') return 'Gửi yêu cầu kết nối giao thương (Connect Request)';
   if (p.includes('/network/connections') && m === 'PATCH') return 'Chấp nhận lời mời kết nối (Accept Connection)';
   if (p.includes('/network/connections') && m === 'DELETE') return 'Hủy kết nối hoặc Từ chối yêu cầu kết nối';
-  if (p.includes('/network/connections') && m === 'GET') return 'Xem danh sách đối tác / hội viên đã kết nối chính thức';
+  if (p.includes('/network/connections') && m === 'GET') return 'Xem danh sách đối tác / Học viên đã kết nối chính thức';
   if (p.includes('/network/suggestions')) return 'Gợi ý kết nối doanh nghiệp cùng ngành nghề / địa bàn';
   if (p.includes('/network/status')) return 'Kiểm tra trạng thái quan hệ kết nối giữa 2 người dùng';
   if (p.includes('/network/block')) return 'Chặn liên hệ / Bỏ chặn người dùng';
@@ -363,9 +363,9 @@ function getEndpointFeatureName(api) {
   if (p.includes('/sponsors')) return 'Quản trị banner và logo hiển thị của nhà tài trợ';
 
   // Reviews
-  if (p.includes('/reviews') && m === 'GET') return 'Xem danh sách đánh giá & phản hồi của hội viên';
+  if (p.includes('/reviews') && m === 'GET') return 'Xem danh sách đánh giá & phản hồi của Học viên';
   if (p.includes('/reviews') && m === 'POST') return 'Gửi đánh giá dịch vụ, chất lượng hội thảo & ý kiến đóng góp';
-  if (p.includes('/reviews')) return 'Báo cáo chỉ số hài lòng hội viên (NPS)';
+  if (p.includes('/reviews')) return 'Báo cáo chỉ số hài lòng Học viên (NPS)';
 
   // AI Assistant
   if (p.includes('/ai/chat')) return 'Trợ lý AI hỗ trợ tư vấn & tìm kiếm đối tác giao thương';
@@ -432,7 +432,7 @@ function buildHDSDHiepHoiDoc() {
       spacing: { before: 0, after: 300 },
       children: [
         new TextRun({
-          text: 'Ứng dụng Di động Dành cho Ban Chấp Hành & Hội Viên Doanh Nhân (v2.5.0 Production)',
+          text: 'Ứng dụng Di động Dành cho Ban Chấp Hành & Học viên Doanh Nhân (v2.5.0 Production)',
           font: FONT_FAMILY,
           size: 22,
           italics: true,
@@ -443,15 +443,15 @@ function buildHDSDHiepHoiDoc() {
 
     createCallout(
       'QUY CHUẨN TÀI LIỆU HƯỚNG DẪN ĐIỆN TỬ VÀ VẬN HÀNH ĐỘC LẬP',
-      'Tài liệu này chuẩn hóa toàn bộ 14 chuyên đề chức năng thực chiến của Ứng dụng Hiệp hội Doanh nghiệp CEO HN10. Mọi dữ liệu hội viên, thẻ số NFC, tin nhắn P2P, cơ hội giao thương B2B, thanh toán VietQR và tài liệu bảo mật đều được số hóa thời gian thực và vận hành độc lập theo Hướng 2 (Monorepo tách biệt FE/BE, sẵn sàng xuất bản lên Apple App Store và Google Play Store).',
+      'Tài liệu này chuẩn hóa toàn bộ 14 chuyên đề chức năng thực chiến của Ứng dụng Hiệp hội Doanh nghiệp CEO HN10. Mọi dữ liệu Học viên, thẻ số NFC, tin nhắn P2P, cơ hội giao thương B2B, thanh toán VietQR và tài liệu bảo mật đều được số hóa thời gian thực và vận hành độc lập theo Hướng 2 (Monorepo tách biệt FE/BE, sẵn sàng xuất bản lên Apple App Store và Google Play Store).',
       'info'
     ),
 
-    createHeading1('CHUYÊN ĐỀ 1: ĐĂNG NHẬP & KÍCH HOẠT QUYỀN LỢI THẺ HỘI VIÊN SỐ'),
+    createHeading1('CHUYÊN ĐỀ 1: ĐĂNG NHẬP & KÍCH HOẠT QUYỀN LỢI THẺ Học viên SỐ'),
     createPara('• Bước 1 (Truy cập): Mở trình duyệt trên điện thoại hoặc máy tính, truy cập đường dẫn /association/login.'),
-    createPara('• Bước 2 (Nhập định danh): Nhập Số điện thoại hoặc Mã hội viên (VD: 098.333.1983 hoặc HN10-007) đã được Ban Thư Ký CLB phê duyệt.'),
+    createPara('• Bước 2 (Nhập định danh): Nhập Số điện thoại hoặc Mã Học viên (VD: 098.333.1983 hoặc HN10-007) đã được Ban Thư Ký CLB phê duyệt.'),
     createPara('• Bước 3 (Xác thực OTP): Nhập mật khẩu cá nhân hoặc chọn "Quên mật khẩu" để nhận mã OTP SMS xác thực tức thời.'),
-    createPara('• Bước 4 (Kích hoạt Thẻ số): Hệ thống liên kết dữ liệu CRM, cấp huy hiệu Hội viên chính thức và mã QR định danh cá nhân.'),
+    createPara('• Bước 4 (Kích hoạt Thẻ số): Hệ thống liên kết dữ liệu CRM, cấp huy hiệu Học viên chính thức và mã QR định danh cá nhân.'),
     createPara('• Bước 5 (Cài đặt PWA lên Màn hình chính): Tại trang cá nhân, bấm "Cài đặt ứng dụng". Trên iPhone chọn Chia sẻ > "Thêm vào MH chính". Trên Android chọn menu 3 chấm > "Cài đặt ứng dụng" để sử dụng mượt mà như app native.'),
 
     createHeading1('CHUYÊN ĐỀ 2: ĐIỀU HƯỚNG THAO TÁC 1 TAY DYNAMIC & CHẾ ĐỘ REACHABILITY'),
@@ -461,29 +461,29 @@ function buildHDSDHiepHoiDoc() {
     createPara('• Vuốt chuyển Tab ngang linh hoạt: Vuốt ngang màn hình sang trái hoặc phải để chuyển đổi tức thì giữa các phân hệ: Bảng tin ↔ Sự kiện ↔ Thẻ 83 ↔ Tin nhắn ↔ Trang cá nhân kèm hiệu ứng chỉ báo cử chỉ co giãn động.'),
     createPara('• Phản hồi xúc giác Haptic: Tích hợp rung phản hồi êm ái khi hoàn tất thao tác, hỗ trợ thao tác tự tin không cần nhìn.'),
 
-    createHeading1('CHUYÊN ĐỀ 3: DANH THIẾP ĐIỆN TỬ, THẺ HỘI VIÊN BĐH & CÔNG NGHỆ CHẠM THẺ NFC'),
-    createPara('• Thẻ Hội Viên Ban Điều Hành & QR Trực Diện: Thẻ hội viên số thiết kế ánh kim phản chiếu sang trọng. Khung thông tin cá nhân (Executive Profile) được đặt ngay bên dưới thẻ hội viên, tích hợp trực tiếp mã QR ngay trên ảnh bìa giúp đối tác quét tức thì mà không cần bấm thêm nút.'),
+    createHeading1('CHUYÊN ĐỀ 3: DANH THIẾP ĐIỆN TỬ, THẺ Học viên BĐH & CÔNG NGHỆ CHẠM THẺ NFC'),
+    createPara('• Thẻ Học viên Ban Điều Hành & QR Trực Diện: Thẻ Học viên số thiết kế ánh kim phản chiếu sang trọng. Khung thông tin cá nhân (Executive Profile) được đặt ngay bên dưới thẻ Học viên, tích hợp trực tiếp mã QR ngay trên ảnh bìa giúp đối tác quét tức thì mà không cần bấm thêm nút.'),
     createPara('• Mạng Xã Hội & Ví Điện Tử 1-Chạm: Tích hợp đầy đủ các liên kết mạng xã hội chính thức (Facebook cá nhân/Fanpage, Zalo OA, LinkedIn, Website doanh nghiệp) và nút lưu thẻ vào Apple Wallet / Google Wallet tiện lợi.'),
     createPara('• Danh Thiếp Số Công Khai (/card/$code): Tinh chỉnh nhận diện thương hiệu "CLB DOANH NHÂN CEO HN10", định dạng ngày tháng chuẩn Việt Nam (DD/MM/YYYY), tự động làm sạch các chuỗi thử nghiệm và chuyển đổi mã ngành kỹ thuật thành tên ngành kinh tế tường minh (Công nghệ thông tin, Bất động sản...). Có nút "Quay về Hiệp hội" tiện lợi.'),
-    createPara('• Thao tác chạm thẻ NFC: Mỗi hội viên được cấp 01 Thẻ thông minh kim loại NFC. Chạm mặt lưng thẻ vào đầu iPhone hoặc lưng Android để mở hồ sơ số tức thì mà không cần cài app.'),
+    createPara('• Thao tác chạm thẻ NFC: Mỗi Học viên được cấp 01 Thẻ thông minh kim loại NFC. Chạm mặt lưng thẻ vào đầu iPhone hoặc lưng Android để mở hồ sơ số tức thì mà không cần cài app.'),
     createPara('• Lưu danh bạ chuẩn vCard 3.0: Đối tác bấm "Lưu danh bạ", toàn bộ Họ tên, Chức vụ, Công ty, Hotline, Email, Website và Mạng xã hội được lưu vào danh bạ máy trong 1 giây.'),
 
     createHeading1('CHUYÊN ĐỀ 4: HỆ THỐNG TIN NHẮN CHUẨN MESSENGER VIP & TAB "CHƯA ĐỌC" TỐI ƯU'),
     createPara('• Danh mục Tin nhắn Tinh gọn & Khoa học:'),
     createPara('   1. Tất cả: Toàn bộ các cuộc trò chuyện đang hoạt động hai chiều hoặc thông báo hệ thống.'),
     createPara('   2. Chưa đọc: Đặt ngay vị trí thứ 2 cạnh tab "Tất cả" với huy hiệu đỏ đếm số lượng tin nhắn mới chưa xem.'),
-    createPara('   3. Bạn bè: Lọc danh sách riêng các hội viên đã kết nối chính thức.'),
+    createPara('   3. Bạn bè: Lọc danh sách riêng các Học viên đã kết nối chính thức.'),
     createPara('   4. Hệ thống: Thông báo định danh từ Ban Chấp Hành, Ban Thư Ký và Lịch họp CLB.'),
-    createPara('   5. Tin nhắn chờ: Tin nhắn từ người lạ chưa kết nối; bảo vệ hội viên khỏi tin rác.'),
+    createPara('   5. Tin nhắn chờ: Tin nhắn từ người lạ chưa kết nối; bảo vệ Học viên khỏi tin rác.'),
     createPara('• Thao tác chuẩn Messenger: Trả lời trích dẫn (Reply), Chuyển tiếp (Forward), Thả 6 biểu tượng cảm xúc Emoji (👍 ❤️ 😂 😮 😢 😡), Thu hồi tin nhắn 2 chiều và Avatar "Đã xem" (Seen) ngoài viền bong bóng.'),
 
-    createHeading1('CHUYÊN ĐỀ 5: DANH BẠ HỘI VIÊN, XEM DANH THIẾP SỐ & MỜI HỘI VIÊN MỚI'),
+    createHeading1('CHUYÊN ĐỀ 5: DANH BẠ Học viên, XEM DANH THIẾP SỐ & MỜI Học viên MỚI'),
     createPara('• Tra cứu Danh bạ 500+ Doanh nhân: Tìm kiếm không dấu siêu tốc, lọc theo 12 phân khúc ngành hàng, hiển thị mã thẻ M1983 và pháp nhân doanh nghiệp.'),
-    createPara('• Xem Danh thiếp số: Khi bấm vào hồ sơ hội viên bất kỳ, nút hành động chính chuyển thành "Xem danh thiếp số" dẫn trực tiếp đến trang danh thiếp công khai của đối tác.'),
-    createPara('• Tính năng Mời Hội Viên Mới vào CLB CEO HN10: Bấm nút "Mời vào CLB CEO HN10" cạnh ô tìm kiếm để mở modal mời thành viên với mã QR giới thiệu cá nhân hóa, đường link referral độc quyền và 2 mẫu thư mời soạn sẵn (Trang trọng / Thân thiện) kèm nút chia sẻ 1 chạm lên Zalo hoặc SMS.'),
+    createPara('• Xem Danh thiếp số: Khi bấm vào hồ sơ Học viên bất kỳ, nút hành động chính chuyển thành "Xem danh thiếp số" dẫn trực tiếp đến trang danh thiếp công khai của đối tác.'),
+    createPara('• Tính năng Mời Học viên Mới vào CLB CEO HN10: Bấm nút "Mời vào CLB CEO HN10" cạnh ô tìm kiếm để mở modal mời thành viên với mã QR giới thiệu cá nhân hóa, đường link referral độc quyền và 2 mẫu thư mời soạn sẵn (Trang trọng / Thân thiện) kèm nút chia sẻ 1 chạm lên Zalo hoặc SMS.'),
 
     createHeading1('CHUYÊN ĐỀ 6: QUY TRÌNH KẾT NỐI DOANH NHÂN 2 CHIỀU CHUẨN MỰC'),
-    createPara('• Nguyên tắc tôn trọng danh bạ: Nhắn tin trao đổi với hội viên mới không tự động tạo quan hệ bạn bè.'),
+    createPara('• Nguyên tắc tôn trọng danh bạ: Nhắn tin trao đổi với Học viên mới không tự động tạo quan hệ bạn bè.'),
     createPara('• Gửi lời mời kết nối: Bấm nút "KẾT NỐI NGAY", hệ thống gửi thông báo lời mời đến đối tác.'),
     createPara('• Phê duyệt lời mời: Khi đối phương bấm "ĐỒNG Ý", hai bên chính thức trở thành Bạn bè và hiển thị trong danh mục Bạn bè của Tin nhắn.'),
     createPara('• Hủy kết nối an toàn: Có thể bấm "HỦY KẾT NỐI" bất kỳ lúc nào mà không làm mất lịch sử tin nhắn trước đó.'),
@@ -496,7 +496,7 @@ function buildHDSDHiepHoiDoc() {
     createHeading1('CHUYÊN ĐỀ 8: TỦ TÀI LIỆU NỘI BỘ, NGHỊ QUYẾT & BỐ CỤC BÁO CHÍ 50% ẢNH'),
     createPara('• Bố cục Tin tức Tỷ lệ 50% Ảnh & 50% Chữ: Thẻ tin tức chia đều 2 nửa (50% ảnh bìa sắc nét có huy hiệu chuyên mục, 50% tiêu đề, trích đoạn, thời gian và lượt xem). Modal đọc bài viết phóng to ảnh bìa chất lượng cao tạo cảm giác đọc tạp chí doanh nhân chuyên nghiệp.'),
     createPara('• Kho tài liệu nội bộ: Lưu trữ toàn bộ Điều lệ, Quy chế, Báo cáo tài chính và Nghị quyết các kỳ họp của CLB CEO HN10.'),
-    createPara('• Phân quyền theo cấp hội viên: Tài liệu được gắn quyền bảo mật (Công khai / Hội viên chính thức / Ban Chấp Hành / Ban Thường Trực).'),
+    createPara('• Phân quyền theo cấp Học viên: Tài liệu được gắn quyền bảo mật (Công khai / Học viên chính thức / Ban Chấp Hành / Ban Thường Trực).'),
 
     createHeading1('CHUYÊN ĐỀ 9: CUỘC HỌP BAN CHẤP HÀNH, NGHỊ SỰ & KÝ SỐ BIÊN BẢN'),
     createPara('• Lịch họp thường kỳ & đột xuất: Xem thông báo triệu tập, chương trình nghị sự và danh sách đại biểu được mời.'),
@@ -511,7 +511,7 @@ function buildHDSDHiepHoiDoc() {
     createHeading1('CHUYÊN ĐỀ 11: ĐÓNG HỘI PHÍ NIÊN KIM QUA VIETQR TỰ ĐỘNG GẠCH NỢ 24/7'),
     createPara('• Hóa đơn niên kim: Đến kỳ gia hạn, ứng dụng gửi thông báo kèm hóa đơn niên kim điện tử trực quan.'),
     createPara('• Quét mã VietQR bằng App Ngân Hàng: Mở bất kỳ ứng dụng ngân hàng nào (MB, VCB, Techcombank, VietinBank...). Quét mã VietQR trên màn hình: Số tài khoản, số tiền và nội dung định danh (VD: HN10-007 HOI PHI) được điền tự động chính xác 100%.'),
-    createPara('• Gạch nợ tự động trong 3 giây: Core Banking xác nhận, thẻ hội viên tự động gia hạn thành công và xuất biên lai điện tử VAT.'),
+    createPara('• Gạch nợ tự động trong 3 giây: Core Banking xác nhận, thẻ Học viên tự động gia hạn thành công và xuất biên lai điện tử VAT.'),
 
     createHeading1('CHUYÊN ĐỀ 12: BIỂU QUYẾT ĐẠI HỘI & BẦU CỬ BAN CHẤP HÀNH TRỰC TUYẾN'),
     createPara('• Tham gia biểu quyết: Trong các kỳ Đại hội hoặc phiên họp biểu quyết, ứng dụng mở cổng biểu quyết điện tử minh bạch.'),

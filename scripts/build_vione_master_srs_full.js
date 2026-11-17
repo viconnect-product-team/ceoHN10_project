@@ -397,7 +397,7 @@ for (let i = 1; i <= 40; i++) {
     `UC-VN-APP-${pad}`,
     cat,
     name,
-    'Chủ Doanh Nghiệp, Đại Biểu Hội Viên, Khách Mời VIP',
+    'Chủ Doanh Nghiệp, Đại Biểu Học viên, Khách Mời VIP',
     'Cài đặt ứng dụng ViOne Connect trên thiết bị di động có kết nối mạng',
     flow,
     'Nếu mất kết nối mạng, ứng dụng chuyển sang chế độ Offline Cache bảo mật.',

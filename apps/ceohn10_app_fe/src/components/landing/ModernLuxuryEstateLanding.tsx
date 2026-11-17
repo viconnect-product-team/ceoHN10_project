@@ -222,7 +222,7 @@ export function ModernLuxuryEstateLanding({ config }: ModernLuxuryEstateLandingP
             <a href="#portfolio" className="hover:text-[#C5A880] transition">Bộ Sưu Tập</a>
             <a href="#philosophy" className="hover:text-[#C5A880] transition">Kiến Trúc &amp; Thủ Công</a>
             <a href="#virtual-tour" className="hover:text-[#C5A880] transition">360° Virtual Tour</a>
-            <a href="#privileges" className="hover:text-[#C5A880] transition">Đặc Quyền Hội Viên</a>
+            <a href="#privileges" className="hover:text-[#C5A880] transition">Đặc Quyền Học viên</a>
           </nav>
 
           <div className="flex items-center gap-3">
@@ -400,11 +400,10 @@ export function ModernLuxuryEstateLanding({ config }: ModernLuxuryEstateLandingP
               <div
                 key={estate.id}
                 onClick={() => setSelectedEstate(estate)}
-                className={`rounded-3xl overflow-hidden border transition-all duration-300 cursor-pointer group flex flex-col justify-between ${
-                  isCurrent
+                className={`rounded-3xl overflow-hidden border transition-all duration-300 cursor-pointer group flex flex-col justify-between ${isCurrent
                     ? "border-[#C5A880] ring-2 ring-[#C5A880]/40 bg-[#16181E]"
                     : "border-white/10 bg-[#13151A] hover:border-[#C5A880]/60"
-                }`}
+                  }`}
               >
                 <div className="relative h-72 overflow-hidden">
                   <img
@@ -566,11 +565,10 @@ export function ModernLuxuryEstateLanding({ config }: ModernLuxuryEstateLandingP
                 key={room.id}
                 type="button"
                 onClick={() => setActiveTourRoom(room.id)}
-                className={`px-4 py-2 rounded-xl text-xs font-bold transition shrink-0 cursor-pointer ${
-                  activeTourRoom === room.id
+                className={`px-4 py-2 rounded-xl text-xs font-bold transition shrink-0 cursor-pointer ${activeTourRoom === room.id
                     ? "bg-[#C5A880] text-[#0D0E11] shadow-md shadow-[#C5A880]/30"
                     : "bg-[#1A1D24] text-slate-300 hover:text-white"
-                }`}
+                  }`}
               >
                 {room.name}
               </button>
@@ -585,10 +583,10 @@ export function ModernLuxuryEstateLanding({ config }: ModernLuxuryEstateLandingP
               activeTourRoom === "living"
                 ? selectedEstate.mainImage
                 : activeTourRoom === "master"
-                ? selectedEstate.gallery[0] || selectedEstate.mainImage
-                : activeTourRoom === "cellar"
-                ? selectedEstate.gallery[1] || selectedEstate.mainImage
-                : selectedEstate.gallery[2] || selectedEstate.mainImage
+                  ? selectedEstate.gallery[0] || selectedEstate.mainImage
+                  : activeTourRoom === "cellar"
+                    ? selectedEstate.gallery[1] || selectedEstate.mainImage
+                    : selectedEstate.gallery[2] || selectedEstate.mainImage
             }
             alt="Virtual Room"
             className="w-full h-full object-cover group-hover:scale-102 transition duration-700"
@@ -626,7 +624,7 @@ export function ModernLuxuryEstateLanding({ config }: ModernLuxuryEstateLandingP
         </div>
       </section>
 
-      {/* ── 6. ĐẶC QUYỀN HỘI VIÊN CEO HN10 ── */}
+      {/* ── 6. ĐẶC QUYỀN Học viên CEO HN10 ── */}
       <section id="privileges" className="py-24 bg-gradient-to-b from-[#111317] to-[#0D0E11] border-t border-white/5">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
           <div className="text-center space-y-3 max-w-2xl mx-auto">
@@ -634,10 +632,10 @@ export function ModernLuxuryEstateLanding({ config }: ModernLuxuryEstateLandingP
               Quyền Lợi Độc Quyền CLB
             </span>
             <h2 className="font-serif text-3xl sm:text-5xl font-black text-white">
-              Đặc Quyền Dành Cho Hội Viên CEO HN10
+              Đặc Quyền Dành Cho Học viên CEO HN10
             </h2>
             <p className="text-xs sm:text-sm text-slate-400">
-              Được bảo trợ bởi Hội Doanh nghiệp Trẻ Hà Nội (HanoiBA), hội viên chính thức nhận được những ưu đãi bất động sản tối cao.
+              Được bảo trợ bởi Hội Doanh nghiệp Trẻ Hà Nội (HanoiBA), Học viên chính thức nhận được những ưu đãi bất động sản tối cao.
             </p>
           </div>
 
@@ -646,7 +644,7 @@ export function ModernLuxuryEstateLanding({ config }: ModernLuxuryEstateLandingP
               {
                 icon: Crown,
                 title: "Chiết Khấu Trực Tiếp 5%",
-                desc: "Ưu đãi thanh toán lên đến 15 Tỷ VNĐ khi giao dịch nội bộ giữa các doanh nghiệp hội viên CEO HN10.",
+                desc: "Ưu đãi thanh toán lên đến 15 Tỷ VNĐ khi giao dịch nội bộ giữa các doanh nghiệp Học viên CEO HN10.",
               },
               {
                 icon: Key,

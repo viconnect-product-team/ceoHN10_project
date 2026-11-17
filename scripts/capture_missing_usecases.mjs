@@ -42,7 +42,7 @@ async function main() {
     console.log(' -> Đã chụp: crm_08_cinema_seating_studio.png');
     // Đóng modal
     const closeBtn = crmPage.locator('button:has-text("Đóng"), button:has-text("Hủy"), button[aria-label="Close"]').first();
-    if (await closeBtn.isVisible().catch(() => false)) await closeBtn.click().catch(() => {});
+    if (await closeBtn.isVisible().catch(() => false)) await closeBtn.click().catch(() => { });
     await crmPage.waitForTimeout(1000);
   }
 
@@ -57,7 +57,7 @@ async function main() {
     await crmPage.screenshot({ path: path.join(screenshotsDir, 'crm_08_event_qr_gatekeeper_modal.png') });
     console.log(' -> Đã chụp: crm_08_event_qr_gatekeeper_modal.png');
     const closeBtn = crmPage.locator('button:has-text("Đóng"), button[aria-label="Close"]').first();
-    if (await closeBtn.isVisible().catch(() => false)) await closeBtn.click().catch(() => {});
+    if (await closeBtn.isVisible().catch(() => false)) await closeBtn.click().catch(() => { });
     await crmPage.waitForTimeout(1000);
   }
 
@@ -99,7 +99,7 @@ async function main() {
   await crmContext.close();
 
   // --------------------------------------------------------------------
-  // USE CASE 5: MOBILE APP - TRUNG TÂM MÃ QR SỰ KIỆN & THẺ VÉ HỘI VIÊN
+  // USE CASE 5: MOBILE APP - TRUNG TÂM MÃ QR SỰ KIỆN & THẺ VÉ Học viên
   // --------------------------------------------------------------------
   console.log('\n--- BƯỚC 2: CHỤP MOBILE APP CÁC USE CASE QR & ĐĂNG KÝ ---');
   const mobileContext = await browser.newContext({
@@ -151,7 +151,7 @@ async function main() {
   console.log('7. Chụp Mobile Đơn Đăng Ký Gia Nhập & Xác Nhận Thành Công...');
   await mobilePage.goto('https://ceohn10.viconnect.vn/landing', { waitUntil: 'networkidle', timeout: 45000 });
   await mobilePage.waitForTimeout(3500);
-  // Điền form đăng ký hội viên
+  // Điền form đăng ký Học viên
   const mName = mobilePage.locator('input[placeholder*="họ và tên" i], input[name*="name" i]').first();
   const mPhone = mobilePage.locator('input[placeholder*="số điện thoại" i], input[type="tel"]').first();
   const mEmail = mobilePage.locator('input[placeholder*="email" i], input[type="email"]').first();

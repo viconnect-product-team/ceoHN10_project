@@ -56,8 +56,8 @@ import { RBAC_MATRIX_STORAGE_KEY, normalizeActionRoles, dispatchPermissionSyncEv
 // ── 6 BAN CHUYÊN MÔN / BAN ĐIỀU HÀNH ──
 // ── ĐỒNG BỘ HÓA TỰ ĐỘNG TÊN CHỨC NĂNG THEO SIDEBAR & GIAO DIỆN HỆ THỐNG ──
 export const SIDEBAR_ROUTE_NAMES: Record<string, string> = {
-  "/members": "Hội viên & Doanh nghiệp",
-  "/companies": "Doanh nghiệp hội viên",
+  "/members": "Học viên & Doanh nghiệp",
+  "/companies": "Doanh nghiệp Học viên",
   "/departments": "Quản lý Ban Chuyên Môn",
   "/accounts": "Quản trị người dùng",
   "/account-settings": "Quản trị người dùng",
@@ -84,9 +84,9 @@ export const SIDEBAR_ROUTE_NAMES: Record<string, string> = {
   "/notifications": "Quản lý thông báo",
   "/permissions": "Phân quyền hệ thống",
   "/documents": "Quản lý tài liệu & Học liệu",
-  "/association/card": "Thẻ Hội Viên & Danh Thiếp Số",
-  "/association/feed": "Mạng Lưới Hội Viên (Feed)",
-  "/association/members": "Danh Bạ Hội Viên Trên App",
+  "/association/card": "Thẻ Học viên & Danh Thiếp Số",
+  "/association/feed": "Mạng Lưới Học viên (Feed)",
+  "/association/members": "Danh Bạ Học viên Trên App",
   "/association/messages": "Tin Nhắn & Trao Đổi Lãnh Đạo",
   "/association/trainings": "Khóa Đào Tạo Trên App",
   "/association/events": "Sự Kiện & Vé Điện Tử E-Ticket",
@@ -160,7 +160,7 @@ export const SYSTEM_ROLES: SystemRole[] = [
   { key: "truong_ban_dao_tao", name: "Trưởng ban Đào tạo & Phát triển", shortName: "Trưởng ban Đào Tạo", color: "text-blue-700 bg-blue-50 border-blue-200 dark:bg-blue-950/50 dark:text-blue-300 dark:border-blue-800", desc: "Quản lý khóa đào tạo doanh nhân, lớp học thứ 7 và học liệu" },
   { key: "thanh_vien_ban_dao_tao", name: "Thành viên ban đào tạo", shortName: "Thành viên Ban Đào Tạo", color: "text-blue-600 bg-blue-50 border-blue-200 dark:bg-blue-950/50 dark:text-blue-300 dark:border-blue-800", desc: "Hỗ trợ tổ chức lớp học, điểm danh và quản lý học viên" },
   { key: "truong_ban_truyen_thong", name: "Trưởng ban truyền thông", shortName: "Trưởng ban Truyền Thông", color: "text-rose-700 bg-rose-50 border-rose-200 dark:bg-rose-950/50 dark:text-rose-300 dark:border-rose-800", desc: "Quản lý truyền thông, tin tức, hình ảnh & thương hiệu" },
-  { key: "truong_ban_thanh_vien", name: "Trưởng ban thành viên", shortName: "Trưởng ban Thành Viên", color: "text-emerald-700 bg-emerald-50 border-emerald-200 dark:bg-emerald-950/50 dark:text-emerald-300 dark:border-emerald-800", desc: "Phát triển hội viên, kết nạp & chăm sóc hội viên mới" },
+  { key: "truong_ban_thanh_vien", name: "Trưởng ban thành viên", shortName: "Trưởng ban Thành Viên", color: "text-emerald-700 bg-emerald-50 border-emerald-200 dark:bg-emerald-950/50 dark:text-emerald-300 dark:border-emerald-800", desc: "Phát triển Học viên, kết nạp & chăm sóc Học viên mới" },
   { key: "truong_ban_xuc_tien", name: "Trưởng ban xúc tiến TM", shortName: "Trưởng ban Xúc Tiến TM", color: "text-orange-700 bg-orange-50 border-orange-200 dark:bg-orange-950/50 dark:text-orange-300 dark:border-orange-800", desc: "Điều phối cơ hội giao thương, kết nối B2B & kinh doanh" },
   { key: "truong_ban_tai_chinh", name: "Trưởng ban tài chính", shortName: "Trưởng ban Tài Chính", color: "text-yellow-700 bg-yellow-50 border-yellow-200 dark:bg-yellow-950/50 dark:text-yellow-300 dark:border-yellow-800", desc: "Quản lý quỹ, thu chi & ngân sách hiệp hội" },
   { key: "truong_ban_thien_nguyen", name: "Trưởng ban thiện nguyện", shortName: "Trưởng ban Thiện Nguyện", color: "text-teal-700 bg-teal-50 border-teal-200 dark:bg-teal-950/50 dark:text-teal-300 dark:border-teal-800", desc: "Tổ chức hoạt động thiện nguyện vì cộng đồng" },
@@ -170,7 +170,7 @@ export const SYSTEM_ROLES: SystemRole[] = [
   { key: "thanh_vien_ban_truyen_thong", name: "Thành viên ban truyền thông", shortName: "Thành viên Ban Truyền Thông", color: "text-blue-600 bg-blue-50 border-blue-200 dark:bg-blue-950/50 dark:text-blue-300 dark:border-blue-800", desc: "Thành viên chuyên trách Ban Truyền Thông" },
   { key: "thanh_vien_ban_tai_chinh", name: "Thành viên ban tài chính", shortName: "Thành viên Ban Tài Chính", color: "text-yellow-600 bg-yellow-50 border-yellow-200 dark:bg-yellow-950/50 dark:text-yellow-300 dark:border-yellow-800", desc: "Thành viên chuyên trách Ban Tài Chính" },
   { key: "thanh_vien_ban_thien_nguyen", name: "Thành viên ban thiện nguyện", shortName: "Thành viên Ban Thiện Nguyện", color: "text-teal-600 bg-teal-50 border-teal-200 dark:bg-teal-950/50 dark:text-teal-300 dark:border-teal-800", desc: "Thành viên chuyên trách Ban Thiện Nguyện" },
-  { key: "member", name: "Hội viên", shortName: "Hội viên", color: "text-slate-700 bg-slate-50 border-slate-200 dark:bg-slate-900/50 dark:text-slate-300 dark:border-slate-800", desc: "Hội viên sinh hoạt chính thức của hiệp hội" },
+  { key: "member", name: "Học viên", shortName: "Học viên", color: "text-slate-700 bg-slate-50 border-slate-200 dark:bg-slate-900/50 dark:text-slate-300 dark:border-slate-800", desc: "Học viên sinh hoạt chính thức của hiệp hội" },
 ];
 
 export function getDynamicSystemRoles(): SystemRole[] {
@@ -219,24 +219,24 @@ export interface TreeCategory {
 
 // ── CẤU TRÚC 8 NHÓM CHỨC NĂNG CHUẨN XÁC 100% THEO MENU SIDEBAR CRM HIỆP HỘI ──
 export const INITIAL_CATEGORIES: TreeCategory[] = [
-  // NHÓM 1: HỘI VIÊN
+  // NHÓM 1: Học viên
   {
     id: "cat_members",
-    name: "HỘI VIÊN",
+    name: "Học viên",
     iconName: "Users",
     features: [
       {
         id: "feat_members",
-        name: "Hội viên",
+        name: "Học viên",
         route: "/members",
-        description: "Quản lý hồ sơ hội viên cá nhân, mã hội viên và thông tin hội viên",
+        description: "Quản lý hồ sơ Học viên cá nhân, mã Học viên và thông tin Học viên",
         actions: [
-          { id: "act_mem_view", name: "Xem danh sách & hồ sơ hội viên", code: "MEM_VIEW", description: "Tra cứu thông tin cá nhân, chức danh, doanh nghiệp", apiEndpoint: "GET /api/members", roles: { bqt: true, thu_ky: true, thanh_vien: true, xuc_tien: true, truyen_thong: true, thien_nguyen: true, quan_tri: true, admin: true, tong_thu_ky: true, ban_thu_ky: true, member: true } },
-          { id: "act_mem_add", name: "Thêm mới hội viên", code: "MEM_ADD", description: "Tạo mới tài khoản và hồ sơ hội viên vào hệ thống", apiEndpoint: "POST /api/members", roles: { bqt: true, thu_ky: true, thanh_vien: true, quan_tri: true, admin: true, tong_thu_ky: true } },
-          { id: "act_mem_edit", name: "Chỉnh sửa thông tin hội viên", code: "MEM_EDIT", description: "Cập nhật email, số điện thoại, chức danh, ảnh đại diện", apiEndpoint: "PUT /api/members/:id", roles: { bqt: true, thu_ky: true, thanh_vien: true, quan_tri: true, admin: true, tong_thu_ky: true } },
-          { id: "act_mem_delete", name: "Xóa / Thu hồi tư cách hội viên", code: "MEM_DELETE", description: "Xóa hoặc đình chỉ tư cách hội viên trong hiệp hội", apiEndpoint: "DELETE /api/members/:id", roles: { bqt: true, quan_tri: true, admin: true } },
-          { id: "act_mem_approve", name: "Phê duyệt hồ sơ đăng ký", code: "MEM_APPROVE", description: "Duyệt hồ sơ gia nhập và cấp mã hội viên chính thức", apiEndpoint: "POST /api/members/:id/approve", roles: { bqt: true, thu_ky: true, thanh_vien: true, quan_tri: true, admin: true, tong_thu_ky: true } },
-          { id: "act_mem_export", name: "Xuất file Excel danh sách", code: "MEM_EXPORT", description: "Trích xuất danh bạ hội viên phục vụ kỷ yếu và báo cáo", apiEndpoint: "GET /api/members/export", roles: { bqt: true, thu_ky: true, thanh_vien: true, quan_tri: true, admin: true, tong_thu_ky: true } },
+          { id: "act_mem_view", name: "Xem danh sách & hồ sơ Học viên", code: "MEM_VIEW", description: "Tra cứu thông tin cá nhân, chức danh, doanh nghiệp", apiEndpoint: "GET /api/members", roles: { bqt: true, thu_ky: true, thanh_vien: true, xuc_tien: true, truyen_thong: true, thien_nguyen: true, quan_tri: true, admin: true, tong_thu_ky: true, ban_thu_ky: true, member: true } },
+          { id: "act_mem_add", name: "Thêm mới Học viên", code: "MEM_ADD", description: "Tạo mới tài khoản và hồ sơ Học viên vào hệ thống", apiEndpoint: "POST /api/members", roles: { bqt: true, thu_ky: true, thanh_vien: true, quan_tri: true, admin: true, tong_thu_ky: true } },
+          { id: "act_mem_edit", name: "Chỉnh sửa thông tin Học viên", code: "MEM_EDIT", description: "Cập nhật email, số điện thoại, chức danh, ảnh đại diện", apiEndpoint: "PUT /api/members/:id", roles: { bqt: true, thu_ky: true, thanh_vien: true, quan_tri: true, admin: true, tong_thu_ky: true } },
+          { id: "act_mem_delete", name: "Xóa / Thu hồi tư cách Học viên", code: "MEM_DELETE", description: "Xóa hoặc đình chỉ tư cách Học viên trong hiệp hội", apiEndpoint: "DELETE /api/members/:id", roles: { bqt: true, quan_tri: true, admin: true } },
+          { id: "act_mem_approve", name: "Phê duyệt hồ sơ đăng ký", code: "MEM_APPROVE", description: "Duyệt hồ sơ gia nhập và cấp mã Học viên chính thức", apiEndpoint: "POST /api/members/:id/approve", roles: { bqt: true, thu_ky: true, thanh_vien: true, quan_tri: true, admin: true, tong_thu_ky: true } },
+          { id: "act_mem_export", name: "Xuất file Excel danh sách", code: "MEM_EXPORT", description: "Trích xuất danh bạ Học viên phục vụ kỷ yếu và báo cáo", apiEndpoint: "GET /api/members/export", roles: { bqt: true, thu_ky: true, thanh_vien: true, quan_tri: true, admin: true, tong_thu_ky: true } },
         ],
       },
       {
@@ -249,28 +249,28 @@ export const INITIAL_CATEGORIES: TreeCategory[] = [
           { id: "act_com_add", name: "Thêm mới doanh nghiệp", code: "COM_ADD", description: "Tạo hồ sơ pháp nhân doanh nghiệp mới", apiEndpoint: "POST /api/companies", roles: { bqt: true, thu_ky: true, thanh_vien: true, xuc_tien: true, quan_tri: true, admin: true } },
           { id: "act_com_edit", name: "Chỉnh sửa thông tin doanh nghiệp", code: "COM_EDIT", description: "Cập nhật ngành nghề, địa chỉ, website, logo doanh nghiệp", apiEndpoint: "PUT /api/companies/:id", roles: { bqt: true, thu_ky: true, thanh_vien: true, xuc_tien: true, quan_tri: true, admin: true } },
           { id: "act_com_delete", name: "Xóa hồ sơ doanh nghiệp", code: "COM_DELETE", description: "Xóa thông tin doanh nghiệp khỏi cơ sở dữ liệu", apiEndpoint: "DELETE /api/companies/:id", roles: { bqt: true, quan_tri: true, admin: true } },
-          { id: "act_com_export", name: "Xuất danh sách doanh nghiệp", code: "COM_EXPORT", description: "Trích xuất danh sách doanh nghiệp hội viên", apiEndpoint: "GET /api/companies/export", roles: { bqt: true, thu_ky: true, thanh_vien: true, xuc_tien: true, quan_tri: true, admin: true } },
+          { id: "act_com_export", name: "Xuất danh sách doanh nghiệp", code: "COM_EXPORT", description: "Trích xuất danh sách doanh nghiệp Học viên", apiEndpoint: "GET /api/companies/export", roles: { bqt: true, thu_ky: true, thanh_vien: true, xuc_tien: true, quan_tri: true, admin: true } },
         ],
       },
       {
         id: "feat_segments",
-        name: "Phân loại hội viên",
+        name: "Phân loại Học viên",
         route: "/segments",
-        description: "Quản lý các nhóm phân khúc, tiêu chí hội viên và nhiệm kỳ",
+        description: "Quản lý các nhóm phân khúc, tiêu chí Học viên và nhiệm kỳ",
         actions: [
-          { id: "act_seg_view", name: "Xem danh sách phân loại hội viên", code: "SEG_VIEW", description: "Tra cứu danh sách nhóm phân loại và tiêu chí", apiEndpoint: "GET /api/segments", roles: { bqt: true, thu_ky: true, thanh_vien: true, quan_tri: true, admin: true, tong_thu_ky: true, ban_thu_ky: true } },
-          { id: "act_seg_add", name: "Thêm mới phân loại hội viên", code: "SEG_ADD", description: "Khởi tạo nhóm phân khúc mới", apiEndpoint: "POST /api/segments", roles: { bqt: true, thu_ky: true, thanh_vien: true, quan_tri: true, admin: true } },
-          { id: "act_seg_edit", name: "Chỉnh sửa phân loại hội viên", code: "SEG_EDIT", description: "Cập nhật tiêu chí hoặc điều kiện phân loại", apiEndpoint: "PUT /api/segments/:id", roles: { bqt: true, thu_ky: true, thanh_vien: true, quan_tri: true, admin: true } },
-          { id: "act_seg_delete", name: "Xóa phân loại hội viên", code: "SEG_DELETE", description: "Xóa nhóm phân loại không còn sử dụng", apiEndpoint: "DELETE /api/segments/:id", roles: { bqt: true, quan_tri: true, admin: true } },
+          { id: "act_seg_view", name: "Xem danh sách phân loại Học viên", code: "SEG_VIEW", description: "Tra cứu danh sách nhóm phân loại và tiêu chí", apiEndpoint: "GET /api/segments", roles: { bqt: true, thu_ky: true, thanh_vien: true, quan_tri: true, admin: true, tong_thu_ky: true, ban_thu_ky: true } },
+          { id: "act_seg_add", name: "Thêm mới phân loại Học viên", code: "SEG_ADD", description: "Khởi tạo nhóm phân khúc mới", apiEndpoint: "POST /api/segments", roles: { bqt: true, thu_ky: true, thanh_vien: true, quan_tri: true, admin: true } },
+          { id: "act_seg_edit", name: "Chỉnh sửa phân loại Học viên", code: "SEG_EDIT", description: "Cập nhật tiêu chí hoặc điều kiện phân loại", apiEndpoint: "PUT /api/segments/:id", roles: { bqt: true, thu_ky: true, thanh_vien: true, quan_tri: true, admin: true } },
+          { id: "act_seg_delete", name: "Xóa phân loại Học viên", code: "SEG_DELETE", description: "Xóa nhóm phân loại không còn sử dụng", apiEndpoint: "DELETE /api/segments/:id", roles: { bqt: true, quan_tri: true, admin: true } },
         ],
       },
       {
         id: "feat_renewal",
-        name: "Gia hạn hội viên",
+        name: "Gia hạn Học viên",
         route: "/renewal",
-        description: "Quản lý chu kỳ gia hạn thẻ hội viên thường niên +365 ngày",
+        description: "Quản lý chu kỳ gia hạn thẻ Học viên thường niên +365 ngày",
         actions: [
-          { id: "act_ren_view", name: "Xem danh sách gia hạn hội viên", code: "REN_VIEW", description: "Xem danh sách hội viên sắp hết hạn và đã gia hạn", apiEndpoint: "GET /api/renewals", roles: { bqt: true, thu_ky: true, thanh_vien: true, quan_tri: true, admin: true, tong_thu_ky: true } },
+          { id: "act_ren_view", name: "Xem danh sách gia hạn Học viên", code: "REN_VIEW", description: "Xem danh sách Học viên sắp hết hạn và đã gia hạn", apiEndpoint: "GET /api/renewals", roles: { bqt: true, thu_ky: true, thanh_vien: true, quan_tri: true, admin: true, tong_thu_ky: true } },
           { id: "act_ren_process", name: "Thực hiện gia hạn (+365 ngày)", code: "REN_PROCESS", description: "Ghi nhận gia hạn niên liễm và kích hoạt lại thẻ", apiEndpoint: "POST /api/renewals/extend", roles: { bqt: true, thu_ky: true, thanh_vien: true, quan_tri: true, admin: true } },
           { id: "act_ren_edit", name: "Chỉnh sửa thông tin gia hạn", code: "REN_EDIT", description: "Điều chỉnh ngày hết hạn hoặc thời gian gia hạn", apiEndpoint: "PUT /api/renewals/:id", roles: { bqt: true, thu_ky: true, quan_tri: true, admin: true } },
           { id: "act_ren_cancel", name: "Hủy lượt gia hạn", code: "REN_CANCEL", description: "Hủy lượt gia hạn sai sót", apiEndpoint: "DELETE /api/renewals/:id", roles: { bqt: true, quan_tri: true, admin: true } },
@@ -295,7 +295,7 @@ export const INITIAL_CATEGORIES: TreeCategory[] = [
           { id: "act_evt_add", name: "Thêm mới sự kiện", code: "EVT_ADD", description: "Tạo chương trình sự kiện mới", apiEndpoint: "POST /api/events", roles: { bqt: true, thu_ky: true, truyen_thong: true, quan_tri: true, admin: true, tong_thu_ky: true, ban_thu_ky: true } },
           { id: "act_evt_edit", name: "Chỉnh sửa thông tin sự kiện", code: "EVT_EDIT", description: "Cập nhật nội dung, thời gian, vé tham dự", apiEndpoint: "PUT /api/events/:id", roles: { bqt: true, thu_ky: true, truyen_thong: true, quan_tri: true, admin: true, tong_thu_ky: true, ban_thu_ky: true } },
           { id: "act_evt_delete", name: "Xóa / Hủy sự kiện", code: "EVT_DELETE", description: "Hủy bỏ hoặc xóa sự kiện", apiEndpoint: "DELETE /api/events/:id", roles: { bqt: true, quan_tri: true, admin: true } },
-          { id: "act_evt_publish", name: "Phê duyệt & Xuất bản sự kiện", code: "EVT_PUBLISH", description: "Duyệt công khai sự kiện lên App hội viên", apiEndpoint: "PATCH /api/events/:id/publish", roles: { bqt: true, thu_ky: true, quan_tri: true, admin: true, tong_thu_ky: true } },
+          { id: "act_evt_publish", name: "Phê duyệt & Xuất bản sự kiện", code: "EVT_PUBLISH", description: "Duyệt công khai sự kiện lên App Học viên", apiEndpoint: "PATCH /api/events/:id/publish", roles: { bqt: true, thu_ky: true, quan_tri: true, admin: true, tong_thu_ky: true } },
         ],
       },
       {
@@ -390,10 +390,10 @@ export const INITIAL_CATEGORIES: TreeCategory[] = [
         id: "feat_fees",
         name: "Hội phí",
         route: "/fees",
-        description: "Quản lý niên liễm hội viên, hóa đơn thu tiền và đối soát VietQR",
+        description: "Quản lý niên liễm Học viên, hóa đơn thu tiền và đối soát VietQR",
         actions: [
           { id: "act_fee_view", name: "Xem danh sách hội phí & công nợ", code: "FEE_VIEW", description: "Xem ai đã nộp, chưa nộp và số tiền hội phí", apiEndpoint: "GET /api/fees", roles: { bqt: true, thu_ky: true, thanh_vien: true, quan_tri: true, admin: true, tong_thu_ky: true } },
-          { id: "act_fee_add", name: "Lập hóa đơn thu hội phí", code: "FEE_ADD", description: "Tạo phiếu thu hội phí cho hội viên", apiEndpoint: "POST /api/fees", roles: { bqt: true, thu_ky: true, quan_tri: true, admin: true } },
+          { id: "act_fee_add", name: "Lập hóa đơn thu hội phí", code: "FEE_ADD", description: "Tạo phiếu thu hội phí cho Học viên", apiEndpoint: "POST /api/fees", roles: { bqt: true, thu_ky: true, quan_tri: true, admin: true } },
           { id: "act_fee_edit", name: "Chỉnh sửa hóa đơn hội phí", code: "FEE_EDIT", description: "Điều chỉnh số tiền, hạn thanh toán hoặc miễn giảm", apiEndpoint: "PUT /api/fees/:id", roles: { bqt: true, thu_ky: true, quan_tri: true, admin: true } },
           { id: "act_fee_delete", name: "Xóa / Hủy hóa đơn", code: "FEE_DELETE", description: "Hủy phiếu thu lập sai sót", apiEndpoint: "DELETE /api/fees/:id", roles: { bqt: true, quan_tri: true, admin: true } },
           { id: "act_fee_reconcile", name: "Đối soát thanh toán VietQR", code: "FEE_RECONCILE", description: "Kiểm tra gạch nợ tự động qua ngân hàng", apiEndpoint: "POST /api/fees/reconcile", roles: { bqt: true, quan_tri: true, admin: true } },
@@ -466,7 +466,7 @@ export const INITIAL_CATEGORIES: TreeCategory[] = [
           { id: "act_eml_add", name: "Tạo chiến dịch email mới", code: "EML_ADD", description: "Thiết kế nội dung email và chọn danh sách gửi", apiEndpoint: "POST /api/email-campaigns", roles: { bqt: true, thu_ky: true, truyen_thong: true, quan_tri: true, admin: true, tong_thu_ky: true } },
           { id: "act_eml_edit", name: "Chỉnh sửa chiến dịch email", code: "EML_EDIT", description: "Điều chỉnh mẫu template hoặc thời gian gửi", apiEndpoint: "PUT /api/email-campaigns/:id", roles: { bqt: true, thu_ky: true, truyen_thong: true, quan_tri: true, admin: true } },
           { id: "act_eml_delete", name: "Xóa chiến dịch email", code: "EML_DELETE", description: "Hủy chiến dịch email chưa gửi", apiEndpoint: "DELETE /api/email-campaigns/:id", roles: { bqt: true, quan_tri: true, admin: true } },
-          { id: "act_eml_send", name: "Phát hành email hàng loạt", code: "EML_SEND", description: "Thực thi gửi email tức thì tới hàng nghìn hội viên", apiEndpoint: "POST /api/email-campaigns/:id/send", roles: { bqt: true, truyen_thong: true, quan_tri: true, admin: true } },
+          { id: "act_eml_send", name: "Phát hành email hàng loạt", code: "EML_SEND", description: "Thực thi gửi email tức thì tới hàng nghìn Học viên", apiEndpoint: "POST /api/email-campaigns/:id/send", roles: { bqt: true, truyen_thong: true, quan_tri: true, admin: true } },
         ],
       },
       {
@@ -486,7 +486,7 @@ export const INITIAL_CATEGORIES: TreeCategory[] = [
         id: "feat_perks",
         name: "Đặc quyền",
         route: "/perks",
-        description: "Quản lý các đặc quyền ưu đãi dành riêng cho hội viên",
+        description: "Quản lý các đặc quyền ưu đãi dành riêng cho Học viên",
         actions: [
           { id: "act_prk_view", name: "Xem danh sách đặc quyền", code: "PRK_VIEW", description: "Xem các đặc quyền dịch vụ, phòng chờ VIP, sân golf", apiEndpoint: "GET /api/perks", roles: { bqt: true, thu_ky: true, thanh_vien: true, xuc_tien: true, truyen_thong: true, thien_nguyen: true, quan_tri: true, admin: true, tong_thu_ky: true, ban_thu_ky: true, member: true } },
           { id: "act_prk_add", name: "Thêm đặc quyền mới", code: "PRK_ADD", description: "Tạo dịch vụ đặc quyền mới cho hiệp hội", apiEndpoint: "POST /api/perks", roles: { bqt: true, thu_ky: true, thanh_vien: true, quan_tri: true, admin: true } },
@@ -505,11 +505,11 @@ export const INITIAL_CATEGORIES: TreeCategory[] = [
     features: [
       {
         id: "feat_network",
-        name: "Kết nối hội viên",
+        name: "Kết nối Học viên",
         route: "/network",
         description: "Mạng lưới kết nối giao lưu giữa các doanh nhân CEO HN10",
         actions: [
-          { id: "act_net_view", name: "Xem mạng lưới kết nối", code: "NET_VIEW", description: "Tra cứu kết nối và sơ đồ quan hệ hội viên", apiEndpoint: "GET /api/network", roles: { bqt: true, thu_ky: true, thanh_vien: true, xuc_tien: true, truyen_thong: true, thien_nguyen: true, quan_tri: true, admin: true, tong_thu_ky: true, ban_thu_ky: true, member: true } },
+          { id: "act_net_view", name: "Xem mạng lưới kết nối", code: "NET_VIEW", description: "Tra cứu kết nối và sơ đồ quan hệ Học viên", apiEndpoint: "GET /api/network", roles: { bqt: true, thu_ky: true, thanh_vien: true, xuc_tien: true, truyen_thong: true, thien_nguyen: true, quan_tri: true, admin: true, tong_thu_ky: true, ban_thu_ky: true, member: true } },
           { id: "act_net_connect", name: "Khởi tạo kết nối & Nhắn tin", code: "NET_CONNECT", description: "Gửi lời mời kết nối trực tiếp đến doanh nghiệp", apiEndpoint: "POST /api/network/connect", roles: { bqt: true, thu_ky: true, thanh_vien: true, xuc_tien: true, truyen_thong: true, thien_nguyen: true, quan_tri: true, admin: true, tong_thu_ky: true, ban_thu_ky: true, member: true } },
           { id: "act_net_export", name: "Xuất dữ liệu kết nối", code: "NET_EXPORT", description: "Xuất file danh bạ mạng lưới kết nối", apiEndpoint: "GET /api/network/export", roles: { bqt: true, thu_ky: true, xuc_tien: true, quan_tri: true, admin: true, tong_thu_ky: true } },
         ],
@@ -649,22 +649,22 @@ export const INITIAL_CATEGORIES: TreeCategory[] = [
       },
       {
         id: "feat_app_smart_card",
-        name: "Thẻ Hội Viên & Danh Thiếp Số",
+        name: "Thẻ Học viên & Danh Thiếp Số",
         route: "/association/card",
         description: "Smart VIP Card, mã QR định danh và danh thiếp số lãnh đạo",
         actions: [
-          { id: "act_app_card_view", name: "Xem Thẻ Hội Viên & Smart Card", code: "APP_CARD_VIEW", description: "Xem thẻ hội viên thông minh, số thẻ và hợp đồng", apiEndpoint: "GET /api/app/card", roles: { bqt: true, thu_ky: true, thanh_vien: true, xuc_tien: true, truyen_thong: true, thien_nguyen: true, quan_tri: true, admin: true, tong_thu_ky: true, ban_thu_ky: true, member: true } },
+          { id: "act_app_card_view", name: "Xem Thẻ Học viên & Smart Card", code: "APP_CARD_VIEW", description: "Xem thẻ Học viên thông minh, số thẻ và hợp đồng", apiEndpoint: "GET /api/app/card", roles: { bqt: true, thu_ky: true, thanh_vien: true, xuc_tien: true, truyen_thong: true, thien_nguyen: true, quan_tri: true, admin: true, tong_thu_ky: true, ban_thu_ky: true, member: true } },
           { id: "act_app_card_share", name: "Chia sẻ Danh thiếp số công khai", code: "APP_CARD_SHARE", description: "Tạo link và mã QR danh thiếp số gửi đối tác", apiEndpoint: "GET /api/app/card/share", roles: { bqt: true, thu_ky: true, thanh_vien: true, xuc_tien: true, truyen_thong: true, thien_nguyen: true, quan_tri: true, admin: true, tong_thu_ky: true, ban_thu_ky: true, member: true } },
-          { id: "act_app_card_scan", name: "Quét mã QR Thẻ hội viên đối tác", code: "APP_CARD_SCAN", description: "Dùng camera quét mã QR trên thẻ hội viên khác", apiEndpoint: "POST /api/app/card/scan", roles: { bqt: true, thu_ky: true, thanh_vien: true, xuc_tien: true, truyen_thong: true, thien_nguyen: true, quan_tri: true, admin: true, tong_thu_ky: true, ban_thu_ky: true, member: true } },
+          { id: "act_app_card_scan", name: "Quét mã QR Thẻ Học viên đối tác", code: "APP_CARD_SCAN", description: "Dùng camera quét mã QR trên thẻ Học viên khác", apiEndpoint: "POST /api/app/card/scan", roles: { bqt: true, thu_ky: true, thanh_vien: true, xuc_tien: true, truyen_thong: true, thien_nguyen: true, quan_tri: true, admin: true, tong_thu_ky: true, ban_thu_ky: true, member: true } },
         ],
       },
       {
         id: "feat_app_members",
-        name: "Danh Bạ Hội Viên Trên App",
+        name: "Danh Bạ Học viên Trên App",
         route: "/association/members",
         description: "Tra cứu danh bạ các lãnh đạo và doanh nghiệp trong CLB",
         actions: [
-          { id: "act_app_mem_dir", name: "Xem Danh bạ Hội viên CLB", code: "APP_MEM_DIR", description: "Xem thông tin doanh nhân, ngành nghề và công ty", apiEndpoint: "GET /api/app/members", roles: { bqt: true, thu_ky: true, thanh_vien: true, xuc_tien: true, truyen_thong: true, thien_nguyen: true, quan_tri: true, admin: true, tong_thu_ky: true, ban_thu_ky: true, member: true } },
+          { id: "act_app_mem_dir", name: "Xem Danh bạ Học viên CLB", code: "APP_MEM_DIR", description: "Xem thông tin doanh nhân, ngành nghề và công ty", apiEndpoint: "GET /api/app/members", roles: { bqt: true, thu_ky: true, thanh_vien: true, xuc_tien: true, truyen_thong: true, thien_nguyen: true, quan_tri: true, admin: true, tong_thu_ky: true, ban_thu_ky: true, member: true } },
           { id: "act_app_mem_contact", name: "Xem Hotline & Liên hệ Lãnh đạo", code: "APP_MEM_CONTACT", description: "Xem số điện thoại, email và trụ sở công ty", apiEndpoint: "GET /api/app/members/contact", roles: { bqt: true, thu_ky: true, thanh_vien: true, xuc_tien: true, truyen_thong: true, thien_nguyen: true, quan_tri: true, admin: true, tong_thu_ky: true, ban_thu_ky: true, member: true } },
         ],
       },
@@ -675,7 +675,7 @@ export const INITIAL_CATEGORIES: TreeCategory[] = [
         description: "Gửi lời mời kết nối, đặt lịch hẹn gặp 1-1 và chat trao đổi",
         actions: [
           { id: "act_app_b2b_invite", name: "Gửi lời mời kết nối 1-on-1", code: "APP_B2B_INVITE", description: "Mời lãnh đạo doanh nghiệp khác gặp gỡ kết nối", apiEndpoint: "POST /api/app/b2b/invite", roles: { bqt: true, thu_ky: true, thanh_vien: true, xuc_tien: true, truyen_thong: true, thien_nguyen: true, quan_tri: true, admin: true, tong_thu_ky: true, ban_thu_ky: true, member: true } },
-          { id: "act_app_b2b_chat", name: "Nhắn tin trực tiếp giữa các hội viên", code: "APP_B2B_CHAT", description: "Trao đổi tin nhắn, gửi file và chia sẻ danh thiếp", apiEndpoint: "POST /api/app/messages", roles: { bqt: true, thu_ky: true, thanh_vien: true, xuc_tien: true, truyen_thong: true, thien_nguyen: true, quan_tri: true, admin: true, tong_thu_ky: true, ban_thu_ky: true, member: true } },
+          { id: "act_app_b2b_chat", name: "Nhắn tin trực tiếp giữa các Học viên", code: "APP_B2B_CHAT", description: "Trao đổi tin nhắn, gửi file và chia sẻ danh thiếp", apiEndpoint: "POST /api/app/messages", roles: { bqt: true, thu_ky: true, thanh_vien: true, xuc_tien: true, truyen_thong: true, thien_nguyen: true, quan_tri: true, admin: true, tong_thu_ky: true, ban_thu_ky: true, member: true } },
         ],
       },
       {
@@ -724,7 +724,7 @@ export const INITIAL_CATEGORIES: TreeCategory[] = [
 const STORAGE_KEY = RBAC_MATRIX_STORAGE_KEY;
 
 export const DETECTABLE_SYSTEM_FEATURES = [
-  { name: "Hội viên & Doanh nghiệp", route: "/members", catId: "cat_members", desc: "Quản lý danh sách hội viên, hồ sơ năng lực & chức vụ" },
+  { name: "Học viên & Doanh nghiệp", route: "/members", catId: "cat_members", desc: "Quản lý danh sách Học viên, hồ sơ năng lực & chức vụ" },
   { name: "Ban chuyên môn & Công tác", route: "/departments", catId: "cat_admin", desc: "Quản lý 6 Ban chuyên môn và phân công nhân sự ban" },
   { name: "Tài khoản & Phân quyền", route: "/accounts", catId: "cat_admin", desc: "Quản lý tài khoản đăng nhập, cấp quyền và bảo mật" },
   { name: "Bốc thăm trúng thưởng", route: "/lucky-draw", catId: "cat_events", desc: "Quản lý chương trình quay số may mắn & giải thưởng sự kiện" },
@@ -732,7 +732,7 @@ export const DETECTABLE_SYSTEM_FEATURES = [
   { name: "Đăng ký sự kiện", route: "/event-registrations", catId: "cat_events", desc: "Quản lý danh sách đăng ký sự kiện và phê duyệt" },
   { name: "Gói Tài trợ & Quyền lợi", route: "/sponsor-packages", catId: "cat_events", desc: "Quản lý các gói tài trợ kim cương, vàng, bạc cho sự kiện" },
   { name: "Kết nối giao thương B2B", route: "/business-connect", catId: "cat_network", desc: "Sàn kết nối cung cầu, cơ hội hợp tác kinh doanh giữa các CEO" },
-  { name: "Cuộc hẹn & Gặp gỡ", route: "/meetings", catId: "cat_network", desc: "Đặt lịch hẹn 1-on-1 và kết nối giao thương giữa các hội viên" },
+  { name: "Cuộc hẹn & Gặp gỡ", route: "/meetings", catId: "cat_network", desc: "Đặt lịch hẹn 1-on-1 và kết nối giao thương giữa các Học viên" },
   { name: "Quỹ hội & Báo cáo tài chính", route: "/finance-report", catId: "cat_finance", desc: "Tổng quan thu chi, số dư quỹ hội và báo cáo tài chính" },
   { name: "Khoản thu & Hội phí", route: "/income", catId: "cat_finance", desc: "Quản lý thu hội phí thường niên, tài trợ và nhập file sao kê" },
   { name: "Khoản chi & Quyết toán", route: "/expenses", catId: "cat_finance", desc: "Quản lý phiếu chi, duyệt chi ngân sách và quyết toán" },
@@ -740,11 +740,11 @@ export const DETECTABLE_SYSTEM_FEATURES = [
   { name: "Thư viện truyền thông & Media", route: "/media", catId: "cat_media", desc: "Kho ảnh sự kiện, video hoạt động và tư liệu hiệp hội" },
   { name: "Gian hàng & Sản phẩm", route: "/marketplace", catId: "cat_marketplace", desc: "Chợ giao thương sản phẩm, dịch vụ ưu đãi nội bộ" },
   { name: "Khảo sát & Biểu quyết", route: "/voting", catId: "cat_governance", desc: "Biểu quyết trực tuyến, bầu cử ban điều hành và khảo sát" },
-  { name: "Thông báo & Tin nhắn", route: "/notifications", catId: "cat_system", desc: "Gửi thông báo đẩy, email và tin nhắn tức thời đến hội viên" },
+  { name: "Thông báo & Tin nhắn", route: "/notifications", catId: "cat_system", desc: "Gửi thông báo đẩy, email và tin nhắn tức thời đến Học viên" },
   { name: "Ma trận phân quyền & Tài khoản", route: "/permissions", catId: "cat_system", desc: "Thiết lập phân quyền hệ thống và quản lý tài khoản người dùng" },
   { name: "App: Smart VIP Card & Danh thiếp số", route: "/association/card", catId: "cat_mobile_app", desc: "Smart VIP Card, mã QR định danh và danh thiếp số lãnh đạo trên App" },
   { name: "App: Bảng tin nội bộ & Khoảnh khắc", route: "/association/feed", catId: "cat_mobile_app", desc: "Bảng tin giao lưu, chia sẻ hoạt động và hình ảnh doanh nghiệp trên App" },
-  { name: "App: Danh bạ Hội viên & Lãnh đạo", route: "/association/members", catId: "cat_mobile_app", desc: "Tra cứu danh bạ các lãnh đạo và doanh nghiệp trong CLB trên App" },
+  { name: "App: Danh bạ Học viên & Lãnh đạo", route: "/association/members", catId: "cat_mobile_app", desc: "Tra cứu danh bạ các lãnh đạo và doanh nghiệp trong CLB trên App" },
   { name: "App: Kết nối B2B & Tin nhắn riêng", route: "/association/messages", catId: "cat_mobile_app", desc: "Gửi lời mời kết nối, hẹn gặp 1-on-1 và chat trao đổi trên App" },
   { name: "App: Sàn cơ hội kinh doanh B2B", route: "/association/opportunities", catId: "cat_mobile_app", desc: "Đăng tải và tìm kiếm cơ hội hợp tác kinh doanh trên App" },
   { name: "App: Gian hàng Marketplace", route: "/association/products", catId: "cat_mobile_app", desc: "Quảng bá sản phẩm, dịch vụ và giải pháp doanh nghiệp trên App" },
@@ -824,7 +824,7 @@ export function RbacPermissionMatrix({
       } catch {
         try {
           localStorage.removeItem(STORAGE_KEY);
-        } catch {}
+        } catch { }
       }
     }
     return (base || []).map((cat) => ({
@@ -868,10 +868,10 @@ export function RbacPermissionMatrix({
           setInitialCategoriesStr(JSON.stringify(normalized));
           try {
             localStorage.setItem(STORAGE_KEY, JSON.stringify(normalized));
-          } catch {}
+          } catch { }
         }
       })
-      .catch(() => {});
+      .catch(() => { });
     return () => {
       active = false;
     };
@@ -1039,7 +1039,7 @@ export function RbacPermissionMatrix({
       await fetchNestApi("/admin/permission-matrix", {
         method: "PUT",
         body: JSON.stringify({ categories, rows: categories }),
-      }).catch(() => {});
+      }).catch(() => { });
 
       if (typeof window !== "undefined") {
         window.dispatchEvent(new Event("role-changed"));
@@ -1124,7 +1124,7 @@ export function RbacPermissionMatrix({
         const restored = JSON.parse(initialCategoriesStr);
         setCategories(restored);
         toast.info("Đã hoàn tác các thay đổi trên ma trận.");
-      } catch {}
+      } catch { }
     }
   }, [initialCategoriesStr]);
 
@@ -1177,12 +1177,12 @@ export function RbacPermissionMatrix({
       await fetchNestApi("/admin/permission-matrix", {
         method: "PUT",
         body: JSON.stringify({ categories: normalized, rows: normalized }),
-      }).catch(() => {});
+      }).catch(() => { });
       if (typeof window !== "undefined") {
         window.dispatchEvent(new Event("crm_permissions_updated"));
         window.dispatchEvent(new Event("role-changed"));
       }
-    } catch {}
+    } catch { }
     toast.success("Đã khôi phục ma trận phân quyền về chuẩn vai trò hệ thống!");
   };
 
@@ -1311,7 +1311,7 @@ export function RbacPermissionMatrix({
       await fetchNestApi("/admin/permission-matrix", {
         method: "PUT",
         body: JSON.stringify({ categories: updated, rows: updated }),
-      }).catch(() => {});
+      }).catch(() => { });
 
       if (typeof window !== "undefined") {
         window.dispatchEvent(new Event("crm_permissions_updated"));
@@ -1589,7 +1589,7 @@ export function RbacPermissionMatrix({
     if (role.key === "member") {
       return (
         <span className="text-center">
-          HỘI VIÊN
+          Học viên
         </span>
       );
     }
@@ -1740,10 +1740,10 @@ export function RbacPermissionMatrix({
           <img className="h-12 w-auto object-contain drop-shadow-sm" src="/ceohn10-official-logo.png" alt="CEOHN10 logo" />
           <div className="inline-flex flex-col justify-start items-start gap-1">
             <div className="flex items-center gap-2">
-              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black tracking-wider uppercase bg-[#7C2D82] text-white">
+              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black tracking-wider uppercase bg-[#334155] text-white">
                 CEOHN10 GOVERNANCE
               </span>
-              <span className="text-xs text-purple-700 dark:text-purple-300 font-semibold">
+              <span className="text-xs text-slate-600 dark:text-slate-300 font-semibold">
                 Group Quản Trị &amp; Khởi Nghiệp
               </span>
             </div>
@@ -1751,16 +1751,16 @@ export function RbacPermissionMatrix({
               Phân Quyền Vai Trò &amp; Ban Chuyên Môn CEOHN10
             </div>
             <div className="justify-start text-slate-600 dark:text-slate-300 text-xs font-normal font-['Inter']">
-              Kiểm soát phân quyền phân hệ CRM và ứng dụng di động theo 4 Ban chuyên môn &amp; Hội viên
+              Kiểm soát phân quyền phân hệ CRM và ứng dụng di động theo 4 Ban chuyên môn &amp; Học viên
             </div>
           </div>
         </div>
       </div>
 
       {/* ── THANH TÌM KIẾM VÀ CÁC NÚT THAO TÁC ── */}
-      <div className="self-stretch rounded-[20px] shadow-[0px_2px_4px_0px_rgba(124,45,130,0.04)] border border-purple-100 dark:border-purple-900/40 bg-white dark:bg-slate-900 inline-flex flex-wrap justify-between items-center overflow-hidden p-2 gap-2">
-        <div className="w-[460px] max-w-full h-9 px-3 bg-[#FAF5FF] dark:bg-slate-800/80 rounded-xl border border-purple-200/60 dark:border-purple-900/40 flex justify-start items-center gap-2 overflow-hidden">
-          <Search className="size-4 text-purple-700 dark:text-purple-400 shrink-0" />
+      <div className="self-stretch rounded-[20px] shadow-xs border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 inline-flex flex-wrap justify-between items-center overflow-hidden p-2 gap-2">
+        <div className="w-[460px] max-w-full h-9 px-3 bg-slate-50 dark:bg-slate-800/80 rounded-xl border border-slate-200 dark:border-slate-700 flex justify-start items-center gap-2 overflow-hidden">
+          <Search className="size-4 text-slate-500 dark:text-slate-400 shrink-0" />
           <input
             type="text"
             value={searchTerm}
@@ -1789,7 +1789,7 @@ export function RbacPermissionMatrix({
           <button
             type="button"
             onClick={() => setAddFeatureOpen(true)}
-            className="h-9 px-4 bg-gradient-to-r from-[#7C2D82] via-[#9333EA] to-[#6B21A8] hover:opacity-95 text-white rounded-xl flex justify-center items-center gap-1.5 cursor-pointer transition shadow-sm font-bold text-xs"
+            className="h-9 px-4 bg-gradient-to-r from-[#334155] via-[#475569] to-[#1E293B] hover:opacity-95 text-white rounded-xl flex justify-center items-center gap-1.5 cursor-pointer transition shadow-sm font-bold text-xs"
           >
             <FolderPlus className="size-4" />
             <span>Thêm Chức Năng</span>
@@ -1803,7 +1803,7 @@ export function RbacPermissionMatrix({
               }
               setAddActionOpen(true);
             }}
-            className="h-9 px-4 bg-gradient-to-r from-[#7C2D82] via-[#9333EA] to-[#6B21A8] hover:opacity-95 text-white rounded-xl flex justify-center items-center gap-1.5 cursor-pointer transition shadow-sm font-bold text-xs"
+            className="h-9 px-4 bg-gradient-to-r from-[#334155] via-[#475569] to-[#1E293B] hover:opacity-95 text-white rounded-xl flex justify-center items-center gap-1.5 cursor-pointer transition shadow-sm font-bold text-xs"
           >
             <KeyRound className="size-4" />
             <span>Thêm Quyền</span>
@@ -1813,7 +1813,7 @@ export function RbacPermissionMatrix({
             type="button"
             onClick={handleResetDefault}
             title="Khôi phục mặc định ban đầu"
-            className="size-9 bg-[#FAF5FF] dark:bg-slate-800 rounded-xl border border-purple-200/60 dark:border-purple-800 text-purple-700 dark:text-purple-300 flex justify-center items-center hover:bg-purple-100 dark:hover:bg-slate-700 transition cursor-pointer"
+            className="size-9 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 flex justify-center items-center hover:bg-slate-100 dark:hover:bg-slate-700 transition cursor-pointer"
           >
             <RotateCcw className="size-4" />
           </button>
@@ -1821,22 +1821,20 @@ export function RbacPermissionMatrix({
       </div>
 
       {/* ── 2 TAB PHÂN QUYỀN CHUYÊN BIỆT: CRM RIÊNG & APP CEO HN10 RIÊNG ── */}
-      <div className="self-stretch flex flex-wrap items-center justify-between gap-3 border-b border-purple-100 dark:border-purple-900/40 pb-3">
+      <div className="self-stretch flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 dark:border-slate-800 pb-3">
         <div className="flex items-center gap-2">
           <button
             type="button"
             onClick={() => setMatrixTab("crm")}
-            className={`px-4 sm:px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm flex items-center gap-2 transition cursor-pointer ${
-              matrixTab === "crm"
-                ? "bg-gradient-to-r from-[#7C2D82] to-[#9333EA] text-white shadow-md shadow-purple-900/25"
-                : "bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-purple-50 dark:hover:bg-slate-750 border border-purple-100 dark:border-purple-900/40"
-            }`}
+            className={`px-4 sm:px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm flex items-center gap-2 transition cursor-pointer ${matrixTab === "crm"
+                ? "bg-gradient-to-r from-[#334155] to-[#475569] text-white shadow-md"
+                : "bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-750 border border-slate-200 dark:border-slate-800"
+              }`}
           >
             <Monitor className="size-4" />
             <span>PHÂN QUYỀN HỆ THỐNG CRM</span>
-            <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${
-              matrixTab === "crm" ? "bg-white/20 text-white" : "bg-purple-100/60 dark:bg-slate-700 text-purple-800 dark:text-purple-300"
-            }`}>
+            <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${matrixTab === "crm" ? "bg-white/20 text-white" : "bg-slate-100 dark:bg-slate-700 text-slate-800 dark:text-slate-300"
+              }`}>
               {crmCategories.reduce((acc, c) => acc + c.features.length, 0)} phân hệ
             </span>
           </button>
@@ -1844,32 +1842,29 @@ export function RbacPermissionMatrix({
           <button
             type="button"
             onClick={() => setMatrixTab("app")}
-            className={`px-4 sm:px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm flex items-center gap-2 transition cursor-pointer ${
-              matrixTab === "app"
-                ? "bg-gradient-to-r from-[#D61F69] to-[#9333EA] text-white shadow-md shadow-pink-900/25"
-                : "bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-pink-50 dark:hover:bg-slate-750 border border-purple-100 dark:border-purple-900/40"
-            }`}
+            className={`px-4 sm:px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm flex items-center gap-2 transition cursor-pointer ${matrixTab === "app"
+                ? "bg-gradient-to-r from-[#475569] to-[#64748B] text-white shadow-md"
+                : "bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-750 border border-slate-200 dark:border-slate-800"
+              }`}
           >
             <Smartphone className="size-4" />
             <span>PHÂN QUYỀN APP CEO HN10</span>
-            <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${
-              matrixTab === "app" ? "bg-white/20 text-white" : "bg-pink-100/60 dark:bg-slate-700 text-pink-800 dark:text-pink-300"
-            }`}>
+            <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${matrixTab === "app" ? "bg-white/20 text-white" : "bg-slate-100 dark:bg-slate-700 text-slate-800 dark:text-slate-300"
+              }`}>
               {appCategories.reduce((acc, c) => acc + c.features.length, 0)} chức năng
             </span>
           </button>
         </div>
 
         {/* BỘ CHUYỂN ĐỔI CHẾ ĐỘ XEM: THEO TỪNG VAI TRÒ (CHUẨN RBAC) VS BẢNG MA TRẬN TỔNG THỂ */}
-        <div className="flex items-center gap-1 p-1 bg-purple-50/90 dark:bg-slate-800 rounded-xl border border-purple-200/60 dark:border-purple-800">
+        <div className="flex items-center gap-1 p-1 bg-slate-100 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
           <button
             type="button"
             onClick={() => setViewMode("role_focused")}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
-              viewMode === "role_focused"
-                ? "bg-gradient-to-r from-[#7C2D82] to-[#9333EA] text-white shadow-xs"
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${viewMode === "role_focused"
+                ? "bg-gradient-to-r from-[#334155] to-[#475569] text-white shadow-xs"
                 : "text-muted-foreground hover:text-foreground"
-            }`}
+              }`}
           >
             <ShieldCheck className="size-3.5" />
             <span>Theo Từng Vai Trò (Chuẩn RBAC)</span>
@@ -1877,11 +1872,10 @@ export function RbacPermissionMatrix({
           <button
             type="button"
             onClick={() => setViewMode("matrix_grid")}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
-              viewMode === "matrix_grid"
-                ? "bg-gradient-to-r from-[#7C2D82] to-[#9333EA] text-white shadow-xs"
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${viewMode === "matrix_grid"
+                ? "bg-gradient-to-r from-[#334155] to-[#475569] text-white shadow-xs"
                 : "text-muted-foreground hover:text-foreground"
-            }`}
+              }`}
           >
             <FileBarChart className="size-3.5" />
             <span>Bảng Ma Trận Đối Chiếu</span>
@@ -1917,7 +1911,7 @@ export function RbacPermissionMatrix({
               type="button"
               onClick={handleSaveAll}
               disabled={saving}
-              className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-xl bg-gradient-to-r from-[#7C2D82] via-[#9333EA] to-[#6B21A8] hover:opacity-95 text-white font-bold text-xs transition shadow-xs cursor-pointer disabled:opacity-50"
+              className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-xl bg-gradient-to-r from-[#334155] via-[#475569] to-[#1E293B] hover:opacity-95 text-white font-bold text-xs transition shadow-xs cursor-pointer disabled:opacity-50"
             >
               <Save className="h-3.5 w-3.5 text-white" />
               <span>{saving ? "Đang lưu..." : "Lưu Thay Đổi"}</span>
@@ -1930,10 +1924,10 @@ export function RbacPermissionMatrix({
       {viewMode === "role_focused" ? (
         <div className="self-stretch grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
           {/* CỘT TRÁI (4 COLS): DANH SÁCH VAI TRÒ HỆ THỐNG */}
-          <div className="lg:col-span-4 rounded-2xl border border-purple-100 dark:border-purple-900/40 bg-white dark:bg-slate-900 p-4 space-y-3 shadow-xs sticky top-24">
-            <div className="flex items-center justify-between pb-2 border-b border-purple-100 dark:border-purple-900/30">
+          <div className="lg:col-span-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 space-y-3 shadow-xs sticky top-24">
+            <div className="flex items-center justify-between pb-2 border-b border-slate-200 dark:border-slate-800">
               <div className="flex items-center gap-2">
-                <Users className="size-4 text-[#7C2D82] dark:text-purple-400" />
+                <Users className="size-4 text-[#334155] dark:text-slate-400" />
                 <h3 className="text-xs font-black uppercase tracking-wider text-foreground">
                   Danh Sách Vai Trò ({orderedRoles.length})
                 </h3>
@@ -1984,20 +1978,18 @@ export function RbacPermissionMatrix({
                       key={role.key}
                       type="button"
                       onClick={() => setSelectedRoleKey(role.key)}
-                      className={`w-full text-left p-3 rounded-xl border transition-all cursor-pointer flex flex-col gap-1.5 ${
-                        isSelected
-                          ? "border-[#7C2D82] bg-purple-50 dark:bg-purple-950/40 shadow-xs ring-1 ring-[#7C2D82]/30"
-                          : "border-border/60 bg-card hover:bg-muted/40 hover:border-purple-200"
-                      }`}
+                      className={`w-full text-left p-3 rounded-xl border transition-all cursor-pointer flex flex-col gap-1.5 ${isSelected
+                          ? "border-[#334155] bg-slate-100 dark:bg-slate-800 shadow-xs ring-1 ring-slate-400/30"
+                          : "border-border/60 bg-card hover:bg-muted/40 hover:border-slate-300"
+                        }`}
                     >
                       <div className="flex items-center justify-between gap-2">
                         <div className="flex items-center gap-2 min-w-0">
                           <span
-                            className={`size-7 rounded-lg flex items-center justify-center text-xs font-black shrink-0 ${
-                              isSelected
-                                ? "bg-gradient-to-r from-[#7C2D82] to-[#9333EA] text-white"
+                            className={`size-7 rounded-lg flex items-center justify-center text-xs font-black shrink-0 ${isSelected
+                                ? "bg-gradient-to-r from-[#334155] to-[#475569] text-white"
                                 : "bg-muted text-muted-foreground"
-                            }`}
+                              }`}
                           >
                             {role.name.charAt(0)}
                           </span>
@@ -2006,13 +1998,12 @@ export function RbacPermissionMatrix({
                           </span>
                         </div>
                         <span
-                          className={`px-2 py-0.5 rounded-full text-[10px] font-bold shrink-0 ${
-                            pct >= 90
+                          className={`px-2 py-0.5 rounded-full text-[10px] font-bold shrink-0 ${pct >= 90
                               ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20"
                               : pct >= 50
-                              ? "bg-purple-500/10 text-purple-700 dark:text-purple-300 border border-purple-500/20"
-                              : "bg-muted text-muted-foreground"
-                          }`}
+                                ? "bg-slate-200 text-slate-800 dark:bg-slate-700 dark:text-slate-200 border border-slate-300"
+                                : "bg-muted text-muted-foreground"
+                            }`}
                         >
                           {grantedActs}/{totalActs} quyền ({pct}%)
                         </span>
@@ -2049,7 +2040,7 @@ export function RbacPermissionMatrix({
                   <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 p-5 space-y-4 shadow-xs">
                     <div className="flex flex-wrap items-center justify-between gap-3">
                       <div className="flex items-center gap-3">
-                        <div className="size-11 rounded-2xl bg-gradient-to-r from-[#7C2D82] via-[#9333EA] to-[#D61F69] text-white flex items-center justify-center font-black text-lg shadow-sm">
+                        <div className="size-11 rounded-2xl bg-gradient-to-r from-[#334155] via-[#475569] to-[#1E293B] text-white flex items-center justify-center font-black text-lg shadow-sm">
                           <ShieldCheck className="size-6" />
                         </div>
                         <div>
@@ -2070,7 +2061,7 @@ export function RbacPermissionMatrix({
                       <div className="text-right">
                         <div className="text-xs font-bold text-foreground">
                           Quyền hạn kích hoạt:{" "}
-                          <span className="text-[#7C2D82] dark:text-purple-300 font-black">
+                          <span className="text-[#334155] dark:text-slate-300 font-black">
                             {roleGrantedActs} / {roleTotalActs}
                           </span>
                         </div>
@@ -2124,11 +2115,10 @@ export function RbacPermissionMatrix({
                     <button
                       type="button"
                       onClick={() => setSelectedCategoryTab("all")}
-                      className={`px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer ${
-                        selectedCategoryTab === "all"
-                          ? "bg-gradient-to-r from-[#7C2D82] to-[#9333EA] text-white shadow-xs"
+                      className={`px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer ${selectedCategoryTab === "all"
+                          ? "bg-[#334155] text-white shadow-xs"
                           : "bg-card border border-border text-muted-foreground hover:bg-muted"
-                      }`}
+                        }`}
                     >
                       Tất cả ({currentTabCategories.length} nhóm)
                     </button>
@@ -2137,11 +2127,10 @@ export function RbacPermissionMatrix({
                         key={cat.id}
                         type="button"
                         onClick={() => setSelectedCategoryTab(cat.id)}
-                        className={`px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer ${
-                          selectedCategoryTab === cat.id
-                            ? "bg-gradient-to-r from-[#7C2D82] to-[#9333EA] text-white shadow-xs"
+                        className={`px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer ${selectedCategoryTab === cat.id
+                            ? "bg-[#334155] text-white shadow-xs"
                             : "bg-card border border-border text-muted-foreground hover:bg-muted"
-                        }`}
+                          }`}
                       >
                         {cat.name}
                       </button>
@@ -2187,11 +2176,10 @@ export function RbacPermissionMatrix({
                               <button
                                 type="button"
                                 onClick={() => handleToggleCategoryForRole(cat.id, activeRole.key)}
-                                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer flex items-center gap-1.5 ${
-                                  isAllCatGranted
+                                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer flex items-center gap-1.5 ${isAllCatGranted
                                     ? "bg-rose-500/10 text-rose-700 dark:text-rose-300 hover:bg-rose-500/20"
                                     : "bg-purple-600/10 text-purple-700 dark:text-purple-300 hover:bg-purple-600/20"
-                                }`}
+                                  }`}
                               >
                                 {isAllCatGranted ? (
                                   <>
@@ -2213,7 +2201,7 @@ export function RbacPermissionMatrix({
                                 <div key={feat.id} className="space-y-2">
                                   <div className="flex items-center justify-between text-xs font-bold text-foreground">
                                     <div className="flex items-center gap-2">
-                                      <span className="size-2 rounded-full bg-[#7C2D82]"></span>
+                                      <span className="size-2 rounded-full bg-[#334155]"></span>
                                       <span>{getSynchronizedFeatureName(feat.route, feat.name)}</span>
                                       {feat.route && (
                                         <span className="text-[10px] font-mono text-muted-foreground bg-muted px-1.5 py-0.2 rounded">
@@ -2233,18 +2221,16 @@ export function RbacPermissionMatrix({
                                           onClick={() =>
                                             handleTogglePermission(cat.id, feat.id, act.id, activeRole.key)
                                           }
-                                          className={`p-3 rounded-xl border transition-all cursor-pointer flex items-start justify-between gap-3 ${
-                                            isChecked
-                                              ? "border-purple-300 dark:border-purple-800 bg-purple-50/30 dark:bg-purple-950/20 shadow-xs"
+                                          className={`p-3 rounded-xl border transition-all cursor-pointer flex items-start justify-between gap-3 ${isChecked
+                                              ? "border-slate-300 dark:border-slate-700 bg-slate-100/60 dark:bg-slate-800/40 shadow-xs"
                                               : "border-border/60 bg-background/50 hover:bg-muted/30 opacity-75"
-                                          }`}
+                                            }`}
                                         >
                                           <div className="min-w-0 space-y-0.5">
                                             <div className="flex items-center gap-1.5">
                                               <span
-                                                className={`size-2 rounded-full ${
-                                                  isChecked ? "bg-emerald-500" : "bg-slate-400"
-                                                }`}
+                                                className={`size-2 rounded-full ${isChecked ? "bg-emerald-500" : "bg-slate-400"
+                                                  }`}
                                               ></span>
                                               <span className="text-xs font-bold text-foreground">
                                                 {act.name}
@@ -2260,13 +2246,12 @@ export function RbacPermissionMatrix({
 
                                           {/* Modern Toggle Switch */}
                                           <div
-                                            className={`w-10 h-6 shrink-0 rounded-full transition-colors p-0.5 flex items-center cursor-pointer ${
-                                              isChecked
-                                                ? "bg-gradient-to-r from-[#7C2D82] to-[#9333EA] justify-end"
+                                            className={`w-10 h-6 shrink-0 rounded-full transition-colors p-0.5 flex items-center cursor-pointer ${isChecked
+                                                ? "bg-gradient-to-r from-[#334155] to-[#475569] justify-end"
                                                 : "bg-slate-300 dark:bg-slate-700 justify-start"
-                                            }`}
+                                              }`}
                                           >
-                                            <div className="size-5 rounded-full bg-white shadow-sm flex items-center justify-center text-[10px] text-purple-700">
+                                            <div className="size-5 rounded-full bg-white shadow-sm flex items-center justify-center text-[10px] text-slate-700">
                                               {isChecked ? <Check className="size-3 stroke-[3]" /> : null}
                                             </div>
                                           </div>
@@ -2287,200 +2272,199 @@ export function RbacPermissionMatrix({
           </div>
         </div>
       ) : (
-        <div className="self-stretch relative bg-white dark:bg-slate-900 rounded-[20px] border border-purple-100 dark:border-purple-900/40 flex flex-col justify-start items-start overflow-x-auto shadow-xs">
-        {/* Hàng Header Bảng */}
-        <div className="w-full min-w-max h-24 bg-gradient-to-r from-[#FAF5FF] via-[#F3E8FF]/60 to-[#FAF5FF] dark:from-slate-800/80 dark:to-slate-800/40 border-b border-purple-100 dark:border-purple-900/40 inline-flex justify-start items-start">
-          <div className="sticky left-0 z-30 w-60 min-w-[240px] self-stretch pl-4 border-l border-r border-purple-100 dark:border-purple-900/40 flex justify-start items-center bg-[#FAF5FF] dark:bg-slate-800 shadow-[2px_0_5px_rgba(124,45,130,0.05)]">
-            <div className="justify-start text-purple-950 dark:text-purple-200 text-xs font-bold font-['Inter']">QUYỀN THAO TÁC</div>
-          </div>
+        <div className="self-stretch relative bg-white dark:bg-slate-900 rounded-[20px] border border-slate-200 dark:border-slate-800 flex flex-col justify-start items-start overflow-x-auto shadow-xs">
+          {/* Hàng Header Bảng */}
+          <div className="w-full min-w-max h-24 bg-gradient-to-r from-slate-50 via-slate-100/60 to-slate-50 dark:from-slate-800/80 dark:to-slate-800/40 border-b border-slate-200 dark:border-slate-800 inline-flex justify-start items-start">
+            <div className="sticky left-0 z-30 w-60 min-w-[240px] self-stretch pl-4 border-l border-r border-slate-200 dark:border-slate-800 flex justify-start items-center bg-slate-100 dark:bg-slate-800 shadow-[2px_0_5px_rgba(0,0,0,0.03)]">
+              <div className="justify-start text-slate-900 dark:text-slate-100 text-xs font-bold font-['Inter']">QUYỀN THAO TÁC</div>
+            </div>
 
-          {orderedRoles.map((col) => {
-            let totalActions = 0;
-            let activeCount = 0;
-            categories.forEach((cat) => {
-              (cat?.features || []).forEach((feat) => {
-                (feat?.actions || []).forEach((act) => {
-                  totalActions++;
-                  if (act.roles && act.roles[col.key]) activeCount++;
+            {orderedRoles.map((col) => {
+              let totalActions = 0;
+              let activeCount = 0;
+              categories.forEach((cat) => {
+                (cat?.features || []).forEach((feat) => {
+                  (feat?.actions || []).forEach((act) => {
+                    totalActions++;
+                    if (act.roles && act.roles[col.key]) activeCount++;
+                  });
                 });
               });
-            });
-            const isAllChecked = totalActions > 0 && activeCount === totalActions;
-            const colWidth = getRoleColWidth(col.key);
+              const isAllChecked = totalActions > 0 && activeCount === totalActions;
+              const colWidth = getRoleColWidth(col.key);
 
-            return (
-              <div
-                key={col.key}
-                className={`${colWidth} h-24 pt-2.5 pb-3 inline-flex flex-col justify-center items-center gap-4 overflow-hidden border-r border-purple-100 dark:border-purple-900/40`}
-              >
-                <div className="h-7 flex flex-col justify-center items-center gap-2.5">
-                  <div className="px-2.5 py-0.5 rounded-2xl inline-flex justify-center items-center">
-                    <div className="text-center text-[#7C2D82] dark:text-purple-300 text-xs font-bold font-['Inter'] leading-tight">
-                      {getRoleHeaderDisplay(col)}
+              return (
+                <div
+                  key={col.key}
+                  className={`${colWidth} h-24 pt-2.5 pb-3 inline-flex flex-col justify-center items-center gap-4 overflow-hidden border-r border-slate-200 dark:border-slate-800`}
+                >
+                  <div className="h-7 flex flex-col justify-center items-center gap-2.5">
+                    <div className="px-2.5 py-0.5 rounded-2xl inline-flex justify-center items-center">
+                      <div className="text-center text-[#334155] dark:text-slate-300 text-xs font-bold font-['Inter'] leading-tight">
+                        {getRoleHeaderDisplay(col)}
+                      </div>
                     </div>
                   </div>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => handleToggleColumnAll(col.key, col.shortName)}
-                  className="px-2 rounded-[3px] inline-flex justify-start items-center gap-1 cursor-pointer hover:opacity-80 transition"
-                >
-                  <img src="/icons/ceohn10_icon_1/square-check.svg" className="size-2.5" alt="check" />
-                  <div
-                    className={`${
-                      isAllChecked ? "text-[#7C2D82] dark:text-purple-300" : "text-slate-800 dark:text-slate-300"
-                    } text-[10px] font-semibold font-['Inter']`}
-                  >
-                    {isAllChecked ? "Bỏ chọn hết" : "Chọn tất cả"}
-                  </div>
-                </button>
-              </div>
-            );
-          })}
-
-          <div className="sticky right-0 z-30 min-w-[130px] self-stretch flex justify-center items-center bg-[#FAF5FF] dark:bg-slate-800 border-l border-purple-100 dark:border-purple-900/40 shadow-[-2px_0_5px_rgba(124,45,130,0.05)]">
-            <div className="justify-start text-purple-950 dark:text-purple-200 text-xs font-bold font-['Inter']">THAO TÁC</div>
-          </div>
-        </div>
-
-        {/* Các Chức Năng và Thao Tác Con Theo Từng Danh Mục Menu Sidebar */}
-        {currentTabCategories.map((cat) => {
-          const isCatExpanded = expandedNodes[cat.id] ?? true;
-
-          return (
-            <React.Fragment key={cat.id}>
-              {/* Tiêu đề Danh mục Sidebar (Category Group Banner: Royal Purple Gradient) */}
-              <div className="w-full min-w-max h-12 bg-gradient-to-r from-[#240E3E] via-[#3B1560] to-[#1E0B35] text-white border-y border-purple-800/60 inline-flex justify-between items-center px-4">
-                <div className="sticky left-0 z-20 flex items-center gap-2.5 bg-transparent pr-6">
                   <button
                     type="button"
-                    onClick={() => toggleExpand(cat.id)}
-                    className="flex items-center gap-2 cursor-pointer text-white hover:text-purple-200 font-bold transition"
+                    onClick={() => handleToggleColumnAll(col.key, col.shortName)}
+                    className="px-2 rounded-[3px] inline-flex justify-start items-center gap-1 cursor-pointer hover:opacity-80 transition"
                   >
-                    <ChevronDown className={`size-4 transition-transform ${isCatExpanded ? "" : "-rotate-90"}`} />
-                    <span className="text-xs font-black tracking-wider uppercase font-['Inter']">
-                      {cat.name}
-                    </span>
+                    <img src="/icons/ceohn10_icon_1/square-check.svg" className="size-2.5" alt="check" />
+                    <div
+                      className={`${isAllChecked ? "text-[#334155] dark:text-slate-300" : "text-slate-800 dark:text-slate-300"
+                        } text-[10px] font-semibold font-['Inter']`}
+                    >
+                      {isAllChecked ? "Bỏ chọn hết" : "Chọn tất cả"}
+                    </div>
                   </button>
-                  <span className="rounded-full bg-purple-400/20 text-purple-200 text-[10px] font-bold px-2 py-0.5 border border-purple-400/40">
-                    {(cat.features || []).length} phân hệ
-                  </span>
                 </div>
-              </div>
+              );
+            })}
 
-              {isCatExpanded &&
-                (cat.features || []).map((feat) => {
-                  const isFeatExpanded = expandedNodes[feat.id] ?? true;
+            <div className="sticky right-0 z-30 min-w-[130px] self-stretch flex justify-center items-center bg-slate-100 dark:bg-slate-800 border-l border-slate-200 dark:border-slate-800 shadow-[-2px_0_5px_rgba(0,0,0,0.03)]">
+              <div className="justify-start text-slate-900 dark:text-slate-100 text-xs font-bold font-['Inter']">THAO TÁC</div>
+            </div>
+          </div>
 
-                  return (
-                    <React.Fragment key={feat.id}>
-                      {/* Tiêu đề Chức năng (Nhóm nghiệp vụ) */}
-                      <div className="w-full min-w-max h-11 bg-[#FAF5FF]/70 dark:bg-slate-800/40 border-b border-purple-100 dark:border-purple-900/40 inline-flex justify-start items-center">
-                        <div className="sticky left-0 z-10 w-fit self-stretch pl-6 flex justify-start items-center gap-2.5 bg-[#FAF5FF]/95 dark:bg-slate-800/95 pr-6">
-                          <button
-                            type="button"
-                            onClick={() => toggleExpand(feat.id)}
-                            className="flex items-center gap-2 cursor-pointer hover:text-[#7C2D82] transition"
-                          >
-                            <img
-                              src="/icons/ceohn10_icon_1/chevron-down.svg"
-                              className={`size-2.5 transition-transform ${isFeatExpanded ? "" : "-rotate-90"}`}
-                              alt="toggle"
-                            />
-                            <div className="justify-start text-slate-900 dark:text-white text-xs font-bold font-['Inter']">
-                              {getSynchronizedFeatureName(feat.route, feat.name)}
+          {/* Các Chức Năng và Thao Tác Con Theo Từng Danh Mục Menu Sidebar */}
+          {currentTabCategories.map((cat) => {
+            const isCatExpanded = expandedNodes[cat.id] ?? true;
+
+            return (
+              <React.Fragment key={cat.id}>
+                {/* Tiêu đề Danh mục Sidebar (Category Group Banner: Executive Slate Gradient) */}
+                <div className="w-full min-w-max h-12 bg-gradient-to-r from-[#1E293B] via-[#334155] to-[#0F172A] text-white border-y border-slate-700 inline-flex justify-between items-center px-4">
+                  <div className="sticky left-0 z-20 flex items-center gap-2.5 bg-transparent pr-6">
+                    <button
+                      type="button"
+                      onClick={() => toggleExpand(cat.id)}
+                      className="flex items-center gap-2 cursor-pointer text-white hover:text-slate-300 font-bold transition"
+                    >
+                      <ChevronDown className={`size-4 transition-transform ${isCatExpanded ? "" : "-rotate-90"}`} />
+                      <span className="text-xs font-black tracking-wider uppercase font-['Inter']">
+                        {cat.name}
+                      </span>
+                    </button>
+                    <span className="rounded-full bg-slate-700/50 text-slate-300 text-[10px] font-bold px-2 py-0.5 border border-slate-600">
+                      {(cat.features || []).length} phân hệ
+                    </span>
+                  </div>
+                </div>
+
+                {isCatExpanded &&
+                  (cat.features || []).map((feat) => {
+                    const isFeatExpanded = expandedNodes[feat.id] ?? true;
+
+                    return (
+                      <React.Fragment key={feat.id}>
+                        {/* Tiêu đề Chức năng (Nhóm nghiệp vụ) */}
+                        <div className="w-full min-w-max h-11 bg-slate-50 dark:bg-slate-800/40 border-b border-slate-200 dark:border-slate-800 inline-flex justify-start items-center">
+                          <div className="sticky left-0 z-10 w-fit self-stretch pl-6 flex justify-start items-center gap-2.5 bg-slate-100 dark:bg-slate-800 pr-6">
+                            <button
+                              type="button"
+                              onClick={() => toggleExpand(feat.id)}
+                              className="flex items-center gap-2 cursor-pointer hover:text-slate-700 transition"
+                            >
+                              <img
+                                src="/icons/ceohn10_icon_1/chevron-down.svg"
+                                className={`size-2.5 transition-transform ${isFeatExpanded ? "" : "-rotate-90"}`}
+                                alt="toggle"
+                              />
+                              <div className="justify-start text-slate-900 dark:text-white text-xs font-bold font-['Inter']">
+                                {getSynchronizedFeatureName(feat.route, feat.name)}
+                              </div>
+                            </button>
+                            <div className="justify-start text-slate-500 text-[10px] font-medium font-['Inter']">
+                              ({(feat.actions || []).length} thao tác)
                             </div>
-                          </button>
-                          <div className="justify-start text-slate-500 text-[10px] font-medium font-['Inter']">
-                            ({(feat.actions || []).length} thao tác)
                           </div>
                         </div>
-                      </div>
 
-                      {/* Danh sách các Thao tác con */}
-                      {isFeatExpanded &&
-                        (feat.actions || []).map((action) => (
-                          <div
-                            key={action.id}
-                            className="w-full min-w-max h-10 border-b border-purple-50 dark:border-slate-800 inline-flex justify-start items-start hover:bg-purple-50/40 dark:hover:bg-slate-800/30 transition-colors"
-                          >
-                            <div className="sticky left-0 z-20 w-60 min-w-[240px] self-stretch pl-8 pr-4 border-r border-purple-100 dark:border-slate-800 flex justify-start items-center bg-white dark:bg-slate-900 shadow-[2px_0_5px_rgba(124,45,130,0.03)]">
-                              <div
-                                className="flex-1 justify-start text-slate-900 dark:text-slate-200 text-xs font-semibold font-['Inter'] leading-4 truncate"
-                                title={action.name}
-                              >
-                                {action.name}
+                        {/* Danh sách các Thao tác con */}
+                        {isFeatExpanded &&
+                          (feat.actions || []).map((action) => (
+                            <div
+                              key={action.id}
+                              className="w-full min-w-max h-10 border-b border-slate-100 dark:border-slate-800 inline-flex justify-start items-start hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors"
+                            >
+                              <div className="sticky left-0 z-20 w-60 min-w-[240px] self-stretch pl-8 pr-4 border-r border-slate-200 dark:border-slate-800 flex justify-start items-center bg-white dark:bg-slate-900 shadow-[2px_0_5px_rgba(0,0,0,0.02)]">
+                                <div
+                                  className="flex-1 justify-start text-slate-900 dark:text-slate-200 text-xs font-semibold font-['Inter'] leading-4 truncate"
+                                  title={action.name}
+                                >
+                                  {action.name}
+                                </div>
+                              </div>
+
+                              {orderedRoles.map((col) => {
+                                const isChecked = !!action.roles[col.key];
+                                const colWidth = getRoleColWidth(col.key);
+
+                                return (
+                                  <div
+                                    key={col.key}
+                                    className={`${colWidth} self-stretch bg-slate-50/50 dark:bg-slate-900/30 flex justify-center items-center border-r border-slate-100 dark:border-slate-800/50`}
+                                  >
+                                    <button
+                                      type="button"
+                                      onClick={() => handleTogglePermission(cat.id, feat.id, action.id, col.key)}
+                                      className="cursor-pointer"
+                                      title={`${isChecked ? "Bỏ quyền" : "Cấp quyền"} cho ${col.name}`}
+                                    >
+                                      {isChecked ? (
+                                        <div className="size-5 bg-gradient-to-r from-[#334155] to-[#475569] rounded-md shadow-xs flex justify-center items-center overflow-hidden">
+                                          <Check className="size-3 text-white stroke-[2.5]" />
+                                        </div>
+                                      ) : (
+                                        <div className="size-5 bg-white dark:bg-slate-800 rounded-md border border-slate-300 dark:border-slate-700" />
+                                      )}
+                                    </button>
+                                  </div>
+                                );
+                              })}
+
+                              <div className="sticky right-0 z-20 min-w-[130px] self-stretch flex justify-center items-center gap-1.5 bg-white dark:bg-slate-900 border-l border-slate-200 dark:border-slate-800 shadow-[-2px_0_5px_rgba(0,0,0,0.02)] px-2">
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setSelectedDetail({ action, featureName: getSynchronizedFeatureName(feat.route, feat.name), categoryName: cat.name });
+                                    setDetailModalOpen(true);
+                                  }}
+                                  className="inline-flex h-7 w-7 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-100 hover:text-slate-900 transition cursor-pointer dark:bg-slate-900 dark:border-slate-700 dark:text-slate-300"
+                                  title="Xem chi tiết"
+                                  aria-label="Xem chi tiết"
+                                >
+                                  <Eye className="h-3.5 w-3.5" strokeWidth={2.2} />
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => handleStartEditAction(cat.id, feat.id, action)}
+                                  className="inline-flex h-7 w-7 items-center justify-center rounded-lg border border-slate-200 bg-slate-100 text-[#334155] hover:bg-slate-200 transition cursor-pointer dark:bg-slate-800 dark:border-slate-700 dark:text-slate-300"
+                                  title="Chỉnh sửa thao tác"
+                                  aria-label="Chỉnh sửa thao tác"
+                                >
+                                  <Pencil className="h-3.5 w-3.5" strokeWidth={2.2} />
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => handleDeleteAction(cat.id, feat.id, action.id, action.name)}
+                                  className="inline-flex h-7 w-7 items-center justify-center rounded-lg border border-rose-200 bg-rose-50 text-rose-700 hover:bg-rose-100 hover:text-rose-800 transition cursor-pointer dark:bg-rose-950/50 dark:border-rose-800 dark:text-rose-300"
+                                  title="Xóa thao tác"
+                                  aria-label="Xóa thao tác"
+                                >
+                                  <Trash2 className="h-3.5 w-3.5" strokeWidth={2.2} />
+                                </button>
                               </div>
                             </div>
-
-                            {orderedRoles.map((col) => {
-                              const isChecked = !!action.roles[col.key];
-                              const colWidth = getRoleColWidth(col.key);
-
-                              return (
-                                <div
-                                  key={col.key}
-                                  className={`${colWidth} self-stretch bg-[#FAF5FF]/20 dark:bg-slate-900/30 flex justify-center items-center border-r border-purple-50 dark:border-slate-800/50`}
-                                >
-                                  <button
-                                    type="button"
-                                    onClick={() => handleTogglePermission(cat.id, feat.id, action.id, col.key)}
-                                    className="cursor-pointer"
-                                    title={`${isChecked ? "Bỏ quyền" : "Cấp quyền"} cho ${col.name}`}
-                                  >
-                                    {isChecked ? (
-                                      <div className="size-5 bg-gradient-to-r from-[#7C2D82] to-[#9333EA] rounded-md shadow-xs flex justify-center items-center overflow-hidden">
-                                        <Check className="size-3 text-white stroke-[2.5]" />
-                                      </div>
-                                    ) : (
-                                      <div className="size-5 bg-white dark:bg-slate-800 rounded-md border border-purple-200 dark:border-slate-700" />
-                                    )}
-                                  </button>
-                                </div>
-                              );
-                            })}
-
-                            <div className="sticky right-0 z-20 min-w-[130px] self-stretch flex justify-center items-center gap-1.5 bg-white dark:bg-slate-900 border-l border-purple-100 dark:border-slate-800 shadow-[-2px_0_5px_rgba(124,45,130,0.03)] px-2">
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  setSelectedDetail({ action, featureName: getSynchronizedFeatureName(feat.route, feat.name), categoryName: cat.name });
-                                  setDetailModalOpen(true);
-                                }}
-                                className="inline-flex h-7 w-7 items-center justify-center rounded-lg border border-purple-200 bg-white text-purple-700 hover:border-purple-300 hover:bg-purple-50 hover:text-purple-900 transition cursor-pointer dark:bg-slate-900 dark:border-slate-700 dark:text-purple-300"
-                                title="Xem chi tiết"
-                                aria-label="Xem chi tiết"
-                              >
-                                <Eye className="h-3.5 w-3.5" strokeWidth={2.2} />
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => handleStartEditAction(cat.id, feat.id, action)}
-                                className="inline-flex h-7 w-7 items-center justify-center rounded-lg border border-purple-200 bg-purple-50 text-[#7C2D82] hover:bg-purple-100 transition cursor-pointer dark:bg-purple-950/50 dark:border-purple-800 dark:text-purple-300"
-                                title="Chỉnh sửa thao tác"
-                                aria-label="Chỉnh sửa thao tác"
-                              >
-                                <Pencil className="h-3.5 w-3.5" strokeWidth={2.2} />
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => handleDeleteAction(cat.id, feat.id, action.id, action.name)}
-                                className="inline-flex h-7 w-7 items-center justify-center rounded-lg border border-rose-200 bg-rose-50 text-rose-700 hover:bg-rose-100 hover:text-rose-800 transition cursor-pointer dark:bg-rose-950/50 dark:border-rose-800 dark:text-rose-300"
-                                title="Xóa thao tác"
-                                aria-label="Xóa thao tác"
-                              >
-                                <Trash2 className="h-3.5 w-3.5" strokeWidth={2.2} />
-                              </button>
-                            </div>
-                          </div>
-                        ))}
-                    </React.Fragment>
-                  );
-                })}
-            </React.Fragment>
-          );
-        })}
-      </div>
+                          ))}
+                      </React.Fragment>
+                    );
+                  })}
+              </React.Fragment>
+            );
+          })}
+        </div>
       )}
 
       {/* ── MODAL 1: XEM CHI TIẾT QUYỀN / THAO TÁC CON ── */}
@@ -2786,9 +2770,8 @@ export function RbacPermissionMatrix({
                             [role.key]: !isChecked,
                           }))
                         }
-                        className={`flex items-center gap-1.5 p-2 rounded-xl border text-xs font-semibold transition cursor-pointer ${
-                          isChecked ? role.color : "border-border text-muted-foreground bg-muted/20"
-                        }`}
+                        className={`flex items-center gap-1.5 p-2 rounded-xl border text-xs font-semibold transition cursor-pointer ${isChecked ? role.color : "border-border text-muted-foreground bg-muted/20"
+                          }`}
                       >
                         <Check className={`h-3 w-3 stroke-[3] ${isChecked ? "opacity-100" : "opacity-0"}`} />
                         <span className="truncate">{role.shortName}</span>

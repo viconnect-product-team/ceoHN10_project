@@ -9,8 +9,7 @@ import { PrismaClient } from '@ceohn10/db';
 @Injectable()
 export class PrismaService
   extends PrismaClient
-  implements OnModuleInit, OnModuleDestroy
-{
+  implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(PrismaService.name);
 
   constructor() {
@@ -35,9 +34,9 @@ export class PrismaService
           updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
         );
       `,
-      ).catch(() => {});
+      ).catch(() => { });
 
-      // Đảm bảo các bảng lưu trữ tương tác Zalo OA và mapping hội viên luôn sẵn sàng
+      // Đảm bảo các bảng lưu trữ tương tác Zalo OA và mapping Học viên luôn sẵn sàng
       await this.$executeRawUnsafe(
         `
         CREATE TABLE IF NOT EXISTS public.zalo_subscribers (
@@ -77,7 +76,7 @@ export class PrismaService
         ALTER TABLE public.documents ADD COLUMN IF NOT EXISTS doc_scope TEXT DEFAULT 'association';
         ALTER TABLE public.documents ADD COLUMN IF NOT EXISTS enterprise_name TEXT;
       `,
-      ).catch(() => {});
+      ).catch(() => { });
     } catch (err: any) {
       this.logger.warn(
         `⚠️ [PrismaService] Chưa thể kết nối cơ sở dữ liệu khi khởi động (${err?.message || err}). Tiến trình sẽ tiếp tục chạy và tự động tái kết nối khi CSDL sẵn sàng.`,
@@ -88,6 +87,6 @@ export class PrismaService
   async onModuleDestroy() {
     try {
       await this.$disconnect();
-    } catch {}
+    } catch { }
   }
 }

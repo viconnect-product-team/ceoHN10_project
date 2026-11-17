@@ -16,7 +16,7 @@
 
 ### 1. Phần 1 (09h00 - 09h45): Báo cáo thuyết trình & Demo thực tế sản phẩm
 - ViConnect trình diễn trực tiếp Mobile App và Web CRM trên máy tính và điện thoại.
-- Kiểm tra luồng Sổ quỹ Thông tư 200, Điểm danh sự kiện QR, Thẻ hội viên số, Gian hàng B2B.
+- Kiểm tra luồng Sổ quỹ Thông tư 200, Điểm danh sự kiện QR, Thẻ Học viên số, Gian hàng B2B.
 - Dữ liệu hoàn toàn lấy trực tiếp từ Database PostgreSQL thật.
 
 ### 2. Phần 2 (09h45 - 11h45): Trao đổi, chất vấn kỹ thuật & Nhận xét trải nghiệm
@@ -33,4 +33,4 @@
 ## II. Nghị Quyết Ban Điều Hành
 1. **Nghiệm thu toàn diện:** Chấp thuận nghiệm thu hệ thống công nghệ số CEO HN10 giai đoạn 1.
 2. **Kế hoạch phát hành:** ViConnect hoàn tất đóng gói và phát hành ứng dụng lên Google Play & App Store.
-3. **Đào tạo & Ứng dụng:** Tổ chức buổi tập huấn sử dụng cho toàn thể hội viên và đưa vào vận hành chính thức trong kỳ sinh hoạt hiệp hội sắp tới.
+3. **Đào tạo & Ứng dụng:** Tổ chức buổi tập huấn sử dụng cho toàn thể Học viên và đưa vào vận hành chính thức trong kỳ sinh hoạt hiệp hội sắp tới.

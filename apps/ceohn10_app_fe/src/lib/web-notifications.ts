@@ -1,6 +1,6 @@
 /**
  * Quản lý Web Push & Hệ thống Thông Báo Thiết Bị CLB Doanh Nhân CEO HN10 (HanoiBA)
- * Cho phép hiển thị thông báo ra ngoài màn hình thiết bị khi hội viên thoát app hoặc ẩn trình duyệt.
+ * Cho phép hiển thị thông báo ra ngoài màn hình thiết bị khi Học viên thoát app hoặc ẩn trình duyệt.
  */
 
 export async function requestNotificationPermission(): Promise<NotificationPermission> {
@@ -37,7 +37,7 @@ export interface SystemNotificationOptions {
 
 /**
  * Bắn thông báo ra ngoài app (hệ điều hành / màn hình khóa / khay thông báo)
- * Hoạt động cả khi hội viên đang ở ứng dụng khác hoặc thoát app ra màn hình chính.
+ * Hoạt động cả khi Học viên đang ở ứng dụng khác hoặc thoát app ra màn hình chính.
  */
 export async function triggerSystemNotification(
   title: string,
@@ -110,6 +110,6 @@ export function syncAuthToServiceWorker(userId: string | null, token: string | n
         userId,
         token,
       });
-    }).catch(() => {});
+    }).catch(() => { });
   }
 }

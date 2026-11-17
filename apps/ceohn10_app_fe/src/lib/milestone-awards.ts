@@ -7,11 +7,11 @@
 export interface MilestoneAward {
   id: string;
   category:
-    | "top_referrals"
-    | "top_revenue"
-    | "top_connect"
-    | "top_opportunities"
-    | "top_events_meetings";
+  | "top_referrals"
+  | "top_revenue"
+  | "top_connect"
+  | "top_opportunities"
+  | "top_events_meetings";
   categoryName: string;
   targetCount: number; // Mốc số lượng, ví dụ: 10, 25, 50
   targetUnit: string; // "người giới thiệu", "kết nối", "cơ hội", "buổi họp", "triệu VNĐ"
@@ -26,7 +26,7 @@ export interface MilestoneAward {
 const STORAGE_AWARDS = "vba_milestone_awards";
 
 export const DEFAULT_MILESTONE_AWARDS: MilestoneAward[] = [
-  // 1. Giới thiệu Hội Viên
+  // 1. Giới thiệu Học viên
   {
     id: "award-ref-10",
     category: "top_referrals",
@@ -34,7 +34,7 @@ export const DEFAULT_MILESTONE_AWARDS: MilestoneAward[] = [
     targetCount: 10,
     targetUnit: "người",
     awardName: "Đại Sứ Kết Nối Đồng Niên",
-    awardDescription: "Tặng Voucher Ưu đãi 5.000.000đ áp dụng tại tất cả doanh nghiệp hội viên",
+    awardDescription: "Tặng Voucher Ưu đãi 5.000.000đ áp dụng tại tất cả doanh nghiệp Học viên",
     rewardType: "voucher",
     rewardValueStr: "Voucher B2B 5.000.000đ",
     status: "active",
@@ -102,7 +102,7 @@ export const DEFAULT_MILESTONE_AWARDS: MilestoneAward[] = [
     categoryName: "Kết Nối Mạng Lưới 1-on-1",
     targetCount: 20,
     targetUnit: "cuộc gặp 1-on-1",
-    awardName: "Hội Viên Kết Nối Năng Động",
+    awardName: "Học viên Kết Nối Năng Động",
     awardDescription: "Tặng Combo Voucher Coffee & Teabreak tại các điểm hẹn liên kết",
     rewardType: "voucher",
     rewardValueStr: "Combo Voucher Teabreak 1.000.000đ",
@@ -132,7 +132,7 @@ export const DEFAULT_MILESTONE_AWARDS: MilestoneAward[] = [
     categoryName: "Tham Gia Sự Kiện & Họp Ban",
     targetCount: 15,
     targetUnit: "sự kiện",
-    awardName: "Hội Viên Gắn Kết Xuất Sắc",
+    awardName: "Học viên Gắn Kết Xuất Sắc",
     awardDescription: "Thẻ VIP ưu tiên bàn đại biểu danh dự tại mọi sự kiện của CLB",
     rewardType: "badge",
     rewardValueStr: "Thẻ VIP Đại biểu Danh dự",
@@ -170,7 +170,7 @@ export function saveMilestoneAward(award: MilestoneAward): void {
   try {
     localStorage.setItem(STORAGE_AWARDS, JSON.stringify(updated));
     window.dispatchEvent(new CustomEvent("vba_milestone_awards_updated", { detail: award }));
-  } catch {}
+  } catch { }
 }
 
 export function deleteMilestoneAward(id: string): void {
@@ -179,7 +179,7 @@ export function deleteMilestoneAward(id: string): void {
   try {
     localStorage.setItem(STORAGE_AWARDS, JSON.stringify(updated));
     window.dispatchEvent(new CustomEvent("vba_milestone_awards_updated", { detail: { id, deleted: true } }));
-  } catch {}
+  } catch { }
 }
 
 export function getAwardsByCategory(

@@ -31,7 +31,7 @@ export function getMemberDriveConfig(): MemberDriveConfig | null {
   try {
     const raw = localStorage.getItem(MEMBER_DRIVE_STORAGE_KEY);
     if (raw) return JSON.parse(raw);
-  } catch {}
+  } catch { }
   return null;
 }
 
@@ -124,7 +124,7 @@ export function MemberGoogleDriveSyncModal({
       toast.error("Vui lòng dán liên kết tài liệu Google Drive hợp lệ!");
       return;
     }
-    const finalName = importName.trim() || "Tài liệu Google Drive Hội viên";
+    const finalName = importName.trim() || "Tài liệu Google Drive Học viên";
     if (onImportFromDrive) {
       onImportFromDrive({
         name: finalName,
@@ -170,11 +170,10 @@ export function MemberGoogleDriveSyncModal({
             <button
               type="button"
               onClick={() => setActiveTab("sync")}
-              className={`pb-2.5 transition border-b-2 cursor-pointer ${
-                activeTab === "sync"
+              className={`pb-2.5 transition border-b-2 cursor-pointer ${activeTab === "sync"
                   ? "border-[#003B95] text-[#003B95] dark:border-blue-400 dark:text-blue-400"
                   : "border-transparent text-slate-500 hover:text-slate-800"
-              }`}
+                }`}
             >
               Chuyển Về Drive Cá Nhân
             </button>
@@ -182,22 +181,20 @@ export function MemberGoogleDriveSyncModal({
           <button
             type="button"
             onClick={() => setActiveTab("import")}
-            className={`pb-2.5 transition border-b-2 cursor-pointer ${
-              activeTab === "import"
+            className={`pb-2.5 transition border-b-2 cursor-pointer ${activeTab === "import"
                 ? "border-[#003B95] text-[#003B95] dark:border-blue-400 dark:text-blue-400"
                 : "border-transparent text-slate-500 hover:text-slate-800"
-            }`}
+              }`}
           >
             Nạp Từ Google Drive
           </button>
           <button
             type="button"
             onClick={() => setActiveTab("link")}
-            className={`pb-2.5 transition border-b-2 cursor-pointer ${
-              activeTab === "link"
+            className={`pb-2.5 transition border-b-2 cursor-pointer ${activeTab === "link"
                 ? "border-[#003B95] text-[#003B95] dark:border-blue-400 dark:text-blue-400"
                 : "border-transparent text-slate-500 hover:text-slate-800"
-            }`}
+              }`}
           >
             Cấu Hình Tài Khoản Drive
           </button>
@@ -257,7 +254,7 @@ export function MemberGoogleDriveSyncModal({
           {activeTab === "import" && (
             <div className="space-y-4 text-xs">
               <p className="text-slate-500 leading-relaxed">
-                Dán đường dẫn tài liệu từ Google Drive của bạn (Google Docs, Sheets, PDF, Thư mục chia sẻ). Hệ thống sẽ tự động đồng bộ liên kết để toàn thể hội viên hoặc ban chuyên môn có thể truy cập ngay.
+                Dán đường dẫn tài liệu từ Google Drive của bạn (Google Docs, Sheets, PDF, Thư mục chia sẻ). Hệ thống sẽ tự động đồng bộ liên kết để toàn thể Học viên hoặc ban chuyên môn có thể truy cập ngay.
               </p>
 
               <div className="space-y-1.5">

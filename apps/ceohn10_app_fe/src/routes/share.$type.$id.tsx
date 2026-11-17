@@ -74,7 +74,7 @@ export function detectExternalPlatform(): string {
     if (ref.includes("facebook.com") || ref.includes("fb.me")) return "Facebook";
     if (ref.includes("zalo.me") || ref.includes("chat.zalo")) return "Zalo";
     if (ref.includes("t.me") || ref.includes("telegram")) return "Telegram";
-  } catch {}
+  } catch { }
   return "Web / Trình duyệt ngoài";
 }
 
@@ -103,13 +103,13 @@ export function recordExternalShareClick(
     clicks.unshift(clickRecord);
     localStorage.setItem("vba_external_share_clicks", JSON.stringify(clicks.slice(0, 200)));
     window.dispatchEvent(new CustomEvent("vba_share_clicks_updated"));
-  } catch {}
+  } catch { }
 
   // Gửi API backend nếu khả dụng
   fetchNestApi("/analytics/share-click", {
     method: "POST",
     body: JSON.stringify(clickRecord),
-  }).catch(() => {});
+  }).catch(() => { });
 }
 
 function PublicSharePage() {
@@ -180,7 +180,7 @@ function PublicSharePage() {
               type: "opportunity",
               title: found.name || found.title || "Sản phẩm B2B",
               subtitle: found.category || "Sàn Thương Mại CEO HN10",
-              content: found.description || "Sản phẩm / Dịch vụ tiêu biểu từ Hội viên Doanh nhân CEO HN10.",
+              content: found.description || "Sản phẩm / Dịch vụ tiêu biểu từ Học viên Doanh nhân CEO HN10.",
               image: found.image_url || found.imageUrl || (Array.isArray(found.image_urls) ? found.image_urls[0] : undefined),
               authorCompany: found.company,
               value: Number(found.member_price || found.price) || undefined,
@@ -195,7 +195,7 @@ function PublicSharePage() {
             setItem({
               id: found.id,
               type: "post",
-              title: found.title || `Bài viết từ ${found.authorName || "Hội viên CEO HN10"}`,
+              title: found.title || `Bài viết từ ${found.authorName || "Học viên CEO HN10"}`,
               subtitle: "Diễn đàn & Mạng lưới CEO HN10",
               content: found.content || "",
               image: Array.isArray(found.images) && found.images.length > 0 ? found.images[0] : undefined,
@@ -216,7 +216,7 @@ function PublicSharePage() {
             type: (type as any) || "opportunity",
             title: qTitle,
             subtitle: qCompany ? `Doanh nghiệp: ${qCompany}` : "Hệ Sinh Thái Doanh Nhân CEO HN10",
-            content: qDesc || "Bấm vào để xem chi tiết và kết nối trực tiếp với hội viên CEO HN10.",
+            content: qDesc || "Bấm vào để xem chi tiết và kết nối trực tiếp với Học viên CEO HN10.",
             image: qImage || undefined,
             authorCompany: qCompany || undefined,
             value: qPrice ? Number(qPrice) : undefined,
@@ -231,8 +231,8 @@ function PublicSharePage() {
             type === "event"
               ? "Diễn Đàn Doanh Nhân CEO HN10: Tiên Phong Đổi Mới 2026"
               : type === "opportunity"
-              ? "Cơ Hội Hợp Tác Chuỗi Cung Ứng Vật Liệu Xây Dựng & B2B"
-              : "Bản Tin Kinh Doanh & Chia Sẻ Kết Nối Giao Thương Tuần";
+                ? "Cơ Hội Hợp Tác Chuỗi Cung Ứng Vật Liệu Xây Dựng & B2B"
+                : "Bản Tin Kinh Doanh & Chia Sẻ Kết Nối Giao Thương Tuần";
 
           setItem({
             id,
@@ -270,14 +270,14 @@ function PublicSharePage() {
     try {
       sessionStorage.setItem("vba_external_source", platform);
       sessionStorage.setItem("vba_external_redirect_item", JSON.stringify(item));
-    } catch {}
+    } catch { }
 
     const targetUrl =
       item.type === "event"
         ? `/association/events`
         : item.type === "opportunity"
-        ? `/association/opportunities`
-        : `/association/messages?tab=feed`;
+          ? `/association/opportunities`
+          : `/association/messages?tab=feed`;
 
     toast.info("Đang chuyển tiếp đến màn hình đăng nhập...", {
       description: `Nguồn chia sẻ: ${platform}`,
@@ -397,7 +397,7 @@ function PublicSharePage() {
                   </div>
                   <div className="min-w-0">
                     <p className="text-xs font-bold text-white truncate">{item.authorName}</p>
-                    <p className="text-[11px] text-slate-400 truncate">{item.authorCompany || "Hội viên CLB CEO HN10"}</p>
+                    <p className="text-[11px] text-slate-400 truncate">{item.authorCompany || "Học viên CLB CEO HN10"}</p>
                   </div>
                 </div>
               )}
@@ -438,7 +438,7 @@ function PublicSharePage() {
                 <div className="rounded-2xl border border-amber-400/30 bg-amber-500/10 p-4 space-y-2">
                   <div className="flex items-center gap-2 text-amber-300 font-bold text-xs uppercase tracking-wider">
                     <ShieldCheck className="size-4 text-amber-400" />
-                    <span>Khu Vực Dành Riêng Cho Hội Viên Doanh Nhân</span>
+                    <span>Khu Vực Dành Riêng Cho Học viên Doanh Nhân</span>
                   </div>
                   <p className="text-[12px] text-slate-300 leading-relaxed">
                     Để xem toàn bộ tài liệu đính kèm, danh sách đại biểu tham gia hoặc liên hệ trực tiếp với tác giả, vui lòng bấm nút bên dưới để đăng nhập vào ứng dụng Hiệp hội.
@@ -463,7 +463,7 @@ function PublicSharePage() {
                       onClick={handleNavigateToLogin}
                       className="w-full py-2.5 rounded-xl border border-blue-500/40 bg-blue-600/20 hover:bg-blue-600/30 text-blue-200 font-semibold text-xs transition flex items-center justify-center gap-2 cursor-pointer"
                     >
-                      <span>Hội viên CLB CEO HN10? Đăng nhập app tại đây</span>
+                      <span>Học viên CLB CEO HN10? Đăng nhập app tại đây</span>
                     </button>
                   </>
                 ) : (

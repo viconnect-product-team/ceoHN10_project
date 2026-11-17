@@ -74,7 +74,7 @@ export const CeoCalendarAlarmModal: React.FC<CeoCalendarAlarmModalProps> = ({
     setAlarms(newAlarms);
     try {
       localStorage.setItem("vba_calendar_alarms", JSON.stringify(newAlarms));
-    } catch {}
+    } catch { }
   };
 
   // Compile calendar events and meetings
@@ -268,7 +268,7 @@ export const CeoCalendarAlarmModal: React.FC<CeoCalendarAlarmModalProps> = ({
             </span>
             <div>
               <h3 className="text-sm font-black uppercase tracking-wide flex items-center gap-1.5">
-                <span>Lịch &amp; Báo Thức Hội Viên</span>
+                <span>Lịch &amp; Báo Thức Học viên</span>
                 <span className="px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 text-[10px] font-black">
                   {activeAlarmsCount} Đang Bật
                 </span>
@@ -294,11 +294,10 @@ export const CeoCalendarAlarmModal: React.FC<CeoCalendarAlarmModalProps> = ({
             <button
               type="button"
               onClick={() => setViewMode("grid")}
-              className={`flex-1 py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer ${
-                viewMode === "grid"
+              className={`flex-1 py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer ${viewMode === "grid"
                   ? "bg-[#003B95] text-white shadow-xs font-black"
                   : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
-              }`}
+                }`}
             >
               <CalendarIcon className="size-3.5" />
               <span>📅 Dạng Lưới</span>
@@ -306,11 +305,10 @@ export const CeoCalendarAlarmModal: React.FC<CeoCalendarAlarmModalProps> = ({
             <button
               type="button"
               onClick={() => setViewMode("list")}
-              className={`flex-1 py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer ${
-                viewMode === "list"
+              className={`flex-1 py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer ${viewMode === "list"
                   ? "bg-[#003B95] text-white shadow-xs font-black"
                   : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
-              }`}
+                }`}
             >
               <Clock className="size-3.5" />
               <span>📋 Dạng Danh Sách ({allScheduleItems.length})</span>
@@ -357,18 +355,16 @@ export const CeoCalendarAlarmModal: React.FC<CeoCalendarAlarmModalProps> = ({
                       key={item.dateStr}
                       type="button"
                       onClick={() => setSelectedDate(item.dateStr)}
-                      className={`h-9 rounded-xl flex flex-col items-center justify-center relative transition cursor-pointer text-xs font-bold ${
-                        isSelected
+                      className={`h-9 rounded-xl flex flex-col items-center justify-center relative transition cursor-pointer text-xs font-bold ${isSelected
                           ? "bg-[#003B95] text-white shadow-md font-black"
                           : "hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300"
-                      }`}
+                        }`}
                     >
                       <span>{item.dayNum}</span>
                       {item.hasEvents && (
                         <span
-                          className={`size-1.5 rounded-full absolute bottom-1 ${
-                            isSelected ? "bg-amber-400" : "bg-red-500"
-                          }`}
+                          className={`size-1.5 rounded-full absolute bottom-1 ${isSelected ? "bg-amber-400" : "bg-red-500"
+                            }`}
                         />
                       )}
                     </button>
@@ -415,19 +411,18 @@ export const CeoCalendarAlarmModal: React.FC<CeoCalendarAlarmModalProps> = ({
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-1.5 flex-wrap">
                             <span
-                              className={`px-2 py-0.5 rounded-full text-[9.5px] font-black uppercase ${
-                                item.type === "event"
+                              className={`px-2 py-0.5 rounded-full text-[9.5px] font-black uppercase ${item.type === "event"
                                   ? "bg-red-500/15 text-red-600 dark:text-red-400"
                                   : item.type === "meeting_1on1"
-                                  ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400"
-                                  : "bg-[#003B95]/15 text-[#003B95] dark:text-blue-400"
-                              }`}
+                                    ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400"
+                                    : "bg-[#003B95]/15 text-[#003B95] dark:text-blue-400"
+                                }`}
                             >
                               {item.type === "event"
                                 ? "Sự kiện CLB"
                                 : item.type === "meeting_1on1"
-                                ? "Kết nối B2B 1-1"
-                                : "Họp Ban"}
+                                  ? "Kết nối B2B 1-1"
+                                  : "Họp Ban"}
                             </span>
                             <span className="text-xs font-bold text-amber-600 dark:text-amber-400 flex items-center gap-1">
                               <Clock className="size-3" />
@@ -447,11 +442,10 @@ export const CeoCalendarAlarmModal: React.FC<CeoCalendarAlarmModalProps> = ({
                         <button
                           type="button"
                           onClick={() => handleToggleAlarm(item.id, item.alarmEnabled)}
-                          className={`px-3 py-1.5 rounded-xl flex items-center gap-1.5 transition active:scale-95 cursor-pointer shadow-xs text-xs font-bold ${
-                            item.alarmEnabled
+                          className={`px-3 py-1.5 rounded-xl flex items-center gap-1.5 transition active:scale-95 cursor-pointer shadow-xs text-xs font-bold ${item.alarmEnabled
                               ? "bg-emerald-600 text-white hover:bg-emerald-700"
                               : "bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-300"
-                          }`}
+                            }`}
                           title={item.alarmEnabled ? "Nhấn để bỏ nhắc" : "Nhấn để bật nhắc"}
                         >
                           <Bell className={`size-3.5 ${item.alarmEnabled ? "fill-white" : ""}`} />
@@ -476,11 +470,10 @@ export const CeoCalendarAlarmModal: React.FC<CeoCalendarAlarmModalProps> = ({
                                 key={lead.min}
                                 type="button"
                                 onClick={() => handleChangeLeadMinutes(item.id, lead.min)}
-                                className={`px-2 py-0.5 rounded-lg text-[10.5px] font-bold transition cursor-pointer border ${
-                                  item.alarmLeadMinutes === lead.min
+                                className={`px-2 py-0.5 rounded-lg text-[10.5px] font-bold transition cursor-pointer border ${item.alarmLeadMinutes === lead.min
                                     ? "bg-amber-400 text-slate-950 border-amber-300 font-black"
                                     : "bg-white dark:bg-slate-700 text-slate-600 dark:text-slate-300 border-slate-300 dark:border-slate-600"
-                                }`}
+                                  }`}
                               >
                                 {lead.label}
                               </button>
@@ -539,19 +532,18 @@ export const CeoCalendarAlarmModal: React.FC<CeoCalendarAlarmModalProps> = ({
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-1.5 flex-wrap">
                           <span
-                            className={`px-2 py-0.5 rounded-full text-[9.5px] font-black uppercase ${
-                              item.type === "event"
+                            className={`px-2 py-0.5 rounded-full text-[9.5px] font-black uppercase ${item.type === "event"
                                 ? "bg-red-500/15 text-red-600 dark:text-red-400"
                                 : item.type === "meeting_1on1"
-                                ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400"
-                                : "bg-[#003B95]/15 text-[#003B95] dark:text-blue-400"
-                            }`}
+                                  ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400"
+                                  : "bg-[#003B95]/15 text-[#003B95] dark:text-blue-400"
+                              }`}
                           >
                             {item.type === "event"
                               ? "Sự kiện CLB"
                               : item.type === "meeting_1on1"
-                              ? "Kết nối B2B 1-1"
-                              : "Họp Ban"}
+                                ? "Kết nối B2B 1-1"
+                                : "Họp Ban"}
                           </span>
                           <span className="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1">
                             <CalendarIcon className="size-3 text-[#003B95]" />
@@ -575,11 +567,10 @@ export const CeoCalendarAlarmModal: React.FC<CeoCalendarAlarmModalProps> = ({
                       <button
                         type="button"
                         onClick={() => handleToggleAlarm(item.id, item.alarmEnabled)}
-                        className={`px-3 py-1.5 rounded-xl flex items-center gap-1.5 transition active:scale-95 cursor-pointer shadow-xs text-xs font-bold shrink-0 ${
-                          item.alarmEnabled
+                        className={`px-3 py-1.5 rounded-xl flex items-center gap-1.5 transition active:scale-95 cursor-pointer shadow-xs text-xs font-bold shrink-0 ${item.alarmEnabled
                             ? "bg-emerald-600 text-white hover:bg-emerald-700"
                             : "bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-300"
-                        }`}
+                          }`}
                         title={item.alarmEnabled ? "Nhấn để bỏ nhắc" : "Nhấn để bật nhắc"}
                       >
                         <Bell className={`size-3.5 ${item.alarmEnabled ? "fill-white" : ""}`} />
@@ -604,11 +595,10 @@ export const CeoCalendarAlarmModal: React.FC<CeoCalendarAlarmModalProps> = ({
                               key={lead.min}
                               type="button"
                               onClick={() => handleChangeLeadMinutes(item.id, lead.min)}
-                              className={`px-2 py-0.5 rounded-lg text-[10.5px] font-bold transition cursor-pointer border ${
-                                item.alarmLeadMinutes === lead.min
+                              className={`px-2 py-0.5 rounded-lg text-[10.5px] font-bold transition cursor-pointer border ${item.alarmLeadMinutes === lead.min
                                   ? "bg-amber-400 text-slate-950 border-amber-300 font-black"
                                   : "bg-white dark:bg-slate-700 text-slate-600 dark:text-slate-300 border-slate-300 dark:border-slate-600"
-                              }`}
+                                }`}
                             >
                               {lead.label}
                             </button>

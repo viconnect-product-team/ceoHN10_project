@@ -5,13 +5,13 @@
 ## I. TỔNG QUAN & LỢI THẾ CHIẾN LƯỢC CỦA ZALO MINI APP
 
 ### 1. Zalo Mini App là gì?
-**Zalo Mini App (ZMA)** là ứng dụng chạy trực tiếp bên trong nền tảng Zalo trên cả hai hệ điều hành iOS và Android. Hội viên của CLB Doanh Nhân CEO HN10 không cần phải vào Apple App Store hay Google Play Store để tải về, không tốn dung lượng bộ nhớ điện thoại, và có thể truy cập ngay lập tức chỉ với 1 cú chạm hoặc 1 lần quét mã QR.
+**Zalo Mini App (ZMA)** là ứng dụng chạy trực tiếp bên trong nền tảng Zalo trên cả hai hệ điều hành iOS và Android. Học viên của CLB Doanh Nhân CEO HN10 không cần phải vào Apple App Store hay Google Play Store để tải về, không tốn dung lượng bộ nhớ điện thoại, và có thể truy cập ngay lập tức chỉ với 1 cú chạm hoặc 1 lần quét mã QR.
 
-### 2. Vì sao Zalo Mini App là kênh then chốt cho Hội viên Doanh nhân?
-1. **Thói quen 100% Doanh nhân Việt Nam**: Toàn bộ hội viên CEO HN10 đều sử dụng Zalo hàng ngày để giao tiếp, kết nối đối tác và làm việc.
-2. **Đăng nhập 1 chạm không cần mật khẩu**: Hội viên bấm "Cho phép", hệ thống tự động nhận diện số điện thoại đăng ký Zalo và khớp nối ngay với hồ sơ hội viên trên CSDL PostgreSQL của CLB CEO HN10.
+### 2. Vì sao Zalo Mini App là kênh then chốt cho Học viên Doanh nhân?
+1. **Thói quen 100% Doanh nhân Việt Nam**: Toàn bộ Học viên CEO HN10 đều sử dụng Zalo hàng ngày để giao tiếp, kết nối đối tác và làm việc.
+2. **Đăng nhập 1 chạm không cần mật khẩu**: Học viên bấm "Cho phép", hệ thống tự động nhận diện số điện thoại đăng ký Zalo và khớp nối ngay với hồ sơ Học viên trên CSDL PostgreSQL của CLB CEO HN10.
 3. **Check-in Sự kiện & Caravan tức thì**: Sử dụng trực tiếp Camera Native của Zalo để quét QR Code vé sự kiện với tốc độ phản hồi tính bằng mili-giây.
-4. **Kết nối Giao thương B2B trực tiếp**: Khi tìm thấy đối tác tiềm năng trên Danh bạ CEO HN10, hội viên có thể bấm nút "Mở Chat Zalo" để nhắn tin 1-1 ngay trên Zalo.
+4. **Kết nối Giao thương B2B trực tiếp**: Khi tìm thấy đối tác tiềm năng trên Danh bạ CEO HN10, Học viên có thể bấm nút "Mở Chat Zalo" để nhắn tin 1-1 ngay trên Zalo.
 5. **Lan tỏa mạng lưới**: Dễ dàng chia sẻ Thẻ doanh nhân số, Tin tuyển dụng, hoặc Cơ hội kinh doanh lên Nhật ký Zalo hoặc gửi vào các nhóm Zalo ngành nghề của CLB.
 
 ---
@@ -51,9 +51,9 @@ Cung cấp các hàm tích hợp sẵn:
 - `isZaloMiniApp()`: Tự động phát hiện ứng dụng đang chạy trong Zalo để kích hoạt tính năng ZMA.
 - `loginWithZaloPhone()`: Xin quyền lấy số điện thoại và tự động đăng nhập vào hệ thống CEO HN10.
 - `scanQrCodeZalo()`: Kích hoạt camera quét mã QR của Zalo.
-- `openZaloChatWithUser(zaloUserId)`: Mở cửa sổ chat riêng với hội viên đối tác.
+- `openZaloChatWithUser(zaloUserId)`: Mở cửa sổ chat riêng với Học viên đối tác.
 - `followCeoHN10OA(oaId)`: Bật popup bấm Quan tâm Zalo Official Account của CLB.
-- `shareToZalo(options)`: Chia sẻ Thẻ hội viên và Cơ hội kinh doanh vào Zalo Chat / Zalo Feed.
+- `shareToZalo(options)`: Chia sẻ Thẻ Học viên và Cơ hội kinh doanh vào Zalo Chat / Zalo Feed.
 
 ### 3. Backend API Xác Thực: `apps/ceohn10_app_be/src/auth/`
 - **Endpoint**: `POST /auth/zalo-miniapp-login`
@@ -61,8 +61,8 @@ Cung cấp các hàm tích hợp sẵn:
   1. Nhận `accessToken` và `phoneToken` từ Zalo Mini App gửi lên.
   2. Backend gọi Zalo Graph API `https://graph.zalo.me/v2.0/me/info` kết hợp cùng `ZALO_APP_SECRET` của CLB để giải mã ra số điện thoại thật (Ví dụ: `0912345678`).
   3. Tra cứu số điện thoại trong bảng `public.vione_users` và `public.members`.
-  4. Nếu tìm thấy hội viên: Trả về Access Token và Refresh Token JWT để đăng nhập ngay.
-  5. Nếu là hội viên mới: Tự động khởi tạo tài khoản liên kết để hội viên hoàn thiện hồ sơ.
+  4. Nếu tìm thấy Học viên: Trả về Access Token và Refresh Token JWT để đăng nhập ngay.
+  5. Nếu là Học viên mới: Tự động khởi tạo tài khoản liên kết để Học viên hoàn thiện hồ sơ.
 
 ---
 
@@ -79,7 +79,7 @@ Cung cấp các hàm tích hợp sẵn:
 2. Bấm nút **"Tạo Mini App Mới"**.
 3. Điền thông tin ứng dụng:
    - **Tên Mini App**: `CLB Doanh Nhân CEO HN10` (hoặc `CEO HN10 - HanoiBA`).
-   - **Mô tả ngắn**: *Ứng dụng kết nối giao thương, danh bạ hội viên và quản trị hoạt động CLB Doanh Nhân CEO HN10 (HanoiBA).*
+   - **Mô tả ngắn**: *Ứng dụng kết nối giao thương, danh bạ Học viên và quản trị hoạt động CLB Doanh Nhân CEO HN10 (HanoiBA).*
    - **Danh mục**: *Kinh doanh & Doanh nghiệp* (hoặc *Cộng đồng*).
    - **Logo ứng dụng**: Tải lên logo chuẩn hình tròn của CLB CEO HN10 (512x512 px).
 4. Sau khi tạo xong, hệ thống sẽ cấp cho bạn một mã **App ID** (Dãy 18 số, ví dụ: `HN1000293847561829`).
@@ -98,7 +98,7 @@ Cung cấp các hàm tích hợp sẵn:
 1. Trong menu bên trái, chọn **Liên kết OA (Official Account)**.
 2. Chọn đúng trang Zalo OA của **CLB Doanh Nhân CEO HN10** (đã xác thực tick vàng doanh nghiệp).
 3. Bấm **Xác nhận liên kết**.
-*(Lợi ích: Giúp hội viên có thể bấm "Quan tâm OA" trực tiếp trong Mini App và cho phép gửi thông báo ZNS mời họp tự động).*
+*(Lợi ích: Giúp Học viên có thể bấm "Quan tâm OA" trực tiếp trong Mini App và cho phép gửi thông báo ZNS mời họp tự động).*
 
 ### Bước 5: Cấu Hình Biến Môi Trường Backend Server
 Mở file `.env` trên máy chủ Backend (`apps/ceohn10_app_be/.env`) và bổ sung:
@@ -184,22 +184,22 @@ Sau khi Mini App được Zalo phê duyệt, bạn có thể triển khai vào c
 1. Vào trang quản trị Zalo OA: [https://oa.zalo.me/manage/oa](https://oa.zalo.me/manage/oa)
 2. Vào mục **Quản lý** -> **Thiết lập Menu**.
 3. Tạo 3 nút Menu cố định ở đáy khung chat:
-   - Nút 1: **"Hội Viên CEO HN10"** -> Chọn loại hành động: **Mở Zalo Mini App** -> Chọn Mini App CEO HN10.
+   - Nút 1: **"Học viên CEO HN10"** -> Chọn loại hành động: **Mở Zalo Mini App** -> Chọn Mini App CEO HN10.
    - Nút 2: **"Thẻ Danh Thiếp QR"** -> Mở thẳng trang Thẻ cá nhân (`/association/card`).
    - Nút 3: **"Cơ Hội Giao Thương"** -> Mở thẳng sàn cơ hội B2B (`/association/opportunities`).
-*(Mỗi khi hội viên nhắn tin cho trang Zalo OA của CLB, họ chỉ cần bấm nút menu dưới màn hình là mở ngay Mini App).*
+*(Mỗi khi Học viên nhắn tin cho trang Zalo OA của CLB, họ chỉ cần bấm nút menu dưới màn hình là mở ngay Mini App).*
 
 ### 2. Tạo Mã QR Để Tại Bàn Sự Kiện & Backdrop Đại Hội
 - Tải mã QR chính thức của Mini App từ mục **Cài đặt** trên `mini.zalo.me`.
 - In mã QR này lên:
-  - Thẻ đeo Ban Tổ Chức & Thẻ Hội viên.
+  - Thẻ đeo Ban Tổ Chức & Thẻ Học viên.
   - Backdrop và Standee tại cửa check-in các sự kiện Caravan, Gala, Họp Ban Điều Hành.
-  - Hội viên đến sự kiện chỉ cần rút Zalo quét mã là hoàn tất điểm danh và nhận ngay thông tin chương trình.
+  - Học viên đến sự kiện chỉ cần rút Zalo quét mã là hoàn tất điểm danh và nhận ngay thông tin chương trình.
 
 ### 3. Chia sẻ Đường link Trực tiếp
 Đường link định dạng chuẩn của Zalo Mini App:
 ```
 https://zalo.me/s/YOUR_ZALO_APP_ID/
 ```
-Gửi đường link này vào các nhóm Zalo Chat của CLB CEO HN10, hội viên chỉ cần bấm vào là ứng dụng bật lên ngay lập tức bên trong Zalo.
+Gửi đường link này vào các nhóm Zalo Chat của CLB CEO HN10, Học viên chỉ cần bấm vào là ứng dụng bật lên ngay lập tức bên trong Zalo.
 

@@ -114,15 +114,15 @@ export function Create1on1MeetingModal({
     try {
       const ceoHist = JSON.parse(localStorage.getItem("ceohn10_meetings_history") || "[]");
       if (Array.isArray(ceoHist)) allMeetings.push(...ceoHist);
-    } catch {}
+    } catch { }
     try {
       const vioneHist = JSON.parse(localStorage.getItem("vione_meetings_history") || "[]");
       if (Array.isArray(vioneHist)) allMeetings.push(...vioneHist);
-    } catch {}
+    } catch { }
     try {
       const ceoCal = JSON.parse(localStorage.getItem("ceohn10_saved_calendar_events") || "[]");
       if (Array.isArray(ceoCal)) allMeetings.push(...ceoCal);
-    } catch {}
+    } catch { }
 
     // Deduplicate theo id hoặc tiêu đề + thời gian
     const seen = new Set<string>();
@@ -337,9 +337,8 @@ export function Create1on1MeetingModal({
           venueType === "online"
             ? `Trực tuyến: ${onlineUrl}`
             : venue.trim(),
-        description: `Gặp gỡ kết nối 1-on-1 với ${partnerName.trim()}${
-          partnerCompany ? ` (${partnerCompany})` : ""
-        }. Ghi chú: ${notes.trim()}`,
+        description: `Gặp gỡ kết nối 1-on-1 với ${partnerName.trim()}${partnerCompany ? ` (${partnerCompany})` : ""
+          }. Ghi chú: ${notes.trim()}`,
         organizer: hostName.trim(),
         isOnline: venueType === "online",
         type: "meeting",
@@ -423,11 +422,10 @@ export function Create1on1MeetingModal({
                   if (errors.title) setErrors((prev) => ({ ...prev, title: "" }));
                 }}
                 placeholder="VD: Trao đổi hợp tác chuỗi cung ứng vật tư..."
-                className={`w-full rounded-xl border bg-background px-3 py-2 text-foreground focus:outline-none text-xs transition ${
-                  errors.title
+                className={`w-full rounded-xl border bg-background px-3 py-2 text-foreground focus:outline-none text-xs transition ${errors.title
                     ? "border-destructive focus:border-destructive ring-1 ring-destructive/30"
                     : "border-border focus:ring-2 focus:ring-primary"
-                }`}
+                  }`}
               />
               {errors.title && (
                 <p className="mt-1 text-xs font-semibold text-destructive animate-in fade-in duration-150">
@@ -446,7 +444,7 @@ export function Create1on1MeetingModal({
                   type="text"
                   value={hostName}
                   onChange={(e) => setHostName(e.target.value)}
-                  placeholder="Tên hội viên chủ trì"
+                  placeholder="Tên Học viên chủ trì"
                   className="w-full rounded-xl border border-border bg-background px-3 py-2 text-foreground focus:outline-none focus:ring-2 focus:ring-primary text-xs"
                 />
               </div>
@@ -462,11 +460,10 @@ export function Create1on1MeetingModal({
                     if (errors.partnerName) setErrors((prev) => ({ ...prev, partnerName: "" }));
                   }}
                   placeholder="Tên đối tác hoặc doanh nhân..."
-                  className={`w-full rounded-xl border bg-background px-3 py-2 text-foreground focus:outline-none text-xs transition ${
-                    errors.partnerName
+                  className={`w-full rounded-xl border bg-background px-3 py-2 text-foreground focus:outline-none text-xs transition ${errors.partnerName
                       ? "border-destructive focus:border-destructive ring-1 ring-destructive/30"
                       : "border-border focus:ring-2 focus:ring-primary"
-                  }`}
+                    }`}
                 />
                 {errors.partnerName && (
                   <p className="mt-1 text-xs font-semibold text-destructive animate-in fade-in duration-150">
@@ -480,7 +477,7 @@ export function Create1on1MeetingModal({
             <div className="rounded-xl border border-border bg-secondary/30 p-3 space-y-2">
               <DepartmentMemberTreeSelect
                 multiple={false}
-                label="Chọn đối tác từ Ban chuyên môn (CSDL Hội viên CEO HN10)"
+                label="Chọn đối tác từ Ban chuyên môn (CSDL Học viên CEO HN10)"
                 placeholder="Tìm kiếm đối tác theo tên, chức danh, email, SĐT..."
                 onChange={(selectedItems) => {
                   if (selectedItems.length > 0) {
@@ -531,11 +528,10 @@ export function Create1on1MeetingModal({
                 <button
                   type="button"
                   onClick={() => setVenueType("offline")}
-                  className={`flex items-center justify-center gap-2 rounded-xl border py-2.5 px-3 transition cursor-pointer font-medium ${
-                    venueType === "offline"
+                  className={`flex items-center justify-center gap-2 rounded-xl border py-2.5 px-3 transition cursor-pointer font-medium ${venueType === "offline"
                       ? "border-primary bg-primary/10 text-primary font-bold shadow-xs"
                       : "border-border bg-secondary/40 text-muted-foreground hover:bg-secondary"
-                  }`}
+                    }`}
                 >
                   <MapPin className="h-3.5 w-3.5" /> Gặp Trực Tiếp (Offline)
                 </button>
@@ -547,11 +543,10 @@ export function Create1on1MeetingModal({
                       setOnlineUrl(`https://meet.uniwork.space/CEOHN10_Connect_${Math.floor(1000 + Math.random() * 9000)}`);
                     }
                   }}
-                  className={`flex items-center justify-center gap-2 rounded-xl border py-2.5 px-3 transition cursor-pointer font-medium ${
-                    venueType === "online"
+                  className={`flex items-center justify-center gap-2 rounded-xl border py-2.5 px-3 transition cursor-pointer font-medium ${venueType === "online"
                       ? "border-indigo-500 bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-bold shadow-xs"
                       : "border-border bg-secondary/40 text-muted-foreground hover:bg-secondary"
-                  }`}
+                    }`}
                 >
                   <Video className="h-3.5 w-3.5" /> Họp Trực Tuyến (Online)
                 </button>
@@ -589,11 +584,10 @@ export function Create1on1MeetingModal({
                       setOnlinePlatform("uniwork");
                       setOnlineUrl(`https://meet.uniwork.space/CEOHN10_Connect_${Math.floor(1000 + Math.random() * 9000)}`);
                     }}
-                    className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold border transition cursor-pointer text-center flex flex-col items-center justify-center gap-0.5 ${
-                      onlinePlatform === "uniwork"
+                    className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold border transition cursor-pointer text-center flex flex-col items-center justify-center gap-0.5 ${onlinePlatform === "uniwork"
                         ? "bg-indigo-600 text-white border-indigo-600 shadow-sm"
                         : "bg-background text-muted-foreground border-border hover:bg-secondary"
-                    }`}
+                      }`}
                   >
                     <span>Uniwork Meet</span>
                     <span className="text-[9px] opacity-80">(Mặc định)</span>
@@ -605,11 +599,10 @@ export function Create1on1MeetingModal({
                       setOnlinePlatform("meet");
                       setOnlineUrl("https://meet.google.com/new");
                     }}
-                    className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold border transition cursor-pointer text-center flex flex-col items-center justify-center gap-0.5 ${
-                      onlinePlatform === "meet"
+                    className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold border transition cursor-pointer text-center flex flex-col items-center justify-center gap-0.5 ${onlinePlatform === "meet"
                         ? "bg-emerald-600 text-white border-emerald-600 shadow-sm"
                         : "bg-background text-muted-foreground border-border hover:bg-secondary"
-                    }`}
+                      }`}
                   >
                     <span>Google Meet</span>
                     <span className="text-[9px] opacity-80">meet.google.com</span>
@@ -621,11 +614,10 @@ export function Create1on1MeetingModal({
                       setOnlinePlatform("zoom");
                       setOnlineUrl("https://zoom.us/join");
                     }}
-                    className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold border transition cursor-pointer text-center flex flex-col items-center justify-center gap-0.5 ${
-                      onlinePlatform === "zoom"
+                    className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold border transition cursor-pointer text-center flex flex-col items-center justify-center gap-0.5 ${onlinePlatform === "zoom"
                         ? "bg-blue-600 text-white border-blue-600 shadow-sm"
                         : "bg-background text-muted-foreground border-border hover:bg-secondary"
-                    }`}
+                      }`}
                   >
                     <span>Zoom</span>
                     <span className="text-[9px] opacity-80">zoom.us</span>
@@ -634,11 +626,10 @@ export function Create1on1MeetingModal({
                   <button
                     type="button"
                     onClick={() => setOnlinePlatform("custom")}
-                    className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold border transition cursor-pointer text-center flex flex-col items-center justify-center gap-0.5 ${
-                      onlinePlatform === "custom"
+                    className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold border transition cursor-pointer text-center flex flex-col items-center justify-center gap-0.5 ${onlinePlatform === "custom"
                         ? "bg-purple-600 text-white border-purple-600 shadow-sm"
                         : "bg-background text-muted-foreground border-border hover:bg-secondary"
-                    }`}
+                      }`}
                   >
                     <span>Khác</span>
                     <span className="text-[9px] opacity-80">Tùy biến link</span>
@@ -756,11 +747,10 @@ export function Create1on1MeetingModal({
             {/* Header */}
             <div className="flex items-start gap-3.5">
               <div
-                className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl ring-8 ${
-                  conflictModalData.type === "both"
+                className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl ring-8 ${conflictModalData.type === "both"
                     ? "bg-rose-500/15 text-rose-500 ring-rose-500/10"
                     : "bg-amber-500/15 text-amber-500 ring-amber-500/10"
-                }`}
+                  }`}
               >
                 <AlertTriangle className="h-6 w-6" />
               </div>
@@ -782,8 +772,8 @@ export function Create1on1MeetingModal({
                   {conflictModalData.type === "both"
                     ? "Trùng cả thời gian & địa điểm"
                     : conflictModalData.type === "time"
-                    ? "Trùng thời gian cuộc gặp"
-                    : "Trùng địa điểm cuộc gặp"}
+                      ? "Trùng thời gian cuộc gặp"
+                      : "Trùng địa điểm cuộc gặp"}
                 </div>
                 <h3 className="text-base font-black text-foreground">
                   Phát hiện lịch gặp bị trùng
@@ -792,8 +782,8 @@ export function Create1on1MeetingModal({
                   {conflictModalData.type === "both"
                     ? "Bạn đang thiết lập cuộc gặp trùng cả khung giờ và địa điểm với một cuộc gặp khác."
                     : conflictModalData.type === "time"
-                    ? "Bạn đang thiết lập cuộc gặp trùng khung giờ với một cuộc gặp khác trong ngày."
-                    : "Địa điểm trực tiếp này đã được lên lịch sử dụng cho cuộc gặp khác cùng ngày."}
+                      ? "Bạn đang thiết lập cuộc gặp trùng khung giờ với một cuộc gặp khác trong ngày."
+                      : "Địa điểm trực tiếp này đã được lên lịch sử dụng cho cuộc gặp khác cùng ngày."}
                 </p>
               </div>
             </div>
@@ -866,11 +856,10 @@ export function Create1on1MeetingModal({
                   <span>
                     {conflictModalData.primaryMeeting.partnerName
                       ? `Đối tác: ${conflictModalData.primaryMeeting.partnerName}`
-                      : `Người tổ chức: ${
-                          conflictModalData.primaryMeeting.organizer ||
-                          conflictModalData.primaryMeeting.hostName ||
-                          "Hiệp hội"
-                        }`}
+                      : `Người tổ chức: ${conflictModalData.primaryMeeting.organizer ||
+                      conflictModalData.primaryMeeting.hostName ||
+                      "Hiệp hội"
+                      }`}
                   </span>
                 </div>
               </div>

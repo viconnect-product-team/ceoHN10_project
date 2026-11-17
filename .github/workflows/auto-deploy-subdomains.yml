@@ -106,8 +106,11 @@ jobs:
 
       - name: Kiểm tra cấu hình SSH Secret trên GitHub
         id: check_ssh
+        env:
+          SSH_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SSH_PASS: ${{ secrets.SSH_PASSWORD }}
         run: |
-          if [ -n "${{ secrets.SSH_PRIVATE_KEY }}" ] || [ -n "${{ secrets.SSH_PASSWORD }}" ]; then
+          if [ -n "$SSH_KEY" ] || [ -n "$SSH_PASS" ]; then
             echo "has_ssh=true" >> $GITHUB_OUTPUT
             echo "✓ Đã tìm thấy cấu hình SSH Secret trên GitHub Actions."
           else

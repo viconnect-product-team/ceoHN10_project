@@ -435,7 +435,7 @@ async function buildElevatedSpeakerDocx() {
                             font: FONT,
                           }),
                           new TextRun({
-                            text: 'Khẳng định rõ ràng: Yêu cầu ban đầu của CEO HN10 không hề có phần Thu Chi! Chính đội ngũ kỹ thuật ViConnect qua nghiên cứu sâu nghiệp vụ hiệp hội đã nhìn nhận ra mắt xích trọng yếu: Sự kiện và Hội viên không thể tách rời dòng tiền khép kín (tạm ứng, hoàn ứng, quyết toán, sổ quỹ Thông tư 200 nộp HanoiBA) nên đã chủ động kiến tạo tích hợp sẵn!',
+                            text: 'Khẳng định rõ ràng: Yêu cầu ban đầu của CEO HN10 không hề có phần Thu Chi! Chính đội ngũ kỹ thuật ViConnect qua nghiên cứu sâu nghiệp vụ hiệp hội đã nhìn nhận ra mắt xích trọng yếu: Sự kiện và Học viên không thể tách rời dòng tiền khép kín (tạm ứng, hoàn ứng, quyết toán, sổ quỹ Thông tư 200 nộp HanoiBA) nên đã chủ động kiến tạo tích hợp sẵn!',
                             size: 20,
                             font: FONT,
                           }),
@@ -494,7 +494,7 @@ async function buildElevatedSpeakerDocx() {
               'Để buổi làm việc đạt hiệu quả cao nhất và tôn trọng tuyệt đối quỹ thời gian quý báu của các CEO, hội nghị hôm nay được ấn định bắt đầu đúng 09h00 sáng và bế mạc đúng 12h00 trưa, được phân bổ khoa học thành 3 giai đoạn rõ ràng:',
               {
                 prefix: '• Giai đoạn 1 (09h00 – 09h45, 45 phút):',
-                text: 'Báo cáo tổng quan bức tranh sản phẩm và Trình diễn thực tế (Live Demo) trên cả 2 nền tảng: Web CRM Quản trị tháp chỉ huy và Ứng dụng Mobile App dành riêng cho hội viên.',
+                text: 'Báo cáo tổng quan bức tranh sản phẩm và Trình diễn thực tế (Live Demo) trên cả 2 nền tảng: Web CRM Quản trị tháp chỉ huy và Ứng dụng Mobile App dành riêng cho Học viên.',
                 bold: true,
                 textColor: COLOR_NAVY,
               },
@@ -532,7 +532,7 @@ async function buildElevatedSpeakerDocx() {
               },
               '“Kính thưa anh Chủ tịch, các anh chị trong Ban Thường Trực và toàn thể Ban Điều Hành,',
               'Hôm nay, em xin phép được trình bày với các anh chị bức tranh tổng thể về sản phẩm và giải pháp số hóa toàn diện mà liên minh công nghệ ViConnect & ViOne đã tâm huyết nghiên cứu, thiết kế và phát triển dành riêng cho CLB Doanh Nhân CEO HN10.',
-              'Mục tiêu của chúng em không phải là tạo ra một phần mềm đơn thuần, mà là cùng các anh chị xây dựng nên một công cụ điều hành đắc lực, giải phóng sức lao động cho Ban Điều Hành, đồng thời tạo ra một kênh giao thương thực chiến, mang lại doanh thu và niềm tự hào cho từng hội viên doanh nhân sinh năm 1983.',
+              'Mục tiêu của chúng em không phải là tạo ra một phần mềm đơn thuần, mà là cùng các anh chị xây dựng nên một công cụ điều hành đắc lực, giải phóng sức lao động cho Ban Điều Hành, đồng thời tạo ra một kênh giao thương thực chiến, mang lại doanh thu và niềm tự hào cho từng Học viên doanh nhân sinh năm 1983.',
               {
                 prefix: '2.2. DANH SÁCH VẤN ĐỀ CỦA ĐỐI TÁC & 3 YÊU CẦU BAN ĐẦU CỦA CEO HN10:',
                 text: '',
@@ -543,7 +543,7 @@ async function buildElevatedSpeakerDocx() {
               'Kính thưa các anh chị, nhìn lại những ngày đầu tiên khi ViConnect ngồi lại cùng Ban Thường Trực CLB để lắng nghe bài toán, các anh chị đã chia sẻ với chúng em 3 bài toán lớn và đặt ra 3 nhóm yêu cầu cốt lõi ban đầu:',
               {
                 prefix: '1. Yêu cầu thứ nhất về Quản trị thành viên:',
-                text: 'Hơn 500 hồ sơ doanh nghiệp hội viên nhưng dữ liệu đang bị phân tán rải rác trên các file Excel cá nhân, danh sách Zalo và giấy tờ văn phòng. Mỗi lần cần tra cứu đối tác hay xét duyệt kết nạp hội viên mới đều diễn ra rất chậm chạp, thủ công. Đặc biệt, các doanh nhân 1983 vẫn đang thiếu một tấm thẻ định danh số sang trọng và một danh thiếp thông minh để khẳng định đẳng cấp khi đi giao lưu đối ngoại.',
+                text: 'Hơn 500 hồ sơ doanh nghiệp Học viên nhưng dữ liệu đang bị phân tán rải rác trên các file Excel cá nhân, danh sách Zalo và giấy tờ văn phòng. Mỗi lần cần tra cứu đối tác hay xét duyệt kết nạp Học viên mới đều diễn ra rất chậm chạp, thủ công. Đặc biệt, các doanh nhân 1983 vẫn đang thiếu một tấm thẻ định danh số sang trọng và một danh thiếp thông minh để khẳng định đẳng cấp khi đi giao lưu đối ngoại.',
               },
               {
                 prefix: '2. Yêu cầu thứ hai về Quản lý sự kiện:',
@@ -571,11 +571,11 @@ async function buildElevatedSpeakerDocx() {
               'Thế nhưng, trong quá trình đào sâu nghiên cứu thực tế vận hành hiệp hội, chính đội ngũ phát triển kỹ thuật của ViConnect đã nhìn nhận ra một mắt xích cốt tử mà nếu không giải quyết, hệ sinh thái sẽ không thể vận hành hoàn hảo:',
               {
                 prefix: 'VÌ SAO TEAM KỸ THUẬT VICONNECT LẠI NHÌN NHẬN RA CHỨC NĂNG THU - CHI?',
-                text: 'Bởi vì các kỹ sư ViConnect nhận thấy: Sự kiện và Hội viên không thể nào tách rời khỏi bài toán Quản trị dòng tiền! Nếu chúng em chỉ làm đúng theo yêu cầu ban đầu là bán vé và soát vé sự kiện đơn thuần, thì sau mỗi kỳ Gala, Ban Sự kiện và Ban Tài chính sẽ rơi vào một ma trận chứng từ vô cùng áp lực: Tiền tạm ứng cho Ban Sự kiện để đặt cọc địa điểm, tiền hoàn ứng khi thừa, tiền thu tài trợ bằng tiền mặt hoặc qua tài khoản, và tiền bán vé lẻ... tất cả đều phải ghi chép sổ tay, đối soát sao kê thủ công cực kỳ vất vả, rất dễ xảy ra sai sót, nhầm lẫn và gây rủi ro thất thoát ngân quỹ.',
+                text: 'Bởi vì các kỹ sư ViConnect nhận thấy: Sự kiện và Học viên không thể nào tách rời khỏi bài toán Quản trị dòng tiền! Nếu chúng em chỉ làm đúng theo yêu cầu ban đầu là bán vé và soát vé sự kiện đơn thuần, thì sau mỗi kỳ Gala, Ban Sự kiện và Ban Tài chính sẽ rơi vào một ma trận chứng từ vô cùng áp lực: Tiền tạm ứng cho Ban Sự kiện để đặt cọc địa điểm, tiền hoàn ứng khi thừa, tiền thu tài trợ bằng tiền mặt hoặc qua tài khoản, và tiền bán vé lẻ... tất cả đều phải ghi chép sổ tay, đối soát sao kê thủ công cực kỳ vất vả, rất dễ xảy ra sai sót, nhầm lẫn và gây rủi ro thất thoát ngân quỹ.',
                 bold: true,
                 textColor: COLOR_NAVY,
               },
-              'Quan trọng hơn cả, cuối quý, cuối năm, Ban Tài chính lấy đâu ra số liệu tức thì để lập Sổ Quỹ Tiền Mặt minh bạch báo cáo trước Đại hội hội viên và giải trình nộp lên Hội Doanh Nghiệp Trẻ Hà Nội (HanoiBA)?',
+              'Quan trọng hơn cả, cuối quý, cuối năm, Ban Tài chính lấy đâu ra số liệu tức thì để lập Sổ Quỹ Tiền Mặt minh bạch báo cáo trước Đại hội Học viên và giải trình nộp lên Hội Doanh Nghiệp Trẻ Hà Nội (HanoiBA)?',
               'Chính vì nhìn thấy trước lỗ hổng vận hành chí mạng đó, team phát triển kỹ thuật ViConnect đã CHỦ ĐỘNG ĐỀ XUẤT, THIẾT KẾ VÀ TÍCH HỢP TRỌN BỘ PHÂN HỆ QUẢN LÝ THU - CHI KHÉP KÍN vào hệ thống:',
               '• Tích hợp cổng thanh toán VietQR Napas 24/7 gạch nợ tự động sau đúng 1 giây.',
               '• Chu trình quản trị dòng tiền sự kiện 4 bước minh bạch: Lập dự toán -> Thu tiền bán vé & tài trợ -> Tạm ứng kinh phí cho Ban Sự kiện -> Hoàn ứng tiền thừa & Quyết toán thực tế.',
@@ -588,8 +588,8 @@ async function buildElevatedSpeakerDocx() {
                 color: COLOR_NAVY,
               },
               'Và bây giờ, em xin phép được mời các anh chị cùng hướng mắt lên màn hình lớn để chúng ta trực tiếp trải nghiệm giải pháp này hoạt động trên điện thoại thật và máy tính thật:',
-              '• Về Mobile App Hội viên: Chiếc điện thoại trên tay em đang hiển thị Thẻ Hội Viên VIP mạ vàng mang mã số M1983 duy nhất; Danh thiếp thông minh tích hợp Dynamic QR vCard 1 chạm lưu thẳng vào danh bạ mà HOÀN TOÀN KHÔNG CẦN CÀI APP; Company Profile 2 trang chuyên nghiệp; Danh bạ 11 ngành nghề; Đặt lịch hẹn giao thương 1-on-1 đồng bộ lịch điện thoại; Sàn Marketplace ưu đãi nội khối và Ví vé điện tử QR soát vé dưới 1 giây.',
-              '• Về Web CRM Quản trị tháp chỉ huy: Executive Dashboard 360 độ theo dõi nhịp đập CLB thời gian thực; Quy trình thẩm định xét duyệt hội viên 3 bước nghiêm ngặt; Phân quyền vai trò RBAC cho 6 Ban chuyên môn; và đặc biệt là Phân hệ Sổ Quỹ Thu Chi Thông tư 200 xuất file Excel chuẩn mực chỉ với 1 click chuột.',
+              '• Về Mobile App Học viên: Chiếc điện thoại trên tay em đang hiển thị Thẻ Học viên VIP mạ vàng mang mã số M1983 duy nhất; Danh thiếp thông minh tích hợp Dynamic QR vCard 1 chạm lưu thẳng vào danh bạ mà HOÀN TOÀN KHÔNG CẦN CÀI APP; Company Profile 2 trang chuyên nghiệp; Danh bạ 11 ngành nghề; Đặt lịch hẹn giao thương 1-on-1 đồng bộ lịch điện thoại; Sàn Marketplace ưu đãi nội khối và Ví vé điện tử QR soát vé dưới 1 giây.',
+              '• Về Web CRM Quản trị tháp chỉ huy: Executive Dashboard 360 độ theo dõi nhịp đập CLB thời gian thực; Quy trình thẩm định xét duyệt Học viên 3 bước nghiêm ngặt; Phân quyền vai trò RBAC cho 6 Ban chuyên môn; và đặc biệt là Phân hệ Sổ Quỹ Thu Chi Thông tư 200 xuất file Excel chuẩn mực chỉ với 1 click chuột.',
               {
                 prefix: '2.5. BỘ CÔNG CỤ VẬN HÀNH THỰC TẾ NGOÀI BRD GỐC DƯỚI GÓC NHÌN KỸ THUẬT VICONNECT:',
                 text: '',
@@ -600,7 +600,7 @@ async function buildElevatedSpeakerDocx() {
               'Chưa dừng lại ở đó, xuất phát từ góc nhìn của người làm công nghệ thực chiến, ViConnect còn chủ động kiến tạo thêm Bộ công cụ vận hành hàng ngày (hoàn toàn nằm ngoài yêu cầu ban đầu):',
               '1. Bảng giao việc Kanban phân cấp: Chủ tịch, Tổng thư ký và các Trưởng ban giao việc rõ người, rõ hạn chót, theo dõi tiến độ trực quan.',
               '2. Quản trị cuộc họp & Điểm danh QR động (Sapphire Hub): Mã QR đổi sau mỗi 30 giây chống chụp ảnh gửi ra ngoài điểm danh hộ, đính kèm tài liệu họp số.',
-              '3. Kho tài liệu số tập trung (Knowledge Hub): Lưu trữ Điều lệ CLB, Quy chế tài chính, Hợp đồng mẫu, Kỷ yếu để hội viên tra cứu tức thì.',
+              '3. Kho tài liệu số tập trung (Knowledge Hub): Lưu trữ Điều lệ CLB, Quy chế tài chính, Hợp đồng mẫu, Kỷ yếu để Học viên tra cứu tức thì.',
               '4. Đàm thoại VoIP nội bộ mã hóa & Không gian mạng xã hội doanh nhân Moments B2B văn minh.',
               'Tất cả những phân hệ này khẳng định: ViConnect không phải đơn vị gia công làm theo đơn hàng bề nổi, mà chúng em là Người Bạn Đồng Hành Công Nghệ Chiến Lược, cùng xây dựng giải pháp trọn vẹn nhất cho CEO HN10!”'
             ],
@@ -624,7 +624,7 @@ async function buildElevatedSpeakerDocx() {
                 textColor: COLOR_NAVY,
               },
               'Đội ngũ kỹ thuật ViConnect đã mở sẵn Biểu Mẫu Tiếp Nhận Ý Kiến trên màn hình lớn. Từng câu hỏi của anh Chủ tịch và các Trưởng Ban chuyên môn sẽ được chúng em lắng nghe, ghi chép trung thực, giải trình ngay tại chỗ và thống nhất phân loại mức độ ưu tiên P0, P1, P2 để xử lý.',
-              'Mục tiêu của chúng em không phải là bảo vệ quan điểm cá nhân, mà mục tiêu duy nhất là làm sao để hệ sinh thái số này khi bàn giao phải thực sự mượt mà, tiện dụng và mang lại niềm tự hào lớn nhất cho toàn thể hội viên CEO HN10.',
+              'Mục tiêu của chúng em không phải là bảo vệ quan điểm cá nhân, mà mục tiêu duy nhất là làm sao để hệ sinh thái số này khi bàn giao phải thực sự mượt mà, tiện dụng và mang lại niềm tự hào lớn nhất cho toàn thể Học viên CEO HN10.',
               'Sau đây, em xin trân trọng kính mời anh Chủ tịch, chị Tổng Thư ký và các anh chị Trưởng Ban Sự kiện, Ban Thành viên, Ban Tài chính, Ban Xúc tiến thương mại, Ban Truyền thông và Ban Thiện nguyện bắt đầu phiên thảo luận ạ!”'
             ],
             'Mở file Excel "BIEU_MAU_GHI_NHAN_Y_KIEN_TRAO_DOI_THU_4_CEOHN10.xlsx" trên máy chiếu. Cầm bút ghi chép cẩn thận. Lắng nghe không ngắt lời đại biểu.'
@@ -643,7 +643,7 @@ async function buildElevatedSpeakerDocx() {
               'Bây giờ, em xin phép đại diện hai bên được trình bày BẢNG MA TRẬN CHỐT CHỨC NĂNG HỆ THỐNG (SCOPE FREEZE MATRIX) để chúng ta cùng đối soát và ký kết nghiệm thu giai đoạn 1:',
               {
                 prefix: '1. VỀ DANH MỤC 30 CHỨC NĂNG CỐT LÕI ĐÃ HOÀN THÀNH (CHỐT NGHIỆM THU 100%):',
-                text: 'Toàn bộ 30 tính năng thuộc 5 nhóm giải pháp: Quản trị tài chính Sổ quỹ Thông tư 200, Danh bạ & Thẻ VIP hội viên, Quản lý sự kiện & Vé QR, Sàn giao thương B2B và Bộ công cụ vận hành thực tế đã được kiểm thử tự động, kết nối trực tiếp cơ sở dữ liệu thật và được BĐH đánh giá ĐẠT YÊU CẦU 100%. Hôm nay, hai bên chính thức ký kết Đóng Băng Phạm Vi Phát Triển (Scope Freeze) để chuẩn bị phát hành.',
+                text: 'Toàn bộ 30 tính năng thuộc 5 nhóm giải pháp: Quản trị tài chính Sổ quỹ Thông tư 200, Danh bạ & Thẻ VIP Học viên, Quản lý sự kiện & Vé QR, Sàn giao thương B2B và Bộ công cụ vận hành thực tế đã được kiểm thử tự động, kết nối trực tiếp cơ sở dữ liệu thật và được BĐH đánh giá ĐẠT YÊU CẦU 100%. Hôm nay, hai bên chính thức ký kết Đóng Băng Phạm Vi Phát Triển (Scope Freeze) để chuẩn bị phát hành.',
                 bold: true,
                 textColor: COLOR_NAVY,
               },
@@ -697,8 +697,8 @@ async function buildElevatedSpeakerDocx() {
           createScenarioCard(
             1,
             'Bảo Mật Quyền Riêng Tư & Số Điện Thoại Cá Nhân Của CEO',
-            '“Nhiều hội viên phản ánh không muốn công khai số điện thoại cá nhân vì sợ bị bên ngoài gọi điện chào mời bất động sản, bảo hiểm, làm phiền...”',
-            '“Dạ thưa anh/chị, đây là bài toán bảo mật thông tin mà ViConnect đã lường trước ngay từ khâu thiết kế. Chúng em trang bị Cơ chế Danh Thiếp Kép và Công tắc Bật/Tắt Riêng Tư: Hội viên có toàn quyền ẩn số điện thoại trên danh thiếp chia sẻ. Khi đối tác quét mã QR, họ chỉ thấy thông tin tên doanh nghiệp, lĩnh vực hoạt động và form kết nối B2B mà không thấy số điện thoại riêng tư. Chỉ khi nào chính CEO đó chấp thuận kết nối 1-on-1, số điện thoại mới được hiển thị. Dữ liệu hội viên được mã hóa hoàn toàn và lưu trữ trên cụm máy chủ bảo mật tại Việt Nam.”'
+            '“Nhiều Học viên phản ánh không muốn công khai số điện thoại cá nhân vì sợ bị bên ngoài gọi điện chào mời bất động sản, bảo hiểm, làm phiền...”',
+            '“Dạ thưa anh/chị, đây là bài toán bảo mật thông tin mà ViConnect đã lường trước ngay từ khâu thiết kế. Chúng em trang bị Cơ chế Danh Thiếp Kép và Công tắc Bật/Tắt Riêng Tư: Học viên có toàn quyền ẩn số điện thoại trên danh thiếp chia sẻ. Khi đối tác quét mã QR, họ chỉ thấy thông tin tên doanh nghiệp, lĩnh vực hoạt động và form kết nối B2B mà không thấy số điện thoại riêng tư. Chỉ khi nào chính CEO đó chấp thuận kết nối 1-on-1, số điện thoại mới được hiển thị. Dữ liệu Học viên được mã hóa hoàn toàn và lưu trữ trên cụm máy chủ bảo mật tại Việt Nam.”'
           ),
           new Paragraph({ spacing: { before: 120 } }),
 
@@ -720,9 +720,9 @@ async function buildElevatedSpeakerDocx() {
 
           createScenarioCard(
             4,
-            'Hội Viên Lớn Tuổi Hoặc Ngại Cài Đặt App Thì Sử Dụng Danh Thiếp Thế Nào?',
-            '“Nhiều hội viên không rành công nghệ, đi gặp khách hàng mà bắt khách phải tải app thì rất phiền và bất khả thi...”',
-            '“Dạ đây chính là ưu điểm vượt trội của giải pháp ViConnect! Người quét mã QR HOÀN TOÀN KHÔNG CẦN CÀI APP. Khi anh chị chìa mã QR trên thẻ VIP hoặc sau ốp điện thoại, đối tác chỉ cần mở camera thông thường là lập tức xem được danh thiếp điện tử và bấm nút ‘Lưu Danh Bạ vCard’ trực tiếp vào danh bạ điện thoại của họ trong 1 giây. Việc cài app chỉ dành riêng cho hội viên 1983 để vào sàn B2B và điều hành nội bộ.”'
+            'Học viên Lớn Tuổi Hoặc Ngại Cài Đặt App Thì Sử Dụng Danh Thiếp Thế Nào?',
+            '“Nhiều Học viên không rành công nghệ, đi gặp khách hàng mà bắt khách phải tải app thì rất phiền và bất khả thi...”',
+            '“Dạ đây chính là ưu điểm vượt trội của giải pháp ViConnect! Người quét mã QR HOÀN TOÀN KHÔNG CẦN CÀI APP. Khi anh chị chìa mã QR trên thẻ VIP hoặc sau ốp điện thoại, đối tác chỉ cần mở camera thông thường là lập tức xem được danh thiếp điện tử và bấm nút ‘Lưu Danh Bạ vCard’ trực tiếp vào danh bạ điện thoại của họ trong 1 giây. Việc cài app chỉ dành riêng cho Học viên 1983 để vào sàn B2B và điều hành nội bộ.”'
           ),
           new Paragraph({ spacing: { before: 120 } }),
 
@@ -737,8 +737,8 @@ async function buildElevatedSpeakerDocx() {
           createScenarioCard(
             6,
             'Kiểm Soát Chất Lượng Hàng Hóa & Đề Phòng Lừa Đảo Trên Sàn Marketplace B2B',
-            '“Nếu có hội viên đăng bán sản phẩm kém chất lượng hoặc xảy ra tranh chấp giao thương trên app thì giải quyết thế nào?”',
-            '“Dạ hệ thống được thiết kế theo mô hình Chợ Doanh Nhân Khép Kín: Chỉ có hội viên chính thức đã được Ban Thành viên thẩm định cấp mã M1983 mới được quyền đăng sản phẩm. Mỗi bài đăng đều phải qua quy trình kiểm duyệt nội dung của Ban Xúc tiến thương mại. Khi xảy ra phản ánh, Ban Quản trị có quyền tạm khóa sản phẩm hoặc tước quyền gian hàng tức thì. Mọi giao dịch đều được ghi nhận dấu vết pháp lý rõ ràng.”'
+            '“Nếu có Học viên đăng bán sản phẩm kém chất lượng hoặc xảy ra tranh chấp giao thương trên app thì giải quyết thế nào?”',
+            '“Dạ hệ thống được thiết kế theo mô hình Chợ Doanh Nhân Khép Kín: Chỉ có Học viên chính thức đã được Ban Thành viên thẩm định cấp mã M1983 mới được quyền đăng sản phẩm. Mỗi bài đăng đều phải qua quy trình kiểm duyệt nội dung của Ban Xúc tiến thương mại. Khi xảy ra phản ánh, Ban Quản trị có quyền tạm khóa sản phẩm hoặc tước quyền gian hàng tức thì. Mọi giao dịch đều được ghi nhận dấu vết pháp lý rõ ràng.”'
           ),
           new Paragraph({ spacing: { before: 120 } }),
 
@@ -752,17 +752,17 @@ async function buildElevatedSpeakerDocx() {
 
           createScenarioCard(
             8,
-            'Hội Viên Bị Mất Điện Thoại Hoặc Quên Mật Khẩu Thì Phục Hồi Thế Nào?',
-            '“Hội viên đổi máy mới hoặc bị mất máy, có bị lộ dữ liệu kinh doanh và mất tài khoản không?”',
-            '“Dạ thưa anh/chị, tài khoản được bảo vệ bằng lớp mã hóa JWT và xác thực đa kênh. Khi đổi máy mới, hội viên chỉ cần tải app, nhập số điện thoại và nhận mã xác thực OTP gửi về SMS hoặc email đã đăng ký để đặt lại mật khẩu an toàn. Trường hợp khẩn cấp, Ban Thư ký có quyền kích hoạt tính năng ‘Đăng xuất từ xa’ trên các thiết bị cũ từ màn hình CRM để bảo vệ tài khoản hội viên.”'
+            'Học viên Bị Mất Điện Thoại Hoặc Quên Mật Khẩu Thì Phục Hồi Thế Nào?',
+            '“Học viên đổi máy mới hoặc bị mất máy, có bị lộ dữ liệu kinh doanh và mất tài khoản không?”',
+            '“Dạ thưa anh/chị, tài khoản được bảo vệ bằng lớp mã hóa JWT và xác thực đa kênh. Khi đổi máy mới, Học viên chỉ cần tải app, nhập số điện thoại và nhận mã xác thực OTP gửi về SMS hoặc email đã đăng ký để đặt lại mật khẩu an toàn. Trường hợp khẩn cấp, Ban Thư ký có quyền kích hoạt tính năng ‘Đăng xuất từ xa’ trên các thiết bị cũ từ màn hình CRM để bảo vệ tài khoản Học viên.”'
           ),
           new Paragraph({ spacing: { before: 120 } }),
 
           createScenarioCard(
             9,
             'Tốc Độ Kết Nối Thanh Toán VietQR Tự Động Gạch Nợ Có Thực Sự 1 Giây Không?',
-            '“Trước đây hội viên nộp tiền hay chụp màn hình chuyển khoản gửi Zalo, kế toán phải căng mắt đối soát từng giao dịch, hệ thống mới có thực sự giải phóng được việc này không?”',
-            '“Dạ đúng 100%! ViConnect tích hợp trực tiếp Cổng thanh toán VietQR Napas 24/7. Mỗi khoản thu (tiền vé sự kiện, hội phí, tài trợ) đều sinh ra một mã QR động chứa đúng số tiền và cú pháp nhận diện duy nhất. Khi hội viên quét mã chuyển khoản thành công từ bất kỳ ngân hàng nào, hệ thống nhận tín hiệu Webhook tức thì, tự động đổi trạng thái ‘Đã thanh toán’ sau đúng 1 giây và phát hành vé điện tử về app mà không cần con người can thiệp đối soát.”'
+            '“Trước đây Học viên nộp tiền hay chụp màn hình chuyển khoản gửi Zalo, kế toán phải căng mắt đối soát từng giao dịch, hệ thống mới có thực sự giải phóng được việc này không?”',
+            '“Dạ đúng 100%! ViConnect tích hợp trực tiếp Cổng thanh toán VietQR Napas 24/7. Mỗi khoản thu (tiền vé sự kiện, hội phí, tài trợ) đều sinh ra một mã QR động chứa đúng số tiền và cú pháp nhận diện duy nhất. Khi Học viên quét mã chuyển khoản thành công từ bất kỳ ngân hàng nào, hệ thống nhận tín hiệu Webhook tức thì, tự động đổi trạng thái ‘Đã thanh toán’ sau đúng 1 giây và phát hành vé điện tử về app mà không cần con người can thiệp đối soát.”'
           ),
           new Paragraph({ spacing: { before: 120 } }),
 
@@ -880,7 +880,7 @@ async function buildElevatedMarkdown() {
 
 *Hôm nay, em xin phép được trình bày với các anh chị bức tranh tổng thể về sản phẩm và giải pháp số hóa toàn diện mà liên minh công nghệ ViConnect & ViOne đã tâm huyết nghiên cứu, thiết kế và phát triển dành riêng cho CLB Doanh Nhân CEO HN10.*
 
-*Mục tiêu của chúng em không phải là tạo ra một phần mềm đơn thuần, mà là cùng các anh chị xây dựng nên một công cụ điều hành đắc lực, giải phóng sức lao động cho Ban Điều Hành, đồng thời tạo ra một kênh giao thương thực chiến, mang lại doanh thu và niềm tự hào cho từng hội viên doanh nhân sinh năm 1983.*
+*Mục tiêu của chúng em không phải là tạo ra một phần mềm đơn thuần, mà là cùng các anh chị xây dựng nên một công cụ điều hành đắc lực, giải phóng sức lao động cho Ban Điều Hành, đồng thời tạo ra một kênh giao thương thực chiến, mang lại doanh thu và niềm tự hào cho từng Học viên doanh nhân sinh năm 1983.*
 
 ---
 
@@ -888,8 +888,8 @@ async function buildElevatedMarkdown() {
 *Kính thưa các anh chị, nhìn lại những ngày đầu tiên khi ViConnect ngồi lại cùng Ban Thường Trực CLB để lắng nghe bài toán, các anh chị đã chia sẻ với chúng em 3 bài toán lớn và đặt ra 3 nhóm yêu cầu cốt lõi ban đầu:*
 
 1. **Yêu cầu thứ nhất về Quản trị thành viên:**
-   - Hơn 500 hồ sơ doanh nghiệp hội viên nhưng dữ liệu đang bị phân tán rải rác trên các file Excel cá nhân, danh sách Zalo và giấy tờ văn phòng.
-   - Mỗi lần cần tra cứu đối tác hay xét duyệt kết nạp hội viên mới đều diễn ra rất chậm chạp, thủ công.
+   - Hơn 500 hồ sơ doanh nghiệp Học viên nhưng dữ liệu đang bị phân tán rải rác trên các file Excel cá nhân, danh sách Zalo và giấy tờ văn phòng.
+   - Mỗi lần cần tra cứu đối tác hay xét duyệt kết nạp Học viên mới đều diễn ra rất chậm chạp, thủ công.
    - Đặc biệt, các doanh nhân 1983 vẫn đang thiếu một tấm thẻ định danh số sang trọng và một danh thiếp thông minh để khẳng định đẳng cấp khi đi giao lưu đối ngoại.
 
 2. **Yêu cầu thứ hai về Quản lý sự kiện:**
@@ -915,9 +915,9 @@ async function buildElevatedMarkdown() {
 *Thế nhưng, trong quá trình đào sâu nghiên cứu thực tế vận hành hiệp hội, **chính đội ngũ phát triển kỹ thuật của ViConnect đã nhìn nhận ra một mắt xích cốt tử** mà nếu không giải quyết, hệ sinh thái sẽ không thể vận hành hoàn hảo:*
 
 *Vì sao team kỹ thuật ViConnect lại nhìn nhận ra chức năng Thu - Chi?*  
-*Bởi vì các kỹ sư ViConnect nhận thấy: **Sự kiện và Hội viên không thể nào tách rời khỏi bài toán Quản trị dòng tiền!** Nếu chúng em chỉ làm đúng theo yêu cầu ban đầu là bán vé và soát vé sự kiện đơn thuần, thì sau mỗi kỳ Gala, Ban Sự kiện và Ban Tài chính sẽ rơi vào một ma trận chứng từ vô cùng áp lực:*
+*Bởi vì các kỹ sư ViConnect nhận thấy: **Sự kiện và Học viên không thể nào tách rời khỏi bài toán Quản trị dòng tiền!** Nếu chúng em chỉ làm đúng theo yêu cầu ban đầu là bán vé và soát vé sự kiện đơn thuần, thì sau mỗi kỳ Gala, Ban Sự kiện và Ban Tài chính sẽ rơi vào một ma trận chứng từ vô cùng áp lực:*
 - *Tiền tạm ứng cho Ban Sự kiện để đặt cọc địa điểm, tiền hoàn ứng khi thừa, tiền thu tài trợ bằng tiền mặt hoặc qua tài khoản, và tiền bán vé lẻ... tất cả đều phải ghi chép sổ tay, đối soát sao kê thủ công cực kỳ vất vả, rất dễ xảy ra sai sót, nhầm lẫn và gây rủi ro thất thoát ngân quỹ.*
-- *Quan trọng hơn cả, cuối quý, cuối năm, Ban Tài chính lấy đâu ra số liệu tức thì để lập Sổ Quỹ Tiền Mặt minh bạch báo cáo trước Đại hội hội viên và giải trình nộp lên Hội Doanh Nghiệp Trẻ Hà Nội (HanoiBA)?*
+- *Quan trọng hơn cả, cuối quý, cuối năm, Ban Tài chính lấy đâu ra số liệu tức thì để lập Sổ Quỹ Tiền Mặt minh bạch báo cáo trước Đại hội Học viên và giải trình nộp lên Hội Doanh Nghiệp Trẻ Hà Nội (HanoiBA)?*
 
 *Chính vì nhìn thấy trước lỗ hổng vận hành chí mạng đó, **team phát triển kỹ thuật ViConnect đã CHỦ ĐỘNG ĐỀ XUẤT, THIẾT KẾ VÀ TÍCH HỢP TRỌN BỘ PHÂN HỆ QUẢN LÝ THU - CHI KHÉP KÍN** vào hệ thống:*
 - **Tích hợp cổng thanh toán VietQR Napas 24/7**: Gạch nợ tự động sau đúng 1 giây.
@@ -929,8 +929,8 @@ async function buildElevatedMarkdown() {
 #### 2.4. Live Demo thực tế Mobile App & Web CRM
 *“Và bây giờ, em xin phép được mời các anh chị cùng hướng mắt lên màn hình lớn để chúng ta trực tiếp trải nghiệm giải pháp này hoạt động trên điện thoại thật và máy tính thật:*
 
-1. **Trải nghiệm Mobile App Hội viên CEO HN10 (Chiếu điện thoại thật):**
-   - **Thẻ Hội Viên VIP mạ vàng**: Mang mã số M1983 duy nhất, nhận diện Deep Cobalt Navy & Warm Amber Gold sang trọng.
+1. **Trải nghiệm Mobile App Học viên CEO HN10 (Chiếu điện thoại thật):**
+   - **Thẻ Học viên VIP mạ vàng**: Mang mã số M1983 duy nhất, nhận diện Deep Cobalt Navy & Warm Amber Gold sang trọng.
    - **Danh thiếp thông minh kép & Dynamic QR vCard 1 chạm**: Quét camera lưu ngay vào danh bạ điện thoại mà **HOÀN TOÀN KHÔNG CẦN CÀI APP**!
    - **Company Profile 2 trang**: Giới thiệu năng lực doanh nghiệp sắc nét.
    - **Danh bạ 11 ngành nghề & Đặt lịch hẹn B2B 1-on-1**: Đồng bộ lịch Google/Apple Calendar.
@@ -938,8 +938,8 @@ async function buildElevatedMarkdown() {
    - **Ví vé điện tử QR E-Ticket**: Soát vé dưới 1 giây, hỗ trợ Offline Cache chống mất mạng.
 
 2. **Trải nghiệm Web CRM Quản trị tháp chỉ huy (Chiếu máy tính thật):**
-   - **Executive Dashboard 360 độ**: Theo dõi nhịp đập CLB, hội viên, sự kiện, dòng tiền thời gian thực.
-   - **Quy trình thẩm định hội viên 3 bước nghiêm ngặt**: Cấp mã thẻ tự động, lưu trữ số hóa.
+   - **Executive Dashboard 360 độ**: Theo dõi nhịp đập CLB, Học viên, sự kiện, dòng tiền thời gian thực.
+   - **Quy trình thẩm định Học viên 3 bước nghiêm ngặt**: Cấp mã thẻ tự động, lưu trữ số hóa.
    - **Ma trận phân quyền RBAC cho 6 Ban chuyên môn**: Đúng người, đúng việc, bảo mật phân cấp.
    - **Sổ Quỹ Thu Chi Thông tư 200/2014/TT-BTC**: Bấm nút xuất Excel tải ngay mẫu S07-DN có công thức tính toán tự động.”*
 
@@ -951,7 +951,7 @@ async function buildElevatedMarkdown() {
 *“Chưa dừng lại ở đó, xuất phát từ góc nhìn của người làm công nghệ thực chiến, ViConnect còn chủ động kiến tạo thêm Bộ công cụ vận hành hàng ngày:*
 1. **Bảng giao việc Kanban phân cấp**: Chủ tịch, Tổng thư ký và các Trưởng ban giao việc rõ người, rõ hạn chót, theo dõi tiến độ trực quan.
 2. **Quản trị cuộc họp & Điểm danh QR động (Sapphire Hub)**: Mã QR đổi sau mỗi 30 giây chống chụp ảnh gửi ra ngoài điểm danh hộ, đính kèm tài liệu họp số.
-3. **Kho tài liệu số tập trung (Knowledge Hub)**: Lưu trữ Điều lệ CLB, Quy chế tài chính, Hợp đồng mẫu, Kỷ yếu để hội viên tra cứu tức thì.
+3. **Kho tài liệu số tập trung (Knowledge Hub)**: Lưu trữ Điều lệ CLB, Quy chế tài chính, Hợp đồng mẫu, Kỷ yếu để Học viên tra cứu tức thì.
 4. **Đàm thoại VoIP nội bộ mã hóa & Không gian mạng xã hội doanh nhân Moments B2B văn minh.**
 
 *Tất cả những phân hệ này khẳng định: **ViConnect không phải đơn vị gia công làm theo đơn hàng bề nổi, mà chúng em là Người Bạn Đồng Hành Công Nghệ Chiến Lược**, cùng xây dựng giải pháp trọn vẹn nhất cho CEO HN10!”*

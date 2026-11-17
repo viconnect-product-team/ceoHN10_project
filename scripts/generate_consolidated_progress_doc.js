@@ -55,8 +55,8 @@ const crmModules = [
       },
       {
         id: 'RBAC-04',
-        name: 'Phân quyền nhanh và khóa/mở khóa tài khoản trực tiếp trong Drawer chi tiết hội viên',
-        screen: 'Drawer Hội Viên CRM (/members)',
+        name: 'Phân quyền nhanh và khóa/mở khóa tài khoản trực tiếp trong Drawer chi tiết Học viên',
+        screen: 'Drawer Học viên CRM (/members)',
         api: 'PATCH /api/members/:id/status, PUT /api/users/:id/role',
         devDate: '12/09/2026',
         priority: 'Cao (P1)',
@@ -113,7 +113,7 @@ const crmModules = [
     features: [
       {
         id: 'DASH-01',
-        name: '4 Khối chỉ số KPI trọng điểm: Tổng hội viên, Hội phí thường niên đã thu, Sự kiện đã tổ chức, Deals giao thương',
+        name: '4 Khối chỉ số KPI trọng điểm: Tổng Học viên, Hội phí thường niên đã thu, Sự kiện đã tổ chức, Deals giao thương',
         screen: 'Bảng điều khiển (/dashboard)',
         api: 'GET /api/crm/dashboard/kpi-summary',
         devDate: '12/09/2026',
@@ -124,14 +124,14 @@ const crmModules = [
       },
       {
         id: 'DASH-02',
-        name: 'Biểu đồ tăng trưởng hội viên theo tháng và phân bổ theo 7 Ban Ngành Chuyên Trách',
+        name: 'Biểu đồ tăng trưởng Học viên theo tháng và phân bổ theo 7 Ban Ngành Chuyên Trách',
         screen: 'Bảng điều khiển (/dashboard)',
         api: 'GET /api/crm/dashboard/member-growth-chart',
         devDate: '13/09/2026',
         priority: 'Cao (P1)',
         status: 'Done',
         pct: 100,
-        note: 'Biểu đồ trực quan hóa cơ cấu ngành nghề và xu hướng gia nhập của hội viên.'
+        note: 'Biểu đồ trực quan hóa cơ cấu ngành nghề và xu hướng gia nhập của Học viên.'
       },
       {
         id: 'DASH-03',
@@ -146,7 +146,7 @@ const crmModules = [
       },
       {
         id: 'DASH-04',
-        name: 'Khối cảnh báo nhanh: Hồ sơ hội viên chờ duyệt, vé sự kiện sắp khai mạc và phản hồi cần xử lý',
+        name: 'Khối cảnh báo nhanh: Hồ sơ Học viên chờ duyệt, vé sự kiện sắp khai mạc và phản hồi cần xử lý',
         screen: 'Bảng điều khiển (/dashboard)',
         api: 'GET /api/crm/dashboard/action-alerts',
         devDate: '14/09/2026',
@@ -159,13 +159,13 @@ const crmModules = [
   },
   {
     moduleId: 'CRM-04',
-    moduleName: 'Quản Trị Hội Viên, Xét Duyệt Hồ Sơ 360° & Cấp Tài Khoản Email',
+    moduleName: 'Quản Trị Học viên, Xét Duyệt Hồ Sơ 360° & Cấp Tài Khoản Email',
     platform: 'Web CRM',
     features: [
       {
         id: 'MEM-CRM-01',
-        name: 'Bảng dữ liệu hội viên đa năng: Data Table phân trang, sắp xếp, tìm kiếm họ tên/công ty/MST',
-        screen: 'Quản trị Hội Viên (/members)',
+        name: 'Bảng dữ liệu Học viên đa năng: Data Table phân trang, sắp xếp, tìm kiếm họ tên/công ty/MST',
+        screen: 'Quản trị Học viên (/members)',
         api: 'GET /api/members, GET /api/members/search',
         devDate: '12/09/2026',
         priority: 'Khẩn cấp (P0)',
@@ -176,18 +176,18 @@ const crmModules = [
       {
         id: 'MEM-CRM-02',
         name: 'Bộ lọc thông minh theo 7 Ban Ngành Chuyên Trách và Trạng thái nộp hội phí',
-        screen: 'Quản trị Hội Viên (/members)',
+        screen: 'Quản trị Học viên (/members)',
         api: 'GET /api/members?department=...&feeStatus=...',
         devDate: '13/09/2026',
         priority: 'Cao (P1)',
         status: 'Done',
         pct: 100,
-        note: 'Dễ dàng phân loại hội viên theo từng ban chuyên môn và tình trạng đóng phí.'
+        note: 'Dễ dàng phân loại Học viên theo từng ban chuyên môn và tình trạng đóng phí.'
       },
       {
         id: 'MEM-CRM-03',
         name: 'Drawer thẩm định hồ sơ 360°: Hiển thị đầy đủ thông tin cá nhân, pháp nhân, MST, CCCD, ảnh đại diện',
-        screen: 'Drawer Chi Tiết Hội Viên (/members)',
+        screen: 'Drawer Chi Tiết Học viên (/members)',
         api: 'GET /api/members/:id/detail-360',
         devDate: '13/09/2026',
         priority: 'Cao (P1)',
@@ -197,8 +197,8 @@ const crmModules = [
       },
       {
         id: 'MEM-CRM-04',
-        name: 'Thao tác Phê duyệt (Approve) tự động cấp mã hội viên HN10-xxx và sinh tài khoản đăng nhập vione_users',
-        screen: 'Drawer Chi Tiết Hội Viên (/members)',
+        name: 'Thao tác Phê duyệt (Approve) tự động cấp mã Học viên HN10-xxx và sinh tài khoản đăng nhập vione_users',
+        screen: 'Drawer Chi Tiết Học viên (/members)',
         api: 'POST /api/members/:id/approve',
         devDate: '14/09/2026',
         priority: 'Khẩn cấp (P0)',
@@ -219,8 +219,8 @@ const crmModules = [
       },
       {
         id: 'MEM-CRM-06',
-        name: 'Thao tác Từ chối (Reject) kèm lý do chi tiết & Xuất danh bạ hội viên ra file Excel tiêu chuẩn',
-        screen: 'Drawer Chi Tiết Hội Viên (/members)',
+        name: 'Thao tác Từ chối (Reject) kèm lý do chi tiết & Xuất danh bạ Học viên ra file Excel tiêu chuẩn',
+        screen: 'Drawer Chi Tiết Học viên (/members)',
         api: 'POST /api/members/:id/reject, GET /api/members/export-excel',
         devDate: '15/09/2026',
         priority: 'Trung bình (P2)',
@@ -321,14 +321,14 @@ const crmModules = [
       },
       {
         id: 'VOTE-CRM-03',
-        name: 'Đẩy thông báo biểu quyết tức thì về App Hội Viên để tham gia bỏ phiếu 1 chạm',
+        name: 'Đẩy thông báo biểu quyết tức thì về App Học viên để tham gia bỏ phiếu 1 chạm',
         screen: 'Quản trị Biểu Quyết (/voting)',
         api: 'POST /api/voting/sessions/:id/broadcast',
         devDate: '15/09/2026',
         priority: 'Cao (P1)',
         status: 'Done',
         pct: 100,
-        note: 'Tất cả hội viên tham dự sự kiện nhận thông báo đẩy về hòm thư để vote ngay.'
+        note: 'Tất cả Học viên tham dự sự kiện nhận thông báo đẩy về hòm thư để vote ngay.'
       },
       {
         id: 'VOTE-CRM-04',
@@ -350,7 +350,7 @@ const crmModules = [
     features: [
       {
         id: 'MKT-CRM-01',
-        name: 'Hàng đợi thẩm định sản phẩm do hội viên đăng tải từ App Hiệp Hội',
+        name: 'Hàng đợi thẩm định sản phẩm do Học viên đăng tải từ App Hiệp Hội',
         screen: 'Sàn Giao Thương CRM (/marketplace)',
         api: 'GET /api/crm/marketplace/products?status=pending',
         devDate: '13/09/2026',
@@ -368,7 +368,7 @@ const crmModules = [
         priority: 'Cao (P1)',
         status: 'Done',
         pct: 100,
-        note: 'Đảm bảo sản phẩm có nguồn gốc uy tín và ưu đãi giá độc quyền cho hội viên CLB.'
+        note: 'Đảm bảo sản phẩm có nguồn gốc uy tín và ưu đãi giá độc quyền cho Học viên CLB.'
       },
       {
         id: 'MKT-CRM-03',
@@ -430,7 +430,7 @@ const crmModules = [
         priority: 'Cao (P1)',
         status: 'Done',
         pct: 100,
-        note: 'Cung cấp số liệu chính xác phục vụ báo cáo đại hội và vinh danh hội viên.'
+        note: 'Cung cấp số liệu chính xác phục vụ báo cáo đại hội và vinh danh Học viên.'
       }
     ]
   },
@@ -481,7 +481,7 @@ const crmModules = [
     features: [
       {
         id: 'FIN-01',
-        name: 'Bảng theo dõi hội phí thường niên theo từng năm tài chính của toàn bộ hội viên (Đã nộp / Chưa nộp / Quá hạn)',
+        name: 'Bảng theo dõi hội phí thường niên theo từng năm tài chính của toàn bộ Học viên (Đã nộp / Chưa nộp / Quá hạn)',
         screen: 'Quản Lý Hội Phí Thường Niên (/finance/membership-fees)',
         api: 'GET /api/crm/finance/fees',
         devDate: '13/09/2026',
@@ -499,7 +499,7 @@ const crmModules = [
         priority: 'Cao (P1)',
         status: 'Done',
         pct: 90,
-        note: 'Tự động bắt khớp mã giao dịch Napas 247 và gạch nợ tức thì cho hội viên.'
+        note: 'Tự động bắt khớp mã giao dịch Napas 247 và gạch nợ tức thì cho Học viên.'
       },
       {
         id: 'FIN-03',
@@ -620,7 +620,7 @@ const crmModules = [
 
 // Combine all modules
 const allModules = [
-  ...appModules.map(m => ({ ...m, platform: 'App Hội Viên' })),
+  ...appModules.map(m => ({ ...m, platform: 'App Học viên' })),
   ...crmModules
 ];
 
@@ -668,7 +668,7 @@ const overallPct = Math.round((totalDone / totalTasks) * 100);
 // Build Markdown
 let md = `# KẾ HOẠCH TIẾN ĐỘ & DANH MỤC TÍNH NĂNG HỢP NHẤT TOÀN DIỆN
 **HỆ THỐNG SỐ HÓA HIỆP HỘI CLB DOANH NHÂN CEO HN10**  
-**Dự án:** VIONE Ecosystem · **Phân hệ:** Hợp Nhất 100% **App Hội Viên** & **Web CRM Quản Trị**  
+**Dự án:** VIONE Ecosystem · **Phân hệ:** Hợp Nhất 100% **App Học viên** & **Web CRM Quản Trị**  
 **Đơn vị chủ quản:** Ban Quản Trị & Ban Thư Ký CLB Doanh Nhân CEO HN10 (Trực thuộc HanoiBA)  
 **Người phụ trách phát triển:** Phạm Văn Vũ · **Thời gian cập nhật:** Tháng 09/2026  
 
@@ -676,7 +676,7 @@ let md = `# KẾ HOẠCH TIẾN ĐỘ & DANH MỤC TÍNH NĂNG HỢP NHẤT TOÀ
 
 ## 1. TỔNG QUAN HIỆN TRẠNG & TỶ LỆ HOÀN THIỆN TOÀN HỆ THỐNG
 
-- **Tổng số phân hệ chức năng hợp nhất:** **24 phân hệ** (13 Phân hệ App Hội Viên + 11 Phân hệ Web CRM Quản Trị)
+- **Tổng số phân hệ chức năng hợp nhất:** **24 phân hệ** (13 Phân hệ App Học viên + 11 Phân hệ Web CRM Quản Trị)
 - **Tổng số hạng mục tính năng khảo sát & triển khai:** **${totalTasks} tính năng**
 - **Phân bổ theo 3 trạng thái chuẩn:**
   - 📋 **Khởi tạo:** **${totalKhoiTao} / ${totalTasks} tính năng** (${Math.round((totalKhoiTao / totalTasks) * 100)}%)
@@ -692,7 +692,7 @@ let md = `# KẾ HOẠCH TIẾN ĐỘ & DANH MỤC TÍNH NĂNG HỢP NHẤT TOÀ
 
 ---
 
-## 2. BẢNG TỔNG HỢP TIẾN ĐỘ THEO PHÂN HỆ (APP HỘI VIÊN & WEB CRM)
+## 2. BẢNG TỔNG HỢP TIẾN ĐỘ THEO PHÂN HỆ (APP Học viên & WEB CRM)
 
 | Mã Phân Hệ | Tên Phân Hệ Chức Năng | Nền Tảng | Tổng Số Task | Khởi tạo | Inprocess | Done | Tỷ Lệ Hoàn Thành |
 |---|---|:---:|:---:|:---:|:---:|:---:|:---:|
@@ -799,7 +799,7 @@ async function generateExcel() {
   // Subtitle
   wsOverview.mergeCells('B3:H3');
   const subCell = wsOverview.getCell('B3');
-  subCell.value = 'Hợp Nhất 100% App Hội Viên (13 Phân hệ) & Web CRM Quản Trị (11 Phân hệ) · 127 Tính Năng';
+  subCell.value = 'Hợp Nhất 100% App Học viên (13 Phân hệ) & Web CRM Quản Trị (11 Phân hệ) · 127 Tính Năng';
   subCell.font = { name: 'Times New Roman', size: 11, italic: true, color: { argb: '475569' } };
   subCell.alignment = { vertical: 'middle', horizontal: 'center' };
   wsOverview.getRow(3).height = 24;

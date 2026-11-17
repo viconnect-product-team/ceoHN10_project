@@ -31,7 +31,7 @@ async function run() {
       const assocId = assoc.rows[0].id;
       await client.query(`
         INSERT INTO public.vba_memberships (user_id, association_id, membership_role, executive_role, status, joined_at, created_at, updated_at)
-        VALUES ($1, $2, 'member', 'Hội viên chính thức', 'approved', NOW(), NOW(), NOW())
+        VALUES ($1, $2, 'member', 'Học viên chính thức', 'approved', NOW(), NOW(), NOW())
         ON CONFLICT DO NOTHING
       `, [userId, assocId]).catch(err => console.log('Membership insert notice:', err.message));
     }

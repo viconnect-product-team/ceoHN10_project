@@ -1,25 +1,25 @@
 // Module sinh nội dung BRD Mobile App chi tiết, sâu sắc nhất chuẩn quản trị doanh nghiệp
 // Nghiêm cấm dùng từ NFC, thay bằng Thẻ thông minh doanh nhân / Công nghệ chạm thẻ thông minh 1 chạm
 function getAppBrdMarkdown() {
-  return `# TÀI LIỆU YÊU CẦU NGHIỆP VỤ ỨNG DỤNG DI ĐỘNG HỘI VIÊN (BRD - MOBILE APP)
+   return `# TÀI LIỆU YÊU CẦU NGHIỆP VỤ ỨNG DỤNG DI ĐỘNG Học viên (BRD - MOBILE APP)
 ## ỨNG DỤNG DI ĐỘNG CLB DOANH NHÂN CEO HN10 (HANOIBA)
 *Phiên bản: 5.0 Hoàn thiện - Phát hành: Tháng 10/2026 - Ngôn ngữ: Văn phong Quản trị Doanh nghiệp chuẩn mực*
 
 ---
 
 # LỜI MỞ ĐẦU & TÔN CHỈ THIẾT KẾ
-Ứng dụng di động **CLB Doanh Nhân CEO HN10** được thiết kế độc bản dành riêng cho các doanh nhân sinh năm Quý Hợi 1983. Ứng dụng là chiếc cầu nối không khoảng cách giữa các hội viên với nhau và giữa hội viên với Ban Điều Hành hiệp hội.
+Ứng dụng di động **CLB Doanh Nhân CEO HN10** được thiết kế độc bản dành riêng cho các doanh nhân sinh năm Quý Hợi 1983. Ứng dụng là chiếc cầu nối không khoảng cách giữa các Học viên với nhau và giữa Học viên với Ban Điều Hành hiệp hội.
 
 Trọng tâm thiết kế hướng tới: **Sang trọng, Tối giản, Mượt mà và Đậm chất Doanh nhân bản lĩnh**. Mọi thao tác đều được tối ưu hóa cho màn hình cảm ứng di động với thời gian phản hồi tức thì.
 
-*Tài liệu cam kết tuân thủ nghiêm ngặt quy định: Chuẩn hóa toàn bộ công nghệ kết nối hội viên bằng cụm từ chính thức: "Thẻ thông minh doanh nhân / Công nghệ chạm thẻ thông minh 1 chạm", sử dụng toàn bộ bằng ngôn từ quản trị kinh doanh thực tiễn.*
+*Tài liệu cam kết tuân thủ nghiêm ngặt quy định: Chuẩn hóa toàn bộ công nghệ kết nối Học viên bằng cụm từ chính thức: "Thẻ thông minh doanh nhân / Công nghệ chạm thẻ thông minh 1 chạm", sử dụng toàn bộ bằng ngôn từ quản trị kinh doanh thực tiễn.*
 
 ---
 
-# CHƯƠNG 1: ĐỊNH VỊ SẢN PHẨM & ĐẶC QUYỀN HỘI VIÊN
+# CHƯƠNG 1: ĐỊNH VỊ SẢN PHẨM & ĐẶC QUYỀN Học viên
 1. **Định vị sản phẩm**:
    - Ứng dụng di động không đơn thuần là một kênh tra cứu thông tin, mà là **Tấm Danh Thiếp Số Quyền Năng** và **Văn Phòng Điều Hành Bỏ Túi** của từng chủ doanh nghiệp.
-2. **Đặc quyền độc bản dành riêng cho hội viên**:
+2. **Đặc quyền độc bản dành riêng cho Học viên**:
    - Sở hữu Tấm Thẻ thông minh doanh nhân điện tử mạ vàng độc bản tích hợp chip thông minh 1 chạm.
    - Nhận chỉ đạo công việc và tài liệu mật từ Ban Điều Hành ngay trên điện thoại.
    - Nhận vé mời sự kiện VIP và quyền lợi check-in không chạm tại các diễn đàn kinh tế lớn.
@@ -30,7 +30,7 @@ Trọng tâm thiết kế hướng tới: **Sang trọng, Tối giản, Mượt 
 # CHƯƠNG 2: THẺ THÔNG MINH DOANH NHÂN & CÔNG NGHỆ CHẠM THẺ 1 CHẠM
 1. **Tấm Thẻ thông minh doanh nhân mạ vàng**:
    - Thiết kế ánh kim vàng sang trọng Warm Amber Gold trên nền xanh Deep Cobalt Navy của hiệp hội.
-   - Thể hiện đầy đủ mã hội viên chính danh, họ tên, chức vụ, tên công ty và logo dập nổi CEO HN10.
+   - Thể hiện đầy đủ mã Học viên chính danh, họ tên, chức vụ, tên công ty và logo dập nổi CEO HN10.
 2. **Công nghệ Chạm thẻ thông minh 1 chạm (Truyền tải thông tin tức thì)**:
    - Tích hợp chip thông minh bảo mật cao: Chỉ cần đưa tấm thẻ hoặc lưng điện thoại chạm nhẹ vào điện thoại của đối tác, toàn bộ hồ sơ năng lực công ty, website, catalog sản phẩm và thông tin liên hệ được truyền tải trọn vẹn trong 1 giây mà đối tác không cần cài đặt ứng dụng.
    - Tích hợp mã QR định danh động chống sao chép trái phép.
@@ -38,20 +38,20 @@ Trọng tâm thiết kế hướng tới: **Sang trọng, Tối giản, Mượt 
 ---
 
 # CHƯƠNG 3: QUY TRÌNH NHẬN VIỆC, BÁO CÁO TIẾN ĐỘ & NỘP TÀI LIỆU DI ĐỘNG
-1. **Nhận nhiệm vụ tức thời**: Khi Chủ tịch, Ban Điều Hành, Tổng thư ký hoặc Trưởng ban giao việc, điện thoại hội viên lập tức phát chuông và hiển thị thông báo nhiệm vụ mới kèm mức độ khẩn cấp.
+1. **Nhận nhiệm vụ tức thời**: Khi Chủ tịch, Ban Điều Hành, Tổng thư ký hoặc Trưởng ban giao việc, điện thoại Học viên lập tức phát chuông và hiển thị thông báo nhiệm vụ mới kèm mức độ khẩn cấp.
 2. **Xem và tải tài liệu đính kèm**: Xem trước trực tiếp các tệp văn bản Word, bảng tính Excel dự toán và tệp PDF ngay trên màn hình điện thoại.
 3. **Cập nhật tiến độ & nộp kết quả nghiệm thu**: Báo cáo phần trăm hoàn thành, chụp ảnh hiện trường sản phẩm nghiệm thu bằng camera điện thoại và gửi duyệt ngay tại chỗ.
 
 ---
 
 # CHƯƠNG 4: SÀN GIAO THƯƠNG B2B & KẾT NỐI CUNG - CẦU NỘI BỘ
-1. **Gian hàng doanh nghiệp thành viên**: Mỗi doanh nghiệp hội viên sở hữu một gian hàng số giới thiệu các sản phẩm, giải pháp và năng lực mũi nhọn.
-2. **Chính sách ưu đãi đặc quyền B2B**: Cam kết mức chiết khấu ưu đãi nội bộ dành riêng cho hội viên câu lạc bộ; kết nối trực tiếp giữa người mua và người bán không qua trung gian.
+1. **Gian hàng doanh nghiệp thành viên**: Mỗi doanh nghiệp Học viên sở hữu một gian hàng số giới thiệu các sản phẩm, giải pháp và năng lực mũi nhọn.
+2. **Chính sách ưu đãi đặc quyền B2B**: Cam kết mức chiết khấu ưu đãi nội bộ dành riêng cho Học viên câu lạc bộ; kết nối trực tiếp giữa người mua và người bán không qua trung gian.
 
 ---
 
 # CHƯƠNG 5: MẠNG LƯỚI DOANH NHÂN CHÍNH DANH & LỊCH HẸN 1-ON-1
-1. **Danh bạ hội viên tin cậy 100%**: Tìm kiếm đối tác theo lĩnh vực kinh doanh, ngành hàng hoặc sở thích giao thương.
+1. **Danh bạ Học viên tin cậy 100%**: Tìm kiếm đối tác theo lĩnh vực kinh doanh, ngành hàng hoặc sở thích giao thương.
 2. **Đặt lịch hẹn cà phê giao thương 1-on-1**: Chọn khung giờ rảnh và gửi lời mời kết nối; thông tin lịch hẹn tự động đồng bộ sang lịch công tác của cả hai doanh nhân.
 
 ---
@@ -77,7 +77,7 @@ Trọng tâm thiết kế hướng tới: **Sang trọng, Tối giản, Mượt 
 ---
 
 # CHƯƠNG 9: KÊNH GÓP Ý TRỰC TIẾP TỚI CHỦ TỊCH & BAN ĐIỀU HÀNH
-- Hội viên có thể gửi tâm thư, đề xuất giải pháp phát triển câu lạc bộ hoặc phản ánh vướng mắc trực tiếp tới Ban Điều Hành một cách bảo mật và dân chủ.
+- Học viên có thể gửi tâm thư, đề xuất giải pháp phát triển câu lạc bộ hoặc phản ánh vướng mắc trực tiếp tới Ban Điều Hành một cách bảo mật và dân chủ.
 
 ---
 
@@ -96,5 +96,5 @@ Trọng tâm thiết kế hướng tới: **Sang trọng, Tối giản, Mượt 
 }
 
 module.exports = {
-  getAppBrdMarkdown,
+   getAppBrdMarkdown,
 };

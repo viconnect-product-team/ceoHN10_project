@@ -118,14 +118,14 @@ function resolveDisplay(
   customAvatar?: string | null,
   currentUser?: any,
 ): Display {
-  const isGeneric = !member?.name || member.name === "Thành viên mới" || member.name === "Hội viên CLB CEO HN10";
+  const isGeneric = !member?.name || member.name === "Thành viên mới" || member.name === "Học viên CLB CEO HN10";
   const authUserName = currentUser?.name || currentUser?.user_metadata?.full_name;
 
   // Khi người dùng chỉnh sửa hồ sơ thẻ (customProfile hoặc settings), thông tin mới cập nhật PHẢI có độ ưu tiên cao nhất
   const customName = customProfile?.name?.trim() || s?.displayName?.trim();
   const dbMemberName = (!isGeneric && member?.name) ? member.name.trim() : null;
   const rawName = customName || dbMemberName || authUserName || member?.name || "";
-  const cleanName = rawName || "Hội viên CLB CEO HN10";
+  const cleanName = rawName || "Học viên CLB CEO HN10";
 
   const customCompany = customProfile?.company?.trim() || s?.displayCompany?.trim();
   const dbCompany = (member as any)?.companyName || (member as any)?.company;
@@ -134,7 +134,7 @@ function resolveDisplay(
   const cleanCompany = !rawCompany || isOldSeed ? "CLB Doanh Nhân CEO HN10" : rawCompany;
 
   return {
-    name: cleanName.trim() || "Hội viên CLB CEO HN10",
+    name: cleanName.trim() || "Học viên CLB CEO HN10",
     company: cleanCompany.trim(),
     photo: (() => {
       const raw =
@@ -246,7 +246,7 @@ function CardScreen() {
           setDirectMember(live);
         }
       })
-      .catch(() => {});
+      .catch(() => { });
     return () => {
       active = false;
     };
@@ -416,7 +416,7 @@ function CardScreen() {
       }
       const cp = JSON.parse(localStorage.getItem("ceohn10_custom_profile") || "null");
       if (cp?.companyLogo && !isBlackBackgroundLogo(cp.companyLogo)) return cp.companyLogo;
-    } catch {}
+    } catch { }
     return "/ceohn10-official-logo.png";
   });
 
@@ -454,7 +454,7 @@ function CardScreen() {
     try {
       const raw = localStorage.getItem("vba_company_profile_2pages");
       if (raw) return JSON.parse(raw);
-    } catch {}
+    } catch { }
     return DEFAULT_COMPANY_PROFILE;
   });
   const [contractData, setContractData] = useState(() => {
@@ -463,19 +463,19 @@ function CardScreen() {
         contractNo: "HĐ-CEO HN10/2024-VIP08",
         joinedAt: "15/08/2023",
         validUntil: "15/08/2027",
-        tier: "Hội viên Doanh nghiệp VIP",
+        tier: "Học viên Doanh nghiệp VIP",
         status: "Đang hiệu lực",
       };
     }
     try {
       const raw = localStorage.getItem("vba_member_contract_data");
       if (raw) return JSON.parse(raw);
-    } catch {}
+    } catch { }
     return {
       contractNo: "HĐ-CEO HN10/2024-VIP08",
       joinedAt: "15/08/2023",
       validUntil: "15/08/2027",
-      tier: "Hội viên Doanh nghiệp VIP",
+      tier: "Học viên Doanh nghiệp VIP",
       status: "Đang hiệu lực",
     };
   });
@@ -492,7 +492,7 @@ function CardScreen() {
     try {
       const raw = localStorage.getItem("vba_member_privacy_settings");
       if (raw) return JSON.parse(raw);
-    } catch {}
+    } catch { }
     return {
       showPhone: true,
       showEmail: true,
@@ -509,7 +509,7 @@ function CardScreen() {
         setCustomAvatar(localStorage.getItem("vba_member_avatar_photo"));
         const logo = e?.detail?.companyLogo || localStorage.getItem("vba_member_company_logo");
         if (logo) setCompanyLogo(logo);
-      } catch {}
+      } catch { }
     };
     const handleSyncContractAndPrivacy = () => {
       try {
@@ -517,7 +517,7 @@ function CardScreen() {
         if (rawContract) setContractData(JSON.parse(rawContract));
         const rawPrivacy = localStorage.getItem("vba_member_privacy_settings");
         if (rawPrivacy) setCardPrivacy(JSON.parse(rawPrivacy));
-      } catch {}
+      } catch { }
     };
     const handleCoverUpdate = (e?: any) => {
       try {
@@ -527,7 +527,7 @@ function CardScreen() {
         } else {
           setCoverPhoto(localStorage.getItem("vba_member_cover_photo"));
         }
-      } catch {}
+      } catch { }
     };
     const handleLogoUpdate = (e?: any) => {
       try {
@@ -537,13 +537,13 @@ function CardScreen() {
         } else {
           setCompanyLogo(localStorage.getItem("vba_member_company_logo"));
         }
-      } catch {}
+      } catch { }
     };
     const handle2PageProfileUpdate = (e?: any) => {
       try {
         const raw = localStorage.getItem("vba_company_profile_2pages");
         if (raw) setCompanyProfile2Pages(JSON.parse(raw));
-      } catch {}
+      } catch { }
     };
     window.addEventListener("profile-updated", handleProfileUpdate);
     window.addEventListener("ceohn10_profile_updated", handleProfileUpdate);
@@ -576,7 +576,7 @@ function CardScreen() {
     if (!code) return;
     navigator.clipboard.writeText(code);
     setCopiedCode(true);
-    toast.success(lang === "en" ? "Member code copied!" : "Đã sao chép mã hội viên!");
+    toast.success(lang === "en" ? "Member code copied!" : "Đã sao chép mã Học viên!");
     setTimeout(() => setCopiedCode(false), 2000);
   };
 
@@ -587,17 +587,17 @@ function CardScreen() {
     effectiveMember?.code ||
     (typeof window !== "undefined"
       ? (() => {
-          try {
-            const m = JSON.parse(localStorage.getItem(user?.id ? `vba_my_member_${user.id}` : "vba_my_member") || "null");
-            return m?.code || null;
-          } catch {
-            return null;
-          }
-        })()
+        try {
+          const m = JSON.parse(localStorage.getItem(user?.id ? `vba_my_member_${user.id}` : "vba_my_member") || "null");
+          return m?.code || null;
+        } catch {
+          return null;
+        }
+      })()
       : null) ||
     "HN10-292";
 
-  // URL danh thiếp số công khai - khi quét từ bất kỳ ứng dụng nào (Zalo, Camera iOS/Android) đều mở ra hồ sơ hội viên
+  // URL danh thiếp số công khai - khi quét từ bất kỳ ứng dụng nào (Zalo, Camera iOS/Android) đều mở ra hồ sơ Học viên
   const resolvedCardCode = effectiveMember?.code || currentMemberCode || "HN10-001";
   const qrValue = `${origin}/card/${encodeURIComponent(resolvedCardCode)}`;
 
@@ -606,20 +606,20 @@ function CardScreen() {
   const stateStyle = STATE_STYLES[state];
   const pass = effectiveMember
     ? buildMembershipPass({
-        memberCode: effectiveMember.code,
-        memberName: d.name || effectiveMember.name,
-        organization: d.company || effectiveMember.title,
-        associationName: brand?.name ?? null,
-        associationLogoUrl: brand?.logoUrl ?? null,
-        membershipLevel: effectiveMember.type === "company" ? "Doanh nghiệp" : "Cá nhân",
-        state,
-        issuedAt: effectiveMember.joinedAt,
-        expiresAt: effectiveMember.validUntil,
-        themeId: theme.id,
-        brandPrimary: brand?.brandPrimary ?? null,
-        origin,
-        photoUrl: d.photo,
-      })
+      memberCode: effectiveMember.code,
+      memberName: d.name || effectiveMember.name,
+      organization: d.company || effectiveMember.title,
+      associationName: brand?.name ?? null,
+      associationLogoUrl: brand?.logoUrl ?? null,
+      membershipLevel: effectiveMember.type === "company" ? "Doanh nghiệp" : "Cá nhân",
+      state,
+      issuedAt: effectiveMember.joinedAt,
+      expiresAt: effectiveMember.validUntil,
+      themeId: theme.id,
+      brandPrimary: brand?.brandPrimary ?? null,
+      origin,
+      photoUrl: d.photo,
+    })
     : null;
   const wallets = walletCapabilities();
 
@@ -684,7 +684,7 @@ function CardScreen() {
     if (typeof navigator !== "undefined" && navigator.clipboard) {
       await navigator.clipboard.writeText(url);
       setCopiedLink(true);
-      toast.success("Đã sao chép liên kết danh thiếp hội viên!");
+      toast.success("Đã sao chép liên kết danh thiếp Học viên!");
       setTimeout(() => setCopiedLink(false), 2000);
     }
   };
@@ -695,7 +695,7 @@ function CardScreen() {
     if (typeof navigator !== "undefined" && navigator.share) {
       try {
         await navigator.share({
-          title: `Hồ sơ Hội viên CEO HN10 - ${d.name || effectiveMember.name}`,
+          title: `Hồ sơ Học viên CEO HN10 - ${d.name || effectiveMember.name}`,
           text: `Danh thiếp & Hồ sơ Doanh nhân ${d.name || effectiveMember.name} - ${d.company || effectiveMember.title}`,
           url,
         });
@@ -747,7 +747,7 @@ function CardScreen() {
         mem.companyProfileUrl = uploadedUrl;
         mem.brochureUrl = uploadedUrl;
         localStorage.setItem("vba_my_member", JSON.stringify(mem));
-      } catch {}
+      } catch { }
 
       // Dispatch event to sync with other components
       window.dispatchEvent(new CustomEvent("profile-updated", { detail: updatedProfile }));
@@ -805,7 +805,7 @@ function CardScreen() {
           />
         </div>
 
-        {/* Thời gian hiệu lực thẻ hội viên (thay thế Đã đồng bộ theo Req 7) */}
+        {/* Thời gian hiệu lực thẻ Học viên (thay thế Đã đồng bộ theo Req 7) */}
         <div className="mt-3 flex items-center justify-center gap-1.5 text-[12px] font-medium text-slate-600 dark:text-slate-400">
           <CalendarClock className="h-3.5 w-3.5 text-amber-500" />
           <span>
@@ -816,7 +816,7 @@ function CardScreen() {
           </span>
         </div>
 
-        {/* Nút thao tác dưới thẻ hội viên */}
+        {/* Nút thao tác dưới thẻ Học viên */}
         <div className="mt-3.5 space-y-2">
           {/* Cặp nút Hành động chính: Quét QR & Chụp danh thiếp nằm cạnh nhau */}
           <div className="grid grid-cols-2 gap-2.5 w-full">
@@ -895,7 +895,7 @@ function CardScreen() {
           </div>
         </div>
 
-        {/* ── HỒ SƠ HỘI VIÊN & DOANH NGHIỆP (PROFILE) ── */}
+        {/* ── HỒ SƠ Học viên & DOANH NGHIỆP (PROFILE) ── */}
         <div className="mt-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-[#0F172A] p-4 shadow-sm">
           <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
             <div className="flex items-center gap-2.5">
@@ -915,10 +915,10 @@ function CardScreen() {
           </div>
 
           <div className="mt-3 space-y-2 text-[12.5px]">
-            {/* Tách riêng hàng Hội viên và hàng Chức vụ */}
+            {/* Tách riêng hàng Học viên và hàng Chức vụ */}
             <div className="flex items-center justify-between py-1.5 border-b border-slate-100 dark:border-slate-800">
-              <span className="font-semibold text-slate-500 dark:text-slate-400">Hội viên:</span>
-              <span className="font-bold text-slate-900 dark:text-white">{d.name || effectiveMember?.name || "Hội viên CEO HN10"}</span>
+              <span className="font-semibold text-slate-500 dark:text-slate-400">Học viên:</span>
+              <span className="font-bold text-slate-900 dark:text-white">{d.name || effectiveMember?.name || "Học viên CEO HN10"}</span>
             </div>
             <div className="flex items-center justify-between py-1.5 border-b border-slate-100 dark:border-slate-800">
               <span className="font-semibold text-slate-500 dark:text-slate-400">Chức vụ:</span>
@@ -1095,7 +1095,7 @@ function CardScreen() {
                 const p2 = { ...companyProfile2Pages, companyProfileUrl: null, companyProfileName: null };
                 localStorage.setItem("vba_company_profile_2pages", JSON.stringify(p2));
                 setCompanyProfile2Pages(p2);
-              } catch {}
+              } catch { }
               toast.success("Đã chuyển về mẫu hồ sơ số hóa 2 trang!");
             }}
           />
@@ -1157,7 +1157,7 @@ function CardScreen() {
           onClose={() => setCompanyProfileModalOpen(false)}
           data={{
             companyName: d.company || (effectiveMember as any)?.company || (effectiveMember as any)?.companyName || "CLB Doanh Nhân CEO HN10",
-            leaderName: d.name || effectiveMember?.name || "Hội viên CEO HN10",
+            leaderName: d.name || effectiveMember?.name || "Học viên CEO HN10",
             leaderTitle: customProfile?.title || effectiveMember?.title || "Chủ tịch / Tổng Giám đốc",
             memberCode: currentMemberCode,
             industry: customProfile?.industry || effectiveMember?.industry || "Thương mại & Dịch vụ Đa ngành",
@@ -1269,18 +1269,18 @@ function CardScreen() {
                   avatar: freshAvatar || fresh.avatar || prev?.avatar,
                 }));
               }
-            } catch {}
+            } catch { }
             reloadSettings();
           }}
         />
       )}
 
-      {/* ── MODAL MÃ QR HỘI VIÊN & QUÉT QR (DUAL TAB) ── */}
+      {/* ── MODAL MÃ QR Học viên & QUÉT QR (DUAL TAB) ── */}
       <AssociationMemberQrModal
         open={memberQrModalOpen}
         onClose={() => setMemberQrModalOpen(false)}
         memberCode={currentMemberCode}
-        memberName={d.name || "Hội viên CEO HN10"}
+        memberName={d.name || "Học viên CEO HN10"}
         memberTitle={customProfile?.title || member?.title || "Ban Quản Trị"}
         memberCompany={d.company || "CLB Doanh Nhân CEO HN10"}
         memberAvatar={d.photo || null}
@@ -1478,7 +1478,7 @@ function EditCardModal({
             avatarBlobRef.current = null;
           }
         })
-        .catch(() => {});
+        .catch(() => { });
     } catch (err) {
       toast.error(err instanceof Error ? err.message : t("m.card.photoLoadError"));
     }
@@ -1577,7 +1577,7 @@ function EditCardModal({
         localStorage.setItem("ceohn10_custom_profile", JSON.stringify(updatedProfile));
         if (finalPhoto) localStorage.setItem("vba_member_avatar_photo", finalPhoto);
         if (finalLogo) localStorage.setItem("vba_member_company_logo", finalLogo);
-      } catch {}
+      } catch { }
 
       window.dispatchEvent(new CustomEvent("profile-updated", { detail: updatedProfile }));
       window.dispatchEvent(new CustomEvent("ceohn10_profile_updated", { detail: updatedProfile }));
@@ -1619,7 +1619,7 @@ function EditCardModal({
 
         <h2 className="mb-4 text-[16px] font-bold text-slate-900 dark:text-white flex items-center gap-2">
           <Pencil className="h-4 w-4 text-amber-500" />
-          <span>Chỉnh sửa hồ sơ hội viên</span>
+          <span>Chỉnh sửa hồ sơ Học viên</span>
         </h2>
 
         {/* Photo */}
@@ -1666,7 +1666,7 @@ function EditCardModal({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className="mb-1 block text-[11.5px] font-medium text-slate-600 dark:text-slate-400">
-                Họ và tên hội viên <span className="text-rose-500">*</span>
+                Họ và tên Học viên <span className="text-rose-500">*</span>
               </label>
               <input
                 value={name}
@@ -1675,9 +1675,8 @@ function EditCardModal({
                   if (errors.name) setErrors((prev) => ({ ...prev, name: "" }));
                 }}
                 placeholder="Nhập họ và tên..."
-                className={`${inputCls} ${
-                  errors.name ? "border-rose-500 ring-1 ring-rose-500/30 focus:border-rose-500" : ""
-                }`}
+                className={`${inputCls} ${errors.name ? "border-rose-500 ring-1 ring-rose-500/30 focus:border-rose-500" : ""
+                  }`}
               />
               {errors.name && (
                 <p className="mt-1 text-xs font-semibold text-rose-500 animate-in fade-in duration-150">
@@ -1721,9 +1720,8 @@ function EditCardModal({
                   if (errors.phone) setErrors((prev) => ({ ...prev, phone: "" }));
                 }}
                 placeholder="Nhập số điện thoại..."
-                className={`${inputCls} ${
-                  errors.phone ? "border-rose-500 ring-1 ring-rose-500/30 focus:border-rose-500" : ""
-                }`}
+                className={`${inputCls} ${errors.phone ? "border-rose-500 ring-1 ring-rose-500/30 focus:border-rose-500" : ""
+                  }`}
               />
               {errors.phone && (
                 <p className="mt-1 text-xs font-semibold text-rose-500 animate-in fade-in duration-150">
@@ -1823,7 +1821,7 @@ function EditCardModal({
         <div className="mt-4 pt-4 border-t border-slate-200 dark:border-slate-800 space-y-1">
           <div className="text-[12px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
             <Lock className="h-4 w-4" />
-            <span>2. Quyền riêng tư (Hiển thị cho hội viên khác khi quét QR)</span>
+            <span>2. Quyền riêng tư (Hiển thị cho Học viên khác khi quét QR)</span>
           </div>
           <p className="text-[11px] text-slate-500 dark:text-slate-400 mb-2">
             Bật/tắt các thông tin bạn muốn chia sẻ khi người khác quét mã QR danh thiếp của bạn:
@@ -1875,14 +1873,12 @@ function Toggle({
     >
       <span className="text-[13px] font-medium text-slate-800 dark:text-slate-200 text-left pr-2">{label}</span>
       <span
-        className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full transition-colors duration-200 ease-in-out ${
-          checked ? "bg-[#003B95]" : "bg-slate-300 dark:bg-slate-600"
-        }`}
+        className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full transition-colors duration-200 ease-in-out ${checked ? "bg-[#003B95]" : "bg-slate-300 dark:bg-slate-600"
+          }`}
       >
         <span
-          className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-md ring-0 transition duration-200 ease-in-out mt-0.5 ${
-            checked ? "translate-x-5.5" : "translate-x-0.5"
-          }`}
+          className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-md ring-0 transition duration-200 ease-in-out mt-0.5 ${checked ? "translate-x-5.5" : "translate-x-0.5"
+            }`}
         />
       </span>
     </button>

@@ -15,7 +15,7 @@ async function buildEvaluationExcel() {
   const appFeatures = [
     {
       parent: 'Đăng Nhập & Bảo Mật',
-      child: 'Đăng nhập Hội viên',
+      child: 'Đăng nhập Học viên',
       desc: 'Đăng nhập vào app bằng Email và Mật khẩu được cấp, tự động ghi nhớ tài khoản.'
     },
     {
@@ -54,24 +54,24 @@ async function buildEvaluationExcel() {
       desc: 'Chuyển đổi 4 màu chủ đề CLB: Đỏ Ruby, Vàng Hoàng Gia, Xanh Doanh Nhân, Cam Tiên Phong.'
     },
     {
-      parent: 'NODE-APP-002: Thẻ Hội Viên VIP Số',
+      parent: 'NODE-APP-002: Thẻ Học viên VIP Số',
       child: 'Thẻ danh thiếp VIP xoay 2 mặt',
       desc: 'Hiển thị thẻ điện tử: Họ tên, Chức vụ, Công ty, Logo, chạm lật mặt sau.'
     },
     {
-      parent: 'NODE-APP-002: Thẻ Hội Viên VIP Số',
+      parent: 'NODE-APP-002: Thẻ Học viên VIP Số',
       child: 'Mã QR cá nhân & Phóng to',
       desc: 'Mã QR định danh cá nhân, chạm vào để phóng to toàn màn hình đi dự sự kiện.'
     },
     {
-      parent: 'NODE-APP-002: Thẻ Hội Viên VIP Số',
+      parent: 'NODE-APP-002: Thẻ Học viên VIP Số',
       child: 'Cài đặt quyền riêng tư thẻ',
       desc: 'Công tắc gạt Ẩn/Hiện Số điện thoại và Ẩn/Hiện Email khi người khác quét thẻ.'
     },
     {
-      parent: 'NODE-APP-002: Thẻ Hội Viên VIP Số',
+      parent: 'NODE-APP-002: Thẻ Học viên VIP Số',
       child: 'Quét mã QR đối tác',
-      desc: 'Nút mở camera quét trực tiếp mã QR trên thẻ VIP của hội viên khác để kết nối.'
+      desc: 'Nút mở camera quét trực tiếp mã QR trên thẻ VIP của Học viên khác để kết nối.'
     },
     {
       parent: 'NODE-APP-003: Quét Thẻ Công Khai',
@@ -84,14 +84,14 @@ async function buildEvaluationExcel() {
       desc: 'Nút tải file vCard tự động lưu tên, số điện thoại, công ty vào danh bạ iPhone/Android.'
     },
     {
-      parent: 'NODE-APP-004: Danh Bạ Hội Viên',
+      parent: 'NODE-APP-004: Danh Bạ Học viên',
       child: 'Tìm kiếm & Bộ lọc 6 Ban',
       desc: 'Tìm kiếm nhanh theo Tên, Doanh nghiệp, Ngành nghề; lọc theo 6 Ban chuyên môn.'
     },
     {
-      parent: 'NODE-APP-004: Danh Bạ Hội Viên',
+      parent: 'NODE-APP-004: Danh Bạ Học viên',
       child: 'Xem hồ sơ & Liên hệ nhanh',
-      desc: 'Xem chi tiết thông tin hội viên; nút Gọi điện, Gửi email, Nhắn tin trực tiếp.'
+      desc: 'Xem chi tiết thông tin Học viên; nút Gọi điện, Gửi email, Nhắn tin trực tiếp.'
     },
     {
       parent: 'NODE-APP-005: Cơ Hội Giao Thương B2B',
@@ -120,13 +120,13 @@ async function buildEvaluationExcel() {
     },
     {
       parent: 'NODE-APP-007: Sàn B2B Marketplace',
-      child: 'Trưng bày sản phẩm dịch vụ hội viên',
+      child: 'Trưng bày sản phẩm dịch vụ Học viên',
       desc: 'Hiển thị sản phẩm tiêu biểu của các doanh nghiệp thành viên (giới hạn 5 sản phẩm/DN).'
     },
     {
       parent: 'NODE-APP-007: Sàn B2B Marketplace',
       child: 'Đăng bán sản phẩm mới',
-      desc: 'Nhập tên sản phẩm, giá bán, % ưu đãi dành riêng cho hội viên CEO HN10, tải ảnh.'
+      desc: 'Nhập tên sản phẩm, giá bán, % ưu đãi dành riêng cho Học viên CEO HN10, tải ảnh.'
     },
     {
       parent: 'NODE-APP-007: Sàn B2B Marketplace',
@@ -189,7 +189,7 @@ async function buildEvaluationExcel() {
       desc: 'Nút Đăng xuất ở cuối trang cài đặt để thoát tài khoản trên thiết bị.'
     },
     {
-      parent: 'NODE-APP-013: Ưu Đãi Hội Viên',
+      parent: 'NODE-APP-013: Ưu Đãi Học viên',
       child: 'Chính sách ưu đãi đặc quyền',
       desc: 'Danh mục voucher, chiết khấu ưu đãi chéo giữa các doanh nghiệp thành viên.'
     },
@@ -230,7 +230,7 @@ async function buildEvaluationExcel() {
     {
       parent: 'NODE-CRM-001: Tổng Quan & KPI',
       child: '4 Khối chỉ số KPI CLB',
-      desc: 'Tổng số Hội viên, Doanh nghiệp thành viên, Tổng quỹ tiền mặt, Tỷ lệ tham dự sự kiện.'
+      desc: 'Tổng số Học viên, Doanh nghiệp thành viên, Tổng quỹ tiền mặt, Tỷ lệ tham dự sự kiện.'
     },
     {
       parent: 'NODE-CRM-001: Tổng Quan & KPI',
@@ -253,14 +253,14 @@ async function buildEvaluationExcel() {
       desc: 'Phóng to thu nhỏ cột biểu đồ 1x-3x; thanh trượt Brush kéo chọn khoảng ngày đối soát.'
     },
     {
-      parent: 'NODE-CRM-003: Danh Bạ Hội Viên 360°',
-      child: 'Quản trị hồ sơ hội viên toàn diện',
-      desc: 'Danh sách hội viên, tìm kiếm theo tên/SĐT, lọc theo 6 Ban chuyên môn, xuất file Excel.'
+      parent: 'NODE-CRM-003: Danh Bạ Học viên 360°',
+      child: 'Quản trị hồ sơ Học viên toàn diện',
+      desc: 'Danh sách Học viên, tìm kiếm theo tên/SĐT, lọc theo 6 Ban chuyên môn, xuất file Excel.'
     },
     {
-      parent: 'NODE-CRM-003: Danh Bạ Hội Viên 360°',
+      parent: 'NODE-CRM-003: Danh Bạ Học viên 360°',
       child: 'Phê duyệt hồ sơ đăng ký mới',
-      desc: 'Kiểm tra giấy phép kinh doanh, chức vụ, duyệt cấp mã hội viên (CEO HN10-xxxxxx).'
+      desc: 'Kiểm tra giấy phép kinh doanh, chức vụ, duyệt cấp mã Học viên (CEO HN10-xxxxxx).'
     },
     {
       parent: 'NODE-CRM-004: Doanh Nghiệp Thành Viên',
@@ -345,12 +345,12 @@ async function buildEvaluationExcel() {
     {
       parent: 'NODE-CRM-016: Bản Tin CLB',
       child: 'Biên tập & Xuất bản tin tức',
-      desc: 'Viết bài truyền thông, hoạt động thăm doanh nghiệp, xuất bản lên app cho hội viên đọc.'
+      desc: 'Viết bài truyền thông, hoạt động thăm doanh nghiệp, xuất bản lên app cho Học viên đọc.'
     },
     {
       parent: 'NODE-CRM-017: Gia Hạn & Nợ Phí',
       child: 'Theo dõi hạn niên liễm & Nhắc phí tự động',
-      desc: 'Quét hội viên đến hạn/quá hạn; gửi thông báo nhắc phí kèm VietQR; gia hạn thẻ 1 năm.'
+      desc: 'Quét Học viên đến hạn/quá hạn; gửi thông báo nhắc phí kèm VietQR; gia hạn thẻ 1 năm.'
     },
     {
       parent: 'NODE-CRM-018: Đào Tạo Doanh Nghiệp',
@@ -365,7 +365,7 @@ async function buildEvaluationExcel() {
     {
       parent: 'NODE-CRM-020: Cơ Hội Giao Thương B2B',
       child: 'Kiểm duyệt tin cơ hội kinh doanh',
-      desc: 'Kiểm tra tính xác thực tin đăng của hội viên; duyệt hiển thị lên app hoặc từ chối kèm lý do.'
+      desc: 'Kiểm tra tính xác thực tin đăng của Học viên; duyệt hiển thị lên app hoặc từ chối kèm lý do.'
     },
     {
       parent: 'NODE-CRM-021: Theme Studio',
@@ -375,7 +375,7 @@ async function buildEvaluationExcel() {
     {
       parent: 'NODE-CRM-022: Trung Tâm Thông Báo Quản Trị',
       child: 'Xử lý yêu cầu Quên mật khẩu từ App',
-      desc: 'Tiếp nhận thông báo hội viên yêu cầu quên mật khẩu; tự động tạo mã và gửi email khôi phục.'
+      desc: 'Tiếp nhận thông báo Học viên yêu cầu quên mật khẩu; tự động tạo mã và gửi email khôi phục.'
     },
     {
       parent: 'NODE-CRM-023: Thư Mời & Zalo ZBS',
@@ -434,7 +434,7 @@ async function buildEvaluationExcel() {
     subtitleCell.alignment = { vertical: 'middle', horizontal: 'center' };
     sheet.getRow(2).height = 24;
 
-    // 3. Dòng Ghi chú hướng dẫn cho khách hàng / hội viên
+    // 3. Dòng Ghi chú hướng dẫn cho khách hàng / Học viên
     sheet.mergeCells('A3:K3');
     const noteCell = sheet.getCell('A3');
     noteCell.value = '💡 HƯỚNG DẪN: Các cột chức năng (A, B, C, D) đã liệt kê đầy đủ. Các cột đánh giá (E, F, G, H, I, J, K) để trống để Anh/Chị ghi nhận người đánh giá, lỗi phát sinh, ý kiến góp ý.';
@@ -489,7 +489,7 @@ async function buildEvaluationExcel() {
       // SECTION I: APP MOBILE
       sheet.mergeCells(`A${currentRow}:K${currentRow}`);
       const sec1 = sheet.getCell(`A${currentRow}`);
-      sec1.value = '📱 PHẦN I: ỨNG DỤNG DI ĐỘNG HỘI VIÊN (MOBILE APP - https://ceohn10.viconnect.vn)';
+      sec1.value = '📱 PHẦN I: ỨNG DỤNG DI ĐỘNG Học viên (MOBILE APP - https://ceohn10.viconnect.vn)';
       sec1.font = { name: 'Calibri', size: 12, bold: true, color: { argb: 'FFFFFFFF' } };
       sec1.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF003B95' } };
       sec1.alignment = { vertical: 'middle', horizontal: 'left', indent: 1 };
@@ -603,17 +603,17 @@ async function buildEvaluationExcel() {
   setupSheet(
     sheetOverall,
     'BẢNG THEO DÕI & ĐÁNH GIÁ TÍNH NĂNG TOÀN HỆ THỐNG CEO HN10',
-    'Phân chia rõ ràng: Phần I - Ứng Dụng Di Động Hội Viên (App) & Phần II - Cổng Quản Trị Hệ Thống (Web CRM)',
+    'Phân chia rõ ràng: Phần I - Ứng Dụng Di Động Học viên (App) & Phần II - Cổng Quản Trị Hệ Thống (Web CRM)',
     [],
     true
   );
 
   // 2. Tạo Sheet 2: Chỉ riêng APP MOBILE
-  const sheetApp = workbook.addWorksheet('📱 APP MOBILE HỘI VIÊN');
+  const sheetApp = workbook.addWorksheet('📱 APP MOBILE Học viên');
   setupSheet(
     sheetApp,
-    'BẢNG ĐÁNH GIÁ CHỨC NĂNG ỨNG DỤNG DI ĐỘNG HỘI VIÊN (MOBILE APP)',
-    'Subdomain: https://ceohn10.viconnect.vn • Dành cho Hội viên CLB Doanh Nhân CEO HN10 (HanoiBA)',
+    'BẢNG ĐÁNH GIÁ CHỨC NĂNG ỨNG DỤNG DI ĐỘNG Học viên (MOBILE APP)',
+    'Subdomain: https://ceohn10.viconnect.vn • Dành cho Học viên CLB Doanh Nhân CEO HN10 (HanoiBA)',
     appFeatures,
     false
   );

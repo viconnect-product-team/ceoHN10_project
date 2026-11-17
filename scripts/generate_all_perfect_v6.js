@@ -12,7 +12,7 @@
  * 2. POSTER / PROFILE CRM QUẢN TRỊ:
  *    - Trưng bày theo dạng TECH COMMAND CENTER SHOWROOM 3D
  *    - Laptop MacBook Pro 16" 3D ở trung tâm trưng bày Dashboard & Thống kê BI
- *    - 5 Cửa sổ giao diện CRM 3D lơ lửng xung quanh (Hội viên 360, Bàn tiệc Gala, Hội phí VietQR, Đào tạo & Tri thức, Giao việc 6 Ban)
+ *    - 5 Cửa sổ giao diện CRM 3D lơ lửng xung quanh (Học viên 360, Bàn tiệc Gala, Hội phí VietQR, Đào tạo & Tri thức, Giao việc 6 Ban)
  *    - Hiệu ứng hòa quyện với nền poster, sàn kính phản chiếu bóng gương (Mirror floor reflection), tia sáng laser neon kết nối
  *    - Logo ViConnect và CEO HN10 CHUẨN XỊN
  * 
@@ -279,7 +279,7 @@ function generatePosterAppHtml() {
 
       <div class="flex items-center gap-4">
         <div class="text-right">
-          <div class="text-[11px] font-extrabold uppercase tracking-widest text-cyan-300">NỀN TẢNG SỐ HỘI VIÊN</div>
+          <div class="text-[11px] font-extrabold uppercase tracking-widest text-cyan-300">NỀN TẢNG SỐ Học viên</div>
           <div class="text-sm font-black text-white">PHIÊN BẢN DOANH NHÂN 2026</div>
         </div>
         <div class="px-5 py-2.5 rounded-full bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-950 font-black text-xs uppercase tracking-wider shadow-lg shadow-amber-500/30 flex items-center gap-2">
@@ -301,24 +301,24 @@ function generatePosterAppHtml() {
       </h1>
 
       <p class="text-base text-blue-200/90 font-medium max-w-3xl mx-auto leading-relaxed">
-        Giải pháp chuyển đổi số toàn diện: Định danh số hội viên VIP, khớp lệnh giao thương B2B bảo mật và quản lý sự kiện thông minh ngay trên chiếc điện thoại thông minh.
+        Giải pháp chuyển đổi số toàn diện: Định danh số Học viên VIP, khớp lệnh giao thương B2B bảo mật và quản lý sự kiện thông minh ngay trên chiếc điện thoại thông minh.
       </p>
     </div>
 
     <!-- ==================== 3 MÀN HÌNH CHÍNH 3D TRƯNG BÀY NỔI BẬT ==================== -->
     <div class="relative z-30 perspective-stage my-4 flex items-center justify-center gap-8 px-4">
       
-      <!-- CỘT 1: THẺ HỘI VIÊN VIP (NGHIÊNG TRÁI 3D) -->
+      <!-- CỘT 1: THẺ Học viên VIP (NGHIÊNG TRÁI 3D) -->
       <div class="relative flex flex-col items-center" style="transform: rotateY(16deg) rotateZ(-2deg) translateZ(-40px);">
         <!-- Badge tính năng bay 3D -->
         <div class="absolute -top-7 z-50 px-5 py-2.5 rounded-2xl bg-gradient-to-r from-amber-500 to-yellow-500 text-slate-950 font-black text-xs uppercase tracking-wider shadow-2xl border-2 border-yellow-200 flex items-center gap-2">
-          <span>💳</span> 01. THẺ HỘI VIÊN SỐ VIP
+          <span>💳</span> 01. THẺ Học viên SỐ VIP
         </div>
 
         <div class="phone-mockup w-[360px] h-[730px]">
           <div class="phone-inner w-full h-full">
             <div class="phone-notch"><div class="phone-camera"></div></div>
-            <img src="${APP_02}" class="w-full h-full object-cover object-top" alt="Thẻ Hội Viên VIP" />
+            <img src="${APP_02}" class="w-full h-full object-cover object-top" alt="Thẻ Học viên VIP" />
           </div>
         </div>
 
@@ -557,9 +557,9 @@ function generateProfileCrmHtml() {
     <!-- ==================== SHOWROOM TRƯNG BÀY LAPTOP & 5 CỬA SỔ BAY 3D ==================== -->
     <div class="relative z-30 my-auto grid grid-cols-12 gap-6 items-center pt-2">
       
-      <!-- CỘT TRÁI: 2 CỬA SỔ 3D (HỘI VIÊN 360 & SỰ KIỆN GALA) -->
+      <!-- CỘT TRÁI: 2 CỬA SỔ 3D (Học viên 360 & SỰ KIỆN GALA) -->
       <div class="col-span-3 space-y-6">
-        <!-- Window 1: Hội Viên 360 -->
+        <!-- Window 1: Học viên 360 -->
         <div class="floating-window transform hover:scale-[1.02] transition">
           <div class="window-header">
             <div class="window-dots">
@@ -567,15 +567,15 @@ function generateProfileCrmHtml() {
               <div class="window-dot bg-amber-400"></div>
               <div class="window-dot bg-green-400"></div>
             </div>
-            <div class="text-[11px] font-extrabold text-blue-900 tracking-wide uppercase">01. HỒ SƠ HỘI VIÊN 360°</div>
+            <div class="text-[11px] font-extrabold text-blue-900 tracking-wide uppercase">01. HỒ SƠ Học viên 360°</div>
             <span class="text-[10px] font-mono text-cyan-700 bg-cyan-50 px-2 py-0.5 rounded font-bold">500+ CEO</span>
           </div>
           <div class="p-2 bg-slate-100">
-            <img src="${CRM_03}" class="w-full h-36 object-cover object-top rounded-xl border border-slate-200" alt="Hội viên 360" />
+            <img src="${CRM_03}" class="w-full h-36 object-cover object-top rounded-xl border border-slate-200" alt="Học viên 360" />
           </div>
           <div class="p-3 bg-white">
             <div class="text-xs font-black text-slate-900">Quản Trị Hồ Sơ Doanh Nghiệp Toàn Diện</div>
-            <div class="text-[11px] text-slate-600 mt-0.5">Tra cứu chính xác ngành nghề, sản phẩm, phê duyệt hội viên mới 2 lớp.</div>
+            <div class="text-[11px] text-slate-600 mt-0.5">Tra cứu chính xác ngành nghề, sản phẩm, phê duyệt Học viên mới 2 lớp.</div>
           </div>
         </div>
 
@@ -645,7 +645,7 @@ function generateProfileCrmHtml() {
           </div>
           <div class="p-2.5 bg-white">
             <div class="text-xs font-black text-slate-900">Gạch Nợ Tức Thì Qua Webhook</div>
-            <div class="text-[10px] text-slate-600 mt-0.5">Mã QR động từng hội viên, minh bạch sổ quỹ hiệp hội.</div>
+            <div class="text-[10px] text-slate-600 mt-0.5">Mã QR động từng Học viên, minh bạch sổ quỹ hiệp hội.</div>
           </div>
         </div>
 
@@ -736,9 +736,9 @@ const SLIDES_V6 = [
     tag: 'BỨC TRANH TỔNG THỂ TOÀN CẢNH',
     title: 'HỆ SINH THÁI KÉP: CỔNG QUẢN TRỊ WEB CRM & CEO HN10 MOBILE APP',
     subtitle: 'NỀN TẢNG SỐ HÓA HIỆN THỰC HÓA 3 BÀI TOÁN CHIẾN LƯỢC CHO CỘNG ĐỒNG 500+ DOANH NHÂN',
-    summaryText: 'Đột phá toàn diện trong quản trị hiệp hội: Trung tâm điều hành Web CRM minh bạch kết hợp cùng Văn phòng số bỏ túi Mobile App mang lại sức mạnh vượt trội cho Ban Lãnh Đạo và toàn thể Hội viên.',
+    summaryText: 'Đột phá toàn diện trong quản trị hiệp hội: Trung tâm điều hành Web CRM minh bạch kết hợp cùng Văn phòng số bỏ túi Mobile App mang lại sức mạnh vượt trội cho Ban Lãnh Đạo và toàn thể Học viên.',
     kpis: [
-      { num: '500+', label: 'Hội Viên Doanh Nhân', icon: '👥' },
+      { num: '500+', label: 'Học viên Doanh Nhân', icon: '👥' },
       { num: '06', label: 'Ban Chuyên Môn Vận Hành', icon: '🏛️' },
       { num: '100%', label: 'Số Hóa Hoạt Động', icon: '⚡' },
       { num: '01s', label: 'Check-in Vé Sự Kiện', icon: '🎟️' },
@@ -749,13 +749,13 @@ const SLIDES_V6 = [
     type: 'two_products_detail',
     tag: 'KIẾN TRÚC TƯƠNG HỖ KHÉP KÍN',
     title: 'HAI CÔNG CỤ ĐỘT PHÁ TƯƠNG TÁC ĐỒNG BỘ HAI CHIỀU',
-    subtitle: 'Web CRM chuẩn hóa quản trị điều hành — Mobile App trao quyền kết nối giao thương tức thì cho hội viên',
-    summaryText: 'Đồng bộ hóa tức thì qua nền tảng Cloud: Mọi thay đổi về sự kiện, đào tạo, bàn tiệc và hội phí trên Web CRM đều được phản ánh tức thì xuống điện thoại của hội viên.',
+    subtitle: 'Web CRM chuẩn hóa quản trị điều hành — Mobile App trao quyền kết nối giao thương tức thì cho Học viên',
+    summaryText: 'Đồng bộ hóa tức thì qua nền tảng Cloud: Mọi thay đổi về sự kiện, đào tạo, bàn tiệc và hội phí trên Web CRM đều được phản ánh tức thì xuống điện thoại của Học viên.',
     crm: {
       title: '1. CỔNG ĐIỀU HÀNH TRUNG TÂM WEB CRM',
       target: 'Dành cho: Chủ Tịch, Ban Thư Ký & 6 Ban Chuyên Môn',
       bullets: [
-        'Quản lý hồ sơ hội viên 360° & phân quyền RBAC 11 cấp bảo mật',
+        'Quản lý hồ sơ Học viên 360° & phân quyền RBAC 11 cấp bảo mật',
         'Sơ đồ xếp bàn tiệc Gala trang trọng, phân bổ chỗ ngồi thông minh',
         'Điều hành giao việc Kanban, theo dõi tiến độ các ban thời gian thực',
         'Quản lý hội phí VietQR tự động, gạch nợ tức thì và minh bạch sổ quỹ',
@@ -764,9 +764,9 @@ const SLIDES_V6 = [
     },
     app: {
       title: '2. VĂN PHÒNG DOANH NHÂN BỎ TÚI MOBILE APP',
-      target: 'Dành cho: Toàn thể hơn 500 Doanh nhân Hội viên',
+      target: 'Dành cho: Toàn thể hơn 500 Doanh nhân Học viên',
       bullets: [
-        'Thẻ hội viên số mạ vàng hoàng gia, danh thiếp số chạm để kết nối',
+        'Thẻ Học viên số mạ vàng hoàng gia, danh thiếp số chạm để kết nối',
         'Sàn giao thương B2B nội khối, trao đổi cơ hội và xúc tiến hợp đồng',
         'Ví vé sự kiện Gala, sơ đồ bàn tiệc và QR Check-in 1 giây tại cửa',
         'Thống kê tương tác, doanh thu và bục vinh danh Top 3 doanh nhân',
@@ -778,16 +778,16 @@ const SLIDES_V6 = [
     id: 3,
     type: 'feature_deep',
     tag: 'PHÂN HỆ TRỌNG YẾU 01',
-    title: 'DASHBOARD TỔNG QUAN & HỒ SƠ HỘI VIÊN 360° TRÊN CRM',
+    title: 'DASHBOARD TỔNG QUAN & HỒ SƠ Học viên 360° TRÊN CRM',
     subtitle: 'Nắm trọn dữ liệu vận hành toàn hiệp hội trong một màn hình điều hành duy nhất',
     summaryText: 'Chuẩn hóa định danh số doanh nghiệp: Kiểm soát truy cập chặt chẽ theo 11 cấp bậc phân quyền, loại bỏ hoàn toàn nguy cơ rò rỉ thông tin nội bộ của CLB.',
     crmImg: CRM_01,
     appImg: CRM_03,
     points: [
-      'Dashboard BI cập nhật thời gian thực các chỉ số tài chính, sự kiện và tương tác hội viên.',
+      'Dashboard BI cập nhật thời gian thực các chỉ số tài chính, sự kiện và tương tác Học viên.',
       'Hồ sơ doanh nghiệp đầy đủ thông tin pháp lý, ngành nghề kinh doanh và người đại diện.',
-      'Cơ chế phân quyền 11 cấp chặt chẽ: Chủ tịch, Phó Chủ tịch, Trưởng ban, Kế toán, Thư ký, Hội viên.',
-      'Xuất báo cáo danh sách hội viên chuẩn Excel phục vụ công tác đối soát của Ban Thư Ký.'
+      'Cơ chế phân quyền 11 cấp chặt chẽ: Chủ tịch, Phó Chủ tịch, Trưởng ban, Kế toán, Thư ký, Học viên.',
+      'Xuất báo cáo danh sách Học viên chuẩn Excel phục vụ công tác đối soát của Ban Thư Ký.'
     ]
   },
   {
@@ -795,7 +795,7 @@ const SLIDES_V6 = [
     type: 'feature_deep',
     tag: 'PHÂN HỆ TRỌNG YẾU 02',
     title: 'THỐNG KÊ & BÁO CÁO BI TOÀN DIỆN (BAR + LINE RECHARTS)',
-    subtitle: 'Đo lường trực quan hiệu quả hoạt động, biến động dòng tiền và vinh danh hội viên tích cực',
+    subtitle: 'Đo lường trực quan hiệu quả hoạt động, biến động dòng tiền và vinh danh Học viên tích cực',
     summaryText: 'Quyết sách dựa trên dữ liệu thực tế: Cung cấp bức tranh toàn cảnh về giao thương, dòng tiền và tần suất tương tác, giúp Ban Điều Hành hoạch định chính sách chuẩn xác.',
     crmImg: CRM_02,
     appImg: APP_05,
@@ -816,9 +816,9 @@ const SLIDES_V6 = [
     crmImg: CRM_04,
     appImg: APP_05,
     points: [
-      'Thiết kế sơ đồ bàn tiệc trực quan: Phân loại bàn VIP, Bàn Lãnh đạo, Bàn Hội viên và Khách mời danh dự.',
-      'Gán hội viên vào từng bàn tiệc chỉ với 1 click kéo thả; tự động cảnh báo khi bàn tiệc đã đủ người.',
-      'Vé điện tử phát hành tức thì vào Ví sự kiện trên Mobile App của từng hội viên kèm vị trí bàn.',
+      'Thiết kế sơ đồ bàn tiệc trực quan: Phân loại bàn VIP, Bàn Lãnh đạo, Bàn Học viên và Khách mời danh dự.',
+      'Gán Học viên vào từng bàn tiệc chỉ với 1 click kéo thả; tự động cảnh báo khi bàn tiệc đã đủ người.',
+      'Vé điện tử phát hành tức thì vào Ví sự kiện trên Mobile App của từng Học viên kèm vị trí bàn.',
       'Cổng soát vé quét QR tại cửa: Điểm danh trong 1 giây, tự động cập nhật trạng thái "Đã tham gia".'
     ]
   },
@@ -832,10 +832,10 @@ const SLIDES_V6 = [
     crmImg: CRM_07,
     appImg: CRM_06,
     points: [
-      'Tạo mã VietQR động chuẩn NAPAS theo từng hội viên kèm cú pháp định danh chính xác.',
+      'Tạo mã VietQR động chuẩn NAPAS theo từng Học viên kèm cú pháp định danh chính xác.',
       'Webhook ngân hàng kết nối tự động: Nhận tiền về tài khoản là hệ thống tự động gạch nợ hội phí tức thì.',
       'Báo cáo dòng tiền thu chi minh bạch: Phân loại các khoản chi hoạt động, tài trợ và quỹ thiện nguyện.',
-      'Hội viên xem trực tiếp lịch sử đóng phí và tải biên lai thu tiền điện tử trên Mobile App.'
+      'Học viên xem trực tiếp lịch sử đóng phí và tải biên lai thu tiền điện tử trên Mobile App.'
     ]
   },
   {
@@ -843,15 +843,15 @@ const SLIDES_V6 = [
     type: 'feature_deep',
     tag: 'PHÂN HỆ TRỌNG YẾU 05',
     title: 'CHƯƠNG TRÌNH ĐÀO TẠO DOANH NHÂN & KHO TRI THỨC SỐ',
-    subtitle: 'Chuẩn hóa công tác nâng cao năng lực hội viên: Tổ chức lớp học đa phương thức & mở form tuyển sinh',
+    subtitle: 'Chuẩn hóa công tác nâng cao năng lực Học viên: Tổ chức lớp học đa phương thức & mở form tuyển sinh',
     summaryText: 'Lan tỏa giá trị tri thức bền vững: Xây dựng kho tài nguyên bài giảng số độc quyền cho CLB, hỗ trợ đào tạo hybrid linh hoạt cho doanh nhân bận rộn.',
     crmImg: CRM_05,
     appImg: APP_06,
     points: [
       'Đa dạng hình thức đào tạo: Trực tuyến (tích hợp Jitsi Meet / Zoom bảo mật), Trực tiếp, hoặc Hybrid kết hợp.',
       'Modal tạo Form tuyển sinh công khai kèm liên kết rút gọn và mã QR tải về gửi các kênh mạng xã hội.',
-      'Nút "Bắn xuống App CEO HN10": Đẩy ngay bài giảng và lịch học vào mục Mạng lưới của tất cả hội viên.',
-      'Kho tri thức số lưu trữ tài liệu slide, video ghi lại bài giảng để hội viên ôn tập mọi lúc mọi nơi.'
+      'Nút "Bắn xuống App CEO HN10": Đẩy ngay bài giảng và lịch học vào mục Mạng lưới của tất cả Học viên.',
+      'Kho tri thức số lưu trữ tài liệu slide, video ghi lại bài giảng để Học viên ôn tập mọi lúc mọi nơi.'
     ]
   },
   {
@@ -875,14 +875,14 @@ const SLIDES_V6 = [
     type: 'feature_deep',
     tag: 'PHÂN HỆ TRỌNG YẾU 07',
     title: 'VĂN PHÒNG SỐ MOBILE APP: THẺ VIP, SÀN B2B & MẠNG LƯỚI',
-    subtitle: 'Tất cả đặc quyền hội viên trong tầm tay, mở ra không gian giao thương 24/7',
-    summaryText: 'Xúc tiến thương mại không giới hạn: Kết nối trực tiếp cung cầu giữa hơn 500 doanh nghiệp hội viên, thúc đẩy doanh số và giá trị hợp đồng thực tế nội khối.',
+    subtitle: 'Tất cả đặc quyền Học viên trong tầm tay, mở ra không gian giao thương 24/7',
+    summaryText: 'Xúc tiến thương mại không giới hạn: Kết nối trực tiếp cung cầu giữa hơn 500 doanh nghiệp Học viên, thúc đẩy doanh số và giá trị hợp đồng thực tế nội khối.',
     crmImg: APP_02,
     appImg: APP_04,
     points: [
-      'Thẻ hội viên VIP mạ vàng hoàng gia tích hợp mã QR động cá nhân hóa danh thiếp số.',
+      'Thẻ Học viên VIP mạ vàng hoàng gia tích hợp mã QR động cá nhân hóa danh thiếp số.',
       'Sàn cơ hội hợp tác B2B: Đăng tin tìm đối tác, chào bán sản phẩm và kết nối mua sắm nội khối.',
-      'Bản đồ hội viên số 2D tương tác: Định vị doanh nghiệp lân cận, hỗ trợ kết nối gặp gỡ trực tiếp.',
+      'Bản đồ Học viên số 2D tương tác: Định vị doanh nghiệp lân cận, hỗ trợ kết nối gặp gỡ trực tiếp.',
       'Mạng lưới chia sẻ bài viết, tin tức sự kiện và vinh danh những cột mốc phát triển của CLB.'
     ]
   },
@@ -895,9 +895,9 @@ const SLIDES_V6 = [
     summaryText: 'Đối tác công nghệ tin cậy: Cam kết bảo trì 24/7, nâng cấp liên tục và hỗ trợ tận tâm mọi hoạt động chuyển đổi số của Hiệp hội trong suốt giai đoạn phát triển.',
     commitments: [
       { title: 'Bảo Trì & Vận Hành 24/7', desc: 'Đảm bảo hệ thống hoạt động ổn định 99.9% trên hạ tầng máy chủ đám mây tốc độ cao.' },
-      { title: 'Bảo Mật Dữ Liệu Đa Tầng', desc: 'Mã hóa SSL/TLS, sao lưu tự động hàng ngày, tuân thủ nghiêm ngặt bảo mật thông tin hội viên.' },
+      { title: 'Bảo Mật Dữ Liệu Đa Tầng', desc: 'Mã hóa SSL/TLS, sao lưu tự động hàng ngày, tuân thủ nghiêm ngặt bảo mật thông tin Học viên.' },
       { title: 'Tập Huấn & Chuyển Giao', desc: 'Hướng dẫn chi tiết Ban Thư Ký và 6 Ban Chuyên Môn sử dụng thành thạo toàn bộ chức năng.' },
-      { title: 'Nâng Cấp Tính Năng Liên Tục', desc: 'Lắng nghe phản hồi từ Ban Điều Hành để bổ sung kịp thời các tiện ích phục vụ hội viên.' },
+      { title: 'Nâng Cấp Tính Năng Liên Tục', desc: 'Lắng nghe phản hồi từ Ban Điều Hành để bổ sung kịp thời các tiện ích phục vụ Học viên.' },
     ]
   }
 ];
@@ -1089,7 +1089,7 @@ function generateSlideDeckHtml() {
                   </div>
                 </div>
                 <div class="mt-2 text-center text-xs font-extrabold text-cyan-300">
-                  Dashboard BI · Quản Lý 500+ Hội Viên · Sơ Đồ Bàn Tiệc · Thu Phí VietQR
+                  Dashboard BI · Quản Lý 500+ Học viên · Sơ Đồ Bàn Tiệc · Thu Phí VietQR
                 </div>
               </div>
 
@@ -1121,7 +1121,7 @@ function generateSlideDeckHtml() {
                   </div>
                 </div>
                 <div class="mt-2 text-center text-xs font-extrabold text-amber-300">
-                  Thẻ Hội Viên VIP QR · Sàn Giao Thương B2B · Vé Sự Kiện 1 Giây
+                  Thẻ Học viên VIP QR · Sàn Giao Thương B2B · Vé Sự Kiện 1 Giây
                 </div>
               </div>
 
@@ -1400,7 +1400,7 @@ function generatePrintableDeckHtml() {
                 </div>
               </div>
               <div class="mt-2 text-center text-xs font-extrabold text-cyan-300">
-                Dashboard BI · Quản Lý 500+ Hội Viên · Sơ Đồ Bàn Tiệc · Thu Phí VietQR
+                Dashboard BI · Quản Lý 500+ Học viên · Sơ Đồ Bàn Tiệc · Thu Phí VietQR
               </div>
             </div>
 
@@ -1430,7 +1430,7 @@ function generatePrintableDeckHtml() {
                 </div>
               </div>
               <div class="mt-2 text-center text-xs font-extrabold text-amber-300">
-                Thẻ Hội Viên VIP QR · Sàn Giao Thương B2B · Vé Sự Kiện 1 Giây
+                Thẻ Học viên VIP QR · Sàn Giao Thương B2B · Vé Sự Kiện 1 Giây
               </div>
             </div>
           </div>

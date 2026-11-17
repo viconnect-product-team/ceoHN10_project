@@ -143,37 +143,37 @@ function buildDataRow(item) {
 }
 
 const data = [
-  // A. GIAO DIỆN & THẺ HỘI VIÊN
+  // A. GIAO DIỆN & THẺ Học viên
   {
-    group: 'A. GIAO DIỆN & THẺ HỘI VIÊN',
+    group: 'A. GIAO DIỆN & THẺ Học viên',
     items: [
       {
         stt: '1',
         hangMuc: 'Trang chủ ứng dụng',
         vanDe: 'Trang chủ có 8 ô tính năng nhanh, dàn trải; có cả Đặc quyền VIP, Biểu quyết số, Hội phí.',
-        mucDich: 'Đơn giản hóa để hội viên dùng thường xuyên, tập trung vào giá trị cốt lõi.',
-        deXuatCLB: 'Rút gọn quanh 4 chức năng: Sự kiện, Tìm hội viên, Cơ hội, Góc hội viên; thông tin CLB đặt sau. Bỏ Đặc quyền VIP, Biểu quyết số, Hội phí khỏi khu tính năng nhanh. Giữ Danh bạ hội viên làm chức năng nền tảng.',
+        mucDich: 'Đơn giản hóa để Học viên dùng thường xuyên, tập trung vào giá trị cốt lõi.',
+        deXuatCLB: 'Rút gọn quanh 4 chức năng: Sự kiện, Tìm Học viên, Cơ hội, Góc Học viên; thông tin CLB đặt sau. Bỏ Đặc quyền VIP, Biểu quyết số, Hội phí khỏi khu tính năng nhanh. Giữ Danh bạ Học viên làm chức năng nền tảng.',
         nguoiGopY: 'Anh Tuấn\nAnh Thành',
         uuTien: 'Cao · Đợt 1',
         giaiPhapViconnect: [
-          '• Giải pháp kiến trúc giao diện tinh giản: Định hướng thiết kế trang chủ hội tụ quanh 4 luồng nghiệp vụ cốt lõi: Lịch sự kiện, Danh bạ hội viên, Sàn giao thương và Mạng lưới kết nối; chuyển các tính năng chuyên biệt về phân hệ riêng.',
+          '• Giải pháp kiến trúc giao diện tinh giản: Định hướng thiết kế trang chủ hội tụ quanh 4 luồng nghiệp vụ cốt lõi: Lịch sự kiện, Danh bạ Học viên, Sàn giao thương và Mạng lưới kết nối; chuyển các tính năng chuyên biệt về phân hệ riêng.',
           '• Ý tưởng cá nhân hóa màn hình: ViOne cung cấp cơ chế cho phép từng doanh nhân tự do tùy biến chọn 4 phím tắt theo sở thích và thói quen sinh hoạt tại CLB.',
-          '• Ý tưởng Dải Ticker cơ hội & Sàn B2B thời gian thực: Ứng dụng dải biến động cơ hội theo thời gian thực (Realtime Ticker) đặt nổi bật dưới Thẻ hội viên nhằm tạo nhịp đập giao thương và kích thích hội viên truy cập thường xuyên.'
+          '• Ý tưởng Dải Ticker cơ hội & Sàn B2B thời gian thực: Ứng dụng dải biến động cơ hội theo thời gian thực (Realtime Ticker) đặt nổi bật dưới Thẻ Học viên nhằm tạo nhịp đập giao thương và kích thích Học viên truy cập thường xuyên.'
         ],
         statusType: 'READY',
         thoiGian: '🟢 ĐÃ SẴN SÀNG\n(Nền tảng sẵn có - Đợt 1)'
       },
       {
         stt: '2',
-        hangMuc: 'Thẻ hội viên',
+        hangMuc: 'Thẻ Học viên',
         vanDe: 'Chưa có tùy chọn ẩn/hiện email và số điện thoại trên thẻ.',
-        mucDich: 'Bảo vệ quyền riêng tư của hội viên.',
+        mucDich: 'Bảo vệ quyền riêng tư của Học viên.',
         deXuatCLB: 'Thêm công tắc ẩn/hiện email, số điện thoại. Tinh giản, tối giản giao diện thẻ.',
         nguoiGopY: 'Ban Thư ký / BĐH',
         uuTien: 'Cao · Đợt 1\n(Cần chốt: trường ẩn, mặc định)',
         giaiPhapViconnect: [
-          '• Giải pháp bảo mật danh tính hội viên: Thiết lập bộ công tắc độc lập cho phép hội viên chủ động quản lý việc Ẩn/Hiện Số điện thoại và Email trên Thẻ điện tử mọi lúc.',
-          '• Ý tưởng định danh khi chia sẻ đối ngoại: Khi chia sẻ thẻ ra bên ngoài, hệ thống tự động hiển thị huy hiệu xác thực: "🔒 Đã bảo mật theo thiết lập của hội viên", vừa bảo vệ dữ liệu cá nhân vừa tôn vinh sự chuyên nghiệp.',
+          '• Giải pháp bảo mật danh tính Học viên: Thiết lập bộ công tắc độc lập cho phép Học viên chủ động quản lý việc Ẩn/Hiện Số điện thoại và Email trên Thẻ điện tử mọi lúc.',
+          '• Ý tưởng định danh khi chia sẻ đối ngoại: Khi chia sẻ thẻ ra bên ngoài, hệ thống tự động hiển thị huy hiệu xác thực: "🔒 Đã bảo mật theo thiết lập của Học viên", vừa bảo vệ dữ liệu cá nhân vừa tôn vinh sự chuyên nghiệp.',
           '• Thiết kế Thẻ Doanh Nhân Obsidian Gold: Ứng dụng nhận diện thương hiệu sang trọng (Đen Huyền Bí & Vàng Hoàng Kim), tích hợp mã QR Code chạm mở phóng to tức thì giúp kết nối siêu tốc tại các sự kiện giao lưu.'
         ],
         statusType: 'READY',
@@ -181,15 +181,15 @@ const data = [
       },
       {
         stt: '3',
-        hangMuc: 'Đặc quyền hội viên',
+        hangMuc: 'Đặc quyền Học viên',
         vanDe: 'Đang nằm trong khu tính năng nhanh, chưa là tính năng riêng.',
-        mucDich: 'Tạo kênh quyền lợi riêng; mở hướng hội viên là gian hàng/gian thương.',
-        deXuatCLB: 'Tách thành tính năng riêng. Nghiên cứu mô hình hội viên là gian hàng, gian thương theo kiểu triển lãm.',
+        mucDich: 'Tạo kênh quyền lợi riêng; mở hướng Học viên là gian hàng/gian thương.',
+        deXuatCLB: 'Tách thành tính năng riêng. Nghiên cứu mô hình Học viên là gian hàng, gian thương theo kiểu triển lãm.',
         nguoiGopY: 'Anh Tuấn',
         uuTien: 'Trung bình · Đợt 1\n(Cần chốt quy mô triển lãm)',
         giaiPhapViconnect: [
           '• Phân hệ Đặc Quyền chuyên biệt (Dedicated Perks Hub): Tách riêng thành trung tâm quản trị ưu đãi độc lập, phân loại theo ngành nghề kèm bản đồ chỉ đường Google Maps tới điểm ưu đãi và QR Voucher tự sinh.',
-          '• Ý tưởng Đột phá - Triển Lãm Số Doanh Nghiệp: Thay vì danh sách đơn thuần, ViConnect đề xuất mô hình "Gian Hàng Doanh Nghiệp Số" độc quyền cho từng hội viên. Mỗi doanh nghiệp sở hữu 1 gian hàng trưng bày hồ sơ năng lực, catalogue 5 sản phẩm tiêu biểu và chính sách chiết khấu riêng cho cộng đồng CEO HN10.',
+          '• Ý tưởng Đột phá - Triển Lãm Số Doanh Nghiệp: Thay vì danh sách đơn thuần, ViConnect đề xuất mô hình "Gian Hàng Doanh Nghiệp Số" độc quyền cho từng Học viên. Mỗi doanh nghiệp sở hữu 1 gian hàng trưng bày hồ sơ năng lực, catalogue 5 sản phẩm tiêu biểu và chính sách chiết khấu riêng cho cộng đồng CEO HN10.',
           '• Kiểm soát định danh: Mỗi doanh nghiệp liên kết với một Mã số thuế duy nhất, bảo đảm tính minh bạch và tránh hiện tượng trùng lặp gian hàng.'
         ],
         statusType: 'IN_PROGRESS',
@@ -204,13 +204,13 @@ const data = [
       {
         stt: '4',
         hangMuc: 'Sàn thương mại (B2B)',
-        vanDe: 'Mỗi sản phẩm tối đa 5 ảnh, nhưng chưa giới hạn số sản phẩm của mỗi doanh nghiệp. Hạ tầng chưa đủ hiển thị toàn bộ sản phẩm của mọi hội viên.',
+        vanDe: 'Mỗi sản phẩm tối đa 5 ảnh, nhưng chưa giới hạn số sản phẩm của mỗi doanh nghiệp. Hạ tầng chưa đủ hiển thị toàn bộ sản phẩm của mọi Học viên.',
         mucDich: 'Giữ sàn gọn, đủ tải; CLB không đi sâu quản trị thông tin sản phẩm.',
         deXuatCLB: 'Giới hạn tối đa 5 sản phẩm cần bán cho mỗi doanh nghiệp.',
         nguoiGopY: 'Anh Thành',
         uuTien: 'Cao · Đợt 1',
         giaiPhapViconnect: [
-          '• Giải pháp Hạn mức thông minh: Áp dụng thuật toán giới hạn tối đa 5 sản phẩm/dịch vụ tiêu biểu cho mỗi doanh nghiệp. Giúp hội viên chọn lọc tinh hoa kinh doanh, loại bỏ thông tin rác và tối ưu 80% hạ tầng lưu trữ của CLB.',
+          '• Giải pháp Hạn mức thông minh: Áp dụng thuật toán giới hạn tối đa 5 sản phẩm/dịch vụ tiêu biểu cho mỗi doanh nghiệp. Giúp Học viên chọn lọc tinh hoa kinh doanh, loại bỏ thông tin rác và tối ưu 80% hạ tầng lưu trữ của CLB.',
           '• Cơ chế đo lường & chuẩn hóa đăng tải: Cung cấp thanh tiến trình trực quan (X/5 sản phẩm) và biểu mẫu đăng tải tiêu chuẩn hóa hình ảnh.',
           '• Công nghệ tối ưu đa phương tiện (ViOne Media Engine): Cơ chế nén ảnh tự động chuẩn WebP siêu nhẹ, đảm bảo tốc độ tải trang siêu tốc ngay cả khi hàng nghìn người cùng truy cập.'
         ],
@@ -226,7 +226,7 @@ const data = [
         nguoiGopY: 'Anh Thành\nAnh Tuấn',
         uuTien: 'Cao · Đợt 1',
         giaiPhapViconnect: [
-          '• Giải pháp Phân luồng giao thương 2 chiều: Thiết lập bộ lọc trực quan phân tách rõ ràng: "🛒 Bên Mua (Cần mua / Tìm đối tác)" và "📦 Bên Bán (Cung cấp / Bán hàng)" giúp hội viên tìm kiếm chính xác nhu cầu.',
+          '• Giải pháp Phân luồng giao thương 2 chiều: Thiết lập bộ lọc trực quan phân tách rõ ràng: "🛒 Bên Mua (Cần mua / Tìm đối tác)" và "📦 Bên Bán (Cung cấp / Bán hàng)" giúp Học viên tìm kiếm chính xác nhu cầu.',
           '• Hệ thống phân loại ngành nghề chuẩn HanoiBA: Tích hợp thanh chọn 10 lĩnh vực kinh doanh trọng điểm giúp kết nối đúng đối tác chỉ trong 1 thao tác.',
           '• Ý tưởng Tinh giản & Chuyển giao số liệu: Đưa toàn bộ các biểu đồ phức tạp sang Trung tâm Thống Kê; trang Cơ hội chỉ giữ giao diện danh sách tinh gọn kèm nút bấm trực tiếp "Gọi điện" hoặc "Đặt lịch hẹn 1-on-1".'
         ],
@@ -235,16 +235,16 @@ const data = [
       },
       {
         stt: '6',
-        hangMuc: 'Giới thiệu hội viên',
+        hangMuc: 'Giới thiệu Học viên',
         vanDe: 'Chưa có cơ chế giới thiệu và voucher; mục “Quản lý quảng cáo” trên menu quản trị chưa có mô tả trong tài liệu.',
-        mucDich: 'Khuyến khích hội viên giới thiệu, mở rộng mạng lưới.',
+        mucDich: 'Khuyến khích Học viên giới thiệu, mở rộng mạng lưới.',
         deXuatCLB: 'Xây dựng cơ chế giới thiệu theo mô hình người giới thiệu nhận voucher. Nhưng không làm theo mô hình affiliate.',
         nguoiGopY: 'Anh Thành',
         uuTien: 'Trung bình · Đợt 1\n(Cần chốt: voucher, giá trị)',
         giaiPhapViconnect: [
           '• Giải pháp Tối ưu hóa Menu CRM: Thu hồi mục "Quản lý quảng cáo" không phù hợp khỏi menu quản trị CRM để tập trung vào các chức năng cốt lõi.',
-          '• Ý tưởng Lan Tỏa Doanh Nhân: Xây dựng cơ chế "Hội Viên Giới Thiệu Hội Viên" dựa trên uy tín và niềm tự hào CLB. Mỗi hội viên được cấp mã mời cá nhân và mã QR định danh riêng.',
-          '• Cơ chế Tri Ân Quyền Lợi Thực Chất: Khi hội viên mới hoàn tất thủ tục và đóng phí, hệ thống tự động gửi tặng người giới thiệu 01 "Voucher Đặc Quyền VIP" (ưu đãi sự kiện lớn, tài trợ truyền thông). Tuyệt đối không áp dụng mô hình chi trả hoa hồng tiền mặt (affiliate) nhằm bảo toàn nét đẹp văn hóa doanh nhân.'
+          '• Ý tưởng Lan Tỏa Doanh Nhân: Xây dựng cơ chế "Học viên Giới Thiệu Học viên" dựa trên uy tín và niềm tự hào CLB. Mỗi Học viên được cấp mã mời cá nhân và mã QR định danh riêng.',
+          '• Cơ chế Tri Ân Quyền Lợi Thực Chất: Khi Học viên mới hoàn tất thủ tục và đóng phí, hệ thống tự động gửi tặng người giới thiệu 01 "Voucher Đặc Quyền VIP" (ưu đãi sự kiện lớn, tài trợ truyền thông). Tuyệt đối không áp dụng mô hình chi trả hoa hồng tiền mặt (affiliate) nhằm bảo toàn nét đẹp văn hóa doanh nhân.'
         ],
         statusType: 'IN_PROGRESS',
         thoiGian: '🟡 ĐANG TRIỂN KHAI\n(Hoàn thiện Đợt 1 - trước 05/11/2026)'
@@ -275,13 +275,13 @@ const data = [
         stt: '8',
         hangMuc: 'Đăng ký, mua vé & thanh toán',
         vanDe: 'E-Ticket hiện chỉ gửi qua email; chưa có Zalo OA và VNPAY.',
-        mucDich: 'Thuận tiện thanh toán; hội viên nhận thông tin kịp thời trên kênh quen thuộc.',
+        mucDich: 'Thuận tiện thanh toán; Học viên nhận thông tin kịp thời trên kênh quen thuộc.',
         deXuatCLB: 'Sau khi mua vé: xác nhận thông tin và thông báo về Zalo. Gửi thông báo đồng thời trên app và Zalo. Tích hợp VNPAY vào Zalo OA để thanh toán.',
         nguoiGopY: 'BĐH / Ban Thư ký',
         uuTien: 'Cao · Đợt 1\n(Cần chốt: pháp nhân VNPAY)',
         giaiPhapViconnect: [
           '• Giải pháp Vé Điện Tử Chống Rơi Vào Spam: Cấu hình hệ thống gửi vé QR qua Email với kỹ thuật Inline CID Attachment, đảm bảo vé hiển thị ảnh đẹp mắt ngay lập tức, không bị chặn ảnh hay rơi vào hộp thư rác.',
-          '• Giải pháp Tích hợp Đa Kênh Zalo Notification Service (ZNS): Đề xuất tự động bắn thông báo xác nhận vé và mã QR Check-in trực tiếp vào Zalo cá nhân của hội viên ngay khi có biến động thanh toán.',
+          '• Giải pháp Tích hợp Đa Kênh Zalo Notification Service (ZNS): Đề xuất tự động bắn thông báo xác nhận vé và mã QR Check-in trực tiếp vào Zalo cá nhân của Học viên ngay khi có biến động thanh toán.',
           '• Cổng thanh toán tự động VNPAY-QR: Sẵn sàng kiến trúc cổng thanh toán trực tuyến bảo mật, hỗ trợ quét mã VietQR tự động khớp tiền và nội dung chuyển khoản, tích hợp VNPAY Merchant ngay khi CLB bàn giao thông tin pháp nhân.'
         ],
         statusType: 'PLANNED',
@@ -290,13 +290,13 @@ const data = [
       {
         stt: '9',
         hangMuc: 'Check-in',
-        vanDe: 'Check-in chưa gắn với lợi ích cụ thể cho hội viên.',
-        mucDich: 'Khuyến khích hội viên tham gia, có dữ liệu tham dự.',
-        deXuatCLB: 'Phát triển hai dòng tính năng check-in gắn với lợi ích hội viên.',
+        vanDe: 'Check-in chưa gắn với lợi ích cụ thể cho Học viên.',
+        mucDich: 'Khuyến khích Học viên tham gia, có dữ liệu tham dự.',
+        deXuatCLB: 'Phát triển hai dòng tính năng check-in gắn với lợi ích Học viên.',
         nguoiGopY: 'BĐH',
         uuTien: 'Cần làm rõ\n(Cần chốt: 2 dòng lợi ích)',
         giaiPhapViconnect: [
-          '• Ý tưởng Kiến Tạo 2 Dòng Giá Trị Đột Phá Cho Check-in:\n- Dòng 1 (Live Event Networking): Quét QR Check-in lập tức hiển thị huy hiệu xanh [✓ Đã Check-in] trên Mạng lưới và mở khóa Danh bạ đại biểu đang có mặt, cho phép các doanh nhân tìm thấy nhau và gửi lời mời kết nối tức thì.\n- Dòng 2 (Điểm Chuyên Cần & Gamification): Tự động cộng điểm hoạt động vào hồ sơ cá nhân để tích lũy chiết khấu niên liễm, đồng thời mã check-in trở thành mã số may mắn tham gia Vòng quay may mắn (Lucky Draw) trúng quà tặng tài trợ từ các hội viên trong sự kiện.'
+          '• Ý tưởng Kiến Tạo 2 Dòng Giá Trị Đột Phá Cho Check-in:\n- Dòng 1 (Live Event Networking): Quét QR Check-in lập tức hiển thị huy hiệu xanh [✓ Đã Check-in] trên Mạng lưới và mở khóa Danh bạ đại biểu đang có mặt, cho phép các doanh nhân tìm thấy nhau và gửi lời mời kết nối tức thì.\n- Dòng 2 (Điểm Chuyên Cần & Gamification): Tự động cộng điểm hoạt động vào hồ sơ cá nhân để tích lũy chiết khấu niên liễm, đồng thời mã check-in trở thành mã số may mắn tham gia Vòng quay may mắn (Lucky Draw) trúng quà tặng tài trợ từ các Học viên trong sự kiện.'
         ],
         statusType: 'IN_PROGRESS',
         thoiGian: '🟡 ĐANG TRIỂN KHAI\n(Hoàn thiện Đợt 1 - trước 05/11/2026)'
@@ -305,8 +305,8 @@ const data = [
         stt: '10',
         hangMuc: 'Lịch họp & điều kiện gia nhập',
         vanDe: 'Lịch họp chưa kèm thống kê, thông báo. Chưa có tiêu chí gia nhập gắn với buổi họp mở đầu.',
-        mucDich: 'Đánh giá mức độ gặp gỡ giữa hội viên; đặt điều kiện gia nhập rõ ràng.',
-        deXuatCLB: 'Lịch họp kèm thống kê tham dự và thông báo. Hội viên mới phải tham gia buổi họp mở đầu (ví dụ buổi training) mới đủ điều kiện vào CLB.',
+        mucDich: 'Đánh giá mức độ gặp gỡ giữa Học viên; đặt điều kiện gia nhập rõ ràng.',
+        deXuatCLB: 'Lịch họp kèm thống kê tham dự và thông báo. Học viên mới phải tham gia buổi họp mở đầu (ví dụ buổi training) mới đủ điều kiện vào CLB.',
         nguoiGopY: 'Chị Phương',
         uuTien: 'Trung bình · Đợt 1',
         giaiPhapViconnect: [
@@ -319,38 +319,38 @@ const data = [
       }
     ]
   },
-  // D. QUẢN TRỊ HỘI VIÊN & BÁO CÁO (CRM)
+  // D. QUẢN TRỊ Học viên & BÁO CÁO (CRM)
   {
-    group: 'D. QUẢN TRỊ HỘI VIÊN & BÁO CÁO (CỔNG QUẢN TRỊ CRM)',
+    group: 'D. QUẢN TRỊ Học viên & BÁO CÁO (CỔNG QUẢN TRỊ CRM)',
     items: [
       {
         stt: '11',
-        hangMuc: 'Dữ liệu hội viên',
+        hangMuc: 'Dữ liệu Học viên',
         vanDe: 'Thông tin trong file thành viên cần chính xác; ngày sinh chưa cập nhật đầy đủ.',
-        mucDich: 'Làm nền cho chăm sóc hội viên và các báo cáo.',
-        deXuatCLB: 'Rà soát, chuẩn hóa hồ sơ hội viên. Cập nhật đầy đủ ngày sinh.',
+        mucDich: 'Làm nền cho chăm sóc Học viên và các báo cáo.',
+        deXuatCLB: 'Rà soát, chuẩn hóa hồ sơ Học viên. Cập nhật đầy đủ ngày sinh.',
         nguoiGopY: 'Chị Phương',
         uuTien: 'Cao · Trước khi triển khai rộng\n(Ban Thư ký thực hiện)',
         giaiPhapViconnect: [
           '• Bộ công cụ Chuẩn Hóa & Nhập Liệu Thông Minh: Cung cấp tính năng nạp dữ liệu Excel linh hoạt, tự động nhận diện và đối soát lỗi sai các trường thông tin: Ngày sinh, Ban chuyên môn, Chức vụ, Mã số thuế doanh nghiệp.',
-          '• Cơ chế Chăm sóc & Nhắc nhở tự động: Ứng dụng tự động gửi thông báo dịu dàng nhắc hội viên cập nhật ngày sinh để nhận lời chúc và quà tặng tri ân đặc biệt từ Chủ Tịch và CLB.',
-          '• Cam kết đồng hành kỹ thuật: ViConnect bố trí nhân sự kỹ thuật chuyên trách phối hợp trực tiếp cùng Ban Thư Ký để rà soát, làm sạch và nạp toàn bộ danh sách hội viên hoàn tất trong vòng 24h kể từ khi tiếp nhận file.'
+          '• Cơ chế Chăm sóc & Nhắc nhở tự động: Ứng dụng tự động gửi thông báo dịu dàng nhắc Học viên cập nhật ngày sinh để nhận lời chúc và quà tặng tri ân đặc biệt từ Chủ Tịch và CLB.',
+          '• Cam kết đồng hành kỹ thuật: ViConnect bố trí nhân sự kỹ thuật chuyên trách phối hợp trực tiếp cùng Ban Thư Ký để rà soát, làm sạch và nạp toàn bộ danh sách Học viên hoàn tất trong vòng 24h kể từ khi tiếp nhận file.'
         ],
         statusType: 'PLANNED',
         thoiGian: '🔵 KẾ HOẠCH TIẾP THEO\n(Đợt 1: Hỗ trợ nạp CSDL trước 10/11/2026)'
       },
       {
         stt: '12',
-        hangMuc: 'Mức độ tích cực của hội viên',
-        vanDe: 'Dashboard chủ yếu là số đếm; chưa có chỉ số tích cực theo hội viên, theo ban; chưa cảnh báo hội viên ít hoạt động.',
-        mucDich: 'Biến dữ liệu hoạt động thành công cụ quản trị; kịp thời chăm sóc hội viên ít tham gia.',
-        deXuatCLB: 'Chỉ số tham gia sự kiện, họp, giao thương theo từng hội viên và từng ban. Cảnh báo hội viên hoạt động ít để chăm sóc.',
+        hangMuc: 'Mức độ tích cực của Học viên',
+        vanDe: 'Dashboard chủ yếu là số đếm; chưa có chỉ số tích cực theo Học viên, theo ban; chưa cảnh báo Học viên ít hoạt động.',
+        mucDich: 'Biến dữ liệu hoạt động thành công cụ quản trị; kịp thời chăm sóc Học viên ít tham gia.',
+        deXuatCLB: 'Chỉ số tham gia sự kiện, họp, giao thương theo từng Học viên và từng ban. Cảnh báo Học viên hoạt động ít để chăm sóc.',
         nguoiGopY: 'Chị Phương\nAnh Tuấn',
         uuTien: 'Cao · Đợt 1\n(Cần chốt ngưỡng ít hoạt động)',
         giaiPhapViconnect: [
-          '• Hệ thống Đo lường mức độ hoạt động của Hội Viên trong app: Xây dựng thuật toán nhận diện đa chiều dựa trên: Tần suất tham gia sự kiện, Số lượt kết nối B2B, Giao dịch thành công, Điểm danh họp ban và Đóng góp nội dung.',
+          '• Hệ thống Đo lường mức độ hoạt động của Học viên trong app: Xây dựng thuật toán nhận diện đa chiều dựa trên: Tần suất tham gia sự kiện, Số lượt kết nối B2B, Giao dịch thành công, Điểm danh họp ban và Đóng góp nội dung.',
           '• Biểu đồ Trực quan hóa Xu hướng (Visual Composed Analytics): Thiết kế đồ thị kết hợp Bar & Line với 2 màu trực quan: Đường xanh thể hiện xu hướng tăng trưởng tích cực, Đường đỏ cảnh báo độ suy giảm. Đặt vinh danh Top 1 Giver trên đỉnh biểu đồ và bục vinh danh Top 3 nằm gọn trên 1 hàng ngang.',
-          '• Ý tưởng Cảnh Báo Sớm Hội Viên Trầm Lắng (Early Inactivity Alert): Hệ thống tự động lọc và gắn cờ các hội viên không phát sinh tương tác trong 30-60 ngày, cung cấp nút bấm nhanh (Gọi điện / Gửi Email chăm sóc) để Ban Hội Viên và Ban Thư Ký chủ động liên hệ hỗ trợ kịp thời.'
+          '• Ý tưởng Cảnh Báo Sớm Học viên Trầm Lắng (Early Inactivity Alert): Hệ thống tự động lọc và gắn cờ các Học viên không phát sinh tương tác trong 30-60 ngày, cung cấp nút bấm nhanh (Gọi điện / Gửi Email chăm sóc) để Ban Học viên và Ban Thư Ký chủ động liên hệ hỗ trợ kịp thời.'
         ],
         statusType: 'IN_PROGRESS',
         thoiGian: '🟡 ĐANG TRIỂN KHAI\n(Hoàn thiện Đợt 1 - trước 05/11/2026)'
@@ -364,7 +364,7 @@ const data = [
         nguoiGopY: 'Chị Phương',
         uuTien: 'Cao · Đợt 1',
         giaiPhapViconnect: [
-          '• Quản lý Niên độ & Trạng thái phí thông minh: Tự động theo dõi vòng đời hội phí 365 ngày của từng hội viên, phân loại trực quan 3 nhóm: "Đang hiệu lực", "Sắp đến hạn (còn 30 ngày)" và "Quá hạn nợ phí".',
+          '• Quản lý Niên độ & Trạng thái phí thông minh: Tự động theo dõi vòng đời hội phí 365 ngày của từng Học viên, phân loại trực quan 3 nhóm: "Đang hiệu lực", "Sắp đến hạn (còn 30 ngày)" và "Quá hạn nợ phí".',
           '• Thông báo gia hạn chuyên nghiệp tích hợp mã QR: Hệ thống phát hành mẫu thông báo gia hạn lịch sự, tự động chèn mã QR động với đầy đủ số tiền niên liễm và cú pháp chuyển khoản chính xác, giúp kế toán đối soát công nợ tự động.',
           '• Giải pháp mở rộng nhắc nợ đa kênh: Sẵn sàng kiến trúc gửi tin nhắn tự động nhắc phí qua Zalo OA (ZNS) và SMS Brandname khi kết nối Zalo OA, giúp tăng tỷ lệ thu phí đúng hạn lên trên 95%.'
         ],
@@ -380,8 +380,8 @@ const data = [
         nguoiGopY: 'Chị Phương',
         uuTien: 'Trung bình · Đợt 1',
         giaiPhapViconnect: [
-          '• Bộ Báo Cáo Chuẩn Hóa Điều Hành: Thiết kế mẫu báo cáo chuẩn hóa theo kỳ Tháng/Quý/Năm tích hợp đầy đủ 4 trụ cột: Biến động tài chính hội phí, Chỉ số tích cực & chuyên cần, Tổng giá trị giao thương B2B, và Tốc độ phát triển hội viên mới.',
-          '• Công nghệ Xuất Bản Đa Định Dạng Tức Thì (Instant Multi-Format Export): Hỗ trợ nút xuất bản Báo cáo in ấn định dạng A4 chuyên nghiệp (đầy đủ phân tích biểu đồ và vị trí phê duyệt của Ban Tài Chính, Ban Hội Viên, Chủ Tịch) và xuất dữ liệu thô Excel (.xlsx) phục vụ lưu trữ kế toán.'
+          '• Bộ Báo Cáo Chuẩn Hóa Điều Hành: Thiết kế mẫu báo cáo chuẩn hóa theo kỳ Tháng/Quý/Năm tích hợp đầy đủ 4 trụ cột: Biến động tài chính hội phí, Chỉ số tích cực & chuyên cần, Tổng giá trị giao thương B2B, và Tốc độ phát triển Học viên mới.',
+          '• Công nghệ Xuất Bản Đa Định Dạng Tức Thì (Instant Multi-Format Export): Hỗ trợ nút xuất bản Báo cáo in ấn định dạng A4 chuyên nghiệp (đầy đủ phân tích biểu đồ và vị trí phê duyệt của Ban Tài Chính, Ban Học viên, Chủ Tịch) và xuất dữ liệu thô Excel (.xlsx) phục vụ lưu trữ kế toán.'
         ],
         statusType: 'IN_PROGRESS',
         thoiGian: '🟡 ĐANG TRIỂN KHAI\n(Hoàn thiện Đợt 1 - trước 05/11/2026)'
@@ -394,15 +394,15 @@ const data = [
     items: [
       {
         stt: '15',
-        hangMuc: 'Trang cá nhân hội viên',
+        hangMuc: 'Trang cá nhân Học viên',
         vanDe: 'Mới có mục Lịch sử trên trang chủ; chưa có trang tổng hợp sự kiện và cơ hội đã tham gia.',
-        mucDich: 'Hội viên xem lại quá trình tham gia; có dữ liệu phục vụ đánh giá.',
+        mucDich: 'Học viên xem lại quá trình tham gia; có dữ liệu phục vụ đánh giá.',
         deXuatCLB: 'Tổng hợp trên trang cá nhân: sự kiện, hoạt động đã tham gia; cơ hội giao thương đã tham gia; lịch sử hoạt động.',
         nguoiGopY: 'Chị Dung',
         uuTien: 'Trung bình · Đợt 1',
         giaiPhapViconnect: [
           '• Tái cấu trúc Hồ Sơ Số Toàn Diện: Tinh giản toàn bộ giao diện hồ sơ, định danh rõ nét vị trí doanh nghiệp, chức vụ trong CLB và tích hợp nút chia sẻ danh thiếp số 1 chạm.',
-          '• Ý tưởng Dòng Thời Gian Hoạt Động (Member Journey Timeline): Tổng hợp trực quan và đầy đủ toàn bộ hành trình gắn bó của hội viên: Lịch sử các sự kiện đã tham gia, các cơ hội hợp tác đã đăng tải, các hợp đồng giao thương đã khớp lệnh, và các cuộc hẹn kết nối 1-on-1.',
+          '• Ý tưởng Dòng Thời Gian Hoạt Động (Member Journey Timeline): Tổng hợp trực quan và đầy đủ toàn bộ hành trình gắn bó của Học viên: Lịch sử các sự kiện đã tham gia, các cơ hội hợp tác đã đăng tải, các hợp đồng giao thương đã khớp lệnh, và các cuộc hẹn kết nối 1-on-1.',
           '• Đồng bộ Nhận diện Sự Kiện: Tự động hiển thị huy hiệu và chủ đề sự kiện/lễ hội đang diễn ra tại CLB để tạo sự gắn kết cộng đồng mạnh mẽ.'
         ],
         statusType: 'IN_PROGRESS',
@@ -438,10 +438,10 @@ function generateDocumentXml() {
 
   <!-- Section I -->
   <w:p><w:pPr><w:spacing w:before="100" w:after="60"/></w:pPr><w:r><w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial" w:eastAsia="Arial" w:cs="Arial"/><w:b/><w:bCs/><w:color w:val="1F3864"/><w:sz w:val="22"/><w:szCs w:val="22"/></w:rPr><w:t>I. TỔNG QUAN ĐỐI SOÁT &amp; CAM KẾT TIẾN ĐỘ TỪ VICONNECT (ĐỢT 1)</w:t></w:r></w:p>
-  <w:p><w:pPr><w:spacing w:after="60"/></w:pPr><w:r><w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial" w:eastAsia="Arial" w:cs="Arial"/><w:b/><w:bCs/><w:color w:val="1F3864"/><w:sz w:val="18"/><w:szCs w:val="18"/></w:rPr><w:t xml:space="preserve">Mục tiêu chung: </w:t></w:r><w:r><w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial" w:eastAsia="Arial" w:cs="Arial"/><w:sz w:val="18"/><w:szCs w:val="18"/></w:rPr><w:t>Đơn giản hóa ứng dụng để hội viên dùng thường xuyên; biến dữ liệu hoạt động thành công cụ quản trị sắc bén cho Ban điều hành.</w:t></w:r></w:p>
+  <w:p><w:pPr><w:spacing w:after="60"/></w:pPr><w:r><w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial" w:eastAsia="Arial" w:cs="Arial"/><w:b/><w:bCs/><w:color w:val="1F3864"/><w:sz w:val="18"/><w:szCs w:val="18"/></w:rPr><w:t xml:space="preserve">Mục tiêu chung: </w:t></w:r><w:r><w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial" w:eastAsia="Arial" w:cs="Arial"/><w:sz w:val="18"/><w:szCs w:val="18"/></w:rPr><w:t>Đơn giản hóa ứng dụng để Học viên dùng thường xuyên; biến dữ liệu hoạt động thành công cụ quản trị sắc bén cho Ban điều hành.</w:t></w:r></w:p>
   <w:p><w:pPr><w:spacing w:after="60"/></w:pPr><w:r><w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial" w:eastAsia="Arial" w:cs="Arial"/><w:b/><w:bCs/><w:color w:val="1F3864"/><w:sz w:val="18"/><w:szCs w:val="18"/></w:rPr><w:t xml:space="preserve">Phạm vi &amp; Tiến độ Đợt 1: </w:t></w:r><w:r><w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial" w:eastAsia="Arial" w:cs="Arial"/><w:sz w:val="18"/><w:szCs w:val="18"/></w:rPr><w:t xml:space="preserve">Toàn bộ 15 hạng mục thuộc </w:t></w:r><w:r><w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial" w:eastAsia="Arial" w:cs="Arial"/><w:b/><w:bCs/><w:color w:val="1F3864"/><w:sz w:val="18"/><w:szCs w:val="18"/></w:rPr><w:t>ĐỢT 1</w:t></w:r><w:r><w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial" w:eastAsia="Arial" w:cs="Arial"/><w:sz w:val="18"/><w:szCs w:val="18"/></w:rPr><w:t xml:space="preserve">, dự kiến hoàn thành toàn diện trước </w:t></w:r><w:r><w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial" w:eastAsia="Arial" w:cs="Arial"/><w:b/><w:bCs/><w:color w:val="059669"/><w:sz w:val="18"/><w:szCs w:val="18"/></w:rPr><w:t>05/11/2026</w:t></w:r><w:r><w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial" w:eastAsia="Arial" w:cs="Arial"/><w:sz w:val="18"/><w:szCs w:val="18"/></w:rPr><w:t>.</w:t></w:r></w:p>
   <w:p><w:pPr><w:spacing w:after="60"/></w:pPr><w:r><w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial" w:eastAsia="Arial" w:cs="Arial"/><w:b/><w:bCs/><w:color w:val="1F3864"/><w:sz w:val="18"/><w:szCs w:val="18"/></w:rPr><w:t xml:space="preserve">Phân định 3 trạng thái: </w:t></w:r><w:r><w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial" w:eastAsia="Arial" w:cs="Arial"/><w:b/><w:bCs/><w:color w:val="059669"/><w:sz w:val="18"/><w:szCs w:val="18"/></w:rPr><w:t>🟢 ĐÃ SẴN SÀNG (02 hạng mục)</w:t></w:r><w:r><w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial" w:eastAsia="Arial" w:cs="Arial"/><w:sz w:val="18"/><w:szCs w:val="18"/></w:rPr><w:t xml:space="preserve">  ·  </w:t></w:r><w:r><w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial" w:eastAsia="Arial" w:cs="Arial"/><w:b/><w:bCs/><w:color w:val="D97706"/><w:sz w:val="18"/><w:szCs w:val="18"/></w:rPr><w:t>🟡 ĐANG TRIỂN KHAI (11 hạng mục)</w:t></w:r><w:r><w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial" w:eastAsia="Arial" w:cs="Arial"/><w:sz w:val="18"/><w:szCs w:val="18"/></w:rPr><w:t xml:space="preserve">  ·  </w:t></w:r><w:r><w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial" w:eastAsia="Arial" w:cs="Arial"/><w:b/><w:bCs/><w:color w:val="1D4ED8"/><w:sz w:val="18"/><w:szCs w:val="18"/></w:rPr><w:t>🔵 KẾ HOẠCH TIẾP THEO (02 hạng mục)</w:t></w:r></w:p>
-  <w:p><w:pPr><w:spacing w:after="140"/></w:pPr><w:r><w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial" w:eastAsia="Arial" w:cs="Arial"/><w:b/><w:bCs/><w:color w:val="1F3864"/><w:sz w:val="18"/><w:szCs w:val="18"/></w:rPr><w:t xml:space="preserve">Người góp ý: </w:t></w:r><w:r><w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial" w:eastAsia="Arial" w:cs="Arial"/><w:sz w:val="18"/><w:szCs w:val="18"/></w:rPr><w:t>Anh Thành (Phó Tổng Thư ký)  ·  Anh Tuấn (Phó Chủ tịch)  ·  Chị Phương (Phó ban Hội viên)  ·  Chị Dung (Phó Chánh Văn phòng)</w:t></w:r></w:p>
+  <w:p><w:pPr><w:spacing w:after="140"/></w:pPr><w:r><w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial" w:eastAsia="Arial" w:cs="Arial"/><w:b/><w:bCs/><w:color w:val="1F3864"/><w:sz w:val="18"/><w:szCs w:val="18"/></w:rPr><w:t xml:space="preserve">Người góp ý: </w:t></w:r><w:r><w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial" w:eastAsia="Arial" w:cs="Arial"/><w:sz w:val="18"/><w:szCs w:val="18"/></w:rPr><w:t>Anh Thành (Phó Tổng Thư ký)  ·  Anh Tuấn (Phó Chủ tịch)  ·  Chị Phương (Phó ban Học viên)  ·  Chị Dung (Phó Chánh Văn phòng)</w:t></w:r></w:p>
 
   <!-- Section II -->
   <w:p><w:pPr><w:spacing w:before="140" w:after="100"/></w:pPr><w:r><w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial" w:eastAsia="Arial" w:cs="Arial"/><w:b/><w:bCs/><w:color w:val="1F3864"/><w:sz w:val="22"/><w:szCs w:val="22"/></w:rPr><w:t>II. BẢNG CHI TIẾT Ý TƯỞNG &amp; GIẢI PHÁP CÔNG NGHỆ VIONE / VICONNECT CHO 15 Ý KIẾN HỌP</w:t></w:r></w:p>

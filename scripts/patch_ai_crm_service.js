@@ -59,7 +59,7 @@ const chatMethodCode = `
 
     // 2. Chuẩn bị Evidence metadata
     const evidence = [
-      { title: 'Tổng hội viên CLB', countOrVal: \`\${membersCount} Doanh nhân\`, source: 'CSDL Hội viên CEO HN10' },
+      { title: 'Tổng Học viên CLB', countOrVal: \`\${membersCount} Doanh nhân\`, source: 'CSDL Học viên CEO HN10' },
       { title: 'Số dư quỹ ngân sách', countOrVal: \`\${(financialBalance / 1e6).toFixed(1)} Triệu VNĐ\`, source: 'Sổ quỹ Kế toán' },
       { title: 'Sự kiện trọng điểm', countOrVal: \`\${eventsList.length} sự kiện gần nhất\`, source: 'Ban Sự Kiện' },
       { title: 'Cơ hội B2B mới nhất', countOrVal: \`\${oppsList.length} cơ hội\`, source: 'Ban Xúc Tiến Thương Mại' },
@@ -74,11 +74,11 @@ Quy tắc trả lời:
 - Đưa ra các khuyến nghị chiến lược và giải pháp hành động cụ thể (Actionable Insights).
 
 DỮ LIỆU HIỆN HỮU THỜI GIAN THỰC CỦA CLB CEO HN10:
-- Tổng số hội viên: \${membersCount} Doanh nhân.
+- Tổng số Học viên: \${membersCount} Doanh nhân.
 - Số dư ngân sách quỹ hiện tại: \${financialBalance.toLocaleString('vi-VN')} VNĐ (Tổng thu: \${totalIncome.toLocaleString('vi-VN')} đ, Tổng chi: \${totalExpense.toLocaleString('vi-VN')} đ).
 - Danh sách 5 sự kiện gần nhất: \${eventsList.map((e) => \`\${e.title} (\${e.location || 'Hà Nội'})\`).join(', ')}.
 - Danh sách 5 cơ hội B2B mới nhất: \${oppsList.map((o) => \`\${o.title} [\${o.category || 'Thương mại'}]\`).join(', ')}.
-- 6 Ban chuyên môn điều hành: 1. Ban Xúc tiến Thương mại; 2. Ban Sự kiện & Lễ tân; 3. Ban Tài chính - Kế toán; 4. Ban Thư ký & Truyền thông; 5. Ban Hội viên & Đối ngoại; 6. Ban Đào tạo & Chuyển đổi số.
+- 6 Ban chuyên môn điều hành: 1. Ban Xúc tiến Thương mại; 2. Ban Sự kiện & Lễ tân; 3. Ban Tài chính - Kế toán; 4. Ban Thư ký & Truyền thông; 5. Ban Học viên & Đối ngoại; 6. Ban Đào tạo & Chuyển đổi số.
 \`;
 
     // 4. Thử gọi mô hình ngoài nếu có cấu hình API Key
@@ -146,26 +146,26 @@ DỮ LIỆU HIỆN HỮU THỜI GIAN THỰC CỦA CLB CEO HN10:
       const lower = message.toLowerCase();
       modelLabel = \`CEO HN10 Executive AI (Tối ưu hóa Free Model)\`;
 
-      if (lower.includes('hội viên') || lower.includes('thành viên') || lower.includes('phát triển')) {
-        generatedReply = \`### 📊 Báo Cáo & Phân Tích Hiện Trạng Hội Viên CLB CEO HN10
+      if (lower.includes('Học viên') || lower.includes('thành viên') || lower.includes('phát triển')) {
+        generatedReply = \`### 📊 Báo Cáo & Phân Tích Hiện Trạng Học viên CLB CEO HN10
 
-Chào Anh/Chị, dựa trên dữ liệu thời gian thực từ CSDL Hội viên Hiệp hội:
+Chào Anh/Chị, dựa trên dữ liệu thời gian thực từ CSDL Học viên Hiệp hội:
 
-1. **Quy mô hiện tại**: Toàn CLB hiện có **\${membersCount} hội viên chính thức**, trong đó:
+1. **Quy mô hiện tại**: Toàn CLB hiện có **\${membersCount} Học viên chính thức**, trong đó:
    - **Doanh nghiệp vừa và lớn**: ~35% (ngành xây dựng, tài chính, sản xuất, CNTT).
    - **Doanh nghiệp nhỏ và Startup**: ~65% (thương mại dịch vụ, F&B, đào tạo).
 2. **Đánh giá mức độ tương tác**:
    - Tỷ lệ tham gia các kỳ họp tháng và kết nối định kỳ đạt **78.4%**.
-   - Có **12 hội viên** chưa cập nhật thông tin doanh nghiệp hoặc thẻ danh thiếp số.
+   - Có **12 Học viên** chưa cập nhật thông tin doanh nghiệp hoặc thẻ danh thiếp số.
 
-| Nhóm Hội Viên | Số Lượng | Tỷ Lệ | Đánh Giá Tương Tác |
+| Nhóm Học viên | Số Lượng | Tỷ Lệ | Đánh Giá Tương Tác |
 | :--- | :--- | :--- | :--- |
 | Ban Lãnh Đạo & Trưởng Ban | 15 | 8.3% | Rất tích cực, dẫn dắt phong trào |
-| Hội viên Nòng Cốt (Active) | 125 | 69.4% | Giao thương và dự sự kiện đều đặn |
-| Hội viên Cần Chăm Sóc | 40 | 22.3% | Cần Ban Hội viên liên hệ gia hạn & hỗ trợ kết nối |
+| Học viên Nòng Cốt (Active) | 125 | 69.4% | Giao thương và dự sự kiện đều đặn |
+| Học viên Cần Chăm Sóc | 40 | 22.3% | Cần Ban Học viên liên hệ gia hạn & hỗ trợ kết nối |
 
 💡 **Đề xuất hành động cho Ban Điều Hành:**
-- Ban Hội viên & Đối ngoại nên tổ chức chương trình **"Cà phê Doanh nhân Thứ 6"** để kết nối nhóm 40 hội viên ít tương tác.
+- Ban Học viên & Đối ngoại nên tổ chức chương trình **"Cà phê Doanh nhân Thứ 6"** để kết nối nhóm 40 Học viên ít tương tác.
 - Triển khai gắn huy hiệu **"Doanh nghiệp Uy tín CEO HN10"** trên ứng dụng di động để kích thích tinh thần giao thương.\`;
       } else if (lower.includes('thu chi') || lower.includes('tài chính') || lower.includes('quỹ') || lower.includes('tiền') || lower.includes('hội phí')) {
         generatedReply = \`### 💰 Báo Cáo Tài Chính & Dòng Tiền Ngân Sách CLB CEO HN10
@@ -210,26 +210,26 @@ Dữ liệu cập nhật từ Ban Sự Kiện & Lễ Tân:
 \${eventsList.map((e, idx) => \`\${idx + 1}. **\${e.title}**
    - 📍 Địa điểm: \${e.location || 'Trung tâm Hội nghị Hà Nội'}
    - 🕒 Thời gian: \${e.event_date ? new Date(e.event_date).toLocaleDateString('vi-VN') : 'Đang cập nhật'}
-   - 📌 Tình trạng: Đã mở đăng ký qua App Hội viên\`).join('\\n\\n')}
+   - 📌 Tình trạng: Đã mở đăng ký qua App Học viên\`).join('\\n\\n')}
 
 📋 **Nhiệm vụ trọng tâm tuần này:**
 - Kiểm tra danh sách check-in QR Code của các đại biểu tham dự.
-- Đẩy bài truyền thông lên Fanpage Facebook và gửi thông báo đẩy (Push Notification) đến toàn bộ \${membersCount} hội viên trên Mobile App.\`;
+- Đẩy bài truyền thông lên Fanpage Facebook và gửi thông báo đẩy (Push Notification) đến toàn bộ \${membersCount} Học viên trên Mobile App.\`;
       } else {
         generatedReply = \`### 🌟 Phân Tích & Tư Vấn Tổng Thể CEO HN10 AI
 
 Cảm ơn Anh/Chị đã gửi yêu cầu. Dựa trên cơ sở dữ liệu thời gian thực của Hiệp hội CEO HN10:
 
-- **Hội viên**: Hệ thống đang vận hành ổn định với **\${membersCount} doanh nhân**.
+- **Học viên**: Hệ thống đang vận hành ổn định với **\${membersCount} doanh nhân**.
 - **Dòng tiền**: Quỹ duy trì số dư khả dụng **\${financialBalance.toLocaleString('vi-VN')} VNĐ**.
 - **Sự kiện & Giao thương**: Các hoạt động kết nối B2B và sự kiện tháng đang diễn ra đúng tiến độ của 6 Ban chuyên môn.
 
 Anh/Chị có thể yêu cầu AI thực hiện nhanh các tác vụ sau:
-1. *"Phân tích chi tiết hội viên theo ngành nghề"*
+1. *"Phân tích chi tiết Học viên theo ngành nghề"*
 2. *"Xuất báo cáo tài chính thu chi quý"*
 3. *"Đề xuất các cơ hội hợp tác B2B tiềm năng"*
 4. *"Soạn thảo bài viết hoặc thông báo sự kiện"*
-5. *"Tạo phiếu thu / hóa đơn điện tử cho hội viên"*
+5. *"Tạo phiếu thu / hóa đơn điện tử cho Học viên"*
 
 Tôi luôn sẵn sàng hỗ trợ Anh/Chị điều hành Hiệp hội một cách hiệu quả và minh bạch nhất!\`;
       }
@@ -260,7 +260,7 @@ Tôi luôn sẵn sàng hỗ trợ Anh/Chị điều hành Hiệp hội một cá
       evidence,
       suggestedFollowUps: [
         'Phân tích chi tiết dòng tiền và số dư quỹ',
-        'Đề xuất chiến lược mở rộng hội viên quý tới',
+        'Đề xuất chiến lược mở rộng Học viên quý tới',
         'Tổng hợp cơ hội giao thương B2B nổi bật',
         'Kế hoạch tổ chức sự kiện và phân công các Ban',
       ],

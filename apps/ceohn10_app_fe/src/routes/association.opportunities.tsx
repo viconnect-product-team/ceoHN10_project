@@ -278,9 +278,9 @@ function OpportunitiesScreen() {
               setSelectedOpp(res);
             }
           })
-          .catch(() => {});
+          .catch(() => { });
       }
-    } catch {}
+    } catch { }
   }, [activeOppsList]);
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [recipientType, setRecipientType] = useState<"all" | "by_department" | "friends">("all");
@@ -336,7 +336,7 @@ function OpportunitiesScreen() {
         id: dealId,
         oppId: dealModalOpp.id,
         oppTitle: dealModalOpp.title,
-        partnerName: member?.name || "Hội viên CEO HN10",
+        partnerName: member?.name || "Học viên CEO HN10",
         partnerCompany: (member as any)?.company || (member as any)?.companyName || "Doanh nghiệp CLB",
         partnerPhone: member?.phone || "",
         ownerName: dealModalOpp.contactName || dealModalOpp.company || "Chủ cơ hội",
@@ -372,7 +372,7 @@ function OpportunitiesScreen() {
         id: `deal_req_${Date.now()}`,
         targetUserId: targetUserId,
         title: "Đề xuất Deal chào giá mới cho cơ hội của bạn!",
-        body: `${member?.name || "Hội viên"} vừa gửi đề xuất deal ${Number(dealPrice).toLocaleString("vi-VN")} đ cho cơ hội "${dealModalOpp.title}": "${dealMessage}"`,
+        body: `${member?.name || "Học viên"} vừa gửi đề xuất deal ${Number(dealPrice).toLocaleString("vi-VN")} đ cho cơ hội "${dealModalOpp.title}": "${dealMessage}"`,
         createdAt: new Date().toISOString(),
         unread: true,
         type: "deal",
@@ -422,7 +422,7 @@ function OpportunitiesScreen() {
       });
       localStorage.setItem("vba_notifications", JSON.stringify(notifs.slice(0, 50)));
       window.dispatchEvent(new CustomEvent("notifications-updated"));
-    } catch {}
+    } catch { }
 
     recordUserActivity({
       action: "APPROVE_DEAL",
@@ -474,7 +474,7 @@ function OpportunitiesScreen() {
           setOppReport(res);
         }
       })
-      .catch(() => {});
+      .catch(() => { });
   };
 
   useEffect(() => {
@@ -484,7 +484,7 @@ function OpportunitiesScreen() {
   const handleNegotiate = (opp: any) => {
     const target: BusinessConnectTarget = {
       code: opp.posterCode || opp.posterId || (opp.creator ? opp.creator.code : "admin"),
-      name: opp.posterName || opp.contactName || opp.company || "Hội viên CLB CEO HN10",
+      name: opp.posterName || opp.contactName || opp.company || "Học viên CLB CEO HN10",
       company: opp.company,
       title: opp.contactTitle || "Chủ đề xuất cơ hội",
       userId: opp.posterId || opp.userId,
@@ -496,9 +496,9 @@ function OpportunitiesScreen() {
   const handleNegotiateWithMember = (m: any, opp: any) => {
     const target: BusinessConnectTarget = {
       code: m.memberCode || m.memberId || m.phone || "member",
-      name: m.name || "Hội viên quan tâm",
+      name: m.name || "Học viên quan tâm",
       company: m.company || "Doanh nghiệp CLB CEO HN10",
-      title: m.personTitle || "Hội viên",
+      title: m.personTitle || "Học viên",
       userId: m.userId || m.memberId,
     };
     setNegotiateTarget(target);
@@ -531,7 +531,7 @@ function OpportunitiesScreen() {
     try {
       localStorage.setItem("vba_pending_chat_inquiry", JSON.stringify(inquiry));
       window.dispatchEvent(new Event("storage"));
-    } catch {}
+    } catch { }
 
     void navigate({
       to: "/association/messages",
@@ -640,9 +640,9 @@ function OpportunitiesScreen() {
     const uObj = user || storedUser;
 
     if (mObj || uObj) {
-      const defaultName = mObj?.name || uObj?.name || uObj?.username || "Hội viên CEO HN10";
+      const defaultName = mObj?.name || uObj?.name || uObj?.username || "Học viên CEO HN10";
       const defaultPhone = mObj?.phone || uObj?.phone || "";
-      const defaultTitle = mObj?.title || mObj?.job_title || mObj?.position || mObj?.professional_title || "Lãnh đạo Doanh nghiệp Hội viên";
+      const defaultTitle = mObj?.title || mObj?.job_title || mObj?.position || mObj?.professional_title || "Lãnh đạo Doanh nghiệp Học viên";
       const defaultCompany = mObj?.company || mObj?.companyName || "CLB Doanh Nhân CEO HN10";
 
       if (!newContactName || newContactName === "Ban Quản Trị") setNewContactName(defaultName);
@@ -719,7 +719,7 @@ function OpportunitiesScreen() {
             setInterestedMembers(list);
           }
         })
-        .catch(() => {})
+        .catch(() => { })
         .finally(() => setLoadingInterests(false));
     } else {
       setInterestedMembers([]);
@@ -1150,7 +1150,7 @@ function OpportunitiesScreen() {
         metadata: {
           oppId: id,
           oppTitle: opp?.title,
-          detail: `Hội viên bấm quan tâm cơ hội: "${opp?.title || id}"`,
+          detail: `Học viên bấm quan tâm cơ hội: "${opp?.title || id}"`,
         },
       });
       toast.success("Đã ghi nhận sự quan tâm kết nối của Quý CEO!");
@@ -1165,7 +1165,7 @@ function OpportunitiesScreen() {
         metadata: {
           oppId: id,
           oppTitle: opp?.title,
-          detail: `Hội viên bấm quan tâm cơ hội: "${opp?.title || id}"`,
+          detail: `Học viên bấm quan tâm cơ hội: "${opp?.title || id}"`,
         },
       });
       toast.success("Đã ghi nhận sự quan tâm kết nối của Quý CEO!");
@@ -1285,7 +1285,7 @@ function OpportunitiesScreen() {
         metadata: {
           oppId: id,
           title: selectedOpp?.title,
-          detail: `Hội viên đã đóng/xóa cơ hội giao thương khỏi sàn B2B`,
+          detail: `Học viên đã đóng/xóa cơ hội giao thương khỏi sàn B2B`,
         },
       });
       toast.success("Đã xóa cơ hội thành công!");
@@ -1303,7 +1303,7 @@ function OpportunitiesScreen() {
         metadata: {
           oppId: id,
           title: selectedOpp?.title,
-          detail: `Hội viên đã đóng/xóa cơ hội giao thương khỏi sàn B2B`,
+          detail: `Học viên đã đóng/xóa cơ hội giao thương khỏi sàn B2B`,
         },
       });
       toast.error("Không thể xóa cơ hội. Vui lòng thử lại!");
@@ -1384,34 +1384,34 @@ function OpportunitiesScreen() {
         cleanBudgetMin && cleanBudgetMax && cleanBudgetMin !== cleanBudgetMax
           ? `${cleanBudgetMin.toLocaleString("vi-VN")} - ${cleanBudgetMax.toLocaleString("vi-VN")} đ`
           : cleanBudgetMax
-          ? `${cleanBudgetMax.toLocaleString("vi-VN")} đ`
-          : cleanBudgetMin
-          ? `Từ ${cleanBudgetMin.toLocaleString("vi-VN")} đ`
-          : "Thỏa thuận B2B";
+            ? `${cleanBudgetMax.toLocaleString("vi-VN")} đ`
+            : cleanBudgetMin
+              ? `Từ ${cleanBudgetMin.toLocaleString("vi-VN")} đ`
+              : "Thỏa thuận B2B";
 
       setLocalOpps((prev) =>
         (prev || []).map((o) =>
           o.id === editingOpp.id
             ? {
-                ...o,
-                title: editTitle.trim(),
-                description: editDesc.trim(),
-                tag: editTag,
-                company: editCompany.trim(),
-                contactName: editContactName.trim(),
-                contactPhone: editContactPhone.trim(),
-                contactTitle: editContactTitle.trim(),
-                industry: editIndustry,
-                region: editRegion,
-                budgetMin: cleanBudgetMin || undefined,
-                budgetMax: cleanBudgetMax || undefined,
-                value: updatedVal,
-                targetScope,
-                visibility,
-                targetRecipients: editSelectedRecipientIds,
-                image: finalImgs[0] || o.image,
-                images: finalImgs,
-              }
+              ...o,
+              title: editTitle.trim(),
+              description: editDesc.trim(),
+              tag: editTag,
+              company: editCompany.trim(),
+              contactName: editContactName.trim(),
+              contactPhone: editContactPhone.trim(),
+              contactTitle: editContactTitle.trim(),
+              industry: editIndustry,
+              region: editRegion,
+              budgetMin: cleanBudgetMin || undefined,
+              budgetMax: cleanBudgetMax || undefined,
+              value: updatedVal,
+              targetScope,
+              visibility,
+              targetRecipients: editSelectedRecipientIds,
+              image: finalImgs[0] || o.image,
+              images: finalImgs,
+            }
             : o,
         ),
       );
@@ -1515,10 +1515,10 @@ function OpportunitiesScreen() {
         cleanBudgetMin && cleanBudgetMax && cleanBudgetMin !== cleanBudgetMax
           ? `${cleanBudgetMin.toLocaleString("vi-VN")} - ${cleanBudgetMax.toLocaleString("vi-VN")} đ`
           : cleanBudgetMax
-          ? `${cleanBudgetMax.toLocaleString("vi-VN")} đ`
-          : cleanBudgetMin
-          ? `Từ ${cleanBudgetMin.toLocaleString("vi-VN")} đ`
-          : "Thỏa thuận B2B";
+            ? `${cleanBudgetMax.toLocaleString("vi-VN")} đ`
+            : cleanBudgetMin
+              ? `Từ ${cleanBudgetMin.toLocaleString("vi-VN")} đ`
+              : "Thỏa thuận B2B";
 
       const createdId = createRes?.id || `opp_${Date.now()}`;
       const newOppItem: any = {
@@ -1609,7 +1609,7 @@ function OpportunitiesScreen() {
 
       {/* ── SCROLLABLE CONTENT (ẢNH 2 FIGMA SPEC) ── */}
       <div className="self-stretch px-4 pt-4 pb-28 flex flex-col justify-start items-start gap-5">
-                {/* ── 6 CHỈ SỐ CHI TIẾT CƠ HỘI NỀN TRẮNG (CẤM NỀN XANH - REQ 3) ── */}
+        {/* ── 6 CHỈ SỐ CHI TIẾT CƠ HỘI NỀN TRẮNG (CẤM NỀN XANH - REQ 3) ── */}
         <div className="self-stretch flex flex-col gap-2">
           <div className="flex items-center justify-between px-1">
             <div className="flex items-center gap-1.5">
@@ -1804,33 +1804,30 @@ function OpportunitiesScreen() {
                 <button
                   type="button"
                   onClick={() => setBenefitSort("highest_benefit")}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1 transition cursor-pointer ${
-                    benefitSort === "highest_benefit"
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1 transition cursor-pointer ${benefitSort === "highest_benefit"
                       ? "bg-amber-500 text-slate-950 shadow-xs"
                       : "bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700"
-                  }`}
+                    }`}
                 >
                   <span>🏆 % Có lợi nhất cho tôi</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => setBenefitSort("highest_value")}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1 transition cursor-pointer ${
-                    benefitSort === "highest_value"
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1 transition cursor-pointer ${benefitSort === "highest_value"
                       ? "bg-amber-500 text-slate-950 shadow-xs"
                       : "bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700"
-                  }`}
+                    }`}
                 >
                   <span>💎 Giá trị deal cao nhất</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => setBenefitSort("newest")}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1 transition cursor-pointer ${
-                    benefitSort === "newest"
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1 transition cursor-pointer ${benefitSort === "newest"
                       ? "bg-amber-500 text-slate-950 shadow-xs"
                       : "bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700"
-                  }`}
+                    }`}
                 >
                   <span>🕒 Mới nhất</span>
                 </button>
@@ -1848,11 +1845,10 @@ function OpportunitiesScreen() {
                   key={ind.id}
                   type="button"
                   onClick={() => setIndustryFilter(ind.id)}
-                  className={`shrink-0 px-3 py-1 rounded-lg text-[11px] font-semibold transition cursor-pointer ${
-                    isActive
+                  className={`shrink-0 px-3 py-1 rounded-lg text-[11px] font-semibold transition cursor-pointer ${isActive
                       ? "bg-amber-500 text-slate-950 font-bold shadow-2xs"
                       : "bg-white text-slate-600 border border-slate-200 hover:bg-slate-50"
-                  }`}
+                    }`}
                 >
                   {ind.label}
                 </button>
@@ -1868,11 +1864,10 @@ function OpportunitiesScreen() {
                   key={tItem}
                   type="button"
                   onClick={() => setTab(tItem)}
-                  className={`shrink-0 px-3.5 py-1.5 rounded-[100px] text-xs transition cursor-pointer font-['Inter'] ${
-                    isActive
+                  className={`shrink-0 px-3.5 py-1.5 rounded-[100px] text-xs transition cursor-pointer font-['Inter'] ${isActive
                       ? "bg-sky-950 text-white font-bold"
                       : "bg-white text-slate-500 font-semibold outline outline-1 outline-offset-[-1px] outline-slate-200 hover:bg-slate-50"
-                  }`}
+                    }`}
                 >
                   {tItem}
                 </button>
@@ -1959,246 +1954,243 @@ function OpportunitiesScreen() {
                 </div>
               </div>
             ) : (
-            <div className="self-stretch flex flex-col justify-start items-start gap-3">
-              {(() => {
-                const displayItems = list;
-                if (displayItems.length === 0) {
-                  return (
-                    <div className="self-stretch py-10 px-4 bg-white rounded-2xl outline outline-1 outline-offset-[-1px] outline-slate-200 flex flex-col items-center justify-center text-center gap-3 shadow-xs">
-                      <div className="size-12 rounded-2xl bg-blue-50 grid place-items-center">
-                        <Handshake className="size-6 text-[#003B95]" />
-                      </div>
-                      <div>
-                        <h4 className="text-sm font-bold text-slate-900">Chưa có cơ hội kinh doanh nào</h4>
-                        <p className="text-xs text-slate-500 max-w-xs mt-1">
-                          Các cơ hội kết nối và giao thương từ hội viên sẽ hiển thị tại đây khi được thêm vào hệ thống.
-                        </p>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => setCreateModalOpen(true)}
-                        className="mt-1 px-4 py-2 bg-sky-950 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 hover:bg-sky-900 transition cursor-pointer shadow-xs active:scale-95"
-                      >
-                        <Plus className="size-4" />
-                        <span>Chia sẻ cơ hội mới</span>
-                      </button>
-                    </div>
-                  );
-                }
-
-                return displayItems
-                  .slice((pageOpps - 1) * OPP_PAGE_SIZE, pageOpps * OPP_PAGE_SIZE)
-                  .map((o, idx) => {
-                    const tagVi = normalizeTag(o.tag);
-                    const isLogistics =
-                      o.tag?.toLowerCase().includes("logistics") ||
-                      tagVi.toLowerCase().includes("logistics");
-                    const rawOppImg = o.image;
-                    const oppImg =
-                      (rawOppImg &&
-                      (rawOppImg.startsWith("data:") ||
-                        rawOppImg.startsWith("http") ||
-                        rawOppImg.startsWith("/"))
-                        ? rawOppImg.startsWith("data:")
-                          ? rawOppImg
-                          : resolveMediaUrl(rawOppImg) || rawOppImg
-                        : null) || defaultOppImages[idx % defaultOppImages.length];
-
+              <div className="self-stretch flex flex-col justify-start items-start gap-3">
+                {(() => {
+                  const displayItems = list;
+                  if (displayItems.length === 0) {
                     return (
-                      <div
-                        key={o.id}
-                        id={idx === 0 ? "tour-opps-card-item" : undefined}
-                        className="self-stretch bg-white rounded-2xl outline outline-1 outline-offset-[-1px] outline-slate-200 flex flex-col justify-start items-start overflow-hidden shadow-xs hover:border-[#001B54]/30 transition-all"
-                      >
-                        <div
-                          onClick={() => handleOpenOppDetail(o)}
-                          className="self-stretch p-3 inline-flex justify-start items-center gap-3 cursor-pointer"
+                      <div className="self-stretch py-10 px-4 bg-white rounded-2xl outline outline-1 outline-offset-[-1px] outline-slate-200 flex flex-col items-center justify-center text-center gap-3 shadow-xs">
+                        <div className="size-12 rounded-2xl bg-blue-50 grid place-items-center">
+                          <Handshake className="size-6 text-[#003B95]" />
+                        </div>
+                        <div>
+                          <h4 className="text-sm font-bold text-slate-900">Chưa có cơ hội kinh doanh nào</h4>
+                          <p className="text-xs text-slate-500 max-w-xs mt-1">
+                            Các cơ hội kết nối và giao thương từ Học viên sẽ hiển thị tại đây khi được thêm vào hệ thống.
+                          </p>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setCreateModalOpen(true)}
+                          className="mt-1 px-4 py-2 bg-sky-950 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 hover:bg-sky-900 transition cursor-pointer shadow-xs active:scale-95"
                         >
-                          <img
-                            className="size-20 rounded-lg object-cover shrink-0"
-                            src={oppImg}
-                            alt={o.title}
-                          />
-                          <div className="flex-1 min-w-0 inline-flex flex-col justify-start items-start gap-1.5">
-                            <div className="self-stretch inline-flex justify-between items-center">
-                              <div className="flex items-center gap-1">
-                                <div
-                                  className={`px-1.5 py-0.5 ${
-                                    isLogistics ? "bg-indigo-100" : "bg-amber-100"
-                                  } rounded-sm flex justify-start items-start`}
-                                >
-                                  <div
-                                    className={`justify-start ${
-                                      isLogistics ? "text-blue-900" : "text-amber-600"
-                                    } text-[9px] font-extrabold font-['Inter']`}
-                                  >
-                                    {isLogistics ? "LOGISTICS" : (o.tag || "HỢP TÁC B2B").toUpperCase()}
-                                  </div>
-                                </div>
-                                <span
-                                  className={`px-1.5 py-0.5 rounded-sm text-[9px] font-bold ${
-                                    o.tradeType === "buyer"
-                                      ? "bg-blue-100 text-blue-700"
-                                      : "bg-emerald-100 text-emerald-700"
-                                  }`}
-                                >
-                                  {o.tradeType === "buyer" ? "BÊN MUA" : "BÊN BÁN"}
-                                </span>
-                                {((o as any).visibility === "private" ||
-                                  (o as any).targetScope === "private" ||
-                                  (Array.isArray((o as any).targetRecipients) &&
-                                    (o as any).targetRecipients.length > 0)) && (
-                                  <span className="px-1.5 py-0.5 rounded-sm text-[9px] font-bold bg-amber-100 text-amber-800 border border-amber-300">
-                                    🔒 Riêng tư
-                                  </span>
-                                )}
-                              </div>
-                              <div className="justify-start text-zinc-600 text-[10px] font-normal font-['Inter']">
-                                {o.time
-                                  ? new Date(o.time).toLocaleDateString("vi-VN")
-                                  : "Đang mở"}
-                              </div>
-                            </div>
-                            <div className="self-stretch justify-start text-black text-xs font-bold font-['Inter'] leading-4 line-clamp-2">
-                              {o.title}
-                            </div>
-                            <div className="justify-start text-zinc-600 text-xs font-normal font-['Inter'] truncate w-full">
-                              Đăng bởi:{" "}
-                              {o.posterName || o.contactName || o.company || "Hội viên CLB CEO HN10"}
-                            </div>
-                          </div>
-                        </div>
-                        <div className="self-stretch px-3 py-2 bg-gray-50 border-t border-slate-200 inline-flex justify-between items-center">
-                          <div className="justify-start text-blue-900 text-xs font-bold font-['Inter']">
-                            {formatSmartPrice(
-                              o.value ||
-                              (o.budgetMax ?? (o as any).budget_max) ||
-                              (o.budgetMin ?? (o as any).budget_min) ||
-                              (o.estimatedValue ?? (o as any).estimated_value)
-                            )}
-                          </div>
-                          <div className="flex items-center gap-1.5">
-                            <button
-                              type="button"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                executeShare(
-                                  {
-                                    type: "opportunity",
-                                    id: o.id,
-                                    title: `[Cơ Hội Giao Thương B2B] ${o.title} — CLB CEO HN10`,
-                                    desc: o.description || `Cơ hội hợp tác kinh doanh CEO HN10: ${o.title} (${formatSmartPrice(o.value)})`,
-                                    image: (o as any).images?.[0] || (o as any).image || undefined,
-                                    targetPath: `/association/opportunities?id=${o.id}`,
-                                  },
-                                  () => toast.success("Đã sao chép liên kết cơ hội hợp tác!")
-                                );
-                              }}
-                              className="size-7 rounded-lg border border-slate-200 bg-white hover:bg-slate-100 text-slate-600 grid place-items-center transition active:scale-95 cursor-pointer shadow-2xs"
-                              title="Chia sẻ cơ hội"
-                            >
-                              <Share2 className="size-3.5" />
-                            </button>
-
-                            {checkIsMine(o) ? (
-                              <div className="flex items-center gap-1.5 justify-end">
-                                <button
-                                  type="button"
-                                  onClick={(e) => startEditOpp(o as any, e)}
-                                  className="px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-bold hover:bg-slate-50 transition active:scale-95 cursor-pointer flex items-center gap-1 shadow-2xs"
-                                  title="Chỉnh sửa cơ hội"
-                                >
-                                  <Pencil className="size-3" />
-                                  <span>Chỉnh sửa</span>
-                                </button>
-                                <button
-                                  type="button"
-                                  onClick={(e) => handleDeleteOpp(o.id, e)}
-                                  className="px-3 py-1.5 rounded-lg border border-rose-200 dark:border-rose-900 bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 text-xs font-bold hover:bg-rose-100 transition active:scale-95 cursor-pointer flex items-center gap-1 shadow-2xs"
-                                  title="Xóa cơ hội"
-                                >
-                                  <Trash2 className="size-3" />
-                                  <span>Xóa</span>
-                                </button>
-                              </div>
-                            ) : (
-                              <div className="flex items-center gap-1.5 justify-end">
-                                {agreedDeals[o.id] ? (
-                                  <div className="flex items-center gap-1.5">
-                                    <span className="px-2 py-1 bg-emerald-100 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 rounded-md text-[10.5px] font-bold flex items-center gap-1">
-                                      <Check className="size-3" /> Deal đã đồng ý
-                                    </span>
-                                    <button
-                                      type="button"
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        navigate({
-                                          to: "/association/connect" as any,
-                                          search: {
-                                            partnerName: o.contactName || o.company || "Chủ cơ hội",
-                                            partnerCompany: o.company || "CLB CEO HN10",
-                                            notes: `Gặp gỡ 1-1 xúc tiến thương vụ: ${o.title}`,
-                                          } as any,
-                                        });
-                                      }}
-                                      className="px-3 py-1.5 bg-[#003B95] hover:bg-[#002B70] text-white rounded-lg text-xs font-bold flex items-center gap-1.5 cursor-pointer transition active:scale-95 shadow-xs"
-                                    >
-                                      <Calendar className="size-3.5" />
-                                      <span>Kết nối cuộc gặp</span>
-                                    </button>
-                                  </div>
-                                ) : (
-                                  <>
-                                    {o.interested || interestedIds.includes(o.id) ? (
-                                      <button
-                                        type="button"
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          uninterest(o.id, o);
-                                        }}
-                                        disabled={busy === o.id}
-                                        className="px-3 py-1.5 rounded-lg text-xs font-bold transition active:scale-95 cursor-pointer flex items-center gap-1 shadow-2xs bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-800"
-                                        title="Bấm để hủy quan tâm cơ hội này"
-                                      >
-                                        <HeartOff className="size-3 text-rose-500" />
-                                        <span>Bỏ quan tâm</span>
-                                      </button>
-                                    ) : (
-                                      <button
-                                        type="button"
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          interest(o.id, o);
-                                        }}
-                                        disabled={busy === o.id}
-                                        className="px-3 py-1.5 rounded-lg text-xs font-bold transition active:scale-95 cursor-pointer flex items-center gap-1 shadow-2xs bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 hover:bg-slate-200"
-                                      >
-                                        <Heart className="size-3" />
-                                        <span>Quan tâm</span>
-                                      </button>
-                                    )}
-                                    <button
-                                      type="button"
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        handleOpenDealModal(o);
-                                      }}
-                                      className="px-3 py-1.5 bg-[#003B95] hover:bg-[#002b6e] text-white rounded-lg text-xs font-bold flex items-center gap-1.5 cursor-pointer transition active:scale-95 shadow-xs"
-                                    >
-                                      <Handshake className="size-3.5 text-amber-300" />
-                                      <span>Deal chào giá</span>
-                                    </button>
-                                  </>
-                                )}
-                              </div>
-                            )}
-                          </div>
-                        </div>
+                          <Plus className="size-4" />
+                          <span>Chia sẻ cơ hội mới</span>
+                        </button>
                       </div>
                     );
-                  });
-              })()}
-            </div>
+                  }
+
+                  return displayItems
+                    .slice((pageOpps - 1) * OPP_PAGE_SIZE, pageOpps * OPP_PAGE_SIZE)
+                    .map((o, idx) => {
+                      const tagVi = normalizeTag(o.tag);
+                      const isLogistics =
+                        o.tag?.toLowerCase().includes("logistics") ||
+                        tagVi.toLowerCase().includes("logistics");
+                      const rawOppImg = o.image;
+                      const oppImg =
+                        (rawOppImg &&
+                          (rawOppImg.startsWith("data:") ||
+                            rawOppImg.startsWith("http") ||
+                            rawOppImg.startsWith("/"))
+                          ? rawOppImg.startsWith("data:")
+                            ? rawOppImg
+                            : resolveMediaUrl(rawOppImg) || rawOppImg
+                          : null) || defaultOppImages[idx % defaultOppImages.length];
+
+                      return (
+                        <div
+                          key={o.id}
+                          id={idx === 0 ? "tour-opps-card-item" : undefined}
+                          className="self-stretch bg-white rounded-2xl outline outline-1 outline-offset-[-1px] outline-slate-200 flex flex-col justify-start items-start overflow-hidden shadow-xs hover:border-[#001B54]/30 transition-all"
+                        >
+                          <div
+                            onClick={() => handleOpenOppDetail(o)}
+                            className="self-stretch p-3 inline-flex justify-start items-center gap-3 cursor-pointer"
+                          >
+                            <img
+                              className="size-20 rounded-lg object-cover shrink-0"
+                              src={oppImg}
+                              alt={o.title}
+                            />
+                            <div className="flex-1 min-w-0 inline-flex flex-col justify-start items-start gap-1.5">
+                              <div className="self-stretch inline-flex justify-between items-center">
+                                <div className="flex items-center gap-1">
+                                  <div
+                                    className={`px-1.5 py-0.5 ${isLogistics ? "bg-indigo-100" : "bg-amber-100"
+                                      } rounded-sm flex justify-start items-start`}
+                                  >
+                                    <div
+                                      className={`justify-start ${isLogistics ? "text-blue-900" : "text-amber-600"
+                                        } text-[9px] font-extrabold font-['Inter']`}
+                                    >
+                                      {isLogistics ? "LOGISTICS" : (o.tag || "HỢP TÁC B2B").toUpperCase()}
+                                    </div>
+                                  </div>
+                                  <span
+                                    className={`px-1.5 py-0.5 rounded-sm text-[9px] font-bold ${o.tradeType === "buyer"
+                                        ? "bg-blue-100 text-blue-700"
+                                        : "bg-emerald-100 text-emerald-700"
+                                      }`}
+                                  >
+                                    {o.tradeType === "buyer" ? "BÊN MUA" : "BÊN BÁN"}
+                                  </span>
+                                  {((o as any).visibility === "private" ||
+                                    (o as any).targetScope === "private" ||
+                                    (Array.isArray((o as any).targetRecipients) &&
+                                      (o as any).targetRecipients.length > 0)) && (
+                                      <span className="px-1.5 py-0.5 rounded-sm text-[9px] font-bold bg-amber-100 text-amber-800 border border-amber-300">
+                                        🔒 Riêng tư
+                                      </span>
+                                    )}
+                                </div>
+                                <div className="justify-start text-zinc-600 text-[10px] font-normal font-['Inter']">
+                                  {o.time
+                                    ? new Date(o.time).toLocaleDateString("vi-VN")
+                                    : "Đang mở"}
+                                </div>
+                              </div>
+                              <div className="self-stretch justify-start text-black text-xs font-bold font-['Inter'] leading-4 line-clamp-2">
+                                {o.title}
+                              </div>
+                              <div className="justify-start text-zinc-600 text-xs font-normal font-['Inter'] truncate w-full">
+                                Đăng bởi:{" "}
+                                {o.posterName || o.contactName || o.company || "Học viên CLB CEO HN10"}
+                              </div>
+                            </div>
+                          </div>
+                          <div className="self-stretch px-3 py-2 bg-gray-50 border-t border-slate-200 inline-flex justify-between items-center">
+                            <div className="justify-start text-blue-900 text-xs font-bold font-['Inter']">
+                              {formatSmartPrice(
+                                o.value ||
+                                (o.budgetMax ?? (o as any).budget_max) ||
+                                (o.budgetMin ?? (o as any).budget_min) ||
+                                (o.estimatedValue ?? (o as any).estimated_value)
+                              )}
+                            </div>
+                            <div className="flex items-center gap-1.5">
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  executeShare(
+                                    {
+                                      type: "opportunity",
+                                      id: o.id,
+                                      title: `[Cơ Hội Giao Thương B2B] ${o.title} — CLB CEO HN10`,
+                                      desc: o.description || `Cơ hội hợp tác kinh doanh CEO HN10: ${o.title} (${formatSmartPrice(o.value)})`,
+                                      image: (o as any).images?.[0] || (o as any).image || undefined,
+                                      targetPath: `/association/opportunities?id=${o.id}`,
+                                    },
+                                    () => toast.success("Đã sao chép liên kết cơ hội hợp tác!")
+                                  );
+                                }}
+                                className="size-7 rounded-lg border border-slate-200 bg-white hover:bg-slate-100 text-slate-600 grid place-items-center transition active:scale-95 cursor-pointer shadow-2xs"
+                                title="Chia sẻ cơ hội"
+                              >
+                                <Share2 className="size-3.5" />
+                              </button>
+
+                              {checkIsMine(o) ? (
+                                <div className="flex items-center gap-1.5 justify-end">
+                                  <button
+                                    type="button"
+                                    onClick={(e) => startEditOpp(o as any, e)}
+                                    className="px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-bold hover:bg-slate-50 transition active:scale-95 cursor-pointer flex items-center gap-1 shadow-2xs"
+                                    title="Chỉnh sửa cơ hội"
+                                  >
+                                    <Pencil className="size-3" />
+                                    <span>Chỉnh sửa</span>
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={(e) => handleDeleteOpp(o.id, e)}
+                                    className="px-3 py-1.5 rounded-lg border border-rose-200 dark:border-rose-900 bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 text-xs font-bold hover:bg-rose-100 transition active:scale-95 cursor-pointer flex items-center gap-1 shadow-2xs"
+                                    title="Xóa cơ hội"
+                                  >
+                                    <Trash2 className="size-3" />
+                                    <span>Xóa</span>
+                                  </button>
+                                </div>
+                              ) : (
+                                <div className="flex items-center gap-1.5 justify-end">
+                                  {agreedDeals[o.id] ? (
+                                    <div className="flex items-center gap-1.5">
+                                      <span className="px-2 py-1 bg-emerald-100 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 rounded-md text-[10.5px] font-bold flex items-center gap-1">
+                                        <Check className="size-3" /> Deal đã đồng ý
+                                      </span>
+                                      <button
+                                        type="button"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          navigate({
+                                            to: "/association/connect" as any,
+                                            search: {
+                                              partnerName: o.contactName || o.company || "Chủ cơ hội",
+                                              partnerCompany: o.company || "CLB CEO HN10",
+                                              notes: `Gặp gỡ 1-1 xúc tiến thương vụ: ${o.title}`,
+                                            } as any,
+                                          });
+                                        }}
+                                        className="px-3 py-1.5 bg-[#003B95] hover:bg-[#002B70] text-white rounded-lg text-xs font-bold flex items-center gap-1.5 cursor-pointer transition active:scale-95 shadow-xs"
+                                      >
+                                        <Calendar className="size-3.5" />
+                                        <span>Kết nối cuộc gặp</span>
+                                      </button>
+                                    </div>
+                                  ) : (
+                                    <>
+                                      {o.interested || interestedIds.includes(o.id) ? (
+                                        <button
+                                          type="button"
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            uninterest(o.id, o);
+                                          }}
+                                          disabled={busy === o.id}
+                                          className="px-3 py-1.5 rounded-lg text-xs font-bold transition active:scale-95 cursor-pointer flex items-center gap-1 shadow-2xs bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-800"
+                                          title="Bấm để hủy quan tâm cơ hội này"
+                                        >
+                                          <HeartOff className="size-3 text-rose-500" />
+                                          <span>Bỏ quan tâm</span>
+                                        </button>
+                                      ) : (
+                                        <button
+                                          type="button"
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            interest(o.id, o);
+                                          }}
+                                          disabled={busy === o.id}
+                                          className="px-3 py-1.5 rounded-lg text-xs font-bold transition active:scale-95 cursor-pointer flex items-center gap-1 shadow-2xs bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 hover:bg-slate-200"
+                                        >
+                                          <Heart className="size-3" />
+                                          <span>Quan tâm</span>
+                                        </button>
+                                      )}
+                                      <button
+                                        type="button"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          handleOpenDealModal(o);
+                                        }}
+                                        className="px-3 py-1.5 bg-[#003B95] hover:bg-[#002b6e] text-white rounded-lg text-xs font-bold flex items-center gap-1.5 cursor-pointer transition active:scale-95 shadow-xs"
+                                      >
+                                        <Handshake className="size-3.5 text-amber-300" />
+                                        <span>Deal chào giá</span>
+                                      </button>
+                                    </>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    });
+                })()}
+              </div>
             )}
           </div>
         </div>
@@ -2225,7 +2217,7 @@ function OpportunitiesScreen() {
         </div>
       </div>
 
-            {/* Modals extracted to @/components/opportunities/modals */}
+      {/* Modals extracted to @/components/opportunities/modals */}
       <OpportunityDetailModal
         selectedOpp={selectedOpp}
         allOpportunities={allOpportunities}
@@ -2349,7 +2341,7 @@ function OpportunitiesScreen() {
         setEditExternalLink={setEditExternalLink}
       />
 
-{/* MODAL ĐÀM PHÁN HẸN GẶP 1-1 GẮN VỚI CƠ HỘI */}
+      {/* MODAL ĐÀM PHÁN HẸN GẶP 1-1 GẮN VỚI CƠ HỘI */}
       <BusinessConnectBottomSheet
         isOpen={Boolean(negotiateTarget)}
         onClose={() => {

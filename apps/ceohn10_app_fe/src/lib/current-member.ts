@@ -12,7 +12,7 @@ import { fetchNestApiFromServer } from "./api-client";
  */
 export async function resolveMemberId(token: string | any): Promise<string> {
   const data = await fetchNestApiFromServer("/members/me", token) as any;
-  if (!data?.id) throw new Error("Tài khoản chưa được liên kết hồ sơ hội viên.");
+  if (!data?.id) throw new Error("Tài khoản chưa được liên kết hồ sơ Học viên.");
   return data.id as string;
 }
 

@@ -35,28 +35,28 @@ export interface ViOneAiTutorGuideProps {
 const CRM_USE_CASES: { ucCode: string; ucName: string; steps: TourStep[] }[] = [
   {
     ucCode: "UC-CRM-01",
-    ucName: "Quản trị Hội viên & Phân quyền Ban Điều Hành",
+    ucName: "Quản trị Học viên & Phân quyền Ban Điều Hành",
     steps: [
       {
-        title: "Bước 1: Tiếp nhận và xem xét hồ sơ hội viên mới",
+        title: "Bước 1: Tiếp nhận và xem xét hồ sơ Học viên mới",
         ucCode: "UC-CRM-01",
-        ucName: "Quản trị Hội viên & Phân quyền",
-        instruction: "Tại menu bên trái, bấm vào 'Hội viên' để mở danh sách toàn bộ doanh nhân đăng ký hoặc gia nhập CLB CEO HN10.",
-        aiAdvice: "Thưa Anh/Chị quản trị, hệ thống tự động lọc ra các hồ sơ đăng ký mới nhất từ Zalo Mini App và Web công khai để Anh/Chị duyệt trước khi cấp mã hội viên.",
+        ucName: "Quản trị Học viên & Phân quyền",
+        instruction: "Tại menu bên trái, bấm vào 'Học viên' để mở danh sách toàn bộ doanh nhân đăng ký hoặc gia nhập CLB CEO HN10.",
+        aiAdvice: "Thưa Anh/Chị quản trị, hệ thống tự động lọc ra các hồ sơ đăng ký mới nhất từ Zalo Mini App và Web công khai để Anh/Chị duyệt trước khi cấp mã Học viên.",
         actionText: "Tôi đã hiểu, sang bước tiếp theo",
       },
       {
         title: "Bước 2: Phê duyệt kết nạp và tự động cấp tài khoản",
         ucCode: "UC-CRM-01",
-        ucName: "Quản trị Hội viên & Phân quyền",
-        instruction: "Bấm nút 'Duyệt & Cấp Tài Khoản' tại dòng của hội viên. Hệ thống tự động sinh mật khẩu ngẫu nhiên và gửi email thông báo kết nạp.",
+        ucName: "Quản trị Học viên & Phân quyền",
+        instruction: "Bấm nút 'Duyệt & Cấp Tài Khoản' tại dòng của Học viên. Hệ thống tự động sinh mật khẩu ngẫu nhiên và gửi email thông báo kết nạp.",
         aiAdvice: "Việc này giúp tiết kiệm 100% thời gian tạo thủ công và bảo mật tuyệt đối thông tin đăng nhập cho doanh nhân.",
         actionText: "Tiếp tục",
       },
       {
         title: "Bước 3: Phân vai trò BCH & Ban Chuyên Môn",
         ucCode: "UC-CRM-01",
-        ucName: "Quản trị Hội viên & Phân quyền",
+        ucName: "Quản trị Học viên & Phân quyền",
         instruction: "Chọn thẻ 'Phân quyền & Ban' để gán chức danh (Chủ tịch, Phó Chủ tịch, Trưởng Ban Xúc tiến) theo mô hình RBAC chuẩn mực.",
         aiAdvice: "Quyền hạn của từng vai trò được mã hóa theo tiêu chuẩn an ninh đa tầng của CLB CEO HN10.",
         actionText: "Hoàn tất hướng dẫn UC-01",
@@ -79,7 +79,7 @@ const CRM_USE_CASES: { ucCode: string; ucName: string; steps: TourStep[] }[] = [
         title: "Bước 2: Kích hoạt Check-in QR bảo mật chống trùng lặp",
         ucCode: "UC-CRM-02",
         ucName: "Tạo Sự Kiện & QR Check-in",
-        instruction: "Bật tùy chọn 'Mã QR Động Check-in'. Mỗi hội viên khi đăng ký sẽ nhận 1 mã QR mã hóa SHA-256 duy nhất trên Mobile App.",
+        instruction: "Bật tùy chọn 'Mã QR Động Check-in'. Mỗi Học viên khi đăng ký sẽ nhận 1 mã QR mã hóa SHA-256 duy nhất trên Mobile App.",
         aiAdvice: "Lễ tân tại bàn đón tiếp chỉ cần dùng camera quét là ghi nhận điểm danh tức thì trong 0.2 giây.",
         actionText: "Tiếp tục",
       },
@@ -101,7 +101,7 @@ const CRM_USE_CASES: { ucCode: string; ucName: string; steps: TourStep[] }[] = [
         title: "Bước 1: Khám phá Trung tâm Báo cáo Chỉ số Giao thương",
         ucCode: "UC-CRM-03",
         ucName: "Thống Kê & Excel",
-        instruction: "Mở menu 'Báo cáo & Thống kê'. Xem 5 nhóm chỉ số: Gắn kết hội viên, Kết nối 1-on-1, Cơ hội B2B, Sự kiện & Phát triển mạng lưới.",
+        instruction: "Mở menu 'Báo cáo & Thống kê'. Xem 5 nhóm chỉ số: Gắn kết Học viên, Kết nối 1-on-1, Cơ hội B2B, Sự kiện & Phát triển mạng lưới.",
         aiAdvice: "Biểu đồ Recharts kết hợp Bar-Line cho phép Anh/Chị đối soát mục tiêu kế hoạch so với thực tế đạt được của từng ban chuyên môn.",
         actionText: "Tiếp tục",
       },
@@ -109,12 +109,12 @@ const CRM_USE_CASES: { ucCode: string; ucName: string; steps: TourStep[] }[] = [
         title: "Bước 2: Xuất file Excel chuẩn hóa theo 3 chế độ",
         ucCode: "UC-CRM-03",
         ucName: "Thống Kê & Excel",
-        instruction: "Bấm nút 'Xuất Báo Cáo Excel'. Chọn 1 trong 3 chế độ: Theo Tháng/Quý/Năm, Theo từng Cá nhân Hội viên, hoặc Phân tích Biến động (Delta).",
+        instruction: "Bấm nút 'Xuất Báo Cáo Excel'. Chọn 1 trong 3 chế độ: Theo Tháng/Quý/Năm, Theo từng Cá nhân Học viên, hoặc Phân tích Biến động (Delta).",
         aiAdvice: "Tệp Excel được định dạng sẵn màu sắc thương hiệu và có sẵn dòng tổng cộng doanh thu để Anh/Chị in nộp Ban Thường vụ.",
         actionText: "Tiếp tục",
       },
       {
-        title: "Bước 3: Nhập dữ liệu danh sách hội viên bằng Excel thông minh",
+        title: "Bước 3: Nhập dữ liệu danh sách Học viên bằng Excel thông minh",
         ucCode: "UC-CRM-03",
         ucName: "Thống Kê & Excel",
         instruction: "Bấm 'Nhập File Excel', kéo thả tệp danh sách. Hệ thống tự động nhận diện và bóc tách các cột Họ tên, SĐT, Email, Doanh nghiệp.",
@@ -147,14 +147,14 @@ const CRM_USE_CASES: { ucCode: string; ucName: string; steps: TourStep[] }[] = [
   },
 ];
 
-// 5 USE CASES CHO MOBILE APP HỘI VIÊN
+// 5 USE CASES CHO MOBILE APP Học viên
 const APP_USE_CASES: { ucCode: string; ucName: string; steps: TourStep[] }[] = [
   {
     ucCode: "UC-APP-01",
-    ucName: "Thẻ Hội Viên Điện Tử & Check-in QR",
+    ucName: "Thẻ Học viên Điện Tử & Check-in QR",
     steps: [
       {
-        title: "Khám phá Thẻ Hội Viên Điện Tử",
+        title: "Khám phá Thẻ Học viên Điện Tử",
         ucCode: "UC-APP-01",
         ucName: "Thẻ Doanh Nhân & QR",
         instruction: "Tại màn hình Trang Chủ, chạm vào Thẻ Doanh Nhân để mở mã QR định danh cá nhân độc quyền của Anh/Chị.",
@@ -172,7 +172,7 @@ const APP_USE_CASES: { ucCode: string; ucName: string; steps: TourStep[] }[] = [
         ucCode: "UC-APP-02",
         ucName: "Giao Thương B2B",
         instruction: "Vào mục 'Giao thương', bấm nút '+ Đăng cơ hội'. Điền giá trị dự kiến (VNĐ), ngành nghề và mô tả nhu cầu hợp tác.",
-        aiAdvice: "Hệ thống AI sẽ tự động phân tích và gợi ý các doanh nghiệp hội viên có ngành nghề tương thích để kết nối.",
+        aiAdvice: "Hệ thống AI sẽ tự động phân tích và gợi ý các doanh nghiệp Học viên có ngành nghề tương thích để kết nối.",
         actionText: "Tôi đã hiểu",
       },
     ],
@@ -253,7 +253,7 @@ export function ViOneAiTutorGuide({
       if (q.toLowerCase().includes("lỗi") || q.toLowerCase().includes("không được")) {
         ans = `Anh/Chị đừng lo lắng! Nếu gặp trở ngại ở bước này, vui lòng kiểm tra kết nối mạng hoặc liên hệ Ban Công Nghệ CLB CEO HN10. Hệ thống đã tự động lưu lại trạng thái thao tác gần nhất của Anh/Chị.`;
       }
-      setAiAnswers((prev) => [...prev, `Hội viên hỏi: "${q}"\n→ AI Trợ Lý: ${ans}`]);
+      setAiAnswers((prev) => [...prev, `Học viên hỏi: "${q}"\n→ AI Trợ Lý: ${ans}`]);
       setIsAskingAi(false);
     }, 500);
   };
@@ -300,7 +300,7 @@ export function ViOneAiTutorGuide({
           {/* CỘT TRÁI (4 CỘT): ICON / AVATAR AI GIÁO VIÊN CỐ VẤN */}
           <div className="md:col-span-4 flex flex-col items-center justify-center p-5 rounded-2xl bg-gradient-to-b from-blue-950/70 to-slate-900/90 border border-blue-900/50 text-center relative overflow-hidden">
             <div className="absolute -top-12 -left-12 size-36 rounded-full bg-amber-500/10 blur-2xl pointer-events-none" />
-            
+
             {/* Avatar AI Giáo viên */}
             <div className="relative mb-3">
               <div className="size-28 sm:size-32 rounded-3xl p-1 bg-gradient-to-tr from-amber-400 via-amber-200 to-blue-500 shadow-xl shadow-amber-500/10">
@@ -337,11 +337,10 @@ export function ViOneAiTutorGuide({
                     setSelectedUcIdx(idx);
                     setCurrentStepIdx(0);
                   }}
-                  className={`w-full text-left px-2.5 py-1.5 rounded-lg text-xs font-semibold flex items-center justify-between transition cursor-pointer ${
-                    selectedUcIdx === idx
+                  className={`w-full text-left px-2.5 py-1.5 rounded-lg text-xs font-semibold flex items-center justify-between transition cursor-pointer ${selectedUcIdx === idx
                       ? "bg-amber-500/20 text-amber-300 border border-amber-500/40"
                       : "text-slate-400 hover:bg-slate-800/60 hover:text-white"
-                  }`}
+                    }`}
                 >
                   <span className="line-clamp-1">{uc.ucCode}: {uc.ucName}</span>
                   {selectedUcIdx === idx && <CheckCircle2 className="size-3 text-amber-400 shrink-0" />}
@@ -368,13 +367,12 @@ export function ViOneAiTutorGuide({
                   {currentUc.steps.map((_, i) => (
                     <span
                       key={i}
-                      className={`size-2.5 rounded-full transition-all ${
-                        i === currentStepIdx
+                      className={`size-2.5 rounded-full transition-all ${i === currentStepIdx
                           ? "bg-amber-400 scale-125"
                           : i < currentStepIdx
-                          ? "bg-emerald-500"
-                          : "bg-slate-700"
-                      }`}
+                            ? "bg-emerald-500"
+                            : "bg-slate-700"
+                        }`}
                     />
                   ))}
                 </div>

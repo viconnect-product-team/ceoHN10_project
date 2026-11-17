@@ -271,16 +271,14 @@ export function NetworkHome({
                 type="button"
                 onClick={() => handleTabChange(tabItem.id as any)}
                 aria-pressed={isActive}
-                className={`all-unset box-border inline-flex h-[34px] px-4 rounded-full border items-center justify-center relative border-solid transition-all duration-200 cursor-pointer ${
-                  isActive
+                className={`all-unset box-border inline-flex h-[34px] px-4 rounded-full border items-center justify-center relative border-solid transition-all duration-200 cursor-pointer ${isActive
                     ? "bg-[var(--bc-mobile-accent-grad)] text-black border-transparent shadow-[0_2px_10px_rgba(201,158,74,0.35)]"
                     : "bg-[var(--bc-mobile-surface-2)] border-[var(--bc-mobile-border)] text-[var(--bc-mobile-muted)] hover:border-[var(--bc-mobile-accent)] hover:text-[var(--bc-mobile-text)]"
-                }`}
+                  }`}
               >
                 <span
-                  className={`[font-family:'Inter-Medium',Helvetica] text-xs text-center leading-4 relative flex items-center w-fit tracking-[0] whitespace-nowrap font-medium ${
-                    isActive ? "text-black font-bold" : "text-[var(--bc-mobile-muted)]"
-                  }`}
+                  className={`[font-family:'Inter-Medium',Helvetica] text-xs text-center leading-4 relative flex items-center w-fit tracking-[0] whitespace-nowrap font-medium ${isActive ? "text-black font-bold" : "text-[var(--bc-mobile-muted)]"
+                    }`}
                 >
                   {tabItem.label}
                 </span>
@@ -298,281 +296,279 @@ export function NetworkHome({
             <NetworkIncomingRequestsSection full />
           </div>
         ) : (
-        <>
-
-        {/* Lời mời kết bạn đang chờ phản hồi — luôn hiển thị ngay đầu danh sách khi có lời mời */}
-        {!narrowed && <NetworkIncomingRequestsSection />}
-
-        {/* Khoảnh khắc 24h Doanh nhân (Facebook-grade Stories Carousel) */}
-        {!narrowed && (
-          <NetworkStoriesStrip onOpenCreateStory={() => setStoryModalOpen(true)} />
-        )}
-
-        {/* B — Ô tìm kiếm + bộ lọc */}
-        <form
-          className="mt-4 flex items-center gap-2 relative self-stretch w-full flex-[0_0_auto]"
-          role="search"
-          onSubmit={(event) => event.preventDefault()}
-        >
-          <MobileSearchBar
-            id="bc-network-search"
-            value={term}
-            onChange={setTerm}
-            placeholder={t("bc.mobile.network.search.placeholder")}
-          />
-          <div className="relative shrink-0">
-            <button
-              className="flex w-[42px] h-[42px] items-center justify-center p-2.5 relative bg-[var(--bc-mobile-surface-2)] backdrop-blur-md rounded-lg border border-solid border-[var(--bc-mobile-border)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--bc-mobile-accent)] hover:border-[var(--bc-mobile-accent)] transition-colors"
-              type="button"
-              aria-label={t("bc.mobile.network.filter")}
-              aria-pressed={sortOpen}
-              onClick={() => setSortOpen((active) => !active)}
-            >
-              <SlidersHorizontal className="h-4 w-4 text-[var(--bc-mobile-muted)]" aria-hidden="true" strokeWidth={1.8} />
-            </button>
-            {sortOpen ? (
-              <div className="absolute right-0 z-30 mt-1 w-56 overflow-hidden rounded-xl border border-[var(--bc-mobile-border)] bg-[var(--bc-mobile-surface)] backdrop-blur-xl py-1 shadow-2xl">
-                <p className="px-3.5 pb-1 pt-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--bc-mobile-muted)]">
-                  {t("bc.mobile.network.sort.label")}
-                </p>
-                <ul>
-                  {(["recent", "name", "company"] as const).map((option) => (
-                    <li key={option}>
-                      <button
-                        type="button"
-                        onClick={() => setSort(option)}
-                        aria-current={sort === option}
-                        className={`flex min-h-[44px] w-full items-center px-3.5 text-left text-[14px] transition-colors hover:bg-[var(--bc-mobile-surface-2)] ${
-                          sort === option
-                            ? "text-[var(--bc-mobile-accent)]"
-                            : "text-[var(--bc-mobile-text)]"
-                        }`}
-                      >
-                        {t(`bc.mobile.network.sort.${option}` as const)}
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-                <p className="border-t border-[var(--bc-mobile-border)] px-3.5 pb-1 pt-2.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--bc-mobile-muted)]">
-                  {t("bc.mobile.network.filter")}
-                </p>
-                <ul>
-                  {FILTERS.map((option) => (
-                    <li key={option}>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setFilter(option);
-                          setSortOpen(false);
-                        }}
-                        aria-current={filter === option}
-                        className={`flex min-h-[44px] w-full items-center px-3.5 text-left text-[14px] transition-colors hover:bg-[var(--bc-mobile-surface-2)] ${
-                          filter === option
-                            ? "text-[var(--bc-mobile-accent)]"
-                            : "text-[var(--bc-mobile-text)]"
-                        }`}
-                      >
-                        {t(FILTER_TKEY[option])}
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ) : null}
-          </div>
-        </form>
-
-        {network.initialLoading ? (
-          <NetworkSkeleton />
-        ) : network.coreError ? (
-          <NetworkError onRetry={network.retry} />
-        ) : (
           <>
 
-            {/* AI Match và Nurture List - Chỉ hiển thị khi tab là network */}
-            {tab === "network" && (
-              <>
-                {/* Facebook-grade Social Status Composer - Đặt ngay trên đầu để tiện chia sẻ khoảnh khắc */}
-                {!narrowed ? (
-                  <NetworkSocialComposer />
-                ) : null}
+            {/* Lời mời kết bạn đang chờ phản hồi — luôn hiển thị ngay đầu danh sách khi có lời mời */}
+            {!narrowed && <NetworkIncomingRequestsSection />}
 
-                {/* ViOne Dynamic AI Copilot Banner */}
-                {!narrowed && (
-                  <div className="mb-4 p-4 rounded-2xl border border-amber-300/60 dark:border-amber-500/30 bg-gradient-to-r from-amber-50 via-amber-100/35 to-amber-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 shadow-xs dark:shadow-xl relative overflow-hidden transition-colors">
-                    <div className="absolute top-0 right-0 w-36 h-36 bg-amber-400/15 rounded-full blur-2xl pointer-events-none" />
-                    <div className="flex items-start justify-between gap-3 relative z-10">
-                      <div className="flex items-start gap-3">
-                        <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-[#F6E1C3] to-[#D8B282] p-0.5 shadow-xs shrink-0 flex items-center justify-center">
-                          <Sparkles className="h-5 w-5 text-amber-900" />
-                        </div>
-                        <div>
-                          <div className="flex items-center gap-1.5 flex-wrap">
-                            <span className="text-[11.5px] font-extrabold uppercase tracking-wider text-amber-800 dark:text-amber-300">ViOne AI Copilot Matcher</span>
-                            <span className="px-1.5 py-0.5 rounded text-[9px] font-black bg-amber-500/15 dark:bg-amber-400/20 text-amber-900 dark:text-amber-200 border border-amber-500/30 dark:border-amber-400/40">Dynamic %</span>
-                          </div>
-                          <p className="text-[13.5px] font-bold text-slate-900 dark:!text-white mt-0.5">Tìm kiếm đối tác theo năng lực & chức danh</p>
-                          <p className="text-[11.5px] text-slate-600 dark:!text-slate-300 mt-0.5 line-clamp-1">Ví dụ: "Tôi cần tìm 1 người có khả năng gọi vốn quỹ đầu tư..."</p>
-                        </div>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => handleTabChange("suggestions")}
-                        className="shrink-0 px-3.5 py-2 rounded-xl bg-[linear-gradient(135deg,#FFF3C4_0%,#FEE180_30%,#F5C443_65%,#EDB028_100%)] text-slate-950 border border-amber-400/50 text-xs font-black uppercase tracking-wider shadow-xs hover:brightness-105 active:scale-95 transition-all flex items-center gap-1 cursor-pointer"
-                      >
-                        <span>Khám phá AI</span>
-                        <ChevronRight className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  </div>
-                )}
-
-                <NetworkAiMatchStrip
-                  peopleById={peopleById}
-                  allowedIds={allowedIds}
-                  onViewAll={() => handleTabChange("suggestions")}
-                />
-                <NetworkNurtureList
-                  allowedIds={allowedIds}
-                  onViewAll={() => handleTabChange("suggestions")}
-                />
-              </>
+            {/* Khoảnh khắc 24h Doanh nhân (Facebook-grade Stories Carousel) */}
+            {!narrowed && (
+              <NetworkStoriesStrip onOpenCreateStory={() => setStoryModalOpen(true)} />
             )}
 
-            {/* Gặp gần đây và Feed cuộc gặp - Chỉ hiển thị khi tab là network */}
-            {tab === "network" && (
-              <>
-                {!narrowed && recent.length > 0 ? (
-                  <NetworkRecentStrip
-                    people={recent}
-                    onViewAll={() => {
-                      setTab("network");
-                      setFilter("all");
-                    }}
-                  />
-                ) : null}
-
-                {/* Gợi ý kết nối doanh nhân cùng ngành (Facebook-grade Partner Suggestions) */}
-                {!narrowed ? (
-                  <NetworkPartnerSuggestionsStrip />
-                ) : null}
-
-                {/* Khoảnh khắc mạng lưới (Feed cuộc gặp) ngay dưới thanh ghi nhanh */}
-                {!narrowed ? (
-                  <section className="mt-6">
-                    <div className="mb-3 flex items-center justify-between gap-3">
-                      <h2 className="min-w-0 truncate text-[10px] font-medium tracking-[1px] uppercase text-[var(--bc-mobile-muted)]">
-                        {t("bc.mobile.network.moments.title")}
-                      </h2>
-                      <div className="flex items-center gap-2">
-                        <Link
-                          to="/connect-app/moment"
-                          className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-500/15 border border-amber-500/30 text-amber-700 dark:text-amber-400 hover:bg-amber-500/25 transition active:scale-95 shadow-xs"
-                        >
-                          <Plus className="h-3.5 w-3.5" />
-                          <span>Đăng khoảnh khắc</span>
-                        </Link>
-                        {feed.items.length > 0 && (
-                          <span className="text-[11px] text-[var(--bc-mobile-muted)]">
-                            {feed.items.length}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                    {feed.items.length > 0 ? (
-                      <ul
-                        aria-label={t("bc.mobile.network.moments.title")}
-                        aria-busy={feed.isLoadingMore}
-                        className="space-y-3"
-                      >
-                        {feed.items.map((item) => (
-                          <NetworkFeedCard
-                            key={item.momentId}
-                            item={item}
-                            person={peopleById.get(item.personId) ?? null}
-                          />
-                        ))}
-                      </ul>
-                    ) : (
-                      <div className="rounded-2xl border border-[var(--bc-mobile-border)] bg-[var(--bc-mobile-surface)] p-5 text-center shadow-xs">
-                        <div className="mx-auto grid h-10 w-10 place-items-center rounded-full bg-[var(--bc-mobile-surface-2)] text-[var(--bc-mobile-accent)]">
-                          <Sparkles className="h-5 w-5" />
-                        </div>
-                        <p className="mt-2 text-[13px] font-semibold text-[var(--bc-mobile-text)]">
-                          Chưa có khoảnh khắc nào gần đây
-                        </p>
-                        <p className="mt-1 text-[11.5px] text-[var(--bc-mobile-muted)]">
-                          Ghi lại các cuộc gặp gỡ, trao đổi và hợp tác đầu tiên của bạn để lưu giữ hành trình.
-                        </p>
-                        <Link
-                          to="/connect-app/moment"
-                          className="mt-3 inline-flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 px-4 py-1.5 text-xs font-bold text-slate-950 shadow-sm transition hover:opacity-90"
-                        >
-                          <Plus className="h-3.5 w-3.5" />
-                          <span>Ghi khoảnh khắc ngay</span>
-                        </Link>
-                      </div>
-                    )}
-                  </section>
-                ) : null}
-
-                {/* Danh sách người trong Network */}
-                <section className="mt-7">
-                  <div className="mb-3 flex items-center justify-between gap-3">
-                    <h2 className="min-w-0 truncate text-[10px] font-medium tracking-[1px] uppercase text-[var(--bc-mobile-muted)]">
-                      {t("bc.mobile.network.people")}
-                    </h2>
-                    {narrowed ? (
-                      <p
-                        aria-live="polite"
-                        className="shrink-0 text-[12.5px] text-[var(--bc-mobile-muted)]"
-                      >
-                        {t("bc.mobile.network.results", { count: people.length })}
-                        {filtering ? ` · ${t(FILTER_TKEY[filter])}` : ""}
-                      </p>
-                    ) : null}
-                  </div>
-
-                  {people.length === 0 ? (
-                    network.searching ? (
-                      <NetworkSearchEmpty onClear={clearSearch} />
-                    ) : filtering ? (
-                      <NetworkFilterEmpty onReset={() => setFilter("all")} />
-                    ) : (
-                      <NetworkEmpty onOpenV={openV} />
-                    )
-                  ) : (
-                    <ul
-                      aria-label={t("bc.mobile.network.list.label")}
-                      aria-busy={network.isLoadingMore}
-                      className="space-y-2.5"
-                    >
-                      {people.map((person) => (
-                        <NetworkPersonRow key={person.personId} person={person} />
+            {/* B — Ô tìm kiếm + bộ lọc */}
+            <form
+              className="mt-4 flex items-center gap-2 relative self-stretch w-full flex-[0_0_auto]"
+              role="search"
+              onSubmit={(event) => event.preventDefault()}
+            >
+              <MobileSearchBar
+                id="bc-network-search"
+                value={term}
+                onChange={setTerm}
+                placeholder={t("bc.mobile.network.search.placeholder")}
+              />
+              <div className="relative shrink-0">
+                <button
+                  className="flex w-[42px] h-[42px] items-center justify-center p-2.5 relative bg-[var(--bc-mobile-surface-2)] backdrop-blur-md rounded-lg border border-solid border-[var(--bc-mobile-border)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--bc-mobile-accent)] hover:border-[var(--bc-mobile-accent)] transition-colors"
+                  type="button"
+                  aria-label={t("bc.mobile.network.filter")}
+                  aria-pressed={sortOpen}
+                  onClick={() => setSortOpen((active) => !active)}
+                >
+                  <SlidersHorizontal className="h-4 w-4 text-[var(--bc-mobile-muted)]" aria-hidden="true" strokeWidth={1.8} />
+                </button>
+                {sortOpen ? (
+                  <div className="absolute right-0 z-30 mt-1 w-56 overflow-hidden rounded-xl border border-[var(--bc-mobile-border)] bg-[var(--bc-mobile-surface)] backdrop-blur-xl py-1 shadow-2xl">
+                    <p className="px-3.5 pb-1 pt-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--bc-mobile-muted)]">
+                      {t("bc.mobile.network.sort.label")}
+                    </p>
+                    <ul>
+                      {(["recent", "name", "company"] as const).map((option) => (
+                        <li key={option}>
+                          <button
+                            type="button"
+                            onClick={() => setSort(option)}
+                            aria-current={sort === option}
+                            className={`flex min-h-[44px] w-full items-center px-3.5 text-left text-[14px] transition-colors hover:bg-[var(--bc-mobile-surface-2)] ${sort === option
+                                ? "text-[var(--bc-mobile-accent)]"
+                                : "text-[var(--bc-mobile-text)]"
+                              }`}
+                          >
+                            {t(`bc.mobile.network.sort.${option}` as const)}
+                          </button>
+                        </li>
                       ))}
                     </ul>
-                  )}
-                </section>
+                    <p className="border-t border-[var(--bc-mobile-border)] px-3.5 pb-1 pt-2.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--bc-mobile-muted)]">
+                      {t("bc.mobile.network.filter")}
+                    </p>
+                    <ul>
+                      {FILTERS.map((option) => (
+                        <li key={option}>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setFilter(option);
+                              setSortOpen(false);
+                            }}
+                            aria-current={filter === option}
+                            className={`flex min-h-[44px] w-full items-center px-3.5 text-left text-[14px] transition-colors hover:bg-[var(--bc-mobile-surface-2)] ${filter === option
+                                ? "text-[var(--bc-mobile-accent)]"
+                                : "text-[var(--bc-mobile-text)]"
+                              }`}
+                          >
+                            {t(FILTER_TKEY[option])}
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ) : null}
+              </div>
+            </form>
+
+            {network.initialLoading ? (
+              <NetworkSkeleton />
+            ) : network.coreError ? (
+              <NetworkError onRetry={network.retry} />
+            ) : (
+              <>
+
+                {/* AI Match và Nurture List - Chỉ hiển thị khi tab là network */}
+                {tab === "network" && (
+                  <>
+                    {/* Facebook-grade Social Status Composer - Đặt ngay trên đầu để tiện chia sẻ khoảnh khắc */}
+                    {!narrowed ? (
+                      <NetworkSocialComposer />
+                    ) : null}
+
+                    {/* ViOne Dynamic AI Copilot Banner */}
+                    {!narrowed && (
+                      <div className="mb-4 p-4 rounded-2xl border border-amber-300/60 dark:border-amber-500/30 bg-gradient-to-r from-amber-50 via-amber-100/35 to-amber-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 shadow-xs dark:shadow-xl relative overflow-hidden transition-colors">
+                        <div className="absolute top-0 right-0 w-36 h-36 bg-amber-400/15 rounded-full blur-2xl pointer-events-none" />
+                        <div className="flex items-start justify-between gap-3 relative z-10">
+                          <div className="flex items-start gap-3">
+                            <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-[#F6E1C3] to-[#D8B282] p-0.5 shadow-xs shrink-0 flex items-center justify-center">
+                              <Sparkles className="h-5 w-5 text-amber-900" />
+                            </div>
+                            <div>
+                              <div className="flex items-center gap-1.5 flex-wrap">
+                                <span className="text-[11.5px] font-extrabold uppercase tracking-wider text-amber-800 dark:text-amber-300">ViOne AI Copilot Matcher</span>
+                                <span className="px-1.5 py-0.5 rounded text-[9px] font-black bg-amber-500/15 dark:bg-amber-400/20 text-amber-900 dark:text-amber-200 border border-amber-500/30 dark:border-amber-400/40">Dynamic %</span>
+                              </div>
+                              <p className="text-[13.5px] font-bold text-slate-900 dark:!text-white mt-0.5">Tìm kiếm đối tác theo năng lực & chức danh</p>
+                              <p className="text-[11.5px] text-slate-600 dark:!text-slate-300 mt-0.5 line-clamp-1">Ví dụ: "Tôi cần tìm 1 người có khả năng gọi vốn quỹ đầu tư..."</p>
+                            </div>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => handleTabChange("suggestions")}
+                            className="shrink-0 px-3.5 py-2 rounded-xl bg-[linear-gradient(135deg,#FFF3C4_0%,#FEE180_30%,#F5C443_65%,#EDB028_100%)] text-slate-950 border border-amber-400/50 text-xs font-black uppercase tracking-wider shadow-xs hover:brightness-105 active:scale-95 transition-all flex items-center gap-1 cursor-pointer"
+                          >
+                            <span>Khám phá AI</span>
+                            <ChevronRight className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </div>
+                    )}
+
+                    <NetworkAiMatchStrip
+                      peopleById={peopleById}
+                      allowedIds={allowedIds}
+                      onViewAll={() => handleTabChange("suggestions")}
+                    />
+                    <NetworkNurtureList
+                      allowedIds={allowedIds}
+                      onViewAll={() => handleTabChange("suggestions")}
+                    />
+                  </>
+                )}
+
+                {/* Gặp gần đây và Feed cuộc gặp - Chỉ hiển thị khi tab là network */}
+                {tab === "network" && (
+                  <>
+                    {!narrowed && recent.length > 0 ? (
+                      <NetworkRecentStrip
+                        people={recent}
+                        onViewAll={() => {
+                          setTab("network");
+                          setFilter("all");
+                        }}
+                      />
+                    ) : null}
+
+                    {/* Gợi ý kết nối doanh nhân cùng ngành (Facebook-grade Partner Suggestions) */}
+                    {!narrowed ? (
+                      <NetworkPartnerSuggestionsStrip />
+                    ) : null}
+
+                    {/* Khoảnh khắc mạng lưới (Feed cuộc gặp) ngay dưới thanh ghi nhanh */}
+                    {!narrowed ? (
+                      <section className="mt-6">
+                        <div className="mb-3 flex items-center justify-between gap-3">
+                          <h2 className="min-w-0 truncate text-[10px] font-medium tracking-[1px] uppercase text-[var(--bc-mobile-muted)]">
+                            {t("bc.mobile.network.moments.title")}
+                          </h2>
+                          <div className="flex items-center gap-2">
+                            <Link
+                              to="/connect-app/moment"
+                              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-500/15 border border-amber-500/30 text-amber-700 dark:text-amber-400 hover:bg-amber-500/25 transition active:scale-95 shadow-xs"
+                            >
+                              <Plus className="h-3.5 w-3.5" />
+                              <span>Đăng khoảnh khắc</span>
+                            </Link>
+                            {feed.items.length > 0 && (
+                              <span className="text-[11px] text-[var(--bc-mobile-muted)]">
+                                {feed.items.length}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        {feed.items.length > 0 ? (
+                          <ul
+                            aria-label={t("bc.mobile.network.moments.title")}
+                            aria-busy={feed.isLoadingMore}
+                            className="space-y-3"
+                          >
+                            {feed.items.map((item) => (
+                              <NetworkFeedCard
+                                key={item.momentId}
+                                item={item}
+                                person={peopleById.get(item.personId) ?? null}
+                              />
+                            ))}
+                          </ul>
+                        ) : (
+                          <div className="rounded-2xl border border-[var(--bc-mobile-border)] bg-[var(--bc-mobile-surface)] p-5 text-center shadow-xs">
+                            <div className="mx-auto grid h-10 w-10 place-items-center rounded-full bg-[var(--bc-mobile-surface-2)] text-[var(--bc-mobile-accent)]">
+                              <Sparkles className="h-5 w-5" />
+                            </div>
+                            <p className="mt-2 text-[13px] font-semibold text-[var(--bc-mobile-text)]">
+                              Chưa có khoảnh khắc nào gần đây
+                            </p>
+                            <p className="mt-1 text-[11.5px] text-[var(--bc-mobile-muted)]">
+                              Ghi lại các cuộc gặp gỡ, trao đổi và hợp tác đầu tiên của bạn để lưu giữ hành trình.
+                            </p>
+                            <Link
+                              to="/connect-app/moment"
+                              className="mt-3 inline-flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 px-4 py-1.5 text-xs font-bold text-slate-950 shadow-sm transition hover:opacity-90"
+                            >
+                              <Plus className="h-3.5 w-3.5" />
+                              <span>Ghi khoảnh khắc ngay</span>
+                            </Link>
+                          </div>
+                        )}
+                      </section>
+                    ) : null}
+
+                    {/* Danh sách người trong Network */}
+                    <section className="mt-7">
+                      <div className="mb-3 flex items-center justify-between gap-3">
+                        <h2 className="min-w-0 truncate text-[10px] font-medium tracking-[1px] uppercase text-[var(--bc-mobile-muted)]">
+                          {t("bc.mobile.network.people")}
+                        </h2>
+                        {narrowed ? (
+                          <p
+                            aria-live="polite"
+                            className="shrink-0 text-[12.5px] text-[var(--bc-mobile-muted)]"
+                          >
+                            {t("bc.mobile.network.results", { count: people.length })}
+                            {filtering ? ` · ${t(FILTER_TKEY[filter])}` : ""}
+                          </p>
+                        ) : null}
+                      </div>
+
+                      {people.length === 0 ? (
+                        network.searching ? (
+                          <NetworkSearchEmpty onClear={clearSearch} />
+                        ) : filtering ? (
+                          <NetworkFilterEmpty onReset={() => setFilter("all")} />
+                        ) : (
+                          <NetworkEmpty onOpenV={openV} />
+                        )
+                      ) : (
+                        <ul
+                          aria-label={t("bc.mobile.network.list.label")}
+                          aria-busy={network.isLoadingMore}
+                          className="space-y-2.5"
+                        >
+                          {people.map((person) => (
+                            <NetworkPersonRow key={person.personId} person={person} />
+                          ))}
+                        </ul>
+                      )}
+                    </section>
+                  </>
+                )}
+
+                {network.hasMore ? (
+                  <div className="mt-2 flex min-h-[52px] items-center justify-center">
+                    <button
+                      type="button"
+                      onClick={network.loadMore}
+                      disabled={network.isLoadingMore}
+                      className="inline-flex min-h-[44px] items-center rounded-lg px-4 text-[14px] font-medium text-[var(--bc-mobile-muted)] transition-colors duration-150 hover:bg-[var(--bc-mobile-surface-2)] hover:text-[var(--bc-mobile-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--bc-mobile-navy)] disabled:opacity-60 motion-reduce:transition-none"
+                    >
+                      {network.isLoadingMore
+                        ? t("bc.mobile.network.loadingMore")
+                        : t("bc.mobile.network.loadMore")}
+                    </button>
+                  </div>
+                ) : null}
               </>
             )}
-
-            {network.hasMore ? (
-              <div className="mt-2 flex min-h-[52px] items-center justify-center">
-                <button
-                  type="button"
-                  onClick={network.loadMore}
-                  disabled={network.isLoadingMore}
-                  className="inline-flex min-h-[44px] items-center rounded-lg px-4 text-[14px] font-medium text-[var(--bc-mobile-muted)] transition-colors duration-150 hover:bg-[var(--bc-mobile-surface-2)] hover:text-[var(--bc-mobile-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--bc-mobile-navy)] disabled:opacity-60 motion-reduce:transition-none"
-                >
-                  {network.isLoadingMore
-                    ? t("bc.mobile.network.loadingMore")
-                    : t("bc.mobile.network.loadMore")}
-                </button>
-              </div>
-            ) : null}
           </>
-        )}
-        </>
         )}
       </main>
 
@@ -619,7 +615,7 @@ function NetworkAllAiSuggestionsPanel({
       .then((payload) => {
         if (active) setViewerCity(payload?.identity?.city ?? null);
       })
-      .catch(() => {});
+      .catch(() => { });
     return () => {
       active = false;
     };
@@ -679,11 +675,10 @@ function NetworkAllAiSuggestionsPanel({
         <button
           type="button"
           onClick={() => setAiViewMode("dynamic")}
-          className={`flex-1 py-2.5 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
-            aiViewMode === "dynamic"
+          className={`flex-1 py-2.5 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${aiViewMode === "dynamic"
               ? "bg-[var(--bc-mobile-accent-grad)] text-black border border-[#D8B282]/50 shadow-sm font-bold"
               : "text-[var(--bc-mobile-muted)] hover:text-[var(--bc-mobile-text)]"
-          }`}
+            }`}
         >
           <Sparkles className="w-3.5 h-3.5 text-black" />
           <span>AI Matcher Năng Lực (Dynamic %)</span>
@@ -691,11 +686,10 @@ function NetworkAllAiSuggestionsPanel({
         <button
           type="button"
           onClick={() => setAiViewMode("routine")}
-          className={`flex-1 py-2.5 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
-            aiViewMode === "routine"
+          className={`flex-1 py-2.5 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${aiViewMode === "routine"
               ? "bg-[var(--bc-mobile-accent-grad)] text-black border border-[#D8B282]/50 shadow-sm font-bold"
               : "text-[var(--bc-mobile-muted)] hover:text-[var(--bc-mobile-text)]"
-          }`}
+            }`}
         >
           <Users className="w-3.5 h-3.5 text-black" />
           <span>Gợi Ý Hàng Ngày (Routine)</span>
@@ -736,206 +730,201 @@ function NetworkAllAiSuggestionsPanel({
             </p>
           </div>
 
-      {/* Ô tìm kiếm gợi ý */}
-      <div className="flex items-center gap-2">
-        <MobileSearchBar
-          id="bc-ai-search"
-          value={query}
-          onChange={setQuery}
-          placeholder="Tìm theo tên, công ty, ghi chú gợi ý..."
-        />
-      </div>
+          {/* Ô tìm kiếm gợi ý */}
+          <div className="flex items-center gap-2">
+            <MobileSearchBar
+              id="bc-ai-search"
+              value={query}
+              onChange={setQuery}
+              placeholder="Tìm theo tên, công ty, ghi chú gợi ý..."
+            />
+          </div>
 
-      {/* Filter chips */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-        <button
-          type="button"
-          onClick={() => setFilterMode("all")}
-          style={filterMode === "all" ? { background: "var(--bc-mobile-accent-grad)" } : undefined}
-          className={`h-7 px-3 rounded-full text-xs font-medium border transition-colors cursor-pointer whitespace-nowrap ${
-            filterMode === "all"
-              ? "text-[#050c15] font-bold border-transparent"
-              : "bg-[var(--bc-mobile-surface-2)] text-slate-400 dark:text-slate-300 border-[var(--bc-mobile-border)] hover:border-[var(--bc-mobile-accent)] hover:text-slate-900 dark:hover:text-white"
-          }`}
-        >
-          Tất cả ({recommendations.length})
-        </button>
-        <button
-          type="button"
-          onClick={() => setFilterMode("near")}
-          style={filterMode === "near" ? { background: "var(--bc-mobile-accent-grad)" } : undefined}
-          className={`h-7 px-3 rounded-full text-xs font-medium border transition-colors cursor-pointer whitespace-nowrap ${
-            filterMode === "near"
-              ? "text-[#050c15] font-bold border-transparent"
-              : "bg-[var(--bc-mobile-surface-2)] text-slate-400 dark:text-slate-300 border-[var(--bc-mobile-border)] hover:border-[var(--bc-mobile-accent)] hover:text-slate-900 dark:hover:text-white"
-          }`}
-        >
-          📍 Ở gần bạn
-        </button>
-        <button
-          type="button"
-          onClick={() => setFilterMode("potential")}
-          style={filterMode === "potential" ? { background: "var(--bc-mobile-accent-grad)" } : undefined}
-          className={`h-7 px-3 rounded-full text-xs font-medium border transition-colors cursor-pointer whitespace-nowrap ${
-            filterMode === "potential"
-              ? "text-[#050c15] font-bold border-transparent"
-              : "bg-[var(--bc-mobile-surface-2)] text-slate-400 dark:text-slate-300 border-[var(--bc-mobile-border)] hover:border-[var(--bc-mobile-accent)] hover:text-slate-900 dark:hover:text-white"
-          }`}
-        >
-          ⭐ Tiềm năng cao
-        </button>
-        <button
-          type="button"
-          onClick={() => setFilterMode("frequent")}
-          style={filterMode === "frequent" ? { background: "var(--bc-mobile-accent-grad)" } : undefined}
-          className={`h-7 px-3 rounded-full text-xs font-medium border transition-colors cursor-pointer whitespace-nowrap ${
-            filterMode === "frequent"
-              ? "text-[#050c15] font-bold border-transparent"
-              : "bg-[var(--bc-mobile-surface-2)] text-slate-400 dark:text-slate-300 border-[var(--bc-mobile-border)] hover:border-[var(--bc-mobile-accent)] hover:text-slate-900 dark:hover:text-white"
-          }`}
-        >
-          🔥 Nhiều tương tác
-        </button>
-        <button
-          type="button"
-          onClick={() => setFilterMode("nurture")}
-          style={filterMode === "nurture" ? { background: "var(--bc-mobile-accent-grad)" } : undefined}
-          className={`h-7 px-3 rounded-full text-xs font-medium border transition-colors cursor-pointer whitespace-nowrap ${
-            filterMode === "nurture"
-              ? "text-[#050c15] font-bold border-transparent"
-              : "bg-[var(--bc-mobile-surface-2)] text-slate-400 dark:text-slate-300 border-[var(--bc-mobile-border)] hover:border-[var(--bc-mobile-accent)] hover:text-slate-900 dark:hover:text-white"
-          }`}
-        >
-          ⏳ Cần chăm sóc
-        </button>
-      </div>
-
-      {/* Danh sách gợi ý */}
-      {filtered.length === 0 ? (
-        <div className="py-12 text-center rounded-2xl border border-[var(--bc-mobile-border)] bg-[var(--bc-mobile-surface)] p-6">
-          <Sparkles className="mx-auto h-8 w-8 text-[var(--bc-mobile-muted)] opacity-50" />
-          <p className="mt-3 text-sm font-semibold text-[var(--bc-mobile-text)]">
-            Không tìm thấy gợi ý phù hợp
-          </p>
-          <p className="mt-1 text-xs text-[var(--bc-mobile-muted)]">
-            Thử tìm kiếm với từ khóa khác hoặc chuyển chế độ xem
-          </p>
-          {(query || filterMode !== "all") && (
+          {/* Filter chips */}
+          <div className="flex items-center gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             <button
               type="button"
-              onClick={() => {
-                setQuery("");
-                setFilterMode("all");
-              }}
-              className="mt-4 inline-flex h-8 items-center rounded-full px-4 text-xs font-medium text-[var(--bc-mobile-accent)] bg-[var(--bc-mobile-surface-2)] border border-[var(--bc-mobile-border)] hover:border-[var(--bc-mobile-accent)]"
+              onClick={() => setFilterMode("all")}
+              style={filterMode === "all" ? { background: "var(--bc-mobile-accent-grad)" } : undefined}
+              className={`h-7 px-3 rounded-full text-xs font-medium border transition-colors cursor-pointer whitespace-nowrap ${filterMode === "all"
+                  ? "text-[#050c15] font-bold border-transparent"
+                  : "bg-[var(--bc-mobile-surface-2)] text-slate-400 dark:text-slate-300 border-[var(--bc-mobile-border)] hover:border-[var(--bc-mobile-accent)] hover:text-slate-900 dark:hover:text-white"
+                }`}
             >
-              Xem lại tất cả
+              Tất cả ({recommendations.length})
             </button>
-          )}
-        </div>
-      ) : (
-        <div className="flex flex-col gap-3">
-          {filtered.map((rec) => {
-            const name = rec.person.displayName ?? t("bc.mobile.network.unknownPerson");
-            const roleLine = [rec.person.headline, rec.person.companyName].filter(Boolean).join(" · ");
-            const daysText = rec.reason.days > 0 ? `${rec.reason.days} ngày chưa liên hệ` : "Gợi ý kết nối";
-            const target = targetFor(rec.person.personId);
-            const isNearBadge = (rec.aiSuggestion || "").includes("Gần bạn") || (rec.aiSuggestion || "").includes("khu vực");
-            const isPotentialBadge = (rec.aiSuggestion || "").includes("Tiềm năng") || (rec.aiSuggestion || "").includes("lãnh đạo");
-            const isFrequentBadge = (rec.aiSuggestion || "").includes("tương tác") || (rec.aiSuggestion || "").includes("thân thiết");
+            <button
+              type="button"
+              onClick={() => setFilterMode("near")}
+              style={filterMode === "near" ? { background: "var(--bc-mobile-accent-grad)" } : undefined}
+              className={`h-7 px-3 rounded-full text-xs font-medium border transition-colors cursor-pointer whitespace-nowrap ${filterMode === "near"
+                  ? "text-[#050c15] font-bold border-transparent"
+                  : "bg-[var(--bc-mobile-surface-2)] text-slate-400 dark:text-slate-300 border-[var(--bc-mobile-border)] hover:border-[var(--bc-mobile-accent)] hover:text-slate-900 dark:hover:text-white"
+                }`}
+            >
+              📍 Ở gần bạn
+            </button>
+            <button
+              type="button"
+              onClick={() => setFilterMode("potential")}
+              style={filterMode === "potential" ? { background: "var(--bc-mobile-accent-grad)" } : undefined}
+              className={`h-7 px-3 rounded-full text-xs font-medium border transition-colors cursor-pointer whitespace-nowrap ${filterMode === "potential"
+                  ? "text-[#050c15] font-bold border-transparent"
+                  : "bg-[var(--bc-mobile-surface-2)] text-slate-400 dark:text-slate-300 border-[var(--bc-mobile-border)] hover:border-[var(--bc-mobile-accent)] hover:text-slate-900 dark:hover:text-white"
+                }`}
+            >
+              ⭐ Tiềm năng cao
+            </button>
+            <button
+              type="button"
+              onClick={() => setFilterMode("frequent")}
+              style={filterMode === "frequent" ? { background: "var(--bc-mobile-accent-grad)" } : undefined}
+              className={`h-7 px-3 rounded-full text-xs font-medium border transition-colors cursor-pointer whitespace-nowrap ${filterMode === "frequent"
+                  ? "text-[#050c15] font-bold border-transparent"
+                  : "bg-[var(--bc-mobile-surface-2)] text-slate-400 dark:text-slate-300 border-[var(--bc-mobile-border)] hover:border-[var(--bc-mobile-accent)] hover:text-slate-900 dark:hover:text-white"
+                }`}
+            >
+              🔥 Nhiều tương tác
+            </button>
+            <button
+              type="button"
+              onClick={() => setFilterMode("nurture")}
+              style={filterMode === "nurture" ? { background: "var(--bc-mobile-accent-grad)" } : undefined}
+              className={`h-7 px-3 rounded-full text-xs font-medium border transition-colors cursor-pointer whitespace-nowrap ${filterMode === "nurture"
+                  ? "text-[#050c15] font-bold border-transparent"
+                  : "bg-[var(--bc-mobile-surface-2)] text-slate-400 dark:text-slate-300 border-[var(--bc-mobile-border)] hover:border-[var(--bc-mobile-accent)] hover:text-slate-900 dark:hover:text-white"
+                }`}
+            >
+              ⏳ Cần chăm sóc
+            </button>
+          </div>
 
-            return (
-              <article
-                key={rec.id}
-                className="flex flex-col rounded-2xl border border-[var(--bc-mobile-border)] bg-[var(--bc-mobile-surface)] p-4 transition-all hover:border-[var(--bc-mobile-border-active)] active:border-[var(--bc-mobile-border-active)] shadow-xs"
-              >
-                <div className="flex items-start gap-3">
-                  <img
-                    src={avatarOrDemo(rec.person.avatarUrl, rec.person.personId)}
-                    alt={name}
-                    loading="lazy"
-                    className="h-12 w-12 rounded-full object-cover border border-[var(--bc-mobile-border)] shrink-0"
-                  />
-                  <div className="flex min-w-0 flex-1 flex-col">
-                    <div className="flex items-center justify-between gap-2">
-                      <h3 className="truncate text-sm font-bold text-[var(--bc-mobile-text)]">
-                        {name}
-                      </h3>
-                      <div className="flex items-center gap-1 shrink-0">
-                        {isNearBadge && (
-                          <span className="rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-[10px] font-semibold text-amber-300">
-                            Gần bạn
-                          </span>
+          {/* Danh sách gợi ý */}
+          {filtered.length === 0 ? (
+            <div className="py-12 text-center rounded-2xl border border-[var(--bc-mobile-border)] bg-[var(--bc-mobile-surface)] p-6">
+              <Sparkles className="mx-auto h-8 w-8 text-[var(--bc-mobile-muted)] opacity-50" />
+              <p className="mt-3 text-sm font-semibold text-[var(--bc-mobile-text)]">
+                Không tìm thấy gợi ý phù hợp
+              </p>
+              <p className="mt-1 text-xs text-[var(--bc-mobile-muted)]">
+                Thử tìm kiếm với từ khóa khác hoặc chuyển chế độ xem
+              </p>
+              {(query || filterMode !== "all") && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setQuery("");
+                    setFilterMode("all");
+                  }}
+                  className="mt-4 inline-flex h-8 items-center rounded-full px-4 text-xs font-medium text-[var(--bc-mobile-accent)] bg-[var(--bc-mobile-surface-2)] border border-[var(--bc-mobile-border)] hover:border-[var(--bc-mobile-accent)]"
+                >
+                  Xem lại tất cả
+                </button>
+              )}
+            </div>
+          ) : (
+            <div className="flex flex-col gap-3">
+              {filtered.map((rec) => {
+                const name = rec.person.displayName ?? t("bc.mobile.network.unknownPerson");
+                const roleLine = [rec.person.headline, rec.person.companyName].filter(Boolean).join(" · ");
+                const daysText = rec.reason.days > 0 ? `${rec.reason.days} ngày chưa liên hệ` : "Gợi ý kết nối";
+                const target = targetFor(rec.person.personId);
+                const isNearBadge = (rec.aiSuggestion || "").includes("Gần bạn") || (rec.aiSuggestion || "").includes("khu vực");
+                const isPotentialBadge = (rec.aiSuggestion || "").includes("Tiềm năng") || (rec.aiSuggestion || "").includes("lãnh đạo");
+                const isFrequentBadge = (rec.aiSuggestion || "").includes("tương tác") || (rec.aiSuggestion || "").includes("thân thiết");
+
+                return (
+                  <article
+                    key={rec.id}
+                    className="flex flex-col rounded-2xl border border-[var(--bc-mobile-border)] bg-[var(--bc-mobile-surface)] p-4 transition-all hover:border-[var(--bc-mobile-border-active)] active:border-[var(--bc-mobile-border-active)] shadow-xs"
+                  >
+                    <div className="flex items-start gap-3">
+                      <img
+                        src={avatarOrDemo(rec.person.avatarUrl, rec.person.personId)}
+                        alt={name}
+                        loading="lazy"
+                        className="h-12 w-12 rounded-full object-cover border border-[var(--bc-mobile-border)] shrink-0"
+                      />
+                      <div className="flex min-w-0 flex-1 flex-col">
+                        <div className="flex items-center justify-between gap-2">
+                          <h3 className="truncate text-sm font-bold text-[var(--bc-mobile-text)]">
+                            {name}
+                          </h3>
+                          <div className="flex items-center gap-1 shrink-0">
+                            {isNearBadge && (
+                              <span className="rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-[10px] font-semibold text-amber-300">
+                                Gần bạn
+                              </span>
+                            )}
+                            {isPotentialBadge && (
+                              <span className="rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-[10px] font-semibold text-amber-300">
+                                Tiềm năng
+                              </span>
+                            )}
+                            <span className="rounded-full border border-[var(--bc-mobile-border)] bg-[var(--bc-mobile-surface-2)] px-2 py-0.5 text-[10px] font-semibold text-[var(--bc-mobile-accent)]">
+                              {daysText}
+                            </span>
+                          </div>
+                        </div>
+                        {roleLine && (
+                          <p className="mt-0.5 truncate text-xs text-[var(--bc-mobile-muted)]">
+                            {roleLine}
+                          </p>
                         )}
-                        {isPotentialBadge && (
-                          <span className="rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-[10px] font-semibold text-amber-300">
-                            Tiềm năng
-                          </span>
-                        )}
-                        <span className="rounded-full border border-[var(--bc-mobile-border)] bg-[var(--bc-mobile-surface-2)] px-2 py-0.5 text-[10px] font-semibold text-[var(--bc-mobile-accent)]">
-                          {daysText}
-                        </span>
+                        <div className="mt-0.5 flex items-center gap-2 text-[11px] text-[var(--bc-mobile-muted)]">
+                          {rec.person.areaLabel && (
+                            <span>📍 {rec.person.areaLabel}</span>
+                          )}
+                          {rec.person.industryLabel && (
+                            <span>• {rec.person.industryLabel}</span>
+                          )}
+                        </div>
                       </div>
                     </div>
-                    {roleLine && (
-                      <p className="mt-0.5 truncate text-xs text-[var(--bc-mobile-muted)]">
-                        {roleLine}
+
+                    {/* Khối gợi ý nội dung AI */}
+                    <div className="mt-3 rounded-xl border border-[var(--bc-mobile-border)] bg-[var(--bc-mobile-surface-2)] p-3 text-xs leading-relaxed text-[var(--bc-mobile-text)]">
+                      <div className="flex items-center gap-1.5 font-semibold text-[var(--bc-mobile-accent)] mb-1">
+                        <Sparkles className="h-3.5 w-3.5" />
+                        <span>Lý do AI đề xuất:</span>
+                      </div>
+                      <p className="text-[var(--bc-mobile-muted)]">
+                        {rec.aiSuggestion || `Đã ${rec.reason.days > 0 ? rec.reason.days : "nhiều"} ngày từ lần tương tác gần nhất. Duy trì liên hệ định kỳ giúp củng cố mối quan hệ và tạo cơ hội hợp tác mới.`}
                       </p>
-                    )}
-                    <div className="mt-0.5 flex items-center gap-2 text-[11px] text-[var(--bc-mobile-muted)]">
-                      {rec.person.areaLabel && (
-                        <span>📍 {rec.person.areaLabel}</span>
-                      )}
-                      {rec.person.industryLabel && (
-                        <span>• {rec.person.industryLabel}</span>
-                      )}
                     </div>
-                  </div>
-                </div>
 
-                {/* Khối gợi ý nội dung AI */}
-                <div className="mt-3 rounded-xl border border-[var(--bc-mobile-border)] bg-[var(--bc-mobile-surface-2)] p-3 text-xs leading-relaxed text-[var(--bc-mobile-text)]">
-                  <div className="flex items-center gap-1.5 font-semibold text-[var(--bc-mobile-accent)] mb-1">
-                    <Sparkles className="h-3.5 w-3.5" />
-                    <span>Lý do AI đề xuất:</span>
-                  </div>
-                  <p className="text-[var(--bc-mobile-muted)]">
-                    {rec.aiSuggestion || `Đã ${rec.reason.days > 0 ? rec.reason.days : "nhiều"} ngày từ lần tương tác gần nhất. Duy trì liên hệ định kỳ giúp củng cố mối quan hệ và tạo cơ hội hợp tác mới.`}
-                  </p>
-                </div>
+                    {/* Hàng hành động */}
+                    <div className="mt-3.5 flex items-center justify-between gap-2 pt-2 border-t border-[var(--bc-mobile-border)]">
+                      <button
+                        type="button"
+                        onClick={() => setOpenId(rec.id)}
+                        className="inline-flex h-9 items-center justify-center rounded-xl px-3 text-xs font-semibold text-[var(--bc-mobile-text)] bg-[var(--bc-mobile-surface-2)] border border-[var(--bc-mobile-border)] hover:border-[var(--bc-mobile-accent)] transition-colors cursor-pointer"
+                      >
+                        Xem phân tích
+                      </button>
+                      <div className="flex items-center gap-2">
+                        <Link
+                          to="/connect-app/network/$personId"
+                          params={{ personId: rec.person.personId }}
+                          className="inline-flex h-9 items-center justify-center rounded-xl px-3 text-xs font-semibold text-[var(--bc-mobile-muted)] hover:text-[var(--bc-mobile-text)] bg-[var(--bc-mobile-surface-2)] border border-[var(--bc-mobile-border)] hover:border-[var(--bc-mobile-accent)] transition-colors"
+                        >
+                          Hồ sơ
+                        </Link>
+                        <AiMatchConnectAction personName={name} target={target} compact />
+                      </div>
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
+          )}
 
-                {/* Hàng hành động */}
-                <div className="mt-3.5 flex items-center justify-between gap-2 pt-2 border-t border-[var(--bc-mobile-border)]">
-                  <button
-                    type="button"
-                    onClick={() => setOpenId(rec.id)}
-                    className="inline-flex h-9 items-center justify-center rounded-xl px-3 text-xs font-semibold text-[var(--bc-mobile-text)] bg-[var(--bc-mobile-surface-2)] border border-[var(--bc-mobile-border)] hover:border-[var(--bc-mobile-accent)] transition-colors cursor-pointer"
-                  >
-                    Xem phân tích
-                  </button>
-                  <div className="flex items-center gap-2">
-                    <Link
-                      to="/connect-app/network/$personId"
-                      params={{ personId: rec.person.personId }}
-                      className="inline-flex h-9 items-center justify-center rounded-xl px-3 text-xs font-semibold text-[var(--bc-mobile-muted)] hover:text-[var(--bc-mobile-text)] bg-[var(--bc-mobile-surface-2)] border border-[var(--bc-mobile-border)] hover:border-[var(--bc-mobile-accent)] transition-colors"
-                    >
-                      Hồ sơ
-                    </Link>
-                    <AiMatchConnectAction personName={name} target={target} compact />
-                  </div>
-                </div>
-              </article>
-            );
-          })}
-        </div>
-      )}
-
-      <AiMatchDetailSheet
-        open={activeRec !== null}
-        onOpenChange={(next: boolean) => setOpenId(next ? openId : null)}
-        rec={activeRec}
-        target={activeRec ? targetFor(activeRec.person.personId) : { cardSlug: null, alreadyConnected: false }}
-      />
+          <AiMatchDetailSheet
+            open={activeRec !== null}
+            onOpenChange={(next: boolean) => setOpenId(next ? openId : null)}
+            rec={activeRec}
+            target={activeRec ? targetFor(activeRec.person.personId) : { cardSlug: null, alreadyConnected: false }}
+          />
         </>
       )}
     </section>
@@ -1001,7 +990,7 @@ function NetworkAiMatchStrip({
           const roleLine = [rec.person.headline, rec.person.companyName]
             .filter(Boolean)
             .join(" · ");
-          const daysText = (rec.reason?.days ?? 0) > 0 
+          const daysText = (rec.reason?.days ?? 0) > 0
             ? `${rec.reason.days} ngày từ lần gặp...`
             : "Gặp gần đây...";
 
@@ -1106,7 +1095,7 @@ function NetworkNurtureList({
             .filter(Boolean)
             .join(" · ");
           const days = rec.reason?.days ?? 0;
-          const daysText = days > 0 
+          const daysText = days > 0
             ? `${days} ngày chưa liên hệ`
             : "Chưa liên hệ...";
 
@@ -1116,9 +1105,8 @@ function NetworkNurtureList({
               to="/connect-app/network/$personId"
               params={{ personId: rec.person.personId }}
               aria-label={`${t("bc.mobile.network.nurture.title")}: ${name}`}
-              className={`flex items-center justify-between gap-3 p-3 hover:bg-[var(--bc-mobile-surface-2)] transition-colors ${
-                index !== items.length - 1 ? "border-b border-solid border-[var(--bc-mobile-border)]" : ""
-              }`}
+              className={`flex items-center justify-between gap-3 p-3 hover:bg-[var(--bc-mobile-surface-2)] transition-colors ${index !== items.length - 1 ? "border-b border-solid border-[var(--bc-mobile-border)]" : ""
+                }`}
             >
               <img
                 src={avatarOrDemo(rec.person.avatarUrl, rec.person.personId)}
@@ -1189,11 +1177,10 @@ function NetworkRecentStrip({
                 className="w-full flex flex-col items-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--bc-mobile-accent)] rounded-xl"
               >
                 <div
-                  className={`w-12 h-12 rounded-full p-[2px] flex items-center justify-center box-border ${
-                    isFirst
+                  className={`w-12 h-12 rounded-full p-[2px] flex items-center justify-center box-border ${isFirst
                       ? "border border-solid border-[var(--bc-mobile-accent)]"
                       : "border border-solid border-[var(--bc-mobile-border)]"
-                  }`}
+                    }`}
                 >
                   <img
                     src={avatarOrDemo(person.avatarUrl, person.personId)}
@@ -1411,7 +1398,7 @@ function NetworkIncomingRequestsSection({ full = false }: { full?: boolean } = {
 
       <div className="divide-y divide-[var(--bc-mobile-border)] rounded-2xl border border-[var(--bc-mobile-border-gold,#D8B282)]/60 bg-[var(--bc-mobile-surface)] p-3 shadow-md">
         {displayed.map((req) => {
-          const name = req.counterpart?.displayName ?? "Hội viên ViOne";
+          const name = req.counterpart?.displayName ?? "Học viên ViOne";
           const subtitle = [req.counterpart?.headline, req.counterpart?.companyName].filter(Boolean).join(" · ");
           const userId = req.counterpart?.userId;
           const avatarUrl = resolveMediaUrl(req.counterpart?.avatarUrl);

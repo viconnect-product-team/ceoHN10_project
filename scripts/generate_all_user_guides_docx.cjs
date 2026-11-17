@@ -353,7 +353,7 @@ async function main() {
   await convertMarkdownToDocx(
     path.join(DOC_DIR, 'HUONG_DAN_SU_DUNG_APP_MOBILE_CHI_TIET.md'),
     appDocx,
-    'HƯỚNG DẪN SỬ DỤNG ỨNG DỤNG DI ĐỘNG HỘI VIÊN',
+    'HƯỚNG DẪN SỬ DỤNG ỨNG DỤNG DI ĐỘNG Học viên',
     'Hệ Thống Giao Thương B2B & Sinh Hoạt Hiệp Hội CLB CEO HN10 (17 Functional Nodes)',
     'mobile'
   );

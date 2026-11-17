@@ -9,7 +9,7 @@ import * as crypto from 'crypto';
 
 @Injectable()
 export class ConnectIdentityService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   async getMyProfile(userId: string) {
     const profileRows = await this.prisma.$queryRaw<any[]>`
@@ -149,7 +149,7 @@ export class ConnectIdentityService {
           data: vioneUpdate,
         })
         .catch(() => null);
-    } catch {}
+    } catch { }
 
     // 3. members (App Hiệp hội CEO HN10)
     try {
@@ -169,7 +169,7 @@ export class ConnectIdentityService {
           updated_at = NOW()
         WHERE user_id = ${userId}::uuid OR id = ${userId}
       `.catch(() => null);
-    } catch {}
+    } catch { }
 
     // 4. card_settings & member_business_cards
     try {
@@ -183,7 +183,7 @@ export class ConnectIdentityService {
           company_logo_url = COALESCE(${companyLogoUrl}, card_settings.company_logo_url),
           updated_at = NOW()
       `.catch(() => null);
-    } catch {}
+    } catch { }
 
     try {
       await this.prisma.$executeRaw`
@@ -200,7 +200,7 @@ export class ConnectIdentityService {
           updated_at = NOW()
         WHERE owner_user_id = ${userId}::uuid
       `.catch(() => null);
-    } catch {}
+    } catch { }
 
     return this.getMyProfile(userId);
   }
@@ -230,7 +230,7 @@ export class ConnectIdentityService {
           display_name:
             profile?.display_name ||
             userEmail?.split('@')[0] ||
-            'Hội viên CEO HN10',
+            'Học viên CEO HN10',
           headline: profile?.professional_title || null,
           job_title: profile?.professional_title || null,
           company_name: profile?.company_name || null,
@@ -281,26 +281,26 @@ export class ConnectIdentityService {
     return {
       identity: identity
         ? {
-            id: identity.id,
-            ownerUserId: identity.owner_user_id,
-            displayName: identity.display_name,
-            headline: identity.headline,
-            jobTitle: identity.job_title,
-            companyName: identity.company_name,
-            bio: identity.bio,
-            avatarUrl: identity.avatar_url,
-            primaryEmail: identity.primary_email,
-            primaryPhone: identity.primary_phone,
-            website: identity.website,
-            linkedinUrl: identity.linkedin_url,
-            address: identity.address,
-            city: identity.city,
-            countryCode: identity.country_code,
-            preferredLocale: identity.preferred_locale,
-            status: identity.status,
-            createdAt: identity.created_at,
-            updatedAt: identity.updated_at,
-          }
+          id: identity.id,
+          ownerUserId: identity.owner_user_id,
+          displayName: identity.display_name,
+          headline: identity.headline,
+          jobTitle: identity.job_title,
+          companyName: identity.company_name,
+          bio: identity.bio,
+          avatarUrl: identity.avatar_url,
+          primaryEmail: identity.primary_email,
+          primaryPhone: identity.primary_phone,
+          website: identity.website,
+          linkedinUrl: identity.linkedin_url,
+          address: identity.address,
+          city: identity.city,
+          countryCode: identity.country_code,
+          preferredLocale: identity.preferred_locale,
+          status: identity.status,
+          createdAt: identity.created_at,
+          updatedAt: identity.updated_at,
+        }
         : null,
       visibility,
     };
@@ -579,7 +579,7 @@ export class ConnectIdentityService {
       UPDATE public.identity_share_links
       SET last_used_at = ${new Date()}
       WHERE id = ${link.id}::uuid
-    `.catch(() => {});
+    `.catch(() => { });
 
     // Projection mapping
     const isFieldVisible = (key: string) => {

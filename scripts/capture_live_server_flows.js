@@ -66,7 +66,7 @@ async function captureAllLiveFlows() {
     await appPage.locator('input[type="email"]').first().fill('vuvp090120@gmail.com');
     await appPage.locator('input[type="date"]').first().fill('1983-01-20');
     await appPage.locator('input[placeholder*="ViOne"], input[placeholder*="Công ty"]').first().fill('Công ty Cổ phần Công nghệ ViConnect');
-    
+
     const addressInput = appPage.locator('input[placeholder*="Số nhà"], input[placeholder*="địa chỉ"]').first();
     if (await addressInput.count() > 0) {
       await addressInput.fill('Tầng 6, Tháp CEO, Phạm Hùng, Nam Từ Liêm, Hà Nội');
@@ -155,11 +155,11 @@ async function captureAllLiveFlows() {
           <div style="padding:28px;color:#1e293b;line-height:1.6;font-size:14px;">
             <p style="font-size:16px;font-weight:700;margin-top:0;">Kính gửi: Anh <strong>Vũ Văn Phúc</strong>,</p>
             <p>Đại diện cho <strong>Công ty Cổ phần Công nghệ ViConnect</strong>,</p>
-            <p>Ban Chủ Nhiệm & Ban Thường Vụ CLB Doanh Nhân CEO HN10 xin trân trọng chúc mừng Anh/Chị đã chính thức trở thành Hội viên của Hiệp hội. Dưới đây là thông tin tài khoản truy cập hệ thống:</p>
+            <p>Ban Chủ Nhiệm & Ban Thường Vụ CLB Doanh Nhân CEO HN10 xin trân trọng chúc mừng Anh/Chị đã chính thức trở thành Học viên của Hiệp hội. Dưới đây là thông tin tài khoản truy cập hệ thống:</p>
             
             <div style="background:#f8fafc;border:2px dashed #003B95;border-radius:14px;padding:20px;margin:20px 0;">
               <div style="display:flex;justify-content:space-between;border-bottom:1px solid #e2e8f0;padding-bottom:10px;margin-bottom:10px;">
-                <span style="color:#64748b;">Mã Hội Viên:</span>
+                <span style="color:#64748b;">Mã Học viên:</span>
                 <strong style="color:#003B95;font-size:16px;font-family:monospace;">HN10-089</strong>
               </div>
               <div style="display:flex;justify-content:space-between;border-bottom:1px solid #e2e8f0;padding-bottom:10px;margin-bottom:10px;">
@@ -669,7 +669,7 @@ async function captureAllLiveFlows() {
     // FLOW G: DEEP SYSTEM FEATURES (APP & CRM)
     // ==========================================
     console.log('\n--- 7. FLOW G: Deep System Features ---');
-    
+
     // VIP 3D Card on App
     await appPage.goto('https://14.225.217.232:5444/association/card', { waitUntil: 'networkidle', timeout: 30000 });
     await appPage.waitForTimeout(2500);

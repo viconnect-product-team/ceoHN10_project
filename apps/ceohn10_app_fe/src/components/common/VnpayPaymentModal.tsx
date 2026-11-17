@@ -90,18 +90,18 @@ export function VnpayPaymentModal({
       const payload =
         type === "event"
           ? {
-              registrationId: targetId,
-              eventId: eventId || "",
-              amount,
-              memberName: attendeeName,
-              memberCode,
-            }
+            registrationId: targetId,
+            eventId: eventId || "",
+            amount,
+            memberName: attendeeName,
+            memberCode,
+          }
           : {
-              invoiceId: targetId,
-              amount,
-              memberName: attendeeName,
-              year: new Date().getFullYear(),
-            };
+            invoiceId: targetId,
+            amount,
+            memberName: attendeeName,
+            year: new Date().getFullYear(),
+          };
 
       fetchNestApi<any>(endpoint, {
         method: "POST",
@@ -255,19 +255,17 @@ export function VnpayPaymentModal({
       <div className="w-full max-w-lg bg-card border border-border rounded-3xl shadow-2xl overflow-hidden flex flex-col">
         {/* Header */}
         <div
-          className={`px-6 py-4 border-b border-border flex items-center justify-between ${
-            paymentMethod === "momo"
+          className={`px-6 py-4 border-b border-border flex items-center justify-between ${paymentMethod === "momo"
               ? "bg-gradient-to-r from-pink-900/40 via-purple-950/20 to-card"
               : "bg-gradient-to-r from-blue-900/40 via-blue-950/20 to-card"
-          }`}
+            }`}
         >
           <div className="flex items-center gap-3">
             <div
-              className={`w-10 h-10 rounded-2xl flex items-center justify-center text-white shadow-md ${
-                paymentMethod === "momo"
+              className={`w-10 h-10 rounded-2xl flex items-center justify-center text-white shadow-md ${paymentMethod === "momo"
                   ? "bg-gradient-to-br from-[#A50064] to-[#D82D8B]"
                   : "bg-gradient-to-br from-blue-600 to-indigo-700"
-              }`}
+                }`}
             >
               {paymentMethod === "momo" ? (
                 <Wallet className="h-5 w-5" />
@@ -281,11 +279,10 @@ export function VnpayPaymentModal({
                   {paymentMethod === "momo" ? "Cổng Thanh Toán MoMo" : "Cổng Thanh Toán VNPAY"}
                 </h3>
                 <span
-                  className={`text-[10px] font-black uppercase px-2 py-0.5 rounded-full border ${
-                    paymentMethod === "momo"
+                  className={`text-[10px] font-black uppercase px-2 py-0.5 rounded-full border ${paymentMethod === "momo"
                       ? "bg-pink-500/10 text-pink-600 dark:text-pink-400 border-pink-500/20"
                       : "bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20"
-                  }`}
+                    }`}
                 >
                   {paymentMethod === "momo" ? "Ví Điện Tử MoMo" : "Chuẩn Quốc Gia"}
                 </span>
@@ -311,11 +308,10 @@ export function VnpayPaymentModal({
               <button
                 type="button"
                 onClick={() => setPaymentMethod("vnpay")}
-                className={`py-2 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 cursor-pointer ${
-                  paymentMethod === "vnpay"
+                className={`py-2 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 cursor-pointer ${paymentMethod === "vnpay"
                     ? "bg-[#003B95] text-white shadow-xs font-extrabold"
                     : "text-muted-foreground hover:text-foreground"
-                }`}
+                  }`}
               >
                 <div className="w-2 h-2 rounded-full bg-blue-400" />
                 <span>Cổng VNPAY-QR</span>
@@ -323,11 +319,10 @@ export function VnpayPaymentModal({
               <button
                 type="button"
                 onClick={() => setPaymentMethod("momo")}
-                className={`py-2 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 cursor-pointer ${
-                  paymentMethod === "momo"
+                className={`py-2 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 cursor-pointer ${paymentMethod === "momo"
                     ? "bg-[#A50064] text-white shadow-xs font-extrabold"
                     : "text-muted-foreground hover:text-foreground"
-                }`}
+                  }`}
               >
                 <div className="w-2 h-2 rounded-full bg-pink-400" />
                 <span>Ví Điện Tử MoMo</span>
@@ -403,21 +398,19 @@ export function VnpayPaymentModal({
             <>
               {/* Order Info Card */}
               <div
-                className={`p-4 rounded-2xl border flex items-center justify-between ${
-                  paymentMethod === "momo"
+                className={`p-4 rounded-2xl border flex items-center justify-between ${paymentMethod === "momo"
                     ? "bg-gradient-to-r from-pink-500/10 via-purple-500/10 to-transparent border-pink-500/20"
                     : "bg-gradient-to-r from-blue-500/10 via-indigo-500/10 to-transparent border-blue-500/20"
-                }`}
+                  }`}
               >
                 <div>
                   <span
-                    className={`text-[11px] font-bold uppercase tracking-wider block ${
-                      paymentMethod === "momo"
+                    className={`text-[11px] font-bold uppercase tracking-wider block ${paymentMethod === "momo"
                         ? "text-pink-600 dark:text-pink-400"
                         : "text-blue-600 dark:text-blue-400"
-                    }`}
+                      }`}
                   >
-                    {type === "event" ? "Vé Tham Dự Sự Kiện" : "Hội Phí Niên Liễm Hội Viên"}
+                    {type === "event" ? "Vé Tham Dự Sự Kiện" : "Hội Phí Niên Liễm Học viên"}
                   </span>
                   <h4 className="text-sm font-bold text-foreground line-clamp-1 mt-0.5">{title}</h4>
                   {attendeeName && (
@@ -430,11 +423,10 @@ export function VnpayPaymentModal({
                 <div className="text-right">
                   <span className="text-[10px] text-muted-foreground block">Tổng tiền</span>
                   <span
-                    className={`text-lg font-black leading-tight ${
-                      paymentMethod === "momo"
+                    className={`text-lg font-black leading-tight ${paymentMethod === "momo"
                         ? "text-[#A50064] dark:text-pink-400"
                         : "text-[#003B95] dark:text-cyan-400"
-                    }`}
+                      }`}
                   >
                     {amount.toLocaleString("vi-VN")} đ
                   </span>
@@ -471,9 +463,8 @@ export function VnpayPaymentModal({
                     if (!currentQr) return null;
                     return (
                       <div
-                        className={`relative p-3 rounded-2xl bg-white border-2 shadow-lg group ${
-                          paymentMethod === "momo" ? "border-pink-500/40" : "border-blue-500/40"
-                        }`}
+                        className={`relative p-3 rounded-2xl bg-white border-2 shadow-lg group ${paymentMethod === "momo" ? "border-pink-500/40" : "border-blue-500/40"
+                          }`}
                       >
                         <img
                           src={currentQr}

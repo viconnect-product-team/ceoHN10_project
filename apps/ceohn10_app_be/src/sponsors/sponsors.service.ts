@@ -33,7 +33,7 @@ export class SponsorsService {
   constructor(
     private readonly sponsorsRepo: SponsorsRepository,
     private readonly mailService: MailService,
-  ) {}
+  ) { }
 
   private async resolveAssociationId(assocId?: string): Promise<string> {
     if (assocId) return assocId;
@@ -174,7 +174,7 @@ export class SponsorsService {
           } else if (typeof rawSponsors === 'string') {
             try {
               spList = JSON.parse(rawSponsors);
-            } catch {}
+            } catch { }
           }
           if (Array.isArray(spList)) {
             const found = spList.find(
@@ -183,7 +183,7 @@ export class SponsorsService {
                 s.id === r.id ||
                 (s.sponsorName &&
                   s.sponsorName.trim().toLowerCase() ===
-                    r.name?.trim().toLowerCase()) ||
+                  r.name?.trim().toLowerCase()) ||
                 (s.name &&
                   s.name.trim().toLowerCase() === r.name?.trim().toLowerCase()),
             );
@@ -696,9 +696,9 @@ export class SponsorsService {
     const formattedAmount =
       Number(sponsor.amount || 0) > 0
         ? new Intl.NumberFormat('vi-VN', {
-            style: 'currency',
-            currency: 'VND',
-          }).format(Number(sponsor.amount))
+          style: 'currency',
+          currency: 'VND',
+        }).format(Number(sponsor.amount))
         : sponsor.packageType === 'in_kind'
           ? 'Tài trợ Hiện vật'
           : '0 đ';
@@ -878,16 +878,15 @@ export class SponsorsService {
             <td class="info-label">Hình thức:</td>
             <td class="info-val">${packageTypeLabel}</td>
           </tr>
-          ${
-            sponsor.packageType === 'in_kind' && sponsor.inKindDescription
-              ? `
+          ${sponsor.packageType === 'in_kind' && sponsor.inKindDescription
+        ? `
           <tr>
             <td class="info-label">Mô tả hiện vật:</td>
             <td class="info-val">${sponsor.inKindDescription}</td>
           </tr>
           `
-              : ''
-          }
+        : ''
+      }
           <tr>
             <td class="info-label">Giá trị tài trợ:</td>
             <td class="info-val" style="color: #001B54; font-size: 15px; font-weight: 800;">${formattedAmount}</td>
@@ -905,7 +904,7 @@ export class SponsorsService {
         <div class="benefits-title">★ CAM KẾT QUYỀN LỢI ĐẶC QUYỀN</div>
         <div class="benefit-item">✓ Vinh danh trang trọng thương hiệu trên toàn bộ backdrop, kỷ yếu, ấn phẩm và truyền thông số của CLB.</div>
         <div class="benefit-item">✓ Bố trí gian hàng / vị trí trưng bày VIP giới thiệu giải pháp sản phẩm trực tiếp đến hàng trăm CEO đối tác.</div>
-        <div class="benefit-item">✓ Quyền lợi kết nối giao thương 1-1 độc quyền cùng Ban Lãnh đạo và mạng lưới Hội viên HanoiBA.</div>
+        <div class="benefit-item">✓ Quyền lợi kết nối giao thương 1-1 độc quyền cùng Ban Lãnh đạo và mạng lưới Học viên HanoiBA.</div>
         <div class="benefit-item">✓ Trao kỷ niệm chương và thư tri ân trang trọng tại Gala sự kiện chính thức.</div>
       </div>
 

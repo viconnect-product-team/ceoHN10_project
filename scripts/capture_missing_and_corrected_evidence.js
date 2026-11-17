@@ -74,7 +74,7 @@ async function main() {
 
   await crmPage.goto(`${CRM_URL}/`, { waitUntil: 'networkidle', timeout: 30000 });
   await crmPage.waitForTimeout(3000);
-  await snap(crmPage, 'crm_step_02_dashboard_kpi_live.png', 'Executive Dashboard CRM Tổng Quan: KPI Hội Viên, Doanh Thu, Sự Kiện');
+  await snap(crmPage, 'crm_step_02_dashboard_kpi_live.png', 'Executive Dashboard CRM Tổng Quan: KPI Học viên, Doanh Thu, Sự Kiện');
 
   // =========================================================================
   // MỤC 2: BẦU CỬ & BIỂU QUYẾT TÍN NHIỆM TRÊN CRM
@@ -154,11 +154,11 @@ async function main() {
   }
   await snap(appPage, 'app_visit_card_back.png', 'Danh thiếp số Doanh nhân CEO HN10 (Mặt sau với Mã QR & Thông tin kết nối)');
 
-  // 4.3. Cuộn xuống phần Thẻ Định Danh Hội Viên VIP
-  console.log('4.3. Thẻ Định Danh Hội Viên VIP...');
+  // 4.3. Cuộn xuống phần Thẻ Định Danh Học viên VIP
+  console.log('4.3. Thẻ Định Danh Học viên VIP...');
   await appPage.evaluate(() => window.scrollBy(0, 450));
   await appPage.waitForTimeout(1200);
-  await snap(appPage, 'app_identity_card_vip.png', 'Thẻ định danh số Hội viên VIP GOLD 3D với Mã hội viên & Chip NFC');
+  await snap(appPage, 'app_identity_card_vip.png', 'Thẻ định danh số Học viên VIP GOLD 3D với Mã Học viên & Chip NFC');
 
   // 4.4. Modal Cài đặt Quyền riêng tư danh thiếp
   console.log('4.4. Cài đặt Quyền riêng tư danh thiếp...');
@@ -183,7 +183,7 @@ async function main() {
   // Thử quét mã HN10-292 của user test
   await appPage.goto(`${APP_URL}/card/HN10-292`, { waitUntil: 'networkidle', timeout: 30000 });
   await appPage.waitForTimeout(2000);
-  await snap(appPage, 'app_public_qr_scan_user.png', 'Xác thực thông tin hội viên Phạm Vũ Nam khi quét QR từ app ngoài');
+  await snap(appPage, 'app_public_qr_scan_user.png', 'Xác thực thông tin Học viên Phạm Vũ Nam khi quét QR từ app ngoài');
 
   // =========================================================================
   // MỤC 6: BẦU CỬ & BIỂU QUYẾT TRÊN APP HIỆP HỘI

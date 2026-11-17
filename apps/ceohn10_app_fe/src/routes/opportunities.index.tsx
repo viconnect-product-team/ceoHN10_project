@@ -212,7 +212,7 @@ function OpportunityCard({
             search={REVIEW_SEARCH_RESET}
             className="truncate font-medium text-primary hover:underline"
           >
-            {opp.posterName || opp.contactName || poster?.name || opp.company || "Hội viên CLB"}
+            {opp.posterName || opp.contactName || poster?.name || opp.company || "Học viên CLB"}
           </Link>
           <div className="flex items-center gap-2.5">
             <span className="flex items-center gap-1">
@@ -428,11 +428,10 @@ function NewOpportunityModal({ onClose }: { onClose: () => void }) {
                 if (errors.title) setErrors((prev) => ({ ...prev, title: "" }));
               }}
               placeholder={t("opp.form.titlePh")}
-              className={`w-full rounded-lg border bg-background px-3 py-2 text-sm outline-none transition ${
-                errors.title
+              className={`w-full rounded-lg border bg-background px-3 py-2 text-sm outline-none transition ${errors.title
                   ? "border-destructive ring-1 ring-destructive/30 focus:border-destructive"
                   : "border-border focus:border-primary"
-              }`}
+                }`}
             />
             {errors.title && (
               <p className="mt-1 text-xs font-semibold text-destructive animate-in fade-in duration-150">
@@ -452,11 +451,10 @@ function NewOpportunityModal({ onClose }: { onClose: () => void }) {
               }}
               rows={4}
               placeholder={t("opp.form.descPh")}
-              className={`w-full resize-none rounded-lg border bg-background px-3 py-2 text-sm outline-none transition ${
-                errors.desc
+              className={`w-full resize-none rounded-lg border bg-background px-3 py-2 text-sm outline-none transition ${errors.desc
                   ? "border-destructive ring-1 ring-destructive/30 focus:border-destructive"
                   : "border-border focus:border-primary"
-              }`}
+                }`}
             />
             {errors.desc && (
               <p className="mt-1 text-xs font-semibold text-destructive animate-in fade-in duration-150">
@@ -490,11 +488,10 @@ function NewOpportunityModal({ onClose }: { onClose: () => void }) {
                   setDeadline(iso);
                   if (errors.deadline) setErrors((prev) => ({ ...prev, deadline: "" }));
                 }}
-                className={`w-full rounded-lg border bg-background px-3 py-2 text-sm outline-none transition ${
-                  errors.deadline
+                className={`w-full rounded-lg border bg-background px-3 py-2 text-sm outline-none transition ${errors.deadline
                     ? "border-destructive ring-1 ring-destructive/30 focus:border-destructive"
                     : "border-border focus:border-primary"
-                }`}
+                  }`}
               />
               {errors.deadline && (
                 <p className="mt-1 text-xs font-semibold text-destructive animate-in fade-in duration-150">
@@ -560,11 +557,10 @@ function NewOpportunityModal({ onClose }: { onClose: () => void }) {
                   if (errors.region) setErrors((prev) => ({ ...prev, region: "" }));
                 }}
                 placeholder="VD: TP. Hồ Chí Minh"
-                className={`w-full rounded-lg border bg-background px-3 py-2 text-sm outline-none transition ${
-                  errors.region
+                className={`w-full rounded-lg border bg-background px-3 py-2 text-sm outline-none transition ${errors.region
                     ? "border-destructive ring-1 ring-destructive/30 focus:border-destructive"
                     : "border-border focus:border-primary"
-                }`}
+                  }`}
               />
               {errors.region && (
                 <p className="mt-1 text-xs font-semibold text-destructive animate-in fade-in duration-150">
@@ -583,11 +579,10 @@ function NewOpportunityModal({ onClose }: { onClose: () => void }) {
                   if (errors.industry) setErrors((prev) => ({ ...prev, industry: "" }));
                 }}
                 placeholder="VD: Sản xuất"
-                className={`w-full rounded-lg border bg-background px-3 py-2 text-sm outline-none transition ${
-                  errors.industry
+                className={`w-full rounded-lg border bg-background px-3 py-2 text-sm outline-none transition ${errors.industry
                     ? "border-destructive ring-1 ring-destructive/30 focus:border-destructive"
                     : "border-border focus:border-primary"
-                }`}
+                  }`}
               />
               {errors.industry && (
                 <p className="mt-1 text-xs font-semibold text-destructive animate-in fade-in duration-150">
@@ -624,9 +619,8 @@ function NewOpportunityModal({ onClose }: { onClose: () => void }) {
                 }}
                 placeholder="VD: 200.000.000"
                 unit="VNĐ"
-                className={`w-full rounded-lg border bg-background px-3 py-2 text-sm outline-none font-medium transition ${
-                  errors.budgetMax ? "border-destructive ring-1 ring-destructive/30" : "border-border focus:border-primary"
-                }`}
+                className={`w-full rounded-lg border bg-background px-3 py-2 text-sm outline-none font-medium transition ${errors.budgetMax ? "border-destructive ring-1 ring-destructive/30" : "border-border focus:border-primary"
+                  }`}
               />
               {errors.budgetMax && (
                 <p className="mt-1 text-xs font-semibold text-destructive animate-in fade-in duration-150">
@@ -643,11 +637,10 @@ function NewOpportunityModal({ onClose }: { onClose: () => void }) {
                   type="button"
                   key={i}
                   onClick={() => setEmoji(i)}
-                  className={`h-9 w-9 rounded-lg border text-lg transition ${
-                    emoji === i
+                  className={`h-9 w-9 rounded-lg border text-lg transition ${emoji === i
                       ? "border-primary bg-primary/10"
                       : "border-border hover:bg-secondary"
-                  }`}
+                    }`}
                 >
                   {i}
                 </button>
@@ -737,11 +730,10 @@ function InterestModal({ opp, onClose }: { opp: Opportunity; onClose: () => void
             <label className="mb-1.5 flex items-center justify-between text-xs font-semibold text-foreground">
               <span>Giá trị Deal đề xuất (VNĐ)</span>
               {dealPercent !== null && (
-                <span className={`px-2 py-0.5 rounded-full text-[11px] font-bold ${
-                  dealPercent >= 100 
+                <span className={`px-2 py-0.5 rounded-full text-[11px] font-bold ${dealPercent >= 100
                     ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300"
                     : "bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300"
-                }`}>
+                  }`}>
                   {dealPercent}% ngân sách ({dealPercent >= 100 ? `+${dealPercent - 100}% lời` : `${dealPercent - 100}%`})
                 </span>
               )}
@@ -842,7 +834,7 @@ function OpportunitiesPage() {
           });
         }
       })
-      .catch(() => {});
+      .catch(() => { });
   }, []);
 
   const deleteOpp = useServerFn(deleteOpportunityFn);
@@ -903,7 +895,7 @@ function OpportunitiesPage() {
 
   const myOpps = useMemo(() => all.filter((o) => isOwnerOpp(o)), [all, currentUserId, member?.id, user?.id]);
   const closedOpps = useMemo(() => all.filter((o) => o.status === "closed"), [all]);
-  
+
   // Sắp xếp các đề xuất deal theo giá trị lời nhất cho người đăng cơ hội (deal_value cao nhất lên đầu)
   const myInterests = useMemo(
     () =>
@@ -977,51 +969,46 @@ function OpportunitiesPage() {
       <div className="mb-4 flex flex-wrap items-center gap-2">
         <button
           onClick={() => setTab("browse")}
-          className={`rounded-lg px-4 py-2 text-sm font-medium transition cursor-pointer ${
-            tab === "browse"
+          className={`rounded-lg px-4 py-2 text-sm font-medium transition cursor-pointer ${tab === "browse"
               ? "bg-primary text-primary-foreground shadow-[var(--shadow-glow)]"
               : "border border-border bg-card hover:bg-secondary"
-          }`}
+            }`}
         >
           {t("opp.tab.browse")}
         </button>
         <button
           onClick={() => setTab("mine")}
-          className={`rounded-lg px-4 py-2 text-sm font-medium transition cursor-pointer ${
-            tab === "mine"
+          className={`rounded-lg px-4 py-2 text-sm font-medium transition cursor-pointer ${tab === "mine"
               ? "bg-primary text-primary-foreground shadow-[var(--shadow-glow)]"
               : "border border-border bg-card hover:bg-secondary"
-          }`}
+            }`}
         >
           {t("opp.tab.mine")} ({myOpps.length})
         </button>
         <button
           onClick={() => setTab("my_interests")}
-          className={`rounded-lg px-4 py-2 text-sm font-medium transition cursor-pointer ${
-            tab === "my_interests"
+          className={`rounded-lg px-4 py-2 text-sm font-medium transition cursor-pointer ${tab === "my_interests"
               ? "bg-primary text-primary-foreground shadow-[var(--shadow-glow)]"
               : "border border-border bg-card hover:bg-secondary"
-          }`}
+            }`}
         >
           Cơ hội tôi quan tâm
         </button>
         <button
           onClick={() => setTab("closed")}
-          className={`rounded-lg px-4 py-2 text-sm font-medium transition cursor-pointer ${
-            tab === "closed"
+          className={`rounded-lg px-4 py-2 text-sm font-medium transition cursor-pointer ${tab === "closed"
               ? "bg-primary text-primary-foreground shadow-[var(--shadow-glow)]"
               : "border border-border bg-card hover:bg-secondary"
-          }`}
+            }`}
         >
           Đã đóng ({closedOpps.length})
         </button>
         <button
           onClick={() => setTab("interests")}
-          className={`rounded-lg px-4 py-2 text-sm font-medium transition cursor-pointer ${
-            tab === "interests"
+          className={`rounded-lg px-4 py-2 text-sm font-medium transition cursor-pointer ${tab === "interests"
               ? "bg-primary text-primary-foreground shadow-[var(--shadow-glow)]"
               : "border border-border bg-card hover:bg-secondary"
-          }`}
+            }`}
         >
           {t("opp.tab.interests")}
         </button>
@@ -1064,11 +1051,10 @@ function OpportunitiesPage() {
               <button
                 type="button"
                 onClick={() => setView("table")}
-                className={`rounded-md p-1.5 transition-colors ${
-                  view === "table"
+                className={`rounded-md p-1.5 transition-colors ${view === "table"
                     ? "bg-primary text-primary-foreground shadow-sm"
                     : "text-muted-foreground hover:text-foreground"
-                }`}
+                  }`}
                 title="Dạng bảng"
               >
                 <TableIcon className="h-4 w-4" />
@@ -1076,11 +1062,10 @@ function OpportunitiesPage() {
               <button
                 type="button"
                 onClick={() => setView("grid")}
-                className={`rounded-md p-1.5 transition-colors ${
-                  view === "grid"
+                className={`rounded-md p-1.5 transition-colors ${view === "grid"
                     ? "bg-primary text-primary-foreground shadow-sm"
                     : "text-muted-foreground hover:text-foreground"
-                }`}
+                  }`}
                 title="Dạng lưới"
               >
                 <LayoutGrid className="h-4 w-4" />
@@ -1131,21 +1116,19 @@ function OpportunitiesPage() {
                     return (
                       <div
                         key={it.id}
-                        className={`rounded-xl border p-4 text-sm transition-all ${
-                          isTop1
+                        className={`rounded-xl border p-4 text-sm transition-all ${isTop1
                             ? "border-amber-300 bg-amber-50/50 dark:border-amber-700/60 dark:bg-amber-950/20 shadow-xs"
                             : "border-border bg-card hover:bg-secondary/40"
-                        }`}
+                          }`}
                       >
                         <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
                           <div className="flex items-center gap-2">
-                            <span className={`inline-flex items-center justify-center h-6 min-w-6 px-1.5 rounded-full text-xs font-extrabold ${
-                              isTop1
+                            <span className={`inline-flex items-center justify-center h-6 min-w-6 px-1.5 rounded-full text-xs font-extrabold ${isTop1
                                 ? "bg-amber-500 text-white shadow-xs"
                                 : idx === 1
-                                ? "bg-slate-400 text-white"
-                                : "bg-secondary text-muted-foreground"
-                            }`}>
+                                  ? "bg-slate-400 text-white"
+                                  : "bg-secondary text-muted-foreground"
+                              }`}>
                               #{idx + 1}
                             </span>
                             <Link
@@ -1371,13 +1354,13 @@ function OpportunitiesPage() {
                           className="font-semibold text-primary hover:underline text-xs block"
                         >
                           <TruncatedText
-                            text={opp.posterName || poster?.name || `Hội viên #${opp.posterId.slice(0, 6)}`}
+                            text={opp.posterName || poster?.name || `Học viên #${opp.posterId.slice(0, 6)}`}
                             maxWidth="max-w-[300px]"
                           />
                         </Link>
                         <div className="text-[11px] text-muted-foreground">
                           <TruncatedText
-                            text={poster?.email || poster?.contact || "Hội viên"}
+                            text={poster?.email || poster?.contact || "Học viên"}
                             maxWidth="max-w-[300px]"
                           />
                         </div>

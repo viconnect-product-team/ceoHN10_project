@@ -112,7 +112,7 @@ export const assignMemberUserFn = createServerFn({ method: "POST" })
       .eq("id", data.memberId)
       .maybeSingle();
     if (mErr) throw new Error(mErr.message);
-    if (!member) throw new Error("Không tìm thấy hội viên");
+    if (!member) throw new Error("Không tìm thấy Học viên");
     // GUARD: caller must administer this member's association.
     await assertAssocAdmin(context as unknown as Ctx, member.association_id as string);
 
@@ -123,7 +123,7 @@ export const assignMemberUserFn = createServerFn({ method: "POST" })
       .eq("user_id", data.userId)
       .neq("id", data.memberId)
       .maybeSingle();
-    if (taken) throw new Error("Tài khoản này đã được gán cho hội viên khác");
+    if (taken) throw new Error("Tài khoản này đã được gán cho Học viên khác");
 
     await ensureMembership(supabaseAdmin, data.userId, member.association_id);
 
@@ -169,7 +169,7 @@ export const createMemberUserFn = createServerFn({ method: "POST" })
       .eq("id", data.memberId)
       .maybeSingle();
     if (mErr) throw new Error(mErr.message);
-    if (!member) throw new Error("Không tìm thấy hội viên");
+    if (!member) throw new Error("Không tìm thấy Học viên");
     // GUARD: caller must administer this member's association.
     await assertAssocAdmin(context as unknown as Ctx, member.association_id as string);
 
@@ -205,7 +205,7 @@ export const createMemberUserFn = createServerFn({ method: "POST" })
       .eq("user_id", userId)
       .neq("id", data.memberId)
       .maybeSingle();
-    if (taken) throw new Error("Tài khoản này đã được gán cho hội viên khác");
+    if (taken) throw new Error("Tài khoản này đã được gán cho Học viên khác");
 
     await ensureMembership(supabaseAdmin, userId, member.association_id);
 
@@ -261,10 +261,10 @@ export const sendMemberInviteFn = createServerFn({ method: "POST" })
       .eq("id", data.memberId)
       .maybeSingle();
     if (error) throw new Error(error.message);
-    if (!member) throw new Error("Không tìm thấy hội viên");
+    if (!member) throw new Error("Không tìm thấy Học viên");
     // GUARD: caller must administer this member's association.
     await assertAssocAdmin(context as unknown as Ctx, member.association_id as string);
-    if (!member?.user_id) throw new Error("Hội viên chưa được gán tài khoản");
+    if (!member?.user_id) throw new Error("Học viên chưa được gán tài khoản");
     const { data: prof } = await supabaseAdmin
       .from("profiles")
       .select("email")
@@ -296,7 +296,7 @@ export const unassignMemberUserFn = createServerFn({ method: "POST" })
       .select("id, name, user_id, association_id")
       .eq("id", data.memberId)
       .maybeSingle();
-    if (!member) throw new Error("Không tìm thấy hội viên");
+    if (!member) throw new Error("Không tìm thấy Học viên");
     // GUARD: caller must administer this member's association.
     await assertAssocAdmin(context as unknown as Ctx, member.association_id as string);
     const { error } = await supabaseAdmin

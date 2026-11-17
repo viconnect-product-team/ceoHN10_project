@@ -50,14 +50,14 @@ export function TaskCard({ task, onClick, zoomLevel = 'standard' }: TaskCardProp
         e.dataTransfer.setData('application/json', JSON.stringify({ id: task.id, status: task.status, title: task.title }));
         e.dataTransfer.effectAllowed = 'move';
       }}
-      className={`group relative flex flex-col justify-between rounded-xl border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 ${cardPadding} shadow-xs transition-all duration-200 hover:-translate-y-1 hover:border-[#003B95]/50 hover:shadow-md cursor-grab active:cursor-grabbing active:opacity-60 active:scale-[0.98] select-none`}
+      className={`group relative flex flex-col justify-between rounded-xl border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 ${cardPadding} shadow-xs transition-all duration-200 hover:-translate-y-1 hover:border-slate-400 hover:shadow-md cursor-grab active:cursor-grabbing active:opacity-60 active:scale-[0.98] select-none`}
       title="Nhấn để xem chi tiết hoặc Kéo thả để chuyển cột trạng thái"
     >
       <div>
         {/* Top Header: Code, Priority, Status dot */}
         <div className="flex items-center justify-between gap-1.5 mb-2 flex-wrap">
           <div className="flex items-center gap-1.5 flex-wrap min-w-0">
-            <span className="inline-flex items-center gap-1 rounded-md bg-[#ffffff]/10 text-[#003B95] dark:text-blue-300 font-extrabold px-2 py-0.5 text-[11px] border border-[#003B95]/20 font-mono truncate">
+            <span className="inline-flex items-center gap-1 rounded-md bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 font-extrabold px-2 py-0.5 text-[11px] border border-slate-200 dark:border-slate-700 font-mono truncate">
               {task.code}
             </span>
             <span
@@ -73,7 +73,7 @@ export function TaskCard({ task, onClick, zoomLevel = 'standard' }: TaskCardProp
             <span
               className={`h-2.5 w-2.5 rounded-full ${
                 TASK_STATUS_CONFIG[task.status]?.dot || 'bg-slate-400'
-              } ${task.status === 'IN_PROGRESS' ? 'ring-2 ring-blue-300 dark:ring-blue-700 animate-pulse' : ''}`}
+              } ${task.status === 'IN_PROGRESS' ? 'ring-2 ring-slate-400 animate-pulse' : ''}`}
               title={`Trạng thái: ${TASK_STATUS_CONFIG[task.status]?.label}`}
             />
           </div>
@@ -81,8 +81,8 @@ export function TaskCard({ task, onClick, zoomLevel = 'standard' }: TaskCardProp
 
         {/* Department & Meeting Tag */}
         <div className="mb-2 flex items-center justify-between gap-1.5 flex-wrap">
-          <span className="inline-flex items-center gap-1 rounded-md bg-[#ffffff]/10 text-[#003B95] dark:text-blue-300 font-extrabold px-2 py-0.5 text-[11px] border border-[#003B95]/20 truncate max-w-[190px]">
-            <Building className="w-3 h-3 text-[#003B95] dark:text-blue-300 flex-shrink-0" />
+          <span className="inline-flex items-center gap-1 rounded-md bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 font-extrabold px-2 py-0.5 text-[11px] border border-slate-200 dark:border-slate-700 truncate max-w-[190px]">
+            <Building className="w-3 h-3 text-slate-500 dark:text-slate-400 flex-shrink-0" />
             <span className="truncate">{task.department}</span>
           </span>
 
@@ -95,7 +95,7 @@ export function TaskCard({ task, onClick, zoomLevel = 'standard' }: TaskCardProp
               className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold border transition ${
                 MEETING_PLATFORMS[task.meeting.platform]?.bg || 'bg-blue-50'
               } ${
-                MEETING_PLATFORMS[task.meeting.platform]?.text || 'text-[#003B95]'
+                MEETING_PLATFORMS[task.meeting.platform]?.text || 'text-slate-700 dark:text-slate-300'
               } ${
                 MEETING_PLATFORMS[task.meeting.platform]?.border || 'border-blue-200'
               } hover:opacity-85 shadow-2xs`}
@@ -109,7 +109,7 @@ export function TaskCard({ task, onClick, zoomLevel = 'standard' }: TaskCardProp
         </div>
 
         {/* Task Title */}
-        <h4 className={`${titleSize} text-slate-900 dark:text-slate-100 group-hover:text-[#003B95] dark:group-hover:text-blue-400 transition-colors line-clamp-2`}>
+        <h4 className={`${titleSize} text-slate-900 dark:text-slate-100 group-hover:text-slate-900 dark:group-hover:text-white transition-colors line-clamp-2`}>
           {task.title}
         </h4>
 
@@ -129,12 +129,12 @@ export function TaskCard({ task, onClick, zoomLevel = 'standard' }: TaskCardProp
                 <span className="text-[10px] text-slate-400">({completedSubtasks}/{totalSubtasks} mục)</span>
               )}
             </span>
-            <span className="font-mono font-bold text-[#003B95] dark:text-blue-400">{task.progress}%</span>
+            <span className="font-mono font-bold text-slate-700 dark:text-slate-300">{task.progress}%</span>
           </div>
           <div className="w-full bg-slate-100 dark:bg-slate-800 h-1.5 rounded-full overflow-hidden">
             <div
               className={`h-full rounded-full transition-all duration-300 ${
-                task.status === 'DONE' ? 'bg-emerald-500' : task.progress > 0 ? 'bg-[#003B95]' : 'bg-slate-300 dark:bg-slate-700'
+                task.status === 'DONE' ? 'bg-emerald-500' : task.progress > 0 ? 'bg-slate-700' : 'bg-slate-300 dark:bg-slate-700'
               }`}
               style={{ width: `${task.progress}%` }}
             />
@@ -162,7 +162,7 @@ export function TaskCard({ task, onClick, zoomLevel = 'standard' }: TaskCardProp
                     <div
                       key={i}
                       title={a.name}
-                      className="w-5 h-5 text-[9px] rounded-full bg-[#003B95] text-white flex items-center justify-center font-bold border border-white dark:border-slate-900 flex-shrink-0"
+                      className="w-5 h-5 text-[9px] rounded-full bg-slate-700 text-white flex items-center justify-center font-bold border border-white dark:border-slate-900 flex-shrink-0"
                     >
                       {a.name.charAt(0)}
                     </div>
@@ -176,7 +176,7 @@ export function TaskCard({ task, onClick, zoomLevel = 'standard' }: TaskCardProp
                 className={`${isCompact ? 'w-5 h-5' : 'w-6 h-6'} rounded-full object-cover border border-slate-200 dark:border-slate-700 flex-shrink-0`}
               />
             ) : (
-              <div className={`${isCompact ? 'w-5 h-5 text-[9px]' : 'w-6 h-6 text-[10px]'} rounded-full bg-[#003B95] text-white flex items-center justify-center font-bold flex-shrink-0`}>
+              <div className={`${isCompact ? 'w-5 h-5 text-[9px]' : 'w-6 h-6 text-[10px]'} rounded-full bg-slate-700 text-white flex items-center justify-center font-bold flex-shrink-0`}>
                 {task.assignee.name.charAt(0)}
               </div>
             )}

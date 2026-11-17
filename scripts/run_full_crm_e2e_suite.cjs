@@ -20,7 +20,7 @@ async function queryDB(sql, params = []) {
     console.error('DB Query Error:', err.message);
     return [];
   } finally {
-    await client.end().catch(() => {});
+    await client.end().catch(() => { });
   }
 }
 
@@ -74,7 +74,7 @@ async function main() {
   await captureScreen(page, '02_admin_credentials_entered.png', 'Nhập tài khoản admini@connect.vn và mật khẩu');
 
   await page.click('button#crm-login-submit, button.ceo-login-submit, button[type="submit"]');
-  await page.waitForNavigation({ waitUntil: 'networkidle', timeout: 20000 }).catch(() => {});
+  await page.waitForNavigation({ waitUntil: 'networkidle', timeout: 20000 }).catch(() => { });
   await page.waitForTimeout(3000);
   await captureScreen(page, '03_admin_dashboard_home.png', 'Dashboard Quản trị viên sau khi đăng nhập thành công');
 
@@ -140,7 +140,7 @@ async function main() {
   // Chuyển sang trang Quản trị người dùng /account-settings?tab=users
   await page.goto(`${BASE_URL}/account-settings?tab=users`, { waitUntil: 'networkidle', timeout: 30000 });
   await page.waitForTimeout(2000);
-  await captureScreen(page, '07_user_roles_management.png', 'Danh sách Hội viên với Chức danh Lớp Trưởng, Lớp Phó & 7 Ban');
+  await captureScreen(page, '07_user_roles_management.png', 'Danh sách Học viên với Chức danh Lớp Trưởng, Lớp Phó & 7 Ban');
 
   // --------------------------------------------------------------------------
   // LUỒNG 3: LUỒNG SỰ KIỆN (EVENTS)
@@ -164,7 +164,7 @@ async function main() {
     ON CONFLICT (id) DO UPDATE SET title = EXCLUDED.title, updated_at = NOW()
   `, [newEventId]);
 
-  // Đăng ký tham gia cho hội viên Vũ Phan Vũ
+  // Đăng ký tham gia cho Học viên Vũ Phan Vũ
   await queryDB(`
     INSERT INTO event_registrations (id, event_id, user_id, full_name, email, phone, status, ticket_code, checked_in, created_at)
     VALUES ('reg-evt-001', $1, '00000000-0000-4000-8000-000000000005', 'Vũ Phan Vũ', 'vupv090120@gmail.com', '0912345678', 'confirmed', 'TK-GALA-001', false, NOW())
@@ -213,11 +213,11 @@ async function main() {
   console.log('\n>>> LUỒNG 5: Thống kê & Báo cáo (Analytics)...');
   await page.goto(`${BASE_URL}/analytics`, { waitUntil: 'networkidle', timeout: 30000 });
   await page.waitForTimeout(2000);
-  await captureScreen(page, '13_analytics_dashboard_overview.png', 'Báo cáo Tổng quan KPI, Tăng trưởng Hội viên & Sự kiện');
+  await captureScreen(page, '13_analytics_dashboard_overview.png', 'Báo cáo Tổng quan KPI, Tăng trưởng Học viên & Sự kiện');
 
   await page.goto(`${BASE_URL}/analytics?category=member_activities`, { waitUntil: 'networkidle', timeout: 30000 });
   await page.waitForTimeout(2000);
-  await captureScreen(page, '14_analytics_member_activities.png', 'Báo cáo Chi tiết Hoạt động Hội viên theo Ban Chuyên Môn');
+  await captureScreen(page, '14_analytics_member_activities.png', 'Báo cáo Chi tiết Hoạt động Học viên theo Ban Chuyên Môn');
 
   // --------------------------------------------------------------------------
   // LUỒNG 6: PHẢN ÁNH & GÓP Ý Ý KIẾN (FEEDBACK)
@@ -233,7 +233,7 @@ async function main() {
 
   await page.goto(`${BASE_URL}/feedback`, { waitUntil: 'networkidle', timeout: 30000 });
   await page.waitForTimeout(2000);
-  await captureScreen(page, '15_feedback_management_list.png', 'Danh sách Phản ánh & Đóng góp ý kiến từ Hội viên');
+  await captureScreen(page, '15_feedback_management_list.png', 'Danh sách Phản ánh & Đóng góp ý kiến từ Học viên');
 
   // --------------------------------------------------------------------------
   // LUỒNG 7: QUẢN LÝ TÀI LIỆU (DOCUMENTS)
@@ -302,7 +302,7 @@ async function main() {
   console.log('Tạo giao dịch thu hội phí: 25.000.000 VNĐ...');
   await queryDB(`
     INSERT INTO ceohn10_transactions (id, type, amount, status, description, member_name, member_code, member_id, created_at, updated_at)
-    VALUES ($1, 'income', 25000000, 'completed', 'Thu hội phí gia nhập CLB CEO HN10 - Hội viên Vũ Phan Vũ', 'Vũ Phan Vũ', 'HN10-099', 'mem-vupv090120', NOW(), NOW())
+    VALUES ($1, 'income', 25000000, 'completed', 'Thu hội phí gia nhập CLB CEO HN10 - Học viên Vũ Phan Vũ', 'Vũ Phan Vũ', 'HN10-099', 'mem-vupv090120', NOW(), NOW())
     ON CONFLICT (id) DO UPDATE SET amount = 25000000, status = 'completed', updated_at = NOW()
   `, [txId]);
 
@@ -339,26 +339,26 @@ async function main() {
   await captureScreen(page, '23_notifications_management.png', 'Danh sách Thông báo Điều hành Hệ thống CEO HN10');
 
   // --------------------------------------------------------------------------
-  // LUỒNG 12: ĐĂNG NHẬP HỘI VIÊN vupv090120@gmail.com
+  // LUỒNG 12: ĐĂNG NHẬP Học viên vupv090120@gmail.com
   // --------------------------------------------------------------------------
-  console.log('\n>>> LUỒNG 12: Đăng nhập Tài khoản Hội viên vupv090120@gmail.com...');
+  console.log('\n>>> LUỒNG 12: Đăng nhập Tài khoản Học viên vupv090120@gmail.com...');
   await page.goto(`${BASE_URL}/auth`, { waitUntil: 'networkidle', timeout: 30000 });
   await page.evaluate(() => localStorage.clear());
   await page.reload({ waitUntil: 'networkidle' });
 
   await page.fill('input[autoComplete="username"]', 'vupv090120@gmail.com');
   await page.fill('input[type="password"]', '123456');
-  await captureScreen(page, '24_login_vupv_credentials.png', 'Đăng nhập tài khoản Hội viên: vupv090120@gmail.com');
+  await captureScreen(page, '24_login_vupv_credentials.png', 'Đăng nhập tài khoản Học viên: vupv090120@gmail.com');
 
   await page.click('button#crm-login-submit, button.ceo-login-submit, button[type="submit"]');
-  await page.waitForNavigation({ waitUntil: 'networkidle', timeout: 20000 }).catch(() => {});
+  await page.waitForNavigation({ waitUntil: 'networkidle', timeout: 20000 }).catch(() => { });
   await page.waitForTimeout(3000);
-  await captureScreen(page, '25_vupv_member_dashboard.png', 'Giao diện Hội viên Vũ Phan Vũ sau khi đăng nhập');
+  await captureScreen(page, '25_vupv_member_dashboard.png', 'Giao diện Học viên Vũ Phan Vũ sau khi đăng nhập');
 
   // Xem thông báo
   await page.goto(`${BASE_URL}/notifications`, { waitUntil: 'networkidle', timeout: 30000 });
   await page.waitForTimeout(2000);
-  await captureScreen(page, '26_vupv_received_notification.png', 'Hội viên nhận Thông báo Kiện toàn Ban Cán Sự');
+  await captureScreen(page, '26_vupv_received_notification.png', 'Học viên nhận Thông báo Kiện toàn Ban Cán Sự');
 
   // --------------------------------------------------------------------------
   // LUỒNG 13: ĐĂNG NHẬP BAN TÀI CHÍNH vumikasa6@gmail.com
@@ -373,7 +373,7 @@ async function main() {
   await captureScreen(page, '27_login_vumikasa_credentials.png', 'Đăng nhập Ban Tài Chính: vumikasa6@gmail.com');
 
   await page.click('button#crm-login-submit, button.ceo-login-submit, button[type="submit"]');
-  await page.waitForNavigation({ waitUntil: 'networkidle', timeout: 20000 }).catch(() => {});
+  await page.waitForNavigation({ waitUntil: 'networkidle', timeout: 20000 }).catch(() => { });
   await page.waitForTimeout(3000);
   await captureScreen(page, '28_vumikasa_dashboard.png', 'Giao diện Ban Tài Chính Vũ Minh Tuấn sau khi đăng nhập');
 

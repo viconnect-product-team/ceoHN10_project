@@ -1,7 +1,7 @@
 {
-  "name": "ViOne — Hội viên Hiệp hội Doanh nghiệp",
-  "short_name": "ViOne Hội viên",
-  "description": "Ứng dụng hội viên: thẻ hội viên, sự kiện, cơ hội kinh doanh và ưu đãi.",
+  "name": "ViOne — Học viên Hiệp hội Doanh nghiệp",
+  "short_name": "ViOne Học viên",
+  "description": "Ứng dụng Học viên: thẻ Học viên, sự kiện, cơ hội kinh doanh và ưu đãi.",
   "start_url": "/m",
   "scope": "/",
   "display": "standalone",

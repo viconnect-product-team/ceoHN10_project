@@ -27,11 +27,11 @@ describe('CRM RBAC & Permission Matrix Module', () => {
       const validCategories = [
         {
           id: 'cat_members',
-          name: 'HỘI VIÊN',
+          name: 'Học viên',
           features: [
             {
               id: 'feat_members',
-              name: 'Hội viên',
+              name: 'Học viên',
               route: '/members',
               actions: [
                 {

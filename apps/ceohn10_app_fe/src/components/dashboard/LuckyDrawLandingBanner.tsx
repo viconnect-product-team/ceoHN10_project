@@ -216,11 +216,10 @@ export function LuckyDrawLandingBanner({
                   <button
                     key={ev.id}
                     onClick={() => setSelectedEventId(ev.id)}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
-                      isSelected
+                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${isSelected
                         ? "bg-amber-500 text-slate-950 shadow-sm font-black"
                         : "bg-secondary/80 border border-border text-foreground hover:bg-muted"
-                    }`}
+                      }`}
                   >
                     <Calendar className="w-3.5 h-3.5 shrink-0" />
                     <span className="truncate max-w-[200px] sm:max-w-[260px]">{ev.name}</span>
@@ -651,7 +650,7 @@ function LuckyDrawSetupModal({
 
   const handleRemovePrize = async (prizeId: string) => {
     try {
-      await fetchNestApi(`/sponsors/prizes/${prizeId}`, { method: "DELETE" }).catch(() => {});
+      await fetchNestApi(`/sponsors/prizes/${prizeId}`, { method: "DELETE" }).catch(() => { });
       const updatedPrizes = formData.prizes.filter((p) => p.id !== prizeId);
       const updatedConfig: LuckyDrawEventConfig = {
         ...formData,
@@ -697,31 +696,28 @@ function LuckyDrawSetupModal({
         <div className="flex border-b border-slate-200 bg-white px-6 gap-2 text-xs font-bold">
           <button
             onClick={() => setActiveTab("prizes")}
-            className={`py-3 px-4 border-b-2 transition flex items-center gap-2 cursor-pointer ${
-              activeTab === "prizes"
+            className={`py-3 px-4 border-b-2 transition flex items-center gap-2 cursor-pointer ${activeTab === "prizes"
                 ? "border-amber-500 text-amber-600 bg-amber-50/40"
                 : "border-transparent text-slate-500 hover:text-slate-800"
-            }`}
+              }`}
           >
             <span>Cơ Cấu Giải Thưởng ({formData.prizes?.length || 0})</span>
           </button>
           <button
             onClick={() => setActiveTab("info")}
-            className={`py-3 px-4 border-b-2 transition flex items-center gap-2 cursor-pointer ${
-              activeTab === "info"
+            className={`py-3 px-4 border-b-2 transition flex items-center gap-2 cursor-pointer ${activeTab === "info"
                 ? "border-amber-500 text-amber-600 bg-amber-50/40"
                 : "border-transparent text-slate-500 hover:text-slate-800"
-            }`}
+              }`}
           >
             <span>Thông Tin Sự Kiện &amp; Poster</span>
           </button>
           <button
             onClick={() => setActiveTab("candidates")}
-            className={`py-3 px-4 border-b-2 transition flex items-center gap-2 cursor-pointer ${
-              activeTab === "candidates"
+            className={`py-3 px-4 border-b-2 transition flex items-center gap-2 cursor-pointer ${activeTab === "candidates"
                 ? "border-amber-500 text-amber-600 bg-amber-50/40"
                 : "border-transparent text-slate-500 hover:text-slate-800"
-            }`}
+              }`}
           >
             <span>Đại Biểu Bốc Thăm ({formData.candidates?.length || 0})</span>
           </button>
@@ -790,7 +786,7 @@ function LuckyDrawSetupModal({
                       <option value="">-- Chọn sản phẩm có sẵn để tự động điền --</option>
                       {products.map((prod) => (
                         <option key={prod.id} value={prod.id}>
-                          {prod.name || prod.title} — {prod.company || "Hội viên"} ({prod.price ? `${Number(prod.price).toLocaleString("vi-VN")} VNĐ` : "Liên hệ"})
+                          {prod.name || prod.title} — {prod.company || "Học viên"} ({prod.price ? `${Number(prod.price).toLocaleString("vi-VN")} VNĐ` : "Liên hệ"})
                         </option>
                       ))}
                     </select>
@@ -1206,7 +1202,7 @@ function InteractiveLuckyDrawModal({
               quantity: nextQty,
               status: nextQty <= 0 ? "won" : "active",
             }),
-          }).catch(() => {});
+          }).catch(() => { });
         }
 
         // 4. Tự động bắn thông báo email trúng giải & đẩy về mục Ưu Đãi cả ở CRM và App Mobile

@@ -61,7 +61,7 @@ export function TaskTableView({
           <CeoTableEllipsis
             text={task.title}
             maxLines={2}
-            className="font-semibold text-slate-900 dark:text-slate-100 group-hover:text-[#003B95] dark:group-hover:text-blue-400 transition-colors"
+            className="font-semibold text-slate-900 dark:text-slate-100 group-hover:text-[#334155] dark:group-hover:text-slate-300 transition-colors"
           />
           {task.deliverables && (
             <CeoTableEllipsis
@@ -79,7 +79,7 @@ export function TaskTableView({
                 className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10.5px] font-bold border transition ${
                   MEETING_PLATFORMS[task.meeting.platform]?.bg || 'bg-blue-50'
                 } ${
-                  MEETING_PLATFORMS[task.meeting.platform]?.text || 'text-[#003B95]'
+                  MEETING_PLATFORMS[task.meeting.platform]?.text || 'text-slate-700 dark:text-slate-300'
                 } ${
                   MEETING_PLATFORMS[task.meeting.platform]?.border || 'border-blue-200'
                 } hover:opacity-85`}
@@ -295,7 +295,7 @@ export function TaskTableView({
               <button
                 type="button"
                 onClick={() => onTaskClick(task)}
-                className="p-1.5 rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-[#003B95] dark:hover:text-blue-400 transition-colors cursor-pointer"
+                className="p-1.5 rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-[#334155] dark:hover:text-slate-200 transition-colors cursor-pointer"
                 title="Xem chi tiết"
               >
                 <Eye className="w-4 h-4" />

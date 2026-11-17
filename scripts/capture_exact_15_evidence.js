@@ -70,15 +70,15 @@ async function main() {
     console.error('  ✗ Lỗi STT 1:', e.message);
   }
 
-  // STT 2: Thẻ hội viên VIP số hóa & Bảo mật SĐT/Email
+  // STT 2: Thẻ Học viên VIP số hóa & Bảo mật SĐT/Email
   try {
-    console.log('📸 STT 2: Chụp Thẻ hội viên VIP số hóa & Bảo mật...');
+    console.log('📸 STT 2: Chụp Thẻ Học viên VIP số hóa & Bảo mật...');
     await appPage.goto(`${APP_BASE}/association/card`, { waitUntil: 'networkidle', timeout: 25000 });
     await appPage.waitForTimeout(2000);
     // Cố gắng mở modal cài đặt bảo mật nếu có
     const privacyBtn = await appPage.$('button:has-text("Bảo mật"), button:has-text("Quyền riêng tư"), button[title*="bảo mật" i], button[aria-label*="bảo mật" i]');
     if (privacyBtn) {
-      await privacyBtn.click().catch(() => {});
+      await privacyBtn.click().catch(() => { });
       await appPage.waitForTimeout(1000);
     }
     await appPage.screenshot({ path: path.join(OUT_DIR, 'req02_app_the_vip_baomat.png') });
@@ -87,9 +87,9 @@ async function main() {
     console.error('  ✗ Lỗi STT 2:', e.message);
   }
 
-  // STT 3: Đặc quyền VIP hội viên riêng biệt
+  // STT 3: Đặc quyền VIP Học viên riêng biệt
   try {
-    console.log('📸 STT 3: Chụp Đặc quyền VIP hội viên...');
+    console.log('📸 STT 3: Chụp Đặc quyền VIP Học viên...');
     await appPage.goto(`${APP_BASE}/association/perks`, { waitUntil: 'networkidle', timeout: 25000 });
     await appPage.waitForTimeout(2000);
     await appPage.screenshot({ path: path.join(OUT_DIR, 'req03_app_dacquyen_vip.png') });
@@ -163,9 +163,9 @@ async function main() {
     localStorage.setItem('vibe_user', JSON.stringify(data.user));
   }, crmAuth);
 
-  // STT 6: CRM Sidebar Menu tinh hoa (Đã xóa hoàn toàn mục Quảng cáo) & Danh sách hội viên
+  // STT 6: CRM Sidebar Menu tinh hoa (Đã xóa hoàn toàn mục Quảng cáo) & Danh sách Học viên
   try {
-    console.log('📸 STT 6: Chụp CRM Sidebar & Quản lý hội viên (Xóa bỏ quảng cáo)...');
+    console.log('📸 STT 6: Chụp CRM Sidebar & Quản lý Học viên (Xóa bỏ quảng cáo)...');
     await crmPage.goto(`${CRM_BASE}/members`, { waitUntil: 'networkidle', timeout: 25000 });
     await crmPage.waitForTimeout(2000);
     await crmPage.screenshot({ path: path.join(OUT_DIR, 'req06_crm_sidebar_khong_quangcao.png') });
@@ -207,15 +207,15 @@ async function main() {
     console.error('  ✗ Lỗi STT 10:', e.message);
   }
 
-  // STT 11: Chuẩn hóa Hồ sơ hội viên 360 & Tự động chúc mừng sinh nhật
+  // STT 11: Chuẩn hóa Hồ sơ Học viên 360 & Tự động chúc mừng sinh nhật
   try {
-    console.log('📸 STT 11: Chụp Hồ sơ hội viên 360 & Ngày sinh chuẩn hóa...');
+    console.log('📸 STT 11: Chụp Hồ sơ Học viên 360 & Ngày sinh chuẩn hóa...');
     await crmPage.goto(`${CRM_BASE}/members`, { waitUntil: 'networkidle', timeout: 25000 });
     await crmPage.waitForTimeout(2000);
-    // Click vào dòng hội viên đầu tiên để mở Drawer 360 nếu có
+    // Click vào dòng Học viên đầu tiên để mở Drawer 360 nếu có
     const row = await crmPage.$('table tbody tr:first-child');
     if (row) {
-      await row.click().catch(() => {});
+      await row.click().catch(() => { });
       await crmPage.waitForTimeout(1500);
     }
     await crmPage.screenshot({ path: path.join(OUT_DIR, 'req11_crm_hoivien_sinhnhat.png') });
@@ -224,9 +224,9 @@ async function main() {
     console.error('  ✗ Lỗi STT 11:', e.message);
   }
 
-  // STT 12: Chỉ số sức khỏe hội viên Recharts & Cảnh báo trầm lắng
+  // STT 12: Chỉ số sức khỏe Học viên Recharts & Cảnh báo trầm lắng
   try {
-    console.log('📸 STT 12: Chụp Chỉ số sức khỏe hội viên & Cảnh báo trầm lắng...');
+    console.log('📸 STT 12: Chụp Chỉ số sức khỏe Học viên & Cảnh báo trầm lắng...');
     await crmPage.goto(`${CRM_BASE}/analytics`, { waitUntil: 'networkidle', timeout: 25000 });
     await crmPage.waitForTimeout(2500);
     await crmPage.screenshot({ path: path.join(OUT_DIR, 'req12_crm_suckhoe_hoivien.png') });

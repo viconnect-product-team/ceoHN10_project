@@ -245,9 +245,9 @@ function getEventAgenda(e: MyEvent, index: number): EventAgendaInfo {
     desc,
     schedule: [], // Không hardcode lịch trình giả lập
     speakers: [], // Không hardcode diễn giả giả lập
-    audience: "Chủ tịch, CEO & Hội viên CLB Doanh Nhân CEO HN10",
+    audience: "Chủ tịch, CEO & Học viên CLB Doanh Nhân CEO HN10",
     zaloLink: "",
-    offer: isFree ? "Vé tham dự miễn phí dành cho Hội viên chính thức" : "Ưu đãi vé tham dự dành cho Hội viên chính thức",
+    offer: isFree ? "Vé tham dự miễn phí dành cho Học viên chính thức" : "Ưu đãi vé tham dự dành cho Học viên chính thức",
     regLink: typeof window !== "undefined" ? `${window.location.origin}/events/${e.id}/register` : `/events/${e.id}/register`,
   };
 }
@@ -377,7 +377,7 @@ export const SECTIONS_CONFIG = [
     key: "regular" as const,
     title: "Sinh Hoạt Định Kỳ & Coffee CEO",
     titleEn: "Regular Meetings & Coffee Networking",
-    subtitle: "Gặp gỡ thân mật hàng tuần, giao lưu cởi mở, kết nối hội viên và chia sẻ bài học kinh nghiệm điều hành thực chiến...",
+    subtitle: "Gặp gỡ thân mật hàng tuần, giao lưu cởi mở, kết nối Học viên và chia sẻ bài học kinh nghiệm điều hành thực chiến...",
     subtitleEn: "Weekly casual meetups, open networking, peer connections and practical business leadership sharing...",
     icon: Coffee,
     variant: "default" as const,
@@ -462,14 +462,14 @@ function EventPosterCard({
         {/* Status badge top right */}
         <div
           className={`px-2.5 py-1 right-[48px] top-[12.64px] absolute rounded-3xl inline-flex justify-start items-center gap-1.5 shadow-md z-10 ${isPast
-              ? "bg-slate-700 text-slate-200"
-              : registered
-                ? "bg-blue-600 text-white"
-                : isFull
-                  ? "bg-rose-600 text-white"
-                  : isFree
-                    ? "bg-sky-500 text-white"
-                    : "bg-[#003B95] text-white font-bold"
+            ? "bg-slate-700 text-slate-200"
+            : registered
+              ? "bg-blue-600 text-white"
+              : isFull
+                ? "bg-rose-600 text-white"
+                : isFree
+                  ? "bg-sky-500 text-white"
+                  : "bg-[#003B95] text-white font-bold"
             }`}
         >
           <div className="size-1.5 bg-white rounded-full" />
@@ -495,8 +495,8 @@ function EventPosterCard({
             toast.success(isBookmarked ? "Đã bỏ lưu sự kiện" : "Đã lưu sự kiện vào danh sách quan tâm");
           }}
           className={`size-8 right-[12.64px] top-[12.64px] absolute rounded-full outline outline-1 outline-offset-[-1.05px] outline-white/20 inline-flex justify-center items-center overflow-hidden transition cursor-pointer shadow-md z-10 ${isBookmarked
-              ? "bg-[#003B95] text-white font-bold"
-              : "bg-stone-900/80 hover:bg-stone-800 text-white"
+            ? "bg-[#003B95] text-white font-bold"
+            : "bg-stone-900/80 hover:bg-stone-800 text-white"
             }`}
           title={isBookmarked ? "Bỏ lưu sự kiện" : "Lưu sự kiện"}
         >
@@ -553,7 +553,7 @@ function EventPosterCard({
         <div className="self-stretch h-6 inline-flex justify-between items-center">
           <div className="flex justify-start items-center gap-2">
             <span className="text-slate-500 dark:text-slate-400 text-xs font-normal font-sans leading-4">
-              {registered ? "Đã giữ chỗ" : "Mở cho toàn thể Hội viên"}
+              {registered ? "Đã giữ chỗ" : "Mở cho toàn thể Học viên"}
             </span>
             {!isPast && (
               <button
@@ -738,8 +738,8 @@ function UpcomingEventsCoverflow({
                 opacity,
               }}
               className={`group/slide absolute top-0 bottom-0 w-[84%] sm:w-[68%] max-w-[420px] my-auto cursor-pointer rounded-xl sm:rounded-2xl overflow-hidden shadow-lg transition-all duration-500 ease-out ${isCenter
-                  ? "shadow-[0_16px_36px_rgba(0,0,0,0.65)] ring-1 ring-white/20"
-                  : "hover:opacity-90"
+                ? "shadow-[0_16px_36px_rgba(0,0,0,0.65)] ring-1 ring-white/20"
+                : "hover:opacity-90"
                 }`}
             >
               {/* Ảnh poster sự kiện */}
@@ -800,8 +800,8 @@ function UpcomingEventsCoverflow({
               onClick={() => setActiveIdx(dotIdx)}
               aria-label={`Chuyển đến slide ${dotIdx + 1}`}
               className={`transition-all duration-300 rounded-full cursor-pointer ${isActive
-                  ? "w-6 h-1.5 bg-[#001B54] dark:bg-white shadow-xs"
-                  : "w-1.5 h-1.5 bg-slate-300 hover:bg-slate-400 dark:bg-slate-700 dark:hover:bg-slate-600"
+                ? "w-6 h-1.5 bg-[#001B54] dark:bg-white shadow-xs"
+                : "w-1.5 h-1.5 bg-slate-300 hover:bg-slate-400 dark:bg-slate-700 dark:hover:bg-slate-600"
                 }`}
             />
           );
@@ -1165,8 +1165,8 @@ function FeaturedUpcomingEventHero({
             type="button"
             onClick={() => setActiveIdx(i)}
             className={`transition-all duration-300 cursor-pointer ${i === activeIdx
-                ? "w-2.5 h-1 bg-[#003B95] rounded-[99px]"
-                : "size-1 bg-slate-300 dark:bg-slate-700 rounded-[99px] hover:bg-slate-400"
+              ? "w-2.5 h-1 bg-[#003B95] rounded-[99px]"
+              : "size-1 bg-slate-300 dark:bg-slate-700 rounded-[99px] hover:bg-slate-400"
               }`}
           />
         ))}
@@ -1322,257 +1322,257 @@ function EventsScreen() {
     };
   }, []);
 
-// Category & bookmark state
-const [eventCategory, setEventCategory] = useState<
-  "all" | "upcoming" | "free" | "paid" | "registered" | "bookmarked" | "history" | "b2b" | "gala" | "training" | "caravan" | "ban_thien_nguyen" | "ban_su_kien" | "ban_dao_tao" | "ban_b2b" | "ban_truyen_thong"
->("all");
-const [activityFilter, setActivityFilter] = useState<"all" | "b2b_connect" | "trainings" | "fixed_committee" | "extraordinary">("all");
-const [recapModalEvent, setRecapModalEvent] = useState<MyEvent | any | null>(null);
-const [eventsPage, setEventsPage] = useState(1);
-const EVENTS_PER_PAGE = 4;
-const [cancellingEvent, setCancellingEvent] = useState<MyEvent | null>(null);
-const [cancelReason, setCancelReason] = useState<string>("Có việc bận đột xuất");
+  // Category & bookmark state
+  const [eventCategory, setEventCategory] = useState<
+    "all" | "upcoming" | "free" | "paid" | "registered" | "bookmarked" | "history" | "b2b" | "gala" | "training" | "caravan" | "ban_thien_nguyen" | "ban_su_kien" | "ban_dao_tao" | "ban_b2b" | "ban_truyen_thong"
+  >("all");
+  const [activityFilter, setActivityFilter] = useState<"all" | "b2b_connect" | "trainings" | "fixed_committee" | "extraordinary">("all");
+  const [recapModalEvent, setRecapModalEvent] = useState<MyEvent | any | null>(null);
+  const [eventsPage, setEventsPage] = useState(1);
+  const EVENTS_PER_PAGE = 4;
+  const [cancellingEvent, setCancellingEvent] = useState<MyEvent | null>(null);
+  const [cancelReason, setCancelReason] = useState<string>("Có việc bận đột xuất");
 
-const [bookmarkedIds, setBookmarkedIds] = useState<Record<string, boolean>>(() => {
-  if (typeof window === "undefined") return {};
-  try {
-    return JSON.parse(localStorage.getItem("vba_bookmarked_events") || "{}");
-  } catch {
-    return {};
-  }
-});
-
-// Lịch sử sự kiện xem gần đây
-const [recentEventIds, setRecentEventIds] = useState<string[]>(() => {
-  if (typeof window === "undefined") return [];
-  try {
-    return JSON.parse(localStorage.getItem("vba_recent_viewed_events") || "[]");
-  } catch {
-    return [];
-  }
-});
-
-const toggleBookmark = (id: string) => {
-  setBookmarkedIds((prev) => {
-    const next = { ...prev, [id]: !prev[id] };
+  const [bookmarkedIds, setBookmarkedIds] = useState<Record<string, boolean>>(() => {
+    if (typeof window === "undefined") return {};
     try {
-      localStorage.setItem("vba_bookmarked_events", JSON.stringify(next));
-    } catch { }
-    if (next[id]) {
-      toast.success(isEn ? "Event bookmarked" : "Đã đánh dấu sự kiện");
-    } else {
-      toast.info(isEn ? "Bookmark removed" : "Đã bỏ đánh dấu sự kiện");
+      return JSON.parse(localStorage.getItem("vba_bookmarked_events") || "{}");
+    } catch {
+      return {};
     }
-    return next;
   });
-};
 
-const getEventPrice = (e: MyEvent | any) => {
-  if (!e) return 0;
-  const rawPrice = e.ticketPrice !== undefined && e.ticketPrice !== null
-    ? Number(e.ticketPrice)
-    : (e.fee !== undefined && e.fee !== null ? Number(e.fee) : 0);
-  return Number.isFinite(rawPrice) && rawPrice > 0 ? rawPrice : 0;
-};
-
-const isEventFree = (e: MyEvent | any) => {
-  return getEventPrice(e) <= 0;
-};
-
-// Modals state
-const [selectedEvent, setSelectedEvent] = useState<MyEvent | null>(null);
-
-const handleSelectEvent = (e: MyEvent) => {
-  setSelectedEvent(e);
-  setRecentEventIds((prev) => {
-    const updated = [e.id, ...prev.filter((id) => id !== e.id)].slice(0, 8);
+  // Lịch sử sự kiện xem gần đây
+  const [recentEventIds, setRecentEventIds] = useState<string[]>(() => {
+    if (typeof window === "undefined") return [];
     try {
-      localStorage.setItem("vba_recent_viewed_events", JSON.stringify(updated));
-    } catch { }
-    return updated;
+      return JSON.parse(localStorage.getItem("vba_recent_viewed_events") || "[]");
+    } catch {
+      return [];
+    }
   });
-};
 
-const [registeringEvent, setRegisteringEvent] = useState<MyEvent | null>(null);
-const [registeredSuccessInfo, setRegisteredSuccessInfo] = useState<{
-  eventTitle: string;
-  totalAmount: number;
-  invoiceNo: string;
-  ticketCount: number;
-  isFree?: boolean;
-  luckyNumber?: string;
-  seatAssignment?: string;
-  qrCodeUrl?: string;
-  phone?: string;
-  event?: MyEvent | null;
-} | null>(null);
-const [ticketPassModal, setTicketPassModal] = useState<{
-  eventTitle: string;
-  ticketCode: string;
-  luckyNumber: string;
-  ticketType: string;
-  ticketCount: number;
-  isFree: boolean;
-  date: string;
-  time: string;
-  location: string;
-  attendeeName: string;
-  attendeePhone?: string;
-  attendeeCompany?: string;
-  attendeePosition?: string;
-  qrUrl: string;
-} | null>(null);
-const [allTicketsModalOpen, setAllTicketsModalOpen] = useState(false);
+  const toggleBookmark = (id: string) => {
+    setBookmarkedIds((prev) => {
+      const next = { ...prev, [id]: !prev[id] };
+      try {
+        localStorage.setItem("vba_bookmarked_events", JSON.stringify(next));
+      } catch { }
+      if (next[id]) {
+        toast.success(isEn ? "Event bookmarked" : "Đã đánh dấu sự kiện");
+      } else {
+        toast.info(isEn ? "Bookmark removed" : "Đã bỏ đánh dấu sự kiện");
+      }
+      return next;
+    });
+  };
 
-// Form registration state
-const [formName, setFormName] = useState("");
-const [formPhone, setFormPhone] = useState("");
-const [formEmail, setFormEmail] = useState("");
-const [formCompany, setFormCompany] = useState("");
-const [formPosition, setFormPosition] = useState("");
-const [formTicketCount, setFormTicketCount] = useState<number | "">(1);
-const [formTicketType, setFormTicketType] = useState("Standard");
-const [formNote, setFormNote] = useState("");
-const [submittingReg, setSubmittingReg] = useState(false);
+  const getEventPrice = (e: MyEvent | any) => {
+    if (!e) return 0;
+    const rawPrice = e.ticketPrice !== undefined && e.ticketPrice !== null
+      ? Number(e.ticketPrice)
+      : (e.fee !== undefined && e.fee !== null ? Number(e.fee) : 0);
+    return Number.isFinite(rawPrice) && rawPrice > 0 ? rawPrice : 0;
+  };
 
-// Open registration modal with auto prefilled user profile
-function handleOpenRegister(e: MyEvent, evt?: React.MouseEvent) {
-  if (evt) evt.stopPropagation();
-  if (isEventFull(e)) {
-    toast.error("Sự kiện này đã đủ số lượng đại biểu đăng ký (Hết chỗ). Vui lòng liên hệ Ban Tổ Chức.");
-    return;
+  const isEventFree = (e: MyEvent | any) => {
+    return getEventPrice(e) <= 0;
+  };
+
+  // Modals state
+  const [selectedEvent, setSelectedEvent] = useState<MyEvent | null>(null);
+
+  const handleSelectEvent = (e: MyEvent) => {
+    setSelectedEvent(e);
+    setRecentEventIds((prev) => {
+      const updated = [e.id, ...prev.filter((id) => id !== e.id)].slice(0, 8);
+      try {
+        localStorage.setItem("vba_recent_viewed_events", JSON.stringify(updated));
+      } catch { }
+      return updated;
+    });
+  };
+
+  const [registeringEvent, setRegisteringEvent] = useState<MyEvent | null>(null);
+  const [registeredSuccessInfo, setRegisteredSuccessInfo] = useState<{
+    eventTitle: string;
+    totalAmount: number;
+    invoiceNo: string;
+    ticketCount: number;
+    isFree?: boolean;
+    luckyNumber?: string;
+    seatAssignment?: string;
+    qrCodeUrl?: string;
+    phone?: string;
+    event?: MyEvent | null;
+  } | null>(null);
+  const [ticketPassModal, setTicketPassModal] = useState<{
+    eventTitle: string;
+    ticketCode: string;
+    luckyNumber: string;
+    ticketType: string;
+    ticketCount: number;
+    isFree: boolean;
+    date: string;
+    time: string;
+    location: string;
+    attendeeName: string;
+    attendeePhone?: string;
+    attendeeCompany?: string;
+    attendeePosition?: string;
+    qrUrl: string;
+  } | null>(null);
+  const [allTicketsModalOpen, setAllTicketsModalOpen] = useState(false);
+
+  // Form registration state
+  const [formName, setFormName] = useState("");
+  const [formPhone, setFormPhone] = useState("");
+  const [formEmail, setFormEmail] = useState("");
+  const [formCompany, setFormCompany] = useState("");
+  const [formPosition, setFormPosition] = useState("");
+  const [formTicketCount, setFormTicketCount] = useState<number | "">(1);
+  const [formTicketType, setFormTicketType] = useState("Standard");
+  const [formNote, setFormNote] = useState("");
+  const [submittingReg, setSubmittingReg] = useState(false);
+
+  // Open registration modal with auto prefilled user profile
+  function handleOpenRegister(e: MyEvent, evt?: React.MouseEvent) {
+    if (evt) evt.stopPropagation();
+    if (isEventFull(e)) {
+      toast.error("Sự kiện này đã đủ số lượng đại biểu đăng ký (Hết chỗ). Vui lòng liên hệ Ban Tổ Chức.");
+      return;
+    }
+    setRegisteringEvent(e);
+    setFormName(member?.name || user?.name || user?.user_metadata?.full_name || "");
+    setFormEmail(member?.email || user?.email || "");
+    setFormPhone(member?.phone || (user?.username && /^\d+$/.test(user.username) ? user.username : ""));
+    setFormCompany((member as any)?.company || (member as any)?.companyName || (user?.user_metadata as any)?.company || "CLB Doanh Nhân CEO HN10");
+    setFormPosition(member?.title || (member as any)?.position || "Học viên CLB Doanh Nhân CEO HN10");
+    setFormTicketCount(1);
+    setFormTicketType("Standard");
+    setFormNote("");
   }
-  setRegisteringEvent(e);
-  setFormName(member?.name || user?.name || user?.user_metadata?.full_name || "");
-  setFormEmail(member?.email || user?.email || "");
-  setFormPhone(member?.phone || (user?.username && /^\d+$/.test(user.username) ? user.username : ""));
-  setFormCompany((member as any)?.company || (member as any)?.companyName || (user?.user_metadata as any)?.company || "CLB Doanh Nhân CEO HN10");
-  setFormPosition(member?.title || (member as any)?.position || "Hội viên CLB Doanh Nhân CEO HN10");
-  setFormTicketCount(1);
-  setFormTicketType("Standard");
-  setFormNote("");
-}
 
-// Lắng nghe URL Query Params khi quét mã QR hoặc click link từ Zalo OA / Email:
-// Ví dụ: /association/events?action=register&id=...&ticket=...&ref=qr_scan
-useEffect(() => {
-  if (typeof window === "undefined") return;
-  const params = new URLSearchParams(window.location.search);
-  const action = params.get("action");
-  const targetEventId = params.get("id") || params.get("eventId");
-  const ticketParam = params.get("ticket") || params.get("ticketCode") || params.get("regId");
-  const qrData = params.get("qrData");
+  // Lắng nghe URL Query Params khi quét mã QR hoặc click link từ Zalo OA / Email:
+  // Ví dụ: /association/events?action=register&id=...&ticket=...&ref=qr_scan
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    const action = params.get("action");
+    const targetEventId = params.get("id") || params.get("eventId");
+    const ticketParam = params.get("ticket") || params.get("ticketCode") || params.get("regId");
+    const qrData = params.get("qrData");
 
-  // Chỉ kích hoạt khi URL có tham số đăng ký, mã vé hoặc xem chi tiết sự kiện
-  if (action === "register" || action === "dang-ky" || targetEventId || ticketParam || qrData) {
-    const allEvs = serverEvents || [];
-    const matched = allEvs.find((ev) => ev.id === targetEventId) || allEvs[0];
+    // Chỉ kích hoạt khi URL có tham số đăng ký, mã vé hoặc xem chi tiết sự kiện
+    if (action === "register" || action === "dang-ky" || targetEventId || ticketParam || qrData) {
+      const allEvs = serverEvents || [];
+      const matched = allEvs.find((ev) => ev.id === targetEventId) || allEvs[0];
 
-    if (action === "ticket" && ticketParam) {
-      setTicketPassModal({
-        eventTitle: matched?.title || "Sự Kiện CLB Doanh Nhân CEO HN10",
-        ticketCode: ticketParam,
-        luckyNumber: "1983",
-        ticketType: "VIP Member Pass",
-        ticketCount: 1,
-        isFree: true,
-        date: matched?.date ? formatDisplayDate(matched.date) : "15/11/2026",
-        time: matched?.time || "08:30 - Thứ Bảy",
-        location: matched?.place || "Keangnam Landmark 72, Phạm Hùng, Hà Nội",
-        attendeeName: member?.name || user?.name || "Hội viên CEO HN10",
-        attendeePhone: member?.phone || "",
-        attendeeCompany: (member as any)?.companyName || "CLB Doanh Nhân CEO HN10",
-        attendeePosition: member?.title || "Hội viên chính thức",
-        qrUrl: `https://crm.ceohn10.viconnect.vn/api/events/qr?data=${encodeURIComponent(ticketParam)}`,
-      });
-    } else {
-      const evToOpen: MyEvent = matched || {
-        id: targetEventId || "gala-ceohn10-2026",
-        title: "Gala Doanh Nhân CEO HN10 & Kết Nối Giao Thương 2026",
-        description: "Sự kiện kết nối giao thương trọng điểm thường niên của CLB Doanh Nhân CEO HN10 (HanoiBA).",
-        date: new Date().toISOString(),
-        time: "08:30 - Thứ Bảy",
-        place: "Keangnam Landmark 72, Phạm Hùng, Hà Nội",
-        fee: 0,
-        ticketPrice: 0,
-        registered: false,
-        communityName: "CLB Doanh Nhân CEO HN10 (HanoiBA)",
-      } as any;
-
-      // Nếu rõ ràng có action đăng ký từ QR thì mới mở Form Đăng Ký
-      if (action === "register" || action === "dang-ky") {
-        handleOpenRegister(evToOpen);
-        toast.success(`Đã tự động mở Form Đăng Ký tham dự sự kiện "${evToOpen.title}"!`, {
-          icon: "🎟️",
-          duration: 4000,
+      if (action === "ticket" && ticketParam) {
+        setTicketPassModal({
+          eventTitle: matched?.title || "Sự Kiện CLB Doanh Nhân CEO HN10",
+          ticketCode: ticketParam,
+          luckyNumber: "1983",
+          ticketType: "VIP Member Pass",
+          ticketCount: 1,
+          isFree: true,
+          date: matched?.date ? formatDisplayDate(matched.date) : "15/11/2026",
+          time: matched?.time || "08:30 - Thứ Bảy",
+          location: matched?.place || "Keangnam Landmark 72, Phạm Hùng, Hà Nội",
+          attendeeName: member?.name || user?.name || "Học viên CEO HN10",
+          attendeePhone: member?.phone || "",
+          attendeeCompany: (member as any)?.companyName || "CLB Doanh Nhân CEO HN10",
+          attendeePosition: member?.title || "Học viên chính thức",
+          qrUrl: `https://crm.ceohn10.viconnect.vn/api/events/qr?data=${encodeURIComponent(ticketParam)}`,
         });
       } else {
-        // Ngược lại (bấm Xem Chi Tiết từ Banner Trang chủ hoặc liên kết sự kiện): Mở thẳng Popup Chi Tiết Sự Kiện
-        handleSelectEvent(evToOpen);
+        const evToOpen: MyEvent = matched || {
+          id: targetEventId || "gala-ceohn10-2026",
+          title: "Gala Doanh Nhân CEO HN10 & Kết Nối Giao Thương 2026",
+          description: "Sự kiện kết nối giao thương trọng điểm thường niên của CLB Doanh Nhân CEO HN10 (HanoiBA).",
+          date: new Date().toISOString(),
+          time: "08:30 - Thứ Bảy",
+          place: "Keangnam Landmark 72, Phạm Hùng, Hà Nội",
+          fee: 0,
+          ticketPrice: 0,
+          registered: false,
+          communityName: "CLB Doanh Nhân CEO HN10 (HanoiBA)",
+        } as any;
+
+        // Nếu rõ ràng có action đăng ký từ QR thì mới mở Form Đăng Ký
+        if (action === "register" || action === "dang-ky") {
+          handleOpenRegister(evToOpen);
+          toast.success(`Đã tự động mở Form Đăng Ký tham dự sự kiện "${evToOpen.title}"!`, {
+            icon: "🎟️",
+            duration: 4000,
+          });
+        } else {
+          // Ngược lại (bấm Xem Chi Tiết từ Banner Trang chủ hoặc liên kết sự kiện): Mở thẳng Popup Chi Tiết Sự Kiện
+          handleSelectEvent(evToOpen);
+        }
       }
     }
-  }
-}, [serverEvents]);
+  }, [serverEvents]);
 
-const isRegistered = (e: MyEvent) => {
-  if (localRegistered[e.id] !== undefined) return localRegistered[e.id];
-  return !!e.registered;
-};
+  const isRegistered = (e: MyEvent) => {
+    if (localRegistered[e.id] !== undefined) return localRegistered[e.id];
+    return !!e.registered;
+  };
 
-const events = serverEvents || [];
-const upcomingEvents = events.filter((e) => !isEventPast(e));
-const pastEvents = events.filter((e) => isEventPast(e));
+  const events = serverEvents || [];
+  const upcomingEvents = events.filter((e) => !isEventPast(e));
+  const pastEvents = events.filter((e) => isEventPast(e));
 
-const freeEvents = upcomingEvents.filter((e) => isEventFree(e));
-const paidEvents = upcomingEvents.filter((e) => !isEventFree(e));
-const registeredEvents = events.filter((e) => isRegistered(e));
-const bookmarkedEventsList = events.filter((e) => !!bookmarkedIds[e.id]);
+  const freeEvents = upcomingEvents.filter((e) => isEventFree(e));
+  const paidEvents = upcomingEvents.filter((e) => !isEventFree(e));
+  const registeredEvents = events.filter((e) => isRegistered(e));
+  const bookmarkedEventsList = events.filter((e) => !!bookmarkedIds[e.id]);
 
-const filteredEvents = useMemo(() => {
-  const allList = events;
-  switch (eventCategory) {
-    case "all":
-      return allList;
-    case "upcoming":
-      return upcomingEvents;
-    case "free":
-      return freeEvents;
-    case "paid":
-      return paidEvents;
-    case "registered":
-      return registeredEvents;
-    case "bookmarked":
-      return bookmarkedEventsList;
-    case "history":
-      return pastEvents;
-    case "b2b":
-      return allList.filter((e: any) => ((e.category || e.type || "").toLowerCase().includes("giao thương") || (e.category || e.type || "").toLowerCase().includes("b2b")));
-    case "gala":
-      return allList.filter((e: any) => ((e.category || e.type || "").toLowerCase().includes("gala") || (e.category || e.type || "").toLowerCase().includes("đại hội")));
-    case "training":
-      return allList.filter((e: any) => ((e.category || e.type || "").toLowerCase().includes("đào tạo") || (e.category || e.type || "").toLowerCase().includes("tọa đàm") || (e.category || e.type || "").toLowerCase().includes("workshop")));
-    case "caravan":
-      return allList.filter((e: any) => ((e.category || e.type || "").toLowerCase().includes("caravan") || (e.category || e.type || "").toLowerCase().includes("xúc tiến")));
-    case "ban_thien_nguyen":
-      return allList.filter((e: any) => (e.department === "ban_thien_nguyen" || (e.description || e.name || "").toLowerCase().includes("thiện nguyện") || (e.description || e.name || "").toLowerCase().includes("từ thiện")));
-    case "ban_su_kien":
-      return allList.filter((e: any) => (!e.department || e.department === "ban_su_kien"));
-    case "ban_dao_tao":
-      return allList.filter((e: any) => (e.department === "ban_dao_tao" || (e.category || e.type || "").toLowerCase().includes("đào tạo")));
-    case "ban_b2b":
-      return allList.filter((e: any) => (e.department === "ban_b2b" || (e.category || e.type || "").toLowerCase().includes("b2b") || (e.category || e.type || "").toLowerCase().includes("giao thương")));
-    case "ban_truyen_thong":
-      return allList.filter((e: any) => (e.department === "ban_truyen_thong"));
-    default:
-      return allList;
-  }
-}, [eventCategory, events, freeEvents, paidEvents, registeredEvents, bookmarkedEventsList, pastEvents, upcomingEvents]);
+  const filteredEvents = useMemo(() => {
+    const allList = events;
+    switch (eventCategory) {
+      case "all":
+        return allList;
+      case "upcoming":
+        return upcomingEvents;
+      case "free":
+        return freeEvents;
+      case "paid":
+        return paidEvents;
+      case "registered":
+        return registeredEvents;
+      case "bookmarked":
+        return bookmarkedEventsList;
+      case "history":
+        return pastEvents;
+      case "b2b":
+        return allList.filter((e: any) => ((e.category || e.type || "").toLowerCase().includes("giao thương") || (e.category || e.type || "").toLowerCase().includes("b2b")));
+      case "gala":
+        return allList.filter((e: any) => ((e.category || e.type || "").toLowerCase().includes("gala") || (e.category || e.type || "").toLowerCase().includes("đại hội")));
+      case "training":
+        return allList.filter((e: any) => ((e.category || e.type || "").toLowerCase().includes("đào tạo") || (e.category || e.type || "").toLowerCase().includes("tọa đàm") || (e.category || e.type || "").toLowerCase().includes("workshop")));
+      case "caravan":
+        return allList.filter((e: any) => ((e.category || e.type || "").toLowerCase().includes("caravan") || (e.category || e.type || "").toLowerCase().includes("xúc tiến")));
+      case "ban_thien_nguyen":
+        return allList.filter((e: any) => (e.department === "ban_thien_nguyen" || (e.description || e.name || "").toLowerCase().includes("thiện nguyện") || (e.description || e.name || "").toLowerCase().includes("từ thiện")));
+      case "ban_su_kien":
+        return allList.filter((e: any) => (!e.department || e.department === "ban_su_kien"));
+      case "ban_dao_tao":
+        return allList.filter((e: any) => (e.department === "ban_dao_tao" || (e.category || e.type || "").toLowerCase().includes("đào tạo")));
+      case "ban_b2b":
+        return allList.filter((e: any) => (e.department === "ban_b2b" || (e.category || e.type || "").toLowerCase().includes("b2b") || (e.category || e.type || "").toLowerCase().includes("giao thương")));
+      case "ban_truyen_thong":
+        return allList.filter((e: any) => (e.department === "ban_truyen_thong"));
+      default:
+        return allList;
+    }
+  }, [eventCategory, events, freeEvents, paidEvents, registeredEvents, bookmarkedEventsList, pastEvents, upcomingEvents]);
 
   const mappedB2bItems = useMemo(() => {
     return b2bConnections
       .filter((b: any) => b.status === "confirmed" || b.status === "accepted")
       .map((b: any, idx: number) => {
-        const partnerName = b.partner_name || b.partnerName || b.partner?.name || b.receiver?.name || "Hội viên Doanh nhân";
+        const partnerName = b.partner_name || b.partnerName || b.partner?.name || b.receiver?.name || "Học viên Doanh nhân";
         const partnerComp = b.partner_company || b.partnerCompany || b.partner?.company_name || b.receiver?.company || "Doanh nghiệp CEO HN10";
         const myName = member?.name || user?.name || "Bạn";
         return {
@@ -1765,7 +1765,7 @@ const filteredEvents = useMemo(() => {
           };
           localStorage.setItem("vba_recent_activities", JSON.stringify([newAct, ...existingActivities]));
 
-          // Tự động lưu vào Lịch hội viên & Bật báo thức nhắc lịch
+          // Tự động lưu vào Lịch Học viên & Bật báo thức nhắc lịch
           saveCalendarItem({
             id: `ev-${eventId}`,
             sourceType: "event",
@@ -1862,7 +1862,7 @@ const filteredEvents = useMemo(() => {
           };
           localStorage.setItem("vba_recent_activities", JSON.stringify([newAct, ...existingActivities]));
 
-          // Tự động lưu vào Lịch hội viên & Bật báo thức nhắc lịch
+          // Tự động lưu vào Lịch Học viên & Bật báo thức nhắc lịch
           saveCalendarItem({
             id: `ev-${eventId}`,
             sourceType: "event",
@@ -2057,8 +2057,8 @@ const filteredEvents = useMemo(() => {
               >
                 <div className="self-stretch py-3 relative flex flex-col justify-center items-center gap-2.5 overflow-hidden">
                   <div className={`text-base font-['Inter'] leading-5 transition-colors ${mainTab === "events"
-                      ? "text-[#003B95] dark:text-blue-400 font-semibold"
-                      : "text-slate-600 dark:text-slate-400 font-normal hover:text-slate-900 dark:hover:text-white"
+                    ? "text-[#003B95] dark:text-blue-400 font-semibold"
+                    : "text-slate-600 dark:text-slate-400 font-normal hover:text-slate-900 dark:hover:text-white"
                     }`}>
                     Sự kiện
                   </div>
@@ -2076,8 +2076,8 @@ const filteredEvents = useMemo(() => {
               >
                 <div className="self-stretch py-3 relative flex flex-col justify-center items-center gap-2.5 overflow-hidden">
                   <div className={`text-base font-['Inter'] leading-5 transition-colors ${mainTab === "meetings"
-                      ? "text-[#003B95] dark:text-blue-400 font-semibold"
-                      : "text-slate-600 dark:text-slate-400 font-normal hover:text-slate-900 dark:hover:text-white"
+                    ? "text-[#003B95] dark:text-blue-400 font-semibold"
+                    : "text-slate-600 dark:text-slate-400 font-normal hover:text-slate-900 dark:hover:text-white"
                     }`}>
                     Hoạt động
                   </div>
@@ -2173,8 +2173,8 @@ const filteredEvents = useMemo(() => {
                   type="button"
                   onClick={() => setEventCategory("all")}
                   className={`px-3 py-1.5 rounded-full border flex justify-center items-center gap-1.5 text-xs font-semibold cursor-pointer transition shrink-0 ${eventCategory === "all"
-                      ? "bg-[#003B95] border-[#003B95] text-white shadow-xs"
-                      : "border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50"
+                    ? "bg-[#003B95] border-[#003B95] text-white shadow-xs"
+                    : "border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50"
                     }`}
                 >
                   <span>Tất cả</span>
@@ -2189,8 +2189,8 @@ const filteredEvents = useMemo(() => {
                   type="button"
                   onClick={() => setEventCategory("upcoming")}
                   className={`px-3 py-1.5 rounded-full border flex justify-center items-center gap-1.5 text-xs font-medium cursor-pointer transition shrink-0 ${eventCategory === "upcoming"
-                      ? "bg-[#003B95] border-[#003B95] text-white shadow-xs font-semibold"
-                      : "border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50"
+                    ? "bg-[#003B95] border-[#003B95] text-white shadow-xs font-semibold"
+                    : "border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50"
                     }`}
                 >
                   <span>Sắp diễn ra</span>
@@ -2207,8 +2207,8 @@ const filteredEvents = useMemo(() => {
                   type="button"
                   onClick={() => setEventCategory("registered")}
                   className={`px-3 py-1.5 rounded-full border flex justify-center items-center gap-1.5 text-xs font-medium cursor-pointer transition shrink-0 ${eventCategory === "registered"
-                      ? "bg-[#003B95] border-[#003B95] text-white shadow-xs font-semibold"
-                      : "border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50"
+                    ? "bg-[#003B95] border-[#003B95] text-white shadow-xs font-semibold"
+                    : "border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50"
                     }`}
                 >
                   <span>Đã đăng ký</span>
@@ -2223,8 +2223,8 @@ const filteredEvents = useMemo(() => {
                   type="button"
                   onClick={() => setEventCategory("free")}
                   className={`px-3 py-1.5 rounded-full border flex justify-center items-center gap-1.5 text-xs font-medium cursor-pointer transition shrink-0 ${eventCategory === "free"
-                      ? "bg-[#003B95] border-[#003B95] text-white shadow-xs font-semibold"
-                      : "border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50"
+                    ? "bg-[#003B95] border-[#003B95] text-white shadow-xs font-semibold"
+                    : "border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50"
                     }`}
                 >
                   <span>Miễn phí</span>
@@ -2239,8 +2239,8 @@ const filteredEvents = useMemo(() => {
                   type="button"
                   onClick={() => setEventCategory("paid")}
                   className={`px-3 py-1.5 rounded-full border flex justify-center items-center gap-1.5 text-xs font-medium cursor-pointer transition shrink-0 ${eventCategory === "paid"
-                      ? "bg-[#003B95] border-[#003B95] text-white shadow-xs font-semibold"
-                      : "border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50"
+                    ? "bg-[#003B95] border-[#003B95] text-white shadow-xs font-semibold"
+                    : "border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50"
                     }`}
                 >
                   <span>Có phí</span>
@@ -2255,8 +2255,8 @@ const filteredEvents = useMemo(() => {
                   type="button"
                   onClick={() => setEventCategory("history")}
                   className={`px-3 py-1.5 rounded-full border flex justify-center items-center gap-1.5 text-xs font-medium cursor-pointer transition shrink-0 ${eventCategory === "history"
-                      ? "bg-[#003B95] border-[#003B95] text-white shadow-xs font-semibold"
-                      : "border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50"
+                    ? "bg-[#003B95] border-[#003B95] text-white shadow-xs font-semibold"
+                    : "border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50"
                     }`}
                 >
                   <span>Lịch sử</span>
@@ -2271,8 +2271,8 @@ const filteredEvents = useMemo(() => {
                   type="button"
                   onClick={() => setEventCategory("ban_thien_nguyen")}
                   className={`px-3 py-1.5 rounded-full border flex justify-center items-center gap-1.5 text-xs font-medium cursor-pointer transition shrink-0 ${eventCategory === "ban_thien_nguyen"
-                      ? "bg-teal-700 border-teal-700 text-white shadow-xs font-semibold"
-                      : "border-teal-200 dark:border-teal-800 text-teal-800 dark:text-teal-300 bg-teal-50/50 hover:bg-teal-100/50"
+                    ? "bg-teal-700 border-teal-700 text-white shadow-xs font-semibold"
+                    : "border-teal-200 dark:border-teal-800 text-teal-800 dark:text-teal-300 bg-teal-50/50 hover:bg-teal-100/50"
                     }`}
                 >
                   <span>🤝 Ban Thiện Nguyện</span>
@@ -2283,8 +2283,8 @@ const filteredEvents = useMemo(() => {
                   type="button"
                   onClick={() => setEventCategory("ban_su_kien")}
                   className={`px-3 py-1.5 rounded-full border flex justify-center items-center gap-1.5 text-xs font-medium cursor-pointer transition shrink-0 ${eventCategory === "ban_su_kien"
-                      ? "bg-rose-700 border-rose-700 text-white shadow-xs font-semibold"
-                      : "border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-300 bg-rose-50/50 hover:bg-rose-100/50"
+                    ? "bg-rose-700 border-rose-700 text-white shadow-xs font-semibold"
+                    : "border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-300 bg-rose-50/50 hover:bg-rose-100/50"
                     }`}
                 >
                   <span>🎉 Ban Sự Kiện</span>
@@ -2295,8 +2295,8 @@ const filteredEvents = useMemo(() => {
                   type="button"
                   onClick={() => setEventCategory("ban_dao_tao")}
                   className={`px-3 py-1.5 rounded-full border flex justify-center items-center gap-1.5 text-xs font-medium cursor-pointer transition shrink-0 ${eventCategory === "ban_dao_tao"
-                      ? "bg-blue-700 border-blue-700 text-white shadow-xs font-semibold"
-                      : "border-blue-200 dark:border-blue-800 text-blue-800 dark:text-blue-300 bg-blue-50/50 hover:bg-blue-100/50"
+                    ? "bg-blue-700 border-blue-700 text-white shadow-xs font-semibold"
+                    : "border-blue-200 dark:border-blue-800 text-blue-800 dark:text-blue-300 bg-blue-50/50 hover:bg-blue-100/50"
                     }`}
                 >
                   <span>🎓 Ban Đào Tạo</span>
@@ -2307,8 +2307,8 @@ const filteredEvents = useMemo(() => {
                   type="button"
                   onClick={() => setEventCategory("ban_b2b")}
                   className={`px-3 py-1.5 rounded-full border flex justify-center items-center gap-1.5 text-xs font-medium cursor-pointer transition shrink-0 ${eventCategory === "ban_b2b"
-                      ? "bg-amber-700 border-amber-700 text-white shadow-xs font-semibold"
-                      : "border-amber-200 dark:border-amber-800 text-amber-800 dark:text-amber-300 bg-amber-50/50 hover:bg-amber-100/50"
+                    ? "bg-amber-700 border-amber-700 text-white shadow-xs font-semibold"
+                    : "border-amber-200 dark:border-amber-800 text-amber-800 dark:text-amber-300 bg-amber-50/50 hover:bg-amber-100/50"
                     }`}
                 >
                   <span>💼 Ban B2B</span>
@@ -2444,8 +2444,8 @@ const filteredEvents = useMemo(() => {
 
                       <div className="self-stretch pt-3 border-t border-slate-100 dark:border-slate-800 inline-flex justify-between items-center">
                         <div className={`px-3 py-1.5 rounded-full flex justify-start items-center gap-1.5 ${isFree
-                            ? "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400"
-                            : "bg-orange-50 dark:bg-orange-950/40 text-orange-700 dark:text-orange-400"
+                          ? "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400"
+                          : "bg-orange-50 dark:bg-orange-950/40 text-orange-700 dark:text-orange-400"
                           }`}>
                           <span className="text-xs font-semibold font-['Inter'] leading-4">
                             {statusText}
@@ -2459,8 +2459,8 @@ const filteredEvents = useMemo(() => {
                             handleSelectEvent(e);
                           }}
                           className={`px-3 py-1.5 rounded-lg border flex justify-start items-center gap-1.5 text-sm font-semibold font-['Inter'] leading-5 active:scale-95 transition cursor-pointer shadow-xs ${registered
-                              ? "bg-emerald-600 border-emerald-600 text-white"
-                              : "bg-[#003B95] hover:bg-[#002B70] border-[#003B95] text-white"
+                            ? "bg-emerald-600 border-emerald-600 text-white"
+                            : "bg-[#003B95] hover:bg-[#002B70] border-[#003B95] text-white"
                             }`}
                         >
                           <span>{registered ? "Đã đăng ký (Xem chi tiết)" : "Xem chi tiết"}</span>
@@ -2566,8 +2566,8 @@ const filteredEvents = useMemo(() => {
                 type="button"
                 onClick={() => setActivityFilter("all")}
                 className={`px-3 py-1.5 rounded-full border flex justify-center items-center gap-1.5 text-xs font-semibold cursor-pointer transition shrink-0 ${activityFilter === "all"
-                    ? "bg-[#003B95] border-[#003B95] text-white shadow-xs"
-                    : "border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50"
+                  ? "bg-[#003B95] border-[#003B95] text-white shadow-xs"
+                  : "border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50"
                   }`}
               >
                 <span>Tất cả</span>
@@ -2582,8 +2582,8 @@ const filteredEvents = useMemo(() => {
                 type="button"
                 onClick={() => setActivityFilter("b2b_connect")}
                 className={`px-3 py-1.5 rounded-full border flex justify-center items-center gap-1.5 text-xs font-medium cursor-pointer transition shrink-0 ${activityFilter === "b2b_connect"
-                    ? "bg-[#003B95] border-[#003B95] text-white shadow-xs font-semibold"
-                    : "border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50"
+                  ? "bg-[#003B95] border-[#003B95] text-white shadow-xs font-semibold"
+                  : "border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50"
                   }`}
               >
                 <Handshake className="size-3.5" />
@@ -2599,8 +2599,8 @@ const filteredEvents = useMemo(() => {
                 type="button"
                 onClick={() => setActivityFilter("trainings")}
                 className={`px-3 py-1.5 rounded-full border flex justify-center items-center gap-1.5 text-xs font-medium cursor-pointer transition shrink-0 ${activityFilter === "trainings"
-                    ? "bg-[#003B95] border-[#003B95] text-white shadow-xs font-semibold"
-                    : "border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50"
+                  ? "bg-[#003B95] border-[#003B95] text-white shadow-xs font-semibold"
+                  : "border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50"
                   }`}
               >
                 <GraduationCap className="size-3.5" />
@@ -2616,8 +2616,8 @@ const filteredEvents = useMemo(() => {
                 type="button"
                 onClick={() => setActivityFilter("fixed_committee")}
                 className={`px-3 py-1.5 rounded-full border flex justify-center items-center gap-1.5 text-xs font-medium cursor-pointer transition shrink-0 ${activityFilter === "fixed_committee"
-                    ? "bg-[#003B95] border-[#003B95] text-white shadow-xs font-semibold"
-                    : "border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50"
+                  ? "bg-[#003B95] border-[#003B95] text-white shadow-xs font-semibold"
+                  : "border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50"
                   }`}
               >
                 <span>Họp ban định kỳ</span>
@@ -2632,8 +2632,8 @@ const filteredEvents = useMemo(() => {
                 type="button"
                 onClick={() => setActivityFilter("extraordinary")}
                 className={`px-3 py-1.5 rounded-full border flex justify-center items-center gap-1.5 text-xs font-medium cursor-pointer transition shrink-0 ${activityFilter === "extraordinary"
-                    ? "bg-[#003B95] border-[#003B95] text-white shadow-xs font-semibold"
-                    : "border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50"
+                  ? "bg-[#003B95] border-[#003B95] text-white shadow-xs font-semibold"
+                  : "border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50"
                   }`}
               >
                 <span>Họp bất thường/ Đột xuất</span>
@@ -2694,12 +2694,12 @@ const filteredEvents = useMemo(() => {
                       <div className="self-stretch inline-flex justify-between items-center gap-2 flex-wrap">
                         <div className="inline-flex items-center gap-1.5">
                           <div className={`px-2 py-0.5 rounded-full flex justify-start items-center gap-1 ${isB2bConnect
-                              ? "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60"
-                              : isTrainingCourse
-                                ? "bg-blue-50 text-[#003B95] border border-blue-200"
-                                : isOnline
-                                  ? "bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300"
-                                  : "bg-orange-50 dark:bg-orange-950/40 text-orange-700 dark:text-orange-300"
+                            ? "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60"
+                            : isTrainingCourse
+                              ? "bg-blue-50 text-[#003B95] border border-blue-200"
+                              : isOnline
+                                ? "bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300"
+                                : "bg-orange-50 dark:bg-orange-950/40 text-orange-700 dark:text-orange-300"
                             }`}>
                             {isB2bConnect ? (
                               <Handshake className="size-3 shrink-0" />
@@ -2743,7 +2743,7 @@ const filteredEvents = useMemo(() => {
 
                       {isTrainingCourse && m.instructor && (
                         <div className="self-stretch text-xs text-slate-600 dark:text-slate-300 flex items-center gap-1.5 font-medium">
-                          <GraduationCap className="size-3.5 text-purple-600 shrink-0" />
+                          <GraduationCap className="size-3.5 text-slate-700 dark:text-slate-300 shrink-0" />
                           <span className="truncate">Giảng viên: <strong className="text-slate-900 dark:text-white">{m.instructor}</strong> • {m.instructorCompany || "Ban Đào Tạo"}</span>
                         </div>
                       )}
@@ -2808,7 +2808,7 @@ const filteredEvents = useMemo(() => {
             <div className="self-stretch pt-2 pb-8 flex flex-col justify-start items-center">
               <div className="inline-flex justify-center items-center gap-1.5 text-slate-400 text-xs font-normal font-['Inter'] leading-4 max-w-sm text-center">
                 <img src="/icons/activities/user-circle-02.svg" className="size-3.5 shrink-0 opacity-60" alt="convener" />
-                <span>Triệu tập bởi Chủ tịch CLB · Thành phần: Hội viên được triệu tập</span>
+                <span>Triệu tập bởi Chủ tịch CLB · Thành phần: Học viên được triệu tập</span>
               </div>
             </div>
           </div>
@@ -2876,10 +2876,10 @@ const filteredEvents = useMemo(() => {
         onViewPass={(e) => {
           const invNo = String(e.regId || e.ticketCode || e.id);
           const isFree = isEventFree(e);
-          const attendeeName = member?.name || user?.name || "Hội viên CEO HN10";
+          const attendeeName = member?.name || user?.name || "Học viên CEO HN10";
           const attendeePhone = member?.phone || "";
           const attendeeCompany = (member as any)?.companyName || "CLB Doanh Nhân CEO HN10";
-          const attendeePosition = member?.title || "Hội viên chính thức";
+          const attendeePosition = member?.title || "Học viên chính thức";
           const ticketQr = makeTicketQrUrl({
             ticketCode: invNo,
             attendeeName,
@@ -2945,10 +2945,10 @@ const filteredEvents = useMemo(() => {
         onClose={() => setRegisteredSuccessInfo(null)}
         onViewPass={(info) => {
           setRegisteredSuccessInfo(null);
-          const attendeeName = member?.name || user?.name || "Hội viên CEO HN10";
+          const attendeeName = member?.name || user?.name || "Học viên CEO HN10";
           const attendeePhone = member?.phone || "";
           const attendeeCompany = (member as any)?.companyName || "CLB Doanh Nhân CEO HN10";
-          const attendeePosition = member?.title || "Hội viên chính thức";
+          const attendeePosition = member?.title || "Học viên chính thức";
           const ticketQr = makeTicketQrUrl({
             ticketCode: info.invoiceNo,
             attendeeName,
@@ -3033,8 +3033,8 @@ const filteredEvents = useMemo(() => {
                   <label
                     key={reason}
                     className={`flex items-center gap-2.5 p-2.5 rounded-lg border text-xs cursor-pointer transition-all ${cancelReason === reason
-                        ? "bg-slate-100 border-[#1F3864] text-[#1F3864] font-medium"
-                        : "bg-slate-50/50 border-slate-200 text-slate-700 hover:bg-slate-50"
+                      ? "bg-slate-100 border-[#1F3864] text-[#1F3864] font-medium"
+                      : "bg-slate-50/50 border-slate-200 text-slate-700 hover:bg-slate-50"
                       }`}
                   >
                     <input

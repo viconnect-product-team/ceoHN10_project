@@ -412,7 +412,7 @@ function generateVioneMasterHtml() {
     <div class="chapter" id="c4">
       <div class="chap-header">
         <div class="num">04</div>
-        <h2>Quản Lý Mạng Lưới Đối Tác Doanh Nghiệp & Hội Viên</h2>
+        <h2>Quản Lý Mạng Lưới Đối Tác Doanh Nghiệp & Học viên</h2>
       </div>
       <div class="meta-box">
         <div class="k">Đường dẫn</div><div class="v"><code>/members</code></div>
@@ -757,7 +757,7 @@ async function buildVioneMasterUserGuidePdf() {
   console.log('=== BẮT ĐẦU XUẤT BẢN TÀI LIỆU HDSD VIONE MASTER (HTML & PDF) ===\n');
 
   const htmlContent = generateVioneMasterHtml();
-  
+
   // 1. Lưu file HTML
   const htmlPath1 = path.join(VIONE_DOC_DIR, 'HDSD_HE_THONG_VIONE_TOAN_DIEN.html');
   const htmlPath2 = path.join(VIONE_DOC_DIR, 'HDSD_HE_THONG_VIONE_CONNECT_TOAN_DIEN.html');

@@ -633,7 +633,7 @@ async function buildBRD() {
         createCallout(
           'PHÂN ĐỊNH THẨM QUYỀN TUYỆT ĐỐI GIỮA BTK VÀ BTV',
           [
-            'Ban Thư Ký TUYỆT ĐỐI KHÔNG CÓ THẨM QUYỀN PHÊ DUYỆT HỘI VIÊN MỚI.',
+            'Ban Thư Ký TUYỆT ĐỐI KHÔNG CÓ THẨM QUYỀN PHÊ DUYỆT Học viên MỚI.',
             'Thẩm quyền này thuộc về ĐỘC QUYỀN Ban Thành Viên (BTV) hoặc Ban Quản Trị tối cao.',
             'Mọi nỗ lực can thiệp sẽ bị hệ thống API chặn đứng bằng mã lỗi HTTP 403 Forbidden.',
           ],
@@ -655,7 +655,7 @@ async function buildBRD() {
     '*Quy ước ma trận: R (Responsible - Người thực thi); A (Accountable - Người chịu trách nhiệm & phê duyệt); C (Consulted - Người tham vấn); I (Informed - Người nhận thông tin).*\n'
   );
 
-  const raciHeaders = ['Mã', 'Quy Trình Nghiệp Vụ Cốt Lõi', 'BQT', 'BTV', 'BTK', 'Tài Chính', 'Truyền Thông', 'Xúc Tiến', 'Hội Viên'];
+  const raciHeaders = ['Mã', 'Quy Trình Nghiệp Vụ Cốt Lõi', 'BQT', 'BTV', 'BTK', 'Tài Chính', 'Truyền Thông', 'Xúc Tiến', 'Học viên'];
   const raciRows = BRD_DATA.raciMatrix.processes.map((p) => [
     p.id,
     p.name,
@@ -814,7 +814,7 @@ async function generateSrsDocument({ title, subTitle, docCode, useCases, targetF
   children.push(createHeading2('1.2. Phạm Vi Tài Liệu (Document Scope)'));
   addMd('### 1.2. Phạm Vi Tài Liệu (Document Scope)');
   const scopeText =
-    `Tài liệu này bao gồm đặc tả chi tiết của ${useCases.length} trường hợp sử dụng (Use Cases) tương ứng với phạm vi chức năng bàn giao, áp dụng nguyên tắc MECE (Mutually Exclusive, Collectively Exhaustive) để tuyệt đối không trùng lặp và không bỏ sót bất kỳ luồng tác nghiệp nào của Hội đồng Điều hành và Hội viên CLB Doanh Nhân CEO HN10.`;
+    `Tài liệu này bao gồm đặc tả chi tiết của ${useCases.length} trường hợp sử dụng (Use Cases) tương ứng với phạm vi chức năng bàn giao, áp dụng nguyên tắc MECE (Mutually Exclusive, Collectively Exhaustive) để tuyệt đối không trùng lặp và không bỏ sót bất kỳ luồng tác nghiệp nào của Hội đồng Điều hành và Học viên CLB Doanh Nhân CEO HN10.`;
   children.push(createPara(scopeText));
   addMd(scopeText);
 
@@ -826,7 +826,7 @@ async function generateSrsDocument({ title, subTitle, docCode, useCases, targetF
     ['CLB CEO HN10', 'CEO HN10 Business Club', 'Câu lạc bộ các nhà lãnh đạo doanh nghiệp sinh năm 1983 (Quý Hợi).'],
     ['BQT', 'Board of Management', 'Ban Quản Trị CLB Doanh Nhân CEO HN10.'],
     ['BTK', 'Secretariat Committee', 'Ban Thư Ký CLB, cơ quan điều hành hành chính văn phòng.'],
-    ['BTV', 'Membership Committee', 'Ban Thành Viên, cơ quan độc quyền thẩm định và duyệt kết nạp hội viên.'],
+    ['BTV', 'Membership Committee', 'Ban Thành Viên, cơ quan độc quyền thẩm định và duyệt kết nạp Học viên.'],
     ['BTN', 'Charity Committee', 'Ban Thiện Nguyện & An Sinh Xã Hội.'],
     ['BTT', 'Media & Event Committee', 'Ban Truyền Thông & Sự Kiện.'],
     ['BXT', 'Trade Promotion Committee', 'Ban Xúc Tiến Thương Mại & Đầu Tư.'],
@@ -965,7 +965,7 @@ async function generateSrsDocument({ title, subTitle, docCode, useCases, targetF
         'Mã hóa đường truyền dữ liệu 100% bằng HTTPS TLS 1.3 và WSS.',
         'Mật khẩu người dùng được băm an toàn bằng thuật toán Bcrypt với Salt 10 vòng.',
         'Tự động khóa tài khoản tạm thời trong 15 phút nếu nhập sai mật khẩu quá 5 lần.',
-        'Phân quyền theo vai trò RBAC 5 cấp bậc nghiêm ngặt kết hợp chặn cứng quyền duyệt hội viên của Ban Thư Ký.',
+        'Phân quyền theo vai trò RBAC 5 cấp bậc nghiêm ngặt kết hợp chặn cứng quyền duyệt Học viên của Ban Thư Ký.',
       ],
     },
     {
@@ -998,7 +998,7 @@ async function generateSrsDocument({ title, subTitle, docCode, useCases, targetF
     '  - Chip NFC tần số 13.56MHz tương thích chuẩn ISO/IEC 14443 Type A.\n' +
     '  - Chạm mặt sau thẻ vào smartphone để mở liên kết công khai `/card/:slug`.\n' +
     '* Kiến Trúc Cơ Sở Dữ Liệu PostgreSQL (Prisma ORM):\n' +
-    '  - Bảng hội viên: `members` (liên kết `vione_users` qua `user_id`).\n' +
+    '  - Bảng Học viên: `members` (liên kết `vione_users` qua `user_id`).\n' +
     '  - Bảng danh thiếp số: `member_business_cards` (chứa slug, branding, liên kết mạng xã hội).\n' +
     '  - Bảng sự kiện: `events`, `event_ticket_types`, `event_registrations`, `member_checkins`.\n' +
     '  - Bảng tài chính & hội phí: `invoices`, `associations`.\n' +
@@ -1101,11 +1101,11 @@ async function buildSRS() {
     ],
   });
 
-  // 3. TÀI LIỆU SRS_02_App_Hiep_Hoi_CEOHN10 (CHUYÊN BIỆT CHO MOBILE APP HỘI VIÊN - 20 USE CASES)
-  console.log('>>> [3/3] Xuất bản SRS_02_App_Hiep_Hoi_CEOHN10 (Ứng dụng di động hội viên & PWA)...');
+  // 3. TÀI LIỆU SRS_02_App_Hiep_Hoi_CEOHN10 (CHUYÊN BIỆT CHO MOBILE APP Học viên - 20 USE CASES)
+  console.log('>>> [3/3] Xuất bản SRS_02_App_Hiep_Hoi_CEOHN10 (Ứng dụng di động Học viên & PWA)...');
   const appUseCases = ALL_USE_CASES_DETAILED.filter((uc) => uc.ucId.startsWith('UC-APP-'));
   await generateSrsDocument({
-    title: 'TÀI LIỆU ĐẶC TẢ YÊU CẦU PHẦN MỀM (SRS) — PHÂN HỆ ỨNG DỤNG DI ĐỘNG HỘI VIÊN & PWA',
+    title: 'TÀI LIỆU ĐẶC TẢ YÊU CẦU PHẦN MỀM (SRS) — PHÂN HỆ ỨNG DỤNG DI ĐỘNG Học viên & PWA',
     subTitle: 'HỆ SINH THÁI SỐ HÓA HIỆP HỘI DOANH NHÂN CEO HN10 (HANOIBA)',
     docCode: 'SRS-02-APP-CEO HN10-2026',
     useCases: appUseCases,
@@ -1408,7 +1408,7 @@ async function buildHDSD() {
       <h1>HƯỚNG DẪN SỬ DỤNG & ĐÀO TẠO CHUYỂN GIAO VẬN HÀNH</h1>
       <h2>Hệ Sinh Thái Số Hóa Quản Trị Hiệp Hội & Ứng Dụng Doanh Nhân CEO HN10</h2>
       <p style="text-align:center; color:#64748b; margin-top:20px; font-size:11pt;">
-        Chuẩn Mực Vận Hành 6 Ban Chuyên Môn & 500+ Hội Viên Chính Danh
+        Chuẩn Mực Vận Hành 6 Ban Chuyên Môn & 500+ Học viên Chính Danh
       </p>
     </div>
 
@@ -1448,13 +1448,13 @@ async function buildHDSD() {
           <td style="text-align:center;">2</td>
           <td><strong>Ban Thư Ký (BTK)</strong></td>
           <td><code>ceo.tongthuky@ceohn10.com</code></td>
-          <td>Triệu tập họp, phòng họp Sapphire Hub, biên bản. <em>Tuyệt đối không duyệt hội viên.</em></td>
+          <td>Triệu tập họp, phòng họp Sapphire Hub, biên bản. <em>Tuyệt đối không duyệt Học viên.</em></td>
         </tr>
         <tr>
           <td style="text-align:center;">3</td>
           <td><strong>Ban Thành Viên (BTV)</strong></td>
           <td><code>ceo.thanhvien@ceohn10.com</code></td>
-          <td><strong>Độc quyền tiếp nhận, thẩm định và phê duyệt kết nạp hội viên mới.</strong></td>
+          <td><strong>Độc quyền tiếp nhận, thẩm định và phê duyệt kết nạp Học viên mới.</strong></td>
         </tr>
         <tr>
           <td style="text-align:center;">4</td>
@@ -1479,7 +1479,7 @@ async function buildHDSD() {
 
     <div class="callout danger">
       <div class="callout-title">🚫 LƯU Ý PHÂN QUYỀN ĐẶC BIỆT:</div>
-      Ban Thư Ký TUYỆT ĐỐI KHÔNG CÓ THẨM QUYỀN PHÊ DUYỆT HỘI VIÊN MỚI. Thẩm quyền này thuộc về ĐỘC QUYỀN Ban Thành Viên (BTV) hoặc Ban Quản Trị tối cao. Mọi can thiệp sẽ bị hệ thống API chặn đứng bằng mã lỗi HTTP 403 Forbidden.
+      Ban Thư Ký TUYỆT ĐỐI KHÔNG CÓ THẨM QUYỀN PHÊ DUYỆT Học viên MỚI. Thẩm quyền này thuộc về ĐỘC QUYỀN Ban Thành Viên (BTV) hoặc Ban Quản Trị tối cao. Mọi can thiệp sẽ bị hệ thống API chặn đứng bằng mã lỗi HTTP 403 Forbidden.
     </div>
 
     <!-- CHƯƠNG 2 -->
@@ -1494,14 +1494,14 @@ async function buildHDSD() {
       <div class="image-caption">Hình 2.1: Màn hình Đăng nhập Cổng Quản Trị Web CRM CLB CEO HN10</div>
     </div>
 
-    <h2 class="section-title">2.2. Thẩm Định & Phê Duyệt Hội Viên Mới (Độc Quyền Ban Thành Viên)</h2>
-    <p><strong>Bước 1:</strong> Cán bộ BTV mở màn hình "Quản Lý Hội Viên" (<code>/members</code>) và chọn tab "Chờ Thẩm Định".</p>
+    <h2 class="section-title">2.2. Thẩm Định & Phê Duyệt Học viên Mới (Độc Quyền Ban Thành Viên)</h2>
+    <p><strong>Bước 1:</strong> Cán bộ BTV mở màn hình "Quản Lý Học viên" (<code>/members</code>) và chọn tab "Chờ Thẩm Định".</p>
     <p><strong>Bước 2:</strong> Bấm vào hồ sơ ứng viên để mở Ngăn kéo chi tiết (Drawer). Kiểm tra năm sinh (bắt buộc 1983), MST và uy tín doanh nghiệp.</p>
-    <p><strong>Bước 3:</strong> Nhấn nút "Phê Duyệt Kết Nạp". Hệ thống tự động cấp mã định danh <code>CEO-83xxx</code> và gửi email mật khẩu đến hội viên.</p>
+    <p><strong>Bước 3:</strong> Nhấn nút "Phê Duyệt Kết Nạp". Hệ thống tự động cấp mã định danh <code>CEO-83xxx</code> và gửi email mật khẩu đến Học viên.</p>
 
     <div class="desktop-screenshot-container">
-      <img class="desktop-screenshot" src="images/04_crm_members_management.png" alt="Quản lý hồ sơ hội viên và phê duyệt kết nạp trên CRM" />
-      <div class="image-caption">Hình 2.2: Bảng Quản trị Danh bạ Hội viên 360 độ và Ngăn kéo Thẩm định của Ban Thành Viên</div>
+      <img class="desktop-screenshot" src="images/04_crm_members_management.png" alt="Quản lý hồ sơ Học viên và phê duyệt kết nạp trên CRM" />
+      <div class="image-caption">Hình 2.2: Bảng Quản trị Danh bạ Học viên 360 độ và Ngăn kéo Thẩm định của Ban Thành Viên</div>
     </div>
 
     <h2 class="section-title">2.3. Vận Hành Cổng An Ninh Soát Vé Gate Check-in QR (&lt; 0.2s)</h2>
@@ -1515,29 +1515,29 @@ async function buildHDSD() {
     </div>
 
     <!-- CHƯƠNG 3 -->
-    <h1 class="chapter-title">CHƯƠNG 3: HƯỚNG DẪN HỘI VIÊN SỬ DỤNG MOBILE APP</h1>
+    <h1 class="chapter-title">CHƯƠNG 3: HƯỚNG DẪN Học viên SỬ DỤNG MOBILE APP</h1>
     <h2 class="section-title">3.1. Đăng Nhập & Bắt Buộc Đổi Mật Khẩu Lần Đầu</h2>
-    <p>Hội viên mở ứng dụng trên điện thoại, đăng nhập bằng Email/SĐT và mật khẩu khởi tạo. Hệ thống bắt buộc đổi mật khẩu cá nhân mới trước khi vào màn hình chính.</p>
+    <p>Học viên mở ứng dụng trên điện thoại, đăng nhập bằng Email/SĐT và mật khẩu khởi tạo. Hệ thống bắt buộc đổi mật khẩu cá nhân mới trước khi vào màn hình chính.</p>
 
     <div class="mobile-mockup-wrapper">
       <div class="phone-mockup">
         <img src="images/06_app_login_screen.png" alt="Màn hình Đăng nhập Mobile App CEO HN10" />
-        <div class="image-caption">Hình 3.1: Màn hình Đăng nhập Mobile App Hội viên</div>
+        <div class="image-caption">Hình 3.1: Màn hình Đăng nhập Mobile App Học viên</div>
       </div>
     </div>
 
     <h2 class="section-title">3.2. Sử Dụng Thẻ VIP 3D Titanium & Chạm NFC</h2>
-    <p>Hội viên mở mục "Thẻ VIP", chạm để lật 180 độ 3D. Khi gặp đối tác, chạm mặt sau thẻ vào điện thoại đối tác để mở trang công khai <code>/card/:slug</code> và bấm "Lưu Danh Bạ" xuất file vCard (.vcf) đồng bộ trong 1 giây.</p>
+    <p>Học viên mở mục "Thẻ VIP", chạm để lật 180 độ 3D. Khi gặp đối tác, chạm mặt sau thẻ vào điện thoại đối tác để mở trang công khai <code>/card/:slug</code> và bấm "Lưu Danh Bạ" xuất file vCard (.vcf) đồng bộ trong 1 giây.</p>
 
     <div class="mobile-mockup-wrapper">
       <div class="phone-mockup">
-        <img src="images/09_app_vip_card.png" alt="Thẻ Hội Viên VIP 3D Titanium" />
-        <div class="image-caption">Hình 3.2: Thẻ Hội Viên VIP 3D Titanium hiệu ứng lật 180 độ</div>
+        <img src="images/09_app_vip_card.png" alt="Thẻ Học viên VIP 3D Titanium" />
+        <div class="image-caption">Hình 3.2: Thẻ Học viên VIP 3D Titanium hiệu ứng lật 180 độ</div>
       </div>
     </div>
 
     <h2 class="section-title">3.3. Thanh Toán Hội Phí Thường Niên Qua VietQR Napas 24/7</h2>
-    <p>Hội viên mở mục "Hội Phí", nhấn "Thanh Toán VietQR". Mở app ngân hàng quét mã chuyển tiền nhanh 5.000.000 VNĐ. Kế toán đối soát sao kê và duyệt gạch nợ trên CRM gia hạn thẻ +365 ngày.</p>
+    <p>Học viên mở mục "Hội Phí", nhấn "Thanh Toán VietQR". Mở app ngân hàng quét mã chuyển tiền nhanh 5.000.000 VNĐ. Kế toán đối soát sao kê và duyệt gạch nợ trên CRM gia hạn thẻ +365 ngày.</p>
 
     <div class="mobile-mockup-wrapper">
       <div class="phone-mockup">
@@ -1547,7 +1547,7 @@ async function buildHDSD() {
     </div>
 
     <h2 class="section-title">3.4. Vé Sự Kiện Điện Tử E-Ticket QR Check-in</h2>
-    <p>Hội viên mở mục "Vé Của Tôi" để xuất trình mã QR khổ lớn tại Cổng an ninh đón tiếp. Mã vé được lưu trữ offline, kèm số bốc thăm may mắn (#LUCKY-xxxx).</p>
+    <p>Học viên mở mục "Vé Của Tôi" để xuất trình mã QR khổ lớn tại Cổng an ninh đón tiếp. Mã vé được lưu trữ offline, kèm số bốc thăm may mắn (#LUCKY-xxxx).</p>
 
     <div class="mobile-mockup-wrapper">
       <div class="phone-mockup">
@@ -1557,7 +1557,7 @@ async function buildHDSD() {
     </div>
 
     <h2 class="section-title">3.5. Biểu Quyết Đại Hội Trực Tuyến 1 Người 1 Phiếu</h2>
-    <p>Khi phiên biểu quyết mở, hội viên vào mục "Biểu Quyết" (<code>/association/voting</code>), chọn phương án và bấm "Xác Nhận". Kết quả cập nhật trực tiếp lên màn hình lớn đại hội trong 1 giây.</p>
+    <p>Khi phiên biểu quyết mở, Học viên vào mục "Biểu Quyết" (<code>/association/voting</code>), chọn phương án và bấm "Xác Nhận". Kết quả cập nhật trực tiếp lên màn hình lớn đại hội trong 1 giây.</p>
 
     <div class="mobile-mockup-wrapper">
       <div class="phone-mockup">
@@ -1567,7 +1567,7 @@ async function buildHDSD() {
     </div>
 
     <h2 class="section-title">3.6. Giao Thương Sàn B2B & Bảng Tin Cơ Hội Cung - Cầu</h2>
-    <p>Hội viên đăng bán sản phẩm trợ giá nội bộ (chiết khấu &gt;= 5%) và đăng tin tìm đối tác Cung - Cầu 1-on-1 có bảo chứng của câu lạc bộ.</p>
+    <p>Học viên đăng bán sản phẩm trợ giá nội bộ (chiết khấu &gt;= 5%) và đăng tin tìm đối tác Cung - Cầu 1-on-1 có bảo chứng của câu lạc bộ.</p>
 
     <div class="mobile-mockup-wrapper">
       <div class="phone-mockup">
@@ -1594,7 +1594,7 @@ async function buildHDSD() {
   hdsdMd += '*Phiên bản: Version 5.0 (Master Release) | Ngày ban hành: 04/10/2026*\n\n';
   hdsdMd += '### QUY CHUẨN TRÌNH BÀY HÌNH ẢNH PLAYBOOK 18:\n';
   hdsdMd += '- **Màn hình Web CRM Desktop:** Hiển thị toàn cảnh chiều ngang, góc bo 8px, viền xám mềm mại.\n';
-  hdsdMd += '- **Màn hình Mobile App Hội Viên:** BẮT BUỘC đặt trong khung điện thoại `.phone-mockup` chiều rộng 275px-320px, bo góc cong 28px-36px, viền kim loại sang trọng, không kéo giãn ảnh dọc thành hình chữ nhật ngang!\n\n';
+  hdsdMd += '- **Màn hình Mobile App Học viên:** BẮT BUỘC đặt trong khung điện thoại `.phone-mockup` chiều rộng 275px-320px, bo góc cong 28px-36px, viền kim loại sang trọng, không kéo giãn ảnh dọc thành hình chữ nhật ngang!\n\n';
   hdsdMd += '*(Xem chi tiết tài liệu in ấn PDF tại tệp HTML: [HDSD_CEOHN10_TOAN_DIEN_PRO.html](HDSD_CEOHN10_TOAN_DIEN_PRO.html))*\n';
 
   fs.writeFileSync(path.join(__dirname, '../docs/tai-lieu-huong-dan-su-dung.md'), hdsdMd, 'utf-8');

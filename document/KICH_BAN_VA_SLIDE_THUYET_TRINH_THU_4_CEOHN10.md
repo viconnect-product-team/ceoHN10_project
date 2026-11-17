@@ -11,7 +11,7 @@
 | Mốc Thời Gian | Thời Lượng | Nội Dung Trọng Tâm | Tác Vụ Cốt Lõi | Người Thực Hiện |
 |:---:|:---:|:---|:---|:---:|
 | **09:00 - 09:10** | 10 phút | **Phần 1: Khởi động hội nghị & Giới thiệu hai bên** | Lời chào: *"Em chào tất cả mọi người"*, giới thiệu thành phần ViConnect/ViOne, thông báo mốc 9h-12h, mời phía CEO HN10 giới thiệu. | Diễn giả ViConnect & Chủ tịch BĐH |
-| **09:10 - 09:45** | 35 phút (30-40p) | **Phần 2: Báo cáo sản phẩm & Live Demo Song Song** | 2.1 Mở đầu -> 2.2 List 3 yêu cầu ban đầu (mỗi ý 1-2 dòng) & Tuyên bố giải pháp kép -> Trình bày song song 6 quy trình chức năng: Hội viên, Sự kiện, Sản phẩm, Cơ hội, Kết nối -> Phân hệ Thu Chi Mã QR Ngân Hàng & TT200 -> Tháp Dashboard. | Diễn giả ViConnect |
+| **09:10 - 09:45** | 35 phút (30-40p) | **Phần 2: Báo cáo sản phẩm & Live Demo Song Song** | 2.1 Mở đầu -> 2.2 List 3 yêu cầu ban đầu (mỗi ý 1-2 dòng) & Tuyên bố giải pháp kép -> Trình bày song song 6 quy trình chức năng: Học viên, Sự kiện, Sản phẩm, Cơ hội, Kết nối -> Phân hệ Thu Chi Mã QR Ngân Hàng & TT200 -> Tháp Dashboard. | Diễn giả ViConnect |
 | **09:45 - 10:45** | 60 phút | **Phần 3: Phiên Nhận xét & Chất vấn từ Đối tác** | Dành trọn 60 phút (9h45 - 10h45) lắng nghe BĐH và 6 Trưởng Ban; thư ký gõ trực tiếp lên Biểu mẫu tiếp nhận trên màn chiếu; phân loại P0/P1/P2. | Hai bên đối thoại |
 | **10:45 - 12:00** | 75 phút (Linh hoạt đến 12h) | **Phần 4: Tổng kết "Cái gì chốt - Cái gì sửa" & Cam kết văn bản** | Bản đánh giá tổng kết: Cái gì chốt (Scope Freeze 30 tính năng, 100% Pass) - Cái gì sửa (xử lý P0/P1 trong 48h); cam kết gửi Biên bản trong 24h & Kế hoạch trong 48h. | Diễn giả & Chủ tịch BĐH |
 
@@ -36,9 +36,9 @@
   - *Quản lý sự kiện:* Tổ chức Gala/hội nghị hàng trăm khách tốn nhân lực soát vé, dễ ùn tắc cửa đón tiếp, khó kiểm soát chỗ ngồi và check-in đại biểu.
   - *Xúc tiến thương mại (Cơ hội, Marketplace):* Bài đăng mua bán bị trôi trên nhóm Zalo sau vài giờ; thiếu sàn giao thương B2B nội bộ tập trung và công cụ đo lường giá trị deal thực tế.
   - *Tuyên bố giải pháp:* Dựa trên yêu cầu của anh chị kết hợp giải pháp của ViOne & ViConnect đã tạo nên Hệ thống Web CRM Quản trị tháp chỉ huy và Ứng dụng Mobile App CEO HN10.
-- **Slide 5: Sơ đồ kiến trúc trải nghiệm song song:** Mobile App (Hội viên) tương tác trực tiếp 2 chiều với Web CRM (Ban Quản trị).
+- **Slide 5: Sơ đồ kiến trúc trải nghiệm song song:** Mobile App (Học viên) tương tác trực tiếp 2 chiều với Web CRM (Ban Quản trị).
 - **Slide 6: Song song 1 - Đăng ký, Đăng nhập & Thẩm định tài khoản:** App nhập nhanh ngày sinh `DD/MM/YYYY` -> Web CRM duyệt, cấp mã HN10 tự động, gửi email kích hoạt.
-- **Slide 7: Song song 2 - Quản trị Hội viên & Thẻ Doanh Nhân Số số / QR vCard:** App thẻ hội viên điện tử Obsidian/Gold, Dynamic QR vCard quét camera lưu danh bạ không cần cài app, Company Profile 2 trang -> Web CRM quản lý danh bạ 11 ngành, lọc và xuất Excel 1 click.
+- **Slide 7: Song song 2 - Quản trị Học viên & Thẻ Doanh Nhân Số số / QR vCard:** App thẻ Học viên điện tử Obsidian/Gold, Dynamic QR vCard quét camera lưu danh bạ không cần cài app, Company Profile 2 trang -> Web CRM quản lý danh bạ 11 ngành, lọc và xuất Excel 1 click.
 - **Slide 8: Song song 3 - Quản lý Sự kiện & Vé E-Ticket / Soát vé 1 giây:** App đăng ký vé, quét Mã QR Ngân Hàng thanh toán, nhận vé E-Ticket lưu offline kèm số may mắn Lucky Draw -> Web CRM tạo sự kiện bản đồ kéo thả Leaflet OSM, camera soát vé dưới 1 giây, cập nhật đại biểu real-time.
 - **Slide 9: Song song 4 - Sản phẩm & Sàn Marketplace B2B nội bộ:** App hiển thị băng chuyền tài trợ Obsidian/Amber, danh mục động, chi tiết Deep Cobalt Navy (không màu cam Shopee), review real CSDL, nhắn tin/gọi trực tiếp chủ hàng -> Web CRM duyệt sản phẩm & quản lý gói tài trợ.
 - **Slide 10: Song song 5 - Cơ hội kinh doanh & Ghép nối Deal thời gian thực:** App đăng nhu cầu Cung - Cầu giá trị cao, nhận tín hiệu ghép nối deal -> Web CRM tháp chỉ huy đo lường tổng giá trị giao thương hàng trăm tỷ đồng của CLB.

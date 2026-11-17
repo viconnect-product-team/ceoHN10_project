@@ -56,8 +56,8 @@ export const AI_KNOWLEDGE_ACCOUNTS: CandidateAccount[] = [
     jobTitle: "Chủ tịch HĐQT & Tổng Giám Đốc",
     industry: "Đầu tư bất động sản & Xây dựng công nghiệp",
     skills: ["Điều hành thư ký", "Điều phối chính sách", "Quản trị hiệp hội", "Hạ tầng khu công nghiệp"],
-    talents: ["Gắn kết hội viên", "Thủ tục pháp lý dự án", "Xúc tiến đầu tư liên tỉnh"],
-    headline: "Tổng thư ký Hiệp hội CEO HN10. Đầu tàu điều phối và kết nối hội viên vững mạnh.",
+    talents: ["Gắn kết Học viên", "Thủ tục pháp lý dự án", "Xúc tiến đầu tư liên tỉnh"],
+    headline: "Tổng thư ký Hiệp hội CEO HN10. Đầu tàu điều phối và kết nối Học viên vững mạnh.",
     dealSize: ">500 Tỷ VNĐ",
     phone: "0983 000 001",
     email: "ceo.tongthuky@ceohn10.com",
@@ -73,9 +73,9 @@ export const AI_KNOWLEDGE_ACCOUNTS: CandidateAccount[] = [
     company: "Cường Thịnh Corp",
     jobTitle: "Tổng Giám Đốc",
     industry: "Vật liệu xây dựng & Chuỗi cung ứng công trình",
-    skills: ["Phát triển hội viên", "Gắn kết liên kết kinh doanh", "Thẩm định năng lực thành viên", "Phân phối VLXD"],
+    skills: ["Phát triển Học viên", "Gắn kết liên kết kinh doanh", "Thẩm định năng lực thành viên", "Phân phối VLXD"],
     talents: ["Mở rộng mạng lưới", "Kết nối đối tác tin cậy", "Đàm phán hợp đồng cung ứng"],
-    headline: "Trưởng ban thành viên CEO HN10. Chuyên trách thẩm định, phát triển và kết nối hội viên chất lượng cao.",
+    headline: "Trưởng ban thành viên CEO HN10. Chuyên trách thẩm định, phát triển và kết nối Học viên chất lượng cao.",
     dealSize: "100 - 300 Tỷ VNĐ",
     phone: "0983 000 002",
     email: "ceo.thanhvien@ceohn10.com",
@@ -283,15 +283,15 @@ export const AI_KNOWLEDGE_ACCOUNTS: CandidateAccount[] = [
     id: "00000000-0000-4000-8000-000000000004",
     name: "Demo User",
     avatarUrl: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&auto=format&fit=crop&q=80",
-    executiveRole: "Hội viên Doanh nghiệp Tiêu Biểu",
-    department: "Hội viên CEO HN10",
+    executiveRole: "Học viên Doanh nghiệp Tiêu Biểu",
+    department: "Học viên CEO HN10",
     association: "Cộng đồng Doanh nhân CEO HN10",
     company: "CEO HN10 Demo Corp",
     jobTitle: "Giám Đốc Kinh Doanh",
     industry: "Dịch vụ thương mại & Bán buôn",
     skills: ["Giao thương B2B", "Kết nối đối tác", "Thương mại dịch vụ", "Chăm sóc khách hàng VIP"],
     talents: ["Mở rộng tệp khách hàng", "Đàm phán đơn hàng giá trị cao"],
-    headline: "Hội viên năng động tại cộng đồng CEO HN10. Sẵn sàng giao lưu kết nối và chia sẻ cơ hội hợp tác.",
+    headline: "Học viên năng động tại cộng đồng CEO HN10. Sẵn sàng giao lưu kết nối và chia sẻ cơ hội hợp tác.",
     dealSize: "10 - 50 Tỷ VNĐ",
     phone: "0901 000 004",
     email: "demo.user@ceohn10.vn",
@@ -301,15 +301,15 @@ export const AI_KNOWLEDGE_ACCOUNTS: CandidateAccount[] = [
     id: "00000000-0000-4000-8000-000000000005",
     name: "Nguyen Hoang Nam",
     avatarUrl: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=500&auto=format&fit=crop&q=80",
-    executiveRole: "Hội viên Doanh nghiệp",
-    department: "Hội viên CEO HN10",
+    executiveRole: "Học viên Doanh nghiệp",
+    department: "Học viên CEO HN10",
     association: "Cộng đồng Doanh nhân CEO HN10",
     company: "Nam Phát Logistics",
     jobTitle: "Giám Đốc Vận Tải",
     industry: "Kho vận & Giao nhận quốc tế",
     skills: ["Vận tải đường bộ liên tỉnh", "Kho bãi lưu trữ", "Dịch vụ hải quan nhanh", "Bảo hiểm hàng hóa"],
     talents: ["Điều phối đội xe chuyên dụng", "Cam kết tiến độ giao nhận 24/7"],
-    headline: "Hội viên CEO HN10 chuyên về logistics và vận chuyển hàng hóa nội địa & xuất nhập khẩu.",
+    headline: "Học viên CEO HN10 chuyên về logistics và vận chuyển hàng hóa nội địa & xuất nhập khẩu.",
     dealSize: "20 - 60 Tỷ VNĐ",
     phone: "0901 000 005",
     email: "peer1@ceohn10.vn",
@@ -319,8 +319,8 @@ export const AI_KNOWLEDGE_ACCOUNTS: CandidateAccount[] = [
     id: "00000000-0000-4000-8000-000000000006",
     name: "Tran Thu Thao",
     avatarUrl: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=500&auto=format&fit=crop&q=80",
-    executiveRole: "Hội viên Doanh nghiệp",
-    department: "Hội viên CEO HN10",
+    executiveRole: "Học viên Doanh nghiệp",
+    department: "Học viên CEO HN10",
     association: "Cộng đồng Doanh nhân CEO HN10",
     company: "Thảo Điền Architecture",
     jobTitle: "Kiến Trúc Sư Trưởng & Founder",
@@ -344,7 +344,7 @@ const QUICK_PROMPTS = [
   { label: "⚖️ Quản trị & Thư ký", query: "Cần tìm đầu mối ban thư ký điều phối hoạt động và chính sách hiệp hội" },
   { label: "🏗️ Xây dựng & Bất động sản", query: "Tìm đối tác có kinh nghiệm đầu tư bất động sản, hạ tầng và tổng thầu xây dựng" },
   { label: "🤝 Xúc tiến thương mại B2B", query: "Cần kết nối mở rộng thị trường phân phối và xúc tiến giao thương B2B nội khối" },
-  { label: "👥 Phát triển hội viên", query: "Tìm trưởng ban thành viên để thẩm định và gia nhập cộng đồng doanh nhân" },
+  { label: "👥 Phát triển Học viên", query: "Tìm trưởng ban thành viên để thẩm định và gia nhập cộng đồng doanh nhân" },
 ];
 
 export function DynamicAiMatcherPanel({ initialQuery = "" }: { initialQuery?: string } = {}) {
@@ -562,11 +562,10 @@ export function DynamicAiMatcherPanel({ initialQuery = "" }: { initialQuery?: st
               key={idx}
               type="button"
               onClick={() => handleChipClick(chip)}
-              className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer border ${
-                activeChip === chip.label
+              className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer border ${activeChip === chip.label
                   ? "bg-[var(--bc-mobile-accent-grad)] text-black border-transparent shadow-md font-bold scale-105"
                   : "bg-[var(--bc-mobile-surface-2)] border-[var(--bc-mobile-border)] text-[var(--bc-mobile-text)] dark:bg-white/5 dark:border-white/10 dark:text-slate-300 hover:border-[var(--bc-mobile-border-gold)] hover:text-[var(--bc-mobile-text)]"
-              }`}
+                }`}
             >
               {chip.label}
             </button>

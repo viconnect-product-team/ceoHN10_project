@@ -12,7 +12,7 @@
  * 
  * 2. Tạo POSTER_APP_CEOHN10_3D:
  *    - Thể hiện 3 màn chính chứa 3 chức năng quan trọng nhất của App CEO HN10:
- *      (1) Thẻ Hội Viên VIP & Danh Thiếp Số 1 Chạm
+ *      (1) Thẻ Học viên VIP & Danh Thiếp Số 1 Chạm
  *      (2) Sàn Giao Thương B2B & Deal Đặc Quyền Nội Khối
  *      (3) Ví Vé Sự Kiện & Điểm Danh Gala / Sơ Đồ Bàn Tiệc
  *    - Hiệu ứng 3D isometric mockups, nền chìm mờ, gradient xanh cobalt/navy, ánh sáng phát quang cyan
@@ -22,7 +22,7 @@
  * 3. Tạo PROFILE_CRM_QUAN_TRI_CEOHN10:
  *    - Thể hiện 6 chức năng chính nổi bật nhất của hệ thống Web CRM:
  *      (1) Trung Tâm Điều Hành & Thống Kê BI Toàn Cảnh
- *      (2) Quản Trị Hồ Sơ Hội Viên 360° & Phân Quyền RBAC 6 Ban
+ *      (2) Quản Trị Hồ Sơ Học viên 360° & Phân Quyền RBAC 6 Ban
  *      (3) Quản Lý Sự Kiện Gala & Sơ Đồ Bàn Tiệc Thông Minh
  *      (4) Quản Trị Tài Chính, Thu Chi & Thu Hội Phí VietQR
  *      (5) Quản Lý Chương Trình Đào Tạo Doanh Nhân & Kho Tri Thức Số
@@ -67,7 +67,7 @@ const SLIDES_MASTER = [
     type: 'cover',
     tag: 'BÁO CÁO GIẢI PHÁP CHUYỂN ĐỔI SỐ TOÀN DIỆN',
     title: 'HỆ THỐNG ĐIỀU HÀNH & KẾT NỐI DOANH NHÂN CEO HN10',
-    subtitle: 'HIỆN THỰC HÓA 3 BÀI TOÁN CHIẾN LƯỢC VÌ SỰ PHÁT TRIỂN BỀN VỮNG CỦA HỘI VIÊN',
+    subtitle: 'HIỆN THỰC HÓA 3 BÀI TOÁN CHIẾN LƯỢC VÌ SỰ PHÁT TRIỂN BỀN VỮNG CỦA Học viên',
     description: 'Báo cáo toàn diện giải pháp chuyển đổi số gồm Hệ Thống Quản Trị Web CRM & Ứng Dụng Di Động Doanh Nhân do Đơn vị công nghệ nghiên cứu và phát triển theo đặt hàng từ Ban Lãnh Đạo CLB CEO HN10.',
     meetingInfo: {
       time: '09:00 – 12:00 | Thứ Tư, ngày 21/10/2026',
@@ -75,20 +75,20 @@ const SLIDES_MASTER = [
       content: 'Báo Cáo Nghiệm Thu Thử Nghiệm & Tiếp Thu Góp Ý Hoàn Thiện',
       lunch: 'Bữa trưa thân mật tại Nhà hàng Phiến Hoan Việt Trì',
     },
-    footerText: 'Rất hân hạnh được đồng hành cùng Quý Lãnh Đạo & Hội Viên CLB CEO HN10.',
+    footerText: 'Rất hân hạnh được đồng hành cùng Quý Lãnh Đạo & Học viên CLB CEO HN10.',
   },
   {
     id: 2,
     bgImage: 'images/backgrounds/02_boardroom.jpg',
     type: 'two_products',
     tag: 'BỨC TRANH TỔNG THỂ 2 SẢN PHẨM',
-    title: 'KIẾN TRÚC KÉP: WEB CRM ĐIỀU HÀNH & MOBILE APP HỘI VIÊN',
+    title: 'KIẾN TRÚC KÉP: WEB CRM ĐIỀU HÀNH & MOBILE APP Học viên',
     subtitle: 'Hai công cụ tương hỗ khép kín: Trung tâm điều hành minh bạch & Văn phòng số bỏ túi của từng doanh nhân',
     crm: {
       title: '1. CỔNG ĐIỀU HÀNH TRUNG TÂM WEB CRM',
       target: 'Dành cho: Ban Điều Hành, Ban Thư Ký, Chủ Tịch & 6 Ban Chuyên Môn',
       bullets: [
-        'Quản lý tập trung toàn diện hơn 500 hồ sơ doanh nghiệp hội viên chính danh',
+        'Quản lý tập trung toàn diện hơn 500 hồ sơ doanh nghiệp Học viên chính danh',
         'Sơ đồ xếp bàn tiệc Gala trang trọng, phân bổ chỗ ngồi khoa học, chính xác',
         'Điều hành công việc, phân công nhiệm vụ và theo dõi tiến độ các ban',
         'Quản lý thu chi, hội phí và ngân sách tự động hóa, minh bạch tài chính',
@@ -97,10 +97,10 @@ const SLIDES_MASTER = [
     },
     app: {
       title: '2. VĂN PHÒNG DOANH NHÂN BỎ TÚI MOBILE APP',
-      target: 'Dành cho: Hơn 500 Doanh nhân & Lãnh đạo hội viên CLB CEO HN10',
+      target: 'Dành cho: Hơn 500 Doanh nhân & Lãnh đạo Học viên CLB CEO HN10',
       bullets: [
-        'Thẻ Hội Viên Điện Tử Thông Minh & Danh thiếp số tiện lợi, lưu danh bạ 1 chạm',
-        'Sàn giao thương B2B nội khối: Giới thiệu sản phẩm và ưu đãi đặc quyền giữa các hội viên',
+        'Thẻ Học viên Điện Tử Thông Minh & Danh thiếp số tiện lợi, lưu danh bạ 1 chạm',
+        'Sàn giao thương B2B nội khối: Giới thiệu sản phẩm và ưu đãi đặc quyền giữa các Học viên',
         'Ví vé sự kiện Gala, xem trước số bàn tiệc, số ghế VIP và mã bốc thăm may mắn',
         'Danh bạ kết nối hơn 500 CEO chính danh 11 ngành nghề, gửi lời mời hẹn gặp 1-on-1',
         'Kênh trao đổi công việc và liên lạc trực tiếp, bảo mật riêng tư giữa các lãnh đạo',
@@ -119,7 +119,7 @@ const SLIDES_MASTER = [
       {
         num: '01',
         badge: 'BÀI TOÁN 1: QUẢN LÝ THÀNH VIÊN',
-        title: 'Quản Lý Tập Trung Hồ Sơ 500+ Hội Viên',
+        title: 'Quản Lý Tập Trung Hồ Sơ 500+ Học viên',
         problem: 'Trước đây: Dữ liệu phân tán trong các file bảng tính rời rạc, khó tra cứu, thông tin doanh nghiệp không được cập nhật kịp thời.',
         solution: 'Hệ thống giải quyết: Số hóa hồ sơ doanh nghiệp 360 độ gồm pháp lý, mã số thuế, năng lực cốt lõi, ngành nghề mũi nhọn và lịch sử tham gia.',
       },
@@ -148,8 +148,8 @@ const SLIDES_MASTER = [
     subtitle: 'Chuẩn hóa toàn diện quy trình điều hành của Ban Thư Ký và 6 Ban Chuyên Môn trên một giao diện thống nhất',
     features: [
       {
-        title: '1. Quản Trị Danh Bạ Hội Viên 360°',
-        desc: 'Hồ sơ pháp lý, mã số thuế, phân ban chuyên môn, thẩm định và phê duyệt hội viên mới minh bạch.',
+        title: '1. Quản Trị Danh Bạ Học viên 360°',
+        desc: 'Hồ sơ pháp lý, mã số thuế, phân ban chuyên môn, thẩm định và phê duyệt Học viên mới minh bạch.',
         imgFile: 'images/live_captures_fresh/crm_03_quanly_hoivien_360.png',
       },
       {
@@ -178,7 +178,7 @@ const SLIDES_MASTER = [
     subtitle: 'Nâng tầm hình ảnh lãnh đạo, gắn kết giao thương bền chặt ngay trên chiếc điện thoại thông minh',
     features: [
       {
-        title: '1. Thẻ Hội Viên & Danh Thiếp Số Tiện Lợi',
+        title: '1. Thẻ Học viên & Danh Thiếp Số Tiện Lợi',
         desc: 'Thẻ số nhận diện sang trọng, tích hợp mã QR cá nhân giúp đối tác lưu danh bạ tức thì mà không cần cài app.',
         imgFile: 'images/live_captures_fresh/app_02_the_hoivien_so_vip.png',
       },
@@ -208,8 +208,8 @@ const SLIDES_MASTER = [
     subtitle: 'Trực quan hóa mọi chỉ số sức khỏe tổ chức, tài chính thu chi và hiệu quả giao thương B2B thời gian thực',
     features: [
       {
-        title: '1. Dashboard BI Thống Kê Hội Viên',
-        desc: 'Đo lường cơ cấu 500+ doanh nghiệp theo 11 ngành nghề chủ lực, biến động hội viên mới và tỷ lệ gắn kết hoạt động.',
+        title: '1. Dashboard BI Thống Kê Học viên',
+        desc: 'Đo lường cơ cấu 500+ doanh nghiệp theo 11 ngành nghề chủ lực, biến động Học viên mới và tỷ lệ gắn kết hoạt động.',
         imgFile: 'images/live_captures_fresh/crm_02_thongke_baocao_bi.png',
       },
       {
@@ -264,7 +264,7 @@ const SLIDES_MASTER = [
     bgImage: 'images/backgrounds/06_innovation.jpg',
     type: 'breakthroughs',
     tag: 'GIÁ TRỊ GIA TĂNG THỰC TIỄN',
-    title: '5 ĐIỂM SÁNG NÂNG TẦM TRẢI NGHIỆM VẬN HÀNH & HỘI VIÊN',
+    title: '5 ĐIỂM SÁNG NÂNG TẦM TRẢI NGHIỆM VẬN HÀNH & Học viên',
     subtitle: 'Những tiện ích thiết thực do Đơn vị phát triển chủ động nghiên cứu tích hợp nâng cao nhằm tối ưu hiệu quả CLB',
     items: [
       {
@@ -282,14 +282,14 @@ const SLIDES_MASTER = [
       {
         num: '03',
         badge: 'HỖ TRỢ THƯỜNG TRỰC',
-        title: 'Trợ Lý Số Hướng Dẫn Hội Viên 24/7',
-        desc: 'Hỗ trợ hội viên tra cứu nhanh thông tin sự kiện sắp diễn ra, thông tin hội đồng, liên hệ Ban Thư Ký và tìm kiếm các đối tác tiềm năng.',
+        title: 'Trợ Lý Số Hướng Dẫn Học viên 24/7',
+        desc: 'Hỗ trợ Học viên tra cứu nhanh thông tin sự kiện sắp diễn ra, thông tin hội đồng, liên hệ Ban Thư Ký và tìm kiếm các đối tác tiềm năng.',
       },
       {
         num: '04',
         badge: 'KẾT NỐI BẢO MẬT',
         title: 'Kênh Trao Đổi & Liên Lạc Nội Bộ Riêng Tư',
-        desc: 'Gọi điện thoại và trao đổi trực tiếp giữa các Chủ tịch & CEO hội viên, bảo mật tuyệt đối, giữ gìn tính riêng tư trong các cuộc thảo luận kinh doanh.',
+        desc: 'Gọi điện thoại và trao đổi trực tiếp giữa các Chủ tịch & CEO Học viên, bảo mật tuyệt đối, giữ gìn tính riêng tư trong các cuộc thảo luận kinh doanh.',
       },
       {
         num: '05',
@@ -343,7 +343,7 @@ const SLIDES_MASTER = [
     bullets: [
       'Đơn vị phát triển cam kết duy trì vận hành máy chủ đám mây ổn định 99.9% uptime',
       'Đội ngũ kỹ sư túc trực hỗ trợ kỹ thuật tận tâm tại mọi sự kiện Gala của Hiệp hội',
-      'Liên tục cập nhật các công nghệ trí tuệ nhân tạo (AI) mới nhất phục vụ hội viên',
+      'Liên tục cập nhật các công nghệ trí tuệ nhân tạo (AI) mới nhất phục vụ Học viên',
     ],
     contact: {
       hotline: '0983 1983 83 / 0988 66 55 44',
@@ -790,7 +790,7 @@ function generateSlidesHtml(slides) {
             <!-- Footer không có chữ vàng bên phải -->
             <div class="relative z-10 border-t border-white/15 pt-3 flex justify-between text-xs text-cyan-300 font-bold">
               <span>Đột phá công nghệ do Đơn vị phát triển chủ động nghiên cứu tích hợp</span>
-              <span class="text-xs text-blue-200 font-medium">Tối ưu trải nghiệm hội viên</span>
+              <span class="text-xs text-blue-200 font-medium">Tối ưu trải nghiệm Học viên</span>
             </div>
           </div>
         \`;
@@ -831,7 +831,7 @@ function generateSlidesHtml(slides) {
             <!-- Footer không có chữ vàng bên phải (Đã bỏ viconnectPartner) -->
             <div class="relative z-10 border-t border-white/15 pt-3 flex justify-between text-xs text-cyan-300 font-bold">
               <span>Cam kết bảo hành máy chủ 24/7 và đồng hành trọn đời cùng HanoiBA</span>
-              <span class="text-xs text-blue-200 font-medium">Hợp tác bền vững vì hội viên</span>
+              <span class="text-xs text-blue-200 font-medium">Hợp tác bền vững vì Học viên</span>
             </div>
           </div>
         \`;
@@ -894,7 +894,7 @@ function generateSlidesHtml(slides) {
             <!-- Footer không có chữ vàng bên phải -->
             <div class="relative z-10 border-t border-white/15 pt-3 flex justify-between text-xs text-blue-200">
               <span>Hệ sinh thái công nghệ số hóa · HanoiBA 2026</span>
-              <span class="text-cyan-300 font-semibold">Trân trọng cảm ơn Ban Lãnh Đạo &amp; Quý Hội Viên!</span>
+              <span class="text-cyan-300 font-semibold">Trân trọng cảm ơn Ban Lãnh Đạo &amp; Quý Học viên!</span>
             </div>
           </div>
         \`;
@@ -1298,7 +1298,7 @@ function generatePrintableDeckHtml(slides) {
           <!-- Footer -->
           <div class="relative z-10 border-t border-white/15 pt-4 flex justify-between text-sm text-cyan-300 font-bold">
             <span>Đột phá công nghệ do Đơn vị phát triển chủ động nghiên cứu tích hợp</span>
-            <span class="text-xs text-blue-200 font-medium">Tối ưu trải nghiệm hội viên</span>
+            <span class="text-xs text-blue-200 font-medium">Tối ưu trải nghiệm Học viên</span>
           </div>
         </div>
       `;
@@ -1339,7 +1339,7 @@ function generatePrintableDeckHtml(slides) {
           <!-- Footer -->
           <div class="relative z-10 border-t border-white/15 pt-4 flex justify-between text-sm text-cyan-300 font-bold">
             <span>Cam kết bảo hành máy chủ 24/7 và đồng hành trọn đời cùng HanoiBA</span>
-            <span class="text-xs text-blue-200 font-medium">Hợp tác bền vững vì hội viên</span>
+            <span class="text-xs text-blue-200 font-medium">Hợp tác bền vững vì Học viên</span>
           </div>
         </div>
       `;
@@ -1403,7 +1403,7 @@ function generatePrintableDeckHtml(slides) {
           <!-- Footer -->
           <div class="relative z-10 border-t border-white/15 pt-4 flex justify-between text-sm text-blue-200">
             <span>Hệ sinh thái công nghệ số hóa · HanoiBA 2026</span>
-            <span class="text-cyan-300 font-semibold">Trân trọng cảm ơn Ban Lãnh Đạo &amp; Quý Hội Viên!</span>
+            <span class="text-cyan-300 font-semibold">Trân trọng cảm ơn Ban Lãnh Đạo &amp; Quý Học viên!</span>
           </div>
         </div>
       `;
@@ -2101,7 +2101,7 @@ function generatePosterAppHtml() {
         KẾT NỐI KHÔNG GIỚI HẠN · GIAO THƯƠNG ĐẶC QUYỀN · VẬN HÀNH THÔNG MINH
       </p>
       <p class="text-slate-300 text-base max-w-3xl font-medium leading-relaxed">
-        Giải pháp chuyển đổi số toàn diện hỗ trợ hơn 500 Chủ tịch &amp; CEO hội viên kết nối kinh doanh, trao đổi danh thiếp số 1 chạm và tiếp cận đặc quyền sự kiện đẳng cấp.
+        Giải pháp chuyển đổi số toàn diện hỗ trợ hơn 500 Chủ tịch &amp; CEO Học viên kết nối kinh doanh, trao đổi danh thiếp số 1 chạm và tiếp cận đặc quyền sự kiện đẳng cấp.
       </p>
     </div>
 
@@ -2109,7 +2109,7 @@ function generatePosterAppHtml() {
     <div class="relative z-10 my-auto py-8">
       <div class="grid grid-cols-3 gap-8 items-center justify-center">
 
-        <!-- MÀN 1 (BÊN TRÁI 3D): THẺ HỘI VIÊN VIP & SMART QR -->
+        <!-- MÀN 1 (BÊN TRÁI 3D): THẺ Học viên VIP & SMART QR -->
         <div class="flex flex-col items-center space-y-5" style="transform: perspective(1000px) rotateY(12deg) rotateX(4deg);">
           <div class="inline-block px-4 py-1.5 rounded-full bg-blue-500/20 border border-blue-400/40 text-blue-200 text-xs font-black uppercase tracking-wider">
             CHỨC NĂNG 01
@@ -2120,18 +2120,18 @@ function generatePosterAppHtml() {
               <span class="w-3 h-3 rounded-full bg-cyan-500/50"></span>
             </div>
             <div class="phone-screen">
-              <img src="${imgCard}" class="w-full h-full object-cover object-top" alt="Thẻ Hội Viên VIP" />
+              <img src="${imgCard}" class="w-full h-full object-cover object-top" alt="Thẻ Học viên VIP" />
             </div>
           </div>
 
           <div class="white-card-info p-5 text-slate-800 text-center w-[350px] space-y-2">
             <h3 class="text-base font-black text-[#001F54] uppercase tracking-wide">
-              Thẻ Hội Viên Số VIP &amp; QR
+              Thẻ Học viên Số VIP &amp; QR
             </h3>
             <ul class="text-left text-xs space-y-1.5 text-slate-600 font-semibold">
               <li class="flex items-start gap-2">
                 <span class="text-blue-600 font-bold">✓</span>
-                <span>Định danh hội viên chính thức HanoiBA</span>
+                <span>Định danh Học viên chính thức HanoiBA</span>
               </li>
               <li class="flex items-start gap-2">
                 <span class="text-blue-600 font-bold">✓</span>
@@ -2410,24 +2410,24 @@ function generateProfileCrmHtml() {
         <div>
           <h3 class="text-sm font-black text-[#001F54]">1. Dashboard &amp; Thống Kê BI Toàn Cảnh</h3>
           <p class="text-[11.5px] text-slate-600 font-medium leading-relaxed mt-1">
-            Đo lường sức khỏe hiệp hội, phân tích cơ cấu 500+ doanh nhân theo 11 ngành nghề, biểu đồ biến động hội viên và theo dõi tương tác thời gian thực.
+            Đo lường sức khỏe hiệp hội, phân tích cơ cấu 500+ doanh nhân theo 11 ngành nghề, biểu đồ biến động Học viên và theo dõi tương tác thời gian thực.
           </p>
         </div>
       </div>
 
-      <!-- 2. QUẢN LÝ HỘI VIÊN 360 & RBAC -->
+      <!-- 2. QUẢN LÝ Học viên 360 & RBAC -->
       <div class="white-card-3d p-4 flex flex-col justify-between space-y-3">
         <div class="w-full h-36 rounded-xl overflow-hidden bg-slate-100 border border-slate-200 relative shadow-inner">
-          <img src="${imgMember}" class="w-full h-full object-cover object-top" alt="Hội Viên 360" />
+          <img src="${imgMember}" class="w-full h-full object-cover object-top" alt="Học viên 360" />
           <div class="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent"></div>
           <span class="absolute top-2.5 left-2.5 px-2.5 py-0.5 rounded-full bg-emerald-600 text-white font-mono text-[10px] font-black shadow-md">
             02 · MEMBER 360°
           </span>
         </div>
         <div>
-          <h3 class="text-sm font-black text-[#001F54]">2. Quản Trị Hội Viên 360° &amp; Phân Quyền RBAC</h3>
+          <h3 class="text-sm font-black text-[#001F54]">2. Quản Trị Học viên 360° &amp; Phân Quyền RBAC</h3>
           <p class="text-[11.5px] text-slate-600 font-medium leading-relaxed mt-1">
-            Số hóa hồ sơ pháp lý, mã số thuế, năng lực cốt lõi của hội viên; thẩm định kết nạp minh bạch và phân quyền đúng chức năng của 6 ban chuyên môn.
+            Số hóa hồ sơ pháp lý, mã số thuế, năng lực cốt lõi của Học viên; thẩm định kết nạp minh bạch và phân quyền đúng chức năng của 6 ban chuyên môn.
           </p>
         </div>
       </div>
@@ -2537,7 +2537,7 @@ async function main() {
 
   // 1. TẠO SLIDE TỔNG THỂ HỆ SINH THÁI CEO HN10
   console.log('\n>>> [1/3] Tạo SLIDE_TONG_THE_HE_SINH_THAI_CEOHN10 (HTML, PDF, PPTX, MD)...');
-  
+
   // 1.1 HTML Slide tương tác
   const slideHtml = generateSlidesHtml(SLIDES_MASTER);
   const outSlideHtml = path.join(DOC_DIR, 'SLIDE_TONG_THE_HE_SINH_THAI_CEOHN10.html');

@@ -29,10 +29,10 @@ async function verify() {
 
   // Check Group headers
   const groups = [
-    'A. GIAO DIỆN &amp; THẺ HỘI VIÊN',
+    'A. GIAO DIỆN &amp; THẺ Học viên',
     'B. XÚC TIẾN THƯƠNG MẠI',
     'C. SỰ KIỆN &amp; SINH HOẠT',
-    'D. QUẢN TRỊ HỘI VIÊN &amp; BÁO CÁO (CỔNG QUẢN TRỊ CRM)',
+    'D. QUẢN TRỊ Học viên &amp; BÁO CÁO (CỔNG QUẢN TRỊ CRM)',
     'E. TRANG CÁ NHÂN'
   ];
   groups.forEach(g => {

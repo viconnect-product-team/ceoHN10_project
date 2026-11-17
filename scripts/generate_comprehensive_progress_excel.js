@@ -213,58 +213,58 @@ async function generateProgressWorkbook() {
     // ══════════════════════════════════════════════════════════════════════════
     // PHÂN HỆ 1: HỆ THỐNG CRM QUẢN TRỊ (CRM ADMIN PORTAL)
     // ══════════════════════════════════════════════════════════════════════════
-    // 1.1 Hội Viên & Ban Chấp Hành
+    // 1.1 Học viên & Ban Chấp Hành
     {
-      wbs: 'WBS-CRM-001', module: 'Hệ Thống CRM', epic: 'Hội Viên & Ban Chấp Hành',
+      wbs: 'WBS-CRM-001', module: 'Hệ Thống CRM', epic: 'Học viên & Ban Chấp Hành',
       feature: 'Tiếp nhận hồ sơ đăng ký gia nhập từ Web Portal',
       desc: 'Form đăng ký trực tuyến, kiểm tra định dạng và lưu vào danh sách chờ duyệt',
       api: 'Không (Nội bộ DB)', priority: 'Cao', prog: '100%', status: 'Hoàn thành nội bộ', test: 'Passed (Nội bộ)', notes: '/members?status=pending'
     },
     {
-      wbs: 'WBS-CRM-002', module: 'Hệ Thống CRM', epic: 'Hội Viên & Ban Chấp Hành',
+      wbs: 'WBS-CRM-002', module: 'Hệ Thống CRM', epic: 'Học viên & Ban Chấp Hành',
       feature: 'Kiểm tra trùng lặp Mã số thuế & CCCD',
       desc: 'Truy vấn bảng members và companies để cảnh báo trùng lặp thông tin đại diện pháp luật',
       api: 'Không (Nội bộ DB)', priority: 'Cao', prog: '100%', status: 'Hoàn thành nội bộ', test: 'Passed (Nội bộ)', notes: 'Kiểm tra unique constraint'
     },
     {
-      wbs: 'WBS-CRM-003', module: 'Hệ Thống CRM', epic: 'Hội Viên & Ban Chấp Hành',
+      wbs: 'WBS-CRM-003', module: 'Hệ Thống CRM', epic: 'Học viên & Ban Chấp Hành',
       feature: 'Quy trình thẩm định hồ sơ 2 cấp',
       desc: 'Thư ký rà soát tính hợp lệ -> Đề xuất Ban Thường trực phê duyệt -> Lưu vết log',
       api: 'Không (Nội bộ DB)', priority: 'Khẩn cấp', prog: '100%', status: 'Hoàn thành nội bộ', test: 'Passed (Nội bộ)', notes: '/members/:id/review'
     },
     {
-      wbs: 'WBS-CRM-004', module: 'Hệ Thống CRM', epic: 'Hội Viên & Ban Chấp Hành',
-      feature: 'Phê duyệt chính thức & Cấp mã số hội viên độc bản',
+      wbs: 'WBS-CRM-004', module: 'Hệ Thống CRM', epic: 'Học viên & Ban Chấp Hành',
+      feature: 'Phê duyệt chính thức & Cấp mã số Học viên độc bản',
       desc: 'Lãnh đạo ký duyệt điện tử, kích hoạt trạng thái Active và sinh mã HN10-xxx',
       api: 'Không (Nội bộ DB)', priority: 'Khẩn cấp', prog: '100%', status: 'Hoàn thành nội bộ', test: 'Passed (Nội bộ)', notes: '/members/:id/approve'
     },
     {
-      wbs: 'WBS-CRM-005', module: 'Hệ Thống CRM', epic: 'Hội Viên & Ban Chấp Hành',
+      wbs: 'WBS-CRM-005', module: 'Hệ Thống CRM', epic: 'Học viên & Ban Chấp Hành',
       feature: 'Bổ nhiệm chức danh Ban Chấp Hành nhiệm kỳ',
       desc: 'Gán chức danh: Chủ tịch, Phó Chủ tịch, Trưởng ban chuyên môn kèm quyền RBAC',
       api: 'Không (Nội bộ DB)', priority: 'Cao', prog: '100%', status: 'Hoàn thành nội bộ', test: 'Passed (Nội bộ)', notes: '/members/:id/board'
     },
     {
-      wbs: 'WBS-CRM-006', module: 'Hệ Thống CRM', epic: 'Hội Viên & Ban Chấp Hành',
-      feature: 'Phân bổ hội viên vào Phân ban / Câu lạc bộ chuyên ngành',
-      desc: 'Gán hội viên vào CLB Bất động sản, CLB Công nghệ, CLB Nữ doanh nhân, CLB Golf',
+      wbs: 'WBS-CRM-006', module: 'Hệ Thống CRM', epic: 'Học viên & Ban Chấp Hành',
+      feature: 'Phân bổ Học viên vào Phân ban / Câu lạc bộ chuyên ngành',
+      desc: 'Gán Học viên vào CLB Bất động sản, CLB Công nghệ, CLB Nữ doanh nhân, CLB Golf',
       api: 'Không (Nội bộ DB)', priority: 'Trung bình', prog: '100%', status: 'Hoàn thành nội bộ', test: 'Passed (Nội bộ)', notes: '/members/:id/clubs'
     },
     {
-      wbs: 'WBS-CRM-007', module: 'Hệ Thống CRM', epic: 'Hội Viên & Ban Chấp Hành',
+      wbs: 'WBS-CRM-007', module: 'Hệ Thống CRM', epic: 'Học viên & Ban Chấp Hành',
       feature: 'Xuất danh bạ đại biểu in Kỷ yếu Đại hội (Excel)',
       desc: 'Bộ lọc ngành nghề, xuất danh sách chuẩn format gồm ảnh, MST, chức danh',
       api: 'Không (Nội bộ File)', priority: 'Trung bình', prog: '100%', status: 'Hoàn thành nội bộ', test: 'Passed (Nội bộ)', notes: '/members/export'
     },
     {
-      wbs: 'WBS-CRM-008', module: 'Hệ Thống CRM', epic: 'Hội Viên & Ban Chấp Hành',
-      feature: 'Nhập danh sách hội viên hàng loạt từ Excel',
+      wbs: 'WBS-CRM-008', module: 'Hệ Thống CRM', epic: 'Học viên & Ban Chấp Hành',
+      feature: 'Nhập danh sách Học viên hàng loạt từ Excel',
       desc: 'Đọc file Excel, validate định dạng ngày tháng và nạp dữ liệu vào CSDL',
       api: 'Không (Nội bộ File)', priority: 'Cao', prog: '100%', status: 'Hoàn thành nội bộ', test: 'Passed (Nội bộ)', notes: '/members/import'
     },
     {
-      wbs: 'WBS-CRM-009', module: 'Hệ Thống CRM', epic: 'Hội Viên & Ban Chấp Hành',
-      feature: 'Đình chỉ / Thu hồi tư cách hội viên kèm lý do',
+      wbs: 'WBS-CRM-009', module: 'Hệ Thống CRM', epic: 'Học viên & Ban Chấp Hành',
+      feature: 'Đình chỉ / Thu hồi tư cách Học viên kèm lý do',
       desc: 'Chuyển trạng thái sang Suspended/Terminated, khóa quyền truy cập app',
       api: 'Không (Nội bộ DB)', priority: 'Trung bình', prog: '100%', status: 'Hoàn thành nội bộ', test: 'Passed (Nội bộ)', notes: '/members/:id/status'
     },
@@ -322,7 +322,7 @@ async function generateProgressWorkbook() {
     },
     {
       wbs: 'WBS-CRM-018', module: 'Hệ Thống CRM', epic: 'Tài chính & Hội phí',
-      feature: 'Gia hạn ngày hết hạn thẻ hội viên (+1 năm)',
+      feature: 'Gia hạn ngày hết hạn thẻ Học viên (+1 năm)',
       desc: 'Gia hạn ngày hết hạn thẻ ngay khi kế toán duyệt nộp phí thành công, ghi log audit',
       api: 'Không (Nội bộ DB)', priority: 'Khẩn cấp', prog: '100%', status: 'Hoàn thành nội bộ', test: 'Passed (Nội bộ)', notes: 'term_end + 1 year'
     },
@@ -367,7 +367,7 @@ async function generateProgressWorkbook() {
     {
       wbs: 'WBS-CRM-025', module: 'Hệ Thống CRM', epic: 'Sự Kiện & Điểm Danh',
       feature: 'Phát hành mã vé QR Check-in độc bản',
-      desc: 'Vé QR chứa ID sự kiện, mã hội viên, số bàn, số ghế, chữ ký số nội bộ',
+      desc: 'Vé QR chứa ID sự kiện, mã Học viên, số bàn, số ghế, chữ ký số nội bộ',
       api: 'Không (Nội bộ Backend)', priority: 'Khẩn cấp', prog: '100%', status: 'Hoàn thành nội bộ', test: 'Passed (Nội bộ)', notes: '/events/:id/tickets'
     },
     {
@@ -438,20 +438,20 @@ async function generateProgressWorkbook() {
     // 1.7 Truyền Thông & Email Marketing
     {
       wbs: 'WBS-CRM-036', module: 'Hệ Thống CRM', epic: 'Truyền Thông & Email',
-      feature: 'Gửi Email thông báo hàng loạt tới hội viên',
+      feature: 'Gửi Email thông báo hàng loạt tới Học viên',
       desc: 'Soạn email, cá nhân hóa tên đại biểu, gửi thông báo qua dịch vụ SMTP',
       api: 'Có (SMTP Server)', priority: 'Cao', prog: '90%', status: 'Hoàn thành qua SMTP', test: 'Passed (SMTP nội bộ)', notes: '/email-marketing'
     },
     {
       wbs: 'WBS-CRM-037', module: 'Hệ Thống CRM', epic: 'Truyền Thông & Email',
       feature: 'Quản lý danh sách mẫu email ngoại giao hiệp hội',
-      desc: 'Template thư chúc mừng sinh nhật hội viên, thư mời họp BCH, thông báo ĐÓNG HỘI PHÍ',
+      desc: 'Template thư chúc mừng sinh nhật Học viên, thư mời họp BCH, thông báo ĐÓNG HỘI PHÍ',
       api: 'Không (Nội bộ DB)', priority: 'Trung bình', prog: '100%', status: 'Hoàn thành nội bộ', test: 'Passed (Nội bộ)', notes: '/email-marketing/templates'
     },
     {
       wbs: 'WBS-CRM-038', module: 'Hệ Thống CRM', epic: 'Truyền Thông & Email',
       feature: 'Đăng tin tức hoạt động & Thông cáo báo chí',
-      desc: 'Trình soạn thảo văn bản Rich-Text, đăng bài viết lên cổng thông tin hội viên',
+      desc: 'Trình soạn thảo văn bản Rich-Text, đăng bài viết lên cổng thông tin Học viên',
       api: 'Không (Nội bộ DB)', priority: 'Cao', prog: '100%', status: 'Hoàn thành nội bộ', test: 'Passed (Nội bộ)', notes: '/news, /news/create'
     },
     {
@@ -500,7 +500,7 @@ async function generateProgressWorkbook() {
     {
       wbs: 'WBS-ASS-003', module: 'App Hiệp Hội', epic: 'Xác Thực & Tài Khoản',
       feature: 'Tích hợp SMS Brandname Gateway gửi OTP viễn thông',
-      desc: 'Gửi tin nhắn SMS OTP thực tế tới số điện thoại hội viên qua tổng đài Telco',
+      desc: 'Gửi tin nhắn SMS OTP thực tế tới số điện thoại Học viên qua tổng đài Telco',
       api: 'CÓ (eSMS / SpeedSMS / Twilio)', priority: 'Cao', prog: '20%', status: 'CHƯA TÍCH HỢP GATEWAY', test: 'Chưa thông luồng SMS', notes: 'Chưa đăng ký Brandname Telco'
     },
     {
@@ -516,17 +516,17 @@ async function generateProgressWorkbook() {
       api: 'CÓ (Apple Sign-In Services ID)', priority: 'Cao', prog: '30%', status: 'CHƯA CẤU HÌNH API NGOÀI', test: 'FAILED - Chưa có Apple Key', notes: 'Chưa cấu hình Services ID Apple'
     },
 
-    // 2.2 Thẻ Hội Viên & Danh Thiếp Số
+    // 2.2 Thẻ Học viên & Danh Thiếp Số
     {
       wbs: 'WBS-ASS-006', module: 'App Hiệp Hội', epic: 'Thẻ Số & Danh Thiếp',
-      feature: 'Thẻ hội viên kỹ thuật số 3D sắc nét',
-      desc: 'Thẻ hiển thị huy hiệu VIP, mã hội viên, chữ trắng nổi bật trên nền obsidian/blue',
+      feature: 'Thẻ Học viên kỹ thuật số 3D sắc nét',
+      desc: 'Thẻ hiển thị huy hiệu VIP, mã Học viên, chữ trắng nổi bật trên nền obsidian/blue',
       api: 'Không (Nội bộ UI)', priority: 'Khẩn cấp', prog: '100%', status: 'Hoàn thành nội bộ', test: 'Passed (Nội bộ)', notes: '/association/card'
     },
     {
       wbs: 'WBS-ASS-007', module: 'App Hiệp Hội', epic: 'Thẻ Số & Danh Thiếp',
-      feature: 'Sinh mã QR thẻ hội viên để xác thực danh tính',
-      desc: 'Mã QR động chứa thông tin hội viên đã được mã hóa token chống chụp màn hình giả mạo',
+      feature: 'Sinh mã QR thẻ Học viên để xác thực danh tính',
+      desc: 'Mã QR động chứa thông tin Học viên đã được mã hóa token chống chụp màn hình giả mạo',
       api: 'Không (Nội bộ UI)', priority: 'Khẩn cấp', prog: '100%', status: 'Hoàn thành nội bộ', test: 'Passed (Nội bộ)', notes: '/association/card (QR)'
     },
     {
@@ -538,20 +538,20 @@ async function generateProgressWorkbook() {
     {
       wbs: 'WBS-ASS-009', module: 'App Hiệp Hội', epic: 'Thẻ Số & Danh Thiếp',
       feature: 'Tích hợp Ví điện tử Apple Wallet & Google Wallet Pass',
-      desc: 'Đẩy thẻ hội viên vào Apple Wallet (.pkpass) và Google Wallet trên điện thoại',
+      desc: 'Đẩy thẻ Học viên vào Apple Wallet (.pkpass) và Google Wallet trên điện thoại',
       api: 'CÓ (Apple Wallet / Google Wallet API)', priority: 'Trung bình', prog: '25%', status: 'CHƯA ĐĂNG KÝ CERTIFICATE', test: 'Chưa kết nối Wallet API', notes: 'Cần Pass Type ID & Private Key'
     },
 
     // 2.3 Bảng Tin & Danh Bạ
     {
       wbs: 'WBS-ASS-010', module: 'App Hiệp Hội', epic: 'Bảng Tin & Danh Bạ',
-      feature: 'Trang chủ hội viên & Bảng tin hoạt động thời gian thực',
+      feature: 'Trang chủ Học viên & Bảng tin hoạt động thời gian thực',
       desc: 'Hiển thị tin tức nội bộ CLB CEO HN10, sự kiện sắp diễn ra, thông báo từ Ban Chấp Hành',
       api: 'Không (Nội bộ DB)', priority: 'Cao', prog: '100%', status: 'Hoàn thành nội bộ', test: 'Passed (Nội bộ)', notes: '/association, /association/news'
     },
     {
       wbs: 'WBS-ASS-011', module: 'App Hiệp Hội', epic: 'Bảng Tin & Danh Bạ',
-      feature: 'Tra cứu danh bạ hội viên theo ngành nghề',
+      feature: 'Tra cứu danh bạ Học viên theo ngành nghề',
       desc: 'Tìm kiếm đối tác theo lĩnh vực kinh doanh, xem hồ sơ doanh nghiệp thành viên',
       api: 'Không (Nội bộ DB)', priority: 'Cao', prog: '100%', status: 'Hoàn thành nội bộ', test: 'Passed (Nội bộ)', notes: '/association/members'
     },
@@ -578,7 +578,7 @@ async function generateProgressWorkbook() {
     {
       wbs: 'WBS-ASS-015', module: 'App Hiệp Hội', epic: 'Sự Kiện & Vé Số',
       feature: 'Tự quét mã QR check-in tại quầy đón tiếp',
-      desc: 'Hội viên mở camera quét mã QR đặt tại bàn tiếp đón để tự động điểm danh',
+      desc: 'Học viên mở camera quét mã QR đặt tại bàn tiếp đón để tự động điểm danh',
       api: 'Không (Camera Native)', priority: 'Khẩn cấp', prog: '100%', status: 'Hoàn thành nội bộ', test: 'Passed (Nội bộ)', notes: '/association/checkin'
     },
 
@@ -586,25 +586,25 @@ async function generateProgressWorkbook() {
     {
       wbs: 'WBS-ASS-016', module: 'App Hiệp Hội', epic: 'Hội Phí Trực Tuyến',
       feature: 'Tra cứu tình trạng đóng phí & hạn sử dụng thẻ',
-      desc: 'Hiển thị rõ ngày hết hạn thẻ hội viên, số tiền hội phí cần nộp cho kỳ mới',
+      desc: 'Hiển thị rõ ngày hết hạn thẻ Học viên, số tiền hội phí cần nộp cho kỳ mới',
       api: 'Không (Nội bộ DB)', priority: 'Khẩn cấp', prog: '100%', status: 'Hoàn thành nội bộ', test: 'Passed (Nội bộ)', notes: '/association/renew'
     },
     {
       wbs: 'WBS-ASS-017', module: 'App Hiệp Hội', epic: 'Hội Phí Trực Tuyến',
       feature: 'Hiển thị mã VietQR chuyển khoản ngân hàng',
-      desc: 'Hiển thị mã VietQR có sẵn số tiền và nội dung chuyển khoản để hội viên quét bằng app ngân hàng',
+      desc: 'Hiển thị mã VietQR có sẵn số tiền và nội dung chuyển khoản để Học viên quét bằng app ngân hàng',
       api: 'Có (VietQR Tĩnh)', priority: 'Khẩn cấp', prog: '90%', status: 'Hoàn thành hiển thị QR', test: 'Passed UI QR', notes: '/association/renew/pay'
     },
     {
       wbs: 'WBS-ASS-018', module: 'App Hiệp Hội', epic: 'Hội Phí Trực Tuyến',
       feature: 'Tự động gạch nợ tức thời qua kết nối Ngân hàng',
       desc: 'Hệ thống tự động kích hoạt gia hạn thẻ ngay khi tiền vào tài khoản hiệp hội',
-      api: 'CÓ (API Ngân hàng / Cổng TT)', priority: 'Khẩn cấp', prog: '20%', status: 'CHƯA LIÊN KẾT API', test: 'FAILED - Chưa thông luồng', notes: 'Hội viên phải chờ kế toán xác nhận'
+      api: 'CÓ (API Ngân hàng / Cổng TT)', priority: 'Khẩn cấp', prog: '20%', status: 'CHƯA LIÊN KẾT API', test: 'FAILED - Chưa thông luồng', notes: 'Học viên phải chờ kế toán xác nhận'
     },
     {
       wbs: 'WBS-ASS-019', module: 'App Hiệp Hội', epic: 'Hội Phí Trực Tuyến',
       feature: 'Gửi ảnh chụp Ủy nhiệm chi xác nhận chuyển tiền',
-      desc: 'Hội viên upload ảnh chụp màn hình chuyển khoản để kế toán kiểm tra thủ công',
+      desc: 'Học viên upload ảnh chụp màn hình chuyển khoản để kế toán kiểm tra thủ công',
       api: 'Không (Nội bộ MinIO)', priority: 'Khẩn cấp', prog: '100%', status: 'Hoàn thành nội bộ', test: 'Passed (Nội bộ)', notes: 'Fallback chờ API ngân hàng'
     },
 
@@ -617,7 +617,7 @@ async function generateProgressWorkbook() {
     },
     {
       wbs: 'WBS-ASS-021', module: 'App Hiệp Hội', epic: 'Tiện Ích & Hỗ Trợ',
-      feature: 'Kho đặc quyền hội viên & Ưu đãi B2B nội bộ',
+      feature: 'Kho đặc quyền Học viên & Ưu đãi B2B nội bộ',
       desc: 'Xem danh sách ưu đãi giảm giá từ các doanh nghiệp thành viên trong CLB',
       api: 'Không (Nội bộ DB)', priority: 'Trung bình', prog: '100%', status: 'Hoàn thành nội bộ', test: 'Passed (Nội bộ)', notes: '/association/perks'
     },
@@ -766,7 +766,7 @@ async function generateProgressWorkbook() {
     },
     {
       wbs: 'WBS-VIO-018', module: 'App ViOne', epic: 'Mobile Native App',
-      feature: 'Tích hợp In-App Purchase (IAP) mua gói hội viên ViOne Pro',
+      feature: 'Tích hợp In-App Purchase (IAP) mua gói Học viên ViOne Pro',
       desc: 'Thanh toán gói thuê bao nâng cao qua tài khoản Apple ID / Google Play Billing',
       api: 'CÓ (Apple IAP / Google Play Billing)', priority: 'Trung bình', prog: '10%', status: 'CHƯA TÍCH HỢP STORE BILLING', test: 'Chưa kết nối Store API', notes: 'Chưa cấu hình In-App Purchase'
     },
@@ -1060,9 +1060,9 @@ async function generateProgressWorkbook() {
   const landingTasks = [
     {
       wbs: 'WBS-LAND-001', template: 'CEO HN10 Landing (Hoàng Kim)', section: 'Hero Banner Hoàng Kim CEO HN10',
-      demo: 'Khẩu hiệu "Hội tụ Tinh hoa - Kết nối Bền vững", số lượng hội viên thời gian thực, nút Đăng ký & Tải App',
+      demo: 'Khẩu hiệu "Hội tụ Tinh hoa - Kết nối Bền vững", số lượng Học viên thời gian thực, nút Đăng ký & Tải App',
       effects: 'Golden Glow gradient, hạt ánh sáng vàng chuyển động, 3D emblem xoay nhẹ',
-      api: 'Có (Đếm hội viên active)', priority: 'Khẩn cấp', prog: '100%', status: 'Hoàn thành UI & Text Demo', file: 'Ceo1983Landing.tsx'
+      api: 'Có (Đếm Học viên active)', priority: 'Khẩn cấp', prog: '100%', status: 'Hoàn thành UI & Text Demo', file: 'Ceo1983Landing.tsx'
     },
     {
       wbs: 'WBS-LAND-002', template: 'CEO HN10 Landing (Hoàng Kim)', section: 'Tôn Chỉ & Giá Trị Cốt Lõi CLB',
@@ -1077,7 +1077,7 @@ async function generateProgressWorkbook() {
       api: 'Có (Đọc danh sách BCH từ CRM)', priority: 'Cao', prog: '100%', status: 'Hoàn thành UI & Text Demo', file: 'Ceo1983Landing.tsx'
     },
     {
-      wbs: 'WBS-LAND-004', template: 'CEO HN10 Landing (Hoàng Kim)', section: '8 Đặc Quyền Hội Viên Kim Cương',
+      wbs: 'WBS-LAND-004', template: 'CEO HN10 Landing (Hoàng Kim)', section: '8 Đặc Quyền Học viên Kim Cương',
       demo: 'Giao thương B2B nội khối, cấp Thẻ số NFC độc bản, tham gia Gala thường niên, bảo hộ thương hiệu',
       effects: 'Grid 4 cột responsive, icon mạ vàng chuyển động lấp lánh',
       api: 'Không (Nội dung bản sắc)', priority: 'Cao', prog: '100%', status: 'Hoàn thành UI & Text Demo', file: 'Ceo1983Landing.tsx'
@@ -1120,7 +1120,7 @@ async function generateProgressWorkbook() {
     },
     {
       wbs: 'WBS-LAND-011', template: 'Association Public Landing', section: 'Cổng Thông Tin Công Cộng Hiệp Hội',
-      demo: 'Cổng thông tin mở cho đối tác bên ngoài tra cứu danh bạ hội viên chính thức, xác thực mã thẻ hội viên',
+      demo: 'Cổng thông tin mở cho đối tác bên ngoài tra cứu danh bạ Học viên chính thức, xác thực mã thẻ Học viên',
       effects: 'Thanh tìm kiếm nhanh, bộ lọc doanh nghiệp theo tỉnh thành',
       api: 'Có (Public Directory API)', priority: 'Cao', prog: '100%', status: 'Hoàn thành UI & Text Demo', file: 'AssociationLandingView.tsx'
     },
@@ -1391,7 +1391,7 @@ async function generateProgressWorkbook() {
     },
     {
       wbs: 'WBS-V2-024', module: 'Cộng Đồng & Phân Ban', feature: 'Sàn cơ hội kinh doanh & Chào thầu nội khối',
-      desc: 'Đăng tin tìm kiếm nhà thầu phụ, cơ hội đầu tư chung, chuyển nhượng dự án độc quyền cho hội viên',
+      desc: 'Đăng tin tìm kiếm nhà thầu phụ, cơ hội đầu tư chung, chuyển nhượng dự án độc quyền cho Học viên',
       api: 'Không (Nội bộ DB)', priority: 'Khẩn cấp', prog: '100%', status: 'Hoàn thành nội bộ', test: 'Passed (Nội bộ)', route: '/connect-app/community/:id/opportunities'
     },
     {

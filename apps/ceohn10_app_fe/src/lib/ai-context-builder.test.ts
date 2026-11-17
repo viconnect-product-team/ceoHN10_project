@@ -12,7 +12,7 @@ import { emptyMemory } from "@/lib/ai-session-memory";
 describe("ai-capability-router", () => {
   it("routes documents / members / fees by keyword", () => {
     expect(detectCapability("Tóm tắt tài liệu quyết định mới").capability).toBe("document_qa");
-    expect(detectCapability("Tìm hội viên ngành logistics").capability).toBe("member_search");
+    expect(detectCapability("Tìm Học viên ngành logistics").capability).toBe("member_search");
     expect(detectCapability("Hội phí quá hạn còn bao nhiêu?").capability).toBe("fee_analysis");
     expect(detectCapability("Viết thông báo mời họp").capability).toBe("announcement_draft");
   });
@@ -80,7 +80,7 @@ describe("ai-context-builder", () => {
 
   it("only attaches known valid routes to actions", () => {
     const bundle = buildContextBundle({
-      message: "Tìm hội viên ngành logistics",
+      message: "Tìm Học viên ngành logistics",
       capability: "member_search",
       permissionLevel: "admin",
       data: { members: [{ id: "m1", name: "A", industry: "Logistics" }] },
@@ -94,11 +94,11 @@ describe("ai-context-builder", () => {
 describe("ai-mock-answer-engine", () => {
   it("returns a no-data answer when context is empty", () => {
     const bundle = buildContextBundle({
-      message: "Tìm hội viên ngành logistics",
+      message: "Tìm Học viên ngành logistics",
       capability: "member_search",
       permissionLevel: "admin",
     });
-    const ans = generateMockAnswer("Tìm hội viên", "member_search", bundle);
+    const ans = generateMockAnswer("Tìm Học viên", "member_search", bundle);
     expect(ans.answer).toContain("Em đã ghi nhận câu hỏi của anh/chị");
   });
 

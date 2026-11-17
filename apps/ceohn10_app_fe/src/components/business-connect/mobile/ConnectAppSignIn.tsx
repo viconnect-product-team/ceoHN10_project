@@ -365,7 +365,7 @@ export function ConnectAppSignIn({
           </button>
         </form>
 
-        {/* Sign up -> Chuyển đến Cổng Đăng Ký Hội Viên (/register) */}
+        {/* Sign up -> Chuyển đến Cổng Đăng Ký Học viên (/register) */}
         <div className="shrink-0 my-1">
           <Link
             to="/register"

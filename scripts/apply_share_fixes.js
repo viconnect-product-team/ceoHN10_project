@@ -93,7 +93,7 @@ feedContent = feedContent.replace(
         {
           type: "post",
           id: post.id,
-          title: \`[Mạng Lưới CEO HN10] Bài viết từ \${post.author?.name || "Hội viên"}\`,
+          title: \`[Mạng Lưới CEO HN10] Bài viết từ \${post.author?.name || "Học viên"}\`,
           desc: post.content?.slice(0, 200),
           image: post.images?.[0] || undefined,
           targetPath: \`/association/messages?post=\${post.id}\`,

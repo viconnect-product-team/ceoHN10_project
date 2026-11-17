@@ -93,7 +93,7 @@ export const DEFAULT_FEE_INVOICES: FeeRecord[] = [
       feeYear: 2026,
       feePaid: false,
       address: "Hà Nội, Việt Nam",
-      about: "Phó Ban Phát Triển Hội Viên CLB CEO HN10",
+      about: "Phó Ban Phát Triển Học viên CLB CEO HN10",
     },
   },
   {

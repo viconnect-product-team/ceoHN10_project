@@ -20,10 +20,10 @@
       "bundleIdentifier": "vn.ceohn10.app",
       "buildNumber": "7",
       "infoPlist": {
-        "NSCameraUsageDescription": "CEO HN10 cần quyền truy cập camera để quét mã QR check-in sự kiện và kết nối hội viên.",
-        "NSPhotoLibraryUsageDescription": "CEO HN10 cần quyền truy cập thư viện ảnh để tải lên avatar và tài liệu hội viên.",
+        "NSCameraUsageDescription": "CEO HN10 cần quyền truy cập camera để quét mã QR check-in sự kiện và kết nối Học viên.",
+        "NSPhotoLibraryUsageDescription": "CEO HN10 cần quyền truy cập thư viện ảnh để tải lên avatar và tài liệu Học viên.",
         "NSFaceIDUsageDescription": "Xác thực sinh trắc học Face ID / Touch ID để bảo mật đăng nhập tài khoản CEO HN10.",
-        "NFCReaderUsageDescription": "Đọc thẻ danh thiếp hội viên NFC 1-chạm kết nối và giao lưu doanh nhân."
+        "NFCReaderUsageDescription": "Đọc thẻ danh thiếp Học viên NFC 1-chạm kết nối và giao lưu doanh nhân."
       }
     },
     "android": {

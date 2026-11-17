@@ -91,7 +91,7 @@ export function CreatePostModal({ isOpen, onClose, onSuccess, initialShare }: Cr
       try {
         const u = new URL(cleanUrl);
         setSharedDomain(u.hostname.replace(/^www\./, "").toUpperCase());
-      } catch {}
+      } catch { }
 
       const res = await fetchNestApi<any>(`/feed/url-metadata?url=${encodeURIComponent(cleanUrl)}`);
       if (res && res.ok) {
@@ -169,7 +169,7 @@ export function CreatePostModal({ isOpen, onClose, onSuccess, initialShare }: Cr
       }
       const cleanDomain = hostname.replace(/^www\./, "").toUpperCase();
       setSharedDomain(cleanDomain);
-    } catch {}
+    } catch { }
 
     if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
     debounceTimerRef.current = setTimeout(() => {
@@ -190,7 +190,7 @@ export function CreatePostModal({ isOpen, onClose, onSuccess, initialShare }: Cr
     if (!files || files.length === 0) return;
     const remainingSlots = 5 - images.length;
     if (remainingSlots <= 0) {
-      toast.warning("Hội viên chỉ được đính kèm tối đa 5 ảnh cho mỗi bài viết.");
+      toast.warning("Học viên chỉ được đính kèm tối đa 5 ảnh cho mỗi bài viết.");
       if (fileInputRef.current) fileInputRef.current.value = "";
       return;
     }
@@ -249,16 +249,16 @@ export function CreatePostModal({ isOpen, onClose, onSuccess, initialShare }: Cr
       const sharedArticle =
         postMode === "external" && sharedUrl.trim()
           ? {
-              url: cleanUrl,
-              domain: sharedDomain || "LIÊN KẾT NGOÀI",
-              title: sharedTitle.trim() || title.trim() || "Bài viết chia sẻ",
-              snippet: sharedSummary.trim() || "Bấm vào để đọc toàn văn bài viết chi tiết từ ứng dụng nguồn.",
-              thumbnailUrl:
-                sharedThumbnail.trim() ||
-                images[0] ||
-                "",
-              sourceName: sharedDomain || "LIÊN KẾT NGOÀI",
-            }
+            url: cleanUrl,
+            domain: sharedDomain || "LIÊN KẾT NGOÀI",
+            title: sharedTitle.trim() || title.trim() || "Bài viết chia sẻ",
+            snippet: sharedSummary.trim() || "Bấm vào để đọc toàn văn bài viết chi tiết từ ứng dụng nguồn.",
+            thumbnailUrl:
+              sharedThumbnail.trim() ||
+              images[0] ||
+              "",
+            sourceName: sharedDomain || "LIÊN KẾT NGOÀI",
+          }
           : undefined;
 
       const payload = {
@@ -282,7 +282,7 @@ export function CreatePostModal({ isOpen, onClose, onSuccess, initialShare }: Cr
         authorAvatar:
           user?.avatar ||
           "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80",
-        authorTitle: "Hội viên CLB",
+        authorTitle: "Học viên CLB",
         department: department || "Ban Thành viên",
         category,
         title: payload.title,
@@ -302,7 +302,7 @@ export function CreatePostModal({ isOpen, onClose, onSuccess, initialShare }: Cr
         const list = existing ? JSON.parse(existing) : [];
         list.unshift(createdPost);
         localStorage.setItem("vba_network_feed_posts", JSON.stringify(list));
-      } catch {}
+      } catch { }
 
       toast.success("Đăng bài thành công lên Bảng tin & Mạng lưới CEO HN10!");
       onSuccess(createdPost);
@@ -346,11 +346,10 @@ export function CreatePostModal({ isOpen, onClose, onSuccess, initialShare }: Cr
           <button
             type="button"
             onClick={() => setPostMode("standard")}
-            className={`pb-2.5 px-3 text-xs font-bold transition flex items-center gap-1.5 border-b-2 cursor-pointer ${
-              postMode === "standard"
+            className={`pb-2.5 px-3 text-xs font-bold transition flex items-center gap-1.5 border-b-2 cursor-pointer ${postMode === "standard"
                 ? "border-red-600 text-red-600 dark:text-red-400"
                 : "border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400"
-            }`}
+              }`}
           >
             <Newspaper className="size-3.5" />
             <span>Bài viết nội bộ</span>
@@ -358,11 +357,10 @@ export function CreatePostModal({ isOpen, onClose, onSuccess, initialShare }: Cr
           <button
             type="button"
             onClick={() => setPostMode("external")}
-            className={`pb-2.5 px-3 text-xs font-bold transition flex items-center gap-1.5 border-b-2 cursor-pointer ${
-              postMode === "external"
+            className={`pb-2.5 px-3 text-xs font-bold transition flex items-center gap-1.5 border-b-2 cursor-pointer ${postMode === "external"
                 ? "border-blue-600 text-blue-600 dark:text-blue-400"
                 : "border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400"
-            }`}
+              }`}
           >
             <Link2 className="size-3.5" />
             <span>Chia sẻ bài viết từ bên ngoài (Dạng Facebook)</span>
@@ -481,11 +479,10 @@ export function CreatePostModal({ isOpen, onClose, onSuccess, initialShare }: Cr
               <button
                 type="button"
                 onClick={() => setPrivacy("public")}
-                className={`p-2 rounded-xl border text-center flex flex-col items-center gap-1 transition cursor-pointer ${
-                  privacy === "public"
+                className={`p-2 rounded-xl border text-center flex flex-col items-center gap-1 transition cursor-pointer ${privacy === "public"
                     ? "border-[#003B95] bg-blue-50/80 dark:bg-blue-950/40 text-[#003B95] dark:text-blue-300 font-bold"
                     : "border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800"
-                }`}
+                  }`}
               >
                 <Globe className="size-4" />
                 <span className="text-[11px]">Công khai</span>
@@ -493,11 +490,10 @@ export function CreatePostModal({ isOpen, onClose, onSuccess, initialShare }: Cr
               <button
                 type="button"
                 onClick={() => setPrivacy("friends")}
-                className={`p-2 rounded-xl border text-center flex flex-col items-center gap-1 transition cursor-pointer ${
-                  privacy === "friends"
+                className={`p-2 rounded-xl border text-center flex flex-col items-center gap-1 transition cursor-pointer ${privacy === "friends"
                     ? "border-[#003B95] bg-blue-50/80 dark:bg-blue-950/40 text-[#003B95] dark:text-blue-300 font-bold"
                     : "border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800"
-                }`}
+                  }`}
               >
                 <Users className="size-4" />
                 <span className="text-[11px]">Bạn bè</span>
@@ -505,11 +501,10 @@ export function CreatePostModal({ isOpen, onClose, onSuccess, initialShare }: Cr
               <button
                 type="button"
                 onClick={() => setPrivacy("only_me")}
-                className={`p-2 rounded-xl border text-center flex flex-col items-center gap-1 transition cursor-pointer ${
-                  privacy === "only_me"
+                className={`p-2 rounded-xl border text-center flex flex-col items-center gap-1 transition cursor-pointer ${privacy === "only_me"
                     ? "border-[#003B95] bg-blue-50/80 dark:bg-blue-950/40 text-[#003B95] dark:text-blue-300 font-bold"
                     : "border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800"
-                }`}
+                  }`}
               >
                 <Lock className="size-4" />
                 <span className="text-[11px]">Chỉ mình tôi</span>
@@ -531,11 +526,10 @@ export function CreatePostModal({ isOpen, onClose, onSuccess, initialShare }: Cr
                     key={c.id}
                     type="button"
                     onClick={() => setCategory(c.id)}
-                    className={`p-2.5 rounded-xl border text-left flex items-center gap-2.5 transition cursor-pointer ${
-                      isSelected
+                    className={`p-2.5 rounded-xl border text-left flex items-center gap-2.5 transition cursor-pointer ${isSelected
                         ? "border-red-600 bg-red-50/50 dark:bg-red-950/20 text-red-700 dark:text-red-400 font-bold shadow-xs"
                         : "border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 text-slate-700 dark:text-slate-300"
-                    }`}
+                      }`}
                   >
                     <div className={`p-1.5 rounded-lg ${c.color}`}>
                       <Icon className="size-4" />
@@ -608,11 +602,10 @@ export function CreatePostModal({ isOpen, onClose, onSuccess, initialShare }: Cr
                   type="button"
                   onClick={() => cameraInputRef.current?.click()}
                   disabled={uploadingImages || images.length >= 5}
-                  className={`px-2.5 py-1.5 rounded-xl border text-[11px] font-bold inline-flex items-center gap-1 cursor-pointer transition active:scale-95 ${
-                    images.length >= 5
+                  className={`px-2.5 py-1.5 rounded-xl border text-[11px] font-bold inline-flex items-center gap-1 cursor-pointer transition active:scale-95 ${images.length >= 5
                       ? "border-slate-200 text-slate-400 cursor-not-allowed opacity-60"
                       : "border-amber-400 dark:border-amber-600 bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 hover:bg-amber-100"
-                  }`}
+                    }`}
                   title="Mở máy ảnh chụp trực tiếp"
                 >
                   <Camera className="size-3.5 text-amber-600 dark:text-amber-400" />
@@ -633,11 +626,10 @@ export function CreatePostModal({ isOpen, onClose, onSuccess, initialShare }: Cr
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
                   disabled={uploadingImages || images.length >= 5}
-                  className={`px-2.5 py-1.5 rounded-xl border text-[11px] font-bold inline-flex items-center gap-1 cursor-pointer transition active:scale-95 ${
-                    images.length >= 5
+                  className={`px-2.5 py-1.5 rounded-xl border text-[11px] font-bold inline-flex items-center gap-1 cursor-pointer transition active:scale-95 ${images.length >= 5
                       ? "border-slate-200 text-slate-400 cursor-not-allowed opacity-60"
                       : "border-blue-300 dark:border-blue-700 bg-blue-50 dark:bg-blue-950/40 text-[#003B95] dark:text-blue-300 hover:bg-blue-100"
-                  }`}
+                    }`}
                   title="Tải ảnh có sẵn từ thiết bị"
                 >
                   <ImagePlus className="size-3.5 text-[#003B95] dark:text-blue-400" />

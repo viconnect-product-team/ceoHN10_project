@@ -325,7 +325,7 @@ export default function NewsScreen() {
       member?.name ||
       (user as any)?.name ||
       (user as any)?.user_metadata?.full_name ||
-      "Hội viên CLB CEO HN10";
+      "Học viên CLB CEO HN10";
 
     if (editingNews) {
       // UPDATE ARTICLE
@@ -335,7 +335,7 @@ export default function NewsScreen() {
         category: finalCategory,
         excerpt:
           postContent.trim() ||
-          (postUrl.trim() ? `Bài viết chia sẻ: ${postUrl.trim()}` : "Chia sẻ từ hội viên"),
+          (postUrl.trim() ? `Bài viết chia sẻ: ${postUrl.trim()}` : "Chia sẻ từ Học viên"),
         image:
           postImage ||
           editingNews.image ||
@@ -377,7 +377,7 @@ export default function NewsScreen() {
         category: finalCategory,
         excerpt:
           postContent.trim() ||
-          (postUrl.trim() ? `Bài viết chia sẻ: ${postUrl.trim()}` : "Chia sẻ từ hội viên"),
+          (postUrl.trim() ? `Bài viết chia sẻ: ${postUrl.trim()}` : "Chia sẻ từ Học viên"),
         author: authorName,
         time: new Date().toISOString(),
         views: 1,
@@ -484,15 +484,15 @@ export default function NewsScreen() {
             type="button"
             onClick={() => setActiveTab("all")}
             className={`py-2 px-1 text-center rounded-xl text-xs font-bold transition-all flex flex-col sm:flex-row items-center justify-center gap-1 cursor-pointer ${activeTab === "all"
-                ? "bg-white text-[#003B95] border border-[#003B95] shadow-xs"
-                : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+              ? "bg-white text-[#003B95] border border-[#003B95] shadow-xs"
+              : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
               }`}
           >
             <span>Tất cả</span>
             <span
               className={`text-[9.5px] px-1.5 py-0.2 rounded-full font-semibold ${activeTab === "all"
-                  ? "bg-blue-50 text-[#003B95] border border-blue-200"
-                  : "bg-slate-100 dark:bg-white/10 text-slate-500 dark:text-slate-400"
+                ? "bg-blue-50 text-[#003B95] border border-blue-200"
+                : "bg-slate-100 dark:bg-white/10 text-slate-500 dark:text-slate-400"
                 }`}
             >
               {allNews.length}
@@ -504,8 +504,8 @@ export default function NewsScreen() {
             type="button"
             onClick={() => setActiveTab("latest")}
             className={`py-2 px-1 text-center rounded-xl text-xs font-bold transition-all flex flex-col sm:flex-row items-center justify-center gap-1 cursor-pointer ${activeTab === "latest"
-                ? "bg-white text-[#003B95] border border-[#003B95] shadow-xs"
-                : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+              ? "bg-white text-[#003B95] border border-[#003B95] shadow-xs"
+              : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
               }`}
           >
             <span className="flex items-center gap-0.5">
@@ -519,15 +519,15 @@ export default function NewsScreen() {
             type="button"
             onClick={() => setActiveTab("read")}
             className={`py-2 px-1 text-center rounded-xl text-xs font-bold transition-all flex flex-col sm:flex-row items-center justify-center gap-1 cursor-pointer ${activeTab === "read"
-                ? "bg-white text-[#003B95] border border-[#003B95] shadow-xs"
-                : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+              ? "bg-white text-[#003B95] border border-[#003B95] shadow-xs"
+              : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
               }`}
           >
             <span>Đã xem</span>
             <span
               className={`text-[9.5px] px-1.5 py-0.2 rounded-full font-semibold ${activeTab === "read"
-                  ? "bg-blue-50 text-[#003B95] border border-blue-200"
-                  : "bg-slate-100 dark:bg-white/10 text-slate-500 dark:text-slate-400"
+                ? "bg-blue-50 text-[#003B95] border border-blue-200"
+                : "bg-slate-100 dark:bg-white/10 text-slate-500 dark:text-slate-400"
                 }`}
             >
               {readCount}
@@ -539,8 +539,8 @@ export default function NewsScreen() {
             type="button"
             onClick={() => setActiveTab("unread")}
             className={`py-2 px-1 text-center rounded-xl text-xs font-bold transition-all flex flex-col sm:flex-row items-center justify-center gap-1 cursor-pointer relative ${activeTab === "unread"
-                ? "bg-white text-[#003B95] border border-[#003B95] shadow-xs"
-                : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+              ? "bg-white text-[#003B95] border border-[#003B95] shadow-xs"
+              : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
               }`}
           >
             <span className="flex items-center gap-1">
@@ -549,10 +549,10 @@ export default function NewsScreen() {
             </span>
             <span
               className={`text-[9.5px] px-1.5 py-0.2 rounded-full font-bold ${activeTab === "unread"
-                  ? "bg-blue-50 text-[#003B95] border border-blue-200"
-                  : unreadCount > 0
-                    ? "bg-amber-100 text-amber-700 dark:bg-amber-950/80 dark:text-amber-300"
-                    : "bg-slate-100 dark:bg-white/10 text-slate-500 dark:text-slate-400"
+                ? "bg-blue-50 text-[#003B95] border border-blue-200"
+                : unreadCount > 0
+                  ? "bg-amber-100 text-amber-700 dark:bg-amber-950/80 dark:text-amber-300"
+                  : "bg-slate-100 dark:bg-white/10 text-slate-500 dark:text-slate-400"
                 }`}
             >
               {unreadCount}
@@ -1007,7 +1007,7 @@ export default function NewsScreen() {
                   />
                 </div>
                 <p className="text-[10.5px] text-slate-400 mt-1">
-                  Hội viên có thể dán link bài viết từ báo chí, website công ty hoặc mạng xã hội.
+                  Học viên có thể dán link bài viết từ báo chí, website công ty hoặc mạng xã hội.
                 </p>
               </div>
 
@@ -1111,7 +1111,7 @@ export default function NewsScreen() {
                 <p className="text-slate-600 dark:text-slate-300">
                   Hiệp hội doanh nhân CEO HN10 không ngừng đẩy mạnh các hoạt động xúc tiến kết nối
                   giao thương nội khối, xây dựng chuỗi cung ứng bền vững và lan tỏa giá trị kinh tế
-                  thiết thực đến từng hội viên trong kỷ nguyên chuyển đổi số toàn diện.
+                  thiết thực đến từng Học viên trong kỷ nguyên chuyển đổi số toàn diện.
                 </p>
 
                 {selectedNews.url && (

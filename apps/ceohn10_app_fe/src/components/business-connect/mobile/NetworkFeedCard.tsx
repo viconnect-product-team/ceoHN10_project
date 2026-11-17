@@ -226,9 +226,9 @@ export function NetworkFeedCard({
   const isOwner = Boolean(
     (viewerUserId &&
       (authorUserId === viewerUserId ||
-       item.ownerUserId === viewerUserId ||
-       item.owner?.userId === viewerUserId ||
-       (authorUserId && authorUserId.replace(/^u:/, "") === viewerUserId.replace(/^u:/, "")))) ||
+        item.ownerUserId === viewerUserId ||
+        item.owner?.userId === viewerUserId ||
+        (authorUserId && authorUserId.replace(/^u:/, "") === viewerUserId.replace(/^u:/, "")))) ||
     (user && (
       (authorUserId && (user.id === authorUserId || (user as any).member_id === authorUserId)) ||
       (authorName && (user.name === authorName || (user as any).fullName === authorName || (user as any).name === authorName)) ||
@@ -551,9 +551,9 @@ function FeedActionRow({
   const isOwner = Boolean(
     (viewerUserId &&
       (authorUserId === viewerUserId ||
-       item.ownerUserId === viewerUserId ||
-       item.owner?.userId === viewerUserId ||
-       (authorUserId && authorUserId.replace(/^u:/, "") === viewerUserId.replace(/^u:/, "")))) ||
+        item.ownerUserId === viewerUserId ||
+        item.owner?.userId === viewerUserId ||
+        (authorUserId && authorUserId.replace(/^u:/, "") === viewerUserId.replace(/^u:/, "")))) ||
     (user && (
       (authorUserId && (user.id === authorUserId || (user as any).member_id === authorUserId)) ||
       (authorName && (user.name === authorName || (user as any).fullName === authorName || (user as any).name === authorName)) ||
@@ -607,7 +607,7 @@ function FeedActionRow({
       .then((res) => {
         if (res?.ok) setIsMuted(res.isMuted);
       })
-      .catch(() => {});
+      .catch(() => { });
   }, [item.momentId]);
 
   const handleToggleMute = async () => {
@@ -673,8 +673,8 @@ function FeedActionRow({
             {state === "pending_received"
               ? "Đã nhận lời mời kết nối"
               : state === "pending_sent"
-              ? "Đã gửi lời mời kết nối"
-              : "Chưa kết nối với hội viên"}
+                ? "Đã gửi lời mời kết nối"
+                : "Chưa kết nối với Học viên"}
           </span>
 
           <div className="flex items-center gap-1.5 shrink-0">

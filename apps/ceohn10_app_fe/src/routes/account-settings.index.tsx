@@ -167,13 +167,13 @@ function AccountManagementPage() {
   const [createEmail, setCreateEmail] = useState("");
   const [createPassword, setCreatePassword] = useState("");
   const [createName, setCreateName] = useState("");
-  const [createDepartment, setCreateDepartment] = useState("Hội viên ceohn10");
+  const [createDepartment, setCreateDepartment] = useState("Học viên ceohn10");
   const [createRole, setCreateRole] = useState("member");
   const [createStatus, setCreateStatus] = useState("active");
 
   const [editName, setEditName] = useState("");
   const [editEmail, setEditEmail] = useState("");
-  const [editDepartment, setEditDepartment] = useState("Hội viên ceohn10");
+  const [editDepartment, setEditDepartment] = useState("Học viên ceohn10");
   const [editRole, setEditRole] = useState("member");
   const [editStatus, setEditStatus] = useState("active");
   const [adminNewPassword, setAdminNewPassword] = useState("");
@@ -269,7 +269,7 @@ function AccountManagementPage() {
     }
   };
 
-  // ── Load Admin Users List (Real-time từ CSDL & Đồng bộ Hội viên) ─────────
+  // ── Load Admin Users List (Real-time từ CSDL & Đồng bộ Học viên) ─────────
   const loadUsers = async (page = pagination.page) => {
     setUsersLoading(true);
     try {
@@ -285,13 +285,13 @@ function AccountManagementPage() {
       let paginationData = res?.pagination;
       let statsData = res?.stats;
 
-      // Đảm bảo dữ liệu thời gian thực: Nếu danh sách trả về trống hoặc chưa sync, đồng bộ ngay với 2 hội viên thực tế
+      // Đảm bảo dữ liệu thời gian thực: Nếu danh sách trả về trống hoặc chưa sync, đồng bộ ngay với 2 Học viên thực tế
       if (userItems.length === 0) {
         let mems: any[] = [];
         try {
           const memsRes = await fetchNestApi<any[]>("/members");
           if (Array.isArray(memsRes) && memsRes.length > 0) mems = memsRes;
-        } catch {}
+        } catch { }
         if (mems.length === 0) {
           const { DEFAULT_MEMBERS } = await import("@/lib/members-data");
           mems = DEFAULT_MEMBERS;
@@ -516,7 +516,7 @@ function AccountManagementPage() {
             localStorage.setItem("vba_managed_accounts_v2", JSON.stringify(next));
             window.dispatchEvent(new CustomEvent("vba_accounts_changed", { detail: next }));
           }
-        } catch {}
+        } catch { }
 
         toast.success(`Tạo tài khoản "${createName.trim() || createUsername}" với chức vụ "${getRoleBadgeLabel(createRole)}" thành công!`);
         setCreateModalOpen(false);
@@ -524,7 +524,7 @@ function AccountManagementPage() {
         setCreateEmail("");
         setCreatePassword("");
         setCreateName("");
-        setCreateDepartment("Hội viên ceohn10");
+        setCreateDepartment("Học viên ceohn10");
         setCreateRole("member");
 
         window.dispatchEvent(new Event("role-changed"));
@@ -619,7 +619,7 @@ function AccountManagementPage() {
               window.dispatchEvent(new CustomEvent("vba_accounts_changed", { detail: next }));
             }
           }
-        } catch {}
+        } catch { }
 
         // 4. Nếu tài khoản được chỉnh sửa là tài khoản hiện tại, cập nhật localStorage và xóa cache
         clearMeCache();
@@ -652,7 +652,7 @@ function AccountManagementPage() {
               localStorage.setItem("vba_crm_current_user", JSON.stringify(cu));
             }
           }
-        } catch {}
+        } catch { }
 
         // 5. Bắn các sự kiện hệ thống để cập nhật Sidebar và toàn bộ giao diện ngay lập tức
         if (typeof window !== "undefined") {
@@ -691,7 +691,7 @@ function AccountManagementPage() {
       if (res && res.error) {
         toast.error(res.message || "Không thể đặt lại mật khẩu");
       } else {
-        toast.success(`Đã thiết lập mật khẩu mới cho ${targetUser.username}! Hệ thống đã tự động gửi Email và Zalo OA mật khẩu mới tới hội viên.`);
+        toast.success(`Đã thiết lập mật khẩu mới cho ${targetUser.username}! Hệ thống đã tự động gửi Email và Zalo OA mật khẩu mới tới Học viên.`);
         setResetModalOpen(false);
         setAdminNewPassword("");
       }
@@ -818,295 +818,292 @@ function AccountManagementPage() {
         {/* ── QUẢN TRỊ NGƯỜI DÙNG & PHÂN QUYỀN TÀI KHOẢN (DUY NHẤT) ── */}
         <div className="space-y-6">
           {/* Stats Row */}
-            <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-              <StatCard
-                label="Tổng số tài khoản"
-                value={userStats.total}
-                tone="primary"
-                icon={<Users className="h-5 w-5 text-primary" />}
-              />
-              <StatCard
-                label="Đang hoạt động"
-                value={userStats.active}
-                tone="success"
-                icon={<CheckCircle2 className="h-5 w-5 text-emerald-500" />}
-              />
-              <StatCard
-                label="Đã tạm khóa"
-                value={userStats.suspended}
-                tone="danger"
-                icon={<AlertCircle className="h-5 w-5 text-destructive" />}
-              />
-              <StatCard
-                label="Quản trị viên"
-                value={userStats.admins}
-                tone="info"
-                icon={<ShieldCheck className="h-5 w-5 text-sky-500" />}
-              />
-            </div>
-
-            {/* Filter Toolbar */}
-            <Card className="p-4">
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <div className="relative flex-1 max-w-md">
-                  <Search className="absolute left-3.5 top-3 h-4 w-4 text-muted-foreground" />
-                  <input
-                    type="text"
-                    placeholder="Tìm theo tên, username, email..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="h-10 w-full rounded-xl border border-border bg-background pl-9 pr-4 text-sm text-foreground focus:border-ring focus:ring-1 focus:ring-ring outline-none transition"
-                  />
-                </div>
-
-                <div className="flex flex-wrap items-center gap-2">
-                  <select
-                    value={roleFilter}
-                    onChange={(e) => setRoleFilter(e.target.value)}
-                    className="h-10 rounded-xl border border-border bg-background px-3 text-xs font-medium text-foreground outline-none focus:border-ring"
-                  >
-                    <option value="all">Tất cả vai trò</option>
-                    <option value="platform_admin">Quản trị</option>
-                    <option value="tenant_admin">Tenant Admin</option>
-                    <option value="staff">Staff</option>
-                    <option value="viewer">Viewer</option>
-                  </select>
-
-                  <select
-                    value={statusFilter}
-                    onChange={(e) => setStatusFilter(e.target.value)}
-                    className="h-10 rounded-xl border border-border bg-background px-3 text-xs font-medium text-foreground outline-none focus:border-ring"
-                  >
-                    <option value="all">Tất cả trạng thái</option>
-                    <option value="active">Đang hoạt động</option>
-                    <option value="suspended">Đã tạm khóa</option>
-                  </select>
-
-                  <button
-                    onClick={() => loadUsers(pagination.page)}
-                    className="rounded-xl border border-border bg-card p-2.5 text-muted-foreground hover:bg-secondary hover:text-foreground transition"
-                    title="Làm mới"
-                  >
-                    <RefreshCw className={`h-4 w-4 ${usersLoading ? "animate-spin" : ""}`} />
-                  </button>
-
-                  <button
-                    onClick={() => setCreateModalOpen(true)}
-                    className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2.5 text-xs font-semibold text-primary-foreground shadow transition hover:opacity-90"
-                  >
-                    <UserPlus className="h-4 w-4" /> Thêm tài khoản
-                  </button>
-                </div>
-              </div>
-            </Card>
-
-            {/* Users Data Table */}
-            <CustomTable
-              columns={[
-                {
-                  key: "name",
-                  label: "Người dùng",
-                  width: 250,
-                  render: (u: any) => (
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-primary/10 text-xs font-bold text-primary">
-                        {u.avatar_url ? (
-                          <img src={u.avatar_url} alt={u.name} className="h-full w-full object-cover" />
-                        ) : (
-                          getInitials(u.name || u.username)
-                        )}
-                      </div>
-                      <div>
-                        <CeoTableEllipsis text={u.name || "—"} maxLines={1} className="font-semibold text-foreground" />
-                        <div className="text-[11px] text-muted-foreground">{u.email || "Chưa có email"}</div>
-                      </div>
-                    </div>
-                  ),
-                },
-                {
-                  key: "username",
-                  label: "Tên đăng nhập",
-                  width: 140,
-                  render: (u: any) => (
-                    <span className="font-mono text-xs text-foreground font-medium">{displayUsername(u.username || u.email)}</span>
-                  ),
-                },
-                {
-                  key: "department",
-                  label: "Ban chuyên môn",
-                  width: 200,
-                  render: (u: any) => (
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-muted border border-border/70 text-foreground font-semibold text-xs">
-                      <Building className="h-3 w-3 text-primary shrink-0" />
-                      <CeoTableEllipsis text={u.department || "Hội viên ceohn10"} maxLines={1} />
-                    </span>
-                  ),
-                },
-                {
-                  key: "executiveRole",
-                  label: "Vai trò chức danh",
-                  width: 190,
-                  render: (u: any) => {
-                    const userRoleKey = u.executiveRole || u.roles?.[0] || "member";
-                    const isSuper = userRoleKey === "quan_tri" || userRoleKey === "platform_admin";
-                    const isLeader =
-                      userRoleKey === "chu_tich" ||
-                      userRoleKey === "admin" ||
-                      userRoleKey.startsWith("truong_ban_") ||
-                      userRoleKey === "tong_thu_ky";
-                    const isSpecialist = userRoleKey.startsWith("thanh_vien_ban_");
-
-                    return (
-                      <span
-                        className={`inline-flex items-center gap-1 rounded-md px-2.5 py-1 text-xs font-bold border ${
-                          isSuper
-                            ? "bg-red-500/10 text-red-700 border-red-500/30"
-                            : isLeader
-                            ? "bg-amber-500/10 text-amber-700 dark:text-amber-300 border-amber-500/30"
-                            : isSpecialist
-                            ? "bg-blue-500/10 text-blue-700 dark:text-blue-300 border-blue-500/30"
-                            : "bg-secondary text-muted-foreground border-border"
-                        }`}
-                      >
-                        <ShieldCheck className="h-3 w-3 shrink-0" />
-                        <CeoTableEllipsis text={getRoleBadgeLabel(userRoleKey)} maxLines={1} />
-                      </span>
-                    );
-                  },
-                },
-                {
-                  key: "account_status",
-                  label: "Trạng thái",
-                  width: 130,
-                  align: "center",
-                  render: (u: any) => (
-                    <span
-                      className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${
-                        u.account_status === "suspended"
-                          ? "bg-destructive/10 text-destructive"
-                          : "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
-                      }`}
-                    >
-                      {u.account_status === "suspended" ? (
-                        <>
-                          <AlertCircle className="h-3 w-3" /> Đã tạm khóa
-                        </>
-                      ) : (
-                        <>
-                          <CheckCircle2 className="h-3 w-3" /> Hoạt động
-                        </>
-                      )}
-                    </span>
-                  ),
-                },
-                {
-                  key: "created_at",
-                  label: "Ngày tạo",
-                  width: 120,
-                  align: "center",
-                  render: (u: any) => (
-                    <span className="text-xs text-muted-foreground">
-                      {u.created_at ? new Date(u.created_at).toLocaleDateString("vi-VN") : "—"}
-                    </span>
-                  ),
-                },
-              ]}
-              data={usersList}
-              keyExtractor={(u: any) => u.id}
-              showStt={true}
-              loading={usersLoading}
-              emptyText="Không tìm thấy tài khoản người dùng nào"
-              page={pagination.page}
-              pageSize={pagination.limit}
-              total={pagination.total}
-              onPageChange={(p) => loadUsers(p)}
-              actionColumn={{
-                title: "THAO TÁC",
-                width: 140,
-                render: (u: any) => (
-                  <div className="inline-flex items-center gap-1 justify-center">
-                    {/* View User Details */}
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setSelectedViewUser(u);
-                        setViewModalOpen(true);
-                      }}
-                      className="rounded-lg p-1.5 text-muted-foreground hover:bg-secondary hover:text-foreground transition cursor-pointer"
-                      title="Xem chi tiết tài khoản"
-                    >
-                      <Eye className="h-4 w-4" />
-                    </button>
-
-                    {/* Edit User */}
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setTargetUser(u);
-                        setEditName(u.name !== "—" ? u.name : "");
-                        setEditEmail(u.email || "");
-                        const initDept = u.department || "Hội viên ceohn10";
-                        const initRole = u.executiveRole || u.roles?.[0] || "member";
-                        setEditDepartment(initDept);
-                        setEditRole(initRole);
-                        setEditStatus(u.account_status || "active");
-                        setEditModalOpen(true);
-                      }}
-                      className="rounded-lg p-1.5 text-muted-foreground hover:bg-secondary hover:text-foreground transition cursor-pointer"
-                      title="Chỉnh sửa tài khoản"
-                    >
-                      <Pencil className="h-4 w-4" />
-                    </button>
-
-                    {/* Toggle Lock / Unlock */}
-                    <button
-                      type="button"
-                      onClick={() => handleToggleStatus(u)}
-                      className={`rounded-lg p-1.5 transition cursor-pointer ${
-                        u.account_status === "suspended"
-                          ? "text-emerald-600 hover:bg-emerald-500/10"
-                          : "text-amber-600 hover:bg-amber-500/10"
-                      }`}
-                      title={u.account_status === "suspended" ? "Mở khóa tài khoản" : "Tạm khóa tài khoản"}
-                    >
-                      {u.account_status === "suspended" ? (
-                        <Unlock className="h-4 w-4" />
-                      ) : (
-                        <Lock className="h-4 w-4" />
-                      )}
-                    </button>
-
-                    {/* Reset Password */}
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setTargetUser(u);
-                        setAdminNewPassword("");
-                        setResetModalOpen(true);
-                      }}
-                      className="rounded-lg p-1.5 text-muted-foreground hover:bg-secondary hover:text-foreground transition cursor-pointer"
-                      title="Đặt lại mật khẩu"
-                    >
-                      <KeyRound className="h-4 w-4" />
-                    </button>
-
-                    {/* Delete User */}
-                    {u.id !== account?.id && (
-                      <button
-                        type="button"
-                        onClick={() => handleDeleteUser(u)}
-                        className="rounded-lg p-1.5 text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition cursor-pointer"
-                        title="Xóa tài khoản"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </button>
-                    )}
-                  </div>
-                ),
-              }}
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+            <StatCard
+              label="Tổng số tài khoản"
+              value={userStats.total}
+              tone="primary"
+              icon={<Users className="h-5 w-5 text-primary" />}
+            />
+            <StatCard
+              label="Đang hoạt động"
+              value={userStats.active}
+              tone="success"
+              icon={<CheckCircle2 className="h-5 w-5 text-emerald-500" />}
+            />
+            <StatCard
+              label="Đã tạm khóa"
+              value={userStats.suspended}
+              tone="danger"
+              icon={<AlertCircle className="h-5 w-5 text-destructive" />}
+            />
+            <StatCard
+              label="Quản trị viên"
+              value={userStats.admins}
+              tone="info"
+              icon={<ShieldCheck className="h-5 w-5 text-sky-500" />}
             />
           </div>
+
+          {/* Filter Toolbar */}
+          <Card className="p-4">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div className="relative flex-1 max-w-md">
+                <Search className="absolute left-3.5 top-3 h-4 w-4 text-muted-foreground" />
+                <input
+                  type="text"
+                  placeholder="Tìm theo tên, username, email..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="h-10 w-full rounded-xl border border-border bg-background pl-9 pr-4 text-sm text-foreground focus:border-ring focus:ring-1 focus:ring-ring outline-none transition"
+                />
+              </div>
+
+              <div className="flex flex-wrap items-center gap-2">
+                <select
+                  value={roleFilter}
+                  onChange={(e) => setRoleFilter(e.target.value)}
+                  className="h-10 rounded-xl border border-border bg-background px-3 text-xs font-medium text-foreground outline-none focus:border-ring"
+                >
+                  <option value="all">Tất cả vai trò</option>
+                  <option value="platform_admin">Quản trị</option>
+                  <option value="tenant_admin">Tenant Admin</option>
+                  <option value="staff">Staff</option>
+                  <option value="viewer">Viewer</option>
+                </select>
+
+                <select
+                  value={statusFilter}
+                  onChange={(e) => setStatusFilter(e.target.value)}
+                  className="h-10 rounded-xl border border-border bg-background px-3 text-xs font-medium text-foreground outline-none focus:border-ring"
+                >
+                  <option value="all">Tất cả trạng thái</option>
+                  <option value="active">Đang hoạt động</option>
+                  <option value="suspended">Đã tạm khóa</option>
+                </select>
+
+                <button
+                  onClick={() => loadUsers(pagination.page)}
+                  className="rounded-xl border border-border bg-card p-2.5 text-muted-foreground hover:bg-secondary hover:text-foreground transition"
+                  title="Làm mới"
+                >
+                  <RefreshCw className={`h-4 w-4 ${usersLoading ? "animate-spin" : ""}`} />
+                </button>
+
+                <button
+                  onClick={() => setCreateModalOpen(true)}
+                  className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2.5 text-xs font-semibold text-primary-foreground shadow transition hover:opacity-90"
+                >
+                  <UserPlus className="h-4 w-4" /> Thêm tài khoản
+                </button>
+              </div>
+            </div>
+          </Card>
+
+          {/* Users Data Table */}
+          <CustomTable
+            columns={[
+              {
+                key: "name",
+                label: "Người dùng",
+                width: 250,
+                render: (u: any) => (
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-primary/10 text-xs font-bold text-primary">
+                      {u.avatar_url ? (
+                        <img src={u.avatar_url} alt={u.name} className="h-full w-full object-cover" />
+                      ) : (
+                        getInitials(u.name || u.username)
+                      )}
+                    </div>
+                    <div>
+                      <CeoTableEllipsis text={u.name || "—"} maxLines={1} className="font-semibold text-foreground" />
+                      <div className="text-[11px] text-muted-foreground">{u.email || "Chưa có email"}</div>
+                    </div>
+                  </div>
+                ),
+              },
+              {
+                key: "username",
+                label: "Tên đăng nhập",
+                width: 140,
+                render: (u: any) => (
+                  <span className="font-mono text-xs text-foreground font-medium">{displayUsername(u.username || u.email)}</span>
+                ),
+              },
+              {
+                key: "department",
+                label: "Ban chuyên môn",
+                width: 200,
+                render: (u: any) => (
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-muted border border-border/70 text-foreground font-semibold text-xs">
+                    <Building className="h-3 w-3 text-primary shrink-0" />
+                    <CeoTableEllipsis text={u.department || "Học viên ceohn10"} maxLines={1} />
+                  </span>
+                ),
+              },
+              {
+                key: "executiveRole",
+                label: "Vai trò chức danh",
+                width: 190,
+                render: (u: any) => {
+                  const userRoleKey = u.executiveRole || u.roles?.[0] || "member";
+                  const isSuper = userRoleKey === "quan_tri" || userRoleKey === "platform_admin";
+                  const isLeader =
+                    userRoleKey === "chu_tich" ||
+                    userRoleKey === "admin" ||
+                    userRoleKey.startsWith("truong_ban_") ||
+                    userRoleKey === "tong_thu_ky";
+                  const isSpecialist = userRoleKey.startsWith("thanh_vien_ban_");
+
+                  return (
+                    <span
+                      className={`inline-flex items-center gap-1 rounded-md px-2.5 py-1 text-xs font-bold border ${isSuper
+                          ? "bg-red-500/10 text-red-700 border-red-500/30"
+                          : isLeader
+                            ? "bg-amber-500/10 text-amber-700 dark:text-amber-300 border-amber-500/30"
+                            : isSpecialist
+                              ? "bg-blue-500/10 text-blue-700 dark:text-blue-300 border-blue-500/30"
+                              : "bg-secondary text-muted-foreground border-border"
+                        }`}
+                    >
+                      <ShieldCheck className="h-3 w-3 shrink-0" />
+                      <CeoTableEllipsis text={getRoleBadgeLabel(userRoleKey)} maxLines={1} />
+                    </span>
+                  );
+                },
+              },
+              {
+                key: "account_status",
+                label: "Trạng thái",
+                width: 130,
+                align: "center",
+                render: (u: any) => (
+                  <span
+                    className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${u.account_status === "suspended"
+                        ? "bg-destructive/10 text-destructive"
+                        : "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                      }`}
+                  >
+                    {u.account_status === "suspended" ? (
+                      <>
+                        <AlertCircle className="h-3 w-3" /> Đã tạm khóa
+                      </>
+                    ) : (
+                      <>
+                        <CheckCircle2 className="h-3 w-3" /> Hoạt động
+                      </>
+                    )}
+                  </span>
+                ),
+              },
+              {
+                key: "created_at",
+                label: "Ngày tạo",
+                width: 120,
+                align: "center",
+                render: (u: any) => (
+                  <span className="text-xs text-muted-foreground">
+                    {u.created_at ? new Date(u.created_at).toLocaleDateString("vi-VN") : "—"}
+                  </span>
+                ),
+              },
+            ]}
+            data={usersList}
+            keyExtractor={(u: any) => u.id}
+            showStt={true}
+            loading={usersLoading}
+            emptyText="Không tìm thấy tài khoản người dùng nào"
+            page={pagination.page}
+            pageSize={pagination.limit}
+            total={pagination.total}
+            onPageChange={(p) => loadUsers(p)}
+            actionColumn={{
+              title: "THAO TÁC",
+              width: 140,
+              render: (u: any) => (
+                <div className="inline-flex items-center gap-1 justify-center">
+                  {/* View User Details */}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSelectedViewUser(u);
+                      setViewModalOpen(true);
+                    }}
+                    className="rounded-lg p-1.5 text-muted-foreground hover:bg-secondary hover:text-foreground transition cursor-pointer"
+                    title="Xem chi tiết tài khoản"
+                  >
+                    <Eye className="h-4 w-4" />
+                  </button>
+
+                  {/* Edit User */}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setTargetUser(u);
+                      setEditName(u.name !== "—" ? u.name : "");
+                      setEditEmail(u.email || "");
+                      const initDept = u.department || "Học viên ceohn10";
+                      const initRole = u.executiveRole || u.roles?.[0] || "member";
+                      setEditDepartment(initDept);
+                      setEditRole(initRole);
+                      setEditStatus(u.account_status || "active");
+                      setEditModalOpen(true);
+                    }}
+                    className="rounded-lg p-1.5 text-muted-foreground hover:bg-secondary hover:text-foreground transition cursor-pointer"
+                    title="Chỉnh sửa tài khoản"
+                  >
+                    <Pencil className="h-4 w-4" />
+                  </button>
+
+                  {/* Toggle Lock / Unlock */}
+                  <button
+                    type="button"
+                    onClick={() => handleToggleStatus(u)}
+                    className={`rounded-lg p-1.5 transition cursor-pointer ${u.account_status === "suspended"
+                        ? "text-emerald-600 hover:bg-emerald-500/10"
+                        : "text-amber-600 hover:bg-amber-500/10"
+                      }`}
+                    title={u.account_status === "suspended" ? "Mở khóa tài khoản" : "Tạm khóa tài khoản"}
+                  >
+                    {u.account_status === "suspended" ? (
+                      <Unlock className="h-4 w-4" />
+                    ) : (
+                      <Lock className="h-4 w-4" />
+                    )}
+                  </button>
+
+                  {/* Reset Password */}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setTargetUser(u);
+                      setAdminNewPassword("");
+                      setResetModalOpen(true);
+                    }}
+                    className="rounded-lg p-1.5 text-muted-foreground hover:bg-secondary hover:text-foreground transition cursor-pointer"
+                    title="Đặt lại mật khẩu"
+                  >
+                    <KeyRound className="h-4 w-4" />
+                  </button>
+
+                  {/* Delete User */}
+                  {u.id !== account?.id && (
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteUser(u)}
+                      className="rounded-lg p-1.5 text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition cursor-pointer"
+                      title="Xóa tài khoản"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  )}
+                </div>
+              ),
+            }}
+          />
         </div>
+      </div>
 
       {/* ── MODAL: CREATE USER ──────────────────────────────────────────────── */}
       {createModalOpen && (
@@ -1433,11 +1430,10 @@ function AccountManagementPage() {
                 <div className="p-3 rounded-xl bg-muted/40 border border-border/60">
                   <span className="font-semibold text-muted-foreground block mb-1">Trạng thái tài khoản:</span>
                   <span
-                    className={`inline-flex items-center gap-1 font-bold ${
-                      selectedViewUser.account_status === "suspended"
+                    className={`inline-flex items-center gap-1 font-bold ${selectedViewUser.account_status === "suspended"
                         ? "text-destructive"
                         : "text-emerald-600 dark:text-emerald-400"
-                    }`}
+                      }`}
                   >
                     {selectedViewUser.account_status === "suspended" ? "Tạm khóa" : "Đang hoạt động"}
                   </span>
@@ -1454,7 +1450,7 @@ function AccountManagementPage() {
               <div className="grid grid-cols-2 gap-3">
                 <div className="p-3 rounded-xl bg-muted/40 border border-border/60">
                   <span className="font-semibold text-muted-foreground block mb-1">Ban chuyên môn:</span>
-                  <span className="font-bold text-foreground">{selectedViewUser.department || "Hội viên ceohn10"}</span>
+                  <span className="font-bold text-foreground">{selectedViewUser.department || "Học viên ceohn10"}</span>
                 </div>
                 <div className="p-3 rounded-xl bg-muted/40 border border-border/60">
                   <span className="font-semibold text-muted-foreground block mb-1">Vai trò theo Ban:</span>
@@ -1468,7 +1464,7 @@ function AccountManagementPage() {
                 <strong className="block font-bold mb-0.5">Quyền hạn áp dụng:</strong>
                 Tài khoản này được tự động đồng bộ quyền theo Ma trận phân quyền hệ thống tương ứng với vai trò{" "}
                 <strong>{selectedViewUser.executiveRole || selectedViewUser.roles?.[0] || "member"}</strong> trong{" "}
-                <strong>{selectedViewUser.department || "Hội viên ceohn10"}</strong>.
+                <strong>{selectedViewUser.department || "Học viên ceohn10"}</strong>.
               </div>
             </div>
 

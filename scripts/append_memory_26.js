@@ -9,13 +9,13 @@ const content = `
 ### 26.1. Thẩm Định Nghiệp Vụ & Báo Cáo GAP Analysis Đối Chiếu Codebase vs BRD
 - **Kết quả thẩm định 100% Khớp (Match):**
   - Cơ cấu tổ chức 6 Ban chuyên môn: Ban Quản Trị (\`admin@connect.vn\`), Ban Thư Ký (\`ceo.tongthuky@ceohn10.com\`), Ban Thành Viên (\`ceo.thanhvien@ceohn10.com\`), Ban Thiện Nguyện (\`ceo.thiennguyen@ceohn10.com\`), Ban Truyền Thông (\`ceo.truyenthong@ceohn10.com\`), Ban Xúc Tiến Thương Mại (\`ceo.xuctien@ceohn10.com\`).
-  - Quy tắc phân quyền thẩm định: Ban Thành Viên (BTV) độc quyền thẩm định và duyệt hồ sơ kết nạp hội viên; Ban Thư Ký (BTK) tuyệt đối không có quyền duyệt kết nạp.
+  - Quy tắc phân quyền thẩm định: Ban Thành Viên (BTV) độc quyền thẩm định và duyệt hồ sơ kết nạp Học viên; Ban Thư Ký (BTK) tuyệt đối không có quyền duyệt kết nạp.
   - Luồng Onboarding trực tuyến từ Landing Page cấp mã \`CEO-83xxx\` và phát hành mật khẩu qua SMTP Mailer Gmail.
   - Sơ đồ ghế Cinema Seating Map (\`/events/seating\`) phân bổ bàn tiệc VIP 10 chỗ.
   - Cổng an ninh soát vé Gate Check-in QR (\`/checkin\`) phản hồi xanh lục < 0.2s và cảnh báo đỏ vé trùng/vé giả.
   - Quản trị công việc phân cấp đa dạng 5 chế độ xem (Tasks: Table, Kanban với Zoom kích thước 3 cấp, Calendar, Statistics Chart, Org Tree).
   - Điều hành cuộc họp tích hợp Zoom / Google Meet / UniWork, xử lý khẩn cấp (\`isUrgent\`) và chống trùng phòng Sapphire Hub.
-  - Thẻ hội viên VIP 3D chìm logo doanh nghiệp, danh thiếp thông minh NFC và trang danh thiếp công khai (\`/card/:code\`).
+  - Thẻ Học viên VIP 3D chìm logo doanh nghiệp, danh thiếp thông minh NFC và trang danh thiếp công khai (\`/card/:code\`).
   - Hộp thư doanh nhân Messenger chuẩn #0084FF kèm thẻ giao dịch Zalo OA ghim trên cùng.
 - **Báo cáo trung thực hiện trạng kết nối bên thứ 3 (GAP Analysis):**
   - *VietQR & Đối soát gạch nợ:* Đã có mã QR động Napas 24/7 chứa thông tin số tài khoản MB Bank và cú pháp chuẩn, nhưng chưa có Webhook Open API ngân hàng tự động gạch nợ. Ban Kế toán / Thủ quỹ đối soát sao kê và bấm duyệt gạch nợ thủ công trong CRM (\`/fees\`).

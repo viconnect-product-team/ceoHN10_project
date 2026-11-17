@@ -112,7 +112,7 @@ function ConnectAppSecurityPage() {
     account?.name ||
     user?.user_metadata?.full_name ||
     user?.email?.split("@")[0] ||
-    "Hội viên CEO HN10";
+    "Học viên CEO HN10";
   const userEmail = account?.email || user?.email || "Chưa cập nhật";
   const username =
     account?.username || (user?.user_metadata as any)?.username || userEmail.split("@")[0];

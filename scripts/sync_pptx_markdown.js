@@ -15,34 +15,34 @@ const mdContent = `# SLIDE TỔNG THỂ HỆ SINH THÁI CEO HN10 (HANOIBA)
 ### HỆ SINH THÁI KÉP: CỔNG QUẢN TRỊ WEB CRM & CEO HN10 MOBILE APP
 - **Định vị**: Nền tảng số hóa hiện thực hóa 3 bài toán chiến lược cho cộng đồng 500+ Doanh nhân.
 - **Màn hình song hành**:
-  - Web CRM Quản trị: Dashboard BI, Quản lý 500+ Hội viên, Sơ đồ bàn tiệc, Thu phí VietQR.
-  - Mobile App Hội viên: Thẻ hội viên VIP QR, Sàn giao thương B2B, Vé sự kiện 1 giây.
+  - Web CRM Quản trị: Dashboard BI, Quản lý 500+ Học viên, Sơ đồ bàn tiệc, Thu phí VietQR.
+  - Mobile App Học viên: Thẻ Học viên VIP QR, Sàn giao thương B2B, Vé sự kiện 1 giây.
 - **Trục đồng bộ**: Real-time Cloud Sync Engine (Đồng bộ thời gian thực hai chiều).
-- **Chỉ số KPI**: 500+ Hội viên doanh nhân | 06 Ban chuyên môn | 100% Số hóa hoạt động | 01s Check-in vé sự kiện.
-- **Giá trị cốt lõi**: Đột phá toàn diện trong quản trị hiệp hội: Trung tâm điều hành Web CRM minh bạch kết hợp cùng Văn phòng số bỏ túi Mobile App mang lại sức mạnh vượt trội cho Ban Lãnh Đạo và toàn thể Hội viên.
+- **Chỉ số KPI**: 500+ Học viên doanh nhân | 06 Ban chuyên môn | 100% Số hóa hoạt động | 01s Check-in vé sự kiện.
+- **Giá trị cốt lõi**: Đột phá toàn diện trong quản trị hiệp hội: Trung tâm điều hành Web CRM minh bạch kết hợp cùng Văn phòng số bỏ túi Mobile App mang lại sức mạnh vượt trội cho Ban Lãnh Đạo và toàn thể Học viên.
 
 ---
 
 ## SLIDE 2: KIẾN TRÚC TƯƠNG HỖ KHÉP KÍN
 ### HAI CÔNG CỤ ĐỘT PHÁ TƯƠNG TÁC ĐỒNG BỘ HAI CHIỀU
 - **1. Cổng điều hành Web CRM (Desktop)**:
-  - Quản lý hồ sơ hội viên 360° & phân quyền RBAC 11 cấp bảo mật.
+  - Quản lý hồ sơ Học viên 360° & phân quyền RBAC 11 cấp bảo mật.
   - Sơ đồ xếp bàn tiệc Gala trang trọng, phân bổ chỗ ngồi thông minh.
   - Điều hành giao việc Kanban, theo dõi tiến độ các ban thời gian thực.
   - Quản lý hội phí VietQR tự động, gạch nợ tức thì và minh bạch sổ quỹ.
   - Cấu hình chương trình đào tạo trực tuyến/trực tiếp và mở link tuyển sinh.
 - **2. Văn phòng doanh nhân Mobile App (Smartphone)**:
-  - Thẻ hội viên số mạ vàng hoàng gia, danh thiếp số chạm để kết nối.
+  - Thẻ Học viên số mạ vàng hoàng gia, danh thiếp số chạm để kết nối.
   - Sàn giao thương B2B nội khối, trao đổi cơ hội và xúc tiến hợp đồng.
   - Ví vé sự kiện Gala, sơ đồ bàn tiệc và QR Check-in 1 giây tại cửa.
   - Thống kê tương tác, doanh thu và bục vinh danh Top 3 doanh nhân.
   - Đăng ký khóa học, học trực tuyến và tiếp cận kho tài liệu đào tạo số.
-- **Giá trị cốt lõi**: Đồng bộ hóa tức thì qua nền tảng Cloud: Mọi thay đổi về sự kiện, đào tạo, bàn tiệc và hội phí trên Web CRM đều được phản ánh tức thì xuống điện thoại của hội viên.
+- **Giá trị cốt lõi**: Đồng bộ hóa tức thì qua nền tảng Cloud: Mọi thay đổi về sự kiện, đào tạo, bàn tiệc và hội phí trên Web CRM đều được phản ánh tức thì xuống điện thoại của Học viên.
 
 ---
 
 ## SLIDE 3: PHÂN HỆ TRỌNG YẾU 01
-### DASHBOARD TỔNG QUAN & HỒ SƠ HỘI VIÊN 360° TRÊN CRM
+### DASHBOARD TỔNG QUAN & HỒ SƠ Học viên 360° TRÊN CRM
 - Nắm trọn dữ liệu vận hành toàn hiệp hội trong một màn hình điều hành duy nhất.
 - Phân quyền RBAC 11 cấp bậc bảo mật chặt chẽ.
 - Quản trị hồ sơ doanh nghiệp đầy đủ thông tin pháp lý, ngành nghề kinh doanh và người đại diện.
@@ -62,8 +62,8 @@ const mdContent = `# SLIDE TỔNG THỂ HỆ SINH THÁI CEO HN10 (HANOIBA)
 
 ## SLIDE 5: PHÂN HỆ TRỌNG YẾU 03
 ### TỔ CHỨC SỰ KIỆN GALA & SƠ ĐỒ BÀN TIỆC ĐỘNG THÔNG MINH
-- Sơ đồ bàn tiệc trực quan: Phân loại bàn VIP, Bàn Lãnh đạo, Bàn Hội viên và Khách mời.
-- Gán hội viên vào từng bàn tiệc kéo thả, cảnh báo quá tải chỗ ngồi.
+- Sơ đồ bàn tiệc trực quan: Phân loại bàn VIP, Bàn Lãnh đạo, Bàn Học viên và Khách mời.
+- Gán Học viên vào từng bàn tiệc kéo thả, cảnh báo quá tải chỗ ngồi.
 - Vé điện tử phát hành tức thì vào Ví sự kiện trên Mobile App kèm vị trí bàn tiệc.
 - Điểm danh QR Check-in 1 giây tại cửa hội trường, chống trùng lặp vé.
 - **Giá trị cốt lõi**: Nâng tầm đẳng cấp tổ chức sự kiện: Loại bỏ hoàn toàn tình trạng tranh cãi về chỗ ngồi tiệc Gala, kiểm soát chặt chẽ vé khách mời và check-in không chạm.
@@ -72,10 +72,10 @@ const mdContent = `# SLIDE TỔNG THỂ HỆ SINH THÁI CEO HN10 (HANOIBA)
 
 ## SLIDE 6: PHÂN HỆ TRỌNG YẾU 04
 ### QUẢN LÝ HỘI PHÍ TỰ ĐỘNG VIETQR & SỔ QUỸ THU CHI MINH BẠCH
-- Tạo mã VietQR động chuẩn NAPAS theo từng hội viên kèm cú pháp định danh chính xác.
+- Tạo mã VietQR động chuẩn NAPAS theo từng Học viên kèm cú pháp định danh chính xác.
 - Webhook ngân hàng kết nối tự động: Nhận tiền về tài khoản là hệ thống tự động gạch nợ hội phí tức thì.
 - Báo cáo dòng tiền thu chi minh bạch: Phân loại chi hoạt động, tài trợ và quỹ thiện nguyện.
-- Hội viên xem trực tiếp lịch sử đóng phí và tải biên lai thu tiền điện tử trên Mobile App.
+- Học viên xem trực tiếp lịch sử đóng phí và tải biên lai thu tiền điện tử trên Mobile App.
 - **Giá trị cốt lõi**: Minh bạch tài chính tuyệt đối: Tự động hóa quy trình thu nộp hội phí qua VietQR động, giảm 95% thời gian đối soát kế toán và loại bỏ sai sót số liệu.
 
 ---
@@ -84,8 +84,8 @@ const mdContent = `# SLIDE TỔNG THỂ HỆ SINH THÁI CEO HN10 (HANOIBA)
 ### CHƯƠNG TRÌNH ĐÀO TẠO DOANH NHÂN & KHO TRI THỨC SỐ
 - Đa dạng hình thức đào tạo: Trực tuyến (tích hợp Jitsi Meet / Zoom bảo mật), Trực tiếp, hoặc Hybrid kết hợp.
 - Modal tạo Form tuyển sinh công khai kèm liên kết rút gọn và mã QR tải về gửi các kênh mạng xã hội.
-- Nút "Bắn xuống App CEO HN10": Đẩy ngay bài giảng và lịch học vào mục Mạng lưới của tất cả hội viên.
-- Kho tri thức số lưu trữ tài liệu slide, video ghi lại bài giảng để hội viên ôn tập mọi lúc mọi nơi.
+- Nút "Bắn xuống App CEO HN10": Đẩy ngay bài giảng và lịch học vào mục Mạng lưới của tất cả Học viên.
+- Kho tri thức số lưu trữ tài liệu slide, video ghi lại bài giảng để Học viên ôn tập mọi lúc mọi nơi.
 - **Giá trị cốt lõi**: Lan tỏa giá trị tri thức bền vững: Xây dựng kho tài nguyên bài giảng số độc quyền cho CLB, hỗ trợ đào tạo hybrid linh hoạt cho doanh nhân bận rộn.
 
 ---
@@ -102,11 +102,11 @@ const mdContent = `# SLIDE TỔNG THỂ HỆ SINH THÁI CEO HN10 (HANOIBA)
 
 ## SLIDE 9: PHÂN HỆ TRỌNG YẾU 07
 ### VĂN PHÒNG SỐ MOBILE APP: THẺ VIP, SÀN B2B & MẠNG LƯỚI
-- Thẻ hội viên VIP mạ vàng hoàng gia tích hợp mã QR động cá nhân hóa danh thiếp số.
+- Thẻ Học viên VIP mạ vàng hoàng gia tích hợp mã QR động cá nhân hóa danh thiếp số.
 - Sàn cơ hội hợp tác B2B: Đăng tin tìm đối tác, chào bán sản phẩm và kết nối mua sắm nội khối.
-- Bản đồ hội viên số 2D tương tác: Định vị doanh nghiệp lân cận, hỗ trợ kết nối gặp gỡ trực tiếp.
+- Bản đồ Học viên số 2D tương tác: Định vị doanh nghiệp lân cận, hỗ trợ kết nối gặp gỡ trực tiếp.
 - Mạng lưới chia sẻ bài viết, tin tức sự kiện và vinh danh những cột mốc phát triển của CLB.
-- **Giá trị cốt lõi**: Xúc tiến thương mại không giới hạn: Kết nối trực tiếp cung cầu giữa hơn 500 doanh nghiệp hội viên, thúc đẩy doanh số và giá trị hợp đồng thực tế nội khối.
+- **Giá trị cốt lõi**: Xúc tiến thương mại không giới hạn: Kết nối trực tiếp cung cầu giữa hơn 500 doanh nghiệp Học viên, thúc đẩy doanh số và giá trị hợp đồng thực tế nội khối.
 
 ---
 
@@ -129,13 +129,13 @@ pptx.layout = 'LAYOUT_WIDE'; // 16:9
 const slidesData = [
   { title: 'TỔNG QUAN HỆ SINH THÁI KÉP: WEB CRM & MOBILE APP', desc: 'Nền tảng số hóa hiện thực hóa 3 bài toán chiến lược cho cộng đồng 500+ Doanh nhân' },
   { title: 'KIẾN TRÚC TƯƠNG HỖ KHÉP KÍN: CRM & MOBILE APP', desc: 'Web CRM điều hành quản trị tập trung - Mobile App kết nối giao thương tức thì' },
-  { title: 'DASHBOARD TỔNG QUAN & HỒ SƠ HỘI VIÊN 360°', desc: 'Quản trị hồ sơ doanh nghiệp toàn diện & phân quyền RBAC 11 cấp bảo mật' },
+  { title: 'DASHBOARD TỔNG QUAN & HỒ SƠ Học viên 360°', desc: 'Quản trị hồ sơ doanh nghiệp toàn diện & phân quyền RBAC 11 cấp bảo mật' },
   { title: 'THỐNG KÊ & BÁO CÁO BI TOÀN DIỆN (RECHARTS)', desc: 'Biểu đồ Bar + Line tăng giảm, vinh danh Top 3 doanh nhân xuất sắc' },
   { title: 'TỔ CHỨC SỰ KIỆN GALA & SƠ ĐỒ BÀN TIỆC ĐỘNG', desc: 'Sơ đồ xếp bàn tiệc VIP thông minh, check-in QR 1 giây không tiếp xúc' },
-  { title: 'QUẢN LÝ HỘI PHÍ VIETQR & SỔ QUỸ THU CHI', desc: 'Mã VietQR động từng hội viên, webhook gạch nợ tức thì, minh bạch tài chính' },
+  { title: 'QUẢN LÝ HỘI PHÍ VIETQR & SỔ QUỸ THU CHI', desc: 'Mã VietQR động từng Học viên, webhook gạch nợ tức thì, minh bạch tài chính' },
   { title: 'CHƯƠNG TRÌNH ĐÀO TẠO DOANH NHÂN & TRI THỨC SỐ', desc: 'Đào tạo Hybrid trực tuyến/trực tiếp, mở form tuyển sinh QR, bắn bài xuống App' },
   { title: 'ĐIỀU HÀNH GIAO VIỆC 6 BAN & KANBAN THỜI GIAN THỰC', desc: 'Bảng Kanban trực quan, phân quyền Trưởng ban/Thư ký, đo lường tiến độ' },
-  { title: 'VĂN PHÒNG SỐ MOBILE APP: THẺ VIP, SÀN B2B & MẠNG LƯỚI', desc: 'Thẻ hội viên VIP QR, sàn giao thương khớp nối cung cầu, mạng xã hội nội khối' },
+  { title: 'VĂN PHÒNG SỐ MOBILE APP: THẺ VIP, SÀN B2B & MẠNG LƯỚI', desc: 'Thẻ Học viên VIP QR, sàn giao thương khớp nối cung cầu, mạng xã hội nội khối' },
   { title: 'CAM KẾT ĐỒNG HÀNH & KẾ HOẠCH BÀN GIAO HỆ THỐNG', desc: 'Bảo trì 24/7, bảo mật đa tầng, tập huấn chuyển giao và nâng cấp liên tục' }
 ];
 

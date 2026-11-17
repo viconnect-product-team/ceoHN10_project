@@ -179,7 +179,7 @@ export const createProductFn = createServerFn({ method: "POST" })
         memberPrice: data.memberPrice != null ? Math.round(data.memberPrice) : Math.round(data.price),
         unit: data.unit?.trim() || "Gói",
         company: data.company?.trim() || "CLB Doanh Nhân CEO HN10",
-        sellerName: data.sellerName?.trim() || "Hội viên CLB",
+        sellerName: data.sellerName?.trim() || "Học viên CLB",
         sellerPhone: data.sellerPhone?.trim() || "",
         category: data.category,
         status: "active",
@@ -198,7 +198,7 @@ export const createProductFn = createServerFn({ method: "POST" })
     return {
       id: res?.id || id,
       sellerId: data.sellerId || "ceohn10",
-      sellerName: data.sellerName?.trim() || "Hội viên CLB",
+      sellerName: data.sellerName?.trim() || "Học viên CLB",
       sellerPhone: data.sellerPhone?.trim() || "",
       title: data.title.trim(),
       description: data.description.trim(),
@@ -265,7 +265,7 @@ export const updateProductFn = createServerFn({ method: "POST" })
     return {
       id: data.id,
       sellerId: data.sellerId || "ceohn10",
-      sellerName: data.sellerName?.trim() || "Hội viên CLB",
+      sellerName: data.sellerName?.trim() || "Học viên CLB",
       sellerPhone: data.sellerPhone?.trim() || "",
       title: data.title.trim(),
       description: data.description.trim(),

@@ -137,7 +137,7 @@ export function ConversationList({
           );
         }
       })
-      .catch(() => {});
+      .catch(() => { });
   }, []);
 
   useEffect(() => {
@@ -184,7 +184,7 @@ export function ConversationList({
       const raw =
         localStorage.getItem(userRecentsKey) || localStorage.getItem("vba.recent_conversations");
       if (raw) setLocalRecents(JSON.parse(raw));
-    } catch {}
+    } catch { }
   }, [userRecentsKey]);
 
   const [localGroups, setLocalGroups] = useState<MyConversation[]>(() => {
@@ -228,7 +228,7 @@ export function ConversationList({
       if (typeof navigator !== "undefined" && navigator.vibrate) {
         try {
           navigator.vibrate(35);
-        } catch {}
+        } catch { }
       }
       setSelectedConvForAction(conv);
     }, 450);
@@ -265,7 +265,7 @@ export function ConversationList({
       const next = { ...prev, [code]: !prev[code] };
       try {
         localStorage.setItem("vba_pinned_convs", JSON.stringify(next));
-      } catch {}
+      } catch { }
       return next;
     });
     setSelectedConvForAction(null);
@@ -279,7 +279,7 @@ export function ConversationList({
       const next = { ...prev, [code]: !prev[code] };
       try {
         localStorage.setItem("vba_muted_convs", JSON.stringify(next));
-      } catch {}
+      } catch { }
       return next;
     });
     setSelectedConvForAction(null);
@@ -300,7 +300,7 @@ export function ConversationList({
         list.push(targetKey);
         localStorage.setItem("vba_deleted_convs", JSON.stringify(list));
       }
-    } catch {}
+    } catch { }
 
     setLocalRecents((prev) => {
       const next = prev.filter(
@@ -309,7 +309,7 @@ export function ConversationList({
       try {
         localStorage.setItem(userRecentsKey, JSON.stringify(next));
         localStorage.setItem("vba.recent_conversations", JSON.stringify(next));
-      } catch {}
+      } catch { }
       return next;
     });
     setLocalGroups((prev) => {
@@ -318,12 +318,12 @@ export function ConversationList({
       );
       try {
         localStorage.setItem("vba.group_conversations", JSON.stringify(next));
-      } catch {}
+      } catch { }
       return next;
     });
     try {
       localStorage.removeItem(`vba.chat.${peerCode}`);
-    } catch {}
+    } catch { }
     setSwipedConvCode(null);
     setSelectedConvForAction(null);
     window.dispatchEvent(new CustomEvent("vba:conversation_updated"));
@@ -340,7 +340,7 @@ export function ConversationList({
         if (rawGroups) setLocalGroups(JSON.parse(rawGroups));
         fetchDirectConversations();
         reload();
-      } catch {}
+      } catch { }
     };
     window.addEventListener("focus", syncLocal);
     window.addEventListener("storage", syncLocal);
@@ -367,7 +367,7 @@ export function ConversationList({
           setDirectMembers(res);
         }
       })
-      .catch(() => {});
+      .catch(() => { });
   }, []);
 
   const members = (propMembers && propMembers.length > 0)
@@ -405,7 +405,7 @@ export function ConversationList({
         code: c.peerCode,
         name: c.name,
         personName: c.name,
-        personTitle: "Hội viên CEO HN10",
+        personTitle: "Học viên CEO HN10",
         industry: "Kinh doanh & Quản lý",
         region: "Hà Nội",
         type: "individual",
@@ -446,7 +446,7 @@ export function ConversationList({
         const raw =
           localStorage.getItem(userRecentsKey) || localStorage.getItem("vba.recent_conversations");
         if (raw) setLocalRecents(JSON.parse(raw));
-      } catch {}
+      } catch { }
     };
     const handleOnline = (data: { userId?: string }) => {
       if (data?.userId) {
@@ -511,7 +511,7 @@ export function ConversationList({
             if (k) deletedConvs.add(String(k).toLowerCase());
           });
         }
-      } catch {}
+      } catch { }
 
       const memberMap = new Map<string, DirectoryMember>();
       if (Array.isArray(members)) {
@@ -663,7 +663,7 @@ export function ConversationList({
             if (!map.has(finalKey)) {
               map.set(finalKey, {
                 peerCode: mem?.code || rawCode,
-                name: mem?.personName || mem?.contact || mem?.name || "Hội viên kết nối QR",
+                name: mem?.personName || mem?.contact || mem?.name || "Học viên kết nối QR",
                 last: "Đã kết nối qua mã QR. Bắt đầu trò chuyện!",
                 time: "Vừa xong",
                 rawTime: new Date().toISOString(),
@@ -680,7 +680,7 @@ export function ConversationList({
             }
           }
         }
-      } catch {}
+      } catch { }
 
       // Các kênh thông tin thuộc các ban đã được chuyển giao sang Zalo OA theo quy định mới
       // Không còn tự động tiêm channel_ vào danh sách trò chuyện cục bộ
@@ -701,7 +701,7 @@ export function ConversationList({
               }
             }
           }
-        } catch {}
+        } catch { }
       }
 
       const list = Array.from(map.values()).filter((c) => {
@@ -1078,11 +1078,10 @@ export function ConversationList({
         <button
           type="button"
           onClick={() => setActiveTab("all")}
-          className={`flex shrink-0 items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold transition-all cursor-pointer ${
-            activeTab === "all"
+          className={`flex shrink-0 items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold transition-all cursor-pointer ${activeTab === "all"
               ? "bg-[#003B95] text-white font-bold shadow-xs"
               : "border-0 bg-slate-100 dark:bg-white/[0.04] text-slate-700 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white"
-          }`}
+            }`}
         >
           <span>Tất cả</span>
           <span className="text-[11px] opacity-80">({allCount})</span>
@@ -1092,11 +1091,10 @@ export function ConversationList({
         <button
           type="button"
           onClick={() => setActiveTab("groups")}
-          className={`flex shrink-0 items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold transition-all cursor-pointer ${
-            activeTab === "groups"
+          className={`flex shrink-0 items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold transition-all cursor-pointer ${activeTab === "groups"
               ? "bg-[#003B95] text-white font-bold shadow-xs"
               : "border-0 bg-slate-100 dark:bg-white/[0.04] text-slate-700 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white"
-          }`}
+            }`}
         >
           <Users className="h-3.5 w-3.5 text-amber-500 shrink-0" />
           <span>Nhóm</span>
@@ -1106,11 +1104,10 @@ export function ConversationList({
         <button
           type="button"
           onClick={() => setActiveTab("unread")}
-          className={`flex shrink-0 items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold transition-all cursor-pointer ${
-            activeTab === "unread"
+          className={`flex shrink-0 items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold transition-all cursor-pointer ${activeTab === "unread"
               ? "bg-[#003B95] text-white font-bold shadow-xs"
               : "border-0 bg-slate-100 dark:bg-white/[0.04] text-slate-700 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white"
-          }`}
+            }`}
         >
           <span>Chưa đọc</span>
           {unreadCount > 0 && (
@@ -1123,11 +1120,10 @@ export function ConversationList({
         <button
           type="button"
           onClick={() => setActiveTab("friends")}
-          className={`flex shrink-0 items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold transition-all cursor-pointer ${
-            activeTab === "friends"
+          className={`flex shrink-0 items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold transition-all cursor-pointer ${activeTab === "friends"
               ? "bg-[#003B95] text-white font-bold shadow-xs"
               : "border-0 bg-slate-100 dark:bg-white/[0.04] text-slate-700 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white"
-          }`}
+            }`}
         >
           <Users className="h-3.5 w-3.5 text-amber-500 shrink-0" />
           <span>Bạn bè</span>
@@ -1137,11 +1133,10 @@ export function ConversationList({
         <button
           type="button"
           onClick={() => setActiveTab("system")}
-          className={`flex shrink-0 items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold transition-all cursor-pointer ${
-            activeTab === "system"
+          className={`flex shrink-0 items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold transition-all cursor-pointer ${activeTab === "system"
               ? "bg-[#003B95] text-white font-bold shadow-xs"
               : "border-0 bg-slate-100 dark:bg-white/[0.04] text-slate-700 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white"
-          }`}
+            }`}
         >
           <ShieldCheck className="h-3.5 w-3.5 text-amber-400 shrink-0" />
           <span>Hệ thống</span>
@@ -1151,11 +1146,10 @@ export function ConversationList({
         <button
           type="button"
           onClick={() => setActiveTab("pending")}
-          className={`flex shrink-0 items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold transition-all cursor-pointer ${
-            activeTab === "pending"
+          className={`flex shrink-0 items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold transition-all cursor-pointer ${activeTab === "pending"
               ? "bg-[#003B95] text-white font-bold shadow-xs"
               : "border-0 bg-slate-100 dark:bg-white/[0.04] text-slate-700 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white"
-          }`}
+            }`}
         >
           <Clock className="h-3.5 w-3.5 text-amber-500 shrink-0" />
           <span>Tin nhắn chờ</span>
@@ -1171,8 +1165,8 @@ export function ConversationList({
         {loading
           ? t("m.messages.announce.loading")
           : t("m.messages.announce.count", {
-              count: conversations && Array.isArray(conversations) ? conversations.length : 0,
-            })}
+            count: conversations && Array.isArray(conversations) ? conversations.length : 0,
+          })}
       </p>
 
       {/* Member Picker Modal - Centered on Mobile via Portal */}
@@ -1230,7 +1224,7 @@ export function ConversationList({
                         </span>
                       </h4>
                       <p className="text-[10.5px] text-slate-500 dark:text-slate-400">
-                        Kết nối và thảo luận nhiều hội viên cùng lúc
+                        Kết nối và thảo luận nhiều Học viên cùng lúc
                       </p>
                     </div>
                   </div>
@@ -1313,11 +1307,10 @@ export function ConversationList({
                   <button
                     type="button"
                     onClick={() => setSortMode("newest")}
-                    className={`flex items-center justify-between p-2.5 rounded-xl border text-xs font-semibold cursor-pointer transition ${
-                      sortMode === "newest"
+                    className={`flex items-center justify-between p-2.5 rounded-xl border text-xs font-semibold cursor-pointer transition ${sortMode === "newest"
                         ? "bg-[#003B95]/10 border-[#003B95] text-[#003B95] dark:text-amber-400 dark:border-amber-400/50"
                         : "border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-white/5"
-                    }`}
+                      }`}
                   >
                     <span className="flex items-center gap-1.5">
                       <Clock className="h-3.5 w-3.5" /> Mới nhất
@@ -1327,11 +1320,10 @@ export function ConversationList({
                   <button
                     type="button"
                     onClick={() => setSortMode("oldest")}
-                    className={`flex items-center justify-between p-2.5 rounded-xl border text-xs font-semibold cursor-pointer transition ${
-                      sortMode === "oldest"
+                    className={`flex items-center justify-between p-2.5 rounded-xl border text-xs font-semibold cursor-pointer transition ${sortMode === "oldest"
                         ? "bg-[#003B95]/10 border-[#003B95] text-[#003B95] dark:text-amber-400 dark:border-amber-400/50"
                         : "border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-white/5"
-                    }`}
+                      }`}
                   >
                     <span className="flex items-center gap-1.5">
                       <RotateCcw className="h-3.5 w-3.5" /> Cũ nhất
@@ -1341,11 +1333,10 @@ export function ConversationList({
                   <button
                     type="button"
                     onClick={() => setSortMode("alpha_asc")}
-                    className={`flex items-center justify-between p-2.5 rounded-xl border text-xs font-semibold cursor-pointer transition ${
-                      sortMode === "alpha_asc"
+                    className={`flex items-center justify-between p-2.5 rounded-xl border text-xs font-semibold cursor-pointer transition ${sortMode === "alpha_asc"
                         ? "bg-[#003B95]/10 border-[#003B95] text-[#003B95] dark:text-amber-400 dark:border-amber-400/50"
                         : "border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-white/5"
-                    }`}
+                      }`}
                   >
                     <span className="flex items-center gap-1.5">
                       <ArrowDownAZ className="h-3.5 w-3.5" /> Tên A → Z
@@ -1355,11 +1346,10 @@ export function ConversationList({
                   <button
                     type="button"
                     onClick={() => setSortMode("alpha_desc")}
-                    className={`flex items-center justify-between p-2.5 rounded-xl border text-xs font-semibold cursor-pointer transition ${
-                      sortMode === "alpha_desc"
+                    className={`flex items-center justify-between p-2.5 rounded-xl border text-xs font-semibold cursor-pointer transition ${sortMode === "alpha_desc"
                         ? "bg-[#003B95]/10 border-[#003B95] text-[#003B95] dark:text-amber-400 dark:border-amber-400/50"
                         : "border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-white/5"
-                    }`}
+                      }`}
                   >
                     <span className="flex items-center gap-1.5">
                       <ArrowUpAZ className="h-3.5 w-3.5" /> Tên Z → A
@@ -1369,11 +1359,10 @@ export function ConversationList({
                   <button
                     type="button"
                     onClick={() => setSortMode("unread_first")}
-                    className={`col-span-2 flex items-center justify-between p-2.5 rounded-xl border text-xs font-semibold cursor-pointer transition ${
-                      sortMode === "unread_first"
+                    className={`col-span-2 flex items-center justify-between p-2.5 rounded-xl border text-xs font-semibold cursor-pointer transition ${sortMode === "unread_first"
                         ? "bg-[#003B95]/10 border-[#003B95] text-[#003B95] dark:text-amber-400 dark:border-amber-400/50"
                         : "border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-white/5"
-                    }`}
+                      }`}
                   >
                     <span className="flex items-center gap-1.5">
                       <Filter className="h-3.5 w-3.5" /> Ưu tiên tin chưa đọc lên đầu
@@ -1407,11 +1396,10 @@ export function ConversationList({
                         key={char}
                         type="button"
                         onClick={() => setSelectedLetter(isSelected ? null : char)}
-                        className={`h-8 w-8 rounded-lg text-xs font-bold transition cursor-pointer ${
-                          isSelected
+                        className={`h-8 w-8 rounded-lg text-xs font-bold transition cursor-pointer ${isSelected
                             ? "bg-amber-500 text-white shadow-xs"
                             : "bg-slate-100 dark:bg-white/5 text-slate-700 dark:text-slate-300 hover:bg-slate-200"
-                        }`}
+                          }`}
                       >
                         {char}
                       </button>
@@ -1428,11 +1416,10 @@ export function ConversationList({
                 <button
                   type="button"
                   onClick={() => setFilterOnlineOnly((prev) => !prev)}
-                  className={`flex w-full items-center justify-between p-3 rounded-xl border text-xs font-semibold cursor-pointer transition ${
-                    filterOnlineOnly
+                  className={`flex w-full items-center justify-between p-3 rounded-xl border text-xs font-semibold cursor-pointer transition ${filterOnlineOnly
                       ? "bg-emerald-500/10 border-emerald-500 text-emerald-600 dark:text-emerald-400"
                       : "border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-white/5"
-                  }`}
+                    }`}
                 >
                   <div className="flex items-center gap-2">
                     <span className="h-2.5 w-2.5 rounded-full bg-emerald-500" />
@@ -1496,7 +1483,7 @@ export function ConversationList({
                 Chưa có nhóm trò chuyện nào
               </p>
               <p className="text-[12px] text-slate-500 dark:text-slate-400 max-w-xs mx-auto">
-                Tạo nhóm để kết nối nhiều hội viên, bàn bạc công việc, dự án hoặc giao lưu cùng lúc.
+                Tạo nhóm để kết nối nhiều Học viên, bàn bạc công việc, dự án hoặc giao lưu cùng lúc.
               </p>
               <button
                 type="button"
@@ -1525,7 +1512,7 @@ export function ConversationList({
                 Chưa có cuộc trò chuyện nào từ bạn bè
               </p>
               <p className="text-[12px] text-slate-400">
-                Kết nối thêm hội viên trong mục Danh bạ để bắt đầu trao đổi
+                Kết nối thêm Học viên trong mục Danh bạ để bắt đầu trao đổi
               </p>
             </div>
           ) : activeTab === "system" ? (
@@ -1558,7 +1545,7 @@ export function ConversationList({
               <p className="text-[12px] text-slate-500 dark:text-slate-400 max-w-xs mx-auto">
                 {searchTerm
                   ? "Thử tìm kiếm với từ khóa khác hoặc xóa ô tìm kiếm."
-                  : "Bấm nút 'Nhắn mới' để kết nối và trao đổi với các hội viên!"}
+                  : "Bấm nút 'Nhắn mới' để kết nối và trao đổi với các Học viên!"}
               </p>
               {searchTerm ? (
                 <button
@@ -1586,10 +1573,10 @@ export function ConversationList({
             c?.name && String(c.name).trim().toLowerCase() !== peerCodeLower
               ? c.name
               : matchedMember?.personName ||
-                matchedMember?.contact ||
-                matchedMember?.name ||
-                c?.name ||
-                peerCode;
+              matchedMember?.contact ||
+              matchedMember?.name ||
+              c?.name ||
+              peerCode;
           const isSwiped = swipedConvCode === peerCode;
           const isPinned = Boolean(pinnedConvs[peerCode]);
           const isMuted = Boolean(mutedConvs[peerCode]);
@@ -1637,15 +1624,14 @@ export function ConversationList({
                     }
                     onOpen(c);
                   }}
-                  className={`flex w-full items-center gap-3 rounded-2xl border p-3.5 text-left transition-all cursor-pointer ${
-                    isSystem
+                  className={`flex w-full items-center gap-3 rounded-2xl border p-3.5 text-left transition-all cursor-pointer ${isSystem
                       ? "border-amber-400/40 bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-transparent dark:from-amber-400/10 dark:border-amber-400/30 shadow-sm"
                       : isGroup
                         ? "border-indigo-200/80 dark:border-indigo-900/40 bg-white dark:bg-[#131a27] hover:border-indigo-400/40 shadow-xs"
                         : isPinned
                           ? "border-amber-400/60 bg-amber-50/20 dark:bg-amber-950/20 shadow-xs"
                           : "border-slate-200/80 dark:border-white/10 bg-white dark:bg-[#131a27] hover:border-amber-400/30 shadow-xs"
-                  }`}
+                    }`}
                 >
                   <div
                     className="relative shrink-0 cursor-pointer group/avatar"
@@ -1653,7 +1639,7 @@ export function ConversationList({
                       e.stopPropagation();
                       handleAvatarClick(c);
                     }}
-                    title={isGroup ? "Nhóm chat" : "Xem thông tin hội viên & Nhắn tin"}
+                    title={isGroup ? "Nhóm chat" : "Xem thông tin Học viên & Nhắn tin"}
                   >
                     {c.peerCode === "channel_media" ? (
                       <div className="grid h-12 w-12 place-items-center rounded-2xl bg-gradient-to-tr from-rose-600 to-amber-500 text-white shadow-xs">

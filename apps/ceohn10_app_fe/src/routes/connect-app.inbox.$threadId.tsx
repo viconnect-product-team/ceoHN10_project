@@ -260,7 +260,7 @@ function ThreadPage() {
     let tid = String(rawThreadId || "").trim();
     try {
       tid = decodeURIComponent(tid);
-    } catch {}
+    } catch { }
     if (/^[0-9a-fA-F-]{36}$/.test(tid)) return tid;
     const match = tid.match(/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/);
     if (match) return match[0];
@@ -454,10 +454,10 @@ function ThreadPage() {
         clientToken: newToken(),
         replyTo: replyingTo
           ? {
-              id: replyingTo.id,
-              senderName: replyingTo.senderName,
-              preview: replyingTo.preview,
-            }
+            id: replyingTo.id,
+            senderName: replyingTo.senderName,
+            preview: replyingTo.preview,
+          }
           : null,
       });
 
@@ -484,10 +484,10 @@ function ThreadPage() {
       clientToken: newToken(),
       replyTo: replyingTo
         ? {
-            id: replyingTo.id,
-            senderName: replyingTo.senderName,
-            preview: replyingTo.preview,
-          }
+          id: replyingTo.id,
+          senderName: replyingTo.senderName,
+          preview: replyingTo.preview,
+        }
         : null,
     });
     if (res.ok) {
@@ -537,10 +537,10 @@ function ThreadPage() {
       clientToken: newToken(),
       replyTo: replyingTo
         ? {
-            id: replyingTo.id,
-            senderName: replyingTo.senderName,
-            preview: replyingTo.preview,
-          }
+          id: replyingTo.id,
+          senderName: replyingTo.senderName,
+          preview: replyingTo.preview,
+        }
         : null,
     });
 
@@ -676,7 +676,7 @@ function ThreadPage() {
                       Đang hoạt động
                     </span>
                   ) : (
-                    thread.companyName || thread.headline || "Hội viên CEO HN10"
+                    thread.companyName || thread.headline || "Học viên CEO HN10"
                   )}
                 </p>
               </div>
@@ -764,7 +764,7 @@ function ThreadPage() {
                   const isNewDay =
                     !prevMsg ||
                     new Date(m.createdAt).toDateString() !==
-                      new Date(prevMsg.createdAt).toDateString();
+                    new Date(prevMsg.createdAt).toDateString();
                   const timeFormatted = new Date(m.createdAt).toLocaleTimeString(locale, {
                     hour: "2-digit",
                     minute: "2-digit",
@@ -792,9 +792,8 @@ function ThreadPage() {
                       ) : null}
 
                       <div
-                        className={`flex items-start gap-2.5 group relative ${
-                          m.fromMe ? "justify-end" : "justify-start"
-                        }`}
+                        className={`flex items-start gap-2.5 group relative ${m.fromMe ? "justify-end" : "justify-start"
+                          }`}
                       >
                         {!m.fromMe ? (
                           <div className="relative shrink-0 mt-0.5">
@@ -820,14 +819,12 @@ function ThreadPage() {
                         ) : null}
 
                         <div
-                          className={`flex flex-col max-w-[82%] min-w-0 ${
-                            m.fromMe ? "items-end" : "items-start"
-                          }`}
+                          className={`flex flex-col max-w-[82%] min-w-0 ${m.fromMe ? "items-end" : "items-start"
+                            }`}
                         >
                           <div
-                            className={`flex items-center gap-1.5 w-full ${
-                              m.fromMe ? "justify-end" : "justify-start"
-                            }`}
+                            className={`flex items-center gap-1.5 w-full ${m.fromMe ? "justify-end" : "justify-start"
+                              }`}
                           >
                             {m.fromMe && !m.retractedAt ? (
                               <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -913,11 +910,10 @@ function ThreadPage() {
                                           key={emoji}
                                           type="button"
                                           onClick={() => handleToggleReaction(m.id, emoji)}
-                                          className={`flex h-7 w-7 items-center justify-center rounded-full text-[15px] hover:scale-125 transition-transform cursor-pointer ${
-                                            myReaction?.emoji === emoji
+                                          className={`flex h-7 w-7 items-center justify-center rounded-full text-[15px] hover:scale-125 transition-transform cursor-pointer ${myReaction?.emoji === emoji
                                               ? "bg-amber-100 dark:bg-[var(--bc-mobile-accent-soft)] ring-1 ring-amber-500 dark:ring-[var(--bc-mobile-accent)]"
                                               : "hover:bg-slate-100 dark:hover:bg-[var(--bc-mobile-surface-2)]"
-                                          }`}
+                                            }`}
                                         >
                                           {emoji}
                                         </button>
@@ -936,11 +932,10 @@ function ThreadPage() {
                               <div className="relative min-w-0">
                                 {m.replyTo ? (
                                   <div
-                                    className={`mb-1 rounded-xl px-3 py-1.5 text-[11.5px] border-l-2 ${
-                                      m.fromMe
+                                    className={`mb-1 rounded-xl px-3 py-1.5 text-[11.5px] border-l-2 ${m.fromMe
                                         ? "bg-black/15 border-black/50 text-[#1a1206]"
                                         : "bg-slate-100 dark:bg-[var(--bc-mobile-surface-2)] border-amber-500 dark:border-[var(--bc-mobile-accent)] text-slate-800 dark:text-[var(--bc-mobile-text)]"
-                                    }`}
+                                      }`}
                                   >
                                     <p className="font-semibold text-[10.5px]">
                                       {m.replyTo.senderName || "Trả lời"}
@@ -950,13 +945,12 @@ function ThreadPage() {
                                 ) : null}
 
                                 <div
-                                  className={`relative break-words transition-all shadow-xs overflow-hidden ${
-                                    content.type === "action_payment"
+                                  className={`relative break-words transition-all shadow-xs overflow-hidden ${content.type === "action_payment"
                                       ? "rounded-2xl bg-transparent border-0 shadow-none p-0"
                                       : m.fromMe
                                         ? "rounded-2xl rounded-tr-xs bg-[linear-gradient(135deg,#F6E1C3_0%,#D8B282_50%,#C29B69_100%)] text-[#1A1206] font-medium shadow-[0_2px_10px_rgba(184,134,11,0.25)] border border-amber-300/40"
                                         : "rounded-2xl rounded-tl-xs border border-slate-200 dark:border-white/10 bg-white dark:bg-[#131A26] text-slate-900 dark:text-slate-100 shadow-xs"
-                                  }`}
+                                    }`}
                                 >
                                   {content.type === "action_payment" ? (
                                     <ZaloTransactionCard data={content.data} isFromMe={m.fromMe} />
@@ -981,9 +975,8 @@ function ThreadPage() {
                                       </div>
                                       {content.caption ? (
                                         <p
-                                          className={`px-2 pb-1 text-[13.5px] leading-relaxed ${
-                                            m.fromMe ? "text-[#1A1206] font-medium" : "text-slate-900 dark:text-[var(--bc-mobile-text)]"
-                                          }`}
+                                          className={`px-2 pb-1 text-[13.5px] leading-relaxed ${m.fromMe ? "text-[#1A1206] font-medium" : "text-slate-900 dark:text-[var(--bc-mobile-text)]"
+                                            }`}
                                         >
                                           {content.caption}
                                         </p>
@@ -999,11 +992,10 @@ function ThreadPage() {
                                             target="_blank"
                                             rel="noopener noreferrer"
                                             download
-                                            className={`flex items-center gap-3 rounded-xl p-2.5 transition-all cursor-pointer ${
-                                              m.fromMe
+                                            className={`flex items-center gap-3 rounded-xl p-2.5 transition-all cursor-pointer ${m.fromMe
                                                 ? "bg-black/10 hover:bg-black/15 text-[#1A1206]"
                                                 : "bg-slate-50 dark:bg-[var(--bc-mobile-surface-2)] hover:bg-slate-100 dark:hover:bg-[var(--bc-mobile-surface-2)]/80 text-slate-900 dark:text-[var(--bc-mobile-text)] border border-slate-200 dark:border-[var(--bc-mobile-border)]"
-                                            }`}
+                                              }`}
                                           >
                                             <div
                                               className={`grid h-10 w-10 shrink-0 place-items-center rounded-lg border font-bold text-[11px] ${badge.color}`}
@@ -1017,21 +1009,19 @@ function ThreadPage() {
                                               <div className="flex items-center gap-2 mt-0.5">
                                                 {content.size ? (
                                                   <span
-                                                    className={`text-[11px] ${
-                                                      m.fromMe
+                                                    className={`text-[11px] ${m.fromMe
                                                         ? "text-[#1A1206]/70"
                                                         : "text-slate-500 dark:text-[var(--bc-mobile-muted)]"
-                                                    }`}
+                                                      }`}
                                                   >
                                                     {formatFileSize(content.size)}
                                                   </span>
                                                 ) : null}
                                                 <span
-                                                  className={`flex items-center gap-0.5 text-[11px] font-medium underline ${
-                                                    m.fromMe
+                                                  className={`flex items-center gap-0.5 text-[11px] font-medium underline ${m.fromMe
                                                       ? "text-[#1A1206]"
                                                       : "text-amber-700 dark:text-[var(--bc-mobile-accent)]"
-                                                  }`}
+                                                    }`}
                                                 >
                                                   <Download className="h-3 w-3" />
                                                   Tải về
@@ -1043,9 +1033,8 @@ function ThreadPage() {
                                       })()}
                                       {content.caption ? (
                                         <p
-                                          className={`px-2 text-[13.5px] leading-relaxed ${
-                                            m.fromMe ? "text-[#1A1206] font-medium" : "text-slate-900 dark:text-[var(--bc-mobile-text)]"
-                                          }`}
+                                          className={`px-2 text-[13.5px] leading-relaxed ${m.fromMe ? "text-[#1A1206] font-medium" : "text-slate-900 dark:text-[var(--bc-mobile-text)]"
+                                            }`}
                                         >
                                           {content.caption}
                                         </p>
@@ -1055,15 +1044,14 @@ function ThreadPage() {
                                     <div className="p-3">
                                       <div className="flex items-center gap-3">
                                         <div
-                                          className={`grid h-10 w-10 shrink-0 place-items-center rounded-xl ${
-                                            content.status === "missed"
+                                          className={`grid h-10 w-10 shrink-0 place-items-center rounded-xl ${content.status === "missed"
                                               ? "bg-rose-500/15 text-rose-500 border border-rose-500/30"
                                               : content.status === "declined"
                                                 ? "bg-slate-500/15 text-slate-400 border border-slate-500/30"
                                                 : m.fromMe
                                                   ? "bg-black/15 text-amber-900 border border-amber-800/20"
                                                   : "bg-emerald-500/15 text-emerald-500 border border-emerald-500/30"
-                                          }`}
+                                            }`}
                                         >
                                           {content.status === "missed" ? (
                                             <PhoneMissed className="h-5 w-5" />
@@ -1077,15 +1065,14 @@ function ThreadPage() {
                                         </div>
                                         <div className="min-w-0 flex-1">
                                           <p
-                                            className={`text-[13.5px] font-semibold leading-tight ${
-                                              content.status === "missed"
+                                            className={`text-[13.5px] font-semibold leading-tight ${content.status === "missed"
                                                 ? "text-rose-600 dark:text-rose-400"
                                                 : content.status === "declined"
                                                   ? "text-slate-600 dark:text-slate-400"
                                                   : m.fromMe
                                                     ? "text-[#1A1206]"
                                                     : "text-slate-900 dark:text-white"
-                                            }`}
+                                              }`}
                                           >
                                             {content.status === "missed"
                                               ? `Cuộc gọi ${content.callType === "video" ? "video " : ""}nhỡ`
@@ -1094,11 +1081,10 @@ function ThreadPage() {
                                                 : `Cuộc gọi ${content.callType === "video" ? "video" : "thoại"}`}
                                           </p>
                                           <p
-                                            className={`text-[11.5px] mt-0.5 ${
-                                              m.fromMe
+                                            className={`text-[11.5px] mt-0.5 ${m.fromMe
                                                 ? "text-[#1A1206]/70"
                                                 : "text-slate-500 dark:text-[var(--bc-mobile-muted)]"
-                                            }`}
+                                              }`}
                                           >
                                             {content.status === "ended" && content.duration > 0
                                               ? `Thời lượng: ${formatCallDuration(content.duration)}`
@@ -1112,11 +1098,10 @@ function ThreadPage() {
                                         <button
                                           type="button"
                                           onClick={() => setCallModal({ isOpen: true, type: content.callType })}
-                                          className={`shrink-0 rounded-lg px-2.5 py-1 text-[11.5px] font-semibold transition-colors cursor-pointer ${
-                                            m.fromMe
+                                          className={`shrink-0 rounded-lg px-2.5 py-1 text-[11.5px] font-semibold transition-colors cursor-pointer ${m.fromMe
                                               ? "bg-black/10 hover:bg-black/20 text-[#1A1206]"
                                               : "bg-amber-500/15 hover:bg-amber-500/25 text-amber-600 dark:text-[var(--bc-mobile-accent)] border border-amber-500/30"
-                                          }`}
+                                            }`}
                                         >
                                           Gọi lại
                                         </button>
@@ -1127,9 +1112,8 @@ function ThreadPage() {
                                       <VoiceMessagePlayer url={content.url} duration={content.duration} fromMe={m.fromMe} />
                                       {content.caption ? (
                                         <p
-                                          className={`px-3 pb-2 text-[13px] leading-relaxed ${
-                                            m.fromMe ? "text-[#1A1206] font-medium" : "text-slate-900 dark:text-[var(--bc-mobile-text)]"
-                                          }`}
+                                          className={`px-3 pb-2 text-[13px] leading-relaxed ${m.fromMe ? "text-[#1A1206] font-medium" : "text-slate-900 dark:text-[var(--bc-mobile-text)]"
+                                            }`}
                                         >
                                           {content.caption}
                                         </p>
@@ -1144,9 +1128,8 @@ function ThreadPage() {
 
                                 {Object.keys(reactionsGrouped).length > 0 ? (
                                   <div
-                                    className={`absolute -bottom-2.5 flex items-center gap-1 rounded-full border border-[var(--bc-mobile-border)] bg-[var(--bc-mobile-surface)] px-1.5 py-0.5 shadow-md ${
-                                      m.fromMe ? "right-2" : "left-2"
-                                    }`}
+                                    className={`absolute -bottom-2.5 flex items-center gap-1 rounded-full border border-[var(--bc-mobile-border)] bg-[var(--bc-mobile-surface)] px-1.5 py-0.5 shadow-md ${m.fromMe ? "right-2" : "left-2"
+                                      }`}
                                   >
                                     {Object.entries(reactionsGrouped).map(([emoji, count]) => (
                                       <span
@@ -1189,11 +1172,10 @@ function ThreadPage() {
                                           key={emoji}
                                           type="button"
                                           onClick={() => handleToggleReaction(m.id, emoji)}
-                                          className={`flex h-7 w-7 items-center justify-center rounded-full text-[15px] hover:scale-125 transition-transform cursor-pointer ${
-                                            myReaction?.emoji === emoji
+                                          className={`flex h-7 w-7 items-center justify-center rounded-full text-[15px] hover:scale-125 transition-transform cursor-pointer ${myReaction?.emoji === emoji
                                               ? "bg-[var(--bc-mobile-accent-soft)] ring-1 ring-[var(--bc-mobile-accent)]"
                                               : "hover:bg-[var(--bc-mobile-surface-2)]"
-                                          }`}
+                                            }`}
                                         >
                                           {emoji}
                                         </button>
@@ -1247,9 +1229,8 @@ function ThreadPage() {
                           </div>
 
                           <div
-                            className={`mt-1 flex items-center gap-1.5 px-1 text-[10.5px] text-[var(--bc-mobile-muted)] ${
-                              m.fromMe ? "justify-end" : "justify-start"
-                            }`}
+                            className={`mt-1 flex items-center gap-1.5 px-1 text-[10.5px] text-[var(--bc-mobile-muted)] ${m.fromMe ? "justify-end" : "justify-start"
+                              }`}
                           >
                             <span>{timeFormatted}</span>
                             {m.isEdited ? (
@@ -1350,9 +1331,8 @@ function ThreadPage() {
                         className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--bc-mobile-surface)] text-[var(--bc-mobile-accent)] border border-[var(--bc-mobile-border)] hover:bg-[var(--bc-mobile-surface-2)] transition-colors cursor-pointer"
                       >
                         <Plus
-                          className={`h-4 w-4 transition-transform duration-200 ${
-                            uploadMenuOpen ? "rotate-45" : ""
-                          }`}
+                          className={`h-4 w-4 transition-transform duration-200 ${uploadMenuOpen ? "rotate-45" : ""
+                            }`}
                         />
                       </button>
 

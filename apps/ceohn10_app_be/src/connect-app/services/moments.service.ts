@@ -14,7 +14,7 @@ export class ConnectMomentsService {
   constructor(
     private prisma: PrismaService,
     private gateway: ConnectAppGateway,
-  ) {}
+  ) { }
 
   async prepareMoment(userId: string, input: any) {
     const {
@@ -396,7 +396,7 @@ export class ConnectMomentsService {
     }
 
     const formattedList: any[] = rawComments.map((c) => {
-      const displayName = c.display_name || 'Hội viên CEO HN10';
+      const displayName = c.display_name || 'Học viên CEO HN10';
       const words = displayName.trim().split(/\s+/).filter(Boolean);
       const initials =
         words.length > 1
@@ -500,7 +500,7 @@ export class ConnectMomentsService {
       LIMIT 1
     `.catch(() => [] as any[]);
     const author = authorProfiles[0] || {};
-    const displayName = author.display_name || 'Hội viên CEO HN10';
+    const displayName = author.display_name || 'Học viên CEO HN10';
     const words = displayName.trim().split(/\s+/).filter(Boolean);
     const initials =
       words.length > 1

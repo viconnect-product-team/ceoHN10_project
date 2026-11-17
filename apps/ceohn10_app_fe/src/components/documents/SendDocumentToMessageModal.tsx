@@ -119,7 +119,7 @@ export function SendDocumentToMessageModal({
     }
 
     setIsSending(true);
-    const toastId = toast.loading(`Đang gửi tài liệu tới ${selectedMember.name || "hội viên"}...`);
+    const toastId = toast.loading(`Đang gửi tài liệu tới ${selectedMember.name || "Học viên"}...`);
 
     try {
       const fileName = documentItem.name.toLowerCase().endsWith(`.${docType}`)
@@ -162,7 +162,7 @@ export function SendDocumentToMessageModal({
           seen: false,
         };
         localStorage.setItem(localKey, JSON.stringify([...existingLocal, optimistic].slice(-50)));
-      } catch {}
+      } catch { }
 
       // Bắn sự kiện cập nhật hội thoại toàn cục
       window.dispatchEvent(new CustomEvent("vba:conversation_updated"));
@@ -200,7 +200,7 @@ export function SendDocumentToMessageModal({
                 Gửi Tài Liệu Vào Tin Nhắn CRM
               </h3>
               <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                Chuyển phát văn bản trực tiếp đến Hội viên qua hệ thống Chat
+                Chuyển phát văn bản trực tiếp đến Học viên qua hệ thống Chat
               </p>
             </div>
           </div>
@@ -238,7 +238,7 @@ export function SendDocumentToMessageModal({
           {/* Recipient Picker */}
           <div>
             <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-              Chọn Người Nhận (Hội viên / Ban điều hành):
+              Chọn Người Nhận (Học viên / Ban điều hành):
             </label>
 
             {/* Search Box */}
@@ -248,7 +248,7 @@ export function SendDocumentToMessageModal({
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Tìm theo tên, mã hội viên, công ty..."
+                placeholder="Tìm theo tên, mã Học viên, công ty..."
                 className="w-full pl-8 pr-3 py-1.5 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white outline-none focus:border-[#003B95] transition"
               />
             </div>
@@ -258,11 +258,11 @@ export function SendDocumentToMessageModal({
               {loadingMembers ? (
                 <div className="py-6 text-center text-xs text-slate-400 flex items-center justify-center gap-1.5">
                   <Loader2 className="size-4 animate-spin text-[#003B95]" />
-                  <span>Đang tải danh sách hội viên...</span>
+                  <span>Đang tải danh sách Học viên...</span>
                 </div>
               ) : filteredMembers.length === 0 ? (
                 <div className="py-6 text-center text-xs text-slate-400">
-                  Không tìm thấy hội viên phù hợp
+                  Không tìm thấy Học viên phù hợp
                 </div>
               ) : (
                 filteredMembers.map((m) => {
@@ -271,9 +271,8 @@ export function SendDocumentToMessageModal({
                     <div
                       key={m.id || m.code}
                       onClick={() => setSelectedMember(m)}
-                      className={`flex items-center justify-between p-2 text-xs transition cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/60 ${
-                        isSelected ? "bg-blue-50/70 dark:bg-blue-950/40 font-bold" : ""
-                      }`}
+                      className={`flex items-center justify-between p-2 text-xs transition cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/60 ${isSelected ? "bg-blue-50/70 dark:bg-blue-950/40 font-bold" : ""
+                        }`}
                     >
                       <div className="flex items-center gap-2 min-w-0">
                         <div className="size-6.5 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 flex items-center justify-center shrink-0 text-[10px] font-bold">
@@ -282,7 +281,7 @@ export function SendDocumentToMessageModal({
                         <div className="truncate">
                           <span className="text-slate-900 dark:text-white">{m.name || m.contact}</span>
                           <span className="text-[10px] text-slate-400 ml-1.5">
-                            ({m.code || "Hội viên"})
+                            ({m.code || "Học viên"})
                           </span>
                         </div>
                       </div>

@@ -336,7 +336,7 @@ function PlatformAiUsersPage() {
       </div>
 
       {/* Policy Explanation Banner */}
-      <div className="mb-6 rounded-2xl border border-blue-500/20 bg-gradient-to-r from-blue-500/5 via-indigo-500/5 to-purple-500/5 p-4 sm:p-5 shadow-[var(--shadow-card)]">
+      <div className="mb-6 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-850 p-4 sm:p-5 shadow-[var(--shadow-card)]">
         <div className="flex items-start gap-3.5">
           <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400">
             <Sparkles className="h-5 w-5" />
@@ -346,7 +346,7 @@ function PlatformAiUsersPage() {
               Quy tắc Hạn Mức Tự Động: 50 câu hỏi / 1 tài khoản
             </div>
             <p className="text-muted-foreground leading-relaxed">
-              Mỗi tài khoản hội viên/người dùng khi tương tác với Trợ lý AI sẽ có hạn mức mặc định tối đa là{" "}
+              Mỗi tài khoản Học viên/người dùng khi tương tác với Trợ lý AI sẽ có hạn mức mặc định tối đa là{" "}
               <strong className="text-foreground">50 câu hỏi</strong>. Khi chạm ngưỡng 50 câu, hệ thống sẽ tự động
               khóa tính năng đặt câu hỏi để tránh lạm dụng chi phí token API. Quản trị viên nền tảng có thể:
             </p>
@@ -378,7 +378,7 @@ function PlatformAiUsersPage() {
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Tìm theo tên, email, công ty, mã hội viên..."
+              placeholder="Tìm theo tên, email, công ty, mã Học viên..."
               className="w-full rounded-xl border border-border bg-background pl-10 pr-10 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
             />
             {search && (
@@ -412,19 +412,17 @@ function PlatformAiUsersPage() {
                   key={tab.id}
                   type="button"
                   onClick={() => setStatusFilter(tab.id)}
-                  className={`inline-flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-semibold transition ${
-                    active
+                  className={`inline-flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-semibold transition ${active
                       ? "bg-primary text-primary-foreground shadow-sm"
                       : "bg-secondary text-muted-foreground hover:bg-muted hover:text-foreground"
-                  }`}
+                    }`}
                 >
                   <span>{tab.label}</span>
                   <span
-                    className={`rounded-full px-1.5 py-0.2 text-[10px] font-bold ${
-                      active
+                    className={`rounded-full px-1.5 py-0.2 text-[10px] font-bold ${active
                         ? "bg-primary-foreground/20 text-primary-foreground"
                         : "bg-background text-muted-foreground"
-                    }`}
+                      }`}
                   >
                     {tab.count}
                   </span>
@@ -441,7 +439,7 @@ function PlatformAiUsersPage() {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-border bg-secondary/60 text-left text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
-                <th className="px-5 py-3.5">Người Dùng / Hội Viên</th>
+                <th className="px-5 py-3.5">Người Dùng / Học viên</th>
                 <th className="px-4 py-3.5">Hạn Mức & Tiến Độ (50 câu)</th>
                 <th className="px-4 py-3.5">Trạng Thái</th>
                 <th className="px-4 py-3.5">Câu Hỏi Gần Nhất</th>
@@ -535,13 +533,12 @@ function PlatformAiUsersPage() {
                               {u.usedCount} <span className="font-normal text-muted-foreground">/ {u.totalLimit} câu</span>
                             </span>
                             <span
-                              className={`text-[11px] font-bold ${
-                                isExceeded
+                              className={`text-[11px] font-bold ${isExceeded
                                   ? "text-rose-600 dark:text-rose-400"
                                   : isWarning
-                                  ? "text-amber-600 dark:text-amber-400"
-                                  : "text-muted-foreground"
-                              }`}
+                                    ? "text-amber-600 dark:text-amber-400"
+                                    : "text-muted-foreground"
+                                }`}
                             >
                               {isExceeded ? "Hết lượt" : `Còn ${u.remaining}`}
                             </span>
@@ -635,11 +632,10 @@ function PlatformAiUsersPage() {
                             title={u.isBlocked ? "Mở khóa AI" : "Khóa AI"}
                             disabled={actionLoading}
                             onClick={() => handleToggleBlock(u)}
-                            className={`inline-flex h-8 w-8 items-center justify-center rounded-lg border border-border bg-background transition disabled:opacity-40 ${
-                              u.isBlocked
+                            className={`inline-flex h-8 w-8 items-center justify-center rounded-lg border border-border bg-background transition disabled:opacity-40 ${u.isBlocked
                                 ? "text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/30"
                                 : "text-muted-foreground hover:bg-rose-50 hover:text-rose-600 dark:hover:bg-rose-950/30"
-                            }`}
+                              }`}
                           >
                             {u.isBlocked ? (
                               <Unlock className="h-3.5 w-3.5" />
@@ -706,9 +702,8 @@ function PlatformAiUsersPage() {
                 <div>
                   <div className="text-muted-foreground">Còn Lại</div>
                   <div
-                    className={`text-base font-bold ${
-                      selectedUser.isExceeded ? "text-rose-500" : "text-emerald-500"
-                    }`}
+                    className={`text-base font-bold ${selectedUser.isExceeded ? "text-rose-500" : "text-emerald-500"
+                      }`}
                   >
                     {selectedUser.remaining}
                   </div>

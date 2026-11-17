@@ -111,7 +111,7 @@ export const CeoInteractiveMapModal: React.FC<CeoInteractiveMapModalProps> = ({
   const mapInstanceRef = useRef<any>(null);
   const markersGroupRef = useRef<any>(null);
 
-  // Danh sách hội viên đã kết nối (từ localStorage)
+  // Danh sách Học viên đã kết nối (từ localStorage)
   const connectedMemberCodes = useMemo(() => {
     if (typeof window === "undefined") return new Set<string>();
     try {
@@ -120,7 +120,7 @@ export const CeoInteractiveMapModal: React.FC<CeoInteractiveMapModalProps> = ({
         const list = JSON.parse(raw);
         return new Set(list.map((c: any) => String(c).toLowerCase()));
       }
-    } catch {}
+    } catch { }
     return new Set<string>();
   }, [isOpen]);
 
@@ -141,7 +141,7 @@ export const CeoInteractiveMapModal: React.FC<CeoInteractiveMapModalProps> = ({
     const list: MapMarkerItem[] = [];
     const myCode = myMember?.code?.toLowerCase() || "";
 
-    // 1. Hội viên bật định vị GPS
+    // 1. Học viên bật định vị GPS
     if (isSharingLocation) {
       members.forEach((m, idx) => {
         const baseKey = Object.keys(landmarkCoords)[idx % Object.keys(landmarkCoords).length];
@@ -158,7 +158,7 @@ export const CeoInteractiveMapModal: React.FC<CeoInteractiveMapModalProps> = ({
           id: `mem-${m.id || m.code || idx}`,
           type: "member",
           category: isConnected || isMine ? "personal" : "overview",
-          title: m.name || m.contact || "Hội viên CEO HN10",
+          title: m.name || m.contact || "Học viên CEO HN10",
           subtitle: m.company || m.title || "Doanh nghiệp CLB",
           avatar: m.avatar ? resolveMediaUrl(m.avatar) : null,
           locationName: m.address || m.companyAddress || "Khu vực Cầu Giấy, Hà Nội",
@@ -231,7 +231,7 @@ export const CeoInteractiveMapModal: React.FC<CeoInteractiveMapModalProps> = ({
         type: is1on1 ? "meeting_1on1" : "meeting_board",
         category: isRelatesToMe ? "personal" : "overview",
         title: mt.title || (is1on1 ? "Gặp gỡ kết nối 1-on-1" : "Cuộc họp Ban Chuyên Môn"),
-        subtitle: mt.partnerName || mt.hostName || "Hội viên kết nối",
+        subtitle: mt.partnerName || mt.hostName || "Học viên kết nối",
         avatar: mt.partnerAvatar || mt.hostAvatar || null,
         locationName: mt.venue || mt.location || "Highlands Coffee Cầu Giấy, Hà Nội",
         lat,
@@ -343,18 +343,16 @@ export const CeoInteractiveMapModal: React.FC<CeoInteractiveMapModalProps> = ({
         iconHtml = `
           <div style="position:relative; width:44px; height:44px; display:flex; flex-direction:column; align-items:center; cursor:pointer; filter:drop-shadow(0 4px 8px rgba(0,0,0,0.35)); transition:transform 0.2s;">
             <div style="width:40px; height:40px; border-radius:50%; background:#ffffff; border:3px solid ${ringColor}; overflow:hidden; display:flex; align-items:center; justify-content:center; box-shadow:0 0 10px ${ringColor}80;">
-              ${
-                item.avatar
-                  ? `<img src="${item.avatar}" style="width:100%; height:100%; object-fit:cover;" onerror="this.src='/ceohn10-logo.png'"/>`
-                  : `<div style="font-size:12px; font-weight:900; color:#003B95;">${item.title.slice(0, 2).toUpperCase()}</div>`
-              }
+              ${item.avatar
+            ? `<img src="${item.avatar}" style="width:100%; height:100%; object-fit:cover;" onerror="this.src='/ceohn10-logo.png'"/>`
+            : `<div style="font-size:12px; font-weight:900; color:#003B95;">${item.title.slice(0, 2).toUpperCase()}</div>`
+          }
             </div>
             <div style="width:0; height:0; border-left:6px solid transparent; border-right:6px solid transparent; border-top:8px solid ${ringColor}; margin-top:-2px;"></div>
-            ${
-              isMine
-                ? `<div style="position:absolute; -top:4px; -right:2px; width:12px; height:12px; border-radius:50%; background:#EF4444; border:2px solid #ffffff;"></div>`
-                : ""
-            }
+            ${isMine
+            ? `<div style="position:absolute; -top:4px; -right:2px; width:12px; height:12px; border-radius:50%; background:#EF4444; border:2px solid #ffffff;"></div>`
+            : ""
+          }
           </div>
         `;
       } else if (item.type === "event") {
@@ -412,7 +410,7 @@ export const CeoInteractiveMapModal: React.FC<CeoInteractiveMapModalProps> = ({
     setIsSharingLocation(next);
     try {
       localStorage.setItem("vba_location_sharing_enabled", String(next));
-    } catch {}
+    } catch { }
   };
 
   if (!isOpen || typeof document === "undefined") return null;
@@ -433,7 +431,7 @@ export const CeoInteractiveMapModal: React.FC<CeoInteractiveMapModalProps> = ({
                   <span className="size-2 rounded-full bg-emerald-400 animate-ping inline-block" />
                 </h3>
                 <p className="text-[10.5px] text-slate-300">
-                  Định vị hội viên, sự kiện &amp; cuộc gặp thực tế
+                  Định vị Học viên, sự kiện &amp; cuộc gặp thực tế
                 </p>
               </div>
             </div>
@@ -454,11 +452,10 @@ export const CeoInteractiveMapModal: React.FC<CeoInteractiveMapModalProps> = ({
                 setActiveScope("overview");
                 setSelectedMarker(null);
               }}
-              className={`py-2 px-3 rounded-xl text-xs font-black transition flex items-center justify-center gap-1.5 cursor-pointer ${
-                activeScope === "overview"
+              className={`py-2 px-3 rounded-xl text-xs font-black transition flex items-center justify-center gap-1.5 cursor-pointer ${activeScope === "overview"
                   ? "bg-gradient-to-r from-sky-900 via-[#003B95] to-blue-700 text-white shadow-md"
                   : "text-slate-400 hover:text-white"
-              }`}
+                }`}
             >
               <Globe className="size-3.5" />
               <span>Tổng thể ({allMarkers.length})</span>
@@ -470,11 +467,10 @@ export const CeoInteractiveMapModal: React.FC<CeoInteractiveMapModalProps> = ({
                 setActiveScope("personal");
                 setSelectedMarker(null);
               }}
-              className={`py-2 px-3 rounded-xl text-xs font-black transition flex items-center justify-center gap-1.5 cursor-pointer ${
-                activeScope === "personal"
+              className={`py-2 px-3 rounded-xl text-xs font-black transition flex items-center justify-center gap-1.5 cursor-pointer ${activeScope === "personal"
                   ? "bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 font-black shadow-md"
                   : "text-slate-400 hover:text-white"
-              }`}
+                }`}
             >
               <UserCheck className="size-3.5" />
               <span>Cá nhân ({allMarkers.filter((m) => m.category === "personal").length})</span>
@@ -491,7 +487,7 @@ export const CeoInteractiveMapModal: React.FC<CeoInteractiveMapModalProps> = ({
               placeholder={
                 activeScope === "personal"
                   ? "Tìm bạn bè đã kết nối, sự kiện đã đăng ký..."
-                  : "Tìm hội viên, sự kiện, họp ban trên bản đồ..."
+                  : "Tìm Học viên, sự kiện, họp ban trên bản đồ..."
               }
               className="w-full bg-transparent text-xs text-white placeholder:text-slate-400 border-0 outline-none font-medium"
             />
@@ -502,11 +498,11 @@ export const CeoInteractiveMapModal: React.FC<CeoInteractiveMapModalProps> = ({
             )}
           </div>
 
-          {/* Bộ lọc con: Tất cả / Hội viên / Sự kiện / Họp ban */}
+          {/* Bộ lọc con: Tất cả / Học viên / Sự kiện / Họp ban */}
           <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
             {[
               { id: "all", label: "Tất cả" },
-              { id: "member", label: "Hội viên" },
+              { id: "member", label: "Học viên" },
               { id: "event", label: "Sự kiện" },
               { id: "meeting", label: "Cuộc họp" },
             ].map((f) => (
@@ -514,11 +510,10 @@ export const CeoInteractiveMapModal: React.FC<CeoInteractiveMapModalProps> = ({
                 key={f.id}
                 type="button"
                 onClick={() => setActiveTypeFilter(f.id as any)}
-                className={`shrink-0 px-2.5 py-1 rounded-full text-[10.5px] font-bold transition flex items-center gap-1 cursor-pointer border ${
-                  activeTypeFilter === f.id
+                className={`shrink-0 px-2.5 py-1 rounded-full text-[10.5px] font-bold transition flex items-center gap-1 cursor-pointer border ${activeTypeFilter === f.id
                     ? "bg-white text-slate-950 border-white shadow-xs font-black"
                     : "bg-slate-900/80 text-slate-300 border-slate-700 hover:bg-slate-800"
-                }`}
+                  }`}
               >
                 {f.label}
               </button>
@@ -554,11 +549,10 @@ export const CeoInteractiveMapModal: React.FC<CeoInteractiveMapModalProps> = ({
             <button
               type="button"
               onClick={handleToggleLocation}
-              className={`size-10 rounded-full shadow-lg border flex items-center justify-center cursor-pointer active:scale-95 transition ${
-                isSharingLocation
+              className={`size-10 rounded-full shadow-lg border flex items-center justify-center cursor-pointer active:scale-95 transition ${isSharingLocation
                   ? "bg-emerald-600 text-white border-emerald-500"
                   : "bg-white dark:bg-slate-900 text-slate-400 border-slate-300"
-              }`}
+                }`}
               title={isSharingLocation ? "Đang chia sẻ vị trí (Bấm để tắt)" : "Đã tắt định vị (Bấm để bật)"}
             >
               <MapPin className="size-4" />

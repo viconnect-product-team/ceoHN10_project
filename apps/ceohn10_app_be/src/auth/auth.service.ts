@@ -44,7 +44,7 @@ export class AuthService implements OnModuleInit {
           if (r.jti) this.revokedJtiStore.add(r.jti);
         }
       }
-    } catch {}
+    } catch { }
   }
 
   async revokeToken(jti: string, userId: string, tokenType = 'access_token', exp?: number) {
@@ -58,9 +58,9 @@ export class AuthService implements OnModuleInit {
           userId,
           tokenType,
           expiresAt,
-        ).catch(() => {});
+        ).catch(() => { });
       }
-    } catch {}
+    } catch { }
   }
 
   isTokenRevoked(jti?: string): boolean {
@@ -114,8 +114,8 @@ export class AuthService implements OnModuleInit {
     const details = await this.usersService.getAccountDetails(user.id);
     const resolvedRole = details?.role || 'member';
     const roleList = details?.roles || [resolvedRole];
-    const execRole = details?.executive_role || details?.executiveRole || 'Hội viên';
-    const department = details?.department || 'Hội viên ceohn10';
+    const execRole = details?.executive_role || details?.executiveRole || 'Học viên';
+    const department = details?.department || 'Học viên ceohn10';
 
     const permissions = details?.permissions || [];
     const accessJti = crypto.randomUUID();
@@ -207,8 +207,8 @@ export class AuthService implements OnModuleInit {
       const details = await this.usersService.getAccountDetails(user.id);
       const resolvedRole = details?.role || 'member';
       const roleList = details?.roles || [resolvedRole];
-      const execRole = details?.executive_role || details?.executiveRole || 'Hội viên';
-      const department = details?.department || 'Hội viên ceohn10';
+      const execRole = details?.executive_role || details?.executiveRole || 'Học viên';
+      const department = details?.department || 'Học viên ceohn10';
       const permissions = details?.permissions || [];
 
       const newAccessJti = crypto.randomUUID();
@@ -284,7 +284,7 @@ export class AuthService implements OnModuleInit {
         SELECT id FROM public.members WHERE LOWER(email) = ${cleanEmail} LIMIT 1
       `.catch(() => []);
       if (existingEmailMember.length > 0) {
-        throw new BadRequestException('Địa chỉ email này đã được sử dụng bởi một hội viên. Vui lòng chọn email khác!');
+        throw new BadRequestException('Địa chỉ email này đã được sử dụng bởi một Học viên. Vui lòng chọn email khác!');
       }
     }
 
@@ -316,7 +316,7 @@ export class AuthService implements OnModuleInit {
 
     // Gửi email chào mừng đăng ký thành công về email người đăng ký
     const targetEmail = (data.email || (data.username?.includes('@') ? data.username : '') || '').trim();
-    const applicantName = data.name || data.fullName || data.username || 'Quý Hội viên';
+    const applicantName = data.name || data.fullName || data.username || 'Quý Học viên';
     if (this.mailService && targetEmail && targetEmail.includes('@')) {
       void this.mailService.sendAppWelcomeRegistrationEmail({
         to: targetEmail,
@@ -330,9 +330,9 @@ export class AuthService implements OnModuleInit {
       });
     }
 
-    // Gửi tin nhắn chào mừng hội viên mới đến với kênh Zalo CEO HN10
+    // Gửi tin nhắn chào mừng Học viên mới đến với kênh Zalo CEO HN10
     if (this.zaloService && (data.phone || data.username)) {
-      const welcomeMsg = `🎉 [CLB DOANH NHÂN CEO HN10 - CHÀO MỪNG HỘI VIÊN MỚI]
+      const welcomeMsg = `🎉 [CLB DOANH NHÂN CEO HN10 - CHÀO MỪNG Học viên MỚI]
 Kính gửi: Anh/Chị ${applicantName}
 Ban Chấp Hành CLB Doanh Nhân CEO HN10 (HanoiBA) nồng nhiệt chào mừng Anh/Chị đã đăng ký tài khoản thành công trên Hệ sinh thái Số CEO HN10!
 
@@ -394,7 +394,7 @@ Kính chúc Doanh nghiệp của Anh/Chị luôn phát triển thịnh vượng,
 
       // User Logic
       let user = await this.usersService.findByGoogleId(googleId);
-      
+
       if (!user && email) {
         // Fallback check by email to link accounts
         user = await this.usersService.findByEmail(email);
@@ -474,7 +474,7 @@ Kính chúc Doanh nghiệp của Anh/Chị luôn phát triển thịnh vượng,
 
       const appleId = payload.sub;
       const tokenEmail = payload.email || '';
-      
+
       // Apple only returns email & fullName in the first login. 
       // If we don't have it in payload, use the one sent by Client
       const email = tokenEmail || data.email || '';
@@ -561,7 +561,7 @@ Kính chúc Doanh nghiệp của Anh/Chị luôn phát triển thịnh vượng,
 
   private async exchangeAppleCode(clientId: string, code: string): Promise<string | null> {
     const clientSecret = this.generateAppleClientSecret(clientId);
-    
+
     const params = new URLSearchParams();
     params.append('client_id', clientId);
     params.append('client_secret', clientSecret);
@@ -599,8 +599,8 @@ Kính chúc Doanh nghiệp của Anh/Chị luôn phát triển thịnh vượng,
           ) VALUES (
             gen_random_uuid(),
             ${'Yêu cầu cấp lại mật khẩu: ' + memberName},
-            ${'Hội viên ' + memberName + ' (' + targetEmail + ') đã gửi yêu cầu cấp lại mật khẩu. Vui lòng bấm vào thông báo này để thiết lập mật khẩu mới.'},
-            ${'Hội viên ' + memberName + ' (' + targetEmail + ') đã gửi yêu cầu cấp lại mật khẩu. Vui lòng bấm vào thông báo này để thiết lập mật khẩu mới.'},
+            ${'Học viên ' + memberName + ' (' + targetEmail + ') đã gửi yêu cầu cấp lại mật khẩu. Vui lòng bấm vào thông báo này để thiết lập mật khẩu mới.'},
+            ${'Học viên ' + memberName + ' (' + targetEmail + ') đã gửi yêu cầu cấp lại mật khẩu. Vui lòng bấm vào thông báo này để thiết lập mật khẩu mới.'},
             'forgot_password',
             'security',
             'high',
@@ -619,7 +619,7 @@ Kính chúc Doanh nghiệp của Anh/Chị luôn phát triển thịnh vượng,
     return {
       ok: true,
       success: true,
-      message: 'Yêu cầu cấp lại mật khẩu đã được gửi đến Ban Quản Trị CRM. Quản trị viên sẽ thiết lập mật khẩu mới và tự động gửi thông báo về Email cùng Zalo OA của Quý Hội viên.',
+      message: 'Yêu cầu cấp lại mật khẩu đã được gửi đến Ban Quản Trị CRM. Quản trị viên sẽ thiết lập mật khẩu mới và tự động gửi thông báo về Email cùng Zalo OA của Quý Học viên.',
     };
   }
 
@@ -723,10 +723,10 @@ Kính chúc Doanh nghiệp của Anh/Chị luôn phát triển thịnh vượng,
     }
 
     if (!phoneNumber && !dto.zaloUserId) {
-      throw new UnauthorizedException('Không thể xác định danh tính hội viên từ Zalo');
+      throw new UnauthorizedException('Không thể xác định danh tính Học viên từ Zalo');
     }
 
-    // 2. Tra cứu tài khoản Hội viên trong hệ thống
+    // 2. Tra cứu tài khoản Học viên trong hệ thống
     let user: any = null;
     if (phoneNumber) {
       user = await this.usersService.findByUsername(phoneNumber);
@@ -745,16 +745,16 @@ Kính chúc Doanh nghiệp của Anh/Chị luôn phát triển thịnh vượng,
           if (members.length > 0) {
             user = members[0];
           }
-        } catch {}
+        } catch { }
       }
     }
 
-    // 3. Nếu chưa tồn tại tài khoản, tự động tạo tài khoản hội viên mới gắn với Zalo
+    // 3. Nếu chưa tồn tại tài khoản, tự động tạo tài khoản Học viên mới gắn với Zalo
     if (!user) {
       user = await this.usersService.createUser({
         username: phoneNumber || `zalo-${dto.zaloUserId}`,
         email: `${phoneNumber || dto.zaloUserId}@ceohn10.vn`,
-        name: dto.zaloName || 'Hội viên Zalo CEO HN10',
+        name: dto.zaloName || 'Học viên Zalo CEO HN10',
         avatar_url: dto.zaloAvatar || undefined,
         email_verified: true,
       });
@@ -765,12 +765,12 @@ Kính chúc Doanh nghiệp của Anh/Chị luôn phát triển thịnh vượng,
             `INSERT INTO public.members (name, phone, email, zalo_user_id, status, role)
              VALUES ($1, $2, $3, $4, 'ACTIVE', 'MEMBER')
              ON CONFLICT DO NOTHING`,
-            dto.zaloName || 'Hội viên Zalo',
+            dto.zaloName || 'Học viên Zalo',
             phoneNumber,
             `${phoneNumber}@ceohn10.vn`,
             dto.zaloUserId || null
           );
-        } catch {}
+        } catch { }
       }
     } else if (dto.zaloUserId && this.prisma) {
       try {
@@ -780,7 +780,7 @@ Kính chúc Doanh nghiệp của Anh/Chị luôn phát triển thịnh vượng,
           phoneNumber,
           user.email
         );
-      } catch {}
+      } catch { }
     }
 
     // 4. Cấp phát phiên đăng nhập chuẩn JWT

@@ -5,7 +5,7 @@
 
 ## I. NGUYÊN TẮC THIẾT KẾ CỐT LÕI (CORE DESIGN PRINCIPLES)
 
-Nhằm định vị đẳng cấp của **CLB Doanh Nhân CEO HN10 (Group Quản Trị & Khởi Nghiệp - HanoiBA)**, toàn bộ hệ sinh thái phần mềm (bao gồm **Hệ thống Web CRM Quản trị** và **Ứng dụng Mobile App/PWA Hội viên**) áp dụng nghiêm ngặt quy tắc thiết kế:
+Nhằm định vị đẳng cấp của **CLB Doanh Nhân CEO HN10 (Group Quản Trị & Khởi Nghiệp - HanoiBA)**, toàn bộ hệ sinh thái phần mềm (bao gồm **Hệ thống Web CRM Quản trị** và **Ứng dụng Mobile App/PWA Học viên**) áp dụng nghiêm ngặt quy tắc thiết kế:
 
 > **NGUYÊN TẮC BẤT KHẢ XÂM PHẠM: TỐI ƯU DUY NHẤT 5 MÀU.**  
 > **Dải Gradient chủ đạo là TÍM HỒNG kết hợp NỀN ĐEN chữ TRẮNG. TUYỆT ĐỐI KHÔNG SỬ DỤNG BẤT KỲ MÀU NÀO KHÁC.**
@@ -28,7 +28,7 @@ Nhằm định vị đẳng cấp của **CLB Doanh Nhân CEO HN10 (Group Quản
   $$\text{CSS Gradient} = \text{linear-gradient}(135^\circ, \#7C2D82 \;\; 0\%, \;\; \#D61F69 \;\; 100\%)$$
 - **Ứng dụng của Gradient**:
   - Nút bấm hành động chính (Primary Action CTAs): Nút Đăng nhập, Nút Lưu dữ liệu, Nút Đăng ký sự kiện, Nút Tạo khóa học, Nút Đóng hội phí.
-  - Thẻ Danh thiếp số VIP & Thẻ Hội viên điện tử (Digital Membership Card).
+  - Thẻ Danh thiếp số VIP & Thẻ Học viên điện tử (Digital Membership Card).
   - Khung viền vinh danh, Avatar của Ban Điều Hành, Top 1-2-3 Bảng xếp hạng.
   - Huy hiệu (Badges), Thẻ đánh dấu trạng thái hoạt động chính, Biểu đồ tiến độ.
   - Quầng sáng tỏa nhẹ (Radial glow mesh) trên nền đen của màn hình đăng nhập và trang chủ.
@@ -57,7 +57,7 @@ Hệ thống hỗ trợ chuyển đổi mượt mà giữa 2 chế độ hiển 
 | **Thẻ khối (Card / Container)** | **Trắng `#FFFFFF`**, viền `#E4E4E7`, bóng mờ tinh tế | **Đen `#000000`**, viền `#18181B` |
 | **Thanh bên (Sidebar)** | **Trắng `#FFFFFF`**, chữ đen, item active nền `#FAF5FF` chữ tím | **Đen `#000000`**, viền `#18181B`, chữ trắng |
 | **Nút bấm chính (Primary CTA)** | **Gradient Tím - Hồng (`#7C2D82` ➔ `#D61F69`)**, chữ **TRẮNG `#FFFFFF`** | **Gradient Tím - Hồng (`#7C2D82` ➔ `#D61F69`)**, chữ **TRẮNG `#FFFFFF`** |
-| **Thẻ Hội viên VIP & Danh thiếp số** | **Gradient Tím - Hồng (`#7C2D82` ➔ `#D61F69`)**, chữ **TRẮNG `#FFFFFF`** | **Gradient Tím - Hồng (`#7C2D82` ➔ `#D61F69`)**, chữ **TRẮNG `#FFFFFF`** |
+| **Thẻ Học viên VIP & Danh thiếp số** | **Gradient Tím - Hồng (`#7C2D82` ➔ `#D61F69`)**, chữ **TRẮNG `#FFFFFF`** | **Gradient Tím - Hồng (`#7C2D82` ➔ `#D61F69`)**, chữ **TRẮNG `#FFFFFF`** |
 
 > 💡 **Điểm then chốt**: Bất kể ở Theme Sáng hay Theme Tối, **mọi nút bấm hành động hoặc khối nền dải Gradient Tím - Hồng đều có CHỮ TRẮNG (`#FFFFFF`)** nổi bật, tuyệt đối không bị đổi sang chữ đen.
 
@@ -85,7 +85,7 @@ Thay vào đó, hệ thống tập trung sâu sắc vào 5 trục giá trị c�
 2. 📚 **Kho Lưu trữ Tài liệu & Học liệu số Doanh nghiệp (Digital Vault)**
 3. 🎪 **Sự kiện & Check-in QR Code Realtime (Events Management)**
 4. 💳 **Báo cáo Tài chính Realtime & Đóng hội phí tự động MoMo/VNPay (Treasury)**
-5. 🏆 **Danh bạ Doanh nhân & Bảng xếp hạng Vinh danh Hội viên (Leaderboard)**
+5. 🏆 **Danh bạ Doanh nhân & Bảng xếp hạng Vinh danh Học viên (Leaderboard)**
 
 ---
 
@@ -101,7 +101,7 @@ Thay vào đó, hệ thống tập trung sâu sắc vào 5 trục giá trị c�
 +--------------------------------+-----------------------------+-------------------------+
 | [Thanh bên - Nền Đen #000000]  | [Vùng làm việc chính - Nền Đen #000000 / Quầng tím hồng] |
 | 📊 Tổng quan                   |                                                       |
-| 👥 Hội viên                    |  [KPI 1: Hội viên]  [KPI 2: Tài chính]  [KPI 3: Lớp học] |
+| 👥 Học viên                    |  [KPI 1: Học viên]  [KPI 2: Tài chính]  [KPI 3: Lớp học] |
 | 🛡️ Phân quyền RBAC              |  Gradient Tím-Hồng   Gradient Tím-Hồng   Gradient Tím-Hồng |
 | 🎪 Sự kiện & QR                |  Số liệu chữ Trắng  Số liệu chữ Trắng  Số liệu chữ Trắng|
 | 🎓 Lớp học & Đào tạo           +-------------------------------------------------------+
@@ -130,30 +130,30 @@ Thay vào đó, hệ thống tập trung sâu sắc vào 5 trục giá trị c�
 - **Màu nền**: Màu Đen tuyền `#000000` kết hợp viền phân cách `#18181B`.
 - **Header trang**: "TỔNG QUAN HỆ THỐNG CEO HN10" (Chữ Trắng `#FFFFFF`, font-bold) kèm phụ đề "Cập nhật dữ liệu thời gian thực từ cơ sở dữ liệu PostgreSQL ceohn10_project" (Chữ Trắng mờ 70%).
 - **4 Thẻ thống kê KPI chủ đạo**:
-  1. *Thẻ 1 - Hội viên chính thức*: Khung card nền Đen `#000000`, viền Đen xám `#18181B`. Số lượng hội viên hiển thị chữ Trắng cỡ lớn `text-3xl font-black`. Icon người dùng viền dải Gradient Tím - Hồng.
+  1. *Thẻ 1 - Học viên chính thức*: Khung card nền Đen `#000000`, viền Đen xám `#18181B`. Số lượng Học viên hiển thị chữ Trắng cỡ lớn `text-3xl font-black`. Icon người dùng viền dải Gradient Tím - Hồng.
   2. *Thẻ 2 - Quỹ Hội & Tài Chính Realtime*: Số dư ngân quỹ biến động tức thì theo từng giao dịch MoMo/VNPay thành công. Số tiền VND màu Trắng `#FFFFFF`.
   3. *Thẻ 3 - Sự kiện & Tỷ lệ Tham gia*: Số lượng sự kiện trong tháng và tỷ lệ check-in QR thực tế. Huy hiệu trạng thái viền tím hồng chữ trắng.
-  4. *Thẻ 4 - Lớp học & Đào tạo Doanh nghiệp*: Tổng số khóa học đang triển khai và số lượt hội viên đã tham gia học.
+  4. *Thẻ 4 - Lớp học & Đào tạo Doanh nghiệp*: Tổng số khóa học đang triển khai và số lượt Học viên đã tham gia học.
 - **Khu vực Biểu đồ Tăng trưởng & Dòng tiền**: Biểu đồ đường (Line Chart) và cột (Bar Chart) vẽ trên nền đen `#000000`, đường lưới viền `#18181B`, dải màu biểu đồ phối giữa Tím `#7C2D82`, Hồng `#D61F69` và Trắng `#FFFFFF`.
 - **Bảng Sự kiện sắp diễn ra & Khóa đào tạo mới nhất**: Bảng dữ liệu nền Đen `#000000`, đường kẻ ngang `#18181B`, tiêu đề cột chữ trắng đậm, toàn bộ nội dung chữ trắng dễ đọc.
 
 ---
 
-#### Màn hình 3: Quản Lý Danh Bạ & Hồ Sơ Hội Viên (Members Management)
+#### Màn hình 3: Quản Lý Danh Bạ & Hồ Sơ Học viên (Members Management)
 - **Đường dẫn**: `/members`
 - **Màu nền**: Đen `#000000`, viền `#18181B`.
 - **Thanh công cụ lọc (Filter Toolbar)**:
-  - Ô tìm kiếm theo tên, công ty, mã số hội viên: Nền `#18181B`, viền `#18181B`, chữ Trắng `#FFFFFF`.
+  - Ô tìm kiếm theo tên, công ty, mã số Học viên: Nền `#18181B`, viền `#18181B`, chữ Trắng `#FFFFFF`.
   - Bộ lọc theo Ban chuyên môn (Ban Đào tạo, Ban Sự kiện, Ban Tài chính, v.v.): Dropdown nền Đen viền `#18181B`, chữ trắng.
-  - Nút "Thêm Hội Viên Mới": Nền Gradient Tím - Hồng (`#7C2D82` ➔ `#D61F69`), icon dấu cộng trắng, chữ Trắng `#FFFFFF`.
+  - Nút "Thêm Học viên Mới": Nền Gradient Tím - Hồng (`#7C2D82` ➔ `#D61F69`), icon dấu cộng trắng, chữ Trắng `#FFFFFF`.
   - Nút "Xuất Danh Sách Excel": Khung nền `#000000`, viền Tím `#7C2D82`, chữ Trắng `#FFFFFF`.
-- **Bảng Danh Sách Hội Viên (Data Table)**:
+- **Bảng Danh Sách Học viên (Data Table)**:
   - Hàng tiêu đề (Table Header): Nền `#18181B`, chữ Trắng `#FFFFFF` in hoa font-bold.
   - Cột Avatar & Thông tin: Ảnh đại diện bo tròn viền Tím `#7C2D82`. Tên doanh nhân chữ Trắng đậm, tên doanh nghiệp chữ Trắng mờ 70%.
   - Cột Chức vụ / Ban chuyên môn: Pill tag nền Gradient Tím - Hồng chữ Trắng sắc nét.
   - Cột Trạng thái hội phí: Tag viền Tím `#7C2D82` chữ Trắng (Đã nộp) hoặc viền Hồng `#D61F69` chữ Trắng (Chờ nộp).
   - Cột Thao tác: Icon chỉnh sửa, xem chi tiết màu Trắng `#FFFFFF`.
-- **Modal Chi Tiết Hồ Sơ Hội Viên**: Nền Đen `#000000`, viền bao quanh `#18181B`. Các tab thông tin (Thông tin chung, Doanh nghiệp, Lịch sử tham gia sự kiện, Lịch sử học tập) khi active sẽ có gạch chân Gradient Tím - Hồng chữ Trắng.
+- **Modal Chi Tiết Hồ Sơ Học viên**: Nền Đen `#000000`, viền bao quanh `#18181B`. Các tab thông tin (Thông tin chung, Doanh nghiệp, Lịch sử tham gia sự kiện, Lịch sử học tập) khi active sẽ có gạch chân Gradient Tím - Hồng chữ Trắng.
 
 ---
 
@@ -168,10 +168,10 @@ Thay vào đó, hệ thống tập trung sâu sắc vào 5 trục giá trị c�
   - Tab "QUẢN TRỊ CRM (WEB)" (Active): Nền Gradient Tím - Hồng, chữ Trắng đậm.
   - Tab "ỨNG DỤNG MOBILE (APP)" (Inactive): Nền `#000000`, viền `#18181B`, chữ Trắng mờ 70%.
 - **Bảng Ma Trận Phân Quyền**:
-  - Tiêu đề cột các Ban Điều Hành (Chủ tịch CLB, Ban Thư ký & Vận hành, Ban Đào tạo & Chuyên môn, Ban Tài chính & Quỹ, Ban Sự kiện & Truyền thông, Ban Hội viên & Gắn kết): Nền `#18181B`, chữ Trắng font-bold.
+  - Tiêu đề cột các Ban Điều Hành (Chủ tịch CLB, Ban Thư ký & Vận hành, Ban Đào tạo & Chuyên môn, Ban Tài chính & Quỹ, Ban Sự kiện & Truyền thông, Ban Học viên & Gắn kết): Nền `#18181B`, chữ Trắng font-bold.
   - Các nhóm quyền:
     * Nhóm Quản trị Tổng quan & Hệ thống
-    * Nhóm Quản lý Hội viên & Hồ sơ Doanh nhân
+    * Nhóm Quản lý Học viên & Hồ sơ Doanh nhân
     * Nhóm Quản lý Sự kiện & Điểm danh QR
     * Nhóm **Lớp học & Khóa đào tạo Doanh nghiệp** (Đặc quyền mới của CEO HN10)
     * Nhóm **Kho Tài liệu & Học liệu số** (Đặc quyền mới của CEO HN10)
@@ -189,7 +189,7 @@ Thay vào đó, hệ thống tập trung sâu sắc vào 5 trục giá trị c�
   - Ảnh cover sự kiện: Tỷ lệ 16:9 sắc nét.
   - Tên sự kiện: Chữ Trắng `#FFFFFF` font-bold `text-lg`.
   - Thời gian, địa điểm: Icon Trắng, chữ Trắng mờ 70%.
-  - Huy hiệu tiến độ: Tag viền Gradient Tím - Hồng, chữ Trắng (ví dụ: "Đã có 68/80 hội viên đăng ký").
+  - Huy hiệu tiến độ: Tag viền Gradient Tím - Hồng, chữ Trắng (ví dụ: "Đã có 68/80 Học viên đăng ký").
 - **Màn hình Quầy Điểm Danh QR Code Trực Tiếp (Live QR Gate)**:
   - Khung quét camera: Viền laser phát sáng Gradient Tím - Hồng trên nền đen.
   - Khi quét thành công: Pop-up thông báo hiển thị Họ tên Doanh nhân, Tên Công ty, Thời gian quét chính xác, âm thanh xác nhận, toàn bộ chữ Trắng `#FFFFFF` trên nền Gradient Tím - Hồng.
@@ -200,7 +200,7 @@ Thay vào đó, hệ thống tập trung sâu sắc vào 5 trục giá trị c�
 #### Màn hình 6: Quản Lý Lớp Học & Khóa Đào Tạo (Trainings Management)
 - **Đường dẫn**: `/trainings`
 - **Màu nền**: Đen `#000000`, viền `#18181B`.
-- **Mục tiêu chuyên biệt**: Phục vụ các chuyên đề bồi dưỡng lãnh đạo, kỹ năng khởi nghiệp và quản trị vận hành dành riêng cho hội viên CEO Hà Nội.
+- **Mục tiêu chuyên biệt**: Phục vụ các chuyên đề bồi dưỡng lãnh đạo, kỹ năng khởi nghiệp và quản trị vận hành dành riêng cho Học viên CEO Hà Nội.
 - **Thanh tác vụ**: Nút "Tạo Khóa Đào Tạo Mới" (Gradient Tím - Hồng, chữ Trắng), Bộ lọc chuyên đề (Quản trị, Tài chính, Pháp lý, Nhân sự, Công nghệ).
 - **Lưới danh sách Khóa học (Training Course Cards)**:
   - Thẻ khóa học: Nền Đen `#000000`, viền `#18181B`.
@@ -210,7 +210,7 @@ Thay vào đó, hệ thống tập trung sâu sắc vào 5 trục giá trị c�
   - Tiến độ lớp học & Số lượng học viên: Thanh tiến độ (Progress bar) bằng dải Gradient Tím - Hồng.
 - **Màn hình Quản lý Buổi học & Tài liệu Khóa học**:
   - Danh sách bài giảng / video / slide buổi học: Chữ Trắng, nút tải tài liệu nền `#18181B` chữ Trắng.
-  - Danh sách điểm danh hội viên tham gia từng buổi: Dữ liệu realtime từ PostgreSQL `ceohn10_project`.
+  - Danh sách điểm danh Học viên tham gia từng buổi: Dữ liệu realtime từ PostgreSQL `ceohn10_project`.
 
 ---
 
@@ -228,7 +228,7 @@ Thay vào đó, hệ thống tập trung sâu sắc vào 5 trục giá trị c�
 - **Bảng Danh Sách Tài Liệu (Document Table)**:
   - Cột Tên tài liệu & Định dạng (PDF, DOCX...): Chữ Trắng.
   - Cột Dung lượng & Ngày tải lên: Chữ Trắng mờ 70%.
-  - Cột Phân quyền truy cập: Tag viền Tím `#7C2D82` chữ Trắng (Tất cả hội viên / Chỉ BĐH / Lớp học đặc biệt).
+  - Cột Phân quyền truy cập: Tag viền Tím `#7C2D82` chữ Trắng (Tất cả Học viên / Chỉ BĐH / Lớp học đặc biệt).
   - Cột Thao tác: Nút Tải về (Download) và Xem trước (Preview) màu Trắng `#FFFFFF`.
 
 ---
@@ -266,7 +266,7 @@ Thay vào đó, hệ thống tập trung sâu sắc vào 5 trục giá trị c�
 
 ---
 
-### PHÂN HỆ 2: ỨNG DỤNG MOBILE APP / PWA HỘI VIÊN (MEMBER APP)
+### PHÂN HỆ 2: ỨNG DỤNG MOBILE APP / PWA Học viên (MEMBER APP)
 
 ```
 +---------------------------------------+
@@ -275,7 +275,7 @@ Thay vào đó, hệ thống tập trung sâu sắc vào 5 trục giá trị c�
 |  Chào Anh/Chị, NGUYỄN VĂN A            |
 +---------------------------------------+
 |  +---------------------------------+  |
-|  | THẺ HỘI VIÊN VIP CEO HN10       |  |
+|  | THẺ Học viên VIP CEO HN10       |  |
 |  | [Gradient Tím - Hồng Rực Rỡ]    |  |
 |  | Số thẻ: HN10-8888               |  |
 |  | Công ty: CỔ PHẦN CÔNG NGHỆ ABC  |  |
@@ -307,17 +307,17 @@ Thay vào đó, hệ thống tập trung sâu sắc vào 5 trục giá trị c�
 
 ---
 
-#### Màn hình 11: Trang Chủ App Hội Viên (Member Home Feed)
+#### Màn hình 11: Trang Chủ App Học viên (Member Home Feed)
 - **Màu nền**: Đen tuyền `#000000`.
 - **Thanh trạng thái & Lời chào**:
-  - Header chào đón: "Xin chào, [Họ và Tên Hội Viên]" - Chữ Trắng `#FFFFFF` `text-lg font-bold`.
-  - Avatar hội viên: Viền Gradient Tím - Hồng sắc nét.
+  - Header chào đón: "Xin chào, [Họ và Tên Học viên]" - Chữ Trắng `#FFFFFF` `text-lg font-bold`.
+  - Avatar Học viên: Viền Gradient Tím - Hồng sắc nét.
   - Nút quả chuông thông báo: Icon màu Trắng, chấm đỏ thông báo thay bằng chấm Hồng `#D61F69`.
-- **Thẻ Hội Viên Điện Tử Thông Minh (Digital VIP Membership Card)**:
+- **Thẻ Học viên Điện Tử Thông Minh (Digital VIP Membership Card)**:
   - Kích thước tỷ lệ thẻ tín dụng quốc tế (85.6mm x 53.98mm).
   - Nền thẻ: Dải màu Gradient Tím - Hồng (`linear-gradient(135deg, #7C2D82 0%, #D61F69 100%)`) cao cấp.
   - Họa tiết chìm: Biểu trưng mạng lưới kết nối CEO HN10 màu Trắng mờ.
-  - Thông tin in trên thẻ: Họ tên Doanh nhân, Tên Doanh nghiệp, Mã số hội viên (HN10-xxxx), Cấp bậc hội viên - Toàn bộ in bằng chữ Trắng `#FFFFFF` sắc sảo.
+  - Thông tin in trên thẻ: Họ tên Doanh nhân, Tên Doanh nghiệp, Mã số Học viên (HN10-xxxx), Cấp bậc Học viên - Toàn bộ in bằng chữ Trắng `#FFFFFF` sắc sảo.
 - **Khối Phím Tắt Nhanh (Quick Actions)**:
   - 4 nút biểu tượng tròn:
     1. *Sự kiện CLB*: Icon Trắng trên nền Đen xám `#18181B` viền Tím `#7C2D82`.
@@ -372,7 +372,7 @@ Thay vào đó, hệ thống tập trung sâu sắc vào 5 trục giá trị c�
 
 #### Màn hình 15: Kho Học Liệu & Thư Viện Tài Liệu Doanh Nghiệp (Mobile Document Vault)
 - **Màu nền**: Đen `#000000`.
-- **Bộ lọc chuyên mục**: Kỷ yếu hội viên, Pháp lý doanh nghiệp, Quản trị nhân sự, Tài chính - Kế toán. Các pill lọc khi chọn sẽ có nền Gradient Tím - Hồng chữ Trắng.
+- **Bộ lọc chuyên mục**: Kỷ yếu Học viên, Pháp lý doanh nghiệp, Quản trị nhân sự, Tài chính - Kế toán. Các pill lọc khi chọn sẽ có nền Gradient Tím - Hồng chữ Trắng.
 - **Danh sách Tệp Tin Học Liệu**:
   - Thẻ tệp tin: Nền Đen `#000000`, viền `#18181B`.
   - Tên file & Mô tả ngắn: Chữ Trắng `#FFFFFF`.
@@ -383,7 +383,7 @@ Thay vào đó, hệ thống tập trung sâu sắc vào 5 trục giá trị c�
 
 #### Màn hình 16: Đóng Hội Phí & Cổng Thanh Toán MoMo / VNPay (Mobile Dues Payment)
 - **Màu nền**: Đen `#000000`.
-- **Thẻ Tình Trạng Hội Phí Hội Viên**:
+- **Thẻ Tình Trạng Hội Phí Học viên**:
   - Nền dải Gradient Tím - Hồng (`#7C2D82` ➔ `#D61F69`).
   - Số tiền hội phí kỳ hiện tại: Chữ Trắng `#FFFFFF` cỡ lớn `text-2xl font-black`.
   - Hạn thanh toán: Chữ Trắng `#FFFFFF`.
@@ -405,7 +405,7 @@ Thay vào đó, hệ thống tập trung sâu sắc vào 5 trục giá trị c�
 - **Danh Sách Xếp Hạng Gắn Kết (4 - 50)**:
   - Từng dòng thành viên: Nền Đen `#000000`, viền dưới `#18181B`.
   - Số thứ tự: Chữ Trắng font-bold.
-  - Tên hội viên & Doanh nghiệp: Chữ Trắng `#FFFFFF`.
+  - Tên Học viên & Doanh nghiệp: Chữ Trắng `#FFFFFF`.
   - Điểm hoạt động tích lũy (Tham gia sự kiện, hoàn thành đào tạo, đóng hội phí đúng hạn): Chữ Trắng trên pill viền Tím `#7C2D82`.
 
 ---
@@ -432,7 +432,7 @@ Thay vào đó, hệ thống tập trung sâu sắc vào 5 trục giá trị c�
 | **Nút bấm phụ (Secondary Button)** | `#000000` (Đen) | `#18181B` | `#FFFFFF` (Trắng) | Hover đổi viền thành `#7C2D82` |
 | **Ô nhập liệu (Input / Select)** | `#18181B` (Đen xám) | `#18181B` | `#FFFFFF` (Trắng) | Focus viền phát sáng `#D61F69` |
 | **Huy hiệu trạng thái (Badge)** | `#000000` (Đen) | `#7C2D82` hoặc `#D61F69` | `#FFFFFF` (Trắng) | Bo tròn `rounded-full` |
-| **Thẻ Hội Viên VIP / Danh thiếp số** | `linear-gradient(135deg, #7C2D82 0%, #D61F69 100%)` | `#D61F69` | `#FFFFFF` (Trắng) | Chiều sâu ánh sáng thương hiệu |
+| **Thẻ Học viên VIP / Danh thiếp số** | `linear-gradient(135deg, #7C2D82 0%, #D61F69 100%)` | `#D61F69` | `#FFFFFF` (Trắng) | Chiều sâu ánh sáng thương hiệu |
 | **Bảng dữ liệu (Data Table)** | `#000000` (Đen) | `#18181B` | `#FFFFFF` (Trắng) | Hàng tiêu đề nền `#18181B` |
 | **Đường phân cách (Divider)** | Trong suốt | `#18181B` (1px) | Không | Sắc nét, tinh tế |
 

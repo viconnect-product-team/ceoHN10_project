@@ -72,16 +72,16 @@ export function EventPosterStudioModal({
   const [subtitle, setSubtitle] = useState<string>("Thư Tri Ân & Thư Mời Đại Biểu");
   const [salutation, setSalutation] = useState<string>("Kính gửi: Quý Doanh Nhân & Đại Biểu Danh Dự");
   const [letterBody, setLetterBody] = useState<string>(
-    `Nhân dịp sự kiện trọng đại của CLB Doanh Nhân CEO HN10 (HanoiBA), Ban Tổ Chức xin trân trọng gửi lời tri ân sâu sắc đến Quý Anh/Chị Hội viên và Quý Đối tác đã luôn đồng hành, cống hiến vì sự phát triển bền vững của cộng đồng doanh nhân.\n\nTrải qua hành trình gắn kết và bứt phá, mỗi thành viên chính là hạt nhân lan tỏa tinh thần tiên phong, sáng tạo và bản lĩnh thương trường. Chúng tôi tin tưởng rằng sự hiện diện của Quý Anh/Chị sẽ góp phần tạo nên một dấu ấn kết nối giao thương B2B đỉnh cao và thắt chặt tình bằng hữu doanh nhân CEO HN10.\n\nKính chúc Quý Anh/Chị dồi dào sức khỏe, thành công rực rỡ và luôn giữ vững ngọn lửa nhiệt huyết tiên phong!`
+    `Nhân dịp sự kiện trọng đại của CLB Doanh Nhân CEO HN10 (HanoiBA), Ban Tổ Chức xin trân trọng gửi lời tri ân sâu sắc đến Quý Anh/Chị Học viên và Quý Đối tác đã luôn đồng hành, cống hiến vì sự phát triển bền vững của cộng đồng doanh nhân.\n\nTrải qua hành trình gắn kết và bứt phá, mỗi thành viên chính là hạt nhân lan tỏa tinh thần tiên phong, sáng tạo và bản lĩnh thương trường. Chúng tôi tin tưởng rằng sự hiện diện của Quý Anh/Chị sẽ góp phần tạo nên một dấu ấn kết nối giao thương B2B đỉnh cao và thắt chặt tình bằng hữu doanh nhân CEO HN10.\n\nKính chúc Quý Anh/Chị dồi dào sức khỏe, thành công rực rỡ và luôn giữ vững ngọn lửa nhiệt huyết tiên phong!`
   );
   const [eventDate, setEventDate] = useState<string>(
     event?.date
       ? new Date(event.date).toLocaleDateString("vi-VN", {
-          weekday: "long",
-          day: "2-digit",
-          month: "2-digit",
-          year: "numeric",
-        })
+        weekday: "long",
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+      })
       : "20:00 - Thứ Bảy, 20/11/2026"
   );
   const [eventLocation, setEventLocation] = useState<string>(
@@ -304,11 +304,10 @@ export function EventPosterStudioModal({
                       setSelectedBg(bg.url);
                       setCustomBgUrl("");
                     }}
-                    className={`group relative h-16 rounded-xl overflow-hidden border text-left p-2 transition cursor-pointer ${
-                      currentBg === bg.url
+                    className={`group relative h-16 rounded-xl overflow-hidden border text-left p-2 transition cursor-pointer ${currentBg === bg.url
                         ? "border-blue-500 ring-2 ring-blue-500/30"
                         : "border-border hover:border-slate-400"
-                    }`}
+                      }`}
                   >
                     <img
                       src={bg.url}
@@ -471,9 +470,8 @@ export function EventPosterStudioModal({
                 <button
                   type="button"
                   onClick={() => setShowEmblem(!showEmblem)}
-                  className={`px-3 py-1 text-xs font-bold rounded-lg transition cursor-pointer ${
-                    showEmblem ? "bg-blue-600 text-white" : "bg-muted text-muted-foreground"
-                  }`}
+                  className={`px-3 py-1 text-xs font-bold rounded-lg transition cursor-pointer ${showEmblem ? "bg-blue-600 text-white" : "bg-muted text-muted-foreground"
+                    }`}
                 >
                   {showEmblem ? "Bật" : "Tắt"}
                 </button>
@@ -484,23 +482,20 @@ export function EventPosterStudioModal({
                 <div className="flex gap-1.5">
                   <button
                     onClick={() => setThemeGlowColor("cyan")}
-                    className={`w-6 h-6 rounded-full bg-cyan-400 border-2 transition ${
-                      themeGlowColor === "cyan" ? "border-white ring-2 ring-cyan-400" : "border-transparent"
-                    }`}
+                    className={`w-6 h-6 rounded-full bg-cyan-400 border-2 transition ${themeGlowColor === "cyan" ? "border-white ring-2 ring-cyan-400" : "border-transparent"
+                      }`}
                     title="Cyan Electric"
                   />
                   <button
                     onClick={() => setThemeGlowColor("gold")}
-                    className={`w-6 h-6 rounded-full bg-amber-400 border-2 transition ${
-                      themeGlowColor === "gold" ? "border-white ring-2 ring-amber-400" : "border-transparent"
-                    }`}
+                    className={`w-6 h-6 rounded-full bg-amber-400 border-2 transition ${themeGlowColor === "gold" ? "border-white ring-2 ring-amber-400" : "border-transparent"
+                      }`}
                     title="Amber Gold"
                   />
                   <button
                     onClick={() => setThemeGlowColor("royal")}
-                    className={`w-6 h-6 rounded-full bg-blue-500 border-2 transition ${
-                      themeGlowColor === "royal" ? "border-white ring-2 ring-blue-500" : "border-transparent"
-                    }`}
+                    className={`w-6 h-6 rounded-full bg-blue-500 border-2 transition ${themeGlowColor === "royal" ? "border-white ring-2 ring-blue-500" : "border-transparent"
+                      }`}
                     title="Royal Cobalt"
                   />
                 </div>

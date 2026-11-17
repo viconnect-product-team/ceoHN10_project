@@ -15,7 +15,7 @@ export class ConnectCommunityService {
     private readonly prisma: PrismaService,
     private readonly gateway?: ConnectAppGateway,
     private readonly networkService?: ConnectNetworkService,
-  ) {}
+  ) { }
 
   async getMyCommunities(userId: string) {
     const ceoAssocId = 'c1983000-0000-4000-8000-000000001983';
@@ -45,7 +45,7 @@ export class ConnectCommunityService {
             VALUES (gen_random_uuid(), ${userId}::uuid, ${d.id}::uuid, 'member', true, now(), now())
             ON CONFLICT (user_id, association_id) DO NOTHING
           `;
-        } catch {}
+        } catch { }
         memberships = [
           {
             association_id: d.id,
@@ -290,7 +290,7 @@ export class ConnectCommunityService {
         SELECT
           ms.user_id::text as user_or_member_id,
           ms.id::text as member_ref,
-          COALESCE(bi.display_name, card.display_name, 'Hội viên CEO HN10')::text as display_name,
+          COALESCE(bi.display_name, card.display_name, 'Học viên CEO HN10')::text as display_name,
           null::text as industry_label,
           null::text as region_label,
           ms.user_id::text as user_id,
@@ -442,7 +442,7 @@ export class ConnectCommunityService {
       if (msRows.length > 0) {
         const ms = msRows[0];
         targetUserId = ms.user_id;
-        displayName = ms.display_name || 'Hội viên CEO HN10';
+        displayName = ms.display_name || 'Học viên CEO HN10';
         avatarUrl = ms.avatar_url;
         jobTitle = ms.job_title;
         companyName = ms.company_name;
@@ -520,7 +520,7 @@ export class ConnectCommunityService {
     return {
       member: {
         memberRef: memberRef,
-        displayName: displayName || 'Hội viên CEO HN10',
+        displayName: displayName || 'Học viên CEO HN10',
         avatarUrl: avatarUrl || null,
         jobTitle: jobTitle || null,
         companyName: companyName || null,
@@ -697,7 +697,7 @@ export class ConnectCommunityService {
     // Increment view count
     await this.prisma.$executeRaw`
       UPDATE public.news SET views = COALESCE(views, 0) + 1 WHERE id = ${row.id}::uuid
-    `.catch(() => {});
+    `.catch(() => { });
 
     return {
       news: {
@@ -795,7 +795,7 @@ export class ConnectCommunityService {
         INSERT INTO public.memberships (id, user_id, association_id, role, is_default, created_at, updated_at)
         VALUES (gen_random_uuid(), ${userId}::uuid, ${communityId}::uuid, 'member', false, ${now}, ${now})
       `;
-    } catch {}
+    } catch { }
 
     const requests = await this.prisma.$queryRaw<any[]>`
       SELECT id, status FROM public.community_join_requests
@@ -812,7 +812,7 @@ export class ConnectCommunityService {
             message = ${note},
             updated_at = ${now}
         WHERE id = ${existing.id}::uuid
-      `.catch(() => {});
+      `.catch(() => { });
     } else {
       const reqId = crypto.randomUUID();
       await this.prisma.$executeRaw`
@@ -821,7 +821,7 @@ export class ConnectCommunityService {
         ) VALUES (
           ${reqId}::uuid, ${userId}::uuid, ${communityId}::uuid, 'approved', ${note}, ${now}, ${now}, ${now}
         )
-      `.catch(() => {});
+      `.catch(() => { });
     }
 
     // Trigger Realtime Notification for Association CRM Admins
@@ -830,7 +830,7 @@ export class ConnectCommunityService {
         SELECT display_name, company_name FROM public.business_identities WHERE owner_user_id = ${userId}::uuid LIMIT 1
       `.catch(() => []);
       const applicantName =
-        userProfiles[0]?.display_name || 'Hội viên CEO HN10';
+        userProfiles[0]?.display_name || 'Học viên CEO HN10';
       const applicantCompany = userProfiles[0]?.company_name || '';
 
       void this.notifyAssociationAdmins(communityId, {
@@ -925,14 +925,14 @@ export class ConnectCommunityService {
         INSERT INTO public.memberships (id, user_id, association_id, role, is_default, created_at, updated_at)
         VALUES (gen_random_uuid(), ${userId}::uuid, ${communityId}::uuid, 'admin', true, ${now}, ${now})
       `;
-    } catch {}
+    } catch { }
 
     // Thông báo cho các client
     try {
       this.gateway?.emitToRoom(`user:${userId}`, 'community:updated', {
         communityId,
       });
-    } catch {}
+    } catch { }
 
     return {
       id: communityId,
@@ -1073,7 +1073,7 @@ export class ConnectCommunityService {
           ${JSON.stringify({ communityName: name })}::jsonb,
           'normal', 'delivered', ${now}, ${`community_join:${r.id}:${r.status}`}
         )
-      `.catch(() => {});
+      `.catch(() => { });
 
       output.push({
         communityId: r.association_id,
@@ -1697,7 +1697,7 @@ export class ConnectCommunityService {
 
     const memberCode =
       memberRows[0]?.code ?? `MB-${Date.now().toString(36).toUpperCase()}`;
-    const memberName = memberRows[0]?.name ?? userRows?.name ?? 'Hội viên';
+    const memberName = memberRows[0]?.name ?? userRows?.name ?? 'Học viên';
     const email = memberRows[0]?.email ?? userRows?.email ?? '';
 
     const regId = `REG-${Date.now().toString(36).toUpperCase()}`;

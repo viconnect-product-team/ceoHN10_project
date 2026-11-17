@@ -120,7 +120,7 @@ Payload giải mã của Access Token:
 
 #### \`GET /api/users/me\` — Nạp hồ sơ và quyền hạn cá nhân
 - **Header**: \`Authorization: Bearer <token>\`
-- **Response 200 OK**: Trả về toàn bộ hồ sơ hội viên, ban chuyên trách và danh sách quyền RBAC.
+- **Response 200 OK**: Trả về toàn bộ hồ sơ Học viên, ban chuyên trách và danh sách quyền RBAC.
 
 #### \`POST /api/auth/refresh\` — Làm mới Access Token
 - **Request Body**: \`{ "refreshToken": "..." }\`
@@ -140,7 +140,7 @@ Payload giải mã của Access Token:
       "totalBalance": 450000000,
       "totalIncome": 600000000,
       "totalExpense": 150000000,
-      "source": "Tổng hợp từ phí hội viên đóng thường niên",
+      "source": "Tổng hợp từ phí Học viên đóng thường niên",
       "purpose": "Chi sự kiện, họp ban, hoạt động hiếu hỷ Ban Đời Sống"
     },
     "sponsorshipFund": {
@@ -210,8 +210,8 @@ Payload giải mã của Access Token:
   }
   \`\`\`
 
-#### \`GET /api/events/my-events\` — Danh sách sự kiện hội viên đã tham gia
-- **Response 200 OK**: Danh sách sự kiện hội viên hiện tại đã đăng ký để hiển thị trên Dashboard tổng quan.
+#### \`GET /api/events/my-events\` — Danh sách sự kiện Học viên đã tham gia
+- **Response 200 OK**: Danh sách sự kiện Học viên hiện tại đã đăng ký để hiển thị trên Dashboard tổng quan.
 
 ---
 
@@ -246,8 +246,8 @@ Payload giải mã của Access Token:
 - **Request Body**: \`{ "mediaUrls": ["https://youtube.com/watch?v=k01-lecture"] }\`
 - **Tác vụ ngầm**: Tự động tạo bản ghi trong \`public.documents\` với danh mục \`event_media\`.
 
-#### \`GET /api/trainings/my/enrolled\` — Khóa học hội viên tham gia
-- **Response 200 OK**: Danh sách khóa học hội viên đã ghi danh để hiển thị trên Dashboard tổng quan kèm nút "Tải Slide" và "Góp ý".
+#### \`GET /api/trainings/my/enrolled\` — Khóa học Học viên tham gia
+- **Response 200 OK**: Danh sách khóa học Học viên đã ghi danh để hiển thị trên Dashboard tổng quan kèm nút "Tải Slide" và "Góp ý".
 
 ---
 
@@ -387,7 +387,7 @@ Payload giải mã của Access Token:
   [
     { "roleKey": "chu_tich", "roleName": "Chủ tịch CLB", "grantedCount": 38, "totalCount": 38 },
     { "roleKey": "thanh_vien_ban_tai_chinh", "roleName": "Thành viên Ban Tài chính", "grantedCount": 14, "totalCount": 38 },
-    { "roleKey": "member", "roleName": "Hội viên Doanh nhân", "grantedCount": 8, "totalCount": 38 }
+    { "roleKey": "member", "roleName": "Học viên Doanh nhân", "grantedCount": 8, "totalCount": 38 }
   ]
   \`\`\`
 
@@ -423,7 +423,7 @@ sequenceDiagram
     autonumber
     actor Admin as Ban Quản Trị
     actor Sponsor as Nhà Tài Trợ
-    actor Member as Hội Viên
+    actor Member as Học viên
     participant BE as Backend NestJS
     participant DB as PostgreSQL 113.20.107.184:6432
     participant Mail as Mailer Service

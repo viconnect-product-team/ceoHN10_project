@@ -313,15 +313,15 @@ export function TaskStatisticsChartView({ tasks, onTaskClick }: TaskStatisticsCh
                 <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                   Cuộc họp gắn liền CV
                 </span>
-                <span className="p-1.5 rounded-lg bg-purple-50 dark:bg-purple-950 text-purple-600">
+                <span className="p-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
                   <Video className="w-4 h-4" />
                 </span>
               </div>
               <div className="mt-2 flex items-baseline gap-2">
-                <span className="text-3xl font-black text-purple-700 dark:text-purple-400 font-mono">
+                <span className="text-3xl font-black text-slate-800 dark:text-slate-200 font-mono">
                   {kpis.withMeetings}
                 </span>
-                <span className="text-xs text-purple-600 dark:text-purple-400 font-semibold">
+                <span className="text-xs text-slate-600 dark:text-slate-400 font-semibold">
                   Zoom • Meet • UniWork
                 </span>
               </div>

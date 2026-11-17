@@ -41,7 +41,7 @@ export class MembersService {
     private mailService: MailService,
     private readonly membersRepo: MembersRepository,
     @Optional() private readonly zaloService?: ZaloService,
-  ) {}
+  ) { }
 
   private async checkIsPlatformAdmin(userId: string): Promise<boolean> {
     if (!userId) return false;
@@ -535,7 +535,7 @@ export class MembersService {
         if (meta.staffSize && !staffSizeStr) {
           staffSizeStr = meta.staffSize;
         }
-      } catch {}
+      } catch { }
     }
 
     if (!compName) {
@@ -611,7 +611,7 @@ export class MembersService {
       userId: r.user_id,
       executiveRole: r.executive_role || 'member',
       executive_role: r.executive_role || 'member',
-      department: r.department || 'Hội viên CEO HN10',
+      department: r.department || 'Học viên CEO HN10',
       role: r.executive_role || 'member',
       coverUrl: r.cover_url || null,
       cover_url: r.cover_url || null,
@@ -818,7 +818,7 @@ export class MembersService {
         userId: m.user_id ?? null,
         executiveRole: m.executive_role || 'member',
         executive_role: m.executive_role || 'member',
-        department: m.department || 'Hội viên CEO HN10',
+        department: m.department || 'Học viên CEO HN10',
         role: m.executive_role || 'member',
         avatar: m.avatar ?? null,
       };
@@ -875,7 +875,7 @@ export class MembersService {
     if (rows.length > 0 && (!rows[0].user_id || rows[0].user_id !== userId)) {
       await this.prisma.$executeRaw`
         UPDATE public.members SET user_id = ${userId}::uuid WHERE id = ${rows[0].id}
-      `.catch(() => {});
+      `.catch(() => { });
     }
 
     // If new user has no member record yet, auto-create CEO HN10 member with their real name
@@ -884,14 +884,14 @@ export class MembersService {
         user?.name ||
         profile?.display_name ||
         user?.username ||
-        'Hội viên CEO HN10'
+        'Học viên CEO HN10'
       ).trim();
       const userEmail =
         user?.email || `${user?.username || userId.slice(0, 8)}@ceohn10.vn`;
       const finalPhone = userPhone || '0983000000';
       const newCode = 'HN10-' + String(Math.floor(100 + Math.random() * 900));
       const company = profile?.company_name || 'CLB Doanh Nhân CEO HN10';
-      const title = profile?.professional_title || 'Hội viên chính thức';
+      const title = profile?.professional_title || 'Học viên chính thức';
       const industry = profile?.industry || 'Kinh doanh & Quản lý';
       const region = profile?.region || 'Hà Nội';
 
@@ -905,7 +905,7 @@ export class MembersService {
           ${userId}::text, ${newCode}, ${realName}, ${realName},
           ${userEmail}, ${finalPhone}, 'individual', 'standard', ${industry}, ${region},
           'active', CURRENT_DATE, 2026, true, ${region}, ${company}, 'paid',
-          'member', 'Hội viên ceohn10',
+          'member', 'Học viên ceohn10',
           ${userId}::uuid, 'c1983000-0000-4000-8000-000000001983'::uuid, now(), now()
         ) ON CONFLICT (id) DO UPDATE SET user_id = ${userId}::uuid, name = EXCLUDED.name
       `.catch(() => null);
@@ -957,16 +957,16 @@ export class MembersService {
     if (rows.length > 0) {
       const memberName =
         m.name &&
-        m.name !== 'Hội viên CEO HN10' &&
-        m.name !== 'Thành viên mới' &&
-        m.name !== 'Hội viên CEO HN10'
+          m.name !== 'Học viên CEO HN10' &&
+          m.name !== 'Thành viên mới' &&
+          m.name !== 'Học viên CEO HN10'
           ? m.name
           : cardSetting?.display_name ||
-            user?.name ||
-            profile?.display_name ||
-            m.name ||
-            user?.username ||
-            'Hội viên CEO HN10';
+          user?.name ||
+          profile?.display_name ||
+          m.name ||
+          user?.username ||
+          'Học viên CEO HN10';
 
       return {
         id: m.id,
@@ -1008,7 +1008,7 @@ export class MembersService {
           : null,
         executiveRole: m.executive_role || 'member',
         executive_role: m.executive_role || 'member',
-        department: m.department || 'Hội viên CEO HN10',
+        department: m.department || 'Học viên CEO HN10',
         role: m.executive_role || 'member',
         avatar: unifiedAvatar,
         avatarUrl: unifiedAvatar,
@@ -1036,7 +1036,7 @@ export class MembersService {
       validUntil: null,
       verified: false,
       type: 'individual',
-      title: profile?.professional_title || 'Chưa là hội viên chính thức',
+      title: profile?.professional_title || 'Chưa là Học viên chính thức',
       company: unifiedCompanyName,
       companyName: unifiedCompanyName,
       email: user?.email || '',
@@ -1096,7 +1096,7 @@ export class MembersService {
           UPDATE public.members
           SET cover_url = ${coverUrl}, updated_at = NOW()
           WHERE LOWER(email) = LOWER(${user.email})
-        `.catch(() => {});
+        `.catch(() => { });
       }
     }
 
@@ -1150,7 +1150,7 @@ export class MembersService {
           data: userUpdate,
         })
         .catch(() => null);
-    } catch {}
+    } catch { }
 
     // 2. Update user_profiles
     try {
@@ -1165,7 +1165,7 @@ export class MembersService {
           company_logo_url = COALESCE(${companyLogo || null}, user_profiles.company_logo_url),
           updated_at = NOW()
       `.catch(() => null);
-    } catch {}
+    } catch { }
 
     // 3. Update members table
     try {
@@ -1200,7 +1200,7 @@ export class MembersService {
           WHERE id = ${memId}::text
         `;
       }
-    } catch {}
+    } catch { }
 
     // 4. Update card_settings
     try {
@@ -1214,7 +1214,7 @@ export class MembersService {
           company_logo_url = COALESCE(${companyLogo || null}, card_settings.company_logo_url),
           updated_at = NOW()
       `.catch(() => null);
-    } catch {}
+    } catch { }
 
     // 5. Also sync primary business card if exists
     try {
@@ -1238,7 +1238,7 @@ export class MembersService {
           updated_at = NOW()
         WHERE owner_user_id = ${userId}::uuid
       `.catch(() => null);
-    } catch {}
+    } catch { }
 
     return this.getMyMember(userId);
   }
@@ -1294,13 +1294,13 @@ export class MembersService {
             id, user_id, code, name, email, phone, company_name, department, executive_role, status,
             association_id, type, level, industry, region, payment_status, fee_paid, created_at, updated_at
           ) VALUES (
-            ${targetMemberId}, ${u.id}::uuid, ${targetMemberId}, ${u.display_name || u.name || 'Hội viên CEO HN10'},
+            ${targetMemberId}, ${u.id}::uuid, ${targetMemberId}, ${u.display_name || u.name || 'Học viên CEO HN10'},
             ${u.email}, ${u.phone || ''}, ${u.company_name || 'CLB Doanh Nhân CEO HN10'}, 'Ban Thành viên',
             'member', 'active', 'c1983000-0000-4000-8000-000000001983'::uuid,
             'company', 'memberLevel.large', 'ind.trade', 'region.north', 'paid', true, NOW(), NOW()
           )
           ON CONFLICT (id) DO UPDATE SET updated_at = NOW()
-        `.catch(() => {});
+        `.catch(() => { });
 
         const createdRows = await this.prisma.$queryRaw<any[]>`
           SELECT * FROM public.members WHERE id = ${targetMemberId} LIMIT 1
@@ -1324,7 +1324,7 @@ export class MembersService {
           return this.mapMemberRow(memFromCard[0]);
         }
       }
-      throw new NotFoundException('Không tìm thấy hội viên');
+      throw new NotFoundException('Không tìm thấy Học viên');
     }
 
     return this.mapMemberRow(rows[0]);
@@ -1476,7 +1476,7 @@ export class MembersService {
       const memberRows = await this.prisma.$queryRaw<any[]>`
         SELECT m.id, m.code, m.name, m.contact, m.email, m.phone,
                COALESCE(m.executive_role, 'member') as executive_role,
-               COALESCE(m.department, 'Hội viên CEO HN10') as department,
+               COALESCE(m.department, 'Học viên CEO HN10') as department,
                m.status, m.avatar_url, m.created_at, m.joined_at,
                u.name AS user_name, u.email AS user_email, u.phone AS user_phone, u.avatar_url AS user_avatar
         FROM public.members m
@@ -1601,7 +1601,7 @@ export class MembersService {
       await this.prisma.$executeRaw`
         INSERT INTO public.members (id, code, name, contact, email, phone, company_name, executive_role, department, status, joined_at)
         VALUES (${newId}, ${'NV-' + Math.floor(1000 + Math.random() * 9000)}, ${name || email}, ${name}, ${email}, ${phone}, ${companyId}, ${role}, ${title}, 'active', ${now.toISOString().slice(0, 10)})
-      `.catch(() => {});
+      `.catch(() => { });
     });
 
     return { ok: true, message: 'Thêm nhân sự thành công' };
@@ -1625,7 +1625,7 @@ export class MembersService {
     const isAdmin = await this.checkIsAdmin(userId, assocId ?? undefined);
     if (!isAdmin) {
       throw new ForbiddenException(
-        'Chỉ quản trị viên mới có quyền thêm hội viên',
+        'Chỉ quản trị viên mới có quyền thêm Học viên',
       );
     }
     const canAdd = await this.checkActionPermission(
@@ -1635,7 +1635,7 @@ export class MembersService {
     );
     if (!canAdd) {
       throw new ForbiddenException(
-        'Hành động thêm hội viên mới (MEM_ADD) đã bị thu hồi trong cấu hình phân quyền hệ thống',
+        'Hành động thêm Học viên mới (MEM_ADD) đã bị thu hồi trong cấu hình phân quyền hệ thống',
       );
     }
 
@@ -1644,7 +1644,7 @@ export class MembersService {
     const feeYear = now.getFullYear();
     const joinedAt = now.toISOString().slice(0, 10);
 
-    // Kiểm tra trùng Email trong danh sách hội viên
+    // Kiểm tra trùng Email trong danh sách Học viên
     const cleanEmail = (data.email || '').trim().toLowerCase();
     if (cleanEmail) {
       const existingEmail = await this.prisma.$queryRaw<any[]>`
@@ -1652,12 +1652,12 @@ export class MembersService {
       `.catch(() => []);
       if (existingEmail.length > 0) {
         throw new BadRequestException(
-          'Email này đã được sử dụng bởi một hội viên khác trên hệ thống!',
+          'Email này đã được sử dụng bởi một Học viên khác trên hệ thống!',
         );
       }
     }
 
-    // Kiểm tra trùng Số điện thoại trong danh sách hội viên
+    // Kiểm tra trùng Số điện thoại trong danh sách Học viên
     const cleanPhone = (data.phone || '').replace(/[^0-9+]/g, '').trim();
     if (cleanPhone && cleanPhone.length >= 8) {
       const existingPhone = await this.prisma.$queryRaw<any[]>`
@@ -1665,7 +1665,7 @@ export class MembersService {
       `.catch(() => []);
       if (existingPhone.length > 0) {
         throw new BadRequestException(
-          'Số điện thoại này đã được sử dụng bởi một hội viên khác trên hệ thống!',
+          'Số điện thoại này đã được sử dụng bởi một Học viên khác trên hệ thống!',
         );
       }
     }
@@ -1699,7 +1699,7 @@ export class MembersService {
         ${data.employees ?? null},
         ${data.about ?? ''},
         'member',
-        'Hội viên ceohn10',
+        'Học viên ceohn10',
         ${assocId}::uuid,
         now(),
         now()
@@ -1714,7 +1714,7 @@ export class MembersService {
         gen_random_uuid(),
         ${id},
         ${userId},
-        'Thêm hội viên',
+        'Thêm Học viên',
         ${data.name},
         'member',
         to_char(now(), 'YYYY-MM-DD HH24:MI:SS'),
@@ -1760,7 +1760,7 @@ export class MembersService {
             id, user_id, code, name, email, phone, company_name, department, executive_role, status,
             association_id, type, level, industry, region, payment_status, fee_paid, created_at, updated_at
           ) VALUES (
-            ${targetMemberId}, ${u.id}::uuid, ${targetMemberId}, ${data.name || u.name || 'Hội viên CEO HN10'},
+            ${targetMemberId}, ${u.id}::uuid, ${targetMemberId}, ${data.name || u.name || 'Học viên CEO HN10'},
             ${cleanEmail || u.email}, ${data.phone || ''}, ${(data as any).companyName || data.company || 'CLB Doanh Nhân CEO HN10'},
             ${data.department || 'Ban Thành viên'}, ${data.executiveRole || 'member'}, 'active',
             'c1983000-0000-4000-8000-000000001983'::uuid, 'company', 'memberLevel.large', 'ind.trade',
@@ -1772,7 +1772,7 @@ export class MembersService {
             phone = EXCLUDED.phone,
             company_name = EXCLUDED.company_name,
             updated_at = NOW()
-        `.catch(() => {});
+        `.catch(() => { });
 
         existing = await this.prisma.$queryRaw<any[]>`
           SELECT * FROM public.members WHERE id = ${targetMemberId} LIMIT 1
@@ -1781,14 +1781,14 @@ export class MembersService {
     }
 
     if (existing.length === 0) {
-      throw new NotFoundException('Không tìm thấy hội viên');
+      throw new NotFoundException('Không tìm thấy Học viên');
     }
 
     const current = existing[0];
     const isAdmin = await this.checkIsAdmin(userId, current.association_id);
     if (!isAdmin) {
       throw new ForbiddenException(
-        'Chỉ quản trị viên mới có quyền cập nhật hội viên',
+        'Chỉ quản trị viên mới có quyền cập nhật Học viên',
       );
     }
     const canEdit = await this.checkActionPermission(
@@ -1798,7 +1798,7 @@ export class MembersService {
     );
     if (!canEdit) {
       throw new ForbiddenException(
-        'Hành động chỉnh sửa thông tin hội viên (MEM_EDIT) đã bị thu hồi trong cấu hình phân quyền hệ thống',
+        'Hành động chỉnh sửa thông tin Học viên (MEM_EDIT) đã bị thu hồi trong cấu hình phân quyền hệ thống',
       );
     }
 
@@ -1806,7 +1806,7 @@ export class MembersService {
     if (
       data.email &&
       data.email.trim().toLowerCase() !==
-        (current.email || '').trim().toLowerCase()
+      (current.email || '').trim().toLowerCase()
     ) {
       const cleanEmail = data.email.trim().toLowerCase();
       const dup = await this.prisma.$queryRaw<any[]>`
@@ -1814,7 +1814,7 @@ export class MembersService {
       `.catch(() => []);
       if (dup.length > 0) {
         throw new BadRequestException(
-          'Email này đã được sử dụng bởi một hội viên khác trên hệ thống!',
+          'Email này đã được sử dụng bởi một Học viên khác trên hệ thống!',
         );
       }
     }
@@ -1835,7 +1835,7 @@ export class MembersService {
         `.catch(() => []);
         if (dup.length > 0) {
           throw new BadRequestException(
-            'Số điện thoại này đã được sử dụng bởi một hội viên khác trên hệ thống!',
+            'Số điện thoại này đã được sử dụng bởi một Học viên khác trên hệ thống!',
           );
         }
       }
@@ -1911,19 +1911,19 @@ export class MembersService {
           phone = ${phone},
           updated_at = now()
         WHERE id = ${current.user_id}::uuid
-      `.catch(() => {});
+      `.catch(() => { });
 
       await this.prisma.$executeRaw`
         UPDATE public.user_profiles SET
           display_name = ${name},
           updated_at = now()
         WHERE user_id = ${current.user_id}::uuid
-      `.catch(() => {});
+      `.catch(() => { });
     }
 
     // Activity log
     await this.logActivity(
-      'Cập nhật thông tin hội viên',
+      'Cập nhật thông tin Học viên',
       `${name} (${current.code || id})`,
       'member',
       'admin@connect.vn',
@@ -1952,7 +1952,7 @@ export class MembersService {
           if (u.length > 0) memberUserId = u[0].id;
         }
 
-        // Tự động khởi tạo tài khoản đăng nhập khi duyệt hội viên nếu chưa có (BUG-AUTH-001)
+        // Tự động khởi tạo tài khoản đăng nhập khi duyệt Học viên nếu chưa có (BUG-AUTH-001)
         const isApproved = status === 'active' || status === 'approved';
         if (
           !memberUserId &&
@@ -1966,7 +1966,7 @@ export class MembersService {
               current.email ||
               `${(current.member_code || 'member').toLowerCase().replace(/[^a-z0-9]/g, '')}@ceohn10.com`;
             const memberPhone = phone || current.phone || '';
-            const memberName = name || current.name || 'Hội viên CEO HN10';
+            const memberName = name || current.name || 'Học viên CEO HN10';
             await this.prisma.$executeRaw`
               INSERT INTO public.vione_users (id, email, phone, name, role, status, created_at, updated_at)
               VALUES (${newUserId}::uuid, ${memberEmail}, ${memberPhone}, ${memberName}, 'member', 'active', now(), now())
@@ -2002,8 +2002,8 @@ export class MembersService {
               ? 'Hồ sơ gia nhập CLB của bạn đang được xét duyệt'
               : 'Thông báo kết quả duyệt hồ sơ gia nhập CLB';
           const notifBody = isApproved
-            ? `Chúc mừng bạn đã chính thức trở thành hội viên của ${name || 'Hiệp hội'}. Thẻ VIP Số NFC và toàn bộ quyền lợi đã được kích hoạt trong App Hội Viên.`
-            : `Hồ sơ gia nhập của bạn đã được cập nhật trạng thái: ${status}. Vui lòng mở App Hội Viên hoặc liên hệ Ban thư ký để biết thêm chi tiết.`;
+            ? `Chúc mừng bạn đã chính thức trở thành Học viên của ${name || 'Hiệp hội'}. Thẻ VIP Số NFC và toàn bộ quyền lợi đã được kích hoạt trong App Học viên.`
+            : `Hồ sơ gia nhập của bạn đã được cập nhật trạng thái: ${status}. Vui lòng mở App Học viên hoặc liên hệ Ban thư ký để biết thêm chi tiết.`;
 
           const safeData = JSON.stringify({
             title: notifTitle,
@@ -2021,7 +2021,7 @@ export class MembersService {
               ${notifId}::uuid, ${memberUserId}::uuid, 'association', ${id},
               'member_approval', ${isApproved ? 'member_approved' : 'member_status_changed'},
               ${notifTitle}, ${notifBody},
-              ${safeData}::jsonb, 'navigate', 'Mở App Hội Viên', '{"route": "/m"}'::jsonb,
+              ${safeData}::jsonb, 'navigate', 'Mở App Học viên', '{"route": "/m"}'::jsonb,
               'high', 'delivered', 'all', 'all', now(), now(), ${`member_approval:${id}:${status}:${Date.now()}`}
             )
           `.catch((err) =>
@@ -2034,7 +2034,7 @@ export class MembersService {
             ) VALUES (
               gen_random_uuid(), ${id}, ${notifTitle}, ${notifBody}, false, false, 'member_approval', ${id}, now()
             )
-          `.catch(() => {});
+          `.catch(() => { });
 
           // Đẩy thông báo chuông vào App Hiệp Hội
           await this.prisma.$executeRaw`
@@ -2043,10 +2043,10 @@ export class MembersService {
             ) VALUES (
               gen_random_uuid(), ${memberUserId || id}, ${notifTitle}, ${notifBody}, 'member_approval', false, now()
             )
-          `.catch(() => {});
+          `.catch(() => { });
         }
 
-        // Gửi email thông báo phê duyệt hồ sơ chính thức vào email hội viên
+        // Gửi email thông báo phê duyệt hồ sơ chính thức vào email Học viên
         if (isApproved && this.mailService) {
           const memberEmail = (email || current.email || '').trim();
           if (memberEmail && memberEmail.includes('@')) {
@@ -2072,12 +2072,12 @@ export class MembersService {
                 if (current.user_id) {
                   await this.prisma.$executeRaw`
                     UPDATE public.vione_users SET password = ${newHash}, updated_at = now() WHERE id = ${current.user_id}::uuid
-                  `.catch(() => {});
+                  `.catch(() => { });
                 }
                 const updatedAbout = `${current.about || ''} | Pass=${rawPass}`;
                 await this.prisma.$executeRaw`
                   UPDATE public.members SET about = ${updatedAbout}, updated_at = now() WHERE id = ${id}
-                `.catch(() => {});
+                `.catch(() => { });
               } catch (hErr) {
                 console.warn('Password hash error:', hErr);
               }
@@ -2087,7 +2087,7 @@ export class MembersService {
               .sendMemberApprovedEmail({
                 to: memberEmail,
                 fullName:
-                  name || current.name || current.contact || 'Quý Hội viên',
+                  name || current.name || current.contact || 'Quý Học viên',
                 memberCode: current.code || id,
                 associationName: 'CLB Doanh Nhân CEO HN10',
                 companyName: current.company || current.organization || name,
@@ -2123,14 +2123,14 @@ export class MembersService {
     `.catch(() => []);
 
     if (existing.length === 0) {
-      throw new NotFoundException('Không tìm thấy hội viên');
+      throw new NotFoundException('Không tìm thấy Học viên');
     }
 
     const current = existing[0];
     const isAdmin = await this.checkIsAdmin(userId, current.association_id);
     if (!isAdmin) {
       throw new ForbiddenException(
-        'Chỉ quản trị viên mới có quyền cập nhật hội viên',
+        'Chỉ quản trị viên mới có quyền cập nhật Học viên',
       );
     }
 
@@ -2170,7 +2170,7 @@ export class MembersService {
     `.catch(() => []);
 
     if (existing.length === 0) {
-      throw new NotFoundException('Không tìm thấy hội viên');
+      throw new NotFoundException('Không tìm thấy Học viên');
     }
 
     const current = existing[0];
@@ -2211,27 +2211,27 @@ export class MembersService {
           DELETE FROM public.companies
           WHERE LOWER(name) = LOWER(${companyName})
              OR (owner_id IS NOT NULL AND ${memberUserId ? memberUserId : '00000000-0000-0000-0000-000000000000'}::uuid = owner_id)
-        `.catch(() => {});
+        `.catch(() => { });
 
         await this.prisma.$executeRaw`
           DELETE FROM public.vione_companies
           WHERE LOWER(name) = LOWER(${companyName})
              OR (user_id IS NOT NULL AND ${memberUserId ? memberUserId : '00000000-0000-0000-0000-000000000000'}::uuid = user_id)
-        `.catch(() => {});
+        `.catch(() => { });
       }
       if (taxCode) {
         await this.prisma.$executeRaw`
           DELETE FROM public.companies WHERE tax_code = ${taxCode}
-        `.catch(() => {});
+        `.catch(() => { });
       }
       // Xóa bản ghi độc lập của công ty trong bảng members nếu có
       await this.prisma.$executeRaw`
         DELETE FROM public.members 
         WHERE (type = 'company' OR type = 'enterprise') 
           AND (LOWER(name) = LOWER(${companyName}) OR (code = ${current.code} AND id != ${current.id}))
-      `.catch(() => {});
+      `.catch(() => { });
 
-      // Xóa các trường doanh nghiệp khỏi hồ sơ hội viên cá nhân
+      // Xóa các trường doanh nghiệp khỏi hồ sơ Học viên cá nhân
       await this.prisma.$executeRaw`
         UPDATE public.members SET
           company_name = NULL,
@@ -2242,7 +2242,7 @@ export class MembersService {
           employees = NULL,
           updated_at = now()
         WHERE id = ${current.id}
-      `.catch(() => {});
+      `.catch(() => { });
 
       const actorUserId =
         userId && userId.length === 36
@@ -2303,7 +2303,7 @@ export class MembersService {
       };
     }
 
-    // CASE 2: Xóa toàn diện cả hội viên và doanh nghiệp liên kết (mode === 'all')
+    // CASE 2: Xóa toàn diện cả Học viên và doanh nghiệp liên kết (mode === 'all')
     // 1. Xóa doanh nghiệp liên quan (bảng companies và vione_companies)
     if (companyName) {
       await this.prisma.$executeRaw`
@@ -2327,7 +2327,7 @@ export class MembersService {
     if (taxCode) {
       await this.prisma.$executeRaw`
         DELETE FROM public.companies WHERE tax_code = ${taxCode}
-      `.catch(() => {});
+      `.catch(() => { });
     }
 
     // 2. Xóa danh thiếp và hồ sơ cá nhân
@@ -2335,53 +2335,53 @@ export class MembersService {
       await this.prisma.$executeRaw`
         DELETE FROM public.member_business_cards
         WHERE owner_user_id = ${memberUserId}::uuid OR member_id = ${current.id}
-      `.catch(() => {});
+      `.catch(() => { });
 
       await this.prisma.$executeRaw`
         DELETE FROM public.business_cards
         WHERE user_id = ${memberUserId}::uuid
-      `.catch(() => {});
+      `.catch(() => { });
 
       await this.prisma.$executeRaw`
         DELETE FROM public.card_settings
         WHERE user_id = ${memberUserId}::uuid
-      `.catch(() => {});
+      `.catch(() => { });
 
       await this.prisma.$executeRaw`
         DELETE FROM public.user_profiles
         WHERE user_id = ${memberUserId}::uuid
-      `.catch(() => {});
+      `.catch(() => { });
 
       await this.prisma.$executeRaw`
         DELETE FROM public.user_roles
         WHERE user_id = ${memberUserId}::uuid
-      `.catch(() => {});
+      `.catch(() => { });
 
       await this.prisma.$executeRaw`
         DELETE FROM public.memberships
         WHERE user_id = ${memberUserId}::uuid
-      `.catch(() => {});
+      `.catch(() => { });
 
       await this.prisma.$executeRaw`
         DELETE FROM public.vba_member_permissions
         WHERE user_id::text = ${memberUserId}::text OR member_id = ${current.id}
-      `.catch(() => {});
+      `.catch(() => { });
 
       await this.prisma.$executeRaw`
         DELETE FROM public.business_appointments
         WHERE host_user_id = ${memberUserId}::uuid OR invitee_user_id = ${memberUserId}::uuid
-      `.catch(() => {});
+      `.catch(() => { });
 
       await this.prisma.$executeRaw`
         DELETE FROM public.meeting_participants
         WHERE user_id = ${memberUserId}::uuid
-      `.catch(() => {});
+      `.catch(() => { });
 
       await this.prisma.$executeRaw`
         DELETE FROM public.event_registrations
         WHERE user_id = ${memberUserId}::uuid
            OR (${memberEmail !== ''} AND LOWER(email) = ${memberEmail})
-      `.catch(() => {});
+      `.catch(() => { });
 
       // 3. Xóa vĩnh viễn tài khoản trong vione_users và auth.users
       await this.prisma.$executeRaw`
@@ -2404,14 +2404,14 @@ export class MembersService {
       await this.prisma.$executeRaw`
         DELETE FROM public.vione_users
         WHERE LOWER(email) = ${memberEmail} OR LOWER(username) = ${memberEmail}
-      `.catch(() => {});
+      `.catch(() => { });
       await this.prisma.$executeRaw`
         DELETE FROM auth.users
         WHERE LOWER(email) = ${memberEmail}
-      `.catch(() => {});
+      `.catch(() => { });
     }
 
-    // 4. Xóa hồ sơ hội viên và các bản ghi công ty liên quan trong bảng members
+    // 4. Xóa hồ sơ Học viên và các bản ghi công ty liên quan trong bảng members
     await this.prisma.$executeRaw`
       DELETE FROM public.members 
       WHERE id = ${current.id} 
@@ -2465,8 +2465,8 @@ export class MembersService {
       );
 
     await this.logActivity(
-      'Xóa hội viên, tài khoản & doanh nghiệp liên quan',
-      `${current.name || companyName || 'Hội viên'} (${current.code || cleanId})`,
+      'Xóa Học viên, tài khoản & doanh nghiệp liên quan',
+      `${current.name || companyName || 'Học viên'} (${current.code || cleanId})`,
       'member',
       actorEmail,
       effectiveAssoc,
@@ -2476,7 +2476,7 @@ export class MembersService {
       ok: true,
       mode: 'all',
       message:
-        'Đã xóa hội viên, doanh nghiệp và tài khoản liên quan thành công',
+        'Đã xóa Học viên, doanh nghiệp và tài khoản liên quan thành công',
     };
   }
 
@@ -2489,7 +2489,7 @@ export class MembersService {
     `.catch(() => []);
 
     if (rows.length === 0)
-      throw new NotFoundException('Không tìm thấy hội viên');
+      throw new NotFoundException('Không tìm thấy Học viên');
     const current = rows[0];
 
     const isAdmin = await this.checkIsAdmin(userId, current.association_id);
@@ -2529,8 +2529,8 @@ export class MembersService {
     // Dispatch 2-way notification
     if (current.user_id) {
       try {
-        const notifTitle = '🎉 Gia hạn hội viên thành công';
-        const notifBody = `Hồ sơ hội viên ${current.name} đã được gia hạn thành công. Nhiệm kỳ mới có hiệu lực đến ngày ${newEndStr}.`;
+        const notifTitle = '🎉 Gia hạn Học viên thành công';
+        const notifBody = `Hồ sơ Học viên ${current.name} đã được gia hạn thành công. Nhiệm kỳ mới có hiệu lực đến ngày ${newEndStr}.`;
         const notifId = crypto.randomUUID();
         const dedupeKey = `renew-${current.id}-${Date.now()}`;
         const safeData = JSON.stringify({
@@ -2559,7 +2559,7 @@ export class MembersService {
             safeData,
             dedupeKey,
           )
-          .catch(() => {});
+          .catch(() => { });
 
         await this.prisma
           .$executeRawUnsafe(
@@ -2575,7 +2575,7 @@ export class MembersService {
             notifBody,
             current.id,
           )
-          .catch(() => {});
+          .catch(() => { });
       } catch (e: any) {
         console.warn('Failed to notify member of renewal:', e?.message);
       }
@@ -2593,7 +2593,7 @@ export class MembersService {
     `.catch(() => []);
 
     if (rows.length === 0)
-      throw new NotFoundException('Không tìm thấy hội viên');
+      throw new NotFoundException('Không tìm thấy Học viên');
     const current = rows[0];
 
     const isAdmin = await this.checkIsAdmin(userId, current.association_id);
@@ -2612,7 +2612,7 @@ export class MembersService {
 
     // Activity log
     await this.logActivity(
-      'Hủy gia hạn hội viên',
+      'Hủy gia hạn Học viên',
       `${current.name} (${current.code || cleanId})`,
       'fee',
       'admin@connect.vn',
@@ -2635,7 +2635,7 @@ export class MembersService {
     `.catch(() => []);
 
     if (rows.length === 0)
-      throw new NotFoundException('Không tìm thấy hội viên');
+      throw new NotFoundException('Không tìm thấy Học viên');
     const current = rows[0];
 
     const isAdmin = await this.checkIsAdmin(userId, current.association_id);
@@ -2683,7 +2683,7 @@ export class MembersService {
     `.catch(() => []);
 
     if (rows.length === 0)
-      throw new NotFoundException('Không tìm thấy hội viên');
+      throw new NotFoundException('Không tìm thấy Học viên');
     const current = rows[0];
 
     const isAdmin = await this.checkIsAdmin(userId, current.association_id);
@@ -2714,7 +2714,7 @@ export class MembersService {
         const reminderTag = isAuto
           ? 'HỆ THỐNG TỰ ĐỘNG NHẮC NHỞ'
           : 'BAN THƯ KÝ NHẮC NHỞ';
-        const subject = `[CLB CEO HN10] Nhắc Nhở Gia Hạn Niên Liễm — Hội Viên ${current.name}`;
+        const subject = `[CLB CEO HN10] Nhắc Nhở Gia Hạn Niên Liễm — Học viên ${current.name}`;
         const html = `
 <!DOCTYPE html>
 <html lang="vi">
@@ -2737,16 +2737,16 @@ export class MembersService {
         Kính gửi Anh/Chị <strong>${current.name}</strong>,
       </div>
       <p style="font-size: 14px; line-height: 1.6; color: #475569; margin-bottom: 20px;">
-        Ban Thư Ký CLB Doanh Nhân CEO HN10 xin trân trọng thông báo: Thời hạn niên liễm sinh hoạt hội viên của Quý Anh/Chị sắp kết thúc vào ngày <strong>${termEndStr}</strong>.
+        Ban Thư Ký CLB Doanh Nhân CEO HN10 xin trân trọng thông báo: Thời hạn niên liễm sinh hoạt Học viên của Quý Anh/Chị sắp kết thúc vào ngày <strong>${termEndStr}</strong>.
       </p>
 
       <div style="background: #f8fafc; border: 1.5px solid #cbd5e1; border-radius: 14px; padding: 20px; margin-bottom: 22px; border-left: 4px solid #003B95;">
         <div style="font-size: 12px; font-weight: 800; text-transform: uppercase; color: #003B95; margin-bottom: 12px; letter-spacing: 0.5px;">
-          📋 Thông Tin Hội Viên & Kỳ Gia Hạn
+          📋 Thông Tin Học viên & Kỳ Gia Hạn
         </div>
         <table style="width: 100%; font-size: 13.5px; border-collapse: collapse;">
           <tr>
-            <td style="color: #64748b; padding: 6px 0;">Mã số Hội viên:</td>
+            <td style="color: #64748b; padding: 6px 0;">Mã số Học viên:</td>
             <td style="font-weight: 700; color: #003B95; text-align: right; font-family: monospace;">${current.code || 'HN10'}</td>
           </tr>
           <tr>
@@ -2761,7 +2761,7 @@ export class MembersService {
       </div>
 
       <p style="font-size: 13.5px; line-height: 1.6; color: #334155;">
-        Để duy trì liên tục các quyền lợi đặc quyền: Danh thiếp số Titanium, gian hàng Marketplace B2B, quyền biểu quyết đại hội và cơ hội kết nối giao thương giữa các hội viên, Quý Anh/Chị vui lòng hoàn tất đóng phí niên liễm bằng cách:
+        Để duy trì liên tục các quyền lợi đặc quyền: Danh thiếp số Titanium, gian hàng Marketplace B2B, quyền biểu quyết đại hội và cơ hội kết nối giao thương giữa các Học viên, Quý Anh/Chị vui lòng hoàn tất đóng phí niên liễm bằng cách:
       </p>
       <ul style="font-size: 13px; color: #475569; line-height: 1.6; padding-left: 20px; margin-bottom: 24px;">
         <li><strong>Thanh toán VNPAY-QR:</strong> Quét mã VNPAY-QR trên App Hiệp Hội (hệ thống tự động gạch nợ và xuất hóa đơn sau 3-5 giây).</li>
@@ -2809,7 +2809,7 @@ export class MembersService {
           : 'Sắp tới hạn';
         const zaloMsg = `📢 [CLB DOANH NHÂN CEO HN10 - NHẮC NHỞ NIÊN LIỄM]
 Kính gửi Anh/Chị ${current.name} (${current.code || 'HN10'}),
-Ban Thư Ký CLB Doanh Nhân CEO HN10 xin trân trọng thông báo: Thời hạn niên liễm sinh hoạt hội viên của Quý Anh/Chị sắp kết thúc vào ngày ${termEndStr}.
+Ban Thư Ký CLB Doanh Nhân CEO HN10 xin trân trọng thông báo: Thời hạn niên liễm sinh hoạt Học viên của Quý Anh/Chị sắp kết thúc vào ngày ${termEndStr}.
 💰 Phí thường niên: 2.000.000 VNĐ / năm.
 📲 Vui lòng mở App Hiệp Hội để gia hạn trực tuyến bằng VNPAY/MoMo hoặc liên hệ Hotline: 0983 1010 10.
 Trân trọng cảm ơn Anh/Chị!`;
@@ -2836,8 +2836,8 @@ Trân trọng cảm ơn Anh/Chị!`;
     // 2. Dispatch 2-way in-app notification
     if (current.user_id) {
       try {
-        const notifTitle = 'Nhắc nhở gia hạn tư cách hội viên';
-        const notifBody = `Hội viên ${current.name} thân mến, thời hạn hội viên của bạn sắp kết thúc (${current.term_end ? new Date(current.term_end).toISOString().slice(0, 10) : 'hôm nay'}). Vui lòng hoàn thành gia hạn hội phí để duy trì mọi quyền lợi kết nối và ưu đãi.`;
+        const notifTitle = 'Nhắc nhở gia hạn tư cách Học viên';
+        const notifBody = `Học viên ${current.name} thân mến, thời hạn Học viên của bạn sắp kết thúc (${current.term_end ? new Date(current.term_end).toISOString().slice(0, 10) : 'hôm nay'}). Vui lòng hoàn thành gia hạn hội phí để duy trì mọi quyền lợi kết nối và ưu đãi.`;
         const notifId = crypto.randomUUID();
         const dedupeKey = `renew-remind-${current.id}-${Date.now()}`;
         const safeData = JSON.stringify({
@@ -2866,7 +2866,7 @@ Trân trọng cảm ơn Anh/Chị!`;
             safeData,
             dedupeKey,
           )
-          .catch(() => {});
+          .catch(() => { });
 
         await this.prisma
           .$executeRawUnsafe(
@@ -2882,7 +2882,7 @@ Trân trọng cảm ơn Anh/Chị!`;
             notifBody,
             current.id,
           )
-          .catch(() => {});
+          .catch(() => { });
       } catch (e: any) {
         console.warn(
           'Failed to send renewal reminder notification:',
@@ -3342,7 +3342,7 @@ Trân trọng cảm ơn Anh/Chị!`;
     body: { method: string; correlationId?: string },
   ) {
     const quote = await this.getRenewalQuote(userId);
-    if (!quote.found) throw new NotFoundException('Không tìm thấy hội viên');
+    if (!quote.found) throw new NotFoundException('Không tìm thấy Học viên');
 
     const nextEnd = quote.nextTermEnd;
     const ref =
@@ -3362,7 +3362,7 @@ Trân trọng cảm ơn Anh/Chị!`;
       const memRows = await this.prisma.$queryRaw<any[]>`
         SELECT name, email, code FROM public.members WHERE user_id = ${userId}::uuid LIMIT 1
       `.catch(() => []);
-      const memberName = memRows[0]?.name || user?.name || 'Quý Hội viên';
+      const memberName = memRows[0]?.name || user?.name || 'Quý Học viên';
       const recipientEmail = (
         memRows[0]?.email ||
         user?.email ||
@@ -3461,10 +3461,10 @@ Trân trọng cảm ơn Anh/Chị!`;
     const member = await this.prisma.members.findUnique({
       where: { id: memberId },
     });
-    if (!member) throw new NotFoundException('Không tìm thấy hồ sơ hội viên');
+    if (!member) throw new NotFoundException('Không tìm thấy hồ sơ Học viên');
     if (member.email?.toLowerCase() !== user.email?.toLowerCase()) {
       throw new BadRequestException(
-        'Email tài khoản không khớp với email hồ sơ hội viên',
+        'Email tài khoản không khớp với email hồ sơ Học viên',
       );
     }
 
@@ -3479,7 +3479,7 @@ Trân trọng cảm ơn Anh/Chị!`;
     const member = await this.prisma.members.findUnique({
       where: { id: memberId },
     });
-    if (!member) throw new NotFoundException('Không tìm thấy hồ sơ hội viên');
+    if (!member) throw new NotFoundException('Không tìm thấy hồ sơ Học viên');
     if (member.user_id !== userId) {
       throw new ForbiddenException('Bạn không sở hữu liên kết này');
     }
@@ -3574,7 +3574,7 @@ Trân trọng cảm ơn Anh/Chị!`;
     // Normalize to exact committees
     const rawDept = (data.department || '').trim();
     const rawDeptLower = rawDept.toLowerCase();
-    let sanitizedDept = 'Hội viên ceohn10';
+    let sanitizedDept = 'Học viên ceohn10';
     if (
       rawDeptLower.includes('điều hành') ||
       rawDeptLower.includes('quản trị') ||
@@ -3616,7 +3616,7 @@ Trân trọng cảm ơn Anh/Chị!`;
       sanitizedDept = 'Ban tài chính';
     } else if (
       rawDept &&
-      !rawDeptLower.includes('hội viên') &&
+      !rawDeptLower.includes('Học viên') &&
       !rawDeptLower.includes('ceohn10')
     ) {
       sanitizedDept = rawDept;
@@ -3645,7 +3645,7 @@ Trân trọng cảm ơn Anh/Chị!`;
       rawRole === 'truong_ban_dieu_hanh' ||
       rawRole === 'pho_chu_tich' ||
       rawRole.includes('phó chủ tịch') ||
-      (rawRole.includes('điều hành') && !rawRole.includes('hội viên'))
+      (rawRole.includes('điều hành') && !rawRole.includes('Học viên'))
     ) {
       sanitizedRole = 'ban_dieu_hanh';
     } else if (rawRole === 'tong_thu_ky' || rawRole.includes('tổng thư ký')) {
@@ -3718,7 +3718,7 @@ Trân trọng cảm ơn Anh/Chị!`;
           : crypto.randomUUID();
       const targetCode =
         data.code || `CEO-${targetMemberId.slice(0, 4).toUpperCase()}`;
-      const targetName = data.name || existingUser?.name || 'Hội viên CEO HN10';
+      const targetName = data.name || existingUser?.name || 'Học viên CEO HN10';
       const targetEmail = (
         data.email ||
         existingUser?.email ||
@@ -3762,7 +3762,7 @@ Trân trọng cảm ơn Anh/Chị!`;
           sanitizedDept,
           sanitizedRole,
         )
-        .catch(() => {});
+        .catch(() => { });
 
       member = await this.prisma.members
         .findUnique({ where: { id: targetMemberId } })
@@ -3802,7 +3802,7 @@ Trân trọng cảm ơn Anh/Chị!`;
               userId,
               member.id,
             )
-            .catch(() => {});
+            .catch(() => { });
         }
       }
     }
@@ -3839,7 +3839,7 @@ Trân trọng cảm ơn Anh/Chị!`;
               sanitizedDept,
               member.id,
             )
-            .catch(() => {});
+            .catch(() => { });
         });
     }
 
@@ -3903,7 +3903,7 @@ Trân trọng cảm ơn Anh/Chị!`;
               sanitizedDept,
               sanitizedRole,
             )
-            .catch(() => {});
+            .catch(() => { });
         });
 
       // Cleanly sync user_roles in public.user_roles (enum app_role: admin, member, platform_admin)
@@ -3914,7 +3914,7 @@ Trân trọng cảm ơn Anh/Chị!`;
       `,
           userId,
         )
-        .catch(() => {});
+        .catch(() => { });
 
       await this.prisma
         .$executeRawUnsafe(
@@ -3925,7 +3925,7 @@ Trân trọng cảm ơn Anh/Chị!`;
           userId,
           appRoleValue,
         )
-        .catch(() => {});
+        .catch(() => { });
 
       // Dispatch 2-way business notification
       try {
@@ -3960,7 +3960,7 @@ Trân trọng cảm ơn Anh/Chị!`;
             safeData,
             dedupeKey,
           )
-          .catch(() => {});
+          .catch(() => { });
 
         await this.prisma
           .$executeRawUnsafe(
@@ -3976,7 +3976,7 @@ Trân trọng cảm ơn Anh/Chị!`;
             notifBody,
             member?.id || memberId,
           )
-          .catch(() => {});
+          .catch(() => { });
       } catch (e: any) {
         console.warn('Failed to send role update notification:', e?.message);
       }
@@ -3986,7 +3986,7 @@ Trân trọng cảm ơn Anh/Chị!`;
   }
 
   /**
-   * Đăng ký hội viên công khai dạng Google Form (dành cho người nhận link đăng ký công ty)
+   * Đăng ký Học viên công khai dạng Google Form (dành cho người nhận link đăng ký công ty)
    */
   async publicRegister(data: {
     fullName: string;
@@ -4052,7 +4052,7 @@ Trân trọng cảm ơn Anh/Chị!`;
     const feeYear = now.getFullYear();
     const joinedAt = now.toISOString().slice(0, 10);
 
-    // Kiểm tra trùng Email trong danh sách hội viên
+    // Kiểm tra trùng Email trong danh sách Học viên
     const cleanEmail = (data.email || '').trim().toLowerCase();
     if (cleanEmail) {
       const existingEmail = await this.prisma.$queryRaw<any[]>`
@@ -4060,12 +4060,12 @@ Trân trọng cảm ơn Anh/Chị!`;
       `.catch(() => []);
       if (existingEmail.length > 0) {
         throw new BadRequestException(
-          'Email này đã được sử dụng bởi một hội viên khác trên hệ thống!',
+          'Email này đã được sử dụng bởi một Học viên khác trên hệ thống!',
         );
       }
     }
 
-    // Kiểm tra trùng Số điện thoại trong danh sách hội viên
+    // Kiểm tra trùng Số điện thoại trong danh sách Học viên
     const cleanPhone = (data.phone || '').replace(/[^0-9+]/g, '').trim();
     if (cleanPhone && cleanPhone.length >= 8) {
       const existingPhone = await this.prisma.$queryRaw<any[]>`
@@ -4073,7 +4073,7 @@ Trân trọng cảm ơn Anh/Chị!`;
       `.catch(() => []);
       if (existingPhone.length > 0) {
         throw new BadRequestException(
-          'Số điện thoại này đã được sử dụng bởi một hội viên khác trên hệ thống!',
+          'Số điện thoại này đã được sử dụng bởi một Học viên khác trên hệ thống!',
         );
       }
     }
@@ -4124,7 +4124,7 @@ Trân trọng cảm ơn Anh/Chị!`;
           ${taxCode || null},
           ${aboutMeta},
           'member',
-          'Hội viên ceohn10',
+          'Học viên ceohn10',
           ${staffSize || null},
           ${parsedEmployees},
           ${companyName},
@@ -4164,7 +4164,7 @@ Trân trọng cảm ơn Anh/Chị!`;
             ${taxCode || null},
             ${aboutMeta},
             'member',
-            'Hội viên ceohn10',
+            'Học viên ceohn10',
             ${staffSize || null},
             ${parsedEmployees},
             ${companyName},
@@ -4188,7 +4188,7 @@ Trân trọng cảm ơn Anh/Chị!`;
     // Thông báo cho Ban Quản Trị & Ban Thành Viên
     const notifCode = `NOTIF-MBR-${Date.now().toString().slice(-6)}`;
     const notifTitle = `Hồ sơ đăng ký mới: ${companyName}`;
-    const notifBody = `Hội viên ${fullName} (${companyName}) vừa nộp đơn đăng ký gia nhập CLB CEO HN10. Vui lòng kiểm tra và phê duyệt.`;
+    const notifBody = `Học viên ${fullName} (${companyName}) vừa nộp đơn đăng ký gia nhập CLB CEO HN10. Vui lòng kiểm tra và phê duyệt.`;
 
     await this.prisma.$executeRaw`
       INSERT INTO public.notifications (
@@ -4230,7 +4230,7 @@ Trân trọng cảm ơn Anh/Chị!`;
       })
       .catch((err: any) => {
         this.logger.warn(
-          `Lỗi gửi thư cảm ơn đăng ký hội viên: ${err?.message}`,
+          `Lỗi gửi thư cảm ơn đăng ký Học viên: ${err?.message}`,
         );
       });
 
@@ -4238,12 +4238,12 @@ Trân trọng cảm ơn Anh/Chị!`;
       ok: true,
       memberId: id,
       message:
-        'Đăng ký hội viên thành công! Thư cảm ơn đã được gửi tới email của Anh/Chị.',
+        'Đăng ký Học viên thành công! Thư cảm ơn đã được gửi tới email của Anh/Chị.',
     };
   }
 
   /**
-   * Kiểm tra thẩm quyền phê duyệt hồ sơ hội viên mới.
+   * Kiểm tra thẩm quyền phê duyệt hồ sơ Học viên mới.
    * Thẩm quyền thuộc về Ban Thành Viên (BTV) hoặc Ban Quản Trị (BQT) / Admin / Super Admin.
    */
   async checkCanApproveMember(
@@ -4378,7 +4378,7 @@ Trân trọng cảm ơn Anh/Chị!`;
   }
 
   /**
-   * Phê duyệt hội viên mới và gửi email chứa thông tin tài khoản đăng nhập (Email + Mật khẩu ngẫu nhiên)
+   * Phê duyệt Học viên mới và gửi email chứa thông tin tài khoản đăng nhập (Email + Mật khẩu ngẫu nhiên)
    */
   async approveMemberAndSendCredentials(adminUserId: string, memberId: string) {
     const rows = await this.prisma.$queryRaw<any[]>`
@@ -4386,7 +4386,7 @@ Trân trọng cảm ơn Anh/Chị!`;
     `.catch(() => []);
 
     if (rows.length === 0) {
-      throw new NotFoundException('Không tìm thấy thông tin hội viên');
+      throw new NotFoundException('Không tìm thấy thông tin Học viên');
     }
 
     const member = rows[0];
@@ -4396,7 +4396,7 @@ Trân trọng cảm ơn Anh/Chị!`;
     );
     if (!canApprove) {
       throw new ForbiddenException(
-        'Thẩm quyền kiểm duyệt hội viên thuộc về Ban Thành Viên hoặc Ban Quản Trị. Bạn vui lòng sử dụng tài khoản Ban Quản Trị/Ban Thành Viên để phê duyệt hồ sơ kết nạp.',
+        'Thẩm quyền kiểm duyệt Học viên thuộc về Ban Thành Viên hoặc Ban Quản Trị. Bạn vui lòng sử dụng tài khoản Ban Quản Trị/Ban Thành Viên để phê duyệt hồ sơ kết nạp.',
       );
     }
     const canApproveAction = await this.checkActionPermission(
@@ -4406,17 +4406,17 @@ Trân trọng cảm ơn Anh/Chị!`;
     );
     if (!canApproveAction) {
       throw new ForbiddenException(
-        'Quyền phê duyệt hội viên (MEM_APPROVE) đã bị thu hồi trong cấu hình ma trận phân quyền hệ thống',
+        'Quyền phê duyệt Học viên (MEM_APPROVE) đã bị thu hồi trong cấu hình ma trận phân quyền hệ thống',
       );
     }
 
     if (!member.email || !member.email.includes('@')) {
       throw new BadRequestException(
-        'Hội viên chưa có địa chỉ email hợp lệ để cấp phát tài khoản',
+        'Học viên chưa có địa chỉ email hợp lệ để cấp phát tài khoản',
       );
     }
 
-    // 1. Sinh mật khẩu ngẫu nhiên cho hội viên (vd: CEO HN10@9482)
+    // 1. Sinh mật khẩu ngẫu nhiên cho Học viên (vd: CEO HN10@9482)
     const randomSuffix = Math.floor(1000 + Math.random() * 9000);
     const passwordRaw = `CEO HN10@${randomSuffix}`;
     const salt = await bcrypt.genSalt(10);
@@ -4503,13 +4503,13 @@ Trân trọng cảm ơn Anh/Chị!`;
       this.logger.warn(`Could not sync to auth.users: ${authErr?.message}`);
     }
 
-    // 3. Tạo mã hội viên nếu chưa có
+    // 3. Tạo mã Học viên nếu chưa có
     const memberCode =
       member.code && member.code.trim() !== ''
         ? member.code
         : `HN10-${Math.floor(100 + Math.random() * 900)}`;
 
-    // 4. Kích hoạt trạng thái hội viên trong bảng members
+    // 4. Kích hoạt trạng thái Học viên trong bảng members
     await this.prisma.$executeRaw`
       UPDATE public.members SET
         status = 'active',
@@ -4527,7 +4527,7 @@ Trân trọng cảm ơn Anh/Chị!`;
         INSERT INTO public.memberships (id, user_id, association_id, role, status, created_at, updated_at)
         VALUES (gen_random_uuid(), ${assignedUserId}::uuid, ${member.association_id}::uuid, 'member', 'active', NOW(), NOW())
         ON CONFLICT (user_id, association_id) DO UPDATE SET role = 'member', status = 'active', updated_at = NOW()
-      `.catch(() => {});
+      `.catch(() => { });
     }
 
     // 6. Gửi email tài khoản đăng nhập chính thức
@@ -4567,11 +4567,11 @@ Trân trọng cảm ơn Anh/Chị!`;
         ) VALUES (
           gen_random_uuid(), ${assignedUserId}::uuid,
           'Chào mừng bạn đến với CLB Doanh Nhân CEO HN10!',
-          'Tài khoản của bạn đã được phê duyệt chính thức. Mã hội viên: ' || ${memberCode},
+          'Tài khoản của bạn đã được phê duyệt chính thức. Mã Học viên: ' || ${memberCode},
           'member_approval', false, NOW()
         )
-      `.catch(() => {});
-    } catch {}
+      `.catch(() => { });
+    } catch { }
 
     // 7. Ghi nhật ký hoạt động
     await this.prisma.$executeRaw`
@@ -4581,7 +4581,7 @@ Trân trọng cảm ơn Anh/Chị!`;
         gen_random_uuid(),
         ${memberId},
         ${adminUserId},
-        'Phê duyệt hội viên & Cấp tài khoản',
+        'Phê duyệt Học viên & Cấp tài khoản',
         ${member.name},
         'member',
         to_char(NOW(), 'YYYY-MM-DD HH24:MI:SS'),
@@ -4600,7 +4600,7 @@ Trân trọng cảm ơn Anh/Chị!`;
       temporaryPassword: passwordRaw,
       emailSent,
       emailMessage,
-      message: `Đã phê duyệt thành công hội viên ${member.name} (${memberCode}) và gửi email tài khoản!`,
+      message: `Đã phê duyệt thành công Học viên ${member.name} (${memberCode}) và gửi email tài khoản!`,
     };
   }
 
@@ -4611,9 +4611,9 @@ Trân trọng cảm ơn Anh/Chị!`;
         m.code,
         COALESCE(m.contact, m.name) AS name,
         COALESCE(m.company_name, m.name) AS company,
-        COALESCE(m.executive_role, 'Hội viên') AS title,
+        COALESCE(m.executive_role, 'Học viên') AS title,
         COALESCE(m.avatar_url, m.avatar) AS avatar,
-        COALESCE(m.department, 'Hội viên ceohn10') AS department,
+        COALESCE(m.department, 'Học viên ceohn10') AS department,
         m.phone,
         m.email
       FROM public.members m
@@ -4629,7 +4629,7 @@ Trân trọng cảm ơn Anh/Chị!`;
       'Ban tài chính',
       'Ban thiện nguyện',
       'Ban Thư Ký',
-      'Hội viên ceohn10',
+      'Học viên ceohn10',
     ];
 
     const groupedMap: Record<string, any[]> = {};
@@ -4638,7 +4638,7 @@ Trân trọng cảm ơn Anh/Chị!`;
     }
 
     for (const row of rows) {
-      const dept = row.department || 'Hội viên ceohn10';
+      const dept = row.department || 'Học viên ceohn10';
       if (!groupedMap[dept]) {
         groupedMap[dept] = [];
       }
@@ -4686,7 +4686,7 @@ Trân trọng cảm ơn Anh/Chị!`;
         phone: m.phone,
         email: m.email,
         industry: m.industry,
-        department: m.department || 'Hội viên',
+        department: m.department || 'Học viên',
         role: m.executive_role || 'member',
         latitude: Number(m.latitude),
         longitude: Number(m.longitude),
@@ -4907,10 +4907,10 @@ Trân trọng cảm ơn Anh/Chị!`;
       ).trim();
       const title = String(
         item.title ||
-          item.position ||
-          item.chucVu ||
-          item.executiveRole ||
-          'Hội viên',
+        item.position ||
+        item.chucVu ||
+        item.executiveRole ||
+        'Học viên',
       ).trim();
       const address = String(item.address || item.diaChi || '').trim();
       const department = String(
@@ -4977,7 +4977,7 @@ Trân trọng cảm ơn Anh/Chị!`;
       created,
       updated,
       skipped,
-      message: `Đã nhập thành công ${created} hội viên mới, cập nhật ${updated} hội viên. Bỏ qua: ${skipped}.`,
+      message: `Đã nhập thành công ${created} Học viên mới, cập nhật ${updated} Học viên. Bỏ qua: ${skipped}.`,
     };
   }
 }

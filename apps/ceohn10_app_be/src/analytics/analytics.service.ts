@@ -294,8 +294,8 @@ export const CHART_METAS: Record<
     timelineColor: '#DC2626',
   },
   top_referrals: {
-    unit: 'Hội viên',
-    col1Label: 'Hội viên giới thiệu',
+    unit: 'Học viên',
+    col1Label: 'Học viên giới thiệu',
     col1Color: '#003B95',
     col2Label: 'Đã kết nạp chính thức',
     col2Color: '#10B981',
@@ -303,7 +303,7 @@ export const CHART_METAS: Record<
     col3Color: '#F59E0B',
     col4Label: 'Điểm thưởng tích lũy (x10)',
     col4Color: '#EC4899',
-    timelineLabel: 'Tổng hội viên mới',
+    timelineLabel: 'Tổng Học viên mới',
     timelineColor: '#0284C7',
   },
   member_activities: {
@@ -319,7 +319,7 @@ export const CHART_METAS: Record<
     col3Unit: 'Lượt',
     col4Label: undefined as any,
     col4Color: undefined as any,
-    timelineLabel: 'Tổng hoạt động hội viên',
+    timelineLabel: 'Tổng hoạt động Học viên',
     timelineColor: '#DC2626',
     timelineUnit: 'Lượt',
   },
@@ -336,7 +336,7 @@ export const CHART_METAS: Record<
     col3Unit: 'Lượt',
     col4Label: undefined as any,
     col4Color: undefined as any,
-    timelineLabel: 'Tổng hoạt động hội viên',
+    timelineLabel: 'Tổng hoạt động Học viên',
     timelineColor: '#DC2626',
     timelineUnit: 'Lượt',
   },
@@ -449,7 +449,7 @@ export function buildGranularChart(
       col2 = bMems.filter(
         (m) => !m.fee_paid || Number(m.fee_paid || 0) === 0,
       ).length; // Chờ kết nạp
-      col3 = Math.round(bMems.length * 0.5); // Hội viên giới thiệu
+      col3 = Math.round(bMems.length * 0.5); // Học viên giới thiệu
       col4 = Math.round(bMems.length * 0.2); // Hoàn thành nhiệm vụ
       timelineVal = col1 + col2 + col3 + col4;
     } else if (category === 'member_activities' || category === 'activity_sentiment') {
@@ -461,7 +461,7 @@ export function buildGranularChart(
       col1 = bCmts.length;
       // 2. Lượt share bài viết từ trong app ra các nền tảng
       col2 = Math.max(bShares.length, Math.round(bCmts.length * 0.4));
-      // 3. Lượt click link giới thiệu hội viên mới
+      // 3. Lượt click link giới thiệu Học viên mới
       col3 = Math.max(bRefClicks.length, Math.round(bCmts.length * 0.3));
       col4 = 0;
       timelineVal = col1 + col2 + col3;
@@ -497,7 +497,7 @@ export function buildGranularChart(
 
 @Injectable()
 export class AnalyticsService implements OnModuleInit {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   async onModuleInit() {
     await this.ensureTables();
@@ -531,7 +531,7 @@ export class AnalyticsService implements OnModuleInit {
         )
       `,
         )
-        .catch(() => {});
+        .catch(() => { });
 
       await this.prisma
         .$executeRawUnsafe(
@@ -544,7 +544,7 @@ export class AnalyticsService implements OnModuleInit {
         )
       `,
         )
-        .catch(() => {});
+        .catch(() => { });
 
       await this.prisma
         .$executeRawUnsafe(
@@ -566,7 +566,7 @@ export class AnalyticsService implements OnModuleInit {
         )
       `,
         )
-        .catch(() => {});
+        .catch(() => { });
 
       await this.prisma
         .$executeRawUnsafe(
@@ -583,7 +583,7 @@ export class AnalyticsService implements OnModuleInit {
         )
       `,
         )
-        .catch(() => {});
+        .catch(() => { });
     } catch (e: any) {
       console.warn('[AnalyticsService] ensureTables notice:', e?.message);
     }
@@ -624,9 +624,9 @@ export class AnalyticsService implements OnModuleInit {
           m.code,
           COALESCE(m.contact, m.name) AS name,
           COALESCE(m.company_name, m.name) AS company,
-          COALESCE(m.executive_role, 'Hội viên') AS title,
+          COALESCE(m.executive_role, 'Học viên') AS title,
           COALESCE(m.avatar, '/ceohn10-emblem-8.png') AS avatar,
-          COALESCE(m.department, 'Hội viên ceohn10') AS department,
+          COALESCE(m.department, 'Học viên ceohn10') AS department,
           m.phone,
           m.email,
           m.fee_paid,
@@ -808,11 +808,11 @@ export class AnalyticsService implements OnModuleInit {
         const entry = {
           id: m.id,
           code: m.code || 'CEO-83',
-          name: m.name || 'Hội viên',
+          name: m.name || 'Học viên',
           company: m.company || 'Doanh nghiệp CLB',
-          title: m.title || 'Hội viên',
+          title: m.title || 'Học viên',
           avatar: m.avatar || '/ceohn10-emblem-8.png',
-          department: m.department || 'Hội viên ceohn10',
+          department: m.department || 'Học viên ceohn10',
           phone: m.phone || '0983 1010 10',
           email: m.email || 'ceohn10@hanoiba.vn',
           feePaid: fee,
@@ -961,7 +961,7 @@ export class AnalyticsService implements OnModuleInit {
           } else {
             valueStr =
               (item.referralsCount || item.connectionsCount || 0) +
-              ' Hội viên giới thiệu';
+              ' Học viên giới thiệu';
           }
 
           return {
@@ -976,7 +976,7 @@ export class AnalyticsService implements OnModuleInit {
         });
       };
 
-      // CHỈ XẾP HẠNG HỘI VIÊN KHI CÓ DỮ LIỆU THỰC TẾ PHÁT SINH (> 0), KHÔNG TỰ BỊA TOP KHI CHƯA CÓ HOẠT ĐỘNG
+      // CHỈ XẾP HẠNG Học viên KHI CÓ DỮ LIỆU THỰC TẾ PHÁT SINH (> 0), KHÔNG TỰ BỊA TOP KHI CHƯA CÓ HOẠT ĐỘNG
       const validConnectionsList = [...uniqueStats]
         .filter((m) => (m.connectionsCount || 0) > 0)
         .sort(
@@ -1134,22 +1134,22 @@ export class AnalyticsService implements OnModuleInit {
 
       const refPieChartData = [
         {
-          name: 'Hội viên Kim Cương',
+          name: 'Học viên Kim Cương',
           value: Math.max(1, Math.round(uniqueStats.length * 0.15)),
           fill: '#06B6D4',
         },
         {
-          name: 'Hội viên Bạch Kim',
+          name: 'Học viên Bạch Kim',
           value: Math.max(1, Math.round(uniqueStats.length * 0.25)),
           fill: '#64748B',
         },
         {
-          name: 'Hội viên Vàng',
+          name: 'Học viên Vàng',
           value: Math.max(1, Math.round(uniqueStats.length * 0.35)),
           fill: '#F59E0B',
         },
         {
-          name: 'Hội viên Tiêu Chuẩn',
+          name: 'Học viên Tiêu Chuẩn',
           value: Math.max(1, Math.round(uniqueStats.length * 0.25)),
           fill: '#003B95',
         },
@@ -1208,8 +1208,8 @@ export class AnalyticsService implements OnModuleInit {
             granularity === 'year'
               ? `Năm ${curSelectedYear}`
               : granularity === 'quarter'
-              ? `Quý ${curSelectedQuarter}/${curSelectedYear}`
-              : `Tháng ${curSelectedMonth}/${curSelectedYear}`,
+                ? `Quý ${curSelectedQuarter}/${curSelectedYear}`
+                : `Tháng ${curSelectedMonth}/${curSelectedYear}`,
         },
         kpi: {
           totalMembers: uniqueStats.length,
@@ -1234,7 +1234,7 @@ export class AnalyticsService implements OnModuleInit {
         },
         categories: {
           memberActivities: {
-            title: `Hoạt động hội viên (${granLabel})`,
+            title: `Hoạt động Học viên (${granLabel})`,
             metricLabel: 'Lượt hoạt động',
             totalComments: feedComments.length,
             totalPostShares: Math.max(shareLogs.length, Math.round(feedComments.length * 0.4)),
@@ -1244,7 +1244,7 @@ export class AnalyticsService implements OnModuleInit {
             granularities: sentimentGranularCharts,
           },
           activitySentiment: {
-            title: `Hoạt động hội viên (${granLabel})`,
+            title: `Hoạt động Học viên (${granLabel})`,
             metricLabel: 'Lượt hoạt động',
             data: sentimentTrendData,
             chartData: sentimentGranularCharts[granularity] || [],
@@ -1279,8 +1279,8 @@ export class AnalyticsService implements OnModuleInit {
             pieChartData: eventPieChartData,
           },
           topReferrals: {
-            title: `Giới thiệu hội viên mới (${granLabel})`,
-            metricLabel: 'Hội viên giới thiệu',
+            title: `Giới thiệu Học viên mới (${granLabel})`,
+            metricLabel: 'Học viên giới thiệu',
             data: topReferrals,
             chartData: refGranularCharts[granularity] || [],
             chartMeta: CHART_METAS.top_referrals,

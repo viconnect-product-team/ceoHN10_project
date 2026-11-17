@@ -427,7 +427,7 @@ export function InvitationTemplateStudio() {
   const activeBg = customBgUrl.trim() || selectedBg;
   const didInitRef = useRef<boolean>(false);
 
-  // Nạp danh sách hội viên & sự kiện (1 lần duy nhất, module cache chống loop call API)
+  // Nạp danh sách Học viên & sự kiện (1 lần duy nhất, module cache chống loop call API)
   useEffect(() => {
     if (didInitRef.current) return;
     didInitRef.current = true;
@@ -441,7 +441,7 @@ export function InvitationTemplateStudio() {
             setAllMembers(list);
           }
         })
-        .catch(() => {});
+        .catch(() => { });
     }
 
     if (!globalEventsCache) {
@@ -459,11 +459,11 @@ export function InvitationTemplateStudio() {
                   const regList = Array.isArray(r) ? r : r?.items || r?.data || [];
                   if (Array.isArray(regList)) setEventRegistrations(regList);
                 })
-                .catch(() => {});
+                .catch(() => { });
             }
           }
         })
-        .catch(() => {});
+        .catch(() => { });
     } else if (globalEventsCache.length > 0 && !selectedEventId) {
       setSelectedEventId(globalEventsCache[0].id);
     }
@@ -481,7 +481,7 @@ export function InvitationTemplateStudio() {
         const res = await fetchNestApi<any>("/events/registrations");
         const list = Array.isArray(res) ? res : res?.items || res?.data || [];
         if (Array.isArray(list)) setEventRegistrations(list);
-      } catch {}
+      } catch { }
       return;
     }
 
@@ -850,7 +850,7 @@ export function InvitationTemplateStudio() {
         globalTemplatesCache = defaults;
         setTemplates(defaults);
       }
-    } catch {}
+    } catch { }
   };
 
   // Lưu template vào hệ thống backend
@@ -989,22 +989,22 @@ export function InvitationTemplateStudio() {
         posterRatio === "9:16"
           ? 1080
           : posterRatio === "3:4"
-          ? 1200
-          : posterRatio === "1:1"
-          ? 1200
-          : posterRatio === "16:9"
-          ? 1920
-          : 1600;
+            ? 1200
+            : posterRatio === "1:1"
+              ? 1200
+              : posterRatio === "16:9"
+                ? 1920
+                : 1600;
       const exportH =
         posterRatio === "9:16"
           ? 1920
           : posterRatio === "3:4"
-          ? 1600
-          : posterRatio === "1:1"
-          ? 1200
-          : posterRatio === "16:9"
-          ? 1080
-          : 1200;
+            ? 1600
+            : posterRatio === "1:1"
+              ? 1200
+              : posterRatio === "16:9"
+                ? 1080
+                : 1200;
       canvas.width = exportW;
       canvas.height = exportH;
       const ctx = canvas.getContext("2d");
@@ -1256,11 +1256,10 @@ export function InvitationTemplateStudio() {
             <button
               type="button"
               onClick={() => setActiveTab("background")}
-              className={`p-2 rounded-xl text-xs font-bold transition cursor-pointer flex flex-col items-center gap-1 ${
-                activeTab === "background"
+              className={`p-2 rounded-xl text-xs font-bold transition cursor-pointer flex flex-col items-center gap-1 ${activeTab === "background"
                   ? "bg-white dark:bg-slate-900 text-sky-600 dark:text-sky-400 shadow-sm"
                   : "text-slate-600 dark:text-slate-400 hover:text-slate-900"
-              }`}
+                }`}
             >
               <Palette className="size-4 text-emerald-500" />
               <span>Ảnh Nền</span>
@@ -1269,11 +1268,10 @@ export function InvitationTemplateStudio() {
             <button
               type="button"
               onClick={() => setActiveTab("layers")}
-              className={`p-2 rounded-xl text-xs font-bold transition cursor-pointer flex flex-col items-center gap-1 ${
-                activeTab === "layers"
+              className={`p-2 rounded-xl text-xs font-bold transition cursor-pointer flex flex-col items-center gap-1 ${activeTab === "layers"
                   ? "bg-white dark:bg-slate-900 text-sky-600 dark:text-sky-400 shadow-sm"
                   : "text-slate-600 dark:text-slate-400 hover:text-slate-900"
-              }`}
+                }`}
             >
               <Layers className="size-4 text-purple-500" />
               <span>Lớp Ảnh ({imageLayers.length})</span>
@@ -1282,11 +1280,10 @@ export function InvitationTemplateStudio() {
             <button
               type="button"
               onClick={() => setActiveTab("content")}
-              className={`p-2 rounded-xl text-xs font-bold transition cursor-pointer flex flex-col items-center gap-1 ${
-                activeTab === "content"
+              className={`p-2 rounded-xl text-xs font-bold transition cursor-pointer flex flex-col items-center gap-1 ${activeTab === "content"
                   ? "bg-white dark:bg-slate-900 text-sky-600 dark:text-sky-400 shadow-sm"
                   : "text-slate-600 dark:text-slate-400 hover:text-slate-900"
-              }`}
+                }`}
             >
               <Type className="size-4 text-blue-500" />
               <span>Văn Bản</span>
@@ -1295,11 +1292,10 @@ export function InvitationTemplateStudio() {
             <button
               type="button"
               onClick={() => setActiveTab("attendee")}
-              className={`p-2 rounded-xl text-xs font-bold transition cursor-pointer flex flex-col items-center gap-1 ${
-                activeTab === "attendee"
+              className={`p-2 rounded-xl text-xs font-bold transition cursor-pointer flex flex-col items-center gap-1 ${activeTab === "attendee"
                   ? "bg-white dark:bg-slate-900 text-sky-600 dark:text-sky-400 shadow-sm"
                   : "text-slate-600 dark:text-slate-400 hover:text-slate-900"
-              }`}
+                }`}
             >
               <Users className="size-4 text-amber-500" />
               <span>Đại Biểu</span>
@@ -1308,11 +1304,10 @@ export function InvitationTemplateStudio() {
             <button
               type="button"
               onClick={() => setActiveTab("ornaments")}
-              className={`p-2 rounded-xl text-xs font-bold transition cursor-pointer flex flex-col items-center gap-1 ${
-                activeTab === "ornaments"
+              className={`p-2 rounded-xl text-xs font-bold transition cursor-pointer flex flex-col items-center gap-1 ${activeTab === "ornaments"
                   ? "bg-white dark:bg-slate-900 text-sky-600 dark:text-sky-400 shadow-sm"
                   : "text-slate-600 dark:text-slate-400 hover:text-slate-900"
-              }`}
+                }`}
             >
               <Crown className="size-4 text-yellow-500" />
               <span>Họa Tiết 3D</span>
@@ -1321,11 +1316,10 @@ export function InvitationTemplateStudio() {
             <button
               type="button"
               onClick={() => setActiveTab("templates")}
-              className={`p-2 rounded-xl text-xs font-bold transition cursor-pointer flex flex-col items-center gap-1 ${
-                activeTab === "templates"
+              className={`p-2 rounded-xl text-xs font-bold transition cursor-pointer flex flex-col items-center gap-1 ${activeTab === "templates"
                   ? "bg-white dark:bg-slate-900 text-sky-600 dark:text-sky-400 shadow-sm"
                   : "text-slate-600 dark:text-slate-400 hover:text-slate-900"
-              }`}
+                }`}
             >
               <Bookmark className="size-4 text-rose-500" />
               <span>Kho Mẫu ({templates.length})</span>
@@ -1413,11 +1407,10 @@ export function InvitationTemplateStudio() {
                           setSelectedBg(bg.url);
                           toast.success(`Đã chọn nền: ${bg.name}`);
                         }}
-                        className={`relative rounded-xl overflow-hidden border-2 transition cursor-pointer group ${
-                          isSelected
+                        className={`relative rounded-xl overflow-hidden border-2 transition cursor-pointer group ${isSelected
                             ? "border-emerald-500 ring-2 ring-emerald-400/40 shadow-md"
                             : "border-slate-200 dark:border-slate-800 hover:border-emerald-400/60"
-                        }`}
+                          }`}
                       >
                         <img
                           src={bg.url}
@@ -1544,11 +1537,10 @@ export function InvitationTemplateStudio() {
                       <div
                         key={layer.id}
                         onClick={() => setSelectedImageLayerId(layer.id)}
-                        className={`p-3 rounded-2xl border transition cursor-pointer flex items-center justify-between gap-3 ${
-                          isSelected
+                        className={`p-3 rounded-2xl border transition cursor-pointer flex items-center justify-between gap-3 ${isSelected
                             ? "border-purple-500 bg-purple-50/60 dark:bg-purple-950/30 ring-2 ring-purple-400/40"
                             : "border-slate-200 dark:border-slate-800 bg-slate-50/40 dark:bg-slate-950/40 hover:border-purple-300"
-                        }`}
+                          }`}
                       >
                         <div className="flex items-center gap-2.5 min-w-0">
                           <img
@@ -1608,10 +1600,10 @@ export function InvitationTemplateStudio() {
                           selectedImageLayer.shape === "circle"
                             ? "circle"
                             : selectedImageLayer.shape === "arch"
-                            ? "arch"
-                            : selectedImageLayer.shape === "oval"
-                            ? "oval"
-                            : "square"
+                              ? "arch"
+                              : selectedImageLayer.shape === "oval"
+                                ? "oval"
+                                : "square"
                         );
                         setIsCropOpen(true);
                       }}
@@ -1756,11 +1748,10 @@ export function InvitationTemplateStudio() {
                           onClick={() =>
                             handleUpdateImageLayer(selectedImageLayer.id, { shape: sh.id as ImageShapeType })
                           }
-                          className={`p-1.5 rounded-lg text-[10px] font-bold transition text-center cursor-pointer ${
-                            selectedImageLayer.shape === sh.id
+                          className={`p-1.5 rounded-lg text-[10px] font-bold transition text-center cursor-pointer ${selectedImageLayer.shape === sh.id
                               ? "bg-purple-600 text-white"
                               : "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300"
-                          }`}
+                            }`}
                         >
                           {sh.name}
                         </button>
@@ -1815,11 +1806,10 @@ export function InvitationTemplateStudio() {
                     {customTextLayers.map((tl) => (
                       <div
                         key={tl.id}
-                        className={`p-2.5 rounded-xl border flex items-center justify-between gap-2 ${
-                          selectedCustomTextId === tl.id
+                        className={`p-2.5 rounded-xl border flex items-center justify-between gap-2 ${selectedCustomTextId === tl.id
                             ? "border-blue-500 bg-blue-100/50 dark:bg-blue-900/40"
                             : "border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900"
-                        }`}
+                          }`}
                       >
                         <input
                           type="text"
@@ -2134,20 +2124,18 @@ export function InvitationTemplateStudio() {
                   <button
                     type="button"
                     onClick={() => setSelectedSourceType("registrations")}
-                    className={`flex-1 py-1 rounded-lg text-xs font-bold cursor-pointer ${
-                      selectedSourceType === "registrations" ? "bg-amber-500 text-white" : "text-amber-900 dark:text-slate-300"
-                    }`}
+                    className={`flex-1 py-1 rounded-lg text-xs font-bold cursor-pointer ${selectedSourceType === "registrations" ? "bg-amber-500 text-white" : "text-amber-900 dark:text-slate-300"
+                      }`}
                   >
                     Người Đã Đăng Ký ({eventRegistrations.length})
                   </button>
                   <button
                     type="button"
                     onClick={() => setSelectedSourceType("members")}
-                    className={`flex-1 py-1 rounded-lg text-xs font-bold cursor-pointer ${
-                      selectedSourceType === "members" ? "bg-amber-500 text-white" : "text-amber-900 dark:text-slate-300"
-                    }`}
+                    className={`flex-1 py-1 rounded-lg text-xs font-bold cursor-pointer ${selectedSourceType === "members" ? "bg-amber-500 text-white" : "text-amber-900 dark:text-slate-300"
+                      }`}
                   >
-                    Tất Cả Hội Viên ({allMembers.length})
+                    Tất Cả Học viên ({allMembers.length})
                   </button>
                 </div>
 
@@ -2165,7 +2153,7 @@ export function InvitationTemplateStudio() {
 
                 <div className="max-h-40 overflow-y-auto space-y-1.5 pr-1 divide-y divide-amber-100">
                   {filteredList.slice(0, 20).map((item: any) => {
-                    const itemName = item.name || item.full_name || item.member?.name || "Hội viên";
+                    const itemName = item.name || item.full_name || item.member?.name || "Học viên";
                     const itemCompany = item.company || item.member?.company || "CEO HN10";
                     const itemAvatar = resolveMediaUrl(item.avatar || item.member?.avatar) || "/vietnamese-young-male-ceo-avatar.png";
                     return (
@@ -2257,15 +2245,14 @@ export function InvitationTemplateStudio() {
                               e.currentTarget.onerror = null;
                               (e.currentTarget as HTMLImageElement).src = SAFE_FALLBACK_AVATAR;
                             }}
-                            className={`size-12 object-cover border-2 border-amber-500 shadow-sm ${
-                              attendeeConfig.style === "royal_circle" || attendeeConfig.style === "soft_feather"
+                            className={`size-12 object-cover border-2 border-amber-500 shadow-sm ${attendeeConfig.style === "royal_circle" || attendeeConfig.style === "soft_feather"
                                 ? "rounded-full"
                                 : attendeeConfig.style === "heian_arch"
-                                ? "rounded-t-2xl rounded-b-md"
-                                : attendeeConfig.style === "oval_luxury"
-                                ? "rounded-[45%]"
-                                : "rounded-xl"
-                            }`}
+                                  ? "rounded-t-2xl rounded-b-md"
+                                  : attendeeConfig.style === "oval_luxury"
+                                    ? "rounded-[45%]"
+                                    : "rounded-xl"
+                              }`}
                           />
                           <span className="absolute -bottom-1 -right-1 px-1 py-0.2 rounded-full bg-amber-500 text-slate-950 text-[7px] font-black uppercase shadow-xs">
                             CEO
@@ -2352,11 +2339,10 @@ export function InvitationTemplateStudio() {
                               }));
                               toast.success(`✓ Đã áp dụng avatar ${p.name}!`);
                             }}
-                            className={`p-1 rounded-xl border flex flex-col items-center gap-1 transition cursor-pointer ${
-                              attendeeConfig.attendees[0]?.avatar === p.url
+                            className={`p-1 rounded-xl border flex flex-col items-center gap-1 transition cursor-pointer ${attendeeConfig.attendees[0]?.avatar === p.url
                                 ? "border-amber-500 bg-amber-100/80 dark:bg-amber-900/50 ring-2 ring-amber-400"
                                 : "border-slate-200 dark:border-slate-800 hover:bg-amber-50/50"
-                            }`}
+                              }`}
                           >
                             <img
                               src={p.url}
@@ -2470,11 +2456,10 @@ export function InvitationTemplateStudio() {
                           style: st.id as AttendeeCardStyle,
                         }))
                       }
-                      className={`p-2.5 rounded-xl border text-xs font-bold text-center transition cursor-pointer ${
-                        attendeeConfig.style === st.id
+                      className={`p-2.5 rounded-xl border text-xs font-bold text-center transition cursor-pointer ${attendeeConfig.style === st.id
                           ? "border-amber-500 bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 ring-2 ring-amber-500/30 shadow-xs"
                           : "border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-50"
-                      }`}
+                        }`}
                     >
                       <div className="text-base mb-1">{st.icon}</div>
                       <div>{st.name}</div>
@@ -2574,11 +2559,10 @@ export function InvitationTemplateStudio() {
                     key={orn.id}
                     type="button"
                     onClick={() => setTopOrnament(orn.id as TopOrnamentType)}
-                    className={`p-2.5 rounded-xl border text-xs font-bold text-center transition cursor-pointer ${
-                      topOrnament === orn.id
+                    className={`p-2.5 rounded-xl border text-xs font-bold text-center transition cursor-pointer ${topOrnament === orn.id
                         ? "border-sky-500 bg-sky-50 dark:bg-sky-950/40 text-sky-800 dark:text-sky-300 ring-2 ring-sky-500/30"
                         : "border-slate-200 dark:border-slate-800 text-slate-600"
-                    }`}
+                      }`}
                   >
                     <div className="text-base mb-1">{orn.icon}</div>
                     <div className="text-[11px]">{orn.name}</div>
@@ -2600,11 +2584,10 @@ export function InvitationTemplateStudio() {
                     key={orn.id}
                     type="button"
                     onClick={() => setBottomOrnament(orn.id as BottomOrnamentType)}
-                    className={`p-2.5 rounded-xl border text-xs font-bold text-center transition cursor-pointer ${
-                      bottomOrnament === orn.id
+                    className={`p-2.5 rounded-xl border text-xs font-bold text-center transition cursor-pointer ${bottomOrnament === orn.id
                         ? "border-sky-500 bg-sky-50 dark:bg-sky-950/40 text-sky-800 dark:text-sky-300 ring-2 ring-sky-500/30"
                         : "border-slate-200 dark:border-slate-800 text-slate-600"
-                    }`}
+                      }`}
                   >
                     <div className="text-base mb-1">{orn.icon}</div>
                     <div className="text-[11px]">{orn.name}</div>
@@ -2656,11 +2639,10 @@ export function InvitationTemplateStudio() {
                     <div
                       key={tmpl.id}
                       onClick={() => handleSelectTemplate(tmpl)}
-                      className={`p-3 rounded-2xl border transition cursor-pointer flex items-center justify-between gap-3 ${
-                        isSelected
+                      className={`p-3 rounded-2xl border transition cursor-pointer flex items-center justify-between gap-3 ${isSelected
                           ? "border-sky-500 bg-sky-50/70 dark:bg-sky-950/40 ring-2 ring-sky-400/40"
                           : "border-slate-200 bg-slate-50/60 dark:border-slate-800 dark:bg-slate-950/40 hover:border-sky-300"
-                      }`}
+                        }`}
                     >
                       <div className="flex items-center gap-3 min-w-0">
                         {tmpl.bgUrl ? (
@@ -2726,11 +2708,10 @@ export function InvitationTemplateStudio() {
                     key={r.id}
                     type="button"
                     onClick={() => setPosterRatio(r.id as any)}
-                    className={`px-2 py-1 rounded-xl text-xs font-bold transition flex items-center gap-1 cursor-pointer ${
-                      posterRatio === r.id
+                    className={`px-2 py-1 rounded-xl text-xs font-bold transition flex items-center gap-1 cursor-pointer ${posterRatio === r.id
                         ? "bg-[#003B95] text-white shadow-xs"
                         : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
-                    }`}
+                      }`}
                   >
                     <span>{r.label}</span>
                   </button>
@@ -2789,566 +2770,553 @@ export function InvitationTemplateStudio() {
           >
             <div
               ref={posterRef}
-            style={{
-              backgroundImage: `url(${activeBg})`,
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-              filter: bgBlur > 0 ? `blur(${bgBlur}px)` : "none",
-            }}
-            className={`${
-              posterRatio === "9:16"
-                ? "w-[360px] h-[640px] sm:w-[380px] sm:h-[675px]"
-                : posterRatio === "1:1"
-                ? "w-[360px] h-[360px] sm:w-[460px] sm:h-[460px]"
-                : posterRatio === "3:4"
-                ? "w-[360px] h-[480px] sm:w-[420px] sm:h-[560px]"
-                : posterRatio === "16:9"
-                ? "w-[380px] h-[214px] sm:w-[580px] sm:h-[326px]"
-                : "w-[380px] h-[285px] sm:w-[500px] sm:h-[375px]"
-            } rounded-3xl shadow-[0_20px_60px_rgba(0,0,0,0.7)] relative overflow-hidden select-none border-2 border-white/20 transition-all`}
-          >
-            {/* Vệt Phủ Nền Đêm & Darkness Filter */}
-            <div
-              style={{ backgroundColor: `rgba(7, 21, 48, ${bgDarkness / 100})` }}
-              className="absolute inset-0 pointer-events-none"
-            />
-
-            {/* ── HOA VĂN ĐỈNH TRÊN CÙNG (TOP ORNAMENT) ── */}
-            {topOrnament === "atlantis_trident" && (
-              <div className="absolute top-2 left-1/2 -translate-x-1/2 z-20 pointer-events-none flex flex-col items-center">
-                <span className="text-3xl text-amber-300 drop-shadow-[0_2px_12px_rgba(234,179,8,0.7)]">
-                  🔱
-                </span>
-                <div className="w-24 h-0.5 bg-gradient-to-r from-transparent via-cyan-300 to-transparent mt-0.5" />
-              </div>
-            )}
-            {topOrnament === "baroque_gold" && (
-              <div className="absolute top-1 left-1/2 -translate-x-1/2 z-20 pointer-events-none flex flex-col items-center">
-                <div className="text-xl text-amber-300 drop-shadow-[0_2px_12px_rgba(234,179,8,0.8)]">
-                  ⚜️ 👑 ⚜️
-                </div>
-                <div className="w-32 h-0.5 bg-gradient-to-r from-transparent via-amber-300 to-transparent" />
-              </div>
-            )}
-            {topOrnament === "diamond_stars" && (
-              <div className="absolute top-2 left-1/2 -translate-x-1/2 z-20 pointer-events-none flex items-center gap-2 text-cyan-200">
-                <span>✦</span>
-                <span className="text-lg">⭐</span>
-                <span>✦</span>
-              </div>
-            )}
-
-            {/* ── KHỐI HEADER LOGOS ── */}
-            {blocksLayout.header?.visible !== false && (
+              style={{
+                backgroundImage: `url(${activeBg})`,
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+                filter: bgBlur > 0 ? `blur(${bgBlur}px)` : "none",
+              }}
+              className={`${posterRatio === "9:16"
+                  ? "w-[360px] h-[640px] sm:w-[380px] sm:h-[675px]"
+                  : posterRatio === "1:1"
+                    ? "w-[360px] h-[360px] sm:w-[460px] sm:h-[460px]"
+                    : posterRatio === "3:4"
+                      ? "w-[360px] h-[480px] sm:w-[420px] sm:h-[560px]"
+                      : posterRatio === "16:9"
+                        ? "w-[380px] h-[214px] sm:w-[580px] sm:h-[326px]"
+                        : "w-[380px] h-[285px] sm:w-[500px] sm:h-[375px]"
+                } rounded-3xl shadow-[0_20px_60px_rgba(0,0,0,0.7)] relative overflow-hidden select-none border-2 border-white/20 transition-all`}
+            >
+              {/* Vệt Phủ Nền Đêm & Darkness Filter */}
               <div
-                onMouseDown={(e) => handleMouseDownItem("block", "header", e)}
-                onTouchStart={(e) => handleMouseDownItem("block", "header", e)}
-                style={{
-                  position: "absolute",
-                  left: `${blocksLayout.header?.x ?? 50}%`,
-                  top: `${blocksLayout.header?.y ?? 3.5}%`,
-                  transform: "translate(-50%, 0)",
-                  zIndex: blocksLayout.header?.zIndex ?? 10,
-                }}
-                className={`w-[92%] transition-shadow cursor-move group select-none ${
-                  selectedBlockId === "header"
-                    ? "ring-2 ring-amber-400 ring-dashed"
-                    : "hover:outline hover:outline-1 hover:outline-sky-400/50"
-                }`}
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-1.5">
-                    <img
-                      src={logoUrl}
-                      alt="Logo"
-                      className="h-6 object-contain drop-shadow-md"
-                      onError={(e) => {
-                        e.currentTarget.onerror = null;
-                        (e.currentTarget as HTMLImageElement).src = "/app-icon.png";
-                      }}
-                    />
-                    <span className="text-[8.5px] font-bold tracking-widest text-slate-100 uppercase">
-                      CEO HN10
-                    </span>
+                style={{ backgroundColor: `rgba(7, 21, 48, ${bgDarkness / 100})` }}
+                className="absolute inset-0 pointer-events-none"
+              />
+
+              {/* ── HOA VĂN ĐỈNH TRÊN CÙNG (TOP ORNAMENT) ── */}
+              {topOrnament === "atlantis_trident" && (
+                <div className="absolute top-2 left-1/2 -translate-x-1/2 z-20 pointer-events-none flex flex-col items-center">
+                  <span className="text-3xl text-amber-300 drop-shadow-[0_2px_12px_rgba(234,179,8,0.7)]">
+                    🔱
+                  </span>
+                  <div className="w-24 h-0.5 bg-gradient-to-r from-transparent via-cyan-300 to-transparent mt-0.5" />
+                </div>
+              )}
+              {topOrnament === "baroque_gold" && (
+                <div className="absolute top-1 left-1/2 -translate-x-1/2 z-20 pointer-events-none flex flex-col items-center">
+                  <div className="text-xl text-amber-300 drop-shadow-[0_2px_12px_rgba(234,179,8,0.8)]">
+                    ⚜️ 👑 ⚜️
                   </div>
-                  <div className="text-xs font-serif italic tracking-wider text-sky-100 font-semibold drop-shadow-sm">
-                    {signatureText}
-                  </div>
-                  <div className="text-[8px] font-bold tracking-wider text-slate-200 uppercase">
-                    {partnerLogoUrl}
-                  </div>
+                  <div className="w-32 h-0.5 bg-gradient-to-r from-transparent via-amber-300 to-transparent" />
                 </div>
-              </div>
-            )}
+              )}
+              {topOrnament === "diamond_stars" && (
+                <div className="absolute top-2 left-1/2 -translate-x-1/2 z-20 pointer-events-none flex items-center gap-2 text-cyan-200">
+                  <span>✦</span>
+                  <span className="text-lg">⭐</span>
+                  <span>✦</span>
+                </div>
+              )}
 
-            {/* ── KHỐI CÁNH GÀ ATLANTIS ── */}
-            {blocksLayout.atlantis_wings?.visible !== false && selectedBg.includes("atlantis") && (
-              <div
-                onMouseDown={(e) => handleMouseDownItem("block", "atlantis_wings", e)}
-                onTouchStart={(e) => handleMouseDownItem("block", "atlantis_wings", e)}
-                style={{
-                  position: "absolute",
-                  left: `${blocksLayout.atlantis_wings?.x ?? 50}%`,
-                  top: `${blocksLayout.atlantis_wings?.y ?? 9}%`,
-                  transform: "translate(-50%, 0)",
-                  zIndex: blocksLayout.atlantis_wings?.zIndex ?? 9,
-                }}
-                className={`w-[94%] flex items-center justify-between px-2 cursor-move select-none ${
-                  selectedBlockId === "atlantis_wings" ? "ring-2 ring-cyan-400 ring-dashed" : ""
-                }`}
-              >
-                <div className="text-[7.5px] font-serif uppercase tracking-[0.25em] text-slate-200 leading-tight text-left">
-                  {leftWingText.split("\n").map((t, i) => (
-                    <div key={i}>{t}</div>
-                  ))}
-                </div>
-                <div className="text-[7.5px] font-serif uppercase tracking-[0.25em] text-slate-200 leading-tight text-right">
-                  {rightWingText.split("\n").map((t, i) => (
-                    <div key={i}>{t}</div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* ── KHỐI TIÊU ĐỀ 'ATLANTIS' / 'THƯ MỜI' ── */}
-            {blocksLayout.title?.visible !== false && (
-              <div
-                onMouseDown={(e) => handleMouseDownItem("block", "title", e)}
-                onTouchStart={(e) => handleMouseDownItem("block", "title", e)}
-                style={{
-                  position: "absolute",
-                  left: `${blocksLayout.title?.x ?? 50}%`,
-                  top: `${blocksLayout.title?.y ?? 15}%`,
-                  transform: "translate(-50%, 0)",
-                  zIndex: blocksLayout.title?.zIndex ?? 12,
-                }}
-                className={`w-[90%] text-center transition-shadow cursor-move group select-none ${
-                  selectedBlockId === "title"
-                    ? "ring-2 ring-amber-400 ring-dashed"
-                    : "hover:outline hover:outline-1 hover:outline-sky-400/50"
-                }`}
-              >
-                <h1
-                  className={`${getFontSizeClass(
-                    blocksLayout.title?.fontSize,
-                    "text-3xl sm:text-4xl"
-                  )} ${getFontFamilyClass(blocksLayout.title?.fontFamily)} ${getGradientClass(
-                    blocksLayout.title?.colorGradient
-                  )}`}
-                >
-                  {invitationHeader}
-                </h1>
-                <div className="text-[8px] sm:text-[8.5px] font-bold uppercase tracking-[0.28em] text-slate-200 drop-shadow-sm mt-0.5">
-                  {invitationSubtitle}
-                </div>
-              </div>
-            )}
-
-            {/* ── KHỐI TIÊU ĐỀ LỚN NGHỆ THUẬT 'KẾT NỐI DOANH NHÂN' ── */}
-            {blocksLayout.headline?.visible !== false && (
-              <div
-                onMouseDown={(e) => handleMouseDownItem("block", "headline", e)}
-                onTouchStart={(e) => handleMouseDownItem("block", "headline", e)}
-                style={{
-                  position: "absolute",
-                  left: `${blocksLayout.headline?.x ?? 50}%`,
-                  top: `${blocksLayout.headline?.y ?? 25}%`,
-                  transform: "translate(-50%, 0)",
-                  zIndex: blocksLayout.headline?.zIndex ?? 11,
-                }}
-                className={`w-[92%] text-center transition-shadow cursor-move group select-none ${
-                  selectedBlockId === "headline"
-                    ? "ring-2 ring-amber-400 ring-dashed"
-                    : "hover:outline hover:outline-1 hover:outline-sky-400/50"
-                }`}
-              >
-                <div className="text-[11px] sm:text-xs text-[#85bfe8] font-light tracking-wide italic drop-shadow-sm">
-                  {kicker}
-                </div>
-                <div className="text-[11px] sm:text-xs text-slate-100 font-serif mt-0.5 drop-shadow-sm">
-                  {leadPhrase}
-                </div>
-                <h2
-                  className={`${getFontSizeClass(
-                    blocksLayout.headline?.fontSize,
-                    "text-xl sm:text-2xl"
-                  )} font-black uppercase tracking-[0.06em] leading-tight mt-1 ${getFontFamilyClass(
-                    blocksLayout.headline?.fontFamily
-                  )} ${getGradientClass(blocksLayout.headline?.colorGradient || "cyan")}`}
-                >
-                  {mainTitleLine1}
-                </h2>
-                <h2
-                  className={`${getFontSizeClass(
-                    blocksLayout.headline?.fontSize,
-                    "text-xl sm:text-2xl"
-                  )} font-black uppercase tracking-[0.06em] leading-tight ${getFontFamilyClass(
-                    blocksLayout.headline?.fontFamily
-                  )} ${getGradientClass(blocksLayout.headline?.colorGradient || "cyan")}`}
-                >
-                  {mainTitleLine2}
-                </h2>
-                <div className="text-[10px] sm:text-[11px] text-[#80c5f0] font-medium tracking-wide mt-0.5 drop-shadow-sm">
-                  {venueHighlight}
-                </div>
-              </div>
-            )}
-
-            {/* ── KHỐI ĐẠI BIỂU DANH DỰ ── */}
-            {attendeeConfig.enabled &&
-              blocksLayout.attendee?.visible !== false &&
-              attendeeConfig.attendees.length > 0 && (
+              {/* ── KHỐI HEADER LOGOS ── */}
+              {blocksLayout.header?.visible !== false && (
                 <div
-                  onMouseDown={(e) => handleMouseDownItem("block", "attendee", e)}
-                  onTouchStart={(e) => handleMouseDownItem("block", "attendee", e)}
+                  onMouseDown={(e) => handleMouseDownItem("block", "header", e)}
+                  onTouchStart={(e) => handleMouseDownItem("block", "header", e)}
                   style={{
                     position: "absolute",
-                    left: `${blocksLayout.attendee?.x ?? 50}%`,
-                    top: `${blocksLayout.attendee?.y ?? 45}%`,
-                    transform: `translate(-50%, 0) scale(${attendeeConfig.scale / 100})`,
-                    zIndex: blocksLayout.attendee?.zIndex ?? 15,
+                    left: `${blocksLayout.header?.x ?? 50}%`,
+                    top: `${blocksLayout.header?.y ?? 3.5}%`,
+                    transform: "translate(-50%, 0)",
+                    zIndex: blocksLayout.header?.zIndex ?? 10,
                   }}
-                  className={`w-[88%] transition-shadow cursor-move select-none ${
-                    selectedBlockId === "attendee"
+                  className={`w-[92%] transition-shadow cursor-move group select-none ${selectedBlockId === "header"
                       ? "ring-2 ring-amber-400 ring-dashed"
-                      : "hover:outline hover:outline-1 hover:outline-amber-400/50"
-                  }`}
+                      : "hover:outline hover:outline-1 hover:outline-sky-400/50"
+                    }`}
                 >
-                  <div className="p-2.5 rounded-2xl flex items-center gap-3 backdrop-blur-md bg-slate-950/65 border border-amber-400/50 shadow-2xl">
-                    <div className="relative shrink-0">
-                      {/* 1. Tròn Hoàng Gia 3D */}
-                      {attendeeConfig.style === "royal_circle" && (
-                        <div className="relative">
-                          <img
-                            src={resolveMediaUrl(attendeeConfig.attendees[0].avatar) || SAFE_FALLBACK_AVATAR}
-                            alt=""
-                            onError={(e) => {
-                              e.currentTarget.onerror = null;
-                              (e.currentTarget as HTMLImageElement).src = SAFE_FALLBACK_AVATAR;
-                            }}
-                            className="size-14 rounded-full object-cover border-2 border-amber-400 ring-2 ring-amber-300/40 shadow-[0_0_16px_rgba(251,191,36,0.6)]"
-                          />
-                          <span className="absolute -bottom-1 -right-1 px-1.5 py-0.2 rounded-full bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-950 text-[7px] font-black uppercase tracking-wider shadow-sm">
-                            CEO
-                          </span>
-                        </div>
-                      )}
-
-                      {/* 2. Vòm Cung Heian */}
-                      {attendeeConfig.style === "heian_arch" && (
-                        <div className="relative">
-                          <img
-                            src={resolveMediaUrl(attendeeConfig.attendees[0].avatar) || SAFE_FALLBACK_AVATAR}
-                            alt=""
-                            onError={(e) => {
-                              e.currentTarget.onerror = null;
-                              (e.currentTarget as HTMLImageElement).src = SAFE_FALLBACK_AVATAR;
-                            }}
-                            className="w-13 h-16 rounded-t-[26px] rounded-b-lg object-cover border-2 border-amber-300 shadow-[0_4px_16px_rgba(245,158,11,0.5)]"
-                          />
-                          <span className="absolute -bottom-1 -right-1 px-1.5 py-0.2 rounded-full bg-amber-500 text-slate-950 text-[7px] font-black uppercase">
-                            CEO
-                          </span>
-                        </div>
-                      )}
-
-                      {/* 3. Bầu Dục Ngọc Trai */}
-                      {attendeeConfig.style === "oval_luxury" && (
-                        <div className="relative">
-                          <img
-                            src={resolveMediaUrl(attendeeConfig.attendees[0].avatar) || SAFE_FALLBACK_AVATAR}
-                            alt=""
-                            onError={(e) => {
-                              e.currentTarget.onerror = null;
-                              (e.currentTarget as HTMLImageElement).src = SAFE_FALLBACK_AVATAR;
-                            }}
-                            className="w-13 h-16 rounded-[45%] object-cover border-2 border-amber-200 shadow-[0_0_18px_rgba(254,240,138,0.55)]"
-                          />
-                          <span className="absolute -bottom-1 -right-1 px-1.5 py-0.2 rounded-full bg-amber-400 text-slate-950 text-[7px] font-black uppercase">
-                            CEO
-                          </span>
-                        </div>
-                      )}
-
-                      {/* 4. Mờ Viền Lông Vũ (Mép hòa tan mềm mại, mặt sắc nét) */}
-                      {attendeeConfig.style === "soft_feather" && (
-                        <div
-                          className="relative"
-                          style={{
-                            maskImage: `radial-gradient(circle at center, black 65%, transparent 100%)`,
-                            WebkitMaskImage: `radial-gradient(circle at center, black 65%, transparent 100%)`,
-                            filter:
-                              attendeeConfig.featherBlur > 0
-                                ? `drop-shadow(0 0 ${attendeeConfig.featherBlur / 2}px rgba(251,191,36,0.6))`
-                                : undefined,
-                          }}
-                        >
-                          <img
-                            src={resolveMediaUrl(attendeeConfig.attendees[0].avatar) || SAFE_FALLBACK_AVATAR}
-                            alt=""
-                            onError={(e) => {
-                              e.currentTarget.onerror = null;
-                              (e.currentTarget as HTMLImageElement).src = SAFE_FALLBACK_AVATAR;
-                            }}
-                            className="size-14 rounded-full object-cover"
-                          />
-                          <span className="absolute -bottom-0.5 -right-0.5 px-1 py-0.2 rounded-full bg-amber-500 text-slate-950 text-[7px] font-black uppercase">
-                            CEO
-                          </span>
-                        </div>
-                      )}
-
-                      {/* 5. Thẻ Nổi 3D */}
-                      {attendeeConfig.style === "3d_card" && (
-                        <div className="relative">
-                          <img
-                            src={resolveMediaUrl(attendeeConfig.attendees[0].avatar) || SAFE_FALLBACK_AVATAR}
-                            alt=""
-                            onError={(e) => {
-                              e.currentTarget.onerror = null;
-                              (e.currentTarget as HTMLImageElement).src = SAFE_FALLBACK_AVATAR;
-                            }}
-                            className="size-14 rounded-2xl object-cover border-2 border-cyan-400 shadow-[0_0_18px_rgba(103,232,249,0.5)]"
-                          />
-                          <span className="absolute -bottom-1 -right-1 px-1.5 py-0.2 rounded-full bg-cyan-400 text-slate-950 text-[7px] font-black uppercase">
-                            CEO
-                          </span>
-                        </div>
-                      )}
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-1.5">
+                      <img
+                        src={logoUrl}
+                        alt="Logo"
+                        className="h-6 object-contain drop-shadow-md"
+                        onError={(e) => {
+                          e.currentTarget.onerror = null;
+                          (e.currentTarget as HTMLImageElement).src = "/app-icon.png";
+                        }}
+                      />
+                      <span className="text-[8.5px] font-bold tracking-widest text-slate-100 uppercase">
+                        CEO HN10
+                      </span>
                     </div>
-
-                    <div className="flex-1 text-left min-w-0">
-                      <div className="text-[8px] font-bold uppercase tracking-wider text-amber-300">
-                        {attendeeConfig.attendees[0].roleInEvent}
-                      </div>
-                      <div className="font-black text-white truncate drop-shadow-sm text-sm">
-                        {attendeeConfig.attendees[0].name}
-                      </div>
-                      {attendeeConfig.showTitle && (
-                        <div className="text-[9.5px] text-cyan-200 truncate">
-                          {attendeeConfig.attendees[0].title}
-                        </div>
-                      )}
-                      {attendeeConfig.showCompany && (
-                        <div className="text-[8.5px] text-slate-300 truncate">
-                          {attendeeConfig.attendees[0].company}
-                        </div>
-                      )}
+                    <div className="text-xs font-serif italic tracking-wider text-sky-100 font-semibold drop-shadow-sm">
+                      {signatureText}
+                    </div>
+                    <div className="text-[8px] font-bold tracking-wider text-slate-200 uppercase">
+                      {partnerLogoUrl}
                     </div>
                   </div>
                 </div>
               )}
 
-            {/* ── KHỐI HỘP ĐẶC QUYỀN CAPSULE ── */}
-            {blocksLayout.capsule?.visible !== false && (
-              <div
-                onMouseDown={(e) => handleMouseDownItem("block", "capsule", e)}
-                onTouchStart={(e) => handleMouseDownItem("block", "capsule", e)}
-                style={{
-                  position: "absolute",
-                  left: `${blocksLayout.capsule?.x ?? 50}%`,
-                  top: `${blocksLayout.capsule?.y ?? 63}%`,
-                  transform: "translate(-50%, 0)",
-                  zIndex: blocksLayout.capsule?.zIndex ?? 10,
-                }}
-                className={`w-[90%] text-center transition-shadow cursor-move group select-none ${
-                  selectedBlockId === "capsule"
-                    ? "ring-2 ring-amber-400 ring-dashed"
-                    : "hover:outline hover:outline-1 hover:outline-sky-400/50"
-                }`}
-              >
-                <div className="inline-block px-3 py-1 rounded-full border border-cyan-300/60 bg-gradient-to-r from-cyan-400/25 via-cyan-200/40 to-cyan-400/25 shadow-[0_2px_12px_rgba(103,232,249,0.35)] backdrop-blur-xs">
-                  <span className="text-[7.5px] sm:text-[8px] font-black uppercase tracking-wider text-slate-950">
-                    {capsuleBadge}
-                  </span>
+              {/* ── KHỐI CÁNH GÀ ATLANTIS ── */}
+              {blocksLayout.atlantis_wings?.visible !== false && selectedBg.includes("atlantis") && (
+                <div
+                  onMouseDown={(e) => handleMouseDownItem("block", "atlantis_wings", e)}
+                  onTouchStart={(e) => handleMouseDownItem("block", "atlantis_wings", e)}
+                  style={{
+                    position: "absolute",
+                    left: `${blocksLayout.atlantis_wings?.x ?? 50}%`,
+                    top: `${blocksLayout.atlantis_wings?.y ?? 9}%`,
+                    transform: "translate(-50%, 0)",
+                    zIndex: blocksLayout.atlantis_wings?.zIndex ?? 9,
+                  }}
+                  className={`w-[94%] flex items-center justify-between px-2 cursor-move select-none ${selectedBlockId === "atlantis_wings" ? "ring-2 ring-cyan-400 ring-dashed" : ""
+                    }`}
+                >
+                  <div className="text-[7.5px] font-serif uppercase tracking-[0.25em] text-slate-200 leading-tight text-left">
+                    {leftWingText.split("\n").map((t, i) => (
+                      <div key={i}>{t}</div>
+                    ))}
+                  </div>
+                  <div className="text-[7.5px] font-serif uppercase tracking-[0.25em] text-slate-200 leading-tight text-right">
+                    {rightWingText.split("\n").map((t, i) => (
+                      <div key={i}>{t}</div>
+                    ))}
+                  </div>
                 </div>
-                <div className="text-xs sm:text-[13px] font-black uppercase tracking-wide text-white drop-shadow-md mt-1">
-                  {capsuleBenefit}
-                </div>
-                <div className="text-[8px] sm:text-[8.5px] text-slate-300 font-light italic mt-0.5">
-                  {capsuleNote}
-                </div>
-              </div>
-            )}
+              )}
 
-            {/* ── KHỐI CỤM NGÀY GIỜ SỐ LỚN ── */}
-            {blocksLayout.datetime?.visible !== false && (
-              <div
-                onMouseDown={(e) => handleMouseDownItem("block", "datetime", e)}
-                onTouchStart={(e) => handleMouseDownItem("block", "datetime", e)}
-                style={{
-                  position: "absolute",
-                  left: `${blocksLayout.datetime?.x ?? 50}%`,
-                  top: `${blocksLayout.datetime?.y ?? 72}%`,
-                  transform: "translate(-50%, 0)",
-                  zIndex: blocksLayout.datetime?.zIndex ?? 10,
-                }}
-                className={`w-[90%] text-center transition-shadow cursor-move group select-none ${
-                  selectedBlockId === "datetime"
-                    ? "ring-2 ring-amber-400 ring-dashed"
-                    : "hover:outline hover:outline-1 hover:outline-sky-400/50"
-                }`}
-              >
-                <div className="flex items-center justify-center gap-1.5 text-xs text-cyan-300 font-medium">
-                  <span>{dayOfWeek}</span>
-                  <Clock className="size-3 text-cyan-300" />
-                  <span>{timeHour}</span>
+              {/* ── KHỐI TIÊU ĐỀ 'ATLANTIS' / 'THƯ MỜI' ── */}
+              {blocksLayout.title?.visible !== false && (
+                <div
+                  onMouseDown={(e) => handleMouseDownItem("block", "title", e)}
+                  onTouchStart={(e) => handleMouseDownItem("block", "title", e)}
+                  style={{
+                    position: "absolute",
+                    left: `${blocksLayout.title?.x ?? 50}%`,
+                    top: `${blocksLayout.title?.y ?? 15}%`,
+                    transform: "translate(-50%, 0)",
+                    zIndex: blocksLayout.title?.zIndex ?? 12,
+                  }}
+                  className={`w-[90%] text-center transition-shadow cursor-move group select-none ${selectedBlockId === "title"
+                      ? "ring-2 ring-amber-400 ring-dashed"
+                      : "hover:outline hover:outline-1 hover:outline-sky-400/50"
+                    }`}
+                >
+                  <h1
+                    className={`${getFontSizeClass(
+                      blocksLayout.title?.fontSize,
+                      "text-3xl sm:text-4xl"
+                    )} ${getFontFamilyClass(blocksLayout.title?.fontFamily)} ${getGradientClass(
+                      blocksLayout.title?.colorGradient
+                    )}`}
+                  >
+                    {invitationHeader}
+                  </h1>
+                  <div className="text-[8px] sm:text-[8.5px] font-bold uppercase tracking-[0.28em] text-slate-200 drop-shadow-sm mt-0.5">
+                    {invitationSubtitle}
+                  </div>
                 </div>
+              )}
 
-                <div className="flex items-center justify-center gap-3 text-3xl sm:text-4xl font-serif font-normal text-white drop-shadow-[0_4px_12px_rgba(0,0,0,0.8)] tracking-widest my-0.5">
-                  <span>{dayDigits}</span>
-                  <span className="text-cyan-200/60 font-light text-2xl">|</span>
-                  <span>{monthDigits}</span>
-                  <span className="text-cyan-200/60 font-light text-2xl">|</span>
-                  <span>{yearDigits}</span>
+              {/* ── KHỐI TIÊU ĐỀ LỚN NGHỆ THUẬT 'KẾT NỐI DOANH NHÂN' ── */}
+              {blocksLayout.headline?.visible !== false && (
+                <div
+                  onMouseDown={(e) => handleMouseDownItem("block", "headline", e)}
+                  onTouchStart={(e) => handleMouseDownItem("block", "headline", e)}
+                  style={{
+                    position: "absolute",
+                    left: `${blocksLayout.headline?.x ?? 50}%`,
+                    top: `${blocksLayout.headline?.y ?? 25}%`,
+                    transform: "translate(-50%, 0)",
+                    zIndex: blocksLayout.headline?.zIndex ?? 11,
+                  }}
+                  className={`w-[92%] text-center transition-shadow cursor-move group select-none ${selectedBlockId === "headline"
+                      ? "ring-2 ring-amber-400 ring-dashed"
+                      : "hover:outline hover:outline-1 hover:outline-sky-400/50"
+                    }`}
+                >
+                  <div className="text-[11px] sm:text-xs text-[#85bfe8] font-light tracking-wide italic drop-shadow-sm">
+                    {kicker}
+                  </div>
+                  <div className="text-[11px] sm:text-xs text-slate-100 font-serif mt-0.5 drop-shadow-sm">
+                    {leadPhrase}
+                  </div>
+                  <h2
+                    className={`${getFontSizeClass(
+                      blocksLayout.headline?.fontSize,
+                      "text-xl sm:text-2xl"
+                    )} font-black uppercase tracking-[0.06em] leading-tight mt-1 ${getFontFamilyClass(
+                      blocksLayout.headline?.fontFamily
+                    )} ${getGradientClass(blocksLayout.headline?.colorGradient || "cyan")}`}
+                  >
+                    {mainTitleLine1}
+                  </h2>
+                  <h2
+                    className={`${getFontSizeClass(
+                      blocksLayout.headline?.fontSize,
+                      "text-xl sm:text-2xl"
+                    )} font-black uppercase tracking-[0.06em] leading-tight ${getFontFamilyClass(
+                      blocksLayout.headline?.fontFamily
+                    )} ${getGradientClass(blocksLayout.headline?.colorGradient || "cyan")}`}
+                  >
+                    {mainTitleLine2}
+                  </h2>
+                  <div className="text-[10px] sm:text-[11px] text-[#80c5f0] font-medium tracking-wide mt-0.5 drop-shadow-sm">
+                    {venueHighlight}
+                  </div>
                 </div>
+              )}
 
-                <div className="flex items-center justify-center gap-1 text-[9px] sm:text-[9.5px] text-slate-200 font-light">
-                  <MapPin className="size-3 text-rose-400 shrink-0" />
-                  <span className="truncate max-w-xs">{eventLocation}</span>
-                </div>
-              </div>
-            )}
-
-            {/* ── RENDER CÁC LỚP ẢNH TỰ DO (MULTI-IMAGE LAYERS WITH RESIZE & DRAG) ── */}
-            {imageLayers
-              .filter((l) => l.visible !== false)
-              .map((layer) => {
-                const isSelected = selectedImageLayerId === layer.id;
-                return (
+              {/* ── KHỐI ĐẠI BIỂU DANH DỰ ── */}
+              {attendeeConfig.enabled &&
+                blocksLayout.attendee?.visible !== false &&
+                attendeeConfig.attendees.length > 0 && (
                   <div
-                    key={layer.id}
-                    onMouseDown={(e) => handleMouseDownItem("image", layer.id, e)}
-                    onTouchStart={(e) => handleMouseDownItem("image", layer.id, e)}
+                    onMouseDown={(e) => handleMouseDownItem("block", "attendee", e)}
+                    onTouchStart={(e) => handleMouseDownItem("block", "attendee", e)}
                     style={{
                       position: "absolute",
-                      left: `${layer.x}%`,
-                      top: `${layer.y}%`,
-                      width: `${layer.width}px`,
-                      height: `${layer.height}px`,
-                      transform: `translate(-50%, -50%) scale(${layer.scale / 100}) rotate(${layer.rotation}deg)`,
-                      opacity: layer.opacity / 100,
-                      filter: layer.featherBlur > 0 ? `blur(${layer.featherBlur / 5}px)` : "none",
-                      zIndex: layer.zIndex,
+                      left: `${blocksLayout.attendee?.x ?? 50}%`,
+                      top: `${blocksLayout.attendee?.y ?? 45}%`,
+                      transform: `translate(-50%, 0) scale(${attendeeConfig.scale / 100})`,
+                      zIndex: blocksLayout.attendee?.zIndex ?? 15,
                     }}
-                    className={`cursor-move select-none transition-shadow ${
-                      isSelected
-                        ? "ring-2 ring-purple-400 ring-dashed shadow-2xl"
-                        : "hover:outline hover:outline-1 hover:outline-purple-400/50"
-                    }`}
-                  >
-                    <img
-                      src={layer.url}
-                      alt={layer.name}
-                      className={`w-full h-full object-cover pointer-events-none ${
-                        layer.shape === "circle"
-                          ? "rounded-full"
-                          : layer.shape === "arch"
-                          ? "rounded-t-[80px] rounded-b-xl"
-                          : layer.shape === "oval"
-                          ? "rounded-[50%]"
-                          : layer.shape === "rounded"
-                          ? "rounded-2xl"
-                          : "rounded-none"
+                    className={`w-[88%] transition-shadow cursor-move select-none ${selectedBlockId === "attendee"
+                        ? "ring-2 ring-amber-400 ring-dashed"
+                        : "hover:outline hover:outline-1 hover:outline-amber-400/50"
                       }`}
-                    />
+                  >
+                    <div className="p-2.5 rounded-2xl flex items-center gap-3 backdrop-blur-md bg-slate-950/65 border border-amber-400/50 shadow-2xl">
+                      <div className="relative shrink-0">
+                        {/* 1. Tròn Hoàng Gia 3D */}
+                        {attendeeConfig.style === "royal_circle" && (
+                          <div className="relative">
+                            <img
+                              src={resolveMediaUrl(attendeeConfig.attendees[0].avatar) || SAFE_FALLBACK_AVATAR}
+                              alt=""
+                              onError={(e) => {
+                                e.currentTarget.onerror = null;
+                                (e.currentTarget as HTMLImageElement).src = SAFE_FALLBACK_AVATAR;
+                              }}
+                              className="size-14 rounded-full object-cover border-2 border-amber-400 ring-2 ring-amber-300/40 shadow-[0_0_16px_rgba(251,191,36,0.6)]"
+                            />
+                            <span className="absolute -bottom-1 -right-1 px-1.5 py-0.2 rounded-full bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-950 text-[7px] font-black uppercase tracking-wider shadow-sm">
+                              CEO
+                            </span>
+                          </div>
+                        )}
 
-                    {/* Nút xóa nhanh ngay trên góc ảnh khi đang chọn */}
-                    {isSelected && (
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDeleteImageLayer(layer.id);
-                        }}
-                        className="absolute -top-3 -right-3 size-6 rounded-full bg-rose-600 text-white flex items-center justify-center shadow-lg hover:bg-rose-700 transition cursor-pointer z-30"
-                        title="Xóa ảnh này"
-                      >
-                        <X className="size-3.5" />
-                      </button>
-                    )}
+                        {/* 2. Vòm Cung Heian */}
+                        {attendeeConfig.style === "heian_arch" && (
+                          <div className="relative">
+                            <img
+                              src={resolveMediaUrl(attendeeConfig.attendees[0].avatar) || SAFE_FALLBACK_AVATAR}
+                              alt=""
+                              onError={(e) => {
+                                e.currentTarget.onerror = null;
+                                (e.currentTarget as HTMLImageElement).src = SAFE_FALLBACK_AVATAR;
+                              }}
+                              className="w-13 h-16 rounded-t-[26px] rounded-b-lg object-cover border-2 border-amber-300 shadow-[0_4px_16px_rgba(245,158,11,0.5)]"
+                            />
+                            <span className="absolute -bottom-1 -right-1 px-1.5 py-0.2 rounded-full bg-amber-500 text-slate-950 text-[7px] font-black uppercase">
+                              CEO
+                            </span>
+                          </div>
+                        )}
+
+                        {/* 3. Bầu Dục Ngọc Trai */}
+                        {attendeeConfig.style === "oval_luxury" && (
+                          <div className="relative">
+                            <img
+                              src={resolveMediaUrl(attendeeConfig.attendees[0].avatar) || SAFE_FALLBACK_AVATAR}
+                              alt=""
+                              onError={(e) => {
+                                e.currentTarget.onerror = null;
+                                (e.currentTarget as HTMLImageElement).src = SAFE_FALLBACK_AVATAR;
+                              }}
+                              className="w-13 h-16 rounded-[45%] object-cover border-2 border-amber-200 shadow-[0_0_18px_rgba(254,240,138,0.55)]"
+                            />
+                            <span className="absolute -bottom-1 -right-1 px-1.5 py-0.2 rounded-full bg-amber-400 text-slate-950 text-[7px] font-black uppercase">
+                              CEO
+                            </span>
+                          </div>
+                        )}
+
+                        {/* 4. Mờ Viền Lông Vũ (Mép hòa tan mềm mại, mặt sắc nét) */}
+                        {attendeeConfig.style === "soft_feather" && (
+                          <div
+                            className="relative"
+                            style={{
+                              maskImage: `radial-gradient(circle at center, black 65%, transparent 100%)`,
+                              WebkitMaskImage: `radial-gradient(circle at center, black 65%, transparent 100%)`,
+                              filter:
+                                attendeeConfig.featherBlur > 0
+                                  ? `drop-shadow(0 0 ${attendeeConfig.featherBlur / 2}px rgba(251,191,36,0.6))`
+                                  : undefined,
+                            }}
+                          >
+                            <img
+                              src={resolveMediaUrl(attendeeConfig.attendees[0].avatar) || SAFE_FALLBACK_AVATAR}
+                              alt=""
+                              onError={(e) => {
+                                e.currentTarget.onerror = null;
+                                (e.currentTarget as HTMLImageElement).src = SAFE_FALLBACK_AVATAR;
+                              }}
+                              className="size-14 rounded-full object-cover"
+                            />
+                            <span className="absolute -bottom-0.5 -right-0.5 px-1 py-0.2 rounded-full bg-amber-500 text-slate-950 text-[7px] font-black uppercase">
+                              CEO
+                            </span>
+                          </div>
+                        )}
+
+                        {/* 5. Thẻ Nổi 3D */}
+                        {attendeeConfig.style === "3d_card" && (
+                          <div className="relative">
+                            <img
+                              src={resolveMediaUrl(attendeeConfig.attendees[0].avatar) || SAFE_FALLBACK_AVATAR}
+                              alt=""
+                              onError={(e) => {
+                                e.currentTarget.onerror = null;
+                                (e.currentTarget as HTMLImageElement).src = SAFE_FALLBACK_AVATAR;
+                              }}
+                              className="size-14 rounded-2xl object-cover border-2 border-cyan-400 shadow-[0_0_18px_rgba(103,232,249,0.5)]"
+                            />
+                            <span className="absolute -bottom-1 -right-1 px-1.5 py-0.2 rounded-full bg-cyan-400 text-slate-950 text-[7px] font-black uppercase">
+                              CEO
+                            </span>
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="flex-1 text-left min-w-0">
+                        <div className="text-[8px] font-bold uppercase tracking-wider text-amber-300">
+                          {attendeeConfig.attendees[0].roleInEvent}
+                        </div>
+                        <div className="font-black text-white truncate drop-shadow-sm text-sm">
+                          {attendeeConfig.attendees[0].name}
+                        </div>
+                        {attendeeConfig.showTitle && (
+                          <div className="text-[9.5px] text-cyan-200 truncate">
+                            {attendeeConfig.attendees[0].title}
+                          </div>
+                        )}
+                        {attendeeConfig.showCompany && (
+                          <div className="text-[8.5px] text-slate-300 truncate">
+                            {attendeeConfig.attendees[0].company}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+              {/* ── KHỐI HỘP ĐẶC QUYỀN CAPSULE ── */}
+              {blocksLayout.capsule?.visible !== false && (
+                <div
+                  onMouseDown={(e) => handleMouseDownItem("block", "capsule", e)}
+                  onTouchStart={(e) => handleMouseDownItem("block", "capsule", e)}
+                  style={{
+                    position: "absolute",
+                    left: `${blocksLayout.capsule?.x ?? 50}%`,
+                    top: `${blocksLayout.capsule?.y ?? 63}%`,
+                    transform: "translate(-50%, 0)",
+                    zIndex: blocksLayout.capsule?.zIndex ?? 10,
+                  }}
+                  className={`w-[90%] text-center transition-shadow cursor-move group select-none ${selectedBlockId === "capsule"
+                      ? "ring-2 ring-amber-400 ring-dashed"
+                      : "hover:outline hover:outline-1 hover:outline-sky-400/50"
+                    }`}
+                >
+                  <div className="inline-block px-3 py-1 rounded-full border border-cyan-300/60 bg-gradient-to-r from-cyan-400/25 via-cyan-200/40 to-cyan-400/25 shadow-[0_2px_12px_rgba(103,232,249,0.35)] backdrop-blur-xs">
+                    <span className="text-[7.5px] sm:text-[8px] font-black uppercase tracking-wider text-slate-950">
+                      {capsuleBadge}
+                    </span>
+                  </div>
+                  <div className="text-xs sm:text-[13px] font-black uppercase tracking-wide text-white drop-shadow-md mt-1">
+                    {capsuleBenefit}
+                  </div>
+                  <div className="text-[8px] sm:text-[8.5px] text-slate-300 font-light italic mt-0.5">
+                    {capsuleNote}
+                  </div>
+                </div>
+              )}
+
+              {/* ── KHỐI CỤM NGÀY GIỜ SỐ LỚN ── */}
+              {blocksLayout.datetime?.visible !== false && (
+                <div
+                  onMouseDown={(e) => handleMouseDownItem("block", "datetime", e)}
+                  onTouchStart={(e) => handleMouseDownItem("block", "datetime", e)}
+                  style={{
+                    position: "absolute",
+                    left: `${blocksLayout.datetime?.x ?? 50}%`,
+                    top: `${blocksLayout.datetime?.y ?? 72}%`,
+                    transform: "translate(-50%, 0)",
+                    zIndex: blocksLayout.datetime?.zIndex ?? 10,
+                  }}
+                  className={`w-[90%] text-center transition-shadow cursor-move group select-none ${selectedBlockId === "datetime"
+                      ? "ring-2 ring-amber-400 ring-dashed"
+                      : "hover:outline hover:outline-1 hover:outline-sky-400/50"
+                    }`}
+                >
+                  <div className="flex items-center justify-center gap-1.5 text-xs text-cyan-300 font-medium">
+                    <span>{dayOfWeek}</span>
+                    <Clock className="size-3 text-cyan-300" />
+                    <span>{timeHour}</span>
+                  </div>
+
+                  <div className="flex items-center justify-center gap-3 text-3xl sm:text-4xl font-serif font-normal text-white drop-shadow-[0_4px_12px_rgba(0,0,0,0.8)] tracking-widest my-0.5">
+                    <span>{dayDigits}</span>
+                    <span className="text-cyan-200/60 font-light text-2xl">|</span>
+                    <span>{monthDigits}</span>
+                    <span className="text-cyan-200/60 font-light text-2xl">|</span>
+                    <span>{yearDigits}</span>
+                  </div>
+
+                  <div className="flex items-center justify-center gap-1 text-[9px] sm:text-[9.5px] text-slate-200 font-light">
+                    <MapPin className="size-3 text-rose-400 shrink-0" />
+                    <span className="truncate max-w-xs">{eventLocation}</span>
+                  </div>
+                </div>
+              )}
+
+              {/* ── RENDER CÁC LỚP ẢNH TỰ DO (MULTI-IMAGE LAYERS WITH RESIZE & DRAG) ── */}
+              {imageLayers
+                .filter((l) => l.visible !== false)
+                .map((layer) => {
+                  const isSelected = selectedImageLayerId === layer.id;
+                  return (
+                    <div
+                      key={layer.id}
+                      onMouseDown={(e) => handleMouseDownItem("image", layer.id, e)}
+                      onTouchStart={(e) => handleMouseDownItem("image", layer.id, e)}
+                      style={{
+                        position: "absolute",
+                        left: `${layer.x}%`,
+                        top: `${layer.y}%`,
+                        width: `${layer.width}px`,
+                        height: `${layer.height}px`,
+                        transform: `translate(-50%, -50%) scale(${layer.scale / 100}) rotate(${layer.rotation}deg)`,
+                        opacity: layer.opacity / 100,
+                        filter: layer.featherBlur > 0 ? `blur(${layer.featherBlur / 5}px)` : "none",
+                        zIndex: layer.zIndex,
+                      }}
+                      className={`cursor-move select-none transition-shadow ${isSelected
+                          ? "ring-2 ring-purple-400 ring-dashed shadow-2xl"
+                          : "hover:outline hover:outline-1 hover:outline-purple-400/50"
+                        }`}
+                    >
+                      <img
+                        src={layer.url}
+                        alt={layer.name}
+                        className={`w-full h-full object-cover pointer-events-none ${layer.shape === "circle"
+                            ? "rounded-full"
+                            : layer.shape === "arch"
+                              ? "rounded-t-[80px] rounded-b-xl"
+                              : layer.shape === "oval"
+                                ? "rounded-[50%]"
+                                : layer.shape === "rounded"
+                                  ? "rounded-2xl"
+                                  : "rounded-none"
+                          }`}
+                      />
+
+                      {/* Nút xóa nhanh ngay trên góc ảnh khi đang chọn */}
+                      {isSelected && (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteImageLayer(layer.id);
+                          }}
+                          className="absolute -top-3 -right-3 size-6 rounded-full bg-rose-600 text-white flex items-center justify-center shadow-lg hover:bg-rose-700 transition cursor-pointer z-30"
+                          title="Xóa ảnh này"
+                        >
+                          <X className="size-3.5" />
+                        </button>
+                      )}
+                    </div>
+                  );
+                })}
+
+              {/* ── RENDER CÁC DÒNG CHỮ TỰ DO (CUSTOM TEXT LAYERS) ── */}
+              {customTextLayers.map((textLayer) => {
+                const isSelected = selectedCustomTextId === textLayer.id;
+                return (
+                  <div
+                    key={textLayer.id}
+                    onMouseDown={(e) => handleMouseDownItem("custom_text", textLayer.id, e)}
+                    onTouchStart={(e) => handleMouseDownItem("custom_text", textLayer.id, e)}
+                    style={{
+                      position: "absolute",
+                      left: `${textLayer.x}%`,
+                      top: `${textLayer.y}%`,
+                      transform: "translate(-50%, -50%)",
+                      zIndex: textLayer.zIndex,
+                    }}
+                    className={`cursor-move select-none text-center px-2 py-1 ${isSelected ? "ring-2 ring-blue-400 ring-dashed" : "hover:ring-1 hover:ring-blue-300"
+                      }`}
+                  >
+                    <span
+                      className={`${getFontSizeClass(textLayer.fontSize)} ${getFontFamilyClass(
+                        textLayer.fontFamily
+                      )} ${getGradientClass(textLayer.colorGradient)}`}
+                    >
+                      {textLayer.text}
+                    </span>
                   </div>
                 );
               })}
 
-            {/* ── RENDER CÁC DÒNG CHỮ TỰ DO (CUSTOM TEXT LAYERS) ── */}
-            {customTextLayers.map((textLayer) => {
-              const isSelected = selectedCustomTextId === textLayer.id;
-              return (
+              {/* ── LỜI KẾT ── */}
+              {blocksLayout.salute?.visible !== false && (
                 <div
-                  key={textLayer.id}
-                  onMouseDown={(e) => handleMouseDownItem("custom_text", textLayer.id, e)}
-                  onTouchStart={(e) => handleMouseDownItem("custom_text", textLayer.id, e)}
+                  onMouseDown={(e) => handleMouseDownItem("block", "salute", e)}
+                  onTouchStart={(e) => handleMouseDownItem("block", "salute", e)}
                   style={{
                     position: "absolute",
-                    left: `${textLayer.x}%`,
-                    top: `${textLayer.y}%`,
-                    transform: "translate(-50%, -50%)",
-                    zIndex: textLayer.zIndex,
+                    left: `${blocksLayout.salute?.x ?? 50}%`,
+                    top: `${blocksLayout.salute?.y ?? 93}%`,
+                    transform: "translate(-50%, 0)",
+                    zIndex: blocksLayout.salute?.zIndex ?? 10,
                   }}
-                  className={`cursor-move select-none text-center px-2 py-1 ${
-                    isSelected ? "ring-2 ring-blue-400 ring-dashed" : "hover:ring-1 hover:ring-blue-300"
-                  }`}
+                  className={`w-[90%] text-center cursor-move select-none ${selectedBlockId === "salute" ? "ring-2 ring-amber-400 ring-dashed" : ""
+                    }`}
                 >
-                  <span
-                    className={`${getFontSizeClass(textLayer.fontSize)} ${getFontFamilyClass(
-                      textLayer.fontFamily
-                    )} ${getGradientClass(textLayer.colorGradient)}`}
-                  >
-                    {textLayer.text}
-                  </span>
+                  <div className="text-[10px] font-serif italic font-semibold text-sky-200 tracking-wide drop-shadow-md">
+                    {saluteText}
+                  </div>
                 </div>
-              );
-            })}
+              )}
 
-            {/* ── LỜI KẾT ── */}
-            {blocksLayout.salute?.visible !== false && (
-              <div
-                onMouseDown={(e) => handleMouseDownItem("block", "salute", e)}
-                onTouchStart={(e) => handleMouseDownItem("block", "salute", e)}
-                style={{
-                  position: "absolute",
-                  left: `${blocksLayout.salute?.x ?? 50}%`,
-                  top: `${blocksLayout.salute?.y ?? 93}%`,
-                  transform: "translate(-50%, 0)",
-                  zIndex: blocksLayout.salute?.zIndex ?? 10,
-                }}
-                className={`w-[90%] text-center cursor-move select-none ${
-                  selectedBlockId === "salute" ? "ring-2 ring-amber-400 ring-dashed" : ""
-                }`}
-              >
-                <div className="text-[10px] font-serif italic font-semibold text-sky-200 tracking-wide drop-shadow-md">
-                  {saluteText}
+              {/* ── MÃ QR CHECK-IN ── */}
+              {blocksLayout.qr?.visible !== false && (
+                <div
+                  onMouseDown={(e) => handleMouseDownItem("block", "qr", e)}
+                  onTouchStart={(e) => handleMouseDownItem("block", "qr", e)}
+                  style={{
+                    position: "absolute",
+                    left: `${blocksLayout.qr?.x ?? 86}%`,
+                    top: `${blocksLayout.qr?.y ?? 88}%`,
+                    transform: "translate(-50%, -50%)",
+                    zIndex: blocksLayout.qr?.zIndex ?? 12,
+                  }}
+                  className={`cursor-move p-1.5 rounded-xl backdrop-blur-md bg-white/95 shadow-xl transition-all select-none ${selectedBlockId === "qr" ? "ring-2 ring-amber-400 ring-dashed" : "hover:ring-1 hover:ring-sky-400"
+                    }`}
+                >
+                  <QrCode className="size-8 sm:size-9 text-slate-900" />
+                  <div className="text-[6.5px] font-black uppercase text-center text-slate-900 tracking-tighter mt-0.5">
+                    Quét QR
+                  </div>
                 </div>
-              </div>
-            )}
-
-            {/* ── MÃ QR CHECK-IN ── */}
-            {blocksLayout.qr?.visible !== false && (
-              <div
-                onMouseDown={(e) => handleMouseDownItem("block", "qr", e)}
-                onTouchStart={(e) => handleMouseDownItem("block", "qr", e)}
-                style={{
-                  position: "absolute",
-                  left: `${blocksLayout.qr?.x ?? 86}%`,
-                  top: `${blocksLayout.qr?.y ?? 88}%`,
-                  transform: "translate(-50%, -50%)",
-                  zIndex: blocksLayout.qr?.zIndex ?? 12,
-                }}
-                className={`cursor-move p-1.5 rounded-xl backdrop-blur-md bg-white/95 shadow-xl transition-all select-none ${
-                  selectedBlockId === "qr" ? "ring-2 ring-amber-400 ring-dashed" : "hover:ring-1 hover:ring-sky-400"
-                }`}
-              >
-                <QrCode className="size-8 sm:size-9 text-slate-900" />
-                <div className="text-[6.5px] font-black uppercase text-center text-slate-900 tracking-tighter mt-0.5">
-                  Quét QR
-                </div>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         </div>
       </div>
-    </div>
 
       {/* ── MODAL CẮT ẢNH CHUYÊN NGHIỆP ── */}
       <ImageCropModal

@@ -205,7 +205,7 @@ function ConnectAppMePage() {
             id: user.id,
             ownerUserId: user.id,
             displayName:
-              user.user_metadata?.full_name || user.email?.split("@")[0] || "Hội viên CEO HN10",
+              user.user_metadata?.full_name || user.email?.split("@")[0] || "Học viên CEO HN10",
             headline: null,
             jobTitle: null,
             companyName: null,
@@ -231,7 +231,7 @@ function ConnectAppMePage() {
             id: user.id,
             ownerUserId: user.id,
             displayName:
-              user.user_metadata?.full_name || user.email?.split("@")[0] || "Hội viên CEO HN10",
+              user.user_metadata?.full_name || user.email?.split("@")[0] || "Học viên CEO HN10",
             headline: null,
             jobTitle: null,
             companyName: null,
@@ -261,7 +261,7 @@ function ConnectAppMePage() {
             id: user.id,
             ownerUserId: user.id,
             displayName:
-              user.user_metadata?.full_name || user.email?.split("@")[0] || "Hội viên CEO HN10",
+              user.user_metadata?.full_name || user.email?.split("@")[0] || "Học viên CEO HN10",
             headline: null,
             jobTitle: null,
             companyName: null,
@@ -695,11 +695,10 @@ function ConnectAppMePage() {
                     type="button"
                     onClick={() => setLang(l.code)}
                     aria-pressed={lang === l.code}
-                    className={`rounded-2xl border px-3 py-2.5 text-[13px] font-semibold transition text-left flex items-center justify-between gap-1.5 cursor-pointer ${
-                      lang === l.code
+                    className={`rounded-2xl border px-3 py-2.5 text-[13px] font-semibold transition text-left flex items-center justify-between gap-1.5 cursor-pointer ${lang === l.code
                         ? "bg-[linear-gradient(135deg,#F6E1C3_0%,#D8B282_45%,#C29B69_70%,#8C653B_100%)] text-[#050c15] border-transparent font-bold shadow-xs"
                         : "border-[var(--bc-mobile-border)] text-[var(--bc-mobile-muted)] hover:border-[#D8B282]/50 hover:text-white"
-                    }`}
+                      }`}
                   >
                     <span className="flex items-center gap-2 min-w-0">
                       <span className="text-base shrink-0">{l.flag}</span>

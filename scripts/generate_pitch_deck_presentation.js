@@ -131,9 +131,9 @@ async function buildMasterPresentation() {
     });
 
     const cards = [
-      { num: '01', title: 'Web CRM Quản Trị', desc: 'Trung tâm kiểm soát dữ liệu hội viên, tài chính quỹ hội, sự kiện và đối soát tự động theo thời gian thực.' },
+      { num: '01', title: 'Web CRM Quản Trị', desc: 'Trung tâm kiểm soát dữ liệu Học viên, tài chính quỹ hội, sự kiện và đối soát tự động theo thời gian thực.' },
       { num: '02', title: 'Mobile App Doanh Nhân', desc: 'Văn phòng số bỏ túi: Thẻ VIP 3D, Radar kết nối, gian hàng Marketplace & mạng xã hội trao đổi cơ hội.' },
-      { num: '03', title: 'Đồng Bộ Hai Chiều Realtime', desc: 'Hội viên thao tác trên App -> Tự động đổ về CRM xét duyệt -> CRM đẩy thông báo và phân quyền tức thì xuống App.' },
+      { num: '03', title: 'Đồng Bộ Hai Chiều Realtime', desc: 'Học viên thao tác trên App -> Tự động đổ về CRM xét duyệt -> CRM đẩy thông báo và phân quyền tức thì xuống App.' },
     ];
     cards.forEach((c, idx) => {
       const x = 1.0 + idx * 3.9;
@@ -173,7 +173,7 @@ async function buildMasterPresentation() {
     const pains = [
       {
         title: 'Quản Lý Dữ Liệu Rời Rạc & Trôi Bài',
-        desc: 'Thông tin hội viên lưu phân tán trên nhiều file Excel cá nhân. Nhóm Zalo thường xuyên trôi tin nhắn, tài liệu quan trọng và nhu cầu hợp tác không thể tìm kiếm lại.',
+        desc: 'Thông tin Học viên lưu phân tán trên nhiều file Excel cá nhân. Nhóm Zalo thường xuyên trôi tin nhắn, tài liệu quan trọng và nhu cầu hợp tác không thể tìm kiếm lại.',
         icon: '📊'
       },
       {
@@ -188,7 +188,7 @@ async function buildMasterPresentation() {
       },
       {
         title: 'Giao Thương B2B Kém Hiệu Quả',
-        desc: 'Hội viên không nắm rõ thế mạnh, sản phẩm dịch vụ của nhau. Nhu cầu mua sắm nội khối bị bỏ lỡ, thiếu nền tảng số bảo đảm uy tín và ghi nhận giá trị deal kết nối.',
+        desc: 'Học viên không nắm rõ thế mạnh, sản phẩm dịch vụ của nhau. Nhu cầu mua sắm nội khối bị bỏ lỡ, thiếu nền tảng số bảo đảm uy tín và ghi nhận giá trị deal kết nối.',
         icon: '🤝'
       }
     ];
@@ -242,13 +242,13 @@ async function buildMasterPresentation() {
       {
         num: '01',
         title: 'GẮN KẾT BỀN CHẶT',
-        desc: 'Số hóa 100% hồ sơ hội viên thành định danh số. Thẻ VIP 3D và danh bạ thông minh giúp doanh nhân kết nối trong 1 chạm.',
+        desc: 'Số hóa 100% hồ sơ Học viên thành định danh số. Thẻ VIP 3D và danh bạ thông minh giúp doanh nhân kết nối trong 1 chạm.',
         badge: 'Định danh số'
       },
       {
         num: '02',
         title: 'CHIA SẺ CƠ HỘI',
-        desc: 'Bảng tin Trao cơ hội & Sàn B2B thúc đẩy giao thương nội khối, chuyển giao dự án và ưu đãi chéo giữa các hội viên.',
+        desc: 'Bảng tin Trao cơ hội & Sàn B2B thúc đẩy giao thương nội khối, chuyển giao dự án và ưu đãi chéo giữa các Học viên.',
         badge: 'B2B Commerce'
       },
       {
@@ -260,7 +260,7 @@ async function buildMasterPresentation() {
       {
         num: '04',
         title: 'PHÁT TRIỂN BỨT PHÁ',
-        desc: 'Báo cáo KPI phân tích thời gian thực giúp Ban Chấp Hành ra quyết định chiến lược, mở rộng mạng lưới hội viên chất lượng cao.',
+        desc: 'Báo cáo KPI phân tích thời gian thực giúp Ban Chấp Hành ra quyết định chiến lược, mở rộng mạng lưới Học viên chất lượng cao.',
         badge: 'Ra quyết định số'
       }
     ];
@@ -327,8 +327,8 @@ async function buildMasterPresentation() {
       color: C.WHITE, bold: true, fontSize: 11, align: 'center', valign: 'middle', fontFace: 'Calibri'
     });
     const crmPoints = [
-      'Tiếp nhận đơn đăng ký hội viên từ Landing & App.',
-      'Phê duyệt và cấp phát quyền hạn đa tầng (Admin, BCH, Hội viên).',
+      'Tiếp nhận đơn đăng ký Học viên từ Landing & App.',
+      'Phê duyệt và cấp phát quyền hạn đa tầng (Admin, BCH, Học viên).',
       'Khởi tạo sự kiện, thiết lập sơ đồ ghế Cinema và bảng giá vé.',
       'Duyệt gian hàng sản phẩm B2B và giám sát deal cơ hội.',
       'Quản lý thu chi, đối soát thanh toán tự động VietQR & niên phí.'
@@ -355,7 +355,7 @@ async function buildMasterPresentation() {
       x: 5.75, y: 3.55, w: 1.83, h: 0.6,
       color: C.WHITE, bold: true, fontSize: 28, align: 'center', fontFace: 'Calibri'
     });
-    slide.addText('Hội viên gửi:\n• Đăng ký sự kiện\n• Đăng sản phẩm\n• Gửi báo giá VIP\n• Gửi bày tỏ quan tâm\n\nCRM phản hồi:\n• Cập nhật trạng thái\n• Đẩy thông báo Push\n• Cấp vé QR Pass', {
+    slide.addText('Học viên gửi:\n• Đăng ký sự kiện\n• Đăng sản phẩm\n• Gửi báo giá VIP\n• Gửi bày tỏ quan tâm\n\nCRM phản hồi:\n• Cập nhật trạng thái\n• Đẩy thông báo Push\n• Cấp vé QR Pass', {
       x: 5.75, y: 4.2, w: 1.83, h: 2.0,
       color: 'CBD5E1', fontSize: 9.5, align: 'center', fontFace: 'Calibri'
     });
@@ -372,7 +372,7 @@ async function buildMasterPresentation() {
       fill: { color: C.GOLD_DARK },
       roundRadio: 0.08
     });
-    slide.addText('MOBILE APP HIỆP HỘI (VĂN PHÒNG HỘI VIÊN)', {
+    slide.addText('MOBILE APP HIỆP HỘI (VĂN PHÒNG Học viên)', {
       x: 8.18, y: 2.3, w: 4.1, h: 0.4,
       color: C.WHITE, bold: true, fontSize: 11, align: 'center', valign: 'middle', fontFace: 'Calibri'
     });
@@ -380,7 +380,7 @@ async function buildMasterPresentation() {
       'Nhận định danh số & Thẻ VIP 3D cá nhân hóa tức thời.',
       'Nhận vé Pass điện tử & Check-in QR 1 giây tại cửa sự kiện.',
       'Đăng sản phẩm lên Sàn B2B: Tác giả tự sửa/xóa bài, đối tác nhận báo giá VIP.',
-      'Đăng cơ hội kết nối: Xem danh sách hội viên quan tâm theo thời gian thực.',
+      'Đăng cơ hội kết nối: Xem danh sách Học viên quan tâm theo thời gian thực.',
       'Giao tiếp nội bộ: Trò chuyện 1-1, gọi thoại, gửi vị trí và danh thiếp số.'
     ];
     appPoints.forEach((pt, i) => {
@@ -414,8 +414,8 @@ async function buildMasterPresentation() {
     });
 
     const crmFeatures = [
-      { t: 'KPI Dashboard Thời Gian Thực:', d: 'Theo dõi tổng số hội viên chính thức, doanh thu sự kiện, tỷ lệ đóng phí và cơ hội B2B đang mở.' },
-      { t: 'Quản Lý Hội Viên & Phân Quyền:', d: 'Hồ sơ 360° doanh nghiệp, phân quyền đa tầng (Admin hệ thống, Ban Chấp Hành, Hội viên chính thức, Khách mời).' },
+      { t: 'KPI Dashboard Thời Gian Thực:', d: 'Theo dõi tổng số Học viên chính thức, doanh thu sự kiện, tỷ lệ đóng phí và cơ hội B2B đang mở.' },
+      { t: 'Quản Lý Học viên & Phân Quyền:', d: 'Hồ sơ 360° doanh nghiệp, phân quyền đa tầng (Admin hệ thống, Ban Chấp Hành, Học viên chính thức, Khách mời).' },
       { t: 'Trung Tâm Soát Vé & Sự Kiện:', d: 'Cấu hình vé miễn phí 0đ và thu phí VietQR tự động; sơ đồ ghế Cinema trực quan; đối soát check-in tức thì.' },
       { t: 'Kiểm Duyệt Marketplace & Cơ Hội:', d: 'Giám sát sàn giao thương, duyệt tin đăng sản phẩm và theo dõi giá trị deal kết nối giữa các thành viên.' }
     ];
@@ -452,11 +452,11 @@ async function buildMasterPresentation() {
   }
 
   // ---------------------------------------------------------------------------
-  // SLIDE 6: QUẢN LÝ HỘI VIÊN & PHÂN QUYỀN ĐA TẦNG TRÊN CRM
+  // SLIDE 6: QUẢN LÝ Học viên & PHÂN QUYỀN ĐA TẦNG TRÊN CRM
   // ---------------------------------------------------------------------------
   {
     const slide = pres.addSlide();
-    addSlideHeader(slide, pres, 'QUẢN TRỊ NHÂN SỰ HỘI', 'Quản Lý Hồ Sơ Hội Viên 360° & Phân Quyền Vai Trò Đa Tầng', 'Hồ sơ doanh nghiệp chuẩn hóa, mã hóa an toàn, phân quyền rõ ràng giữa Ban Lãnh Đạo và Hội Viên');
+    addSlideHeader(slide, pres, 'QUẢN TRỊ NHÂN SỰ HỘI', 'Quản Lý Hồ Sơ Học viên 360° & Phân Quyền Vai Trò Đa Tầng', 'Hồ sơ doanh nghiệp chuẩn hóa, mã hóa an toàn, phân quyền rõ ràng giữa Ban Lãnh Đạo và Học viên');
 
     // Left Column: Details
     slide.addShape(pres.ShapeType.rect, {
@@ -472,9 +472,9 @@ async function buildMasterPresentation() {
     });
 
     const memberFeatures = [
-      { t: 'Mã Hội Viên & Profile Chuẩn Hóa:', d: 'Cấp mã định danh duy nhất (VD: HN10-007), lưu trữ thông tin công ty, ngành nghề, mã số thuế, chức vụ và hotline.' },
-      { t: 'Phân Quyền Vai Trò (Roles & Permissions):', d: 'Tách bạch quyền hạn: Admin tối cao duyệt hội viên & sự kiện; BCH tra cứu báo cáo; Hội viên khai thác giao thương.' },
-      { t: 'Xuất Dữ Liệu Excel & Đối Soát:', d: 'Công cụ trích xuất danh sách hội viên, lịch sử nộp quỹ, tình trạng hoạt động chỉ trong 1 click phục vụ đại hội.' },
+      { t: 'Mã Học viên & Profile Chuẩn Hóa:', d: 'Cấp mã định danh duy nhất (VD: HN10-007), lưu trữ thông tin công ty, ngành nghề, mã số thuế, chức vụ và hotline.' },
+      { t: 'Phân Quyền Vai Trò (Roles & Permissions):', d: 'Tách bạch quyền hạn: Admin tối cao duyệt Học viên & sự kiện; BCH tra cứu báo cáo; Học viên khai thác giao thương.' },
+      { t: 'Xuất Dữ Liệu Excel & Đối Soát:', d: 'Công cụ trích xuất danh sách Học viên, lịch sử nộp quỹ, tình trạng hoạt động chỉ trong 1 click phục vụ đại hội.' },
       { t: 'Đồng Bộ Trạng Thái Tức Thời Với App:', d: 'Khi Admin kích hoạt hoặc thay đổi chức danh trên CRM, thẻ VIP và quyền truy cập trên App tự động cập nhật ngay.' }
     ];
 
@@ -531,7 +531,7 @@ async function buildMasterPresentation() {
 
     const appFeatures = [
       { t: 'Trang Chủ Dashboard Cá Nhân Hóa:', d: 'Hiển thị lời chào cá nhân, chức danh CLB, sự kiện sắp diễn ra gần nhất và các cơ hội kinh doanh mới nổi bật.' },
-      { t: 'Thanh Điều Hướng Nghiệp Vụ 1 Chạm:', d: 'Truy cập nhanh chóng: Sự kiện & Check-in, Sàn B2B, Trao cơ hội, Danh bạ hội viên và Kênh chat mật.' },
+      { t: 'Thanh Điều Hướng Nghiệp Vụ 1 Chạm:', d: 'Truy cập nhanh chóng: Sự kiện & Check-in, Sàn B2B, Trao cơ hội, Danh bạ Học viên và Kênh chat mật.' },
       { t: 'Công Nghệ PWA & Native App Đồng Bộ:', d: 'Hỗ trợ tải ứng dụng mượt mà trên iOS (IPA/PWA) và Android (APK). Tự động cập nhật không cần cài lại.' },
       { t: 'Giao Diện Hai Chế Độ Sáng / Tối (Dark Mode):', d: 'Thiết kế chuẩn Luxury Gold - Royal Navy, bảo vệ thị giác và tối ưu hiển thị cho các lãnh đạo doanh nghiệp.' }
     ];
@@ -568,11 +568,11 @@ async function buildMasterPresentation() {
   }
 
   // ---------------------------------------------------------------------------
-  // SLIDE 8: THẺ HỘI VIÊN VIP 3D & RADAR KẾT NỐI DOANH NHÂN
+  // SLIDE 8: THẺ Học viên VIP 3D & RADAR KẾT NỐI DOANH NHÂN
   // ---------------------------------------------------------------------------
   {
     const slide = pres.addSlide();
-    addSlideHeader(slide, pres, 'ĐỊNH DANH SỐ ĐẲNG CẤP', 'Thẻ Hội Viên VIP 3D Ánh Vàng & Radar Định Vị Không Dây', 'Giải pháp thay thế danh thiếp giấy truyền thống, nâng tầm vị thế thương hiệu cá nhân của mỗi CEO');
+    addSlideHeader(slide, pres, 'ĐỊNH DANH SỐ ĐẲNG CẤP', 'Thẻ Học viên VIP 3D Ánh Vàng & Radar Định Vị Không Dây', 'Giải pháp thay thế danh thiếp giấy truyền thống, nâng tầm vị thế thương hiệu cá nhân của mỗi CEO');
 
     // Left Column: Details
     slide.addShape(pres.ShapeType.rect, {
@@ -590,8 +590,8 @@ async function buildMasterPresentation() {
     const cardFeatures = [
       { t: 'Thẻ VIP 3D Lật 2 Mặt Hologram:', d: 'Mặt trước khắc nổi tên, công ty, chức vụ và logo HanoiBA; mặt sau chứa mã QR định danh số mã hóa bảo mật.' },
       { t: 'Danh Thiếp Số Công Khai (Public Card):', d: 'Mở link danh thiếp bằng cách quét mã QR hoặc chạm NFC. Đối tác không cần cài app vẫn xem và lưu danh bạ 1 chạm.' },
-      { t: 'Radar Quét Tìm Hội Viên Xung Quanh:', d: 'Tính năng định vị doanh nhân tham dự trong cùng phòng họp hoặc hội trường để kết nối giao lưu tức thời.' },
-      { t: 'Huy Hiệu Xác Thực CLB CEO HN10:', d: 'Chứng nhận hội viên chính thức với dấu tích xanh đã thẩm định uy tín từ Ban Chấp Hành hiệp hội.' }
+      { t: 'Radar Quét Tìm Học viên Xung Quanh:', d: 'Tính năng định vị doanh nhân tham dự trong cùng phòng họp hoặc hội trường để kết nối giao lưu tức thời.' },
+      { t: 'Huy Hiệu Xác Thực CLB CEO HN10:', d: 'Chứng nhận Học viên chính thức với dấu tích xanh đã thẩm định uy tín từ Ban Chấp Hành hiệp hội.' }
     ];
 
     cardFeatures.forEach((f, i) => {
@@ -635,7 +635,7 @@ async function buildMasterPresentation() {
     const evCards = [
       {
         title: 'LUỒNG 1: SỰ KIỆN NỘI BỘ (MIỄN PHÍ 0Đ)',
-        desc: 'Hội viên đăng ký 1 chạm -> Tự động xác thực quyền hội viên -> Cấp ngay Vé Pass điện tử chứa mã QR Check-in & Số bốc thăm may mắn.',
+        desc: 'Học viên đăng ký 1 chạm -> Tự động xác thực quyền Học viên -> Cấp ngay Vé Pass điện tử chứa mã QR Check-in & Số bốc thăm may mắn.',
         badge: 'Miễn phí 0đ',
         color: C.EMERALD
       },
@@ -647,7 +647,7 @@ async function buildMasterPresentation() {
       },
       {
         title: 'SƠ ĐỒ GHẾ NGỒI CINEMA TRỰC QUAN',
-        desc: 'Sắp xếp chỗ ngồi theo từng bàn tiệc hoặc dãy ghế VIP dành riêng cho Lãnh đạo, Nhà tài trợ và Hội viên; loại bỏ hoàn toàn tình trạng nhầm lẫn vị trí.',
+        desc: 'Sắp xếp chỗ ngồi theo từng bàn tiệc hoặc dãy ghế VIP dành riêng cho Lãnh đạo, Nhà tài trợ và Học viên; loại bỏ hoàn toàn tình trạng nhầm lẫn vị trí.',
         badge: 'Cinema Seat Map',
         color: C.GOLD_DARK
       },
@@ -717,9 +717,9 @@ async function buildMasterPresentation() {
     });
 
     const marketFeatures = [
-      { t: 'Phân Quyền Tác Giả Sở Hữu Tin Đăng:', d: 'Hội viên đăng bài sẽ hiển thị huy hiệu "Sản phẩm của bạn", kèm nút Sửa / Xóa tin nhanh chóng, không bị nút "Nhận báo giá VIP" đè lên chính mình.' },
-      { t: 'Nút "Nhận Báo Giá VIP" Cho Đối Tác:', d: 'Hội viên khác khi quan tâm sản phẩm sẽ gửi yêu cầu báo giá VIP trực tiếp đến chủ doanh nghiệp, thông báo tức thời qua App & CRM.' },
-      { t: 'Mức Giá Ưu Đãi Nội Khối CEO HN10:', d: 'Hiển thị giá thị trường và giá độc quyền dành riêng cho hội viên CLB CEO HN10, khuyến khích ưu tiên tiêu dùng sản phẩm của nhau.' },
+      { t: 'Phân Quyền Tác Giả Sở Hữu Tin Đăng:', d: 'Học viên đăng bài sẽ hiển thị huy hiệu "Sản phẩm của bạn", kèm nút Sửa / Xóa tin nhanh chóng, không bị nút "Nhận báo giá VIP" đè lên chính mình.' },
+      { t: 'Nút "Nhận Báo Giá VIP" Cho Đối Tác:', d: 'Học viên khác khi quan tâm sản phẩm sẽ gửi yêu cầu báo giá VIP trực tiếp đến chủ doanh nghiệp, thông báo tức thời qua App & CRM.' },
+      { t: 'Mức Giá Ưu Đãi Nội Khối CEO HN10:', d: 'Hiển thị giá thị trường và giá độc quyền dành riêng cho Học viên CLB CEO HN10, khuyến khích ưu tiên tiêu dùng sản phẩm của nhau.' },
       { t: 'Đồng Bộ Hóa Đơn Hàng Về CRM:', d: 'Mọi giao dịch báo giá và lượt xem sản phẩm đều được tổng hợp về Web CRM để Ban Xúc tiến Thương mại theo dõi hỗ trợ.' }
     ];
 
@@ -776,8 +776,8 @@ async function buildMasterPresentation() {
 
     const oppFeatures = [
       { t: 'Đăng Tin Cơ Hội Chuẩn Định Dạng VNĐ:', d: 'Trường nhập ngân sách tối thiểu - tối đa tự động có ký tự phân cách hàng nghìn (VD: 50.000.000 - 200.000.000 đ), giúp thông tin rõ ràng, chuyên nghiệp.' },
-      { t: 'Phân Quyền Chủ Sở Hữu Cơ Hội:', d: 'Chủ bài đăng hiển thị nút "Cơ hội của bạn" để theo dõi danh sách hội viên bấm quan tâm và hotline liên hệ; không bị hiển thị nút tự quan tâm cơ hội của mình.' },
-      { t: 'Danh Sách Hội Viên Quan Tâm Realtime:', d: 'Hội viên ấn "Quan tâm" -> Ngay lập tức người đăng nhận được danh sách liên hệ gồm Họ tên, Số điện thoại và Doanh nghiệp để kết nối giao thương.' },
+      { t: 'Phân Quyền Chủ Sở Hữu Cơ Hội:', d: 'Chủ bài đăng hiển thị nút "Cơ hội của bạn" để theo dõi danh sách Học viên bấm quan tâm và hotline liên hệ; không bị hiển thị nút tự quan tâm cơ hội của mình.' },
+      { t: 'Danh Sách Học viên Quan Tâm Realtime:', d: 'Học viên ấn "Quan tâm" -> Ngay lập tức người đăng nhận được danh sách liên hệ gồm Họ tên, Số điện thoại và Doanh nghiệp để kết nối giao thương.' },
       { t: 'Xác Thực Giá Trị Hợp Đồng Trực Tiếp CRM:', d: 'Mỗi cơ hội chốt thành công được ghi nhận vào hệ thống CRM nhằm vinh danh các thành viên có đóng góp lớn cho sự phát triển của CLB.' }
     ];
 
@@ -875,7 +875,7 @@ async function buildMasterPresentation() {
   // ---------------------------------------------------------------------------
   {
     const slide = pres.addSlide();
-    addSlideHeader(slide, pres, 'MINH BẠCH TÀI CHÍNH', 'Quản Lý Quỹ Hội, Niên Phí & Thu Chi Minh Bạch Đối Soát Tự Động', 'Xây dựng lòng tin tuyệt đối giữa hội viên và Ban Điều Hành nhờ hệ thống kế toán quỹ số hóa chuẩn chỉ');
+    addSlideHeader(slide, pres, 'MINH BẠCH TÀI CHÍNH', 'Quản Lý Quỹ Hội, Niên Phí & Thu Chi Minh Bạch Đối Soát Tự Động', 'Xây dựng lòng tin tuyệt đối giữa Học viên và Ban Điều Hành nhờ hệ thống kế toán quỹ số hóa chuẩn chỉ');
 
     // Left Column: Details
     slide.addShape(pres.ShapeType.rect, {
@@ -891,8 +891,8 @@ async function buildMasterPresentation() {
     });
 
     const feeFeatures = [
-      { t: 'Theo Dõi Tình Trạng Niên Phí Từng Hội Viên:', d: 'Phân loại trực quan: Đã đóng, Chưa đóng, Sắp đến hạn; tra cứu lịch sử đóng quỹ qua từng năm rõ ràng.' },
-      { t: 'Thông Báo Nhắc Phí Tự Động Đa Kênh:', d: 'Hệ thống tự động gửi thông báo nhắc gia hạn hội viên qua App Push và Email kèm mã VietQR đóng phí tiện lợi.' },
+      { t: 'Theo Dõi Tình Trạng Niên Phí Từng Học viên:', d: 'Phân loại trực quan: Đã đóng, Chưa đóng, Sắp đến hạn; tra cứu lịch sử đóng quỹ qua từng năm rõ ràng.' },
+      { t: 'Thông Báo Nhắc Phí Tự Động Đa Kênh:', d: 'Hệ thống tự động gửi thông báo nhắc gia hạn Học viên qua App Push và Email kèm mã VietQR đóng phí tiện lợi.' },
       { t: 'Sổ Thu - Chi Quỹ Minh Bạch Thời Gian Thực:', d: 'Ghi nhận chi tiết từng khoản thu (hội phí, tài trợ sự kiện) và khoản chi (từ thiện, hoạt động CLB) có hóa đơn kèm theo.' },
       { t: 'Báo Cáo Tài Chính Chuẩn Bị Cho Đại Hội:', d: 'Tự động xuất báo cáo ngân sách và dòng tiền trực quan, phục vụ công tác thanh tra tài chính định kỳ của CLB.' }
     ];
@@ -933,7 +933,7 @@ async function buildMasterPresentation() {
   // ---------------------------------------------------------------------------
   {
     const slide = pres.addSlide();
-    addSlideHeader(slide, pres, 'TUYỂN MỘ HỘI VIÊN MỚI', 'Cổng Thông Tin Đối Ngoại Landing 3D & Cấp Tài Khoản Tự Động', 'Trải nghiệm gia nhập ấn tượng: Đăng ký trực tuyến, Admin duyệt trên CRM, hệ thống tự cấp mật khẩu qua Email');
+    addSlideHeader(slide, pres, 'TUYỂN MỘ Học viên MỚI', 'Cổng Thông Tin Đối Ngoại Landing 3D & Cấp Tài Khoản Tự Động', 'Trải nghiệm gia nhập ấn tượng: Đăng ký trực tuyến, Admin duyệt trên CRM, hệ thống tự cấp mật khẩu qua Email');
 
     // Left Column: Details
     slide.addShape(pres.ShapeType.rect, {
@@ -943,13 +943,13 @@ async function buildMasterPresentation() {
       roundRadio: 0.1
     });
 
-    slide.addText('Quy Trình Onboarding Hội Viên Tự Động:', {
+    slide.addText('Quy Trình Onboarding Học viên Tự Động:', {
       x: 1.05, y: 2.3, w: 4.7, h: 0.35,
       color: C.NAVY_PRIMARY, bold: true, fontSize: 13, fontFace: 'Calibri'
     });
 
     const landingFeatures = [
-      { t: 'Landing Page 3D Điện Ảnh Sang Trọng:', d: 'Cổng thông tin đối ngoại giới thiệu tôn chỉ, cơ cấu lãnh đạo và quyền lợi đặc quyền của hội viên CLB CEO HN10.' },
+      { t: 'Landing Page 3D Điện Ảnh Sang Trọng:', d: 'Cổng thông tin đối ngoại giới thiệu tôn chỉ, cơ cấu lãnh đạo và quyền lợi đặc quyền của Học viên CLB CEO HN10.' },
       { t: 'Biểu Mẫu Gia Nhập Trực Tuyến 24/7:', d: 'Ứng viên điền thông tin doanh nghiệp, đính kèm hồ sơ và logo công ty trực tiếp ngay trên trang web.' },
       { t: 'Luồng Phê Duyệt 1 Chạm Trên CRM:', d: 'Ban Thư ký thẩm định hồ sơ và nhấn "Phê duyệt" trên Web CRM; không cần nhập liệu thủ công lại.' },
       { t: 'Gửi Email Thông Báo & Mật Khẩu (SMTP):', d: 'Hệ thống tự động kích hoạt tài khoản và gửi email chúc mừng kèm thông tin đăng nhập và liên kết tải Mobile App.' }
@@ -997,13 +997,13 @@ async function buildMasterPresentation() {
       {
         stat: '85%',
         title: 'Tiết Kiệm Thời Gian Thư Ký',
-        desc: 'Tự động hóa hoàn toàn việc nhắc phí, đối soát danh sách, soát vé sự kiện và gửi thông báo, giúp văn phòng hội tập trung phát triển hội viên.',
+        desc: 'Tự động hóa hoàn toàn việc nhắc phí, đối soát danh sách, soát vé sự kiện và gửi thông báo, giúp văn phòng hội tập trung phát triển Học viên.',
         color: C.NAVY_PRIMARY
       },
       {
         stat: '300%',
         title: 'Tăng Trưởng Giao Thương Nội Khối',
-        desc: 'Sàn B2B và Bảng tin Trao cơ hội giúp hội viên dễ dàng tiếp cận nhu cầu của nhau, tăng gấp 3 lần số lượng giao dịch và giá trị hợp đồng kết nối.',
+        desc: 'Sàn B2B và Bảng tin Trao cơ hội giúp Học viên dễ dàng tiếp cận nhu cầu của nhau, tăng gấp 3 lần số lượng giao dịch và giá trị hợp đồng kết nối.',
         color: C.GOLD_DARK
       },
       {
@@ -1086,8 +1086,8 @@ async function buildMasterPresentation() {
 
     const milestones = [
       { step: 'GIAI ĐOẠN 1', time: 'Tháng 09/2026', title: 'Hoàn Tất Kiểm Thử & Chuyển Giao', desc: 'Kiểm thử toàn diện luồng nghiệp vụ trên Live HTTPS; bàn giao tài khoản quản trị tối cao cho Ban Thư Ký.' },
-      { step: 'GIAI ĐOẠN 2', time: 'Tháng 10/2026', title: 'Đào Tạo & Nhập Liệu Hội Viên', desc: 'Tổ chức buổi tập huấn hướng dẫn sử dụng Web CRM cho Ban Điều Hành; nhập liệu 100+ doanh nghiệp hội viên chính thức.' },
-      { step: 'GIAI ĐOẠN 3', time: 'Tháng 11/2026', title: 'Ra Mắt Chính Thức Tại Đại Hội', desc: 'Kích hoạt Thẻ VIP 3D cho toàn thể hội viên; áp dụng quy trình Check-in QR Pass và Lucky Draw tại sự kiện lớn của CLB.' },
+      { step: 'GIAI ĐOẠN 2', time: 'Tháng 10/2026', title: 'Đào Tạo & Nhập Liệu Học viên', desc: 'Tổ chức buổi tập huấn hướng dẫn sử dụng Web CRM cho Ban Điều Hành; nhập liệu 100+ doanh nghiệp Học viên chính thức.' },
+      { step: 'GIAI ĐOẠN 3', time: 'Tháng 11/2026', title: 'Ra Mắt Chính Thức Tại Đại Hội', desc: 'Kích hoạt Thẻ VIP 3D cho toàn thể Học viên; áp dụng quy trình Check-in QR Pass và Lucky Draw tại sự kiện lớn của CLB.' },
       { step: 'GIAI ĐOẠN 4', time: 'Năm 2027+', title: 'Bảo Trì & Nâng Cấp Liên Tục', desc: 'Đồng hành hỗ trợ kỹ thuật 24/7; liên tục bổ sung các tiện ích số mới theo nhu cầu phát triển mở rộng của hiệp hội.' },
     ];
 
@@ -1170,25 +1170,25 @@ async function buildMasterPresentation() {
 - Nhu cầu giao thương B2B nội khối bị bỏ lỡ do thiếu sàn kết nối chuẩn hóa.
 
 ### SLIDE 3: TẦM NHÌN & SỨ MỆNH: GẮN KẾT - CHIA SẺ - ĐỒNG HÀNH - PHÁT TRIỂN
-- 01. Gắn kết bền chặt: Định danh số cho 100% hội viên.
+- 01. Gắn kết bền chặt: Định danh số cho 100% Học viên.
 - 02. Chia sẻ cơ hội: Bảng tin cơ hội B2B và Sàn thương mại nội khối.
 - 03. Đồng hành vận hành: Web CRM hỗ trợ tự động hóa Ban Thư Ký.
 - 04. Phát triển bứt phá: Ra quyết định dựa trên số liệu KPI phân tích trực quan.
 
 ### SLIDE 4: KIẾN TRÚC ĐỒNG BỘ HAI CHIỀU (CRM QUẢN TRỊ ⇄ APP HIỆP HỘI)
 - **Web CRM Điều Hành**: Tiếp nhận đăng ký, duyệt bài, cấu hình sự kiện, quản lý thu chi.
-- **Đồng bộ thời gian thực**: Hội viên thao tác -> Tự động đổ về CRM xét duyệt -> CRM phản hồi trạng thái, gửi thông báo Push & cấp vé tức thời.
-- **Mobile App Hội Viên**: Nhận Thẻ VIP 3D, vé QR Pass, đăng bài sản phẩm/cơ hội, quản lý người quan tâm.
+- **Đồng bộ thời gian thực**: Học viên thao tác -> Tự động đổ về CRM xét duyệt -> CRM phản hồi trạng thái, gửi thông báo Push & cấp vé tức thời.
+- **Mobile App Học viên**: Nhận Thẻ VIP 3D, vé QR Pass, đăng bài sản phẩm/cơ hội, quản lý người quan tâm.
 
 ### SLIDE 5: TỔNG QUAN WEB CRM QUẢN TRỊ - BỘ NÃO ĐIỀU HÀNH TẬP TRUNG
 - **Ảnh chụp thực tế**: \`crm_02_dashboard_kpi.png\`
-- Dashboard tổng hợp KPI hội viên, dòng tiền sự kiện, trạng thái gian hàng.
+- Dashboard tổng hợp KPI Học viên, dòng tiền sự kiện, trạng thái gian hàng.
 - Báo cáo biểu đồ tài chính và tỷ lệ tương tác theo ngày/tháng.
 
-### SLIDE 6: QUẢN TRỊ HỘI VIÊN & PHÂN QUYỀN ĐA TẦNG TRÊN CRM
+### SLIDE 6: QUẢN TRỊ Học viên & PHÂN QUYỀN ĐA TẦNG TRÊN CRM
 - **Ảnh chụp thực tế**: \`crm_03_members_list.png\`
-- Hồ sơ doanh nghiệp 360°, mã hội viên duy nhất.
-- Phân quyền chặt chẽ giữa Admin, Ban Chấp Hành và Hội Viên.
+- Hồ sơ doanh nghiệp 360°, mã Học viên duy nhất.
+- Phân quyền chặt chẽ giữa Admin, Ban Chấp Hành và Học viên.
 - Trích xuất file Excel danh sách và lịch sử hoạt động chỉ trong 1 click.
 
 ### SLIDE 7: TỔNG QUAN MOBILE APP HIỆP HỘI - VĂN PHÒNG SỐ BỎ TÚI
@@ -1197,14 +1197,14 @@ async function buildMasterPresentation() {
 - Thanh điều hướng 1 chạm cho các nghiệp vụ trọng tâm.
 - Hỗ trợ đa nền tảng iOS (IPA/PWA) và Android (APK).
 
-### SLIDE 8: THẺ HỘI VIÊN VIP 3D & RADAR KẾT NỐI DOANH NHÂN KHÔNG DÂY
+### SLIDE 8: THẺ Học viên VIP 3D & RADAR KẾT NỐI DOANH NHÂN KHÔNG DÂY
 - **Ảnh chụp thực tế**: \`09_app_vip_card.png\`
 - Thẻ mạ vàng 3D lật 2 mặt, tích hợp mã QR cá nhân hóa.
 - Danh thiếp số công khai (Public Card) chia sẻ không cần cài app.
 - Radar tìm kiếm doanh nhân tham dự xung quanh hội trường.
 
 ### SLIDE 9: TỰ ĐỘNG HÓA SỰ KIỆN: 2 LUỒNG MIỄN PHÍ (0Đ) & THU PHÍ VIETQR
-- Sự kiện miễn phí 0đ: Hội viên nhận ngay Vé Pass và mã check-in.
+- Sự kiện miễn phí 0đ: Học viên nhận ngay Vé Pass và mã check-in.
 - Hội thảo thu phí: Tự sinh mã VietQR động, đối soát Napas247 trong 3 giây.
 - Sơ đồ ghế ngồi Cinema Map tránh nhầm lẫn chỗ ngồi.
 - Soát vé QR 1 giây tại cửa và nạp dữ liệu vào Lucky Draw sân khấu.
@@ -1213,12 +1213,12 @@ async function buildMasterPresentation() {
 - **Ảnh chụp thực tế**: \`16_app_products_ecommerce_grid.png\`
 - Phân quyền tác giả: Nút "Sản phẩm của bạn" + Chỉnh sửa / Xóa tin.
 - Phân quyền đối tác: Nút "Nhận báo giá VIP" gửi yêu cầu trực tiếp.
-- Mức giá ưu đãi nội khối kích thích mua sắm giữa các hội viên.
+- Mức giá ưu đãi nội khối kích thích mua sắm giữa các Học viên.
 
 ### SLIDE 11: BẢNG TIN TRAO CƠ HỘI & KẾT NỐI GIAO THƯƠNG THỰC CHIẾN
 - **Ảnh chụp thực tế**: \`20_app_opportunities_feed.png\`
 - Nhập ngân sách VNĐ tự động có ký tự phân cách hàng nghìn (50.000.000 đ).
-- Danh sách hội viên quan tâm hiển thị theo thời gian thực kèm số điện thoại.
+- Danh sách Học viên quan tâm hiển thị theo thời gian thực kèm số điện thoại.
 - Giám sát tiến trình đàm phán và giá trị deal trên CRM.
 
 ### SLIDE 12: MẠNG LƯỚI NHẮN TIN & GIAO TIẾP NỘI BỘ BẢO MẬT
@@ -1233,7 +1233,7 @@ async function buildMasterPresentation() {
 - Nhắc phí tự động kèm mã VietQR qua App Push & Email.
 - Sổ quỹ thu chi minh bạch phục vụ công tác thanh tra tài chính.
 
-### SLIDE 14: CỔNG TIẾP NHẬN HỘI VIÊN LANDING 3D & CẤP QUYỀN TỰ ĐỘNG QUA EMAIL
+### SLIDE 14: CỔNG TIẾP NHẬN Học viên LANDING 3D & CẤP QUYỀN TỰ ĐỘNG QUA EMAIL
 - **Ảnh chụp thực tế**: \`01_landing_hero.png\`
 - Landing Page 3D điện ảnh giới thiệu quyền lợi gia nhập CLB CEO HN10.
 - Biểu mẫu ứng tuyển trực tuyến 24/7.
@@ -1242,12 +1242,12 @@ async function buildMasterPresentation() {
 ### SLIDE 15: HIỆU QUẢ ĐO LƯỜNG ĐƯỢC (ROI) SAU KHI VẬN HÀNH
 - Tiết kiệm 85% thời gian thủ công của Ban Thư Ký.
 - Tăng trưởng 300% số lượng và giá trị giao thương nội khối.
-- Tốc độ check-in đón tiếp chỉ 1 giây/hội viên.
+- Tốc độ check-in đón tiếp chỉ 1 giây/Học viên.
 - Bảo mật 100% dữ liệu trên máy chủ hạ tầng độc lập HTTPS.
 
 ### SLIDE 16: LỘ TRÌNH TRIỂN KHAI & CAM KẾT ĐỒNG HÀNH CÙNG CEO HN10
 - Tháng 09/2026: Hoàn tất kiểm thử và bàn giao tài khoản Admin.
-- Tháng 10/2026: Đào tạo sử dụng CRM và nhập liệu toàn bộ hội viên.
+- Tháng 10/2026: Đào tạo sử dụng CRM và nhập liệu toàn bộ Học viên.
 - Tháng 11/2026: Ra mắt chính thức tại đại hội CLB CEO HN10.
 - Năm 2027+: Bảo trì hệ thống và hỗ trợ kỹ thuật 24/7.
 `;
@@ -1329,7 +1329,7 @@ async function buildMasterPresentation() {
           <div class="card">
             <div class="card-num">01</div>
             <div class="card-title">Web CRM Quản Trị</div>
-            <div class="card-desc">Trung tâm kiểm soát dữ liệu hội viên, tài chính quỹ hội, sự kiện và đối soát tự động theo thời gian thực.</div>
+            <div class="card-desc">Trung tâm kiểm soát dữ liệu Học viên, tài chính quỹ hội, sự kiện và đối soát tự động theo thời gian thực.</div>
           </div>
           <div class="card">
             <div class="card-num">02</div>
@@ -1339,7 +1339,7 @@ async function buildMasterPresentation() {
           <div class="card">
             <div class="card-num">03</div>
             <div class="card-title">Đồng Bộ 2 Chiều Realtime</div>
-            <div class="card-desc">Hội viên thao tác trên App -> Tự động đổ về CRM xét duyệt -> CRM đẩy thông báo và phân quyền tức thì xuống App.</div>
+            <div class="card-desc">Học viên thao tác trên App -> Tự động đổ về CRM xét duyệt -> CRM đẩy thông báo và phân quyền tức thì xuống App.</div>
           </div>
         </div>
       </div>
@@ -1361,7 +1361,7 @@ async function buildMasterPresentation() {
         <div class="card-grid-2">
           <div class="card">
             <div class="card-title">📊 Quản Lý Dữ Liệu Rời Rạc & Trôi Bài</div>
-            <div class="card-desc">Dữ liệu hội viên lưu phân tán trên nhiều file Excel cá nhân. Nhóm Zalo thường xuyên trôi tin nhắn, tài liệu quan trọng và nhu cầu hợp tác không thể tìm kiếm lại.</div>
+            <div class="card-desc">Dữ liệu Học viên lưu phân tán trên nhiều file Excel cá nhân. Nhóm Zalo thường xuyên trôi tin nhắn, tài liệu quan trọng và nhu cầu hợp tác không thể tìm kiếm lại.</div>
           </div>
           <div class="card">
             <div class="card-title">💳 Thu Phí & Quản Trị Quỹ Thủ Công</div>
@@ -1373,7 +1373,7 @@ async function buildMasterPresentation() {
           </div>
           <div class="card">
             <div class="card-title">🤝 Giao Thương B2B Kém Hiệu Quả</div>
-            <div class="card-desc">Hội viên không nắm rõ thế mạnh, sản phẩm dịch vụ của nhau. Nhu cầu mua sắm nội khối bị bỏ lỡ, thiếu nền tảng số bảo đảm uy tín và ghi nhận giá trị deal kết nối.</div>
+            <div class="card-desc">Học viên không nắm rõ thế mạnh, sản phẩm dịch vụ của nhau. Nhu cầu mua sắm nội khối bị bỏ lỡ, thiếu nền tảng số bảo đảm uy tín và ghi nhận giá trị deal kết nối.</div>
           </div>
         </div>
       </div>
@@ -1396,12 +1396,12 @@ async function buildMasterPresentation() {
           <div class="card">
             <div class="card-num">01</div>
             <div class="card-title">GẮN KẾT BỀN CHẶT</div>
-            <div class="card-desc">Số hóa 100% hồ sơ hội viên thành định danh số. Thẻ VIP 3D và danh bạ thông minh giúp doanh nhân kết nối trong 1 chạm.</div>
+            <div class="card-desc">Số hóa 100% hồ sơ Học viên thành định danh số. Thẻ VIP 3D và danh bạ thông minh giúp doanh nhân kết nối trong 1 chạm.</div>
           </div>
           <div class="card">
             <div class="card-num">02</div>
             <div class="card-title">CHIA SẺ CƠ HỘI</div>
-            <div class="card-desc">Bảng tin Trao cơ hội & Sàn B2B thúc đẩy giao thương nội khối, chuyển giao dự án và ưu đãi chéo giữa các hội viên.</div>
+            <div class="card-desc">Bảng tin Trao cơ hội & Sàn B2B thúc đẩy giao thương nội khối, chuyển giao dự án và ưu đãi chéo giữa các Học viên.</div>
           </div>
           <div class="card">
             <div class="card-num">03</div>
@@ -1411,7 +1411,7 @@ async function buildMasterPresentation() {
           <div class="card">
             <div class="card-num">04</div>
             <div class="card-title">PHÁT TRIỂN BỨT PHÁ</div>
-            <div class="card-desc">Báo cáo KPI phân tích thời gian thực giúp Ban Chấp Hành ra quyết định chiến lược, mở rộng mạng lưới hội viên chất lượng cao.</div>
+            <div class="card-desc">Báo cáo KPI phân tích thời gian thực giúp Ban Chấp Hành ra quyết định chiến lược, mở rộng mạng lưới Học viên chất lượng cao.</div>
           </div>
         </div>
       </div>
@@ -1434,20 +1434,20 @@ async function buildMasterPresentation() {
           <div class="card">
             <div class="card-title">💻 Web CRM (Bộ Não Điều Hành)</div>
             <div class="card-desc">
-              • Tiếp nhận đơn đăng ký hội viên từ Landing & App.<br>
-              • Phê duyệt và cấp phát quyền hạn đa tầng (Admin, BCH, Hội viên).<br>
+              • Tiếp nhận đơn đăng ký Học viên từ Landing & App.<br>
+              • Phê duyệt và cấp phát quyền hạn đa tầng (Admin, BCH, Học viên).<br>
               • Khởi tạo sự kiện, thiết lập sơ đồ ghế Cinema và bảng giá vé.<br>
               • Duyệt gian hàng sản phẩm B2B và giám sát deal cơ hội.<br>
               • Quản lý thu chi, đối soát thanh toán tự động VietQR & niên phí.
             </div>
           </div>
           <div class="card">
-            <div class="card-title">📱 Mobile App (Văn Phòng Hội Viên)</div>
+            <div class="card-title">📱 Mobile App (Văn Phòng Học viên)</div>
             <div class="card-desc">
               • Nhận định danh số & Thẻ VIP 3D cá nhân hóa tức thời.<br>
               • Nhận vé Pass điện tử & Check-in QR 1 giây tại cửa sự kiện.<br>
               • Đăng sản phẩm lên Sàn B2B: Tác giả tự sửa/xóa bài, đối tác nhận báo giá VIP.<br>
-              • Đăng cơ hội kết nối: Xem danh sách hội viên quan tâm theo thời gian thực.<br>
+              • Đăng cơ hội kết nối: Xem danh sách Học viên quan tâm theo thời gian thực.<br>
               • Giao tiếp nội bộ: Trò chuyện 1-1, gọi thoại, gửi vị trí và danh thiếp số.
             </div>
           </div>
@@ -1471,8 +1471,8 @@ async function buildMasterPresentation() {
         <div class="card" style="flex: 1;">
           <div class="card-title">Các Tính Năng Trọng Tâm:</div>
           <div class="card-desc">
-            <b>✔ KPI Dashboard:</b> Theo dõi tổng số hội viên chính thức, doanh thu sự kiện, tỷ lệ đóng phí và cơ hội B2B.<br><br>
-            <b>✔ Quản Lý Hội Viên:</b> Hồ sơ 360° doanh nghiệp, phân quyền đa tầng.<br><br>
+            <b>✔ KPI Dashboard:</b> Theo dõi tổng số Học viên chính thức, doanh thu sự kiện, tỷ lệ đóng phí và cơ hội B2B.<br><br>
+            <b>✔ Quản Lý Học viên:</b> Hồ sơ 360° doanh nghiệp, phân quyền đa tầng.<br><br>
             <b>✔ Quản Lý Sự Kiện:</b> Cấu hình vé miễn phí 0đ và thu phí VietQR tự động; sơ đồ ghế Cinema.<br><br>
             <b>✔ Giám Sát Giao Thương:</b> Duyệt tin đăng sản phẩm và theo dõi giá trị deal kết nối.
           </div>
@@ -1492,16 +1492,16 @@ async function buildMasterPresentation() {
       <div class="slide-top-bar"></div>
       <div class="slide-header">
         <span class="eyebrow">Quản Trị Nhân Sự Hội</span>
-        <h2 class="slide-title">Quản Lý Hồ Sơ Hội Viên 360° & Phân Quyền Vai Trò Đa Tầng</h2>
-        <p class="slide-subtitle">Hồ sơ doanh nghiệp chuẩn hóa, mã hóa an toàn, phân quyền rõ ràng giữa Ban Lãnh Đạo và Hội Viên</p>
+        <h2 class="slide-title">Quản Lý Hồ Sơ Học viên 360° & Phân Quyền Vai Trò Đa Tầng</h2>
+        <p class="slide-subtitle">Hồ sơ doanh nghiệp chuẩn hóa, mã hóa an toàn, phân quyền rõ ràng giữa Ban Lãnh Đạo và Học viên</p>
       </div>
       <div class="slide-body">
         <div class="card" style="flex: 1;">
-          <div class="card-title">Chuẩn Hóa Dữ Liệu Hội Viên:</div>
+          <div class="card-title">Chuẩn Hóa Dữ Liệu Học viên:</div>
           <div class="card-desc">
-            <b>✔ Mã Hội Viên & Profile Chuẩn Hóa:</b> Cấp mã định danh duy nhất (HN10-007), lưu trữ thông tin công ty, ngành nghề, mã số thuế.<br><br>
-            <b>✔ Phân Quyền Vai Trò:</b> Tách bạch quyền hạn giữa Admin tối cao, Ban Chấp Hành và Hội viên.<br><br>
-            <b>✔ Xuất Dữ Liệu Excel:</b> Trích xuất danh sách hội viên, lịch sử nộp quỹ trong 1 click.<br><br>
+            <b>✔ Mã Học viên & Profile Chuẩn Hóa:</b> Cấp mã định danh duy nhất (HN10-007), lưu trữ thông tin công ty, ngành nghề, mã số thuế.<br><br>
+            <b>✔ Phân Quyền Vai Trò:</b> Tách bạch quyền hạn giữa Admin tối cao, Ban Chấp Hành và Học viên.<br><br>
+            <b>✔ Xuất Dữ Liệu Excel:</b> Trích xuất danh sách Học viên, lịch sử nộp quỹ trong 1 click.<br><br>
             <b>✔ Đồng Bộ Realtime Với App:</b> Thay đổi chức danh hoặc kích hoạt tài khoản được cập nhật ngay trên App.
           </div>
         </div>
@@ -1548,7 +1548,7 @@ async function buildMasterPresentation() {
       <div class="slide-top-bar"></div>
       <div class="slide-header">
         <span class="eyebrow">Định Danh Số Đẳng Cấp</span>
-        <h2 class="slide-title">Thẻ Hội Viên VIP 3D Ánh Vàng & Radar Định Vị Không Dây</h2>
+        <h2 class="slide-title">Thẻ Học viên VIP 3D Ánh Vàng & Radar Định Vị Không Dây</h2>
         <p class="slide-subtitle">Giải pháp thay thế danh thiếp giấy truyền thống, nâng tầm vị thế thương hiệu cá nhân của mỗi CEO</p>
       </div>
       <div class="slide-body">
@@ -1557,8 +1557,8 @@ async function buildMasterPresentation() {
           <div class="card-desc">
             <b>✔ Thẻ VIP 3D Lật 2 Mặt:</b> Mặt trước khắc nổi thông tin doanh nhân, mặt sau chứa mã QR định danh số.<br><br>
             <b>✔ Danh Thiếp Số Công Khai:</b> Quét mã QR hoặc chạm NFC mở ngay danh thiếp, lưu danh bạ 1 chạm.<br><br>
-            <b>✔ Radar Quét Tìm Hội Viên:</b> Định vị hội viên tham dự cùng phòng họp để kết nối giao lưu.<br><br>
-            <b>✔ Huy Hiệu Tích Xanh:</b> Chứng nhận hội viên chính thức đã thẩm định uy tín từ Ban Chấp Hành.
+            <b>✔ Radar Quét Tìm Học viên:</b> Định vị Học viên tham dự cùng phòng họp để kết nối giao lưu.<br><br>
+            <b>✔ Huy Hiệu Tích Xanh:</b> Chứng nhận Học viên chính thức đã thẩm định uy tín từ Ban Chấp Hành.
           </div>
         </div>
         <div class="img-frame">
@@ -1583,7 +1583,7 @@ async function buildMasterPresentation() {
         <div class="card-grid-2">
           <div class="card">
             <div class="card-title">🎟️ Luồng Miễn Phí (0đ)</div>
-            <div class="card-desc">Hội viên đăng ký 1 chạm -> Tự động xác thực quyền hội viên -> Cấp ngay Vé Pass điện tử chứa mã QR Check-in & Số bốc thăm may mắn.</div>
+            <div class="card-desc">Học viên đăng ký 1 chạm -> Tự động xác thực quyền Học viên -> Cấp ngay Vé Pass điện tử chứa mã QR Check-in & Số bốc thăm may mắn.</div>
           </div>
           <div class="card">
             <div class="card-title">💳 Luồng Thu Phí (VietQR)</div>
@@ -1618,7 +1618,7 @@ async function buildMasterPresentation() {
           <div class="card-title">Phân Quyền Minh Bạch Sàn B2B:</div>
           <div class="card-desc">
             <b>✔ Tác Giả Sở Hữu Tin Đăng:</b> Hiển thị huy hiệu "Sản phẩm của bạn" cùng nút Sửa / Xóa tin nhanh chóng.<br><br>
-            <b>✔ Nút "Nhận Báo Giá VIP" Cho Khách:</b> Hội viên khác gửi yêu cầu báo giá VIP trực tiếp đến chủ doanh nghiệp.<br><br>
+            <b>✔ Nút "Nhận Báo Giá VIP" Cho Khách:</b> Học viên khác gửi yêu cầu báo giá VIP trực tiếp đến chủ doanh nghiệp.<br><br>
             <b>✔ Ưu Đãi Độc Quyền CEO HN10:</b> Hiển thị giá thị trường và giá độc quyền nội khối.<br><br>
             <b>✔ Đồng Bộ Đơn Hàng Về CRM:</b> Mọi giao dịch báo giá đều được tổng hợp về Web CRM để hỗ trợ kết nối.
           </div>
@@ -1695,13 +1695,13 @@ async function buildMasterPresentation() {
       <div class="slide-header">
         <span class="eyebrow">Minh Bạch Tài Chính</span>
         <h2 class="slide-title">Quản Lý Quỹ Hội, Niên Phí & Thu Chi Minh Bạch Đối Soát Tự Động</h2>
-        <p class="slide-subtitle">Xây dựng lòng tin tuyệt đối giữa hội viên và Ban Điều Hành nhờ hệ thống kế toán quỹ số hóa chuẩn chỉ</p>
+        <p class="slide-subtitle">Xây dựng lòng tin tuyệt đối giữa Học viên và Ban Điều Hành nhờ hệ thống kế toán quỹ số hóa chuẩn chỉ</p>
       </div>
       <div class="slide-body">
         <div class="card" style="flex: 1;">
           <div class="card-title">Tự Động Hóa Kế Toán Quỹ:</div>
           <div class="card-desc">
-            <b>✔ Theo Dõi Niên Phí Từng Hội Viên:</b> Phân loại: Đã đóng, Chưa đóng, Sắp đến hạn; tra cứu lịch sử đóng quỹ qua từng năm.<br><br>
+            <b>✔ Theo Dõi Niên Phí Từng Học viên:</b> Phân loại: Đã đóng, Chưa đóng, Sắp đến hạn; tra cứu lịch sử đóng quỹ qua từng năm.<br><br>
             <b>✔ Nhắc Phí Tự Động Đa Kênh:</b> Tự động gửi thông báo nhắc gia hạn qua App Push và Email kèm mã VietQR đóng phí.<br><br>
             <b>✔ Sổ Thu - Chi Minh Bạch:</b> Ghi nhận chi tiết từng khoản thu tài trợ và chi phí hoạt động có hóa đơn đính kèm.<br><br>
             <b>✔ Báo Cáo Ngân Sách Đại Hội:</b> Tự động xuất báo cáo tài chính trực quan phục vụ đại hội thường niên.
@@ -1721,7 +1721,7 @@ async function buildMasterPresentation() {
     <div class="slide">
       <div class="slide-top-bar"></div>
       <div class="slide-header">
-        <span class="eyebrow">Tuyển Mộ Hội Viên Mới</span>
+        <span class="eyebrow">Tuyển Mộ Học viên Mới</span>
         <h2 class="slide-title">Cổng Thông Tin Đối Ngoại Landing 3D & Cấp Tài Khoản Tự Động</h2>
         <p class="slide-subtitle">Trải nghiệm gia nhập ấn tượng: Đăng ký trực tuyến, Admin duyệt trên CRM, hệ thống tự cấp mật khẩu qua Email</p>
       </div>
@@ -1729,7 +1729,7 @@ async function buildMasterPresentation() {
         <div class="card" style="flex: 1;">
           <div class="card-title">Quy Trình Gia Nhập Khép Kín:</div>
           <div class="card-desc">
-            <b>✔ Landing Page 3D Điện Ảnh:</b> Cổng thông tin đối ngoại giới thiệu tôn chỉ và quyền lợi hội viên CLB CEO HN10.<br><br>
+            <b>✔ Landing Page 3D Điện Ảnh:</b> Cổng thông tin đối ngoại giới thiệu tôn chỉ và quyền lợi Học viên CLB CEO HN10.<br><br>
             <b>✔ Biểu Mẫu Gia Nhập 24/7:</b> Doanh nhân ứng tuyển điền thông tin và đính kèm hồ sơ trực tiếp.<br><br>
             <b>✔ Phê Duyệt 1 Chạm Trên CRM:</b> Ban Thư ký thẩm định và duyệt hồ sơ trực tiếp trên Web CRM.<br><br>
             <b>✔ Tự Cấp Mật Khẩu Qua Email:</b> Hệ thống tự động kích hoạt tài khoản và gửi email chúc mừng kèm mật khẩu đăng nhập.
@@ -1758,12 +1758,12 @@ async function buildMasterPresentation() {
           <div class="card">
             <div class="card-num">85%</div>
             <div class="card-title">Tiết Kiệm Thời Gian Thư Ký</div>
-            <div class="card-desc">Tự động hóa nhắc phí, đối soát danh sách, soát vé sự kiện và gửi thông báo, giúp văn phòng hội tập trung phát triển hội viên.</div>
+            <div class="card-desc">Tự động hóa nhắc phí, đối soát danh sách, soát vé sự kiện và gửi thông báo, giúp văn phòng hội tập trung phát triển Học viên.</div>
           </div>
           <div class="card">
             <div class="card-num">300%</div>
             <div class="card-title">Tăng Trưởng Giao Thương Nội Khối</div>
-            <div class="card-desc">Sàn B2B và Bảng tin cơ hội giúp hội viên dễ dàng tiếp cận nhu cầu của nhau, tăng gấp 3 lần số lượng giao dịch và giá trị hợp đồng kết nối.</div>
+            <div class="card-desc">Sàn B2B và Bảng tin cơ hội giúp Học viên dễ dàng tiếp cận nhu cầu của nhau, tăng gấp 3 lần số lượng giao dịch và giá trị hợp đồng kết nối.</div>
           </div>
           <div class="card">
             <div class="card-num">1 Giây</div>
@@ -1801,12 +1801,12 @@ async function buildMasterPresentation() {
           <div class="card">
             <div class="card-num" style="font-size: 16px;">GIAI ĐOẠN 2</div>
             <div class="card-title">Đào Tạo & Nhập Liệu</div>
-            <div class="card-desc">Tổ chức tập huấn sử dụng Web CRM cho Ban Điều Hành; nhập liệu 100+ doanh nghiệp hội viên.</div>
+            <div class="card-desc">Tổ chức tập huấn sử dụng Web CRM cho Ban Điều Hành; nhập liệu 100+ doanh nghiệp Học viên.</div>
           </div>
           <div class="card">
             <div class="card-num" style="font-size: 16px;">GIAI ĐOẠN 3</div>
             <div class="card-title">Ra Mắt Tại Đại Hội</div>
-            <div class="card-desc">Kích hoạt Thẻ VIP 3D cho toàn thể hội viên; áp dụng Check-in QR Pass và Lucky Draw tại đại hội.</div>
+            <div class="card-desc">Kích hoạt Thẻ VIP 3D cho toàn thể Học viên; áp dụng Check-in QR Pass và Lucky Draw tại đại hội.</div>
           </div>
           <div class="card">
             <div class="card-num" style="font-size: 16px;">GIAI ĐOẠN 4</div>

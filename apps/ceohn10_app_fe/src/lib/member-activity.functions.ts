@@ -101,7 +101,7 @@ export const listInteractionsWithFn = createServerFn({ method: "GET" })
         id: `conn-${peer}`,
         type: "connect",
         at: (c.updated_at as string) ?? (c.created_at as string),
-        title: connected ? "Đã kết nối trong mạng lưới hội viên" : "Lời mời kết nối",
+        title: connected ? "Đã kết nối trong mạng lưới Học viên" : "Lời mời kết nối",
         detail: connected ? undefined : "Đang chờ phản hồi kết nối.",
       });
     }

@@ -253,9 +253,9 @@ function MembersOnly({ slug }: { slug: string }) {
       <span className="grid h-12 w-12 place-items-center rounded-2xl bg-[var(--vba-gold-soft)] text-[var(--vba-gold)]">
         <Lock className="h-6 w-6" />
       </span>
-      <p className="text-[15px] font-bold text-[var(--vba-text)]">Danh thiếp dành cho hội viên</p>
+      <p className="text-[15px] font-bold text-[var(--vba-text)]">Danh thiếp dành cho Học viên</p>
       <p className="text-[13px] text-[var(--vba-text-muted)]">
-        Danh thiếp này chỉ hiển thị với hội viên đã đăng nhập. Vui lòng đăng nhập để xem.
+        Danh thiếp này chỉ hiển thị với Học viên đã đăng nhập. Vui lòng đăng nhập để xem.
       </p>
       <Link
         to="/auth"

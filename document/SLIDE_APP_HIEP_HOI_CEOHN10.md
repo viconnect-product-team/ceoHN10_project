@@ -17,7 +17,7 @@
 - ❌ Dùng danh thiếp giấy dễ thất lạc, tốn kém
 - ❌ Hỏi thăm cơ hội kinh doanh qua tin nhắn rời rạc
 - ❌ Đến sự kiện phải xếp hàng tìm tên trên giấy
-- ❌ Khó nhớ lĩnh vực hoạt động của 500+ hội viên
+- ❌ Khó nhớ lĩnh vực hoạt động của 500+ Học viên
 
 **CEO HN10 Mobile App:**
 - ✅ Thẻ Doanh Nhân Số điện tử & Mã QR lưu danh bạ vCard 1 chạm
@@ -27,7 +27,7 @@
 
 ---
 
-### SLIDE 3: Thẻ Hội Viên Điện Tử Thông Minh & DANH THIẾP VCARD
+### SLIDE 3: Thẻ Học viên Điện Tử Thông Minh & DANH THIẾP VCARD
 *Tấm danh thiếp số quyền năng định danh đẳng cấp doanh nhân bản lĩnh*
 
 - **Thiết kế hoàng gia Warm Amber Gold:** Tông xanh Cobalt Navy kết hợp vàng ánh kim tinh tế.
@@ -50,7 +50,7 @@
 ### SLIDE 5: MẠNG LƯỚI DOANH NHÂN CHÍNH DANH & HẸN 1-ON-1
 *Tìm kiếm đối tác tin cậy và đặt lịch cà phê giao thương trong 30 giây*
 
-- **Danh bạ 500+ CEO xác thực:** Hội viên chính thức với huy hiệu Verified tích xanh uy tín.
+- **Danh bạ 500+ CEO xác thực:** Học viên chính thức với huy hiệu Verified tích xanh uy tín.
 - **Đặt lịch hẹn 1-on-1 tự động:** Chọn khung giờ trống và gửi lời mời cà phê kết nối kinh doanh.
 - **Đồng bộ lịch điện thoại:** Lịch hẹn tự động cập nhật vào Google Calendar / Apple Calendar.
 - **Ghi chú đối tác:** Lưu trữ thông tin nhu cầu và tiềm năng hợp tác sau buổi gặp gỡ.
@@ -73,7 +73,7 @@
 - **Cuộc gọi thoại & video HD:** Đàm thoại trực tiếp 1-1 với chất lượng âm thanh trong trẻo, bảo mật.
 - **Dịch vụ thông báo nền Native:** Đổ chuông ngay trên màn hình khóa kể cả khi ứng dụng đang đóng.
 - **Ngắt máy 0ms không độ trễ:** Một bên gác máy là cả hai đầu kết thúc tức thời, không chuông ảo.
-- **Không bị làm phiền:** Chỉ các hội viên chính danh trong hệ sinh thái mới có thể kết nối.
+- **Không bị làm phiền:** Chỉ các Học viên chính danh trong hệ sinh thái mới có thể kết nối.
 
 ---
 
@@ -98,7 +98,7 @@
 ---
 
 ### SLIDE 10: GIA NHẬP HỆ SINH THÁI DOANH NHÂN BẢN LĨNH
-*Tải ứng dụng trên App Store & Google Play để trải nghiệm đặc quyền hội viên*
+*Tải ứng dụng trên App Store & Google Play để trải nghiệm đặc quyền Học viên*
 
 - ✨ Quét mã QR để cài đặt ứng dụng CEO HN10 trên iOS và Android
 - ✨ Đăng nhập bằng tài khoản chính danh do Ban Thư Ký hiệp hội cấp

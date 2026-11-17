@@ -66,12 +66,12 @@ export const Route = createFileRoute("/fees/")({
     try {
       const serverInvs = await listInvoicesFn().catch(() => []);
       if (Array.isArray(serverInvs) && serverInvs.length > 0) invoices = serverInvs;
-    } catch {}
+    } catch { }
     if (invoices.length === 0) {
       try {
         const clientInvs = await fetchNestApi<FeeRecord[]>("/admin/invoices");
         if (Array.isArray(clientInvs) && clientInvs.length > 0) invoices = clientInvs;
-      } catch {}
+      } catch { }
     }
     const members = await fetchNestApi<Member[]>("/members").then((res) => (Array.isArray(res) ? res : [])).catch(() => []);
     if (invoices.length === 0 && members.length > 0) {
@@ -191,6 +191,40 @@ function isDueSoon(r: FeeRecord) {
   return d >= 0 && d <= 30;
 }
 
+function sanitizeFeeRecord(r: any): FeeRecord {
+  const member = r.member || {
+    id: r.memberId || r.id || "unknown",
+    code: r.member_code || (r.customer_name ? "MB-HN10" : "HN10-MB"),
+    name: r.member_name || r.customer_name || r.customer_email || "Học viên CEO HN10",
+    contact: r.member_contact || r.customer_name || "",
+    email: r.member_email || r.customer_email || "",
+    phone: r.member_phone || r.customer_phone || "",
+    type: r.member_type || "company",
+    level: r.member_level || "memberLevel.medium",
+    industry: r.member_industry || "ind.trade",
+    region: r.member_region || "region.north",
+    status: r.member_status || "active",
+    joinedAt: r.member_joined_at || "2026-01-01",
+    feeYear: Number(r.year || 2026),
+    feePaid: r.status === "paid",
+    address: r.member_address || "",
+    reminderCount: Number(r.member_reminder_count ?? 0),
+    lastReminder: r.member_last_reminder,
+  };
+  return {
+    ...r,
+    id: String(r.id || ""),
+    year: Number(r.year || 2026),
+    amount: Number(r.amount || 0),
+    invoiceNo: r.invoiceNo || r.invoice_no || `HD-2026-${String(r.id || "").slice(0, 4)}`,
+    status: (r.status || "unpaid") as FeeStatus,
+    dueDate: r.dueDate || r.due_date || "2026-03-31",
+    paidAt: r.paidAt || r.paid_at || null,
+    method: r.method || null,
+    member,
+  };
+}
+
 function FeesPage() {
   const t = useT();
   const router = useRouter();
@@ -198,20 +232,22 @@ function FeesPage() {
     invoices: FeeRecord[];
     members: Member[];
   };
-  const [allRecords, setAllRecords] = useState<FeeRecord[]>(loaderInvoices || []);
+  const [allRecords, setAllRecords] = useState<FeeRecord[]>(() =>
+    (loaderInvoices || []).map(sanitizeFeeRecord)
+  );
 
   useEffect(() => {
     if (loaderInvoices && loaderInvoices.length > 0) {
-      setAllRecords(loaderInvoices);
+      setAllRecords(loaderInvoices.map(sanitizeFeeRecord));
     } else {
       fetchNestApi<FeeRecord[]>("/admin/invoices")
         .then((res) => {
           if (Array.isArray(res) && res.length > 0) {
-            setAllRecords(res);
+            setAllRecords(res.map(sanitizeFeeRecord));
           } else if (members && members.length > 0) {
             const mapped = members.map((m, idx) => {
               const isPaid = m.feePaid || m.code === "HP-HN10-099" || (m.name && m.name.includes("Vũ Phan Vũ"));
-              return {
+              return sanitizeFeeRecord({
                 id: `INV-HN10-${String(idx + 1).padStart(3, "0")}`,
                 memberId: m.id,
                 invoiceNo: `HD-2026-${String(idx + 1).padStart(4, "0")}`,
@@ -224,7 +260,7 @@ function FeesPage() {
                 createdAt: m.joinedAt || "2026-01-01T00:00:00Z",
                 updatedAt: m.joinedAt || "2026-01-01T00:00:00Z",
                 member: m,
-              } as FeeRecord;
+              });
             });
             setAllRecords(mapped);
           }
@@ -240,11 +276,11 @@ function FeesPage() {
   const [remindingId, setRemindingId] = useState<string | null>(null);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const YEARS = useMemo(() => {
-    const ys = Array.from(new Set(allRecords.map((r: any) => r.year)));
+    const ys = Array.from(new Set(allRecords.map((r: any) => Number(r.year)).filter((y) => y > 2000)));
     if (!ys.includes(new Date().getFullYear())) ys.push(new Date().getFullYear());
     return ys.sort((a, b) => b - a);
   }, [allRecords]);
-  const [year, setYear] = useState<number>(YEARS[0]);
+  const [year, setYear] = useState<number>(() => YEARS[0] || 2026);
   const [status, setStatus] = useState<QuickFilter>("all");
   const [typeFilter, setTypeFilter] = useState<TypeFilter>("all");
   const [q, setQ] = useUrlState<string>("q", "");
@@ -288,7 +324,11 @@ function FeesPage() {
       return next;
     });
 
-  const yearRecords = useMemo(() => allRecords.filter((r) => r.year === year), [allRecords, year]);
+  const yearRecords = useMemo(() => {
+    if (!allRecords || allRecords.length === 0) return [];
+    if (!year) return allRecords;
+    return allRecords.filter((r) => Number(r.year) === Number(year) || !r.year);
+  }, [allRecords, year]);
 
   const invoiceItems: InvoiceItem[] = useMemo(() => {
     return yearRecords.map((r) => ({
@@ -296,9 +336,9 @@ function FeesPage() {
       code: r.invoiceNo,
       date: r.paidAt || r.dueDate || new Date().toISOString(),
       category: `Hội phí niên khóa ${r.year}`,
-      description: `Thu hội phí thường niên CLB Doanh Nhân CEO HN10 - ${r.member?.name || r.member?.contact || `Hội viên ${r.member?.code || ""}`}`,
+      description: `Thu hội phí thường niên CLB Doanh Nhân CEO HN10 - ${r.member?.name || r.member?.contact || `Học viên ${r.member?.code || ""}`}`,
       amount: r.amount,
-      recipient: r.member?.name || r.member?.contact || `Hội viên ${r.member?.code || ""}`,
+      recipient: r.member?.name || r.member?.contact || `Học viên ${r.member?.code || ""}`,
       method: r.method || "vnpay",
       status: r.status,
     }));
@@ -311,26 +351,25 @@ function FeesPage() {
         if (status === "dueSoon") return isDueSoon(r);
         return r.status === status;
       })
-      .filter((r) => typeFilter === "all" || r.member.type === typeFilter)
+      .filter((r) => typeFilter === "all" || (r.member && r.member.type === typeFilter))
       .filter((r) => {
         if (!q) return true;
         const k = q.toLowerCase();
-        return (
-          r.member.name.toLowerCase().includes(k) ||
-          r.member.code.toLowerCase().includes(k) ||
-          r.invoiceNo.toLowerCase().includes(k)
-        );
+        const mName = r.member?.name?.toLowerCase() || "";
+        const mCode = r.member?.code?.toLowerCase() || "";
+        const inv = r.invoiceNo?.toLowerCase() || "";
+        return mName.includes(k) || mCode.includes(k) || inv.includes(k);
       });
   }, [yearRecords, status, typeFilter, q]);
 
   const sortedRecords = useMemo(() => {
     const acc: Record<string, (r: FeeRecord) => string | number> = {
-      invoice: (r) => r.invoiceNo,
-      member: (r) => r.member.name,
-      amount: (r) => r.amount,
-      due: (r) => r.dueDate,
+      invoice: (r) => r.invoiceNo || "",
+      member: (r) => r.member?.name || "",
+      amount: (r) => r.amount || 0,
+      due: (r) => r.dueDate || "",
       paid: (r) => r.paidAt ?? "",
-      status: (r) => r.status,
+      status: (r) => r.status || "",
     };
     const get = acc[sortKey] ?? acc.due;
     const copy = [...records];
@@ -397,8 +436,8 @@ function FeesPage() {
       data: records,
       columns: [
         { header: "Mã hóa đơn", key: "invoiceNo", width: 16, value: (r) => r.invoiceNo },
-        { header: "Mã hội viên", key: "code", width: 16, value: (r) => r.member.code },
-        { header: "Họ và tên hội viên", key: "name", width: 28, value: (r) => r.member.name },
+        { header: "Mã Học viên", key: "code", width: 16, value: (r) => r.member?.code || "" },
+        { header: "Họ và tên Học viên", key: "name", width: 28, value: (r) => r.member?.name || "" },
         { header: "Niên khóa", key: "year", width: 14, value: (r) => r.year },
         { header: "Số tiền (VNĐ)", key: "amount", width: 20, value: (r) => formatExcelCurrency(r.amount) },
         { header: "Trạng thái", key: "status", width: 18, value: (r) => (r.status === "paid" ? "Đã nộp" : r.status === "overdue" ? "Quá hạn" : "Chưa nộp") },
@@ -444,14 +483,14 @@ function FeesPage() {
       data: rows,
       columns: [
         { header: "Mã hóa đơn", key: "invoiceNo", width: 16, value: (r) => r.invoiceNo },
-        { header: "Mã hội viên", key: "code", width: 16, value: (r) => r.member.code },
-        { header: "Họ và tên hội viên", key: "name", width: 28, value: (r) => r.member.name },
+        { header: "Mã Học viên", key: "code", width: 16, value: (r) => r.member?.code || "" },
+        { header: "Họ và tên Học viên", key: "name", width: 28, value: (r) => r.member?.name || "" },
         { header: "Niên khóa", key: "year", width: 14, value: (r) => r.year },
         { header: "Số tiền (VNĐ)", key: "amount", width: 20, value: (r) => formatExcelCurrency(r.amount) },
         { header: "Trạng thái", key: "status", width: 18, value: (r) => (r.status === "paid" ? "Đã nộp" : r.status === "overdue" ? "Quá hạn" : "Chưa nộp") },
         { header: "Hạn nộp", key: "dueDate", width: 16, value: (r) => formatDisplayDate(r.dueDate) },
-        { header: "Số lần nhắc", key: "reminders", width: 14, value: (r) => r.member.reminderCount ?? 0 },
-        { header: "Lần nhắc gần nhất", key: "lastReminder", width: 18, value: (r) => formatDisplayDate(r.member.lastReminder) },
+        { header: "Số lần nhắc", key: "reminders", width: 14, value: (r) => r.member?.reminderCount ?? 0 },
+        { header: "Lần nhắc gần nhất", key: "lastReminder", width: 18, value: (r) => formatDisplayDate(r.member?.lastReminder) },
       ],
       summaryRows: [
         ["TỔNG CỘNG TIỀN PHÍ:", "", "", "", formatExcelCurrency(totalAmount) + " đ"],
@@ -579,7 +618,7 @@ function FeesPage() {
               {recentPayments.map((r: any) => (
                 <li key={r.id} className="flex items-center justify-between gap-2 text-xs">
                   <div className="min-w-0">
-                    <div className="truncate font-semibold text-foreground">{r.member.name}</div>
+                    <div className="truncate font-semibold text-foreground">{r.member?.name || "Học viên CEO HN10"}</div>
                     <div className="text-[11px] text-muted-foreground">
                       {r.paidAt && new Date(r.paidAt).toLocaleDateString("vi-VN")}
                     </div>
@@ -730,11 +769,10 @@ function FeesPage() {
               key={k}
               onClick={() => setStatus(k)}
               aria-pressed={status === k}
-              className={`whitespace-nowrap rounded-md px-2.5 py-1 text-xs font-semibold transition-colors ${
-                status === k
+              className={`whitespace-nowrap rounded-md px-2.5 py-1 text-xs font-semibold transition-colors ${status === k
                   ? "bg-primary text-primary-foreground"
                   : "text-muted-foreground hover:text-foreground"
-              }`}
+                }`}
             >
               {t(`fees.tab.${k}` as TKey)}
             </button>
@@ -746,11 +784,10 @@ function FeesPage() {
             aria-pressed={view === "list"}
             aria-label={t("fees.view.list")}
             title={t("fees.view.list")}
-            className={`grid h-7 w-7 place-items-center rounded-md transition-colors ${
-              view === "list"
+            className={`grid h-7 w-7 place-items-center rounded-md transition-colors ${view === "list"
                 ? "bg-primary text-primary-foreground"
                 : "text-muted-foreground hover:text-foreground"
-            }`}
+              }`}
           >
             <ListIcon className="h-4 w-4" aria-hidden="true" />
           </button>
@@ -759,11 +796,10 @@ function FeesPage() {
             aria-pressed={view === "card"}
             aria-label={t("fees.view.card")}
             title={t("fees.view.card")}
-            className={`grid h-7 w-7 place-items-center rounded-md transition-colors ${
-              view === "card"
+            className={`grid h-7 w-7 place-items-center rounded-md transition-colors ${view === "card"
                 ? "bg-primary text-primary-foreground"
                 : "text-muted-foreground hover:text-foreground"
-            }`}
+              }`}
           >
             <LayoutGrid className="h-4 w-4" aria-hidden="true" />
           </button>
@@ -1062,33 +1098,32 @@ function QueueColumn({
                       params={{ invoiceId: r.id }}
                       className="block truncate text-xs font-semibold text-foreground hover:text-primary hover:underline"
                     >
-                      {r.member.name}
+                      {r.member?.name || "Học viên CEO HN10"}
                     </Link>
                     <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11px] text-muted-foreground">
-                      <span className="font-mono">{r.member.code}</span>
+                      <span className="font-mono">{r.member?.code || "HN10"}</span>
                       <span className="font-semibold tabular-nums text-foreground">
                         {formatVnd(r.amount)}
                       </span>
                     </div>
                     <div className="mt-1 flex flex-wrap items-center gap-1.5">
                       <span
-                        className={`rounded-full px-1.5 py-0.5 text-[10px] font-semibold ${
-                          d < 0
+                        className={`rounded-full px-1.5 py-0.5 text-[10px] font-semibold ${d < 0
                             ? "bg-destructive/10 text-destructive"
                             : "bg-warning/15 text-[oklch(0.45_0.16_65)]"
-                        }`}
+                          }`}
                       >
                         {d < 0
                           ? t("fees.queue.daysOverdue", { n: Math.abs(d) })
                           : t("fees.queue.daysLeft", { n: d })}
                       </span>
                       <span className="text-[10px] text-muted-foreground">
-                        {r.member.reminderCount
+                        {r.member?.reminderCount
                           ? t("fees.queue.remindCount", { n: r.member.reminderCount })
                           : t("fees.queue.neverReminded")}
                       </span>
                     </div>
-                    {r.member.lastReminder && (
+                    {r.member?.lastReminder && (
                       <div className="mt-0.5 text-[10px] text-muted-foreground">
                         {t("fees.queue.lastReminder")}:{" "}
                         {new Date(r.member.lastReminder).toLocaleDateString("vi-VN")}
@@ -1164,7 +1199,7 @@ function FeeCard({
   canManage: boolean;
 }) {
   const t = useT();
-  const memberName = r.member?.name || r.member?.contact || r.member?.email || `Hội viên #${(r.member?.code || r.memberId || "").slice(0, 6)}`;
+  const memberName = r.member?.name || r.member?.contact || r.member?.email || `Học viên #${(r.member?.code || r.memberId || "").slice(0, 6)}`;
   const memberCode = r.member?.code || r.memberId || "MB";
 
   return (
@@ -1432,7 +1467,7 @@ function FeeRow({
   canManage: boolean;
 }) {
   const t = useT();
-  const memberName = r.member?.name || r.member?.contact || r.member?.email || `Hội viên #${(r.member?.code || r.memberId || "").slice(0, 6)}`;
+  const memberName = r.member?.name || r.member?.contact || r.member?.email || `Học viên #${(r.member?.code || r.memberId || "").slice(0, 6)}`;
   const memberCode = r.member?.code || r.memberId || "MB";
 
   return (

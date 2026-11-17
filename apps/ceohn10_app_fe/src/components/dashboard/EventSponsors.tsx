@@ -87,7 +87,7 @@ export function EventSponsors({ sponsors: propSponsors }: { sponsors?: any[] }) 
           <span>Đơn Vị Đồng Hành & Nhà Tài Trợ Sự Kiện ({allSponsors.length})</span>
         </h2>
         <span className="text-xs text-muted-foreground">
-          Được tài trợ bởi các doanh nghiệp hội viên tiên phong
+          Được tài trợ bởi các doanh nghiệp Học viên tiên phong
         </span>
       </div>
 

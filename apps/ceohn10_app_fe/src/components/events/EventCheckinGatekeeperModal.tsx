@@ -116,7 +116,7 @@ export function EventCheckinGatekeeperModal({
             regs.map((r: any) => ({
               id: r.id,
               memberCode: r.memberCode || "HN10",
-              memberName: r.memberName || r.name || "Hội viên",
+              memberName: r.memberName || r.name || "Học viên",
               phone: r.phone || "—",
               table: r.table || "Bàn VIP 01",
               seat: r.seat || "Ghế 01",
@@ -128,7 +128,7 @@ export function EventCheckinGatekeeperModal({
           );
         }
       })
-      .catch(() => {});
+      .catch(() => { });
   }, [event]);
 
   if (!open || !event) return null;
@@ -136,7 +136,7 @@ export function EventCheckinGatekeeperModal({
   const origin = typeof window !== "undefined" && window.location.origin
     ? window.location.origin
     : "https://crm.ceohn10.viconnect.vn";
-  
+
   // Zalo Guest Registration URL: non-members scan with Zalo / Phone Camera to register & check-in
   const zaloGuestUrl = `${origin}/guest-event-register/${event.id}`;
   // App internal event checkin payload for club members using CEO HN10 App scanner
@@ -288,11 +288,10 @@ export function EventCheckinGatekeeperModal({
           <button
             type="button"
             onClick={() => setActiveTab("qr_standee")}
-            className={`flex items-center gap-1.5 border-b-2 px-4 py-2.5 text-xs font-bold transition cursor-pointer ${
-              activeTab === "qr_standee"
+            className={`flex items-center gap-1.5 border-b-2 px-4 py-2.5 text-xs font-bold transition cursor-pointer ${activeTab === "qr_standee"
                 ? "border-amber-500 text-amber-600 dark:text-amber-400"
                 : "border-transparent text-muted-foreground hover:text-foreground"
-            }`}
+              }`}
           >
             <QrCode className="h-4 w-4" />
             <span>Mã QR Standee Sự Kiện</span>
@@ -300,11 +299,10 @@ export function EventCheckinGatekeeperModal({
           <button
             type="button"
             onClick={() => setActiveTab("gatekeepers")}
-            className={`flex items-center gap-1.5 border-b-2 px-4 py-2.5 text-xs font-bold transition cursor-pointer ${
-              activeTab === "gatekeepers"
+            className={`flex items-center gap-1.5 border-b-2 px-4 py-2.5 text-xs font-bold transition cursor-pointer ${activeTab === "gatekeepers"
                 ? "border-amber-500 text-amber-600 dark:text-amber-400"
                 : "border-transparent text-muted-foreground hover:text-foreground"
-            }`}
+              }`}
           >
             <ShieldCheck className="h-4 w-4" />
             <span>Ban Soát Vé (Ban Truyền Thông: {selectedScanners.length})</span>
@@ -312,11 +310,10 @@ export function EventCheckinGatekeeperModal({
           <button
             type="button"
             onClick={() => setActiveTab("attendees")}
-            className={`flex items-center gap-1.5 border-b-2 px-4 py-2.5 text-xs font-bold transition cursor-pointer ${
-              activeTab === "attendees"
+            className={`flex items-center gap-1.5 border-b-2 px-4 py-2.5 text-xs font-bold transition cursor-pointer ${activeTab === "attendees"
                 ? "border-amber-500 text-amber-600 dark:text-amber-400"
                 : "border-transparent text-muted-foreground hover:text-foreground"
-            }`}
+              }`}
           >
             <Users className="h-4 w-4" />
             <span>Người Tham Gia ({checkedInCount}/{attendees.length})</span>
@@ -333,11 +330,10 @@ export function EventCheckinGatekeeperModal({
                 <button
                   type="button"
                   onClick={() => setQrTarget("zalo")}
-                  className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-xl text-xs font-bold transition cursor-pointer ${
-                    qrTarget === "zalo"
+                  className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-xl text-xs font-bold transition cursor-pointer ${qrTarget === "zalo"
                       ? "bg-blue-600 text-white shadow-sm"
                       : "text-muted-foreground hover:text-foreground hover:bg-secondary"
-                  }`}
+                    }`}
                 >
                   <Globe className="h-3.5 w-3.5" />
                   <span>Quét Qua ZALO (Khách Mời / Đại Biểu Ngoài)</span>
@@ -345,23 +341,21 @@ export function EventCheckinGatekeeperModal({
                 <button
                   type="button"
                   onClick={() => setQrTarget("member_app")}
-                  className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-xl text-xs font-bold transition cursor-pointer ${
-                    qrTarget === "member_app"
+                  className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-xl text-xs font-bold transition cursor-pointer ${qrTarget === "member_app"
                       ? "bg-amber-500 text-slate-950 shadow-sm"
                       : "text-muted-foreground hover:text-foreground hover:bg-secondary"
-                  }`}
+                    }`}
                 >
                   <ShieldCheck className="h-3.5 w-3.5" />
-                  <span>Quét Qua App (Hội Viên CLB)</span>
+                  <span>Quét Qua App (Học viên CLB)</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => setQrTarget("both")}
-                  className={`hidden sm:flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl text-xs font-bold transition cursor-pointer ${
-                    qrTarget === "both"
+                  className={`hidden sm:flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl text-xs font-bold transition cursor-pointer ${qrTarget === "both"
                       ? "bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-sm"
                       : "text-muted-foreground hover:text-foreground hover:bg-secondary"
-                  }`}
+                    }`}
                 >
                   <span>Xem Cả Hai</span>
                 </button>
@@ -387,7 +381,7 @@ export function EventCheckinGatekeeperModal({
                     <span>Mã QR Soát Vé & Đăng Ký Cho Khách Mời (Quét Qua ZALO)</span>
                   </div>
                   <p className="mt-1 text-[11.5px] text-muted-foreground max-w-lg leading-relaxed">
-                    Khách mời, đối tác vãng lai chưa là hội viên chỉ cần dùng <strong>Zalo</strong> hoặc <strong>Camera điện thoại</strong> quét mã này để mở ngay biểu mẫu đăng ký, chọn loại vé và nhận vị trí bàn ghế tức thì không cần đăng nhập.
+                    Khách mời, đối tác vãng lai chưa là Học viên chỉ cần dùng <strong>Zalo</strong> hoặc <strong>Camera điện thoại</strong> quét mã này để mở ngay biểu mẫu đăng ký, chọn loại vé và nhận vị trí bàn ghế tức thì không cần đăng nhập.
                   </p>
 
                   <div className="mt-2.5 w-full max-w-md p-2 rounded-xl bg-white dark:bg-slate-800 border border-blue-200 dark:border-blue-900 text-[11px] font-mono text-slate-800 dark:text-slate-200 flex items-center justify-between gap-2 overflow-hidden">
@@ -443,7 +437,7 @@ export function EventCheckinGatekeeperModal({
                 <div className="flex flex-col items-center text-center p-4 rounded-2xl bg-amber-50/50 dark:bg-amber-950/20 border-2 border-amber-400 dark:border-amber-700 shadow-xs relative">
                   <div className="absolute top-3 right-3">
                     <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-black bg-amber-500 text-slate-950 shadow-2xs">
-                      DÀNH CHO HỘI VIÊN CÓ APP
+                      DÀNH CHO Học viên CÓ APP
                     </span>
                   </div>
 
@@ -455,10 +449,10 @@ export function EventCheckinGatekeeperModal({
                   </div>
 
                   <div className="mt-3 text-sm font-bold text-amber-950 dark:text-amber-200 flex items-center gap-1.5">
-                    <span>Mã QR Check-in Nhanh Cho Hội Viên (Quét Bằng App CEO HN10)</span>
+                    <span>Mã QR Check-in Nhanh Cho Học viên (Quét Bằng App CEO HN10)</span>
                   </div>
                   <p className="mt-1 text-[11.5px] text-muted-foreground max-w-lg leading-relaxed">
-                    Hội viên CLB đã cài đặt App CEO HN10 chỉ cần mở tính năng <strong>Quét mã QR</strong> tại bàn đón tiếp để hệ thống tự động xác nhận điểm danh trong 1 giây.
+                    Học viên CLB đã cài đặt App CEO HN10 chỉ cần mở tính năng <strong>Quét mã QR</strong> tại bàn đón tiếp để hệ thống tự động xác nhận điểm danh trong 1 giây.
                   </p>
 
                   <div className="mt-2.5 w-full max-w-md p-2 rounded-xl bg-white dark:bg-slate-800 border border-amber-300 dark:border-amber-800 text-[11px] font-mono text-slate-800 dark:text-slate-200 flex items-center justify-between gap-2 overflow-hidden">
@@ -572,19 +566,17 @@ export function EventCheckinGatekeeperModal({
                       <div
                         key={m.id || m.code}
                         onClick={() => handleToggleScanner(m)}
-                        className={`flex items-center justify-between p-3 rounded-2xl border transition cursor-pointer select-none ${
-                          selected
+                        className={`flex items-center justify-between p-3 rounded-2xl border transition cursor-pointer select-none ${selected
                             ? "border-amber-500 bg-amber-50/50 dark:bg-amber-950/30 text-foreground shadow-2xs"
                             : "border-border bg-card hover:bg-secondary/40 text-foreground"
-                        }`}
+                          }`}
                       >
                         <div className="flex items-center gap-3">
                           <div
-                            className={`h-5 w-5 rounded-lg border flex items-center justify-center transition ${
-                              selected
+                            className={`h-5 w-5 rounded-lg border flex items-center justify-center transition ${selected
                                 ? "bg-amber-500 border-amber-500 text-slate-950"
                                 : "border-slate-300 dark:border-slate-600 bg-background"
-                            }`}
+                              }`}
                           >
                             {selected && <Check className="h-3.5 w-3.5 stroke-[3]" />}
                           </div>
@@ -666,7 +658,7 @@ export function EventCheckinGatekeeperModal({
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
                   <input
                     type="text"
-                    placeholder="Tìm theo tên, mã hội viên, số điện thoại..."
+                    placeholder="Tìm theo tên, mã Học viên, số điện thoại..."
                     value={attendeeSearch}
                     onChange={(e) => setAttendeeSearch(e.target.value)}
                     className="w-full pl-8 pr-3 py-1.5 rounded-xl border border-border bg-background text-xs text-foreground outline-none focus:ring-1 focus:ring-amber-500"
@@ -689,12 +681,12 @@ export function EventCheckinGatekeeperModal({
                   className="p-4 rounded-2xl border border-blue-200 dark:border-blue-900 bg-blue-50/50 dark:bg-blue-950/20 space-y-3"
                 >
                   <div className="font-bold text-xs text-blue-900 dark:text-blue-300">
-                    Thêm Nhanh Hội Viên Tham Gia Sự Kiện:
+                    Thêm Nhanh Học viên Tham Gia Sự Kiện:
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                     <div>
                       <label className="block text-[11px] font-semibold text-foreground mb-0.5">
-                        Tên Hội Viên <span className="text-destructive">*</span>
+                        Tên Học viên <span className="text-destructive">*</span>
                       </label>
                       <input
                         type="text"
@@ -815,11 +807,10 @@ export function EventCheckinGatekeeperModal({
                       <button
                         type="button"
                         onClick={() => handleToggleCheckin(a.id)}
-                        className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${
-                          a.checkedIn
+                        className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${a.checkedIn
                             ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-300"
                             : "bg-secondary text-muted-foreground hover:text-foreground border border-border"
-                        }`}
+                          }`}
                       >
                         {a.checkedIn ? (
                           <>

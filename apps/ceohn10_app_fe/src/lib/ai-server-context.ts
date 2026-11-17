@@ -89,7 +89,7 @@ const BASELINE_MARKETPLACE: SafeListing[] = [
   },
   {
     id: "opp-02",
-    title: "Cung cấp giải pháp in ấn bao bì, tem nhãn thông minh NFC & QR bảo mật cho sản phẩm hội viên",
+    title: "Cung cấp giải pháp in ấn bao bì, tem nhãn thông minh NFC & QR bảo mật cho sản phẩm Học viên",
     category: "opp.type.supply",
     owner: "Nguyễn Thế Duẩn (Công ty CP PVN)",
     interestCount: 22,
@@ -125,7 +125,7 @@ const BASELINE_MARKETPLACE: SafeListing[] = [
 const BASELINE_NOTIFICATIONS: SafeNotification[] = [
   {
     id: "notif-01",
-    title: "Chào mừng Quý Hội viên đến với nền tảng số Hiệp Hội Doanh Nhân CEO HN10!",
+    title: "Chào mừng Quý Học viên đến với nền tảng số Hiệp Hội Doanh Nhân CEO HN10!",
     category: "Hệ thống",
     read: true,
     route: "/notifications",
@@ -211,12 +211,12 @@ export async function buildServerContext(input: ServerContextInput): Promise<Con
     notifications: BASELINE_NOTIFICATIONS,
     executive: isAdmin
       ? {
-          members: DEFAULT_MEMBERS.length,
-          fees: kpis.total,
-          events: BASELINE_EVENTS.length,
-          opportunities: BASELINE_MARKETPLACE.length,
-          notifications: BASELINE_NOTIFICATIONS.length,
-        }
+        members: DEFAULT_MEMBERS.length,
+        fees: kpis.total,
+        events: BASELINE_EVENTS.length,
+        opportunities: BASELINE_MARKETPLACE.length,
+        notifications: BASELINE_NOTIFICATIONS.length,
+      }
       : undefined,
   };
 

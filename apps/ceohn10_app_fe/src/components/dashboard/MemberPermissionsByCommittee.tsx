@@ -94,7 +94,7 @@ export function MemberPermissionsByCommittee({
           const parsed = JSON.parse(stored);
           if (Array.isArray(parsed) && parsed.length > 0) return parsed;
         }
-      } catch {}
+      } catch { }
     }
     return INITIAL_CATEGORIES;
   });
@@ -104,12 +104,12 @@ export function MemberPermissionsByCommittee({
       try {
         const raw = localStorage.getItem("vba_member_permissions");
         if (raw) return JSON.parse(raw) || {};
-      } catch {}
+      } catch { }
     }
     return {};
   });
 
-  // Tải cấu hình phân quyền hội viên thực tế từ CSDL PostgreSQL (RESTful API)
+  // Tải cấu hình phân quyền Học viên thực tế từ CSDL PostgreSQL (RESTful API)
   useEffect(() => {
     let active = true;
     fetchNestApi("/admin/member-permissions")
@@ -119,7 +119,7 @@ export function MemberPermissionsByCommittee({
           setMemberPermsMap((prev) => ({ ...res, ...prev }));
         }
       })
-      .catch(() => {});
+      .catch(() => { });
     return () => {
       active = false;
     };
@@ -135,7 +135,7 @@ export function MemberPermissionsByCommittee({
       }
       const rawPerms = localStorage.getItem("vba_member_permissions");
       if (rawPerms) setMemberPermsMap(JSON.parse(rawPerms) || {});
-    } catch {}
+    } catch { }
   };
 
   useEffect(() => {
@@ -279,7 +279,7 @@ export function MemberPermissionsByCommittee({
         executiveRole: newRole,
         department: currentDept,
         associationId: m.associationId || "c1983000-0000-4000-8000-000000001983",
-        memberName: m.name || m.code || "Hội viên",
+        memberName: m.name || m.code || "Học viên",
       },
     }));
   };
@@ -294,7 +294,7 @@ export function MemberPermissionsByCommittee({
         executiveRole: currentRole,
         department: newDept,
         associationId: m.associationId || "c1983000-0000-4000-8000-000000001983",
-        memberName: m.name || m.code || "Hội viên",
+        memberName: m.name || m.code || "Học viên",
       },
     }));
   };
@@ -343,7 +343,7 @@ export function MemberPermissionsByCommittee({
     }
     if (
       !confirm(
-        `Bạn có chắc chắn muốn xóa cấu hình quyền riêng của hội viên "${m.name}"? Quyền hạn sẽ được khôi phục về mặc định theo Ban & Vai trò.`
+        `Bạn có chắc chắn muốn xóa cấu hình quyền riêng của Học viên "${m.name}"? Quyền hạn sẽ được khôi phục về mặc định theo Ban & Vai trò.`
       )
     ) {
       return;
@@ -365,7 +365,7 @@ export function MemberPermissionsByCommittee({
       if (typeof window !== "undefined") {
         try {
           localStorage.setItem("vba_member_permissions", JSON.stringify(next));
-        } catch {}
+        } catch { }
       }
       return next;
     });
@@ -373,8 +373,8 @@ export function MemberPermissionsByCommittee({
     try {
       await fetchNestApi(`/admin/member-permissions/${encodeURIComponent(mCode)}`, {
         method: "DELETE",
-      }).catch(() => {});
-    } catch {}
+      }).catch(() => { });
+    } catch { }
 
     dispatchPermissionSyncEvent();
     toast.success(`Đã xóa cấu hình quyền riêng cho "${m.name}". Quyền đã trở về mặc định theo Ban!`);
@@ -405,7 +405,7 @@ export function MemberPermissionsByCommittee({
         body: JSON.stringify(finalMap),
       });
 
-      // 2. Gửi API cập nhật Vai trò & Ban chuyên môn cho từng hội viên được chỉnh sửa
+      // 2. Gửi API cập nhật Vai trò & Ban chuyên môn cho từng Học viên được chỉnh sửa
       const stagedItems = Object.values(stagedRoleDept);
       for (const item of stagedItems) {
         await onUpdateRoleDept({
@@ -420,13 +420,13 @@ export function MemberPermissionsByCommittee({
       if (typeof window !== "undefined") {
         try {
           localStorage.setItem("vba_member_permissions", JSON.stringify(finalMap));
-        } catch {}
+        } catch { }
         dispatchPermissionSyncEvent();
       }
 
       setStagedRoleDept({});
       setStagedOverrides({});
-      toast.success("Đã lưu toàn bộ phân quyền hội viên vào hệ thống thành công!");
+      toast.success("Đã lưu toàn bộ phân quyền Học viên vào hệ thống thành công!");
     } catch (err: any) {
       console.error("Save member permissions error:", err);
       toast.error(err?.message || "Lỗi khi lưu phân quyền vào cơ sở dữ liệu");
@@ -471,7 +471,7 @@ export function MemberPermissionsByCommittee({
         <div>
           <span className="font-bold text-sm block mb-0.5">Phân Hệ 3: Phân Quyền Tài Khoản Theo Từng Ban</span>
           <p className="leading-relaxed">
-            Danh sách tài khoản hội viên được phân theo từng <strong>Ban Chuyên Môn</strong>. Quyền hạn thao tác thực tế (Thêm, Sửa, Xóa, Duyệt) được <strong>tự động thừa hưởng từ Ban và Vai trò</strong> (Phân hệ 1 &amp; 2). Người quản trị có thể tùy chỉnh ghi đè riêng cho từng tài khoản khi cần bật thêm hoặc thu hồi đặc quyền cụ thể.
+            Danh sách tài khoản Học viên được phân theo từng <strong>Ban Chuyên Môn</strong>. Quyền hạn thao tác thực tế (Thêm, Sửa, Xóa, Duyệt) được <strong>tự động thừa hưởng từ Ban và Vai trò</strong> (Phân hệ 1 &amp; 2). Người quản trị có thể tùy chỉnh ghi đè riêng cho từng tài khoản khi cần bật thêm hoặc thu hồi đặc quyền cụ thể.
           </p>
         </div>
       </div>
@@ -481,11 +481,10 @@ export function MemberPermissionsByCommittee({
         <button
           type="button"
           onClick={() => setSelectedCommitteeTab("all")}
-          className={`px-3.5 py-2 rounded-xl text-xs font-bold transition cursor-pointer ${
-            selectedCommitteeTab === "all"
+          className={`px-3.5 py-2 rounded-xl text-xs font-bold transition cursor-pointer ${selectedCommitteeTab === "all"
               ? "bg-[#003B95] text-white shadow-xs"
               : "bg-card border border-border text-muted-foreground hover:bg-muted"
-          }`}
+            }`}
         >
           Tất cả ban ({members.length})
         </button>
@@ -500,16 +499,14 @@ export function MemberPermissionsByCommittee({
               key={comm.key}
               type="button"
               onClick={() => setSelectedCommitteeTab(comm.key)}
-              className={`px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
-                selectedCommitteeTab === comm.key
+              className={`px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${selectedCommitteeTab === comm.key
                   ? "bg-[#003B95] text-white shadow-xs"
                   : "bg-card border border-border text-muted-foreground hover:bg-muted"
-              }`}
+                }`}
             >
               <span>{comm.name}</span>
-              <span className={`text-[10px] px-1.5 py-0.2 rounded-full ${
-                selectedCommitteeTab === comm.key ? "bg-white/20 text-white" : "bg-muted text-muted-foreground"
-              }`}>
+              <span className={`text-[10px] px-1.5 py-0.2 rounded-full ${selectedCommitteeTab === comm.key ? "bg-white/20 text-white" : "bg-muted text-muted-foreground"
+                }`}>
                 {count}
               </span>
             </button>
@@ -553,7 +550,7 @@ export function MemberPermissionsByCommittee({
             <thead>
               <tr className="border-b border-border bg-secondary/40 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
                 <th className="px-4 py-3 text-center w-12">STT</th>
-                <th className="px-4 py-3 min-w-[200px]">Hội Viên / Tài Khoản</th>
+                <th className="px-4 py-3 min-w-[200px]">Học viên / Tài Khoản</th>
                 <th className="px-4 py-3 min-w-[160px]">Ban Chuyên Môn</th>
                 <th className="px-4 py-3 min-w-[140px]">Vai Trò Hệ Thống</th>
                 <th className="px-4 py-3 min-w-[260px]">Thẩm Quyền Thao Tác Thực Tế</th>
@@ -577,11 +574,10 @@ export function MemberPermissionsByCommittee({
                   return (
                     <tr
                       key={m.id}
-                      className={`transition-colors ${
-                        isStaged
+                      className={`transition-colors ${isStaged
                           ? "bg-amber-500/5 hover:bg-amber-500/10 border-l-4 border-l-amber-500"
                           : "hover:bg-secondary/20"
-                      }`}
+                        }`}
                     >
                       <td className="px-4 py-3 text-center text-xs text-muted-foreground font-mono">
                         {idx + 1}
@@ -620,11 +616,10 @@ export function MemberPermissionsByCommittee({
                         <select
                           value={currentDept}
                           onChange={(e) => handleStageDeptChange(m, e.target.value)}
-                          className={`text-xs rounded-lg border px-2.5 py-1.5 font-medium outline-none focus:border-primary cursor-pointer max-w-[170px] ${
-                            stagedRoleDept[m.id]?.department
+                          className={`text-xs rounded-lg border px-2.5 py-1.5 font-medium outline-none focus:border-primary cursor-pointer max-w-[170px] ${stagedRoleDept[m.id]?.department
                               ? "border-amber-500 bg-amber-500/10 font-bold"
                               : "border-border bg-background"
-                          }`}
+                            }`}
                         >
                           {DEPARTMENT_OPTIONS.map((dept) => (
                             <option key={dept} value={dept}>
@@ -639,11 +634,10 @@ export function MemberPermissionsByCommittee({
                         <select
                           value={currentRole}
                           onChange={(e) => handleStageRoleChange(m, e.target.value)}
-                          className={`text-xs rounded-lg border px-2.5 py-1.5 font-bold outline-none focus:border-primary cursor-pointer max-w-[150px] ${
-                            stagedRoleDept[m.id]?.executiveRole
+                          className={`text-xs rounded-lg border px-2.5 py-1.5 font-bold outline-none focus:border-primary cursor-pointer max-w-[150px] ${stagedRoleDept[m.id]?.executiveRole
                               ? "border-amber-500 bg-amber-500/10 text-amber-700 dark:text-amber-400"
                               : "border-border bg-background text-[#003B95] dark:text-blue-400"
-                          }`}
+                            }`}
                         >
                           {ROLE_OPTIONS.map((r) => (
                             <option key={r.value} value={r.value}>
@@ -658,11 +652,10 @@ export function MemberPermissionsByCommittee({
                         <div className="flex flex-wrap items-center gap-1.5">
                           {/* View */}
                           <span
-                            className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold ${
-                              permState.canView
+                            className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold ${permState.canView
                                 ? "bg-sky-100 text-sky-800 dark:bg-sky-950 dark:text-sky-300 border border-sky-300"
                                 : "bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300 border border-rose-300"
-                            }`}
+                              }`}
                             title={permState.canView ? "Được phép xem dữ liệu" : "Không có quyền xem dữ liệu (Bị khóa)"}
                           >
                             {permState.canView ? <CheckCircle2 className="w-2.5 h-2.5" /> : <XCircle className="w-2.5 h-2.5" />}
@@ -671,11 +664,10 @@ export function MemberPermissionsByCommittee({
 
                           {/* Add */}
                           <span
-                            className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold ${
-                              permState.canAdd
+                            className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold ${permState.canAdd
                                 ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-300"
                                 : "bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300 border border-rose-300"
-                            }`}
+                              }`}
                             title={permState.canAdd ? "Được phép thêm mới" : "Không có quyền thêm mới (Bị khóa)"}
                           >
                             {permState.canAdd ? <CheckCircle2 className="w-2.5 h-2.5" /> : <XCircle className="w-2.5 h-2.5" />}
@@ -684,11 +676,10 @@ export function MemberPermissionsByCommittee({
 
                           {/* Edit */}
                           <span
-                            className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold ${
-                              permState.canEdit
+                            className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold ${permState.canEdit
                                 ? "bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300 border border-blue-300"
                                 : "bg-muted text-muted-foreground border border-border"
-                            }`}
+                              }`}
                           >
                             {permState.canEdit ? <CheckCircle2 className="w-2.5 h-2.5" /> : <XCircle className="w-2.5 h-2.5" />}
                             Sửa: {permState.canEdit ? "Bật" : "Tắt"}
@@ -696,11 +687,10 @@ export function MemberPermissionsByCommittee({
 
                           {/* Delete */}
                           <span
-                            className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold ${
-                              permState.canDelete
+                            className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold ${permState.canDelete
                                 ? "bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 border border-amber-300"
                                 : "bg-muted text-muted-foreground border border-border"
-                            }`}
+                              }`}
                           >
                             {permState.canDelete ? <CheckCircle2 className="w-2.5 h-2.5" /> : <XCircle className="w-2.5 h-2.5" />}
                             Xóa: {permState.canDelete ? "Bật" : "Tắt"}
@@ -708,11 +698,10 @@ export function MemberPermissionsByCommittee({
 
                           {/* Approve */}
                           <span
-                            className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold ${
-                              permState.canApprove
+                            className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold ${permState.canApprove
                                 ? "bg-purple-100 text-purple-800 dark:bg-purple-950 dark:text-purple-300 border border-purple-300"
                                 : "bg-muted text-muted-foreground border border-border"
-                            }`}
+                              }`}
                           >
                             {permState.canApprove ? <CheckCircle2 className="w-2.5 h-2.5" /> : <XCircle className="w-2.5 h-2.5" />}
                             Duyệt: {permState.canApprove ? "Bật" : "Tắt"}
@@ -776,7 +765,7 @@ export function MemberPermissionsByCommittee({
             </div>
             <div>
               <div className="text-xs font-bold text-foreground flex items-center gap-2">
-                <span>Đang có {unsavedCount} thay đổi phân quyền hội viên chưa lưu vào Database</span>
+                <span>Đang có {unsavedCount} thay đổi phân quyền Học viên chưa lưu vào Database</span>
                 <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-700 dark:text-amber-300">
                   Draft Mode
                 </span>
@@ -1002,7 +991,7 @@ function CustomMemberPermissionModal({
             </label>
 
             <label className="flex items-center justify-between p-2.5 rounded-xl border border-border bg-background cursor-pointer hover:border-primary/50 transition">
-              <span className="font-medium text-foreground">👥 Quản lý Hội viên</span>
+              <span className="font-medium text-foreground">👥 Quản lý Học viên</span>
               <input
                 type="checkbox"
                 checked={canManageMembers}
@@ -1126,7 +1115,7 @@ function MemberPermissionDetailModal({
             <span className="font-bold text-foreground">{member.name}</span>
           </div>
           <div>
-            <span className="text-muted-foreground block text-[11px]">Mã hội viên:</span>
+            <span className="text-muted-foreground block text-[11px]">Mã Học viên:</span>
             <span className="font-mono font-bold text-foreground">{member.code || "Chưa cấp"}</span>
           </div>
           <div>

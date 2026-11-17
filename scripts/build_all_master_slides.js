@@ -360,15 +360,15 @@ function addAppMobileFeatureSlide(pres, header, imgFilename, badgeText, features
 // DỮ LIỆU TẤT CẢ SLIDES CRM (26 SLIDES ĐẦY ĐỦ 100% KHÔNG THIẾU BẤT KỲ LUỒNG NÀO)
 // =============================================================================
 const CRM_FEATURE_SLIDES = [
-  
+
   {
     eyebrow: 'CHỨC NĂNG QUẢN TRỊ 01',
     title: 'Bảng Điều Khiển Tổng Quan (Dashboard) & Chỉ Số KPI Thực',
-    subtitle: 'Bức tranh toàn cảnh về sức khỏe hiệp hội: Hội viên, Dòng tiền sổ quỹ và Giao thương B2B',
+    subtitle: 'Bức tranh toàn cảnh về sức khỏe hiệp hội: Học viên, Dòng tiền sổ quỹ và Giao thương B2B',
     img: 'crm_step_02_dashboard_kpi_live.png',
     badge: '📊 Dữ liệu phản hồi trực tiếp từ Database với biểu đồ tiến độ & thống kê thời gian thực',
     features: [
-      { title: 'Chỉ Số Tăng Trưởng Hội Viên', desc: 'Thống kê tổng số doanh nhân chính thức đang hoạt động và số lượng hồ sơ mới đang chờ thẩm định.' },
+      { title: 'Chỉ Số Tăng Trưởng Học viên', desc: 'Thống kê tổng số doanh nhân chính thức đang hoạt động và số lượng hồ sơ mới đang chờ thẩm định.' },
       { title: 'Theo Dõi Dòng Tiền & Quỹ Hội', desc: 'Đo lường nguồn thu hội phí thường niên, vé sự kiện và các khoản tài trợ chuyển khoản VietQR.' },
       { title: 'Đo Lường Hiệu Quả Sàn B2B', desc: 'Tổng hợp số lượng hoạt động kết nối, sản phẩm niêm yết và số lượng Deal giao thương thành công.' },
       { title: 'Xuất Báo Cáo Ban Chấp Hành Tức Thì', desc: 'Tải dữ liệu chuẩn hóa phục vụ các kỳ họp Ban Chấp Hành định kỳ chỉ với một cú nhấp chuột.' }
@@ -376,14 +376,14 @@ const CRM_FEATURE_SLIDES = [
   },
   {
     eyebrow: 'CHỨC NĂNG QUẢN TRỊ 02',
-    title: 'Quản Trị Danh Sách Hội Viên, Phân Hạng & Bộ Lọc Ban Ngành',
+    title: 'Quản Trị Danh Sách Học viên, Phân Hạng & Bộ Lọc Ban Ngành',
     subtitle: 'Quản lý toàn bộ 100+ lãnh đạo doanh nhân sinh năm 1983 theo ban chuyên môn',
     img: 'crm_step_03_members_management.png',
     badge: '👥 Bảng dữ liệu đa năng hỗ trợ tìm kiếm nhanh, lọc theo trạng thái và xuất Excel',
     features: [
       { title: 'Danh Mục Hồ Sơ Doanh Nhân Đầy Đủ', desc: 'Lưu trữ họ tên, công ty, mã số thuế, chức vụ trong CLB, số điện thoại và địa chỉ trụ sở.' },
       { title: 'Bộ Lọc & Tìm Kiếm Thông Minh', desc: 'Tra cứu tức thì theo tên doanh nhân, công ty, số điện thoại hoặc trạng thái Hoạt động/Chờ duyệt.' },
-      { title: 'Phân Bổ Ban Chuyên Môn Sinh Hoạt', desc: 'Sắp xếp hội viên vào Ban Sự kiện, Ban Tài chính, Ban Xúc tiến Thương mại, Ban Truyền thông.' },
+      { title: 'Phân Bổ Ban Chuyên Môn Sinh Hoạt', desc: 'Sắp xếp Học viên vào Ban Sự kiện, Ban Tài chính, Ban Xúc tiến Thương mại, Ban Truyền thông.' },
       { title: 'Xuất Báo Cáo Excel Danh Bạ', desc: 'Tải file Excel định dạng chuẩn phục vụ công tác in ấn kỷ yếu và lưu trữ nội bộ hiệp hội.' }
     ]
   },
@@ -392,23 +392,23 @@ const CRM_FEATURE_SLIDES = [
     title: 'Thẩm Định Hồ Sơ 360° & Ban Thường Vụ Độc Quyền Phê Duyệt',
     subtitle: 'Ban Thường Vụ độc quyền duyệt cấp mã CEO-83xxx; Cơ chế bảo vệ phân quyền chặt chẽ',
     img: 'crm_step_04_member_approval_drawer.png',
-    badge: '⚡ Bấm Phê duyệt: Tự động kích hoạt tài khoản DB & Gửi ngay Email mật khẩu cho hội viên',
+    badge: '⚡ Bấm Phê duyệt: Tự động kích hoạt tài khoản DB & Gửi ngay Email mật khẩu cho Học viên',
     features: [
       { title: 'Drawer Thẩm Định Toàn Diện 360°', desc: 'Xem trọn vẹn giấy phép đăng ký kinh doanh, chức vụ C-Level và lĩnh vực kinh doanh của doanh nghiệp.' },
       { title: 'Ban Thường Vụ Độc Quyền Phê Duyệt', desc: 'Chỉ BTV có quyền bấm Duyệt; hệ thống tự động sinh mã định danh chính thức CEO-83xxx.' },
       { title: 'Tách Biệt Thẩm Quyền Phê Duyệt', desc: 'Hệ thống kiểm soát nghiêm ngặt theo thẩm quyền Ban Thường Vụ, tự động từ chối thao tác ngoài thẩm quyền.' },
-      { title: 'Bắn Email Kèm Mật Khẩu Tức Thì', desc: 'Hệ thống gửi thư điện tử chúc mừng kết nạp kèm mật khẩu khởi tạo an toàn về hòm thư hội viên.' }
+      { title: 'Bắn Email Kèm Mật Khẩu Tức Thì', desc: 'Hệ thống gửi thư điện tử chúc mừng kết nạp kèm mật khẩu khởi tạo an toàn về hòm thư Học viên.' }
     ]
   },
   {
     eyebrow: 'CHỨC NĂNG QUẢN TRỊ 04',
-    title: 'Hồ Sơ Chi Tiết Hội Viên 360°, Phân Hạng Kim Cương & Quản Trị Tài Khoản',
-    subtitle: 'Trang chi tiết hồ sơ hội viên toàn diện, chấm điểm gắn kết KPI, đặt lại mật khẩu và phân quyền',
+    title: 'Hồ Sơ Chi Tiết Học viên 360°, Phân Hạng Kim Cương & Quản Trị Tài Khoản',
+    subtitle: 'Trang chi tiết hồ sơ Học viên toàn diện, chấm điểm gắn kết KPI, đặt lại mật khẩu và phân quyền',
     img: 'crm1983_04_member_detail_drawer.png',
-    badge: '👤 Hồ sơ hội viên 360°: Quản trị tài khoản, reset mật khẩu, lịch sử sinh hoạt & điểm gắn kết KPI',
+    badge: '👤 Hồ sơ Học viên 360°: Quản trị tài khoản, reset mật khẩu, lịch sử sinh hoạt & điểm gắn kết KPI',
     features: [
-      { title: 'Trang Xem Chi Tiết Hội Viên 360°', desc: 'Theo dõi lịch sử tham gia họp, sự kiện, giao thương B2B và tình trạng đóng hội phí thường niên.' },
-      { title: 'Quản Trị Tài Khoản, Khóa & Reset Mật Khẩu', desc: 'Đặt lại mật khẩu gửi về email hội viên, tạm khóa tài khoản hoặc mở khóa quyền truy cập tức thì.' },
+      { title: 'Trang Xem Chi Tiết Học viên 360°', desc: 'Theo dõi lịch sử tham gia họp, sự kiện, giao thương B2B và tình trạng đóng hội phí thường niên.' },
+      { title: 'Quản Trị Tài Khoản, Khóa & Reset Mật Khẩu', desc: 'Đặt lại mật khẩu gửi về email Học viên, tạm khóa tài khoản hoặc mở khóa quyền truy cập tức thì.' },
       { title: 'Chấm Điểm Gắn Kết & Phân Hạng Tự Động', desc: 'Hệ thống tự động tính điểm KPI hoạt động và phân hạng: Kim Cương, Vàng, Bạc minh bạch.' },
       { title: 'Phân Khúc Ngành Nghề & Xuất/Nhập Excel', desc: 'Phân loại 12 nhóm ngành kinh tế, cấp quyền lợi ưu đãi và hỗ trợ import/export danh bạ Excel.' }
     ]
@@ -422,7 +422,7 @@ const CRM_FEATURE_SLIDES = [
     features: [
       { title: 'Biểu Mẫu Khởi Tạo & Hiệu Chỉnh Sự Kiện', desc: 'Cập nhật tiêu đề, mô tả, địa điểm, thời gian, banner chuẩn cinematic, tùy chỉnh nội dung bất kỳ lúc nào.' },
       { title: 'Cấu Hình Timeline Chi Tiết & Diễn Giả VIP', desc: 'Thiết lập lịch trình từng phiên thảo luận, đính kèm hình ảnh và trích dẫn diễn giả C-Level.' },
-      { title: 'Cấu Hình Vé Đa Tầng & Phụ Thu VietQR', desc: 'Vé VIP 0đ đặc quyền cho hội viên; Vé đối tác/khách mời phụ thu (1.500.000đ) qua VietQR tự động.' },
+      { title: 'Cấu Hình Vé Đa Tầng & Phụ Thu VietQR', desc: 'Vé VIP 0đ đặc quyền cho Học viên; Vé đối tác/khách mời phụ thu (1.500.000đ) qua VietQR tự động.' },
       { title: 'Quản Lý Danh Sách & Xác Nhận Tham Gia', desc: 'Ban Tổ Chức duyệt/hủy đăng ký, xác nhận tham dự, gửi email thông báo mã vé và xuất báo cáo Excel.' }
     ]
   },
@@ -435,7 +435,7 @@ const CRM_FEATURE_SLIDES = [
     features: [
       { title: 'Trực Quan Hóa Sơ Đồ Khán Phòng', desc: 'Mô phỏng chân thực ma trận ghế ngồi và bàn tiệc: Bàn VIP Kim Cương, Bàn Đại biểu, Bàn Khách mời.' },
       { title: 'Kéo Thả Xếp Chỗ Ngồi Danh Dự', desc: 'Gán đại biểu và khách VIP vào từng vị trí ghế ngồi cụ thể theo giao thức ngoại giao trang trọng.' },
-      { title: 'Tự Động Cập Nhật Lên Vé Trên App', desc: 'Vị trí số bàn và số ghế tự động hiển thị trên Vé điện tử thông minh trong điện thoại của hội viên.' },
+      { title: 'Tự Động Cập Nhật Lên Vé Trên App', desc: 'Vị trí số bàn và số ghế tự động hiển thị trên Vé điện tử thông minh trong điện thoại của Học viên.' },
       { title: 'Ngăn Ngừa Trùng Lặp Chỗ Ngồi 100%', desc: 'Hệ thống tự động khóa ghế đã được gán, đảm bảo không bao giờ xảy ra tình trạng xếp trùng vị trí.' }
     ]
   },
@@ -509,12 +509,12 @@ const CRM_FEATURE_SLIDES = [
     title: 'Quản Trị Sàn Marketplace, Kiểm Duyệt Sản Phẩm Doanh Nghiệp',
     subtitle: 'Thẩm định chất lượng và xuất xứ trước khi niêm yết chào hàng nội bộ',
     img: 'crm_step_08_marketplace_moderation.png',
-    badge: '🏷️ Gán nhãn Đã Kiểm Duyệt CLB CEO HN10 và kích hoạt ưu đãi đặc quyền cho hội viên',
+    badge: '🏷️ Gán nhãn Đã Kiểm Duyệt CLB CEO HN10 và kích hoạt ưu đãi đặc quyền cho Học viên',
     features: [
-      { title: 'Hàng Đợi Kiểm Duyệt Sản Phẩm', desc: 'Tiếp nhận bài đăng sản phẩm từ Mobile App hội viên, xem hình ảnh, thông số kỹ thuật và báo giá sỉ.' },
+      { title: 'Hàng Đợi Kiểm Duyệt Sản Phẩm', desc: 'Tiếp nhận bài đăng sản phẩm từ Mobile App Học viên, xem hình ảnh, thông số kỹ thuật và báo giá sỉ.' },
       { title: 'Thẩm Định Chính Sách Ưu Đãi Nội Bộ', desc: 'Đảm bảo sản phẩm có chính sách chiết khấu thực chất dành riêng cho cộng đồng doanh nhân CEO HN10.' },
-      { title: 'Phê Duyệt Xuất Bản Lên App Tức Thì', desc: 'Bấm Duyệt: Sản phẩm ngay lập tức xuất hiện trên sàn giao dịch của toàn bộ hội viên trên di động.' },
-      { title: 'Theo Dõi & Giám Sát Báo Giá B2B', desc: 'Thống kê số lượt hội viên gửi yêu cầu báo giá và lưu lượng tương tác giao thương giữa các bên.' }
+      { title: 'Phê Duyệt Xuất Bản Lên App Tức Thì', desc: 'Bấm Duyệt: Sản phẩm ngay lập tức xuất hiện trên sàn giao dịch của toàn bộ Học viên trên di động.' },
+      { title: 'Theo Dõi & Giám Sát Báo Giá B2B', desc: 'Thống kê số lượt Học viên gửi yêu cầu báo giá và lưu lượng tương tác giao thương giữa các bên.' }
     ]
   },
   {
@@ -525,7 +525,7 @@ const CRM_FEATURE_SLIDES = [
     badge: '🤝 Đo lường giá trị các Deal kinh doanh đã kết nối thành công phục vụ báo cáo hiệp hội',
     features: [
       { title: 'Nắm Bắt Toàn Diện Nhu Cầu Giao Thương', desc: 'Theo dõi các đề xuất mua bán, tìm nhà cung ứng, mời gọi hợp tác đầu tư và phân phối hàng hóa.' },
-      { title: 'Giám Sát Trạng Thái Kết Nối Deals', desc: 'Biết chính xác cơ hội nào đã được hội viên đón nhận (Claimed) và tiến độ ký kết hợp đồng.' },
+      { title: 'Giám Sát Trạng Thái Kết Nối Deals', desc: 'Biết chính xác cơ hội nào đã được Học viên đón nhận (Claimed) và tiến độ ký kết hợp đồng.' },
       { title: 'Thống Kê Tổng Giá Trị Giao Thương', desc: 'Đo lường quy mô kinh tế bằng tiền (Tỷ đồng) mà hệ sinh thái CEO HN10 đã tạo ra cho thành viên.' },
       { title: 'Hỗ Trợ Kết Nối Chéo Giữa Các Ban', desc: 'Ban Xúc tiến thương mại đóng vai trò điều phối, giới thiệu các đối tác tiềm năng phù hợp nhất.' }
     ]
@@ -537,10 +537,10 @@ const CRM_FEATURE_SLIDES = [
     img: 'crm_step_10_finance_fees_cashbook.png',
     badge: '💳 Gạch nợ tự động qua VietQR, xuất phiếu thu điện tử và lưu trữ sổ quỹ kế toán minh bạch',
     features: [
-      { title: 'Theo Dõi Hội Phí Thường Niên Theo Năm', desc: 'Bảng theo dõi trạng thái: Đã thanh toán, Chưa nộp, Miễn giảm theo từng hội viên cụ thể.' },
-      { title: 'Đối Soát Tự Động Qua Cổng VietQR 24/7', desc: 'Khi hội viên quét mã chuyển khoản trên App, hệ thống tự động gạch nợ và gia hạn thẻ số tức thì.' },
+      { title: 'Theo Dõi Hội Phí Thường Niên Theo Năm', desc: 'Bảng theo dõi trạng thái: Đã thanh toán, Chưa nộp, Miễn giảm theo từng Học viên cụ thể.' },
+      { title: 'Đối Soát Tự Động Qua Cổng VietQR 24/7', desc: 'Khi Học viên quét mã chuyển khoản trên App, hệ thống tự động gạch nợ và gia hạn thẻ số tức thì.' },
       { title: 'Sổ Quỹ Thu Chi Duyệt 3 Cấp Nghiêm Ngặt', desc: 'Lập phiếu, Kế toán soát xét, BTV phê duyệt; ghi nhận minh bạch thu hội phí, tài trợ, quỹ từ thiện.' },
-      { title: 'Xuất Báo Cáo Kế Toán & Phiếu Thu Số', desc: 'Tự động tạo phiếu thu điện tử gửi về email hội viên và xuất file đối soát phục vụ ban kiểm soát.' }
+      { title: 'Xuất Báo Cáo Kế Toán & Phiếu Thu Số', desc: 'Tự động tạo phiếu thu điện tử gửi về email Học viên và xuất file đối soát phục vụ ban kiểm soát.' }
     ]
   },
   {
@@ -552,7 +552,7 @@ const CRM_FEATURE_SLIDES = [
     features: [
       { title: 'Lưu Trữ Hồ Sơ Pháp Nhân Đầy Đủ', desc: 'Quản lý mã số thuế, địa chỉ trụ sở, người đại diện pháp luật và hồ sơ năng lực chi tiết của công ty.' },
       { title: 'Phân Loại Ngành Nghề Chuỗi Giá Trị', desc: 'Sắp xếp theo cụm ngành: Cơ khí sản xuất, Xây dựng hoàn thiện, F&B, Logistics, Dịch vụ số.' },
-      { title: 'Thúc Đẩy Sử Dụng Sản Phẩm Chéo', desc: 'Khuyến khích hội viên ưu tiên sử dụng vật tư, thiết bị và dịch vụ của nhau với chiết khấu nội bộ.' },
+      { title: 'Thúc Đẩy Sử Dụng Sản Phẩm Chéo', desc: 'Khuyến khích Học viên ưu tiên sử dụng vật tư, thiết bị và dịch vụ của nhau với chiết khấu nội bộ.' },
       { title: 'Liên Kết Tài Khoản Lãnh Đạo Với Công Ty', desc: 'Một doanh nghiệp có thể có Chủ tịch và Tổng Giám Đốc cùng sinh hoạt với quyền hạn rõ ràng.' }
     ]
   },
@@ -563,8 +563,8 @@ const CRM_FEATURE_SLIDES = [
     img: '02_crm_members_roles_permission.png',
     badge: '🔒 Nhật ký kiểm toán lưu vết IP, tài khoản thực hiện và thời gian chính xác của mọi thao tác',
     features: [
-      { title: 'Ma Trận Phân Quyền 6 Ban Chuyên Môn', desc: 'BTV, BTK, Ban Sự kiện, Ban Tài chính, Ban Hội viên, Ban Truyền thông theo đúng thẩm quyền.' },
-      { title: 'Nhật Ký Kiểm Toán An Ninh Bất Biến', desc: 'Ghi nhận lịch sử: Ai đã phê duyệt hội viên, ai đã sửa số liệu sổ quỹ, ai đã xuất file danh bạ.' },
+      { title: 'Ma Trận Phân Quyền 6 Ban Chuyên Môn', desc: 'BTV, BTK, Ban Sự kiện, Ban Tài chính, Ban Học viên, Ban Truyền thông theo đúng thẩm quyền.' },
+      { title: 'Nhật Ký Kiểm Toán An Ninh Bất Biến', desc: 'Ghi nhận lịch sử: Ai đã phê duyệt Học viên, ai đã sửa số liệu sổ quỹ, ai đã xuất file danh bạ.' },
       { title: 'Bảo Vệ Hạ Tầng Chuẩn SSL/HTTPS', desc: 'Toàn bộ dữ liệu truyền tải giữa Web CRM, App Mobile và CSDL đều được mã hóa tuyệt đối.' },
       { title: 'Cơ Chế Sao Lưu Định Kỳ Tự Động', desc: 'Tự động sao lưu dự phòng CSDL hàng ngày, đảm bảo khả năng phục hồi nguyên vẹn khi cần thiết.' }
     ]
@@ -577,7 +577,7 @@ const CRM_FEATURE_SLIDES = [
 // =============================================================================
 const APP_FEATURE_SLIDES = [
   {
-    eyebrow: 'CHỨC NĂNG HỘI VIÊN 01',
+    eyebrow: 'CHỨC NĂNG Học viên 01',
     title: 'Trang Chủ Dashboard Doanh Nhân & Tiện Ích 1-Chạm',
     subtitle: 'Tổng hợp mọi thông tin sinh hoạt, sự kiện và cơ hội hợp tác ngay trong tầm tay',
     img: 'app_step_04_home_dashboard.png',
@@ -590,20 +590,20 @@ const APP_FEATURE_SLIDES = [
     ]
   },
   {
-    eyebrow: 'CHỨC NĂNG HỘI VIÊN 02',
+    eyebrow: 'CHỨC NĂNG Học viên 02',
     title: 'Thẻ Định Danh Số VIP Titanium & Tích Hợp Chip Chạm NFC',
     subtitle: 'Biểu tượng danh giá khẳng định tư cách lãnh đạo thành viên chính thức CLB CEO HN10',
     img: 'live_26_app_vip_3d_card.png',
     badge: 'Thẻ định danh VIP Titanium',
     features: [
-      { title: 'Thiết Kế Thẻ Hội Viên VIP Titanium Độc Bản', desc: 'Tông màu vàng kim hoàng gia sang trọng, gắn ảnh chân dung lãnh đạo, họ tên và doanh nghiệp.' },
-      { title: 'Mã Số Hội Viên Độc Nhất (CEO-83xxx)', desc: 'Mã định danh duy nhất xác nhận tư cách pháp nhân thành viên chính thức được phê duyệt.' },
+      { title: 'Thiết Kế Thẻ Học viên VIP Titanium Độc Bản', desc: 'Tông màu vàng kim hoàng gia sang trọng, gắn ảnh chân dung lãnh đạo, họ tên và doanh nghiệp.' },
+      { title: 'Mã Số Học viên Độc Nhất (CEO-83xxx)', desc: 'Mã định danh duy nhất xác nhận tư cách pháp nhân thành viên chính thức được phê duyệt.' },
       { title: 'Huy Hiệu Tích Xanh Chứng Nhận Lãnh Đạo', desc: 'Dấu tích xanh Verified minh chứng uy tín doanh nhân được Hội Doanh Nhân Trẻ Hà Nội công nhận.' },
       { title: 'Tích Hợp Chip Cảm Ứng Không Tiếp Xúc NFC', desc: 'Chạm điện thoại vào bất kỳ máy quét hoặc điện thoại thông minh nào để mở trang định danh tức thì.' }
     ]
   },
   {
-    eyebrow: 'CHỨC NĂNG HỘI VIÊN 03',
+    eyebrow: 'CHỨC NĂNG Học viên 03',
     title: 'Danh Thiếp Số Doanh Nhân Visit Card Lật Mặt Sau & Chuẩn Brandbook',
     subtitle: 'Thay thế hoàn toàn card visit giấy: Mặt trước thông tin C-Level, mặt sau Brandbook xanh Navy',
     img: 'app_visit_card_front.png',
@@ -616,7 +616,7 @@ const APP_FEATURE_SLIDES = [
     ]
   },
   {
-    eyebrow: 'CHỨC NĂNG HỘI VIÊN 04',
+    eyebrow: 'CHỨC NĂNG Học viên 04',
     title: 'Quét Mã QR Bằng Camera WebRTC Siêu Tốc 0.1s & Nhận Diện Đa Chiều',
     subtitle: 'Quét danh thiếp số doanh nhân, vé sự kiện điện tử và điểm danh cuộc họp trong tích tắc',
     img: 'app_public_qr_scan_user.png',
@@ -629,7 +629,7 @@ const APP_FEATURE_SLIDES = [
     ]
   },
   {
-    eyebrow: 'CHỨC NĂNG HỘI VIÊN 05',
+    eyebrow: 'CHỨC NĂNG Học viên 05',
     title: 'Quét Mã QR Từ Ngoài & Trang Xác Thực Công Khai Chuẩn Brandbook',
     subtitle: 'Đối tác quét bằng Zalo / Camera iPhone không cần cài app vẫn hiển thị hồ sơ thẩm định 100%',
     img: 'app_public_qr_scan_view.png',
@@ -642,7 +642,7 @@ const APP_FEATURE_SLIDES = [
     ]
   },
   {
-    eyebrow: 'CHỨC NĂNG HỘI VIÊN 06',
+    eyebrow: 'CHỨC NĂNG Học viên 06',
     title: 'Chỉnh Sửa Nhanh Hồ Sơ Doanh Nhân (QuickProfileEditModal) Tiện Lợi',
     subtitle: 'Cập nhật ảnh đại diện, ảnh bìa, logo công ty, chức danh và slogan doanh nghiệp trong 1 màn hình',
     img: 'live_30_app_member_profile_edit.png',
@@ -655,7 +655,7 @@ const APP_FEATURE_SLIDES = [
     ]
   },
   {
-    eyebrow: 'CHỨC NĂNG HỘI VIÊN 07',
+    eyebrow: 'CHỨC NĂNG Học viên 07',
     title: 'Hồ Sơ Năng Lực Doanh Nhân 360° & Pháp Nhân Doanh Nghiệp',
     subtitle: 'Khẳng định uy tín thương hiệu cá nhân và năng lực công ty trong mạng lưới',
     img: 'app_step_06_profile_view.png',
@@ -668,11 +668,11 @@ const APP_FEATURE_SLIDES = [
     ]
   },
   {
-    eyebrow: 'CHỨC NĂNG HỘI VIÊN 08',
-    title: 'Danh Bạ Hội Viên CLB CEO HN10 & Tra Cứu Đối Tác Đa Ngành Nghề',
+    eyebrow: 'CHỨC NĂNG Học viên 08',
+    title: 'Danh Bạ Học viên CLB CEO HN10 & Tra Cứu Đối Tác Đa Ngành Nghề',
     subtitle: 'Kết nối trực tiếp hơn 500+ Chủ tịch và Tổng Giám Đốc sinh năm 1983',
     img: 'app1983_03_members_directory.png',
-    badge: 'Danh bạ hội viên',
+    badge: 'Danh bạ Học viên',
     features: [
       { title: 'Mạng Lưới Lãnh Đạo Đồng Niên 1983', desc: 'Cộng đồng các nhà sáng lập cùng thế hệ, thấu hiểu tư duy và chia sẻ chung khát vọng phát triển.' },
       { title: 'Bộ Lọc Đa Chiều Theo Ngành Nghề', desc: 'Tìm kiếm đối tác theo lĩnh vực: Xây dựng, Công nghệ, Y tế, Nông nghiệp, Tài chính, Bất động sản.' },
@@ -681,7 +681,7 @@ const APP_FEATURE_SLIDES = [
     ]
   },
   {
-    eyebrow: 'CHỨC NĂNG HỘI VIÊN 09',
+    eyebrow: 'CHỨC NĂNG Học viên 09',
     title: 'Xem Chi Tiết Hồ Sơ Năng Lực Đối Tác & Kết Nối Hợp Tác',
     subtitle: 'Nắm bắt trọn vẹn thông tin đối tác trước khi tiến hành đàm phán kinh doanh',
     img: 'app_step_08_member_profile_modal.png',
@@ -694,7 +694,7 @@ const APP_FEATURE_SLIDES = [
     ]
   },
   {
-    eyebrow: 'CHỨC NĂNG HỘI VIÊN 10',
+    eyebrow: 'CHỨC NĂNG Học viên 10',
     title: 'Đặt Lịch Hẹn Gặp Kết Nối 1-on-1 Giữa 2 CEO Doanh Nghiệp',
     subtitle: 'Khởi tạo cuộc hẹn giao thương, chọn địa điểm quán cafe / văn phòng, đổi giờ & đồng bộ lịch',
     img: 'app1983_14_meetings_schedule.png',
@@ -707,7 +707,7 @@ const APP_FEATURE_SLIDES = [
     ]
   },
   {
-    eyebrow: 'CHỨC NĂNG HỘI VIÊN 11',
+    eyebrow: 'CHỨC NĂNG Học viên 11',
     title: 'Hộp Thư Doanh Nghiệp, Chat 1-1 & Nhóm Chat 6 Ban Realtime',
     subtitle: 'Trao đổi cơ hội hợp tác, gửi tài liệu báo giá, vị trí và nhận thông báo [CEOHN10_SYSTEM]',
     img: 'app_step_10_chat_conversation.png',
@@ -720,33 +720,33 @@ const APP_FEATURE_SLIDES = [
     ]
   },
   {
-    eyebrow: 'CHỨC NĂNG HỘI VIÊN 12',
+    eyebrow: 'CHỨC NĂNG Học viên 12',
     title: 'Lịch Sự Kiện, Diễn Đàn Doanh Nhân & Đăng Ký Vé Tham Dự',
     subtitle: 'Không bỏ lỡ các kỳ Đại hội, Caravan kết nối kinh doanh và Gala thường niên',
     img: 'app_step_11_events_list.png',
     badge: 'Lịch sự kiện',
     features: [
       { title: 'Lịch Trình Chi Tiết Các Hoạt Động CLB', desc: 'Nắm bắt thời gian, địa điểm tổ chức, nội dung chương trình và diễn giả của từng sự kiện.' },
-      { title: 'Đặc Quyền Vé Miễn Phí Dành Cho Hội Viên', desc: 'Hội viên chính thức được miễn phí vé tham dự hoặc nhận mức giá ưu đãi đặc biệt.' },
+      { title: 'Đặc Quyền Vé Miễn Phí Dành Cho Học viên', desc: 'Học viên chính thức được miễn phí vé tham dự hoặc nhận mức giá ưu đãi đặc biệt.' },
       { title: 'Thanh Toán Vé Đại Biểu Qua VietQR', desc: 'Đối với vé có thu phí, hệ thống cung cấp mã QR chuyển khoản chính xác tới từng đồng.' },
       { title: 'Đồng Bộ Lịch Hẹn Vào Google Calendar', desc: 'Tự động thêm sự kiện vào lịch cá nhân trên điện thoại kèm nhắc nhở trước 24 giờ.' }
     ]
   },
   {
-    eyebrow: 'CHỨC NĂNG HỘI VIÊN 13',
+    eyebrow: 'CHỨC NĂNG Học viên 13',
     title: 'Đăng Ký Sự Kiện, Chọn Chỗ Khán Phòng VIP & Vé Điện Tử E-Ticket',
     subtitle: 'Form đăng ký thông minh, vé VIP 0đ, phụ thu vé đối tác VietQR và lưu trữ vé số offline',
     img: 'app_step_12_event_detail_modal.png',
     badge: 'Trải nghiệm sự kiện 4.0: Chọn ghế trực quan, vé điện tử QR lưu trữ trên máy & Lucky Draw',
     features: [
-      { title: 'Form Đăng Ký Vé VIP 0đ & Vé Phụ Thu', desc: 'Đăng ký suất tham dự miễn phí cho hội viên; đăng ký thêm vé đối tác đi cùng thanh toán VietQR.' },
+      { title: 'Form Đăng Ký Vé VIP 0đ & Vé Phụ Thu', desc: 'Đăng ký suất tham dự miễn phí cho Học viên; đăng ký thêm vé đối tác đi cùng thanh toán VietQR.' },
       { title: 'Sơ Đồ Chọn Ghế Khán Phòng Trực Quan', desc: 'Chạm chọn vị trí ghế ngồi và bàn tiệc trực tiếp trên sơ đồ rạp Cinema Seating Map trên mobile.' },
       { title: 'Ví Vé Điện Tử Offline Kèm Mã QR Động', desc: 'Vé lưu trực tiếp trong máy, hiển thị họ tên, số bàn tiệc, mã may mắn và check-in không cần mạng.' },
       { title: 'Tự Động Đưa Vào Danh Sách Lucky Draw', desc: 'Mã vé check-in hợp lệ được đồng bộ tự động vào vòng quay may mắn trúng xe VinFast VF3 đêm Gala.' }
     ]
   },
   {
-    eyebrow: 'CHỨC NĂNG HỘI VIÊN 14',
+    eyebrow: 'CHỨC NĂNG Học viên 14',
     title: 'Vé Điện Tử Thông Minh & Quét Mã QR Check-in Siêu Tốc 1s',
     subtitle: 'Không lo quên vé giấy, kiểm soát lối vào hội trường chỉ với 1 thao tác quét',
     img: 'app_step_13_ticket_qr_pass.png',
@@ -759,61 +759,61 @@ const APP_FEATURE_SLIDES = [
     ]
   },
   {
-    eyebrow: 'CHỨC NĂNG HỘI VIÊN 15',
+    eyebrow: 'CHỨC NĂNG Học viên 15',
     title: 'Bầu Cử BCH & Biểu Quyết Tín Nhiệm Trực Tuyến Trên App',
     subtitle: 'Thực thi quyền dân chủ đại hội minh bạch, bảo mật tuyệt đối với giao diện trực quan',
     img: 'app_voting_mobile_view.png',
     badge: 'Giao diện bầu cử tín nhiệm trên Mobile App',
     features: [
       { title: 'Bỏ Phiếu Tín Nhiệm Đại Biểu Trực Tiếp', desc: 'Bầu cử Ban Chấp Hành nhiệm kỳ mới ngay trên màn hình điện thoại với danh sách ứng viên minh bạch.' },
-      { title: 'Mã Hóa Phiếu Bầu Chống Gian Lận', desc: 'Mỗi hội viên chỉ được bỏ phiếu một lần duy nhất, kết quả được mã hóa bảo mật danh tính người bầu.' },
+      { title: 'Mã Hóa Phiếu Bầu Chống Gian Lận', desc: 'Mỗi Học viên chỉ được bỏ phiếu một lần duy nhất, kết quả được mã hóa bảo mật danh tính người bầu.' },
       { title: 'Xem Chi Tiết Hồ Sơ & Chương Trình Hành Động', desc: 'Chạm vào tên ứng viên để xem quá trình cống hiến, doanh nghiệp và cam kết hành động trước khi vote.' },
       { title: 'Cập Nhật Tiến Độ Kiểm Phiếu Tức Thì', desc: 'Theo dõi tỷ lệ phần trăm cử tri đã tham gia bỏ phiếu theo thời gian thực trên màn hình ứng dụng.' }
     ]
   },
   {
-    eyebrow: 'CHỨC NĂNG HỘI VIÊN 16',
+    eyebrow: 'CHỨC NĂNG Học viên 16',
     title: 'Vòng Quay May Mắn Lucky Draw & Nhận Quà Tức Thì',
     subtitle: 'Khuấy động không khí Gala Dinner: Đồng bộ kết quả trúng thưởng may mắn xuống điện thoại',
     img: 'app_lucky_draw_winner_notification.png',
     badge: 'Thông báo trúng giải Lucky Draw đêm tiệc Gala',
     features: [
-      { title: 'Quay Số May Mắn Theo Mã Vé Check-in', desc: 'Toàn bộ hội viên đã check-in vào sự kiện được tự động đưa vào danh sách quay số trúng thưởng.' },
+      { title: 'Quay Số May Mắn Theo Mã Vé Check-in', desc: 'Toàn bộ Học viên đã check-in vào sự kiện được tự động đưa vào danh sách quay số trúng thưởng.' },
       { title: 'Giải Thưởng Đỉnh Cao VinFast VF3', desc: 'Hồi hộp theo dõi các vòng quay giải Đặc biệt, giải Nhất với quà tặng giá trị cao từ nhà tài trợ.' },
-      { title: 'Thông Báo Push Trực Tiếp Tới Điện Thoại', desc: 'Hệ thống gửi thông báo chúc mừng đích danh hội viên trúng giải ngay trên màn hình ứng dụng.' },
+      { title: 'Thông Báo Push Trực Tiếp Tới Điện Thoại', desc: 'Hệ thống gửi thông báo chúc mừng đích danh Học viên trúng giải ngay trên màn hình ứng dụng.' },
       { title: 'Hiển Thị Thông Tin Lên Sân Khấu Vinh Danh', desc: 'Doanh nhân mang thông báo trên điện thoại lên sân khấu chính nhận quà vinh danh từ Ban Tổ Chức.' }
     ]
   },
   {
-    eyebrow: 'CHỨC NĂNG HỘI VIÊN 17',
+    eyebrow: 'CHỨC NĂNG Học viên 17',
     title: 'Sàn Thương Mại Marketplace & Gian Hàng Doanh Nghiệp',
     subtitle: 'Kênh giới thiệu sản phẩm và dịch vụ uy tín với chính sách ưu đãi nội bộ',
     img: 'live_28_app_marketplace_b2b.png',
     badge: 'Sàn Marketplace B2B',
     features: [
-      { title: 'Gian Hàng Số Hóa Cho Từng Doanh Nghiệp', desc: 'Mỗi doanh nghiệp hội viên được sở hữu gian hàng trưng bày sản phẩm sản xuất và dịch vụ chủ lực.' },
+      { title: 'Gian Hàng Số Hóa Cho Từng Doanh Nghiệp', desc: 'Mỗi doanh nghiệp Học viên được sở hữu gian hàng trưng bày sản phẩm sản xuất và dịch vụ chủ lực.' },
       { title: 'Chính Sách Chiết Khấu Ưu Đãi VIP', desc: 'Cam kết mức giá ưu đãi đặc quyền giữa các thành viên CEO HN10 so với giá thị trường bên ngoài.' },
       { title: 'Đã Kiểm Duyệt An Toàn Từ Web CRM', desc: 'Toàn bộ mặt hàng đều qua thẩm định xuất xứ và tiêu chuẩn chất lượng từ Ban Quản Trị CLB.' },
       { title: 'Yêu Cầu Báo Giá Sỉ & Hợp Đồng 1-Chạm', desc: 'Doanh nhân gửi yêu cầu báo giá khối lượng lớn trực tiếp tới giám đốc kinh doanh đối tác.' }
     ]
   },
   {
-    eyebrow: 'CHỨC NĂNG HỘI VIÊN 18',
+    eyebrow: 'CHỨC NĂNG Học viên 18',
     title: 'Sàn Trao Cơ Hội Giao Thương B2B & Tìm Kiếm Đối Tác',
     subtitle: 'Chia sẻ nhu cầu mua sỉ, bán buôn, cung ứng vật tư và kêu gọi vốn đầu tư',
     img: 'live_29_app_opportunities_feed_1on1.png',
     badge: 'Cơ hội giao thương B2B',
     features: [
       { title: 'Bảng Tin Trao Đổi Cơ Hội Độc Quyền', desc: 'Nơi doanh nhân công khai nhu cầu mua sắm thiết bị, tìm đại lý phân phối hoặc kết nối chuỗi cung ứng.' },
-      { title: 'Khu Vực Cơ Hội Tiêu Điểm Xoay Vòng 2s', desc: 'Hiệu ứng chuyển đổi cơ hội nổi bật mỗi 2 giây thu hút sự chú ý tối đa của toàn thể hội viên.' },
+      { title: 'Khu Vực Cơ Hội Tiêu Điểm Xoay Vòng 2s', desc: 'Hiệu ứng chuyển đổi cơ hội nổi bật mỗi 2 giây thu hút sự chú ý tối đa của toàn thể Học viên.' },
       { title: 'Đón Nhận Cơ Hội (Claim Deal) Nhanh Chóng', desc: 'Nhấn Đón nhận cơ hội để nhận thông tin liên lạc trực tiếp của doanh nhân có nhu cầu.' },
       { title: 'Thống Kê Tổng Giá Trị Giao Thương Đạt Được', desc: 'Ghi nhận thành quả kết nối, vinh danh các doanh nhân tích cực trao cơ hội cho đồng đội.' }
     ]
   },
   {
-    eyebrow: 'CHỨC NĂNG HỘI VIÊN 19',
+    eyebrow: 'CHỨC NĂNG Học viên 19',
     title: 'Cổng Đóng Hội Phí Thường Niên & Quét Mã VietQR Tự Động',
-    subtitle: 'Gia hạn thẻ hội viên trong 30 giây, đối soát tự động không cần gửi hóa đơn',
+    subtitle: 'Gia hạn thẻ Học viên trong 30 giây, đối soát tự động không cần gửi hóa đơn',
     img: 'app1983_09_fees_vietqr.png',
     badge: 'Đóng hội phí VietQR',
     features: [
@@ -824,7 +824,7 @@ const APP_FEATURE_SLIDES = [
     ]
   },
   {
-    eyebrow: 'CHỨC NĂNG HỘI VIÊN 20',
+    eyebrow: 'CHỨC NĂNG Học viên 20',
     title: 'Cài Đặt Quyền Riêng Tư Thẻ Số & Bảo Mật 2 Lớp',
     subtitle: 'Chủ động quản lý dữ liệu cá nhân, quyền riêng tư liên hệ và bảo vệ thông tin C-Level',
     img: 'app_card_privacy_settings.png',
@@ -833,7 +833,7 @@ const APP_FEATURE_SLIDES = [
       { title: 'Bật/Tắt Hiển Thị Số Điện Thoại Cá Nhân', desc: 'Chủ động lựa chọn hiển thị số di động hoặc chỉ hiển thị qua kênh tổng đài công ty khi đối tác quét thẻ.' },
       { title: 'Ẩn/Hiện Email & Trụ Sở Doanh Nghiệp', desc: 'Tùy biến các trường thông tin hiển thị trên trang xác thực công khai theo từng thời kỳ.' },
       { title: 'Bảo Vệ Đổi Mật Khẩu 2 Lớp', desc: 'Mọi thay đổi thông tin trọng yếu đều yêu cầu xác thực bảo mật trước khi cập nhật vào CSDL.' },
-      { title: 'Đồng Bộ Bảo Mật Toàn Hệ Sinh Thái', desc: 'Cài đặt riêng tư có hiệu lực ngay lập tức trên Thẻ 3D Titanium, Danh thiếp NFC và Danh bạ hội viên.' }
+      { title: 'Đồng Bộ Bảo Mật Toàn Hệ Sinh Thái', desc: 'Cài đặt riêng tư có hiệu lực ngay lập tức trên Thẻ 3D Titanium, Danh thiếp NFC và Danh bạ Học viên.' }
     ]
   }
 ];
@@ -877,7 +877,7 @@ async function generateCrmPptx() {
       x: 1.0, y: 3.3, w: 11.33, h: 0.5,
       color: CRM_THEME.BLUE_ACCENT, bold: true, fontSize: 15, align: 'center', fontFace: 'Calibri'
     });
-    slide.addText('Trung Tâm Chỉ Huy: Hồ Sơ Hội Viên 360° · Tài Chính VietQR · Sơ Đồ Khán Phòng Sự Kiện · Biểu Quyết & Lucky Draw', {
+    slide.addText('Trung Tâm Chỉ Huy: Hồ Sơ Học viên 360° · Tài Chính VietQR · Sơ Đồ Khán Phòng Sự Kiện · Biểu Quyết & Lucky Draw', {
       x: 1.0, y: 3.85, w: 11.33, h: 0.45,
       color: CRM_THEME.TEXT_MUTED, fontSize: 12.5, italic: true, align: 'center', fontFace: 'Calibri'
     });
@@ -909,12 +909,12 @@ async function generateCrmPptx() {
   // SLIDE 2: TỔNG QUAN HỆ THỐNG
   {
     const slide = pres.addSlide();
-    addCrmSlideHeader(slide, pres, 'TRUNG TÂM ĐIỀU HÀNH & QUẢN TRỊ SỐ HÓA HIỆP HỘI', 'TỔNG QUAN HỆ THỐNG: 4 TRỤ CỘT ĐIỀU HÀNH SỐ HÓA', 'Kiểm Soát Toàn Diện: Hồ Sơ Hội Viên · Quỹ Hội VietQR · Bầu Cử & Lucky Draw · Sàn B2B');
+    addCrmSlideHeader(slide, pres, 'TRUNG TÂM ĐIỀU HÀNH & QUẢN TRỊ SỐ HÓA HIỆP HỘI', 'TỔNG QUAN HỆ THỐNG: 4 TRỤ CỘT ĐIỀU HÀNH SỐ HÓA', 'Kiểm Soát Toàn Diện: Hồ Sơ Học viên · Quỹ Hội VietQR · Bầu Cử & Lucky Draw · Sàn B2B');
     const pillars = [
-      { num: '01', title: 'Quản Trị Hội Viên 360°', desc: 'Thẩm định hồ sơ trực tuyến, phân bổ ban bệ và tự động cấp thông tin tài khoản qua email tức thì.' },
+      { num: '01', title: 'Quản Trị Học viên 360°', desc: 'Thẩm định hồ sơ trực tuyến, phân bổ ban bệ và tự động cấp thông tin tài khoản qua email tức thì.' },
       { num: '02', title: 'Tài Chính & Đối Soát VietQR', desc: 'Theo dõi hội phí thường niên, gạch nợ hội phí tự động qua mã VietQR và minh bạch thu chi ngân quỹ.' },
       { num: '03', title: 'Sự Kiện, Bầu Cử & Lucky Draw', desc: 'Khởi tạo vé đa tầng, sắp đặt sơ đồ khán phòng VIP, bỏ phiếu đại hội và quay số VinFast VF3.' },
-      { num: '04', title: 'Đồng Bộ Hai Chiều Realtime', desc: 'Tách biệt chuyên sâu cho Ban Quản Trị nhưng liên kết 100% dữ liệu xuống Mobile App của hội viên.' },
+      { num: '04', title: 'Đồng Bộ Hai Chiều Realtime', desc: 'Tách biệt chuyên sâu cho Ban Quản Trị nhưng liên kết 100% dữ liệu xuống Mobile App của Học viên.' },
     ];
     pillars.forEach((p, idx) => {
       const x = 1.0 + idx * 2.9;
@@ -941,7 +941,7 @@ async function generateCrmPptx() {
     const advs = [
       { num: '01', title: 'Tiết Kiệm 90% Thời Gian Thủ Công', desc: 'Tự động hóa hoàn toàn việc tiếp nhận hồ sơ, gửi email mật khẩu, xuất danh sách đại biểu và gạch nợ hội phí.' },
       { num: '02', title: 'Minh Bạch Tài Chính Tuyệt Đối', desc: 'Mọi dòng tiền thu chi đều được đối soát khớp lệnh qua mã VietQR và lưu vết trong sổ quỹ điện tử.' },
-      { num: '03', title: 'Kế Thừa Dữ Liệu Bất Biến', desc: 'Toàn bộ danh bạ hội viên, kỷ yếu sự kiện và lịch sử giao thương được lưu trữ trên hạ tầng bảo mật.' },
+      { num: '03', title: 'Kế Thừa Dữ Liệu Bất Biến', desc: 'Toàn bộ danh bạ Học viên, kỷ yếu sự kiện và lịch sử giao thương được lưu trữ trên hạ tầng bảo mật.' },
       { num: '04', title: 'Độ Tin Cậy & Sẵn Sàng 99.9%', desc: 'Kiến trúc máy chủ hiệu năng cao, phản hồi dưới 100ms và cơ chế tự động khôi phục sự cố thông suốt.' }
     ];
     advs.forEach((a, idx) => {
@@ -962,7 +962,7 @@ async function generateCrmPptx() {
     const slide = pres.addSlide();
     addCrmSlideHeader(slide, pres, 'HƯỚNG PHÁT TRIỂN TƯƠNG LAI', 'Lộ Trình Nâng Cấp Hệ Thống CRM Quản Trị Giai Đoạn 2026 - 2028', 'Tích hợp Trí tuệ nhân tạo và mở rộng liên minh giao thương hiệp hội toàn quốc');
     const roadmaps = [
-      { phase: 'GIAI ĐOẠN 1 (ĐÃ HOÀN THÀNH)', title: 'Chuẩn Hóa Nền Tảng Quản Trị Số', desc: 'Số hóa 100% hồ sơ hội viên, tự động hóa duyệt tài khoản, sơ đồ khán phòng VIP, cổng soát vé QR 1s và VietQR.' },
+      { phase: 'GIAI ĐOẠN 1 (ĐÃ HOÀN THÀNH)', title: 'Chuẩn Hóa Nền Tảng Quản Trị Số', desc: 'Số hóa 100% hồ sơ Học viên, tự động hóa duyệt tài khoản, sơ đồ khán phòng VIP, cổng soát vé QR 1s và VietQR.' },
       { phase: 'GIAI ĐOẠN 2 (QUÝ 3 - QUÝ 4/2026)', title: 'Tích Hợp AI Matching & Trợ Lý Ảo', desc: 'Thuật toán AI tự động gợi ý kết nối cung - cầu giữa các doanh nghiệp theo lĩnh vực; AI tóm tắt biên bản họp BCH.' },
       { phase: 'GIAI ĐOẠN 3 (NĂM 2027)', title: 'Hệ Thống Phân Tích Dữ Liệu Lớn (BI)', desc: 'Báo cáo thông minh dự báo xu hướng dòng tiền quỹ hội, đo lường chỉ số gắn kết của từng thành viên.' },
       { phase: 'GIAI ĐOẠN 4 (NĂM 2028)', title: 'Liên Minh Số Hiệp Hội Toàn Quốc', desc: 'Mở rộng liên kết cơ sở dữ liệu với Hội Doanh Nhân Trẻ các tỉnh thành và các tổ chức xúc tiến quốc tế.' }
@@ -1110,7 +1110,7 @@ async function generateAppPptx() {
       color: APP_THEME.BG_WHITE, bold: true, fontSize: 13, align: 'center', valign: 'middle', fontFace: 'Calibri'
     });
 
-    slide.addText('ỨNG DỤNG DI ĐỘNG HỘI VIÊN CEO HN10', {
+    slide.addText('ỨNG DỤNG DI ĐỘNG Học viên CEO HN10', {
       x: 1.0, y: 1.85, w: 11.33, h: 1.1,
       color: APP_THEME.NAVY_PRIMARY, bold: true, fontSize: 34, align: 'center', fontFace: 'Calibri'
     });
@@ -1121,7 +1121,7 @@ async function generateAppPptx() {
       x: 1.0, y: 3.3, w: 11.33, h: 0.5,
       color: APP_THEME.NAVY_PRIMARY, bold: true, fontSize: 15, align: 'center', fontFace: 'Calibri'
     });
-    slide.addText('Thẻ Hội Viên VIP Gold · Thẻ Visit Card Số Hóa · Check-in QR Sự Kiện & Bàn VIP · Sàn Cơ Hội Giao Thương B2B', {
+    slide.addText('Thẻ Học viên VIP Gold · Thẻ Visit Card Số Hóa · Check-in QR Sự Kiện & Bàn VIP · Sàn Cơ Hội Giao Thương B2B', {
       x: 1.0, y: 3.85, w: 11.33, h: 0.45,
       color: APP_THEME.TEXT_MUTED, fontSize: 12.5, italic: true, align: 'center', fontFace: 'Calibri'
     });
@@ -1153,12 +1153,12 @@ async function generateAppPptx() {
   // SLIDE 2: 4 TRỤ CỘT ĐẶC QUYỀN
   {
     const slide = pres.addSlide();
-    addAppSlideHeader(slide, pres, 'ỨNG DỤNG DI ĐỘNG HIỆP HỘI THỜI KỲ SỐ', 'TỔNG QUAN NỀN TẢNG: 4 GIÁ TRỊ ĐẶC QUYỀN HỘI VIÊN', 'Không Gian Số Hội Viên Đẳng Cấp: Thẻ VIP Gold · Danh Thiếp Visit Card · Chạm NFC · Quét QR Công Khai');
+    addAppSlideHeader(slide, pres, 'ỨNG DỤNG DI ĐỘNG HIỆP HỘI THỜI KỲ SỐ', 'TỔNG QUAN NỀN TẢNG: 4 GIÁ TRỊ ĐẶC QUYỀN Học viên', 'Không Gian Số Học viên Đẳng Cấp: Thẻ VIP Gold · Danh Thiếp Visit Card · Chạm NFC · Quét QR Công Khai');
     const pillars = [
-      { num: '01', title: 'Thẻ VIP & NFC 1 Chạm', desc: 'Thẻ hội viên VIP Gold số hóa chuẩn quốc tế, tích hợp chip NFC chạm trao danh thiếp ngay trên điện thoại.' },
+      { num: '01', title: 'Thẻ VIP & NFC 1 Chạm', desc: 'Thẻ Học viên VIP Gold số hóa chuẩn quốc tế, tích hợp chip NFC chạm trao danh thiếp ngay trên điện thoại.' },
       { num: '02', title: 'Sàn Trao Đổi Cơ Hội B2B', desc: 'Chia sẻ nhu cầu mua bán sỉ, kết nối cung ứng và kêu gọi đầu tư trực tiếp giữa các doanh nhân.' },
       { num: '03', title: 'Sự Kiện, Vé & Bầu Cử Đại Hội', desc: 'Xem lịch đại hội, đăng ký vé VietQR, quét mã QR vào cửa 1s, bỏ phiếu BCH và quay số trúng thưởng.' },
-      { num: '04', title: 'Đồng Bộ Realtime CRM', desc: 'Tách biệt giao diện chuyên dụng cho hội viên nhưng liên kết 100% dữ liệu vận hành từ Web CRM Quản trị.' },
+      { num: '04', title: 'Đồng Bộ Realtime CRM', desc: 'Tách biệt giao diện chuyên dụng cho Học viên nhưng liên kết 100% dữ liệu vận hành từ Web CRM Quản trị.' },
     ];
     pillars.forEach((p, idx) => {
       const x = 1.0 + idx * 2.9;
@@ -1181,7 +1181,7 @@ async function generateAppPptx() {
   // SLIDE: ƯU ĐIỂM VƯỢT TRỘI
   {
     const slide = pres.addSlide();
-    addAppSlideHeader(slide, pres, 'ƯU ĐIỂM VƯỢT TRỘI', 'Giá Trị Thiết Thực & Đẳng Cấp Cho Doanh Nhân Hội Viên', 'Nâng tầm trải nghiệm cá nhân và tối ưu hóa cơ hội kinh doanh');
+    addAppSlideHeader(slide, pres, 'ƯU ĐIỂM VƯỢT TRỘI', 'Giá Trị Thiết Thực & Đẳng Cấp Cho Doanh Nhân Học viên', 'Nâng tầm trải nghiệm cá nhân và tối ưu hóa cơ hội kinh doanh');
     const advs = [
       { num: '01', title: 'Networking Đỉnh Cao 1-Chạm', desc: 'Không cần mang danh thiếp giấy. Chạm điện thoại NFC hoặc mở mã QR là trao trọn vẹn thông tin liên hệ và hồ sơ công ty.' },
       { num: '02', title: 'Thúc Đẩy Doanh Thu B2B Thực Chất', desc: 'Sở hữu ngay gian hàng trưng bày sản phẩm ưu đãi nội khối và tiếp cận trực tiếp các nhu cầu mua sắm lớn.' },
@@ -1221,7 +1221,7 @@ async function generateAppPptx() {
       x: 1.0, y: 1.5, w: 11.33, h: 0.9,
       color: APP_THEME.NAVY_PRIMARY, bold: true, fontSize: 36, align: 'center', fontFace: 'Calibri'
     });
-    slide.addText('Kính Chúc Quý Hội Viên Kết Nối Thành Công & Đón Nhận Trọn Vẹn Giá Trị Số Hóa', {
+    slide.addText('Kính Chúc Quý Học viên Kết Nối Thành Công & Đón Nhận Trọn Vẹn Giá Trị Số Hóa', {
       x: 1.0, y: 2.45, w: 11.33, h: 0.45,
       color: APP_THEME.NAVY_PRIMARY, fontSize: 14, align: 'center', fontFace: 'Calibri'
     });
@@ -1232,8 +1232,8 @@ async function generateAppPptx() {
 
     const infoCards = [
       { icon: '📱', title: 'CÀI ĐẶT ỨNG DỤNG', sub: 'Khả Dụng iOS & Android', desc: 'Trải nghiệm thẻ VIP số, chạm NFC danh thiếp thông minh và khám phá danh bạ kết nối 100+ doanh nhân.' },
-      { icon: '💬', title: 'HỎI ĐÁP & CHIA SẺ', sub: 'Lắng Nghe Hội Viên', desc: 'Mọi ý kiến đóng góp của Quý Doanh nhân là động lực để Ban Thư Ký liên tục nâng cấp và tối ưu hóa.' },
-      { icon: '🤝', title: 'KẾT NỐI BAN THƯ KÝ', sub: 'Hỗ Trợ Kỹ Thuật 24/7', desc: 'Hỗ trợ cấp lại mã hội viên, cài đặt thẻ visit card, chia sẻ danh bạ và tham gia 6 Ban chuyên trách.' }
+      { icon: '💬', title: 'HỎI ĐÁP & CHIA SẺ', sub: 'Lắng Nghe Học viên', desc: 'Mọi ý kiến đóng góp của Quý Doanh nhân là động lực để Ban Thư Ký liên tục nâng cấp và tối ưu hóa.' },
+      { icon: '🤝', title: 'KẾT NỐI BAN THƯ KÝ', sub: 'Hỗ Trợ Kỹ Thuật 24/7', desc: 'Hỗ trợ cấp lại mã Học viên, cài đặt thẻ visit card, chia sẻ danh bạ và tham gia 6 Ban chuyên trách.' }
     ];
     infoCards.forEach((c, idx) => {
       const xPos = 1.0 + idx * 3.9;
@@ -1247,7 +1247,7 @@ async function generateAppPptx() {
       slide.addText(c.desc, { x: xPos + 0.3, y: 5.2, w: 3.0, h: 1.0, color: APP_THEME.TEXT_BODY, fontSize: 10.5, fontFace: 'Calibri' });
     });
 
-    slide.addText('Ứng Dụng Di Động Hội Viên · CLB Doanh Nhân CEO HN10 · HanoiBA', {
+    slide.addText('Ứng Dụng Di Động Học viên · CLB Doanh Nhân CEO HN10 · HanoiBA', {
       x: 1.0, y: 6.85, w: 11.33, h: 0.3, color: APP_THEME.TEXT_MUTED, fontSize: 10.5, align: 'center', fontFace: 'Calibri'
     });
   }
@@ -1456,12 +1456,12 @@ function generateHtmlSlides() {
       type: 'cover',
       eyebrow: 'TRUNG TÂM ĐIỀU HÀNH & QUẢN TRỊ SỐ HÓA HIỆP HỘI',
       title: 'TỔNG QUAN HỆ THỐNG: 4 TRỤ CỘT ĐIỀU HÀNH SỐ HÓA',
-      subtitle: 'Kiểm Soát Toàn Diện: Hồ Sơ Hội Viên · Quỹ Hội VietQR · Bầu Cử & Lucky Draw · Sàn B2B',
+      subtitle: 'Kiểm Soát Toàn Diện: Hồ Sơ Học viên · Quỹ Hội VietQR · Bầu Cử & Lucky Draw · Sàn B2B',
       pillars: [
-        { num: '01', title: 'Quản Trị Hội Viên 360°', desc: 'Thẩm định hồ sơ trực tuyến, phân bổ ban bệ và tự động cấp thông tin tài khoản qua email tức thì.' },
+        { num: '01', title: 'Quản Trị Học viên 360°', desc: 'Thẩm định hồ sơ trực tuyến, phân bổ ban bệ và tự động cấp thông tin tài khoản qua email tức thì.' },
         { num: '02', title: 'Tài Chính & Đối Soát VietQR', desc: 'Theo dõi hội phí thường niên, gạch nợ hội phí tự động qua mã VietQR và minh bạch thu chi ngân quỹ.' },
         { num: '03', title: 'Sự Kiện, Bầu Cử & Lucky Draw', desc: 'Khởi tạo vé đa tầng, sắp đặt sơ đồ khán phòng VIP, bỏ phiếu đại hội và quay số VinFast VF3.' },
-        { num: '04', title: 'Đồng Bộ Hai Chiều Realtime', desc: 'Tách biệt chuyên sâu cho Ban Quản Trị nhưng liên kết 100% dữ liệu xuống Mobile App của hội viên.' },
+        { num: '04', title: 'Đồng Bộ Hai Chiều Realtime', desc: 'Tách biệt chuyên sâu cho Ban Quản Trị nhưng liên kết 100% dữ liệu xuống Mobile App của Học viên.' },
       ]
     },
     ...CRM_FEATURE_SLIDES.map(s => ({
@@ -1488,13 +1488,13 @@ function generateHtmlSlides() {
     {
       type: 'cover',
       eyebrow: 'ỨNG DỤNG DI ĐỘNG HIỆP HỘI THỜI KỲ SỐ',
-      title: 'TỔNG QUAN NỀN TẢNG: 4 GIÁ TRỊ ĐẶC QUYỀN HỘI VIÊN',
-      subtitle: 'Không Gian Số Hội Viên Đẳng Cấp: Thẻ VIP Gold · Danh Thiếp Visit Card · Chạm NFC · Quét QR Công Khai',
+      title: 'TỔNG QUAN NỀN TẢNG: 4 GIÁ TRỊ ĐẶC QUYỀN Học viên',
+      subtitle: 'Không Gian Số Học viên Đẳng Cấp: Thẻ VIP Gold · Danh Thiếp Visit Card · Chạm NFC · Quét QR Công Khai',
       pillars: [
-        { num: '01', title: 'Thẻ VIP & NFC 1 Chạm', desc: 'Thẻ hội viên VIP Gold số hóa chuẩn quốc tế, tích hợp chip NFC chạm trao danh thiếp ngay trên điện thoại.' },
+        { num: '01', title: 'Thẻ VIP & NFC 1 Chạm', desc: 'Thẻ Học viên VIP Gold số hóa chuẩn quốc tế, tích hợp chip NFC chạm trao danh thiếp ngay trên điện thoại.' },
         { num: '02', title: 'Sàn Trao Đổi Cơ Hội B2B', desc: 'Chia sẻ nhu cầu mua bán sỉ, kết nối cung ứng và kêu gọi đầu tư trực tiếp giữa các doanh nhân.' },
         { num: '03', title: 'Sự Kiện, Vé & Bầu Cử Đại Hội', desc: 'Xem lịch đại hội, đăng ký vé VietQR, quét mã QR vào cửa 1s, bỏ phiếu BCH và quay số trúng thưởng.' },
-        { num: '04', title: 'Đồng Bộ Realtime CRM', desc: 'Tách biệt giao diện chuyên dụng cho hội viên nhưng liên kết 100% dữ liệu vận hành từ Web CRM Quản trị.' },
+        { num: '04', title: 'Đồng Bộ Realtime CRM', desc: 'Tách biệt giao diện chuyên dụng cho Học viên nhưng liên kết 100% dữ liệu vận hành từ Web CRM Quản trị.' },
       ]
     },
     ...APP_FEATURE_SLIDES.map(s => ({

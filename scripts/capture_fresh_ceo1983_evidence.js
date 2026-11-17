@@ -2,7 +2,7 @@
  * CAPTURE_FRESH_CEOHN10_EVIDENCE.JS
  * Xóa sạch toàn bộ ảnh cũ và chụp mới 100% bộ ảnh thực tế từ hệ thống:
  * - Web CRM Quản Trị: https://14.225.217.232:5443
- * - App Di Động Hội Viên: https://14.225.217.232:5444
+ * - App Di Động Học viên: https://14.225.217.232:5444
  * DÀNH RIÊNG CHO CLB DOANH NHÂN CEO HN10 (HANOIBA) — KHÔNG VIONE
  */
 
@@ -28,7 +28,7 @@ for (const dir of TARGET_DIRS) {
       if (f.endsWith('.png') || f.endsWith('.jpg')) {
         try {
           fs.unlinkSync(path.join(dir, f));
-        } catch (e) {}
+        } catch (e) { }
       }
     }
   } else {
@@ -110,14 +110,14 @@ async function run() {
     console.error('  Lỗi A2:', e.message);
   }
 
-  // A3: Danh sách Hội viên 360 độ
+  // A3: Danh sách Học viên 360 độ
   try {
-    console.log('A3. Danh sách Hội viên CRM...');
+    console.log('A3. Danh sách Học viên CRM...');
     await crmPage.goto(`${CRM_BASE}/members`, { waitUntil: 'networkidle', timeout: 20000 });
     await crmPage.waitForTimeout(2000);
     let buf = await crmPage.screenshot();
-    saveImage(buf, '03_crm_members_list.png', 'Bảng Quản lý Danh bạ Hội viên 360 độ');
-    saveImage(buf, '04_crm_members_management.png', 'Quản lý Hội viên và Phân quyền');
+    saveImage(buf, '03_crm_members_list.png', 'Bảng Quản lý Danh bạ Học viên 360 độ');
+    saveImage(buf, '04_crm_members_management.png', 'Quản lý Học viên và Phân quyền');
 
     // Mở ngăn kéo thẩm định thành viên (Drawer)
     const viewBtn = crmPage.locator('button:has-text("Xem"), button:has-text("Duyệt"), tr').nth(1);
@@ -126,7 +126,7 @@ async function run() {
       await crmPage.waitForTimeout(1500);
       let drawerBuf = await crmPage.screenshot();
       saveImage(buf, '04_crm_member_drawer_approval.png', 'Ngăn kéo Drawer Thẩm định & Phê duyệt Kết nạp (BTV)');
-      saveImage(buf, '05_crm_member_approved.png', 'Phê duyệt Hội viên Ban Thành Viên');
+      saveImage(buf, '05_crm_member_approved.png', 'Phê duyệt Học viên Ban Thành Viên');
     }
   } catch (e) {
     console.error('  Lỗi A3:', e.message);
@@ -217,9 +217,9 @@ async function run() {
   }
 
   // =========================================================================
-  // PHẦN B: CHỤP MÀN HÌNH MOBILE APP HỘI VIÊN CEO HN10 (390x844)
+  // PHẦN B: CHỤP MÀN HÌNH MOBILE APP Học viên CEO HN10 (390x844)
   // =========================================================================
-  console.log('\n>>> [PHẦN B] Chụp Màn Hình Mobile App Hội Viên (Tỷ lệ Dọc Smartphone 390x844)...');
+  console.log('\n>>> [PHẦN B] Chụp Màn Hình Mobile App Học viên (Tỷ lệ Dọc Smartphone 390x844)...');
   const appPage = await mobileCtx.newPage();
 
   // B1: Landing Page Cổng tiếp nhận hồ sơ gia nhập
@@ -240,13 +240,13 @@ async function run() {
     console.error('  Lỗi B1:', e.message);
   }
 
-  // B2: Đăng nhập Mobile App Hội viên
+  // B2: Đăng nhập Mobile App Học viên
   try {
     console.log('B2. Đăng nhập Mobile App...');
     await appPage.goto(`${APP_BASE}/association/login`, { waitUntil: 'networkidle', timeout: 25000 });
     await appPage.waitForTimeout(2000);
     let buf = await appPage.screenshot();
-    saveImage(buf, '06_app_login_screen.png', 'Màn hình Đăng nhập Mobile App Hội viên CEO HN10');
+    saveImage(buf, '06_app_login_screen.png', 'Màn hình Đăng nhập Mobile App Học viên CEO HN10');
 
     // Đăng nhập vào app
     const uInput = appPage.locator('input[type="text"], input[type="email"], input[name="username"]').first();
@@ -265,13 +265,13 @@ async function run() {
     console.error('  Lỗi B2:', e.message);
   }
 
-  // B3: Trang chủ Hội viên VIP
+  // B3: Trang chủ Học viên VIP
   try {
-    console.log('B3. Trang chủ Hội viên...');
+    console.log('B3. Trang chủ Học viên...');
     await appPage.goto(`${APP_BASE}/association`, { waitUntil: 'networkidle', timeout: 25000 });
     await appPage.waitForTimeout(2500);
     let buf = await appPage.screenshot();
-    saveImage(buf, '08_app_home_dashboard.png', 'Trang Chủ Hội Viên CLB Doanh Nhân CEO HN10');
+    saveImage(buf, '08_app_home_dashboard.png', 'Trang Chủ Học viên CLB Doanh Nhân CEO HN10');
   } catch (e) {
     console.error('  Lỗi B3:', e.message);
   }
@@ -282,7 +282,7 @@ async function run() {
     await appPage.goto(`${APP_BASE}/association/card`, { waitUntil: 'networkidle', timeout: 20000 });
     await appPage.waitForTimeout(2500);
     let buf = await appPage.screenshot();
-    saveImage(buf, '09_app_vip_card.png', 'Thẻ Hội Viên VIP 3D Titanium Hiệu Ứng Lật 180 Độ');
+    saveImage(buf, '09_app_vip_card.png', 'Thẻ Học viên VIP 3D Titanium Hiệu Ứng Lật 180 Độ');
   } catch (e) {
     console.error('  Lỗi B4:', e.message);
   }
@@ -304,7 +304,7 @@ async function run() {
     await appPage.goto(`${APP_BASE}/association/members`, { waitUntil: 'networkidle', timeout: 20000 });
     await appPage.waitForTimeout(2500);
     let buf = await appPage.screenshot();
-    saveImage(buf, '15_app_members_directory.png', 'Danh Bạ 500+ CEO Hội Viên & Lọc Chuyên Ban');
+    saveImage(buf, '15_app_members_directory.png', 'Danh Bạ 500+ CEO Học viên & Lọc Chuyên Ban');
   } catch (e) {
     console.error('  Lỗi B6:', e.message);
   }

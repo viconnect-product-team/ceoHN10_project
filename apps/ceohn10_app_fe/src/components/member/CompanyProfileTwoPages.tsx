@@ -126,9 +126,9 @@ export function CompanyProfileTwoPages({
   // Split aboutUs into bullet items
   const introItems = aboutUs
     ? aboutUs
-        .split(/\r?\n|•/)
-        .map((s) => s.trim().replace(/^[-*•]\s*/, ""))
-        .filter(Boolean)
+      .split(/\r?\n|•/)
+      .map((s) => s.trim().replace(/^[-*•]\s*/, ""))
+      .filter(Boolean)
     : [];
 
   // Clean website display
@@ -231,7 +231,7 @@ export function CompanyProfileTwoPages({
                 {data.companyProfileName || `${companyName} - Profile.pdf`}
               </div>
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                Tài liệu đã được tải lên lưu trữ an toàn & liên kết với danh thiếp hội viên.
+                Tài liệu đã được tải lên lưu trữ an toàn & liên kết với danh thiếp Học viên.
               </p>
             </div>
           </div>

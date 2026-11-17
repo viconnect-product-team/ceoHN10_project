@@ -41,32 +41,32 @@ const FIELDS: {
   required?: boolean;
   type?: "textarea";
 }[] = [
-  { key: "full_name", labelKey: "profile.fullName", placeholder: "Nhập họ và tên...", required: true },
-  { key: "phone", labelKey: "profile.phone", placeholder: "Nhập số điện thoại...", required: true },
-  { key: "title", labelKey: "profile.titleField", placeholder: "Nhập chức danh (VD: Giám đốc, Tổng giám đốc...)" },
-  { key: "location", labelKey: "profile.location", placeholder: "Nhập địa điểm làm việc / khu vực..." },
-  { key: "bio", labelKey: "profile.bio", placeholder: "Giới thiệu ngắn gọn về bản thân hoặc doanh nghiệp...", type: "textarea" },
-];
+    { key: "full_name", labelKey: "profile.fullName", placeholder: "Nhập họ và tên...", required: true },
+    { key: "phone", labelKey: "profile.phone", placeholder: "Nhập số điện thoại...", required: true },
+    { key: "title", labelKey: "profile.titleField", placeholder: "Nhập chức danh (VD: Giám đốc, Tổng giám đốc...)" },
+    { key: "location", labelKey: "profile.location", placeholder: "Nhập địa điểm làm việc / khu vực..." },
+    { key: "bio", labelKey: "profile.bio", placeholder: "Giới thiệu ngắn gọn về bản thân hoặc doanh nghiệp...", type: "textarea" },
+  ];
 
 const PERMISSION_DESCRIPTIONS: Record<string, { label: string; desc: string }> = {
   "admin:full_access": { label: "Toàn quyền Quản trị", desc: "Toàn quyền tối cao quản trị toàn bộ hệ sinh thái CEO HN10" },
   "*": { label: "Toàn quyền Hệ thống", desc: "Được phép thực thi mọi tính năng trên nền tảng" },
   "system:manage": { label: "Cấu hình Hệ thống", desc: "Quản trị cài đặt, tham số và phân quyền CRM" },
   "account:manage": { label: "Quản lý Tài khoản", desc: "Thêm mới, kích hoạt, khóa và phân quyền tài khoản người dùng" },
-  "member:view": { label: "Xem Danh bạ Hội viên", desc: "Tra cứu hồ sơ và danh sách các doanh nghiệp hội viên" },
-  "member:edit": { label: "Chỉnh sửa Hồ sơ Hội viên", desc: "Cập nhật thông tin chi tiết của hội viên" },
-  "member:approve": { label: "Phê duyệt Hội viên", desc: "Xét duyệt hồ sơ đăng ký gia nhập CLB mới" },
-  "member:renew": { label: "Gia hạn Niên liễm", desc: "Xác nhận và gia hạn hội phí định kỳ cho hội viên" },
+  "member:view": { label: "Xem Danh bạ Học viên", desc: "Tra cứu hồ sơ và danh sách các doanh nghiệp Học viên" },
+  "member:edit": { label: "Chỉnh sửa Hồ sơ Học viên", desc: "Cập nhật thông tin chi tiết của Học viên" },
+  "member:approve": { label: "Phê duyệt Học viên", desc: "Xét duyệt hồ sơ đăng ký gia nhập CLB mới" },
+  "member:renew": { label: "Gia hạn Niên liễm", desc: "Xác nhận và gia hạn hội phí định kỳ cho Học viên" },
   "event:view": { label: "Xem Sự kiện", desc: "Theo dõi lịch trình các sự kiện và hội thảo" },
   "event:create": { label: "Quản lý Sự kiện", desc: "Khởi tạo, điều chỉnh và phát hành sự kiện CLB" },
-  "event:checkin": { label: "Quét vé Check-in", desc: "Quét mã QR soát vé hội viên tại cổng sự kiện" },
+  "event:checkin": { label: "Quét vé Check-in", desc: "Quét mã QR soát vé Học viên tại cổng sự kiện" },
   "marketplace:view": { label: "Xem Sàn Giao thương", desc: "Duyệt xem sản phẩm, dịch vụ và hồ sơ doanh nghiệp" },
   "marketplace:manage": { label: "Quản lý Sàn Giao thương", desc: "Đăng tải sản phẩm, duyệt tin và quản trị danh mục" },
   "finance:view": { label: "Xem Báo cáo Tài chính", desc: "Theo dõi số liệu thu chi, quỹ hội và tài trợ" },
   "finance:manage": { label: "Quản trị Thu Chi", desc: "Lập phiếu thu, phiếu chi và duyệt chi ngân sách CLB" },
   "media:view": { label: "Xem Bản tin Truyền thông", desc: "Xem các tin tức nội bộ và thông cáo báo chí" },
   "media:manage": { label: "Biên tập Bản tin", desc: "Đăng bài viết, phát hành ấn phẩm truyền thông" },
-  "voting:manage": { label: "Quản trị Biểu quyết", desc: "Tạo khảo sát, lấy ý kiến biểu quyết của hội viên" },
+  "voting:manage": { label: "Quản trị Biểu quyết", desc: "Tạo khảo sát, lấy ý kiến biểu quyết của Học viên" },
   "opportunity:manage": { label: "Kết nối Giao thương", desc: "Quản trị cơ hội hợp tác và giới thiệu kinh doanh" },
   "charity:manage": { label: "Quản lý Thiện nguyện", desc: "Điều phối các chiến dịch và ngân sách thiện nguyện" },
 };
@@ -120,7 +120,7 @@ function ProfilePage() {
         if (!active) return;
         const p = prof || {};
         setForm((prev) => ({
-          full_name: p.display_name || p.name || prev.full_name || user?.name || "Hội viên CLB CEO HN10",
+          full_name: p.display_name || p.name || prev.full_name || user?.name || "Học viên CLB CEO HN10",
           phone: p.phone || prev.phone || user?.phone || "",
           title: p.professional_title || p.profile?.professional_title || prev.title || user?.title || "",
           location: p.region || p.profile?.region || prev.location || "",
@@ -204,20 +204,20 @@ function ProfilePage() {
   const roleBadgeLabel = isPresident
     ? "Chủ tịch CLB CEO HN10"
     : isPlatformAdmin
-    ? "Quản trị viên Nền tảng (Platform Admin)"
-    : isAdmin || isBQT
-    ? "Ban Quản Trị CLB (BQT)"
-    : srsRole === "truong_ban_tai_chinh" || srsRole === "BTC"
-    ? "Trưởng Ban Tài chính"
-    : srsRole === "truong_ban_thanh_vien" || srsRole === "BTV"
-    ? "Trưởng Ban Hội viên"
-    : srsRole === "truong_ban_truyen_thong" || srsRole === "BTT"
-    ? "Trưởng Ban Truyền thông"
-    : srsRole === "truong_ban_xuc_tien" || srsRole === "BXT"
-    ? "Trưởng Ban Xúc tiến Giao thương"
-    : srsRole === "tong_thu_ky" || srsRole === "BTK"
-    ? "Tổng Thư ký CLB"
-    : "Hội viên chính thức";
+      ? "Quản trị viên Nền tảng (Platform Admin)"
+      : isAdmin || isBQT
+        ? "Ban Quản Trị CLB (BQT)"
+        : srsRole === "truong_ban_tai_chinh" || srsRole === "BTC"
+          ? "Trưởng Ban Tài chính"
+          : srsRole === "truong_ban_thanh_vien" || srsRole === "BTV"
+            ? "Trưởng Ban Học viên"
+            : srsRole === "truong_ban_truyen_thong" || srsRole === "BTT"
+              ? "Trưởng Ban Truyền thông"
+              : srsRole === "truong_ban_xuc_tien" || srsRole === "BXT"
+                ? "Trưởng Ban Xúc tiến Giao thương"
+                : srsRole === "tong_thu_ky" || srsRole === "BTK"
+                  ? "Tổng Thư ký CLB"
+                  : "Học viên chính thức";
 
   return (
     <AppShell>
@@ -269,22 +269,20 @@ function ProfilePage() {
                         onChange={(e) => set(f.key, e.target.value)}
                         placeholder={f.placeholder}
                         rows={3}
-                        className={`w-full rounded-lg border bg-secondary px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none transition-colors ${
-                          errors[f.key]
+                        className={`w-full rounded-lg border bg-secondary px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none transition-colors ${errors[f.key]
                             ? "border-destructive focus:border-destructive"
                             : "border-border focus:border-[#003B95]"
-                        }`}
+                          }`}
                       />
                     ) : (
                       <input
                         value={form[f.key]}
                         onChange={(e) => set(f.key, e.target.value)}
                         placeholder={f.placeholder}
-                        className={`h-10 w-full rounded-lg border bg-secondary px-3 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none transition-colors ${
-                          errors[f.key]
+                        className={`h-10 w-full rounded-lg border bg-secondary px-3 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none transition-colors ${errors[f.key]
                             ? "border-destructive focus:border-destructive"
                             : "border-border focus:border-[#003B95]"
-                        }`}
+                          }`}
                       />
                     )}
                     {errors[f.key] && (
@@ -366,7 +364,7 @@ function ProfilePage() {
 
                 {permissions.length === 0 ? (
                   <p className="text-muted-foreground text-xs italic">
-                    Chưa có quyền hạn quản trị nâng cao. Tài khoản đang hoạt động ở chế độ Hội viên tiêu chuẩn.
+                    Chưa có quyền hạn quản trị nâng cao. Tài khoản đang hoạt động ở chế độ Học viên tiêu chuẩn.
                   </p>
                 ) : (
                   <div className="space-y-2 pt-1 max-h-80 overflow-y-auto pr-1">

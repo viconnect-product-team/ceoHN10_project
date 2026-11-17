@@ -266,7 +266,7 @@ export class MailService {
 
   /**
    * Tự động gửi thông báo đồng bộ qua Zalo OA (Non-blocking, an toàn tuyệt đối)
-   * Phục vụ yêu cầu: Khi có hội viên mới tham gia, đăng ký sự kiện thành công,
+   * Phục vụ yêu cầu: Khi có Học viên mới tham gia, đăng ký sự kiện thành công,
    * hoặc bất kỳ thông báo gửi mail nào cũng đồng thời gửi về tài khoản Zalo của người nhận qua Zalo OA.
    */
   private dispatchZaloOaNotification(payload: {
@@ -321,7 +321,7 @@ export class MailService {
     if (!clean) return { active: false, reason: 'Email rỗng' };
 
     try {
-      // 1. Kiểm tra trong bảng members (Hội viên)
+      // 1. Kiểm tra trong bảng members (Học viên)
       const members = await this.prisma.$queryRawUnsafe<any[]>(
         `SELECT id, status, is_active FROM public.members WHERE LOWER(email) = LOWER($1) LIMIT 1;`,
         clean,
@@ -340,11 +340,11 @@ export class MailService {
           status === 'tam_khoa';
         if (isInactive) {
           this.logger.warn(
-            `[SUPPRESSED_DELETED_ACCOUNT] Chặn gửi email đến tài khoản Hội viên đã xóa/ngừng hoạt động "${clean}" (Trạng thái: ${status}, is_active: ${m.is_active}). Ngữ cảnh: ${context || 'General'}`,
+            `[SUPPRESSED_DELETED_ACCOUNT] Chặn gửi email đến tài khoản Học viên đã xóa/ngừng hoạt động "${clean}" (Trạng thái: ${status}, is_active: ${m.is_active}). Ngữ cảnh: ${context || 'General'}`,
           );
           return {
             active: false,
-            reason: `Tài khoản Hội viên mang trạng thái "${status || 'inactive'}"`,
+            reason: `Tài khoản Học viên mang trạng thái "${status || 'inactive'}"`,
           };
         }
       }
@@ -603,7 +603,7 @@ export class MailService {
   }
 
   /**
-   * Gửi email thông tin tài khoản đăng nhập (Email + Mật khẩu ngẫu nhiên) cho hội viên mới
+   * Gửi email thông tin tài khoản đăng nhập (Email + Mật khẩu ngẫu nhiên) cho Học viên mới
    */
   async sendRegistrationAccountEmail(
     options: SendAccountEmailOptions,
@@ -665,7 +665,7 @@ export class MailService {
 <body>
   <div class="container">
     <div class="header">
-      <div class="gold-badge">✦ Chào Mừng Hội Viên Mới ✦</div>
+      <div class="gold-badge">✦ Chào Mừng Học viên Mới ✦</div>
       <h1 class="title">CLB DOANH NHÂN CEO HN10</h1>
       <p class="subtitle">Kết nối bền vững — Kiến tạo thịnh vượng — Vươn tầm doanh nhân</p>
     </div>
@@ -675,7 +675,7 @@ export class MailService {
       <div class="intro">
         Ban Thư Ký CLB Doanh Nhân CEO HN10 xin trân trọng thông báo hồ sơ đăng ký gia nhập của Anh/Chị ${companyName ? `(đại diện cho <strong>${companyName}</strong>)` : ''} đã được tiếp nhận thành công vào hệ thống.
         <br><br>
-        Dưới đây là thông tin tài khoản hội viên chính thức của Anh/Chị để đăng nhập vào <strong>App Hiệp Hội CEO HN10</strong>:
+        Dưới đây là thông tin tài khoản Học viên chính thức của Anh/Chị để đăng nhập vào <strong>App Hiệp Hội CEO HN10</strong>:
       </div>
 
       <div class="card-box">
@@ -691,7 +691,7 @@ export class MailService {
         ${memberCode
         ? `
         <div class="info-row" style="margin-top: 8px;">
-          <span class="info-label">Mã số Hội viên dự kiến:</span>
+          <span class="info-label">Mã số Học viên dự kiến:</span>
           <span class="info-value" style="color: #d97706;">${memberCode}</span>
         </div>
         `
@@ -733,9 +733,9 @@ export class MailService {
     this.dispatchZaloOaNotification({
       recipientEmail: cleanTo,
       recipientName: fullName,
-      title: 'THÔNG TIN TÀI KHOẢN HỘI VIÊN CEO HN10',
-      content: `Kính gửi Quý Doanh nhân ${fullName},\nBan Thư Ký trân trọng gửi thông tin tài khoản đăng nhập Cổng Hội viên CLB Doanh Nhân CEO HN10:\n- Tên đăng nhập: ${username}\n- Mật khẩu: ${passwordRaw}\n- Mã hội viên: ${memberCode || 'Đang cập nhật'}\nQuý Anh/Chị vui lòng đăng nhập để đổi mật khẩu và cập nhật hồ sơ doanh nghiệp.`,
-      ctaText: 'Đăng Nhập Cổng Hội Viên',
+      title: 'THÔNG TIN TÀI KHOẢN Học viên CEO HN10',
+      content: `Kính gửi Quý Doanh nhân ${fullName},\nBan Thư Ký trân trọng gửi thông tin tài khoản đăng nhập Cổng Học viên CLB Doanh Nhân CEO HN10:\n- Tên đăng nhập: ${username}\n- Mật khẩu: ${passwordRaw}\n- Mã Học viên: ${memberCode || 'Đang cập nhật'}\nQuý Anh/Chị vui lòng đăng nhập để đổi mật khẩu và cập nhật hồ sơ doanh nghiệp.`,
+      ctaText: 'Đăng Nhập Cổng Học viên',
       ctaUrl: portalUrl || DEFAULT_APP_URL,
       trackingType: 'account_created',
     });
@@ -1410,7 +1410,7 @@ export class MailService {
   }
 
   /**
-   * Gửi email chào mừng hội viên mới đăng ký tài khoản vào App Doanh Nhân CEO HN10
+   * Gửi email chào mừng Học viên mới đăng ký tài khoản vào App Doanh Nhân CEO HN10
    */
   async sendAppWelcomeRegistrationEmail(
     options: SendAppWelcomeEmailOptions,
@@ -1572,7 +1572,7 @@ export class MailService {
       recipientPhone: phone,
       recipientName: fullName,
       title: 'CHÀO MỪNG ĐẾN VỚI CLB DOANH NHÂN CEO HN10',
-      content: `Kính gửi Quý Doanh nhân ${fullName},\nChúc mừng Quý Doanh nhân đã đăng ký tài khoản thành công trên App CEO HN10.\n- Tài khoản: ${username}\n${passwordRaw ? `- Mật khẩu: ${passwordRaw}\n` : ''}- Trạng thái: ✓ Đã kích hoạt sẵn sàng truy cập\nQuý Anh/Chị vui lòng đăng nhập để hoàn thiện hồ sơ doanh nghiệp và nhận đặc quyền hội viên.`,
+      content: `Kính gửi Quý Doanh nhân ${fullName},\nChúc mừng Quý Doanh nhân đã đăng ký tài khoản thành công trên App CEO HN10.\n- Tài khoản: ${username}\n${passwordRaw ? `- Mật khẩu: ${passwordRaw}\n` : ''}- Trạng thái: ✓ Đã kích hoạt sẵn sàng truy cập\nQuý Anh/Chị vui lòng đăng nhập để hoàn thiện hồ sơ doanh nghiệp và nhận đặc quyền Học viên.`,
       ctaText: 'Mở App CEO HN10',
       ctaUrl: appLoginUrl,
       trackingType: 'app_welcome',
@@ -1699,7 +1699,7 @@ export class MailService {
         ${memberCode
         ? `
         <div class="info-row">
-          <span class="info-label">Mã hội viên:</span>
+          <span class="info-label">Mã Học viên:</span>
           <span class="info-value" style="color: #003B95; font-weight: 800;">${memberCode}</span>
         </div>
         `
@@ -1751,7 +1751,7 @@ export class MailService {
       recipientPhone: phone,
       recipientName: fullName,
       title: 'KÍCH HOẠT TÀI KHOẢN APP CEO HN10 THÀNH CÔNG',
-      content: `Kính gửi Quý Doanh nhân ${fullName},\nTài khoản App CEO HN10 của Quý Anh/Chị đã được kích hoạt thành công:\n- Tài khoản: ${username || cleanTo}\n${newPassword ? `- Mật khẩu mới: ${newPassword}\n` : ''}${memberCode ? `- Mã hội viên: ${memberCode}\n` : ''}- Trạng thái: ✓ Đã kích hoạt hoàn tất.\nQuý Anh/Chị có thể đăng nhập ngay để trải nghiệm danh thiếp điện tử và giao thương B2B.`,
+      content: `Kính gửi Quý Doanh nhân ${fullName},\nTài khoản App CEO HN10 của Quý Anh/Chị đã được kích hoạt thành công:\n- Tài khoản: ${username || cleanTo}\n${newPassword ? `- Mật khẩu mới: ${newPassword}\n` : ''}${memberCode ? `- Mã Học viên: ${memberCode}\n` : ''}- Trạng thái: ✓ Đã kích hoạt hoàn tất.\nQuý Anh/Chị có thể đăng nhập ngay để trải nghiệm danh thiếp điện tử và giao thương B2B.`,
       ctaText: 'Đăng Nhập App',
       ctaUrl: appLoginUrl,
       trackingType: 'app_activated',
@@ -1767,7 +1767,7 @@ export class MailService {
   }
 
   /**
-   * Gửi email chúc mừng khi hồ sơ hội viên được Ban điều hành / Quản trị viên duyệt chính thức
+   * Gửi email chúc mừng khi hồ sơ Học viên được Ban điều hành / Quản trị viên duyệt chính thức
    */
   async sendMemberApprovedEmail(
     options: SendMemberApprovedEmailOptions,
@@ -1793,7 +1793,7 @@ export class MailService {
     const appOpenUrl = `${DEFAULT_APP_URL}/open-app?email=${encodeURIComponent(username || cleanTo)}`;
     const appUrl = portalUrl || appOpenUrl;
     const assocTitle = associationName || 'CLB Doanh Nhân CEO HN10';
-    const subject = `[${assocTitle}] Chúc Mừng Hồ Sơ Hội Viên Của Anh/Chị ${fullName} Đã Được Phê Duyệt Chính Thức`;
+    const subject = `[${assocTitle}] Chúc Mừng Hồ Sơ Học viên Của Anh/Chị ${fullName} Đã Được Phê Duyệt Chính Thức`;
 
     const html = `
 <!DOCTYPE html>
@@ -1826,9 +1826,9 @@ export class MailService {
 <body>
   <div class="container">
     <div class="header">
-      <div class="gold-badge">✦ PHÊ DUYỆT HỘI VIÊN CHÍNH THỨC ✦</div>
+      <div class="gold-badge">✦ PHÊ DUYỆT Học viên CHÍNH THỨC ✦</div>
       <h1 class="title">${assocTitle}</h1>
-      <p class="subtitle">Chúc mừng Anh/Chị đã chính thức trở thành Hội viên CLB</p>
+      <p class="subtitle">Chúc mừng Anh/Chị đã chính thức trở thành Học viên CLB</p>
     </div>
 
     <div class="content">
@@ -1836,18 +1836,18 @@ export class MailService {
       <div class="intro">
         Ban Chủ Nhiệm & Ban Thư Ký ${assocTitle} xin trân trọng thông báo: Hồ sơ đăng ký gia nhập của Anh/Chị ${companyName ? `(đại diện cho <strong>${companyName}</strong>)` : ''} đã được <strong>phê duyệt chính thức</strong>.
         <br><br>
-        Toàn bộ đặc quyền của Hội viên chính thức (Thẻ Doanh Nhân Số VIP, kết nối giao thương nội bộ, ưu đãi hội viên) đã được kích hoạt trên hệ thống.
+        Toàn bộ đặc quyền của Học viên chính thức (Thẻ Doanh Nhân Số VIP, kết nối giao thương nội bộ, ưu đãi Học viên) đã được kích hoạt trên hệ thống.
       </div>
 
       <div class="card-box">
         <div class="info-row">
-          <span class="info-label">Hội viên:</span>
+          <span class="info-label">Học viên:</span>
           <span class="info-value">${fullName}</span>
         </div>
         ${memberCode
         ? `
         <div class="info-row">
-          <span class="info-label">Mã số Hội viên:</span>
+          <span class="info-label">Mã số Học viên:</span>
           <span class="info-value" style="color: #003B95; font-weight: 800;">${memberCode}</span>
         </div>
         `
@@ -1910,9 +1910,9 @@ export class MailService {
     this.dispatchZaloOaNotification({
       recipientEmail: cleanTo,
       recipientName: fullName,
-      title: 'QUYẾT ĐỊNH KẾT NẠP HỘI VIÊN CHÍNH THỨC CEO HN10',
-      content: `Kính gửi Quý Doanh nhân ${fullName},\nBan Điều Hành ${assocTitle} xin trân trọng chúc mừng Quý Doanh nhân đã chính thức được chuẩn y kết nạp là Hội viên Chính thức.\n- Mã hội viên: ${memberCode}\n${companyName ? `- Doanh nghiệp: ${companyName}\n` : ''}- Tài khoản: ${username || cleanTo}\n${passwordRaw ? `- Mật khẩu: ${passwordRaw}\n` : ''}- Trạng thái: ✓ Đã phê duyệt chính thức.\nTrân trọng chào đón Quý Doanh nhân gia nhập ngôi nhà chung CEO HN10!`,
-      ctaText: 'Đăng Nhập App Hội Viên',
+      title: 'QUYẾT ĐỊNH KẾT NẠP Học viên CHÍNH THỨC CEO HN10',
+      content: `Kính gửi Quý Doanh nhân ${fullName},\nBan Điều Hành ${assocTitle} xin trân trọng chúc mừng Quý Doanh nhân đã chính thức được chuẩn y kết nạp là Học viên Chính thức.\n- Mã Học viên: ${memberCode}\n${companyName ? `- Doanh nghiệp: ${companyName}\n` : ''}- Tài khoản: ${username || cleanTo}\n${passwordRaw ? `- Mật khẩu: ${passwordRaw}\n` : ''}- Trạng thái: ✓ Đã phê duyệt chính thức.\nTrân trọng chào đón Quý Doanh nhân gia nhập ngôi nhà chung CEO HN10!`,
+      ctaText: 'Đăng Nhập App Học viên',
       ctaUrl: appUrl,
       trackingType: 'member_approved',
     });
@@ -1990,7 +1990,7 @@ export class MailService {
 <body>
   <div class="container">
     <div class="header">
-      <div class="gold-badge">✦ TIẾP NHẬN ĐĂNG KÝ HỘI VIÊN MỚI ✦</div>
+      <div class="gold-badge">✦ TIẾP NHẬN ĐĂNG KÝ Học viên MỚI ✦</div>
       <h1 class="title">CLB DOANH NHÂN CEO HN10</h1>
       <p class="subtitle">Hội Doanh Nhân Trẻ Hà Nội (HanoiBA) — Kết Nối & Giao Thương</p>
     </div>
@@ -2063,7 +2063,7 @@ export class MailService {
       <div class="status-box">
         <strong>📌 Quy trình xét duyệt tiếp theo:</strong>
         <ol class="step-list">
-          <li><strong>Thẩm định hồ sơ:</strong> Ban Thành Viên & Ban Kiểm Soát CLB sẽ xem xét thông tin doanh nghiệp theo tiêu chí hội viên trong 24 giờ làm việc.</li>
+          <li><strong>Thẩm định hồ sơ:</strong> Ban Thành Viên & Ban Kiểm Soát CLB sẽ xem xét thông tin doanh nghiệp theo tiêu chí Học viên trong 24 giờ làm việc.</li>
           <li><strong>Liên hệ xác nhận:</strong> Ban Thư Ký có thể liên hệ qua điện thoại/Zalo để trao đổi thêm về quyền lợi và cơ chế kết nối.</li>
           <li><strong>Cấp tài khoản & Thẻ Doanh Nhân Số:</strong> Khi hồ sơ được phê duyệt chính thức, hệ thống sẽ tự động gửi email thông báo kèm tài khoản đăng nhập App Doanh Nhân CEO HN10 cho Anh/Chị.</li>
         </ol>
@@ -2115,7 +2115,7 @@ export class MailService {
         category: 'fee',
         name: 'Thông Báo Nộp Hội Phí Niên Liễm Định Kỳ',
         description:
-          'Tự động gửi thông báo nộp phí hội viên định kỳ hàng năm kèm mã VietQR và hướng dẫn thanh toán.',
+          'Tự động gửi thông báo nộp phí Học viên định kỳ hàng năm kèm mã VietQR và hướng dẫn thanh toán.',
         channels: ['email', 'in_app', 'push'],
         subject:
           '[CLB CEO HN10] Thông Báo Nộp Hội Phí Thường Niên Năm {{fee_year}} — Anh/Chị {{full_name}}',
@@ -2125,10 +2125,10 @@ export class MailService {
         variables: [
           {
             key: 'full_name',
-            label: 'Tên hội viên',
+            label: 'Tên Học viên',
             example: 'Nguyễn Văn Hùng',
           },
-          { key: 'member_code', label: 'Mã hội viên', example: 'HN10-001' },
+          { key: 'member_code', label: 'Mã Học viên', example: 'HN10-001' },
           {
             key: 'company_name',
             label: 'Tên doanh nghiệp',
@@ -2170,7 +2170,7 @@ export class MailService {
     </p>
     <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 18px; margin-bottom: 20px;">
       <table style="width: 100%; font-size: 13.5px; border-collapse: collapse;">
-        <tr><td style="padding: 6px 0; color: #64748b; width: 140px;">Mã hội viên:</td><td style="padding: 6px 0; font-weight: 700; color: #003B95;">{{member_code}}</td></tr>
+        <tr><td style="padding: 6px 0; color: #64748b; width: 140px;">Mã Học viên:</td><td style="padding: 6px 0; font-weight: 700; color: #003B95;">{{member_code}}</td></tr>
         <tr><td style="padding: 6px 0; color: #64748b;">Mức hội phí:</td><td style="padding: 6px 0; font-weight: 800; color: #dc2626; font-size: 15px;">{{fee_amount}} VNĐ</td></tr>
         <tr><td style="padding: 6px 0; color: #64748b;">Hạn chót thanh toán:</td><td style="padding: 6px 0; font-weight: 700; color: #d97706;">{{due_date}}</td></tr>
       </table>
@@ -2190,9 +2190,9 @@ export class MailService {
         id: 'tmpl-welcome-new-member',
         code: 'WELCOME_NEW_MEMBER',
         category: 'welcome',
-        name: 'Thư Chào Mừng & Cảm Ơn Hội Viên Mới Gia Nhập',
+        name: 'Thư Chào Mừng & Cảm Ơn Học viên Mới Gia Nhập',
         description:
-          'Tự động gửi ngay sau khi tài khoản hội viên được Ban Quản Trị phê duyệt chính thức.',
+          'Tự động gửi ngay sau khi tài khoản Học viên được Ban Quản Trị phê duyệt chính thức.',
         channels: ['email', 'in_app', 'push'],
         subject:
           'CHÀO MỪNG ANH/CHỊ {{full_name}} CHÍNH THỨC GIA NHẬP CLB DOANH NHÂN CEO HN10',
@@ -2200,8 +2200,8 @@ export class MailService {
         inAppBody:
           'Hồ sơ của Anh/Chị đã được Ban Thường Trực duyệt. Chào mừng Anh/Chị đến với cộng đồng Doanh nhân CEO HN10!',
         variables: [
-          { key: 'full_name', label: 'Tên hội viên', example: 'Trần Thị Mai' },
-          { key: 'member_code', label: 'Mã hội viên', example: 'HN10-088' },
+          { key: 'full_name', label: 'Tên Học viên', example: 'Trần Thị Mai' },
+          { key: 'member_code', label: 'Mã Học viên', example: 'HN10-088' },
           {
             key: 'company_name',
             label: 'Tên công ty',
@@ -2211,7 +2211,7 @@ export class MailService {
           {
             key: 'executive_role',
             label: 'Vai trò hiệp hội',
-            example: 'Hội Viên Chính Thức',
+            example: 'Học viên Chính Thức',
           },
           {
             key: 'department',
@@ -2229,7 +2229,7 @@ export class MailService {
         htmlBody: `
 <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 620px; margin: 0 auto; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.06);">
   <div style="background: linear-gradient(135deg, #1e3a8a 0%, #003B95 50%, #d97706 100%); padding: 36px 24px; text-align: center; color: #ffffff;">
-    <h1 style="margin: 0; font-size: 23px; font-weight: 800; color: #ffffff;">CHÀO MỪNG HỘI VIÊN MỚI GIA NHẬP</h1>
+    <h1 style="margin: 0; font-size: 23px; font-weight: 800; color: #ffffff;">CHÀO MỪNG Học viên MỚI GIA NHẬP</h1>
     <p style="margin: 8px 0 0; font-size: 13.5px; color: #fef08a;">CLB DOANH NHÂN CEO HN10 (HanoiBA)</p>
   </div>
   <div style="padding: 28px 24px; color: #1e293b;">
@@ -2522,11 +2522,10 @@ export class MailService {
       title: isConfirmed
         ? `LỊCH HẸN KẾT NỐI B2B ĐÃ XÁC NHẬN: ${partnerName}`
         : `LỜI MỜI KẾT NỐI GIAO THƯƠNG 1-1 TỪ ${partnerName}`,
-      content: `Kính gửi Anh/Chị ${recipientName},\n${
-        isConfirmed
+      content: `Kính gửi Anh/Chị ${recipientName},\n${isConfirmed
           ? `Lịch hẹn kết nối giao thương 1-1 với ${partnerName} đã được xác nhận thành công:`
           : `Doanh nhân ${partnerName} ${partnerCompany ? `(${partnerCompany})` : ''} vừa gửi lời mời hẹn gặp giao thương 1-1:`
-      }\n- Thời gian: ${time} ngày ${date}\n- Hình thức: ${isOnline ? '💻 Trực tuyến (Online)' : '🏢 Gặp mặt trực tiếp (Offline)'}\n- ${isOnline ? 'Đường link họp' : 'Địa điểm'}: ${venueOrLink || 'Không gian Doanh Nhân CEO HN10'}\n- Mục đích: ${purpose || notes || 'Gặp gỡ giao thương và xúc tiến hợp tác'}.`,
+        }\n- Thời gian: ${time} ngày ${date}\n- Hình thức: ${isOnline ? '💻 Trực tuyến (Online)' : '🏢 Gặp mặt trực tiếp (Offline)'}\n- ${isOnline ? 'Đường link họp' : 'Địa điểm'}: ${venueOrLink || 'Không gian Doanh Nhân CEO HN10'}\n- Mục đích: ${purpose || notes || 'Gặp gỡ giao thương và xúc tiến hợp tác'}.`,
       ctaText: 'Xem Lịch Hẹn & Phản Hồi',
       ctaUrl: appUrl,
       trackingType: 'connection_appointment',
@@ -2738,8 +2737,8 @@ export class MailService {
     const qrImg = vietQrAttachment ? 'cid:vnpay_fee_qr' : vietQrUrlStr;
 
     const subject = isReminder
-      ? `[CLB CEO HN10] Nhắc Đóng Hội Phí Thường Niên Năm ${year} (Lần ${reminderCount}) — Hội Viên ${memberName}`
-      : `[CLB CEO HN10] Thông Báo Đóng Hội Phí Thường Niên Năm ${year} — Hội Viên ${memberName} (HĐ #${invoiceNo})`;
+      ? `[CLB CEO HN10] Nhắc Đóng Hội Phí Thường Niên Năm ${year} (Lần ${reminderCount}) — Học viên ${memberName}`
+      : `[CLB CEO HN10] Thông Báo Đóng Hội Phí Thường Niên Năm ${year} — Học viên ${memberName} (HĐ #${invoiceNo})`;
 
     const html = `
 <!DOCTYPE html>
@@ -2780,12 +2779,12 @@ export class MailService {
     <div class="content">
       <div class="greeting">Kính gửi Anh/Chị <strong>${memberName}</strong>,</div>
       <div class="intro">
-        Ban Tài chính & Ban Thư Ký CLB Doanh Nhân CEO HN10 xin trân trọng thông báo tới Anh/Chị ${companyName ? `(đại diện <strong>${companyName}</strong>)` : ''} thông tin đóng hội phí thường niên năm <strong>${year}</strong> để tiếp tục duy trì tư cách hội viên chính thức và các quyền lợi giao thương.
+        Ban Tài chính & Ban Thư Ký CLB Doanh Nhân CEO HN10 xin trân trọng thông báo tới Anh/Chị ${companyName ? `(đại diện <strong>${companyName}</strong>)` : ''} thông tin đóng hội phí thường niên năm <strong>${year}</strong> để tiếp tục duy trì tư cách Học viên chính thức và các quyền lợi giao thương.
       </div>
       <div class="card-box">
         <div class="card-title">🧾 Chi Tiết Hóa Đơn Hội Phí</div>
         <div class="info-row"><span class="info-label">Mã hóa đơn:</span><span class="info-value" style="color: #003B95;">#${invoiceNo}</span></div>
-        <div class="info-row"><span class="info-label">Hội viên:</span><span class="info-value">${memberName} ${memberCode ? `(${memberCode})` : ''}</span></div>
+        <div class="info-row"><span class="info-label">Học viên:</span><span class="info-value">${memberName} ${memberCode ? `(${memberCode})` : ''}</span></div>
         <div class="info-row"><span class="info-label">Niên khóa:</span><span class="info-value">Năm ${year}</span></div>
         <div class="info-row"><span class="info-label">Số tiền hội phí:</span><span class="info-value" style="color: #d97706; font-size: 16px;">${amount.toLocaleString('vi-VN')} VNĐ</span></div>
         <div class="info-row"><span class="info-label">Hạn nộp hội phí:</span><span class="info-value" style="color: #dc2626;">${dueDate}</span></div>
@@ -2821,7 +2820,7 @@ export class MailService {
       recipientEmail: cleanTo,
       recipientName: memberName,
       title: `THÔNG BÁO HỘI PHÍ THƯỜNG NIÊN NĂM ${year}`,
-      content: `Kính gửi Anh/Chị ${memberName},\nBan Tài chính CLB Doanh Nhân CEO HN10 kính gửi thông báo hội phí:\n- Số tiền cần đóng: ${Number(amount || 0).toLocaleString('vi-VN')} VNĐ\n- Hạn thanh toán: ${dueDate}\n- Mã hóa đơn: #${invoiceNo}\n- Số tài khoản: 1983.888.888 tại Vietcombank (CLB Doanh Nhân CEO HN10)\n- Cú pháp CK: ${memberCode || memberName} dong hoi phi ${year}.\nAnh/Chị vui lòng hoàn tất hội phí để duy trì đầy đủ đặc quyền hội viên.`,
+      content: `Kính gửi Anh/Chị ${memberName},\nBan Tài chính CLB Doanh Nhân CEO HN10 kính gửi thông báo hội phí:\n- Số tiền cần đóng: ${Number(amount || 0).toLocaleString('vi-VN')} VNĐ\n- Hạn thanh toán: ${dueDate}\n- Mã hóa đơn: #${invoiceNo}\n- Số tài khoản: 1983.888.888 tại Vietcombank (CLB Doanh Nhân CEO HN10)\n- Cú pháp CK: ${memberCode || memberName} dong hoi phi ${year}.\nAnh/Chị vui lòng hoàn tất hội phí để duy trì đầy đủ đặc quyền Học viên.`,
       ctaText: 'Đóng Phí Online / Xem Chi Tiết',
       ctaUrl: appUrl,
       trackingType: 'dues_notification',
@@ -2838,7 +2837,7 @@ export class MailService {
   }
 
   /**
-   * 5. Gửi email xác nhận thanh toán hội phí thành công & gia hạn hội viên
+   * 5. Gửi email xác nhận thanh toán hội phí thành công & gia hạn Học viên
    */
   async sendMembershipFeeSuccessEmail(
     options: SendMembershipFeeSuccessEmailOptions,
@@ -2863,7 +2862,7 @@ export class MailService {
       'vupv090120@gmail.com'
     ).trim();
     const appUrl = portalUrl || `${DEFAULT_APP_URL}/association/profile`;
-    const subject = `[CLB CEO HN10] Xác Nhận Hoàn Thành Hội Phí Năm ${year} — Hội Viên ${memberName}`;
+    const subject = `[CLB CEO HN10] Xác Nhận Hoàn Thành Hội Phí Năm ${year} — Học viên ${memberName}`;
 
     const html = `
 <!DOCTYPE html>
@@ -2906,21 +2905,21 @@ export class MailService {
       </div>
       <div class="card-box">
         <div class="card-title">🧾 Thông Tin Xác Nhận Hoàn Tất</div>
-        <div class="info-row"><span class="info-label">Hội viên:</span><span class="info-value" style="color: #003B95;">${memberName} ${memberCode ? `(${memberCode})` : ''}</span></div>
+        <div class="info-row"><span class="info-label">Học viên:</span><span class="info-value" style="color: #003B95;">${memberName} ${memberCode ? `(${memberCode})` : ''}</span></div>
         <div class="info-row"><span class="info-label">Mã hóa đơn / Biên lai:</span><span class="info-value">#${invoiceNo}</span></div>
         <div class="info-row"><span class="info-label">Niên khóa hội phí:</span><span class="info-value">Năm ${year}</span></div>
         <div class="info-row"><span class="info-label">Số tiền đã thanh toán:</span><span class="info-value" style="color: #16a34a; font-size: 16px;">${amount.toLocaleString('vi-VN')} VNĐ</span></div>
         <div class="info-row"><span class="info-label">Ngày thanh toán:</span><span class="info-value">${paidDate}</span></div>
         <div class="info-row"><span class="info-label">Phương thức:</span><span class="info-value">${paymentMethod}</span></div>
-        ${newTermEnd ? `<div class="info-row"><span class="info-label">Thời hạn hội viên chính thức:</span><span class="info-value" style="color: #d97706;">Đến hết ${newTermEnd}</span></div>` : ''}
+        ${newTermEnd ? `<div class="info-row"><span class="info-label">Thời hạn Học viên chính thức:</span><span class="info-value" style="color: #d97706;">Đến hết ${newTermEnd}</span></div>` : ''}
       </div>
 
       <div style="background: #f0fdf4; border: 1px solid #bbf7d0; padding: 14px; border-radius: 12px; font-size: 13px; color: #166534; line-height: 1.5; margin-bottom: 20px;">
-        🌟 <strong>Quyền lợi hội viên duy trì:</strong> Anh/Chị được hưởng trọn vẹn toàn bộ quyền lợi tham gia các chương trình xúc tiến thương mại, kết nối B2B, gian hàng ưu đãi, và các sự kiện độc quyền của CLB CEO HN10.
+        🌟 <strong>Quyền lợi Học viên duy trì:</strong> Anh/Chị được hưởng trọn vẹn toàn bộ quyền lợi tham gia các chương trình xúc tiến thương mại, kết nối B2B, gian hàng ưu đãi, và các sự kiện độc quyền của CLB CEO HN10.
       </div>
 
       <div class="btn-wrap">
-        <a href="${appUrl}" class="btn-primary" target="_blank">📲 Xem Hồ Sơ & Quyền Lợi Hội Viên</a>
+        <a href="${appUrl}" class="btn-primary" target="_blank">📲 Xem Hồ Sơ & Quyền Lợi Học viên</a>
       </div>
     </div>
     <div class="footer">
@@ -2937,7 +2936,7 @@ export class MailService {
       recipientEmail: cleanTo,
       recipientName: memberName,
       title: `XÁC NHẬN HOÀN THÀNH HỘI PHÍ NĂM ${year}`,
-      content: `Kính gửi Anh/Chị ${memberName},\nBan Tài chính CLB Doanh Nhân CEO HN10 xác nhận đã nhận đủ số tiền: ${Number(amount || 0).toLocaleString('vi-VN')} VNĐ cho kỳ hội phí năm ${year}.\n- Mã biên lai: #${invoiceNo}\n- Ngày thanh toán: ${paidDate}\n${newTermEnd ? `- Hạn hội viên mới: ${newTermEnd}\n` : ''}- Trạng thái: ✓ Đã gia hạn quyền lợi hội viên chính thức.\nTrân trọng cảm ơn sự đồng hành của Quý Doanh nhân!`,
+      content: `Kính gửi Anh/Chị ${memberName},\nBan Tài chính CLB Doanh Nhân CEO HN10 xác nhận đã nhận đủ số tiền: ${Number(amount || 0).toLocaleString('vi-VN')} VNĐ cho kỳ hội phí năm ${year}.\n- Mã biên lai: #${invoiceNo}\n- Ngày thanh toán: ${paidDate}\n${newTermEnd ? `- Hạn Học viên mới: ${newTermEnd}\n` : ''}- Trạng thái: ✓ Đã gia hạn quyền lợi Học viên chính thức.\nTrân trọng cảm ơn sự đồng hành của Quý Doanh nhân!`,
       ctaText: 'Xem Hồ Sơ & Quyền Lợi',
       ctaUrl: appUrl,
       trackingType: 'dues_success',
@@ -3260,7 +3259,7 @@ export class MailService {
   }
 
   /**
-   * Gửi email chúc mừng đại biểu/hội viên trúng giải bốc thăm may mắn (Lucky Draw)
+   * Gửi email chúc mừng đại biểu/Học viên trúng giải bốc thăm may mắn (Lucky Draw)
    */
   async sendLuckyDrawWinnerEmail(
     options: SendLuckyDrawWinnerEmailOptions,
@@ -3338,7 +3337,7 @@ export class MailService {
           <td class="info-value">${winnerName}</td>
         </tr>
         ${winnerCompany ? `<tr><td class="info-label">🏢 Doanh nghiệp:</td><td class="info-value">${winnerCompany}</td></tr>` : ''}
-        ${winnerCode ? `<tr><td class="info-label">🏷️ Mã hội viên:</td><td class="info-value">${winnerCode}</td></tr>` : ''}
+        ${winnerCode ? `<tr><td class="info-label">🏷️ Mã Học viên:</td><td class="info-value">${winnerCode}</td></tr>` : ''}
         ${luckyNumber ? `<tr><td class="info-label">🎟️ Con số may mắn:</td><td class="info-value" style="color: #d97706;">#${luckyNumber}</td></tr>` : ''}
         <tr>
           <td class="info-label">🎪 Sự kiện:</td>

@@ -34,11 +34,11 @@ function getGuide1Content() {
 1. [TỔNG QUAN HỆ THỐNG & ĐỊA CHỈ TRUY CẬP](#1-tổng-quan-hệ-thống--địa-chỉ-truy-cập)
 2. [HƯỚNG DẪN ĐĂNG NHẬP & BẢO MẬT TÀI KHOẢN](#2-hướng-dẫn-đăng-nhập--bảo-mật-tài-khoản)
 3. [BẢNG ĐIỀU KHIỂN TỔNG QUAN (EXECUTIVE DASHBOARD KPI)](#3-bảng-điều-khiển-tổng-quan-executive-dashboard-kpi)
-4. [QUẢN TRỊ HỒ SƠ HỘI VIÊN & DOANH NGHIỆP THÀNH VIÊN](#4-quản-trị-hồ-sơ-hội-viên--doanh-nghiệp-thành-viên)
+4. [QUẢN TRỊ HỒ SƠ Học viên & DOANH NGHIỆP THÀNH VIÊN](#4-quản-trị-hồ-sơ-hội-viên--doanh-nghiệp-thành-viên)
 5. [QUẢN TRỊ SỰ KIỆN, HỘI THẢO & ĐIỂM DANH QR CODE TỐC ĐỘ CAO](#5-quản-trị-sự-kiện-hội-thảo--điểm-danh-qr-code-tốc-độ-cao)
 6. [ĐIỀU PHỐI CUỘC HỌP 6 BAN & BIỂU QUYẾT TRỰC TUYẾN](#6-điều-phối-cuộc-họp-6-ban--biểu-quyết-trực-tuyến)
 7. [QUẢN TRỊ TÀI CHÍNH, HỘI PHÍ & BÁO CÁO MINH BẠCH](#7-quản-trị-tài-chính-hội-phí--báo-cáo-minh-bạch)
-8. [QUẢN LÝ NHÀ TÀI TRỢ, GÓI TÀI TRỢ & ĐẶC QUYỀN HỘI VIÊN](#8-quản-lý-nhà-tài-trợ-gói-tài-trợ--đặc-quyền-hội-viên)
+8. [QUẢN LÝ NHÀ TÀI TRỢ, GÓI TÀI TRỢ & ĐẶC QUYỀN Học viên](#8-quản-lý-nhà-tài-trợ-gói-tài-trợ--đặc-quyền-hội-viên)
 9. [SÀN GIAO THƯƠNG B2B MARKETPLACE & KIỂM DUYỆT SẢN PHẨM](#9-sàn-giao-thương-b2b-marketplace--kiểm-duyệt-sản-phẩm)
 10. [TRUYỀN THÔNG, BẢN TIN HIỆP HỘI & EMAIL MARKETING TẬP TRUNG](#10-truyền-thông-bản-tin-hiệp-hội--email-marketing-tập-trung)
 11. [MA TRẬN PHÂN QUYỀN RBAC 5 ROLE & GIAO VIỆC TỰ ĐỘNG THÔNG BÁO](#11-ma-trận-phân-quyền-rbac-5-role--giao-việc-tự-động-thông-báo)
@@ -49,7 +49,7 @@ function getGuide1Content() {
 # 1. TỔNG QUAN HỆ THỐNG & ĐỊA CHỈ TRUY CẬP
 
 ### 1.1. Sứ mệnh Nền tảng
-Hệ thống Web CRM Quản trị Hiệp hội CLB Doanh Nhân CEO HN10 là cổng điều hành trực tuyến tập trung, giúp Ban Chấp Hành, Ban Thư Ký và Kế Toán quản lý minh bạch toàn bộ vòng đời hội viên: từ tiếp nhận đăng ký trực tuyến, thẩm định kết nạp, thu hội phí thường niên, tổ chức sự kiện quy mô lớn, kết nối giao thương B2B đến phân quyền vận hành 6 Ban chuyên môn.
+Hệ thống Web CRM Quản trị Hiệp hội CLB Doanh Nhân CEO HN10 là cổng điều hành trực tuyến tập trung, giúp Ban Chấp Hành, Ban Thư Ký và Kế Toán quản lý minh bạch toàn bộ vòng đời Học viên: từ tiếp nhận đăng ký trực tuyến, thẩm định kết nạp, thu hội phí thường niên, tổ chức sự kiện quy mô lớn, kết nối giao thương B2B đến phân quyền vận hành 6 Ban chuyên môn.
 
 ### 1.2. Thông số Kỹ thuật & Địa chỉ Truy cập
 | Thông số Kỹ thuật | Giá trị Thực tế Máy chủ Dev | Ghi chú Vận hành |
@@ -86,45 +86,45 @@ Hệ thống Web CRM Quản trị Hiệp hội CLB Doanh Nhân CEO HN10 là cổ
 Sau khi đăng nhập thành công, hệ thống chuyển thẳng đến Bảng điều khiển Tổng quan tại tuyến đường \`/\` hoặc \`/dashboard\`.
 
 ![Bảng điều khiển Tổng quan Dashboard KPI CRM CEO HN10](images/evidence/crm1983_02_dashboard_overview.png)
-*Hình 3.1: Bảng điều khiển Tổng quan Dashboard KPI CRM hiển thị các chỉ số tài chính, hội viên và sự kiện*
+*Hình 3.1: Bảng điều khiển Tổng quan Dashboard KPI CRM hiển thị các chỉ số tài chính, Học viên và sự kiện*
 
 ### 3.1. Các Khối Chỉ số KPI Chiến lược (Top Metrics)
-1. **Tổng số Hội viên Chính thức**: Số lượng doanh nhân 1983 đã kích hoạt tài khoản và đang hoạt động.
-2. **Hội viên Mới Tiếp nhận**: Các hồ sơ gửi từ form đăng ký trực tuyến chờ Ban Thư ký thẩm định.
+1. **Tổng số Học viên Chính thức**: Số lượng doanh nhân 1983 đã kích hoạt tài khoản và đang hoạt động.
+2. **Học viên Mới Tiếp nhận**: Các hồ sơ gửi từ form đăng ký trực tuyến chờ Ban Thư ký thẩm định.
 3. **Tổng Doanh thu & Quỹ Hiệp hội**: Tổng thu từ Hội phí, Tài trợ và Vé sự kiện đã đối soát gạch nợ.
 4. **Sự kiện Sắp diễn ra**: Lịch họp Ban Chấp Hành, Gala xúc tiến thương mại và Hội thảo chuyên đề.
 
 ### 3.2. Biểu đồ Tăng trưởng & Dòng tiền Minh bạch
 - **Biểu đồ Cột Doanh thu theo Tháng**: So sánh chỉ số Thu - Chi thực tế và thặng dư quỹ hiệp hội.
-- **Biểu đồ Cơ cấu Hội viên theo 6 Ban chuyên môn**: Thống kê tỷ lệ phân bổ nhân sự vào Ban Quản trị, Thư ký, Thành viên, Xúc tiến thương mại, Truyền thông, Thiện nguyện.
+- **Biểu đồ Cơ cấu Học viên theo 6 Ban chuyên môn**: Thống kê tỷ lệ phân bổ nhân sự vào Ban Quản trị, Thư ký, Thành viên, Xúc tiến thương mại, Truyền thông, Thiện nguyện.
 - **Dòng Hoạt động Thời gian thực (Activity Log)**: Ghi nhận từng giao dịch thu phí, check-in sự kiện và thao tác phê duyệt của Quản trị viên.
 
 ---
 
-# 4. QUẢN TRỊ HỒ SƠ HỘI VIÊN & DOANH NGHIỆP THÀNH VIÊN
+# 4. QUẢN TRỊ HỒ SƠ Học viên & DOANH NGHIỆP THÀNH VIÊN
 
 Tuyến đường chức năng: \`/members\` và \`/companies\`.
 
-![Quản lý Danh bạ Hội viên CRM CEO HN10](images/evidence/crm1983_03_members_management.png)
-*Hình 4.1: Giao diện Quản lý Danh bạ Hội viên CLB CEO HN10 với bộ lọc phân loại và trạng thái*
+![Quản lý Danh bạ Học viên CRM CEO HN10](images/evidence/crm1983_03_members_management.png)
+*Hình 4.1: Giao diện Quản lý Danh bạ Học viên CLB CEO HN10 với bộ lọc phân loại và trạng thái*
 
-### 4.1. Quy trình 4 Bước Thẩm định & Kết nạp Hội viên Mới
+### 4.1. Quy trình 4 Bước Thẩm định & Kết nạp Học viên Mới
 1. **Bước 1 - Tiếp nhận hồ sơ**: Khi doanh nhân gửi thông tin từ Landing Page, hệ thống tự động lưu vào danh sách với trạng thái **"Chờ duyệt" (Pending)**.
-2. **Bước 2 - Xem xét hồ sơ 360°**: Quản trị viên bấm nút **"Xem chi tiết"** trên dòng hội viên để mở Drawer thông tin đa chiều.
+2. **Bước 2 - Xem xét hồ sơ 360°**: Quản trị viên bấm nút **"Xem chi tiết"** trên dòng Học viên để mở Drawer thông tin đa chiều.
 
-![Drawer Xem Chi tiết Hồ sơ Hội viên 360 độ](images/evidence/crm1983_04_member_detail_drawer.png)
-*Hình 4.2: Drawer chi tiết hồ sơ hội viên 360° hiển thị đầy đủ thông tin cá nhân, doanh nghiệp và chức danh*
+![Drawer Xem Chi tiết Hồ sơ Học viên 360 độ](images/evidence/crm1983_04_member_detail_drawer.png)
+*Hình 4.2: Drawer chi tiết hồ sơ Học viên 360° hiển thị đầy đủ thông tin cá nhân, doanh nghiệp và chức danh*
 
 3. **Bước 3 - Phê duyệt kết nạp**:
    - Quản trị viên kiểm tra tính xác thực về năm sinh (1983), giấy phép kinh doanh và chức danh C-Level.
-   - Bấm nút **"Phê duyệt Hội viên"**. Hệ thống tự động gán mã hội viên tuần tự (\`HN10-001\`, \`HN10-002\`,...), cập nhật trạng thái **"Đang hoạt động" (Active)** và kích hoạt quyền truy cập App Di Động.
-4. **Bước 4 - Phân ban & Cấp thẻ**: Gán hội viên vào 1 trong 6 Ban chuyên môn và phát hành Thẻ Hội viên VIP 3D.
+   - Bấm nút **"Phê duyệt Học viên"**. Hệ thống tự động gán mã Học viên tuần tự (\`HN10-001\`, \`HN10-002\`,...), cập nhật trạng thái **"Đang hoạt động" (Active)** và kích hoạt quyền truy cập App Di Động.
+4. **Bước 4 - Phân ban & Cấp thẻ**: Gán Học viên vào 1 trong 6 Ban chuyên môn và phát hành Thẻ Học viên VIP 3D.
 
 ### 4.2. Quản lý Doanh nghiệp Thành viên (\`/companies\`)
-Hệ thống cung cấp danh bạ pháp nhân doanh nghiệp thuộc sở hữu của các hội viên:
+Hệ thống cung cấp danh bạ pháp nhân doanh nghiệp thuộc sở hữu của các Học viên:
 - Tìm kiếm nhanh theo Mã số thuế, Tên công ty, Ngành nghề kinh doanh.
 - Quản trị quy mô nhân sự, vốn điều lệ, địa chỉ trụ sở và năng lực cung ứng sản phẩm.
-- Liên kết 1-nhiều giữa Hội viên và các Công ty trực thuộc.
+- Liên kết 1-nhiều giữa Học viên và các Công ty trực thuộc.
 
 ![Quản lý Doanh nghiệp Thành viên CRM CEO HN10](images/evidence/crm1983_05_companies_management.png)
 *Hình 4.3: Quản lý Doanh nghiệp Thành viên CLB Doanh Nhân CEO HN10*
@@ -143,11 +143,11 @@ Tuyến đường chức năng: \`/events\`, \`/event-registrations\`, \`/checki
 2. Modal Wizard 3 bước thông minh xuất hiện:
    - **Bước 1 - Thông tin cơ bản**: Nhập Tên sự kiện, Thời gian bắt đầu/kết thúc, Địa điểm tổ chức (Khách sạn / Trung tâm hội nghị / Trực tuyến), Tải lên Banner ảnh bìa sắc nét.
    - **Bước 2 - Phân loại Vé & Giá vé**:
-     + Cấu hình loại vé: **Vé Hội viên thường (Miễn phí)**, **Vé VIP**, **Vé Khách mời Doanh nghiệp**.
+     + Cấu hình loại vé: **Vé Học viên thường (Miễn phí)**, **Vé VIP**, **Vé Khách mời Doanh nghiệp**.
      + Ô nhập Giá vé tích hợp bộ tự động định dạng phân cách hàng nghìn \`FormattedCurrencyInput\` (Ví dụ gõ \`1000000\` tự động hiển thị \`1.000.000 đ\` mà không nhảy con trỏ chuột).
      + Giới hạn số lượng vé phát hành.
    - **Bước 3 - Cấu hình Quyền lợi & Nhà tài trợ**: Đính kèm danh sách tài trợ Kim Cương, Vàng, Bạc hiển thị trên vé.
-3. Bấm **"Xuất bản Sự kiện"**. Sự kiện lập tức hiển thị đồng bộ lên App Hiệp hội của toàn thể hội viên.
+3. Bấm **"Xuất bản Sự kiện"**. Sự kiện lập tức hiển thị đồng bộ lên App Hiệp hội của toàn thể Học viên.
 
 ![Modal Tạo Sự kiện Mới Thông Minh](images/evidence/crm1983_07_event_create_modal.png)
 *Hình 5.2: Modal Tạo Sự kiện mới với phân loại vé và giá vé định dạng chuẩn*
@@ -179,7 +179,7 @@ Tuyến đường chức năng: \`/meetings\` và \`/voting\`.
 ### 6.2. Quản lý Biểu quyết & Bầu cử Đại hội Trực tuyến (\`/voting\`)
 - Tạo kỳ biểu quyết thông qua Nghị quyết Hiệp hội hoặc Bầu cử Ban Chấp Hành nhiệm kỳ mới.
 - Thiết lập thời hạn mở/đóng hòm phiếu điện tử.
-- Bỏ phiếu kín mã hóa một chiều: Mỗi hội viên chỉ được biểu quyết 1 lần duy nhất; kết quả thống kê theo thời gian thực với biểu đồ % đồng thuận minh bạch.
+- Bỏ phiếu kín mã hóa một chiều: Mỗi Học viên chỉ được biểu quyết 1 lần duy nhất; kết quả thống kê theo thời gian thực với biểu đồ % đồng thuận minh bạch.
 
 ![Quản lý Biểu quyết Bầu cử Đại hội](images/evidence/crm1983_10_voting_management.png)
 *Hình 6.2: Quản lý Biểu quyết & Bầu cử Đại hội Trực tuyến*
@@ -191,8 +191,8 @@ Tuyến đường chức năng: \`/meetings\` và \`/voting\`.
 Tuyến đường chức năng: \`/fees\`, \`/income\`, \`/expenses\`, \`/finance-report\`.
 
 ### 7.1. Quản lý Hội phí Thường niên (\`/fees\`)
-- Theo dõi danh sách hội viên theo kỳ hạn đóng phí: **Đã nộp**, **Chờ thanh toán**, **Quá hạn**.
-- Khi hội viên quét mã VietQR trên App chuyển khoản vào tài khoản MB Bank \`1983000000\`, Kế toán đối soát sao kê ngân hàng và bấm nút **"Xác nhận Thu Phí (+1 Năm)"**; hệ thống tự động cộng 365 ngày vào hạn sử dụng thẻ hội viên và gửi thông báo chúc mừng.
+- Theo dõi danh sách Học viên theo kỳ hạn đóng phí: **Đã nộp**, **Chờ thanh toán**, **Quá hạn**.
+- Khi Học viên quét mã VietQR trên App chuyển khoản vào tài khoản MB Bank \`1983000000\`, Kế toán đối soát sao kê ngân hàng và bấm nút **"Xác nhận Thu Phí (+1 Năm)"**; hệ thống tự động cộng 365 ngày vào hạn sử dụng thẻ Học viên và gửi thông báo chúc mừng.
 
 ![Quản lý Hội phí Thường niên CRM CEO HN10](images/evidence/crm1983_11_fees_management.png)
 *Hình 7.1: Quản lý Hội phí Thường niên & Đối soát Gạch nợ*
@@ -221,7 +221,7 @@ Tuyến đường chức năng: \`/fees\`, \`/income\`, \`/expenses\`, \`/financ
 
 ---
 
-# 8. QUẢN LÝ NHÀ TÀI TRỢ, GÓI TÀI TRỢ & ĐẶC QUYỀN HỘI VIÊN
+# 8. QUẢN LÝ NHÀ TÀI TRỢ, GÓI TÀI TRỢ & ĐẶC QUYỀN Học viên
 
 Tuyến đường chức năng: \`/sponsors\`, \`/sponsor-packages\`, \`/benefits\`, \`/perks\`.
 
@@ -234,10 +234,10 @@ Tuyến đường chức năng: \`/sponsors\`, \`/sponsor-packages\`, \`/benefit
 *Hình 8.1: Quản lý Nhà Tài Trợ & Phân bổ Gói Tài Trợ Hiệp hội*
 
 ### 8.2. Quản lý Quyền lợi & Kho Đặc quyền Doanh nghiệp (\`/benefits\`, \`/perks\`)
-- Cấu hình các đặc quyền ưu đãi dành riêng cho hội viên chính thức: Giảm giá dịch vụ khách sạn, ưu đãi vận chuyển logistics, tư vấn pháp lý miễn phí từ các doanh nghiệp thành viên.
-- Duyệt và phát hành mã voucher ưu đãi lên App Hội viên.
+- Cấu hình các đặc quyền ưu đãi dành riêng cho Học viên chính thức: Giảm giá dịch vụ khách sạn, ưu đãi vận chuyển logistics, tư vấn pháp lý miễn phí từ các doanh nghiệp thành viên.
+- Duyệt và phát hành mã voucher ưu đãi lên App Học viên.
 
-![Quản lý Quyền lợi & Đặc quyền Hội viên](images/evidence/crm1983_16_benefits_perks.png)
+![Quản lý Quyền lợi & Đặc quyền Học viên](images/evidence/crm1983_16_benefits_perks.png)
 *Hình 8.2: Quản lý Quyền lợi & Kho Đặc quyền Doanh nghiệp*
 
 ---
@@ -253,9 +253,9 @@ Tuyến đường chức năng: \`/marketplace\`.
 Sàn B2B CEO HN10 là kênh kết nối giao thương trực tiếp giữa các doanh nghiệp thành viên, thúc đẩy phương châm "Người 1983 ưu tiên dùng hàng 1983".
 
 ### 9.2. Quy trình Kiểm duyệt Sản phẩm/Dịch vụ
-1. Hội viên đăng ký sản phẩm thế mạnh từ App di động.
+1. Học viên đăng ký sản phẩm thế mạnh từ App di động.
 2. Sản phẩm hiển thị trong hàng đợi **"Chờ duyệt"** trên Web CRM.
-3. Ban Xúc tiến Thương mại kiểm tra: Giấy chứng nhận chất lượng, Nguồn gốc xuất xứ, Mức chiết khấu ưu đãi cho hội viên.
+3. Ban Xúc tiến Thương mại kiểm tra: Giấy chứng nhận chất lượng, Nguồn gốc xuất xứ, Mức chiết khấu ưu đãi cho Học viên.
 4. Bấm **"Phê duyệt niêm yết"**: Sản phẩm xuất hiện ngay lập tức trên Sàn Marketplace chuẩn Shopee của App di động với đầy đủ đánh giá % uy tín công ty.
 
 ---
@@ -272,8 +272,8 @@ Tuyến đường chức năng: \`/news\` và \`/email-marketing\`.
 *Hình 10.1: Quản lý Tin tức & Phóng sự Hoạt động Hiệp hội*
 
 ### 10.2. Cổng Email Marketing & Thông báo Đẩy Tập trung (\`/email-marketing\`)
-- Soạn thảo chiến dịch email thông báo gửi tự động tới danh sách toàn thể hội viên hoặc lọc theo từng Ban chuyên môn.
-- Tích hợp các mẫu Template HTML thiết kế sang trọng: Thư mời họp Ban Chấp Hành, Thông báo gia hạn hội phí, Thư chúc mừng sinh nhật hội viên.
+- Soạn thảo chiến dịch email thông báo gửi tự động tới danh sách toàn thể Học viên hoặc lọc theo từng Ban chuyên môn.
+- Tích hợp các mẫu Template HTML thiết kế sang trọng: Thư mời họp Ban Chấp Hành, Thông báo gia hạn hội phí, Thư chúc mừng sinh nhật Học viên.
 
 ![Cổng Email Marketing Tập trung](images/evidence/crm1983_19_email_marketing.png)
 *Hình 10.2: Cổng Email Marketing & Thông báo Tập trung*
@@ -289,7 +289,7 @@ Tuyến đường chức năng: \`/permissions\` và \`/tasks\`.
 
 ### 11.1. Ma trận Phân quyền 5 Role Chuẩn hóa
 Hệ thống cố định duy nhất đúng 5 vai trò hệ thống (đã loại bỏ Platform Admin, Quản trị là quyền to nhất):
-1. **Quản trị (\`quan_tri\`)**: Toàn quyền cấu hình hệ thống, duyệt hội viên, phê duyệt cuộc họp và quản trị tài chính.
+1. **Quản trị (\`quan_tri\`)**: Toàn quyền cấu hình hệ thống, duyệt Học viên, phê duyệt cuộc họp và quản trị tài chính.
 2. **Admin (\`admin\`)**: Quản trị vận hành sự kiện, tin tức và phê duyệt sản phẩm marketplace.
 3. **Tổng thư ký (\`tong_thu_ky\`)**: Điều phối công việc, tạo lịch họp, gửi thông báo và quản lý danh bạ.
 4. **Trưởng ban (\`truong_ban\`)**: Quản lý thành viên thuộc Ban phụ trách, đề xuất ngân sách và tạo lịch họp Ban.
@@ -304,7 +304,7 @@ Hệ thống cố định duy nhất đúng 5 vai trò hệ thống (đã loại
 - Ban Thiện nguyện
 
 ### 11.3. Cơ chế Giao việc Tự động Bắn Thông báo (Task Workflow)
-- Khi Quản trị viên hoặc Trưởng ban tạo công việc tại \`/tasks\` và chọn người thực hiện từ danh bạ hội viên:
+- Khi Quản trị viên hoặc Trưởng ban tạo công việc tại \`/tasks\` và chọn người thực hiện từ danh bạ Học viên:
 - Backend tự động đối soát \`user_id\` trong PostgreSQL và ghi đồng thời vào 2 bảng CSDL:
   + \`public.business_notifications\`: Hiển thị icon chuông trên Web CRM Quản trị.
   + \`public.member_notifications\`: Bắn thông báo đẩy tức thì lên App Di Động của người nhận.
@@ -314,13 +314,13 @@ Hệ thống cố định duy nhất đúng 5 vai trò hệ thống (đã loại
 # 12. QUY TRÌNH ĐỐI SOÁT THỦ CÔNG & XỬ LÝ SỰ CỐ (TROUBLESHOOTING)
 
 ### 12.1. Quy trình Đối soát Gạch nợ Hội phí VietQR
-1. **Bước 1**: Hội viên chuyển khoản quét mã VietQR MB Bank \`1983000000\` với cú pháp \`HP[MÃ_HV] [SĐT]\`.
+1. **Bước 1**: Học viên chuyển khoản quét mã VietQR MB Bank \`1983000000\` với cú pháp \`HP[MÃ_HV] [SĐT]\`.
 2. **Bước 2**: Kế toán mở màn hình \`/fees\`, đối chiếu mã giao dịch trên sao kê ngân hàng với danh sách chờ.
-3. **Bước 3**: Bấm nút **"Xác nhận Đã nộp"**. Hệ thống cập nhật trạng thái hóa đơn thành \`PAID\`, gia hạn thời hạn hội viên thêm 1 năm và gửi thông báo xác nhận thành công.
+3. **Bước 3**: Bấm nút **"Xác nhận Đã nộp"**. Hệ thống cập nhật trạng thái hóa đơn thành \`PAID\`, gia hạn thời hạn Học viên thêm 1 năm và gửi thông báo xác nhận thành công.
 
 ### 12.2. Xử lý Lỗi Đăng nhập hoặc Quên Mật khẩu
-- Nếu tài khoản báo lỗi sai thông tin đăng nhập: Kiểm tra xem đã nhập đúng định dạng email hoặc mã hội viên chưa.
-- Để cấp lại mật khẩu: Quản trị viên truy cập \`/members\`, mở Drawer hội viên và bấm nút **"Đặt lại mật khẩu mặc định (123456)"**. Hội viên đăng nhập lại và được yêu cầu đổi mật khẩu mới.
+- Nếu tài khoản báo lỗi sai thông tin đăng nhập: Kiểm tra xem đã nhập đúng định dạng email hoặc mã Học viên chưa.
+- Để cấp lại mật khẩu: Quản trị viên truy cập \`/members\`, mở Drawer Học viên và bấm nút **"Đặt lại mật khẩu mặc định (123456)"**. Học viên đăng nhập lại và được yêu cầu đổi mật khẩu mới.
 
 ---
 *Tài liệu được biên soạn và chuẩn hóa phục vụ công tác bàn giao nghiệm thu CLB Doanh Nhân CEO HN10.*

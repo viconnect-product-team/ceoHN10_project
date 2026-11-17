@@ -206,7 +206,7 @@ function buildDoc() {
   children.push(
     createCallout(
       'QUY CHUẨN VẬN HÀNH & AN TOÀN THÔNG TIN NỘI BỘ',
-      'Tài liệu này được lưu hành nội bộ phục vụ công tác chuyển giao công nghệ, đào tạo Ban Quản trị, Ban Thư ký và hướng dẫn hội viên CLB Doanh Nhân CEO HN10. Mọi dữ liệu tài khoản, phân quyền và khóa bảo mật trong tài liệu đều tuân thủ nghiêm ngặt tiêu chuẩn VIONE Connect Enterprise.'
+      'Tài liệu này được lưu hành nội bộ phục vụ công tác chuyển giao công nghệ, đào tạo Ban Quản trị, Ban Thư ký và hướng dẫn Học viên CLB Doanh Nhân CEO HN10. Mọi dữ liệu tài khoản, phân quyền và khóa bảo mật trong tài liệu đều tuân thủ nghiêm ngặt tiêu chuẩn VIONE Connect Enterprise.'
     )
   );
 
@@ -270,7 +270,7 @@ function buildDoc() {
           new TableCell({
             borders: BORDER_THIN,
             margins: { top: 100, bottom: 100, left: 120, right: 120 },
-            children: [createPara('Ban Thư Ký CLB: Duyệt hồ sơ, cấp mã hội viên, quản lý deal, sự kiện', { size: 21 })],
+            children: [createPara('Ban Thư Ký CLB: Duyệt hồ sơ, cấp mã Học viên, quản lý deal, sự kiện', { size: 21 })],
           }),
         ],
       }),
@@ -294,7 +294,7 @@ function buildDoc() {
           new TableCell({
             borders: BORDER_THIN,
             margins: { top: 100, bottom: 100, left: 120, right: 120 },
-            children: [createPara('Hội viên chính thức: Thẻ số VIP, Quét QR Camera, Chat, Vé sự kiện, B2B', { size: 21 })],
+            children: [createPara('Học viên chính thức: Thẻ số VIP, Quét QR Camera, Chat, Vé sự kiện, B2B', { size: 21 })],
           }),
         ],
       }),
@@ -335,27 +335,27 @@ function buildDoc() {
     createBullet('matkhau123', 'Mật khẩu bảo mật:'),
     createBullet('Toàn quyền Quản trị CLB CEO HN10 (System Administrator)', 'Vai trò:'),
     createBullet('Tiếp nhận hồ sơ đăng ký, duyệt cấp thẻ, quản lý doanh số & giá trị deal, tạo sự kiện, mở hòm phiếu biểu quyết.', 'Trách nhiệm:'),
-    createHeading2('2.2. Tài khoản Hội viên Mẫu Thực Tế (App Hiệp Hội)'),
-    createBullet('member1983@vione.com / matkhau123 (Mã: HN10-007, SĐT: 0901000002) - Lê Hoàng Long, Chủ tịch HĐQT & CEO.', 'Hội viên 1:'),
-    createBullet('jame.nguyen@vione.com / matkhau123 (Mã: HN10-001, SĐT: 0901000001) - Jame Nguyễn, Giám đốc Điều hành.', 'Hội viên 2:')
+    createHeading2('2.2. Tài khoản Học viên Mẫu Thực Tế (App Hiệp Hội)'),
+    createBullet('member1983@vione.com / matkhau123 (Mã: HN10-007, SĐT: 0901000002) - Lê Hoàng Long, Chủ tịch HĐQT & CEO.', 'Học viên 1:'),
+    createBullet('jame.nguyen@vione.com / matkhau123 (Mã: HN10-001, SĐT: 0901000001) - Jame Nguyễn, Giám đốc Điều hành.', 'Học viên 2:')
   );
 
-  // 3. QUY TRÌNH 1: ĐĂNG KÝ & PHÊ DUYỆT HỘI VIÊN
+  // 3. QUY TRÌNH 1: ĐĂNG KÝ & PHÊ DUYỆT Học viên
   children.push(
-    createHeading1('3. QUY TRÌNH 1: ĐĂNG KÝ, PHÊ DUYỆT HỘI VIÊN TỪ LANDING VÀO CRM'),
+    createHeading1('3. QUY TRÌNH 1: ĐĂNG KÝ, PHÊ DUYỆT Học viên TỪ LANDING VÀO CRM'),
     createPara('Luồng nghiệp vụ xử lý trọn vẹn từ lúc tiếp nhận hồ sơ doanh nhân đến khi phát hành tài khoản:'),
     createBullet('Doanh nhân vào Landing Page CLB CEO HN10, bấm "Đăng ký gia nhập", điền thông tin doanh nghiệp & cá nhân.', 'Bước 1:'),
     createBullet('Hồ sơ truyền tức thì về CRM, kích hoạt chuông thông báo hồ sơ mới.', 'Bước 2:'),
-    createBullet('Admin đăng nhập CRM (admin@vione.com / matkhau123), vào "Hội viên" -> "Hồ sơ chờ phê duyệt".', 'Bước 3:'),
+    createBullet('Admin đăng nhập CRM (admin@vione.com / matkhau123), vào "Học viên" -> "Hồ sơ chờ phê duyệt".', 'Bước 3:'),
     createBullet('Admin thẩm định thông tin pháp nhân, bấm "Phê duyệt & Phát hành thẻ".', 'Bước 4:'),
-    createBullet('CRM tự động sinh Mã hội viên duy nhất (VD: HN10-007), hash mật khẩu và gửi email chúc mừng.', 'Bước 5:'),
-    createBullet('Hội viên mở App (/association/login), nhập mã hội viên & mật khẩu để kích hoạt thẻ số.', 'Bước 6:')
+    createBullet('CRM tự động sinh Mã Học viên duy nhất (VD: HN10-007), hash mật khẩu và gửi email chúc mừng.', 'Bước 5:'),
+    createBullet('Học viên mở App (/association/login), nhập mã Học viên & mật khẩu để kích hoạt thẻ số.', 'Bước 6:')
   );
 
   // 4. QUY TRÌNH 2: THẺ SỐ DOANH NHÂN & QUÉT QR CAMERA THỰC TẾ
   children.push(
     createHeading1('4. QUY TRÌNH 2: ĐĂNG NHẬP, THẺ SỐ DOANH NHÂN & QUÉT MÃ QR CAMERA THỰC TẾ'),
-    createPara('Ứng dụng tích hợp thẻ hội viên VIP Gold biểu tượng số 8 phong thủy và công nghệ quét camera thực tế đã khắc phục 100% sự cố gián đoạn luồng video:'),
+    createPara('Ứng dụng tích hợp thẻ Học viên VIP Gold biểu tượng số 8 phong thủy và công nghệ quét camera thực tế đã khắc phục 100% sự cố gián đoạn luồng video:'),
     createBullet('Thẻ VIP dập nổi 3D, tích xanh xác thực, mã QR vCard động và chip truyền dữ liệu trường gần NFC.', 'Thẻ số Doanh nhân:'),
     createBullet('Bấm biểu tượng Camera 📷 tại Header trang chủ hoặc nút "Quét QR kết nối" màu vàng hổ phách trên thẻ.', 'Kích hoạt Camera:'),
     createBullet('Hỗ trợ lật camera trước/sau, bật đèn Flash (Torch) trong hội trường tối, tải ảnh QR từ máy.', 'Tính năng Camera:'),
@@ -366,7 +366,7 @@ function buildDoc() {
   // 5. QUY TRÌNH 3: CÀI ĐẶT QUYỀN RIÊNG TƯ
   children.push(
     createHeading1('5. QUY TRÌNH 3: CÀI ĐẶT QUYỀN RIÊNG TƯ & KIỂM SOÁT HIỂN THỊ KHI QUÉT QR'),
-    createPara('Hội viên làm chủ hoàn toàn dữ liệu cá nhân khi chia sẻ mã QR tại các sự kiện giao thương:'),
+    createPara('Học viên làm chủ hoàn toàn dữ liệu cá nhân khi chia sẻ mã QR tại các sự kiện giao thương:'),
     createBullet('Vào Trang cá nhân (/association/profile) -> Chọn "Quyền riêng tư & Quản lý hiển thị khi quét QR".', 'Vị trí cài đặt:'),
     createBullet('6 công tắc gồm: Số điện thoại/Hotline, Email, Địa chỉ văn phòng, Tên công ty, Họ tên, Ảnh đại diện.', 'Các trường kiểm soát:'),
     createBullet('Nếu ẩn SĐT hoặc Email, người khác quét QR sẽ thấy nhãn "Đã ẩn theo cài đặt riêng tư" thay vì số thật.', 'Cơ chế bảo vệ:'),
@@ -377,10 +377,10 @@ function buildDoc() {
   children.push(
     createHeading1('6. QUY TRÌNH 4: ĐĂNG KÝ SỰ KIỆN, TỰ ĐỘNG ĐIỀN THÔNG TIN & CHỌN SỐ VÉ LINH HOẠT'),
     createPara('Đơn giản hóa thủ tục tham gia Gala Doanh nhân, Diễn đàn kinh tế và các buổi Business Matching:'),
-    createBullet('Form mở ra tự động điền 100% họ tên, SĐT, email, doanh nghiệp, chức vụ từ hồ sơ hội viên.', 'Tự động điền:'),
+    createBullet('Form mở ra tự động điền 100% họ tên, SĐT, email, doanh nghiệp, chức vụ từ hồ sơ Học viên.', 'Tự động điền:'),
     createBullet('Gõ trực tiếp số vé mong muốn vào ô số, hoặc dùng nút tăng giảm (- / +).', 'Chọn số lượng vé:'),
     createBullet('Phím tắt chọn nhanh tiện lợi: 1 vé, 2 vé, 5 vé, 10 vé chỉ với 1 chạm.', 'Phím tắt nhanh:'),
-    createBullet('Tự động nhân số lượng vé, trừ chiết khấu Hội viên VIP CLB CEO HN10, cấp vé QR Check-in ngay.', 'Tính giá thông minh:')
+    createBullet('Tự động nhân số lượng vé, trừ chiết khấu Học viên VIP CLB CEO HN10, cấp vé QR Check-in ngay.', 'Tính giá thông minh:')
   );
 
   // 7. QUY TRÌNH 5: CƠ HỘI GIAO THƯƠNG & GIAN HÀNG
@@ -392,7 +392,7 @@ function buildDoc() {
     createBullet('Bấm "Nhận cơ hội" hoặc "Liên hệ ngay" để kết nối chủ deal.', 'Tương tác nhanh:'),
     createHeading2('7.2. Gian hàng sản phẩm (/association/products)'),
     createBullet('Hiển thị giá niêm yết ngoài thị trường (chữ nhỏ gạch ngang).', 'Giá thị trường:'),
-    createBullet('Nổi bật với vương miện vàng và mức chiết khấu nội bộ 10% - 30% dành riêng cho Hội viên CLB.', 'Giá VIP CEO HN10:'),
+    createBullet('Nổi bật với vương miện vàng và mức chiết khấu nội bộ 10% - 30% dành riêng cho Học viên CLB.', 'Giá VIP CEO HN10:'),
     createBullet('Nút "Đặt mua / Báo giá B2B" trao đổi trực tiếp giữa hai lãnh đạo doanh nghiệp.', 'Thương mại B2B:')
   );
 
@@ -400,7 +400,7 @@ function buildDoc() {
   children.push(
     createHeading1('8. QUY TRÌNH 6: BIỂU QUYẾT ĐIỆN TỬ & KHẢO SÁT THỜI GIAN THỰC'),
     createBullet('Bầu cử Ban Chấp Hành, biểu quyết các nghị quyết thường niên của CLB CEO HN10.', 'Mục đích:'),
-    createBullet('Mỗi hội viên chỉ được bỏ phiếu duy nhất 1 lần dựa trên mã định danh bảo mật.', 'Nguyên tắc bảo mật:'),
+    createBullet('Mỗi Học viên chỉ được bỏ phiếu duy nhất 1 lần dựa trên mã định danh bảo mật.', 'Nguyên tắc bảo mật:'),
     createBullet('Biểu đồ tỷ lệ % cập nhật tức thì trên màn hình hội trường đại hội.', 'Thời gian thực:')
   );
 
@@ -426,7 +426,7 @@ function buildDoc() {
   children.push(
     createCallout(
       'THÔNG TIN LIÊN HỆ BAN THƯ KÝ CLB DOANH NHÂN CEO HN10',
-      'Hotline hỗ trợ hội viên: 0901 000 002 / 1900 8383 | Email: support@vione.com / bientap@ceohn10.vn | Trụ sở: Tầng 8, Tòa nhà CEO HN10 Tower, Hà Nội, Việt Nam.'
+      'Hotline hỗ trợ Học viên: 0901 000 002 / 1900 8383 | Email: support@vione.com / bientap@ceohn10.vn | Trụ sở: Tầng 8, Tòa nhà CEO HN10 Tower, Hà Nội, Việt Nam.'
     )
   );
 
@@ -499,7 +499,7 @@ function buildDoc() {
 async function main() {
   const doc = buildDoc();
   const buffer = await Packer.toBuffer(doc);
-  
+
   function safeWrite(filePath, data) {
     try {
       fs.writeFileSync(filePath, data);

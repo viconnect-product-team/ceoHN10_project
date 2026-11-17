@@ -21,7 +21,7 @@ const testSteps = [
   {
     step: 1,
     title: 'Xác thực & Đăng nhập Hệ thống với 3 Tài khoản',
-    desc: 'Kiểm thử cơ chế bảo mật đăng nhập qua URL CRM https://14.225.217.232:10443 với tài khoản Quản trị admini@connect.vn, Hội viên vupv090120@gmail.com, và Ban Tài Chính vumikasa6@gmail.com.',
+    desc: 'Kiểm thử cơ chế bảo mật đăng nhập qua URL CRM https://14.225.217.232:10443 với tài khoản Quản trị admini@connect.vn, Học viên vupv090120@gmail.com, và Ban Tài Chính vumikasa6@gmail.com.',
     status: 'PASS',
     result: 'Đăng nhập thành công 100%, hệ thống cấp JWT Token hợp lệ, phân luồng đúng vai trò và quyền hạn quản trị.',
     images: [
@@ -79,22 +79,22 @@ const testSteps = [
   {
     step: 6,
     title: 'Kiểm thử Luồng Báo cáo Phân tích & Chỉ số Hoạt động',
-    desc: 'Truy cập module Báo cáo & Thống kê Analytics, theo dõi biểu đồ tăng trưởng hội viên, tỷ lệ tham gia sự kiện theo ban, hiệu suất giao thương B2B Connect.',
+    desc: 'Truy cập module Báo cáo & Thống kê Analytics, theo dõi biểu đồ tăng trưởng Học viên, tỷ lệ tham gia sự kiện theo ban, hiệu suất giao thương B2B Connect.',
     status: 'PASS',
     result: 'Biểu đồ Recharts và thẻ KPI tổng quan hiển thị trực quan, số liệu đối chiếu chính xác từ dữ liệu thực tế.',
     images: [
       { file: '13_analytics_dashboard_overview.png', caption: 'Hình 6.1: Tổng quan chỉ số KPI phát triển và hiệu suất hoạt động' },
-      { file: '14_analytics_member_activities.png', caption: 'Hình 6.2: Phân tích hoạt động hội viên và phân bổ theo từng ban' }
+      { file: '14_analytics_member_activities.png', caption: 'Hình 6.2: Phân tích hoạt động Học viên và phân bổ theo từng ban' }
     ]
   },
   {
     step: 7,
-    title: 'Kiểm thử Luồng Quản lý Phản ánh & Góp ý Hội viên',
-    desc: 'Tiếp nhận phản ánh từ hội viên Vũ Phan Vũ đóng góp ý kiến về phiên kết nối giao thương 1-1 giữa các ban chuyên môn, phân loại trạng thái xử lý.',
+    title: 'Kiểm thử Luồng Quản lý Phản ánh & Góp ý Học viên',
+    desc: 'Tiếp nhận phản ánh từ Học viên Vũ Phan Vũ đóng góp ý kiến về phiên kết nối giao thương 1-1 giữa các ban chuyên môn, phân loại trạng thái xử lý.',
     status: 'PASS',
-    result: 'Phản ánh được ghi nhận đầy đủ, lưu vào CSDL event_feedbacks, hỗ trợ Ban Cán Sự phản hồi trực tiếp cho hội viên.',
+    result: 'Phản ánh được ghi nhận đầy đủ, lưu vào CSDL event_feedbacks, hỗ trợ Ban Cán Sự phản hồi trực tiếp cho Học viên.',
     images: [
-      { file: '15_feedback_management_list.png', caption: 'Hình 7.1: Danh sách tiếp nhận và xử lý ý kiến đóng góp hội viên' }
+      { file: '15_feedback_management_list.png', caption: 'Hình 7.1: Danh sách tiếp nhận và xử lý ý kiến đóng góp Học viên' }
     ]
   },
   {
@@ -131,7 +131,7 @@ const testSteps = [
   {
     step: 11,
     title: 'Kiểm thử Luồng Dòng tiền Thực tế & Xuất Hóa đơn Chứng từ',
-    desc: 'Ghi nhận giao dịch thu hội phí 25.000.000 VNĐ từ hội viên Vũ Phan Vũ (mã HP-HN10-099), kiểm tra biến động dòng tiền trên báo cáo tài chính và bật modal xem mẫu Hóa đơn/Phiếu thu.',
+    desc: 'Ghi nhận giao dịch thu hội phí 25.000.000 VNĐ từ Học viên Vũ Phan Vũ (mã HP-HN10-099), kiểm tra biến động dòng tiền trên báo cáo tài chính và bật modal xem mẫu Hóa đơn/Phiếu thu.',
     status: 'PASS',
     result: 'Dòng tiền cập nhật tăng thực tế +25.000.000 VNĐ, ghi nhận tức thời vào bảng ceohn10_transactions, xuất chứng từ hóa đơn đầy đủ pháp lý.',
     images: [
@@ -142,15 +142,15 @@ const testSteps = [
   },
   {
     step: 12,
-    title: 'Kiểm thử Luồng Thông báo Hệ thống & Trải nghiệm Hội viên',
-    desc: 'Phát hành thông báo hệ thống "Kiện toàn 7 Ban Chuyên Môn & Kế hoạch Hoạt động", đăng nhập tài khoản hội viên vupv090120@gmail.com kiểm chứng nhận thông báo.',
+    title: 'Kiểm thử Luồng Thông báo Hệ thống & Trải nghiệm Học viên',
+    desc: 'Phát hành thông báo hệ thống "Kiện toàn 7 Ban Chuyên Môn & Kế hoạch Hoạt động", đăng nhập tài khoản Học viên vupv090120@gmail.com kiểm chứng nhận thông báo.',
     status: 'PASS',
-    result: 'Hội viên đăng nhập thành công vào trang cá nhân, nhận thông báo đầy đủ ngay trên chuông thông báo giao diện.',
+    result: 'Học viên đăng nhập thành công vào trang cá nhân, nhận thông báo đầy đủ ngay trên chuông thông báo giao diện.',
     images: [
       { file: '23_notifications_management.png', caption: 'Hình 12.1: Trung tâm quản lý thông báo hệ thống của Quản trị viên' },
-      { file: '24_login_vupv_credentials.png', caption: 'Hình 12.2: Đăng nhập tài khoản Hội viên vupv090120@gmail.com' },
-      { file: '25_vupv_member_dashboard.png', caption: 'Hình 12.3: Bàn làm việc cá nhân của Hội viên Vũ Phan Vũ' },
-      { file: '26_vupv_received_notification.png', caption: 'Hình 12.4: Hội viên nhận thông báo kiện toàn Ban Cán Sự Lớp' }
+      { file: '24_login_vupv_credentials.png', caption: 'Hình 12.2: Đăng nhập tài khoản Học viên vupv090120@gmail.com' },
+      { file: '25_vupv_member_dashboard.png', caption: 'Hình 12.3: Bàn làm việc cá nhân của Học viên Vũ Phan Vũ' },
+      { file: '26_vupv_received_notification.png', caption: 'Hình 12.4: Học viên nhận thông báo kiện toàn Ban Cán Sự Lớp' }
     ]
   },
   {
@@ -529,7 +529,7 @@ function generateHtml() {
             <td>admini@connect.vn (Super Admin)</td>
           </tr>
           <tr>
-            <td class="label">Tài khoản Hội viên:</td>
+            <td class="label">Tài khoản Học viên:</td>
             <td>vupv090120@gmail.com (Lớp Phó Sự Kiện & Hậu Cần)</td>
           </tr>
           <tr>
@@ -650,8 +650,8 @@ function generateHtml() {
           </tr>
           <tr>
             <td>7</td>
-            <td>Ý kiến phản ánh hội viên</td>
-            <td>vupv090120@gmail.com (Hội viên)</td>
+            <td>Ý kiến phản ánh Học viên</td>
+            <td>vupv090120@gmail.com (Học viên)</td>
             <td>Ảnh 7.1 | event_feedbacks</td>
             <td><strong style="color: #16a34a;">PASS</strong></td>
           </tr>
@@ -686,7 +686,7 @@ function generateHtml() {
           <tr>
             <td>12</td>
             <td>Hệ thống thông báo & Trải nghiệm</td>
-            <td>vupv090120@gmail.com (Hội viên)</td>
+            <td>vupv090120@gmail.com (Học viên)</td>
             <td>Ảnh 12.1 - 12.4 | notifications</td>
             <td><strong style="color: #16a34a;">PASS</strong></td>
           </tr>

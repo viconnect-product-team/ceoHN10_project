@@ -67,7 +67,7 @@ BEGIN
   PERFORM public.add_member_notification(
     _peer, _assoc, 'network',
     'Lời mời kết nối được chấp nhận',
-    COALESCE(_my_name, 'Một hội viên') || ' đã chấp nhận lời mời kết nối của bạn.'
+    COALESCE(_my_name, 'Một Học viên') || ' đã chấp nhận lời mời kết nối của bạn.'
   );
 END;
 $function$;
@@ -98,7 +98,7 @@ BEGIN
     PERFORM public.add_member_notification(
       _peer, _assoc, 'network',
       'Lời mời kết nối bị từ chối',
-      COALESCE(_my_name, 'Một hội viên') || ' đã từ chối lời mời kết nối của bạn.'
+      COALESCE(_my_name, 'Một Học viên') || ' đã từ chối lời mời kết nối của bạn.'
     );
   END IF;
 END;

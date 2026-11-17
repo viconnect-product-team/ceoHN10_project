@@ -33,7 +33,7 @@ export type AiPersonaType =
 export class AiCrmAnalyticsService {
   private readonly logger = new Logger(AiCrmAnalyticsService.name);
 
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   /**
    * Lấy cấu hình hệ thống AI, kiểm tra trạng thái các model và hạn mức cảnh báo
@@ -70,7 +70,7 @@ export class AiCrmAnalyticsService {
         .catch(() => [{ count: 0 }]);
       const reqCount = auditCount[0]?.count || 0;
       estimatedTokensUsed = Math.max(reqCount * 850, 45200);
-    } catch {}
+    } catch { }
 
     const monthlyLimit =
       Number(stored.monthlyTokensLimit) || defaultMonthlyLimit;
@@ -344,9 +344,9 @@ export class AiCrmAnalyticsService {
       scope,
       healthScore: computedHealthScore,
       dataVerified: true,
-      executiveSummary: `Hệ thống CEO HN10 (HanoiBA) hiện ghi nhận chính xác: ${totalMembers} tài khoản hội viên doanh nhân, ${totalEvents} chương trình sự kiện, ${totalMeetings} cuộc hẹn B2B và ${totalDocs} văn bản tài liệu được ban hành. Tổng cộng có ${totalOpps} cơ hội giao thương B2B đang mở với quy mô giá trị thực tế đạt ${oppValueBillions} Tỷ VNĐ. Quỹ ngân sách đối soát thực tế từ sổ kế toán đạt số dư ${surplusFormatted}.`,
+      executiveSummary: `Hệ thống CEO HN10 (HanoiBA) hiện ghi nhận chính xác: ${totalMembers} tài khoản Học viên doanh nhân, ${totalEvents} chương trình sự kiện, ${totalMeetings} cuộc hẹn B2B và ${totalDocs} văn bản tài liệu được ban hành. Tổng cộng có ${totalOpps} cơ hội giao thương B2B đang mở với quy mô giá trị thực tế đạt ${oppValueBillions} Tỷ VNĐ. Quỹ ngân sách đối soát thực tế từ sổ kế toán đạt số dư ${surplusFormatted}.`,
       keyStrengths: [
-        `Giao thương B2B thực tế: Ghi nhận ${totalOpps} cơ hội đang mở xúc tiến giữa các hội viên với tổng ngân sách ${oppValueBillions} Tỷ VNĐ.`,
+        `Giao thương B2B thực tế: Ghi nhận ${totalOpps} cơ hội đang mở xúc tiến giữa các Học viên với tổng ngân sách ${oppValueBillions} Tỷ VNĐ.`,
         `Dòng tiền quỹ ngân sách: Tổng thu thực tế ${new Intl.NumberFormat('vi-VN').format(totalIncome)} đ, Tổng chi ${new Intl.NumberFormat('vi-VN').format(totalExpense)} đ, số dư quỹ an toàn ${surplusFormatted}.`,
         `Điều phối sự kiện & kết nối: Đang triển khai ${totalEvents} sự kiện trọng điểm kết nối giao thương cấp hiệp hội.`,
       ],
@@ -397,9 +397,9 @@ export class AiCrmAnalyticsService {
     if (type === 'invoice' || type === 'receipt') {
       const receiptNo = `PT-HN10-${Date.now().toString().slice(-6)}`;
       const amount = Number(options?.amount || 5000000);
-      const payerName = options?.payerName || 'Doanh Nhân Hội Viên CEO HN10';
+      const payerName = options?.payerName || 'Doanh Nhân Học viên CEO HN10';
       const companyName =
-        options?.companyName || 'Doanh nghiệp Hội viên CLB CEO HN10';
+        options?.companyName || 'Doanh nghiệp Học viên CLB CEO HN10';
       const reason =
         options?.reason ||
         'Đóng hội phí thường niên năm 2026 - CLB Doanh Nhân CEO HN10 (HanoiBA)';
@@ -459,7 +459,7 @@ export class AiCrmAnalyticsService {
         totalIncome = Number(txRaw[0].income || 0);
         totalExpense = Number(txRaw[0].expense || 0);
       }
-    } catch {}
+    } catch { }
 
     const balance = totalIncome - totalExpense;
 
@@ -486,12 +486,12 @@ export class AiCrmAnalyticsService {
       expenseBreakdown:
         totalExpense > 0
           ? [
-              {
-                category: 'Chi phí vận hành & hoạt động sự kiện',
-                amount: totalExpense,
-                percentage: 100,
-              },
-            ]
+            {
+              category: 'Chi phí vận hành & hoạt động sự kiện',
+              amount: totalExpense,
+              percentage: 100,
+            },
+          ]
           : [],
       verifiedDatabase: 'Hệ thống Quản trị Tài chính CEO HN10',
     };
@@ -648,7 +648,7 @@ export class AiCrmAnalyticsService {
           oppVal >= 1e9
             ? `${(oppVal / 1e9).toFixed(1)} Tỷ VNĐ`
             : `${(oppVal / 1e6).toFixed(0)} Triệu VNĐ`;
-        proactiveAlert = `🔔 **THÔNG BÁO CƠ HỘI MỚI:** Tôi vừa ghi nhận có 1 cơ hội B2B mới đăng: **"${newestOpp.title}"** (Ngân sách: **${oppValStr}**, Người đăng: **${newestOpp.contact_name || newestOpp.company || 'Hội viên CLB'}**). Tôi sẵn sàng kết nối ngay cho Anh/Chị!`;
+        proactiveAlert = `🔔 **THÔNG BÁO CƠ HỘI MỚI:** Tôi vừa ghi nhận có 1 cơ hội B2B mới đăng: **"${newestOpp.title}"** (Ngân sách: **${oppValStr}**, Người đăng: **${newestOpp.contact_name || newestOpp.company || 'Học viên CLB'}**). Tôi sẵn sàng kết nối ngay cho Anh/Chị!`;
       }
     } else if (persona === 'events') {
       personaName = 'Trợ Lý Điều Phối Sự Kiện & Hội Thảo';
@@ -687,7 +687,7 @@ export class AiCrmAnalyticsService {
 Quy tắc trả lời:
 - Luôn xưng "Tôi" và gọi "Anh/Chị". Trả lời có chiều sâu, lịch thiệp, đồng cảm và đưa ra giải pháp thực tế.
 - TUYỆT ĐỐI KHÔNG BỊA ĐẶT DỮ LIỆU HOẶC CON SỐ FAKE. Chỉ dùng các số liệu thực tế được cung cấp bên dưới:
-  + Hội viên thật: ${membersCount} tài khoản.
+  + Học viên thật: ${membersCount} tài khoản.
   + Cơ hội B2B thật: ${oppsList.length} cơ hội với tổng ngân sách ${oppBudgetFormatted} Tỷ VNĐ.
     Danh sách cơ hội thật: ${oppsList.map((o) => `"${o.title}" (Ngân sách: ${Number(o.budget_max || o.budget_min || 0).toLocaleString('vi-VN')} đ, Người đăng: ${o.contact_name || o.company})`).join('; ')}.
   + Sự kiện thật: ${eventsList.map((e) => `"${e.name}" (${e.location})`).join('; ')}.
@@ -778,20 +778,20 @@ Kính thưa Anh/Chị, tôi xin phép cập nhật tình hình cơ hội kinh do
 
 #### 📋 Danh sách cơ hội nổi bật vừa được đăng tải:
 ${oppsList
-  .map((o, idx) => {
-    const val = Number(o.budget_max || o.budget_min || 0);
-    const valStr =
-      val >= 1e9
-        ? `${(val / 1e9).toFixed(1)} Tỷ VNĐ`
-        : val > 0
-          ? `${(val / 1e6).toFixed(0)} Triệu VNĐ`
-          : 'Thương lượng';
-    return `${idx + 1}. **${o.title}**
-   - 🏢 Doanh nghiệp: *${o.company || 'Doanh nghiệp Hội viên'}* (Liên hệ: **${o.contact_name || 'Đại diện'}**)
+            .map((o, idx) => {
+              const val = Number(o.budget_max || o.budget_min || 0);
+              const valStr =
+                val >= 1e9
+                  ? `${(val / 1e9).toFixed(1)} Tỷ VNĐ`
+                  : val > 0
+                    ? `${(val / 1e6).toFixed(0)} Triệu VNĐ`
+                    : 'Thương lượng';
+              return `${idx + 1}. **${o.title}**
+   - 🏢 Doanh nghiệp: *${o.company || 'Doanh nghiệp Học viên'}* (Liên hệ: **${o.contact_name || 'Đại diện'}**)
    - 💰 Quy mô ngân sách: **${valStr}**
    - 📌 Trạng thái: *${o.status === 'open' ? 'Đang mở kết nối' : 'Đang xử lý'}*`;
-  })
-  .join('\n\n')}
+            })
+            .join('\n\n')}
 
 💡 **Đề xuất hành động từ Trợ lý:**
 - Tôi thấy cơ hội **"${oppsList[0]?.title || 'Mới nhất'}"** rất phù hợp để Ban Xúc Tiến Thương Mại ưu tiên matching 1-on-1 trong tuần này. Anh/Chị có muốn tôi hỗ trợ thông báo đến các doanh nghiệp cùng ngành không?`;
@@ -808,13 +808,13 @@ Kính thưa Anh/Chị, tôi xin gửi báo cáo tiến độ các sự kiện tr
 - **Tổng số chương trình đang triển khai**: **${eventsList.length} sự kiện**.
 
 ${eventsList
-  .map(
-    (e, idx) => `${idx + 1}. **${e.name}**
+            .map(
+              (e, idx) => `${idx + 1}. **${e.name}**
    - 📍 Địa điểm: **${e.location || 'Hà Nội'}**
    - 🕒 Thời gian: **${e.date ? new Date(e.date).toLocaleDateString('vi-VN') : 'Đang cập nhật'}**
    - 📌 Tiến độ: Đang tiếp nhận đăng ký đại biểu và phát hành vé điện tử QR Code`,
-  )
-  .join('\n\n')}
+            )
+            .join('\n\n')}
 
 📋 **Nhiệm vụ Ban Lễ Tân & Sự Kiện cần lưu ý:**
 1. Tiến hành rà soát danh sách khách mời VIP và các Nhà tài trợ kim cương.
@@ -853,7 +853,7 @@ Kính gửi Anh/Chị, số liệu tài chính được trích xuất minh bạc
 Kính thưa Anh/Chị, tôi là Trợ lý Lịch họp CEO HN10:
 
 - Hiện tại hệ thống đang quản lý các phiên kết nối và lịch gặp gỡ định kỳ giữa các CEO thành viên.
-- Toàn bộ thời gian rảnh, địa điểm (Cà phê Doanh nhân, Văn phòng Hội viên hoặc phòng họp trực tuyến) đều được cập nhật đồng bộ.
+- Toàn bộ thời gian rảnh, địa điểm (Cà phê Doanh nhân, Văn phòng Học viên hoặc phòng họp trực tuyến) đều được cập nhật đồng bộ.
 
 Anh/Chị có thể yêu cầu tôi:
 1. *"Đặt lịch hẹn B2B 1-on-1 với doanh nghiệp trong CLB"*
@@ -866,7 +866,7 @@ Tôi sẽ lập tức tạo lịch và gửi thông báo đẩy đến ứng d�
 
 Tôi là người bạn đồng hành số hóa của Ban Điều Hành CLB Doanh Nhân CEO HN10. Hệ thống vận hành với **100% dữ liệu sống thực tế**:
 
-- 👥 **Hội viên**: ${membersCount} tài khoản doanh nhân.
+- 👥 **Học viên**: ${membersCount} tài khoản doanh nhân.
 - 💼 **Giao thương B2B**: ${oppsList.length} cơ hội đang mở (${oppBudgetFormatted} Tỷ VNĐ).
 - 📅 **Sự kiện**: ${eventsList.length} chương trình đang triển khai.
 - 💰 **Quỹ ngân sách**: ${balanceFormatted} VNĐ khả dụng.
@@ -893,7 +893,7 @@ Anh/Chị có thể chọn nhanh vai trò trợ lý chuyên biệt ở thanh cô
         modelLabel,
         latencyMs,
       )
-      .catch(() => {});
+      .catch(() => { });
 
     return {
       ok: true,

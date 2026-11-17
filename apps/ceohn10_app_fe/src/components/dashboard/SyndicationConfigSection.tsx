@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from "react";
-import { 
-  Share2, 
-  Globe, 
-  Facebook, 
-  MessageSquare, 
-  CheckCircle2, 
-  Save, 
-  RefreshCw, 
-  Calendar, 
-  Users, 
+import {
+  Share2,
+  Globe,
+  Facebook,
+  MessageSquare,
+  CheckCircle2,
+  Save,
+  RefreshCw,
+  Calendar,
+  Users,
   FileText,
   ShieldCheck,
   ExternalLink,
@@ -100,7 +100,7 @@ export function SyndicationConfigSection() {
   // Trạng thái cho modal 1-Click Broadcast
   const [broadcastItemType, setBroadcastItemType] = useState<"event" | "meeting" | "news">("event");
   const [broadcastTitle, setBroadcastTitle] = useState("Hội nghị Xúc tiến Thương mại & Giao thương B2B CEO HN10");
-  const [broadcastSummary, setBroadcastSummary] = useState("Trân trọng kính mời Quý Doanh nhân Hội viên tham dự phiên kết nối giao thương tháng 11/2026.");
+  const [broadcastSummary, setBroadcastSummary] = useState("Trân trọng kính mời Quý Doanh nhân Học viên tham dự phiên kết nối giao thương tháng 11/2026.");
   const [broadcastTime, setBroadcastTime] = useState("14:30 - Thứ Năm, 12/11/2026");
   const [broadcastLocation, setBroadcastLocation] = useState("Trung tâm Hội nghị Quốc gia, Hà Nội & Zoom Online");
   const [targetChannels, setTargetChannels] = useState<{ facebook: boolean; zalo: boolean; website: boolean }>({
@@ -120,10 +120,10 @@ export function SyndicationConfigSection() {
           setSettings((prev) => ({ ...prev, ...res.config }));
           try {
             localStorage.setItem("vba_syndication_config", JSON.stringify(res.config));
-          } catch {}
+          } catch { }
         }
       })
-      .catch(() => {});
+      .catch(() => { });
     return () => {
       isMounted = false;
     };
@@ -136,7 +136,7 @@ export function SyndicationConfigSection() {
       await fetchNestApi("/syndication/config", {
         method: "POST",
         body: JSON.stringify(settings),
-      }).catch(() => {});
+      }).catch(() => { });
       toast.success("Đã lưu cấu hình liên kết Hội nhóm Facebook, Zalo & Website thành công!");
     } catch (err: any) {
       toast.error(err?.message || "Không thể lưu cấu hình");
@@ -199,23 +199,23 @@ export function SyndicationConfigSection() {
         results: {
           facebook: targetChannels.facebook
             ? {
-                success: true,
-                groupUrl: settings.fbGroupUrl,
-                publishedUrl: `${settings.fbGroupUrl}/posts/${Date.now().toString().slice(-8)}`,
-              }
+              success: true,
+              groupUrl: settings.fbGroupUrl,
+              publishedUrl: `${settings.fbGroupUrl}/posts/${Date.now().toString().slice(-8)}`,
+            }
             : null,
           zalo: targetChannels.zalo
             ? {
-                success: true,
-                groupUrl: settings.zaloGroupUrl,
-                publishedUrl: settings.zaloGroupUrl,
-              }
+              success: true,
+              groupUrl: settings.zaloGroupUrl,
+              publishedUrl: settings.zaloGroupUrl,
+            }
             : null,
           website: targetChannels.website
             ? {
-                success: true,
-                publishedUrl: `${settings.webEventsUrl}/ev-${Date.now().toString().slice(-6)}`,
-              }
+              success: true,
+              publishedUrl: `${settings.webEventsUrl}/ev-${Date.now().toString().slice(-6)}`,
+            }
             : null,
         },
       }));
@@ -452,7 +452,7 @@ export function SyndicationConfigSection() {
                 )}
               </div>
               <p className="text-xs text-muted-foreground">
-                Tự động gửi thông báo lịch họp, sự kiện vào Nhóm Zalo hội viên và gửi ZNS tới từng doanh nhân
+                Tự động gửi thông báo lịch họp, sự kiện vào Nhóm Zalo Học viên và gửi ZNS tới từng doanh nhân
               </p>
             </div>
           </div>
@@ -701,13 +701,12 @@ export function SyndicationConfigSection() {
                     onClick={() => {
                       setBroadcastItemType("event");
                       setBroadcastTitle("Hội nghị Xúc tiến Thương mại & Giao thương B2B CEO HN10");
-                      setBroadcastSummary("Trân trọng kính mời Quý Doanh nhân Hội viên tham dự phiên kết nối giao thương tháng 11/2026.");
+                      setBroadcastSummary("Trân trọng kính mời Quý Doanh nhân Học viên tham dự phiên kết nối giao thương tháng 11/2026.");
                     }}
-                    className={`py-2 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer transition ${
-                      broadcastItemType === "event"
+                    className={`py-2 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer transition ${broadcastItemType === "event"
                         ? "bg-[#003B95] text-white shadow-xs"
                         : "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300"
-                    }`}
+                      }`}
                   >
                     <Calendar className="size-3.5" />
                     <span>Sự Kiện CLB</span>
@@ -720,11 +719,10 @@ export function SyndicationConfigSection() {
                       setBroadcastTitle("Phiên Họp Ban Chấp Hành Định Kỳ Tháng 11/2026 - CLB CEO HN10");
                       setBroadcastSummary("Đánh giá kết quả công tác tháng 10 và triển khai kế hoạch xúc tiến thương mại quý IV.");
                     }}
-                    className={`py-2 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer transition ${
-                      broadcastItemType === "meeting"
+                    className={`py-2 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer transition ${broadcastItemType === "meeting"
                         ? "bg-[#003B95] text-white shadow-xs"
                         : "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300"
-                    }`}
+                      }`}
                   >
                     <Users className="size-3.5" />
                     <span>Lịch Họp Ban / BCH</span>
@@ -735,13 +733,12 @@ export function SyndicationConfigSection() {
                     onClick={() => {
                       setBroadcastItemType("news");
                       setBroadcastTitle("Bản Tin Doanh Nhân & Cơ Hội Giao Thương Tuần 45");
-                      setBroadcastSummary("Tổng hợp 12 cơ hội B2B giá trị cao và hoạt động kết nối nổi bật của các hội viên trong tuần.");
+                      setBroadcastSummary("Tổng hợp 12 cơ hội B2B giá trị cao và hoạt động kết nối nổi bật của các Học viên trong tuần.");
                     }}
-                    className={`py-2 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer transition ${
-                      broadcastItemType === "news"
+                    className={`py-2 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer transition ${broadcastItemType === "news"
                         ? "bg-[#003B95] text-white shadow-xs"
                         : "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300"
-                    }`}
+                      }`}
                   >
                     <FileText className="size-3.5" />
                     <span>Bản Tin / Thông Báo</span>

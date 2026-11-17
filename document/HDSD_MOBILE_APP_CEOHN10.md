@@ -1,4 +1,4 @@
-# HƯỚNG DẪN SỬ DỤNG ỨNG DỤNG DI ĐỘNG HỘI VIÊN (HDSD - MOBILE APP)
+# HƯỚNG DẪN SỬ DỤNG ỨNG DỤNG DI ĐỘNG Học viên (HDSD - MOBILE APP)
 ## CẨM NANG THAO TÁC DÀNH CHO DOANH NHÂN CLB CEO HN10
 *Phiên bản: 4.0 - Phát hành: Tháng 10/2026*
 
@@ -6,16 +6,16 @@
 
 ### BÀI 1: CÀI ĐẶT ỨNG DỤNG, ĐĂNG NHẬP & BẮT BUỘC ĐỔI MẬT KHẨU LẦN ĐẦU
 1. Mở ứng dụng CEO HN10 trên điện thoại thông minh (hoặc truy cập `https://ceohn10.viconnect.vn`).
-2. Đăng nhập bằng Email/Mã hội viên và mật khẩu tạm thời do Ban Thư ký cấp gửi qua email kích hoạt.
+2. Đăng nhập bằng Email/Mã Học viên và mật khẩu tạm thời do Ban Thư ký cấp gửi qua email kích hoạt.
 3. **Quy trình Đổi Mật Khẩu Bắt Buộc (Mandatory Initial Password Change)**:
    - Đối với tài khoản mới kích hoạt có cờ `must_change_password = true`, hệ thống lập tức khóa thanh điều hướng dưới (Bottom Tab Bar) và chuyển hướng bắt buộc tới màn hình Đổi Mật Khẩu.
-   - Hội viên bắt buộc phải nhập mật khẩu mới và xác nhận mật khẩu hợp lệ (tối thiểu 6 ký tự).
+   - Học viên bắt buộc phải nhập mật khẩu mới và xác nhận mật khẩu hợp lệ (tối thiểu 6 ký tự).
    - Tuyệt đối không thể bấm nút quay lại hoặc truy cập các tính năng khác cho đến khi hoàn thành đổi mật khẩu.
    - Sau khi đổi thành công, hệ thống mở khóa toàn bộ quyền năng ứng dụng di động.
 4. Bật quyền nhận thông báo và quyền mic/camera để sẵn sàng kết nối.
 
-### BÀI 2: SỬ DỤNG THẺ HỘI VIÊN ĐIỆN TỬ & CHẠM DANH THIẾP NFC
-1. Tại màn hình chính, thẻ hội viên điện tử điện tử hiển thị trang trọng.
+### BÀI 2: SỬ DỤNG THẺ Học viên ĐIỆN TỬ & CHẠM DANH THIẾP NFC
+1. Tại màn hình chính, thẻ Học viên điện tử điện tử hiển thị trang trọng.
 2. Bật tính năng NFC trên điện thoại, chạm lưng máy vào điện thoại đối tác để trao đổi danh thiếp số.
 3. Hoặc nhấn vào thẻ để phóng to mã QR kết nối.
 
@@ -31,13 +31,13 @@
 
 ### BÀI 5: QUY ĐỊNH BẢO MẬT & PHÂN QUYỀN TRÊN MOBILE APP
 1. Toàn bộ thiết lập phân quyền thao tác hệ thống đã được di chuyển tập trung về Cổng Web CRM (`/permissions`).
-2. Trên Mobile App không còn hiển thị mục "Phân quyền", đảm bảo giao diện gọn gàng, tinh gọn, thuần túy trải nghiệm hội viên doanh nhân.
-3. Quyền hạn thao tác trên App (quét mã QR sự kiện, đăng bài tin tức, quản lý cuộc họp) sẽ tự động kế thừa tức thời từ Ban chuyên môn mà hội viên tham gia do Ban Điều Hành phân công trên CRM.
+2. Trên Mobile App không còn hiển thị mục "Phân quyền", đảm bảo giao diện gọn gàng, tinh gọn, thuần túy trải nghiệm Học viên doanh nhân.
+3. Quyền hạn thao tác trên App (quét mã QR sự kiện, đăng bài tin tức, quản lý cuộc họp) sẽ tự động kế thừa tức thời từ Ban chuyên môn mà Học viên tham gia do Ban Điều Hành phân công trên CRM.
 
-### BÀI 6: QUẢN LÝ HỒ SƠ DOANH NGHIỆP ĐA BỐ CỤC (CHUẨN ẢNH 1) & BANNER ƯU ĐÃI HỘI VIÊN (ẢNH 2)
+### BÀI 6: QUẢN LÝ HỒ SƠ DOANH NGHIỆP ĐA BỐ CỤC (CHUẨN ẢNH 1) & BANNER ƯU ĐÃI Học viên (ẢNH 2)
 1. **Thiết Kế Profile Đa Bố Cục (3 Tùy Chọn Trải Nghiệm)**:
    - **Bố cục 1: Cắt Vát Đa Giác (Chuẩn Ảnh 1)**:
-     * Ảnh nền bị cắt giảm vát chéo đa giác (`clip-path: polygon`), kết hợp 2 cánh hình học ("TĂNG TRƯỞNG LIÊN TỤC" & "CHUYỂN ĐỔI SỐ") rực rỡ và khối trung tâm xếp tầng làm nổi bật tên doanh nghiệp, chức vụ và họ tên hội viên.
+     * Ảnh nền bị cắt giảm vát chéo đa giác (`clip-path: polygon`), kết hợp 2 cánh hình học ("TĂNG TRƯỞNG LIÊN TỤC" & "CHUYỂN ĐỔI SỐ") rực rỡ và khối trung tâm xếp tầng làm nổi bật tên doanh nghiệp, chức vụ và họ tên Học viên.
      * Khối **ABOUT US — GIỚI THIỆU DOANH NGHIỆP**: Đoạn giới thiệu tổng quan, tầm nhìn và năng lực cốt lõi đặt ngay bên dưới.
      * Khối **OUR SERVICES & THÔNG SỐ**: Lưới 2 ô nổi bật cho *Lĩnh vực hoạt động* và *Quy mô nhân sự*.
      * Khối **FIND US — LIÊN HỆ & THÔNG TIN**: *Số điện thoại / Hotline* (nút Gọi trực tiếp `tel:` và Sao chép) và *Website công ty* (nút Mở web).
@@ -53,26 +53,26 @@
    - **Xanh Đêm Obsidian**: Đẳng cấp bóng đêm bí ẩn.
 3. **Chỉnh Sửa Nhanh Hồ Sơ (`QuickProfileEditModal`)**:
    - Nhấn nút "Sửa hồ sơ" để cập nhật ngay tên công ty, chức vụ, quy mô nhân sự, lĩnh vực, website và giới thiệu.
-4. **Banner Ưu Đãi Hội Viên & Đối Tác (Chuẩn Ảnh 2)**:
+4. **Banner Ưu Đãi Học viên & Đối Tác (Chuẩn Ảnh 2)**:
    - Tại trang chủ ứng dụng (`/association`), hiển thị toàn cảnh hình ảnh thiết kế gốc **Ảnh 2 (`/uu_dai_event.jpg`)** với hộp quà 3D, dải ruy băng và hiệu ứng ánh sao.
    - Nút hành động CTA ("Xem ưu đãi ngay →") được **bóc tách riêng biệt ra bên ngoài/bên dưới banner**, giúp banner hiển thị trọn vẹn 100% không bị che lấp, bấm vào chuyển ngay tới trang đặc quyền `/association/perks`.
 
 ### BÀI 7: BẬT / TẮT TRỢ LÝ AI & TRUNG TÂM HƯỚNG DẪN SỬ DỤNG CHUYÊN BIỆT APP CEO HN10
 1. **Bật / Tắt Trợ Lý AI CEO HN10**:
-   - Tại màn Cá nhân (`/association/profile`) hoặc trang Cài đặt (`/association/settings`), hội viên có thể chủ động Bật hoặc Tắt Trợ lý AI bằng công tắc gạt 1-chạm.
+   - Tại màn Cá nhân (`/association/profile`) hoặc trang Cài đặt (`/association/settings`), Học viên có thể chủ động Bật hoặc Tắt Trợ lý AI bằng công tắc gạt 1-chạm.
    - Khi Bật: Nút nổi bóng chat Robot AI xuất hiện ở góc dưới màn hình, sẵn sàng hỗ trợ tìm kiếm đối tác, tra cứu thông tin và hướng dẫn nghiệp vụ 24/7.
    - Khi Tắt: Robot AI lập tức biến mất khỏi màn hình, giúp không gian ứng dụng thoáng đãng, tập trung tối đa cho công việc.
 2. **Trung Tâm Hướng Dẫn Sử Dụng Chuyên Biệt Cho App CEO HN10**:
    - Truy cập nhanh từ nút "Hướng dẫn" trên Header màn cá nhân hoặc mục "Hướng dẫn sử dụng App CEO HN10" trong Cài đặt.
-   - Nội dung được biên soạn chuẩn hóa 100% dành riêng cho Ứng dụng Di Động Hội Viên CEO HN10:
-     * Chỉ dẫn tương tác 10 màn hình cốt lõi (Trang chủ, Thẻ hội viên NFC, Check-in sự kiện, Cơ hội B2B, Sàn thương mại, Biểu quyết, Lịch họp, Tin tức, Tin nhắn, Trang cá nhân).
+   - Nội dung được biên soạn chuẩn hóa 100% dành riêng cho Ứng dụng Di Động Học viên CEO HN10:
+     * Chỉ dẫn tương tác 10 màn hình cốt lõi (Trang chủ, Thẻ Học viên NFC, Check-in sự kiện, Cơ hội B2B, Sàn thương mại, Biểu quyết, Lịch họp, Tin tức, Tin nhắn, Trang cá nhân).
      * Sổ tay hướng dẫn sử dụng định dạng PDF tải trực tiếp về điện thoại (`HUONG_DAN_SU_DUNG_APP_HIEP_HOI_CEO HN10.pdf`).
-     * Tuyệt đối không hiển thị nội dung Web CRM Quản trị, đảm bảo tập trung tuyệt đối vào trải nghiệm di động của Hội viên.
+     * Tuyệt đối không hiển thị nội dung Web CRM Quản trị, đảm bảo tập trung tuyệt đối vào trải nghiệm di động của Học viên.
 
 ### BÀI 8: MÀN HÌNH CÁ NHÂN TINH GỌN & THIẾT KẾ NÚT PHẲNG HIỆN ĐẠI
 1. **Loại Bỏ Badge & Danh Xưng Thừa Thãi**:
-   - Khi đã đăng nhập vào hệ sinh thái CEO HN10, người dùng mặc định đã là hội viên câu lạc bộ.
-   - Toàn bộ các nhãn, ruy băng "Hội viên chính thức" được loại bỏ hoàn toàn, giao diện tập trung trực diện vào Họ tên, Chức vụ và Tên doanh nghiệp.
+   - Khi đã đăng nhập vào hệ sinh thái CEO HN10, người dùng mặc định đã là Học viên câu lạc bộ.
+   - Toàn bộ các nhãn, ruy băng "Học viên chính thức" được loại bỏ hoàn toàn, giao diện tập trung trực diện vào Họ tên, Chức vụ và Tên doanh nghiệp.
 2. **Hàng Nút Tiện Ích Tinh Gọn (Không Nền)**:
    - 4 nút chức năng cốt lõi (`Danh thiếp`, `Sửa hồ sơ`, `Chia sẻ`, `Mã QR`) được tinh chỉnh kích thước nhỏ gọn, loại bỏ nền màu cồng kềnh, chuyển sang thiết kế phẳng thanh thoát và hiện đại.
    - Người dùng chỉ cần chạm nhẹ để thực hiện nhanh các tác vụ kết nối giao thương mà không bị rối mắt.
@@ -81,13 +81,13 @@
    - Tab **Giao thương**: Tích hợp danh thiếp số điện tử, cơ hội kết nối B2B, gian hàng sản phẩm và danh bạ doanh nhân.
    - Tab **Cài đặt**: Tích hợp công tắc Bật/Tắt Trợ lý AI tức thì, Sổ tay hướng dẫn sử dụng App, Đổi mật khẩu, Chế độ ban đêm và Trung tâm hỗ trợ.
 
-### BÀI 9: HỒ SƠ DOANH NGHIỆP TẠI THẺ HỘI VIÊN, ĐĂNG KÝ SỰ KIỆN CÓ PHÍ & GIAN HÀNG ĐA PHƯƠNG TIỆN
-1. **Hồ Sơ Năng Lực Doanh Nghiệp (Brochure / Flyer) Tại Thẻ Hội Viên (`/association/card`)**:
-   - Khối hồ sơ doanh nghiệp được tích hợp hiển thị ngay bên dưới thẻ hội viên điện tử điện tử.
-   - Hội viên có thể xem trực quan thông tin giới thiệu, lĩnh vực kinh doanh, quy mô, brochure năng lực của công ty và chia sẻ nhanh cho đối tác khi gặp gỡ.
+### BÀI 9: HỒ SƠ DOANH NGHIỆP TẠI THẺ Học viên, ĐĂNG KÝ SỰ KIỆN CÓ PHÍ & GIAN HÀNG ĐA PHƯƠNG TIỆN
+1. **Hồ Sơ Năng Lực Doanh Nghiệp (Brochure / Flyer) Tại Thẻ Học viên (`/association/card`)**:
+   - Khối hồ sơ doanh nghiệp được tích hợp hiển thị ngay bên dưới thẻ Học viên điện tử điện tử.
+   - Học viên có thể xem trực quan thông tin giới thiệu, lĩnh vực kinh doanh, quy mô, brochure năng lực của công ty và chia sẻ nhanh cho đối tác khi gặp gỡ.
 2. **Quy Trình Đăng Ký Sự Kiện Có Phí & Nhận Vé E-Ticket**:
    - Khi chọn đăng ký sự kiện có phí: Ứng dụng cung cấp mã QR ngân hàng thanh toán chuẩn số tiền vé về tài khoản MB Bank `1000000000` kèm cú pháp chuyển khoản định danh.
-   - Vé tham dự chỉ được kích hoạt (sinh mã QR check-in vào ví vé) sau khi Ban Tổ Chức / Admin xác nhận thanh toán trên hệ thống; đồng thời hệ thống tự động gửi email E-ticket chứa mã QR vé check-in về email của hội viên.
+   - Vé tham dự chỉ được kích hoạt (sinh mã QR check-in vào ví vé) sau khi Ban Tổ Chức / Admin xác nhận thanh toán trên hệ thống; đồng thời hệ thống tự động gửi email E-ticket chứa mã QR vé check-in về email của Học viên.
 3. **Đăng Sản Phẩm & Cơ Hội Hợp Tác Đa Phương Tiện**:
    - Gian hàng Marketplace: Đăng tải nhiều ảnh sản phẩm sắc nét, chèn link video giới thiệu (YouTube hoặc video trực tiếp) để tăng tính sinh động và uy tín cho sản phẩm.
    - Cơ hội B2B: Đăng kèm album nhiều ảnh thực tế của hàng hóa, máy móc, xưởng sản xuất để đối tác dễ dàng đánh giá năng lực.

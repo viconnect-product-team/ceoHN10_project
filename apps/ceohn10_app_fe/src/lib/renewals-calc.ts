@@ -4,7 +4,7 @@ import type { RenewalRecord, RenewalStatus } from "./renewal-data";
 export type Row = Record<string, unknown>;
 
 export function mapMember(r: Row): Member {
-  const rawName = (r.name as string) || (r.user_name as string) || (r.contact as string) || (r.person_name as string) || "Hội viên";
+  const rawName = (r.name as string) || (r.user_name as string) || (r.contact as string) || (r.person_name as string) || "Học viên";
   const rawCode = (r.code as string) || (r.member_code as string) || "HV";
   const rawEmail = (r.email as string) || (r.user_email as string) || "";
   const rawPhone = (r.phone as string) || (r.user_phone as string) || "";
@@ -68,7 +68,7 @@ export function isApprovedMember(r: Row): boolean {
   if (status === "deleted" || status === "rejected" || status === "archived" || status === "inactive") {
     return false;
   }
-  // Chấp nhận tất cả hội viên hợp lệ cần theo dõi và gia hạn (active, approved, pending, expired, waiting, v.v.)
+  // Chấp nhận tất cả Học viên hợp lệ cần theo dõi và gia hạn (active, approved, pending, expired, waiting, v.v.)
   return true;
 }
 

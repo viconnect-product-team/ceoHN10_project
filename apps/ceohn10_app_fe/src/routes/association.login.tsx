@@ -186,8 +186,8 @@ function AssociationLoginPage() {
         if (isMustChange) {
           try {
             localStorage.setItem("vba_must_change_password", "true");
-          } catch {}
-          toast.warning("Hội viên mới bắt buộc phải thay đổi mật khẩu khởi tạo trước khi sử dụng ứng dụng.", {
+          } catch { }
+          toast.warning("Học viên mới bắt buộc phải thay đổi mật khẩu khởi tạo trước khi sử dụng ứng dụng.", {
             duration: 6000,
           });
           navigate({
@@ -199,11 +199,11 @@ function AssociationLoginPage() {
         } else {
           try {
             localStorage.removeItem("vba_must_change_password");
-          } catch {}
+          } catch { }
         }
 
         const memberWelcomeName = res.user?.name || res.user?.user_metadata?.full_name || cleanId;
-        toast.success(`Chào mừng hội viên ${memberWelcomeName} trở lại!`);
+        toast.success(`Chào mừng Học viên ${memberWelcomeName} trở lại!`);
         const target = safeRedirect(redirectTo) || "/association";
         if (typeof window !== "undefined") {
           window.location.replace(target);
@@ -239,7 +239,7 @@ function AssociationLoginPage() {
     if (result.kind === "email") {
       setIdentifier(result.email);
       rememberScannedCard(result.card);
-      toast.success(`Đã nhận diện thẻ của ${result.card?.fullName || "hội viên"}`);
+      toast.success(`Đã nhận diện thẻ của ${result.card?.fullName || "Học viên"}`);
     }
   }
 

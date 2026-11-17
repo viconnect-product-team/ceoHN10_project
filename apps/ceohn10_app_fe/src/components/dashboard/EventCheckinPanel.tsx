@@ -56,7 +56,7 @@ export function EventCheckinPanel({
       data: exportable,
       columns: [
         { header: "Mã đăng ký", key: "id", width: 16, value: (r) => r.id },
-        { header: "Mã hội viên / Đại biểu", key: "memberCode", width: 18, value: (r) => r.memberCode || "—" },
+        { header: "Mã Học viên / Đại biểu", key: "memberCode", width: 18, value: (r) => r.memberCode || "—" },
         { header: "Họ và tên đại biểu", key: "memberName", width: 28, value: (r) => r.memberName || r.memberCode },
         { header: "Chức vụ / Đơn vị", key: "company", width: 28, value: (r) => (r as any).title || (r as any).company || "—" },
         { header: "Số điện thoại", key: "phone", width: 16, value: (r) => (r as any).phone || "—" },
@@ -79,9 +79,8 @@ export function EventCheckinPanel({
           <QrCode className="h-4 w-4 text-primary" aria-hidden="true" /> {t("ecin.title")}
         </h2>
         <span
-          className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold ${
-            available ? "bg-success/12 text-success" : "bg-secondary text-muted-foreground"
-          }`}
+          className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold ${available ? "bg-success/12 text-success" : "bg-secondary text-muted-foreground"
+            }`}
         >
           {available ? (
             <ScanLine className="h-3.5 w-3.5" aria-hidden="true" />

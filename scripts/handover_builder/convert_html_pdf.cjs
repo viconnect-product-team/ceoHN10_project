@@ -613,7 +613,7 @@ function wrapHtmlDocument(bodyHtml, docInfo) {
     </table>
 
     <div class="cover-footer">
-      Lưu hành nội bộ Ban Chấp Hành CLB Doanh Nhân CEO HN10 & Doanh Nghiệp Hội Viên
+      Lưu hành nội bộ Ban Chấp Hành CLB Doanh Nhân CEO HN10 & Doanh Nghiệp Học viên
     </div>
   </div>
 

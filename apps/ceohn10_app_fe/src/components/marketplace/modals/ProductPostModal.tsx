@@ -107,7 +107,7 @@ export const ProductPostModal: React.FC<ProductPostModalProps> = ({
     }
     const cleanPrice = Number(formPrice.replace(/\D/g, ""));
     if (!formPrice.trim() || isNaN(cleanPrice) || cleanPrice <= 0) {
-      newErrors.price = isEn ? "Please enter a valid price (> 0)" : "Vui lòng nhập giá ưu đãi hội viên (> 0 đ)";
+      newErrors.price = isEn ? "Please enter a valid price (> 0)" : "Vui lòng nhập giá ưu đãi Học viên (> 0 đ)";
     }
     if (!formDesc.trim()) {
       newErrors.desc = isEn ? "Please enter product description" : "Vui lòng nhập mô tả sản phẩm & cam kết chất lượng";
@@ -172,9 +172,8 @@ export const ProductPostModal: React.FC<ProductPostModalProps> = ({
                     if (errors.company) setErrors((prev) => ({ ...prev, company: "" }));
                   }}
                   placeholder={isEn ? "Company name" : "Ví dụ: Công ty Cổ phần Công nghệ ABC"}
-                  className={`w-full rounded-xl border-0 bg-white dark:bg-slate-800 px-3 py-2 text-xs text-slate-900 dark:text-white placeholder:text-slate-400 outline-none transition ${
-                    errors.company ? "ring-2 ring-rose-500" : "ring-1 ring-slate-200 dark:ring-slate-700 focus:ring-2 focus:ring-[#003B95]"
-                  }`}
+                  className={`w-full rounded-xl border-0 bg-white dark:bg-slate-800 px-3 py-2 text-xs text-slate-900 dark:text-white placeholder:text-slate-400 outline-none transition ${errors.company ? "ring-2 ring-rose-500" : "ring-1 ring-slate-200 dark:ring-slate-700 focus:ring-2 focus:ring-[#003B95]"
+                    }`}
                 />
                 {errors.company && (
                   <p className="mt-1 text-[11px] font-semibold text-rose-500 animate-in fade-in duration-150">
@@ -357,9 +356,8 @@ export const ProductPostModal: React.FC<ProductPostModalProps> = ({
                     if (errors.name) setErrors((prev) => ({ ...prev, name: "" }));
                   }}
                   placeholder={isEn ? "e.g. Enterprise Cloud Solution..." : "Ví dụ: Gói giải pháp chuyển đổi số doanh nghiệp..."}
-                  className={`w-full rounded-xl border-0 bg-white dark:bg-slate-800 px-3 py-2 text-xs text-slate-900 dark:text-white placeholder:text-slate-400 outline-none transition ${
-                    errors.name ? "ring-2 ring-rose-500" : "ring-1 ring-slate-200 dark:ring-slate-700 focus:ring-2 focus:ring-[#003B95]"
-                  }`}
+                  className={`w-full rounded-xl border-0 bg-white dark:bg-slate-800 px-3 py-2 text-xs text-slate-900 dark:text-white placeholder:text-slate-400 outline-none transition ${errors.name ? "ring-2 ring-rose-500" : "ring-1 ring-slate-200 dark:ring-slate-700 focus:ring-2 focus:ring-[#003B95]"
+                    }`}
                 />
                 {errors.name && (
                   <p className="mt-1 text-[11px] font-semibold text-rose-500 animate-in fade-in duration-150">
@@ -442,7 +440,7 @@ export const ProductPostModal: React.FC<ProductPostModalProps> = ({
                 </div>
                 <div>
                   <label className="mb-1 block text-[11px] font-semibold text-slate-700 dark:text-slate-300">
-                    {isEn ? "VIP Member Price" : "Giá ưu đãi Hội viên"} <span className="text-rose-500 font-bold">*</span>
+                    {isEn ? "VIP Member Price" : "Giá ưu đãi Học viên"} <span className="text-rose-500 font-bold">*</span>
                   </label>
                   <StandardCurrencyInput
                     value={formPrice}
@@ -452,9 +450,8 @@ export const ProductPostModal: React.FC<ProductPostModalProps> = ({
                     }}
                     placeholder="Ví dụ: 15.000.000 đ"
                     unit="đ"
-                    className={`w-full rounded-xl border-0 bg-white dark:bg-slate-800 px-3 py-2 text-xs text-slate-900 dark:text-white placeholder:text-slate-400 outline-none transition ${
-                      errors.price ? "ring-2 ring-rose-500" : "ring-1 ring-slate-200 dark:ring-slate-700 focus:ring-2 focus:ring-[#003B95]"
-                    }`}
+                    className={`w-full rounded-xl border-0 bg-white dark:bg-slate-800 px-3 py-2 text-xs text-slate-900 dark:text-white placeholder:text-slate-400 outline-none transition ${errors.price ? "ring-2 ring-rose-500" : "ring-1 ring-slate-200 dark:ring-slate-700 focus:ring-2 focus:ring-[#003B95]"
+                      }`}
                   />
                   {errors.price && (
                     <p className="mt-1 text-[11px] font-semibold text-rose-500 animate-in fade-in duration-150">
@@ -503,10 +500,9 @@ export const ProductPostModal: React.FC<ProductPostModalProps> = ({
                     setFormDesc(e.target.value);
                     if (errors.desc) setErrors((prev) => ({ ...prev, desc: "" }));
                   }}
-                  placeholder={isEn ? "Describe specs, warranty, exclusive member discounts..." : "Mô tả thông số, chính sách bảo hành, ưu đãi riêng cho hội viên CEO HN10..."}
-                  className={`w-full rounded-xl border-0 bg-white dark:bg-slate-800 p-2.5 text-xs text-slate-900 dark:text-white placeholder:text-slate-400 outline-none resize-none transition ${
-                    errors.desc ? "ring-2 ring-rose-500" : "ring-1 ring-slate-200 dark:ring-slate-700 focus:ring-2 focus:ring-[#003B95]"
-                  }`}
+                  placeholder={isEn ? "Describe specs, warranty, exclusive member discounts..." : "Mô tả thông số, chính sách bảo hành, ưu đãi riêng cho Học viên CEO HN10..."}
+                  className={`w-full rounded-xl border-0 bg-white dark:bg-slate-800 p-2.5 text-xs text-slate-900 dark:text-white placeholder:text-slate-400 outline-none resize-none transition ${errors.desc ? "ring-2 ring-rose-500" : "ring-1 ring-slate-200 dark:ring-slate-700 focus:ring-2 focus:ring-[#003B95]"
+                    }`}
                 />
                 {errors.desc && (
                   <p className="mt-1 text-[11px] font-semibold text-rose-500 animate-in fade-in duration-150">

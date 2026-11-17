@@ -584,7 +584,7 @@ export function SupplyDeclarationModal({
                           {it.estimatedCost > 0 ? `${(it.estimatedCost * it.quantity).toLocaleString("vi-VN")} đ` : "0 đ (Tài trợ)"}
                         </td>
                         <td className="py-2.5 px-3">
-                          <span className="inline-flex items-center gap-1 rounded-full bg-purple-500/10 px-2 py-0.5 text-[10px] font-semibold text-[#7C2D82]">
+                          <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-semibold text-[#334155] border border-slate-200">
                             <CheckCircle2 className="h-3 w-3" /> {it.status === "ready" ? "Sẵn sàng" : "Đã duyệt cấp"}
                           </span>
                         </td>

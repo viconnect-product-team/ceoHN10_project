@@ -115,14 +115,14 @@ export const getPublicCard = createServerFn({ method: "GET" })
         return {
           found: true,
           code: memberRes.code || data.code,
-          name: memberRes.name || "Hội viên CLB CEO HN10",
+          name: memberRes.name || "Học viên CLB CEO HN10",
           company: memberRes.company || memberRes.companyName || "CLB Doanh Nhân CEO HN10",
           type: memberRes.type || "individual",
           status: memberRes.status || "active",
           verified: true,
           validUntil: memberRes.validUntil || "2027-12-31",
           joinedAt: memberRes.joinedAt || "2024-01-01",
-          title: memberRes.title || memberRes.position || "Hội viên chính thức CLB CEO HN10",
+          title: memberRes.title || memberRes.position || "Học viên chính thức CLB CEO HN10",
           email: memberRes.email || null,
           phone: memberRes.phone || null,
           taxCode: memberRes.taxCode || null,
@@ -132,8 +132,8 @@ export const getPublicCard = createServerFn({ method: "GET" })
           website: memberRes.website || "https://ceohn10.vn",
           photoUrl: memberRes.avatar || memberRes.avatarUrl || null,
           companyLogoUrl: memberRes.companyLogoUrl || memberRes.companyLogo || null,
-          headline: memberRes.title || "Hội viên chính thức CLB Doanh Nhân CEO HN10",
-          bio: memberRes.bio || memberRes.about || "Hội viên tích cực CLB Doanh Nhân CEO HN10, sẵn sàng giao lưu kết nối và hợp tác giao thương.",
+          headline: memberRes.title || "Học viên chính thức CLB Doanh Nhân CEO HN10",
+          bio: memberRes.bio || memberRes.about || "Học viên tích cực CLB Doanh Nhân CEO HN10, sẵn sàng giao lưu kết nối và hợp tác giao thương.",
         };
       }
 
@@ -141,14 +141,14 @@ export const getPublicCard = createServerFn({ method: "GET" })
       return {
         found: true,
         code: data.code,
-        name: "Hội viên CLB Doanh Nhân CEO HN10",
+        name: "Học viên CLB Doanh Nhân CEO HN10",
         company: "CLB Doanh Nhân CEO HN10",
         type: "individual",
         status: "active",
         verified: true,
         validUntil: "2027-12-31",
         joinedAt: "2024-01-01",
-        title: "Hội viên chính thức CLB CEO HN10",
+        title: "Học viên chính thức CLB CEO HN10",
         email: "contact@ceohn10.vn",
         phone: "0988 123 456",
         taxCode: null,
@@ -158,20 +158,20 @@ export const getPublicCard = createServerFn({ method: "GET" })
         website: "https://ceohn10.vn",
         photoUrl: null,
         headline: "Lãnh đạo Doanh nghiệp CLB CEO HN10",
-        bio: "Hội viên tích cực CLB Doanh Nhân CEO HN10, sẵn sàng giao lưu kết nối và hợp tác giao thương.",
+        bio: "Học viên tích cực CLB Doanh Nhân CEO HN10, sẵn sàng giao lưu kết nối và hợp tác giao thương.",
       };
     } catch {
       return {
         found: true,
         code: data.code,
-        name: "Hội viên CLB Doanh Nhân CEO HN10",
+        name: "Học viên CLB Doanh Nhân CEO HN10",
         company: "CLB Doanh Nhân CEO HN10",
         type: "individual",
         status: "active",
         verified: true,
         validUntil: "2027-12-31",
         joinedAt: "2024-01-01",
-        title: "Hội viên chính thức CLB CEO HN10",
+        title: "Học viên chính thức CLB CEO HN10",
         email: "contact@ceohn10.vn",
         phone: "0988 123 456",
         taxCode: null,
@@ -181,7 +181,7 @@ export const getPublicCard = createServerFn({ method: "GET" })
         website: "https://ceohn10.vn",
         photoUrl: null,
         headline: "Lãnh đạo Doanh nghiệp CLB CEO HN10",
-        bio: "Hội viên tích cực CLB Doanh Nhân CEO HN10, sẵn sàng giao lưu kết nối và hợp tác giao thương.",
+        bio: "Học viên tích cực CLB Doanh Nhân CEO HN10, sẵn sàng giao lưu kết nối và hợp tác giao thương.",
       };
     }
   });

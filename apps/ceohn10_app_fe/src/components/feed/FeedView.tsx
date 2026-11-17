@@ -198,8 +198,8 @@ function RenderCommentNode({
     level === 1
       ? ""
       : level === 2
-      ? "ml-4 sm:ml-6 pl-2.5 border-l-2 border-slate-200 dark:border-slate-700/60"
-      : "ml-7 sm:ml-10 pl-2.5 border-l-2 border-slate-200 dark:border-slate-700/60";
+        ? "ml-4 sm:ml-6 pl-2.5 border-l-2 border-slate-200 dark:border-slate-700/60"
+        : "ml-7 sm:ml-10 pl-2.5 border-l-2 border-slate-200 dark:border-slate-700/60";
 
   return (
     <div className={`space-y-1 ${levelIndent}`}>
@@ -207,19 +207,17 @@ function RenderCommentNode({
         {node.authorAvatar ? (
           <img
             src={resolveMediaUrl(node.authorAvatar) || node.authorAvatar}
-            alt={node.authorName || "Hội viên"}
-            className={`rounded-full object-cover shrink-0 mt-0.5 border border-slate-200 dark:border-slate-700 shadow-2xs ${
-              level === 1 ? "size-8" : "size-7"
-            }`}
+            alt={node.authorName || "Học viên"}
+            className={`rounded-full object-cover shrink-0 mt-0.5 border border-slate-200 dark:border-slate-700 shadow-2xs ${level === 1 ? "size-8" : "size-7"
+              }`}
             onError={(e) => {
               (e.target as HTMLImageElement).src = "/ceohn10-emblem-8.png";
             }}
           />
         ) : (
           <div
-            className={`rounded-full shrink-0 mt-0.5 bg-gradient-to-br from-[#003B95] to-[#B8860B] text-white font-bold flex items-center justify-center text-[10.5px] shadow-2xs ${
-              level === 1 ? "size-8" : "size-7"
-            }`}
+            className={`rounded-full shrink-0 mt-0.5 bg-gradient-to-br from-[#003B95] to-[#B8860B] text-white font-bold flex items-center justify-center text-[10.5px] shadow-2xs ${level === 1 ? "size-8" : "size-7"
+              }`}
           >
             {((node.authorName || "H").trim()[0] || "H").toUpperCase()}
           </div>
@@ -230,7 +228,7 @@ function RenderCommentNode({
           <div className="inline-block max-w-[95%] bg-[#f0f2f5] dark:bg-[#3a3b3c] rounded-[18px] px-3.5 py-2 relative shadow-2xs">
             <div className="flex items-center gap-1.5 flex-wrap">
               <span className="font-bold text-[12px] text-slate-900 dark:text-white hover:underline cursor-pointer">
-                {node.authorName || "Hội viên Doanh nhân"}
+                {node.authorName || "Học viên Doanh nhân"}
               </span>
               {node.replyToAuthorName && (
                 <span className="text-[11px] text-[#003B95] dark:text-blue-400 font-semibold">
@@ -322,11 +320,10 @@ function RenderCommentNode({
                 e.preventDefault();
                 setActiveReactionCommentId(isReactionPickerOpen ? null : node.id);
               }}
-              className={`hover:underline cursor-pointer transition ${
-                matchedEmotion
+              className={`hover:underline cursor-pointer transition ${matchedEmotion
                   ? "text-[#003B95] dark:text-blue-400 font-extrabold flex items-center gap-1"
                   : "hover:text-slate-800 dark:hover:text-slate-200"
-              }`}
+                }`}
             >
               {matchedEmotion ? (
                 <>
@@ -350,7 +347,7 @@ function RenderCommentNode({
             <button
               type="button"
               onClick={() =>
-                onReply(postId, node.id, node.authorName || "Hội viên", (node.level || 1) as 1 | 2 | 3)
+                onReply(postId, node.id, node.authorName || "Học viên", (node.level || 1) as 1 | 2 | 3)
               }
               className="hover:underline cursor-pointer text-slate-600 dark:text-slate-300 hover:text-slate-900"
             >
@@ -433,8 +430,8 @@ export function FeedView({
   const handleDeletePost = async (postId: string) => {
     if (!window.confirm("Bạn có chắc chắn muốn xóa bài viết này khỏi bảng tin?")) return;
     try {
-      await fetchNestApi(`/feed/${postId}`, { method: "DELETE" }).catch(() => {});
-    } catch {}
+      await fetchNestApi(`/feed/${postId}`, { method: "DELETE" }).catch(() => { });
+    } catch { }
     setPosts((prev) => prev.filter((p) => p.id !== postId));
     recordUserActivity({
       action: "DELETE_POST",
@@ -450,7 +447,7 @@ export function FeedView({
           JSON.stringify(list.filter((p: any) => p.id !== postId))
         );
       }
-    } catch {}
+    } catch { }
     toast.success("Đã xóa bài viết thành công!");
   };
 
@@ -622,7 +619,7 @@ export function FeedView({
             }
           });
         }
-      } catch {}
+      } catch { }
 
       setPosts(feedItems);
 
@@ -681,10 +678,10 @@ export function FeedView({
       prev.map((p) =>
         p.id === post.id
           ? {
-              ...p,
-              hasLiked: !isLiked,
-              likesCount: isLiked ? Math.max(0, p.likesCount - 1) : p.likesCount + 1,
-            }
+            ...p,
+            hasLiked: !isLiked,
+            likesCount: isLiked ? Math.max(0, p.likesCount - 1) : p.likesCount + 1,
+          }
           : p
       )
     );
@@ -704,10 +701,10 @@ export function FeedView({
         prev.map((p) =>
           p.id === post.id
             ? {
-                ...p,
-                hasLiked: isLiked,
-                likesCount: post.likesCount,
-              }
+              ...p,
+              hasLiked: isLiked,
+              likesCount: post.likesCount,
+            }
             : p
         )
       );
@@ -730,7 +727,7 @@ export function FeedView({
       const targetReplyToAuthor = activeReply ? activeReply.authorName : undefined;
 
       // Real user avatar & name from session
-      const realAuthorName = user?.name || (user as any)?.contact || "Hội viên Doanh nhân";
+      const realAuthorName = user?.name || (user as any)?.contact || "Học viên Doanh nhân";
       const realAuthorAvatar = user?.avatar || (user as any)?.avatarUrl || "";
 
       const res = await fetchNestApi<any>(`/feed/${postId}/comments`, {
@@ -799,7 +796,7 @@ export function FeedView({
 
       recordUserActivity({
         action: "SHARE_POST",
-        title: `Chia sẻ bài viết của ${post.authorName || "Hội viên"}`,
+        title: `Chia sẻ bài viết của ${post.authorName || "Học viên"}`,
         badge: "Chia sẻ",
         metadata: { postId: post.id },
       });
@@ -808,7 +805,7 @@ export function FeedView({
         {
           type: "post",
           id: post.id,
-          title: `[Mạng Lưới CEO HN10] ${post.title || `Bài viết từ Doanh nhân ${post.authorName || "Hội viên"}`}`,
+          title: `[Mạng Lưới CEO HN10] ${post.title || `Bài viết từ Doanh nhân ${post.authorName || "Học viên"}`}`,
           desc: post.content?.slice(0, 200),
           image: post.images?.[0] || undefined,
           targetPath: `/association/messages?post=${post.id}`,
@@ -879,7 +876,7 @@ export function FeedView({
     <div className="w-full flex flex-col font-sans">
       {/* ── BAR ĐĂNG BÀI VIẾT MỚI (THEO CHUẨN GIAO DIỆN USER) ── */}
       <div className="w-full px-4 pt-3 flex flex-col justify-start items-start gap-2.5 bg-white dark:bg-slate-900">
-        <div 
+        <div
           onClick={() => setCreateModalOpen(true)}
           className="w-full inline-flex justify-between items-center py-1 cursor-pointer"
         >
@@ -918,11 +915,10 @@ export function FeedView({
                   setSelectedCategory(tab.id);
                   if (tab.id !== "NEWS") setSelectedDepartment("ALL");
                 }}
-                className={`py-3 px-2 relative flex flex-col items-center justify-center shrink-0 cursor-pointer transition ${
-                  isSelected
+                className={`py-3 px-2 relative flex flex-col items-center justify-center shrink-0 cursor-pointer transition ${isSelected
                     ? "text-slate-900 dark:text-white font-semibold"
                     : "text-slate-600 dark:text-slate-400 font-normal hover:text-slate-900 dark:hover:text-white"
-                }`}
+                  }`}
               >
                 <span className="text-sm font-['Inter'] leading-5 whitespace-nowrap">{tab.label}</span>
                 {isSelected && (
@@ -964,11 +960,10 @@ export function FeedView({
           <button
             type="button"
             onClick={() => setSelectedDepartment("ALL")}
-            className={`px-2.5 py-1 rounded-xl text-[11px] font-bold whitespace-nowrap transition cursor-pointer ${
-              selectedDepartment === "ALL"
+            className={`px-2.5 py-1 rounded-xl text-[11px] font-bold whitespace-nowrap transition cursor-pointer ${selectedDepartment === "ALL"
                 ? "bg-[#B8860B] text-white shadow-xs"
                 : "bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700"
-            }`}
+              }`}
           >
             Tất cả ban
           </button>
@@ -977,11 +972,10 @@ export function FeedView({
               key={dept}
               type="button"
               onClick={() => setSelectedDepartment(dept)}
-              className={`px-2.5 py-1 rounded-xl text-[11px] font-bold whitespace-nowrap transition cursor-pointer ${
-                selectedDepartment === dept
+              className={`px-2.5 py-1 rounded-xl text-[11px] font-bold whitespace-nowrap transition cursor-pointer ${selectedDepartment === dept
                   ? "bg-[#B8860B] text-white shadow-xs"
                   : "bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700"
-              }`}
+                }`}
             >
               {dept}
             </button>
@@ -1005,7 +999,7 @@ export function FeedView({
               Chưa có bài đăng nào trong danh mục này
             </h4>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-xs">
-              Hãy là người đầu tiên chia sẻ thông tin, tin tức ban hoặc cơ hội đến các hội viên CEO HN10.
+              Hãy là người đầu tiên chia sẻ thông tin, tin tức ban hoặc cơ hội đến các Học viên CEO HN10.
             </p>
             <button
               type="button"
@@ -1048,7 +1042,7 @@ export function FeedView({
                     </div>
                     <div className="flex-1 flex flex-col justify-start items-start overflow-hidden">
                       <h4 className="text-slate-900 dark:text-white text-sm font-semibold font-['Inter'] leading-5 truncate w-full">
-                        {post.authorName || "Hội viên CLB CEO HN10"}
+                        {post.authorName || "Học viên CLB CEO HN10"}
                       </h4>
                       <div className="pt-0.5 flex items-center gap-1.5 overflow-hidden text-xs text-slate-400 font-normal font-['Inter'] leading-4">
                         <span>{formatRelativeTime(post.createdAt)}</span>
@@ -1179,7 +1173,7 @@ export function FeedView({
                     if (!domain && targetUrl && targetUrl.startsWith("http")) {
                       try {
                         domain = new URL(targetUrl).hostname.replace(/^www\./, "").toUpperCase();
-                      } catch {}
+                      } catch { }
                     }
                     const artTitle = art.title || post.title || "Xem liên kết bài viết";
                     const artSnippet = art.snippet || (art as any).excerpt || "Bấm vào để đọc toàn văn bài viết chi tiết từ ứng dụng nguồn.";
@@ -1251,7 +1245,7 @@ export function FeedView({
                         CEO HN10.VN · BẢO TRỢ GIAO THƯƠNG
                       </span>
                       <h4 className="font-extrabold text-xs text-slate-900 dark:text-white group-hover:text-[#1F3864] dark:group-hover:text-amber-400 transition line-clamp-1">
-                        {post.title || "Cơ hội giao thương & hợp tác chiến lược giữa các doanh nghiệp hội viên"}
+                        {post.title || "Cơ hội giao thương & hợp tác chiến lược giữa các doanh nghiệp Học viên"}
                       </h4>
                       <p className="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-2">
                         {post.content.slice(0, 150)}...
@@ -1263,13 +1257,12 @@ export function FeedView({
                 {/* Multi-image display grid if not opportunity or multiple images */}
                 {!isSharedOpportunity && Array.isArray(post.images) && post.images.length > 0 && (
                   <div
-                    className={`grid gap-1.5 rounded-2xl overflow-hidden ${
-                      post.images.length === 1
+                    className={`grid gap-1.5 rounded-2xl overflow-hidden ${post.images.length === 1
                         ? "grid-cols-1"
                         : post.images.length === 2
-                        ? "grid-cols-2"
-                        : "grid-cols-3"
-                    }`}
+                          ? "grid-cols-2"
+                          : "grid-cols-3"
+                      }`}
                   >
                     {post.images.slice(0, 3).map((imgUrl, i) => {
                       const isLastOfThree = i === 2 && post.images.length > 3;
@@ -1313,11 +1306,11 @@ export function FeedView({
                     post.attendees && post.attendees.length > 0
                       ? post.attendees
                       : [
-                          { id: "att-1", name: "Nguyễn Văn Tuấn", checkedIn: true },
-                          { id: "att-2", name: "Trần Mai Phương", checkedIn: true },
-                          { id: "att-3", name: "Lê Hoàng Nam", checkedIn: false },
-                          { id: "att-4", name: "Phạm Hải Yến", checkedIn: true },
-                        ];
+                        { id: "att-1", name: "Nguyễn Văn Tuấn", checkedIn: true },
+                        { id: "att-2", name: "Trần Mai Phương", checkedIn: true },
+                        { id: "att-3", name: "Lê Hoàng Nam", checkedIn: false },
+                        { id: "att-4", name: "Phạm Hải Yến", checkedIn: true },
+                      ];
 
                   const checkedInCount = attendeesList.filter((a) => a.checkedIn).length;
 
@@ -1594,7 +1587,7 @@ export function FeedView({
                                 </div>
 
                                 <p className="text-[10px] text-slate-500 dark:text-slate-400 italic">
-                                  Hội viên quét QR bằng camera hoặc bấm nút dưới để hiện form đăng ký tham gia ngay.
+                                  Học viên quét QR bằng camera hoặc bấm nút dưới để hiện form đăng ký tham gia ngay.
                                 </p>
 
                                 <div className="flex items-center justify-center sm:justify-start gap-2 pt-0.5">

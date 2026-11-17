@@ -95,7 +95,7 @@ export const ALL_SHORTCUT_OPTIONS: ShortcutItem[] = [
   },
   {
     id: "profile",
-    name: "Hội viên",
+    name: "Học viên",
     desc: "Hồ sơ & thông tin doanh nghiệp",
     to: "/association/profile",
     iconName: "IdCard",
@@ -350,19 +350,17 @@ export function CustomHomeShortcutsModal({
               <div
                 key={item.id}
                 onClick={(e) => handleToggle(item.id, e)}
-                className={`pt-2 first:pt-0 flex items-center justify-between p-3 rounded-2xl cursor-pointer transition-all ${
-                  isSelected
+                className={`pt-2 first:pt-0 flex items-center justify-between p-3 rounded-2xl cursor-pointer transition-all ${isSelected
                     ? "bg-amber-500/10 border-2 border-amber-500 dark:bg-amber-950/20"
                     : "hover:bg-slate-50 dark:hover:bg-slate-800/50 border-2 border-transparent"
-                }`}
+                  }`}
               >
                 <div className="flex items-center gap-3">
                   <div
-                    className={`size-11 rounded-2xl flex items-center justify-center transition-colors ${
-                      isSelected
+                    className={`size-11 rounded-2xl flex items-center justify-center transition-colors ${isSelected
                         ? "bg-red-600 text-white shadow-xs"
                         : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300"
-                    }`}
+                      }`}
                   >
                     {getShortcutIcon(item.iconName, "size-5")}
                   </div>
@@ -373,9 +371,8 @@ export function CustomHomeShortcutsModal({
                       </span>
                       {item.badge && (
                         <span
-                          className={`px-1.5 py-0.5 rounded-md text-[9px] font-black uppercase ${
-                            item.badgeColor || "bg-amber-500 text-slate-900"
-                          }`}
+                          className={`px-1.5 py-0.5 rounded-md text-[9px] font-black uppercase ${item.badgeColor || "bg-amber-500 text-slate-900"
+                            }`}
                         >
                           {item.badge}
                         </span>

@@ -361,13 +361,13 @@ function AiAssistantPage() {
               : prev.activeFilters,
             recentSources: allowed
               ? [
-                  ...prev.recentSources,
-                  ...structured.evidence.map((e: any) => ({
-                    id: e.id,
-                    title: e.title,
-                    capability: capId,
-                  })),
-                ]
+                ...prev.recentSources,
+                ...structured.evidence.map((e: any) => ({
+                  id: e.id,
+                  title: e.title,
+                  capability: capId,
+                })),
+              ]
               : prev.recentSources,
             suggestedActions: allowed
               ? getCapabilityMemory(capId).followUpSuggestions.map((label) => ({ label }))
@@ -848,11 +848,10 @@ function AiAssistantPage() {
                       aria-pressed={isActive}
                       disabled={restricted}
                       onClick={() => setActiveCapability(cap.id)}
-                      className={`flex w-full items-center gap-2.5 rounded-xl border px-3 py-2 text-left transition-colors focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50 ${
-                        isActive
+                      className={`flex w-full items-center gap-2.5 rounded-xl border px-3 py-2 text-left transition-colors focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50 ${isActive
                           ? "border-primary/50 bg-primary/5"
                           : "border-border/70 hover:bg-muted"
-                      }`}
+                        }`}
                     >
                       <cap.icon className="h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
                       <span className="min-w-0 flex-1 truncate text-[13px] font-medium text-foreground">
@@ -917,7 +916,7 @@ function WelcomePanel({
           Xin chào, tôi là Trợ lý AI của Hiệp hội
         </h2>
         <p className="mx-auto mt-2 max-w-lg text-sm text-muted-foreground">
-          Tôi điều phối nhiều năng lực chuyên biệt — tài liệu, hội viên, kết nối, hội phí, sự kiện,
+          Tôi điều phối nhiều năng lực chuyên biệt — tài liệu, Học viên, kết nối, hội phí, sự kiện,
           marketplace, thông báo và điều hành — và luôn trả lời dựa trên dữ liệu bạn có quyền truy
           cập.
         </p>
@@ -1260,11 +1259,10 @@ function ToolCard({ tool, availability }: { tool: AiTool; availability: ToolAvai
 
   return (
     <div
-      className={`flex flex-col gap-2 rounded-xl border p-3 transition-colors ${
-        disabled
+      className={`flex flex-col gap-2 rounded-xl border p-3 transition-colors ${disabled
           ? "border-border/60 bg-muted/20 opacity-70"
           : "border-border bg-card hover:border-primary/40"
-      }`}
+        }`}
     >
       <div className="flex items-start gap-2">
         <div className="mt-0.5 grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-primary/10 text-primary">
@@ -1467,13 +1465,12 @@ function WorkflowRunner({
           {run.name}
         </h2>
         <span
-          className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-medium ${
-            run.outcome === "completed"
+          className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-medium ${run.outcome === "completed"
               ? "bg-success/15 text-success"
               : run.outcome === "cancelled" || run.outcome === "failed"
                 ? "bg-destructive/15 text-destructive"
                 : "bg-warning/15 text-warning"
-          }`}
+            }`}
         >
           {run.outcome === "completed"
             ? "Hoàn tất"

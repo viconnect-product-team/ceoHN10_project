@@ -175,7 +175,7 @@ function createCover() {
       spacing: { before: 0, after: 800 },
       children: [
         new TextRun({
-          text: 'Cổng Quản Trị Trung Tâm Web CRM & Ứng Dụng Di Động Hội Viên CEO HN10',
+          text: 'Cổng Quản Trị Trung Tâm Web CRM & Ứng Dụng Di Động Học viên CEO HN10',
           font: FONT_FAMILY,
           size: 24,
           italics: true,
@@ -190,7 +190,7 @@ function createCover() {
         ['Phiên Bản', 'Version 5.0 — Master Specification (Khớp Kỹ Thuật 100%)'],
         ['Cơ Quan Chủ Quản', 'CLB Doanh Nhân CEO HN10 (Trực thuộc HanoiBA)'],
         ['Đơn Vị Thực Hiện', 'ViConnect Platform & Ban Công Nghệ Chuyển Đổi Số'],
-        ['Phạm Vi Áp Dụng', 'Ban Quản Trị, Ban Thư Ký, 6 Ban Chuyên Môn & Toàn Thể Hội Viên'],
+        ['Phạm Vi Áp Dụng', 'Ban Quản Trị, Ban Thư Ký, 6 Ban Chuyên Môn & Toàn Thể Học viên'],
         ['Ngày Phê Duyệt', '04/10/2026'],
       ].map(([label, val]) =>
         new TableRow({
@@ -263,8 +263,8 @@ function parseMarkdownToDocx(mdText) {
                 shading: isHeader
                   ? { fill: COLOR_HEADER_BG, type: ShadingType.CLEAR }
                   : rIdx % 2 === 1
-                  ? { fill: COLOR_ALT_BG, type: ShadingType.CLEAR }
-                  : undefined,
+                    ? { fill: COLOR_ALT_BG, type: ShadingType.CLEAR }
+                    : undefined,
                 children: [
                   createPara(cText, {
                     bold: isHeader,

@@ -16,7 +16,7 @@ const membersToSeed = [
     phone: '0983000051',
     company: 'Công ty May Mặc & Xuất Nhập Khẩu Mai Hương',
     dept: 'Ban Thành viên',
-    execRole: 'Hội viên'
+    execRole: 'Học viên'
   },
   {
     id: 'c1983000-0000-4000-8000-000000000012',
@@ -26,7 +26,7 @@ const membersToSeed = [
     phone: '0983000052',
     company: 'Thắng Lợi B2B Supply Chain JSC',
     dept: 'Ban Xúc tiến',
-    execRole: 'Hội viên'
+    execRole: 'Học viên'
   },
   {
     id: 'c1983000-0000-4000-8000-000000000013',
@@ -36,7 +36,7 @@ const membersToSeed = [
     phone: '0983000053',
     company: 'Bảo Anh Digital Marketing Studio',
     dept: 'Ban Truyền thông',
-    execRole: 'Hội viên'
+    execRole: 'Học viên'
   },
   {
     id: 'c1983000-0000-4000-8000-000000000014',
@@ -46,7 +46,7 @@ const membersToSeed = [
     phone: '0983000054',
     company: 'Trọng Hiếu Green Energy Solutions',
     dept: 'Ban Thiện nguyện',
-    execRole: 'Hội viên'
+    execRole: 'Học viên'
   },
   {
     id: 'c1983000-0000-4000-8000-000000000015',
@@ -56,7 +56,7 @@ const membersToSeed = [
     phone: '0983000055',
     company: 'Kim Oanh Luật & Dịch Vụ Doanh Nghiệp',
     dept: 'Ban Thư ký',
-    execRole: 'Hội viên'
+    execRole: 'Học viên'
   }
 ];
 

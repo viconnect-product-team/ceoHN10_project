@@ -55,7 +55,7 @@ const ALL_TEST_ACCOUNTS = [
     appRole: 'member',
     assocRole: 'member',
     phone: '0983000103',
-    company: 'Phát Triển Hội Viên Test JSC',
+    company: 'Phát Triển Học viên Test JSC',
     title: 'Thành viên Ban Thành viên',
     about: 'Tài khoản thử nghiệm chuyên dụng phân hệ Ban Thành viên CLB CEO HN10.'
   },

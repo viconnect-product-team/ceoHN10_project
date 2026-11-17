@@ -54,7 +54,7 @@ export function MemberBirthdayPosterModal({
         try {
           const parsed = JSON.parse(rawPolicy);
           if (parsed?.testMode) testMode = true;
-        } catch {}
+        } catch { }
       }
 
       let isToday = false;
@@ -75,7 +75,7 @@ export function MemberBirthdayPosterModal({
         const timer = setTimeout(() => setInternalOpen(true), 1200);
         return () => clearTimeout(timer);
       }
-    } catch {}
+    } catch { }
   }, [member, propIsOpen, autoCheckToday]);
 
   const isOpen = typeof propIsOpen === "boolean" ? propIsOpen : internalOpen;
@@ -95,7 +95,7 @@ export function MemberBirthdayPosterModal({
 
   const displayCompany =
     member?.company ||
-    "Doanh nghiệp Hội viên CEO HN10";
+    "Doanh nghiệp Học viên CEO HN10";
 
   const displayRole =
     member?.title ||
@@ -118,7 +118,7 @@ export function MemberBirthdayPosterModal({
         const mm = String(d.getMonth() + 1).padStart(2, "0");
         formattedBday = `${dd}/${mm}/1983`;
       }
-    } catch {}
+    } catch { }
   }
 
   // Tải poster dạng Canvas image
@@ -313,7 +313,7 @@ export function MemberBirthdayPosterModal({
               </div>
             </div>
 
-            {/* Thông tin Doanh nhân hội viên */}
+            {/* Thông tin Doanh nhân Học viên */}
             <div className="space-y-1 mb-3">
               <h3 className="text-lg sm:text-xl font-black text-amber-200 uppercase tracking-wide">
                 {displayName}

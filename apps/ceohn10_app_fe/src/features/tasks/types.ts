@@ -69,9 +69,9 @@ export const MEETING_PLATFORMS: Record<
   UNIWORK: {
     label: 'UniWork Meeting',
     shortName: 'UniWork',
-    bg: 'bg-[#003B95]/10 dark:bg-[#003B95]/30',
-    text: 'text-[#003B95] dark:text-blue-300',
-    border: 'border-[#003B95]/30 dark:border-[#003B95]/50',
+    bg: 'bg-slate-100 dark:bg-slate-800',
+    text: 'text-slate-700 dark:text-slate-300',
+    border: 'border-slate-200 dark:border-slate-700',
     defaultUrl: 'https://uni-hrm.ubos.vn/meeting/',
   },
 };

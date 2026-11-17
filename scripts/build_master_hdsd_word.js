@@ -317,15 +317,15 @@ const HDSD_CHAPTERS = [
     tableColWidths: [1800, 2200, 1000, 1600, 2600],
     tableRows: [
       ['Ban Quản Trị (BQT)', 'admin@connect.vn', '123456', 'Cổng Quản Trị', 'Toàn quyền cấu hình hệ thống, kiểm soát bảo mật, phân quyền RBAC và phê duyệt ngân sách cấp cao.'],
-      ['Ban Thư Ký (BTK)', 'ceo.tongthuky@ceohn10.com', '123456', 'Quản Lý Họp BCH', 'Lên lịch họp giao ban, điểm danh QR cuộc họp, lưu trữ biên bản nghị quyết. Tuyệt đối không có quyền duyệt hội viên.'],
-      ['Ban Thành Viên (BTV)', 'ceo.thanhvien@ceohn10.com', '123456', 'Quản Lý Hội Viên', 'Độc quyền thẩm định hồ sơ, kiểm tra MST pháp nhân, cấp mã hội viên CEO-83xxx và phát hành tài khoản mật khẩu.'],
+      ['Ban Thư Ký (BTK)', 'ceo.tongthuky@ceohn10.com', '123456', 'Quản Lý Họp BCH', 'Lên lịch họp giao ban, điểm danh QR cuộc họp, lưu trữ biên bản nghị quyết. Tuyệt đối không có quyền duyệt Học viên.'],
+      ['Ban Thành Viên (BTV)', 'ceo.thanhvien@ceohn10.com', '123456', 'Quản Lý Học viên', 'Độc quyền thẩm định hồ sơ, kiểm tra MST pháp nhân, cấp mã Học viên CEO-83xxx và phát hành tài khoản mật khẩu.'],
       ['Ban Thiện Nguyện (BTN)', 'ceo.thiennguyen@ceohn10.com', '123456', 'Sổ Quỹ Thiện Nguyện', 'Quản trị Quỹ An Sinh Xã Hội "Áo Ấm Cho Em", duyệt chi 3 cấp và công khai sao kê minh bạch thời gian thực.'],
       ['Ban Truyền Thông (BTT)', 'ceo.truyenthong@ceohn10.com', '123456', 'Sự Kiện & Tin Tức', 'Quản lý tin tức bản tin nội bộ, sự kiện Gala, thiết kế banner truyền thông và quét mã QR soát vé tại cổng an ninh.'],
       ['Ban Xúc Tiến (BXT)', 'ceo.xuctien@ceohn10.com', '123456', 'Gian Hàng B2B', 'Quản trị Gian hàng B2B Doanh nhân CEO HN10, thẩm định chất lượng sản phẩm và khớp lệnh cơ hội Cung - Cầu 1-1.']
     ],
     callout: {
       title: 'QUY TẮC PHÂN ĐỊNH THẨM QUYỀN NGHIÊM NGẶT (STRICT RBAC)',
-      text: 'Chức năng phê duyệt kết nạp và cấp tài khoản hội viên thuộc thẩm quyền độc quyền của Ban Thành Viên và Ban Quản Trị. Ban Thư Ký và các ban khác không có quyền duyệt hội viên nhằm đảm bảo tính độc lập và minh bạch trong công tác tổ chức nhân sự của Hiệp hội.',
+      text: 'Chức năng phê duyệt kết nạp và cấp tài khoản Học viên thuộc thẩm quyền độc quyền của Ban Thành Viên và Ban Quản Trị. Ban Thư Ký và các ban khác không có quyền duyệt Học viên nhằm đảm bảo tính độc lập và minh bạch trong công tác tổ chức nhân sự của Hiệp hội.',
       type: 'warning'
     },
     images: [
@@ -355,19 +355,19 @@ const HDSD_CHAPTERS = [
     ]
   },
   {
-    chapterTitle: 'CHƯƠNG 3: QUY TRÌNH THẨM ĐỊNH & PHÊ DUYỆT HỘI VIÊN CHÍNH THỨC (ĐỘC QUYỀN BAN THÀNH VIÊN)',
+    chapterTitle: 'CHƯƠNG 3: QUY TRÌNH THẨM ĐỊNH & PHÊ DUYỆT Học viên CHÍNH THỨC (ĐỘC QUYỀN BAN THÀNH VIÊN)',
     intro: `Ban Thành Viên chịu trách nhiệm giữ gìn uy tín và chất lượng của cộng đồng doanh nhân thông qua quy trình thẩm định 360 độ:`,
     steps: [
       'Bước 1: Chuyên viên Ban Thành Viên đăng nhập Cổng Quản Trị bằng tài khoản ceo.thanhvien@ceohn10.com.',
-      'Bước 2: Mở menu "Quản Lý Hội Viên", chọn tab "Chờ Thẩm Định". Danh sách các hồ sơ mới nộp sẽ hiển thị theo thứ tự thời gian.',
+      'Bước 2: Mở menu "Quản Lý Học viên", chọn tab "Chờ Thẩm Định". Danh sách các hồ sơ mới nộp sẽ hiển thị theo thứ tự thời gian.',
       'Bước 3: Bấm vào hồ sơ ứng viên Phạm Văn Vũ để mở ngăn kéo thẩm định chi tiết 360 độ: Đối soát năm sinh (1983), tra cứu tình trạng hoạt động của Mã số thuế trên Cổng thông tin quốc gia về đăng ký doanh nghiệp, đánh giá năng lực công ty.',
       'Bước 4: Sau khi thẩm định đạt tiêu chuẩn, bấm nút "Phê Duyệt Kết Nạp & Cấp Tài Khoản".',
-      'Bước 5: Hệ thống tự động cấp Mã hội viên độc bản CEO-83007, kích hoạt trạng thái "Hội viên Chính thức", tạo tài khoản bảo mật và tự động gửi email chào mừng kèm mật khẩu khởi tạo tới vupv090120@gmail.com.'
+      'Bước 5: Hệ thống tự động cấp Mã Học viên độc bản CEO-83007, kích hoạt trạng thái "Học viên Chính thức", tạo tài khoản bảo mật và tự động gửi email chào mừng kèm mật khẩu khởi tạo tới vupv090120@gmail.com.'
     ],
     images: [
-      { file: 'btv_screen.png', caption: 'Hình 3.1: Phân hệ Quản Lý Hội Viên của Ban Thành Viên trên Cổng Quản Trị' },
+      { file: 'btv_screen.png', caption: 'Hình 3.1: Phân hệ Quản Lý Học viên của Ban Thành Viên trên Cổng Quản Trị' },
       { file: 'live_07_crm_member_detail_drawer.png', caption: 'Hình 3.2: Ngăn kéo Drawer thẩm định chi tiết hồ sơ doanh nghiệp 360 độ' },
-      { file: 'live_08_crm_member_approved_credentials_toast.png', caption: 'Hình 3.3: Thông báo phê duyệt kết nạp thành công và cấp mã hội viên CEO-83007' }
+      { file: 'live_08_crm_member_approved_credentials_toast.png', caption: 'Hình 3.3: Thông báo phê duyệt kết nạp thành công và cấp mã Học viên CEO-83007' }
     ]
   },
   {
@@ -392,8 +392,8 @@ const HDSD_CHAPTERS = [
     steps: [
       'Bước 1: Ban Truyền Thông / Ban Tổ Chức đăng nhập tài khoản ceo.truyenthong@ceohn10.com, mở mục "Quản Lý Sự Kiện".',
       'Bước 2: Tạo sự kiện mới: Tên chương trình "Gala Hội Ngộ Doanh Nhân CEO HN10", Thời gian, Địa điểm sảnh tiệc, Diễn giả và Banner nhận diện 16:9.',
-      'Bước 3: Cấu hình các hạng vé: Vé Hội viên chính thức (Miễn phí 0đ), Vé Khách mời VIP (Có phí 1.500.000 VNĐ qua VietQR Napas).',
-      'Bước 4: Thiết lập sơ đồ chỗ ngồi Cinema Seating Map: Phân bổ bàn Kim Cương VIP, bàn Vàng Ban Điều Hành, bàn Bạc Hội viên.',
+      'Bước 3: Cấu hình các hạng vé: Vé Học viên chính thức (Miễn phí 0đ), Vé Khách mời VIP (Có phí 1.500.000 VNĐ qua VietQR Napas).',
+      'Bước 4: Thiết lập sơ đồ chỗ ngồi Cinema Seating Map: Phân bổ bàn Kim Cương VIP, bàn Vàng Ban Điều Hành, bàn Bạc Học viên.',
       'Bước 5: Vận hành cổng an ninh Check-in: Tại cửa đón tiếp, nhân viên mở Camera Soát Vé trên máy tính bảng hoặc điện thoại. Khách xuất trình mã QR trên vé điện tử, camera nhận diện trong 0.2 giây. Màn hình viền xanh lục xác nhận vé hợp lệ và thông báo vị trí bàn ngồi; Màn hình viền đỏ cảnh báo nếu vé bị quét trùng.'
     ],
     images: [
@@ -408,11 +408,11 @@ const HDSD_CHAPTERS = [
   },
   {
     chapterTitle: 'CHƯƠNG 6: HƯỚNG DẪN QUẢN TRỊ GIAN HÀNG B2B & KẾT NỐI CUNG - CẦU (BAN XÚC TIẾN THƯƠNG MẠI)',
-    intro: `Ban Xúc Tiến Thương Mại giữ vai trò cầu nối giao thương, thúc đẩy tiêu dùng nội bộ và gia tăng doanh số thực chất cho các doanh nghiệp hội viên:`,
+    intro: `Ban Xúc Tiến Thương Mại giữ vai trò cầu nối giao thương, thúc đẩy tiêu dùng nội bộ và gia tăng doanh số thực chất cho các doanh nghiệp Học viên:`,
     steps: [
       'Bước 1: Ban Xúc Tiến đăng nhập bằng tài khoản ceo.xuctien@ceohn10.com, mở mục "Gian Hàng B2B".',
-      'Bước 2: Xem danh sách sản phẩm chờ kiểm duyệt từ các hội viên. Kiểm tra thông số kỹ thuật, hình ảnh, chứng nhận chất lượng và chính sách trợ giá nội bộ (Tối thiểu chiết khấu 10%).',
-      'Bước 3: Nhấn nút "Phê Duyệt & Niêm Yết Lên Sàn". Sản phẩm lập tức xuất hiện trên Gian hàng B2B của Ứng dụng Hội viên.',
+      'Bước 2: Xem danh sách sản phẩm chờ kiểm duyệt từ các Học viên. Kiểm tra thông số kỹ thuật, hình ảnh, chứng nhận chất lượng và chính sách trợ giá nội bộ (Tối thiểu chiết khấu 10%).',
+      'Bước 3: Nhấn nút "Phê Duyệt & Niêm Yết Lên Sàn". Sản phẩm lập tức xuất hiện trên Gian hàng B2B của Ứng dụng Học viên.',
       'Bước 4: Mở mục "Cơ Hội Cung - Cầu": Rà soát các nhu cầu mua bán, sử dụng tính năng "Gợi Ý Khớp Lệnh 1-1" để kết nối hai doanh nghiệp có ngành nghề phù hợp.',
       'Bước 5: Định kỳ hàng quý, nhấn nút "Xuất Báo Cáo Giao Thương B2B" để thống kê tổng doanh số hợp đồng đã thực hiện giữa các thành viên.'
     ],
@@ -431,7 +431,7 @@ const HDSD_CHAPTERS = [
       'Bước 2: Lập phiếu chi hoạt động: Nhập lý do chi, số tiền, chọn nguồn quỹ tương ứng và đính kèm hóa đơn chứng từ.',
       'Bước 3: Quy trình duyệt chi 3 cấp: Người lập phiếu (Chờ soát) -> Kế toán trưởng (Đã kiểm tra) -> Chủ tịch CLB (Phê duyệt xuất quỹ).',
       'Bước 4: Quản lý Quỹ An Sinh Xã Hội "Áo Ấm Cho Em": Theo dõi các khoản ủng hộ qua mã VietQR chuyển thẳng vào tài khoản MB Bank chuyên dùng.',
-      'Bước 5: Nhấn "Xuất Báo Cáo Tài Chính": Kết xuất sao kê chi tiết phục vụ các phiên họp Ban Chấp Hành và công khai minh bạch trước toàn thể hội viên.'
+      'Bước 5: Nhấn "Xuất Báo Cáo Tài Chính": Kết xuất sao kê chi tiết phục vụ các phiên họp Ban Chấp Hành và công khai minh bạch trước toàn thể Học viên.'
     ],
     images: [
       { file: 'btn_screen.png', caption: 'Hình 7.1: Phân hệ Sổ Quỹ & Hoạt Động Xã Hội của Ban Thiện Nguyện' },
@@ -441,13 +441,13 @@ const HDSD_CHAPTERS = [
     ]
   },
   {
-    chapterTitle: 'CHƯƠNG 8: HƯỚNG DẪN VẬN HÀNH ỨNG DỤNG DOANH NHÂN CEO HN10 DÀNH CHO HỘI VIÊN',
-    intro: `Ứng Dụng Doanh Nhân CEO HN10 là người bạn đồng hành số hóa cao cấp, giúp hội viên kết nối, sinh hoạt và phát triển kinh doanh mọi lúc mọi nơi:`,
+    chapterTitle: 'CHƯƠNG 8: HƯỚNG DẪN VẬN HÀNH ỨNG DỤNG DOANH NHÂN CEO HN10 DÀNH CHO Học viên',
+    intro: `Ứng Dụng Doanh Nhân CEO HN10 là người bạn đồng hành số hóa cao cấp, giúp Học viên kết nối, sinh hoạt và phát triển kinh doanh mọi lúc mọi nơi:`,
     steps: [
       '1. Đăng nhập lần đầu & Đổi mật khẩu: Mở ứng dụng, nhập email vupv090120@gmail.com và mật khẩu khởi tạo được cấp. Hệ thống tự động chuyển sang màn hình Bắt buộc đổi mật khẩu mới để bảo mật tuyệt đối.',
-      '2. Thẻ Hội Viên VIP 3D & Danh Thiếp Số: Mở mục "Thẻ VIP", thẻ nhận diện Navy & Amber Gold hiển thị với mã QR cá nhân độc bản. Hội viên có thể chạm mặt lưng điện thoại vào máy đối tác (NFC 1 chạm) để truyền danh bạ ngay tức thì.',
+      '2. Thẻ Học viên VIP 3D & Danh Thiếp Số: Mở mục "Thẻ VIP", thẻ nhận diện Navy & Amber Gold hiển thị với mã QR cá nhân độc bản. Học viên có thể chạm mặt lưng điện thoại vào máy đối tác (NFC 1 chạm) để truyền danh bạ ngay tức thì.',
       '3. Danh Bạ Doanh Nhân & Hẹn Gặp 1-1: Tìm kiếm đối tác theo ngành nghề trong danh bạ 500+ CEO. Bấm "Gửi Lời Mời Hẹn Gặp 1-1" để kết nối hợp tác kinh doanh.',
-      '4. Mua Sắm & Bán Hàng Trên Gian Hàng B2B: Khám phá hàng trăm sản phẩm dịch vụ chất lượng cao với giá ưu đãi nội bộ. Hội viên có thể đăng bán sản phẩm của công ty mình và nhận đơn đặt hàng trực tiếp.',
+      '4. Mua Sắm & Bán Hàng Trên Gian Hàng B2B: Khám phá hàng trăm sản phẩm dịch vụ chất lượng cao với giá ưu đãi nội bộ. Học viên có thể đăng bán sản phẩm của công ty mình và nhận đơn đặt hàng trực tiếp.',
       '5. Nhận Vé Sự Kiện & Quét Mã Check-in: Xem lịch sự kiện Gala, bấm nhận vé VIP miễn phí. Xuất trình mã QR E-Ticket tại cổng đón tiếp để vào hội trường trong 0.2 giây.',
       '6. Biểu Quyết Đại Hội Điện Tử: Tham gia bỏ phiếu bầu cử Ban Chấp Hành trực tuyến bảo mật theo nguyên tắc 1 người 1 phiếu duy nhất.',
       '7. Đóng Hội Phí & Ủng Hộ Thiện Nguyện Qua VietQR 24/7: Bấm thanh toán, quét mã VietQR Napas trên bất kỳ App ngân hàng nào, hệ thống tự động gạch nợ thành công trong 1 giây.'
@@ -456,8 +456,8 @@ const HDSD_CHAPTERS = [
       { file: 'live_10_app_login_screen.png', caption: 'Hình 8.1: Màn hình Đăng Nhập Ứng Dụng Doanh Nhân CEO HN10' },
       { file: 'live_11_app_login_filled_vu.png', caption: 'Hình 8.2: Nhập tài khoản vupv090120@gmail.com và mật khẩu khởi tạo' },
       { file: 'live_12_app_onboarding_password_change.png', caption: 'Hình 8.3: Bắt buộc đổi mật khẩu mới ngay trong lần đăng nhập đầu tiên' },
-      { file: 'app_02_home_dashboard.png', caption: 'Hình 8.4: Màn hình Trang Chủ Dashboard Hội Viên Doanh Nhân CEO HN10' },
-      { file: 'live_26_app_vip_3d_card.png', caption: 'Hình 8.5: Thẻ Hội Viên VIP 3D Hoàng Gia xoay lật 180 độ tôn vinh thương hiệu cá nhân' },
+      { file: 'app_02_home_dashboard.png', caption: 'Hình 8.4: Màn hình Trang Chủ Dashboard Học viên Doanh Nhân CEO HN10' },
+      { file: 'live_26_app_vip_3d_card.png', caption: 'Hình 8.5: Thẻ Học viên VIP 3D Hoàng Gia xoay lật 180 độ tôn vinh thương hiệu cá nhân' },
       { file: 'app_identity_card_vip.png', caption: 'Hình 8.6: Thẻ danh thiếp điện tử thông minh tích hợp chip NFC và mã QR độc bản' },
       { file: 'live_27_public_digital_card_web.png', caption: 'Hình 8.7: Trang Danh thiếp điện tử công khai hiển thị khi chạm thẻ NFC' },
       { file: 'app_step_07_members_directory.png', caption: 'Hình 8.8: Danh bạ doanh nhân thành viên tra cứu theo chuyên ban và ngành nghề' },
@@ -481,7 +481,7 @@ const HDSD_CHAPTERS = [
     intro: `Ban Quản Trị nắm giữ quyền điều hành hạ tầng kỹ thuật, đảm bảo hệ thống luôn vận hành ổn định 24/7 và an toàn tuyệt đối:`,
     steps: [
       '1. Cấu hình Phân quyền RBAC: Quản lý ma trận phân quyền chi tiết cho 6 Ban chuyên môn và người dùng hệ thống.',
-      '2. Giám sát Nhật ký Kiểm toán (Audit Logs): Toàn bộ thao tác phê duyệt hội viên, duyệt chi tài chính, chỉnh sửa sự kiện đều được ghi nhận nhật ký bất biến.',
+      '2. Giám sát Nhật ký Kiểm toán (Audit Logs): Toàn bộ thao tác phê duyệt Học viên, duyệt chi tài chính, chỉnh sửa sự kiện đều được ghi nhận nhật ký bất biến.',
       '3. Sao lưu Dữ liệu Tự động (Automated Backup): Hệ thống tự động sao lưu dữ liệu quan hệ và tệp đa phương tiện định kỳ vào 03:00 sáng mỗi ngày.',
       '4. Quản lý Nhà tài trợ & Banner Quảng cáo: Phân bổ các gói tài trợ Kim Cương, Vàng, Bạc và điều phối banner trượt trên toàn hệ sinh thái.',
       '5. Tùy biến Nhận diện Thương hiệu: Cấu hình bảng màu, logo và phông chữ đồng bộ theo tiêu chuẩn HanoiBA.'
@@ -506,7 +506,7 @@ function generateHdsdMarkdown() {
 
 * **Tên tài liệu:** Sổ Tay Hướng Dẫn Sử Dụng & Vận Hành Toàn Diện Hệ Thống
 * **Đơn vị ban hành:** Ban Chấp Hành CLB Doanh Nhân CEO HN10 (Trực thuộc Hội Doanh Nhân Trẻ Hà Nội - HanoiBA)
-* **Đối tượng sử dụng:** Ban Lãnh Đạo, 6 Ban Chuyên Môn Điều Hành và Toàn Thể Hội Viên Doanh Nhân CEO HN10
+* **Đối tượng sử dụng:** Ban Lãnh Đạo, 6 Ban Chuyên Môn Điều Hành và Toàn Thể Học viên Doanh Nhân CEO HN10
 * **Phiên bản:** Version 4.0 Production Master Release
 * **Ngày phát hành:** 01/10/2026
 * **Email tài khoản mẫu:** \`vupv090120@gmail.com\` (Doanh nhân Phạm Văn Vũ - CEO Công ty CP Công nghệ VIO CONNECT, Mã HV: \`CEO-83007\`)
@@ -634,9 +634,9 @@ async function buildMasterUserGuideDocx() {
     ['Phiên Bản', 'Version 4.0 Production Master (Đầy đủ 6 Ban & Toàn bộ phân hệ)'],
     ['Đơn Vị Chủ Quản', 'CLB Doanh Nhân CEO HN10 (Trực thuộc Hội Doanh Nhân Trẻ Hà Nội - HanoiBA)'],
     ['Đơn Vị Phát Triển', 'Ban Công Nghệ & Chuyển Đổi Số — ViConnect Platform'],
-    ['Phạm Vi Áp Dụng', 'Cổng Thông Tin Điện Tử, Cổng Quản Trị Ban Chấp Hành & Ứng Dụng Hội Viên'],
+    ['Phạm Vi Áp Dụng', 'Cổng Thông Tin Điện Tử, Cổng Quản Trị Ban Chấp Hành & Ứng Dụng Học viên'],
     ['Email Đăng Ký Đại Diện', 'vupv090120@gmail.com (Doanh nhân Phạm Văn Vũ - CEO Công ty CP Công nghệ VIO CONNECT)'],
-    ['Mã Hội Viên Đại Diện', 'CEO-83007'],
+    ['Mã Học viên Đại Diện', 'CEO-83007'],
     ['Cổng Thanh Toán VietQR', 'Napas 24/7 Tự Động Gạch Nợ & Tạo Mã QR Động Trong 1 Giây'],
     ['Trạng Thái Nghiệm Thu', 'Đã thẩm định thực tế và nghiệm thu bàn giao 100%']
   ];

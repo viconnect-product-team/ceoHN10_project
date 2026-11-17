@@ -63,7 +63,7 @@ export function CreateRewardModal({
   const [loadingMembers, setLoadingMembers] = useState(false);
   const [memberSearchQuery, setMemberSearchQuery] = useState("");
 
-  // Nạp danh sách hội viên thực tế từ API /members
+  // Nạp danh sách Học viên thực tế từ API /members
   useEffect(() => {
     if (!isOpen) return;
     let isMounted = true;
@@ -76,10 +76,10 @@ export function CreateRewardModal({
             res.map((m: any) => ({
               id: m.id || m.code || m.user_id,
               code: m.code || m.id,
-              name: m.contact || m.name || "Hội viên CEO HN10",
+              name: m.contact || m.name || "Học viên CEO HN10",
               company: m.company_name || m.company || "CLB Doanh Nhân CEO HN10",
-              role: m.executive_role || m.role || "Hội viên chính thức",
-              department: m.department || "Ban Hội Viên",
+              role: m.executive_role || m.role || "Học viên chính thức",
+              department: m.department || "Ban Học viên",
               avatar: m.avatar_url || m.avatar || "/ceohn10-emblem-8.png",
               phone: m.phone || "",
               email: m.email || "",
@@ -98,7 +98,7 @@ export function CreateRewardModal({
     };
   }, [isOpen]);
 
-  // Lọc danh sách hội viên theo tìm kiếm
+  // Lọc danh sách Học viên theo tìm kiếm
   const filteredMembers = useMemo(() => {
     const q = memberSearchQuery.trim().toLowerCase();
     if (!q) return members;
@@ -111,7 +111,7 @@ export function CreateRewardModal({
     );
   }, [members, memberSearchQuery]);
 
-  // Danh sách hội viên đã chọn
+  // Danh sách Học viên đã chọn
   const selectedMembers = useMemo(() => {
     return members.filter((m) => selectedMemberIds.includes(m.id));
   }, [members, selectedMemberIds]);
@@ -228,9 +228,8 @@ export function CreateRewardModal({
         .map((m) => `${m.name} (${m.company || "Doanh nghiệp CLB"})`)
         .join("\n- ");
 
-      const postContent = `${description.trim()}\n\n🏆 Danh sách doanh nhân được vinh danh khen thưởng:\n- ${awardedCompanies}${
-        rewardValue ? `\n\n🎁 Phần thưởng / Quyền lợi: ${rewardValue}` : ""
-      }`;
+      const postContent = `${description.trim()}\n\n🏆 Danh sách doanh nhân được vinh danh khen thưởng:\n- ${awardedCompanies}${rewardValue ? `\n\n🎁 Phần thưởng / Quyền lợi: ${rewardValue}` : ""
+        }`;
 
       // 1. Đăng bài viết vinh danh lên Feed Mobile (Bảng tin mạng lưới)
       await fetchNestApi("/feed", {
@@ -251,7 +250,7 @@ export function CreateRewardModal({
           action: "create_reward_honors",
           targetType: "award",
           targetId: `AWD-${Date.now()}`,
-          details: `Tạo khen thưởng: "${title.trim()}" cho ${selectedMembers.length} hội viên: ${awardedNames}`,
+          details: `Tạo khen thưởng: "${title.trim()}" cho ${selectedMembers.length} Học viên: ${awardedNames}`,
           metadata: {
             title: title.trim(),
             description: description.trim(),
@@ -264,9 +263,9 @@ export function CreateRewardModal({
             rewardValue,
           },
         }),
-      }).catch(() => {});
+      }).catch(() => { });
 
-      // 3. Gửi thông báo tới từng hội viên được khen thưởng
+      // 3. Gửi thông báo tới từng Học viên được khen thưởng
       for (const m of selectedMembers) {
         if (m.id) {
           await fetchNestApi("/admin/notifications", {
@@ -278,12 +277,12 @@ export function CreateRewardModal({
               recipientId: m.id,
               audience: "members",
             }),
-          }).catch(() => {});
+          }).catch(() => { });
         }
       }
 
       toast.success(
-        `✓ Đã tạo khen thưởng "${title.trim()}" thành công cho ${selectedMembers.length} hội viên!`
+        `✓ Đã tạo khen thưởng "${title.trim()}" thành công cho ${selectedMembers.length} Học viên!`
       );
 
       // Reset form
@@ -319,7 +318,7 @@ export function CreateRewardModal({
             </div>
             <div>
               <h3 className="text-base font-extrabold text-slate-900 dark:text-white">
-                Tạo Khen Thưởng &amp; Vinh Danh Hội Viên
+                Tạo Khen Thưởng &amp; Vinh Danh Học viên
               </h3>
               <p className="text-xs text-slate-500 dark:text-slate-400">
                 Ghi nhận thành tích, vinh danh trực tiếp lên bảng tin và cấp quyền lợi
@@ -354,11 +353,10 @@ export function CreateRewardModal({
                 if (errors.title) setErrors((prev) => ({ ...prev, title: undefined }));
               }}
               placeholder="Ví dụ: Vinh danh Top 10 Doanh Nhân Hoạt Động Xuất Sắc Quý 4/2026"
-              className={`w-full px-3.5 py-2.5 rounded-xl border text-xs text-slate-900 dark:text-white bg-slate-50 dark:bg-slate-800/80 focus:outline-none focus:ring-2 transition ${
-                errors.title
+              className={`w-full px-3.5 py-2.5 rounded-xl border text-xs text-slate-900 dark:text-white bg-slate-50 dark:bg-slate-800/80 focus:outline-none focus:ring-2 transition ${errors.title
                   ? "border-red-500 ring-red-500/20"
                   : "border-slate-200 dark:border-slate-700 focus:ring-[#003B95]/30 focus:border-[#003B95]"
-              }`}
+                }`}
             />
             {errors.title && (
               <p className="text-[11px] text-red-500 flex items-center gap-1 font-medium mt-1">
@@ -385,12 +383,11 @@ export function CreateRewardModal({
                 if (errors.description)
                   setErrors((prev) => ({ ...prev, description: undefined }));
               }}
-              placeholder="Mô tả lý do khen thưởng, các đóng góp nổi bật về kết nối, giao thương B2B, phát triển hội viên hoặc tài trợ sự kiện..."
-              className={`w-full px-3.5 py-2.5 rounded-xl border text-xs text-slate-900 dark:text-white bg-slate-50 dark:bg-slate-800/80 focus:outline-none focus:ring-2 transition ${
-                errors.description
+              placeholder="Mô tả lý do khen thưởng, các đóng góp nổi bật về kết nối, giao thương B2B, phát triển Học viên hoặc tài trợ sự kiện..."
+              className={`w-full px-3.5 py-2.5 rounded-xl border text-xs text-slate-900 dark:text-white bg-slate-50 dark:bg-slate-800/80 focus:outline-none focus:ring-2 transition ${errors.description
                   ? "border-red-500 ring-red-500/20"
                   : "border-slate-200 dark:border-slate-700 focus:ring-[#003B95]/30 focus:border-[#003B95]"
-              }`}
+                }`}
             />
             {errors.description && (
               <p className="text-[11px] text-red-500 flex items-center gap-1 font-medium mt-1">
@@ -449,19 +446,19 @@ export function CreateRewardModal({
               </div>
             </div>
 
-            {/* Ô tìm kiếm hội viên */}
+            {/* Ô tìm kiếm Học viên */}
             <div className="relative">
               <Search className="size-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
                 value={memberSearchQuery}
                 onChange={(e) => setMemberSearchQuery(e.target.value)}
-                placeholder="Tìm hội viên theo họ tên, doanh nghiệp, ban chuyên môn..."
+                placeholder="Tìm Học viên theo họ tên, doanh nghiệp, ban chuyên môn..."
                 className="w-full pl-9 pr-3.5 py-2 rounded-xl border border-slate-200 dark:border-slate-700 text-xs text-slate-900 dark:text-white bg-white dark:bg-slate-900 focus:outline-none focus:ring-1 focus:ring-[#003B95]"
               />
             </div>
 
-            {/* Pills danh sách hội viên đã chọn */}
+            {/* Pills danh sách Học viên đã chọn */}
             {selectedMembers.length > 0 && (
               <div className="p-2.5 rounded-xl bg-blue-50/60 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-900/40 space-y-1.5">
                 <span className="text-[10.5px] font-bold text-blue-700 dark:text-blue-300 uppercase tracking-wider block">
@@ -496,15 +493,15 @@ export function CreateRewardModal({
               </div>
             )}
 
-            {/* Danh sách scrollable để chọn nhiều hội viên */}
+            {/* Danh sách scrollable để chọn nhiều Học viên */}
             <div className="border border-slate-200 dark:border-slate-800 rounded-2xl max-h-48 overflow-y-auto divide-y divide-slate-100 dark:divide-slate-800 bg-white dark:bg-slate-900">
               {loadingMembers ? (
                 <div className="p-4 text-center text-xs text-slate-400">
-                  Đang nạp danh sách hội viên...
+                  Đang nạp danh sách Học viên...
                 </div>
               ) : filteredMembers.length === 0 ? (
                 <div className="p-4 text-center text-xs text-slate-400">
-                  Không tìm thấy hội viên phù hợp với từ khóa "{memberSearchQuery}"
+                  Không tìm thấy Học viên phù hợp với từ khóa "{memberSearchQuery}"
                 </div>
               ) : (
                 filteredMembers.map((m) => {
@@ -513,19 +510,17 @@ export function CreateRewardModal({
                     <div
                       key={m.id}
                       onClick={() => toggleMemberSelection(m.id)}
-                      className={`px-3 py-2 flex items-center justify-between gap-3 cursor-pointer transition ${
-                        isSelected
+                      className={`px-3 py-2 flex items-center justify-between gap-3 cursor-pointer transition ${isSelected
                           ? "bg-blue-50 dark:bg-blue-950/40 text-blue-900 dark:text-blue-100"
                           : "hover:bg-slate-50 dark:hover:bg-slate-800/60"
-                      }`}
+                        }`}
                     >
                       <div className="flex items-center gap-2.5 min-w-0">
                         <div
-                          className={`size-4 rounded-md border flex items-center justify-center shrink-0 transition ${
-                            isSelected
+                          className={`size-4 rounded-md border flex items-center justify-center shrink-0 transition ${isSelected
                               ? "bg-[#003B95] border-[#003B95] text-white"
                               : "border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800"
-                          }`}
+                            }`}
                         >
                           {isSelected && <Check className="size-3" />}
                         </div>
@@ -569,11 +564,10 @@ export function CreateRewardModal({
                 <span>Đăng ảnh vinh danh (Tối đa 5 ảnh)</span>
               </label>
               <span
-                className={`text-[11px] font-bold ${
-                  images.length >= 5
+                className={`text-[11px] font-bold ${images.length >= 5
                     ? "text-red-500"
                     : "text-slate-500 dark:text-slate-400"
-                }`}
+                  }`}
               >
                 {images.length}/5 ảnh
               </span>

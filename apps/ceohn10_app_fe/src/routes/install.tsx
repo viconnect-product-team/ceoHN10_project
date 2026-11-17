@@ -7,11 +7,11 @@ const appIcon = "/app-icon.png";
 export const Route = createFileRoute("/install")({
   head: () => ({
     meta: [
-      { title: "Cài đặt ứng dụng Hội viên CEO HN10 — CLB Doanh Nhân CEO HN10" },
+      { title: "Cài đặt ứng dụng Học viên CEO HN10 — CLB Doanh Nhân CEO HN10" },
       {
         name: "description",
         content:
-          "Quét mã QR để cài đặt ứng dụng hội viên CEO HN10 lên màn hình chính. Hướng dẫn chi tiết cho iOS và Android.",
+          "Quét mã QR để cài đặt ứng dụng Học viên CEO HN10 lên màn hình chính. Hướng dẫn chi tiết cho iOS và Android.",
       },
     ],
   }),
@@ -43,12 +43,12 @@ function InstallPage() {
             width={80}
             height={80}
           />
-          <h1 className="mt-4 text-2xl font-extrabold vba-gold-text">CEO HN10 — Ứng dụng Hội viên</h1>
+          <h1 className="mt-4 text-2xl font-extrabold vba-gold-text">CEO HN10 — Ứng dụng Học viên</h1>
           <p className="mt-1 text-[13px] text-[var(--vba-text-muted)]">
             CLB Doanh Nhân CEO HN10
           </p>
           <p className="mt-3 max-w-md text-[13px] leading-relaxed text-[var(--vba-text-muted)]">
-            Cài đặt ứng dụng lên màn hình chính để truy cập thẻ hội viên, sự kiện, cơ hội kinh doanh
+            Cài đặt ứng dụng lên màn hình chính để truy cập thẻ Học viên, sự kiện, cơ hội kinh doanh
             và ưu đãi — nhanh như một ứng dụng thật, không cần qua kho ứng dụng.
           </p>
         </div>

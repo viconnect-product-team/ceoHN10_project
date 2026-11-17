@@ -63,7 +63,7 @@ export function GoogleFormEventRegistrationModal({
     company: "Công ty Cổ phần Đầu tư & Tài chính Sen Vàng",
     jobTitle: "Tổng Giám Đốc",
     industry: "Tài chính & Đầu tư",
-    role: "Hội viên chính thức (Official Member)",
+    role: "Học viên chính thức (Official Member)",
     b2bNeeds: "Tìm kiếm các doanh nghiệp sản xuất xuất khẩu và công nghệ để đầu tư mở rộng quy mô vốn 20-50 tỷ.",
     speakerQuestions: "Ban tổ chức có thể chia sẻ sâu hơn về cơ chế thuế mới áp dụng cho doanh nghiệp SME từ quý 4?",
     banquetChoice: "Bàn Tiệc VIP Gala 02 (Bàn Tròn 10 Chỗ)",
@@ -283,9 +283,8 @@ export function GoogleFormEventRegistrationModal({
               {/* Card 2: Họ và tên */}
               <div
                 onClick={() => setActiveCard("fullName")}
-                className={`rounded-xl border bg-white p-6 shadow-sm transition-all ${
-                  activeCard === "fullName" ? "border-l-4 border-l-[#673ab7] border-gray-300" : "border-gray-200"
-                }`}
+                className={`rounded-xl border bg-white p-6 shadow-sm transition-all ${activeCard === "fullName" ? "border-l-4 border-l-[#673ab7] border-gray-300" : "border-gray-200"
+                  }`}
               >
                 <label className="block text-sm font-semibold text-gray-900 mb-1">
                   1. Họ và tên đại biểu <span className="text-red-500">*</span>
@@ -304,9 +303,8 @@ export function GoogleFormEventRegistrationModal({
               {/* Card 3: Email */}
               <div
                 onClick={() => setActiveCard("email")}
-                className={`rounded-xl border bg-white p-6 shadow-sm transition-all ${
-                  activeCard === "email" ? "border-l-4 border-l-[#673ab7] border-gray-300" : "border-gray-200"
-                }`}
+                className={`rounded-xl border bg-white p-6 shadow-sm transition-all ${activeCard === "email" ? "border-l-4 border-l-[#673ab7] border-gray-300" : "border-gray-200"
+                  }`}
               >
                 <label className="block text-sm font-semibold text-gray-900 mb-1">
                   2. Địa chỉ Email chính thức <span className="text-red-500">*</span>
@@ -325,9 +323,8 @@ export function GoogleFormEventRegistrationModal({
               {/* Card 4: Số điện thoại */}
               <div
                 onClick={() => setActiveCard("phone")}
-                className={`rounded-xl border bg-white p-6 shadow-sm transition-all ${
-                  activeCard === "phone" ? "border-l-4 border-l-[#673ab7] border-gray-300" : "border-gray-200"
-                }`}
+                className={`rounded-xl border bg-white p-6 shadow-sm transition-all ${activeCard === "phone" ? "border-l-4 border-l-[#673ab7] border-gray-300" : "border-gray-200"
+                  }`}
               >
                 <label className="block text-sm font-semibold text-gray-900 mb-1">
                   3. Số điện thoại liên hệ (Zalo) <span className="text-red-500">*</span>
@@ -346,9 +343,8 @@ export function GoogleFormEventRegistrationModal({
               {/* Card 5: Công ty & Chức vụ */}
               <div
                 onClick={() => setActiveCard("company")}
-                className={`rounded-xl border bg-white p-6 shadow-sm transition-all ${
-                  activeCard === "company" ? "border-l-4 border-l-[#673ab7] border-gray-300" : "border-gray-200"
-                }`}
+                className={`rounded-xl border bg-white p-6 shadow-sm transition-all ${activeCard === "company" ? "border-l-4 border-l-[#673ab7] border-gray-300" : "border-gray-200"
+                  }`}
               >
                 <label className="block text-sm font-semibold text-gray-900 mb-1">
                   4. Tên Doanh nghiệp & Chức vụ đại diện <span className="text-red-500">*</span>
@@ -381,16 +377,15 @@ export function GoogleFormEventRegistrationModal({
               {/* Card 6: Vai trò tham dự */}
               <div
                 onClick={() => setActiveCard("role")}
-                className={`rounded-xl border bg-white p-6 shadow-sm transition-all ${
-                  activeCard === "role" ? "border-l-4 border-l-[#673ab7] border-gray-300" : "border-gray-200"
-                }`}
+                className={`rounded-xl border bg-white p-6 shadow-sm transition-all ${activeCard === "role" ? "border-l-4 border-l-[#673ab7] border-gray-300" : "border-gray-200"
+                  }`}
               >
                 <label className="block text-sm font-semibold text-gray-900 mb-3">
                   5. Vai trò tham dự của Quý vị <span className="text-red-500">*</span>
                 </label>
                 <div className="space-y-2.5">
                   {[
-                    "Hội viên chính thức (Official Member)",
+                    "Học viên chính thức (Official Member)",
                     "Khách mời VIP / Diễn giả (VIP Speaker)",
                     "Đại diện Nhà tài trợ (Sponsor Delegate)",
                     "Doanh nhân tìm hiểu gia nhập Hiệp hội",
@@ -412,9 +407,8 @@ export function GoogleFormEventRegistrationModal({
               {/* Card 7: Nhu cầu B2B Matching */}
               <div
                 onClick={() => setActiveCard("b2bNeeds")}
-                className={`rounded-xl border bg-white p-6 shadow-sm transition-all ${
-                  activeCard === "b2bNeeds" ? "border-l-4 border-l-[#673ab7] border-gray-300" : "border-gray-200"
-                }`}
+                className={`rounded-xl border bg-white p-6 shadow-sm transition-all ${activeCard === "b2bNeeds" ? "border-l-4 border-l-[#673ab7] border-gray-300" : "border-gray-200"
+                  }`}
               >
                 <label className="block text-sm font-semibold text-gray-900 mb-1">
                   6. Nhu cầu kết nối giao thương B2B (Matchmaking)
@@ -434,9 +428,8 @@ export function GoogleFormEventRegistrationModal({
               {/* Card 8: Câu hỏi cho diễn giả */}
               <div
                 onClick={() => setActiveCard("speakerQuestions")}
-                className={`rounded-xl border bg-white p-6 shadow-sm transition-all ${
-                  activeCard === "speakerQuestions" ? "border-l-4 border-l-[#673ab7] border-gray-300" : "border-gray-200"
-                }`}
+                className={`rounded-xl border bg-white p-6 shadow-sm transition-all ${activeCard === "speakerQuestions" ? "border-l-4 border-l-[#673ab7] border-gray-300" : "border-gray-200"
+                  }`}
               >
                 <label className="block text-sm font-semibold text-gray-900 mb-1">
                   7. Câu hỏi hoặc vấn đề gửi đến Diễn giả / Ban tổ chức
@@ -456,15 +449,14 @@ export function GoogleFormEventRegistrationModal({
               {/* Card 9: Bàn tiệc Gala & Chế độ ăn */}
               <div
                 onClick={() => setActiveCard("banquetChoice")}
-                className={`rounded-xl border bg-white p-6 shadow-sm transition-all ${
-                  activeCard === "banquetChoice" ? "border-l-4 border-l-[#673ab7] border-gray-300" : "border-gray-200"
-                }`}
+                className={`rounded-xl border bg-white p-6 shadow-sm transition-all ${activeCard === "banquetChoice" ? "border-l-4 border-l-[#673ab7] border-gray-300" : "border-gray-200"
+                  }`}
               >
                 <label className="block text-sm font-semibold text-gray-900 mb-1">
                   8. Đăng ký vị trí Bàn tiệc Gala & Khẩu phần ăn
                 </label>
                 <p className="text-xs text-gray-500 mb-3">
-                  Ban tổ chức bố trí bàn tiệc theo chuyên đề để quý hội viên dễ dàng giao lưu cùng đối tác tiềm năng.
+                  Ban tổ chức bố trí bàn tiệc theo chuyên đề để quý Học viên dễ dàng giao lưu cùng đối tác tiềm năng.
                 </p>
                 <div className="space-y-3 mt-2">
                   <div>
@@ -512,9 +504,8 @@ export function GoogleFormEventRegistrationModal({
               {/* Card 10: Tệp hồ sơ doanh nghiệp */}
               <div
                 onClick={() => setActiveCard("attachment")}
-                className={`rounded-xl border bg-white p-6 shadow-sm transition-all ${
-                  activeCard === "attachment" ? "border-l-4 border-l-[#673ab7] border-gray-300" : "border-gray-200"
-                }`}
+                className={`rounded-xl border bg-white p-6 shadow-sm transition-all ${activeCard === "attachment" ? "border-l-4 border-l-[#673ab7] border-gray-300" : "border-gray-200"
+                  }`}
               >
                 <label className="block text-sm font-semibold text-gray-900 mb-1">
                   9. Tệp đính kèm: Hồ sơ Năng lực / Profile Doanh nghiệp
@@ -555,7 +546,7 @@ export function GoogleFormEventRegistrationModal({
                       company: "",
                       jobTitle: "",
                       industry: "",
-                      role: "Hội viên chính thức (Official Member)",
+                      role: "Học viên chính thức (Official Member)",
                       b2bNeeds: "",
                       speakerQuestions: "",
                       banquetChoice: "Bàn Tiệc VIP Gala 01 (Chủ tịch & Ban Cố Vấn)",

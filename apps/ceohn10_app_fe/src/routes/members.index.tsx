@@ -82,7 +82,7 @@ export function getMemberDepartment(m: any): string {
   if (s.includes("thư ký") || s.includes("điều phối")) return "Ban Thư ký";
   if (s.includes("truyền thông") || s.includes("sự kiện")) return "Ban Truyền thông";
   if (s.includes("xúc tiến") || s.includes("thương mại") || s.includes("b2b")) return "Ban Xúc tiến";
-  if (s.includes("thành viên") && !s.includes("hội viên") && !s.includes("ceo")) return "Ban Thành viên";
+  if (s.includes("thành viên") && !s.includes("Học viên") && !s.includes("ceo")) return "Ban Thành viên";
   if (s.includes("thiện nguyện") || s.includes("tài chính") || s.includes("an sinh")) return "Ban Thiện nguyện";
   if (d && d !== "—" && d !== "undefined" && d !== "null") return String(d);
   if (m?.industry === "ind.it") return "Ban Quản trị";
@@ -446,7 +446,7 @@ function MembersPage() {
 
       if (editing) {
         if (!can(PERMISSIONS.MEMBER_EDIT)) {
-          toast.error("Bạn không có quyền chỉnh sửa thông tin hội viên!");
+          toast.error("Bạn không có quyền chỉnh sửa thông tin Học viên!");
           return;
         }
         await fetchNestApi(`/members/${editing.id}`, {
@@ -474,7 +474,7 @@ function MembersPage() {
                 },
               }),
             });
-          } catch {}
+          } catch { }
 
           // 2. Đặc biệt nếu ở Ban Truyền Thông khi được gán quyền quét mã checkin sự kiện
           const isMedia = /truyền thông|media|btt/i.test(deptName);
@@ -491,11 +491,11 @@ function MembersPage() {
                   department: deptName,
                 }),
               }).catch(() => null);
-            } catch {}
+            } catch { }
           }
         }
 
-        toast.success(t("members.updated") || "Cập nhật thông tin hội viên thành công");
+        toast.success(t("members.updated") || "Cập nhật thông tin Học viên thành công");
         setEditing(null);
       }
       await qc.invalidateQueries({ queryKey: ["members"] });
@@ -522,7 +522,7 @@ function MembersPage() {
     setSubmitting(true);
     try {
       await fetchNestApi(`/members/${targetId}?mode=all`, { method: "DELETE" });
-      toast.success(`Đã xóa vĩnh viễn hội viên "${deleting.name}", doanh nghiệp và tài khoản.`);
+      toast.success(`Đã xóa vĩnh viễn Học viên "${deleting.name}", doanh nghiệp và tài khoản.`);
       setDeleting(null);
       setDeleteMode("choose");
       qc.setQueryData(["members"], (old: Member[] | undefined) =>
@@ -544,7 +544,7 @@ function MembersPage() {
     setSubmitting(true);
     try {
       await fetchNestApi(`/members/${targetId}?mode=company_only`, { method: "DELETE" });
-      toast.success(`Đã xóa thông tin doanh nghiệp của hội viên "${deleting.name}".`);
+      toast.success(`Đã xóa thông tin doanh nghiệp của Học viên "${deleting.name}".`);
       setDeleteMode("confirm_member_only");
       await qc.invalidateQueries({ queryKey: ["members"] });
       await refetch();
@@ -568,7 +568,7 @@ function MembersPage() {
     setSubmitting(true);
     try {
       await fetchNestApi(`/members/${targetId}?mode=all`, { method: "DELETE" });
-      toast.success(`Đã xóa hồ sơ hội viên và tài khoản "${deleting.name}" thành công.`);
+      toast.success(`Đã xóa hồ sơ Học viên và tài khoản "${deleting.name}" thành công.`);
       setDeleting(null);
       setDeleteMode("choose");
       qc.setQueryData(["members"], (old: Member[] | undefined) =>
@@ -599,13 +599,13 @@ function MembersPage() {
         const target = old.find((item) => item.id === m.id);
         const updatedItem = target
           ? {
-              ...target,
-              feePaid: newStatus !== "unpaid",
-              payment_status: newStatus,
-              paymentStatus: newStatus,
-              updatedAt: new Date().toISOString(),
-              updated_at: new Date().toISOString(),
-            }
+            ...target,
+            feePaid: newStatus !== "unpaid",
+            payment_status: newStatus,
+            paymentStatus: newStatus,
+            updatedAt: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          }
           : null;
         if (!updatedItem) return old;
         // Đưa bản ghi vừa cập nhật lên đầu danh sách (STT 1)
@@ -631,12 +631,12 @@ function MembersPage() {
 
   const handleApproveAndSendCredentials = async (m: Member) => {
     if (!canApprove) {
-      toast.error("Thẩm quyền hạn chế: Chỉ Ban Thành Viên hoặc Ban Quản Trị mới có thẩm quyền kiểm duyệt và phê duyệt hội viên!");
+      toast.error("Thẩm quyền hạn chế: Chỉ Ban Thành Viên hoặc Ban Quản Trị mới có thẩm quyền kiểm duyệt và phê duyệt Học viên!");
       return;
     }
     if (
       !confirm(
-        `[Ban Thành Viên Thẩm Định]\n\nXác nhận phê duyệt kết nạp hội viên "${m.name}"?\n\nHệ thống sẽ cấp mã hội viên chính thức, kích hoạt tài khoản và tự động gửi email thông tin đăng nhập đến: ${m.email || "email hội viên"}`
+        `[Ban Thành Viên Thẩm Định]\n\nXác nhận phê duyệt kết nạp Học viên "${m.name}"?\n\nHệ thống sẽ cấp mã Học viên chính thức, kích hoạt tài khoản và tự động gửi email thông tin đăng nhập đến: ${m.email || "email Học viên"}`
       )
     ) {
       return;
@@ -765,14 +765,14 @@ function MembersPage() {
   };
 
   const memberExcelColumns = [
-    { header: "Mã hội viên", key: "code", width: 16, value: (m: Member) => m.code },
+    { header: "Mã Học viên", key: "code", width: 16, value: (m: Member) => m.code },
     { header: "Họ và tên", key: "name", width: 28, value: (m: Member) => m.name },
     { header: "Ban chuyên môn", key: "department", width: 24, value: (m: Member) => getMemberDepartment(m) },
     { header: "Doanh nghiệp / Liên hệ", key: "contact", width: 30, value: (m: Member) => m.contact },
     { header: "Email", key: "email", width: 26, value: (m: Member) => m.email },
     { header: "Số điện thoại", key: "phone", width: 16, value: (m: Member) => m.phone },
     { header: "Phân loại", key: "type", width: 16, value: (m: Member) => m.type },
-    { header: "Hạng hội viên", key: "level", width: 18, value: (m: Member) => m.level },
+    { header: "Hạng Học viên", key: "level", width: 18, value: (m: Member) => m.level },
     { header: "Ngành nghề", key: "industry", width: 22, value: (m: Member) => m.industry },
     { header: "Khu vực", key: "region", width: 16, value: (m: Member) => m.region },
     { header: "Trạng thái", key: "status", width: 16, value: (m: Member) => (m.status === "active" ? "Đang hoạt động" : "Chờ duyệt") },
@@ -783,36 +783,36 @@ function MembersPage() {
 
   const handleExport = () => {
     exportToExcel<Member>({
-      title: "DANH BẠ HỘI VIÊN CHÍNH THỨC CLB DOANH NHÂN CEO HN10",
+      title: "DANH BẠ Học viên CHÍNH THỨC CLB DOANH NHÂN CEO HN10",
       subtitle: "Trực thuộc Hội Doanh Nhân Trẻ Hà Nội (HanoiBA)",
       filename: "danh-ba-hoi-vien-ceohn10",
       sheetName: "Danh_Ba_Hoi_Vien",
       data: tc.sorted,
       columns: memberExcelColumns,
       summaryRows: [
-        ["TỔNG SỐ HỘI VIÊN:", "", "", "", "", "", "", "", "", "", "", `${tc.sorted.length} hội viên`],
+        ["TỔNG SỐ Học viên:", "", "", "", "", "", "", "", "", "", "", `${tc.sorted.length} Học viên`],
       ],
-      signerTitles: ["NGƯỜI LẬP BIỂU", "TRƯỞNG BAN HỘI VIÊN", "CHỦ TỊCH CLB CEO HN10"],
+      signerTitles: ["NGƯỜI LẬP BIỂU", "TRƯỞNG BAN Học viên", "CHỦ TỊCH CLB CEO HN10"],
     });
-    toast.success("Đã xuất danh bạ hội viên chuẩn doanh nghiệp CEO HN10 (.xlsx)!");
+    toast.success("Đã xuất danh bạ Học viên chuẩn doanh nghiệp CEO HN10 (.xlsx)!");
   };
 
   const handleExportSelected = () => {
     const rows = members.filter((m) => sel.has(m.id));
     if (rows.length === 0) return;
     exportToExcel<Member>({
-      title: "DANH SÁCH HỘI VIÊN ĐƯỢC CHỌN - CEO HN10",
+      title: "DANH SÁCH Học viên ĐƯỢC CHỌN - CEO HN10",
       subtitle: "Trực thuộc Hội Doanh Nhân Trẻ Hà Nội (HanoiBA)",
       filename: "hoi-vien-duoc-chon",
       sheetName: "Hoi_Vien_Chon_Loc",
       data: rows,
       columns: memberExcelColumns,
       summaryRows: [
-        ["TỔNG SỐ HỘI VIÊN ĐƯỢC CHỌN:", "", "", "", "", "", "", "", "", "", "", `${rows.length} hội viên`],
+        ["TỔNG SỐ Học viên ĐƯỢC CHỌN:", "", "", "", "", "", "", "", "", "", "", `${rows.length} Học viên`],
       ],
-      signerTitles: ["NGƯỜI LẬP BIỂU", "TRƯỞNG BAN HỘI VIÊN", "CHỦ TỊCH CLB CEO HN10"],
+      signerTitles: ["NGƯỜI LẬP BIỂU", "TRƯỞNG BAN Học viên", "CHỦ TỊCH CLB CEO HN10"],
     });
-    toast.success("Đã xuất danh sách hội viên được chọn ra file Excel (.xlsx)!");
+    toast.success("Đã xuất danh sách Học viên được chọn ra file Excel (.xlsx)!");
   };
 
   const toggleSel = (id: string) =>
@@ -881,22 +881,20 @@ function MembersPage() {
             <button
               onClick={() => setView("cards")}
               aria-pressed={view === "cards"}
-              className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${
-                view === "cards"
+              className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${view === "cards"
                   ? "bg-secondary text-foreground"
                   : "text-muted-foreground hover:text-foreground"
-              }`}
+                }`}
             >
               <LayoutGrid className="h-4 w-4" /> {t("mlist.viewCards")}
             </button>
             <button
               onClick={() => setView("table")}
               aria-pressed={view === "table"}
-              className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${
-                view === "table"
+              className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${view === "table"
                   ? "bg-secondary text-foreground"
                   : "text-muted-foreground hover:text-foreground"
-              }`}
+                }`}
             >
               <List className="h-4 w-4" /> {t("mlist.viewTable")}
             </button>
@@ -918,7 +916,7 @@ function MembersPage() {
         <div className="flex h-32 flex-col justify-between rounded-2xl border border-border/80 bg-card p-4 shadow-[var(--shadow-card)] transition-all hover:border-primary/40 hover:shadow-sm">
           <div className="flex items-center justify-between gap-2">
             <span className="truncate text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-              Tổng Hội Viên
+              Tổng Học viên
             </span>
             <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
               <User className="h-4 w-4" />
@@ -984,7 +982,7 @@ function MembersPage() {
               {paidCount} / {members.length}
             </div>
             <div className="mt-1 truncate text-[11px] text-muted-foreground">
-              Còn {unpaidCount} hội viên chưa hoàn tất phí
+              Còn {unpaidCount} Học viên chưa hoàn tất phí
             </div>
           </div>
         </div>
@@ -1014,21 +1012,19 @@ function MembersPage() {
       <div className="flex items-center gap-2 mb-4 overflow-x-auto pb-1">
         <button
           onClick={() => setStatus("all")}
-          className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors cursor-pointer ${
-            status === "all"
+          className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors cursor-pointer ${status === "all"
               ? "bg-[#003B95] text-white shadow-sm"
               : "bg-card border border-border text-foreground hover:bg-muted"
-          }`}
+            }`}
         >
           Tất cả ({members.length})
         </button>
         <button
           onClick={() => setStatus("pending")}
-          className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap flex items-center gap-1.5 transition-colors cursor-pointer ${
-            status === "pending"
+          className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap flex items-center gap-1.5 transition-colors cursor-pointer ${status === "pending"
               ? "bg-amber-600 text-white shadow-sm"
               : "bg-amber-50 text-amber-800 border border-amber-200 hover:bg-amber-100"
-          }`}
+            }`}
         >
           <span>Chờ phê duyệt</span>
           {pendingCount > 0 && (
@@ -1039,42 +1035,38 @@ function MembersPage() {
         </button>
         <button
           onClick={() => setStatus("active")}
-          className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors cursor-pointer ${
-            status === "active"
+          className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors cursor-pointer ${status === "active"
               ? "bg-emerald-600 text-white shadow-sm"
               : "bg-card border border-border text-foreground hover:bg-muted"
-          }`}
+            }`}
         >
           Đang hoạt động ({members.filter((m) => m.status === "active").length})
         </button>
         <button
           onClick={() => setStatus("expired")}
-          className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors cursor-pointer ${
-            status === "expired"
+          className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors cursor-pointer ${status === "expired"
               ? "bg-rose-600 text-white shadow-sm"
               : "bg-card border border-border text-foreground hover:bg-muted"
-          }`}
+            }`}
         >
           Hết hạn ({members.filter((m) => m.status === "expired").length})
         </button>
         <div className="h-5 w-px bg-border mx-1 shrink-0" />
         <button
           onClick={() => setPaymentFilter(paymentFilter === "paid" ? "all" : "paid")}
-          className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors cursor-pointer ${
-            paymentFilter === "paid"
+          className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors cursor-pointer ${paymentFilter === "paid"
               ? "bg-emerald-600 text-white shadow-sm"
               : "bg-emerald-50 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 hover:bg-emerald-100"
-          }`}
+            }`}
         >
           ✓ Đã thanh toán ({paidCount})
         </button>
         <button
           onClick={() => setPaymentFilter(paymentFilter === "unpaid" ? "all" : "unpaid")}
-          className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors cursor-pointer ${
-            paymentFilter === "unpaid"
+          className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors cursor-pointer ${paymentFilter === "unpaid"
               ? "bg-rose-600 text-white shadow-sm"
               : "bg-rose-50 text-rose-800 dark:bg-rose-950/40 dark:text-rose-300 border border-rose-200 dark:border-rose-800 hover:bg-rose-100"
-          }`}
+            }`}
         >
           ✗ Chưa thanh toán ({unpaidCount})
         </button>
@@ -1133,11 +1125,10 @@ function MembersPage() {
           <button
             onClick={() => setFavOnly((v) => !v)}
             aria-pressed={favOnly}
-            className={`inline-flex h-9 items-center gap-1.5 rounded-lg border px-3 text-sm font-medium transition-colors ${
-              favOnly
+            className={`inline-flex h-9 items-center gap-1.5 rounded-lg border px-3 text-sm font-medium transition-colors ${favOnly
                 ? "border-primary/40 bg-primary/10 text-primary"
                 : "border-border bg-background text-foreground hover:bg-muted"
-            }`}
+              }`}
           >
             <Star className={`h-4 w-4 ${favOnly ? "fill-current" : ""}`} />{" "}
             {t("mlist.onlyFavorites")}
@@ -1361,11 +1352,10 @@ function MembersPage() {
                         aria-label="Lọc trạng thái thanh toán"
                         value={paymentFilter}
                         onChange={(e) => setPaymentFilter(e.target.value as any)}
-                        className={`text-[11px] font-semibold rounded px-1.5 py-0.5 border cursor-pointer ${
-                          paymentFilter !== "all"
+                        className={`text-[11px] font-semibold rounded px-1.5 py-0.5 border cursor-pointer ${paymentFilter !== "all"
                             ? "bg-primary text-primary-foreground border-primary"
                             : "bg-background/80 text-muted-foreground border-border"
-                        }`}
+                          }`}
                         title="Lọc trạng thái thanh toán"
                       >
                         <option value="all">Tất cả</option>
@@ -1616,14 +1606,14 @@ function MembersPage() {
                     <AlertTriangle className="h-5 w-5" />
                   </div>
                   <div>
-                    <h3 className="text-base font-bold text-foreground">Xác nhận xóa hội viên</h3>
+                    <h3 className="text-base font-bold text-foreground">Xác nhận xóa Học viên</h3>
                     <p className="text-xs text-muted-foreground">Lựa chọn phương án xóa hồ sơ và dữ liệu liên kết</p>
                   </div>
                 </div>
 
                 <div className="mt-4 rounded-xl border border-border/80 bg-muted/30 p-3.5 space-y-2 text-xs">
                   <div className="flex justify-between items-center">
-                    <span className="text-muted-foreground">Hội viên:</span>
+                    <span className="text-muted-foreground">Học viên:</span>
                     <strong className="text-foreground font-semibold">{deleting.name} ({deleting.code})</strong>
                   </div>
                   <div className="flex justify-between items-center">
@@ -1637,8 +1627,8 @@ function MembersPage() {
                 </div>
 
                 <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
-                  Hội viên này đang gắn liền với dữ liệu doanh nghiệp và tài khoản quản trị/thành viên.
-                  Bạn có thể chọn <strong>xóa riêng doanh nghiệp trước</strong> (sau đó quay lại xóa hội viên) hoặc <strong>xóa toàn diện cả hội viên và doanh nghiệp</strong> ở cả 2 bảng.
+                  Học viên này đang gắn liền với dữ liệu doanh nghiệp và tài khoản quản trị/thành viên.
+                  Bạn có thể chọn <strong>xóa riêng doanh nghiệp trước</strong> (sau đó quay lại xóa Học viên) hoặc <strong>xóa toàn diện cả Học viên và doanh nghiệp</strong> ở cả 2 bảng.
                 </p>
 
                 <div className="mt-5 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-end">
@@ -1664,7 +1654,7 @@ function MembersPage() {
                     disabled={submitting}
                     className="order-1 sm:order-3 rounded-xl bg-destructive px-3.5 py-2 text-xs font-semibold text-destructive-foreground hover:bg-destructive/90 disabled:opacity-50 cursor-pointer shadow-sm transition-colors"
                   >
-                    2. Xóa cả hội viên và doanh nghiệp
+                    2. Xóa cả Học viên và doanh nghiệp
                   </button>
                 </div>
               </>
@@ -1676,13 +1666,13 @@ function MembersPage() {
                   </div>
                   <div>
                     <h3 className="text-base font-bold text-foreground">Đã xóa doanh nghiệp liên kết</h3>
-                    <p className="text-xs text-muted-foreground">Tiến hành xóa hồ sơ hội viên và tài khoản</p>
+                    <p className="text-xs text-muted-foreground">Tiến hành xóa hồ sơ Học viên và tài khoản</p>
                   </div>
                 </div>
 
                 <div className="mt-4 rounded-xl border border-emerald-200 dark:border-emerald-900/50 bg-emerald-50/50 dark:bg-emerald-950/20 p-3.5 text-xs text-emerald-800 dark:text-emerald-200">
-                  Dữ liệu doanh nghiệp của hội viên <strong>{deleting.name}</strong> đã được gỡ bỏ khỏi bảng doanh nghiệp.
-                  Bạn có muốn tiếp tục xóa vĩnh viễn hồ sơ hội viên và tài khoản đăng nhập không?
+                  Dữ liệu doanh nghiệp của Học viên <strong>{deleting.name}</strong> đã được gỡ bỏ khỏi bảng doanh nghiệp.
+                  Bạn có muốn tiếp tục xóa vĩnh viễn hồ sơ Học viên và tài khoản đăng nhập không?
                 </div>
 
                 <div className="mt-5 flex items-center justify-end gap-2">
@@ -1694,14 +1684,14 @@ function MembersPage() {
                     disabled={submitting}
                     className="rounded-xl border border-border bg-card px-4 py-2 text-xs font-medium text-foreground hover:bg-muted disabled:opacity-50 cursor-pointer"
                   >
-                    Giữ lại hồ sơ hội viên
+                    Giữ lại hồ sơ Học viên
                   </button>
                   <button
                     onClick={onConfirmDeleteMemberOnly}
                     disabled={submitting}
                     className="rounded-xl bg-destructive px-4 py-2 text-xs font-semibold text-destructive-foreground hover:bg-destructive/90 disabled:opacity-50 cursor-pointer shadow-sm"
                   >
-                    Xác nhận xóa hội viên &amp; tài khoản
+                    Xác nhận xóa Học viên &amp; tài khoản
                   </button>
                 </div>
               </>
@@ -1815,9 +1805,8 @@ function MemberCard({
 }) {
   return (
     <div
-      className={`vba-pop-in group relative flex flex-col rounded-2xl border bg-card p-5 shadow-[var(--shadow-card)] transition-all duration-[var(--motion-base)] hover:-translate-y-0.5 hover:shadow-[var(--shadow-elevated)] ${
-        selected ? "border-primary ring-1 ring-primary/30" : "border-border"
-      }`}
+      className={`vba-pop-in group relative flex flex-col rounded-2xl border bg-card p-5 shadow-[var(--shadow-card)] transition-all duration-[var(--motion-base)] hover:-translate-y-0.5 hover:shadow-[var(--shadow-elevated)] ${selected ? "border-primary ring-1 ring-primary/30" : "border-border"
+        }`}
     >
       {/* top row: checkbox + fav/pin */}
       <div className="mb-3 flex items-start justify-between">
@@ -1833,9 +1822,8 @@ function MemberCard({
             onClick={onToggleFav}
             aria-label={t("mlist.addToFavorites")}
             aria-pressed={favorite}
-            className={`grid h-7 w-7 place-items-center rounded-lg transition-colors ${
-              favorite ? "text-warning" : "text-muted-foreground hover:bg-muted"
-            }`}
+            className={`grid h-7 w-7 place-items-center rounded-lg transition-colors ${favorite ? "text-warning" : "text-muted-foreground hover:bg-muted"
+              }`}
           >
             <Star className={`h-4 w-4 ${favorite ? "fill-current" : ""}`} />
           </button>
@@ -1843,9 +1831,8 @@ function MemberCard({
             onClick={onTogglePin}
             aria-label={pinned ? t("mlist.unpin") : t("mlist.pin")}
             aria-pressed={pinned}
-            className={`grid h-7 w-7 place-items-center rounded-lg transition-colors ${
-              pinned ? "text-primary" : "text-muted-foreground hover:bg-muted"
-            }`}
+            className={`grid h-7 w-7 place-items-center rounded-lg transition-colors ${pinned ? "text-primary" : "text-muted-foreground hover:bg-muted"
+              }`}
           >
             <Pin className={`h-4 w-4 ${pinned ? "fill-current" : ""}`} />
           </button>

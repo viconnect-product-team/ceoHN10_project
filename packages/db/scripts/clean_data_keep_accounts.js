@@ -175,7 +175,7 @@ async function main() {
       'c1983000-0000-4000-8000-000000000091', 'N198301',
       'Hội nghị Xúc tiến Thương mại & Kết nối Đầu tư Quốc tế Quý 3/2026',
       'Thông báo Ban Chấp Hành', 'Ban Thư Ký', now(), 342, 'published',
-      'Chương trình kết nối giao thương giữa các hội viên CLB CEO HN10 và các hiệp hội doanh nghiệp quốc tế.',
+      'Chương trình kết nối giao thương giữa các Học viên CLB CEO HN10 và các hiệp hội doanh nghiệp quốc tế.',
       'Toàn bộ kế hoạch tổ chức, danh sách đối tác và lịch trình chi tiết...',
       '/ceohn10_hero_cosmos_skyline.jpg', $1, now(), now()
     );

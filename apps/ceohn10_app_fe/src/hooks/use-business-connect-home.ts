@@ -72,8 +72,8 @@ export type BcMobileHomeData = {
    *           thẻ HÔM NAY (lọc theo loại / đổi cách sắp xếp / tăng số mục).
    */
   today:
-    | { status: "ok"; items: BcMobileTodayItem[]; pool: BcMobileTodayItem[] }
-    | { status: "error"; items: BcMobileTodayItem[]; pool: BcMobileTodayItem[] };
+  | { status: "ok"; items: BcMobileTodayItem[]; pool: BcMobileTodayItem[] }
+  | { status: "error"; items: BcMobileTodayItem[]; pool: BcMobileTodayItem[] };
   /** null = unread state unavailable → bell renders WITHOUT a badge. */
   unreadNotificationCount: number | null;
 };
@@ -219,7 +219,7 @@ export function useBusinessConnectHome() {
             avatarUrl = identity.profile?.avatarUrl ?? avatarUrl;
             email = identity.email ?? email;
           }
-        } catch {}
+        } catch { }
       }
 
       // 2. Overview & Unread
@@ -244,11 +244,11 @@ export function useBusinessConnectHome() {
         if (unreadRes.status === "fulfilled" && unreadRes.value) {
           unreadCount = unreadRes.value.count ?? 0;
         }
-      } catch {}
+      } catch { }
 
       return {
         identity: {
-          displayName: displayName || "Hội viên CEO HN10",
+          displayName: displayName || "Học viên CEO HN10",
           avatarUrl,
           email,
         },

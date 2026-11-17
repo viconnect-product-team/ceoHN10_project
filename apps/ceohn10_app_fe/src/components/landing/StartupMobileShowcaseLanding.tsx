@@ -123,7 +123,7 @@ export function StartupMobileShowcaseLanding({
     "Cộng đồng kết nối xúc tiến giao thương, nâng tầm quản trị thực chiến và bảo chứng tín nhiệm dành riêng cho các chủ doanh nghiệp CEO Hà Nội 10 (Quý Hợi) trực thuộc Hội Doanh nghiệp Trẻ Hà Nội (HanoiBA).";
   const heroUnderline = startup?.hero?.underlineAccent || "Kết Nối – Chia Sẻ – Bứt Phá!";
   const handPhoneImg = startup?.hero?.handPhoneImage || "/images/landing/hand_holding_phone_transparent.png";
-  const badge1 = startup?.hero?.floatingBadge1 || { title: "500+ Doanh Nghiệp", subtitle: "Hội viên chính thức HanoiBA" };
+  const badge1 = startup?.hero?.floatingBadge1 || { title: "500+ Doanh Nghiệp", subtitle: "Học viên chính thức HanoiBA" };
   const badge2 = startup?.hero?.floatingBadge2 || { title: "+105.8 Tỷ VNĐ", subtitle: "Giao thương B2B hoàn tất" };
   const ctaPrimaryText = startup?.hero?.ctaPrimaryText || "Khám Phá Ngay";
   const ctaSecondaryText = startup?.hero?.ctaSecondaryText || "Xem Video Giới Thiệu";
@@ -135,8 +135,8 @@ export function StartupMobileShowcaseLanding({
     startup?.ribbonStats && startup.ribbonStats.length > 0
       ? startup.ribbonStats
       : [
-        { value: "1.983+", label: "Hội Viên Doanh Nhân", desc: "Doanh nhân CEO HN10 toàn quốc" },
-        { value: "500+", label: "Doanh Nghiệp Thành Viên", desc: "Hội viên chính thức HanoiBA" },
+        { value: "1.983+", label: "Học viên Doanh Nhân", desc: "Doanh nhân CEO HN10 toàn quốc" },
+        { value: "500+", label: "Doanh Nghiệp Thành Viên", desc: "Học viên chính thức HanoiBA" },
         { value: "100+ Tỷ", label: "VNĐ Giao Thương B2B", desc: "Giá trị kết nối hoàn tất" },
         { value: "98%", label: "Tín Nhiệm Hài Lòng", desc: "Đánh giá giao thương thực chất" },
       ];
@@ -145,7 +145,7 @@ export function StartupMobileShowcaseLanding({
   const phoneFeatures = {
     b2b: {
       title: "Sàn Thương Mại B2B",
-      desc: "Niêm yết hơn 500+ sản phẩm & dịch vụ độc quyền từ các doanh nghiệp hội viên",
+      desc: "Niêm yết hơn 500+ sản phẩm & dịch vụ độc quyền từ các doanh nghiệp Học viên",
       stat: "500+ Sản phẩm B2B",
       badge: "Ưu đãi nội khối 15-30%",
       items: [
@@ -166,12 +166,12 @@ export function StartupMobileShowcaseLanding({
       ],
     },
     card: {
-      title: "Thẻ Hội Viên Điện Tử",
+      title: "Thẻ Học viên Điện Tử",
       desc: "Định danh doanh nhân chuẩn xác, tích hợp mã QR cá nhân check-in tức thì",
       stat: "100% Xác thực",
       badge: "Chuẩn NFC & QR Code",
       items: [
-        { name: "Mã Hội Viên: CEO HN10-8888", price: "VIP Member", author: "Chủ Tịch Lê Thị Dung" },
+        { name: "Mã Học viên: CEO HN10-8888", price: "VIP Member", author: "Chủ Tịch Lê Thị Dung" },
         { name: "Doanh nghiệp: Tập đoàn CEO HN10", price: "Hà Nội", author: "Nhiệm kỳ 2024-2029" },
         { name: "Trạng thái: Đang hoạt động", price: "Bảo trợ HanoiBA", author: "Thẻ Doanh Nhân Số" },
       ],
@@ -202,7 +202,7 @@ export function StartupMobileShowcaseLanding({
   const defaultTestimonials = [
     {
       quote:
-        "Nền tảng số hóa của CLB giúp các hội viên trao đổi cơ hội kinh doanh chỉ trong 1 chạm. Qua các phiên Business Matching và chia sẻ cơ hội B2B, doanh nghiệp tôi đã kết nối thành công nhiều hợp đồng chiến lược giá trị cao.",
+        "Nền tảng số hóa của CLB giúp các Học viên trao đổi cơ hội kinh doanh chỉ trong 1 chạm. Qua các phiên Business Matching và chia sẻ cơ hội B2B, doanh nghiệp tôi đã kết nối thành công nhiều hợp đồng chiến lược giá trị cao.",
       author: "Trần Tuấn Anh",
       role: "Phó Chủ Tịch CLB, CEO ViConnect Tech",
       company: "Ban Điều Hành CEO HN10",
@@ -229,7 +229,7 @@ export function StartupMobileShowcaseLanding({
     },
     {
       quote:
-        "Các chương trình CEO Talk, Business Tour và tọa đàm chuyên đề mang lại giá trị tri thức thực chiến vô cùng quý báu, giúp các doanh nghiệp hội viên tự tin tháo gỡ điểm nghẽn và bứt phá mạnh mẽ.",
+        "Các chương trình CEO Talk, Business Tour và tọa đàm chuyên đề mang lại giá trị tri thức thực chiến vô cùng quý báu, giúp các doanh nghiệp Học viên tự tin tháo gỡ điểm nghẽn và bứt phá mạnh mẽ.",
       author: "Đỗ Minh Đức",
       role: "Trưởng Ban Đào Tạo & Doanh Trí",
       company: "Ban Chuyên Môn CEO HN10",
@@ -243,11 +243,11 @@ export function StartupMobileShowcaseLanding({
 
   // Map chapter pins data matching Frame 00:07 - 00:08
   const defaultChapterPins = [
-    { id: "hanoi", name: "Hà Nội — Trụ Sở Chính", count: "1.250+ Hội viên", desc: "Cung Tri Thức, Số 1 Tôn Thất Thuyết, Cầu Giấy", x: "48%", y: "22%" },
-    { id: "haiphong", name: "Hải Phòng & Quảng Ninh", count: "210+ Hội viên", desc: "Cụm Công nghiệp & Cảng biển Logistics Đông Bắc", x: "55%", y: "27%" },
-    { id: "danang", name: "Đà Nẵng & Miền Trung", count: "185+ Hội viên", desc: "Trung tâm xúc tiến đầu tư Du lịch & Dịch vụ", x: "57%", y: "48%" },
-    { id: "hcm", name: "TP. Hồ Chí Minh", count: "320+ Hội viên", desc: "VP Đại diện Phía Nam & Kết nối thị trường tài chính", x: "52%", y: "78%" },
-    { id: "cantho", name: "Cần Thơ & ĐBSCL", count: "95+ Hội viên", desc: "Mạng lưới kết nối Nông sản & Xuất khẩu", x: "46%", y: "85%" },
+    { id: "hanoi", name: "Hà Nội — Trụ Sở Chính", count: "1.250+ Học viên", desc: "Cung Tri Thức, Số 1 Tôn Thất Thuyết, Cầu Giấy", x: "48%", y: "22%" },
+    { id: "haiphong", name: "Hải Phòng & Quảng Ninh", count: "210+ Học viên", desc: "Cụm Công nghiệp & Cảng biển Logistics Đông Bắc", x: "55%", y: "27%" },
+    { id: "danang", name: "Đà Nẵng & Miền Trung", count: "185+ Học viên", desc: "Trung tâm xúc tiến đầu tư Du lịch & Dịch vụ", x: "57%", y: "48%" },
+    { id: "hcm", name: "TP. Hồ Chí Minh", count: "320+ Học viên", desc: "VP Đại diện Phía Nam & Kết nối thị trường tài chính", x: "52%", y: "78%" },
+    { id: "cantho", name: "Cần Thơ & ĐBSCL", count: "95+ Học viên", desc: "Mạng lưới kết nối Nông sản & Xuất khẩu", x: "46%", y: "85%" },
   ];
 
   const activePins =
@@ -301,16 +301,16 @@ export function StartupMobileShowcaseLanding({
       answer: "Sứ mệnh của CLB là kiến tạo cộng đồng doanh nhân bản lĩnh, trí tuệ và nhân văn. Các hoạt động cốt lõi gồm: Xúc tiến giao thương B2B (Business Matching & Business Tour), Đào tạo nâng tầm quản trị (CEO Talk & CEO Exchange), Đặt lịch hẹn 1-on-1 giữa các lãnh đạo và các hoạt động trách nhiệm xã hội CSR (Áo ấm vùng cao, xây nhà tình nghĩa).",
     },
     {
-      question: "Điều kiện để gia nhập trở thành Hội viên chính thức của CLB?",
-      answer: "Hội viên là các Doanh nhân, Chủ tịch HĐQT, CEO, Tổng giám đốc hoặc Cấp quản lý doanh nghiệp CEO Hà Nội 10 (Quý Hợi). Hồ sơ gia nhập sẽ được Ban Thẩm định và Ban Điều hành phê duyệt theo đúng quy chế hiệp hội của HanoiBA.",
+      question: "Điều kiện để gia nhập trở thành Học viên chính thức của CLB?",
+      answer: "Học viên là các Doanh nhân, Chủ tịch HĐQT, CEO, Tổng giám đốc hoặc Cấp quản lý doanh nghiệp CEO Hà Nội 10 (Quý Hợi). Hồ sơ gia nhập sẽ được Ban Thẩm định và Ban Điều hành phê duyệt theo đúng quy chế hiệp hội của HanoiBA.",
     },
     {
-      question: "Ứng dụng di động CEO HN10 mang lại những lợi ích gì cho hội viên?",
+      question: "Ứng dụng di động CEO HN10 mang lại những lợi ích gì cho Học viên?",
       answer: "Ứng dụng cung cấp trọn vẹn giải pháp số hóa: Thẻ Doanh nhân số & mã QR định danh cá nhân, Sàn thương mại B2B niêm yết sản phẩm/dịch vụ ưu đãi nội khối 15-30%, công cụ đặt lịch hẹn kết nối 1-on-1 trực tiếp, biểu đồ thống kê cơ hội minh bạch và thông báo đẩy lịch sự kiện thời gian thực.",
     },
     {
       question: "Làm thế nào để đăng ký niêm yết sản phẩm lên Sàn B2B nội khối?",
-      answer: "Sau khi tài khoản hội viên được phê duyệt chính thức, bạn vào mục 'Sàn Thương Mại' trên app hoặc cổng CRM, chọn 'Đăng Sản Phẩm', nhập thông tin, hình ảnh, mức chiết khấu ưu đãi cho hội viên và gửi duyệt. Ban Giao thương sẽ thẩm định trong vòng 24 giờ làm việc.",
+      answer: "Sau khi tài khoản Học viên được phê duyệt chính thức, bạn vào mục 'Sàn Thương Mại' trên app hoặc cổng CRM, chọn 'Đăng Sản Phẩm', nhập thông tin, hình ảnh, mức chiết khấu ưu đãi cho Học viên và gửi duyệt. Ban Giao thương sẽ thẩm định trong vòng 24 giờ làm việc.",
     },
   ];
 
@@ -411,7 +411,7 @@ export function StartupMobileShowcaseLanding({
               { id: "features", label: "Tính năng App", href: "#features" },
               { id: "map", label: "Điểm cầu", href: "#map-section" },
               { id: "community", label: "Cộng đồng", href: "#community-section" },
-              { id: "testimonials", label: "Hội viên", href: "#testimonials-section" },
+              { id: "testimonials", label: "Học viên", href: "#testimonials-section" },
               { id: "faq", label: "Hỏi đáp FAQ", href: "#faq" },
             ].map((menu) => (
               <a
@@ -441,7 +441,7 @@ export function StartupMobileShowcaseLanding({
               to="/register"
               className="px-6 py-2.5 rounded-full border border-slate-300 hover:border-slate-400 bg-white hover:bg-slate-50 text-slate-800 text-xs font-bold transition shadow-2xs cursor-pointer inline-flex items-center justify-center"
             >
-              Đăng Ký Hội Viên
+              Đăng Ký Học viên
             </Link>
           </div>
 
@@ -484,7 +484,7 @@ export function StartupMobileShowcaseLanding({
               onClick={() => setMobileMenuOpen(false)}
               className="block py-2 px-3 rounded-lg text-sm font-bold text-slate-800 hover:bg-slate-50"
             >
-              Cộng Đồng Hội Viên
+              Cộng Đồng Học viên
             </a>
             <a
               href="#faq"
@@ -507,7 +507,7 @@ export function StartupMobileShowcaseLanding({
                 onClick={() => setMobileMenuOpen(false)}
                 className="w-full py-2.5 text-center text-xs font-bold rounded-full border border-slate-300 text-slate-800 inline-block"
               >
-                Đăng Ký Hội Viên Mới
+                Đăng Ký Học viên Mới
               </Link>
             </div>
           </div>
@@ -611,8 +611,8 @@ export function StartupMobileShowcaseLanding({
                     type="button"
                     onClick={() => setActiveAppTab(tab)}
                     className={`px-3 py-1.5 rounded-full text-xs font-bold transition cursor-pointer ${activeAppTab === tab
-                        ? "bg-[#003B95] text-white shadow-sm"
-                        : "bg-white hover:bg-slate-100 text-slate-600 border border-slate-200"
+                      ? "bg-[#003B95] text-white shadow-sm"
+                      : "bg-white hover:bg-slate-100 text-slate-600 border border-slate-200"
                       }`}
                   >
                     {tab === "b2b" && "Sàn B2B"}
@@ -769,7 +769,7 @@ export function StartupMobileShowcaseLanding({
                       {activeAppTab === "card" && (
                         <div className="p-1.5 rounded-lg bg-gradient-to-r from-[#003B95] to-blue-800 text-white text-[8px] space-y-0.5 shadow-xs">
                           <div className="flex items-center justify-between">
-                            <span className="font-bold">THẺ HỘI VIÊN CHÍNH THỨC</span>
+                            <span className="font-bold">THẺ Học viên CHÍNH THỨC</span>
                             <QrCode className="size-3" />
                           </div>
                           <p className="font-mono text-amber-300">CEO HN10-8888</p>
@@ -798,7 +798,7 @@ export function StartupMobileShowcaseLanding({
                       </div>
                       <div className="flex flex-col items-center gap-0.5">
                         <Users className="size-3" />
-                        <span>Hội viên</span>
+                        <span>Học viên</span>
                       </div>
                     </div>
                   </div>
@@ -857,7 +857,7 @@ export function StartupMobileShowcaseLanding({
                   to="/register"
                   className="inline-flex items-center gap-2 text-xs font-black text-[#003B95] hover:text-[#002660] group cursor-pointer"
                 >
-                  <span>Tìm hiểu quyền lợi &amp; Đăng ký hội viên</span>
+                  <span>Tìm hiểu quyền lợi &amp; Đăng ký Học viên</span>
                   <ArrowRight className="size-4 group-hover:translate-x-1 transition-transform" />
                 </Link>
               </div>
@@ -874,7 +874,7 @@ export function StartupMobileShowcaseLanding({
                   Sàn Thương Mại B2B
                 </h3>
                 <p className="mt-2 text-xs text-slate-600 leading-relaxed font-medium">
-                  Hơn 500+ sản phẩm &amp; dịch vụ độc quyền từ các doanh nghiệp hội viên với ưu đãi nội khối 15-30%.
+                  Hơn 500+ sản phẩm &amp; dịch vụ độc quyền từ các doanh nghiệp Học viên với ưu đãi nội khối 15-30%.
                 </p>
               </div>
 
@@ -962,7 +962,7 @@ export function StartupMobileShowcaseLanding({
                 Vươn Tầm Toàn Quốc
               </h2>
               <p className="text-sm text-slate-600 leading-relaxed font-medium">
-                Khám phá các chi nhánh, điểm cầu giao thương và doanh nghiệp hội viên CEO HN10 trải dài từ Bắc chí Nam.
+                Khám phá các chi nhánh, điểm cầu giao thương và doanh nghiệp Học viên CEO HN10 trải dài từ Bắc chí Nam.
               </p>
 
               {/* Search Card Container matching Pinterest Video */}
@@ -1110,7 +1110,7 @@ export function StartupMobileShowcaseLanding({
           <div className="flex items-center justify-between mb-10">
             <div>
               <span className="text-xs font-black uppercase tracking-wider text-amber-700 px-3.5 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/20">
-                Tín Nhiệm Hội Viên
+                Tín Nhiệm Học viên
               </span>
               <h2 className="mt-3 text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
                 Doanh Nhân Đồng Niên Chia Sẻ Về CEO HN10
@@ -1149,8 +1149,8 @@ export function StartupMobileShowcaseLanding({
                   key={idx}
                   onClick={() => setActiveTestimonialIdx(idx)}
                   className={`p-7 rounded-3xl bg-white border transition duration-300 flex flex-col justify-between cursor-pointer ${isSelected
-                      ? "border-[#003B95] shadow-xl ring-2 ring-[#003B95]/10 -translate-y-1"
-                      : "border-slate-200/90 shadow-2xs hover:shadow-md"
+                    ? "border-[#003B95] shadow-xl ring-2 ring-[#003B95]/10 -translate-y-1"
+                    : "border-slate-200/90 shadow-2xs hover:shadow-md"
                     }`}
                 >
                   <div className="space-y-4">
@@ -1200,7 +1200,7 @@ export function StartupMobileShowcaseLanding({
                 Về CLB CEO HN10?
               </h2>
               <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-medium">
-                Nếu bạn có bất kỳ câu hỏi nào cần giải đáp về quy chế gia nhập và quyền lợi hội viên, chúng tôi luôn sẵn sàng hỗ trợ.
+                Nếu bạn có bất kỳ câu hỏi nào cần giải đáp về quy chế gia nhập và quyền lợi Học viên, chúng tôi luôn sẵn sàng hỗ trợ.
               </p>
 
               {/* Integrated Pill Input Bar matching Video Frame 00:15: [ Enter Phone/Email | Submit ] */}
@@ -1384,7 +1384,7 @@ export function StartupMobileShowcaseLanding({
                 </div>
                 <h4 className="text-lg font-black text-slate-900">Đăng Ký Thành Công!</h4>
                 <p className="text-xs text-slate-600">
-                  Cảm ơn bạn. Ban Thư ký CLB Doanh Nhân CEO HN10 sẽ liên hệ và hướng dẫn hoàn thiện hồ sơ hội viên trong thời gian sớm nhất.
+                  Cảm ơn bạn. Ban Thư ký CLB Doanh Nhân CEO HN10 sẽ liên hệ và hướng dẫn hoàn thiện hồ sơ Học viên trong thời gian sớm nhất.
                 </p>
               </div>
             ) : (

@@ -23,7 +23,7 @@ export const Route = createFileRoute("/checkin-qr")({
       { title: "Mã QR check-in sự kiện | CEO HN10" },
       {
         name: "description",
-        content: "Hiển thị mã QR để hội viên quét check-in sự kiện hiệp hội nhanh chóng.",
+        content: "Hiển thị mã QR để Học viên quét check-in sự kiện hiệp hội nhanh chóng.",
       },
       { property: "og:title", content: "Mã QR check-in sự kiện | CEO HN10" },
       {
@@ -48,8 +48,8 @@ function EventQrCard({ event }: { event: CheckinQrEvent }) {
   const [writing, setWriting] = useState(false);
   const [qrMode, setQrMode] = useState<"register" | "checkin">("register");
 
-  const registerUrl = typeof window !== "undefined" 
-    ? `${window.location.origin}/guest-event-register/${event.id}` 
+  const registerUrl = typeof window !== "undefined"
+    ? `${window.location.origin}/guest-event-register/${event.id}`
     : `/guest-event-register/${event.id}`;
 
   const copyId = async () => {
@@ -101,8 +101,8 @@ function EventQrCard({ event }: { event: CheckinQrEvent }) {
         <div className="flex items-center justify-between gap-2">
           <h2 className="truncate text-base font-bold text-foreground">{event.name}</h2>
           <span className="shrink-0 rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-semibold text-primary">
-            {event.ticketPrice && Number(event.ticketPrice) > 0 
-              ? `${new Intl.NumberFormat("vi-VN").format(Number(event.ticketPrice))} đ` 
+            {event.ticketPrice && Number(event.ticketPrice) > 0
+              ? `${new Intl.NumberFormat("vi-VN").format(Number(event.ticketPrice))} đ`
               : "Miễn phí (0đ)"}
           </span>
         </div>
@@ -129,22 +129,20 @@ function EventQrCard({ event }: { event: CheckinQrEvent }) {
         <button
           type="button"
           onClick={() => setQrMode("register")}
-          className={`flex-1 rounded-md py-1.5 transition-all cursor-pointer ${
-            qrMode === "register"
+          className={`flex-1 rounded-md py-1.5 transition-all cursor-pointer ${qrMode === "register"
               ? "bg-card text-primary shadow-sm font-bold"
               : "text-muted-foreground hover:text-foreground"
-          }`}
+            }`}
         >
           ✦ QR Khách Mới Quét Đăng Ký
         </button>
         <button
           type="button"
           onClick={() => setQrMode("checkin")}
-          className={`flex-1 rounded-md py-1.5 transition-all cursor-pointer ${
-            qrMode === "checkin"
+          className={`flex-1 rounded-md py-1.5 transition-all cursor-pointer ${qrMode === "checkin"
               ? "bg-card text-foreground shadow-sm font-bold"
               : "text-muted-foreground hover:text-foreground"
-          }`}
+            }`}
         >
           QR Check-in Mã Vé
         </button>
@@ -174,7 +172,7 @@ function EventQrCard({ event }: { event: CheckinQrEvent }) {
                 {event.id}
               </code>
               <p className="text-muted-foreground text-[11px] leading-relaxed">
-                Dành cho hội viên đã có tài khoản quét check-in trực tiếp.
+                Dành cho Học viên đã có tài khoản quét check-in trực tiếp.
               </p>
             </>
           )}

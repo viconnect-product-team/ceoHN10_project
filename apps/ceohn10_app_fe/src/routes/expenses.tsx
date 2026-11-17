@@ -608,7 +608,7 @@ function ExpensesPage() {
             </button>
             <button
               onClick={() => openCreate(true)}
-              className="inline-flex items-center gap-1.5 rounded-xl bg-[#003B95] hover:bg-[#002B70] px-3.5 py-2 text-xs font-bold text-white shadow-xs cursor-pointer transition"
+              className="inline-flex items-center gap-1.5 rounded-xl bg-[#334155] hover:bg-[#1E293B] px-3.5 py-2 text-xs font-bold text-white shadow-xs cursor-pointer transition"
             >
               <RotateCcw className="h-4 w-4" />
               <span>Lập Phiếu Tạm Ứng</span>
@@ -697,8 +697,8 @@ function ExpensesPage() {
             {/* Card 3: Chi Chuyển Khoản (Xanh Navy) */}
             <div className="p-4 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 flex flex-col justify-between gap-2 shadow-xs">
               <div className="flex items-center justify-between">
-                <span className="text-[#003B95] dark:text-blue-400 text-xs font-bold uppercase tracking-wider">CHI CHUYỂN KHOẢN</span>
-                <span className="size-2 rounded-full bg-[#003B95]" />
+                <span className="text-slate-800 dark:text-slate-200 text-xs font-bold uppercase tracking-wider">CHI CHUYỂN KHOẢN</span>
+                <span className="size-2 rounded-full bg-slate-700" />
               </div>
               <div className="text-slate-900 dark:text-slate-100 text-2xl font-black">
                 {fmt.money(expenseBank)}

@@ -25,7 +25,7 @@ async function run() {
   • Nội dung chính: Tọa đàm Kinh tế Doanh Nghiệp Việt 2027 (Củng cố nội lực - Tạo đà tăng trưởng | Thị trường - Dòng tiền - Năng suất trong kỷ nguyên AI); Lễ Kỷ niệm 4 năm thành lập Viện Doanh Trí (2022 - 2026) & Tri ân Ngày Nhà giáo Việt Nam 20/11; Tiệc Gala Dinner & Kết nối giao thương B2B
   • Thời gian: 15:00 - 22:00 | Thứ Bảy, 21/11/2026
   • Địa điểm: Nhà hàng Long Phụng - Tầng 2, Tòa nhà 29T2, Hoàng Đạo Thúy, Cầu Giấy, Hà Nội
-  • Chi phí: 0 VNĐ (Miễn phí dành cho Hội viên CEO HN10 & Khách mời danh dự)
+  • Chi phí: 0 VNĐ (Miễn phí dành cho Học viên CEO HN10 & Khách mời danh dự)
   • Google Maps: https://maps.google.com/?q=Nhà+hàng+Long+Phụng+29T2+Hoàng+Đạo+Thúy+Hà+Nội
   • Trang phục: Formal / Lịch sự trang trọng (Vest, Áo dài, Sơ mi trang trọng)
   • Gửi xe: Hầm B1 & B2 Tòa nhà 29T2 Hoàng Đạo Thúy (Có nhân viên hướng dẫn của BTC)
@@ -126,7 +126,7 @@ async function run() {
     'TKT-VDT-2027-VIP',
     eventId,
     assocId,
-    'Vé Mời Danh Dự (Hội Viên CEO HN10 & Khách Mời)',
+    'Vé Mời Danh Dự (Học viên CEO HN10 & Khách Mời)',
     0,
     300,
     'Bao gồm trọn gói tham dự Tọa đàm kinh tế, Tài liệu hội thảo chuyên sâu, Tiệc Gala Dinner và Kết nối giao thương B2B.',

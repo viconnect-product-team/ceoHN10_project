@@ -1,6 +1,6 @@
 /**
  * 46 — Design Pattern Pragmatism: BUILDER PATTERN
- * Phục vụ Kịch bản 4: Khởi tạo dữ liệu phức tạp (Chứng thư Hội viên, Hợp đồng, Báo cáo xuất khẩu).
+ * Phục vụ Kịch bản 4: Khởi tạo dữ liệu phức tạp (Chứng thư Học viên, Hợp đồng, Báo cáo xuất khẩu).
  * Cấm nhồi nhét hàng chục tham số vào constructor. Tách thành các bước lắp ráp rõ ràng.
  */
 

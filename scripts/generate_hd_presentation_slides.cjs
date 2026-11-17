@@ -7,7 +7,7 @@
  *    - Nửa trái: Xanh Navy Doanh Nhân đậm, phủ ảnh background chân thực (Skyline Hà Nội, Dạ tiệc Gala, Phòng họp).
  *    - Nửa phải: Nền trắng tinh khiết/xám ngọc trai, giúp ảnh chụp màn hình CRM & App nổi bần bật, rõ ràng 100%.
  * 2. CÁC CHỨC NĂNG CRM HIỂN THỊ TO RÕ, ĐẦY ĐỦ:
- *    - Dashboard BI 360, Bảng 500+ Hội viên, Sơ đồ xếp bàn tiệc Gala, Tài chính VietQR, Bảng giao việc Kanban.
+ *    - Dashboard BI 360, Bảng 500+ Học viên, Sơ đồ xếp bàn tiệc Gala, Tài chính VietQR, Bảng giao việc Kanban.
  */
 
 const assets = require('./poster_assets_and_styles.cjs');
@@ -176,20 +176,21 @@ function generateHdSlideDeckHtml() {
       <!-- Top header -->
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-6">
-          <img src="${LOGO_CEO HN10}" class="h-24 object-contain drop-shadow" alt="CEO HN10" />
-          <div class="h-12 w-[2px] bg-white/20"></div>
-          <div>
-            <div class="text-amber-400 font-black text-sm tracking-widest uppercase">HỘI DOANH NHÂN TRẺ HÀ NỘI (HANOIBA)</div>
-            <div class="text-white font-extrabold text-2xl font-['Montserrat']">CLB DOANH NHÂN CEO HN10</div>
-          </div>
-        </div>
+          <img src="${LOGO_CEO HN10
+} " class="h - 24 object - contain drop - shadow" alt="CEO HN10" />
+  < div class="h-12 w-[2px] bg-white/20" ></div >
+    <div>
+      <div class="text-amber-400 font-black text-sm tracking-widest uppercase">HỘI DOANH NHÂN TRẺ HÀ NỘI (HANOIBA)</div>
+      <div class="text-white font-extrabold text-2xl font-['Montserrat']">CLB DOANH NHÂN CEO HN10</div>
+    </div>
+        </div >
 
-        <div class="px-6 py-2.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-cyan-300 text-xs font-black tracking-widest uppercase">
-          BÁO CÁO GIẢI PHÁP CHUYỂN ĐỔI SỐ TOÀN DIỆN 2026
-        </div>
-      </div>
+  <div class="px-6 py-2.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-cyan-300 text-xs font-black tracking-widest uppercase">
+    BÁO CÁO GIẢI PHÁP CHUYỂN ĐỔI SỐ TOÀN DIỆN 2026
+  </div>
+      </div >
 
-      <!-- Center content -->
+      < !--Center content-- >
       <div class="max-w-5xl space-y-6 my-auto">
         <div class="inline-flex items-center gap-3 px-5 py-2 rounded-full bg-amber-400/20 border border-amber-400/50 text-amber-300 text-sm font-black tracking-wide">
           <span>⚡</span> HỆ SINH THÁI ĐIỀU HÀNH &amp; KẾT NỐI DOANH NHÂN ĐỘC QUYỀN
@@ -203,14 +204,14 @@ function generateHdSlideDeckHtml() {
         </h1>
 
         <p class="text-xl text-blue-100 font-medium leading-relaxed max-w-4xl">
-          Sự kết hợp hoàn hảo giữa <strong>Cổng Điều Hành Web CRM Trung Tâm</strong> (phục vụ Ban Lãnh Đạo, Ban Thư Ký &amp; 6 Ban Chuyên Môn) và <strong>Ứng Dụng Di Động Thông Minh</strong> (Văn phòng bỏ túi cho 500+ Doanh nhân hội viên).
+          Sự kết hợp hoàn hảo giữa <strong>Cổng Điều Hành Web CRM Trung Tâm</strong> (phục vụ Ban Lãnh Đạo, Ban Thư Ký &amp; 6 Ban Chuyên Môn) và <strong>Ứng Dụng Di Động Thông Minh</strong> (Văn phòng bỏ túi cho 500+ Doanh nhân Học viên).
         </p>
 
         <!-- 4 Badges số liệu -->
         <div class="grid grid-cols-4 gap-6 pt-4">
           <div class="p-5 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15">
             <div class="text-4xl font-black text-amber-400 font-mono">500+</div>
-            <div class="text-xs font-bold text-slate-200 mt-1 uppercase">Hội Viên Doanh Nhân</div>
+            <div class="text-xs font-bold text-slate-200 mt-1 uppercase">Học viên Doanh Nhân</div>
           </div>
           <div class="p-5 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15">
             <div class="text-4xl font-black text-cyan-400 font-mono">06</div>
@@ -227,20 +228,20 @@ function generateHdSlideDeckHtml() {
         </div>
       </div>
 
-      <!-- Bottom footer -->
-      <div class="flex items-center justify-between border-t border-white/15 pt-6 text-sm text-slate-300">
-        <div>Đơn vị nghiên cứu &amp; phát triển công nghệ: <strong>ViConnect Technology</strong></div>
-        <div class="flex items-center gap-2">
-          ${VIONE_EMBLEM_SVG}
-          <span class="font-bold text-white">ViOne - Business Connect</span>
-        </div>
-      </div>
+      <!--Bottom footer-- >
+  <div class="flex items-center justify-between border-t border-white/15 pt-6 text-sm text-slate-300">
+    <div>Đơn vị nghiên cứu &amp; phát triển công nghệ: <strong>ViConnect Technology</strong></div>
+    <div class="flex items-center gap-2">
+      ${VIONE_EMBLEM_SVG}
+      <span class="font-bold text-white">ViOne - Business Connect</span>
     </div>
   </div>
+    </div >
+  </div >
 
-  <!-- ========================================================================= -->
-  <!-- SLIDE 2: BỨC TRANH KIẾN TRÚC KÉP (NỬA XANH NỬA TRẮNG)                     -->
-  <!-- ========================================================================= -->
+  < !-- ========================================================================= -->
+  < !--SLIDE 2: BỨC TRANH KIẾN TRÚC KÉP(NỬA XANH NỬA TRẮNG)-- >
+  < !-- ========================================================================= -->
   <div class="slide-page">
     <!-- NỬA TRÁI (XANH) -->
     <div class="slide-left-panel">
@@ -263,7 +264,7 @@ function generateHdSlideDeckHtml() {
         <div class="p-5 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15">
           <div class="text-cyan-300 font-black text-sm uppercase">1. Web CRM Quản Trị</div>
           <div class="text-xs text-slate-200 mt-1 leading-normal">
-            Bảng điều khiển trung tâm cho Ban Điều Hành: quản lý hội viên, duyệt hồ sơ, xếp bàn tiệc Gala, đối soát tài chính VietQR.
+            Bảng điều khiển trung tâm cho Ban Điều Hành: quản lý Học viên, duyệt hồ sơ, xếp bàn tiệc Gala, đối soát tài chính VietQR.
           </div>
         </div>
 
@@ -284,7 +285,7 @@ function generateHdSlideDeckHtml() {
     <div class="slide-right-stage">
       <div class="flex items-center justify-between pb-4 border-b border-slate-200">
         <h3 class="text-2xl font-black text-[#002B7F] font-['Montserrat'] uppercase">
-          SỰ PHỐI HỢP NHỊP NHÀNG GIỮA QUẢN LÝ VÀ HỘI VIÊN
+          SỰ PHỐI HỢP NHỊP NHÀNG GIỮA QUẢN LÝ VÀ Học viên
         </h3>
         <span class="text-xs font-mono font-bold text-slate-500">LIVE SYSTEM PREVIEW</span>
       </div>
@@ -313,7 +314,7 @@ function generateHdSlideDeckHtml() {
               <span class="text-xs text-slate-500 font-mono">iOS / ANDROID</span>
             </div>
             <h4 class="text-xl font-black text-slate-900 mt-3">Văn Phòng Số Bỏ Túi</h4>
-            <p class="text-slate-600 text-xs mt-1">Dành cho 500+ Doanh nhân hội viên chính thức.</p>
+            <p class="text-slate-600 text-xs mt-1">Dành cho 500+ Doanh nhân Học viên chính thức.</p>
           </div>
           <div class="flex items-center justify-center gap-4 h-[450px]">
             <div class="w-48 h-full rounded-3xl overflow-hidden border-2 border-slate-300 shadow-md">
@@ -334,8 +335,8 @@ function generateHdSlideDeckHtml() {
   </div>
 
   <!-- ========================================================================= -->
-  <!-- SLIDE 3: SHOWCASE POSTER 1 (PANORAMA 4 IPHONE THEO ĐÚNG ẢNH 1)            -->
-  <!-- ========================================================================= -->
+  < !--SLIDE 3: SHOWCASE POSTER 1(PANORAMA 4 IPHONE THEO ĐÚNG ẢNH 1)-- >
+  < !-- ========================================================================= -->
   <div class="slide-page">
     <div class="slide-left-panel">
       <img src="${BG_SKYLINE}" class="slide-left-bg" alt="Skyline" />
@@ -349,7 +350,7 @@ function generateHdSlideDeckHtml() {
           TOÀN CẢNH MOBILE APP<br><span class="text-amber-300">DÀN 4 IPHONE SIÊU NÉT</span>
         </h2>
         <p class="text-blue-100 text-sm leading-relaxed font-medium">
-          Showcase toàn bộ hành trình trải nghiệm hội viên: Khám phá Trang chủ -> Định danh Thẻ VIP -> Giao thương B2B -> Soát vé Gala.
+          Showcase toàn bộ hành trình trải nghiệm Học viên: Khám phá Trang chủ -> Định danh Thẻ VIP -> Giao thương B2B -> Soát vé Gala.
         </p>
       </div>
 
@@ -358,7 +359,7 @@ function generateHdSlideDeckHtml() {
           <strong class="text-cyan-300">1. Trang chủ số:</strong> Tin tức, sự kiện sắp tới &amp; 14 tính năng CLB.
         </div>
         <div class="p-3.5 rounded-xl bg-white/10 border border-white/15 text-xs text-slate-200">
-          <strong class="text-amber-300">2. Thẻ hội viên VIP:</strong> Định danh số, mã QR &amp; NameDrop NFC.
+          <strong class="text-amber-300">2. Thẻ Học viên VIP:</strong> Định danh số, mã QR &amp; NameDrop NFC.
         </div>
         <div class="p-3.5 rounded-xl bg-white/10 border border-white/15 text-xs text-slate-200">
           <strong class="text-cyan-300">3. Sàn giao thương B2B:</strong> Niêm yết sản phẩm &amp; ưu đãi 11 ngành.
@@ -381,8 +382,8 @@ function generateHdSlideDeckHtml() {
   </div>
 
   <!-- ========================================================================= -->
-  <!-- SLIDE 4: SHOWCASE POSTER 2 (PANORAMA 3 MÀN HÌNH CRM THEO ĐÚNG ẢNH 2)       -->
-  <!-- ========================================================================= -->
+  < !--SLIDE 4: SHOWCASE POSTER 2(PANORAMA 3 MÀN HÌNH CRM THEO ĐÚNG ẢNH 2)-- >
+  < !-- ========================================================================= -->
   <div class="slide-page">
     <div class="slide-left-panel">
       <img src="${BG_BOARDROOM}" class="slide-left-bg" alt="Boardroom" />
@@ -396,7 +397,7 @@ function generateHdSlideDeckHtml() {
           TOÀN CẢNH WEB CRM<br><span class="text-cyan-300">DÀN 3 MÀN HÌNH ĐIỀU HÀNH</span>
         </h2>
         <p class="text-blue-100 text-sm leading-relaxed font-medium">
-          Showcase toàn bộ sức mạnh điều hành hiệp hội: Dashboard Executive BI -> Quản trị 500+ Hội viên -> Sơ đồ bàn tiệc Gala &amp; Tài chính VietQR.
+          Showcase toàn bộ sức mạnh điều hành hiệp hội: Dashboard Executive BI -> Quản trị 500+ Học viên -> Sơ đồ bàn tiệc Gala &amp; Tài chính VietQR.
         </p>
       </div>
 
@@ -405,7 +406,7 @@ function generateHdSlideDeckHtml() {
           <strong class="text-cyan-300">1. Executive Dashboard BI:</strong> 8 chỉ số sức khỏe, dòng tiền &amp; tăng trưởng.
         </div>
         <div class="p-3.5 rounded-xl bg-white/10 border border-white/15 text-xs text-slate-200">
-          <strong class="text-amber-300">2. Bảng 500+ Hội viên:</strong> Lọc theo ban, phân quyền RBAC &amp; thẩm định.
+          <strong class="text-amber-300">2. Bảng 500+ Học viên:</strong> Lọc theo ban, phân quyền RBAC &amp; thẩm định.
         </div>
         <div class="p-3.5 rounded-xl bg-white/10 border border-white/15 text-xs text-slate-200">
           <strong class="text-emerald-300">3. Sơ đồ bàn tiệc Gala:</strong> Trực quan bố trí bàn VIP &amp; check-in tự động.
@@ -425,8 +426,8 @@ function generateHdSlideDeckHtml() {
   </div>
 
   <!-- ========================================================================= -->
-  <!-- SLIDE 5: SHOWCASE POSTER MASTER TỔNG HỢP HỆ SINH THÁI (A3/A2 KHỔ ĐỨNG)   -->
-  <!-- ========================================================================= -->
+  < !--SLIDE 5: SHOWCASE POSTER MASTER TỔNG HỢP HỆ SINH THÁI(A3 / A2 KHỔ ĐỨNG)-- >
+  < !-- ========================================================================= -->
   <div class="slide-page">
     <div class="slide-left-panel">
       <img src="${BG_BANQUET}" class="slide-left-bg" alt="Banquet" />
@@ -440,7 +441,7 @@ function generateHdSlideDeckHtml() {
           POSTER MASTER<br><span class="text-amber-300">TỔNG THỂ HỆ SINH THÁI</span>
         </h2>
         <p class="text-blue-100 text-sm leading-relaxed font-medium">
-          Tác phẩm poster tổng lực kết hợp trọn vẹn cả 3 màn hình CRM quản trị và 4 điện thoại Mobile App hội viên trên nền nửa xanh nửa trắng sang trọng.
+          Tác phẩm poster tổng lực kết hợp trọn vẹn cả 3 màn hình CRM quản trị và 4 điện thoại Mobile App Học viên trên nền nửa xanh nửa trắng sang trọng.
         </p>
       </div>
 
@@ -469,8 +470,8 @@ function generateHdSlideDeckHtml() {
   </div>
 
   <!-- ========================================================================= -->
-  <!-- SLIDE 6: BỘ 4 POSTER ĐẶC TẢ CHI TIẾT                                      -->
-  <!-- ========================================================================= -->
+  < !--SLIDE 6: BỘ 4 POSTER ĐẶC TẢ CHI TIẾT-- >
+  < !-- ========================================================================= -->
   <div class="slide-page">
     <div class="slide-left-panel">
       <img src="${BG_OPERATIONS}" class="slide-left-bg" alt="Operations" />
@@ -484,13 +485,13 @@ function generateHdSlideDeckHtml() {
           BỘ 4 POSTER<br><span class="text-cyan-300">CHUYÊN SÂU TỪNG MẢNG</span>
         </h2>
         <p class="text-blue-100 text-sm leading-relaxed font-medium">
-          4 ấn phẩm độc lập phục vụ truyền thông, đào tạo hội viên và giới thiệu giải pháp cho Đại hội &amp; Gala thường niên.
+          4 ấn phẩm độc lập phục vụ truyền thông, đào tạo Học viên và giới thiệu giải pháp cho Đại hội &amp; Gala thường niên.
         </p>
       </div>
 
       <div class="relative z-10 space-y-2.5 my-auto text-xs text-slate-200">
         <div class="p-3 rounded-xl bg-white/10"><strong>Poster 1:</strong> Tổng quan ứng dụng di động</div>
-        <div class="p-3 rounded-xl bg-white/10"><strong>Poster 2:</strong> 4 Đặc quyền hội viên trong tầm tay</div>
+        <div class="p-3 rounded-xl bg-white/10"><strong>Poster 2:</strong> 4 Đặc quyền Học viên trong tầm tay</div>
         <div class="p-3 rounded-xl bg-white/10"><strong>Poster 3:</strong> Nền tảng quản trị Web CRM trung tâm</div>
         <div class="p-3 rounded-xl bg-white/10"><strong>Poster 4:</strong> 4 Phân hệ điều hành dành riêng CLB</div>
       </div>
@@ -508,8 +509,8 @@ function generateHdSlideDeckHtml() {
   </div>
 
   <!-- ========================================================================= -->
-  <!-- SLIDE 7: CHỨC NĂNG CRM 1 - DASHBOARD EXECUTIVE BI 360° (PHÓNG TO CỰC NÉT)   -->
-  <!-- ========================================================================= -->
+  < !--SLIDE 7: CHỨC NĂNG CRM 1 - DASHBOARD EXECUTIVE BI 360° (PHÓNG TO CỰC NÉT)-->
+  < !-- ========================================================================= -->
   <div class="slide-page">
     <div class="slide-left-panel">
       <img src="${BG_BOARDROOM}" class="slide-left-bg" alt="Boardroom" />
@@ -530,11 +531,11 @@ function generateHdSlideDeckHtml() {
       <div class="relative z-10 space-y-4 my-auto">
         <div class="p-4 rounded-xl bg-white/10 border border-white/15">
           <div class="text-cyan-300 font-bold text-xs uppercase">8 Chỉ Số Trọng Yếu</div>
-          <div class="text-slate-200 text-xs mt-1">Tổng hội viên, Hội viên mới tháng, Hóa đơn chưa thu, Sự kiện sắp tới, Cơ hội mở.</div>
+          <div class="text-slate-200 text-xs mt-1">Tổng Học viên, Học viên mới tháng, Hóa đơn chưa thu, Sự kiện sắp tới, Cơ hội mở.</div>
         </div>
         <div class="p-4 rounded-xl bg-white/10 border border-white/15">
           <div class="text-amber-300 font-bold text-xs uppercase">Biểu Đồ Tài Chính Recharts</div>
-          <div class="text-slate-200 text-xs mt-1">Trực quan hóa doanh thu thu phí, tốc độ kết nạp hội viên qua 6 tháng liên tiếp.</div>
+          <div class="text-slate-200 text-xs mt-1">Trực quan hóa doanh thu thu phí, tốc độ kết nạp Học viên qua 6 tháng liên tiếp.</div>
         </div>
         <div class="p-4 rounded-xl bg-white/10 border border-white/15">
           <div class="text-emerald-300 font-bold text-xs uppercase">Bộ Lọc Phân Tách 6 Ban</div>
@@ -563,8 +564,8 @@ function generateHdSlideDeckHtml() {
   </div>
 
   <!-- ========================================================================= -->
-  <!-- SLIDE 8: CHỨC NĂNG CRM 2 - QUẢN TRỊ 500+ HỘI VIÊN & THẨM ĐỊNH HỒ SƠ 360°    -->
-  <!-- ========================================================================= -->
+  < !--SLIDE 8: CHỨC NĂNG CRM 2 - QUẢN TRỊ 500 + Học viên & THẨM ĐỊNH HỒ SƠ 360°    -->
+  < !-- ========================================================================= -->
   <div class="slide-page">
     <div class="slide-left-panel">
       <img src="${BG_OPERATIONS}" class="slide-left-bg" alt="Operations" />
@@ -575,21 +576,21 @@ function generateHdSlideDeckHtml() {
           CHỨC NĂNG CRM 02 · SLIDE 08 / 15
         </span>
         <h2 class="text-3xl font-black text-white font-['Montserrat'] uppercase tracking-tight mt-4">
-          QUẢN TRỊ HỘI VIÊN 360°<br><span class="text-amber-300">THẨM ĐỊNH &amp; PHÂN BAN</span>
+          QUẢN TRỊ Học viên 360°<br><span class="text-amber-300">THẨM ĐỊNH &amp; PHÂN BAN</span>
         </h2>
         <p class="text-blue-100 text-sm leading-relaxed font-medium">
-          Hệ thống cơ sở dữ liệu lớn quản lý toàn diện hồ sơ năng lực 500+ doanh nghiệp hội viên, thẩm định tư cách và phân công ban sinh hoạt.
+          Hệ thống cơ sở dữ liệu lớn quản lý toàn diện hồ sơ năng lực 500+ doanh nghiệp Học viên, thẩm định tư cách và phân công ban sinh hoạt.
         </p>
       </div>
 
       <div class="relative z-10 space-y-4 my-auto">
         <div class="p-4 rounded-xl bg-white/10 border border-white/15">
           <div class="text-amber-300 font-bold text-xs uppercase">Bảng Dữ Liệu Excel Thông Minh</div>
-          <div class="text-slate-200 text-xs mt-1">Xem chi tiết họ tên, mã hội viên, công ty, ngành nghề, chức vụ trong CLB và trạng thái hoạt động.</div>
+          <div class="text-slate-200 text-xs mt-1">Xem chi tiết họ tên, mã Học viên, công ty, ngành nghề, chức vụ trong CLB và trạng thái hoạt động.</div>
         </div>
         <div class="p-4 rounded-xl bg-white/10 border border-white/15">
           <div class="text-cyan-300 font-bold text-xs uppercase">Quy Trình Phê Duyệt 3 Cấp</div>
-          <div class="text-slate-200 text-xs mt-1">Ban Thư Ký tiếp nhận -> Ban Hội Viên thẩm định -> Ban Thường Trực phê duyệt cấp thẻ.</div>
+          <div class="text-slate-200 text-xs mt-1">Ban Thư Ký tiếp nhận -> Ban Học viên thẩm định -> Ban Thường Trực phê duyệt cấp thẻ.</div>
         </div>
         <div class="p-4 rounded-xl bg-white/10 border border-white/15">
           <div class="text-emerald-300 font-bold text-xs uppercase">Xuất Báo Cáo Excel Tức Thì</div>
@@ -618,8 +619,8 @@ function generateHdSlideDeckHtml() {
   </div>
 
   <!-- ========================================================================= -->
-  <!-- SLIDE 9: CHỨC NĂNG CRM 3 - SƠ ĐỒ BỐ TRÍ BÀN TIỆC GALA KHÁN PHÒNG TỰ ĐỘNG     -->
-  <!-- ========================================================================= -->
+  < !--SLIDE 9: CHỨC NĂNG CRM 3 - SƠ ĐỒ BỐ TRÍ BÀN TIỆC GALA KHÁN PHÒNG TỰ ĐỘNG-- >
+  < !-- ========================================================================= -->
   <div class="slide-page">
     <div class="slide-left-panel">
       <img src="${BG_BANQUET}" class="slide-left-bg" alt="Banquet Gala" />
@@ -643,8 +644,8 @@ function generateHdSlideDeckHtml() {
           <div class="text-slate-200 text-xs mt-1">Mô phỏng trực quan từng bàn tròn 10 người, phân biệt bàn VIP Lãnh đạo, VIP Khách mời, bàn Doanh nhân theo màu sắc.</div>
         </div>
         <div class="p-4 rounded-xl bg-white/10 border border-white/15">
-          <div class="text-amber-300 font-bold text-xs uppercase">Đồng Bộ Vé QR Hội Viên</div>
-          <div class="text-slate-200 text-xs mt-1">Khi xếp bàn trên CRM, vé điện tử trên app điện thoại của hội viên sẽ tự động cập nhật số bàn và vị trí ngồi.</div>
+          <div class="text-amber-300 font-bold text-xs uppercase">Đồng Bộ Vé QR Học viên</div>
+          <div class="text-slate-200 text-xs mt-1">Khi xếp bàn trên CRM, vé điện tử trên app điện thoại của Học viên sẽ tự động cập nhật số bàn và vị trí ngồi.</div>
         </div>
         <div class="p-4 rounded-xl bg-white/10 border border-white/15">
           <div class="text-emerald-300 font-bold text-xs uppercase">Điểm Danh &amp; Soát Vé Real-Time</div>
@@ -673,8 +674,8 @@ function generateHdSlideDeckHtml() {
   </div>
 
   <!-- ========================================================================= -->
-  <!-- SLIDE 10: CHỨC NĂNG CRM 4 - TÀI CHÍNH THU CHI & GẠCH NỢ VIETQR TỰ ĐỘNG     -->
-  <!-- ========================================================================= -->
+  < !--SLIDE 10: CHỨC NĂNG CRM 4 - TÀI CHÍNH THU CHI & GẠCH NỢ VIETQR TỰ ĐỘNG-- >
+  < !-- ========================================================================= -->
   <div class="slide-page">
     <div class="slide-left-panel">
       <img src="${BG_BOARDROOM}" class="slide-left-bg" alt="Boardroom" />
@@ -695,11 +696,11 @@ function generateHdSlideDeckHtml() {
       <div class="relative z-10 space-y-4 my-auto">
         <div class="p-4 rounded-xl bg-white/10 border border-white/15">
           <div class="text-emerald-300 font-bold text-xs uppercase">VietQR Chuyển Khoản Tự Động</div>
-          <div class="text-slate-200 text-xs mt-1">Mỗi hội viên quét mã QR chứa nội dung cú pháp chuẩn, tiền về tài khoản là hệ thống tự động gạch nợ tức thì.</div>
+          <div class="text-slate-200 text-xs mt-1">Mỗi Học viên quét mã QR chứa nội dung cú pháp chuẩn, tiền về tài khoản là hệ thống tự động gạch nợ tức thì.</div>
         </div>
         <div class="p-4 rounded-xl bg-white/10 border border-white/15">
           <div class="text-cyan-300 font-bold text-xs uppercase">Sổ Quỹ Thu Chi Minh Bạch</div>
-          <div class="text-slate-200 text-xs mt-1">Báo cáo kiểm toán dòng tiền chi tiết theo từng hạng mục sự kiện, sinh nhật, thăm hỏi hội viên.</div>
+          <div class="text-slate-200 text-xs mt-1">Báo cáo kiểm toán dòng tiền chi tiết theo từng hạng mục sự kiện, sinh nhật, thăm hỏi Học viên.</div>
         </div>
         <div class="p-4 rounded-xl bg-white/10 border border-white/15">
           <div class="text-amber-300 font-bold text-xs uppercase">Gửi Hóa Đơn &amp; Nhắc Phí Tự Động</div>
@@ -728,8 +729,8 @@ function generateHdSlideDeckHtml() {
   </div>
 
   <!-- ========================================================================= -->
-  <!-- SLIDE 11: CHỨC NĂNG CRM 5 - GIAO VIỆC KANBAN & PHÂN QUYỀN RBAC 6 BAN      -->
-  <!-- ========================================================================= -->
+  < !--SLIDE 11: CHỨC NĂNG CRM 5 - GIAO VIỆC KANBAN & PHÂN QUYỀN RBAC 6 BAN-- >
+  < !-- ========================================================================= -->
   <div class="slide-page">
     <div class="slide-left-panel">
       <img src="${BG_OPERATIONS}" class="slide-left-bg" alt="Operations" />
@@ -743,7 +744,7 @@ function generateHdSlideDeckHtml() {
           GIAO VIỆC KANBAN<br><span class="text-cyan-300">ĐIỀU HÀNH 6 BAN CHUYÊN MÔN</span>
         </h2>
         <p class="text-blue-100 text-sm leading-relaxed font-medium">
-          Công cụ phối hợp tác chiến giữa Ban Chủ tịch, Ban Thư Ký và các Ban Hội viên, Sự kiện, Tài chính, Đào tạo, Truyền thông, Đối ngoại.
+          Công cụ phối hợp tác chiến giữa Ban Chủ tịch, Ban Thư Ký và các Ban Học viên, Sự kiện, Tài chính, Đào tạo, Truyền thông, Đối ngoại.
         </p>
       </div>
 
@@ -783,8 +784,8 @@ function generateHdSlideDeckHtml() {
   </div>
 
   <!-- ========================================================================= -->
-  <!-- SLIDE 12: CHỨC NĂNG APP 1 - THẺ HỘI VIÊN VIP & TRAO ĐỔI DANH THIẾP NFC 1 CHẠM -->
-  <!-- ========================================================================= -->
+  < !--SLIDE 12: CHỨC NĂNG APP 1 - THẺ Học viên VIP & TRAO ĐỔI DANH THIẾP NFC 1 CHẠM-- >
+  < !-- ========================================================================= -->
   <div class="slide-page">
     <div class="slide-left-panel">
       <img src="${BG_SKYLINE}" class="slide-left-bg" alt="Skyline" />
@@ -795,7 +796,7 @@ function generateHdSlideDeckHtml() {
           CHỨC NĂNG APP 01 · SLIDE 12 / 15
         </span>
         <h2 class="text-3xl font-black text-white font-['Montserrat'] uppercase tracking-tight mt-4">
-          THẺ HỘI VIÊN VIP<br><span class="text-amber-300">NAMEDROP NFC 1 CHẠM</span>
+          THẺ Học viên VIP<br><span class="text-amber-300">NAMEDROP NFC 1 CHẠM</span>
         </h2>
         <p class="text-blue-100 text-sm leading-relaxed font-medium">
           Biến chiếc điện thoại thành danh thiếp số quyền lực. Chạm nhẹ 2 điện thoại để trao đổi thông tin doanh nghiệp ngay lập tức.
@@ -805,7 +806,7 @@ function generateHdSlideDeckHtml() {
       <div class="relative z-10 space-y-4 my-auto">
         <div class="p-4 rounded-xl bg-white/10 border border-white/15">
           <div class="text-amber-300 font-bold text-xs uppercase">Nhận Diện Chính Danh HanoiBA</div>
-          <div class="text-slate-200 text-xs mt-1">Logo CLB CEO HN10, ảnh chân dung lãnh đạo, chức vụ, mã hội viên và hotline xác thực.</div>
+          <div class="text-slate-200 text-xs mt-1">Logo CLB CEO HN10, ảnh chân dung lãnh đạo, chức vụ, mã Học viên và hotline xác thực.</div>
         </div>
         <div class="p-4 rounded-xl bg-white/10 border border-white/15">
           <div class="text-cyan-300 font-bold text-xs uppercase">Công Nghệ Chạm Không Tiếp Xúc</div>
@@ -826,15 +827,15 @@ function generateHdSlideDeckHtml() {
       <div class="phone-stage-card w-[380px] h-[780px]">
         <div class="island"></div>
         <div class="w-full h-full rounded-[38px] overflow-hidden bg-white">
-          <img src="${APP_CARD_CLEAN}" class="w-full h-full object-cover object-top" alt="Thẻ Hội Viên VIP" />
+          <img src="${APP_CARD_CLEAN}" class="w-full h-full object-cover object-top" alt="Thẻ Học viên VIP" />
         </div>
       </div>
     </div>
   </div>
 
   <!-- ========================================================================= -->
-  <!-- SLIDE 13: CHỨC NĂNG APP 2 - SÀN GIAO THƯƠNG B2B & DEAL NỘI KHỐI             -->
-  <!-- ========================================================================= -->
+  < !--SLIDE 13: CHỨC NĂNG APP 2 - SÀN GIAO THƯƠNG B2B & DEAL NỘI KHỐI-- >
+  < !-- ========================================================================= -->
   <div class="slide-page">
     <div class="slide-left-panel">
       <img src="${BG_SKYLINE_LAKE}" class="slide-left-bg" alt="Skyline" />
@@ -848,7 +849,7 @@ function generateHdSlideDeckHtml() {
           SÀN GIAO THƯƠNG B2B<br><span class="text-cyan-300">KẾT NỐI 11 NHÓM NGÀNH</span>
         </h2>
         <p class="text-blue-100 text-sm leading-relaxed font-medium">
-          Môi trường kết nối kinh doanh nội bộ tin cậy: Đăng tải nhu cầu mua bán, mở cơ hội hợp tác và hưởng ưu đãi dành riêng cho hội viên.
+          Môi trường kết nối kinh doanh nội bộ tin cậy: Đăng tải nhu cầu mua bán, mở cơ hội hợp tác và hưởng ưu đãi dành riêng cho Học viên.
         </p>
       </div>
 
@@ -859,7 +860,7 @@ function generateHdSlideDeckHtml() {
         </div>
         <div class="p-4 rounded-xl bg-white/10 border border-white/15">
           <div class="text-amber-300 font-bold text-xs uppercase">Deal Ưu Đãi Độc Quyền</div>
-          <div class="text-slate-200 text-xs mt-1">Các doanh nghiệp hội viên cam kết chiết khấu ưu đãi từ 10% - 30% cho các thành viên CLB.</div>
+          <div class="text-slate-200 text-xs mt-1">Các doanh nghiệp Học viên cam kết chiết khấu ưu đãi từ 10% - 30% cho các thành viên CLB.</div>
         </div>
         <div class="p-4 rounded-xl bg-white/10 border border-white/15">
           <div class="text-emerald-300 font-bold text-xs uppercase">Chat &amp; Hẹn Gặp 1-on-1</div>
@@ -883,8 +884,8 @@ function generateHdSlideDeckHtml() {
   </div>
 
   <!-- ========================================================================= -->
-  <!-- SLIDE 14: CHỨC NĂNG APP 3 - VÉ SỰ KIỆN GALA & CHECK-IN QR BÀN TIỆC 1 GIÂY -->
-  <!-- ========================================================================= -->
+  < !--SLIDE 14: CHỨC NĂNG APP 3 - VÉ SỰ KIỆN GALA & CHECK - IN QR BÀN TIỆC 1 GIÂY-- >
+  < !-- ========================================================================= -->
   <div class="slide-page">
     <div class="slide-left-panel">
       <img src="${BG_BANQUET}" class="slide-left-bg" alt="Banquet" />
@@ -905,7 +906,7 @@ function generateHdSlideDeckHtml() {
       <div class="relative z-10 space-y-4 my-auto">
         <div class="p-4 rounded-xl bg-white/10 border border-white/15">
           <div class="text-emerald-300 font-bold text-xs uppercase">Mã Vé QR Cá Nhân Hóa</div>
-          <div class="text-slate-200 text-xs mt-1">Mỗi vé đại biểu sinh mã QR mã hóa an toàn, phân hạng vé VIP, Ban Chấp hành, Hội viên.</div>
+          <div class="text-slate-200 text-xs mt-1">Mỗi vé đại biểu sinh mã QR mã hóa an toàn, phân hạng vé VIP, Ban Chấp hành, Học viên.</div>
         </div>
         <div class="p-4 rounded-xl bg-white/10 border border-white/15">
           <div class="text-cyan-300 font-bold text-xs uppercase">Định Vị Số Bàn &amp; Chỗ Ngồi</div>
@@ -913,7 +914,7 @@ function generateHdSlideDeckHtml() {
         </div>
         <div class="p-4 rounded-xl bg-white/10 border border-white/15">
           <div class="text-amber-300 font-bold text-xs uppercase">Kích Hoạt Quay Số May Mắn</div>
-          <div class="text-slate-200 text-xs mt-1">Hội viên check-in thành công sẽ được tự động đưa số may mắn vào phần mềm quay giải Gala.</div>
+          <div class="text-slate-200 text-xs mt-1">Học viên check-in thành công sẽ được tự động đưa số may mắn vào phần mềm quay giải Gala.</div>
         </div>
       </div>
 
@@ -933,8 +934,8 @@ function generateHdSlideDeckHtml() {
   </div>
 
   <!-- ========================================================================= -->
-  <!-- SLIDE 15: KẾT LUẬN & CAM KẾT ĐỒNG HÀNH CHUYỂN ĐỔI SỐ                      -->
-  <!-- ========================================================================= -->
+  < !--SLIDE 15: KẾT LUẬN & CAM KẾT ĐỒNG HÀNH CHUYỂN ĐỔI SỐ-- >
+  < !-- ========================================================================= -->
   <div class="slide-page" style="background: linear-gradient(135deg, #021B4D 0%, #002B7F 45%, #0B3A82 70%, #031842 100%); color: #FFFFFF;">
     <div class="absolute inset-0 opacity-20 pointer-events-none">
       <img src="${BG_SKYLINE_LAKE}" class="w-full h-full object-cover" alt="Skyline" />
@@ -960,9 +961,9 @@ function generateHdSlideDeckHtml() {
       <div class="max-w-5xl my-auto space-y-6">
         <h2 class="text-5xl font-black text-white uppercase font-['Montserrat'] tracking-tight">
           SẴN SÀNG VẬN HÀNH THỰC TẾ<br>
-          <span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-yellow-200 to-cyan-300">
-            KIẾN TẠO CỘNG ĐỒNG DOANH NHÂN HÙNG CƯỜNG
-          </span>
+            <span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-yellow-200 to-cyan-300">
+              KIẾN TẠO CỘNG ĐỒNG DOANH NHÂN HÙNG CƯỜNG
+            </span>
         </h2>
 
         <p class="text-lg text-blue-100 font-medium leading-relaxed max-w-4xl">
@@ -973,7 +974,7 @@ function generateHdSlideDeckHtml() {
           <div class="p-6 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 space-y-2">
             <div class="text-amber-400 font-black text-lg">1. Độc Quyền Dữ Liệu</div>
             <p class="text-xs text-slate-200 leading-relaxed">
-              Toàn bộ cơ sở dữ liệu hội viên, tài chính và giao thương lưu trữ trên hạ tầng máy chủ riêng của Hiệp hội, cam kết bảo mật 100%.
+              Toàn bộ cơ sở dữ liệu Học viên, tài chính và giao thương lưu trữ trên hạ tầng máy chủ riêng của Hiệp hội, cam kết bảo mật 100%.
             </p>
           </div>
 
@@ -1003,8 +1004,8 @@ function generateHdSlideDeckHtml() {
     </div>
   </div>
 
-</body>
-</html>`;
+</body >
+</html > `;
 }
 
 module.exports = {

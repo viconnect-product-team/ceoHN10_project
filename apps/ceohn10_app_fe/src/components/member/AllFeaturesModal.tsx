@@ -43,7 +43,7 @@ export interface AllFeaturesModalProps {
 interface FeatureItem {
   id: string;
   name: string;
-  category: "Giao thương & Kết nối" | "Hoạt động & Sự kiện" | "Đặc quyền & Hội viên" | "Tiện ích số";
+  category: "Giao thương & Kết nối" | "Hoạt động & Sự kiện" | "Đặc quyền & Học viên" | "Tiện ích số";
   desc: string;
   to?: string;
   action?: () => void;
@@ -106,7 +106,7 @@ export function AllFeaturesModal({
             return;
           }
         }
-      } catch {}
+      } catch { }
       setSelectedShortcuts(DEFAULT_SHORTCUT_IDS);
     };
 
@@ -174,7 +174,7 @@ export function AllFeaturesModal({
       id: "marketplace",
       name: "Sàn B2B",
       category: "Giao thương & Kết nối",
-      desc: "Sản phẩm & dịch vụ ưu đãi độc quyền hội viên",
+      desc: "Sản phẩm & dịch vụ ưu đãi độc quyền Học viên",
       to: "/association/products",
       icon: Package,
     },
@@ -218,7 +218,7 @@ export function AllFeaturesModal({
       id: "messages",
       name: "Tin nhắn",
       category: "Giao thương & Kết nối",
-      desc: "Trò chuyện & trao đổi hợp tác riêng tư với hội viên",
+      desc: "Trò chuyện & trao đổi hợp tác riêng tư với Học viên",
       to: "/association/messages?tab=messages",
       icon: MessageSquare,
       badge: "Chat",
@@ -227,8 +227,8 @@ export function AllFeaturesModal({
     {
       id: "card",
       name: "Danh thiếp",
-      category: "Đặc quyền & Hội viên",
-      desc: "Thẻ hội viên số nhận diện doanh nhân công nghệ NFC",
+      category: "Đặc quyền & Học viên",
+      desc: "Thẻ Học viên số nhận diện doanh nhân công nghệ NFC",
       to: "/association/card",
       icon: IdCard,
       badge: "VIP",
@@ -237,7 +237,7 @@ export function AllFeaturesModal({
     {
       id: "perks",
       name: "Ưu đãi",
-      category: "Đặc quyền & Hội viên",
+      category: "Đặc quyền & Học viên",
       desc: "Kho voucher & ưu đãi dịch vụ 5 sao đối tác",
       to: "/association/perks",
       icon: Crown,
@@ -245,7 +245,7 @@ export function AllFeaturesModal({
     {
       id: "library",
       name: "Tài liệu",
-      category: "Đặc quyền & Hội viên",
+      category: "Đặc quyền & Học viên",
       desc: "Điều lệ, quy chế hoạt động, kỷ yếu & biểu mẫu",
       to: "/association/library",
       icon: FolderOpen,
@@ -253,8 +253,8 @@ export function AllFeaturesModal({
     {
       id: "renew",
       name: "Hội phí",
-      category: "Đặc quyền & Hội viên",
-      desc: "Gia hạn tư cách hội viên, thanh toán VietQR",
+      category: "Đặc quyền & Học viên",
+      desc: "Gia hạn tư cách Học viên, thanh toán VietQR",
       to: "/association/renew",
       icon: CreditCard,
     },
@@ -294,7 +294,7 @@ export function AllFeaturesModal({
     return features.filter((f) => f.name.toLowerCase().includes(q) || f.desc.toLowerCase().includes(q) || f.category.toLowerCase().includes(q));
   }, [features, search]);
 
-  const categories = ["Giao thương & Kết nối", "Hoạt động & Sự kiện", "Đặc quyền & Hội viên", "Tiện ích số"] as const;
+  const categories = ["Giao thương & Kết nối", "Hoạt động & Sự kiện", "Đặc quyền & Học viên", "Tiện ích số"] as const;
 
   const handleFeatureClick = (f: FeatureItem) => {
     onClose();

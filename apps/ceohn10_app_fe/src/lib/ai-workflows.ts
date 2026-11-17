@@ -107,27 +107,27 @@ const step = (
 export const AI_WORKFLOWS: AiWorkflow[] = [
   {
     id: "member-list",
-    name: "Tìm & mở danh sách hội viên",
-    description: "Tìm hội viên theo tiêu chí rồi mở danh sách để xem chi tiết.",
+    name: "Tìm & mở danh sách Học viên",
+    description: "Tìm Học viên theo tiêu chí rồi mở danh sách để xem chi tiết.",
     icon: Users,
     supportedCapabilities: ["member"],
     requiredRole: "member",
     requiredPermissions: [],
     confirmationPolicy: "per-protected-step",
-    triggers: ["danh sách hội viên", "tìm hội viên", "hội viên ngành", "danh bạ"],
+    triggers: ["danh sách Học viên", "tìm Học viên", "Học viên ngành", "danh bạ"],
     steps: [
       step(
         "search",
         "SEARCH",
-        "Tìm hội viên",
-        "Tìm hội viên phù hợp trong phạm vi quyền.",
+        "Tìm Học viên",
+        "Tìm Học viên phù hợp trong phạm vi quyền.",
         2,
         "SearchMembers",
       ),
       step(
         "open",
         "NAVIGATE",
-        "Mở danh sách hội viên",
+        "Mở danh sách Học viên",
         "Mở danh bạ để xem chi tiết.",
         1,
         "OpenMemberProfile",
@@ -136,22 +136,22 @@ export const AI_WORKFLOWS: AiWorkflow[] = [
   },
   {
     id: "member-export",
-    name: "Xuất danh sách hội viên (CSV)",
-    description: "Tìm hội viên, tạo bản xem trước CSV rồi mở trang xuất.",
+    name: "Xuất danh sách Học viên (CSV)",
+    description: "Tìm Học viên, tạo bản xem trước CSV rồi mở trang xuất.",
     icon: FileSpreadsheet,
     supportedCapabilities: ["member"],
     requiredRole: "moderator",
     requiredPermissions: ["member.export"],
     confirmationPolicy: "per-protected-step",
     triggers: [
-      "xuất hội viên",
-      "export hội viên",
-      "csv hội viên",
-      "tải danh sách hội viên",
+      "xuất Học viên",
+      "export Học viên",
+      "csv Học viên",
+      "tải danh sách Học viên",
       "xuất danh sách",
     ],
     steps: [
-      step("search", "SEARCH", "Tìm hội viên", "Lọc hội viên theo tiêu chí.", 2, "SearchMembers"),
+      step("search", "SEARCH", "Tìm Học viên", "Lọc Học viên theo tiêu chí.", 2, "SearchMembers"),
       step(
         "preview",
         "GENERATE",
@@ -171,7 +171,7 @@ export const AI_WORKFLOWS: AiWorkflow[] = [
   },
   {
     id: "fee-reminder",
-    name: "Nhắc hội viên chưa đóng hội phí",
+    name: "Nhắc Học viên chưa đóng hội phí",
     description: "Tìm công nợ, soạn bản nháp nhắc và xem trước danh sách nhận.",
     icon: Wallet,
     supportedCapabilities: ["fee"],
@@ -231,7 +231,7 @@ export const AI_WORKFLOWS: AiWorkflow[] = [
   {
     id: "marketplace-match",
     name: "Gợi ý kết nối từ Marketplace",
-    description: "Tìm tin đăng, tìm hội viên phù hợp và soạn gợi ý kết nối.",
+    description: "Tìm tin đăng, tìm Học viên phù hợp và soạn gợi ý kết nối.",
     icon: Handshake,
     supportedCapabilities: ["marketplace", "networking"],
     requiredRole: "member",
@@ -250,7 +250,7 @@ export const AI_WORKFLOWS: AiWorkflow[] = [
       step(
         "members",
         "SEARCH",
-        "Tìm hội viên phù hợp",
+        "Tìm Học viên phù hợp",
         "Đối chiếu ngành/khu vực.",
         2,
         "SearchMembers",
@@ -364,7 +364,7 @@ function stepAvailability(
         ? "quản trị viên"
         : wf.requiredRole === "moderator"
           ? "điều hành viên"
-          : "hội viên";
+          : "Học viên";
     return { allowed: false, reason: `Cần quyền ${roleLabel}` };
   }
   return { allowed: true };

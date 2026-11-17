@@ -59,7 +59,7 @@ const CRM_SLIDES = [
     subtitle: 'Chuyển đổi từ mô hình quản lý phân tán sang nền tảng tập trung duy nhất',
     col1_title: 'Quản Trị Thủ Công Trước Đây',
     col1_items: [
-      'Dữ liệu hội viên lưu file rời rạc, khó đối soát',
+      'Dữ liệu Học viên lưu file rời rạc, khó đối soát',
       'Thất thoát và chậm trễ thu hội phí thường niên',
       'Sắp xếp chỗ ngồi Gala nhầm lẫn, mất thời gian',
       'Phân quyền lỏng lẻo, rủi ro bảo mật thông tin',
@@ -77,7 +77,7 @@ const CRM_SLIDES = [
     title: 'Hiệu Quả Vận Hành Đo Lường Bằng Số Liệu',
     subtitle: 'Các chỉ số ấn tượng khẳng định năng lực quản trị vượt bậc của hệ sinh thái',
     kpis: [
-      { num: '500+', label: 'Doanh Nghiệp Hội Viên', desc: 'Thẩm định pháp lý chính danh 100%' },
+      { num: '500+', label: 'Doanh Nghiệp Học viên', desc: 'Thẩm định pháp lý chính danh 100%' },
       { num: '100%', label: 'Đối Soát Tự Động', desc: 'Gạch nợ hội phí tức thời qua VietQR' },
       { num: '0.1s', label: 'Tốc Độ Soát Vé QR', desc: 'Check-in sự kiện không chạm qua camera' },
       { num: '0', label: 'Sai Sót Xếp Chỗ', desc: 'Khán phòng trực quan Cinema Seating Map' },
@@ -85,11 +85,11 @@ const CRM_SLIDES = [
   },
   {
     type: 'feature',
-    title: 'Quản Trị Hội Viên & Hồ Sơ Doanh Nghiệp 360°',
+    title: 'Quản Trị Học viên & Hồ Sơ Doanh Nghiệp 360°',
     subtitle: 'Nền tảng lưu trữ và thẩm định năng lực thành viên tin cậy bậc nhất',
     bullets: [
       { strong: 'Hồ sơ pháp lý đầy đủ:', text: 'Mã số thuế, giấy phép ĐKKD, ban chuyên môn và nhiệm kỳ.' },
-      { strong: 'Xác thực chính ngạch:', text: 'Quy trình xét duyệt hội viên 3 cấp (Thư ký -> Trưởng ban -> Ban Điều Hành).' },
+      { strong: 'Xác thực chính ngạch:', text: 'Quy trình xét duyệt Học viên 3 cấp (Thư ký -> Trưởng ban -> Ban Điều Hành).' },
       { strong: 'Phân loại ngành nghề:', text: 'Gắn thẻ lĩnh vực B2B giúp gợi ý giao thương trúng đích.' },
       { strong: 'Lịch sử hoạt động:', text: 'Theo dõi điểm chuyên cần, sự kiện tham gia và đóng góp phong trào.' },
     ],
@@ -100,7 +100,7 @@ const CRM_SLIDES = [
     subtitle: 'Đột phá tổ chức sự kiện: Phân khu bàn ghế thông minh không nhầm lẫn',
     bullets: [
       { strong: 'Mô phỏng sân khấu thực tế:', text: 'Giao diện Screen trung tâm và lưới hàng ghế A, B, C, D trực quan.' },
-      { strong: 'Phân khu màu sắc chuyên nghiệp:', text: 'Khu VIP Lãnh đạo (Vàng), Ban Chấp Hành (Xanh), Hội viên (Ngọc).' },
+      { strong: 'Phân khu màu sắc chuyên nghiệp:', text: 'Khu VIP Lãnh đạo (Vàng), Ban Chấp Hành (Xanh), Học viên (Ngọc).' },
       { strong: 'Gán chỗ 1 chạm:', text: 'Click chọn đại biểu để xếp ghế; tự động khóa ghế chống trùng lặp.' },
       { strong: 'Đón tiếp chuẩn xác:', text: 'Lễ tân quét vé thấy ngay số ghế để dẫn khách về đúng vị trí.' },
     ],
@@ -108,7 +108,7 @@ const CRM_SLIDES = [
   {
     type: 'feature',
     title: 'Cổng Soát Vé QR Gatekeeper & Standee Zalo',
-    subtitle: 'Đón tiếp đại biểu thần tốc, linh hoạt cho cả hội viên và khách mời ngoài',
+    subtitle: 'Đón tiếp đại biểu thần tốc, linh hoạt cho cả Học viên và khách mời ngoài',
     bullets: [
       { strong: 'Soát vé QR 0.1 giây:', text: 'Nhận diện tức thì qua camera máy tính bảng/điện thoại lễ tân.' },
       { strong: 'Standee Zalo sảnh chờ:', text: 'Mã QR công khai cho khách ngoài quét Zalo mở ngay form đăng ký.' },
@@ -122,7 +122,7 @@ const CRM_SLIDES = [
     subtitle: 'Minh bạch từng đồng thu chi, gạch nợ tự động không cần kế toán kiểm đếm',
     bullets: [
       { strong: 'Mã VietQR động Napas 247:', text: 'Nhúng sẵn số tiền và cú pháp hóa đơn, quét là chuyển tiền chuẩn 100%.' },
-      { strong: 'Gạch nợ tức thời:', text: 'Hệ thống tự động kích hoạt trạng thái hội viên ngay khi tiền về tài khoản.' },
+      { strong: 'Gạch nợ tức thời:', text: 'Hệ thống tự động kích hoạt trạng thái Học viên ngay khi tiền về tài khoản.' },
       { strong: 'Sổ quỹ thu chi minh bạch:', text: 'Theo dõi quỹ hoạt động, tài trợ sự kiện và giải ngân chi tiết.' },
       { strong: 'Xuất báo cáo tài chính:', text: 'Trích xuất báo cáo kế toán chuẩn mực phục vụ đại hội thường niên.' },
     ],
@@ -132,7 +132,7 @@ const CRM_SLIDES = [
     title: 'Ma Trận Phân Quyền Sticky 2 Cột (Advanced RBAC)',
     subtitle: 'Kiểm soát an toàn thông tin tuyệt đối với 10 vai trò trên 11 module chức năng',
     bullets: [
-      { strong: '10 Vai trò hành chính:', text: 'Chủ tịch, Phó Chủ tịch, Tổng thư ký, Trưởng ban, Kế toán, Hội viên...' },
+      { strong: '10 Vai trò hành chính:', text: 'Chủ tịch, Phó Chủ tịch, Tổng thư ký, Trưởng ban, Kế toán, Học viên...' },
       { strong: 'Giao diện Sticky chống trôi:', text: 'Cố định cột Vai trò và Nhóm quyền khi cuộn ngang dọc tiện lợi.' },
       { strong: 'Cập nhật phân quyền tức thì:', text: 'Áp dụng quyền mới ngay lập tức mà không cần đăng nhập lại.' },
       { strong: 'Nhật ký kiểm toán (Audit Log):', text: 'Ghi vết 100% thao tác sửa đổi dữ liệu bảo vệ hệ thống.' },
@@ -166,7 +166,7 @@ const CRM_SLIDES = [
 const APP_SLIDES = [
   {
     type: 'cover',
-    tag: 'ỨNG DỤNG DI ĐỘNG HỘI VIÊN',
+    tag: 'ỨNG DỤNG DI ĐỘNG Học viên',
     title: 'CEO HN10 MOBILE APP',
     subtitle: 'Hiệp hội Doanh nhân bỏ túi · Thẻ VIP quyền năng · Kết nối giao thương B2B thực chiến',
     footer: 'CLB Doanh Nhân CEO HN10 · Trực thuộc Hội Doanh Nhân Trẻ Hà Nội (HanoiBA)',
@@ -180,7 +180,7 @@ const APP_SLIDES = [
       'Dùng danh thiếp giấy dễ thất lạc, tốn kém',
       'Hỏi thăm cơ hội kinh doanh qua tin nhắn rời rạc',
       'Đến sự kiện phải xếp hàng tìm tên trên giấy',
-      'Khó nhớ lĩnh vực hoạt động của 500+ hội viên',
+      'Khó nhớ lĩnh vực hoạt động của 500+ Học viên',
     ],
     col2_title: 'CEO HN10 Mobile App',
     col2_items: [
@@ -192,7 +192,7 @@ const APP_SLIDES = [
   },
   {
     type: 'feature',
-    title: 'Thẻ Hội Viên VIP Mạ Vàng & Danh Thiếp vCard',
+    title: 'Thẻ Học viên VIP Mạ Vàng & Danh Thiếp vCard',
     subtitle: 'Tấm danh thiếp số quyền năng định danh đẳng cấp doanh nhân bản lĩnh',
     bullets: [
       { strong: 'Thiết kế hoàng gia Warm Amber Gold:', text: 'Tông xanh Cobalt Navy kết hợp vàng ánh kim tinh tế.' },
@@ -217,7 +217,7 @@ const APP_SLIDES = [
     title: 'Mạng Lưới Doanh Nhân Chính Danh & Hẹn 1-on-1',
     subtitle: 'Tìm kiếm đối tác tin cậy và đặt lịch cà phê giao thương trong 30 giây',
     bullets: [
-      { strong: 'Danh bạ 500+ CEO xác thực:', text: 'Hội viên chính thức với huy hiệu Verified tích xanh uy tín.' },
+      { strong: 'Danh bạ 500+ CEO xác thực:', text: 'Học viên chính thức với huy hiệu Verified tích xanh uy tín.' },
       { strong: 'Đặt lịch hẹn 1-on-1 tự động:', text: 'Chọn khung giờ trống và gửi lời mời cà phê kết nối kinh doanh.' },
       { strong: 'Đồng bộ lịch điện thoại:', text: 'Lịch hẹn tự động cập nhật vào Google Calendar / Apple Calendar.' },
       { strong: 'Ghi chú đối tác:', text: 'Lưu trữ thông tin nhu cầu và tiềm năng hợp tác sau buổi gặp gỡ.' },
@@ -242,7 +242,7 @@ const APP_SLIDES = [
       { strong: 'Cuộc gọi thoại & video HD:', text: 'Đàm thoại trực tiếp 1-1 với chất lượng âm thanh trong trẻo, bảo mật.' },
       { strong: 'Dịch vụ thông báo nền Native:', text: 'Đổ chuông ngay trên màn hình khóa kể cả khi ứng dụng đang đóng.' },
       { strong: 'Ngắt máy 0ms không độ trễ:', text: 'Một bên gác máy là cả hai đầu kết thúc tức thời, không chuông ảo.' },
-      { strong: 'Không bị làm phiền:', text: 'Chỉ các hội viên chính danh trong hệ sinh thái mới có thể kết nối.' },
+      { strong: 'Không bị làm phiền:', text: 'Chỉ các Học viên chính danh trong hệ sinh thái mới có thể kết nối.' },
     ],
   },
   {
@@ -271,7 +271,7 @@ const APP_SLIDES = [
     type: 'closing',
     tag: 'KẾT NỐI NGAY HÔM NAY',
     title: 'GIA NHẬP HỆ SINH THÁI DOANH NHÂN BẢN LĨNH',
-    subtitle: 'Tải ứng dụng trên App Store & Google Play để trải nghiệm đặc quyền hội viên',
+    subtitle: 'Tải ứng dụng trên App Store & Google Play để trải nghiệm đặc quyền Học viên',
     bullets: [
       'Quét mã QR để cài đặt ứng dụng CEO HN10 trên iOS và Android',
       'Đăng nhập bằng tài khoản chính danh do Ban Thư Ký hiệp hội cấp',
@@ -286,7 +286,7 @@ const MASTER_SLIDES = [
     type: 'cover',
     tag: 'BÁO CÁO TỔNG THỂ HỆ SINH THÁI',
     title: 'HỆ SINH THÁI CHUYỂN ĐỔI SỐ KÉP CEO HN10',
-    subtitle: 'Đồng bộ toàn diện Web CRM Quản trị & Mobile App Hội viên · Kiến tạo tương lai HanoiBA',
+    subtitle: 'Đồng bộ toàn diện Web CRM Quản trị & Mobile App Học viên · Kiến tạo tương lai HanoiBA',
     footer: 'CLB Doanh Nhân CEO HN10 · Trực thuộc Hội Doanh Nhân Trẻ Hà Nội (HanoiBA)',
   },
   {
@@ -297,7 +297,7 @@ const MASTER_SLIDES = [
       { strong: 'Tập hợp tinh hoa thế hệ 1983:', text: 'Quy tụ các nhà sáng lập, CEO đang bước vào độ chín của sự nghiệp.' },
       { strong: 'Tiên phong chuyển đổi số:', text: 'Xây dựng mô hình hiệp hội doanh nhân số kiểu mẫu đầu tiên tại Việt Nam.' },
       { strong: 'Liên minh kinh tế thực chiến:', text: 'Hợp tác phát triển kinh doanh bền vững, tương trợ và đồng hành lâu dài.' },
-      { strong: 'Đồng bộ dữ liệu thời gian thực:', text: 'Kết nối thông suốt giữa Ban Chấp Hành và từng hội viên thành viên.' },
+      { strong: 'Đồng bộ dữ liệu thời gian thực:', text: 'Kết nối thông suốt giữa Ban Chấp Hành và từng Học viên thành viên.' },
     ],
   },
   {
@@ -307,14 +307,14 @@ const MASTER_SLIDES = [
     col1_title: '1. Cổng Quản Trị Web CRM',
     col1_items: [
       'Dành cho Ban Điều Hành, Ban Thư Ký & Trưởng Ban',
-      'Quản lý dữ liệu hội viên, phân ban và nhiệm kỳ',
+      'Quản lý dữ liệu Học viên, phân ban và nhiệm kỳ',
       'Sơ đồ xếp chỗ Cinema Map & Soát vé Gatekeeper',
       'Kế toán đối soát VietQR và báo cáo thu chi minh bạch',
       'Ma trận phân quyền Sticky 2 cột cho 10 vai trò',
     ],
     col2_title: '2. Ứng Dụng Di Động Mobile App',
     col2_items: [
-      'Dành cho 500+ Doanh nhân hội viên chính danh',
+      'Dành cho 500+ Doanh nhân Học viên chính danh',
       'Thẻ VIP điện tử mạ vàng & QR vCard lưu danh bạ',
       'Sàn B2B niêm yết sản phẩm ưu đãi nội bộ đặc quyền',
       'Ví vé E-ticket sự kiện kèm số ghế và Lucky Draw',
@@ -326,7 +326,7 @@ const MASTER_SLIDES = [
     title: '5 Trụ Cột Giá Trị Cốt Lõi Của Hệ Sinh Thái',
     subtitle: 'Hiện đại hóa toàn bộ các hoạt động thường nhật của hiệp hội doanh nhân',
     kpis: [
-      { num: 'HỘI VIÊN', label: 'Số Hóa Hồ Sơ 360°', desc: 'Thẩm định minh bạch, thẻ VIP định danh độc bản' },
+      { num: 'Học viên', label: 'Số Hóa Hồ Sơ 360°', desc: 'Thẩm định minh bạch, thẻ VIP định danh độc bản' },
       { num: 'GIAO THƯƠNG', label: 'Sàn B2B & Hẹn 1-on-1', desc: 'Khớp nối cung cầu thực chiến không trung gian' },
       { num: 'SỰ KIỆN', label: 'Cinema Map & Lucky Draw', desc: 'Xếp chỗ rạp phim, soát vé QR 0.1s tốc độ cao' },
       { num: 'TÀI CHÍNH', label: 'VietQR Napas 247', desc: 'Gạch nợ tức thời, sổ quỹ công khai minh bạch' },
@@ -337,7 +337,7 @@ const MASTER_SLIDES = [
     title: 'Trụ Cột 1: Quản Trị Trung Ương Trên Web CRM',
     subtitle: 'Công cụ đắc lực giúp Ban Lãnh Đạo điều hành khoa học, tiết kiệm 85% thời gian',
     bullets: [
-      { strong: 'Dashboard tổng quan trực quan:', text: 'Nắm bắt biến động hội viên, tiến độ công việc và số dư tài chính.' },
+      { strong: 'Dashboard tổng quan trực quan:', text: 'Nắm bắt biến động Học viên, tiến độ công việc và số dư tài chính.' },
       { strong: 'Quản trị hồ sơ doanh nghiệp:', text: 'Lưu trữ hợp đồng, giấy phép kinh doanh và lịch sử đóng góp.' },
       { strong: 'Giao việc phân ban Kanban:', text: 'Giao nhiệm vụ, đính kèm file tài liệu và theo dõi deadline sát sao.' },
       { strong: 'Biểu quyết điện tử đại hội:', text: 'Tạo phiếu bầu tín nhiệm, kiểm phiếu tự động chuẩn xác 100%.' },
@@ -348,7 +348,7 @@ const MASTER_SLIDES = [
     title: 'Trụ Cột 2: Văn Phòng Bỏ Túi Trên Mobile App',
     subtitle: 'Đồng hành cùng doanh nhân mọi lúc mọi nơi trên chiếc điện thoại thông minh',
     bullets: [
-      { strong: 'Thẻ Hội Viên VIP mạ vàng:', text: 'Tự hào xuất trình thẻ số định danh tại các diễn đàn kinh tế lớn.' },
+      { strong: 'Thẻ Học viên VIP mạ vàng:', text: 'Tự hào xuất trình thẻ số định danh tại các diễn đàn kinh tế lớn.' },
       { strong: 'Chia sẻ danh thiếp không giới hạn:', text: 'Quét mã QR là đối tác lưu ngay danh bạ mà không cần cài app.' },
       { strong: 'Nhận chỉ đạo tức thời:', text: 'Thông báo nhiệm vụ khẩn và văn bản nội bộ gửi thẳng về điện thoại.' },
       { strong: 'Trợ lý Voice AI tiếng Việt:', text: 'Điều khiển bằng giọng nói thông minh, tra cứu dữ liệu trong chớp mắt.' },
@@ -371,7 +371,7 @@ const MASTER_SLIDES = [
     subtitle: 'Biến mối quan hệ đồng niên thành cơ hội kinh doanh sinh lời bền vững',
     steps: [
       { num: '01', title: 'Đăng Gian Hàng B2B', desc: 'Doanh nghiệp niêm yết sản phẩm kèm chính sách chiết khấu ưu đãi.' },
-      { num: '02', title: 'Khám Phá Nhu Cầu', desc: 'Hội viên lọc tìm kiếm theo ngành hàng cần mua sắm hoặc hợp tác.' },
+      { num: '02', title: 'Khám Phá Nhu Cầu', desc: 'Học viên lọc tìm kiếm theo ngành hàng cần mua sắm hoặc hợp tác.' },
       { num: '03', title: 'Đặt Lịch Hẹn 1-on-1', desc: 'Gửi lời mời cà phê giao thương, đồng bộ tự động vào lịch điện thoại.' },
       { num: '04', title: 'Ký Kết & Báo Doanh Thu', desc: 'Giao dịch thành công, ghi nhận thành tích thi đua cho ban chuyên môn.' },
     ],
@@ -384,7 +384,7 @@ const MASTER_SLIDES = [
       { strong: 'Sinh mã VietQR Napas 247:', text: 'Mã QR thanh toán chứa sẵn số tiền và nội dung hóa đơn tự động.' },
       { strong: 'Gạch nợ tức thời 24/7:', text: 'Webhook ngân hàng thông báo là hệ thống tự động duyệt trạng thái hoàn tất.' },
       { strong: 'Báo cáo thu chi công khai:', text: 'Báo cáo tài chính rõ ràng từng khoản mục thu chi, tài trợ sự kiện.' },
-      { strong: 'Nhắc phí lịch thiệp:', text: 'Hệ thống gửi thông báo nhắc gia hạn tự động tới email và app hội viên.' },
+      { strong: 'Nhắc phí lịch thiệp:', text: 'Hệ thống gửi thông báo nhắc gia hạn tự động tới email và app Học viên.' },
     ],
   },
   {
@@ -402,7 +402,7 @@ const MASTER_SLIDES = [
     type: 'comparison',
     title: 'Giá Trị Gia Tăng Cho Các Bên Liên Quan',
     subtitle: 'Hệ sinh thái đem lại lợi ích thiết thực, bền vững cho toàn bộ cộng đồng',
-    col1_title: 'Cho Doanh Nhân Hội Viên',
+    col1_title: 'Cho Doanh Nhân Học viên',
     col1_items: [
       'Nâng tầm hình ảnh chuyên nghiệp với Thẻ VIP & Danh thiếp vCard',
       'Mở rộng kênh bán hàng B2B nội bộ không tốn chi phí quảng cáo',

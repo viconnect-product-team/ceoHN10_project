@@ -91,7 +91,7 @@ export interface LandingWebConfig {
   // 3. Số liệu thống kê động
   metrics: LandingMetricItem[];
 
-  // 4. Quyền lợi hội viên
+  // 4. Quyền lợi Học viên
   benefits: LandingBenefitItem[];
 
   // 5. Cấu hình SEO & OpenGraph
@@ -137,22 +137,22 @@ export const DEFAULT_LANDING_CONFIG: LandingWebConfig = {
   heroSubtitle:
     "Nền tảng số hóa kết nối giao thương B2B, hợp tác chiến lược, chia sẻ tri thức quản trị và xúc tiến đầu tư quy mô toàn quốc.",
   heroBannerUrl: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1600&auto=format&fit=crop&q=80",
-  cta1Text: "Mở App Hội Viên",
+  cta1Text: "Mở App Học viên",
   cta1Link: "/association",
   cta2Text: "Đăng Ký Gia Nhập",
   cta2Link: "/register",
 
   metrics: [
-    { id: "m-1", label: "Hội viên chính thức", value: "500+", sub: "Doanh nhân chủ doanh nghiệp" },
+    { id: "m-1", label: "Học viên chính thức", value: "500+", sub: "Doanh nhân chủ doanh nghiệp" },
     { id: "m-2", label: "Giá trị giao thương", value: "1.500+ Tỷ", sub: "Doanh số hợp tác xúc tiến B2B" },
     { id: "m-3", label: "Sự kiện & Hội nghị", value: "60+", sub: "Diễn đàn, Gala, Cafe Doanh nhân" },
-    { id: "m-4", label: "Ban Chuyên Môn", value: "12+", sub: "Các ban chuyên trách hỗ trợ hội viên" },
+    { id: "m-4", label: "Ban Chuyên Môn", value: "12+", sub: "Các ban chuyên trách hỗ trợ Học viên" },
   ],
 
   benefits: [
     {
       id: "b-1",
-      title: "Thẻ Hội Viên VIP Số & NFC",
+      title: "Thẻ Học viên VIP Số & NFC",
       desc: "Định danh doanh nhân chuẩn quốc tế, tích hợp mã QR động, chip NFC và đồng bộ Apple Wallet & Google Wallet.",
       iconName: "IdCard",
     },
@@ -212,7 +212,7 @@ export function LandingWebManager({ onSwitchTab }: { onSwitchTab?: (tab: string)
           const parsed = JSON.parse(saved);
           return { ...DEFAULT_LANDING_CONFIG, ...parsed };
         }
-      } catch {}
+      } catch { }
     }
     return DEFAULT_LANDING_CONFIG;
   });
@@ -235,7 +235,7 @@ export function LandingWebManager({ onSwitchTab }: { onSwitchTab?: (tab: string)
           isPublished: b.landingPublished ?? prev.isPublished,
         }));
       })
-      .catch(() => {});
+      .catch(() => { });
     return () => {
       active = false;
     };
@@ -309,12 +309,12 @@ export function LandingWebManager({ onSwitchTab }: { onSwitchTab?: (tab: string)
     }));
   };
 
-  // Thao tác với quyền lợi hội viên
+  // Thao tác với quyền lợi Học viên
   const handleAddBenefit = () => {
     const newBenefit: LandingBenefitItem = {
       id: `b-${Date.now()}`,
       title: "Quyền lợi mới",
-      desc: "Mô tả chi tiết quyền lợi và đặc quyền hội viên.",
+      desc: "Mô tả chi tiết quyền lợi và đặc quyền Học viên.",
       iconName: "Sparkles",
     };
     setConfig((prev) => ({ ...prev, benefits: [...prev.benefits, newBenefit] }));
@@ -344,7 +344,7 @@ export function LandingWebManager({ onSwitchTab }: { onSwitchTab?: (tab: string)
             <span>Quản Lý Landing Web (Trang Giới Thiệu Công Khai)</span>
           </h2>
           <p className="text-xs text-slate-700 dark:text-slate-200 mt-1">
-            Thiết lập dynamic toàn diện: Hero banner, thông số ấn tượng, quyền lợi hội viên, SEO và thông tin liên hệ.
+            Thiết lập dynamic toàn diện: Hero banner, thông số ấn tượng, quyền lợi Học viên, SEO và thông tin liên hệ.
           </p>
         </div>
 
@@ -380,7 +380,7 @@ export function LandingWebManager({ onSwitchTab }: { onSwitchTab?: (tab: string)
         </div>
       </div>
 
-      
+
       {/* ── CẤU HÌNH SUBDOMAIN & LANDING PAGE DYNAMIC ── */}
       <div className="bg-blue-50/80 dark:bg-slate-900/90 p-5 rounded-2xl border-2 border-blue-200 dark:border-blue-800 shadow-xs">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -482,7 +482,7 @@ export function LandingWebManager({ onSwitchTab }: { onSwitchTab?: (tab: string)
           { key: "branding", label: "Nhận Diện & Màu Sắc", icon: Palette },
           { key: "hero", label: "Hero Banner & Kêu Gọi", icon: Layout },
           { key: "metrics", label: "Số Liệu Nổi Bật", icon: BarChart3 },
-          { key: "benefits", label: "Quyền Lợi Hội Viên", icon: Award },
+          { key: "benefits", label: "Quyền Lợi Học viên", icon: Award },
           { key: "seo", label: "Cấu Hình SEO / MXH", icon: Share2 },
           { key: "contact", label: "Liên Hệ & Mạng Xã Hội", icon: Phone },
         ].map((tab) => {
@@ -493,11 +493,10 @@ export function LandingWebManager({ onSwitchTab }: { onSwitchTab?: (tab: string)
               key={tab.key}
               type="button"
               onClick={() => setActiveTab(tab.key as any)}
-              className={`px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition cursor-pointer ${
-                isSelected
+              className={`px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition cursor-pointer ${isSelected
                   ? "bg-[#003B95] text-white shadow-xs"
                   : "text-slate-600 dark:text-slate-600 dark:text-slate-300 hover:bg-white/60 dark:hover:bg-slate-800"
-              }`}
+                }`}
             >
               <Icon className="size-3.5" />
               <span>{tab.label}</span>
@@ -786,33 +785,30 @@ export function LandingWebManager({ onSwitchTab }: { onSwitchTab?: (tab: string)
                       <button
                         type="button"
                         onClick={() => setConfig({ ...config, heroTextAlign: "left" })}
-                        className={`flex-1 h-full rounded-lg text-xs font-bold flex items-center justify-center gap-1 transition ${
-                          (config.heroTextAlign || "left") === "left"
+                        className={`flex-1 h-full rounded-lg text-xs font-bold flex items-center justify-center gap-1 transition ${(config.heroTextAlign || "left") === "left"
                             ? "bg-[#003B95] text-white"
                             : "text-slate-600 dark:text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
-                        }`}
+                          }`}
                       >
                         <AlignLeft className="size-3.5" /> Trái
                       </button>
                       <button
                         type="button"
                         onClick={() => setConfig({ ...config, heroTextAlign: "center" })}
-                        className={`flex-1 h-full rounded-lg text-xs font-bold flex items-center justify-center gap-1 transition ${
-                          config.heroTextAlign === "center"
+                        className={`flex-1 h-full rounded-lg text-xs font-bold flex items-center justify-center gap-1 transition ${config.heroTextAlign === "center"
                             ? "bg-[#003B95] text-white"
                             : "text-slate-600 dark:text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
-                        }`}
+                          }`}
                       >
                         <AlignCenter className="size-3.5" /> Giữa
                       </button>
                       <button
                         type="button"
                         onClick={() => setConfig({ ...config, heroTextAlign: "right" })}
-                        className={`flex-1 h-full rounded-lg text-xs font-bold flex items-center justify-center gap-1 transition ${
-                          config.heroTextAlign === "right"
+                        className={`flex-1 h-full rounded-lg text-xs font-bold flex items-center justify-center gap-1 transition ${config.heroTextAlign === "right"
                             ? "bg-[#003B95] text-white"
                             : "text-slate-600 dark:text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
-                        }`}
+                          }`}
                       >
                         <AlignRight className="size-3.5" /> Phải
                       </button>
@@ -979,12 +975,12 @@ export function LandingWebManager({ onSwitchTab }: { onSwitchTab?: (tab: string)
           </div>
         )}
 
-        {/* 4. QUYỀN LỢI HỘI VIÊN DYNAMIC */}
+        {/* 4. QUYỀN LỢI Học viên DYNAMIC */}
         {activeTab === "benefits" && (
           <div className="space-y-6">
             <div className="flex items-center justify-between border-b border-slate-200 pb-2">
               <h3 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider">
-                4. Quyền Lợi &amp; Đặc Quyền Hội Viên (Dynamic Benefits)
+                4. Quyền Lợi &amp; Đặc Quyền Học viên (Dynamic Benefits)
               </h3>
               <button
                 type="button"

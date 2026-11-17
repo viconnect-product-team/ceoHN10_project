@@ -93,7 +93,7 @@ export function resolveUserPermissions(
   const rList = roles.map((r) => r.toLowerCase().trim());
   const dept = (department || '').toLowerCase().trim();
 
-  // 1. Quản trị hệ thống, Admin, Chủ tịch -> Toàn quyền (Chỉ áp dụng khi không phải vai trò hội viên chuyên môn hoặc hội viên thường)
+  // 1. Quản trị hệ thống, Admin, Chủ tịch -> Toàn quyền (Chỉ áp dụng khi không phải vai trò Học viên chuyên môn hoặc Học viên thường)
   const isExplicitSpecialistOrMember =
     normRole.startsWith('thanh_vien_ban_') ||
     normRole === 'member' ||
@@ -409,12 +409,12 @@ export class UsersService implements OnModuleInit {
         INSERT INTO public.user_roles (user_id, role)
         VALUES (${adminUserId}::uuid, 'admin'::public.app_role)
         ON CONFLICT DO NOTHING
-      `.catch(() => {});
+      `.catch(() => { });
       await this.prisma.$executeRaw`
         INSERT INTO public.user_roles (user_id, role)
         VALUES (${adminUserId}::uuid, 'platform_admin'::public.app_role)
         ON CONFLICT DO NOTHING
-      `.catch(() => {});
+      `.catch(() => { });
 
       // Đảm bảo profile cho admin
       await this.prisma.$executeRaw`
@@ -422,7 +422,7 @@ export class UsersService implements OnModuleInit {
         VALUES (${adminUserId}::uuid, 'Lê Thị Dung (Admin Viconnect)', 'Công ty CP Giải Pháp Viconnect', 'Quản trị viên hệ thống')
         ON CONFLICT (user_id) DO UPDATE SET
           display_name = EXCLUDED.display_name
-      `.catch(() => {});
+      `.catch(() => { });
 
       // Đảm bảo record trong public.members cho admin
       await this.prisma.$executeRaw`
@@ -504,7 +504,7 @@ export class UsersService implements OnModuleInit {
           UPDATE public.vione_users 
           SET username = 'infor@viconnect.vn', email = 'infor@viconnect.vn', password = ${mediaPasswordHash}, name = 'Phạm Hồng Nguyên', updated_at = NOW() 
           WHERE id = ${mediaUserId}::uuid
-        `.catch(() => {});
+        `.catch(() => { });
       }
 
       // Đảm bảo roles cho media
@@ -512,7 +512,7 @@ export class UsersService implements OnModuleInit {
         INSERT INTO public.user_roles (user_id, role)
         VALUES (${mediaUserId}::uuid, 'staff'::public.app_role)
         ON CONFLICT DO NOTHING
-      `.catch(() => {});
+      `.catch(() => { });
 
       // Đảm bảo profile cho media
       await this.prisma.$executeRaw`
@@ -522,7 +522,7 @@ export class UsersService implements OnModuleInit {
           display_name = EXCLUDED.display_name,
           company_name = EXCLUDED.company_name,
           professional_title = EXCLUDED.professional_title
-      `.catch(() => {});
+      `.catch(() => { });
 
       // Đảm bảo record trong public.members cho media (Phạm Hồng Nguyên)
       await this.prisma.$executeRaw`
@@ -571,12 +571,12 @@ export class UsersService implements OnModuleInit {
         UPDATE public.members 
         SET email = 'infor@viconnect.vn', name = 'Phạm Hồng Nguyên', updated_at = NOW() 
         WHERE email IN ('info@viconnect.vn', 'infor@viconnect.vn') OR id = 'HN10-002' OR code = 'HN10-002'
-      `.catch(() => {});
+      `.catch(() => { });
       await this.prisma.$executeRaw`
         UPDATE public.vione_users 
         SET email = 'infor@viconnect.vn', username = 'infor@viconnect.vn', password = ${mediaPasswordHash}, name = 'Phạm Hồng Nguyên', updated_at = NOW() 
         WHERE email IN ('info@viconnect.vn', 'infor@viconnect.vn') OR username IN ('info@viconnect.vn', 'infor@viconnect.vn')
-      `.catch(() => {});
+      `.catch(() => { });
 
     } catch (e: any) {
       this.logger.error(`Error ensuring default accounts in database: ${e?.message}`);
@@ -903,7 +903,7 @@ export class UsersService implements OnModuleInit {
       let normalizedDept =
         memberRow?.department ||
         memberships?.[0]?.department ||
-        'Hội viên ceohn10';
+        'Học viên ceohn10';
       if (normalizedDept.toLowerCase().includes('quản trị')) {
         normalizedDept = normalizedDept
           .replace(/ban quản trị/gi, 'Ban Điều Hành')
@@ -943,7 +943,7 @@ export class UsersService implements OnModuleInit {
           exec === 'pho_chu_tich' ||
           exec === 'vice_president' ||
           exec.includes('phó chủ tịch') ||
-          (exec.includes('điều hành') && !exec.includes('hội viên')) ||
+          (exec.includes('điều hành') && !exec.includes('Học viên')) ||
           roleList.includes('ban_dieu_hanh'));
 
       const hasSpecificSpecialistRole =
@@ -951,7 +951,7 @@ export class UsersService implements OnModuleInit {
         exec.startsWith('thanh_vien_ban_') ||
         exec === 'ban_thu_ky' ||
         exec === 'tong_thu_ky' ||
-        (exec.includes('thư ký') && !exec.includes('hội viên'));
+        (exec.includes('thư ký') && !exec.includes('Học viên'));
 
       const isExplicitAdmin =
         !isExplicitPresident &&
@@ -989,7 +989,7 @@ export class UsersService implements OnModuleInit {
           }
         } else if (
           exec.includes('thành viên') ||
-          (dept.includes('thành viên') && !dept.includes('hội viên'))
+          (dept.includes('thành viên') && !dept.includes('Học viên'))
         ) {
           if (
             exec.startsWith('truong_ban_') ||
@@ -1164,7 +1164,7 @@ export class UsersService implements OnModuleInit {
               ? 'Quản trị viên'
               : primaryRole === 'ban_dieu_hanh'
                 ? 'Ban Điều Hành'
-                : 'Hội viên'),
+                : 'Học viên'),
         executive_role:
           memberRow?.executive_role ||
           (primaryRole === 'chu_tich'
@@ -1173,7 +1173,7 @@ export class UsersService implements OnModuleInit {
               ? 'Quản trị viên'
               : primaryRole === 'ban_dieu_hanh'
                 ? 'Ban Điều Hành'
-                : 'Hội viên'),
+                : 'Học viên'),
         department: normalizedDept,
         memberCode: memberRow?.code || null,
         memberId: memberRow?.id || null,
@@ -1249,14 +1249,14 @@ export class UsersService implements OnModuleInit {
             : roleList,
           normalizedDept,
           !(primaryRole.startsWith('thanh_vien_ban_') || primaryRole === 'member' || primaryRole === 'hoi_vien') &&
-            (primaryRole === 'chu_tich' || roleList.includes('chu_tich')),
+          (primaryRole === 'chu_tich' || roleList.includes('chu_tich')),
           !(primaryRole.startsWith('thanh_vien_ban_') || primaryRole === 'member' || primaryRole === 'hoi_vien') &&
-            (primaryRole === 'admin' ||
-              primaryRole === 'chu_tich' ||
-              primaryRole === 'quan_tri' ||
-              primaryRole === 'platform_admin' ||
-              roleList.includes('admin') ||
-              roleList.includes('platform_admin')),
+          (primaryRole === 'admin' ||
+            primaryRole === 'chu_tich' ||
+            primaryRole === 'quan_tri' ||
+            primaryRole === 'platform_admin' ||
+            roleList.includes('admin') ||
+            roleList.includes('platform_admin')),
           dynamicMatrix,
         ),
         permissionMatrix: dynamicMatrix,
@@ -1573,7 +1573,7 @@ export class UsersService implements OnModuleInit {
       await this.usersRepo.syncAuthUserEmail(targetUserId, finalEmail);
     }
 
-    // Cập nhật thông tin hội viên (public.members & public.user_profiles)
+    // Cập nhật thông tin Học viên (public.members & public.user_profiles)
     const profile = await this.usersRepo.getUserProfile(targetUserId);
     const memberRow = await this.usersRepo.getMemberInfo(
       targetUserId,
@@ -1594,7 +1594,7 @@ export class UsersService implements OnModuleInit {
             options?.fullName ||
             profile?.display_name ||
             user.name ||
-            'Hội viên',
+            'Học viên',
           updated_at: new Date(),
         },
         {
@@ -1613,7 +1613,7 @@ export class UsersService implements OnModuleInit {
       profile?.display_name ||
       user.name ||
       memberRow?.name ||
-      'Hội viên CEO HN10';
+      'Học viên CEO HN10';
     const memberCode = memberRow?.code || profile?.member_code || 'HV-HN10';
     const companyName = profile?.company_name || 'CLB Doanh Nhân CEO HN10';
     const resolvedPhone =
@@ -1789,23 +1789,23 @@ export class UsersService implements OnModuleInit {
       const executiveRole =
         rawExec ||
         (u.email === 'infor@viconnect.vn' ||
-        u.username === 'infor@viconnect.vn' ||
-        u.email === 'info@viconnect.vn' ||
-        u.username === 'info@viconnect.vn'
+          u.username === 'infor@viconnect.vn' ||
+          u.email === 'info@viconnect.vn' ||
+          u.username === 'info@viconnect.vn'
           ? 'truong_ban_truyen_thong'
           : userRoles.includes('platform_admin')
-          ? 'quan_tri'
-          : userRoles.includes('admin')
-          ? 'admin'
-          : 'member');
+            ? 'quan_tri'
+            : userRoles.includes('admin')
+              ? 'admin'
+              : 'member');
       const department =
         m?.department ||
         (u.email === 'infor@viconnect.vn' ||
-        u.username === 'infor@viconnect.vn' ||
-        u.email === 'info@viconnect.vn' ||
-        u.username === 'info@viconnect.vn'
+          u.username === 'infor@viconnect.vn' ||
+          u.email === 'info@viconnect.vn' ||
+          u.username === 'info@viconnect.vn'
           ? 'Ban Truyền Thông'
-          : 'Hội viên ceohn10');
+          : 'Học viên ceohn10');
 
       return {
         id: u.id,
@@ -1826,7 +1826,7 @@ export class UsersService implements OnModuleInit {
       };
     });
 
-    // Đảm bảo luôn trả về ít nhất 2 tài khoản hội viên thực tế nếu bảng vione_users trống hoặc chưa sync
+    // Đảm bảo luôn trả về ít nhất 2 tài khoản Học viên thực tế nếu bảng vione_users trống hoặc chưa sync
     if (items.length === 0) {
       const dbMembers = await this.prisma.$queryRaw<any[]>`
         SELECT * FROM public.members ORDER BY updated_at DESC, created_at DESC LIMIT 50
@@ -1952,7 +1952,7 @@ export class UsersService implements OnModuleInit {
       `.catch(() => []);
       if (existingMember.length > 0) {
         throw new BadRequestException(
-          'Địa chỉ Email này đã được sử dụng bởi một hội viên trên hệ thống',
+          'Địa chỉ Email này đã được sử dụng bởi một Học viên trên hệ thống',
         );
       }
     }
@@ -2013,7 +2013,7 @@ export class UsersService implements OnModuleInit {
     `.catch(() => { });
 
     const rawRole = (data.executiveRole || (typeof data.role === 'string' ? data.role : '') || 'member').toLowerCase().trim();
-    const rawDept = (data.department || 'Hội viên ceohn10').trim();
+    const rawDept = (data.department || 'Học viên ceohn10').trim();
 
     let appRoleValue: app_role = 'member';
     if (rawRole === 'quan_tri' || rawRole === 'platform_admin') {
@@ -2057,7 +2057,7 @@ export class UsersService implements OnModuleInit {
       appRoleValue,
       rawDept,
       rawRole,
-    ).catch(() => {});
+    ).catch(() => { });
 
     return this.getAccountDetails(newUser.id);
   }
@@ -2092,7 +2092,7 @@ export class UsersService implements OnModuleInit {
       `.catch(() => []);
       if (existingMember.length > 0) {
         throw new BadRequestException(
-          'Địa chỉ Email này đã được sử dụng bởi một hội viên khác',
+          'Địa chỉ Email này đã được sử dụng bởi một Học viên khác',
         );
       }
     }
@@ -2163,7 +2163,7 @@ export class UsersService implements OnModuleInit {
           id,
           user.email || '',
         )
-        .catch(() => {});
+        .catch(() => { });
 
       // Cập nhật memberships
       const defaultAssoc = await this.prisma.$queryRaw<any[]>`
@@ -2187,7 +2187,7 @@ export class UsersService implements OnModuleInit {
         id,
         assocId,
         appRoleValue,
-        rawDept || 'Hội viên ceohn10',
+        rawDept || 'Học viên ceohn10',
         rawRole || 'member',
       ).catch(async () => {
         await this.prisma.$executeRawUnsafe(
@@ -2197,9 +2197,9 @@ export class UsersService implements OnModuleInit {
           WHERE user_id = $3::uuid
         `,
           rawRole || 'member',
-          rawDept || 'Hội viên ceohn10',
+          rawDept || 'Học viên ceohn10',
           id,
-        ).catch(() => {});
+        ).catch(() => { });
       });
     }
 
@@ -2225,11 +2225,11 @@ export class UsersService implements OnModuleInit {
 
     await this.usersRepo.syncAuthUserPassword(id, hashedPassword);
 
-    // Lấy thông tin hội viên (email, phone, name) để gửi thông báo tự động
+    // Lấy thông tin Học viên (email, phone, name) để gửi thông báo tự động
     const memberRow = await this.usersRepo.getMemberInfo(id, user.email);
     const targetEmail = (user.email || memberRow?.email || '').trim().toLowerCase();
     const targetPhone = ((user as any).phone || memberRow?.phone || '').trim();
-    const targetName = user.name || memberRow?.name || memberRow?.contact || 'Hội viên';
+    const targetName = user.name || memberRow?.name || memberRow?.contact || 'Học viên';
 
     // 1. Tự động gửi Email thông báo mật khẩu mới
     if (targetEmail && targetEmail.includes('@') && this.mailService) {
@@ -2259,7 +2259,7 @@ export class UsersService implements OnModuleInit {
       `;
       void this.mailService.sendDirectEmail({
         to: targetEmail,
-        subject: '[CEO HN10] Mật khẩu mới tài khoản hội viên',
+        subject: '[CEO HN10] Mật khẩu mới tài khoản Học viên',
         html: emailHtml,
       }).catch((e: any) => console.warn('[adminResetPassword] Mail error:', e?.message));
     }
@@ -2284,12 +2284,12 @@ export class UsersService implements OnModuleInit {
         SET status = 'resolved', updated_at = NOW()
         WHERE app_scope = 'crm' 
           AND (title LIKE ${'%cấp lại mật khẩu%' + targetName + '%'} OR body LIKE ${'%' + targetEmail + '%'})
-      `.catch(() => {});
+      `.catch(() => { });
     }
 
     return {
       success: true,
-      message: 'Mật khẩu đã được thiết lập lại thành công và đã tự động gửi Email, Zalo OA cho hội viên',
+      message: 'Mật khẩu đã được thiết lập lại thành công và đã tự động gửi Email, Zalo OA cho Học viên',
     };
   }
 
@@ -2387,7 +2387,7 @@ export class UsersService implements OnModuleInit {
         actualId,
       );
 
-    // Tra cứu thông tin doanh nghiệp gắn với hội viên để xóa triệt để
+    // Tra cứu thông tin doanh nghiệp gắn với Học viên để xóa triệt để
     const memberRows = await this.prisma.$queryRaw<any[]>`
       SELECT id, code, company_name, tax_code FROM public.members
       WHERE user_id::text = ${actualId} 

@@ -1,7 +1,7 @@
 {
   "miniprogramRoot": "./",
   "projectname": "ceohn10-zalo-mini-app",
-  "description": "Zalo Mini App Dành Cho Hội Viên CLB Doanh Nhân CEO HN10 (HanoiBA)",
+  "description": "Zalo Mini App Dành Cho Học viên CLB Doanh Nhân CEO HN10 (HanoiBA)",
   "appid": "YOUR_ZALO_APP_ID",
   "setting": {
     "urlCheck": false,
@@ -10,4 +10,3 @@
     "minified": true
   }
 }
-

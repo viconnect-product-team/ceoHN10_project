@@ -8,13 +8,13 @@ const fs = require('fs');
 const path = require('path');
 
 function generateDbApiMarkdown() {
-  const srcPath = path.resolve('document/notebooklm/09_DAC_TA_API_VA_THIET_KE_CSDL.md');
-  let content = fs.readFileSync(srcPath, 'utf8');
+   const srcPath = path.resolve('document/notebooklm/09_DAC_TA_API_VA_THIET_KE_CSDL.md');
+   let content = fs.readFileSync(srcPath, 'utf8');
 
-  // Update header and metadata
-  content = content.replace(
-    /# TÀI LIỆU ĐẶC TẢ CHI TIẾT API & THIẾT KẾ CƠ SỞ DỮ LIỆU POSTGRESQL[\s\S]*?## PHẦN I: TỔNG QUAN KIẾN TRÚC DỮ LIỆU/,
-    `# HỆ SINH THÁI NỀN TẢNG SỐ CLB DOANH NHÂN CEO HN10 (HANOIBA)
+   // Update header and metadata
+   content = content.replace(
+      /# TÀI LIỆU ĐẶC TẢ CHI TIẾT API & THIẾT KẾ CƠ SỞ DỮ LIỆU POSTGRESQL[\s\S]*?## PHẦN I: TỔNG QUAN KIẾN TRÚC DỮ LIỆU/,
+      `# HỆ SINH THÁI NỀN TẢNG SỐ CLB DOANH NHÂN CEO HN10 (HANOIBA)
 
 ## TÀI LIỆU THIẾT KẾ CƠ SỞ DỮ LIỆU POSTGRESQL & ĐẶC TẢ REST API
 *(DATABASE DESIGN & REST API SPECIFICATIONS - MASTER ENTERPRISE SPEC)*
@@ -38,7 +38,7 @@ function generateDbApiMarkdown() {
    - 1.3. Cơ Chế Bảo Mật RBAC, DataScopeInterceptor & Xác Thực JWT
 2. **PHẦN II: THIẾT KẾ CƠ SỞ DỮ LIỆU POSTGRESQL CHI TIẾT (16 BẢNG DỮ LIỆU)**
    - 2.1. Sơ Đồ Quan Hệ Thực Thể Toàn Diện (Full ERD Diagram)
-   - 2.2. Phân Hệ Người Dùng, Hội Viên & Doanh Nghiệp (\`vione_users\`, \`members\`, \`companies\`)
+   - 2.2. Phân Hệ Người Dùng, Học viên & Doanh Nghiệp (\`vione_users\`, \`members\`, \`companies\`)
    - 2.3. Phân Hệ Phân Quyền Vai Trò & Phân Ban (\`user_roles\`, \`committee_members\`)
    - 2.4. Phân Hệ Giao Thương B2B, Cơ Hội & Đàm Phán Deal (\`opportunities\`, \`opportunity_interests\`)
    - 2.5. Phân Hệ Sản Phẩm & Gian Hàng Sàn TMĐT (\`products\`)
@@ -50,7 +50,7 @@ function generateDbApiMarkdown() {
    - 2.11. Phân Hệ Quản Trị Hệ Thống & Nhật Ký Kiểm Toán (\`audit_logs\`, \`app_settings\`, \`notifications\`)
 3. **PHẦN III: ĐẶC TẢ CHI TIẾT 50+ REST API ENDPOINTS CHUẨN DOANH NGHIỆP**
    - 3.1. Phân Hệ Xác Thực & Phiên Làm Việc (Authentication & Session APIs)
-   - 3.2. Phân Hệ Quản Trị Hội Viên & Thẩm Định Hồ Sơ (Members APIs)
+   - 3.2. Phân Hệ Quản Trị Học viên & Thẩm Định Hồ Sơ (Members APIs)
    - 3.3. Phân Hệ Sự Kiện, Sơ Đồ Bàn Tiệc & Trạm Soát Vé QR Gate (Events & Seating APIs)
    - 3.4. Phân Hệ Cuộc Họp Ban & Quản Lý Check-in Độc Lập (Meetings & Check-in APIs)
    - 3.5. Phân Hệ Cơ Hội Giao Thương B2B & Đàm Phán Deal Sinh Lời (Opportunities & Deals APIs)
@@ -63,9 +63,9 @@ function generateDbApiMarkdown() {
 ---
 
 ## PHẦN I: TỔNG QUAN KIẾN TRÚC DỮ LIỆU`
-  );
+   );
 
-  return content;
+   return content;
 }
 
 module.exports = { generateDbApiMarkdown };

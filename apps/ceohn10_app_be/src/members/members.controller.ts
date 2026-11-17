@@ -26,7 +26,7 @@ import { OptionalJwtAuthGuard } from '../auth/optional-jwt-auth.guard';
 
 @Controller('members')
 export class MembersController {
-  constructor(private readonly membersService: MembersService) {}
+  constructor(private readonly membersService: MembersService) { }
 
   /**
    * Endpoint đăng ký công khai dạng Google Form (không cần đăng nhập)
@@ -37,7 +37,7 @@ export class MembersController {
   }
 
   /**
-   * Endpoint duyệt hội viên mới và gửi email tài khoản ngẫu nhiên
+   * Endpoint duyệt Học viên mới và gửi email tài khoản ngẫu nhiên
    */
   @UseGuards(JwtAuthGuard)
   @Post(':id/approve-and-send-credentials')

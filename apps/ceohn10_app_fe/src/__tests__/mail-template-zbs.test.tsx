@@ -89,7 +89,7 @@ describe("CRM template ZBS dispatch", () => {
     localStorage.setItem("vba_zalo_access_token", "stale-browser-token");
     await openZaloChannel();
     fireEvent.click(
-      screen.getByText("Thư Cảm Ơn & Chào Mừng Hội Viên Mới Gia Nhập"),
+      screen.getByText("Thư Cảm Ơn & Chào Mừng Học viên Mới Gia Nhập"),
     );
     fireEvent.click(screen.getByRole("button", { name: "Bắn Thông Báo Ngay" }));
     await waitFor(() => expect(toast.success).toHaveBeenCalledOnce());
@@ -167,7 +167,7 @@ describe("CRM template ZBS dispatch", () => {
       expect(stored.FEE_NOTICE_ANNUAL.templateId).toBe("fee-new-id"),
     );
     fireEvent.click(
-      screen.getByText("Thư Cảm Ơn & Chào Mừng Hội Viên Mới Gia Nhập"),
+      screen.getByText("Thư Cảm Ơn & Chào Mừng Học viên Mới Gia Nhập"),
     );
     fireEvent.change(screen.getByLabelText("Template ID đã được Zalo duyệt"), {
       target: { value: "welcome-new-id" },
@@ -193,7 +193,7 @@ describe("CRM template ZBS dispatch", () => {
       ).value,
     ).toBe("fee-new-id");
     fireEvent.click(
-      screen.getByText("Thư Cảm Ơn & Chào Mừng Hội Viên Mới Gia Nhập"),
+      screen.getByText("Thư Cảm Ơn & Chào Mừng Học viên Mới Gia Nhập"),
     );
     expect(
       (
@@ -210,7 +210,7 @@ describe("CRM template ZBS dispatch", () => {
       target: { value: "unsaved-fee" },
     });
     fireEvent.click(
-      screen.getByText("Thư Cảm Ơn & Chào Mừng Hội Viên Mới Gia Nhập"),
+      screen.getByText("Thư Cảm Ơn & Chào Mừng Học viên Mới Gia Nhập"),
     );
     expect(
       (

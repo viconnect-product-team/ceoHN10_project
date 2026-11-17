@@ -167,7 +167,7 @@ export const ProductAdRegistrationModal: React.FC<ProductAdRegistrationModalProp
               onChange={(e) => setAdGoal(e.target.value)}
               className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/80 px-3 py-2.5 text-xs text-slate-900 dark:text-white outline-none focus:border-amber-500"
             >
-              <option value="Quảng bá sản phẩm / dịch vụ nổi bật tới toàn thể hội viên">
+              <option value="Quảng bá sản phẩm / dịch vụ nổi bật tới toàn thể Học viên">
                 Quảng bá sản phẩm / dịch vụ nổi bật
               </option>
               <option value="Chiến dịch liên kết Affiliate chia sẻ doanh thu B2B">

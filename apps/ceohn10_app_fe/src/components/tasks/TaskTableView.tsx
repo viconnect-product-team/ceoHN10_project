@@ -47,7 +47,7 @@ export function TaskTableView({
       label: 'Mã CV',
       width: 110,
       render: (task) => (
-        <span className="inline-flex items-center gap-1 rounded-md bg-[#003B95]/10 text-[#003B95] dark:text-blue-300 font-extrabold px-2 py-0.5 text-[11px] border border-[#003B95]/20 font-mono">
+        <span className="inline-flex items-center gap-1 rounded-md bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 font-extrabold px-2 py-0.5 text-[11px] border border-slate-200 dark:border-slate-700 font-mono">
           {task.code}
         </span>
       ),
@@ -61,7 +61,7 @@ export function TaskTableView({
           <CeoTableEllipsis
             text={task.title}
             maxLines={2}
-            className="font-semibold text-slate-900 dark:text-slate-100 group-hover:text-[#003B95] dark:group-hover:text-blue-400 transition-colors"
+            className="font-semibold text-slate-900 dark:text-slate-100 group-hover:text-[#334155] dark:group-hover:text-slate-300 transition-colors"
           />
           {task.deliverables && (
             <CeoTableEllipsis
@@ -79,7 +79,7 @@ export function TaskTableView({
                 className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10.5px] font-bold border transition ${
                   MEETING_PLATFORMS[task.meeting.platform]?.bg || 'bg-blue-50'
                 } ${
-                  MEETING_PLATFORMS[task.meeting.platform]?.text || 'text-[#003B95]'
+                  MEETING_PLATFORMS[task.meeting.platform]?.text || 'text-slate-700 dark:text-slate-300'
                 } ${
                   MEETING_PLATFORMS[task.meeting.platform]?.border || 'border-blue-200'
                 } hover:opacity-85`}
@@ -104,8 +104,8 @@ export function TaskTableView({
       label: 'Ban phụ trách',
       minWidth: 160,
       render: (task) => (
-        <span className="inline-flex items-center gap-1 rounded-md bg-[#003B95]/10 text-[#003B95] dark:text-blue-300 font-extrabold px-2 py-0.5 text-[11px] border border-[#003B95]/20">
-          <Building className="w-3 h-3 text-[#003B95] dark:text-blue-300" />
+        <span className="inline-flex items-center gap-1 rounded-md bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 font-extrabold px-2 py-0.5 text-[11px] border border-slate-200 dark:border-slate-700">
+          <Building className="w-3 h-3 text-slate-500 dark:text-slate-400" />
           <CeoTableEllipsis text={task.department} maxLines={1} />
         </span>
       ),
@@ -132,7 +132,7 @@ export function TaskTableView({
                     <div
                       key={i}
                       title={a.name}
-                      className="w-6 h-6 rounded-full bg-[#003B95] text-white flex items-center justify-center text-[10px] font-bold border border-white dark:border-slate-800"
+                      className="w-6 h-6 rounded-full bg-[#334155] text-white flex items-center justify-center text-[10px] font-bold border border-white dark:border-slate-800"
                     >
                       {a.name.charAt(0)}
                     </div>
@@ -162,7 +162,7 @@ export function TaskTableView({
                 className="w-6 h-6 rounded-full object-cover shrink-0"
               />
             ) : (
-              <div className="w-6 h-6 rounded-full bg-[#003B95] text-white flex items-center justify-center text-[10px] font-bold shrink-0">
+              <div className="w-6 h-6 rounded-full bg-[#334155] text-white flex items-center justify-center text-[10px] font-bold shrink-0">
                 {(task.assignee?.name || 'A').charAt(0)}
               </div>
             )}
@@ -228,7 +228,7 @@ export function TaskTableView({
           <div className="w-16 bg-slate-100 dark:bg-slate-800 h-2 rounded-full overflow-hidden">
             <div
               className={`h-full rounded-full transition-all duration-300 ${
-                task.status === 'DONE' ? 'bg-emerald-500' : 'bg-[#003B95]'
+                task.status === 'DONE' ? 'bg-emerald-500' : 'bg-[#334155]'
               }`}
               style={{ width: `${task.progress}%` }}
             />
@@ -295,7 +295,7 @@ export function TaskTableView({
               <button
                 type="button"
                 onClick={() => onTaskClick(task)}
-                className="p-1.5 rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-[#003B95] dark:hover:text-blue-400 transition-colors cursor-pointer"
+                className="p-1.5 rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-[#334155] dark:hover:text-slate-200 transition-colors cursor-pointer"
                 title="Xem chi tiết"
               >
                 <Eye className="w-4 h-4" />

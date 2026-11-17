@@ -96,11 +96,11 @@ async function main() {
       passwordHash: hash123456,
       appRole: 'member',
       assocRole: 'member',
-      executiveRole: 'Hội viên Ban Thành viên',
+      executiveRole: 'Học viên Ban Thành viên',
       department: 'Ban Thành viên',
       phone: '0983000006',
       company: 'EcoClean Vietnam',
-      title: 'Hội viên Ban Thành viên',
+      title: 'Học viên Ban Thành viên',
       memberCode: 'HN10-TV02'
     },
     {
@@ -111,11 +111,11 @@ async function main() {
       passwordHash: hash123456,
       appRole: 'member',
       assocRole: 'member',
-      executiveRole: 'Hội viên Ban Xúc tiến',
+      executiveRole: 'Học viên Ban Xúc tiến',
       department: 'Ban Xúc tiến',
       phone: '0983000007',
       company: 'Thắng Lợi XNK JSC',
-      title: 'Hội viên Ban Xúc tiến',
+      title: 'Học viên Ban Xúc tiến',
       memberCode: 'HN10-XT02'
     },
     {
@@ -126,11 +126,11 @@ async function main() {
       passwordHash: hash123456,
       appRole: 'member',
       assocRole: 'member',
-      executiveRole: 'Hội viên Ban Truyền thông',
+      executiveRole: 'Học viên Ban Truyền thông',
       department: 'Ban Truyền thông',
       phone: '0983000008',
       company: 'MediaPro Solution',
-      title: 'Hội viên Ban Truyền thông',
+      title: 'Học viên Ban Truyền thông',
       memberCode: 'HN10-TT02'
     },
     {
@@ -141,11 +141,11 @@ async function main() {
       passwordHash: hash123456,
       appRole: 'member',
       assocRole: 'member',
-      executiveRole: 'Hội viên Ban Thiện nguyện',
+      executiveRole: 'Học viên Ban Thiện nguyện',
       department: 'Ban Thiện nguyện',
       phone: '0983000009',
       company: 'Quỹ Thiện Nguyện CEO HN10',
-      title: 'Hội viên Ban Thiện nguyện',
+      title: 'Học viên Ban Thiện nguyện',
       memberCode: 'HN10-TN02'
     },
     {
@@ -156,11 +156,11 @@ async function main() {
       passwordHash: hash123456,
       appRole: 'member',
       assocRole: 'member',
-      executiveRole: 'Hội viên Ban Thư ký',
+      executiveRole: 'Học viên Ban Thư ký',
       department: 'Ban Thư ký',
       phone: '0983000010',
       company: 'An Phát Holding',
-      title: 'Hội viên Ban Thư ký',
+      title: 'Học viên Ban Thư ký',
       memberCode: 'HN10-TK02'
     }
   ];
@@ -216,7 +216,7 @@ async function main() {
         avatar, association_id, user_id, department, executive_role
       ) VALUES (
         $1::uuid, $2, $3, $3, $4, $5, 'official', 'member', 'Đa ngành', 'Hà Nội', 'active',
-        now(), 2026, true, 'Hà Nội', 'Hội viên CLB CEO HN10', now(), now(),
+        now(), 2026, true, 'Hà Nội', 'Học viên CLB CEO HN10', now(), now(),
         'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&auto=format&fit=crop&q=80',
         $6::uuid, $1::uuid, $7, $8
       )

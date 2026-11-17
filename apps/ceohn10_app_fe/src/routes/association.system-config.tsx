@@ -168,7 +168,7 @@ export function AssociationSystemConfigScreen() {
       />
 
       <div className="mx-4 mt-4 space-y-4">
-        {/* Banner Nhận diện Hội viên & CLB Doanh Nhân CEO HN10 */}
+        {/* Banner Nhận diện Học viên & CLB Doanh Nhân CEO HN10 */}
         <div
           style={{
             background: brandColorTheme.gradientCard,
@@ -186,11 +186,11 @@ export function AssociationSystemConfigScreen() {
                 CLB DOANH NHÂN 1983
               </div>
               <h2 className="text-[15px] font-black text-white leading-snug truncate">
-                {member?.name || user?.name || "Hội viên Doanh nhân"}
+                {member?.name || user?.name || "Học viên Doanh nhân"}
               </h2>
               <div className="flex items-center gap-2 mt-1">
                 <span className="inline-flex items-center gap-1 rounded bg-amber-400/20 px-2 py-0.5 text-[10px] font-bold text-amber-300 border border-amber-400/40">
-                  <ShieldCheck className="h-3 w-3 text-amber-300" /> Hội viên chính thức
+                  <ShieldCheck className="h-3 w-3 text-amber-300" /> Học viên chính thức
                 </span>
                 <span className="text-[11px] text-blue-100 truncate">
                   {member?.title || "CLB CEO HN10"}
@@ -281,8 +281,8 @@ export function AssociationSystemConfigScreen() {
               }}
               style={lang === "vi" ? { borderColor: brandColorTheme.primaryColor, color: brandColorTheme.primaryColor } : undefined}
               className={`py-3 px-3.5 rounded-2xl border text-xs font-bold flex items-center justify-center gap-2 transition cursor-pointer ${lang === "vi"
-                  ? "bg-blue-50/80 dark:bg-slate-800 shadow-2xs font-black"
-                  : "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+                ? "bg-blue-50/80 dark:bg-slate-800 shadow-2xs font-black"
+                : "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
                 }`}
             >
               <span className="text-base">🇻🇳</span>
@@ -298,8 +298,8 @@ export function AssociationSystemConfigScreen() {
               }}
               style={lang === "en" ? { borderColor: brandColorTheme.primaryColor, color: brandColorTheme.primaryColor } : undefined}
               className={`py-3 px-3.5 rounded-2xl border text-xs font-bold flex items-center justify-center gap-2 transition cursor-pointer ${lang === "en"
-                  ? "bg-blue-50/80 dark:bg-slate-800 shadow-2xs font-black"
-                  : "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+                ? "bg-blue-50/80 dark:bg-slate-800 shadow-2xs font-black"
+                : "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
                 }`}
             >
               <span className="text-base">🇬🇧</span>

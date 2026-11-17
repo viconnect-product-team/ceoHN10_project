@@ -339,7 +339,7 @@ export function TrainingAttendeesModal({
                         </td>
                         <td className="py-3">
                           <div className="text-slate-700 dark:text-slate-300">
-                            {a.company || "Hội viên CLB"}
+                            {a.company || "Học viên CLB"}
                           </div>
                           <div className="text-[11px] text-slate-400">{a.phone || "—"}</div>
                         </td>
@@ -355,11 +355,10 @@ export function TrainingAttendeesModal({
                         </td>
                         <td className="py-3">
                           <span
-                            className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold ${
-                              isAttended
+                            className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold ${isAttended
                                 ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300"
                                 : "bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300"
-                            }`}
+                              }`}
                           >
                             {isAttended ? (
                               <>

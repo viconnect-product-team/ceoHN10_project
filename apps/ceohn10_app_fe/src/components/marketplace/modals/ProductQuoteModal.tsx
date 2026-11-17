@@ -87,7 +87,7 @@ export const ProductQuoteModal: React.FC<ProductQuoteModalProps> = ({
               <div className="min-w-0 flex-1">
                 <p className="text-xs font-bold text-slate-900 dark:text-white truncate">{quoteProduct.name}</p>
                 <p className="text-[11px] text-amber-800 dark:text-amber-300 truncate">{quoteProduct.company}</p>
-                <p className="text-[11px] font-bold text-rose-500">{quoteProduct.price || (isEn ? "Contact for price" : "Giá ưu đãi hội viên")}</p>
+                <p className="text-[11px] font-bold text-rose-500">{quoteProduct.price || (isEn ? "Contact for price" : "Giá ưu đãi Học viên")}</p>
               </div>
             </div>
 
@@ -118,9 +118,8 @@ export const ProductQuoteModal: React.FC<ProductQuoteModalProps> = ({
                     if (errors.phone) setErrors((prev) => ({ ...prev, phone: "" }));
                   }}
                   placeholder="0988 123 456"
-                  className={`w-full rounded-xl border-0 bg-slate-100 dark:bg-white/[0.06] py-2.5 pl-9 pr-3 text-xs text-slate-900 dark:text-white outline-none transition ${
-                    errors.phone ? "ring-2 ring-rose-500" : "ring-0 focus:ring-1 focus:ring-[#003B95]"
-                  }`}
+                  className={`w-full rounded-xl border-0 bg-slate-100 dark:bg-white/[0.06] py-2.5 pl-9 pr-3 text-xs text-slate-900 dark:text-white outline-none transition ${errors.phone ? "ring-2 ring-rose-500" : "ring-0 focus:ring-1 focus:ring-[#003B95]"
+                    }`}
                 />
               </div>
               {errors.phone && (

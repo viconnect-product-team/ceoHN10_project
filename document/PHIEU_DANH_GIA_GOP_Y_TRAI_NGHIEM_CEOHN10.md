@@ -9,7 +9,7 @@
 - **Số điện thoại**: ........................................................................
 - **Đơn vị công tác**: ......................................................................
 - **Chức vụ**: .............................................................................
-- **Vai trò trong hệ sinh thái**: [ ] Ban Điều Hành  [ ] Hội Viên Chính Thức  [ ] Khách Mời Sự Kiện
+- **Vai trò trong hệ sinh thái**: [ ] Ban Điều Hành  [ ] Học viên Chính Thức  [ ] Khách Mời Sự Kiện
 - **Ngày đánh giá**: ...... / ...... / 2026
 
 ---
@@ -24,15 +24,15 @@
 | **3** | **Giao Diện & Thẩm Mỹ** | Bố cục đa dạng, câu từ ngắn gọn, thông minh, dễ hiểu | [ 5 ] | Súc tích, mạch lạc |
 | **4** | **Tốc Độ & Hiệu Năng** | Tốc độ tải trang dưới 1.5s, phản hồi tức thì | [ 5 ] | Tải nhanh |
 | **5** | **Tốc Độ & Hiệu Năng** | Thao tác vuốt chạm trên Mobile App mượt mà, không giật trễ | [ 5 ] | 60 FPS rất mượt |
-| **6** | **Mobile App** | thẻ hội viên điện tử mạ vàng hiệu ứng lật 2 mặt hoàng gia sang trọng | [ 5 ] | Độc bản, tự hào |
+| **6** | **Mobile App** | thẻ Học viên điện tử mạ vàng hiệu ứng lật 2 mặt hoàng gia sang trọng | [ 5 ] | Độc bản, tự hào |
 | **7** | **Mobile App** | Chia sẻ mã QR & Lưu danh bạ vCard 1 chạm không cần cài app | [ 5 ] | Rất tiện lợi |
 | **8** | **Mobile App** | Sàn giao thương B2B niêm yết sản phẩm, phân trang & lọc ngành nghề | [ 5 ] | Mua bán trực tiếp |
 | **9** | **Mobile App** | Đặt lịch hẹn cà phê 1-on-1 tự động đồng bộ lịch công tác điện thoại | [ 5 ] | Tiết kiệm thời gian |
 | **10** | **Mobile App** | Ví vé E-Ticket kèm vị trí số ghế VIP và mã bốc thăm Lucky Draw | [ 5 ] | Check-in 0.1s |
 | **11** | **Mobile App** | Đàm thoại nội bộ bảo mật, thông báo cuộc gọi nền native khi tắt app | [ 5 ] | Không lỡ cuộc gọi |
 | **12** | **Mobile App** | Trợ lý giọng nói Voice AI tiếng Việt điều hướng màn hình tức thì | [ 5 ] | Nhận diện giọng chuẩn |
-| **13** | **Web CRM** | Dashboard tổng quan theo dõi biến động hội viên và thu chi tài chính | [ 5 ] | Số liệu thời gian thực |
-| **14** | **Web CRM** | Quản lý hội viên & hồ sơ doanh nghiệp 360°, duyệt hội viên 3 cấp | [ 5 ] | Chặt chẽ, chính danh |
+| **13** | **Web CRM** | Dashboard tổng quan theo dõi biến động Học viên và thu chi tài chính | [ 5 ] | Số liệu thời gian thực |
+| **14** | **Web CRM** | Quản lý Học viên & hồ sơ doanh nghiệp 360°, duyệt Học viên 3 cấp | [ 5 ] | Chặt chẽ, chính danh |
 | **15** | **Web CRM** | Sơ đồ xếp chỗ Cinema Seating Map phân khu khán phòng trực quan | [ 5 ] | Tránh nhầm chỗ Gala |
 | **16** | **Web CRM** | Cổng soát vé Gatekeeper QR siêu tốc & Standee Zalo cho khách ngoài | [ 5 ] | Đón tiếp chuyên nghiệp |
 | **17** | **Web CRM** | Thu phí Mã QR Ngân Hàng Napas 247 tự động gạch nợ tức thời 24/7 | [ 5 ] | Kế toán minh bạch |
@@ -51,7 +51,7 @@
    > *Trả lời*: Hệ thống vận hành rất trơn tru, mong muốn tiếp tục duy trì tính ổn định cao như hiện nay.
 
 3. **Ý tưởng hoặc tính năng mới Anh/Chị muốn đề xuất phát triển trong phiên bản tiếp theo?**
-   > *Trả lời*: Có thể bổ sung thêm tính năng nhắc nhở lịch sinh nhật doanh nghiệp của hội viên tự động.
+   > *Trả lời*: Có thể bổ sung thêm tính năng nhắc nhở lịch sinh nhật doanh nghiệp của Học viên tự động.
 
 ---
 

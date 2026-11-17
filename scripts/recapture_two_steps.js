@@ -59,7 +59,7 @@ async function run() {
     if (await memberName.count() > 0) {
       await memberName.click({ timeout: 5000 });
       await appPage.waitForTimeout(2000);
-      await snap(appPage, 'app_step_08_member_profile_modal.png', 'Drawer/Modal Chi Tiết Hồ Sơ Năng Lực Hội Viên Đối Tác');
+      await snap(appPage, 'app_step_08_member_profile_modal.png', 'Drawer/Modal Chi Tiết Hồ Sơ Năng Lực Học viên Đối Tác');
     }
   } catch (e) {
     console.log('  Error member modal:', e.message);

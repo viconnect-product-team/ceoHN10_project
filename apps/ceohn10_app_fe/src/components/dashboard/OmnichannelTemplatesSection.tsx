@@ -25,7 +25,7 @@ export function OmnichannelTemplatesSection() {
               Hệ Thống Mẫu Email &amp; Câu Trả Lời Nhanh
             </h3>
             <p className="max-w-2xl text-xs text-slate-500 dark:text-slate-400">
-              Quản lý tập trung các mẫu Email HTML Dynamic visual phục vụ gửi thư mời, hội phí, kỷ niệm và kho phản hồi nhanh cho Hội viên CLB CEO HN10.
+              Quản lý tập trung các mẫu Email HTML Dynamic visual phục vụ gửi thư mời, hội phí, kỷ niệm và kho phản hồi nhanh cho Học viên CLB CEO HN10.
             </p>
           </div>
 
@@ -34,11 +34,10 @@ export function OmnichannelTemplatesSection() {
             <button
               type="button"
               onClick={() => setActiveSubTab("email")}
-              className={`inline-flex items-center gap-2 rounded-lg px-3.5 py-1.5 text-xs font-semibold transition cursor-pointer ${
-                activeSubTab === "email"
+              className={`inline-flex items-center gap-2 rounded-lg px-3.5 py-1.5 text-xs font-semibold transition cursor-pointer ${activeSubTab === "email"
                   ? "bg-white text-blue-700 shadow-xs dark:bg-slate-700 dark:text-white"
                   : "text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
-              }`}
+                }`}
             >
               <FileText className="size-3.5" />
               <span>Mẫu Email CRM</span>
@@ -46,11 +45,10 @@ export function OmnichannelTemplatesSection() {
             <button
               type="button"
               onClick={() => setActiveSubTab("replies")}
-              className={`inline-flex items-center gap-2 rounded-lg px-3.5 py-1.5 text-xs font-semibold transition cursor-pointer ${
-                activeSubTab === "replies"
+              className={`inline-flex items-center gap-2 rounded-lg px-3.5 py-1.5 text-xs font-semibold transition cursor-pointer ${activeSubTab === "replies"
                   ? "bg-white text-blue-700 shadow-xs dark:bg-slate-700 dark:text-white"
                   : "text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
-              }`}
+                }`}
             >
               <MessageCircle className="size-3.5" />
               <span>Mẫu Phản Hồi Nhanh</span>

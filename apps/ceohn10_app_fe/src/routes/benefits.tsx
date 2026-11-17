@@ -130,7 +130,7 @@ function BenefitsAdminPage() {
   const notifyBenefitsUpdated = () => window.dispatchEvent(new CustomEvent("benefits-updated"));
   const reload = () => loadBenefits();
 
-  // Danh sách Top 10 hội viên theo danh mục thống kê
+  // Danh sách Top 10 Học viên theo danh mục thống kê
   const currentCategoryTop10 = useMemo<TopRankedMember[]>(() => {
     if (!analyticsOverview) return [];
     let list: TopRankedMember[] = [];
@@ -152,24 +152,24 @@ function BenefitsAdminPage() {
         idx === 0
           ? "Kim Cương 💎"
           : idx === 1
-          ? "Bạch Kim 🪙"
-          : idx === 2
-          ? "Vàng 🥇"
-          : "Top 10 Xuất Sắc 🌟",
+            ? "Bạch Kim 🪙"
+            : idx === 2
+              ? "Vàng 🥇"
+              : "Top 10 Xuất Sắc 🌟",
     }));
   }, [analyticsOverview, selectedRewardCat]);
 
-  // Hành động: Khen thưởng hội viên top 10
+  // Hành động: Khen thưởng Học viên top 10
   const handleOpenRewardModal = (memberItem: TopRankedMember) => {
     setRewardingMember(memberItem);
     const categoryName =
       selectedRewardCat === "top_connections"
         ? "Top Kết Nối Giao Thương"
         : selectedRewardCat === "top_opportunities"
-        ? "Top Chia Sẻ Cơ Hội B2B"
-        : selectedRewardCat === "top_events_meetings"
-        ? "Top Tham Gia Sự Kiện & Tương Tác"
-        : "Top Giới Thiệu Hội Viên";
+          ? "Top Chia Sẻ Cơ Hội B2B"
+          : selectedRewardCat === "top_events_meetings"
+            ? "Top Tham Gia Sự Kiện & Tương Tác"
+            : "Top Giới Thiệu Học viên";
     setRewardVoucherTitle(`Khen thưởng ${memberItem.tier}: ${categoryName}`);
     setRewardVoucherCode(`CEO HN10-TOP${memberItem.rank}-${Date.now().toString().slice(-4)}`);
     setRewardModalOpen(true);
@@ -186,7 +186,7 @@ function BenefitsAdminPage() {
           category: "HONOR",
           department: "Ban Thi Đua Khen Thưởng",
         }),
-      }).catch(() => {});
+      }).catch(() => { });
 
       // Ghi nhận audit log thi đua khen thưởng để báo cáo & lưu vết hệ thống
       await fetchNestApi("/admin/audit-logs", {
@@ -205,7 +205,7 @@ function BenefitsAdminPage() {
             period,
           },
         }),
-      }).catch(() => {});
+      }).catch(() => { });
 
       toast.success(
         `✓ Đã trao thưởng thành công cho CEO ${rewardingMember.name}! Mẫu quà tặng & mã ưu đãi đã được lưu vào hệ thống.`
@@ -313,7 +313,7 @@ function BenefitsAdminPage() {
   return (
     <AppShell>
       <PageHeader
-        title="Khen Thưởng & Danh Hiệu Hội Viên"
+        title="Khen Thưởng & Danh Hiệu Học viên"
         subtitle="Vinh danh và trao thưởng trực tiếp cho Top 10 cá nhân xuất sắc nhất từ các danh mục thống kê CLB CEO HN10"
         actions={
           <div className="flex flex-wrap items-center gap-2">
@@ -322,11 +322,10 @@ function BenefitsAdminPage() {
               <button
                 type="button"
                 onClick={() => setActiveMainTab("top10_rewards")}
-                className={`inline-flex items-center gap-1.5 rounded-xl px-3.5 py-1.5 text-xs font-bold transition-all cursor-pointer ${
-                  activeMainTab === "top10_rewards"
+                className={`inline-flex items-center gap-1.5 rounded-xl px-3.5 py-1.5 text-xs font-bold transition-all cursor-pointer ${activeMainTab === "top10_rewards"
                     ? "bg-[#003B95] text-white shadow-sm"
                     : "text-slate-600 dark:text-slate-400 hover:text-slate-900"
-                }`}
+                  }`}
               >
                 <Trophy className="h-3.5 w-3.5 text-amber-400" />
                 <span>Khen Thưởng Top 10 Thống Kê</span>
@@ -334,11 +333,10 @@ function BenefitsAdminPage() {
               <button
                 type="button"
                 onClick={() => setActiveMainTab("benefits_crud")}
-                className={`inline-flex items-center gap-1.5 rounded-xl px-3.5 py-1.5 text-xs font-bold transition-all cursor-pointer ${
-                  activeMainTab === "benefits_crud"
+                className={`inline-flex items-center gap-1.5 rounded-xl px-3.5 py-1.5 text-xs font-bold transition-all cursor-pointer ${activeMainTab === "benefits_crud"
                     ? "bg-[#003B95] text-white shadow-sm"
                     : "text-slate-600 dark:text-slate-400 hover:text-slate-900"
-                }`}
+                  }`}
               >
                 <Award className="h-3.5 w-3.5" />
                 <span>Danh Mục Quyền Lợi Hiệp Hội</span>
@@ -394,11 +392,10 @@ function BenefitsAdminPage() {
                     key={c.id}
                     type="button"
                     onClick={() => setSelectedRewardCat(c.id as RewardCategory)}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
-                      isSelected
+                    className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${isSelected
                         ? "bg-[#003B95] text-white shadow-md shadow-blue-900/20"
                         : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200"
-                    }`}
+                      }`}
                   >
                     <Icon className="size-3.5 text-amber-400" />
                     <span>{c.label}</span>
@@ -418,11 +415,10 @@ function BenefitsAdminPage() {
                   key={p.id}
                   type="button"
                   onClick={() => setPeriod(p.id as any)}
-                  className={`px-2.5 py-1 rounded-lg text-xs font-bold transition cursor-pointer ${
-                    period === p.id
+                  className={`px-2.5 py-1 rounded-lg text-xs font-bold transition cursor-pointer ${period === p.id
                       ? "bg-white dark:bg-slate-700 text-[#003B95] dark:text-white shadow-xs"
                       : "text-slate-600 dark:text-slate-400 hover:text-slate-900"
-                  }`}
+                    }`}
                 >
                   {p.label}
                 </button>
@@ -450,7 +446,7 @@ function BenefitsAdminPage() {
               </div>
             ) : currentCategoryTop10.length === 0 ? (
               <div className="py-16 text-center text-xs text-slate-400">
-                Chưa có dữ liệu hội viên trong kỳ thống kê này.
+                Chưa có dữ liệu Học viên trong kỳ thống kê này.
               </div>
             ) : (
               <div className="overflow-x-auto">
@@ -458,7 +454,7 @@ function BenefitsAdminPage() {
                   <thead>
                     <tr className="bg-slate-50 dark:bg-slate-800/70 border-b border-slate-200 dark:border-slate-800 text-[11px] font-extrabold text-slate-500 uppercase tracking-wider">
                       <th className="py-3 px-4 w-16 text-center">Hạng</th>
-                      <th className="py-3 px-4">Hội viên / Doanh nghiệp</th>
+                      <th className="py-3 px-4">Học viên / Doanh nghiệp</th>
                       <th className="py-3 px-4">Ban chuyên môn</th>
                       <th className="py-3 px-4">Thành tích ghi nhận</th>
                       <th className="py-3 px-4">Danh hiệu thi đua</th>
@@ -475,35 +471,33 @@ function BenefitsAdminPage() {
                         (selectedRewardCat === "top_connections"
                           ? `${m.connectionsCount || 0} Lượt kết nối`
                           : selectedRewardCat === "top_opportunities"
-                          ? `${m.publicOppsShared || 0} Cơ hội public`
-                          : selectedRewardCat === "top_events_meetings"
-                          ? `${m.eventsAttended || 0} Buổi họp & tương tác`
-                          : `${m.referralsCount || m.connectionsCount || 0} Hội viên đã giới thiệu`);
+                            ? `${m.publicOppsShared || 0} Cơ hội public`
+                            : selectedRewardCat === "top_events_meetings"
+                              ? `${m.eventsAttended || 0} Buổi họp & tương tác`
+                              : `${m.referralsCount || m.connectionsCount || 0} Học viên đã giới thiệu`);
 
                       return (
                         <tr
                           key={`${m.name}-${m.rank}`}
-                          className={`hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors ${
-                            isTop1
+                          className={`hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors ${isTop1
                               ? "bg-amber-500/5 font-semibold"
                               : isTop2
-                              ? "bg-slate-400/5"
-                              : isTop3
-                              ? "bg-amber-700/5"
-                              : ""
-                          }`}
+                                ? "bg-slate-400/5"
+                                : isTop3
+                                  ? "bg-amber-700/5"
+                                  : ""
+                            }`}
                         >
                           <td className="py-3.5 px-4 text-center">
                             <span
-                              className={`size-7 mx-auto rounded-full flex items-center justify-center font-black text-xs shadow-xs ${
-                                isTop1
+                              className={`size-7 mx-auto rounded-full flex items-center justify-center font-black text-xs shadow-xs ${isTop1
                                   ? "bg-amber-400 text-slate-950 ring-2 ring-amber-300"
                                   : isTop2
-                                  ? "bg-slate-300 text-slate-900"
-                                  : isTop3
-                                  ? "bg-amber-700 text-white"
-                                  : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400"
-                              }`}
+                                    ? "bg-slate-300 text-slate-900"
+                                    : isTop3
+                                      ? "bg-amber-700 text-white"
+                                      : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400"
+                                }`}
                             >
                               {m.rank}
                             </span>
@@ -539,15 +533,14 @@ function BenefitsAdminPage() {
                           </td>
                           <td className="py-3.5 px-4">
                             <span
-                              className={`px-2.5 py-1 rounded-full text-[10.5px] font-black uppercase tracking-wider inline-flex items-center gap-1 ${
-                                isTop1
+                              className={`px-2.5 py-1 rounded-full text-[10.5px] font-black uppercase tracking-wider inline-flex items-center gap-1 ${isTop1
                                   ? "bg-cyan-500/15 text-cyan-600 dark:text-cyan-300 border border-cyan-500/30"
                                   : isTop2
-                                  ? "bg-slate-300/30 text-slate-700 dark:text-slate-200 border border-slate-400/30"
-                                  : isTop3
-                                  ? "bg-amber-500/15 text-amber-700 dark:text-amber-400 border border-amber-500/30"
-                                  : "bg-blue-500/10 text-blue-600 dark:text-blue-300 border border-blue-500/20"
-                              }`}
+                                    ? "bg-slate-300/30 text-slate-700 dark:text-slate-200 border border-slate-400/30"
+                                    : isTop3
+                                      ? "bg-amber-500/15 text-amber-700 dark:text-amber-400 border border-amber-500/30"
+                                      : "bg-blue-500/10 text-blue-600 dark:text-blue-300 border border-blue-500/20"
+                                }`}
                             >
                               {m.tier}
                             </span>
@@ -682,7 +675,7 @@ function BenefitsAdminPage() {
         </div>
       )}
 
-      {/* MODAL TRAO KHEN THƯỞNG CHO HỘI VIÊN TOP 10 */}
+      {/* MODAL TRAO KHEN THƯỞNG CHO Học viên TOP 10 */}
       {rewardModalOpen && rewardingMember && (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-950/75 backdrop-blur-md animate-in fade-in duration-200">
           <div className="relative w-full max-w-md rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 text-slate-900 dark:text-white shadow-2xl space-y-4 animate-in zoom-in-95 duration-200">
@@ -702,7 +695,7 @@ function BenefitsAdminPage() {
               </button>
             </div>
 
-            {/* Thông tin hội viên được khen thưởng */}
+            {/* Thông tin Học viên được khen thưởng */}
             <div className="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center gap-3">
               <img
                 src={

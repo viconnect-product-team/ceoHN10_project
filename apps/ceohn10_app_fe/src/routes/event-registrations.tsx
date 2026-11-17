@@ -229,7 +229,7 @@ function RegPage() {
           ticketType: r.ticketType || "VIP",
           status: r.status || "confirmed",
           phone: r.phone || "",
-          title: r.title || (r as any).position || "Hội viên VIP",
+          title: r.title || (r as any).position || "Học viên VIP",
         };
         map[r.seatAssignment] = info;
         const match = r.seatAssignment.match(/[A-Z]+-\d{2}|T\d+-\d{2}|SK-\d{2}/i);
@@ -471,7 +471,7 @@ function RegPage() {
   const handleConfirmBankPayment = async (r: Registration) => {
     if (
       !window.confirm(
-        `Xác nhận hội viên "${r.memberName}" ĐÃ THANH TOÁN phí tham dự sự kiện?\n` +
+        `Xác nhận Học viên "${r.memberName}" ĐÃ THANH TOÁN phí tham dự sự kiện?\n` +
         `Số tiền: ${fmt.money(r.paymentAmount || 0)}\n\n` +
         `Sau khi xác nhận:\n` +
         `1. Hệ thống sẽ kích hoạt vé chính thức (Trạng thái: Đã thanh toán).\n` +
@@ -728,7 +728,7 @@ function RegPage() {
             {REGISTRATIONS.length}
           </div>
           <div className="text-slate-500 dark:text-slate-400 text-xs">
-            Hội viên &amp; khách mời tham dự
+            Học viên &amp; khách mời tham dự
           </div>
         </div>
 
@@ -782,7 +782,7 @@ function RegPage() {
           <input
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            placeholder="Tìm tên, mã hội viên, email, số bàn ghế..."
+            placeholder="Tìm tên, mã Học viên, email, số bàn ghế..."
             className="h-10 w-full rounded-lg border border-border bg-card pl-9 pr-3 text-sm shadow-[var(--shadow-card)] focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/20"
           />
         </div>
@@ -974,7 +974,7 @@ function RegPage() {
                         <span className="font-semibold text-foreground text-xs">{r.memberName}</span>
                         {isMember ? (
                           <span className="text-[10px] font-bold px-1.5 py-0.2 rounded bg-blue-500/10 text-blue-700 dark:text-blue-400 border border-blue-500/20">
-                            Hội viên
+                            Học viên
                           </span>
                         ) : (
                           <span className="text-[10px] font-medium px-1.5 py-0.2 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700">
@@ -1064,8 +1064,8 @@ function RegPage() {
                         <div className="flex items-center gap-1.5">
                           <span
                             className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-bold ${isPaid
-                                ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400"
-                                : "bg-amber-500/15 text-amber-700 dark:text-amber-400"
+                              ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400"
+                              : "bg-amber-500/15 text-amber-700 dark:text-amber-400"
                               }`}
                           >
                             {isPaid ? "Đã nộp" : "Chờ thanh toán"}
@@ -1282,7 +1282,7 @@ function RegPage() {
                     "Bàn VIP 01 - Ban Chủ Tọa - Ghế 1",
                     "Bàn VIP 02 - Khách Mời Danh Dự - Ghế 1",
                     "Bàn 03 - Ban Xúc Tiến B2B - Ghế 1",
-                    "Bàn 04 - Hội Viên CEO HN10 - Ghế 1",
+                    "Bàn 04 - Học viên CEO HN10 - Ghế 1",
                     "Khu Khách Mời Tự Do",
                   ].map((preset) => (
                     <button
@@ -1383,7 +1383,7 @@ function RegPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs">
           <div className="w-full max-w-lg rounded-2xl border border-border bg-card p-6 shadow-2xl animate-in fade-in max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-4 border-b border-border pb-3">
-              <div className="flex items-center gap-2 text-purple-600 dark:text-purple-400">
+              <div className="flex items-center gap-2 text-slate-800 dark:text-slate-200">
                 <FileText className="h-5 w-5" />
                 <h3 className="text-base font-bold text-foreground">
                   Dữ Liệu Khảo Sát Google Form Của Đại Biểu
@@ -1404,7 +1404,7 @@ function RegPage() {
                   Email: {selectedSurveyReg.email} · Mã: {selectedSurveyReg.id}
                 </p>
                 <p className="text-muted-foreground mt-0.5">
-                  Doanh nghiệp: <strong>{selectedSurveyReg.company || "Công ty Hội Viên Hiệp Hội"}</strong>
+                  Doanh nghiệp: <strong>{selectedSurveyReg.company || "Công ty Học viên Hiệp Hội"}</strong>
                 </p>
               </div>
 
@@ -1418,7 +1418,7 @@ function RegPage() {
               <div className="space-y-1">
                 <span className="font-bold text-foreground">Câu hỏi đặt trước cho Ban Tổ Chức / Diễn Giả:</span>
                 <p className="text-muted-foreground bg-secondary/40 p-2.5 rounded-lg border border-border/60 leading-relaxed">
-                  Kế hoạch hỗ trợ các doanh nghiệp hội viên tham gia hội chợ xúc tiến thương mại quốc tế trong năm 2026?
+                  Kế hoạch hỗ trợ các doanh nghiệp Học viên tham gia hội chợ xúc tiến thương mại quốc tế trong năm 2026?
                 </p>
               </div>
 
@@ -1485,8 +1485,8 @@ function RegPage() {
                 type="button"
                 onClick={() => setAttendeeMode("qr")}
                 className={`py-2 rounded-lg transition ${attendeeMode === "qr"
-                    ? "bg-card text-foreground shadow-sm font-bold"
-                    : "text-muted-foreground hover:text-foreground"
+                  ? "bg-card text-foreground shadow-sm font-bold"
+                  : "text-muted-foreground hover:text-foreground"
                   }`}
               >
                 Quét QR / Điểm danh nhanh
@@ -1495,8 +1495,8 @@ function RegPage() {
                 type="button"
                 onClick={() => setAttendeeMode("manual")}
                 className={`py-2 rounded-lg transition ${attendeeMode === "manual"
-                    ? "bg-card text-foreground shadow-sm font-bold"
-                    : "text-muted-foreground hover:text-foreground"
+                  ? "bg-card text-foreground shadow-sm font-bold"
+                  : "text-muted-foreground hover:text-foreground"
                   }`}
               >
                 Thêm thông tin người mới
@@ -1509,7 +1509,7 @@ function RegPage() {
                   <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-amber-500/20 text-amber-600 mb-2">
                     <QrCode className="h-8 w-8 animate-pulse" />
                   </div>
-                  <p className="text-sm font-bold text-foreground">Quét mã QR từ Thẻ hội viên / Vé điện tử</p>
+                  <p className="text-sm font-bold text-foreground">Quét mã QR từ Thẻ Học viên / Vé điện tử</p>
                   <p className="text-xs text-muted-foreground mt-1">
                     Hướng camera máy quét vào mã QR hoặc nhập trực tiếp mã đại biểu/số điện thoại bên dưới.
                   </p>
@@ -1517,7 +1517,7 @@ function RegPage() {
 
                 <div className="space-y-2">
                   <label className="text-xs font-semibold text-foreground">
-                    Mã QR / Mã Hội Viên / Email / Tên đại biểu:
+                    Mã QR / Mã Học viên / Email / Tên đại biểu:
                   </label>
                   <div className="flex gap-2">
                     <input
@@ -1598,7 +1598,7 @@ function RegPage() {
                     />
                   </div>
                   <div>
-                    <label className="font-semibold text-foreground block mb-1">Mã Hội Viên:</label>
+                    <label className="font-semibold text-foreground block mb-1">Mã Học viên:</label>
                     <input
                       type="text"
                       value={newAttendee.memberCode}

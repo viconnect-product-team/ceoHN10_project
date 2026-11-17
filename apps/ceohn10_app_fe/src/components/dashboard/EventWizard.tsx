@@ -322,13 +322,12 @@ function EventWizardDialog({
             {steps.map((label, i) => (
               <li key={label} className="flex flex-1 items-center gap-2">
                 <span
-                  className={`grid h-7 w-7 shrink-0 place-items-center rounded-full text-xs font-semibold ${
-                    i < step
+                  className={`grid h-7 w-7 shrink-0 place-items-center rounded-full text-xs font-semibold ${i < step
                       ? "bg-[#003B95] text-white font-bold"
                       : i === step
                         ? "bg-[#003B95]/15 text-[#003B95] ring-2 ring-[#003B95] font-bold dark:text-blue-400 dark:ring-blue-400"
                         : "bg-muted text-muted-foreground border border-border"
-                  }`}
+                    }`}
                   aria-current={i === step ? "step" : undefined}
                 >
                   {i < step ? <Check className="h-3.5 w-3.5" aria-hidden="true" /> : i + 1}
@@ -452,11 +451,10 @@ function InfoStep({
                 key={key}
                 type="button"
                 onClick={() => handleSelectType(key)}
-                className={`flex flex-col items-start p-2.5 rounded-xl border text-left transition-all cursor-pointer ${
-                  isSelected
+                className={`flex flex-col items-start p-2.5 rounded-xl border text-left transition-all cursor-pointer ${isSelected
                     ? "border-[#003B95] bg-blue-50 dark:bg-blue-950/30 ring-2 ring-[#003B95]/30 shadow-xs"
                     : "border-border bg-card hover:bg-muted/50 hover:border-[#003B95]/40 text-foreground"
-                }`}
+                  }`}
               >
                 <div className="flex items-center gap-1.5 w-full">
                   <span className={`text-xs font-bold line-clamp-1 ${isSelected ? "text-[#003B95] dark:text-blue-400" : "text-foreground"}`}>{tpl.label}</span>
@@ -757,22 +755,20 @@ function InfoStep({
               <button
                 type="button"
                 onClick={() => setInfo({ ...info, isFixed: false })}
-                className={`flex-1 py-2 px-3 rounded-xl border text-xs font-bold transition cursor-pointer ${
-                  !info.isFixed
+                className={`flex-1 py-2 px-3 rounded-xl border text-xs font-bold transition cursor-pointer ${!info.isFixed
                     ? "border-primary bg-primary/10 text-primary"
                     : "border-border bg-background text-muted-foreground hover:text-foreground"
-                }`}
+                  }`}
               >
                 Không cố định (Đột xuất)
               </button>
               <button
                 type="button"
                 onClick={() => setInfo({ ...info, isFixed: true })}
-                className={`flex-1 py-2 px-3 rounded-xl border text-xs font-bold transition cursor-pointer ${
-                  info.isFixed
+                className={`flex-1 py-2 px-3 rounded-xl border text-xs font-bold transition cursor-pointer ${info.isFixed
                     ? "border-primary bg-primary/10 text-primary"
                     : "border-border bg-background text-muted-foreground hover:text-foreground"
-                }`}
+                  }`}
               >
                 Cố định (Định kỳ)
               </button>
@@ -797,22 +793,20 @@ function InfoStep({
               <button
                 type="button"
                 onClick={() => setInfo({ ...info, isPaid: false })}
-                className={`flex-1 py-2 px-3 rounded-xl border text-xs font-bold transition cursor-pointer ${
-                  !info.isPaid
+                className={`flex-1 py-2 px-3 rounded-xl border text-xs font-bold transition cursor-pointer ${!info.isPaid
                     ? "border-emerald-500 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400"
                     : "border-border bg-background text-muted-foreground hover:text-foreground"
-                }`}
+                  }`}
               >
                 Miễn phí (Free)
               </button>
               <button
                 type="button"
                 onClick={() => setInfo({ ...info, isPaid: true })}
-                className={`flex-1 py-2 px-3 rounded-xl border text-xs font-bold transition cursor-pointer ${
-                  info.isPaid
+                className={`flex-1 py-2 px-3 rounded-xl border text-xs font-bold transition cursor-pointer ${info.isPaid
                     ? "border-amber-500 bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400"
                     : "border-border bg-background text-muted-foreground hover:text-foreground"
-                }`}
+                  }`}
               >
                 Có thu phí (Vé)
               </button>
@@ -820,7 +814,7 @@ function InfoStep({
             <p className="mt-1 text-[11px] text-muted-foreground">
               {info.isPaid
                 ? "Thiết lập chi tiết các hạng vé và mức phí ở Bước 2 tiếp theo."
-                : "Hội viên và khách mời đăng ký tham dự miễn phí 100%."}
+                : "Học viên và khách mời đăng ký tham dự miễn phí 100%."}
             </p>
           </div>
         </div>
@@ -855,7 +849,7 @@ function InfoStep({
           onChange={(e) => setInfo({ ...info, photoGalleryUrl: e.target.value })}
         />
         <p className="mt-1 text-[11px] text-muted-foreground">
-          Ban Truyền Thông dán link Google Drive hoặc OneDrive chứa ảnh sự kiện vào đây để hội viên xem và tải ảnh sau khi sự kiện kết thúc.
+          Ban Truyền Thông dán link Google Drive hoặc OneDrive chứa ảnh sự kiện vào đây để Học viên xem và tải ảnh sau khi sự kiện kết thúc.
         </p>
       </div>
 
@@ -1079,11 +1073,10 @@ function QrStep({
           return (
             <label
               key={f}
-              className={`flex cursor-pointer items-start gap-3 rounded-xl border p-3 transition ${
-                checked
+              className={`flex cursor-pointer items-start gap-3 rounded-xl border p-3 transition ${checked
                   ? "border-[#003B95] bg-blue-50 dark:bg-blue-950/30 text-foreground shadow-xs"
                   : "border-border bg-card hover:bg-muted/50 text-foreground"
-              }`}
+                }`}
             >
               <input
                 type="checkbox"

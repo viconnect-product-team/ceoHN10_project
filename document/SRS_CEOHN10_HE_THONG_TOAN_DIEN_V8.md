@@ -29,13 +29,13 @@
 - **API Endpoint Xuất Thống Kê**: `GET /analytics/overview?granularity={period}&period={period}`
 - **Chế độ Xuất Excel 1 (Theo Thời Gian)**:
   - Input: `year: string`, `periodType: 'month' | 'quarter' | 'year'`, `periodValue: string`.
-  - Process: Lấy dữ liệu hội viên, format tiền tệ, tính tổng `totalVolume`, `totalConnections`, `totalDeals`.
+  - Process: Lấy dữ liệu Học viên, format tiền tệ, tính tổng `totalVolume`, `totalConnections`, `totalDeals`.
   - Output: Tệp `CEOHN10_BaoCao_GiaoThuong_{year}_{timestamp}.xlsx`.
-- **Chế độ Xuất Excel 2 (Theo Từng Cá Nhân Hội Viên)**:
+- **Chế độ Xuất Excel 2 (Theo Từng Cá Nhân Học viên)**:
   - Input: `selectedMemberIds: string[]`.
   - Process: Sinh multi-sheet workbook, mỗi sheet chứa bảng thông tin cá nhân, chỉ số KPI và lịch sử thương vụ.
   - Output: Tệp `CEOHN10_HoSo_HoiVien_{timestamp}.xlsx`.
-- **Chế độ Xuất Excel 3 (Biến Động Hội Viên - Delta)**:
+- **Chế độ Xuất Excel 3 (Biến Động Học viên - Delta)**:
   - Input: So sánh kỳ này và kỳ trước.
   - Process: Tính Delta %, gán nhãn phân loại xu hướng và hành động đề xuất của BĐH.
   - Output: Tệp `CEOHN10_BaoCao_BienDong_HoiVien_{timestamp}.xlsx`.

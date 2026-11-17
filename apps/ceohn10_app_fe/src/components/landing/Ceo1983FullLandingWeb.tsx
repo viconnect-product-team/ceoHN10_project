@@ -108,7 +108,7 @@ export function Ceo1983FullLandingWeb() {
               onClick={() => scrollTo("benefits")}
               className="text-slate-700 dark:text-slate-300 hover:text-[#003B95] dark:hover:text-[#B8860B] transition cursor-pointer"
             >
-              Đặc Quyền Hội Viên
+              Đặc Quyền Học viên
             </button>
             <button
               type="button"
@@ -132,7 +132,7 @@ export function Ceo1983FullLandingWeb() {
               className="px-4 py-2 rounded-xl bg-linear-to-r from-[#1F3864] to-[#003B95] hover:brightness-110 text-white text-xs font-bold shadow-sm transition flex items-center gap-1.5"
             >
               <Smartphone className="size-3.5" />
-              <span>Mở App Hội Viên</span>
+              <span>Mở App Học viên</span>
             </Link>
           </div>
 
@@ -189,7 +189,7 @@ export function Ceo1983FullLandingWeb() {
               onClick={() => scrollTo("benefits")}
               className="block w-full text-left py-2 text-slate-700 dark:text-slate-300 hover:text-[#003B95]"
             >
-              Đặc Quyền Hội Viên
+              Đặc Quyền Học viên
             </button>
             <button
               type="button"
@@ -259,7 +259,7 @@ export function Ceo1983FullLandingWeb() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-16 max-w-5xl mx-auto">
             <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-sm text-center space-y-1">
               <div className="text-3xl lg:text-4xl font-black text-[#1F3864] dark:text-[#B8860B]">500+</div>
-              <div className="text-xs font-bold text-slate-800 dark:text-slate-200">Hội Viên Chính Thức</div>
+              <div className="text-xs font-bold text-slate-800 dark:text-slate-200">Học viên Chính Thức</div>
               <div className="text-[11px] text-slate-500">Chủ tịch, CEO các doanh nghiệp</div>
             </div>
             <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-sm text-center space-y-1">
@@ -332,7 +332,7 @@ export function Ceo1983FullLandingWeb() {
           <div className="text-center max-w-2xl mx-auto space-y-3">
             <span className="text-xs font-black uppercase tracking-wider text-[#B8860B]">CƠ CẤU VẬN HÀNH CHUYÊN NGHIỆP</span>
             <h2 className="text-2xl sm:text-3xl font-black text-[#1F3864] dark:text-white">
-              6 Ban Chuyên Môn Đồng Hành Cùng Hội Viên
+              6 Ban Chuyên Môn Đồng Hành Cùng Học viên
             </h2>
           </div>
 
@@ -344,8 +344,8 @@ export function Ceo1983FullLandingWeb() {
                 icon: ShieldCheck,
               },
               {
-                title: "Ban Hội Viên & Đào Tạo",
-                desc: "Thẩm định chất lượng hội viên mới, tổ chức các khóa huấn luyện chuyên sâu về kỹ năng quản trị và điều hành.",
+                title: "Ban Học viên & Đào Tạo",
+                desc: "Thẩm định chất lượng Học viên mới, tổ chức các khóa huấn luyện chuyên sâu về kỹ năng quản trị và điều hành.",
                 icon: Users,
               },
               {
@@ -392,7 +392,7 @@ export function Ceo1983FullLandingWeb() {
             Gia Nhập Cộng Đồng Doanh Nhân CEO HN10
           </h2>
           <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 max-w-xl mx-auto">
-            Điền biểu mẫu trực tuyến dưới đây. Ban Thư Ký CLB sẽ liên hệ hỗ trợ thẩm định và cấp Thẻ Hội Viên Số trong vòng 24 giờ.
+            Điền biểu mẫu trực tuyến dưới đây. Ban Thư Ký CLB sẽ liên hệ hỗ trợ thẩm định và cấp Thẻ Học viên Số trong vòng 24 giờ.
           </p>
         </div>
 
@@ -446,7 +446,7 @@ export function Ceo1983FullLandingWeb() {
                 <li>
                   <Link to="/association" className="hover:text-white transition flex items-center gap-1.5">
                     <ChevronRight className="size-3 text-[#B8860B]" />
-                    <span>Ứng Dụng Di Động Hội Viên CEO HN10</span>
+                    <span>Ứng Dụng Di Động Học viên CEO HN10</span>
                   </Link>
                 </li>
                 <li>

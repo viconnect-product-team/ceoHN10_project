@@ -89,7 +89,7 @@ function getDeletedIdentifiers(): Set<string> {
         return new Set(filtered);
       }
     }
-  } catch {}
+  } catch { }
   return new Set();
 }
 
@@ -106,7 +106,7 @@ function addDeletedIdentifiers(identifiers: (string | undefined | null)[]) {
       }
     });
     localStorage.setItem(DELETED_ACCOUNTS_KEY, JSON.stringify(Array.from(cur)));
-  } catch {}
+  } catch { }
 }
 
 function AccountsPage() {
@@ -131,7 +131,7 @@ function AccountsPage() {
             if (valid.length > 0) return valid;
           }
         }
-      } catch {}
+      } catch { }
     }
     const deleted = getDeletedIdentifiers();
     return DEFAULT_ACCOUNTS.filter((a) => {
@@ -148,7 +148,7 @@ function AccountsPage() {
       try {
         const saved = localStorage.getItem(STORAGE_KEY);
         if (saved) return saved;
-      } catch {}
+      } catch { }
     }
     return JSON.stringify(DEFAULT_ACCOUNTS);
   });
@@ -311,7 +311,7 @@ function AccountsPage() {
               return a;
             });
 
-          // 2. Bổ sung các hội viên từ CSDL chưa có trong danh sách
+          // 2. Bổ sung các Học viên từ CSDL chưa có trong danh sách
           const newAccounts: UserAccountItem[] = validMList
             .filter((m) => m.id && !matchedMemberIds.has(m.id))
             .filter(
@@ -324,7 +324,7 @@ function AccountsPage() {
             .map((m) => ({
               id: `acc_${m.id || m.code}`,
               dbMemberId: m.id,
-              name: m.name || m.personName || "Hội viên CEO HN10",
+              name: m.name || m.personName || "Học viên CEO HN10",
               code: m.code || `CEO-${m.id.slice(0, 4)}`,
               email: m.email || `${(m.code || 'member').toLowerCase()}@ceohn10.vn`,
               phone: m.phone || m.mobile || "",
@@ -339,11 +339,11 @@ function AccountsPage() {
           try {
             localStorage.setItem(STORAGE_KEY, JSON.stringify(combined));
             setInitialAccountsStr(JSON.stringify(combined));
-          } catch {}
+          } catch { }
           return combined;
         });
       })
-      .catch(() => {});
+      .catch(() => { });
 
     return () => {
       active = false;
@@ -386,7 +386,7 @@ function AccountsPage() {
         localStorage.setItem(STORAGE_KEY, nextStr);
         setInitialAccountsStr(nextStr);
         setHasUnsavedChanges(false);
-      } catch {}
+      } catch { }
 
       clearMeCache();
       if (typeof window !== "undefined") {
@@ -408,7 +408,7 @@ function AccountsPage() {
       let initialList: UserAccountItem[] = [];
       try {
         if (initialAccountsStr) initialList = JSON.parse(initialAccountsStr);
-      } catch {}
+      } catch { }
 
       const initialMap = new Map<string, UserAccountItem>();
       initialList.forEach((a) => {
@@ -473,7 +473,7 @@ function AccountsPage() {
       clearMeCache();
       try {
         dispatchPermissionSyncEvent();
-      } catch {}
+      } catch { }
       if (typeof window !== "undefined") {
         window.dispatchEvent(new Event("role-changed"));
         window.dispatchEvent(new Event("crm_permissions_updated"));
@@ -498,7 +498,7 @@ function AccountsPage() {
         setAccounts(restored);
         setHasUnsavedChanges(false);
         toast.info("Đã hoàn tác toàn bộ thay đổi tài khoản chưa lưu.");
-      } catch {}
+      } catch { }
     } else {
       setHasUnsavedChanges(false);
     }
@@ -641,7 +641,7 @@ function AccountsPage() {
                 localStorage.setItem("vba_crm_current_user", JSON.stringify(cu));
               }
             }
-          } catch {}
+          } catch { }
 
           if (typeof window !== "undefined") {
             window.dispatchEvent(new Event("role-changed"));
@@ -649,7 +649,7 @@ function AccountsPage() {
             window.dispatchEvent(new Event("vba_auth_changed"));
           }
         })
-        .catch(() => {});
+        .catch(() => { });
     }
 
     try {
@@ -657,7 +657,7 @@ function AccountsPage() {
       localStorage.setItem(STORAGE_KEY, nextStr);
       setInitialAccountsStr(nextStr);
       setHasUnsavedChanges(false);
-    } catch {}
+    } catch { }
 
     toast.success(`Đã cập nhật phân quyền "${getRoleLabel(formRole)}" cho "${formName}" vào CSDL thành công.`);
     setIsEditOpen(false);
@@ -717,9 +717,9 @@ function AccountsPage() {
         window.dispatchEvent(new Event("role-changed"));
         window.dispatchEvent(new Event("crm_permissions_updated"));
         window.dispatchEvent(new Event("vba_auth_changed"));
-      } catch {}
+      } catch { }
 
-      toast.success(`Đã xóa tài khoản "${acc.name}" cùng hồ sơ hội viên và doanh nghiệp thành công.`);
+      toast.success(`Đã xóa tài khoản "${acc.name}" cùng hồ sơ Học viên và doanh nghiệp thành công.`);
     } catch (err: any) {
       toast.error(err?.message || "Lỗi khi xóa tài khoản");
     }
@@ -772,7 +772,7 @@ function AccountsPage() {
         window.dispatchEvent(new Event("role-changed"));
         window.dispatchEvent(new Event("crm_permissions_updated"));
         window.dispatchEvent(new Event("vba_auth_changed"));
-      } catch {}
+      } catch { }
 
       toast.success(`Đã xóa thành công ${toDelete.length} tài khoản đã chọn.`);
     } catch (err: any) {
@@ -826,7 +826,7 @@ function AccountsPage() {
         window.dispatchEvent(new Event("role-changed"));
         window.dispatchEvent(new Event("crm_permissions_updated"));
         window.dispatchEvent(new Event("vba_auth_changed"));
-      } catch {}
+      } catch { }
 
       toast.success(`Đã xóa tất cả ${toDelete.length} tài khoản thành công (Bảo vệ tài khoản quản trị gốc).`);
     } catch (err: any) {
@@ -983,9 +983,12 @@ function AccountsPage() {
         {/* Header với Icon Logo */}
         <div className="flex items-center gap-3 border-b border-slate-200 dark:border-slate-800 pb-5">
           <img
-            src="/icons/ceohn10_icon_2/image 6.png"
+            src="/ceohn10-logo.png"
             alt="CEO HN10"
             className="w-16 h-16 object-contain shrink-0"
+            onError={(e) => {
+              (e.currentTarget as HTMLImageElement).src = '/brand-header-logo.png';
+            }}
           />
           <div className="flex-1">
             <h1 className="text-slate-900 dark:text-white text-2xl font-bold font-['Inter'] leading-8">
@@ -1005,7 +1008,7 @@ function AccountsPage() {
               <div className="text-[#003B95] dark:text-blue-400 text-xs font-semibold font-['Inter']">TỔNG SỐ TÀI KHOẢN</div>
             </div>
             <div className="text-slate-900 dark:text-white text-2xl font-bold font-['Inter'] leading-7">{accounts.length}</div>
-            <div className="text-slate-500 text-xs font-normal font-['Inter']">Tài khoản quản trị &amp; hội viên</div>
+            <div className="text-slate-500 text-xs font-normal font-['Inter']">Tài khoản quản trị &amp; Học viên</div>
           </div>
 
           <div className="h-32 p-4 bg-white dark:bg-card rounded-[20px] border border-slate-200 dark:border-slate-800 flex flex-col justify-start items-start gap-2.5 overflow-hidden shadow-xs">
@@ -1051,7 +1054,7 @@ function AccountsPage() {
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Tìm tài khoản theo tên, email, SĐT, mã hội viên..."
+                placeholder="Tìm tài khoản theo tên, email, SĐT, mã Học viên..."
                 className="flex-1 bg-transparent text-xs text-slate-900 dark:text-white placeholder:text-slate-500 outline-none"
               />
               {searchQuery && (
@@ -1266,9 +1269,8 @@ function AccountsPage() {
                   return (
                     <tr
                       key={acc.id}
-                      className={`h-16 hover:bg-slate-50/60 dark:hover:bg-slate-900/40 transition ${
-                        isChecked ? "bg-blue-50/40 dark:bg-blue-950/20" : ""
-                      }`}
+                      className={`h-16 hover:bg-slate-50/60 dark:hover:bg-slate-900/40 transition ${isChecked ? "bg-blue-50/40 dark:bg-blue-950/20" : ""
+                        }`}
                     >
                       {/* Checkbox */}
                       <td className="w-10 px-2 text-center border-r border-slate-200">
@@ -1277,9 +1279,8 @@ function AccountsPage() {
                           checked={isChecked}
                           disabled={root}
                           onChange={() => toggleSelectOne(acc.id)}
-                          className={`w-4 h-4 rounded cursor-pointer accent-[#003B95] ${
-                            root ? "opacity-30 cursor-not-allowed" : ""
-                          }`}
+                          className={`w-4 h-4 rounded cursor-pointer accent-[#003B95] ${root ? "opacity-30 cursor-not-allowed" : ""
+                            }`}
                           title={
                             root
                               ? "Tài khoản quản trị viên gốc không thể chọn xóa"
@@ -1293,103 +1294,103 @@ function AccountsPage() {
                         {(currentPage - 1) * pageSize + index + 1}
                       </td>
 
-                    {/* THÔNG TIN TÀI KHOẢN */}
-                    <td className="px-6 border-r border-slate-200">
-                      <div className="flex items-center gap-3">
-                        {acc.avatar ? (
-                          <img
-                            src={resolveMediaUrl(acc.avatar) || acc.avatar}
-                            alt={acc.name}
-                            className="w-10 h-10 rounded-full object-cover shrink-0 border border-slate-200 dark:border-slate-700"
-                            onError={(e) => {
-                              (e.currentTarget as HTMLElement).style.display = "none";
-                            }}
-                          />
-                        ) : (
-                          <div className="w-10 h-10 rounded-full bg-[#003B95] text-white flex items-center justify-center font-semibold text-xs shrink-0">
-                            {acc.name.charAt(0).toUpperCase()}
+                      {/* THÔNG TIN TÀI KHOẢN */}
+                      <td className="px-6 border-r border-slate-200">
+                        <div className="flex items-center gap-3">
+                          {acc.avatar ? (
+                            <img
+                              src={resolveMediaUrl(acc.avatar) || acc.avatar}
+                              alt={acc.name}
+                              className="w-10 h-10 rounded-full object-cover shrink-0 border border-slate-200 dark:border-slate-700"
+                              onError={(e) => {
+                                (e.currentTarget as HTMLElement).style.display = "none";
+                              }}
+                            />
+                          ) : (
+                            <div className="w-10 h-10 rounded-full bg-[#003B95] text-white flex items-center justify-center font-semibold text-xs shrink-0">
+                              {acc.name.charAt(0).toUpperCase()}
+                            </div>
+                          )}
+                          <div className="min-w-0">
+                            <div className="text-slate-900 dark:text-white text-xs font-bold truncate">{acc.name}</div>
+                            <div className="mt-0.5 inline-flex px-1 bg-indigo-50 dark:bg-indigo-950/60 rounded-[3px]">
+                              <span className="text-blue-800 dark:text-blue-300 text-[10px] font-bold font-mono leading-3">{acc.code}</span>
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+
+                      {/* LIÊN HỆ */}
+                      <td className="px-4 border-r border-slate-200">
+                        <div className="flex items-center gap-1.5 text-slate-500 text-xs truncate">
+                          <Mail className="h-3.5 w-3.5 shrink-0 text-slate-500" strokeWidth={2} />
+                          <span className="truncate">{acc.email}</span>
+                        </div>
+                        {acc.phone && (
+                          <div className="flex items-center gap-1.5 text-slate-500 text-xs mt-1">
+                            <Phone className="h-3.5 w-3.5 shrink-0 text-slate-500" strokeWidth={2} />
+                            <span>{acc.phone}</span>
                           </div>
                         )}
-                        <div className="min-w-0">
-                          <div className="text-slate-900 dark:text-white text-xs font-bold truncate">{acc.name}</div>
-                          <div className="mt-0.5 inline-flex px-1 bg-indigo-50 dark:bg-indigo-950/60 rounded-[3px]">
-                            <span className="text-blue-800 dark:text-blue-300 text-[10px] font-bold font-mono leading-3">{acc.code}</span>
-                          </div>
+                      </td>
+
+                      {/* DOANH NGHIỆP */}
+                      <td className="px-4 border-r border-slate-200">
+                        <div className="text-slate-900 dark:text-white text-xs font-semibold truncate">{acc.companyName || "—"}</div>
+                        <div className="text-slate-500 text-[10px]">Pháp nhân Học viên</div>
+                      </td>
+
+                      {/* PHÂN LOẠI BAN */}
+                      <td className="px-4 border-r border-slate-200">
+                        <div className="px-2.5 py-1 bg-sky-100 dark:bg-sky-950/60 rounded-xl inline-flex items-center gap-1.5">
+                          <Building2 className="h-3.5 w-3.5 shrink-0 text-sky-700 dark:text-sky-300" strokeWidth={2} />
+                          <span className="text-slate-900 dark:text-sky-200 text-xs font-semibold leading-4">{acc.department}</span>
                         </div>
-                      </div>
-                    </td>
+                      </td>
 
-                    {/* LIÊN HỆ */}
-                    <td className="px-4 border-r border-slate-200">
-                      <div className="flex items-center gap-1.5 text-slate-500 text-xs truncate">
-                        <Mail className="h-3.5 w-3.5 shrink-0 text-slate-500" strokeWidth={2} />
-                        <span className="truncate">{acc.email}</span>
-                      </div>
-                      {acc.phone && (
-                        <div className="flex items-center gap-1.5 text-slate-500 text-xs mt-1">
-                          <Phone className="h-3.5 w-3.5 shrink-0 text-slate-500" strokeWidth={2} />
-                          <span>{acc.phone}</span>
+                      {/* VAI TRÒ (HIỂN THỊ DẠNG BADGE KHÔNG CHO SELECT TRỰC TIẾP TRÊN BẢNG) */}
+                      <td className="px-4 border-r border-slate-200">
+                        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 text-xs font-bold border border-slate-200/80 dark:border-slate-700">
+                          <Shield className="size-3 text-[#003B95] dark:text-blue-400" />
+                          <span>{getRoleLabel(acc.role)}</span>
                         </div>
-                      )}
-                    </td>
+                      </td>
 
-                    {/* DOANH NGHIỆP */}
-                    <td className="px-4 border-r border-slate-200">
-                      <div className="text-slate-900 dark:text-white text-xs font-semibold truncate">{acc.companyName || "—"}</div>
-                      <div className="text-slate-500 text-[10px]">Pháp nhân hội viên</div>
-                    </td>
-
-                    {/* PHÂN LOẠI BAN */}
-                    <td className="px-4 border-r border-slate-200">
-                      <div className="px-2.5 py-1 bg-sky-100 dark:bg-sky-950/60 rounded-xl inline-flex items-center gap-1.5">
-                        <Building2 className="h-3.5 w-3.5 shrink-0 text-sky-700 dark:text-sky-300" strokeWidth={2} />
-                        <span className="text-slate-900 dark:text-sky-200 text-xs font-semibold leading-4">{acc.department}</span>
-                      </div>
-                    </td>
-
-                    {/* VAI TRÒ (HIỂN THỊ DẠNG BADGE KHÔNG CHO SELECT TRỰC TIẾP TRÊN BẢNG) */}
-                    <td className="px-4 border-r border-slate-200">
-                      <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 text-xs font-bold border border-slate-200/80 dark:border-slate-700">
-                        <Shield className="size-3 text-[#003B95] dark:text-blue-400" />
-                        <span>{getRoleLabel(acc.role)}</span>
-                      </div>
-                    </td>
-
-                    {/* THAO TÁC */}
-                    <td className="px-4 text-center">
-                      <div className="flex items-center justify-center gap-1.5">
-                        <button
-                          type="button"
-                          onClick={() => handleOpenView(acc)}
-                          title="Xem chi tiết"
-                          aria-label="Xem chi tiết"
-                          className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-600 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-800 transition cursor-pointer dark:bg-slate-900 dark:border-slate-700 dark:text-slate-300"
-                        >
-                          <Eye className="h-4 w-4" strokeWidth={2.2} />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleOpenEdit(acc)}
-                          title="Chỉnh sửa"
-                          aria-label="Chỉnh sửa"
-                          className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-blue-200 bg-blue-50 text-blue-800 hover:bg-blue-100 hover:text-blue-900 transition cursor-pointer dark:bg-blue-950/50 dark:border-blue-800 dark:text-blue-300"
-                        >
-                          <Pencil className="h-4 w-4" strokeWidth={2.2} />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setDeleteConfirmAccount(acc)}
-                          title="Xóa tài khoản"
-                          aria-label="Xóa tài khoản"
-                          className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-rose-200 bg-rose-50 text-rose-600 hover:bg-rose-100 hover:text-rose-700 transition cursor-pointer dark:bg-rose-950/50 dark:border-rose-800 dark:text-rose-300"
-                        >
-                          <Trash2 className="h-4 w-4" strokeWidth={2.2} />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
+                      {/* THAO TÁC */}
+                      <td className="px-4 text-center">
+                        <div className="flex items-center justify-center gap-1.5">
+                          <button
+                            type="button"
+                            onClick={() => handleOpenView(acc)}
+                            title="Xem chi tiết"
+                            aria-label="Xem chi tiết"
+                            className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-600 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-800 transition cursor-pointer dark:bg-slate-900 dark:border-slate-700 dark:text-slate-300"
+                          >
+                            <Eye className="h-4 w-4" strokeWidth={2.2} />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleOpenEdit(acc)}
+                            title="Chỉnh sửa"
+                            aria-label="Chỉnh sửa"
+                            className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-blue-200 bg-blue-50 text-blue-800 hover:bg-blue-100 hover:text-blue-900 transition cursor-pointer dark:bg-blue-950/50 dark:border-blue-800 dark:text-blue-300"
+                          >
+                            <Pencil className="h-4 w-4" strokeWidth={2.2} />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setDeleteConfirmAccount(acc)}
+                            title="Xóa tài khoản"
+                            aria-label="Xóa tài khoản"
+                            className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-rose-200 bg-rose-50 text-rose-600 hover:bg-rose-100 hover:text-rose-700 transition cursor-pointer dark:bg-rose-950/50 dark:border-rose-800 dark:text-rose-300"
+                          >
+                            <Trash2 className="h-4 w-4" strokeWidth={2.2} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
@@ -1523,7 +1524,7 @@ function AccountsPage() {
 
                 <div>
                   <label className="font-semibold text-foreground block mb-1">
-                    Mã Hội Viên / Code <span className="text-destructive">*</span>
+                    Mã Học viên / Code <span className="text-destructive">*</span>
                   </label>
                   <input
                     type="text"

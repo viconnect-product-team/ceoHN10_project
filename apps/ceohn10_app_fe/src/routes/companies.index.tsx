@@ -43,9 +43,9 @@ export const Route = createFileRoute("/companies/")({
   head: () => ({
     meta: [
       { title: "Doanh nghiệp — CEO HN10" },
-      { name: "description", content: "Quản lý danh sách doanh nghiệp và hội viên tổ chức." },
+      { name: "description", content: "Quản lý danh sách doanh nghiệp và Học viên tổ chức." },
       { property: "og:title", content: "Doanh nghiệp — CEO HN10" },
-      { property: "og:description", content: "Quản lý hồ sơ doanh nghiệp hội viên." },
+      { property: "og:description", content: "Quản lý hồ sơ doanh nghiệp Học viên." },
     ],
   }),
   component: CompaniesPage,
@@ -113,7 +113,7 @@ function CompaniesPage() {
       try {
         const { DEFAULT_MEMBERS } = await import("@/lib/members-data");
         setMembers(DEFAULT_MEMBERS.filter((m) => m.type === "company" || Boolean(m.company)));
-      } catch {}
+      } catch { }
     }
   };
 
@@ -353,7 +353,7 @@ function CompaniesPage() {
 
   const handleExport = () => {
     exportToExcel<Member>({
-      title: "DANH BẠ DOANH NGHIỆP HỘI VIÊN HIỆP HỘI DOANH NHÂN CEO HN10",
+      title: "DANH BẠ DOANH NGHIỆP Học viên HIỆP HỘI DOANH NHÂN CEO HN10",
       subtitle: "Trực thuộc Hội Doanh Nhân Trẻ Hà Nội (HanoiBA)",
       filename: "danh-ba-doanh-nghiep-ceohn10",
       sheetName: "Doanh_Nghiep_Hoi_Vien",
@@ -367,7 +367,7 @@ function CompaniesPage() {
         { header: "Website", key: "website", width: 28, value: (m) => m.website ?? "—" },
         { header: "Ngành nghề kinh doanh", key: "industry", width: 24, value: (m) => m.industry },
         { header: "Khu vực hoạt động", key: "region", width: 18, value: (m) => m.region },
-        { header: "Quy mô hội viên", key: "level", width: 18, value: (m) => m.level },
+        { header: "Quy mô Học viên", key: "level", width: 18, value: (m) => m.level },
         { header: "Hội phí", key: "feePaid", width: 16, value: (m) => (m.feePaid ? "Đã nộp" : "Chưa nộp") },
         { header: "Số lao động", key: "employees", width: 16, value: (m) => m.employees ?? "—" },
         { header: "Trạng thái", key: "status", width: 16, value: (m) => (m.status === "active" ? "Hoạt động" : "Chờ duyệt") },
@@ -395,35 +395,35 @@ function CompaniesPage() {
     iconBg: string;
     iconColor: string;
   }> = [
-    {
-      label: "companies.kpi.total",
-      value: base.length.toString(),
-      Icon: Building2,
-      iconBg: "bg-primary/10",
-      iconColor: "text-primary",
-    },
-    {
-      label: "companies.kpi.active",
-      value: activeCount.toString(),
-      Icon: CheckCircle2,
-      iconBg: "bg-success/10",
-      iconColor: "text-success",
-    },
-    {
-      label: "companies.kpi.pending",
-      value: pendingCount.toString(),
-      Icon: Clock,
-      iconBg: "bg-warning/15",
-      iconColor: "text-[oklch(0.55_0.16_65)]",
-    },
-    {
-      label: "companies.kpi.employees",
-      value: totalEmployees.toLocaleString("vi-VN"),
-      Icon: Users,
-      iconBg: "bg-info/10",
-      iconColor: "text-info",
-    },
-  ];
+      {
+        label: "companies.kpi.total",
+        value: base.length.toString(),
+        Icon: Building2,
+        iconBg: "bg-primary/10",
+        iconColor: "text-primary",
+      },
+      {
+        label: "companies.kpi.active",
+        value: activeCount.toString(),
+        Icon: CheckCircle2,
+        iconBg: "bg-success/10",
+        iconColor: "text-success",
+      },
+      {
+        label: "companies.kpi.pending",
+        value: pendingCount.toString(),
+        Icon: Clock,
+        iconBg: "bg-warning/15",
+        iconColor: "text-[oklch(0.55_0.16_65)]",
+      },
+      {
+        label: "companies.kpi.employees",
+        value: totalEmployees.toLocaleString("vi-VN"),
+        Icon: Users,
+        iconBg: "bg-info/10",
+        iconColor: "text-info",
+      },
+    ];
 
   return (
     <AppShell>
@@ -481,7 +481,7 @@ function CompaniesPage() {
               <div>
                 <div className="truncate text-2xl font-bold tracking-tight text-foreground">{k.value}</div>
                 <div className="mt-1 truncate text-[11px] text-muted-foreground">
-                  Dữ liệu doanh nghiệp hội viên
+                  Dữ liệu doanh nghiệp Học viên
                 </div>
               </div>
             </div>
@@ -541,22 +541,20 @@ function CompaniesPage() {
               <div className="flex rounded-xl border border-border bg-background p-1">
                 <button
                   onClick={() => setView("grid")}
-                  className={`flex h-8 w-8 items-center justify-center rounded-lg transition ${
-                    view === "grid"
+                  className={`flex h-8 w-8 items-center justify-center rounded-lg transition ${view === "grid"
                       ? "bg-primary text-primary-foreground shadow"
                       : "text-muted-foreground hover:text-foreground"
-                  }`}
+                    }`}
                   title={t("companies.view.grid")}
                 >
                   <LayoutGrid className="h-4 w-4" />
                 </button>
                 <button
                   onClick={() => setView("list")}
-                  className={`flex h-8 w-8 items-center justify-center rounded-lg transition ${
-                    view === "list"
+                  className={`flex h-8 w-8 items-center justify-center rounded-lg transition ${view === "list"
                       ? "bg-primary text-primary-foreground shadow"
                       : "text-muted-foreground hover:text-foreground"
-                  }`}
+                    }`}
                   title={t("companies.view.list")}
                 >
                   <ListIcon className="h-4 w-4" />
@@ -764,11 +762,10 @@ function CompanyCard({
             <button
               type="button"
               onClick={() => onToggleFee?.(m)}
-              className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[10px] font-semibold transition cursor-pointer shadow-sm ${
-                m.feePaid
+              className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[10px] font-semibold transition cursor-pointer shadow-sm ${m.feePaid
                   ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/20 border border-emerald-500/30"
                   : "bg-amber-500/10 text-amber-600 dark:text-amber-400 hover:bg-amber-500/20 border border-amber-500/30"
-              }`}
+                }`}
               title="Nhấn để đổi trạng thái đóng hội phí"
             >
               <span className={`h-1.5 w-1.5 rounded-full ${m.feePaid ? "bg-emerald-500" : "bg-amber-500"}`} />
@@ -776,11 +773,10 @@ function CompanyCard({
             </button>
           ) : (
             <span
-              className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[10px] font-semibold ${
-                m.feePaid
+              className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[10px] font-semibold ${m.feePaid
                   ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30"
                   : "bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30"
-              }`}
+                }`}
             >
               <span className={`h-1.5 w-1.5 rounded-full ${m.feePaid ? "bg-emerald-500" : "bg-amber-500"}`} />
               {m.feePaid ? "Đã thanh toán" : "Chưa thanh toán"}
@@ -967,11 +963,10 @@ function CompanyTable({
                       <button
                         type="button"
                         onClick={() => onToggleFee?.(m)}
-                        className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold transition cursor-pointer shadow-sm ${
-                          m.feePaid
+                        className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold transition cursor-pointer shadow-sm ${m.feePaid
                             ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/20 border border-emerald-500/30"
                             : "bg-amber-500/10 text-amber-600 dark:text-amber-400 hover:bg-amber-500/20 border border-amber-500/30"
-                        }`}
+                          }`}
                         title="Nhấp để chuyển trạng thái hội phí"
                       >
                         <span className={`h-1.5 w-1.5 rounded-full ${m.feePaid ? "bg-emerald-500" : "bg-amber-500"}`} />
@@ -979,11 +974,10 @@ function CompanyTable({
                       </button>
                     ) : (
                       <span
-                        className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold ${
-                          m.feePaid
+                        className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold ${m.feePaid
                             ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30"
                             : "bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30"
-                        }`}
+                          }`}
                       >
                         <span className={`h-1.5 w-1.5 rounded-full ${m.feePaid ? "bg-emerald-500" : "bg-amber-500"}`} />
                         {m.feePaid ? "Đã thanh toán" : "Chưa thanh toán"}

@@ -59,7 +59,7 @@ export interface MeetingVoteSession {
 const INITIAL_VOTES: MeetingVoteSession[] = [
   {
     id: "vote-01",
-    meetingTitle: "Đại Hội Hội Viên Toàn Thể Thường Niên CEO HN10 - Khóa II",
+    meetingTitle: "Đại Hội Học viên Toàn Thể Thường Niên CEO HN10 - Khóa II",
     meetingType: "dai-hoi",
     meetingTypeName: "Đại Hội Toàn Thể",
     meetingDate: "28/09/2026",
@@ -68,7 +68,7 @@ const INITIAL_VOTES: MeetingVoteSession[] = [
     organizer: "Ban Thường Trực CLB CEO HN10",
     voteTitle: "Thông qua Báo cáo Tài chính kiểm toán 2025 & Dự toán Ngân sách 2026",
     voteDescription:
-      "Căn cứ Điều lệ Hiệp hội, Ban Điều Hành kính trình toàn thể Quý Hội viên biểu quyết thông qua báo cáo quyết toán tài chính năm 2025 và hạn mức phân bổ ngân sách xúc tiến thương mại năm 2026.",
+      "Căn cứ Điều lệ Hiệp hội, Ban Điều Hành kính trình toàn thể Quý Học viên biểu quyết thông qua báo cáo quyết toán tài chính năm 2025 và hạn mức phân bổ ngân sách xúc tiến thương mại năm 2026.",
     status: "active",
     totalEligibleMembers: 320,
     totalVoted: 248,
@@ -110,7 +110,7 @@ const INITIAL_VOTES: MeetingVoteSession[] = [
     organizer: "Ban Truyền Thông & Sự Kiện",
     voteTitle: "Lựa chọn cung đường & chủ đề chương trình Caravan Doanh Nhân 2026",
     voteDescription:
-      "Toàn thể Hội viên tham gia biểu quyết lựa chọn cung đường di chuyển và chương trình thiện nguyện đồng hành cùng Caravan CEO HN10.",
+      "Toàn thể Học viên tham gia biểu quyết lựa chọn cung đường di chuyển và chương trình thiện nguyện đồng hành cùng Caravan CEO HN10.",
     status: "closed",
     closedAt: "16/08/2026",
     resolutionResult: "ĐÃ THÔNG QUA: Cung đường Tây Bắc - Sưởi ấm vùng cao (78.5% tán thành)",
@@ -125,16 +125,16 @@ const INITIAL_VOTES: MeetingVoteSession[] = [
   },
   {
     id: "vote-04",
-    meetingTitle: "Đại Hội Bất Thường Ban Kiểm Tra & Thẩm Định Hội Viên",
+    meetingTitle: "Đại Hội Bất Thường Ban Kiểm Tra & Thẩm Định Học viên",
     meetingType: "sinh-hoat-dinh-ky",
     meetingTypeName: "Họp Định Kỳ Thẩm Định",
     meetingDate: "20/07/2026",
     meetingTime: "09:00 - 11:00",
     meetingLocation: "Phòng họp Trực tuyến Hội nghị số CEO HN10",
     organizer: "Ban Kiểm Tra & Thẩm Định",
-    voteTitle: "Sửa đổi Quy chế xét duyệt kết nạp Hội viên chính thức năm 2026",
+    voteTitle: "Sửa đổi Quy chế xét duyệt kết nạp Học viên chính thức năm 2026",
     voteDescription:
-      "Quy chế mới áp dụng tiêu chuẩn xác thực pháp lý doanh nghiệp và chứng thư số hóa danh thiếp thông minh cho toàn thể hội viên gia nhập.",
+      "Quy chế mới áp dụng tiêu chuẩn xác thực pháp lý doanh nghiệp và chứng thư số hóa danh thiếp thông minh cho toàn thể Học viên gia nhập.",
     status: "closed",
     closedAt: "21/07/2026",
     resolutionResult: "ĐÃ THÔNG QUA NGHỊ QUYẾT: 92.4% số phiếu tán thành",
@@ -162,7 +162,7 @@ function AssociationVotingScreen() {
     try {
       const raw = localStorage.getItem("vba_meeting_votes_v2");
       if (raw) return JSON.parse(raw);
-    } catch {}
+    } catch { }
     return INITIAL_VOTES;
   });
 
@@ -263,11 +263,11 @@ function AssociationVotingScreen() {
 
       try {
         localStorage.setItem("vba_meeting_votes_v2", JSON.stringify(updated));
-      } catch {}
+      } catch { }
       return updated;
     });
 
-    toast.success("Hội viên đã biểu quyết thành công!", {
+    toast.success("Học viên đã biểu quyết thành công!", {
       description: "Ý kiến của Quý CEO đã được ghi nhận trực tiếp vào hệ thống CRM Hiệp hội.",
     });
 
@@ -296,7 +296,7 @@ function AssociationVotingScreen() {
     <div className="vba-animate min-h-screen bg-[var(--vba-bg)] text-[var(--vba-text)] pb-20">
       <MemberHeader
         title="Biểu quyết Sự kiện & Cuộc họp"
-        subtitle="Quyền biểu quyết trực tuyến của Hội viên CLB CEO HN10"
+        subtitle="Quyền biểu quyết trực tuyến của Học viên CLB CEO HN10"
       />
 
       {/* Hero Atmosphere Banner */}
@@ -361,11 +361,10 @@ function AssociationVotingScreen() {
         <button
           type="button"
           onClick={() => setActiveTab("active")}
-          className={`flex-1 flex items-center justify-center gap-2 py-2 text-xs font-bold rounded-xl transition cursor-pointer ${
-            activeTab === "active"
+          className={`flex-1 flex items-center justify-center gap-2 py-2 text-xs font-bold rounded-xl transition cursor-pointer ${activeTab === "active"
               ? "bg-[#003B95] text-white shadow-md shadow-[#003B95]/30"
               : "text-slate-600 dark:text-slate-400 hover:text-slate-900"
-          }`}
+            }`}
         >
           <Vote className="h-3.5 w-3.5" />
           <span>Biểu quyết đang mở ({activeCount})</span>
@@ -374,11 +373,10 @@ function AssociationVotingScreen() {
         <button
           type="button"
           onClick={() => setActiveTab("history")}
-          className={`flex-1 flex items-center justify-center gap-2 py-2 text-xs font-bold rounded-xl transition cursor-pointer ${
-            activeTab === "history"
+          className={`flex-1 flex items-center justify-center gap-2 py-2 text-xs font-bold rounded-xl transition cursor-pointer ${activeTab === "history"
               ? "bg-[#003B95] text-white shadow-md shadow-[#003B95]/30"
               : "text-slate-600 dark:text-slate-400 hover:text-slate-900"
-          }`}
+            }`}
         >
           <History className="h-3.5 w-3.5" />
           <span>Lịch sử biểu quyết ({historyCount})</span>
@@ -451,11 +449,10 @@ function AssociationVotingScreen() {
                   </div>
 
                   <span
-                    className={`shrink-0 rounded-full px-2.5 py-0.5 text-[10px] font-bold ${
-                      session.status === "active"
+                    className={`shrink-0 rounded-full px-2.5 py-0.5 text-[10px] font-bold ${session.status === "active"
                         ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30"
                         : "bg-slate-100 dark:bg-slate-800 text-slate-500 border border-slate-200 dark:border-slate-700"
-                    }`}
+                      }`}
                   >
                     {session.status === "active" ? "Đang mở biểu quyết" : "Đã kết thúc"}
                   </span>
@@ -506,23 +503,21 @@ function AssociationVotingScreen() {
                             setSelectedOptions((prev) => ({ ...prev, [session.id]: opt.id }));
                           }
                         }}
-                        className={`relative overflow-hidden rounded-2xl border p-3 transition ${
-                          hasVoted
+                        className={`relative overflow-hidden rounded-2xl border p-3 transition ${hasVoted
                             ? isMyChoice
                               ? "border-[#003B95] dark:border-amber-400 bg-blue-50/60 dark:bg-blue-950/30"
                               : "border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50"
                             : isSelected
                               ? "border-[#003B95] dark:border-amber-400 bg-blue-50/70 dark:bg-blue-950/40 shadow-xs cursor-pointer"
                               : "border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 bg-white dark:bg-slate-900/40 cursor-pointer"
-                        }`}
+                          }`}
                       >
                         {/* Background Progress Bar Fill for Realtime Percent */}
                         <div
-                          className={`absolute left-0 top-0 bottom-0 pointer-events-none transition-all duration-500 ${
-                            isMyChoice || isSelected
+                          className={`absolute left-0 top-0 bottom-0 pointer-events-none transition-all duration-500 ${isMyChoice || isSelected
                               ? "bg-[#003B95]/10 dark:bg-amber-400/10"
                               : "bg-slate-100/70 dark:bg-white/[0.03]"
-                          }`}
+                            }`}
                           style={{ width: `${optPercent}%` }}
                         />
 
@@ -530,21 +525,19 @@ function AssociationVotingScreen() {
                           <div className="flex items-center gap-2.5">
                             {/* Checkbox indicator */}
                             <div
-                              className={`grid h-5 w-5 place-items-center rounded-lg border text-white transition ${
-                                isMyChoice || isSelected
+                              className={`grid h-5 w-5 place-items-center rounded-lg border text-white transition ${isMyChoice || isSelected
                                   ? "bg-[#003B95] dark:bg-amber-500 border-[#003B95] dark:border-amber-500"
                                   : "border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800"
-                              }`}
+                                }`}
                             >
                               {(isMyChoice || isSelected) && <Check className="h-3 w-3 stroke-[3]" />}
                             </div>
 
                             <span
-                              className={`text-xs font-bold ${
-                                isMyChoice
+                              className={`text-xs font-bold ${isMyChoice
                                   ? "text-[#003B95] dark:text-amber-300"
                                   : "text-slate-800 dark:text-slate-200"
-                              }`}
+                                }`}
                             >
                               {opt.label}
                               {isMyChoice && (

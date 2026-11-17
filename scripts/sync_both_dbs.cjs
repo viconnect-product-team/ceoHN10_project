@@ -175,7 +175,7 @@ async function syncDb(dbUrl) {
   if (checkNamMem.rows.length === 0) {
     await client.query(`
       INSERT INTO public.members (id, code, user_id, association_id, name, email, executive_role, department, status, created_at, updated_at)
-      VALUES ('MBMWD8NCJH', 'CEO HN10-000004', $1, $2, 'Phạm An Nam', 'vupv090120@gmail.com', 'member', 'Hội viên ceohn10', 'active', NOW(), NOW())
+      VALUES ('MBMWD8NCJH', 'CEO HN10-000004', $1, $2, 'Phạm An Nam', 'vupv090120@gmail.com', 'member', 'Học viên ceohn10', 'active', NOW(), NOW())
     `, [namId, ASSOC_ID]);
   } else {
     await client.query(`
@@ -183,7 +183,7 @@ async function syncDb(dbUrl) {
       SET code = COALESCE(code, 'CEO HN10-000004'),
           association_id = COALESCE(association_id, $1),
           executive_role = 'member',
-          department = 'Hội viên ceohn10',
+          department = 'Học viên ceohn10',
           status = 'active',
           updated_at = NOW()
       WHERE email = 'vupv090120@gmail.com'

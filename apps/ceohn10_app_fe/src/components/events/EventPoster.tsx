@@ -79,7 +79,7 @@ function buildDefaultAgenda(event: any): AgendaItem[] {
     {
       time: "10:30 - 11:15",
       title: "Giao thương B2B & Xúc tiến Kết nối Hợp tác Đầu tư",
-      speaker: "Toàn thể Hội viên & Doanh nghiệp",
+      speaker: "Toàn thể Học viên & Doanh nghiệp",
       desc: "Trưng bày sản phẩm, kết nối 1-1, tìm kiếm đối tác và ký kết hợp tác.",
     },
     {
@@ -377,19 +377,18 @@ export const EventPoster: React.FC<EventPosterProps> = ({
               </div>
 
               <span
-                className={`px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-wider ${
-                  isSoldOut
+                className={`px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-wider ${isSoldOut
                     ? "bg-rose-500/20 text-rose-300 border border-rose-500/40"
                     : isNearSoldOut
-                    ? "bg-amber-500/20 text-amber-300 border border-amber-500/40 animate-pulse"
-                    : "bg-emerald-500/20 text-emerald-300 border border-emerald-500/40"
-                }`}
+                      ? "bg-amber-500/20 text-amber-300 border border-amber-500/40 animate-pulse"
+                      : "bg-emerald-500/20 text-emerald-300 border border-emerald-500/40"
+                  }`}
               >
                 {isSoldOut
                   ? "🔴 Đã kín chỗ (Hết vé)"
                   : isNearSoldOut
-                  ? `🟡 Sắp hết chỗ (Chỉ còn ${remainingSeats} ghế)`
-                  : `🟢 Đang mở đăng ký (Còn ${remainingSeats} ghế)`}
+                    ? `🟡 Sắp hết chỗ (Chỉ còn ${remainingSeats} ghế)`
+                    : `🟢 Đang mở đăng ký (Còn ${remainingSeats} ghế)`}
               </span>
             </div>
 
@@ -484,7 +483,7 @@ export const EventPoster: React.FC<EventPosterProps> = ({
                 </div>
               ) : (
                 <div className="p-3 rounded-xl bg-white/[0.04] border border-white/10 text-xs text-slate-300 leading-relaxed">
-                  Hiệp Hội Doanh Nhân CEO HN10 (HanoiBA) đồng hành cùng các Doanh nghiệp Hội viên kiến tạo giá trị và kết nối giao thương vững bền.
+                  Hiệp Hội Doanh Nhân CEO HN10 (HanoiBA) đồng hành cùng các Doanh nghiệp Học viên kiến tạo giá trị và kết nối giao thương vững bền.
                 </div>
               )}
 

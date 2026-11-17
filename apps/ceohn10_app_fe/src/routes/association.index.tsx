@@ -334,8 +334,8 @@ const defaultEventImages = [
 const CEOHN10_TOUR_STEPS: TourStep[] = [
   {
     targetId: "tour-member-card",
-    title: "Thẻ Hội Viên & Số Điện Thoại",
-    description: "Thẻ nhận diện số chính thức của bạn trong Hiệp hội CEO HN10. Hiển thị ảnh đại diện, ảnh bìa sắc nét, mã hội viên HN10 và số điện thoại liên hệ trực tiếp.",
+    title: "Thẻ Học viên & Số Điện Thoại",
+    description: "Thẻ nhận diện số chính thức của bạn trong Hiệp hội CEO HN10. Hiển thị ảnh đại diện, ảnh bìa sắc nét, mã Học viên HN10 và số điện thoại liên hệ trực tiếp.",
     icon: "🎖️",
   },
   {
@@ -347,7 +347,7 @@ const CEOHN10_TOUR_STEPS: TourStep[] = [
   {
     targetId: "tour-quick-actions",
     title: "Tính Năng Nhanh & Danh Bạ Kết Nối",
-    description: "Truy cập nhanh danh thiếp số, danh bạ hội viên, quét check-in, đặc quyền VIP và biểu quyết số.",
+    description: "Truy cập nhanh danh thiếp số, danh bạ Học viên, quét check-in, đặc quyền VIP và biểu quyết số.",
     icon: "⚡",
   },
   {
@@ -406,7 +406,8 @@ function Home() {
   }, []);
 
   const { theme } = useTheme();
-  const isDark = theme === "dark" || (typeof document !== "undefined" && document.documentElement.classList.contains("dark"));
+  // QUY CHUẨN TỐI CAO: Luôn cố định 100% Theme Sáng thanh khiết, triệt tiêu hoàn toàn nền đen trên app
+  const isDark = false;
 
   useEffect(() => {
     void syncThemeFromBackend();
@@ -457,7 +458,7 @@ function Home() {
         const timer = setTimeout(() => setTourOpen(true), 400);
         return () => clearTimeout(timer);
       }
-    } catch {}
+    } catch { }
   }, []);
 
   // ── DAILY FIRST-OPEN REMINDER POPUP & TOAST ──
@@ -526,7 +527,7 @@ function Home() {
                 body: `Bạn có ${todayItems.length} sự kiện/cuộc họp cần tham dự hôm nay!`,
                 icon: "/favicon.ico",
               });
-            } catch {}
+            } catch { }
           }
         }
       }
@@ -596,7 +597,7 @@ function Home() {
       .then((res) => {
         if (Array.isArray(res)) setAllMarketplaceProducts(res);
       })
-      .catch(() => {});
+      .catch(() => { });
   }, []);
 
   const { data: products = [] } = useServerData<MyProduct[]>(
@@ -655,7 +656,7 @@ function Home() {
           setDirectMember(live);
         }
       })
-      .catch(() => {});
+      .catch(() => { });
     return () => {
       active = false;
     };
@@ -695,10 +696,10 @@ function Home() {
           setActivePollsCount(count);
           try {
             localStorage.setItem("vba_active_polls_count", String(count));
-          } catch {}
+          } catch { }
         }
       })
-      .catch(() => {});
+      .catch(() => { });
   }, []);
 
   // Fetch real-time analytics overview for candlestick stock ticker widget
@@ -710,7 +711,7 @@ function Home() {
           setAnalyticsOverview(res);
         }
       })
-      .catch(() => {});
+      .catch(() => { });
   }, []);
 
   // User-scoped custom profile (STRICTLY FOR CURRENT LOGGED IN USER)
@@ -827,7 +828,7 @@ function Home() {
           return parsed;
         }
       }
-    } catch {}
+    } catch { }
     return DEFAULT_SHORTCUT_IDS;
   });
 
@@ -857,7 +858,7 @@ function Home() {
             setActiveShortcutIds(parsed);
           }
         }
-      } catch {}
+      } catch { }
     };
     window.addEventListener("ceohn10_shortcuts_changed", syncShortcuts);
     window.addEventListener("storage", syncShortcuts);
@@ -877,7 +878,7 @@ function Home() {
       }
       window.dispatchEvent(new Event("ceohn10_shortcuts_changed"));
       window.dispatchEvent(new Event("storage"));
-    } catch {}
+    } catch { }
   };
 
   // Event banner carousel slide state (Yêu cầu 1: 1 sự kiện banner to kèm slide chuyển)
@@ -896,10 +897,10 @@ function Home() {
       const genLogo = localStorage.getItem("vba_member_company_logo");
       const customProf = uId ? localStorage.getItem(`ceohn10_custom_profile_${uId}`) : localStorage.getItem("ceohn10_custom_profile");
       let cpLogo = null;
-      try { cpLogo = customProf ? JSON.parse(customProf)?.companyLogo : null; } catch {}
+      try { cpLogo = customProf ? JSON.parse(customProf)?.companyLogo : null; } catch { }
       const myMem = localStorage.getItem("vba_my_member");
       let mmLogo = null;
-      try { mmLogo = myMem ? (JSON.parse(myMem)?.companyLogoUrl || JSON.parse(myMem)?.companyLogo) : null; } catch {}
+      try { mmLogo = myMem ? (JSON.parse(myMem)?.companyLogoUrl || JSON.parse(myMem)?.companyLogo) : null; } catch { }
 
       return (
         userLogo ||
@@ -994,7 +995,7 @@ function Home() {
         const mem = JSON.parse(localStorage.getItem("vba_my_member") || "{}");
         mem.avatar = croppedDataUrl;
         localStorage.setItem("vba_my_member", JSON.stringify(mem));
-      } catch {}
+      } catch { }
 
       window.dispatchEvent(new CustomEvent("vba_member_avatar_updated", { detail: croppedDataUrl }));
       window.dispatchEvent(new CustomEvent("profile-updated", { detail: { avatar: croppedDataUrl } }));
@@ -1010,7 +1011,7 @@ function Home() {
             }).catch(() => null);
           }
         })
-        .catch(() => {});
+        .catch(() => { });
     } else {
       setCoverPhoto(croppedDataUrl);
       setCoverError(false);
@@ -1020,7 +1021,7 @@ function Home() {
         const mem = JSON.parse(localStorage.getItem("vba_my_member") || "{}");
         mem.coverUrl = croppedDataUrl;
         localStorage.setItem("vba_my_member", JSON.stringify(mem));
-      } catch {}
+      } catch { }
 
       window.dispatchEvent(new CustomEvent("vba_member_cover_updated", { detail: croppedDataUrl }));
       window.dispatchEvent(new CustomEvent("profile-updated", { detail: { cover: croppedDataUrl } }));
@@ -1036,7 +1037,7 @@ function Home() {
             }).catch(() => null);
           }
         })
-        .catch(() => {});
+        .catch(() => { });
     }
   };
 
@@ -1089,7 +1090,7 @@ function Home() {
               const cpGen = JSON.parse(localStorage.getItem("ceohn10_custom_profile") || "{}");
               cpGen.companyLogo = uploadedUrl;
               localStorage.setItem("ceohn10_custom_profile", JSON.stringify(cpGen));
-            } catch {}
+            } catch { }
             window.dispatchEvent(new CustomEvent("vba_member_company_logo_updated", { detail: uploadedUrl }));
             window.dispatchEvent(new CustomEvent("profile-updated", { detail: { companyLogo: uploadedUrl } }));
             fetchNestApi("/members/me", {
@@ -1098,7 +1099,7 @@ function Home() {
             }).catch(() => null);
           }
         })
-        .catch(() => {});
+        .catch(() => { });
     } catch {
       toast.error("Không thể tải logo công ty");
     } finally {
@@ -1120,7 +1121,7 @@ function Home() {
           if (newLogo && !isBlackBackgroundLogo(newLogo)) {
             setCompanyLogo(newLogo);
             if (user?.id) {
-              try { localStorage.setItem(`vba_member_company_logo_${user.id}`, newLogo); } catch {}
+              try { localStorage.setItem(`vba_member_company_logo_${user.id}`, newLogo); } catch { }
             }
           }
           if (detail.name || detail.title || detail.company) {
@@ -1145,7 +1146,7 @@ function Home() {
             setCustomProfile(parsedGen);
           }
         }
-      } catch {}
+      } catch { }
     };
     const handleCoverUpdate = (e?: any) => {
       try {
@@ -1158,9 +1159,9 @@ function Home() {
           if (userCover || genCover) setCoverPhoto(userCover || genCover);
         }
         if (user?.id) {
-          fetchNestApi<any>("/members/me").then((live) => { if (live) setDirectMember(live); }).catch(() => {});
+          fetchNestApi<any>("/members/me").then((live) => { if (live) setDirectMember(live); }).catch(() => { });
         }
-      } catch {}
+      } catch { }
     };
     const handleAvatarUpdate = (e?: any) => {
       try {
@@ -1173,9 +1174,9 @@ function Home() {
           if (userAvatar || genAvatar) setAvatarPhoto(userAvatar || genAvatar);
         }
         if (user?.id) {
-          fetchNestApi<any>("/members/me").then((live) => { if (live) setDirectMember(live); }).catch(() => {});
+          fetchNestApi<any>("/members/me").then((live) => { if (live) setDirectMember(live); }).catch(() => { });
         }
-      } catch {}
+      } catch { }
     };
     const handleLogoUpdate = (e?: any) => {
       try {
@@ -1190,7 +1191,7 @@ function Home() {
             setCompanyLogo(target);
           }
         }
-      } catch {}
+      } catch { }
     };
     window.addEventListener("notifications-updated", handleUpdate);
     window.addEventListener("profile-updated", handleProfileUpdate);
@@ -1212,14 +1213,14 @@ function Home() {
 
   // Priority-driven resolution: Custom Profile (instant reactivity) > Real Member Record from DB > Real Auth User Name > Fallback
   const realUserName = (user as any)?.name || (user as any)?.user_metadata?.full_name;
-  const isGenericMemberName = !effectiveMember?.name || effectiveMember.name === "Thành viên mới" || effectiveMember.name === "Hội viên CLB CEO HN10";
+  const isGenericMemberName = !effectiveMember?.name || effectiveMember.name === "Thành viên mới" || effectiveMember.name === "Học viên CLB CEO HN10";
   const validCustomName = (customProfile?.userId === user?.id || !customProfile?.userId) ? customProfile?.name?.trim() : undefined;
-  
+
   const displayName = validCustomName || ((!isGenericMemberName && effectiveMember?.name)
     ? effectiveMember.name
-    : (realUserName || effectiveMember?.name || (user as any)?.username || "Hội viên CLB CEO HN10"));
+    : (realUserName || effectiveMember?.name || (user as any)?.username || "Học viên CLB CEO HN10"));
 
-  const displayTitle = customProfile?.title?.trim() || effectiveMember?.title || (effectiveMember as any)?.position || (isEn ? "Official Member" : "Hội viên chính thức");
+  const displayTitle = customProfile?.title?.trim() || effectiveMember?.title || (effectiveMember as any)?.position || (isEn ? "Official Member" : "Học viên chính thức");
   const displayPhone =
     (customProfile as any)?.phone?.trim() ||
     effectiveMember?.phone ||
@@ -1244,7 +1245,7 @@ function Home() {
     if (!effectiveMember?.code) return;
     navigator.clipboard.writeText(effectiveMember.code);
     setCopied(true);
-    toast.success(isEn ? "Member code copied!" : "Đã sao chép mã hội viên!");
+    toast.success(isEn ? "Member code copied!" : "Đã sao chép mã Học viên!");
     setTimeout(() => setCopied(false), 2000);
   };
 
@@ -1327,13 +1328,7 @@ function Home() {
 
   return (
     <div
-      className="w-full max-w-full min-h-screen relative bg-slate-50 dark:bg-slate-50 flex flex-col justify-start items-start pb-6 transition-colors duration-300"
-      style={{
-        backgroundImage: "var(--festival-bg-image, none)",
-        backgroundSize: "cover",
-        backgroundAttachment: "fixed",
-        backgroundPosition: "center",
-      }}
+      className="w-full max-w-full min-h-screen relative bg-white flex flex-col justify-start items-start pb-6 transition-colors duration-300"
     >
       <SeasonalEventHeader />
       {/* Hidden inputs cho phép click trực tiếp để upload */}
@@ -1350,56 +1345,56 @@ function Home() {
         }}
         className="self-stretch px-4 pb-2 bg-white dark:bg-[var(--vba-bg-2)] shadow-[0px_2px_8px_0px_rgba(0,0,0,0.06)] flex justify-between items-center overflow-hidden sticky top-0 z-40 border-b border-slate-100 dark:border-slate-800 transition-all select-none"
       >
-          <div className="flex justify-start items-center gap-2.5">
-            <div className="w-14 h-9 relative shrink-0">
-              <img
-                className="w-14 h-9 left-0 top-0 absolute object-contain mix-blend-multiply"
-                src="/ceohn10-official-logo.png"
-                alt="Logo CEO HN10"
-                onError={(e) => {
-                  (e.currentTarget as HTMLImageElement).src = "/ceohn10-official-logo.png";
-                }}
-              />
-            </div>
-            <div className="inline-flex flex-col justify-center items-start gap-px">
-              <div className="text-slate-600 text-xs font-normal font-['Inter'] leading-4">Xin chào,</div>
-              <div className="text-slate-900 text-sm font-semibold font-['Inter'] leading-5 truncate max-w-[170px]">
-                {displayName || "Trần Tuấn Anh"}
-              </div>
+        <div className="flex justify-start items-center gap-2.5">
+          <div className="w-14 h-9 relative shrink-0">
+            <img
+              className="w-14 h-9 left-0 top-0 absolute object-contain mix-blend-multiply"
+              src="/ceohn10-official-logo.png"
+              alt="Logo CEO HN10"
+              onError={(e) => {
+                (e.currentTarget as HTMLImageElement).src = "/ceohn10-official-logo.png";
+              }}
+            />
+          </div>
+          <div className="inline-flex flex-col justify-center items-start gap-px">
+            <div className="text-slate-600 text-xs font-normal font-['Inter'] leading-4">Xin chào,</div>
+            <div className="text-slate-900 text-sm font-semibold font-['Inter'] leading-5 truncate max-w-[170px]">
+              {displayName || "Trần Tuấn Anh"}
             </div>
           </div>
-          <Link
-            to="/association/notifications"
-            onClick={() => {
-              try {
-                const stored = localStorage.getItem("vba_notifications");
-                if (stored) {
-                  const parsed = JSON.parse(stored);
-                  if (Array.isArray(parsed)) {
-                    const marked = parsed.map((item) => ({ ...item, unread: false, isRead: true }));
-                    localStorage.setItem("vba_notifications", JSON.stringify(marked));
-                    window.dispatchEvent(new Event("notifications-updated"));
-                    window.dispatchEvent(new Event("vba_notifications_updated"));
-                  }
+        </div>
+        <Link
+          to="/association/notifications"
+          onClick={() => {
+            try {
+              const stored = localStorage.getItem("vba_notifications");
+              if (stored) {
+                const parsed = JSON.parse(stored);
+                if (Array.isArray(parsed)) {
+                  const marked = parsed.map((item) => ({ ...item, unread: false, isRead: true }));
+                  localStorage.setItem("vba_notifications", JSON.stringify(marked));
+                  window.dispatchEvent(new Event("notifications-updated"));
+                  window.dispatchEvent(new Event("vba_notifications_updated"));
                 }
-              } catch {}
-            }}
-            className="relative p-2 rounded-xl border border-orange-200 bg-orange-50/50 inline-flex justify-center items-center hover:scale-105 active:scale-95 transition shadow-xs"
-            aria-label="Thông báo"
-          >
-            <img src="/icons/home/notification-01.svg" className="size-5" alt="Thông báo" />
-            {unreadNotifCount > 0 && (
-              <div className="px-1.5 py-0.5 -right-1.5 -top-1.5 absolute bg-[#EF4444] rounded-[100px] inline-flex justify-center items-center overflow-hidden ring-1 ring-white shadow-xs">
-                <div className="text-center text-white text-[10px] font-bold font-['Inter'] leading-3">
-                  {unreadNotifCount > 9 ? "9+" : unreadNotifCount}
-                </div>
+              }
+            } catch { }
+          }}
+          className="relative p-2 rounded-xl border border-orange-200 bg-orange-50/50 inline-flex justify-center items-center hover:scale-105 active:scale-95 transition shadow-xs"
+          aria-label="Thông báo"
+        >
+          <img src="/icons/home/notification-01.svg" className="size-5" alt="Thông báo" />
+          {unreadNotifCount > 0 && (
+            <div className="px-1.5 py-0.5 -right-1.5 -top-1.5 absolute bg-[#EF4444] rounded-[100px] inline-flex justify-center items-center overflow-hidden ring-1 ring-white shadow-xs">
+              <div className="text-center text-white text-[10px] font-bold font-['Inter'] leading-3">
+                {unreadNotifCount > 9 ? "9+" : unreadNotifCount}
               </div>
-            )}
-          </Link>
-        </header>
+            </div>
+          )}
+        </Link>
+      </header>
 
-        <div className="self-stretch flex flex-col justify-start items-center">
-          {/* ── THẺ HỘI VIÊN CHÍNH THỨC HERO CARD THEO TONE MÀU ĐỘNG BRAND THEME ── */}
+      <div className="self-stretch flex flex-col justify-start items-center">
+        {/* ── THẺ Học viên CHÍNH THỨC HERO CARD THEO TONE MÀU ĐỘNG BRAND THEME ── */}
         <div className="self-stretch px-4 pt-3 flex flex-col justify-start items-start gap-2.5">
           <div
             onClick={() => setProfileSheetOpen(true)}
@@ -1725,7 +1720,7 @@ function Home() {
                                     const mm = String(d.getMinutes()).padStart(2, "0");
                                     return `${hh}:${mm} - 21:30`;
                                   }
-                                } catch {}
+                                } catch { }
                               }
 
                               const tl = realTitle.toLowerCase();
@@ -1790,11 +1785,10 @@ function Home() {
                       key={idx}
                       type="button"
                       onClick={() => setEventSlideIndex(idx)}
-                      className={`transition-all duration-300 rounded-full cursor-pointer ${
-                        eventSlideIndex % displayEvents.length === idx
+                      className={`transition-all duration-300 rounded-full cursor-pointer ${eventSlideIndex % displayEvents.length === idx
                           ? "w-6 h-1.5 bg-orange-500"
                           : "w-1.5 h-1.5 bg-slate-300 dark:bg-slate-700"
-                      }`}
+                        }`}
                       title={`Sự kiện ${idx + 1}`}
                     />
                   ))}
@@ -1804,7 +1798,7 @@ function Home() {
           )}
         </div>
 
-        {/* ── ƯU ĐÃI RIÊNG HỘI VIÊN & ĐỐI TÁC: CAROUSEL SLIDER (3 ƯU ĐÃI + SINH NHẬT + BIỂU DƯƠNG NĂM) ── */}
+        {/* ── ƯU ĐÃI RIÊNG Học viên & ĐỐI TÁC: CAROUSEL SLIDER (3 ƯU ĐÃI + SINH NHẬT + BIỂU DƯƠNG NĂM) ── */}
         <div className="self-stretch">
           <MemberPerksCarousel />
         </div>
@@ -1823,7 +1817,7 @@ function Home() {
           />
         </div>
 
-        {/* ── 3. GIAO THƯƠNG DOANH NGHIỆP HỘI VIÊN (ĐẨY XUỐNG DƯỚI TOÀN ĐỘ RỘNG) ── */}
+        {/* ── 3. GIAO THƯƠNG DOANH NGHIỆP Học viên (ĐẨY XUỐNG DƯỚI TOÀN ĐỘ RỘNG) ── */}
         <div className="w-full flex flex-col gap-3">
           <Link
             to="/association/products"
@@ -1835,7 +1829,7 @@ function Home() {
                   Giao thương
                 </h3>
                 <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                  Sản phẩm &amp; dịch vụ ưu đãi độc quyền hội viên
+                  Sản phẩm &amp; dịch vụ ưu đãi độc quyền Học viên
                 </p>
               </div>
               <div className="flex items-center gap-1 text-xs font-bold text-orange-600 dark:text-orange-400 group-hover:translate-x-0.5 transition-transform">
@@ -1849,6 +1843,9 @@ function Home() {
               <img
                 src="/images/ceohn10/marketplace-banner.jpg"
                 alt="Giao thương"
+                onError={(e) => {
+                  (e.currentTarget as HTMLImageElement).src = "/images/ceo1983/marketplace-banner.jpg";
+                }}
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/40 to-transparent" />
@@ -1870,7 +1867,7 @@ function Home() {
         <div className="self-stretch flex flex-col justify-start items-start gap-2">
           <div className="self-stretch inline-flex justify-between items-center overflow-hidden">
             <div className="flex justify-start items-center gap-2">
-              <span className="text-slate-800 dark:text-white text-sm font-bold font-sans leading-5">HỘI VIÊN MỚI GIA NHẬP</span>
+              <span className="text-slate-800 dark:text-white text-sm font-bold font-sans leading-5">Học viên MỚI GIA NHẬP</span>
             </div>
             <Link to="/association/members" className="p-1 rounded-full bg-orange-50 dark:bg-slate-800 flex justify-center items-center hover:bg-orange-100 transition">
               <ChevronRight className="size-4 text-slate-500 dark:text-slate-400" />
@@ -1884,32 +1881,32 @@ function Home() {
               </div>
             ) : (
               directoryMembers.slice(0, 8).map((m, i) => {
-              const pName = (m as any).personName || (m as any).contact || m.name || "Hội viên";
-              const cName = (m as any).company || ((m as any).type === 'company' ? m.name : '') || (m as any).companyName || "Doanh nghiệp hội viên";
-              const rawAvatar = (m as any).avatar || (m as any).avatarUrl || (m as any).avatar_url;
-              const resolvedAv = resolveMediaUrl(rawAvatar);
-              return (
-                <button
-                  type="button"
-                  key={(m as any).id || (m as any).code || i}
-                  onClick={() => setSelectedMemberForProfile(m)}
-                  className="w-48 h-14 p-2.5 bg-white dark:bg-slate-900 rounded-2xl shadow-xs outline outline-1 outline-offset-[-1px] outline-slate-200 dark:outline-slate-800 flex justify-start items-center gap-2.5 shrink-0 overflow-hidden hover:border-orange-500 dark:hover:border-orange-500 hover:shadow-md transition cursor-pointer text-left"
-                  title={`Xem hồ sơ chi tiết của ${pName}`}
-                >
-                  <div className="size-9 bg-orange-500 rounded-xl outline outline-1 outline-orange-300 overflow-hidden flex justify-center items-center shrink-0 shadow-2xs">
-                    {resolvedAv ? (
-                      <img src={resolvedAv} alt={pName} className="w-full h-full object-cover" />
-                    ) : (
-                      <span className="text-white text-xs font-bold font-sans">{initials(pName)}</span>
-                    )}
-                  </div>
-                  <div className="inline-flex flex-col justify-start items-start min-w-0">
-                    <span className="text-slate-800 dark:text-white text-xs font-bold truncate max-w-[120px]">{pName}</span>
-                    <span className="text-slate-400 text-[11px] truncate max-w-[120px]">{cName}</span>
-                  </div>
-                </button>
-              );
-            }))}
+                const pName = (m as any).personName || (m as any).contact || m.name || "Học viên";
+                const cName = (m as any).company || ((m as any).type === 'company' ? m.name : '') || (m as any).companyName || "Doanh nghiệp Học viên";
+                const rawAvatar = (m as any).avatar || (m as any).avatarUrl || (m as any).avatar_url;
+                const resolvedAv = resolveMediaUrl(rawAvatar);
+                return (
+                  <button
+                    type="button"
+                    key={(m as any).id || (m as any).code || i}
+                    onClick={() => setSelectedMemberForProfile(m)}
+                    className="w-48 h-14 p-2.5 bg-white dark:bg-slate-900 rounded-2xl shadow-xs outline outline-1 outline-offset-[-1px] outline-slate-200 dark:outline-slate-800 flex justify-start items-center gap-2.5 shrink-0 overflow-hidden hover:border-orange-500 dark:hover:border-orange-500 hover:shadow-md transition cursor-pointer text-left"
+                    title={`Xem hồ sơ chi tiết của ${pName}`}
+                  >
+                    <div className="size-9 bg-orange-500 rounded-xl outline outline-1 outline-orange-300 overflow-hidden flex justify-center items-center shrink-0 shadow-2xs">
+                      {resolvedAv ? (
+                        <img src={resolvedAv} alt={pName} className="w-full h-full object-cover" />
+                      ) : (
+                        <span className="text-white text-xs font-bold font-sans">{initials(pName)}</span>
+                      )}
+                    </div>
+                    <div className="inline-flex flex-col justify-start items-start min-w-0">
+                      <span className="text-slate-800 dark:text-white text-xs font-bold truncate max-w-[120px]">{pName}</span>
+                      <span className="text-slate-400 text-[11px] truncate max-w-[120px]">{cName}</span>
+                    </div>
+                  </button>
+                );
+              }))}
           </div>
         </div>
 
@@ -2054,11 +2051,10 @@ function Home() {
                         key={idx}
                         type="button"
                         onClick={() => setNewsSlideIndex(idx)}
-                        className={`transition-all duration-300 rounded-full cursor-pointer ${
-                          currentIndex === idx
+                        className={`transition-all duration-300 rounded-full cursor-pointer ${currentIndex === idx
                             ? "w-6 h-1.5 bg-orange-500"
                             : "w-1.5 h-1.5 bg-slate-300 dark:bg-slate-700"
-                        }`}
+                          }`}
                         title={`Bản tin ${idx + 1}`}
                       />
                     ))}
@@ -2103,7 +2099,7 @@ function Home() {
         )}
       </div>
 
-      {/* ── MODAL MÃ QR HỘI VIÊN & QUÉT QR (DUAL TAB) ── */}
+      {/* ── MODAL MÃ QR Học viên & QUÉT QR (DUAL TAB) ── */}
       <AssociationMemberQrModal
         open={memberQrModalOpen}
         onClose={() => setMemberQrModalOpen(false)}
@@ -2111,13 +2107,13 @@ function Home() {
           member?.code ||
           (typeof window !== "undefined"
             ? (() => {
-                try {
-                  const m = JSON.parse(localStorage.getItem("vba_my_member") || "null");
-                  return m?.code || null;
-                } catch {
-                  return null;
-                }
-              })()
+              try {
+                const m = JSON.parse(localStorage.getItem("vba_my_member") || "null");
+                return m?.code || null;
+              } catch {
+                return null;
+              }
+            })()
             : null) ||
           "HN10-292"
         }
@@ -2132,7 +2128,7 @@ function Home() {
         open={profileSheetOpen}
         onClose={() => setProfileSheetOpen(false)}
         profile={{
-          displayName: displayName || "Hội viên CEO HN10",
+          displayName: displayName || "Học viên CEO HN10",
           jobTitle: displayTitle || null,
           companyName: displayCompany || null,
           companyLogo: companyLogo || null,
@@ -2145,7 +2141,7 @@ function Home() {
             (member as any)?.bio ||
             (member as any)?.about ||
             (customProfile as any)?.bio ||
-            "Hội viên chính thức CLB Doanh Nhân CEO HN10, tích cực giao lưu kết nối và hợp tác giao thương.",
+            "Học viên chính thức CLB Doanh Nhân CEO HN10, tích cực giao lưu kết nối và hợp tác giao thương.",
           facebookUrl:
             (customProfile as any)?.facebook ||
             (member as any)?.facebookUrl ||
@@ -2227,7 +2223,7 @@ function Home() {
           }
           setQuickEditOpen(false);
           if (user?.id) {
-            fetchNestApi<any>("/members/me").then((live) => { if (live) setDirectMember(live); }).catch(() => {});
+            fetchNestApi<any>("/members/me").then((live) => { if (live) setDirectMember(live); }).catch(() => { });
           }
           toast.success("Đã cập nhật thông tin tài khoản thành công!");
         }}
@@ -2276,7 +2272,7 @@ function Home() {
         myMember={member}
       />
 
-      {/* ── LỊCH & BÁO THỨC HỘI VIÊN ── */}
+      {/* ── LỊCH & BÁO THỨC Học viên ── */}
       <CeoCalendarAlarmModal
         isOpen={alarmModalOpen}
         onClose={() => setAlarmModalOpen(false)}
@@ -2299,7 +2295,7 @@ function Home() {
         onClose={() => setCreateConnectionModalOpen(false)}
       />
 
-      {/* ── XEM HỒ SƠ CHI TIẾT HỘI VIÊN MỚI ── */}
+      {/* ── XEM HỒ SƠ CHI TIẾT Học viên MỚI ── */}
       {selectedMemberForProfile && (
         <MemberProfileModal
           member={selectedMemberForProfile}

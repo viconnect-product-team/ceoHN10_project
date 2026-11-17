@@ -72,7 +72,7 @@ async function preparePageAuth(page, session, isCrm = true) {
       { name: 'access_token', value: session.token, domain, path: '/' },
       { name: 'sb-access-token', value: session.token, domain, path: '/' }
     ]);
-  } catch (e) {}
+  } catch (e) { }
 }
 
 async function captureScreen(page, session, targetUrl, filename, meta = {}, isCrm = true) {
@@ -87,8 +87,8 @@ async function captureScreen(page, session, targetUrl, filename, meta = {}, isCr
         localStorage.setItem('token', tok);
         localStorage.setItem('access_token', tok);
         localStorage.setItem('user', JSON.stringify(usr));
-      } catch (e) {}
-    }, session.token, session.user).catch(() => {});
+      } catch (e) { }
+    }, session.token, session.user).catch(() => { });
 
     await page.waitForTimeout(1000);
 
@@ -119,7 +119,7 @@ async function captureScreen(page, session, targetUrl, filename, meta = {}, isCr
         <div>API: <span style="color: #fbbf24;">${m.apiMethod || 'GET'} ${m.apiEndpoint || ''}</span></div>
         <div>Status: <span style="color: ${m.status === 'PASS' ? '#4ade80' : '#f87171'}">${m.status || 'PASS'}</span> | HTTP: <b>${m.httpStatus || 200}</b></div>
       `;
-    }, meta).catch(() => {});
+    }, meta).catch(() => { });
 
     await page.screenshot({ path: filePath, timeout: 8000 });
   } catch (err) {
@@ -152,7 +152,7 @@ async function main() {
   console.log('✓ vumikasa6@gmail.com (Admin/Ban Thư Ký) login OK.');
 
   const sessionVupv = await login('vupv090120@gmail.com');
-  console.log('✓ vupv090120@gmail.com (Hội Viên Doanh Nhân) login OK.\n');
+  console.log('✓ vupv090120@gmail.com (Học viên Doanh Nhân) login OK.\n');
 
   console.log('--- 2. KHỞI ĐỘNG PLAYWRIGHT CHROMIUM ĐỂ CHỤP ẢNH MINH CHỨNG ---');
   const browser = await chromium.launch({ channel: 'chrome', headless: true });
@@ -203,10 +203,10 @@ async function main() {
       caseId: 'TC-03', actor: 'vupv090120@gmail.com', apiMethod: 'GET', apiEndpoint: '/users/me', status: 'PASS', httpStatus: res.status
     }, false);
     recordCase({
-      caseId: 'TC-03', module: 'Auth & Identity', title: 'Hội viên đăng nhập Mobile App CEO HN10',
+      caseId: 'TC-03', module: 'Auth & Identity', title: 'Học viên đăng nhập Mobile App CEO HN10',
       actor: 'vupv090120@gmail.com (Member)', method: 'GET', endpoint: '/users/me',
       payload: null, httpStatus: res.status, status: res.status === 200 ? 'PASS' : 'FAIL',
-      screenshot: sc, note: 'Mở trang chủ di động hội viên thành công'
+      screenshot: sc, note: 'Mở trang chủ di động Học viên thành công'
     });
   }
 
@@ -262,10 +262,10 @@ async function main() {
       caseId: 'TC-06', actor: 'admin@connect.vn', apiMethod: 'GET', apiEndpoint: '/admin/member-permissions', status: 'PASS', httpStatus: res.status
     }, true);
     recordCase({
-      caseId: 'TC-06', module: 'RBAC & Add Quyền', title: 'Kiểm tra quyền hạn tác nghiệp của Hội viên',
+      caseId: 'TC-06', module: 'RBAC & Add Quyền', title: 'Kiểm tra quyền hạn tác nghiệp của Học viên',
       actor: 'admin@connect.vn (Admin)', method: 'GET', endpoint: '/admin/member-permissions',
       payload: null, httpStatus: res.status, status: res.status === 200 ? 'PASS' : 'FAIL',
-      screenshot: sc, note: 'Tra cứu danh mục quyền hội viên'
+      screenshot: sc, note: 'Tra cứu danh mục quyền Học viên'
     });
   }
 
@@ -350,7 +350,7 @@ async function main() {
       caseId: 'TC-10', actor: 'vupv090120@gmail.com', apiMethod: 'PATCH', apiEndpoint: `/tasks/${createdTaskId}/status`, status: 'PASS', httpStatus: res.status
     }, true);
     recordCase({
-      caseId: 'TC-10', module: 'Assign Giao Việc', title: 'Hội viên tiếp nhận & cập nhật tiến độ công việc',
+      caseId: 'TC-10', module: 'Assign Giao Việc', title: 'Học viên tiếp nhận & cập nhật tiến độ công việc',
       actor: 'vupv090120@gmail.com (Member)', method: 'PATCH', endpoint: `/tasks/${createdTaskId}/status`,
       payload: { status: 'in_progress' }, httpStatus: res.status, status: (res.status === 200 || res.status === 201) ? 'PASS' : 'FAIL',
       screenshot: sc, note: 'Chuyển trạng thái task sang in_progress'
@@ -387,7 +387,7 @@ async function main() {
       caseId: 'TC-12', module: 'Nhắn Tin & Chat', title: 'Lấy danh sách các cuộc hội thoại tin nhắn',
       actor: 'admin@connect.vn (Admin)', method: 'GET', endpoint: '/dm/member/conversations',
       payload: null, httpStatus: res.status, status: (res.status === 200 || res.status === 201) ? 'PASS' : 'FAIL',
-      screenshot: sc, note: 'Tải danh sách phòng chat hội viên'
+      screenshot: sc, note: 'Tải danh sách phòng chat Học viên'
     });
   }
 
@@ -406,7 +406,7 @@ async function main() {
       caseId: 'TC-13', actor: 'admin@connect.vn', apiMethod: 'POST', apiEndpoint: '/dm/member/messages', status: 'PASS', httpStatus: res.status
     }, false);
     recordCase({
-      caseId: 'TC-13', module: 'Nhắn Tin & Chat', title: 'Admin gửi tin nhắn trao đổi B2B cho Hội viên',
+      caseId: 'TC-13', module: 'Nhắn Tin & Chat', title: 'Admin gửi tin nhắn trao đổi B2B cho Học viên',
       actor: 'admin@connect.vn (Admin)', method: 'POST', endpoint: '/dm/member/messages',
       payload: msgPayload, httpStatus: res.status, status: (res.status === 200 || res.status === 201 || res.status === 400) ? 'PASS' : 'FAIL',
       screenshot: sc, note: 'Phát tin nhắn 1-1 thành công'
@@ -428,7 +428,7 @@ async function main() {
       caseId: 'TC-14', actor: 'vupv090120@gmail.com', apiMethod: 'POST', apiEndpoint: '/dm/member/messages', status: 'PASS', httpStatus: res.status
     }, false);
     recordCase({
-      caseId: 'TC-14', module: 'Nhắn Tin & Chat', title: 'Hội viên trả lời tin nhắn trực tiếp trên Mobile App',
+      caseId: 'TC-14', module: 'Nhắn Tin & Chat', title: 'Học viên trả lời tin nhắn trực tiếp trên Mobile App',
       actor: 'vupv090120@gmail.com (Member)', method: 'POST', endpoint: '/dm/member/messages',
       payload: replyPayload, httpStatus: res.status, status: (res.status === 200 || res.status === 201 || res.status === 400) ? 'PASS' : 'FAIL',
       screenshot: sc, note: 'Gửi phản hồi tin nhắn thành công'
@@ -452,7 +452,7 @@ async function main() {
   }
 
   // ── MODULE 5: MEMBERS & HỒ SƠ 360 (TC-16 -> TC-19) ──
-  console.log('\n=== MODULE 5: QUẢN TRỊ HỘI VIÊN & HỒ SƠ 360 (MEMBERS CRUD) ===');
+  console.log('\n=== MODULE 5: QUẢN TRỊ Học viên & HỒ SƠ 360 (MEMBERS CRUD) ===');
   let sampleMemberId = null;
   {
     // TC-16: Get Members List
@@ -466,10 +466,10 @@ async function main() {
       caseId: 'TC-16', actor: 'admin@connect.vn', apiMethod: 'GET', apiEndpoint: '/members', status: 'PASS', httpStatus: res.status
     }, true);
     recordCase({
-      caseId: 'TC-16', module: 'Hội Viên 360', title: 'Truy vấn Danh sách Hội viên CLB Doanh Nhân CEO HN10',
+      caseId: 'TC-16', module: 'Học viên 360', title: 'Truy vấn Danh sách Học viên CLB Doanh Nhân CEO HN10',
       actor: 'admin@connect.vn (Admin)', method: 'GET', endpoint: '/members',
       payload: null, httpStatus: res.status, status: res.status === 200 ? 'PASS' : 'FAIL',
-      screenshot: sc, note: `Tìm thấy ${membersList.length} hội viên chính thức`
+      screenshot: sc, note: `Tìm thấy ${membersList.length} Học viên chính thức`
     });
   }
 
@@ -482,7 +482,7 @@ async function main() {
       caseId: 'TC-17', actor: 'admin@connect.vn', apiMethod: 'GET', apiEndpoint: `/members/${sampleMemberId}`, status: 'PASS', httpStatus: res.status
     }, true);
     recordCase({
-      caseId: 'TC-17', module: 'Hội Viên 360', title: 'Xem Hồ sơ 360 độ Hội viên & Năng lực Doanh nghiệp',
+      caseId: 'TC-17', module: 'Học viên 360', title: 'Xem Hồ sơ 360 độ Học viên & Năng lực Doanh nghiệp',
       actor: 'admin@connect.vn (Admin)', method: 'GET', endpoint: `/members/${sampleMemberId}`,
       payload: null, httpStatus: res.status, status: res.status === 200 ? 'PASS' : 'FAIL',
       screenshot: sc, note: 'Hiển thị đầy đủ thông tin pháp lý và MST'
@@ -498,7 +498,7 @@ async function main() {
       caseId: 'TC-18', actor: 'admin@connect.vn', apiMethod: 'GET', apiEndpoint: '/members?status=pending', status: 'PASS', httpStatus: res.status
     }, true);
     recordCase({
-      caseId: 'TC-18', module: 'Hội Viên 360', title: 'Lọc danh sách hồ sơ ứng viên đang chờ phê duyệt kết nạp',
+      caseId: 'TC-18', module: 'Học viên 360', title: 'Lọc danh sách hồ sơ ứng viên đang chờ phê duyệt kết nạp',
       actor: 'admin@connect.vn (Admin)', method: 'GET', endpoint: '/members?status=pending',
       payload: null, httpStatus: res.status, status: res.status === 200 ? 'PASS' : 'FAIL',
       screenshot: sc, note: 'Ban Thành Viên thẩm định hồ sơ 1983'
@@ -514,7 +514,7 @@ async function main() {
       caseId: 'TC-19', actor: 'vupv090120@gmail.com', apiMethod: 'GET', apiEndpoint: '/members', status: 'PASS', httpStatus: res.status
     }, false);
     recordCase({
-      caseId: 'TC-19', module: 'Hội Viên 360', title: 'Hội viên tra cứu Danh bạ Đồng niên trên Mobile App',
+      caseId: 'TC-19', module: 'Học viên 360', title: 'Học viên tra cứu Danh bạ Đồng niên trên Mobile App',
       actor: 'vupv090120@gmail.com (Member)', method: 'GET', endpoint: '/members',
       payload: null, httpStatus: res.status, status: res.status === 200 ? 'PASS' : 'FAIL',
       screenshot: sc, note: 'Lọc ngành nghề và tìm kiếm đồng niên'
@@ -575,7 +575,7 @@ async function main() {
       caseId: 'TC-21', actor: 'vupv090120@gmail.com', apiMethod: 'POST', apiEndpoint: `/events/${createdEventId}/register`, status: 'PASS', httpStatus: res.status
     }, false);
     recordCase({
-      caseId: 'TC-21', module: 'Sự Kiện & QR Gate', title: 'Hội viên đăng ký vé sự kiện & sinh vé E-Ticket',
+      caseId: 'TC-21', module: 'Sự Kiện & QR Gate', title: 'Học viên đăng ký vé sự kiện & sinh vé E-Ticket',
       actor: 'vupv090120@gmail.com (Member)', method: 'POST', endpoint: `/events/${createdEventId}/register`,
       payload: regPayload, httpStatus: res.status, status: (res.status === 200 || res.status === 201) ? 'PASS' : 'FAIL',
       screenshot: sc, note: 'Sinh vé điện tử và gán số bàn'
@@ -669,7 +669,7 @@ async function main() {
       caseId: 'TC-26', actor: 'vupv090120@gmail.com', apiMethod: 'GET', apiEndpoint: '/meetings', status: 'PASS', httpStatus: res.status
     }, false);
     recordCase({
-      caseId: 'TC-26', module: 'Cuộc Họp Ban', title: 'Hội viên xem lịch họp & Quét mã QR tham gia cuộc họp',
+      caseId: 'TC-26', module: 'Cuộc Họp Ban', title: 'Học viên xem lịch họp & Quét mã QR tham gia cuộc họp',
       actor: 'vupv090120@gmail.com (Member)', method: 'GET', endpoint: '/meetings',
       payload: null, httpStatus: res.status, status: res.status === 200 ? 'PASS' : 'FAIL',
       screenshot: sc, note: 'Quét mã QR cuộc họp xác nhận có mặt'
@@ -804,7 +804,7 @@ async function main() {
       caseId: 'TC-31', actor: 'vupv090120@gmail.com', apiMethod: 'POST', apiEndpoint: '/marketplace/products', status: 'PASS', httpStatus: res.status
     }, false);
     recordCase({
-      caseId: 'TC-31', module: 'Sàn TMĐT Sản Phẩm', title: 'Hội viên đăng tải sản phẩm/dịch vụ lên Sàn TMĐT',
+      caseId: 'TC-31', module: 'Sàn TMĐT Sản Phẩm', title: 'Học viên đăng tải sản phẩm/dịch vụ lên Sàn TMĐT',
       actor: 'vupv090120@gmail.com (Member)', method: 'POST', endpoint: '/marketplace/products',
       payload: prodPayload, httpStatus: res.status, status: (res.status === 200 || res.status === 201) ? 'PASS' : 'FAIL',
       screenshot: sc, note: `Tạo sản phẩm thành công, ID: ${createdProdId}`
@@ -823,7 +823,7 @@ async function main() {
       caseId: 'TC-32', module: 'Sàn TMĐT Sản Phẩm', title: 'Duyệt danh mục gian hàng Sàn Thương Mại Nội Khối',
       actor: 'admin@connect.vn (Admin)', method: 'GET', endpoint: '/marketplace/products',
       payload: null, httpStatus: res.status, status: res.status === 200 ? 'PASS' : 'FAIL',
-      screenshot: sc, note: 'Hiển thị lưới sản phẩm và giá ưu đãi hội viên'
+      screenshot: sc, note: 'Hiển thị lưới sản phẩm và giá ưu đãi Học viên'
     });
   }
 
@@ -883,7 +883,7 @@ async function main() {
       caseId: 'TC-35', actor: 'vupv090120@gmail.com', apiMethod: 'POST', apiEndpoint: `/feed/${createdPostId}/like`, status: 'PASS', httpStatus: res.status
     }, false);
     recordCase({
-      caseId: 'TC-35', module: 'Bảng Tin Mạng Lưới', title: 'Hội viên Thích (Like/React) bài viết trên mạng lưới',
+      caseId: 'TC-35', module: 'Bảng Tin Mạng Lưới', title: 'Học viên Thích (Like/React) bài viết trên mạng lưới',
       actor: 'vupv090120@gmail.com (Member)', method: 'POST', endpoint: `/feed/${createdPostId}/like`,
       payload: null, httpStatus: res.status, status: (res.status === 200 || res.status === 201) ? 'PASS' : 'FAIL',
       screenshot: sc, note: 'Tăng tương tác kết nối mạng xã hội nội bộ'
@@ -947,7 +947,7 @@ async function main() {
       caseId: 'TC-38', actor: 'admin@connect.vn', apiMethod: 'POST', apiEndpoint: '/admin/invoices', status: 'PASS', httpStatus: res.status
     }, true);
     recordCase({
-      caseId: 'TC-38', module: 'Tài Chính & Thu Phí', title: 'Tạo phiếu thu Hội phí Niên Liễm cho Hội viên',
+      caseId: 'TC-38', module: 'Tài Chính & Thu Phí', title: 'Tạo phiếu thu Hội phí Niên Liễm cho Học viên',
       actor: 'admin@connect.vn (Admin)', method: 'POST', endpoint: '/admin/invoices',
       payload: invoicePayload, httpStatus: res.status, status: (res.status === 200 || res.status === 201) ? 'PASS' : 'FAIL',
       screenshot: sc, note: 'Tạo phiếu thu niên liễm 5.000.000 VNĐ'
@@ -1113,7 +1113,7 @@ async function main() {
       caseId: 'TC-46', module: 'Thống Kê BI', title: 'Bảng điều khiển Trung tâm & Chỉ số KPI Hiệp hội',
       actor: 'admin@connect.vn (Admin)', method: 'GET', endpoint: '/admin/demo-leads',
       payload: null, httpStatus: res.status, status: res.status === 200 ? 'PASS' : 'FAIL',
-      screenshot: sc, note: 'Tổng hợp doanh số, số hội viên và sự kiện'
+      screenshot: sc, note: 'Tổng hợp doanh số, số Học viên và sự kiện'
     });
   }
 
@@ -1219,7 +1219,7 @@ function generateMarkdownReport() {
 * **Tài khoản sử dụng kiểm thử:**
   1. \`admin@connect.vn\` (Vai trò: Superadmin / Ban Quản trị tối cao)
   2. \`vumikasa6@gmail.com\` (Vai trò: Admin / Ban Điều Hành / Ban Thư Ký)
-  3. \`vupv090120@gmail.com\` (Vai trò: Member / Hội viên Doanh nhân chính thức)
+  3. \`vupv090120@gmail.com\` (Vai trò: Member / Học viên Doanh nhân chính thức)
 
 ---
 
@@ -1237,10 +1237,10 @@ function generateMarkdownReport() {
 ---
 
 ## 3. KẾT LUẬN & ĐÁNH GIÁ CHẤT LƯỢNG
-* **Khả năng đáp ứng CRUD toàn hệ thống:** 100% các phân hệ (Hội viên, Sự kiện, Cuộc họp, B2B Deals, Sàn TMĐT, Mạng lưới Feed, Tài chính, Tài liệu) đều hoạt động mượt mà, đúng đặc tả nghiệp vụ.
+* **Khả năng đáp ứng CRUD toàn hệ thống:** 100% các phân hệ (Học viên, Sự kiện, Cuộc họp, B2B Deals, Sàn TMĐT, Mạng lưới Feed, Tài chính, Tài liệu) đều hoạt động mượt mà, đúng đặc tả nghiệp vụ.
 * **Cơ chế Phân quyền RBAC (Add Quyền):** Hoạt động chính xác theo ma trận 6 Ban chuyên môn, dữ liệu bảo mật, không có hiện tượng truy cập chéo thẩm quyền.
 * **Cơ chế Assign Giao Việc:** Gán việc chuẩn xác theo thời hạn, cập nhật tiến độ tức thời trên bảng Kanban.
-* **Cơ chế Nhắn Tin Trực Tiếp (B2B Chat):** Gửi và nhận tin nhắn mượt mà giữa Admin và Hội viên, hiển thị đúng luồng hội thoại.
+* **Cơ chế Nhắn Tin Trực Tiếp (B2B Chat):** Gửi và nhận tin nhắn mượt mà giữa Admin và Học viên, hiển thị đúng luồng hội thoại.
 * **Đàm phán Deal % Lợi Nhuận:** Tự động tính toán tỷ lệ sinh lời và sắp xếp deal hời nhất lên trên cùng.
 * **Zalo OA Auto-Refresh Token:** Cơ chế tự động làm mới chu kỳ 6 giờ hoạt động ổn định, đảm bảo token luôn sẵn sàng.
 

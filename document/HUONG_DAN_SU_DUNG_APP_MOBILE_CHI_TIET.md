@@ -1,4 +1,4 @@
-# HƯỚNG DẪN SỬ DỤNG ỨNG DỤNG DI ĐỘNG HỘI VIÊN CEO HN10
+# HƯỚNG DẪN SỬ DỤNG ỨNG DỤNG DI ĐỘNG Học viên CEO HN10
 ## HỆ THỐNG GIAO THƯƠNG & KẾT NỐI DOANH NHÂN CLB CEO HN10 (HANOIBA)
 *Địa chỉ truy cập ứng dụng: `https://ceohn10.viconnect.vn`*
 
@@ -8,9 +8,9 @@
 
 1. [Đăng Nhập & Quên Mật Khẩu](#1-đăng-nhập--quên-mật-khẩu)
 2. [NODE-APP-001: Trang Chủ & Trung Tâm Thông Báo](#node-app-001-trang-chủ--trung-tâm-thông-báo)
-3. [NODE-APP-002: Thẻ Hội Viên VIP Số & QR Cá Nhân](#node-app-002-thẻ-hội-viên-vip-số--qr-cá-nhân)
+3. [NODE-APP-002: Thẻ Học viên VIP Số & QR Cá Nhân](#node-app-002-thẻ-hội-viên-vip-số--qr-cá-nhân)
 4. [NODE-APP-003: Trang Quét Danh Thiếp Công Khai](#node-app-003-trang-quét-danh-thiếp-công-khai)
-5. [NODE-APP-004: Danh Bạ Hội Viên](#node-app-004-danh-bạ-hội-viên)
+5. [NODE-APP-004: Danh Bạ Học viên](#node-app-004-danh-bạ-hội-viên)
 6. [NODE-APP-005: Cơ Hội Giao Thương B2B](#node-app-005-cơ-hội-giao-thương-b2b)
 7. [NODE-APP-006: Thống Kê Hoạt Động & Biểu Đồ Realtime](#node-app-006-thống-kê-hoạt-động--biểu-đồ-realtime)
 8. [NODE-APP-007: Sàn Giao Thương B2B Marketplace](#node-app-007-sàn-giao-thương-b2b-marketplace)
@@ -19,7 +19,7 @@
 11. [NODE-APP-010: Bảng Tin Mạng Lưới Moments & Tin Nhắn Trao Đổi](#node-app-010-bảng-tin-mạng-lưới-moments--tin-nhắn-trao-đổi)
 12. [NODE-APP-011: Hồ Sơ Cá Nhân & Doanh Nghiệp](#node-app-011-hồ-sơ-cá-nhân--doanh-nghiệp)
 13. [NODE-APP-012: Cài Đặt Hệ Thống & Đổi Mật Khẩu](#node-app-012-cài-đặt-hệ-thống--đổi-mật-khẩu)
-14. [NODE-APP-013: Ưu Đãi Hội Viên & Điểm Sử Dụng](#node-app-013-ưu-đãi-hội-viên--điểm-sử-dụng)
+14. [NODE-APP-013: Ưu Đãi Học viên & Điểm Sử Dụng](#node-app-013-ưu-đãi-hội-viên--điểm-sử-dụng)
 15. [NODE-APP-014: Cài Đặt Ứng Dụng Màn Hình Chính (PWA)](#node-app-014-cài-đặt-ứng-dụng-màn-hình-chính-pwa)
 16. [NODE-APP-015: Hẹn Gặp Kết Nối B2B 1-on-1](#node-app-015-hẹn-gặp-kết-nối-b2b-1-on-1)
 17. [NODE-APP-016: Đào Tạo Doanh Nghiệp & Video Call](#node-app-016-đào-tạo-doanh-nghiệp--video-call)
@@ -30,7 +30,7 @@
 ## 1. ĐĂNG NHẬP & QUÊN MẬT KHẨU
 
 ### 1.1. Đăng nhập ứng dụng
-![Đăng nhập Di động Hội viên](./images/guide_app/00_app_login.png)
+![Đăng nhập Di động Học viên](./images/guide_app/00_app_login.png)
 
 - **Tại màn hình Đăng nhập (`https://ceohn10.viconnect.vn/auth`)**:
   - Bước 1: Nhập địa chỉ email vào ô **"Email"** (ví dụ: `vumikasa6@gmail.com`).
@@ -61,7 +61,7 @@ Theo dõi biểu đồ nến biến động giao thương, sử dụng các phí
 ![Trang Chủ Ticker Nến Realtime Mobile](./images/guide_app/01_app_home_ticker.png)
 *Hình 1.1: Giao diện Trang Chủ với biểu đồ nến Ticker và các nút chức năng nhanh.*
 
-![Trung Tâm Thông Báo Đa Kênh Hội Viên](./images/guide_app/01_b_app_notifications_center.png)
+![Trung Tâm Thông Báo Đa Kênh Học viên](./images/guide_app/01_b_app_notifications_center.png)
 *Hình 1.2: Trung tâm thông báo hệ thống, lời mời kết nối và sự kiện.*
 
 ![Cài Đặt Giao Diện & Bộ Chọn Màu Brandbook](./images/guide_app/01_c_app_theme_switcher_modal.png)
@@ -89,7 +89,7 @@ Theo dõi biểu đồ nến biến động giao thương, sử dụng các phí
 
 ---
 
-## NODE-APP-002: THẺ HỘI VIÊN VIP SỐ & QR CÁ NHÂN
+## NODE-APP-002: THẺ Học viên VIP SỐ & QR CÁ NHÂN
 
 ### 1. Mục đích
 Sử dụng thẻ danh thiếp điện tử thay thế danh thiếp giấy và quét mã QR để kết nối doanh nhân.
@@ -99,12 +99,12 @@ Sử dụng thẻ danh thiếp điện tử thay thế danh thiếp giấy và q
 - Cách mở: Tại màn Trang Chủ, bấm vào ô **"Thẻ VIP"** hoặc vào mục **Cá Nhân** -> chọn **"Thẻ danh thiếp số"**.
 
 ### 3. Hình ảnh giao diện
-![Thẻ Hội Viên VIP Số Mobile](./images/guide_app/02_app_vip_card.png)
-*Hình 2.1: Thẻ hội viên VIP điện tử với mã QR cá nhân.*
+![Thẻ Học viên VIP Số Mobile](./images/guide_app/02_app_vip_card.png)
+*Hình 2.1: Thẻ Học viên VIP điện tử với mã QR cá nhân.*
 
 ### 4. Các bước thao tác
 #### a. Xem và lật mặt thẻ:
-- Tại màn Thẻ VIP: Chạm vào mặt thẻ để xoay chuyển giữa Mặt trước (Họ tên, Ảnh đại diện, Chức danh, Tên công ty) và Mặt sau (Mã QR định danh, Mã số hội viên).
+- Tại màn Thẻ VIP: Chạm vào mặt thẻ để xoay chuyển giữa Mặt trước (Họ tên, Ảnh đại diện, Chức danh, Tên công ty) và Mặt sau (Mã QR định danh, Mã số Học viên).
 - Chạm trực tiếp vào **Mã QR** để phóng to mã phục vụ việc quét mã tại các buổi gặp mặt.
 
 #### b. Cài đặt quyền riêng tư:
@@ -113,10 +113,10 @@ Sử dụng thẻ danh thiếp điện tử thay thế danh thiếp giấy và q
   - Gạt công tắc **"Hiển thị email"**: Tắt nếu không muốn người quét nhìn thấy địa chỉ email.
 - Bấm nút **"Lưu cấu hình thẻ"**.
 
-#### c. Quét mã QR của hội viên khác:
+#### c. Quét mã QR của Học viên khác:
 - Bước 1: Bấm nút **"Quét mã QR"** màu đỏ ở cuối màn hình.
 - Bước 2: Hướng camera điện thoại về phía mã QR trên thẻ của đối tác.
-- Kết quả: Hệ thống tự động mở hồ sơ hội viên đối tác để bạn kết nối.
+- Kết quả: Hệ thống tự động mở hồ sơ Học viên đối tác để bạn kết nối.
 
 ---
 
@@ -139,27 +139,27 @@ Hiển thị danh thiếp của bạn khi người khác quét mã QR mà chưa 
 
 ---
 
-## NODE-APP-004: DANH BẠ HỘI VIÊN
+## NODE-APP-004: DANH BẠ Học viên
 
 ### 1. Mục đích
-Tra cứu thông tin liên hệ của toàn bộ hội viên trong CLB theo họ tên, doanh nghiệp hoặc lĩnh vực ngành nghề.
+Tra cứu thông tin liên hệ của toàn bộ Học viên trong CLB theo họ tên, doanh nghiệp hoặc lĩnh vực ngành nghề.
 
 ### 2. Đường dẫn truy cập
 - Route: `/association/members`
-- Cách mở: Tại màn Trang Chủ, chọn chức năng **"Danh Bạ Hội Viên"**.
+- Cách mở: Tại màn Trang Chủ, chọn chức năng **"Danh Bạ Học viên"**.
 
 ### 3. Hình ảnh giao diện
-![Danh Bạ Hội Viên Mobile](./images/guide_app/04_app_members_directory.png)
-*Hình 4.1: Danh sách hội viên doanh nhân kèm bộ lọc tìm kiếm.*
+![Danh Bạ Học viên Mobile](./images/guide_app/04_app_members_directory.png)
+*Hình 4.1: Danh sách Học viên doanh nhân kèm bộ lọc tìm kiếm.*
 
 ### 4. Các bước thao tác
-#### a. Tìm kiếm hội viên:
+#### a. Tìm kiếm Học viên:
 - Bước 1: Nhập từ khóa vào ô **"Tìm kiếm theo tên, công ty, ngành nghề..."** (Ví dụ: "Vũ", "Xây dựng", "ViOne").
 - Bước 2: Bấm chọn Ban chuyên môn tại thanh cuộn ngang bên dưới (Tất cả, Ban Thành Viên, Ban Sự Kiện, Ban Truyền Thông...).
-- Kết quả: Danh sách hội viên phù hợp tự động hiển thị ngay bên dưới.
+- Kết quả: Danh sách Học viên phù hợp tự động hiển thị ngay bên dưới.
 
 #### b. Xem chi tiết và liên hệ:
-- Bước 1: Chạm vào thẻ của hội viên cần xem.
+- Bước 1: Chạm vào thẻ của Học viên cần xem.
 - Bước 2: Màn hình hiển thị đầy đủ: Ảnh đại diện, Chức danh, Số điện thoại, Email, Giới thiệu công ty.
 - Bước 3: Bấm nút **"Gọi điện"**, **"Gửi Email"** hoặc **"Nhắn tin"** để liên hệ trực tiếp.
 
@@ -188,7 +188,7 @@ Tra cứu thông tin liên hệ của toàn bộ hội viên trong CLB theo họ
     - Ô **"Nhóm ngành nghề"**: Chọn ngành nghề tương ứng trong danh sách thả xuống.
     - Ô **"Mô tả chi tiết"**: Nhập yêu cầu cụ thể về sản phẩm/dịch vụ.
   - Bước 3: Bấm nút **"Xác nhận đăng"**.
-  - Kết quả: Cơ hội hiển thị trên bảng tin giao thương của toàn bộ hội viên.
+  - Kết quả: Cơ hội hiển thị trên bảng tin giao thương của toàn bộ Học viên.
 
 #### b. Phản hồi cơ hội kinh doanh:
 - Bước 1: Chạm vào cơ hội bạn quan tâm trong danh sách.
@@ -200,7 +200,7 @@ Tra cứu thông tin liên hệ của toàn bộ hội viên trong CLB theo họ
 ## NODE-APP-006: THỐNG KÊ HOẠT ĐỘNG & BIỂU ĐỒ REALTIME
 
 ### 1. Mục đích
-Theo dõi các chỉ số giao thương B2B, điểm danh sự kiện, bảng vinh danh Top hội viên kèm tính năng phóng to thu nhỏ và xem chi tiết theo ngày/tuần/tháng/quý/năm.
+Theo dõi các chỉ số giao thương B2B, điểm danh sự kiện, bảng vinh danh Top Học viên kèm tính năng phóng to thu nhỏ và xem chi tiết theo ngày/tuần/tháng/quý/năm.
 
 ### 2. Đường dẫn truy cập
 - Route: `/association/analytics`
@@ -225,14 +225,14 @@ Theo dõi các chỉ số giao thương B2B, điểm danh sự kiện, bảng vi
 - Bước 3: Dùng ngón tay vuốt ngang sang trái/phải trên vùng biểu đồ để xem các mốc ngày/tuần bị ẩn khi phóng to.
 
 #### c. Xem Bục vinh danh Top 3 kết nối:
-- Cuộn xuống phần **"Bục Vinh Danh Top Hội Viên"**: Quan sát vị trí Top 1 (Vàng), Top 2 (Bạc), Top 3 (Đồng) căn cứ theo tổng giá trị giao dịch và số lượng lời mời kết nối thành công.
+- Cuộn xuống phần **"Bục Vinh Danh Top Học viên"**: Quan sát vị trí Top 1 (Vàng), Top 2 (Bạc), Top 3 (Đồng) căn cứ theo tổng giá trị giao dịch và số lượng lời mời kết nối thành công.
 
 ---
 
 ## NODE-APP-007: SÀN GIAO THƯƠNG B2B MARKETPLACE
 
 ### 1. Mục đích
-Quảng bá và giới thiệu các sản phẩm, dịch vụ tiêu biểu của doanh nghiệp hội viên (mỗi doanh nghiệp tối đa 5 sản phẩm tiêu biểu).
+Quảng bá và giới thiệu các sản phẩm, dịch vụ tiêu biểu của doanh nghiệp Học viên (mỗi doanh nghiệp tối đa 5 sản phẩm tiêu biểu).
 
 ### 2. Đường dẫn truy cập
 - Route: `/association/products`
@@ -248,7 +248,7 @@ Quảng bá và giới thiệu các sản phẩm, dịch vụ tiêu biểu của
 - Bước 2: Nhập thông tin sản phẩm:
   - Ô **"Tên sản phẩm / dịch vụ"**: Nhập tên chính xác.
   - Ô **"Giá bán (VNĐ)"**: Nhập đơn giá hoặc ghi 0 nếu là giá thỏa thuận.
-  - Ô **"Ưu đãi cho hội viên CEO HN10 (%)"**: Nhập % giảm giá dành riêng cho hội viên (ví dụ: `15`).
+  - Ô **"Ưu đãi cho Học viên CEO HN10 (%)"**: Nhập % giảm giá dành riêng cho Học viên (ví dụ: `15`).
   - Nút **"Chọn ảnh"**: Tải lên ảnh sản phẩm từ thư viện điện thoại.
   - Ô **"Mô tả sản phẩm"**: Nhập chi tiết tính năng, quy cách.
 - Bước 3: Bấm nút **"Lưu sản phẩm"**.
@@ -318,7 +318,7 @@ Tham gia bỏ phiếu, biểu quyết các nghị quyết, bầu cử Ban Chấp
 ## NODE-APP-010: BẢNG TIN MẠNG LƯỚI MOMENTS & TIN NHẮN TRAO ĐỔI
 
 ### 1. Mục đích
-Chia sẻ hình ảnh hoạt động, khoảnh khắc giao lưu doanh nghiệp và nhắn tin trao đổi 1-on-1 giữa các hội viên.
+Chia sẻ hình ảnh hoạt động, khoảnh khắc giao lưu doanh nghiệp và nhắn tin trao đổi 1-on-1 giữa các Học viên.
 
 ### 2. Đường dẫn truy cập
 - Route: `/association/messages`
@@ -326,7 +326,7 @@ Chia sẻ hình ảnh hoạt động, khoảnh khắc giao lưu doanh nghiệp v
 
 ### 3. Hình ảnh giao diện
 ![Bảng Tin Mạng Lưới Moments](./images/guide_app/10_app_moments_feed.png)
-*Hình 10.1: Bảng tin chia sẻ hình ảnh và bài viết của hội viên.*
+*Hình 10.1: Bảng tin chia sẻ hình ảnh và bài viết của Học viên.*
 
 ![Tin Nhắn Trao Đổi 1-on-1](./images/guide_app/10_b_app_messages_chat_1on1.png)
 *Hình 10.2: Khung chat tin nhắn trực tiếp giữa 2 doanh nhân.*
@@ -338,7 +338,7 @@ Chia sẻ hình ảnh hoạt động, khoảnh khắc giao lưu doanh nghiệp v
 - Bước 3: Bấm nút **"Đăng bài"**.
 
 #### b. Nhắn tin trao đổi 1-on-1:
-- Bước 1: Bấm vào biểu tượng bong bóng chat hoặc chọn nút **"Nhắn tin"** trên thẻ của một hội viên.
+- Bước 1: Bấm vào biểu tượng bong bóng chat hoặc chọn nút **"Nhắn tin"** trên thẻ của một Học viên.
 - Bước 2: Nhập nội dung tin nhắn vào ô soạn thảo ở cuối màn hình.
 - Bước 3: Bấm nút **"Gửi"** (Biểu tượng mũi tên).
 - *Thao tác với tin nhắn đã gửi*: Chạm vào biểu tượng dấu 3 chấm (`...`) trên bong bóng chat để chọn:
@@ -374,7 +374,7 @@ Xem và cập nhật thông tin cá nhân, logo doanh nghiệp, lĩnh vực kinh
 
 #### b. Xem tình trạng hội phí niên liễm:
 - Quan sát khối thẻ **"Tình trạng Hội Phí"**:
-  - Nhãn xanh **"Đã hoàn thành niên liễm 2026"**: Hội viên đang hoạt động chuẩn.
+  - Nhãn xanh **"Đã hoàn thành niên liễm 2026"**: Học viên đang hoạt động chuẩn.
   - Nhãn đỏ **"Đến hạn đóng phí"**: Kèm theo nút **"Đóng phí qua VietQR"** để thanh toán trực tiếp.
 
 ---
@@ -407,7 +407,7 @@ Thiết lập các thông số tài khoản, đổi mật khẩu đăng nhập �
 
 ---
 
-## NODE-APP-013: ƯU ĐÃI HỘI VIÊN & ĐIỂM SỬ DỤNG
+## NODE-APP-013: ƯU ĐÃI Học viên & ĐIỂM SỬ DỤNG
 
 ### 1. Mục đích
 Khám phá và nhận các voucher, chính sách chiết khấu ưu đãi chéo giữa các doanh nghiệp trong CLB CEO HN10.
@@ -417,8 +417,8 @@ Khám phá và nhận các voucher, chính sách chiết khấu ưu đãi chéo 
 - Cách mở: Tại màn Trang Chủ, chọn chức năng **"Ưu Đãi Đặc Quyền"**.
 
 ### 3. Hình ảnh giao diện
-![Ưu Đãi Hội Viên & Điểm Sử Dụng](./images/guide_app/13_app_perks_benefits.png)
-*Hình 13.1: Danh sách các chính sách ưu đãi dành riêng cho hội viên.*
+![Ưu Đãi Học viên & Điểm Sử Dụng](./images/guide_app/13_app_perks_benefits.png)
+*Hình 13.1: Danh sách các chính sách ưu đãi dành riêng cho Học viên.*
 
 ### 4. Các bước thao tác
 - Bước 1: Duyệt danh sách các gói ưu đãi (Nhà hàng, Khách sạn, Dịch vụ xe, Tư vấn luật, Phần mềm...).
@@ -465,12 +465,12 @@ Khám phá và nhận các voucher, chính sách chiết khấu ưu đãi chéo 
 ### 4. Các bước thao tác
 - Bước 1: Bấm nút **"Tạo lịch hẹn 1-on-1"**.
 - Bước 2: Nhập thông tin lịch hẹn:
-  - Ô **"Hội viên muốn gặp"**: Chọn tên đối tác trong danh sách.
+  - Ô **"Học viên muốn gặp"**: Chọn tên đối tác trong danh sách.
   - Ô **"Thời gian hẹn"**: Chọn ngày và giờ gặp mặt.
   - Ô **"Địa điểm"**: Nhập địa chỉ quán cafe / văn phòng hoặc chọn họp trực tuyến.
   - Ô **"Mục đích buổi gặp"**: Nhập nội dung trao đổi chính.
 - Bước 3: Bấm nút **"Gửi lời mời hẹn gặp"**.
-- Kết quả: Lời mời được gửi đến trung tâm thông báo của hội viên được mời.
+- Kết quả: Lời mời được gửi đến trung tâm thông báo của Học viên được mời.
 
 ---
 
@@ -502,7 +502,7 @@ Xem các video khóa học, tài liệu chia sẻ kinh nghiệm quản trị doa
 ## NODE-APP-017: LỊCH HOẠT ĐỘNG CLB
 
 ### 1. Mục đích
-Theo dõi toàn bộ lịch trình công tác, lịch họp ban chấp hành, lịch thăm doanh nghiệp hội viên và các ngày kỷ niệm trong tháng.
+Theo dõi toàn bộ lịch trình công tác, lịch họp ban chấp hành, lịch thăm doanh nghiệp Học viên và các ngày kỷ niệm trong tháng.
 
 ### 2. Đường dẫn truy cập
 - Route: `/association/calendar`

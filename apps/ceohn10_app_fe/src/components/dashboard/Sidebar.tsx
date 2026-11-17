@@ -498,14 +498,12 @@ export function Sidebar({
   const currentRoleKey: SystemRoleKey = useMemo(() => {
     const rawRole = (srsRole as string) || "";
 
-    // 1. ƯU TIÊN TUYỆT ĐỐI: Vai trò chuyên môn của Ban (Thành viên ban chuyên trách)
-    if (rawRole === "thanh_vien_ban_su_kien" || rawRole.includes("su_kien")) return "thanh_vien_ban_su_kien";
-    if (rawRole === "thanh_vien_ban_xuc_tien") return "thanh_vien_ban_xuc_tien";
-    if (rawRole === "thanh_vien_ban_thanh_vien") return "thanh_vien_ban_thanh_vien";
-    if (rawRole === "thanh_vien_ban_truyen_thong") return "thanh_vien_ban_truyen_thong";
-    if (rawRole === "thanh_vien_ban_tai_chinh") return "thanh_vien_ban_tai_chinh";
-    if (rawRole === "thanh_vien_ban_thien_nguyen") return "thanh_vien_ban_thien_nguyen";
-    if (rawRole === "thanh_vien_ban_dieu_hanh") return "thanh_vien_ban_dieu_hanh";
+    // 1. Vai trò Lãnh đạo cấp cao: Lớp Trưởng & Lớp Phó Lâm Thời, Quản trị hệ thống
+    if (rawRole === "chu_tich" || rawRole === "president" || isChuTich) return "chu_tich";
+    if (rawRole === "pho_chu_tich" || rawRole.startsWith("lop_pho_")) return "chu_tich";
+    if (rawRole.startsWith("truong_team_") || rawRole.startsWith("pho_team_") || rawRole.startsWith("tb_")) return "admin";
+    if (rawRole === "quan_tri" || rawRole === "ADM" || isPlatformAdmin) return "quan_tri";
+    if (rawRole === "admin" || (isAdmin && !rawRole.startsWith("thanh_vien_ban_") && rawRole !== "member" && rawRole !== "HVT") || isBQT) return "admin";
 
     // 2. Trưởng ban các Ban Chuyên Môn
     if (rawRole === "truong_ban_truyen_thong" || rawRole === "BTT" || isTruongBanTruyenThong) return "truong_ban_truyen_thong";
@@ -517,10 +515,15 @@ export function Sidebar({
     if (rawRole === "ban_thu_ky" || isBanThuKy) return "tong_thu_ky";
     if (rawRole === "ban_dieu_hanh" || rawRole === "truong_ban_dieu_hanh" || rawRole === "BQT") return "truong_ban_dieu_hanh";
 
-    // 3. Vai trò Lãnh đạo cấp cao & Quản trị hệ thống
-    if (rawRole === "chu_tich" || rawRole === "president" || isChuTich) return "chu_tich";
-    if (rawRole === "quan_tri" || rawRole === "ADM" || isPlatformAdmin) return "quan_tri";
-    if (rawRole === "admin" || (isAdmin && !rawRole.startsWith("thanh_vien_ban_") && rawRole !== "member" && rawRole !== "HVT") || isBQT) return "admin";
+    // 3. Vai trò chuyên môn của Ban (Thành viên ban chuyên trách)
+    if (rawRole === "thanh_vien_ban_su_kien") return "thanh_vien_ban_su_kien";
+    if (rawRole === "thanh_vien_ban_xuc_tien") return "thanh_vien_ban_xuc_tien";
+    if (rawRole === "thanh_vien_ban_thanh_vien") return "thanh_vien_ban_thanh_vien";
+    if (rawRole === "thanh_vien_ban_truyen_thong") return "thanh_vien_ban_truyen_thong";
+    if (rawRole === "thanh_vien_ban_tai_chinh") return "thanh_vien_ban_tai_chinh";
+    if (rawRole === "thanh_vien_ban_thien_nguyen") return "thanh_vien_ban_thien_nguyen";
+    if (rawRole === "thanh_vien_ban_dieu_hanh") return "thanh_vien_ban_dieu_hanh";
+
     return "member";
   }, [
     srsRole,

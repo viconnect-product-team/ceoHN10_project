@@ -19,7 +19,7 @@ async function main() {
       image, contact_name, contact_phone, contact_title, company, created_at, updated_at
     ) VALUES (
       ${oppId}, ${assocId}::uuid, ${adminId}, 'Cơ hội kết nối cấp quản trị viên',
-      'Admin tạo cơ hội kết nối hệ thống giao thương toàn quốc cho hội viên CLB CEO HN10', 'Hợp tác B2B',
+      'Admin tạo cơ hội kết nối hệ thống giao thương toàn quốc cho Học viên CLB CEO HN10', 'Hợp tác B2B',
       ${BigInt(50000000)}, ${BigInt(200000000)},
       'Toàn quốc', 'Công nghệ & Đầu tư',
       ${new Date(Date.now() + 30 * 86400000)},

@@ -120,7 +120,7 @@ export function IncomingConnectionModal() {
   const profile = incoming.requesterProfile || {};
   const displayName = profile.display_name || "Doanh nhân CEO HN10";
   const company = profile.company_name || "CLB Doanh Nhân CEO HN10";
-  const title = profile.job_title || "Hội viên Chính thức";
+  const title = profile.job_title || "Học viên Chính thức";
   const avatar = profile.avatar_url;
   const phone = profile.phone;
   const email = profile.email;
@@ -147,14 +147,14 @@ export function IncomingConnectionModal() {
           connectionId: incoming.connectionId,
           targetUserId: profile.userId || profile.memberCode,
           accepterProfile: {
-            display_name: user?.name || "Hội viên CEO HN10",
-            name: user?.name || "Hội viên CEO HN10",
+            display_name: user?.name || "Học viên CEO HN10",
+            name: user?.name || "Học viên CEO HN10",
             avatar_url: user?.avatar,
             memberCode: user?.code,
             userId: user?.id,
           },
         });
-      } catch {}
+      } catch { }
 
       // Cập nhật danh bạ đã kết nối vào CẢ 2 key localStorage (vba_connected_members & vba.connected_members)
       try {
@@ -173,7 +173,7 @@ export function IncomingConnectionModal() {
           if (!list2.includes(id)) list2.push(id);
         }
         localStorage.setItem("vba.connected_members", JSON.stringify(list2));
-      } catch {}
+      } catch { }
 
       setAccepted(true);
       toast.success(`Đã kết nối thành công với ${displayName}!`);
@@ -200,13 +200,13 @@ export function IncomingConnectionModal() {
         connectionId: incoming.connectionId,
         targetUserId: profile.userId || profile.memberCode,
         declinerProfile: {
-          display_name: user?.name || "Hội viên CEO HN10",
-          name: user?.name || "Hội viên CEO HN10",
+          display_name: user?.name || "Học viên CEO HN10",
+          name: user?.name || "Học viên CEO HN10",
           memberCode: user?.code,
           userId: user?.id,
         },
       });
-    } catch {}
+    } catch { }
 
     toast.info(`Đã từ chối lời mời kết nối từ ${displayName}.`);
     setIncoming(null);

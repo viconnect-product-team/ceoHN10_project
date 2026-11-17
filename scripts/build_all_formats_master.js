@@ -857,7 +857,7 @@ async function generateMasterExcelRTM(outputPath) {
 
   const templates = [
     { stt: 1, code: 'BM-CEO HN10-MEM-01', name: 'Đơn Đăng Ký Gia Nhập CLB Doanh Nhân CEO HN10', module: 'Mobile App / CRM', approver: 'Ban Thư Ký & Chủ Tịch', retention: 'Vĩnh viễn', desc: 'Kê khai thông tin doanh nhân, năm sinh 1983, CCCD, pháp nhân doanh nghiệp, mã số thuế.' },
-    { stt: 2, code: 'BM-CEO HN10-MEM-02', name: 'Bản Cam Đoan & Thỏa Thuận Bảo Mật Thông Tin (NDA)', module: 'Mobile App / CRM', approver: 'Hội Viên & Ban Kiểm Tra', retention: 'Vĩnh viễn', desc: 'Bảo mật danh bạ nội khối, cơ hội kinh doanh và mức giá chiết khấu theo Nghị định 13/2023.' },
+    { stt: 2, code: 'BM-CEO HN10-MEM-02', name: 'Bản Cam Đoan & Thỏa Thuận Bảo Mật Thông Tin (NDA)', module: 'Mobile App / CRM', approver: 'Học viên & Ban Kiểm Tra', retention: 'Vĩnh viễn', desc: 'Bảo mật danh bạ nội khối, cơ hội kinh doanh và mức giá chiết khấu theo Nghị định 13/2023.' },
     { stt: 3, code: 'BM-CEO HN10-FIN-03', name: 'Biên Lai Điện Tử Thu Hội Phí Niên Khóa (VietQR)', module: 'Hệ Thống Tự Động', approver: 'Hệ Thống / Kế Toán', retention: '10 năm', desc: 'Phát hành tự động khi gạch nợ thành công qua VietQR Napas247, MoMo hoặc VNPay.' },
     { stt: 4, code: 'BM-CEO HN10-FIN-04', name: 'Giấy Đề Nghị Tạm Ứng Kinh Phí Hoạt Động Ban', module: 'Web CRM', approver: 'Trưởng Ban -> Chủ Tịch', retention: '05 năm', desc: 'Dự toán chi tiết kinh phí sự kiện, giải đấu trong hạn mức ngân sách được giao của Ban.' },
     { stt: 5, code: 'BM-CEO HN10-FIN-05', name: 'Giấy Thanh Toán & Bảng Kê Quyết Toán Hoàn Ứng', module: 'Web CRM', approver: 'Kế Toán Trưởng', retention: '05 năm', desc: 'Hoàn ứng trong 07 ngày làm việc sau sự kiện, đính kèm hóa đơn đỏ VAT hợp lệ.' },
@@ -888,7 +888,7 @@ async function generateMasterExcelRTM(outputPath) {
 
   const nodes = [
     { id: 'NODE-CRM-001', scope: 'Web CRM', name: 'Xác thực & Phân quyền RBAC 5 cấp', api: 'POST /api/auth/login', tables: 'ceohn10_users, audit_logs', status: 'Hoàn thành 100%' },
-    { id: 'NODE-CRM-002', scope: 'Web CRM', name: 'Quản trị danh sách hội viên 360 độ', api: 'GET /api/members', tables: 'members, companies', status: 'Hoàn thành 100%' },
+    { id: 'NODE-CRM-002', scope: 'Web CRM', name: 'Quản trị danh sách Học viên 360 độ', api: 'GET /api/members', tables: 'members, companies', status: 'Hoàn thành 100%' },
     { id: 'NODE-CRM-003', scope: 'Web CRM', name: 'Thẩm định & Phê duyệt kết nạp', api: 'PUT /api/members/:id/approve', tables: 'members, invoices', status: 'Hoàn thành 100%' },
     { id: 'NODE-CRM-004', scope: 'Web CRM', name: 'Quản trị hồ sơ doanh nghiệp & đối tác', api: 'GET /api/companies', tables: 'companies, products', status: 'Hoàn thành 100%' },
     { id: 'NODE-CRM-005', scope: 'Web CRM', name: 'Studio poster thư mời Wyndham 9:16', api: 'POST /api/templates/poster', tables: 'app_settings', status: 'Hoàn thành 100%' },
@@ -907,7 +907,7 @@ async function generateMasterExcelRTM(outputPath) {
     { id: 'NODE-APP-001', scope: 'Mobile App', name: 'Launcher cài đặt PWA /open-app & Auth', api: 'POST /api/auth/mobile-login', tables: 'ceohn10_users', status: 'Hoàn thành 100%' },
     { id: 'NODE-APP-002', scope: 'Mobile App', name: 'Đăng ký gia nhập trực tuyến', api: 'POST /api/members/register', tables: 'members, companies', status: 'Hoàn thành 100%' },
     { id: 'NODE-APP-003', scope: 'Mobile App', name: 'Trang chủ, Bảng tin 3 cấp & Menu 3 chấm', api: 'GET /api/feed', tables: 'feed_posts, feed_comments', status: 'Hoàn thành 100%' },
-    { id: 'NODE-APP-004', scope: 'Mobile App', name: 'Thẻ hội viên số Hoàng Gia & QR vCard', api: 'GET /api/members/me/card', tables: 'members', status: 'Hoàn thành 100%' },
+    { id: 'NODE-APP-004', scope: 'Mobile App', name: 'Thẻ Học viên số Hoàng Gia & QR vCard', api: 'GET /api/members/me/card', tables: 'members', status: 'Hoàn thành 100%' },
     { id: 'NODE-APP-005', scope: 'Mobile App', name: 'Danh bạ doanh nhân & Bản đồ số GPS', api: 'GET /api/members/directory', tables: 'members, companies', status: 'Hoàn thành 100%' },
     { id: 'NODE-APP-006', scope: 'Mobile App', name: 'Sàn giao thương B2B & Đăng cơ hội', api: 'POST /api/opportunities', tables: 'opportunities', status: 'Hoàn thành 100%' },
     { id: 'NODE-APP-007', scope: 'Mobile App', name: 'Gian hàng sản phẩm ưu đãi nội khối', api: 'POST /api/products', tables: 'products', status: 'Hoàn thành 100%' },
@@ -942,15 +942,15 @@ async function generateMasterExcelRTM(outputPath) {
     { header: 'Ban Thư Ký', key: 'sec', width: 16 },
     { header: 'Kế Toán', key: 'acc', width: 16 },
     { header: 'Trưởng Ban', key: 'head', width: 16 },
-    { header: 'Hội Viên', key: 'mem', width: 16 },
+    { header: 'Học viên', key: 'mem', width: 16 },
     { header: 'Khách Mời', key: 'guest', width: 16 }
   ]);
 
   const rbac = [
     { group: 'Quản trị hệ thống & CSDL', sa: 'Toàn quyền', pres: 'Xem', sec: 'Không', acc: 'Không', head: 'Không', mem: 'Không', guest: 'Không' },
     { group: 'Phân quyền tài khoản RBAC', sa: 'Toàn quyền', pres: 'Xem', sec: 'Không', acc: 'Không', head: 'Không', mem: 'Không', guest: 'Không' },
-    { group: 'Duyệt kết nạp Hội viên mới', sa: 'Toàn quyền', pres: 'Phê duyệt cuối', sec: 'Thẩm định', acc: 'Xem', head: 'Đề xuất', mem: 'Không', guest: 'Nộp đơn' },
-    { group: 'Quản trị hồ sơ Hội viên 360', sa: 'Toàn quyền', pres: 'Xem toàn bộ', sec: 'Toàn quyền', acc: 'Xem thông tin', head: 'Xem theo Ban', mem: 'Sửa hồ sơ mình', guest: 'Không' },
+    { group: 'Duyệt kết nạp Học viên mới', sa: 'Toàn quyền', pres: 'Phê duyệt cuối', sec: 'Thẩm định', acc: 'Xem', head: 'Đề xuất', mem: 'Không', guest: 'Nộp đơn' },
+    { group: 'Quản trị hồ sơ Học viên 360', sa: 'Toàn quyền', pres: 'Xem toàn bộ', sec: 'Toàn quyền', acc: 'Xem thông tin', head: 'Xem theo Ban', mem: 'Sửa hồ sơ mình', guest: 'Không' },
     { group: 'Phát hành Hóa đơn Hội phí', sa: 'Toàn quyền', pres: 'Xem báo cáo', sec: 'Xem', acc: 'Toàn quyền', head: 'Xem theo Ban', mem: 'Xem nợ mình', guest: 'Không' },
     { group: 'Xác nhận gạch nợ thanh toán', sa: 'Toàn quyền', pres: 'Xem', sec: 'Không', acc: 'Thủ công/Duyệt', head: 'Không', mem: 'Nộp phí', guest: 'Không' },
     { group: 'Tạo Sự kiện Gala & Xếp Bàn', sa: 'Toàn quyền', pres: 'Phê duyệt', sec: 'Toàn quyền', acc: 'Phối hợp', head: 'Phối hợp', mem: 'Mua vé/Xem bàn', guest: 'Mua vé mở' },
@@ -984,7 +984,7 @@ async function generateMasterExcelRTM(outputPath) {
   const testCases = [
     { tcId: 'TC-AUTH-001', scope: 'Web CRM', node: 'NODE-CRM-001', objective: 'Đăng nhập thành công với tài khoản Chủ tịch', priority: 'P1 - Blocker', expected: 'Trả về JWT Token và chuyển vào Dashboard 17 menu', status: 'PASS' },
     { tcId: 'TC-AUTH-004', scope: 'Web CRM', node: 'NODE-CRM-001', objective: 'Kiểm tra RBAC - Kế toán không được vào duyệt kết nạp', priority: 'P2 - Critical', expected: 'Trả về HTTP 403 Forbidden', status: 'PASS' },
-    { tcId: 'TC-MEM-003', scope: 'Web CRM', node: 'NODE-CRM-003', objective: 'Phê duyệt kết nạp tự động sinh mã CEO HN10-XXX', priority: 'P1 - Blocker', expected: 'Cấp mã hội viên, hóa đơn niên khóa, gửi Zalo/Email', status: 'PASS' },
+    { tcId: 'TC-MEM-003', scope: 'Web CRM', node: 'NODE-CRM-003', objective: 'Phê duyệt kết nạp tự động sinh mã CEO HN10-XXX', priority: 'P1 - Blocker', expected: 'Cấp mã Học viên, hóa đơn niên khóa, gửi Zalo/Email', status: 'PASS' },
     { tcId: 'TC-FIN-008', scope: 'Payment Engine', node: 'NODE-CRM-012', objective: 'Gạch nợ tự động qua Webhook IPN Napas247', priority: 'P1 - Blocker', expected: 'Hóa đơn chuyển PAID, tăng sổ quỹ, bắn Socket.IO', status: 'PASS' },
     { tcId: 'TC-FIN-009', scope: 'Payment Engine', node: 'NODE-CORE-004', objective: 'Chống tấn công giả mạo chữ ký Webhook HMAC-SHA512', priority: 'P1 - Blocker', expected: 'Chặn 403 Forbidden, ghi nhật ký cảnh báo an ninh', status: 'PASS' },
     { tcId: 'TC-CHECKIN-001', scope: 'Web CRM / App', node: 'NODE-CRM-009', objective: 'Soát vé QR hợp lệ tại Keangnam < 0.5 giây', priority: 'P1 - Blocker', expected: 'Thời gian phản hồi < 0.45s, báo Bàn VIP và Ghế', status: 'PASS' },

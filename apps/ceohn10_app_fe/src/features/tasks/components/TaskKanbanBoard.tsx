@@ -41,9 +41,9 @@ const COLUMNS: {
     status: 'IN_PROGRESS',
     title: 'Đang thực hiện',
     icon: PlayCircle,
-    accentColor: 'text-[#003B95] dark:text-blue-400',
-    badgeBg: 'bg-blue-100 text-[#003B95] dark:bg-blue-950 dark:text-blue-300',
-    borderTop: 'border-t-[#003B95]',
+    accentColor: 'text-slate-700 dark:text-slate-300',
+    badgeBg: 'bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-200',
+    borderTop: 'border-t-slate-600',
   },
   {
     status: 'REVIEW',
@@ -112,7 +112,7 @@ export function TaskKanbanBoard({
       {/* Zoom & View Controller Bar */}
       <div className="flex flex-wrap items-center justify-between gap-3 bg-white dark:bg-slate-900 px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-2xs">
         <div className="flex items-center gap-2 text-xs text-slate-500">
-          <SlidersHorizontal className="w-3.5 h-3.5 text-[#003B95] dark:text-blue-400" />
+          <SlidersHorizontal className="w-3.5 h-3.5 text-slate-700 dark:text-slate-300" />
           <span className="font-semibold text-slate-700 dark:text-slate-300">Giao diện Bảng Lưới (Kanban Board)</span>
           <span className="hidden sm:inline text-slate-400">•</span>
           <span className="hidden sm:inline text-slate-500 font-mono">
@@ -131,7 +131,7 @@ export function TaskKanbanBoard({
             onClick={() => handleZoomChange('compact')}
             className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold transition cursor-pointer ${
               zoomLevel === 'compact'
-                ? 'bg-white dark:bg-slate-700 text-[#003B95] dark:text-blue-300 shadow-xs font-bold ring-1 ring-slate-200 dark:ring-slate-600'
+                ? 'bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-200 shadow-xs font-bold ring-1 ring-slate-200 dark:ring-slate-600'
                 : 'text-slate-500 hover:text-slate-800 dark:text-slate-400'
             }`}
             title="Thu nhỏ để xem tổng thể nhiều cột cùng lúc (280px)"
@@ -145,7 +145,7 @@ export function TaskKanbanBoard({
             onClick={() => handleZoomChange('standard')}
             className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold transition cursor-pointer ${
               zoomLevel === 'standard'
-                ? 'bg-white dark:bg-slate-700 text-[#003B95] dark:text-blue-300 shadow-xs font-bold ring-1 ring-slate-200 dark:ring-slate-600'
+                ? 'bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-200 shadow-xs font-bold ring-1 ring-slate-200 dark:ring-slate-600'
                 : 'text-slate-500 hover:text-slate-800 dark:text-slate-400'
             }`}
             title="Kích thước tiêu chuẩn cân đối (345px)"
@@ -159,7 +159,7 @@ export function TaskKanbanBoard({
             onClick={() => handleZoomChange('spacious')}
             className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold transition cursor-pointer ${
               zoomLevel === 'spacious'
-                ? 'bg-white dark:bg-slate-700 text-[#003B95] dark:text-blue-300 shadow-xs font-bold ring-1 ring-slate-200 dark:ring-slate-600'
+                ? 'bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-200 shadow-xs font-bold ring-1 ring-slate-200 dark:ring-slate-600'
                 : 'text-slate-500 hover:text-slate-800 dark:text-slate-400'
             }`}
             title="Phóng to thẻ rộng rãi, hiển thị chi tiết đầy đủ (410px)"
@@ -207,7 +207,7 @@ export function TaskKanbanBoard({
                 isOverThisCol
                   ? col.status === 'DONE'
                     ? 'ring-2 ring-emerald-500 bg-emerald-50/70 dark:bg-emerald-950/40 shadow-lg scale-[1.01]'
-                    : 'ring-2 ring-[#003B95] dark:ring-blue-400 bg-blue-50/70 dark:bg-blue-950/40 shadow-lg scale-[1.01]'
+                    : 'ring-2 ring-slate-500 bg-slate-100/70 dark:bg-slate-800 shadow-lg scale-[1.01]'
                   : 'bg-slate-50/90 dark:bg-slate-900/70 border border-slate-200/90 dark:border-slate-800'
               }`}
             >
@@ -229,7 +229,7 @@ export function TaskKanbanBoard({
                   <button
                     type="button"
                     onClick={() => onAddTaskToColumn(col.status)}
-                    className="p-1.5 rounded-lg hover:bg-slate-200/70 dark:hover:bg-slate-800 text-slate-500 hover:text-[#003B95] dark:hover:text-blue-400 transition cursor-pointer"
+                    className="p-1.5 rounded-lg hover:bg-slate-200/70 dark:hover:bg-slate-800 text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 transition cursor-pointer"
                     title={`Thêm công việc vào ${col.title}`}
                   >
                     <Plus className="w-4 h-4" />
@@ -244,7 +244,7 @@ export function TaskKanbanBoard({
                     className={`p-2.5 rounded-xl border-2 border-dashed text-xs font-bold text-center animate-pulse flex items-center justify-center gap-1.5 ${
                       col.status === 'DONE'
                         ? 'border-emerald-500 bg-emerald-100/90 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300'
-                        : 'border-[#003B95] bg-blue-100/90 text-[#003B95] dark:bg-blue-950 dark:text-blue-300'
+                        : 'border-slate-500 bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-200'
                     }`}
                   >
                     <CheckCircle2 className="w-4 h-4" />

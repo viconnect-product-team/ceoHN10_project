@@ -70,8 +70,8 @@ export function EventHistoryRecapModal({ open, onClose, event }: EventHistoryRec
       tier: "Đồng Hành B2B",
       badgeColor: "bg-emerald-50 text-emerald-800 border-emerald-300 dark:bg-emerald-950/60 dark:text-emerald-300",
       items: [
-        { name: "Hoàng Long Holding JSC", amount: "50.000.000 VNĐ", rep: "Hội viên CEO HN10", logoText: "HOÀNG LONG" },
-        { name: "Cường Thịnh Group", amount: "50.000.000 VNĐ", rep: "Hội viên Ban Thành viên", logoText: "CƯỜNG THỊNH" },
+        { name: "Hoàng Long Holding JSC", amount: "50.000.000 VNĐ", rep: "Học viên CEO HN10", logoText: "HOÀNG LONG" },
+        { name: "Cường Thịnh Group", amount: "50.000.000 VNĐ", rep: "Học viên Ban Thành viên", logoText: "CƯỜNG THỊNH" },
       ],
     },
   ];
@@ -94,7 +94,7 @@ export function EventHistoryRecapModal({ open, onClose, event }: EventHistoryRec
       approvedRatio: "100%",
       approvedCount: "144/144 đại biểu",
       status: "ĐÃ THÔNG QUA",
-      notes: "Toàn thể hội viên tham dự nhất trí phê chuẩn tổng ngân sách 1.2 tỷ VNĐ.",
+      notes: "Toàn thể Học viên tham dự nhất trí phê chuẩn tổng ngân sách 1.2 tỷ VNĐ.",
     },
     {
       id: "res-03",
@@ -176,7 +176,7 @@ export function EventHistoryRecapModal({ open, onClose, event }: EventHistoryRec
       seats: [
         { seat: "Ghế 01", name: "Nguyễn Văn Linh", role: "Công nghệ Alpha" },
         { seat: "Ghế 02", name: "Administrator", role: "Ban Quản trị & Điều phối" },
-        { seat: "Ghế 03", name: "Đại diện MISA JSC", role: "Hội viên chính thức" },
+        { seat: "Ghế 03", name: "Đại diện MISA JSC", role: "Học viên chính thức" },
         { seat: "Ghế 04", name: "Phạm Quang Huy", role: "Huy Hoàng Media" },
         { seat: "Ghế 05", name: "Trần Bảo Sơn", role: "TechVione Solutions" },
         { seat: "Ghế 06", name: "Lê Đức Anh", role: "CloudBiz JSC" },
@@ -274,17 +274,15 @@ export function EventHistoryRecapModal({ open, onClose, event }: EventHistoryRec
                   key={tab.id}
                   type="button"
                   onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition whitespace-nowrap cursor-pointer ${
-                    active
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition whitespace-nowrap cursor-pointer ${active
                       ? "bg-[#003B95] text-white shadow-xs"
                       : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
-                  }`}
+                    }`}
                 >
                   <Icon className="w-3.5 h-3.5" />
                   <span>{tab.label}</span>
-                  <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-mono ${
-                    active ? "bg-white/20 text-white" : "bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300"
-                  }`}>
+                  <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-mono ${active ? "bg-white/20 text-white" : "bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300"
+                    }`}>
                     {tab.count}
                   </span>
                 </button>
@@ -322,7 +320,7 @@ export function EventHistoryRecapModal({ open, onClose, event }: EventHistoryRec
                   </div>
                   <div className="flex items-center justify-between text-slate-600 dark:text-slate-300">
                     <span>Quyền truy cập:</span>
-                    <strong className="text-emerald-600 dark:text-emerald-400">Công khai cho Hội viên tải về</strong>
+                    <strong className="text-emerald-600 dark:text-emerald-400">Công khai cho Học viên tải về</strong>
                   </div>
                   <div className="flex items-center justify-between text-slate-600 dark:text-slate-300">
                     <span>Dung lượng lưu trữ:</span>
@@ -516,7 +514,7 @@ export function EventHistoryRecapModal({ open, onClose, event }: EventHistoryRec
                 <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                 <input
                   type="text"
-                  placeholder="Tra cứu tên hội viên, doanh nghiệp hoặc bàn tiệc..."
+                  placeholder="Tra cứu tên Học viên, doanh nghiệp hoặc bàn tiệc..."
                   value={seatSearch}
                   onChange={(e) => setSeatSearch(e.target.value)}
                   className="w-full pl-8 pr-3 py-2 rounded-xl text-xs bg-slate-100 dark:bg-slate-800 border-none text-slate-900 dark:text-white focus:ring-1 focus:ring-[#003B95]"

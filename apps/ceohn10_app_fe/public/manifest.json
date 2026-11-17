@@ -1,7 +1,7 @@
 {
   "name": "CLB Doanh Nhân CEO HN10",
   "short_name": "CEO HN10",
-  "description": "Ứng dụng CLB Doanh Nhân CEO HN10: Thẻ hội viên số, biểu quyết, quay số trúng thưởng, sàn sản phẩm và cơ hội kinh doanh B2B.",
+  "description": "Ứng dụng CLB Doanh Nhân CEO HN10: Thẻ Học viên số, biểu quyết, quay số trúng thưởng, sàn sản phẩm và cơ hội kinh doanh B2B.",
   "id": "/association",
   "start_url": "/association",
   "scope": "/",
@@ -52,4 +52,3 @@
     }
   }
 }
-

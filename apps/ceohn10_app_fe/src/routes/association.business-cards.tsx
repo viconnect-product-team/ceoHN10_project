@@ -141,10 +141,10 @@ function emptyDraft(member?: any, user?: any, kind: CardKind = "secondary"): Dra
   if (typeof window !== "undefined") {
     try {
       saved = JSON.parse(localStorage.getItem("ceohn10_custom_profile") || "{}");
-    } catch {}
+    } catch { }
   }
   const name = saved.name || member?.name || user?.name || "";
-  const title = saved.title || member?.title || (user as any)?.user_metadata?.professional_title || "Hội viên chính thức CLB CEO HN10";
+  const title = saved.title || member?.title || (user as any)?.user_metadata?.professional_title || "Học viên chính thức CLB CEO HN10";
   const company = saved.company || (member as any)?.companyName || member?.industry || (member as any)?.about || "CLB Doanh Nhân CEO HN10";
   // Mỗi danh thiếp chính/phụ độc lập: Danh thiếp mới tạo thứ 2 trở đi mặc định avatar rỗng để người dùng tải ảnh riêng biệt
   const avatar =
@@ -155,7 +155,7 @@ function emptyDraft(member?: any, user?: any, kind: CardKind = "secondary"): Dra
   const email = saved.email || member?.email || user?.email || "";
   const address = saved.address || member?.address || "Hà Nội, Việt Nam";
   const website = saved.website || member?.website || "https://ceohn10.vn";
-  const bio = saved.bio || (member as any)?.about || "Hội viên tích cực CLB Doanh Nhân CEO HN10, sẵn sàng giao lưu kết nối và hợp tác giao thương.";
+  const bio = saved.bio || (member as any)?.about || "Học viên tích cực CLB Doanh Nhân CEO HN10, sẵn sàng giao lưu kết nối và hợp tác giao thương.";
   const baseSlug = (name || user?.username || "member")
     .toLowerCase()
     .normalize("NFD")
@@ -265,7 +265,7 @@ function BusinessCardsScreen() {
       if (typeof window !== "undefined") {
         try {
           localProfile = JSON.parse(localStorage.getItem("ceohn10_custom_profile") || "{}");
-        } catch {}
+        } catch { }
       }
 
       const mem = memberRef.current;
@@ -280,13 +280,13 @@ function BusinessCardsScreen() {
         cardKind: "primary",
         status: "published",
         publicMode: "public",
-        displayName: localProfile.name || mem?.name || u?.name || "Hội viên CLB CEO HN10",
-        professionalTitle: localProfile.title || mem?.title || "Hội viên chính thức CLB CEO HN10",
+        displayName: localProfile.name || mem?.name || u?.name || "Học viên CLB CEO HN10",
+        professionalTitle: localProfile.title || mem?.title || "Học viên chính thức CLB CEO HN10",
         companyName: "CLB Doanh Nhân CEO HN10",
         avatarUrl:
           (typeof window !== "undefined"
             ? localStorage.getItem("vba_card_avatar_card-official-primary") ||
-              localStorage.getItem("vba_member_avatar_photo")
+            localStorage.getItem("vba_member_avatar_photo")
             : null) ||
           mem?.avatar ||
           "",
@@ -299,7 +299,7 @@ function BusinessCardsScreen() {
         cardKind: "secondary",
         status: "published",
         publicMode: "public",
-        displayName: localProfile.name || mem?.name || u?.name || "Hội viên CLB CEO HN10",
+        displayName: localProfile.name || mem?.name || u?.name || "Học viên CLB CEO HN10",
         professionalTitle: localProfile.title || "Giám đốc / Chủ Doanh Nghiệp",
         companyName: localProfile.company || (mem as any)?.companyName || mem?.industry || "Doanh nghiệp cá nhân",
         avatarUrl:
@@ -433,11 +433,10 @@ function BusinessCardsScreen() {
           <button
             key={tk}
             onClick={() => setTab(tk)}
-            className={`rounded-full px-4 py-1.5 text-[13px] font-semibold transition ${
-              tab === tk
+            className={`rounded-full px-4 py-1.5 text-[13px] font-semibold transition ${tab === tk
                 ? "bg-[#001B54] text-white shadow-sm"
                 : "bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-300 hover:bg-slate-200"
-            }`}
+              }`}
           >
             {t(tk === "cards" ? "bc.tab.cards" : tk === "leads" ? "bc.tab.leads" : "bc.tab.stats")}
           </button>
@@ -514,22 +513,20 @@ function BusinessCardsScreen() {
                     <button
                       type="button"
                       onClick={() => setKindFilter("all")}
-                      className={`py-2 px-2 text-center rounded-xl text-xs font-bold transition ${
-                        kindFilter === "all"
+                      className={`py-2 px-2 text-center rounded-xl text-xs font-bold transition ${kindFilter === "all"
                           ? "bg-white dark:bg-slate-800 text-[#003B95] dark:text-blue-400 shadow-xs"
                           : "text-slate-600 dark:text-slate-400 hover:text-slate-900"
-                      }`}
+                        }`}
                     >
                       Tất cả ({cards.length})
                     </button>
                     <button
                       type="button"
                       onClick={() => setKindFilter("primary")}
-                      className={`py-2 px-2 text-center rounded-xl text-xs font-bold transition flex items-center justify-center gap-1 ${
-                        kindFilter === "primary"
+                      className={`py-2 px-2 text-center rounded-xl text-xs font-bold transition flex items-center justify-center gap-1 ${kindFilter === "primary"
                           ? "bg-white dark:bg-slate-800 text-[#003B95] dark:text-blue-400 shadow-xs"
                           : "text-slate-600 dark:text-slate-400 hover:text-slate-900"
-                      }`}
+                        }`}
                     >
                       <span>⭐ DT Chính</span>
                       <span className="text-[10px] opacity-75">({primaryCount})</span>
@@ -537,11 +534,10 @@ function BusinessCardsScreen() {
                     <button
                       type="button"
                       onClick={() => setKindFilter("secondary")}
-                      className={`py-2 px-2 text-center rounded-xl text-xs font-bold transition flex items-center justify-center gap-1 ${
-                        kindFilter === "secondary"
+                      className={`py-2 px-2 text-center rounded-xl text-xs font-bold transition flex items-center justify-center gap-1 ${kindFilter === "secondary"
                           ? "bg-white dark:bg-slate-800 text-[#003B95] dark:text-blue-400 shadow-xs"
                           : "text-slate-600 dark:text-slate-400 hover:text-slate-900"
-                      }`}
+                        }`}
                     >
                       <span>💼 DT Phụ</span>
                       <span className="text-[10px] opacity-75">({secondaryCount})</span>
@@ -566,11 +562,10 @@ function BusinessCardsScreen() {
                         key={f.key}
                         onClick={() => setStatusFilter(f.key)}
                         aria-pressed={statusFilter === f.key}
-                        className={`rounded-full px-3 py-1.5 text-[12px] font-semibold transition ${
-                          statusFilter === f.key
+                        className={`rounded-full px-3 py-1.5 text-[12px] font-semibold transition ${statusFilter === f.key
                             ? "bg-[#001B54] text-white shadow-sm"
                             : "bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-300 hover:bg-slate-200"
-                        }`}
+                          }`}
                       >
                         {f.label}
                       </button>
@@ -680,11 +675,10 @@ function StatsPanel() {
           <button
             key={d}
             onClick={() => setDays(d)}
-            className={`rounded-full px-3 py-1 text-[12px] font-semibold transition ${
-              days === d
+            className={`rounded-full px-3 py-1 text-[12px] font-semibold transition ${days === d
                 ? "bg-[#001B54] text-white shadow-sm"
                 : "bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-300 hover:bg-slate-200"
-            }`}
+              }`}
           >
             {t(`bc.stats.range.${d}` as TKey)}
           </button>
@@ -996,11 +990,10 @@ function LeadsPanel({ selectedLeadId }: { selectedLeadId?: string }) {
               key={s}
               type="button"
               onClick={() => setStatusFilter(s)}
-              className={`rounded-full border px-3 py-1 text-[12px] font-semibold transition ${
-                statusFilter === s
+              className={`rounded-full border px-3 py-1 text-[12px] font-semibold transition ${statusFilter === s
                   ? "border-[#001B54] bg-[#001B54] text-white shadow-xs"
                   : "border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5"
-              }`}
+                }`}
             >
               {s === "all" ? t("bc.leads.filter.all") : t(LEAD_STATUS_KEY[s])}
             </button>
@@ -1011,11 +1004,10 @@ function LeadsPanel({ selectedLeadId }: { selectedLeadId?: string }) {
                 key={s}
                 type="button"
                 onClick={() => setSort(s)}
-                className={`rounded-full border px-3 py-1 text-[12px] font-semibold transition ${
-                  sort === s
+                className={`rounded-full border px-3 py-1 text-[12px] font-semibold transition ${sort === s
                     ? "border-[#001B54] bg-[#001B54] text-white shadow-xs"
                     : "border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5"
-                }`}
+                  }`}
               >
                 {t(s === "newest" ? "bc.leads.sort.newest" : "bc.leads.sort.oldest")}
               </button>
@@ -1031,11 +1023,10 @@ function LeadsPanel({ selectedLeadId }: { selectedLeadId?: string }) {
               key={ty}
               type="button"
               onClick={() => setTypeFilter(ty)}
-              className={`rounded-full border px-3 py-1 text-[12px] font-semibold transition ${
-                typeFilter === ty
+              className={`rounded-full border px-3 py-1 text-[12px] font-semibold transition ${typeFilter === ty
                   ? "border-[#001B54] bg-[#001B54] text-white shadow-xs"
                   : "border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5"
-              }`}
+                }`}
             >
               {ty === "all" ? t("bc.leads.filter.all") : t(LEAD_TYPE_KEY[ty])}
             </button>
@@ -1128,11 +1119,10 @@ function LeadRow({
           ) : null}
         </div>
         <span
-          className={`shrink-0 rounded-full px-2.5 py-1 text-[11px] font-semibold ${
-            lead.status === "new"
+          className={`shrink-0 rounded-full px-2.5 py-1 text-[11px] font-semibold ${lead.status === "new"
               ? "bg-[var(--vba-gold)]/15 text-[var(--vba-gold)]"
               : "bg-card/5 text-[var(--vba-text-dim)]"
-          }`}
+            }`}
         >
           {t(LEAD_STATUS_KEY[lead.status])}
         </span>
@@ -1350,11 +1340,10 @@ function LeadStatusChanger({
               key={s}
               disabled={busy || active}
               onClick={() => void apply(s)}
-              className={`rounded-lg px-3 py-1.5 text-[12px] font-semibold transition disabled:opacity-60 ${
-                active
+              className={`rounded-lg px-3 py-1.5 text-[12px] font-semibold transition disabled:opacity-60 ${active
                   ? "bg-[#001B54] text-white shadow-sm"
                   : "bg-card/5 text-[var(--vba-text)] hover:bg-card/10"
-              }`}
+                }`}
             >
               {t(LEAD_STATUS_KEY[s])}
             </button>
@@ -1404,17 +1393,17 @@ function LeadReplyBlock({
     dbTemplates.length > 0
       ? dbTemplates
       : REPLY_TEMPLATES.map((tpl) => ({
-          id: tpl.id,
-          channel: tpl.channel,
-          labelVi: tpl.labelVi,
-          labelEn: tpl.labelEn,
-          subjectVi: tpl.subjectVi ?? null,
-          subjectEn: tpl.subjectEn ?? null,
-          bodyVi: tpl.bodyVi,
-          bodyEn: tpl.bodyEn,
-          priority: 0,
-          isActive: true,
-        }));
+        id: tpl.id,
+        channel: tpl.channel,
+        labelVi: tpl.labelVi,
+        labelEn: tpl.labelEn,
+        subjectVi: tpl.subjectVi ?? null,
+        subjectEn: tpl.subjectEn ?? null,
+        bodyVi: tpl.bodyVi,
+        bodyEn: tpl.bodyEn,
+        priority: 0,
+        isActive: true,
+      }));
 
   const applyTemplate = (id: string) => {
     setTemplateId(id);
@@ -1515,11 +1504,10 @@ function LeadReplyBlock({
                 <button
                   key={tpl.id}
                   onClick={() => applyTemplate(tpl.id)}
-                  className={`rounded-lg px-2.5 py-1.5 text-[11px] font-semibold ${
-                    templateId === tpl.id
+                  className={`rounded-lg px-2.5 py-1.5 text-[11px] font-semibold ${templateId === tpl.id
                       ? "bg-[#001B54] text-white shadow-sm"
                       : "bg-card/5 text-[var(--vba-text)] hover:bg-card/10"
-                  }`}
+                    }`}
                 >
                   {lang === "en" ? tpl.labelEn : tpl.labelVi}
                 </button>
@@ -1532,11 +1520,10 @@ function LeadReplyBlock({
               <button
                 key={c}
                 onClick={() => setChannel(c)}
-                className={`rounded-lg px-2.5 py-1.5 text-[11px] font-semibold ${
-                  channel === c
+                className={`rounded-lg px-2.5 py-1.5 text-[11px] font-semibold ${channel === c
                     ? "bg-[var(--vba-gold)]/15 text-[var(--vba-gold)]"
                     : "bg-card/5 text-[var(--vba-text-dim)] hover:bg-card/10"
-                }`}
+                  }`}
               >
                 {t(REPLY_CHANNEL_KEY[c as ReplyChannel])}
               </button>
@@ -1676,16 +1663,16 @@ function CardRow({
   const cachedCardAvatar =
     typeof window !== "undefined" && (card.id || card.slug)
       ? localStorage.getItem(`vba_card_avatar_${card.id}`) ||
-        localStorage.getItem(`vba_card_avatar_${card.slug}`) ||
-        localStorage.getItem(`vba_secondary_card_avatar_${card.id}`) ||
-        localStorage.getItem(`vba_secondary_card_avatar_${card.slug}`) ||
-        ((card as any).isPrimary ? localStorage.getItem("vba_member_avatar_photo") : null)
+      localStorage.getItem(`vba_card_avatar_${card.slug}`) ||
+      localStorage.getItem(`vba_secondary_card_avatar_${card.id}`) ||
+      localStorage.getItem(`vba_secondary_card_avatar_${card.slug}`) ||
+      ((card as any).isPrimary ? localStorage.getItem("vba_member_avatar_photo") : null)
       : null;
   const effectiveAvatar = cachedCardAvatar || card.avatarUrl || null;
   const resolvedAvatar = effectiveAvatar
     ? (effectiveAvatar.startsWith("data:") || effectiveAvatar.startsWith("blob:")
-        ? effectiveAvatar
-        : resolveMediaUrl(effectiveAvatar) || effectiveAvatar)
+      ? effectiveAvatar
+      : resolveMediaUrl(effectiveAvatar) || effectiveAvatar)
     : null;
   const [copied, setCopied] = useState(false);
 
@@ -1704,81 +1691,80 @@ function CardRow({
     <>
       <div className="overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-md p-4 transition-all hover:border-amber-300 dark:hover:border-amber-800 space-y-3.5">
         {/* Visual Business Card Clean Header */}
-      <div className="flex items-center justify-between">
-        <span className="flex items-center gap-1.5 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-3 py-1 text-[11px] font-extrabold uppercase tracking-wider text-slate-700 dark:text-slate-300 shadow-2xs">
-          <IdCard className="h-3.5 w-3.5 text-[#003B95] dark:text-amber-400" />
-          {card.cardKind === "primary" ? "Danh thiếp chính" : "Danh thiếp phụ"}
-        </span>
-        <div className="flex items-center gap-1.5">
-          <span
-            className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-extrabold ${
-              published
-                ? "bg-emerald-500 text-white shadow-xs"
-                : "bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400"
-            }`}
-          >
+        <div className="flex items-center justify-between">
+          <span className="flex items-center gap-1.5 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-3 py-1 text-[11px] font-extrabold uppercase tracking-wider text-slate-700 dark:text-slate-300 shadow-2xs">
+            <IdCard className="h-3.5 w-3.5 text-[#003B95] dark:text-amber-400" />
+            {card.cardKind === "primary" ? "Danh thiếp chính" : "Danh thiếp phụ"}
+          </span>
+          <div className="flex items-center gap-1.5">
             <span
-              className={`h-2 w-2 rounded-full ${published ? "bg-white animate-pulse" : "bg-slate-400"}`}
-            />
-            {published ? "Công khai" : "Đang ẩn"}
-          </span>
-        </div>
-      </div>
-
-      {/* Card Info */}
-      <div className="flex items-center gap-3.5 pt-1">
-        {resolvedAvatar ? (
-          <img
-            src={resolvedAvatar}
-            alt=""
-            className="h-16 w-16 shrink-0 rounded-2xl border-2 border-slate-200 dark:border-slate-700 object-cover shadow-md bg-slate-100 dark:bg-slate-800 ring-2 ring-amber-500/20"
-            width={64}
-            height={64}
-            onError={(e) => {
-              if (cachedCardAvatar && e.currentTarget.src !== cachedCardAvatar) {
-                e.currentTarget.src = cachedCardAvatar;
-              }
-            }}
-          />
-        ) : (
-          <div className="grid h-16 w-16 shrink-0 place-items-center rounded-2xl border-2 border-slate-200 dark:border-slate-700 bg-gradient-to-br from-[#003B95] to-[#0A1A3A] text-white font-black text-2xl shadow-md ring-2 ring-amber-500/20">
-            {(card.displayName || card.slug).slice(0, 1).toUpperCase()}
+              className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-extrabold ${published
+                  ? "bg-emerald-500 text-white shadow-xs"
+                  : "bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400"
+                }`}
+            >
+              <span
+                className={`h-2 w-2 rounded-full ${published ? "bg-white animate-pulse" : "bg-slate-400"}`}
+              />
+              {published ? "Công khai" : "Đang ẩn"}
+            </span>
           </div>
-        )}
-        <div className="min-w-0 flex-1">
-          <h3 className="truncate text-[17px] font-black tracking-tight text-slate-900 dark:text-white leading-tight">
-            {card.displayName || card.slug}
-          </h3>
-          {card.professionalTitle ? (
-            <p className="truncate text-[13px] font-semibold text-slate-600 dark:text-slate-400 mt-0.5">
-              {card.professionalTitle}
-              {card.companyName ? ` · ${card.companyName}` : ""}
-            </p>
-          ) : null}
         </div>
-      </div>
 
-      {/* Public Link Box (Path hidden, only Copy button) */}
-      <div className="flex items-center justify-between gap-2 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 p-2.5">
-        <div className="min-w-0 flex items-center gap-2">
-          <Link2 className="h-4 w-4 text-[#003B95] dark:text-amber-400 shrink-0" />
-          <span className="text-[12px] font-bold text-slate-700 dark:text-slate-300">
-            Đường dẫn danh thiếp số
-          </span>
-        </div>
-        <button
-          type="button"
-          onClick={handleCopyLink}
-          className="shrink-0 flex items-center gap-1.5 rounded-lg bg-[#003B95] hover:bg-[#002B70] text-white px-3.5 py-1.5 text-[12px] font-bold shadow-xs transition-colors cursor-pointer"
-        >
-          {copied ? (
-            <Check className="h-3.5 w-3.5" />
+        {/* Card Info */}
+        <div className="flex items-center gap-3.5 pt-1">
+          {resolvedAvatar ? (
+            <img
+              src={resolvedAvatar}
+              alt=""
+              className="h-16 w-16 shrink-0 rounded-2xl border-2 border-slate-200 dark:border-slate-700 object-cover shadow-md bg-slate-100 dark:bg-slate-800 ring-2 ring-amber-500/20"
+              width={64}
+              height={64}
+              onError={(e) => {
+                if (cachedCardAvatar && e.currentTarget.src !== cachedCardAvatar) {
+                  e.currentTarget.src = cachedCardAvatar;
+                }
+              }}
+            />
           ) : (
-            <Copy className="h-3.5 w-3.5" />
+            <div className="grid h-16 w-16 shrink-0 place-items-center rounded-2xl border-2 border-slate-200 dark:border-slate-700 bg-gradient-to-br from-[#003B95] to-[#0A1A3A] text-white font-black text-2xl shadow-md ring-2 ring-amber-500/20">
+              {(card.displayName || card.slug).slice(0, 1).toUpperCase()}
+            </div>
           )}
-          <span>{copied ? "Đã chép" : "Sao chép đường dẫn"}</span>
-        </button>
-      </div>
+          <div className="min-w-0 flex-1">
+            <h3 className="truncate text-[17px] font-black tracking-tight text-slate-900 dark:text-white leading-tight">
+              {card.displayName || card.slug}
+            </h3>
+            {card.professionalTitle ? (
+              <p className="truncate text-[13px] font-semibold text-slate-600 dark:text-slate-400 mt-0.5">
+                {card.professionalTitle}
+                {card.companyName ? ` · ${card.companyName}` : ""}
+              </p>
+            ) : null}
+          </div>
+        </div>
+
+        {/* Public Link Box (Path hidden, only Copy button) */}
+        <div className="flex items-center justify-between gap-2 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 p-2.5">
+          <div className="min-w-0 flex items-center gap-2">
+            <Link2 className="h-4 w-4 text-[#003B95] dark:text-amber-400 shrink-0" />
+            <span className="text-[12px] font-bold text-slate-700 dark:text-slate-300">
+              Đường dẫn danh thiếp số
+            </span>
+          </div>
+          <button
+            type="button"
+            onClick={handleCopyLink}
+            className="shrink-0 flex items-center gap-1.5 rounded-lg bg-[#003B95] hover:bg-[#002B70] text-white px-3.5 py-1.5 text-[12px] font-bold shadow-xs transition-colors cursor-pointer"
+          >
+            {copied ? (
+              <Check className="h-3.5 w-3.5" />
+            ) : (
+              <Copy className="h-3.5 w-3.5" />
+            )}
+            <span>{copied ? "Đã chép" : "Sao chép đường dẫn"}</span>
+          </button>
+        </div>
 
         {/* Primary Action Row - High Contrast Buttons */}
         <div className="mt-3.5 flex flex-wrap items-center gap-2">
@@ -2001,7 +1987,7 @@ function CardEditor({
             window.dispatchEvent(new Event("storage"));
           }
         }
-      } catch {}
+      } catch { }
       toast.success(t("bc.saved"));
       onSaved(d);
     } catch (e) {
@@ -2425,11 +2411,10 @@ function Segmented({
         <button
           key={o.value}
           onClick={() => onChange(o.value)}
-          className={`rounded-md px-3 py-1.5 text-[12px] font-semibold transition ${
-            value === o.value
+          className={`rounded-md px-3 py-1.5 text-[12px] font-semibold transition ${value === o.value
               ? "bg-[#001B54] text-white shadow-sm"
               : "text-[var(--vba-text-muted)] hover:text-[var(--vba-text)]"
-          }`}
+            }`}
         >
           {o.label}
         </button>
@@ -2455,14 +2440,12 @@ function VisToggle({
     >
       <span className="text-[12px] font-medium text-[var(--vba-text)]">{label}</span>
       <span
-        className={`relative h-5 w-9 shrink-0 rounded-full transition ${
-          checked ? "bg-[#001B54]" : "bg-[var(--vba-border-soft)]"
-        }`}
+        className={`relative h-5 w-9 shrink-0 rounded-full transition ${checked ? "bg-[#001B54]" : "bg-[var(--vba-border-soft)]"
+          }`}
       >
         <span
-          className={`absolute top-0.5 h-4 w-4 rounded-full bg-card transition-all ${
-            checked ? "left-[18px]" : "left-0.5"
-          }`}
+          className={`absolute top-0.5 h-4 w-4 rounded-full bg-card transition-all ${checked ? "left-[18px]" : "left-0.5"
+            }`}
         />
       </span>
     </button>

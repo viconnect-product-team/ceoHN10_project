@@ -16,7 +16,7 @@ export class VotingService {
   constructor(
     private readonly votingRepo: VotingRepository,
     @Optional() private readonly mailService?: MailService,
-  ) {}
+  ) { }
 
   private computeOptionsWithStats(rawOptions: any[]): any[] {
     const opts = (rawOptions || []).map((o) => ({
@@ -264,7 +264,7 @@ export class VotingService {
               </div>
             `,
             fromName: 'CLB Doanh Nhân CEO HN10',
-          }).catch(() => {});
+          }).catch(() => { });
         }
       }
     } catch (err: any) {
@@ -382,7 +382,7 @@ export class VotingService {
   ) {
     const effectivePrize = data.prize || data.prizeName || 'Phần quà may mắn từ Ban Tổ Chức';
     const title = `🎁 [Ưu Đãi Trúng Thưởng] Chúc mừng bạn đã trúng ${effectivePrize}!`;
-    const body = `Ban Tổ chức CLB Doanh Nhân CEO HN10 xin trân trọng chúc mừng Anh/Chị ${data.winnerName} (${data.winnerCompany || 'Hội viên'}, Số may mắn: #${data.luckyNumber || 'LUCKY'}) đã xuất sắc trúng giải thưởng "${effectivePrize}" tại sự kiện "${data.eventName || 'Sự kiện CEO HN10'}". Phần thưởng đã được đẩy vào mục Ưu Đãi của bạn!`;
+    const body = `Ban Tổ chức CLB Doanh Nhân CEO HN10 xin trân trọng chúc mừng Anh/Chị ${data.winnerName} (${data.winnerCompany || 'Học viên'}, Số may mắn: #${data.luckyNumber || 'LUCKY'}) đã xuất sắc trúng giải thưởng "${effectivePrize}" tại sự kiện "${data.eventName || 'Sự kiện CEO HN10'}". Phần thưởng đã được đẩy vào mục Ưu Đãi của bạn!`;
 
     const targetCode = data.winnerCode || data.luckyNumber;
     const recipients = await this.votingRepo.findMemberForLuckyDraw(

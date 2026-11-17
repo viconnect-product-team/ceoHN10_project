@@ -78,7 +78,7 @@ export function ForumMeetingTemplateManager() {
       type: "executive",
       title: "HỘI NGHỊ BAN ĐIỀU HÀNH & TRƯỞNG BAN CHUYÊN MÔN",
       subtitle: "Đánh Giá Phong Trào & Triển Khai Nhiệm Vụ",
-      description: "Cuộc họp nội bộ lãnh đạo CLB để tổng kết các chỉ số kết nạp hội viên, doanh số B2B, quản lý thu chi và chuẩn bị sự kiện lớn tiếp theo.",
+      description: "Cuộc họp nội bộ lãnh đạo CLB để tổng kết các chỉ số kết nạp Học viên, doanh số B2B, quản lý thu chi và chuẩn bị sự kiện lớn tiếp theo.",
       format: "hybrid",
       locationDefault: "Phòng Họp VIP Ban Điều Hành HanoiBA",
       onlineLink: "https://ceohn10.viconnect.vn/association/training",
@@ -90,9 +90,9 @@ export function ForumMeetingTemplateManager() {
     },
     {
       id: "business-tour",
-      name: "Thăm Quan Doanh Nghiệp Hội Viên (Business Tour)",
+      name: "Thăm Quan Doanh Nghiệp Học viên (Business Tour)",
       type: "tour",
-      title: "BUSINESS TOUR - THĂM DOANH NGHIỆP HỘI VIÊN TIÊU BIỂU",
+      title: "BUSINESS TOUR - THĂM DOANH NGHIỆP Học viên TIÊU BIỂU",
       subtitle: "Mục Sở Thị Quy Trình & Khảo Sát Cơ Hội Hợp Tác",
       description: "Đoàn kết nối trực tiếp đến trụ sở hoặc nhà máy của doanh nghiệp thành viên, học hỏi mô hình vận hành và hỗ trợ quảng bá sản phẩm.",
       format: "offline",
@@ -181,11 +181,10 @@ export function ForumMeetingTemplateManager() {
                 <div
                   key={tmpl.id}
                   onClick={() => setSelectedId(tmpl.id)}
-                  className={`p-3.5 rounded-xl border text-left transition cursor-pointer ${
-                    selectedId === tmpl.id
+                  className={`p-3.5 rounded-xl border text-left transition cursor-pointer ${selectedId === tmpl.id
                       ? "border-purple-500 bg-purple-50/50 dark:bg-purple-950/20 ring-1 ring-purple-500/30"
                       : "border-slate-200 bg-slate-50/50 dark:border-slate-800 dark:bg-slate-950/40 hover:border-slate-300"
-                  }`}
+                    }`}
                 >
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-bold text-slate-900 dark:text-slate-100">
@@ -322,7 +321,7 @@ export function ForumMeetingTemplateManager() {
               <Users2 className="size-4 text-purple-500" />
               <span>Xem Trước Thẻ Cuộc Gặp Diễn Đàn</span>
             </h4>
-            <span className="text-[11px] text-slate-400">Giao diện Hội viên</span>
+            <span className="text-[11px] text-slate-400">Giao diện Học viên</span>
           </div>
 
           <div className="rounded-2xl border border-purple-500/30 bg-slate-950 text-white p-6 shadow-2xl space-y-5">
@@ -389,7 +388,7 @@ export function ForumMeetingTemplateManager() {
           posterUrl: "/ceohn10_hero_cosmos_skyline.jpg",
           date: "Theo thông báo lịch trình",
           location: current.locationDefault,
-          salutation: "Kính gửi: Quý Anh/Chị Hội viên CLB Doanh Nhân CEO HN10,",
+          salutation: "Kính gửi: Quý Anh/Chị Học viên CLB Doanh Nhân CEO HN10,",
           bodyText: current.description,
         }}
       />

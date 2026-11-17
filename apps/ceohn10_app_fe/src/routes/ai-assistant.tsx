@@ -82,7 +82,7 @@ export function AiAssistantPage() {
       if (res?.ok) {
         setFinanceReport(res);
       }
-    } catch {}
+    } catch { }
   };
 
   // Tạo hóa đơn / phiếu thu
@@ -171,11 +171,10 @@ export function AiAssistantPage() {
           <button
             type="button"
             onClick={() => setActiveTab("chat")}
-            className={`pb-3 px-4 text-xs font-bold transition flex items-center gap-2 border-b-2 cursor-pointer whitespace-nowrap ${
-              activeTab === "chat"
+            className={`pb-3 px-4 text-xs font-bold transition flex items-center gap-2 border-b-2 cursor-pointer whitespace-nowrap ${activeTab === "chat"
                 ? "border-primary text-primary"
                 : "border-transparent text-muted-foreground hover:text-foreground"
-            }`}
+              }`}
           >
             <MessageSquare className="size-4 text-primary" />
             <span>Trò Chuyện AI (ChatGPT Style)</span>
@@ -186,11 +185,10 @@ export function AiAssistantPage() {
           <button
             type="button"
             onClick={() => setActiveTab("analysis")}
-            className={`pb-3 px-4 text-xs font-bold transition flex items-center gap-2 border-b-2 cursor-pointer whitespace-nowrap ${
-              activeTab === "analysis"
+            className={`pb-3 px-4 text-xs font-bold transition flex items-center gap-2 border-b-2 cursor-pointer whitespace-nowrap ${activeTab === "analysis"
                 ? "border-primary text-primary"
                 : "border-transparent text-muted-foreground hover:text-foreground"
-            }`}
+              }`}
           >
             <Sparkles className="size-4" />
             <span>Phân Tích Thông Minh CRM</span>
@@ -198,11 +196,10 @@ export function AiAssistantPage() {
           <button
             type="button"
             onClick={() => setActiveTab("finance_report")}
-            className={`pb-3 px-4 text-xs font-bold transition flex items-center gap-2 border-b-2 cursor-pointer whitespace-nowrap ${
-              activeTab === "finance_report"
+            className={`pb-3 px-4 text-xs font-bold transition flex items-center gap-2 border-b-2 cursor-pointer whitespace-nowrap ${activeTab === "finance_report"
                 ? "border-primary text-primary"
                 : "border-transparent text-muted-foreground hover:text-foreground"
-            }`}
+              }`}
           >
             <FileSpreadsheet className="size-4" />
             <span>Báo Cáo Thu Chi & Ngân Sách</span>
@@ -210,11 +207,10 @@ export function AiAssistantPage() {
           <button
             type="button"
             onClick={() => setActiveTab("invoice")}
-            className={`pb-3 px-4 text-xs font-bold transition flex items-center gap-2 border-b-2 cursor-pointer whitespace-nowrap ${
-              activeTab === "invoice"
+            className={`pb-3 px-4 text-xs font-bold transition flex items-center gap-2 border-b-2 cursor-pointer whitespace-nowrap ${activeTab === "invoice"
                 ? "border-primary text-primary"
                 : "border-transparent text-muted-foreground hover:text-foreground"
-            }`}
+              }`}
           >
             <Receipt className="size-4" />
             <span>Xuất Hóa Đơn / Phiếu Thu Điện Tử</span>
@@ -245,7 +241,7 @@ export function AiAssistantPage() {
                       </span>
                     </h3>
                     <p className="text-xs text-muted-foreground">
-                      Điểm số tổng hợp từ 4 trụ cột: Hội viên, Tài chính, Sự kiện và Giao thương B2B
+                      Điểm số tổng hợp từ 4 trụ cột: Học viên, Tài chính, Sự kiện và Giao thương B2B
                     </p>
                   </div>
                 </div>
@@ -259,16 +255,16 @@ export function AiAssistantPage() {
 
               <p className="text-xs leading-relaxed text-foreground/90 bg-background/80 p-4 rounded-xl border border-border/60">
                 {analysisData?.executiveSummary ||
-                  "Hệ sinh thái CLB Doanh Nhân CEO HN10 (HanoiBA) đang duy trì nhịp độ tăng trưởng tích cực. Mạng lưới hội viên kết nối keo sơn, các chỉ số giao thương B2B và dòng tiền ngân sách duy trì ở trạng thái thặng dư an toàn."}
+                  "Hệ sinh thái CLB Doanh Nhân CEO HN10 (HanoiBA) đang duy trì nhịp độ tăng trưởng tích cực. Mạng lưới Học viên kết nối keo sơn, các chỉ số giao thương B2B và dòng tiền ngân sách duy trì ở trạng thái thặng dư an toàn."}
               </p>
             </div>
 
             {/* 4 Trụ cột cốt lõi */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {/* Hội viên */}
+              {/* Học viên */}
               <div className="p-4 rounded-2xl border border-border bg-card shadow-xs space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-muted-foreground">Hội Viên & Nhân Sự</span>
+                  <span className="text-xs font-bold text-muted-foreground">Học viên & Nhân Sự</span>
                   <Users className="size-4 text-primary" />
                 </div>
                 <div className="text-2xl font-black text-foreground">
@@ -337,7 +333,7 @@ export function AiAssistantPage() {
                 </div>
                 <ul className="space-y-2 text-xs text-foreground/90">
                   {(analysisData?.keyStrengths || [
-                    "Giao thương B2B sôi động giữa các doanh nghiệp hội viên",
+                    "Giao thương B2B sôi động giữa các doanh nghiệp Học viên",
                     "Tài chính bền vững, tỷ lệ thặng dư an toàn",
                     "Tính gắn kết cao thông qua các kỳ họp và quét QR danh thiếp",
                   ]).map((s: string, idx: number) => (
@@ -356,7 +352,7 @@ export function AiAssistantPage() {
                 </div>
                 <ul className="space-y-2 text-xs text-foreground/90">
                   {(analysisData?.bottlenecks || [
-                    "Hội viên mới cần hoàn thiện bổ sung hồ sơ năng lực và sản phẩm",
+                    "Học viên mới cần hoàn thiện bổ sung hồ sơ năng lực và sản phẩm",
                     "Cần đẩy mạnh các phiên Matching B2B chuyên đề ngành xây dựng và công nghệ",
                   ]).map((b: string, idx: number) => (
                     <li key={idx} className="flex items-start gap-2">
@@ -384,7 +380,7 @@ export function AiAssistantPage() {
                   {
                     priority: "Trung bình",
                     title: "Nhắc nhở đóng hội phí kỳ mới",
-                    desc: "Tự động gửi thông báo qua Zalo OA và App CEO HN10 cho các hội viên sắp đến hạn.",
+                    desc: "Tự động gửi thông báo qua Zalo OA và App CEO HN10 cho các Học viên sắp đến hạn.",
                   },
                   {
                     priority: "Trung bình",

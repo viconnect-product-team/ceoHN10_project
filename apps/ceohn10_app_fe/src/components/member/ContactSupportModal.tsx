@@ -75,7 +75,7 @@ const COMMITTEES: CommitteeItem[] = [
     icon: Users,
     color: "#4F46E5",
     bgLight: "bg-indigo-50 dark:bg-indigo-950/30 border-indigo-200 dark:border-indigo-800/40",
-    description: "Thẩm định tiêu chuẩn gia nhập, xác thực năng lực pháp lý, chăm sóc và gia hạn hội viên.",
+    description: "Thẩm định tiêu chuẩn gia nhập, xác thực năng lực pháp lý, chăm sóc và gia hạn Học viên.",
   },
   {
     id: "tai-chinh",
@@ -99,7 +99,7 @@ const COMMITTEES: CommitteeItem[] = [
     icon: Sparkles,
     color: "#0284C7",
     bgLight: "bg-sky-50 dark:bg-sky-950/30 border-sky-200 dark:border-sky-800/40",
-    description: "Tổ chức Gala thường niên, Caravan, Cafe Doanh nhân và lan tỏa thương hiệu hội viên.",
+    description: "Tổ chức Gala thường niên, Caravan, Cafe Doanh nhân và lan tỏa thương hiệu Học viên.",
   },
   {
     id: "xuc-tien",
@@ -209,11 +209,10 @@ export function ContactSupportModal({ open, onClose }: ContactSupportModalProps)
           <button
             type="button"
             onClick={() => setActiveTab("committees")}
-            className={`pb-2.5 px-3 text-xs font-bold border-b-2 transition cursor-pointer flex items-center gap-1.5 ${
-              activeTab === "committees"
+            className={`pb-2.5 px-3 text-xs font-bold border-b-2 transition cursor-pointer flex items-center gap-1.5 ${activeTab === "committees"
                 ? "border-[#003B95] text-[#003B95] dark:border-blue-400 dark:text-blue-400"
                 : "border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-800"
-            }`}
+              }`}
           >
             <Users className="h-3.5 w-3.5" />
             <span>8 Ban Chuyên Môn ({COMMITTEES.length})</span>
@@ -222,11 +221,10 @@ export function ContactSupportModal({ open, onClose }: ContactSupportModalProps)
           <button
             type="button"
             onClick={() => setActiveTab("form")}
-            className={`pb-2.5 px-3 text-xs font-bold border-b-2 transition cursor-pointer flex items-center gap-1.5 ${
-              activeTab === "form"
+            className={`pb-2.5 px-3 text-xs font-bold border-b-2 transition cursor-pointer flex items-center gap-1.5 ${activeTab === "form"
                 ? "border-[#003B95] text-[#003B95] dark:border-blue-400 dark:text-blue-400"
                 : "border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-800"
-            }`}
+              }`}
           >
             <Send className="h-3.5 w-3.5" />
             <span>Gửi Yêu Cầu Hỗ Trợ</span>
@@ -388,11 +386,10 @@ export function ContactSupportModal({ open, onClose }: ContactSupportModalProps)
                         key={comm.id}
                         type="button"
                         onClick={() => setTopic(comm.id)}
-                        className={`rounded-xl py-2 px-1 text-[10.5px] font-bold border transition text-center cursor-pointer truncate ${
-                          topic === comm.id
+                        className={`rounded-xl py-2 px-1 text-[10.5px] font-bold border transition text-center cursor-pointer truncate ${topic === comm.id
                             ? "border-[#003B95] bg-blue-50 dark:bg-blue-950/50 text-[#003B95] dark:text-blue-300"
                             : "border-slate-200 dark:border-white/10 bg-white dark:bg-white/[0.03] text-slate-600 dark:text-slate-400 hover:bg-slate-50"
-                        }`}
+                          }`}
                         title={comm.name}
                       >
                         {comm.name.replace("Ban ", "")}

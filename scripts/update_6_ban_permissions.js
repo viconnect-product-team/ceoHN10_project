@@ -34,7 +34,7 @@ async function run() {
 
     UPDATE public.members 
     SET department = 'Ban Thành viên' 
-    WHERE department IN ('Ban Phát Triển Hội Viên & Thẩm Định', 'Ban Thành viên');
+    WHERE department IN ('Ban Phát Triển Học viên & Thẩm Định', 'Ban Thành viên');
 
     UPDATE public.members 
     SET department = 'Ban Thiện nguyện' 
@@ -123,11 +123,11 @@ async function run() {
   // 4. Update ceo.member4 to Ban Thiện nguyện
   await client.query(`
     UPDATE public.memberships
-    SET department = 'Ban Thiện nguyện', executive_role = 'Hội viên Ban Thiện nguyện'
+    SET department = 'Ban Thiện nguyện', executive_role = 'Học viên Ban Thiện nguyện'
     WHERE user_id = 'c1983000-0000-4000-8000-000000000009';
 
     UPDATE public.user_profiles
-    SET professional_title = 'Hội viên Ban Thiện nguyện'
+    SET professional_title = 'Học viên Ban Thiện nguyện'
     WHERE user_id = 'c1983000-0000-4000-8000-000000000009';
   `);
   console.log('✓ Updated ceo.member4 to Ban Thiện nguyện.');
@@ -140,7 +140,7 @@ async function run() {
 
     UPDATE public.memberships
     SET department = 'Ban Thành viên'
-    WHERE department IN ('Ban Thành Viên', 'Ban Phát Triển Hội Viên & Thẩm Định');
+    WHERE department IN ('Ban Thành Viên', 'Ban Phát Triển Học viên & Thẩm Định');
 
     UPDATE public.memberships
     SET department = 'Ban Truyền thông'
@@ -199,11 +199,11 @@ async function run() {
       { email: 'ceo.thiennguyen@ceohn10.com', name: 'Vũ Thu Trang', department: 'Ban Thiện nguyện', role: 'Trưởng Ban Thiện Nguyện' },
       { email: 'ceo.truyenthong@ceohn10.com', name: 'Phạm Quang Huy', department: 'Ban Truyền thông', role: 'Trưởng Ban Truyền Thông' },
       { email: 'ceo.xuctien@ceohn10.com', name: 'Hoàng Minh Tuấn', department: 'Ban Xúc tiến', role: 'Trưởng Ban Xúc Tiến' },
-      { email: 'ceo.member1@ceohn10.com', name: 'Đỗ Thị Mai', department: 'Ban Thành viên', role: 'Hội viên Ban Thành viên' },
-      { email: 'ceo.member2@ceohn10.com', name: 'Bùi Đức Thắng', department: 'Ban Xúc tiến', role: 'Hội viên Ban Xúc tiến' },
-      { email: 'ceo.member3@ceohn10.com', name: 'Ngô Bảo Anh', department: 'Ban Truyền thông', role: 'Hội viên Ban Truyền thông' },
-      { email: 'ceo.member4@ceohn10.com', name: 'Đinh Trọng Hiếu', department: 'Ban Thiện nguyện', role: 'Hội viên Ban Thiện nguyện' },
-      { email: 'ceo.member5@ceohn10.com', name: 'Trịnh Kim Oanh', department: 'Ban Thư ký', role: 'Hội viên Ban Thư ký' }
+      { email: 'ceo.member1@ceohn10.com', name: 'Đỗ Thị Mai', department: 'Ban Thành viên', role: 'Học viên Ban Thành viên' },
+      { email: 'ceo.member2@ceohn10.com', name: 'Bùi Đức Thắng', department: 'Ban Xúc tiến', role: 'Học viên Ban Xúc tiến' },
+      { email: 'ceo.member3@ceohn10.com', name: 'Ngô Bảo Anh', department: 'Ban Truyền thông', role: 'Học viên Ban Truyền thông' },
+      { email: 'ceo.member4@ceohn10.com', name: 'Đinh Trọng Hiếu', department: 'Ban Thiện nguyện', role: 'Học viên Ban Thiện nguyện' },
+      { email: 'ceo.member5@ceohn10.com', name: 'Trịnh Kim Oanh', department: 'Ban Thư ký', role: 'Học viên Ban Thư ký' }
     ]
   };
 

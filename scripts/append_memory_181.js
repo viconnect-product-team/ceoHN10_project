@@ -5,15 +5,15 @@ const entry = `
 ## 181. Hoàn Thiện Tối Ưu Slide Thuyết Trình: Loại Bỏ Phần Đăng Nhập, Nâng Cấp Mockup Smartphone Titanium & Sửa Lỗi 2 Màn Hình Mobile
 
 ### 181.1. Loại Bỏ Hoàn Toàn Slide Đăng Nhập Theo Chỉ Đạo Lãnh Đạo
-- **Bối cảnh**: Trình chiếu đối ngoại / lãnh đạo hiệp hội không cần đưa màn hình đăng nhập tiện ích cơ bản, thay vào đó tập trung 100% vào giá trị cốt lõi, đặc quyền hội viên và các luồng giao thương B2B.
+- **Bối cảnh**: Trình chiếu đối ngoại / lãnh đạo hiệp hội không cần đưa màn hình đăng nhập tiện ích cơ bản, thay vào đó tập trung 100% vào giá trị cốt lõi, đặc quyền Học viên và các luồng giao thương B2B.
 - **Hành động**:
   - Loại bỏ Slide Đăng nhập khỏi bộ Slide CRM (từ 17 slides tinh gọn thành 16 slides chuẩn mực, đánh số lại từ CHỨC NĂNG QUẢN TRỊ 01 đến 16).
-  - Loại bỏ Slide Đăng nhập khỏi bộ Slide Mobile App (từ 21 slides tinh gọn thành 20 slides, đánh số lại từ CHỨC NĂNG HỘI VIÊN 01 đến 20).
+  - Loại bỏ Slide Đăng nhập khỏi bộ Slide Mobile App (từ 21 slides tinh gọn thành 20 slides, đánh số lại từ CHỨC NĂNG Học viên 01 đến 20).
   - Khử toàn bộ thuật ngữ IT kỹ thuật (HTTP 403, JWT, bcrypt, route URL) sang ngôn ngữ hành chính - quản trị doanh nghiệp cao cấp.
 
 ### 181.2. Khắc Phục Lỗi Giao Diện Mobile Trên Slide & Chụp Lại 2 Màn Hình Trực Tiếp Localhost
 - **Lỗi cũ phát hiện**:
-  1. Slide 06 (Quét QR WebRTC): Trước đó gán nhầm ảnh thẻ hội viên tĩnh, cắt xén nửa chừng, không hiển thị giao diện Camera Scanner.
+  1. Slide 06 (Quét QR WebRTC): Trước đó gán nhầm ảnh thẻ Học viên tĩnh, cắt xén nửa chừng, không hiển thị giao diện Camera Scanner.
   2. Slide 07 (Trang xác thực ngoài): Ảnh chụp bị cắt ngang phần thông tin liên lạc (Trụ sở, điện thoại, email) do chiều cao trang vượt quá khung nhìn và khung viền slide bị co kéo thô kệch.
 - **Giải pháp xử lý**:
   - Chạy Playwright chụp trực tiếp trên localhost:

@@ -73,7 +73,7 @@ async function seedRealData() {
   const txId = crypto.randomUUID();
   await client.query(`
     INSERT INTO ceohn10_transactions (id, association_id, type, amount, status, description, date, method, category, code, created_at, updated_at)
-    VALUES ($1, $2, 'income', 25000000, 'completed', 'Thu hội phí gia nhập CLB CEO HN10 - Hội viên Vũ Phan Vũ', '2026-11-16', 'Chuyển khoản Ngân hàng', 'Hội phí', 'HP-HN10-099', NOW(), NOW())
+    VALUES ($1, $2, 'income', 25000000, 'completed', 'Thu hội phí gia nhập CLB CEO HN10 - Học viên Vũ Phan Vũ', '2026-11-16', 'Chuyển khoản Ngân hàng', 'Hội phí', 'HP-HN10-099', NOW(), NOW())
     ON CONFLICT (code) DO UPDATE SET amount = 25000000, status = 'completed', updated_at = NOW()
   `, [txId, assocId]);
   console.log('✅ Đã lưu Giao dịch tài chính thực tế vào Database ceohn10_transactions');

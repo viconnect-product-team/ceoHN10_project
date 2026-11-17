@@ -169,7 +169,7 @@ export function memberProvider(
 ): ProviderResult {
   const res = empty();
   if (!data || data.length === 0) {
-    res.limitations.push("Chưa có hội viên nào trong phạm vi quyền truy cập của bạn.");
+    res.limitations.push("Chưa có Học viên nào trong phạm vi quyền truy cập của bạn.");
     return res;
   }
   if (!isAdminLike(permission)) {
@@ -187,7 +187,7 @@ export function memberProvider(
     safeSummary: m.status ? `Trạng thái: ${m.status}` : undefined,
   }));
   res.suggestedActions = [
-    { label: "Mở Danh bạ hội viên", route: "/members" },
+    { label: "Mở Danh bạ Học viên", route: "/members" },
     { label: "Xem hồ sơ & kết nối", route: "/association/members" },
     { label: "Xem cơ hội giao thương", route: "/association/opportunities" },
     { label: "Chủ đề mới", intent: "new-topic" },
@@ -198,7 +198,7 @@ export function memberProvider(
 export function networkingProvider(members: SafeMember[] | undefined): ProviderResult {
   const res = empty();
   if (!members || members.length === 0) {
-    res.limitations.push("Chưa đủ dữ liệu hội viên để gợi ý kết nối.");
+    res.limitations.push("Chưa đủ dữ liệu Học viên để gợi ý kết nối.");
     return res;
   }
   res.limitations.push("Gợi ý kết nối dựa trên ngành/khu vực; không có điểm khớp giả định.");
@@ -397,7 +397,7 @@ export function runProvider(
     default: {
       const res = empty();
       res.limitations.push(
-        "Chưa xác định rõ năng lực phù hợp; vui lòng nêu cụ thể hơn (tài liệu, hội viên, hội phí, sự kiện…).",
+        "Chưa xác định rõ năng lực phù hợp; vui lòng nêu cụ thể hơn (tài liệu, Học viên, hội phí, sự kiện…).",
       );
       return res;
     }

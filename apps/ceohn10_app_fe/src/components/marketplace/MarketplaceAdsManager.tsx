@@ -388,7 +388,7 @@ export function MarketplaceAdsManager() {
             onClick={() => {
               setSelectedReq(null);
               setFormTitle("Ưu đãi đặc quyền Doanh nghiệp CEO HN10");
-              setFormCompany("Công ty Hội viên");
+              setFormCompany("Công ty Học viên");
               setFormBanner("https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=800&auto=format&fit=crop&q=80");
               setSetupModalOpen(true);
             }}
@@ -441,8 +441,8 @@ export function MarketplaceAdsManager() {
                   </div>
                   <span
                     className={`absolute top-2.5 right-2.5 rounded-full px-2 py-0.5 text-[10px] font-bold ${ad.status === "active"
-                        ? "bg-emerald-500/80 text-white"
-                        : "bg-amber-500/80 text-white"
+                      ? "bg-emerald-500/80 text-white"
+                      : "bg-amber-500/80 text-white"
                       }`}
                   >
                     {ad.status === "active" ? "Đang chạy" : "Tạm dừng"}
@@ -511,7 +511,7 @@ export function MarketplaceAdsManager() {
                 Yêu Cầu Đăng Ký Chạy Quảng Cáo & Affiliate Từ Doanh Nghiệp
               </h3>
               <p className="text-xs text-muted-foreground">
-                Tiếp nhận yêu cầu từ hội viên đăng nhập ở Marketplace, gửi mã QR thanh toán và kích hoạt quảng cáo
+                Tiếp nhận yêu cầu từ Học viên đăng nhập ở Marketplace, gửi mã QR thanh toán và kích hoạt quảng cáo
               </p>
             </div>
           </div>
@@ -801,8 +801,8 @@ export function MarketplaceAdsManager() {
                       type="button"
                       onClick={() => setFormAnimation(an.id as any)}
                       className={`p-2 rounded-xl border text-center transition cursor-pointer font-medium ${formAnimation === an.id
-                          ? "border-blue-600 bg-blue-500/10 text-blue-600 font-bold"
-                          : "border-border bg-secondary/40 text-muted-foreground hover:bg-secondary"
+                        ? "border-blue-600 bg-blue-500/10 text-blue-600 font-bold"
+                        : "border-border bg-secondary/40 text-muted-foreground hover:bg-secondary"
                         }`}
                     >
                       {an.label}

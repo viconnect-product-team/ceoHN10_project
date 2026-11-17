@@ -99,14 +99,14 @@ function buildDoc3() {
     createPara('ViOne Connect phân định rõ 3 nhóm đối tượng sử dụng với quyền hạn minh bạch:'),
     createCallout(
       'QUY CHẾ PHÂN QUYỀN VIONE CONNECT:',
-      '• Doanh Nhân Hội Viên: Toàn quyền quản lý danh thiếp cá nhân, xem và chuyển đổi khách hàng tiềm năng (Leads) phát sinh từ thẻ của mình, đăng tin cung - cầu, đặt lịch hẹn bàn 1-1 và nhắn tin đối tác.\n' +
+      '• Doanh Nhân Học viên: Toàn quyền quản lý danh thiếp cá nhân, xem và chuyển đổi khách hàng tiềm năng (Leads) phát sinh từ thẻ của mình, đăng tin cung - cầu, đặt lịch hẹn bàn 1-1 và nhắn tin đối tác.\n' +
       '• Quản Trị Viên Doanh Nghiệp (Enterprise Admin): Quản lý danh sách nhân sự trong công ty sử dụng thẻ ViOne, cấp phát thẻ NFC, xem báo cáo tổng hợp leads của toàn bộ đội ngũ kinh doanh.\n' +
       '• Quản Trị Hệ Thống (System Admin): Quản lý cấu hình server, giám sát lưu lượng chạm thẻ NFC, quản trị thuật toán AI Matchmaking và phê duyệt gian hàng B2B.',
       'tip'
     )
   );
 
-  const vioneMatrixHeaders = ['Phân Hệ Chức Năng', 'Chức Năng Con', 'Thao Tác Cụ Thể', 'Hội Viên Cá Nhân', 'Doanh Nghiệp (Admin)', 'Hệ Thống (Super Admin)'];
+  const vioneMatrixHeaders = ['Phân Hệ Chức Năng', 'Chức Năng Con', 'Thao Tác Cụ Thể', 'Học viên Cá Nhân', 'Doanh Nghiệp (Admin)', 'Hệ Thống (Super Admin)'];
   const vioneMatrixRows = [
     ['1. Danh Thiếp Số 3D', 'Cấu hình giao diện thẻ 3D', 'Chọn theme, đổi màu ánh kim', 'Toàn quyền thẻ mình', 'Cấu hình template cty', 'Quản trị toàn bộ theme'],
     ['1. Danh Thiếp Số 3D', 'Gán mã chip NFC vật lý', 'Đọc / Ghi mã chip NFC', 'Toàn quyền thẻ mình', 'Cấp phát thẻ nhân viên', 'Quản lý kho chip NFC'],

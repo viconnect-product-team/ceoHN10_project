@@ -655,7 +655,7 @@ async function buildDocxFile(outputPath) {
         ['Phiên Bản', 'Phiên bản 5.0 Master Release (Tích hợp ảnh minh chứng thực tế)'],
         ['Ngày Phát Hành', '02/10/2026'],
         ['Đơn Vị Chủ Trì', 'Ban Công Nghệ & Chuyển Đổi Số — VioConnect Corporation'],
-        ['Đối Tượng Sử Dụng', 'Ban Giám Đốc, Quản Lý Phòng Ban, Nhân Viên Kinh Doanh & Hội Viên'],
+        ['Đối Tượng Sử Dụng', 'Ban Giám Đốc, Quản Lý Phòng Ban, Nhân Viên Kinh Doanh & Học viên'],
         ['Mức Độ Bảo Mật', 'TÀI LIỆU BẢO MẬT NỘI BỘ — LƯU HÀNH NỘI BỘ'],
         ['Tình Trạng Nghiệm Thu', 'Đã xác thực thực địa 100% các bước thao tác trên hệ thống']
       ],

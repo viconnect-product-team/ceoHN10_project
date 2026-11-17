@@ -163,7 +163,7 @@ export function useVoiceGpsTour() {
     } else {
       // Đã hoàn tất toàn bộ lộ trình
       speakText(
-        `Chúc mừng Quý hội viên đã hoàn tất chỉ dẫn thao tác ${activeTour.title}! Chúc Quý anh chị có trải nghiệm kết nối tuyệt vời.`,
+        `Chúc mừng Quý Học viên đã hoàn tất chỉ dẫn thao tác ${activeTour.title}! Chúc Quý anh chị có trải nghiệm kết nối tuyệt vời.`,
         () => {
           setActiveTour(null);
           setCurrentStepIndex(0);

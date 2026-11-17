@@ -70,7 +70,7 @@ export const DEFAULT_DYNAMIC_ZONES: DynamicZone[] = [
   },
   {
     id: "zone-members",
-    name: "Khu Đại Biểu Hội Viên Doanh Nhân CEO HN10",
+    name: "Khu Đại Biểu Học viên Doanh Nhân CEO HN10",
     x: 20,
     y: 335,
     width: 1040,
@@ -239,7 +239,7 @@ const BANQUET_TABLES: BanquetTable[] = [
   { id: "T1", name: "Bàn VIP 01 - Ban Chủ Tọa", shape: "round", seatsCount: 8, isVip: true },
   { id: "T2", name: "Bàn VIP 02 - Khách Mời Danh Dự", shape: "round", seatsCount: 8, isVip: true },
   { id: "T3", name: "Bàn 03 - Ban Xúc Tiến B2B", shape: "round", seatsCount: 10, isVip: false },
-  { id: "T4", name: "Bàn 04 - Hội Viên CEO HN10", shape: "round", seatsCount: 10, isVip: false },
+  { id: "T4", name: "Bàn 04 - Học viên CEO HN10", shape: "round", seatsCount: 10, isVip: false },
   { id: "T5", name: "Bàn 05 - Đối Tác Chiến Lược (Chữ nhật)", shape: "rect", seatsCount: 10, isVip: false },
   { id: "T6", name: "Bàn 06 - Doanh Nghiệp Trẻ (Vuông)", shape: "square", seatsCount: 8, isVip: false },
   { id: "T7", name: "Bàn 07 - Báo Chí & Truyền Thông (Chữ nhật)", shape: "rect", seatsCount: 8, isVip: false },
@@ -271,7 +271,7 @@ export function CinemaSeatingMap({
     try {
       const saved = localStorage.getItem(`ceohn10_dynamic_seats_${eventId || "default"}`);
       if (saved) return JSON.parse(saved);
-    } catch {}
+    } catch { }
     return DEFAULT_DYNAMIC_SEATS;
   });
 
@@ -297,7 +297,7 @@ export function CinemaSeatingMap({
     try {
       const saved = localStorage.getItem(`ceohn10_dynamic_zones_${eventId || "default"}`);
       if (saved) return JSON.parse(saved);
-    } catch {}
+    } catch { }
     return DEFAULT_DYNAMIC_ZONES;
   });
 
@@ -327,7 +327,7 @@ export function CinemaSeatingMap({
     try {
       const saved = localStorage.getItem(`ceohn10_cinema_rows_${eventId || "default"}`);
       if (saved) return JSON.parse(saved);
-    } catch {}
+    } catch { }
     return CINEMA_ROWS;
   });
 
@@ -335,7 +335,7 @@ export function CinemaSeatingMap({
     try {
       const saved = localStorage.getItem(`ceohn10_seating_zones_${eventId || "default"}`);
       if (saved) return JSON.parse(saved);
-    } catch {}
+    } catch { }
     return DEFAULT_SEATING_ZONES;
   });
 
@@ -343,7 +343,7 @@ export function CinemaSeatingMap({
     try {
       const saved = localStorage.getItem(`ceohn10_banquet_tables_${eventId || "default"}`);
       if (saved) return JSON.parse(saved);
-    } catch {}
+    } catch { }
     return BANQUET_TABLES;
   });
 
@@ -351,7 +351,7 @@ export function CinemaSeatingMap({
     try {
       const saved = localStorage.getItem(`ceohn10_stage_seats_${eventId || "default"}`);
       if (saved) return Number(saved) || 6;
-    } catch {}
+    } catch { }
     return 6;
   });
 
@@ -389,14 +389,14 @@ export function CinemaSeatingMap({
       setBanquetTables(savedTables ? JSON.parse(savedTables) : BANQUET_TABLES);
       const savedStage = localStorage.getItem(`ceohn10_stage_seats_${eventId || "default"}`);
       setStageSeatsCount(savedStage ? Number(savedStage) || 6 : 6);
-    } catch {}
+    } catch { }
   }, [eventId]);
 
   const saveDynamicSeats = (newSeats: DynamicSeat[]) => {
     setDynamicSeats(newSeats);
     try {
       localStorage.setItem(`ceohn10_dynamic_seats_${eventId || "default"}`, JSON.stringify(newSeats));
-    } catch {}
+    } catch { }
   };
 
   // Zoom & Pan handlers
@@ -420,7 +420,7 @@ export function CinemaSeatingMap({
     setPanStart({ x: e.clientX - pan.x, y: e.clientY - pan.y });
     try {
       (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
-    } catch {}
+    } catch { }
   };
 
   const handleCanvasPointerMove = (e: React.PointerEvent) => {
@@ -438,7 +438,7 @@ export function CinemaSeatingMap({
       setIsPanning(false);
       try {
         (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
-      } catch {}
+      } catch { }
     }
   };
 
@@ -447,7 +447,7 @@ export function CinemaSeatingMap({
     setDynamicZones(newZones);
     try {
       localStorage.setItem(`ceohn10_dynamic_zones_${eventId || "default"}`, JSON.stringify(newZones));
-    } catch {}
+    } catch { }
   };
 
   const handleAddDynamicZone = () => {
@@ -480,7 +480,7 @@ export function CinemaSeatingMap({
     e.stopPropagation();
     try {
       (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
-    } catch {}
+    } catch { }
 
     setDragZoneState({
       zoneId: zone.id,
@@ -526,7 +526,7 @@ export function CinemaSeatingMap({
     e.stopPropagation();
     try {
       (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
-    } catch {}
+    } catch { }
     saveDynamicZones(dynamicZones);
     setDragZoneState(null);
   };
@@ -536,7 +536,7 @@ export function CinemaSeatingMap({
     e.stopPropagation();
     try {
       (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
-    } catch {}
+    } catch { }
     setResizingZoneState({
       zoneId: zone.id,
       startX: e.clientX,
@@ -565,7 +565,7 @@ export function CinemaSeatingMap({
     e.stopPropagation();
     try {
       (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
-    } catch {}
+    } catch { }
     saveDynamicZones(dynamicZones);
     setResizingZoneState(null);
   };
@@ -616,7 +616,7 @@ export function CinemaSeatingMap({
     const target = e.currentTarget;
     try {
       target.setPointerCapture(e.pointerId);
-    } catch {}
+    } catch { }
 
     setDragState({
       seatId: seat.id,
@@ -664,7 +664,7 @@ export function CinemaSeatingMap({
 
     try {
       e.currentTarget.releasePointerCapture(e.pointerId);
-    } catch {}
+    } catch { }
 
     if (!dragState.hasMoved) {
       handleSeatClick(seat.id, seat.label);
@@ -695,28 +695,28 @@ export function CinemaSeatingMap({
     setCinemaRows(newRows);
     try {
       localStorage.setItem(`ceohn10_cinema_rows_${eventId || "default"}`, JSON.stringify(newRows));
-    } catch {}
+    } catch { }
   };
 
   const saveSeatingZones = (newZones: SeatingZone[]) => {
     setSeatingZones(newZones);
     try {
       localStorage.setItem(`ceohn10_seating_zones_${eventId || "default"}`, JSON.stringify(newZones));
-    } catch {}
+    } catch { }
   };
 
   const saveBanquetTables = (newTables: BanquetTable[]) => {
     setBanquetTables(newTables);
     try {
       localStorage.setItem(`ceohn10_banquet_tables_${eventId || "default"}`, JSON.stringify(newTables));
-    } catch {}
+    } catch { }
   };
 
   const saveStageSeatsCount = (cnt: number) => {
     setStageSeatsCount(cnt);
     try {
       localStorage.setItem(`ceohn10_stage_seats_${eventId || "default"}`, String(cnt));
-    } catch {}
+    } catch { }
   };
 
   // Helper tìm kiếm thông tin người ngồi theo nhiều định dạng tên ghế
@@ -1023,19 +1023,19 @@ export function CinemaSeatingMap({
               {mode === "dynamic"
                 ? "Sơ đồ Ghế Tự Do (Dynamic Drag & Drop)"
                 : mode === "cinema"
-                ? "Sơ đồ Ghế Hội Trường (Hàng Ngang)"
-                : mode === "zones"
-                ? "Sơ đồ Chia Khu (Hình Vuông & Hình Chữ Nhật)"
-                : "Sơ đồ Bàn Tiệc Gala (Banquet)"}
+                  ? "Sơ đồ Ghế Hội Trường (Hàng Ngang)"
+                  : mode === "zones"
+                    ? "Sơ đồ Chia Khu (Hình Vuông & Hình Chữ Nhật)"
+                    : "Sơ đồ Bàn Tiệc Gala (Banquet)"}
             </h4>
             <p className="text-[11px] text-slate-500 dark:text-slate-400">
               {mode === "dynamic"
                 ? "Di chuyển ghế tự do như icon ứng dụng trên điện thoại · Hiện tên, chức danh, mã số, SĐT"
                 : mode === "cinema"
-                ? "Hàng VIP & Ghế Tiêu Chuẩn · Di chuyển ghế & Hoán đổi linh hoạt"
-                : mode === "zones"
-                ? "Phân khu ma trận hình chữ nhật & vuông cụ thể · Tùy chỉnh hàng x cột"
-                : "Bàn tiệc tròn, vuông & chữ nhật · Kéo thả sắp xếp đại biểu"}
+                  ? "Hàng VIP & Ghế Tiêu Chuẩn · Di chuyển ghế & Hoán đổi linh hoạt"
+                  : mode === "zones"
+                    ? "Phân khu ma trận hình chữ nhật & vuông cụ thể · Tùy chỉnh hàng x cột"
+                    : "Bàn tiệc tròn, vuông & chữ nhật · Kéo thả sắp xếp đại biểu"}
             </p>
           </div>
         </div>
@@ -1047,44 +1047,40 @@ export function CinemaSeatingMap({
             <button
               type="button"
               onClick={() => setMode("dynamic")}
-              className={`px-2.5 sm:px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
-                mode === "dynamic"
+              className={`px-2.5 sm:px-3 py-1.5 rounded-lg transition-all cursor-pointer ${mode === "dynamic"
                   ? "bg-white dark:bg-slate-900 text-[#003B95] dark:text-amber-400 shadow-xs font-bold"
                   : "text-slate-600 dark:text-slate-400 hover:text-slate-900"
-              }`}
+                }`}
             >
               Tự Do (Dynamic)
             </button>
             <button
               type="button"
               onClick={() => setMode("cinema")}
-              className={`px-2.5 sm:px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
-                mode === "cinema"
+              className={`px-2.5 sm:px-3 py-1.5 rounded-lg transition-all cursor-pointer ${mode === "cinema"
                   ? "bg-white dark:bg-slate-900 text-[#003B95] dark:text-amber-400 shadow-xs font-bold"
                   : "text-slate-600 dark:text-slate-400 hover:text-slate-900"
-              }`}
+                }`}
             >
               Hội Trường
             </button>
             <button
               type="button"
               onClick={() => setMode("zones")}
-              className={`px-2.5 sm:px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
-                mode === "zones"
+              className={`px-2.5 sm:px-3 py-1.5 rounded-lg transition-all cursor-pointer ${mode === "zones"
                   ? "bg-white dark:bg-slate-900 text-[#003B95] dark:text-amber-400 shadow-xs font-bold"
                   : "text-slate-600 dark:text-slate-400 hover:text-slate-900"
-              }`}
+                }`}
             >
               Chia Khu (Vuông / Chữ Nhật)
             </button>
             <button
               type="button"
               onClick={() => setMode("banquet")}
-              className={`px-2.5 sm:px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
-                mode === "banquet"
+              className={`px-2.5 sm:px-3 py-1.5 rounded-lg transition-all cursor-pointer ${mode === "banquet"
                   ? "bg-white dark:bg-slate-900 text-[#003B95] dark:text-amber-400 shadow-xs font-bold"
                   : "text-slate-600 dark:text-slate-400 hover:text-slate-900"
-              }`}
+                }`}
             >
               Bàn Tiệc Gala
             </button>
@@ -1233,11 +1229,10 @@ export function CinemaSeatingMap({
                 <button
                   type="button"
                   onClick={() => setSnapToGrid(!snapToGrid)}
-                  className={`px-2.5 py-1.5 rounded-xl border text-xs font-bold transition shadow-xs flex items-center gap-1 cursor-pointer ${
-                    snapToGrid
+                  className={`px-2.5 py-1.5 rounded-xl border text-xs font-bold transition shadow-xs flex items-center gap-1 cursor-pointer ${snapToGrid
                       ? "border-emerald-500 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300"
                       : "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600"
-                  }`}
+                    }`}
                   title="Bật/Tắt chế độ bắt lưới 20px"
                 >
                   <Grid className="size-3.5" />
@@ -1252,9 +1247,8 @@ export function CinemaSeatingMap({
               onPointerDown={handleCanvasPointerDown}
               onPointerMove={handleCanvasPointerMove}
               onPointerUp={handleCanvasPointerUp}
-              className={`relative w-full max-w-6xl h-[750px] rounded-3xl border-2 border-slate-200/90 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-950/80 overflow-hidden shadow-inner select-none ${
-                isPanning ? "cursor-grabbing" : "cursor-grab"
-              }`}
+              className={`relative w-full max-w-6xl h-[750px] rounded-3xl border-2 border-slate-200/90 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-950/80 overflow-hidden shadow-inner select-none ${isPanning ? "cursor-grabbing" : "cursor-grab"
+                }`}
             >
               {/* Transformable Studio Plane */}
               <div
@@ -1325,9 +1319,8 @@ export function CinemaSeatingMap({
                         height: `${zone.height}px`,
                         touchAction: "none",
                       }}
-                      className={`absolute rounded-3xl border-2 border-dashed ${colorMap.border} transition-shadow ${
-                        isDraggingZone ? "z-30 shadow-2xl ring-2 ring-primary" : "z-5 shadow-xs"
-                      }`}
+                      className={`absolute rounded-3xl border-2 border-dashed ${colorMap.border} transition-shadow ${isDraggingZone ? "z-30 shadow-2xl ring-2 ring-primary" : "z-5 shadow-xs"
+                        }`}
                     >
                       {/* Zone Header Bar */}
                       <div
@@ -1384,32 +1377,29 @@ export function CinemaSeatingMap({
                         top: `${seat.y}px`,
                         touchAction: "none",
                       }}
-                      className={`dynamic-seat group absolute w-[124px] h-[102px] rounded-2xl p-2 transition-shadow select-none flex flex-col justify-between text-left cursor-grab active:cursor-grabbing ${
-                        isDragging
+                      className={`dynamic-seat group absolute w-[124px] h-[102px] rounded-2xl p-2 transition-shadow select-none flex flex-col justify-between text-left cursor-grab active:cursor-grabbing ${isDragging
                           ? "z-50 scale-110 shadow-2xl ring-4 ring-amber-400 opacity-95 -translate-y-1 rotate-1 cursor-grabbing"
                           : isBeingMoved
-                          ? "z-40 ring-4 ring-amber-500 bg-amber-500 text-slate-950 font-black animate-pulse scale-105"
-                          : isSelected
-                          ? "z-30 ring-3 ring-amber-400 shadow-xl scale-105"
-                          : "z-20 shadow-md hover:shadow-xl hover:scale-105"
-                      } ${
-                        isOccupied
+                            ? "z-40 ring-4 ring-amber-500 bg-amber-500 text-slate-950 font-black animate-pulse scale-105"
+                            : isSelected
+                              ? "z-30 ring-3 ring-amber-400 shadow-xl scale-105"
+                              : "z-20 shadow-md hover:shadow-xl hover:scale-105"
+                        } ${isOccupied
                           ? "bg-gradient-to-b from-emerald-600 via-emerald-700 to-teal-800 text-white border border-emerald-400/50"
                           : seat.category === "vip"
-                          ? "bg-gradient-to-b from-amber-50 to-amber-100/90 dark:from-amber-950/40 dark:to-slate-900 border-2 border-dashed border-amber-400/80 text-amber-900 dark:text-amber-200 hover:border-amber-500"
-                          : "bg-gradient-to-b from-white to-slate-100 dark:from-slate-800 dark:to-slate-900 border-2 border-dashed border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:border-[#003B95]"
-                      }`}
+                            ? "bg-gradient-to-b from-amber-50 to-amber-100/90 dark:from-amber-950/40 dark:to-slate-900 border-2 border-dashed border-amber-400/80 text-amber-900 dark:text-amber-200 hover:border-amber-500"
+                            : "bg-gradient-to-b from-white to-slate-100 dark:from-slate-800 dark:to-slate-900 border-2 border-dashed border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:border-[#003B95]"
+                        }`}
                     >
                       {/* Header icon row: Seat ID badge & Category & Delete */}
                       <div className="flex items-center justify-between gap-1 leading-none">
                         <span
-                          className={`px-1.5 py-0.5 rounded text-[10px] font-mono font-black ${
-                            isOccupied
+                          className={`px-1.5 py-0.5 rounded text-[10px] font-mono font-black ${isOccupied
                               ? "bg-emerald-900/60 text-emerald-200 border border-emerald-400/40"
                               : seat.category === "vip"
-                              ? "bg-amber-400 text-slate-950 font-black"
-                              : "bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200"
-                          }`}
+                                ? "bg-amber-400 text-slate-950 font-black"
+                                : "bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200"
+                            }`}
                         >
                           {seat.id}
                         </span>
@@ -1440,7 +1430,7 @@ export function CinemaSeatingMap({
                               {occ.attendeeName}
                             </span>
                             <span className="text-[9.5px] font-bold text-emerald-100 truncate leading-tight block mt-0.5">
-                              {occ.title || "Hội viên Doanh Nhân"}
+                              {occ.title || "Học viên Doanh Nhân"}
                             </span>
                           </>
                         ) : (
@@ -1580,15 +1570,14 @@ export function CinemaSeatingMap({
                         handleDropOnSeat(seatLabel, seatId);
                       }}
                       onClick={() => handleSeatClick(seatId, seatLabel)}
-                      className={`relative min-w-[72px] sm:min-w-[80px] h-12 rounded-xl p-1 flex flex-col items-center justify-center text-center transition-all cursor-pointer select-none ${
-                        isBeingMoved
+                      className={`relative min-w-[72px] sm:min-w-[80px] h-12 rounded-xl p-1 flex flex-col items-center justify-center text-center transition-all cursor-pointer select-none ${isBeingMoved
                           ? "ring-4 ring-amber-500 bg-amber-500 text-slate-950 font-black animate-pulse scale-105 z-20"
                           : isSelected
-                          ? "bg-[#003B95] text-white ring-2 ring-amber-400 shadow-md scale-105 z-10"
-                          : isOccupied
-                          ? "bg-emerald-600 text-white shadow-xs hover:bg-emerald-700"
-                          : "bg-amber-100 dark:bg-amber-950/60 text-amber-900 dark:text-amber-300 border border-amber-400/40 hover:bg-amber-200"
-                      }`}
+                            ? "bg-[#003B95] text-white ring-2 ring-amber-400 shadow-md scale-105 z-10"
+                            : isOccupied
+                              ? "bg-emerald-600 text-white shadow-xs hover:bg-emerald-700"
+                              : "bg-amber-100 dark:bg-amber-950/60 text-amber-900 dark:text-amber-300 border border-amber-400/40 hover:bg-amber-200"
+                        }`}
                       title={occ ? `${seatLabel} - ${occ.attendeeName} (${occ.company || ""}) - Kéo hoặc click để di chuyển` : `${seatLabel} - Ghế trống`}
                     >
                       <span className="text-[10px] font-black leading-none">{seatId}</span>
@@ -1636,11 +1625,10 @@ export function CinemaSeatingMap({
                     <button
                       type="button"
                       onClick={() => handleToggleRowCategory(row.id)}
-                      className={`w-7 sm:w-8 h-7 sm:h-8 rounded-lg flex items-center justify-center font-black text-xs shrink-0 select-none shadow-xs cursor-pointer transition ${
-                        row.category === "vip"
+                      className={`w-7 sm:w-8 h-7 sm:h-8 rounded-lg flex items-center justify-center font-black text-xs shrink-0 select-none shadow-xs cursor-pointer transition ${row.category === "vip"
                           ? "bg-amber-500 text-slate-950 border border-amber-400 hover:bg-amber-400"
                           : "bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-300"
-                      }`}
+                        }`}
                       title={`${row.name} (Click để đổi loại VIP / Tiêu chuẩn)`}
                     >
                       {row.rowLetter}
@@ -1677,20 +1665,19 @@ export function CinemaSeatingMap({
                               handleDropOnSeat(seatLabel, seatId);
                             }}
                             onClick={() => handleSeatClick(seatId, seatLabel)}
-                            className={`group relative flex-1 min-w-[36px] sm:min-w-[44px] max-w-[58px] h-12 rounded-xl p-1 flex flex-col items-center justify-center text-center transition-all cursor-pointer select-none ${
-                              isBeingMoved
+                            className={`group relative flex-1 min-w-[36px] sm:min-w-[44px] max-w-[58px] h-12 rounded-xl p-1 flex flex-col items-center justify-center text-center transition-all cursor-pointer select-none ${isBeingMoved
                                 ? "ring-4 ring-amber-500 bg-amber-500 text-slate-950 font-black animate-pulse scale-105 z-20"
                                 : isSelected
-                                ? "bg-[#003B95] text-white ring-2 ring-amber-400 shadow-md scale-105 z-10"
-                                : isOccupied
-                                ? "bg-emerald-600 text-white shadow-xs hover:bg-emerald-700 hover:scale-105"
-                                : row.category === "vip"
-                                ? "bg-amber-100 dark:bg-amber-950/40 text-amber-900 dark:text-amber-300 border border-amber-300/60 hover:bg-amber-200"
-                                : "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300/60 dark:border-slate-700 hover:bg-slate-200"
-                            }`}
+                                  ? "bg-[#003B95] text-white ring-2 ring-amber-400 shadow-md scale-105 z-10"
+                                  : isOccupied
+                                    ? "bg-emerald-600 text-white shadow-xs hover:bg-emerald-700 hover:scale-105"
+                                    : row.category === "vip"
+                                      ? "bg-amber-100 dark:bg-amber-950/40 text-amber-900 dark:text-amber-300 border border-amber-300/60 hover:bg-amber-200"
+                                      : "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300/60 dark:border-slate-700 hover:bg-slate-200"
+                              }`}
                             title={
                               occ
-                                ? `${seatLabel}: ${occ.attendeeName} (${occ.company || "Hội viên"}) - Kéo hoặc click để di chuyển`
+                                ? `${seatLabel}: ${occ.attendeeName} (${occ.company || "Học viên"}) - Kéo hoặc click để di chuyển`
                                 : `${seatLabel} - Ghế trống`
                             }
                           >
@@ -1799,21 +1786,19 @@ export function CinemaSeatingMap({
                 return (
                   <div
                     key={zone.id}
-                    className={`rounded-2xl p-4 border transition-all flex flex-col justify-between ${
-                      isVip
+                    className={`rounded-2xl p-4 border transition-all flex flex-col justify-between ${isVip
                         ? "bg-amber-500/5 dark:bg-amber-950/20 border-amber-500/40 shadow-xs"
                         : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-xs"
-                    }`}
+                      }`}
                   >
                     {/* Zone Header */}
                     <div className="flex items-center justify-between gap-2 pb-2.5 border-b border-slate-100 dark:border-slate-800">
                       <div className="flex items-center gap-2">
                         <span
-                          className={`px-2 py-0.5 rounded-md text-[10px] font-black uppercase ${
-                            isVip
+                          className={`px-2 py-0.5 rounded-md text-[10px] font-black uppercase ${isVip
                               ? "bg-amber-500 text-slate-950 font-black"
                               : "bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300"
-                          }`}
+                            }`}
                         >
                           {zone.id} · {isVip ? "Khu VIP" : "Tiêu Chuẩn"}
                         </span>
@@ -1846,11 +1831,10 @@ export function CinemaSeatingMap({
 
                     {/* Khung Hình Chữ Nhật / Hình Vuông cụ thể chứa Ma Trận Ghế */}
                     <div
-                      className={`my-2 p-3 rounded-xl border flex flex-col items-center justify-center gap-1.5 overflow-x-auto ${
-                        isRect
+                      className={`my-2 p-3 rounded-xl border flex flex-col items-center justify-center gap-1.5 overflow-x-auto ${isRect
                           ? "bg-slate-50/70 dark:bg-slate-800/40 border-slate-200 dark:border-slate-700 min-h-[140px]"
                           : "bg-slate-50/70 dark:bg-slate-800/40 border-slate-200 dark:border-slate-700 min-h-[160px] aspect-square max-w-[380px] mx-auto w-full"
-                      }`}
+                        }`}
                     >
                       {Array.from({ length: zone.rowsCount }, (_, rIdx) => {
                         const rowNum = rIdx + 1;
@@ -1887,17 +1871,16 @@ export function CinemaSeatingMap({
                                       handleDropOnSeat(seatLabel, seatId);
                                     }}
                                     onClick={() => handleSeatClick(seatId, seatLabel)}
-                                    className={`h-9 min-w-[34px] sm:min-w-[40px] flex-1 max-w-[52px] rounded-lg p-0.5 flex flex-col items-center justify-center text-center transition-all cursor-pointer select-none ${
-                                      isBeingMoved
+                                    className={`h-9 min-w-[34px] sm:min-w-[40px] flex-1 max-w-[52px] rounded-lg p-0.5 flex flex-col items-center justify-center text-center transition-all cursor-pointer select-none ${isBeingMoved
                                         ? "ring-4 ring-amber-500 bg-amber-500 text-slate-950 font-black animate-pulse scale-105 z-20"
                                         : isSelected
-                                        ? "bg-[#003B95] text-white ring-2 ring-amber-400 font-bold shadow-md scale-105 z-10"
-                                        : isOccupied
-                                        ? "bg-emerald-600 text-white shadow-xs hover:bg-emerald-700 hover:scale-105"
-                                        : isVip
-                                        ? "bg-amber-100 dark:bg-amber-950/40 text-amber-900 dark:text-amber-300 border border-amber-300/60 hover:bg-amber-200"
-                                        : "bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 hover:bg-slate-100"
-                                    }`}
+                                          ? "bg-[#003B95] text-white ring-2 ring-amber-400 font-bold shadow-md scale-105 z-10"
+                                          : isOccupied
+                                            ? "bg-emerald-600 text-white shadow-xs hover:bg-emerald-700 hover:scale-105"
+                                            : isVip
+                                              ? "bg-amber-100 dark:bg-amber-950/40 text-amber-900 dark:text-amber-300 border border-amber-300/60 hover:bg-amber-200"
+                                              : "bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 hover:bg-slate-100"
+                                      }`}
                                     title={occ ? `${seatLabel}: ${occ.attendeeName} - Kéo hoặc click để di chuyển` : `${seatLabel} - Ghế trống`}
                                   >
                                     <span className="text-[9.5px] font-black leading-none block">{colNum}</span>
@@ -2014,20 +1997,18 @@ export function CinemaSeatingMap({
                   <div
                     key={table.id}
                     onClick={() => setActiveTableId(table.id)}
-                    className={`rounded-2xl p-3.5 border transition-all cursor-pointer flex flex-col justify-between ${
-                      isActive
+                    className={`rounded-2xl p-3.5 border transition-all cursor-pointer flex flex-col justify-between ${isActive
                         ? "border-[#003B95] dark:border-amber-400 bg-blue-50/40 dark:bg-slate-800/90 shadow-md ring-2 ring-[#003B95]/30"
                         : "border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/60 hover:border-slate-300"
-                    }`}
+                      }`}
                   >
                     <div>
                       <div className="flex items-center justify-between gap-1 mb-1">
                         <span
-                          className={`text-[10px] font-black uppercase px-2 py-0.5 rounded-md ${
-                            table.isVip
+                          className={`text-[10px] font-black uppercase px-2 py-0.5 rounded-md ${table.isVip
                               ? "bg-amber-500 text-slate-950 font-black"
                               : "bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300"
-                          }`}
+                            }`}
                         >
                           {table.id} · {table.shape === "rect" ? "Bàn Chữ Nhật" : table.shape === "square" ? "Bàn Vuông" : "Bàn Tròn"}
                         </span>
@@ -2057,11 +2038,10 @@ export function CinemaSeatingMap({
                     <div className="my-3 flex items-center justify-center">
                       {table.shape === "rect" ? (
                         <div
-                          className={`h-16 w-36 rounded-2xl border-2 flex flex-col items-center justify-center p-1.5 text-center shadow-inner relative ${
-                            table.isVip
+                          className={`h-16 w-36 rounded-2xl border-2 flex flex-col items-center justify-center p-1.5 text-center shadow-inner relative ${table.isVip
                               ? "bg-amber-50 dark:bg-amber-950/40 border-amber-400"
                               : "bg-slate-100 dark:bg-slate-800 border-slate-300 dark:border-slate-700"
-                          }`}
+                            }`}
                         >
                           <span className="text-[11px] font-black text-slate-800 dark:text-slate-100">
                             {table.id} · BÀN CHỮ NHẬT
@@ -2072,11 +2052,10 @@ export function CinemaSeatingMap({
                         </div>
                       ) : table.shape === "square" ? (
                         <div
-                          className={`h-22 w-22 rounded-2xl border-2 flex flex-col items-center justify-center p-1.5 text-center shadow-inner relative ${
-                            table.isVip
+                          className={`h-22 w-22 rounded-2xl border-2 flex flex-col items-center justify-center p-1.5 text-center shadow-inner relative ${table.isVip
                               ? "bg-amber-50 dark:bg-amber-950/40 border-amber-400"
                               : "bg-slate-100 dark:bg-slate-800 border-slate-300 dark:border-slate-700"
-                          }`}
+                            }`}
                         >
                           <span className="text-[11px] font-black text-slate-800 dark:text-slate-100">
                             {table.id} · BÀN VUÔNG
@@ -2087,11 +2066,10 @@ export function CinemaSeatingMap({
                         </div>
                       ) : (
                         <div
-                          className={`h-24 w-24 rounded-full border-2 flex flex-col items-center justify-center p-2 text-center shadow-inner relative ${
-                            table.isVip
+                          className={`h-24 w-24 rounded-full border-2 flex flex-col items-center justify-center p-2 text-center shadow-inner relative ${table.isVip
                               ? "bg-amber-50 dark:bg-amber-950/40 border-amber-400"
                               : "bg-slate-100 dark:bg-slate-800 border-slate-300 dark:border-slate-700"
-                          }`}
+                            }`}
                         >
                           <span className="text-[10.5px] font-black text-slate-800 dark:text-slate-100">
                             {table.id} · BÀN TRÒN
@@ -2135,15 +2113,14 @@ export function CinemaSeatingMap({
                               e.stopPropagation();
                               handleSeatClick(seatId, seatLabel);
                             }}
-                            className={`h-8 rounded-lg text-[10px] font-bold flex flex-col items-center justify-center transition-all cursor-pointer ${
-                              isBeingMoved
+                            className={`h-8 rounded-lg text-[10px] font-bold flex flex-col items-center justify-center transition-all cursor-pointer ${isBeingMoved
                                 ? "ring-4 ring-amber-500 bg-amber-500 text-slate-950 font-black animate-pulse scale-105 z-20"
                                 : isSelected
-                                ? "bg-[#003B95] text-white ring-2 ring-amber-400 font-black shadow-sm"
-                                : isOccupied
-                                ? "bg-emerald-600 text-white shadow-xs hover:bg-emerald-700"
-                                : "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 hover:bg-slate-200"
-                            }`}
+                                  ? "bg-[#003B95] text-white ring-2 ring-amber-400 font-black shadow-sm"
+                                  : isOccupied
+                                    ? "bg-emerald-600 text-white shadow-xs hover:bg-emerald-700"
+                                    : "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 hover:bg-slate-200"
+                              }`}
                             title={occ ? `${seatLabel}: ${occ.attendeeName} - Kéo hoặc click để di chuyển` : `${seatLabel} - Ghế trống`}
                           >
                             <span>G{seatNum}</span>
@@ -2236,22 +2213,20 @@ export function CinemaSeatingMap({
                   <button
                     type="button"
                     onClick={() => setNewRowCategory("standard")}
-                    className={`py-2 px-3 rounded-xl text-xs font-bold border transition cursor-pointer ${
-                      newRowCategory === "standard"
+                    className={`py-2 px-3 rounded-xl text-xs font-bold border transition cursor-pointer ${newRowCategory === "standard"
                         ? "bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 border-slate-900 dark:border-slate-100"
                         : "border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400"
-                    }`}
+                      }`}
                   >
                     Tiêu Chuẩn
                   </button>
                   <button
                     type="button"
                     onClick={() => setNewRowCategory("vip")}
-                    className={`py-2 px-3 rounded-xl text-xs font-bold border transition cursor-pointer flex items-center justify-center gap-1 ${
-                      newRowCategory === "vip"
+                    className={`py-2 px-3 rounded-xl text-xs font-bold border transition cursor-pointer flex items-center justify-center gap-1 ${newRowCategory === "vip"
                         ? "bg-amber-500 text-slate-950 border-amber-500"
                         : "border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400"
-                    }`}
+                      }`}
                   >
                     <Crown className="size-3 text-amber-950" />
                     <span>Hàng VIP</span>
@@ -2333,11 +2308,10 @@ export function CinemaSeatingMap({
                   <button
                     type="button"
                     onClick={() => setNewZoneShape("rect")}
-                    className={`py-2 px-3 rounded-xl text-xs font-bold border transition cursor-pointer flex items-center justify-center gap-1 ${
-                      newZoneShape === "rect"
+                    className={`py-2 px-3 rounded-xl text-xs font-bold border transition cursor-pointer flex items-center justify-center gap-1 ${newZoneShape === "rect"
                         ? "bg-[#003B95] text-white border-[#003B95]"
                         : "border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400"
-                    }`}
+                      }`}
                   >
                     <span>📐 Hình Chữ Nhật</span>
                   </button>
@@ -2347,11 +2321,10 @@ export function CinemaSeatingMap({
                       setNewZoneShape("square");
                       setNewZoneCols(newZoneRows);
                     }}
-                    className={`py-2 px-3 rounded-xl text-xs font-bold border transition cursor-pointer flex items-center justify-center gap-1 ${
-                      newZoneShape === "square"
+                    className={`py-2 px-3 rounded-xl text-xs font-bold border transition cursor-pointer flex items-center justify-center gap-1 ${newZoneShape === "square"
                         ? "bg-[#003B95] text-white border-[#003B95]"
                         : "border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400"
-                    }`}
+                      }`}
                   >
                     <span>⏹ Hình Vuông</span>
                   </button>
@@ -2400,22 +2373,20 @@ export function CinemaSeatingMap({
                   <button
                     type="button"
                     onClick={() => setNewZoneIsVip(false)}
-                    className={`py-2 px-3 rounded-xl text-xs font-bold border transition cursor-pointer ${
-                      !newZoneIsVip
+                    className={`py-2 px-3 rounded-xl text-xs font-bold border transition cursor-pointer ${!newZoneIsVip
                         ? "bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 border-slate-900 dark:border-slate-100"
                         : "border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400"
-                    }`}
+                      }`}
                   >
                     Tiêu Chuẩn
                   </button>
                   <button
                     type="button"
                     onClick={() => setNewZoneIsVip(true)}
-                    className={`py-2 px-3 rounded-xl text-xs font-bold border transition cursor-pointer flex items-center justify-center gap-1 ${
-                      newZoneIsVip
+                    className={`py-2 px-3 rounded-xl text-xs font-bold border transition cursor-pointer flex items-center justify-center gap-1 ${newZoneIsVip
                         ? "bg-amber-500 text-slate-950 border-amber-500"
                         : "border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400"
-                    }`}
+                      }`}
                   >
                     <Crown className="size-3 text-amber-950" />
                     <span>Khu VIP</span>
@@ -2470,7 +2441,7 @@ export function CinemaSeatingMap({
                   type="text"
                   value={newTableName}
                   onChange={(e) => setNewTableName(e.target.value)}
-                  placeholder={`Ví dụ: Bàn ${String(banquetTables.length + 1).padStart(2, "0")} - Hội Viên`}
+                  placeholder={`Ví dụ: Bàn ${String(banquetTables.length + 1).padStart(2, "0")} - Học viên`}
                   className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs font-semibold focus:outline-none focus:border-primary"
                 />
               </div>
@@ -2483,33 +2454,30 @@ export function CinemaSeatingMap({
                   <button
                     type="button"
                     onClick={() => setNewTableShape("round")}
-                    className={`py-2 px-1.5 rounded-xl text-xs font-bold border transition cursor-pointer ${
-                      newTableShape === "round"
+                    className={`py-2 px-1.5 rounded-xl text-xs font-bold border transition cursor-pointer ${newTableShape === "round"
                         ? "bg-[#003B95] text-white border-[#003B95]"
                         : "border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400"
-                    }`}
+                      }`}
                   >
                     Bàn Tròn
                   </button>
                   <button
                     type="button"
                     onClick={() => setNewTableShape("rect")}
-                    className={`py-2 px-1.5 rounded-xl text-xs font-bold border transition cursor-pointer ${
-                      newTableShape === "rect"
+                    className={`py-2 px-1.5 rounded-xl text-xs font-bold border transition cursor-pointer ${newTableShape === "rect"
                         ? "bg-[#003B95] text-white border-[#003B95]"
                         : "border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400"
-                    }`}
+                      }`}
                   >
                     Chữ Nhật
                   </button>
                   <button
                     type="button"
                     onClick={() => setNewTableShape("square")}
-                    className={`py-2 px-1.5 rounded-xl text-xs font-bold border transition cursor-pointer ${
-                      newTableShape === "square"
+                    className={`py-2 px-1.5 rounded-xl text-xs font-bold border transition cursor-pointer ${newTableShape === "square"
                         ? "bg-[#003B95] text-white border-[#003B95]"
                         : "border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400"
-                    }`}
+                      }`}
                   >
                     Bàn Vuông
                   </button>
@@ -2524,22 +2492,20 @@ export function CinemaSeatingMap({
                   <button
                     type="button"
                     onClick={() => setNewTableIsVip(false)}
-                    className={`py-2 px-3 rounded-xl text-xs font-bold border transition cursor-pointer ${
-                      !newTableIsVip
+                    className={`py-2 px-3 rounded-xl text-xs font-bold border transition cursor-pointer ${!newTableIsVip
                         ? "bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 border-slate-900 dark:border-slate-100"
                         : "border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400"
-                    }`}
+                      }`}
                   >
                     Tiêu Chuẩn
                   </button>
                   <button
                     type="button"
                     onClick={() => setNewTableIsVip(true)}
-                    className={`py-2 px-3 rounded-xl text-xs font-bold border transition cursor-pointer flex items-center justify-center gap-1 ${
-                      newTableIsVip
+                    className={`py-2 px-3 rounded-xl text-xs font-bold border transition cursor-pointer flex items-center justify-center gap-1 ${newTableIsVip
                         ? "bg-amber-500 text-slate-950 border-amber-500"
                         : "border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400"
-                    }`}
+                      }`}
                   >
                     <Crown className="size-3 text-amber-950" />
                     <span>Bàn VIP</span>
@@ -2638,11 +2604,10 @@ export function CinemaSeatingMap({
                         key={c}
                         type="button"
                         onClick={() => setNewDynamicZoneColor(c)}
-                        className={`h-9 rounded-xl border-2 transition cursor-pointer flex items-center justify-center ${bgColors[c]} ${
-                          newDynamicZoneColor === c
+                        className={`h-9 rounded-xl border-2 transition cursor-pointer flex items-center justify-center ${bgColors[c]} ${newDynamicZoneColor === c
                             ? "border-slate-900 ring-2 ring-slate-900 dark:border-white dark:ring-white scale-105"
                             : "border-transparent opacity-80 hover:opacity-100"
-                        }`}
+                          }`}
                       >
                         {newDynamicZoneColor === c && <Check className="size-4 text-white" />}
                       </button>
@@ -2710,7 +2675,7 @@ export function CinemaSeatingMap({
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 pt-0.5">
                   <div className="text-[11px] font-bold text-blue-700 dark:text-blue-300 flex items-center gap-1">
                     <Crown className="h-3 w-3 text-amber-500 shrink-0" />
-                    <span className="truncate">Chức danh: {selectedOccupant.title || "Hội viên VIP"}</span>
+                    <span className="truncate">Chức danh: {selectedOccupant.title || "Học viên VIP"}</span>
                   </div>
                   <div className="text-[11px] font-mono font-semibold text-slate-700 dark:text-slate-200 flex items-center gap-1">
                     <Phone className="h-3 w-3 text-slate-400 shrink-0" />
@@ -2826,9 +2791,8 @@ export function CinemaSeatingMap({
                         <tr
                           key={idx}
                           onClick={() => handleSeatClick(item.seatKey, item.seatKey)}
-                          className={`hover:bg-slate-50 dark:hover:bg-slate-800/50 cursor-pointer transition ${
-                            isCurrent ? "bg-amber-50 dark:bg-amber-950/40 font-bold" : ""
-                          }`}
+                          className={`hover:bg-slate-50 dark:hover:bg-slate-800/50 cursor-pointer transition ${isCurrent ? "bg-amber-50 dark:bg-amber-950/40 font-bold" : ""
+                            }`}
                         >
                           <td className="py-2 px-3 font-mono font-bold text-emerald-700 dark:text-emerald-400 whitespace-nowrap">
                             {item.seatKey}
@@ -2837,7 +2801,7 @@ export function CinemaSeatingMap({
                             {item.occupant.attendeeName}
                           </td>
                           <td className="py-2 px-3 text-blue-700 dark:text-blue-300 font-semibold text-[11px] whitespace-nowrap">
-                            {item.occupant.title || "Hội viên VIP"}
+                            {item.occupant.title || "Học viên VIP"}
                           </td>
                           <td className="py-2 px-3 font-mono text-[11px] text-slate-600 dark:text-slate-300 whitespace-nowrap">
                             {item.occupant.attendeeCode || "-"}
@@ -2846,15 +2810,14 @@ export function CinemaSeatingMap({
                             {item.occupant.phone || "-"}
                           </td>
                           <td className="py-2 px-3 text-slate-500 hidden md:table-cell truncate max-w-[150px]">
-                            {item.occupant.company || "Hội viên CEO HN10"}
+                            {item.occupant.company || "Học viên CEO HN10"}
                           </td>
                           <td className="py-2 px-3 whitespace-nowrap">
                             <span
-                              className={`px-2 py-0.5 rounded text-[10px] font-bold ${
-                                (item.occupant.ticketType || "").toLowerCase().includes("vip")
+                              className={`px-2 py-0.5 rounded text-[10px] font-bold ${(item.occupant.ticketType || "").toLowerCase().includes("vip")
                                   ? "bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-300"
                                   : "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300"
-                              }`}
+                                }`}
                             >
                               {item.occupant.ticketType || "VIP"}
                             </span>

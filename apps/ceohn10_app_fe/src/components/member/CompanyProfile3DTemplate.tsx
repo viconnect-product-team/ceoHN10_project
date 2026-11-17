@@ -62,7 +62,7 @@ export function CompanyProfile3DTemplate({
   const profileRef = useRef<HTMLDivElement>(null);
   const [downloading, setDownloading] = useState(false);
 
-  const companyName = data.companyName?.trim() || "DOANH NGHIỆP HỘI VIÊN CEO HN10";
+  const companyName = data.companyName?.trim() || "DOANH NGHIỆP Học viên CEO HN10";
   const leaderName = data.leaderName?.trim() || "Lãnh đạo Doanh nghiệp";
   const leaderTitle = data.leaderTitle?.trim() || "Chủ tịch / Tổng Giám đốc";
   const memberCode = data.memberCode?.trim() || "CEO HN10-VIP";
@@ -217,7 +217,7 @@ export function CompanyProfile3DTemplate({
             className="w-full h-full object-cover opacity-80 filter brightness-90"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-[#020b1c] via-black/40 to-transparent" />
-          
+
           {/* Top Header Badge Floating on Cover */}
           <div className="absolute top-3.5 left-4 right-4 flex items-center justify-between z-10">
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-gradient-to-r from-amber-400 via-amber-500 to-yellow-500 text-slate-950 shadow-lg border border-amber-300">
@@ -313,148 +313,148 @@ export function CompanyProfile3DTemplate({
             </div>
           </div>
 
-        {/* 4 Pillars Matrix (Quy mô - Thâm niên - Năng lực - Thị trường) */}
-        <div className="relative z-10 grid grid-cols-2 sm:grid-cols-4 gap-2.5 my-4">
-          <div className="p-3 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm space-y-0.5">
-            <span className="text-[10.5px] text-slate-400 flex items-center gap-1">
-              <Calendar className="size-3 text-amber-400" /> Năm thành lập
-            </span>
-            <div className="text-sm font-black text-white">{establishedYear}</div>
-            <div className="text-[9.5px] text-emerald-400 font-medium">Hoạt động vững mạnh</div>
-          </div>
-
-          <div className="p-3 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm space-y-0.5">
-            <span className="text-[10.5px] text-slate-400 flex items-center gap-1">
-              <Users className="size-3 text-amber-400" /> Quy mô nhân sự
-            </span>
-            <div className="text-sm font-black text-white">{companySize}</div>
-            <div className="text-[9.5px] text-blue-300 font-medium">Đội ngũ chuyên nghiệp</div>
-          </div>
-
-          <div className="p-3 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm space-y-0.5">
-            <span className="text-[10.5px] text-slate-400 flex items-center gap-1">
-              <Briefcase className="size-3 text-amber-400" /> Năng lực B2B
-            </span>
-            <div className="text-sm font-black text-white">Đối tác Chiến lược</div>
-            <div className="text-[9.5px] text-amber-300 font-medium">Hệ sinh thái 1983</div>
-          </div>
-
-          <div className="p-3 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm space-y-0.5">
-            <span className="text-[10.5px] text-slate-400 flex items-center gap-1">
-              <TrendingUp className="size-3 text-amber-400" /> Uy tín tín nhiệm
-            </span>
-            <div className="text-sm font-black text-amber-400 flex items-center gap-1">
-              <span>Hạng AAA</span>
-              <Star className="size-3.5 fill-amber-400 text-amber-400" />
+          {/* 4 Pillars Matrix (Quy mô - Thâm niên - Năng lực - Thị trường) */}
+          <div className="relative z-10 grid grid-cols-2 sm:grid-cols-4 gap-2.5 my-4">
+            <div className="p-3 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm space-y-0.5">
+              <span className="text-[10.5px] text-slate-400 flex items-center gap-1">
+                <Calendar className="size-3 text-amber-400" /> Năm thành lập
+              </span>
+              <div className="text-sm font-black text-white">{establishedYear}</div>
+              <div className="text-[9.5px] text-emerald-400 font-medium">Hoạt động vững mạnh</div>
             </div>
-            <div className="text-[9.5px] text-slate-400">Được xác minh pháp lý</div>
-          </div>
-        </div>
 
-        {/* Core Strengths (Thế mạnh cạnh tranh 3D) */}
-        <div className="relative z-10 my-4 space-y-2">
-          <div className="text-[11px] font-black uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
-            <Award className="size-3.5" />
-            <span>NĂNG LỰC CỐT LÕI &amp; THẾ MẠNH CẠNH TRANH</span>
-          </div>
+            <div className="p-3 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm space-y-0.5">
+              <span className="text-[10.5px] text-slate-400 flex items-center gap-1">
+                <Users className="size-3 text-amber-400" /> Quy mô nhân sự
+              </span>
+              <div className="text-sm font-black text-white">{companySize}</div>
+              <div className="text-[9.5px] text-blue-300 font-medium">Đội ngũ chuyên nghiệp</div>
+            </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
-            <div className="p-3 rounded-xl bg-gradient-to-b from-white/10 to-white/5 border border-white/10 space-y-1">
-              <div className="font-bold text-white flex items-center gap-1.5">
-                <CheckCircle2 className="size-3.5 text-amber-400 shrink-0" />
-                <span>Tiêu chuẩn Chất lượng</span>
+            <div className="p-3 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm space-y-0.5">
+              <span className="text-[10.5px] text-slate-400 flex items-center gap-1">
+                <Briefcase className="size-3 text-amber-400" /> Năng lực B2B
+              </span>
+              <div className="text-sm font-black text-white">Đối tác Chiến lược</div>
+              <div className="text-[9.5px] text-amber-300 font-medium">Hệ sinh thái 1983</div>
+            </div>
+
+            <div className="p-3 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm space-y-0.5">
+              <span className="text-[10.5px] text-slate-400 flex items-center gap-1">
+                <TrendingUp className="size-3 text-amber-400" /> Uy tín tín nhiệm
+              </span>
+              <div className="text-sm font-black text-amber-400 flex items-center gap-1">
+                <span>Hạng AAA</span>
+                <Star className="size-3.5 fill-amber-400 text-amber-400" />
               </div>
-              <p className="text-[11px] text-slate-300 leading-relaxed">
-                Quy trình kiểm duyệt chuẩn mực, áp dụng công nghệ chuyển đổi số hiện đại.
-              </p>
+              <div className="text-[9.5px] text-slate-400">Được xác minh pháp lý</div>
+            </div>
+          </div>
+
+          {/* Core Strengths (Thế mạnh cạnh tranh 3D) */}
+          <div className="relative z-10 my-4 space-y-2">
+            <div className="text-[11px] font-black uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
+              <Award className="size-3.5" />
+              <span>NĂNG LỰC CỐT LÕI &amp; THẾ MẠNH CẠNH TRANH</span>
             </div>
 
-            <div className="p-3 rounded-xl bg-gradient-to-b from-white/10 to-white/5 border border-white/10 space-y-1">
-              <div className="font-bold text-white flex items-center gap-1.5">
-                <CheckCircle2 className="size-3.5 text-blue-400 shrink-0" />
-                <span>Mạng lưới Kết nối B2B</span>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
+              <div className="p-3 rounded-xl bg-gradient-to-b from-white/10 to-white/5 border border-white/10 space-y-1">
+                <div className="font-bold text-white flex items-center gap-1.5">
+                  <CheckCircle2 className="size-3.5 text-amber-400 shrink-0" />
+                  <span>Tiêu chuẩn Chất lượng</span>
+                </div>
+                <p className="text-[11px] text-slate-300 leading-relaxed">
+                  Quy trình kiểm duyệt chuẩn mực, áp dụng công nghệ chuyển đổi số hiện đại.
+                </p>
               </div>
-              <p className="text-[11px] text-slate-300 leading-relaxed">
-                Liên kết sâu rộng trong CLB Doanh nhân CEO HN10 &amp; Hội Doanh nghiệp trẻ Hà Nội.
-              </p>
-            </div>
 
-            <div className="p-3 rounded-xl bg-gradient-to-b from-white/10 to-white/5 border border-white/10 space-y-1">
-              <div className="font-bold text-white flex items-center gap-1.5">
-                <CheckCircle2 className="size-3.5 text-emerald-400 shrink-0" />
-                <span>Ưu đãi Nội bộ Đặc quyền</span>
+              <div className="p-3 rounded-xl bg-gradient-to-b from-white/10 to-white/5 border border-white/10 space-y-1">
+                <div className="font-bold text-white flex items-center gap-1.5">
+                  <CheckCircle2 className="size-3.5 text-blue-400 shrink-0" />
+                  <span>Mạng lưới Kết nối B2B</span>
+                </div>
+                <p className="text-[11px] text-slate-300 leading-relaxed">
+                  Liên kết sâu rộng trong CLB Doanh nhân CEO HN10 &amp; Hội Doanh nghiệp trẻ Hà Nội.
+                </p>
               </div>
-              <p className="text-[11px] text-slate-300 leading-relaxed">
-                Cam kết chính sách chiết khấu và hợp tác tin cậy tối ưu nhất cho hội viên.
-              </p>
+
+              <div className="p-3 rounded-xl bg-gradient-to-b from-white/10 to-white/5 border border-white/10 space-y-1">
+                <div className="font-bold text-white flex items-center gap-1.5">
+                  <CheckCircle2 className="size-3.5 text-emerald-400 shrink-0" />
+                  <span>Ưu đãi Nội bộ Đặc quyền</span>
+                </div>
+                <p className="text-[11px] text-slate-300 leading-relaxed">
+                  Cam kết chính sách chiết khấu và hợp tác tin cậy tối ưu nhất cho Học viên.
+                </p>
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* Featured Products & Services */}
-        <div className="relative z-10 my-4 p-4 rounded-2xl bg-white/[0.04] border border-amber-400/20 space-y-2">
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] font-black uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
-              <Sparkles className="size-3.5" />
-              SẢN PHẨM &amp; DỊCH VỤ CHỦ LỰC
-            </span>
-            <span className="text-[10px] text-slate-400">Bảo chứng CEO HN10</span>
-          </div>
-          <p className="text-xs text-slate-200 leading-relaxed">
-            {featuredProducts}
-          </p>
-        </div>
-
-        {/* Contact Info Footer Grid */}
-        <div className="relative z-10 pt-4 border-t border-white/10 grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs text-slate-300">
-          <div className="flex items-center gap-2">
-            <div className="size-7 rounded-lg bg-white/10 flex items-center justify-center text-amber-400 shrink-0">
-              <MapPin className="size-3.5" />
+          {/* Featured Products & Services */}
+          <div className="relative z-10 my-4 p-4 rounded-2xl bg-white/[0.04] border border-amber-400/20 space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] font-black uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
+                <Sparkles className="size-3.5" />
+                SẢN PHẨM &amp; DỊCH VỤ CHỦ LỰC
+              </span>
+              <span className="text-[10px] text-slate-400">Bảo chứng CEO HN10</span>
             </div>
-            <span className="truncate">{address}</span>
+            <p className="text-xs text-slate-200 leading-relaxed">
+              {featuredProducts}
+            </p>
           </div>
 
-          <div className="flex items-center gap-2">
-            <div className="size-7 rounded-lg bg-white/10 flex items-center justify-center text-amber-400 shrink-0">
-              <Phone className="size-3.5" />
+          {/* Contact Info Footer Grid */}
+          <div className="relative z-10 pt-4 border-t border-white/10 grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs text-slate-300">
+            <div className="flex items-center gap-2">
+              <div className="size-7 rounded-lg bg-white/10 flex items-center justify-center text-amber-400 shrink-0">
+                <MapPin className="size-3.5" />
+              </div>
+              <span className="truncate">{address}</span>
             </div>
-            <a href={`tel:${phone.replace(/[^0-9+]/g, "")}`} className="hover:text-white font-medium">
-              Hotline: {phone}
-            </a>
-          </div>
 
-          <div className="flex items-center gap-2">
-            <div className="size-7 rounded-lg bg-white/10 flex items-center justify-center text-amber-400 shrink-0">
-              <Globe className="size-3.5" />
+            <div className="flex items-center gap-2">
+              <div className="size-7 rounded-lg bg-white/10 flex items-center justify-center text-amber-400 shrink-0">
+                <Phone className="size-3.5" />
+              </div>
+              <a href={`tel:${phone.replace(/[^0-9+]/g, "")}`} className="hover:text-white font-medium">
+                Hotline: {phone}
+              </a>
             </div>
-            <a href={website.startsWith("http") ? website : `https://${website}`} target="_blank" rel="noreferrer" className="hover:text-white font-medium truncate flex items-center gap-1">
-              <span>{website.replace(/^https?:\/\//, "")}</span>
-              <ExternalLink className="size-3" />
-            </a>
-          </div>
 
-          <div className="flex items-center gap-2">
-            <div className="size-7 rounded-lg bg-white/10 flex items-center justify-center text-amber-400 shrink-0">
-              <Mail className="size-3.5" />
+            <div className="flex items-center gap-2">
+              <div className="size-7 rounded-lg bg-white/10 flex items-center justify-center text-amber-400 shrink-0">
+                <Globe className="size-3.5" />
+              </div>
+              <a href={website.startsWith("http") ? website : `https://${website}`} target="_blank" rel="noreferrer" className="hover:text-white font-medium truncate flex items-center gap-1">
+                <span>{website.replace(/^https?:\/\//, "")}</span>
+                <ExternalLink className="size-3" />
+              </a>
             </div>
-            <a href={`mailto:${email}`} className="hover:text-white font-medium truncate">
-              {email}
-            </a>
-          </div>
-        </div>
 
-        {/* Certification Seal Footer */}
-        <div className="relative z-10 mt-5 pt-3 border-t border-dashed border-white/15 flex flex-col sm:flex-row items-center justify-between gap-2 text-[10px] text-slate-400">
-          <div className="flex items-center gap-1.5">
-            <ShieldCheck className="size-4 text-amber-400" />
-            <span>Hồ sơ số được xác thực điện tử bởi CLB Doanh Nhân CEO HN10 (HanoiBA)</span>
+            <div className="flex items-center gap-2">
+              <div className="size-7 rounded-lg bg-white/10 flex items-center justify-center text-amber-400 shrink-0">
+                <Mail className="size-3.5" />
+              </div>
+              <a href={`mailto:${email}`} className="hover:text-white font-medium truncate">
+                {email}
+              </a>
+            </div>
           </div>
-          <div className="font-mono text-[9px] text-amber-300/80">
-            SECURE VERIFICATION HASH: #{memberCode.replace(/[^a-zA-Z0-9]/g, "")}-VBA
+
+          {/* Certification Seal Footer */}
+          <div className="relative z-10 mt-5 pt-3 border-t border-dashed border-white/15 flex flex-col sm:flex-row items-center justify-between gap-2 text-[10px] text-slate-400">
+            <div className="flex items-center gap-1.5">
+              <ShieldCheck className="size-4 text-amber-400" />
+              <span>Hồ sơ số được xác thực điện tử bởi CLB Doanh Nhân CEO HN10 (HanoiBA)</span>
+            </div>
+            <div className="font-mono text-[9px] text-amber-300/80">
+              SECURE VERIFICATION HASH: #{memberCode.replace(/[^a-zA-Z0-9]/g, "")}-VBA
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
   );
 }

@@ -48,11 +48,11 @@ async function syncUserVu() {
         INSERT INTO public.user_profiles (
           user_id, display_name, professional_title, company_name, account_status
         ) VALUES (
-          $1, $2, 'Tổng Giám Đốc • Hội viên CEO HN10', $3, 'active'
+          $1, $2, 'Tổng Giám Đốc • Học viên CEO HN10', $3, 'active'
         )
         ON CONFLICT (user_id) DO UPDATE SET
           display_name = $2,
-          professional_title = 'Tổng Giám Đốc • Hội viên CEO HN10',
+          professional_title = 'Tổng Giám Đốc • Học viên CEO HN10',
           company_name = $3,
           account_status = 'active'
       `, [userId, fullName, company]);
@@ -75,7 +75,7 @@ async function syncUserVu() {
             $1::uuid, 'CEO-83007', $2, $2,
             $3, $4, 'Chính thức', 'VIP', 'Công nghệ & Chuyển đổi số',
             'Hà Nội', 'active', 2026, true, 'paid', $5, $6,
-            'Ban Thành viên', 'Hội viên Chính thức', $1::uuid,
+            'Ban Thành viên', 'Học viên Chính thức', $1::uuid,
             'c1983000-0000-4000-8000-000000001983', NOW()
           )
         `, [userId, fullName, email, phone, company, taxCode]);
@@ -93,7 +93,7 @@ async function syncUserVu() {
             status = 'active',
             level = 'VIP',
             department = 'Ban Thành viên',
-            executive_role = 'Hội viên Chính thức'
+            executive_role = 'Học viên Chính thức'
           WHERE id = $6::uuid OR email = $2 OR user_id = $6::uuid
         `, [fullName, email, phone, company, taxCode, userId]);
         console.log('members UPDATE OK');

@@ -52,7 +52,7 @@ function composeDynamicAnswer(capability: AiCapability, bundle: ContextBundle, u
       "• **Phó Chủ tịch:** Ông **Đỗ Minh Thành** (CEO Valis Corporation) & Ông **Nguyễn Thế Duẩn** (Giám đốc Công ty CP PVN).",
       "• **Ban Thư Ký & Điều Phối:** Ông **Nguyễn Đình Toản** (Chủ tịch Địa ốc Tân Hưng Gia) - Trưởng Ban.",
       "",
-      "Anh/chị có thể tra cứu chi tiết thông tin hồ sơ từng lãnh đạo trong module **Danh bạ Hội viên**.",
+      "Anh/chị có thể tra cứu chi tiết thông tin hồ sơ từng lãnh đạo trong module **Danh bạ Học viên**.",
     ].join("\n");
   }
 
@@ -89,8 +89,8 @@ function composeDynamicAnswer(capability: AiCapability, bundle: ContextBundle, u
     return [
       "📚 **Quy chế Quản lý & Phân quyền Tài liệu CLB CEO HN10:**",
       "",
-      "• **Tài liệu Hiệp Hội (🏛️):** Bao gồm điều lệ, quy chế kết nối B2B, biên bản đại hội, báo cáo tài chính nội bộ. **Phân quyền nghiêm ngặt:** Chỉ có Quản trị viên, Chủ tịch, Tổng thư ký và Trưởng các ban chuyên môn mới có quyền upload, chỉnh sửa và xóa. Hội viên thường chỉ có quyền xem & tải về.",
-      "• **Tài liệu Doanh Nghiệp (🏢):** Hồ sơ năng lực (Profile), catalogue, bảng giá, hợp đồng mẫu do từng doanh nghiệp hội viên tự quản lý. Hội viên có toàn quyền upload và chỉnh sửa tài liệu của doanh nghiệp mình.",
+      "• **Tài liệu Hiệp Hội (🏛️):** Bao gồm điều lệ, quy chế kết nối B2B, biên bản đại hội, báo cáo tài chính nội bộ. **Phân quyền nghiêm ngặt:** Chỉ có Quản trị viên, Chủ tịch, Tổng thư ký và Trưởng các ban chuyên môn mới có quyền upload, chỉnh sửa và xóa. Học viên thường chỉ có quyền xem & tải về.",
+      "• **Tài liệu Doanh Nghiệp (🏢):** Hồ sơ năng lực (Profile), catalogue, bảng giá, hợp đồng mẫu do từng doanh nghiệp Học viên tự quản lý. Học viên có toàn quyền upload và chỉnh sửa tài liệu của doanh nghiệp mình.",
       "",
       "Hệ thống đã phân loại rõ ràng thành 2 tab tại mục **Tài liệu** trên cả ứng dụng di động và cổng CRM.",
     ].join("\n");
@@ -149,7 +149,7 @@ function composeDynamicAnswer(capability: AiCapability, bundle: ContextBundle, u
     if (opps.length > 0) {
       const listStr = opps
         .slice(0, 4)
-        .map((o) => `• **${o.title}**\n  *Người đăng: ${o.subtitle || "Hội viên CEO HN10"}* — ${o.safeSummary || "Đang mở"}`)
+        .map((o) => `• **${o.title}**\n  *Người đăng: ${o.subtitle || "Học viên CEO HN10"}* — ${o.safeSummary || "Đang mở"}`)
         .join("\n\n");
 
       return [
@@ -157,13 +157,13 @@ function composeDynamicAnswer(capability: AiCapability, bundle: ContextBundle, u
         "",
         listStr,
         "",
-        "CLB khuyến khích hội viên ưu tiên kết nối và giao dịch nội khối để cùng nhau phát triển chuỗi cung ứng.",
+        "CLB khuyến khích Học viên ưu tiên kết nối và giao dịch nội khối để cùng nhau phát triển chuỗi cung ứng.",
       ].join("\n");
     }
   }
 
-  // 2.7 Tìm kiếm hội viên & Kết nối (Member / Networking)
-  if (capability === "member_search" || capability === "networking" || lower.includes("hội viên") || lower.includes("tìm ai")) {
+  // 2.7 Tìm kiếm Học viên & Kết nối (Member / Networking)
+  if (capability === "member_search" || capability === "networking" || lower.includes("Học viên") || lower.includes("tìm ai")) {
     const members = bundle.sources.filter((s) => s.type === "member");
     if (members.length > 0) {
       const listStr = members
@@ -172,11 +172,11 @@ function composeDynamicAnswer(capability: AiCapability, bundle: ContextBundle, u
         .join("\n\n");
 
       return [
-        `👥 **Danh Sách Hội Viên Phù Hợp Trong Mạng Lưới:**`,
+        `👥 **Danh Sách Học viên Phù Hợp Trong Mạng Lưới:**`,
         "",
         listStr,
         "",
-        "Anh/chị có thể bấm vào hồ sơ hội viên để xem chi tiết doanh nghiệp, sản phẩm tiêu biểu và gửi tin nhắn kết nối 1-1 trực tiếp.",
+        "Anh/chị có thể bấm vào hồ sơ Học viên để xem chi tiết doanh nghiệp, sản phẩm tiêu biểu và gửi tin nhắn kết nối 1-1 trực tiếp.",
       ].join("\n");
     }
   }
@@ -206,7 +206,7 @@ function composeDynamicAnswer(capability: AiCapability, bundle: ContextBundle, u
     return [
       "📊 **Báo Cáo Tổng Hợp Điều Hành Hiệp Hội CEO HN10:**",
       "",
-      `• Tổng số hội viên chính thức: **${m.members ?? 100}+ doanh nghiệp**`,
+      `• Tổng số Học viên chính thức: **${m.members ?? 100}+ doanh nghiệp**`,
       `• Kế hoạch ngân sách & hội phí 2026: **${(typeof m.fees === "number" ? m.fees.toLocaleString("vi-VN") : m.fees) ?? "60,000,000"} đ**`,
       `• Sự kiện & Hội thảo kết nối: **${m.events ?? 5} sự kiện trọng điểm**`,
       `• Cơ hội giao thương B2B niêm yết: **${m.opportunities ?? 5}+ dự án**`,
@@ -221,9 +221,9 @@ function composeDynamicAnswer(capability: AiCapability, bundle: ContextBundle, u
       "📝 **Bản Nháp Thông Báo Chính Thức:**",
       "",
       "**BAN ĐIỀU HÀNH CLB DOANH NHÂN CEO HN10**",
-      "*Kính gửi: Toàn thể Quý Hội viên CLB Doanh Nhân CEO HN10*",
+      "*Kính gửi: Toàn thể Quý Học viên CLB Doanh Nhân CEO HN10*",
       "",
-      `Về việc: ${query.length > 10 ? query : "Kế hoạch hoạt động & giao thương kết nối hội viên"}`,
+      `Về việc: ${query.length > 10 ? query : "Kế hoạch hoạt động & giao thương kết nối Học viên"}`,
       "",
       "Thay mặt Ban Chấp Hành, chúng tôi xin trân trọng thông báo đến Quý Doanh nhân kế hoạch phối hợp triển khai công tác sắp tới. Đề nghị các Trưởng ban chuyên môn và các thành viên chủ động đăng ký tham gia.",
       "",
@@ -244,7 +244,7 @@ function composeDynamicAnswer(capability: AiCapability, bundle: ContextBundle, u
       "Dưới đây là một số thông tin liên quan tìm thấy trong hệ thống:",
       sourcesPreview,
       "",
-      "Anh/chị có thể đặt câu hỏi chi tiết hơn về từng mục (ví dụ: *Điều lệ CLB*, *Hội viên ngành xây dựng/thương mại*, *Sự kiện Đại hội*, hoặc *Tình hình hội phí*).",
+      "Anh/chị có thể đặt câu hỏi chi tiết hơn về từng mục (ví dụ: *Điều lệ CLB*, *Học viên ngành xây dựng/thương mại*, *Sự kiện Đại hội*, hoặc *Tình hình hội phí*).",
     ].join("\n");
   }
 
@@ -253,7 +253,7 @@ function composeDynamicAnswer(capability: AiCapability, bundle: ContextBundle, u
     "",
     "Em có thể hỗ trợ anh/chị tra cứu các nội dung sau trong CLB CEO HN10:",
     "1. **Tài liệu & Điều lệ:** Quy chế B2B, mẫu hợp đồng NDA, điều lệ CLB, hồ sơ năng lực liên minh.",
-    "2. **Danh bạ Hội viên & Ban Lãnh Đạo:** Thông tin Chủ tịch, các Phó chủ tịch, trưởng ban và hội viên theo ngành/khu vực.",
+    "2. **Danh bạ Học viên & Ban Lãnh Đạo:** Thông tin Chủ tịch, các Phó chủ tịch, trưởng ban và Học viên theo ngành/khu vực.",
     "3. **Sự kiện & Hội thảo:** Lịch đại hội gala, workshop AI, caravan thiện nguyện và lấy vé QR.",
     "4. **Cơ hội Giao thương:** Tìm kiếm đối tác cung ứng, phân phối, đầu tư nội khối.",
     "5. **Hội phí & Báo cáo:** Tra cứu hạn đóng hội phí và số liệu điều hành.",

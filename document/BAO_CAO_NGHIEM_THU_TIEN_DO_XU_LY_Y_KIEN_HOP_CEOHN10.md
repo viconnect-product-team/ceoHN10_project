@@ -18,7 +18,7 @@
 
 ### 1. Thông Điệp Chuyển Đổi Số Dành Riêng Cho CEO HN10
 Hệ sinh thái công nghệ **CEO HN10 (HanoiBA)** được Viconnect may đo và kiến tạo không đơn thuần là một phần mềm quản lý, mà là một **"Vũ Khí Kết Nối Giao Thương & Trợ Lý Số Toàn Năng"** dành cho các lãnh đạo doanh nghiệp CLB Doanh Nhân CEO HN10:
-1. **Nâng Tầm Đẳng Cấp Thương Hiệu:** Mỗi hội viên sở hữu một Thẻ Doanh Nhân Số số hóa kim loại sang trọng, một Hồ sơ Doanh nhân 360 bảo mật tuyệt đối, khẳng định vị thế uy tín trên thương trường.
+1. **Nâng Tầm Đẳng Cấp Thương Hiệu:** Mỗi Học viên sở hữu một Thẻ Doanh Nhân Số số hóa kim loại sang trọng, một Hồ sơ Doanh nhân 360 bảo mật tuyệt đối, khẳng định vị thế uy tín trên thương trường.
 2. **Kích Hoạt Dòng Tiền Giao Thương B2B:** Sàn sản phẩm tinh hoa giới hạn 5 sản phẩm/doanh nghiệp, sàn đấu cơ hội hợp tác phân loại 10 ngành nghề trọng điểm và cơ chế Hẹn gặp 1-on-1 đo lường giá trị hợp đồng thực tế (Deal Value).
 3. **Thanh Toán Chuẩn Mực Quốc Gia VNPAY:** Thay thế hoàn toàn các phương thức chuyển khoản cá nhân thủ công bằng **Cổng thanh toán điện tử VNPAY Gateway (VNPAY-QR, Thẻ ATM/Nội địa, Thẻ quốc tế Visa/MasterCard)** bảo mật mã hóa HMAC-SHA512, vé điện tử tức thì gửi thẳng qua Zalo OA Doanh Nghiệp.
 4. **Giải Phóng 90% Sức Lao Động Cho Ban Thư Ký & Ban Điều Hành:** Tự động hóa từ khâu đón tiếp sự kiện, in thẻ đại biểu, quay số trúng thưởng Lucky Draw, đến tự động gửi thông báo chúc mừng sinh nhật, tự động nhắc hội phí thường niên và trích xuất báo cáo tài chính in ấn A4 chỉ với một phím bấm.
@@ -27,10 +27,10 @@ Hệ sinh thái công nghệ **CEO HN10 (HanoiBA)** được Viconnect may đo v
 
 | Nhóm Tính Năng | Số lượng | Đã Pass (100%) | Đạt 90% (Sẵn Sàng) | Đánh Giá Hiệu Năng Thực Tế |
 | :--- | :---: | :---: | :---: | :--- |
-| **A. Giao Diện & thẻ hội viên điện tử** | 03 | 03 | 00 | **100% Hoàn hảo**: Giao diện 1 chạm, Thẻ Doanh Nhân Số kim loại, Khiên bảo mật SĐT. |
+| **A. Giao Diện & thẻ Học viên điện tử** | 03 | 03 | 00 | **100% Hoàn hảo**: Giao diện 1 chạm, Thẻ Doanh Nhân Số kim loại, Khiên bảo mật SĐT. |
 | **B. Sàn Giao Thương B2B & Kết Nối** | 04 | 04 | 00 | **100% Hoàn hảo**: Giới hạn 5 sản phẩm, lọc 10 ngành nghề, hẹn gặp 1-on-1. |
 | **C. Sự Kiện, Vé VNPAY & Lịch Họp** | 03 | 02 | 01 *(Chờ VNPAY CLB)* | **Sẵn sàng toàn diện**: Cổng VNPAY và E-Ticket hoàn thiện, chờ kích hoạt merchant. |
-| **D. CRM Quản Trị, BI & Tài Chính** | 04 | 04 | 00 | **100% Hoàn hảo**: Quản lý hội phí, Radar sức khỏe hội viên, Báo cáo A4 & Excel. |
+| **D. CRM Quản Trị, BI & Tài Chính** | 04 | 04 | 00 | **100% Hoàn hảo**: Quản lý hội phí, Radar sức khỏe Học viên, Báo cáo A4 & Excel. |
 | **E. Hồ Sơ Doanh Nhân 360** | 01 | 01 | 00 | **100% Hoàn hảo**: Tích hợp lịch sử sự kiện, năng lực doanh nghiệp và giao thương. |
 | **TỔNG CỘNG TOÀN DỰ ÁN** | **15** | **14 / 15 (93.3%)** | **01 / 15 (6.7%)** | **HỆ THỐNG ĐỦ ĐIỀU KIỆN VẬN HÀNH CHÍNH THỨC 100%** |
 
@@ -47,9 +47,9 @@ Hệ sinh thái công nghệ **CEO HN10 (HanoiBA)** được Viconnect may đo v
 
 ---
 
-### 2. thẻ hội viên điện tử Số Hóa & Khiên Bảo Mật Thông Tin Doanh Nhân (Executive Privacy Shield)
+### 2. thẻ Học viên điện tử Số Hóa & Khiên Bảo Mật Thông Tin Doanh Nhân (Executive Privacy Shield)
 * **Thách thức Doanh nhân:** Nỗi sợ lớn nhất của các Chủ tịch, CEO khi gia nhập các hiệp hội là bị lộ số điện thoại và email cá nhân, dẫn đến tình trạng bị nhân viên telesale mời chào chứng khoán, bất động sản rác quấy rầy ngày đêm.
-* **Giải pháp Đột phá Viconnect:** Thiết kế Thẻ Doanh Nhân Số số hóa với chất liệu ánh kim vát cạnh sang trọng, tích hợp mã QR nhận diện một chạm. Đặc biệt, trang bị **"Khiên Bảo Mật Doanh Nhân" (Privacy Shield)**: Hội viên có toàn quyền bật/tắt chế độ ẩn Số điện thoại và Email cá nhân. Khi kích hoạt, người ngoài chỉ có thể liên hệ thông qua cổng tin nhắn nội bộ hoặc gửi thư mời hợp tác lịch thiệp, bảo vệ danh bạ tuyệt đối.
+* **Giải pháp Đột phá Viconnect:** Thiết kế Thẻ Doanh Nhân Số số hóa với chất liệu ánh kim vát cạnh sang trọng, tích hợp mã QR nhận diện một chạm. Đặc biệt, trang bị **"Khiên Bảo Mật Doanh Nhân" (Privacy Shield)**: Học viên có toàn quyền bật/tắt chế độ ẩn Số điện thoại và Email cá nhân. Khi kích hoạt, người ngoài chỉ có thể liên hệ thông qua cổng tin nhắn nội bộ hoặc gửi thư mời hợp tác lịch thiệp, bảo vệ danh bạ tuyệt đối.
 * **Giá trị Vàng Mang Lại:** Bảo vệ 100% không gian riêng tư cho lãnh đạo cấp cao; loại bỏ hoàn toàn rủi ro spam; tạo niềm tin tối đa để doanh nhân chia sẻ thông tin trong cộng đồng.
 * **Minh chứng Live Domain:** Đã kiểm thử trực tiếp tại `https://ceohn10.viconnect.vn/association/card`.
   * *Hình ảnh minh chứng:* `document/evidence_exact_15/req02_app_the_doanh_nhan_so_baomat.png`
@@ -58,8 +58,8 @@ Hệ sinh thái công nghệ **CEO HN10 (HanoiBA)** được Viconnect may đo v
 
 ### 3. Cổng Đặc Quyền VIP Doanh Nhân Riêng Biệt (CEO HN10 Elite Perks)
 * **Thách thức Doanh nhân:** Các chính sách ưu đãi nội bộ giữa các doanh nghiệp thành viên nếu bị xếp chung với gian hàng bán lẻ đại trà sẽ làm giảm giá trị và uy tín của các đặc quyền cao cấp.
-* **Giải pháp Đột phá Viconnect:** Tách bạch hoàn toàn phân hệ **"Đặc Quyền VIP Doanh Nhân" (Executive Perks)** thành một không gian danh giá riêng. Đây là nơi hội tụ các chính sách trợ giá độc quyền, voucher nghỉ dưỡng, ưu đãi dịch vụ tài chính, y tế, golf... chỉ dành riêng cho những người mang thẻ hội viên CEO HN10.
-* **Giá trị Vàng Mang Lại:** Gia tăng sức hút mãnh liệt cho chiếc thẻ hội viên; thúc đẩy các doanh nghiệp trong Hội ưu tiên sử dụng dịch vụ của nhau; giữ dòng tiền tiêu dùng luân chuyển mạnh mẽ trong nội bộ CLB.
+* **Giải pháp Đột phá Viconnect:** Tách bạch hoàn toàn phân hệ **"Đặc Quyền VIP Doanh Nhân" (Executive Perks)** thành một không gian danh giá riêng. Đây là nơi hội tụ các chính sách trợ giá độc quyền, voucher nghỉ dưỡng, ưu đãi dịch vụ tài chính, y tế, golf... chỉ dành riêng cho những người mang thẻ Học viên CEO HN10.
+* **Giá trị Vàng Mang Lại:** Gia tăng sức hút mãnh liệt cho chiếc thẻ Học viên; thúc đẩy các doanh nghiệp trong Hội ưu tiên sử dụng dịch vụ của nhau; giữ dòng tiền tiêu dùng luân chuyển mạnh mẽ trong nội bộ CLB.
 * **Minh chứng Live Domain:** Đã kiểm thử trực tiếp tại `https://ceohn10.viconnect.vn/association/perks`.
   * *Hình ảnh minh chứng:* `document/evidence_exact_15/req03_app_dacquyen_vip.png`
 
@@ -84,8 +84,8 @@ Hệ sinh thái công nghệ **CEO HN10 (HanoiBA)** được Viconnect may đo v
 ---
 
 ### 6. Quản Trị Tinh Hoa: Mô Hình Giới Thiệu Non-Affiliate & Xóa Bỏ Hoàn Toàn Quảng Cáo
-* **Thách thức Doanh nhân:** Việc áp dụng chiêu trò tiếp thị liên kết (affiliate chia phần trăm hoa hồng tiền mặt) để lôi kéo hội viên sẽ làm tầm thường hóa giá trị của CLB; các banner quảng cáo nhấp nháy làm mất đi tính trang nghiêm của cổng quản trị.
-* **Giải pháp Đột phá Viconnect:** Xóa bỏ vĩnh viễn mục "Quản lý quảng cáo" trên cả CRM và App. Thay vào đó, áp dụng **"Chính Sách Tri Ân Đối Tác Văn Minh" (Non-Affiliate Referral)**: Hội viên chia sẻ mã giới thiệu trang trọng để mời bạn bè doanh nhân gia nhập. Khi kết nạp thành công, hệ thống vinh danh người giới thiệu trên Bảng Vàng Đóng Góp và tặng voucher tham dự gala sự kiện, hoàn toàn không sử dụng tiền hoa hồng thương mại.
+* **Thách thức Doanh nhân:** Việc áp dụng chiêu trò tiếp thị liên kết (affiliate chia phần trăm hoa hồng tiền mặt) để lôi kéo Học viên sẽ làm tầm thường hóa giá trị của CLB; các banner quảng cáo nhấp nháy làm mất đi tính trang nghiêm của cổng quản trị.
+* **Giải pháp Đột phá Viconnect:** Xóa bỏ vĩnh viễn mục "Quản lý quảng cáo" trên cả CRM và App. Thay vào đó, áp dụng **"Chính Sách Tri Ân Đối Tác Văn Minh" (Non-Affiliate Referral)**: Học viên chia sẻ mã giới thiệu trang trọng để mời bạn bè doanh nhân gia nhập. Khi kết nạp thành công, hệ thống vinh danh người giới thiệu trên Bảng Vàng Đóng Góp và tặng voucher tham dự gala sự kiện, hoàn toàn không sử dụng tiền hoa hồng thương mại.
 * **Giá trị Vàng Mang Lại:** Giữ trọn cốt cách và sự thanh lịch của giới doanh nhân; củng cố niềm tin và sự tự hào khi là thành viên của CEO HN10; không gian số thuần khiết 100% không rác quảng cáo.
 * **Minh chứng Live Domain:** Đã kiểm thử trực tiếp tại `https://crm.ceohn10.viconnect.vn/members`.
   * *Hình ảnh minh chứng:* `document/evidence_exact_15/req06_crm_sidebar_khong_quangcao.png`
@@ -95,7 +95,7 @@ Hệ sinh thái công nghệ **CEO HN10 (HanoiBA)** được Viconnect may đo v
 ### 7. Đặt Lịch Hẹn Gặp 1-on-1 Doanh Nhân & Đo Lường Giá Trị Giao Thương (Deal Value)
 * **Thách thức Doanh nhân:** Ban Chấp Hành rất khó đo lường được phong trào kết nối của CLB có thực chất hay không, vì các cuộc hẹn cafe thường diễn ra tự phát và không có số liệu ghi nhận kết quả hợp tác.
 * **Giải pháp Đột phá Viconnect:** Phân tách rõ ràng giữa việc đăng tin cơ hội chung với tính năng **"Hẹn Gặp 1-on-1 Doanh Nhân"**. Cho phép hai CEO đặt lịch gặp chính thức, lựa chọn địa điểm, xác định mục tiêu làm việc và đặc biệt là có trường ghi nhận **"Giá trị giao dịch dự kiến / thành công (Deal Value)"**.
-* **Giá trị Vàng Mang Lại:** Lượng hóa chính xác bằng con số hàng tỷ đồng giá trị kinh tế mà CLB mang lại cho hội viên; tạo động lực thi đua kết nối lành mạnh; cung cấp số liệu thực tế để báo cáo trước Đại hội và Hội Doanh nghiệp Trẻ Hà Nội.
+* **Giá trị Vàng Mang Lại:** Lượng hóa chính xác bằng con số hàng tỷ đồng giá trị kinh tế mà CLB mang lại cho Học viên; tạo động lực thi đua kết nối lành mạnh; cung cấp số liệu thực tế để báo cáo trước Đại hội và Hội Doanh nghiệp Trẻ Hà Nội.
 * **Minh chứng Live Domain:** Đã kiểm thử trực tiếp tại `https://ceohn10.viconnect.vn/association/connect`.
   * *Hình ảnh minh chứng:* `document/evidence_exact_15/req07_app_ketnoi_1on1_dealvalue.png`
 
@@ -119,39 +119,39 @@ Hệ sinh thái công nghệ **CEO HN10 (HanoiBA)** được Viconnect may đo v
 
 ---
 
-### 10. Quản Lý Lịch Họp Đa Tầng Thông Minh & Phễu Chăm Sóc Hội Viên Mới (Onboarding)
-* **Thách thức Doanh nhân:** Ban Lãnh đạo thường xuyên bị trùng lịch họp giữa Ban Chấp Hành, Ban Điều Hành và 6 Ban chuyên môn; hội viên mới sau khi nộp đơn thường bị bỏ rơi, không biết các bước tiếp theo để hòa nhập.
-* **Giải pháp Đột phá Viconnect:** Lịch sinh hoạt số hóa đa tầng: Phân loại rành mạch lịch họp BCH, BĐH, Toàn thể CLB và Lịch họp từng Ban chuyên môn, tích hợp tự động nhắc lịch trước 24h qua Zalo và App. Song song là **"Phễu Chăm Sóc Hội Viên Mới" (Onboarding Funnel)**: Quản lý tự động hành trình 3 bước (Tiếp nhận hồ sơ -> Thẩm định & Kết nạp -> Giao lưu ra mắt tại kỳ họp gần nhất).
-* **Giá trị Vàng Mang Lại:** Không bao giờ bỏ sót cuộc họp chiến lược nào; giúp hội viên mới cảm nhận được sự chào đón nồng nhiệt và gắn bó ngay từ ngày đầu gia nhập.
+### 10. Quản Lý Lịch Họp Đa Tầng Thông Minh & Phễu Chăm Sóc Học viên Mới (Onboarding)
+* **Thách thức Doanh nhân:** Ban Lãnh đạo thường xuyên bị trùng lịch họp giữa Ban Chấp Hành, Ban Điều Hành và 6 Ban chuyên môn; Học viên mới sau khi nộp đơn thường bị bỏ rơi, không biết các bước tiếp theo để hòa nhập.
+* **Giải pháp Đột phá Viconnect:** Lịch sinh hoạt số hóa đa tầng: Phân loại rành mạch lịch họp BCH, BĐH, Toàn thể CLB và Lịch họp từng Ban chuyên môn, tích hợp tự động nhắc lịch trước 24h qua Zalo và App. Song song là **"Phễu Chăm Sóc Học viên Mới" (Onboarding Funnel)**: Quản lý tự động hành trình 3 bước (Tiếp nhận hồ sơ -> Thẩm định & Kết nạp -> Giao lưu ra mắt tại kỳ họp gần nhất).
+* **Giá trị Vàng Mang Lại:** Không bao giờ bỏ sót cuộc họp chiến lược nào; giúp Học viên mới cảm nhận được sự chào đón nồng nhiệt và gắn bó ngay từ ngày đầu gia nhập.
 * **Minh chứng Live Domain:** Đã kiểm thử trực tiếp tại `https://crm.ceohn10.viconnect.vn/meetings`.
   * *Hình ảnh minh chứng:* `document/evidence_exact_15/req10_crm_lichhop_onboarding.png`
 
 ---
 
 ### 11. Chuẩn Hóa Hồ Sơ Doanh Nhân 360 & Tự Động Chúc Mừng Sinh Nhật Trưởng Ban
-* **Thách thức Doanh nhân:** Dữ liệu ngày sinh hội viên bị lưu sai định dạng dẫn đến việc gửi lời chúc mừng sinh nhật muộn hoặc nhầm ngày, gây mất thiện cảm và thiếu chu đáo.
-* **Giải pháp Đột phá Viconnect:** Chuẩn hóa toàn bộ dữ liệu ngày sinh theo định dạng chuẩn quốc gia (DD/MM/YYYY) trong Hồ sơ doanh nhân 360. Thiết lập **"Trợ Lý Tri Ân Sinh Nhật Tự Động"**: Đúng 08:00 sáng ngày sinh nhật hội viên, hệ thống tự động gửi thiệp chúc mừng thiết kế trang trọng mang thông điệp từ Chủ tịch CLB qua thông báo App, Zalo OA và hiển thị Banner chúc mừng trên toàn hệ thống.
+* **Thách thức Doanh nhân:** Dữ liệu ngày sinh Học viên bị lưu sai định dạng dẫn đến việc gửi lời chúc mừng sinh nhật muộn hoặc nhầm ngày, gây mất thiện cảm và thiếu chu đáo.
+* **Giải pháp Đột phá Viconnect:** Chuẩn hóa toàn bộ dữ liệu ngày sinh theo định dạng chuẩn quốc gia (DD/MM/YYYY) trong Hồ sơ doanh nhân 360. Thiết lập **"Trợ Lý Tri Ân Sinh Nhật Tự Động"**: Đúng 08:00 sáng ngày sinh nhật Học viên, hệ thống tự động gửi thiệp chúc mừng thiết kế trang trọng mang thông điệp từ Chủ tịch CLB qua thông báo App, Zalo OA và hiển thị Banner chúc mừng trên toàn hệ thống.
 * **Giá trị Vàng Mang Lại:** Chăm sóc tinh tế đến từng cá nhân doanh nhân; thắt chặt tình cảm gắn kết bền chặt như người một nhà; khẳng định sự quan tâm sâu sắc của Ban Lãnh đạo.
 * **Minh chứng Live Domain:** Đã kiểm thử trực tiếp tại `https://crm.ceohn10.viconnect.vn/members`.
   * *Hình ảnh minh chứng:* `document/evidence_exact_15/req11_crm_hoivien_sinhnhat.png`
 
 ---
 
-### 12. Hệ Thống Báo Cáo BI: Radar Chỉ Số Sức Khỏe Hội Viên & Cảnh Báo Trầm Lắng
-* **Thách thức Doanh nhân:** Ban Chấp Hành thường chỉ biết hội viên đã chán sinh hoạt khi họ từ chối đóng phí năm tiếp theo, lúc này thì đã quá muộn để cứu vãn sự gắn kết.
-* **Giải pháp Đột phá Viconnect:** Ứng dụng **"Radar Đo Lường Sức Khỏe Hội Viên" (Member Engagement BI)** với biểu đồ Recharts trực quan 4 màu: Đánh giá tỷ lệ tham dự sinh hoạt, tần suất kết nối giao thương và mức độ hoạt động. Hệ thống tự động kích hoạt **Cờ Cảnh Báo Đỏ (Hội viên trầm lắng)** đối với những doanh nhân vắng bóng 3 kỳ liên tiếp để Ban Thư ký chủ động liên hệ thăm hỏi, tháo gỡ khó khăn.
-* **Giá trị Vàng Mang Lại:** Giữ vững tỷ lệ duy trì hội viên (Retention Rate) trên 95%; kịp thời lắng nghe tâm tư của hội viên; bảo đảm câu lạc bộ luôn tràn đầy năng lượng tích cực.
+### 12. Hệ Thống Báo Cáo BI: Radar Chỉ Số Sức Khỏe Học viên & Cảnh Báo Trầm Lắng
+* **Thách thức Doanh nhân:** Ban Chấp Hành thường chỉ biết Học viên đã chán sinh hoạt khi họ từ chối đóng phí năm tiếp theo, lúc này thì đã quá muộn để cứu vãn sự gắn kết.
+* **Giải pháp Đột phá Viconnect:** Ứng dụng **"Radar Đo Lường Sức Khỏe Học viên" (Member Engagement BI)** với biểu đồ Recharts trực quan 4 màu: Đánh giá tỷ lệ tham dự sinh hoạt, tần suất kết nối giao thương và mức độ hoạt động. Hệ thống tự động kích hoạt **Cờ Cảnh Báo Đỏ (Học viên trầm lắng)** đối với những doanh nhân vắng bóng 3 kỳ liên tiếp để Ban Thư ký chủ động liên hệ thăm hỏi, tháo gỡ khó khăn.
+* **Giá trị Vàng Mang Lại:** Giữ vững tỷ lệ duy trì Học viên (Retention Rate) trên 95%; kịp thời lắng nghe tâm tư của Học viên; bảo đảm câu lạc bộ luôn tràn đầy năng lượng tích cực.
 * **Minh chứng Live Domain:** Đã kiểm thử trực tiếp tại `https://crm.ceohn10.viconnect.vn/analytics`.
   * *Hình ảnh minh chứng:* `document/evidence_exact_15/req12_crm_suckhoe_hoivien.png`
 
 ---
 
 ### 13. Quản Trị Hội Phí Thường Niên Tự Động: Tích Hợp VNPAY & Trợ Lý Nhắc Phí Văn Minh
-* **Thách thức Doanh nhân:** Việc kế toán phải gọi điện giục từng hội viên đóng hội phí 10.000.000 VNĐ hàng năm là công việc vô cùng nhạy cảm, dễ gây sứt mẻ tình cảm và tốn nhiều thời gian.
+* **Thách thức Doanh nhân:** Việc kế toán phải gọi điện giục từng Học viên đóng hội phí 10.000.000 VNĐ hàng năm là công việc vô cùng nhạy cảm, dễ gây sứt mẻ tình cảm và tốn nhiều thời gian.
 * **Giải pháp Đột phá Viconnect:** Xây dựng module **"Quản Trị Hội Phí Văn Minh & Tự Động"**:
-  1. Mỗi hội viên có một tài khoản hội phí minh bạch với mã hóa đơn rõ ràng.
+  1. Mỗi Học viên có một tài khoản hội phí minh bạch với mã hóa đơn rõ ràng.
   2. Tích hợp thanh toán trực tiếp qua **Cổng thanh toán VNPAY Gateway** chỉ với 1 thao tác quét mã hoặc thanh toán thẻ.
-  3. Trang bị nút **"Gửi Nhắc Phí Tự Động"**: Hệ thống gửi thông báo nhắc lịch tế nhị, sang trọng qua Zalo OA và App kèm liên kết VNPAY để hội viên bấm thanh toán ngay.
+  3. Trang bị nút **"Gửi Nhắc Phí Tự Động"**: Hệ thống gửi thông báo nhắc lịch tế nhị, sang trọng qua Zalo OA và App kèm liên kết VNPAY để Học viên bấm thanh toán ngay.
   4. Lưu lại lịch sử số lần nhắc phí và nút **"Xuất Báo Cáo Excel Chuẩn Kiểm Toán"** có đầy đủ chữ ký 3 bên.
 * **Giá trị Vàng Mang Lại:** Xóa bỏ hoàn toàn sự ngại ngùng khi nhắc phí; nâng tỷ lệ thu hội phí đúng hạn lên trên 90%; minh bạch tài chính từng đồng cho toàn câu lạc bộ.
 * **Minh chứng Live Domain:** Đã kiểm thử trực tiếp tại `https://crm.ceohn10.viconnect.vn/fees`.
@@ -162,14 +162,14 @@ Hệ sinh thái công nghệ **CEO HN10 (HanoiBA)** được Viconnect may đo v
 ### 14. Trung Tâm Điều Hành Tài Chính & Chỉ Số Kỳ Họp (Xuất Báo Cáo A4 & Excel)
 * **Thách thức Doanh nhân:** Trước mỗi phiên họp Ban Chấp Hành, thủ quỹ và kế toán phải mất nhiều ngày để làm slide, tổng hợp hóa đơn thu chi thủ công, rất dễ nhầm lẫn số liệu.
 * **Giải pháp Đột phá Viconnect:** Xây dựng **"Trung Tâm Điều Hành Tài Chính Tức Thời"**: Theo dõi chi tiết Quỹ Hội, Quỹ Phát Triển, các khoản thu từ sự kiện và chi phí vận hành theo Tháng, Quý, Năm với biểu đồ trực quan. Hỗ trợ in ấn Biên bản tài chính định dạng chuẩn khổ giấy A4 chỉ với 1 cú click và xuất file Excel chi tiết phục vụ Ban Kiểm Tra.
-* **Giá trị Vàng Mang Lại:** Ban Lãnh đạo nắm rõ thực trạng tài chính mọi lúc mọi nơi; minh bạch tuyệt đối trước toàn thể hội viên; giảm 95% áp lực làm báo cáo cho bộ phận tài vụ.
+* **Giá trị Vàng Mang Lại:** Ban Lãnh đạo nắm rõ thực trạng tài chính mọi lúc mọi nơi; minh bạch tuyệt đối trước toàn thể Học viên; giảm 95% áp lực làm báo cáo cho bộ phận tài vụ.
 * **Minh chứng Live Domain:** Đã kiểm thử trực tiếp tại `https://crm.ceohn10.viconnect.vn/finance-report`.
   * *Hình ảnh minh chứng:* `document/evidence_exact_15/req14_crm_baocao_taichinh.png`
 
 ---
 
 ### 15. Trang Cá Nhân Doanh Nhân 360: Hồ Sơ Năng Lực, Lịch Sử Sự Kiện & Giao Thương
-* **Thách thức Doanh nhân:** Trang cá nhân trước đây quá đơn điệu, không thể hiện được uy tín, tầm vóc doanh nghiệp và những đóng góp của hội viên trong suốt quá trình tham gia CLB.
+* **Thách thức Doanh nhân:** Trang cá nhân trước đây quá đơn điệu, không thể hiện được uy tín, tầm vóc doanh nghiệp và những đóng góp của Học viên trong suốt quá trình tham gia CLB.
 * **Giải pháp Đột phá Viconnect:** Nâng cấp thành **"Profile Doanh Nhân Thượng Lưu 360 Độ"** tích hợp 3 khối dữ liệu giá trị:
   1. *Hồ Sơ Năng Lực Doanh Nghiệp:* Logo, giới thiệu sản phẩm cốt lõi, lĩnh vực kinh doanh, địa chỉ trụ sở và thông tin liên hệ được bảo vệ bởi Khiên Bảo Mật.
   2. *Lịch Sử Sự Kiện Đã Tham Dự:* Tự động lưu vết tất cả các hội nghị, caravan, tọa đàm đại biểu đã tham gia kèm huy hiệu điểm danh.
@@ -184,7 +184,7 @@ Hệ sinh thái công nghệ **CEO HN10 (HanoiBA)** được Viconnect may đo v
 
 1. **Kích Hoạt Cổng VNPAY Live:** Ban Thư ký cung cấp thông tin tài khoản Merchant VNPAY của CLB/Hiệp hội để Viconnect cấu hình chuyển từ môi trường Sandbox sang Production trong vòng 24 giờ.
 2. **Kích Hoạt Zalo OA Doanh Nghiệp:** Cung cấp quyền quản trị Zalo OA để đồng bộ dịch vụ ZNS gửi thông báo vé sự kiện và nhắc hội phí tự động.
-3. **Đào Tạo & Chuyển Giao:** Viconnect sẵn sàng tổ chức buổi đào tạo hướng dẫn sử dụng trực tiếp cho Ban Thư ký, Ban Điều hành và cung cấp trọn bộ cẩm nang số cho toàn thể hội viên.
+3. **Đào Tạo & Chuyển Giao:** Viconnect sẵn sàng tổ chức buổi đào tạo hướng dẫn sử dụng trực tiếp cho Ban Thư ký, Ban Điều hành và cung cấp trọn bộ cẩm nang số cho toàn thể Học viên.
 
 ---
 *Báo cáo được khởi tạo và phê duyệt kỹ thuật bởi Đội Ngũ Kỹ Sư & Chuyên Viên Giải Pháp Viconnect.*

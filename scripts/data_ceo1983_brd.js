@@ -27,8 +27,8 @@ Với sứ mệnh "Bản lĩnh - Tiên phong - Kết nối - Phát triển", CLB
     painPoints: [
       {
         id: "PP-01",
-        title: "Dữ liệu Hội viên Phân tán & Thất lạc Nghiêm trọng",
-        desc: "Trước khi số hóa, hồ sơ của hơn 500 hội viên được lưu trữ rải rác trên nhiều bảng tính Excel cá nhân của từng cán bộ văn phòng và các nhóm chat mạng xã hội (Zalo, Viber, Facebook). Khi có sự thay đổi về chức danh lãnh đạo, địa chỉ trụ sở, mã số thuế hoặc năng lực cung ứng sản phẩm, dữ liệu không được cập nhật tập trung, dẫn đến việc mất dấu thông tin hội viên, thiếu cơ sở dữ liệu xác thực để kết nối giao thương nội bộ."
+        title: "Dữ liệu Học viên Phân tán & Thất lạc Nghiêm trọng",
+        desc: "Trước khi số hóa, hồ sơ của hơn 500 Học viên được lưu trữ rải rác trên nhiều bảng tính Excel cá nhân của từng cán bộ văn phòng và các nhóm chat mạng xã hội (Zalo, Viber, Facebook). Khi có sự thay đổi về chức danh lãnh đạo, địa chỉ trụ sở, mã số thuế hoặc năng lực cung ứng sản phẩm, dữ liệu không được cập nhật tập trung, dẫn đến việc mất dấu thông tin Học viên, thiếu cơ sở dữ liệu xác thực để kết nối giao thương nội bộ."
       },
       {
         id: "PP-02",
@@ -38,12 +38,12 @@ Với sứ mệnh "Bản lĩnh - Tiên phong - Kết nối - Phát triển", CLB
       {
         id: "PP-03",
         title: "Thất thoát & Chậm trễ Trong Công tác Thu - Nộp - Đối soát Hội phí Thường niên",
-        desc: "Hội phí thường niên (5.000.000 VNĐ/hội viên/năm) là nguồn kinh phí duy trì hoạt động cốt lõi của câu lạc bộ. Việc theo dõi công nợ hoàn toàn dựa trên việc Ban Tài chính/Thủ quỹ đối soát thủ công từng dòng biến động số dư tài khoản ngân hàng với danh sách Excel. Không có mã định danh giao dịch chuẩn hóa dẫn đến tình trạng chuyển khoản không ghi rõ họ tên/mã hội viên, gây tranh cãi về tình trạng hoàn thành nghĩa vụ tài chính và tốn hàng trăm giờ làm việc mỗi kỳ đại hội."
+        desc: "Hội phí thường niên (5.000.000 VNĐ/Học viên/năm) là nguồn kinh phí duy trì hoạt động cốt lõi của câu lạc bộ. Việc theo dõi công nợ hoàn toàn dựa trên việc Ban Tài chính/Thủ quỹ đối soát thủ công từng dòng biến động số dư tài khoản ngân hàng với danh sách Excel. Không có mã định danh giao dịch chuẩn hóa dẫn đến tình trạng chuyển khoản không ghi rõ họ tên/mã Học viên, gây tranh cãi về tình trạng hoàn thành nghĩa vụ tài chính và tốn hàng trăm giờ làm việc mỗi kỳ đại hội."
       },
       {
         id: "PP-04",
         title: "Hỗn loạn Sơ đồ Ghế ngồi & Ùn tắc Cửa Check-in Sự kiện Gala Đại hội",
-        desc: "Tại các sự kiện thường niên, Gala Dinner và Đại hội toàn thể quy mô từ 300 đến 600 đại biểu, ban tổ chức phải in danh sách giấy tại bàn đón tiếp. Việc tìm kiếm tên thủ công gây ùn tắc kéo dài từ 30 - 45 phút tại sảnh hội trường. Nghiêm trọng hơn, việc sắp xếp vị trí bàn tiệc VIP cho các Lãnh đạo Thành ủy, Hội LHTN, HanoiBA và Hội viên kim cương không có sơ đồ trực quan, dẫn đến việc đại biểu ngồi sai vị trí, làm ảnh hưởng tiêu cực đến tính trang trọng của sự kiện."
+        desc: "Tại các sự kiện thường niên, Gala Dinner và Đại hội toàn thể quy mô từ 300 đến 600 đại biểu, ban tổ chức phải in danh sách giấy tại bàn đón tiếp. Việc tìm kiếm tên thủ công gây ùn tắc kéo dài từ 30 - 45 phút tại sảnh hội trường. Nghiêm trọng hơn, việc sắp xếp vị trí bàn tiệc VIP cho các Lãnh đạo Thành ủy, Hội LHTN, HanoiBA và Học viên kim cương không có sơ đồ trực quan, dẫn đến việc đại biểu ngồi sai vị trí, làm ảnh hưởng tiêu cực đến tính trang trọng của sự kiện."
       },
       {
         id: "PP-05",
@@ -53,11 +53,11 @@ Với sứ mệnh "Bản lĩnh - Tiên phong - Kết nối - Phát triển", CLB
       {
         id: "PP-06",
         title: "Thiếu Kênh Giao thương B2B Nội Khối & Minh Bạch Quỹ Thiện Nguyện",
-        desc: "Hội viên có nhu cầu tiêu dùng chéo và tìm kiếm nhà cung cấp tin cậy trong nội bộ những người bạn đồng niên 1983 nhưng không có sàn thương mại B2B chính danh để niêm yết sản phẩm với chính sách ưu đãi đặc quyền. Đồng thời, nguồn tiền quyên góp Quỹ Thiện nguyện an sinh xã hội thiếu cơ chế công khai sao kê thời gian thực, chưa đáp ứng kỳ vọng minh bạch tuyệt đối của các nhà hảo tâm."
+        desc: "Học viên có nhu cầu tiêu dùng chéo và tìm kiếm nhà cung cấp tin cậy trong nội bộ những người bạn đồng niên 1983 nhưng không có sàn thương mại B2B chính danh để niêm yết sản phẩm với chính sách ưu đãi đặc quyền. Đồng thời, nguồn tiền quyên góp Quỹ Thiện nguyện an sinh xã hội thiếu cơ chế công khai sao kê thời gian thực, chưa đáp ứng kỳ vọng minh bạch tuyệt đối của các nhà hảo tâm."
       },
       {
         id: "PP-07",
-        title: "Hội Viên & Cán Bộ Bỡ Ngỡ Trước 32+ Phân Hệ Tính Năng (Thiếu Trợ Lý Hướng Dẫn Tức Thời)",
+        title: "Học viên & Cán Bộ Bỡ Ngỡ Trước 32+ Phân Hệ Tính Năng (Thiếu Trợ Lý Hướng Dẫn Tức Thời)",
         desc: "Hệ thống sở hữu hơn 32 phân hệ tính năng phức tạp từ quản trị sự kiện, soát vé QR/NFC, danh thiếp số AI OCR, sàn giao thương B2B, biểu quyết đại hội đến phân quyền RBAC và kế toán hội phí. Đa số doanh nhân CEO HN10 bận rộn và cán bộ văn phòng mới tiếp cận không có thời gian đọc cẩm nang hướng dẫn dài hàng trăm trang, thường xuyên gọi điện hỏi Ban Thư Ký về các thao tác cơ bản, gây quá tải bộ máy hành chính và giảm tỷ lệ tương tác với nền tảng số."
       }
     ],
@@ -65,13 +65,13 @@ Với sứ mệnh "Bản lĩnh - Tiên phong - Kết nối - Phát triển", CLB
     strategicObjectives: [
       {
         id: "OBJ-01",
-        kpi: "Số hóa 100% Hồ Sơ Hội Viên",
-        target: "Định danh điện tử (e-KYC Doanh nghiệp) cho toàn bộ 500+ hội viên với mã định danh chuẩn `CEO-83xxx` trước Quý 4/2026."
+        kpi: "Số hóa 100% Hồ Sơ Học viên",
+        target: "Định danh điện tử (e-KYC Doanh nghiệp) cho toàn bộ 500+ Học viên với mã định danh chuẩn `CEO-83xxx` trước Quý 4/2026."
       },
       {
         id: "OBJ-02",
         kpi: "Tự Động Hóa 100% Thu - Nộp Hội Phí Qua VietQR",
-        target: "Sinh mã VietQR động Napas 24/7 chứa chính xác mã hội viên và số tiền; kế toán đối soát gạch nợ trên CRM giảm 95% thời gian xử lý thủ công."
+        target: "Sinh mã VietQR động Napas 24/7 chứa chính xác mã Học viên và số tiền; kế toán đối soát gạch nợ trên CRM giảm 95% thời gian xử lý thủ công."
       },
       {
         id: "OBJ-03",
@@ -91,7 +91,7 @@ Với sứ mệnh "Bản lĩnh - Tiên phong - Kết nối - Phát triển", CLB
       {
         id: "OBJ-06",
         kpi: "Minh Bạch 100% Sổ Quỹ Thu Chi & Thiện Nguyện",
-        target: "Áp dụng quy trình kiểm soát chi tiêu 3 cấp nghiêm ngặt; công khai sao kê quỹ thiện nguyện thời gian thực cho toàn thể hội viên."
+        target: "Áp dụng quy trình kiểm soát chi tiêu 3 cấp nghiêm ngặt; công khai sao kê quỹ thiện nguyện thời gian thực cho toàn thể Học viên."
       },
       {
         id: "OBJ-07",
@@ -115,7 +115,7 @@ Với sứ mệnh "Bản lĩnh - Tiên phong - Kết nối - Phát triển", CLB
           "Phê duyệt chiến lược phát triển, kế hoạch công tác năm và quy chế hoạt động của các ban chuyên môn.",
           "Phê duyệt dự toán và quyết toán các sự kiện quy mô lớn, ngân sách tài chính và quỹ thiện nguyện.",
           "Cấu hình và giám sát ma trận phân quyền RBAC 5 cấp bậc trong toàn hệ thống.",
-          "Phê duyệt quyết định kết nạp hội viên danh dự và quyết định khai trừ/chấm dứt tư cách hội viên khi vi phạm điều lệ."
+          "Phê duyệt quyết định kết nạp Học viên danh dự và quyết định khai trừ/chấm dứt tư cách Học viên khi vi phạm điều lệ."
         ]
       },
       {
@@ -129,7 +129,7 @@ Với sứ mệnh "Bản lĩnh - Tiên phong - Kết nối - Phát triển", CLB
           "Quản lý lịch phòng họp tập trung Sapphire Hub (sức chứa 40 chỗ), phòng họp trực tuyến Zoom/Meet.",
           "Soạn thảo, trình ký và ban hành nghị quyết, thông báo, biên bản đại hội và phân công nhiệm vụ (Tasks).",
           "Tổng hợp báo cáo tiến độ công việc đa chiều từ các ban chuyên trách gửi Ban Quản Trị.",
-          "ĐẶC BIỆT LƯU Ý: Ban Thư Ký TUYỆT ĐỐI KHÔNG CÓ THẨM QUYỀN PHÊ DUYỆT HỒ SƠ KẾT NẠP HỘI VIÊN MỚI. Mọi can thiệp vào thẩm quyền này bị hệ thống chặn đứng hoàn toàn."
+          "ĐẶC BIỆT LƯU Ý: Ban Thư Ký TUYỆT ĐỐI KHÔNG CÓ THẨM QUYỀN PHÊ DUYỆT HỒ SƠ KẾT NẠP Học viên MỚI. Mọi can thiệp vào thẩm quyền này bị hệ thống chặn đứng hoàn toàn."
         ]
       },
       {
@@ -137,13 +137,13 @@ Với sứ mệnh "Bản lĩnh - Tiên phong - Kết nối - Phát triển", CLB
         name: "Ban Thành Viên (BTV)",
         email: "ceo.thanhvien@ceohn10.com",
         role: "truong_ban",
-        mandate: "Cơ quan chuyên trách phát triển hội viên, thẩm định tư cách và chăm sóc thành viên.",
+        mandate: "Cơ quan chuyên trách phát triển Học viên, thẩm định tư cách và chăm sóc thành viên.",
         responsibilities: [
           "ĐỘC QUYỀN TIẾP NHẬN & THẨM ĐỊNH HỒ SƠ ĐĂNG KÝ GIA NHẬP mới từ Cổng thông tin công khai.",
           "Xác minh điều kiện pháp lý: Năm sinh 1983 (Quý Hợi), Giấy chứng nhận ĐKKD, Mã số thuế, Năng lực tài chính và uy tín của doanh nghiệp ứng viên.",
           "BẤM NÚT PHÊ DUYỆT KẾT NẠP CHÍNH THỨC trên hệ thống Web CRM, kích hoạt quy trình cấp mã định danh `CEO-83xxx`.",
-          "Phát hành email thông báo kết nạp kèm mật khẩu khởi tạo tài khoản ứng dụng di động cho hội viên mới.",
-          "Theo dõi, đánh giá điểm cống hiến và xếp hạng hội viên thường niên (Hạng Kim Cương, Vàng, Bạc, Tiêu Chuẩn)."
+          "Phát hành email thông báo kết nạp kèm mật khẩu khởi tạo tài khoản ứng dụng di động cho Học viên mới.",
+          "Theo dõi, đánh giá điểm cống hiến và xếp hạng Học viên thường niên (Hạng Kim Cương, Vàng, Bạc, Tiêu Chuẩn)."
         ]
       },
       {
@@ -153,10 +153,10 @@ Với sứ mệnh "Bản lĩnh - Tiên phong - Kết nối - Phát triển", CLB
         role: "truong_ban",
         mandate: "Cơ quan chuyên trách các chương trình nhân đạo, xây dựng điểm trường, tài trợ đồng bào lũ lụt và công tác an sinh xã hội của HanoiBA.",
         responsibilities: [
-          "Xây dựng kế hoạch và phát động các chiến dịch gây quỹ thiện nguyện trong hội viên và đối tác.",
+          "Xây dựng kế hoạch và phát động các chiến dịch gây quỹ thiện nguyện trong Học viên và đối tác.",
           "Quản lý nguồn quỹ thiện nguyện chuyên biệt trên hệ thống Web CRM (`/funds`).",
           "Phối hợp Ban Tài chính thực hiện quy trình kiểm soát chi tiêu 3 cấp trước khi giải ngân nguồn quỹ.",
-          "Cập nhật và công khai báo cáo sao kê thu chi tài chính thiện nguyện thời gian thực cho toàn thể hội viên."
+          "Cập nhật và công khai báo cáo sao kê thu chi tài chính thiện nguyện thời gian thực cho toàn thể Học viên."
         ]
       },
       {
@@ -181,9 +181,9 @@ Với sứ mệnh "Bản lĩnh - Tiên phong - Kết nối - Phát triển", CLB
         mandate: "Cơ quan chuyên trách thúc đẩy hợp tác đầu tư, liên minh kinh tế và hỗ trợ tiêu thụ sản phẩm giữa các doanh nghiệp thành viên.",
         responsibilities: [
           "Quản trị và kiểm duyệt sản phẩm, dịch vụ niêm yết trên Sàn Thương Mại Doanh Nhân B2B.",
-          "Thẩm định chính sách trợ giá nội bộ (Ưu đãi độc quyền từ 5% - 30% dành riêng cho hội viên CEO HN10).",
+          "Thẩm định chính sách trợ giá nội bộ (Ưu đãi độc quyền từ 5% - 30% dành riêng cho Học viên CEO HN10).",
           "Điều phối và duyệt các tin đăng trên Bảng tin Cơ hội Kinh doanh Cung - Cầu (Cần Mua / Cần Bán).",
-          "Tổ chức các phiên kết nối giao thương 1-on-1, ký kết biên bản ghi nhớ hợp tác chiến lược giữa các hội viên."
+          "Tổ chức các phiên kết nối giao thương 1-on-1, ký kết biên bản ghi nhớ hợp tác chiến lược giữa các Học viên."
         ]
       }
     ]
@@ -198,7 +198,7 @@ Với sứ mệnh "Bản lĩnh - Tiên phong - Kết nối - Phát triển", CLB
       { code: "BTN_BTC", name: "Ban Thiện Nguyện / Kế Toán" },
       { code: "BTT", name: "Ban Truyền Thông" },
       { code: "BXT", name: "Ban Xúc Tiến B2B" },
-      { code: "MEM", name: "Hội Viên Chính Thức" }
+      { code: "MEM", name: "Học viên Chính Thức" }
     ],
     processes: [
       {
@@ -288,7 +288,7 @@ Với sứ mệnh "Bản lĩnh - Tiên phong - Kết nối - Phát triển", CLB
   coreProcesses: [
     {
       id: "FLOW-01",
-      name: "Quy Trình Tiếp Nhận, Thẩm Định & Phê Duyệt Kết Nạp Hội Viên Mới",
+      name: "Quy Trình Tiếp Nhận, Thẩm Định & Phê Duyệt Kết Nạp Học viên Mới",
       actor: "Ứng viên Doanh nhân 1983, Ban Thành Viên (BTV), Hệ thống SMTP Mailer",
       steps: [
         {
@@ -308,8 +308,8 @@ Với sứ mệnh "Bản lĩnh - Tiên phong - Kết nối - Phát triển", CLB
         },
         {
           step: 4,
-          name: "Phê duyệt kết nạp & Cấp mã hội viên định danh",
-          desc: "Lãnh đạo BTV bấm nút 'Phê Duyệt Kết Nạp'. Hệ thống kiểm tra quyền hạn (Chỉ tài khoản BTV hoặc BQT tối cao mới được phép; chặn hoàn toàn Ban Thư Ký). Hệ thống tự động sinh Mã số hội viên chuẩn `CEO-83xxx` (VD: `CEO-83007`), chuyển trạng thái tài khoản sang `active`, tạo tài khoản đăng nhập và mật khẩu khởi tạo ngẫu nhiên bảo mật cao."
+          name: "Phê duyệt kết nạp & Cấp mã Học viên định danh",
+          desc: "Lãnh đạo BTV bấm nút 'Phê Duyệt Kết Nạp'. Hệ thống kiểm tra quyền hạn (Chỉ tài khoản BTV hoặc BQT tối cao mới được phép; chặn hoàn toàn Ban Thư Ký). Hệ thống tự động sinh Mã số Học viên chuẩn `CEO-83xxx` (VD: `CEO-83007`), chuyển trạng thái tài khoản sang `active`, tạo tài khoản đăng nhập và mật khẩu khởi tạo ngẫu nhiên bảo mật cao."
         },
         {
           step: 5,
@@ -321,7 +321,7 @@ Với sứ mệnh "Bản lĩnh - Tiên phong - Kết nối - Phát triển", CLB
     {
       id: "FLOW-02",
       name: "Quy Trình Quản Trị Hội Phí Thường Niên & Thu Nộp Qua VietQR Napas 24/7",
-      actor: "Hội viên chính thức, Ban Tài chính / Kế toán, Cổng thanh toán VietQR",
+      actor: "Học viên chính thức, Ban Tài chính / Kế toán, Cổng thanh toán VietQR",
       steps: [
         {
           step: 1,
@@ -331,44 +331,44 @@ Với sứ mệnh "Bản lĩnh - Tiên phong - Kết nối - Phát triển", CLB
         {
           step: 2,
           name: "Sinh mã VietQR động Napas 24/7",
-          desc: "Hội viên mở mục 'Hội Phí' trên Mobile App, nhấn 'Thanh Toán VietQR'. Hệ thống sinh mã QR động chuẩn Napas 24/7 chứa đầy đủ: Số tiền chính xác (5.000.000 VNĐ), Số tài khoản thụ hưởng của CLB CEO HN10 và Cú pháp chuẩn hóa: `HOIPHI CEO HN10 [MÃ_HỘI_VIÊN] [HỌ_TÊN]`."
+          desc: "Học viên mở mục 'Hội Phí' trên Mobile App, nhấn 'Thanh Toán VietQR'. Hệ thống sinh mã QR động chuẩn Napas 24/7 chứa đầy đủ: Số tiền chính xác (5.000.000 VNĐ), Số tài khoản thụ hưởng của CLB CEO HN10 và Cú pháp chuẩn hóa: `HOIPHI CEO HN10 [MÃ_HỘI_VIÊN] [HỌ_TÊN]`."
         },
         {
           step: 3,
           name: "Chuyển khoản liên ngân hàng",
-          desc: "Hội viên sử dụng ứng dụng Mobile Banking của bất kỳ ngân hàng thương mại nào tại Việt Nam, quét mã VietQR và xác nhận chuyển khoản nhanh 24/7 không cần nhập tay."
+          desc: "Học viên sử dụng ứng dụng Mobile Banking của bất kỳ ngân hàng thương mại nào tại Việt Nam, quét mã VietQR và xác nhận chuyển khoản nhanh 24/7 không cần nhập tay."
         },
         {
           step: 4,
           name: "Đối soát sao kê ngân hàng & Gạch nợ thủ công trên CRM",
-          desc: "Kế toán câu lạc bộ truy cập màn hình 'Quản Lý Hội Phí' (`/fees`) trên Web CRM. Đối soát số tiền và cú pháp giao dịch trên sao kê tài khoản ngân hàng thực tế. Khi khớp lệnh, kế toán bấm nút 'Duyệt Gạch Nợ' tương ứng với bản ghi hội viên."
+          desc: "Kế toán câu lạc bộ truy cập màn hình 'Quản Lý Hội Phí' (`/fees`) trên Web CRM. Đối soát số tiền và cú pháp giao dịch trên sao kê tài khoản ngân hàng thực tế. Khi khớp lệnh, kế toán bấm nút 'Duyệt Gạch Nợ' tương ứng với bản ghi Học viên."
         },
         {
           step: 5,
           name: "Kích hoạt gia hạn Thẻ VIP & Xuất hóa đơn điện tử",
-          desc: "Hệ thống tự động chuyển trạng thái bản ghi sang `paid`, cộng thêm +365 ngày vào hạn dùng của Thẻ hội viên VIP (`term_end`), đồng thời tạo hóa đơn điện tử (`invoices`) và gửi thông báo xác nhận đã hoàn thành nghĩa vụ tài chính đến hội viên."
+          desc: "Hệ thống tự động chuyển trạng thái bản ghi sang `paid`, cộng thêm +365 ngày vào hạn dùng của Thẻ Học viên VIP (`term_end`), đồng thời tạo hóa đơn điện tử (`invoices`) và gửi thông báo xác nhận đã hoàn thành nghĩa vụ tài chính đến Học viên."
         }
       ]
     },
     {
       id: "FLOW-03",
       name: "Quy Trình Tổ Chức Sự Kiện Gala, Thiết Kế Sơ Đồ Ghế & Soát Vé QR Gate",
-      actor: "Ban Truyền Thông (BTT), Ban Thư Ký (BTK), Hội viên, Đại biểu khách mời",
+      actor: "Ban Truyền Thông (BTT), Ban Thư Ký (BTK), Học viên, Đại biểu khách mời",
       steps: [
         {
           step: 1,
           name: "Khởi tạo sự kiện & Cấu hình gói vé",
-          desc: "Ban Truyền Thông tạo sự kiện Gala trên Web CRM (`/events`), thiết lập thông tin: Tên chương trình, thời gian, địa điểm tổ chức, diễn giả VIP và cấu hình các loại vé: Vé VIP Đại biểu danh dự (0 VNĐ), Vé Hội viên chính thức (0 VNĐ), Vé Khách mời mở rộng có phí (1.500.000 VNĐ)."
+          desc: "Ban Truyền Thông tạo sự kiện Gala trên Web CRM (`/events`), thiết lập thông tin: Tên chương trình, thời gian, địa điểm tổ chức, diễn giả VIP và cấu hình các loại vé: Vé VIP Đại biểu danh dự (0 VNĐ), Vé Học viên chính thức (0 VNĐ), Vé Khách mời mở rộng có phí (1.500.000 VNĐ)."
         },
         {
           step: 2,
           name: "Thiết kế sơ đồ chỗ ngồi trực quan (Cinema Seating Map)",
-          desc: "Ban tổ chức sử dụng công cụ thiết kế sơ đồ ghế trực quan (`/events/seating`), bố trí bàn tròn Gala VIP 10 chỗ (Bàn VIP 1 đến VIP 6 dành cho Lãnh đạo Thành ủy, HanoiBA), dãy ghế đại biểu danh dự và các bàn tiệc hội viên."
+          desc: "Ban tổ chức sử dụng công cụ thiết kế sơ đồ ghế trực quan (`/events/seating`), bố trí bàn tròn Gala VIP 10 chỗ (Bàn VIP 1 đến VIP 6 dành cho Lãnh đạo Thành ủy, HanoiBA), dãy ghế đại biểu danh dự và các bàn tiệc Học viên."
         },
         {
           step: 3,
           name: "Đăng ký vé & Nhận E-Ticket QR độc bản",
-          desc: "Hội viên đăng ký tham dự qua Mobile App, hệ thống tự động gán vị trí bàn tiệc và phát hành Vé điện tử E-Ticket lưu trong Ví vé offline. Mã vé chứa chuỗi QR mã hóa bảo mật độc bản và số may mắn tham dự quay thưởng (#LUCKY-xxxx)."
+          desc: "Học viên đăng ký tham dự qua Mobile App, hệ thống tự động gán vị trí bàn tiệc và phát hành Vé điện tử E-Ticket lưu trong Ví vé offline. Mã vé chứa chuỗi QR mã hóa bảo mật độc bản và số may mắn tham dự quay thưởng (#LUCKY-xxxx)."
         },
         {
           step: 4,
@@ -421,8 +421,8 @@ Với sứ mệnh "Bản lĩnh - Tiên phong - Kết nối - Phát triển", CLB
     {
       id: "BR-01",
       code: "RULE-AUTH-BTV-EXCLUSIVE",
-      name: "Quy Tắc Độc Quyền Thẩm Định & Phê Duyệt Hội Viên Của Ban Thành Viên",
-      desc: "Thẩm quyền xem xét hồ sơ, đối soát tính hợp lệ doanh nghiệp và bấm nút 'Phê Duyệt Kết Nạp' hội viên mới thuộc về duy nhất Ban Thành Viên (tài khoản `ceo.thanhvien@ceohn10.com`) hoặc Ban Quản Trị tối cao (`admin@connect.vn`). Ban Thư Ký và các ban chuyên môn khác TUYỆT ĐỐI KHÔNG CÓ THẨM QUYỀN DUYỆT HỘI VIÊN. Nếu cố tình can thiệp qua API hoặc giao diện, hệ thống bắt buộc chặn đứng bằng mã lỗi HTTP 403 Forbidden."
+      name: "Quy Tắc Độc Quyền Thẩm Định & Phê Duyệt Học viên Của Ban Thành Viên",
+      desc: "Thẩm quyền xem xét hồ sơ, đối soát tính hợp lệ doanh nghiệp và bấm nút 'Phê Duyệt Kết Nạp' Học viên mới thuộc về duy nhất Ban Thành Viên (tài khoản `ceo.thanhvien@ceohn10.com`) hoặc Ban Quản Trị tối cao (`admin@connect.vn`). Ban Thư Ký và các ban chuyên môn khác TUYỆT ĐỐI KHÔNG CÓ THẨM QUYỀN DUYỆT Học viên. Nếu cố tình can thiệp qua API hoặc giao diện, hệ thống bắt buộc chặn đứng bằng mã lỗi HTTP 403 Forbidden."
     },
     {
       id: "BR-02",
@@ -439,8 +439,8 @@ Với sứ mệnh "Bản lĩnh - Tiên phong - Kết nối - Phát triển", CLB
     {
       id: "BR-04",
       code: "RULE-MEMBER-BIRTHYEAR-1983",
-      name: "Quy Tắc Ràng Buộc Năm Sinh Hội Viên Chính Thức (Quý Hợi 1983)",
-      desc: "Biểu mẫu đăng ký gia nhập hội viên chính thức bắt buộc kiểm tra trường năm sinh của người đại diện pháp luật phải chính xác là năm 1983. Mọi trường hợp sinh năm khác 1983 chỉ được tiếp nhận ở tư cách 'Khách mời danh dự' hoặc 'Đối tác liên kết' sau khi có nghị quyết phê duyệt riêng của Ban Quản Trị."
+      name: "Quy Tắc Ràng Buộc Năm Sinh Học viên Chính Thức (Quý Hợi 1983)",
+      desc: "Biểu mẫu đăng ký gia nhập Học viên chính thức bắt buộc kiểm tra trường năm sinh của người đại diện pháp luật phải chính xác là năm 1983. Mọi trường hợp sinh năm khác 1983 chỉ được tiếp nhận ở tư cách 'Khách mời danh dự' hoặc 'Đối tác liên kết' sau khi có nghị quyết phê duyệt riêng của Ban Quản Trị."
     },
     {
       id: "BR-05",
@@ -458,7 +458,7 @@ Với sứ mệnh "Bản lĩnh - Tiên phong - Kết nối - Phát triển", CLB
       id: "BR-07",
       code: "RULE-VOTING-ONE-PERSON-ONE-VOTE",
       name: "Quy Tắc Biểu Quyết Đại Hội 1 Người 1 Phiếu",
-      desc: "Mỗi hội viên chính thức (`member`) có trạng thái hội phí `paid` chỉ sở hữu đúng 01 phiếu biểu quyết duy nhất cho mỗi nghị quyết đại hội. Phiếu bầu được mã hóa một chiều đảm bảo tính ẩn danh tuyệt đối và không thể sửa đổi sau khi đã bấm xác nhận gửi phiếu."
+      desc: "Mỗi Học viên chính thức (`member`) có trạng thái hội phí `paid` chỉ sở hữu đúng 01 phiếu biểu quyết duy nhất cho mỗi nghị quyết đại hội. Phiếu bầu được mã hóa một chiều đảm bảo tính ẩn danh tuyệt đối và không thể sửa đổi sau khi đã bấm xác nhận gửi phiếu."
     },
     {
       id: "BR-08",
@@ -487,14 +487,14 @@ Với sứ mệnh "Bản lĩnh - Tiên phong - Kết nối - Phát triển", CLB
     {
       id: "BR-12",
       code: "RULE-EVT-USER-OVERLAP-WARNING",
-      name: "Quy Tắc Cảnh Báo Trùng Khung Giờ Đăng Ký Sự Kiện Hội Viên (confirmOverlap)",
-      desc: "Khi hội viên đăng ký một sự kiện mới có cùng thời gian diễn ra với một sự kiện khác mà hội viên đó đã đăng ký trước đó, hệ thống không chặn cứng mà BẮT BUỘC hiển thị hộp thoại cảnh báo xác nhận: 'Bạn đang đăng ký sự kiện [Tên sự kiện mới] cùng thời gian với sự kiện [Tên sự kiện cũ] ([Thời gian]). Bạn có chắc muốn đăng ký thêm không?'. Khi hội viên chủ động bấm 'Tiếp Tục Đăng Ký', client gửi kèm cờ `confirmOverlap: true` để backend phê duyệt lưu bản ghi."
+      name: "Quy Tắc Cảnh Báo Trùng Khung Giờ Đăng Ký Sự Kiện Học viên (confirmOverlap)",
+      desc: "Khi Học viên đăng ký một sự kiện mới có cùng thời gian diễn ra với một sự kiện khác mà Học viên đó đã đăng ký trước đó, hệ thống không chặn cứng mà BẮT BUỘC hiển thị hộp thoại cảnh báo xác nhận: 'Bạn đang đăng ký sự kiện [Tên sự kiện mới] cùng thời gian với sự kiện [Tên sự kiện cũ] ([Thời gian]). Bạn có chắc muốn đăng ký thêm không?'. Khi Học viên chủ động bấm 'Tiếp Tục Đăng Ký', client gửi kèm cờ `confirmOverlap: true` để backend phê duyệt lưu bản ghi."
     },
     {
       id: "BR-13",
       code: "RULE-SMTP-FAIL-SUPPRESSION",
       name: "Quy Tắc Kiểm Soát Thư Tín SMTP & Khóa Gửi 1-Fail Suppression List",
-      desc: "Máy chủ dịch vụ thư điện tử (SMTP Relay) phải chủ động lọc và bỏ qua các địa chỉ hòm thư giả lập, kiểm thử nội bộ (`@ceohn10.com`, `test`, `dummy`). Đối với các email hội viên thực tế, nếu gửi thất bại ngay lần đầu (mã lỗi 5xx, Recipient Rejected, Mailbox Unavailable), hệ thống lập tức đưa email đó vào Danh Sách Chặn (Suppression List - lưu trữ tại `uploads/mail_suppression_list.json`) và TUYỆT ĐỐI KHÔNG thử lại lần thứ 2, nhằm triệt tiêu hoàn toàn vòng lặp thử lại vô hạn 47 giờ gây quá tải hạ tầng và rủi ro bị khóa tài khoản Google Mailer-Daemon."
+      desc: "Máy chủ dịch vụ thư điện tử (SMTP Relay) phải chủ động lọc và bỏ qua các địa chỉ hòm thư giả lập, kiểm thử nội bộ (`@ceohn10.com`, `test`, `dummy`). Đối với các email Học viên thực tế, nếu gửi thất bại ngay lần đầu (mã lỗi 5xx, Recipient Rejected, Mailbox Unavailable), hệ thống lập tức đưa email đó vào Danh Sách Chặn (Suppression List - lưu trữ tại `uploads/mail_suppression_list.json`) và TUYỆT ĐỐI KHÔNG thử lại lần thứ 2, nhằm triệt tiêu hoàn toàn vòng lặp thử lại vô hạn 47 giờ gây quá tải hạ tầng và rủi ro bị khóa tài khoản Google Mailer-Daemon."
     },
     {
       id: "BR-14",
@@ -512,7 +512,7 @@ Với sứ mệnh "Bản lĩnh - Tiên phong - Kết nối - Phát triển", CLB
       id: "BR-16",
       code: "RULE-AI-32-FEATURES-TWO-PHASE-GPS-GUIDE",
       name: "Quy Chuẩn Trợ Lý AI Điều Hành 32 Tính Năng & Cơ Chế 2 Pha Chỉ Dẫn Trực Tiếp (Voice GPS Tour Spotlight)",
-      desc: "1) Nền tảng 100% Miễn Phí: Kết hợp Google Gemini 2.0 Flash Free Tier, Web Speech API vi-VN và Smart Hybrid NLP Engine nội bộ, đảm bảo 0đ chi phí vận hành và tốc độ phản hồi < 400ms. 2) Tự Động Nắm Bắt Phiên Đăng Nhập: Truy vấn dữ liệu thực tế thời gian thực (Hồ sơ cá nhân, Hội phí nợ, Thông báo chưa đọc, Vé sự kiện đã đặt, Top 5 sự kiện đông nhất). 3) Quy Trình Đàm Thoại 2 Pha: Pha 1 giải thích chi tiết các bước thao tác và chủ động hỏi: 'Quý Anh/Chị có muốn tôi hướng dẫn thao tác trực tiếp trên màn hình không?'; Pha 2 khi người dùng bấm 'Có' hoặc nói khẩu lệnh khẳng định ('Có', 'Đồng ý', 'Bắt đầu', 'OK'), hệ thống tự động đóng modal, điều hướng URL đến trang đích và kích hoạt Spotlight viền vàng nhấp nháy dẫn đường từng bước như Google Maps. 4) Ma Trận 32 Tính Năng Toàn Diện: Bao phủ 24 chức năng nội bộ hội viên và 8 chức năng quản trị CRM bên ngoài, không bỏ sót bất kỳ phân hệ nào."
+      desc: "1) Nền tảng 100% Miễn Phí: Kết hợp Google Gemini 2.0 Flash Free Tier, Web Speech API vi-VN và Smart Hybrid NLP Engine nội bộ, đảm bảo 0đ chi phí vận hành và tốc độ phản hồi < 400ms. 2) Tự Động Nắm Bắt Phiên Đăng Nhập: Truy vấn dữ liệu thực tế thời gian thực (Hồ sơ cá nhân, Hội phí nợ, Thông báo chưa đọc, Vé sự kiện đã đặt, Top 5 sự kiện đông nhất). 3) Quy Trình Đàm Thoại 2 Pha: Pha 1 giải thích chi tiết các bước thao tác và chủ động hỏi: 'Quý Anh/Chị có muốn tôi hướng dẫn thao tác trực tiếp trên màn hình không?'; Pha 2 khi người dùng bấm 'Có' hoặc nói khẩu lệnh khẳng định ('Có', 'Đồng ý', 'Bắt đầu', 'OK'), hệ thống tự động đóng modal, điều hướng URL đến trang đích và kích hoạt Spotlight viền vàng nhấp nháy dẫn đường từng bước như Google Maps. 4) Ma Trận 32 Tính Năng Toàn Diện: Bao phủ 24 chức năng nội bộ Học viên và 8 chức năng quản trị CRM bên ngoài, không bỏ sót bất kỳ phân hệ nào."
     }
   ],
 
@@ -528,13 +528,13 @@ Với sứ mệnh "Bản lĩnh - Tiên phong - Kết nối - Phát triển", CLB
       item: "Trợ Lý AI Điều Hành & Dẫn Đường Thao Tác Trực Tiếp (Turn-by-Turn Voice GPS)",
       designedState: "Người dùng phải đọc tài liệu văn bản tĩnh hoặc xem video hướng dẫn rời rạc, tự tìm kiếm các nút bấm phức tạp trên giao diện.",
       actualState: "Đã tích hợp Trợ lý AI giọng nói tiếng Việt 100% miễn phí (Gemini 2.0 Flash Free Tier + Web Speech API); cơ chế 2 pha đàm thoại thông minh; tự động lái màn hình và chiếu Spotlight viền vàng nhấp nháy vào đúng nút cần thao tác khi người dùng đồng ý.",
-      operationalSolution: "Hội viên và cán bộ quản trị chỉ cần mở micro nói khẩu lệnh (ví dụ: 'Đăng ký sự kiện như nào', 'Tạo sự kiện mới kiểu gì', 'Có'), AI tự động giải thích và dẫn đường tận tay."
+      operationalSolution: "Học viên và cán bộ quản trị chỉ cần mở micro nói khẩu lệnh (ví dụ: 'Đăng ký sự kiện như nào', 'Tạo sự kiện mới kiểu gì', 'Có'), AI tự động giải thích và dẫn đường tận tay."
     },
     {
       item: "Đăng Nhập Một Chạm (SSO Google / Apple)",
       designedState: "Đăng nhập tức thì chỉ với một chạm qua Google OAuth 2.0 hoặc Apple Sign-In.",
       actualState: "Đã thiết kế nút bấm UI trên màn hình đăng nhập; chưa cấu hình chính thức Google Client ID và Apple Developer Service ID.",
-      operationalSolution: "Hội viên và cán bộ quản lý đăng nhập ổn định bằng Số điện thoại / Email kết hợp Mật khẩu tài khoản cá nhân."
+      operationalSolution: "Học viên và cán bộ quản lý đăng nhập ổn định bằng Số điện thoại / Email kết hợp Mật khẩu tài khoản cá nhân."
     },
     {
       item: "Phòng Họp Trực Tuyến Trực Tiếp (In-app Video Call)",
@@ -555,10 +555,10 @@ Với sứ mệnh "Bản lĩnh - Tiên phong - Kết nối - Phát triển", CLB
       operationalSolution: "Backend API `POST /api/association/events` tự động quét các sự kiện active cùng ngày/giờ; nếu trùng địa điểm thì trả về HTTP 409 kèm gợi ý thời gian đăng ký khả dụng."
     },
     {
-      item: "Cảnh Báo Đăng Ký Sự Kiện Trùng Lịch Hội Viên",
-      designedState: "Hội viên có thể vô tình hoặc cố ý đăng ký tham dự nhiều sự kiện diễn ra cùng thời gian ở 2 địa điểm khác nhau mà không có bất kỳ cảnh báo nào từ hệ thống.",
+      item: "Cảnh Báo Đăng Ký Sự Kiện Trùng Lịch Học viên",
+      designedState: "Học viên có thể vô tình hoặc cố ý đăng ký tham dự nhiều sự kiện diễn ra cùng thời gian ở 2 địa điểm khác nhau mà không có bất kỳ cảnh báo nào từ hệ thống.",
       actualState: "Giao diện và API đã bổ sung bước xác thực overlap. Hiển thị modal cảnh báo xác nhận rõ tên sự kiện cũ và mới, thời gian trùng lặp; chỉ lưu khi có cờ `confirmOverlap: true`.",
-      operationalSolution: "Mobile App hiển thị Confirm Dialog giải thích xung đột; khi hội viên bấm 'Tiếp Tục Đăng Ký', API nhận `confirmOverlap = true` để lưu vé hợp lệ."
+      operationalSolution: "Mobile App hiển thị Confirm Dialog giải thích xung đột; khi Học viên bấm 'Tiếp Tục Đăng Ký', API nhận `confirmOverlap = true` để lưu vé hợp lệ."
     },
     {
       item: "Vòng Lặp Thử Lại Thư Điện Tử (Google Mailer-Daemon Loop)",

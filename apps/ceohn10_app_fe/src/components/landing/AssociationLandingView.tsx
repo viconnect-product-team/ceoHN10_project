@@ -39,14 +39,14 @@ const LAND_I18N = {
   vi: {
     heroBadge: "NỀN TẢNG SỐ HÓA HIỆP HỘI DOANH NGHIỆP",
     heroTagline: "Gắn kết doanh nhân — Nâng tầm giá trị thương hiệu",
-    heroDesc: "Cộng đồng kết nối giao thương, hợp tác đầu tư và chia sẻ tri thức quản trị bền vững. Trải nghiệm ứng dụng hội viên với đầy đủ thẻ số, danh bạ B2B và đặc quyền sự kiện.",
-    ctaOpen: "Mở App Hội Viên",
+    heroDesc: "Cộng đồng kết nối giao thương, hợp tác đầu tư và chia sẻ tri thức quản trị bền vững. Trải nghiệm ứng dụng Học viên với đầy đủ thẻ số, danh bạ B2B và đặc quyền sự kiện.",
+    ctaOpen: "Mở App Học viên",
     ctaContact: "Liên hệ ban thư ký",
     ctaSignIn: "Đăng nhập",
     passTitle: "Quét mã để cài đặt & mở ứng dụng",
     passSubtitle: "Hỗ trợ tức thì trên cả iPhone, Android & Máy tính",
     passDirect: "Mở trực tiếp trên trình duyệt",
-    stat1: "Hội viên chính thức",
+    stat1: "Học viên chính thức",
     stat2: "Sự kiện thường niên",
     stat3: "Số hóa danh thiếp & vé",
     stat4: "Kết nối giao thương B2B",
@@ -54,9 +54,9 @@ const LAND_I18N = {
     leadTitle: "Đội Ngũ Lãnh Đạo Tiên Phong",
     leadTerm: "Nhiệm kỳ 2026 — 2030",
     featTag: "HỆ SINH THÁI TÍNH NĂNG TOÀN DIỆN",
-    featTitle: "Quyền Lợi & Tiện Ích Dành Cho Hội Viên",
+    featTitle: "Quyền Lợi & Tiện Ích Dành Cho Học viên",
     featDesc: "Nền tảng số hóa tối tân mang đến trải nghiệm kết nối đỉnh cao cho các nhà lãnh đạo và doanh nhân thành đạt.",
-    f1Title: "Thẻ Hội Viên VIP Số & NFC",
+    f1Title: "Thẻ Học viên VIP Số & NFC",
     f1Desc: "Định danh doanh nhân chuẩn quốc tế, tích hợp mã QR động, chip NFC và đồng bộ Apple Wallet & Google Wallet.",
     f2Title: "Sàn Kết Nối Giao Thương B2B",
     f2Desc: "Đăng tải nhu cầu mua - bán - hợp tác. AI thông minh tự động gợi ý đối tác phù hợp nhất trong mạng lưới.",
@@ -73,7 +73,7 @@ const LAND_I18N = {
     oppPost: "Đăng nhu cầu mới",
     oppMatch: "Kết nối giao thương",
     prodTag: "SẢN PHẨM & DỊCH VỤ",
-    prodTitle: "Gian Hàng Doanh Nghiệp Hội Viên",
+    prodTitle: "Gian Hàng Doanh Nghiệp Học viên",
     prodAll: "Xem tất cả gian hàng",
     prodDetail: "Xem chi tiết & Báo giá",
     modTitle: "Khám Phá Các Phân Hệ Ứng Dụng",
@@ -402,7 +402,7 @@ export function AssociationLandingView({ a }: { a: PublicAssociation }) {
       try {
         const raw = localStorage.getItem("ceohn10_landing_web_config");
         if (raw) return JSON.parse(raw);
-      } catch {}
+      } catch { }
     }
     return null;
   });
@@ -437,201 +437,201 @@ export function AssociationLandingView({ a }: { a: PublicAssociation }) {
 
   const leaders = isCeo1983
     ? [
-        {
-          name: "Lê Hoàng Long",
-          role: lang === "vi" ? "Chủ tịch CLB CEO HN10" : lang === "en" ? "President of CEO HN10 Club" : lang === "ja" ? "CEO HN10 クラブ 会長" : lang === "ko" ? "CEO HN10 클럽 회장" : "CEO HN10 俱乐部会长",
-          company: "Long Tech Solutions",
-          title: lang === "vi" ? "Tổng Giám Đốc" : "CEO & Founder",
-          avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
-        },
-        {
-          name: "Trần Thị Mai Lan",
-          role: lang === "vi" ? "Phó Chủ tịch kiêm Tổng Thư ký" : lang === "en" ? "Vice President & Secretary General" : lang === "ja" ? "副会長 兼 事務総長" : lang === "ko" ? "부회장 겸 사무총장" : "副会长兼秘书长",
-          company: "Mai Lan Logistics",
-          title: lang === "vi" ? "Chủ tịch HĐQT" : "Chairwoman",
-          avatar: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=150&auto=format&fit=crop&q=80",
-        },
-        {
-          name: "Phạm Đức Minh",
-          role: lang === "vi" ? "Phó Chủ tịch ban Xúc tiến TM" : lang === "en" ? "VP of Trade Promotion" : lang === "ja" ? "貿易促進担当 副会長" : lang === "ko" ? "무역진흥 부회장" : "贸易促进副会长",
-          company: "Minh Capital Investment",
-          title: "Managing Partner",
-          avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80",
-        },
-        {
-          name: "Vũ Thu Trang",
-          role: lang === "vi" ? "Trưởng ban Truyền thông & Sự kiện" : lang === "en" ? "Head of Media & Events" : lang === "ja" ? "広報＆イベント部長" : lang === "ko" ? "미디어 & 이벤트 위원장" : "媒体与活动部部长",
-          company: "Trang Media & Events",
-          title: lang === "vi" ? "Giám đốc Điều hành" : "Managing Director",
-          avatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80",
-        },
-      ]
+      {
+        name: "Lê Hoàng Long",
+        role: lang === "vi" ? "Chủ tịch CLB CEO HN10" : lang === "en" ? "President of CEO HN10 Club" : lang === "ja" ? "CEO HN10 クラブ 会長" : lang === "ko" ? "CEO HN10 클럽 회장" : "CEO HN10 俱乐部会长",
+        company: "Long Tech Solutions",
+        title: lang === "vi" ? "Tổng Giám Đốc" : "CEO & Founder",
+        avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
+      },
+      {
+        name: "Trần Thị Mai Lan",
+        role: lang === "vi" ? "Phó Chủ tịch kiêm Tổng Thư ký" : lang === "en" ? "Vice President & Secretary General" : lang === "ja" ? "副会長 兼 事務総長" : lang === "ko" ? "부회장 겸 사무총장" : "副会长兼秘书长",
+        company: "Mai Lan Logistics",
+        title: lang === "vi" ? "Chủ tịch HĐQT" : "Chairwoman",
+        avatar: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=150&auto=format&fit=crop&q=80",
+      },
+      {
+        name: "Phạm Đức Minh",
+        role: lang === "vi" ? "Phó Chủ tịch ban Xúc tiến TM" : lang === "en" ? "VP of Trade Promotion" : lang === "ja" ? "貿易促進担当 副会長" : lang === "ko" ? "무역진흥 부회장" : "贸易促进副会长",
+        company: "Minh Capital Investment",
+        title: "Managing Partner",
+        avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80",
+      },
+      {
+        name: "Vũ Thu Trang",
+        role: lang === "vi" ? "Trưởng ban Truyền thông & Sự kiện" : lang === "en" ? "Head of Media & Events" : lang === "ja" ? "広報＆イベント部長" : lang === "ko" ? "미디어 & 이벤트 위원장" : "媒体与活动部部长",
+        company: "Trang Media & Events",
+        title: lang === "vi" ? "Giám đốc Điều hành" : "Managing Director",
+        avatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80",
+      },
+    ]
     : [
-        {
-          name: "Trần Đăng Khoa",
-          role: lang === "vi" ? "Chủ tịch Hội HanoiBA" : lang === "en" ? "President of HanoiBA" : lang === "ja" ? "HanoiBA 会長" : lang === "ko" ? "HanoiBA 회장" : "HanoiBA 会长",
-          company: "Khoa Vàng Tech Group",
-          title: lang === "vi" ? "Chủ tịch HĐQT" : "Chairman of the Board",
-          avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80",
-        },
-        {
-          name: "Lê Minh Hưng",
-          role: lang === "vi" ? "Phó Chủ tịch Hội" : lang === "en" ? "Vice President" : lang === "ja" ? "副会長" : lang === "ko" ? "부회장" : "副会长",
-          company: "Hưng Thịnh Real Estate",
-          title: lang === "vi" ? "Phó Chủ tịch HĐQT" : "Vice Chairman",
-          avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&auto=format&fit=crop&q=80",
-        },
-        {
-          name: "Nguyễn Thị Bích Ngọc",
-          role: lang === "vi" ? "Phó Chủ tịch kiêm Tổng Thư ký" : lang === "en" ? "Vice President & Secretary General" : lang === "ja" ? "副会長 兼 事務総長" : lang === "ko" ? "부회장 겸 사무총장" : "副会长兼秘书长",
-          company: "Bích Ngọc Global Trade",
-          title: lang === "vi" ? "Tổng Giám Đốc" : "General Director",
-          avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&auto=format&fit=crop&q=80",
-        },
-        {
-          name: "Phạm Hải Đăng",
-          role: lang === "vi" ? "Ủy viên BCH - Trưởng ban XTTM" : lang === "en" ? "Board Member - Head of Trade" : lang === "ja" ? "理事・貿易促進委員長" : lang === "ko" ? "이사회 이사 - 무역진흥위원장" : "理事·贸易促进部长",
-          company: "Đăng Quang Logistics",
-          title: lang === "vi" ? "Chủ tịch HĐQT" : "Chairman of the Board",
-          avatar: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=150&auto=format&fit=crop&q=80",
-        },
-      ];
+      {
+        name: "Trần Đăng Khoa",
+        role: lang === "vi" ? "Chủ tịch Hội HanoiBA" : lang === "en" ? "President of HanoiBA" : lang === "ja" ? "HanoiBA 会長" : lang === "ko" ? "HanoiBA 회장" : "HanoiBA 会长",
+        company: "Khoa Vàng Tech Group",
+        title: lang === "vi" ? "Chủ tịch HĐQT" : "Chairman of the Board",
+        avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80",
+      },
+      {
+        name: "Lê Minh Hưng",
+        role: lang === "vi" ? "Phó Chủ tịch Hội" : lang === "en" ? "Vice President" : lang === "ja" ? "副会長" : lang === "ko" ? "부회장" : "副会长",
+        company: "Hưng Thịnh Real Estate",
+        title: lang === "vi" ? "Phó Chủ tịch HĐQT" : "Vice Chairman",
+        avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&auto=format&fit=crop&q=80",
+      },
+      {
+        name: "Nguyễn Thị Bích Ngọc",
+        role: lang === "vi" ? "Phó Chủ tịch kiêm Tổng Thư ký" : lang === "en" ? "Vice President & Secretary General" : lang === "ja" ? "副会長 兼 事務総長" : lang === "ko" ? "부회장 겸 사무총장" : "副会长兼秘书长",
+        company: "Bích Ngọc Global Trade",
+        title: lang === "vi" ? "Tổng Giám Đốc" : "General Director",
+        avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&auto=format&fit=crop&q=80",
+      },
+      {
+        name: "Phạm Hải Đăng",
+        role: lang === "vi" ? "Ủy viên BCH - Trưởng ban XTTM" : lang === "en" ? "Board Member - Head of Trade" : lang === "ja" ? "理事・貿易促進委員長" : lang === "ko" ? "이사회 이사 - 무역진흥위원장" : "理事·贸易促进部长",
+        company: "Đăng Quang Logistics",
+        title: lang === "vi" ? "Chủ tịch HĐQT" : "Chairman of the Board",
+        avatar: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=150&auto=format&fit=crop&q=80",
+      },
+    ];
 
   const events = isCeo1983
     ? [
-        {
-          day: "18",
-          month: lang === "vi" ? "THÁNG 9" : "SEP",
-          title: lang === "vi" ? "Đại Hội Kết Nối Giao Thương CEO HN10 - Quý III/2026" : "CEO HN10 Business Matchmaking Summit - Q3/2026",
-          time: "18:00 - 21:30",
-          location: "JW Marriott Hotel, Hanoi",
-          type: "Gala & Summit",
-        },
-        {
-          day: "25",
-          month: lang === "vi" ? "THÁNG 9" : "SEP",
-          title: lang === "vi" ? "Tọa Đàm: Quản Trị Dữ Liệu & Thẻ Hội Viên Số Doanh Nghiệp" : "Executive Workshop: Enterprise Data & Digital Member Identity",
-          time: "08:30 - 11:30",
-          location: "Lotte International Convention Center, Hanoi",
-          type: "Workshop",
-        },
-        {
-          day: "05",
-          month: lang === "vi" ? "THÁNG 10" : "OCT",
-          title: lang === "vi" ? "Giải Golf Kỷ Niệm Thành Lập CLB CEO HN10" : "CEO HN10 Anniversary Golf Championship",
-          time: "06:00 - 15:00",
-          location: "Long Bien Golf Course, Hanoi",
-          type: "Sports & Networking",
-        },
-      ]
+      {
+        day: "18",
+        month: lang === "vi" ? "THÁNG 9" : "SEP",
+        title: lang === "vi" ? "Đại Hội Kết Nối Giao Thương CEO HN10 - Quý III/2026" : "CEO HN10 Business Matchmaking Summit - Q3/2026",
+        time: "18:00 - 21:30",
+        location: "JW Marriott Hotel, Hanoi",
+        type: "Gala & Summit",
+      },
+      {
+        day: "25",
+        month: lang === "vi" ? "THÁNG 9" : "SEP",
+        title: lang === "vi" ? "Tọa Đàm: Quản Trị Dữ Liệu & Thẻ Học viên Số Doanh Nghiệp" : "Executive Workshop: Enterprise Data & Digital Member Identity",
+        time: "08:30 - 11:30",
+        location: "Lotte International Convention Center, Hanoi",
+        type: "Workshop",
+      },
+      {
+        day: "05",
+        month: lang === "vi" ? "THÁNG 10" : "OCT",
+        title: lang === "vi" ? "Giải Golf Kỷ Niệm Thành Lập CLB CEO HN10" : "CEO HN10 Anniversary Golf Championship",
+        time: "06:00 - 15:00",
+        location: "Long Bien Golf Course, Hanoi",
+        type: "Sports & Networking",
+      },
+    ]
     : [
-        {
-          day: "15",
-          month: lang === "vi" ? "THÁNG 9" : "SEP",
-          title: lang === "vi" ? "Diễn Đàn Doanh Nghiệp Trẻ Thủ Đô 2026: Đột Phá AI & Chuyển Đổi Xanh" : "Hanoi Young Entrepreneurs Forum 2026: AI & Green Transition",
-          time: "08:00 - 17:00",
-          location: "National Convention Center, Hanoi",
-          type: "Summit",
-        },
-        {
-          day: "28",
-          month: lang === "vi" ? "THÁNG 9" : "SEP",
-          title: lang === "vi" ? "Đại Hội Hội Doanh Nghiệp Trẻ Hà Nội Khóa IX (2026 - 2030)" : "HanoiBA 9th General Assembly (2026 - 2030)",
-          time: "13:30 - 21:00",
-          location: "Melia Hotel, Hoan Kiem, Hanoi",
-          type: "Congress",
-        },
-        {
-          day: "12",
-          month: lang === "vi" ? "THÁNG 10" : "OCT",
-          title: lang === "vi" ? "Giải Golf HanoiBA Open 2026 & Kết Nối Giao Thương B2B" : "HanoiBA Open 2026 Golf Championship & B2B Matchmaking",
-          time: "06:00 - 18:00",
-          location: "BRG Kings Island Golf Resort, Son Tay",
-          type: "Golf Championship",
-        },
-      ];
+      {
+        day: "15",
+        month: lang === "vi" ? "THÁNG 9" : "SEP",
+        title: lang === "vi" ? "Diễn Đàn Doanh Nghiệp Trẻ Thủ Đô 2026: Đột Phá AI & Chuyển Đổi Xanh" : "Hanoi Young Entrepreneurs Forum 2026: AI & Green Transition",
+        time: "08:00 - 17:00",
+        location: "National Convention Center, Hanoi",
+        type: "Summit",
+      },
+      {
+        day: "28",
+        month: lang === "vi" ? "THÁNG 9" : "SEP",
+        title: lang === "vi" ? "Đại Hội Hội Doanh Nghiệp Trẻ Hà Nội Khóa IX (2026 - 2030)" : "HanoiBA 9th General Assembly (2026 - 2030)",
+        time: "13:30 - 21:00",
+        location: "Melia Hotel, Hoan Kiem, Hanoi",
+        type: "Congress",
+      },
+      {
+        day: "12",
+        month: lang === "vi" ? "THÁNG 10" : "OCT",
+        title: lang === "vi" ? "Giải Golf HanoiBA Open 2026 & Kết Nối Giao Thương B2B" : "HanoiBA Open 2026 Golf Championship & B2B Matchmaking",
+        time: "06:00 - 18:00",
+        location: "BRG Kings Island Golf Resort, Son Tay",
+        type: "Golf Championship",
+      },
+    ];
 
   const opportunities = isCeo1983
     ? [
-        {
-          tag: lang === "vi" ? "CẦN TÌM ĐỐI TÁC" : "PARTNER SEARCH",
-          tagColor: "bg-blue-500/15 text-blue-400 border-blue-500/30",
-          title: lang === "vi" ? "Tìm đối tác cung ứng vật liệu xây dựng & thép kết cấu cho dự án nghỉ dưỡng" : "Seeking supplier for structural steel and construction materials for resort project",
-          company: "Bảo Gia Construction",
-          budget: "5.000.000.000 đ",
-        },
-        {
-          tag: lang === "vi" ? "HỢP TÁC ĐẦU TƯ" : "INVESTMENT",
-          tagColor: "bg-amber-500/15 text-amber-400 border-amber-500/30",
-          title: lang === "vi" ? "Hợp tác phát triển giải pháp ERP và CRM cho chuỗi 30 nhà hàng ẩm thực" : "Cooperation to deploy cloud ERP & CRM for 30 restaurant franchise chain",
-          company: "Yến Ngọc Hospitality",
-          budget: "800.000.000 đ",
-        },
-      ]
+      {
+        tag: lang === "vi" ? "CẦN TÌM ĐỐI TÁC" : "PARTNER SEARCH",
+        tagColor: "bg-blue-500/15 text-blue-400 border-blue-500/30",
+        title: lang === "vi" ? "Tìm đối tác cung ứng vật liệu xây dựng & thép kết cấu cho dự án nghỉ dưỡng" : "Seeking supplier for structural steel and construction materials for resort project",
+        company: "Bảo Gia Construction",
+        budget: "5.000.000.000 đ",
+      },
+      {
+        tag: lang === "vi" ? "HỢP TÁC ĐẦU TƯ" : "INVESTMENT",
+        tagColor: "bg-amber-500/15 text-amber-400 border-amber-500/30",
+        title: lang === "vi" ? "Hợp tác phát triển giải pháp ERP và CRM cho chuỗi 30 nhà hàng ẩm thực" : "Cooperation to deploy cloud ERP & CRM for 30 restaurant franchise chain",
+        company: "Yến Ngọc Hospitality",
+        budget: "800.000.000 đ",
+      },
+    ]
     : [
-        {
-          tag: lang === "vi" ? "CẦN TÌM ĐỐI TÁC" : "PARTNER SEARCH",
-          tagColor: "bg-blue-500/15 text-blue-400 border-blue-500/30",
-          title: lang === "vi" ? "Tìm đối tác phát triển nền tảng AI ERP & CRM tự động hóa cho chuỗi bán lẻ" : "Seeking AI ERP & CRM automation solution partner for retail chain",
-          company: "Khoa Vàng Tech Group",
-          budget: "2.000.000.000 đ",
-        },
-        {
-          tag: lang === "vi" ? "CUNG ỨNG DỊCH VỤ" : "SERVICE SUPPLY",
-          tagColor: "bg-emerald-500/15 text-emerald-400 border-emerald-500/30",
-          title: lang === "vi" ? "Cung cấp giải pháp kho vận thông minh và trung tâm logistics ngoại thành Hà Nội" : "Smart warehousing and suburban logistics hub solutions provider",
-          company: "Đăng Quang Logistics",
-          budget: "500.000.000 đ",
-        },
-      ];
+      {
+        tag: lang === "vi" ? "CẦN TÌM ĐỐI TÁC" : "PARTNER SEARCH",
+        tagColor: "bg-blue-500/15 text-blue-400 border-blue-500/30",
+        title: lang === "vi" ? "Tìm đối tác phát triển nền tảng AI ERP & CRM tự động hóa cho chuỗi bán lẻ" : "Seeking AI ERP & CRM automation solution partner for retail chain",
+        company: "Khoa Vàng Tech Group",
+        budget: "2.000.000.000 đ",
+      },
+      {
+        tag: lang === "vi" ? "CUNG ỨNG DỊCH VỤ" : "SERVICE SUPPLY",
+        tagColor: "bg-emerald-500/15 text-emerald-400 border-emerald-500/30",
+        title: lang === "vi" ? "Cung cấp giải pháp kho vận thông minh và trung tâm logistics ngoại thành Hà Nội" : "Smart warehousing and suburban logistics hub solutions provider",
+        company: "Đăng Quang Logistics",
+        budget: "500.000.000 đ",
+      },
+    ];
 
   const products = isCeo1983
     ? [
-        {
-          name: lang === "vi" ? "Vật Liệu Xây Dựng & Thép Kết Cấu Tiêu Chuẩn Cao" : "High-Standard Structural Steel & Construction Materials",
-          category: lang === "vi" ? "Xây dựng & Bất động sản" : "Construction & Real Estate",
-          price: "18.500.000 đ / tấn",
-          seller: "Bảo Gia Construction",
-          icon: "🏗️",
-        },
-        {
-          name: lang === "vi" ? "Phần Mềm Quản Trị Khách Sạn & Nhà Hàng Cloud POS" : "Cloud POS & Hotel Management ERP Suite",
-          category: lang === "vi" ? "Công nghệ & Phần mềm" : "Technology & Software",
-          price: "12.000.000 đ / năm",
-          seller: "Long Tech Solutions",
-          icon: "💻",
-        },
-        {
-          name: lang === "vi" ? "Hộp Yến Sào Hoàng Gia Thượng Hạng CEO HN10" : "CEO HN10 Royal Bird's Nest Luxury Gift Box",
-          category: lang === "vi" ? "Quà tặng & Sức khỏe" : "Gifts & Wellness",
-          price: "3.200.000 đ / hộp",
-          seller: "Yến Ngọc Hospitality",
-          icon: "🪺",
-        },
-      ]
+      {
+        name: lang === "vi" ? "Vật Liệu Xây Dựng & Thép Kết Cấu Tiêu Chuẩn Cao" : "High-Standard Structural Steel & Construction Materials",
+        category: lang === "vi" ? "Xây dựng & Bất động sản" : "Construction & Real Estate",
+        price: "18.500.000 đ / tấn",
+        seller: "Bảo Gia Construction",
+        icon: "🏗️",
+      },
+      {
+        name: lang === "vi" ? "Phần Mềm Quản Trị Khách Sạn & Nhà Hàng Cloud POS" : "Cloud POS & Hotel Management ERP Suite",
+        category: lang === "vi" ? "Công nghệ & Phần mềm" : "Technology & Software",
+        price: "12.000.000 đ / năm",
+        seller: "Long Tech Solutions",
+        icon: "💻",
+      },
+      {
+        name: lang === "vi" ? "Hộp Yến Sào Hoàng Gia Thượng Hạng CEO HN10" : "CEO HN10 Royal Bird's Nest Luxury Gift Box",
+        category: lang === "vi" ? "Quà tặng & Sức khỏe" : "Gifts & Wellness",
+        price: "3.200.000 đ / hộp",
+        seller: "Yến Ngọc Hospitality",
+        icon: "🪺",
+      },
+    ]
     : [
-        {
-          name: lang === "vi" ? "Gói Chuyển Đổi Số Doanh Nghiệp Enterprise AI" : "Enterprise AI Digital Transformation Package",
-          category: lang === "vi" ? "Công nghệ & Phần mềm" : "Technology & AI",
-          price: "45.000.000 đ / gói",
-          seller: "Khoa Vàng Tech Group",
-          icon: "🚀",
-        },
-        {
-          name: lang === "vi" ? "Dịch Vụ Kho Vận & Phân Phối Hàng Hóa Nhanh 24/7" : "24/7 Express Warehousing & Freight Logistics",
-          category: lang === "vi" ? "Vận tải & Logistics" : "Logistics & Transport",
-          price: lang === "vi" ? "Liên hệ báo giá" : "Contact for Quote",
-          seller: "Đăng Quang Logistics",
-          icon: "🚚",
-        },
-        {
-          name: lang === "vi" ? "Hộp Quà Tặng Nông Sản Hữu Cơ Cao Cấp HanoiBA" : "HanoiBA Premium Organic Agricultural Gift Set",
-          category: lang === "vi" ? "Quà tặng & Tiêu dùng" : "Gifts & Agriculture",
-          price: "1.250.000 đ / hộp",
-          seller: "Việt An Eco Food",
-          icon: "🎁",
-        },
-      ];
+      {
+        name: lang === "vi" ? "Gói Chuyển Đổi Số Doanh Nghiệp Enterprise AI" : "Enterprise AI Digital Transformation Package",
+        category: lang === "vi" ? "Công nghệ & Phần mềm" : "Technology & AI",
+        price: "45.000.000 đ / gói",
+        seller: "Khoa Vàng Tech Group",
+        icon: "🚀",
+      },
+      {
+        name: lang === "vi" ? "Dịch Vụ Kho Vận & Phân Phối Hàng Hóa Nhanh 24/7" : "24/7 Express Warehousing & Freight Logistics",
+        category: lang === "vi" ? "Vận tải & Logistics" : "Logistics & Transport",
+        price: lang === "vi" ? "Liên hệ báo giá" : "Contact for Quote",
+        seller: "Đăng Quang Logistics",
+        icon: "🚚",
+      },
+      {
+        name: lang === "vi" ? "Hộp Quà Tặng Nông Sản Hữu Cơ Cao Cấp HanoiBA" : "HanoiBA Premium Organic Agricultural Gift Set",
+        category: lang === "vi" ? "Quà tặng & Tiêu dùng" : "Gifts & Agriculture",
+        price: "1.250.000 đ / hộp",
+        seller: "Việt An Eco Food",
+        icon: "🎁",
+      },
+    ];
 
   const stats = [
     { value: isCeo1983 ? "200+" : "1.000+", label: l.stat1 },
@@ -689,8 +689,8 @@ export function AssociationLandingView({ a }: { a: PublicAssociation }) {
               landingConfig.watermarkPosition === "bottom-right"
                 ? "bottom right"
                 : landingConfig.watermarkPosition === "top-left"
-                ? "top left"
-                : "center",
+                  ? "top left"
+                  : "center",
             backgroundRepeat: landingConfig.watermarkPosition === "repeat" ? "repeat" : "no-repeat",
             backgroundSize: landingConfig.watermarkPosition === "repeat" ? "200px" : "contain",
           }}
@@ -908,7 +908,7 @@ export function AssociationLandingView({ a }: { a: PublicAssociation }) {
             <LandingInteractiveShowcase />
           </section>
 
-          {/* Section 2: Hệ Sinh Thái Quyền Lợi & Tính Năng Hội Viên */}
+          {/* Section 2: Hệ Sinh Thái Quyền Lợi & Tính Năng Học viên */}
           <section className="mt-20">
             <div className="text-center">
               <span className="inline-flex items-center gap-1.5 rounded-full border border-[var(--vba-gold)]/30 bg-[var(--vba-gold-soft)] px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-[var(--vba-gold)]">
@@ -1039,7 +1039,7 @@ export function AssociationLandingView({ a }: { a: PublicAssociation }) {
             </div>
           </section>
 
-          {/* Section 5: Gian Hàng Sản Phẩm & Dịch Vụ Hội Viên */}
+          {/* Section 5: Gian Hàng Sản Phẩm & Dịch Vụ Học viên */}
           <section className="mt-20">
             <div className="mb-6 flex items-center justify-between">
               <div>
@@ -1104,7 +1104,7 @@ export function AssociationLandingView({ a }: { a: PublicAssociation }) {
 
             <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-6">
               {[
-                { label: lang === "vi" ? "Danh bạ hội viên" : "Members Directory", icon: Users, to: "/m/members" },
+                { label: lang === "vi" ? "Danh bạ Học viên" : "Members Directory", icon: Users, to: "/m/members" },
                 { label: lang === "vi" ? "Sự kiện & Lịch họp" : "Events & Summits", icon: Calendar, to: "/m/events" },
                 { label: lang === "vi" ? "Cơ hội giao thương" : "B2B Deals", icon: Handshake, to: "/m/opportunities" },
                 { label: lang === "vi" ? "Sản phẩm & Dịch vụ" : "Products Showcase", icon: Gift, to: "/m/products" },
@@ -1143,7 +1143,7 @@ export function AssociationLandingView({ a }: { a: PublicAssociation }) {
                   Giới thiệu Hiệp Hội
                 </Link>
                 <Link to="/m" className="text-[var(--vba-gold)] hover:underline">
-                  App Hội viên
+                  App Học viên
                 </Link>
                 <Link to="/auth" className="text-[var(--vba-gold)] hover:underline">
                   Đăng nhập

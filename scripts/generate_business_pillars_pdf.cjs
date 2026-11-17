@@ -400,24 +400,24 @@ function generateComprehensiveHtml() {
     </div>
 
     <div class="report-title-box">
-      <h1>BÁO CÁO ĐẶC TẢ LUỒNG NGHIỆP VỤ TOÀN DIỆN<br/>KẾT NỐI, PHÂN QUYỀN & CHỨC NĂNG HỘI VIÊN CEO HN10</h1>
-      <p>Cẩm nang vận hành chi tiết: Sự Kiện, Gặp Gỡ Kết Nối 1-on-1, Trao Cơ Hội B2B, Ưu Đãi Đặc Quyền, Sàn Thương Mại, Ma Trận Phân Quyền RBAC và 10 Quyền Năng Của Hội Viên Khi Đăng Nhập App.</p>
+      <h1>BÁO CÁO ĐẶC TẢ LUỒNG NGHIỆP VỤ TOÀN DIỆN<br/>KẾT NỐI, PHÂN QUYỀN & CHỨC NĂNG Học viên CEO HN10</h1>
+      <p>Cẩm nang vận hành chi tiết: Sự Kiện, Gặp Gỡ Kết Nối 1-on-1, Trao Cơ Hội B2B, Ưu Đãi Đặc Quyền, Sàn Thương Mại, Ma Trận Phân Quyền RBAC và 10 Quyền Năng Của Học viên Khi Đăng Nhập App.</p>
       <div class="badge-bar">
         <span class="pill-badge pill-gold">04 Trụ Cột Vận Hành</span>
         <span class="pill-badge pill-blue">Gặp Gỡ Kết Nối 1-on-1</span>
         <span class="pill-badge pill-emerald">Ma Trận Phân Quyền RBAC</span>
-        <span class="pill-badge pill-purple">10 Quyền Năng Hội Viên</span>
+        <span class="pill-badge pill-purple">10 Quyền Năng Học viên</span>
         <span class="pill-badge pill-red">Chuẩn 9 Trường Thư Mời</span>
       </div>
     </div>
 
     <h2>1. TỔNG QUAN CHU TRÌNH GIÁ TRỊ KHÉP KÍN TRONG HỆ SINH THÁI</h2>
-    <p>Hệ sinh thái số CLB Doanh Nhân CEO HN10 (HanoiBA) được thiết kế khép kín nhằm thúc đẩy chu chuyển dòng tiền, niềm tin và năng lực giữa các doanh nghiệp hội viên cùng năm sinh 1983. Mọi điểm chạm đều có mục tiêu gia tăng doanh thu và gắn kết bền vững:</p>
+    <p>Hệ sinh thái số CLB Doanh Nhân CEO HN10 (HanoiBA) được thiết kế khép kín nhằm thúc đẩy chu chuyển dòng tiền, niềm tin và năng lực giữa các doanh nghiệp Học viên cùng năm sinh 1983. Mọi điểm chạm đều có mục tiêu gia tăng doanh thu và gắn kết bền vững:</p>
 
     <div class="grid-2">
       <div class="stat-box">
         <div class="stat-val">100+ Doanh Nhân</div>
-        <div class="stat-lbl">Hội viên chính thức cùng khóa 1983</div>
+        <div class="stat-lbl">Học viên chính thức cùng khóa 1983</div>
       </div>
       <div class="stat-box">
         <div class="stat-val">Đa Kênh Tự Động</div>
@@ -467,12 +467,12 @@ function generateComprehensiveHtml() {
     <div class="pillar-card">
       <div class="card-header">
         <span class="card-title">B. Luồng Đăng Ký Công Khai & Quét Mã QR Cổng Tiếp Đón</span>
-        <span class="pill-badge pill-emerald">Khách ngoài & Hội viên</span>
+        <span class="pill-badge pill-emerald">Khách ngoài & Học viên</span>
       </div>
       <ul class="step-list">
         <li class="step-item">
           <div class="step-number">1</div>
-          <div class="step-content"><strong>Hội viên trong App:</strong> Bấm "Đăng ký 1 chạm" tại banner trang chủ ➔ Cấp ngay vé điện tử kèm mã QR check-in.</div>
+          <div class="step-content"><strong>Học viên trong App:</strong> Bấm "Đăng ký 1 chạm" tại banner trang chủ ➔ Cấp ngay vé điện tử kèm mã QR check-in.</div>
         </li>
         <li class="step-item">
           <div class="step-number">2</div>
@@ -510,7 +510,7 @@ function generateComprehensiveHtml() {
       <ul class="step-list">
         <li class="step-item">
           <div class="step-number">1</div>
-          <div class="step-content"><strong>Khởi xướng cuộc gặp:</strong> Hội viên mở Danh bạ hoặc Trang cá nhân của đồng môn muốn kết nối ➔ Bấm nút "Hẹn gặp 1-on-1".</div>
+          <div class="step-content"><strong>Khởi xướng cuộc gặp:</strong> Học viên mở Danh bạ hoặc Trang cá nhân của đồng môn muốn kết nối ➔ Bấm nút "Hẹn gặp 1-on-1".</div>
         </li>
         <li class="step-item">
           <div class="step-number">2</div>
@@ -542,7 +542,7 @@ function generateComprehensiveHtml() {
       <ul class="step-list">
         <li class="step-item">
           <div class="step-number">1</div>
-          <div class="step-content"><strong>Đăng cơ hội mới:</strong> Hội viên đăng gói thầu / nhu cầu: Tiêu đề, Giá trị dự kiến (đơn vị Triệu đ / Tỷ đ), Ngành nghề, Thời hạn chào thầu, Yêu cầu năng lực.</div>
+          <div class="step-content"><strong>Đăng cơ hội mới:</strong> Học viên đăng gói thầu / nhu cầu: Tiêu đề, Giá trị dự kiến (đơn vị Triệu đ / Tỷ đ), Ngành nghề, Thời hạn chào thầu, Yêu cầu năng lực.</div>
         </li>
         <li class="step-item">
           <div class="step-number">2</div>
@@ -550,7 +550,7 @@ function generateComprehensiveHtml() {
         </li>
         <li class="step-item">
           <div class="step-number">3</div>
-          <div class="step-content"><strong>Nhận kết nối 1 chạm:</strong> Hội viên phù hợp bấm "Nhận kết nối", hệ thống mở kết nối trực tiếp (Chat DM nội bộ, Gọi điện, Mở Zalo đối tác) và tự động tạo lịch hẹn gặp 1-on-1 trong Lịch hoạt động.</div>
+          <div class="step-content"><strong>Nhận kết nối 1 chạm:</strong> Học viên phù hợp bấm "Nhận kết nối", hệ thống mở kết nối trực tiếp (Chat DM nội bộ, Gọi điện, Mở Zalo đối tác) và tự động tạo lịch hẹn gặp 1-on-1 trong Lịch hoạt động.</div>
         </li>
         <li class="step-item">
           <div class="step-number">4</div>
@@ -559,7 +559,7 @@ function generateComprehensiveHtml() {
       </ul>
     </div>
 
-    <h2>5. TRỤ CỘT 3: LUỒNG NGHIỆP VỤ ƯU ĐÃI & ĐẶC QUYỀN HỘI VIÊN</h2>
+    <h2>5. TRỤ CỘT 3: LUỒNG NGHIỆP VỤ ƯU ĐÃI & ĐẶC QUYỀN Học viên</h2>
     <p><strong>Mã Node:</strong> <code>[NODE-CRM-009]</code>, <code>[NODE-APP-005]</code>, <code>[NODE-APP-013]</code>.</p>
     
     <div class="pillar-card">
@@ -570,19 +570,19 @@ function generateComprehensiveHtml() {
       <ul class="step-list">
         <li class="step-item">
           <div class="step-number">1</div>
-          <div class="step-content"><strong>2 Nguồn ưu đãi:</strong> (a) Đặc quyền đối tác chiến lược do CLB đàm phán ký kết (Khách sạn 5*, Golf, Hàng không); (b) Ưu đãi nội khối do chính doanh nghiệp hội viên tài trợ chiết khấu chéo cho đồng môn.</div>
+          <div class="step-content"><strong>2 Nguồn ưu đãi:</strong> (a) Đặc quyền đối tác chiến lược do CLB đàm phán ký kết (Khách sạn 5*, Golf, Hàng không); (b) Ưu đãi nội khối do chính doanh nghiệp Học viên tài trợ chiết khấu chéo cho đồng môn.</div>
         </li>
         <li class="step-item">
           <div class="step-number">2</div>
-          <div class="step-content"><strong>Đăng ưu đãi mới & Đẩy lên đầu slide:</strong> Hội viên mở Modal đăng ưu đãi. Ngay khi lưu thành công, hệ thống phát sự kiện <code>vba:member_custom_perk_created</code> và đẩy ưu đãi mới lên đầu Carousel trang chủ.</div>
+          <div class="step-content"><strong>Đăng ưu đãi mới & Đẩy lên đầu slide:</strong> Học viên mở Modal đăng ưu đãi. Ngay khi lưu thành công, hệ thống phát sự kiện <code>vba:member_custom_perk_created</code> và đẩy ưu đãi mới lên đầu Carousel trang chủ.</div>
         </li>
         <li class="step-item">
           <div class="step-number">3</div>
-          <div class="step-content"><strong>Lưu ưu đãi & Cấp Voucher QR:</strong> Khi hội viên bấm "LƯU", ưu đãi chuyển vào ví cá nhân. Hệ thống tự động mở Modal hiển thị: Mã số voucher độc quyền (<code>CEO HN10-PROMO-...</code>), Mã QR động, Điều kiện áp dụng và Nút dẫn đường Google Maps 1 chạm tới cơ sở kinh doanh.</div>
+          <div class="step-content"><strong>Lưu ưu đãi & Cấp Voucher QR:</strong> Khi Học viên bấm "LƯU", ưu đãi chuyển vào ví cá nhân. Hệ thống tự động mở Modal hiển thị: Mã số voucher độc quyền (<code>CEO HN10-PROMO-...</code>), Mã QR động, Điều kiện áp dụng và Nút dẫn đường Google Maps 1 chạm tới cơ sở kinh doanh.</div>
         </li>
         <li class="step-item">
           <div class="step-number">4</div>
-          <div class="step-content"><strong>Áp dụng tại điểm bán:</strong> Hội viên xuất trình mã QR hoặc đọc mã voucher tại quầy đối tác để được áp dụng mức giá chiết khấu đã cam kết.</div>
+          <div class="step-content"><strong>Áp dụng tại điểm bán:</strong> Học viên xuất trình mã QR hoặc đọc mã voucher tại quầy đối tác để được áp dụng mức giá chiết khấu đã cam kết.</div>
         </li>
       </ul>
     </div>
@@ -612,15 +612,15 @@ function generateComprehensiveHtml() {
       <ul class="step-list">
         <li class="step-item">
           <div class="step-number">1</div>
-          <div class="step-content"><strong>Quy định khắt khe 5 sản phẩm:</strong> Mỗi doanh nghiệp hội viên chỉ được phép niêm yết tối đa 5 sản phẩm/dịch vụ mũi nhọn nhất. Quy tắc này triệt tiêu tình trạng spam bán hàng, nâng cao chất lượng sàn giao thương.</div>
+          <div class="step-content"><strong>Quy định khắt khe 5 sản phẩm:</strong> Mỗi doanh nghiệp Học viên chỉ được phép niêm yết tối đa 5 sản phẩm/dịch vụ mũi nhọn nhất. Quy tắc này triệt tiêu tình trạng spam bán hàng, nâng cao chất lượng sàn giao thương.</div>
         </li>
         <li class="step-item">
           <div class="step-number">2</div>
-          <div class="step-content"><strong>Thiết lập Gian hàng số:</strong> Hội viên nhập Tên sản phẩm, Ngành nghề, Giá niêm yết, Giá ưu đãi riêng cho CEO HN10, Thông số kỹ thuật, Hồ sơ năng lực PDF và Cam kết bảo hành.</div>
+          <div class="step-content"><strong>Thiết lập Gian hàng số:</strong> Học viên nhập Tên sản phẩm, Ngành nghề, Giá niêm yết, Giá ưu đãi riêng cho CEO HN10, Thông số kỹ thuật, Hồ sơ năng lực PDF và Cam kết bảo hành.</div>
         </li>
         <li class="step-item">
           <div class="step-number">3</div>
-          <div class="step-content"><strong>Khám phá & Bộ lọc phân ban:</strong> Hội viên trên toàn mạng lưới lọc sản phẩm theo phân ban ngành nghề. Banner trang chủ hiển thị tổng số lượng sản phẩm và tổng giá trị gói thầu đang niêm yết.</div>
+          <div class="step-content"><strong>Khám phá & Bộ lọc phân ban:</strong> Học viên trên toàn mạng lưới lọc sản phẩm theo phân ban ngành nghề. Banner trang chủ hiển thị tổng số lượng sản phẩm và tổng giá trị gói thầu đang niêm yết.</div>
         </li>
         <li class="step-item">
           <div class="step-number">4</div>
@@ -645,7 +645,7 @@ function generateComprehensiveHtml() {
         <tr>
           <td><strong>Chủ Tịch CLB / BQT</strong><br/><code>admin</code>, <code>chu_tich</code></td>
           <td>Web CRM & Mobile App (Toàn quyền hệ thống)</td>
-          <td>Duyệt kết nạp hội viên, phê duyệt sự kiện, mở phiên biểu quyết, điều hành ngân sách thu chi, cấu hình Zalo OA ZBS.</td>
+          <td>Duyệt kết nạp Học viên, phê duyệt sự kiện, mở phiên biểu quyết, điều hành ngân sách thu chi, cấu hình Zalo OA ZBS.</td>
           <td>Bảo mật 2 lớp, giám sát mọi hoạt động qua Nhật ký Kiểm toán hệ thống.</td>
         </tr>
         <tr>
@@ -658,7 +658,7 @@ function generateComprehensiveHtml() {
           <td><strong>Kế Toán / Kiểm Soát</strong><br/><code>ke_toan</code>, <code>kiem_soat</code></td>
           <td>Web CRM (Phân hệ Tài chính)</td>
           <td>Theo dõi sổ quỹ thu chi niên liễm, quản lý hóa đơn/biên lai, xuất báo cáo tài chính kiểm toán A4/Excel.</td>
-          <td>Chỉ có quyền đọc & ghi dữ liệu thu chi, không sửa đổi dữ liệu hội viên.</td>
+          <td>Chỉ có quyền đọc & ghi dữ liệu thu chi, không sửa đổi dữ liệu Học viên.</td>
         </tr>
         <tr>
           <td><strong>Trưởng / Phó Ban Chuyên Môn</strong><br/><code>truong_ban</code></td>
@@ -667,13 +667,13 @@ function generateComprehensiveHtml() {
           <td>Phân quyền theo phạm vi Ban sinh hoạt trực thuộc.</td>
         </tr>
         <tr>
-          <td><strong>Hội Viên Chính Thức</strong><br/><code>member</code></td>
+          <td><strong>Học viên Chính Thức</strong><br/><code>member</code></td>
           <td>CEO HN10 Mobile App</td>
-          <td>Toàn quyền sử dụng 10 tính năng hội viên: Danh thiếp số, Danh bạ, Cơ hội B2B, Ưu đãi, Sàn TMĐT, Lịch hẹn 1-on-1, Biểu quyết.</td>
+          <td>Toàn quyền sử dụng 10 tính năng Học viên: Danh thiếp số, Danh bạ, Cơ hội B2B, Ưu đãi, Sàn TMĐT, Lịch hẹn 1-on-1, Biểu quyết.</td>
           <td>Chỉ chỉnh sửa được hồ sơ cá nhân và sản phẩm gian hàng của công ty mình.</td>
         </tr>
         <tr>
-          <td><strong>Hội Viên Tạm Khóa / Nợ Phí</strong><br/><code>unpaid</code>, <code>inactive</code></td>
+          <td><strong>Học viên Tạm Khóa / Nợ Phí</strong><br/><code>unpaid</code>, <code>inactive</code></td>
           <td>Mobile App (Hạn chế)</td>
           <td>Chỉ được xem danh bạ và nhận cảnh báo nợ phí niên liễm kèm mã QR Napas247 để đóng tiền.</td>
           <td>Khóa quyền đăng bài sàn thương mại, tạm dừng nhận cơ hội giao thương B2B mới.</td>
@@ -681,7 +681,7 @@ function generateComprehensiveHtml() {
         <tr>
           <td><strong>Khách Mời / Đại Biểu Ngoài</strong><br/><code>guest</code></td>
           <td>Trang Web Public</td>
-          <td>Đăng ký tham gia sự kiện công khai, quét mã danh thiếp số công khai của hội viên.</td>
+          <td>Đăng ký tham gia sự kiện công khai, quét mã danh thiếp số công khai của Học viên.</td>
           <td>Tuyệt đối không truy cập vào danh bạ nội bộ, SĐT/Email bị ẩn theo quyền riêng tư.</td>
         </tr>
       </tbody>
@@ -701,8 +701,8 @@ function generateComprehensiveHtml() {
       </div>
     </div>
 
-    <h2>8. ĐẶC TẢ CHI TIẾT 10 QUYỀN NĂNG CỦA HỘI VIÊN KHI ĐĂNG NHẬP APP</h2>
-    <p>Khi đăng nhập vào ứng dụng di động <strong>CEO HN10 Mobile App</strong>, hội viên chính thức được trao toàn quyền sử dụng bộ công cụ kết nối kinh doanh toàn năng:</p>
+    <h2>8. ĐẶC TẢ CHI TIẾT 10 QUYỀN NĂNG CỦA Học viên KHI ĐĂNG NHẬP APP</h2>
+    <p>Khi đăng nhập vào ứng dụng di động <strong>CEO HN10 Mobile App</strong>, Học viên chính thức được trao toàn quyền sử dụng bộ công cụ kết nối kinh doanh toàn năng:</p>
 
     <div class="feature-grid">
       <div class="feature-item">
@@ -748,7 +748,7 @@ function generateComprehensiveHtml() {
     </div>
 
     <h2>9. CAM KẾT CHẤT LƯỢNG & KÝ TÊN XÁC NHẬN</h2>
-    <p>Toàn bộ 10 quyền năng trên cùng các luồng nghiệp vụ đã được triển khai thực tế trên cả hai phân hệ Cổng Quản Trị Web CRM và CEO HN10 Mobile App, vận hành trên nền CSDL PostgreSQL thật 100%, bảo mật cao và sẵn sàng phục vụ toàn diện hội viên CLB Doanh Nhân CEO HN10 (HanoiBA).</p>
+    <p>Toàn bộ 10 quyền năng trên cùng các luồng nghiệp vụ đã được triển khai thực tế trên cả hai phân hệ Cổng Quản Trị Web CRM và CEO HN10 Mobile App, vận hành trên nền CSDL PostgreSQL thật 100%, bảo mật cao và sẵn sàng phục vụ toàn diện Học viên CLB Doanh Nhân CEO HN10 (HanoiBA).</p>
 
     <div class="signature-section">
       <div class="sig-box">
@@ -770,7 +770,7 @@ function generateComprehensiveHtml() {
 
 async function main() {
   console.log('🚀 Đang khởi tạo tiến trình xuất bản PDF Báo Cáo Toàn Diện (4 Trang A4)...');
-  
+
   if (!fs.existsSync(DOC_DIR)) fs.mkdirSync(DOC_DIR, { recursive: true });
   if (!fs.existsSync(FE_DOCS_DIR)) fs.mkdirSync(FE_DOCS_DIR, { recursive: true });
   if (!fs.existsSync(ARTIFACT_DIR)) fs.mkdirSync(ARTIFACT_DIR, { recursive: true });

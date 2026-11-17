@@ -10,9 +10,9 @@
   - Mở màn hình bìa: *Hệ thống Quản trị & Kết nối Doanh nhân - Nền tảng Công nghệ CEO1983*.
   - Chuyển cảnh sang hình ảnh thực tế `assets/voa_demo.jpg` mô tả không gian hội trường kết nối doanh nhân.
 - **Lời bình Voice-Over (VOA)**:
-  > *"Kính chào Quý Lãnh đạo Hiệp hội Doanh nghiệp trẻ Hà Nội HanoiBA, Ban Cán Sự và toàn thể Quý Hội viên Doanh nhân CLB CEO HN10!*
+  > *"Kính chào Quý Lãnh đạo Hiệp hội Doanh nghiệp trẻ Hà Nội HanoiBA, Ban Cán Sự và toàn thể Quý Học viên Doanh nhân CLB CEO HN10!*
   > *Nhằm nâng tầm hiệu quả vận hành, tối ưu hóa sự gắn kết và minh bạch hóa toàn bộ các hoạt động giao thương, CLB Doanh Nhân CEO HN10 tự hào giới thiệu nền tảng công nghệ toàn diện CEO1983.*
-  > *Đây là giải pháp chuyển đổi số phân hệ kép, kết hợp hoàn hảo giữa Cổng Quản trị Web CRM chuyên sâu dành cho Ban Điều Hành và Ứng dụng Di động tiện ích dành cho từng Hội viên doanh nhân."*
+  > *Đây là giải pháp chuyển đổi số phân hệ kép, kết hợp hoàn hảo giữa Cổng Quản trị Web CRM chuyên sâu dành cho Ban Điều Hành và Ứng dụng Di động tiện ích dành cho từng Học viên doanh nhân."*
 
 ---
 
@@ -38,7 +38,7 @@
 - **Hình ảnh (Visual)**: 
   - Mở module Sự kiện, hiển thị sự kiện *CEO HN10 - GALA GẮN KẾT VÀ XÚC TIẾN THƯƠNG MẠI 2026*.
   - Thao tác mở trang Chi tiết sự kiện và bật công cụ Check-in QR.
-  - Trình diễn màn hình quét mã QR cá nhân của hội viên `vupv090120@gmail.com` để hoàn tất điểm danh chỉ trong 1 giây.
+  - Trình diễn màn hình quét mã QR cá nhân của Học viên `vupv090120@gmail.com` để hoàn tất điểm danh chỉ trong 1 giây.
 - **Lời bình Voice-Over (VOA)**:
   > *"Điểm nhấn vượt trội của CEO1983 nằm ở khả năng điều phối sự kiện thông minh. Mọi sự kiện lớn như Gala cuối năm hay các buổi sinh hoạt giao thương đều được khởi tạo dễ dàng.*
   > *Hệ sinh thái Check-in tự động bằng mã QR giúp loại bỏ hoàn toàn cảnh xếp hàng ùn tắc tại cửa hội trường. Dữ liệu tham dự được cập nhật tức thì, giúp Ban Tổ Chức nắm bắt số lượng khách mời theo thời gian thực."*
@@ -67,12 +67,12 @@
 
 ---
 
-### PHÂN CẢNH 6: TRẢI NGHIỆM HỘI VIÊN TRÊN MOBILE APP & THÔNG BÁO (4:45 - 5:15)
+### PHÂN CẢNH 6: TRẢI NGHIỆM Học viên TRÊN MOBILE APP & THÔNG BÁO (4:45 - 5:15)
 - **Hình ảnh (Visual)**: 
   - Màn hình điện thoại hiển thị giao diện CEO HN10 Mobile App.
-  - Hội viên `vupv090120@gmail.com` mở Thẻ Hội viên số QR, nhận thông báo đẩy về việc Kiện toàn 7 Ban Chuyên Môn, duyệt hồ sơ B2B Connect.
+  - Học viên `vupv090120@gmail.com` mở Thẻ Học viên số QR, nhận thông báo đẩy về việc Kiện toàn 7 Ban Chuyên Môn, duyệt hồ sơ B2B Connect.
 - **Lời bình Voice-Over (VOA)**:
-  > *"Đối với từng hội viên doanh nhân, ứng dụng di động CEO HN10 là người trợ lý đắc lực bỏ túi. Tấm thẻ hội viên số cùng hệ thống thông báo tức thời giúp doanh nhân luôn kết nối, nắm bắt cơ hội hợp tác kinh doanh mọi lúc, mọi nơi."*
+  > *"Đối với từng Học viên doanh nhân, ứng dụng di động CEO HN10 là người trợ lý đắc lực bỏ túi. Tấm thẻ Học viên số cùng hệ thống thông báo tức thời giúp doanh nhân luôn kết nối, nắm bắt cơ hội hợp tác kinh doanh mọi lúc, mọi nơi."*
 
 ---
 

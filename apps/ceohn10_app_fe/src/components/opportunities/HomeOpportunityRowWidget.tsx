@@ -274,11 +274,10 @@ export const HomeOpportunityRowWidget: React.FC<HomeOpportunityRowWidgetProps> =
                     <button
                       type="button"
                       onClick={() => setCountFilter("green")}
-                      className={`p-2 rounded-2xl flex flex-col items-center justify-center gap-0.5 border transition cursor-pointer ${
-                        countFilter === "green"
+                      className={`p-2 rounded-2xl flex flex-col items-center justify-center gap-0.5 border transition cursor-pointer ${countFilter === "green"
                           ? "bg-emerald-500/20 border-emerald-500 text-emerald-600 dark:text-emerald-400 font-black shadow-xs"
                           : "bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400"
-                      }`}
+                        }`}
                     >
                       <span className="size-2 rounded-full bg-emerald-500 inline-block" />
                       <span className="text-xs font-black">{countGreen}</span>
@@ -289,11 +288,10 @@ export const HomeOpportunityRowWidget: React.FC<HomeOpportunityRowWidgetProps> =
                     <button
                       type="button"
                       onClick={() => setCountFilter("yellow")}
-                      className={`p-2 rounded-2xl flex flex-col items-center justify-center gap-0.5 border transition cursor-pointer ${
-                        countFilter === "yellow"
+                      className={`p-2 rounded-2xl flex flex-col items-center justify-center gap-0.5 border transition cursor-pointer ${countFilter === "yellow"
                           ? "bg-amber-500/20 border-amber-500 text-amber-600 dark:text-amber-400 font-black shadow-xs"
                           : "bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400"
-                      }`}
+                        }`}
                     >
                       <span className="size-2 rounded-full bg-amber-500 inline-block" />
                       <span className="text-xs font-black">{countYellow}</span>
@@ -304,11 +302,10 @@ export const HomeOpportunityRowWidget: React.FC<HomeOpportunityRowWidgetProps> =
                     <button
                       type="button"
                       onClick={() => setCountFilter("red")}
-                      className={`p-2 rounded-2xl flex flex-col items-center justify-center gap-0.5 border transition cursor-pointer ${
-                        countFilter === "red"
+                      className={`p-2 rounded-2xl flex flex-col items-center justify-center gap-0.5 border transition cursor-pointer ${countFilter === "red"
                           ? "bg-rose-500/20 border-rose-500 text-rose-600 dark:text-rose-400 font-black shadow-xs"
                           : "bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400"
-                      }`}
+                        }`}
                     >
                       <span className="size-2 rounded-full bg-rose-500 inline-block" />
                       <span className="text-xs font-black">{countRed}</span>
@@ -343,13 +340,12 @@ export const HomeOpportunityRowWidget: React.FC<HomeOpportunityRowWidgetProps> =
                               {item.title}
                             </h4>
                             <span
-                              className={`shrink-0 text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                                countFilter === "green"
+                              className={`shrink-0 text-[10px] font-bold px-2 py-0.5 rounded-full ${countFilter === "green"
                                   ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400"
                                   : countFilter === "yellow"
-                                  ? "bg-amber-500/15 text-amber-600 dark:text-amber-400"
-                                  : "bg-rose-500/15 text-rose-600 dark:text-rose-400"
-                              }`}
+                                    ? "bg-amber-500/15 text-amber-600 dark:text-amber-400"
+                                    : "bg-rose-500/15 text-rose-600 dark:text-rose-400"
+                                }`}
                             >
                               {countFilter === "green" && "Đang mở"}
                               {countFilter === "yellow" && (item.claimedByName ? `Đang deal: ${item.claimedByName}` : "Đang deal")}
@@ -383,7 +379,7 @@ export const HomeOpportunityRowWidget: React.FC<HomeOpportunityRowWidgetProps> =
                       {displayTotalValue}
                     </h3>
                     <p className="text-[11px] text-slate-600 dark:text-slate-300 mt-1">
-                      Tổng vốn &amp; giá trị hợp đồng được hội viên CEO HN10 công bố
+                      Tổng vốn &amp; giá trị hợp đồng được Học viên CEO HN10 công bố
                     </p>
                   </div>
 

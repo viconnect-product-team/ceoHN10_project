@@ -358,7 +358,7 @@ export const MoMoConfigSection: React.FC = () => {
               </button>
             </div>
             <p className="text-[11px] text-muted-foreground mt-1">
-              Cung cấp URL này vào Cổng Đối tác MoMo để hệ thống tự động gạch nợ hội phí và cấp vé ngay khi hội viên quét MoMo
+              Cung cấp URL này vào Cổng Đối tác MoMo để hệ thống tự động gạch nợ hội phí và cấp vé ngay khi Học viên quét MoMo
             </p>
           </div>
         </div>
@@ -397,11 +397,10 @@ export const MoMoConfigSection: React.FC = () => {
             ].map((pm) => (
               <label
                 key={pm.key}
-                className={`p-3 rounded-xl border flex flex-col justify-between cursor-pointer transition ${
-                  pm.enabled
+                className={`p-3 rounded-xl border flex flex-col justify-between cursor-pointer transition ${pm.enabled
                     ? "border-[#A50064] bg-pink-50/50 dark:bg-pink-950/20"
                     : "border-border bg-background opacity-60"
-                }`}
+                  }`}
               >
                 <div className="flex items-center justify-between mb-1.5">
                   <span className="text-xs font-bold text-foreground">{pm.label}</span>

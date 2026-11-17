@@ -181,7 +181,7 @@ export const DEFAULT_STARTUP_MOBILE_CONFIG: StartupMobileTemplateConfig = {
     videoUrl: "https://v1.pinimg.com/videos/iht/expMp4/v2/92/8a/ca/928aca8b8e476ade2d17a603c7e62015_720w.mp4",
     floatingBadge1: {
       title: "500+ Doanh Nghiệp",
-      subtitle: "Hội viên chính thức HanoiBA",
+      subtitle: "Học viên chính thức HanoiBA",
     },
     floatingBadge2: {
       title: "+105.8 Tỷ VNĐ",
@@ -189,15 +189,15 @@ export const DEFAULT_STARTUP_MOBILE_CONFIG: StartupMobileTemplateConfig = {
     },
   },
   ribbonStats: [
-    { value: "1.983+", label: "Hội Viên Doanh Nhân", desc: "Doanh nhân CEO HN10 toàn quốc" },
-    { value: "500+", label: "Doanh Nghiệp Thành Viên", desc: "Hội viên chính thức HanoiBA" },
+    { value: "1.983+", label: "Học viên Doanh Nhân", desc: "Doanh nhân CEO HN10 toàn quốc" },
+    { value: "500+", label: "Doanh Nghiệp Thành Viên", desc: "Học viên chính thức HanoiBA" },
     { value: "100+ Tỷ", label: "VNĐ Giao Thương B2B", desc: "Giá trị kết nối hoàn tất" },
     { value: "98%", label: "Tín Nhiệm Hài Lòng", desc: "Đánh giá giao thương thực chất" },
   ],
   appTabs: {
     b2b: {
       title: "Sàn Thương Mại B2B",
-      desc: "Niêm yết hơn 500+ sản phẩm & dịch vụ độc quyền từ các doanh nghiệp hội viên",
+      desc: "Niêm yết hơn 500+ sản phẩm & dịch vụ độc quyền từ các doanh nghiệp Học viên",
       stat: "500+ Sản phẩm B2B",
       items: [
         { name: "Phần mềm ERP Quản trị Doanh nghiệp", price: "120.000.000 đ", author: "ViConnect Tech" },
@@ -217,10 +217,10 @@ export const DEFAULT_STARTUP_MOBILE_CONFIG: StartupMobileTemplateConfig = {
     },
     card: {
       title: "Thẻ Doanh Nhân Số & QR",
-      desc: "Trao danh thiếp thông minh, quét mã định danh xác thực hội viên chính thức",
+      desc: "Trao danh thiếp thông minh, quét mã định danh xác thực Học viên chính thức",
       stat: "Định danh Chuẩn",
       items: [
-        { name: "Doanh nhân: Trần Tuấn Anh", price: "Hội viên Vàng", author: "ViConnect Group" },
+        { name: "Doanh nhân: Trần Tuấn Anh", price: "Học viên Vàng", author: "ViConnect Group" },
         { name: "Chức vụ: Tổng Giám Đốc", price: "Đã xác thực", author: "Mã số: CEO HN10-0089" },
         { name: "Lĩnh vực: Công nghệ thông tin & AI", price: "Kết nối ngay", author: "Trụ sở: Hà Nội" },
       ],
@@ -237,11 +237,11 @@ export const DEFAULT_STARTUP_MOBILE_CONFIG: StartupMobileTemplateConfig = {
     },
   },
   mapChapterPins: [
-    { id: "hanoi", name: "Hà Nội — Trụ Sở Chính", count: "1.250+ Hội viên", desc: "Cung Tri Thức, Số 1 Tôn Thất Thuyết, Cầu Giấy", x: "48%", y: "22%" },
-    { id: "haiphong", name: "Hải Phòng & Quảng Ninh", count: "210+ Hội viên", desc: "Cụm Công nghiệp & Cảng biển Logistics Đông Bắc", x: "55%", y: "27%" },
-    { id: "danang", name: "Đà Nẵng & Miền Trung", count: "185+ Hội viên", desc: "Trung tâm xúc tiến đầu tư Du lịch & Dịch vụ", x: "57%", y: "48%" },
-    { id: "hcm", name: "TP. Hồ Chí Minh", count: "320+ Hội viên", desc: "VP Đại diện Phía Nam & Kết nối thị trường tài chính", x: "52%", y: "78%" },
-    { id: "cantho", name: "Cần Thơ & ĐBSCL", count: "95+ Hội viên", desc: "Mạng lưới kết nối Nông sản & Xuất khẩu", x: "46%", y: "85%" },
+    { id: "hanoi", name: "Hà Nội — Trụ Sở Chính", count: "1.250+ Học viên", desc: "Cung Tri Thức, Số 1 Tôn Thất Thuyết, Cầu Giấy", x: "48%", y: "22%" },
+    { id: "haiphong", name: "Hải Phòng & Quảng Ninh", count: "210+ Học viên", desc: "Cụm Công nghiệp & Cảng biển Logistics Đông Bắc", x: "55%", y: "27%" },
+    { id: "danang", name: "Đà Nẵng & Miền Trung", count: "185+ Học viên", desc: "Trung tâm xúc tiến đầu tư Du lịch & Dịch vụ", x: "57%", y: "48%" },
+    { id: "hcm", name: "TP. Hồ Chí Minh", count: "320+ Học viên", desc: "VP Đại diện Phía Nam & Kết nối thị trường tài chính", x: "52%", y: "78%" },
+    { id: "cantho", name: "Cần Thơ & ĐBSCL", count: "95+ Học viên", desc: "Mạng lưới kết nối Nông sản & Xuất khẩu", x: "46%", y: "85%" },
   ],
   communityAvatars: [
     {
@@ -287,7 +287,7 @@ export const DEFAULT_STARTUP_MOBILE_CONFIG: StartupMobileTemplateConfig = {
   ],
   testimonials: [
     {
-      quote: "Nền tảng số hóa của CLB giúp các hội viên trao đổi cơ hội kinh doanh chỉ trong 1 chạm. Qua các phiên Business Matching và chia sẻ cơ hội B2B, doanh nghiệp tôi đã kết nối thành công nhiều hợp đồng chiến lược giá trị cao.",
+      quote: "Nền tảng số hóa của CLB giúp các Học viên trao đổi cơ hội kinh doanh chỉ trong 1 chạm. Qua các phiên Business Matching và chia sẻ cơ hội B2B, doanh nghiệp tôi đã kết nối thành công nhiều hợp đồng chiến lược giá trị cao.",
       author: "Trần Tuấn Anh",
       role: "Phó Chủ Tịch CLB, CEO ViConnect Tech",
       company: "Ban Điều Hành CEO HN10",
@@ -311,7 +311,7 @@ export const DEFAULT_STARTUP_MOBILE_CONFIG: StartupMobileTemplateConfig = {
       avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80",
     },
     {
-      quote: "Các chương trình CEO Talk, Business Tour và tọa đàm chuyên đề mang lại giá trị tri thức thực chiến vô cùng quý báu, giúp các doanh nghiệp hội viên tự tin tháo gỡ điểm nghẽn và bứt phá mạnh mẽ.",
+      quote: "Các chương trình CEO Talk, Business Tour và tọa đàm chuyên đề mang lại giá trị tri thức thực chiến vô cùng quý báu, giúp các doanh nghiệp Học viên tự tin tháo gỡ điểm nghẽn và bứt phá mạnh mẽ.",
       author: "Đỗ Minh Đức",
       role: "Trưởng Ban Đào Tạo & Doanh Trí",
       company: "Ban Chuyên Môn CEO HN10",
@@ -329,11 +329,11 @@ export const DEFAULT_STARTUP_MOBILE_CONFIG: StartupMobileTemplateConfig = {
       answer: "Sứ mệnh của CLB là kiến tạo cộng đồng doanh nhân bản lĩnh, trí tuệ và nhân văn. Các hoạt động cốt lõi gồm: Xúc tiến giao thương B2B (Business Matching & Business Tour), Đào tạo nâng tầm quản trị (CEO Talk & CEO Exchange), Đặt lịch hẹn 1-on-1 giữa các lãnh đạo và các hoạt động trách nhiệm xã hội CSR (Áo ấm vùng cao, xây nhà tình nghĩa).",
     },
     {
-      question: "Điều kiện để gia nhập trở thành Hội viên chính thức của CLB?",
-      answer: "Hội viên là các Doanh nhân, Chủ tịch HĐQT, CEO, Tổng giám đốc hoặc Cấp quản lý doanh nghiệp CEO Hà Nội 10 (Quý Hợi). Hồ sơ gia nhập sẽ được Ban Thẩm định và Ban Điều hành phê duyệt theo đúng quy chế hiệp hội của HanoiBA.",
+      question: "Điều kiện để gia nhập trở thành Học viên chính thức của CLB?",
+      answer: "Học viên là các Doanh nhân, Chủ tịch HĐQT, CEO, Tổng giám đốc hoặc Cấp quản lý doanh nghiệp CEO Hà Nội 10 (Quý Hợi). Hồ sơ gia nhập sẽ được Ban Thẩm định và Ban Điều hành phê duyệt theo đúng quy chế hiệp hội của HanoiBA.",
     },
     {
-      question: "Ứng dụng di động CEO HN10 mang lại những lợi ích gì cho hội viên?",
+      question: "Ứng dụng di động CEO HN10 mang lại những lợi ích gì cho Học viên?",
       answer: "Ứng dụng cung cấp trọn vẹn giải pháp số hóa: Thẻ Doanh nhân số & mã QR định danh cá nhân, Sàn thương mại B2B niêm yết sản phẩm/dịch vụ ưu đãi nội khối 15-30%, công cụ đặt lịch hẹn kết nối 1-on-1 trực tiếp, biểu đồ thống kê cơ hội minh bạch và thông báo đẩy lịch sự kiện thời gian thực.",
     },
   ],
@@ -470,7 +470,7 @@ export const DEFAULT_FORGE_LUXURY_ATELIER_CONFIG: ForgeLuxuryAtelierTemplateConf
       number: "04",
       category: "Media & Gala",
       title: "Diễn Đàn Doanh Nhân & Tỏa Sáng Thương Hiệu",
-      desc: "Tổ chức các sự kiện Diễn đàn, Gala Keangnam Landmark72 và Business Tour vinh danh thương hiệu hội viên trên toàn quốc.",
+      desc: "Tổ chức các sự kiện Diễn đàn, Gala Keangnam Landmark72 và Business Tour vinh danh thương hiệu Học viên trên toàn quốc.",
       image: "https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=1200&q=80",
       tag: "Landmark72",
     },
@@ -866,11 +866,10 @@ export const TimedCardsOpeningLanding: React.FC<TimedCardsOpeningLandingProps> =
             <div key={node.id} className="text-left">
               <div
                 onClick={() => handleMenuItemClick(node)}
-                className={`group flex items-center justify-between gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold transition cursor-pointer ${
-                  depth === 0
+                className={`group flex items-center justify-between gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold transition cursor-pointer ${depth === 0
                     ? 'text-white hover:bg-white/10'
                     : 'text-slate-300 hover:text-white hover:bg-white/5'
-                }`}
+                  }`}
               >
                 <div className="flex items-center gap-2 min-w-0">
                   {hasChildren ? (
@@ -1015,9 +1014,8 @@ export const TimedCardsOpeningLanding: React.FC<TimedCardsOpeningLandingProps> =
                 <button
                   type="button"
                   onClick={() => handleMenuItemClick(item)}
-                  className={`group relative py-1.5 flex items-center gap-1.5 hover:text-white transition cursor-pointer ${
-                    item.active ? 'text-white' : 'text-white/80'
-                  }`}
+                  className={`group relative py-1.5 flex items-center gap-1.5 hover:text-white transition cursor-pointer ${item.active ? 'text-white' : 'text-white/80'
+                    }`}
                 >
                   <span>{item.label}</span>
                   {hasChildren && <ChevronDown className="size-3.5 opacity-60 group-hover:opacity-100 transition" />}
@@ -1153,9 +1151,8 @@ export const TimedCardsOpeningLanding: React.FC<TimedCardsOpeningLandingProps> =
           <button
             type="button"
             onClick={() => toggleBookmark(currentSlide.id)}
-            className={`size-11 sm:size-12 rounded-full grid place-items-center transition duration-200 cursor-pointer shadow-lg active:scale-95 ${
-              bookmarkedIds[currentSlide.id] ? 'brightness-125' : 'hover:brightness-110'
-            }`}
+            className={`size-11 sm:size-12 rounded-full grid place-items-center transition duration-200 cursor-pointer shadow-lg active:scale-95 ${bookmarkedIds[currentSlide.id] ? 'brightness-125' : 'hover:brightness-110'
+              }`}
             style={{ backgroundColor: primaryColor }}
             title="Lưu vào danh sách yêu thích"
           >

@@ -1,5 +1,5 @@
 # BỘ HƯỚNG DẪN SỬ DỤNG TOÀN DIỆN HỆ SINH THÁI SỐ CEO HN10
-## TÀI LIỆU VẬN HÀNH ĐỒNG BỘ 2 SUBDOMAIN: WEB CRM QUẢN TRỊ & MOBILE APP HỘI VIÊN
+## TÀI LIỆU VẬN HÀNH ĐỒNG BỘ 2 SUBDOMAIN: WEB CRM QUẢN TRỊ & MOBILE APP Học viên
 *Hiệp Hội Doanh Nhân CEO HN10 (HanoiBA) — Phiên bản: 5.0 (Năm 2026)*
 
 ---
@@ -18,10 +18,10 @@ Hệ thống số hóa CLB Doanh Nhân CEO HN10 (HanoiBA) được kiến trúc 
                                       │                                               │
                                       ▼                                               ▼
          ┌──────────────────────────────────────────────┐    ┌──────────────────────────────────────────────┐
-         │         SUBDOMAIN 1: WEB CRM QUẢN TRỊ        │    │         SUBDOMAIN 2: MOBILE APP HỘI VIÊN     │
+         │         SUBDOMAIN 1: WEB CRM QUẢN TRỊ        │    │         SUBDOMAIN 2: MOBILE APP Học viên     │
          │     🌐 https://crm.ceohn10.viconnect.vn      │    │         📱 https://ceohn10.viconnect.vn      │
          ├──────────────────────────────────────────────┤    ├──────────────────────────────────────────────┤
-         │ • Đối tượng: Chủ tịch, BĐH, 6 Ban, Admin    │    │ • Đối tượng: Hội viên Doanh nhân, Đối tác B2B│
+         │ • Đối tượng: Chủ tịch, BĐH, 6 Ban, Admin    │    │ • Đối tượng: Học viên Doanh nhân, Đối tác B2B│
          │ • Môi trường: Desktop Web, Sidebar cố định   │    │ • Môi trường: Mobile-First VIP Shell, 5 Tabs │
          │ • Chức năng: 24 Functional Nodes CRM        │    │ • Chức năng: 17 Functional Nodes Mobile App  │
          │ • Nghiệp vụ: Duyệt hồ sơ, Quản lý tài chính, │    │ • Nghiệp vụ: Thẻ VIP số, QR Danh thiếp, Sàn  │
@@ -34,20 +34,20 @@ Hệ thống số hóa CLB Doanh Nhân CEO HN10 (HanoiBA) được kiến trúc 
 
 ## 2. MA TRẬN ĐỐI CHIẾU DỮ LIỆU ĐỒNG BỘ 2 CHIỀU (CROSS-SYSTEM TRACEABILITY)
 
-Dưới đây là ma trận ánh xạ luồng tương tác thời gian thực giữa hành động quản trị trên Web CRM và trải nghiệm nhận diện của Hội viên trên Mobile App:
+Dưới đây là ma trận ánh xạ luồng tương tác thời gian thực giữa hành động quản trị trên Web CRM và trải nghiệm nhận diện của Học viên trên Mobile App:
 
 | Luồng Nghiệp Vụ | Thao Tác Của Ban Điều Hành Trên Web CRM (`crm.ceohn10.viconnect.vn`) | Phản Hồi Thời Gian Thực Trên Mobile App (`ceohn10.viconnect.vn`) | Bảng Dữ Liệu PostgreSQL |
 | :--- | :--- | :--- | :--- |
-| **1. Kết Nạp Hội Viên** | Ban Thư Ký nhấp **[Phê duyệt & Cấp tài khoản]** tại `[NODE-CRM-003]` | Hội viên nhận email kích hoạt, đăng nhập app thấy ngay Thẻ VIP số tại `[NODE-APP-002]` | `members`, `vione_users` |
+| **1. Kết Nạp Học viên** | Ban Thư Ký nhấp **[Phê duyệt & Cấp tài khoản]** tại `[NODE-CRM-003]` | Học viên nhận email kích hoạt, đăng nhập app thấy ngay Thẻ VIP số tại `[NODE-APP-002]` | `members`, `vione_users` |
 | **2. Phân Quyền Ban** | Admin gán chức vụ Ban Chuyên Môn tại `[NODE-CRM-005]` | Huy hiệu chức vụ và quyền hạn trên app cập nhật ngay lập tức tại `[NODE-APP-011]` | `members.executive_role`, `departments` |
 | **3. Bắn Mạng Lưới Sự Kiện** | Ban Sự Kiện tạo sự kiện và bấm **[Bắn Mạng Lưới]** tại `[NODE-CRM-007]` | Bảng tin Mạng lưới (`Feed`) trên app hiện bài phát thanh kèm poster và nút đặt vé tại `[NODE-APP-010]` | `events`, `feed_posts` |
-| **4. Đối Soát Vé Sự Kiện** | Kế toán xác nhận **[✓ Đã thanh toán]** tại danh sách đăng ký vé | Hội viên mở app thấy Thẻ vé QR Check-in chuyển từ Chờ nộp sang Kích hoạt chính thức tại `[NODE-APP-008]` | `event_registrations` |
-| **5. Biểu Quyết Trực Tuyến** | Ban Thư Ký khởi tạo phiên biểu quyết nghị quyết tại `[NODE-CRM-015]` | Hội viên nhận thông báo và tham gia bỏ phiếu điện tử 1 chạm tại `[NODE-APP-009]` | `polls`, `poll_votes` |
+| **4. Đối Soát Vé Sự Kiện** | Kế toán xác nhận **[✓ Đã thanh toán]** tại danh sách đăng ký vé | Học viên mở app thấy Thẻ vé QR Check-in chuyển từ Chờ nộp sang Kích hoạt chính thức tại `[NODE-APP-008]` | `event_registrations` |
+| **5. Biểu Quyết Trực Tuyến** | Ban Thư Ký khởi tạo phiên biểu quyết nghị quyết tại `[NODE-CRM-015]` | Học viên nhận thông báo và tham gia bỏ phiếu điện tử 1 chạm tại `[NODE-APP-009]` | `polls`, `poll_votes` |
 | **6. Giao Thương B2B** | Lãnh đạo trao cơ hội kinh doanh đa điểm tại `[NODE-CRM-020]` | Các CEO nhận thông báo đẩy, vào mục Cơ hội B2B xúc tiến deal tại `[NODE-APP-005]` | `opportunities` |
-| **7. Quản Trị Sàn B2B** | Admin kiểm duyệt danh mục và tiêu chuẩn sản phẩm | Hội viên đăng tối đa 5 sản phẩm, xem sàn thương mại nội bộ tại `[NODE-APP-007]` | `products` |
-| **8. Đồng Bộ Theme Giao Diện** | Admin đổi chủ đề (Mùa Lễ Hội / Hoàng Gia) tại `[NODE-CRM-021]` | Toàn bộ app của hội viên tự động đổi màu sắc và hình nền hoa đào/mai (`--festival-bg-image`) | `landing_templates`, `system_settings` |
-| **9. Nhắc Phí Niên Liễm** | Kế toán nhấp **[Gửi thông báo gia hạn]** tại `[NODE-CRM-017]` | Hội viên nhận email kèm mã VietQR MB Bank chuyển khoản niên liễm tự động | `income_records`, `members` |
-| **10. Đào Tạo Trực Tuyến** | Giảng viên mở phòng Video Call tại `[NODE-CRM-018]` | Hội viên nhấp nút **[Vào Phòng Học]** gọi video call Jitsi trực tiếp tại `[NODE-APP-016]` | `trainings` |
+| **7. Quản Trị Sàn B2B** | Admin kiểm duyệt danh mục và tiêu chuẩn sản phẩm | Học viên đăng tối đa 5 sản phẩm, xem sàn thương mại nội bộ tại `[NODE-APP-007]` | `products` |
+| **8. Đồng Bộ Theme Giao Diện** | Admin đổi chủ đề (Mùa Lễ Hội / Hoàng Gia) tại `[NODE-CRM-021]` | Toàn bộ app của Học viên tự động đổi màu sắc và hình nền hoa đào/mai (`--festival-bg-image`) | `landing_templates`, `system_settings` |
+| **9. Nhắc Phí Niên Liễm** | Kế toán nhấp **[Gửi thông báo gia hạn]** tại `[NODE-CRM-017]` | Học viên nhận email kèm mã VietQR MB Bank chuyển khoản niên liễm tự động | `income_records`, `members` |
+| **10. Đào Tạo Trực Tuyến** | Giảng viên mở phòng Video Call tại `[NODE-CRM-018]` | Học viên nhấp nút **[Vào Phòng Học]** gọi video call Jitsi trực tiếp tại `[NODE-APP-016]` | `trainings` |
 
 ---
 
@@ -59,7 +59,7 @@ Tất cả hình ảnh trong bộ tài liệu đều được chụp trực ti�
 1. [00_crm_login.png](./images/guide_crm/00_crm_login.png) — Màn hình Đăng nhập Hệ thống CRM
 2. [01_crm_dashboard.png](./images/guide_crm/01_crm_dashboard.png) — [NODE-CRM-001] Dashboard KPI & Lịch hoạt động
 3. [02_crm_analytics.png](./images/guide_crm/02_crm_analytics.png) — [NODE-CRM-002] Thống kê chuyên sâu 5 danh mục & Bục vinh danh
-4. [03_crm_members_list.png](./images/guide_crm/03_crm_members_list.png) — [NODE-CRM-003] Quản trị Danh bạ Hội viên 360°
+4. [03_crm_members_list.png](./images/guide_crm/03_crm_members_list.png) — [NODE-CRM-003] Quản trị Danh bạ Học viên 360°
 5. [04_crm_member_detail_drawer.png](./images/guide_crm/04_crm_member_detail_drawer.png) — [NODE-CRM-003] Drawer chi tiết & Phê duyệt kết nạp
 6. [05_crm_companies_list.png](./images/guide_crm/05_crm_companies_list.png) — [NODE-CRM-004] Quản trị Doanh nghiệp thành viên
 7. [06_crm_company_edit_modal.png](./images/guide_crm/06_crm_company_edit_modal.png) — [NODE-CRM-004] Modal chỉnh sửa doanh nghiệp
@@ -83,7 +83,7 @@ Tất cả hình ảnh trong bộ tài liệu đều được chụp trực ti�
 25. [20_crm_documents_list.png](./images/guide_crm/20_crm_documents_list.png) — [NODE-CRM-014] Kho Tài liệu & Universal Document Viewer
 26. [21_crm_voting_and_luckydraw.png](./images/guide_crm/21_crm_voting_and_luckydraw.png) — [NODE-CRM-015] Quản trị Biểu quyết & Vòng quay Lucky Draw
 27. [22_crm_news_admin.png](./images/guide_crm/22_crm_news_admin.png) — [NODE-CRM-016] Quản lý Bản tin & Soạn thảo truyền thông
-28. [23_crm_renewal_list.png](./images/guide_crm/23_crm_renewal_list.png) — [NODE-CRM-017] Gia hạn hội viên & Xử lý nợ phí niên liễm
+28. [23_crm_renewal_list.png](./images/guide_crm/23_crm_renewal_list.png) — [NODE-CRM-017] Gia hạn Học viên & Xử lý nợ phí niên liễm
 29. [24_crm_trainings_list.png](./images/guide_crm/24_crm_trainings_list.png) — [NODE-CRM-018] Quản trị Đào tạo & Video Call Jitsi
 30. [25_crm_activity_logs.png](./images/guide_crm/25_crm_activity_logs.png) — [NODE-CRM-019] Nhật ký an ninh thao tác Audit Log
 31. [26_crm_opportunities_list.png](./images/guide_crm/26_crm_opportunities_list.png) — [NODE-CRM-020] Trao cơ hội B2B đa điểm
@@ -95,15 +95,15 @@ Tất cả hình ảnh trong bộ tài liệu đều được chụp trực ti�
 37. [responsive_crm_tablet_1024.png](./images/guide_crm/responsive_crm_tablet_1024.png) — CRM Responsive hiển thị trên Tablet (1024x768)
 38. [responsive_crm_mobile_390.png](./images/guide_crm/responsive_crm_mobile_390.png) — CRM Responsive hiển thị trên Smartphone Mobile (390x844)
 
-### 3.2. Hình Ảnh Mobile App Hội Viên (`document/images/guide_app/`)
-1. [00_app_login.png](./images/guide_app/00_app_login.png) — Màn hình Đăng nhập Di động Hội viên
+### 3.2. Hình Ảnh Mobile App Học viên (`document/images/guide_app/`)
+1. [00_app_login.png](./images/guide_app/00_app_login.png) — Màn hình Đăng nhập Di động Học viên
 2. [01_app_home_ticker.png](./images/guide_app/01_app_home_ticker.png) — [NODE-APP-001] Trang chủ Ticker nến Realtime & Shortcut chat
-3. [01_b_app_notifications_center.png](./images/guide_app/01_b_app_notifications_center.png) — [NODE-APP-001] Trung tâm Thông báo Đa kênh Hội viên (/association/notifications)
+3. [01_b_app_notifications_center.png](./images/guide_app/01_b_app_notifications_center.png) — [NODE-APP-001] Trung tâm Thông báo Đa kênh Học viên (/association/notifications)
 4. [01_c_app_theme_switcher_modal.png](./images/guide_app/01_c_app_theme_switcher_modal.png) — [NODE-APP-001] Cài đặt Giao diện & Bộ chọn Màu Brandbook 4 màu (/association/system-config)
 5. [01_d_app_theme_dark_mode.png](./images/guide_app/01_d_app_theme_dark_mode.png) — [NODE-APP-001] Giao diện Chế độ Tối (Dark Mode) Doanh nhân
-6. [02_app_vip_card.png](./images/guide_app/02_app_vip_card.png) — [NODE-APP-002] Thẻ Hội viên VIP số 2 mặt & QR cá nhân hóa
+6. [02_app_vip_card.png](./images/guide_app/02_app_vip_card.png) — [NODE-APP-002] Thẻ Học viên VIP số 2 mặt & QR cá nhân hóa
 7. [03_app_public_card.png](./images/guide_app/03_app_public_card.png) — [NODE-APP-003] Trang quét danh thiếp công khai bảo mật
-8. [04_app_members_directory.png](./images/guide_app/04_app_members_directory.png) — [NODE-APP-004] Danh bạ Hội viên & Tìm kiếm đối tác
+8. [04_app_members_directory.png](./images/guide_app/04_app_members_directory.png) — [NODE-APP-004] Danh bạ Học viên & Tìm kiếm đối tác
 9. [05_app_opportunities_strip.png](./images/guide_app/05_app_opportunities_strip.png) — [NODE-APP-005] Cơ hội giao thương B2B Strip 3 thẻ ngang
 10. [06_app_analytics_dashboard.png](./images/guide_app/06_app_analytics_dashboard.png) — [NODE-APP-006] Trung tâm Thống kê & Bục vinh danh Top 3
 11. [07_app_marketplace_products.png](./images/guide_app/07_app_marketplace_products.png) — [NODE-APP-007] Sàn B2B Marketplace giới hạn 5 sản phẩm/DN
@@ -123,7 +123,7 @@ Tất cả hình ảnh trong bộ tài liệu đều được chụp trực ti�
 
 ## 4. QUY TRÌNH VẬN HÀNH KHÉP KÍN 6 BƯỚC (END-TO-END BUSINESS LIFECYCLE)
 
-Để toàn bộ hệ thống hoạt động trơn tru, Ban Điều Hành và Hội viên tuân thủ quy trình 6 bước khép kín sau:
+Để toàn bộ hệ thống hoạt động trơn tru, Ban Điều Hành và Học viên tuân thủ quy trình 6 bước khép kín sau:
 
 ```
   BƯỚC 1: Đăng ký gia nhập qua Landing Page (https://ceohn10.viconnect.vn/landing/ceohn10)

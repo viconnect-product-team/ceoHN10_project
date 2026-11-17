@@ -48,7 +48,7 @@ async function main() {
   for (const [dept, members] of Object.entries(banMap)) {
     console.log(`\n📌 [${dept}] (${members.length} tài khoản):`);
     for (const m of members) {
-      console.log(`  - Họ tên: ${m.name} | Email: ${m.email} | SĐT: ${m.phone || 'Chưa có'} | Chức vụ: ${m.role || m.title || 'Hội viên'} | Doanh nghiệp: ${m.company || 'CEO HN10'}`);
+      console.log(`  - Họ tên: ${m.name} | Email: ${m.email} | SĐT: ${m.phone || 'Chưa có'} | Chức vụ: ${m.role || m.title || 'Học viên'} | Doanh nghiệp: ${m.company || 'CEO HN10'}`);
     }
   }
 

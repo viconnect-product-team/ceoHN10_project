@@ -76,7 +76,7 @@ describe("action planning", () => {
     const withExport = planActions("fee", "Xuất báo cáo hội phí quý này", ADMIN);
     expect(withExport.steps.some((s) => /xuất/i.test(s.label))).toBe(true);
 
-    const noExport = planActions("member", "Tìm hội viên ngành Logistics", MEMBER);
+    const noExport = planActions("member", "Tìm Học viên ngành Logistics", MEMBER);
     const firstTool = getTool(noExport.steps[0].toolId!);
     expect(firstTool?.kind).not.toBe("export");
   });

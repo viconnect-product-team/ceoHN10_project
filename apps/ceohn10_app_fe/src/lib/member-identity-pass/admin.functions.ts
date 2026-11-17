@@ -23,7 +23,7 @@ export const getMemberPassesFn = createServerFn({ method: "GET" })
       .select("id, association_id")
       .eq("id", data.memberId)
       .maybeSingle();
-    if (!member) throw new Error("Không tìm thấy hội viên.");
+    if (!member) throw new Error("Không tìm thấy Học viên.");
     await assertManager(supabase, (member as Record<string, unknown>).association_id as string);
 
     const { canMintApplePass } = await import("@/lib/apple-wallet.server");
@@ -92,7 +92,7 @@ export const issueMemberPassFn = createServerFn({ method: "POST" })
       .select("id, association_id, term_end")
       .eq("id", data.memberId)
       .maybeSingle();
-    if (!member) throw new Error("Không tìm thấy hội viên.");
+    if (!member) throw new Error("Không tìm thấy Học viên.");
     const m = member as Record<string, unknown>;
     const associationId = m.association_id as string;
     await assertManager(supabase, associationId);
@@ -103,7 +103,7 @@ export const issueMemberPassFn = createServerFn({ method: "POST" })
       .eq("member_id", data.memberId)
       .eq("status", "active")
       .maybeSingle();
-    if (existing) throw new Error("Hội viên đã có thẻ đang hoạt động.");
+    if (existing) throw new Error("Học viên đã có thẻ đang hoạt động.");
 
     const now = new Date();
     const expiresAt =

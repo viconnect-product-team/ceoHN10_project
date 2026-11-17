@@ -345,10 +345,10 @@ export function PrivacySettingsModal({ open, onClose, onUpdated }: PrivacySettin
                     </div>
                     <div>
                       <div className="text-xs font-bold text-slate-800 dark:text-slate-200">
-                        {isEn ? "Full Member Name" : "Họ và tên hội viên"}
+                        {isEn ? "Full Member Name" : "Họ và tên Học viên"}
                       </div>
                       <div className="text-[11px] text-slate-500 dark:text-slate-400">
-                        {isEn ? "Show full personal name" : "Hiển thị danh tính hội viên"}
+                        {isEn ? "Show full personal name" : "Hiển thị danh tính Học viên"}
                       </div>
                     </div>
                   </div>

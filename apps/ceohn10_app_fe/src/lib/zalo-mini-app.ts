@@ -2,7 +2,7 @@
  * ZALO MINI APP SDK BRIDGE HELPER
  * Hệ thống CLB Doanh Nhân CEO HN10 (HanoiBA)
  * 
- * Hỗ trợ giao tiếp 2 chiều giữa Ứng dụng Hội viên và Nền tảng Zalo Mini App:
+ * Hỗ trợ giao tiếp 2 chiều giữa Ứng dụng Học viên và Nền tảng Zalo Mini App:
  * 1. Đăng nhập 1 chạm qua Số Điện Thoại Zalo (scope.userPhonenumber)
  * 2. Mở Camera Native Zalo quét mã QR Check-in / Kết nối Danh bạ
  * 3. Mở khung chat Zalo 1-on-1 giữa 2 Doanh nhân
@@ -98,7 +98,7 @@ export async function loginWithZaloPhone(): Promise<{
           fail: () => resolve(null),
         });
       });
-    } catch {}
+    } catch { }
 
     // 1.4. Gửi token lên Backend NestJS để giải mã và đăng nhập
     const response = await fetchNestApi<any>("/auth/zalo-miniapp-login", {
@@ -160,7 +160,7 @@ export async function scanQrCodeZalo(): Promise<string | null> {
 }
 
 /**
- * 3. MỞ KHUNG CHAT ZALO 1-ON-1 VỚI HỘI VIÊN ĐỐI TÁC
+ * 3. MỞ KHUNG CHAT ZALO 1-ON-1 VỚI Học viên ĐỐI TÁC
  */
 export async function openZaloChatWithUser(zaloUserId: string): Promise<boolean> {
   if (!zaloUserId) return false;

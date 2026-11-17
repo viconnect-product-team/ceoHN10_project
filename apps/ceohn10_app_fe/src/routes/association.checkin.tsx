@@ -115,8 +115,8 @@ function CheckinScreen() {
           r.status !== "cancelled" &&
           r.status !== "canceled" &&
           ((member?.code && r.memberCode === member.code) ||
-          (user?.email && r.email === user.email) ||
-          (user?.id && (r.userId === user.id || r.id === user.id)))
+            (user?.email && r.email === user.email) ||
+            (user?.id && (r.userId === user.id || r.id === user.id)))
       ) || null
     );
   }, [serverRegistrations, member, user]);
@@ -158,7 +158,7 @@ function CheckinScreen() {
         const valid = records.filter((r: any) => r.status !== "cancelled" && r.status !== "canceled");
         return valid[0] || null;
       }
-    } catch {}
+    } catch { }
     return null;
   }, []);
 
@@ -378,14 +378,14 @@ function CheckinScreen() {
       if (!currentRegs || currentRegs.length === 0) {
         try {
           currentRegs = await fetchNestApi<any[]>("/events/registrations").catch(() => []);
-        } catch {}
+        } catch { }
       }
 
       let currentEvents: any[] = serverEventsData || [];
       if (!currentEvents || currentEvents.length === 0) {
         try {
           currentEvents = await fetchNestApi<any[]>("/events").catch(() => []);
-        } catch {}
+        } catch { }
       }
 
       // Chức năng soát vé sự kiện chỉ quét mã QR vé sự kiện của người có vé
@@ -473,11 +473,11 @@ function CheckinScreen() {
             attendeeName: regMatch.memberName || regMatch.name || "Đại biểu Tham dự",
             attendeePhone: regMatch.phone || regMatch.email || "—",
             attendeeCompany: regMatch.company || (member as any)?.companyName || "CLB Doanh nhân CEO HN10",
-            attendeePosition: regMatch.position || regMatch.ticketType || "Hội viên chính thức",
-            eventTitle: matchedEvent?.name || matchedEvent?.title || regMatch.eventTitle || "Đại hội Hội viên CLB CEO HN10",
+            attendeePosition: regMatch.position || regMatch.ticketType || "Học viên chính thức",
+            eventTitle: matchedEvent?.name || matchedEvent?.title || regMatch.eventTitle || "Đại hội Học viên CLB CEO HN10",
             eventDate: matchedEvent?.date ? new Date(matchedEvent.date).toLocaleDateString("vi-VN") : "27/09/2026",
             eventLocation: matchedEvent?.location || "Trung tâm Hội nghị Quốc gia, Hà Nội",
-            ticketType: regMatch.ticketType || "Vé VIP Hội Viên",
+            ticketType: regMatch.ticketType || "Vé VIP Học viên",
             seatAssignment: regMatch.seatAssignment || seat || "Chờ Ban Truyền Thông xếp chỗ",
             luckyNumber: regMatch.luckyNumber || lucky || `#${mCode.slice(-4)}`,
             ticketCount: 1,
@@ -498,12 +498,12 @@ function CheckinScreen() {
 
               setScannedTicket({
                 ticketCode,
-                attendeeName: cardData.fullName || cardData.displayName || cardData.name || "Hội viên Doanh Nhân",
+                attendeeName: cardData.fullName || cardData.displayName || cardData.name || "Học viên Doanh Nhân",
                 attendeePhone: cardData.phone || "—",
                 attendeeCompany: cardData.companyName || cardData.company || "Công ty thành viên CEO HN10",
-                attendeePosition: cardData.executiveRole || cardData.jobTitle || "Ban Thường Trực • Hội viên CEO HN10",
+                attendeePosition: cardData.executiveRole || cardData.jobTitle || "Ban Thường Trực • Học viên CEO HN10",
                 attendeeAvatar: cardData.avatarUrl || cardData.avatar || null,
-                eventTitle: matchedEvent?.name || "Đại hội Hội viên CLB CEO HN10 & Tuyên dương Doanh nghiệp 2026",
+                eventTitle: matchedEvent?.name || "Đại hội Học viên CLB CEO HN10 & Tuyên dương Doanh nghiệp 2026",
                 eventDate: matchedEvent?.date ? new Date(matchedEvent.date).toLocaleDateString("vi-VN") : "27/09/2026",
                 eventLocation: matchedEvent?.location || "Trung tâm Hội nghị Quốc gia, Hà Nội",
                 ticketType: "Vé Mời Danh Dự (VIP Member Pass)",
@@ -516,11 +516,11 @@ function CheckinScreen() {
               });
               return;
             }
-          } catch {}
+          } catch { }
         }
 
         toast.error("Không tìm thấy thông tin vé đại biểu trong hệ thống!", {
-          description: `Mã hội viên [${mCode || resolved}] chưa đăng ký sự kiện này.`,
+          description: `Mã Học viên [${mCode || resolved}] chưa đăng ký sự kiện này.`,
           duration: 5000,
         });
         setError(`Mã đại biểu "${mCode || resolved}" chưa có thông tin đăng ký sự kiện!`);
@@ -533,7 +533,7 @@ function CheckinScreen() {
         if (resolved.startsWith("{") && resolved.endsWith("}")) {
           parsedJson = JSON.parse(resolved);
         }
-      } catch {}
+      } catch { }
 
       if (parsedJson && (parsedJson.ticketCode || parsedJson.invoiceNo || parsedJson.eventId || parsedJson.memberCode)) {
         const tCode = parsedJson.ticketCode || parsedJson.invoiceNo || parsedJson.id || "";
@@ -554,7 +554,7 @@ function CheckinScreen() {
             attendeePhone: regMatch.phone || regMatch.email || "—",
             attendeeCompany: regMatch.company || "Công ty thành viên CEO HN10",
             attendeePosition: regMatch.position || regMatch.ticketType || "Lãnh đạo Doanh nghiệp",
-            eventTitle: matchedEvent?.name || regMatch.eventTitle || "Đại hội Hội viên CLB CEO HN10",
+            eventTitle: matchedEvent?.name || regMatch.eventTitle || "Đại hội Học viên CLB CEO HN10",
             eventDate: matchedEvent?.date ? new Date(matchedEvent.date).toLocaleDateString("vi-VN") : "27/09/2026",
             eventLocation: matchedEvent?.location || "Trung tâm Hội nghị Quốc gia, Hà Nội",
             ticketType: regMatch.ticketType || "VIP Standard Pass",
@@ -577,7 +577,7 @@ function CheckinScreen() {
             attendeePhone: parsedJson.attendeePhone || parsedJson.phone || "—",
             attendeeCompany: parsedJson.attendeeCompany || parsedJson.company || "CLB Doanh Nhân CEO HN10",
             attendeePosition: parsedJson.attendeePosition || parsedJson.position || "Đại biểu",
-            eventTitle: parsedJson.eventTitle || currentEvents[0]?.name || "Đại hội Hội viên CLB CEO HN10",
+            eventTitle: parsedJson.eventTitle || currentEvents[0]?.name || "Đại hội Học viên CLB CEO HN10",
             eventDate: parsedJson.eventDate || "27/09/2026",
             eventLocation: parsedJson.eventLocation || "Trung tâm Hội nghị Quốc gia, Hà Nội",
             ticketType: parsedJson.ticketType || "VIP Standard Pass",
@@ -621,11 +621,11 @@ function CheckinScreen() {
           attendeeName: foundReg.memberName || foundReg.name || "Đại biểu tham dự",
           attendeePhone: foundReg.phone || foundReg.email || "—",
           attendeeCompany: foundReg.company || "Công ty thành viên CLB CEO HN10",
-          attendeePosition: foundReg.position || foundReg.ticketType || "Hội viên chính thức",
-          eventTitle: matchedEvent?.name || matchedEvent?.title || foundReg.eventTitle || "Đại hội Hội viên CLB CEO HN10",
+          attendeePosition: foundReg.position || foundReg.ticketType || "Học viên chính thức",
+          eventTitle: matchedEvent?.name || matchedEvent?.title || foundReg.eventTitle || "Đại hội Học viên CLB CEO HN10",
           eventDate: matchedEvent?.date ? new Date(matchedEvent.date).toLocaleDateString("vi-VN") : "27/09/2026",
           eventLocation: matchedEvent?.location || "Trung tâm Hội nghị Quốc gia, Hà Nội",
-          ticketType: foundReg.ticketType || "Vé Tham Dự Hội Viên",
+          ticketType: foundReg.ticketType || "Vé Tham Dự Học viên",
           seatAssignment: foundReg.seatAssignment || "Chờ Ban Truyền Thông xếp chỗ",
           luckyNumber: foundReg.luckyNumber || `#${foundReg.id.slice(-4).toUpperCase()}`,
           ticketCount: 1,
@@ -652,12 +652,12 @@ function CheckinScreen() {
 
             setScannedTicket({
               ticketCode,
-              attendeeName: cardData.fullName || cardData.displayName || cardData.name || "Hội viên Doanh Nhân",
+              attendeeName: cardData.fullName || cardData.displayName || cardData.name || "Học viên Doanh Nhân",
               attendeePhone: cardData.phone || "—",
               attendeeCompany: cardData.companyName || cardData.company || "Công ty thành viên CEO HN10",
-              attendeePosition: cardData.executiveRole || cardData.jobTitle || "Ban Thường Trực • Hội viên CEO HN10",
+              attendeePosition: cardData.executiveRole || cardData.jobTitle || "Ban Thường Trực • Học viên CEO HN10",
               attendeeAvatar: cardData.avatarUrl || cardData.avatar || null,
-              eventTitle: matchedEvent?.name || "Đại hội Hội viên CLB CEO HN10 & Tuyên dương Doanh nghiệp 2026",
+              eventTitle: matchedEvent?.name || "Đại hội Học viên CLB CEO HN10 & Tuyên dương Doanh nghiệp 2026",
               eventDate: matchedEvent?.date ? new Date(matchedEvent.date).toLocaleDateString("vi-VN") : "27/09/2026",
               eventLocation: matchedEvent?.location || "Trung tâm Hội nghị Quốc gia, Hà Nội",
               ticketType: "Vé Mời Danh Dự (VIP Member Pass)",
@@ -670,7 +670,7 @@ function CheckinScreen() {
             });
             return;
           }
-        } catch {}
+        } catch { }
       }
 
       // CASE 4: Check against local stored registered event records (for local testing records)
@@ -685,7 +685,7 @@ function CheckinScreen() {
             resolved.includes(r.ticketCode) ||
             resolved.includes(r.id)
         );
-      } catch {}
+      } catch { }
 
       if (foundRecord) {
         const ticketCode = foundRecord.ticketCode || foundRecord.id;
@@ -695,8 +695,8 @@ function CheckinScreen() {
           attendeeName: foundRecord.name || member?.name || "Đại biểu danh dự",
           attendeePhone: foundRecord.phone || member?.phone || "—",
           attendeeCompany: foundRecord.company || (member as any)?.companyName || "CLB Doanh Nhân CEO HN10",
-          attendeePosition: foundRecord.position || member?.title || "Hội viên chính thức",
-          eventTitle: foundRecord.eventTitle || foundRecord.name || currentEvents[0]?.name || "Đại hội Hội viên CLB CEO HN10",
+          attendeePosition: foundRecord.position || member?.title || "Học viên chính thức",
+          eventTitle: foundRecord.eventTitle || foundRecord.name || currentEvents[0]?.name || "Đại hội Học viên CLB CEO HN10",
           eventDate: foundRecord.date || "27/09/2026",
           eventLocation: foundRecord.place || "Trung tâm Hội nghị Quốc gia, Hà Nội",
           ticketType: foundRecord.ticketType || "VIP Standard Pass",
@@ -749,15 +749,15 @@ function CheckinScreen() {
 
       try {
         void reloadRegistrations();
-      } catch {}
+      } catch { }
 
-      // 3. Bắn thông báo chỗ ngồi và mã số vé (để quay trúng thưởng) về Mail và App CEO HN10 cho hội viên; đối với khách ngoài thì bắn về email của khách
+      // 3. Bắn thông báo chỗ ngồi và mã số vé (để quay trúng thưởng) về Mail và App CEO HN10 cho Học viên; đối với khách ngoài thì bắn về email của khách
       const seat = updatedTicket.seatAssignment || "Khu vực VIP • Bàn 01";
       const luckyCode = updatedTicket.luckyNumber || updatedTicket.ticketCode;
       const isMember = Boolean(updatedTicket.memberCode);
 
       if (isMember) {
-        // App Notification cho Hội viên
+        // App Notification cho Học viên
         fetchNestApi("/notifications", {
           method: "POST",
           body: JSON.stringify({
@@ -774,7 +774,7 @@ function CheckinScreen() {
           }),
         }).catch(() => null);
 
-        // Email cho Hội viên
+        // Email cho Học viên
         const memberEmail = (updatedTicket as any).attendeeEmail || (member as any)?.email;
         if (memberEmail) {
           fetchNestApi("/mail/send-test", {
@@ -852,7 +852,7 @@ function CheckinScreen() {
         luckyNumber: updatedTicket.luckyNumber,
       } as any;
       setHistory((prev) => [newRec, ...prev]);
-    } catch {}
+    } catch { }
   };
 
   const startScan = useCallback(() => {
@@ -907,7 +907,7 @@ function CheckinScreen() {
   const ticketEventLocation =
     currentDisplayEvent?.location || registeredEventPass?.place || "Trung tâm Hội nghị Quốc gia, Hà Nội";
   const attendeeName =
-    myRealRegistration?.memberName || member?.name || user?.fullName || (user as any)?.name || "Đại biểu Hội viên CLB CEO HN10";
+    myRealRegistration?.memberName || member?.name || user?.fullName || (user as any)?.name || "Đại biểu Học viên CLB CEO HN10";
   const attendeePosition =
     myRealRegistration?.position ||
     (member as any)?.jobTitle ||
@@ -990,11 +990,10 @@ function CheckinScreen() {
           <button
             type="button"
             onClick={() => setMainTab("scan")}
-            className={`py-3 px-2 text-xs sm:text-sm font-extrabold rounded-xl transition flex items-center justify-center gap-2 cursor-pointer ${
-              mainTab === "scan"
+            className={`py-3 px-2 text-xs sm:text-sm font-extrabold rounded-xl transition flex items-center justify-center gap-2 cursor-pointer ${mainTab === "scan"
                 ? "bg-[#003B95] text-white shadow-md border border-amber-400/50"
                 : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
-            }`}
+              }`}
           >
             <ScanLine className="h-4 w-4 shrink-0" />
             <span className="truncate">Quét Vé & Check-in</span>
@@ -1005,11 +1004,10 @@ function CheckinScreen() {
               stopScan();
               setMainTab("event_qr");
             }}
-            className={`py-3 px-2 text-xs sm:text-sm font-extrabold rounded-xl transition flex items-center justify-center gap-2 cursor-pointer ${
-              mainTab === "event_qr"
+            className={`py-3 px-2 text-xs sm:text-sm font-extrabold rounded-xl transition flex items-center justify-center gap-2 cursor-pointer ${mainTab === "event_qr"
                 ? "bg-[#003B95] text-white shadow-md border border-amber-400/50"
                 : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
-            }`}
+              }`}
           >
             <QrCode className="h-4 w-4 shrink-0" />
             <span className="truncate">Mã QR Sự Kiện</span>
@@ -1028,7 +1026,7 @@ function CheckinScreen() {
                 </div>
                 <div className="min-w-0">
                   <span className="block text-[10px] font-extrabold text-amber-300 uppercase tracking-wider">
-                    QUYỀN HẠN HỘI VIÊN CHÍNH THỨC
+                    QUYỀN HẠN Học viên CHÍNH THỨC
                   </span>
                   <h4 className="text-xs font-extrabold text-white truncate">
                     Ban Truyền Thông & Sự Kiện CEO HN10
@@ -1357,13 +1355,13 @@ function CheckinScreen() {
             </div>
           )}
 
-          {/* SUB-CARD 1: Thẻ Vé & QR Điểm Danh Hội Viên */}
+          {/* SUB-CARD 1: Thẻ Vé & QR Điểm Danh Học viên */}
           <div className="space-y-2.5">
             <div className="flex items-center justify-between px-1">
               <div className="flex items-center gap-2">
                 <Ticket className="h-4 w-4 text-[#003B95] dark:text-amber-400" />
                 <h3 className="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white uppercase tracking-wider">
-                  1. Thẻ Vé & QR Điểm Danh Hội Viên
+                  1. Thẻ Vé & QR Điểm Danh Học viên
                 </h3>
               </div>
               <span className="text-[10.5px] font-bold text-slate-500">Cá nhân</span>
@@ -1600,7 +1598,7 @@ function CheckinScreen() {
 
                 {/* Instructions */}
                 <div className="rounded-lg bg-emerald-50/80 dark:bg-emerald-950/40 p-3 text-[11px] leading-relaxed text-emerald-900 dark:text-emerald-300 text-left border border-emerald-200/60 dark:border-emerald-900/40">
-                  💡 <b>Hướng dẫn sử dụng:</b> Bạn có thể tải mã QR này để in Standee, in Backdrop hoặc gửi hình ảnh qua Zalo cho đối tác. Khách mời quét mã bằng Zalo sẽ mở trực tiếp form đăng ký đại biểu mà không cần tài khoản hội viên.
+                  💡 <b>Hướng dẫn sử dụng:</b> Bạn có thể tải mã QR này để in Standee, in Backdrop hoặc gửi hình ảnh qua Zalo cho đối tác. Khách mời quét mã bằng Zalo sẽ mở trực tiếp form đăng ký đại biểu mà không cần tài khoản Học viên.
                 </div>
 
                 {/* Action Buttons */}
@@ -1703,11 +1701,11 @@ function CheckinScreen() {
               {/* Name & Association Role */}
               <div>
                 <h3 className="text-base font-black text-slate-900 dark:text-white">
-                  {scannedMember.personName || "Hội viên CLB CEO HN10"}
+                  {scannedMember.personName || "Học viên CLB CEO HN10"}
                 </h3>
                 <div className="mt-1 flex flex-wrap items-center justify-center gap-1.5">
                   <span className="rounded-full bg-amber-500/15 border border-amber-500/30 px-2.5 py-0.5 text-[10.5px] font-bold text-amber-600 dark:text-amber-400">
-                    {scannedMember.personTitle || "Ban Thường Trực • Hội viên CEO HN10"}
+                    {scannedMember.personTitle || "Ban Thường Trực • Học viên CEO HN10"}
                   </span>
                   <span className="rounded-md bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 text-[10px] font-mono font-bold text-slate-500 dark:text-slate-400">
                     {scannedMember.code}

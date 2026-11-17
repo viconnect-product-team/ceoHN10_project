@@ -57,12 +57,12 @@ describe("workflow registry", () => {
 
 describe("workflow planner", () => {
   it("selects the fee reminder workflow for an unpaid-fee request", () => {
-    const plan = planWorkflow("Hãy nhắc những hội viên chưa đóng hội phí", "fee");
+    const plan = planWorkflow("Hãy nhắc những Học viên chưa đóng hội phí", "fee");
     expect(plan.workflow?.id).toBe("fee-reminder");
   });
 
   it("returns matches sorted by score", () => {
-    const matches = matchWorkflows("xuất hội viên ra file csv", "member");
+    const matches = matchWorkflows("xuất Học viên ra file csv", "member");
     expect(matches[0].workflow.id).toBe("member-export");
   });
 

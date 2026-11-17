@@ -1,4 +1,4 @@
--- 1) Quản trị viên nền tảng (platform admin) có thể quản lý hồ sơ hội viên
+-- 1) Quản trị viên nền tảng (platform admin) có thể quản lý hồ sơ Học viên
 -- (quyền xem đã có sẵn, nay bổ sung quyền thêm/sửa/xóa tương ứng)
 DROP POLICY IF EXISTS members_admin_insert ON public.members;
 CREATE POLICY members_admin_insert ON public.members FOR INSERT TO authenticated
@@ -47,7 +47,7 @@ CREATE POLICY event_ticket_types_select_assoc ON public.event_ticket_types FOR S
   USING (public.is_platform_admin() OR public.is_member_of(association_id));
 
 -- 5) Trigger ghi nhật ký đổi trạng thái danh thiếp: không còn lỗi khi thẻ
--- chưa gắn hiệp hội — tự suy ra hiệp hội từ hồ sơ hội viên/chủ thẻ, bỏ qua nếu không xác định được
+-- chưa gắn hiệp hội — tự suy ra hiệp hội từ hồ sơ Học viên/chủ thẻ, bỏ qua nếu không xác định được
 CREATE OR REPLACE FUNCTION public.log_business_card_status_change()
 RETURNS trigger
 LANGUAGE plpgsql
@@ -78,7 +78,7 @@ BEGIN
 END;
 $$;
 
--- 6) Hàm bảo đảm người dùng có hồ sơ hội viên trong hiệp hội đang hoạt động
+-- 6) Hàm bảo đảm người dùng có hồ sơ Học viên trong hiệp hội đang hoạt động
 -- (dùng khi đăng sản phẩm chợ lần đầu). Chỉ tạo cho chính người gọi,
 -- chỉ khi họ là thành viên của hiệp hội đang hoạt động.
 CREATE OR REPLACE FUNCTION public.ensure_my_member_profile()

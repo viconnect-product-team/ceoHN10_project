@@ -71,7 +71,7 @@ async function captureAll() {
     await injectLoginSession(crmDesktop, 'admin@connect.vn', '123456', CRM_BASE);
     await crmDesktop.goto(`${CRM_BASE}/members`, { waitUntil: 'networkidle', timeout: 30000 });
     await crmDesktop.waitForTimeout(2000);
-    await snap(crmDesktop, '02_crm_members_roles_permission.png', 'CRM: Danh sách Hội viên & Phân quyền Vai trò Ban Điều Hành');
+    await snap(crmDesktop, '02_crm_members_roles_permission.png', 'CRM: Danh sách Học viên & Phân quyền Vai trò Ban Điều Hành');
 
     // -------------------------------------------------------------
     // 3. CRM EVENT CREATION MODAL & SEATING
@@ -79,7 +79,7 @@ async function captureAll() {
     console.log('Capturing CRM Event Creation Modal...');
     await crmDesktop.goto(`${CRM_BASE}/events`, { waitUntil: 'networkidle', timeout: 30000 });
     await crmDesktop.waitForTimeout(2000);
-    
+
     // Try clicking the create event button if present
     const createBtn = await crmDesktop.$('button:has-text("Tạo sự kiện"), button:has-text("Thêm sự kiện")');
     if (createBtn) {
@@ -165,7 +165,7 @@ async function captureAll() {
     console.log('Capturing App User Guide PDF Viewer...');
     await appMobile.goto(`${APP_BASE}/association/profile`, { waitUntil: 'networkidle', timeout: 30000 });
     await appMobile.waitForTimeout(2000);
-    
+
     // Click "Hướng dẫn sử dụng"
     const guideBtn = await appMobile.$('button:has-text("Hướng dẫn sử dụng"), div:has-text("Hướng dẫn sử dụng")');
     if (guideBtn) {

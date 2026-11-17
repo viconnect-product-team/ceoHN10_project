@@ -699,14 +699,14 @@ function EventDetailPage() {
             </button>
           </section>
 
-          {/* Mã QR cho người ngoài không phải hội viên quét đăng ký sự kiện */}
+          {/* Mã QR cho người ngoài không phải Học viên quét đăng ký sự kiện */}
           <section className="rounded-2xl border-2 border-dashed border-amber-500/50 bg-gradient-to-b from-amber-500/5 to-transparent p-5 shadow-[var(--shadow-card)] text-center space-y-3">
             <div className="flex items-center justify-center gap-2 text-amber-700 dark:text-amber-400 font-bold text-xs uppercase tracking-wider">
               <QrCode className="h-4 w-4 text-amber-500" />
               <span>Mã QR Đăng Ký (Dành Cho Khách Mời)</span>
             </div>
             <p className="text-xs text-muted-foreground leading-relaxed">
-              Khách mời chưa phải là hội viên có thể quét mã QR bằng Zalo hoặc Camera điện thoại để đăng ký vé tham dự sự kiện.
+              Khách mời chưa phải là Học viên có thể quét mã QR bằng Zalo hoặc Camera điện thoại để đăng ký vé tham dự sự kiện.
             </p>
             <div className="mx-auto w-44 h-44 p-2 bg-white rounded-2xl border border-amber-300 shadow-sm flex items-center justify-center">
               <img

@@ -704,8 +704,8 @@ function DocsPage() {
         aria-pressed={pinned}
         aria-label={pinned ? t("doc.unpin") : t("doc.pin")}
         className={`inline-flex h-9 w-9 items-center justify-center rounded-lg border border-border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${pinned
-            ? "bg-warning/15 text-warning"
-            : "bg-background text-muted-foreground hover:text-foreground"
+          ? "bg-warning/15 text-warning"
+          : "bg-background text-muted-foreground hover:text-foreground"
           }`}
       >
         {pinned ? (
@@ -725,9 +725,8 @@ function DocsPage() {
           if (isFolder) setCurrentFolderId(d.id);
           else setPreviewDoc(d);
         }}
-        className={`group flex flex-col gap-3 rounded-2xl border border-border bg-card p-4 shadow-[var(--shadow-card)] transition-all hover:shadow-[var(--shadow-md)] cursor-pointer ${
-          isFolder ? "hover:border-amber-500/50 hover:bg-amber-500/5" : "hover:border-blue-500/40 hover:bg-muted/40"
-        }`}
+        className={`group flex flex-col gap-3 rounded-2xl border border-border bg-card p-4 shadow-[var(--shadow-card)] transition-all hover:shadow-[var(--shadow-md)] cursor-pointer ${isFolder ? "hover:border-amber-500/50 hover:bg-amber-500/5" : "hover:border-blue-500/40 hover:bg-muted/40"
+          }`}
       >
         <div className="flex items-start gap-3">
           <TypeGlyph d={d} />
@@ -755,20 +754,20 @@ function DocsPage() {
             <div className="mt-1 flex flex-wrap items-center gap-1.5 text-xs">
               <span
                 className={`inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[10.5px] font-bold ${(d.docScope || "association") === "association"
-                    ? "bg-amber-500/15 text-amber-700 dark:text-amber-400"
-                    : "bg-blue-500/15 text-blue-700 dark:text-blue-400"
+                  ? "bg-amber-500/15 text-amber-700 dark:text-amber-400"
+                  : "bg-blue-500/15 text-blue-700 dark:text-blue-400"
                   }`}
               >
                 {(d.docScope || "association") === "association" ? "🏛️ Hiệp hội" : "🏢 Doanh nghiệp"}
               </span>
               <span
                 className={`inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[10px] font-bold ${d.shareScope === "public"
-                    ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400"
-                    : d.shareScope === "internal"
-                      ? "bg-blue-500/15 text-blue-700 dark:text-blue-400"
-                      : d.shareScope === "specific"
-                        ? "bg-amber-500/15 text-amber-700"
-                        : "bg-slate-500/15 text-slate-700"
+                  ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400"
+                  : d.shareScope === "internal"
+                    ? "bg-blue-500/15 text-blue-700 dark:text-blue-400"
+                    : d.shareScope === "specific"
+                      ? "bg-amber-500/15 text-amber-700"
+                      : "bg-slate-500/15 text-slate-700"
                   }`}
               >
                 {d.shareScope === "public" && "🌐 Công khai"}
@@ -957,8 +956,8 @@ function DocsPage() {
                     aria-pressed={view === "card"}
                     aria-label={t("doc.view.card")}
                     className={`inline-flex h-9 w-9 items-center justify-center rounded-md transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${view === "card"
-                        ? "bg-secondary text-foreground"
-                        : "text-muted-foreground hover:text-foreground"
+                      ? "bg-secondary text-foreground"
+                      : "text-muted-foreground hover:text-foreground"
                       }`}
                   >
                     <LayoutGrid className="h-4 w-4" aria-hidden="true" />
@@ -968,8 +967,8 @@ function DocsPage() {
                     aria-pressed={view === "list"}
                     aria-label={t("doc.view.list")}
                     className={`inline-flex h-9 w-9 items-center justify-center rounded-md transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${view === "list"
-                        ? "bg-secondary text-foreground"
-                        : "text-muted-foreground hover:text-foreground"
+                      ? "bg-secondary text-foreground"
+                      : "text-muted-foreground hover:text-foreground"
                       }`}
                   >
                     <ListIcon className="h-4 w-4" aria-hidden="true" />
@@ -1037,8 +1036,8 @@ function DocsPage() {
                 type="button"
                 onClick={() => setScopeTab("all")}
                 className={`inline-flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-bold transition-all cursor-pointer ${scopeTab === "all"
-                    ? "bg-primary text-primary-foreground shadow-sm"
-                    : "bg-transparent text-muted-foreground hover:bg-muted hover:text-foreground"
+                  ? "bg-primary text-primary-foreground shadow-sm"
+                  : "bg-transparent text-muted-foreground hover:bg-muted hover:text-foreground"
                   }`}
               >
                 <FolderOpen className="h-3.5 w-3.5" />
@@ -1052,8 +1051,8 @@ function DocsPage() {
                 type="button"
                 onClick={() => setScopeTab("association")}
                 className={`inline-flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-bold transition-all cursor-pointer ${scopeTab === "association"
-                    ? "bg-amber-600 text-white shadow-sm"
-                    : "bg-transparent text-amber-700 dark:text-amber-400 hover:bg-amber-500/10"
+                  ? "bg-amber-600 text-white shadow-sm"
+                  : "bg-transparent text-amber-700 dark:text-amber-400 hover:bg-amber-500/10"
                   }`}
               >
                 <ShieldCheck className="h-3.5 w-3.5" />
@@ -1070,8 +1069,8 @@ function DocsPage() {
                 type="button"
                 onClick={() => setScopeTab("enterprise")}
                 className={`inline-flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-bold transition-all cursor-pointer ${scopeTab === "enterprise"
-                    ? "bg-blue-600 text-white shadow-sm"
-                    : "bg-transparent text-blue-700 dark:text-blue-400 hover:bg-blue-500/10"
+                  ? "bg-blue-600 text-white shadow-sm"
+                  : "bg-transparent text-blue-700 dark:text-blue-400 hover:bg-blue-500/10"
                   }`}
               >
                 <Building className="h-3.5 w-3.5" />
@@ -1094,8 +1093,8 @@ function DocsPage() {
           <button
             onClick={() => setDocTab("docs")}
             className={`inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all ${docTab === "docs"
-                ? "bg-primary text-primary-foreground shadow-sm shadow-primary/25"
-                : "border border-border bg-card text-muted-foreground hover:bg-muted hover:text-foreground"
+              ? "bg-primary text-primary-foreground shadow-sm shadow-primary/25"
+              : "border border-border bg-card text-muted-foreground hover:bg-muted hover:text-foreground"
               }`}
           >
             <FolderOpen className="h-4 w-4" />
@@ -1111,8 +1110,8 @@ function DocsPage() {
           <button
             onClick={() => setDocTab("mail_templates")}
             className={`inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all ${docTab === "mail_templates"
-                ? "bg-primary text-primary-foreground shadow-sm shadow-primary/25"
-                : "border border-border bg-card text-muted-foreground hover:bg-muted hover:text-foreground"
+              ? "bg-primary text-primary-foreground shadow-sm shadow-primary/25"
+              : "border border-border bg-card text-muted-foreground hover:bg-muted hover:text-foreground"
               }`}
           >
             <FileText className="h-4 w-4" />
@@ -1396,8 +1395,8 @@ function DocsPage() {
                   onClick={() => setPinnedOnly(pinnedActive ? "0" : "1")}
                   aria-pressed={pinnedActive}
                   className={`inline-flex h-9 items-center gap-1.5 rounded-full border px-3 text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${pinnedActive
-                      ? "border-warning/40 bg-warning/15 text-warning"
-                      : "border-border bg-background text-muted-foreground hover:text-foreground"
+                    ? "border-warning/40 bg-warning/15 text-warning"
+                    : "border-border bg-background text-muted-foreground hover:text-foreground"
                     }`}
                 >
                   <Pin className="h-3.5 w-3.5" aria-hidden="true" />
@@ -1407,8 +1406,8 @@ function DocsPage() {
                   onClick={() => setGroup(group === "cat" ? "none" : "cat")}
                   aria-pressed={group === "cat"}
                   className={`inline-flex h-9 items-center gap-1.5 rounded-full border px-3 text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${group === "cat"
-                      ? "border-primary/40 bg-primary/10 text-primary"
-                      : "border-border bg-background text-muted-foreground hover:text-foreground"
+                    ? "border-primary/40 bg-primary/10 text-primary"
+                    : "border-border bg-background text-muted-foreground hover:text-foreground"
                     }`}
                 >
                   <FolderOpen className="h-3.5 w-3.5" aria-hidden="true" />
@@ -1492,8 +1491,8 @@ function DocsPage() {
                               type="button"
                               onClick={() => setCurrentFolderId(crumb.id)}
                               className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-semibold transition-colors cursor-pointer ${isLast
-                                  ? "bg-amber-500/15 text-amber-700 dark:text-amber-400 font-bold"
-                                  : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                                ? "bg-amber-500/15 text-amber-700 dark:text-amber-400 font-bold"
+                                : "text-muted-foreground hover:bg-muted hover:text-foreground"
                                 }`}
                             >
                               {idx === 0 ? <Folder className="h-3.5 w-3.5 text-amber-500" /> : <FolderOpen className="h-3.5 w-3.5 text-amber-600" />}
@@ -1879,7 +1878,7 @@ function DocsPage() {
                     autoFocus
                     value={newFolderName}
                     onChange={(e) => setNewFolderName(e.target.value)}
-                    placeholder="Ví dụ: Đại hội Hội viên 2026, Biểu mẫu ban Xúc tiến..."
+                    placeholder="Ví dụ: Đại hội Học viên 2026, Biểu mẫu ban Xúc tiến..."
                     className="w-full rounded-xl border border-border bg-background px-3.5 py-2.5 text-sm focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20"
                   />
                 </div>
@@ -2024,7 +2023,7 @@ function DocsPage() {
           document={previewDoc}
         />
 
-        {/* Modal Gửi Tài Liệu Vào Tin Nhắn CRM / Hội Viên */}
+        {/* Modal Gửi Tài Liệu Vào Tin Nhắn CRM / Học viên */}
         <SendDocumentToMessageModal
           isOpen={Boolean(sendMessageDoc)}
           onClose={() => setSendMessageDoc(null)}

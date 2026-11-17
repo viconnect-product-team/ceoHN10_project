@@ -67,6 +67,22 @@ export class TrainingsService implements OnModuleInit {
         `ALTER TABLE public.trainings ADD COLUMN IF NOT EXISTS slide_url TEXT;`,
         `ALTER TABLE public.trainings ADD COLUMN IF NOT EXISTS media_url TEXT;`,
         `ALTER TABLE public.trainings ADD COLUMN IF NOT EXISTS document_id UUID;`,
+        `ALTER TABLE public.trainings ADD COLUMN IF NOT EXISTS room_id TEXT;`,
+        `ALTER TABLE public.trainings ADD COLUMN IF NOT EXISTS room_url TEXT;`,
+        `ALTER TABLE public.trainings ADD COLUMN IF NOT EXISTS meeting_passcode TEXT DEFAULT '198388';`,
+        `ALTER TABLE public.trainings ADD COLUMN IF NOT EXISTS video_provider TEXT DEFAULT 'jitsi';`,
+        `ALTER TABLE public.trainings ADD COLUMN IF NOT EXISTS max_attendees INTEGER DEFAULT 100;`,
+        `ALTER TABLE public.trainings ADD COLUMN IF NOT EXISTS attendee_count INTEGER DEFAULT 0;`,
+        `ALTER TABLE public.trainings ADD COLUMN IF NOT EXISTS ticket_tiers JSONB DEFAULT '[]'::jsonb;`,
+        `ALTER TABLE public.trainings ADD COLUMN IF NOT EXISTS materials JSONB DEFAULT '[]'::jsonb;`,
+        `ALTER TABLE public.trainings ADD COLUMN IF NOT EXISTS cover_image TEXT;`,
+        `ALTER TABLE public.trainings ADD COLUMN IF NOT EXISTS registration_url TEXT;`,
+        `ALTER TABLE public.trainings ADD COLUMN IF NOT EXISTS open_registration BOOLEAN DEFAULT true;`,
+        `ALTER TABLE public.trainings ADD COLUMN IF NOT EXISTS created_by UUID;`,
+        `ALTER TABLE public.trainings ADD COLUMN IF NOT EXISTS tagline TEXT;`,
+        `ALTER TABLE public.trainings ADD COLUMN IF NOT EXISTS instructor_title TEXT;`,
+        `ALTER TABLE public.trainings ADD COLUMN IF NOT EXISTS instructor_company TEXT;`,
+        `ALTER TABLE public.trainings ADD COLUMN IF NOT EXISTS address TEXT;`,
       ];
 
       for (const sql of columnsToAdd) {
@@ -219,38 +235,100 @@ export class TrainingsService implements OnModuleInit {
       ) RETURNING id;
     `;
 
-    const res = await this.prisma.$queryRawUnsafe<any[]>(
-      insertSql,
-      data.title.trim(),
-      data.tagline || '',
-      data.instructorName || '',
-      data.instructorTitle || '',
-      data.instructorCompany || '',
-      data.description || '',
-      data.category || 'Kỹ năng lãnh đạo',
-      data.format || 'hybrid',
-      data.status || 'upcoming',
-      isFixed,
-      scheduleType,
-      isCustomSession,
-      totalCost,
-      expectedAttendees,
-      calculatedFee,
-      fundType,
-      agendaJson,
-      data.startTime ? new Date(data.startTime) : null,
-      data.endTime ? new Date(data.endTime) : null,
-      data.location || '',
-      data.address || '',
-      maxAtt,
-      tiersJson,
-      materialsJson,
-      data.slideUrl || '',
-      data.mediaUrl || '',
-      data.coverImage || '',
-      data.registrationUrl || '',
-      data.openRegistration !== false,
-    );
+    const parseDate = (d: any) => (d && !isNaN(new Date(d).getTime()) ? new Date(d) : null);
+
+    let res: any[] = [];
+    try {
+      res = await this.prisma.$queryRawUnsafe<any[]>(
+        insertSql,
+        data.title.trim(),
+        data.tagline || '',
+        data.instructorName || '',
+        data.instructorTitle || '',
+        data.instructorCompany || '',
+        data.description || '',
+        data.category || 'Kỹ năng lãnh đạo',
+        data.format || 'hybrid',
+        data.status || 'upcoming',
+        isFixed,
+        scheduleType,
+        isCustomSession,
+        totalCost,
+        expectedAttendees,
+        calculatedFee,
+        fundType,
+        agendaJson,
+        parseDate(data.startTime),
+        parseDate(data.endTime),
+        data.location || '',
+        data.address || '',
+        maxAtt,
+        tiersJson,
+        materialsJson,
+        data.slideUrl || '',
+        data.mediaUrl || '',
+        data.coverImage || '',
+        data.registrationUrl || '',
+        data.openRegistration !== false,
+      );
+    } catch (insertErr) {
+      console.warn('Initial training insert failed, attempting schema sync and retry:', insertErr);
+      await this.ensureSchema();
+      try {
+        res = await this.prisma.$queryRawUnsafe<any[]>(
+          insertSql,
+          data.title.trim(),
+          data.tagline || '',
+          data.instructorName || '',
+          data.instructorTitle || '',
+          data.instructorCompany || '',
+          data.description || '',
+          data.category || 'Kỹ năng lãnh đạo',
+          data.format || 'hybrid',
+          data.status || 'upcoming',
+          isFixed,
+          scheduleType,
+          isCustomSession,
+          totalCost,
+          expectedAttendees,
+          calculatedFee,
+          fundType,
+          agendaJson,
+          parseDate(data.startTime),
+          parseDate(data.endTime),
+          data.location || '',
+          data.address || '',
+          maxAtt,
+          tiersJson,
+          materialsJson,
+          data.slideUrl || '',
+          data.mediaUrl || '',
+          data.coverImage || '',
+          data.registrationUrl || '',
+          data.openRegistration !== false,
+        );
+      } catch (retryErr) {
+        // Fallback to essential columns if any extended column is still causing issues
+        const fallbackSql = `
+          INSERT INTO public.trainings (
+            title, description, format, status, start_time, end_time, location, max_attendees, created_at, updated_at
+          ) VALUES (
+            $1, $2, $3, $4, $5, $6, $7, $8, now(), now()
+          ) RETURNING id;
+        `;
+        res = await this.prisma.$queryRawUnsafe<any[]>(
+          fallbackSql,
+          data.title.trim(),
+          data.description || '',
+          data.format || 'hybrid',
+          data.status || 'upcoming',
+          parseDate(data.startTime),
+          parseDate(data.endTime),
+          data.location || '',
+          maxAtt,
+        );
+      }
+    }
 
     const newId = res[0]?.id;
 

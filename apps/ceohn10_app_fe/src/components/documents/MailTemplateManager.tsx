@@ -82,10 +82,10 @@ export const INITIAL_MAIL_TEMPLATES: MailTemplateItem[] = [
     inAppTitle: "Hôm nay trong App CEO HN10 có gì?",
     inAppBody: "Kính gửi Anh/Chị {{full_name}}!\n\nHôm nay trong App CEO HN10 có gì?\n\n📌 Mô tả hoạt động:\n{{activity_description}}\n\n⏰ Thời gian diễn ra: {{activity_datetime}}\n💰 Chi phí tham dự: {{activity_fee}}\n📍 Địa điểm / Kênh: {{activity_location}}\n📱 Mã QR Check-in: Quét mã QR đính kèm để điểm danh\n\nTrân trọng,\nBan Thư Ký CLB Doanh Nhân CEO HN10",
     variables: [
-      { key: "full_name", label: "Tên hội viên", example: "Dương Thị Huệ" },
+      { key: "full_name", label: "Tên Học viên", example: "Dương Thị Huệ" },
       { key: "activity_description", label: "Mô tả hoạt động", example: "Phiên kết nối giao thương nội bộ B2B 1-on-1 ngành F&B & Công nghệ, chia sẻ chuyên đề tối ưu dòng tiền và giao lưu kết nối cùng 15+ thành viên mới gia nhập CLB." },
       { key: "activity_datetime", label: "Thời gian diễn ra", example: "14:30 - 17:00 Hôm nay, 14/11/2026" },
-      { key: "activity_fee", label: "Chi phí tham dự", example: "Miễn phí dành cho Hội viên chính thức" },
+      { key: "activity_fee", label: "Chi phí tham dự", example: "Miễn phí dành cho Học viên chính thức" },
       { key: "activity_location", label: "Địa điểm / Phòng họp", example: "Hội Trường VIONE, 83 Vũ Trọng Phụng, Thanh Xuân, Hà Nội & Online App CEO HN10" },
       { key: "qr_code_url", label: "Mã QR Check-in", example: "https://ceohn10.viconnect.vn/events/today" },
     ],
@@ -113,7 +113,7 @@ export const INITIAL_MAIL_TEMPLATES: MailTemplateItem[] = [
         label: "Chi phí / Hội phí tham dự",
         type: "price",
         value: "0",
-        placeholder: "0 VNĐ (Miễn phí dành cho Hội viên)",
+        placeholder: "0 VNĐ (Miễn phí dành cho Học viên)",
       },
       {
         id: "f_location",
@@ -219,7 +219,7 @@ export const INITIAL_MAIL_TEMPLATES: MailTemplateItem[] = [
       { key: "event_summary", label: "Nội dung chính", example: "Chiến lược tăng trưởng doanh nghiệp 2026, Xúc tiến thương mại đa kênh, Ký kết hợp tác B2B" },
       { key: "event_date", label: "Thời gian", example: "18:30 - 21:30 Thứ Bảy, 10/09/2026" },
       { key: "event_location", label: "Địa điểm", example: "Habblet Hotel & Cung Điện Atlantis, Hà Nội" },
-      { key: "event_fee", label: "Chi phí", example: "Miễn phí dành cho Hội viên chính thức CEO HN10" },
+      { key: "event_fee", label: "Chi phí", example: "Miễn phí dành cho Học viên chính thức CEO HN10" },
       { key: "google_maps_url", label: "Google Maps", example: "https://maps.google.com/?q=Habblet+Hotel+Hanoi" },
       { key: "dress_code", label: "Trang phục", example: "Vest / Dạ tiệc lịch sự" },
       { key: "parking_info", label: "Gửi xe", example: "Tầng hầm B1-B2 khách sạn, miễn phí vé xe" },
@@ -286,7 +286,7 @@ export const INITIAL_MAIL_TEMPLATES: MailTemplateItem[] = [
       { key: "full_name", label: "Tên Anh/Chị tham dự", example: "Lê Minh Tuấn" },
       { key: "meeting_title", label: "Tên cuộc họp", example: "Họp Giao Ban Ban Điều Hành CLB CEO HN10 Tháng 10/2026" },
       { key: "speaker_name", label: "Chủ trì cuộc họp", example: "Chủ tịch CLB Doanh Nhân CEO HN10 & Tổng Thư Ký" },
-      { key: "event_summary", label: "Nội dung chính", example: "Đánh giá kết quả kết nối B2B quý 3, Thống nhất kế hoạch xúc tiến thương mại và phê duyệt tân hội viên quý 4" },
+      { key: "event_summary", label: "Nội dung chính", example: "Đánh giá kết quả kết nối B2B quý 3, Thống nhất kế hoạch xúc tiến thương mại và phê duyệt tân Học viên quý 4" },
       { key: "event_date", label: "Thời gian", example: "14:00 - 17:00 Thứ Sáu, 16/10/2026" },
       { key: "event_location", label: "Địa điểm / Phòng họp", example: "Văn phòng Hiệp hội HanoiBA, Tầng 5 Tháp Doanh Nhân" },
       { key: "event_fee", label: "Chi phí", example: "Kinh phí CLB đài thọ" },
@@ -427,7 +427,7 @@ export const INITIAL_MAIL_TEMPLATES: MailTemplateItem[] = [
       { key: "event_summary", label: "Nội dung chính", example: "Nắm vững kỹ thuật quản trị vốn lưu động, kiểm soát rủi ro đòn bẩy và lập kế hoạch ngân sách tự động cho CEO" },
       { key: "event_date", label: "Thời gian", example: "08:30 - 17:00 Thứ Bảy, 24/10/2026" },
       { key: "event_location", label: "Địa điểm / Phòng đào tạo", example: "Hội trường Diamond, Trung tâm Đào tạo Doanh nhân Hà Nội" },
-      { key: "event_fee", label: "Chi phí", example: "Hội viên CEO HN10 được hỗ trợ 100% học phí" },
+      { key: "event_fee", label: "Chi phí", example: "Học viên CEO HN10 được hỗ trợ 100% học phí" },
       { key: "google_maps_url", label: "Google Maps", example: "https://maps.google.com/?q=Hanoi+Training+Center" },
       { key: "dress_code", label: "Trang phục", example: "Lịch sự / Business Casual" },
       { key: "parking_info", label: "Gửi xe", example: "Bãi đỗ xe khuôn viên trung tâm đào tạo" },
@@ -483,15 +483,15 @@ export const INITIAL_MAIL_TEMPLATES: MailTemplateItem[] = [
     id: "tmpl-welcome-new-member",
     code: "NEW_MEMBER_THANKS",
     category: "welcome",
-    name: "Thư Cảm Ơn & Chào Mừng Hội Viên Mới Gia Nhập",
-    description: "Thư cảm ơn và chúc mừng chính thức gửi đến tân hội viên ngay sau khi hoàn tất đăng ký gia nhập CLB CEO HN10.",
+    name: "Thư Cảm Ơn & Chào Mừng Học viên Mới Gia Nhập",
+    description: "Thư cảm ơn và chúc mừng chính thức gửi đến tân Học viên ngay sau khi hoàn tất đăng ký gia nhập CLB CEO HN10.",
     channels: ["email", "in_app", "zalo_oa"],
     subject: "[THƯ CẢM ƠN] Chúc mừng Anh/Chị {{full_name}} chính thức gia nhập CLB Doanh Nhân CEO HN10",
-    inAppTitle: "Chào mừng tân hội viên {{full_name}}!",
-    inAppBody: "Kính gửi Anh/Chị {{full_name}}\n- Ban Chấp Hành CLB Doanh Nhân CEO HN10 trân trọng cảm ơn và chúc mừng Anh/Chị đã chính thức gia nhập CLB!\n- Họ và tên: {{full_name}}\n- Tên doanh nghiệp: {{company_name}}\n- Mã hội viên: {{member_code}}\n- Ban sinh hoạt: {{department}}\n- Hotline BTC khi cần hỗ trợ: 0973.205.683 / 0903.205.683 / 0903.203.204\n- Trân trọng! TM. BAN CHẤP HÀNH CLB DOANH NHÂN CEO HN10",
+    inAppTitle: "Chào mừng tân Học viên {{full_name}}!",
+    inAppBody: "Kính gửi Anh/Chị {{full_name}}\n- Ban Chấp Hành CLB Doanh Nhân CEO HN10 trân trọng cảm ơn và chúc mừng Anh/Chị đã chính thức gia nhập CLB!\n- Họ và tên: {{full_name}}\n- Tên doanh nghiệp: {{company_name}}\n- Mã Học viên: {{member_code}}\n- Ban sinh hoạt: {{department}}\n- Hotline BTC khi cần hỗ trợ: 0973.205.683 / 0903.205.683 / 0903.203.204\n- Trân trọng! TM. BAN CHẤP HÀNH CLB DOANH NHÂN CEO HN10",
     variables: [
-      { key: "full_name", label: "Họ và tên hội viên", example: "Trần Anh Đức" },
-      { key: "member_code", label: "Mã hội viên được cấp", example: "HN10-025" },
+      { key: "full_name", label: "Họ và tên Học viên", example: "Trần Anh Đức" },
+      { key: "member_code", label: "Mã Học viên được cấp", example: "HN10-025" },
       { key: "company_name", label: "Tên doanh nghiệp", example: "Công ty Cổ phần Giải pháp Năng lượng Xanh" },
       { key: "department", label: "Ban sinh hoạt", example: "Ban Xúc tiến thương mại & Đầu tư" },
     ],
@@ -502,18 +502,18 @@ export const INITIAL_MAIL_TEMPLATES: MailTemplateItem[] = [
     <div style="display: inline-block; padding: 4px 14px; background: rgba(52, 211, 153, 0.2); border: 1px solid rgba(52, 211, 153, 0.4); border-radius: 9999px; font-size: 11px; font-weight: 800; color: #6ee7b7; margin-bottom: 12px; text-transform: uppercase;">
       THƯ CẢM ƠN & CHÀO MỪNG CHÍNH THỨC
     </div>
-    <h1 style="margin: 0; font-size: 21px; font-weight: 800; color: #ffffff;">CHÀO MỪNG TÂN HỘI VIÊN CEO HN10</h1>
+    <h1 style="margin: 0; font-size: 21px; font-weight: 800; color: #ffffff;">CHÀO MỪNG TÂN Học viên CEO HN10</h1>
     <p style="margin: 8px 0 0; font-size: 13px; color: #94a3b8;">Cùng gắn kết - Cùng chia sẻ - Cùng phát triển vững mạnh</p>
   </div>
   <div style="padding: 26px 24px; color: #1e293b; line-height: 1.6; font-size: 14px;">
     <p style="margin: 0 0 10px; font-size: 15px;"><strong>Kính gửi Anh/Chị {{full_name}}</strong></p>
     <p style="margin: 0 0 14px; color: #334155;">- Ban Chấp Hành CLB Doanh Nhân CEO HN10 trân trọng cảm ơn và chúc mừng Anh/Chị đã chính thức gia nhập CLB!</p>
     <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 12px; padding: 16px; margin: 16px 0;">
-      <p style="margin: 0 0 8px; font-weight: bold; color: #166534; text-transform: uppercase; font-size: 12.5px;">- Thông tin hội viên:</p>
+      <p style="margin: 0 0 8px; font-weight: bold; color: #166534; text-transform: uppercase; font-size: 12.5px;">- Thông tin Học viên:</p>
       <table style="width: 100%; font-size: 13px; border-collapse: collapse;">
         <tr><td style="padding: 4px 0; color: #4b5563; width: 170px;">+ Họ và tên:</td><td style="padding: 4px 0; font-weight: 700; color: #111827;">{{full_name}}</td></tr>
         <tr><td style="padding: 4px 0; color: #4b5563;">+ Tên doanh nghiệp:</td><td style="padding: 4px 0; font-weight: 600; color: #111827;">{{company_name}}</td></tr>
-        <tr><td style="padding: 4px 0; color: #4b5563;">+ Mã hội viên:</td><td style="padding: 4px 0; font-family: monospace; font-weight: 700; color: #15803d; font-size: 14px;">{{member_code}}</td></tr>
+        <tr><td style="padding: 4px 0; color: #4b5563;">+ Mã Học viên:</td><td style="padding: 4px 0; font-family: monospace; font-weight: 700; color: #15803d; font-size: 14px;">{{member_code}}</td></tr>
         <tr><td style="padding: 4px 0; color: #4b5563;">+ Ban sinh hoạt:</td><td style="padding: 4px 0; font-weight: 600; color: #1d4ed8;">{{department}}</td></tr>
       </table>
     </div>
@@ -529,17 +529,17 @@ export const INITIAL_MAIL_TEMPLATES: MailTemplateItem[] = [
     id: "tmpl-member-credentials",
     code: "MEMBER_ACCOUNT_CREDENTIALS",
     category: "system",
-    name: "Template Gửi Tài Khoản & Mật Khẩu Cho Hội Viên Mới",
+    name: "Template Gửi Tài Khoản & Mật Khẩu Cho Học viên Mới",
     description: "Tự động gửi thông tin tài khoản đăng nhập kèm link cài đặt app 1-chạm và liên kết Zalo OA chính thức.",
     channels: ["email", "in_app", "zalo_oa"],
-    subject: "[TÀI KHOẢN HỘI VIÊN] Thông tin đăng nhập ứng dụng CEO HN10 - Kính gửi Anh/Chị {{full_name}}",
+    subject: "[TÀI KHOẢN Học viên] Thông tin đăng nhập ứng dụng CEO HN10 - Kính gửi Anh/Chị {{full_name}}",
     inAppTitle: "Thông tin tài khoản ứng dụng CEO HN10",
     inAppBody: "Kính gửi Anh/Chị {{full_name}}\n- Ban Quản Trị gửi thông tin tài khoản đăng nhập app CEO HN10:\n- Tên đăng nhập: {{email}}\n- Mật khẩu: {{temporary_password}}\n- Hotline BTC khi cần hỗ trợ: 0973.205.683 / 0903.205.683 / 0903.203.204\n- Trân trọng!",
     variables: [
-      { key: "full_name", label: "Họ và tên hội viên", example: "Nguyễn Văn Tuấn" },
+      { key: "full_name", label: "Họ và tên Học viên", example: "Nguyễn Văn Tuấn" },
       { key: "email", label: "Tên đăng nhập (Email)", example: "tuan.nguyen@vione.com" },
       { key: "temporary_password", label: "Mật khẩu khởi tạo", example: "Ceo1983@Pass" },
-      { key: "member_code", label: "Mã hội viên", example: "HN10-088" },
+      { key: "member_code", label: "Mã Học viên", example: "HN10-088" },
       { key: "department", label: "Ban sinh hoạt", example: "Ban Truyền Thông" },
       { key: "app_install_url", label: "Link cài App & Zalo OA", example: "https://ceohn10.viconnect.vn/open-app?email=tuan.nguyen@vione.com&auto_install=true" },
     ],
@@ -548,7 +548,7 @@ export const INITIAL_MAIL_TEMPLATES: MailTemplateItem[] = [
 <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 620px; margin: 0 auto; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.06);">
   <div style="background: linear-gradient(135deg, #001D4A 0%, #003B95 100%); padding: 30px 24px; text-align: center; color: #ffffff;">
     <div style="display: inline-block; padding: 4px 14px; background: rgba(254, 240, 138, 0.25); border: 1px solid rgba(254, 240, 138, 0.5); border-radius: 9999px; font-size: 11px; font-weight: 800; color: #fde047; margin-bottom: 12px; text-transform: uppercase;">
-      THÔNG TIN TÀI KHOẢN HỘI VIÊN CHÍNH THỨC
+      THÔNG TIN TÀI KHOẢN Học viên CHÍNH THỨC
     </div>
     <h1 style="margin: 0; font-size: 21px; font-weight: 800; color: #ffffff;">TÀI KHOẢN ỨNG DỤNG CEO HN10</h1>
     <p style="margin: 8px 0 0; font-size: 13px; color: #cbd5e1;">CLB Doanh Nhân CEO HN10 (HanoiBA)</p>
@@ -556,7 +556,7 @@ export const INITIAL_MAIL_TEMPLATES: MailTemplateItem[] = [
   <div style="padding: 26px 24px; color: #1e293b; line-height: 1.6; font-size: 14px;">
     <p style="margin: 0 0 12px; font-size: 15px;"><strong>Kính gửi Anh/Chị {{full_name}}</strong></p>
     <p style="margin: 0 0 14px; color: #334155;">
-      - Ban Quản Trị CLB Doanh Nhân CEO HN10 trân trọng gửi Quý Anh/Chị thông tin tài khoản đăng nhập ứng dụng Hội viên CEO HN10:
+      - Ban Quản Trị CLB Doanh Nhân CEO HN10 trân trọng gửi Quý Anh/Chị thông tin tài khoản đăng nhập ứng dụng Học viên CEO HN10:
     </p>
 
     <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-left: 4px solid #003B95; border-radius: 10px; padding: 18px; margin: 16px 0;">
@@ -564,7 +564,7 @@ export const INITIAL_MAIL_TEMPLATES: MailTemplateItem[] = [
       <table style="width: 100%; font-size: 13px; border-collapse: collapse;">
         <tr><td style="padding: 5px 0; color: #64748b; width: 170px;">+ Tên đăng nhập (Email):</td><td style="padding: 5px 0; font-family: monospace; font-weight: 700; color: #0284c7; font-size: 14px;">{{email}}</td></tr>
         <tr><td style="padding: 5px 0; color: #64748b;">+ Mật khẩu khởi tạo:</td><td style="padding: 5px 0; font-family: monospace; font-weight: 700; color: #d97706; font-size: 14px;">{{temporary_password}}</td></tr>
-        <tr><td style="padding: 5px 0; color: #64748b;">+ Mã hội viên:</td><td style="padding: 5px 0; font-weight: 700; color: #0f172a;">{{member_code}}</td></tr>
+        <tr><td style="padding: 5px 0; color: #64748b;">+ Mã Học viên:</td><td style="padding: 5px 0; font-weight: 700; color: #0f172a;">{{member_code}}</td></tr>
         <tr><td style="padding: 5px 0; color: #64748b;">+ Ban sinh hoạt:</td><td style="padding: 5px 0; font-weight: 600; color: #166534;">{{department}}</td></tr>
       </table>
     </div>
@@ -600,7 +600,7 @@ export const INITIAL_MAIL_TEMPLATES: MailTemplateItem[] = [
     inAppTitle: "Thông báo nộp hội phí năm {{fee_year}}",
     inAppBody: "Kính gửi Anh/Chị {{full_name}}\n- Ban Thường Trực CLB Doanh Nhân CEO HN10 trân trọng thông báo quyết toán niên liễm năm {{fee_year}}.\n- Mức hội phí: {{fee_amount}} VNĐ\n- Hạn nộp: {{due_date}}\n- Tên tài khoản: {{bank_owner}}\n- Số tài khoản CLB: {{bank_account}}\n- Ngân hàng: {{bank_name}}\n- Cú pháp chuyển khoản: {{transfer_content}}\n- Hotline Kế toán: 0973.205.683 / 0903.205.683 / 0903.203.204\n- Trân trọng! TM. BAN TÀI CHÍNH & KẾ TOÁN CLB DOANH NHÂN CEO HN10",
     variables: [
-      { key: "full_name", label: "Tên hội viên / Đại diện", example: "Phạm Hồng Nguyên" },
+      { key: "full_name", label: "Tên Học viên / Đại diện", example: "Phạm Hồng Nguyên" },
       { key: "company_name", label: "Tên doanh nghiệp", example: "Tập Đoàn An Phát" },
       { key: "fee_year", label: "Năm tài chính", example: "2026" },
       { key: "fee_amount", label: "Mức hội phí", example: "5.000.000" },
@@ -656,14 +656,14 @@ export const INITIAL_MAIL_TEMPLATES: MailTemplateItem[] = [
     inAppBody: "- Kính gửi Anh/Chị: {{full_name}}\n- BTC trân trọng kính mời Anh/Chị tham dự sự kiện: {{event_title}}\n- Thời gian: {{event_date}}\n- Địa điểm: {{event_location}}\n- Hotline BTC khi cần hỗ trợ: 0973.205.683 / 0903.205.683 / 0903.203.204\n- Trân trọng!",
     variables: [
       { key: "full_name", label: "Tên đại biểu (Kính gửi Anh/Chị)", example: "Dương Thị Huệ" },
-      { key: "member_code", label: "Mã hội viên", example: "HN10-016" },
+      { key: "member_code", label: "Mã Học viên", example: "HN10-016" },
       { key: "event_title", label: "Tên sự kiện", example: "Diễn Đàn Chuyển Đổi Số Doanh Nghiệp 2026 & Gala Kết Nối" },
       { key: "poster_url", label: "Ảnh Poster sự kiện", example: "https://ceohn10.viconnect.vn/uploads/events/poster.jpg" },
       { key: "speakers", label: "Diễn giả", example: "Chủ tịch HĐQT & Sáng Lập VICONNECT GROUP, Chuyên gia Kinh tế trưởng" },
       { key: "summary", label: "Nội dung chính", example: "Chiến lược tăng trưởng doanh nghiệp 2026, Xúc tiến thương mại đa kênh, Ký kết hợp tác B2B" },
       { key: "event_date", label: "Thời gian", example: "18:30 - 21:30 Thứ Bảy, 10/09/2026" },
       { key: "event_location", label: "Địa điểm", example: "Habblet Hotel & Cung Điện Atlantis, Hà Nội" },
-      { key: "fee", label: "Chi phí", example: "Miễn phí dành cho Hội viên chính thức CEO HN10" },
+      { key: "fee", label: "Chi phí", example: "Miễn phí dành cho Học viên chính thức CEO HN10" },
       { key: "google_maps_link", label: "Google Maps", example: "https://maps.google.com/?q=Habblet+Hotel+Hanoi" },
       { key: "dress_code", label: "Trang phục", example: "Black Tie / Vest / Dạ tiệc lịch sự" },
       { key: "parking_info", label: "Gửi xe", example: "Tầng hầm B1-B2 khách sạn, miễn phí vé xe" },
@@ -751,15 +751,15 @@ export const INITIAL_MAIL_TEMPLATES: MailTemplateItem[] = [
     id: "tmpl-birthday-greeting",
     code: "BIRTHDAY_GREETING",
     category: "birthday",
-    name: "Thiệp & Thư Chúc Mừng Sinh Nhật Hội Viên",
+    name: "Thiệp & Thư Chúc Mừng Sinh Nhật Học viên",
     description: "Tự động gửi thư chúc mừng sinh nhật kèm thiệp mừng sang trọng, lời chúc từ Chủ tịch & Ban Điều Hành, và banner ảnh tải lên tùy biến.",
     channels: ["email", "in_app", "zalo_oa"],
     subject: "[CHÚC MỪNG SINH NHẬT] CLB Doanh Nhân CEO HN10 chúc mừng sinh nhật Anh/Chị {{full_name}}!",
     inAppTitle: "Chúc mừng sinh nhật Anh/Chị {{full_name}}!",
     inAppBody: "Ban Chấp Hành CLB Doanh Nhân CEO HN10 kính chúc Anh/Chị {{full_name}} ({{company_name}}) tuổi mới sức khỏe dồi dào, vạn sự hanh thông và gặt hái nhiều thành công rực rỡ!",
     variables: [
-      { key: "full_name", label: "Họ và tên hội viên", example: "Lê Minh Tuấn" },
-      { key: "member_code", label: "Mã hội viên", example: "HN10-099" },
+      { key: "full_name", label: "Họ và tên Học viên", example: "Lê Minh Tuấn" },
+      { key: "member_code", label: "Mã Học viên", example: "HN10-099" },
       { key: "company_name", label: "Tên doanh nghiệp", example: "Tập Đoàn Đầu Tư Quốc Tế An Phát" },
       { key: "executive_role", label: "Vai trò / Chức danh", example: "Ủy viên Ban Điều Hành" },
       { key: "department", label: "Ban chuyên môn", example: "Ban Xúc tiến thương mại" },
@@ -774,7 +774,7 @@ export const INITIAL_MAIL_TEMPLATES: MailTemplateItem[] = [
     <div style="display: inline-block; padding: 6px 18px; background: rgba(245, 158, 11, 0.25); border: 1px solid rgba(245, 158, 11, 0.6); border-radius: 9999px; font-size: 12px; font-weight: 800; color: #FBBF24; margin-bottom: 14px; text-transform: uppercase; letter-spacing: 1.5px;">
       🎂 HAPPY BIRTHDAY · CHÚC MỪNG SINH NHẬT
     </div>
-    <h1 style="margin: 0; font-size: 24px; font-weight: 900; color: #ffffff; letter-spacing: 0.5px;">CHÚC MỪNG SINH NHẬT HỘI VIÊN</h1>
+    <h1 style="margin: 0; font-size: 24px; font-weight: 900; color: #ffffff; letter-spacing: 0.5px;">CHÚC MỪNG SINH NHẬT Học viên</h1>
     <p style="margin: 8px 0 0; font-size: 15px; color: #fef08a; font-weight: 700;">Anh/Chị {{full_name}} ({{birth_date}})</p>
     <p style="margin: 4px 0 0; font-size: 12px; color: #cbd5e1;">CLB Doanh Nhân CEO HN10 - Hiệp Hội Doanh Nghiệp Trẻ Hà Nội (HanoiBA)</p>
   </div>
@@ -825,9 +825,9 @@ export const INITIAL_MAIL_TEMPLATES: MailTemplateItem[] = [
     channels: ["email", "in_app", "zalo_oa"],
     subject: "[CEO HN10 B2B] Cơ hội hợp tác & Bản tin kết nối giao thương tháng {{campaign_month}}",
     inAppTitle: "Bản tin kết nối giao thương B2B tháng {{campaign_month}}",
-    inAppBody: "Kính gửi Anh/Chị {{full_name}}, khám phá danh mục chào hàng và nhu cầu mua sắm ưu tiên từ các doanh nghiệp hội viên CEO HN10.",
+    inAppBody: "Kính gửi Anh/Chị {{full_name}}, khám phá danh mục chào hàng và nhu cầu mua sắm ưu tiên từ các doanh nghiệp Học viên CEO HN10.",
     variables: [
-      { key: "full_name", label: "Tên hội viên", example: "Vũ Minh Tuấn" },
+      { key: "full_name", label: "Tên Học viên", example: "Vũ Minh Tuấn" },
       { key: "company_name", label: "Doanh nghiệp", example: "Công ty Cổ phần Alpha Tech" },
       { key: "campaign_month", label: "Kỳ bản tin", example: "11/2026" },
       { key: "featured_deals", label: "Deal nổi bật", example: "Cung ứng thiết bị văn phòng thông minh 2026 (850 Tr đ)" },
@@ -946,7 +946,7 @@ export function buildInAppBodyFromVisualContent(c: VisualBlockContent, category?
 - ${c.welcomeIntro || "Ban Chấp Hành CLB Doanh Nhân CEO HN10 trân trọng cảm ơn và chúc mừng Anh/Chị đã chính thức gia nhập CLB!"}
 - Họ và tên: ${c.fullName || "{{full_name}}"}
 - Tên doanh nghiệp: ${c.companyName || "{{company_name}}"}
-- Mã hội viên: ${c.memberCode || "{{member_code}}"}
+- Mã Học viên: ${c.memberCode || "{{member_code}}"}
 - Ban sinh hoạt: ${c.department || "{{department}}"}
 - Hotline BTC khi cần hỗ trợ: ${c.hotline || "0973.205.683 / 0903.205.683 / 0903.203.204"}
 - ${c.signature || "Trân trọng!"}`;
@@ -1010,18 +1010,18 @@ export function buildHtmlFromVisualContent(c: VisualBlockContent, category?: Mai
     <div style="display: inline-block; padding: 4px 14px; background: rgba(52, 211, 153, 0.2); border: 1px solid rgba(52, 211, 153, 0.4); border-radius: 9999px; font-size: 11px; font-weight: 800; color: #6ee7b7; margin-bottom: 12px; text-transform: uppercase;">
       THƯ CẢM ƠN & CHÀO MỪNG CHÍNH THỨC
     </div>
-    <h1 style="margin: 0; font-size: 21px; font-weight: 800; color: #ffffff;">${c.welcomeTitle || "CHÀO MỪNG TÂN HỘI VIÊN CEO HN10"}</h1>
+    <h1 style="margin: 0; font-size: 21px; font-weight: 800; color: #ffffff;">${c.welcomeTitle || "CHÀO MỪNG TÂN Học viên CEO HN10"}</h1>
     <p style="margin: 8px 0 0; font-size: 13px; color: #94a3b8;">Cùng gắn kết - Cùng chia sẻ - Cùng phát triển vững mạnh</p>
   </div>
   <div style="padding: 26px 24px; color: #1e293b; line-height: 1.6; font-size: 14px;">
     <p style="margin: 0 0 10px; font-size: 15px;"><strong>${c.greeting || "Kính gửi Anh/Chị {{full_name}}"}</strong></p>
     <p style="margin: 0 0 14px; color: #334155;">- ${c.welcomeIntro || "Ban Chấp Hành CLB Doanh Nhân CEO HN10 trân trọng cảm ơn và chúc mừng Anh/Chị đã chính thức gia nhập CLB!"}</p>
     <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 12px; padding: 16px; margin: 16px 0;">
-      <p style="margin: 0 0 8px; font-weight: bold; color: #166534; text-transform: uppercase; font-size: 12.5px;">- Thông tin hội viên:</p>
+      <p style="margin: 0 0 8px; font-weight: bold; color: #166534; text-transform: uppercase; font-size: 12.5px;">- Thông tin Học viên:</p>
       <table style="width: 100%; font-size: 13px; border-collapse: collapse;">
         <tr><td style="padding: 4px 0; color: #4b5563; width: 170px;">+ Họ và tên:</td><td style="padding: 4px 0; font-weight: 700; color: #111827;">${c.fullName || "{{full_name}}"}</td></tr>
         <tr><td style="padding: 4px 0; color: #4b5563;">+ Tên doanh nghiệp:</td><td style="padding: 4px 0; font-weight: 600; color: #111827;">${c.companyName || "{{company_name}}"}</td></tr>
-        <tr><td style="padding: 4px 0; color: #4b5563;">+ Mã hội viên:</td><td style="padding: 4px 0; font-family: monospace; font-weight: 700; color: #15803d; font-size: 14px;">${c.memberCode || "{{member_code}}"}</td></tr>
+        <tr><td style="padding: 4px 0; color: #4b5563;">+ Mã Học viên:</td><td style="padding: 4px 0; font-family: monospace; font-weight: 700; color: #15803d; font-size: 14px;">${c.memberCode || "{{member_code}}"}</td></tr>
         <tr><td style="padding: 4px 0; color: #4b5563;">+ Ban sinh hoạt:</td><td style="padding: 4px 0; font-weight: 600; color: #1d4ed8;">${c.department || "{{department}}"}</td></tr>
       </table>
     </div>
@@ -1129,16 +1129,16 @@ function extractVisualContentFromTemplate(t: MailTemplateItem): VisualBlockConte
       department: "{{department}}",
       hotline: "0973.205.683 / 0903.205.683 / 0903.203.204",
       signature: "Trân trọng! TM. BAN CHẤP HÀNH CLB DOANH NHÂN CEO HN10",
-      headerBadge: "CHÀO MỪNG HỘI VIÊN MỚI",
+      headerBadge: "CHÀO MỪNG Học viên MỚI",
       headerTitle: t.name,
       headerSubtitle: "CLB Doanh Nhân CEO HN10",
       introMessage: "Ban Chấp Hành CLB Doanh Nhân CEO HN10 trân trọng cảm ơn và chúc mừng Anh/Chị đã chính thức gia nhập CLB!",
       showHighlightBox: true,
-      highlightBoxTitle: "THÔNG TIN HỘI VIÊN CHÍNH THỨC",
+      highlightBoxTitle: "THÔNG TIN Học viên CHÍNH THỨC",
       highlightRows: [
         { label: "Họ và tên", value: "{{full_name}}" },
         { label: "Doanh nghiệp", value: "{{company_name}}" },
-        { label: "Mã hội viên", value: "{{member_code}}" },
+        { label: "Mã Học viên", value: "{{member_code}}" },
         { label: "Ban sinh hoạt", value: "{{department}}" },
       ],
       showQrCode: false,
@@ -1204,7 +1204,7 @@ export function MailTemplateManager() {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) return parsed;
       }
-    } catch {}
+    } catch { }
     return INITIAL_MAIL_TEMPLATES;
   });
 
@@ -1222,7 +1222,7 @@ export function MailTemplateManager() {
   const testPhoneRef = useRef<HTMLInputElement>(null);
   const zbs = useZbsTemplateConfigs();
 
-  // CRM Advanced Targeting State (Ban hội viên, Zalo OA subscribers, Excel import)
+  // CRM Advanced Targeting State (Ban Học viên, Zalo OA subscribers, Excel import)
   const [membersList, setMembersList] = useState<any[]>([]);
   const [zaloSubscribers, setZaloSubscribers] = useState<any[]>([]);
   const [trainingPrograms, setTrainingPrograms] = useState<any[]>([]);
@@ -1257,7 +1257,7 @@ export function MailTemplateManager() {
         const list = Array.isArray(res) ? res : res?.data;
         if (Array.isArray(list) && list.length > 0) setMembersList(list);
       })
-      .catch(() => {});
+      .catch(() => { });
 
     fetchNestApi<any>("/zalo/subscribers")
       .then((res: any) => {
@@ -1267,8 +1267,8 @@ export function MailTemplateManager() {
             ...s,
             id: String(s.id || s.userId || s.zalo_user_id || `zalo-${idx + 1}`),
             zalo_user_id: String(s.zalo_user_id || s.userId || s.id || `zalo-${idx + 1}`),
-            name: s.displayName || s.name || s.fullName || (s.phone ? `Hội viên (${s.phone})` : `Khách Zalo ${idx + 1}`),
-            displayName: s.displayName || s.name || s.fullName || (s.phone ? `Hội viên (${s.phone})` : `Khách Zalo ${idx + 1}`),
+            name: s.displayName || s.name || s.fullName || (s.phone ? `Học viên (${s.phone})` : `Khách Zalo ${idx + 1}`),
+            displayName: s.displayName || s.name || s.fullName || (s.phone ? `Học viên (${s.phone})` : `Khách Zalo ${idx + 1}`),
             phone: s.phone || "",
             company: s.company || s.companyName || "",
           }));
@@ -1296,14 +1296,14 @@ export function MailTemplateManager() {
         const list = Array.isArray(res) ? res : res?.data;
         if (Array.isArray(list)) setAllEvents(list);
       })
-      .catch(() => {});
+      .catch(() => { });
 
     fetchNestApi<any>("/meetings")
       .then((res: any) => {
         const list = Array.isArray(res) ? res : res?.data;
         if (Array.isArray(list)) setAllMeetings(list);
       })
-      .catch(() => {});
+      .catch(() => { });
 
     fetchNestApi<any>("/events?type=training")
       .then((res: any) => {
@@ -1328,7 +1328,7 @@ export function MailTemplateManager() {
 
   const departmentList = useMemo(() => {
     return [
-      "Ban Hội Viên",
+      "Ban Học viên",
       "Ban Truyền Thông",
       "Ban Xúc Tiến Thương Mại",
       "Ban Tài Chính",
@@ -1371,7 +1371,7 @@ export function MailTemplateManager() {
           return Array.from(new Set([...existing, ...newEmails])).join(", ");
         });
       }
-      toast.success(`Đã chọn TẤT CẢ ${filtered.length} hội viên từ ${dept}!`);
+      toast.success(`Đã chọn TẤT CẢ ${filtered.length} Học viên từ ${dept}!`);
     } else {
       setShowMemberDropdown(true);
     }
@@ -1403,7 +1403,7 @@ export function MailTemplateManager() {
         return Array.from(new Set([...existing, ...newEmails])).join(", ");
       });
     }
-    toast.success(`Đã thêm ${targetList.length} hội viên được chọn!`);
+    toast.success(`Đã thêm ${targetList.length} Học viên được chọn!`);
   };
 
   const handleApplyZaloSelection = (mode: "all" | "single" | "multiple", zaloIds: string[]) => {
@@ -1512,7 +1512,7 @@ export function MailTemplateManager() {
     }
   };
 
-    // Reminder Builder Modal State
+  // Reminder Builder Modal State
   const [isReminderBuilderOpen, setIsReminderBuilderOpen] = useState(false);
   const [reminderEditingTemplate, setReminderEditingTemplate] = useState<MailTemplateItem | null>(null);
 
@@ -1539,7 +1539,7 @@ export function MailTemplateManager() {
     setSelectedTemplateId(newTemplate.id);
   };
 
-// Edit / Create Modal State
+  // Edit / Create Modal State
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingTemplate, setEditingTemplate] = useState<MailTemplateItem | null>(null);
   const [modalEditorMode, setModalEditorMode] = useState<"visual" | "code">("visual");
@@ -1593,11 +1593,11 @@ export function MailTemplateManager() {
       });
     }
 
-    // Common synonyms like [Họ và tên hội viên], [Mã hội viên], [Tên doanh nghiệp]
+    // Common synonyms like [Họ và tên Học viên], [Mã Học viên], [Tên doanh nghiệp]
     const commonLabels: Record<string, string> = {
-      "Họ và tên hội viên": sampleValues["full_name"] || "Trần Anh Đức",
+      "Họ và tên Học viên": sampleValues["full_name"] || "Trần Anh Đức",
       "Họ tên": sampleValues["full_name"] || "Trần Anh Đức",
-      "Mã hội viên": sampleValues["member_code"] || "HN10-025",
+      "Mã Học viên": sampleValues["member_code"] || "HN10-025",
       "Tên doanh nghiệp": sampleValues["company_name"] || "Công ty Cổ phần Giải pháp Năng lượng Xanh",
       "Mức phí": sampleValues["fee_amount"] || "10.000.000",
       "Hạn nộp": sampleValues["due_date"] || "31/12/2026",
@@ -1610,7 +1610,7 @@ export function MailTemplateManager() {
       "Hạng vé": sampleValues["ticket_type"] || "VIP",
       "Vị trí bàn/ghế": sampleValues["seat_assignment"] || "Bàn VIP 01",
       "Ban chuyên môn": sampleValues["department"] || "Ban Xúc tiến thương mại",
-      "Chức danh": sampleValues["executive_role"] || "Hội viên chính thức",
+      "Chức danh": sampleValues["executive_role"] || "Học viên chính thức",
       "Ngày gia nhập": sampleValues["joined_date"] || "19/08/2024",
     };
     Object.entries(commonLabels).forEach(([lbl, val]) => {
@@ -1644,7 +1644,7 @@ export function MailTemplateManager() {
     setTemplates(newTemplates);
     try {
       localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(newTemplates));
-    } catch {}
+    } catch { }
   };
 
   // Open Create Modal
@@ -1660,7 +1660,7 @@ export function MailTemplateManager() {
       inAppBody: "Kính gửi Anh/Chị {{full_name}}, hệ thống gửi thông báo quan trọng đến đơn vị {{company_name}}.",
       channels: ["email", "in_app"],
       variables: [
-        { key: "full_name", label: "Tên hội viên", example: "Lê Văn Hùng" },
+        { key: "full_name", label: "Tên Học viên", example: "Lê Văn Hùng" },
         { key: "company_name", label: "Tên doanh nghiệp", example: "Tập Đoàn ABC" },
         { key: "title", label: "Tiêu đề nội dung", example: "Kế hoạch quý mới" },
       ],
@@ -1714,7 +1714,7 @@ export function MailTemplateManager() {
           { key: "event_summary", label: "Nội dung chính", example: "Chiến lược tăng trưởng doanh nghiệp 2026, Xúc tiến thương mại đa kênh, Ký kết hợp tác B2B" },
           { key: "event_date", label: "Thời gian", example: "18:30 - 21:30 Thứ Bảy, 10/09/2026" },
           { key: "event_location", label: "Địa điểm", example: "Habblet Hotel & Cung Điện Atlantis, Hà Nội" },
-          { key: "event_fee", label: "Chi phí", example: "Miễn phí dành cho Hội viên chính thức CEO HN10" },
+          { key: "event_fee", label: "Chi phí", example: "Miễn phí dành cho Học viên chính thức CEO HN10" },
           { key: "google_maps_url", label: "Google Maps", example: "https://maps.google.com/?q=Habblet+Hotel+Hanoi" },
           { key: "dress_code", label: "Trang phục", example: "Vest / Dạ tiệc lịch sự" },
           { key: "parking_info", label: "Gửi xe", example: "Tầng hầm B1-B2 khách sạn, miễn phí vé xe" },
@@ -1756,7 +1756,7 @@ export function MailTemplateManager() {
         inAppBody: buildInAppBodyFromVisualContent(visual, "meeting"),
         htmlBody: buildHtmlFromVisualContent(visual, "meeting"),
         variables: [
-          { key: "full_name", label: "Tên hội viên", example: "Lê Hoàng Quân" },
+          { key: "full_name", label: "Tên Học viên", example: "Lê Hoàng Quân" },
           { key: "meeting_title", label: "Tên cuộc họp", example: "Họp Ban Xúc Tiến Thương Mại B2B Tháng 11" },
           { key: "speaker_name", label: "Chủ trì cuộc họp", example: "Trưởng Ban & Phó Chủ Tịch CLB" },
           { key: "event_summary", label: "Nội dung chính", example: "Tổng kết giao thương quý 3 và định hướng triển khai quý 4/2026" },
@@ -1799,8 +1799,8 @@ export function MailTemplateManager() {
         inAppBody: buildInAppBodyFromVisualContent(visual, "fee"),
         htmlBody: buildHtmlFromVisualContent(visual, "fee"),
         variables: [
-          { key: "full_name", label: "Tên hội viên", example: "Phạm Hồng Nguyên" },
-          { key: "member_code", label: "Mã hội viên", example: "HN10-008" },
+          { key: "full_name", label: "Tên Học viên", example: "Phạm Hồng Nguyên" },
+          { key: "member_code", label: "Mã Học viên", example: "HN10-008" },
           { key: "fee_year", label: "Năm tài chính", example: "2026" },
           { key: "fee_amount", label: "Mức hội phí", example: "5.000.000" },
           { key: "due_date", label: "Hạn thanh toán", example: "31/12/2026" },
@@ -1830,7 +1830,7 @@ export function MailTemplateManager() {
       const tmpl: MailTemplateItem = {
         ...editingTemplate,
         code: "NEW_MEMBER_THANKS",
-        name: "Thư Cảm Ơn & Chào Mừng Hội Viên Mới Gia Nhập",
+        name: "Thư Cảm Ơn & Chào Mừng Học viên Mới Gia Nhập",
         category: "welcome",
         description: "Gửi thư cảm ơn trang trọng tới Quý Doanh nhân khi hoàn tất đăng ký gia nhập CLB Doanh Nhân CEO HN10.",
         subject: "[CEO HN10] Thư cảm ơn Quý Doanh nhân {{full_name}} gia nhập CLB Doanh Nhân CEO HN10",
@@ -1838,16 +1838,16 @@ export function MailTemplateManager() {
         inAppBody: buildInAppBodyFromVisualContent(visual, "welcome"),
         htmlBody: buildHtmlFromVisualContent(visual, "welcome"),
         variables: [
-          { key: "full_name", label: "Tên hội viên", example: "Nguyễn Văn Hải" },
+          { key: "full_name", label: "Tên Học viên", example: "Nguyễn Văn Hải" },
           { key: "company_name", label: "Tên doanh nghiệp", example: "Tập Đoàn Hải Nam Global" },
-          { key: "member_code", label: "Mã hội viên", example: "HN10-168" },
+          { key: "member_code", label: "Mã Học viên", example: "HN10-168" },
           { key: "department", label: "Ban sinh hoạt", example: "Ban Xúc tiến Thương mại" },
         ],
         visualContent: visual,
       };
       setEditingTemplate(tmpl);
       setVisualContent(visual);
-      toast.success("Đã áp dụng mẫu Thư cảm ơn đăng ký hội viên mới!");
+      toast.success("Đã áp dụng mẫu Thư cảm ơn đăng ký Học viên mới!");
       return;
     } else if (presetKey === "TRAINING_INVITATION") {
       const visual: VisualBlockContent = {
@@ -1878,13 +1878,13 @@ export function MailTemplateManager() {
         inAppBody: buildInAppBodyFromVisualContent(visual, "event"),
         htmlBody: buildHtmlFromVisualContent(visual, "event"),
         variables: [
-          { key: "full_name", label: "Tên hội viên", example: "Lê Minh Tuấn" },
+          { key: "full_name", label: "Tên Học viên", example: "Lê Minh Tuấn" },
           { key: "training_title", label: "Tên khóa đào tạo", example: "Quản Trị Dòng Tiền & Tối Ưu Chi Phí 2026" },
           { key: "speaker_name", label: "Diễn giả", example: "TS. Lê Thẩm Dương" },
           { key: "event_summary", label: "Nội dung chính", example: "Chiến lược tối ưu hóa dòng tiền và kiểm soát đòn bẩy" },
           { key: "event_date", label: "Thời gian", example: "08:30 Thứ Bảy, 20/11/2026" },
           { key: "event_location", label: "Địa điểm", example: "Hội trường CEO HN10, Keangnam Landmark 72, Hà Nội" },
-          { key: "event_fee", label: "Chi phí", example: "Miễn phí dành cho Hội viên chính thức CEO HN10" },
+          { key: "event_fee", label: "Chi phí", example: "Miễn phí dành cho Học viên chính thức CEO HN10" },
           { key: "google_maps_url", label: "Google Maps", example: "https://maps.google.com/?q=Hanoi+Training+Center" },
           { key: "dress_code", label: "Trang phục", example: "Lịch sự / Business Casual" },
           { key: "parking_info", label: "Gửi xe", example: "Bãi đỗ xe khuôn viên trung tâm" },
@@ -1910,7 +1910,7 @@ export function MailTemplateManager() {
       next.name = `Thư Mời Đào Tạo: ${prog.title}`;
       next.subject = `[ĐÀO TẠO CEO HN10] ${prog.title} - Kính gửi Anh/Chị {{full_name}}`;
       next.inAppTitle = `Thư mời đào tạo: ${prog.title}`;
-      next.inAppBody = `- Kính gửi Anh/Chị: {{full_name}}\n- BTC trân trọng kính mời Anh/Chị tham dự khóa đào tạo: ${prog.title}\n- Diễn giả: ${prog.speaker}\n- Thời gian: ${prog.date} (${prog.duration || "1 Ngày"})\n- Địa điểm: ${prog.place}\n- Chi phí: Miễn phí dành cho Hội viên chính thức CEO HN10\n- Hotline BTC khi cần hỗ trợ: 0973.205.683 / 0903.205.683 / 0903.203.204\n- Trân trọng!`;
+      next.inAppBody = `- Kính gửi Anh/Chị: {{full_name}}\n- BTC trân trọng kính mời Anh/Chị tham dự khóa đào tạo: ${prog.title}\n- Diễn giả: ${prog.speaker}\n- Thời gian: ${prog.date} (${prog.duration || "1 Ngày"})\n- Địa điểm: ${prog.place}\n- Chi phí: Miễn phí dành cho Học viên chính thức CEO HN10\n- Hotline BTC khi cần hỗ trợ: 0973.205.683 / 0903.205.683 / 0903.203.204\n- Trân trọng!`;
 
       const nextVisual: VisualBlockContent = {
         ...(prev.visualContent || visualContent),
@@ -1926,7 +1926,7 @@ export function MailTemplateManager() {
           { label: "Diễn giả", value: prog.speaker || "Chuyên gia cao cấp" },
           { label: "Thời gian", value: `${prog.date || "Theo lịch"} (${prog.duration || "1 Ngày"})` },
           { label: "Địa điểm", value: prog.place || "Trụ sở CLB CEO HN10" },
-          { label: "Chi phí", value: "Miễn phí dành cho Hội viên chính thức CEO HN10" },
+          { label: "Chi phí", value: "Miễn phí dành cho Học viên chính thức CEO HN10" },
           { label: "Xác nhận tham dự", value: "https://app.ceohn10.viconnect.vn/association/events" },
         ],
         outroMessage: "Quý Anh/Chị vui lòng xác nhận đăng ký sớm để BTC chuẩn bị tài liệu và phòng học chu đáo nhất.",
@@ -2168,7 +2168,7 @@ export function MailTemplateManager() {
       if (sendChannel === "zalo_oa" || sendChannel === "all") {
         try {
           await saveSelectedZbsConfig();
-        } catch {}
+        } catch { }
       }
       // 1. Gửi qua Email nếu chọn Email hoặc Cả hai
       if (sendChannel === "email" || sendChannel === "all") {
@@ -2215,7 +2215,7 @@ export function MailTemplateManager() {
             if (result?.success) {
               zaloSuccessCount++;
             }
-          } catch {}
+          } catch { }
         }
         if (zaloSuccessCount > 0) {
           sentChannels.push(`ZBS (${zaloSuccessCount}/${targetPhones.length})`);
@@ -2254,9 +2254,9 @@ export function MailTemplateManager() {
             if (typeof window !== "undefined") {
               window.dispatchEvent(new Event("notifications_updated"));
             }
-          } catch {}
+          } catch { }
           sentChannels.push("App CEO HN10");
-        } catch {}
+        } catch { }
       }
 
       if (sendChannel !== "in_app" && emailSuccessCount === 0 && zaloSuccessCount === 0 && emailError) {
@@ -2284,7 +2284,7 @@ export function MailTemplateManager() {
             Hệ Thống Quản Lý Template Email & Thông Báo Đa Kênh Tự Động
           </h2>
           <p className="text-xs text-muted-foreground mt-0.5">
-            Cấu hình giao diện, nội dung mẫu động (Hội phí, Thư cảm ơn hội viên mới, Nhắc phí, Vé QR sự kiện) và bắn thử nghiệm về mail Quản trị viên
+            Cấu hình giao diện, nội dung mẫu động (Hội phí, Thư cảm ơn Học viên mới, Nhắc phí, Vé QR sự kiện) và bắn thử nghiệm về mail Quản trị viên
           </p>
         </div>
 
@@ -2323,11 +2323,10 @@ export function MailTemplateManager() {
                   <button
                     key={c.id}
                     onClick={() => setActiveCategory(c.id)}
-                    className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-left transition cursor-pointer ${
-                      isAct
+                    className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-left transition cursor-pointer ${isAct
                         ? "bg-amber-500 text-white font-bold shadow-xs"
                         : "text-muted-foreground hover:bg-secondary hover:text-foreground"
-                    }`}
+                      }`}
                   >
                     <Icon className="h-3.5 w-3.5 shrink-0" />
                     <span className="truncate">{c.label}</span>
@@ -2357,19 +2356,17 @@ export function MailTemplateManager() {
                 <div
                   key={t.id}
                   onClick={() => setSelectedTemplateId(t.id)}
-                  className={`p-3 rounded-xl border transition-all cursor-pointer ${
-                    isSelected
+                  className={`p-3 rounded-xl border transition-all cursor-pointer ${isSelected
                       ? "border-[#003B95] bg-blue-50/80 dark:bg-blue-950/40 shadow-sm ring-2 ring-[#003B95]/30"
                       : "border-border/80 bg-card hover:border-border hover:bg-secondary/40"
-                  }`}
+                    }`}
                 >
                   <div className="flex items-center justify-between gap-1 mb-1">
                     <span
-                      className={`font-mono text-[10px] font-bold ${
-                        isSelected
+                      className={`font-mono text-[10px] font-bold ${isSelected
                           ? "text-[#003B95] dark:text-blue-400"
                           : "text-muted-foreground"
-                      }`}
+                        }`}
                     >
                       {t.code}
                     </span>
@@ -2378,20 +2375,18 @@ export function MailTemplateManager() {
                     </span>
                   </div>
                   <h4
-                    className={`font-bold text-xs line-clamp-1 ${
-                      isSelected
+                    className={`font-bold text-xs line-clamp-1 ${isSelected
                         ? "text-[#003B95] dark:text-blue-200"
                         : "text-slate-800 dark:text-slate-100"
-                    }`}
+                      }`}
                   >
                     {t.name}
                   </h4>
                   <p
-                    className={`text-[11px] line-clamp-2 mt-0.5 leading-snug ${
-                      isSelected
+                    className={`text-[11px] line-clamp-2 mt-0.5 leading-snug ${isSelected
                         ? "text-slate-700 dark:text-slate-300"
                         : "text-slate-500 dark:text-slate-400"
-                    }`}
+                      }`}
                   >
                     {t.description}
                   </p>
@@ -2439,29 +2434,29 @@ export function MailTemplateManager() {
           {/* Header Card */}
           <div className="rounded-2xl border border-border bg-card p-4 shadow-sm space-y-3">
             {(activeTemplate.reminderFields || activeTemplate.code === "TODAY_IN_APP_CEOHN10") && (
-            <div className="bg-amber-500/10 border border-amber-500/30 rounded-2xl p-3.5 flex flex-wrap items-center justify-between gap-3">
-              <div className="flex items-center gap-2.5">
-                <Clock className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
-                <div>
-                  <div className="font-bold text-xs text-amber-950 dark:text-amber-200">
-                    Mẫu Thư Nhắc Nhở Động: Hôm Nay Trong App CEO HN10 Có Gì
-                  </div>
-                  <div className="text-[11px] text-amber-800/80 dark:text-amber-400">
-                    Hỗ trợ tùy biến thêm/xóa trường: mô tả textarea, datetime ngày giờ, price chi phí, mã QR check-in.
+              <div className="bg-amber-500/10 border border-amber-500/30 rounded-2xl p-3.5 flex flex-wrap items-center justify-between gap-3">
+                <div className="flex items-center gap-2.5">
+                  <Clock className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
+                  <div>
+                    <div className="font-bold text-xs text-amber-950 dark:text-amber-200">
+                      Mẫu Thư Nhắc Nhở Động: Hôm Nay Trong App CEO HN10 Có Gì
+                    </div>
+                    <div className="text-[11px] text-amber-800/80 dark:text-amber-400">
+                      Hỗ trợ tùy biến thêm/xóa trường: mô tả textarea, datetime ngày giờ, price chi phí, mã QR check-in.
+                    </div>
                   </div>
                 </div>
+                <button
+                  type="button"
+                  onClick={() => handleOpenReminderBuilder(activeTemplate)}
+                  className="px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs transition cursor-pointer shadow-xs"
+                >
+                  ⚙️ Tùy Chỉnh Trường Động
+                </button>
               </div>
-              <button
-                type="button"
-                onClick={() => handleOpenReminderBuilder(activeTemplate)}
-                className="px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs transition cursor-pointer shadow-xs"
-              >
-                ⚙️ Tùy Chỉnh Trường Động
-              </button>
-            </div>
-          )}
+            )}
 
-          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border pb-3">
+            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border pb-3">
               <div>
                 <div className="flex items-center gap-2">
                   <h3 className="text-sm font-bold text-foreground">{activeTemplate.name}</h3>
@@ -2479,21 +2474,19 @@ export function MailTemplateManager() {
                 <div className="flex items-center gap-1 bg-secondary rounded-xl p-1 text-xs">
                   <button
                     onClick={() => setPreviewDevice("desktop")}
-                    className={`px-3 py-1 rounded-lg font-bold transition cursor-pointer flex items-center gap-1 ${
-                      previewDevice === "desktop"
+                    className={`px-3 py-1 rounded-lg font-bold transition cursor-pointer flex items-center gap-1 ${previewDevice === "desktop"
                         ? "bg-card text-foreground shadow-sm"
                         : "text-muted-foreground hover:text-foreground"
-                    }`}
+                      }`}
                   >
                     <Monitor className="w-3.5 h-3.5" /> Desktop
                   </button>
                   <button
                     onClick={() => setPreviewDevice("mobile")}
-                    className={`px-3 py-1 rounded-lg font-bold transition cursor-pointer flex items-center gap-1 ${
-                      previewDevice === "mobile"
+                    className={`px-3 py-1 rounded-lg font-bold transition cursor-pointer flex items-center gap-1 ${previewDevice === "mobile"
                         ? "bg-card text-foreground shadow-sm"
                         : "text-muted-foreground hover:text-foreground"
-                    }`}
+                      }`}
                   >
                     <Smartphone className="w-3.5 h-3.5" /> Mobile
                   </button>
@@ -2516,10 +2509,10 @@ export function MailTemplateManager() {
                   <div>
                     <span className="text-xs font-bold text-amber-800 dark:text-amber-300 flex items-center gap-1.5">
                       <Gift className="w-4 h-4 text-amber-600 dark:text-amber-400" />
-                      Trình Tùy Biến Thiệp Mừng Sinh Nhật Hội Viên &amp; Tải Ảnh Lên
+                      Trình Tùy Biến Thiệp Mừng Sinh Nhật Học viên &amp; Tải Ảnh Lên
                     </span>
                     <p className="text-[11px] text-muted-foreground mt-0.5">
-                      Tải ảnh banner thiệp mừng tùy biến hoặc chọn các phong cách thiệp mừng hội viên được thiết kế riêng.
+                      Tải ảnh banner thiệp mừng tùy biến hoặc chọn các phong cách thiệp mừng Học viên được thiết kế riêng.
                     </p>
                   </div>
 
@@ -2559,7 +2552,7 @@ export function MailTemplateManager() {
                 {/* Mẫu phôi thiệp có sẵn và các trường tùy chỉnh */}
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
                   <div>
-                    <span className="text-[11px] font-semibold text-muted-foreground">Tên hội viên sinh nhật:</span>
+                    <span className="text-[11px] font-semibold text-muted-foreground">Tên Học viên sinh nhật:</span>
                     <input
                       type="text"
                       value={sampleValues.full_name || ""}
@@ -2641,7 +2634,7 @@ export function MailTemplateManager() {
                   </div>
                   <button
                     type="button"
-                    onClick={() => toast.success("Đang phát động chiến dịch Email Marketing gửi tới toàn thể Hội viên...")}
+                    onClick={() => toast.success("Đang phát động chiến dịch Email Marketing gửi tới toàn thể Học viên...")}
                     className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-xs transition cursor-pointer shrink-0"
                   >
                     <Mail className="w-3.5 h-3.5" />
@@ -2688,44 +2681,40 @@ export function MailTemplateManager() {
                   <button
                     type="button"
                     onClick={() => setSendChannel("all")}
-                    className={`px-2.5 py-1 rounded-lg text-xs font-bold transition cursor-pointer ${
-                      sendChannel === "all"
+                    className={`px-2.5 py-1 rounded-lg text-xs font-bold transition cursor-pointer ${sendChannel === "all"
                         ? "bg-[#003B95] text-white shadow-xs"
                         : "text-slate-600 dark:text-slate-400 hover:text-slate-900"
-                    }`}
+                      }`}
                   >
                     🌟 Gửi Cả 3 Kênh (App, Email, Zalo)
                   </button>
                   <button
                     type="button"
                     onClick={() => setSendChannel("in_app")}
-                    className={`px-2.5 py-1 rounded-lg text-xs font-bold transition cursor-pointer ${
-                      sendChannel === "in_app"
+                    className={`px-2.5 py-1 rounded-lg text-xs font-bold transition cursor-pointer ${sendChannel === "in_app"
                         ? "bg-emerald-600 text-white shadow-xs"
                         : "text-slate-600 dark:text-slate-400 hover:text-slate-900"
-                    }`}
+                      }`}
                   >
                     📱 App CEO HN10
                   </button>
                   <button
                     type="button"
                     onClick={() => setSendChannel("zalo_oa")}
-                    className={`px-2.5 py-1 rounded-lg text-xs font-bold transition cursor-pointer ${
-                      sendChannel === "zalo_oa"
+                    className={`px-2.5 py-1 rounded-lg text-xs font-bold transition cursor-pointer ${sendChannel === "zalo_oa"
                         ? "bg-blue-600 text-white shadow-xs"
                         : "text-slate-600 dark:text-slate-400 hover:text-slate-900"
-                    }`}
+                      }`}
                   >
                     💬 Zalo OA
                   </button>
                   <button
                     type="button"
                     onClick={() => setSendChannel("email")}
-                    className={`px-2.5 py-1 rounded-lg text-xs font-bold transition cursor-pointer ${
-                      sendChannel === "email"
+                    className={`px-2.5 py-1 rounded-lg text-xs font-bold transition cursor-pointer ${sendChannel === "email"
                         ? "bg-indigo-600 text-white shadow-xs"
                         : "text-slate-600 dark:text-slate-400 hover:text-slate-900"
-                    }`}
+                      }`}
                   >
                     📧 Email
                   </button>
@@ -2802,12 +2791,12 @@ export function MailTemplateManager() {
               {/* CRM Advanced Targeting Toolbar: Ban, Zalo OA Subscribers, Excel Import */}
               <div className="pt-2 border-t border-blue-200/50 dark:border-blue-900/40 space-y-2">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                  {/* Call API Hội viên theo Ban kèm 3 chế độ (Chọn tất cả / Chọn 1 / Chọn nhiều) */}
+                  {/* Call API Học viên theo Ban kèm 3 chế độ (Chọn tất cả / Chọn 1 / Chọn nhiều) */}
                   <div className="p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-1.5">
                     <div className="flex items-center justify-between gap-1">
                       <span className="text-[11px] font-bold text-slate-900 dark:text-white flex items-center gap-1">
                         <Users className="size-3.5 text-blue-600 dark:text-blue-400 shrink-0" />
-                        Nạp Hội Viên Theo Ban ({membersList.length} HV)
+                        Nạp Học viên Theo Ban ({membersList.length} HV)
                       </span>
                       <div className="flex items-center gap-0.5 bg-slate-100 dark:bg-slate-800 p-0.5 rounded-lg text-[10px] font-semibold">
                         <button
@@ -2816,9 +2805,8 @@ export function MailTemplateManager() {
                             setDeptSelectMode("all");
                             if (selectedDepartment) handleSelectDepartment(selectedDepartment);
                           }}
-                          className={`px-1.5 py-0.5 rounded cursor-pointer ${
-                            deptSelectMode === "all" ? "bg-blue-600 text-white font-bold" : "text-slate-600 dark:text-slate-400"
-                          }`}
+                          className={`px-1.5 py-0.5 rounded cursor-pointer ${deptSelectMode === "all" ? "bg-blue-600 text-white font-bold" : "text-slate-600 dark:text-slate-400"
+                            }`}
                         >
                           Tất cả
                         </button>
@@ -2828,9 +2816,8 @@ export function MailTemplateManager() {
                             setDeptSelectMode("single");
                             setShowMemberDropdown(true);
                           }}
-                          className={`px-1.5 py-0.5 rounded cursor-pointer ${
-                            deptSelectMode === "single" ? "bg-blue-600 text-white font-bold" : "text-slate-600 dark:text-slate-400"
-                          }`}
+                          className={`px-1.5 py-0.5 rounded cursor-pointer ${deptSelectMode === "single" ? "bg-blue-600 text-white font-bold" : "text-slate-600 dark:text-slate-400"
+                            }`}
                         >
                           1 người
                         </button>
@@ -2840,9 +2827,8 @@ export function MailTemplateManager() {
                             setDeptSelectMode("multiple");
                             setShowMemberDropdown(true);
                           }}
-                          className={`px-1.5 py-0.5 rounded cursor-pointer ${
-                            deptSelectMode === "multiple" ? "bg-blue-600 text-white font-bold" : "text-slate-600 dark:text-slate-400"
-                          }`}
+                          className={`px-1.5 py-0.5 rounded cursor-pointer ${deptSelectMode === "multiple" ? "bg-blue-600 text-white font-bold" : "text-slate-600 dark:text-slate-400"
+                            }`}
                         >
                           Nhiều người
                         </button>
@@ -2874,14 +2860,14 @@ export function MailTemplateManager() {
                       )}
                     </div>
 
-                    {/* Dropdown tree / multi-select hội viên của Ban */}
+                    {/* Dropdown tree / multi-select Học viên của Ban */}
                     {showMemberDropdown && (
                       <div className="mt-1 p-2 rounded-lg border border-blue-200 dark:border-blue-900 bg-slate-50 dark:bg-slate-950 max-h-48 overflow-y-auto space-y-1">
                         <input
                           type="text"
                           value={memberSearchTerm}
                           onChange={(e) => setMemberSearchTerm(e.target.value)}
-                          placeholder="Tìm hội viên theo tên, SĐT, doanh nghiệp..."
+                          placeholder="Tìm Học viên theo tên, SĐT, doanh nghiệp..."
                           className="w-full text-[10.5px] p-1.5 rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 mb-1"
                         />
                         {deptMembers
@@ -2908,9 +2894,8 @@ export function MailTemplateManager() {
                                     handleApplyDeptMemberSelection("multiple", next);
                                   }
                                 }}
-                                className={`flex items-center justify-between p-1.5 rounded text-[11px] cursor-pointer transition ${
-                                  isSelected ? "bg-blue-100 dark:bg-blue-900/60 font-bold" : "hover:bg-slate-100 dark:hover:bg-slate-800"
-                                }`}
+                                className={`flex items-center justify-between p-1.5 rounded text-[11px] cursor-pointer transition ${isSelected ? "bg-blue-100 dark:bg-blue-900/60 font-bold" : "hover:bg-slate-100 dark:hover:bg-slate-800"
+                                  }`}
                               >
                                 <div className="truncate pr-1">
                                   <span className="text-slate-900 dark:text-white font-semibold">{m.name || m.fullName}</span>
@@ -2937,9 +2922,8 @@ export function MailTemplateManager() {
                         <button
                           type="button"
                           onClick={() => handleApplyZaloSelection("all", [])}
-                          className={`px-1.5 py-0.5 rounded cursor-pointer ${
-                            zaloSelectMode === "all" ? "bg-cyan-600 text-white font-bold" : "text-slate-600 dark:text-slate-400"
-                          }`}
+                          className={`px-1.5 py-0.5 rounded cursor-pointer ${zaloSelectMode === "all" ? "bg-cyan-600 text-white font-bold" : "text-slate-600 dark:text-slate-400"
+                            }`}
                         >
                           Tất cả
                         </button>
@@ -2949,9 +2933,8 @@ export function MailTemplateManager() {
                             setZaloSelectMode("single");
                             setShowZaloDropdown(true);
                           }}
-                          className={`px-1.5 py-0.5 rounded cursor-pointer ${
-                            zaloSelectMode === "single" ? "bg-cyan-600 text-white font-bold" : "text-slate-600 dark:text-slate-400"
-                          }`}
+                          className={`px-1.5 py-0.5 rounded cursor-pointer ${zaloSelectMode === "single" ? "bg-cyan-600 text-white font-bold" : "text-slate-600 dark:text-slate-400"
+                            }`}
                         >
                           1 người
                         </button>
@@ -2961,9 +2944,8 @@ export function MailTemplateManager() {
                             setZaloSelectMode("multiple");
                             setShowZaloDropdown(true);
                           }}
-                          className={`px-1.5 py-0.5 rounded cursor-pointer ${
-                            zaloSelectMode === "multiple" ? "bg-cyan-600 text-white font-bold" : "text-slate-600 dark:text-slate-400"
-                          }`}
+                          className={`px-1.5 py-0.5 rounded cursor-pointer ${zaloSelectMode === "multiple" ? "bg-cyan-600 text-white font-bold" : "text-slate-600 dark:text-slate-400"
+                            }`}
                         >
                           Nhiều người
                         </button>
@@ -3039,9 +3021,8 @@ export function MailTemplateManager() {
                                     handleApplyZaloSelection("multiple", next);
                                   }
                                 }}
-                                className={`flex items-center justify-between p-1.5 rounded text-[11px] cursor-pointer transition ${
-                                  isSelected ? "bg-cyan-100 dark:bg-cyan-900/60 font-bold" : "hover:bg-slate-100 dark:hover:bg-slate-800"
-                                }`}
+                                className={`flex items-center justify-between p-1.5 rounded text-[11px] cursor-pointer transition ${isSelected ? "bg-cyan-100 dark:bg-cyan-900/60 font-bold" : "hover:bg-slate-100 dark:hover:bg-slate-800"
+                                  }`}
                               >
                                 <div className="truncate pr-1">
                                   <span className="text-slate-900 dark:text-white font-semibold">
@@ -3183,7 +3164,7 @@ export function MailTemplateManager() {
                   </div>
                 )}
               </div>
-              </div>
+            </div>
 
             {/* Subject and In-App Push Details */}
             <div className="rounded-xl bg-secondary/40 border border-border/80 p-3 space-y-2 text-xs">
@@ -3236,11 +3217,10 @@ export function MailTemplateManager() {
               </span>
               <div className="border border-border rounded-2xl overflow-hidden bg-slate-100 dark:bg-slate-900/50 p-4 flex justify-center">
                 <div
-                  className={`w-full transition-all duration-200 ${
-                    previewDevice === "mobile"
+                  className={`w-full transition-all duration-200 ${previewDevice === "mobile"
                       ? "max-w-[380px] rounded-3xl border-8 border-slate-800 bg-white p-2 shadow-2xl"
                       : "max-w-2xl bg-white rounded-xl shadow-md p-2"
-                  }`}
+                    }`}
                 >
                   {/* VULN-13 Fix: Sử dụng Sandboxed Iframe triệt tiêu 100% rủi ro XSS khi hiển thị HTML email */}
                   <iframe
@@ -3313,8 +3293,8 @@ export function MailTemplateManager() {
                       <option value="MEETING_INVITATION">Thư mời cuộc họp ban chuyên môn</option>
                       <option value="TRAINING_INVITATION">Thư mời chương trình đào tạo chuyên đề</option>
                       <option value="ANNUAL_FEE_NOTICE">Thông báo hội phí niên liễm (Để trống QR, thêm STK CLB)</option>
-                      <option value="MEMBER_WELCOME_THANKS">Thư cảm ơn đăng ký hội viên mới</option>
-                      <option value="MEMBER_ACCOUNT_CREDENTIALS">Template gửi tài khoản đăng nhập cho hội viên mới</option>
+                      <option value="MEMBER_WELCOME_THANKS">Thư cảm ơn đăng ký Học viên mới</option>
+                      <option value="MEMBER_ACCOUNT_CREDENTIALS">Template gửi tài khoản đăng nhập cho Học viên mới</option>
                     </select>
                   </div>
 
@@ -3370,7 +3350,7 @@ export function MailTemplateManager() {
                     className="w-full rounded-xl border border-border bg-background p-2 text-xs font-medium"
                   >
                     <option value="fee">Hội phí & Niên liễm</option>
-                    <option value="welcome">Chào mừng & Cảm ơn hội viên</option>
+                    <option value="welcome">Chào mừng & Cảm ơn Học viên</option>
                     <option value="event">Sự kiện & Vé mời QR</option>
                     <option value="meeting">Cuộc họp & Lịch ban</option>
                     <option value="system">Hệ thống & Tài khoản</option>
@@ -3418,11 +3398,10 @@ export function MailTemplateManager() {
                     <button
                       type="button"
                       onClick={() => setModalEditorMode("visual")}
-                      className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-bold text-xs transition cursor-pointer ${
-                        modalEditorMode === "visual"
+                      className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-bold text-xs transition cursor-pointer ${modalEditorMode === "visual"
                           ? "bg-white dark:bg-slate-800 text-[#003B95] dark:text-blue-400 shadow-sm"
                           : "text-muted-foreground hover:text-foreground"
-                      }`}
+                        }`}
                     >
                       <Sparkles className="w-3.5 h-3.5 text-amber-500" />
                       Chế Độ Trực Quan Dễ Dùng (Không Cần Code)
@@ -3430,11 +3409,10 @@ export function MailTemplateManager() {
                     <button
                       type="button"
                       onClick={() => setModalEditorMode("code")}
-                      className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-bold text-xs transition cursor-pointer ${
-                        modalEditorMode === "code"
+                      className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-bold text-xs transition cursor-pointer ${modalEditorMode === "code"
                           ? "bg-white dark:bg-slate-800 text-[#003B95] dark:text-blue-400 shadow-sm"
                           : "text-muted-foreground hover:text-foreground"
-                      }`}
+                        }`}
                     >
                       <Code className="w-3.5 h-3.5" />
                       Mã Nguồn HTML Nâng Cao
@@ -3452,7 +3430,7 @@ export function MailTemplateManager() {
                 <div className="rounded-xl border border-amber-500/30 bg-amber-500/5 p-3 mb-3">
                   <div className="flex items-center gap-1.5 text-xs font-bold text-amber-700 dark:text-amber-300 mb-2">
                     <Tag className="w-3.5 h-3.5 text-amber-500" />
-                    <span>Chọn thông tin muốn chèn tự động vào thư (Hệ thống sẽ tự điền dữ liệu của từng hội viên):</span>
+                    <span>Chọn thông tin muốn chèn tự động vào thư (Hệ thống sẽ tự điền dữ liệu của từng Học viên):</span>
                   </div>
                   <div className="flex flex-wrap gap-2">
                     {editingTemplate.variables.map((v) => (
@@ -3579,7 +3557,7 @@ export function MailTemplateManager() {
                     /* DÀNH CHO MẪU THƯ CẢM ƠN GIA NHẬP (WELCOME) - TỰ CHỈNH SỬA TẤT CẢ CÁC TRƯỜNG */
                     <div className="space-y-3.5 bg-slate-50/70 dark:bg-slate-900/40 p-3 sm:p-4 rounded-2xl border border-border">
                       <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-xl p-3 text-xs text-emerald-800 dark:text-emerald-300">
-                        <strong>Mẫu Thư Cảm Ơn Đăng Ký Hội Viên:</strong> Mẫu riêng biệt chào mừng tân hội viên, người dùng có thể tự do chỉnh sửa từng trường thông tin bên dưới.
+                        <strong>Mẫu Thư Cảm Ơn Đăng Ký Học viên:</strong> Mẫu riêng biệt chào mừng tân Học viên, người dùng có thể tự do chỉnh sửa từng trường thông tin bên dưới.
                       </div>
                       <div className="bg-card p-3 rounded-xl border border-border space-y-1.5">
                         <span className="font-bold text-foreground text-xs block">Khối 1: Lời chào (Kính gửi Anh/Chị)</span>
@@ -3594,7 +3572,7 @@ export function MailTemplateManager() {
                         <span className="font-bold text-foreground text-xs block">Khối 2: Tiêu đề thư cảm ơn &amp; Chào mừng</span>
                         <input
                           type="text"
-                          value={visualContent.welcomeTitle || "CHÀO MỪNG TÂN HỘI VIÊN CEO HN10"}
+                          value={visualContent.welcomeTitle || "CHÀO MỪNG TÂN Học viên CEO HN10"}
                           onChange={(e) => handleUpdateVisualField("welcomeTitle", e.target.value)}
                           className="w-full rounded-lg border border-border bg-background p-2 text-xs font-bold text-emerald-600"
                         />
@@ -3609,7 +3587,7 @@ export function MailTemplateManager() {
                         />
                       </div>
                       <div className="bg-card p-3 rounded-xl border border-border space-y-2.5">
-                        <span className="font-bold text-foreground text-xs block">Khối 4: Thông tin hội viên</span>
+                        <span className="font-bold text-foreground text-xs block">Khối 4: Thông tin Học viên</span>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                           <div>
                             <label className="text-[11px] font-semibold text-muted-foreground block mb-0.5">+ Họ và tên</label>
@@ -3630,7 +3608,7 @@ export function MailTemplateManager() {
                             />
                           </div>
                           <div>
-                            <label className="text-[11px] font-semibold text-muted-foreground block mb-0.5">+ Mã hội viên</label>
+                            <label className="text-[11px] font-semibold text-muted-foreground block mb-0.5">+ Mã Học viên</label>
                             <input
                               type="text"
                               value={visualContent.memberCode || "{{member_code}}"}

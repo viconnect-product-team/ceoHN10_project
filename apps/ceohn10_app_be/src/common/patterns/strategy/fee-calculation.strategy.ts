@@ -1,6 +1,6 @@
 /**
  * 46 — Design Pattern Pragmatism: STRATEGY PATTERN
- * Phục vụ Kịch bản 1: Logic tính toán phân nhánh (Tính phí hội viên, chiết khấu, quyền lợi).
+ * Phục vụ Kịch bản 1: Logic tính toán phân nhánh (Tính phí Học viên, chiết khấu, quyền lợi).
  * Tách biệt từng đối tượng thành Strategy riêng thay vì dùng chuỗi if/else dài dòng.
  */
 
@@ -35,7 +35,7 @@ export class RegularMemberFeeStrategy implements IFeeCalculationStrategy {
     return {
       finalAmount,
       discountAmount: discount,
-      tierName: 'Hội viên Chính thức',
+      tierName: 'Học viên Chính thức',
       appliedBenefits: [
         'Tham gia sinh hoạt định kỳ',
         'Sở hữu Danh thiếp số thông minh',
@@ -51,7 +51,7 @@ export class VipMemberFeeStrategy implements IFeeCalculationStrategy {
   calculate(context: FeeCalculationContext): CalculationResult {
     let discount = 0;
     if (context.yearsJoined >= 2) {
-      discount += context.baseAmount * 0.1; // 10% tri ân hội viên gắn kết
+      discount += context.baseAmount * 0.1; // 10% tri ân Học viên gắn kết
     }
     if (context.isEarlyBird) {
       discount += context.baseAmount * 0.05;
@@ -60,9 +60,9 @@ export class VipMemberFeeStrategy implements IFeeCalculationStrategy {
     return {
       finalAmount,
       discountAmount: discount,
-      tierName: 'Hội viên VIP',
+      tierName: 'Học viên VIP',
       appliedBenefits: [
-        'Toàn bộ quyền lợi Hội viên Chính thức',
+        'Toàn bộ quyền lợi Học viên Chính thức',
         'Ưu tiên kết nối xúc tiến thương mại cấp cao',
         'Vị trí gian hàng danh dự tại Caravan & Triển lãm',
         'Biểu tượng VIP Badge trên nền tảng số',
@@ -80,7 +80,7 @@ export class ExecutiveMemberFeeStrategy implements IFeeCalculationStrategy {
     return {
       finalAmount: baseFee,
       discountAmount: 0,
-      tierName: 'Hội viên Ban Điều Hành',
+      tierName: 'Học viên Ban Điều Hành',
       appliedBenefits: [
         'Quyền biểu quyết và hoạch định chiến lược CLB',
         'Đại diện hiệp hội tham gia đối thoại chính sách',

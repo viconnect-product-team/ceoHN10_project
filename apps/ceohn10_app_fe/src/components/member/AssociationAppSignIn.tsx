@@ -272,11 +272,10 @@ export function AssociationAppSignIn({
               className="flex items-center gap-2 text-[12.5px] cursor-pointer text-slate-600 hover:text-slate-900 transition-colors"
             >
               <span
-                className={`flex h-4.5 w-4.5 items-center justify-center rounded-[5px] border transition-all ${
-                  remember
+                className={`flex h-4.5 w-4.5 items-center justify-center rounded-[5px] border transition-all ${remember
                     ? "bg-[#002B70] border-amber-500 text-amber-300"
                     : "bg-white border-slate-300"
-                }`}
+                  }`}
                 aria-hidden="true"
               >
                 {remember && (
@@ -323,7 +322,7 @@ export function AssociationAppSignIn({
           </button>
         </form>
 
-        {/* Member Activation & Register Button -> Cổng Tiếp Nhận Hồ Sơ Đăng Ký Hội Viên (/register) */}
+        {/* Member Activation & Register Button -> Cổng Tiếp Nhận Hồ Sơ Đăng Ký Học viên (/register) */}
         <div className="shrink-0 mt-0.5">
           <Link
             to="/register"
@@ -331,7 +330,7 @@ export function AssociationAppSignIn({
             className="relative flex h-11 w-full items-center justify-center gap-2 rounded-xl border border-amber-500/40 bg-amber-50/70 hover:bg-amber-100/90 text-[13.5px] font-semibold text-amber-900 transition-all active:scale-[0.99] cursor-pointer shadow-xs"
           >
             <Shield className="h-4 w-4 text-amber-600" aria-hidden="true" />
-            <span>{lang === "en" ? "Register new member" : "Đăng ký hội viên mới"}</span>
+            <span>{lang === "en" ? "Register new member" : "Đăng ký Học viên mới"}</span>
             <ChevronRight className="absolute right-4 h-4 w-4 text-amber-600" aria-hidden="true" />
           </Link>
         </div>

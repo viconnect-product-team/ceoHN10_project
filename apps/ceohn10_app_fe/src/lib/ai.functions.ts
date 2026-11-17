@@ -33,7 +33,7 @@ const MAX_CHARS = 4000;
 
 const SYSTEM_PROMPT = `Bạn là Trợ lý AI của nền tảng quản trị Hiệp hội (Association Hub).
 Nguyên tắc bắt buộc:
-- Chỉ trả lời dựa trên dữ liệu và ngữ cảnh được cung cấp. TUYỆT ĐỐI không bịa số liệu, tên hội viên, số tiền hội phí, hay nguồn tham chiếu.
+- Chỉ trả lời dựa trên dữ liệu và ngữ cảnh được cung cấp. TUYỆT ĐỐI không bịa số liệu, tên Học viên, số tiền hội phí, hay nguồn tham chiếu.
 - Nếu chưa có dữ liệu thực để trả lời, hãy nói rõ giới hạn: bạn đang ở chế độ chỉ đọc và chưa được kết nối trực tiếp với dữ liệu hiệp hội trong phiên này.
 - Không tiết lộ thông tin nhạy cảm hoặc dữ liệu vượt quá quyền của người dùng.
 - Trả lời ngắn gọn, chuyên nghiệp, bằng tiếng Việt (trừ khi người dùng dùng ngôn ngữ khác).
@@ -93,12 +93,12 @@ export const askAssistant = createServerFn({ method: "POST" })
 
     const allowedScopes = [
       "tài liệu (theo quyền xem)",
-      "danh bạ hội viên (trường công khai)",
+      "danh bạ Học viên (trường công khai)",
       "sự kiện",
       "marketplace",
       "thông báo",
       ...(canAccessAdminData
-        ? ["hội phí / tài chính", "báo cáo lãnh đạo", "quản trị hội viên"]
+        ? ["hội phí / tài chính", "báo cáo lãnh đạo", "quản trị Học viên"]
         : []),
     ];
     const deniedNote = canAccessAdminData
@@ -249,21 +249,21 @@ export const askAssociationAiFn = createServerFn({ method: "POST" })
     // buildServerContext không dùng Supabase — truyền null an toàn
     const syntheticMemory = data.clientMemorySummary
       ? {
-          conversationId: data.conversationId || "",
-          associationId: associationId ?? null,
-          lastCapability: null,
-          activeCapability: null,
-          selectedContextSources: data.selectedContextSources || [],
-          recentMessages: [],
-          recentEntities: [],
-          recentResults: [],
-          recentSources: [],
-          activeFilters: [],
-          suggestedActions: [],
-          lastUserIntent: null,
-          lastAssistantSummary: data.clientMemorySummary,
-          updatedAt: Date.now(),
-        }
+        conversationId: data.conversationId || "",
+        associationId: associationId ?? null,
+        lastCapability: null,
+        activeCapability: null,
+        selectedContextSources: data.selectedContextSources || [],
+        recentMessages: [],
+        recentEntities: [],
+        recentResults: [],
+        recentSources: [],
+        activeFilters: [],
+        suggestedActions: [],
+        lastUserIntent: null,
+        lastAssistantSummary: data.clientMemorySummary,
+        updatedAt: Date.now(),
+      }
       : null;
 
     const bundle = await buildServerContext({

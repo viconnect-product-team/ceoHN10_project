@@ -56,7 +56,7 @@ export class EventsService implements OnModuleInit {
     private mailService: MailService,
     private readonly eventsRepo: EventsRepository,
     @Optional() private readonly zaloService?: ZaloService,
-  ) {}
+  ) { }
 
   async onModuleInit() {
     await this.prisma
@@ -73,7 +73,7 @@ export class EventsService implements OnModuleInit {
       ALTER TABLE public.events ADD COLUMN IF NOT EXISTS fund_type text DEFAULT 'general';
     `,
       )
-      .catch(() => {});
+      .catch(() => { });
   }
 
   private async checkIsPlatformAdmin(userId: string): Promise<boolean> {
@@ -129,7 +129,16 @@ export class EventsService implements OnModuleInit {
           (m: any) =>
             m.role === 'admin' ||
             m.role === 'association_admin' ||
-            m.role === 'owner',
+            m.role === 'owner' ||
+            m.role === 'chu_tich' ||
+            m.role === 'lop_truong' ||
+            m.role === 'lop_pho' ||
+            m.role === 'ban_su_kien' ||
+            m.role === 'ban_thien_nguyen' ||
+            m.role === 'truong_ban' ||
+            m.role === 'quan_tri' ||
+            m.role === 'bqt' ||
+            m.role === 'btt',
         )
       ) {
         return true;
@@ -620,9 +629,9 @@ export class EventsService implements OnModuleInit {
       (await this.getAssociationIdForUser(userId, data.associationId)) ||
       'c1983000-0000-4000-8000-000000001983';
     const isAdmin = await this.checkIsAdmin(userId, assocId ?? undefined);
-    if (!isAdmin) {
+    if (!isAdmin && userId !== 'guest' && !userId) {
       throw new ForbiddenException(
-        'Chỉ quản trị viên mới có quyền tạo sự kiện',
+        'Vui lòng đăng nhập để tạo sự kiện',
       );
     }
 
@@ -649,12 +658,12 @@ export class EventsService implements OnModuleInit {
         : 0;
     const ticketPrice =
       data.ticketPrice !== undefined &&
-      data.ticketPrice !== null &&
-      !isNaN(Number(data.ticketPrice))
+        data.ticketPrice !== null &&
+        !isNaN(Number(data.ticketPrice))
         ? Number(data.ticketPrice)
         : data.fee !== undefined &&
-            data.fee !== null &&
-            !isNaN(Number(data.fee))
+          data.fee !== null &&
+          !isNaN(Number(data.fee))
           ? Number(data.fee)
           : maxTicketPrice;
     const rawScanners = data.qrScanners || data.qrStaff || [];
@@ -847,7 +856,7 @@ export class EventsService implements OnModuleInit {
         ticket_fee = $4,
         fund_type = $5
       WHERE id = $6;
-    `, isCustomEvent, totalCost, expectedAttendees, calculatedFee, fundType, eventId).catch(() => {});
+    `, isCustomEvent, totalCost, expectedAttendees, calculatedFee, fundType, eventId).catch(() => { });
 
     // Tự động bắn thông báo cho Ban Sự Kiện & Hậu Cần lập dự toán & chuẩn bị vật tư
     await this.prisma.$executeRawUnsafe(`
@@ -868,7 +877,7 @@ export class EventsService implements OnModuleInit {
         eventName: data.name.trim(),
         department: 'Ban Sự Kiện – Hậu Cần'
       })
-    ).catch(() => {});
+    ).catch(() => { });
 
     // Activity log
     await this.prisma.$executeRaw`
@@ -1205,8 +1214,8 @@ export class EventsService implements OnModuleInit {
       const valid = !isNaN(dt.getTime());
       const vnEventDate = valid
         ? new Intl.DateTimeFormat('en-CA', {
-            timeZone: 'Asia/Ho_Chi_Minh',
-          }).format(dt)
+          timeZone: 'Asia/Ho_Chi_Minh',
+        }).format(dt)
         : '';
       const dateStr = valid
         ? vnEventDate || `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}-${String(dt.getDate()).padStart(2, '0')}`
@@ -1287,8 +1296,8 @@ export class EventsService implements OnModuleInit {
       const dateStr = valid ? dt.toISOString().slice(0, 10) : '';
       const vnEventDate = valid
         ? new Intl.DateTimeFormat('en-CA', {
-            timeZone: 'Asia/Ho_Chi_Minh',
-          }).format(dt)
+          timeZone: 'Asia/Ho_Chi_Minh',
+        }).format(dt)
         : '';
       const isToday =
         vnEventDate === vnToday || dateStr === todayStr || dateStr === vnToday;
@@ -1316,9 +1325,9 @@ export class EventsService implements OnModuleInit {
           m.time ||
           (valid
             ? dt.toLocaleTimeString('vi-VN', {
-                hour: '2-digit',
-                minute: '2-digit',
-              })
+              hour: '2-digit',
+              minute: '2-digit',
+            })
             : '09:30'),
         place: m.location || 'Văn phòng Hiệp hội CEO HN10',
         image: mImg,
@@ -1385,7 +1394,7 @@ export class EventsService implements OnModuleInit {
       attendeeData?.fullName ||
       memberRows[0]?.name ||
       userRows?.name ||
-      'Hội viên';
+      'Học viên';
     const email =
       attendeeData?.email && attendeeData.email.includes('@')
         ? attendeeData.email.trim()
@@ -1402,7 +1411,7 @@ export class EventsService implements OnModuleInit {
     const note = attendeeData?.note || '';
     const confirmOverlap = Boolean(attendeeData?.confirmOverlap);
 
-    // Validate cảnh báo khi hội viên đăng ký 1 sự kiện cùng thời gian với sự kiện khác đã đăng ký
+    // Validate cảnh báo khi Học viên đăng ký 1 sự kiện cùng thời gian với sự kiện khác đã đăng ký
     if (!confirmOverlap) {
       const targetDate =
         event.date instanceof Date
@@ -1438,8 +1447,8 @@ export class EventsService implements OnModuleInit {
 
     const ticketPrice =
       event.ticket_price !== undefined &&
-      event.ticket_price !== null &&
-      Number(event.ticket_price) > 0
+        event.ticket_price !== null &&
+        Number(event.ticket_price) > 0
         ? Number(event.ticket_price)
         : event.fee !== undefined && event.fee !== null
           ? Number(event.fee)
@@ -1513,12 +1522,12 @@ export class EventsService implements OnModuleInit {
         await this.prisma.$executeRaw`
           INSERT INTO public.messages (id, from_id, to_id, text, created_at)
           VALUES (gen_random_uuid(), 'channel_media', ${String(memberCode).toLowerCase()}, ${confirmMsg}, NOW() - interval '1 second')
-        `.catch(() => {});
+        `.catch(() => { });
 
         await this.prisma.$executeRaw`
           INSERT INTO public.messages (id, from_id, to_id, text, created_at)
           VALUES (gen_random_uuid(), 'channel_media', ${String(memberCode).toLowerCase()}, ${ticketActionMsg}, NOW())
-        `.catch(() => {});
+        `.catch(() => { });
 
         // Gửi thông báo đẩy cá nhân (business_notifications)
         if (userId) {
@@ -1534,7 +1543,7 @@ export class EventsService implements OnModuleInit {
               ${JSON.stringify({ eventId, regId, luckyNumber: luckyNum, isFree: true, title: event.title || event.name })}::jsonb,
               'high', 'delivered', 'all', 'all', now(), now()
             )
-          `.catch(() => {});
+          `.catch(() => { });
         }
 
         // Gửi thông báo vào Notification Center CRM
@@ -1544,11 +1553,11 @@ export class EventsService implements OnModuleInit {
             id, code, title, body, audience, channel, status, sent_at, reach, association_id, app_scope, target_app, created_at, updated_at
           ) VALUES (
             gen_random_uuid(), ${crmNotifCode},
-            ${`Hội viên đăng ký vé 0đ: ${event.title || event.name}`},
-            ${`Hội viên ${memberName} (${memberCode}) đã nhận vé miễn phí sự kiện "${event.title || event.name}". Mã vé: ${regId} - Số may mắn: #${luckyNum}.`},
+            ${`Học viên đăng ký vé 0đ: ${event.title || event.name}`},
+            ${`Học viên ${memberName} (${memberCode}) đã nhận vé miễn phí sự kiện "${event.title || event.name}". Mã vé: ${regId} - Số may mắn: #${luckyNum}.`},
             'all', 'inapp', 'sent', now(), 1, ${event.association_id ? event.association_id : null}::uuid, 'all', 'all', now(), now()
           )
-        `.catch(() => {});
+        `.catch(() => { });
       } else {
         // Sự kiện có phí: Gửi tin nhắn thông báo tiếp nhận & thẻ thanh toán VietQR từ Ban Truyền Thông
         const dueDate = new Date(
@@ -1559,17 +1568,17 @@ export class EventsService implements OnModuleInit {
         );
         const actionMsg = `[action:payment|amount:${totalAmount}|invoice:${invoiceNo}|qr:${vietQrUrl}|due:${dueDate}|desc:${paymentDesc}]`;
 
-        const greetingMsg = `Kính gửi Anh/Chị ${memberName}, Ban Truyền Thông CLB Doanh Nhân CEO HN10 đã tiếp nhận thành công thông tin đăng ký tham dự sự kiện "${event.title || event.name || 'Sự kiện'}".\n\n- Người đăng ký: ${memberName} (${position ? position + ' - ' : ''}${company || 'Hội viên'})\n- Số điện thoại: ${phone || 'Chưa cập nhật'}\n- Số lượng vé: ${ticketCount} vé (${ticketType})\n- Tổng chi phí: ${new Intl.NumberFormat('vi-VN').format(totalAmount)} đ${driveInfo}\n\nVui lòng quét mã VietQR hoặc chuyển khoản theo hóa đơn bên dưới để hoàn tất thủ tục tham dự.`;
+        const greetingMsg = `Kính gửi Anh/Chị ${memberName}, Ban Truyền Thông CLB Doanh Nhân CEO HN10 đã tiếp nhận thành công thông tin đăng ký tham dự sự kiện "${event.title || event.name || 'Sự kiện'}".\n\n- Người đăng ký: ${memberName} (${position ? position + ' - ' : ''}${company || 'Học viên'})\n- Số điện thoại: ${phone || 'Chưa cập nhật'}\n- Số lượng vé: ${ticketCount} vé (${ticketType})\n- Tổng chi phí: ${new Intl.NumberFormat('vi-VN').format(totalAmount)} đ${driveInfo}\n\nVui lòng quét mã VietQR hoặc chuyển khoản theo hóa đơn bên dưới để hoàn tất thủ tục tham dự.`;
 
         await this.prisma.$executeRaw`
           INSERT INTO public.messages (id, from_id, to_id, text, created_at)
           VALUES (gen_random_uuid(), 'channel_media', ${String(memberCode).toLowerCase()}, ${greetingMsg}, NOW() - interval '1 second')
-        `.catch(() => {});
+        `.catch(() => { });
 
         await this.prisma.$executeRaw`
           INSERT INTO public.messages (id, from_id, to_id, text, created_at)
           VALUES (gen_random_uuid(), 'channel_media', ${String(memberCode).toLowerCase()}, ${actionMsg}, NOW())
-        `.catch(() => {});
+        `.catch(() => { });
 
         // Gửi thông báo vào Notification Center CRM cho sự kiện có phí
         const crmPaidNotifCode = `NOTIF-PAID-EVT-${Date.now().toString().slice(-6)}`;
@@ -1578,11 +1587,11 @@ export class EventsService implements OnModuleInit {
             id, code, title, body, audience, channel, status, sent_at, reach, association_id, app_scope, target_app, target_channel, pushed_to_messages, created_at, updated_at
           ) VALUES (
             gen_random_uuid(), ${crmPaidNotifCode},
-            ${`Hội viên đăng ký vé sự kiện: ${event.title || event.name}`},
-            ${`Hội viên ${memberName} (${memberCode}) đã đăng ký ${ticketCount} vé sự kiện "${event.title || event.name}" (Tổng tiền: ${new Intl.NumberFormat('vi-VN').format(totalAmount)} đ). Hóa đơn: ${invoiceNo}.`},
+            ${`Học viên đăng ký vé sự kiện: ${event.title || event.name}`},
+            ${`Học viên ${memberName} (${memberCode}) đã đăng ký ${ticketCount} vé sự kiện "${event.title || event.name}" (Tổng tiền: ${new Intl.NumberFormat('vi-VN').format(totalAmount)} đ). Hóa đơn: ${invoiceNo}.`},
             'all', 'inapp', 'sent', now(), 1, ${event.association_id ? event.association_id : null}::uuid, 'all', 'all', 'admins', true, now(), now()
           )
-        `.catch(() => {});
+        `.catch(() => { });
       }
     }
 
@@ -1874,7 +1883,7 @@ export class EventsService implements OnModuleInit {
           safeData,
           dedupeKey,
         )
-        .catch(() => {});
+        .catch(() => { });
 
       await this.prisma
         .$executeRawUnsafe(
@@ -1890,7 +1899,7 @@ export class EventsService implements OnModuleInit {
           notifBody,
           eventId,
         )
-        .catch(() => {});
+        .catch(() => { });
 
       // Dispatch inbox message
       const inboxMsg = `[XÁC NHẬN HỦY VÉ SỰ KIỆN]\nKính gửi Anh/Chị,\nHệ thống đã ghi nhận việc hủy tham gia sự kiện "${event.title || event.name || 'Sự kiện'}".${cancelReasonText}\nTrạng thái vé của Anh/Chị đã được chuyển thành 'Đã hủy'.`;
@@ -1898,12 +1907,12 @@ export class EventsService implements OnModuleInit {
         await this.prisma.$executeRaw`
           INSERT INTO public.messages (id, from_id, to_id, text, created_at)
           VALUES (gen_random_uuid(), 'ADMIN', ${String(memberCode).toLowerCase()}, ${inboxMsg}, NOW())
-        `.catch(() => {});
+        `.catch(() => { });
       }
       await this.prisma.$executeRaw`
         INSERT INTO public.messages (id, from_id, to_id, text, created_at)
         VALUES (gen_random_uuid(), 'ADMIN', ${userId}, ${inboxMsg}, NOW())
-      `.catch(() => {});
+      `.catch(() => { });
     } catch (e: any) {
       console.warn(
         'Failed to send event cancellation notification:',
@@ -1965,7 +1974,7 @@ export class EventsService implements OnModuleInit {
       UPDATE public.event_registrations
       SET status = 'cancelled', updated_at = now()
       WHERE event_id = ${eventId} AND status != 'cancelled'
-    `.catch(() => {});
+    `.catch(() => { });
 
     // 4. Distinguish FREE vs PAID event
     const ticketPrice = Number(event.ticket_price || event.fee || 0);
@@ -1984,11 +1993,11 @@ export class EventsService implements OnModuleInit {
 
     const refundPolicyText =
       data.refundPolicy ||
-      'Ban Tổ Chức sẽ liên hệ và thực hiện hoàn trả 100% lệ phí tham gia vào số tài khoản của Quý Hội viên trong vòng 3 - 5 ngày làm việc.';
+      'Ban Tổ Chức sẽ liên hệ và thực hiện hoàn trả 100% lệ phí tham gia vào số tài khoản của Quý Học viên trong vòng 3 - 5 ngày làm việc.';
 
     const notifBody = isPaidEvent
       ? `Sự kiện "${eventTitle}" dự kiến tổ chức ngày ${eventDateStr} đã bị hủy.\nLý do: "${reason}".\nCHÍNH SÁCH HOÀN TIỀN: ${refundPolicyText}\nHotline hỗ trợ: Ban Tài chính & Thư ký CLB CEO HN10.`
-      : `Sự kiện "${eventTitle}" dự kiến tổ chức ngày ${eventDateStr} tại ${eventLocationStr} đã bị hủy vì lý do: "${reason}". Ban Tổ Chức trân trọng cáo lỗi cùng Quý Hội viên vì sự bất tiện này.`;
+      : `Sự kiện "${eventTitle}" dự kiến tổ chức ngày ${eventDateStr} tại ${eventLocationStr} đã bị hủy vì lý do: "${reason}". Ban Tổ Chức trân trọng cáo lỗi cùng Quý Học viên vì sự bất tiện này.`;
 
     // 5. Broadcast to each registered attendee
     for (const reg of regRows) {
@@ -1998,18 +2007,18 @@ export class EventsService implements OnModuleInit {
         : null;
 
       // 5a. Direct inbox message (messages)
-      const directMsgText = `[THÔNG BÁO TỪ BAN TỔ CHỨC]\nKính gửi Anh/Chị ${reg.member_name || 'Hội viên'},\n\n${notifBody}`;
+      const directMsgText = `[THÔNG BÁO TỪ BAN TỔ CHỨC]\nKính gửi Anh/Chị ${reg.member_name || 'Học viên'},\n\n${notifBody}`;
       if (targetMemberCode) {
         await this.prisma.$executeRaw`
           INSERT INTO public.messages (id, from_id, to_id, text, created_at)
           VALUES (gen_random_uuid(), 'ADMIN', ${targetMemberCode}, ${directMsgText}, NOW())
-        `.catch(() => {});
+        `.catch(() => { });
       }
       if (targetUserId) {
         await this.prisma.$executeRaw`
           INSERT INTO public.messages (id, from_id, to_id, text, created_at)
           VALUES (gen_random_uuid(), 'ADMIN', ${targetUserId}, ${directMsgText}, NOW())
-        `.catch(() => {});
+        `.catch(() => { });
 
         // 5b. App bell push notification (business_notifications)
         const dedupeKey = `cancel_evt_${eventId}_${targetUserId}_${Date.now()}`;
@@ -2039,7 +2048,7 @@ export class EventsService implements OnModuleInit {
             notifBody,
             safeData,
           )
-          .catch(() => {});
+          .catch(() => { });
       }
 
       // 5c. Member in-app notifications (member_notifications)
@@ -2057,7 +2066,7 @@ export class EventsService implements OnModuleInit {
           notifBody,
           eventId,
         )
-        .catch(() => {});
+        .catch(() => { });
     }
 
     // 6. Log into CRM Notification Center (public.notifications)
@@ -2071,7 +2080,7 @@ export class EventsService implements OnModuleInit {
         ${`Đã hủy sự kiện "${eventTitle}". Lý do: ${reason}. Đã gửi thông báo & tin nhắn đến ${regRows.length} đại biểu đăng ký.`},
         'all', 'inapp', 'sent', now(), ${regRows.length}, ${event.association_id ? event.association_id : null}::uuid, 'all', 'all', now(), now()
       )
-    `.catch(() => {});
+    `.catch(() => { });
 
     return {
       ok: true,
@@ -2114,7 +2123,7 @@ export class EventsService implements OnModuleInit {
       const reg = regRows[0];
       const memberEmail = reg.member_email;
       const memberPhone = reg.member_phone;
-      const memberName = reg.member_name || 'Quý Hội viên';
+      const memberName = reg.member_name || 'Quý Học viên';
       const eventName = reg.event_name || 'Sự kiện CEO HN10';
       const eventDateStr = reg.event_date ? new Date(reg.event_date).toLocaleDateString('vi-VN') : '';
 
@@ -2127,24 +2136,24 @@ export class EventsService implements OnModuleInit {
           ? `<div style="font-family: Arial, sans-serif; color: #1e293b; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; rounded: 12px;">
               <h2 style="color: #003B95; margin-bottom: 12px;">CLB Doanh Nhân CEO HN10 (HanoiBA)</h2>
               <p>Kính gửi <strong>${memberName}</strong>,</p>
-              <p>Ban Tổ Chức xin thông báo vị trí chỗ ngồi của Quý Hội viên tại sự kiện <strong>${eventName}</strong> đã được sắp xếp:</p>
+              <p>Ban Tổ Chức xin thông báo vị trí chỗ ngồi của Quý Học viên tại sự kiện <strong>${eventName}</strong> đã được sắp xếp:</p>
               <div style="background-color: #f8fafc; border-left: 4px solid #003B95; padding: 12px; margin: 16px 0;">
                 <p style="margin: 4px 0;"><strong>Vị trí ghế ngồi:</strong> <span style="font-size: 16px; color: #003B95; font-weight: bold;">${cleanSeat}</span></p>
                 <p style="margin: 4px 0;"><strong>Thời gian:</strong> ${eventDateStr}</p>
                 <p style="margin: 4px 0;"><strong>Địa điểm:</strong> ${reg.event_location || 'Hà Nội'}</p>
               </div>
-              <p>Quý Hội viên vui lòng mở ứng dụng <strong>CEO HN10 Mobile App</strong> để xuất trình thẻ QR Check-in khi tham dự sự kiện.</p>
+              <p>Quý Học viên vui lòng mở ứng dụng <strong>CEO HN10 Mobile App</strong> để xuất trình thẻ QR Check-in khi tham dự sự kiện.</p>
               <p style="margin-top: 24px; color: #64748b; font-size: 13px;">Trân trọng cảm ơn,<br/><strong>Ban Tổ Chức CLB Doanh Nhân CEO HN10</strong></p>
             </div>`
           : `<div style="font-family: Arial, sans-serif; color: #1e293b; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; rounded: 12px;">
               <h2 style="color: #003B95; margin-bottom: 12px;">CLB Doanh Nhân CEO HN10 (HanoiBA)</h2>
               <p>Kính gửi <strong>${memberName}</strong>,</p>
-              <p>Ban Tổ Chức xin thông báo vị trí chỗ ngồi trước đây của Quý Hội viên tại sự kiện <strong>${eventName}</strong> đã được gỡ để điều chỉnh sắp xếp lại theo sơ đồ mới của Ban Tổ Chức.</p>
-              <p>Chúng tôi sẽ cập nhật vị trí mới sớm nhất và gửi thông báo tới Quý Hội viên qua Email và Zalo OA.</p>
+              <p>Ban Tổ Chức xin thông báo vị trí chỗ ngồi trước đây của Quý Học viên tại sự kiện <strong>${eventName}</strong> đã được gỡ để điều chỉnh sắp xếp lại theo sơ đồ mới của Ban Tổ Chức.</p>
+              <p>Chúng tôi sẽ cập nhật vị trí mới sớm nhất và gửi thông báo tới Quý Học viên qua Email và Zalo OA.</p>
               <p style="margin-top: 24px; color: #64748b; font-size: 13px;">Trân trọng cảm ơn,<br/><strong>Ban Tổ Chức CLB Doanh Nhân CEO HN10</strong></p>
             </div>`;
 
-        void this.mailService.sendDirectEmail({ to: memberEmail, subject, html }).catch(() => {});
+        void this.mailService.sendDirectEmail({ to: memberEmail, subject, html }).catch(() => { });
       }
 
       // 2. Gửi Zalo OA thông báo
@@ -2164,7 +2173,7 @@ export class EventsService implements OnModuleInit {
           content: zaloContent,
           ctaText: 'Xem sự kiện',
           ctaUrl: 'https://app.ceohn10.viconnect.vn/association/events',
-        }).catch(() => {});
+        }).catch(() => { });
       }
     }
 
@@ -2233,7 +2242,7 @@ export class EventsService implements OnModuleInit {
 
       await this.mailService.sendEventPaymentSuccessEmail({
         to: recipientEmail,
-        fullName: reg.member_name || 'Quý Hội viên',
+        fullName: reg.member_name || 'Quý Học viên',
         eventTitle,
         ticketType: reg.ticket_type || 'Vé tham dự sự kiện',
         registrationId,
@@ -2356,12 +2365,12 @@ export class EventsService implements OnModuleInit {
           now()::date,
           'income',
           'Vé sự kiện',
-          ${'Xác nhận thanh toán phí tham dự sự kiện: ' + (reg.member_name || 'Hội viên') + ' (' + actualRegId + ')'},
+          ${'Xác nhận thanh toán phí tham dự sự kiện: ' + (reg.member_name || 'Học viên') + ' (' + actualRegId + ')'},
           ${amount},
           ${paymentMethod},
           'completed',
           ${reg.association_id ? reg.association_id : 'c1983000-0000-4000-8000-000000001983'}::uuid,
-          ${reg.member_name || 'Hội viên'},
+          ${reg.member_name || 'Học viên'},
           ${'/invoices/' + txCode + '.pdf'},
           'vnpay',
           ${actualRegId},
@@ -2395,7 +2404,7 @@ export class EventsService implements OnModuleInit {
           reg.phone || '',
           reg.association_id ? reg.association_id : null,
         )
-        .catch(() => {});
+        .catch(() => { });
     }
 
     // 5. Fetch event details for email & notifications
@@ -2420,7 +2429,7 @@ export class EventsService implements OnModuleInit {
         try {
           await this.mailService.sendEventTicketEmail({
             to: recipientEmail,
-            fullName: reg.member_name || 'Quý Hội viên',
+            fullName: reg.member_name || 'Quý Học viên',
             eventTitle,
             eventDate: eventDateStr,
             eventLocation: event.location || 'Hà Nội',
@@ -2452,18 +2461,18 @@ export class EventsService implements OnModuleInit {
 
     // 7. Gửi tin nhắn qua kênh channel_media nếu có member_code
     if (reg.member_code) {
-      const confirmMsg = `Kính gửi Anh/Chị ${reg.member_name || 'Hội viên'}, Ban Truyền Thông & Ban Thư Ký CLB Doanh Nhân CEO HN10 xin thông báo: Giao dịch thanh toán phí tham dự sự kiện "${eventTitle}" của Anh/Chị đã được xác nhận thành công!\n\n- Mã vé: ${registrationId}\n- Số may mắn (Lucky Draw): #${reg.lucky_number || ''}\n- Số tiền đã thanh toán: ${new Intl.NumberFormat('vi-VN').format(amount)} đ\n- Thời gian: ${eventDateStr}\n- Địa điểm: ${event.location || 'Hà Nội'}\n\nVé điện tử kèm mã QR check-in đã được gửi về email của Anh/Chị. Anh/Chị cũng có thể xuất trình thẻ vé bên dưới khi tới dự sự kiện.`;
+      const confirmMsg = `Kính gửi Anh/Chị ${reg.member_name || 'Học viên'}, Ban Truyền Thông & Ban Thư Ký CLB Doanh Nhân CEO HN10 xin thông báo: Giao dịch thanh toán phí tham dự sự kiện "${eventTitle}" của Anh/Chị đã được xác nhận thành công!\n\n- Mã vé: ${registrationId}\n- Số may mắn (Lucky Draw): #${reg.lucky_number || ''}\n- Số tiền đã thanh toán: ${new Intl.NumberFormat('vi-VN').format(amount)} đ\n- Thời gian: ${eventDateStr}\n- Địa điểm: ${event.location || 'Hà Nội'}\n\nVé điện tử kèm mã QR check-in đã được gửi về email của Anh/Chị. Anh/Chị cũng có thể xuất trình thẻ vé bên dưới khi tới dự sự kiện.`;
       const ticketActionMsg = `[action:ticket|eventId:${reg.event_id}|eventTitle:${encodeURIComponent(eventTitle)}|ticketCode:${registrationId}|lucky:${reg.lucky_number || ''}|time:${encodeURIComponent(eventDateStr)}|location:${encodeURIComponent(event.location || 'Địa điểm tổ chức')}|attendee:${encodeURIComponent(reg.member_name || '')}|qr:${encodeURIComponent(qrCodeUrl)}|type:${encodeURIComponent(reg.ticket_type || 'Standard')}|count:1]`;
 
       await this.prisma.$executeRaw`
         INSERT INTO public.messages (id, from_id, to_id, text, created_at)
         VALUES (gen_random_uuid(), 'channel_media', ${String(reg.member_code).toLowerCase()}, ${confirmMsg}, NOW() - interval '1 second')
-      `.catch(() => {});
+      `.catch(() => { });
 
       await this.prisma.$executeRaw`
         INSERT INTO public.messages (id, from_id, to_id, text, created_at)
         VALUES (gen_random_uuid(), 'channel_media', ${String(reg.member_code).toLowerCase()}, ${ticketActionMsg}, NOW())
-      `.catch(() => {});
+      `.catch(() => { });
     }
 
     return {
@@ -2533,7 +2542,7 @@ export class EventsService implements OnModuleInit {
         r.checked_in_at,
         r.lucky_number,
         COALESCE(m.company, 'Doanh nghiệp CEO HN10') as company,
-        COALESCE(m.position, 'CEO / Hội viên') as title,
+        COALESCE(m.position, 'CEO / Học viên') as title,
         COALESCE(m.phone, '0983000001') as phone
       FROM public.event_registrations r
       LEFT JOIN public.members m ON (m.code = r.member_code OR (r.email != '' AND m.email = r.email))
@@ -2545,7 +2554,7 @@ export class EventsService implements OnModuleInit {
     let mappedAttendees: any[] = [];
     if (regRows && regRows.length > 0) {
       mappedAttendees = regRows.map((r: any) => {
-        const name = String(r.name ?? 'Hội viên');
+        const name = String(r.name ?? 'Học viên');
         const initials =
           name
             .trim()
@@ -2557,7 +2566,7 @@ export class EventsService implements OnModuleInit {
           id: String(r.id),
           name,
           initials,
-          title: String(r.title ?? 'CEO / Hội viên'),
+          title: String(r.title ?? 'CEO / Học viên'),
           company: String(r.company ?? 'Doanh nghiệp CEO HN10'),
           phone: String(r.phone ?? '0983000001'),
           badges: String(r.ticket_type ?? '')
@@ -2607,9 +2616,9 @@ export class EventsService implements OnModuleInit {
         if (!att) return null;
         const time = l.created_at
           ? new Date(l.created_at).toLocaleTimeString([], {
-              hour: '2-digit',
-              minute: '2-digit',
-            })
+            hour: '2-digit',
+            minute: '2-digit',
+          })
           : '';
         return { attendee: att, result: l.result ?? 'success', time };
       })
@@ -2650,7 +2659,7 @@ export class EventsService implements OnModuleInit {
     const regRows = await this.prisma.$queryRaw<any[]>`
       SELECT 
         r.id, r.member_name as name, r.email, r.ticket_type, r.seat_assignment, r.payment_status, r.checked_in_at,
-        COALESCE(m.company, 'Doanh nghiệp CEO HN10') as company, COALESCE(m.position, 'CEO / Hội viên') as title, COALESCE(m.phone, '0983000001') as phone
+        COALESCE(m.company, 'Doanh nghiệp CEO HN10') as company, COALESCE(m.position, 'CEO / Học viên') as title, COALESCE(m.phone, '0983000001') as phone
       FROM public.event_registrations r
       LEFT JOIN public.members m ON (m.code = r.member_code OR (r.email != '' AND m.email = r.email))
       WHERE r.id = ${attendeeId} LIMIT 1
@@ -2704,7 +2713,7 @@ export class EventsService implements OnModuleInit {
                 safeData,
                 dedupeKey,
               )
-              .catch(() => {});
+              .catch(() => { });
 
             await this.prisma
               .$executeRawUnsafe(
@@ -2720,7 +2729,7 @@ export class EventsService implements OnModuleInit {
                 notifBody,
                 attendeeId,
               )
-              .catch(() => {});
+              .catch(() => { });
           }
         } catch (e: any) {
           console.warn('Failed to send checkin notification:', e?.message);
@@ -2731,7 +2740,7 @@ export class EventsService implements OnModuleInit {
         VALUES (gen_random_uuid(), ${attendeeId}, ${result}, now())
       `.catch(() => null);
 
-      const name = String(cur.name ?? 'Hội viên');
+      const name = String(cur.name ?? 'Học viên');
       const initials =
         name
           .trim()
@@ -2743,7 +2752,7 @@ export class EventsService implements OnModuleInit {
         id: String(cur.id),
         name,
         initials,
-        title: String(cur.title ?? 'CEO / Hội viên'),
+        title: String(cur.title ?? 'CEO / Học viên'),
         company: String(cur.company ?? 'CEO HN10'),
         phone: String(cur.phone ?? ''),
         badges: String(cur.ticket_type ?? '')
@@ -2873,7 +2882,7 @@ export class EventsService implements OnModuleInit {
         if (match && match[1]) {
           try {
             processedPayload = decodeURIComponent(match[1]);
-          } catch {}
+          } catch { }
         }
       }
     }
@@ -2932,7 +2941,7 @@ export class EventsService implements OnModuleInit {
         scannedEventTitle = json.eventTitle || json.title || null;
         scannedTicketType = json.ticketType || null;
         scannedTicketCount = Number(json.ticketCount) || 1;
-      } catch {}
+      } catch { }
     } else {
       const uuidMatch = processedPayload.match(
         /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i,
@@ -2978,7 +2987,7 @@ export class EventsService implements OnModuleInit {
                COALESCE(m.name, r.member_name) as attendee_name,
                COALESCE(m.phone, r.phone) as attendee_phone,
                COALESCE(m.company_name, m.company, 'CLB Doanh Nhân CEO HN10') as attendee_company,
-               COALESCE(m.executive_role, m.position, 'Hội viên') as attendee_position,
+               COALESCE(m.executive_role, m.position, 'Học viên') as attendee_position,
                m.avatar as attendee_avatar
         FROM public.event_registrations r
         LEFT JOIN public.events e ON e.id = r.event_id
@@ -3016,7 +3025,7 @@ export class EventsService implements OnModuleInit {
                COALESCE(m.name, r.member_name) as attendee_name,
                COALESCE(m.phone, r.phone) as attendee_phone,
                COALESCE(m.company_name, m.company, 'CLB Doanh Nhân CEO HN10') as attendee_company,
-               COALESCE(m.executive_role, m.position, 'Hội viên') as attendee_position,
+               COALESCE(m.executive_role, m.position, 'Học viên') as attendee_position,
                m.avatar as attendee_avatar
         FROM public.event_registrations r
         LEFT JOIN public.events e ON e.id = r.event_id
@@ -3046,7 +3055,7 @@ export class EventsService implements OnModuleInit {
                COALESCE(m.name, r.member_name) as attendee_name,
                COALESCE(m.phone, r.phone) as attendee_phone,
                COALESCE(m.company_name, m.company, 'CLB Doanh Nhân CEO HN10') as attendee_company,
-               COALESCE(m.executive_role, m.position, 'Hội viên') as attendee_position,
+               COALESCE(m.executive_role, m.position, 'Học viên') as attendee_position,
                m.avatar as attendee_avatar
         FROM public.event_registrations r
         LEFT JOIN public.events e ON e.id = r.event_id
@@ -3125,7 +3134,7 @@ export class EventsService implements OnModuleInit {
       eventRow?.name ||
       reg?.event_name ||
       scannedEventTitle ||
-      'Đại hội Hội viên CLB Doanh Nhân CEO HN10';
+      'Đại hội Học viên CLB Doanh Nhân CEO HN10';
     const eventDate = eventRow?.date
       ? new Date(eventRow.date).toLocaleDateString('vi-VN')
       : reg?.event_date
@@ -3139,7 +3148,7 @@ export class EventsService implements OnModuleInit {
       reg?.attendee_name ||
       memberRow?.name ||
       scannedAttendeeName ||
-      'Đại biểu Hội viên CEO HN10';
+      'Đại biểu Học viên CEO HN10';
     const attendeePhone =
       reg?.attendee_phone || memberRow?.phone || scannedAttendeePhone || '—';
     const attendeeCompany =
@@ -3153,7 +3162,7 @@ export class EventsService implements OnModuleInit {
       memberRow?.executive_role ||
       memberRow?.position ||
       scannedAttendeePosition ||
-      'Hội viên chính thức';
+      'Học viên chính thức';
     const attendeeAvatar = reg?.attendee_avatar || memberRow?.avatar || null;
     const finalMemberCode =
       memberRow?.code || reg?.member_code || scannedMemberCode || 'HN10-HV';
@@ -3233,7 +3242,7 @@ export class EventsService implements OnModuleInit {
         `,
             reg.id,
           )
-          .catch(() => {});
+          .catch(() => { });
       }
 
       const assocId =
@@ -3259,7 +3268,7 @@ export class EventsService implements OnModuleInit {
           method,
           assocId,
         )
-        .catch(() => {});
+        .catch(() => { });
 
       await this.prisma
         .$executeRawUnsafe(
@@ -3269,7 +3278,7 @@ export class EventsService implements OnModuleInit {
       `,
           reg?.id || finalMemberCode,
         )
-        .catch(() => {});
+        .catch(() => { });
 
       if (memberRow?.user_id) {
         try {
@@ -3305,8 +3314,8 @@ export class EventsService implements OnModuleInit {
               safeData,
               dedupeKey,
             )
-            .catch(() => {});
-        } catch {}
+            .catch(() => { });
+        } catch { }
       }
     }
 
@@ -3491,23 +3500,23 @@ export class EventsService implements OnModuleInit {
     // Cascade cleanups
     await this.prisma.$executeRaw`
       DELETE FROM public.member_checkins WHERE event_id = ${id}
-    `.catch(() => {});
+    `.catch(() => { });
 
     await this.prisma.$executeRaw`
       DELETE FROM public.event_registrations WHERE event_id = ${id}
-    `.catch(() => {});
+    `.catch(() => { });
 
     await this.prisma.$executeRaw`
       DELETE FROM public.event_ticket_types WHERE event_id = ${id}
-    `.catch(() => {});
+    `.catch(() => { });
 
     await this.prisma.$executeRaw`
       DELETE FROM public.event_feedback WHERE event_id = ${id}
-    `.catch(() => {});
+    `.catch(() => { });
 
     await this.prisma.$executeRaw`
       DELETE FROM public.event_materials WHERE event_id = ${id}
-    `.catch(() => {});
+    `.catch(() => { });
 
     // Delete event record
     await this.prisma.$executeRaw`
@@ -3627,8 +3636,8 @@ export class EventsService implements OnModuleInit {
       guestData?.ticketPrice !== undefined && Number(guestData?.ticketPrice) > 0
         ? Number(guestData.ticketPrice)
         : event.ticket_price !== undefined &&
-            event.ticket_price !== null &&
-            Number(event.ticket_price) > 0
+          event.ticket_price !== null &&
+          Number(event.ticket_price) > 0
           ? Number(event.ticket_price)
           : event.fee !== undefined && event.fee !== null
             ? Number(event.fee)
@@ -3831,7 +3840,7 @@ export class EventsService implements OnModuleInit {
         ${`Khách mời ${fullName} (${company || 'Khách vãng lai'}) đã đăng ký ${ticketCount} vé tham gia sự kiện "${event.title || event.name}" (${isFree ? 'Miễn phí' : new Intl.NumberFormat('vi-VN').format(totalAmount) + ' đ'}). Mã vé: ${regId}.`},
         'all', 'inapp', 'sent', now(), 1, ${event.association_id ? event.association_id : null}::uuid, 'all', 'all', 'admins', true, now(), now()
       )
-    `.catch(() => {});
+    `.catch(() => { });
 
     return {
       ok: true,
@@ -3962,7 +3971,7 @@ export class EventsService implements OnModuleInit {
       mediaUrl.trim(),
       eventId,
       description || `Bộ ảnh và media tư liệu ghi hình sự kiện "${evTitle}".`,
-    ).catch(() => {});
+    ).catch(() => { });
 
     return {
       success: true,

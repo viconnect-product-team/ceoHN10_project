@@ -186,11 +186,11 @@ function VotingPage() {
   }
 
   async function handleClosePoll(id: string) {
-    if (!confirm("Bạn có chắc chắn muốn kết thúc cuộc biểu quyết này? Kết quả chung cuộc sẽ được chốt và tự động phát thông báo kết quả tới App Hội viên và CRM.")) return;
+    if (!confirm("Bạn có chắc chắn muốn kết thúc cuộc biểu quyết này? Kết quả chung cuộc sẽ được chốt và tự động phát thông báo kết quả tới App Học viên và CRM.")) return;
     setClosingId(id);
     try {
       await closeVote({ data: { id } });
-      toast.success("Đã kết thúc biểu quyết & phát thông báo kết quả tới App Hội viên và CRM!");
+      toast.success("Đã kết thúc biểu quyết & phát thông báo kết quả tới App Học viên và CRM!");
       await router.invalidate();
     } catch (err: any) {
       toast.error(err?.message || "Không thể kết thúc biểu quyết");
@@ -206,7 +206,7 @@ function VotingPage() {
         .then((res) => {
           if (active) setRemotePref(res.pref);
         })
-        .catch(() => {});
+        .catch(() => { });
     } else {
       setRemotePref(null);
     }
@@ -348,17 +348,15 @@ function VotingPage() {
           <button
             key={tab.key}
             onClick={() => selectFilter(tab.key)}
-            className={`rounded-full px-4 py-1.5 text-sm font-medium transition ${
-              filter === tab.key
+            className={`rounded-full px-4 py-1.5 text-sm font-medium transition ${filter === tab.key
                 ? "bg-primary text-primary-foreground"
                 : "bg-secondary text-muted-foreground hover:text-foreground"
-            }`}
+              }`}
           >
             {tab.label}
             <span
-              className={`ml-2 rounded-full px-1.5 py-0.5 text-xs font-semibold ${
-                filter === tab.key ? "bg-primary-foreground/20" : "bg-background"
-              }`}
+              className={`ml-2 rounded-full px-1.5 py-0.5 text-xs font-semibold ${filter === tab.key ? "bg-primary-foreground/20" : "bg-background"
+                }`}
             >
               {countFor(tab.key)}
             </span>
@@ -418,13 +416,12 @@ function VotingPage() {
                         {v.optionDetails.map((opt) => (
                           <div
                             key={opt.id}
-                            className={`p-2.5 rounded-xl border transition-all ${
-                              opt.isLeading
+                            className={`p-2.5 rounded-xl border transition-all ${opt.isLeading
                                 ? isClosed
                                   ? "bg-emerald-500/10 border-emerald-500/40 shadow-xs"
                                   : "bg-amber-500/10 border-amber-500/40 shadow-xs"
                                 : "bg-secondary/40 border-border"
-                            }`}
+                              }`}
                           >
                             <div className="flex items-center justify-between gap-2 mb-1.5">
                               <div className="flex items-center gap-2">
@@ -433,11 +430,10 @@ function VotingPage() {
                                     type="button"
                                     onClick={() => handleVote(v.id, opt.id)}
                                     disabled={votingOptionId === opt.id}
-                                    className={`w-4 h-4 rounded-full border flex items-center justify-center transition-all cursor-pointer ${
-                                      v.myVote === opt.id
+                                    className={`w-4 h-4 rounded-full border flex items-center justify-center transition-all cursor-pointer ${v.myVote === opt.id
                                         ? "border-amber-500 bg-amber-500 text-white"
                                         : "border-muted-foreground hover:border-primary"
-                                    }`}
+                                      }`}
                                     title="Bấm để bình chọn cho phương án này"
                                   >
                                     {v.myVote === opt.id && <span className="w-1.5 h-1.5 rounded-full bg-white" />}
@@ -449,11 +445,10 @@ function VotingPage() {
                                 )}
                                 <span className="text-xs font-semibold text-foreground">{opt.title}</span>
                                 {opt.isLeading && (
-                                  <span className={`inline-flex items-center gap-0.5 rounded-full px-2 py-0.5 text-[9.5px] font-bold border ${
-                                    isClosed
+                                  <span className={`inline-flex items-center gap-0.5 rounded-full px-2 py-0.5 text-[9.5px] font-bold border ${isClosed
                                       ? "bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border-emerald-500/30"
                                       : "bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-amber-500/30"
-                                  }`}>
+                                    }`}>
                                     {isClosed ? "🏆 Phương án được chọn" : "👑 Dẫn đầu"}
                                   </span>
                                 )}
@@ -466,13 +461,12 @@ function VotingPage() {
                                     <span className="text-slate-500 font-medium">💻 CRM: {opt.crmVotes || 0}</span>
                                   </span>
                                 ) : null}
-                                <span className={`font-black text-xs ${
-                                  opt.isLeading
+                                <span className={`font-black text-xs ${opt.isLeading
                                     ? isClosed
                                       ? "text-emerald-600 dark:text-emerald-400"
                                       : "text-amber-600 dark:text-amber-400"
                                     : "text-foreground"
-                                }`}>
+                                  }`}>
                                   {opt.percentage.toFixed(1)}%
                                 </span>
                               </div>
@@ -628,13 +622,13 @@ function VoteModal({ vote, onClose }: { vote?: Vote; onClose: () => void }) {
         const items = Array.isArray(res) ? res : res?.items || [];
         setEventsList(items);
       })
-      .catch(() => {});
+      .catch(() => { });
     fetchNestApi<any>("/trainings?page=1&size=100")
       .then((res) => {
         const items = Array.isArray(res) ? res : res?.items || [];
         setTrainingsList(items);
       })
-      .catch(() => {});
+      .catch(() => { });
   }, []);
 
   function setOpt(i: number, val: string) {
@@ -797,12 +791,12 @@ function VoteModal({ vote, onClose }: { vote?: Vote; onClose: () => void }) {
               onChange={(e) => setTargetAudience(e.target.value)}
               className={inputCls}
             >
-              <option value="all">🌐 Toàn thể Hội viên (App Hiệp hội & CRM)</option>
-              <option value="members">⭐ Chỉ hội viên chính thức hiệp hội</option>
+              <option value="all">🌐 Toàn thể Học viên (App Hiệp hội & CRM)</option>
+              <option value="members">⭐ Chỉ Học viên chính thức hiệp hội</option>
               <option value="non_members">🎯 Người ngoài hiệp hội (Khách mời sự kiện)</option>
             </select>
             <p className="mt-1 text-[11px] text-muted-foreground">
-              * Hệ thống sẽ tự động phát thông báo thời gian thực tới App Hội viên và CRM cho các đối tượng liên quan đã chọn.
+              * Hệ thống sẽ tự động phát thông báo thời gian thực tới App Học viên và CRM cho các đối tượng liên quan đã chọn.
             </p>
           </div>
 
@@ -932,7 +926,7 @@ function LuckyDrawModal({ onClose }: { onClose: () => void }) {
           }
         }
       })
-      .catch(() => {});
+      .catch(() => { });
   }, []);
 
   const handleSelectEvent = (evId: string) => {
@@ -983,7 +977,7 @@ function LuckyDrawModal({ onClose }: { onClose: () => void }) {
           ...prev,
         ]);
 
-        // 2. Loại bỏ hội viên đã trúng giải khỏi danh sách quay thưởng để không thể trúng lần 2
+        // 2. Loại bỏ Học viên đã trúng giải khỏi danh sách quay thưởng để không thể trúng lần 2
         setCandidates((prev) => prev.filter((c) => c.code !== chosen.code));
 
         // 3. Giảm số lượng hoặc ẩn giải thưởng đã trúng nếu đã hết số lượng
@@ -1010,7 +1004,7 @@ function LuckyDrawModal({ onClose }: { onClose: () => void }) {
               quantity: nextQty,
               status: nextQty <= 0 ? "won" : "active",
             }),
-          }).catch(() => {});
+          }).catch(() => { });
         }
 
         // 4. Tự động bắn email trúng thưởng và đẩy về mục Ưu Đãi trên CRM & App mobile

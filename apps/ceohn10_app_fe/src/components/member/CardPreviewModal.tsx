@@ -95,7 +95,7 @@ export function CardPreviewModal({
 
   // Merge draft / fetched details / fallback props
   const effectiveKind = draft?.cardKind || cardDetails?.cardKind || cardKind;
-  const effectiveName = draft?.displayName || cardDetails?.displayName || name || "Hội viên CLB CEO HN10";
+  const effectiveName = draft?.displayName || cardDetails?.displayName || name || "Học viên CLB CEO HN10";
   const effectiveTitle = draft?.professionalTitle || cardDetails?.professionalTitle || title || "Doanh nhân CEO HN10";
   const effectiveCompany = draft?.companyName || cardDetails?.companyName || company || "CLB Doanh Nhân CEO HN10";
   const effectivePhone = draft?.workPhone || cardDetails?.workPhone || "";
@@ -109,15 +109,15 @@ export function CardPreviewModal({
   const cachedCardAvatar =
     typeof window !== "undefined" && (cardId || slug)
       ? localStorage.getItem(`vba_card_avatar_${cardId || slug}`) ||
-        localStorage.getItem(`vba_secondary_card_avatar_${cardId || slug}`) ||
-        (effectiveKind === "primary" ? localStorage.getItem("vba_member_avatar_photo") : null)
+      localStorage.getItem(`vba_secondary_card_avatar_${cardId || slug}`) ||
+      (effectiveKind === "primary" ? localStorage.getItem("vba_member_avatar_photo") : null)
       : null;
 
   const rawAvatar = draft?.avatarUrl || cardDetails?.avatarUrl || avatarUrl || cachedCardAvatar || null;
   const resolvedAvatar = rawAvatar
     ? (rawAvatar.startsWith("data:") || rawAvatar.startsWith("blob:")
-        ? rawAvatar
-        : resolveMediaUrl(rawAvatar) || rawAvatar)
+      ? rawAvatar
+      : resolveMediaUrl(rawAvatar) || rawAvatar)
     : null;
 
   // Visibility flags
@@ -149,7 +149,7 @@ export function CardPreviewModal({
       showEmail && effectiveEmail ? `EMAIL:${effectiveEmail}` : "",
       showCompany && effectiveWebsite ? `URL:${effectiveWebsite}` : "",
       showAddress && effectiveAddress ? `ADR;TYPE=WORK:;;${effectiveAddress};;;;` : "",
-      "NOTE:Hội viên CLB Doanh Nhân CEO HN10",
+      "NOTE:Học viên CLB Doanh Nhân CEO HN10",
       "END:VCARD",
     ]
       .filter(Boolean)
@@ -175,7 +175,7 @@ export function CardPreviewModal({
           text: `${effectiveName} — ${effectiveTitle} tại ${effectiveCompany}`,
           url: publicUrl,
         });
-      } catch {}
+      } catch { }
     } else {
       try {
         await navigator.clipboard.writeText(publicUrl);
@@ -223,11 +223,10 @@ export function CardPreviewModal({
         <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0F172A] px-4 py-3 shrink-0">
           <div className="flex items-center gap-2 min-w-0">
             <span
-              className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[11px] font-extrabold uppercase tracking-wider ${
-                effectiveKind === "primary"
+              className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[11px] font-extrabold uppercase tracking-wider ${effectiveKind === "primary"
                   ? "bg-blue-100 text-[#003B95] dark:bg-blue-950/60 dark:text-blue-300 border border-blue-300 dark:border-blue-800"
                   : "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border border-slate-300 dark:border-slate-700"
-              }`}
+                }`}
             >
               {effectiveKind === "primary" ? (
                 <>
@@ -239,7 +238,7 @@ export function CardPreviewModal({
               )}
             </span>
             <span className="truncate text-xs font-semibold text-slate-500 dark:text-slate-400">
-              Xem trước Thẻ &amp; Profile Hội Viên
+              Xem trước Thẻ &amp; Profile Học viên
             </span>
           </div>
 
@@ -282,7 +281,7 @@ export function CardPreviewModal({
               <div>
                 <p className="font-bold text-[#003B95] dark:text-blue-400">Danh thiếp số chính thức CEO HN10</p>
                 <p className="text-slate-600 dark:text-slate-300 mt-0.5 text-[11.5px]">
-                  Khi bất kỳ ai quét mã QR thẻ hội viên của bạn, thẻ danh thiếp cùng toàn bộ Profile bên dưới sẽ hiển thị đồng bộ.
+                  Khi bất kỳ ai quét mã QR thẻ Học viên của bạn, thẻ danh thiếp cùng toàn bộ Profile bên dưới sẽ hiển thị đồng bộ.
                 </p>
               </div>
             </div>
@@ -299,7 +298,7 @@ export function CardPreviewModal({
             </div>
           )}
 
-          {/* ── THẺ DANH THIẾP SỐ CEO HN10 EXECUTIVE (GIAO DIỆN CHUẨN THẺ HỘI VIÊN) ── */}
+          {/* ── THẺ DANH THIẾP SỐ CEO HN10 EXECUTIVE (GIAO DIỆN CHUẨN THẺ Học viên) ── */}
           <div className="rounded-2xl overflow-hidden shadow-md">
             <Ceo1983BusinessCardVisit
               name={effectiveName}
@@ -317,7 +316,7 @@ export function CardPreviewModal({
             />
           </div>
 
-          {/* ── KHỐI PROFILE HỘI VIÊN CHI TIẾT (ĐỒNG BỘ THEO MẪU PROFILE CEO HN10) ── */}
+          {/* ── KHỐI PROFILE Học viên CHI TIẾT (ĐỒNG BỘ THEO MẪU PROFILE CEO HN10) ── */}
           <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0F172A] p-4 text-center shadow-sm space-y-3">
             <div className="flex items-center justify-center gap-3">
               <div className="size-14 rounded-full ring-2 ring-[#003B95] dark:ring-blue-400 overflow-hidden bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0">
@@ -347,7 +346,7 @@ export function CardPreviewModal({
 
           </div>
 
-          {/* ── 4 NÚT HÀNH ĐỘNG KẾT NỐI (GIỐNG THẺ HỘI VIÊN) ── */}
+          {/* ── 4 NÚT HÀNH ĐỘNG KẾT NỐI (GIỐNG THẺ Học viên) ── */}
           <div className="grid grid-cols-4 gap-2 pt-1">
             <button
               type="button"
@@ -426,11 +425,11 @@ export function CardPreviewModal({
             </p>
           </div>
 
-          {/* ── BẢNG THÔNG TIN HỘI VIÊN ĐƯỢC XÁC THỰC ── */}
+          {/* ── BẢNG THÔNG TIN Học viên ĐƯỢC XÁC THỰC ── */}
           <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0F172A] p-4 shadow-sm">
             <h2 className="mb-2.5 flex items-center gap-2 text-xs font-bold text-[#003B95] dark:text-blue-400 uppercase tracking-wider">
               <Building2 className="h-4 w-4 text-amber-500" />
-              <span>Thông tin chi tiết Profile hội viên</span>
+              <span>Thông tin chi tiết Profile Học viên</span>
             </h2>
 
             <dl className="divide-y divide-slate-100 dark:divide-slate-800 text-[12px]">
@@ -558,7 +557,7 @@ export function CardPreviewModal({
             )}
           </div>
 
-          {/* ── PROFILE DOANH NGHIỆP 2 TRANG XUẤT HIỆN BÊN DƯỚI (CHUẨN THEO THẺ HỘI VIÊN) ── */}
+          {/* ── PROFILE DOANH NGHIỆP 2 TRANG XUẤT HIỆN BÊN DƯỚI (CHUẨN THEO THẺ Học viên) ── */}
           <div className="pt-1">
             <div className="mb-2 flex items-center justify-between">
               <h3 className="text-xs font-bold text-[#003B95] uppercase tracking-wider flex items-center gap-1.5">

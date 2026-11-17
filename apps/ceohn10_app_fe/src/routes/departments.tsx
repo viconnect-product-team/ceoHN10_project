@@ -134,7 +134,7 @@ function matchesDept(m: any, d: DepartmentItem): boolean {
     return mDept.includes("thư ký") || mDept === "btk" || mDept === "thu_ky";
   }
   if (dCode === "btv" || dName.includes("thành viên")) {
-    return (mDept.includes("thành viên") && !mDept.includes("hội viên")) || mDept.includes("phát triển hội viên");
+    return (mDept.includes("thành viên") && !mDept.includes("Học viên")) || mDept.includes("phát triển Học viên");
   }
   if (dCode === "bxt" || dName.includes("xúc tiến") || dName.includes("thương mại")) {
     return mDept.includes("xúc tiến") || mDept.includes("thương mại") || mDept.includes("đầu tư b2b") || mDept === "bxt" || mDept === "xuc_tien";
@@ -176,7 +176,7 @@ function DepartmentsPage() {
         const parsed = JSON.parse(raw);
         if (Array.isArray(parsed)) localAccounts = parsed;
       }
-    } catch {}
+    } catch { }
     return [...DEFAULT_MEMBERS, ...localAccounts];
   });
 
@@ -197,7 +197,7 @@ function DepartmentsPage() {
           });
         }
       })
-      .catch(() => {});
+      .catch(() => { });
   }, []);
 
   const deptMembersMap = useMemo(() => {
@@ -278,14 +278,14 @@ function DepartmentsPage() {
       const updated = departments.map((d) =>
         d.id === editingDeptId
           ? {
-              ...d,
-              name: formName.trim(),
-              code: formCode.trim().toUpperCase(),
-              headTitle: formHeadTitle.trim(),
-              description: formDescription.trim(),
-              color: formColor,
-              memberCount: Number(formMemberCount) || 0,
-            }
+            ...d,
+            name: formName.trim(),
+            code: formCode.trim().toUpperCase(),
+            headTitle: formHeadTitle.trim(),
+            description: formDescription.trim(),
+            color: formColor,
+            memberCount: Number(formMemberCount) || 0,
+          }
           : d
       );
       setDepartments(updated);
@@ -473,7 +473,7 @@ function DepartmentsPage() {
             index={2}
           />
           <StandardMetricCard
-            title="Hội Viên Trực Thuộc"
+            title="Học viên Trực Thuộc"
             value={totalMembers}
             subtitle="Đã được phân công vào các ban"
             icon={Users}
@@ -581,11 +581,10 @@ function DepartmentsPage() {
                     type="button"
                     onClick={() => setDeleteConfirmDept(dept)}
                     disabled={dept.isCore}
-                    className={`inline-flex h-8 w-8 items-center justify-center rounded-lg border transition ${
-                      dept.isCore
+                    className={`inline-flex h-8 w-8 items-center justify-center rounded-lg border transition ${dept.isCore
                         ? "border-slate-200/50 bg-slate-50 text-slate-300 cursor-not-allowed dark:bg-slate-800/40 dark:border-slate-800 dark:text-slate-600"
                         : "border-rose-200 bg-rose-50 text-rose-700 hover:bg-rose-100 hover:text-rose-800 cursor-pointer dark:bg-rose-950/50 dark:border-rose-800 dark:text-rose-300"
-                    }`}
+                      }`}
                     title={dept.isCore ? "Ban nòng cốt không thể xóa" : "Xóa ban"}
                     aria-label="Xóa ban"
                   >
@@ -653,7 +652,7 @@ function DepartmentsPage() {
                     <div className="flex items-center gap-2">
                       <Users className="h-4 w-4 text-[#003B95]" />
                       <span className="font-bold text-sm text-foreground">
-                        Danh Sách Hội Viên Thuộc Ban
+                        Danh Sách Học viên Thuộc Ban
                       </span>
                     </div>
                     <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#003B95]/10 text-[#003B95]">
@@ -664,14 +663,14 @@ function DepartmentsPage() {
                   {viewMembers.length === 0 ? (
                     <div className="text-center py-8 px-4 rounded-xl border border-dashed border-border bg-muted/20">
                       <Users className="h-8 w-8 mx-auto text-muted-foreground/50 mb-2" />
-                      <p className="font-medium text-muted-foreground">Chưa có hội viên nào được ghi nhận thuộc ban này.</p>
-                      <p className="text-[11px] text-muted-foreground/80 mt-1">Các hội viên được phân công vào ban sẽ tự động hiển thị tại đây.</p>
+                      <p className="font-medium text-muted-foreground">Chưa có Học viên nào được ghi nhận thuộc ban này.</p>
+                      <p className="text-[11px] text-muted-foreground/80 mt-1">Các Học viên được phân công vào ban sẽ tự động hiển thị tại đây.</p>
                     </div>
                   ) : (
                     <div className="space-y-2 max-h-[320px] overflow-y-auto pr-1">
                       {viewMembers.map((m, idx) => {
-                        const name = m.name || m.fullName || "Hội viên CEO HN10";
-                        const code = m.code || m.memberCode || `Hội viên #${idx + 1}`;
+                        const name = m.name || m.fullName || "Học viên CEO HN10";
+                        const code = m.code || m.memberCode || `Học viên #${idx + 1}`;
                         const company = m.company || m.companyName || "";
                         const role = m.executiveRole || m.role || m.position || "Thành viên";
                         const avatar = m.avatar || m.avatarUrl;
@@ -885,7 +884,7 @@ function DepartmentsPage() {
                             </div>
                             <div className="min-w-0">
                               <p className="font-semibold text-foreground truncate">
-                                {m.name || m.fullName || "Hội viên"}
+                                {m.name || m.fullName || "Học viên"}
                               </p>
                               <p className="text-[10px] text-muted-foreground truncate">
                                 {m.email} {m.phone ? `• ${m.phone}` : ""}

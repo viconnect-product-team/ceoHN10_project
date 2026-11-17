@@ -229,22 +229,20 @@ export function InvoiceExportModal({
               <button
                 type="button"
                 onClick={() => setExportMode("all")}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${
-                  exportMode === "all"
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${exportMode === "all"
                     ? "bg-[#003B95] text-white shadow-xs"
                     : "text-muted-foreground hover:text-foreground"
-                }`}
+                  }`}
               >
                 Xuất Hóa Đơn Tổng Hợp
               </button>
               <button
                 type="button"
                 onClick={() => setExportMode("category")}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${
-                  exportMode === "category"
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${exportMode === "category"
                     ? "bg-[#003B95] text-white shadow-xs"
                     : "text-muted-foreground hover:text-foreground"
-                }`}
+                  }`}
               >
                 Xuất Theo Từng Danh Mục
               </button>
@@ -354,7 +352,7 @@ export function InvoiceExportModal({
                         <td className="border border-slate-400 p-1.5 text-center font-semibold">{idx + 1}</td>
                         <td className="border border-slate-400 p-1.5 font-mono font-bold text-blue-900">{it.code || it.id}</td>
                         <td className="border border-slate-400 p-1.5 text-center">{formatDisplayDate(it.date)}</td>
-                        <td className="border border-slate-400 p-1.5 font-semibold">{it.recipient || "Hội viên CEO HN10"}</td>
+                        <td className="border border-slate-400 p-1.5 font-semibold">{it.recipient || "Học viên CEO HN10"}</td>
                         <td className="border border-slate-400 p-1.5">{it.description}</td>
                         <td className="border border-slate-400 p-1.5 text-center uppercase font-bold text-[10px]">
                           {it.method || "VNPAY"}

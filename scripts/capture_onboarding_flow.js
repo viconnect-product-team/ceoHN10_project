@@ -8,14 +8,14 @@ const EVIDENCE_DIR = path.join(__dirname, '..', 'document', 'images', 'evidence'
 
 async function main() {
   const browser = await chromium.launch({ channel: 'chrome', headless: true });
-  
+
   // 1. Landing Page & Registration Modal (Desktop & Mobile)
   console.log('1. Navigating to Landing Page...');
   const landingPage = await browser.newPage({
     viewport: { width: 1440, height: 900 },
     ignoreHTTPSErrors: true
   });
-  
+
   await landingPage.goto('https://14.225.217.232:5444/landing/ceo/v1', { waitUntil: 'networkidle', timeout: 30000 });
   await landingPage.waitForTimeout(2000);
   await landingPage.screenshot({ path: path.join(EVIDENCE_DIR, 'step_00a_landing_portal.png') });
@@ -57,7 +57,7 @@ async function main() {
     dispatcher: new undici.Agent({ connect: { rejectUnauthorized: false } })
   });
   const crmAuth = await crmResp.json();
-  
+
   const crmContext = await browser.newContext({
     viewport: { width: 1440, height: 900 },
     ignoreHTTPSErrors: true
@@ -86,7 +86,7 @@ async function main() {
       await searchInput.fill('MediSocial');
       await crmPage.waitForTimeout(1500);
     }
-  } catch {}
+  } catch { }
 
   // Click row to open Drawer
   const memberRow = await crmPage.$('tbody tr, .member-card, table tr:nth-child(2)');
@@ -135,11 +135,11 @@ async function main() {
           <div style="font-size: 13px; font-weight: 700; color: #003B95; text-transform: uppercase; margin-bottom: 12px;">Thông Tin Tài Khoản Đăng Nhập Ứng Dụng:</div>
           <div class="cred-row"><span class="cred-label">Cổng đăng nhập App:</span><span class="cred-val">https://14.225.217.232:5444/association</span></div>
           <div class="cred-row"><span class="cred-label">Tên đăng nhập / Email:</span><span class="cred-val">vumikasa6@gmail.com</span></div>
-          <div class="cred-row"><span class="cred-label">Mã số Hội viên:</span><span class="cred-val">CEO HN10-000002</span></div>
+          <div class="cred-row"><span class="cred-label">Mã số Học viên:</span><span class="cred-val">CEO HN10-000002</span></div>
           <div class="cred-row"><span class="cred-label">Mật khẩu khởi tạo:</span><span class="cred-val">CEO HN10@2026</span></div>
           <div class="cred-row"><span class="cred-label">Trạng thái hồ sơ:</span><span class="cred-val" style="color: #16a34a;">ĐÃ PHÊ DUYỆT (ACTIVE)</span></div>
         </div>
-        <p style="font-size: 13px; color: #475569;">Quý hội viên vui lòng tải ứng dụng hoặc truy cập vào liên kết bên dưới để đăng nhập, cập nhật hồ sơ doanh nghiệp và kích hoạt Thẻ Hội Viên VIP Kỹ Thuật Số.</p>
+        <p style="font-size: 13px; color: #475569;">Quý Học viên vui lòng tải ứng dụng hoặc truy cập vào liên kết bên dưới để đăng nhập, cập nhật hồ sơ doanh nghiệp và kích hoạt Thẻ Học viên VIP Kỹ Thuật Số.</p>
         <div style="text-align: center;">
           <a href="#" class="cta-btn">Truy Cập App Hiệp Hội Ngay</a>
         </div>

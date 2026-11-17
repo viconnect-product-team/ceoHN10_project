@@ -10,7 +10,7 @@ export const Route = createFileRoute("/business-connect/")({
       {
         name: "description",
         content:
-          "Nền tảng hợp nhất quản lý hội viên 360°, kết nối giao thương B2B, sự kiện thông minh và AI Copilot.",
+          "Nền tảng hợp nhất quản lý Học viên 360°, kết nối giao thương B2B, sự kiện thông minh và AI Copilot.",
       },
     ],
   }),

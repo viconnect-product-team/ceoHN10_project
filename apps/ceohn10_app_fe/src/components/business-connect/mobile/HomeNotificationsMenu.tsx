@@ -45,9 +45,9 @@ function humanizeNotifTitle(kind: string, rawTitle?: string): string {
     case "club_application_submitted":
       return "Đơn đăng ký gia nhập CLB mới";
     case "club_application_approved":
-      return "Hồ sơ hội viên đã được phê duyệt!";
+      return "Hồ sơ Học viên đã được phê duyệt!";
     case "club_application_rejected":
-      return "Thông báo về hồ sơ hội viên";
+      return "Thông báo về hồ sơ Học viên";
     case "connection_request_received":
       return "Lời mời kết nối mới";
     case "connection_request_accepted":
@@ -139,7 +139,7 @@ function UnreadList({ onClose }: { onClose: () => void }) {
       <ul className="max-h-[60vh] overflow-y-auto divide-y divide-[var(--bc-mobile-border)]">
         {items.map((n: any) => {
           const avatarUrl = n.safeDisplayData?.avatarUrl;
-          const counterpartName = n.safeDisplayData?.counterpartDisplayName || "Hội viên CEO HN10";
+          const counterpartName = n.safeDisplayData?.counterpartDisplayName || "Học viên CEO HN10";
           const initial = counterpartName[0]?.toUpperCase() || "C";
           const isConnection =
             n.notificationKind === "connection_request_received" || n.sourceDomain === "connection";
@@ -169,8 +169,8 @@ function UnreadList({ onClose }: { onClose: () => void }) {
           const targetRoute = isConnection
             ? "/connect-app/network"
             : isOpp && oppId
-            ? `/connect-app/community/${commId}/opportunities/${oppId}`
-            : n.action?.targetRoute || "/connect-app/notifications";
+              ? `/connect-app/community/${commId}/opportunities/${oppId}`
+              : n.action?.targetRoute || "/connect-app/notifications";
           const targetSearch = isConnection
             ? { tab: "requests" }
             : n.action?.targetSearch || undefined;
@@ -294,7 +294,7 @@ function UnreadList({ onClose }: { onClose: () => void }) {
           disabled={markRead.isPending}
           onClick={async () => {
             for (const n of items) {
-              await markRead.mutateAsync({ id: n.id }).catch(() => {});
+              await markRead.mutateAsync({ id: n.id }).catch(() => { });
             }
             void q.refetch();
             toast.success("Đã đánh dấu tất cả là đã đọc");

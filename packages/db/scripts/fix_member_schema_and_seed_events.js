@@ -37,7 +37,7 @@ async function run() {
       id: 'e1983000-0000-4000-8000-000000000001',
       name: 'Đại Hội Thường Niên & Gala Vinh Danh CEO HN10 Xuất Sắc',
       title: 'Đại Hội Thường Niên & Gala Vinh Danh CEO HN10 Xuất Sắc',
-      description: 'Đại hội toàn thể hội viên CLB Doanh Nhân CEO HN10 trực thuộc HanoiBA. Tổng kết hoạt động giao thương, vinh danh các doanh nghiệp tiêu biểu và bầu Ban Chấp Hành nhiệm kỳ mới.',
+      description: 'Đại hội toàn thể Học viên CLB Doanh Nhân CEO HN10 trực thuộc HanoiBA. Tổng kết hoạt động giao thương, vinh danh các doanh nghiệp tiêu biểu và bầu Ban Chấp Hành nhiệm kỳ mới.',
       date: '2026-11-28',
       location: 'Trung Tâm Hội Nghị Quốc Gia (NCC), Số 1 Đại Lộ Thăng Long, Hà Nội',
       place: 'Trung Tâm Hội Nghị Quốc Gia (NCC), Số 1 Đại Lộ Thăng Long, Hà Nội',

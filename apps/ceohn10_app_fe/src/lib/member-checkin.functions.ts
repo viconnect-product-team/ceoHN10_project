@@ -44,7 +44,7 @@ export const syncMemberCheckins = createServerFn({ method: "POST" })
       .eq("user_id", userId)
       .maybeSingle();
     if (meErr) throw new Error(meErr.message);
-    if (!me) throw new Error("Tài khoản chưa được liên kết hồ sơ hội viên.");
+    if (!me) throw new Error("Tài khoản chưa được liên kết hồ sơ Học viên.");
     const memberCode = me.code as string;
     const associationId = me.association_id as string;
 

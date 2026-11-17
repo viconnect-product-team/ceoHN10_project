@@ -34,10 +34,10 @@ export const Route = createFileRoute("/card/$code")({
   loader: ({ params }) => getPublicCard({ data: { code: params.code } }),
   head: () => ({
     meta: [
-      { title: "Danh thiếp & Thẻ hội viên — CLB Doanh nhân CEO HN10" },
+      { title: "Danh thiếp & Thẻ Học viên — CLB Doanh nhân CEO HN10" },
       {
         name: "description",
-        content: "Xác thực và xem danh thiếp số / thẻ hội viên CLB Doanh nhân CEO HN10.",
+        content: "Xác thực và xem danh thiếp số / thẻ Học viên CLB Doanh nhân CEO HN10.",
       },
     ],
   }),
@@ -62,7 +62,7 @@ export const Route = createFileRoute("/card/$code")({
       <div className="w-16 h-16 rounded-2xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center mb-4">
         <User className="h-8 w-8 text-rose-400" />
       </div>
-      <h2 className="text-lg font-bold text-white mb-2">Không tìm thấy hội viên</h2>
+      <h2 className="text-lg font-bold text-white mb-2">Không tìm thấy Học viên</h2>
       <p className="text-sm text-slate-400 max-w-sm">Mã thẻ không tồn tại trên hệ thống CLB Doanh Nhân CEO HN10 hoặc đã hết hạn.</p>
       <Link
         to="/association"
@@ -78,11 +78,11 @@ type Lang = "vi" | "en";
 
 const T = {
   verified: { vi: "Đã xác thực", en: "Verified" },
-  memberCard: { vi: "THẺ HỘI VIÊN CHÍNH THỨC", en: "OFFICIAL MEMBER CARD" },
+  memberCard: { vi: "THẺ Học viên CHÍNH THỨC", en: "OFFICIAL MEMBER CARD" },
   company: { vi: "Doanh nghiệp", en: "Company" },
   individual: { vi: "Lãnh đạo", en: "Executive" },
-  info: { vi: "Hồ sơ hội viên được xác thực", en: "Verified Member Profile" },
-  code: { vi: "Mã hội viên", en: "Member code" },
+  info: { vi: "Hồ sơ Học viên được xác thực", en: "Verified Member Profile" },
+  code: { vi: "Mã Học viên", en: "Member code" },
   status: { vi: "Trạng thái", en: "Status" },
   validUntil: { vi: "Hiệu lực đến", en: "Valid until" },
   joined: { vi: "Gia nhập từ", en: "Member since" },
@@ -98,10 +98,10 @@ const T = {
   shareCard: { vi: "Chia sẻ", en: "Share" },
   flipCard: { vi: "Lật thẻ", en: "Flip Card" },
   authentic: {
-    vi: "Hồ sơ hội viên hợp lệ, được cấp chứng thực điện tử bởi CLB Doanh nhân CEO HN10.",
+    vi: "Hồ sơ Học viên hợp lệ, được cấp chứng thực điện tử bởi CLB Doanh nhân CEO HN10.",
     en: "Official verified member record, issued by CEO HN10 Business Club.",
   },
-  noName: { vi: "Hội viên CLB Doanh Nhân CEO HN10", en: "CEO HN10 Member" },
+  noName: { vi: "Học viên CLB Doanh Nhân CEO HN10", en: "CEO HN10 Member" },
   noCompany: { vi: "CLB Doanh nhân CEO HN10", en: "CEO HN10 Business Club" },
   noValue: { vi: "—", en: "—" },
 } as const;
@@ -163,7 +163,7 @@ function PublicCardView() {
         <div className="w-16 h-16 rounded-2xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center mb-4">
           <User className="h-8 w-8 text-rose-400" />
         </div>
-        <h2 className="text-lg font-bold text-white mb-2">Không tìm thấy thẻ hội viên</h2>
+        <h2 className="text-lg font-bold text-white mb-2">Không tìm thấy thẻ Học viên</h2>
         <p className="text-sm text-slate-400 max-w-sm mb-1">
           Mã định danh <span className="font-mono text-amber-300 font-bold">{code}</span> chưa được kích hoạt hoặc không tồn tại.
         </p>
@@ -189,7 +189,7 @@ function PublicCardView() {
     secondaryCompany = "CLB Doanh Nhân CEO HN10";
   }
 
-  const primaryTitle = member.title?.trim() || (isCompany ? "Đại diện Doanh nghiệp" : "Lãnh đạo Doanh nghiệp Hội viên");
+  const primaryTitle = member.title?.trim() || (isCompany ? "Đại diện Doanh nghiệp" : "Lãnh đạo Doanh nghiệp Học viên");
 
   const initials =
     primaryName
@@ -340,11 +340,10 @@ function PublicCardView() {
                 type="button"
                 onClick={() => setLang(l)}
                 aria-pressed={lang === l}
-                className={`inline-flex h-7 min-w-[44px] items-center justify-center gap-1 rounded-full px-2.5 transition font-bold ${
-                  lang === l
+                className={`inline-flex h-7 min-w-[44px] items-center justify-center gap-1 rounded-full px-2.5 transition font-bold ${lang === l
                     ? "bg-sky-950 text-white shadow-xs"
                     : "text-slate-500 hover:text-slate-800"
-                }`}
+                  }`}
               >
                 {l === "vi" ? "🇻🇳 VI" : "🇬🇧 EN"}
               </button>
@@ -352,7 +351,7 @@ function PublicCardView() {
           </div>
         </header>
 
-        {/* ── THẺ DANH THIẾP SỐ CEO HN10 EXECUTIVE (CHUẨN 100% GIAO DIỆN THẺ HỘI VIÊN) ── */}
+        {/* ── THẺ DANH THIẾP SỐ CEO HN10 EXECUTIVE (CHUẨN 100% GIAO DIỆN THẺ Học viên) ── */}
         <div className="my-2">
           <Ceo1983BusinessCardVisit
             name={primaryName}
@@ -500,7 +499,7 @@ function PublicCardView() {
           </dl>
         </div>
 
-        {/* ── PROFILE DOANH NGHIỆP 2 TRANG XUẤT HIỆN NGAY DƯỚI THÔNG TIN HỘI VIÊN KHI QUÉT MÃ QR ── */}
+        {/* ── PROFILE DOANH NGHIỆP 2 TRANG XUẤT HIỆN NGAY DƯỚI THÔNG TIN Học viên KHI QUÉT MÃ QR ── */}
         <div className="mt-4">
           <CompanyProfileTwoPages
             data={{

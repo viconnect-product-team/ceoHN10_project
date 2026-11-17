@@ -272,18 +272,36 @@ function injectGlobalThemeOverride(theme: Ceo1983ColorTheme): void {
     }
 
     /* 5. Chuyển triệt để mọi class màu tím / violet về màu xám trung tính */
-    [class*="bg-purple-"],
-    [class*="bg-violet-"] {
+    .bg-\[\#7C2D82\],
+    .bg-\[\#7c2d82\],
+    .bg-\[\#6B21A8\],
+    .bg-\[\#581C87\],
+    .bg-\[\#4A1C6E\],
+    [class*="bg-[#7C2D82]" i]:not([class*="/"]),
+    [class*="bg-[#7c2d82]" i]:not([class*="/"]),
+    button[class*="bg-purple-"],
+    button[class*="bg-violet-"] {
+      background-color: ${primary} !important;
+      color: #FFFFFF !important;
+    }
+
+    [class*="bg-purple-"]:not(button):not([class*="bg-purple-700"]):not([class*="bg-purple-800"]):not([class*="bg-purple-900"]),
+    [class*="bg-violet-"]:not(button):not([class*="bg-violet-700"]):not([class*="bg-violet-800"]):not([class*="bg-violet-900"]) {
       background-color: #F1F5F9 !important;
       color: #334155 !important;
-      border-color: #CBD5E1 !important;
+      border-color: #E2E8F0 !important;
     }
+
     [class*="text-purple-"],
-    [class*="text-violet-"] {
-      color: #475569 !important;
+    [class*="text-violet-"],
+    [class*="text-[#7C2D82]" i],
+    [class*="text-[#7c2d82]" i] {
+      color: #334155 !important;
     }
     [class*="border-purple-"],
-    [class*="border-violet-"] {
+    [class*="border-violet-"],
+    [class*="border-[#7C2D82]" i],
+    [class*="border-[#7c2d82]" i] {
       border-color: #CBD5E1 !important;
     }
     [class*="border-[#0052CC]" i],

@@ -28,7 +28,7 @@ const newHeader = `# HỆ SINH THÁI NỀN TẢNG SỐ CLB DOANH NHÂN CEO HN10 
    - 1.3. Cơ Chế Bảo Mật RBAC, DataScopeInterceptor & Xác Thực JWT
 2. **PHẦN II: THIẾT KẾ CƠ SỞ DỮ LIỆU POSTGRESQL CHI TIẾT (16 BẢNG DỮ LIỆU)**
    - 2.1. Sơ Đồ Quan Hệ Thực Thể Toàn Diện (Full ERD Diagram)
-   - 2.2. Phân Hệ Người Dùng, Hội Viên & Doanh Nghiệp (\`vione_users\`, \`members\`, \`companies\`)
+   - 2.2. Phân Hệ Người Dùng, Học viên & Doanh Nghiệp (\`vione_users\`, \`members\`, \`companies\`)
    - 2.3. Phân Hệ Phân Quyền Vai Trò & Phân Ban (\`user_roles\`, \`committee_members\`)
    - 2.4. Phân Hệ Giao Thương B2B, Cơ Hội & Đàm Phán Deal (\`opportunities\`, \`opportunity_interests\`)
    - 2.5. Phân Hệ Sản Phẩm & Gian Hàng Sàn TMĐT (\`products\`)
@@ -40,7 +40,7 @@ const newHeader = `# HỆ SINH THÁI NỀN TẢNG SỐ CLB DOANH NHÂN CEO HN10 
    - 2.11. Phân Hệ Quản Trị Hệ Thống & Nhật Ký Kiểm Toán (\`audit_logs\`, \`app_settings\`, \`notifications\`)
 3. **PHẦN III: ĐẶC TẢ CHI TIẾT 50+ REST API ENDPOINTS CHUẨN DOANH NGHIỆP**
    - 3.1. Phân Hệ Xác Thực & Phiên Làm Việc (Authentication & Session APIs)
-   - 3.2. Phân Hệ Quản Trị Hội Viên & Thẩm Định Hồ Sơ (Members APIs)
+   - 3.2. Phân Hệ Quản Trị Học viên & Thẩm Định Hồ Sơ (Members APIs)
    - 3.3. Phân Hệ Sự Kiện, Sơ Đồ Bàn Tiệc & Trạm Soát Vé QR Gate (Events & Seating APIs)
    - 3.4. Phân Hệ Cuộc Họp Ban & Quản Lý Check-in Độc Lập (Meetings & Check-in APIs)
    - 3.5. Phân Hệ Cơ Hội Giao Thương B2B & Đàm Phán Deal Sinh Lời (Opportunities & Deals APIs)

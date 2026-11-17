@@ -53,7 +53,7 @@ async function main() {
 
   // 2. Clear old data completely (Clean slate)
   console.log('Clearing database tables...');
-  
+
   // Drop delete-blocking triggers on child tables if present
   await client.query('DROP TRIGGER IF EXISTS bmfu_block_delete_trg ON public.business_meeting_follow_ups;');
 
@@ -236,7 +236,7 @@ async function main() {
       appRole: 'member',
       assocRole: 'member',
       executiveRole: 'member',
-      department: 'Hội viên VIONE',
+      department: 'Học viên VIONE',
       phone: '0901000004',
       company: 'VIONE Demo Corp'
     },
@@ -249,7 +249,7 @@ async function main() {
       appRole: 'member',
       assocRole: 'member',
       executiveRole: 'member',
-      department: 'Hội viên VIONE',
+      department: 'Học viên VIONE',
       phone: '0901000005',
       company: 'Nam Phát Logistics'
     },
@@ -262,7 +262,7 @@ async function main() {
       appRole: 'member',
       assocRole: 'member',
       executiveRole: 'member',
-      department: 'Hội viên VIONE',
+      department: 'Học viên VIONE',
       phone: '0901000006',
       company: 'Thảo Điền Architecture'
     }
@@ -352,7 +352,7 @@ async function main() {
       department: 'Ban Thành viên',
       phone: '0983000006',
       company: 'EcoClean Vietnam',
-      title: 'Hội viên Ban Thành viên'
+      title: 'Học viên Ban Thành viên'
     },
     {
       id: 'c1983000-0000-4000-8000-000000000007',
@@ -366,7 +366,7 @@ async function main() {
       department: 'Ban Xúc tiến',
       phone: '0983000007',
       company: 'Thắng Lợi XNK JSC',
-      title: 'Hội viên Ban Xúc tiến'
+      title: 'Học viên Ban Xúc tiến'
     },
     {
       id: 'c1983000-0000-4000-8000-000000000008',
@@ -380,7 +380,7 @@ async function main() {
       department: 'Ban Truyền thông',
       phone: '0983000008',
       company: 'MediaPro Solution',
-      title: 'Hội viên Ban Truyền thông'
+      title: 'Học viên Ban Truyền thông'
     },
     {
       id: 'c1983000-0000-4000-8000-000000000009',
@@ -394,7 +394,7 @@ async function main() {
       department: 'Ban Thiện nguyện',
       phone: '0983000009',
       company: 'Quỹ Thiện Nguyện CEO HN10',
-      title: 'Hội viên Ban Thiện nguyện'
+      title: 'Học viên Ban Thiện nguyện'
     },
     {
       id: 'c1983000-0000-4000-8000-000000000010',
@@ -408,7 +408,7 @@ async function main() {
       department: 'Ban Thư ký',
       phone: '0983000010',
       company: 'An Phát Holding',
-      title: 'Hội viên Ban Thư ký'
+      title: 'Học viên Ban Thư ký'
     }
   ];
 
@@ -785,7 +785,7 @@ async function main() {
       '2026-09-11',
       198,
       'published',
-      'Sự kiện quy tụ hơn 150 lãnh đạo doanh nghiệp tiêu biểu của Thủ đô Hà Nội. Hội viên và khách mời có thể đăng ký trực tiếp trên ứng dụng VIONE, thanh toán VietQR tự động và nhận vé điện tử QR Code định danh bàn VIP.',
+      'Sự kiện quy tụ hơn 150 lãnh đạo doanh nghiệp tiêu biểu của Thủ đô Hà Nội. Học viên và khách mời có thể đăng ký trực tiếp trên ứng dụng VIONE, thanh toán VietQR tự động và nhận vé điện tử QR Code định danh bàn VIP.',
       $1, now(), now()
     );
   `, [assocId]);

@@ -73,18 +73,18 @@ async function run() {
       console.log('3. Registration Modal...');
       await landing.evaluate(() => window.scrollTo(0, 0));
       await landing.waitForTimeout(500);
-      const regBtn = landing.locator('button:has-text("Đăng Ký Hội Viên"), button:has-text("ĐĂNG KÝ")').first();
+      const regBtn = landing.locator('button:has-text("Đăng Ký Học viên"), button:has-text("ĐĂNG KÝ")').first();
       if (await regBtn.count() > 0) {
         await regBtn.click({ timeout: 5000 });
         await landing.waitForTimeout(1200);
 
         // Fill inputs by label or placeholder with 2s timeout
-        await landing.locator('input[placeholder*="Hưng"], input[type="text"]').first().fill('Nguyễn Thanh Tuấn', { timeout: 2000 }).catch(() => {});
-        await landing.locator('input[placeholder*="công ty"]').first().fill('Tập đoàn Công nghệ Nam Hải', { timeout: 2000 }).catch(() => {});
-        await landing.locator('input[placeholder*="Chủ tịch"]').first().fill('Chủ tịch HĐQT & Tổng Giám Đốc', { timeout: 2000 }).catch(() => {});
-        await landing.locator('input[type="tel"]').first().fill('0983198399', { timeout: 2000 }).catch(() => {});
-        await landing.locator('input[type="email"], input[placeholder*="email"]').first().fill('ceo.namhai@vione.app', { timeout: 2000 }).catch(() => {});
-        await landing.locator('input[placeholder*="Bất động sản"]').first().fill('Công nghệ thông tin & Chuyển đổi số', { timeout: 2000 }).catch(() => {});
+        await landing.locator('input[placeholder*="Hưng"], input[type="text"]').first().fill('Nguyễn Thanh Tuấn', { timeout: 2000 }).catch(() => { });
+        await landing.locator('input[placeholder*="công ty"]').first().fill('Tập đoàn Công nghệ Nam Hải', { timeout: 2000 }).catch(() => { });
+        await landing.locator('input[placeholder*="Chủ tịch"]').first().fill('Chủ tịch HĐQT & Tổng Giám Đốc', { timeout: 2000 }).catch(() => { });
+        await landing.locator('input[type="tel"]').first().fill('0983198399', { timeout: 2000 }).catch(() => { });
+        await landing.locator('input[type="email"], input[placeholder*="email"]').first().fill('ceo.namhai@vione.app', { timeout: 2000 }).catch(() => { });
+        await landing.locator('input[placeholder*="Bất động sản"]').first().fill('Công nghệ thông tin & Chuyển đổi số', { timeout: 2000 }).catch(() => { });
         await landing.waitForTimeout(600);
 
         let buf = await landing.screenshot();
@@ -155,7 +155,7 @@ async function run() {
         'sub_07_crm_members_list.png',
         '04_crm_members_management.png',
         'crm_03_members_list.png'
-      ], 'CRM: Danh sách Quản lý Hội viên tiếp nhận hồ sơ chờ duyệt');
+      ], 'CRM: Danh sách Quản lý Học viên tiếp nhận hồ sơ chờ duyệt');
     } catch (e) { console.error('  Err 7:', e.message); }
 
     // 8. CRM Member Detail Drawer & 9. Approve Button
@@ -166,15 +166,15 @@ async function run() {
         await xemBtn.click({ timeout: 3000 });
         await crm.waitForTimeout(1500);
         let buf = await crm.screenshot();
-        saveSnap(buf, ['sub_08_crm_member_detail_drawer.png', 'crm_04_member_detail_drawer.png'], 'CRM: Drawer chi tiết hồ sơ hội viên 360 độ');
+        saveSnap(buf, ['sub_08_crm_member_detail_drawer.png', 'crm_04_member_detail_drawer.png'], 'CRM: Drawer chi tiết hồ sơ Học viên 360 độ');
 
         const approveBtn = crm.locator('button:has-text("Phê duyệt"), button:has-text("Duyệt")').first();
         if (await approveBtn.count() > 0) {
-          await approveBtn.hover({ timeout: 2000 }).catch(() => {});
+          await approveBtn.hover({ timeout: 2000 }).catch(() => { });
           await crm.waitForTimeout(500);
         }
         buf = await crm.screenshot();
-        saveSnap(buf, ['sub_09_crm_approve_action.png', '05_crm_member_approved.png'], 'CRM: Thao tác Bấm nút Phê duyệt (Approve) Hội viên');
+        saveSnap(buf, ['sub_09_crm_approve_action.png', '05_crm_member_approved.png'], 'CRM: Thao tác Bấm nút Phê duyệt (Approve) Học viên');
       }
     } catch (e) { console.error('  Err 8-9:', e.message); }
 
@@ -234,7 +234,7 @@ async function run() {
           await crm.waitForTimeout(1000);
           const priceInput = crm.locator('input[type="number"], input[placeholder*="giá"]').first();
           if (await priceInput.count() > 0) {
-            await priceInput.fill('500000', { timeout: 2000 }).catch(() => {});
+            await priceInput.fill('500000', { timeout: 2000 }).catch(() => { });
             await crm.waitForTimeout(500);
           }
           buf = await crm.screenshot();
@@ -292,10 +292,10 @@ async function run() {
     // 18. CRM Marketplace Sync
     try {
       console.log('18. CRM Marketplace Sync...');
-      await crm.goto(`${CRM_BASE}/marketplace`, { waitUntil: 'networkidle', timeout: 20000 }).catch(() => {});
+      await crm.goto(`${CRM_BASE}/marketplace`, { waitUntil: 'networkidle', timeout: 20000 }).catch(() => { });
       await crm.waitForTimeout(1500);
       if (!crm.url().includes('marketplace')) {
-        await crm.goto(`${CRM_BASE}/products`, { waitUntil: 'networkidle', timeout: 20000 }).catch(() => {});
+        await crm.goto(`${CRM_BASE}/products`, { waitUntil: 'networkidle', timeout: 20000 }).catch(() => { });
         await crm.waitForTimeout(1500);
       }
       let buf = await crm.screenshot();
@@ -309,7 +309,7 @@ async function run() {
     // 19. CRM Opportunities Sync
     try {
       console.log('19. CRM Opportunities Sync...');
-      await crm.goto(`${CRM_BASE}/opportunities`, { waitUntil: 'networkidle', timeout: 20000 }).catch(() => {});
+      await crm.goto(`${CRM_BASE}/opportunities`, { waitUntil: 'networkidle', timeout: 20000 }).catch(() => { });
       await crm.waitForTimeout(1500);
       let buf = await crm.screenshot();
       saveSnap(buf, [
@@ -321,7 +321,7 @@ async function run() {
     // 20. CRM Fees Management & Companies
     try {
       console.log('20. CRM Fees & Companies...');
-      await crm.goto(`${CRM_BASE}/fees`, { waitUntil: 'networkidle', timeout: 20000 }).catch(() => {});
+      await crm.goto(`${CRM_BASE}/fees`, { waitUntil: 'networkidle', timeout: 20000 }).catch(() => { });
       await crm.waitForTimeout(1500);
       let buf = await crm.screenshot();
       saveSnap(buf, [
@@ -329,7 +329,7 @@ async function run() {
         'crm_08_fees_management.png'
       ], 'CRM: Bảng Quản lý Hội phí Doanh nghiệp thường niên');
 
-      await crm.goto(`${CRM_BASE}/companies`, { waitUntil: 'networkidle', timeout: 20000 }).catch(() => {});
+      await crm.goto(`${CRM_BASE}/companies`, { waitUntil: 'networkidle', timeout: 20000 }).catch(() => { });
       await crm.waitForTimeout(1500);
       buf = await crm.screenshot();
       saveSnap(buf, [
@@ -341,7 +341,7 @@ async function run() {
     // 21. CRM News, Settings & Audit Logs
     try {
       console.log('21. CRM Settings & Audit Logs...');
-      await crm.goto(`${CRM_BASE}/settings`, { waitUntil: 'networkidle', timeout: 20000 }).catch(() => {});
+      await crm.goto(`${CRM_BASE}/settings`, { waitUntil: 'networkidle', timeout: 20000 }).catch(() => { });
       await crm.waitForTimeout(1500);
       let buf = await crm.screenshot();
       saveSnap(buf, ['crm_settings_finance.png'], 'CRM: Cài đặt tài khoản ngân hàng & VietQR thụ hưởng');
@@ -418,7 +418,7 @@ async function run() {
       saveSnap(buf, [
         'sub_13_app_vip_card_front.png',
         '09_app_vip_card.png'
-      ], 'Thẻ Hội Viên VIP Kỹ Thuật Số CLB Doanh Nhân CEO HN10 (HN10-007 - Long Tech)');
+      ], 'Thẻ Học viên VIP Kỹ Thuật Số CLB Doanh Nhân CEO HN10 (HN10-007 - Long Tech)');
     } catch (e) { console.error('  Err 25:', e.message); }
 
     // 26. Radar NFC Modal
@@ -616,7 +616,7 @@ async function run() {
       saveSnap(buf, [
         'sub_41_app_opportunity_detail_modal.png',
         '22_app_opp_claimed.png'
-      ], 'Modal Danh sách Hội viên Quan tâm cơ hội kèm nút Gọi/Email/Chat');
+      ], 'Modal Danh sách Học viên Quan tâm cơ hội kèm nút Gọi/Email/Chat');
     } catch (e) { console.error('  Err 35:', e.message); }
 
     // 36. App Members Directory
@@ -640,7 +640,7 @@ async function run() {
           'sub_17_app_member_profile_modal.png',
           '10_app_profile_view.png',
           'app_13_member_profile_modal.png'
-        ], 'Popup Hồ sơ năng lực hội viên 360 độ');
+        ], 'Popup Hồ sơ năng lực Học viên 360 độ');
 
         saveSnap(buf, [
           'sub_18_app_connection_toggle.png'
@@ -652,7 +652,7 @@ async function run() {
         await inviteBtn.click({ timeout: 3000 });
         await app.waitForTimeout(1000);
         buf = await app.screenshot();
-        saveSnap(buf, ['sub_19_app_invite_member_modal.png'], 'Modal Mời Hội Viên Mới vào CLB CEO HN10');
+        saveSnap(buf, ['sub_19_app_invite_member_modal.png'], 'Modal Mời Học viên Mới vào CLB CEO HN10');
       }
     } catch (e) { console.error('  Err 36:', e.message); }
 
@@ -680,7 +680,7 @@ async function run() {
     // 38. App 1-on-1 Chat Conversation
     try {
       console.log('38. App 1-on-1 Chat Thread...');
-      await app.goto(`${APP_BASE}/association/messages?peerCode=HN10-002`, { waitUntil: 'networkidle', timeout: 20000 }).catch(() => {});
+      await app.goto(`${APP_BASE}/association/messages?peerCode=HN10-002`, { waitUntil: 'networkidle', timeout: 20000 }).catch(() => { });
       await app.waitForTimeout(2000);
       let buf = await app.screenshot();
       saveSnap(buf, [
@@ -718,12 +718,12 @@ async function run() {
     // 40. App Notifications Screen & News
     try {
       console.log('40. App Notifications & News...');
-      await app.goto(`${APP_BASE}/association/notifications`, { waitUntil: 'networkidle', timeout: 20000 }).catch(() => {});
+      await app.goto(`${APP_BASE}/association/notifications`, { waitUntil: 'networkidle', timeout: 20000 }).catch(() => { });
       await app.waitForTimeout(1500);
       let buf = await app.screenshot();
-      saveSnap(buf, ['sub_48_app_notifications_screen.png', '26_app_notifications_personal.png'], 'Trung tâm Thông báo Hội viên với thẻ chúc mừng mạ vàng');
+      saveSnap(buf, ['sub_48_app_notifications_screen.png', '26_app_notifications_personal.png'], 'Trung tâm Thông báo Học viên với thẻ chúc mừng mạ vàng');
 
-      await app.goto(`${APP_BASE}/association/news`, { waitUntil: 'networkidle', timeout: 20000 }).catch(() => {});
+      await app.goto(`${APP_BASE}/association/news`, { waitUntil: 'networkidle', timeout: 20000 }).catch(() => { });
       await app.waitForTimeout(1500);
       buf = await app.screenshot();
       saveSnap(buf, ['sub_49_app_news_screen.png'], 'Bản tin Hoạt động & Thông cáo Báo chí Hiệp Hội');

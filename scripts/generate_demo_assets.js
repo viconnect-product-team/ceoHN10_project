@@ -69,7 +69,7 @@ const authContent = `
     <!-- App Logo in Phone -->
     <circle cx="140" cy="80" r="24" fill="#003B95" />
     <text x="140" y="86" fill="#fbbf24" font-size="16" font-weight="900" text-anchor="middle">1983</text>
-    <text x="140" y="122" fill="#0f172a" font-size="13" font-weight="800" text-anchor="middle">ĐĂNG NHẬP HỘI VIÊN</text>
+    <text x="140" y="122" fill="#0f172a" font-size="13" font-weight="800" text-anchor="middle">ĐĂNG NHẬP Học viên</text>
     <text x="140" y="138" fill="#64748b" font-size="9" text-anchor="middle">CLB Doanh Nhân CEO HN10</text>
     
     <!-- Inputs -->
@@ -86,7 +86,7 @@ const authContent = `
     <rect x="35" y="295" width="210" height="48" rx="12" fill="#f0fdf4" stroke="#86efac" />
     <circle cx="55" cy="319" r="10" fill="#22c55e" />
     <text x="55" y="323" fill="#ffffff" font-size="10" font-weight="900" text-anchor="middle">✓</text>
-    <text x="75" y="315" fill="#15803d" font-size="10" font-weight="800">Thẻ Hội Viên: HN10-007</text>
+    <text x="75" y="315" fill="#15803d" font-size="10" font-weight="800">Thẻ Học viên: HN10-007</text>
     <text x="75" y="329" fill="#166534" font-size="9">Trạng thái: Chính thức hoạt động</text>
   </g>
 
@@ -96,7 +96,7 @@ const authContent = `
     <rect x="0" y="0" width="360" height="85" rx="16" fill="#142247" stroke="#253b75" />
     <circle cx="35" cy="42" r="16" fill="#0084FF" />
     <text x="35" y="47" fill="#ffffff" font-size="13" font-weight="800" text-anchor="middle">1</text>
-    <text x="65" y="34" fill="#ffffff" font-size="13" font-weight="700">Nhập Số Điện Thoại / Mã Hội Viên</text>
+    <text x="65" y="34" fill="#ffffff" font-size="13" font-weight="700">Nhập Số Điện Thoại / Mã Học viên</text>
     <text x="65" y="54" fill="#94a3b8" font-size="11.5">Sử dụng SĐT đã đăng ký với Ban Thư Ký CLB.</text>
     <text x="65" y="70" fill="#38bdf8" font-size="11">Hỗ trợ nhận mã OTP xác thực qua SMS/Zalo.</text>
 
@@ -104,8 +104,8 @@ const authContent = `
     <rect x="0" y="100" width="360" height="85" rx="16" fill="#142247" stroke="#253b75" />
     <circle cx="35" cy="142" r="16" fill="#0084FF" />
     <text x="35" y="147" fill="#ffffff" font-size="13" font-weight="800" text-anchor="middle">2</text>
-    <text x="65" y="134" fill="#ffffff" font-size="13" font-weight="700">Kích Hoạt Quyền Lợi Hội Viên</text>
-    <text x="65" y="154" fill="#94a3b8" font-size="11.5">Hệ thống đối soát tự động danh sách BCH &amp; Hội viên.</text>
+    <text x="65" y="134" fill="#ffffff" font-size="13" font-weight="700">Kích Hoạt Quyền Lợi Học viên</text>
+    <text x="65" y="154" fill="#94a3b8" font-size="11.5">Hệ thống đối soát tự động danh sách BCH &amp; Học viên.</text>
     <text x="65" y="170" fill="#38bdf8" font-size="11">Tự động cấp huy hiệu Xác thực Doanh Nhân CEO.</text>
 
     <!-- Step 3 -->
@@ -177,7 +177,7 @@ const nfcContent = `
 
     <rect x="0" y="115" width="340" height="95" rx="16" fill="#142247" stroke="#253b75" />
     <text x="25" y="147" fill="#fbbf24" font-size="13" font-weight="800">QUÉT MÃ QR CÁ NHÂN</text>
-    <text x="25" y="169" fill="#ffffff" font-size="12" font-weight="600">Mỗi hội viên sở hữu 01 mã QR độc quyền.</text>
+    <text x="25" y="169" fill="#ffffff" font-size="12" font-weight="600">Mỗi Học viên sở hữu 01 mã QR độc quyền.</text>
     <text x="25" y="187" fill="#94a3b8" font-size="11">Dễ dàng chia sẻ qua Zalo, Messenger, LinkedIn</text>
     <text x="25" y="203" fill="#94a3b8" font-size="11">hoặc in trực tiếp lên namecard truyền thống.</text>
 
@@ -294,7 +294,7 @@ const directoryContent = `
   <!-- Right Steps -->
   <g transform="translate(420, 115)">
     <rect x="0" y="0" width="340" height="95" rx="16" fill="#142247" stroke="#253b75" />
-    <text x="25" y="32" fill="#fbbf24" font-size="13" font-weight="800">DANH BẠ HỘI VIÊN CHÍNH THỨC</text>
+    <text x="25" y="32" fill="#fbbf24" font-size="13" font-weight="800">DANH BẠ Học viên CHÍNH THỨC</text>
     <text x="25" y="54" fill="#ffffff" font-size="12" font-weight="600">Tra cứu danh bạ hơn 500+ CEO ưu tú.</text>
     <text x="25" y="72" fill="#94a3b8" font-size="11">Bộ lọc thông minh theo Tỉnh thành, Ngành nghề,</text>
     <text x="25" y="88" fill="#94a3b8" font-size="11">Quy mô doanh nghiệp và Ban chuyên môn CLB.</text>
@@ -308,7 +308,7 @@ const directoryContent = `
     <rect x="0" y="230" width="340" height="95" rx="16" fill="#142247" stroke="#253b75" />
     <text x="25" y="262" fill="#fbbf24" font-size="13" font-weight="800">SÀN GIAO THƯƠNG B2B NỘI BỘ</text>
     <text x="25" y="284" fill="#ffffff" font-size="12" font-weight="600">Đăng tin mua - bán sản phẩm, gọi vốn đầu tư.</text>
-    <text x="25" y="302" fill="#94a3b8" font-size="11">Ưu đãi giảm giá độc quyền dành riêng cho hội viên</text>
+    <text x="25" y="302" fill="#94a3b8" font-size="11">Ưu đãi giảm giá độc quyền dành riêng cho Học viên</text>
     <text x="25" y="318" fill="#94a3b8" font-size="11">với cơ chế bảo chứng chất lượng từ CLB Doanh Nhân.</text>
   </g>
 `;
@@ -358,14 +358,14 @@ const qrContent = `
     <rect x="0" y="115" width="340" height="95" rx="16" fill="#142247" stroke="#253b75" />
     <text x="25" y="147" fill="#fbbf24" font-size="13" font-weight="800">BIỂU QUYẾT &amp; BẦU CỬ ONLINE</text>
     <text x="25" y="169" fill="#ffffff" font-size="12" font-weight="600">Biểu quyết các nghị quyết đại hội trực tiếp.</text>
-    <text x="25" y="187" fill="#94a3b8" font-size="11">Mỗi hội viên chính thức có 01 quyền bỏ phiếu.</text>
+    <text x="25" y="187" fill="#94a3b8" font-size="11">Mỗi Học viên chính thức có 01 quyền bỏ phiếu.</text>
     <text x="25" y="203" fill="#94a3b8" font-size="11">Kết quả kiểm phiếu hiển thị thời gian thực (Real-time).</text>
 
     <rect x="0" y="230" width="340" height="95" rx="16" fill="#142247" stroke="#253b75" />
     <text x="25" y="262" fill="#fbbf24" font-size="13" font-weight="800">TẢI TÀI LIỆU HỘI THẢO 1-CHẠM</text>
     <text x="25" y="284" fill="#ffffff" font-size="12" font-weight="600">Toàn bộ slide diễn giả, kỷ yếu hội thảo.</text>
     <text x="25" y="302" fill="#94a3b8" font-size="11">Được lưu trữ vĩnh viễn trên kho thư viện số</text>
-    <text x="25" y="318" fill="#94a3b8" font-size="11">của ứng dụng để hội viên tra cứu mọi lúc mọi nơi.</text>
+    <text x="25" y="318" fill="#94a3b8" font-size="11">của ứng dụng để Học viên tra cứu mọi lúc mọi nơi.</text>
   </g>
 `;
 
@@ -406,12 +406,12 @@ const feeContent = `
     <text x="25" y="32" fill="#fbbf24" font-size="13" font-weight="800">THANH TOÁN 1-CHẠM QUA VIETQR</text>
     <text x="25" y="54" fill="#ffffff" font-size="12" font-weight="600">Quét mã bằng bất kỳ App ngân hàng nào.</text>
     <text x="25" y="72" fill="#94a3b8" font-size="11">Tự động điền chính xác Số tài khoản MB Bank,</text>
-    <text x="25" y="88" fill="#94a3b8" font-size="11">Số tiền và Cú pháp định danh hội viên duy nhất.</text>
+    <text x="25" y="88" fill="#94a3b8" font-size="11">Số tiền và Cú pháp định danh Học viên duy nhất.</text>
 
     <rect x="0" y="115" width="340" height="95" rx="16" fill="#142247" stroke="#253b75" />
     <text x="25" y="147" fill="#fbbf24" font-size="13" font-weight="800">TỰ ĐỘNG GẠCH NỢ &amp; GIA HẠN THẺ</text>
     <text x="25" y="169" fill="#ffffff" font-size="12" font-weight="600">Tiền về tài khoản CLB được ghi nhận sau 3 giây.</text>
-    <text x="25" y="187" fill="#94a3b8" font-size="11">Thẻ hội viên số tự động cập nhật hạn dùng đến 2027.</text>
+    <text x="25" y="187" fill="#94a3b8" font-size="11">Thẻ Học viên số tự động cập nhật hạn dùng đến 2027.</text>
     <text x="25" y="203" fill="#94a3b8" font-size="11">Gửi thông báo xác nhận kèm hóa đơn vào Zalo/Tin nhắn.</text>
 
     <rect x="0" y="230" width="340" height="95" rx="16" fill="#142247" stroke="#253b75" />
@@ -425,7 +425,7 @@ const feeContent = `
 fs.writeFileSync(path.join(outDir, 'demo_auth_card.svg'), svgWrapper('HƯỚNG DẪN 1: ĐĂNG NHẬP &amp; KÍCH HOẠT THẺ', 'Xác thực tài khoản doanh nhân an toàn &amp; phân quyền thẻ thông minh', authContent));
 fs.writeFileSync(path.join(outDir, 'demo_nfc_card.svg'), svgWrapper('HƯỚNG DẪN 2: DANH THIẾP ĐIỆN TỬ &amp; CHẠM NFC', 'Trao đổi danh bạ 1-chạm không chạm không cần cài đặt phần mềm', nfcContent));
 fs.writeFileSync(path.join(outDir, 'demo_messenger_chat.svg'), svgWrapper('HƯỚNG DẪN 3: NHẮN TIN GIAO THƯƠNG CHUẨN MESSENGER', 'Giao diện Messenger 100%, thu hồi tin nhắn tức thời, thả biểu tượng cảm xúc', chatContent));
-fs.writeFileSync(path.join(outDir, 'demo_directory_b2b.svg'), svgWrapper('HƯỚNG DẪN 4: DANH BẠ HỘI VIÊN &amp; CƠ HỘI B2B', 'Kết nối trực tiếp Chủ tịch, CEO và Sàn giao thương nội bộ', directoryContent));
+fs.writeFileSync(path.join(outDir, 'demo_directory_b2b.svg'), svgWrapper('HƯỚNG DẪN 4: DANH BẠ Học viên &amp; CƠ HỘI B2B', 'Kết nối trực tiếp Chủ tịch, CEO và Sàn giao thương nội bộ', directoryContent));
 fs.writeFileSync(path.join(outDir, 'demo_qr_checkin.svg'), svgWrapper('HƯỚNG DẪN 5: CHECK-IN SỰ KIỆN QR &amp; BIỂU QUYẾT', 'Điểm danh đại hội trong 1 giây, biểu quyết và tải tài liệu tự động', qrContent));
 fs.writeFileSync(path.join(outDir, 'demo_vietqr_fee.svg'), svgWrapper('HƯỚNG DẪN 6: ĐÓNG HỘI PHÍ NIÊN KIM VIETQR', 'Thanh toán tự động 24/7 qua VietQR MB Bank, gạch nợ tức thì', feeContent));
 

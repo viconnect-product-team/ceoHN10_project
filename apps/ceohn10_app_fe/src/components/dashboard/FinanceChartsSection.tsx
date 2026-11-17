@@ -43,7 +43,7 @@ interface FinanceChartsSectionProps {
 // Bảng màu chuẩn CEO HN10 (Deep Cobalt Navy, Warm Amber Gold, Emerald, Rose, Sky)
 const INCOME_COLORS: Record<string, string> = {
   "Tài trợ sự kiện & Doanh nghiệp": "#F59E0B", // Warm Amber Gold
-  "Hội phí hội viên": "#003B95", // Deep Cobalt Navy
+  "Hội phí Học viên": "#003B95", // Deep Cobalt Navy
   "Vé sự kiện & Triển lãm": "#10B981", // Emerald
   "Nguồn thu khác & Đột xuất": "#0284C7", // Sky Blue
 };
@@ -98,7 +98,7 @@ export function FinanceChartsSection({
       const d = new Date(tx.date);
       if (isNaN(d.getTime())) return;
       const mStr = `T${String(d.getMonth() + 1).padStart(2, "0")}/${String(d.getFullYear()).slice(2)}`;
-      
+
       const entry = map.get(mStr) || { month: mStr, income: 0, expense: 0 };
       if (tx.type === "income") {
         entry.income += tx.amount || 0;
@@ -110,7 +110,7 @@ export function FinanceChartsSection({
 
     // Nếu các tháng mặc định không có tiền nhưng có giao dịch mẫu, nạp dữ liệu phân bổ hợp lý
     const result = Array.from(map.values()).sort((a, b) => a.month.localeCompare(b.month));
-    
+
     // Đảm bảo có dữ liệu trực quan sinh động
     let curBalance = 0;
     return result.map((item) => {
@@ -165,7 +165,7 @@ export function FinanceChartsSection({
 
     const items = [
       { name: "Tài trợ sự kiện & Doanh nghiệp", value: sponsorAmt, color: INCOME_COLORS["Tài trợ sự kiện & Doanh nghiệp"] },
-      { name: "Hội phí hội viên", value: feeAmt, color: INCOME_COLORS["Hội phí hội viên"] },
+      { name: "Hội phí Học viên", value: feeAmt, color: INCOME_COLORS["Hội phí Học viên"] },
       { name: "Vé sự kiện & Triển lãm", value: ticketAmt, color: INCOME_COLORS["Vé sự kiện & Triển lãm"] },
       { name: "Nguồn thu khác & Đột xuất", value: otherAmt, color: INCOME_COLORS["Nguồn thu khác & Đột xuất"] },
     ].filter((it) => it.value > 0);
@@ -227,7 +227,7 @@ export function FinanceChartsSection({
   const sponsorshipTiersData = useMemo(() => {
     // Ước tính hoặc tính từ các giao dịch tài trợ
     const sponsorTotal = incomeCategoryData.find((it) => it.name.includes("Tài trợ"))?.value || Math.round(totalIncome * 0.45);
-    
+
     return [
       { tier: "Kim Cương (Platinum)", amount: Math.round(sponsorTotal * 0.5), count: 2, color: SPONSOR_TIER_COLORS["Kim Cương (Platinum)"] },
       { tier: "Vàng (Gold)", amount: Math.round(sponsorTotal * 0.3), count: 3, color: SPONSOR_TIER_COLORS["Vàng (Gold)"] },
@@ -275,11 +275,10 @@ export function FinanceChartsSection({
                   key={tab.id}
                   type="button"
                   onClick={() => setActiveTab(tab.id as any)}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${
-                    active
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${active
                       ? "bg-[#003B95] text-white shadow-xs dark:bg-amber-500 dark:text-slate-950"
                       : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
-                  }`}
+                    }`}
                 >
                   <Icon className="size-3.5" />
                   <span className="hidden sm:inline">{tab.label}</span>

@@ -491,7 +491,7 @@ async function buildDocxFile(outputPath) {
 
     createHeading1('5. MA TRẬN PHÂN ĐỊNH TRÁCH NHIỆM RACI'),
     createTable(
-      ['Hạng Mục Quy Trình', 'Ban Giám Đốc', 'Trưởng Phòng', 'Chuyên Viên', 'Hội Viên / Đối Tác'],
+      ['Hạng Mục Quy Trình', 'Ban Giám Đốc', 'Trưởng Phòng', 'Chuyên Viên', 'Học viên / Đối Tác'],
       [
         ['Phê duyệt ngân sách & Báo cáo P&L', 'Accountable (A)', 'Consulted (C)', 'Informed (I)', 'No Access'],
         ['Quản lý phễu Lead & Chốt hợp đồng', 'Informed (I)', 'Accountable (A)', 'Responsible (R)', 'No Access'],

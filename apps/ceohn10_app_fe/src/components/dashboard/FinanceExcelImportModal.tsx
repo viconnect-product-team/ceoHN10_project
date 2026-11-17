@@ -94,7 +94,7 @@ function parseDate(val: any): string {
 function mapIncomeCategory(raw: string): { key: string; label: string } {
   const norm = (raw || "").toLowerCase().trim();
   if (norm.includes("hội phí") || norm.includes("membership") || norm.includes("phí")) {
-    return { key: "membership_fee", label: "Phí hội viên" };
+    return { key: "membership_fee", label: "Phí Học viên" };
   }
   if (norm.includes("vé") || norm.includes("ticket")) {
     return { key: "event_ticket", label: "Vé sự kiện" };
@@ -184,7 +184,7 @@ export function FinanceExcelImportModal({
         ["HIỆP HỘI DOANH NHÂN CEO HN10 (HANOIBA)", "", "", "", "CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM"],
         ["BAN CHẤP HÀNH - VĂN PHÒNG HIỆP HỘI", "", "", "", "Độc lập - Tự do - Hạnh phúc"],
         [],
-        ["", "", "BẢNG MẪU NHẬP DỮ LIỆU THU QUỸ HỘI VIÊN & ĐỐI TÁC"],
+        ["", "", "BẢNG MẪU NHẬP DỮ LIỆU THU QUỸ Học viên & ĐỐI TÁC"],
         ["(Mẫu chuẩn hóa hệ thống quản trị tài chính Hiệp Hội Doanh Nhân CEO HN10)"],
         [],
         [
@@ -202,8 +202,8 @@ export function FinanceExcelImportModal({
           1,
           "PT-2026-001",
           "10/03/2026",
-          "Phí hội viên",
-          "Thu hội phí hội viên VIP thường niên 2026",
+          "Phí Học viên",
+          "Thu hội phí Học viên VIP thường niên 2026",
           "Công ty CP Tập đoàn Hòa Bình",
           50000000,
           "Chuyển khoản",
@@ -361,7 +361,7 @@ export function FinanceExcelImportModal({
             amount: 25000000,
             method: "bank",
             status: "completed",
-            recipient: "Đối tác / Hội viên CEO HN10",
+            recipient: "Đối tác / Học viên CEO HN10",
             isValid: true,
           }
         ];
@@ -644,18 +644,16 @@ export function FinanceExcelImportModal({
               <button
                 type="button"
                 onClick={() => { setSelectedMode("income"); setRows([]); setSelectedIndices(new Set()); }}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                  isIncome ? "bg-emerald-600 text-white shadow-xs" : "text-muted-foreground hover:text-foreground"
-                }`}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${isIncome ? "bg-emerald-600 text-white shadow-xs" : "text-muted-foreground hover:text-foreground"
+                  }`}
               >
                 Thu Quỹ & Hội Phí
               </button>
               <button
                 type="button"
                 onClick={() => { setSelectedMode("expense"); setRows([]); setSelectedIndices(new Set()); }}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                  !isIncome ? "bg-rose-600 text-white shadow-xs" : "text-muted-foreground hover:text-foreground"
-                }`}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${!isIncome ? "bg-rose-600 text-white shadow-xs" : "text-muted-foreground hover:text-foreground"
+                  }`}
               >
                 Khoản Chi & Tạm Ứng
               </button>
@@ -734,17 +732,15 @@ export function FinanceExcelImportModal({
                 <div className="flex items-center gap-1">
                   <button
                     onClick={() => setFilterTab("all")}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-                      filterTab === "all" ? "bg-foreground text-background font-semibold" : "text-muted-foreground hover:bg-muted"
-                    }`}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${filterTab === "all" ? "bg-foreground text-background font-semibold" : "text-muted-foreground hover:bg-muted"
+                      }`}
                   >
                     Tất cả ({rows.length})
                   </button>
                   <button
                     onClick={() => setFilterTab("valid")}
-                    className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-                      filterTab === "valid" ? "bg-emerald-600 text-white font-semibold" : "text-muted-foreground hover:bg-muted"
-                    }`}
+                    className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${filterTab === "valid" ? "bg-emerald-600 text-white font-semibold" : "text-muted-foreground hover:bg-muted"
+                      }`}
                   >
                     <CheckCircle2 className="h-3.5 w-3.5 text-emerald-300" />
                     Hợp lệ ({validTotal})
@@ -752,9 +748,8 @@ export function FinanceExcelImportModal({
                   {invalidTotal > 0 && (
                     <button
                       onClick={() => setFilterTab("invalid")}
-                      className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-                        filterTab === "invalid" ? "bg-rose-600 text-white font-semibold" : "text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30"
-                      }`}
+                      className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${filterTab === "invalid" ? "bg-rose-600 text-white font-semibold" : "text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30"
+                        }`}
                     >
                       <AlertCircle className="h-3.5 w-3.5" />
                       Lỗi cần sửa ({invalidTotal})
@@ -805,9 +800,8 @@ export function FinanceExcelImportModal({
                         return (
                           <tr
                             key={r.originalIdx}
-                            className={`hover:bg-muted/40 transition-colors ${
-                              !r.isValid ? "bg-rose-500/5 text-rose-600 dark:text-rose-400" : isSelected ? "bg-[#003B95]/5" : ""
-                            }`}
+                            className={`hover:bg-muted/40 transition-colors ${!r.isValid ? "bg-rose-500/5 text-rose-600 dark:text-rose-400" : isSelected ? "bg-[#003B95]/5" : ""
+                              }`}
                           >
                             <td className="p-2.5 text-center">
                               <input
@@ -837,16 +831,14 @@ export function FinanceExcelImportModal({
                               {r.amount.toLocaleString("vi-VN")} đ
                             </td>
                             <td className="p-2.5 whitespace-nowrap">
-                              <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${
-                                r.method === "cash" ? "bg-amber-500/10 text-amber-600" : "bg-blue-500/10 text-blue-600"
-                              }`}>
+                              <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${r.method === "cash" ? "bg-amber-500/10 text-amber-600" : "bg-blue-500/10 text-blue-600"
+                                }`}>
                                 {r.method === "cash" ? "Tiền mặt" : "Chuyển khoản"}
                               </span>
                             </td>
                             <td className="p-2.5 whitespace-nowrap">
-                              <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${
-                                r.status === "completed" ? "bg-emerald-500/10 text-emerald-600" : "bg-yellow-500/10 text-yellow-600"
-                              }`}>
+                              <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${r.status === "completed" ? "bg-emerald-500/10 text-emerald-600" : "bg-yellow-500/10 text-yellow-600"
+                                }`}>
                                 {r.status === "completed" ? "Đã duyệt" : "Chờ duyệt"}
                               </span>
                             </td>

@@ -50,7 +50,7 @@ export class ConnectOpportunityService {
   constructor(
     private prisma: PrismaService,
     private gateway: ConnectAppGateway,
-  ) {}
+  ) { }
 
   private async checkCommunityMembership(
     userId: string,
@@ -208,9 +208,9 @@ export class ConnectOpportunityService {
       budgetMax: o.budget_max != null ? Number(o.budget_max) : null,
       poster: p
         ? {
-            memberRef: p.id,
-            displayName: p.name,
-          }
+          memberRef: p.id,
+          displayName: p.name,
+        }
         : null,
       communityId,
       communityName: assoc[0]?.name || 'CLB Doanh Nhân CEO HN10',
@@ -220,12 +220,12 @@ export class ConnectOpportunityService {
       followUpAttachments: [],
       claimedBy: o.claimed_by_name
         ? {
-            id: o.claimed_by_id,
-            name: o.claimed_by_name,
-            at: o.claimed_at,
-            phone: o.claimed_phone,
-            company: o.claimed_company,
-          }
+          id: o.claimed_by_id,
+          name: o.claimed_by_name,
+          at: o.claimed_at,
+          phone: o.claimed_phone,
+          company: o.claimed_company,
+        }
         : null,
       image: o.image || null,
       thumbnail: o.image || null,
@@ -243,7 +243,7 @@ export class ConnectOpportunityService {
       WHERE user_id = ${userId}::uuid OR id = ${userId}
       LIMIT 1
     `.catch(() => [] as any[]);
-    const posterName = member[0]?.name || 'Hội viên CEO HN10';
+    const posterName = member[0]?.name || 'Học viên CEO HN10';
 
     await this.prisma.$executeRaw`
       INSERT INTO public.opportunities (
@@ -314,7 +314,7 @@ export class ConnectOpportunityService {
     `.catch(() => [] as any[]);
 
     const claimantName =
-      member[0]?.name || userProfile[0]?.display_name || 'Hội viên CEO HN10';
+      member[0]?.name || userProfile[0]?.display_name || 'Học viên CEO HN10';
     const claimantPhone = member[0]?.phone || '';
     const claimantCompany =
       member[0]?.company || userProfile[0]?.company_name || '';
@@ -478,7 +478,7 @@ export class ConnectOpportunityService {
       SELECT id, name, phone, company, contact FROM public.members WHERE user_id = ${userId}::uuid LIMIT 1
     `.catch(() => [] as any[]);
     const contact = member[0]?.phone || member[0]?.contact || '';
-    const claimantName = member[0]?.name || 'Hội viên CEO HN10';
+    const claimantName = member[0]?.name || 'Học viên CEO HN10';
     const claimantCompany = member[0]?.company || '';
 
     // Fetch opp title, poster, budget & association
@@ -676,7 +676,7 @@ export class ConnectOpportunityService {
         status,
         opportunityId,
       )
-      .catch(() => {});
+      .catch(() => { });
 
     const rows = await this.prisma
       .$queryRawUnsafe<any[]>(
@@ -781,7 +781,7 @@ export class ConnectOpportunityService {
                COALESCE(m.executive_role, o.contact_title, 'Đại diện hợp tác') as contact_title,
                COALESCE(m.name, bi.company_name, o.company, 'CLB Doanh Nhân CEO HN10') as company,
                o.image, o.images,
-               COALESCE(up.display_name, m.contact, m.name, u.name, o.contact_name, 'Hội viên CLB') as poster_name,
+               COALESCE(up.display_name, m.contact, m.name, u.name, o.contact_name, 'Học viên CLB') as poster_name,
                COALESCE(up.avatar_url, m.cover_url, u.avatar_url, '') as poster_avatar,
                COALESCE(m.phone, o.contact_phone, '') as poster_phone,
                COALESCE(m.name, bi.company_name, o.company, 'CLB Doanh Nhân CEO HN10') as poster_company,
@@ -796,7 +796,7 @@ export class ConnectOpportunityService {
 
       const interests = await this.prisma.$queryRaw<any[]>`
         SELECT oi.id, oi.opportunity_id, oi.member_id, oi.message, oi.contact, oi.interest_level, oi.deal_value, oi.deal_percent, oi.created_at,
-               COALESCE(m.contact, m.name, u.name, oi.contact, 'Hội viên') as member_name,
+               COALESCE(m.contact, m.name, u.name, oi.contact, 'Học viên') as member_name,
                COALESCE(m.cover_url, u.avatar_url, '') as member_avatar,
                COALESCE(m.phone, oi.contact, '') as member_phone,
                COALESCE(m.email, u.email, '') as member_email,
@@ -879,8 +879,8 @@ export class ConnectOpportunityService {
           ? o.target_groups.map((g: any) => String(g).toLowerCase().trim())
           : typeof o.target_groups === 'string'
             ? JSON.parse(o.target_groups || '[]').map((g: any) =>
-                String(g).toLowerCase().trim(),
-              )
+              String(g).toLowerCase().trim(),
+            )
             : [];
 
         if (scope === 'department' || scope === 'group' || targetGroups.length > 0) {
@@ -897,7 +897,7 @@ export class ConnectOpportunityService {
         // 4. Nếu là Admin hệ thống thì có thể xem các cơ hội công khai/chung (nhưng KHÔNG xem private như đã chặn ở trên)
         if (isPlatformAdmin) return true;
 
-        // 5. Cơ hội công khai toàn hội viên (all / public)
+        // 5. Cơ hội công khai toàn Học viên (all / public)
         if (scope === 'all' || scope === 'public') {
           return true;
         }
@@ -992,7 +992,7 @@ export class ConnectOpportunityService {
                COALESCE(o.contact_phone, m.phone, '') as contact_phone,
                COALESCE(o.contact_title, m.executive_role, 'Đại diện hợp tác') as contact_title,
                COALESCE(o.company, m.name, bi.company_name, 'CLB Doanh Nhân CEO HN10') as company,
-               COALESCE(m.contact, u.name, m.name, o.contact_name, 'Hội viên CLB') as poster_name,
+               COALESCE(m.contact, u.name, m.name, o.contact_name, 'Học viên CLB') as poster_name,
                COALESCE(m.cover_url, u.avatar_url, '') as poster_avatar,
                COALESCE(m.phone, o.contact_phone, '') as poster_phone,
                COALESCE(o.company, m.name, bi.company_name, 'CLB Doanh Nhân CEO HN10') as poster_company
@@ -1040,7 +1040,7 @@ export class ConnectOpportunityService {
 
       const interests = await this.prisma.$queryRaw<any[]>`
         SELECT oi.id, oi.opportunity_id, oi.member_id, oi.message, oi.contact, oi.interest_level, oi.created_at,
-               COALESCE(m.contact, m.name, u.name, oi.contact, 'Hội viên') as member_name,
+               COALESCE(m.contact, m.name, u.name, oi.contact, 'Học viên') as member_name,
                COALESCE(m.cover_url, u.avatar_url, '') as member_avatar,
                COALESCE(m.phone, oi.contact, '') as member_phone,
                COALESCE(m.email, u.email, '') as member_email,
@@ -1283,7 +1283,7 @@ export class ConnectOpportunityService {
                 company,
                 posterId: userId,
               }),
-            ).catch(() => {});
+            ).catch(() => { });
           }
 
           if (this.gateway) {
@@ -1325,10 +1325,10 @@ export class ConnectOpportunityService {
   async deleteOpportunity(userId: string, opportunityId: string) {
     await this.prisma.$executeRaw`
       DELETE FROM public.opportunity_interests WHERE opportunity_id = ${opportunityId}
-    `.catch(() => {});
+    `.catch(() => { });
     await this.prisma.$executeRaw`
       DELETE FROM public.opportunities WHERE id = ${opportunityId}
-    `.catch(() => {});
+    `.catch(() => { });
     return { ok: true };
   }
 
@@ -1416,7 +1416,7 @@ export class ConnectOpportunityService {
       const opportunities = await this.prisma.$queryRaw<any[]>`
         SELECT o.*, a.name as association_name,
                m.code as poster_code,
-               COALESCE(up.display_name, vu.name, m.contact, m.name, o.contact_name, o.claimed_by_name, 'Hội viên CLB CEO HN10') as poster_name,
+               COALESCE(up.display_name, vu.name, m.contact, m.name, o.contact_name, o.claimed_by_name, 'Học viên CLB CEO HN10') as poster_name,
                COALESCE(m.name, bi.company_name, o.claimed_company, a.name, 'CLB Doanh Nhân CEO HN10') as poster_company
         FROM public.opportunities o
         LEFT JOIN public.associations a ON o.association_id = a.id
@@ -1627,7 +1627,7 @@ export class ConnectOpportunityService {
             o.poster_name ||
             o.contact_name ||
             o.poster_company ||
-            'Hội viên CLB',
+            'Học viên CLB',
           contactName: o.poster_name || o.contact_name || 'Đại diện hợp tác',
           contactPhone: o.contact_phone || null,
           contactTitle: o.contact_title || 'Đại diện hợp tác',
@@ -1653,15 +1653,15 @@ export class ConnectOpportunityService {
             ((o.title + ' ' + (o.description || ''))
               .toLowerCase()
               .includes('tìm') ||
-            (o.title + ' ' + (o.description || ''))
-              .toLowerCase()
-              .includes('cần mua') ||
-            (o.title + ' ' + (o.description || ''))
-              .toLowerCase()
-              .includes('nhập') ||
-            (o.title + ' ' + (o.description || ''))
-              .toLowerCase()
-              .includes('kêu gọi')
+              (o.title + ' ' + (o.description || ''))
+                .toLowerCase()
+                .includes('cần mua') ||
+              (o.title + ' ' + (o.description || ''))
+                .toLowerCase()
+                .includes('nhập') ||
+              (o.title + ' ' + (o.description || ''))
+                .toLowerCase()
+                .includes('kêu gọi')
               ? 'buyer'
               : 'seller'),
           isOwner:
@@ -1676,7 +1676,7 @@ export class ConnectOpportunityService {
               : [],
           visibility:
             o.target_scope === 'private' ||
-            (Array.isArray(o.target_recipients) && o.target_recipients.length > 0)
+              (Array.isArray(o.target_recipients) && o.target_recipients.length > 0)
               ? 'private'
               : 'public',
         };
@@ -1722,7 +1722,7 @@ export class ConnectOpportunityService {
       const rows = await this.prisma.$queryRaw<any[]>`
         SELECT 
           oi.id, oi.opportunity_id, oi.member_id, oi.message, oi.contact, oi.interest_level, oi.deal_value, oi.deal_percent, oi.created_at,
-          COALESCE(m.contact, m.name, u.name, 'Hội viên CLB') as name,
+          COALESCE(m.contact, m.name, u.name, 'Học viên CLB') as name,
           COALESCE(m.name, bi.company_name, '') as company,
           COALESCE(m.phone, oi.contact, '') as phone,
           COALESCE(m.email, u.email, '') as email,
@@ -1759,7 +1759,7 @@ export class ConnectOpportunityService {
     try {
       const allOpps = await this.prisma.$queryRaw<any[]>`
         SELECT o.*,
-               COALESCE(m.contact, m.name, o.contact_name, 'Hội viên') as poster_name,
+               COALESCE(m.contact, m.name, o.contact_name, 'Học viên') as poster_name,
                COALESCE(m.company_name, o.company, 'Doanh nghiệp CLB') as poster_company,
                COALESCE(m.department, 'Ban kết nối') as poster_department
         FROM public.opportunities o
@@ -1864,15 +1864,15 @@ export class ConnectOpportunityService {
 
       for (const o of allOpps) {
         const pId = String(
-          o.poster_id || o.poster_name || 'Hội viên',
+          o.poster_id || o.poster_name || 'Học viên',
         ).toLowerCase();
         const val = Number(o.budget_max) || Number(o.budget_min) || 0;
         if (!giversMap.has(pId)) {
           giversMap.set(pId, {
             posterId: pId,
-            name: o.poster_name || 'Hội viên CLB',
+            name: o.poster_name || 'Học viên CLB',
             company: o.poster_company || 'Doanh nghiệp CLB',
-            department: o.poster_department || 'Hội viên CEO HN10',
+            department: o.poster_department || 'Học viên CEO HN10',
             count: 0,
             totalValue: 0,
           });

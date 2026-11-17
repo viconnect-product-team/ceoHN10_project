@@ -92,13 +92,13 @@ async function main() {
       INSERT INTO auth.users (id, email, role)
       VALUES ($1::uuid, $2, 'authenticated')
       ON CONFLICT (id) DO NOTHING
-    `, [acc.id, acc.email]).catch(() => {});
+    `, [acc.id, acc.email]).catch(() => { });
 
     await client.query(`
       INSERT INTO public.memberships (id, user_id, association_id, role, is_default, created_at, updated_at)
       VALUES (gen_random_uuid(), $1::uuid, $2::uuid, 'admin', true, now(), now())
       ON CONFLICT DO NOTHING
-    `, [acc.id, ceoAssocId]).catch(() => {});
+    `, [acc.id, ceoAssocId]).catch(() => { });
   }
 
   // 3. Seed Executive & Member Roster
@@ -110,8 +110,8 @@ async function main() {
     { id: 'b1000000-0000-4000-8000-000000000004', name: 'Trần Thị Mai Lan', company: 'Mai Lan Logistics', title: 'Tổng Giám Đốc', industry: 'Vận tải & Logistics', email: 'lan.tran@mailanlogistics.com', phone: '0983191004', code: 'HN10-0004', execRole: 'Trưởng Ban Tài Chính', dept: 'Ban Tài chính' },
     { id: 'b1000000-0000-4000-8000-000000000005', name: 'Vũ Thu Trang', company: 'Trang Media & Events', title: 'Giám đốc Điều hành', industry: 'Truyền thông & Sự kiện', email: 'trang.vu@trangmedia.vn', phone: '0933191005', code: 'HN10-0005', execRole: 'Trưởng Ban Truyền Thông', dept: 'Ban Truyền thông' },
     { id: 'b1000000-0000-4000-8000-000000000006', name: 'Phạm Đức Minh', company: 'Minh Capital Investment', title: 'Managing Partner', industry: 'Đầu tư & Tài chính', email: 'minh.pham@minhcapital.vn', phone: '0973191006', code: 'HN10-0006', execRole: 'Trưởng Ban Xúc Tiến TM', dept: 'Ban Xúc tiến thương mại' },
-    { id: 'b1000000-0000-4000-8000-000000000007', name: 'Hoàng Hải Yến', company: 'Yến Ngọc Hospitality', title: 'Tổng Giám Đốc', industry: 'Du lịch & Khách sạn', email: 'yen.hoang@yenngochospitality.vn', phone: '0963191007', code: 'HN10-0007', execRole: 'Hội viên VIP', dept: 'Hội viên' },
-    { id: 'b1000000-0000-4000-8000-000000000008', name: 'Bùi Anh Tuấn', company: 'Tuấn Minh Pharma', title: 'Giám đốc Phân phối', industry: 'Dược phẩm & Thiết bị Y tế', email: 'tuan.bui@tuanminhpharma.vn', phone: '0923191008', code: 'HN10-0008', execRole: 'Hội viên VIP', dept: 'Hội viên' }
+    { id: 'b1000000-0000-4000-8000-000000000007', name: 'Hoàng Hải Yến', company: 'Yến Ngọc Hospitality', title: 'Tổng Giám Đốc', industry: 'Du lịch & Khách sạn', email: 'yen.hoang@yenngochospitality.vn', phone: '0963191007', code: 'HN10-0007', execRole: 'Học viên VIP', dept: 'Học viên' },
+    { id: 'b1000000-0000-4000-8000-000000000008', name: 'Bùi Anh Tuấn', company: 'Tuấn Minh Pharma', title: 'Giám đốc Phân phối', industry: 'Dược phẩm & Thiết bị Y tế', email: 'tuan.bui@tuanminhpharma.vn', phone: '0923191008', code: 'HN10-0008', execRole: 'Học viên VIP', dept: 'Học viên' }
   ];
 
   for (const m of memberList) {
@@ -122,14 +122,14 @@ async function main() {
       INSERT INTO public.vione_users (id, username, email, password, name, email_verified, created_at, updated_at)
       VALUES ($1::uuid, $2, $3, $4, $5, true, now(), now())
       ON CONFLICT (id) DO NOTHING
-    `, [userId, m.email, m.email, hash123456, m.name]).catch(() => {});
+    `, [userId, m.email, m.email, hash123456, m.name]).catch(() => { });
 
     // Create membership
     await client.query(`
       INSERT INTO public.memberships (id, user_id, association_id, role, is_default, created_at, updated_at)
       VALUES (gen_random_uuid(), $1::uuid, $2::uuid, 'member', true, now(), now())
       ON CONFLICT DO NOTHING
-    `, [userId, ceoAssocId]).catch(() => {});
+    `, [userId, ceoAssocId]).catch(() => { });
 
     // Create member profile
     await client.query(`

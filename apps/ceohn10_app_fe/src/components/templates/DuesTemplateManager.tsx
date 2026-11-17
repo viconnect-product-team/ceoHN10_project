@@ -28,28 +28,28 @@ export function DuesTemplateManager() {
   const [packages, setPackages] = useState([
     {
       id: "pkg-diamond",
-      name: "Hội Viên Kim Cương (VIP Diamond)",
+      name: "Học viên Kim Cương (VIP Diamond)",
       amount: 50000000,
       description: "Quyền lợi vinh danh đặc biệt, vị trí VIP tại Gala, đối tác chiến lược cấp cao",
       badgeColor: "bg-cyan-500/20 text-cyan-400 border-cyan-500/30",
     },
     {
       id: "pkg-gold",
-      name: "Hội Viên Vàng (Gold Member)",
+      name: "Học viên Vàng (Gold Member)",
       amount: 20000000,
       description: "Ưu tiên kết nối giao thương B2B, gian hàng Marketplace, tham dự mọi sự kiện",
       badgeColor: "bg-amber-500/20 text-amber-400 border-amber-500/30",
     },
     {
       id: "pkg-regular",
-      name: "Hội Viên Chính Thức (Standard)",
+      name: "Học viên Chính Thức (Standard)",
       amount: 10000000,
-      description: "Quyền biểu quyết, tham dự họp ban, danh bạ hội viên 360°, đào tạo chuyên sâu",
+      description: "Quyền biểu quyết, tham dự họp ban, danh bạ Học viên 360°, đào tạo chuyên sâu",
       badgeColor: "bg-blue-500/20 text-blue-400 border-blue-500/30",
     },
     {
       id: "pkg-startup",
-      name: "Hội Viên Khởi Nghiệp (Startup & Trẻ)",
+      name: "Học viên Khởi Nghiệp (Startup & Trẻ)",
       amount: 5000000,
       description: "Hỗ trợ kết nối khởi nghiệp, học hỏi từ các CEO đàn anh, tham gia ban chuyên môn",
       badgeColor: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30",
@@ -95,7 +95,7 @@ export function DuesTemplateManager() {
               Quản Lý Mẫu Trang &amp; Thông Báo Thanh Toán Hội Phí
             </h3>
             <p className="max-w-2xl text-xs text-slate-500 dark:text-slate-400">
-              Cấu hình tài khoản ngân hàng thụ hưởng, bảng định mức hội phí theo phân hạng hội viên, mã VietQR thanh toán tự sinh và mẫu thông báo nhắc nộp niên liễm đa kênh.
+              Cấu hình tài khoản ngân hàng thụ hưởng, bảng định mức hội phí theo phân hạng Học viên, mã VietQR thanh toán tự sinh và mẫu thông báo nhắc nộp niên liễm đa kênh.
             </p>
           </div>
 
@@ -175,7 +175,7 @@ export function DuesTemplateManager() {
           <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-xs dark:border-slate-800 dark:bg-slate-900 space-y-4">
             <h4 className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 flex items-center gap-2">
               <Layers className="size-4 text-emerald-500" />
-              <span>Định Mức Niên Liễm Theo Phân Hạng Hội Viên</span>
+              <span>Định Mức Niên Liễm Theo Phân Hạng Học viên</span>
             </h4>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -183,11 +183,10 @@ export function DuesTemplateManager() {
                 <div
                   key={pkg.id}
                   onClick={() => setSelectedPkgId(pkg.id)}
-                  className={`p-4 rounded-xl border transition cursor-pointer text-left ${
-                    selectedPkgId === pkg.id
+                  className={`p-4 rounded-xl border transition cursor-pointer text-left ${selectedPkgId === pkg.id
                       ? "border-emerald-500 bg-emerald-50/50 dark:bg-emerald-950/20 ring-1 ring-emerald-500/30"
                       : "border-slate-200 bg-slate-50/50 dark:border-slate-800 dark:bg-slate-950/40 hover:border-slate-300"
-                  }`}
+                    }`}
                 >
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-bold text-slate-900 dark:text-slate-100">
@@ -211,12 +210,12 @@ export function DuesTemplateManager() {
           {/* THỬ NGHIỆM TẠO CÚ PHÁP CHUYỂN KHOẢN */}
           <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-xs dark:border-slate-800 dark:bg-slate-900 space-y-3">
             <h4 className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
-              Mô Phỏng Cú Pháp Cho Hội Viên Cụ Thể
+              Mô Phỏng Cú Pháp Cho Học viên Cụ Thể
             </h4>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label className="text-xs text-slate-500 block mb-1">Mã Hội viên</label>
+                <label className="text-xs text-slate-500 block mb-1">Mã Học viên</label>
                 <input
                   type="text"
                   value={sampleMemberCode}
@@ -336,7 +335,7 @@ export function DuesTemplateManager() {
           posterUrl: vietQrUrl,
           date: "Kỳ niên liễm thường niên 2026",
           location: "Chuyển khoản trực tiếp qua VietQR tài khoản CLB",
-          salutation: "Kính gửi: Quý Anh/Chị Hội viên CLB CEO HN10,",
+          salutation: "Kính gửi: Quý Anh/Chị Học viên CLB CEO HN10,",
           bodyText: `Kính mời Quý Anh/Chị thực hiện hoàn tất niên liễm ${selectedPkg.name} (${selectedPkg.amount.toLocaleString("vi-VN")} VNĐ) để duy trì toàn bộ quyền lợi kết nối B2B và tham dự các kỳ sự kiện CLB.`,
         }}
       />

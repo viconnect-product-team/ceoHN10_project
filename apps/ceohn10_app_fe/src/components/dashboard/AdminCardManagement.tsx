@@ -70,7 +70,7 @@ export function AdminCardManagement({ memberId }: { memberId: string }) {
     <section className="rounded-2xl border border-border bg-card p-5 shadow-[var(--shadow-card)]">
       <div className="mb-4 flex items-center gap-2">
         <IdCard className="h-5 w-5 text-primary" />
-        <h3 className="text-base font-semibold text-foreground">Quản lý thẻ hội viên số</h3>
+        <h3 className="text-base font-semibold text-foreground">Quản lý thẻ Học viên số</h3>
       </div>
 
       {isLoading ? (
@@ -125,7 +125,7 @@ export function AdminCardManagement({ memberId }: { memberId: string }) {
             </div>
           ) : (
             <p className="mb-4 rounded-xl border border-dashed border-border bg-background p-4 text-sm text-muted-foreground">
-              Hội viên chưa có thẻ số đang hoạt động.
+              Học viên chưa có thẻ số đang hoạt động.
             </p>
           )}
 

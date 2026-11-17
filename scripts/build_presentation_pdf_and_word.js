@@ -124,7 +124,7 @@ async function generateSlidePdf() {
       </h1>
       
       <p class="hero-lead-description">
-        BÁO CÁO GIẢI PHÁP SỐ HÓA TOÀN DIỆN: <strong>WEB CRM THÁP CHỈ HUY TRUNG TÂM</strong> & <strong>MOBILE APP HỘI VIÊN ĐẶC QUYỀN</strong>
+        BÁO CÁO GIẢI PHÁP SỐ HÓA TOÀN DIỆN: <strong>WEB CRM THÁP CHỈ HUY TRUNG TÂM</strong> & <strong>MOBILE APP Học viên ĐẶC QUYỀN</strong>
       </p>
 
       <div class="hero-meta-cards">
@@ -237,8 +237,8 @@ async function generateSlidePdf() {
       <div class="three-cards-grid">
         <div class="challenge-card">
           <div class="card-icon-box">👥</div>
-          <span class="card-badge">BÀI TOÁN 1 · HỘI VIÊN</span>
-          <h3 class="card-heading">Quản Trị 500+ Hội Viên</h3>
+          <span class="card-badge">BÀI TOÁN 1 · Học viên</span>
+          <h3 class="card-heading">Quản Trị 500+ Học viên</h3>
           <div class="diff-block diff-old">
             <span class="diff-tag old-tag">✕ Cũ:</span> Dữ liệu phân tán Excel, Zalo; duyệt hồ sơ giấy tờ thủ công; không có định danh số xứng tầm CEO.
           </div>
@@ -291,7 +291,7 @@ async function generateSlidePdf() {
       <div class="dual-columns-container">
         <div class="platform-card platform-app">
           <div class="platform-header">
-            <div class="platform-badge app-badge">📱 DÀNH CHO 500+ HỘI VIÊN</div>
+            <div class="platform-badge app-badge">📱 DÀNH CHO 500+ Học viên</div>
             <h3 class="platform-name">Mobile App CEO HN10 (Văn Phòng Bỏ Túi)</h3>
             <p class="platform-lead">Trải nghiệm di động chuẩn nhận diện Deep Cobalt Navy & Warm Amber Gold:</p>
           </div>
@@ -324,7 +324,7 @@ async function generateSlidePdf() {
           <div class="platform-bullets">
             <div class="bullet-item">
               <span class="bullet-icon">📊</span>
-              <div><strong>Executive Dashboard 360°:</strong> Đo lường KPI hội viên, sự kiện, dòng tiền thực.</div>
+              <div><strong>Executive Dashboard 360°:</strong> Đo lường KPI Học viên, sự kiện, dòng tiền thực.</div>
             </div>
             <div class="bullet-item">
               <span class="bullet-icon">🛡</span>
@@ -363,7 +363,7 @@ async function generateSlidePdf() {
           <div class="flow-step-num">BƯỚC 1</div>
           <div class="flow-icon">📝</div>
           <h4 class="flow-card-title">Dự Toán & Thu Tiền</h4>
-          <p class="flow-card-desc">Lập dự toán sự kiện. Hội viên quét VietQR Napas 24/7 thanh toán vé & tài trợ. Hệ thống tự gạch nợ 1s.</p>
+          <p class="flow-card-desc">Lập dự toán sự kiện. Học viên quét VietQR Napas 24/7 thanh toán vé & tài trợ. Hệ thống tự gạch nợ 1s.</p>
         </div>
 
         <div class="flow-connector">➔</div>
@@ -540,13 +540,13 @@ async function generateSlidePdf() {
     </div>
     `,
 
-    // SLIDE 8: THẺ HỘI VIÊN VIP & DANH THIẾP SỐ KÉP (BỐ CỤC MOCKUP THẺ 3D & BẢO MẬT SĐT RIÊNG TƯ)
+    // SLIDE 8: THẺ Học viên VIP & DANH THIẾP SỐ KÉP (BỐ CỤC MOCKUP THẺ 3D & BẢO MẬT SĐT RIÊNG TƯ)
     `
     <div class="slide slide-vip-card" data-slide="8">
       ${createSlideHeader('MOBILE APP · ĐỊNH DANH ĐẲNG CẤP', 'THẺ VIP & DANH THIẾP SỐ KÉP', 8)}
       
       <div class="slide-title-group">
-        <h2 class="slide-title">THẺ HỘI VIÊN VIP MẠ VÀNG & DANH THIẾP SỐ KÉP 1 CHẠM</h2>
+        <h2 class="slide-title">THẺ Học viên VIP MẠ VÀNG & DANH THIẾP SỐ KÉP 1 CHẠM</h2>
         <p class="slide-subtitle">Định danh số đẳng cấp doanh nhân · Lưu vCard danh bạ tức thì · Cơ chế bảo mật số điện thoại riêng tư</p>
       </div>
 
@@ -567,7 +567,7 @@ async function generateSlidePdf() {
             <div class="tech-icon">🔀</div>
             <div class="tech-text">
               <h4>Cơ Chế Danh Thiếp Kép (Primary / Secondary)</h4>
-              <p>Hội viên có thể thiết lập 2 danh thiếp: Danh thiếp công việc chính và Danh thiếp kinh doanh phụ. Tùy ý chọn danh thiếp mặc định khi chia sẻ.</p>
+              <p>Học viên có thể thiết lập 2 danh thiếp: Danh thiếp công việc chính và Danh thiếp kinh doanh phụ. Tùy ý chọn danh thiếp mặc định khi chia sẻ.</p>
             </div>
           </div>
 
@@ -626,8 +626,8 @@ async function generateSlidePdf() {
           <h4 class="journey-title">Sơ Đồ Cinema Map</h4>
           <ul class="journey-list">
             <li>Ban tổ chức kéo thả xếp chỗ trực quan trên CRM.</li>
-            <li>Phân chia khu vực VIP, Bàn danh dự, Bàn hội viên.</li>
-            <li>Hội viên nhìn thấy rõ số bàn, số ghế ngay trên vé.</li>
+            <li>Phân chia khu vực VIP, Bàn danh dự, Bàn Học viên.</li>
+            <li>Học viên nhìn thấy rõ số bàn, số ghế ngay trên vé.</li>
             <li>Lễ tân xuất bản in sơ đồ dự phòng dẫn khách.</li>
           </ul>
         </div>
@@ -923,7 +923,7 @@ async function generateSlidePdf() {
             <div class="v-icon gold-v-icon">📲</div>
             <div>
               <h4>Cuộc Gọi Nền Native Push Call (Công Nghệ Vượt Trội)</h4>
-              <p>Khác biệt hoàn toàn với các app thông thường: Kể cả khi hội viên <strong>đã tắt app hoàn toàn hoặc đang khóa màn hình</strong>, khi có cuộc gọi đến, điện thoại vẫn tự động bật sáng, đổ chuông và hiện nút Nhận/Từ chối y như cuộc gọi nhà mạng!</p>
+              <p>Khác biệt hoàn toàn với các app thông thường: Kể cả khi Học viên <strong>đã tắt app hoàn toàn hoặc đang khóa màn hình</strong>, khi có cuộc gọi đến, điện thoại vẫn tự động bật sáng, đổ chuông và hiện nút Nhận/Từ chối y như cuộc gọi nhà mạng!</p>
             </div>
           </div>
 
@@ -1001,7 +1001,7 @@ async function generateSlidePdf() {
       
       <div class="slide-title-group">
         <h2 class="slide-title">EXECUTIVE DASHBOARD 360°: ĐO LƯỜNG SỨC KHỎE TOÀN DIỆN CLB</h2>
-        <p class="slide-subtitle">Kiểm soát trực quan số liệu hội viên, sự kiện, dòng tiền và cơ hội giao thương theo thời gian thực</p>
+        <p class="slide-subtitle">Kiểm soát trực quan số liệu Học viên, sự kiện, dòng tiền và cơ hội giao thương theo thời gian thực</p>
       </div>
 
       <div class="dashboard-preview-layout">
@@ -1013,7 +1013,7 @@ async function generateSlidePdf() {
           <div class="quad-card">
             <div class="quad-icon">👥</div>
             <div class="quad-num">500+</div>
-            <div class="quad-label">Hội Viên Chính Thức</div>
+            <div class="quad-label">Học viên Chính Thức</div>
             <p class="quad-desc">Phân loại theo 11 ngành nghề, quản lý hồ sơ và mã thẻ CEO-83xxx.</p>
           </div>
 
@@ -1054,7 +1054,7 @@ async function generateSlidePdf() {
 
       <div class="rbac-split-container">
         <div class="rbac-approval-card">
-          <h4 class="card-title-blue">QUY TRÌNH DUYỆT HỘI VIÊN 3 BƯỚC</h4>
+          <h4 class="card-title-blue">QUY TRÌNH DUYỆT Học viên 3 BƯỚC</h4>
           <div class="step-row">
             <div class="s-badge">B1</div>
             <div>
@@ -1136,7 +1136,7 @@ async function generateSlidePdf() {
       
       <div class="slide-title-group">
         <h2 class="slide-title">LỘ TRÌNH NÂNG CẤP HỆ THỐNG: CÔNG NGHỆ TIÊN PHONG</h2>
-        <p class="slide-subtitle">Nền tảng ViConnect liên tục nghiên cứu và mở rộng · Nâng cấp tự động qua mạng cho toàn bộ hội viên</p>
+        <p class="slide-subtitle">Nền tảng ViConnect liên tục nghiên cứu và mở rộng · Nâng cấp tự động qua mạng cho toàn bộ Học viên</p>
       </div>
 
       <div class="three-pillars-grid">
@@ -1180,7 +1180,7 @@ async function generateSlidePdf() {
           <ul class="p-list">
             <li>Mở rộng thị trường sang CEO 1982, CEO 1984.</li>
             <li>Tiếp cận mạng lưới Hội DNT các tỉnh bạn.</li>
-            <li>Nhân cấp số nhân cơ hội bán hàng cho hội viên.</li>
+            <li>Nhân cấp số nhân cơ hội bán hàng cho Học viên.</li>
             <li>Bảo mật độc lập dữ liệu tài chính nội bộ.</li>
           </ul>
         </div>
@@ -1206,8 +1206,8 @@ async function generateSlidePdf() {
         <div class="sc-card">
           <div class="sc-num">01</div>
           <div class="sc-text">
-            <strong>Bảo Mật SĐT Hội Viên:</strong>
-            <p>Danh thiếp số kép, chủ động ẩn SĐT, chỉ hội viên được duyệt mới tra cứu danh bạ.</p>
+            <strong>Bảo Mật SĐT Học viên:</strong>
+            <p>Danh thiếp số kép, chủ động ẩn SĐT, chỉ Học viên được duyệt mới tra cứu danh bạ.</p>
           </div>
         </div>
 
@@ -1369,8 +1369,8 @@ async function generateSlidePdf() {
           <div class="h-card h-card-highlight">
             <div class="h-step-badge gold-badge">GIAI ĐOẠN 3</div>
             <div>
-              <h4>BĐH Trải Nghiệm & Phát Động 500+ Hội Viên</h4>
-              <p>BĐH chạy thử thực tế 3 - 5 ngày; chính thức phát động toàn thể hội viên CEO HN10 tải App trên App Store và Google Play.</p>
+              <h4>BĐH Trải Nghiệm & Phát Động 500+ Học viên</h4>
+              <p>BĐH chạy thử thực tế 3 - 5 ngày; chính thức phát động toàn thể Học viên CEO HN10 tải App trên App Store và Google Play.</p>
             </div>
           </div>
         </div>
@@ -3847,7 +3847,7 @@ async function generateSpeakerDocx() {
             spacing: { after: 80 },
             children: [
               new TextRun({
-                text: 'HỆ SINH THÁI CÔNG NGHỆ KÉP: WEB CRM QUẢN TRỊ & MOBILE APP HỘI VIÊN',
+                text: 'HỆ SINH THÁI CÔNG NGHỆ KÉP: WEB CRM QUẢN TRỊ & MOBILE APP Học viên',
                 bold: true,
                 size: 24,
                 color: COLOR_GOLD,
@@ -3956,7 +3956,7 @@ async function generateSpeakerDocx() {
             '“Đúng 09h00 bắt đầu – 12h00 bế mạc. Thuyết trình 60p, Phản biện 45p, Chốt nghiệm thu 60p, Bàn giao 15p.”',
             [
               '“Em chào tất cả mọi người! Em xin gửi lời chào trân trọng nhất tới Ban Thường Trực, Ban Điều Hành và 6 Ban Chuyên Môn của CLB Doanh Nhân CEO HN10.”',
-              '“Hôm nay, liên minh ViConnect & ViOne báo cáo giải pháp số hóa toàn diện: Web CRM Tháp chỉ huy và Mobile App Hội viên.”',
+              '“Hôm nay, liên minh ViConnect & ViOne báo cáo giải pháp số hóa toàn diện: Web CRM Tháp chỉ huy và Mobile App Học viên.”',
               '“Cuộc họp bắt đầu đúng 09h00 và bế mạc đúng 12h00 trưa, phân bổ khoa học:',
               '• 09h00 - 10h00: Báo cáo bối cảnh và Demo trực tiếp cả 2 nền tảng.',
               '• 10h00 - 10h45 (đến 11h kém 15): Lắng nghe ý kiến và giải đáp phản biện chuyên sâu.',
@@ -3976,7 +3976,7 @@ async function generateSpeakerDocx() {
             '“3 bài toán gốc được giải quyết bằng 2 luồng huyết mạch: Thanh toán tài chính toàn diện & Xúc tiến thương mại B2B.”',
             [
               '“Thưa các anh chị, khi nhận bài toán từ CEO HN10, chúng em đúc kết 3 nỗi đau lớn nhất:',
-              '• Một là Hội viên: 500 hồ sơ phân tán trên Excel, Zalo; duyệt giấy tờ phức tạp; thiếu tấm thẻ định danh số.',
+              '• Một là Học viên: 500 hồ sơ phân tán trên Excel, Zalo; duyệt giấy tờ phức tạp; thiếu tấm thẻ định danh số.',
               '• Hai là Sự kiện & Tài chính: Sự kiện không chỉ là soát vé, mà gắn liền dòng tiền: Thu tiền vé, thu tài trợ, tạm ứng tổ chức, hoàn ứng và quyết toán.',
               '• Ba là Giao thương: Bài đăng trôi tin trên Zalo, chưa có công cụ đo lường giá trị giao dịch của CLB.',
               '“Từ 3 bài toán trên, giải pháp của chúng em định hình 2 LUỒNG QUAN TRỌNG NHẤT HỆ THỐNG:',
@@ -3989,9 +3989,9 @@ async function generateSpeakerDocx() {
 
           new Paragraph({ spacing: { before: 200 } }),
 
-          // PHẦN 3A: DEMO THỰC TẾ MOBILE APP HỘI VIÊN (09:25 - 09:45)
+          // PHẦN 3A: DEMO THỰC TẾ MOBILE APP Học viên (09:25 - 09:45)
           createRehearsalSection(
-            'Phần 3A: Demo Thực Tế Mobile App Hội Viên CEO HN10',
+            'Phần 3A: Demo Thực Tế Mobile App Học viên CEO HN10',
             '09:25 – 09:45 (20 Phút)',
             '“Thẻ VIP mạ vàng, Danh thiếp kép ẩn hiện SĐT riêng tư, Lưu vCard 1 chạm không cần cài app, Ví vé QR 0.1s.”',
             [
@@ -4015,7 +4015,7 @@ async function generateSpeakerDocx() {
             '“Tháp chỉ huy: Dashboard 360°, Phân quyền RBAC 6 Ban, Sổ Quỹ Tiền Mặt TT200 VietQR Napas 24/7 gạch nợ 1s.”',
             [
               '“Chuyển sang màn hình máy tính Web CRM - Tháp điều khiển trung tâm:',
-              '• 1. Executive Dashboard 360°: Kiểm soát thời gian thực 500+ hội viên, các sự kiện, doanh số giao thương.',
+              '• 1. Executive Dashboard 360°: Kiểm soát thời gian thực 500+ Học viên, các sự kiện, doanh số giao thương.',
               '• 2. Thẩm định hồ sơ kết nạp 3 bước: Thư ký tiếp nhận ➔ Ban Thành viên thẩm định ➔ Thường trực duyệt cấp mã thẻ.',
               '• 3. Phân quyền RBAC 6 Ban: Ban nào chỉ thao tác đúng nghiệp vụ ban đó, Audit Log lưu vết 100% thao tác.',
               '• 4. LUỒNG TÀI CHÍNH TOÀN DIỆN & SỔ QUỸ TT 200 (MẪU S07-DN): VietQR Napas gạch nợ sau 1s. Quản lý thu phí, tạm ứng cho ban sự kiện, hoàn ứng tiền thừa, quyết toán thực chi. Đọc số tiền bằng chữ và xuất file Excel chuẩn mực nộp HanoiBA.',
@@ -4070,7 +4070,7 @@ async function generateSpeakerDocx() {
               '• Trong vòng 24 giờ: Chúng em gửi lại Biên Bản Họp có đầy đủ chữ ký hai bên.',
               '• Trong vòng 48 giờ: Chúng em gửi Văn Bản Kế Hoạch Chỉnh Sửa Chi Tiết (Action Plan) cho Danh mục 2.',
               '• Trong vòng 03 ngày: Bàn giao trọn bộ tài liệu HDSD chuẩn hóa (PDF & Video clip 60s).',
-              '• Lộ trình bàn giao: Tổ chức 01 buổi tập huấn 30 phút cho Ban Thư ký & 6 Ban ➔ BĐH dùng thử 3-5 ngày ➔ Phát động 500+ hội viên.”',
+              '• Lộ trình bàn giao: Tổ chức 01 buổi tập huấn 30 phút cho Ban Thư ký & 6 Ban ➔ BĐH dùng thử 3-5 ngày ➔ Phát động 500+ Học viên.”',
               '“Đồng hồ hiện tại vừa đúng 12h00 trưa! Thay mặt liên minh ViConnect & ViOne, em xin trân trọng cảm ơn anh Chủ tịch và toàn thể Ban Điều Hành đã dành trọn vẹn buổi sáng làm việc nghiêm túc, trách nhiệm và thành công tốt đẹp!”',
             ],
             'Slide 21 (Bàn giao) ➔ Slide 22 (Lời cảm ơn). Cúi đầu chào trân trọng, bắt tay lãnh đạo kết thúc lúc 12:00.'
@@ -4105,8 +4105,8 @@ async function generateSpeakerDocx() {
           createScenarioFlashcard(
             1,
             'Ban Thành Viên - Bảo Mật Số Điện Thoại Cá Nhân',
-            '“Hội viên là lãnh đạo doanh nghiệp, rất sợ bị lộ số điện thoại cho bảo hiểm, bất động sản gọi phiền.”',
-            '“Dạ hệ thống trang bị cơ chế Danh thiếp số kép. CEO có quyền tắt hiển thị SĐT cá nhân trên thẻ. Người ngoài quét mã QR chỉ thấy tên, chức danh và logo doanh nghiệp, hoàn toàn không thấy số điện thoại. Danh bạ toàn thể 500+ CEO được bảo vệ khép kín, chỉ tài khoản hội viên được Ban Thành Viên phê duyệt mới đăng nhập tra cứu được ạ.”'
+            '“Học viên là lãnh đạo doanh nghiệp, rất sợ bị lộ số điện thoại cho bảo hiểm, bất động sản gọi phiền.”',
+            '“Dạ hệ thống trang bị cơ chế Danh thiếp số kép. CEO có quyền tắt hiển thị SĐT cá nhân trên thẻ. Người ngoài quét mã QR chỉ thấy tên, chức danh và logo doanh nghiệp, hoàn toàn không thấy số điện thoại. Danh bạ toàn thể 500+ CEO được bảo vệ khép kín, chỉ tài khoản Học viên được Ban Thành Viên phê duyệt mới đăng nhập tra cứu được ạ.”'
           ),
           new Paragraph({ spacing: { before: 120 } }),
 
@@ -4129,7 +4129,7 @@ async function generateSpeakerDocx() {
           createScenarioFlashcard(
             4,
             'Ban Tài Chính - Dòng Tiền & VietQR Napas 24/7',
-            '“Hội viên nộp hội phí hoặc mua vé sự kiện qua QR, tiền về đâu? Kế toán có phải rà sao kê không?”',
+            '“Học viên nộp hội phí hoặc mua vé sự kiện qua QR, tiền về đâu? Kế toán có phải rà sao kê không?”',
             '“Dạ ViConnect KHÔNG BAO GIỜ giữ tiền của CLB. Tiền chảy thẳng 100% về tài khoản chính thức của CLB CEO HN10 tại ngân hàng. Cổng VietQR Napas tự động gạch nợ sau 1 giây và xuất Sổ Quỹ Tiền Mặt chuẩn Thông tư 200 (Mẫu S07-DN). Kế toán chỉ cần bấm 1 click là xuất trọn vẹn file Excel đối soát thu chi nộp HanoiBA ạ.”'
           ),
           new Paragraph({ spacing: { before: 120 } }),
@@ -4138,14 +4138,14 @@ async function generateSpeakerDocx() {
             5,
             'Ban Truyền Thông - Dung Lượng Ảnh & Phân Quyền Đăng Tin',
             '“Sau Gala có hàng nghìn ảnh nét căng và video phóng sự, hệ thống có bị nặng không? Ai được đăng tin?”',
-            '“Dạ bài viết trên App cho phép gắn trực tiếp link Kho ảnh gốc Google Drive dung lượng cao để hội viên tải ảnh nét căng, còn trên App hệ thống tối ưu ảnh hiển thị siêu nhẹ lướt mượt. Về phân quyền: Chỉ tài khoản Ban Truyền Thông mới được đăng và duyệt tin tức; hội viên chỉ tương tác văn minh trên Moments B2B ạ.”'
+            '“Dạ bài viết trên App cho phép gắn trực tiếp link Kho ảnh gốc Google Drive dung lượng cao để Học viên tải ảnh nét căng, còn trên App hệ thống tối ưu ảnh hiển thị siêu nhẹ lướt mượt. Về phân quyền: Chỉ tài khoản Ban Truyền Thông mới được đăng và duyệt tin tức; Học viên chỉ tương tác văn minh trên Moments B2B ạ.”'
           ),
           new Paragraph({ spacing: { before: 120 } }),
 
           createScenarioFlashcard(
             6,
-            'Ban Thư Ký - Quy Trình Thẩm Định Duyệt Hội Viên',
-            '“Hội viên nộp đơn online thì duyệt thế nào? Có sợ duyệt nhầm hoặc không biết ai duyệt không?”',
+            'Ban Thư Ký - Quy Trình Thẩm Định Duyệt Học viên',
+            '“Học viên nộp đơn online thì duyệt thế nào? Có sợ duyệt nhầm hoặc không biết ai duyệt không?”',
             '“Dạ quy trình duyệt tuân thủ chuẩn 3 bước: Bước 1 Thư ký tiếp nhận kiểm tra sơ bộ; Bước 2 Ban Thành viên thẩm định pháp nhân doanh nghiệp; Bước 3 Thường trực bấm duyệt cấp mã CEO-83xxx. Hệ thống lưu Audit Log chi tiết: ai duyệt, mấy giờ mấy phút, đảm bảo kỷ luật và minh bạch tuyệt đối ạ.”'
           ),
           new Paragraph({ spacing: { before: 120 } }),
@@ -4162,7 +4162,7 @@ async function generateSpeakerDocx() {
             8,
             'Xử Lý Scope Creep - Đối Tác Đề Xuất Tính Năng Ngoài Phạm Vi',
             '“Một Trưởng ban hào hứng yêu cầu làm thêm chức năng quản lý nhân sự chấm công nội bộ cho doanh nghiệp...”',
-            '“Dạ ý tưởng của anh/chị rất hay cho quản trị doanh nghiệp riêng lẻ. Tuy nhiên, để hệ thống tập trung đúng tôn chỉ hiệp hội là Kết Nối & Giao Thương và bàn giao đúng tiến độ, em xin phép ghi nhận tính năng này vào Danh mục 3 trong lộ trình R&D tương lai. Hôm nay chúng ta cùng tập trung chốt nghiệm thu các tính năng cốt lõi đang có để sớm đưa app đến tay 500 hội viên sinh hoạt ạ!”'
+            '“Dạ ý tưởng của anh/chị rất hay cho quản trị doanh nghiệp riêng lẻ. Tuy nhiên, để hệ thống tập trung đúng tôn chỉ hiệp hội là Kết Nối & Giao Thương và bàn giao đúng tiến độ, em xin phép ghi nhận tính năng này vào Danh mục 3 trong lộ trình R&D tương lai. Hôm nay chúng ta cùng tập trung chốt nghiệm thu các tính năng cốt lõi đang có để sớm đưa app đến tay 500 Học viên sinh hoạt ạ!”'
           ),
           new Paragraph({ spacing: { before: 120 } }),
 
@@ -4206,7 +4206,7 @@ async function generateSpeakerDocx() {
   if (fs.existsSync(feDocsDir)) {
     try {
       fs.copyFileSync(savedPath, path.join(feDocsDir, 'KICH_BAN_LOI_NOI_HOC_THUOC_THUYET_TRINH_CEOHN10.docx'));
-    } catch (_) {}
+    } catch (_) { }
   }
 }
 

@@ -235,7 +235,7 @@ export function TaskFormModal({
           .then((res) => {
             if (Array.isArray(res)) setMemberList(res);
           })
-          .catch(() => {});
+          .catch(() => { });
       })
       .finally(() => {
         setLoadingMembers(false);
@@ -347,7 +347,7 @@ export function TaskFormModal({
       const deptNormalized = department.replace(/^Ban\s+/i, '').toLowerCase().replace(/quản trị/g, 'điều hành').trim();
       const mDept = (m.department || '').toLowerCase().replace(/quản trị/g, 'điều hành');
       const mExec = (m.executive_role || m.executiveRole || '').toLowerCase().replace(/quản trị/g, 'điều hành');
-      return mDept.includes(deptNormalized) || mExec.includes(deptNormalized) || deptNormalized.includes(mDept) || (deptNormalized.includes('thành viên') && mDept.includes('hội viên'));
+      return mDept.includes(deptNormalized) || mExec.includes(deptNormalized) || deptNormalized.includes(mDept) || (deptNormalized.includes('thành viên') && mDept.includes('Học viên'));
     });
   }, [memberList, department, canAssignAll, memberSearchQuery]);
 
@@ -542,10 +542,10 @@ export function TaskFormModal({
       const budgetObj =
         estimatedBudget || actualBudget
           ? {
-              estimated: estimatedBudget ? Number(estimatedBudget) : undefined,
-              actual: actualBudget ? Number(actualBudget) : undefined,
-              currency: 'VND',
-            }
+            estimated: estimatedBudget ? Number(estimatedBudget) : undefined,
+            actual: actualBudget ? Number(actualBudget) : undefined,
+            currency: 'VND',
+          }
           : undefined;
 
       const primaryAssignee = assignees[0] || {
@@ -635,7 +635,7 @@ export function TaskFormModal({
               <input
                 type="text"
                 required
-                placeholder="VD: Tổ chức Gala Gặp gỡ Hội viên Quý 4/2026..."
+                placeholder="VD: Tổ chức Gala Gặp gỡ Học viên Quý 4/2026..."
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 className="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3.5 py-2.5 text-sm text-slate-900 dark:text-slate-100 focus:border-[#003B95] focus:ring-2 focus:ring-[#003B95]/20 outline-none transition"
@@ -663,7 +663,7 @@ export function TaskFormModal({
                 <span>Ban / Bộ phận phụ trách</span>
                 <span className="text-rose-500">*</span>
               </label>
-              <span className="text-[11px] text-muted-foreground">Tự động tải danh sách hội viên theo ban</span>
+              <span className="text-[11px] text-muted-foreground">Tự động tải danh sách Học viên theo ban</span>
             </div>
 
             <select
@@ -746,17 +746,17 @@ export function TaskFormModal({
             <div className="flex items-center justify-between">
               <label className="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
                 <Users className="w-3.5 h-3.5 text-[#003B95]" />
-                <span>Hội viên thuộc ban &amp; Người xử lý công việc ({assignees.length})</span>
+                <span>Học viên thuộc ban &amp; Người xử lý công việc ({assignees.length})</span>
                 <span className="text-rose-500">*</span>
               </label>
-              <span className="text-[11px] text-muted-foreground">Chọn hội viên trong ban</span>
+              <span className="text-[11px] text-muted-foreground">Chọn Học viên trong ban</span>
             </div>
 
             {/* Selected Assignees Chips */}
             <div className="flex flex-wrap items-center gap-1.5 p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900/40 min-h-[46px]">
               {assignees.length === 0 ? (
                 <span className="text-xs text-slate-400 italic">
-                  Chưa chọn người xử lý. Bấm vào hội viên bên dưới để chọn.
+                  Chưa chọn người xử lý. Bấm vào Học viên bên dưới để chọn.
                 </span>
               ) : (
                 assignees.map((a, idx) => (
@@ -789,7 +789,7 @@ export function TaskFormModal({
             <div className="rounded-xl border border-slate-200 dark:border-slate-800 p-3 bg-white dark:bg-slate-900/50 space-y-2">
               <div className="flex items-center justify-between gap-2">
                 <span className="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
-                  <span>Danh sách hội viên {department ? `(${department})` : ''}:</span>
+                  <span>Danh sách Học viên {department ? `(${department})` : ''}:</span>
                   <span className="inline-flex items-center gap-1 rounded-md bg-[#ffffff]/10 text-[#003B95] dark:text-blue-300 font-extrabold px-2 py-0.5 text-[11px] border border-[#003B95]/20">
                     {deptMembers.length} người
                   </span>
@@ -809,11 +809,11 @@ export function TaskFormModal({
               {loadingMembers ? (
                 <div className="py-6 flex items-center justify-center gap-2 text-xs text-muted-foreground">
                   <div className="w-4 h-4 border-2 border-[#003B95] border-t-transparent rounded-full animate-spin" />
-                  <span>Đang tải danh sách hội viên theo ban...</span>
+                  <span>Đang tải danh sách Học viên theo ban...</span>
                 </div>
               ) : deptMembers.length === 0 ? (
                 <div className="py-4 text-center text-xs text-slate-400 italic">
-                  Không tìm thấy hội viên nào thuộc ban này hoặc phù hợp từ khóa. Bạn có thể nhập tên bên dưới.
+                  Không tìm thấy Học viên nào thuộc ban này hoặc phù hợp từ khóa. Bạn có thể nhập tên bên dưới.
                 </div>
               ) : (
                 <div className="max-h-48 overflow-y-auto pr-1 grid grid-cols-1 sm:grid-cols-2 gap-1.5">
@@ -826,11 +826,10 @@ export function TaskFormModal({
                         key={m.id || m.email || m.name}
                         type="button"
                         onClick={() => toggleAssignee(m)}
-                        className={`w-full flex items-center justify-between p-2 rounded-lg text-left transition cursor-pointer border ${
-                          isSelected
+                        className={`w-full flex items-center justify-between p-2 rounded-lg text-left transition cursor-pointer border ${isSelected
                             ? 'bg-blue-50/80 dark:bg-blue-950/40 border-[#003B95]/40 text-[#003B95] dark:text-blue-200'
                             : 'bg-slate-50/50 dark:bg-slate-800/40 border-slate-200 dark:border-slate-800 hover:border-slate-300 text-slate-700 dark:text-slate-300'
-                        }`}
+                          }`}
                       >
                         <div className="flex items-center gap-2 min-w-0">
                           {m.avatar_url || m.avatarUrl || m.avatar ? (
@@ -849,18 +848,17 @@ export function TaskFormModal({
                               {m.name}
                             </div>
                             <div className="text-[10px] text-muted-foreground truncate">
-                              {m.position || m.company || m.executive_role || m.department || 'Hội viên'}
+                              {m.position || m.company || m.executive_role || m.department || 'Học viên'}
                             </div>
                           </div>
                         </div>
 
                         <div className="flex-shrink-0 ml-2">
                           <div
-                            className={`w-4 h-4 rounded flex items-center justify-center border transition ${
-                              isSelected
+                            className={`w-4 h-4 rounded flex items-center justify-center border transition ${isSelected
                                 ? 'bg-[#003B95] border-[#003B95] text-white'
                                 : 'border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800'
-                            }`}
+                              }`}
                           >
                             {isSelected && <Check className="w-3 h-3 stroke-[3]" />}
                           </div>
@@ -955,11 +953,10 @@ export function TaskFormModal({
                     key={val}
                     type="button"
                     onClick={() => handleQuickProgress(val)}
-                    className={`px-2 py-0.5 rounded-md text-[11px] font-bold transition cursor-pointer ${
-                      progress === val
+                    className={`px-2 py-0.5 rounded-md text-[11px] font-bold transition cursor-pointer ${progress === val
                         ? 'bg-[#003B95] text-white shadow-xs'
                         : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
-                    }`}
+                      }`}
                   >
                     {val}%
                   </button>
@@ -1157,15 +1154,14 @@ export function TaskFormModal({
                     >
                       <div className="flex items-center gap-2.5 min-w-0">
                         <div
-                          className={`p-1.5 rounded-lg shrink-0 ${
-                            isXls
+                          className={`p-1.5 rounded-lg shrink-0 ${isXls
                               ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300'
                               : isPdf
-                              ? 'bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300'
-                              : isWord
-                              ? 'bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300'
-                              : 'bg-purple-100 text-purple-700 dark:bg-purple-950 dark:text-purple-300'
-                          }`}
+                                ? 'bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300'
+                                : isWord
+                                  ? 'bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300'
+                                  : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300'
+                            }`}
                         >
                           {isXls ? (
                             <FileSpreadsheet className="w-4 h-4" />
@@ -1291,11 +1287,10 @@ export function TaskFormModal({
                               setMeetingLink(cfg.defaultUrl);
                             }
                           }}
-                          className={`flex items-center justify-center gap-1.5 p-2 rounded-xl text-xs font-bold border transition ${
-                            isSelected
+                          className={`flex items-center justify-center gap-1.5 p-2 rounded-xl text-xs font-bold border transition ${isSelected
                               ? `${cfg.bg} ${cfg.text} ${cfg.border} ring-2 ring-offset-1 ring-[#003B95]/30 shadow-xs`
                               : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-50'
-                          }`}
+                            }`}
                         >
                           <span>{cfg.label}</span>
                         </button>
@@ -1361,7 +1356,7 @@ export function TaskFormModal({
             <button
               type="submit"
               disabled={submitting}
-              className="px-6 py-2.5 rounded-xl bg-[#003B95] text-white text-xs font-bold hover:bg-[#002D73] shadow-md transition disabled:opacity-50 cursor-pointer"
+              className="px-6 py-2.5 rounded-xl bg-[#0F172A] text-white text-xs font-bold hover:bg-[#1E293B] shadow-md transition disabled:opacity-50 cursor-pointer"
             >
               {submitting ? 'Đang lưu...' : isEditing ? 'Lưu thay đổi' : 'Giao việc ngay'}
             </button>

@@ -41,7 +41,7 @@ function BusinessConnectLayout() {
             Cuộc Gặp Kết Nối
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Quản lý và thống kê các cuộc gặp gỡ, giao thương 1-on-1 giữa các hội viên CLB Doanh Nhân CEO HN10
+            Quản lý và thống kê các cuộc gặp gỡ, giao thương 1-on-1 giữa các Học viên CLB Doanh Nhân CEO HN10
           </p>
         </header>
 

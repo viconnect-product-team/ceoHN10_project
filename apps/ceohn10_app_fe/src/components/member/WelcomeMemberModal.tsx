@@ -106,7 +106,7 @@ export function WelcomeMemberModal({ forceOpen = false, onClose }: WelcomeMember
             Chào mừng Doanh nhân!
           </h3>
           <p className="text-xs text-blue-100 font-medium mt-0.5 line-clamp-1">
-            {user?.name ? `${user.name}` : "Chào mừng Quý Hội Viên gia nhập hệ sinh thái"}
+            {user?.name ? `${user.name}` : "Chào mừng Quý Học viên gia nhập hệ sinh thái"}
           </p>
         </div>
 
@@ -154,10 +154,10 @@ export function WelcomeMemberModal({ forceOpen = false, onClose }: WelcomeMember
               </div>
               <div>
                 <h5 className="text-xs font-bold text-slate-900 dark:text-white">
-                  Bản đồ hội viên 2D Google Maps
+                  Bản đồ Học viên 2D Google Maps
                 </h5>
                 <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
-                  Định vị doanh nghiệp hội viên quanh bạn, tra cứu địa điểm họp và sự kiện trực quan.
+                  Định vị doanh nghiệp Học viên quanh bạn, tra cứu địa điểm họp và sự kiện trực quan.
                 </p>
               </div>
             </div>

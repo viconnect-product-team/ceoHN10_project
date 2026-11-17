@@ -104,7 +104,7 @@ export const Route = createFileRoute("/association")({
       });
     }
 
-    // Bắt buộc hội viên mới (mustChangePassword) chuyển hướng ngay tới chức năng đổi mật khẩu
+    // Bắt buộc Học viên mới (mustChangePassword) chuyển hướng ngay tới chức năng đổi mật khẩu
     if (typeof window !== "undefined") {
       let mustChange = false;
       try {
@@ -376,7 +376,7 @@ function MemberRoot() {
     }
   }, []);
 
-  // Trang đăng nhập hoặc tiếp nhận hồ sơ đăng ký Hiệp hội hiển thị độc lập, không hiển thị thanh Tab Bar hay layout hội viên đã đăng nhập
+  // Trang đăng nhập hoặc tiếp nhận hồ sơ đăng ký Hiệp hội hiển thị độc lập, không hiển thị thanh Tab Bar hay layout Học viên đã đăng nhập
   if (isLoginPage || isRegisterPage) {
     return <Outlet />;
   }

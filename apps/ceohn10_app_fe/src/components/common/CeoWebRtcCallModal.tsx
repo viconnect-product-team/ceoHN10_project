@@ -118,7 +118,7 @@ export function CeoWebRtcCallModal({
   peerUserIdRef.current = peerUserId;
   const typeRef = useRef(type);
   typeRef.current = type;
-  const finishCallRef = useRef<(status: "completed" | "missed" | "declined") => void>(() => {});
+  const finishCallRef = useRef<(status: "completed" | "missed" | "declined") => void>(() => { });
 
   useEffect(() => {
     if (callIdProp) callIdRef.current = callIdProp;
@@ -149,7 +149,7 @@ export function CeoWebRtcCallModal({
 
       playBeep();
       dialIntervalRef.current = setInterval(playBeep, 3000);
-    } catch {}
+    } catch { }
   }, []);
 
   const stopOutgoingTone = useCallback(() => {
@@ -160,7 +160,7 @@ export function CeoWebRtcCallModal({
     if (audioContextRef.current) {
       try {
         audioContextRef.current.close();
-      } catch {}
+      } catch { }
       audioContextRef.current = null;
     }
   }, []);
@@ -182,7 +182,7 @@ export function CeoWebRtcCallModal({
       gain.connect(ctx.destination);
       osc.start();
       osc.stop(ctx.currentTime + 0.4);
-    } catch {}
+    } catch { }
   }, []);
 
   const finishCall = useCallback((status: "completed" | "missed" | "declined") => {
@@ -219,14 +219,14 @@ export function CeoWebRtcCallModal({
           callId: callIdRef.current,
           targetUserId: peerUserIdRef.current,
         }),
-      }).catch(() => {});
-    } catch {}
+      }).catch(() => { });
+    } catch { }
 
     // Dismiss any native system notification
     if (typeof window !== "undefined" && (window as any).AndroidNative?.cancelNotification) {
       try {
         (window as any).AndroidNative.cancelNotification(`call-${callIdRef.current}`);
-      } catch {}
+      } catch { }
     }
 
     if (onEndCallRef.current) {
@@ -287,10 +287,10 @@ export function CeoWebRtcCallModal({
             video:
               type === "video"
                 ? {
-                    facingMode,
-                    width: { ideal: 1280, max: 1920 },
-                    height: { ideal: 720, max: 1080 },
-                  }
+                  facingMode,
+                  width: { ideal: 1280, max: 1920 },
+                  height: { ideal: 720, max: 1080 },
+                }
                 : false,
           };
 
@@ -418,7 +418,7 @@ export function CeoWebRtcCallModal({
             callerUserId: viewerUserId,
             callerName: user?.name || user?.user_metadata?.full_name || "Thành viên CEO HN10",
             callerAvatar: user?.avatar_url || user?.user_metadata?.avatar_url || null,
-            callerTitle: peerTitle || "Hội viên CLB CEO HN10",
+            callerTitle: peerTitle || "Học viên CLB CEO HN10",
             callType: type,
           });
         }
@@ -429,7 +429,7 @@ export function CeoWebRtcCallModal({
             callId: callIdRef.current,
             callerUserId: peerUserId,
             calleeUserId: viewerUserId,
-            calleeName: user?.name || "Hội viên CEO HN10",
+            calleeName: user?.name || "Học viên CEO HN10",
             calleeAvatar: user?.avatar_url || null,
           });
         }
@@ -501,7 +501,7 @@ export function CeoWebRtcCallModal({
           // Drain any queued ICE candidates
           while (queuedCandidatesRef.current.length > 0) {
             const cand = queuedCandidatesRef.current.shift();
-            if (cand) await peer.addIceCandidate(new RTCIceCandidate(cand)).catch(() => {});
+            if (cand) await peer.addIceCandidate(new RTCIceCandidate(cand)).catch(() => { });
           }
 
           const answer = await peer.createAnswer();
@@ -522,14 +522,14 @@ export function CeoWebRtcCallModal({
           await peer.setRemoteDescription(new RTCSessionDescription(signal.sdp));
           while (queuedCandidatesRef.current.length > 0) {
             const cand = queuedCandidatesRef.current.shift();
-            if (cand) await peer.addIceCandidate(new RTCIceCandidate(cand)).catch(() => {});
+            if (cand) await peer.addIceCandidate(new RTCIceCandidate(cand)).catch(() => { });
           }
           setCallStatus("connected");
           callStatusRef.current = "connected";
           stopOutgoingTone();
         } else if (signal.type === "candidate" && signal.candidate) {
           if (peer.remoteDescription && peer.remoteDescription.type) {
-            await peer.addIceCandidate(new RTCIceCandidate(signal.candidate)).catch(() => {});
+            await peer.addIceCandidate(new RTCIceCandidate(signal.candidate)).catch(() => { });
           } else {
             queuedCandidatesRef.current.push(signal.candidate);
           }
@@ -803,16 +803,14 @@ export function CeoWebRtcCallModal({
         <button
           type="button"
           onClick={toggleMic}
-          className={`flex flex-col items-center gap-1.5 transition active:scale-95 cursor-pointer ${
-            isMuted ? "text-rose-400" : "text-white"
-          }`}
+          className={`flex flex-col items-center gap-1.5 transition active:scale-95 cursor-pointer ${isMuted ? "text-rose-400" : "text-white"
+            }`}
         >
           <div
-            className={`grid h-13 w-13 place-items-center rounded-full border transition-colors ${
-              isMuted
+            className={`grid h-13 w-13 place-items-center rounded-full border transition-colors ${isMuted
                 ? "bg-rose-500/20 border-rose-500 text-rose-400"
                 : "bg-white/10 border-white/20 hover:bg-white/20 text-white"
-            }`}
+              }`}
           >
             {isMuted ? <MicOff className="h-5 w-5" /> : <Mic className="h-5 w-5" />}
           </div>
@@ -823,16 +821,14 @@ export function CeoWebRtcCallModal({
         <button
           type="button"
           onClick={toggleVideo}
-          className={`flex flex-col items-center gap-1.5 transition active:scale-95 cursor-pointer ${
-            !isVideoEnabled ? "text-rose-400" : "text-white"
-          }`}
+          className={`flex flex-col items-center gap-1.5 transition active:scale-95 cursor-pointer ${!isVideoEnabled ? "text-rose-400" : "text-white"
+            }`}
         >
           <div
-            className={`grid h-13 w-13 place-items-center rounded-full border transition-colors ${
-              !isVideoEnabled
+            className={`grid h-13 w-13 place-items-center rounded-full border transition-colors ${!isVideoEnabled
                 ? "bg-rose-500/20 border-rose-500 text-rose-400"
                 : "bg-white/10 border-white/20 hover:bg-white/20 text-white"
-            }`}
+              }`}
           >
             {isVideoEnabled ? <Video className="h-5 w-5" /> : <VideoOff className="h-5 w-5" />}
           </div>
@@ -862,24 +858,22 @@ export function CeoWebRtcCallModal({
             if (remoteAudioRef.current) {
               remoteAudioRef.current.muted = !nextSpeaker;
               remoteAudioRef.current.volume = nextSpeaker ? 1.0 : 0.0;
-              if (nextSpeaker) remoteAudioRef.current.play().catch(() => {});
+              if (nextSpeaker) remoteAudioRef.current.play().catch(() => { });
             }
             if (remoteVideoRef.current) {
               remoteVideoRef.current.muted = !nextSpeaker;
-              if (nextSpeaker) remoteVideoRef.current.play().catch(() => {});
+              if (nextSpeaker) remoteVideoRef.current.play().catch(() => { });
             }
             toast.info(nextSpeaker ? "Đã bật loa ngoài" : "Đã tắt tiếng loa");
           }}
-          className={`flex flex-col items-center gap-1.5 transition active:scale-95 cursor-pointer ${
-            !isSpeakerOn ? "text-amber-400" : "text-white"
-          }`}
+          className={`flex flex-col items-center gap-1.5 transition active:scale-95 cursor-pointer ${!isSpeakerOn ? "text-amber-400" : "text-white"
+            }`}
         >
           <div
-            className={`grid h-13 w-13 place-items-center rounded-full border transition-colors ${
-              !isSpeakerOn
+            className={`grid h-13 w-13 place-items-center rounded-full border transition-colors ${!isSpeakerOn
                 ? "bg-amber-500/20 border-amber-500 text-amber-400"
                 : "bg-white/10 border-white/20 hover:bg-white/20 text-white"
-            }`}
+              }`}
           >
             {!isSpeakerOn ? <VolumeX className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
           </div>

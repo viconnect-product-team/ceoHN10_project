@@ -55,13 +55,13 @@ const crmProgressData = [
         note: 'Nhóm chức năng Tổng quan không hiện quyền; tập trung cấu hình quyền cho 8 phân hệ chuyên môn.'
       },
       {
-        name: 'Cấu hình ma trận 8 Ban Chuyên Môn (loại bỏ cột Hội viên thường)',
+        name: 'Cấu hình ma trận 8 Ban Chuyên Môn (loại bỏ cột Học viên thường)',
         status: 'Hoàn thành',
         startDate: '12/09/2026',
         assignee: 'Dev Team ViConnect',
         completedDate: '30/09/2026',
         tester: 'QA / Ban Điều Hành CLB CEO HN10',
-        note: 'Chỉ hiển thị 8 ban: Hội viên, Sự kiện, Xúc tiến thương mại, Truyền thông, Đào tạo, Tài chính, Pháp chế, Ngoại giao.'
+        note: 'Chỉ hiển thị 8 ban: Học viên, Sự kiện, Xúc tiến thương mại, Truyền thông, Đào tạo, Tài chính, Pháp chế, Ngoại giao.'
       },
       {
         name: 'Thao tác phân quyền: Nút Xóa, Xem chi tiết, Lưu quyền trực tiếp trên từng chức năng',
@@ -100,7 +100,7 @@ const crmProgressData = [
         note: 'Chặn quyền ở tầng API NestJS, trả lỗi 403 Forbidden nếu không đúng vai trò.'
       },
       {
-        name: 'Chuẩn hóa thứ bậc phân quyền quản trị 7 cấp: Chủ tịch -> Admin -> Ban Điều Hành -> Tổng thư ký -> Trưởng ban chuyên môn -> Ban thư ký -> Hội viên',
+        name: 'Chuẩn hóa thứ bậc phân quyền quản trị 7 cấp: Chủ tịch -> Admin -> Ban Điều Hành -> Tổng thư ký -> Trưởng ban chuyên môn -> Ban thư ký -> Học viên',
         status: 'Hoàn thành',
         startDate: '12/09/2026',
         assignee: 'Dev Team ViConnect',
@@ -152,10 +152,10 @@ const crmProgressData = [
     ]
   },
   {
-    mainFeature: '3. Quản Lý Hội Viên & Hồ Sơ 360° (Members Management)',
+    mainFeature: '3. Quản Lý Học viên & Hồ Sơ 360° (Members Management)',
     subFeatures: [
       {
-        name: 'Danh sách hội viên doanh nhân với bộ lọc đa tiêu chí (Ngành nghề, Ban, Trạng thái)',
+        name: 'Danh sách Học viên doanh nhân với bộ lọc đa tiêu chí (Ngành nghề, Ban, Trạng thái)',
         status: 'Hoàn thành',
         startDate: '12/09/2026',
         assignee: 'Dev Team ViConnect',
@@ -164,7 +164,7 @@ const crmProgressData = [
         note: 'Tra cứu nhanh theo từ khóa, lọc theo Ban chuyên môn và tình trạng hội phí thường niên.'
       },
       {
-        name: 'Drawer xem chi tiết hồ sơ hội viên 360° (Thông tin CEO, Doanh nghiệp, Lịch sử tham gia)',
+        name: 'Drawer xem chi tiết hồ sơ Học viên 360° (Thông tin CEO, Doanh nghiệp, Lịch sử tham gia)',
         status: 'Hoàn thành',
         startDate: '13/09/2026',
         assignee: 'Dev Team ViConnect',
@@ -182,7 +182,7 @@ const crmProgressData = [
         note: 'Duyệt hoặc từ chối hồ sơ kèm lý do; gửi thông báo tự động qua App và email.'
       },
       {
-        name: 'Phân bổ và điều phối hội viên vào các Ban Chuyên Môn phù hợp',
+        name: 'Phân bổ và điều phối Học viên vào các Ban Chuyên Môn phù hợp',
         status: 'Hoàn thành',
         startDate: '15/09/2026',
         assignee: 'Dev Team ViConnect',
@@ -191,16 +191,16 @@ const crmProgressData = [
         note: 'Gán vai trò Trưởng ban, Phó ban, Ủy viên trong 8 ban chuyên môn.'
       },
       {
-        name: 'Khóa / Mở khóa tài khoản hội viên và phân quyền vai trò tức thì',
+        name: 'Khóa / Mở khóa tài khoản Học viên và phân quyền vai trò tức thì',
         status: 'Hoàn thành',
         startDate: '16/09/2026',
         assignee: 'Dev Team ViConnect',
         completedDate: '30/09/2026',
         tester: 'QA / Ban Điều Hành CLB CEO HN10',
-        note: 'Thay đổi trạng thái tài khoản trực tiếp trên giao diện quản trị hội viên.'
+        note: 'Thay đổi trạng thái tài khoản trực tiếp trên giao diện quản trị Học viên.'
       },
       {
-        name: 'Xuất dữ liệu danh bạ hội viên CLB CEO HN10 ra file Excel chuẩn định dạng',
+        name: 'Xuất dữ liệu danh bạ Học viên CLB CEO HN10 ra file Excel chuẩn định dạng',
         status: 'Hoàn thành',
         startDate: '16/09/2026',
         assignee: 'Dev Team ViConnect',
@@ -247,7 +247,7 @@ const crmProgressData = [
         assignee: 'Dev Team ViConnect',
         completedDate: '29/09/2026',
         tester: 'QA / Ban Điều Hành CLB CEO HN10',
-        note: 'Mã vé TIK-xxx duy nhất, gắn liền với hội viên và chống vé giả mạo.'
+        note: 'Mã vé TIK-xxx duy nhất, gắn liền với Học viên và chống vé giả mạo.'
       },
       {
         name: 'Chức năng phân công nhân sự Ban Truyền Thông phụ trách soát vé sự kiện',
@@ -323,7 +323,7 @@ const crmProgressData = [
     mainFeature: '6. Sàn Giao Thương B2B Marketplace Shopee Style (B2B Products)',
     subFeatures: [
       {
-        name: 'Quản lý danh sách sản phẩm, dịch vụ B2B do các công ty hội viên đăng tải',
+        name: 'Quản lý danh sách sản phẩm, dịch vụ B2B do các công ty Học viên đăng tải',
         status: 'Hoàn thành',
         startDate: '18/09/2026',
         assignee: 'Dev Team ViConnect',
@@ -368,7 +368,7 @@ const crmProgressData = [
         note: 'Tự động lưu lịch sử danh mục đã chọn vào localStorage, hiển thị chip 1-chạm lọc nhanh.'
       },
       {
-        name: 'Modal chi tiết sản phẩm Shopee Style: Khối Shop công ty, rating breakdown 1-5 sao, nhận xét hội viên',
+        name: 'Modal chi tiết sản phẩm Shopee Style: Khối Shop công ty, rating breakdown 1-5 sao, nhận xét Học viên',
         status: 'Hoàn thành',
         startDate: '29/09/2026',
         assignee: 'Dev Team ViConnect',
@@ -391,7 +391,7 @@ const crmProgressData = [
         note: 'Số liệu minh bạch, định lượng giá trị kinh tế thực chất mà hiệp hội mang lại.'
       },
       {
-        name: 'Quản lý các bài đăng Chào mua / Chào bán / Hợp tác liên doanh của hội viên',
+        name: 'Quản lý các bài đăng Chào mua / Chào bán / Hợp tác liên doanh của Học viên',
         status: 'Hoàn thành',
         startDate: '20/09/2026',
         assignee: 'Dev Team ViConnect',
@@ -423,13 +423,13 @@ const crmProgressData = [
         note: 'Theo dõi chi tiết nguồn thu hội phí, tài trợ sự kiện và các khoản chi hoạt động CLB.'
       },
       {
-        name: 'Quản lý danh sách hóa đơn hội phí thường niên của toàn bộ hội viên',
+        name: 'Quản lý danh sách hóa đơn hội phí thường niên của toàn bộ Học viên',
         status: 'Hoàn thành',
         startDate: '22/09/2026',
         assignee: 'Dev Team ViConnect',
         completedDate: '29/09/2026',
         tester: 'QA / Ban Điều Hành CLB CEO HN10',
-        note: 'Tự động tính ngày đến hạn hội phí và gửi thông báo nhắc phí đến từng hội viên.'
+        note: 'Tự động tính ngày đến hạn hội phí và gửi thông báo nhắc phí đến từng Học viên.'
       },
       {
         name: 'Cổng thanh toán VietQR Napas 24/7 tự động sinh mã QR và gạch nợ tức thì',
@@ -438,7 +438,7 @@ const crmProgressData = [
         assignee: 'Dev Team ViConnect',
         completedDate: '30/09/2026',
         tester: 'QA / Ban Điều Hành CLB CEO HN10',
-        note: 'Đồng bộ tài khoản ngân hàng CLB, hội viên quét mã là hệ thống tự động gạch nợ sau 2 giây.'
+        note: 'Đồng bộ tài khoản ngân hàng CLB, Học viên quét mã là hệ thống tự động gạch nợ sau 2 giây.'
       },
       {
         name: 'Xuất phiếu thu điện tử và báo cáo tài chính định kỳ theo chuẩn kế toán',
@@ -464,13 +464,13 @@ const crmProgressData = [
         note: 'Tạo danh sách ứng viên, thông tin đề án và thời gian mở/đóng hòm phiếu.'
       },
       {
-        name: 'Cơ chế biểu quyết trực tuyến bảo mật, mỗi hội viên chỉ bỏ phiếu 1 lần duy nhất',
+        name: 'Cơ chế biểu quyết trực tuyến bảo mật, mỗi Học viên chỉ bỏ phiếu 1 lần duy nhất',
         status: 'Hoàn thành',
         startDate: '23/09/2026',
         assignee: 'Dev Team ViConnect',
         completedDate: '29/09/2026',
         tester: 'QA / Ban Điều Hành CLB CEO HN10',
-        note: 'Xác thực qua mã hội viên, chống gian lận và đảm bảo tính dân chủ tuyệt đối.'
+        note: 'Xác thực qua mã Học viên, chống gian lận và đảm bảo tính dân chủ tuyệt đối.'
       },
       {
         name: 'Khóa hòm phiếu và thống kê kết quả kiểm phiếu tự động xuất biểu đồ trực quan',
@@ -488,7 +488,7 @@ const crmProgressData = [
         assignee: 'Dev Team ViConnect',
         completedDate: '30/09/2026',
         tester: 'QA / Ban Điều Hành CLB CEO HN10',
-        note: 'Quay số ngẫu nhiên theo mã vé may mắn của các hội viên đã check-in sự kiện.'
+        note: 'Quay số ngẫu nhiên theo mã vé may mắn của các Học viên đã check-in sự kiện.'
       }
     ]
   },
@@ -502,7 +502,7 @@ const crmProgressData = [
         assignee: 'Dev Team ViConnect',
         completedDate: '30/09/2026',
         tester: 'QA / Ban Điều Hành CLB CEO HN10',
-        note: 'Theo dõi mã chip thẻ NFC, ngày cấp thẻ và trạng thái liên kết hồ sơ hội viên.'
+        note: 'Theo dõi mã chip thẻ NFC, ngày cấp thẻ và trạng thái liên kết hồ sơ Học viên.'
       },
       {
         name: 'Nhật ký truy vết hệ thống Audit Trail ghi nhận toàn bộ thao tác của quản trị viên',
@@ -543,7 +543,7 @@ const crmProgressData = [
         assignee: 'Dev Team ViConnect',
         completedDate: '30/09/2026',
         tester: 'QA / Ban Điều Hành CLB CEO HN10',
-        note: 'Lãnh đạo xem toàn bộ; Tổng thư ký xem Ban Thư Ký; Trưởng ban xem ban của mình; Hội viên chỉ xem việc được giao/phối hợp.'
+        note: 'Lãnh đạo xem toàn bộ; Tổng thư ký xem Ban Thư Ký; Trưởng ban xem ban của mình; Học viên chỉ xem việc được giao/phối hợp.'
       },
       {
         name: 'Hỗ trợ tệp đính kèm giao việc đa định dạng: Word (.doc, .docx), Excel (.xls, .xlsx), PDF (.pdf) và Hình ảnh minh chứng',
@@ -582,7 +582,7 @@ const crmProgressData = [
         note: 'Quy trình khép kín, minh bạch thời gian, đánh giá chất lượng 1-5 sao và lưu trữ lịch sử thao tác đầy đủ.'
       },
       {
-        name: 'Tự động phát chuông đôn đốc tiến độ (Remind task) và đồng bộ thông báo thời gian thực đến điện thoại hội viên',
+        name: 'Tự động phát chuông đôn đốc tiến độ (Remind task) và đồng bộ thông báo thời gian thực đến điện thoại Học viên',
         status: 'Hoàn thành',
         startDate: '23/09/2026',
         assignee: 'Dev Team ViConnect',
@@ -634,16 +634,16 @@ const appProgressData = [
     mainFeature: '1. Xác Thực, Đăng Nhập & Kích Hoạt Thẻ (Authentication)',
     subFeatures: [
       {
-        name: 'Đăng nhập đa kênh (Số điện thoại / Mã hội viên M1983 / Email) kèm mật khẩu',
+        name: 'Đăng nhập đa kênh (Số điện thoại / Mã Học viên M1983 / Email) kèm mật khẩu',
         status: 'Hoàn thành',
         startDate: '10/09/2026',
         assignee: 'Dev Team ViConnect',
         completedDate: '25/09/2026',
         tester: 'QA / Ban Điều Hành CLB CEO HN10',
-        note: 'Hỗ trợ nhớ phiên làm việc, tự động tải thẻ hội viên và kết nối realtime.'
+        note: 'Hỗ trợ nhớ phiên làm việc, tự động tải thẻ Học viên và kết nối realtime.'
       },
       {
-        name: 'Đăng ký tài khoản hội viên mới & Form hồ sơ doanh nghiệp (loại bỏ trường doanh thu)',
+        name: 'Đăng ký tài khoản Học viên mới & Form hồ sơ doanh nghiệp (loại bỏ trường doanh thu)',
         status: 'Hoàn thành',
         startDate: '11/09/2026',
         assignee: 'Dev Team ViConnect',
@@ -670,7 +670,7 @@ const appProgressData = [
         note: 'Trải nghiệm như ứng dụng native, mở app 1 chạm từ màn hình điện thoại.'
       },
       {
-        name: 'Nhận diện vai trò chuẩn xác ngay từ khi đăng nhập: Chủ tịch, Admin, Ban Điều Hành, Trưởng ban, Tổng thư ký, Ban thư ký, Hội viên',
+        name: 'Nhận diện vai trò chuẩn xác ngay từ khi đăng nhập: Chủ tịch, Admin, Ban Điều Hành, Trưởng ban, Tổng thư ký, Ban thư ký, Học viên',
         status: 'Hoàn thành',
         startDate: '14/09/2026',
         assignee: 'Dev Team ViConnect',
@@ -681,7 +681,7 @@ const appProgressData = [
     ]
   },
   {
-    mainFeature: '2. Thẻ Hội Viên Thông Minh VIP 3D Chìm Logo & Danh Thiếp Số (Smart Card)',
+    mainFeature: '2. Thẻ Học viên Thông Minh VIP 3D Chìm Logo & Danh Thiếp Số (Smart Card)',
     subFeatures: [
       {
         name: 'Thẻ VIP 3D hiệu ứng chìm logo tinh tế: Loại bỏ hoàn toàn nền đen bằng kỹ thuật Screen Blend',
@@ -752,7 +752,7 @@ const appProgressData = [
         note: 'Hỗ trợ ghi thẻ trực tiếp trên thiết bị Android có chip NFC.'
       },
       {
-        name: 'Tích hợp thẻ hội viên vào ví điện tử Apple Wallet (.pkpass) và Google Wallet',
+        name: 'Tích hợp thẻ Học viên vào ví điện tử Apple Wallet (.pkpass) và Google Wallet',
         status: 'Hoàn thành',
         startDate: '22/09/2026',
         assignee: 'Dev Team ViConnect',
@@ -799,7 +799,7 @@ const appProgressData = [
         assignee: 'Dev Team ViConnect',
         completedDate: '30/09/2026',
         tester: 'QA / Ban Điều Hành CLB CEO HN10',
-        note: 'Tăng tính gắn kết thân thiện giữa các hội viên doanh nhân.'
+        note: 'Tăng tính gắn kết thân thiện giữa các Học viên doanh nhân.'
       },
       {
         name: 'Đính kèm Thư mời họp B2B ([B2B_CONNECT_INVITE]) trực tiếp trong luồng chat kèm nút bấm phản hồi',
@@ -822,10 +822,10 @@ const appProgressData = [
     ]
   },
   {
-    mainFeature: '5. Danh Bạ Hội Viên & Hẹn Bàn Tròn 1-on-1 (Directory & Meetings)',
+    mainFeature: '5. Danh Bạ Học viên & Hẹn Bàn Tròn 1-on-1 (Directory & Meetings)',
     subFeatures: [
       {
-        name: 'Danh bạ hội viên với bộ lọc ngành nghề, khu vực và thanh tìm kiếm thông minh',
+        name: 'Danh bạ Học viên với bộ lọc ngành nghề, khu vực và thanh tìm kiếm thông minh',
         status: 'Hoàn thành',
         startDate: '14/09/2026',
         assignee: 'Dev Team ViConnect',
@@ -840,7 +840,7 @@ const appProgressData = [
         assignee: 'Dev Team ViConnect',
         completedDate: '28/09/2026',
         tester: 'QA / Ban Điều Hành CLB CEO HN10',
-        note: 'Bộ nút hành động trực quan trên từng thẻ hội viên.'
+        note: 'Bộ nút hành động trực quan trên từng thẻ Học viên.'
       },
       {
         name: 'Gửi thiệp mời Hẹn bàn tròn giao thương 1-on-1 (Địa điểm, Thời gian, Mục đích hợp tác)',
@@ -861,7 +861,7 @@ const appProgressData = [
         note: 'Gửi push notification nhắc hẹn, không để lỡ cơ hội kinh doanh.'
       },
       {
-        name: 'Tính năng Mời doanh nhân mới gia nhập CLB (sinh link giới thiệu kèm mã hội viên)',
+        name: 'Tính năng Mời doanh nhân mới gia nhập CLB (sinh link giới thiệu kèm mã Học viên)',
         status: 'Hoàn thành',
         startDate: '18/09/2026',
         assignee: 'Dev Team ViConnect',
@@ -920,7 +920,7 @@ const appProgressData = [
         note: 'Khối shop uy tín, tỷ lệ phản hồi 100%, số năm tham gia CLB.'
       },
       {
-        name: 'Khối Đánh Giá Sản Phẩm (Rating Breakdown 1-5 sao, bộ lọc tab sao, nhận xét hội viên, phản hồi nhà bán)',
+        name: 'Khối Đánh Giá Sản Phẩm (Rating Breakdown 1-5 sao, bộ lọc tab sao, nhận xét Học viên, phản hồi nhà bán)',
         status: 'Hoàn thành',
         startDate: '29/09/2026',
         assignee: 'Dev Team ViConnect',
@@ -935,7 +935,7 @@ const appProgressData = [
         assignee: 'Dev Team ViConnect',
         completedDate: '30/09/2026',
         tester: 'QA / Ban Điều Hành CLB CEO HN10',
-        note: 'Hội viên trực tiếp đánh giá sản phẩm sau khi mua hoặc hợp tác giao thương.'
+        note: 'Học viên trực tiếp đánh giá sản phẩm sau khi mua hoặc hợp tác giao thương.'
       },
       {
         name: 'Nút "Chat Thương Thảo B2B" chuyển thẳng vào luồng chat 1-1 với chủ doanh nghiệp',
@@ -1044,7 +1044,7 @@ const appProgressData = [
         assignee: 'Dev Team ViConnect',
         completedDate: '30/09/2026',
         tester: 'QA / Ban Điều Hành CLB CEO HN10',
-        note: 'Minh bạch chứng từ tài chính phục vụ quyết toán thuế cho doanh nghiệp hội viên.'
+        note: 'Minh bạch chứng từ tài chính phục vụ quyết toán thuế cho doanh nghiệp Học viên.'
       }
     ]
   },
@@ -1076,7 +1076,7 @@ const appProgressData = [
         assignee: 'Dev Team ViConnect',
         completedDate: '29/09/2026',
         tester: 'QA / Ban Điều Hành CLB CEO HN10',
-        note: 'Hội viên liên hệ trực tiếp Ban Thư ký hoặc Ban Pháp chế khi cần hỗ trợ.'
+        note: 'Học viên liên hệ trực tiếp Ban Thư ký hoặc Ban Pháp chế khi cần hỗ trợ.'
       },
       {
         name: 'Modal UserGuideModal cẩm nang hướng dẫn sử dụng app tương tác từng bước',
@@ -1222,7 +1222,7 @@ const appProgressData = [
         assignee: 'Dev Team ViConnect',
         completedDate: '30/09/2026',
         tester: 'QA / Ban Điều Hành CLB CEO HN10',
-        note: 'Nhấn giữ phím mic và nói tự nhiên để tìm kiếm hội viên, xem lịch họp hoặc tra cứu sản phẩm B2B.'
+        note: 'Nhấn giữ phím mic và nói tự nhiên để tìm kiếm Học viên, xem lịch họp hoặc tra cứu sản phẩm B2B.'
       },
       {
         name: 'Tự động tra cứu cơ sở dữ liệu hiệp hội và điều hướng màn hình rảnh tay',
