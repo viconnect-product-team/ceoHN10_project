@@ -492,3 +492,198 @@ export function exportToExcel<T>({
   const cleanFilename = filename.endsWith(".xlsx") ? filename : `${filename}-${stamp}.xlsx`;
   XLSX.writeFile(wb, cleanFilename);
 }
+
+export interface ExportWordOptions<T> {
+  title: string;
+  subtitle?: string;
+  filename: string;
+  organization?: string;
+  address?: string;
+  categoryName?: string;
+  circularCode?: string;
+  circularNote?: string;
+  currencyUnit?: string;
+  columns: Array<{
+    header: string;
+    key: string;
+    width?: number;
+    value: (row: T, index: number) => string | number | boolean | null | undefined;
+  }>;
+  data: T[];
+  summaryRows?: Array<Array<string | number | null | undefined>>;
+  amountInWords?: string;
+  signerTitles?: [string, string, string];
+}
+
+export function exportToWord<T>(opts: ExportWordOptions<T>) {
+  const {
+    title,
+    subtitle,
+    filename,
+    organization = "CLB DOANH NHÂN CEO HN10 (HANOIBA)",
+    address = "TP. Hà Nội",
+    categoryName,
+    circularCode = "Mẫu số B01-DN",
+    circularNote = "(Ban hành theo quy chế quản trị tài chính CLB CEO HN10)",
+    currencyUnit = "VNĐ",
+    columns,
+    data,
+    summaryRows,
+    amountInWords,
+    signerTitles = ["NGƯỜI LẬP BIỂU", "TRƯỞNG BAN TÀI CHÍNH", "CHỦ TỊCH CLB"],
+  } = opts;
+
+  const now = new Date();
+  const dateStr = `Hà Nội, ngày ${now.getDate()} tháng ${now.getMonth() + 1} năm ${now.getFullYear()}`;
+
+  let tableHeaderHtml = `<tr>
+    <th style="border: 1px solid #000; padding: 6px 4px; background-color: #f2f2f2; text-align: center; width: 40px; font-weight: bold;">STT</th>`;
+  columns.forEach((col) => {
+    tableHeaderHtml += `<th style="border: 1px solid #000; padding: 6px 8px; background-color: #f2f2f2; text-align: center; font-weight: bold;">${col.header}</th>`;
+  });
+  tableHeaderHtml += `</tr>`;
+
+  let tableBodyHtml = "";
+  data.forEach((row, idx) => {
+    tableBodyHtml += `<tr>
+      <td style="border: 1px solid #000; padding: 5px 4px; text-align: center;">${idx + 1}</td>`;
+    columns.forEach((col) => {
+      const val = col.value(row, idx);
+      const isNum = typeof val === "number" || (typeof val === "string" && /^\d+$/.test(val.replace(/[.,\sđ]/g, "")));
+      const align = isNum && col.key !== "id" ? "right" : "left";
+      tableBodyHtml += `<td style="border: 1px solid #000; padding: 5px 8px; text-align: ${align};">${val !== null && val !== undefined ? val : ""}</td>`;
+    });
+    tableBodyHtml += `</tr>`;
+  });
+
+  let summaryHtml = "";
+  if (summaryRows && summaryRows.length > 0) {
+    summaryRows.forEach((sr) => {
+      summaryHtml += `<tr>`;
+      sr.forEach((cell, cellIdx) => {
+        const isBold = true;
+        const align = cellIdx === 0 ? "left" : "right";
+        summaryHtml += `<td style="border: 1px solid #000; padding: 6px 8px; text-align: ${align}; font-weight: ${isBold ? "bold" : "normal"};">${cell ?? ""}</td>`;
+      });
+      summaryHtml += `</tr>`;
+    });
+  }
+
+  const wordHtml = `
+  <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+  <head>
+    <meta charset="utf-8">
+    <title>${title}</title>
+    <style>
+      @page {
+        size: A4 portrait;
+        margin: 20mm 15mm 20mm 20mm;
+      }
+      body {
+        font-family: 'Times New Roman', serif;
+        font-size: 13pt;
+        line-height: 1.3;
+        color: #000;
+      }
+      table {
+        border-collapse: collapse;
+        width: 100%;
+        margin-top: 15px;
+        font-size: 11pt;
+      }
+      .header-table {
+        width: 100%;
+        border: none;
+        margin-bottom: 20px;
+      }
+      .header-table td {
+        border: none;
+        vertical-align: top;
+      }
+      .sign-table {
+        width: 100%;
+        border: none;
+        margin-top: 30px;
+      }
+      .sign-table td {
+        border: none;
+        text-align: center;
+        vertical-align: top;
+      }
+    </style>
+  </head>
+  <body>
+    <table class="header-table">
+      <tr>
+        <td style="width: 50%; text-align: center;">
+          <strong>${organization}</strong><br/>
+          <span>${address}</span>
+        </td>
+        <td style="width: 50%; text-align: center;">
+          <strong>CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</strong><br/>
+          <span>Độc lập - Tự do - Hạnh phúc</span><br/>
+          <span style="font-size: 10pt; font-style: italic;">----------o0o----------</span><br/>
+          <span style="font-size: 10pt; font-style: italic;">${circularCode}</span><br/>
+          <span style="font-size: 9pt; font-style: italic;">${circularNote}</span>
+        </td>
+      </tr>
+    </table>
+
+    <div style="text-align: center; margin-top: 10px; margin-bottom: 20px;">
+      <h2 style="margin: 0; font-size: 16pt; font-weight: bold; text-transform: uppercase;">${title}</h2>
+      ${subtitle ? `<p style="margin: 5px 0 0; font-size: 12pt; font-style: italic;">${subtitle}</p>` : ""}
+      ${categoryName ? `<p style="margin: 3px 0 0; font-size: 11pt; font-weight: bold; color: #003B95;">Danh mục: ${categoryName}</p>` : ""}
+      <p style="margin: 5px 0 0; font-size: 10.5pt; font-style: italic;">(Đơn vị tính: ${currencyUnit})</p>
+    </div>
+
+    <table>
+      <thead>
+        ${tableHeaderHtml}
+      </thead>
+      <tbody>
+        ${tableBodyHtml}
+        ${summaryHtml}
+      </tbody>
+    </table>
+
+    ${amountInWords ? `<p style="margin-top: 12px; font-style: italic;">Số tiền viết bằng chữ: <strong>${amountInWords}</strong></p>` : ""}
+
+    <div style="text-align: right; margin-top: 20px; font-style: italic;">
+      ${dateStr}
+    </div>
+
+    <table class="sign-table">
+      <tr>
+        <td style="width: 33.3%;">
+          <strong>${signerTitles[0]}</strong><br/>
+          <span style="font-size: 10pt; font-style: italic;">(Ký, ghi rõ họ tên)</span>
+          <br/><br/><br/><br/>
+        </td>
+        <td style="width: 33.3%;">
+          <strong>${signerTitles[1]}</strong><br/>
+          <span style="font-size: 10pt; font-style: italic;">(Ký, ghi rõ họ tên)</span>
+          <br/><br/><br/><br/>
+        </td>
+        <td style="width: 33.3%;">
+          <strong>${signerTitles[2]}</strong><br/>
+          <span style="font-size: 10pt; font-style: italic;">(Ký, đóng dấu)</span>
+          <br/><br/><br/><br/>
+        </td>
+      </tr>
+    </table>
+  </body>
+  </html>
+  `;
+
+  const blob = new Blob([wordHtml], { type: "application/msword;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  const stamp = now.toISOString().slice(0, 10);
+  const cleanFilename = filename.endsWith(".doc") || filename.endsWith(".docx") ? filename : `${filename}-${stamp}.doc`;
+  link.href = url;
+  link.download = cleanFilename;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}

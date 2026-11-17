@@ -224,6 +224,7 @@ export const ROLE_OPTIONS = [
   { value: "truong_ban_cong_nghe", label: "Trưởng ban Công nghệ" },
   { value: "truong_ban_doi_ngoai", label: "Trưởng ban Đối ngoại & Giao thương" },
   { value: "truong_ban_doi_song", label: "Trưởng ban Đời sống & Gắn kết thành viên" },
+  { value: "truong_ban_thien_nguyen", label: "Trưởng ban Thiện nguyện" },
   { value: "thanh_vien_ban_hoc_tap", label: "Thành viên Ban Học Tập" },
   { value: "thanh_vien_ban_su_kien", label: "Thành viên Ban Sự Kiện & Hậu Cần" },
   { value: "thanh_vien_ban_tai_chinh", label: "Thành viên Ban Tài Chính & Tài Trợ" },
@@ -231,6 +232,7 @@ export const ROLE_OPTIONS = [
   { value: "thanh_vien_ban_cong_nghe", label: "Thành viên Ban Công Nghệ" },
   { value: "thanh_vien_ban_doi_ngoai", label: "Thành viên Ban Đối Ngoại & Giao Thương" },
   { value: "thanh_vien_ban_doi_song", label: "Thành viên Ban Đời Sống & Gắn Kết Thành Viên" },
+  { value: "thanh_vien_ban_thien_nguyen", label: "Thành viên Ban Thiện Nguyện" },
   { value: "member", label: "Hội viên" },
 ];
 
@@ -254,6 +256,7 @@ export const INITIAL_DEPARTMENTS: DepartmentItem[] = [
   { id: "dept_cn", name: "Ban Công nghệ", code: "BCN", leaderName: "Lớp Phó Công Nghệ Lâm Thời", description: "Ứng dụng chuyển đổi số, hỗ trợ kỹ thuật và công nghệ thông tin", color: "indigo", isCore: true },
   { id: "dept_dn", name: "Ban Đối ngoại & Giao thương", code: "BDN", leaderName: "Lớp Phó Đối Ngoại & Giao Thương Lâm Thời", description: "Kết nối giao thương B2B, hợp tác đối ngoại, phát triển cơ hội", color: "emerald", isCore: true },
   { id: "dept_ds", name: "Ban Đời sống & Gắn kết thành viên", code: "BDS", leaderName: "Lớp Phó Đời Sống & Gắn Kết Thành Viên Lâm Thời", description: "Chăm lo đời sống thành viên, tổ chức sinh nhật, gắn kết tập thể", color: "amber", isCore: true },
+  { id: "dept_tn", name: "Ban Thiện Nguyện", code: "BTN", leaderName: "Trưởng Ban Thiện Nguyện", description: "Tổ chức các hoạt động an sinh xã hội, gây quỹ và chương trình thiện nguyện vì cộng đồng", color: "teal", isCore: true },
 ];
 
 export const DEPARTMENTS_STORAGE_KEY = "ceohn10_departments_v2";
@@ -286,6 +289,7 @@ export const DEPARTMENT_OPTIONS = [
   "Ban Công nghệ",
   "Ban Đối ngoại & Giao thương",
   "Ban Đời sống & Gắn kết thành viên",
+  "Ban Thiện Nguyện",
   "Hội viên ceohn10",
 ];
 

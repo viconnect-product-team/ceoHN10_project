@@ -30,7 +30,7 @@ export type EventItem = {
   capacity: number;
   registered: number;
   status: "upcoming" | "ongoing" | "completed" | "cancelled";
-  type: "forum" | "workshop" | "networking" | "training";
+  type: "forum" | "workshop" | "networking" | "training" | "charity";
   qrFields: QrField[];
   image?: string | null;
   banner?: string | null;

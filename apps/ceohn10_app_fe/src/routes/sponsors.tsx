@@ -16,6 +16,7 @@ import {
   TrendingUp,
   Upload,
   UserPlus,
+  Wallet,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useServerFn } from "@tanstack/react-start";
@@ -61,6 +62,8 @@ function SponsorsPage() {
   const fmt = useFmt();
   const { can } = useRole();
   const { data: SPONSORS, reload } = useServerData<Sponsor[]>(() => listSponsorsFn(), []);
+  const [tab, setTab] = useUrlState<"list" | "funds">("tab", "list");
+  const [fundFilter, setFundFilter] = useUrlState<"all" | "cash" | "in_kind" | "charity">("fund_type", "all");
   const [q, setQ] = useUrlState<string>("q", "");
   const [tier, setTier] = useState<Sponsor["tier"] | "all">("all");
   const [sponsorTypeFilter, setSponsorTypeFilter] = useState<"all" | "regular" | "new">("all");
@@ -151,6 +154,25 @@ function SponsorsPage() {
       .filter((s) => (sponsorTypeFilter === "all" ? true : s.sponsorType === sponsorTypeFilter))
       .filter((s) => (packageTypeFilter === "all" ? true : s.packageType === packageTypeFilter))
       .filter((s) => {
+        if (tab === "funds") {
+          if (fundFilter === "cash") {
+            return s.packageType === "cash" || s.packageType === "bank_transfer" || (s as any).sponsorType === "cash";
+          }
+          if (fundFilter === "in_kind") {
+            return s.packageType === "in_kind" || (s as any).sponsorType === "in_kind";
+          }
+          if (fundFilter === "charity") {
+            return (
+              (s as any).sponsorType === "charity" ||
+              (s as any).fundType === "charity" ||
+              s.name.toLowerCase().includes("thiện nguyện") ||
+              (s.companyName && s.companyName.toLowerCase().includes("thiện nguyện")) ||
+              (s.inKindDescription && s.inKindDescription.toLowerCase().includes("thiện nguyện")) ||
+              (s.inKindDescription && s.inKindDescription.toLowerCase().includes("vùng cao"))
+            );
+          }
+          return true;
+        }
         if (eventAssignedFilter === "all") return true;
         if (eventAssignedFilter === "assigned") return !!s.assignedEvent;
         return !s.assignedEvent;
@@ -164,7 +186,7 @@ function SponsorsPage() {
           s.phone.toLowerCase().includes(ql) ||
           (s.inKindDescription && s.inKindDescription.toLowerCase().includes(ql)),
       );
-  }, [SPONSORS, q, tier, sponsorTypeFilter, packageTypeFilter, eventAssignedFilter]);
+  }, [SPONSORS, q, tier, sponsorTypeFilter, packageTypeFilter, eventAssignedFilter, tab, fundFilter]);
 
   const tc = useTableControls<Sponsor>(
     filtered,
@@ -181,6 +203,30 @@ function SponsorsPage() {
   );
 
   const totalAmount = useMemo(() => SPONSORS.reduce((acc, s) => acc + s.amount, 0), [SPONSORS]);
+
+  const totalCashFunds = useMemo(() => {
+    return SPONSORS.filter(
+      (s) => s.packageType === "cash" || s.packageType === "bank_transfer" || (s as any).sponsorType === "cash"
+    ).reduce((acc, s) => acc + s.amount, 0);
+  }, [SPONSORS]);
+
+  const totalInKindFunds = useMemo(() => {
+    return SPONSORS.filter(
+      (s) => s.packageType === "in_kind" || (s as any).sponsorType === "in_kind"
+    ).reduce((acc, s) => acc + s.amount, 0);
+  }, [SPONSORS]);
+
+  const totalCharityFunds = useMemo(() => {
+    return SPONSORS.filter(
+      (s) =>
+        (s as any).sponsorType === "charity" ||
+        (s as any).fundType === "charity" ||
+        s.name.toLowerCase().includes("thiện nguyện") ||
+        (s.companyName && s.companyName.toLowerCase().includes("thiện nguyện")) ||
+        (s.inKindDescription && s.inKindDescription.toLowerCase().includes("thiện nguyện")) ||
+        (s.inKindDescription && s.inKindDescription.toLowerCase().includes("vùng cao"))
+    ).reduce((acc, s) => acc + s.amount, 0);
+  }, [SPONSORS]);
 
   const exportExcel = () => {
     const total = filtered.reduce((acc, s) => acc + s.amount, 0);
@@ -255,8 +301,12 @@ function SponsorsPage() {
   return (
     <AppShell>
       <PageHeader
-        title={t("sponsors.title")}
-        subtitle="Hệ thống đối tác & nhà tài trợ chính thức đồng hành cùng Hiệp Hội Doanh Nhân CEO HN10"
+        title={tab === "funds" ? "Quỹ Tài Trợ & Vận Động Hiệp Hội" : t("sponsors.title")}
+        subtitle={
+          tab === "funds"
+            ? "Theo dõi minh bạch các nguồn quỹ tài trợ: Tiền mặt, Hiện vật và Quỹ dành cho thiện nguyện (CSR) của CLB Doanh Nhân CEO HN10"
+            : "Hệ thống đối tác & nhà tài trợ chính thức đồng hành cùng Hiệp Hội Doanh Nhân CEO HN10"
+        }
         actions={
           <div className="flex items-center gap-2">
             <button
@@ -283,42 +333,109 @@ function SponsorsPage() {
                 style={{ background: "var(--gradient-primary)" }}
               >
                 <Plus className="h-4 w-4" />
-                <span>{t("sponsors.add")}</span>
+                <span>{tab === "funds" ? "Tiếp nhận tài trợ mới" : t("sponsors.add")}</span>
               </button>
             )}
           </div>
         }
       />
 
-      {/* ── DASHBOARD STATS ── */}
-      <div className="mb-5 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard
-          label="Tổng NTT & Giá Trị"
-          value={`${SPONSORS.length} NTT · ${fmt.money(totalAmount)}`}
-          icon={<Handshake className="h-4 w-4" />}
-        />
-        <StatCard
-          label="★ Thường Xuyên Ổn Định"
-          value={`${SPONSORS.filter((s) => s.sponsorType === "regular").length} Đối tác`}
-          tone="success"
-          hint={`${Math.round((SPONSORS.filter((s) => s.sponsorType === "regular").length / (SPONSORS.length || 1)) * 100)}% tổng số đối tác`}
-          icon={<Award className="h-4 w-4 text-emerald-500" />}
-        />
-        <StatCard
-          label="✦ Nhà Tài Trợ Mới"
-          value={`${SPONSORS.filter((s) => s.sponsorType === "new").length} Đơn vị`}
-          tone="info"
-          hint="Mới đồng hành các kỳ gần nhất"
-          icon={<UserPlus className="h-4 w-4 text-sky-500" />}
-        />
-        <StatCard
-          label="🎁 Tài Trợ Hiện Vật"
-          value={`${SPONSORS.filter((s) => s.packageType === "in_kind").length} Gói hiện vật`}
-          tone="warning"
-          hint={`Quy đổi ~${fmt.money(SPONSORS.filter((s) => s.packageType === "in_kind").reduce((acc, s) => acc + s.amount, 0))}`}
-          icon={<TrendingUp className="h-4 w-4 text-purple-500" />}
-        />
+      {/* ── TABS CHUYỂN ĐỔI: NHÀ TÀI TRỢ & QUỸ TÀI TRỢ ── */}
+      <div className="mb-5 flex border-b border-border">
+        <button
+          type="button"
+          onClick={() => {
+            setTab("list");
+            setFundFilter("all");
+          }}
+          className={`flex items-center gap-2 px-5 py-2.5 text-xs font-bold border-b-2 transition cursor-pointer ${
+            tab !== "funds"
+              ? "border-primary text-primary"
+              : "border-transparent text-muted-foreground hover:text-foreground"
+          }`}
+        >
+          <Handshake className="size-4" />
+          <span>Danh Sách Nhà Tài Trợ ({SPONSORS.length})</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => {
+            setTab("funds");
+            setFundFilter("all");
+          }}
+          className={`flex items-center gap-2 px-5 py-2.5 text-xs font-bold border-b-2 transition cursor-pointer ${
+            tab === "funds"
+              ? "border-primary text-primary"
+              : "border-transparent text-muted-foreground hover:text-foreground"
+          }`}
+        >
+          <Wallet className="size-4" />
+          <span>Quỹ Tài Trợ (Tiền Mặt · Hiện Vật · Thiện Nguyện)</span>
+        </button>
       </div>
+
+      {/* ── DASHBOARD STATS ── */}
+      {tab === "funds" ? (
+        <div className="mb-5 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <StatCard
+            label="Tổng Quỹ Tài Trợ"
+            value={fmt.money(totalAmount)}
+            hint="Toàn bộ nguồn lực tài trợ đồng hành"
+            icon={<Wallet className="h-4 w-4" />}
+          />
+          <StatCard
+            label="Quỹ Tiền Mặt"
+            value={fmt.money(totalCashFunds)}
+            tone="success"
+            hint="Tiền mặt & Chuyển khoản ngân hàng"
+            icon={<Handshake className="h-4 w-4 text-emerald-500" />}
+          />
+          <StatCard
+            label="Quỹ Hiện Vật"
+            value={fmt.money(totalInKindFunds)}
+            tone="warning"
+            hint="Hàng hóa, vật phẩm, kỷ yếu quy đổi"
+            icon={<TrendingUp className="h-4 w-4 text-purple-500" />}
+          />
+          <StatCard
+            label="Quỹ Thiện Nguyện (CSR)"
+            value={fmt.money(totalCharityFunds)}
+            tone="info"
+            hint="Dành riêng cho an sinh xã hội & vùng cao"
+            icon={<Award className="h-4 w-4 text-sky-500" />}
+          />
+        </div>
+      ) : (
+        <div className="mb-5 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <StatCard
+            label="Tổng NTT & Giá Trị"
+            value={`${SPONSORS.length} NTT · ${fmt.money(totalAmount)}`}
+            icon={<Handshake className="h-4 w-4" />}
+          />
+          <StatCard
+            label="★ Thường Xuyên Ổn Định"
+            value={`${SPONSORS.filter((s) => s.sponsorType === "regular").length} Đối tác`}
+            tone="success"
+            hint={`${Math.round((SPONSORS.filter((s) => s.sponsorType === "regular").length / (SPONSORS.length || 1)) * 100)}% tổng số đối tác`}
+            icon={<Award className="h-4 w-4 text-emerald-500" />}
+          />
+          <StatCard
+            label="✦ Nhà Tài Trợ Mới"
+            value={`${SPONSORS.filter((s) => s.sponsorType === "new").length} Đơn vị`}
+            tone="info"
+            hint="Mới đồng hành các kỳ gần nhất"
+            icon={<UserPlus className="h-4 w-4 text-sky-500" />}
+          />
+          <StatCard
+            label="🎁 Tài Trợ Hiện Vật"
+            value={`${SPONSORS.filter((s) => s.packageType === "in_kind").length} Gói hiện vật`}
+            tone="warning"
+            hint={`Quy đổi ~${fmt.money(SPONSORS.filter((s) => s.packageType === "in_kind").reduce((acc, s) => acc + s.amount, 0))}`}
+            icon={<TrendingUp className="h-4 w-4 text-purple-500" />}
+          />
+        </div>
+      )}
 
       {/* ── FILTER TOOLBAR ── */}
       <div className="mb-5 flex flex-wrap items-center gap-3">
@@ -331,25 +448,41 @@ function SponsorsPage() {
             className="h-10 w-full rounded-xl border border-border bg-card pl-9 pr-3 text-xs shadow-xs focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/20 text-foreground"
           />
         </div>
-        <select
-          value={sponsorTypeFilter}
-          onChange={(e) => setSponsorTypeFilter(e.target.value as any)}
-          className="h-10 rounded-xl border border-border bg-card px-3 text-xs font-semibold text-foreground shadow-xs cursor-pointer"
-        >
-          <option value="all">Tất cả đối tác</option>
-          <option value="regular">★ Thường xuyên ổn định</option>
-          <option value="new">✦ Nhà tài trợ mới</option>
-        </select>
-        <select
-          value={packageTypeFilter}
-          onChange={(e) => setPackageTypeFilter(e.target.value as any)}
-          className="h-10 rounded-xl border border-border bg-card px-3 text-xs font-semibold text-foreground shadow-xs cursor-pointer"
-        >
-          <option value="all">Tất cả hình thức</option>
-          <option value="bank_transfer">🏦 Chuyển khoản (VNPAY / Ngân hàng)</option>
-          <option value="cash">💵 Tiền mặt trực tiếp</option>
-          <option value="in_kind">🎁 Tài trợ Hiện vật</option>
-        </select>
+
+        {tab === "funds" ? (
+          <select
+            value={fundFilter}
+            onChange={(e) => setFundFilter(e.target.value as any)}
+            className="h-10 rounded-xl border border-border bg-card px-3 text-xs font-semibold text-foreground shadow-xs cursor-pointer"
+          >
+            <option value="all">Tất cả các loại Quỹ</option>
+            <option value="cash">💵 Quỹ Tiền Mặt (Tiền mặt / Chuyển khoản)</option>
+            <option value="in_kind">🎁 Quỹ Hiện Vật (Vật phẩm quy đổi)</option>
+            <option value="charity">❤️ Quỹ Dành Cho Thiện Nguyện (CSR)</option>
+          </select>
+        ) : (
+          <>
+            <select
+              value={sponsorTypeFilter}
+              onChange={(e) => setSponsorTypeFilter(e.target.value as any)}
+              className="h-10 rounded-xl border border-border bg-card px-3 text-xs font-semibold text-foreground shadow-xs cursor-pointer"
+            >
+              <option value="all">Tất cả đối tác</option>
+              <option value="regular">★ Thường xuyên ổn định</option>
+              <option value="new">✦ Nhà tài trợ mới</option>
+            </select>
+            <select
+              value={packageTypeFilter}
+              onChange={(e) => setPackageTypeFilter(e.target.value as any)}
+              className="h-10 rounded-xl border border-border bg-card px-3 text-xs font-semibold text-foreground shadow-xs cursor-pointer"
+            >
+              <option value="all">Tất cả hình thức</option>
+              <option value="bank_transfer">🏦 Chuyển khoản (VNPAY / Ngân hàng)</option>
+              <option value="cash">💵 Tiền mặt trực tiếp</option>
+              <option value="in_kind">🎁 Tài trợ Hiện vật</option>
+            </select>
+          </>
+        )}
         <select
           value={tier}
           onChange={(e) => setTier(e.target.value as Sponsor["tier"] | "all")}

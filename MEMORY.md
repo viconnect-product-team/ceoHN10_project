@@ -1,5 +1,50 @@
 # System Memory & Architecture
 
+- **Bản cập nhật ngày 17/11/2026 (v12.14): Tái Cấu Trúc Toàn Diện Sidebar Web CRM 9 Nhóm Chức Năng, Luồng Tạo Sự Kiện Thiện Nguyện Ban Thiện Nguyện, Báo Cáo Tài Chính Đa Định Dạng (Word/Excel/PDF), Quỹ Tài Trợ CSR & Chuyển Đổi Lịch Học Kèm Điểm Danh Mã QR Realtime Trên Mobile App ([NODE-CRM-001], [NODE-CRM-002], [NODE-CRM-005], [NODE-CRM-006], [NODE-CRM-018], [NODE-APP-003], [NODE-APP-008])**:
+  - **1. Tái Cấu Trúc Toàn Diện Sidebar Web CRM Theo 9 Nhóm Chuẩn (`Sidebar.tsx`)**:
+    * **Nhóm Đỉnh (Top-Level)**: Tổng quan (`/`), Trợ lý AI (`/ai-assistant`), Học viên (`/members`), Lớp học & Khóa học (`/trainings` - Menu Tree phân cấp: Tất cả lớp học, Xem & Thiết lập buổi học, Nhật ký buổi học đã diễn ra).
+    * **Nhóm TRUYỀN THÔNG (Sự Kiện)**: Sự kiện (`/events`), Tổng quan sự kiện (`/events-overview`), Biểu quyết (`/voting`), Đăng ký sự kiện (`/event-registrations`), Bốc thăm trúng thưởng (`/lucky-draw`).
+    * **Nhóm TÀI TRỢ**: Nhà tài trợ (`/sponsors` - bỏ các gói tài trợ cụ thể), Báo cáo tài trợ (`/sponsor-report`), Quỹ tài trợ (`/sponsors?tab=funds` - hiển thị chi tiết 3 nguồn: Tiền mặt, Hiện vật, Quỹ dành cho thiện nguyện).
+    * **Nhóm TÀI CHÍNH**: Thống kê báo cáo (`/analytics` - bổ sung Thống kê Sự kiện & Thiện nguyện CSR), Khoản thu (`/income`), Khoản chi (`/expenses`), Báo cáo tài chính (`/finance-report` - bộ chọn danh mục chi tiết để xuất báo cáo Word, Excel, PDF; hỗ trợ nhập file Excel, Word, PDF).
+    * **Nhóm TRUYỀN THÔNG (Tin Tức)**: Thông báo (`/notifications`), Tin tức & Truyền thông (`/news`), Quyền lợi & Ưu đãi (`/perks`).
+    * **Nhóm KẾT NỐI GIAO THƯƠNG**: Nhắn tin (`/network`), Chia sẻ cơ hội (`/opportunities`), Giao thương B2B (`/marketplace`).
+    * **Nhóm HOẠT ĐỘNG**: Quản lý công việc (`/tasks`), Quản lý cuộc họp (`/meetings`), Tài liệu biểu mẫu (`/documents`).
+    * **Nhóm HỆ THỐNG**: Cài đặt hệ thống (`/settings`), Lịch sử hoạt động (`/activity`).
+    * **Nhóm PHÂN QUYỀN**: Phân quyền hệ thống (`/permissions`), Quản lý Ban Chuyên Môn (`/departments` - bổ sung Ban Thiện Nguyện `BTN`), Quản trị người dùng (`/accounts` - chuẩn hóa sơ đồ role Lớp trưởng, Lớp phó lâm thời & BCS Team).
+  - **2. Luồng Tạo Sự Kiện Thiện Nguyện (CSR) & Phân Quyền Ban Thiện Nguyện**:
+    * `apps/ceohn10_app_fe/src/routes/events.index.tsx`: Bổ sung kiểm tra quyền `isCharityRole` dành riêng cho Ban Thiện Nguyện (`truong_ban_thien_nguyen`, `thanh_vien_ban_thien_nguyen`, `tb_doi_song_tap_su`, `lop_pho_doi_song`, `admin`, `chu_tich`).
+    * Bổ sung nút "Tạo Sự Kiện Thiện Nguyện" với icon `Heart` màu teal gradient chỉ hiển thị khi người dùng thuộc Ban Thiện Nguyện hoặc lãnh đạo lớp.
+    * Tích hợp `EventWizard.tsx` với template CSR đặc thù (`EVENT_TYPE_TEMPLATES.charity`): Tự động nạp sẵn tiêu đề "HÀNH TRÌNH TƯƠNG THÂN TƯƠNG ÁI: ĐOÀN KẾT VÌ CỘNG ĐỒNG - CEO HN10", khẩu hiệu, banner thiện nguyện, mô tả và thiết lập vé thiện nguyện miễn phí.
+    * Đã seed sự kiện thiện nguyện `evt-csr-ceohn10-2026` trực tiếp vào CSDL PostgreSQL chuẩn `113.20.107.184:6432`.
+  - **3. Quỹ Tài Trợ Trong Quản Lý Nhà Tài Trợ (`/sponsors`)**:
+    * Thêm 2 Tab: "Danh Sách Nhà Tài Trợ" và "Quỹ Tài Trợ (Tiền Mặt · Hiện Vật · Thiện Nguyện)".
+    * Trong Tab Quỹ Tài Trợ: Thống kê tách biệt 3 nguồn quỹ: Quỹ Tiền Mặt, Quỹ Hiện Vật, Quỹ Thiện Nguyện (CSR).
+    * Bộ lọc loại quỹ trực quan; đã loại bỏ hoàn toàn các liên kết đến gói tài trợ cụ thể.
+    * Đã seed 4 bản ghi nhà tài trợ đa dạng nguồn quỹ trực tiếp vào PostgreSQL `113.20.107.184:6432`.
+  - **4. Báo Cáo Tài Chính Đa Định Dạng (Word, Excel, PDF)**:
+    * `apps/ceohn10_app_fe/src/lib/excel-export.ts`: Bổ sung hàm `exportToWord` xuất file Word `.docx`/`.doc` chuẩn văn bản hành chính Việt Nam (Quốc hiệu tiêu ngữ, bảng biểu kẻ ô, tổng kết thu chi, chữ ký 3 bên: Người lập biểu, Kế toán trưởng, Chủ tịch / Lớp trưởng).
+    * `apps/ceohn10_app_fe/src/routes/finance-report.tsx`: Bổ sung bộ chọn chi tiết danh mục xuất báo cáo (Tất cả, Hội phí, Sự kiện, Thiện nguyện CSR, Tài trợ, Chi phí hoạt động); bổ sung nút "Xuất Word (.docx)" bên cạnh "Xuất Excel" và "In Báo Cáo PDF".
+    * Hỗ trợ nhận diện tiếp nhận file đa định dạng (`.xlsx, .xls, .csv, .txt, .docx, .doc, .pdf`) trong `FinanceExcelImportModal.tsx`.
+    * `apps/ceohn10_app_fe/src/routes/analytics.tsx`: Thêm 2 danh mục "Báo cáo sự kiện" và "Báo cáo thiện nguyện (CSR)".
+  - **5. Chuyển Đổi Lịch Học & Điểm Danh Mã QR Realtime Trên Mobile App**:
+    * Thay đổi toàn bộ khái niệm "Đào tạo" / "Chương trình đào tạo" thành **"Lịch học"** trên toàn bộ giao diện Mobile App:
+      - `CustomHomeShortcutsModal.tsx`: Shortcut "Lịch học" - "Lịch học, điểm danh QR & phòng họp video".
+      - `AllFeaturesModal.tsx`: Feature "Lịch học" - "Lịch học, điểm danh QR & phòng họp trực tuyến".
+      - `association.training.tsx`: Tiêu đề màn hình "Lịch Học & Điểm Danh", tiêu đề banner "Lịch Học & Điểm Danh Lớp CEO HN10", 3 thẻ KPI (Tổng buổi học, Buổi học Live, Tài liệu học tập).
+    * **Chức năng Mã QR Điểm Danh Buổi Học**:
+      - Bổ sung nút "Mã QR" trên từng thẻ buổi học: Mở popup hiển thị mã QR kích thước lớn, chứa link điểm danh `https://ceohn10.viconnect.vn/association/training?checkin=${training.id}` để chiếu lên máy chiếu hoặc đưa cho học viên quét.
+      - Hiển thị trực tiếp sĩ số học viên đã điểm danh trên thẻ: `Đã điểm danh: ${t.attendee_count} / ${t.max_attendees} học viên`.
+      - Nút "Quét QR Điểm Danh" trên thanh tìm kiếm: Cho phép học viên dán link hoặc nhập mã buổi học để điểm danh tức thì.
+      - Nút "Điểm danh ngay" trên thẻ: Gửi `POST /trainings/:id/join` với thông tin hội viên, cập nhật số lượng `attendee_count` tăng realtime trên giao diện và lưu trữ vào PostgreSQL `113.20.107.184:6432`.
+      - Tự động nhận diện URL `?checkin=<training_id>`: Khi học viên quét QR bằng camera điện thoại, hệ thống tự động ghi nhận điểm danh và thông báo thành công.
+      - `AssociationQrScanModal.tsx`: Tích hợp tự động bắt các mã QR chứa `training?checkin=` để điểm danh và chuyển hướng mượt mà.
+  - **6. Kiểm Tra Chất Lượng Mã Nguồn Tuyệt Đối (STRICT CODE QUALITY)**:
+    * Kiểm tra TypeScript Diagnostics trên toàn bộ các file đã chỉnh sửa: **PASS 100% với 0 lỗi (0 errors)**.
+    * Route tree TanStack Router được tạo mới đồng bộ với mã thoát 0.
+  - **7. Tuân Thủ Nghiêm Ngặt Quy Chuẩn**:
+    * Tuyệt đối không tự ý chạy `git commit` hay `git push`.
+    * Dữ liệu thực tế được lưu và truy xuất chuẩn mực từ CSDL duy nhất `113.20.107.184:6432`.
+
 - **Bản cập nhật ngày 17/11/2026 (v12.13): Chuẩn Hóa Realtime Dòng Tiền & Sổ Quỹ Thu Chi, Đồng Bộ Hội Phí & Hóa Đơn, Sửa Lỗi Xem Tài Liệu, Chuẩn Hóa Role BCS Lớp & BCS Team Theo Sơ Đồ, Triệt Tiêu 404 Icons & React Error #418, Cấu Hình Subdomain & Git Auto-Deploy CI/CD ([NODE-CRM-001], [NODE-CRM-004], [NODE-CRM-005], [NODE-CRM-009], [NODE-CRM-010], [NODE-CORE-001])**:
   - **1. Khắc Phục Sổ Quỹ Realtime & Dòng Tiền Biến Động Thực Tế**:
     * **Màn Quản Lý Thu (`/income`)**:
@@ -1813,6 +1858,51 @@
      - Tuân thủ nghiêm ngặt STRICT RULE 1: Tuyệt đối không tự động chạy `git push` hay `git commit`.
 
 # System Memory & Architecture
+
+- **Bản cập nhật ngày 17/11/2026 (v12.14): Tái Cấu Trúc Toàn Diện Sidebar Web CRM 9 Nhóm Chức Năng, Luồng Tạo Sự Kiện Thiện Nguyện Ban Thiện Nguyện, Báo Cáo Tài Chính Đa Định Dạng (Word/Excel/PDF), Quỹ Tài Trợ CSR & Chuyển Đổi Lịch Học Kèm Điểm Danh Mã QR Realtime Trên Mobile App ([NODE-CRM-001], [NODE-CRM-002], [NODE-CRM-005], [NODE-CRM-006], [NODE-CRM-018], [NODE-APP-003], [NODE-APP-008])**:
+  - **1. Tái Cấu Trúc Toàn Diện Sidebar Web CRM Theo 9 Nhóm Chuẩn (`Sidebar.tsx`)**:
+    * **Nhóm Đỉnh (Top-Level)**: Tổng quan (`/`), Trợ lý AI (`/ai-assistant`), Học viên (`/members`), Lớp học & Khóa học (`/trainings` - Menu Tree phân cấp: Tất cả lớp học, Xem & Thiết lập buổi học, Nhật ký buổi học đã diễn ra).
+    * **Nhóm TRUYỀN THÔNG (Sự Kiện)**: Sự kiện (`/events`), Tổng quan sự kiện (`/events-overview`), Biểu quyết (`/voting`), Đăng ký sự kiện (`/event-registrations`), Bốc thăm trúng thưởng (`/lucky-draw`).
+    * **Nhóm TÀI TRỢ**: Nhà tài trợ (`/sponsors` - bỏ các gói tài trợ cụ thể), Báo cáo tài trợ (`/sponsor-report`), Quỹ tài trợ (`/sponsors?tab=funds` - hiển thị chi tiết 3 nguồn: Tiền mặt, Hiện vật, Quỹ dành cho thiện nguyện).
+    * **Nhóm TÀI CHÍNH**: Thống kê báo cáo (`/analytics` - bổ sung Thống kê Sự kiện & Thiện nguyện CSR), Khoản thu (`/income`), Khoản chi (`/expenses`), Báo cáo tài chính (`/finance-report` - bộ chọn danh mục chi tiết để xuất báo cáo Word, Excel, PDF; hỗ trợ nhập file Excel, Word, PDF).
+    * **Nhóm TRUYỀN THÔNG (Tin Tức)**: Thông báo (`/notifications`), Tin tức & Truyền thông (`/news`), Quyền lợi & Ưu đãi (`/perks`).
+    * **Nhóm KẾT NỐI GIAO THƯƠNG**: Nhắn tin (`/network`), Chia sẻ cơ hội (`/opportunities`), Giao thương B2B (`/marketplace`).
+    * **Nhóm HOẠT ĐỘNG**: Quản lý công việc (`/tasks`), Quản lý cuộc họp (`/meetings`), Tài liệu biểu mẫu (`/documents`).
+    * **Nhóm HỆ THỐNG**: Cài đặt hệ thống (`/settings`), Lịch sử hoạt động (`/activity`).
+    * **Nhóm PHÂN QUYỀN**: Phân quyền hệ thống (`/permissions`), Quản lý Ban Chuyên Môn (`/departments` - bổ sung Ban Thiện Nguyện `BTN`), Quản trị người dùng (`/accounts` - chuẩn hóa sơ đồ role Lớp trưởng, Lớp phó lâm thời & BCS Team).
+  - **2. Luồng Tạo Sự Kiện Thiện Nguyện (CSR) & Phân Quyền Ban Thiện Nguyện**:
+    * `apps/ceohn10_app_fe/src/routes/events.index.tsx`: Bổ sung kiểm tra quyền `isCharityRole` dành riêng cho Ban Thiện Nguyện (`truong_ban_thien_nguyen`, `thanh_vien_ban_thien_nguyen`, `tb_doi_song_tap_su`, `lop_pho_doi_song`, `admin`, `chu_tich`).
+    * Bổ sung nút "Tạo Sự Kiện Thiện Nguyện" với icon `Heart` màu teal gradient chỉ hiển thị khi người dùng thuộc Ban Thiện Nguyện hoặc lãnh đạo lớp.
+    * Tích hợp `EventWizard.tsx` với template CSR đặc thù (`EVENT_TYPE_TEMPLATES.charity`): Tự động nạp sẵn tiêu đề "HÀNH TRÌNH TƯƠNG THÂN TƯƠNG ÁI: ĐOÀN KẾT VÌ CỘNG ĐỒNG - CEO HN10", khẩu hiệu, banner thiện nguyện, mô tả và thiết lập vé thiện nguyện miễn phí.
+    * Đã seed sự kiện thiện nguyện `evt-csr-ceohn10-2026` trực tiếp vào CSDL PostgreSQL chuẩn `113.20.107.184:6432`.
+  - **3. Quỹ Tài Trợ Trong Quản Lý Nhà Tài Trợ (`/sponsors`)**:
+    * Thêm 2 Tab: "Danh Sách Nhà Tài Trợ" và "Quỹ Tài Trợ (Tiền Mặt · Hiện Vật · Thiện Nguyện)".
+    * Trong Tab Quỹ Tài Trợ: Thống kê tách biệt 3 nguồn quỹ: Quỹ Tiền Mặt, Quỹ Hiện Vật, Quỹ Thiện Nguyện (CSR).
+    * Bộ lọc loại quỹ trực quan; đã loại bỏ hoàn toàn các liên kết đến gói tài trợ cụ thể.
+    * Đã seed 4 bản ghi nhà tài trợ đa dạng nguồn quỹ trực tiếp vào PostgreSQL `113.20.107.184:6432`.
+  - **4. Báo Cáo Tài Chính Đa Định Dạng (Word, Excel, PDF)**:
+    * `apps/ceohn10_app_fe/src/lib/excel-export.ts`: Bổ sung hàm `exportToWord` xuất file Word `.docx`/`.doc` chuẩn văn bản hành chính Việt Nam (Quốc hiệu tiêu ngữ, bảng biểu kẻ ô, tổng kết thu chi, chữ ký 3 bên: Người lập biểu, Kế toán trưởng, Chủ tịch / Lớp trưởng).
+    * `apps/ceohn10_app_fe/src/routes/finance-report.tsx`: Bổ sung bộ chọn chi tiết danh mục xuất báo cáo (Tất cả, Hội phí, Sự kiện, Thiện nguyện CSR, Tài trợ, Chi phí hoạt động); bổ sung nút "Xuất Word (.docx)" bên cạnh "Xuất Excel" và "In Báo Cáo PDF".
+    * Hỗ trợ nhận diện tiếp nhận file đa định dạng (`.xlsx, .xls, .csv, .txt, .docx, .doc, .pdf`) trong `FinanceExcelImportModal.tsx`.
+    * `apps/ceohn10_app_fe/src/routes/analytics.tsx`: Thêm 2 danh mục "Báo cáo sự kiện" và "Báo cáo thiện nguyện (CSR)".
+  - **5. Chuyển Đổi Lịch Học & Điểm Danh Mã QR Realtime Trên Mobile App**:
+    * Thay đổi toàn bộ khái niệm "Đào tạo" / "Chương trình đào tạo" thành **"Lịch học"** trên toàn bộ giao diện Mobile App:
+      - `CustomHomeShortcutsModal.tsx`: Shortcut "Lịch học" - "Lịch học, điểm danh QR & phòng họp video".
+      - `AllFeaturesModal.tsx`: Feature "Lịch học" - "Lịch học, điểm danh QR & phòng họp trực tuyến".
+      - `association.training.tsx`: Tiêu đề màn hình "Lịch Học & Điểm Danh", tiêu đề banner "Lịch Học & Điểm Danh Lớp CEO HN10", 3 thẻ KPI (Tổng buổi học, Buổi học Live, Tài liệu học tập).
+    * **Chức năng Mã QR Điểm Danh Buổi Học**:
+      - Bổ sung nút "Mã QR" trên từng thẻ buổi học: Mở popup hiển thị mã QR kích thước lớn, chứa link điểm danh `https://ceohn10.viconnect.vn/association/training?checkin=${training.id}` để chiếu lên máy chiếu hoặc đưa cho học viên quét.
+      - Hiển thị trực tiếp sĩ số học viên đã điểm danh trên thẻ: `Đã điểm danh: ${t.attendee_count} / ${t.max_attendees} học viên`.
+      - Nút "Quét QR Điểm Danh" trên thanh tìm kiếm: Cho phép học viên dán link hoặc nhập mã buổi học để điểm danh tức thì.
+      - Nút "Điểm danh ngay" trên thẻ: Gửi `POST /trainings/:id/join` với thông tin hội viên, cập nhật số lượng `attendee_count` tăng realtime trên giao diện và lưu trữ vào PostgreSQL `113.20.107.184:6432`.
+      - Tự động nhận diện URL `?checkin=<training_id>`: Khi học viên quét QR bằng camera điện thoại, hệ thống tự động ghi nhận điểm danh và thông báo thành công.
+      - `AssociationQrScanModal.tsx`: Tích hợp tự động bắt các mã QR chứa `training?checkin=` để điểm danh và chuyển hướng mượt mà.
+  - **6. Kiểm Tra Chất Lượng Mã Nguồn Tuyệt Đối (STRICT CODE QUALITY)**:
+    * Kiểm tra TypeScript Diagnostics trên toàn bộ các file đã chỉnh sửa: **PASS 100% với 0 lỗi (0 errors)**.
+    * Route tree TanStack Router được tạo mới đồng bộ với mã thoát 0.
+  - **7. Tuân Thủ Nghiêm Ngặt Quy Chuẩn**:
+    * Tuyệt đối không tự ý chạy `git commit` hay `git push`.
+    * Dữ liệu thực tế được lưu và truy xuất chuẩn mực từ CSDL duy nhất `113.20.107.184:6432`.
 
 - **Bản cập nhật ngày 17/11/2026 (v12.13): Chuẩn Hóa Realtime Dòng Tiền & Sổ Quỹ Thu Chi, Đồng Bộ Hội Phí & Hóa Đơn, Sửa Lỗi Xem Tài Liệu, Chuẩn Hóa Role BCS Lớp & BCS Team Theo Sơ Đồ, Triệt Tiêu 404 Icons & React Error #418, Cấu Hình Subdomain & Git Auto-Deploy CI/CD ([NODE-CRM-001], [NODE-CRM-004], [NODE-CRM-005], [NODE-CRM-009], [NODE-CRM-010], [NODE-CORE-001])**:
   - **1. Khắc Phục Sổ Quỹ Realtime & Dòng Tiền Biến Động Thực Tế**:
@@ -4791,6 +4881,51 @@
      - Tuân thủ nghiêm ngặt STRICT RULE 1: Tuyệt đối không tự động chạy `git push` hay `git commit`.
 
 # System Memory & Architecture
+
+- **Bản cập nhật ngày 17/11/2026 (v12.14): Tái Cấu Trúc Toàn Diện Sidebar Web CRM 9 Nhóm Chức Năng, Luồng Tạo Sự Kiện Thiện Nguyện Ban Thiện Nguyện, Báo Cáo Tài Chính Đa Định Dạng (Word/Excel/PDF), Quỹ Tài Trợ CSR & Chuyển Đổi Lịch Học Kèm Điểm Danh Mã QR Realtime Trên Mobile App ([NODE-CRM-001], [NODE-CRM-002], [NODE-CRM-005], [NODE-CRM-006], [NODE-CRM-018], [NODE-APP-003], [NODE-APP-008])**:
+  - **1. Tái Cấu Trúc Toàn Diện Sidebar Web CRM Theo 9 Nhóm Chuẩn (`Sidebar.tsx`)**:
+    * **Nhóm Đỉnh (Top-Level)**: Tổng quan (`/`), Trợ lý AI (`/ai-assistant`), Học viên (`/members`), Lớp học & Khóa học (`/trainings` - Menu Tree phân cấp: Tất cả lớp học, Xem & Thiết lập buổi học, Nhật ký buổi học đã diễn ra).
+    * **Nhóm TRUYỀN THÔNG (Sự Kiện)**: Sự kiện (`/events`), Tổng quan sự kiện (`/events-overview`), Biểu quyết (`/voting`), Đăng ký sự kiện (`/event-registrations`), Bốc thăm trúng thưởng (`/lucky-draw`).
+    * **Nhóm TÀI TRỢ**: Nhà tài trợ (`/sponsors` - bỏ các gói tài trợ cụ thể), Báo cáo tài trợ (`/sponsor-report`), Quỹ tài trợ (`/sponsors?tab=funds` - hiển thị chi tiết 3 nguồn: Tiền mặt, Hiện vật, Quỹ dành cho thiện nguyện).
+    * **Nhóm TÀI CHÍNH**: Thống kê báo cáo (`/analytics` - bổ sung Thống kê Sự kiện & Thiện nguyện CSR), Khoản thu (`/income`), Khoản chi (`/expenses`), Báo cáo tài chính (`/finance-report` - bộ chọn danh mục chi tiết để xuất báo cáo Word, Excel, PDF; hỗ trợ nhập file Excel, Word, PDF).
+    * **Nhóm TRUYỀN THÔNG (Tin Tức)**: Thông báo (`/notifications`), Tin tức & Truyền thông (`/news`), Quyền lợi & Ưu đãi (`/perks`).
+    * **Nhóm KẾT NỐI GIAO THƯƠNG**: Nhắn tin (`/network`), Chia sẻ cơ hội (`/opportunities`), Giao thương B2B (`/marketplace`).
+    * **Nhóm HOẠT ĐỘNG**: Quản lý công việc (`/tasks`), Quản lý cuộc họp (`/meetings`), Tài liệu biểu mẫu (`/documents`).
+    * **Nhóm HỆ THỐNG**: Cài đặt hệ thống (`/settings`), Lịch sử hoạt động (`/activity`).
+    * **Nhóm PHÂN QUYỀN**: Phân quyền hệ thống (`/permissions`), Quản lý Ban Chuyên Môn (`/departments` - bổ sung Ban Thiện Nguyện `BTN`), Quản trị người dùng (`/accounts` - chuẩn hóa sơ đồ role Lớp trưởng, Lớp phó lâm thời & BCS Team).
+  - **2. Luồng Tạo Sự Kiện Thiện Nguyện (CSR) & Phân Quyền Ban Thiện Nguyện**:
+    * `apps/ceohn10_app_fe/src/routes/events.index.tsx`: Bổ sung kiểm tra quyền `isCharityRole` dành riêng cho Ban Thiện Nguyện (`truong_ban_thien_nguyen`, `thanh_vien_ban_thien_nguyen`, `tb_doi_song_tap_su`, `lop_pho_doi_song`, `admin`, `chu_tich`).
+    * Bổ sung nút "Tạo Sự Kiện Thiện Nguyện" với icon `Heart` màu teal gradient chỉ hiển thị khi người dùng thuộc Ban Thiện Nguyện hoặc lãnh đạo lớp.
+    * Tích hợp `EventWizard.tsx` với template CSR đặc thù (`EVENT_TYPE_TEMPLATES.charity`): Tự động nạp sẵn tiêu đề "HÀNH TRÌNH TƯƠNG THÂN TƯƠNG ÁI: ĐOÀN KẾT VÌ CỘNG ĐỒNG - CEO HN10", khẩu hiệu, banner thiện nguyện, mô tả và thiết lập vé thiện nguyện miễn phí.
+    * Đã seed sự kiện thiện nguyện `evt-csr-ceohn10-2026` trực tiếp vào CSDL PostgreSQL chuẩn `113.20.107.184:6432`.
+  - **3. Quỹ Tài Trợ Trong Quản Lý Nhà Tài Trợ (`/sponsors`)**:
+    * Thêm 2 Tab: "Danh Sách Nhà Tài Trợ" và "Quỹ Tài Trợ (Tiền Mặt · Hiện Vật · Thiện Nguyện)".
+    * Trong Tab Quỹ Tài Trợ: Thống kê tách biệt 3 nguồn quỹ: Quỹ Tiền Mặt, Quỹ Hiện Vật, Quỹ Thiện Nguyện (CSR).
+    * Bộ lọc loại quỹ trực quan; đã loại bỏ hoàn toàn các liên kết đến gói tài trợ cụ thể.
+    * Đã seed 4 bản ghi nhà tài trợ đa dạng nguồn quỹ trực tiếp vào PostgreSQL `113.20.107.184:6432`.
+  - **4. Báo Cáo Tài Chính Đa Định Dạng (Word, Excel, PDF)**:
+    * `apps/ceohn10_app_fe/src/lib/excel-export.ts`: Bổ sung hàm `exportToWord` xuất file Word `.docx`/`.doc` chuẩn văn bản hành chính Việt Nam (Quốc hiệu tiêu ngữ, bảng biểu kẻ ô, tổng kết thu chi, chữ ký 3 bên: Người lập biểu, Kế toán trưởng, Chủ tịch / Lớp trưởng).
+    * `apps/ceohn10_app_fe/src/routes/finance-report.tsx`: Bổ sung bộ chọn chi tiết danh mục xuất báo cáo (Tất cả, Hội phí, Sự kiện, Thiện nguyện CSR, Tài trợ, Chi phí hoạt động); bổ sung nút "Xuất Word (.docx)" bên cạnh "Xuất Excel" và "In Báo Cáo PDF".
+    * Hỗ trợ nhận diện tiếp nhận file đa định dạng (`.xlsx, .xls, .csv, .txt, .docx, .doc, .pdf`) trong `FinanceExcelImportModal.tsx`.
+    * `apps/ceohn10_app_fe/src/routes/analytics.tsx`: Thêm 2 danh mục "Báo cáo sự kiện" và "Báo cáo thiện nguyện (CSR)".
+  - **5. Chuyển Đổi Lịch Học & Điểm Danh Mã QR Realtime Trên Mobile App**:
+    * Thay đổi toàn bộ khái niệm "Đào tạo" / "Chương trình đào tạo" thành **"Lịch học"** trên toàn bộ giao diện Mobile App:
+      - `CustomHomeShortcutsModal.tsx`: Shortcut "Lịch học" - "Lịch học, điểm danh QR & phòng họp video".
+      - `AllFeaturesModal.tsx`: Feature "Lịch học" - "Lịch học, điểm danh QR & phòng họp trực tuyến".
+      - `association.training.tsx`: Tiêu đề màn hình "Lịch Học & Điểm Danh", tiêu đề banner "Lịch Học & Điểm Danh Lớp CEO HN10", 3 thẻ KPI (Tổng buổi học, Buổi học Live, Tài liệu học tập).
+    * **Chức năng Mã QR Điểm Danh Buổi Học**:
+      - Bổ sung nút "Mã QR" trên từng thẻ buổi học: Mở popup hiển thị mã QR kích thước lớn, chứa link điểm danh `https://ceohn10.viconnect.vn/association/training?checkin=${training.id}` để chiếu lên máy chiếu hoặc đưa cho học viên quét.
+      - Hiển thị trực tiếp sĩ số học viên đã điểm danh trên thẻ: `Đã điểm danh: ${t.attendee_count} / ${t.max_attendees} học viên`.
+      - Nút "Quét QR Điểm Danh" trên thanh tìm kiếm: Cho phép học viên dán link hoặc nhập mã buổi học để điểm danh tức thì.
+      - Nút "Điểm danh ngay" trên thẻ: Gửi `POST /trainings/:id/join` với thông tin hội viên, cập nhật số lượng `attendee_count` tăng realtime trên giao diện và lưu trữ vào PostgreSQL `113.20.107.184:6432`.
+      - Tự động nhận diện URL `?checkin=<training_id>`: Khi học viên quét QR bằng camera điện thoại, hệ thống tự động ghi nhận điểm danh và thông báo thành công.
+      - `AssociationQrScanModal.tsx`: Tích hợp tự động bắt các mã QR chứa `training?checkin=` để điểm danh và chuyển hướng mượt mà.
+  - **6. Kiểm Tra Chất Lượng Mã Nguồn Tuyệt Đối (STRICT CODE QUALITY)**:
+    * Kiểm tra TypeScript Diagnostics trên toàn bộ các file đã chỉnh sửa: **PASS 100% với 0 lỗi (0 errors)**.
+    * Route tree TanStack Router được tạo mới đồng bộ với mã thoát 0.
+  - **7. Tuân Thủ Nghiêm Ngặt Quy Chuẩn**:
+    * Tuyệt đối không tự ý chạy `git commit` hay `git push`.
+    * Dữ liệu thực tế được lưu và truy xuất chuẩn mực từ CSDL duy nhất `113.20.107.184:6432`.
 
 - **Bản cập nhật ngày 17/11/2026 (v12.13): Chuẩn Hóa Realtime Dòng Tiền & Sổ Quỹ Thu Chi, Đồng Bộ Hội Phí & Hóa Đơn, Sửa Lỗi Xem Tài Liệu, Chuẩn Hóa Role BCS Lớp & BCS Team Theo Sơ Đồ, Triệt Tiêu 404 Icons & React Error #418, Cấu Hình Subdomain & Git Auto-Deploy CI/CD ([NODE-CRM-001], [NODE-CRM-004], [NODE-CRM-005], [NODE-CRM-009], [NODE-CRM-010], [NODE-CORE-001])**:
   - **1. Khắc Phục Sổ Quỹ Realtime & Dòng Tiền Biến Động Thực Tế**:

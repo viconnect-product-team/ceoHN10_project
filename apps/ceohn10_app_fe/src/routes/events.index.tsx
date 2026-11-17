@@ -19,6 +19,7 @@ import {
   Package,
   MessageSquare,
   Camera,
+  Heart,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -86,6 +87,7 @@ const TYPE_KEY: Record<EventItem["type"], TKey> = {
   workshop: "events.type.workshop",
   networking: "events.type.networking",
   training: "events.type.training",
+  charity: "events.type.charity" as TKey,
 };
 // Decorative branded covers per event type — purely visual, no fabricated data.
 const TYPE_COVER: Record<EventItem["type"], string> = {
@@ -93,10 +95,12 @@ const TYPE_COVER: Record<EventItem["type"], string> = {
   workshop: "linear-gradient(135deg, oklch(0.55 0.15 195), oklch(0.60 0.14 235))",
   networking: "linear-gradient(135deg, oklch(0.58 0.16 330), oklch(0.60 0.16 20))",
   training: "linear-gradient(135deg, oklch(0.55 0.15 155), oklch(0.60 0.14 195))",
+  charity: "linear-gradient(135deg, #0D9488, #047857)",
 };
 
 export const EVENT_DEPARTMENTS = [
   { value: "all", label: "Tất cả các Ban", color: "bg-slate-100 text-slate-700 border-slate-200" },
+  { value: "ban_thien_nguyen", label: "Ban Thiện Nguyện", color: "bg-teal-50 text-teal-700 border-teal-200" },
   { value: "ban_hoc_tap", label: "Ban Học tập", color: "bg-blue-50 text-blue-700 border-blue-200" },
   { value: "ban_su_kien", label: "Ban Sự kiện & Hậu cần", color: "bg-purple-50 text-purple-700 border-purple-200" },
   { value: "ban_tai_chinh", label: "Ban Tài chính & Tài trợ", color: "bg-yellow-50 text-yellow-700 border-yellow-200" },
@@ -108,6 +112,7 @@ export const EVENT_DEPARTMENTS = [
 ];
 
 export const DEPARTMENT_LABELS: Record<string, { label: string; color: string }> = {
+  ban_thien_nguyen: { label: "Ban Thiện Nguyện", color: "bg-teal-100 text-teal-800 border-teal-200" },
   ban_hoc_tap: { label: "Ban Học tập", color: "bg-blue-100 text-blue-800 border-blue-200" },
   ban_su_kien: { label: "Ban Sự kiện & Hậu cần", color: "bg-purple-100 text-purple-800 border-purple-200" },
   ban_tai_chinh: { label: "Ban Tài chính & Tài trợ", color: "bg-yellow-100 text-yellow-800 border-yellow-200" },
@@ -166,6 +171,17 @@ function EventsPage() {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
   const [wizardOpen, setWizardOpen] = useState(false);
+  const [wizardInitialType, setWizardInitialType] = useState<EventItem["type"] | undefined>(undefined);
+
+  const isCharityRole = useMemo(() => {
+    if (!user) return false;
+    const r = (user.role || "").toLowerCase();
+    const s = ((user as any).srsRole || "").toLowerCase();
+    const dept = ((user as any).department || "").toLowerCase();
+    const isSuper = ["admin", "superadmin", "chu_tich", "quan_tri", "lop_truong", "truong_team_lt"].some((x) => r.includes(x) || s.includes(x));
+    const isCharity = ["thien_nguyen", "btn", "doi_song"].some((x) => r.includes(x) || s.includes(x) || dept.includes(x));
+    return isSuper || isCharity;
+  }, [user]);
   const [editing, setEditing] = useState<EventItem | null>(null);
   const [qrGatekeeperEvent, setQrGatekeeperEvent] = useState<EventItem | null>(null);
   const [selectedSupplyEvent, setSelectedSupplyEvent] = useState<EventItem | null>(null);
@@ -232,6 +248,7 @@ function EventsPage() {
         { value: "workshop", label: t("events.type.workshop") },
         { value: "networking", label: t("events.type.networking") },
         { value: "training", label: t("events.type.training") },
+        { value: "charity", label: "Sự kiện Thiện Nguyện (CSR)" },
       ],
     },
     {
@@ -549,9 +566,22 @@ ${(e as any).description ? `📝 Chi tiết: ${(e as any).description}\n\n` : ""
                     {t("common.export")}
                   </button>
                 )}
+                {isCharityRole && (
+                  <button
+                    onClick={() => {
+                      setWizardInitialType("charity");
+                      setWizardOpen(true);
+                    }}
+                    className="inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold text-white bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 shadow-md shadow-teal-500/20 cursor-pointer transition active:scale-95"
+                  >
+                    <Heart className="h-4 w-4" />
+                    Tạo Sự Kiện Thiện Nguyện
+                  </button>
+                )}
                 {can(PERMISSIONS.EVENT_CREATE) && (
                   <button
                     onClick={() => {
+                      setWizardInitialType(undefined);
                       setWizardOpen(true);
                     }}
                     className="inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold text-primary-foreground shadow-[var(--shadow-glow)] cursor-pointer"
@@ -644,6 +674,7 @@ ${(e as any).description ? `📝 Chi tiết: ${(e as any).description}\n\n` : ""
               <option value="workshop">{t("events.type.workshop")}</option>
               <option value="networking">{t("events.type.networking")}</option>
               <option value="training">{t("events.type.training")}</option>
+              <option value="charity">Thiện nguyện (CSR)</option>
             </select>
             <select
               value={status}
@@ -1148,9 +1179,14 @@ ${(e as any).description ? `📝 Chi tiết: ${(e as any).description}\n\n` : ""
 
       <EventWizard
         open={wizardOpen}
-        onClose={() => setWizardOpen(false)}
+        initialType={wizardInitialType}
+        onClose={() => {
+          setWizardOpen(false);
+          setWizardInitialType(undefined);
+        }}
         onCreated={(ev) => {
           setWizardOpen(false);
+          setWizardInitialType(undefined);
           router.invalidate();
           router.navigate({ to: "/events/$eventId", params: { eventId: ev.id } });
         }}

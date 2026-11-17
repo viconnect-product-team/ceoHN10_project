@@ -28,7 +28,7 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchNestApi } from "@/lib/api-client";
 import type { Transaction } from "@/types/finance.types";
 import { useFmt, useT } from "@/lib/i18n";
-import { exportToExcel, formatDisplayDate, formatExcelCurrency, numberToVietnameseWords } from "@/lib/excel-export";
+import { exportToExcel, exportToWord, formatDisplayDate, formatExcelCurrency, numberToVietnameseWords } from "@/lib/excel-export";
 import { toast } from "sonner";
 import { useTableControls } from "@/hooks/use-table-controls";
 import { Pagination } from "@/components/dashboard/DataTablePagination";
@@ -241,23 +241,39 @@ function FinanceReport() {
     year: "Kỳ báo cáo: Theo Năm",
   };
 
+  const [selectedExportCategory, setSelectedExportCategory] = useState<string>("all");
+
+  const getFilteredExportList = (catFilter = selectedExportCategory) => {
+    if (catFilter === "all") return transactions;
+    return transactions.filter((t) => {
+      const c = (t.category || "").toLowerCase();
+      if (catFilter === "Hội phí") return c.includes("hội phí") || c.includes("niên");
+      if (catFilter === "Sự kiện") return c.includes("sự kiện") || c.includes("gala") || c.includes("vé");
+      if (catFilter === "Thiện nguyện") return c.includes("thiện nguyện") || c.includes("từ thiện") || c.includes("csr");
+      if (catFilter === "Tài trợ") return c.includes("tài trợ") || c.includes("ủng hộ");
+      if (catFilter === "Hoạt động") return c.includes("hoạt động") || c.includes("văn phòng") || c.includes("họp");
+      return c.includes(catFilter.toLowerCase());
+    });
+  };
+
   const handleExportCsv = () => {
-    const totalIn = income.reduce((s, tx) => s + tx.amount, 0);
-    const totalOut = expense.reduce((s, tx) => s + tx.amount, 0);
-    const net = totalIn - totalOut;
+    const list = getFilteredExportList();
+    const subIn = list.filter((t) => t.type === "income").reduce((s, tx) => s + tx.amount, 0);
+    const subOut = list.filter((t) => t.type === "expense").reduce((s, tx) => s + tx.amount, 0);
+    const net = subIn - subOut;
 
     exportToExcel<Transaction>({
       title: `BÁO CÁO TỔNG HỢP KIỂM TOÁN TÀI CHÍNH (${periodLabels[period].toUpperCase()})`,
-      subtitle: `${periodLabels[period]} | Hệ thống quản lý tài chính CLB Doanh Nhân CEO HN10`,
-      filename: `bao-cao-tai-chinh-${period}-ceohn10`,
+      subtitle: `${periodLabels[period]} | Danh mục: ${selectedExportCategory === "all" ? "Tất cả các nguồn quỹ" : selectedExportCategory} | CLB Doanh Nhân CEO HN10`,
+      filename: `bao-cao-tai-chinh-${selectedExportCategory}-${period}-ceohn10`,
       sheetName: "Nhat_Ky_Thu_Chi",
       organization: "CLB DOANH NHÂN CEO HN10 (HANOIBA)",
       address: "Tòa nhà HanoiBA, TP. Hà Nội",
       circularCode: "Mẫu số S07-DN",
       circularNote: "(Ban hành theo Thông tư số 200/2014/TT-BTC ngày 22/12/2014 của Bộ Tài chính)",
-      fundType: "Quỹ hoạt động CLB Doanh Nhân CEO HN10",
+      fundType: selectedExportCategory === "all" ? "Quỹ hoạt động CLB Doanh Nhân CEO HN10" : `Quỹ ${selectedExportCategory}`,
       currencyUnit: "VNĐ",
-      data: transactions,
+      data: list,
       columns: [
         { header: "Mã chứng từ", key: "id", width: 16, value: (tx) => tx.id },
         { header: "Ngày ghi sổ", key: "date", width: 16, value: (tx) => formatDisplayDate(tx.date) },
@@ -271,14 +287,47 @@ function FinanceReport() {
         { header: "Trạng thái kiểm toán", key: "status", width: 18, value: (tx) => (tx.status === "completed" ? "Đã duyệt" : "Chờ duyệt") },
       ],
       summaryRows: [
-        ["TỔNG CỘNG NGUỒN THU:", "", "", "", "", "", "", formatExcelCurrency(totalIn) + " đ", "", ""],
-        ["TỔNG CỘNG KHOẢN CHI:", "", "", "", "", "", "", formatExcelCurrency(totalOut) + " đ", "", ""],
+        ["TỔNG CỘNG NGUỒN THU:", "", "", "", "", "", "", formatExcelCurrency(subIn) + " đ", "", ""],
+        ["TỔNG CỘNG KHOẢN CHI:", "", "", "", "", "", "", formatExcelCurrency(subOut) + " đ", "", ""],
         ["TỒN QUỸ RÒNG / THẶNG DƯ:", "", "", "", "", "", "", formatExcelCurrency(net) + " đ", "", ""],
       ],
-      amountInWords: numberToVietnameseWords(net >= 0 ? net : totalIn),
+      amountInWords: numberToVietnameseWords(net >= 0 ? net : subIn),
       signerTitles: ["NGƯỜI LẬP BÁO CÁO", "TRƯỞNG BAN TÀI CHÍNH", "CHỦ TỊCH CLB CEO HN10"],
     });
-    toast.success(`Đã xuất báo cáo tài chính (${periodLabels[period]}) chuẩn doanh nghiệp CEO HN10 (.xlsx)!`);
+    toast.success(`Đã xuất báo cáo tài chính danh mục "${selectedExportCategory}" sang Excel (.xlsx)!`);
+  };
+
+  const handleExportWord = () => {
+    const list = getFilteredExportList();
+    const subIn = list.filter((t) => t.type === "income").reduce((s, tx) => s + tx.amount, 0);
+    const subOut = list.filter((t) => t.type === "expense").reduce((s, tx) => s + tx.amount, 0);
+    const net = subIn - subOut;
+
+    exportToWord<Transaction>({
+      title: "BÁO CÁO THU CHI & QUYẾT TOÁN TÀI CHÍNH",
+      subtitle: `${periodLabels[period]} | Hệ thống quản trị tài chính CLB Doanh Nhân CEO HN10`,
+      categoryName: selectedExportCategory === "all" ? "Tất cả các nguồn quỹ" : selectedExportCategory,
+      filename: `bao-cao-tai-chinh-${selectedExportCategory}-${period}-ceohn10`,
+      columns: [
+        { header: "Mã CT", key: "id", value: (tx) => tx.id },
+        { header: "Ngày ghi sổ", key: "date", value: (tx) => formatDisplayDate(tx.date) },
+        { header: "Phân loại", key: "type", value: (tx) => (tx.type === "income" ? "Khoản Thu" : "Khoản Chi") },
+        { header: "Danh mục", key: "category", value: (tx) => tx.category },
+        { header: "Nội dung hạch toán", key: "description", value: (tx) => tx.description },
+        { header: "Số tiền (VNĐ)", key: "amount", value: (tx) => formatExcelCurrency(tx.amount) },
+        { header: "Người nộp / nhận", key: "recipient", value: (tx) => tx.recipient || "—" },
+        { header: "Hình thức", key: "method", value: (tx) => (tx.method === "cash" ? "Tiền mặt" : "Chuyển khoản") },
+      ],
+      data: list,
+      summaryRows: [
+        ["TỔNG THU:", formatExcelCurrency(subIn) + " đ"],
+        ["TỔNG CHI:", formatExcelCurrency(subOut) + " đ"],
+        ["TỒN QUỸ RÒNG:", formatExcelCurrency(net) + " đ"],
+      ],
+      amountInWords: numberToVietnameseWords(net >= 0 ? net : subIn),
+      signerTitles: ["NGƯỜI LẬP BIỂU", "TRƯỞNG BAN TÀI CHÍNH", "CHỦ TỊCH CLB CEO HN10"],
+    });
+    toast.success(`Đã xuất báo cáo tài chính danh mục "${selectedExportCategory}" sang Word (.doc/.docx)!`);
   };
 
   const handleExportPdf = () => {
@@ -293,21 +342,49 @@ function FinanceReport() {
         subtitle="Tổng hợp thu chi thực tế, cơ cấu ngân quỹ và số liệu kế toán minh bạch"
         actions={
           <div className="flex flex-wrap items-center gap-2">
+            {/* Bộ chọn danh mục xuất báo cáo */}
+            <div className="flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800 rounded-xl px-2.5 py-1 border border-border">
+              <span className="text-[11px] font-bold text-muted-foreground whitespace-nowrap">Danh mục xuất:</span>
+              <select
+                value={selectedExportCategory}
+                onChange={(e) => setSelectedExportCategory(e.target.value)}
+                className="bg-transparent text-xs font-bold text-foreground outline-none cursor-pointer"
+              >
+                <option value="all">Tất cả danh mục quỹ</option>
+                <option value="Hội phí">Quỹ Hội Phí / Niên Liễm</option>
+                <option value="Sự kiện">Quỹ Sự Kiện & Hội Nghị</option>
+                <option value="Thiện nguyện">Quỹ Thiện Nguyện (CSR)</option>
+                <option value="Tài trợ">Quỹ Tài Trợ & Đóng Góp</option>
+                <option value="Hoạt động">Quỹ Chi Hoạt Động Lớp</option>
+              </select>
+            </div>
+
             <button
               type="button"
               onClick={() => setShowImportModal(true)}
               className="inline-flex items-center gap-1.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3.5 py-2 text-xs font-bold text-slate-800 dark:text-slate-200 shadow-xs hover:bg-slate-50 cursor-pointer transition"
+              title="Hỗ trợ nhập file định dạng Excel, Word, PDF"
             >
               <Upload className="h-4 w-4" />
-              <span>Nhập Excel</span>
+              <span>Nhập File (Excel / Word / PDF)</span>
             </button>
             <button
               type="button"
               onClick={handleExportCsv}
               className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 px-3.5 py-2 text-xs font-bold text-white shadow-xs cursor-pointer transition"
+              title="Xuất file bảng tính Excel (.xlsx)"
             >
               <FileSpreadsheet className="h-4 w-4" />
-              <span>Xuất Excel</span>
+              <span>Xuất Excel (.xlsx)</span>
+            </button>
+            <button
+              type="button"
+              onClick={handleExportWord}
+              className="inline-flex items-center gap-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 px-3.5 py-2 text-xs font-bold text-white shadow-xs cursor-pointer transition"
+              title="Xuất văn bản báo cáo Word (.docx)"
+            >
+              <FileText className="h-4 w-4" />
+              <span>Xuất Word (.docx)</span>
             </button>
             <button
               type="button"
@@ -315,14 +392,15 @@ function FinanceReport() {
               className="inline-flex items-center gap-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 px-3.5 py-2 text-xs font-bold text-slate-950 shadow-xs cursor-pointer transition"
             >
               <Receipt className="h-4 w-4" />
-              <span>Xuất Hóa Đơn & Bảng Kê</span>
+              <span>Hóa Đơn & Bảng Kê</span>
             </button>
             <button
               type="button"
               onClick={handleExportPdf}
               className="inline-flex items-center gap-1.5 rounded-xl bg-[#003B95] hover:bg-[#002B70] px-3.5 py-2 text-xs font-bold text-white shadow-xs cursor-pointer transition"
+              title="In hoặc tải xuống báo cáo dạng PDF"
             >
-              <FileText className="h-4 w-4" />
+              <Printer className="h-4 w-4" />
               <span>In / Lưu PDF</span>
             </button>
           </div>

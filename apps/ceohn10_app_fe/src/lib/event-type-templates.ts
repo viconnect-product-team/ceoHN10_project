@@ -1,4 +1,4 @@
-export type EventTypeKey = "forum" | "workshop" | "networking" | "training";
+export type EventTypeKey = "forum" | "workshop" | "networking" | "training" | "charity";
 
 export interface EventTypeTemplate {
   key: EventTypeKey;
@@ -90,6 +90,24 @@ export const EVENT_TYPE_TEMPLATES: Record<EventTypeKey, EventTypeTemplate> = {
     defaultCapacity: "120",
     description: "Khóa đào tạo chuyên sâu về kỹ năng đàm phán thương vụ lớn, truyền cảm hứng đội ngũ và xây dựng văn hóa doanh nghiệp bền vững.",
     defaultTicketName: "Vé Huấn Luyện C-Level (Chứng nhận hoàn thành)",
+    defaultTicketPrice: "0",
+  },
+  charity: {
+    key: "charity",
+    label: "Sự kiện Thiện Nguyện (CSR & Cộng đồng)",
+    name: "HÀNH TRÌNH TƯƠNG THÂN TƯƠNG ÁI: ĐOÀN KẾT VÌ CỘNG ĐỒNG - CEO HN10",
+    badge: "❤️ CHƯƠNG TRÌNH THIỆN NGUYỆN CSR",
+    tagline: "Lan tỏa yêu thương, trách nhiệm xã hội & sứ mệnh cộng đồng của Doanh nhân",
+    themeGradient: "linear-gradient(135deg, #042F2E 0%, #0D9488 55%, #065F46 100%)",
+    badgeBg: "rgba(20, 184, 166, 0.25)",
+    badgeText: "#14B8A6",
+    textColor: "#FFFFFF",
+    accentColor: "#14B8A6",
+    bgImage: "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=1200&auto=format&fit=crop&q=80",
+    defaultLocation: "Điểm trường vùng cao / Trung tâm bảo trợ xã hội Hà Nội",
+    defaultCapacity: "100",
+    description: "Chương trình thiện nguyện do Ban Thiện Nguyện CLB Doanh Nhân CEO HN10 tổ chức nhằm xây điểm trường, tặng quà các gia đình chính sách và học sinh nghèo vượt khó.",
+    defaultTicketName: "Vé Đăng ký Đoàn Thiện Nguyện (Miễn phí)",
     defaultTicketPrice: "0",
   },
 };

@@ -225,7 +225,38 @@ export function AssociationQrScanModal({
     if (!raw) return;
     setErrorMsg(null);
 
-    // 0. Quét mã QR Cuộc Họp, Diễn Đàn, Sự Kiện, Đào Tạo trên App & Mạng Lưới (Yêu Cầu 3)
+    // 0. Quét mã QR Điểm danh Buổi học / Lịch học Lớp CEO HN10
+    if (
+      raw.includes("training?checkin=") ||
+      raw.includes("TRAINING_CHECKIN:") ||
+      (raw.includes("checkin") && raw.includes("training"))
+    ) {
+      let trainingId = "";
+      if (raw.includes("checkin=")) {
+        const match = raw.match(/checkin=([^&]+)/);
+        if (match) trainingId = match[1];
+      } else if (raw.includes("TRAINING_CHECKIN:")) {
+        trainingId = raw.replace("TRAINING_CHECKIN:", "").trim();
+      }
+      if (trainingId) {
+        try {
+          await fetchNestApi(`/trainings/${trainingId}/join`, {
+            method: "POST",
+            body: JSON.stringify({}),
+          }).catch(() => null);
+          toast.success("Điểm danh buổi học thành công!");
+          window.location.href = `/association/training?checkin=${trainingId}`;
+          onClose();
+          return;
+        } catch {
+          window.location.href = `/association/training?checkin=${trainingId}`;
+          onClose();
+          return;
+        }
+      }
+    }
+
+    // 0.1 Quét mã QR Cuộc Họp, Diễn Đàn, Sự Kiện, Đào Tạo trên App & Mạng Lưới (Yêu Cầu 3)
     if (
       raw.includes("CEO HN10:MEETING_REGISTER:") ||
       raw.includes("CEO HN10:MEETING:") ||

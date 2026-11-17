@@ -22,21 +22,25 @@ import {
   Maximize2,
   Check,
   Bell,
+  QrCode,
+  ScanLine,
+  Copy,
 } from "lucide-react";
 import { toast } from "sonner";
 import { fetchNestApi } from "@/lib/api-client";
 import { MemberHeader } from "@/components/member/MemberShell";
 import { useAuth } from "@/context/AuthContext";
 import { saveCalendarItem } from "@/lib/calendar-reminder";
+import { QrCanvas } from "@/components/member/QrCanvas";
 
 export const Route = createFileRoute("/association/training")({
   component: AssociationTrainingScreen,
   head: () => ({
     meta: [
-      { title: "Đào Tạo & Phòng Họp Video Trực Tuyến | CEO HN10" },
+      { title: "Lịch Học & Điểm Danh Trực Tuyến | CEO HN10" },
       {
         name: "description",
-        content: "Trung tâm đào tạo doanh nhân và phòng họp trực tuyến Jitsi Meet bảo mật nội bộ CLB CEO HN10",
+        content: "Theo dõi lịch học chuyên đề, điểm danh mã QR tự động & tham gia phòng họp trực tuyến Jitsi Meet bảo mật nội bộ Lớp CEO HN10",
       },
     ],
   }),
@@ -221,6 +225,9 @@ export function AssociationTrainingScreen() {
   // Modals state
   const [activeMeeting, setActiveMeeting] = useState<TrainingItem | null>(null);
   const [materialsModalTraining, setMaterialsModalTraining] = useState<TrainingItem | null>(null);
+  const [qrModalTraining, setQrModalTraining] = useState<TrainingItem | null>(null);
+  const [scanModalOpen, setScanModalOpen] = useState(false);
+  const [manualCode, setManualCode] = useState("");
   const [checkedInIds, setCheckedInIds] = useState<Record<string, boolean>>({});
   const [joiningId, setJoiningId] = useState<string | null>(null);
 
@@ -273,10 +280,30 @@ export function AssociationTrainingScreen() {
     try {
       await fetchNestApi(`/trainings/${training.id}/join`, {
         method: "POST",
-        body: JSON.stringify({ memberId: user?.id }),
+        body: JSON.stringify({
+          memberId: user?.id,
+          userName: user?.name || "Hội viên CEO HN10",
+          email: user?.email || "",
+          phone: user?.phone || "",
+        }),
       }).catch(() => null);
 
       setCheckedInIds((prev) => ({ ...prev, [training.id]: true }));
+
+      // Cập nhật số lượng học viên đã điểm danh trên hệ thống thời gian thực
+      setTrainings((prev) =>
+        prev.map((item) =>
+          item.id === training.id
+            ? { ...item, attendee_count: (item.attendee_count || 0) + 1 }
+            : item
+        )
+      );
+
+      if (qrModalTraining && qrModalTraining.id === training.id) {
+        setQrModalTraining((prev) =>
+          prev ? { ...prev, attendee_count: (prev.attendee_count || 0) + 1 } : null
+        );
+      }
 
       // Tự động lưu vào Lịch & Bật báo thức nhắc lịch
       saveCalendarItem({
@@ -291,18 +318,35 @@ export function AssociationTrainingScreen() {
             })
           : "09:00",
         location: training.location || "Phòng họp trực tuyến Jitsi Meet",
-        details: `Chuyên gia: ${training.instructor_name || "CEO HN10"}`,
+        details: `Giảng viên / Lãnh đạo lớp: ${training.instructor_name || "CEO HN10"}`,
         alarmEnabled: true,
         alarmLeadMinutes: 30,
       });
 
-      toast.success("Điểm danh & đã lưu lịch đào tạo vào Báo thức nhắc hẹn!");
+      toast.success(
+        `Điểm danh thành công buổi học "${training.title}"! Tổng số học viên có mặt: ${(training.attendee_count || 0) + 1}`
+      );
     } catch {
       toast.error("Không thể ghi nhận điểm danh.");
     } finally {
       setJoiningId(null);
     }
   };
+
+  // Tự động nhận diện quét mã QR điểm danh qua URL query (?checkin=<id>)
+  useEffect(() => {
+    if (typeof window === "undefined" || trainings.length === 0) return;
+    const searchParams = new URLSearchParams(window.location.search);
+    const checkinId = searchParams.get("checkin");
+    if (checkinId && !checkedInIds[checkinId]) {
+      const matched = trainings.find((t) => t.id === checkinId);
+      if (matched) {
+        handleJoinTraining(matched);
+        const cleanUrl = window.location.pathname;
+        window.history.replaceState({}, document.title, cleanUrl);
+      }
+    }
+  }, [trainings]);
 
   const filteredTrainings = useMemo(() => {
     return trainings.filter((t) => {
@@ -343,7 +387,7 @@ export function AssociationTrainingScreen() {
 
   return (
     <div className="vba-animate pb-24 min-h-screen bg-stone-50 dark:bg-slate-950 font-sans">
-      <MemberHeader title="Đào Tạo & Họp Trực Tuyến" back />
+      <MemberHeader title="Lịch Học & Điểm Danh" back />
 
       {/* Top Banner & Quick KPI */}
       <div className="px-4 pt-3 space-y-3 max-w-2xl mx-auto">
@@ -352,11 +396,11 @@ export function AssociationTrainingScreen() {
             <div>
               <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-400/20 text-amber-300 text-[10.5px] font-bold border border-amber-400/30 mb-1.5">
                 <Sparkles className="size-3.5 text-amber-400" />
-                <span>Học Viện Lãnh Đạo CEO HN10</span>
+                <span>Lớp Học Doanh Nhân CEO HN10</span>
               </div>
-              <h2 className="text-base font-black tracking-tight">Trung Tâm Đào Tạo & Họp Video</h2>
+              <h2 className="text-base font-black tracking-tight">Lịch Học & Điểm Danh Lớp CEO HN10</h2>
               <p className="text-xs text-slate-300 mt-1 leading-relaxed">
-                Nâng tầm tư duy lãnh đạo, chia sẻ kinh nghiệm thực chiến & phòng họp Jitsi Meet bảo mật nội bộ.
+                Theo dõi lịch học chuyên đề, quét mã QR điểm danh tự động & tham gia phòng học trực tuyến Jitsi Meet.
               </p>
             </div>
 
@@ -374,13 +418,13 @@ export function AssociationTrainingScreen() {
         {/* 3 Metric Cards */}
         <div className="grid grid-cols-3 gap-2 text-center">
           <div className="p-3 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs">
-            <span className="text-[10px] font-bold text-slate-400 uppercase">Tổng chuyên đề</span>
+            <span className="text-[10px] font-bold text-slate-400 uppercase">Tổng buổi học</span>
             <div className="text-base font-black text-[#1F3864] dark:text-blue-400 mt-0.5">
               {trainings.length}
             </div>
           </div>
           <div className="p-3 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs">
-            <span className="text-[10px] font-bold text-slate-400 uppercase">Phòng họp Live</span>
+            <span className="text-[10px] font-bold text-slate-400 uppercase">Buổi học Live</span>
             <div className="text-base font-black text-emerald-600 mt-0.5 flex items-center justify-center gap-1">
               {ongoingCount > 0 && (
                 <span className="size-2 rounded-full bg-emerald-500 animate-ping inline-block" />
@@ -389,22 +433,34 @@ export function AssociationTrainingScreen() {
             </div>
           </div>
           <div className="p-3 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs">
-            <span className="text-[10px] font-bold text-slate-400 uppercase">Tài liệu lưu hành</span>
+            <span className="text-[10px] font-bold text-slate-400 uppercase">Tài liệu học tập</span>
             <div className="text-base font-black text-[#B8860B] mt-0.5">
               {totalMaterialsCount}
             </div>
           </div>
         </div>
 
-        {/* Search bar */}
-        <div className="relative">
-          <Search className="size-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-          <input
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Tìm theo tên bài giảng, giảng viên, nội dung..."
-            className="w-full pl-8 pr-3 py-2 text-xs rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 outline-none focus:border-[#1F3864] text-slate-800 dark:text-slate-100 shadow-2xs"
-          />
+        {/* Search bar & Scan QR Quick Button */}
+        <div className="flex items-center gap-2">
+          <div className="relative flex-1">
+            <Search className="size-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+            <input
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Tìm theo tên buổi học, giảng viên, nội dung bài giảng..."
+              className="w-full pl-8 pr-3 py-2.5 text-xs rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 outline-none focus:border-[#1F3864] text-slate-800 dark:text-slate-100 shadow-2xs"
+            />
+          </div>
+          <button
+            type="button"
+            onClick={() => setScanModalOpen(true)}
+            className="px-3.5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white text-xs font-bold flex items-center gap-1.5 shadow-sm active:scale-95 cursor-pointer shrink-0"
+            title="Quét mã QR để điểm danh buổi học"
+          >
+            <ScanLine className="size-4" />
+            <span className="hidden sm:inline">Quét QR Điểm Danh</span>
+            <span className="sm:hidden">Quét QR</span>
+          </button>
         </div>
 
         {/* Status Navigation Tabs (Strictly No Red) */}
@@ -561,10 +617,10 @@ export function AssociationTrainingScreen() {
                       )}
                       <div className="min-w-0">
                         <div className="font-bold text-slate-800 dark:text-slate-100 truncate">
-                          {t.instructor_name || "Ban Đào Tạo CEO HN10"}
+                          {t.instructor_name || "Ban Học Tập & Lãnh Đạo Lớp CEO HN10"}
                         </div>
                         <div className="text-[10.5px] text-slate-500 dark:text-slate-400 truncate">
-                          {t.instructor_title || "Chuyên gia cố vấn"}
+                          {t.instructor_title || "Giảng viên / Lãnh đạo lớp"}
                         </div>
                       </div>
                     </div>
@@ -593,8 +649,8 @@ export function AssociationTrainingScreen() {
 
                       <div className="flex items-center gap-1.5">
                         <Users className="size-3.5 text-blue-600 shrink-0" />
-                        <span>
-                          {t.attendee_count || 45} / {t.max_attendees || 100} Hội viên tham gia
+                        <span className="font-bold text-slate-800 dark:text-slate-100">
+                          Đã điểm danh: <span className="text-[#003B95] dark:text-blue-400 font-black">{t.attendee_count || 0}</span> / {t.max_attendees || 100} học viên
                         </span>
                       </div>
 
@@ -616,16 +672,27 @@ export function AssociationTrainingScreen() {
                       <button
                         type="button"
                         onClick={() => setActiveMeeting(t)}
-                        className={`flex-1 min-w-[140px] py-2.5 px-3 rounded-2xl text-xs font-bold inline-flex items-center justify-center gap-1.5 shadow-xs transition active:scale-95 cursor-pointer ${
+                        className={`flex-1 min-w-[130px] py-2.5 px-3 rounded-2xl text-xs font-bold inline-flex items-center justify-center gap-1.5 shadow-xs transition active:scale-95 cursor-pointer ${
                           isLive
                             ? "bg-emerald-600 hover:bg-emerald-700 text-white"
                             : "bg-[#1F3864] hover:bg-[#152747] text-white"
                         }`}
                       >
                         <PhoneCall className="size-3.5" />
-                        <span>{isLive ? "Vào Phòng Họp Ngay" : "Mở Phòng Họp"}</span>
+                        <span>{isLive ? "Vào Học Live" : "Vào Buổi Học"}</span>
                       </button>
                     )}
+
+                    {/* QR Code Check-in View Button */}
+                    <button
+                      type="button"
+                      onClick={() => setQrModalTraining(t)}
+                      className="py-2.5 px-3 rounded-2xl bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-950/60 dark:hover:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 text-xs font-bold inline-flex items-center justify-center gap-1.5 transition cursor-pointer border border-indigo-200 dark:border-indigo-800 shadow-2xs"
+                      title="Hiển thị mã QR điểm danh buổi học này"
+                    >
+                      <QrCode className="size-3.5" />
+                      <span>Mã QR</span>
+                    </button>
 
                     {/* Check-in / Join Button */}
                     <button
@@ -634,7 +701,7 @@ export function AssociationTrainingScreen() {
                       onClick={() => handleJoinTraining(t)}
                       className={`py-2.5 px-3 rounded-2xl text-xs font-bold inline-flex items-center justify-center gap-1.5 transition cursor-pointer ${
                         isCheckedIn
-                          ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300"
+                          ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-300"
                           : "bg-[#B8860B] hover:bg-[#9a7009] text-white shadow-xs active:scale-95"
                       }`}
                     >
@@ -909,6 +976,191 @@ export function AssociationTrainingScreen() {
               >
                 Đóng
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── MODAL HIỂN THỊ MÃ QR ĐIỂM DANH BUỔI HỌC ── */}
+      {qrModalTraining && (
+        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl w-full max-w-sm p-5 shadow-2xl space-y-4 animate-in zoom-in-95 duration-150 text-center">
+            <div className="flex items-start justify-between">
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 text-[10.5px] font-bold border border-indigo-200 dark:border-indigo-800">
+                <QrCode className="size-3.5" />
+                <span>MÃ QR ĐIỂM DANH LỚP HỌC</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setQrModalTraining(null)}
+                className="p-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-500 transition cursor-pointer"
+              >
+                <X className="size-4" />
+              </button>
+            </div>
+
+            <div>
+              <h4 className="font-black text-sm text-[#1F3864] dark:text-white leading-snug line-clamp-2">
+                {qrModalTraining.title}
+              </h4>
+              <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
+                Giảng viên: {qrModalTraining.instructor_name || "CEO HN10"} • {formatDateTime(qrModalTraining.start_time)}
+              </p>
+            </div>
+
+            {/* QR Canvas Display */}
+            <div className="py-2 flex flex-col items-center justify-center">
+              <div className="p-3 bg-white rounded-2xl shadow-md border border-slate-200 inline-block">
+                <QrCanvas
+                  value={`https://ceohn10.viconnect.vn/association/training?checkin=${qrModalTraining.id}`}
+                  size={200}
+                />
+              </div>
+              <div className="mt-3 inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border border-emerald-200 text-xs font-bold">
+                <Users className="size-3.5" />
+                <span>Đã điểm danh: <strong>{qrModalTraining.attendee_count || 0}</strong> học viên</span>
+              </div>
+            </div>
+
+            <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
+              Chiếu mã QR này lên màn hình máy chiếu hoặc đưa cho học viên quét để tự động ghi nhận điểm danh vào hệ thống.
+            </p>
+
+            <div className="grid grid-cols-2 gap-2 pt-1">
+              <button
+                type="button"
+                onClick={() => {
+                  const checkinUrl = `https://ceohn10.viconnect.vn/association/training?checkin=${qrModalTraining.id}`;
+                  navigator.clipboard.writeText(checkinUrl);
+                  toast.success("Đã sao chép liên kết điểm danh buổi học!");
+                }}
+                className="py-2.5 px-3 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-700 dark:text-slate-200 text-xs font-bold inline-flex items-center justify-center gap-1.5 transition cursor-pointer"
+              >
+                <Copy className="size-3.5" />
+                <span>Sao chép Link</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  handleJoinTraining(qrModalTraining);
+                  setQrModalTraining(null);
+                }}
+                className="py-2.5 px-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white text-xs font-bold inline-flex items-center justify-center gap-1.5 shadow-sm active:scale-95 transition cursor-pointer"
+              >
+                <CheckCircle2 className="size-3.5" />
+                <span>Điểm danh ngay</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── MODAL QUÉT / NHẬP QR ĐIỂM DANH BUỔI HỌC ── */}
+      {scanModalOpen && (
+        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl w-full max-w-md p-5 shadow-2xl space-y-4 animate-in zoom-in-95 duration-150">
+            <div className="flex items-start justify-between">
+              <div className="flex items-center gap-2">
+                <div className="size-8 rounded-xl bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 flex items-center justify-center">
+                  <ScanLine className="size-4" />
+                </div>
+                <div>
+                  <h4 className="font-black text-sm text-[#1F3864] dark:text-white">
+                    Quét / Nhập QR Điểm Danh
+                  </h4>
+                  <p className="text-[11px] text-slate-500">Ghi nhận sĩ số học viên vào lớp học thời gian thực</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setScanModalOpen(false)}
+                className="p-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-500 transition cursor-pointer"
+              >
+                <X className="size-4" />
+              </button>
+            </div>
+
+            <div className="space-y-3">
+              <div>
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+                  Dán liên kết mã QR hoặc nhập Mã buổi học:
+                </label>
+                <input
+                  value={manualCode}
+                  onChange={(e) => setManualCode(e.target.value)}
+                  placeholder="VD: train_001 hoặc link chứa ?checkin=..."
+                  className="w-full px-3.5 py-2.5 text-xs rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 outline-none focus:border-emerald-600 text-slate-900 dark:text-white"
+                />
+              </div>
+
+              <button
+                type="button"
+                onClick={() => {
+                  let code = manualCode.trim();
+                  if (!code) {
+                    toast.error("Vui lòng nhập mã buổi học hoặc link điểm danh!");
+                    return;
+                  }
+                  if (code.includes("checkin=")) {
+                    const match = code.match(/checkin=([^&]+)/);
+                    if (match) code = match[1];
+                  }
+                  const matched = trainings.find((t) => t.id === code || t.room_id === code);
+                  if (matched) {
+                    handleJoinTraining(matched);
+                    setScanModalOpen(false);
+                    setManualCode("");
+                  } else {
+                    handleJoinTraining({
+                      id: code,
+                      title: `Buổi học lớp CEO HN10 (${code})`,
+                      status: "ongoing",
+                    });
+                    setScanModalOpen(false);
+                    setManualCode("");
+                  }
+                }}
+                className="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white text-xs font-bold inline-flex items-center justify-center gap-1.5 shadow-md active:scale-95 transition cursor-pointer"
+              >
+                <CheckCircle2 className="size-4" />
+                <span>Xác nhận Điểm danh</span>
+              </button>
+            </div>
+
+            {/* Quick check-in list */}
+            <div className="pt-2 border-t border-slate-100 dark:border-slate-800 space-y-2">
+              <span className="text-[11px] font-bold text-slate-400 uppercase">
+                Điểm danh nhanh các buổi học hôm nay:
+              </span>
+              <div className="space-y-1.5 max-h-48 overflow-y-auto pr-1">
+                {trainings.slice(0, 3).map((item) => (
+                  <div
+                    key={item.id}
+                    className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60 flex items-center justify-between gap-2"
+                  >
+                    <div className="min-w-0">
+                      <div className="text-xs font-bold text-slate-800 dark:text-slate-100 truncate">
+                        {item.title}
+                      </div>
+                      <div className="text-[10px] text-slate-500">
+                        {item.instructor_name || "CEO HN10"} • {item.attendee_count || 0} học viên có mặt
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      disabled={checkedInIds[item.id]}
+                      onClick={() => {
+                        handleJoinTraining(item);
+                        setScanModalOpen(false);
+                      }}
+                      className="px-2.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-300 text-white text-[11px] font-bold shrink-0 transition cursor-pointer"
+                    >
+                      {checkedInIds[item.id] ? "Đã điểm danh" : "Điểm danh"}
+                    </button>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>

@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>BỘ SLIDE TRÌNH BÀY PHẦN MỀM CEO HN10 - HANOIBA</title>
+  <style>
+    @page {
+      size: 297mm 210mm; /* A4 Landscape 16:9 ratio style */
+      margin: 0;
+    }
+    * {
+      box-sizing: border-box;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #0f172a;
+      color: #1e293b;
+    }
+    .slide {
+      width: 297mm;
+      height: 210mm;
+      page-break-after: always;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 14mm 18mm;
+      background-size: cover;
+      background-position: center;
+    }
+    .slide-dark {
+      background: linear-gradient(135deg, #0b192c 0%, #172554 50%, #1e3a8a 100%);
+      color: #ffffff;
+    }
+    .slide-light {
+      background: #f8fafc;
+      color: #0f172a;
+    }
+    
+    .slide-header {
+      border-bottom: 2px solid rgba(255,255,255,0.15);
+      padding-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+    .slide-light .slide-header {
+      border-bottom: 2px solid #e2e8f0;
+    }
+    .org-tag {
+      font-size: 12px;
+      font-weight: 800;
+      color: #f59e0b;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .slide-title {
+      font-size: 24px;
+      font-weight: 900;
+      margin: 4px 0 0 0;
+      color: #ffffff;
+      letter-spacing: -0.5px;
+    }
+    .slide-light .slide-title {
+      color: #0f172a;
+    }
+    .slide-sub {
+      font-size: 13px;
+      color: #94a3b8;
+      margin-top: 3px;
+    }
+    .slide-light .slide-sub {
+      color: #64748b;
+    }
+
+    .slide-body {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      margin: 10px 0;
+    }
+
+    .slide-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid rgba(255,255,255,0.15);
+      padding-top: 8px;
+      font-size: 11px;
+      color: #94a3b8;
+    }
+    .slide-light .slide-footer {
+      border-top: 1px solid #e2e8f0;
+      color: #64748b;
+    }
+
+    /* SLIDE 1 COVER */
+    .cover-content {
+      text-align: left;
+      margin-top: 20px;
+    }
+    .cover-content h1 {
+      font-size: 36px;
+      line-height: 1.25;
+      font-weight: 900;
+      color: #ffffff;
+      margin: 15px 0 10px 0;
+      letter-spacing: -0.5px;
+    }
+    .cover-content h1 span {
+      color: #38bdf8;
+    }
+    .cover-desc {
+      font-size: 15px;
+      color: #cbd5e1;
+      max-width: 820px;
+      line-height: 1.6;
+    }
+    .cover-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 24px;
+    }
+    .badge-item {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.2);
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #ffffff;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* GRIDS & CARDS */
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      align-items: center;
+    }
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+    }
+    .card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 14px 16px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+    }
+    .card h3 {
+      margin: 0 0 8px 0;
+      font-size: 15px;
+      font-weight: 800;
+      color: #0f172a;
+      border-bottom: 2px solid #0284c7;
+      padding-bottom: 6px;
+    }
+    .card ul {
+      margin: 0;
+      padding-left: 18px;
+      font-size: 12.5px;
+      color: #334155;
+      line-height: 1.65;
+    }
+    .card-dark {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 12px;
+      padding: 14px 16px;
+      color: #ffffff;
+    }
+    .card-dark h3 {
+      margin: 0 0 8px 0;
+      font-size: 15px;
+      font-weight: 800;
+      color: #38bdf8;
+      border-bottom: 2px solid #38bdf8;
+      padding-bottom: 6px;
+    }
+    .card-dark ul {
+      margin: 0;
+      padding-left: 18px;
+      font-size: 12.5px;
+      color: #e2e8f0;
+      line-height: 1.65;
+    }
+
+    /* IMAGE CONTAINERS */
+    .img-frame {
+      border-radius: 12px;
+      overflow: hidden;
+      border: 2px solid #cbd5e1;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+      background: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .img-frame img {
+      width: 100%;
+      height: auto;
+      max-height: 130mm;
+      object-fit: contain;
+      display: block;
+    }
+
+    /* KPI STATS */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+    .kpi-card {
+      background: rgba(255,255,255,0.08);
+      border: 1.5px solid rgba(56, 189, 248, 0.4);
+      border-radius: 12px;
+      padding: 12px;
+      text-align: center;
+    }
+    .kpi-card .num {
+      font-size: 24px;
+      font-weight: 900;
+      color: #f59e0b;
+    }
+    .kpi-card .lbl {
+      font-size: 11.5px;
+      color: #ffffff;
+      margin-top: 3px;
+      font-weight: 600;
+    }
+
+    /* BAN CHUYÊN MÔN TILES */
+    .ban-tile {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-left: 4px solid #0284c7;
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 12px;
+    }
+    .ban-tile h4 {
+      margin: 0 0 4px 0;
+      font-size: 13px;
+      font-weight: 800;
+      color: #0f172a;
+    }
+    .ban-tile p {
+      margin: 0;
+      color: #64748b;
+      line-height: 1.45;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- SLIDE 1: BÌA TRANG TRỌNG -->
+  <div class="slide slide-dark">
+    <div class="slide-header">
+      <div>
+        <div class="org-tag">HIỆP HỘI DOANH NGHIỆP TRẺ HÀ NỘI (HANOIBA)</div>
+        <div style="font-size: 16px; font-weight: 800; color: #ffffff; margin-top: 3px;">CÂU LẠC BỘ DOANH NHÂN CEO HN10</div>
+      </div>
+      <img src="slide_assets/hn10_logo.png" style="height: 48px; object-fit: contain;" alt="Logo CEO HN10" />
+    </div>
+    <div class="slide-body">
+      <div class="cover-content">
+        <h1>HỆ THỐNG QUẢN TRỊ CRM & ỨNG DỤNG DI ĐỘNG HỘI VIÊN<br><span>CLB DOANH NHÂN CEO HN10 (HANOIBA)</span></h1>
+        <div class="cover-desc">
+          Giải pháp chuyển đổi số toàn diện kết hợp Cổng Quản trị Web CRM (Desktop) và Ứng dụng Di động Hội viên (iOS, Android, PWA).<br>
+          Chuẩn hóa 7 Ban Chuyên Môn • Minh bạch Tài chính Dòng tiền Quỹ 2.1 Tỷ • Điểm danh QR Check-in Realtime • Quản lý Lịch học & Khóa học • Kết nối CSDL Chuẩn PostgreSQL 113.20.107.184:6432.
+        </div>
+        <div class="cover-badges">
+          <div class="badge-item">🏛️ Cổng CRM: https://crm.ceohn10.viconnect.vn</div>
+          <div class="badge-item">📱 Mobile App: https://ceohn10.viconnect.vn</div>
+          <div class="badge-item">💰 Quỹ Hội Thực Tế: 2.100.000.000 VNĐ</div>
+          <div class="badge-item">⚡ 4 Sự Kiện Cố Định Trong Năm</div>
+          <div class="badge-item">🛡️ RBAC Lớp Trưởng & Lớp Phó Chuẩn Hóa</div>
+        </div>
+      </div>
+    </div>
+    <div class="slide-footer">
+      <span>Bộ Tài Liệu Thuyết Minh Phần Mềm - CLB Doanh Nhân CEO HN10</span>
+      <span>Hà Nội, Ngày 17/11/2026</span>
+    </div>
+  </div>
+
+  <!-- SLIDE 2: BỐI CẢNH & KIẾN TRÚC TỔNG QUAN VOA -->
+  <div class="slide slide-light">
+    <div class="slide-header">
+      <div>
+        <div class="org-tag">TỔNG QUAN CHIẾN LƯỢC</div>
+        <div class="slide-title">BỐI CẢNH VÀ KIẾN TRÚC HỆ SINH THÁI SỐ CEO HN10</div>
+        <div class="slide-sub">Mô hình kiến trúc tổng quan Visual Overview Architecture (VOA) kết nối toàn diện Quản trị & Hội viên</div>
+      </div>
+    </div>
+    <div class="slide-body">
+      <div class="grid-2">
+        <div class="img-frame" style="max-height: 125mm;">
+          <img src="slide_assets/voa_ceohn10.png" alt="Kiến trúc VOA CEO HN10" />
+        </div>
+        <div class="card" style="border-top: 4px solid #0284c7;">
+          <h3 style="color: #0284c7;">3 Trụ Cột Đột Phá Công Nghệ</h3>
+          <ul style="font-size: 13px; line-height: 1.8;">
+            <li><strong>Cổng Quản Trị Web CRM Đa Năng:</strong> Dành cho Chủ tịch, Ban Cán Sự Lớp, Thư ký, Kế toán với 9 nhóm phân hệ chuyên sâu, bảng biểu Excel, biểu đồ Recharts và quản lý thu chi 2.1 tỷ minh bạch.</li>
+            <li><strong>Ứng Dụng Di Động Hội Viên (Mobile App):</strong> Trải nghiệm Mobile-first tối ưu cho 100+ CEO: Thẻ danh thiếp số thông minh, Lịch học, điểm danh mã QR 1 chạm, phòng họp Jitsi Meet và sàn kết nối B2B Connect.</li>
+            <li><strong>Cơ Sở Dữ Liệu Tập Trung An Toàn:</strong> 100% dữ liệu lưu trữ và truy vấn realtime từ máy chủ PostgreSQL <code>113.20.107.184:6432</code>, bảo mật RBAC phân quyền chặt chẽ.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="slide-footer">
+      <span>CLB Doanh Nhân CEO HN10 - Trực thuộc HanoiBA</span>
+      <span>Trang 2 / 10</span>
+    </div>
+  </div>
+
+  <!-- SLIDE 3: 7 BAN CHUYÊN MÔN (THEO ẢNH 1) -->
+  <div class="slide slide-dark">
+    <div class="slide-header">
+      <div>
+        <div class="org-tag">CƠ CẤU CHỨC NĂNG (ẢNH 1)</div>
+        <div class="slide-title">CHUẨN HÓA 7 BAN CHUYÊN MÔN TRONG LỚP CEO HN10</div>
+        <div class="slide-sub">Cơ cấu tổ chức chức năng được số hóa và phân quyền chính xác trên hệ thống</div>
+      </div>
+    </div>
+    <div class="slide-body">
+      <div class="grid-2">
+        <div class="img-frame" style="border-color: #38bdf8;">
+          <img src="slide_assets/so_do_7_ban.jpg" alt="Sơ đồ 7 Ban trong lớp CEOHN10" />
+        </div>
+        <div class="card-dark">
+          <h3>Phân Công Nhiệm Vụ 7 Ban Chuyên Môn</h3>
+          <ul>
+            <li><strong>1. Ban Học tập:</strong> Quản lý lịch học, buổi học chuyên đề, điểm danh QR, tài liệu giáo trình và phòng học trực tuyến.</li>
+            <li><strong>2. Ban Sự kiện & Hậu cần:</strong> Khai báo vật tư, điều phối Gala, họp định kỳ và vận hành bàn đón tiếp check-in.</li>
+            <li><strong>3. Ban Tài chính & Tài trợ:</strong> Quản lý quỹ hội 2.1 tỷ, theo dõi biến động thu chi, xuất báo cáo Word/Excel/PDF.</li>
+            <li><strong>4. Ban Truyền thông:</strong> Quản trị bảng tin, phát thanh thông báo, truyền thông sự kiện và ấn phẩm PR.</li>
+            <li><strong>5. Ban Công nghệ:</strong> Vận hành nền tảng Web CRM, Mobile App và hạ tầng kỹ thuật máy chủ CSDL.</li>
+            <li><strong>6. Ban Đối ngoại & Giao thương:</strong> Xúc tiến thương mại B2B, cơ hội kinh doanh và ký kết hợp tác đa phương.</li>
+            <li><strong>7. Ban Đời sống & Gắn kết thành viên:</strong> Chăm lo hiếu hỷ, sinh nhật, giải thể thao và tổ chức các chương trình thiện nguyện CSR.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="slide-footer">
+      <span>Chuẩn hóa danh mục 7 Ban trên hệ thống CRM & CSDL</span>
+      <span>Trang 3 / 10</span>
+    </div>
+  </div>
+
+  <!-- SLIDE 4: SƠ ĐỒ BCS LỚP & TEAM (THEO ẢNH 2) -->
+  <div class="slide slide-light">
+    <div class="slide-header">
+      <div>
+        <div class="org-tag">MA TRẬN PHÂN QUYỀN RBAC (ẢNH 2)</div>
+        <div class="slide-title">SƠ ĐỒ TỔ CHỨC BAN CÁN SỰ LỚP & BAN CÁN SỰ TEAM</div>
+        <div class="slide-sub">Mô hình phân cấp quản trị đã được thiết lập ma trận quyền RBAC hoàn chỉnh trên phần mềm</div>
+      </div>
+    </div>
+    <div class="slide-body">
+      <div class="grid-2">
+        <div class="img-frame" style="border-color: #0f172a;">
+          <img src="slide_assets/so_do_bcs.jpg" alt="Sơ đồ tổ chức BCS Lớp và BCS Team" />
+        </div>
+        <div class="card" style="border-top: 4px solid #0f172a;">
+          <h3 style="color: #0f172a;">Cấu Trúc Ma Trận Phân Quyền RBAC</h3>
+          <ul style="font-size: 13px; line-height: 1.75;">
+            <li><strong>Ban Cán Sự (BCS) Lớp Lâm Thời:</strong>
+              <br>• Lớp Trưởng Lâm thời (Quản trị toàn diện hệ thống).
+              <br>• 7 Lớp Phó Lâm thời phụ trách trực tiếp 7 Ban: <em>Học tập, Sự kiện & Hậu cần, Tài chính & Tài trợ, Truyền thông, Công nghệ, Đối ngoại & Giao thương, Đời sống & Gắn kết</em>.
+            </li>
+            <li><strong>Ban Cán Sự (BCS) Team:</strong>
+              <br>• Trưởng Team LT & 2 Phó Team LT.
+              <br>• 3 Phó Team Tập sự & 7 Trưởng Ban Tập sự phụ trách các nhóm chuyên đề.
+            </li>
+            <li><strong>Quy Chuẩn Vận Hành:</strong> Mỗi tài khoản được phân bổ đúng phân hệ chức năng, đảm bảo tính bảo mật và tinh gọn trong quản trị.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="slide-footer">
+      <span>Thiết lập ma trận phân quyền RBAC đa cấp độ theo từng vai trò</span>
+      <span>Trang 4 / 10</span>
+    </div>
+  </div>
+
+  <!-- SLIDE 5: WEB CRM & QUẢN LÝ CÔNG VIỆC -->
+  <div class="slide slide-light">
+    <div class="slide-header">
+      <div>
+        <div class="org-tag">CỔNG QUẢN TRỊ DOANH NGHIỆP</div>
+        <div class="slide-title">CỔNG QUẢN TRỊ WEB CRM & ĐIỀU PHỐI CÔNG VIỆC</div>
+        <div class="slide-sub">Giao diện Dashboard hiện đại với 9 nhóm chức năng, bảng Kanban và báo cáo KPI</div>
+      </div>
+    </div>
+    <div class="slide-body">
+      <div class="grid-2">
+        <div class="img-frame">
+          <img src="slide_assets/crm_tasks.jpg" alt="Giao diện Quản lý công việc CRM" />
+        </div>
+        <div class="card" style="border-top: 4px solid #3b82f6;">
+          <h3 style="color: #1e40af;">9 Nhóm Chức Năng Chuẩn Mực Sidebar</h3>
+          <ul style="font-size: 12.5px; line-height: 1.7;">
+            <li><strong>1. Khối Đỉnh:</strong> Tổng quan, Trợ lý AI, Học viên, Lớp học & Khóa học (Menu Tree).</li>
+            <li><strong>2. Nhóm Truyền Thông (Sự Kiện):</strong> Sự kiện, Tổng quan sự kiện, Biểu quyết, Đăng ký sự kiện, Bốc thăm may mắn.</li>
+            <li><strong>3. Nhóm Tài Trợ:</strong> Nhà tài trợ, Báo cáo tài trợ, Quỹ tài trợ (Tiền mặt, Hiện vật, CSR).</li>
+            <li><strong>4. Nhóm Tài Chính:</strong> Thống kê báo cáo, Khoản thu, Khoản chi, Báo cáo tài chính Word/Excel/PDF.</li>
+            <li><strong>5. Nhóm Truyền Thông (Tin Tức):</strong> Thông báo, Tin tức, Quyền lợi & Ưu đãi.</li>
+            <li><strong>6. Nhóm Kết Nối Giao Thương:</strong> Nhắn tin, Chia sẻ cơ hội, Giao thương B2B.</li>
+            <li><strong>7. Nhóm Hoạt Động:</strong> Quản lý công việc, Quản lý cuộc họp, Doanh nghiệp, Tài liệu biểu mẫu.</li>
+            <li><strong>8. Nhóm Hệ Thống:</strong> Cài đặt hệ thống, Lịch sử hoạt động.</li>
+            <li><strong>9. Nhóm Phân Quyền:</strong> Phân quyền hệ thống, Ban Chuyên Môn, Quản trị người dùng.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="slide-footer">
+      <span>Cổng Quản Trị Web CRM - https://crm.ceohn10.viconnect.vn</span>
+      <span>Trang 5 / 10</span>
+    </div>
+  </div>
+
+  <!-- SLIDE 6: TÀI CHÍNH & SỔ QUỸ 2 TỶ 100 TRIỆU -->
+  <div class="slide slide-dark">
+    <div class="slide-header">
+      <div>
+        <div class="org-tag">QUẢN TRỊ TÀI CHÍNH MINH BẠCH</div>
+        <div class="slide-title">DÒNG TIỀN BIẾN ĐỘNG REALTIME & SỔ QUỸ 2 TỶ 100 TRIỆU</div>
+        <div class="slide-sub">Minh bạch 100% dòng tiền thu chi thực tế trên CSDL PostgreSQL chuẩn 113.20.107.184:6432</div>
+      </div>
+    </div>
+    <div class="slide-body">
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="num">2.100.000.000 đ</div>
+          <div class="lbl">TỔNG QUỸ HOẠT ĐỘNG HIỆN CÓ</div>
+        </div>
+        <div class="kpi-card">
+          <div class="num">25.000.000 đ</div>
+          <div class="lbl">THU HỘI PHÍ ĐÃ XÁC NHẬN</div>
+        </div>
+        <div class="kpi-card">
+          <div class="num">0 đ</div>
+          <div class="lbl">TỔNG CHI THỰC TẾ (SỔ QUỸ MINH BẠCH)</div>
+        </div>
+        <div class="kpi-card">
+          <div class="num">3 Nguồn Quỹ</div>
+          <div class="lbl">TIỀN MẶT • HIỆN VẬT • THIỆN NGUYỆN CSR</div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="img-frame" style="border-color: #38bdf8;">
+          <img src="slide_assets/crm_income.jpg" alt="Quản lý Thu Quỹ Hội CRM" />
+        </div>
+        <div class="img-frame" style="border-color: #38bdf8;">
+          <img src="slide_assets/crm_expenses.jpg" alt="Quản lý Chi & Sổ Quỹ CRM" />
+        </div>
+      </div>
+    </div>
+    <div class="slide-footer">
+      <span>Hỗ trợ xuất Báo cáo tài chính đa định dạng Word (.docx), Excel (.xlsx), PDF</span>
+      <span>Trang 6 / 10</span>
+    </div>
+  </div>
+
+  <!-- SLIDE 7: 4 SỰ KIỆN CỐ ĐỊNH & THIỆN NGUYỆN CSR -->
+  <div class="slide slide-light">
+    <div class="slide-header">
+      <div>
+        <div class="org-tag">HOẠT ĐỘNG THƯỜNG NIÊN</div>
+        <div class="slide-title">4 SỰ KIỆN CỐ ĐỊNH TRONG NĂM & SỰ KIỆN THIỆN NGUYỆN CSR</div>
+        <div class="slide-sub">Lịch trình sự kiện văn hóa cốt lõi diễn ra cố định của Lớp Doanh Nhân CEO HN10</div>
+      </div>
+    </div>
+    <div class="slide-body">
+      <div class="grid-4" style="margin-bottom: 16px;">
+        <div class="card" style="border-top: 4px solid #0284c7;">
+          <div style="font-size: 11px; font-weight: 700; color: #0284c7;">15/03/2026 • 250 CHỖ</div>
+          <h3 style="font-size: 14px; margin-top: 4px;">Lễ Khai Giảng Niên Khóa</h3>
+          <p style="font-size: 11.5px; color: #64748b; margin: 0; line-height: 1.5;">
+            Kickoff chính thức niên khóa 2026 tại Trung tâm Hội nghị Quốc gia NCC. Hội tụ đầy đủ Ban Cán Sự Lớp & 100+ CEO học viên.
+          </p>
+        </div>
+        <div class="card" style="border-top: 4px solid #10b981;">
+          <div style="font-size: 11px; font-weight: 700; color: #10b981;">18/07/2026 • 200 CHỖ</div>
+          <h3 style="font-size: 14px; margin-top: 4px;">Team Building Chiến Binh</h3>
+          <p style="font-size: 11.5px; color: #64748b; margin: 0; line-height: 1.5;">
+            Huấn luyện dã ngoại tại Flamingo Đại Lải Resort. Gắn kết tinh thần đồng đội và nâng cao ý chí vượt qua thách thức thương trường.
+          </p>
+        </div>
+        <div class="card" style="border-top: 4px solid #f59e0b;">
+          <div style="font-size: 11px; font-weight: 700; color: #f59e0b;">26/12/2026 • 300 CHỖ</div>
+          <h3 style="font-size: 14px; margin-top: 4px;">Year End Party 2026</h3>
+          <p style="font-size: 11.5px; color: #64748b; margin: 0; line-height: 1.5;">
+            Đại tiệc Gala Tất Niên tại Almaz Vinhomes Riverside. Vinh danh thành tựu doanh nghiệp, bốc thăm may mắn và kết nối B2B.
+          </p>
+        </div>
+        <div class="card" style="border-top: 4px solid #8b5cf6;">
+          <div style="font-size: 11px; font-weight: 700; color: #8b5cf6;">16/01/2027 • 250 CHỖ</div>
+          <h3 style="font-size: 14px; margin-top: 4px;">Lễ Bế Giảng & Trao Bằng</h3>
+          <p style="font-size: 11.5px; color: #64748b; margin: 0; line-height: 1.5;">
+            Lễ tốt nghiệp trang trọng tại JW Marriott Hanoi. Báo cáo đồ án doanh nghiệp thực chiến và trao chứng nhận Giám Đốc Điều Hành.
+          </p>
+        </div>
+      </div>
+
+      <div class="card" style="background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%); border: 1.5px solid #a7f3d0;">
+        <h3 style="color: #047857; border-color: #059669;">❤️ Phân Hệ Sự Kiện Thiện Nguyện (CSR & Cộng Đồng)</h3>
+        <p style="font-size: 12.5px; color: #065f46; margin: 0; line-height: 1.6;">
+          Hệ thống tích hợp luồng phân quyền đặc thù: Chỉ riêng <strong>Ban Thiện Nguyện & Lãnh đạo lớp</strong> mới có quyền thấy nút và khởi tạo sự kiện thiện nguyện CSR. Mẫu sự kiện tích hợp sẵn thông điệp "Hành trình tương thân tương ái", quản lý quỹ tài trợ thiện nguyện và cấp vé tham gia miễn phí cho hội viên.
+        </p>
+      </div>
+    </div>
+    <div class="slide-footer">
+      <span>Các sự kiện được cấu hình cờ cố định is_fixed = true trên CSDL</span>
+      <span>Trang 7 / 10</span>
+    </div>
+  </div>
+
+  <!-- SLIDE 8: MOBILE APP & ĐIỂM DANH QR REALTIME -->
+  <div class="slide slide-light">
+    <div class="slide-header">
+      <div>
+        <div class="org-tag">ỨNG DỤNG DI ĐỘNG HỘI VIÊN</div>
+        <div class="slide-title">MOBILE APP CEO HN10: LỊCH HỌC & ĐIỂM DANH MÃ QR REALTIME</div>
+        <div class="slide-sub">Nâng cấp phân hệ Lịch học và tự động hóa điểm danh buổi học trên di động</div>
+      </div>
+    </div>
+    <div class="slide-body">
+      <div class="grid-2">
+        <div class="img-frame" style="max-height: 125mm;">
+          <img src="slide_assets/mobile_app_home.jpg" alt="Trang chủ Mobile App CEO HN10" />
+        </div>
+        <div class="card" style="border-top: 4px solid #10b981;">
+          <h3 style="color: #047857;">Tính Năng Đột Phá Lịch Học & QR Check-in</h3>
+          <ul style="font-size: 13px; line-height: 1.8;">
+            <li><strong>Chuẩn Hóa "Lịch Học" Toàn Hệ Thống:</strong> Thay thế hoàn toàn thuật ngữ "Đào tạo" thành "Lịch học" trên trang chủ, phím tắt, menu tính năng và trang chuyên đề <code>/association/training</code>.</li>
+            <li><strong>Mã QR Điểm Danh Buổi Học:</strong> Mỗi buổi học có nút mở mã QR kích thước lớn để giảng viên/lớp trưởng chiếu lên máy chiếu hoặc đưa cho học viên quét điểm danh.</li>
+            <li><strong>Quét QR Điểm Danh & Tự Động Ghi Nhận:</strong> Học viên dùng camera quét QR hoặc nhập mã check-in, hệ thống tự động ghi nhận điểm danh và tăng sĩ số có mặt thời gian thực.</li>
+            <li><strong>Phòng Họp Trực Tuyến Jitsi Meet:</strong> Tích hợp họp video trực tuyến bảo mật nội bộ một chạm, kèm kho tài liệu bài giảng đính kèm.</li>
+            <li><strong>Lưu Lịch & Báo Thức Thông Minh:</strong> Tự động đồng bộ lịch học vào Báo thức nhắc hẹn trên điện thoại của hội viên.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="slide-footer">
+      <span>Trải nghiệm Native Mobile App - https://ceohn10.viconnect.vn</span>
+      <span>Trang 8 / 10</span>
+    </div>
+  </div>
+
+  <!-- SLIDE 9: NGHIỆM THU E2E DỮ LIỆU ĐI VÀO CSDL -->
+  <div class="slide slide-dark">
+    <div class="slide-header">
+      <div>
+        <div class="org-tag">MINH CHỨNG KỸ THUẬT & DỮ LIỆU</div>
+        <div class="slide-title">NGHIỆM THU E2E: DỮ LIỆU ĐI TỪ GIAO DIỆN VÀO CSDL THỰC TẾ</div>
+        <div class="slide-sub">Triệt tiêu hoàn toàn dữ liệu mock/fake, bảo đảm 100% dữ liệu sống trên PostgreSQL 113.20.107.184:6432</div>
+      </div>
+    </div>
+    <div class="slide-body">
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="num">100%</div>
+          <div class="lbl">DỮ LIỆU SỐNG TỪ CSDL POSTGRESQL</div>
+        </div>
+        <div class="kpi-card">
+          <div class="num">0 Errors</div>
+          <div class="lbl">KIỂM TRA TYPE-CHECK TOÀN DỰ ÁN</div>
+        </div>
+        <div class="kpi-card">
+          <div class="num">2.1 Tỷ VNĐ</div>
+          <div class="lbl">SỔ QUỸ GIAO DỊCH THỰC TẾ</div>
+        </div>
+        <div class="kpi-card">
+          <div class="num">4 Sự Kiện</div>
+          <div class="lbl">CỐ ĐỊNH TRONG NĂM ĐÃ SEED SẴN</div>
+        </div>
+      </div>
+
+      <div class="card-dark" style="margin-top: 10px;">
+        <h3 style="color: #38bdf8; border-color: #38bdf8;">ĐỐI CHIẾU DỮ LIỆU BẢNG CSDL POSTGRESQL CHÍNH THỨC</h3>
+        <ul style="font-size: 13px; line-height: 1.8;">
+          <li><strong>Bảng <code>events</code>:</strong> Đã lưu trữ đầy đủ 4 sự kiện cố định (Khai giảng, Team building, Year End Party, Bế giảng) và sự kiện thiện nguyện CSR <code>evt-csr-ceohn10-2026</code>.</li>
+          <li><strong>Bảng <code>transactions</code>:</strong> Ghi nhận giao dịch số dư quỹ ban đầu và thu hội phí tổng cộng <strong>2.100.000.000 VNĐ</strong> minh bạch.</li>
+          <li><strong>Bảng <code>trainings</code> & <code>training_attendees</code>:</strong> Kết nối trực tiếp luồng điểm danh QR, tự động cập nhật sĩ số <code>attendee_count</code> realtime khi học viên quét mã.</li>
+          <li><strong>Bảng <code>sponsors</code>:</strong> Quản lý tách biệt 3 nguồn quỹ: Quỹ tiền mặt, Quỹ hiện vật và Quỹ thiện nguyện CSR.</li>
+          <li><strong>Bảng <code>documents</code> & <code>tasks</code>:</strong> Lưu trữ tài liệu quy chế hiệp hội và phân công công việc theo Ban chuyên môn.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="slide-footer">
+      <span>Cam kết tuân thủ Strict Database Law: CSDL PostgreSQL 113.20.107.184:6432</span>
+      <span>Trang 9 / 10</span>
+    </div>
+  </div>
+
+  <!-- SLIDE 10: LỜI KẾT & CAM KẾT VẬN HÀNH -->
+  <div class="slide slide-dark" style="text-align: center; justify-content: center; align-items: center;">
+    <div style="max-width: 900px; margin: auto;">
+      <div class="org-tag" style="font-size: 16px; margin-bottom: 12px;">HIỆP HỘI DOANH NGHIỆP TRẺ HÀ NỘI (HANOIBA)</div>
+      <h1 style="font-size: 40px; font-weight: 900; color: #f59e0b; margin-bottom: 18px; letter-spacing: -0.5px;">KẾT NỐI TINH HOA - VƯƠN TẦM BỨT PHÁ</h1>
+      <p style="font-size: 20px; color: #ffffff; font-weight: 700; line-height: 1.5; margin-bottom: 24px;">
+        HỆ THỐNG QUẢN TRỊ CRM & ỨNG DỤNG DI ĐỘNG HỘI VIÊN<br>
+        CÂU LẠC BỘ DOANH NHÂN CEO HN10
+      </p>
+      <p style="font-size: 15px; color: #cbd5e1; line-height: 1.7; max-width: 800px; margin: 0 auto 30px auto;">
+        Hệ thống đã hoàn tất nghiệm thu kỹ thuật xuất sắc, dữ liệu đồng bộ thời gian thực 100%,<br>
+        sẵn sàng đồng hành cùng Ban Cán Sự Lớp CEO HN10 kiến tạo một cộng đồng doanh nhân vững mạnh, thịnh vượng và tiên phong chuyển đổi số!
+      </p>
+      <div style="font-size: 14px; color: #38bdf8; font-weight: 700; font-style: italic;">
+        Trân trọng cảm ơn Ban Lãnh Đạo Hiệp Hội HanoiBA & Toàn Thể Quý Hội Viên Doanh Nhân CEO HN10!
+      </div>
+    </div>
+    <div class="slide-footer" style="width: 100%;">
+      <span>Hệ Sinh Thái Số Toàn Diện CLB Doanh Nhân CEO HN10 (HanoiBA)</span>
+      <span>Trang 10 / 10</span>
+    </div>
+  </div>
+
+</body>
+</html>
