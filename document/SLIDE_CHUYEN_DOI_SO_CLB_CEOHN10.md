@@ -8,7 +8,7 @@
 ---
 
 ## Slide 1: HỆ THỐNG ĐIỀU HÀNH & KẾT NỐI DOANH NHÂN CEO HN10
-*HIỆN THỰC HÓA 3 BÀI TOÁN CHIẾN LƯỢC VÌ SỰ PHÁT TRIỂN BỀN VỮNG CỦA HỘI VIÊN*
+*HIỆN THỰC HÓA 3 BÀI TOÁN CHIẾN LƯỢC VÌ SỰ PHÁT TRIỂN BỀN VỮNG CỦA Học viên*
 
 Báo cáo toàn diện giải pháp chuyển đổi số gồm Hệ Thống Quản Trị Web CRM & Ứng Dụng Di Động Doanh Nhân do Tập đoàn Công nghệ ViConnect nghiên cứu và phát triển theo đặt hàng từ Ban Lãnh Đạo CLB CEO HN10.
 
@@ -19,21 +19,21 @@ Báo cáo toàn diện giải pháp chuyển đổi số gồm Hệ Thống Qu�
 
 ---
 
-## Slide 2: KIẾN TRÚC KÉP: WEB CRM ĐIỀU HÀNH & MOBILE APP HỘI VIÊN
+## Slide 2: KIẾN TRÚC KÉP: WEB CRM ĐIỀU HÀNH & MOBILE APP Học viên
 *Hai công cụ tương hỗ khép kín: Trung tâm điều hành minh bạch & Văn phòng số bỏ túi của từng doanh nhân*
 
 ### 1. CỔNG ĐIỀU HÀNH TRUNG TÂM WEB CRM
 *Dành cho: Ban Điều Hành, Ban Thư Ký, Chủ Tịch & 6 Ban Chuyên Môn*
-- Quản lý tập trung toàn diện hơn 500 hồ sơ doanh nghiệp hội viên chính danh
+- Quản lý tập trung toàn diện hơn 500 hồ sơ doanh nghiệp Học viên chính danh
 - Sơ đồ xếp bàn tiệc Gala trang trọng, phân bổ chỗ ngồi khoa học, chính xác
 - Điều hành công việc, phân công nhiệm vụ và theo dõi tiến độ các ban
 - Quản lý thu chi, hội phí và ngân sách tự động hóa, minh bạch tài chính
 - Phân quyền vận hành đúng chức năng thẩm quyền của từng ban chuyên môn
 
 ### 2. VĂN PHÒNG DOANH NHÂN BỎ TÚI MOBILE APP
-*Dành cho: Hơn 500 Doanh nhân & Lãnh đạo hội viên CLB CEO HN10*
-- Thẻ Hội Viên Điện Tử Thông Minh & Danh thiếp số tiện lợi, lưu danh bạ 1 chạm
-- Sàn giao thương B2B nội khối: Giới thiệu sản phẩm và ưu đãi đặc quyền giữa các hội viên
+*Dành cho: Hơn 500 Doanh nhân & Lãnh đạo Học viên CLB CEO HN10*
+- Thẻ Học viên Điện Tử Thông Minh & Danh thiếp số tiện lợi, lưu danh bạ 1 chạm
+- Sàn giao thương B2B nội khối: Giới thiệu sản phẩm và ưu đãi đặc quyền giữa các Học viên
 - Ví vé sự kiện Gala, xem trước số bàn tiệc, số ghế VIP và mã bốc thăm may mắn
 - Danh bạ kết nối hơn 500 CEO chính danh 11 ngành nghề, gửi lời mời hẹn gặp 1-on-1
 - Kênh trao đổi công việc và liên lạc trực tiếp, bảo mật riêng tư giữa các lãnh đạo
@@ -45,7 +45,7 @@ Báo cáo toàn diện giải pháp chuyển đổi số gồm Hệ Thống Qu�
 ## Slide 3: GIẢI PHÁP SỐ HÓA TRIỆT ĐỂ CHO 3 TRĂN TRỞ CỦA BAN LÃNH ĐẠO
 *ViConnect lắng nghe và chuyển hóa trọn vẹn mọi yêu cầu của Ban Chủ Nhiệm thành công cụ điều hành thực tế*
 
-### 01. Quản Lý Tập Trung Hồ Sơ 500+ Hội Viên [BÀI TOÁN 1: QUẢN LÝ THÀNH VIÊN]
+### 01. Quản Lý Tập Trung Hồ Sơ 500+ Học viên [BÀI TOÁN 1: QUẢN LÝ THÀNH VIÊN]
 - **Thách thức trước đây**: Trước đây: Dữ liệu phân tán trong các file bảng tính rời rạc, khó tra cứu, thông tin doanh nghiệp không được cập nhật kịp thời.
 - **Giải pháp ViConnect**: ViConnect giải quyết: Số hóa hồ sơ doanh nghiệp 360 độ gồm pháp lý, mã số thuế, năng lực cốt lõi, ngành nghề mũi nhọn và lịch sử tham gia.
 
@@ -62,8 +62,8 @@ Báo cáo toàn diện giải pháp chuyển đổi số gồm Hệ Thống Qu�
 ## Slide 4: PHÂN HỆ WEB CRM: CÔNG CỤ VẬN HÀNH THỰC CHIẾN CỦA BAN LÃNH ĐẠO
 *Chuẩn hóa toàn diện quy trình điều hành của Ban Thư Ký và 6 Ban Chuyên Môn trên một giao diện thống nhất*
 
-### 1. Quản Trị Danh Bạ Hội Viên 360°
-Hồ sơ pháp lý, mã số thuế, phân ban chuyên môn, thẩm định và phê duyệt hội viên mới minh bạch.
+### 1. Quản Trị Danh Bạ Học viên 360°
+Hồ sơ pháp lý, mã số thuế, phân ban chuyên môn, thẩm định và phê duyệt Học viên mới minh bạch.
 
 ### 2. Sơ Đồ Bàn Tiệc & Đón Tiếp Sự Kiện
 Bố trí sơ đồ bàn tiệc VIP, xếp vị trí danh dự từng đại biểu, đón tiếp khách mời bằng mã vé điện tử nhanh chóng.
@@ -79,7 +79,7 @@ Quản lý thu hội phí, tiền tài trợ và chi phí sự kiện; tự đ�
 ## Slide 5: PHÂN HỆ MOBILE APP: VĂN PHÒNG DOANH NHÂN BỎ TÚI CỦA TỪNG CEO
 *Nâng tầm hình ảnh lãnh đạo, gắn kết giao thương bền chặt ngay trên chiếc điện thoại thông minh*
 
-### 1. Thẻ Hội Viên & Danh Thiếp Số Tiện Lợi
+### 1. Thẻ Học viên & Danh Thiếp Số Tiện Lợi
 Thẻ số nhận diện sang trọng, tích hợp mã QR cá nhân giúp đối tác lưu danh bạ tức thì mà không cần cài app.
 
 ### 2. Sàn Giao Thương B2B & Ưu Đãi Nội Khối
@@ -93,7 +93,7 @@ Tìm kiếm đối tác chính danh theo 11 ngành nghề, gửi lời mời cà
 
 ---
 
-## Slide 6: 5 ĐIỂM SÁNG NÂNG TẦM TRẢI NGHIỆM VẬN HÀNH & HỘI VIÊN
+## Slide 6: 5 ĐIỂM SÁNG NÂNG TẦM TRẢI NGHIỆM VẬN HÀNH & Học viên
 *Những tiện ích thiết thực do ViConnect chủ động phát triển nâng cao nhằm tối ưu hiệu quả hoạt động CLB*
 
 ### 01. Thu Chi & Đóng Phí Tự Động Bằng Mã QR [TÀI CHÍNH MINH BẠCH]
@@ -102,11 +102,11 @@ Tự động tạo mã QR thanh toán đúng số tiền và nội dung, hệ th
 ### 02. Sơ Đồ Xếp Bàn Tiệc & Chỗ Ngồi Gala Chu Đáo [ĐÓN TIẾP TRANG TRỌNG]
 Ban tổ chức chủ động xếp chỗ trước theo bàn VIP và nhóm ngành nghề; khách đến sự kiện biết ngay vị trí ngồi của mình, tránh nhầm lẫn.
 
-### 03. Trợ Lý Số Hướng Dẫn Hội Viên 24/7 [HỖ TRỢ THƯỜNG TRỰC]
-Hỗ trợ hội viên tra cứu nhanh thông tin sự kiện sắp diễn ra, thông tin hội đồng, liên hệ Ban Thư Ký và tìm kiếm các đối tác tiềm năng.
+### 03. Trợ Lý Số Hướng Dẫn Học viên 24/7 [HỖ TRỢ THƯỜNG TRỰC]
+Hỗ trợ Học viên tra cứu nhanh thông tin sự kiện sắp diễn ra, thông tin hội đồng, liên hệ Ban Thư Ký và tìm kiếm các đối tác tiềm năng.
 
 ### 04. Kênh Trao Đổi & Liên Lạc Nội Bộ Riêng Tư [KẾT NỐI BẢO MẬT]
-Gọi điện thoại và trao đổi trực tiếp giữa các Chủ tịch & CEO hội viên, bảo mật tuyệt đối, giữ gìn tính riêng tư trong các cuộc thảo luận kinh doanh.
+Gọi điện thoại và trao đổi trực tiếp giữa các Chủ tịch & CEO Học viên, bảo mật tuyệt đối, giữ gìn tính riêng tư trong các cuộc thảo luận kinh doanh.
 
 ### 05. Phân Quyền Vận Hành Theo Đúng 6 Ban Chuyên Môn [QUẢN TRỊ KHOA HỌC]
 Ban Lãnh Đạo nắm toàn cảnh hệ thống; các Trưởng Ban và Thành viên chỉ xem và xử lý đúng nghiệp vụ của ban mình, bảo vệ an toàn thông tin.
@@ -118,10 +118,10 @@ Ban Lãnh Đạo nắm toàn cảnh hệ thống; các Trưởng Ban và Thành 
 
 | Hạng Mục Hoạt Động | Trước Khi Có Hệ Thống | Sau Khi Số Hóa (ViConnect) |
 | :--- | :--- | :--- |
-| **Quản Lý Hồ Sơ Hội Viên** | Dùng file Excel rời rạc, thất lạc thông tin khi đổi nhân sự thư ký. | **Cơ sở dữ liệu số tập trung, cập nhật đầy đủ thông tin pháp lý & ngành nghề.** |
+| **Quản Lý Hồ Sơ Học viên** | Dùng file Excel rời rạc, thất lạc thông tin khi đổi nhân sự thư ký. | **Cơ sở dữ liệu số tập trung, cập nhật đầy đủ thông tin pháp lý & ngành nghề.** |
 | **Đón Tiếp Sự Kiện & Gala** | Tìm tên trên danh sách giấy in, ùn tắc tại sảnh, dễ nhầm bàn ghế. | **Quét vé điện tử trên điện thoại chỉ 1 giây, hiển thị rõ số bàn và số ghế.** |
 | **Giao Thương & Bán Chéo B2B** | Trao đổi danh thiếp giấy dễ quên, khó theo dõi nhu cầu thường xuyên. | **Gian hàng sản phẩm trực tuyến, danh thiếp số lưu danh bạ điện thoại 1 chạm.** |
-| **Thu Chi & Đóng Phí Hội Viên** | Chuyển khoản thủ công, kế toán phải chụp ảnh sao kê dò tìm từng dòng. | **Mã QR thanh toán tự động, gạch nợ tức thời, xuất báo cáo thu chi minh bạch.** |
+| **Thu Chi & Đóng Phí Học viên** | Chuyển khoản thủ công, kế toán phải chụp ảnh sao kê dò tìm từng dòng. | **Mã QR thanh toán tự động, gạch nợ tức thời, xuất báo cáo thu chi minh bạch.** |
 | **Phân Công Việc 6 Ban** | Nhắc việc qua nhóm chat Zalo dễ trôi tin, khó kiểm soát thời hạn. | **Bảng giao việc rõ ràng người chịu trách nhiệm, đính kèm tài liệu họp đầy đủ.** |
 
 ---
@@ -133,7 +133,7 @@ Ban Lãnh Đạo nắm toàn cảnh hệ thống; các Trưởng Ban và Thành 
 Báo cáo trực tiếp tại HDI Mạc Thái Tông; lắng nghe ý kiến đóng góp từ Ban Lãnh Đạo CLB để hoàn thiện sản phẩm.
 
 ### GIAI ĐOẠN 2 (22/10 – 30/10/2026): Nghiệm Thu Kỹ Thuật & Đóng Gói Tài Liệu
-Bàn giao trọn bộ tài liệu hướng dẫn sử dụng Web CRM và Mobile App; đồng bộ cơ sở dữ liệu hội viên chính thức.
+Bàn giao trọn bộ tài liệu hướng dẫn sử dụng Web CRM và Mobile App; đồng bộ cơ sở dữ liệu Học viên chính thức.
 
 ### GIAI ĐOẠN 3 (01/11 – 10/11/2026): Tập Huấn Vận Hành Cho 6 Ban Chuyên Môn
 Tập huấn trực tiếp cho Ban Thư Ký và các Trưởng Ban; chuyển giao quy trình tổ chức sự kiện và quản lý thu chi.
@@ -152,7 +152,7 @@ Phát hành chính thức lên App Store & Google Play Store; ViConnect cử k�
 
 - **Hotline Hỗ Trợ: 0983 1010 10 / 0988 66 55 44**
 - **Cổng Quản Trị: https://crm.ceohn10.viconnect.vn**
-- **Cổng Hội Viên: https://ceohn10.viconnect.vn**
+- **Cổng Học viên: https://ceohn10.viconnect.vn**
 
 *“Kính chúc CLB Doanh Nhân CEO HN10 ngày càng lớn mạnh, đoàn kết và bứt phá thành công!”*
 

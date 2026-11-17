@@ -34,7 +34,7 @@ const crmF1New = `        name: 'Bảo mật API Backend bằng NestJS RolesGuar
         note: 'Chặn quyền ở tầng API NestJS, trả lỗi 403 Forbidden nếu không đúng vai trò.'
       },
       {
-        name: 'Chuẩn hóa thứ bậc phân quyền quản trị 7 cấp: Chủ tịch -> Admin -> Ban Điều Hành -> Tổng thư ký -> Trưởng ban chuyên môn -> Ban thư ký -> Hội viên',
+        name: 'Chuẩn hóa thứ bậc phân quyền quản trị 7 cấp: Chủ tịch -> Admin -> Ban Điều Hành -> Tổng thư ký -> Trưởng ban chuyên môn -> Ban thư ký -> Học viên',
         status: 'Hoàn thành',
         startDate: '12/09/2026',
         assignee: 'Dev Team ViConnect',
@@ -100,7 +100,7 @@ const crmEndNew = `        name: 'Cấu hình thông tin hiệp hội CLB Doanh 
         assignee: 'Dev Team ViConnect',
         completedDate: '30/09/2026',
         tester: 'QA / Ban Điều Hành CLB CEO HN10',
-        note: 'Lãnh đạo xem toàn bộ; Tổng thư ký xem Ban Thư Ký; Trưởng ban xem ban của mình; Hội viên chỉ xem việc được giao/phối hợp.'
+        note: 'Lãnh đạo xem toàn bộ; Tổng thư ký xem Ban Thư Ký; Trưởng ban xem ban của mình; Học viên chỉ xem việc được giao/phối hợp.'
       },
       {
         name: 'Hỗ trợ tệp đính kèm giao việc đa định dạng: Word (.doc, .docx), Excel (.xls, .xlsx), PDF (.pdf) và Hình ảnh minh chứng',
@@ -139,7 +139,7 @@ const crmEndNew = `        name: 'Cấu hình thông tin hiệp hội CLB Doanh 
         note: 'Quy trình khép kín, minh bạch thời gian, đánh giá chất lượng 1-5 sao và lưu trữ lịch sử thao tác đầy đủ.'
       },
       {
-        name: 'Tự động phát chuông đôn đốc tiến độ (Remind task) và đồng bộ thông báo thời gian thực đến điện thoại hội viên',
+        name: 'Tự động phát chuông đôn đốc tiến độ (Remind task) và đồng bộ thông báo thời gian thực đến điện thoại Học viên',
         status: 'Hoàn thành',
         startDate: '23/09/2026',
         assignee: 'Dev Team ViConnect',
@@ -197,7 +197,7 @@ const appF1Old = `        name: 'Cài đặt ứng dụng PWA lên màn hình ch
     ]
   },
   {
-    mainFeature: '2. Thẻ Hội Viên Thông Minh VIP 3D`;
+    mainFeature: '2. Thẻ Học viên Thông Minh VIP 3D`;
 
 const appF1New = `        name: 'Cài đặt ứng dụng PWA lên màn hình chính (Add to Home Screen trên iOS và Android)',
         status: 'Hoàn thành',
@@ -208,7 +208,7 @@ const appF1New = `        name: 'Cài đặt ứng dụng PWA lên màn hình ch
         note: 'Trải nghiệm như ứng dụng native, mở app 1 chạm từ màn hình điện thoại.'
       },
       {
-        name: 'Nhận diện vai trò chuẩn xác ngay từ khi đăng nhập: Chủ tịch, Admin, Ban Điều Hành, Trưởng ban, Tổng thư ký, Ban thư ký, Hội viên',
+        name: 'Nhận diện vai trò chuẩn xác ngay từ khi đăng nhập: Chủ tịch, Admin, Ban Điều Hành, Trưởng ban, Tổng thư ký, Ban thư ký, Học viên',
         status: 'Hoàn thành',
         startDate: '14/09/2026',
         assignee: 'Dev Team ViConnect',
@@ -219,7 +219,7 @@ const appF1New = `        name: 'Cài đặt ứng dụng PWA lên màn hình ch
     ]
   },
   {
-    mainFeature: '2. Thẻ Hội Viên Thông Minh VIP 3D`;
+    mainFeature: '2. Thẻ Học viên Thông Minh VIP 3D`;
 
 content = content.replace(appF1Old, appF1New);
 
@@ -338,7 +338,7 @@ const appEndNew = `        name: 'Carousel Banner nhà tài trợ ở đầu Sà
         assignee: 'Dev Team ViConnect',
         completedDate: '30/09/2026',
         tester: 'QA / Ban Điều Hành CLB CEO HN10',
-        note: 'Nhấn giữ phím mic và nói tự nhiên để tìm kiếm hội viên, xem lịch họp hoặc tra cứu sản phẩm B2B.'
+        note: 'Nhấn giữ phím mic và nói tự nhiên để tìm kiếm Học viên, xem lịch họp hoặc tra cứu sản phẩm B2B.'
       },
       {
         name: 'Tự động tra cứu cơ sở dữ liệu hiệp hội và điều hướng màn hình rảnh tay',

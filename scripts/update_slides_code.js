@@ -25,19 +25,19 @@ code = code.replace(
   "{ title: 'Tách Biệt Thẩm Quyền Phê Duyệt', desc: 'Hệ thống kiểm soát nghiêm ngặt theo thẩm quyền Ban Thường Vụ, tự động từ chối thao tác ngoài thẩm quyền.' },"
 );
 code = code.replace(
-  "subtitle: 'Trang chi tiết hội viên (/members/$memberId), chấm điểm gắn kết KPI, đặt lại mật khẩu và khóa',",
-  "subtitle: 'Trang chi tiết hồ sơ hội viên toàn diện, chấm điểm gắn kết KPI, đặt lại mật khẩu và phân quyền',"
+  "subtitle: 'Trang chi tiết Học viên (/members/$memberId), chấm điểm gắn kết KPI, đặt lại mật khẩu và khóa',",
+  "subtitle: 'Trang chi tiết hồ sơ Học viên toàn diện, chấm điểm gắn kết KPI, đặt lại mật khẩu và phân quyền',"
 );
 
 // 2. Remove login slide from APP_FEATURE_SLIDES
-// The slide is: { eyebrow: 'CHỨC NĂNG HỘI VIÊN 02', title: 'Đăng Nhập & Định Danh Doanh Nhân Bảo Mật' ... }
-code = code.replace(/\{\s*eyebrow:\s*'CHỨC NĂNG HỘI VIÊN 02',\s*title:\s*'Đăng Nhập & Định Danh Doanh Nhân Bảo Mật'[\s\S]*?\},(?=\s*\{\s*eyebrow:\s*'CHỨC NĂNG HỘI VIÊN 03')/, '');
+// The slide is: { eyebrow: 'CHỨC NĂNG Học viên 02', title: 'Đăng Nhập & Định Danh Doanh Nhân Bảo Mật' ... }
+code = code.replace(/\{\s*eyebrow:\s*'CHỨC NĂNG Học viên 02',\s*title:\s*'Đăng Nhập & Định Danh Doanh Nhân Bảo Mật'[\s\S]*?\},(?=\s*\{\s*eyebrow:\s*'CHỨC NĂNG Học viên 03')/, '');
 
 // Renumber APP slides: 03 -> 02, 04 -> 03, ..., 21 -> 20
 for (let i = 3; i <= 21; i++) {
   const oldNum = i < 10 ? `0${i}` : `${i}`;
   const newNum = (i - 1) < 10 ? `0${i - 1}` : `${i - 1}`;
-  code = code.replace(`eyebrow: 'CHỨC NĂNG HỘI VIÊN ${oldNum}'`, `eyebrow: 'CHỨC NĂNG HỘI VIÊN ${newNum}'`);
+  code = code.replace(`eyebrow: 'CHỨC NĂNG Học viên ${oldNum}'`, `eyebrow: 'CHỨC NĂNG Học viên ${newNum}'`);
 }
 
 // 3. Update comments in generateCrmPptx and generateAppPptx

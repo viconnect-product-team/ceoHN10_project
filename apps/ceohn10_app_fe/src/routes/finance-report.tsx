@@ -397,7 +397,7 @@ function FinanceReport() {
             <button
               type="button"
               onClick={handleExportPdf}
-              className="inline-flex items-center gap-1.5 rounded-xl bg-[#003B95] hover:bg-[#002B70] px-3.5 py-2 text-xs font-bold text-white shadow-xs cursor-pointer transition"
+              className="inline-flex items-center gap-1.5 rounded-xl bg-[#334155] hover:bg-[#1E293B] px-3.5 py-2 text-xs font-bold text-white shadow-xs cursor-pointer transition"
               title="In hoặc tải xuống báo cáo dạng PDF"
             >
               <Printer className="h-4 w-4" />

@@ -27,10 +27,10 @@ export const Route = createFileRoute("/verify")({
     deps.code || deps.t ? verifyMemberPassFn({ data: { code: deps.code, token: deps.t } }) : null,
   head: () => ({
     meta: [
-      { title: "Xác thực thẻ hội viên — CLB Doanh Nhân CEO HN10" },
+      { title: "Xác thực thẻ Học viên — CLB Doanh Nhân CEO HN10" },
       {
         name: "description",
-        content: "Cổng xác thực điện tử thẻ hội viên chính thức CLB Doanh Nhân CEO HN10.",
+        content: "Cổng xác thực điện tử thẻ Học viên chính thức CLB Doanh Nhân CEO HN10.",
       },
       { name: "robots", content: "noindex" },
     ],
@@ -58,7 +58,7 @@ function Shell({ children }: { children: React.ReactNode }) {
           </div>
           <div className="text-right">
             <div className="text-[12px] font-bold text-[#E6C687] uppercase tracking-wider">
-              Xác thực hội viên
+              Xác thực Học viên
             </div>
             <div className="text-[9px] font-semibold text-slate-400">
               OFFICIAL VERIFICATION
@@ -82,7 +82,7 @@ function VerifyScreen() {
           <ShieldQuestion className="h-12 w-12 text-[#E6C687]" />
           <div className="text-[16px] font-bold text-white">Chưa có mã để xác thực</div>
           <p className="text-[13px] text-slate-400 max-w-xs">
-            Vui lòng quét mã QR trên thẻ hội viên CEO HN10 để thực hiện xác thực thông tin.
+            Vui lòng quét mã QR trên thẻ Học viên CEO HN10 để thực hiện xác thực thông tin.
           </p>
           <Link
             to="/association"
@@ -122,11 +122,10 @@ function VerifyScreen() {
       <div className="overflow-hidden rounded-3xl border border-white/10 bg-white/[0.04] backdrop-blur-md shadow-2xl">
         {/* Verdict banner */}
         <div
-          className={`flex items-center gap-3.5 px-6 py-4.5 border-b ${
-            ok
+          className={`flex items-center gap-3.5 px-6 py-4.5 border-b ${ok
               ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400"
               : "bg-rose-500/10 border-rose-500/20 text-rose-400"
-          }`}
+            }`}
         >
           {ok ? (
             <ShieldCheck className="h-9 w-9 shrink-0 text-emerald-400" />
@@ -135,7 +134,7 @@ function VerifyScreen() {
           )}
           <div>
             <div className="text-[16px] font-black uppercase tracking-wide">
-              {ok ? "Hội viên hợp lệ" : "Không hợp lệ"}
+              {ok ? "Học viên hợp lệ" : "Không hợp lệ"}
             </div>
             <div className="text-[12px] font-medium text-slate-300 mt-0.5">
               {ok ? "Thẻ chính thức đang hoạt động" : (result.reason ?? "Thẻ không hợp lệ hoặc đã thu hồi")}
@@ -144,15 +143,15 @@ function VerifyScreen() {
         </div>
 
         <div className="space-y-3.5 p-6 divide-y divide-white/5">
-          <Row icon={BadgeCheck} label="Hội viên" value={result.memberName || "—"} />
+          <Row icon={BadgeCheck} label="Học viên" value={result.memberName || "—"} />
           <div className="pt-3.5">
             <Row icon={Building2} label="Tổ chức" value={result.associationName || "CLB Doanh Nhân CEO HN10"} />
           </div>
           <div className="pt-3.5">
-            <Row icon={Hash} label="Mã hội viên" value={result.memberCode || "—"} accent />
+            <Row icon={Hash} label="Mã Học viên" value={result.memberCode || "—"} accent />
           </div>
           <div className="pt-3.5">
-            <Row icon={BadgeCheck} label="Hạng hội viên" value={result.membershipLevel || "Hội viên chính thức"} />
+            <Row icon={BadgeCheck} label="Hạng Học viên" value={result.membershipLevel || "Học viên chính thức"} />
           </div>
           <div className="pt-3.5">
             <Row
@@ -193,9 +192,8 @@ function Row({
       <div className="min-w-0">
         <div className="text-[11px] font-medium text-slate-400">{label}</div>
         <div
-          className={`truncate text-[14px] font-bold ${
-            accent ? "text-[#E6C687]" : "text-white"
-          }`}
+          className={`truncate text-[14px] font-bold ${accent ? "text-[#E6C687]" : "text-white"
+            }`}
         >
           {value}
         </div>

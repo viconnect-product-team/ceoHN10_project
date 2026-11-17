@@ -79,7 +79,7 @@ export const EVENT_TYPE_TEMPLATES: Record<EventTypeKey, EventTypeTemplate> = {
     label: "Đào tạo Huấn luyện (Executive Training)",
     name: "CHƯƠNG TRÌNH HUẤN LUYỆN LÃNH ĐẠO: NÂNG TẦM BẢN LĨNH & TƯ DUY CHIẾN LƯỢC",
     badge: "🎓 EXECUTIVE TRAINING ACADEMY",
-    tagline: "Đào tạo đặc quyền dành riêng cho Hội viên CLB Doanh Nhân CEO HN10",
+    tagline: "Đào tạo đặc quyền dành riêng cho Học viên CLB Doanh Nhân CEO HN10",
     themeGradient: "linear-gradient(135deg, #1E1B4B 0%, #4338CA 55%, #312E81 100%)",
     badgeBg: "rgba(167, 139, 250, 0.25)",
     badgeText: "#A78BFA",

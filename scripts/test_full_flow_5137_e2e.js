@@ -38,9 +38,9 @@ async function runE2ETest() {
 
   try {
     // -------------------------------------------------------------
-    // BƯỚC 1: ĐĂNG KÝ HỘI VIÊN MỚI TRÊN LOCALHOST:5137
+    // BƯỚC 1: ĐĂNG KÝ Học viên MỚI TRÊN LOCALHOST:5137
     // -------------------------------------------------------------
-    console.log('\n[BƯỚC 1] Điều hướng đến trang đăng ký hội viên trên http://localhost:5137/register');
+    console.log('\n[BƯỚC 1] Điều hướng đến trang đăng ký Học viên trên http://localhost:5137/register');
     await page.goto(`${BASE_URL}/register`, { waitUntil: 'domcontentloaded', timeout: 15000 });
     await page.waitForTimeout(1500);
     await page.screenshot({ path: path.join(EVIDENCE_DIR, '01_register_page.png') });
@@ -76,7 +76,7 @@ async function runE2ETest() {
     results.registration = true;
 
     // -------------------------------------------------------------
-    // BƯỚC 2: KIỂM CHỨNG BAN THƯ KÝ KHÔNG CÓ QUYỀN DUYỆT HỘI VIÊN (HTTP 403)
+    // BƯỚC 2: KIỂM CHỨNG BAN THƯ KÝ KHÔNG CÓ QUYỀN DUYỆT Học viên (HTTP 403)
     // -------------------------------------------------------------
     console.log('\n[BƯỚC 2] Kiểm tra thẩm quyền của Ban Thư Ký (ceo.tongthuky@ceohn10.com)...');
     const btkLoginRes = await axios.post(`${API_URL}/auth/login`, {
@@ -90,7 +90,7 @@ async function runE2ETest() {
       await axios.patch(`${API_URL}/members/${memberCreatedId}/approve-with-credentials`, {}, {
         headers: { Authorization: `Bearer ${btkToken}` }
       });
-      console.error('❌ LỖI: Ban Thư Ký duyệt được hội viên (Vi phạm phân quyền!)');
+      console.error('❌ LỖI: Ban Thư Ký duyệt được Học viên (Vi phạm phân quyền!)');
       results.btk_blocked = false;
     } catch (err) {
       if (err.response && err.response.status === 403) {
@@ -102,7 +102,7 @@ async function runE2ETest() {
     }
 
     // -------------------------------------------------------------
-    // BƯỚC 3: KIỂM CHỨNG BAN THÀNH VIÊN DUYỆT HỘI VIÊN THÀNH CÔNG (HTTP 201/200)
+    // BƯỚC 3: KIỂM CHỨNG BAN THÀNH VIÊN DUYỆT Học viên THÀNH CÔNG (HTTP 201/200)
     // -------------------------------------------------------------
     console.log('\n[BƯỚC 3] Ban Thành Viên (ceo.thanhvien@ceohn10.com) kiểm duyệt & phê duyệt kết nạp...');
     const btvLoginRes = await axios.post(`${API_URL}/auth/login`, {
@@ -115,7 +115,7 @@ async function runE2ETest() {
       headers: { Authorization: `Bearer ${btvToken}` }
     });
 
-    console.log(`✅ [THÀNH CÔNG] Ban Thành Viên đã phê duyệt kết nạp hội viên ${testName}!`);
+    console.log(`✅ [THÀNH CÔNG] Ban Thành Viên đã phê duyệt kết nạp Học viên ${testName}!`);
     console.log(`Chi tiết: Mã HV: ${btvApproveRes.data.member?.member_code}, Trạng thái: ${btvApproveRes.data.member?.status}, Email gửi: ${btvApproveRes.data.credentials?.email}`);
     results.btv_approved = true;
 
@@ -144,7 +144,7 @@ async function runE2ETest() {
         email: 'ceo.thanhvien@ceohn10.com',
         pass: '123456',
         targetRoute: '/members',
-        checkText: 'Hội Viên',
+        checkText: 'Học viên',
         screenshot: '06_ban_thanh_vien.png'
       },
       {
@@ -177,7 +177,7 @@ async function runE2ETest() {
 
     for (const acc of BAN_ACCOUNTS) {
       console.log(`\n--- Kiểm tra tài khoản: ${acc.name} (${acc.email}) ---`);
-      
+
       // Xóa cookies / localStorage để đảm bảo phiên đăng nhập riêng biệt
       await context.clearCookies();
       await page.goto(`${BASE_URL}/auth`, { waitUntil: 'domcontentloaded', timeout: 15000 });
@@ -217,9 +217,9 @@ async function runE2ETest() {
     }
 
     // -------------------------------------------------------------
-    // BƯỚC 5: ĐĂNG NHẬP VỚI TÀI KHOẢN HỘI VIÊN MỚI VỪA ĐƯỢC BTV PHÊ DUYỆT
+    // BƯỚC 5: ĐĂNG NHẬP VỚI TÀI KHOẢN Học viên MỚI VỪA ĐƯỢC BTV PHÊ DUYỆT
     // -------------------------------------------------------------
-    console.log('\n[BƯỚC 5] Đăng nhập tài khoản hội viên mới được cấp trên localhost:5137...');
+    console.log('\n[BƯỚC 5] Đăng nhập tài khoản Học viên mới được cấp trên localhost:5137...');
     const memberNewPass = 'CEO HN10@2026';
     await context.clearCookies();
     await page.goto(`${BASE_URL}/auth`, { waitUntil: 'domcontentloaded' });
@@ -244,7 +244,7 @@ async function runE2ETest() {
     await page.waitForTimeout(2000);
     await page.screenshot({ path: path.join(EVIDENCE_DIR, '10_new_member_profile.png') });
 
-    console.log(`✅ [HỘI VIÊN MỚI] Đăng nhập & xem hồ sơ VIP thành công: ${page.url()}`);
+    console.log(`✅ [Học viên MỚI] Đăng nhập & xem hồ sơ VIP thành công: ${page.url()}`);
     results.new_member_login = true;
 
   } catch (err) {

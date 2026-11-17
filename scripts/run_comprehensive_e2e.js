@@ -85,8 +85,8 @@ async function runAllTests() {
     await landingPage.waitForTimeout(1500);
     await snap(landingPage, '01_landing_hero.png', 'Giao diện Landing Page CLB CEO HN10');
 
-    // 1.2 Form Đăng ký Hội viên
-    console.log('1.2 Nộp hồ sơ đăng ký tham gia hội viên qua API...');
+    // 1.2 Form Đăng ký Học viên
+    console.log('1.2 Nộp hồ sơ đăng ký tham gia Học viên qua API...');
     const applicantPhone = '0983198399';
     const applicantEmail = 'ceo.namhai@vione.app';
     const applicantName = 'Trần Nam Hải';
@@ -123,7 +123,7 @@ async function runAllTests() {
     await injectLoginSession(crmPage, 'admin@connect.vn', '123456');
     await crmPage.goto(`${CRM_BASE}/members`, { waitUntil: 'networkidle' });
     await crmPage.waitForTimeout(2000);
-    await snap(crmPage, '04_crm_members_management.png', 'CRM: Quản lý danh sách Hội viên & Đơn chờ duyệt');
+    await snap(crmPage, '04_crm_members_management.png', 'CRM: Quản lý danh sách Học viên & Đơn chờ duyệt');
 
     // Tạo tài khoản an toàn trong auth.users & vione_users trước khi gán FK
     const newUserId = crypto.randomUUID();
@@ -152,15 +152,15 @@ async function runAllTests() {
       SET status = 'active', code = 'HN10-099', user_id = $1::uuid, updated_at = now()
       WHERE phone = $2;
     `, [targetUserId, applicantPhone]);
-    console.log(`✓ Phê duyệt thành công Hội viên: ${applicantName} (Mã: HN10-099)`);
+    console.log(`✓ Phê duyệt thành công Học viên: ${applicantName} (Mã: HN10-099)`);
 
     // Reload CRM Members
     await crmPage.reload({ waitUntil: 'networkidle' });
     await crmPage.waitForTimeout(1500);
-    await snap(crmPage, '05_crm_member_approved.png', 'CRM: Danh sách sau khi phê duyệt hội viên HN10-099');
+    await snap(crmPage, '05_crm_member_approved.png', 'CRM: Danh sách sau khi phê duyệt Học viên HN10-099');
 
-    // 1.4 Hội viên đăng nhập vào App Hiệp Hội
-    console.log('1.4 Hội viên đăng nhập vào App Hiệp Hội...');
+    // 1.4 Học viên đăng nhập vào App Hiệp Hội
+    console.log('1.4 Học viên đăng nhập vào App Hiệp Hội...');
     const appPage = await browser.newPage({ viewport: { width: 414, height: 896 } });
     await appPage.goto(`${APP_BASE}/association/login`, { waitUntil: 'networkidle' });
     await snap(appPage, '06_app_login_screen.png', 'App: Màn hình Đăng nhập Doanh nhân CLB CEO HN10');
@@ -168,19 +168,19 @@ async function runAllTests() {
     // Login bằng form trên giao diện app
     await appPage.fill('#assoc-auth-id', applicantEmail);
     await appPage.fill('#assoc-auth-password', '123456');
-    await snap(appPage, '07_app_login_filled.png', 'App: Điền thông tin đăng nhập hội viên');
+    await snap(appPage, '07_app_login_filled.png', 'App: Điền thông tin đăng nhập Học viên');
     await appPage.click('button[type="submit"]');
     await appPage.waitForTimeout(3000);
 
-    await snap(appPage, '08_app_home_dashboard.png', 'App: Trang chủ Hội viên Hiệp Hội CEO HN10 sau khi đăng nhập');
+    await snap(appPage, '08_app_home_dashboard.png', 'App: Trang chủ Học viên Hiệp Hội CEO HN10 sau khi đăng nhập');
 
-    // 1.5 Mở Thẻ Hội Viên VIP & Danh Thiếp
-    console.log('1.5 Xem Thẻ Hội Viên VIP & Danh thiếp số...');
+    // 1.5 Mở Thẻ Học viên VIP & Danh Thiếp
+    console.log('1.5 Xem Thẻ Học viên VIP & Danh thiếp số...');
     await appPage.goto(`${APP_BASE}/association/card`, { waitUntil: 'networkidle' });
     await appPage.waitForTimeout(2000);
-    await snap(appPage, '09_app_vip_card.png', 'App: Thẻ Hội Viên VIP Navy & Gold kèm mã QR vCard');
+    await snap(appPage, '09_app_vip_card.png', 'App: Thẻ Học viên VIP Navy & Gold kèm mã QR vCard');
 
-    // 1.6 Chỉnh sửa thông tin tài khoản hội viên & đổi mật khẩu
+    // 1.6 Chỉnh sửa thông tin tài khoản Học viên & đổi mật khẩu
     console.log('1.6 Chỉnh sửa thông tin cá nhân & cài đặt bảo mật...');
     await appPage.goto(`${APP_BASE}/association/profile`, { waitUntil: 'networkidle' });
     await appPage.waitForTimeout(2000);
@@ -201,8 +201,8 @@ async function runAllTests() {
     await crmPage.waitForTimeout(2000);
     await snap(crmPage, '12_crm_events_list.png', 'CRM: Danh sách sự kiện & Sơ đồ hội nghị rạp chiếu Cinema Seating');
 
-    // 2.2 Hội viên mở App Hiệp Hội xem sự kiện
-    console.log('2.2 Hội viên xem sự kiện trên App...');
+    // 2.2 Học viên mở App Hiệp Hội xem sự kiện
+    console.log('2.2 Học viên xem sự kiện trên App...');
     await appPage.goto(`${APP_BASE}/association/events`, { waitUntil: 'networkidle' });
     await appPage.waitForTimeout(2000);
     await snap(appPage, '13_app_events_screen.png', 'App: Danh sách sự kiện với thẻ Poster tỉ lệ 2:3');
@@ -257,7 +257,7 @@ async function runAllTests() {
     const luckyDrawData = {
       prizes: [
         { id: 'p1', name: 'Giải Nhất: Kỳ nghỉ dưỡng VIP 5 sao Furama Resort Đà Nẵng', winner: 'Trần Nam Hải (HN10-099)' },
-        { id: 'p2', name: 'Giải Nhì: Thẻ Hội Viên Titan VVIP 2026', winner: 'Lê Hoàng Long (HN10-007)' }
+        { id: 'p2', name: 'Giải Nhì: Thẻ Học viên Titan VVIP 2026', winner: 'Lê Hoàng Long (HN10-007)' }
       ],
       drawnAt: new Date().toISOString()
     };
@@ -313,7 +313,7 @@ async function runAllTests() {
     await snap(crmPage, '18_crm_marketplace_sync.png', 'CRM: Gian hàng Marketplace đồng bộ sản phẩm mới đăng');
 
     // 3.4 Chỉnh sửa sản phẩm
-    console.log('3.4 Cập nhật giá ưu đãi hội viên...');
+    console.log('3.4 Cập nhật giá ưu đãi Học viên...');
     await pg.query(`
       UPDATE public.products 
       SET price = 120000000, title = 'Gói CRM ERP Nam Hải (Ưu Đãi Đặc Biệt CLB CEO HN10)', updated_at = now()
@@ -329,8 +329,8 @@ async function runAllTests() {
     // =========================================================================
     console.log('\n--- [LUỒNG 4] Sàn Cơ hội Giao thương B2B: Đăng -> Nhận kết nối -> Sửa -> Xóa ---');
 
-    // 4.1 Hội viên 1 mở Sàn cơ hội B2B
-    console.log('4.1 Hội viên mở Sàn cơ hội B2B...');
+    // 4.1 Học viên 1 mở Sàn cơ hội B2B
+    console.log('4.1 Học viên mở Sàn cơ hội B2B...');
     await appPage.goto(`${APP_BASE}/association/opportunities`, { waitUntil: 'networkidle' });
     await appPage.waitForTimeout(2000);
     await snap(appPage, '20_app_opportunities_feed.png', 'App: Sàn Cơ hội Giao thương B2B CEO HN10');
@@ -357,8 +357,8 @@ async function runAllTests() {
     await appPage.waitForTimeout(2000);
     await snap(appPage, '21_app_opp_posted.png', 'App: Cơ hội mới đăng hiển thị trên Sàn B2B');
 
-    // 4.3 Hội viên 2 (ceo.member2@ceohn10.com - Bùi Đức Thắng) nhận cơ hội
-    console.log('4.3 Hội viên 2 nhận kết nối cơ hội...');
+    // 4.3 Học viên 2 (ceo.member2@ceohn10.com - Bùi Đức Thắng) nhận cơ hội
+    console.log('4.3 Học viên 2 nhận kết nối cơ hội...');
     await pg.query(`
       UPDATE public.opportunities 
       SET claimed_by_id = 'c1983000-0000-4000-8000-000000000007',
@@ -388,8 +388,8 @@ async function runAllTests() {
     // =========================================================================
     console.log('\n--- [LUỒNG 5] Quét mã QR, Kết nối, Nhắn tin Realtime, Gửi file/ảnh/định vị, Thu hồi, Tạo nhóm ---');
 
-    // 5.1 Danh bạ hội viên & Kết nối
-    console.log('5.1 Mở Danh bạ hội viên...');
+    // 5.1 Danh bạ Học viên & Kết nối
+    console.log('5.1 Mở Danh bạ Học viên...');
     await appPage.goto(`${APP_BASE}/association/members`, { waitUntil: 'networkidle' });
     await appPage.waitForTimeout(2000);
     await snap(appPage, '23_app_members_directory.png', 'App: Danh bạ Doanh nhân CEO HN10 & Nút Kết nối 1 Chạm');
@@ -453,7 +453,7 @@ async function runAllTests() {
         title_key, body_key, safe_display_data, priority, status, app_scope, target_app, created_at, updated_at
       ) VALUES (
         gen_random_uuid(), $1::uuid, 'membership', 'mem-099', 'notif_welcome_namhai_test_' || floor(extract(epoch from now())), 'welcome', 'personal',
-        'Chúc mừng tân Hội viên Trần Nam Hải',
+        'Chúc mừng tân Học viên Trần Nam Hải',
         'Hồ sơ gia nhập CLB Doanh Nhân CEO HN10 của bạn đã được Ban Thường Vụ HanoiBA phê duyệt chính thức.',
         '{}'::jsonb, 'high', 'delivered', 'association', 'association', now(), now()
       ) ON CONFLICT (dedupe_key) DO NOTHING;
@@ -461,7 +461,7 @@ async function runAllTests() {
 
     await appPage.goto(`${APP_BASE}/association/notifications`, { waitUntil: 'networkidle' });
     await appPage.waitForTimeout(2000);
-    await snap(appPage, '26_app_notifications_personal.png', 'App: Hộp thư Thông báo cá nhân dành riêng cho Hội viên');
+    await snap(appPage, '26_app_notifications_personal.png', 'App: Hộp thư Thông báo cá nhân dành riêng cho Học viên');
 
     console.log('\n=============================================================');
     console.log('ALL 6 AUTOMATED END-TO-END FLOWS COMPLETED WITH 100% SUCCESS!');

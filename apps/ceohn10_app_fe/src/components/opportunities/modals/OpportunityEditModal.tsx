@@ -170,7 +170,7 @@ export function OpportunityEditModal({
           setSelectedDept((prev) => prev || res[0]?.department || "");
         }
       })
-      .catch(() => {})
+      .catch(() => { })
       .finally(() => setLoadingDepts(false));
 
     // Gọi API lấy danh sách những người đã kết nối để chọn người giới thiệu
@@ -181,7 +181,7 @@ export function OpportunityEditModal({
           setConnectedMembers(res);
           setFriendsList(res);
         } else {
-          // Fallback nạp danh bạ hội viên để luôn sẵn sàng danh sách
+          // Fallback nạp danh bạ Học viên để luôn sẵn sàng danh sách
           fetchNestApi<any[]>("/association/members")
             .then((mRes) => {
               if (Array.isArray(mRes) && mRes.length > 0) {
@@ -196,10 +196,10 @@ export function OpportunityEditModal({
                 setFriendsList(sampleConnections);
               }
             })
-            .catch(() => {});
+            .catch(() => { });
         }
       })
-      .catch(() => {})
+      .catch(() => { })
       .finally(() => {
         setLoadingConnectedMembers(false);
         setLoadingFriends(false);
@@ -372,11 +372,10 @@ export function OpportunityEditModal({
                   if (editErrors.title) setEditErrors((prev) => ({ ...prev, title: "" }));
                 }}
                 placeholder="Ví dụ: Tìm đối tác cung ứng bao bì giấy số lượng lớn..."
-                className={`w-full rounded-2xl border bg-slate-100 dark:bg-white/[0.06] px-4 py-2.5 text-[13px] text-slate-900 dark:text-white outline-none ring-0 placeholder:text-slate-400 transition ${
-                  editErrors.title
+                className={`w-full rounded-2xl border bg-slate-100 dark:bg-white/[0.06] px-4 py-2.5 text-[13px] text-slate-900 dark:text-white outline-none ring-0 placeholder:text-slate-400 transition ${editErrors.title
                     ? "border-rose-500 ring-1 ring-rose-500/30"
                     : "border-transparent focus:border-amber-500"
-                }`}
+                  }`}
               />
               {editErrors.title && (
                 <p className="mt-1 text-xs font-semibold text-rose-500 animate-in fade-in duration-150">
@@ -527,42 +526,39 @@ export function OpportunityEditModal({
                       setRecipientType("all");
                       setSelectedRecipientIds([]);
                     }}
-                    className={`py-1.5 px-1.5 rounded-lg font-bold text-center border transition cursor-pointer text-[10.5px] leading-tight ${
-                      recipientType === "all"
+                    className={`py-1.5 px-1.5 rounded-lg font-bold text-center border transition cursor-pointer text-[10.5px] leading-tight ${recipientType === "all"
                         ? "bg-[#1F3864] text-white border-[#1F3864] shadow-xs"
                         : "bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700"
-                    }`}
+                      }`}
                   >
-                    Tất cả hội viên
+                    Tất cả Học viên
                   </button>
                   <button
                     type="button"
                     onClick={() => setRecipientType("by_department")}
-                    className={`py-1.5 px-1.5 rounded-lg font-bold text-center border transition cursor-pointer text-[10.5px] leading-tight ${
-                      recipientType === "by_department"
+                    className={`py-1.5 px-1.5 rounded-lg font-bold text-center border transition cursor-pointer text-[10.5px] leading-tight ${recipientType === "by_department"
                         ? "bg-[#1F3864] text-white border-[#1F3864] shadow-xs"
                         : "bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700"
-                    }`}
+                      }`}
                   >
                     Theo từng ban
                   </button>
                   <button
                     type="button"
                     onClick={() => setRecipientType("friends")}
-                    className={`py-1.5 px-1.5 rounded-lg font-bold text-center border transition cursor-pointer text-[10.5px] leading-tight ${
-                      recipientType === "friends"
+                    className={`py-1.5 px-1.5 rounded-lg font-bold text-center border transition cursor-pointer text-[10.5px] leading-tight ${recipientType === "friends"
                         ? "bg-[#1F3864] text-white border-[#1F3864] shadow-xs"
                         : "bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700"
-                    }`}
+                      }`}
                   >
                     Bạn bè đã kết nối
                   </button>
                 </div>
 
-                {/* Recipient Type: Tất cả hội viên */}
+                {/* Recipient Type: Tất cả Học viên */}
                 {recipientType === "all" && (
                   <div className="p-2 rounded-lg bg-blue-50/70 dark:bg-blue-950/30 border border-blue-500/20 text-[11px] text-blue-900 dark:text-blue-200">
-                    Cơ hội này sẽ được hiển thị công khai cho toàn thể hội viên CLB Doanh Nhân CEO HN10.
+                    Cơ hội này sẽ được hiển thị công khai cho toàn thể Học viên CLB Doanh Nhân CEO HN10.
                   </div>
                 )}
 
@@ -625,11 +621,10 @@ export function OpportunityEditModal({
                           return (
                             <label
                               key={memId}
-                              className={`flex items-center gap-2 p-1.5 rounded-lg border text-[11px] cursor-pointer transition ${
-                                isDeptMemChecked
+                              className={`flex items-center gap-2 p-1.5 rounded-lg border text-[11px] cursor-pointer transition ${isDeptMemChecked
                                   ? "bg-amber-50/80 dark:bg-amber-950/40 border-[#B8860B] text-slate-900 dark:text-white font-medium"
                                   : "bg-white dark:bg-slate-800/80 border-slate-200/80 dark:border-slate-700 text-slate-700 dark:text-slate-300"
-                              }`}
+                                }`}
                             >
                               <input
                                 type="checkbox"
@@ -657,7 +652,7 @@ export function OpportunityEditModal({
                               <div className="flex-1 min-w-0">
                                 <p className="font-bold text-[11.5px] truncate">{mem.name}</p>
                                 <p className="text-[10px] text-slate-400 truncate">
-                                  {mem.title || mem.executiveRole || "Hội viên"} {mem.company ? `• ${mem.company}` : ""}
+                                  {mem.title || mem.executiveRole || "Học viên"} {mem.company ? `• ${mem.company}` : ""}
                                 </p>
                               </div>
                             </label>
@@ -678,22 +673,20 @@ export function OpportunityEditModal({
                           setFriendsScope("all");
                           setSelectedRecipientIds([]);
                         }}
-                        className={`py-1.5 px-2 rounded-lg font-bold text-center border transition cursor-pointer text-[10.5px] ${
-                          friendsScope === "all"
+                        className={`py-1.5 px-2 rounded-lg font-bold text-center border transition cursor-pointer text-[10.5px] ${friendsScope === "all"
                             ? "bg-[#1F3864] text-white border-[#1F3864]"
                             : "bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700"
-                        }`}
+                          }`}
                       >
                         Tất cả bạn bè
                       </button>
                       <button
                         type="button"
                         onClick={() => setFriendsScope("selective")}
-                        className={`py-1.5 px-2 rounded-lg font-bold text-center border transition cursor-pointer text-[10.5px] ${
-                          friendsScope === "selective"
+                        className={`py-1.5 px-2 rounded-lg font-bold text-center border transition cursor-pointer text-[10.5px] ${friendsScope === "selective"
                             ? "bg-[#1F3864] text-white border-[#1F3864]"
                             : "bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700"
-                        }`}
+                          }`}
                       >
                         Chọn từng người
                       </button>
@@ -710,7 +703,7 @@ export function OpportunityEditModal({
                           Chưa có kết nối bạn bè nào
                         </div>
                         <p className="text-[11px] text-slate-600 dark:text-slate-300 leading-relaxed">
-                          Bạn chưa có bạn bè đã kết nối trong danh bạ CEO HN10. Vui lòng kết nối giao thương trước khi chia sẻ cơ hội riêng tư, hoặc chọn &quot;Tất cả hội viên&quot;.
+                          Bạn chưa có bạn bè đã kết nối trong danh bạ CEO HN10. Vui lòng kết nối giao thương trước khi chia sẻ cơ hội riêng tư, hoặc chọn &quot;Tất cả Học viên&quot;.
                         </p>
                       </div>
                     ) : friendsScope === "all" ? (
@@ -727,17 +720,16 @@ export function OpportunityEditModal({
                           {friendsList.map((friend: any) => {
                             const friendId = String(friend.counterpartUserId || friend.id);
                             const isFriendChecked = selectedRecipientIds.includes(friendId);
-                            const friendName = friend.displayName || friend.name || "Hội viên CEO HN10";
+                            const friendName = friend.displayName || friend.name || "Học viên CEO HN10";
                             const friendAvatar = friend.avatarUrl || friend.avatar;
                             const friendCompany = friend.companyName || friend.company || friend.headline || "";
                             return (
                               <label
                                 key={friendId}
-                                className={`flex items-center gap-2 p-1.5 rounded-lg border text-[11px] cursor-pointer transition ${
-                                  isFriendChecked
+                                className={`flex items-center gap-2 p-1.5 rounded-lg border text-[11px] cursor-pointer transition ${isFriendChecked
                                     ? "bg-amber-50/80 dark:bg-amber-950/40 border-[#B8860B] text-slate-900 dark:text-white font-medium"
                                     : "bg-white dark:bg-slate-800/80 border-slate-200/80 dark:border-slate-700 text-slate-700 dark:text-slate-300"
-                                }`}
+                                  }`}
                               >
                                 <input
                                   type="checkbox"
@@ -786,9 +778,8 @@ export function OpportunityEditModal({
                   <label className="text-[11px] font-semibold text-slate-600 dark:text-slate-300 block mb-0.5">
                     Họ tên người liên hệ <span className="text-red-500">*</span>
                   </label>
-                  <div className={`flex items-center gap-1.5 rounded-xl bg-white dark:bg-black/20 px-3 py-2 border transition ${
-                    editErrors.contactName ? "border-rose-500 ring-1 ring-rose-500/30" : "border-slate-200/80 dark:border-white/10"
-                  }`}>
+                  <div className={`flex items-center gap-1.5 rounded-xl bg-white dark:bg-black/20 px-3 py-2 border transition ${editErrors.contactName ? "border-rose-500 ring-1 ring-rose-500/30" : "border-slate-200/80 dark:border-white/10"
+                    }`}>
                     <User className="h-3.5 w-3.5 text-slate-400 shrink-0" />
                     <input
                       value={editContactName}
@@ -811,9 +802,8 @@ export function OpportunityEditModal({
                   <label className="text-[11px] font-semibold text-slate-600 dark:text-slate-300 block mb-0.5">
                     Số điện thoại <span className="text-red-500">*</span>
                   </label>
-                  <div className={`flex items-center gap-1.5 rounded-xl bg-white dark:bg-black/20 px-3 py-2 border transition ${
-                    editErrors.contactPhone ? "border-rose-500 ring-1 ring-rose-500/30" : "border-slate-200/80 dark:border-white/10"
-                  }`}>
+                  <div className={`flex items-center gap-1.5 rounded-xl bg-white dark:bg-black/20 px-3 py-2 border transition ${editErrors.contactPhone ? "border-rose-500 ring-1 ring-rose-500/30" : "border-slate-200/80 dark:border-white/10"
+                    }`}>
                     <Phone className="h-3.5 w-3.5 text-slate-400 shrink-0" />
                     <input
                       value={editContactPhone}
@@ -872,7 +862,7 @@ export function OpportunityEditModal({
                             {editReferrer}
                           </span>
                           <span className="text-[9.5px] text-emerald-700 dark:text-emerald-300 font-medium flex items-center gap-1">
-                            Hội viên đã kết nối
+                            Học viên đã kết nối
                           </span>
                         </div>
                       </div>
@@ -986,7 +976,7 @@ export function OpportunityEditModal({
                           </div>
                         ) : (
                           filteredConnectedMembers.map((member: any) => {
-                            const mName = member.displayName || member.name || "Hội viên CEO HN10";
+                            const mName = member.displayName || member.name || "Học viên CEO HN10";
                             const mAvatar = member.avatarUrl || member.avatar;
                             const mCompany = member.companyName || member.company || member.headline || "";
                             return (

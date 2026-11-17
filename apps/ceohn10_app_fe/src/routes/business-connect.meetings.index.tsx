@@ -37,7 +37,7 @@ export const Route = createFileRoute("/business-connect/meetings/")({
   head: () => ({
     meta: [
       { title: "Quản Lý Cuộc Gặp 1-on-1 — Business Connect" },
-      { name: "description", content: "Quản lý và lên lịch cuộc gặp kết nối giao thương giữa các hội viên doanh nghiệp CEO HN10." },
+      { name: "description", content: "Quản lý và lên lịch cuộc gặp kết nối giao thương giữa các Học viên doanh nghiệp CEO HN10." },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -85,7 +85,7 @@ function MeetingsWorkspacePage() {
       try {
         localStorage.removeItem("ceohn10_meetings_history");
         localStorage.removeItem("vione_meetings_history");
-      } catch {}
+      } catch { }
     }
 
     try {
@@ -101,7 +101,7 @@ function MeetingsWorkspacePage() {
         return {
           id: String(m.id),
           title: m.title || "Cuộc gặp giao thương 1-on-1",
-          hostName: tm.hostName || m.creator_name || "Hội viên chủ trì",
+          hostName: tm.hostName || m.creator_name || "Học viên chủ trì",
           hostCompany: tm.hostCompany || m.department,
           hostPhone: tm.hostPhone || m.creator_phone,
           partnerName: tm.partnerName || "Đối tác kết nối",
@@ -151,11 +151,11 @@ function MeetingsWorkspacePage() {
           const list = JSON.parse(localStorage.getItem(k) || "[]");
           const next = list.filter((x: any) => String(x.id) !== String(id));
           localStorage.setItem(k, JSON.stringify(next));
-        } catch {}
+        } catch { }
       }
       try {
         await fetchNestApi(`/meetings/${id}`, { method: "DELETE" });
-      } catch {}
+      } catch { }
 
       toast.success("✓ Đã xóa cuộc gặp thành công!");
       window.dispatchEvent(new CustomEvent("ceohn10:meetings-updated"));
@@ -211,7 +211,7 @@ function MeetingsWorkspacePage() {
             <span>Quản Lý Cuộc Gặp Giao Thương 1-on-1</span>
           </h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Trung tâm theo dõi lịch gặp gỡ kết nối, mở rộng đối tác kinh doanh giữa các hội viên CEO HN10
+            Trung tâm theo dõi lịch gặp gỡ kết nối, mở rộng đối tác kinh doanh giữa các Học viên CEO HN10
           </p>
         </div>
 
@@ -219,18 +219,16 @@ function MeetingsWorkspacePage() {
           <div className="inline-flex rounded-xl border border-border bg-card p-0.5 shadow-xs">
             <button
               onClick={() => setView("grid")}
-              className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors ${
-                view === "grid" ? "bg-secondary text-foreground" : "text-muted-foreground hover:text-foreground"
-              }`}
+              className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors ${view === "grid" ? "bg-secondary text-foreground" : "text-muted-foreground hover:text-foreground"
+                }`}
             >
               <LayoutGrid className="h-3.5 w-3.5" />
               <span>Dạng Thẻ</span>
             </button>
             <button
               onClick={() => setView("table")}
-              className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors ${
-                view === "table" ? "bg-secondary text-foreground" : "text-muted-foreground hover:text-foreground"
-              }`}
+              className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors ${view === "table" ? "bg-secondary text-foreground" : "text-muted-foreground hover:text-foreground"
+                }`}
             >
               <List className="h-3.5 w-3.5" />
               <span>Dạng Bảng</span>
@@ -242,7 +240,7 @@ function MeetingsWorkspacePage() {
             onClick={() => {
               exportToExcel<ConnectionMeetingItem>({
                 title: "Báo Cáo Danh Sách Cuộc Gặp Kết Nối Giao Thương 1-on-1",
-                subtitle: "Hệ thống kết nối doanh nghiệp & hội viên CEO HN10",
+                subtitle: "Hệ thống kết nối doanh nghiệp & Học viên CEO HN10",
                 filename: "danh-sach-cuoc-gap-1on1",
                 sheetName: "Cuộc gặp 1-on-1",
                 columns: [
@@ -251,7 +249,7 @@ function MeetingsWorkspacePage() {
                   { header: "Người chủ trì", key: "hostName", width: 22, value: (m) => m.hostName },
                   { header: "Công ty chủ trì", key: "hostCompany", width: 28, value: (m) => m.hostCompany || "—" },
                   { header: "SĐT chủ trì", key: "hostPhone", width: 16, value: (m) => m.hostPhone || "—" },
-                  { header: "Hội viên kết nối", key: "partnerName", width: 22, value: (m) => m.partnerName },
+                  { header: "Học viên kết nối", key: "partnerName", width: 22, value: (m) => m.partnerName },
                   { header: "Công ty đối tác", key: "partnerCompany", width: 28, value: (m) => m.partnerCompany || "—" },
                   { header: "SĐT đối tác", key: "partnerPhone", width: 16, value: (m) => m.partnerPhone || "—" },
                   { header: "Ngày gặp", key: "date", width: 14, value: (m) => formatDisplayDate(m.date) },
@@ -306,7 +304,7 @@ function MeetingsWorkspacePage() {
           <input
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            placeholder="Tìm theo tên hội viên, đối tác, doanh nghiệp, địa điểm, ghi chú..."
+            placeholder="Tìm theo tên Học viên, đối tác, doanh nghiệp, địa điểm, ghi chú..."
             className="h-9 w-full rounded-xl border border-border bg-background pl-9 pr-3 text-xs text-foreground placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring"
           />
         </div>
@@ -350,7 +348,7 @@ function MeetingsWorkspacePage() {
           <p className="mt-1 text-sm text-muted-foreground max-w-md mx-auto">
             {q || statusFilter !== "all" || venueFilter !== "all"
               ? "Không có cuộc gặp nào khớp với bộ lọc hiện tại. Vui lòng thử tìm kiếm khác."
-              : "Lịch gặp gỡ kết nối 1-on-1 giữa các hội viên doanh nghiệp. Hãy bắt đầu lên lịch cuộc gặp để mở rộng cơ hội hợp tác kinh doanh."}
+              : "Lịch gặp gỡ kết nối 1-on-1 giữa các Học viên doanh nghiệp. Hãy bắt đầu lên lịch cuộc gặp để mở rộng cơ hội hợp tác kinh doanh."}
           </p>
           <div className="mt-6">
             <button
@@ -374,13 +372,12 @@ function MeetingsWorkspacePage() {
                 <div>
                   <div className="flex items-start justify-between gap-2 mb-2">
                     <span
-                      className={`rounded-full px-2.5 py-0.5 text-[10px] font-extrabold uppercase shrink-0 ${
-                        item.venueType === "online"
+                      className={`rounded-full px-2.5 py-0.5 text-[10px] font-extrabold uppercase shrink-0 ${item.venueType === "online"
                           ? (item.onlinePlatform === "uniwork" || item.onlineUrl?.includes("uniwork"))
                             ? "bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/30"
                             : "bg-blue-500/10 text-blue-600 border border-blue-500/30"
                           : "bg-emerald-500/10 text-emerald-600 border border-emerald-500/30"
-                      }`}
+                        }`}
                     >
                       {item.venueType === "online"
                         ? (item.onlinePlatform === "uniwork" || item.onlineUrl?.includes("uniwork"))
@@ -433,11 +430,10 @@ function MeetingsWorkspacePage() {
                   <div className="mt-3 space-y-1.5 text-xs text-muted-foreground">
                     <div className="flex items-center gap-2">
                       {item.venueType === "online" ? (
-                        <Video className={`h-3.5 w-3.5 shrink-0 ${
-                          (item.onlinePlatform === "uniwork" || item.onlineUrl?.includes("uniwork"))
+                        <Video className={`h-3.5 w-3.5 shrink-0 ${(item.onlinePlatform === "uniwork" || item.onlineUrl?.includes("uniwork"))
                             ? "text-indigo-600"
                             : "text-blue-600"
-                        }`} />
+                          }`} />
                       ) : (
                         <MapPin className="h-3.5 w-3.5 text-amber-600 shrink-0" />
                       )}
@@ -487,11 +483,10 @@ function MeetingsWorkspacePage() {
                         href={item.onlineUrl.startsWith("http") ? item.onlineUrl : `https://${item.onlineUrl}`}
                         target="_blank"
                         rel="noreferrer"
-                        className={`rounded-lg px-3 py-1.5 text-[11px] font-bold text-white transition flex items-center gap-1 shadow-xs ${
-                          (item.onlinePlatform === "uniwork" || item.onlineUrl.includes("uniwork"))
+                        className={`rounded-lg px-3 py-1.5 text-[11px] font-bold text-white transition flex items-center gap-1 shadow-xs ${(item.onlinePlatform === "uniwork" || item.onlineUrl.includes("uniwork"))
                             ? "bg-indigo-600 hover:bg-indigo-700"
                             : "bg-blue-600 hover:bg-blue-700"
-                        }`}
+                          }`}
                       >
                         <Video className="h-3 w-3" />
                         <span>
@@ -567,11 +562,10 @@ function MeetingsWorkspacePage() {
                     <td className="px-4 py-3 text-xs border-b border-border max-w-[200px]">
                       {item.venueType === "online" ? (
                         <div className="flex items-center gap-1.5">
-                          <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                            (item.onlinePlatform === "uniwork" || item.onlineUrl?.includes("uniwork"))
+                          <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold ${(item.onlinePlatform === "uniwork" || item.onlineUrl?.includes("uniwork"))
                               ? "bg-indigo-50 text-indigo-700 border border-indigo-200"
                               : "bg-blue-50 text-blue-700 border border-blue-200"
-                          }`}>
+                            }`}>
                             <Video className="h-3 w-3" />
                             {(item.onlinePlatform === "uniwork" || item.onlineUrl?.includes("uniwork")) ? "Uniwork Meet" : "Online"}
                           </span>
@@ -606,11 +600,10 @@ function MeetingsWorkspacePage() {
                             href={item.onlineUrl.startsWith("http") ? item.onlineUrl : `https://${item.onlineUrl}`}
                             target="_blank"
                             rel="noreferrer"
-                            className={`p-1.5 rounded-md text-white transition flex items-center gap-1 text-[11px] font-semibold ${
-                              (item.onlinePlatform === "uniwork" || item.onlineUrl.includes("uniwork"))
+                            className={`p-1.5 rounded-md text-white transition flex items-center gap-1 text-[11px] font-semibold ${(item.onlinePlatform === "uniwork" || item.onlineUrl.includes("uniwork"))
                                 ? "bg-indigo-600 hover:bg-indigo-700"
                                 : "bg-blue-600 hover:bg-blue-700"
-                            }`}
+                              }`}
                             title="Vào phòng họp"
                           >
                             <Video className="h-3.5 w-3.5" />

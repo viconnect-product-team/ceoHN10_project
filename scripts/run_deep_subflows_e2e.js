@@ -101,7 +101,7 @@ async function runDeepTests() {
     // -------------------------------------------------------------------------
     console.log('\n>>> [MODULE 1] Landing Page & Registration Modals');
     const desktopPage = await browser.newPage({ viewport: { width: 1366, height: 768 } });
-    
+
     // 1.1 Landing Hero & Header
     await desktopPage.goto(`${APP_BASE}/landing/ceohn10`, { waitUntil: 'networkidle' });
     await desktopPage.waitForTimeout(1000);
@@ -143,7 +143,7 @@ async function runDeepTests() {
     // -------------------------------------------------------------------------
     console.log('\n>>> [MODULE 2] CRM Members Management, Approvals & Roles');
     const crmPage = await browser.newPage({ viewport: { width: 1440, height: 900 } });
-    
+
     // 2.1 CRM Login
     await crmPage.goto(`${CRM_BASE}/auth`, { waitUntil: 'networkidle' });
     await snap(crmPage, 'sub_05_crm_login.png', 'CRM: Màn hình Đăng nhập Quản trị viên Platform Admin');
@@ -154,12 +154,12 @@ async function runDeepTests() {
     // 2.2 CRM Dashboard KPI
     await crmPage.goto(`${CRM_BASE}/dashboard`, { waitUntil: 'networkidle' });
     await crmPage.waitForTimeout(1500);
-    await snap(crmPage, 'sub_06_crm_dashboard_kpi.png', 'CRM: Bảng điều khiển tổng quan KPI, Biểu đồ Hội viên & Doanh thu');
+    await snap(crmPage, 'sub_06_crm_dashboard_kpi.png', 'CRM: Bảng điều khiển tổng quan KPI, Biểu đồ Học viên & Doanh thu');
 
     // 2.3 CRM Members Management Table
     await crmPage.goto(`${CRM_BASE}/members`, { waitUntil: 'networkidle' });
     await crmPage.waitForTimeout(2000);
-    await snap(crmPage, 'sub_07_crm_members_list.png', 'CRM: Danh sách Hội viên & Các tab lọc trạng thái');
+    await snap(crmPage, 'sub_07_crm_members_list.png', 'CRM: Danh sách Học viên & Các tab lọc trạng thái');
 
     // Ensure user exists in auth.users and vione_users
     const hashedPwd = await bcrypt.hash('123456', 10);
@@ -187,7 +187,7 @@ async function runDeepTests() {
     await crmPage.reload({ waitUntil: 'networkidle' });
     await crmPage.waitForTimeout(1500);
     await snap(crmPage, 'sub_08_crm_member_detail_drawer.png', 'CRM: Chi tiết hồ sơ pháp nhân và thông tin chức vụ');
-    await snap(crmPage, 'sub_09_crm_approve_action.png', 'CRM: Phê duyệt thành công Hội viên HN10-099');
+    await snap(crmPage, 'sub_09_crm_approve_action.png', 'CRM: Phê duyệt thành công Học viên HN10-099');
 
     // -------------------------------------------------------------------------
     // MODULE 3: APP MOBILE AUTH, SMART CARD & PROFILE
@@ -202,7 +202,7 @@ async function runDeepTests() {
     // 3.2 Login with Credentials
     await mobilePage.fill('#assoc-auth-id', applicantEmail);
     await mobilePage.fill('#assoc-auth-password', '123456');
-    await snap(mobilePage, 'sub_11_app_login_credentials.png', 'App: Điền thông tin Mã hội viên/SĐT và Mật khẩu bảo mật');
+    await snap(mobilePage, 'sub_11_app_login_credentials.png', 'App: Điền thông tin Mã Học viên/SĐT và Mật khẩu bảo mật');
     await mobilePage.click('button[type="submit"]');
     await mobilePage.waitForTimeout(2500);
 
@@ -212,7 +212,7 @@ async function runDeepTests() {
     // 3.4 Smart VIP Card Front
     await mobilePage.goto(`${APP_BASE}/association/card`, { waitUntil: 'networkidle' });
     await mobilePage.waitForTimeout(1500);
-    await snap(mobilePage, 'sub_13_app_vip_card_front.png', 'App: Thẻ Hội Viên VIP Navy & Gold với mã QR vCard & dấu tích xanh');
+    await snap(mobilePage, 'sub_13_app_vip_card_front.png', 'App: Thẻ Học viên VIP Navy & Gold với mã QR vCard & dấu tích xanh');
 
     // 3.5 NFC Radar Modal
     const nfcBtn = await mobilePage.$('button:has-text("NFC"), button:has-text("Chạm thẻ")');
@@ -223,7 +223,7 @@ async function runDeepTests() {
       const closeBtn = await mobilePage.$('button:has-text("Đóng"), button:has-text("Hủy"), [aria-label="Close"]');
       if (closeBtn) await closeBtn.click();
     } else {
-      await snap(mobilePage, 'sub_14_app_nfc_radar_modal.png', 'App: Giao diện thẻ hội viên và vùng kích hoạt chạm NFC');
+      await snap(mobilePage, 'sub_14_app_nfc_radar_modal.png', 'App: Giao diện thẻ Học viên và vùng kích hoạt chạm NFC');
     }
 
     // 3.6 Public Digital Card
@@ -244,26 +244,26 @@ async function runDeepTests() {
     if (firstAvatar) {
       await firstAvatar.click();
       await mobilePage.waitForTimeout(1000);
-      await snap(mobilePage, 'sub_17_app_member_profile_modal.png', 'App: Modal Hồ sơ năng lực hội viên căn giữa hoàn hảo trên Mobile');
+      await snap(mobilePage, 'sub_17_app_member_profile_modal.png', 'App: Modal Hồ sơ năng lực Học viên căn giữa hoàn hảo trên Mobile');
       const closeBtn = await mobilePage.$('button:has-text("Đóng"), [aria-label="Close"]');
       if (closeBtn) await closeBtn.click();
     } else {
-      await snap(mobilePage, 'sub_17_app_member_profile_modal.png', 'App: Danh bạ chi tiết hội viên');
+      await snap(mobilePage, 'sub_17_app_member_profile_modal.png', 'App: Danh bạ chi tiết Học viên');
     }
 
     // Connection Toggle Button
     await snap(mobilePage, 'sub_18_app_connection_toggle.png', 'App: Nút chuyển đổi trạng thái Kết nối ngay <-> Hủy kết nối 1 Chạm');
 
     // Invite Member Modal
-    const inviteBtn = await mobilePage.$('button:has-text("Mời hội viên"), button:has-text("Mời gia nhập")');
+    const inviteBtn = await mobilePage.$('button:has-text("Mời Học viên"), button:has-text("Mời gia nhập")');
     if (inviteBtn) {
       await inviteBtn.click();
       await mobilePage.waitForTimeout(800);
-      await snap(mobilePage, 'sub_19_app_invite_member_modal.png', 'App: Modal Mời hội viên gia nhập CLB CEO HN10 kèm mã giới thiệu');
+      await snap(mobilePage, 'sub_19_app_invite_member_modal.png', 'App: Modal Mời Học viên gia nhập CLB CEO HN10 kèm mã giới thiệu');
       const closeBtn = await mobilePage.$('button:has-text("Đóng"), [aria-label="Close"]');
       if (closeBtn) await closeBtn.click();
     } else {
-      await snap(mobilePage, 'sub_19_app_invite_member_modal.png', 'App: Tính năng giới thiệu hội viên');
+      await snap(mobilePage, 'sub_19_app_invite_member_modal.png', 'App: Tính năng giới thiệu Học viên');
     }
 
     // -------------------------------------------------------------------------
@@ -338,7 +338,7 @@ async function runDeepTests() {
     // MODULE 6: EVENTS, SEATING MAP, CHECK-IN QR & LIVE VOTING
     // -------------------------------------------------------------------------
     console.log('\n>>> [MODULE 6] Events, Cinema Seating Map, QR Check-in & Live Voting');
-    
+
     // CRM Events
     await crmPage.goto(`${CRM_BASE}/events`, { waitUntil: 'networkidle' });
     await crmPage.waitForTimeout(1500);
@@ -371,7 +371,7 @@ async function runDeepTests() {
 
     // Live Voting & Lucky Draw
     await snap(mobilePage, 'sub_32_app_event_live_voting.png', 'App: Phiên Biểu quyết Bầu cử Ban Điều Hành & Biểu đồ kết quả realtime');
-    await snap(mobilePage, 'sub_33_app_event_lucky_draw.png', 'App: Vòng quay may mắn (Lucky Draw) tri ân hội viên tham dự sự kiện');
+    await snap(mobilePage, 'sub_33_app_event_lucky_draw.png', 'App: Vòng quay may mắn (Lucky Draw) tri ân Học viên tham dự sự kiện');
 
     // -------------------------------------------------------------------------
     // MODULE 7: PRODUCTS MARKETPLACE & CRM SYNC
@@ -472,7 +472,7 @@ async function runDeepTests() {
     if (guideBtn) {
       await guideBtn.click();
       await mobilePage.waitForTimeout(800);
-      await snap(mobilePage, 'sub_46_app_user_guide_modal.png', 'App: Modal Sổ tay Hướng dẫn sử dụng trực quan dành cho Hội viên');
+      await snap(mobilePage, 'sub_46_app_user_guide_modal.png', 'App: Modal Sổ tay Hướng dẫn sử dụng trực quan dành cho Học viên');
       const closeBtn = await mobilePage.$('button:has-text("Đóng"), [aria-label="Close"]');
       if (closeBtn) await closeBtn.click();
     } else {
@@ -502,7 +502,7 @@ async function runDeepTests() {
     console.log('\n>>> [MODULE 11] CRM Fees & Companies Management');
     await crmPage.goto(`${CRM_BASE}/fees`, { waitUntil: 'networkidle' });
     await crmPage.waitForTimeout(1500);
-    await snap(crmPage, 'sub_50_crm_fees_management.png', 'CRM: Quản lý Hội phí niên khóa, Cột tài khoản/hội viên & Nút nhắc phí');
+    await snap(crmPage, 'sub_50_crm_fees_management.png', 'CRM: Quản lý Hội phí niên khóa, Cột tài khoản/Học viên & Nút nhắc phí');
 
     await crmPage.goto(`${CRM_BASE}/companies`, { waitUntil: 'networkidle' });
     await crmPage.waitForTimeout(1500);

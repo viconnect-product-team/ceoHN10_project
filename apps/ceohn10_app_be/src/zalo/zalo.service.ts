@@ -78,7 +78,7 @@ export class ZaloService implements OnModuleInit, OnModuleDestroy {
     }
   >();
 
-  constructor(@Optional() private readonly prisma?: PrismaService) {}
+  constructor(@Optional() private readonly prisma?: PrismaService) { }
 
   async onModuleInit() {
     this.logger.log(
@@ -385,14 +385,14 @@ export class ZaloService implements OnModuleInit, OnModuleDestroy {
             lastAttemptAt: new Date().toISOString(),
           });
         }
-      } catch {}
+      } catch { }
       return { ok: false, message: errMsg };
     }
   }
 
   /**
    * Tiếp nhận sự kiện Webhook thời gian thực từ Zalo OA (user_send_text, follow, v.v.)
-   * Tự động lưu vào PostgreSQL bền vững và khớp nối với danh sách Hội viên CRM
+   * Tự động lưu vào PostgreSQL bền vững và khớp nối với danh sách Học viên CRM
    */
   async recordWebhookInteraction(event: any) {
     try {
@@ -417,7 +417,7 @@ export class ZaloService implements OnModuleInit, OnModuleDestroy {
         event?.sender?.name ||
         event?.user_name ||
         event?.info?.name ||
-        `Hội viên Zalo (${uid.slice(-4)})`;
+        `Học viên Zalo (${uid.slice(-4)})`;
       const avatar = event?.sender?.avatar || event?.info?.avatar || '';
 
       // 1. Lưu vào bộ nhớ RAM tạm thời
@@ -552,7 +552,7 @@ export class ZaloService implements OnModuleInit, OnModuleDestroy {
             lastRefreshStatus: 'success',
             lastRefreshError: null,
           });
-        } catch {}
+        } catch { }
 
         return {
           success: true,
@@ -567,8 +567,8 @@ export class ZaloService implements OnModuleInit, OnModuleDestroy {
       );
       throw new HttpException(
         response.data?.error_description ||
-          response.data?.message ||
-          'Không thể gia hạn token từ Zalo',
+        response.data?.message ||
+        'Không thể gia hạn token từ Zalo',
         HttpStatus.BAD_REQUEST,
       );
     } catch (error: any) {
@@ -576,8 +576,8 @@ export class ZaloService implements OnModuleInit, OnModuleDestroy {
       if (error instanceof HttpException) throw error;
       throw new HttpException(
         error.response?.data?.error_description ||
-          error.message ||
-          'Lỗi kết nối máy chủ Zalo OAuth',
+        error.message ||
+        'Lỗi kết nối máy chủ Zalo OAuth',
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
@@ -639,7 +639,7 @@ export class ZaloService implements OnModuleInit, OnModuleDestroy {
             lastRefreshStatus: 'success',
             lastRefreshError: null,
           });
-        } catch {}
+        } catch { }
 
         return {
           success: true,
@@ -654,8 +654,8 @@ export class ZaloService implements OnModuleInit, OnModuleDestroy {
       );
       throw new HttpException(
         response.data?.error_description ||
-          response.data?.message ||
-          'Không thể đổi mã ủy quyền từ Zalo',
+        response.data?.message ||
+        'Không thể đổi mã ủy quyền từ Zalo',
         HttpStatus.BAD_REQUEST,
       );
     } catch (error: any) {
@@ -663,8 +663,8 @@ export class ZaloService implements OnModuleInit, OnModuleDestroy {
       if (error instanceof HttpException) throw error;
       throw new HttpException(
         error.response?.data?.error_description ||
-          error.message ||
-          'Lỗi máy chủ Zalo OAuth khi đổi mã ủy quyền',
+        error.message ||
+        'Lỗi máy chủ Zalo OAuth khi đổi mã ủy quyền',
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
@@ -726,7 +726,7 @@ export class ZaloService implements OnModuleInit, OnModuleDestroy {
         const dbSubs: any[] = await this.prisma.$queryRawUnsafe(`
           SELECT 
             s.zalo_user_id as "userId",
-            COALESCE(m.name, s.display_name, 'Hội viên Zalo') as "displayName",
+            COALESCE(m.name, s.display_name, 'Học viên Zalo') as "displayName",
             COALESCE(s.avatar_url, m.avatar_url, '') as "avatar",
             COALESCE(s.last_message, 'Đang quan tâm Official Account') as "lastMessage",
             EXTRACT(EPOCH FROM s.last_interacted_at)*1000 as "time",
@@ -828,7 +828,7 @@ export class ZaloService implements OnModuleInit, OnModuleDestroy {
               seenIds.add(uid);
               chats.push({
                 userId: uid,
-                displayName: name || 'Hội viên Zalo',
+                displayName: name || 'Học viên Zalo',
                 avatar: avatar || '',
                 lastMessage: item.message || '',
                 time: item.time,
@@ -880,7 +880,7 @@ export class ZaloService implements OnModuleInit, OnModuleDestroy {
               seenIds.add(uid);
 
               // Lấy profile
-              let displayName = 'Hội viên Zalo';
+              let displayName = 'Học viên Zalo';
               let avatar = '';
               try {
                 const profileRes = await axios.get(
@@ -896,7 +896,7 @@ export class ZaloService implements OnModuleInit, OnModuleDestroy {
                     profileRes.data.data?.display_name || displayName;
                   avatar = profileRes.data.data?.avatar || '';
                 }
-              } catch {}
+              } catch { }
 
               chats.push({
                 userId: uid,
@@ -993,7 +993,7 @@ export class ZaloService implements OnModuleInit, OnModuleDestroy {
         const uid = String(f.user_id || f.id || '');
         if (!uid) continue;
 
-        let displayName = 'Hội viên Zalo';
+        let displayName = 'Học viên Zalo';
         let avatar = '';
 
         try {
@@ -1008,10 +1008,10 @@ export class ZaloService implements OnModuleInit, OnModuleDestroy {
           const p = profRes.data?.data;
           if (p?.display_name) displayName = p.display_name;
           if (p?.avatar) avatar = p.avatar;
-        } catch {}
+        } catch { }
 
         if (this.prisma) {
-          // Thử tìm hội viên khớp tên hoặc liên kết
+          // Thử tìm Học viên khớp tên hoặc liên kết
           const memberMatch = (await this.prisma
             .$queryRawUnsafe<any[]>(
               `SELECT id, phone FROM public.members WHERE zalo_user_id = $1 OR LOWER(name) = LOWER($2) LIMIT 1`,
@@ -1042,7 +1042,7 @@ export class ZaloService implements OnModuleInit, OnModuleDestroy {
               matchedMember?.phone || null,
               matchedMember?.id || null,
             )
-            .catch(() => {});
+            .catch(() => { });
         }
         syncedCount++;
       }
@@ -1065,7 +1065,7 @@ export class ZaloService implements OnModuleInit, OnModuleDestroy {
   }
 
   /**
-   * Lấy danh sách hội viên / người dùng đã tương tác hoặc theo dõi Zalo OA
+   * Lấy danh sách Học viên / người dùng đã tương tác hoặc theo dõi Zalo OA
    */
   async getSubscribers(): Promise<any[]> {
     if (!this.prisma) return [];
@@ -1103,18 +1103,18 @@ export class ZaloService implements OnModuleInit, OnModuleDestroy {
         return members.map((m) => ({
           userId: m.phone,
           zalo_user_id: m.phone,
-          displayName: m.displayName || 'Hội viên CEO HN10',
-          name: m.displayName || 'Hội viên CEO HN10',
+          displayName: m.displayName || 'Học viên CEO HN10',
+          name: m.displayName || 'Học viên CEO HN10',
           phone: m.phone,
           avatar: m.avatar,
           company: m.company,
-          lastMessage: 'Hội viên CLB Doanh Nhân CEO HN10',
+          lastMessage: 'Học viên CLB Doanh Nhân CEO HN10',
           time: Date.now(),
         }));
       }
       return rows.map((r) => ({
         ...r,
-        name: r.displayName || (r.phone ? `Hội viên (${r.phone})` : 'Khách quan tâm Zalo'),
+        name: r.displayName || (r.phone ? `Học viên (${r.phone})` : 'Khách quan tâm Zalo'),
         phone: r.phone || '',
         time: r.lastInteractedAt
           ? new Date(r.lastInteractedAt).getTime()
@@ -1143,7 +1143,7 @@ export class ZaloService implements OnModuleInit, OnModuleDestroy {
     }
 
     let targetUserId = dto.userId?.trim();
-    let recipientName = dto.targetName || 'Hội viên';
+    let recipientName = dto.targetName || 'Học viên';
 
     // 1. Tra cứu Zalo User ID qua CSDL PostgreSQL theo Số điện thoại hoặc tên
     if (!targetUserId && this.prisma && dto.targetPhone) {
@@ -1234,7 +1234,7 @@ export class ZaloService implements OnModuleInit, OnModuleDestroy {
 
     if (!targetUserId) {
       throw new HttpException(
-        'Chưa xác định được Zalo User ID (UID) của hội viên này. Bạn có thể: 1) Chọn hình thức gửi ZNS theo Số Điện Thoại (Chuẩn doanh nghiệp 100% tự động); 2) Bấm nút "Mở Chat Zalo Trực Tiếp" để gửi ngay; hoặc 3) Cấu hình Webhook để hệ thống tự động ghi nhận UID khi hội viên nhắn tin.',
+        'Chưa xác định được Zalo User ID (UID) của Học viên này. Bạn có thể: 1) Chọn hình thức gửi ZNS theo Số Điện Thoại (Chuẩn doanh nghiệp 100% tự động); 2) Bấm nút "Mở Chat Zalo Trực Tiếp" để gửi ngay; hoặc 3) Cấu hình Webhook để hệ thống tự động ghi nhận UID khi Học viên nhắn tin.',
         HttpStatus.BAD_REQUEST,
       );
     }
@@ -1337,15 +1337,15 @@ export class ZaloService implements OnModuleInit, OnModuleDestroy {
       this.logger.error(`Error sending Zalo message: ${error.message}`);
       throw new HttpException(
         error.response?.data?.message ||
-          error.message ||
-          'Lỗi khi gọi API Zalo OA',
+        error.message ||
+        'Lỗi khi gọi API Zalo OA',
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
   }
 
   /**
-   * Bắn thông báo chiến dịch hàng loạt tới nhiều hội viên Zalo (Bulk Messaging Queue)
+   * Bắn thông báo chiến dịch hàng loạt tới nhiều Học viên Zalo (Bulk Messaging Queue)
    */
   async sendBulkMessages(dto: SendBulkZaloMessageDto) {
     if (!dto.accessToken?.trim()) {
@@ -1360,7 +1360,7 @@ export class ZaloService implements OnModuleInit, OnModuleDestroy {
       dto.recipients.length === 0
     ) {
       throw new HttpException(
-        'Danh sách hội viên nhận tin không được để trống',
+        'Danh sách Học viên nhận tin không được để trống',
         HttpStatus.BAD_REQUEST,
       );
     }
@@ -1382,9 +1382,9 @@ export class ZaloService implements OnModuleInit, OnModuleDestroy {
     );
 
     for (const recipient of dto.recipients) {
-      // Thay thế các biến động tương ứng cho từng hội viên
+      // Thay thế các biến động tương ứng cho từng Học viên
       const message = dto.messageTemplate
-        .replace(/{ho_ten}/g, recipient.name || 'Hội viên')
+        .replace(/{ho_ten}/g, recipient.name || 'Học viên')
         .replace(/{so_dien_thoai}/g, recipient.phone || '')
         .replace(/{ma_hoi_vien}/g, recipient.memberCode || 'CEO HN10')
         .replace(
@@ -1395,7 +1395,7 @@ export class ZaloService implements OnModuleInit, OnModuleDestroy {
         )
         .replace(
           /{ten_doanh_nghiep}/g,
-          recipient.company || 'Doanh nghiệp Hội viên CEO HN10',
+          recipient.company || 'Doanh nghiệp Học viên CEO HN10',
         );
 
       try {
@@ -1479,7 +1479,7 @@ export class ZaloService implements OnModuleInit, OnModuleDestroy {
         );
         recipients = members.map((m) => ({
           phone: m.phone || '',
-          name: m.name || 'Hội viên CEO HN10',
+          name: m.name || 'Học viên CEO HN10',
           memberCode: m.member_code || 'HN10-000',
           company: m.company_name || 'Doanh nghiệp CEO HN10',
           feeAmount: 10000000,
@@ -1511,7 +1511,7 @@ export class ZaloService implements OnModuleInit, OnModuleDestroy {
     const template =
       dto.messageTemplate ||
       `📢 [CLB DOANH NHÂN CEO HN10 - THÔNG BÁO TỰ ĐỘNG ĐỊNH KỲ]
-Kính gửi Hội viên: {ho_ten} ({ma_hoi_vien}) - {ten_doanh_nghiep}
+Kính gửi Học viên: {ho_ten} ({ma_hoi_vien}) - {ten_doanh_nghiep}
 Hệ thống tự động thông báo kỳ hoàn tất hội phí niên liễm thường niên 2026.
 💰 Số tiền: 10.000.000 VNĐ.
 🏦 MB Bank: 1010000000 - CLB DOANH NHAN CEO HN10
@@ -1527,7 +1527,7 @@ Trân trọng cảm ơn Anh/Chị!`;
 
   /**
    * Bắn thông báo ZNS (Zalo Notification Service) theo Số Điện Thoại
-   * Chuẩn doanh nghiệp lớn 100%: Không cần Zalo User ID, Hội viên không cần quan tâm OA trước!
+   * Chuẩn doanh nghiệp lớn 100%: Không cần Zalo User ID, Học viên không cần quan tâm OA trước!
    */
   async sendZns(dto: SendZnsMessageDto) {
     if (typeof dto.phone !== 'string' || !dto.phone.trim()) {
@@ -1564,9 +1564,9 @@ Trân trọng cảm ơn Anh/Chị!`;
       typeof dto.templateCode === 'string' && dto.templateCode.trim()
         ? resolveZbsTemplate(dto.templateCode, dto.templateData, config?.zbsTemplates)
         : {
-            templateId: typeof dto.templateId === 'string' ? dto.templateId.trim() : '',
-            templateData: dto.templateData,
-          };
+          templateId: typeof dto.templateId === 'string' ? dto.templateId.trim() : '',
+          templateData: dto.templateData,
+        };
     if (!templateId) {
       throw new HttpException('Template ID ZBS không được để trống', HttpStatus.BAD_REQUEST);
     }
@@ -1853,7 +1853,7 @@ Trân trọng cảm ơn Anh/Chị!`;
             templateId: options.templateId,
             phone: targetPhone,
             templateData: options.templateData || {
-              name: recipientName || 'Quý Hội viên',
+              name: recipientName || 'Quý Học viên',
               title: options.title,
               content: options.content,
               qr_code: options.qrCodeUrl || '',
@@ -1877,7 +1877,7 @@ Trân trọng cảm ơn Anh/Chị!`;
       // 4. Soạn thảo tin nhắn Zalo OA chuẩn nhận diện thương hiệu CLB Doanh Nhân CEO HN10
       const msgLines: string[] = [
         `🔔 [CLB DOANH NHÂN CEO HN10 - THÔNG BÁO]`,
-        `Kính gửi: ${recipientName || 'Quý Doanh Nhân & Hội Viên'}`,
+        `Kính gửi: ${recipientName || 'Quý Doanh Nhân & Học viên'}`,
         ``,
         `📌 ${options.title}`,
         options.content,
@@ -1907,7 +1907,7 @@ Trân trọng cảm ơn Anh/Chị!`;
       });
 
       this.logger.log(
-        `[Zalo OA Auto-Notify] Đã gửi thông báo Zalo OA (${options.title}) tới ${recipientName || targetPhone || targetUserId || 'Hội viên'}: ${sendRes.success ? 'Thành công' : 'Thất bại'}`,
+        `[Zalo OA Auto-Notify] Đã gửi thông báo Zalo OA (${options.title}) tới ${recipientName || targetPhone || targetUserId || 'Học viên'}: ${sendRes.success ? 'Thành công' : 'Thất bại'}`,
       );
       return sendRes;
     } catch (err: any) {
@@ -1919,7 +1919,7 @@ Trân trọng cảm ơn Anh/Chị!`;
   }
 
   /**
-   * Liên kết Zalo User ID (UID) với Hội viên hoặc Số Điện Thoại trong CRM
+   * Liên kết Zalo User ID (UID) với Học viên hoặc Số Điện Thoại trong CRM
    */
   async bindMemberUid(body: {
     phone?: string;
@@ -1960,7 +1960,7 @@ Trân trọng cảm ơn Anh/Chị!`;
            member_id = COALESCE(EXCLUDED.member_id, public.zalo_subscribers.member_id),
            updated_at = NOW()`,
         cleanUid,
-        name || 'Hội viên',
+        name || 'Học viên',
         cleanPhone || null,
         memberId || null,
       );
@@ -1968,7 +1968,7 @@ Trân trọng cảm ơn Anh/Chị!`;
 
     return {
       success: true,
-      message: `Đã liên kết Zalo UID: ${cleanUid} với Hội viên ${name || cleanPhone} thành công!`,
+      message: `Đã liên kết Zalo UID: ${cleanUid} với Học viên ${name || cleanPhone} thành công!`,
     };
   }
 

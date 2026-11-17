@@ -137,7 +137,7 @@ async function captureAllEvidence() {
       console.log('1.7 Capturing CRM Member Approve Action...');
       await crmPage.goto(`${CRM_BASE}/members`, { waitUntil: 'networkidle', timeout: 30000 });
       await crmPage.waitForTimeout(1500);
-      const approveBtn = crmPage.locator('button:has-text("Phê duyệt"), button:has-text("Duyệt"), button:has-text("+ Thêm hội viên")').first();
+      const approveBtn = crmPage.locator('button:has-text("Phê duyệt"), button:has-text("Duyệt"), button:has-text("+ Thêm Học viên")').first();
       if (await approveBtn.count() > 0) {
         await approveBtn.hover();
         await crmPage.waitForTimeout(500);

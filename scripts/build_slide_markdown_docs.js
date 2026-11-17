@@ -14,33 +14,33 @@ const crmMd = `# SLIDE THUYẾT TRÌNH HỆ THỐNG WEB CRM QUẢN TRỊ - CLB D
 
 ### Slide 01: Bìa Trình Bày - Trung Tâm Điều Hành & Quản Trị Số Hóa Hiệp Hội
 - **Chủ đề**: 4 Trụ Cột Điều Hành Số Hóa Toàn Diện.
-- **Nội dung cốt lõi**: Quản trị hội viên 360° · Tài chính & đối soát VietQR · Sự kiện, bầu cử & Lucky Draw · Sàn giao thương B2B.
+- **Nội dung cốt lõi**: Quản trị Học viên 360° · Tài chính & đối soát VietQR · Sự kiện, bầu cử & Lucky Draw · Sàn giao thương B2B.
 
 ### Slide 02: Bảng Điều Khiển Tổng Quan (Dashboard) & Chỉ Số KPI Thực
-- **Bức tranh toàn cảnh**: Thống kê số lượng lãnh đạo hội viên chính thức, nguồn thu hội phí, số lượng deal giao thương và tỷ lệ tăng trưởng.
+- **Bức tranh toàn cảnh**: Thống kê số lượng lãnh đạo Học viên chính thức, nguồn thu hội phí, số lượng deal giao thương và tỷ lệ tăng trưởng.
 - **Báo cáo**: Xuất báo cáo Ban Chấp Hành tức thì phục vụ các kỳ họp định kỳ.
 
-### Slide 03: Quản Trị Danh Sách Hội Viên, Phân Hạng & Bộ Lọc Ban Ngành
+### Slide 03: Quản Trị Danh Sách Học viên, Phân Hạng & Bộ Lọc Ban Ngành
 - **Quản lý danh bạ**: Họ tên, doanh nghiệp, mã số thuế, chức vụ C-Level, số điện thoại và ngành nghề.
-- **Phân bổ ban bệ**: Sắp xếp hội viên vào 6 ban chuyên môn sinh hoạt và xuất file Excel danh bạ chuẩn in kỷ yếu.
+- **Phân bổ ban bệ**: Sắp xếp Học viên vào 6 ban chuyên môn sinh hoạt và xuất file Excel danh bạ chuẩn in kỷ yếu.
 
 ### Slide 04: Thẩm Định Hồ Sơ 360° & Ban Thường Vụ Độc Quyền Phê Duyệt
 - **Quy trình thẩm định**: Xem xét giấy phép kinh doanh, chức vụ lãnh đạo và lĩnh vực hoạt động.
 - **Phê duyệt độc quyền**: Chỉ Ban Thường Vụ có thẩm quyền bấm duyệt cấp mã định danh chính thức CEO-83xxx.
-- **Tự động hóa**: Hệ thống kích hoạt tài khoản và gửi ngay thư điện tử kèm mật khẩu khởi tạo về hòm thư hội viên.
+- **Tự động hóa**: Hệ thống kích hoạt tài khoản và gửi ngay thư điện tử kèm mật khẩu khởi tạo về hòm thư Học viên.
 
-### Slide 05: Hồ Sơ Chi Tiết Hội Viên 360°, Phân Hạng Kim Cương & Quản Trị Tài Khoản
+### Slide 05: Hồ Sơ Chi Tiết Học viên 360°, Phân Hạng Kim Cương & Quản Trị Tài Khoản
 - **Hồ sơ 360 độ**: Theo dõi lịch sử sinh hoạt, tham gia sự kiện, giao thương và đóng hội phí.
 - **Quản trị an toàn**: Đặt lại mật khẩu gửi về email, tạm khóa hoặc mở khóa quyền truy cập tức thì.
-- **Chấm điểm KPI**: Thuật toán tự động xếp hạng hội viên Kim Cương, Vàng, Bạc minh bạch.
+- **Chấm điểm KPI**: Thuật toán tự động xếp hạng Học viên Kim Cương, Vàng, Bạc minh bạch.
 
 ### Slide 06: Event Wizard: Khởi Tạo, Sửa Sự Kiện, Diễn Giả, Vé Đa Tầng & Xác Nhận
 - **Vòng đời sự kiện**: Thiết lập thông tin, lịch trình chi tiết, hình ảnh diễn giả VIP và vé đa tầng.
-- **Cấu hình vé**: Vé VIP 0đ cho hội viên; vé đối tác phụ thu qua mã VietQR tự động.
+- **Cấu hình vé**: Vé VIP 0đ cho Học viên; vé đối tác phụ thu qua mã VietQR tự động.
 
 ### Slide 07: Sơ Đồ Rạp Cinema Seating Map & Xếp Chỗ VIP Gala Dinner
 - **Khán phòng trực quan**: Mô phỏng ma trận bàn tiệc Bàn Chủ Tọa, Bàn Kim Cương, Bàn Đại biểu.
-- **Xếp chỗ danh dự**: Kéo thả phân bổ chỗ ngồi danh dự và đồng bộ số bàn số ghế lên vé trên điện thoại hội viên.
+- **Xếp chỗ danh dự**: Kéo thả phân bổ chỗ ngồi danh dự và đồng bộ số bàn số ghế lên vé trên điện thoại Học viên.
 
 ### Slide 08: Cổng Soát Vé Check-in QR Tốc Độ Cao & Giám Sát Cửa (Xanh / Đỏ)
 - **Tốc độ 1 giây**: Quét vé QR từ App bằng camera máy tính bảng hoặc máy quét chuyên dụng.
@@ -65,14 +65,14 @@ const crmMd = `# SLIDE THUYẾT TRÌNH HỆ THỐNG WEB CRM QUẢN TRỊ - CLB D
 
 ### Slide 13: Quản Trị Sàn Marketplace, Kiểm Duyệt Sản Phẩm Doanh Nghiệp
 - **Thẩm định chất lượng**: Kiểm duyệt sản phẩm, thông số kỹ thuật và chính sách chiết khấu ưu đãi nội bộ.
-- **Xuất bản tức thì**: Bấm duyệt là sản phẩm xuất hiện ngay trên sàn giao dịch di động của toàn bộ hội viên.
+- **Xuất bản tức thì**: Bấm duyệt là sản phẩm xuất hiện ngay trên sàn giao dịch di động của toàn bộ Học viên.
 
 ### Slide 14: Điều Phối Cơ Hội Giao Thương B2B & Thống Kê Giá Trị Deals
 - **Kết nối cung cầu**: Theo dõi các nhu cầu mua bán sỉ, tìm nhà cung ứng và kêu gọi đầu tư.
-- **Đo lường giá trị**: Thống kê quy mô kinh tế bằng tiền mà hệ sinh thái CEO HN10 đã kiến tạo cho hội viên.
+- **Đo lường giá trị**: Thống kê quy mô kinh tế bằng tiền mà hệ sinh thái CEO HN10 đã kiến tạo cho Học viên.
 
 ### Slide 15: Quản Lý Thu Hội Phí Thường Niên, Đối Soát VietQR & Sổ Quỹ Thu Chi 3 Cấp
-- **Gạch nợ tự động**: Đối soát tự động 24/7 khi hội viên chuyển khoản mã VietQR, gia hạn thẻ số ngay lập tức.
+- **Gạch nợ tự động**: Đối soát tự động 24/7 khi Học viên chuyển khoản mã VietQR, gia hạn thẻ số ngay lập tức.
 - **Sổ quỹ minh bạch**: Quy trình phê duyệt 3 cấp (Lập phiếu -> Soát xét -> Phê duyệt) và xuất phiếu thu điện tử.
 
 ### Slide 16: Ma Trận Phân Quyền 6 Ban Chuyên Trách RBAC & Nhật Ký Kiểm Toán
@@ -87,16 +87,16 @@ const appMd = `# SLIDE THUYẾT TRÌNH ỨNG DỤNG DI ĐỘNG HIỆP HỘI - CL
 
 ---
 
-### Slide 01: Bìa Trình Bày - Không Gian Số Hội Viên Đẳng Cấp
-- **Chủ đề**: 4 Giá Trị Đặc Quyền Dành Cho Lãnh Đạo Hội Viên.
+### Slide 01: Bìa Trình Bày - Không Gian Số Học viên Đẳng Cấp
+- **Chủ đề**: 4 Giá Trị Đặc Quyền Dành Cho Lãnh Đạo Học viên.
 - **Nội dung cốt lõi**: Thẻ VIP Gold & chạm NFC · Sàn giao thương B2B · Sự kiện, vé số & bầu cử đại hội · Đồng bộ realtime với CRM.
 
 ### Slide 02: Trang Chủ Dashboard Doanh Nhân & Tiện Ích 1-Chạm
-- **Tiêu điểm**: Thẻ hội viên VIP Titanium 3D ánh kim, thanh tiện ích truy cập nhanh các nghiệp vụ cốt lõi.
+- **Tiêu điểm**: Thẻ Học viên VIP Titanium 3D ánh kim, thanh tiện ích truy cập nhanh các nghiệp vụ cốt lõi.
 - **Thông tin kịp thời**: Đếm ngược sự kiện sắp diễn ra và bảng tin chỉ đạo từ Ban Chủ Tịch.
 
 ### Slide 03: Thẻ Định Danh Số VIP Titanium & Tích Hợp Chip Chạm NFC
-- **Khẳng định vị thế**: Thiết kế vàng kim sang trọng, mã số hội viên độc bản (CEO-83xxx).
+- **Khẳng định vị thế**: Thiết kế vàng kim sang trọng, mã số Học viên độc bản (CEO-83xxx).
 - **Công nghệ chạm NFC**: Chạm lưng điện thoại vào bất kỳ smartphone nào để mở trang định danh trong 1 giây.
 
 ### Slide 04: Danh Thiếp Số Doanh Nhân Visit Card Lật Mặt Sau & Chuẩn Brandbook
@@ -109,7 +109,7 @@ const appMd = `# SLIDE THUYẾT TRÌNH ỨNG DỤNG DI ĐỘNG HIỆP HỘI - CL
 
 ### Slide 06: Quét Mã QR Từ Ngoài & Trang Xác Thực Công Khai Chuẩn Brandbook
 - **Không cần cài app**: Đối tác dùng camera Zalo/iPhone quét là mở ngay trang web xác thực công khai.
-- **Tích xanh bảo chứng**: Dấu chứng nhận tư cách hội viên chính thức được kiểm định bởi CLB và HanoiBA.
+- **Tích xanh bảo chứng**: Dấu chứng nhận tư cách Học viên chính thức được kiểm định bởi CLB và HanoiBA.
 - **Liên hệ 1-chạm**: Gọi điện thoại, nhắn tin Zalo và lưu danh bạ vCard chỉ với một cú chạm.
 
 ### Slide 07: Chỉnh Sửa Nhanh Hồ Sơ Doanh Nhân (Quick Profile Edit) Tiện Lợi
@@ -120,7 +120,7 @@ const appMd = `# SLIDE THUYẾT TRÌNH ỨNG DỤNG DI ĐỘNG HIỆP HỘI - CL
 - **Thương hiệu cá nhân & tổ chức**: Hiển thị tên công ty, mã số thuế, địa chỉ trụ sở, website và brochure giới thiệu.
 - **Khen thưởng & cống hiến**: Vinh danh các danh hiệu và đóng góp tiêu biểu của doanh nhân cho hiệp hội.
 
-### Slide 09: Danh Bạ Hội Viên CLB CEO HN10 & Tra Cứu Đối Tác Đa Ngành Nghề
+### Slide 09: Danh Bạ Học viên CLB CEO HN10 & Tra Cứu Đối Tác Đa Ngành Nghề
 - **Mạng lưới đồng niên 1983**: Kết nối hơn 100+ Chủ tịch và Tổng Giám Đốc cùng thế hệ.
 - **Bộ lọc đa ngành**: Tìm kiếm đối tác theo Xây dựng, Công nghệ, Y tế, Tài chính, Bất động sản...
 
@@ -138,7 +138,7 @@ const appMd = `# SLIDE THUYẾT TRÌNH ỨNG DỤNG DI ĐỘNG HIỆP HỘI - CL
 
 ### Slide 13: Lịch Sự Kiện, Diễn Đàn Doanh Nhân & Đăng Ký Vé Tham Dự
 - **Lịch trình phong phú**: Nắm bắt Caravan kết nối, Gala Dinner thường niên và Cafe Doanh nhân định kỳ.
-- **Vé mời đặc quyền**: Hội viên chính thức nhận vé miễn phí hoặc ưu đãi đặc biệt dành riêng.
+- **Vé mời đặc quyền**: Học viên chính thức nhận vé miễn phí hoặc ưu đãi đặc biệt dành riêng.
 
 ### Slide 14: Đăng Ký Sự Kiện, Chọn Chỗ Khán Phòng VIP & Vé Điện Tử E-Ticket
 - **Sơ đồ ghế ngồi trực quan**: Chạm chọn trực tiếp vị trí ghế và bàn tiệc VIP trên sơ đồ rạp.
@@ -150,14 +150,14 @@ const appMd = `# SLIDE THUYẾT TRÌNH ỨNG DỤNG DI ĐỘNG HIỆP HỘI - CL
 
 ### Slide 16: Bầu Cử BCH & Biểu Quyết Tín Nhiệm Trực Tuyến Trên App
 - **Thực thi dân chủ**: Bỏ phiếu bầu Ban Chấp Hành nhiệm kỳ mới ngay trên màn hình điện thoại.
-- **Minh bạch & bảo mật**: Mã hóa phiếu bầu một chiều, mỗi hội viên bỏ phiếu 1 lần, theo dõi tỷ lệ kiểm phiếu realtime.
+- **Minh bạch & bảo mật**: Mã hóa phiếu bầu một chiều, mỗi Học viên bỏ phiếu 1 lần, theo dõi tỷ lệ kiểm phiếu realtime.
 
 ### Slide 17: Vòng Quay May Mắn Lucky Draw & Nhận Quà Tức Thì
 - **Khuấy động đêm tiệc**: Tự động đưa mã vé check-in vào danh sách quay số trúng thưởng ô tô VinFast VF3.
 - **Thông báo push tức thì**: Điện thoại rung báo trúng giải ngay trong túi áo để doanh nhân lên sân khấu nhận quà.
 
 ### Slide 18: Sàn Thương Mại Marketplace & Gian Hàng Doanh Nghiệp
-- **Gian hàng số hóa**: Mỗi hội viên sở hữu gian hàng trưng bày sản phẩm chủ lực với giá ưu đãi nội bộ.
+- **Gian hàng số hóa**: Mỗi Học viên sở hữu gian hàng trưng bày sản phẩm chủ lực với giá ưu đãi nội bộ.
 - **Đã kiểm duyệt**: Toàn bộ sản phẩm được thẩm định chất lượng và xuất xứ từ Ban Quản Trị CLB.
 
 ### Slide 19: Sàn Trao Cơ Hội Giao Thương B2B & Tìm Kiếm Đối Tác

@@ -129,12 +129,12 @@ export function DepartmentMemberTreeSelect({
 
             return {
               id: String(m.id || m.code || m.email || Math.random()),
-              name: m.name || m.fullName || m.full_name || "Hội viên CEO HN10",
+              name: m.name || m.fullName || m.full_name || "Học viên CEO HN10",
               code: m.code || "",
               email: m.email || "",
               phone: m.phone || m.contact || "",
               company: m.company || m.companyName || "CLB Doanh Nhân CEO HN10",
-              position: m.position || m.title || m.role || "Hội viên",
+              position: m.position || m.title || m.role || "Học viên",
               role: m.executive_role || m.role || "",
               title: m.title || "",
               department: m.department || "Ban Điều Hành",
@@ -157,7 +157,7 @@ export function DepartmentMemberTreeSelect({
           }
         }
       } catch (err) {
-        console.error("Lỗi khi tải danh sách hội viên cho Tree Select:", err);
+        console.error("Lỗi khi tải danh sách Học viên cho Tree Select:", err);
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -504,7 +504,7 @@ export function DepartmentMemberTreeSelect({
         {loading ? (
           <div className="flex items-center justify-center gap-2 p-8 text-sm text-muted-foreground">
             <Loader2 className="h-4 w-4 animate-spin text-[#003B95]" />
-            <span>Đang tải danh sách ban chuyên môn & hội viên...</span>
+            <span>Đang tải danh sách ban chuyên môn & Học viên...</span>
           </div>
         ) : filteredDepartmentGroups.length === 0 ? (
           <div className="p-8 text-center text-sm text-muted-foreground space-y-1">
@@ -524,9 +524,8 @@ export function DepartmentMemberTreeSelect({
               <div key={dept.id} className="transition-colors">
                 {/* Department Node (Root / Parent) */}
                 <div
-                  className={`flex items-center justify-between px-3.5 py-2.5 bg-secondary/30 hover:bg-secondary/60 cursor-pointer select-none transition ${
-                    isExpanded ? "border-b border-border/40" : ""
-                  }`}
+                  className={`flex items-center justify-between px-3.5 py-2.5 bg-secondary/30 hover:bg-secondary/60 cursor-pointer select-none transition ${isExpanded ? "border-b border-border/40" : ""
+                    }`}
                   onClick={() => handleToggleExpand(dept.name)}
                 >
                   <div className="flex items-center gap-2.5 min-w-0">
@@ -598,22 +597,19 @@ export function DepartmentMemberTreeSelect({
                           <div
                             key={mem.id || mem.email}
                             onClick={() => handleToggleMember(mem)}
-                            className={`flex items-center justify-between px-4 py-2.5 pl-10 cursor-pointer transition ${
-                              selected
+                            className={`flex items-center justify-between px-4 py-2.5 pl-10 cursor-pointer transition ${selected
                                 ? "bg-blue-50/70 dark:bg-blue-950/40 text-foreground font-medium"
                                 : "hover:bg-secondary/40 text-foreground"
-                            }`}
+                              }`}
                           >
                             <div className="flex items-center gap-3 min-w-0 flex-1">
                               {/* Selection Indicator */}
                               <div
-                                className={`size-4 rounded ${
-                                  multiple ? "rounded" : "rounded-full"
-                                } border flex items-center justify-center shrink-0 transition ${
-                                  selected
+                                className={`size-4 rounded ${multiple ? "rounded" : "rounded-full"
+                                  } border flex items-center justify-center shrink-0 transition ${selected
                                     ? "bg-[#003B95] border-[#003B95] text-white"
                                     : "border-border bg-background"
-                                }`}
+                                  }`}
                               >
                                 {selected && <Check className="h-3 w-3 stroke-[3]" />}
                               </div>

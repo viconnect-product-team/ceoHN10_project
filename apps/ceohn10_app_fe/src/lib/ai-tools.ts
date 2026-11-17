@@ -79,8 +79,8 @@ export type AiTool = {
 export const AI_TOOLS: AiTool[] = [
   {
     id: "OpenMemberProfile",
-    name: "Mở hồ sơ hội viên",
-    description: "Mở danh bạ hội viên để xem hồ sơ chi tiết.",
+    name: "Mở hồ sơ Học viên",
+    description: "Mở danh bạ Học viên để xem hồ sơ chi tiết.",
     capability: "member",
     kind: "navigate",
     requiredRole: "member",
@@ -92,8 +92,8 @@ export const AI_TOOLS: AiTool[] = [
   },
   {
     id: "SearchMembers",
-    name: "Tìm kiếm hội viên",
-    description: "Tìm hội viên theo ngành, khu vực hoặc cấp độ.",
+    name: "Tìm kiếm Học viên",
+    description: "Tìm Học viên theo ngành, khu vực hoặc cấp độ.",
     capability: "member",
     kind: "search",
     requiredRole: "member",
@@ -212,8 +212,8 @@ export const AI_TOOLS: AiTool[] = [
   },
   {
     id: "GenerateMemberCard",
-    name: "Tạo thẻ hội viên",
-    description: "Mở khu vực thẻ hội viên để tạo/hiển thị thẻ.",
+    name: "Tạo thẻ Học viên",
+    description: "Mở khu vực thẻ Học viên để tạo/hiển thị thẻ.",
     capability: "member",
     kind: "generate",
     requiredRole: "member",
@@ -261,7 +261,7 @@ export function canExecuteTool(tool: AiTool, ctx: AiToolContext): ToolAvailabili
         ? "quản trị viên"
         : tool.requiredRole === "moderator"
           ? "điều hành viên"
-          : "hội viên";
+          : "Học viên";
     return { allowed: false, reason: `Cần quyền ${roleLabel}` };
   }
   return { allowed: true };

@@ -272,7 +272,7 @@ export function MomentCommentInput({
           className="absolute bottom-full left-0 right-0 mb-2 max-h-48 overflow-y-auto rounded-xl border border-[var(--bc-mobile-border)] bg-[var(--bc-mobile-surface)] shadow-2xl p-1 z-30"
         >
           <div className="px-2 py-1 text-[11px] font-semibold text-[var(--bc-mobile-muted)] uppercase tracking-wider">
-            Nhắc đến hội viên
+            Nhắc đến Học viên
           </div>
           {loadingSuggestions ? (
             <div className="flex items-center justify-center p-3 text-xs text-[var(--bc-mobile-muted)]">

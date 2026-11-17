@@ -42,7 +42,7 @@ export const NOTIFICATION_TEMPLATES: NotificationTemplate[] = [
     code: "MEETING_BOOKING_REQUEST",
     category: "room_booking",
     name: "Thông báo Yêu cầu Đặt phòng Họp (Gửi Ban Quản Trị)",
-    description: "Tự động gửi đến Quản trị viên khi có hội viên / cán bộ ban đăng ký sử dụng phòng họp Online hoặc Offline.",
+    description: "Tự động gửi đến Quản trị viên khi có Học viên / cán bộ ban đăng ký sử dụng phòng họp Online hoặc Offline.",
     targetRole: "admin",
     channels: ["email", "in_app", "push"],
     subject: "[YÊU CẦU DUYỆT PHÒNG HỌP] {{meetingTitle}} - {{requesterName}}",
@@ -289,7 +289,7 @@ export const NOTIFICATION_TEMPLATES: NotificationTemplate[] = [
   </div>
   <div style="padding: 28px; background: #ffffff;">
     <p style="margin: 0 0 16px; font-size: 15px; color: #334155; line-height: 1.6;">
-      Kính gửi <strong>Quý Đại Biểu & Hội Viên CLB CEO HN10</strong>,
+      Kính gửi <strong>Quý Đại Biểu & Học viên CLB CEO HN10</strong>,
     </p>
     <p style="margin: 0 0 20px; font-size: 14px; color: #475569; line-height: 1.6;">
       {{organizerName}} trân trọng kính mời Quý Anh/Chị đến tham dự buổi họp trực tiếp với các thông tin chi tiết như sau:
@@ -340,12 +340,12 @@ export const NOTIFICATION_TEMPLATES: NotificationTemplate[] = [
     code: "PAYMENT_INVOICE_PENDING",
     category: "payment",
     name: "Lệnh Thanh Toán & Mã QR Chuyển Khoản VNPAY-QR",
-    description: "Gửi thông báo thanh toán (phí hội viên, vé sự kiện, gói tài trợ) kèm mã QR chuẩn VNPAY-QR tự động điền số tiền và nội dung.",
+    description: "Gửi thông báo thanh toán (phí Học viên, vé sự kiện, gói tài trợ) kèm mã QR chuẩn VNPAY-QR tự động điền số tiền và nội dung.",
     targetRole: "payer",
     channels: ["email", "in_app", "push"],
     subject: "[LỆNH THANH TOÁN] {{serviceName}} - Số tiền: {{amountFormatted}}",
     inAppTitle: "Lệnh thanh toán: {{serviceName}}",
-    inAppBody: "Quý hội viên có lệnh thanh toán {{amountFormatted}} cho '{{serviceName}}'. Quét VNPAY-QR hoặc thanh toán trước {{deadline}}.",
+    inAppBody: "Quý Học viên có lệnh thanh toán {{amountFormatted}} cho '{{serviceName}}'. Quét VNPAY-QR hoặc thanh toán trước {{deadline}}.",
     variables: [
       { key: "payerName", label: "Tên người nộp", example: "Vũ Thu Trang" },
       { key: "serviceName", label: "Dịch vụ / Hạng mục", example: "Vé VIP Gala Dinner Doanh Nhân CEO HN10" },
@@ -374,7 +374,7 @@ export const NOTIFICATION_TEMPLATES: NotificationTemplate[] = [
       Kính gửi <strong>{{payerName}}</strong>,
     </p>
     <p style="margin: 0 0 20px; font-size: 14px; color: #475569; line-height: 1.6;">
-      Hệ thống xin gửi đến Quý hội viên thông tin thanh toán cho hạng mục <strong>{{serviceName}}</strong>:
+      Hệ thống xin gửi đến Quý Học viên thông tin thanh toán cho hạng mục <strong>{{serviceName}}</strong>:
     </p>
     <div style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 12px; padding: 20px; text-align: center; margin-bottom: 24px;">
       <p style="margin: 0 0 6px; font-size: 13px; color: #64748b; text-transform: uppercase; font-weight: 600;">Tổng Số Tiền Cần Thanh Toán</p>
@@ -405,12 +405,12 @@ export const NOTIFICATION_TEMPLATES: NotificationTemplate[] = [
     code: "PAYMENT_RECEIPT_SUCCESS",
     category: "payment",
     name: "Biên Nhận Xác Nhận Thanh Toán Thành Công",
-    description: "Gửi biên nhận điện tử xác nhận đã thu tiền thành công kèm mã giao dịch và quyền lợi hội viên.",
+    description: "Gửi biên nhận điện tử xác nhận đã thu tiền thành công kèm mã giao dịch và quyền lợi Học viên.",
     targetRole: "payer",
     channels: ["email", "in_app"],
     subject: "[BIÊN NHẬN ĐIỆN TỬ] Xác nhận thanh toán thành công - {{serviceName}}",
     inAppTitle: "Thanh toán thành công: {{serviceName}}",
-    inAppBody: "Hệ thống đã nhận {{amountFormatted}} cho giao dịch {{transactionCode}}. Cảm ơn Quý hội viên!",
+    inAppBody: "Hệ thống đã nhận {{amountFormatted}} cho giao dịch {{transactionCode}}. Cảm ơn Quý Học viên!",
     variables: [
       { key: "payerName", label: "Tên người nộp", example: "Vũ Thu Trang" },
       { key: "serviceName", label: "Dịch vụ", example: "Vé VIP Gala Dinner Doanh Nhân CEO HN10" },
@@ -456,14 +456,14 @@ export const NOTIFICATION_TEMPLATES: NotificationTemplate[] = [
     code: "EVENT_ANNOUNCEMENT",
     category: "event",
     name: "Thông Báo Khởi Động Sự Kiện Mới Trong Hiệp Hội",
-    description: "Gửi thư mời và công bố sự kiện mới tới toàn thể hội viên và khách mời tiềm năng.",
+    description: "Gửi thư mời và công bố sự kiện mới tới toàn thể Học viên và khách mời tiềm năng.",
     targetRole: "members",
     channels: ["email", "in_app", "push"],
     subject: "[THƯ MỜI SỰ KIỆN] {{eventName}} - {{eventDate}}",
     inAppTitle: "Sự kiện mới: {{eventName}}",
     inAppBody: "Hiệp hội trân trọng kính mời Quý Doanh nhân tham dự '{{eventName}}' vào ngày {{eventDate}} tại {{eventLocation}}.",
     variables: [
-      { key: "memberName", label: "Tên hội viên", example: "Đỗ Thị Mai" },
+      { key: "memberName", label: "Tên Học viên", example: "Đỗ Thị Mai" },
       { key: "eventName", label: "Tên sự kiện", example: "Diễn Đàn Chuyển Đổi Số & Kết Nối Giao Thương 2026" },
       { key: "eventDate", label: "Ngày diễn ra", example: "20/11/2026" },
       { key: "eventLocation", label: "Địa điểm", example: "Trung tâm Hội nghị Quốc Gia, Hà Nội" },
@@ -558,7 +558,7 @@ export const NOTIFICATION_TEMPLATES: NotificationTemplate[] = [
     code: "CROSS_APP_COMMUNITY_MESSAGE",
     category: "cross_app",
     name: "Thông Điệp Đồng Bộ 2 Chiều Giữa CRM và App Hiệp Hội CEO HN10",
-    description: "Đảm bảo luồng dữ liệu 2 chiều giữa Web CRM Quản trị và App Hội viên của Hiệp hội CEO HN10.",
+    description: "Đảm bảo luồng dữ liệu 2 chiều giữa Web CRM Quản trị và App Học viên của Hiệp hội CEO HN10.",
     targetRole: "members",
     channels: ["in_app", "push"],
     subject: "[CEO HN10] Tin nhắn mới từ {{senderName}} ({{associationName}})",
@@ -575,7 +575,7 @@ export const NOTIFICATION_TEMPLATES: NotificationTemplate[] = [
     updatedAt: "2026-09-12",
     htmlBody: `
 <div style="font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 24px;">
-  <div style="font-size: 12px; font-weight: 700; color: #2563eb; text-transform: uppercase; margin-bottom: 8px;">{{associationName}} - App Hội Viên</div>
+  <div style="font-size: 12px; font-weight: 700; color: #2563eb; text-transform: uppercase; margin-bottom: 8px;">{{associationName}} - App Học viên</div>
   <h2 style="margin: 0 0 12px; font-size: 18px; color: #0f172a;">Thông Báo Từ {{senderName}}</h2>
   <div style="background: #f1f5f9; border-radius: 10px; padding: 16px; font-size: 14px; color: #334155; line-height: 1.6; margin-bottom: 16px;">
     {{messageSnippet}}

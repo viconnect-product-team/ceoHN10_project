@@ -7,7 +7,7 @@ async function run() {
   const client = new Client({ connectionString: DB_URL });
   await client.connect();
 
-  console.log('=== TRUY VẤN TOÀN BỘ HỘI VIÊN & TÀI KHOẢN CEO HN10 ===\n');
+  console.log('=== TRUY VẤN TOÀN BỘ Học viên & TÀI KHOẢN CEO HN10 ===\n');
 
   const res = await client.query(`
     SELECT 
@@ -17,7 +17,7 @@ async function run() {
       m.email,
       m.phone,
       COALESCE(m.department, ms.department, 'Chưa phân ban') as department,
-      COALESCE(m.executive_role, ms.executive_role, ms.role::text, 'Hội viên') as executive_role,
+      COALESCE(m.executive_role, ms.executive_role, ms.role::text, 'Học viên') as executive_role,
       m.level,
       up.company_name,
       up.professional_title,
@@ -34,7 +34,7 @@ async function run() {
     ORDER BY COALESCE(m.department, ms.department), m.code
   `, [ASSOC_ID]);
 
-  console.log(`Tổng số bản ghi hội viên trong CEO HN10: ${res.rows.length}\n`);
+  console.log(`Tổng số bản ghi Học viên trong CEO HN10: ${res.rows.length}\n`);
 
   // Phân nhóm theo Ban
   const byDept = {};
@@ -65,7 +65,7 @@ async function run() {
   `, [ASSOC_ID]);
 
   if (extraUsers.rows.length > 0) {
-    console.log('\n=== TÀI KHOẢN TRONG MEMBERSHIPS NHƯNG CHƯA TẠO PROFILE HỘI VIÊN ===');
+    console.log('\n=== TÀI KHOẢN TRONG MEMBERSHIPS NHƯNG CHƯA TẠO PROFILE Học viên ===');
     for (const u of extraUsers.rows) {
       console.log(`  • ${u.name} | Email: ${u.email} | Ban: ${u.department} | Role: ${u.role}`);
     }

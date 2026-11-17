@@ -127,11 +127,11 @@ function AssociationSettingsScreen() {
                 CLB DOANH NHÂN 1983
               </div>
               <h2 className="text-[16px] font-black text-white leading-snug truncate">
-                {member?.name || user?.name || "Hội viên Doanh nhân"}
+                {member?.name || user?.name || "Học viên Doanh nhân"}
               </h2>
               <div className="flex items-center gap-2 mt-1">
                 <span className="inline-flex items-center gap-1 rounded bg-amber-400/20 px-2 py-0.5 text-[10px] font-bold text-amber-300 border border-amber-400/40">
-                  <ShieldCheck className="h-3 w-3 text-amber-300" /> Hội viên chính thức
+                  <ShieldCheck className="h-3 w-3 text-amber-300" /> Học viên chính thức
                 </span>
                 <span className="text-[11px] text-blue-100 truncate">
                   {member?.title || "CLB CEO HN10"}

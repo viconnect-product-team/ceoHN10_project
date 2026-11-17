@@ -27,7 +27,7 @@ const tableC3 = `
           <td>Tự động</td>
           <td><code>Text</code></td>
           <td>Xin chào Doanh nhân [Họ tên], Chúc một ngày giao thương thịnh vượng!</td>
-          <td>Tạo cảm giác gắn kết, trang trọng và chào đón hội viên mỗi lần mở ứng dụng.</td>
+          <td>Tạo cảm giác gắn kết, trang trọng và chào đón Học viên mỗi lần mở ứng dụng.</td>
         </tr>
         <tr>
           <td><strong>Banner Thông điệp Ban Thường trực</strong></td>
@@ -47,7 +47,7 @@ const tableC3 = `
           <td><strong>Danh sách Sinh nhật Doanh nhân tuần</strong></td>
           <td>Tự động</td>
           <td><code>Avatar List + Name</code></td>
-          <td>Ảnh đại diện, Họ tên, Tên công ty và ngày sinh nhật của hội viên trong tuần.</td>
+          <td>Ảnh đại diện, Họ tên, Tên công ty và ngày sinh nhật của Học viên trong tuần.</td>
           <td>Gợi ý gửi lời chúc mừng sinh nhật, thắt chặt tình cảm đồng chí, đồng niên.</td>
         </tr>
         <tr>
@@ -80,7 +80,7 @@ const tableC4 = `
           <td>Mặt trước thẻ</td>
           <td><code>Text (In hoa)</code></td>
           <td>NGUYỄN TUẤN ANH</td>
-          <td>Khẳng định danh tính chính thức của chủ doanh nghiệp hội viên.</td>
+          <td>Khẳng định danh tính chính thức của chủ doanh nghiệp Học viên.</td>
         </tr>
         <tr>
           <td><strong>Chức vụ điều hành</strong></td>
@@ -97,14 +97,14 @@ const tableC4 = `
           <td>Quảng bá thương hiệu pháp nhân doanh nghiệp đến các đối tác.</td>
         </tr>
         <tr>
-          <td><strong>Mã Hội viên Độc bản</strong></td>
+          <td><strong>Mã Học viên Độc bản</strong></td>
           <td>Góc dưới mặt trước</td>
           <td><code>Code (Viết hoa)</code></td>
           <td><code>CEO-1983-007</code></td>
           <td>Mã số định danh duy nhất, chống giả mạo danh xưng thành viên CLB.</td>
         </tr>
         <tr>
-          <td><strong>Hạng Thẻ Hội viên</strong></td>
+          <td><strong>Hạng Thẻ Học viên</strong></td>
           <td>Góc trên thẻ</td>
           <td><code>Badge Gold</code></td>
           <td>VIP MEMBER / DIAMOND MEMBER</td>
@@ -309,10 +309,10 @@ const tableC8 = `
           <td>Làm mốc đối chiếu giá trị thực tế của sản phẩm.</td>
         </tr>
         <tr>
-          <td><strong>Mức Ưu đãi Hội viên CEO HN10</strong></td>
+          <td><strong>Mức Ưu đãi Học viên CEO HN10</strong></td>
           <td class="req">Có (*)</td>
           <td><code>Percent / Currency</code></td>
-          <td>Chiết khấu riêng cho hội viên (Ví dụ: Giảm 20% hoặc giá ưu đãi 80 triệu).</td>
+          <td>Chiết khấu riêng cho Học viên (Ví dụ: Giảm 20% hoặc giá ưu đãi 80 triệu).</td>
           <td>Thực thi cam kết tương trợ nội bộ, ưu đãi đặc quyền giữa các thành viên CLB.</td>
         </tr>
         <tr>
@@ -345,7 +345,7 @@ const tableC9 = `
           <td>Bắt buộc</td>
           <td><code>Text</code></td>
           <td>DẠ TIỆC GALA KẾT NỐI DOANH NHÂN CEO HN10</td>
-          <td>Xác định rõ sự kiện mà hội viên đã đăng ký tham dự.</td>
+          <td>Xác định rõ sự kiện mà Học viên đã đăng ký tham dự.</td>
         </tr>
         <tr>
           <td><strong>Thời gian & Địa điểm</strong></td>
@@ -464,7 +464,7 @@ const tableC11 = `
           <td><strong>Cú pháp Nội dung Chuyển khoản</strong></td>
           <td>Bắt buộc</td>
           <td><code>Syntax Code</code></td>
-          <td><code>HOIPHI [Mã Hội Viên] [Số Điện Thoại]</code></td>
+          <td><code>HOIPHI [Mã Học viên] [Số Điện Thoại]</code></td>
           <td>Webhook ngân hàng đọc cú pháp này để tự động gạch nợ tức thời 24/7.</td>
         </tr>
       </tbody>
@@ -518,7 +518,7 @@ const tableC12 = `
           <td class="req">Có (*)</td>
           <td><code>Textarea</code></td>
           <td>Nêu ngắn gọn 3 thế mạnh vượt trội của doanh nghiệp và nhu cầu hợp tác.</td>
-          <td>Giúp các hội viên khác nhận diện cơ hội kinh doanh phù hợp để bắt tay kết nối.</td>
+          <td>Giúp các Học viên khác nhận diện cơ hội kinh doanh phù hợp để bắt tay kết nối.</td>
         </tr>
       </tbody>
     </table>
@@ -674,10 +674,10 @@ const tableC17 = `
           <td>Gán tự động theo danh sách nhân sự ban điều hành hiệp hội.</td>
         </tr>
         <tr>
-          <td><strong>Ghế Hội Viên / Khách Mời</strong></td>
+          <td><strong>Ghế Học viên / Khách Mời</strong></td>
           <td><code>Zone Standard</code></td>
           <td><span style="color:#10B981; font-weight:bold;">Xanh Ngọc (#10B981)</span></td>
-          <td>Dành cho toàn thể hội viên chính thức và đại biểu doanh nhân tham dự.</td>
+          <td>Dành cho toàn thể Học viên chính thức và đại biểu doanh nhân tham dự.</td>
           <td>Gán tự động theo thứ tự check-in hoặc xếp trước theo bàn tiệc.</td>
         </tr>
         <tr>
@@ -886,10 +886,10 @@ const tableC21 = `
           <td>Ghi nhận biến động số dư thực tế trong tài khoản ngân hàng hiệp hội.</td>
         </tr>
         <tr>
-          <td><strong>Hội viên / Đơn vị Nộp hoặc Nhận</strong></td>
+          <td><strong>Học viên / Đơn vị Nộp hoặc Nhận</strong></td>
           <td class="req">Có (*)</td>
           <td><code>Text / Select</code></td>
-          <td>Chọn tên Doanh nghiệp hội viên hoặc đơn vị cung cấp dịch vụ ngoài.</td>
+          <td>Chọn tên Doanh nghiệp Học viên hoặc đơn vị cung cấp dịch vụ ngoài.</td>
           <td>Lưu trữ đối tượng giao dịch minh bạch, chống thất thoát quỹ hiệp hội.</td>
         </tr>
         <tr>
@@ -922,7 +922,7 @@ const tableC22 = `
           <td>Thẩm định</td>
           <td><code>Card Overview</code></td>
           <td>Tên sản phẩm, Logo, Tên công ty thành viên, Mã số thuế.</td>
-          <td>Đảm bảo sản phẩm do chính doanh nghiệp hội viên sản xuất hoặc phân phối.</td>
+          <td>Đảm bảo sản phẩm do chính doanh nghiệp Học viên sản xuất hoặc phân phối.</td>
         </tr>
         <tr>
           <td><strong>Giấy Chứng Nhận Tiêu Chuẩn Chất Lượng</strong></td>
@@ -936,14 +936,14 @@ const tableC22 = `
           <td>Bắt buộc</td>
           <td><code>Discount Rule</code></td>
           <td>Tối thiểu chiết khấu từ 5% - 30% so với giá bán lẻ ngoài thị trường.</td>
-          <td>Đảm bảo hội viên nhận được giá trị kinh tế thực chất khi mua bán nội bộ.</td>
+          <td>Đảm bảo Học viên nhận được giá trị kinh tế thực chất khi mua bán nội bộ.</td>
         </tr>
         <tr>
           <td><strong>Quyết định Phê duyệt</strong></td>
           <td>Thao tác ban</td>
           <td><code>Action Buttons</code></td>
           <td>Nút "Phê Duyệt Đăng Tải" hoặc "Từ Chối Kèm Lý Do".</td>
-          <td>Đưa sản phẩm lên chợ di động hoặc gửi hướng dẫn bổ sung hồ sơ cho hội viên.</td>
+          <td>Đưa sản phẩm lên chợ di động hoặc gửi hướng dẫn bổ sung hồ sơ cho Học viên.</td>
         </tr>
       </tbody>
     </table>
@@ -1034,7 +1034,7 @@ const tableC24 = `
           <td><strong>Cấp Độ Bảo Mật Quyền Truy Cập</strong></td>
           <td class="req">Có (*)</td>
           <td><code>Select Role</code></td>
-          <td>Công khai toàn thể hội viên / Mật - Chỉ dành cho Ban Chấp hành.</td>
+          <td>Công khai toàn thể Học viên / Mật - Chỉ dành cho Ban Chấp hành.</td>
           <td>Bảo vệ các nghị quyết nhân sự và tài liệu nội bộ tuyệt mật của lãnh đạo.</td>
         </tr>
         <tr>
@@ -1042,7 +1042,7 @@ const tableC24 = `
           <td class="req">Có (*)</td>
           <td><code>File (PDF/Word)</code></td>
           <td>Tải lên tệp văn bản có chữ ký và đóng dấu đỏ của Chủ tịch hiệp hội.</td>
-          <td>Hội viên có thể xem trực tuyến trên màn hình hoặc tải về in ấn chuẩn khổ A4.</td>
+          <td>Học viên có thể xem trực tuyến trên màn hình hoặc tải về in ấn chuẩn khổ A4.</td>
         </tr>
       </tbody>
     </table>

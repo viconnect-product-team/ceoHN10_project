@@ -28,7 +28,7 @@ content = content.replace(
 );
 content = content.replace(
   'Dưới đây là bảng đặc tả chi tiết toàn bộ 16 Use Case nghiệp vụ cốt lõi của Hệ sinh thái CEO HN10:',
-  'Dưới đây là bảng đặc tả chi tiết toàn diện 52 Use Cases nghiệp vụ bao phủ 100% Hệ sinh thái Số hóa CEO HN10 (28 Use Cases Web CRM Quản trị & 24 Use Cases Ứng dụng Di động Hội viên):'
+  'Dưới đây là bảng đặc tả chi tiết toàn diện 52 Use Cases nghiệp vụ bao phủ 100% Hệ sinh thái Số hóa CEO HN10 (28 Use Cases Web CRM Quản trị & 24 Use Cases Ứng dụng Di động Học viên):'
 );
 content = content.replace(
   'Phiên bản:** 3.0 (Master Release - Bổ sung toàn diện 16 Use Case, tối ưu ảnh Mobile Frame và tích hợp SMTP Live)',

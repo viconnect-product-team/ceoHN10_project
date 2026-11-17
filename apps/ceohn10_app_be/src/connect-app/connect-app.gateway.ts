@@ -33,8 +33,7 @@ export interface ActiveCallRecord {
   namespace: '/',
 })
 export class ConnectAppGateway
-  implements OnGatewayConnection, OnGatewayDisconnect
-{
+  implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server: Server;
 
@@ -42,7 +41,7 @@ export class ConnectAppGateway
   private readonly onlineUserSockets = new Map<string, Set<string>>();
   private readonly activeCalls = new Map<string, ActiveCallRecord>();
 
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   cleanExpiredCalls() {
     const now = Date.now();
@@ -612,7 +611,7 @@ export class ConnectAppGateway
   private async persistCallNotification(payload: any, callerId: string) {
     try {
       const recipientId = payload.recipientUserId;
-      const title = `Cuộc gọi đến từ ${payload.callerName || 'Hội viên CEO HN10'}`;
+      const title = `Cuộc gọi đến từ ${payload.callerName || 'Học viên CEO HN10'}`;
       const body =
         payload.callType === 'video'
           ? '📹 Cuộc gọi Video trực tiếp'
@@ -653,7 +652,7 @@ export class ConnectAppGateway
             body,
             safeData,
           )
-          .catch(() => {});
+          .catch(() => { });
       }
 
       // 2. Member notifications table
@@ -671,7 +670,7 @@ export class ConnectAppGateway
           body,
           payload.callId,
         )
-        .catch(() => {});
+        .catch(() => { });
     } catch (err: any) {
       this.logger.warn(`Failed to persist call notification: ${err?.message}`);
     }
@@ -781,13 +780,13 @@ export class ConnectAppGateway
           `UPDATE public.business_notifications SET status = 'dismissed', updated_at = NOW() WHERE source_domain = 'call' AND source_record_id = $1`,
           callId,
         )
-        .catch(() => {});
+        .catch(() => { });
       this.prisma
         .$executeRawUnsafe(
           `UPDATE public.member_notifications SET dismissed = true, read = true WHERE ref_type = 'call' AND ref_id = $1`,
           callId,
         )
-        .catch(() => {});
+        .catch(() => { });
     }
 
     return { ok: true };
@@ -852,13 +851,13 @@ export class ConnectAppGateway
           `UPDATE public.business_notifications SET status = 'dismissed', updated_at = NOW() WHERE source_domain = 'call' AND source_record_id = $1`,
           callId,
         )
-        .catch(() => {});
+        .catch(() => { });
       this.prisma
         .$executeRawUnsafe(
           `UPDATE public.member_notifications SET dismissed = true, read = true WHERE ref_type = 'call' AND ref_id = $1`,
           callId,
         )
-        .catch(() => {});
+        .catch(() => { });
     }
 
     return { ok: true };
@@ -911,13 +910,13 @@ export class ConnectAppGateway
           `UPDATE public.business_notifications SET status = 'dismissed', updated_at = NOW() WHERE source_domain = 'call' AND source_record_id = $1`,
           foundCallId,
         )
-        .catch(() => {});
+        .catch(() => { });
       this.prisma
         .$executeRawUnsafe(
           `UPDATE public.member_notifications SET dismissed = true, read = true WHERE ref_type = 'call' AND ref_id = $1`,
           foundCallId,
         )
-        .catch(() => {});
+        .catch(() => { });
     }
 
     return { ok: true };

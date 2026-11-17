@@ -9,7 +9,7 @@
 1. [Đăng Nhập Quản Trị & Phân Quyền Vai Trò](#1-đăng-nhập-quản-trị--phân-quyền-vai-trò)
 2. [NODE-CRM-001: Tổng Quan & Dashboard KPI](#node-crm-001-tổng-quan--dashboard-kpi)
 3. [NODE-CRM-002: Thống Kê & Phân Tích Dữ Liệu Real Data](#node-crm-002-thống-kê--phân-tích-dữ-liệu-real-data)
-4. [NODE-CRM-003: Quản Trị Danh Bạ Hội Viên 360°](#node-crm-003-quản-trị-danh-bạ-hội-viên-360)
+4. [NODE-CRM-003: Quản Trị Danh Bạ Học viên 360°](#node-crm-003-quản-trị-danh-bạ-hội-viên-360)
 5. [NODE-CRM-004: Quản Trị Doanh Nghiệp Thành Viên](#node-crm-004-quản-trị-doanh-nghiệp-thành-viên)
 6. [NODE-CRM-005: Quản Lý Tài Khoản & Gán Ban Chuyên Môn](#node-crm-005-quản-lý-tài-khoản--gán-ban-chuyên-môn)
 7. [NODE-CRM-006: Ma Trận Phân Quyền RBAC Theo Vai Trò](#node-crm-006-ma-trận-phân-quyền-rbac-theo-vai-trò)
@@ -23,7 +23,7 @@
 15. [NODE-CRM-014: Kho Tài Liệu & Văn Kiện Số](#node-crm-014-kho-tài-liệu--văn-kiện-số)
 16. [NODE-CRM-015: Quản Trị Biểu Quyết & Vòng Quay May Mắn](#node-crm-015-quản-trị-biểu-quyết--vòng-quay-may-mắn)
 17. [NODE-CRM-016: Quản Lý Bản Tin & Truyền Thông CLB](#node-crm-016-quản-lý-bản-tin--truyền-thông-clb)
-18. [NODE-CRM-017: Quản Lý Gia Hạn Hội Viên & Xử Lý Nợ Phí](#node-crm-017-quản-lý-gia-hạn-hội-viên--xử-lý-nợ-phí)
+18. [NODE-CRM-017: Quản Lý Gia Hạn Học viên & Xử Lý Nợ Phí](#node-crm-017-quản-lý-gia-hạn-hội-viên--xử-lý-nợ-phí)
 19. [NODE-CRM-018: Quản Trị Đào Tạo Doanh Nghiệp & Video Call](#node-crm-018-quản-trị-đào-tạo-doanh-nghiệp--video-call)
 20. [NODE-CRM-019: Nhật Ký Hoạt Động & Lịch Sử Thao Tác (Audit Log)](#node-crm-019-nhật-ký-hoạt-động--lịch-sử-thao-tác-audit-log)
 21. [NODE-CRM-020: Quản Trị Cơ Hội Giao Thương B2B](#node-crm-020-quản-trị-cơ-hội-giao-thương-b2b)
@@ -50,7 +50,7 @@
 ## NODE-CRM-001: TỔNG QUAN & DASHBOARD KPI
 
 ### 1. Mục đích
-Theo dõi các chỉ số hoạt động tổng thể của CLB: số lượng hội viên, doanh nghiệp, số dư quỹ và tỷ lệ tham dự sự kiện.
+Theo dõi các chỉ số hoạt động tổng thể của CLB: số lượng Học viên, doanh nghiệp, số dư quỹ và tỷ lệ tham dự sự kiện.
 
 ### 2. Đường dẫn truy cập
 - Route: `/` hoặc `/dashboard`
@@ -62,12 +62,12 @@ Theo dõi các chỉ số hoạt động tổng thể của CLB: số lượng h
 
 ### 4. Các bước thao tác
 - Bước 1: Quan sát 4 thẻ thống kê số liệu tại đầu trang:
-  - Thẻ **"Tổng số Hội viên"**: Tổng hội viên chính thức đang sinh hoạt.
-  - Thẻ **"Doanh nghiệp Hội viên"**: Tổng số doanh nghiệp thành viên.
+  - Thẻ **"Tổng số Học viên"**: Tổng Học viên chính thức đang sinh hoạt.
+  - Thẻ **"Doanh nghiệp Học viên"**: Tổng số doanh nghiệp thành viên.
   - Thẻ **"Tổng Quỹ CLB"**: Số dư tiền mặt hiện tại của quỹ.
-  - Thẻ **"Tỷ lệ tham dự"**: % hội viên check-in các sự kiện gần nhất.
+  - Thẻ **"Tỷ lệ tham dự"**: % Học viên check-in các sự kiện gần nhất.
 - Bước 2: Xem lịch hoạt động ở cột bên trái: Bấm vào ngày có chấm tròn để xem danh sách cuộc họp hoặc sự kiện diễn ra trong ngày.
-- Bước 3: Xem cột cảnh báo bên phải: Kiểm tra số lượng hồ sơ hội viên mới đang chờ phê duyệt và danh sách hội viên sắp đến hạn đóng phí.
+- Bước 3: Xem cột cảnh báo bên phải: Kiểm tra số lượng hồ sơ Học viên mới đang chờ phê duyệt và danh sách Học viên sắp đến hạn đóng phí.
 
 ---
 
@@ -100,30 +100,30 @@ Xem biểu đồ phân tích hoạt động giao thương, nộp quỹ, phân b�
 
 ---
 
-## NODE-CRM-003: QUẢN TRỊ DANH BẠ HỘI VIÊN 360°
+## NODE-CRM-003: QUẢN TRỊ DANH BẠ Học viên 360°
 
 ### 1. Mục đích
-Quản lý hồ sơ toàn bộ hội viên CLB, tiếp nhận hồ sơ đăng ký mới và duyệt cấp mã hội viên.
+Quản lý hồ sơ toàn bộ Học viên CLB, tiếp nhận hồ sơ đăng ký mới và duyệt cấp mã Học viên.
 
 ### 2. Đường dẫn truy cập
 - Route: `/members`
-- Menu bên trái: Chọn mục **"Hội viên"**.
+- Menu bên trái: Chọn mục **"Học viên"**.
 
 ### 3. Hình ảnh giao diện
-![Danh Sách Hội Viên CRM](./images/guide_crm/03_crm_members_list.png)
-*Hình 3.1: Bảng quản lý danh sách hội viên 360 độ.*
+![Danh Sách Học viên CRM](./images/guide_crm/03_crm_members_list.png)
+*Hình 3.1: Bảng quản lý danh sách Học viên 360 độ.*
 
 ### 4. Các bước thao tác
-#### a. Tìm kiếm và lọc hội viên:
-- Bước 1: Nhập họ tên hoặc số điện thoại vào ô **"Tìm kiếm hội viên..."**.
+#### a. Tìm kiếm và lọc Học viên:
+- Bước 1: Nhập họ tên hoặc số điện thoại vào ô **"Tìm kiếm Học viên..."**.
 - Bước 2: Bấm vào ô chọn **"Ban chuyên môn"** để lọc theo từng ban (Ban Sự Kiện, Ban Truyền Thông, Ban Xúc Tiến...).
 
-#### b. Phê duyệt hồ sơ hội viên mới:
+#### b. Phê duyệt hồ sơ Học viên mới:
 - Bước 1: Chọn tab **"Chờ duyệt"**.
-- Bước 2: Bấm vào dòng của hội viên cần duyệt để mở khung thông tin chi tiết bên phải.
+- Bước 2: Bấm vào dòng của Học viên cần duyệt để mở khung thông tin chi tiết bên phải.
 - Bước 3: Kiểm tra các mục: Giấy phép kinh doanh, Chức vụ, Ảnh đại diện.
 - Bước 4: Bấm nút **"Phê duyệt hồ sơ"** màu xanh.
-- Kết quả: Hệ thống cấp mã số hội viên (ví dụ: `CEO HN10-000004`) và tự động gửi email thông báo cho hội viên.
+- Kết quả: Hệ thống cấp mã số Học viên (ví dụ: `CEO HN10-000004`) và tự động gửi email thông báo cho Học viên.
 
 ---
 
@@ -152,7 +152,7 @@ Quản lý hồ sơ pháp nhân doanh nghiệp, mã số thuế, địa chỉ tr
   - Ô **"Địa chỉ trụ sở"**: Nhập địa chỉ văn phòng.
   - Ô **"Website / Fanpage"**: Nhập đường link liên kết.
 - Bước 3: Bấm nút **"Lưu thông tin"**.
-- Kết quả: Thông tin công ty được cập nhật đồng bộ lên sàn thương mại và danh bạ hội viên.
+- Kết quả: Thông tin công ty được cập nhật đồng bộ lên sàn thương mại và danh bạ Học viên.
 
 ---
 
@@ -297,7 +297,7 @@ Quản lý lịch họp Ban Chấp Hành, họp giao ban các Ban chuyên môn v
 ## NODE-CRM-009: QUẢN LÝ THU NGÂN SÁCH, PHÍ NIÊN LIỄM & XUẤT NHẬP EXCEL
 
 ### 1. Mục đích
-Theo dõi các khoản thu phí niên liễm hội viên, tiền tài trợ, tiền bán vé sự kiện và hỗ trợ nhập xuất file Excel kế toán.
+Theo dõi các khoản thu phí niên liễm Học viên, tiền tài trợ, tiền bán vé sự kiện và hỗ trợ nhập xuất file Excel kế toán.
 
 ### 2. Đường dẫn truy cập
 - Route: `/income`
@@ -311,9 +311,9 @@ Theo dõi các khoản thu phí niên liễm hội viên, tiền tài trợ, ti�
 #### a. Ghi nhận phiếu thu mới:
 - Bước 1: Bấm nút **"Tạo phiếu thu"**.
 - Bước 2: Nhập các trường:
-  - Ô **"Nội dung thu"**: Nhập lý do (ví dụ: "Thu phí niên liễm năm 2026 - Hội viên Nguyễn Văn A").
+  - Ô **"Nội dung thu"**: Nhập lý do (ví dụ: "Thu phí niên liễm năm 2026 - Học viên Nguyễn Văn A").
   - Ô **"Số tiền (VNĐ)"**: Nhập số tiền thu.
-  - Ô **"Người nộp"**: Chọn tên hội viên trong danh sách.
+  - Ô **"Người nộp"**: Chọn tên Học viên trong danh sách.
   - Ô **"Hình thức"**: Chọn Chuyển khoản (VietQR) hoặc Tiền mặt.
   - Nút **"Đính kèm ủy nhiệm chi"**: Tải lên ảnh chụp chứng từ chuyển khoản.
 - Bước 3: Bấm nút **"Xác nhận ghi thu"**.
@@ -467,11 +467,11 @@ Tạo các phiên biểu quyết trực tuyến tại đại hội và quay số
 #### a. Mở phiên biểu quyết mới:
 - Bước 1: Bấm nút **"Tạo phiên biểu quyết"**.
 - Bước 2: Nhập nội dung câu hỏi biểu quyết và các phương án trả lời (Đồng ý, Không đồng ý, Ý kiến khác).
-- Bước 3: Bấm nút **"Mở biểu quyết"**: Phiên biểu quyết lập tức hiển thị trên ứng dụng của toàn bộ hội viên đang có mặt.
+- Bước 3: Bấm nút **"Mở biểu quyết"**: Phiên biểu quyết lập tức hiển thị trên ứng dụng của toàn bộ Học viên đang có mặt.
 
 #### b. Vận hành Vòng quay may mắn (Lucky Draw):
 - Bước 1: Chọn tab **"Vòng quay may mắn"**.
-- Bước 2: Bấm nút **"Đồng bộ danh sách khách check-in"** để lấy toàn bộ danh sách hội viên đã có mặt tại sự kiện.
+- Bước 2: Bấm nút **"Đồng bộ danh sách khách check-in"** để lấy toàn bộ danh sách Học viên đã có mặt tại sự kiện.
 - Bước 3: Bấm nút **"QUAY SỐ"**: Vòng quay đồ họa xoay tròn và tự động dừng lại ở mã số trúng thưởng.
 
 ---
@@ -493,29 +493,29 @@ Biên tập và xuất bản các bài viết tin tức, thông cáo báo chí, 
 - Bước 1: Bấm nút **"Viết bài mới"**.
 - Bước 2: Nhập Tiêu đề bài viết, chọn Chuyên mục (Tin hiệp hội, Gương doanh nhân, Tin kinh tế) và tải lên Ảnh đại diện bài viết.
 - Bước 3: Nhập nội dung bài viết vào khung soạn thảo văn bản.
-- Bước 4: Bấm nút **"Xuất bản"** để đăng tin lên ứng dụng di động cho hội viên đọc.
+- Bước 4: Bấm nút **"Xuất bản"** để đăng tin lên ứng dụng di động cho Học viên đọc.
 
 ---
 
-## NODE-CRM-017: QUẢN LÝ GIA HẠN HỘI VIÊN & XỬ LÝ NỢ PHÍ
+## NODE-CRM-017: QUẢN LÝ GIA HẠN Học viên & XỬ LÝ NỢ PHÍ
 
 ### 1. Mục đích
-Theo dõi danh sách hội viên sắp hết hạn niên liễm, gửi thông báo nhắc nợ phí tự động và ghi nhận gia hạn thẻ hội viên.
+Theo dõi danh sách Học viên sắp hết hạn niên liễm, gửi thông báo nhắc nợ phí tự động và ghi nhận gia hạn thẻ Học viên.
 
 ### 2. Đường dẫn truy cập
 - Route: `/renewal`
-- Menu bên trái: Chọn mục **"Gia hạn hội viên"**.
+- Menu bên trái: Chọn mục **"Gia hạn Học viên"**.
 
 ### 3. Hình ảnh giao diện
-![Quản Lý Gia Hạn Hội Viên](./images/guide_crm/23_crm_renewal_list.png)
-*Hình 17.1: Danh sách hội viên đến kỳ gia hạn và theo dõi nợ phí.*
+![Quản Lý Gia Hạn Học viên](./images/guide_crm/23_crm_renewal_list.png)
+*Hình 17.1: Danh sách Học viên đến kỳ gia hạn và theo dõi nợ phí.*
 
 ### 4. Các bước thao tác
 - Bước 1: Xem cột **"Tình trạng nợ phí"**:
-  - Hội viên có nhãn đỏ **"Đã quá hạn"**: Cần nhắc phí.
-  - Hội viên có nhãn vàng **"Sắp đến hạn trong 30 ngày"**.
-- Bước 2: Tích chọn các hội viên cần nhắc phí và bấm nút **"Gửi thông báo nhắc phí hàng loạt"**: Hệ thống tự động gửi email và thông báo Zalo kèm mã VietQR đóng phí niên liễm.
-- Bước 3: Khi hội viên chuyển khoản thành công, bấm nút **"Gia hạn 1 năm"** để cập nhật trạng thái thẻ sang hoạt động tiếp.
+  - Học viên có nhãn đỏ **"Đã quá hạn"**: Cần nhắc phí.
+  - Học viên có nhãn vàng **"Sắp đến hạn trong 30 ngày"**.
+- Bước 2: Tích chọn các Học viên cần nhắc phí và bấm nút **"Gửi thông báo nhắc phí hàng loạt"**: Hệ thống tự động gửi email và thông báo Zalo kèm mã VietQR đóng phí niên liễm.
+- Bước 3: Khi Học viên chuyển khoản thành công, bấm nút **"Gia hạn 1 năm"** để cập nhật trạng thái thẻ sang hoạt động tiếp.
 
 ---
 
@@ -561,7 +561,7 @@ Ghi vết và giám sát 100% mọi hành động chỉnh sửa, phê duyệt, x
 ## NODE-CRM-020: QUẢN TRỊ CƠ HỘI GIAO THƯƠNG B2B
 
 ### 1. Mục đích
-Kiểm duyệt các tin đăng cơ hội giao thương của hội viên trước khi hiển thị rộng rãi và theo dõi tổng giá trị các giao dịch thành công.
+Kiểm duyệt các tin đăng cơ hội giao thương của Học viên trước khi hiển thị rộng rãi và theo dõi tổng giá trị các giao dịch thành công.
 
 ### 2. Đường dẫn truy cập
 - Route: `/opportunities`
@@ -574,7 +574,7 @@ Kiểm duyệt các tin đăng cơ hội giao thương của hội viên trướ
 ### 4. Các bước thao tác
 - Bước 1: Chọn tab **"Tin chờ duyệt"**.
 - Bước 2: Đọc nội dung cơ hội kinh doanh, kiểm tra tính xác thực và ngành nghề phù hợp.
-- Bước 3: Bấm nút **"Duyệt tin"** để hiển thị lên app di động, hoặc bấm nút **"Từ chối"** kèm nhập lý do phản hồi cho hội viên.
+- Bước 3: Bấm nút **"Duyệt tin"** để hiển thị lên app di động, hoặc bấm nút **"Từ chối"** kèm nhập lý do phản hồi cho Học viên.
 
 ---
 
@@ -601,7 +601,7 @@ Tùy biến cấu hình nhận diện thương hiệu CLB, thay đổi icon đ�
 ## NODE-CRM-022: TRUNG TÂM THÔNG BÁO QUẢN TRỊ & TIẾP NHẬN QUÊN MẬT KHẨU
 
 ### 1. Mục đích
-Tiếp nhận các cảnh báo từ hệ thống, danh sách yêu cầu cấp lại mật khẩu từ hội viên trên di động và thông báo phê duyệt hồ sơ.
+Tiếp nhận các cảnh báo từ hệ thống, danh sách yêu cầu cấp lại mật khẩu từ Học viên trên di động và thông báo phê duyệt hồ sơ.
 
 ### 2. Đường dẫn truy cập
 - Route: `/notifications`
@@ -613,12 +613,12 @@ Tiếp nhận các cảnh báo từ hệ thống, danh sách yêu cầu cấp l�
 
 ### 4. Các bước thao tác
 #### a. Xử lý yêu cầu quên mật khẩu:
-- Bước 1: Khi hội viên bấm "Quên mật khẩu" trên ứng dụng di động, một thông báo màu vàng xuất hiện tại đây: "Yêu cầu đặt lại mật khẩu từ email [email hội viên]".
-- Bước 2: Hệ thống tự động tạo mã bảo mật và gửi email link khôi phục cho hội viên.
-- Bước 3: Quản trị viên có thể bấm nút **"Cấp lại mật khẩu nhanh"** nếu hội viên yêu cầu cấp trực tiếp mật khẩu mặc định qua điện thoại.
+- Bước 1: Khi Học viên bấm "Quên mật khẩu" trên ứng dụng di động, một thông báo màu vàng xuất hiện tại đây: "Yêu cầu đặt lại mật khẩu từ email [email Học viên]".
+- Bước 2: Hệ thống tự động tạo mã bảo mật và gửi email link khôi phục cho Học viên.
+- Bước 3: Quản trị viên có thể bấm nút **"Cấp lại mật khẩu nhanh"** nếu Học viên yêu cầu cấp trực tiếp mật khẩu mặc định qua điện thoại.
 
 #### b. Quản lý cảnh báo hệ thống:
-- Bấm vào từng thông báo để chuyển nhanh tới hồ sơ hội viên hoặc phiếu thu cần xử lý.
+- Bấm vào từng thông báo để chuyển nhanh tới hồ sơ Học viên hoặc phiếu thu cần xử lý.
 
 ---
 

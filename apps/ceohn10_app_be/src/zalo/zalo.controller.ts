@@ -26,7 +26,7 @@ import { Roles } from '../auth/roles.decorator';
 
 @Controller('zalo')
 export class ZaloController {
-  constructor(private readonly zaloService: ZaloService) {}
+  constructor(private readonly zaloService: ZaloService) { }
 
   /**
    * Endpoint Webhook công khai dành riêng cho Zalo OA Server gửi sự kiện (user_send_text, follow, v.v.)
@@ -159,7 +159,7 @@ export class ZaloController {
   }
 
   /**
-   * Liên kết Zalo User ID với Hội viên CRM
+   * Liên kết Zalo User ID với Học viên CRM
    */
   @Post('bind-uid')
   @UseGuards(JwtAuthGuard)

@@ -102,7 +102,7 @@ function addSlideHeader(slide, pres, eyebrow, title, subtitle) {
 }
 
 // =============================================================================
-// PRESENTATION 1: APP HỘI VIÊN HIỆP HỘI (CLB CEO HN10)
+// PRESENTATION 1: APP Học viên HIỆP HỘI (CLB CEO HN10)
 // =============================================================================
 async function generateAppSlideDeck() {
   console.log('Generating App PowerPoint Slides (Executive Light Palette)...');
@@ -141,7 +141,7 @@ async function generateAppSlideDeck() {
       color: C.GOLD_ACCENT, bold: true, fontSize: 18, italic: true, fontFace: 'Calibri'
     });
 
-    slide.addText('Nền tảng số hóa đặc quyền dành riêng cho Lãnh đạo cấp cao sinh năm 1983 (Quý Hợi - Đại Hải Thủy), kết nối giao thương B2B, quản lý hội viên và thẻ định danh thông minh.', {
+    slide.addText('Nền tảng số hóa đặc quyền dành riêng cho Lãnh đạo cấp cao sinh năm 1983 (Quý Hợi - Đại Hải Thủy), kết nối giao thương B2B, quản lý Học viên và thẻ định danh thông minh.', {
       x: 0.8, y: 3.45, w: 10.5, h: 0.8,
       color: C.BORDER_SUBTLE, fontSize: 13.5, fontFace: 'Calibri'
     });
@@ -198,7 +198,7 @@ async function generateAppSlideDeck() {
       },
       {
         code: 'TRỤ CỘT 03',
-        title: 'Thể Thao & Gắn Kết Hội Viên',
+        title: 'Thể Thao & Gắn Kết Học viên',
         desc: 'Giải Golf CEO HN10 thường niên, CLB Tennis, giải Chạy bộ phong trào và các chuyến Caravan khảo sát thị trường liên tỉnh.',
         accent: C.EMERALD
       },
@@ -257,7 +257,7 @@ async function generateAppSlideDeck() {
           'Logo Hiệp hội Doanh nhân CEO HN10 mạ vàng 3D sắc nét.',
           'Họ tên Doanh nhân, Pháp nhân Doanh nghiệp và Chức danh C-Level.',
           'Mã định danh duy nhất (CEO-1983-xxx) và Hạng thẻ VIP Gold / Diamond.',
-          'Thời hạn hiệu lực hội viên bảo đảm tư cách thành viên chính thức.'
+          'Thời hạn hiệu lực Học viên bảo đảm tư cách thành viên chính thức.'
         ]
       },
       {
@@ -316,8 +316,8 @@ async function generateAppSlideDeck() {
     addSlideHeader(slide, pres, 'QUẢN TRỊ SỰ KIỆN SỐ', 'Hệ Thống Sự Kiện, Vé Điện Tử 0đ & Bốc Thăm Lucky Draw', 'Quy trình tham gia sự kiện tự động hóa 100%, trả vé ngay về Thông báo và Tin nhắn');
 
     const steps = [
-      { step: '01', title: 'Chọn Sự Kiện & Khán Phòng', desc: 'Hội viên duyệt danh sách sự kiện, xem sơ đồ chỗ ngồi VIP, diễn giả và lịch trình gala.' },
-      { step: '02', title: 'Đăng Ký Vé Hội Viên (0đ)', desc: 'Bấm đăng ký vé đặc quyền 0đ; hệ thống xác thực tức thì trong 100ms không cần xét duyệt.' },
+      { step: '01', title: 'Chọn Sự Kiện & Khán Phòng', desc: 'Học viên duyệt danh sách sự kiện, xem sơ đồ chỗ ngồi VIP, diễn giả và lịch trình gala.' },
+      { step: '02', title: 'Đăng Ký Vé Học viên (0đ)', desc: 'Bấm đăng ký vé đặc quyền 0đ; hệ thống xác thực tức thì trong 100ms không cần xét duyệt.' },
       { step: '03', title: 'Cấp Vé & Mã May Mắn', desc: 'Khởi tạo vé QR độc bản và cấp tự động Mã số May mắn Lucky Draw định dạng #XXXX.' },
       { step: '04', title: 'Giao Vé Đa Kênh Tức Thì', desc: 'Bắn thông báo đẩy cá nhân và gửi thẻ vé tương tác trực tiếp vào Hộp thư Tin nhắn App.' }
     ];
@@ -358,17 +358,17 @@ async function generateAppSlideDeck() {
   // ---------------------------------------------------------------------------
   {
     const slide = pres.addSlide();
-    addSlideHeader(slide, pres, 'KẾT NỐI GIAO THƯƠNG', 'Sàn Giao Thương B2B Nội Bộ & Khớp Nhu Cầu Matching', 'Tối ưu hóa dòng tiền và doanh thu thông qua chuỗi cung ứng khép kín giữa các hội viên');
+    addSlideHeader(slide, pres, 'KẾT NỐI GIAO THƯƠNG', 'Sàn Giao Thương B2B Nội Bộ & Khớp Nhu Cầu Matching', 'Tối ưu hóa dòng tiền và doanh thu thông qua chuỗi cung ứng khép kín giữa các Học viên');
 
     const cards = [
       {
         title: 'Sàn Sản Phẩm & Dịch Vụ B2B',
-        desc: 'Hội viên đăng tải sản phẩm, dịch vụ doanh nghiệp với mức chiết khấu ưu đãi nội bộ (Member Deal). Kiểm duyệt bảo đảm chất lượng pháp nhân từ Ban Thư ký.',
+        desc: 'Học viên đăng tải sản phẩm, dịch vụ doanh nghiệp với mức chiết khấu ưu đãi nội bộ (Member Deal). Kiểm duyệt bảo đảm chất lượng pháp nhân từ Ban Thư ký.',
         stats: 'Hơn 50+ Ngành nghề chủ đạo'
       },
       {
         title: 'Bảng Tin Cơ Hội (Needs & Offers)',
-        desc: 'Mô hình Cần Mua - Cần Bán minh bạch. Hội viên đăng tin chào thầu, tìm kiếm đối tác cung ứng và phản hồi chào giá (Send Quote) trực tiếp trên app.',
+        desc: 'Mô hình Cần Mua - Cần Bán minh bạch. Học viên đăng tin chào thầu, tìm kiếm đối tác cung ứng và phản hồi chào giá (Send Quote) trực tiếp trên app.',
         stats: 'Kết nối trực tiếp Chủ tịch & CEO'
       },
       {
@@ -477,8 +477,8 @@ async function generateAppSlideDeck() {
         title: 'Biểu Quyết & Bầu Cử Trực Tiếp (Live Voting)',
         items: [
           'Biểu quyết bầu Ban Chấp Hành, Nghị quyết và giải thưởng Gala.',
-          'Hiển thị thông báo biểu quyết pop-up tức thì trên toàn bộ app hội viên.',
-          'Khóa bình chọn tự động chống gian lận, 1 hội viên = 1 phiếu hợp lệ.',
+          'Hiển thị thông báo biểu quyết pop-up tức thì trên toàn bộ app Học viên.',
+          'Khóa bình chọn tự động chống gian lận, 1 Học viên = 1 phiếu hợp lệ.',
           'Biểu đồ kết quả trực tiếp hiển thị đồng thời lên màn hình LED hội trường.'
         ]
       },
@@ -562,7 +562,7 @@ async function generateAppSlideDeck() {
   }
 
   // ---------------------------------------------------------------------------
-  // SLIDE 9: Lợi Ích Của Hội Viên Khi Tham Gia Hệ Sinh Thái
+  // SLIDE 9: Lợi Ích Của Học viên Khi Tham Gia Hệ Sinh Thái
   // ---------------------------------------------------------------------------
   {
     const slide = pres.addSlide();
@@ -720,13 +720,13 @@ async function generateCrmSlideDeck() {
       color: C.GOLD_ACCENT, bold: true, fontSize: 18, italic: true, fontFace: 'Calibri'
     });
 
-    slide.addText('Trung tâm điều hành số hóa toàn diện dành cho Ban Quản Trị & Ban Thư Ký: Quản lý hồ sơ hội viên, tổ chức sự kiện, sơ đồ chỗ ngồi, Live Voting, sàn B2B và đối soát hội phí VietQR.', {
+    slide.addText('Trung tâm điều hành số hóa toàn diện dành cho Ban Quản Trị & Ban Thư Ký: Quản lý hồ sơ Học viên, tổ chức sự kiện, sơ đồ chỗ ngồi, Live Voting, sàn B2B và đối soát hội phí VietQR.', {
       x: 0.8, y: 3.45, w: 10.5, h: 0.8,
       color: C.BORDER_SUBTLE, fontSize: 13.5, fontFace: 'Calibri'
     });
 
     const crmMetrics = [
-      { num: '360°', label: 'Hồ Sơ Hội Viên', sub: 'Thẩm định & cấp thẻ số tự động' },
+      { num: '360°', label: 'Hồ Sơ Học viên', sub: 'Thẩm định & cấp thẻ số tự động' },
       { num: '100%', label: 'Điểm Danh Mã QR', sub: 'Tốc độ quét 1 giây, chống trùng' },
       { num: '04', label: 'Cấp Phân Quyền RBAC', sub: 'Super Admin, Thư ký, Sự kiện, Tài chính' }
     ];
@@ -770,7 +770,7 @@ async function generateCrmSlideDeck() {
       {
         role: 'Tổng Thư Ký CLB',
         email: 'ceo.tongthuky@ceohn10.com',
-        scope: 'Thẩm định hồ sơ hội viên mới, duyệt đơn đăng ký từ Landing Page, xuất bản tin tức, nghị quyết BCH và gửi thông báo khẩn toàn hiệp hội.'
+        scope: 'Thẩm định hồ sơ Học viên mới, duyệt đơn đăng ký từ Landing Page, xuất bản tin tức, nghị quyết BCH và gửi thông báo khẩn toàn hiệp hội.'
       },
       {
         role: 'Trưởng Ban Sự Kiện',
@@ -816,10 +816,10 @@ async function generateCrmSlideDeck() {
   // ---------------------------------------------------------------------------
   {
     const slide = pres.addSlide();
-    addSlideHeader(slide, pres, 'BÁO CÁO ĐIỀU HÀNH', 'Bảng Điều Khiển Dashboard — Giám Sát Chỉ Số KPI Thời Gian Thực', 'Bức tranh toàn cảnh về quy mô hội viên, sức khỏe tài chính và lưu lượng giao thương B2B');
+    addSlideHeader(slide, pres, 'BÁO CÁO ĐIỀU HÀNH', 'Bảng Điều Khiển Dashboard — Giám Sát Chỉ Số KPI Thời Gian Thực', 'Bức tranh toàn cảnh về quy mô Học viên, sức khỏe tài chính và lưu lượng giao thương B2B');
 
     const kpis = [
-      { label: 'Tổng Số Hội Viên Chính Thức', val: '100+ Lãnh Đạo', desc: 'Chủ tịch HĐQT, Tổng Giám Đốc, CEO tuổi Quý Hợi 1983' },
+      { label: 'Tổng Số Học viên Chính Thức', val: '100+ Lãnh Đạo', desc: 'Chủ tịch HĐQT, Tổng Giám Đốc, CEO tuổi Quý Hợi 1983' },
       { label: 'Tỷ Lệ Hoàn Tất Hội Phí Niên Độ', val: '92.5% Đạt Chuẩn', desc: 'Gạch nợ đối soát sao kê tự động qua cổng VietQR' },
       { label: 'Sự Kiện & Gala Tổ Chức', val: '12 Sự Kiện/Năm', desc: 'Bao gồm Đại hội thường niên, Business Matching Day & Giải Golf' },
       { label: 'Giá Trị Giao Thương Kết Nối B2B', val: 'Hơn 50+ Tỷ Đồng', desc: 'Tổng giá trị hợp đồng được claim và ghi nhận thành công' }
@@ -857,11 +857,11 @@ async function generateCrmSlideDeck() {
   }
 
   // ---------------------------------------------------------------------------
-  // SLIDE 4: Quy Trình Thẩm Định & Phê Duyệt Hồ Sơ Hội Viên 360°
+  // SLIDE 4: Quy Trình Thẩm Định & Phê Duyệt Hồ Sơ Học viên 360°
   // ---------------------------------------------------------------------------
   {
     const slide = pres.addSlide();
-    addSlideHeader(slide, pres, 'QUẢN LÝ HỘI VIÊN 360°', 'Quy Trình Tiếp Nhận & Phê Duyệt Hồ Sơ Trực Tuyến', 'Khép kín từ form đăng ký Landing Page đến kích hoạt tài khoản di động trong 1 cú nhấp');
+    addSlideHeader(slide, pres, 'QUẢN LÝ Học viên 360°', 'Quy Trình Tiếp Nhận & Phê Duyệt Hồ Sơ Trực Tuyến', 'Khép kín từ form đăng ký Landing Page đến kích hoạt tài khoản di động trong 1 cú nhấp');
 
     const appFlow = [
       {
@@ -877,7 +877,7 @@ async function generateCrmSlideDeck() {
       {
         step: 'BƯỚC 3',
         title: 'Thao Tác Phê Duyệt (Approve)',
-        desc: 'Bấm nút Phê duyệt: Hệ thống tự động kích hoạt tài khoản hội viên, sinh mã định danh VIP (CEO-1983-xxx) và cấp quyền đăng nhập app.'
+        desc: 'Bấm nút Phê duyệt: Hệ thống tự động kích hoạt tài khoản Học viên, sinh mã định danh VIP (CEO-1983-xxx) và cấp quyền đăng nhập app.'
       },
       {
         step: 'BƯỚC 4',
@@ -928,7 +928,7 @@ async function generateCrmSlideDeck() {
       },
       {
         title: 'Sơ Đồ Khán Phòng (Cinema Seating Map)',
-        desc: 'Thiết lập ma trận ghế ngồi trực quan gồm các khu vực: VIP Kim Cương (hàng đầu), Đoàn Chủ Tịch, Hội Viên Chính Thức và Khách Mời. Hội viên chọn chỗ chính xác theo thời gian thực.'
+        desc: 'Thiết lập ma trận ghế ngồi trực quan gồm các khu vực: VIP Kim Cương (hàng đầu), Đoàn Chủ Tịch, Học viên Chính Thức và Khách Mời. Học viên chọn chỗ chính xác theo thời gian thực.'
       },
       {
         title: 'Quét Mã QR Check-in Cổng Tốc Độ Cao',
@@ -971,7 +971,7 @@ async function generateCrmSlideDeck() {
         title: 'Bảng Điều Khiển Live Voting',
         items: [
           'Tạo câu hỏi biểu quyết kèm danh sách ứng viên Ban Chấp Hành.',
-          'Bấm nút "Mở phiên bình chọn": Toàn bộ App hội viên tự động bật giao diện bầu cử.',
+          'Bấm nút "Mở phiên bình chọn": Toàn bộ App Học viên tự động bật giao diện bầu cử.',
           'Theo dõi số lượng phiếu bầu tăng theo thời gian thực (Real-time Gauge).',
           'Khóa phiên và trình chiếu biểu đồ kết quả trực tiếp lên màn hình LED.'
         ]
@@ -1023,11 +1023,11 @@ async function generateCrmSlideDeck() {
     const finCards = [
       {
         title: 'Bảng Hội Phí Niên Độ',
-        desc: 'Theo dõi tình trạng đóng phí thường niên của từng hội viên theo từng năm hoạt động. Hiển thị rõ số tiền, ngày gia hạn và trạng thái "Đã đóng" hoặc "Chưa đóng".'
+        desc: 'Theo dõi tình trạng đóng phí thường niên của từng Học viên theo từng năm hoạt động. Hiển thị rõ số tiền, ngày gia hạn và trạng thái "Đã đóng" hoặc "Chưa đóng".'
       },
       {
         title: 'Cổng Thanh Toán VietQR Tự Động',
-        desc: 'Khi hội viên bấm gia hạn trên App, mã VietQR động được tạo với đúng số tiền và cú pháp chuẩn. Kế toán đối soát sao kê ngân hàng và bật/tắt gạch nợ tức thì.'
+        desc: 'Khi Học viên bấm gia hạn trên App, mã VietQR động được tạo với đúng số tiền và cú pháp chuẩn. Kế toán đối soát sao kê ngân hàng và bật/tắt gạch nợ tức thì.'
       },
       {
         title: 'Nhắc Nhở Hội Phí Thông Minh',
@@ -1066,9 +1066,9 @@ async function generateCrmSlideDeck() {
     addSlideHeader(slide, pres, 'KIỂM DUYỆT NỘI DUNG', 'Kiểm Duyệt Sàn B2B & Quản Trị Hồ Sơ Pháp Nhân Doanh Nghiệp', 'Bảo đảm 100% sản phẩm và cơ hội kinh doanh trong mạng lưới đạt chuẩn pháp lý');
 
     const auditSteps = [
-      { num: '01', title: 'Tiếp Nhận Đăng Tải', desc: 'Hội viên đăng sản phẩm hoặc tin nhu cầu mua sắm từ App di động; nội dung vào hàng đợi kiểm duyệt.' },
+      { num: '01', title: 'Tiếp Nhận Đăng Tải', desc: 'Học viên đăng sản phẩm hoặc tin nhu cầu mua sắm từ App di động; nội dung vào hàng đợi kiểm duyệt.' },
       { num: '02', title: 'Thẩm Tra Pháp Lý', desc: 'Ban Thư ký kiểm tra chứng nhận xuất xứ, công bố chất lượng và giấy phép kinh doanh ngành nghề có điều kiện.' },
-      { num: '03', title: 'Phê Duyệt / Khóa Bài', desc: 'Nhấn Duyệt để hiển thị công khai trên App; hoặc từ chối kèm phản hồi lý do chi tiết cho hội viên bổ sung.' },
+      { num: '03', title: 'Phê Duyệt / Khóa Bài', desc: 'Nhấn Duyệt để hiển thị công khai trên App; hoặc từ chối kèm phản hồi lý do chi tiết cho Học viên bổ sung.' },
       { num: '04', title: 'Gắn Nhãn Tiêu Biểu', desc: 'Gắn nhãn "Sản Phẩm Tiêu Biểu CEO HN10" đẩy lên vị trí Top Carousel tiếp cận tối đa mạng lưới.' }
     ];
 
@@ -1121,7 +1121,7 @@ async function generateCrmSlideDeck() {
         title: 'Nhật Ký Kiểm Toán Hệ Thống (Audit Logs)',
         items: [
           'Ghi nhận 100% nhật ký thao tác của Quản trị viên: Thời gian, IP, hành động.',
-          'Giám sát mọi thao tác phê duyệt hội viên, chỉnh sửa vai trò và gạch nợ hội phí.',
+          'Giám sát mọi thao tác phê duyệt Học viên, chỉnh sửa vai trò và gạch nợ hội phí.',
           'Bảo mật theo tiêu chuẩn GDPR và Luật An ninh mạng Việt Nam.',
           'Xuất dữ liệu báo cáo kiểm toán định kỳ phục vụ Ban Kiểm Tra CLB.'
         ]
@@ -1181,7 +1181,7 @@ async function generateCrmSlideDeck() {
       color: C.GOLD_ACCENT, bold: true, fontSize: 22, italic: true, fontFace: 'Calibri'
     });
 
-    slide.addText('Hệ thống Web CRM và App Mobile CEO HN10 sẵn sàng bàn giao, đưa vào vận hành thực tế phục vụ Ban Chấp Hành, Ban Thư Ký và toàn thể Hội viên CLB Doanh Nhân CEO HN10.', {
+    slide.addText('Hệ thống Web CRM và App Mobile CEO HN10 sẵn sàng bàn giao, đưa vào vận hành thực tế phục vụ Ban Chấp Hành, Ban Thư Ký và toàn thể Học viên CLB Doanh Nhân CEO HN10.', {
       x: 0.8, y: 3.6, w: 10.5, h: 0.9,
       color: C.BORDER_SUBTLE, fontSize: 14, fontFace: 'Calibri'
     });

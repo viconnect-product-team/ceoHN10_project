@@ -413,7 +413,7 @@ function createCoverPage(meta) {
     ['Đơn Vị Chủ Quản', 'CLB Doanh Nhân CEO HN10 (Trực thuộc Hiệp Hội Doanh Nghiệp Trẻ Hà Nội)'],
     ['Đơn Vị Xây Dựng & Kỹ Thuật', 'ViConnect Product & Development Engineering Team'],
     ['Thẩm Định & Phê Duyệt', 'Ban Quản Trị, Ban Thư Ký & Ban Chuyên Môn CLB CEO HN10'],
-    ['Phạm Vi Áp Dụng', meta.scope || 'Toàn bộ Ban Điều Hành, Ban Chuyên Môn & Hội Viên CLB'],
+    ['Phạm Vi Áp Dụng', meta.scope || 'Toàn bộ Ban Điều Hành, Ban Chuyên Môn & Học viên CLB'],
     ['Cấp Độ Bảo Mật', 'NỘI BỘ (CONFIDENTIAL — BẢO MẬT DỰ ÁN CLB DOANH NHÂN CEO HN10)'],
   ];
 

@@ -318,7 +318,7 @@ export function Ceo1983ChatAssistant() {
             name: ctx.user.name,
             company: ctx.user.company,
             code: ctx.user.code,
-            role: ctx.roleLabel || "Hội viên",
+            role: ctx.roleLabel || "Học viên",
             title: ctx.user.title,
             email: ctx.user.email,
           }
@@ -326,7 +326,7 @@ export function Ceo1983ChatAssistant() {
             name: user?.name || "Anh/Chị",
             company: (user as any)?.company || "",
             code: (user as any)?.member_code || "",
-            role: (user as any)?.role || "Hội viên",
+            role: (user as any)?.role || "Học viên",
             title: "",
             email: user?.email || "",
           };
@@ -478,7 +478,7 @@ export function Ceo1983ChatAssistant() {
         text:
           `Dạ em là **Trợ lý AI CLB Doanh Nhân CEO HN10**, nắm dữ liệu tài khoản của Anh/Chị **${name}**. Em có thể:\n\n` +
           `1. 📊 Tra cứu tài khoản: sự kiện đã đăng ký, hội phí/hóa đơn, bạn bè kết nối, lịch hẹn B2B, cơ hội quan tâm, sản phẩm.\n` +
-          `2. 🔎 Tìm hội viên, sản phẩm, cơ hội, sự kiện, văn bản, thông tin các Ban.\n` +
+          `2. 🔎 Tìm Học viên, sản phẩm, cơ hội, sự kiện, văn bản, thông tin các Ban.\n` +
           `3. 🧭 Hướng dẫn & mở nhanh mọi tính năng trong app.\n\n` +
           `**Tình hình hiện tại:** ${liveContext.registeredEvents.length} sự kiện đã đăng ký • ${liveContext.connectedCount} bạn bè • ${liveContext.b2bMeetings.filter((m: any) => m.upcoming).length} lịch hẹn sắp tới • ${unpaid} hóa đơn chưa thanh toán.\n\nAnh/Chị cần em hỗ trợ gì ạ?`,
         suggestions: ["Sự kiện tôi đã đăng ký?", "Tôi có bao nhiêu bạn bè?", "Tôi có hóa đơn nào chưa thanh toán?"],
@@ -570,8 +570,8 @@ export function Ceo1983ChatAssistant() {
     ) {
       const connCount = liveContext.connectedCount;
       return {
-        text: `Dạ báo cáo Anh/Chị **${name}**: hiện Anh/Chị có **${connCount} bạn bè / đối tác đã kết nối** trong CLB Doanh Nhân CEO HN10.${connCount === 0 ? "\n\nAnh/Chị có thể mở Danh bạ Hội viên để gửi lời mời kết nối nhé!" : ""}`,
-        actionLink: { label: "Xem Danh Bạ Hội Viên", route: "/association/members" },
+        text: `Dạ báo cáo Anh/Chị **${name}**: hiện Anh/Chị có **${connCount} bạn bè / đối tác đã kết nối** trong CLB Doanh Nhân CEO HN10.${connCount === 0 ? "\n\nAnh/Chị có thể mở Danh bạ Học viên để gửi lời mời kết nối nhé!" : ""}`,
+        actionLink: { label: "Xem Danh Bạ Học viên", route: "/association/members" },
         suggestions: ["Tôi có cuộc gặp kết nối nào không?", "Tôi có hóa đơn nào phải thanh toán?", "Cơ cấu các Ban chuyên môn"],
       };
     }
@@ -601,7 +601,7 @@ export function Ceo1983ChatAssistant() {
         };
       } else {
         return {
-          text: `Dạ hiện tại Anh/Chị chưa có lịch hẹn gặp B2B mới nào được lên lịch.\n\nAnh/Chị có thể chủ động tìm đối tác trong **Danh bạ Hội viên** và bấm nút gửi lời mời hẹn Cafe giao thương 1-on-1 nhé!`,
+          text: `Dạ hiện tại Anh/Chị chưa có lịch hẹn gặp B2B mới nào được lên lịch.\n\nAnh/Chị có thể chủ động tìm đối tác trong **Danh bạ Học viên** và bấm nút gửi lời mời hẹn Cafe giao thương 1-on-1 nhé!`,
           actionLink: { label: "Đặt Lịch Hẹn B2B", route: "/association/members" },
         };
       }
@@ -639,7 +639,7 @@ export function Ceo1983ChatAssistant() {
     // 6. Committee structure & Roles
     if (/(^|\s)ban(\s|$)/.test(norm.replace(/ban be/g, "")) && /(co cau|chuyen mon|to chuc|cac ban|ban nao)/.test(norm)) {
       return {
-        text: `Dạ cơ cấu tổ chức CLB Doanh Nhân CEO HN10 trực thuộc HanoiBA gồm **6 Ban chuyên môn cốt lõi**:\n\n1. 🏛️ **Ban Điều Hành**: Lãnh đạo chung, định hướng chiến lược và đại diện CLB.\n2. 👥 **Ban Thành Viên**: Phát triển mạng lưới, thẩm định hồ sơ kết nạp và chăm sóc hội viên.\n3. 💼 **Ban Xúc Tiến Thương Mại**: Điều phối giao thương B2B, tổ chức phiên kết nối cung cầu.\n4. 📢 **Ban Truyền Thông**: Quảng bá hình ảnh, phụ trách Caravan, Gala và bản tin số.\n5. 💰 **Ban Tài Chính**: Quản trị ngân sách, quỹ CLB và thu hội phí niên liễm.\n6. ❤️ **Ban Thiện Nguyện**: Tổ chức các chương trình an sinh xã hội, vì cộng đồng vùng cao.\n\nMọi hoạt động và phê duyệt đều được phân quyền chặt chẽ trên hệ thống số hóa của CLB ạ!`,
+        text: `Dạ cơ cấu tổ chức CLB Doanh Nhân CEO HN10 trực thuộc HanoiBA gồm **6 Ban chuyên môn cốt lõi**:\n\n1. 🏛️ **Ban Điều Hành**: Lãnh đạo chung, định hướng chiến lược và đại diện CLB.\n2. 👥 **Ban Thành Viên**: Phát triển mạng lưới, thẩm định hồ sơ kết nạp và chăm sóc Học viên.\n3. 💼 **Ban Xúc Tiến Thương Mại**: Điều phối giao thương B2B, tổ chức phiên kết nối cung cầu.\n4. 📢 **Ban Truyền Thông**: Quảng bá hình ảnh, phụ trách Caravan, Gala và bản tin số.\n5. 💰 **Ban Tài Chính**: Quản trị ngân sách, quỹ CLB và thu hội phí niên liễm.\n6. ❤️ **Ban Thiện Nguyện**: Tổ chức các chương trình an sinh xã hội, vì cộng đồng vùng cao.\n\nMọi hoạt động và phê duyệt đều được phân quyền chặt chẽ trên hệ thống số hóa của CLB ạ!`,
         actionLink: { label: "Xem Danh Bạ & Ban Chuyên Môn", route: "/association/members" },
         suggestions: ["Ban chấp hành gồm ai?", "Ban truyền thông làm gì?", "Hội phí bao nhiêu?"],
       };
@@ -648,7 +648,7 @@ export function Ceo1983ChatAssistant() {
     // 7. Identity & Business card
     if (q.includes("tôi là ai") || q.includes("tài khoản của tôi") || q.includes("thông tin của tôi") || q.includes("hồ sơ")) {
       return {
-        text: `Dạ thông tin tài khoản hội viên của Anh/Chị trên hệ thống:\n\n👤 **Họ và tên**: **${name}**\n🔖 **Mã hội viên**: \`${p?.code || "HN10-001"}\`\n🏢 **Doanh nghiệp**: **${p?.company}**\n💼 **Chức vụ**: **${p?.title}**\n🛡️ **Vai trò hệ thống**: **${p?.role || "Quản trị viên / Hội viên chính thức"}**\n📱 **Điện thoại**: **${p?.phone}** | ✉️ **Email**: **${p?.email}**\n\nAnh/Chị có thể quản lý và chia sẻ mã QR danh thiếp số bất cứ lúc nào!`,
+        text: `Dạ thông tin tài khoản Học viên của Anh/Chị trên hệ thống:\n\n👤 **Họ và tên**: **${name}**\n🔖 **Mã Học viên**: \`${p?.code || "HN10-001"}\`\n🏢 **Doanh nghiệp**: **${p?.company}**\n💼 **Chức vụ**: **${p?.title}**\n🛡️ **Vai trò hệ thống**: **${p?.role || "Quản trị viên / Học viên chính thức"}**\n📱 **Điện thoại**: **${p?.phone}** | ✉️ **Email**: **${p?.email}**\n\nAnh/Chị có thể quản lý và chia sẻ mã QR danh thiếp số bất cứ lúc nào!`,
         actionLink: { label: "Mở Danh Thiếp Cá Nhân", route: "/association/card" },
       };
     }
@@ -688,7 +688,7 @@ export function Ceo1983ChatAssistant() {
       if (norm.includes("truyen thong")) {
         return {
           text: `📢 **Ban Truyền Thông CLB CEO HN10**:\n\n` +
-            `- Phụ trách truyền thông thương hiệu, sự kiện, bản tin số và thông báo đẩy tới hội viên.\n` +
+            `- Phụ trách truyền thông thương hiệu, sự kiện, bản tin số và thông báo đẩy tới Học viên.\n` +
             `- Quản trị và cập nhật **Kho ảnh sự kiện Google Drive** chất lượng cao sau mỗi chương trình Caravan, Gala, Forum.\n` +
             `- Điều phối nội dung tin tức và ấn phẩm truyền thông toàn diện.`,
           actionLink: { label: "Xem Tin Tức & Sự Kiện", route: "/association/events" },
@@ -698,8 +698,8 @@ export function Ceo1983ChatAssistant() {
         return {
           text: `👥 **Ban Thành Viên CLB CEO HN10**:\n\n` +
             `- Tiếp nhận và thẩm định hồ sơ kết nạp doanh nhân mới.\n` +
-            `- Quản trị danh bạ hội viên, chăm sóc ngày sinh nhật và lễ kỷ niệm.\n` +
-            `- Theo dõi gia hạn hội viên và cung cấp **Template Hồ sơ Doanh Nghiệp 3D** cao cấp cho các thành viên.`,
+            `- Quản trị danh bạ Học viên, chăm sóc ngày sinh nhật và lễ kỷ niệm.\n` +
+            `- Theo dõi gia hạn Học viên và cung cấp **Template Hồ sơ Doanh Nghiệp 3D** cao cấp cho các thành viên.`,
           actionLink: { label: "Xem Danh Bạ Thành Viên", route: "/association/members" },
         };
       }
@@ -748,8 +748,8 @@ export function Ceo1983ChatAssistant() {
     if (norm.includes("tai lieu") || norm.includes("van ban") || norm.includes("nghi quyet") || norm.includes("dieu le")) {
       return {
         text: `📚 **Phân Hệ Quản Lý Tài Liệu CLB CEO HN10**:\n\n` +
-          `1. 🏛️ **Tài liệu Hiệp Hội**: Gồm điều lệ, quy chế hoạt động, nghị quyết BCH, báo cáo tài chính. Phân quyền bảo mật cao: Chỉ Quản trị viên, Chủ tịch và Trưởng các ban mới có quyền thêm/sửa/xóa; hội viên thường có quyền xem và tải về.\n` +
-          `2. 🏢 **Tài liệu Doanh Nghiệp**: Doanh nghiệp hội viên tự do đăng tải hồ sơ năng lực, brochure, catalogue sản phẩm để giới thiệu tới các thành viên khác.`,
+          `1. 🏛️ **Tài liệu Hiệp Hội**: Gồm điều lệ, quy chế hoạt động, nghị quyết BCH, báo cáo tài chính. Phân quyền bảo mật cao: Chỉ Quản trị viên, Chủ tịch và Trưởng các ban mới có quyền thêm/sửa/xóa; Học viên thường có quyền xem và tải về.\n` +
+          `2. 🏢 **Tài liệu Doanh Nghiệp**: Doanh nghiệp Học viên tự do đăng tải hồ sơ năng lực, brochure, catalogue sản phẩm để giới thiệu tới các thành viên khác.`,
         actionLink: { label: "Mở Thư Viện Tài Liệu", route: "/association/library" },
       };
     }
@@ -758,9 +758,9 @@ export function Ceo1983ChatAssistant() {
     if (norm.includes("danh thiep") || norm.includes("profile") || norm.includes("quet ma") || norm.includes("the hoi vien") || norm.includes("ho so")) {
       return {
         text: `🪪 **Thẻ Doanh Nhân & Profile 3D CEO HN10**:\n\n` +
-          `- Mỗi hội viên được cấp 1 thẻ danh thiếp số điện tử tích hợp công nghệ chạm NFC và mã QR độc bản.\n` +
+          `- Mỗi Học viên được cấp 1 thẻ danh thiếp số điện tử tích hợp công nghệ chạm NFC và mã QR độc bản.\n` +
           `- Khi đối tác quét mã QR, hệ thống sẽ hiển thị thông tin danh thiếp và **Template Profile Doanh Nghiệp 3D** với hình ảnh chìm cao cấp, dấu mộc chứng nhận CEO HN10.\n` +
-          `- Nếu danh thiếp chưa thuộc hội viên CLB, hệ thống sẽ hỗ trợ kết nối và mời tải ứng dụng ViOne Connect.`,
+          `- Nếu danh thiếp chưa thuộc Học viên CLB, hệ thống sẽ hỗ trợ kết nối và mời tải ứng dụng ViOne Connect.`,
         actionLink: { label: "Xem Danh Thiếp & Profile", route: "/association/card" },
       };
     }
@@ -781,10 +781,10 @@ export function Ceo1983ChatAssistant() {
   // Build dynamic system prompt grounded in app data
   const buildSystemPrompt = () => {
     const p = liveContext.memberProfile;
-    const name = p?.full_name || p?.name || user?.name || "Hội viên";
+    const name = p?.full_name || p?.name || user?.name || "Học viên";
     const company = p?.company_name || p?.company || "Doanh nghiệp CEO HN10";
     const code = p?.code || (user as any)?.member_code || "HN10-001";
-    const title = p?.title || p?.position || "Hội viên chính thức";
+    const title = p?.title || p?.position || "Học viên chính thức";
 
     const eventsText =
       liveContext.upcomingEvents.length > 0
@@ -836,11 +836,11 @@ Bạn giao tiếp bằng tiếng Việt lịch thiệp, thông minh, chuẩn m�
 
 THÔNG TIN TÀI KHOẢN NGƯỜI DÙNG HIỆN TẠI (DỮ LIỆU ĐỘNG THẬT):
 - Họ và tên: ${name}
-- Mã hội viên: ${code}
+- Mã Học viên: ${code}
 - Đơn vị / Doanh nghiệp: ${company}
 - Chức danh: ${title}
 - Số lượng kết nối / bạn bè đã kết nối: ${liveContext.connectedCount} người
-- Tổng số hội viên trong danh bạ CLB: ${liveContext.totalMembersCount} doanh nhân
+- Tổng số Học viên trong danh bạ CLB: ${liveContext.totalMembersCount} doanh nhân
 
 CÁC SỰ KIỆN ANH/CHỊ ĐÃ ĐĂNG KÝ:
 ${regEventsText}
@@ -1085,7 +1085,7 @@ HƯỚNG DẪN TRẢ LỜI:
                 setVoiceAiEnabled(false);
                 setAiActive(false);
                 setIsDismissed(false);
-                toast.info("Đã tắt Trợ lý AI CEO HN10. Quý hội viên có thể bật lại bất cứ lúc nào trong Cài đặt & Bảo mật.");
+                toast.info("Đã tắt Trợ lý AI CEO HN10. Quý Học viên có thể bật lại bất cứ lúc nào trong Cài đặt & Bảo mật.");
               }}
               aria-label="Tắt Trợ lý AI"
               title="Tắt Trợ lý AI"

@@ -22,21 +22,21 @@ const TEMPLATES: { id: string; label: string; subject: string; body: (name: stri
     label: "Giới thiệu & Kết nối kinh doanh",
     subject: "Thư chào mừng & Đề xuất kết nối giao thương — CLB CEO HN10",
     body: (name) =>
-      `Kính gửi ${name},\n\nThay mặt CLB Doanh Nhân CEO HN10, chúng tôi rất vui được kết nối với Quý đơn vị.\n\nChúng tôi mong muốn tìm hiểu thêm về các sản phẩm/dịch vụ của ${name} để thúc đẩy cơ hội hợp tác và kết nối giao thương giữa các hội viên.\n\nTrân trọng cảm ơn,\nBan Thư ký CLB CEO HN10`,
+      `Kính gửi ${name},\n\nThay mặt CLB Doanh Nhân CEO HN10, chúng tôi rất vui được kết nối với Quý đơn vị.\n\nChúng tôi mong muốn tìm hiểu thêm về các sản phẩm/dịch vụ của ${name} để thúc đẩy cơ hội hợp tác và kết nối giao thương giữa các Học viên.\n\nTrân trọng cảm ơn,\nBan Thư ký CLB CEO HN10`,
   },
   {
     id: "event",
     label: "Mời tham dự sự kiện hiệp hội",
     subject: "Thư mời tham dự sự kiện giao thương & xúc tiến kinh doanh",
     body: (name) =>
-      `Kính gửi ${name},\n\nHiệp hội trân trọng kính mời đại diện Quý doanh nghiệp tham dự chương trình giao lưu, kết nối hội viên và xúc tiến thương mại sắp tới.\n\nThời gian & địa điểm chi tiết xin vui lòng xem tại cổng thông tin hoặc phản hồi email này để nhận vé mời chính thức.\n\nRất mong được đón tiếp Quý đơn vị!`,
+      `Kính gửi ${name},\n\nHiệp hội trân trọng kính mời đại diện Quý doanh nghiệp tham dự chương trình giao lưu, kết nối Học viên và xúc tiến thương mại sắp tới.\n\nThời gian & địa điểm chi tiết xin vui lòng xem tại cổng thông tin hoặc phản hồi email này để nhận vé mời chính thức.\n\nRất mong được đón tiếp Quý đơn vị!`,
   },
   {
     id: "renewal",
-    label: "Thông báo hội phí & Gia hạn hội viên",
-    subject: "Thông báo về việc gia hạn quyền lợi hội viên hiệp hội",
+    label: "Thông báo hội phí & Gia hạn Học viên",
+    subject: "Thông báo về việc gia hạn quyền lợi Học viên hiệp hội",
     body: (name) =>
-      `Kính gửi ${name},\n\nHiệp hội xin gửi lời cảm ơn chân thành đến Quý đơn vị đã đồng hành cùng cộng đồng doanh nghiệp trong suốt thời gian qua.\n\nKỳ hội phí tiếp theo đã đến hạn, kính mời Quý doanh nghiệp kiểm tra thông tin thanh toán và tiến hành gia hạn để tiếp tục nhận đầy đủ các quyền lợi đặc quyền của hội viên.\n\nTrân trọng,\nBan Tài chính CLB CEO HN10`,
+      `Kính gửi ${name},\n\nHiệp hội xin gửi lời cảm ơn chân thành đến Quý đơn vị đã đồng hành cùng cộng đồng doanh nghiệp trong suốt thời gian qua.\n\nKỳ hội phí tiếp theo đã đến hạn, kính mời Quý doanh nghiệp kiểm tra thông tin thanh toán và tiến hành gia hạn để tiếp tục nhận đầy đủ các quyền lợi đặc quyền của Học viên.\n\nTrân trọng,\nBan Tài chính CLB CEO HN10`,
   },
   {
     id: "partnership",

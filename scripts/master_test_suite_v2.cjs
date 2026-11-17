@@ -83,7 +83,7 @@ async function prepareAuthPage(page, session, isCrm = true) {
       { name: 'access_token', value: session.token, domain: targetDomain, path: '/' },
       { name: 'sb-access-token', value: session.token, domain: targetDomain, path: '/' }
     );
-  } catch (e) {}
+  } catch (e) { }
 
   await page.evaluateOnNewDocument((token, user) => {
     try {
@@ -94,7 +94,7 @@ async function prepareAuthPage(page, session, isCrm = true) {
       localStorage.setItem("sb-access-token", token);
       const minUser = { id: user.id, email: user.email, role: user.role || 'member', name: user.name || user.email };
       localStorage.setItem("user", JSON.stringify(minUser));
-    } catch (e) {}
+    } catch (e) { }
   }, session.token, session.user);
 }
 
@@ -110,8 +110,8 @@ async function takeAnnotatedScreenshot(page, filename, badgeInfo) {
       banner.style.top = '10px';
       banner.style.right = '12px';
       banner.style.zIndex = '99999999';
-      banner.style.background = info.status === 'BUG' 
-        ? 'linear-gradient(135deg, #b91c1c, #ef4444)' 
+      banner.style.background = info.status === 'BUG'
+        ? 'linear-gradient(135deg, #b91c1c, #ef4444)'
         : 'linear-gradient(135deg, #0f172a, #1e3a8a)';
       banner.style.color = '#ffffff';
       banner.style.padding = '8px 14px';
@@ -136,7 +136,7 @@ async function takeAnnotatedScreenshot(page, filename, badgeInfo) {
   } catch (err) {
     console.warn(`takeAnnotatedScreenshot error for ${filename}:`, err.message);
     const fullPath = path.join(SCREENSHOTS_DIR, filename);
-    await page.screenshot({ path: fullPath }).catch(() => {});
+    await page.screenshot({ path: fullPath }).catch(() => { });
     return fullPath;
   }
 }
@@ -153,7 +153,7 @@ async function run() {
   console.log("✅ Đã xác thực thành công 3 tài khoản kiểm thử chính thức:");
   console.log("   - admin@connect.vn (Superadmin CRM)");
   console.log("   - vumikasa6@gmail.com (Ban Điều Hành / Seller)");
-  console.log("   - vupv090120@gmail.com (Hội viên / Doanh nhân)\n");
+  console.log("   - vupv090120@gmail.com (Học viên / Doanh nhân)\n");
 
   const browser = await puppeteer.launch({
     executablePath: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
@@ -196,7 +196,7 @@ async function run() {
       if (freeData.event?.id) freeEventId = freeData.event.id;
 
       await prepareAuthPage(crmPage, adminSession, true);
-      await crmPage.goto(`${CRM_BASE}/events?filter=free`, { waitUntil: 'networkidle2', timeout: 20000 }).catch(() => {});
+      await crmPage.goto(`${CRM_BASE}/events?filter=free`, { waitUntil: 'networkidle2', timeout: 20000 }).catch(() => { });
       await new Promise(r => setTimeout(r, 2000));
       await takeAnnotatedScreenshot(crmPage, "case_1_1_crm_create_free_event.png", {
         caseId: "CASE-1.1",
@@ -241,7 +241,7 @@ async function run() {
       if (paidData.event?.id) paidEventId = paidData.event.id;
 
       await prepareAuthPage(crmPage, adminSession, true);
-      await crmPage.goto(`${CRM_BASE}/events?filter=paid`, { waitUntil: 'networkidle2', timeout: 20000 }).catch(() => {});
+      await crmPage.goto(`${CRM_BASE}/events?filter=paid`, { waitUntil: 'networkidle2', timeout: 20000 }).catch(() => { });
       await new Promise(r => setTimeout(r, 2000));
       await takeAnnotatedScreenshot(crmPage, "case_1_2_crm_create_paid_event.png", {
         caseId: "CASE-1.2",
@@ -266,7 +266,7 @@ async function run() {
     }
 
     // 1.3 Đăng ký sự kiện miễn phí trên App
-    console.log(">>> Case 1.3: Hội viên đăng ký sự kiện Miễn Phí trên App...");
+    console.log(">>> Case 1.3: Học viên đăng ký sự kiện Miễn Phí trên App...");
     try {
       const regFreeRes = await safeFetch(`${API_BASE}/events/${freeEventId}/register`, {
         method: "POST",
@@ -276,7 +276,7 @@ async function run() {
       const regFreeData = await regFreeRes.json();
 
       await prepareAuthPage(appPage, vupvSession, false);
-      await appPage.goto(`${APP_BASE}/association/events/${freeEventId}`, { waitUntil: 'networkidle2', timeout: 20000 }).catch(() => {});
+      await appPage.goto(`${APP_BASE}/association/events/${freeEventId}`, { waitUntil: 'networkidle2', timeout: 20000 }).catch(() => { });
       await new Promise(r => setTimeout(r, 2000));
       await takeAnnotatedScreenshot(appPage, "case_1_3_app_free_event_registered.png", {
         caseId: "CASE-1.3",
@@ -288,7 +288,7 @@ async function run() {
       recordResult(
         "CASE-1.3",
         "Sự Kiện",
-        "Hội viên Đăng Ký Sự Kiện Miễn Phí Trên Mobile App",
+        "Học viên Đăng Ký Sự Kiện Miễn Phí Trên Mobile App",
         "vupv090120@gmail.com",
         "Mã 200/201, sinh mã vé check-in QR miễn phí",
         "Đăng ký thành công vé tham dự Miễn Phí",
@@ -301,7 +301,7 @@ async function run() {
     }
 
     // 1.4 Đăng ký sự kiện có phí trên App
-    console.log(">>> Case 1.4: Hội viên đăng ký sự kiện Có Phí (500k) trên App...");
+    console.log(">>> Case 1.4: Học viên đăng ký sự kiện Có Phí (500k) trên App...");
     try {
       const regPaidRes = await safeFetch(`${API_BASE}/events/${paidEventId}/register`, {
         method: "POST",
@@ -311,7 +311,7 @@ async function run() {
       const regPaidData = await regPaidRes.json();
 
       await prepareAuthPage(appPage, mikaSession, false);
-      await appPage.goto(`${APP_BASE}/association/events/${paidEventId}`, { waitUntil: 'networkidle2', timeout: 20000 }).catch(() => {});
+      await appPage.goto(`${APP_BASE}/association/events/${paidEventId}`, { waitUntil: 'networkidle2', timeout: 20000 }).catch(() => { });
       await new Promise(r => setTimeout(r, 2000));
       await takeAnnotatedScreenshot(appPage, "case_1_4_app_paid_event_registered.png", {
         caseId: "CASE-1.4",
@@ -323,7 +323,7 @@ async function run() {
       recordResult(
         "CASE-1.4",
         "Sự Kiện",
-        "Hội viên Đăng Ký Sự Kiện Có Phí (500k) Trên Mobile App",
+        "Học viên Đăng Ký Sự Kiện Có Phí (500k) Trên Mobile App",
         "vumikasa6@gmail.com",
         "Mã 200/201, tạo đơn đăng ký vé Gala Dinner 500,000 VND",
         "Đăng ký thành công vé Gala Dinner có phí 500.000 VND",
@@ -344,7 +344,7 @@ async function run() {
       const regsData = await regsRes.json();
 
       await prepareAuthPage(crmPage, adminSession, true);
-      await crmPage.goto(`${CRM_BASE}/event-registrations`, { waitUntil: 'networkidle2', timeout: 20000 }).catch(() => {});
+      await crmPage.goto(`${CRM_BASE}/event-registrations`, { waitUntil: 'networkidle2', timeout: 20000 }).catch(() => { });
       await new Promise(r => setTimeout(r, 2000));
       await takeAnnotatedScreenshot(crmPage, "case_1_5_crm_event_registrations.png", {
         caseId: "CASE-1.5",
@@ -383,7 +383,7 @@ async function run() {
       const editEvBody = await editEvRes.text();
 
       await prepareAuthPage(crmPage, adminSession, true);
-      await crmPage.goto(`${CRM_BASE}/events`, { waitUntil: 'networkidle2', timeout: 20000 }).catch(() => {});
+      await crmPage.goto(`${CRM_BASE}/events`, { waitUntil: 'networkidle2', timeout: 20000 }).catch(() => { });
       await new Promise(r => setTimeout(r, 2000));
       await takeAnnotatedScreenshot(crmPage, "case_1_6_crm_edit_event.png", {
         caseId: "CASE-1.6",
@@ -438,7 +438,7 @@ async function run() {
       }
 
       await prepareAuthPage(crmPage, adminSession, true);
-      await crmPage.goto(`${CRM_BASE}/events`, { waitUntil: 'networkidle2', timeout: 20000 }).catch(() => {});
+      await crmPage.goto(`${CRM_BASE}/events`, { waitUntil: 'networkidle2', timeout: 20000 }).catch(() => { });
       await new Promise(r => setTimeout(r, 2000));
       await takeAnnotatedScreenshot(crmPage, "case_1_7_crm_delete_event.png", {
         caseId: "CASE-1.7",
@@ -486,7 +486,7 @@ async function run() {
       if (oppAppData.id) appOppId = oppAppData.id;
 
       await prepareAuthPage(appPage, mikaSession, false);
-      await appPage.goto(`${APP_BASE}/association/opportunities`, { waitUntil: 'networkidle2', timeout: 20000 }).catch(() => {});
+      await appPage.goto(`${APP_BASE}/association/opportunities`, { waitUntil: 'networkidle2', timeout: 20000 }).catch(() => { });
       await new Promise(r => setTimeout(r, 2000));
       await takeAnnotatedScreenshot(appPage, "case_2_1_app_create_opportunity.png", {
         caseId: "CASE-2.1",
@@ -518,7 +518,7 @@ async function run() {
         headers: { "Content-Type": "application/json", "Authorization": `Bearer ${adminSession.token}` },
         body: JSON.stringify({
           title: `Tìm Đối Tác Cung Ứng Vật Liệu Xây Dựng Dự Án CEO HN10 [${Date.now().toString().slice(-4)}]`,
-          content: "Ban Điều Hành thông báo cơ hội hợp tác cung ứng vật liệu hoàn thiện cho chuỗi văn phòng hội viên.",
+          content: "Ban Điều Hành thông báo cơ hội hợp tác cung ứng vật liệu hoàn thiện cho chuỗi văn phòng Học viên.",
           category: "Xây dựng",
           expected_value: 500000000,
           target_industry: "Vật liệu xây dựng & Nội thất"
@@ -527,7 +527,7 @@ async function run() {
       const oppCrmData = await oppCrmRes.json();
 
       await prepareAuthPage(crmPage, adminSession, true);
-      await crmPage.goto(`${CRM_BASE}/opportunities`, { waitUntil: 'networkidle2', timeout: 20000 }).catch(() => {});
+      await crmPage.goto(`${CRM_BASE}/opportunities`, { waitUntil: 'networkidle2', timeout: 20000 }).catch(() => { });
       await new Promise(r => setTimeout(r, 2000));
       await takeAnnotatedScreenshot(crmPage, "case_2_2_crm_create_opportunity.png", {
         caseId: "CASE-2.2",
@@ -551,8 +551,8 @@ async function run() {
       console.error("Lỗi Case 2.2:", e);
     }
 
-    // 2.3 Hội viên bày tỏ quan tâm cơ hội & gửi kết nối gặp mặt B2B
-    console.log(">>> Case 2.3: Hội viên bày tỏ quan tâm cơ hội & gửi kết nối gặp mặt B2B...");
+    // 2.3 Học viên bày tỏ quan tâm cơ hội & gửi kết nối gặp mặt B2B
+    console.log(">>> Case 2.3: Học viên bày tỏ quan tâm cơ hội & gửi kết nối gặp mặt B2B...");
     try {
       const expRes = await safeFetch(`${API_BASE}/opportunities/${appOppId}/interests`, {
         method: "POST",
@@ -562,7 +562,7 @@ async function run() {
       const expData = await expRes.json();
 
       await prepareAuthPage(appPage, vupvSession, false);
-      await appPage.goto(`${APP_BASE}/association/opportunities`, { waitUntil: 'networkidle2', timeout: 20000 }).catch(() => {});
+      await appPage.goto(`${APP_BASE}/association/opportunities`, { waitUntil: 'networkidle2', timeout: 20000 }).catch(() => { });
       await new Promise(r => setTimeout(r, 2000));
       await takeAnnotatedScreenshot(appPage, "case_2_3_app_express_interest.png", {
         caseId: "CASE-2.3",
@@ -574,7 +574,7 @@ async function run() {
       recordResult(
         "CASE-2.3",
         "Cơ Hội B2B",
-        "Hội Viên Bày Tỏ Quan Tâm Cơ Hội & Gửi Yêu Cầu Kết Nối Gặp Mặt B2B",
+        "Học viên Bày Tỏ Quan Tâm Cơ Hội & Gửi Yêu Cầu Kết Nối Gặp Mặt B2B",
         "vupv090120@gmail.com",
         "Mã 200 OK, ghi nhận mức độ quan tâm High và lời nhắn",
         "Ghi nhận quan tâm cơ hội và gửi yêu cầu kết nối gặp mặt B2B thành công",
@@ -595,7 +595,7 @@ async function run() {
       const intListData = await intListRes.json();
 
       await prepareAuthPage(crmPage, mikaSession, true);
-      await crmPage.goto(`${CRM_BASE}/opportunities`, { waitUntil: 'networkidle2', timeout: 20000 }).catch(() => {});
+      await crmPage.goto(`${CRM_BASE}/opportunities`, { waitUntil: 'networkidle2', timeout: 20000 }).catch(() => { });
       await new Promise(r => setTimeout(r, 2000));
       await takeAnnotatedScreenshot(crmPage, "case_2_4_crm_view_interested_members.png", {
         caseId: "CASE-2.4",
@@ -609,8 +609,8 @@ async function run() {
         "Cơ Hội B2B",
         "Chính Chủ Xem Danh Sách Thành Viên Quan Tâm & Bấm Nút Kết Nối Gặp Mặt B2B",
         "vumikasa6@gmail.com",
-        "Hiển thị danh sách hội viên quan tâm kèm nút 'Gặp mặt B2B 1-1'",
-        `Chính chủ xem thấy ${intListData.interests?.length || 1} hội viên quan tâm, có đầy đủ nút gọi điện/nhắn tin/hẹn gặp`,
+        "Hiển thị danh sách Học viên quan tâm kèm nút 'Gặp mặt B2B 1-1'",
+        `Chính chủ xem thấy ${intListData.interests?.length || 1} Học viên quan tâm, có đầy đủ nút gọi điện/nhắn tin/hẹn gặp`,
         "PASS",
         intListData,
         "case_2_4_crm_view_interested_members.png"
@@ -633,7 +633,7 @@ async function run() {
       const editOppData = await editOppRes.json();
 
       await prepareAuthPage(appPage, mikaSession, false);
-      await appPage.goto(`${APP_BASE}/association/opportunities`, { waitUntil: 'networkidle2', timeout: 20000 }).catch(() => {});
+      await appPage.goto(`${APP_BASE}/association/opportunities`, { waitUntil: 'networkidle2', timeout: 20000 }).catch(() => { });
       await new Promise(r => setTimeout(r, 2000));
       await takeAnnotatedScreenshot(appPage, "case_2_5_app_edit_opportunity.png", {
         caseId: "CASE-2.5",
@@ -684,7 +684,7 @@ async function run() {
       }
 
       await prepareAuthPage(appPage, mikaSession, false);
-      await appPage.goto(`${APP_BASE}/association/opportunities`, { waitUntil: 'networkidle2', timeout: 20000 }).catch(() => {});
+      await appPage.goto(`${APP_BASE}/association/opportunities`, { waitUntil: 'networkidle2', timeout: 20000 }).catch(() => { });
       await new Promise(r => setTimeout(r, 2000));
       await takeAnnotatedScreenshot(appPage, "case_2_6_app_delete_opportunity.png", {
         caseId: "CASE-2.6",
@@ -722,7 +722,7 @@ async function run() {
       const myProds = await myProdsRes.json();
 
       await prepareAuthPage(appPage, mikaSession, false);
-      await appPage.goto(`${APP_BASE}/association/products`, { waitUntil: 'networkidle2', timeout: 20000 }).catch(() => {});
+      await appPage.goto(`${APP_BASE}/association/products`, { waitUntil: 'networkidle2', timeout: 20000 }).catch(() => { });
       await new Promise(r => setTimeout(r, 2000));
       await takeAnnotatedScreenshot(appPage, "case_3_1_app_marketplace_5_products.png", {
         caseId: "CASE-3.1",
@@ -762,7 +762,7 @@ async function run() {
       const p6Data = await p6Res.json();
 
       await prepareAuthPage(appPage, mikaSession, false);
-      await appPage.goto(`${APP_BASE}/association/products/new`, { waitUntil: 'networkidle2', timeout: 20000 }).catch(() => {});
+      await appPage.goto(`${APP_BASE}/association/products/new`, { waitUntil: 'networkidle2', timeout: 20000 }).catch(() => { });
       await new Promise(r => setTimeout(r, 2000));
       await takeAnnotatedScreenshot(appPage, "case_3_2_app_block_6th_product.png", {
         caseId: "CASE-3.2",
@@ -786,8 +786,8 @@ async function run() {
       console.error("Lỗi Case 3.2:", e);
     }
 
-    // 3.3 Hội viên khác gửi yêu cầu báo giá & bày tỏ quan tâm sản phẩm
-    console.log(">>> Case 3.3: Hội viên khác gửi yêu cầu báo giá & bày tỏ quan tâm sản phẩm...");
+    // 3.3 Học viên khác gửi yêu cầu báo giá & bày tỏ quan tâm sản phẩm
+    console.log(">>> Case 3.3: Học viên khác gửi yêu cầu báo giá & bày tỏ quan tâm sản phẩm...");
     try {
       const inqRes = await safeFetch(`${API_BASE}/marketplace/inquiries`, {
         method: "POST",
@@ -801,7 +801,7 @@ async function run() {
       const inqData = await inqRes.json();
 
       await prepareAuthPage(appPage, vupvSession, false);
-      await appPage.goto(`${APP_BASE}/association/products`, { waitUntil: 'networkidle2', timeout: 20000 }).catch(() => {});
+      await appPage.goto(`${APP_BASE}/association/products`, { waitUntil: 'networkidle2', timeout: 20000 }).catch(() => { });
       await new Promise(r => setTimeout(r, 2000));
       await takeAnnotatedScreenshot(appPage, "case_3_3_app_product_interest.png", {
         caseId: "CASE-3.3",
@@ -813,7 +813,7 @@ async function run() {
       recordResult(
         "CASE-3.3",
         "Sàn Thương Mại",
-        "Hội Viên Bày Tỏ Quan Tâm Sản Phẩm & Gửi Yêu Cầu Báo Giá",
+        "Học viên Bày Tỏ Quan Tâm Sản Phẩm & Gửi Yêu Cầu Báo Giá",
         "vupv090120@gmail.com",
         "Mã 200/201 OK, lưu yêu cầu báo giá và gửi thông báo tới chủ sản phẩm",
         "Gửi yêu cầu báo giá và kết nối quan tâm sản phẩm thành công",
@@ -834,7 +834,7 @@ async function run() {
       const myInqData = await myInqRes.json();
 
       await prepareAuthPage(crmPage, mikaSession, true);
-      await crmPage.goto(`${CRM_BASE}/crm`, { waitUntil: 'networkidle2', timeout: 20000 }).catch(() => {});
+      await crmPage.goto(`${CRM_BASE}/crm`, { waitUntil: 'networkidle2', timeout: 20000 }).catch(() => { });
       await new Promise(r => setTimeout(r, 2000));
       await takeAnnotatedScreenshot(crmPage, "case_3_4_crm_product_interested_members.png", {
         caseId: "CASE-3.4",
@@ -873,7 +873,7 @@ async function run() {
       const editProdData = await editProdRes.json();
 
       await prepareAuthPage(appPage, mikaSession, false);
-      await appPage.goto(`${APP_BASE}/association/products`, { waitUntil: 'networkidle2', timeout: 20000 }).catch(() => {});
+      await appPage.goto(`${APP_BASE}/association/products`, { waitUntil: 'networkidle2', timeout: 20000 }).catch(() => { });
       await new Promise(r => setTimeout(r, 2000));
       await takeAnnotatedScreenshot(appPage, "case_3_5_app_edit_product.png", {
         caseId: "CASE-3.5",
@@ -907,7 +907,7 @@ async function run() {
       const delProdData = await delProdRes.json();
 
       await prepareAuthPage(appPage, mikaSession, false);
-      await appPage.goto(`${APP_BASE}/association/products`, { waitUntil: 'networkidle2', timeout: 20000 }).catch(() => {});
+      await appPage.goto(`${APP_BASE}/association/products`, { waitUntil: 'networkidle2', timeout: 20000 }).catch(() => { });
       await new Promise(r => setTimeout(r, 2000));
       await takeAnnotatedScreenshot(appPage, "case_3_6_app_delete_product.png", {
         caseId: "CASE-3.6",
@@ -957,7 +957,7 @@ async function run() {
       if (pdfData.id) pdfDocId = pdfData.id;
 
       await prepareAuthPage(crmPage, adminSession, true);
-      await crmPage.goto(`${CRM_BASE}/documents?filter=pdf`, { waitUntil: 'networkidle2', timeout: 20000 }).catch(() => {});
+      await crmPage.goto(`${CRM_BASE}/documents?filter=pdf`, { waitUntil: 'networkidle2', timeout: 20000 }).catch(() => { });
       await new Promise(r => setTimeout(r, 2000));
       await takeAnnotatedScreenshot(crmPage, "case_4_1_crm_upload_pdf.png", {
         caseId: "CASE-4.1",
@@ -999,7 +999,7 @@ async function run() {
       if (docxData.id) docxDocId = docxData.id;
 
       await prepareAuthPage(crmPage, adminSession, true);
-      await crmPage.goto(`${CRM_BASE}/documents?filter=docx`, { waitUntil: 'networkidle2', timeout: 20000 }).catch(() => {});
+      await crmPage.goto(`${CRM_BASE}/documents?filter=docx`, { waitUntil: 'networkidle2', timeout: 20000 }).catch(() => { });
       await new Promise(r => setTimeout(r, 2000));
       await takeAnnotatedScreenshot(crmPage, "case_4_2_crm_upload_docx.png", {
         caseId: "CASE-4.2",
@@ -1041,7 +1041,7 @@ async function run() {
       if (xlsxData.id) xlsxDocId = xlsxData.id;
 
       await prepareAuthPage(crmPage, adminSession, true);
-      await crmPage.goto(`${CRM_BASE}/documents?filter=xlsx`, { waitUntil: 'networkidle2', timeout: 20000 }).catch(() => {});
+      await crmPage.goto(`${CRM_BASE}/documents?filter=xlsx`, { waitUntil: 'networkidle2', timeout: 20000 }).catch(() => { });
       await new Promise(r => setTimeout(r, 2000));
       await takeAnnotatedScreenshot(crmPage, "case_4_3_crm_upload_xlsx.png", {
         caseId: "CASE-4.3",
@@ -1069,7 +1069,7 @@ async function run() {
     console.log(">>> Case 4.4: Xem chi tiết tài liệu PDF...");
     try {
       await prepareAuthPage(appPage, vupvSession, false);
-      await appPage.goto(`${APP_BASE}/association/card`, { waitUntil: 'networkidle2', timeout: 20000 }).catch(() => {});
+      await appPage.goto(`${APP_BASE}/association/card`, { waitUntil: 'networkidle2', timeout: 20000 }).catch(() => { });
       await new Promise(r => setTimeout(r, 2000));
       await takeAnnotatedScreenshot(appPage, "case_4_4_app_view_pdf.png", {
         caseId: "CASE-4.4",
@@ -1097,7 +1097,7 @@ async function run() {
     console.log(">>> Case 4.5: Xem chi tiết tài liệu Word (.docx)...");
     try {
       await prepareAuthPage(crmPage, adminSession, true);
-      await crmPage.goto(`${CRM_BASE}/documents`, { waitUntil: 'networkidle2', timeout: 20000 }).catch(() => {});
+      await crmPage.goto(`${CRM_BASE}/documents`, { waitUntil: 'networkidle2', timeout: 20000 }).catch(() => { });
       await new Promise(r => setTimeout(r, 2000));
       await takeAnnotatedScreenshot(crmPage, "case_4_5_crm_view_docx.png", {
         caseId: "CASE-4.5",
@@ -1125,7 +1125,7 @@ async function run() {
     console.log(">>> Case 4.6: Xem chi tiết tài liệu Excel (.xlsx)...");
     try {
       await prepareAuthPage(crmPage, adminSession, true);
-      await crmPage.goto(`${CRM_BASE}/documents`, { waitUntil: 'networkidle2', timeout: 20000 }).catch(() => {});
+      await crmPage.goto(`${CRM_BASE}/documents`, { waitUntil: 'networkidle2', timeout: 20000 }).catch(() => { });
       await new Promise(r => setTimeout(r, 2000));
       await takeAnnotatedScreenshot(crmPage, "case_4_6_crm_view_xlsx.png", {
         caseId: "CASE-4.6",
@@ -1162,7 +1162,7 @@ async function run() {
       const editDocData = await editDocRes.json();
 
       await prepareAuthPage(crmPage, adminSession, true);
-      await crmPage.goto(`${CRM_BASE}/documents`, { waitUntil: 'networkidle2', timeout: 20000 }).catch(() => {});
+      await crmPage.goto(`${CRM_BASE}/documents`, { waitUntil: 'networkidle2', timeout: 20000 }).catch(() => { });
       await new Promise(r => setTimeout(r, 2000));
       await takeAnnotatedScreenshot(crmPage, "case_4_7_crm_edit_document.png", {
         caseId: "CASE-4.7",
@@ -1196,7 +1196,7 @@ async function run() {
       const delDocData = await delDocRes.json();
 
       await prepareAuthPage(crmPage, adminSession, true);
-      await crmPage.goto(`${CRM_BASE}/documents`, { waitUntil: 'networkidle2', timeout: 20000 }).catch(() => {});
+      await crmPage.goto(`${CRM_BASE}/documents`, { waitUntil: 'networkidle2', timeout: 20000 }).catch(() => { });
       await new Promise(r => setTimeout(r, 2000));
       await takeAnnotatedScreenshot(crmPage, "case_4_8_crm_delete_document.png", {
         caseId: "CASE-4.8",
@@ -1245,7 +1245,7 @@ async function run() {
       onlineMeetingId = mtOnlData.id || mtOnlData.meeting?.id;
 
       await prepareAuthPage(crmPage, adminSession, true);
-      await crmPage.goto(`${CRM_BASE}/meetings?type=online`, { waitUntil: 'networkidle2', timeout: 20000 }).catch(() => {});
+      await crmPage.goto(`${CRM_BASE}/meetings?type=online`, { waitUntil: 'networkidle2', timeout: 20000 }).catch(() => { });
       await new Promise(r => setTimeout(r, 2000));
       await takeAnnotatedScreenshot(crmPage, "case_5_1_crm_create_online_meeting.png", {
         caseId: "CASE-5.1",
@@ -1287,7 +1287,7 @@ async function run() {
       offlineMeetingId = mtOffData.id || mtOffData.meeting?.id;
 
       await prepareAuthPage(crmPage, adminSession, true);
-      await crmPage.goto(`${CRM_BASE}/meetings?type=offline`, { waitUntil: 'networkidle2', timeout: 20000 }).catch(() => {});
+      await crmPage.goto(`${CRM_BASE}/meetings?type=offline`, { waitUntil: 'networkidle2', timeout: 20000 }).catch(() => { });
       await new Promise(r => setTimeout(r, 2000));
       await takeAnnotatedScreenshot(crmPage, "case_5_2_crm_create_offline_meeting.png", {
         caseId: "CASE-5.2",
@@ -1311,11 +1311,11 @@ async function run() {
       console.error("Lỗi Case 5.2:", e);
     }
 
-    // 5.3 Hội viên nhận thông báo cuộc họp trên Mobile App
+    // 5.3 Học viên nhận thông báo cuộc họp trên Mobile App
     console.log(">>> Case 5.3: Kiểm tra thông báo nhận lời mời cuộc họp trên Mobile App...");
     try {
       await prepareAuthPage(appPage, vupvSession, false);
-      await appPage.goto(`${APP_BASE}/association/notifications`, { waitUntil: 'networkidle2', timeout: 20000 }).catch(() => {});
+      await appPage.goto(`${APP_BASE}/association/notifications`, { waitUntil: 'networkidle2', timeout: 20000 }).catch(() => { });
       await new Promise(r => setTimeout(r, 2000));
       await takeAnnotatedScreenshot(appPage, "case_5_3_app_meeting_notification.png", {
         caseId: "CASE-5.3",
@@ -1327,10 +1327,10 @@ async function run() {
       recordResult(
         "CASE-5.3",
         "Cuộc Họp",
-        "Hội Viên Được Thêm Nhận Được Thông Báo Cuộc Họp Trên Mobile App",
+        "Học viên Được Thêm Nhận Được Thông Báo Cuộc Họp Trên Mobile App",
         "vupv090120@gmail.com",
-        "Hội viên thấy thông báo mời tham gia cuộc họp trên App",
-        "Thông báo cuộc họp được đẩy trực tiếp tới hộp thư của hội viên trên App",
+        "Học viên thấy thông báo mời tham gia cuộc họp trên App",
+        "Thông báo cuộc họp được đẩy trực tiếp tới hộp thư của Học viên trên App",
         "PASS",
         { recipient: "vupv090120@gmail.com", status: "received", channel: "mobile_app" },
         "case_5_3_app_meeting_notification.png"
@@ -1339,11 +1339,11 @@ async function run() {
       console.error("Lỗi Case 5.3:", e);
     }
 
-    // 5.4 Hội viên nhận thông báo cuộc họp trên Web CRM
+    // 5.4 Học viên nhận thông báo cuộc họp trên Web CRM
     console.log(">>> Case 5.4: Kiểm tra thông báo nhận lời mời cuộc họp trên Web CRM...");
     try {
       await prepareAuthPage(crmPage, mikaSession, true);
-      await crmPage.goto(`${CRM_BASE}/notifications`, { waitUntil: 'networkidle2', timeout: 20000 }).catch(() => {});
+      await crmPage.goto(`${CRM_BASE}/notifications`, { waitUntil: 'networkidle2', timeout: 20000 }).catch(() => { });
       await new Promise(r => setTimeout(r, 2000));
       await takeAnnotatedScreenshot(crmPage, "case_5_4_crm_meeting_notification.png", {
         caseId: "CASE-5.4",
@@ -1355,7 +1355,7 @@ async function run() {
       recordResult(
         "CASE-5.4",
         "Cuộc Họp",
-        "Hội Viên Được Thêm Thấy Được Thông Báo Cuộc Họp Trên Web CRM",
+        "Học viên Được Thêm Thấy Được Thông Báo Cuộc Họp Trên Web CRM",
         "vumikasa6@gmail.com",
         "Tài khoản vumikasa6@gmail.com thấy thông báo cuộc họp trên Web CRM",
         "Hệ thống Web CRM hiển thị thông báo cuộc họp đồng bộ 2 chiều",
@@ -1381,7 +1381,7 @@ async function run() {
       const editMtData = await editMtRes.json();
 
       await prepareAuthPage(crmPage, adminSession, true);
-      await crmPage.goto(`${CRM_BASE}/meetings`, { waitUntil: 'networkidle2', timeout: 20000 }).catch(() => {});
+      await crmPage.goto(`${CRM_BASE}/meetings`, { waitUntil: 'networkidle2', timeout: 20000 }).catch(() => { });
       await new Promise(r => setTimeout(r, 2000));
       await takeAnnotatedScreenshot(crmPage, "case_5_5_crm_edit_meeting.png", {
         caseId: "CASE-5.5",
@@ -1415,7 +1415,7 @@ async function run() {
       const delMtData = await delMtRes.json();
 
       await prepareAuthPage(crmPage, adminSession, true);
-      await crmPage.goto(`${CRM_BASE}/meetings`, { waitUntil: 'networkidle2', timeout: 20000 }).catch(() => {});
+      await crmPage.goto(`${CRM_BASE}/meetings`, { waitUntil: 'networkidle2', timeout: 20000 }).catch(() => { });
       await new Promise(r => setTimeout(r, 2000));
       await takeAnnotatedScreenshot(crmPage, "case_5_6_crm_delete_meeting.png", {
         caseId: "CASE-5.6",
@@ -1467,7 +1467,7 @@ async function run() {
       onlineTrId = trOnlData.data?.id || trOnlData.id;
 
       await prepareAuthPage(crmPage, adminSession, true);
-      await crmPage.goto(`${CRM_BASE}/trainings?format=online`, { waitUntil: 'networkidle2', timeout: 20000 }).catch(() => {});
+      await crmPage.goto(`${CRM_BASE}/trainings?format=online`, { waitUntil: 'networkidle2', timeout: 20000 }).catch(() => { });
       await new Promise(r => setTimeout(r, 2000));
       await takeAnnotatedScreenshot(crmPage, "case_6_1_crm_create_online_training.png", {
         caseId: "CASE-6.1",
@@ -1512,7 +1512,7 @@ async function run() {
       offlineTrId = trOffData.data?.id || trOffData.id;
 
       await prepareAuthPage(crmPage, adminSession, true);
-      await crmPage.goto(`${CRM_BASE}/trainings?format=offline`, { waitUntil: 'networkidle2', timeout: 20000 }).catch(() => {});
+      await crmPage.goto(`${CRM_BASE}/trainings?format=offline`, { waitUntil: 'networkidle2', timeout: 20000 }).catch(() => { });
       await new Promise(r => setTimeout(r, 2000));
       await takeAnnotatedScreenshot(crmPage, "case_6_2_crm_create_offline_training.png", {
         caseId: "CASE-6.2",
@@ -1536,8 +1536,8 @@ async function run() {
       console.error("Lỗi Case 6.2:", e);
     }
 
-    // 6.3 Hội viên đăng ký tham gia chương trình đào tạo trên App
-    console.log(">>> Case 6.3: Hội viên đăng ký tham gia đào tạo trên App...");
+    // 6.3 Học viên đăng ký tham gia chương trình đào tạo trên App
+    console.log(">>> Case 6.3: Học viên đăng ký tham gia đào tạo trên App...");
     try {
       const regTrRes = await safeFetch(`${API_BASE}/trainings/${onlineTrId}/join`, {
         method: "POST",
@@ -1547,7 +1547,7 @@ async function run() {
       const regTrData = await regTrRes.json();
 
       await prepareAuthPage(appPage, vupvSession, false);
-      await appPage.goto(`${APP_BASE}/association/training`, { waitUntil: 'networkidle2', timeout: 20000 }).catch(() => {});
+      await appPage.goto(`${APP_BASE}/association/training`, { waitUntil: 'networkidle2', timeout: 20000 }).catch(() => { });
       await new Promise(r => setTimeout(r, 2000));
       await takeAnnotatedScreenshot(appPage, "case_6_3_app_register_training.png", {
         caseId: "CASE-6.3",
@@ -1559,7 +1559,7 @@ async function run() {
       recordResult(
         "CASE-6.3",
         "Đào Tạo",
-        "Hội Viên Đăng Ký Tham Gia Chương Trình Đào Tạo Trên Mobile App",
+        "Học viên Đăng Ký Tham Gia Chương Trình Đào Tạo Trên Mobile App",
         "vupv090120@gmail.com",
         "Mã 200/201 OK, lưu thông tin học viên vào danh sách khóa học",
         "Đăng ký tham gia chương trình đào tạo thành công",
@@ -1585,7 +1585,7 @@ async function run() {
       const editTrData = await editTrRes.json();
 
       await prepareAuthPage(crmPage, adminSession, true);
-      await crmPage.goto(`${CRM_BASE}/trainings`, { waitUntil: 'networkidle2', timeout: 20000 }).catch(() => {});
+      await crmPage.goto(`${CRM_BASE}/trainings`, { waitUntil: 'networkidle2', timeout: 20000 }).catch(() => { });
       await new Promise(r => setTimeout(r, 2000));
       await takeAnnotatedScreenshot(crmPage, "case_6_4_crm_edit_training.png", {
         caseId: "CASE-6.4",
@@ -1619,7 +1619,7 @@ async function run() {
       const delTrData = await delTrRes.json();
 
       await prepareAuthPage(crmPage, adminSession, true);
-      await crmPage.goto(`${CRM_BASE}/trainings`, { waitUntil: 'networkidle2', timeout: 20000 }).catch(() => {});
+      await crmPage.goto(`${CRM_BASE}/trainings`, { waitUntil: 'networkidle2', timeout: 20000 }).catch(() => { });
       await new Promise(r => setTimeout(r, 2000));
       await takeAnnotatedScreenshot(crmPage, "case_6_5_crm_delete_training.png", {
         caseId: "CASE-6.5",
@@ -1649,15 +1649,15 @@ async function run() {
     console.log("\n=================== FLOW 7: GIAO VIỆC & BÁO CÁO TIẾN ĐỘ ===================");
     let assignedTaskId = "";
 
-    // 7.1 Admin tạo mới nhiệm vụ giao cho hội viên trên CRM
-    console.log(">>> Case 7.1: Admin tạo mới nhiệm vụ giao cho hội viên...");
+    // 7.1 Admin tạo mới nhiệm vụ giao cho Học viên trên CRM
+    console.log(">>> Case 7.1: Admin tạo mới nhiệm vụ giao cho Học viên...");
     try {
       const crTaskRes = await safeFetch(`${API_BASE}/tasks`, {
         method: "POST",
         headers: { "Content-Type": "application/json", "Authorization": `Bearer ${adminSession.token}` },
         body: JSON.stringify({
           title: `Khảo Sát & Lập Phương Án Kết Nối Doanh Nghiệp Quý 4 [${Date.now().toString().slice(-4)}]`,
-          description: "Yêu cầu đồng chí Phạm Vũ rà soát danh sách 50 doanh nghiệp hội viên ngành công nghệ và gửi báo cáo trước thứ 6.",
+          description: "Yêu cầu đồng chí Phạm Vũ rà soát danh sách 50 doanh nghiệp Học viên ngành công nghệ và gửi báo cáo trước thứ 6.",
           assignedTo: "vupv090120@gmail.com",
           department: "Ban Xúc Tiến Thương Mại",
           priority: "high",
@@ -1668,7 +1668,7 @@ async function run() {
       assignedTaskId = crTaskData.id;
 
       await prepareAuthPage(crmPage, adminSession, true);
-      await crmPage.goto(`${CRM_BASE}/tasks`, { waitUntil: 'networkidle2', timeout: 20000 }).catch(() => {});
+      await crmPage.goto(`${CRM_BASE}/tasks`, { waitUntil: 'networkidle2', timeout: 20000 }).catch(() => { });
       await new Promise(r => setTimeout(r, 2000));
       await takeAnnotatedScreenshot(crmPage, "case_7_1_crm_create_task_assigned.png", {
         caseId: "CASE-7.1",
@@ -1680,7 +1680,7 @@ async function run() {
       recordResult(
         "CASE-7.1",
         "Giao Việc",
-        "Ban Quản Trị Tạo Mới & Giao Nhiệm Vụ Cho Hội Viên Trên Web CRM",
+        "Ban Quản Trị Tạo Mới & Giao Nhiệm Vụ Cho Học viên Trên Web CRM",
         "admin@connect.vn",
         "Mã 201 Created, nhiệm vụ được phân công trực tiếp tới vupv090120@gmail.com",
         `Giao nhiệm vụ thành công ID: ${assignedTaskId}`,
@@ -1692,8 +1692,8 @@ async function run() {
       console.error("Lỗi Case 7.1:", e);
     }
 
-    // 7.2 Hội viên đăng nhập vào xem danh sách nhiệm vụ được giao
-    console.log(">>> Case 7.2: Hội viên vào xem danh sách nhiệm vụ được giao...");
+    // 7.2 Học viên đăng nhập vào xem danh sách nhiệm vụ được giao
+    console.log(">>> Case 7.2: Học viên vào xem danh sách nhiệm vụ được giao...");
     try {
       const myTasksRes = await safeFetch(`${API_BASE}/tasks`, {
         headers: { "Authorization": `Bearer ${vupvSession.token}` }
@@ -1701,7 +1701,7 @@ async function run() {
       const myTasksData = await myTasksRes.json();
 
       await prepareAuthPage(crmPage, vupvSession, true);
-      await crmPage.goto(`${CRM_BASE}/tasks`, { waitUntil: 'networkidle2', timeout: 20000 }).catch(() => {});
+      await crmPage.goto(`${CRM_BASE}/tasks`, { waitUntil: 'networkidle2', timeout: 20000 }).catch(() => { });
       await new Promise(r => setTimeout(r, 2000));
       await takeAnnotatedScreenshot(crmPage, "case_7_2_member_view_assigned_tasks.png", {
         caseId: "CASE-7.2",
@@ -1713,10 +1713,10 @@ async function run() {
       recordResult(
         "CASE-7.2",
         "Giao Việc",
-        "Hội Viên Đăng Nhập Xem Chi Tiết Công Việc Được Ban Quản Trị Giao",
+        "Học viên Đăng Nhập Xem Chi Tiết Công Việc Được Ban Quản Trị Giao",
         "vupv090120@gmail.com",
-        "Hội viên xem thấy nhiệm vụ được chỉ định tên mình kèm hạn nộp và mức ưu tiên",
-        "Hội viên truy cập và nắm bắt rõ ràng nhiệm vụ được giao",
+        "Học viên xem thấy nhiệm vụ được chỉ định tên mình kèm hạn nộp và mức ưu tiên",
+        "Học viên truy cập và nắm bắt rõ ràng nhiệm vụ được giao",
         "PASS",
         Array.isArray(myTasksData) ? myTasksData.slice(0, 3) : myTasksData,
         "case_7_2_member_view_assigned_tasks.png"
@@ -1725,8 +1725,8 @@ async function run() {
       console.error("Lỗi Case 7.2:", e);
     }
 
-    // 7.3 Hội viên cập nhật tiến độ công việc (75%) và trạng thái in_progress
-    console.log(">>> Case 7.3: Hội viên cập nhật tiến độ công việc (75%) và trạng thái in_progress...");
+    // 7.3 Học viên cập nhật tiến độ công việc (75%) và trạng thái in_progress
+    console.log(">>> Case 7.3: Học viên cập nhật tiến độ công việc (75%) và trạng thái in_progress...");
     try {
       const progRes = await safeFetch(`${API_BASE}/tasks/${assignedTaskId}/progress`, {
         method: "PATCH",
@@ -1743,7 +1743,7 @@ async function run() {
       const stData = await stRes.json();
 
       await prepareAuthPage(crmPage, vupvSession, true);
-      await crmPage.goto(`${CRM_BASE}/tasks`, { waitUntil: 'networkidle2', timeout: 20000 }).catch(() => {});
+      await crmPage.goto(`${CRM_BASE}/tasks`, { waitUntil: 'networkidle2', timeout: 20000 }).catch(() => { });
       await new Promise(r => setTimeout(r, 2000));
       await takeAnnotatedScreenshot(crmPage, "case_7_3_member_update_task_progress.png", {
         caseId: "CASE-7.3",
@@ -1755,7 +1755,7 @@ async function run() {
       recordResult(
         "CASE-7.3",
         "Giao Việc",
-        "Hội Viên Cập Nhật Tiến Độ Nhiệm Vụ Lên 75% & Đổi Trạng Thái 'Đang Thực Hiện'",
+        "Học viên Cập Nhật Tiến Độ Nhiệm Vụ Lên 75% & Đổi Trạng Thái 'Đang Thực Hiện'",
         "vupv090120@gmail.com",
         "Mã 200 OK, cập nhật progress = 75% và status = in_progress",
         "Tiến độ nhiệm vụ được ghi nhận đạt 75%, trạng thái 'In Progress'",
@@ -1767,8 +1767,8 @@ async function run() {
       console.error("Lỗi Case 7.3:", e);
     }
 
-    // 7.4 Hội viên gửi bình luận / báo cáo tiến độ
-    console.log(">>> Case 7.4: Hội viên gửi báo cáo tiến độ / bình luận nhiệm vụ...");
+    // 7.4 Học viên gửi bình luận / báo cáo tiến độ
+    console.log(">>> Case 7.4: Học viên gửi báo cáo tiến độ / bình luận nhiệm vụ...");
     try {
       const cmtRes = await safeFetch(`${API_BASE}/tasks/${assignedTaskId}/comments`, {
         method: "POST",
@@ -1780,7 +1780,7 @@ async function run() {
       const cmtData = await cmtRes.json();
 
       await prepareAuthPage(crmPage, vupvSession, true);
-      await crmPage.goto(`${CRM_BASE}/tasks`, { waitUntil: 'networkidle2', timeout: 20000 }).catch(() => {});
+      await crmPage.goto(`${CRM_BASE}/tasks`, { waitUntil: 'networkidle2', timeout: 20000 }).catch(() => { });
       await new Promise(r => setTimeout(r, 2000));
       await takeAnnotatedScreenshot(crmPage, "case_7_4_member_add_task_comment.png", {
         caseId: "CASE-7.4",
@@ -1792,7 +1792,7 @@ async function run() {
       recordResult(
         "CASE-7.4",
         "Giao Việc",
-        "Hội Viên Gửi Báo Cáo Giải Trình & Bình Luận Tiến Độ Trực Tuyến",
+        "Học viên Gửi Báo Cáo Giải Trình & Bình Luận Tiến Độ Trực Tuyến",
         "vupv090120@gmail.com",
         "Mã 201 Created, lưu bình luận báo cáo vào dòng thời gian công việc",
         "Báo cáo tiến độ được lưu thành công kèm mốc thời gian minh bạch",
@@ -1818,7 +1818,7 @@ async function run() {
       const editTkData = await editTkRes.json();
 
       await prepareAuthPage(crmPage, adminSession, true);
-      await crmPage.goto(`${CRM_BASE}/tasks`, { waitUntil: 'networkidle2', timeout: 20000 }).catch(() => {});
+      await crmPage.goto(`${CRM_BASE}/tasks`, { waitUntil: 'networkidle2', timeout: 20000 }).catch(() => { });
       await new Promise(r => setTimeout(r, 2000));
       await takeAnnotatedScreenshot(crmPage, "case_7_5_admin_edit_task.png", {
         caseId: "CASE-7.5",
@@ -1852,7 +1852,7 @@ async function run() {
       const delTkData = await delTkRes.json();
 
       await prepareAuthPage(crmPage, adminSession, true);
-      await crmPage.goto(`${CRM_BASE}/tasks`, { waitUntil: 'networkidle2', timeout: 20000 }).catch(() => {});
+      await crmPage.goto(`${CRM_BASE}/tasks`, { waitUntil: 'networkidle2', timeout: 20000 }).catch(() => { });
       await new Promise(r => setTimeout(r, 2000));
       await takeAnnotatedScreenshot(crmPage, "case_7_6_admin_delete_task.png", {
         caseId: "CASE-7.6",
@@ -1882,8 +1882,8 @@ async function run() {
     console.log("\n=================== FLOW 8: KẾT NỐI, NHẮN TIN & HỦY KẾT NỐI ===================");
     let activeConnectionId = "";
 
-    // 8.1 Gửi lời mời kết nối giữa 2 hội viên
-    console.log(">>> Case 8.1: Hội viên gửi lời mời kết nối doanh nhân...");
+    // 8.1 Gửi lời mời kết nối giữa 2 Học viên
+    console.log(">>> Case 8.1: Học viên gửi lời mời kết nối doanh nhân...");
     try {
       const reqConnRes = await safeFetch(`${API_BASE}/network/requests`, {
         method: "POST",
@@ -1898,7 +1898,7 @@ async function run() {
       activeConnectionId = reqConnData.id || reqConnData.connectionId;
 
       await prepareAuthPage(appPage, vupvSession, false);
-      await appPage.goto(`${APP_BASE}/association/members`, { waitUntil: 'networkidle2', timeout: 20000 }).catch(() => {});
+      await appPage.goto(`${APP_BASE}/association/members`, { waitUntil: 'networkidle2', timeout: 20000 }).catch(() => { });
       await new Promise(r => setTimeout(r, 2000));
       await takeAnnotatedScreenshot(appPage, "case_8_1_app_send_connection_request.png", {
         caseId: "CASE-8.1",
@@ -1910,7 +1910,7 @@ async function run() {
       recordResult(
         "CASE-8.1",
         "Kết Nối & Nhắn Tin",
-        "Hội Viên Gửi Lời Mời Kết Nối Doanh Nhân Tới Thành Viên Khác",
+        "Học viên Gửi Lời Mời Kết Nối Doanh Nhân Tới Thành Viên Khác",
         "vupv090120@gmail.com",
         "Mã 201 Created, tạo bản ghi kết nối pending trong CSDL",
         `Gửi lời mời kết nối thành công ID: ${activeConnectionId}`,
@@ -1923,7 +1923,7 @@ async function run() {
     }
 
     // 8.2 Chấp nhận lời mời kết nối
-    console.log(">>> Case 8.2: Hội viên chấp nhận lời mời kết nối...");
+    console.log(">>> Case 8.2: Học viên chấp nhận lời mời kết nối...");
     try {
       let accData = { ok: true, status: "accepted" };
       if (activeConnectionId) {
@@ -1936,7 +1936,7 @@ async function run() {
       }
 
       await prepareAuthPage(appPage, mikaSession, false);
-      await appPage.goto(`${APP_BASE}/association/members`, { waitUntil: 'networkidle2', timeout: 20000 }).catch(() => {});
+      await appPage.goto(`${APP_BASE}/association/members`, { waitUntil: 'networkidle2', timeout: 20000 }).catch(() => { });
       await new Promise(r => setTimeout(r, 2000));
       await takeAnnotatedScreenshot(appPage, "case_8_2_app_accept_connection.png", {
         caseId: "CASE-8.2",
@@ -1948,7 +1948,7 @@ async function run() {
       recordResult(
         "CASE-8.2",
         "Kết Nối & Nhắn Tin",
-        "Hội Viên Nhận Được Yêu Cầu Chấp Nhận Lời Mời Kết Nối",
+        "Học viên Nhận Được Yêu Cầu Chấp Nhận Lời Mời Kết Nối",
         "vumikasa6@gmail.com",
         "Mã 200 OK, trạng thái chuyển sang 'accepted', mở khóa quyền nhắn tin trực tiếp",
         "Chấp nhận kết nối thành công, trở thành đối tác chính thức",
@@ -1974,7 +1974,7 @@ async function run() {
       const dmMsgData = await dmMsgRes.json();
 
       await prepareAuthPage(appPage, vupvSession, false);
-      await appPage.goto(`${APP_BASE}/association/messages`, { waitUntil: 'networkidle2', timeout: 20000 }).catch(() => {});
+      await appPage.goto(`${APP_BASE}/association/messages`, { waitUntil: 'networkidle2', timeout: 20000 }).catch(() => { });
       await new Promise(r => setTimeout(r, 2000));
       await takeAnnotatedScreenshot(appPage, "case_8_3_app_dm_chat_messaging.png", {
         caseId: "CASE-8.3",
@@ -1986,7 +1986,7 @@ async function run() {
       recordResult(
         "CASE-8.3",
         "Kết Nối & Nhắn Tin",
-        "Nhắn Tin Trực Tiếp (1-1 Direct Messaging) Trao Đổi Giữa 2 Hội Viên",
+        "Nhắn Tin Trực Tiếp (1-1 Direct Messaging) Trao Đổi Giữa 2 Học viên",
         "vupv090120@gmail.com",
         "Mã 200/201 OK, tin nhắn được truyền tải tức thời",
         "Gửi và nhận tin nhắn trò chuyện trực tiếp thành công",
@@ -1998,8 +1998,8 @@ async function run() {
       console.error("Lỗi Case 8.3:", e);
     }
 
-    // 8.4 Hủy kết nối giữa 2 hội viên (Disconnect)
-    console.log(">>> Case 8.4: Hủy kết nối giữa 2 hội viên (Disconnect)...");
+    // 8.4 Hủy kết nối giữa 2 Học viên (Disconnect)
+    console.log(">>> Case 8.4: Hủy kết nối giữa 2 Học viên (Disconnect)...");
     try {
       let disconnData = { ok: true, status: "disconnected" };
       if (activeConnectionId) {
@@ -2011,7 +2011,7 @@ async function run() {
       }
 
       await prepareAuthPage(appPage, vupvSession, false);
-      await appPage.goto(`${APP_BASE}/association/members`, { waitUntil: 'networkidle2', timeout: 20000 }).catch(() => {});
+      await appPage.goto(`${APP_BASE}/association/members`, { waitUntil: 'networkidle2', timeout: 20000 }).catch(() => { });
       await new Promise(r => setTimeout(r, 2000));
       await takeAnnotatedScreenshot(appPage, "case_8_4_app_disconnect_member.png", {
         caseId: "CASE-8.4",
@@ -2023,7 +2023,7 @@ async function run() {
       recordResult(
         "CASE-8.4",
         "Kết Nối & Nhắn Tin",
-        "Hội Viên Thực Hiện Hủy Kết Nối (Disconnect / Xóa Kết Nối)",
+        "Học viên Thực Hiện Hủy Kết Nối (Disconnect / Xóa Kết Nối)",
         "vupv090120@gmail.com",
         "Mã 200 OK, hủy liên kết kết nối an toàn",
         "Hủy kết nối doanh nhân thành công",
@@ -2049,7 +2049,7 @@ async function run() {
       const zaloData = await zaloRes.json();
 
       await prepareAuthPage(crmPage, adminSession, true);
-      await crmPage.goto(`${CRM_BASE}/notifications?tab=zalo`, { waitUntil: 'networkidle2', timeout: 20000 }).catch(() => {});
+      await crmPage.goto(`${CRM_BASE}/notifications?tab=zalo`, { waitUntil: 'networkidle2', timeout: 20000 }).catch(() => { });
       await new Promise(r => setTimeout(r, 2000));
       await takeAnnotatedScreenshot(crmPage, "case_9_1_crm_zalo_oa_send_event.png", {
         caseId: "CASE-9.1",
@@ -2088,14 +2088,14 @@ async function run() {
         body: JSON.stringify({
           displayName: "Phạm Vũ - Chuyên Gia Giải Pháp Số",
           companyName: "Tập Đoàn Công Nghệ ViConnect",
-          bio: "Hội viên chính thức CLB Doanh Nhân CEO HN10 - Phụ trách kết nối xúc tiến thương mại.",
+          bio: "Học viên chính thức CLB Doanh Nhân CEO HN10 - Phụ trách kết nối xúc tiến thương mại.",
           phone: "0973924819"
         })
       });
       const cardData = await cardRes.json();
 
       await prepareAuthPage(appPage, vupvSession, false);
-      await appPage.goto(`${APP_BASE}/association/card`, { waitUntil: 'networkidle2', timeout: 20000 }).catch(() => {});
+      await appPage.goto(`${APP_BASE}/association/card`, { waitUntil: 'networkidle2', timeout: 20000 }).catch(() => { });
       await new Promise(r => setTimeout(r, 2000));
       await takeAnnotatedScreenshot(appPage, "case_10_1_app_smart_card_profile.png", {
         caseId: "CASE-10.1",
@@ -2126,15 +2126,15 @@ async function run() {
         method: "POST",
         headers: { "Content-Type": "application/json", "Authorization": `Bearer ${mikaSession.token}` },
         body: JSON.stringify({
-          title: `Chào Mừng Đoàn Hội Viên CEO HN10 Tham Gia Chương Trình Kết Nối Giao Thương [${Date.now().toString().slice(-4)}]`,
-          content: "Ban Điều Hành nhiệt liệt chào đón các doanh nghiệp hội viên tham dự chuỗi hoạt động xúc tiến thương mại tháng này.",
+          title: `Chào Mừng Đoàn Học viên CEO HN10 Tham Gia Chương Trình Kết Nối Giao Thương [${Date.now().toString().slice(-4)}]`,
+          content: "Ban Điều Hành nhiệt liệt chào đón các doanh nghiệp Học viên tham dự chuỗi hoạt động xúc tiến thương mại tháng này.",
           category: "Hoạt động CLB"
         })
       });
       const postData = await postRes.json();
 
       await prepareAuthPage(appPage, mikaSession, false);
-      await appPage.goto(`${APP_BASE}/association/news`, { waitUntil: 'networkidle2', timeout: 20000 }).catch(() => {});
+      await appPage.goto(`${APP_BASE}/association/news`, { waitUntil: 'networkidle2', timeout: 20000 }).catch(() => { });
       await new Promise(r => setTimeout(r, 2000));
       await takeAnnotatedScreenshot(appPage, "case_10_2_app_feed_new_post.png", {
         caseId: "CASE-10.2",

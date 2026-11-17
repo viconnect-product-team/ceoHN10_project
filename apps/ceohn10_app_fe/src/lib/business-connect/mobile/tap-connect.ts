@@ -38,7 +38,7 @@ export function parseTapConnectValue(raw: string, origin: string): TapConnectTar
       const nested = parseTapConnectValue(urlMatch[1].trim(), origin);
       if (nested.kind === "token") return nested;
     }
-    const noteCodeMatch = /(?:Mã hội viên|MEMBER_CODE|MEMBER|CODE)[:\s]+([a-zA-Z0-9_-]+)/i.exec(value);
+    const noteCodeMatch = /(?:Mã Học viên|MEMBER_CODE|MEMBER|CODE)[:\s]+([a-zA-Z0-9_-]+)/i.exec(value);
     if (noteCodeMatch && noteCodeMatch[1]) {
       return { kind: "token", token: noteCodeMatch[1].trim() };
     }
@@ -62,7 +62,7 @@ export function parseTapConnectValue(raw: string, origin: string): TapConnectTar
       if (memM && memM[1]) return { kind: "token", token: decodeURIComponent(memM[1]) };
       const codeParam = parsedUrl.searchParams.get("code") || parsedUrl.searchParams.get("t");
       if (codeParam) return { kind: "token", token: decodeURIComponent(codeParam) };
-    } catch {}
+    } catch { }
   }
 
   // 1. Bare token (64-hex or JWT ey...)

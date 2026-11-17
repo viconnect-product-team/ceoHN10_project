@@ -76,7 +76,7 @@ async function generateExcelReport() {
   worksheet.getRow(1).height = 40;
 
   worksheet.mergeCells('A2:J2');
-  worksheet.getCell('A2').value = 'Tổng số: 138 Test Cases bao phủ 100% Cổng Thông Tin, Cổng Quản Trị Ban Chấp Hành & Ứng Dụng Hội Viên | Trạng Thái: 100% PASS';
+  worksheet.getCell('A2').value = 'Tổng số: 138 Test Cases bao phủ 100% Cổng Thông Tin, Cổng Quản Trị Ban Chấp Hành & Ứng Dụng Học viên | Trạng Thái: 100% PASS';
   worksheet.getCell('A2').font = { name: 'Times New Roman', size: 11, italic: true, color: { argb: 'FF1E293B' } };
   worksheet.getCell('A2').alignment = { vertical: 'middle', horizontal: 'center' };
   worksheet.getRow(2).height = 24;
@@ -187,7 +187,7 @@ async function generateMarkdownAndDocx() {
 * **Phân bổ theo cấu phần:**
   - Cổng Thông Tin Công Khai & Tiếp Nhận Đăng Ký: 10 Test Cases (TC-001 -> TC-010)
   - Cổng Quản Trị & Điều Hành Ban Chấp Hành (6 Ban): 78 Test Cases (TC-011 -> TC-088)
-  - Ứng Dụng Hội Viên Doanh Nhân CEO HN10: 50 Test Cases (TC-089 -> TC-138)
+  - Ứng Dụng Học viên Doanh Nhân CEO HN10: 50 Test Cases (TC-089 -> TC-138)
 * **Tỷ lệ kiểm thử thành công:** 138/138 (100% PASS)
 * **Email tài khoản mẫu:** \`vupv090120@gmail.com\` (Doanh nhân Phạm Văn Vũ - CEO Công ty CP Công nghệ VIO CONNECT)
 * **Ngày phát hành:** 01/10/2026

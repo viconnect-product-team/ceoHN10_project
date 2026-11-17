@@ -117,7 +117,7 @@ export function CrmExcelImportModal({ isOpen, onClose, onSuccess }: CrmExcelImpo
           const phone = rowObj.phone || "";
           const email = rowObj.email || "";
           const company = rowObj.company || "";
-          const position = rowObj.position || "Hội viên";
+          const position = rowObj.position || "Học viên";
           const industry = rowObj.industry || "Đa ngành";
           const department = rowObj.department || "Ban Thành Viên";
           const address = rowObj.address || "";
@@ -143,7 +143,7 @@ export function CrmExcelImportModal({ isOpen, onClose, onSuccess }: CrmExcelImpo
 
         setParsedRows(parsed);
         setSelectedRowIds(parsed.filter((r) => r.isValid).map((r) => r.id));
-        toast.success(`Đã bóc tách thành công ${parsed.length} dòng thông tin hội viên!`);
+        toast.success(`Đã bóc tách thành công ${parsed.length} dòng thông tin Học viên!`);
       } catch (err: any) {
         console.error("Parse excel error:", err);
         toast.error(`Không thể đọc tệp Excel: ${err?.message || "Lỗi định dạng"}`);
@@ -235,7 +235,7 @@ export function CrmExcelImportModal({ isOpen, onClose, onSuccess }: CrmExcelImpo
   const handleConfirmImport = async () => {
     const toImport = parsedRows.filter((r) => selectedRowIds.includes(r.id));
     if (toImport.length === 0) {
-      toast.error("Vui lòng chọn ít nhất một dòng hội viên hợp lệ để nhập.");
+      toast.error("Vui lòng chọn ít nhất một dòng Học viên hợp lệ để nhập.");
       return;
     }
 
@@ -262,7 +262,7 @@ export function CrmExcelImportModal({ isOpen, onClose, onSuccess }: CrmExcelImpo
         return { success: true, created: toImport.length, updated: 0, message: "Nhập dữ liệu thành công" };
       });
 
-      toast.success(res?.message || `Đã nhập thành công ${toImport.length} hội viên vào hệ thống!`);
+      toast.success(res?.message || `Đã nhập thành công ${toImport.length} Học viên vào hệ thống!`);
       if (onSuccess) onSuccess();
       onClose();
     } catch (err: any) {
@@ -417,9 +417,8 @@ export function CrmExcelImportModal({ isOpen, onClose, onSuccess }: CrmExcelImpo
                     return (
                       <tr
                         key={r.id}
-                        className={`hover:bg-slate-50 dark:hover:bg-slate-800/50 ${
-                          !r.isValid ? "bg-amber-50/30 dark:bg-amber-950/10" : ""
-                        }`}
+                        className={`hover:bg-slate-50 dark:hover:bg-slate-800/50 ${!r.isValid ? "bg-amber-50/30 dark:bg-amber-950/10" : ""
+                          }`}
                       >
                         <td className="p-2.5 text-center">
                           <input
@@ -477,7 +476,7 @@ export function CrmExcelImportModal({ isOpen, onClose, onSuccess }: CrmExcelImpo
           <div className="text-xs text-slate-500">
             {parsedRows.length > 0 && (
               <span>
-                Đã chọn <strong>{selectedRowIds.length}</strong> / {parsedRows.length} hội viên để nhập.
+                Đã chọn <strong>{selectedRowIds.length}</strong> / {parsedRows.length} Học viên để nhập.
               </span>
             )}
           </div>
@@ -506,7 +505,7 @@ export function CrmExcelImportModal({ isOpen, onClose, onSuccess }: CrmExcelImpo
                 ) : (
                   <>
                     <Check className="size-4" />
-                    <span>Xác Nhận Nhập ({selectedRowIds.length} Hội Viên)</span>
+                    <span>Xác Nhận Nhập ({selectedRowIds.length} Học viên)</span>
                   </>
                 )}
               </button>

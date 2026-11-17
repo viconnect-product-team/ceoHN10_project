@@ -27,7 +27,7 @@ export function InviteMemberModal({
   isOpen,
   onClose,
   memberCode = "HN10-002",
-  memberName = "Hội viên CEO HN10",
+  memberName = "Học viên CEO HN10",
   memberEmail,
 }: InviteMemberModalProps) {
   const { user } = useAuth();
@@ -124,7 +124,7 @@ export function InviteMemberModal({
           <div className="flex items-center justify-between rounded-2xl bg-slate-50 dark:bg-slate-800/60 p-3.5 border border-slate-200/80 dark:border-white/10">
             <div className="min-w-0 flex-1">
               <div className="text-[10.5px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-400">
-                Mã hội viên giới thiệu
+                Mã Học viên giới thiệu
               </div>
               <div className="text-[18px] font-black text-[#003B95] dark:text-amber-400 tracking-wider">
                 {memberCode}
@@ -142,7 +142,7 @@ export function InviteMemberModal({
           <div>
             <div className="flex items-center justify-between mb-1.5">
               <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 block">
-                Liên kết đăng ký hội viên mới
+                Liên kết đăng ký Học viên mới
               </label>
               <a
                 href={inviteUrl}
@@ -189,22 +189,20 @@ export function InviteMemberModal({
                 <button
                   type="button"
                   onClick={() => setActiveTemplate("formal")}
-                  className={`px-2 py-0.5 rounded text-[10.5px] font-bold transition cursor-pointer ${
-                    activeTemplate === "formal"
+                  className={`px-2 py-0.5 rounded text-[10.5px] font-bold transition cursor-pointer ${activeTemplate === "formal"
                       ? "bg-[#003B95] text-white"
                       : "bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-400"
-                  }`}
+                    }`}
                 >
                   Trang trọng
                 </button>
                 <button
                   type="button"
                   onClick={() => setActiveTemplate("friendly")}
-                  className={`px-2 py-0.5 rounded text-[10.5px] font-bold transition cursor-pointer ${
-                    activeTemplate === "friendly"
+                  className={`px-2 py-0.5 rounded text-[10.5px] font-bold transition cursor-pointer ${activeTemplate === "friendly"
                       ? "bg-[#003B95] text-white"
                       : "bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-400"
-                  }`}
+                    }`}
                 >
                   Thân mật
                 </button>

@@ -2,7 +2,7 @@
 
 **Mã tài liệu:** `DEPLOY-CEOHN10-V1.0`  
 **Ngày cập nhật:** 16/11/2026  
-**Phạm vi áp dụng:** Hệ thống Monorepo `CEOHN10_project` (Cổng Quản trị CRM + App PWA Hội viên + Backend NestJS + CSDL PostgreSQL)  
+**Phạm vi áp dụng:** Hệ thống Monorepo `CEOHN10_project` (Cổng Quản trị CRM + App PWA Học viên + Backend NestJS + CSDL PostgreSQL)  
 **Nguyên tắc cốt lõi:** Cách ly tuyệt đối (Zero Cross-Impact), không đụng chạm đến cơ sở dữ liệu, cổng mạng hoặc container của CEO HN10 và ViOne.
 
 ---
@@ -80,7 +80,7 @@ docker compose logs -f
 
 ## 4. QUY TRÌNH DEPLOY LÊN MÁY CHỦ (PRODUCTION DEPLOYMENT)
 
-### 4.1. Deploy Phân hệ App PWA Hội viên (`deploy/ceohn10`)
+### 4.1. Deploy Phân hệ App PWA Học viên (`deploy/ceohn10`)
 Kịch bản triển khai tự động đóng gói image, nén Gzip, đẩy qua SCP và kích hoạt Docker Compose độc lập trên VPS tại thư mục `~/ceohn10_association`:
 ```powershell
 cd d:\download\VICONNECT\CEO_VIONE_PROJECT\CEOHN10_project
@@ -111,4 +111,4 @@ cd d:\download\VICONNECT\CEO_VIONE_PROJECT\CEOHN10_project
 2. **Kiểm tra phân quyền Cổng CRM**:
    - Truy cập domain CRM, Service Worker phải tự động bypass/unregister, không can thiệp cache vào trang quản trị.
 3. **Kiểm tra tính toàn vẹn CSDL**:
-   - Ghi nhận thông tin hội viên mới, kiểm tra đúng vào database `ceohn10_project`, xác nhận không ảnh hưởng đến database `ceohn10_project`.
+   - Ghi nhận thông tin Học viên mới, kiểm tra đúng vào database `ceohn10_project`, xác nhận không ảnh hưởng đến database `ceohn10_project`.

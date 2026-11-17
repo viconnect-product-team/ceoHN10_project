@@ -43,7 +43,7 @@ const SLIDES_DATA = [
     type: 'cover',
     tag: 'BÁO CÁO GIẢI PHÁP CHUYỂN ĐỔI SỐ TOÀN DIỆN',
     title: 'HỆ THỐNG ĐIỀU HÀNH & KẾT NỐI DOANH NHÂN CEO HN10',
-    subtitle: 'HIỆN THỰC HÓA 3 BÀI TOÁN CHIẾN LƯỢC VÌ SỰ PHÁT TRIỂN BỀN VỮNG CỦA HỘI VIÊN',
+    subtitle: 'HIỆN THỰC HÓA 3 BÀI TOÁN CHIẾN LƯỢC VÌ SỰ PHÁT TRIỂN BỀN VỮNG CỦA Học viên',
     description: 'Báo cáo toàn diện giải pháp chuyển đổi số gồm Hệ Thống Quản Trị Web CRM & Ứng Dụng Di Động Doanh Nhân do Tập đoàn Công nghệ ViConnect nghiên cứu và phát triển theo đặt hàng từ Ban Lãnh Đạo CLB CEO HN10.',
     meetingInfo: {
       time: '09:00 – 12:00 | Thứ Tư, ngày 21/10/2026',
@@ -51,20 +51,20 @@ const SLIDES_DATA = [
       content: 'Báo Cáo Nghiệm Thu Thử Nghiệm & Tiếp Thu Góp Ý Hoàn Thiện',
       lunch: 'Bữa trưa thân mật tại Nhà hàng Phiến Hoan Việt Trì',
     },
-    footerText: 'Rất hân hạnh được đồng hành cùng Quý Lãnh Đạo & Hội Viên CLB CEO HN10.',
+    footerText: 'Rất hân hạnh được đồng hành cùng Quý Lãnh Đạo & Học viên CLB CEO HN10.',
   },
   {
     id: 2,
     bgImage: 'images/backgrounds/02_boardroom.jpg',
     type: 'two_products',
     tag: 'BỨC TRANH TỔNG THỂ 2 SẢN PHẨM',
-    title: 'KIẾN TRÚC KÉP: WEB CRM ĐIỀU HÀNH & MOBILE APP HỘI VIÊN',
+    title: 'KIẾN TRÚC KÉP: WEB CRM ĐIỀU HÀNH & MOBILE APP Học viên',
     subtitle: 'Hai công cụ tương hỗ khép kín: Trung tâm điều hành minh bạch & Văn phòng số bỏ túi của từng doanh nhân',
     crm: {
       title: '1. CỔNG ĐIỀU HÀNH TRUNG TÂM WEB CRM',
       target: 'Dành cho: Ban Điều Hành, Ban Thư Ký, Chủ Tịch & 6 Ban Chuyên Môn',
       bullets: [
-        'Quản lý tập trung toàn diện hơn 500 hồ sơ doanh nghiệp hội viên chính danh',
+        'Quản lý tập trung toàn diện hơn 500 hồ sơ doanh nghiệp Học viên chính danh',
         'Sơ đồ xếp bàn tiệc Gala trang trọng, phân bổ chỗ ngồi khoa học, chính xác',
         'Điều hành công việc, phân công nhiệm vụ và theo dõi tiến độ các ban',
         'Quản lý thu chi, hội phí và ngân sách tự động hóa, minh bạch tài chính',
@@ -73,10 +73,10 @@ const SLIDES_DATA = [
     },
     app: {
       title: '2. VĂN PHÒNG DOANH NHÂN BỎ TÚI MOBILE APP',
-      target: 'Dành cho: Hơn 500 Doanh nhân & Lãnh đạo hội viên CLB CEO HN10',
+      target: 'Dành cho: Hơn 500 Doanh nhân & Lãnh đạo Học viên CLB CEO HN10',
       bullets: [
-        'Thẻ Hội Viên Điện Tử Thông Minh & Danh thiếp số tiện lợi, lưu danh bạ 1 chạm',
-        'Sàn giao thương B2B nội khối: Giới thiệu sản phẩm và ưu đãi đặc quyền giữa các hội viên',
+        'Thẻ Học viên Điện Tử Thông Minh & Danh thiếp số tiện lợi, lưu danh bạ 1 chạm',
+        'Sàn giao thương B2B nội khối: Giới thiệu sản phẩm và ưu đãi đặc quyền giữa các Học viên',
         'Ví vé sự kiện Gala, xem trước số bàn tiệc, số ghế VIP và mã bốc thăm may mắn',
         'Danh bạ kết nối hơn 500 CEO chính danh 11 ngành nghề, gửi lời mời hẹn gặp 1-on-1',
         'Kênh trao đổi công việc và liên lạc trực tiếp, bảo mật riêng tư giữa các lãnh đạo',
@@ -95,7 +95,7 @@ const SLIDES_DATA = [
       {
         num: '01',
         badge: 'BÀI TOÁN 1: QUẢN LÝ THÀNH VIÊN',
-        title: 'Quản Lý Tập Trung Hồ Sơ 500+ Hội Viên',
+        title: 'Quản Lý Tập Trung Hồ Sơ 500+ Học viên',
         problem: 'Trước đây: Dữ liệu phân tán trong các file bảng tính rời rạc, khó tra cứu, thông tin doanh nghiệp không được cập nhật kịp thời.',
         solution: 'ViConnect giải quyết: Số hóa hồ sơ doanh nghiệp 360 độ gồm pháp lý, mã số thuế, năng lực cốt lõi, ngành nghề mũi nhọn và lịch sử tham gia.',
       },
@@ -124,8 +124,8 @@ const SLIDES_DATA = [
     subtitle: 'Chuẩn hóa toàn diện quy trình điều hành của Ban Thư Ký và 6 Ban Chuyên Môn trên một giao diện thống nhất',
     features: [
       {
-        title: '1. Quản Trị Danh Bạ Hội Viên 360°',
-        desc: 'Hồ sơ pháp lý, mã số thuế, phân ban chuyên môn, thẩm định và phê duyệt hội viên mới minh bạch.',
+        title: '1. Quản Trị Danh Bạ Học viên 360°',
+        desc: 'Hồ sơ pháp lý, mã số thuế, phân ban chuyên môn, thẩm định và phê duyệt Học viên mới minh bạch.',
         imgFile: 'images/guide_crm/08_quan_ly_hoi_vien.png',
       },
       {
@@ -154,7 +154,7 @@ const SLIDES_DATA = [
     subtitle: 'Nâng tầm hình ảnh lãnh đạo, gắn kết giao thương bền chặt ngay trên chiếc điện thoại thông minh',
     features: [
       {
-        title: '1. Thẻ Hội Viên & Danh Thiếp Số Tiện Lợi',
+        title: '1. Thẻ Học viên & Danh Thiếp Số Tiện Lợi',
         desc: 'Thẻ số nhận diện sang trọng, tích hợp mã QR cá nhân giúp đối tác lưu danh bạ tức thì mà không cần cài app.',
         imgFile: 'images/guide_mobile/05_the_hoi_vien_vip_mat_truoc.png',
       },
@@ -180,7 +180,7 @@ const SLIDES_DATA = [
     bgImage: 'images/backgrounds/06_innovation.jpg',
     type: 'breakthroughs',
     tag: 'GIÁ TRỊ GIA TĂNG THỰC TIỄN',
-    title: '5 ĐIỂM SÁNG NÂNG TẦM TRẢI NGHIỆM VẬN HÀNH & HỘI VIÊN',
+    title: '5 ĐIỂM SÁNG NÂNG TẦM TRẢI NGHIỆM VẬN HÀNH & Học viên',
     subtitle: 'Những tiện ích thiết thực do ViConnect chủ động phát triển nâng cao nhằm tối ưu hiệu quả hoạt động CLB',
     items: [
       {
@@ -198,14 +198,14 @@ const SLIDES_DATA = [
       {
         num: '03',
         badge: 'HỖ TRỢ THƯỜNG TRỰC',
-        title: 'Trợ Lý Số Hướng Dẫn Hội Viên 24/7',
-        desc: 'Hỗ trợ hội viên tra cứu nhanh thông tin sự kiện sắp diễn ra, thông tin hội đồng, liên hệ Ban Thư Ký và tìm kiếm các đối tác tiềm năng.',
+        title: 'Trợ Lý Số Hướng Dẫn Học viên 24/7',
+        desc: 'Hỗ trợ Học viên tra cứu nhanh thông tin sự kiện sắp diễn ra, thông tin hội đồng, liên hệ Ban Thư Ký và tìm kiếm các đối tác tiềm năng.',
       },
       {
         num: '04',
         badge: 'KẾT NỐI BẢO MẬT',
         title: 'Kênh Trao Đổi & Liên Lạc Nội Bộ Riêng Tư',
-        desc: 'Gọi điện thoại và trao đổi trực tiếp giữa các Chủ tịch & CEO hội viên, bảo mật tuyệt đối, giữ gìn tính riêng tư trong các cuộc thảo luận kinh doanh.',
+        desc: 'Gọi điện thoại và trao đổi trực tiếp giữa các Chủ tịch & CEO Học viên, bảo mật tuyệt đối, giữ gìn tính riêng tư trong các cuộc thảo luận kinh doanh.',
       },
       {
         num: '05',
@@ -259,7 +259,7 @@ const SLIDES_DATA = [
     bullets: [
       'ViConnect cam kết duy trì vận hành máy chủ đám mây ổn định 99.9% uptime',
       'Đội ngũ kỹ sư túc trực hỗ trợ kỹ thuật tận tâm tại mọi sự kiện Gala của Hiệp hội',
-      'Liên tục cập nhật các công nghệ trí tuệ nhân tạo (AI) mới nhất phục vụ hội viên',
+      'Liên tục cập nhật các công nghệ trí tuệ nhân tạo (AI) mới nhất phục vụ Học viên',
     ],
     contact: {
       hotline: '0983 1983 83 / 0988 66 55 44',

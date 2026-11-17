@@ -20,7 +20,7 @@ chcp 65001 > $null
 # =========================================================================
 # KỊCH BẢN TRIỂN KHAI TỔNG THỂ HỆ THỐNG CEO HN10 TRÊN SERVER DEV 14.225.217.232
 # CHẠY 1 LỆNH DUY NHẤT ĐỒNG THỜI CHO CẢ 2 PHÂN HỆ:
-# 1. Mobile PWA Hội viên: https://ceohn10.viconnect.vn (Scope: association_app)
+# 1. Mobile PWA Học viên: https://ceohn10.viconnect.vn (Scope: association_app)
 # 2. Web CRM Quản trị:    https://crm_ceohn10.viconnect.vn (Scope: crm_platform)
 # Cơ sở dữ liệu chuẩn:    PostgreSQL 113.20.107.184:6432 (ceohn10_project)
 # =========================================================================
@@ -37,7 +37,7 @@ Write-Host "====================================================================
 Write-Host "  TRIỂN KHAI TỔNG THỂ HỆ THỐNG CEO HN10 (DEV SERVER $SERVER_IP)" -ForegroundColor Cyan
 Write-Host "  1 LỆNH DUY NHẤT CHO CẢ MOBILE PWA & CỔNG QUẢN TRỊ WEB CRM" -ForegroundColor Cyan
 Write-Host "=============================================================================" -ForegroundColor Cyan
-Write-Host "  - Mobile PWA Hội viên:  https://ceohn10.viconnect.vn" -ForegroundColor Yellow
+Write-Host "  - Mobile PWA Học viên:  https://ceohn10.viconnect.vn" -ForegroundColor Yellow
 Write-Host "  - Web CRM Quản trị:     https://crm_ceohn10.viconnect.vn" -ForegroundColor Yellow
 Write-Host "  - Cơ sở dữ liệu chuẩn:  PostgreSQL 113.20.107.184:6432 (ceohn10_project)" -ForegroundColor Yellow
 Write-Host "=============================================================================" -ForegroundColor Cyan
@@ -50,10 +50,10 @@ try {
         npm install
     }
 
-    # ── BƯỚC 1: TRIỂN KHAI PHÂN HỆ MOBILE PWA HỘI VIÊN ──
+    # ── BƯỚC 1: TRIỂN KHAI PHÂN HỆ MOBILE PWA Học viên ──
     if (-not $CrmOnly) {
         Write-Host "`n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" -ForegroundColor Green
-        Write-Host "[GIAI ĐOẠN 1/3] TRIỂN KHAI PHÂN HỆ MOBILE PWA HỘI VIÊN CEO HN10..." -ForegroundColor Green
+        Write-Host "[GIAI ĐOẠN 1/3] TRIỂN KHAI PHÂN HỆ MOBILE PWA Học viên CEO HN10..." -ForegroundColor Green
         Write-Host ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" -ForegroundColor Green
 
         $mobileArgs = @{
@@ -112,7 +112,7 @@ try {
     Write-Host "`n=============================================================================" -ForegroundColor Green
     Write-Host "🎉 CHÚC MỪNG: HỆ THỐNG CEO HN10 ĐÃ TRIỂN KHAI HOÀN TẤT THÀNH CÔNG!" -ForegroundColor Green
     Write-Host "=============================================================================" -ForegroundColor Green
-    Write-Host "1. 📱 MOBILE PWA HỘI VIÊN (Giao diện chuẩn App di động, độc lập CRM):" -ForegroundColor Cyan
+    Write-Host "1. 📱 MOBILE PWA Học viên (Giao diện chuẩn App di động, độc lập CRM):" -ForegroundColor Cyan
     Write-Host "   👉 Tên miền chính thức : https://ceohn10.viconnect.vn" -ForegroundColor White
     Write-Host "   👉 Truy cập trực tiếp IP: https://${SERVER_IP}:10444" -ForegroundColor Yellow
     Write-Host "   📌 Hướng dẫn cài đặt lên màn hình chính điện thoại (A2HS):" -ForegroundColor Yellow

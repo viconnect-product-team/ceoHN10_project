@@ -136,7 +136,7 @@ async function main() {
     },
     {
       code: 'DOC-CEO HN10-02',
-      name: 'Danh Bạ & Hồ Sơ Năng Lực Doanh Nghiệp Hội Viên 2026',
+      name: 'Danh Bạ & Hồ Sơ Năng Lực Doanh Nghiệp Học viên 2026',
       category: 'Danh bạ',
       size: '8.5 MB',
       type: 'pdf'
@@ -174,7 +174,7 @@ async function main() {
     {
       title_vi: 'Danh thiếp số ViOne Pass',
       title_en: 'ViOne Digital Card',
-      desc_vi: 'Thẻ hội viên VIP tích hợp mã định danh số và NFC',
+      desc_vi: 'Thẻ Học viên VIP tích hợp mã định danh số và NFC',
       desc_en: 'VIP Member pass with QR code and NFC integration',
       sort_order: 3
     }

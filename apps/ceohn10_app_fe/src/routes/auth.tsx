@@ -194,7 +194,7 @@ function CrmAdminAuthPage() {
             Nền tảng Quản trị & Kết nối Giao thương Doanh nhân CEO HN10
           </h1>
           <p className="text-base xl:text-lg leading-relaxed text-blue-100/90 font-normal">
-            Hội tụ tinh hoa cộng đồng doanh nhân bản lĩnh. Số hóa hồ sơ hội viên, mở rộng xúc tiến thương mại B2B, quản trị cơ hội và điều hành tổ chức chuyên nghiệp, bền vững.
+            Hội tụ tinh hoa cộng đồng doanh nhân bản lĩnh. Số hóa hồ sơ Học viên, mở rộng xúc tiến thương mại B2B, quản trị cơ hội và điều hành tổ chức chuyên nghiệp, bền vững.
           </p>
         </div>
 
@@ -202,7 +202,7 @@ function CrmAdminAuthPage() {
         <div className="relative z-10 max-w-md rounded-2xl border border-white/20 bg-[#001D4D] p-5 shadow-2xl space-y-4">
           <div className="flex items-center justify-between">
             <span className="text-xs xl:text-sm font-semibold text-white/95 tracking-wide">
-              Chỉ số kết nối & giao thương hội viên
+              Chỉ số kết nối & giao thương Học viên
             </span>
             <div className="flex items-center gap-1 rounded-full bg-emerald-500/25 px-2.5 py-0.5 text-xs font-bold text-emerald-300 border border-emerald-400/30">
               <TrendingUp className="h-3 w-3" />
@@ -213,14 +213,14 @@ function CrmAdminAuthPage() {
           {/* Minimalist Bar Chart Graphic */}
           <div className="flex h-20 items-end gap-3 pt-2">
             <div className="w-8 rounded-t-lg bg-white/30 h-[40%] transition-all duration-300" title="Sự kiện CLB" />
-            <div className="w-8 rounded-t-lg bg-white/50 h-[65%] transition-all duration-300" title="Hội viên kết nối" />
+            <div className="w-8 rounded-t-lg bg-white/50 h-[65%] transition-all duration-300" title="Học viên kết nối" />
             <div className="w-8 rounded-t-lg bg-white/40 h-[50%] transition-all duration-300" title="Giao thương B2B" />
             <div className="w-8 rounded-t-lg bg-white/60 h-[80%] transition-all duration-300" title="Cơ hội xúc tiến" />
             <div className="w-8 rounded-t-lg bg-white h-[100%] shadow-md transition-all duration-300" title="Hiệu quả điều hành" />
           </div>
 
           <div className="flex items-center justify-between text-[11px] text-blue-200/90 pt-1 border-t border-white/10 font-medium">
-            <span>500+ Doanh nghiệp hội viên</span>
+            <span>500+ Doanh nghiệp Học viên</span>
             <span>100% Kết nối chính danh</span>
           </div>
         </div>

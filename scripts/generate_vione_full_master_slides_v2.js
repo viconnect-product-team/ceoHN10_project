@@ -472,7 +472,7 @@ async function buildAppSlides() {
     {
       title: 'SÀN CƠ HỘI GIAO THƯƠNG CUNG - CẦU THỜI GIAN THỰC',
       category: 'KẾT NỐI KINH DOANH',
-      desc: 'Chợ giao thương B2B khép kín giữa các hội viên: Đăng tải nhu cầu mua hàng số lượng lớn hoặc giới thiệu nguồn cung độc quyền với chính sách chiết khấu sâu.',
+      desc: 'Chợ giao thương B2B khép kín giữa các Học viên: Đăng tải nhu cầu mua hàng số lượng lớn hoặc giới thiệu nguồn cung độc quyền với chính sách chiết khấu sâu.',
       keyPoints: [
         'Đăng tin Chào mua (Cần tìm nhà cung cấp) và Chào bán (Cung ứng sản phẩm).',
         'Bộ lọc nâng cao theo giá trị hợp đồng, địa bàn và tiến độ giao hàng.',
@@ -489,7 +489,7 @@ async function buildAppSlides() {
       keyPoints: [
         'Duyệt sản phẩm theo danh mục ngành hàng với bộ lọc thông minh.',
         'Xem hồ sơ năng lực (Profile), chứng chỉ chất lượng và năng lực sản xuất.',
-        'Gửi yêu cầu nhận báo giá riêng cho hội viên chỉ với 1 thao tác chạm.',
+        'Gửi yêu cầu nhận báo giá riêng cho Học viên chỉ với 1 thao tác chạm.',
         'Theo dõi lịch sử đơn hàng và tiến độ thực hiện hợp đồng cung ứng.'
       ],
       image: 'app1983_05_shop_marketplace.png',
@@ -536,7 +536,7 @@ async function buildAppSlides() {
     },
     {
       title: 'HỆ SINH THÁI ĐẶC QUYỀN VOUCHER & ƯU ĐÃI NỘI BỘ',
-      category: 'ĐẶC QUYỀN HỘI VIÊN',
+      category: 'ĐẶC QUYỀN Học viên',
       desc: 'Hàng trăm mã ưu đãi độc quyền dành riêng cho lãnh đạo: Dịch vụ phòng chờ sân bay, khách sạn 5 sao, sân golf, nhà hàng sang trọng và dịch vụ xe đưa đón VIP.',
       keyPoints: [
         'Kho voucher số hóa phân loại theo phong cách sống và nhu cầu công tác.',
@@ -591,7 +591,7 @@ async function buildAppSlides() {
       category: 'KẾT NỐI KHÔNG GIAN',
       desc: 'Thuật toán định vị thông minh gợi ý các cơ hội kết nối giao thương trực tiếp khi doanh nhân đi công tác tại các tỉnh thành hoặc tham gia hội chợ thương mại.',
       keyPoints: [
-        'Quét radar tìm kiếm các hội viên doanh nghiệp trong bán kính từ 1km đến 20km.',
+        'Quét radar tìm kiếm các Học viên doanh nghiệp trong bán kính từ 1km đến 20km.',
         'Chỉ kích hoạt khi người dùng bật chế độ "Sẵn sàng giao lưu kết nối".',
         'Gửi lời mời thưởng thức cà phê và giao lưu hợp tác kinh doanh 1 chạm.',
         'Bảo mật tuyệt đối thông tin tọa độ chi tiết, chỉ hiển thị khoảng cách tương đối.'
@@ -694,7 +694,7 @@ async function buildAppSlides() {
 
     // Right Column: Titanium Smartphone Frame Simulation
     s.addShape(pres.ShapeType.rect, { x: 8.0, y: 1.95, w: 4.5, h: 4.8, fill: { color: '000000' }, line: { color: THEME.GOLD_PRIMARY, width: 2 } });
-    
+
     // Titanium phone top speaker bar
     s.addShape(pres.ShapeType.rect, { x: 9.8, y: 2.05, w: 0.9, h: 0.1, fill: { color: '334155' } });
 

@@ -29,7 +29,7 @@ function generateUserGuideMarkdown() {
 * **Phiên bản:** \`Phiên bản 10.0 Enterprise Handover Standard (Bản Bàn Giao Vận Hành & Khách Hàng)\`
 * **Cơ quan chủ quản:** Câu Lạc Bộ Doanh Nhân CEO HN10 — Trực thuộc Hội Doanh Nghiệp Trẻ Hà Nội (HanoiBA)
 * **Đơn vị phát triển giải pháp:** VICONNECT - Nền tảng Chuyển đổi số Hiệp hội Doanh nhân
-* **Đối tượng áp dụng:** Ban Quản trị, Ban Thư ký, Trưởng 6 Ban chuyên môn, Kế toán và Toàn thể Hội viên Doanh nhân CEO HN10
+* **Đối tượng áp dụng:** Ban Quản trị, Ban Thư ký, Trưởng 6 Ban chuyên môn, Kế toán và Toàn thể Học viên Doanh nhân CEO HN10
 * **Cổng truy cập Web CRM:** \`https://14.225.217.232:5443\`
 * **Cổng truy cập Mobile App (PWA):** \`https://14.225.217.232:5444/association\`
 * **Ngày phát hành:** \`08/11/2026\`
@@ -41,7 +41,7 @@ function generateUserGuideMarkdown() {
 * **PHẦN I: HƯỚNG DẪN QUẢN TRỊ VIÊN CỔNG WEB CRM ĐIỀU HÀNH TRUNG ƯƠNG**
   - [1. Tổng Quan Hệ Thống Web CRM & Thông Tin Đăng Nhập](#1-tong-quan-crm)
   - [2. Quản Trị Phân Quyền RBAC 6 Ban Chuyên Môn](#2-phan-quyen-rbac)
-  - [3. Quy Trình 3 Bước Tiếp Nhận & Phê Duyệt Kết Nạp Hội Viên Mới](#3-duyet-hoi-vien)
+  - [3. Quy Trình 3 Bước Tiếp Nhận & Phê Duyệt Kết Nạp Học viên Mới](#3-duyet-hoi-vien)
   - [4. Quản Lý Danh Bạ 360 Độ & Hồ Sơ Doanh Nghiệp](#4-ho-so-360)
   - [5. Quản Trị Sự Kiện, Sơ Đồ Bàn Tiệc Cinema Seating & Trạm Soát Vé QR Gate](#5-su-kien-seating)
   - [6. Quản Lý Cuộc Họp Ban Điều Hành & Điều Phối Công Việc Kanban](#6-hop-ban-kanban)
@@ -52,7 +52,7 @@ function generateUserGuideMarkdown() {
   - [11. Đăng Bài Truyền Thông Đa Kênh 1-Chạm (Facebook, Zalo OA, Website)](#11-dang-bai-da-kenh)
   - [12. Cấu Hình Hệ Thống, Quản Lý Tự Động Refresh Token Zalo OA 6 Giờ & Audit Logs](#12-cai-dat-zalo-audit)
 
-* **PHẦN II: HƯỚNG DẪN HỘI VIÊN SỬ DỤNG ỨNG DỤNG DI ĐỘNG CEO HN10 MOBILE APP**
+* **PHẦN II: HƯỚNG DẪN Học viên SỬ DỤNG ỨNG DỤNG DI ĐỘNG CEO HN10 MOBILE APP**
   - [1. Hướng Dẫn Cài Đặt 1-Chạm (iOS Safari, Android Chrome PWA & APK Native)](#1-cai-dat-app)
   - [2. Đăng Nhập An Toàn & Kích Hoạt Sinh Trắc Học FaceID / Vân Tay](#2-dang-nhap-faceid)
   - [3. Trang Chủ Di Động: Banner Tin Tức Tự Động Trượt Ngang Full-Width & Popup Sinh Nhật](#3-trang-chu-tin-tuc)
@@ -81,8 +81,8 @@ ${g1Body}
 
 ---
 
-# PHẦN II: HƯỚNG DẪN HỘI VIÊN SỬ DỤNG ỨNG DỤNG DI ĐỘNG CEO HN10 MOBILE APP
-*(Dành cho toàn thể Hội viên chính thức CLB Doanh Nhân CEO HN10)*
+# PHẦN II: HƯỚNG DẪN Học viên SỬ DỤNG ỨNG DỤNG DI ĐỘNG CEO HN10 MOBILE APP
+*(Dành cho toàn thể Học viên chính thức CLB Doanh Nhân CEO HN10)*
 
 ---
 

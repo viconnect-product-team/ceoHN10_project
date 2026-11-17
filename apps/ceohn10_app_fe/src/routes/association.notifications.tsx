@@ -130,7 +130,7 @@ function formatNotifBody(n: any): string {
   const name =
     n.safeDisplayData?.counterpartDisplayName ||
     n.safeDisplayData?.senderName ||
-    "Hội viên CLB CEO HN10";
+    "Học viên CLB CEO HN10";
   if (b.includes("connection_request_received") || n.notificationKind === "connection_request_received") {
     return `${name} muốn kết nối danh thiếp số với bạn.`;
   }
@@ -232,10 +232,10 @@ function getChannelOrPeerForNotif(n: any): string {
     return 'channel_media';
   }
 
-  // 2. Ban Thành Viên: Kết nạp, hồ sơ doanh nghiệp, gia hạn hội viên, sinh nhật, danh thiếp
+  // 2. Ban Thành Viên: Kết nạp, hồ sơ doanh nghiệp, gia hạn Học viên, sinh nhật, danh thiếp
   if (
     kind.includes('member') ||
-    text.includes('hội viên') ||
+    text.includes('Học viên') ||
     text.includes('kết nạp') ||
     text.includes('hồ sơ') ||
     text.includes('gia hạn') ||
@@ -297,11 +297,11 @@ const WORKFLOW_ACTIONS: {
   key: TKey;
   Icon: typeof Eye;
 }[] = [
-  { status: "read", key: "m.notifications.lead.markRead", Icon: Eye },
-  { status: "contacting", key: "m.notifications.lead.contacting", Icon: PhoneCall },
-  { status: "won", key: "m.notifications.lead.won", Icon: CheckCircle2 },
-  { status: "lost", key: "m.notifications.lead.lost", Icon: XCircle },
-];
+    { status: "read", key: "m.notifications.lead.markRead", Icon: Eye },
+    { status: "contacting", key: "m.notifications.lead.contacting", Icon: PhoneCall },
+    { status: "won", key: "m.notifications.lead.won", Icon: CheckCircle2 },
+    { status: "lost", key: "m.notifications.lead.lost", Icon: XCircle },
+  ];
 
 function LeadActions({
   leadId,
@@ -591,13 +591,13 @@ function NotificationsScreen() {
           if (!list2.includes(id)) list2.push(id);
         }
         localStorage.setItem("vba.connected_members", JSON.stringify(list2));
-      } catch {}
+      } catch { }
 
       window.dispatchEvent(new CustomEvent("vba:connection_accepted"));
       window.dispatchEvent(new CustomEvent("vba:conversation_updated"));
 
       toast.success("Đã đồng ý kết bạn thành công!");
-      await markRead({ data: { id: n.id } }).catch(() => {});
+      await markRead({ data: { id: n.id } }).catch(() => { });
       reload();
     } catch (e: any) {
       toast.error(e?.message || "Không thể đồng ý kết bạn");
@@ -625,7 +625,7 @@ function NotificationsScreen() {
         ...(connId ? { [connId]: "declined" } : {}),
       }));
       toast.info("Đã từ chối lời mời kết nối");
-      await markRead({ data: { id: n.id } }).catch(() => {});
+      await markRead({ data: { id: n.id } }).catch(() => { });
       reload();
     } catch (e: any) {
       toast.error(e?.message || "Không thể từ chối kết bạn");
@@ -668,7 +668,7 @@ function NotificationsScreen() {
       }
       window.dispatchEvent(new Event("notifications-updated"));
       window.dispatchEvent(new Event("vba_notifications_updated"));
-    } catch {}
+    } catch { }
 
     if (rowBusy) return;
     setRowBusy(n.id);
@@ -833,7 +833,7 @@ function NotificationsScreen() {
     try {
       const saved = localStorage.getItem("pushed_to_messages_notif_ids");
       if (saved) return new Set(JSON.parse(saved));
-    } catch {}
+    } catch { }
     return new Set();
   });
 
@@ -842,7 +842,7 @@ function NotificationsScreen() {
       try {
         const saved = localStorage.getItem("pushed_to_messages_notif_ids");
         if (saved) setPushedMessageIds(new Set(JSON.parse(saved)));
-      } catch {}
+      } catch { }
     };
     window.addEventListener("vba:notification_pushed_to_messages", handlePushed);
     window.addEventListener("storage", handlePushed);
@@ -942,7 +942,7 @@ function NotificationsScreen() {
       return true;
     }
 
-    return /hội phí|phí thường niên|quản lý hội phí|hóa đơn hội viên|đóng phí/i.test(text);
+    return /hội phí|phí thường niên|quản lý hội phí|hóa đơn Học viên|đóng phí/i.test(text);
   };
 
   const handlePayNotification = (n: any) => {
@@ -1195,16 +1195,16 @@ function NotificationsScreen() {
               tab.key === "unread"
                 ? notifications.filter((n) => n.unread && !n.dismissed).length
                 : tab.key === "all"
-                ? notifications.filter((n) => !n.dismissed).length
-                : tab.key === "opportunity"
-                ? notifications.filter((n) => (n.type === "opportunity" || n.type === "lead") && !n.dismissed).length
-                : tab.key === "event"
-                ? notifications.filter((n) => n.type === "event" && !n.dismissed).length
-                : tab.key === "fee"
-                ? notifications.filter((n) => n.type === "fee" && !n.dismissed).length
-                : tab.key === "dismissed"
-                ? notifications.filter((n) => n.dismissed).length
-                : null;
+                  ? notifications.filter((n) => !n.dismissed).length
+                  : tab.key === "opportunity"
+                    ? notifications.filter((n) => (n.type === "opportunity" || n.type === "lead") && !n.dismissed).length
+                    : tab.key === "event"
+                      ? notifications.filter((n) => n.type === "event" && !n.dismissed).length
+                      : tab.key === "fee"
+                        ? notifications.filter((n) => n.type === "fee" && !n.dismissed).length
+                        : tab.key === "dismissed"
+                          ? notifications.filter((n) => n.dismissed).length
+                          : null;
 
             return (
               <button
@@ -1212,20 +1212,18 @@ function NotificationsScreen() {
                 type="button"
                 onClick={() => setFilter(tab.key)}
                 aria-pressed={active}
-                className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs whitespace-nowrap transition-all duration-200 cursor-pointer ${
-                  active
+                className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs whitespace-nowrap transition-all duration-200 cursor-pointer ${active
                     ? "bg-[#003B95] text-white font-black shadow-md scale-[1.02]"
                     : "text-slate-700 dark:text-slate-200 font-bold hover:text-slate-900 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/10"
-                }`}
+                  }`}
               >
                 <span>{tab.label}</span>
                 {count != null && count > 0 && (
                   <span
-                    className={`px-1.5 py-0.2 rounded-full text-[10px] font-extrabold tabular-nums ${
-                      active
+                    className={`px-1.5 py-0.2 rounded-full text-[10px] font-extrabold tabular-nums ${active
                         ? "bg-white/30 text-white"
                         : "bg-red-600 text-white shadow-xs font-black"
-                    }`}
+                      }`}
                   >
                     {count}
                   </span>
@@ -1253,11 +1251,10 @@ function NotificationsScreen() {
                   key={item.key}
                   type="button"
                   onClick={() => setTimeFilter(item.key as TimeFilterPeriod)}
-                  className={`flex-1 py-1.5 px-2 rounded-xl text-xs transition cursor-pointer text-center font-bold ${
-                    isActive
+                  className={`flex-1 py-1.5 px-2 rounded-xl text-xs transition cursor-pointer text-center font-bold ${isActive
                       ? "bg-[#003B95] text-white shadow-xs"
                       : "text-slate-600 dark:text-slate-300 hover:bg-black/5 dark:hover:bg-white/10"
-                  }`}
+                    }`}
                 >
                   {item.label}
                 </button>
@@ -1310,9 +1307,9 @@ function NotificationsScreen() {
           ? t("m.notifications.loading")
           : visible.some((n) => n.unread)
             ? t("m.notifications.announce.summary", {
-                count: visible.length,
-                unread: visible.filter((n) => n.unread).length,
-              })
+              count: visible.length,
+              unread: visible.filter((n) => n.unread).length,
+            })
             : t("m.notifications.announce.allRead")}
       </p>
 
@@ -1363,13 +1360,13 @@ function NotificationsScreen() {
             (connId ? connectionStates[connId] : null) ||
             n.safeDisplayData?.connectionStatus ||
             (n.title?.toLowerCase().includes("chấp nhận") ||
-            n.title?.toLowerCase().includes("thành công") ||
-            n.notificationKind === "connection_request_accepted"
+              n.title?.toLowerCase().includes("thành công") ||
+              n.notificationKind === "connection_request_accepted"
               ? "accepted"
               : n.title?.toLowerCase().includes("từ chối") ||
                 n.notificationKind === "connection_request_declined"
-              ? "declined"
-              : "pending");
+                ? "declined"
+                : "pending");
 
           // Color coded per type - High contrast, sharp & vibrant brand CEO HN10
           const typeTheme: Record<string, { iconBg: string; badge: string; label: string }> = {
@@ -1425,274 +1422,273 @@ function NotificationsScreen() {
                 onDelete={() => setConfirmDelete(n)}
                 disabled={rowBusy === n.id}
               >
-              <div
-                role="listitem"
-                onClick={() => {
-                  setSelectedNotif(n);
-                  if (n.unread) onMarkOneRead(n);
-                }}
-                className={`relative flex gap-2.5 p-2.5 sm:p-3 rounded-xl sm:rounded-2xl border transition-all duration-200 shadow-xs hover:shadow-md overflow-hidden cursor-pointer ${
-                  n.unread
-                    ? "bg-white dark:bg-[#0F172A] border-2 border-amber-500/40 dark:border-amber-500/60 shadow-[0_4px_16px_rgba(245,158,11,0.12)]"
-                    : "bg-white dark:bg-[#0F172A] border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700"
-                }`}
-              >
-                {/* Vertical Indicator on Unread - Amber Gold */}
-                {n.unread && (
-                  <span className="absolute left-0 top-2 bottom-2 w-1 rounded-r-full bg-amber-500" />
-                )}
+                <div
+                  role="listitem"
+                  onClick={() => {
+                    setSelectedNotif(n);
+                    if (n.unread) onMarkOneRead(n);
+                  }}
+                  className={`relative flex gap-2.5 p-2.5 sm:p-3 rounded-xl sm:rounded-2xl border transition-all duration-200 shadow-xs hover:shadow-md overflow-hidden cursor-pointer ${n.unread
+                      ? "bg-white dark:bg-[#0F172A] border-2 border-amber-500/40 dark:border-amber-500/60 shadow-[0_4px_16px_rgba(245,158,11,0.12)]"
+                      : "bg-white dark:bg-[#0F172A] border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700"
+                    }`}
+                >
+                  {/* Vertical Indicator on Unread - Amber Gold */}
+                  {n.unread && (
+                    <span className="absolute left-0 top-2 bottom-2 w-1 rounded-r-full bg-amber-500" />
+                  )}
 
-                <span className={`grid h-8.5 w-8.5 shrink-0 place-items-center rounded-xl border shadow-xs ${theme.iconBg}`}>
-                  <Icon className="h-4 w-4 stroke-[2.2]" />
-                </span>
+                  <span className={`grid h-8.5 w-8.5 shrink-0 place-items-center rounded-xl border shadow-xs ${theme.iconBg}`}>
+                    <Icon className="h-4 w-4 stroke-[2.2]" />
+                  </span>
 
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center justify-between gap-2 flex-wrap mb-1">
-                    <div className="flex items-center gap-1.5 flex-wrap">
-                      <span className={`px-2 py-0.5 rounded-full text-[9.5px] font-black uppercase tracking-wider border shadow-2xs ${theme.badge}`}>
-                        {theme.label}
-                      </span>
-                      {n.priority && n.priority !== "low" && (
-                        <span
-                          className="shrink-0 rounded-full px-2 py-0.5 text-[9.5px] font-black uppercase tracking-wider bg-rose-100 text-rose-800 dark:bg-rose-950/60 dark:text-rose-300 border border-rose-300 dark:border-rose-800 shadow-2xs"
-                          aria-label={`${t("m.notifications.status.priority")}: ${t(PRIORITY_KEY[n.priority as NotificationPriority])}`}
-                        >
-                          {t(PRIORITY_KEY[n.priority as NotificationPriority])}
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center justify-between gap-2 flex-wrap mb-1">
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <span className={`px-2 py-0.5 rounded-full text-[9.5px] font-black uppercase tracking-wider border shadow-2xs ${theme.badge}`}>
+                          {theme.label}
                         </span>
-                      )}
+                        {n.priority && n.priority !== "low" && (
+                          <span
+                            className="shrink-0 rounded-full px-2 py-0.5 text-[9.5px] font-black uppercase tracking-wider bg-rose-100 text-rose-800 dark:bg-rose-950/60 dark:text-rose-300 border border-rose-300 dark:border-rose-800 shadow-2xs"
+                            aria-label={`${t("m.notifications.status.priority")}: ${t(PRIORITY_KEY[n.priority as NotificationPriority])}`}
+                          >
+                            {t(PRIORITY_KEY[n.priority as NotificationPriority])}
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {n.unread && (
+                          <span
+                            className="inline-block h-2.5 w-2.5 rounded-full bg-blue-600 dark:bg-blue-500 shadow-xs shrink-0"
+                            title="Chưa đọc"
+                            aria-label="Chưa đọc"
+                          />
+                        )}
+                        <span className="text-[10.5px] font-medium text-[var(--vba-text-dim)]">
+                          {fmt.rel(n.time)}
+                        </span>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      {n.unread && (
-                        <span
-                          className="inline-block h-2.5 w-2.5 rounded-full bg-blue-600 dark:bg-blue-500 shadow-xs shrink-0"
-                          title="Chưa đọc"
-                          aria-label="Chưa đọc"
-                        />
-                      )}
-                      <span className="text-[10.5px] font-medium text-[var(--vba-text-dim)]">
-                        {fmt.rel(n.time)}
-                      </span>
-                    </div>
-                  </div>
 
-                  <div className="flex items-center gap-2">
-                    <span className="truncate text-[13px] font-bold text-[var(--vba-text)] line-clamp-1">
-                      {formatNotifTitle(n)}
-                    </span>
-                    {isLead && (
-                      <button
-                        type="button"
-                        disabled={openingLeadId === n.id}
-                        onClick={async () => {
-                          setOpeningLeadId(n.id);
-                          let marked = false;
-                          for (let attempt = 0; attempt < 3 && !marked; attempt++) {
-                            try {
-                              await markRead({ data: { id: n.id } });
-                              marked = true;
-                            } catch {
-                              if (attempt < 2) {
-                                await new Promise((r) => setTimeout(r, 300 * (attempt + 1)));
+                    <div className="flex items-center gap-2">
+                      <span className="truncate text-[13px] font-bold text-[var(--vba-text)] line-clamp-1">
+                        {formatNotifTitle(n)}
+                      </span>
+                      {isLead && (
+                        <button
+                          type="button"
+                          disabled={openingLeadId === n.id}
+                          onClick={async () => {
+                            setOpeningLeadId(n.id);
+                            let marked = false;
+                            for (let attempt = 0; attempt < 3 && !marked; attempt++) {
+                              try {
+                                await markRead({ data: { id: n.id } });
+                                marked = true;
+                              } catch {
+                                if (attempt < 2) {
+                                  await new Promise((r) => setTimeout(r, 300 * (attempt + 1)));
+                                }
                               }
                             }
-                          }
-                          try {
-                            await navigate({
-                              to: "/association/business-cards",
-                              search: { tab: "leads", leadId: n.refId as string },
-                            });
-                          } catch (e) {
-                            toast.error(
-                              e instanceof Error ? e.message : t("m.notifications.lead.openError"),
-                            );
-                          } finally {
-                            setOpeningLeadId(null);
-                            if (!marked) reload();
-                          }
-                        }}
-                        aria-label={t("m.notifications.lead.openDetail")}
-                        className="grid h-7 w-7 shrink-0 place-items-center rounded-full text-amber-600 dark:text-amber-400 transition hover:bg-amber-50 dark:hover:bg-slate-800 disabled:opacity-50 cursor-pointer"
-                      >
-                        {openingLeadId === n.id ? (
-                          <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                        ) : (
-                          <ExternalLink className="h-3.5 w-3.5" />
-                        )}
-                      </button>
-                    )}
-                  </div>
+                            try {
+                              await navigate({
+                                to: "/association/business-cards",
+                                search: { tab: "leads", leadId: n.refId as string },
+                              });
+                            } catch (e) {
+                              toast.error(
+                                e instanceof Error ? e.message : t("m.notifications.lead.openError"),
+                              );
+                            } finally {
+                              setOpeningLeadId(null);
+                              if (!marked) reload();
+                            }
+                          }}
+                          aria-label={t("m.notifications.lead.openDetail")}
+                          className="grid h-7 w-7 shrink-0 place-items-center rounded-full text-amber-600 dark:text-amber-400 transition hover:bg-amber-50 dark:hover:bg-slate-800 disabled:opacity-50 cursor-pointer"
+                        >
+                          {openingLeadId === n.id ? (
+                            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                          ) : (
+                            <ExternalLink className="h-3.5 w-3.5" />
+                          )}
+                        </button>
+                      )}
+                    </div>
 
-                  {/* Đoạn preview ngắn (nhấn vào để xem đầy đủ trong modal) */}
-                  <p className="mt-1 text-[11.5px] leading-snug text-[var(--vba-text-muted)] line-clamp-2">
-                    {formatNotifBody(n)}
-                  </p>
+                    {/* Đoạn preview ngắn (nhấn vào để xem đầy đủ trong modal) */}
+                    <p className="mt-1 text-[11.5px] leading-snug text-[var(--vba-text-muted)] line-clamp-2">
+                      {formatNotifBody(n)}
+                    </p>
 
-                  {/* Thanh Action rút gọn */}
-                  <div className="mt-2.5 flex items-center justify-between gap-2 pt-2 border-t border-slate-200/80 dark:border-slate-800/80">
-                    {n.dismissed ? (
-                      <button
-                        type="button"
-                        disabled={rowBusy === n.id}
-                        onClick={() => onUndoDismiss(n)}
-                        className="inline-flex items-center gap-1.5 rounded-xl border-2 border-amber-500 dark:border-amber-400 bg-amber-50 dark:bg-amber-950/60 px-3 py-1.5 text-[11.5px] font-bold text-amber-800 dark:text-amber-200 transition hover:bg-amber-100 disabled:opacity-50 shadow-xs cursor-pointer active:scale-95"
-                      >
-                        {rowBusy === n.id ? (
-                          <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                        ) : (
-                          <Check className="h-3.5 w-3.5 stroke-[2.5]" />
-                        )}
-                        {t("m.notifications.undo.action")}
-                      </button>
-                    ) : (
-                      <>
-                        {isConnectionRequestReceived(n) ? (
-                          <div className="flex items-center gap-1.5">
-                            {(connectionStates[n.id] === "accepted" || (n.safeDisplayData as any)?.connectionStatus === "accepted") ? (
-                              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 text-[11px] font-bold">
-                                <Check className="h-3 w-3 stroke-[2.5]" />
-                                <span>Đã đồng ý kết nối</span>
-                              </span>
-                            ) : (connectionStates[n.id] === "declined" || (n.safeDisplayData as any)?.connectionStatus === "declined") ? (
-                              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-600 dark:text-rose-400 text-[11px] font-bold">
-                                <X className="h-3 w-3" />
-                                <span>Đã từ chối kết nối</span>
-                              </span>
-                            ) : (
-                              <>
-                                <button
-                                  type="button"
-                                  disabled={actionBusy === n.id}
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleAcceptFriend(n);
-                                  }}
-                                  className="inline-flex items-center gap-1 rounded-xl bg-emerald-600 hover:bg-emerald-700 px-2.5 py-1.5 text-[11px] font-bold text-white shadow-xs cursor-pointer active:scale-95 whitespace-nowrap transition-all disabled:opacity-50"
-                                  style={{ color: "#ffffff" }}
-                                >
-                                  <UserCheck className="h-3.5 w-3.5 text-white" />
-                                  <span>{actionBusy === n.id ? "Đang xử lý..." : "Đồng ý"}</span>
-                                </button>
-                                <button
-                                  type="button"
-                                  disabled={actionBusy === n.id}
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleDeclineFriend(n);
-                                  }}
-                                  className="inline-flex items-center gap-1 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 px-2.5 py-1.5 text-[11px] font-bold text-slate-700 dark:text-slate-200 shadow-2xs cursor-pointer active:scale-95 whitespace-nowrap transition-all disabled:opacity-50"
-                                >
-                                  <UserX className="h-3.5 w-3.5 text-slate-500" />
-                                  <span>Từ chối</span>
-                                </button>
-                              </>
-                            )}
-                            <button
-                              type="button"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setSelectedNotif(n);
-                                if (n.unread) onMarkOneRead(n);
-                              }}
-                              className="inline-flex items-center gap-1 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-700 px-2 py-1.5 text-[11px] font-semibold text-slate-700 dark:text-slate-200 shadow-2xs cursor-pointer active:scale-95 whitespace-nowrap transition-all"
-                            >
-                              <Eye className="h-3.5 w-3.5 text-slate-500" />
-                              <span>Chi tiết</span>
-                            </button>
-                          </div>
-                        ) : isMeetingNotification(n) ? (
-                          <div className="flex items-center gap-1.5">
-                            <button
-                              type="button"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                if (n.unread) onMarkOneRead(n);
-                                void navigate({ to: "/association/members", search: { tab: "meetings" } });
-                              }}
-                              className="inline-flex items-center gap-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 px-3 py-1.5 text-[11px] font-bold text-white shadow-xs cursor-pointer active:scale-95 whitespace-nowrap transition-all"
-                              style={{ color: "#ffffff" }}
-                            >
-                              <Calendar className="h-3.5 w-3.5 text-white" />
-                              <span>Lịch hẹn kết nối</span>
-                            </button>
-                            <button
-                              type="button"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setSelectedNotif(n);
-                                if (n.unread) onMarkOneRead(n);
-                              }}
-                              className="inline-flex items-center gap-1 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-700 px-2.5 py-1.5 text-[11px] font-semibold text-slate-700 dark:text-slate-200 shadow-2xs cursor-pointer active:scale-95 whitespace-nowrap transition-all"
-                            >
-                              <Eye className="h-3.5 w-3.5 text-slate-500" />
-                              <span>Chi tiết</span>
-                            </button>
-                          </div>
-                        ) : (
-                          <div className="flex items-center gap-1.5">
-                            {/* Nút Action 1: Xem trong Tin nhắn (Chỉ hiển thị khi đã được bấm Đưa vào tin nhắn ở CRM) */}
-                            {canViewInMessages(n) && (
+                    {/* Thanh Action rút gọn */}
+                    <div className="mt-2.5 flex items-center justify-between gap-2 pt-2 border-t border-slate-200/80 dark:border-slate-800/80">
+                      {n.dismissed ? (
+                        <button
+                          type="button"
+                          disabled={rowBusy === n.id}
+                          onClick={() => onUndoDismiss(n)}
+                          className="inline-flex items-center gap-1.5 rounded-xl border-2 border-amber-500 dark:border-amber-400 bg-amber-50 dark:bg-amber-950/60 px-3 py-1.5 text-[11.5px] font-bold text-amber-800 dark:text-amber-200 transition hover:bg-amber-100 disabled:opacity-50 shadow-xs cursor-pointer active:scale-95"
+                        >
+                          {rowBusy === n.id ? (
+                            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                          ) : (
+                            <Check className="h-3.5 w-3.5 stroke-[2.5]" />
+                          )}
+                          {t("m.notifications.undo.action")}
+                        </button>
+                      ) : (
+                        <>
+                          {isConnectionRequestReceived(n) ? (
+                            <div className="flex items-center gap-1.5">
+                              {(connectionStates[n.id] === "accepted" || (n.safeDisplayData as any)?.connectionStatus === "accepted") ? (
+                                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 text-[11px] font-bold">
+                                  <Check className="h-3 w-3 stroke-[2.5]" />
+                                  <span>Đã đồng ý kết nối</span>
+                                </span>
+                              ) : (connectionStates[n.id] === "declined" || (n.safeDisplayData as any)?.connectionStatus === "declined") ? (
+                                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-600 dark:text-rose-400 text-[11px] font-bold">
+                                  <X className="h-3 w-3" />
+                                  <span>Đã từ chối kết nối</span>
+                                </span>
+                              ) : (
+                                <>
+                                  <button
+                                    type="button"
+                                    disabled={actionBusy === n.id}
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleAcceptFriend(n);
+                                    }}
+                                    className="inline-flex items-center gap-1 rounded-xl bg-emerald-600 hover:bg-emerald-700 px-2.5 py-1.5 text-[11px] font-bold text-white shadow-xs cursor-pointer active:scale-95 whitespace-nowrap transition-all disabled:opacity-50"
+                                    style={{ color: "#ffffff" }}
+                                  >
+                                    <UserCheck className="h-3.5 w-3.5 text-white" />
+                                    <span>{actionBusy === n.id ? "Đang xử lý..." : "Đồng ý"}</span>
+                                  </button>
+                                  <button
+                                    type="button"
+                                    disabled={actionBusy === n.id}
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleDeclineFriend(n);
+                                    }}
+                                    className="inline-flex items-center gap-1 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 px-2.5 py-1.5 text-[11px] font-bold text-slate-700 dark:text-slate-200 shadow-2xs cursor-pointer active:scale-95 whitespace-nowrap transition-all disabled:opacity-50"
+                                  >
+                                    <UserX className="h-3.5 w-3.5 text-slate-500" />
+                                    <span>Từ chối</span>
+                                  </button>
+                                </>
+                              )}
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setSelectedNotif(n);
+                                  if (n.unread) onMarkOneRead(n);
+                                }}
+                                className="inline-flex items-center gap-1 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-700 px-2 py-1.5 text-[11px] font-semibold text-slate-700 dark:text-slate-200 shadow-2xs cursor-pointer active:scale-95 whitespace-nowrap transition-all"
+                              >
+                                <Eye className="h-3.5 w-3.5 text-slate-500" />
+                                <span>Chi tiết</span>
+                              </button>
+                            </div>
+                          ) : isMeetingNotification(n) ? (
+                            <div className="flex items-center gap-1.5">
                               <button
                                 type="button"
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   if (n.unread) onMarkOneRead(n);
-                                  const targetChannel = getChannelOrPeerForNotif(n);
-                                  void navigate({ to: "/association/messages", search: { peerCode: targetChannel } });
+                                  void navigate({ to: "/association/members", search: { tab: "meetings" } });
                                 }}
-                                className="inline-flex items-center gap-1.5 rounded-xl bg-[#003B95] hover:bg-[#002B70] border border-amber-400/50 hover:border-amber-400 px-3 py-1.5 text-[11px] font-bold text-amber-300 shadow-xs cursor-pointer active:scale-95 whitespace-nowrap transition-all"
+                                className="inline-flex items-center gap-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 px-3 py-1.5 text-[11px] font-bold text-white shadow-xs cursor-pointer active:scale-95 whitespace-nowrap transition-all"
+                                style={{ color: "#ffffff" }}
                               >
-                                <MessageSquare className="h-3.5 w-3.5 text-amber-400" />
-                                <span>Xem tin nhắn</span>
+                                <Calendar className="h-3.5 w-3.5 text-white" />
+                                <span>Lịch hẹn kết nối</span>
                               </button>
-                            )}
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setSelectedNotif(n);
+                                  if (n.unread) onMarkOneRead(n);
+                                }}
+                                className="inline-flex items-center gap-1 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-700 px-2.5 py-1.5 text-[11px] font-semibold text-slate-700 dark:text-slate-200 shadow-2xs cursor-pointer active:scale-95 whitespace-nowrap transition-all"
+                              >
+                                <Eye className="h-3.5 w-3.5 text-slate-500" />
+                                <span>Chi tiết</span>
+                              </button>
+                            </div>
+                          ) : (
+                            <div className="flex items-center gap-1.5">
+                              {/* Nút Action 1: Xem trong Tin nhắn (Chỉ hiển thị khi đã được bấm Đưa vào tin nhắn ở CRM) */}
+                              {canViewInMessages(n) && (
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    if (n.unread) onMarkOneRead(n);
+                                    const targetChannel = getChannelOrPeerForNotif(n);
+                                    void navigate({ to: "/association/messages", search: { peerCode: targetChannel } });
+                                  }}
+                                  className="inline-flex items-center gap-1.5 rounded-xl bg-[#003B95] hover:bg-[#002B70] border border-amber-400/50 hover:border-amber-400 px-3 py-1.5 text-[11px] font-bold text-amber-300 shadow-xs cursor-pointer active:scale-95 whitespace-nowrap transition-all"
+                                >
+                                  <MessageSquare className="h-3.5 w-3.5 text-amber-400" />
+                                  <span>Xem tin nhắn</span>
+                                </button>
+                              )}
 
-                            {/* Nút Action 2: Xem chi tiết (mở modal hiển thị toàn bộ nội dung & thẻ tương tác) */}
+                              {/* Nút Action 2: Xem chi tiết (mở modal hiển thị toàn bộ nội dung & thẻ tương tác) */}
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setSelectedNotif(n);
+                                  if (n.unread) onMarkOneRead(n);
+                                }}
+                                className="inline-flex items-center gap-1 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-700 px-2.5 py-1.5 text-[11px] font-semibold text-slate-700 dark:text-slate-200 shadow-2xs cursor-pointer active:scale-95 whitespace-nowrap transition-all"
+                              >
+                                <Eye className="h-3.5 w-3.5 text-slate-500" />
+                                <span>Chi tiết</span>
+                              </button>
+                            </div>
+                          )}
+
+                          <div className="flex items-center gap-1">
                             <button
                               type="button"
+                              disabled={rowBusy === n.id}
                               onClick={(e) => {
                                 e.stopPropagation();
-                                setSelectedNotif(n);
-                                if (n.unread) onMarkOneRead(n);
+                                deleteTriggerRef.current = e.currentTarget;
+                                setConfirmDelete(n);
                               }}
-                              className="inline-flex items-center gap-1 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-700 px-2.5 py-1.5 text-[11px] font-semibold text-slate-700 dark:text-slate-200 shadow-2xs cursor-pointer active:scale-95 whitespace-nowrap transition-all"
+                              className="inline-flex items-center gap-1 rounded-xl border border-rose-200 dark:border-rose-900/60 bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/60 px-2.5 py-1.5 text-[10.5px] font-bold text-rose-600 dark:text-rose-400 disabled:opacity-50 shadow-2xs cursor-pointer active:scale-95 whitespace-nowrap transition-all"
                             >
-                              <Eye className="h-3.5 w-3.5 text-slate-500" />
-                              <span>Chi tiết</span>
+                              <Trash2 className="h-3.5 w-3.5 text-rose-500" />
+                              <span>Xóa</span>
                             </button>
                           </div>
-                        )}
-
-                        <div className="flex items-center gap-1">
-                          <button
-                            type="button"
-                            disabled={rowBusy === n.id}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              deleteTriggerRef.current = e.currentTarget;
-                              setConfirmDelete(n);
-                            }}
-                            className="inline-flex items-center gap-1 rounded-xl border border-rose-200 dark:border-rose-900/60 bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/60 px-2.5 py-1.5 text-[10.5px] font-bold text-rose-600 dark:text-rose-400 disabled:opacity-50 shadow-2xs cursor-pointer active:scale-95 whitespace-nowrap transition-all"
-                          >
-                            <Trash2 className="h-3.5 w-3.5 text-rose-500" />
-                            <span>Xóa</span>
-                          </button>
-                        </div>
-                      </>
+                        </>
+                      )}
+                    </div>
+                    {isLead && !n.dismissed && (
+                      <LeadActions
+                        leadId={n.refId as string}
+                        current={n.leadStatus ?? null}
+                        onDone={reload}
+                      />
                     )}
                   </div>
-                  {isLead && !n.dismissed && (
-                    <LeadActions
-                      leadId={n.refId as string}
-                      current={n.leadStatus ?? null}
-                      onDone={reload}
-                    />
-                  )}
                 </div>
-              </div>
-            </SwipeableNotificationItem>
-          </Fragment>
-        );
-      })}
+              </SwipeableNotificationItem>
+            </Fragment>
+          );
+        })}
       </div>
 
       {/* Dialog 1: Ẩn thông báo */}
@@ -1852,7 +1848,7 @@ function NotificationsScreen() {
               <div className="rounded-2xl bg-amber-500/10 border-2 border-amber-500/40 p-4 space-y-3 text-left shadow-sm">
                 <div className="flex items-center gap-2 text-amber-700 dark:text-amber-400 font-black text-sm">
                   <span className="text-xl">🎉</span>
-                  <span>CHÚC MỪNG HỘI VIÊN TRÚNG THƯỞNG!</span>
+                  <span>CHÚC MỪNG Học viên TRÚNG THƯỞNG!</span>
                 </div>
                 <div className="rounded-xl bg-white dark:bg-slate-900 p-3 border border-amber-200 dark:border-amber-900/50 space-y-1.5">
                   <div className="flex items-center justify-between text-xs">
@@ -1869,7 +1865,7 @@ function NotificationsScreen() {
                   </div>
                 </div>
                 <p className="text-[11.5px] text-slate-600 dark:text-slate-400 leading-relaxed">
-                  Vui lòng mang theo màn hình thông báo này hoặc mã định danh hội viên trên App tới Bàn Lễ Tân Ban Thư Ký để nhận giải thưởng.
+                  Vui lòng mang theo màn hình thông báo này hoặc mã định danh Học viên trên App tới Bàn Lễ Tân Ban Thư Ký để nhận giải thưởng.
                 </p>
                 <button
                   type="button"
@@ -1893,12 +1889,12 @@ function NotificationsScreen() {
                     Vé tham dự sự kiện:
                   </span>
                   <span className="text-xs font-extrabold px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800">
-                    0đ · Miễn phí Hội viên
+                    0đ · Miễn phí Học viên
                   </span>
                 </div>
                 <div className="text-[12px] text-slate-600 dark:text-slate-400 space-y-1">
                   <p>Trạng thái vé: <b className="text-emerald-700 dark:text-emerald-400">Đã đăng ký thành công</b></p>
-                  <p>Hội viên vui lòng xuất trình mã vé điện tử QR tại cổng đón tiếp của sự kiện để check-in tự động trong 1 giây.</p>
+                  <p>Học viên vui lòng xuất trình mã vé điện tử QR tại cổng đón tiếp của sự kiện để check-in tự động trong 1 giây.</p>
                 </div>
                 <div className="flex gap-2">
                   <button
@@ -1946,7 +1942,7 @@ function NotificationsScreen() {
                   </div>
                 )}
                 <div className="text-[11.5px] text-slate-600 dark:text-slate-400">
-                  Hội viên có thể quét mã VNPAY-QR chuyển khoản tự động hoặc thanh toán trực tiếp qua cổng thanh toán của hiệp hội.
+                  Học viên có thể quét mã VNPAY-QR chuyển khoản tự động hoặc thanh toán trực tiếp qua cổng thanh toán của hiệp hội.
                 </div>
                 <button
                   type="button"

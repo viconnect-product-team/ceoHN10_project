@@ -171,11 +171,10 @@ export function ExcelViewerModal({ open, onClose, fileName, fileUrl }: ExcelView
   return (
     <div className="fixed inset-0 z-70 flex items-center justify-center bg-black/75 backdrop-blur-sm p-2 sm:p-4">
       <div
-        className={`w-full flex flex-col bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl overflow-hidden transition-all duration-200 ${
-          isFullscreen
+        className={`w-full flex flex-col bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl overflow-hidden transition-all duration-200 ${isFullscreen
             ? 'fixed inset-2 z-70 rounded-xl'
             : 'max-w-6xl max-h-[92vh] h-[85vh]'
-        }`}
+          }`}
       >
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-3.5 bg-gradient-to-r from-emerald-800 via-emerald-700 to-emerald-900 text-white shadow-md">
@@ -270,11 +269,10 @@ export function ExcelViewerModal({ open, onClose, fileName, fileUrl }: ExcelView
                   setActiveSheetIndex(idx);
                   setSearchQuery('');
                 }}
-                className={`px-3 py-1 rounded-md text-xs font-semibold whitespace-nowrap transition cursor-pointer ${
-                  activeSheetIndex === idx
+                className={`px-3 py-1 rounded-md text-xs font-semibold whitespace-nowrap transition cursor-pointer ${activeSheetIndex === idx
                     ? 'bg-white dark:bg-slate-900 text-emerald-700 dark:text-emerald-300 shadow-xs border border-emerald-500/30'
                     : 'text-slate-600 dark:text-slate-400 hover:bg-white/50 dark:hover:bg-slate-700/50'
-                }`}
+                  }`}
               >
                 {sheet.name}
               </button>
@@ -338,13 +336,12 @@ export function ExcelViewerModal({ open, onClose, fileName, fileUrl }: ExcelView
                       return (
                         <tr
                           key={rIdx}
-                          className={`transition-colors ${
-                            isHeaderRow
+                          className={`transition-colors ${isHeaderRow
                               ? 'bg-emerald-50/70 dark:bg-emerald-950/30 font-bold text-slate-900 dark:text-slate-100 border-b-2 border-emerald-200 dark:border-emerald-800'
                               : rIdx % 2 === 0
-                              ? 'bg-white dark:bg-slate-900 hover:bg-blue-50/30 dark:hover:bg-slate-800/40'
-                              : 'bg-slate-50/50 dark:bg-slate-900/50 hover:bg-blue-50/30 dark:hover:bg-slate-800/40'
-                          }`}
+                                ? 'bg-white dark:bg-slate-900 hover:bg-blue-50/30 dark:hover:bg-slate-800/40'
+                                : 'bg-slate-50/50 dark:bg-slate-900/50 hover:bg-blue-50/30 dark:hover:bg-slate-800/40'
+                            }`}
                         >
                           {/* Row Number (1, 2, 3...) */}
                           <td className="w-10 px-2 py-2 text-center font-mono text-[10px] text-slate-400 select-none border-r border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/80 font-medium">
@@ -367,13 +364,11 @@ export function ExcelViewerModal({ open, onClose, fileName, fileUrl }: ExcelView
                             return (
                               <td
                                 key={cIdx}
-                                className={`px-3 py-2 border-r border-slate-100 dark:border-slate-800/80 whitespace-nowrap ${
-                                  isNumeric && !isHeaderRow ? 'text-right font-mono' : 'text-left'
-                                } ${
-                                  isSearchMatch
+                                className={`px-3 py-2 border-r border-slate-100 dark:border-slate-800/80 whitespace-nowrap ${isNumeric && !isHeaderRow ? 'text-right font-mono' : 'text-left'
+                                  } ${isSearchMatch
                                     ? 'bg-amber-200 dark:bg-amber-900/70 font-bold text-amber-900 dark:text-amber-200'
                                     : ''
-                                }`}
+                                  }`}
                               >
                                 {strVal || <span className="text-slate-300 dark:text-slate-700 italic text-[11px]">-</span>}
                               </td>
@@ -443,7 +438,7 @@ function generateSampleWorkbook(fileName: string): XLSX.WorkBook {
     [3, 'Bộ dụng cụ học tập & bút mực, vở viết', 'Bộ', 500, 80000, 40000000, 'Vở Hồng Hà 96 trang'],
     [4, 'Học bổng vượt khó học giỏi điểm trường', 'Suất', 20, 1000000, 20000000, 'Trao trực tiếp cho học sinh'],
     [5, 'Chi phí thuê xe 45 chỗ chở đoàn & hàng hóa', 'Chuyến', 2, 12000000, 24000000, 'Lộ trình Hà Nội - Hà Giang (2 ngày 1 đêm)'],
-    [6, 'Ăn nghỉ & hậu cần ban tổ chức đoàn xe', 'Gói', 1, 15000000, 15000000, 'Đoàn gồm 30 hội viên tình nguyện viên'],
+    [6, 'Ăn nghỉ & hậu cần ban tổ chức đoàn xe', 'Gói', 1, 15000000, 15000000, 'Đoàn gồm 30 Học viên tình nguyện viên'],
     [7, 'Băng rôn, backdrop & truyền thông phóng sự', 'Gói', 1, 6000000, 6000000, 'Đơn vị media tài trợ 50%'],
     ['', 'TỔNG CỘNG DỰ TOÁN', '', '', '', 240000000, 'Ngân sách vận động quỹ thiện nguyện'],
   ];
@@ -452,7 +447,7 @@ function generateSampleWorkbook(fileName: string): XLSX.WorkBook {
 
   // Sheet 2: Danh sách tài trợ
   const ws2Data = [
-    ['STT', 'Doanh nghiệp / Hội viên tài trợ', 'Chức vụ / Công ty', 'Số tiền (VNĐ)', 'Hiện vật đóng góp', 'Trạng thái chuyển khoản'],
+    ['STT', 'Doanh nghiệp / Học viên tài trợ', 'Chức vụ / Công ty', 'Số tiền (VNĐ)', 'Hiện vật đóng góp', 'Trạng thái chuyển khoản'],
     [1, 'Nguyễn Văn Minh', 'Tổng Giám đốc - VICONNECT Group', 50000000, 'Hỗ trợ xe vận chuyển', 'Đã nhận đủ'],
     [2, 'Trần Thị Thu Hà', 'Chủ tịch HĐQT - Thời trang Hà An', 30000000, '500 áo ấm trẻ em', 'Đã bàn giao hàng'],
     [3, 'Lê Hoàng Nam', 'Giám đốc - Nhựa Tân Phát', 20000000, '500 bình nước học sinh', 'Đã nhận đủ'],

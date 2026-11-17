@@ -139,7 +139,7 @@ export function EditMeetingModal({
             list[idx] = { ...list[idx], ...updatedFields };
             localStorage.setItem(k, JSON.stringify(list));
           }
-        } catch {}
+        } catch { }
       }
 
       // Cập nhật cuộc hẹn trên mobile nếu có
@@ -150,7 +150,7 @@ export function EditMeetingModal({
           vbaApps[aIdx] = { ...vbaApps[aIdx], ...updatedFields };
           localStorage.setItem("vba_connection_appointments", JSON.stringify(vbaApps));
         }
-      } catch {}
+      } catch { }
 
       toast.success("✓ Đã cập nhật thông tin cuộc gặp thành công!");
       window.dispatchEvent(new CustomEvent("ceohn10:meetings-updated"));
@@ -337,11 +337,10 @@ export function EditMeetingModal({
               <button
                 type="button"
                 onClick={() => setVenueType("offline")}
-                className={`flex items-center justify-center gap-2 p-2.5 rounded-xl border text-xs font-bold transition cursor-pointer ${
-                  venueType === "offline"
+                className={`flex items-center justify-center gap-2 p-2.5 rounded-xl border text-xs font-bold transition cursor-pointer ${venueType === "offline"
                     ? "border-amber-500 bg-amber-500/10 text-amber-700 dark:text-amber-400"
                     : "border-border bg-card text-muted-foreground hover:bg-secondary"
-                }`}
+                  }`}
               >
                 <MapPin className="h-4 w-4" />
                 <span>Trực tiếp (Offline)</span>
@@ -349,11 +348,10 @@ export function EditMeetingModal({
               <button
                 type="button"
                 onClick={() => setVenueType("online")}
-                className={`flex items-center justify-center gap-2 p-2.5 rounded-xl border text-xs font-bold transition cursor-pointer ${
-                  venueType === "online"
+                className={`flex items-center justify-center gap-2 p-2.5 rounded-xl border text-xs font-bold transition cursor-pointer ${venueType === "online"
                     ? "border-indigo-500 bg-indigo-500/10 text-indigo-700 dark:text-indigo-400"
                     : "border-border bg-card text-muted-foreground hover:bg-secondary"
-                }`}
+                  }`}
               >
                 <Video className="h-4 w-4" />
                 <span>Trực tuyến (Online)</span>
@@ -412,7 +410,7 @@ export function EditMeetingModal({
               rows={3}
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              placeholder="VD: Trao đổi hợp tác cung ứng dịch vụ, giới thiệu hội viên..."
+              placeholder="VD: Trao đổi hợp tác cung ứng dịch vụ, giới thiệu Học viên..."
               className="w-full rounded-xl border border-border bg-background p-3 text-xs text-foreground focus:outline-none"
             />
           </div>

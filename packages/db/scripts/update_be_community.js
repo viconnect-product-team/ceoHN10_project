@@ -51,7 +51,7 @@ if (!serviceContent.includes('executiveRole: foundMember?.executive_role')) {
       department: foundMember?.department || 'CLB Doanh Nhân CEO HN10',
       association: 'CLB Doanh Nhân CEO HN10 - HanoiBA',
       skills: ['Quản trị doanh nghiệp', 'Xúc tiến thương mại', 'Kết nối B2B', 'Chiến lược dòng tiền'],
-      talents: foundMember?.executive_role ? \`Lãnh đạo \${foundMember?.department || 'Ban'} CLB CEO HN10\` : 'Doanh nhân hội viên chính thức',
+      talents: foundMember?.executive_role ? \`Lãnh đạo \${foundMember?.department || 'Ban'} CLB CEO HN10\` : 'Doanh nhân Học viên chính thức',
       verifiedBadge: true,`
   );
 }
@@ -66,7 +66,7 @@ if (!serviceContent.includes('async createCommunityOpportunity(')) {
       WHERE user_id = \${userId}::uuid OR id = \${userId}
       LIMIT 1
     \`.catch(() => [] as any[]);
-    const posterName = member[0]?.name || 'Hội viên VIONE';
+    const posterName = member[0]?.name || 'Học viên VIONE';
 
     await this.prisma.$executeRaw\`
       INSERT INTO public.opportunities (

@@ -327,7 +327,7 @@ async function buildPdf() {
     <div class="cover-badge">TÀI LIỆU KỸ THUẬT & HƯỚNG DẪN VẬN HÀNH CHÍNH THỨC</div>
     <h1 class="cover-title">SỔ TAY HƯỚNG DẪN SỬ DỤNG<br>ỨNG DỤNG DOANH NHÂN CLB CEO HN10<br>& HỆ THỐNG QUẢN TRỊ CRM</h1>
     <div class="cover-subtitle">
-      Tài liệu hướng dẫn trực quan từng bước dành cho Ban Điều Hành và Hội viên Doanh nhân. Giao diện thực tế, hình ảnh minh chứng xác thực từ hệ thống.
+      Tài liệu hướng dẫn trực quan từng bước dành cho Ban Điều Hành và Học viên Doanh nhân. Giao diện thực tế, hình ảnh minh chứng xác thực từ hệ thống.
     </div>
     <div class="cover-divider"></div>
     <div class="cover-meta">
@@ -336,7 +336,7 @@ async function buildPdf() {
         <span>http://14.225.217.232:5000</span>
       </div>
       <div class="cover-meta-item">
-        <strong>Ứng dụng Di động Hội viên</strong>
+        <strong>Ứng dụng Di động Học viên</strong>
         <span>http://14.225.217.232:5002/association</span>
       </div>
       <div class="cover-meta-item">
@@ -344,7 +344,7 @@ async function buildPdf() {
         <span>admin@connect.vn (123456)</span>
       </div>
       <div class="cover-meta-item">
-        <strong>Tài khoản Hội viên Doanh nhân</strong>
+        <strong>Tài khoản Học viên Doanh nhân</strong>
         <span>ceo.tongthuky@ceohn10.com (123456)</span>
       </div>
       <div class="cover-meta-item">
@@ -386,11 +386,11 @@ async function buildPdf() {
 
     <div class="step-box">
       <div class="step-header">
-        <span class="step-name">1.2 Phân quyền Vai trò & Quản lý Phê duyệt Hồ sơ Hội viên</span>
+        <span class="step-name">1.2 Phân quyền Vai trò & Quản lý Phê duyệt Hồ sơ Học viên</span>
         <span class="step-account">Module: /members</span>
       </div>
       <div class="step-desc">
-        <p><strong>Mô tả chi tiết:</strong> Quản trị viên theo dõi toàn bộ danh sách hội viên đăng ký mới, phân chia cấp bậc quyền hạn rõ ràng và thực hiện phê duyệt chỉ với 1 click:</p>
+        <p><strong>Mô tả chi tiết:</strong> Quản trị viên theo dõi toàn bộ danh sách Học viên đăng ký mới, phân chia cấp bậc quyền hạn rõ ràng và thực hiện phê duyệt chỉ với 1 click:</p>
         <table class="data-table">
           <thead>
             <tr>
@@ -402,26 +402,26 @@ async function buildPdf() {
           <tbody>
             <tr>
               <td><span class="badge-role badge-super">Super Admin</span></td>
-              <td>Toàn quyền cấu hình hệ thống, phân quyền vai trò, quản lý tài chính & phí hội viên.</td>
+              <td>Toàn quyền cấu hình hệ thống, phân quyền vai trò, quản lý tài chính & phí Học viên.</td>
               <td>Toàn hệ thống CRM & CSDL</td>
             </tr>
             <tr>
               <td><span class="badge-role badge-exec">Ban Thư Ký</span></td>
-              <td>Duyệt hồ sơ hội viên mới, tạo sự kiện, gửi thông báo và quản lý sàn B2B.</td>
+              <td>Duyệt hồ sơ Học viên mới, tạo sự kiện, gửi thông báo và quản lý sàn B2B.</td>
               <td>Quản trị phân hệ Hiệp hội</td>
             </tr>
             <tr>
-              <td><span class="badge-role badge-member">Hội viên</span></td>
+              <td><span class="badge-role badge-member">Học viên</span></td>
               <td>Đăng sản phẩm gian hàng, đăng tin cơ hội hợp tác, đăng ký tham gia sự kiện.</td>
-              <td>Ứng dụng di động Hội viên</td>
+              <td>Ứng dụng di động Học viên</td>
             </tr>
           </tbody>
         </table>
-        <p><strong>Cơ chế tự động hóa:</strong> Khi Quản trị viên bấm Duyệt hồ sơ, hệ thống tự động khởi tạo tài khoản đăng nhập tương ứng trong bảng <code>vione_users</code> và liên kết mã định danh <code>user_id</code> với hội viên, giúp hội viên có thể đăng nhập ngay vào ứng dụng mà không cần khởi tạo thủ công.</p>
+        <p><strong>Cơ chế tự động hóa:</strong> Khi Quản trị viên bấm Duyệt hồ sơ, hệ thống tự động khởi tạo tài khoản đăng nhập tương ứng trong bảng <code>vione_users</code> và liên kết mã định danh <code>user_id</code> với Học viên, giúp Học viên có thể đăng nhập ngay vào ứng dụng mà không cần khởi tạo thủ công.</p>
       </div>
       <div class="image-container">
         <img class="evidence-img" src="${imgCrmRoles}" alt="CRM Roles & Members">
-        <div class="caption">Hình 1.2: Danh sách Quản lý Hội viên & Phân quyền Vai trò Ban Điều Hành trên CRM</div>
+        <div class="caption">Hình 1.2: Danh sách Quản lý Học viên & Phân quyền Vai trò Ban Điều Hành trên CRM</div>
       </div>
     </div>
 
@@ -435,7 +435,7 @@ async function buildPdf() {
         <ul>
           <li><strong>Tải ảnh MinIO S3:</strong> Ảnh poster và banner sự kiện được gửi trực tiếp lên máy chủ đám mây MinIO S3, lưu trữ đường dẫn chuẩn, đảm bảo hiển thị sắc nét và tốc độ tải cao.</li>
           <li><strong>Sơ đồ hội trường Cinema Seating:</strong> Cấu hình phân chia hàng ghế VIP, khu vực Bàn Tròn Doanh nhân và ghế tiêu chuẩn.</li>
-          <li><strong>Cấu hình vé có phí / miễn phí:</strong> Thiết lập giá vé tham dự, hạn mức số lượng đăng ký và chính sách ưu đãi dành riêng cho hội viên chính thức.</li>
+          <li><strong>Cấu hình vé có phí / miễn phí:</strong> Thiết lập giá vé tham dự, hạn mức số lượng đăng ký và chính sách ưu đãi dành riêng cho Học viên chính thức.</li>
         </ul>
       </div>
       <div class="image-container">
@@ -445,16 +445,16 @@ async function buildPdf() {
     </div>
   </div>
 
-  <!-- ==================== CHƯƠNG 2: ỨNG DỤNG HỘI VIÊN ==================== -->
+  <!-- ==================== CHƯƠNG 2: ỨNG DỤNG Học viên ==================== -->
   <div class="chapter">
     <div class="chapter-header">
-      <div class="chapter-num">PHẦN II: ỨNG DỤNG DI ĐỘNG HỘI VIÊN CLB CEO HN10</div>
+      <div class="chapter-num">PHẦN II: ỨNG DỤNG DI ĐỘNG Học viên CLB CEO HN10</div>
       <h2 class="chapter-title">Trang Chủ Compact, Danh Mục Sự Kiện & Đăng Ký Tham Gia</h2>
     </div>
 
     <div class="step-box">
       <div class="step-header">
-        <span class="step-name">2.1 Trang chủ Hội viên với Thẻ Sự kiện Compact Tinh gọn</span>
+        <span class="step-name">2.1 Trang chủ Học viên với Thẻ Sự kiện Compact Tinh gọn</span>
         <span class="step-account">URL: http://14.225.217.232:5002/association</span>
       </div>
       <div class="step-desc">
@@ -499,7 +499,7 @@ async function buildPdf() {
         <ul>
           <li><strong>Lịch trình chi tiết:</strong> Thời gian đón tiếp đại biểu, tiệc trà Networking, phiên phát biểu của Diễn giả và tiệc tối Gala Dinner.</li>
           <li><strong>Danh sách diễn giả & khách mời danh dự:</strong> Thông tin chức vụ và doanh nghiệp của các chuyên gia hàng đầu.</li>
-          <li><strong>Nút Đăng ký tham gia:</strong> Cho phép hội viên chọn vị trí bàn ghế và xác nhận đăng ký chỉ với một thao tác.</li>
+          <li><strong>Nút Đăng ký tham gia:</strong> Cho phép Học viên chọn vị trí bàn ghế và xác nhận đăng ký chỉ với một thao tác.</li>
         </ul>
       </div>
       <div class="image-container">
@@ -514,7 +514,7 @@ async function buildPdf() {
         <span class="step-account">Màn hình: /association/checkin</span>
       </div>
       <div class="step-desc">
-        <p><strong>Mô tả chi tiết:</strong> Sau khi hoàn tất đăng ký sự kiện, hội viên nhận ngay Thẻ vé điện tử chính thức:</p>
+        <p><strong>Mô tả chi tiết:</strong> Sau khi hoàn tất đăng ký sự kiện, Học viên nhận ngay Thẻ vé điện tử chính thức:</p>
         <ul>
           <li><strong>Xác nhận vị trí chỗ ngồi:</strong> Hiển thị rõ số bàn và số ghế được phân bổ (Ví dụ: Bàn VIP 01 - Ghế 08).</li>
           <li><strong>Mã QR Check-in VIP:</strong> Mã QR được mã hóa theo chuẩn vCard/Event Pass, cho phép Ban Lễ Tân quét mã tại cổng ra vào trong vòng 1 giây để xác nhận vào hội trường.</li>
@@ -542,8 +542,8 @@ async function buildPdf() {
       <div class="step-desc">
         <p><strong>Mô tả chi tiết:</strong> Đối với các sự kiện có phí hoặc đóng hội phí thường niên, hệ thống tích hợp cổng thanh toán VietQR tự động:</p>
         <ul>
-          <li><strong>Mã QR động thông minh:</strong> Mã QR được sinh theo chuẩn Napas 247, tự động điền sẵn chính xác số tiền cần chuyển và cú pháp nội dung chuyển khoản theo mã hội viên.</li>
-          <li><strong>Khớp lệnh tự động:</strong> Hội viên chỉ cần mở ứng dụng ngân hàng quét mã, không cần nhập tay số tài khoản hay nội dung, hạn chế tối đa sai sót.</li>
+          <li><strong>Mã QR động thông minh:</strong> Mã QR được sinh theo chuẩn Napas 247, tự động điền sẵn chính xác số tiền cần chuyển và cú pháp nội dung chuyển khoản theo mã Học viên.</li>
+          <li><strong>Khớp lệnh tự động:</strong> Học viên chỉ cần mở ứng dụng ngân hàng quét mã, không cần nhập tay số tài khoản hay nội dung, hạn chế tối đa sai sót.</li>
           <li><strong>Sao kê minh bạch:</strong> Hệ thống lưu trữ lịch sử giao dịch và xuất hóa đơn điện tử cho doanh nghiệp.</li>
         </ul>
       </div>
@@ -593,7 +593,7 @@ async function buildPdf() {
 
     <div class="callout-box">
       <strong>KẾT LUẬN & HƯỚNG DẪN HỖ TRỢ VẬN HÀNH:</strong>
-      Toàn bộ các phân hệ trên Hệ thống Quản trị CRM và Ứng dụng Di động Hội viên CLB CEO HN10 đã được kiểm thử toàn diện, hoạt động ổn định và đồng bộ dữ liệu thời gian thực. Trong quá trình sử dụng, nếu cần hỗ trợ kỹ thuật hoặc đóng góp ý kiến nâng cấp tính năng, Quản trị viên và Hội viên vui lòng liên hệ Ban Thư Ký CLB Doanh Nhân CEO HN10 hoặc gửi email về: <code>admin@connect.vn</code>.
+      Toàn bộ các phân hệ trên Hệ thống Quản trị CRM và Ứng dụng Di động Học viên CLB CEO HN10 đã được kiểm thử toàn diện, hoạt động ổn định và đồng bộ dữ liệu thời gian thực. Trong quá trình sử dụng, nếu cần hỗ trợ kỹ thuật hoặc đóng góp ý kiến nâng cấp tính năng, Quản trị viên và Học viên vui lòng liên hệ Ban Thư Ký CLB Doanh Nhân CEO HN10 hoặc gửi email về: <code>admin@connect.vn</code>.
     </div>
   </div>
 

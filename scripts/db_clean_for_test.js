@@ -119,9 +119,9 @@ async function main() {
   console.log('Accounts ready:');
   console.log('- CRM / Platform Admin: admin@connect.vn / 123456');
   console.log('- Hiệp Hội Admin:       ceo.tongthuky@ceohn10.com / 123456');
-  console.log('- Hội viên 1:           ceo.member1@ceohn10.com / 123456 (HN10-012)');
-  console.log('- Hội viên 2:           ceo.member2@ceohn10.com / 123456 (HN10-013)');
-  console.log('- Hội viên 3:           ceo.member3@ceohn10.com / 123456 (HN10-014)');
+  console.log('- Học viên 1:           ceo.member1@ceohn10.com / 123456 (HN10-012)');
+  console.log('- Học viên 2:           ceo.member2@ceohn10.com / 123456 (HN10-013)');
+  console.log('- Học viên 3:           ceo.member3@ceohn10.com / 123456 (HN10-014)');
   console.log('=============================================================\n');
 
   await client.end();

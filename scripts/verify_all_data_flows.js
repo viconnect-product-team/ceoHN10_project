@@ -17,7 +17,7 @@ const adminToken = jwt.sign(
 
 const ENDPOINTS = [
   { path: '/api/events', name: 'Events (Sự kiện)', auth: false },
-  { path: '/api/members', name: 'Members (Hội viên)', auth: false },
+  { path: '/api/members', name: 'Members (Học viên)', auth: false },
   { path: '/api/opportunities', name: 'Opportunities (Giao thương)', auth: true },
   { path: '/api/marketplace/products', name: 'Marketplace (Sản phẩm)', auth: true },
   { path: '/api/voting/polls', name: 'Voting / Polls (Bầu cử)', auth: true },
@@ -55,12 +55,12 @@ async function probe(baseUrl) {
         count: Array.isArray(data)
           ? data.length
           : data && typeof data === 'object' && Array.isArray(data.items)
-          ? data.items.length
-          : data && typeof data === 'object' && Array.isArray(data.data)
-          ? data.data.length
-          : data
-          ? 1
-          : 0,
+            ? data.items.length
+            : data && typeof data === 'object' && Array.isArray(data.data)
+              ? data.data.length
+              : data
+                ? 1
+                : 0,
         sample:
           Array.isArray(data) && data.length > 0
             ? data[0].id || data[0].name || data[0].title || 'record'

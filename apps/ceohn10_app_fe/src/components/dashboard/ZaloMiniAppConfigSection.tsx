@@ -60,7 +60,7 @@ export const ZaloMiniAppConfigSection: React.FC = () => {
           setConfig(res.config);
           try {
             localStorage.setItem("vba_zalo_miniapp_config", JSON.stringify(res.config));
-          } catch {}
+          } catch { }
           return;
         }
         throw new Error("No remote config");
@@ -78,7 +78,7 @@ export const ZaloMiniAppConfigSection: React.FC = () => {
                 setConfig((prev) => ({ ...prev, linkedOaId: storedOaId }));
               }
             }
-          } catch {}
+          } catch { }
         }
       });
   }, []);
@@ -89,7 +89,7 @@ export const ZaloMiniAppConfigSection: React.FC = () => {
       // 1. Lưu cục bộ
       try {
         localStorage.setItem("vba_zalo_miniapp_config", JSON.stringify(config));
-      } catch {}
+      } catch { }
 
       // 2. Lưu trực tiếp vào CSDL PostgreSQL backend
       const res = await fetchNestApi<any>("/zalo/miniapp/config", {
@@ -140,7 +140,7 @@ export const ZaloMiniAppConfigSection: React.FC = () => {
   const DEEP_LINKS = [
     {
       title: "Trang Chủ Mini App",
-      desc: "Mở giao diện trang chủ hội viên CEO HN10 trên Zalo",
+      desc: "Mở giao diện trang chủ Học viên CEO HN10 trên Zalo",
       url: miniAppShareUrl,
     },
     {
@@ -159,7 +159,7 @@ export const ZaloMiniAppConfigSection: React.FC = () => {
       url: `${miniAppShareUrl}?page=business-connect`,
     },
     {
-      title: "Danh Bạ Hội Viên Doanh Nhân",
+      title: "Danh Bạ Học viên Doanh Nhân",
       desc: "Tra cứu thông tin, doanh nghiệp và kết nối 1-on-1",
       url: `${miniAppShareUrl}?page=members`,
     },
@@ -184,7 +184,7 @@ export const ZaloMiniAppConfigSection: React.FC = () => {
               </span>
             </div>
             <p className="text-xs text-sky-100 mt-0.5">
-              Quản trị ứng dụng di động nhúng trực tiếp trong Zalo cho 100% Hội viên Doanh nhân CEO HN10
+              Quản trị ứng dụng di động nhúng trực tiếp trong Zalo cho 100% Học viên Doanh nhân CEO HN10
             </p>
           </div>
         </div>
@@ -279,7 +279,7 @@ export const ZaloMiniAppConfigSection: React.FC = () => {
               </div>
             </div>
             <p className="text-[11px] text-muted-foreground mt-1">
-              Dùng để giải mã Token Số điện thoại Zalo khi hội viên đăng nhập 1 chạm
+              Dùng để giải mã Token Số điện thoại Zalo khi Học viên đăng nhập 1 chạm
             </p>
           </div>
 
@@ -295,7 +295,7 @@ export const ZaloMiniAppConfigSection: React.FC = () => {
               className="w-full h-10 px-3 rounded-xl border border-border bg-background text-sm font-mono focus:border-primary focus:outline-none"
             />
             <p className="text-[11px] text-muted-foreground mt-1">
-              Mini App sẽ tự động nhắc hội viên bấm Quan tâm Zalo OA CLB CEO HN10
+              Mini App sẽ tự động nhắc Học viên bấm Quan tâm Zalo OA CLB CEO HN10
             </p>
           </div>
 

@@ -41,7 +41,7 @@ async function generatePptx() {
     x: 0.8, y: 2.3, w: 11.5, h: 1.8,
     fontSize: 32, fontFace: 'Arial', color: WHITE, bold: true, lineSpacing: 38
   });
-  slide1.addText('Giải pháp chuyển đổi số toàn diện: Web CRM Quản trị & Ứng dụng Di động Hội viên\nĐồng bộ dữ liệu thời gian thực - Minh bạch tài chính - Tối ưu hóa vận hành 7 Ban Chuyên Môn', {
+  slide1.addText('Giải pháp chuyển đổi số toàn diện: Web CRM Quản trị & Ứng dụng Di động Học viên\nĐồng bộ dữ liệu thời gian thực - Minh bạch tài chính - Tối ưu hóa vận hành 7 Ban Chuyên Môn', {
     x: 0.8, y: 4.4, w: 11.5, h: 0.8,
     fontSize: 14, fontFace: 'Arial', color: 'CBD5E1'
   });
@@ -69,7 +69,7 @@ async function generatePptx() {
 
   slide2.addShape(pptx.ShapeType.rect, { x: 0.8, y: colY, w: colW, h: colH, fill: { color: WHITE }, line: { color: 'E2E8F0', width: 1 } });
   slide2.addText('1. Thách thức Quản trị', { x: 1.0, y: colY + 0.3, w: 3.2, h: 0.4, fontSize: 16, bold: true, color: ACCENT });
-  slide2.addText('• Quy mô hội viên tăng nhanh, hoạt động đa dạng nhiều lĩnh vực.\n• Thông tin rời rạc qua mạng xã hội, khó tra cứu tài liệu quy chế.\n• Quản trị thu chi, hội phí, tài trợ cần minh bạch số hóa tuyệt đối.\n• Giao việc và theo dõi tiến độ sự kiện giữa các ban còn thủ công.', {
+  slide2.addText('• Quy mô Học viên tăng nhanh, hoạt động đa dạng nhiều lĩnh vực.\n• Thông tin rời rạc qua mạng xã hội, khó tra cứu tài liệu quy chế.\n• Quản trị thu chi, hội phí, tài trợ cần minh bạch số hóa tuyệt đối.\n• Giao việc và theo dõi tiến độ sự kiện giữa các ban còn thủ công.', {
     x: 1.0, y: colY + 0.8, w: 3.2, h: 3.4, fontSize: 12, color: '334155', lineSpacing: 18
   });
 
@@ -106,7 +106,7 @@ async function generatePptx() {
     { name: 'Ban Học tập', desc: 'Đào tạo kỹ năng lãnh đạo, hội thảo chuyên đề quản trị vốn & kinh doanh' },
     { name: 'Ban Sự kiện & Hậu cần', desc: 'Tổ chức Gala, họp định kỳ, xúc tiến thương mại và hậu cần sự kiện' },
     { name: 'Ban Tài chính & Tài trợ', desc: 'Quản trị ngân sách, quỹ hội, thu chi hội phí và vận động tài trợ' },
-    { name: 'Ban Truyền thông', desc: 'Xây dựng hình ảnh, kênh tin tức, PR thương hiệu CLB và hội viên' }
+    { name: 'Ban Truyền thông', desc: 'Xây dựng hình ảnh, kênh tin tức, PR thương hiệu CLB và Học viên' }
   ];
   bansTop.forEach((b, idx) => {
     const bx = 0.8 + idx * 2.95;
@@ -119,7 +119,7 @@ async function generatePptx() {
   const bansBottom = [
     { name: 'Ban Công nghệ', desc: 'Phát triển & vận hành hệ thống Web CRM, App Mobile, chuyển đổi số' },
     { name: 'Ban Đối ngoại & Giao thương', desc: 'Mở rộng hợp tác liên minh hiệp hội, kết nối cơ hội kinh doanh B2B' },
-    { name: 'Ban Đời sống & Gắn kết thành viên', desc: 'Chăm lo sinh nhật, hiếu hỉ, thể thao văn hóa và gắn bó hội viên' }
+    { name: 'Ban Đời sống & Gắn kết thành viên', desc: 'Chăm lo sinh nhật, hiếu hỉ, thể thao văn hóa và gắn bó Học viên' }
   ];
   bansBottom.forEach((b, idx) => {
     const bx = 1.8 + idx * 3.4;
@@ -143,7 +143,7 @@ async function generatePptx() {
   // Cột trái: SƠ ĐỒ BCS LỚP
   slide4.addShape(pptx.ShapeType.rect, { x: 0.8, y: 1.6, w: 5.6, h: 5.1, fill: { color: WHITE }, line: { color: 'CBD5E1', width: 1 } });
   slide4.addText('1. Sơ đồ tổ chức BCS Lớp', { x: 1.0, y: 1.8, w: 5.2, h: 0.35, fontSize: 15, bold: true, color: ACCENT });
-  
+
   slide4.addShape(pptx.ShapeType.roundRect, { x: 2.3, y: 2.3, w: 2.6, h: 0.6, fill: { color: ACCENT } });
   slide4.addText('Lớp Trưởng Lâm thời', { x: 2.3, y: 2.3, w: 2.6, h: 0.6, fontSize: 12, bold: true, color: WHITE, align: 'center', valign: 'middle' });
 
@@ -194,7 +194,7 @@ async function generatePptx() {
     x: 0.8, y: 0.6, w: 11.5, h: 0.5,
     fontSize: 22, fontFace: 'Arial', color: PRIMARY, bold: true
   });
-  slide5.addText('Kết nối liền mạch giữa Quản trị viên và Hội viên doanh nhân trên một nguồn dữ liệu duy nhất', {
+  slide5.addText('Kết nối liền mạch giữa Quản trị viên và Học viên doanh nhân trên một nguồn dữ liệu duy nhất', {
     x: 0.8, y: 1.1, w: 11.5, h: 0.4,
     fontSize: 13, fontFace: 'Arial', color: '64748B'
   });
@@ -203,15 +203,15 @@ async function generatePptx() {
   slide5.addShape(pptx.ShapeType.rect, { x: 0.8, y: 1.8, w: 5.6, h: 4.8, fill: { color: WHITE }, line: { color: 'CBD5E1', width: 1 } });
   slide5.addText('CỔNG QUẢN TRỊ WEB CRM', { x: 1.1, y: 2.0, w: 5.0, h: 0.4, fontSize: 16, bold: true, color: PRIMARY });
   slide5.addText('Dành cho: Lớp Trưởng, Lớp Phó, Ban Cán Sự, Kế toán, Admin', { x: 1.1, y: 2.45, w: 5.0, h: 0.3, fontSize: 11, color: ACCENT, bold: true });
-  slide5.addText('• Quản lý 7 Ban Chuyên Môn & Ma trận phân quyền RBAC chi tiết.\n• Tổ chức sự kiện, cấu hình vé, điểm danh Check-in QR tự động.\n• Quản trị buổi học đào tạo, phát hành giáo trình & link học Hybrid.\n• Quản trị dòng tiền thực tế, phiếu thu, hóa đơn điện tử chuẩn chỉnh.\n• Bàn giao việc, phân loại thẻ công việc trên bảng Kanban trực quan.\n• Báo cáo tổng thể KPI, tăng trưởng và phân tích hoạt động hội viên.', {
+  slide5.addText('• Quản lý 7 Ban Chuyên Môn & Ma trận phân quyền RBAC chi tiết.\n• Tổ chức sự kiện, cấu hình vé, điểm danh Check-in QR tự động.\n• Quản trị buổi học đào tạo, phát hành giáo trình & link học Hybrid.\n• Quản trị dòng tiền thực tế, phiếu thu, hóa đơn điện tử chuẩn chỉnh.\n• Bàn giao việc, phân loại thẻ công việc trên bảng Kanban trực quan.\n• Báo cáo tổng thể KPI, tăng trưởng và phân tích hoạt động Học viên.', {
     x: 1.1, y: 2.85, w: 5.0, h: 3.5, fontSize: 12, color: '334155', lineSpacing: 20
   });
 
   // Box 2: Mobile App
   slide5.addShape(pptx.ShapeType.rect, { x: 6.8, y: 1.8, w: 5.6, h: 4.8, fill: { color: WHITE }, line: { color: 'CBD5E1', width: 1 } });
   slide5.addText('CEO HN10 MOBILE APP', { x: 7.1, y: 2.0, w: 5.0, h: 0.4, fontSize: 16, bold: true, color: ACCENT });
-  slide5.addText('Dành cho: Toàn thể Hội viên Doanh nhân HanoiBA', { x: 7.1, y: 2.45, w: 5.0, h: 0.3, fontSize: 11, color: PRIMARY, bold: true });
-  slide5.addText('• Thẻ Hội viên số tích hợp mã QR định danh đa năng.\n• Đăng ký tham gia sự kiện và check-in 1 chạm tại cửa hội trường.\n• Tham gia các buổi học chuyên đề, tải tài liệu & quy chế trực tiếp.\n• Kết nối giao thương B2B Connect, tra cứu hồ sơ doanh nghiệp thành viên.\n• Nhận thông báo tức thời (Push Notification) từ Ban Cán Sự Lớp.\n• Góp ý, phản ánh nguyện vọng trực tiếp đến ban điều hành.', {
+  slide5.addText('Dành cho: Toàn thể Học viên Doanh nhân HanoiBA', { x: 7.1, y: 2.45, w: 5.0, h: 0.3, fontSize: 11, color: PRIMARY, bold: true });
+  slide5.addText('• Thẻ Học viên số tích hợp mã QR định danh đa năng.\n• Đăng ký tham gia sự kiện và check-in 1 chạm tại cửa hội trường.\n• Tham gia các buổi học chuyên đề, tải tài liệu & quy chế trực tiếp.\n• Kết nối giao thương B2B Connect, tra cứu hồ sơ doanh nghiệp thành viên.\n• Nhận thông báo tức thời (Push Notification) từ Ban Cán Sự Lớp.\n• Góp ý, phản ánh nguyện vọng trực tiếp đến ban điều hành.', {
     x: 7.1, y: 2.85, w: 5.0, h: 3.5, fontSize: 12, color: '334155', lineSpacing: 20
   });
 
@@ -233,7 +233,7 @@ async function generatePptx() {
     { title: 'Giao việc & Kanban', desc: 'Phân quyền nhiệm vụ cho 7 ban; theo dõi tiến độ thời gian thực với bảng phân cấp và Kanban.' },
     { title: 'Tài chính & Hóa đơn', desc: 'Biến động số dư dòng tiền thực tế; xuất hóa đơn / phiếu thu chuẩn pháp lý kèm mã QR đối soát.' },
     { title: 'Thư viện Tài liệu Số', desc: 'Kho lưu trữ quy chế Ban Cán Sự, văn bản hiệp hội phân quyền theo từng cấp độ bảo mật.' },
-    { title: 'Ý kiến & Thông báo', desc: 'Kênh tiếp nhận phản ánh 2 chiều; hệ thống thông báo đẩy tự động đến từng tài khoản hội viên.' }
+    { title: 'Ý kiến & Thông báo', desc: 'Kênh tiếp nhận phản ánh 2 chiều; hệ thống thông báo đẩy tự động đến từng tài khoản Học viên.' }
   ];
 
   modules.forEach((m, idx) => {
@@ -278,7 +278,7 @@ async function generatePptx() {
   const dbRows = [
     '• Sự kiện Gala 2026: Ghi nhận đồng thời vào bảng events và ceohn10_events (200 chỗ, ID valid UUID).',
     '• Đào tạo Tài chính & Vốn: Ghi nhận vào bảng trainings kèm link Google Meet phòng học trực tuyến.',
-    '• Ý kiến đóng góp: Hội viên Vũ Phan Vũ gửi phản ánh ghi nhận tức thì vào bảng event_feedbacks.',
+    '• Ý kiến đóng góp: Học viên Vũ Phan Vũ gửi phản ánh ghi nhận tức thì vào bảng event_feedbacks.',
     '• Thư viện tài liệu: Thư mục & File PDF quy chế lưu trữ phân quyền an toàn trong bảng documents.',
     '• Phân công công việc: Nhiệm vụ Ban Sự kiện tiến độ 65% ưu tiên CRITICAL lưu vào bảng tasks.',
     '• Dòng tiền thực tế: Giao dịch thu hội phí HP-HN10-099 (+25.000.000 đ) cập nhật vào ceohn10_transactions.'
@@ -298,7 +298,7 @@ async function generatePptx() {
     x: 0.8, y: 3.1, w: 11.5, h: 0.5,
     fontSize: 16, fontFace: 'Arial', color: WHITE, bold: true, align: 'center'
   });
-  slide8.addText('Sẵn sàng đồng hành cùng Ban Điều Hành & Toàn thể Hội viên trên chặng đường phát triển bứt phá!', {
+  slide8.addText('Sẵn sàng đồng hành cùng Ban Điều Hành & Toàn thể Học viên trên chặng đường phát triển bứt phá!', {
     x: 0.8, y: 3.8, w: 11.5, h: 0.5,
     fontSize: 14, fontFace: 'Arial', color: 'CBD5E1', align: 'center'
   });
@@ -314,7 +314,7 @@ async function generatePptx() {
 // 2. TẠO SLIDE DECK HTML & RENDER SANG PDF
 async function generateSlidePdf() {
   console.log('Generating Slide Deck HTML & PDF...');
-  
+
   // Base64 các ảnh cần thiết
   const imgBan1 = fs.existsSync(path.join(rootDir, 'test_evidence', '05_departments_7_bans_configured.png'))
     ? `data:image/png;base64,${fs.readFileSync(path.join(rootDir, 'test_evidence', '05_departments_7_bans_configured.png')).toString('base64')}`
@@ -596,7 +596,7 @@ async function generateSlidePdf() {
       <div class="cover-content">
         <h1>HỆ THỐNG QUẢN TRỊ & KẾT NỐI DOANH NHÂN<br>NỀN TẢNG CÔNG NGHỆ <span>CEO1983</span></h1>
         <div class="cover-desc">
-          Giải pháp chuyển đổi số toàn diện kết hợp Cổng Quản trị Web CRM và Ứng dụng Di động Hội viên.<br>
+          Giải pháp chuyển đổi số toàn diện kết hợp Cổng Quản trị Web CRM và Ứng dụng Di động Học viên.<br>
           Chuẩn hóa 7 Ban Chuyên Môn • Minh bạch Tài chính Dòng tiền • Điểm danh QR Check-in • Đồng bộ CSDL Chuẩn PostgreSQL 113.20.107.184:6432.
         </div>
         <div class="cover-badges">
@@ -624,16 +624,16 @@ async function generateSlidePdf() {
         <div class="card">
           <h3 style="color: #e63946;">1. Thách thức Thực tế</h3>
           <ul>
-            <li>Quy mô hội viên liên tục mở rộng, nhu cầu trao đổi và giao thương nội bộ B2B rất lớn.</li>
+            <li>Quy mô Học viên liên tục mở rộng, nhu cầu trao đổi và giao thương nội bộ B2B rất lớn.</li>
             <li>Phương thức điều hành qua nhóm chat mạng xã hội bị trôi tin, thất lạc tài liệu, khó phân công.</li>
             <li>Công tác thu chi hội phí, tài trợ sự kiện cần báo cáo minh bạch dòng tiền thời gian thực.</li>
-            <li>Thiếu công cụ đo lường KPI hoạt động của từng ban và mức độ tương tác của hội viên.</li>
+            <li>Thiếu công cụ đo lường KPI hoạt động của từng ban và mức độ tương tác của Học viên.</li>
           </ul>
         </div>
         <div class="card">
           <h3 style="color: #0b192c;">2. Giải pháp Công nghệ</h3>
           <ul>
-            <li>Xây dựng nền tảng chuyên biệt cho CEO HN10: Web CRM cho Quản trị & Mobile App cho Hội viên.</li>
+            <li>Xây dựng nền tảng chuyên biệt cho CEO HN10: Web CRM cho Quản trị & Mobile App cho Học viên.</li>
             <li>Chuẩn hóa cơ cấu 7 Ban Chuyên Môn và vai trò Lớp Trưởng, Lớp Phó, Trưởng/Phó Team.</li>
             <li>Tự động hóa toàn trình: Check-in QR sự kiện, đăng ký buổi học, xuất hóa đơn chứng từ.</li>
             <li>Hạ tầng CSDL tập trung chuẩn mực PostgreSQL bảo mật cao, kiểm soát chặt chẽ quyền truy cập.</li>
@@ -644,7 +644,7 @@ async function generateSlidePdf() {
           <ul>
             <li><strong>Chủ tịch & BCS:</strong> Nắm bắt toàn bộ sức khỏe câu lạc bộ chỉ qua một màn hình Dashboard.</li>
             <li><strong>Ban Tài Chính:</strong> Quản lý quỹ hội tức thời, đối soát chứng từ hóa đơn điện tử chính xác.</li>
-            <li><strong>Hội viên:</strong> Thẻ định danh số, không bỏ lỡ sự kiện, kết nối đối tác B2B trong tầm tay.</li>
+            <li><strong>Học viên:</strong> Thẻ định danh số, không bỏ lỡ sự kiện, kết nối đối tác B2B trong tầm tay.</li>
             <li><strong>Hiệp hội HanoiBA:</strong> Hình mẫu chuyển đổi số tiêu biểu cho các câu lạc bộ trực thuộc.</li>
           </ul>
         </div>
@@ -681,7 +681,7 @@ async function generateSlidePdf() {
         </div>
         <div class="ban-card">
           <h4>Ban Truyền thông</h4>
-          <p>Phát triển thương hiệu CLB, quản trị bản tin, phát hành thông báo và truyền thông hình ảnh hội viên.</p>
+          <p>Phát triển thương hiệu CLB, quản trị bản tin, phát hành thông báo và truyền thông hình ảnh Học viên.</p>
         </div>
       </div>
 
@@ -774,7 +774,7 @@ async function generateSlidePdf() {
           <h3>ỨNG DỤNG DI ĐỘNG CEO HN10 (MOBILE APP)</h3>
           <p style="font-size: 12px; color: #0b192c; font-weight: 700; margin: 4px 0 10px 0;">Nền tảng: iOS, Android (Native Capacitor) & PWA</p>
           <ul>
-            <li><strong>Thẻ Hội viên Thông minh:</strong> Mã QR định danh cá nhân, chạm là check-in tại cửa hội trường trong 1 giây.</li>
+            <li><strong>Thẻ Học viên Thông minh:</strong> Mã QR định danh cá nhân, chạm là check-in tại cửa hội trường trong 1 giây.</li>
             <li><strong>B2B Connect & Giao thương:</strong> Danh bạ điện tử doanh nhân, tìm kiếm đối tác theo lĩnh vực, ngành nghề.</li>
             <li><strong>Đăng ký & Tham dự:</strong> Đăng ký sự kiện Gala, xem lịch học chuyên đề, tham gia học online một chạm.</li>
             <li><strong>Trao đổi & Phản ánh:</strong> Bảng tin trao đổi công việc nội bộ và gửi góp ý trực tiếp đến Ban Cán Sự Lớp.</li>
@@ -821,7 +821,7 @@ async function generateSlidePdf() {
         <ul style="color: #e2e8f0; font-size: 12px; line-height: 1.8;">
           <li><strong>Sự kiện Gala Gắn kết 2026:</strong> Lưu đồng thời bảng <code>events</code> và <code>ceohn10_events</code> (ID valid UUID, 200 chỗ).</li>
           <li><strong>Buổi học Quản trị Tài chính:</strong> Lưu bảng <code>trainings</code> kèm thông tin giảng viên và link phòng học trực tuyến.</li>
-          <li><strong>Góp ý & Phản ánh Hội viên:</strong> Ý kiến của hội viên Vũ Phan Vũ lưu vào bảng <code>event_feedbacks</code>.</li>
+          <li><strong>Góp ý & Phản ánh Học viên:</strong> Ý kiến của Học viên Vũ Phan Vũ lưu vào bảng <code>event_feedbacks</code>.</li>
           <li><strong>Thư viện Tài liệu & Quy chế:</strong> Thư mục & file PDF quy chế BCS lưu trữ phân quyền trong bảng <code>documents</code>.</li>
           <li><strong>Giao việc Ban Sự kiện:</strong> Công việc mức CRITICAL, tiến độ 65% lưu vào bảng <code>tasks</code>.</li>
           <li><strong>Dòng tiền thực tế:</strong> Giao dịch mã <code>HP-HN10-099</code> (+25.000.000 VNĐ) lưu vào bảng <code>ceohn10_transactions</code>.</li>
@@ -854,7 +854,7 @@ async function generateSlidePdf() {
         <div class="card">
           <h3 style="color: #e63946;">Giai đoạn 2: Phổ cập Mobile App</h3>
           <ul>
-            <li>Hướng dẫn 100% hội viên tải ứng dụng, đăng nhập và kích hoạt Thẻ Hội viên số.</li>
+            <li>Hướng dẫn 100% Học viên tải ứng dụng, đăng nhập và kích hoạt Thẻ Học viên số.</li>
             <li>Cập nhật đầy đủ hồ sơ doanh nghiệp phục vụ giao thương kết nối B2B Connect.</li>
             <li>Áp dụng Check-in QR tự động tại các sự kiện Gala và buổi sinh hoạt của CLB.</li>
           </ul>
@@ -889,7 +889,7 @@ async function generateSlidePdf() {
         sẵn sàng đồng hành cùng Ban Điều Hành kiến tạo một cộng đồng doanh nhân vững mạnh và thịnh vượng!
       </p>
       <div style="margin-top: 40px; font-size: 14px; color: #f4a261; font-style: italic;">
-        Trân trọng cảm ơn Ban Lãnh Đạo Hiệp Hội & Toàn Thể Quý Hội Viên Doanh Nhân!
+        Trân trọng cảm ơn Ban Lãnh Đạo Hiệp Hội & Toàn Thể Quý Học viên Doanh Nhân!
       </div>
     </div>
     <div class="slide-footer" style="width: 100%;">

@@ -16,7 +16,7 @@ function toValidUuid(id: string | null | undefined): string | null {
 
 @Injectable()
 export class VotingRepository {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   private static seededOnce = false;
 
@@ -34,7 +34,7 @@ export class VotingRepository {
         )
       `,
         )
-        .catch(() => {});
+        .catch(() => { });
 
       const flag = await this.prisma.$queryRaw<any[]>`
         SELECT value FROM public.app_system_flags WHERE key = 'polls_seeded' LIMIT 1
@@ -56,7 +56,7 @@ export class VotingRepository {
             title:
               'Thông qua Báo cáo Tài chính kiểm toán 2025 & Dự toán Ngân sách 2026',
             description:
-              'Căn cứ Điều lệ Hiệp hội, Ban Điều Hành kính trình toàn thể Quý Hội viên biểu quyết thông qua báo cáo quyết toán tài chính năm 2025 và hạn mức phân bổ ngân sách xúc tiến thương mại năm 2026.',
+              'Căn cứ Điều lệ Hiệp hội, Ban Điều Hành kính trình toàn thể Quý Học viên biểu quyết thông qua báo cáo quyết toán tài chính năm 2025 và hạn mức phân bổ ngân sách xúc tiến thương mại năm 2026.',
             status: 'open',
             startDate: new Date('2026-09-20'),
             endDate: new Date('2026-12-31'),
@@ -78,7 +78,7 @@ export class VotingRepository {
             title:
               'Lựa chọn cung đường & chủ đề chương trình Caravan Doanh Nhân 2026',
             description:
-              'Toàn thể Hội viên tham gia biểu quyết lựa chọn cung đường di chuyển và chương trình thiện nguyện đồng hành cùng Caravan CEO HN10.',
+              'Toàn thể Học viên tham gia biểu quyết lựa chọn cung đường di chuyển và chương trình thiện nguyện đồng hành cùng Caravan CEO HN10.',
             status: 'closed',
             startDate: new Date('2026-08-10'),
             endDate: new Date('2026-08-20'),
@@ -87,9 +87,9 @@ export class VotingRepository {
           {
             id: 'c1983000-0000-4000-8000-000000000004',
             title:
-              'Sửa đổi Quy chế xét duyệt kết nạp Hội viên chính thức năm 2026',
+              'Sửa đổi Quy chế xét duyệt kết nạp Học viên chính thức năm 2026',
             description:
-              'Quy chế mới áp dụng tiêu chuẩn xác thực pháp lý doanh nghiệp và chứng thư số hóa danh thiếp thông minh cho toàn thể hội viên gia nhập.',
+              'Quy chế mới áp dụng tiêu chuẩn xác thực pháp lý doanh nghiệp và chứng thư số hóa danh thiếp thông minh cho toàn thể Học viên gia nhập.',
             status: 'closed',
             startDate: new Date('2026-07-15'),
             endDate: new Date('2026-07-25'),
@@ -102,13 +102,13 @@ export class VotingRepository {
             INSERT INTO public.polls (id, title, description, status, start_date, end_date, created_at, updated_at)
             VALUES (${sp.id}::uuid, ${sp.title}, ${sp.description}, ${sp.status}, ${sp.startDate}, ${sp.endDate}, now(), now())
             ON CONFLICT (id) DO NOTHING
-          `.catch(() => {});
+          `.catch(() => { });
 
           for (const optTitle of sp.options) {
             await this.prisma.$executeRaw`
               INSERT INTO public.poll_options (poll_id, title, votes_count, created_at)
               VALUES (${sp.id}::uuid, ${optTitle}, 0, now())
-            `.catch(() => {});
+            `.catch(() => { });
           }
         }
       }
@@ -121,7 +121,7 @@ export class VotingRepository {
         ON CONFLICT (key) DO UPDATE SET value = 'true'
       `,
         )
-        .catch(() => {});
+        .catch(() => { });
       VotingRepository.seededOnce = true;
     } catch (e: any) {
       console.warn('ensureSeedPolls warning:', e?.message);
@@ -218,18 +218,18 @@ export class VotingRepository {
     `.catch(async () => {
       await this.prisma.$executeRaw`
         DELETE FROM public.poll_votes WHERE poll_id = ${safePollId}::uuid AND user_id = ${safeUserId}::uuid
-      `.catch(() => {});
+      `.catch(() => { });
       await this.prisma.$executeRaw`
         INSERT INTO public.poll_votes (id, poll_id, option_id, user_id, source_app, created_at)
         VALUES (${safeVoteId}::uuid, ${safePollId}::uuid, ${safeOptId}::uuid, ${safeUserId}::uuid, ${source}, now())
-      `.catch(() => {});
+      `.catch(() => { });
     });
 
     await this.prisma.$executeRaw`
       UPDATE public.poll_options
       SET votes_count = (SELECT COUNT(*)::int FROM public.poll_votes WHERE option_id = public.poll_options.id)
       WHERE poll_id = ${safePollId}::uuid
-    `.catch(() => {});
+    `.catch(() => { });
   }
 
   async findEventDate(eventId: string): Promise<any[]> {
@@ -267,7 +267,7 @@ export class VotingRepository {
       ALTER TABLE public.polls ADD COLUMN IF NOT EXISTS training_id UUID;
       ALTER TABLE public.polls ADD COLUMN IF NOT EXISTS target_type TEXT;
       ALTER TABLE public.polls ADD COLUMN IF NOT EXISTS target_id TEXT;
-    `).catch(() => {});
+    `).catch(() => { });
 
     await this.prisma.$executeRawUnsafe(`
       INSERT INTO public.polls (
@@ -299,7 +299,7 @@ export class VotingRepository {
     await this.prisma.$executeRaw`
       INSERT INTO public.poll_options (id, poll_id, title, votes_count, created_at)
       VALUES (${safeOptId}::uuid, ${safePollId}::uuid, ${title}, 0, now())
-    `.catch(() => {});
+    `.catch(() => { });
   }
 
   async findAudienceUsers(audience: string): Promise<any[]> {
@@ -355,7 +355,7 @@ export class VotingRepository {
         safeDisplayData,
         dedupeKey,
       )
-      .catch(() => {});
+      .catch(() => { });
 
     await this.prisma
       .$executeRawUnsafe(
@@ -371,7 +371,7 @@ export class VotingRepository {
         body,
         pollId,
       )
-      .catch(() => {});
+      .catch(() => { });
   }
 
   async markPollClosed(id: string): Promise<void> {
@@ -379,7 +379,7 @@ export class VotingRepository {
       UPDATE public.polls
       SET status = 'closed', updated_at = now()
       WHERE id = ${id}::uuid
-    `.catch(() => {});
+    `.catch(() => { });
   }
 
   async updatePollRaw(
@@ -402,7 +402,7 @@ export class VotingRepository {
             end_date = COALESCE(${endDt}, end_date),
             updated_at = now()
         WHERE id = ${id}::uuid
-      `.catch(() => {});
+      `.catch(() => { });
     } else {
       await this.prisma.$executeRaw`
         UPDATE public.polls
@@ -413,20 +413,20 @@ export class VotingRepository {
             end_date = COALESCE(${endDt}, end_date),
             updated_at = now()
         WHERE id = ${id}::uuid
-      `.catch(() => {});
+      `.catch(() => { });
     }
   }
 
   async deletePollRaw(id: string): Promise<void> {
     await this.prisma.$executeRaw`
       DELETE FROM public.poll_votes WHERE poll_id = ${id}::uuid
-    `.catch(() => {});
+    `.catch(() => { });
     await this.prisma.$executeRaw`
       DELETE FROM public.poll_options WHERE poll_id = ${id}::uuid
-    `.catch(() => {});
+    `.catch(() => { });
     await this.prisma.$executeRaw`
       DELETE FROM public.polls WHERE id = ${id}::uuid
-    `.catch(() => {});
+    `.catch(() => { });
   }
 
   async findMemberForLuckyDraw(
@@ -490,7 +490,7 @@ export class VotingRepository {
         safeDisplayData,
         `lucky-win-${Date.now()}`,
       )
-      .catch(() => {});
+      .catch(() => { });
 
     // 2. Member in-app notifications pointing to perks
     await this.prisma
@@ -507,7 +507,7 @@ export class VotingRepository {
         body,
         eventId || 'lucky-draw',
       )
-      .catch(() => {});
+      .catch(() => { });
 
     // 3. Official broadcast notification
     await this.prisma
@@ -524,7 +524,7 @@ export class VotingRepository {
         title,
         body,
       )
-      .catch(() => {});
+      .catch(() => { });
 
     // 4. Create custom perk reward voucher in public.perks for the member
     const perkTitle = prizeTitle ? `🎁 Phần thưởng: ${prizeTitle}` : title;
@@ -539,16 +539,16 @@ export class VotingRepository {
     `,
         perkTitle,
         eventName || 'Ban Tổ Chức CEO HN10',
-        `Phần thưởng sự kiện dành cho hội viên ${memberCode || ''}`,
+        `Phần thưởng sự kiện dành cho Học viên ${memberCode || ''}`,
         body,
       )
-      .catch(() => {});
+      .catch(() => { });
 
     if (memberCode) {
       await this.prisma.$executeRaw`
         INSERT INTO public.messages (id, from_id, to_id, text, created_at)
         VALUES (gen_random_uuid(), 'ADMIN', ${String(memberCode).toLowerCase()}, ${body}, NOW())
-      `.catch(() => {});
+      `.catch(() => { });
     }
   }
 }

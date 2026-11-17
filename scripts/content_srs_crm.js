@@ -20,12 +20,12 @@ Tài liệu xác định rõ ràng:
 - Toàn bộ các yêu cầu phi chức năng (Non-Functional Requirements) về hiệu năng, bảo mật, độ tin cậy, tính toàn vẹn dữ liệu và tiêu chuẩn thẩm mỹ doanh nhân.
 
 ### 1.2. Phạm vi hệ thống
-Hệ thống Cổng Quản trị Web CRM đóng vai trò là "Bộ não điều hành số" trung tâm của hiệp hội, kết nối liên thông thời gian thực với Ứng dụng Di động của các hội viên doanh nhân. Hệ thống phục vụ cho các cấp lãnh đạo: Chủ tịch, Admin quản trị, Ban Điều Hành, Tổng thư ký, 5 Trưởng ban chuyên môn (Thành viên, Xúc tiến thương mại, Tài chính, Truyền thông, Thiện nguyện) và Ban Thư ký câu lạc bộ.
+Hệ thống Cổng Quản trị Web CRM đóng vai trò là "Bộ não điều hành số" trung tâm của hiệp hội, kết nối liên thông thời gian thực với Ứng dụng Di động của các Học viên doanh nhân. Hệ thống phục vụ cho các cấp lãnh đạo: Chủ tịch, Admin quản trị, Ban Điều Hành, Tổng thư ký, 5 Trưởng ban chuyên môn (Thành viên, Xúc tiến thương mại, Tài chính, Truyền thông, Thiện nguyện) và Ban Thư ký câu lạc bộ.
 
 ### 1.3. Định nghĩa thuật ngữ & Từ viết tắt
 - **Hiệp hội / Câu lạc bộ**: CLB Doanh Nhân CEO HN10 trực thuộc Hội Doanh Nghiệp Trẻ Hà Nội (HanoiBA).
-- **Hội viên chính danh**: Doanh nhân sinh năm 1983 (Quý Hợi), là người đại diện pháp luật hoặc lãnh đạo cấp cao của doanh nghiệp thành lập hợp pháp, đã được Ban Thành Viên thẩm định và cấp Mã số hội viên dạng \`CEO-83xxx\`.
-- **Thẻ thông minh doanh nhân / Công nghệ chạm thẻ thông minh 1 chạm**: Tấm thẻ định danh điện tử mạ vàng độc bản của hội viên tích hợp chip cảm ứng bảo mật cao; chỉ cần chạm nhẹ thẻ vào điện thoại là truyền tải tức thì hồ sơ doanh nhân, website và thông tin liên hệ trong vòng dưới 1 giây mà đối tác không cần cài ứng dụng.
+- **Học viên chính danh**: Doanh nhân sinh năm 1983 (Quý Hợi), là người đại diện pháp luật hoặc lãnh đạo cấp cao của doanh nghiệp thành lập hợp pháp, đã được Ban Thành Viên thẩm định và cấp Mã số Học viên dạng \`CEO-83xxx\`.
+- **Thẻ thông minh doanh nhân / Công nghệ chạm thẻ thông minh 1 chạm**: Tấm thẻ định danh điện tử mạ vàng độc bản của Học viên tích hợp chip cảm ứng bảo mật cao; chỉ cần chạm nhẹ thẻ vào điện thoại là truyền tải tức thì hồ sơ doanh nhân, website và thông tin liên hệ trong vòng dưới 1 giây mà đối tác không cần cài ứng dụng.
 - **Mã VietQR Napas 24/7**: Chuẩn mã thanh toán chuyển khoản ngân hàng nhanh quốc gia, tích hợp sẵn số tài khoản hiệp hội và cú pháp đối soát tự động.
 - **Khán phòng Seating Map**: Sơ đồ chỗ ngồi đại biểu trực quan dạng bàn tiệc tròn (10 người/bàn) hoặc dãy ghế rạp chiếu phim có phân khu bàn VIP cho lãnh đạo và nhà tài trợ.
 
@@ -34,7 +34,7 @@ Hệ thống Cổng Quản trị Web CRM đóng vai trò là "Bộ não điều 
 # PHẦN 2: MÔ TẢ TỔNG QUAN KIẾN TRÚC & NGƯỜI DÙNG
 
 ### 2.1. Kiến trúc kết nối đồng bộ 2 chiều thời gian thực (Realtime Dual-Sync)
-Hệ thống CRM và Ứng dụng Di động chia sẻ chung một cơ sở dữ liệu duy nhất. Mọi biến động trạng thái từ Web CRM (phê duyệt kết nạp, phân bổ nhiệm vụ, ban hành thông báo hội phí, xuất bản sự kiện) lập tức phát tín hiệu đẩy chuông tới điện thoại hội viên. Ngược lại, mọi tương tác từ ứng dụng di động (quét mã VietQR nộp tiền, báo cáo tiến độ bằng ảnh camera hiện trường, quét mã QR check-in tại cổng) lập tức hiển thị lên màn hình Web CRM trong vòng dưới 1 giây.
+Hệ thống CRM và Ứng dụng Di động chia sẻ chung một cơ sở dữ liệu duy nhất. Mọi biến động trạng thái từ Web CRM (phê duyệt kết nạp, phân bổ nhiệm vụ, ban hành thông báo hội phí, xuất bản sự kiện) lập tức phát tín hiệu đẩy chuông tới điện thoại Học viên. Ngược lại, mọi tương tác từ ứng dụng di động (quét mã VietQR nộp tiền, báo cáo tiến độ bằng ảnh camera hiện trường, quét mã QR check-in tại cổng) lập tức hiển thị lên màn hình Web CRM trong vòng dưới 1 giây.
 
 ### 2.2. Cơ cấu phân cấp quản trị 7 cấp bậc (RBAC Matrix)
 1. **Cấp 1 - Chủ tịch Hiệp hội (\`chu_tich\`)**: Toàn quyền phê chuẩn nghị quyết, chỉ đạo liên ban và giám sát toàn diện dữ liệu.
@@ -43,7 +43,7 @@ Hệ thống CRM và Ứng dụng Di động chia sẻ chung một cơ sở dữ
 4. **Cấp 4 - Tổng thư ký (\`tong_thu_ky\`)**: Điều hành Văn phòng Ban Thư Ký; thẩm quyền giao việc giới hạn cho Ban Thư Ký.
 5. **Cấp 5 - Trưởng các Ban Chuyên môn (\`truong_ban_*\`)**: Phụ trách độc quyền ban của mình (Thành viên, Xúc tiến, Tài chính, Truyền thông, Thiện nguyện); chỉ giao việc cho thành viên thuộc ban mình phụ trách.
 6. **Cấp 6 - Ban Thư ký (\`ban_thu_ky\`)**: Cán bộ văn phòng thừa hành nhiệm vụ từ Tổng thư ký và Ban Điều Hành.
-7. **Cấp 7 - Hội viên Doanh nhân (\`member\`)**: Thành viên sinh hoạt, nhận nhiệm vụ và kết nối giao thương.
+7. **Cấp 7 - Học viên Doanh nhân (\`member\`)**: Thành viên sinh hoạt, nhận nhiệm vụ và kết nối giao thương.
 
 ---
 
@@ -52,20 +52,20 @@ Hệ thống CRM và Ứng dụng Di động chia sẻ chung một cơ sở dữ
 ## 3.1. Phân hệ Bảng Điều Hành Trung Tâm & Đo Lường Tổng Quan (Executive Dashboard)
 
 ### 3.1.1. Thông tin chung
-- **Mục tiêu**: Cung cấp bức tranh toàn cảnh tức thời (Real-time Snapshot) về sức khỏe tổ chức, quy mô hội viên, tiến độ thu ngân quỹ, tỷ lệ hoàn thành công việc và diễn biến các sự kiện lớn.
+- **Mục tiêu**: Cung cấp bức tranh toàn cảnh tức thời (Real-time Snapshot) về sức khỏe tổ chức, quy mô Học viên, tiến độ thu ngân quỹ, tỷ lệ hoàn thành công việc và diễn biến các sự kiện lớn.
 - **Phạm vi thẩm quyền**:
   - Chủ tịch, Admin và Ban Điều Hành xem được toàn bộ chỉ số tài chính, hội đồng thành viên và KPI liên ban.
   - Trưởng ban chuyên môn chỉ xem được các thẻ chỉ số KPI thuộc ban mình phụ trách.
 
 ### 3.1.2. Màn hình
 - **3.1.2.1. Tìm kiếm / Lọc kỳ báo cáo**: Lọc theo Năm tài chính, Quý hoặc Tháng hoạt động.
-- **3.1.2.2. Danh sách chỉ số đo lường (KPI Cards)**: 4 thẻ số liệu vàng hoàng gia: Tổng số hội viên chính danh, Tổng thu ngân quỹ niên liễm, Tỷ lệ công việc hoàn thành đúng hạn, Lượt kết nối giao thương B2B.
-- **3.1.2.3. Thiết lập mục tiêu năm**: Biểu mẫu nhập kế hoạch chỉ tiêu phát triển hội viên và doanh số giao thương nội bộ.
+- **3.1.2.2. Danh sách chỉ số đo lường (KPI Cards)**: 4 thẻ số liệu vàng hoàng gia: Tổng số Học viên chính danh, Tổng thu ngân quỹ niên liễm, Tỷ lệ công việc hoàn thành đúng hạn, Lượt kết nối giao thương B2B.
+- **3.1.2.3. Thiết lập mục tiêu năm**: Biểu mẫu nhập kế hoạch chỉ tiêu phát triển Học viên và doanh số giao thương nội bộ.
 - **3.1.2.4. Chỉnh sửa chỉ tiêu**: Điều chỉnh chỉ tiêu định kỳ sau phiên họp giữa niên độ.
 - **3.1.2.5. Chỉ định người lập báo cáo**: Phân công Thư ký tổng hợp báo cáo quý.
-- **3.1.2.6. Lịch sử biến động chỉ số**: Biểu đồ đường thời gian theo dõi tăng trưởng hội viên qua các năm.
+- **3.1.2.6. Lịch sử biến động chỉ số**: Biểu đồ đường thời gian theo dõi tăng trưởng Học viên qua các năm.
 - **3.1.2.7. Ẩn / Đặt lại widget**: Tùy biến hiển thị các khối nội dung trên bảng điều hành.
-- **3.1.2.8. Xem chi tiết báo cáo phân tích**: Màn hình xem sâu phân bổ hội viên theo ngành nghề kinh doanh và tình trạng đóng hội phí.
+- **3.1.2.8. Xem chi tiết báo cáo phân tích**: Màn hình xem sâu phân bổ Học viên theo ngành nghề kinh doanh và tình trạng đóng hội phí.
 
 ### 3.1.3. Mô tả chi tiết màn hình
 #### 3.1.3.1. Tìm kiếm & Bộ lọc
@@ -76,7 +76,7 @@ Hệ thống CRM và Ứng dụng Di động chia sẻ chung một cơ sở dữ
 | Tên trường | Nhãn hiển thị | Kiểu dữ liệu | Bắt buộc | Giá trị mặc định | Dải giá trị cho phép | Quy tắc kiểm tra (Validation) |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | \`targetYear\` | Năm kế hoạch | Chọn một | Có | Năm hiện tại | 2024 - 2030 | Bắt buộc chọn đúng năm |
-| \`targetMembers\`| Chỉ tiêu kết nạp (Hội viên)| Số nguyên | Có | 100 | 10 đến 1.000 | Phải là số dương |
+| \`targetMembers\`| Chỉ tiêu kết nạp (Học viên)| Số nguyên | Có | 100 | 10 đến 1.000 | Phải là số dương |
 | \`targetRevenue\`| Chỉ tiêu ngân quỹ (VNĐ) | Số tiền tệ | Có | 1.000.000.000 | 100 triệu đến 50 tỷ | Định dạng dấu chấm hàng nghìn |
 | \`targetDeals\` | Chỉ tiêu cơ hội B2B | Số nguyên | Có | 200 | 20 đến 2.000 | Số lượng giao dịch kết nối |
 | \`focusSector\` | Ngành mũi nhọn ưu tiên | Chọn nhiều | Không | Rỗng | 12 nhóm ngành B2B | Xem quy tắc giao diện động |
@@ -88,7 +88,7 @@ Hệ thống CRM và Ứng dụng Di động chia sẻ chung một cơ sở dữ
     - Màn hình tự động ẩn mục chỉ tiêu ngân quỹ toàn hiệp hội, chỉ hiển thị mục tiêu công việc nội bộ ban.
 
 #### 3.1.3.3. Bảng danh sách hoạt động gần đây
-- Dòng thời gian hiển thị 10 sự kiện mới nhất: Hội viên mới được kết nạp, Phiếu nộp hội phí thành công, Nhiệm vụ vừa được nghiệm thu đạt.
+- Dòng thời gian hiển thị 10 sự kiện mới nhất: Học viên mới được kết nạp, Phiếu nộp hội phí thành công, Nhiệm vụ vừa được nghiệm thu đạt.
 
 #### 3.1.3.4. Lịch sử chỉ tiêu
 - Bảng đối sánh giữa kế hoạch đề ra và kết quả thực tế đạt được.
@@ -100,7 +100,7 @@ Hệ thống CRM và Ứng dụng Di động chia sẻ chung một cơ sở dữ
 - Hộp thoại chọn thành viên Ban Thư Ký xuất báo cáo tổng hợp.
 
 #### 3.1.3.7. Xem chi tiết biểu đồ phân tích
-- Biểu đồ tròn cơ cấu hội viên theo ngành, biểu đồ cột thu chi tài chính 12 tháng.
+- Biểu đồ tròn cơ cấu Học viên theo ngành, biểu đồ cột thu chi tài chính 12 tháng.
 
 ### 3.1.4. Luồng nghiệp vụ
 - **3.1.4.1. Xem tổng quan**: Đăng nhập CRM -> Hệ thống hiển thị bảng điều hành tự động cập nhật số liệu.
@@ -111,7 +111,7 @@ Hệ thống CRM và Ứng dụng Di động chia sẻ chung một cơ sở dữ
 - **3.1.4.6. Xuất báo cáo điều hành**: Xuất báo cáo tổng quan ra tệp Excel hoặc PDF.
 
 ### 3.1.5. Đặc tả tương tác giao tiếp dữ liệu / API
-- **3.1.5.1. Lấy dữ liệu KPI tổng quan**: Trả về số lượng hội viên, quỹ tiền, tiến độ công việc.
+- **3.1.5.1. Lấy dữ liệu KPI tổng quan**: Trả về số lượng Học viên, quỹ tiền, tiến độ công việc.
 - **3.1.5.2. Lấy dữ liệu biểu đồ phân bổ**: Trả về tỷ lệ phần trăm theo ngành và theo ban.
 - **3.1.5.3. Lưu chỉ tiêu kế hoạch mới**: Ghi nhận chỉ tiêu vào cơ sở dữ liệu.
 - **3.1.5.4. Lưu nháp chỉ tiêu**: Lưu vào bộ nhớ tạm.
@@ -132,11 +132,11 @@ Hệ thống CRM và Ứng dụng Di động chia sẻ chung một cơ sở dữ
 - **3.2.2.1. Tìm kiếm**: Khung tìm chức năng theo từ khóa, lọc theo Ban chuyên môn và lọc theo Cấp bậc vai trò.
 - **3.2.2.2. Danh sách ma trận quyền**: Bảng ma trận hiển thị 30 dòng chức năng x các cột vai trò kèm ô chọn bật/tắt (Xem, Thêm, Sửa, Xóa, Duyệt).
 - **3.2.2.3. Thêm mới vai trò / Gán quyền**: Biểu mẫu gán vai trò lãnh đạo hoặc bổ nhiệm nhân sự mới.
-- **3.2.2.4. Chỉnh sửa quyền**: Bật/tắt từng đặc quyền của hội viên.
+- **3.2.2.4. Chỉnh sửa quyền**: Bật/tắt từng đặc quyền của Học viên.
 - **3.2.2.5. Chọn đầu mối phụ trách ban**: Hộp thoại chỉ định Trưởng ban chuyên môn.
 - **3.2.2.6. Lịch sử thay đổi quyền (Audit Log)**: Bảng nhật ký ghi vết ai đã sửa quyền của ai, vào thời gian nào và từ địa chỉ mạng nào.
-- **3.2.2.7. Thu hồi quyền đặc biệt**: Hộp thoại hoàn trả quyền tài khoản về quyền Hội viên mặc định.
-- **3.2.2.8. Xem chi tiết quyền tài khoản**: Cửa sổ kiểm tra toàn bộ các quyền được phép và bị cấm của một hội viên cụ thể.
+- **3.2.2.7. Thu hồi quyền đặc biệt**: Hộp thoại hoàn trả quyền tài khoản về quyền Học viên mặc định.
+- **3.2.2.8. Xem chi tiết quyền tài khoản**: Cửa sổ kiểm tra toàn bộ các quyền được phép và bị cấm của một Học viên cụ thể.
 
 ### 3.2.3. Mô tả chi tiết màn hình
 #### 3.2.3.1. Tìm kiếm & Bộ lọc ma trận quyền
@@ -146,8 +146,8 @@ Hệ thống CRM và Ứng dụng Di động chia sẻ chung một cơ sở dữ
 #### 3.2.3.2. Biểu mẫu Thêm mới / Gán vai trò Lãnh đạo
 | Tên trường | Nhãn hiển thị | Kiểu dữ liệu | Bắt buộc | Giá trị mặc định | Dải giá trị cho phép | Quy tắc kiểm tra (Validation) |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| \`memberId\` | Chọn hội viên | Chọn danh sách | Có | Rỗng | Danh sách hội viên chính danh | Phải là hội viên đang hoạt động |
-| \`systemRole\` | Vai trò lãnh đạo | Chọn một | Có | Thành viên | Chủ tịch, Admin, Ban Điều Hành, Tổng thư ký, Trưởng ban, Ban thư ký, Hội viên | Bắt buộc chọn đúng vai trò |
+| \`memberId\` | Chọn Học viên | Chọn danh sách | Có | Rỗng | Danh sách Học viên chính danh | Phải là Học viên đang hoạt động |
+| \`systemRole\` | Vai trò lãnh đạo | Chọn một | Có | Thành viên | Chủ tịch, Admin, Ban Điều Hành, Tổng thư ký, Trưởng ban, Ban thư ký, Học viên | Bắt buộc chọn đúng vai trò |
 | \`department\` | Ban chuyên môn | Chọn một | Có | Tùy vai trò | 6 Ban chuyên môn chính thức | Xem quy tắc giao diện động |
 | \`assignedScope\`| Phạm vi phụ trách | Chọn một | Không | Nội bộ ban | Nội bộ ban, Toàn hiệp hội | Xem quy tắc giao diện động |
 | \`validUntil\` | Thời hạn ủy quyền | Ngày tháng | Không | Không thời hạn | Từ ngày hiện tại trở đi | Chuẩn dd/mm/yyyy |
@@ -169,10 +169,10 @@ Hệ thống CRM và Ứng dụng Di động chia sẻ chung một cơ sở dữ
 - Ghi nhận chi tiết: Thời gian, Người thực hiện, Người bị thay đổi, Quyền cũ -> Quyền mới.
 
 #### 3.2.3.5. Hộp thoại Thu hồi quyền
-- Cảnh báo chuyển tài khoản về quyền Hội viên cơ bản, yêu cầu nhập lý do thu hồi.
+- Cảnh báo chuyển tài khoản về quyền Học viên cơ bản, yêu cầu nhập lý do thu hồi.
 
 #### 3.2.3.6. Popup Chọn đầu mối Trưởng ban
-- Tìm kiếm nhanh hội viên uy tín để gán vào vị trí Trưởng ban.
+- Tìm kiếm nhanh Học viên uy tín để gán vào vị trí Trưởng ban.
 
 #### 3.2.3.7. Xem chi tiết quyền hạn
 - Bảng trực quan: Xanh lá (Được phép thao tác), Đỏ (Bị cấm thao tác).
@@ -187,37 +187,37 @@ Hệ thống CRM và Ứng dụng Di động chia sẻ chung một cơ sở dữ
 
 ### 3.2.5. Đặc tả tương tác giao tiếp dữ liệu / API
 - **3.2.5.1. Lấy ma trận quyền hiện tại**: Trả về 30 chức năng và quyền của 7 vai trò.
-- **3.2.5.2. Lấy danh sách hội viên theo ban**: Trả về hội viên thuộc ban được chọn.
+- **3.2.5.2. Lấy danh sách Học viên theo ban**: Trả về Học viên thuộc ban được chọn.
 - **3.2.5.3. Cập nhật ma trận quyền chính thức**: Lưu thay đổi và ghi audit log.
 - **3.2.5.4. Lưu nháp ma trận**: Lưu tạm cấu hình.
-- **3.2.5.5. Cập nhật vai trò hội viên**: Đổi chức danh và cấp bậc tài khoản.
+- **3.2.5.5. Cập nhật vai trò Học viên**: Đổi chức danh và cấp bậc tài khoản.
 - **3.2.5.6. Chỉnh sửa quyền tài khoản**: Cập nhật các quyền bật/tắt bổ sung.
-- **3.2.5.7. Thu hồi quyền đặc biệt**: Đặt lại vai trò mặc định Hội viên.
+- **3.2.5.7. Thu hồi quyền đặc biệt**: Đặt lại vai trò mặc định Học viên.
 - **3.2.5.8. Lấy danh mục 7 cấp bậc vai trò**: Trả về hằng số vai trò chuẩn hiệp hội.
 
 ---
 
-## 3.3. Phân hệ Quản lý Hội Viên & Thẩm Định Kết Nạp 360° (/members)
+## 3.3. Phân hệ Quản lý Học viên & Thẩm Định Kết Nạp 360° (/members)
 
 ### 3.3.1. Thông tin chung
-- **Mục tiêu**: Quản trị vòng đời hội viên từ tiếp nhận hồ sơ, thẩm định điều kiện năm sinh 1983 (Quý Hợi), phê duyệt kết nạp, cấp mã số \`CEO-83xxx\` đến quản lý sinh hoạt hội viên.
-- **Thẩm quyền độc quyền**: Ban Thành Viên chịu trách nhiệm chính về thẩm định và kết nạp; Ban Thư Ký không có quyền duyệt kết nạp. Xóa hội viên áp dụng cơ chế Xóa liên thông (Cascade Deletion) sạch sẽ.
+- **Mục tiêu**: Quản trị vòng đời Học viên từ tiếp nhận hồ sơ, thẩm định điều kiện năm sinh 1983 (Quý Hợi), phê duyệt kết nạp, cấp mã số \`CEO-83xxx\` đến quản lý sinh hoạt Học viên.
+- **Thẩm quyền độc quyền**: Ban Thành Viên chịu trách nhiệm chính về thẩm định và kết nạp; Ban Thư Ký không có quyền duyệt kết nạp. Xóa Học viên áp dụng cơ chế Xóa liên thông (Cascade Deletion) sạch sẽ.
 
 ### 3.3.2. Màn hình
-- **3.3.2.1. Tìm kiếm**: Tìm kiếm đa năng (Tên, Mã hội viên, Số điện thoại, Mã số thuế) và lọc theo Ban, Trạng thái hội phí, Trạng thái sinh hoạt.
-- **3.3.2.2. Danh sách dữ liệu**: Bảng danh sách hội viên hiển thị avatar, họ tên, chức vụ, tên công ty, mã số thuế, ban phụ trách, trạng thái thẻ thông minh.
+- **3.3.2.1. Tìm kiếm**: Tìm kiếm đa năng (Tên, Mã Học viên, Số điện thoại, Mã số thuế) và lọc theo Ban, Trạng thái hội phí, Trạng thái sinh hoạt.
+- **3.3.2.2. Danh sách dữ liệu**: Bảng danh sách Học viên hiển thị avatar, họ tên, chức vụ, tên công ty, mã số thuế, ban phụ trách, trạng thái thẻ thông minh.
 - **3.3.2.3. Tiếp nhận hồ sơ kết nạp mới**: Biểu mẫu đăng ký gồm: Thông tin cá nhân lãnh đạo, Pháp nhân doanh nghiệp, Năng lực cung ứng, Người giới thiệu.
 - **3.3.2.4. Chỉnh sửa hồ sơ**: Cập nhật thông tin liên hệ hoặc điều chỉnh phân bổ ban.
 - **3.3.2.5. Chỉ định cán bộ thẩm định**: Hộp thoại chọn thành viên Ban Thành Viên đi khảo sát cơ sở thực tế.
 - **3.3.2.6. Lịch sử sinh hoạt & Đóng phí**: Theo dõi quá trình tham gia đại hội, nộp hội phí qua các năm.
-- **3.3.2.7. Xóa hội viên liên thông**: Hộp thoại xác nhận xóa vĩnh viễn và tự động giải phóng toàn bộ doanh nghiệp, gian hàng B2B và tài khoản liên quan.
+- **3.3.2.7. Xóa Học viên liên thông**: Hộp thoại xác nhận xóa vĩnh viễn và tự động giải phóng toàn bộ doanh nghiệp, gian hàng B2B và tài khoản liên quan.
 - **3.3.2.8. Xem chi tiết hồ sơ 360°**: Toàn cảnh 4 tab: Doanh nhân, Pháp nhân công ty, Gian hàng sản phẩm và Lịch sử cống hiến.
 
 ### 3.3.3. Mô tả chi tiết màn hình
 #### 3.3.3.1. Tìm kiếm & Bộ lọc
 - Tìm kiếm tức thì độ trễ 300ms. Dropdown lọc trạng thái: Đang hoạt động, Chờ thẩm định, Tạm ngưng sinh hoạt.
 
-#### 3.3.3.2. Biểu mẫu Thêm mới / Kết nạp Hội viên
+#### 3.3.3.2. Biểu mẫu Thêm mới / Kết nạp Học viên
 | Tên trường | Nhãn hiển thị | Kiểu dữ liệu | Bắt buộc | Giá trị mặc định | Dải giá trị cho phép | Quy tắc kiểm tra (Validation) |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | \`fullName\` | Họ và tên | Văn bản ngắn | Có | Rỗng | 2 - 100 ký tự | Tự động viết hoa, cắt khoảng trắng thừa |
@@ -226,23 +226,23 @@ Hệ thống CRM và Ứng dụng Di động chia sẻ chung một cơ sở dữ
 | \`personalEmail\`| Thư điện tử | Email | Có | Rỗng | Tối đa 150 ký tự | Định dạng email hợp lệ, duy nhất |
 | \`companyName\` | Tên doanh nghiệp | Văn bản ngắn | Có | Rỗng | 5 - 250 ký tự | Tên công ty theo ĐKKD |
 | \`taxId\` | Mã số thuế | Ký tự số | Có | Rỗng | 10 hoặc 13 số | Kiểm tra hợp lệ theo chuẩn Thuế |
-| \`memberType\` | Phân hạng hội viên | Chọn một | Có | Hội viên Chính thức | Chính thức, Danh dự, Liên kết | Xem quy tắc giao diện động |
+| \`memberType\` | Phân hạng Học viên | Chọn một | Có | Học viên Chính thức | Chính thức, Danh dự, Liên kết | Xem quy tắc giao diện động |
 | \`assignedBan\` | Phân bổ Ban chuyên môn | Chọn một | Có | Ban Thành Viên | 6 Ban chuyên môn chính thức | Bắt buộc chọn đúng ban |
 
 - **Hành vi tương tác giao diện động theo giá trị chọn (Select-State UI Dependencies)**:
-  - *Khi chọn "Phân hạng hội viên" = "Hội viên Chính thức"*:
+  - *Khi chọn "Phân hạng Học viên" = "Học viên Chính thức"*:
     - Bắt buộc kiểm tra năm sinh phải bằng 1983. Nếu khác 1983, viền đỏ cảnh báo vi phạm điều lệ hiệp hội.
-    - Tự động sinh mã hội viên \`CEO-83xxx\` tăng dần.
-  - *Khi chọn "Phân hạng hội viên" = "Hội viên Danh dự"*:
+    - Tự động sinh mã Học viên \`CEO-83xxx\` tăng dần.
+  - *Khi chọn "Phân hạng Học viên" = "Học viên Danh dự"*:
     - Bỏ qua ràng buộc năm sinh 1983, hiển thị thêm trường nhập: *"Căn cứ quyết định công nhận danh dự"*.
 
-#### 3.3.3.3. Bảng danh sách hội viên
+#### 3.3.3.3. Bảng danh sách Học viên
 - Hiển thị ảnh đại diện tròn, họ tên in đậm, huy hiệu chức vụ mạ vàng, cột trạng thái xanh lá cây/vàng.
 
 #### 3.3.3.4. Lịch sử hồ sơ
 - Ghi nhận mọi lần cập nhật chức vụ hoặc thay đổi người đại diện pháp luật.
 
-#### 3.3.3.5. Hộp thoại Xóa hội viên liên thông
+#### 3.3.3.5. Hộp thoại Xóa Học viên liên thông
 - Cảnh báo cấp cao nhất (Nền đỏ đậm). Yêu cầu nhập lý do xóa và tự động xóa doanh nghiệp, sản phẩm, thẻ thông minh và tài khoản.
 
 #### 3.3.3.6. Popup Chọn cán bộ thẩm định
@@ -252,21 +252,21 @@ Hệ thống CRM và Ứng dụng Di động chia sẻ chung một cơ sở dữ
 - Tab 1 Doanh nhân & Thẻ thông minh mạ vàng; Tab 2 Doanh nghiệp; Tab 3 Sản phẩm B2B; Tab 4 Lịch sử hội phí & Sự kiện.
 
 ### 3.3.4. Luồng nghiệp vụ
-- **3.3.4.1. Tìm kiếm hội viên**: Lọc danh bạ nhanh chóng.
+- **3.3.4.1. Tìm kiếm Học viên**: Lọc danh bạ nhanh chóng.
 - **3.3.4.2. Lưu nháp hồ sơ ứng viên**: Tiếp nhận hồ sơ sơ bộ lưu nháp để chờ bổ sung bản quét Giấy phép ĐKKD.
 - **3.3.4.3. Phê duyệt kết nạp chính thức**: Ban Thành Viên thẩm định đạt điều kiện -> Bấm duyệt -> Tự động cấp mã \`CEO-83xxx\` và khởi tạo tài khoản.
-- **3.3.4.4. Xóa liên thông**: Thu hồi tư cách hội viên và xóa cascade dữ liệu liên thông.
+- **3.3.4.4. Xóa liên thông**: Thu hồi tư cách Học viên và xóa cascade dữ liệu liên thông.
 - **3.3.4.5. Xem chi tiết 360°**: Tra cứu toàn diện hồ sơ.
 - **3.3.4.6. Xuất danh bạ Excel**: Xuất danh bạ gửi Ban Chấp Hành.
 
 ### 3.3.5. Đặc tả tương tác giao tiếp dữ liệu / API
-- **3.3.5.1. Tra cứu hội viên**: Lấy danh sách hội viên phân trang.
+- **3.3.5.1. Tra cứu Học viên**: Lấy danh sách Học viên phân trang.
 - **3.3.5.2. Lấy hồ sơ chi tiết 360°**: Trả về dữ liệu 4 khối thông tin.
-- **3.3.5.3. Phê duyệt kết nạp mới**: Cấp mã hội viên duy nhất và tạo tài khoản.
+- **3.3.5.3. Phê duyệt kết nạp mới**: Cấp mã Học viên duy nhất và tạo tài khoản.
 - **3.3.5.4. Lưu nháp hồ sơ**: Lưu thông tin ứng viên chưa duyệt.
-- **3.3.5.5. Cập nhật hồ sơ hội viên**: Chỉnh sửa thông tin liên lạc.
+- **3.3.5.5. Cập nhật hồ sơ Học viên**: Chỉnh sửa thông tin liên lạc.
 - **3.3.5.6. Chỉnh sửa hồ sơ nháp**: Bổ sung tài liệu vào bản nháp.
-- **3.3.5.7. Xóa hội viên cascade**: Xóa hội viên và các bảng liên quan trong một giao dịch an toàn.
+- **3.3.5.7. Xóa Học viên cascade**: Xóa Học viên và các bảng liên quan trong một giao dịch an toàn.
 - **3.3.5.8. Lấy danh mục ngành nghề và phân hạng**: Trả về danh mục chuẩn.
 
 ---
@@ -275,7 +275,7 @@ Hệ thống CRM và Ứng dụng Di động chia sẻ chung một cơ sở dữ
 
 ### 3.4.1. Thông tin chung
 - **Mục tiêu**: Quản trị pháp nhân kinh tế của các doanh nghiệp thành viên CEO HN10. Minh bạch hóa hồ sơ năng lực, vốn điều lệ, quy mô nhân sự, trụ sở và chứng chỉ chất lượng để phục vụ kết nối giao thương nội bộ.
-- **Nguyên tắc gắn kết**: Mỗi doanh nghiệp bắt buộc liên kết với ít nhất một hội viên chính danh đại diện pháp luật.
+- **Nguyên tắc gắn kết**: Mỗi doanh nghiệp bắt buộc liên kết với ít nhất một Học viên chính danh đại diện pháp luật.
 
 ### 3.4.2. Màn hình
 - **3.4.2.1. Tìm kiếm**: Tìm doanh nghiệp theo tên, mã số thuế, ngành nghề hoặc địa bàn hoạt động.
@@ -317,7 +317,7 @@ Hệ thống CRM và Ứng dụng Di động chia sẻ chung một cơ sở dữ
 - Tạm khóa khả năng đăng tải sản phẩm của công ty trên sàn B2B khi doanh nghiệp đang tái cấu trúc.
 
 #### 3.4.3.6. Popup Gán đại diện pháp luật
-- Chọn hội viên CEO HN10 làm đại diện sở hữu doanh nghiệp.
+- Chọn Học viên CEO HN10 làm đại diện sở hữu doanh nghiệp.
 
 #### 3.4.3.7. Xem chi tiết Profile Công ty
 - Xem trực tiếp tệp hồ sơ năng lực PDF và danh sách các sản phẩm đang cung ứng.
@@ -326,7 +326,7 @@ Hệ thống CRM và Ứng dụng Di động chia sẻ chung một cơ sở dữ
 - **3.4.4.1. Tìm kiếm doanh nghiệp**: Lọc danh bạ doanh nghiệp thành viên.
 - **3.4.4.2. Lưu nháp hồ sơ công ty**: Soạn thảo thông tin công ty lưu nháp.
 - **3.4.4.3. Lưu chính thức hồ sơ pháp nhân**: Ban Thành Viên xác thực giấy phép ĐKKD -> Lưu chính thức vào danh bạ hiệp hội.
-- **3.4.4.4. Tạm dừng / Xóa doanh nghiệp**: Đình chỉ hoặc xóa hồ sơ doanh nghiệp khi hội viên giải tán công ty.
+- **3.4.4.4. Tạm dừng / Xóa doanh nghiệp**: Đình chỉ hoặc xóa hồ sơ doanh nghiệp khi Học viên giải tán công ty.
 - **3.4.4.5. Xem chi tiết năng lực**: Đối tác xem hồ sơ năng lực để chuẩn bị ký hợp đồng giao thương.
 - **3.4.4.6. Xuất danh bạ doanh nghiệp**: Xuất tệp Excel danh bạ doanh nhân phục vụ đại hội.
 
@@ -372,7 +372,7 @@ Hệ thống CRM và Ứng dụng Di động chia sẻ chung một cơ sở dữ
 | \`taskTitle\` | Tiêu đề nhiệm vụ | Văn bản ngắn | Có | Rỗng | 5 - 200 ký tự | Tự động cắt khoảng trắng thừa |
 | \`targetDepartment\`| Ban phụ trách | Chọn một | Có | Ban của người đăng nhập| 6 Ban chuyên môn | Phụ thuộc quyền hạn người đăng nhập |
 | \`assigneeId\` | Người chịu trách nhiệm chính| Chọn một | Có | Rỗng | Danh sách thành viên trong ban | Bắt buộc chọn đúng nhân sự hợp lệ |
-| \`collaborators\`| Người cùng phối hợp | Chọn nhiều | Không | Rỗng | Danh sách hội viên | Cho phép chọn tối đa 20 người |
+| \`collaborators\`| Người cùng phối hợp | Chọn nhiều | Không | Rỗng | Danh sách Học viên | Cho phép chọn tối đa 20 người |
 | \`priorityLevel\`| Mức độ ưu tiên | Chọn một | Có | Bình thường | Khẩn cấp, Cao, Bình thường, Thấp | Xem quy tắc giao diện động |
 | \`dueDate\` | Hạn chót hoàn thành | Ngày giờ | Có | +3 ngày | Sau thời điểm hiện tại | Chuẩn dd/mm/yyyy HH:mm |
 | \`budgetCost\` | Dự toán kinh phí (VNĐ) | Số tiền tệ | Không | 0 | 0 đến 50 tỷ VNĐ | Định dạng dấu chấm hàng nghìn |
@@ -393,7 +393,7 @@ Hệ thống CRM và Ứng dụng Di động chia sẻ chung một cơ sở dữ
 - Thẻ công việc hiển thị rõ: Tiêu đề, Tên người phụ trách kèm avatar tròn, Hạn chót (viền đỏ nếu quá hạn), Thanh tiến độ % hoàn thành, Số lượng tệp đính kèm.
 
 #### 3.5.3.4. Lịch sử tiến độ & Hồ sơ nghiệm thu
-- Hội viên nộp báo cáo kết quả kèm ảnh hiện trường và file Word/Excel; người giao việc phản hồi đánh giá.
+- Học viên nộp báo cáo kết quả kèm ảnh hiện trường và file Word/Excel; người giao việc phản hồi đánh giá.
 
 #### 3.5.3.5. Hộp thoại Hủy nhiệm vụ
 - Người giao việc hủy bỏ nhiệm vụ kèm ghi chú lý do.
@@ -459,7 +459,7 @@ Hệ thống CRM và Ứng dụng Di động chia sẻ chung một cơ sở dữ
 | \`eventLocation\`| Địa điểm tổ chức | Văn bản ngắn | Có | Rỗng | 10 - 300 ký tự | Ghi rõ tên khách sạn/trung tâm |
 | \`capacityLimit\`| Sức chứa tối đa (Khách)| Số nguyên | Có | 200 | 10 đến 5.000 người | Giới hạn vé phát hành |
 | \`seatingLayout\`| Kiểu bố trí khán phòng | Chọn một | Có | Bàn tiệc tròn (Gala)| Bàn tròn Gala, Dãy ghế hội trường, Tự do | Xem quy tắc giao diện động |
-| \`isTicketPaid\` | Tính chất vé | Chọn một | Có | Miễn phí cho hội viên| Miễn phí, Có thu phí tham dự | Xem quy tắc giao diện động |
+| \`isTicketPaid\` | Tính chất vé | Chọn một | Có | Miễn phí cho Học viên| Miễn phí, Có thu phí tham dự | Xem quy tắc giao diện động |
 | \`bannerImage\` | Ảnh bìa sự kiện | Tải lên ảnh | Có | Rỗng | Tệp ảnh JPG/PNG (dưới 5MB, tỉ lệ 16:9) | Bắt buộc có ảnh banner sang trọng |
 
 - **Hành vi tương tác giao diện động theo giá trị chọn (Select-State UI Dependencies)**:
@@ -468,10 +468,10 @@ Hệ thống CRM và Ứng dụng Di động chia sẻ chung một cơ sở dữ
     - Hiển thị thêm các trường: *"Số lượng bàn tiệc"*, *"Số ghế mỗi bàn (Mặc định: 10 ghế/bàn)"*, *"Danh sách bàn VIP dành riêng cho Ban Điều Hành & Nhà tài trợ"*.
     - Trên sơ đồ trực quan, từng bàn tiệc tròn được hiển thị rõ số bàn (Bàn VIP 1, Bàn VIP 2, Bàn 3...) và tên của từng đại biểu ngồi tại ghế.
   - *Khi chọn "Tính chất vé" = "Có thu phí tham dự"*:
-    - Form **hiển thị thêm trường**: *"Giá vé cho Hội viên"* và *"Giá vé cho Khách mời ngoài CLB"*.
+    - Form **hiển thị thêm trường**: *"Giá vé cho Học viên"* và *"Giá vé cho Khách mời ngoài CLB"*.
     - Tự động tích hợp cổng thanh toán VietQR Napas 24/7: Khách mua vé bắt buộc quét mã thanh toán thành công mới được xuất vé điện tử.
-  - *Khi chọn "Tính chất vé" = "Miễn phí cho hội viên"*:
-    - Ẩn toàn bộ phần thanh toán; hội viên chỉ cần bấm "Đăng ký tham dự" là hệ thống tự động cấp vé và phân bổ chỗ ngồi.
+  - *Khi chọn "Tính chất vé" = "Miễn phí cho Học viên"*:
+    - Ẩn toàn bộ phần thanh toán; Học viên chỉ cần bấm "Đăng ký tham dự" là hệ thống tự động cấp vé và phân bổ chỗ ngồi.
 
 #### 3.6.3.3. Màn hình Cổng Soát vé QR Tốc độ cao (Check-in Desk)
 - Khung quét camera nhận diện mã QR vé trong 0.1 giây.
@@ -495,7 +495,7 @@ Hệ thống CRM và Ứng dụng Di động chia sẻ chung một cơ sở dữ
 ### 3.6.4. Luồng nghiệp vụ
 - **3.6.4.1. Tìm kiếm sự kiện**: Lọc sự kiện theo thời gian và trạng thái.
 - **3.6.4.2. Lưu nháp kế hoạch sự kiện**: Lưu dự thảo kế hoạch tổ chức sự kiện để lấy ý kiến Ban Chấp Hành.
-- **3.6.4.3. Xuất bản sự kiện chính thức**: Phát hành vé tham dự lên ứng dụng di động của toàn thể hội viên.
+- **3.6.4.3. Xuất bản sự kiện chính thức**: Phát hành vé tham dự lên ứng dụng di động của toàn thể Học viên.
 - **3.6.4.4. Hủy sự kiện**: Hủy sự kiện và hoàn tiền vé (nếu có).
 - **3.6.4.5. Điểm danh soát vé tại cổng**: Quét QR thẻ đại biểu tại bàn lễ tân trong 0.1 giây.
 - **3.6.4.6. Xuất danh sách đại biểu**: Xuất tệp Excel danh sách phục vụ công tác đối soát và truyền thông.
@@ -525,7 +525,7 @@ Hệ thống CRM và Ứng dụng Di động chia sẻ chung một cơ sở dữ
 - **3.7.2.2. Danh sách dữ liệu**: Sổ quỹ tài chính điện tử hiển thị ngày chứng từ, số phiếu thu/chi, phân loại khoản mục, số tiền, hình thức thanh toán, người lập và trạng thái phê duyệt.
 - **3.7.2.3. Lập phiếu thu mới**: Biểu mẫu lập khoản thu niên liễm, thu tài trợ hoặc khoản thu giao thương.
 - **3.7.2.4. Lập phiếu chi / Đề nghị tạm ứng**: Biểu mẫu đề xuất thanh toán chi phí hoạt động kèm chứng từ hóa đơn kế toán.
-- **3.7.2.5. Chọn đối tượng nộp / nhận**: Hộp thoại tìm nhanh hội viên hoặc đối tác cung cấp dịch vụ.
+- **3.7.2.5. Chọn đối tượng nộp / nhận**: Hộp thoại tìm nhanh Học viên hoặc đối tác cung cấp dịch vụ.
 - **3.7.2.6. Lịch sử giao dịch & Đối soát ngân hàng**: Bảng nhật ký đối chiếu biến động số dư tài khoản ngân hàng hiệp hội.
 - **3.7.2.7. Hủy phiếu thu chi**: Hộp thoại hủy phiếu tài chính với sự đồng thuận của Trưởng ban Tài chính.
 - **3.7.2.8. Xem chi tiết phiếu thu chi & Mã VietQR**: Màn hình hóa đơn điện tử hiển thị mã VietQR thanh toán 24/7 và thông tin kế toán.
@@ -540,7 +540,7 @@ Hệ thống CRM và Ứng dụng Di động chia sẻ chung một cơ sở dữ
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | \`voucherType\` | Loại phiếu | Chọn một | Có | Phiếu Thu | Phiếu Thu, Phiếu Chi, Đề nghị Tạm ứng | Xem quy tắc giao diện động |
 | \`fundCategory\` | Quỹ trực thuộc | Chọn một | Có | Quỹ hội phí thường niên | Quỹ hội phí, Quỹ thiện nguyện, Quỹ sự kiện, Quỹ hoạt động | Bắt buộc chọn đúng quỹ quản lý |
-| \`targetMember\` | Người nộp / Người nhận | Chọn một | Có | Rỗng | Danh sách hội viên/đối tác | Bắt buộc chọn đối tượng chính danh |
+| \`targetMember\` | Người nộp / Người nhận | Chọn một | Có | Rỗng | Danh sách Học viên/đối tác | Bắt buộc chọn đối tượng chính danh |
 | \`amountMoney\` | Số tiền (VNĐ) | Số tiền tệ | Có | Rỗng | 1.000 đến 100 tỷ VNĐ | Định dạng dấu chấm hàng nghìn, không số âm |
 | \`paymentMethod\`| Hình thức giao dịch | Chọn một | Có | Chuyển khoản VietQR | Chuyển khoản VietQR, Tiền mặt | Xem quy tắc giao diện động |
 | \`documentProof\`| Chứng từ / Hóa đơn kèm | Tải lên tệp | Có | Rỗng | Tệp ảnh hóa đơn, PDF sao kê | Bắt buộc có chứng từ kế toán |
@@ -549,13 +549,13 @@ Hệ thống CRM và Ứng dụng Di động chia sẻ chung một cơ sở dữ
 - **Hành vi tương tác giao diện động theo giá trị chọn (Select-State UI Dependencies)**:
   - *Khi chọn "Loại phiếu" = "Phiếu Thu" và "Quỹ trực thuộc" = "Quỹ hội phí thường niên"*:
     - Hệ thống **tự động điền số tiền niêm yết theo quy chế hiệp hội** (ví dụ: 10.000.000 VNĐ/năm).
-    - Tự động sinh mã chuyển khoản VietQR Napas 24/7 có sẵn số tài khoản hiệp hội và cú pháp nội dung: \`HOIPHI CEO HN10 [Mã hội viên] [Họ tên]\`.
-    - Sau khi thanh toán thành công, hệ thống tự động cập nhật niên khóa hội viên trên thẻ thông minh doanh nhân.
+    - Tự động sinh mã chuyển khoản VietQR Napas 24/7 có sẵn số tài khoản hiệp hội và cú pháp nội dung: \`HOIPHI CEO HN10 [Mã Học viên] [Họ tên]\`.
+    - Sau khi thanh toán thành công, hệ thống tự động cập nhật niên khóa Học viên trên thẻ thông minh doanh nhân.
   - *Khi chọn "Loại phiếu" = "Phiếu Chi" hoặc "Đề nghị Tạm ứng"*:
     - Giao diện **kích hoạt quy trình duyệt 3 cấp**: Cán bộ đề xuất -> Trưởng ban chuyên môn thẩm định -> Trưởng ban Tài chính hoặc Chủ tịch phê duyệt.
     - Hiển thị thêm trường "Thời hạn hoàn ứng" và bắt buộc tải lên chứng từ dự toán đã được duyệt.
   - *Khi chọn "Hình thức giao dịch" = "Chuyển khoản VietQR"*:
-    - Hiển thị trực tiếp khung mã VietQR trên màn hình để thủ quỹ hoặc hội viên quét thanh toán tức thì qua ứng dụng ngân hàng.
+    - Hiển thị trực tiếp khung mã VietQR trên màn hình để thủ quỹ hoặc Học viên quét thanh toán tức thì qua ứng dụng ngân hàng.
 
 #### 3.7.3.3. Bảng sổ quỹ tài chính
 - Bảng hiển thị tự động tính tổng: Tổng thu, Tổng chi, Số dư quỹ hiện hữu.
@@ -567,8 +567,8 @@ Hệ thống CRM và Ứng dụng Di động chia sẻ chung một cơ sở dữ
 #### 3.7.3.5. Hộp thoại Hủy phiếu thu chi
 - Yêu cầu nhập mật khẩu cấp cao và lý do hủy chứng từ kế toán.
 
-#### 3.7.3.6. Popup Chọn hội viên nộp tiền
-- Tìm kiếm nhanh theo Mã hội viên để tránh thu nhầm tiền của hội viên khác.
+#### 3.7.3.6. Popup Chọn Học viên nộp tiền
+- Tìm kiếm nhanh theo Mã Học viên để tránh thu nhầm tiền của Học viên khác.
 
 #### 3.7.3.7. Xem chi tiết phiếu thu chi
 - Bản in phiếu thu/chi chuẩn mực có đầy đủ chữ ký số của Chủ tịch, Kế toán trưởng và Thủ quỹ.
@@ -622,7 +622,7 @@ Hệ thống CRM và Ứng dụng Di động chia sẻ chung một cơ sở dữ
 | \`meetingStart\` | Thời gian bắt đầu | Ngày giờ | Có | +1 ngày 09:00 | Lớn hơn thời điểm hiện tại | Chuẩn dd/mm/yyyy HH:mm |
 | \`meetingEnd\` | Thời gian kết thúc | Ngày giờ | Có | +1 ngày 11:30 | Lớn hơn thời gian bắt đầu | Tối thiểu 30 phút |
 | \`onlineLink\` | Đường dẫn họp trực tuyến | Đường dẫn web | Không | Rỗng | Đường dẫn Zoom / Meet hợp lệ | Xem quy tắc giao diện động |
-| \`attendeeIds\` | Danh sách triệu tập | Chọn nhiều | Có | Rỗng | Danh sách hội viên | Tối thiểu chọn 2 người |
+| \`attendeeIds\` | Danh sách triệu tập | Chọn nhiều | Có | Rỗng | Danh sách Học viên | Tối thiểu chọn 2 người |
 | \`agendaDocs\` | Tài liệu nghị sự đính kèm | Tải lên tệp | Không | Rỗng | Tệp Word, Excel, PDF (tối đa 25MB) | Cho phép đính kèm nhiều tệp |
 
 - **Hành vi tương tác giao diện động theo giá trị chọn (Select-State UI Dependencies)**:
@@ -670,13 +670,13 @@ Hệ thống CRM và Ứng dụng Di động chia sẻ chung một cơ sở dữ
 ## 3.9. Phân hệ Quản trị Sàn Giao Thương B2B & Khớp Nối Cơ Hội Cung Cầu (/marketplace, /opportunities)
 
 ### 3.9.1. Thông tin chung
-- **Mục tiêu**: Thúc đẩy tối đa giá trị thặng dư thương mại cho các doanh nghiệp hội viên CEO HN10. Cho phép từng doanh nghiệp sở hữu một gian hàng số B2B giới thiệu các sản phẩm, giải pháp và năng lực mũi nhọn; kết nối trực tiếp cung cầu không qua trung gian.
+- **Mục tiêu**: Thúc đẩy tối đa giá trị thặng dư thương mại cho các doanh nghiệp Học viên CEO HN10. Cho phép từng doanh nghiệp sở hữu một gian hàng số B2B giới thiệu các sản phẩm, giải pháp và năng lực mũi nhọn; kết nối trực tiếp cung cầu không qua trung gian.
 - **Vai trò thẩm định kiểm duyệt**: Ban Xúc tiến thương mại độc quyền phụ trách kiểm duyệt chất lượng sản phẩm, chứng chỉ tiêu chuẩn và chính sách ưu đãi đặc quyền trước khi niêm yết lên sàn giao thương.
 
 ### 3.9.2. Màn hình
 - **3.9.2.1. Tìm kiếm**: Khung tìm kiếm sản phẩm/dịch vụ theo từ khóa, lọc theo Phân loại ngành nghề (12 nhóm ngành), Khoảng giá ưu đãi và Trạng thái kiểm duyệt.
-- **3.9.2.2. Danh sách dữ liệu**: Bảng quản lý gian hàng B2B hiển thị ảnh đại diện, tên sản phẩm, doanh nghiệp cung cấp, giá niêm yết, giá ưu đãi cho hội viên, số lượng yêu cầu báo giá và trạng thái kiểm duyệt.
-- **3.9.2.3. Đăng tải sản phẩm mới**: Biểu mẫu đưa sản phẩm lên sàn B2B gồm: Tên giải pháp, Ngành nghề, Mô tả tính năng, Giá thị trường, Mức chiết khấu đặc quyền cho hội viên CEO HN10, Chứng nhận chất lượng, Ảnh/Video giới thiệu.
+- **3.9.2.2. Danh sách dữ liệu**: Bảng quản lý gian hàng B2B hiển thị ảnh đại diện, tên sản phẩm, doanh nghiệp cung cấp, giá niêm yết, giá ưu đãi cho Học viên, số lượng yêu cầu báo giá và trạng thái kiểm duyệt.
+- **3.9.2.3. Đăng tải sản phẩm mới**: Biểu mẫu đưa sản phẩm lên sàn B2B gồm: Tên giải pháp, Ngành nghề, Mô tả tính năng, Giá thị trường, Mức chiết khấu đặc quyền cho Học viên CEO HN10, Chứng nhận chất lượng, Ảnh/Video giới thiệu.
 - **3.9.2.4. Chỉnh sửa**: Điều chỉnh chính sách khuyến mãi hoặc cập nhật thông số kỹ thuật sản phẩm.
 - **3.9.2.5. Chỉ định Cán bộ kiểm duyệt**: Hộp thoại chọn chuyên viên Ban Xúc tiến thương mại thẩm định sản phẩm.
 - **3.9.2.6. Lịch sử giao thương & Yêu cầu báo giá**: Bảng theo dõi các cơ hội hợp tác kinh doanh Cung - Cầu được kết nối thành công.
@@ -692,7 +692,7 @@ Hệ thống CRM và Ứng dụng Di động chia sẻ chung một cơ sở dữ
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | \`productName\` | Tên sản phẩm / Dịch vụ | Văn bản ngắn | Có | Rỗng | 5 - 200 ký tự | Tự động cắt khoảng trắng thừa |
 | \`categoryCode\` | Phân nhóm ngành nghề | Chọn một | Có | Xây dựng - Vật liệu | 12 nhóm ngành kinh tế | Xem quy tắc giao diện động |
-| \`ownerCompany\` | Doanh nghiệp cung ứng | Chọn một | Có | Doanh nghiệp của tôi | Danh sách doanh nghiệp hội viên| Bắt buộc chọn đúng pháp nhân |
+| \`ownerCompany\` | Doanh nghiệp cung ứng | Chọn một | Có | Doanh nghiệp của tôi | Danh sách doanh nghiệp Học viên| Bắt buộc chọn đúng pháp nhân |
 | \`marketPrice\` | Giá niêm yết thị trường | Số tiền tệ | Không | 0 | 0 đến 100 tỷ VNĐ | Định dạng dấu chấm hàng nghìn |
 | \`memberDiscount\`| Chiết khấu đặc quyền (%)| Số phần trăm | Có | 10% | 1% đến 90% | Xem quy tắc giao diện động |
 | \`supplyCapacity\`| Năng lực cung ứng | Văn bản ngắn | Có | Rỗng | Tối đa 200 ký tự | Ví dụ: 10.000 sản phẩm/tháng |
@@ -702,7 +702,7 @@ Hệ thống CRM và Ứng dụng Di động chia sẻ chung một cơ sở dữ
 
 - **Hành vi tương tác giao diện động theo giá trị chọn (Select-State UI Dependencies)**:
   - *Khi nhập "Chiết khấu đặc quyền (%)" >= 20%*:
-    - Hệ thống **tự động gắn huy hiệu vàng VIP**: *"Ưu đãi đặc biệt dành cho Hội viên CEO HN10"* giúp sản phẩm được ưu tiên hiển thị ở vị trí đầu sàn B2B.
+    - Hệ thống **tự động gắn huy hiệu vàng VIP**: *"Ưu đãi đặc biệt dành cho Học viên CEO HN10"* giúp sản phẩm được ưu tiên hiển thị ở vị trí đầu sàn B2B.
   - *Khi chọn "Phân nhóm ngành nghề" = "Bất động sản - Xây dựng"*:
     - Form **hiển thị thêm trường**: *"Hồ sơ năng lực nhà thầu / Chủ đầu tư"* và *"Chính sách bảo hành công trình"*.
   - *Khi chọn "Phân nhóm ngành nghề" = "Dịch vụ Doanh nghiệp & Pháp lý"*:
@@ -714,7 +714,7 @@ Hệ thống CRM và Ứng dụng Di động chia sẻ chung một cơ sở dữ
 - Bảng hiển thị có ảnh thu nhỏ, tên doanh nghiệp, giá thị trường, giá ưu đãi sau chiết khấu và lượt kết nối.
 
 #### 3.9.3.4. Danh sách Yêu cầu báo giá & Cơ hội giao thương
-- Bảng tổng hợp các yêu cầu kết nối giao thương giữa các hội viên: Tên doanh nghiệp mua, Nhu cầu cụ thể, Thời gian gửi yêu cầu và trạng thái xử lý.
+- Bảng tổng hợp các yêu cầu kết nối giao thương giữa các Học viên: Tên doanh nghiệp mua, Nhu cầu cụ thể, Thời gian gửi yêu cầu và trạng thái xử lý.
 
 #### 3.9.3.5. Hộp thoại Gỡ bỏ sản phẩm
 - Xác nhận gỡ sản phẩm khỏi sàn B2B khi tạm hết hàng hoặc thay đổi chính sách kinh doanh.
@@ -792,7 +792,7 @@ Hệ thống CRM và Ứng dụng Di động chia sẻ chung một cơ sở dữ
 - Chuyển trạng thái văn kiện sang "Hết hiệu lực thi hành" kèm số quyết định bãi bỏ.
 
 #### 3.10.3.6. Popup Chọn người duyệt xuất bản
-- Trình Tổng thư ký duyệt tin tức trước khi phát sóng tới điện thoại hội viên.
+- Trình Tổng thư ký duyệt tin tức trước khi phát sóng tới điện thoại Học viên.
 
 #### 3.10.3.7. Xem chi tiết & Tải tệp văn bản
 - Đọc văn kiện trực tiếp trên màn hình, hỗ trợ in ấn và tải về máy tính.
@@ -800,15 +800,15 @@ Hệ thống CRM và Ứng dụng Di động chia sẻ chung một cơ sở dữ
 ### 3.10.4. Luồng nghiệp vụ
 - **3.10.4.1. Tìm kiếm văn bản**: Tra cứu quy chế hoặc nghị quyết đại hội.
 - **3.10.4.2. Lưu nháp văn bản**: Ban Thư Ký soạn thảo dự thảo văn kiện lưu nháp.
-- **3.10.4.3. Ký duyệt & Xuất bản chính thức**: Chủ tịch ký ban hành -> Tự động phát thông báo tới ứng dụng di động của toàn thể hội viên.
+- **3.10.4.3. Ký duyệt & Xuất bản chính thức**: Chủ tịch ký ban hành -> Tự động phát thông báo tới ứng dụng di động của toàn thể Học viên.
 - **3.10.4.4. Hết hiệu lực thi hành**: Cập nhật văn bản thay thế.
-- **3.10.4.5. Xem chi tiết**: Hội viên tra cứu và tải tài liệu.
+- **3.10.4.5. Xem chi tiết**: Học viên tra cứu và tải tài liệu.
 - **3.10.4.6. Xuất kho lưu trữ**: Đồng bộ văn kiện vào kho lưu trữ vĩnh viễn.
 
 ### 3.10.5. Đặc tả tương tác giao tiếp dữ liệu / API
 - **3.10.5.1. Tra cứu danh sách văn bản**: Lấy danh sách văn bản theo loại và kỳ ban hành.
 - **3.10.5.2. Lấy chi tiết văn bản và đường dẫn tệp**: Tải nội dung trích yếu và tệp văn kiện.
-- **3.10.5.3. Xuất bản văn bản mới**: Ghi nhận văn bản và gửi thông báo tới hội viên.
+- **3.10.5.3. Xuất bản văn bản mới**: Ghi nhận văn bản và gửi thông báo tới Học viên.
 - **3.10.5.4. Lưu nháp văn bản**: Lưu dự thảo văn thư.
 - **3.10.5.5. Cập nhật văn bản**: Chỉnh sửa trích yếu hoặc cập nhật tệp mới.
 - **3.10.5.6. Chỉnh sửa bản nháp**: Hoàn thiện dự thảo.
@@ -829,7 +829,7 @@ Hệ thống CRM và Ứng dụng Di động chia sẻ chung một cơ sở dữ
 - **3.11.2.3. Khởi tạo gói ưu đãi mới**: Biểu mẫu ký kết chương trình đặc quyền với đối tác.
 - **3.11.2.4. Chỉnh sửa**: Gia hạn thời gian áp dụng hoặc điều chỉnh chính sách ưu đãi.
 - **3.11.2.5. Chỉ định cán bộ phụ trách đối tác**: Hộp thoại phân công đầu mối chăm sóc đối tác chiến lược.
-- **3.11.2.6. Lịch sử sử dụng đặc quyền**: Thống kê số lượt hội viên đã kích hoạt mã ưu đãi của từng đối tác.
+- **3.11.2.6. Lịch sử sử dụng đặc quyền**: Thống kê số lượt Học viên đã kích hoạt mã ưu đãi của từng đối tác.
 - **3.11.2.7. Tạm dừng chương trình**: Hộp thoại dừng chương trình ưu đãi khi hết hạn mức đối tác.
 - **3.11.2.8. Xem chi tiết đặc quyền VIP**: Toàn văn thỏa thuận hợp tác và mã số kích hoạt ưu đãi.
 
@@ -849,15 +849,15 @@ Hệ thống CRM và Ứng dụng Di động chia sẻ chung một cơ sở dữ
 
 - **Hành vi tương tác giao diện động theo giá trị chọn (Select-State UI Dependencies)**:
   - *Khi chọn "Cách thức nhận đặc quyền" = "Xuất trình Thẻ thông minh doanh nhân"*:
-    - Hệ thống tự động ghi nhận chính sách: Hội viên chỉ cần xuất trình tấm Thẻ thông minh doanh nhân CEO HN10 mạ vàng tại quầy lễ tân của đối tác để được áp dụng giảm giá trực tiếp.
+    - Hệ thống tự động ghi nhận chính sách: Học viên chỉ cần xuất trình tấm Thẻ thông minh doanh nhân CEO HN10 mạ vàng tại quầy lễ tân của đối tác để được áp dụng giảm giá trực tiếp.
   - *Khi chọn "Phân nhóm dịch vụ" = "Sân Golf & Thể thao"*:
-    - Form **hiển thị thêm trường**: *"Danh sách sân Golf liên kết"* và *"Khung giờ Tee-off ưu tiên cho hội viên CEO HN10"*.
+    - Form **hiển thị thêm trường**: *"Danh sách sân Golf liên kết"* và *"Khung giờ Tee-off ưu tiên cho Học viên CEO HN10"*.
 
-#### 3.11.3.3. Danh sách đặc quyền hội viên
+#### 3.11.3.3. Danh sách đặc quyền Học viên
 - Hiển thị các thẻ đặc quyền mạ vàng sang trọng với logo đối tác nổi bật.
 
 #### 3.11.3.4. Báo cáo sử dụng đặc quyền
-- Thống kê tổng số tiền hội viên đã tiết kiệm được nhờ chính sách liên kết của hiệp hội.
+- Thống kê tổng số tiền Học viên đã tiết kiệm được nhờ chính sách liên kết của hiệp hội.
 
 #### 3.11.3.5. Hộp thoại Đóng chương trình
 - Đóng chương trình ưu đãi khi hết hạn hợp đồng đối tác.
@@ -869,11 +869,11 @@ Hệ thống CRM và Ứng dụng Di động chia sẻ chung một cơ sở dữ
 - Xem hợp đồng ký kết và quy trình đối soát dịch vụ.
 
 ### 3.11.4. Luồng nghiệp vụ
-- **3.11.4.1. Tìm kiếm đặc quyền**: Hội viên tra cứu ưu đãi trước khi đặt phòng hoặc đặt sân golf.
+- **3.11.4.1. Tìm kiếm đặc quyền**: Học viên tra cứu ưu đãi trước khi đặt phòng hoặc đặt sân golf.
 - **3.11.4.2. Lưu nháp chương trình**: Ban Xúc tiến soạn thảo thỏa thuận hợp tác lưu nháp.
-- **3.11.4.3. Ký kết & Xuất bản chính thức**: Phê duyệt chương trình -> Hiển thị trên mục Đặc quyền hội viên của ứng dụng di động.
+- **3.11.4.3. Ký kết & Xuất bản chính thức**: Phê duyệt chương trình -> Hiển thị trên mục Đặc quyền Học viên của ứng dụng di động.
 - **3.11.4.4. Gia hạn / Kết thúc**: Cập nhật gia hạn thỏa thuận hàng năm.
-- **3.11.4.5. Xem chi tiết & Sử dụng**: Hội viên xuất trình thẻ thông minh để nhận ưu đãi tại điểm dịch vụ.
+- **3.11.4.5. Xem chi tiết & Sử dụng**: Học viên xuất trình thẻ thông minh để nhận ưu đãi tại điểm dịch vụ.
 - **3.11.4.6. Xuất báo cáo phúc lợi**: Xuất bảng đánh giá hiệu quả chương trình đối tác.
 
 ### 3.11.5. Đặc tả tương tác giao tiếp dữ liệu / API
@@ -906,7 +906,7 @@ Hệ thống CRM và Ứng dụng Di động chia sẻ chung một cơ sở dữ
 
 ### 3.12.3. Mô tả chi tiết màn hình
 #### 3.12.3.1. Tìm kiếm & Lọc nhật ký an ninh
-- Bộ lọc loại hành vi: Đăng nhập/Đăng xuất, Gán quyền quản trị, Thay đổi hội phí, Xóa hội viên cascade, Soát vé sự kiện.
+- Bộ lọc loại hành vi: Đăng nhập/Đăng xuất, Gán quyền quản trị, Thay đổi hội phí, Xóa Học viên cascade, Soát vé sự kiện.
 
 #### 3.12.3.2. Biểu mẫu Cấu hình Tham số Toàn hệ thống
 | Tên trường | Nhãn hiển thị | Kiểu dữ liệu | Bắt buộc | Giá trị mặc định | Dải giá trị cho phép | Quy tắc kiểm tra (Validation) |
@@ -983,7 +983,7 @@ Hệ thống CRM và Ứng dụng Di động chia sẻ chung một cơ sở dữ
 3. **Khả năng Hoạt động Ngoại tuyến (Offline Fallback for Check-in)**: Cổng soát vé QR sự kiện được trang bị bộ nhớ đệm cục bộ an toàn, cho phép tiếp tục quét vé bình thường kể cả khi mất kết nối Internet tạm thời tại hội trường; dữ liệu điểm danh sẽ tự động đồng bộ lên máy chủ ngay khi có mạng trở lại.
 
 ### 4.4. Yêu cầu về Tính toàn vẹn dữ liệu & Cơ chế khôi phục (Data Integrity & Safety)
-1. **Cơ chế Xóa Liên Thông An Toàn (Cascade Deletion Safety)**: Khi xóa một hội viên, toàn bộ các dữ liệu liên thông trực thuộc (doanh nghiệp, sản phẩm gian hàng B2B, thẻ thông minh doanh nhân, tài khoản đăng nhập) bắt buộc phải được giải phóng đồng bộ trong một giao dịch an toàn (Database Transaction), triệt tiêu hoàn toàn rác dữ liệu.
+1. **Cơ chế Xóa Liên Thông An Toàn (Cascade Deletion Safety)**: Khi xóa một Học viên, toàn bộ các dữ liệu liên thông trực thuộc (doanh nghiệp, sản phẩm gian hàng B2B, thẻ thông minh doanh nhân, tài khoản đăng nhập) bắt buộc phải được giải phóng đồng bộ trong một giao dịch an toàn (Database Transaction), triệt tiêu hoàn toàn rác dữ liệu.
 2. **Xử lý & Bóc tách Lỗi Kiểm tra Dữ liệu Tiếng Việt (Vietnamese Validation Formatting)**: Khi máy chủ phát hiện dữ liệu nhập chưa chuẩn, hệ thống tự động bóc tách các mảng lỗi kỹ thuật thành câu thông báo tiếng Việt mạch lạc, chỉ rõ tên trường và hướng dẫn cách sửa chữa thân thiện, không để lộ thông báo lỗi kỹ thuật khó hiểu.
 
 ### 4.5. Yêu cầu về Khả năng tương thích & Môi trường vận hành (Compatibility Requirements)
@@ -1012,7 +1012,7 @@ Hệ thống CRM và Ứng dụng Di động chia sẻ chung một cơ sở dữ
 | :--- | :--- | :--- |
 | **AC-01** | Toàn vẹn 12 phân hệ CRM | 100% các phân hệ từ 3.1 đến 3.12 hoạt động chuẩn xác theo kịch bản đặc tả. |
 | **AC-02** | Phân quyền 7 cấp & Realtime Guard | Chặn đứng 100% các hành vi vượt quyền; hiển thị modal cảnh báo trung tâm và reload giữ phiên khi đổi quyền. |
-| **AC-03** | Nghiệp vụ Hội viên & Cascade Delete | Năm sinh bắt buộc 1983; cấp mã \`CEO-83xxx\`; xóa hội viên tự động xóa sạch doanh nghiệp và tài khoản trực thuộc. |
+| **AC-03** | Nghiệp vụ Học viên & Cascade Delete | Năm sinh bắt buộc 1983; cấp mã \`CEO-83xxx\`; xóa Học viên tự động xóa sạch doanh nghiệp và tài khoản trực thuộc. |
 | **AC-04** | Giao việc đa cấp & File Office | Chặn giao việc trái quyền; đính kèm và xem trước trực tiếp file Word, Excel, PDF và ảnh nghiệm thu. |
 | **AC-05** | Sự kiện & Soát vé QR 0.1s | Sơ đồ bàn tiệc tròn trực quan; quét mã QR đại biểu điểm danh tức thì trong 0.1 giây tại bàn lễ tân. |
 | **AC-06** | Tài chính & VietQR Napas 24/7 | Tự động sinh mã VietQR theo chuẩn Napas; tự động xác nhận số dư tài khoản trong vòng 10 giây; xuất/nhập Excel chuẩn. |

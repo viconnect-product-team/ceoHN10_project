@@ -147,7 +147,7 @@ export const DEFAULT_STARTUP_MOBILE_TEMPLATE: LandingWebConfig = {
     { id: "m1", label: "Trang chủ", url: "#hero" },
     { id: "m2", label: "Tính năng App", url: "#features" },
     { id: "m3", label: "Giao thương B2B", url: "#b2b" },
-    { id: "m4", label: "Hội viên tiêu biểu", url: "#members" },
+    { id: "m4", label: "Học viên tiêu biểu", url: "#members" },
     { id: "m5", label: "Tải ứng dụng", url: "#download" },
   ],
   slides: [
@@ -321,9 +321,8 @@ function LandingImageUploadField({
           <img
             src={resolveMediaUrl(value) || value}
             alt="Preview"
-            className={`object-cover bg-slate-50 dark:bg-slate-900 ${
-              previewAspect === "square" ? "size-14 rounded-lg" : previewAspect === "banner" ? "w-44 h-16" : "w-32 h-20"
-            }`}
+            className={`object-cover bg-slate-50 dark:bg-slate-900 ${previewAspect === "square" ? "size-14 rounded-lg" : previewAspect === "banner" ? "w-44 h-16" : "w-32 h-20"
+              }`}
             onError={(e) => {
               (e.currentTarget as HTMLElement).style.display = "none";
             }}
@@ -594,9 +593,9 @@ function AdminLandingWebsPage() {
           <div className="p-4 rounded-2xl bg-white dark:bg-[#131a26] border border-slate-200 dark:border-slate-800 shadow-xs flex items-center justify-between">
             <div>
               <p className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">API Động Kích Hoạt</p>
-              <h3 className="text-2xl font-black text-purple-600 dark:text-purple-400 mt-1">{apiIntegratedCount}</h3>
+              <h3 className="text-2xl font-black text-slate-800 dark:text-slate-200 mt-1">{apiIntegratedCount}</h3>
             </div>
-            <div className="size-10 rounded-xl bg-purple-500/10 text-purple-600 dark:text-purple-400 grid place-items-center">
+            <div className="size-10 rounded-xl bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 grid place-items-center">
               <Code className="size-5" />
             </div>
           </div>
@@ -666,16 +665,15 @@ function AdminLandingWebsPage() {
                             {isStartupMobile
                               ? "Startup Mobile Showcase"
                               : isTimedCards
-                              ? "Timed Cards Opening"
-                              : "CEO HN10 Executive"}
+                                ? "Timed Cards Opening"
+                                : "CEO HN10 Executive"}
                           </span>
 
                           <span
-                            className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold shadow-md ${
-                              web.isPublished
+                            className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold shadow-md ${web.isPublished
                                 ? "bg-emerald-500/90 text-white"
                                 : "bg-slate-700/90 text-slate-200"
-                            }`}
+                              }`}
                           >
                             {web.isPublished ? "Đang xuất bản" : "Bản nháp"}
                           </span>
@@ -688,7 +686,7 @@ function AdminLandingWebsPage() {
                             <span>{web.slides?.length || 0} thẻ trình diễn</span>
                           </div>
                           {web.apiConfig?.enabled && (
-                            <span className="px-2 py-0.5 rounded-md bg-purple-500/80 text-[10px] font-bold">
+                            <span className="px-2 py-0.5 rounded-md bg-slate-700 text-white text-[10px] font-bold">
                               API Connected
                             </span>
                           )}
@@ -860,11 +858,10 @@ function AdminLandingWebsPage() {
                   {/* Template 1: Pinterest 160088961741878822 */}
                   <div
                     onClick={() => setCreateForm({ ...createForm, template: "timed_cards_opening" })}
-                    className={`p-3 rounded-2xl border-2 transition cursor-pointer ${
-                      createForm.template === "timed_cards_opening"
+                    className={`p-3 rounded-2xl border-2 transition cursor-pointer ${createForm.template === "timed_cards_opening"
                         ? "border-amber-500 bg-amber-500/10"
                         : "border-slate-200 dark:border-slate-800 hover:border-slate-300"
-                    }`}
+                      }`}
                   >
                     <div className="flex items-center justify-between mb-1">
                       <span className="text-xs font-black text-slate-900 dark:text-white">Mẫu 1: Timed Cards Opening</span>
@@ -878,11 +875,10 @@ function AdminLandingWebsPage() {
                   {/* Template 2: Pinterest 234398355598861981 */}
                   <div
                     onClick={() => setCreateForm({ ...createForm, template: "startup_mobile_showcase" })}
-                    className={`p-3 rounded-2xl border-2 transition cursor-pointer ${
-                      createForm.template === "startup_mobile_showcase"
+                    className={`p-3 rounded-2xl border-2 transition cursor-pointer ${createForm.template === "startup_mobile_showcase"
                         ? "border-[#003B95] bg-[#003B95]/10"
                         : "border-slate-200 dark:border-slate-800 hover:border-slate-300"
-                    }`}
+                      }`}
                   >
                     <div className="flex items-center justify-between mb-1">
                       <span className="text-xs font-black text-slate-900 dark:text-white">Mẫu 2: Startup Mobile Showcase</span>
@@ -896,11 +892,10 @@ function AdminLandingWebsPage() {
                   {/* Template 3: Pinterest 569353577917214566 (Forge Luxury Atelier - SOTD Winner) */}
                   <div
                     onClick={() => setCreateForm({ ...createForm, template: "forge_luxury_atelier" })}
-                    className={`p-3 rounded-2xl border-2 transition cursor-pointer ${
-                      createForm.template === "forge_luxury_atelier"
+                    className={`p-3 rounded-2xl border-2 transition cursor-pointer ${createForm.template === "forge_luxury_atelier"
                         ? "border-[#C5A880] bg-[#C5A880]/10"
                         : "border-slate-200 dark:border-slate-800 hover:border-slate-300"
-                    }`}
+                      }`}
                   >
                     <div className="flex items-center justify-between mb-1">
                       <span className="text-xs font-black text-slate-900 dark:text-white">Mẫu 3: Forge Luxury Atelier</span>
@@ -1061,11 +1056,10 @@ function AdminLandingWebsPage() {
                   <button
                     type="button"
                     onClick={() => setActiveBuilderTab("m2_hero")}
-                    className={`py-3 border-b-2 transition flex items-center gap-1.5 cursor-pointer whitespace-nowrap ${
-                      activeBuilderTab === "m2_hero"
+                    className={`py-3 border-b-2 transition flex items-center gap-1.5 cursor-pointer whitespace-nowrap ${activeBuilderTab === "m2_hero"
                         ? "border-[#003B95] text-[#003B95] dark:text-blue-400"
                         : "border-transparent text-slate-500 hover:text-slate-900 dark:hover:text-white"
-                    }`}
+                      }`}
                   >
                     <Smartphone className="size-4" />
                     <span>1. 🌟 Hero &amp; Bàn Tay 3D</span>
@@ -1074,11 +1068,10 @@ function AdminLandingWebsPage() {
                   <button
                     type="button"
                     onClick={() => setActiveBuilderTab("m2_ribbon_tabs")}
-                    className={`py-3 border-b-2 transition flex items-center gap-1.5 cursor-pointer whitespace-nowrap ${
-                      activeBuilderTab === "m2_ribbon_tabs"
+                    className={`py-3 border-b-2 transition flex items-center gap-1.5 cursor-pointer whitespace-nowrap ${activeBuilderTab === "m2_ribbon_tabs"
                         ? "border-[#003B95] text-[#003B95] dark:text-blue-400"
                         : "border-transparent text-slate-500 hover:text-slate-900 dark:hover:text-white"
-                    }`}
+                      }`}
                   >
                     <Sliders className="size-4" />
                     <span>2. 📊 Ruy-băng &amp; 4 Tab App</span>
@@ -1087,11 +1080,10 @@ function AdminLandingWebsPage() {
                   <button
                     type="button"
                     onClick={() => setActiveBuilderTab("m2_map")}
-                    className={`py-3 border-b-2 transition flex items-center gap-1.5 cursor-pointer whitespace-nowrap ${
-                      activeBuilderTab === "m2_map"
+                    className={`py-3 border-b-2 transition flex items-center gap-1.5 cursor-pointer whitespace-nowrap ${activeBuilderTab === "m2_map"
                         ? "border-[#003B95] text-[#003B95] dark:text-blue-400"
                         : "border-transparent text-slate-500 hover:text-slate-900 dark:hover:text-white"
-                    }`}
+                      }`}
                   >
                     <MapPin className="size-4" />
                     <span>3. 📍 Điểm Cầu Bản Đồ ({editItem.startupConfig?.mapChapterPins?.length || 5})</span>
@@ -1100,11 +1092,10 @@ function AdminLandingWebsPage() {
                   <button
                     type="button"
                     onClick={() => setActiveBuilderTab("m2_avatars")}
-                    className={`py-3 border-b-2 transition flex items-center gap-1.5 cursor-pointer whitespace-nowrap ${
-                      activeBuilderTab === "m2_avatars"
+                    className={`py-3 border-b-2 transition flex items-center gap-1.5 cursor-pointer whitespace-nowrap ${activeBuilderTab === "m2_avatars"
                         ? "border-[#003B95] text-[#003B95] dark:text-blue-400"
                         : "border-transparent text-slate-500 hover:text-slate-900 dark:hover:text-white"
-                    }`}
+                      }`}
                   >
                     <Users className="size-4" />
                     <span>4. 👥 Cộng Đồng Avatars 3D ({editItem.startupConfig?.communityAvatars?.length || 4})</span>
@@ -1113,11 +1104,10 @@ function AdminLandingWebsPage() {
                   <button
                     type="button"
                     onClick={() => setActiveBuilderTab("m2_testimonials_faq")}
-                    className={`py-3 border-b-2 transition flex items-center gap-1.5 cursor-pointer whitespace-nowrap ${
-                      activeBuilderTab === "m2_testimonials_faq"
+                    className={`py-3 border-b-2 transition flex items-center gap-1.5 cursor-pointer whitespace-nowrap ${activeBuilderTab === "m2_testimonials_faq"
                         ? "border-[#003B95] text-[#003B95] dark:text-blue-400"
                         : "border-transparent text-slate-500 hover:text-slate-900 dark:hover:text-white"
-                    }`}
+                      }`}
                   >
                     <MessageSquare className="size-4" />
                     <span>5. 💬 Đánh Giá &amp; FAQ</span>
@@ -1128,11 +1118,10 @@ function AdminLandingWebsPage() {
                   <button
                     type="button"
                     onClick={() => setActiveBuilderTab("general")}
-                    className={`py-3 border-b-2 transition flex items-center gap-1.5 cursor-pointer whitespace-nowrap ${
-                      activeBuilderTab === "general"
+                    className={`py-3 border-b-2 transition flex items-center gap-1.5 cursor-pointer whitespace-nowrap ${activeBuilderTab === "general"
                         ? "border-[#003B95] text-[#003B95] dark:text-blue-400"
                         : "border-transparent text-slate-500 hover:text-slate-900 dark:hover:text-white"
-                    }`}
+                      }`}
                   >
                     <Palette className="size-4" />
                     <span>1. Tổng Quan &amp; Brand</span>
@@ -1141,11 +1130,10 @@ function AdminLandingWebsPage() {
                   <button
                     type="button"
                     onClick={() => setActiveBuilderTab("tree_menu")}
-                    className={`py-3 border-b-2 transition flex items-center gap-1.5 cursor-pointer whitespace-nowrap ${
-                      activeBuilderTab === "tree_menu"
+                    className={`py-3 border-b-2 transition flex items-center gap-1.5 cursor-pointer whitespace-nowrap ${activeBuilderTab === "tree_menu"
                         ? "border-[#003B95] text-[#003B95] dark:text-blue-400"
                         : "border-transparent text-slate-500 hover:text-slate-900 dark:hover:text-white"
-                    }`}
+                      }`}
                   >
                     <FolderTree className="size-4" />
                     <span>2. Cây Menu Phân Cấp (Tree Header)</span>
@@ -1154,11 +1142,10 @@ function AdminLandingWebsPage() {
                   <button
                     type="button"
                     onClick={() => setActiveBuilderTab("slides")}
-                    className={`py-3 border-b-2 transition flex items-center gap-1.5 cursor-pointer whitespace-nowrap ${
-                      activeBuilderTab === "slides"
+                    className={`py-3 border-b-2 transition flex items-center gap-1.5 cursor-pointer whitespace-nowrap ${activeBuilderTab === "slides"
                         ? "border-[#003B95] text-[#003B95] dark:text-blue-400"
                         : "border-transparent text-slate-500 hover:text-slate-900 dark:hover:text-white"
-                    }`}
+                      }`}
                   >
                     <ImageIcon className="size-4" />
                     <span>3. Thẻ Trình Diễn ({editItem.slides?.length || 0} Cards)</span>
@@ -1167,11 +1154,10 @@ function AdminLandingWebsPage() {
                   <button
                     type="button"
                     onClick={() => setActiveBuilderTab("api")}
-                    className={`py-3 border-b-2 transition flex items-center gap-1.5 cursor-pointer whitespace-nowrap ${
-                      activeBuilderTab === "api"
+                    className={`py-3 border-b-2 transition flex items-center gap-1.5 cursor-pointer whitespace-nowrap ${activeBuilderTab === "api"
                         ? "border-[#003B95] text-[#003B95] dark:text-blue-400"
                         : "border-transparent text-slate-500 hover:text-slate-900 dark:hover:text-white"
-                    }`}
+                      }`}
                   >
                     <Code className="size-4" />
                     <span>4. Tích Hợp API Động</span>
@@ -1180,11 +1166,10 @@ function AdminLandingWebsPage() {
                   <button
                     type="button"
                     onClick={() => setActiveBuilderTab("sub_screens")}
-                    className={`py-3 border-b-2 transition flex items-center gap-1.5 cursor-pointer whitespace-nowrap ${
-                      activeBuilderTab === "sub_screens"
+                    className={`py-3 border-b-2 transition flex items-center gap-1.5 cursor-pointer whitespace-nowrap ${activeBuilderTab === "sub_screens"
                         ? "border-[#003B95] text-[#003B95] dark:text-blue-400"
                         : "border-transparent text-slate-500 hover:text-slate-900 dark:hover:text-white"
-                    }`}
+                      }`}
                   >
                     <Layers className="size-4" />
                     <span>5. Màn Con Chi Tiết ({editItem.subScreens?.length || 0})</span>
@@ -1409,7 +1394,7 @@ function AdminLandingWebsPage() {
                             },
                           })
                         }
-                        placeholder="Hội viên chính thức"
+                        placeholder="Học viên chính thức"
                         className="w-full px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 text-xs text-slate-500"
                       />
                     </div>
@@ -1570,11 +1555,10 @@ function AdminLandingWebsPage() {
                             key={tab}
                             type="button"
                             onClick={() => setActiveAppTabEdit(tab)}
-                            className={`px-3 py-1 rounded-lg text-xs font-bold transition cursor-pointer ${
-                              activeAppTabEdit === tab
+                            className={`px-3 py-1 rounded-lg text-xs font-bold transition cursor-pointer ${activeAppTabEdit === tab
                                 ? "bg-[#003B95] text-white shadow-xs"
                                 : "text-slate-600 dark:text-slate-400 hover:text-slate-900"
-                            }`}
+                              }`}
                           >
                             {tab === "b2b" && "1. Sàn B2B"}
                             {tab === "connect" && "2. Lịch 1-on-1"}
@@ -1708,7 +1692,7 @@ function AdminLandingWebsPage() {
                         const newPin = {
                           id: newId,
                           name: "Chi Hội Mới",
-                          count: "50+ Hội viên",
+                          count: "50+ Học viên",
                           desc: "Địa chỉ trụ sở / Cụm công nghiệp",
                           x: "50%",
                           y: "50%",
@@ -1771,7 +1755,7 @@ function AdminLandingWebsPage() {
                           </div>
                           <div>
                             <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1">
-                              Quy Mô Hội Viên
+                              Quy Mô Học viên
                             </label>
                             <input
                               type="text"
@@ -1784,7 +1768,7 @@ function AdminLandingWebsPage() {
                                   startupConfig: { ...editItem.startupConfig!, mapChapterPins: copy },
                                 });
                               }}
-                              placeholder="1.250+ Hội viên"
+                              placeholder="1.250+ Học viên"
                               className="w-full px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 text-xs font-bold text-amber-600"
                             />
                           </div>
@@ -1873,7 +1857,7 @@ function AdminLandingWebsPage() {
                         const newId = `avt-${Date.now().toString().slice(-4)}`;
                         const newAvt = {
                           id: newId,
-                          name: "Lãnh Đạo Hội Viên",
+                          name: "Lãnh Đạo Học viên",
                           role: "CEO Doanh Nghiệp",
                           quote: "Kết nối kiến tạo giá trị",
                           avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80",
@@ -2021,12 +2005,12 @@ function AdminLandingWebsPage() {
               {/* ================= MẪU 2: TAB 5 - ĐÁNH GIÁ & FAQ ================= */}
               {activeBuilderTab === "m2_testimonials_faq" && editItem.startupConfig && (
                 <div className="space-y-6 max-w-4xl">
-                  {/* BĂNG CHUYỀN ĐÁNH GIÁ HỘI VIÊN */}
+                  {/* BĂNG CHUYỀN ĐÁNH GIÁ Học viên */}
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
                       <h4 className="text-sm font-black text-slate-900 dark:text-white flex items-center gap-2">
                         <MessageSquare className="size-4 text-[#003B95]" />
-                        <span>Băng Chuyền Đánh Giá Hội Viên (Testimonials Carousel)</span>
+                        <span>Băng Chuyền Đánh Giá Học viên (Testimonials Carousel)</span>
                       </h4>
                       <button
                         type="button"
@@ -2034,9 +2018,9 @@ function AdminLandingWebsPage() {
                           const newTestimonial = {
                             id: `test-${Date.now().toString().slice(-4)}`,
                             quote: "CEO HN10 mang đến cơ hội kết nối giao thương tuyệt vời...",
-                            author: "Doanh Nhân Hội Viên",
+                            author: "Doanh Nhân Học viên",
                             role: "Tổng Giám Đốc",
-                            company: "Hội viên CLB",
+                            company: "Học viên CLB",
                             rating: 5,
                             avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80",
                           };
@@ -2077,9 +2061,9 @@ function AdminLandingWebsPage() {
                             </button>
                           </div>
 
-                          {/* TẢI ẢNH ĐẠI DIỆN HỘI VIÊN */}
+                          {/* TẢI ẢNH ĐẠI DIỆN Học viên */}
                           <LandingImageUploadField
-                            label="Ảnh Đại Diện Hội Viên Đánh Giá (Tải ảnh lên)"
+                            label="Ảnh Đại Diện Học viên Đánh Giá (Tải ảnh lên)"
                             value={item.avatar}
                             onChange={(url) => {
                               const copy = [...editItem.startupConfig!.testimonials];
@@ -2095,7 +2079,7 @@ function AdminLandingWebsPage() {
                           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                             <div>
                               <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1">
-                                Họ Tên Hội Viên
+                                Họ Tên Học viên
                               </label>
                               <input
                                 type="text"
@@ -2187,7 +2171,7 @@ function AdminLandingWebsPage() {
                         onClick={() => {
                           const newFaq = {
                             question: "Câu hỏi thường gặp mới?",
-                            answer: "Câu trả lời giải thích chi tiết cho hội viên...",
+                            answer: "Câu trả lời giải thích chi tiết cho Học viên...",
                           };
                           setEditItem({
                             ...editItem,
@@ -2753,10 +2737,10 @@ function AdminLandingWebsPage() {
               {/* TAB 4: TÍCH HỢP API ĐỘNG */}
               {activeBuilderTab === "api" && (
                 <div className="space-y-4 max-w-2xl">
-                  <div className="flex items-center justify-between p-4 rounded-2xl bg-purple-500/10 border border-purple-500/20">
+                  <div className="flex items-center justify-between p-4 rounded-2xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
                     <div className="space-y-0.5">
-                      <h4 className="text-xs font-black text-purple-900 dark:text-purple-300">Tự Động Nạp Dữ Liệu Từ API</h4>
-                      <p className="text-[11px] text-purple-700 dark:text-purple-400">
+                      <h4 className="text-xs font-black text-slate-900 dark:text-slate-100">Tự Động Nạp Dữ Liệu Từ API</h4>
+                      <p className="text-[11px] text-slate-600 dark:text-slate-400">
                         Khi bật, các slide sẽ tự động được sinh ra từ dữ liệu API thực tế (Cơ hội, Sản phẩm, Sự kiện, v.v.).
                       </p>
                     </div>
@@ -2775,7 +2759,7 @@ function AdminLandingWebsPage() {
                           },
                         })
                       }
-                      className="size-5 rounded text-purple-600 cursor-pointer"
+                      className="size-5 rounded text-slate-800 dark:text-slate-200 cursor-pointer"
                     />
                   </div>
 

@@ -233,7 +233,7 @@ function cleanOldAndRedundantFiles() {
         const p = path.join(DOCS_DIR, file);
         try {
           if (fs.statSync(p).isFile()) fs.unlinkSync(p);
-        } catch {}
+        } catch { }
       }
     });
   }
@@ -255,7 +255,7 @@ async function generateAllBrdDocuments() {
 ---
 
 ### LỜI MỞ ĐẦU & TÔN CHỈ VẬN HÀNH
-Tài liệu Yêu cầu Nghiệp vụ (Business Requirements Document - BRD) này đặc tả toàn diện các quy trình vận hành, thẩm quyền lãnh đạo, luồng công việc và trải nghiệm quản trị trên Cổng Quản trị CRM của CLB Doanh Nhân CEO HN10. Hệ thống được thiết kế hướng tới mục tiêu tối thượng: **Số hóa toàn diện dữ liệu hội viên, chuẩn hóa quy trình điều hành minh bạch, thúc đẩy giao thương B2B hiệu quả và bảo vệ an toàn thông tin doanh nghiệp**.
+Tài liệu Yêu cầu Nghiệp vụ (Business Requirements Document - BRD) này đặc tả toàn diện các quy trình vận hành, thẩm quyền lãnh đạo, luồng công việc và trải nghiệm quản trị trên Cổng Quản trị CRM của CLB Doanh Nhân CEO HN10. Hệ thống được thiết kế hướng tới mục tiêu tối thượng: **Số hóa toàn diện dữ liệu Học viên, chuẩn hóa quy trình điều hành minh bạch, thúc đẩy giao thương B2B hiệu quả và bảo vệ an toàn thông tin doanh nghiệp**.
 
 Tài liệu được biên soạn bằng văn phong quản trị kinh doanh thực tiễn, loại bỏ hoàn toàn các thuật ngữ công nghệ nặng nề để Chủ tịch, Ban Điều Hành, Tổng thư ký và các Trưởng ban chuyên môn dễ dàng thấu suốt và chỉ đạo triển khai.
 
@@ -263,7 +263,7 @@ Tài liệu được biên soạn bằng văn phong quản trị kinh doanh th�
 
 ### CHƯƠNG 1: TỔNG QUAN HỆ THỐNG QUẢN TRỊ CRM HIỆP HỘI
 1. **Mục tiêu sứ mệnh**:
-   - Cung cấp bức tranh toàn cảnh 360 độ về sức khỏe tổ chức, quy mô hội viên và dòng tiền hiệp hội.
+   - Cung cấp bức tranh toàn cảnh 360 độ về sức khỏe tổ chức, quy mô Học viên và dòng tiền hiệp hội.
    - Chấm dứt tình trạng lưu trữ dữ liệu phân tán trên file Excel rời rạc hoặc sổ tay truyền thống.
    - Tự động hóa các nghiệp vụ định kỳ: nhắc hội phí niên liễm, gửi thông báo họp, cấp vé mời sự kiện.
 2. **Đối tượng sử dụng chính**:
@@ -272,7 +272,7 @@ Tài liệu được biên soạn bằng văn phong quản trị kinh doanh th�
    - **Quản trị viên Hệ thống (Admin)**: Thiết lập cấu hình ma trận phân quyền, quản lý bảo mật và tích hợp.
    - **Tổng thư ký**: Điều hành Văn phòng thư ký, truyền đạt thông báo và giám sát tiến độ nghị quyết.
    - **Trưởng các Ban Chuyên môn**: Trưởng ban Thành viên, Ban Xúc tiến thương mại, Ban Tài chính, Ban Truyền thông, Ban Thiện nguyện.
-   - **Ban Thư ký**: Soạn thảo văn bản, tiếp nhận hồ sơ, gửi hóa đơn và hỗ trợ hội viên.
+   - **Ban Thư ký**: Soạn thảo văn bản, tiếp nhận hồ sơ, gửi hóa đơn và hỗ trợ Học viên.
 
 ---
 
@@ -284,13 +284,13 @@ Cơ cấu tổ chức hiệp hội được chuẩn hóa thành 7 cấp bậc th
 4. **Cấp 4 - Tổng thư ký (\`tong_thu_ky\`)**: Điều phối Ban Thư Ký; thẩm quyền giao việc giới hạn cho nhân sự thuộc Ban Thư Ký.
 5. **Cấp 5 - Trưởng ban Chuyên môn (\`truong_ban_*\`)**:
    - Trưởng ban Truyền thông: Quản lý truyền thông, hình ảnh, bài viết sự kiện.
-   - Trưởng ban Thành viên: Quản lý thẩm định, phê duyệt và chăm sóc hội viên.
+   - Trưởng ban Thành viên: Quản lý thẩm định, phê duyệt và chăm sóc Học viên.
    - Trưởng ban Xúc tiến thương mại: Quản lý cơ hội giao thương B2B, gian hàng sản phẩm.
    - Trưởng ban Tài chính: Quản lý ngân quỹ, hội phí niên liễm, thu chi và tạm ứng.
    - Trưởng ban Thiện nguyện: Quản lý các chương trình an sinh xã hội, cứu trợ cộng đồng.
    - *Thẩm quyền giao việc: Chỉ được phép giao việc cho thành viên thuộc chính ban của mình.*
 6. **Cấp 6 - Ban Thư ký (\`ban_thu_ky\`)**: Thực thi nhiệm vụ do Tổng thư ký và Ban Điều Hành phân công.
-7. **Cấp 7 - Hội viên Doanh nhân (\`member\`)**: Thành viên câu lạc bộ, tham gia sinh hoạt, giao thương và kết nối.
+7. **Cấp 7 - Học viên Doanh nhân (\`member\`)**: Thành viên câu lạc bộ, tham gia sinh hoạt, giao thương và kết nối.
 
 ---
 
@@ -307,12 +307,12 @@ Cơ cấu tổ chức hiệp hội được chuẩn hóa thành 7 cấp bậc th
 
 ---
 
-### CHƯƠNG 4: QUẢN TRỊ HỒ SƠ HỘI VIÊN 360° & DOANH NGHIỆP THÀNH VIÊN
+### CHƯƠNG 4: QUẢN TRỊ HỒ SƠ Học viên 360° & DOANH NGHIỆP THÀNH VIÊN
 1. **Quy trình tiếp nhận & phê duyệt hồ sơ**:
    - Tiếp nhận đăng ký trực tuyến từ Cổng thông tin công khai.
    - Ban Thành viên thẩm định tiêu chí: Doanh nhân sinh năm Quý Hợi 1983, người đại diện pháp luật hoặc chủ sở hữu doanh nghiệp.
    - Phê duyệt và tự động phát thư chúc mừng kèm thông tin đăng nhập tài khoản.
-2. **Hồ sơ hội viên đa chiều**:
+2. **Hồ sơ Học viên đa chiều**:
    - Thông tin cá nhân: Họ tên, ngày sinh, số điện thoại, chức vụ, ảnh thẻ đại diện, câu châm ngôn kinh doanh.
    - Doanh nghiệp trực thuộc: Tên công ty, mã số thuế, địa chỉ trụ sở, lĩnh vực hoạt động, quy mô nhân sự, liên kết website.
    - Ban chuyên môn phụ trách và lịch sử đóng hội phí theo từng niên khóa.
@@ -333,10 +333,10 @@ Cơ cấu tổ chức hiệp hội được chuẩn hóa thành 7 cấp bậc th
 ### CHƯƠNG 6: TỔ CHỨC SỰ KIỆN, SƠ ĐỒ KHÁN PHÒNG & SOÁT VÉ QR
 1. **Lập kế hoạch sự kiện**:
    - Khởi tạo sự kiện định kỳ: Họp Ban Chấp Hành, Gala thường niên, Caravan xúc tiến thương mại, Giải Golf CEO HN10.
-   - Cấu hình hạng vé: Vé VIP Ban Điều Hành, Vé Hội viên chính thức, Vé Khách mời danh dự.
+   - Cấu hình hạng vé: Vé VIP Ban Điều Hành, Vé Học viên chính thức, Vé Khách mời danh dự.
 2. **Sơ đồ khán phòng tương tác (Seating Map)**:
    - Thiết kế sơ đồ bàn tiệc trực quan: Vị trí bàn VIP trung tâm, bàn các ban chuyên môn, bàn khách mời.
-   - Gán chỗ ngồi chính xác cho từng hội viên kèm số may mắn quay thưởng.
+   - Gán chỗ ngồi chính xác cho từng Học viên kèm số may mắn quay thưởng.
 3. **Cổng soát vé điện tử QR Check-in**:
    - Ban Thư ký sử dụng máy ảnh hoặc điện thoại quét mã QR vé đại biểu, hiển thị tức thời thông tin doanh nhân, chức vụ và số bàn tiệc.
    - Chương trình quay số may mắn **Lucky Draw** trực tiếp trên màn hình LED lớn tại đêm tiệc.
@@ -353,37 +353,37 @@ Cơ cấu tổ chức hiệp hội được chuẩn hóa thành 7 cấp bậc th
    - Hỗ trợ tải lên trực tiếp văn bản Word (\`.doc\`, \`.docx\`), bảng tính Excel (\`.xls\`, \`.xlsx\`), tài liệu PDF (\`.pdf\`) và hình ảnh minh họa.
    - Người nhận việc có thể tải về nghiên cứu hoặc nộp tệp báo cáo hoàn thành.
 3. **Mô hình công việc động**:
-   - Phân loại danh mục công việc: Chiến lược, Sự kiện, Tài chính, Truyền thông, Hội viên, Xúc tiến, Thiện nguyện.
+   - Phân loại danh mục công việc: Chiến lược, Sự kiện, Tài chính, Truyền thông, Học viên, Xúc tiến, Thiện nguyện.
    - Dự toán ngân sách và tiêu chí nghiệm thu hoàn thành định lượng rõ ràng.
    - Danh sách công việc con (Subtasks) và cuộc họp trực tuyến Google Meet gắn kèm.
 4. **Phân quyền bảo mật dữ liệu công việc**:
    - Cấp Chủ tịch, Admin và Ban Điều Hành: Xem toàn bộ công việc toàn hiệp hội.
    - Tổng thư ký & Trưởng ban: Xem công việc ban mình và việc liên quan trực tiếp.
-   - Hội viên: Chỉ xem các công việc mình được giao, phối hợp hoặc tự tạo.
+   - Học viên: Chỉ xem các công việc mình được giao, phối hợp hoặc tự tạo.
 
 ---
 
 ### CHƯƠNG 8: HỆ SINH THÁI GIAO THƯƠNG & XÚC TIẾN THƯƠNG MẠI B2B
 1. **Sàn sản phẩm & ưu đãi nội bộ**:
-   - Doanh nghiệp hội viên giới thiệu các sản phẩm, giải pháp tiêu biểu kèm chính sách chiết khấu độc quyền cho thành viên CEO HN10.
+   - Doanh nghiệp Học viên giới thiệu các sản phẩm, giải pháp tiêu biểu kèm chính sách chiết khấu độc quyền cho thành viên CEO HN10.
 2. **Quản trị cơ hội giao thương (B2B Deals)**:
    - Ghi nhận và theo dõi các thương vụ kết nối kinh doanh từ bước khởi xướng, trao đổi đến ký kết hợp đồng thành công.
-   - Thống kê tổng giá trị dòng tiền giao thương nội bộ mang lại cho hội viên.
+   - Thống kê tổng giá trị dòng tiền giao thương nội bộ mang lại cho Học viên.
 
 ---
 
 ### CHƯƠNG 9: BIỂU QUYẾT ĐIỆN TỬ & KHẢO SÁT ĐẠI HỘI
 1. **Biểu quyết nghị quyết trực tuyến**:
    - Ban Điều Hành khởi tạo các phiên biểu quyết thông qua quy chế, kế hoạch tài chính hoặc nhân sự.
-   - Hội viên bỏ phiếu minh bạch, hệ thống tính toán tỷ lệ đồng thuận theo thời gian thực.
+   - Học viên bỏ phiếu minh bạch, hệ thống tính toán tỷ lệ đồng thuận theo thời gian thực.
 2. **Khảo sát chất lượng sinh hoạt**:
-   - Thu thập ý kiến đóng góp của hội viên sau mỗi kỳ sinh hoạt để cải tiến chất lượng tổ chức.
+   - Thu thập ý kiến đóng góp của Học viên sau mỗi kỳ sinh hoạt để cải tiến chất lượng tổ chức.
 
 ---
 
 ### CHƯƠNG 10: TRỢ LÝ ĐIỀU HÀNH TRÍ TUỆ NHÂN TẠO (AI ASSISTANT)
 - Được nạp toàn diện tri thức về điều lệ, quy chế và các số liệu hoạt động của hiệp hội.
-- Hỗ trợ lãnh đạo tra cứu tức thì thông tin hội viên, chỉ số tài chính, tiến độ sự kiện.
+- Hỗ trợ lãnh đạo tra cứu tức thì thông tin Học viên, chỉ số tài chính, tiến độ sự kiện.
 - Tự động điều hướng nhanh đến màn hình chức năng khi người dùng yêu cầu hướng dẫn.
 
 ---
@@ -395,14 +395,14 @@ Cơ cấu tổ chức hiệp hội được chuẩn hóa thành 7 cấp bậc th
 `;
 
   // ── BRD 2: MOBILE APP ──
-  const appBrdMd = `# TÀI LIỆU YÊU CẦU NGHIỆP VỤ ỨNG DỤNG DI ĐỘNG HỘI VIÊN (BRD - MOBILE APP)
+  const appBrdMd = `# TÀI LIỆU YÊU CẦU NGHIỆP VỤ ỨNG DỤNG DI ĐỘNG Học viên (BRD - MOBILE APP)
 ## HỆ SINH THÁI DOANH NHÂN CLB CEO HN10 (TRỰC THUỘC HANOIBA)
 *Phiên bản: 4.0 - Phát hành: Tháng 10/2026 - Ngôn ngữ: Tiếng Việt (Doanh nghiệp chuẩn)*
 
 ---
 
 ### LỜI MỞ ĐẦU & TÔN CHỈ THIẾT KẾ
-Ứng dụng di động **CLB Doanh Nhân CEO HN10** được thiết kế độc bản dành riêng cho các doanh nhân sinh năm Quý Hợi 1983. Ứng dụng là chiếc cầu nối không khoảng cách giữa các hội viên với nhau và giữa hội viên với Ban Điều Hành hiệp hội.
+Ứng dụng di động **CLB Doanh Nhân CEO HN10** được thiết kế độc bản dành riêng cho các doanh nhân sinh năm Quý Hợi 1983. Ứng dụng là chiếc cầu nối không khoảng cách giữa các Học viên với nhau và giữa Học viên với Ban Điều Hành hiệp hội.
 
 Trọng tâm thiết kế hướng tới: **Sang trọng, Tối giản, Mượt mà và Đậm chất Doanh nhân bản lĩnh**. Mọi thao tác đều được tối ưu hóa cho màn hình cảm ứng di động với thời gian phản hồi tức thì.
 
@@ -411,18 +411,18 @@ Trọng tâm thiết kế hướng tới: **Sang trọng, Tối giản, Mượt 
 ### CHƯƠNG 1: ĐỊNH VỊ & ĐẶC QUYỀN ỨNG DỤNG DI ĐỘNG CEO HN10
 1. **Định vị sản phẩm**:
    - Không chỉ là một ứng dụng tra cứu thông tin, đây là danh thiếp số quyền năng và văn phòng bỏ túi của từng lãnh đạo doanh nghiệp.
-2. **Đặc quyền dành riêng cho hội viên**:
-   - Sở hữu tấm thẻ hội viên VIP điện tử mạ vàng độc bản.
+2. **Đặc quyền dành riêng cho Học viên**:
+   - Sở hữu tấm thẻ Học viên VIP điện tử mạ vàng độc bản.
    - Nhận thông báo việc làm và chỉ đạo điều hành ngay lập tức.
    - Nhận vé mời sự kiện, check-in không cần chạm giấy tờ.
    - Kết nối đàm thoại nội bộ chất lượng cao không bị làm phiền bởi cuộc gọi rác.
 
 ---
 
-### CHƯƠNG 2: THẺ HỘI VIÊN ĐIỆN TỬ VIP & DANH THIẾP SỐ CHẠM NFC
-1. **Thẻ hội viên VIP kỹ thuật số**:
+### CHƯƠNG 2: THẺ Học viên ĐIỆN TỬ VIP & DANH THIẾP SỐ CHẠM NFC
+1. **Thẻ Học viên VIP kỹ thuật số**:
    - Thiết kế ánh kim vàng sang trọng trên nền xanh Classic Navy của hiệp hội.
-   - Thể hiện đầy đủ mã hội viên chính danh, họ tên, chức vụ, công ty và logo CEO HN10.
+   - Thể hiện đầy đủ mã Học viên chính danh, họ tên, chức vụ, công ty và logo CEO HN10.
 2. **Công nghệ chạm danh thiếp điện tử 1 chạm (NFC)**:
    - Tích hợp công nghệ chạm NFC NTAG213/215: Chỉ cần chạm lưng điện thoại vào đối tác là toàn bộ thông tin doanh nghiệp, website, sản phẩm được truyền tải trọn vẹn trong 1 giây.
    - Mã QR cá nhân hóa động cho phép quét nhanh khi gặp gỡ tại các diễn đàn kinh tế.
@@ -431,7 +431,7 @@ Trọng tâm thiết kế hướng tới: **Sang trọng, Tối giản, Mượt 
 
 ### CHƯƠNG 3: NHẬN NHIỆM VỤ, NỘP BÁO CÁO & XỬ LÝ CÔNG VIỆC DI ĐỘNG
 1. **Nhận việc tức thời từ lãnh đạo**:
-   - Khi Chủ tịch, Ban Điều Hành, Tổng thư ký hoặc Trưởng ban giao việc, điện thoại hội viên lập tức phát chuông và hiển thị thông báo nhiệm vụ mới.
+   - Khi Chủ tịch, Ban Điều Hành, Tổng thư ký hoặc Trưởng ban giao việc, điện thoại Học viên lập tức phát chuông và hiển thị thông báo nhiệm vụ mới.
 2. **Tra cứu tài liệu đính kèm**:
    - Xem và tải trực tiếp các tệp văn bản Word, bảng tính Excel dự toán và tệp PDF kế hoạch hành động.
 3. **Cập nhật tiến độ & nộp kết quả**:
@@ -443,7 +443,7 @@ Trọng tâm thiết kế hướng tới: **Sang trọng, Tối giản, Mượt 
 ---
 
 ### CHƯƠNG 4: DANH BẠ DOANH NHÂN & LỊCH HẸN GIAO THƯƠNG 1-ON-1
-1. **Danh bạ hội viên tin cậy 100% chính danh**:
+1. **Danh bạ Học viên tin cậy 100% chính danh**:
    - Tìm kiếm đối tác theo lĩnh vực kinh doanh, khu vực địa lý hoặc sở thích kết nối.
    - Xem hồ sơ năng lực doanh nghiệp, lịch sử hợp tác và đánh giá uy tín.
 2. **Đặt lịch hẹn gặp gỡ 1-on-1**:
@@ -474,13 +474,13 @@ Trọng tâm thiết kế hướng tới: **Sang trọng, Tối giản, Mượt 
 1. **Đăng tải sản phẩm dịch vụ**:
    - Mỗi doanh nghiệp sở hữu một gian hàng số giới thiệu các thế mạnh mũi nhọn.
 2. **Giao dịch đặc quyền B2B**:
-   - Ưu đãi giảm giá đặc biệt dành riêng cho hội viên CEO HN10.
+   - Ưu đãi giảm giá đặc biệt dành riêng cho Học viên CEO HN10.
    - Nhận yêu cầu báo giá và kết nối trực tiếp với phòng mua hàng của các doanh nghiệp thành viên.
 
 ---
 
 ### CHƯƠNG 8: KÊNH ĐÓNG GÓP Ý KIẾN TỚI CHỦ TỊCH & BAN ĐIỀU HÀNH
-- Hội viên có thể gửi tâm thư, đề xuất giải pháp phát triển câu lạc bộ hoặc phản ánh vướng mắc trực tiếp tới Ban Điều Hành.
+- Học viên có thể gửi tâm thư, đề xuất giải pháp phát triển câu lạc bộ hoặc phản ánh vướng mắc trực tiếp tới Ban Điều Hành.
 - Ban Điều Hành tiếp nhận và phản hồi chính thức, tạo môi trường sinh hoạt gắn kết và dân chủ.
 
 ---
@@ -507,9 +507,9 @@ Trọng tâm thiết kế hướng tới: **Sang trọng, Tối giản, Mượt 
 ### TỔNG QUAN HỆ THỐNG ĐỒNG BỘ 2 CHIỀU
 Hệ sinh thái số CLB Doanh Nhân CEO HN10 là sự kết hợp hoàn hảo giữa 2 trụ cột công nghệ:
 1. **Cổng Quản trị CRM Hiệp hội (Web CRM)**: Dành cho Chủ tịch, Ban Điều Hành, Ban Thư ký và các Trưởng ban điều hành toàn diện công tác hội, hội phí, sự kiện và phân quyền.
-2. **Ứng dụng Di động Hội viên (Mobile App)**: Dành cho toàn thể hội viên doanh nhân kết nối giao thương, quản lý thẻ thành viên, nhận nhiệm vụ và tham dự sự kiện.
+2. **Ứng dụng Di động Học viên (Mobile App)**: Dành cho toàn thể Học viên doanh nhân kết nối giao thương, quản lý thẻ thành viên, nhận nhiệm vụ và tham dự sự kiện.
 
-Cả hai trụ cột chia sẻ chung một cơ sở dữ liệu duy nhất, đồng bộ hóa thời gian thực (Realtime Dual-Sync) đảm bảo mọi quyết sách từ Ban Điều Hành đều được truyền đạt tới hội viên trong từng phần nghìn giây.
+Cả hai trụ cột chia sẻ chung một cơ sở dữ liệu duy nhất, đồng bộ hóa thời gian thực (Realtime Dual-Sync) đảm bảo mọi quyết sách từ Ban Điều Hành đều được truyền đạt tới Học viên trong từng phần nghìn giây.
 `;
 
   // Lưu các file Markdown BRD
@@ -535,7 +535,7 @@ Cả hai trụ cột chia sẻ chung một cơ sở dữ liệu duy nhất, đ�
   fs.copyFileSync(path.join(DOC_DIR, 'BRD_WEB_CRM_CEOHN10.docx'), path.join(FE_DOCS_DIR, 'BRD_WEB_CRM_CEOHN10.docx'));
 
   await generateDocxFromText(
-    'TÀI LIỆU YÊU CẦU NGHIỆP VỤ ỨNG DỤNG DI ĐỘNG HỘI VIÊN (BRD - MOBILE APP)',
+    'TÀI LIỆU YÊU CẦU NGHIỆP VỤ ỨNG DỤNG DI ĐỘNG Học viên (BRD - MOBILE APP)',
     'CLB DOANH NHÂN CEO HN10 - HANOIBA',
     appBrdMd,
     path.join(DOC_DIR, 'BRD_MOBILE_APP_CEOHN10.docx')
@@ -579,15 +579,15 @@ Tài liệu đặc tả chi tiết các yêu cầu chức năng, yêu cầu phi 
 ### 2. CÁC YÊU CẦU CHỨC NĂNG CHÍNH
 1. **Phân hệ Quản trị Phân quyền RBAC**:
    - Ma trận phân quyền động lưu trong cấu hình hệ thống.
-   - 7 cấp bậc: Chủ tịch, Admin, Ban Điều Hành, Tổng thư ký, Trưởng ban, Ban thư ký, Hội viên.
+   - 7 cấp bậc: Chủ tịch, Admin, Ban Điều Hành, Tổng thư ký, Trưởng ban, Ban thư ký, Học viên.
    - Chặn điều hướng khi chưa lưu quyền (Unsaved changes modal 3 lựa chọn).
 2. **Phân hệ Giao việc & Quản lý Nhiệm vụ**:
    - Đính kèm tệp đa định dạng: Word, Excel, PDF, Hình ảnh.
    - Thẩm quyền giao việc theo ban, chặn ném lỗi 403 nếu vượt quyền.
    - Biểu mẫu động: Phân loại, dự toán, tiêu chí nghiệm thu, việc con, họp trực tuyến.
-3. **Phân hệ Quản lý Hội viên & Doanh nghiệp**:
+3. **Phân hệ Quản lý Học viên & Doanh nghiệp**:
    - Tiếp nhận, thẩm định, phê duyệt và cấp tài khoản tự động.
-   - Hồ sơ hội viên 360 độ và danh bạ doanh nghiệp.
+   - Hồ sơ Học viên 360 độ và danh bạ doanh nghiệp.
 4. **Phân hệ Quản lý Tài chính & Hội phí**:
    - Tự động sinh mã VietQR theo chuẩn Napas 24/7.
    - Xuất nhập báo cáo tài chính định dạng Excel tiêu chuẩn.
@@ -596,16 +596,16 @@ Tài liệu đặc tả chi tiết các yêu cầu chức năng, yêu cầu phi 
 `;
 
   const appSrsMd = `# ĐẶC TẢ YÊU CẦU PHẦN MỀM ỨNG DỤNG DI ĐỘNG (SRS - MOBILE APP)
-## ỨNG DỤNG DI ĐỘNG HỘI VIÊN CLB DOANH NHÂN CEO HN10
+## ỨNG DỤNG DI ĐỘNG Học viên CLB DOANH NHÂN CEO HN10
 *Chuẩn IEEE 830 - Phiên bản 4.0 - Tháng 10/2026*
 
 ---
 
 ### 1. MỤC ĐÍCH & PHẠM VI ỨNG DỤNG
 Tài liệu đặc tả các yêu cầu kỹ thuật và trải nghiệm người dùng trên ứng dụng di động CEO HN10:
-- Thẻ hội viên VIP điện tử 3D và chạm danh thiếp số NFC NTAG213/215.
+- Thẻ Học viên VIP điện tử 3D và chạm danh thiếp số NFC NTAG213/215.
 - Nhận nhiệm vụ được giao, xem tệp Word/Excel/PDF đính kèm và nộp báo cáo hoàn thành.
-- Mạng lưới hội viên, đặt lịch gặp 1-on-1 và kết nối kinh doanh B2B.
+- Mạng lưới Học viên, đặt lịch gặp 1-on-1 và kết nối kinh doanh B2B.
 - Ví vé sự kiện điện tử và mã QR soát vé tự động.
 - Dịch vụ đàm thoại WebRTC và dịch vụ thông báo nền Native Android CeoNotificationSyncService.
 - Trợ lý thông minh nhận diện giọng nói tiếng Việt hai động cơ (Dual-Engine STT/TTS).
@@ -698,13 +698,13 @@ async function generateAllHdsdDocuments() {
    - Nhập Dự toán kinh phí và các Tiêu chí nghiệm thu công việc.
 2. Bấm "Khởi tạo công việc": Người được giao việc sẽ lập tức nhận thông báo trên điện thoại.
 
-### BÀI 4: QUẢN TRỊ HỘI VIÊN, HỘI PHÍ & TỔ CHỨC SỰ KIỆN
-1. Duyệt hồ sơ hội viên mới và gửi thư thông báo.
+### BÀI 4: QUẢN TRỊ Học viên, HỘI PHÍ & TỔ CHỨC SỰ KIỆN
+1. Duyệt hồ sơ Học viên mới và gửi thư thông báo.
 2. Theo dõi đóng phí niên liễm qua cổng VietQR Napas 24/7.
 3. Thiết kế sơ đồ khán phòng và kiểm soát cổng soát vé QR tại sự kiện.
 `;
 
-  const appHdsdMd = `# HƯỚNG DẪN SỬ DỤNG ỨNG DỤNG DI ĐỘNG HỘI VIÊN (HDSD - MOBILE APP)
+  const appHdsdMd = `# HƯỚNG DẪN SỬ DỤNG ỨNG DỤNG DI ĐỘNG Học viên (HDSD - MOBILE APP)
 ## CẨM NANG THAO TÁC DÀNH CHO DOANH NHÂN CLB CEO HN10
 *Phiên bản: 4.0 - Phát hành: Tháng 10/2026*
 
@@ -712,11 +712,11 @@ async function generateAllHdsdDocuments() {
 
 ### BÀI 1: CÀI ĐẶT ỨNG DỤNG & ĐĂNG NHẬP LẦN ĐẦU
 1. Mở ứng dụng CEO HN10 trên điện thoại thông minh.
-2. Đăng nhập bằng Email hoặc Mã hội viên và mật khẩu được Ban Thư ký cấp.
+2. Đăng nhập bằng Email hoặc Mã Học viên và mật khẩu được Ban Thư ký cấp.
 3. Bật quyền nhận thông báo và quyền mic/camera để sẵn sàng kết nối.
 
-### BÀI 2: SỬ DỤNG THẺ HỘI VIÊN ĐIỆN TỬ & CHẠM DANH THIẾP NFC
-1. Tại màn hình chính, thẻ hội viên VIP điện tử hiển thị trang trọng.
+### BÀI 2: SỬ DỤNG THẺ Học viên ĐIỆN TỬ & CHẠM DANH THIẾP NFC
+1. Tại màn hình chính, thẻ Học viên VIP điện tử hiển thị trang trọng.
 2. Bật tính năng NFC trên điện thoại, chạm lưng máy vào điện thoại đối tác để trao đổi danh thiếp số.
 3. Hoặc nhấn vào thẻ để phóng to mã QR kết nối.
 
@@ -738,7 +738,7 @@ async function generateAllHdsdDocuments() {
 ---
 
 ### TỔNG HỢP TOÀN BỘ CẨM NANG VẬN HÀNH
-Tài liệu hướng dẫn sử dụng hợp nhất toàn diện mọi quy trình quản trị trên máy tính và thao tác hội viên trên ứng dụng di động.
+Tài liệu hướng dẫn sử dụng hợp nhất toàn diện mọi quy trình quản trị trên máy tính và thao tác Học viên trên ứng dụng di động.
 `;
 
   // Lưu file Markdown HDSD
@@ -764,7 +764,7 @@ Tài liệu hướng dẫn sử dụng hợp nhất toàn diện mọi quy trìn
   fs.copyFileSync(path.join(DOC_DIR, 'HDSD_WEB_CRM_CEOHN10.docx'), path.join(FE_DOCS_DIR, 'HDSD_WEB_CRM_CEOHN10.docx'));
 
   await generateDocxFromText(
-    'HƯỚNG DẪN SỬ DỤNG ỨNG DỤNG DI ĐỘNG HỘI VIÊN (HDSD - MOBILE APP)',
+    'HƯỚNG DẪN SỬ DỤNG ỨNG DỤNG DI ĐỘNG Học viên (HDSD - MOBILE APP)',
     'CLB DOANH NHÂN CEO HN10 - HANOIBA',
     appHdsdMd,
     path.join(DOC_DIR, 'HDSD_MOBILE_APP_CEOHN10.docx')
@@ -814,7 +814,7 @@ async function generateAllTestCasesFiles() {
 
   // Lọc ra các nhóm test case
   const crmUseCases = USE_CASES_DATA.filter((uc) => uc.category.includes('Quản Trị') || uc.category.includes('CRM') || uc.id.includes('CRM'));
-  const appUseCases = USE_CASES_DATA.filter((uc) => uc.category.includes('Hội Viên') || uc.category.includes('App') || uc.id.includes('APP') || uc.id.includes('PUB'));
+  const appUseCases = USE_CASES_DATA.filter((uc) => uc.category.includes('Học viên') || uc.category.includes('App') || uc.id.includes('APP') || uc.id.includes('PUB'));
 
   async function exportTestCaseExcel(testCases, title, outXlsxPath) {
     const workbook = new ExcelJS.Workbook();
@@ -921,8 +921,8 @@ async function generateAllTestCasesFiles() {
   // 2. Mobile App Test cases
   const appXlsx = path.join(DOC_DIR, 'TEST_CASES_MOBILE_APP_CEOHN10.xlsx');
   const appMd = path.join(DOC_DIR, 'TEST_CASES_MOBILE_APP_CEOHN10.md');
-  await exportTestCaseExcel(appUseCases, 'BẢNG TEST CASES KIỂM THỬ ỨNG DỤNG DI ĐỘNG HỘI VIÊN CEO HN10', appXlsx);
-  exportTestCaseMarkdown(appUseCases, 'BẢNG TEST CASES KIỂM THỬ ỨNG DỤNG DI ĐỘNG HỘI VIÊN CEO HN10', appMd);
+  await exportTestCaseExcel(appUseCases, 'BẢNG TEST CASES KIỂM THỬ ỨNG DỤNG DI ĐỘNG Học viên CEO HN10', appXlsx);
+  exportTestCaseMarkdown(appUseCases, 'BẢNG TEST CASES KIỂM THỬ ỨNG DỤNG DI ĐỘNG Học viên CEO HN10', appMd);
   fs.copyFileSync(appXlsx, path.join(DOCS_DIR, 'TEST_CASES_MOBILE_APP_CEOHN10.xlsx'));
   fs.copyFileSync(appMd, path.join(DOCS_DIR, 'TEST_CASES_MOBILE_APP_CEOHN10.md'));
   fs.copyFileSync(appXlsx, path.join(FE_DOCS_DIR, 'TEST_CASES_MOBILE_APP_CEOHN10.xlsx'));

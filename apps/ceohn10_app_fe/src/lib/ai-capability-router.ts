@@ -91,11 +91,11 @@ const KEYWORDS: Array<{ capability: AiCapability; terms: string[] }> = [
   {
     capability: "member_search",
     terms: [
-      "hội viên",
-      "hội viên nào",
-      "hội viên tên",
+      "Học viên",
+      "Học viên nào",
+      "Học viên tên",
       "tên là",
-      "tìm hội viên",
+      "tìm Học viên",
       "doanh nghiệp",
       "ngành",
       "tỉnh",
@@ -187,7 +187,7 @@ export function fromRegistryCapability(id: CapabilityId): AiCapability {
 
 const LABELS: Record<AiCapability, string> = {
   document_qa: "Hỏi đáp tài liệu",
-  member_search: "Tìm kiếm hội viên",
+  member_search: "Tìm kiếm Học viên",
   networking: "Kết nối",
   fee_analysis: "Phân tích hội phí",
   event_summary: "Tổng hợp sự kiện",

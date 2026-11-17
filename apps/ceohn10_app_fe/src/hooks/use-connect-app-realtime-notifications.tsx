@@ -21,8 +21,8 @@ export function useConnectAppRealtimeNotifications() {
     const token =
       (typeof window !== "undefined"
         ? localStorage.getItem("vibe_token") ||
-          localStorage.getItem("token") ||
-          localStorage.getItem("access_token")
+        localStorage.getItem("token") ||
+        localStorage.getItem("access_token")
         : null) || "";
     registerNativePushUser(viewerUserId, token);
   }, [viewerUserId]);
@@ -296,7 +296,7 @@ export function useConnectAppRealtimeNotifications() {
       const senderName =
         notif?.safeDisplayData?.counterpartDisplayName ||
         notif?.actorDisplayName ||
-        "Hội viên CEO HN10";
+        "Học viên CEO HN10";
       const senderCompany = notif?.safeDisplayData?.companyName || notif?.actorCompanyName;
       const senderTitle = notif?.safeDisplayData?.jobTitle || notif?.actorJobTitle;
       const senderAvatar = notif?.safeDisplayData?.avatarUrl || notif?.actorAvatarUrl;
@@ -373,7 +373,7 @@ export function useConnectAppRealtimeNotifications() {
 
     const handleNfcTapped = (data: any) => {
       invalidateEverything();
-      const name = data?.requesterProfile?.display_name || "Hội viên CEO HN10";
+      const name = data?.requesterProfile?.display_name || "Học viên CEO HN10";
       const company = data?.requesterProfile?.company_name;
       const title = data?.requesterProfile?.professional_title;
       const avatar = data?.requesterProfile?.avatar_url;
@@ -393,7 +393,7 @@ export function useConnectAppRealtimeNotifications() {
 
     const handleConnectionRequested = (data: any) => {
       invalidateEverything();
-      const name = data?.requesterProfile?.display_name || "Hội viên CEO HN10";
+      const name = data?.requesterProfile?.display_name || "Học viên CEO HN10";
       const company = data?.requesterProfile?.company_name;
       const title = data?.requesterProfile?.professional_title;
       const avatar = data?.requesterProfile?.avatar_url;
@@ -492,7 +492,7 @@ export function useConnectAppRealtimeNotifications() {
 
       if (typeof rawBody === "string" && rawBody.startsWith("[call:")) {
         const title = `📞 Cuộc gọi từ ${senderName}`;
-        const bodyText = "Cuộc gọi thoại / video trực tiếp giữa 2 hội viên";
+        const bodyText = "Cuộc gọi thoại / video trực tiếp giữa 2 Học viên";
         sendExternalNotification(title, {
           body: bodyText,
           tag: `call-log-${threadId || Date.now()}`,
@@ -528,7 +528,7 @@ export function useConnectAppRealtimeNotifications() {
       invalidateEverything();
       const reqProfile = data?.requesterProfile;
       const meeting = data?.meeting;
-      const name = reqProfile?.display_name || reqProfile?.name || "Hội viên";
+      const name = reqProfile?.display_name || reqProfile?.name || "Học viên";
       const title = `🤝 Lịch hẹn / Cuộc gặp mới từ ${name}`;
       const body =
         meeting?.title || meeting?.purpose || "Mời bạn tham gia cuộc gặp trao đổi kết nối B2B";
@@ -577,7 +577,7 @@ export function useConnectAppRealtimeNotifications() {
     const handleOpportunityCreated = (data: any) => {
       invalidateEverything();
       const opp = data?.opportunity || data;
-      const authorName = opp?.authorName || opp?.creatorName || opp?.memberName || "Hội viên";
+      const authorName = opp?.authorName || opp?.creatorName || opp?.memberName || "Học viên";
       const oppTitle = opp?.title || "Cơ hội giao thương mới";
       const title = `✨ Cơ hội hợp tác mới từ ${authorName}`;
       const bodyText = oppTitle.length > 120 ? oppTitle.slice(0, 120) + "..." : oppTitle;

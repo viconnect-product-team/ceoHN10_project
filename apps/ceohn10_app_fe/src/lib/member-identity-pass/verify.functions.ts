@@ -76,7 +76,7 @@ export const verifyMemberPassFn = createServerFn({ method: "GET" })
       }
     }
 
-    if (!pass) return fail("unknown", "Không tìm thấy thẻ hội viên.");
+    if (!pass) return fail("unknown", "Không tìm thấy thẻ Học viên.");
     const p = pass as Record<string, unknown>;
     const eff = effectiveStatus(p.status as string, (p.expires_at as string) ?? null);
 

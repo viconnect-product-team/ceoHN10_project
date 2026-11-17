@@ -36,7 +36,7 @@ export const ProductQuotesListModal: React.FC<ProductQuotesListModalProps> = ({
           <div className="min-w-0 flex-1 pr-2">
             <h3 className="text-[14.5px] font-black text-slate-900 dark:text-white flex items-center gap-2">
               <Users className="h-5 w-5 text-amber-500" />
-              <span>Hội viên quan tâm / Báo giá</span>
+              <span>Học viên quan tâm / Báo giá</span>
             </h3>
             <p className="text-xs text-slate-400 truncate mt-0.5">{viewingQuotesProduct.name}</p>
           </div>
@@ -56,7 +56,7 @@ export const ProductQuotesListModal: React.FC<ProductQuotesListModalProps> = ({
             <div className="text-center py-8">
               <FileText className="h-10 w-10 text-slate-300 dark:text-slate-600 mx-auto mb-2" />
               <p className="text-xs font-semibold text-slate-600 dark:text-slate-300">Chưa có yêu cầu báo giá nào</p>
-              <p className="text-[11px] text-slate-400 mt-1">Khi có hội viên gửi yêu cầu báo giá hoặc bấm quan tâm, thông tin liên hệ sẽ xuất hiện tại đây.</p>
+              <p className="text-[11px] text-slate-400 mt-1">Khi có Học viên gửi yêu cầu báo giá hoặc bấm quan tâm, thông tin liên hệ sẽ xuất hiện tại đây.</p>
             </div>
           ) : (
             productQuotes.map((q: any) => (
@@ -67,8 +67,8 @@ export const ProductQuotesListModal: React.FC<ProductQuotesListModalProps> = ({
                       {q.buyerName ? q.buyerName.charAt(0).toUpperCase() : "U"}
                     </div>
                     <div className="min-w-0">
-                      <h4 className="font-bold text-xs text-slate-900 dark:text-white truncate">{q.buyerName || "Hội viên CLB"}</h4>
-                      <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate">{q.buyerCompany || "Hội viên CEO HN10"}</p>
+                      <h4 className="font-bold text-xs text-slate-900 dark:text-white truncate">{q.buyerName || "Học viên CLB"}</h4>
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate">{q.buyerCompany || "Học viên CEO HN10"}</p>
                     </div>
                   </div>
                   <span className="text-[10px] text-amber-600 dark:text-amber-400 font-semibold px-2 py-0.5 rounded-md bg-amber-500/10 shrink-0">

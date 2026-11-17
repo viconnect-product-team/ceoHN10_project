@@ -31,7 +31,7 @@ export type ResolvedContext = {
 const REFERENCE_PATTERNS: RegExp[] = [
   /(^|[\s,])họ([\s,.?!]|$)/,
   /nhóm này/,
-  /các hội viên đó/,
+  /các Học viên đó/,
   /những người (này|đó)/,
   /sự kiện (này|đó|trên)/,
   /khoản (này|đó)/,

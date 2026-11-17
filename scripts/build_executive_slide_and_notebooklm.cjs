@@ -13,7 +13,7 @@ if (!fs.existsSync(NOTEBOOK_DIR)) fs.mkdirSync(NOTEBOOK_DIR, { recursive: true }
 const groupsData = [
   {
     code: 'A',
-    title: 'GIAO DIỆN & THẺ HỘI VIÊN',
+    title: 'GIAO DIỆN & THẺ Học viên',
     desc: 'Đơn giản hóa trải nghiệm, tập trung giá trị cốt lõi & bảo mật danh tính doanh nhân',
     items: [
       {
@@ -27,7 +27,7 @@ const groupsData = [
       },
       {
         stt: 2,
-        title: 'Thẻ hội viên thông minh',
+        title: 'Thẻ Học viên thông minh',
         issue: 'Chưa có tùy chọn ẩn/hiện email, số điện thoại để bảo vệ quyền riêng tư.',
         solution: 'Bổ sung công tắc Ẩn/Hiện SĐT & Email độc lập; tự động gắn huy hiệu xác thực bảo mật khi chia sẻ đối ngoại.',
         status: '🟢 ĐÃ SẴN SÀNG',
@@ -70,7 +70,7 @@ const groupsData = [
       },
       {
         stt: 6,
-        title: 'Giới thiệu hội viên (Voucher)',
+        title: 'Giới thiệu Học viên (Voucher)',
         issue: 'Chưa có cơ chế giới thiệu văn minh; mục quảng cáo menu CRM chưa phù hợp.',
         solution: 'Cấp mã mời / QR định danh riêng; tặng Voucher đặc quyền VIP khi giới thiệu thành công (tuyệt đối không làm affiliate).',
         status: '🟡 ĐANG TRIỂN KHAI',
@@ -105,7 +105,7 @@ const groupsData = [
       {
         stt: 9,
         title: 'Check-in gắn 2 dòng lợi ích',
-        issue: 'Quét check-in chưa tạo động lực và giá trị thiết thực cho hội viên tham dự.',
+        issue: 'Quét check-in chưa tạo động lực và giá trị thiết thực cho Học viên tham dự.',
         solution: 'Dòng 1: Mở khóa danh bạ hội trường để kết nối tức thì; Dòng 2: Tích điểm chuyên cần & Quay số may mắn Lucky Draw.',
         status: '🟡 ĐANG TRIỂN KHAI',
         statusType: 'IN_PROGRESS',
@@ -115,7 +115,7 @@ const groupsData = [
         stt: 10,
         title: 'Lịch họp & Phễu Onboarding',
         issue: 'Lịch họp thiếu thống kê; chưa có điều kiện họp định hướng trước khi vào CLB.',
-        solution: 'Số hóa quản trị lịch họp các ban kèm link/QR điểm danh; buộc tham gia buổi đào tạo định hướng mới phê duyệt hội viên.',
+        solution: 'Số hóa quản trị lịch họp các ban kèm link/QR điểm danh; buộc tham gia buổi đào tạo định hướng mới phê duyệt Học viên.',
         status: '🟡 ĐANG TRIỂN KHAI',
         statusType: 'IN_PROGRESS',
         deadline: 'Hoàn thiện trước 05/11/2026'
@@ -125,11 +125,11 @@ const groupsData = [
   {
     code: 'D',
     title: 'QUẢN TRỊ CRM & BÁO CÁO ĐIỀU HÀNH',
-    desc: 'Chỉ số sức khỏe hội viên, cảnh báo trầm lắng, quản lý niên liễm VietQR & xuất báo cáo',
+    desc: 'Chỉ số sức khỏe Học viên, cảnh báo trầm lắng, quản lý niên liễm VietQR & xuất báo cáo',
     items: [
       {
         stt: 11,
-        title: 'Chuẩn hóa CSDL hội viên',
+        title: 'Chuẩn hóa CSDL Học viên',
         issue: 'Dữ liệu thành viên và ngày sinh chưa cập nhật đầy đủ, khó chăm sóc.',
         solution: 'Công cụ Import Excel đối soát lỗi tự động; gửi nhắc cập nhật ngày sinh nhận quà; ViConnect hỗ trợ làm sạch trong 24h.',
         status: '🔵 KẾ HOẠCH TIẾP THEO',
@@ -139,8 +139,8 @@ const groupsData = [
       {
         stt: 12,
         title: 'Chỉ số sức khỏe & Cảnh báo',
-        issue: 'Dashboard thiếu chỉ số tích cực theo người/ban; chưa cảnh báo hội viên trầm lắng.',
-        solution: 'Đồ thị Bar & Line tăng/giảm, bục vinh danh Top 3 gọn 1 hàng; tự động gắn cờ hội viên ít tương tác để BĐH chăm sóc.',
+        issue: 'Dashboard thiếu chỉ số tích cực theo người/ban; chưa cảnh báo Học viên trầm lắng.',
+        solution: 'Đồ thị Bar & Line tăng/giảm, bục vinh danh Top 3 gọn 1 hàng; tự động gắn cờ Học viên ít tương tác để BĐH chăm sóc.',
         status: '🟡 ĐANG TRIỂN KHAI',
         statusType: 'IN_PROGRESS',
         deadline: 'Hoàn thiện trước 05/11/2026'
@@ -158,7 +158,7 @@ const groupsData = [
         stt: 14,
         title: 'Bộ Báo cáo Tháng/Quý/Năm',
         issue: 'Chưa có mẫu báo cáo chuẩn kỳ phục vụ họp Ban Điều Hành.',
-        solution: 'Mẫu báo cáo điều hành 4 trụ cột (Tài chính, Tích cực, Giao thương, Hội viên mới) xuất bản in A4 và file Excel tức thì.',
+        solution: 'Mẫu báo cáo điều hành 4 trụ cột (Tài chính, Tích cực, Giao thương, Học viên mới) xuất bản in A4 và file Excel tức thì.',
         status: '🟡 ĐANG TRIỂN KHAI',
         statusType: 'IN_PROGRESS',
         deadline: 'Hoàn thiện trước 05/11/2026'
@@ -167,7 +167,7 @@ const groupsData = [
   },
   {
     code: 'E',
-    title: 'TRANG CÁ NHÂN HỘI VIÊN',
+    title: 'TRANG CÁ NHÂN Học viên',
     desc: 'Dòng thời gian hoạt động & danh thiếp số doanh nhân tích hợp 1 chạm',
     items: [
       {
@@ -192,11 +192,11 @@ function generateNotebookLmMarkdown() {
 ---
 
 ## 📌 TỔNG QUAN CHIẾN LƯỢC & CAM KẾT TIẾN ĐỘ ĐỢT 1
-- **Định hướng cốt lõi:** *"Đơn giản hóa ứng dụng để hội viên dùng thường xuyên; biến dữ liệu hoạt động thành công cụ quản trị sắc bén cho Ban Điều Hành."*
+- **Định hướng cốt lõi:** *"Đơn giản hóa ứng dụng để Học viên dùng thường xuyên; biến dữ liệu hoạt động thành công cụ quản trị sắc bén cho Ban Điều Hành."*
 - **Quy mô xử lý:** 15 hạng mục trọng điểm / 5 nhóm nghiệp vụ.
 - **Tiến độ cam kết Đợt 1:** Hoàn thành toàn diện trước ngày **05/11/2026**.
 - **Phân định 3 trạng thái:**
-  - 🟢 **02 hạng mục ĐÃ SẴN SÀNG:** Nền tảng giao diện tinh giản & bảo mật thẻ hội viên.
+  - 🟢 **02 hạng mục ĐÃ SẴN SÀNG:** Nền tảng giao diện tinh giản & bảo mật thẻ Học viên.
   - 🟡 **11 hạng mục ĐANG TRIỂN KHAI:** Hoàn thiện trước **05/11/2026**.
   - 🔵 **02 hạng mục KẾ HOẠCH TIẾP THEO:** Phối hợp kết nối Zalo OA, VNPAY & nạp CSDL trước **10/11/2026**.
 
@@ -242,7 +242,7 @@ async function generatePowerPoint() {
 
   // SLIDE 1: COVER WITH SKYLINE BACKGROUND & POSTER
   const slide1 = pptx.addSlide();
-  
+
   const coverBgPath = path.resolve(DOC_DIR, 'images/backgrounds/01_skyline_lake.jpg');
   if (fs.existsSync(coverBgPath)) {
     slide1.addImage({
@@ -342,7 +342,7 @@ async function generatePowerPoint() {
   });
 
   // Subtitle
-  slide1.addText('Đơn giản hóa ứng dụng cho hội viên dễ dùng thường xuyên · Biến dữ liệu thành công cụ quản trị sắc bén cho Ban Điều Hành.\nToàn bộ 15 hạng mục Đợt 1 cam kết hoàn thành trước 05/11/2026.', {
+  slide1.addText('Đơn giản hóa ứng dụng cho Học viên dễ dùng thường xuyên · Biến dữ liệu thành công cụ quản trị sắc bén cho Ban Điều Hành.\nToàn bộ 15 hạng mục Đợt 1 cam kết hoàn thành trước 05/11/2026.', {
     x: 1.1,
     y: 3.20,
     w: 7.0,
@@ -422,7 +422,7 @@ async function generatePowerPoint() {
     fontFace: 'Arial'
   });
 
-  slide2.addText('Mục tiêu chiến lược: "Đơn giản hóa để hội viên dùng thường xuyên - Biến dữ liệu thành công cụ quản trị sắc bén cho BĐH"', {
+  slide2.addText('Mục tiêu chiến lược: "Đơn giản hóa để Học viên dùng thường xuyên - Biến dữ liệu thành công cụ quản trị sắc bén cho BĐH"', {
     x: 0.8,
     y: 1.0,
     w: 8.8,
@@ -513,7 +513,7 @@ async function generatePowerPoint() {
       sol: '💡 ViConnect: Tinh giản trang chủ 4 luồng; xây dựng Gian Hàng Doanh Nghiệp Số riêng biệt.'
     },
     {
-      name: '👤 Chị Phương (Phó ban Hội viên)',
+      name: '👤 Chị Phương (Phó ban Học viên)',
       tag: 'DOANH SỐ & HỘI PHÍ',
       tagBg: 'DBEAFE',
       tagColor: '1E40AF',
@@ -736,7 +736,7 @@ async function generatePowerPoint() {
           title: 'ĐẶC QUYỀN & GIAN HÀNG SỐ',
           color: '9A3412',
           border: 'FED7AA',
-          bullets: '• Thẻ hội viên số kèm huy hiệu bảo mật.\n• Kho Voucher ưu đãi VIP cho CLB.\n• Gian hàng số 5 sản phẩm tiêu biểu.\n• Danh thiếp thông minh chia sẻ 1 chạm.'
+          bullets: '• Thẻ Học viên số kèm huy hiệu bảo mật.\n• Kho Voucher ưu đãi VIP cho CLB.\n• Gian hàng số 5 sản phẩm tiêu biểu.\n• Danh thiếp thông minh chia sẻ 1 chạm.'
         }
       ];
 
@@ -875,10 +875,10 @@ async function generatePowerPoint() {
       });
 
       const bannerText = grp.code === 'B'
-        ? '💡 Trọng tâm Nhóm B: Chuẩn hóa 5 sản phẩm/DN, kết nối trực tiếp cung - cầu 10 ngành nghề trọng điểm HanoiBA và phát hành voucher tri ân hội viên.'
+        ? '💡 Trọng tâm Nhóm B: Chuẩn hóa 5 sản phẩm/DN, kết nối trực tiếp cung - cầu 10 ngành nghề trọng điểm HanoiBA và phát hành voucher tri ân Học viên.'
         : grp.code === 'A'
-        ? '✦ Trọng tâm Nhóm A: Tinh giản giao diện di động 1 chạm; bảo vệ dữ liệu cá nhân theo tiêu chuẩn an toàn thông tin doanh nghiệp.'
-        : '✦ Trọng tâm Nhóm C: Số hóa 100% check-in QR sự kiện; phân định rõ cơ hội giao thương và kết nối có doanh số thực tế.';
+          ? '✦ Trọng tâm Nhóm A: Tinh giản giao diện di động 1 chạm; bảo vệ dữ liệu cá nhân theo tiêu chuẩn an toàn thông tin doanh nghiệp.'
+          : '✦ Trọng tâm Nhóm C: Số hóa 100% check-in QR sự kiện; phân định rõ cơ hội giao thương và kết nối có doanh số thực tế.';
 
       sl.addText(bannerText, {
         x: 1.0,
@@ -937,7 +937,7 @@ async function generatePowerPoint() {
       status: 'ĐÃ SẴN SÀNG',
       borderColor: '10B981',
       titleColor: '34D399',
-      bullets: '• Tinh gọn Trang chủ quanh 4 luồng cốt lõi.\n• Bảo mật thẻ hội viên (công tắc ẩn/hiện SĐT).\n• Tối ưu tốc độ & giao diện di động mượt mà.'
+      bullets: '• Tinh gọn Trang chủ quanh 4 luồng cốt lõi.\n• Bảo mật thẻ Học viên (công tắc ẩn/hiện SĐT).\n• Tối ưu tốc độ & giao diện di động mượt mà.'
     },
     {
       title: '🟡 GIAI ĐOẠN 2: TÍNH NĂNG',
@@ -1209,7 +1209,7 @@ function generateHtmlSlideViewer() {
           <div style="margin-left: auto; background: #003B95; color: #00D2FF; padding: 3px 10px; border-radius: 16px; font-size: 10px; font-weight: 700; letter-spacing: 0.5px;">HỢP TÁC CÔNG NGHỆ</div>
         </div>
         <h1 style="font-size: 19px; font-weight: 800; line-height: 1.3; color: #001F54; margin: 6px 0 6px 0;">BÁO CÁO TIẾP THU Ý KIẾN HỌP &amp;<br>PHƯƠNG ÁN NÂNG CẤP HỆ THỐNG CEO HN10</h1>
-        <p style="font-size: 11px; color: #334155; line-height: 1.45; margin-bottom: 10px;">Đơn giản hóa cho hội viên dùng thường xuyên · Biến dữ liệu thành công cụ quản trị sắc bén cho Ban Điều Hành. Toàn bộ 15 hạng mục Đợt 1 cam kết hoàn thành trước 05/11/2026.</p>
+        <p style="font-size: 11px; color: #334155; line-height: 1.45; margin-bottom: 10px;">Đơn giản hóa cho Học viên dùng thường xuyên · Biến dữ liệu thành công cụ quản trị sắc bén cho Ban Điều Hành. Toàn bộ 15 hạng mục Đợt 1 cam kết hoàn thành trước 05/11/2026.</p>
         
         <div style="background: #FFF7ED; border: 1px solid #FED7AA; border-radius: 8px; padding: 8px 12px; font-size: 10.5px; color: #78350F; line-height: 1.5; margin-bottom: 8px;">
           📅 <strong>Căn cứ cuộc họp Ban Điều Hành:</strong> Ngày 21/10/2026<br>
@@ -1240,7 +1240,7 @@ function generateHtmlSlideViewer() {
       <div>
         <div class="group-code">TỔNG QUAN ĐIỀU HÀNH</div>
         <div class="group-title">MỤC TIÊU CHIẾN LƯỢC &amp; CAM KẾT TIẾN ĐỘ ĐỢT 1</div>
-        <div class="group-desc">Đơn giản hóa cho hội viên - Sắc bén cho Ban Điều Hành (Hoàn thiện toàn diện trước 05/11/2026)</div>
+        <div class="group-desc">Đơn giản hóa cho Học viên - Sắc bén cho Ban Điều Hành (Hoàn thiện toàn diện trước 05/11/2026)</div>
       </div>
       <div style="display: flex; align-items: center; gap: 8px; background: #FFFFFF; padding: 4px 10px; border-radius: 8px; border: 1px solid #E2E8F0; box-shadow: 0 1px 2px rgba(0,0,0,0.04);">
         <img src="${ceoLogoDataUrl}" style="height: 22px; object-fit: contain;" alt="CEO HN10">
@@ -1254,7 +1254,7 @@ function generateHtmlSlideViewer() {
       <div class="dash-card green" style="padding: 8px 10px;">
         <div style="font-weight: 700; font-size: 10.5px;">🟢 ĐÃ SẴN SÀNG</div>
         <div class="dash-num" style="font-size: 18px; margin: 2px 0;">02 HẠNG MỤC</div>
-        <div style="font-size: 10px;">Trang chủ tinh gọn &amp; Bảo mật thẻ hội viên</div>
+        <div style="font-size: 10px;">Trang chủ tinh gọn &amp; Bảo mật thẻ Học viên</div>
       </div>
       <div class="dash-card yellow" style="padding: 8px 10px;">
         <div style="font-weight: 700; font-size: 10.5px;">🟡 ĐANG TRIỂN KHAI</div>
@@ -1307,7 +1307,7 @@ function generateHtmlSlideViewer() {
       <!-- Leader 3 -->
       <div style="background: #FFFFFF; border: 1.5px solid #E2E8F0; border-radius: 8px; padding: 10px 14px; display: flex; flex-direction: column; gap: 6px; box-shadow: 0 1px 2px rgba(0,0,0,0.04);">
         <div style="display: flex; justify-content: space-between; align-items: center;">
-          <div style="font-size: 12px; font-weight: 800; color: #1F3864;">👤 Chị Phương (Phó ban Hội viên)</div>
+          <div style="font-size: 12px; font-weight: 800; color: #1F3864;">👤 Chị Phương (Phó ban Học viên)</div>
           <span style="font-size: 9px; font-weight: 700; background: #DBEAFE; color: #1E40AF; padding: 2px 7px; border-radius: 4px; border: 1px solid #3B82F6;">DOANH SỐ &amp; HỘI PHÍ</span>
         </div>
         <div style="font-size: 10.5px; color: #991B1B; background: #FEF2F2; border-left: 3px solid #EF4444; padding: 5px 8px; border-radius: 4px; line-height: 1.45;">
@@ -1341,11 +1341,11 @@ function generateHtmlSlideViewer() {
   </div>
 
   ${groupsData
-    .map(
-      (grp, idx) => {
-        if (grp.code === 'E') {
-          const it = grp.items[0];
-          return `
+      .map(
+        (grp, idx) => {
+          if (grp.code === 'E') {
+            const it = grp.items[0];
+            return `
   <!-- SLIDE ${idx + 3}: NHÓM E - MEMBER PORTFOLIO -->
   <div class="slide">
     <div class="slide-header" style="display: flex; justify-content: space-between; align-items: center;">
@@ -1399,7 +1399,7 @@ function generateHtmlSlideViewer() {
           <span><strong>🎓 Đào tạo:</strong> Lưu chứng nhận hoàn thành các khóa huấn luyện quản trị doanh nghiệp.</span>
         </div>
         <div style="flex: 1; background: #EFF6FF; border-radius: 6px; padding: 8px 10px; font-size: 10.5px; color: #1E3A8A; line-height: 1.45; display: flex; align-items: center;">
-          <span><strong>🏆 Điểm chuyên cần:</strong> Tích lũy huy hiệu hội viên tích cực &amp; vai trò ban điều hành.</span>
+          <span><strong>🏆 Điểm chuyên cần:</strong> Tích lũy huy hiệu Học viên tích cực &amp; vai trò ban điều hành.</span>
         </div>
       </div>
 
@@ -1430,7 +1430,7 @@ function generateHtmlSlideViewer() {
           <div style="font-weight: 800; font-size: 12px; color: #9A3412;">ĐẶC QUYỀN &amp; GIAN HÀNG SỐ</div>
         </div>
         <div style="flex: 1; background: #FFF7ED; border-radius: 6px; padding: 8px 10px; font-size: 10.5px; color: #7C2D12; line-height: 1.45; display: flex; align-items: center;">
-          <span><strong>🪪 Thẻ hội viên VIP:</strong> Danh thiếp số NFC/QR, kiểm soát bật/tắt bảo mật SĐT.</span>
+          <span><strong>🪪 Thẻ Học viên VIP:</strong> Danh thiếp số NFC/QR, kiểm soát bật/tắt bảo mật SĐT.</span>
         </div>
         <div style="flex: 1; background: #FFF7ED; border-radius: 6px; padding: 8px 10px; font-size: 10.5px; color: #7C2D12; line-height: 1.45; display: flex; align-items: center;">
           <span><strong>🎁 Kho Voucher:</strong> Ưu đãi chiết khấu đặc quyền dành riêng thành viên CEO HN10.</span>
@@ -1444,11 +1444,11 @@ function generateHtmlSlideViewer() {
       </div>
     </div>
   </div>`;
-        }
+          }
 
-        // Groups A, B, C, D
-        const isDense = grp.items.length === 4;
-        return `
+          // Groups A, B, C, D
+          const isDense = grp.items.length === 4;
+          return `
   <!-- SLIDE ${idx + 3}: NHÓM ${grp.code} -->
   <div class="slide">
     <div class="slide-header" style="display: flex; justify-content: space-between; align-items: center;">
@@ -1467,8 +1467,8 @@ function generateHtmlSlideViewer() {
     </div>
     <div class="items-container" style="flex: 1; display: flex; flex-direction: column; justify-content: space-between; gap: ${isDense ? '5px' : '8px'};">
       ${grp.items
-        .map(
-          it => `
+              .map(
+                it => `
       <div class="item-card" style="flex: 1; display: flex; flex-direction: column; justify-content: space-between; padding: ${isDense ? '6px 12px' : '8px 14px'};">
         <div class="item-header" style="margin-bottom: 2px;">
           <div class="item-name" style="font-size: ${isDense ? '12.5px' : '13.5px'}; font-weight: 800;">${it.stt}. ${it.title}</div>
@@ -1485,34 +1485,31 @@ function generateHtmlSlideViewer() {
           </div>
         </div>
       </div>`
-        )
-        .join('')}
-      ${
-        grp.code === 'A'
-          ? `<div style="background: #F0FDF4; border: 1.5px dashed #10B981; border-radius: 8px; padding: 7px 14px; font-size: 10.5px; color: #065F46;">
+              )
+              .join('')}
+      ${grp.code === 'A'
+              ? `<div style="background: #F0FDF4; border: 1.5px dashed #10B981; border-radius: 8px; padding: 7px 14px; font-size: 10.5px; color: #065F46;">
                <strong>✦ Trọng tâm Nhóm A:</strong> Tối ưu trải nghiệm 1 chạm trên di động; bảo vệ dữ liệu cá nhân theo tiêu chuẩn an toàn thông tin doanh nghiệp.
              </div>`
-          : ''
-      }
-      ${
-        grp.code === 'B'
-          ? `<div style="background: #FFFBEB; border: 1px dashed #F59E0B; border-radius: 8px; padding: 5px 12px; font-size: 10px; color: #92400E;">
-               <strong>💡 Trọng tâm chiến lược Nhóm B:</strong> ViConnect triển khai bộ lọc danh mục ngành nghề đa tầng, kết nối trực tiếp cung - cầu và phát hành voucher tri ân hội viên.
+              : ''
+            }
+      ${grp.code === 'B'
+              ? `<div style="background: #FFFBEB; border: 1px dashed #F59E0B; border-radius: 8px; padding: 5px 12px; font-size: 10px; color: #92400E;">
+               <strong>💡 Trọng tâm chiến lược Nhóm B:</strong> ViConnect triển khai bộ lọc danh mục ngành nghề đa tầng, kết nối trực tiếp cung - cầu và phát hành voucher tri ân Học viên.
              </div>`
-          : ''
-      }
-      ${
-        grp.code === 'C'
-          ? `<div style="background: #EFF6FF; border: 1.5px dashed #3B82F6; border-radius: 8px; padding: 7px 14px; font-size: 10.5px; color: #1E40AF;">
+              : ''
+            }
+      ${grp.code === 'C'
+              ? `<div style="background: #EFF6FF; border: 1.5px dashed #3B82F6; border-radius: 8px; padding: 7px 14px; font-size: 10.5px; color: #1E40AF;">
                <strong>✦ Trọng tâm Nhóm C:</strong> Số hóa 100% check-in QR sự kiện; phân định rõ cơ hội giao thương và các phiên kết nối 1-1 có phát sinh deal thực tế.
              </div>`
-          : ''
-      }
+              : ''
+            }
     </div>
   </div>`;
-      }
-    )
-    .join('')}
+        }
+      )
+      .join('')}
 
   <!-- SLIDE 8: KẾT LUẬN & CAM KẾT (RICH ROYAL NAVY) -->
   <div class="slide slide-dark" style="background-color: #001F54 !important; background: linear-gradient(135deg, #001F54 0%, #0A2540 60%, #003B95 100%) !important; color: #FFFFFF !important; display: flex; flex-direction: column; justify-content: space-between; padding: 22px 30px;">
@@ -1532,7 +1529,7 @@ function generateHtmlSlideViewer() {
         </div>
         <div style="font-size: 10px; color: #F1F5F9; line-height: 1.6;">
           • Tinh gọn Trang chủ quanh 4 luồng cốt lõi.<br>
-          • Bảo mật thẻ hội viên (công tắc ẩn/hiện SĐT &amp; Email).<br>
+          • Bảo mật thẻ Học viên (công tắc ẩn/hiện SĐT &amp; Email).<br>
           • Tối ưu tốc độ &amp; giao diện di động mượt mà.<br>
           • Kiểm soát chặt chẽ phân quyền truy cập thông tin.
         </div>
@@ -1559,7 +1556,7 @@ function generateHtmlSlideViewer() {
           <span style="font-size: 9px; font-weight: 700; background: rgba(59, 130, 246, 0.25); color: #BFDBFE; padding: 2px 6px; border-radius: 4px;">TRƯỚC 10/11</span>
         </div>
         <div style="font-size: 10px; color: #F1F5F9; line-height: 1.6;">
-          • Phối hợp Ban Thư Ký nạp &amp; chuẩn hóa CSDL hội viên.<br>
+          • Phối hợp Ban Thư Ký nạp &amp; chuẩn hóa CSDL Học viên.<br>
           • Tích hợp Zalo OA tự động gửi thông báo &amp; vé mời.<br>
           • Cổng thanh toán VietQR động &amp; VNPAY Merchant.<br>
           • Bàn giao trọn bộ tài liệu &amp; quy chuẩn vận hành.
@@ -1570,10 +1567,10 @@ function generateHtmlSlideViewer() {
     <!-- 3 Strategic Value Pillars -->
     <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 4px 0;">
       <div style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.18); border-radius: 6px; padding: 7px 10px; font-size: 9.5px; color: #E2E8F0; text-align: center;">
-        🛡️ <strong>BẢO MẬT &amp; ĐỘC LẬP:</strong> Dữ liệu hội viên lưu trữ riêng biệt, phân quyền chặt chẽ.
+        🛡️ <strong>BẢO MẬT &amp; ĐỘC LẬP:</strong> Dữ liệu Học viên lưu trữ riêng biệt, phân quyền chặt chẽ.
       </div>
       <div style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.18); border-radius: 6px; padding: 7px 10px; font-size: 9.5px; color: #E2E8F0; text-align: center;">
-        ⚡ <strong>TRẢI NGHIỆM 1 CHẠM:</strong> Mọi thao tác hội viên diễn ra dưới 3 giây, trực quan dễ dùng.
+        ⚡ <strong>TRẢI NGHIỆM 1 CHẠM:</strong> Mọi thao tác Học viên diễn ra dưới 3 giây, trực quan dễ dùng.
       </div>
       <div style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.18); border-radius: 6px; padding: 7px 10px; font-size: 9.5px; color: #E2E8F0; text-align: center;">
         📊 <strong>DỮ LIỆU ĐIỀU HÀNH:</strong> Báo cáo thời gian thực, đo lường chính xác hiệu quả giao thương.
@@ -1736,21 +1733,21 @@ async function generateConciseWordDoc() {
 
   // Raw details mapped from groupsData
   const rawDetails = {
-    1: { issue: 'Trang chủ có 8 ô tính năng nhanh, dàn trải.', goal: 'Đơn giản hóa để hội viên dùng thường xuyên.', clb: 'Rút gọn quanh 4 chức năng: Sự kiện, Tìm hội viên, Cơ hội, Góc hội viên.', person: 'Anh Tuấn\nAnh Thành', p: 'Cao · Đợt 1' },
-    2: { issue: 'Chưa có tùy chọn ẩn/hiện email, SĐT trên thẻ.', goal: 'Bảo vệ quyền riêng tư của hội viên.', clb: 'Thêm công tắc ẩn/hiện email, SĐT. Tinh giản giao diện thẻ.', person: 'Ban Thư ký', p: 'Cao · Đợt 1' },
+    1: { issue: 'Trang chủ có 8 ô tính năng nhanh, dàn trải.', goal: 'Đơn giản hóa để Học viên dùng thường xuyên.', clb: 'Rút gọn quanh 4 chức năng: Sự kiện, Tìm Học viên, Cơ hội, Góc Học viên.', person: 'Anh Tuấn\nAnh Thành', p: 'Cao · Đợt 1' },
+    2: { issue: 'Chưa có tùy chọn ẩn/hiện email, SĐT trên thẻ.', goal: 'Bảo vệ quyền riêng tư của Học viên.', clb: 'Thêm công tắc ẩn/hiện email, SĐT. Tinh giản giao diện thẻ.', person: 'Ban Thư ký', p: 'Cao · Đợt 1' },
     3: { issue: 'Đặc quyền đang nằm chung tính năng nhanh.', goal: 'Tạo kênh quyền lợi riêng; mở hướng gian hàng số.', clb: 'Tách thành tính năng riêng. Nghiên cứu mô hình gian hàng triển lãm.', person: 'Anh Tuấn', p: 'Trung bình' },
     4: { issue: 'Chưa giới hạn số sản phẩm mỗi doanh nghiệp.', goal: 'Giữ sàn gọn, đủ tải; chống spam.', clb: 'Giới hạn tối đa 5 sản phẩm cần bán cho mỗi doanh nghiệp.', person: 'Anh Thành', p: 'Cao · Đợt 1' },
     5: { issue: 'Cần tra cứu theo ngành nghề; thông tin cần thu gọn.', goal: 'Doanh nghiệp tìm đúng đối tượng cần.', clb: 'Bổ sung tra cứu, lọc ngành nghề; giữ mức cơ bản mua/bán.', person: 'Anh Thành\nAnh Tuấn', p: 'Cao · Đợt 1' },
-    6: { issue: 'Chưa có cơ chế giới thiệu & voucher; mục quảng cáo chưa rõ.', goal: 'Khuyến khích hội viên giới thiệu mở rộng mạng lưới.', clb: 'Giới thiệu nhận voucher tri ân; không làm affiliate.', person: 'Anh Thành', p: 'Trung bình' },
+    6: { issue: 'Chưa có cơ chế giới thiệu & voucher; mục quảng cáo chưa rõ.', goal: 'Khuyến khích Học viên giới thiệu mở rộng mạng lưới.', clb: 'Giới thiệu nhận voucher tri ân; không làm affiliate.', person: 'Anh Thành', p: 'Trung bình' },
     7: { issue: 'Chưa phân biệt Cơ hội với Kết nối có doanh thu.', goal: 'Đo được hiệu quả giao thương thực tế của CLB.', clb: 'Tách 2 trạng thái Cơ hội & Kết nối. Ghi nhận giao dịch.', person: 'Chị Phương', p: 'Cao · Đợt 1' },
     8: { issue: 'Vé chỉ gửi qua email; chưa có Zalo OA & VNPAY.', goal: 'Thuận tiện thanh toán; nhận tin kênh quen thuộc.', clb: 'Gửi vé qua Zalo OA; tích hợp thanh toán VNPAY/VietQR.', person: 'BĐH', p: 'Cao · Đợt 1' },
-    9: { issue: 'Check-in chưa gắn với lợi ích cụ thể.', goal: 'Khuyến khích hội viên tham gia sự kiện.', clb: 'Phát triển 2 dòng tính năng check-in gắn với lợi ích hội viên.', person: 'BĐH', p: 'Cần làm rõ' },
+    9: { issue: 'Check-in chưa gắn với lợi ích cụ thể.', goal: 'Khuyến khích Học viên tham gia sự kiện.', clb: 'Phát triển 2 dòng tính năng check-in gắn với lợi ích Học viên.', person: 'BĐH', p: 'Cần làm rõ' },
     10: { issue: 'Lịch họp chưa kèm thống kê; chưa có tiêu chí gia nhập.', goal: 'Đánh giá mức độ gặp gỡ; đặt điều kiện gia nhập.', clb: 'Lịch họp kèm thống kê; buộc tham gia họp định hướng mới vào CLB.', person: 'Chị Phương', p: 'Trung bình' },
-    11: { issue: 'Thông tin hồ sơ cần chuẩn hóa; ngày sinh chưa đủ.', goal: 'Làm nền cho chăm sóc hội viên và báo cáo.', clb: 'Rà soát chuẩn hóa hồ sơ hội viên. Cập nhật ngày sinh.', person: 'Chị Phương', p: 'Cao · Trước triển khai' },
-    12: { issue: 'Chưa có chỉ số tích cực; chưa cảnh báo ít hoạt động.', goal: 'Biến dữ liệu thành công cụ quản trị sắc bén.', clb: 'Chỉ số sự kiện, họp, giao thương; cảnh báo hội viên trầm lắng.', person: 'Chị Phương\nAnh Tuấn', p: 'Cao · Đợt 1' },
+    11: { issue: 'Thông tin hồ sơ cần chuẩn hóa; ngày sinh chưa đủ.', goal: 'Làm nền cho chăm sóc Học viên và báo cáo.', clb: 'Rà soát chuẩn hóa hồ sơ Học viên. Cập nhật ngày sinh.', person: 'Chị Phương', p: 'Cao · Trước triển khai' },
+    12: { issue: 'Chưa có chỉ số tích cực; chưa cảnh báo ít hoạt động.', goal: 'Biến dữ liệu thành công cụ quản trị sắc bén.', clb: 'Chỉ số sự kiện, họp, giao thương; cảnh báo Học viên trầm lắng.', person: 'Chị Phương\nAnh Tuấn', p: 'Cao · Đợt 1' },
     13: { issue: 'Chưa có báo cáo phí và nhắc phí định kỳ.', goal: 'Theo dõi, thu phí đúng hạn.', clb: 'Báo cáo tình hình đóng phí. Nhắc phí định kỳ qua Zalo/SMS.', person: 'Chị Phương', p: 'Cao · Đợt 1' },
     14: { issue: 'Chưa có mẫu báo cáo định kỳ theo kỳ.', goal: 'Ban Điều Hành nắm tình hình CLB theo từng kỳ.', clb: 'Thiết kế mẫu báo cáo tháng/quý: tài chính, giao thương, tích cực.', person: 'Chị Phương', p: 'Trung bình' },
-    15: { issue: 'Chưa có trang tổng hợp lịch sử sự kiện & cơ hội.', goal: 'Hội viên xem lại hành trình gắn bó CLB.', clb: 'Tổng hợp trên trang cá nhân: sự kiện, cơ hội, lịch sử giao thương.', person: 'Chị Dung', p: 'Trung bình' }
+    15: { issue: 'Chưa có trang tổng hợp lịch sử sự kiện & cơ hội.', goal: 'Học viên xem lại hành trình gắn bó CLB.', clb: 'Tổng hợp trên trang cá nhân: sự kiện, cơ hội, lịch sử giao thương.', person: 'Chị Dung', p: 'Trung bình' }
   };
 
   const gridColsXml = colWidths.map(w => `<w:gridCol w:w="${w}"/>`).join('');
@@ -1774,7 +1771,7 @@ async function generateConciseWordDoc() {
   <w:p><w:pPr><w:pBdr><w:bottom w:val="single" w:color="B8860B" w:sz="12" w:space="6"/></w:pBdr><w:spacing w:after="140"/></w:pPr><w:r><w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/><w:color w:val="475467"/><w:sz w:val="18"/></w:rPr><w:t>Căn cứ buổi họp ngày 21/10/2026  ·  Bản tóm tắt điều hành ít chữ, trực quan  ·  Ngày lập: 23/10/2026</w:t></w:r></w:p>
 
   <w:p><w:pPr><w:spacing w:before="100" w:after="60"/></w:pPr><w:r><w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/><w:b/><w:color w:val="1F3864"/><w:sz w:val="22"/></w:rPr><w:t>I. TỔNG QUAN CAM KẾT TIẾN ĐỘ ĐỢT 1 (HOÀN THÀNH TRƯỚC 05/11/2026)</w:t></w:r></w:p>
-  <w:p><w:pPr><w:spacing w:after="60"/></w:pPr><w:r><w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/><w:b/><w:color w:val="1F3864"/><w:sz w:val="18"/></w:rPr><w:t xml:space="preserve">Mục tiêu cốt lõi: </w:t></w:r><w:r><w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/><w:sz w:val="18"/></w:rPr><w:t>Đơn giản hóa cho hội viên dùng thường xuyên · Biến dữ liệu thành công cụ quản trị sắc bén cho Ban Điều Hành.</w:t></w:r></w:p>
+  <w:p><w:pPr><w:spacing w:after="60"/></w:pPr><w:r><w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/><w:b/><w:color w:val="1F3864"/><w:sz w:val="18"/></w:rPr><w:t xml:space="preserve">Mục tiêu cốt lõi: </w:t></w:r><w:r><w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/><w:sz w:val="18"/></w:rPr><w:t>Đơn giản hóa cho Học viên dùng thường xuyên · Biến dữ liệu thành công cụ quản trị sắc bén cho Ban Điều Hành.</w:t></w:r></w:p>
   <w:p><w:pPr><w:spacing w:after="140"/></w:pPr><w:r><w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/><w:b/><w:color w:val="1F3864"/><w:sz w:val="18"/></w:rPr><w:t xml:space="preserve">3 Trạng thái triển khai: </w:t></w:r><w:r><w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/><w:b/><w:color w:val="059669"/><w:sz w:val="18"/></w:rPr><w:t>🟢 ĐÃ SẴN SÀNG (02 mục)</w:t></w:r><w:r><w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/><w:sz w:val="18"/></w:rPr><w:t xml:space="preserve">  ·  </w:t></w:r><w:r><w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/><w:b/><w:color w:val="D97706"/><w:sz w:val="18"/></w:rPr><w:t>🟡 ĐANG TRIỂN KHAI (11 mục - trước 05/11)</w:t></w:r><w:r><w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/><w:sz w:val="18"/></w:rPr><w:t xml:space="preserve">  ·  </w:t></w:r><w:r><w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/><w:b/><w:color w:val="1D4ED8"/><w:sz w:val="18"/></w:rPr><w:t>🔵 KẾ HOẠCH TIẾP THEO (02 mục - trước 10/11)</w:t></w:r></w:p>
 
   <w:p><w:pPr><w:spacing w:before="140" w:after="100"/></w:pPr><w:r><w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/><w:b/><w:color w:val="1F3864"/><w:sz w:val="22"/></w:rPr><w:t>II. BẢNG ĐỐI SOÁT 15 Ý KIẾN HỌP &amp; GIẢI PHÁP TRỌNG TÂM</w:t></w:r></w:p>

@@ -41,7 +41,7 @@ export { UpdateDemoLeadDto, CreateInvoiceDto, AddInvoiceReminderDto };
   'pho_chu_tich',
 )
 export class AdminController {
-  constructor(private readonly adminService: AdminService) {}
+  constructor(private readonly adminService: AdminService) { }
 
   @Get('demo-leads')
   @UseGuards(JwtAuthGuard)
@@ -149,7 +149,7 @@ export class AdminController {
     return this.adminService.sendNotification(id);
   }
 
-  // ── NHẮC NHỞ HỘI VIÊN QUA APP & EMAIL (YÊU CẦU 1) ──
+  // ── NHẮC NHỞ Học viên QUA APP & EMAIL (YÊU CẦU 1) ──
   @Post('notifications/:id/remind')
   @UseGuards(JwtAuthGuard)
   async remindNotification(@Param('id') id: string) {

@@ -21,8 +21,8 @@ export const Route = createFileRoute("/h/$slug")({
   },
   head: ({ loaderData }) => {
     const a = loaderData as PublicAssociation | undefined;
-    const title = a ? `${a.name} — Hội viên` : "Hiệp hội";
-    const desc = a?.tagline ?? a?.about ?? "Trang giới thiệu Hiệp hội và ứng dụng hội viên.";
+    const title = a ? `${a.name} — Học viên` : "Hiệp hội";
+    const desc = a?.tagline ?? a?.about ?? "Trang giới thiệu Hiệp hội và ứng dụng Học viên.";
     return {
       meta: [
         { title },
@@ -79,8 +79,8 @@ function AssociationLanding() {
             screenResolution,
             language,
           },
-        }).catch(() => {});
-      } catch {}
+        }).catch(() => { });
+      } catch { }
     }
   }, [a?.slug]);
 

@@ -217,7 +217,7 @@ const htmlContent = `<!DOCTYPE html>
         <span class="sub">HƯỚNG DẪN SỬ DỤNG CHI TIẾT ỨNG DỤNG DI ĐỘNG & CỔNG QUẢN TRỊ HIỆP HỘI (CRM)</span>
       </h1>
       <p class="subtitle">
-        Cẩm nang chuẩn hóa nghiệp vụ dành riêng cho Ban Chấp hành, Ban Thư ký, Ban Chuyên môn và toàn thể Hội viên Hiệp Hội Doanh Nhân CEO HN10 (trực thuộc Hội Doanh nghiệp Trẻ Hà Nội - HanoiBA). Hướng dẫn từng bước thao tác, đặc tả chi tiết 100% trường dữ liệu, biểu mẫu, quy trình duyệt và hình ảnh chụp màn hình thực tế từ hệ thống đang vận hành.
+        Cẩm nang chuẩn hóa nghiệp vụ dành riêng cho Ban Chấp hành, Ban Thư ký, Ban Chuyên môn và toàn thể Học viên Hiệp Hội Doanh Nhân CEO HN10 (trực thuộc Hội Doanh nghiệp Trẻ Hà Nội - HanoiBA). Hướng dẫn từng bước thao tác, đặc tả chi tiết 100% trường dữ liệu, biểu mẫu, quy trình duyệt và hình ảnh chụp màn hình thực tế từ hệ thống đang vận hành.
       </p>
 
       <div class="meta-info">
@@ -228,11 +228,11 @@ const htmlContent = `<!DOCTYPE html>
           </tr>
           <tr>
             <td class="label">Phân hệ tài liệu:</td>
-            <td><strong>02 Phân hệ: Ứng dụng Di động Hội viên (App PWA) & Cổng Quản trị CRM Hiệp hội</strong></td>
+            <td><strong>02 Phân hệ: Ứng dụng Di động Học viên (App PWA) & Cổng Quản trị CRM Hiệp hội</strong></td>
           </tr>
           <tr>
             <td class="label">Đối tượng thụ hưởng:</td>
-            <td><strong>Chủ tịch, Phó Chủ tịch, Ban Chuyên môn, Ban Thư ký và Toàn thể Hội viên Doanh nhân</strong></td>
+            <td><strong>Chủ tịch, Phó Chủ tịch, Ban Chuyên môn, Ban Thư ký và Toàn thể Học viên Doanh nhân</strong></td>
           </tr>
           <tr>
             <td class="label">Đơn vị phát triển công nghệ:</td>
@@ -255,21 +255,21 @@ const htmlContent = `<!DOCTYPE html>
   <!-- MỤC LỤC TỔNG QUAN (TOC) -->
   <section class="trn-section" id="toc">
     <h2 class="toc-title">MỤC LỤC TÀI LIỆU</h2>
-    <p class="toc-subtitle">Tài liệu bao gồm 24 Chương chuyên đề, bao quát 100% tính năng của Hệ sinh thái CEO HN10 từ bước tiếp cận đầu tiên của Hội viên đến quy trình điều hành tối cao của Ban Chấp hành.</p>
+    <p class="toc-subtitle">Tài liệu bao gồm 24 Chương chuyên đề, bao quát 100% tính năng của Hệ sinh thái CEO HN10 từ bước tiếp cận đầu tiên của Học viên đến quy trình điều hành tối cao của Ban Chấp hành.</p>
 
     <div class="toc-grid">
       <!-- Cột 1: Mobile App -->
       <div>
-        <div style="font-size:11pt; font-weight:800; color:#001A4D; margin-bottom:8px; border-bottom:2px solid #F59E0B; padding-bottom:4px;">PHẦN I: ỨNG DỤNG DI ĐỘNG HỘI VIÊN (APP PWA)</div>
+        <div style="font-size:11pt; font-weight:800; color:#001A4D; margin-bottom:8px; border-bottom:2px solid #F59E0B; padding-bottom:4px;">PHẦN I: ỨNG DỤNG DI ĐỘNG Học viên (APP PWA)</div>
         <div style="display:flex; flex-direction:column; gap:8px;">
           <a class="toc-item" href="#app-c1"><span class="toc-index">01</span><span class="toc-text"><b>Cài đặt PWA & Đăng ký Gia nhập</b>Landing Page tiếp nhận hồ sơ Doanh nhân</span></a>
-          <a class="toc-item" href="#app-c2"><span class="toc-index">02</span><span class="toc-text"><b>Đăng nhập & Xác thực Hội viên</b>Cơ chế xác thực bảo mật & Phục hồi tài khoản</span></a>
+          <a class="toc-item" href="#app-c2"><span class="toc-index">02</span><span class="toc-text"><b>Đăng nhập & Xác thực Học viên</b>Cơ chế xác thực bảo mật & Phục hồi tài khoản</span></a>
           <a class="toc-item" href="#app-c3"><span class="toc-index">03</span><span class="toc-text"><b>Trang chủ & Bảng tin Hiệp hội</b>Thông báo, tương tác mạng lưới Doanh nhân</span></a>
-          <a class="toc-item" href="#app-c4"><span class="toc-index">04</span><span class="toc-text"><b>Thẻ Hội viên Smart VIP Card</b>Thẻ 2 mặt, mã QR định danh & vCard thông minh</span></a>
-          <a class="toc-item" href="#app-c5"><span class="toc-index">05</span><span class="toc-text"><b>Danh bạ Hội viên & Tra cứu B2B</b>Tìm kiếm đối tác, ngành nghề kinh doanh</span></a>
+          <a class="toc-item" href="#app-c4"><span class="toc-index">04</span><span class="toc-text"><b>Thẻ Học viên Smart VIP Card</b>Thẻ 2 mặt, mã QR định danh & vCard thông minh</span></a>
+          <a class="toc-item" href="#app-c5"><span class="toc-index">05</span><span class="toc-text"><b>Danh bạ Học viên & Tra cứu B2B</b>Tìm kiếm đối tác, ngành nghề kinh doanh</span></a>
           <a class="toc-item" href="#app-c6"><span class="toc-index">06</span><span class="toc-text"><b>Hệ thống Tin nhắn & Chat Nội bộ</b>Kết nối hội thoại 1-1 và phòng ban chuyên môn</span></a>
           <a class="toc-item" href="#app-c7"><span class="toc-index">07</span><span class="toc-text"><b>Sàn Cơ hội Kinh doanh B2B</b>Đăng tải nhu cầu hợp tác, deal thương mại</span></a>
-          <a class="toc-item" href="#app-c8"><span class="toc-index">08</span><span class="toc-text"><b>Chợ Sản phẩm & Dịch vụ Hội viên</b>Gian hàng điện tử, ưu đãi nội bộ CLB</span></a>
+          <a class="toc-item" href="#app-c8"><span class="toc-index">08</span><span class="toc-text"><b>Chợ Sản phẩm & Dịch vụ Học viên</b>Gian hàng điện tử, ưu đãi nội bộ CLB</span></a>
           <a class="toc-item" href="#app-c9"><span class="toc-index">09</span><span class="toc-text"><b>Sự kiện Hiệp hội & Vé mời Điện tử</b>Đăng ký, lịch trình & Check-in QR Gate</span></a>
           <a class="toc-item" href="#app-c10"><span class="toc-index">10</span><span class="toc-text"><b>Khảo sát & Biểu quyết Trực tiếp</b>Bầu cử Ban Chấp hành, biểu quyết nghị quyết</span></a>
           <a class="toc-item" href="#app-c11"><span class="toc-index">11</span><span class="toc-text"><b>Đóng Niên liễm & Thanh toán VietQR</b>Nộp hội phí tự động đối soát chuẩn ngân hàng</span></a>
@@ -281,16 +281,16 @@ const htmlContent = `<!DOCTYPE html>
       <div>
         <div style="font-size:11pt; font-weight:800; color:#001A4D; margin-bottom:8px; border-bottom:2px solid #003B95; padding-bottom:4px;">PHẦN II: CỔNG QUẢN TRỊ HIỆP HỘI (CRM WEB PORTAL)</div>
         <div style="display:flex; flex-direction:column; gap:8px;">
-          <a class="toc-item" href="#crm-c13"><span class="toc-index">13</span><span class="toc-text"><b>Đăng nhập & Dashboard Tổng quan</b>Báo cáo chỉ số KPI, tài chính & hội viên</span></a>
+          <a class="toc-item" href="#crm-c13"><span class="toc-index">13</span><span class="toc-text"><b>Đăng nhập & Dashboard Tổng quan</b>Báo cáo chỉ số KPI, tài chính & Học viên</span></a>
           <a class="toc-item" href="#crm-c14"><span class="toc-index">14</span><span class="toc-text"><b>Quản lý Cơ cấu Ban Chuyên môn</b>Thiết lập 6 ban nòng cốt & Ban Chấp hành</span></a>
           <a class="toc-item" href="#crm-c15"><span class="toc-index">15</span><span class="toc-text"><b>Quản trị Tài khoản & Phân quyền RBAC</b>Ma trận quyền hạn 6 vai trò bảo mật cấp cao</span></a>
-          <a class="toc-item" href="#crm-c16"><span class="toc-index">16</span><span class="toc-text"><b>Quản lý & Phê duyệt Hồ sơ Hội viên</b>Quy trình thẩm định 3 bước & Cấp thẻ VIP</span></a>
+          <a class="toc-item" href="#crm-c16"><span class="toc-index">16</span><span class="toc-text"><b>Quản lý & Phê duyệt Hồ sơ Học viên</b>Quy trình thẩm định 3 bước & Cấp thẻ VIP</span></a>
           <a class="toc-item" href="#crm-c17"><span class="toc-index">17</span><span class="toc-text"><b>Quản trị Sự kiện & Sơ đồ Ghế Rạp phim</b>Tạo sự kiện, thiết kế Cinema Seating Map</span></a>
           <a class="toc-item" href="#crm-c18"><span class="toc-index">18</span><span class="toc-text"><b>Cổng Check-in Sự kiện Tự động</b>Quét mã QR siêu tốc, thống kê điểm danh</span></a>
           <a class="toc-item" href="#crm-c19"><span class="toc-index">19</span><span class="toc-text"><b>Quản lý Công việc & Dự án (Kanban)</b>Phân công nhiệm vụ, theo dõi tiến độ công việc</span></a>
           <a class="toc-item" href="#crm-c20"><span class="toc-index">20</span><span class="toc-text"><b>Quản trị Cuộc họp & Điểm danh</b>Tổ chức đại hội, lịch sinh hoạt & biên bản họp</span></a>
           <a class="toc-item" href="#crm-c21"><span class="toc-index">21</span><span class="toc-text"><b>Quản lý Tài chính & Quỹ Niên liễm</b>Sổ quỹ thu chi, hóa đơn & quản lý đóng phí</span></a>
-          <a class="toc-item" href="#crm-c22"><span class="toc-index">22</span><span class="toc-text"><b>Quản lý Chợ B2B & Duyệt Sản phẩm</b>Kiểm duyệt hàng hóa, gian hàng của hội viên</span></a>
+          <a class="toc-item" href="#crm-c22"><span class="toc-index">22</span><span class="toc-text"><b>Quản lý Chợ B2B & Duyệt Sản phẩm</b>Kiểm duyệt hàng hóa, gian hàng của Học viên</span></a>
           <a class="toc-item" href="#crm-c23"><span class="toc-index">23</span><span class="toc-text"><b>Quản trị Khảo sát & Bầu cử (Voting)</b>Tạo cuộc thăm dò, quản lý tỷ lệ phiếu hợp lệ</span></a>
           <a class="toc-item" href="#crm-c24"><span class="toc-index">24</span><span class="toc-text"><b>Kho Tài liệu & Biểu mẫu Pháp lý</b>Lưu trữ quy chế, nghị quyết & hồ sơ nhiệm kỳ</span></a>
         </div>
@@ -306,7 +306,7 @@ const htmlContent = `<!DOCTYPE html>
   <section class="trn-section" id="app-c1">
     <span class="trn-tag">CHƯƠNG 01 · PHÂN HỆ DI ĐỘNG</span>
     <h2 class="trn-h2">Cài Đặt PWA & Đăng Ký Gia Nhập CLB CEO HN10</h2>
-    <span class="trn-h3">Tiếp cận Landing Page, cài đặt ứng dụng không cần App Store và nộp hồ sơ hội viên trực tuyến</span>
+    <span class="trn-h3">Tiếp cận Landing Page, cài đặt ứng dụng không cần App Store và nộp hồ sơ Học viên trực tuyến</span>
 
     <div class="trn-goal">
       <strong>Mục tiêu nghiệp vụ:</strong> Giúp các Doanh nhân sinh năm 1983 (Quý Hợi) hoặc các Doanh nhân yêu mến hiệp hội tiếp cận thông tin giới thiệu, tiến hành cài đặt ứng dụng trực tiếp lên màn hình điện thoại (Add to Home Screen) và nộp đơn đăng ký gia nhập kèm hồ sơ doanh nghiệp một cách thuận tiện, nhanh chóng.
@@ -319,7 +319,7 @@ const htmlContent = `<!DOCTYPE html>
     <div class="trn-sec-title">1. Hướng dẫn Quy trình Thao tác:</div>
     <ol class="trn-steps">
       <li><strong>Cài đặt App lên điện thoại (iOS / Android):</strong> Truy cập đường dẫn, trình duyệt sẽ tự động phát hiện thiết bị. Trên iPhone: Bấm nút <em>Chia sẻ (Share)</em> của trình duyệt Safari -> Chọn <em>"Thêm vào Màn hình chính" (Add to Home Screen)</em>. Trên Android: Bấm thông báo <em>"Cài đặt ứng dụng"</em> hoặc dấu 3 chấm góc phải -> <em>"Cài đặt ứng dụng"</em>. Biểu tượng ứng dụng CEO HN10 sẽ xuất hiện trực tiếp ngoài màn hình chính.</li>
-      <li><strong>Tìm hiểu thông tin CLB:</strong> Đọc các giá trị cốt lõi, cơ cấu Ban Chấp hành, quyền lợi khi trở thành Hội viên chính thức tại trang Landing Page.</li>
+      <li><strong>Tìm hiểu thông tin CLB:</strong> Đọc các giá trị cốt lõi, cơ cấu Ban Chấp hành, quyền lợi khi trở thành Học viên chính thức tại trang Landing Page.</li>
       <li><strong>Kéo xuống biểu mẫu "Đăng ký gia nhập CLB":</strong> Nhập đầy đủ và chính xác các trường thông tin theo bảng đặc tả bên dưới.</li>
       <li><strong>Xác nhận & Nộp hồ sơ:</strong> Tải lên ảnh chân dung doanh nhân rõ nét, tích chọn đồng ý Điều lệ CLB và bấm <strong>"Gửi Đơn Đăng Ký Gia Nhập"</strong>. Hệ thống sẽ cấp mã hồ sơ và chuyển tự động sang CRM để Ban Thư ký thẩm định.</li>
     </ol>
@@ -341,7 +341,7 @@ const htmlContent = `<!DOCTYPE html>
           <td class="req">Có (*)</td>
           <td><code>Text</code></td>
           <td>Nhập đầy đủ họ tên có dấu (Ví dụ: Nguyễn Văn Tuấn).</td>
-          <td>In lên Thẻ Hội viên VIP và hiển thị trên toàn hệ thống danh bạ B2B.</td>
+          <td>In lên Thẻ Học viên VIP và hiển thị trên toàn hệ thống danh bạ B2B.</td>
         </tr>
         <tr>
           <td><strong>Số điện thoại</strong></td>
@@ -362,7 +362,7 @@ const htmlContent = `<!DOCTYPE html>
           <td class="req">Có (*)</td>
           <td><code>Text</code></td>
           <td>Nhập tên đầy đủ của công ty/tập đoàn đang điều hành.</td>
-          <td>Định danh năng lực hội viên, quảng bá doanh nghiệp trong hệ sinh thái.</td>
+          <td>Định danh năng lực Học viên, quảng bá doanh nghiệp trong hệ sinh thái.</td>
         </tr>
         <tr>
           <td><strong>Chức vụ điều hành</strong></td>
@@ -383,7 +383,7 @@ const htmlContent = `<!DOCTYPE html>
           <td class="req">Có (*)</td>
           <td><code>File (JPG/PNG)</code></td>
           <td>Tải lên ảnh chụp rõ mặt, trang phục lịch sự, dung lượng dưới 5MB.</td>
-          <td>Làm ảnh đại diện avatar hồ sơ và hiển thị trên thẻ hội viên điện tử.</td>
+          <td>Làm ảnh đại diện avatar hồ sơ và hiển thị trên thẻ Học viên điện tử.</td>
         </tr>
       </tbody>
     </table>
@@ -402,13 +402,13 @@ const htmlContent = `<!DOCTYPE html>
       </div>
       <div class="shot-mobile-card">
         <div class="phone-mockup">
-          <img src="screenshots/app_01_landing_form.png" alt="Biểu mẫu đăng ký hội viên">
+          <img src="screenshots/app_01_landing_form.png" alt="Biểu mẫu đăng ký Học viên">
         </div>
         <div class="phone-caption"><strong>Hình 1.2:</strong> Biểu mẫu tiếp nhận hồ sơ Doanh nhân gia nhập CLB</div>
       </div>
       <div class="shot-mobile-card">
         <div class="phone-mockup">
-          <img src="screenshots/app_01_landing_form_filled.png" alt="Biểu mẫu đăng ký hội viên điền đầy đủ dữ liệu">
+          <img src="screenshots/app_01_landing_form_filled.png" alt="Biểu mẫu đăng ký Học viên điền đầy đủ dữ liệu">
         </div>
         <div class="phone-caption"><strong>Hình 1.3:</strong> Hồ sơ Doanh nhân được điền đầy đủ dữ liệu chuẩn bị gửi phê duyệt</div>
       </div>
@@ -418,11 +418,11 @@ const htmlContent = `<!DOCTYPE html>
   <!-- CHƯƠNG 2 -->
   <section class="trn-section" id="app-c2">
     <span class="trn-tag">CHƯƠNG 02 · PHÂN HỆ DI ĐỘNG</span>
-    <h2 class="trn-h2">Đăng Nhập & Xác Thực Hội Viên Doanh Nhân</h2>
-    <span class="trn-h3">Truy cập không gian hội viên an toàn, hỗ trợ ghi nhớ đăng nhập và phục hồi tài khoản</span>
+    <h2 class="trn-h2">Đăng Nhập & Xác Thực Học viên Doanh Nhân</h2>
+    <span class="trn-h3">Truy cập không gian Học viên an toàn, hỗ trợ ghi nhớ đăng nhập và phục hồi tài khoản</span>
 
     <div class="trn-goal">
-      <strong>Mục tiêu nghiệp vụ:</strong> Đảm bảo chỉ những Hội viên chính thức đã được phê duyệt mới được cấp quyền truy cập vào kho dữ liệu danh bạ B2B, quyền lợi biểu quyết, đăng bài giao thương và nhận vé mời tham dự sự kiện kín của CLB.
+      <strong>Mục tiêu nghiệp vụ:</strong> Đảm bảo chỉ những Học viên chính thức đã được phê duyệt mới được cấp quyền truy cập vào kho dữ liệu danh bạ B2B, quyền lợi biểu quyết, đăng bài giao thương và nhận vé mời tham dự sự kiện kín của CLB.
     </div>
 
     <div class="trn-path">
@@ -432,10 +432,10 @@ const htmlContent = `<!DOCTYPE html>
     <div class="trn-sec-title">1. Quy trình Thao tác:</div>
     <ol class="trn-steps">
       <li>Mở ứng dụng CEO HN10 từ màn hình chính hoặc truy cập liên kết đăng nhập.</li>
-      <li>Nhập <strong>Tài khoản / Số điện thoại / Email</strong> đã được cấp phép khi phê duyệt hội viên.</li>
+      <li>Nhập <strong>Tài khoản / Số điện thoại / Email</strong> đã được cấp phép khi phê duyệt Học viên.</li>
       <li>Nhập <strong>Mật khẩu bảo mật</strong> (Tối thiểu 6 ký tự).</li>
       <li>Tích chọn <em>"Ghi nhớ đăng nhập"</em> để không phải nhập lại mật khẩu trong các phiên sau.</li>
-      <li>Bấm nút <strong>"Đăng Nhập"</strong> để vào Bảng điều khiển Hội viên.</li>
+      <li>Bấm nút <strong>"Đăng Nhập"</strong> để vào Bảng điều khiển Học viên.</li>
       <li><em>Trường hợp quên mật khẩu:</em> Bấm <em>"Quên mật khẩu?"</em> -> Nhập Email hoặc Số điện thoại để nhận mã xác thực OTP cấp lại mật khẩu.</li>
     </ol>
 
@@ -456,7 +456,7 @@ const htmlContent = `<!DOCTYPE html>
           <td class="req">Có (*)</td>
           <td><code>Text</code></td>
           <td>Nhập số điện thoại đã đăng ký (Ví dụ: 0912345678) hoặc Email.</td>
-          <td>Định danh chính xác hồ sơ hội viên trong cơ sở dữ liệu.</td>
+          <td>Định danh chính xác hồ sơ Học viên trong cơ sở dữ liệu.</td>
         </tr>
         <tr>
           <td><strong>Mật khẩu truy cập</strong></td>
@@ -494,7 +494,7 @@ const htmlContent = `<!DOCTYPE html>
   <section class="trn-section" id="app-c3">
     <span class="trn-tag">CHƯƠNG 03 · PHÂN HỆ DI ĐỘNG</span>
     <h2 class="trn-h2">Bảng Tin Trang Chủ & Tương Tác Mạng Lưới Doanh Nhân</h2>
-    <span class="trn-h3">Trung tâm kết nối thông tin, tin tức sự kiện, sinh nhật hội viên và thao tác nhanh</span>
+    <span class="trn-h3">Trung tâm kết nối thông tin, tin tức sự kiện, sinh nhật Học viên và thao tác nhanh</span>
 
     <div class="trn-goal">
       <strong>Mục tiêu nghiệp vụ:</strong> Cung cấp cái nhìn toàn cảnh về dòng chảy sự kiện, hoạt động của các ban chuyên môn, chúc mừng sinh nhật các doanh nhân thành viên trong ngày và truy cập nhanh 1 chạm vào các tiện ích nòng cốt.
@@ -508,16 +508,16 @@ const htmlContent = `<!DOCTYPE html>
     <ol class="trn-steps">
       <li><strong>Xem lời chào & Banner chào mừng:</strong> Nắm bắt thông điệp chỉ đạo, khẩu hiệu hành động nhiệm kỳ của Ban Thường trực.</li>
       <li><strong>Khối Tiện ích 1-chạm (Quick Actions):</strong> Truy cập nhanh vào Thẻ VIP, Danh bạ, Đăng deal B2B, Điểm danh sự kiện bằng các nút icon tròn trực quan.</li>
-      <li><strong>Chuyên mục Sinh nhật Doanh nhân:</strong> Xem danh sách các Hội viên có sinh nhật trong tuần để gửi tin nhắn chúc mừng, thắt chặt tình đoàn kết.</li>
+      <li><strong>Chuyên mục Sinh nhật Doanh nhân:</strong> Xem danh sách các Học viên có sinh nhật trong tuần để gửi tin nhắn chúc mừng, thắt chặt tình đoàn kết.</li>
       <li><strong>Bảng tin Hoạt động & Thông báo Thường trực:</strong> Đọc các văn bản chỉ đạo, lịch trình họp ban, hoạt động thiện nguyện mới nhất.</li>
     </ol>
 
     <div class="shot-mobile-grid">
       <div class="shot-mobile-card">
         <div class="phone-mockup">
-          <img src="screenshots/app_03_home.png" alt="Trang chủ Hội viên">
+          <img src="screenshots/app_03_home.png" alt="Trang chủ Học viên">
         </div>
-        <div class="phone-caption"><strong>Hình 3.1:</strong> Trang chủ điều hành và Bảng tin Mạng lưới Hội viên CEO HN10</div>
+        <div class="phone-caption"><strong>Hình 3.1:</strong> Trang chủ điều hành và Bảng tin Mạng lưới Học viên CEO HN10</div>
       </div>
     </div>
   </section>
@@ -525,7 +525,7 @@ const htmlContent = `<!DOCTYPE html>
   <!-- CHƯƠNG 4 -->
   <section class="trn-section" id="app-c4">
     <span class="trn-tag">CHƯƠNG 04 · PHÂN HỆ DI ĐỘNG</span>
-    <h2 class="trn-h2">Thẻ Hội Viên Điện Tử Smart VIP Card & Chia Sẻ QR Code / vCard</h2>
+    <h2 class="trn-h2">Thẻ Học viên Điện Tử Smart VIP Card & Chia Sẻ QR Code / vCard</h2>
     <span class="trn-h3">Danh thiếp điện tử thông minh 2 mặt, tích hợp mã QR định danh và xuất danh bạ 1 chạm</span>
 
     <div class="trn-goal">
@@ -538,7 +538,7 @@ const htmlContent = `<!DOCTYPE html>
 
     <div class="trn-sec-title">1. Hướng dẫn Thao tác Sử dụng Thẻ VIP:</div>
     <ol class="trn-steps">
-      <li><strong>Xem Thẻ mặt trước (Front Card):</strong> Thể hiện Logo mạ vàng CEO HN10, Ảnh đại diện dập nổi, Họ tên, Chức vụ, Tên Doanh nghiệp, Mã số hội viên độc bản (Ví dụ: CEO-1983-007) và Hạng thẻ VIP.</li>
+      <li><strong>Xem Thẻ mặt trước (Front Card):</strong> Thể hiện Logo mạ vàng CEO HN10, Ảnh đại diện dập nổi, Họ tên, Chức vụ, Tên Doanh nghiệp, Mã số Học viên độc bản (Ví dụ: CEO-1983-007) và Hạng thẻ VIP.</li>
       <li><strong>Lật Thẻ mặt sau (Back Card):</strong> Chạm nhẹ vào thân thẻ hoặc nút <em>"Lật thẻ"</em> để xem Mặt sau. Mặt sau chứa <strong>Mã QR Code động</strong> chứa link danh thiếp công khai của doanh nhân.</li>
       <li><strong>Chia sẻ thông tin nhanh:</strong> Đưa mã QR cho đối tác quét bằng camera điện thoại. Đối tác sẽ mở ngay trang hồ sơ cá nhân và có thể bấm nút <em>"Lưu vào Danh bạ" (.vcf)</em> để lưu toàn bộ số điện thoại, email, địa chỉ công ty vào danh bạ điện thoại chỉ sau 1 giây.</li>
     </ol>
@@ -553,7 +553,7 @@ const htmlContent = `<!DOCTYPE html>
         <div class="phone-mockup">
           <img src="screenshots/app_04_card_front.png" alt="Thẻ VIP mặt trước">
         </div>
-        <div class="phone-caption"><strong>Hình 4.1:</strong> Thẻ Hội viên VIP CEO HN10 Mặt trước sang trọng</div>
+        <div class="phone-caption"><strong>Hình 4.1:</strong> Thẻ Học viên VIP CEO HN10 Mặt trước sang trọng</div>
       </div>
       <div class="shot-mobile-card">
         <div class="phone-mockup">
@@ -567,11 +567,11 @@ const htmlContent = `<!DOCTYPE html>
   <!-- CHƯƠNG 5 -->
   <section class="trn-section" id="app-c5">
     <span class="trn-tag">CHƯƠNG 05 · PHÂN HỆ DI ĐỘNG</span>
-    <h2 class="trn-h2">Danh Bạ Hội Viên Doanh Nghiệp & Tra Cứu Đối Tác B2B</h2>
+    <h2 class="trn-h2">Danh Bạ Học viên Doanh Nghiệp & Tra Cứu Đối Tác B2B</h2>
     <span class="trn-h3">Bộ lọc đa chiều theo ngành nghề, ban chuyên môn và kết nối trực tiếp với lãnh đạo công ty</span>
 
     <div class="trn-goal">
-      <strong>Mục tiêu nghiệp vụ:</strong> Phá vỡ khoảng cách giữa các doanh nghiệp trong hiệp hội; tạo nền tảng kết nối giao thương tin cậy 100% khi người tìm kiếm và người cung cấp đều là Hội viên chính thức đã được CLB xác minh pháp lý.
+      <strong>Mục tiêu nghiệp vụ:</strong> Phá vỡ khoảng cách giữa các doanh nghiệp trong hiệp hội; tạo nền tảng kết nối giao thương tin cậy 100% khi người tìm kiếm và người cung cấp đều là Học viên chính thức đã được CLB xác minh pháp lý.
     </div>
 
     <div class="trn-path">
@@ -583,13 +583,13 @@ const htmlContent = `<!DOCTYPE html>
       <li>Nhập từ khóa tìm kiếm (Họ tên doanh nhân, Tên công ty hoặc Sản phẩm/Dịch vụ) vào thanh tìm kiếm.</li>
       <li>Sử dụng thanh lọc nhanh theo <strong>Ban Chuyên môn</strong> (Ban Xúc tiến Thương mại, Ban Pháp chế, Ban Đào tạo...) hoặc theo <strong>Ngành nghề</strong>.</li>
       <li>Chạm vào thẻ thông tin của Doanh nhân để mở trang Hồ sơ chi tiết (Profile).</li>
-      <li>Thực hiện các thao tác kết nối: Bấm <strong>"Gọi điện"</strong>, <strong>"Gửi tin nhắn"</strong> hoặc <strong>"Xem gian hàng sản phẩm"</strong> của hội viên đó.</li>
+      <li>Thực hiện các thao tác kết nối: Bấm <strong>"Gọi điện"</strong>, <strong>"Gửi tin nhắn"</strong> hoặc <strong>"Xem gian hàng sản phẩm"</strong> của Học viên đó.</li>
     </ol>
 
     <div class="shot-mobile-grid">
       <div class="shot-mobile-card">
         <div class="phone-mockup">
-          <img src="screenshots/app_06_members.png" alt="Danh bạ hội viên">
+          <img src="screenshots/app_06_members.png" alt="Danh bạ Học viên">
         </div>
         <div class="phone-caption"><strong>Hình 5.1:</strong> Danh bạ Doanh nhân & Hệ thống Lọc ngành nghề B2B</div>
       </div>
@@ -623,7 +623,7 @@ const htmlContent = `<!DOCTYPE html>
         <div class="phone-mockup">
           <img src="screenshots/app_07_messages.png" alt="Hệ thống tin nhắn">
         </div>
-        <div class="phone-caption"><strong>Hình 6.1:</strong> Giao diện Phòng chat & Hội thoại Trực tuyến giữa các Hội viên</div>
+        <div class="phone-caption"><strong>Hình 6.1:</strong> Giao diện Phòng chat & Hội thoại Trực tuyến giữa các Học viên</div>
       </div>
     </div>
   </section>
@@ -635,7 +635,7 @@ const htmlContent = `<!DOCTYPE html>
     <span class="trn-h3">Khai thác và chia sẻ nguồn việc, thầu phụ, gọi vốn và hợp tác thương mại nội bộ</span>
 
     <div class="trn-goal">
-      <strong>Mục tiêu nghiệp vụ:</strong> Hiện thực hóa khẩu hiệu "Kết nối cơ hội - Hợp tác cùng phát triển". Cho phép hội viên đăng tải nhu cầu tìm nhà thầu, đối tác cung ứng hoặc tìm kiếm khách hàng với chính sách ưu đãi đặc biệt cho thành viên CEO HN10.
+      <strong>Mục tiêu nghiệp vụ:</strong> Hiện thực hóa khẩu hiệu "Kết nối cơ hội - Hợp tác cùng phát triển". Cho phép Học viên đăng tải nhu cầu tìm nhà thầu, đối tác cung ứng hoặc tìm kiếm khách hàng với chính sách ưu đãi đặc biệt cho thành viên CEO HN10.
     </div>
 
     <div class="trn-path">
@@ -662,11 +662,11 @@ const htmlContent = `<!DOCTYPE html>
   <!-- CHƯƠNG 8 -->
   <section class="trn-section" id="app-c8">
     <span class="trn-tag">CHƯƠNG 08 · PHÂN HỆ DI ĐỘNG</span>
-    <h2 class="trn-h2">Chợ Sản Phẩm & Dịch Vụ Doanh Nghiệp Hội Viên</h2>
+    <h2 class="trn-h2">Chợ Sản Phẩm & Dịch Vụ Doanh Nghiệp Học viên</h2>
     <span class="trn-h3">Gian hàng thương mại điện tử B2B nội bộ, ưu đãi độc quyền cho thành viên hiệp hội</span>
 
     <div class="trn-goal">
-      <strong>Mục tiêu nghiệp vụ:</strong> Trưng bày các sản phẩm, giải pháp công nghệ, vật liệu xây dựng, dịch vụ tư vấn của công ty hội viên; khuyến khích người CEO HN10 ưu tiên sử dụng sản phẩm của nhau trước khi mua ngoài thị trường.
+      <strong>Mục tiêu nghiệp vụ:</strong> Trưng bày các sản phẩm, giải pháp công nghệ, vật liệu xây dựng, dịch vụ tư vấn của công ty Học viên; khuyến khích người CEO HN10 ưu tiên sử dụng sản phẩm của nhau trước khi mua ngoài thị trường.
     </div>
 
     <div class="trn-path">
@@ -686,7 +686,7 @@ const htmlContent = `<!DOCTYPE html>
         <div class="phone-mockup">
           <img src="screenshots/app_09_products.png" alt="Chợ sản phẩm B2B">
         </div>
-        <div class="phone-caption"><strong>Hình 8.1:</strong> Gian hàng Sản phẩm & Giải pháp Doanh nghiệp Hội viên</div>
+        <div class="phone-caption"><strong>Hình 8.1:</strong> Gian hàng Sản phẩm & Giải pháp Doanh nghiệp Học viên</div>
       </div>
     </div>
   </section>
@@ -698,7 +698,7 @@ const htmlContent = `<!DOCTYPE html>
     <span class="trn-h3">Đăng ký tham dự hội nghị, thẻ vé mời điện tử và trung tâm mã QR soát vé Zalo/Web</span>
 
     <div class="trn-goal">
-      <strong>Mục tiêu nghiệp vụ:</strong> Chuyển đổi số toàn diện công tác tổ chức sự kiện; loại bỏ vé giấy, giúp hội viên nắm rõ lịch trình chương trình, địa điểm tổ chức, tài liệu hội thảo, nhận thẻ vé điện tử và cung cấp mã QR cho khách mời quét qua Zalo/Web.
+      <strong>Mục tiêu nghiệp vụ:</strong> Chuyển đổi số toàn diện công tác tổ chức sự kiện; loại bỏ vé giấy, giúp Học viên nắm rõ lịch trình chương trình, địa điểm tổ chức, tài liệu hội thảo, nhận thẻ vé điện tử và cung cấp mã QR cho khách mời quét qua Zalo/Web.
     </div>
 
     <div class="trn-path">
@@ -724,7 +724,7 @@ const htmlContent = `<!DOCTYPE html>
         <div class="phone-mockup">
           <img src="screenshots/app_10_event_qr_hub.png" alt="Trung tâm Mã QR Sự kiện trên Mobile">
         </div>
-        <div class="phone-caption"><strong>Hình 9.2:</strong> Trung tâm Mã QR Sự kiện gồm Thẻ vé Hội viên và Mã QR Zalo Khách mời</div>
+        <div class="phone-caption"><strong>Hình 9.2:</strong> Trung tâm Mã QR Sự kiện gồm Thẻ vé Học viên và Mã QR Zalo Khách mời</div>
       </div>
     </div>
   </section>
@@ -733,7 +733,7 @@ const htmlContent = `<!DOCTYPE html>
   <section class="trn-section" id="app-c10">
     <span class="trn-tag">CHƯƠNG 10 · PHÂN HỆ DI ĐỘNG</span>
     <h2 class="trn-h2">Khảo Sát Ý Kiến & Biểu Quyết Bầu Cử Trực Tiếp (Live Voting)</h2>
-    <span class="trn-h3">Thực hiện quyền làm chủ của hội viên, minh bạch kết quả biểu quyết theo thời gian thực</span>
+    <span class="trn-h3">Thực hiện quyền làm chủ của Học viên, minh bạch kết quả biểu quyết theo thời gian thực</span>
 
     <div class="trn-goal">
       <strong>Mục tiêu nghiệp vụ:</strong> Phục vụ các kỳ Đại hội nhiệm kỳ bầu Ban Chấp hành, lấy ý kiến sửa đổi Điều lệ hoặc biểu quyết các quyết sách quan trọng của Hiệp hội với độ bảo mật tuyệt đối, chống gian lận và thống kê tự động.
@@ -764,7 +764,7 @@ const htmlContent = `<!DOCTYPE html>
   <!-- CHƯƠNG 11 -->
   <section class="trn-section" id="app-c11">
     <span class="trn-tag">CHƯƠNG 11 · PHÂN HỆ DI ĐỘNG</span>
-    <h2 class="trn-h2">Đóng Niên Liễm Hội Viên & Thanh Toán VietQR Tự Động</h2>
+    <h2 class="trn-h2">Đóng Niên Liễm Học viên & Thanh Toán VietQR Tự Động</h2>
     <span class="trn-h3">Nộp hội phí hàng năm tiện lợi, tự động khớp lệnh thanh toán chuẩn Napas 24/7</span>
 
     <div class="trn-goal">
@@ -781,13 +781,13 @@ const htmlContent = `<!DOCTYPE html>
       <li>Xem kỳ niên liễm hiện tại, hạn nộp phí và số tiền cần thanh toán theo quy định (Ví dụ: 10,000,000 VNĐ/Năm).</li>
       <li>Màn hình hiển thị <strong>Mã VietQR Chuyển Khoản Động</strong>.</li>
       <li>Mở ứng dụng Ngân hàng bất kỳ trên điện thoại -> Quét mã VietQR (Toàn bộ Số tài khoản, Ngân hàng thụ hưởng, Số tiền và Cú pháp định danh đã được điền sẵn 100%).</li>
-      <li>Bấm xác nhận chuyển khoản. Hệ thống Webhook ngân hàng sẽ tự động xác nhận trong vòng 3 - 5 giây và gia hạn Thẻ Hội viên sang niên khóa tiếp theo.</li>
+      <li>Bấm xác nhận chuyển khoản. Hệ thống Webhook ngân hàng sẽ tự động xác nhận trong vòng 3 - 5 giây và gia hạn Thẻ Học viên sang niên khóa tiếp theo.</li>
     </ol>
 
     <div class="shot-mobile-grid">
       <div class="shot-mobile-card">
         <div class="phone-mockup">
-          <img src="screenshots/app_12_renew.png" alt="Đóng phí hội viên VietQR">
+          <img src="screenshots/app_12_renew.png" alt="Đóng phí Học viên VietQR">
         </div>
         <div class="phone-caption"><strong>Hình 11.1:</strong> Màn hình Thanh toán Niên liễm tích hợp VietQR Tự Động</div>
       </div>
@@ -797,11 +797,11 @@ const htmlContent = `<!DOCTYPE html>
   <!-- CHƯƠNG 12 -->
   <section class="trn-section" id="app-c12">
     <span class="trn-tag">CHƯƠNG 12 · PHÂN HỆ DI ĐỘNG</span>
-    <h2 class="trn-h2">Quản Lý Hồ Sơ Cá Nhân & Doanh Nghiệp Hội Viên</h2>
+    <h2 class="trn-h2">Quản Lý Hồ Sơ Cá Nhân & Doanh Nghiệp Học viên</h2>
     <span class="trn-h3">Chỉnh sửa thông tin doanh nghiệp, đổi mật khẩu và tùy biến quyền riêng tư</span>
 
     <div class="trn-goal">
-      <strong>Mục tiêu nghiệp vụ:</strong> Cho phép Hội viên chủ động cập nhật các thành tựu mới, đổi ảnh đại diện, bổ sung số điện thoại phụ, địa chỉ văn phòng đại diện hoặc quản lý các tùy chọn bảo mật cá nhân trên hệ thống.
+      <strong>Mục tiêu nghiệp vụ:</strong> Cho phép Học viên chủ động cập nhật các thành tựu mới, đổi ảnh đại diện, bổ sung số điện thoại phụ, địa chỉ văn phòng đại diện hoặc quản lý các tùy chọn bảo mật cá nhân trên hệ thống.
     </div>
 
     <div class="trn-path">
@@ -819,9 +819,9 @@ const htmlContent = `<!DOCTYPE html>
     <div class="shot-mobile-grid">
       <div class="shot-mobile-card">
         <div class="phone-mockup">
-          <img src="screenshots/app_13_profile.png" alt="Quản lý hồ sơ hội viên">
+          <img src="screenshots/app_13_profile.png" alt="Quản lý hồ sơ Học viên">
         </div>
-        <div class="phone-caption"><strong>Hình 12.1:</strong> Trung tâm Quản trị Hồ sơ Cá nhân & Doanh nghiệp Hội viên</div>
+        <div class="phone-caption"><strong>Hình 12.1:</strong> Trung tâm Quản trị Hồ sơ Cá nhân & Doanh nghiệp Học viên</div>
       </div>
     </div>
   </section>
@@ -837,7 +837,7 @@ const htmlContent = `<!DOCTYPE html>
     <span class="trn-h3">Trung tâm chỉ huy số, thống kê trực quan toàn bộ chỉ số KPI vận hành hiệp hội</span>
 
     <div class="trn-goal">
-      <strong>Mục tiêu nghiệp vụ:</strong> Dành riêng cho Chủ tịch, Ban Thường trực và Ban Thư ký theo dõi bức tranh tài chính, số lượng hội viên mới gia nhập, tỷ lệ hoàn thành công việc của các ban chuyên môn và tiến độ thu niên liễm trong thời gian thực.
+      <strong>Mục tiêu nghiệp vụ:</strong> Dành riêng cho Chủ tịch, Ban Thường trực và Ban Thư ký theo dõi bức tranh tài chính, số lượng Học viên mới gia nhập, tỷ lệ hoàn thành công việc của các ban chuyên môn và tiến độ thu niên liễm trong thời gian thực.
     </div>
 
     <div class="trn-path">
@@ -848,8 +848,8 @@ const htmlContent = `<!DOCTYPE html>
     <ol class="trn-steps">
       <li>Truy cập Cổng CRM trên máy tính (Khuyến nghị dùng Google Chrome, độ phân giải từ 1440x900 trở lên).</li>
       <li>Đăng nhập bằng tài khoản quản trị được phân quyền (Ví dụ: <code>admin@connect.vn</code>).</li>
-      <li>Quan sát các <strong>Khối Thẻ Chỉ Số (KPI Stat Cards)</strong> trên cùng: <em>Tổng hội viên chính thức, Số hồ sơ chờ duyệt, Tổng quỹ niên liễm thực thu, Tỷ lệ nhiệm vụ hoàn thành</em>.</li>
-      <li>Phân tích biểu đồ tăng trưởng hội viên theo tháng và biểu đồ phân bổ ngành nghề kinh doanh.</li>
+      <li>Quan sát các <strong>Khối Thẻ Chỉ Số (KPI Stat Cards)</strong> trên cùng: <em>Tổng Học viên chính thức, Số hồ sơ chờ duyệt, Tổng quỹ niên liễm thực thu, Tỷ lệ nhiệm vụ hoàn thành</em>.</li>
+      <li>Phân tích biểu đồ tăng trưởng Học viên theo tháng và biểu đồ phân bổ ngành nghề kinh doanh.</li>
     </ol>
 
     <div class="shot-wrap">
@@ -874,7 +874,7 @@ const htmlContent = `<!DOCTYPE html>
     <span class="trn-h3">Thiết lập 6 ban chức năng nòng cốt, cơ cấu nhân sự lãnh đạo và phân bổ nhiệm vụ</span>
 
     <div class="trn-goal">
-      <strong>Mục tiêu nghiệp vụ:</strong> Chuẩn hóa mô hình tổ chức của CLB CEO HN10 theo đúng Điều lệ Hội HanoiBA, phân chia 6 ban nòng cốt (Ban Thường trực, Ban Xúc tiến Thương mại, Ban Sự kiện, Ban Hội viên, Ban Tài chính, Ban Truyền thông) và chỉ định Trưởng/Phó ban phụ trách.
+      <strong>Mục tiêu nghiệp vụ:</strong> Chuẩn hóa mô hình tổ chức của CLB CEO HN10 theo đúng Điều lệ Hội HanoiBA, phân chia 6 ban nòng cốt (Ban Thường trực, Ban Xúc tiến Thương mại, Ban Sự kiện, Ban Học viên, Ban Tài chính, Ban Truyền thông) và chỉ định Trưởng/Phó ban phụ trách.
     </div>
 
     <div class="trn-path">
@@ -886,7 +886,7 @@ const htmlContent = `<!DOCTYPE html>
       <li>Vào menu <strong>Ban Chuyên Môn</strong> trên thanh Menu điều hướng bên trái.</li>
       <li>Xem danh sách các ban hiện hành, số lượng thành viên và người đứng đầu từng ban.</li>
       <li>Bấm nút <strong>"+ Thêm Ban Mới"</strong> để mở hộp thoại cấu hình.</li>
-      <li>Nhập Tên ban, Mã ban, Chọn Trưởng ban từ danh sách hội viên, nhập chức năng nhiệm vụ.</li>
+      <li>Nhập Tên ban, Mã ban, Chọn Trưởng ban từ danh sách Học viên, nhập chức năng nhiệm vụ.</li>
       <li>Bấm <strong>"Lưu Thay Đổi"</strong> để kích hoạt cấu trúc tổ chức mới.</li>
     </ol>
 
@@ -920,7 +920,7 @@ const htmlContent = `<!DOCTYPE html>
           <td><strong>Trưởng ban phụ trách</strong></td>
           <td class="req">Có (*)</td>
           <td><code>Select Dropdown</code></td>
-          <td>Chọn từ danh sách Hội viên đã kích hoạt.</td>
+          <td>Chọn từ danh sách Học viên đã kích hoạt.</td>
           <td>Gán quyền Quản trị viên cấp ban để điều hành công việc nội bộ.</td>
         </tr>
         <tr>
@@ -966,7 +966,7 @@ const htmlContent = `<!DOCTYPE html>
     <ol class="trn-steps">
       <li>Vào mục <strong>Tài khoản Vận hành</strong> -> Bấm <strong>"+ Thêm Tài Khoản"</strong>.</li>
       <li>Nhập Email công vụ, Mật khẩu ban đầu và chọn <strong>Vai trò (Role)</strong> tương ứng.</li>
-      <li>Chuyển sang tab <strong>Ma Trận Phân Quyền (RBAC Matrix)</strong>: Tại đây hiển thị lưới phân quyền giữa 6 vai trò và hơn 40 quyền hạn nghiệp vụ chi tiết (Xem, Thêm, Sửa, Xóa, Duyệt chi, Phê duyệt hội viên).</li>
+      <li>Chuyển sang tab <strong>Ma Trận Phân Quyền (RBAC Matrix)</strong>: Tại đây hiển thị lưới phân quyền giữa 6 vai trò và hơn 40 quyền hạn nghiệp vụ chi tiết (Xem, Thêm, Sửa, Xóa, Duyệt chi, Phê duyệt Học viên).</li>
       <li>Tích chọn hoặc bỏ tích các ô quyền tương ứng và bấm <strong>"Cập Nhật Ma Trận Quyền"</strong>.</li>
     </ol>
 
@@ -995,11 +995,11 @@ const htmlContent = `<!DOCTYPE html>
   <!-- CHƯƠNG 16 -->
   <section class="trn-section" id="crm-c16">
     <span class="trn-tag">CHƯƠNG 16 · PHÂN HỆ QUẢN TRỊ CRM</span>
-    <h2 class="trn-h2">Quản Lý Hồ Sơ & Quy Trình Thẩm Định Phê Duyệt Hội Viên</h2>
-    <span class="trn-h3">Thẩm tra lý lịch doanh nghiệp 3 bước, phê chuẩn tư cách hội viên và cấp mã số thẻ VIP</span>
+    <h2 class="trn-h2">Quản Lý Hồ Sơ & Quy Trình Thẩm Định Phê Duyệt Học viên</h2>
+    <span class="trn-h3">Thẩm tra lý lịch doanh nghiệp 3 bước, phê chuẩn tư cách Học viên và cấp mã số thẻ VIP</span>
 
     <div class="trn-goal">
-      <strong>Mục tiêu nghiệp vụ:</strong> Đảm bảo 100% hội viên gia nhập đáp ứng đúng tiêu chuẩn Điều lệ (Độ tuổi 1983, tư cách đạo đức tốt, doanh nghiệp hoạt động hợp pháp, đóng góp tích cực cho phong trào doanh nhân thủ đô).
+      <strong>Mục tiêu nghiệp vụ:</strong> Đảm bảo 100% Học viên gia nhập đáp ứng đúng tiêu chuẩn Điều lệ (Độ tuổi 1983, tư cách đạo đức tốt, doanh nghiệp hoạt động hợp pháp, đóng góp tích cực cho phong trào doanh nhân thủ đô).
     </div>
 
     <div class="trn-path">
@@ -1008,11 +1008,11 @@ const htmlContent = `<!DOCTYPE html>
 
     <div class="trn-sec-title">1. Quy trình Thẩm định 3 Bước:</div>
     <ol class="trn-steps">
-      <li><strong>Bước 1 - Tiếp nhận hồ sơ:</strong> Lọc danh sách hội viên theo trạng thái <em>"Chờ phê duyệt"</em>. Bấm vào tên hội viên để xem toàn bộ thông tin đăng ký và ảnh chân dung.</li>
+      <li><strong>Bước 1 - Tiếp nhận hồ sơ:</strong> Lọc danh sách Học viên theo trạng thái <em>"Chờ phê duyệt"</em>. Bấm vào tên Học viên để xem toàn bộ thông tin đăng ký và ảnh chân dung.</li>
       <li><strong>Bước 2 - Thẩm tra thông tin:</strong> Kiểm tra mã số thuế doanh nghiệp, thẩm định uy tín và liên hệ phỏng vấn sơ bộ nếu cần.</li>
       <li><strong>Bước 3 - Ra quyết định phê chuẩn:</strong>
         <ul>
-          <li>Nếu đạt chuẩn: Bấm nút <strong>"Phê Duyệt Hội Viên"</strong>. Hệ thống tự động cấp Mã hội viên, sinh Thẻ VIP điện tử và gửi email chúc mừng kèm thông tin đăng nhập cho Doanh nhân.</li>
+          <li>Nếu đạt chuẩn: Bấm nút <strong>"Phê Duyệt Học viên"</strong>. Hệ thống tự động cấp Mã Học viên, sinh Thẻ VIP điện tử và gửi email chúc mừng kèm thông tin đăng nhập cho Doanh nhân.</li>
           <li>Nếu không đạt: Bấm nút <strong>"Từ Chối"</strong> và nhập rõ lý do để hệ thống gửi thư phản hồi lịch sự.</li>
         </ul>
       </li>
@@ -1020,8 +1020,8 @@ const htmlContent = `<!DOCTYPE html>
 
     <div class="shot-wrap">
       <div class="shot">
-        <img src="screenshots/crm_06_members.png" alt="Quản lý hội viên CRM">
-        <figcaption><strong>Hình 16.1:</strong> Danh sách Cơ sở Dữ liệu Toàn bộ Hội viên Hiệp hội CEO HN10</figcaption>
+        <img src="screenshots/crm_06_members.png" alt="Quản lý Học viên CRM">
+        <figcaption><strong>Hình 16.1:</strong> Danh sách Cơ sở Dữ liệu Toàn bộ Học viên Hiệp hội CEO HN10</figcaption>
       </div>
     </div>
   </section>
@@ -1196,7 +1196,7 @@ const htmlContent = `<!DOCTYPE html>
     <span class="trn-h3">Kiểm soát dòng tiền minh bạch, tự động đối soát giao dịch và xuất báo cáo tài chính</span>
 
     <div class="trn-goal">
-      <strong>Mục tiêu nghiệp vụ:</strong> Giúp Ban Tài chính và Ban Kiểm soát theo dõi chặt chẽ nguồn kinh phí hoạt động; quản lý chi tiết danh sách hội viên đã đóng hoặc còn nợ niên liễm, lập phiếu thu chi và xuất báo cáo kiểm toán rõ ràng.
+      <strong>Mục tiêu nghiệp vụ:</strong> Giúp Ban Tài chính và Ban Kiểm soát theo dõi chặt chẽ nguồn kinh phí hoạt động; quản lý chi tiết danh sách Học viên đã đóng hoặc còn nợ niên liễm, lập phiếu thu chi và xuất báo cáo kiểm toán rõ ràng.
     </div>
 
     <div class="trn-path">
@@ -1205,8 +1205,8 @@ const htmlContent = `<!DOCTYPE html>
 
     <div class="trn-sec-title">1. Quy trình Quản trị Tài chính:</div>
     <ol class="trn-steps">
-      <li>Xem bảng theo dõi <strong>Niên Liễm Hội Viên</strong> theo từng năm tài chính (Đã đóng / Chưa đóng / Hết hạn).</li>
-      <li>Bấm nút <em>"Gửi nhắc phí"</em> để hệ thống tự động gửi thông báo lịch sự kèm mã VietQR đến những hội viên đến hạn đóng phí.</li>
+      <li>Xem bảng theo dõi <strong>Niên Liễm Học viên</strong> theo từng năm tài chính (Đã đóng / Chưa đóng / Hết hạn).</li>
+      <li>Bấm nút <em>"Gửi nhắc phí"</em> để hệ thống tự động gửi thông báo lịch sự kèm mã VietQR đến những Học viên đến hạn đóng phí.</li>
       <li>Ghi nhận phiếu thu/chi thủ công (cho các khoản tài trợ kim cương, chi phí thuê hội trường sự kiện, hoạt động thiện nguyện...).</li>
       <li>Bấm <strong>"Xuất Báo Cáo Excel"</strong> để phục vụ công tác báo cáo trước Đại hội thường niên.</li>
     </ol>
@@ -1214,7 +1214,7 @@ const htmlContent = `<!DOCTYPE html>
     <div class="shot-wrap">
       <div class="shot">
         <img src="screenshots/crm_13_fees.png" alt="Quản lý niên liễm tài chính">
-        <figcaption><strong>Hình 21.1:</strong> Bảng Quản trị Dòng tiền, Quỹ Niên liễm & Trạng thái Đóng phí Hội viên</figcaption>
+        <figcaption><strong>Hình 21.1:</strong> Bảng Quản trị Dòng tiền, Quỹ Niên liễm & Trạng thái Đóng phí Học viên</figcaption>
       </div>
     </div>
   </section>
@@ -1236,9 +1236,9 @@ const htmlContent = `<!DOCTYPE html>
     <div class="trn-sec-title">1. Thao tác Kiểm duyệt Hàng hóa:</div>
     <ol class="trn-steps">
       <li>Vào mục <strong>Chợ Giao Thương (Marketplace)</strong>.</li>
-      <li>Xem danh sách các sản phẩm do hội viên gửi lên ở trạng thái <em>"Chờ duyệt"</em>.</li>
+      <li>Xem danh sách các sản phẩm do Học viên gửi lên ở trạng thái <em>"Chờ duyệt"</em>.</li>
       <li>Kiểm tra hình ảnh, giá niêm yết, chứng từ kiểm định chất lượng sản phẩm.</li>
-      <li>Bấm <strong>"Duyệt Đăng Tải"</strong> để đưa sản phẩm lên ứng dụng di động cho toàn bộ hội viên nhìn thấy; hoặc bấm <strong>"Từ Chối"</strong> kèm ghi chú yêu cầu bổ sung thông tin.</li>
+      <li>Bấm <strong>"Duyệt Đăng Tải"</strong> để đưa sản phẩm lên ứng dụng di động cho toàn bộ Học viên nhìn thấy; hoặc bấm <strong>"Từ Chối"</strong> kèm ghi chú yêu cầu bổ sung thông tin.</li>
     </ol>
 
     <div class="shot-wrap">
@@ -1287,7 +1287,7 @@ const htmlContent = `<!DOCTYPE html>
     <span class="trn-h3">Lưu trữ số hóa toàn diện quy chế hoạt động, nghị quyết nhiệm kỳ và biểu mẫu chuẩn</span>
 
     <div class="trn-goal">
-      <strong>Mục tiêu nghiệp vụ:</strong> Xây dựng thư viện tri thức và pháp lý vững chắc cho hiệp hội; giúp mọi hội viên và ban lãnh đạo có thể dễ dàng tra cứu Điều lệ CLB, Quy chế tài chính, Mẫu đơn đăng ký, Hợp đồng hợp tác chuẩn mẫu bất cứ lúc nào.
+      <strong>Mục tiêu nghiệp vụ:</strong> Xây dựng thư viện tri thức và pháp lý vững chắc cho hiệp hội; giúp mọi Học viên và ban lãnh đạo có thể dễ dàng tra cứu Điều lệ CLB, Quy chế tài chính, Mẫu đơn đăng ký, Hợp đồng hợp tác chuẩn mẫu bất cứ lúc nào.
     </div>
 
     <div class="trn-path">
@@ -1298,8 +1298,8 @@ const htmlContent = `<!DOCTYPE html>
     <ol class="trn-steps">
       <li>Xem cây danh mục tài liệu phân cấp: <em>Quy chế & Điều lệ</em>, <em>Nghị quyết Ban Chấp hành</em>, <em>Biểu mẫu & Hợp đồng mẫu</em>, <em>Kỷ yếu Đại hội</em>.</li>
       <li>Tải lên tệp tài liệu mới (Hỗ trợ PDF, Word, Excel, PowerPoint dung lượng tối đa 50MB/tệp).</li>
-      <li>Phân quyền xem tài liệu: <em>Công khai toàn thể hội viên</em> hoặc <em>Chỉ dành riêng cho Ủy viên Ban Chấp hành</em>.</li>
-      <li>Hội viên có thể bấm <strong>"Tải về"</strong> hoặc <strong>"Xem trực tuyến"</strong> ngay trên trình duyệt mà không cần cài đặt phần mềm ngoài.</li>
+      <li>Phân quyền xem tài liệu: <em>Công khai toàn thể Học viên</em> hoặc <em>Chỉ dành riêng cho Ủy viên Ban Chấp hành</em>.</li>
+      <li>Học viên có thể bấm <strong>"Tải về"</strong> hoặc <strong>"Xem trực tuyến"</strong> ngay trên trình duyệt mà không cần cài đặt phần mềm ngoài.</li>
     </ol>
 
     <div class="shot-wrap">

@@ -304,7 +304,7 @@ function ProductCard({
         <div className="mb-3 border-t border-border pt-2 text-[11px] text-muted-foreground flex items-center justify-between">
           <div className="truncate">
             <span className="font-semibold text-primary">Người đăng: </span>
-            <span className="font-medium text-foreground">{product.sellerName || product.company || seller?.name || "Hội viên CLB"}</span>
+            <span className="font-medium text-foreground">{product.sellerName || product.company || seller?.name || "Học viên CLB"}</span>
             {product.company && product.sellerName && <span className="opacity-70"> ({product.company})</span>}
           </div>
           <span className="shrink-0 text-[10.5px] opacity-75">{fmt.date(product.createdAt)}</span>
@@ -436,7 +436,7 @@ function ProductRow({
           {product.title}
         </Link>
         <div className="mt-0.5 text-[11px] text-muted-foreground">
-          <span className="font-medium text-foreground">{product.sellerName || product.company || seller?.name || "Hội viên"}</span>
+          <span className="font-medium text-foreground">{product.sellerName || product.company || seller?.name || "Học viên"}</span>
           <span className="opacity-50"> • </span>
           {fmt.date(product.createdAt)}
         </div>
@@ -553,7 +553,7 @@ function ProductModal({
       const mem = JSON.parse(localStorage.getItem("vba_my_member") || "{}");
       if (mem?.company?.trim()) return mem.company.trim();
       if (mem?.companyName?.trim()) return mem.companyName.trim();
-    } catch {}
+    } catch { }
     return "";
   }, []);
   const [company, setCompany] = useState(product?.company || profileCompany);
@@ -566,7 +566,7 @@ function ProductModal({
   const [sellerName, setSellerName] = useState(product?.sellerName ?? (user?.user_metadata?.full_name || ""));
   const [sellerPhone, setSellerPhone] = useState(
     product?.sellerPhone ??
-      ((user as any)?.phone || (user?.username && /^\d+$/.test(user.username) ? user.username : "")),
+    ((user as any)?.phone || (user?.username && /^\d+$/.test(user.username) ? user.username : "")),
   );
 
   const categoryOptions = useMemo(() => {
@@ -742,11 +742,10 @@ function ProductModal({
                 if (errors.title) setErrors((prev) => ({ ...prev, title: "" }));
               }}
               placeholder={t("mk.form.titlePh")}
-              className={`w-full rounded-lg border bg-transparent px-3 py-2 text-sm outline-none transition ${
-                errors.title
+              className={`w-full rounded-lg border bg-transparent px-3 py-2 text-sm outline-none transition ${errors.title
                   ? "border-destructive ring-1 ring-destructive/30 focus:border-destructive"
                   : "border-input focus:ring-1 focus:ring-ring"
-              }`}
+                }`}
             />
             {errors.title && (
               <p className="mt-1 text-xs font-semibold text-destructive animate-in fade-in duration-150">
@@ -767,11 +766,10 @@ function ProductModal({
               }}
               placeholder={t("mk.form.descPh")}
               rows={3}
-              className={`w-full rounded-lg border bg-transparent px-3 py-2 text-sm outline-none transition ${
-                errors.description
+              className={`w-full rounded-lg border bg-transparent px-3 py-2 text-sm outline-none transition ${errors.description
                   ? "border-destructive ring-1 ring-destructive/30 focus:border-destructive"
                   : "border-input focus:ring-1 focus:ring-ring"
-              }`}
+                }`}
             />
             {errors.description && (
               <p className="mt-1 text-xs font-semibold text-destructive animate-in fade-in duration-150">
@@ -843,11 +841,10 @@ function ProductModal({
                 }}
                 placeholder="VD: 10.000.000"
                 unit="VND"
-                className={`w-full rounded-lg border bg-transparent px-3 py-2 text-sm outline-none font-mono transition ${
-                  errors.price
+                className={`w-full rounded-lg border bg-transparent px-3 py-2 text-sm outline-none font-mono transition ${errors.price
                     ? "border-destructive ring-1 ring-destructive/30 focus:border-destructive"
                     : "border-input focus:ring-1 focus:ring-ring"
-                }`}
+                  }`}
               />
               {errors.price && (
                 <p className="mt-1 text-xs font-semibold text-destructive animate-in fade-in duration-150">
@@ -926,11 +923,10 @@ function ProductModal({
                 <button
                   key={ic}
                   onClick={() => setEmoji(ic)}
-                  className={`flex h-10 w-10 items-center justify-center rounded-lg border text-xl transition ${
-                    emoji === ic
+                  className={`flex h-10 w-10 items-center justify-center rounded-lg border text-xl transition ${emoji === ic
                       ? "border-primary bg-primary/10"
                       : "border-border hover:bg-secondary"
-                  }`}
+                    }`}
                 >
                   {ic}
                 </button>
@@ -1147,7 +1143,7 @@ function MarketplaceContent({ all, reload }: { all: Product[]; reload: () => voi
           const parsed = JSON.parse(raw);
           if (Array.isArray(parsed) && parsed.length > 0) return parsed;
         }
-      } catch {}
+      } catch { }
     }
     return ["mk.cat.tech", "mk.cat.service", "mk.cat.retail", "mk.cat.finance"];
   });
@@ -1160,7 +1156,7 @@ function MarketplaceContent({ all, reload }: { all: Product[]; reload: () => voi
         const updated = [categoryKey, ...filtered].slice(0, 6);
         try {
           localStorage.setItem("ceohn10_recent_categories", JSON.stringify(updated));
-        } catch {}
+        } catch { }
         return updated;
       });
     }
@@ -1347,22 +1343,20 @@ function MarketplaceContent({ all, reload }: { all: Product[]; reload: () => voi
       <div className="mb-6 flex items-center gap-3 border-b border-border">
         <button
           onClick={() => setAdminSection("catalog")}
-          className={`flex items-center gap-2 border-b-2 px-5 py-3 text-sm font-semibold transition cursor-pointer ${
-            adminSection === "catalog"
+          className={`flex items-center gap-2 border-b-2 px-5 py-3 text-sm font-semibold transition cursor-pointer ${adminSection === "catalog"
               ? "border-blue-600 text-blue-600 dark:text-blue-400"
               : "border-transparent text-muted-foreground hover:text-foreground"
-          }`}
+            }`}
         >
           <Store className="h-4 w-4" />
           Quản Lý Gian Hàng & Sản Phẩm
         </button>
         <button
           onClick={() => setAdminSection("ads")}
-          className={`flex items-center gap-2 border-b-2 px-5 py-3 text-sm font-semibold transition cursor-pointer ${
-            adminSection === "ads"
+          className={`flex items-center gap-2 border-b-2 px-5 py-3 text-sm font-semibold transition cursor-pointer ${adminSection === "ads"
               ? "border-blue-600 text-blue-600 dark:text-blue-400"
               : "border-transparent text-muted-foreground hover:text-foreground"
-          }`}
+            }`}
         >
           <Megaphone className="h-4 w-4" />
           Quản Lý Quảng Cáo & Affiliate
@@ -1373,293 +1367,285 @@ function MarketplaceContent({ all, reload }: { all: Product[]; reload: () => voi
         <MarketplaceAdsManager />
       ) : (
         <>
-      <div className="mb-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
-        <StatCard
-          label={t("mk.kpi.total")}
-          value={fmt.num(all.length)}
-          tone="primary"
-          icon={<Store className="h-4 w-4" />}
-        />
-        <StatCard
-          label={t("mk.kpi.active")}
-          value={fmt.num(active.length)}
-          tone="success"
-          icon={<ShoppingBag className="h-4 w-4" />}
-        />
-        <StatCard
-          label={t("mk.kpi.mine")}
-          value={fmt.num(mine.length)}
-          tone="info"
-          icon={<Package className="h-4 w-4" />}
-        />
-        <StatCard
-          label={t("mk.kpi.value")}
-          value={fmt.money(totalValue)}
-          tone="warning"
-          icon={<TrendingUp className="h-4 w-4" />}
-        />
-      </div>
+          <div className="mb-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
+            <StatCard
+              label={t("mk.kpi.total")}
+              value={fmt.num(all.length)}
+              tone="primary"
+              icon={<Store className="h-4 w-4" />}
+            />
+            <StatCard
+              label={t("mk.kpi.active")}
+              value={fmt.num(active.length)}
+              tone="success"
+              icon={<ShoppingBag className="h-4 w-4" />}
+            />
+            <StatCard
+              label={t("mk.kpi.mine")}
+              value={fmt.num(mine.length)}
+              tone="info"
+              icon={<Package className="h-4 w-4" />}
+            />
+            <StatCard
+              label={t("mk.kpi.value")}
+              value={fmt.money(totalValue)}
+              tone="warning"
+              icon={<TrendingUp className="h-4 w-4" />}
+            />
+          </div>
 
-      <div className="mb-4 flex flex-wrap gap-2 border-b border-border">
-        {(["browse", "mine", "sold"] as const).map((k) => (
-          <button
-            key={k}
-            onClick={() => setTab(k)}
-            className={`-mb-px border-b-2 px-3 py-2 text-sm font-medium transition cursor-pointer ${
-              tab === k
-                ? "border-primary text-foreground"
-                : "border-transparent text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            {k === "browse" ? t("mk.tab.browse") : k === "mine" ? t("mk.tab.mine") : "Đã bán"}
-            {k === "mine" && mine.length > 0 && (
-              <span className="ml-2 rounded-full bg-secondary px-2 py-0.5 text-[10px] font-bold text-foreground">
-                {mine.length}
-              </span>
-            )}
-            {k === "sold" && sold.length > 0 && (
-              <span className="ml-2 rounded-full bg-rose-50 text-rose-700 dark:bg-rose-950/50 dark:text-rose-300 px-2 py-0.5 text-[10px] font-bold">
-                {sold.length}
-              </span>
-            )}
-          </button>
-        ))}
-      </div>
+          <div className="mb-4 flex flex-wrap gap-2 border-b border-border">
+            {(["browse", "mine", "sold"] as const).map((k) => (
+              <button
+                key={k}
+                onClick={() => setTab(k)}
+                className={`-mb-px border-b-2 px-3 py-2 text-sm font-medium transition cursor-pointer ${tab === k
+                    ? "border-primary text-foreground"
+                    : "border-transparent text-muted-foreground hover:text-foreground"
+                  }`}
+              >
+                {k === "browse" ? t("mk.tab.browse") : k === "mine" ? t("mk.tab.mine") : "Đã bán"}
+                {k === "mine" && mine.length > 0 && (
+                  <span className="ml-2 rounded-full bg-secondary px-2 py-0.5 text-[10px] font-bold text-foreground">
+                    {mine.length}
+                  </span>
+                )}
+                {k === "sold" && sold.length > 0 && (
+                  <span className="ml-2 rounded-full bg-rose-50 text-rose-700 dark:bg-rose-950/50 dark:text-rose-300 px-2 py-0.5 text-[10px] font-bold">
+                    {sold.length}
+                  </span>
+                )}
+              </button>
+            ))}
+          </div>
 
-      {tab === "mine" && mine.length > 0 && (
-        <div className="mb-4 flex flex-wrap items-center gap-2">
-          {!selectMode ? (
-            <button
-              onClick={() => setSelectMode(true)}
-              className="inline-flex items-center gap-2 rounded-lg border border-border px-3 py-1.5 text-xs font-semibold text-foreground hover:bg-secondary"
-            >
-              <CheckSquare className="h-3.5 w-3.5" />
-              {t("mk.select")}
-            </button>
-          ) : (
-            <>
-              <span className="text-xs font-semibold text-foreground">
-                {t("mk.selectedCount", { n: selected.size })}
-              </span>
-              <button
-                onClick={() => setSelected(new Set(visible.map((p) => p.id)))}
-                className="rounded-lg border border-border px-3 py-1.5 text-xs font-semibold text-foreground hover:bg-secondary"
-              >
-                {t("mk.selectAll")}
-              </button>
-              <button
-                onClick={() => setSelected(new Set())}
-                disabled={selected.size === 0}
-                className="rounded-lg border border-border px-3 py-1.5 text-xs font-semibold text-foreground hover:bg-secondary disabled:opacity-50"
-              >
-                {t("mk.clearSel")}
-              </button>
-              <button
-                onClick={() => setBulkConfirm(true)}
-                disabled={selected.size === 0}
-                className="inline-flex items-center gap-2 rounded-lg border border-destructive/30 px-3 py-1.5 text-xs font-semibold text-destructive hover:bg-destructive/10 disabled:opacity-50"
-              >
-                <Trash2 className="h-3.5 w-3.5" />
-                {t("mk.deleteSelected")}
-              </button>
-              <button
-                onClick={exitSelect}
-                className="rounded-lg border border-border px-3 py-1.5 text-xs font-semibold text-foreground hover:bg-secondary"
-              >
-                {t("mk.selectDone")}
-              </button>
-            </>
+          {tab === "mine" && mine.length > 0 && (
+            <div className="mb-4 flex flex-wrap items-center gap-2">
+              {!selectMode ? (
+                <button
+                  onClick={() => setSelectMode(true)}
+                  className="inline-flex items-center gap-2 rounded-lg border border-border px-3 py-1.5 text-xs font-semibold text-foreground hover:bg-secondary"
+                >
+                  <CheckSquare className="h-3.5 w-3.5" />
+                  {t("mk.select")}
+                </button>
+              ) : (
+                <>
+                  <span className="text-xs font-semibold text-foreground">
+                    {t("mk.selectedCount", { n: selected.size })}
+                  </span>
+                  <button
+                    onClick={() => setSelected(new Set(visible.map((p) => p.id)))}
+                    className="rounded-lg border border-border px-3 py-1.5 text-xs font-semibold text-foreground hover:bg-secondary"
+                  >
+                    {t("mk.selectAll")}
+                  </button>
+                  <button
+                    onClick={() => setSelected(new Set())}
+                    disabled={selected.size === 0}
+                    className="rounded-lg border border-border px-3 py-1.5 text-xs font-semibold text-foreground hover:bg-secondary disabled:opacity-50"
+                  >
+                    {t("mk.clearSel")}
+                  </button>
+                  <button
+                    onClick={() => setBulkConfirm(true)}
+                    disabled={selected.size === 0}
+                    className="inline-flex items-center gap-2 rounded-lg border border-destructive/30 px-3 py-1.5 text-xs font-semibold text-destructive hover:bg-destructive/10 disabled:opacity-50"
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                    {t("mk.deleteSelected")}
+                  </button>
+                  <button
+                    onClick={exitSelect}
+                    className="rounded-lg border border-border px-3 py-1.5 text-xs font-semibold text-foreground hover:bg-secondary"
+                  >
+                    {t("mk.selectDone")}
+                  </button>
+                </>
+              )}
+            </div>
           )}
-        </div>
-      )}
 
-      <div className="sm:sticky sm:top-18 z-20 -mx-4 mb-4 space-y-3 bg-background/90 px-4 py-3 backdrop-blur lg:-mx-8 lg:px-8">
-        <div className="flex flex-wrap items-center gap-3">
-          {/* Icon dạng Menu bên trái thanh tìm kiếm có sắp xếp giá */}
-          <div className="relative">
-            <button
-              type="button"
-              onClick={() => setSortMenuOpen(!sortMenuOpen)}
-              className="h-10 px-3 rounded-xl border border-border bg-card hover:bg-secondary text-foreground flex items-center gap-2 text-xs font-bold transition shadow-xs cursor-pointer"
-              title="Menu sắp xếp giá và thứ tự hiển thị"
-            >
-              <SlidersHorizontal className="h-4 w-4 text-primary" />
-              <span className="hidden sm:inline">Sắp xếp</span>
-            </button>
+          <div className="sm:sticky sm:top-18 z-20 -mx-4 mb-4 space-y-3 bg-background/90 px-4 py-3 backdrop-blur lg:-mx-8 lg:px-8">
+            <div className="flex flex-wrap items-center gap-3">
+              {/* Icon dạng Menu bên trái thanh tìm kiếm có sắp xếp giá */}
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => setSortMenuOpen(!sortMenuOpen)}
+                  className="h-10 px-3 rounded-xl border border-border bg-card hover:bg-secondary text-foreground flex items-center gap-2 text-xs font-bold transition shadow-xs cursor-pointer"
+                  title="Menu sắp xếp giá và thứ tự hiển thị"
+                >
+                  <SlidersHorizontal className="h-4 w-4 text-primary" />
+                  <span className="hidden sm:inline">Sắp xếp</span>
+                </button>
 
-            {sortMenuOpen && (
-              <div className="absolute left-0 top-12 w-56 rounded-2xl border border-border bg-card p-2 shadow-2xl z-30 animate-in fade-in zoom-in-95">
-                <div className="px-2 py-1.5 text-xs font-bold text-muted-foreground flex items-center justify-between">
-                  <span>Sắp xếp theo giá & thứ tự</span>
-                  <button onClick={() => setSortMenuOpen(false)} className="text-muted-foreground hover:text-foreground">
+                {sortMenuOpen && (
+                  <div className="absolute left-0 top-12 w-56 rounded-2xl border border-border bg-card p-2 shadow-2xl z-30 animate-in fade-in zoom-in-95">
+                    <div className="px-2 py-1.5 text-xs font-bold text-muted-foreground flex items-center justify-between">
+                      <span>Sắp xếp theo giá & thứ tự</span>
+                      <button onClick={() => setSortMenuOpen(false)} className="text-muted-foreground hover:text-foreground">
+                        <X className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                    <div className="space-y-1 pt-1">
+                      {[
+                        { key: "priceLow", label: "Giá: Thấp đến Cao (Tiết kiệm)" },
+                        { key: "priceHigh", label: "Giá: Cao đến Thấp (Cao cấp)" },
+                        { key: "viewed", label: "Xem nhiều / Bán chạy nhất" },
+                        { key: "newest", label: "Sản phẩm mới nhất" },
+                      ].map((item) => (
+                        <button
+                          key={item.key}
+                          type="button"
+                          onClick={() => {
+                            setSort(item.key as Sort);
+                            setSortMenuOpen(false);
+                          }}
+                          className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition cursor-pointer text-left ${sort === item.key
+                              ? "bg-primary text-primary-foreground font-bold"
+                              : "text-foreground hover:bg-secondary"
+                            }`}
+                        >
+                          <span>{item.label}</span>
+                          {sort === item.key && <Check className="h-3.5 w-3.5" />}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Ô tìm kiếm ở giữa */}
+              <div className="flex flex-1 items-center gap-2 rounded-xl border border-border bg-card px-3 py-2 shadow-[var(--shadow-card)]">
+                <Search className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
+                <input
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder={t("mk.search")}
+                  aria-label={t("mk.search")}
+                  className="flex-1 bg-transparent text-sm outline-none"
+                />
+                {query && (
+                  <button onClick={() => setQuery("")} className="text-muted-foreground hover:text-foreground cursor-pointer">
                     <X className="h-3.5 w-3.5" />
                   </button>
-                </div>
-                <div className="space-y-1 pt-1">
-                  {[
-                    { key: "priceLow", label: "Giá: Thấp đến Cao (Tiết kiệm)" },
-                    { key: "priceHigh", label: "Giá: Cao đến Thấp (Cao cấp)" },
-                    { key: "viewed", label: "Xem nhiều / Bán chạy nhất" },
-                    { key: "newest", label: "Sản phẩm mới nhất" },
-                  ].map((item) => (
-                    <button
-                      key={item.key}
-                      type="button"
-                      onClick={() => {
-                        setSort(item.key as Sort);
-                        setSortMenuOpen(false);
-                      }}
-                      className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition cursor-pointer text-left ${
-                        sort === item.key
-                          ? "bg-primary text-primary-foreground font-bold"
-                          : "text-foreground hover:bg-secondary"
-                      }`}
-                    >
-                      <span>{item.label}</span>
-                      {sort === item.key && <Check className="h-3.5 w-3.5" />}
-                    </button>
-                  ))}
+                )}
+              </div>
+
+              <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1 rounded-lg border border-border bg-card p-0.5">
+                  <button
+                    onClick={() => setView("card")}
+                    aria-pressed={view === "card"}
+                    aria-label={t("mk.view.card")}
+                    className={`rounded-md p-1.5 transition ${view === "card"
+                        ? "bg-secondary text-foreground"
+                        : "text-muted-foreground hover:text-foreground"
+                      } focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring`}
+                  >
+                    <LayoutGrid className="h-4 w-4" aria-hidden="true" />
+                  </button>
+                  <button
+                    onClick={() => setView("list")}
+                    aria-pressed={view === "list"}
+                    aria-label={t("mk.view.list")}
+                    className={`rounded-md p-1.5 transition ${view === "list"
+                        ? "bg-secondary text-foreground"
+                        : "text-muted-foreground hover:text-foreground"
+                      } focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring`}
+                  >
+                    <List className="h-4 w-4" aria-hidden="true" />
+                  </button>
                 </div>
               </div>
-            )}
-          </div>
+            </div>
 
-          {/* Ô tìm kiếm ở giữa */}
-          <div className="flex flex-1 items-center gap-2 rounded-xl border border-border bg-card px-3 py-2 shadow-[var(--shadow-card)]">
-            <Search className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
-            <input
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder={t("mk.search")}
-              aria-label={t("mk.search")}
-              className="flex-1 bg-transparent text-sm outline-none"
-            />
-            {query && (
-              <button onClick={() => setQuery("")} className="text-muted-foreground hover:text-foreground cursor-pointer">
-                <X className="h-3.5 w-3.5" />
-              </button>
-            )}
-          </div>
-
-          <div className="flex items-center gap-2">
-            <div className="flex items-center gap-1 rounded-lg border border-border bg-card p-0.5">
+            {/* Dưới tìm kiếm là danh mục gần đây đã chọn (Shopee Style recent categories chips) */}
+            <div className="flex flex-col gap-1.5 pt-0.5">
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-muted-foreground font-medium flex items-center gap-1.5">
+                  <Sparkles className="h-3.5 w-3.5 text-amber-500" />
+                  <span>Danh mục gần đây đã chọn:</span>
+                </span>
+                {recentCategories.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setRecentCategories([]);
+                      try {
+                        localStorage.removeItem("ceohn10_recent_categories");
+                      } catch { }
+                    }}
+                    className="text-[11px] text-muted-foreground hover:text-foreground cursor-pointer"
+                  >
+                    Xóa lịch sử
+                  </button>
+                )}
+              </div>
+              <div className="flex flex-wrap items-center gap-1.5">
+                {recentCategories.map((cKey) => {
+                  const isSelected = cat === cKey;
+                  return (
+                    <button
+                      key={cKey}
+                      type="button"
+                      onClick={() => handleSelectCat(cKey)}
+                      className={`px-3 py-1 rounded-full text-xs font-semibold transition cursor-pointer border ${isSelected
+                          ? "bg-primary text-primary-foreground border-primary shadow-xs"
+                          : "bg-card border-border text-muted-foreground hover:bg-secondary hover:text-foreground"
+                        }`}
+                    >
+                      {t(cKey as any)}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+            <div className="flex flex-wrap gap-1.5">
               <button
-                onClick={() => setView("card")}
-                aria-pressed={view === "card"}
-                aria-label={t("mk.view.card")}
-                className={`rounded-md p-1.5 transition ${
-                  view === "card"
-                    ? "bg-secondary text-foreground"
-                    : "text-muted-foreground hover:text-foreground"
-                } focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring`}
+                onClick={() => setCat("all")}
+                aria-pressed={cat === "all"}
+                className={`rounded-full px-3 py-1.5 text-xs font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${cat === "all"
+                    ? "bg-primary text-primary-foreground"
+                    : "border border-border text-muted-foreground hover:bg-secondary"
+                  }`}
               >
-                <LayoutGrid className="h-4 w-4" aria-hidden="true" />
+                {t("mk.filter.all")}
               </button>
+              {dynamicCategories.map((c: string) => {
+                const isSelected = cat === c || matchProductCategory(c, cat);
+                return (
+                  <button
+                    key={c}
+                    onClick={() => setCat(c)}
+                    aria-pressed={isSelected}
+                    className={`rounded-full px-3 py-1.5 text-xs font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring cursor-pointer ${isSelected
+                        ? "bg-primary text-primary-foreground shadow-xs"
+                        : "border border-border text-muted-foreground hover:bg-secondary hover:text-foreground"
+                      }`}
+                  >
+                    {c}
+                  </button>
+                );
+              })}
               <button
-                onClick={() => setView("list")}
-                aria-pressed={view === "list"}
-                aria-label={t("mk.view.list")}
-                className={`rounded-md p-1.5 transition ${
-                  view === "list"
-                    ? "bg-secondary text-foreground"
-                    : "text-muted-foreground hover:text-foreground"
-                } focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring`}
+                onClick={() => setPinnedOnly((v) => !v)}
+                aria-pressed={pinnedOnly}
+                className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${pinnedOnly
+                    ? "bg-primary text-primary-foreground"
+                    : "border border-border text-muted-foreground hover:bg-secondary"
+                  }`}
               >
-                <List className="h-4 w-4" aria-hidden="true" />
+                <Pin className="h-3 w-3" aria-hidden="true" />
+                {pinned.size > 0
+                  ? t("mk.filter.pinnedCount", { n: pinned.size })
+                  : t("mk.filter.pinned")}
               </button>
             </div>
           </div>
-        </div>
 
-        {/* Dưới tìm kiếm là danh mục gần đây đã chọn (Shopee Style recent categories chips) */}
-        <div className="flex flex-col gap-1.5 pt-0.5">
-          <div className="flex items-center justify-between text-xs">
-            <span className="text-muted-foreground font-medium flex items-center gap-1.5">
-              <Sparkles className="h-3.5 w-3.5 text-amber-500" />
-              <span>Danh mục gần đây đã chọn:</span>
-            </span>
-            {recentCategories.length > 0 && (
-              <button
-                type="button"
-                onClick={() => {
-                  setRecentCategories([]);
-                  try {
-                    localStorage.removeItem("ceohn10_recent_categories");
-                  } catch {}
-                }}
-                className="text-[11px] text-muted-foreground hover:text-foreground cursor-pointer"
-              >
-                Xóa lịch sử
-              </button>
-            )}
-          </div>
-          <div className="flex flex-wrap items-center gap-1.5">
-            {recentCategories.map((cKey) => {
-              const isSelected = cat === cKey;
-              return (
-                <button
-                  key={cKey}
-                  type="button"
-                  onClick={() => handleSelectCat(cKey)}
-                  className={`px-3 py-1 rounded-full text-xs font-semibold transition cursor-pointer border ${
-                    isSelected
-                      ? "bg-primary text-primary-foreground border-primary shadow-xs"
-                      : "bg-card border-border text-muted-foreground hover:bg-secondary hover:text-foreground"
-                  }`}
-                >
-                  {t(cKey as any)}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-        <div className="flex flex-wrap gap-1.5">
-          <button
-            onClick={() => setCat("all")}
-            aria-pressed={cat === "all"}
-            className={`rounded-full px-3 py-1.5 text-xs font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
-              cat === "all"
-                ? "bg-primary text-primary-foreground"
-                : "border border-border text-muted-foreground hover:bg-secondary"
-            }`}
-          >
-            {t("mk.filter.all")}
-          </button>
-          {dynamicCategories.map((c: string) => {
-            const isSelected = cat === c || matchProductCategory(c, cat);
-            return (
-              <button
-                key={c}
-                onClick={() => setCat(c)}
-                aria-pressed={isSelected}
-                className={`rounded-full px-3 py-1.5 text-xs font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring cursor-pointer ${
-                  isSelected
-                    ? "bg-primary text-primary-foreground shadow-xs"
-                    : "border border-border text-muted-foreground hover:bg-secondary hover:text-foreground"
-                }`}
-              >
-                {c}
-              </button>
-            );
-          })}
-          <button
-            onClick={() => setPinnedOnly((v) => !v)}
-            aria-pressed={pinnedOnly}
-            className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
-              pinnedOnly
-                ? "bg-primary text-primary-foreground"
-                : "border border-border text-muted-foreground hover:bg-secondary"
-            }`}
-          >
-            <Pin className="h-3 w-3" aria-hidden="true" />
-            {pinned.size > 0
-              ? t("mk.filter.pinnedCount", { n: pinned.size })
-              : t("mk.filter.pinned")}
-          </button>
-        </div>
-      </div>
-
-      <p className="mb-3 text-xs font-medium text-muted-foreground" aria-live="polite">
+          <p className="mb-3 text-xs font-medium text-muted-foreground" aria-live="polite">
             {t("mk.results", { n: visible.length })}
           </p>
           {visible.length === 0 ? (

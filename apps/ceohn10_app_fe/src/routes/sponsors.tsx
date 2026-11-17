@@ -396,7 +396,7 @@ function SponsorsPage() {
             value={fmt.money(totalInKindFunds)}
             tone="warning"
             hint="Hàng hóa, vật phẩm, kỷ yếu quy đổi"
-            icon={<TrendingUp className="h-4 w-4 text-purple-500" />}
+            icon={<TrendingUp className="h-4 w-4 text-amber-500" />}
           />
           <StatCard
             label="Quỹ Thiện Nguyện (CSR)"
@@ -432,7 +432,7 @@ function SponsorsPage() {
             value={`${SPONSORS.filter((s) => s.packageType === "in_kind").length} Gói hiện vật`}
             tone="warning"
             hint={`Quy đổi ~${fmt.money(SPONSORS.filter((s) => s.packageType === "in_kind").reduce((acc, s) => acc + s.amount, 0))}`}
-            icon={<TrendingUp className="h-4 w-4 text-purple-500" />}
+            icon={<TrendingUp className="h-4 w-4 text-amber-500" />}
           />
         </div>
       )}

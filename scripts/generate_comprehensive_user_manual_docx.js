@@ -314,7 +314,7 @@ async function generateManual() {
       spacing: { before: 100, after: 500 },
       children: [
         new TextRun({
-          text: 'QUẢN TRỊ CRM HIỆP HỘI — APP HỘI VIÊN CEO HN10 — MẠNG XÃ HỘI DOANH NHÂN VIONE\n(ĐẶC TẢ CHI TIẾT TỪNG CHỨC NĂNG CON & PHÂN TÍCH HIỆN TRẠNG KẾT NỐI API BÊN THỨ 3)',
+          text: 'QUẢN TRỊ CRM HIỆP HỘI — APP Học viên CEO HN10 — MẠNG XÃ HỘI DOANH NHÂN VIONE\n(ĐẶC TẢ CHI TIẾT TỪNG CHỨC NĂNG CON & PHÂN TÍCH HIỆN TRẠNG KẾT NỐI API BÊN THỨ 3)',
           font: FONT_FAMILY,
           size: 22,
           bold: true,
@@ -424,7 +424,7 @@ async function generateManual() {
     createPara('  1.2. Bảng kiểm toán trung thực hiện trạng các API bên thứ 3 (External APIs)', { indent: { left: 300 } }),
     createPara('  1.3. Cấu hình định tuyến (URL Routing) & Tài khoản đăng nhập', { indent: { left: 300 } }),
     createPara('PHẦN II: HƯỚNG DẪN VẬN HÀNH HỆ THỐNG CRM QUẢN TRỊ (CRM ADMIN PORTAL)', { bold: true }),
-    createPara('  2.1. Phân hệ Quản lý Hội viên & Ban Chấp Hành (Thẩm định, Phê duyệt, Cấp mã)', { indent: { left: 300 } }),
+    createPara('  2.1. Phân hệ Quản lý Học viên & Ban Chấp Hành (Thẩm định, Phê duyệt, Cấp mã)', { indent: { left: 300 } }),
     createPara('  2.2. Phân hệ Quản lý Doanh nghiệp Thành viên & Năng lực chuỗi cung ứng', { indent: { left: 300 } }),
     createPara('  2.3. Phân hệ Tài chính, Hội phí, Thu chi & Quy trình gạch nợ thủ công', { indent: { left: 300 } }),
     createPara('  2.4. Phân hệ Sự kiện, Sơ đồ bàn tiệc VIP & Quét vé QR điểm danh', { indent: { left: 300 } }),
@@ -434,8 +434,8 @@ async function generateManual() {
     createPara('  2.8. Phân hệ Quản trị nền tảng, Phân quyền RBAC & Nhật ký kiểm toán', { indent: { left: 300 } }),
     createPara('PHẦN III: HƯỚNG DẪN SỬ DỤNG APP HIỆP HỘI (CLB DOANH NHÂN CEO HN10)', { bold: true }),
     createPara('  3.1. Cổng đăng nhập Mobile (Làm rõ luồng nội bộ vs Google/Apple Login)', { indent: { left: 300 } }),
-    createPara('  3.2. Thẻ hội viên kỹ thuật số 3D & Danh thiếp số vCard', { indent: { left: 300 } }),
-    createPara('  3.3. Tra cứu Danh bạ hội viên & Kết nối kinh doanh trực tiếp', { indent: { left: 300 } }),
+    createPara('  3.2. Thẻ Học viên kỹ thuật số 3D & Danh thiếp số vCard', { indent: { left: 300 } }),
+    createPara('  3.3. Tra cứu Danh bạ Học viên & Kết nối kinh doanh trực tiếp', { indent: { left: 300 } }),
     createPara('  3.4. Đăng ký sự kiện & Vé QR điện tử vào cửa', { indent: { left: 300 } }),
     createPara('  3.5. NỘP HỘI PHÍ qua mã VietQR (Quy trình chuyển khoản & chờ duyệt thủ công)', { indent: { left: 300 } }),
     createPara('  3.6. Hộp thư trao đổi Ban Thư ký, Kho đặc quyền & Thư viện tài liệu', { indent: { left: 300 } }),
@@ -461,8 +461,8 @@ async function generateManual() {
     createPara(
       'Hệ sinh thái ViOne được thiết kế nhằm mục tiêu số hóa toàn diện công tác quản trị hiệp hội doanh nghiệp, chuyển đổi từ mô hình quản lý thủ công rời rạc (Excel, Zalo, sổ sách giấy) sang nền tảng số tập trung. Hệ sinh thái được phân chia thành 3 phân hệ độc lập, rõ ràng theo đúng chức năng và đối tượng sử dụng:'
     ),
-    createPara('1. Hệ Thống CRM Quản Trị (CRM Admin Portal): Chuyên dụng cho Ban Chấp Hành, Ban Thư ký và Ban Tài chính kế toán hiệp hội. Chịu trách nhiệm thẩm định hội viên, phát hành hóa đơn, quản lý điểm danh vé QR sự kiện, quản lý thu chi và lập báo cáo tài chính minh bạch.', { indent: { left: 300 } }),
-    createPara('2. App Hiệp Hội (CLB Doanh Nhân CEO HN10 - Association App): Ứng dụng di động dành riêng cho hội viên chính thức của hiệp hội. Giúp hội viên tra cứu danh bạ, xuất trình thẻ hội viên 3D, nhận vé QR vào cửa sự kiện, NỘP HỘI PHÍ qua VietQR và nhận thông báo từ Ban Chấp Hành.', { indent: { left: 300 } }),
+    createPara('1. Hệ Thống CRM Quản Trị (CRM Admin Portal): Chuyên dụng cho Ban Chấp Hành, Ban Thư ký và Ban Tài chính kế toán hiệp hội. Chịu trách nhiệm thẩm định Học viên, phát hành hóa đơn, quản lý điểm danh vé QR sự kiện, quản lý thu chi và lập báo cáo tài chính minh bạch.', { indent: { left: 300 } }),
+    createPara('2. App Hiệp Hội (CLB Doanh Nhân CEO HN10 - Association App): Ứng dụng di động dành riêng cho Học viên chính thức của hiệp hội. Giúp Học viên tra cứu danh bạ, xuất trình thẻ Học viên 3D, nhận vé QR vào cửa sự kiện, NỘP HỘI PHÍ qua VietQR và nhận thông báo từ Ban Chấp Hành.', { indent: { left: 300 } }),
     createPara('3. App Mạng Xã Hội Giao Thương ViOne Connect (ViOne App): Mạng xã hội B2B liên hiệp hội dành cho cộng đồng doanh nhân cả nước. Cho phép chia sẻ khoảnh khắc kinh doanh, kích hoạt danh thiếp thông minh NFC, đăng tin sàn nhu cầu mua sắm B2B và đặt lịch hẹn kết nối 1-on-1.', { indent: { left: 300 } }),
 
     createH2('1.2. Bảng kiểm toán trung thực hiện trạng các API bên thứ 3 (External APIs)'),
@@ -490,7 +490,7 @@ async function generateManual() {
       ['Phân Hệ', 'Địa Chỉ Truy Cập (URL Route)', 'Đối Tượng Phục Vụ', 'Phương Thức Đăng Nhập Thực Tế'],
       [
         ['Hệ Thống CRM Quản Trị', 'http://14.225.217.232:5000/ hoặc /platform', 'BCH, Thư ký, Kế toán', 'Tài khoản Quản trị: admin@vione.vn / Mật khẩu'],
-        ['App Hiệp Hội (CEO HN10)', 'http://14.225.217.232:5000/association', 'Hội viên CLB CEO HN10', 'Đăng nhập tại /auth/mobile/ bằng SĐT/Email + MK'],
+        ['App Hiệp Hội (CEO HN10)', 'http://14.225.217.232:5000/association', 'Học viên CLB CEO HN10', 'Đăng nhập tại /auth/mobile/ bằng SĐT/Email + MK'],
         ['App ViOne Connect', 'http://14.225.217.232:5000/connect-app', 'Doanh nhân B2B toàn quốc', 'Đăng ký tại /auth hoặc chạm thẻ danh thiếp NFC'],
       ],
       [22, 28, 24, 26]
@@ -503,16 +503,16 @@ async function generateManual() {
   // ────────────────────────────────────────────────────────────────────────────
   docElements.push(
     createH1('PHẦN II: HƯỚNG DẪN VẬN HÀNH HỆ THỐNG CRM QUẢN TRỊ (CRM ADMIN PORTAL)'),
-    createH2('2.1. Phân hệ Quản lý Hội viên & Ban Chấp Hành'),
-    createPara('Phân hệ Hội viên (/members) là trái tim vận hành của Ban Thư ký, cung cấp đầy đủ các công cụ quản lý vòng đời hội viên từ khi tiếp nhận hồ sơ đến khi phê duyệt chính thức:'),
+    createH2('2.1. Phân hệ Quản lý Học viên & Ban Chấp Hành'),
+    createPara('Phân hệ Học viên (/members) là trái tim vận hành của Ban Thư ký, cung cấp đầy đủ các công cụ quản lý vòng đời Học viên từ khi tiếp nhận hồ sơ đến khi phê duyệt chính thức:'),
     createPara('• Tiếp nhận hồ sơ gia nhập (/members?status=pending): Khi cá nhân/doanh nghiệp nộp đơn đăng ký trên cổng thông tin, hồ sơ tự động hiển thị trong tab "Chờ duyệt". Hệ thống tự động kiểm tra tính hợp lệ của số CCCD/Hộ chiếu và cảnh báo nếu phát hiện trùng lặp Mã số thuế doanh nghiệp.', { indent: { left: 300 } }),
     createPara('• Quy trình thẩm định 2 cấp (/members/:id/review): Cấp 1 (Ban Thư ký) rà soát tính đầy đủ của hồ sơ, đối chiếu giấy phép kinh doanh -> Bấm "Đề xuất phê duyệt". Cấp 2 (Ban Thường trực / Phó Chủ tịch) bấm "Ký duyệt chính thức".', { indent: { left: 300 } }),
-    createPara('• Cấp mã hội viên độc bản (/members/:id/approve): Sau khi được duyệt, hệ thống tự động sinh mã hội viên chuẩn (Ví dụ: HN10-001, HN10-002), cấp thẻ hội viên số và kích hoạt trạng thái Hoạt động (Active).', { indent: { left: 300 } }),
+    createPara('• Cấp mã Học viên độc bản (/members/:id/approve): Sau khi được duyệt, hệ thống tự động sinh mã Học viên chuẩn (Ví dụ: HN10-001, HN10-002), cấp thẻ Học viên số và kích hoạt trạng thái Hoạt động (Active).', { indent: { left: 300 } }),
     createPara('• Bổ nhiệm chức danh Ban Chấp Hành (/members/:id/board): Gán vai trò trong hiệp hội (Chủ tịch, Phó Chủ tịch thường trực, Trưởng Ban Kiểm tra, Trưởng Ban Xúc tiến thương mại). Khi gán chức danh, tài khoản được cấp thêm quyền quản trị tương ứng trên CRM.', { indent: { left: 300 } }),
-    createPara('• Xuất danh bạ đại biểu (Excel): Phục vụ việc in Kỷ yếu Đại hội hoặc danh bạ hội viên thường niên, xuất đầy đủ họ tên, doanh nghiệp, chức vụ, số điện thoại và ảnh đại diện.', { indent: { left: 300 } }),
+    createPara('• Xuất danh bạ đại biểu (Excel): Phục vụ việc in Kỷ yếu Đại hội hoặc danh bạ Học viên thường niên, xuất đầy đủ họ tên, doanh nghiệp, chức vụ, số điện thoại và ảnh đại diện.', { indent: { left: 300 } }),
 
     createH2('2.2. Phân hệ Quản lý Doanh nghiệp Thành viên'),
-    createPara('Phân hệ Doanh nghiệp (/companies) quản lý hồ sơ năng lực 360 độ của các công ty hội viên:'),
+    createPara('Phân hệ Doanh nghiệp (/companies) quản lý hồ sơ năng lực 360 độ của các công ty Học viên:'),
     createPara('• Thông tin pháp lý: Mã số thuế, ngày thành lập, vốn điều lệ, đại diện pháp luật, địa chỉ trụ sở chính và chi nhánh.', { indent: { left: 300 } }),
     createPara('• Danh mục sản phẩm - dịch vụ tiêu biểu: Doanh nghiệp đăng tải hình ảnh sản phẩm, năng lực sản xuất, quy chuẩn chất lượng (ISO, HACCP, OCOP).', { indent: { left: 300 } }),
     createPara('• Xác thực doanh nghiệp uy tín (Verified Badge): Ban Thư ký kiểm tra thực tế giấy phép và gắn tích xanh xác thực uy tín trên sàn giao thương.', { indent: { left: 300 } }),
@@ -520,14 +520,14 @@ async function generateManual() {
     createH2('2.3. Phân hệ Tài chính, Hội phí, Thu chi & Quy trình gạch nợ thủ công'),
     ...createCallout(
       'QUY TRÌNH ĐỐI SOÁT HỘI PHÍ THỦ CÔNG (BẮT BUỘC NẮM RÕ)',
-      'DO HIỆN TẠI CHƯA KẾT NỐI OPEN API NGÂN HÀNG VÀ CHƯA CÓ WEBHOOK TỰ ĐỘNG GẠCH NỢ: Khi hội viên chuyển khoản qua mã VietQR, tiền sẽ vào tài khoản ngân hàng của hiệp hội nhưng hệ thống CRM CHƯA THỂ tự động gạch nợ. Ban Kế toán BẮT BUỘC phải thực hiện quy trình kiểm tra sao kê ngân hàng và bấm duyệt gạch nợ bằng tay theo hướng dẫn chi tiết dưới đây.',
+      'DO HIỆN TẠI CHƯA KẾT NỐI OPEN API NGÂN HÀNG VÀ CHƯA CÓ WEBHOOK TỰ ĐỘNG GẠCH NỢ: Khi Học viên chuyển khoản qua mã VietQR, tiền sẽ vào tài khoản ngân hàng của hiệp hội nhưng hệ thống CRM CHƯA THỂ tự động gạch nợ. Ban Kế toán BẮT BUỘC phải thực hiện quy trình kiểm tra sao kê ngân hàng và bấm duyệt gạch nợ bằng tay theo hướng dẫn chi tiết dưới đây.',
       true
     ),
     createPara('Quy trình vận hành hội phí chuẩn xác:'),
-    createPara('Bước 1: Lập kế hoạch THU HỘI PHÍ (/fees/generate-annual): Đầu mỗi niên độ, kế toán bấm "Tạo kỳ thu mới", chọn mức phí theo hạng (Kim Cương 20 triệu, Vàng 10 triệu, Bạc 5 triệu). Hệ thống tự sinh công nợ cho toàn thể hội viên.', { indent: { left: 300 } }),
-    createPara('Bước 2: Hội viên quét mã VietQR trên App: Trên màn hình hội viên sẽ xuất hiện mã VietQR chuẩn chứa sẵn STK ngân hàng, số tiền và cú pháp chuyển khoản (Ví dụ: "NL2026 M1983001 NGUYEN VAN A").', { indent: { left: 300 } }),
+    createPara('Bước 1: Lập kế hoạch THU HỘI PHÍ (/fees/generate-annual): Đầu mỗi niên độ, kế toán bấm "Tạo kỳ thu mới", chọn mức phí theo hạng (Kim Cương 20 triệu, Vàng 10 triệu, Bạc 5 triệu). Hệ thống tự sinh công nợ cho toàn thể Học viên.', { indent: { left: 300 } }),
+    createPara('Bước 2: Học viên quét mã VietQR trên App: Trên màn hình Học viên sẽ xuất hiện mã VietQR chuẩn chứa sẵn STK ngân hàng, số tiền và cú pháp chuyển khoản (Ví dụ: "NL2026 M1983001 NGUYEN VAN A").', { indent: { left: 300 } }),
     createPara('Bước 3: Đối soát sao kê & Gạch nợ thủ công (/fees): Kế toán đăng nhập Internet Banking của hiệp hội, tra cứu danh sách tiền về -> Đối chiếu cú pháp chuyển khoản -> Tìm hóa đơn tương ứng trên CRM -> Bấm nút "Xác nhận đã thanh toán" (Confirm Payment).', { indent: { left: 300 } }),
-    createPara('Bước 4: Tự động gia hạn thẻ (+1 năm): Ngay khi kế toán bấm xác nhận, hệ thống tự động cộng thêm 365 ngày vào ngày hết hạn thẻ của hội viên (term_end), đồng thời ghi vết kiểm toán vào bảng platform/renewal-audit.', { indent: { left: 300 } }),
+    createPara('Bước 4: Tự động gia hạn thẻ (+1 năm): Ngay khi kế toán bấm xác nhận, hệ thống tự động cộng thêm 365 ngày vào ngày hết hạn thẻ của Học viên (term_end), đồng thời ghi vết kiểm toán vào bảng platform/renewal-audit.', { indent: { left: 300 } }),
     createPara('Bước 5: Quản lý Thu - Chi ngoài hội phí (/income, /expenses): Ghi nhận thu tài trợ sự kiện, thu tiền mặt tại chỗ; ghi nhận chi phí thuê hội trường, tiệc gala, quà tặng và quản lý phiếu tạm ứng/hoàn ứng của ban tổ chức.', { indent: { left: 300 } }),
 
     createH2('2.4. Phân hệ Sự kiện, Sơ đồ bàn tiệc VIP & Quét vé QR điểm danh'),
@@ -553,7 +553,7 @@ async function generateManual() {
     createPara('• Thư ký duyệt lịch họp để tránh trùng phòng.', { indent: { left: 300 } }),
 
     createH2('2.7. Phân hệ Truyền thông, Email Marketing & Quản trị nền tảng'),
-    createPara('• Gửi email thông báo hàng loạt (/email-marketing): Gửi giấy mời họp BCH, thư chúc mừng sinh nhật hội viên, thông báo NỘP HỘI PHÍ qua máy chủ SMTP.', { indent: { left: 300 } }),
+    createPara('• Gửi email thông báo hàng loạt (/email-marketing): Gửi giấy mời họp BCH, thư chúc mừng sinh nhật Học viên, thông báo NỘP HỘI PHÍ qua máy chủ SMTP.', { indent: { left: 300 } }),
     createPara('• Quản trị phân quyền RBAC (/platform/admins): Thiết lập quyền hạn chặt chẽ theo vai trò: Super Admin, Thư ký hiệp hội, Kế toán trưởng, Ban Kiểm tra.', { indent: { left: 300 } }),
     createPara('• Nhật ký kiểm toán bất biến (/platform/audit): Lưu trữ mọi hành vi tạo, sửa, xóa, duyệt của quản trị viên kèm thời gian, IP và dữ liệu thay đổi.', { indent: { left: 300 } }),
     new Paragraph({ children: [new PageBreak()] })
@@ -567,34 +567,34 @@ async function generateManual() {
     createH2('3.1. Cổng đăng nhập Mobile & Hiện trạng đăng nhập bên ngoài'),
     ...createCallout(
       'PHƯƠNG THỨC ĐĂNG NHẬP THỰC TẾ TRÊN APP HIỆP HỘI',
-      'Trên giao diện App Hiệp hội có hiển thị nút Đăng nhập bằng Google và Apple, tuy nhiên hiện tại các API này CHƯA ĐƯỢC LIÊN KẾT trên Google Cloud Console và Apple Developer. Hội viên vui lòng đăng nhập bằng SỐ ĐIỆN THOẠI / EMAIL và MẬT KHẨU hoặc dùng mã OTP thử nghiệm nội bộ.',
+      'Trên giao diện App Hiệp hội có hiển thị nút Đăng nhập bằng Google và Apple, tuy nhiên hiện tại các API này CHƯA ĐƯỢC LIÊN KẾT trên Google Cloud Console và Apple Developer. Học viên vui lòng đăng nhập bằng SỐ ĐIỆN THOẠI / EMAIL và MẬT KHẨU hoặc dùng mã OTP thử nghiệm nội bộ.',
       true
     ),
-    createPara('Hướng dẫn đăng nhập tài khoản hội viên:'),
+    createPara('Hướng dẫn đăng nhập tài khoản Học viên:'),
     createPara('1. Truy cập đường dẫn: http://14.225.217.232:5000/auth/mobile/ (hoặc mở ứng dụng CEO HN10 trên điện thoại).', { indent: { left: 300 } }),
     createPara('2. Nhập Số điện thoại hoặc Email đã đăng ký với Ban Thư ký.', { indent: { left: 300 } }),
     createPara('3. Nhập mật khẩu được cấp hoặc chọn xác thực qua mã OTP.', { indent: { left: 300 } }),
     createPara('4. Sau khi đăng nhập thành công, hệ thống tự động lưu phiên làm việc an toàn.', { indent: { left: 300 } }),
 
-    createH2('3.2. Thẻ hội viên kỹ thuật số 3D & Chia sẻ danh thiếp số vCard'),
-    createPara('Thẻ hội viên (/association/card) là chứng chỉ số xác thực tư cách hội viên:'),
-    createPara('• Giao diện thẻ 3D sang trọng: Hiển thị logo CLB CEO HN10, họ tên hội viên, chức danh doanh nghiệp, mã hội viên (HN10-xxx) và ngày hết hạn thẻ.', { indent: { left: 300 } }),
-    createPara('• Tùy chỉnh theme thẻ: Hội viên có thể chuyển đổi linh hoạt giữa giao diện Obsidian Luxury (đen mun sang trọng) và Royal Blue (xanh ngoại giao).', { indent: { left: 300 } }),
+    createH2('3.2. Thẻ Học viên kỹ thuật số 3D & Chia sẻ danh thiếp số vCard'),
+    createPara('Thẻ Học viên (/association/card) là chứng chỉ số xác thực tư cách Học viên:'),
+    createPara('• Giao diện thẻ 3D sang trọng: Hiển thị logo CLB CEO HN10, họ tên Học viên, chức danh doanh nghiệp, mã Học viên (HN10-xxx) và ngày hết hạn thẻ.', { indent: { left: 300 } }),
+    createPara('• Tùy chỉnh theme thẻ: Học viên có thể chuyển đổi linh hoạt giữa giao diện Obsidian Luxury (đen mun sang trọng) và Royal Blue (xanh ngoại giao).', { indent: { left: 300 } }),
     createPara('• Chia sẻ vCard thông minh (/association/business-cards): Bấm "Lưu vào danh bạ", điện thoại sẽ tải file chuẩn vCard (.vcf) giúp đối tác lưu đầy đủ họ tên, số điện thoại, email, địa chỉ công ty chỉ với 1 thao tác.', { indent: { left: 300 } }),
 
-    createH2('3.3. Tra cứu Danh bạ hội viên & Đăng ký sự kiện'),
+    createH2('3.3. Tra cứu Danh bạ Học viên & Đăng ký sự kiện'),
     createPara('• Tra cứu danh bạ (/association/members): Tìm kiếm đối tác theo lĩnh vực kinh doanh (Bất động sản, Xây dựng, Tài chính, Công nghệ...). Bấm trực tiếp vào số điện thoại để gọi hoặc bấm vào email để gửi thư ngỏ hợp tác.', { indent: { left: 300 } }),
     createPara('• Đăng ký vé sự kiện (/association/events): Xem lịch Đại hội, Hội nghị xúc tiến, Gala tiệc tối. Bấm "Đăng ký tham dự", hệ thống sẽ sinh ngay vé mời điện tử kèm vị trí bàn tiệc VIP.', { indent: { left: 300 } }),
-    createPara('• Xuất trình vé QR tại sự kiện (/association/checkin): Khi tới sảnh hội nghị, hội viên mở vé QR trên app giơ trước camera của ban tổ chức để hoàn tất thủ tục đón tiếp.', { indent: { left: 300 } }),
+    createPara('• Xuất trình vé QR tại sự kiện (/association/checkin): Khi tới sảnh hội nghị, Học viên mở vé QR trên app giơ trước camera của ban tổ chức để hoàn tất thủ tục đón tiếp.', { indent: { left: 300 } }),
 
     createH2('3.4. NỘP HỘI PHÍ qua mã VietQR trên ứng dụng'),
     ...createCallout(
-      'HƯỚNG DẪN HỘI VIÊN NỘP HỘI PHÍ VÀ XÁC NHẬN',
-      'Khi thanh toán hội phí qua app, hội viên quét mã VietQR và thực hiện chuyển khoản bình thường. DO HỆ THỐNG ĐANG CHỜ KẾT NỐI API NGÂN HÀNG, thẻ sẽ không gia hạn tức thì ngay trong giây lát mà cần Ban Kế toán đối soát sao kê (thường trong vòng 1-2 giờ làm việc). Hội viên có thể tải ảnh chụp chuyển khoản vào app để kế toán duyệt nhanh hơn.',
+      'HƯỚNG DẪN Học viên NỘP HỘI PHÍ VÀ XÁC NHẬN',
+      'Khi thanh toán hội phí qua app, Học viên quét mã VietQR và thực hiện chuyển khoản bình thường. DO HỆ THỐNG ĐANG CHỜ KẾT NỐI API NGÂN HÀNG, thẻ sẽ không gia hạn tức thì ngay trong giây lát mà cần Ban Kế toán đối soát sao kê (thường trong vòng 1-2 giờ làm việc). Học viên có thể tải ảnh chụp chuyển khoản vào app để kế toán duyệt nhanh hơn.',
       false
     ),
     createPara('Các bước nộp phí trên app:'),
-    createPara('1. Vào mục "Gia hạn hội viên" (/association/renew).', { indent: { left: 300 } }),
+    createPara('1. Vào mục "Gia hạn Học viên" (/association/renew).', { indent: { left: 300 } }),
     createPara('2. Xem thông tin HÓA ĐƠN HỘI PHÍ của kỳ mới và bấm "Thanh toán ngay".', { indent: { left: 300 } }),
     createPara('3. Màn hình hiển thị mã VietQR chứa chính xác số tiền và cú pháp chuyển khoản.', { indent: { left: 300 } }),
     createPara('4. Mở app ngân hàng bất kỳ (Vietcombank, Techcombank, MB, BIDV...) quét mã QR và xác nhận chuyển tiền.', { indent: { left: 300 } }),
@@ -657,10 +657,10 @@ async function generateManual() {
     createTable(
       ['Bước', 'Hành Động Cụ Thể', 'Người Chịu Trách Nhiệm', 'Công Cụ Thực Hiện'],
       [
-        ['Bước 1', 'Hội viên thực hiện quét mã VietQR trên app và gửi ảnh chụp ủy nhiệm chi / giao dịch thành công cho thư ký.', 'Hội viên', 'App Hội Viên CEO HN10'],
+        ['Bước 1', 'Học viên thực hiện quét mã VietQR trên app và gửi ảnh chụp ủy nhiệm chi / giao dịch thành công cho thư ký.', 'Học viên', 'App Học viên CEO HN10'],
         ['Bước 2', 'Kế toán đăng nhập tài khoản ngân hàng hiệp hội, kiểm tra số tiền và nội dung chuyển khoản có khớp với mã hóa đơn hay không.', 'Kế toán trưởng', 'Internet Banking'],
         ['Bước 3', 'Truy cập CRM mục Quản lý Tài chính -> Danh sách hóa đơn -> Tìm mã hóa đơn tương ứng -> Bấm nút "Xác nhận thanh toán thủ công".', 'Kế toán trưởng', 'Web CRM /fees'],
-        ['Bước 4', 'Kiểm tra trạng thái hóa đơn chuyển sang "PAID", ngày hết hạn thẻ của hội viên tự động tăng thêm 1 năm và kiểm tra nhật ký gia hạn.', 'Thư ký & Kế toán', 'Web CRM /platform/renewal-audit'],
+        ['Bước 4', 'Kiểm tra trạng thái hóa đơn chuyển sang "PAID", ngày hết hạn thẻ của Học viên tự động tăng thêm 1 năm và kiểm tra nhật ký gia hạn.', 'Thư ký & Kế toán', 'Web CRM /platform/renewal-audit'],
       ],
       [12, 48, 20, 20]
     ),
@@ -801,7 +801,7 @@ async function generateManual() {
     // If locked, try copy
     try {
       fs.copyFileSync(tempPath, outPath);
-    } catch (e2) {}
+    } catch (e2) { }
   }
 }
 

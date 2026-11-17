@@ -16,11 +16,11 @@ async function seedMembers(client, associationId, count) {
   for (let i = 0; i < count; i++) {
     const id = crypto.randomUUID();
     const code = `MEM-${associationId.slice(0, 4)}-${i}`;
-    const name = `Hội viên ${i + 1}`;
+    const name = `Học viên ${i + 1}`;
     const contact = `Representative ${i + 1}`;
     const email = `member-${associationId.slice(0, 4)}-${i}@test.com`;
     const phone = `090000000${i}`;
-    
+
     await client.query(`
       INSERT INTO public.members (
         id, code, name, contact, email, phone, type, level, industry, region, status, 
@@ -62,7 +62,7 @@ async function main() {
   await client.query(`DELETE FROM public.guest_contacts`);
   await client.query(`DELETE FROM public.saved_business_cards`);
   await client.query(`DELETE FROM public.user_connections`);
-  
+
   await client.query(`DELETE FROM public.members WHERE association_id = ANY($1::uuid[])`, [assocIds]);
   await client.query(`DELETE FROM public.memberships WHERE association_id = ANY($1::uuid[])`, [assocIds]);
   await client.query(`DELETE FROM public.events WHERE association_id = ANY($1::uuid[])`, [assocIds]);
@@ -195,12 +195,12 @@ async function main() {
     { id: crypto.randomUUID(), name: 'Hội thảo SME Kết Nối 1', date: '2026-09-01', location: 'Văn phòng Hiệp hội', capacity: 100, registered: 10, status: 'active', type: 'offline', association_id: assoc1Id },
     { id: crypto.randomUUID(), name: 'Hội thảo SME Kết Nối 2', date: '2026-09-15', location: 'Văn phòng Hiệp hội', capacity: 100, registered: 20, status: 'active', type: 'offline', association_id: assoc1Id },
     { id: crypto.randomUUID(), name: 'Đại hội Thường Niên', date: '2026-10-15', location: 'Trung tâm Hội nghị Quốc gia', capacity: 200, registered: 50, status: 'active', type: 'offline', association_id: assoc1Id },
-    
+
     // 3 events for AI Vietnam
     { id: crypto.randomUUID(), name: 'AI Summit 2026', date: '2026-09-10', location: 'GEM Center', capacity: 500, registered: 450, status: 'active', type: 'offline', association_id: assoc2Id },
     { id: crypto.randomUUID(), name: 'GenAI Webinar', date: '2026-09-20', location: 'Zoom Meeting', capacity: 1000, registered: 800, status: 'active', type: 'online', association_id: assoc2Id },
     { id: crypto.randomUUID(), name: 'AI Hackathon', date: '2026-10-05', location: 'Đại học Bách Khoa', capacity: 300, registered: 120, status: 'active', type: 'offline', association_id: assoc2Id },
-    
+
     // 3 events for EdTech Connect
     { id: crypto.randomUUID(), name: 'Diễn đàn EdTech', date: '2026-09-15', location: 'Hanoi Club', capacity: 150, registered: 90, status: 'active', type: 'offline', association_id: assoc3Id },
     { id: crypto.randomUUID(), name: 'E-Learning Workshop', date: '2026-10-02', location: 'Zoom Meeting', capacity: 500, registered: 200, status: 'active', type: 'online', association_id: assoc3Id },
@@ -220,12 +220,12 @@ async function main() {
     { id: crypto.randomUUID(), title: 'Cần tìm đối tác in ấn bao bì hộp giấy', description: 'Số lượng ban đầu 10,000 hộp.', type: 'buy', deadline: '2026-12-31', status: 'open', association_id: assoc1Id },
     { id: crypto.randomUUID(), title: 'Dịch vụ tư vấn pháp lý thuế cuối năm', description: 'Gói hỗ trợ doanh nghiệp SME thành viên.', type: 'sell', deadline: '2026-11-30', status: 'open', association_id: assoc1Id },
     { id: crypto.randomUUID(), title: 'Hợp tác chuyển đổi số văn phòng', description: 'Cần đơn vị triển khai phần mềm quản lý.', type: 'collaboration', deadline: '2026-10-15', status: 'open', association_id: assoc1Id },
-    
+
     // 3 opportunities for AI Vietnam
     { id: crypto.randomUUID(), title: 'Cần tìm chuyên gia tư vấn giải pháp AI Chatbot', description: 'Tích hợp CRM doanh nghiệp.', type: 'buy', deadline: '2026-10-01', status: 'open', association_id: assoc2Id },
     { id: crypto.randomUUID(), title: 'Cung cấp API nhận dạng tiếng Việt độ chính xác cao', description: 'Công nghệ ASR tiên tiến.', type: 'sell', deadline: '2026-10-15', status: 'open', association_id: assoc2Id },
     { id: crypto.randomUUID(), title: 'Tìm đối tác hợp tác dự án xử lý hình ảnh y tế', description: 'Sử dụng mô hình Vision-Language.', type: 'collaboration', deadline: '2026-11-01', status: 'open', association_id: assoc2Id },
-    
+
     // 3 opportunities for EdTech Connect
     { id: crypto.randomUUID(), title: 'Cần mua bản quyền nội dung khóa học tiếng Anh trẻ em', description: 'Chuẩn CEFR.', type: 'buy', deadline: '2026-11-01', status: 'open', association_id: assoc3Id },
     { id: crypto.randomUUID(), title: 'Cung cấp hệ thống LMS tùy biến cao', description: 'Hỗ trợ SCORM và xAPI.', type: 'sell', deadline: '2026-10-15', status: 'open', association_id: assoc3Id },

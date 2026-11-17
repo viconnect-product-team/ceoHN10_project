@@ -64,7 +64,7 @@ export function GrowthChart() {
               content={
                 <ChartAdaptiveTooltip
                   formatter={(val: number, name: string) => [
-                    `${val} hội viên`,
+                    `${val} Học viên`,
                     name === "new" ? "Gia nhập mới" : name === "churn" ? "Rời hiệp hội" : name,
                   ]}
                 />

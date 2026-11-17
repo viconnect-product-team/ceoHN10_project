@@ -34,20 +34,20 @@ import type { GuestContact } from "@/lib/business-card/guest-contact";
 
 export type BcMobilePersonRelationship =
   | {
-      kind: "connected";
-      connectedAt: string | null;
-      requestedByViewer: boolean | null;
-      status?:
-        | "none"
-        | "pending"
-        | "accepted"
-        | "declined"
-        | "cancelled"
-        | "disconnected"
-        | "blocked";
-      connectionId?: string | null;
-      direction?: "none" | "incoming" | "outgoing" | "self" | null;
-    }
+    kind: "connected";
+    connectedAt: string | null;
+    requestedByViewer: boolean | null;
+    status?:
+    | "none"
+    | "pending"
+    | "accepted"
+    | "declined"
+    | "cancelled"
+    | "disconnected"
+    | "blocked";
+    connectionId?: string | null;
+    direction?: "none" | "incoming" | "outgoing" | "self" | null;
+  }
   | { kind: "saved"; savedAt: string | null; favorite: boolean }
   // BC-Mobile-4B — `source` distinguishes a consent-based exchange from a
   // paper-card scan so the UI states provenance truthfully.
@@ -93,7 +93,7 @@ export function parseBcMobilePersonId(raw: string): ParsedPersonId | null {
   let trimmed = raw.trim();
   try {
     trimmed = decodeURIComponent(trimmed);
-  } catch {}
+  } catch { }
   const m = PERSON_ID_RE.exec(trimmed);
   if (m) {
     const kind = m[1] === "u" ? "connection" : m[1] === "c" ? "saved_card" : "guest_contact";
@@ -237,7 +237,7 @@ async function resolveConnectionPerson(
     person: {
       personId: normalizedPersonId,
       kind: "connection",
-      displayName: s?.displayName || "Hội viên CEO HN10",
+      displayName: s?.displayName || "Học viên CEO HN10",
       avatarUrl: s?.avatarUrl ?? null,
       headline: s?.headline ?? null,
       companyName: s?.companyName ?? null,
@@ -307,7 +307,7 @@ async function resolveSavedCardPerson(
         },
       };
     }
-  } catch {}
+  } catch { }
 
   return UNAVAILABLE;
 }

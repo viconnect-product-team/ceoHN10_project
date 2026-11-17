@@ -164,7 +164,7 @@ export function QuickProfileEditModal({
           if (cp.industry && !initialIndustry) setIndustry(cp.industry);
           if (cp.bio && !initialBio) setBio(cp.bio);
         }
-      } catch {}
+      } catch { }
     }
   }, [open, initialName, initialPhone, initialCompany, initialTitle, initialAddress, initialCompanySize, initialIndustry, initialBio, initialLinkedin, initialFacebook, initialZalo, initialWebsite, initialTiktok, initialAvatar, initialCover, initialCompanyLogo]);
 
@@ -214,8 +214,8 @@ export function QuickProfileEditModal({
         type === "avatar"
           ? "Đã chọn ảnh đại diện"
           : type === "cover"
-          ? "Đã chọn ảnh bìa"
-          : "Đã chọn logo công ty"
+            ? "Đã chọn ảnh bìa"
+            : "Đã chọn logo công ty"
       );
     } catch {
       toast.error("Không thể tải ảnh lên. Vui lòng thử lại!");
@@ -408,7 +408,7 @@ export function QuickProfileEditModal({
           localStorage.removeItem("vba_member_name");
           localStorage.removeItem("vba_member_company");
           localStorage.removeItem("vba_member_title");
-        } catch {}
+        } catch { }
       } catch (storageErr) {
         console.warn("Storage save error:", storageErr);
       }
@@ -470,342 +470,246 @@ export function QuickProfileEditModal({
         <form onSubmit={handleSave} className="flex-1 min-h-0 flex flex-col overflow-hidden">
           {/* Scrollable Form Body */}
           <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-5 space-y-4 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
-          {/* 1. Cover Photo Upload - ĐÃ BỎ CHỨC NĂNG TẢI LOGO TRÊN BÌA THEO YÊU CẦU */}
-          <div className="space-y-1.5">
-            <div className="text-xs font-bold text-slate-700 dark:text-slate-300">
-              <span>Ảnh Bìa Doanh Nghiệp Trên Trang Chủ</span>
-            </div>
+            {/* 1. Cover Photo Upload - ĐÃ BỎ CHỨC NĂNG TẢI LOGO TRÊN BÌA THEO YÊU CẦU */}
+            <div className="space-y-1.5">
+              <div className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                <span>Ảnh Bìa Doanh Nghiệp Trên Trang Chủ</span>
+              </div>
 
-            {/* Banner preview */}
-            <div className="relative h-32 w-full rounded-2xl overflow-hidden bg-gradient-to-r from-[#001D4A] via-[#003B95] to-[#002B70] border border-amber-400/30 shadow-inner group">
-              {cover ? (
-                <img
-                  src={resolveMediaUrl(cover) || cover}
-                  alt="Cover Preview"
-                  className="h-full w-full object-cover"
-                />
-              ) : (
-                <div className="h-full w-full grid place-items-center text-slate-400 text-xs">
-                  Chưa có ảnh bìa tùy chỉnh
-                </div>
-              )}
-              <div className="absolute inset-0 bg-black/25 group-hover:bg-black/40 transition-colors" />
-
-              {/* Upload cover overlay button - icon duy nhất tinh tế */}
-              <button
-                type="button"
-                onClick={() => coverInputRef.current?.click()}
-                disabled={uploadingCover}
-                className="absolute top-2.5 right-2.5 z-10 h-8 w-8 rounded-full bg-black/50 hover:bg-black/70 text-white backdrop-blur-md border border-white/20 grid place-items-center shadow-md transition active:scale-95 cursor-pointer"
-                title="Đổi ảnh bìa"
-                aria-label="Đổi ảnh bìa"
-              >
-                {uploadingCover ? (
-                  <Loader2 className="h-4 w-4 animate-spin text-amber-400" />
-                ) : (
-                  <Camera className="h-4 w-4" />
-                )}
-              </button>
-            </div>
-
-            <input
-              ref={coverInputRef}
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={(e) => handleFileChange(e, "cover")}
-            />
-          </div>
-
-          {/* 2. Avatar Upload */}
-          <div className="flex items-center gap-4 pt-1">
-            <div className="relative shrink-0">
-              <div className="h-16 w-16 rounded-full overflow-hidden ring-3 ring-amber-500/50 bg-slate-100 dark:bg-slate-800 grid place-items-center">
-                {avatar ? (
+              {/* Banner preview */}
+              <div className="relative h-32 w-full rounded-2xl overflow-hidden bg-gradient-to-r from-[#001D4A] via-[#003B95] to-[#002B70] border border-amber-400/30 shadow-inner group">
+                {cover ? (
                   <img
-                    src={resolveMediaUrl(avatar) || avatar}
-                    alt={name}
+                    src={resolveMediaUrl(cover) || cover}
+                    alt="Cover Preview"
                     className="h-full w-full object-cover"
                   />
                 ) : (
-                  <User className="h-8 w-8 text-slate-400" />
+                  <div className="h-full w-full grid place-items-center text-slate-400 text-xs">
+                    Chưa có ảnh bìa tùy chỉnh
+                  </div>
                 )}
+                <div className="absolute inset-0 bg-black/25 group-hover:bg-black/40 transition-colors" />
+
+                {/* Upload cover overlay button - icon duy nhất tinh tế */}
+                <button
+                  type="button"
+                  onClick={() => coverInputRef.current?.click()}
+                  disabled={uploadingCover}
+                  className="absolute top-2.5 right-2.5 z-10 h-8 w-8 rounded-full bg-black/50 hover:bg-black/70 text-white backdrop-blur-md border border-white/20 grid place-items-center shadow-md transition active:scale-95 cursor-pointer"
+                  title="Đổi ảnh bìa"
+                  aria-label="Đổi ảnh bìa"
+                >
+                  {uploadingCover ? (
+                    <Loader2 className="h-4 w-4 animate-spin text-amber-400" />
+                  ) : (
+                    <Camera className="h-4 w-4" />
+                  )}
+                </button>
               </div>
-              <button
-                type="button"
-                onClick={() => avatarInputRef.current?.click()}
-                disabled={uploadingAvatar}
-                className="absolute -bottom-1 -right-1 h-6 w-6 rounded-full bg-[#003B95] text-white grid place-items-center shadow-md hover:bg-[#002B70] transition cursor-pointer"
-                title="Thay đổi ảnh đại diện"
-              >
-                {uploadingAvatar ? <Loader2 className="h-3 w-3 animate-spin" /> : <Camera className="h-3 w-3" />}
-              </button>
+
               <input
-                ref={avatarInputRef}
+                ref={coverInputRef}
                 type="file"
                 accept="image/*"
                 className="hidden"
-                onChange={(e) => handleFileChange(e, "avatar")}
-              />
-            </div>
-            <div className="min-w-0 flex-1">
-              <span className="text-xs font-bold text-slate-700 dark:text-slate-300">
-                Ảnh Đại Diện Hội Viên
-              </span>
-              <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
-                Hiển thị trên Trang chủ, Thẻ hội viên, Danh thiếp số và Tin nhắn
-              </p>
-              <button
-                type="button"
-                onClick={() => avatarInputRef.current?.click()}
-                className="mt-1 text-[11px] font-bold text-[#003B95] dark:text-amber-400 hover:underline cursor-pointer"
-              >
-                Tải ảnh mới từ máy
-              </button>
-            </div>
-          </div>
-
-          {/* 3. Text inputs: Name, Phone, Company */}
-          <div className="space-y-3 pt-2">
-            <div>
-              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                Họ và Tên Doanh Nhân <span className="text-rose-500">*</span>
-              </label>
-              <div className="relative">
-                <User className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                <input
-                  type="text"
-                  value={name}
-                  onChange={(e) => {
-                    setName(e.target.value);
-                    if (errors.name) setErrors((prev) => ({ ...prev, name: "" }));
-                  }}
-                  placeholder="Nhập họ và tên..."
-                  className={`w-full rounded-xl border bg-slate-50 dark:bg-slate-900 py-2.5 pl-9 pr-3 text-xs text-slate-900 dark:text-white outline-none transition ${
-                    errors.name
-                      ? "border-rose-500 focus:border-rose-500 ring-1 ring-rose-500/30"
-                      : "border-slate-200 dark:border-slate-700 focus:border-[#003B95] dark:focus:border-amber-400"
-                  }`}
-                />
-              </div>
-              {errors.name && (
-                <p className="mt-1 text-xs font-semibold text-rose-500 animate-in fade-in duration-150">
-                  {errors.name}
-                </p>
-              )}
-            </div>
-
-            <div>
-              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                Số Điện Thoại Liên Hệ <span className="text-rose-500">*</span>
-              </label>
-              <div className="relative">
-                <Phone className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                <input
-                  type="tel"
-                  inputMode="numeric"
-                  maxLength={11}
-                  value={phone}
-                  onKeyDown={handleNumericKeyDown}
-                  onChange={(e) => {
-                    const cleaned = sanitizePhoneNumber(e.target.value);
-                    setPhone(cleaned);
-                    if (errors.phone) setErrors((prev) => ({ ...prev, phone: "" }));
-                  }}
-                  placeholder="0988 xxx xxx"
-                  className={`w-full rounded-xl border bg-slate-50 dark:bg-slate-900 py-2.5 pl-9 pr-3 text-xs text-slate-900 dark:text-white outline-none transition ${
-                    errors.phone
-                      ? "border-rose-500 focus:border-rose-500 ring-1 ring-rose-500/30"
-                      : "border-slate-200 dark:border-slate-700 focus:border-[#003B95] dark:focus:border-amber-400"
-                  }`}
-                />
-              </div>
-              {errors.phone && (
-                <p className="mt-1 text-xs font-semibold text-rose-500 animate-in fade-in duration-150">
-                  {errors.phone}
-                </p>
-              )}
-            </div>
-
-
-            <div>
-              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                Chức Vụ / Chức Danh (Profile)
-              </label>
-              <div className="relative">
-                <Briefcase className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                <input
-                  type="text"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  placeholder="Ví dụ: Chủ tịch HĐQT, Tổng Giám Đốc, CEO..."
-                  className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 py-2.5 pl-9 pr-3 text-xs text-slate-900 dark:text-white outline-none focus:border-[#003B95] dark:focus:border-amber-400 transition"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                Tên Doanh Nghiệp / Công Ty
-              </label>
-              <div className="relative">
-                <Building2 className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                <input
-                  type="text"
-                  value={company}
-                  onChange={(e) => setCompany(e.target.value)}
-                  placeholder="Ví dụ: Công ty Cổ phần Tập đoàn CEO HN10..."
-                  className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 py-2.5 pl-9 pr-3 text-xs text-slate-900 dark:text-white outline-none focus:border-[#003B95] dark:focus:border-amber-400 transition"
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-2.5">
-              <div>
-                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                  Quy Mô Nhân Sự
-                </label>
-                <input
-                  type="text"
-                  value={companySize}
-                  onChange={(e) => setCompanySize(e.target.value)}
-                  placeholder="VD: 50 - 100 nhân sự"
-                  className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 py-2.5 px-3 text-xs text-slate-900 dark:text-white outline-none focus:border-[#003B95] dark:focus:border-amber-400 transition"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                  Lĩnh Vực Hoạt Động
-                </label>
-                <input
-                  type="text"
-                  value={industry}
-                  onChange={(e) => setIndustry(e.target.value)}
-                  placeholder="VD: Công nghệ thông tin..."
-                  className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 py-2.5 px-3 text-xs text-slate-900 dark:text-white outline-none focus:border-[#003B95] dark:focus:border-amber-400 transition"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                Địa Chỉ Trụ Sở Doanh Nghiệp
-              </label>
-              <div className="relative">
-                <MapPin className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#DC2626]" />
-                <input
-                  type="text"
-                  value={address}
-                  onChange={(e) => setAddress(e.target.value)}
-                  placeholder="Nhập địa chỉ trụ sở văn phòng doanh nghiệp..."
-                  className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 py-2.5 pl-9 pr-3 text-xs text-slate-900 dark:text-white outline-none focus:border-[#003B95] dark:focus:border-amber-400 transition"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                Website Doanh Nghiệp
-              </label>
-              <div className="relative">
-                <Globe className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                <input
-                  type="text"
-                  value={website}
-                  onChange={(e) => setWebsite(e.target.value)}
-                  placeholder="https://..."
-                  className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 py-2.5 pl-9 pr-3 text-xs text-slate-900 dark:text-white outline-none focus:border-[#003B95] dark:focus:border-amber-400 transition"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                Giới Thiệu Doanh Nghiệp / Định Hướng
-              </label>
-              <textarea
-                rows={3}
-                value={bio}
-                onChange={(e) => setBio(e.target.value)}
-                placeholder="Giới thiệu năng lực, giải pháp cốt lõi của doanh nghiệp..."
-                className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 p-3 text-xs text-slate-900 dark:text-white outline-none focus:border-[#003B95] dark:focus:border-amber-400 transition resize-none"
+                onChange={(e) => handleFileChange(e, "cover")}
               />
             </div>
 
-            {/* 4. Social Links & Network Platforms (Req 10) */}
-            <div className="pt-2 border-t border-slate-100 dark:border-slate-800 space-y-2.5">
-              <div className="flex items-center gap-1.5 text-xs font-bold text-[#003B95] dark:text-amber-400">
-                <Globe className="h-4 w-4" />
-                <span>Liên Kết Mạng Xã Hội & Kênh Cá Nhân</span>
-              </div>
-
-              {/* LinkedIn */}
-              <div>
-                <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-1">
-                  Hồ sơ LinkedIn (Profile URL)
-                </label>
-                <div className="relative">
-                  <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 font-bold text-xs text-[#0A66C2]">
-                    in
-                  </span>
-                  <input
-                    type="url"
-                    value={linkedin}
-                    onChange={(e) => setLinkedin(e.target.value)}
-                    placeholder="https://linkedin.com/in/..."
-                    className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 py-2.5 pl-8 pr-3 text-xs text-slate-900 dark:text-white outline-none focus:border-[#003B95] dark:focus:border-amber-400 transition"
-                  />
+            {/* 2. Avatar Upload */}
+            <div className="flex items-center gap-4 pt-1">
+              <div className="relative shrink-0">
+                <div className="h-16 w-16 rounded-full overflow-hidden ring-3 ring-amber-500/50 bg-slate-100 dark:bg-slate-800 grid place-items-center">
+                  {avatar ? (
+                    <img
+                      src={resolveMediaUrl(avatar) || avatar}
+                      alt={name}
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    <User className="h-8 w-8 text-slate-400" />
+                  )}
                 </div>
+                <button
+                  type="button"
+                  onClick={() => avatarInputRef.current?.click()}
+                  disabled={uploadingAvatar}
+                  className="absolute -bottom-1 -right-1 h-6 w-6 rounded-full bg-[#003B95] text-white grid place-items-center shadow-md hover:bg-[#002B70] transition cursor-pointer"
+                  title="Thay đổi ảnh đại diện"
+                >
+                  {uploadingAvatar ? <Loader2 className="h-3 w-3 animate-spin" /> : <Camera className="h-3 w-3" />}
+                </button>
+                <input
+                  ref={avatarInputRef}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => handleFileChange(e, "avatar")}
+                />
               </div>
+              <div className="min-w-0 flex-1">
+                <span className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                  Ảnh Đại Diện Học viên
+                </span>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                  Hiển thị trên Trang chủ, Thẻ Học viên, Danh thiếp số và Tin nhắn
+                </p>
+                <button
+                  type="button"
+                  onClick={() => avatarInputRef.current?.click()}
+                  className="mt-1 text-[11px] font-bold text-[#003B95] dark:text-amber-400 hover:underline cursor-pointer"
+                >
+                  Tải ảnh mới từ máy
+                </button>
+              </div>
+            </div>
 
-              {/* Facebook */}
+            {/* 3. Text inputs: Name, Phone, Company */}
+            <div className="space-y-3 pt-2">
               <div>
-                <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-1">
-                  Trang Facebook cá nhân / Fanpage
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                  Họ và Tên Doanh Nhân <span className="text-rose-500">*</span>
                 </label>
                 <div className="relative">
-                  <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 font-bold text-xs text-[#1877F2]">
-                    f
-                  </span>
-                  <input
-                    type="url"
-                    value={facebook}
-                    onChange={(e) => setFacebook(e.target.value)}
-                    placeholder="https://facebook.com/..."
-                    className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 py-2.5 pl-8 pr-3 text-xs text-slate-900 dark:text-white outline-none focus:border-[#003B95] dark:focus:border-amber-400 transition"
-                  />
-                </div>
-              </div>
-
-              {/* Zalo */}
-              <div>
-                <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-1">
-                  Số điện thoại Zalo / Link Zalo
-                </label>
-                <div className="relative">
-                  <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 font-bold text-xs text-[#0068FF]">
-                    Z
-                  </span>
+                  <User className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                   <input
                     type="text"
-                    value={zalo}
-                    onChange={(e) => setZalo(e.target.value)}
-                    placeholder="Số Zalo hoặc https://zalo.me/..."
-                    className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 py-2.5 pl-8 pr-3 text-xs text-slate-900 dark:text-white outline-none focus:border-[#003B95] dark:focus:border-amber-400 transition"
+                    value={name}
+                    onChange={(e) => {
+                      setName(e.target.value);
+                      if (errors.name) setErrors((prev) => ({ ...prev, name: "" }));
+                    }}
+                    placeholder="Nhập họ và tên..."
+                    className={`w-full rounded-xl border bg-slate-50 dark:bg-slate-900 py-2.5 pl-9 pr-3 text-xs text-slate-900 dark:text-white outline-none transition ${errors.name
+                        ? "border-rose-500 focus:border-rose-500 ring-1 ring-rose-500/30"
+                        : "border-slate-200 dark:border-slate-700 focus:border-[#003B95] dark:focus:border-amber-400"
+                      }`}
+                  />
+                </div>
+                {errors.name && (
+                  <p className="mt-1 text-xs font-semibold text-rose-500 animate-in fade-in duration-150">
+                    {errors.name}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                  Số Điện Thoại Liên Hệ <span className="text-rose-500">*</span>
+                </label>
+                <div className="relative">
+                  <Phone className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                  <input
+                    type="tel"
+                    inputMode="numeric"
+                    maxLength={11}
+                    value={phone}
+                    onKeyDown={handleNumericKeyDown}
+                    onChange={(e) => {
+                      const cleaned = sanitizePhoneNumber(e.target.value);
+                      setPhone(cleaned);
+                      if (errors.phone) setErrors((prev) => ({ ...prev, phone: "" }));
+                    }}
+                    placeholder="0988 xxx xxx"
+                    className={`w-full rounded-xl border bg-slate-50 dark:bg-slate-900 py-2.5 pl-9 pr-3 text-xs text-slate-900 dark:text-white outline-none transition ${errors.phone
+                        ? "border-rose-500 focus:border-rose-500 ring-1 ring-rose-500/30"
+                        : "border-slate-200 dark:border-slate-700 focus:border-[#003B95] dark:focus:border-amber-400"
+                      }`}
+                  />
+                </div>
+                {errors.phone && (
+                  <p className="mt-1 text-xs font-semibold text-rose-500 animate-in fade-in duration-150">
+                    {errors.phone}
+                  </p>
+                )}
+              </div>
+
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                  Chức Vụ / Chức Danh (Profile)
+                </label>
+                <div className="relative">
+                  <Briefcase className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                  <input
+                    type="text"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    placeholder="Ví dụ: Chủ tịch HĐQT, Tổng Giám Đốc, CEO..."
+                    className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 py-2.5 pl-9 pr-3 text-xs text-slate-900 dark:text-white outline-none focus:border-[#003B95] dark:focus:border-amber-400 transition"
                   />
                 </div>
               </div>
 
-              {/* Website */}
               <div>
-                <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-1">
-                  Website Doanh Nghiệp / Cá Nhân
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                  Tên Doanh Nghiệp / Công Ty
+                </label>
+                <div className="relative">
+                  <Building2 className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                  <input
+                    type="text"
+                    value={company}
+                    onChange={(e) => setCompany(e.target.value)}
+                    placeholder="Ví dụ: Công ty Cổ phần Tập đoàn CEO HN10..."
+                    className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 py-2.5 pl-9 pr-3 text-xs text-slate-900 dark:text-white outline-none focus:border-[#003B95] dark:focus:border-amber-400 transition"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2.5">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                    Quy Mô Nhân Sự
+                  </label>
+                  <input
+                    type="text"
+                    value={companySize}
+                    onChange={(e) => setCompanySize(e.target.value)}
+                    placeholder="VD: 50 - 100 nhân sự"
+                    className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 py-2.5 px-3 text-xs text-slate-900 dark:text-white outline-none focus:border-[#003B95] dark:focus:border-amber-400 transition"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                    Lĩnh Vực Hoạt Động
+                  </label>
+                  <input
+                    type="text"
+                    value={industry}
+                    onChange={(e) => setIndustry(e.target.value)}
+                    placeholder="VD: Công nghệ thông tin..."
+                    className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 py-2.5 px-3 text-xs text-slate-900 dark:text-white outline-none focus:border-[#003B95] dark:focus:border-amber-400 transition"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                  Địa Chỉ Trụ Sở Doanh Nghiệp
+                </label>
+                <div className="relative">
+                  <MapPin className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#DC2626]" />
+                  <input
+                    type="text"
+                    value={address}
+                    onChange={(e) => setAddress(e.target.value)}
+                    placeholder="Nhập địa chỉ trụ sở văn phòng doanh nghiệp..."
+                    className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 py-2.5 pl-9 pr-3 text-xs text-slate-900 dark:text-white outline-none focus:border-[#003B95] dark:focus:border-amber-400 transition"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                  Website Doanh Nghiệp
                 </label>
                 <div className="relative">
                   <Globe className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                   <input
-                    type="url"
+                    type="text"
                     value={website}
                     onChange={(e) => setWebsite(e.target.value)}
                     placeholder="https://..."
@@ -813,9 +717,103 @@ export function QuickProfileEditModal({
                   />
                 </div>
               </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                  Giới Thiệu Doanh Nghiệp / Định Hướng
+                </label>
+                <textarea
+                  rows={3}
+                  value={bio}
+                  onChange={(e) => setBio(e.target.value)}
+                  placeholder="Giới thiệu năng lực, giải pháp cốt lõi của doanh nghiệp..."
+                  className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 p-3 text-xs text-slate-900 dark:text-white outline-none focus:border-[#003B95] dark:focus:border-amber-400 transition resize-none"
+                />
+              </div>
+
+              {/* 4. Social Links & Network Platforms (Req 10) */}
+              <div className="pt-2 border-t border-slate-100 dark:border-slate-800 space-y-2.5">
+                <div className="flex items-center gap-1.5 text-xs font-bold text-[#003B95] dark:text-amber-400">
+                  <Globe className="h-4 w-4" />
+                  <span>Liên Kết Mạng Xã Hội & Kênh Cá Nhân</span>
+                </div>
+
+                {/* LinkedIn */}
+                <div>
+                  <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-1">
+                    Hồ sơ LinkedIn (Profile URL)
+                  </label>
+                  <div className="relative">
+                    <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 font-bold text-xs text-[#0A66C2]">
+                      in
+                    </span>
+                    <input
+                      type="url"
+                      value={linkedin}
+                      onChange={(e) => setLinkedin(e.target.value)}
+                      placeholder="https://linkedin.com/in/..."
+                      className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 py-2.5 pl-8 pr-3 text-xs text-slate-900 dark:text-white outline-none focus:border-[#003B95] dark:focus:border-amber-400 transition"
+                    />
+                  </div>
+                </div>
+
+                {/* Facebook */}
+                <div>
+                  <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-1">
+                    Trang Facebook cá nhân / Fanpage
+                  </label>
+                  <div className="relative">
+                    <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 font-bold text-xs text-[#1877F2]">
+                      f
+                    </span>
+                    <input
+                      type="url"
+                      value={facebook}
+                      onChange={(e) => setFacebook(e.target.value)}
+                      placeholder="https://facebook.com/..."
+                      className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 py-2.5 pl-8 pr-3 text-xs text-slate-900 dark:text-white outline-none focus:border-[#003B95] dark:focus:border-amber-400 transition"
+                    />
+                  </div>
+                </div>
+
+                {/* Zalo */}
+                <div>
+                  <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-1">
+                    Số điện thoại Zalo / Link Zalo
+                  </label>
+                  <div className="relative">
+                    <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 font-bold text-xs text-[#0068FF]">
+                      Z
+                    </span>
+                    <input
+                      type="text"
+                      value={zalo}
+                      onChange={(e) => setZalo(e.target.value)}
+                      placeholder="Số Zalo hoặc https://zalo.me/..."
+                      className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 py-2.5 pl-8 pr-3 text-xs text-slate-900 dark:text-white outline-none focus:border-[#003B95] dark:focus:border-amber-400 transition"
+                    />
+                  </div>
+                </div>
+
+                {/* Website */}
+                <div>
+                  <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-1">
+                    Website Doanh Nghiệp / Cá Nhân
+                  </label>
+                  <div className="relative">
+                    <Globe className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                    <input
+                      type="url"
+                      value={website}
+                      onChange={(e) => setWebsite(e.target.value)}
+                      placeholder="https://..."
+                      className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 py-2.5 pl-9 pr-3 text-xs text-slate-900 dark:text-white outline-none focus:border-[#003B95] dark:focus:border-amber-400 transition"
+                    />
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
 
           {/* Fixed Footer Actions */}
           <div className="shrink-0 p-4 pb-[max(1rem,env(safe-area-inset-bottom))] flex items-center justify-end gap-2 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60">

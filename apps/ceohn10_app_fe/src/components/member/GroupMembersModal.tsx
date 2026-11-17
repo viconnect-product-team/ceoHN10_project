@@ -89,7 +89,7 @@ export function GroupMembersModal({
                   </span>
                 </div>
                 <p className="text-[10.5px] text-slate-500 dark:text-slate-400">
-                  Hội viên CLB CEO HN10
+                  Học viên CLB CEO HN10
                 </p>
               </div>
             </div>

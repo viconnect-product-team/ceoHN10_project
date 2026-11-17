@@ -158,7 +158,7 @@ export function PerksScreen() {
       try {
         const stored = localStorage.getItem("vba_my_saved_perks");
         if (stored) setSavedPerks(JSON.parse(stored));
-      } catch {}
+      } catch { }
     };
     window.addEventListener("vba:saved_perks_updated", handleSyncSavedPerks);
     return () => window.removeEventListener("vba:saved_perks_updated", handleSyncSavedPerks);
@@ -181,7 +181,7 @@ export function PerksScreen() {
     try {
       localStorage.setItem("vba_my_saved_perks", JSON.stringify(next));
       window.dispatchEvent(new CustomEvent("vba:saved_perks_updated"));
-    } catch {}
+    } catch { }
   };
 
   // Load custom perks posted by members
@@ -194,7 +194,7 @@ export function PerksScreen() {
       return parsed.map((m) => ({
         id: m.id,
         title: m.title,
-        category: m.category || "Hội viên đăng",
+        category: m.category || "Học viên đăng",
         partner: m.partner,
         summary: m.description.slice(0, 90) + (m.description.length > 90 ? "..." : ""),
         description: m.description,
@@ -224,7 +224,7 @@ export function PerksScreen() {
     const formatted: ExtendedPerk = {
       id: newPerkData.id,
       title: newPerkData.title,
-      category: newPerkData.category || "Hội viên đăng",
+      category: newPerkData.category || "Học viên đăng",
       partner: newPerkData.partner,
       summary: newPerkData.description.slice(0, 90),
       description: newPerkData.description,
@@ -251,7 +251,7 @@ export function PerksScreen() {
   const categories = useMemo(() => {
     return [
       "Tất cả",
-      "Hội viên đăng",
+      "Học viên đăng",
       "Trúng thưởng",
       "Golf & Nghỉ dưỡng",
       "Dịch vụ Doanh nghiệp",
@@ -266,7 +266,7 @@ export function PerksScreen() {
     if (selectedCategory === "Trúng thưởng") {
       return LUCKY_DRAW_PRIZES;
     }
-    if (selectedCategory === "Hội viên đăng") {
+    if (selectedCategory === "Học viên đăng") {
       return memberList;
     }
     if (selectedCategory === "Tất cả") {
@@ -287,11 +287,10 @@ export function PerksScreen() {
           <button
             type="button"
             onClick={() => setActiveMainTab("all")}
-            className={`flex-1 py-2.5 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
-              activeMainTab === "all"
+            className={`flex-1 py-2.5 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${activeMainTab === "all"
                 ? "bg-[#003B95] text-white shadow-md shadow-blue-900/20"
                 : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
-            }`}
+              }`}
           >
             <Sparkles className="size-3.5" />
             <span>Tất cả</span>
@@ -300,11 +299,10 @@ export function PerksScreen() {
           <button
             type="button"
             onClick={() => setActiveMainTab("my_perks")}
-            className={`flex-1 py-2.5 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
-              activeMainTab === "my_perks"
+            className={`flex-1 py-2.5 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${activeMainTab === "my_perks"
                 ? "bg-[#B8860B] text-white shadow-md shadow-amber-900/20"
                 : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
-            }`}
+              }`}
           >
             <Gift className="size-3.5" />
             <span>Của tôi ({savedPerks.length})</span>
@@ -329,7 +327,7 @@ export function PerksScreen() {
               </div>
               <div className="flex-1 inline-flex flex-col justify-start items-start gap-1 min-w-0">
                 <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950/70 border border-amber-300/80 dark:border-amber-700/80 text-amber-900 dark:text-amber-300 text-[10.5px] font-extrabold tracking-wide">
-                  👑 Đặc quyền VIP Hội Viên
+                  👑 Đặc quyền VIP Học viên
                 </div>
                 <div className="text-slate-900 dark:text-white text-base font-bold leading-5 line-clamp-1">
                   Ưu đãi &amp; trúng thưởng
@@ -346,7 +344,7 @@ export function PerksScreen() {
         </div>
       </div>
 
-      {/* ── NÚT ĐĂNG ƯU ĐÃI DOANH NGHIỆP DÀNH CHO HỘI VIÊN ── */}
+      {/* ── NÚT ĐĂNG ƯU ĐÃI DOANH NGHIỆP DÀNH CHO Học viên ── */}
       <div className="px-4 pt-3">
         <button
           type="button"
@@ -365,7 +363,7 @@ export function PerksScreen() {
                 </span>
               </div>
               <div className="text-[11px] text-white/90">
-                Voucher, % giảm giá, Mua 1 Tặng 1 dành riêng cho Hội viên
+                Voucher, % giảm giá, Mua 1 Tặng 1 dành riêng cho Học viên
               </div>
             </div>
           </div>
@@ -383,15 +381,14 @@ export function PerksScreen() {
               key={cat}
               type="button"
               onClick={() => setSelectedCategory(cat)}
-              className={`shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition active:scale-95 cursor-pointer shadow-2xs ${
-                isActive
+              className={`shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition active:scale-95 cursor-pointer shadow-2xs ${isActive
                   ? isLucky
                     ? "bg-[#B8860B] text-white shadow-md shadow-amber-900/25 border border-amber-400"
                     : "bg-[#1F3864] text-white shadow-md shadow-blue-900/25 border border-[#1F3864]"
                   : isLucky
                     ? "bg-amber-100 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-700/80 text-amber-900 dark:text-amber-300 hover:bg-amber-200"
                     : "bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700"
-              }`}
+                }`}
             >
               {isLucky && <Trophy className={`h-3.5 w-3.5 ${isActive ? "text-white" : "text-amber-600 dark:text-amber-400"}`} />}
               <span>{cat}</span>
@@ -422,7 +419,7 @@ export function PerksScreen() {
 
             <div className="flex items-center justify-center gap-1.5 text-xs font-black uppercase text-amber-600 dark:text-amber-400 tracking-wider">
               <Sparkles className="size-4 text-amber-500" />
-              <span>MÃ QR ĐẶC QUYỀN HỘI VIÊN CEO HN10</span>
+              <span>MÃ QR ĐẶC QUYỀN Học viên CEO HN10</span>
             </div>
 
             <h3 className="text-base font-extrabold text-[#1F3864] dark:text-white line-clamp-1">
@@ -547,7 +544,7 @@ export function PerksScreen() {
 
             <h3 className="text-xl font-black text-[#1F3864] dark:text-amber-400">Chúc Mừng Bạn!</h3>
             <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-              Đã mở thành công Gói Quà Tặng Đặc Quyền Hội Viên CEO HN10
+              Đã mở thành công Gói Quà Tặng Đặc Quyền Học viên CEO HN10
             </p>
 
             <div className="mt-4 space-y-2 text-left text-xs">
@@ -603,7 +600,7 @@ export function PerksScreen() {
             </div>
 
             <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 dark:bg-amber-950/80 px-2.5 py-0.5 text-[11px] font-extrabold text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-700">
-              <PartyPopper className="h-3 w-3 text-amber-600" /> GIẢI THƯỞNG HỘI VIÊN
+              <PartyPopper className="h-3 w-3 text-amber-600" /> GIẢI THƯỞNG Học viên
             </span>
 
             <h3 className="mt-2 text-base font-black text-slate-900 dark:text-white leading-snug">
@@ -683,7 +680,7 @@ export function PerksScreen() {
                   <div className="flex items-center gap-2 flex-wrap">
                     {p.isMemberPerk && (
                       <span className="inline-block rounded-md bg-blue-100 dark:bg-blue-950/90 border border-blue-300 dark:border-blue-600/80 px-2 py-0.5 text-[10px] font-extrabold text-blue-900 dark:text-blue-300">
-                        🏢 Hội viên tài trợ
+                        🏢 Học viên tài trợ
                       </span>
                     )}
                     {p.category && (
@@ -723,11 +720,10 @@ export function PerksScreen() {
                 <button
                   type="button"
                   onClick={() => handleToggleSavePerk(p)}
-                  className={`py-1.5 px-3.5 rounded-xl text-xs font-bold inline-flex items-center justify-center gap-1.5 transition cursor-pointer shadow-xs ${
-                    isSaved
+                  className={`py-1.5 px-3.5 rounded-xl text-xs font-bold inline-flex items-center justify-center gap-1.5 transition cursor-pointer shadow-xs ${isSaved
                       ? "bg-rose-50 dark:bg-rose-950/40 border border-rose-300 dark:border-rose-800 text-rose-600 dark:text-rose-400 hover:bg-rose-100"
                       : "bg-[#003B95] hover:bg-[#002B70] text-white"
-                  }`}
+                    }`}
                 >
                   <Heart
                     className={`size-3.5 ${isSaved ? "fill-rose-500 text-rose-500" : ""}`}
@@ -797,7 +793,7 @@ export function PerksScreen() {
 
         return (
           <div className="space-y-6 px-4 pt-4">
-            {/* ── SECTION 1: ƯU ĐÃI HỘI VIÊN KHÁC TÀI TRỢ LÊN CLB CEO HN10 ── */}
+            {/* ── SECTION 1: ƯU ĐÃI Học viên KHÁC TÀI TRỢ LÊN CLB CEO HN10 ── */}
             <div className="space-y-2.5">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -806,7 +802,7 @@ export function PerksScreen() {
                   </div>
                   <div>
                     <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wide">
-                      Ưu Đãi Hội Viên Khác Tài Trợ Lên CLB CEO HN10
+                      Ưu Đãi Học viên Khác Tài Trợ Lên CLB CEO HN10
                     </h3>
                     <p className="text-[10.5px] text-slate-500 dark:text-slate-400">
                       Gói quà tặng, chiết khấu nội khối do doanh nhân thành viên tài trợ
@@ -844,7 +840,7 @@ export function PerksScreen() {
                         Ưu Đãi Sinh Nhật
                       </h3>
                       <p className="text-[10.5px] text-slate-500 dark:text-slate-400">
-                        Món quà đặc biệt từ Ban Chấp Hành mừng sinh nhật hội viên trong tháng
+                        Món quà đặc biệt từ Ban Chấp Hành mừng sinh nhật Học viên trong tháng
                       </p>
                     </div>
                   </div>
@@ -890,7 +886,7 @@ export function PerksScreen() {
         );
       })()}
 
-      {/* Modal Đăng Ưu Đãi Doanh Nghiệp Của Hội Viên */}
+      {/* Modal Đăng Ưu Đãi Doanh Nghiệp Của Học viên */}
       <MemberPerkCreateModal
         isOpen={isCreatePerkOpen}
         onClose={() => setIsCreatePerkOpen(false)}

@@ -61,7 +61,7 @@ const DEFAULT_REMINDER_FIELDS: DynamicReminderField[] = [
     label: "Chi phí / Hội phí tham dự",
     type: "price",
     value: "0",
-    placeholder: "0 VNĐ (Miễn phí dành cho Hội viên)",
+    placeholder: "0 VNĐ (Miễn phí dành cho Học viên)",
   },
   {
     id: "f_location",
@@ -95,7 +95,7 @@ export function CustomReminderTemplateModal({
   );
   const [subject, setSubject] = useState(
     initialTemplate?.subject ||
-      "[CEO HN10 NHẮC HẸN] Hôm nay trong App CEO HN10 có gì? — Kính gửi {{full_name}}"
+    "[CEO HN10 NHẮC HẸN] Hôm nay trong App CEO HN10 có gì? — Kính gửi {{full_name}}"
   );
   const [inAppTitle, setInAppTitle] = useState(
     initialTemplate?.inAppTitle || "Hôm nay trong App CEO HN10 có gì?"
@@ -339,7 +339,7 @@ export function CustomReminderTemplateModal({
 `;
 
     const variables: MailVariable[] = [
-      { key: "full_name", label: "Tên hội viên", example: "Nguyễn Văn An" },
+      { key: "full_name", label: "Tên Học viên", example: "Nguyễn Văn An" },
       ...fields.map((f) => ({
         key: f.key,
         label: f.label,
@@ -467,11 +467,10 @@ export function CustomReminderTemplateModal({
                   <button
                     type="button"
                     onClick={() => toggleChannel("in_app")}
-                    className={`px-3 py-1.5 rounded-xl border text-xs font-bold flex items-center gap-1.5 transition ${
-                      channels.includes("in_app")
+                    className={`px-3 py-1.5 rounded-xl border text-xs font-bold flex items-center gap-1.5 transition ${channels.includes("in_app")
                         ? "bg-[#003B95] text-white border-[#003B95]"
                         : "border-border text-muted-foreground bg-background"
-                    }`}
+                      }`}
                   >
                     <Smartphone className="w-3.5 h-3.5" />
                     <span>App CEO HN10</span>
@@ -479,11 +478,10 @@ export function CustomReminderTemplateModal({
                   <button
                     type="button"
                     onClick={() => toggleChannel("email")}
-                    className={`px-3 py-1.5 rounded-xl border text-xs font-bold flex items-center gap-1.5 transition ${
-                      channels.includes("email")
+                    className={`px-3 py-1.5 rounded-xl border text-xs font-bold flex items-center gap-1.5 transition ${channels.includes("email")
                         ? "bg-amber-500 text-white border-amber-500"
                         : "border-border text-muted-foreground bg-background"
-                    }`}
+                      }`}
                   >
                     <Mail className="w-3.5 h-3.5" />
                     <span>Email HTML</span>
@@ -491,11 +489,10 @@ export function CustomReminderTemplateModal({
                   <button
                     type="button"
                     onClick={() => toggleChannel("zalo_oa")}
-                    className={`px-3 py-1.5 rounded-xl border text-xs font-bold flex items-center gap-1.5 transition ${
-                      channels.includes("zalo_oa")
+                    className={`px-3 py-1.5 rounded-xl border text-xs font-bold flex items-center gap-1.5 transition ${channels.includes("zalo_oa")
                         ? "bg-blue-500 text-white border-blue-500"
                         : "border-border text-muted-foreground bg-background"
-                    }`}
+                      }`}
                   >
                     <MessageSquare className="w-3.5 h-3.5" />
                     <span>Zalo OA</span>
@@ -569,23 +566,23 @@ export function CustomReminderTemplateModal({
                     field.type === "textarea"
                       ? "Mô Tả (Nhiều Dòng)"
                       : field.type === "datetime"
-                      ? "Ngày & Giờ"
-                      : field.type === "price"
-                      ? "Chi Phí (Tiền Tệ)"
-                      : field.type === "qr"
-                      ? "Mã QR Check-in"
-                      : "Văn Bản Ngắn";
+                        ? "Ngày & Giờ"
+                        : field.type === "price"
+                          ? "Chi Phí (Tiền Tệ)"
+                          : field.type === "qr"
+                            ? "Mã QR Check-in"
+                            : "Văn Bản Ngắn";
 
                   const badgeColor =
                     field.type === "textarea"
                       ? "bg-blue-100 text-blue-800 border-blue-200"
                       : field.type === "datetime"
-                      ? "bg-emerald-100 text-emerald-800 border-emerald-200"
-                      : field.type === "price"
-                      ? "bg-amber-100 text-amber-800 border-amber-200"
-                      : field.type === "qr"
-                      ? "bg-purple-100 text-purple-800 border-purple-200"
-                      : "bg-slate-100 text-slate-800 border-slate-200";
+                        ? "bg-emerald-100 text-emerald-800 border-emerald-200"
+                        : field.type === "price"
+                          ? "bg-amber-100 text-amber-800 border-amber-200"
+                          : field.type === "qr"
+                            ? "bg-purple-100 text-purple-800 border-purple-200"
+                            : "bg-slate-100 text-slate-800 border-slate-200";
 
                   return (
                     <div
@@ -744,27 +741,24 @@ export function CustomReminderTemplateModal({
                 <button
                   type="button"
                   onClick={() => setPreviewTab("app")}
-                  className={`px-2.5 py-1 rounded-lg transition ${
-                    previewTab === "app" ? "bg-card text-foreground shadow-2xs" : "text-muted-foreground"
-                  }`}
+                  className={`px-2.5 py-1 rounded-lg transition ${previewTab === "app" ? "bg-card text-foreground shadow-2xs" : "text-muted-foreground"
+                    }`}
                 >
                   📱 App
                 </button>
                 <button
                   type="button"
                   onClick={() => setPreviewTab("email")}
-                  className={`px-2.5 py-1 rounded-lg transition ${
-                    previewTab === "email" ? "bg-card text-foreground shadow-2xs" : "text-muted-foreground"
-                  }`}
+                  className={`px-2.5 py-1 rounded-lg transition ${previewTab === "email" ? "bg-card text-foreground shadow-2xs" : "text-muted-foreground"
+                    }`}
                 >
                   📧 Email
                 </button>
                 <button
                   type="button"
                   onClick={() => setPreviewTab("zalo")}
-                  className={`px-2.5 py-1 rounded-lg transition ${
-                    previewTab === "zalo" ? "bg-card text-foreground shadow-2xs" : "text-muted-foreground"
-                  }`}
+                  className={`px-2.5 py-1 rounded-lg transition ${previewTab === "zalo" ? "bg-card text-foreground shadow-2xs" : "text-muted-foreground"
+                    }`}
                 >
                   💬 Zalo
                 </button>
@@ -827,7 +821,7 @@ export function CustomReminderTemplateModal({
                             <div>
                               <div className="text-[10px] font-bold uppercase">{f.label}</div>
                               <div className="font-bold text-xs">
-                                {num === 0 ? "Miễn phí dành cho Hội viên" : `${num.toLocaleString("vi-VN")} VNĐ`}
+                                {num === 0 ? "Miễn phí dành cho Học viên" : `${num.toLocaleString("vi-VN")} VNĐ`}
                               </div>
                             </div>
                           </div>

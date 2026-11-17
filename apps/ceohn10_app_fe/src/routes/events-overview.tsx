@@ -89,7 +89,7 @@ function EventsOverviewPage() {
           statusFilter !== "all" ? `?status=${encodeURIComponent(statusFilter)}` : "";
         const res = await fetchNestApi<EventOverviewRow[]>(`/events/overview${query}`);
         if (Array.isArray(res) && res.length > 0) return res;
-      } catch {}
+      } catch { }
       return initialRows;
     },
     initialData: initialRows,
@@ -194,25 +194,24 @@ function EventsOverviewPage() {
       width: 140,
       render: (r) => (
         <span
-          className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-bold ${
-            r.status === "ongoing" || r.status === "published"
+          className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-bold ${r.status === "ongoing" || r.status === "published"
               ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300"
               : r.status === "completed" || r.status === "ended"
-              ? "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300"
-              : r.status === "cancelled"
-              ? "bg-rose-100 text-rose-800 dark:bg-rose-950/60 dark:text-rose-300"
-              : "bg-blue-100 text-blue-800 dark:bg-blue-950/60 dark:text-blue-300"
-          }`}
+                ? "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300"
+                : r.status === "cancelled"
+                  ? "bg-rose-100 text-rose-800 dark:bg-rose-950/60 dark:text-rose-300"
+                  : "bg-blue-100 text-blue-800 dark:bg-blue-950/60 dark:text-blue-300"
+            }`}
         >
           {r.status === "upcoming"
             ? "Sắp diễn ra"
             : r.status === "ongoing"
-            ? "Đang diễn ra"
-            : r.status === "completed"
-            ? "Đã kết thúc"
-            : r.status === "cancelled"
-            ? "Đã hủy"
-            : r.status}
+              ? "Đang diễn ra"
+              : r.status === "completed"
+                ? "Đã kết thúc"
+                : r.status === "cancelled"
+                  ? "Đã hủy"
+                  : r.status}
         </span>
       ),
     },
@@ -295,7 +294,7 @@ function EventsOverviewPage() {
           <CrmMetricCard
             label={t("eventsOverview.kpiRegistrations")}
             value={totals.registrations}
-            sub="Lượt hội viên & khách đăng ký"
+            sub="Lượt Học viên & khách đăng ký"
             icon={Ticket}
             tone="violet"
           />
@@ -350,19 +349,17 @@ function EventsOverviewPage() {
                   setStatusFilter(tab.key);
                   setPage(1);
                 }}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
-                  statusFilter === tab.key
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${statusFilter === tab.key
                     ? "bg-[#003B95] text-white shadow-xs"
                     : "text-muted-foreground hover:text-foreground"
-                }`}
+                  }`}
               >
                 <span>{tab.label}</span>
                 <span
-                  className={`text-[10px] px-1.5 py-0.2 rounded-full ${
-                    statusFilter === tab.key
+                  className={`text-[10px] px-1.5 py-0.2 rounded-full ${statusFilter === tab.key
                       ? "bg-white/20 text-white"
                       : "bg-white dark:bg-card text-muted-foreground border border-border"
-                  }`}
+                    }`}
                 >
                   {tab.count}
                 </span>

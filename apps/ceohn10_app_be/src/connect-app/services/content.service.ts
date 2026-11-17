@@ -45,7 +45,7 @@ const DEFAULT_OFFICIAL_NEWS = [
     author: 'Ban Thư ký & Ban Truyền thông',
     published_at: '2026-09-20',
     excerpt:
-      'Chương trình trọng điểm quy tụ hơn 200+ doanh nghiệp hội viên cùng các phiên kết nối 1-1, ký kết thỏa thuận hợp tác thương mại đa ngành và mở rộng chuỗi cung ứng nội khối.',
+      'Chương trình trọng điểm quy tụ hơn 200+ doanh nghiệp Học viên cùng các phiên kết nối 1-1, ký kết thỏa thuận hợp tác thương mại đa ngành và mở rộng chuỗi cung ứng nội khối.',
     cover_image:
       'https://images.unsplash.com/photo-1511578314322-379afb476865?w=800&auto=format&fit=crop&q=80',
     views: 428,
@@ -53,12 +53,12 @@ const DEFAULT_OFFICIAL_NEWS = [
   {
     code: 'NEWS-002',
     title:
-      'Đại hội Hội viên thường niên CLB CEO HN10: Bầu cử Ban Chấp Hành nhiệm kỳ 2026 - 2029',
+      'Đại hội Học viên thường niên CLB CEO HN10: Bầu cử Ban Chấp Hành nhiệm kỳ 2026 - 2029',
     category: 'Hoạt động CLB',
     author: 'Ban Chấp Hành CLB',
     published_at: '2026-09-18',
     excerpt:
-      'Đánh giá kết quả hoạt động năm qua và thông qua nghị quyết nhiệm kỳ mới với nhiều chính sách hỗ trợ tăng trưởng doanh thu và bảo trợ thương hiệu cho hội viên.',
+      'Đánh giá kết quả hoạt động năm qua và thông qua nghị quyết nhiệm kỳ mới với nhiều chính sách hỗ trợ tăng trưởng doanh thu và bảo trợ thương hiệu cho Học viên.',
     cover_image:
       'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&auto=format&fit=crop&q=80',
     views: 315,
@@ -110,7 +110,7 @@ const DEFAULT_OFFICIAL_NEWS = [
     author: 'Ban Truyền thông',
     published_at: '2026-09-05',
     excerpt:
-      'Khẳng định chất lượng sản phẩm thương hiệu Việt trên bản đồ quốc tế, mở ra cơ hội hợp tác phân phối độc quyền và gia công liên kết cho các hội viên CLB.',
+      'Khẳng định chất lượng sản phẩm thương hiệu Việt trên bản đồ quốc tế, mở ra cơ hội hợp tác phân phối độc quyền và gia công liên kết cho các Học viên CLB.',
     cover_image:
       'https://images.unsplash.com/photo-1557804506-669a67965ba0?w=800&auto=format&fit=crop&q=80',
     views: 640,
@@ -119,7 +119,7 @@ const DEFAULT_OFFICIAL_NEWS = [
 
 @Injectable()
 export class ConnectContentService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   private async ensureSeedNews(): Promise<void> {
     // Không tự động gieo dữ liệu giả lập tin tức
@@ -387,7 +387,7 @@ export class ConnectContentService {
     const code = data.code || `NEWS-${Date.now().toString().slice(-6)}`;
     const imgList = safeParseImages(
       data.images ||
-        (data.image ? [data.image] : data.coverImage ? [data.coverImage] : []),
+      (data.image ? [data.image] : data.coverImage ? [data.coverImage] : []),
     );
     const firstImg =
       imgList[0] || data.image || data.coverImage || data.cover_image || null;
@@ -519,7 +519,7 @@ export class ConnectContentService {
     const IGNORED_PHRASES = [
       'trang chủ',
       'giới thiệu',
-      'hội viên',
+      'Học viên',
       'danh sách',
       'thư viện',
       'liên hệ',
@@ -667,7 +667,7 @@ export class ConnectContentService {
             await this.prisma.$executeRaw`
               INSERT INTO public.news (code, title, category, author, published_at, status, excerpt, content, cover_image, images, views, created_at, updated_at)
               VALUES (${code}, ${title}, 'Hoạt động CLB', 'CLB Doanh Nhân CEO HN10', NOW(), 'published', ${excerpt}, ${excerpt}, ${coverImage}, ${imgsJson}::jsonb, 250, NOW(), NOW())
-            `.catch(() => {});
+            `.catch(() => { });
           }
         });
 

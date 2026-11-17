@@ -132,7 +132,7 @@ function mapReg(r: Row): Registration {
     paymentAmount: Number(r.payment_amount ?? r.paymentAmount ?? 0),
     phone: (r.phone as string) || (r.member_phone as string) || "",
     company: (r.company as string) || (r.member_company as string) || "",
-    title: (r.title as string) || (r.member_title as string) || (r.position as string) || "Hội viên",
+    title: (r.title as string) || (r.member_title as string) || (r.position as string) || "Học viên",
   };
 }
 
@@ -180,8 +180,8 @@ const eventInput = z.object({
   date: z.string().min(1).max(40),
   location: z.string().max(200).default(""),
   capacity: z.number().int().min(0).max(1000000).default(0),
-  type: z.enum(["forum", "workshop", "networking", "training"]),
-  status: z.enum(["upcoming", "ongoing", "completed", "cancelled"]),
+  type: z.string().default("forum"),
+  status: z.string().default("upcoming"),
   image: z.string().optional().nullable(),
   banner: z.string().optional().nullable(),
   ticketPrice: z.number().optional().nullable(),

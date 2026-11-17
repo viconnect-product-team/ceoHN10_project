@@ -70,8 +70,8 @@ async function main() {
     { name: 'Phạm Hải Đăng', company: 'Đăng Quang Logistics', title: 'Ủy viên Ban Chấp Hành', industry: 'Vận tải & Logistics', email: 'dang.pham@dangquanglog.vn', phone: '0903888004', role: 'Trưởng ban Xúc tiến TM' },
     { name: 'Hoàng Quốc Việt', company: 'Việt An Eco Food', title: 'Giám đốc Điều hành', industry: 'Nông nghiệp & Thực phẩm', email: 'viet.hoang@vietanfood.vn', phone: '0903888005', role: 'Ủy viên BCH' },
     { name: 'Đỗ Thùy Linh', company: 'Linh Trang Fashion & Retail', title: 'Founder & CEO', industry: 'Bán lẻ & Thời trang', email: 'linh.do@linhtrangfashion.vn', phone: '0903888006', role: 'Ủy viên BCH' },
-    { name: 'Vũ Quốc Khánh', company: 'Khánh Gia Energy', title: 'Chủ tịch HĐQT', industry: 'Năng lượng tái tạo', email: 'khanh.vu@khanhgiaenergy.vn', phone: '0903888007', role: 'Hội viên VIP' },
-    { name: 'Ngô Thanh Tùng', company: 'Tùng Lâm Media', title: 'Giám đốc Truyền thông', industry: 'Truyền thông & Marketing', email: 'tung.ngo@tunglammedia.vn', phone: '0903888008', role: 'Hội viên VIP' }
+    { name: 'Vũ Quốc Khánh', company: 'Khánh Gia Energy', title: 'Chủ tịch HĐQT', industry: 'Năng lượng tái tạo', email: 'khanh.vu@khanhgiaenergy.vn', phone: '0903888007', role: 'Học viên VIP' },
+    { name: 'Ngô Thanh Tùng', company: 'Tùng Lâm Media', title: 'Giám đốc Truyền thông', industry: 'Truyền thông & Marketing', email: 'tung.ngo@tunglammedia.vn', phone: '0903888008', role: 'Học viên VIP' }
   ];
 
   for (let i = 0; i < hanoibaMembers.length; i++) {
@@ -207,7 +207,7 @@ async function main() {
       title: 'Gói Chuyển Đổi Số Doanh Nghiệp ViOne Enterprise AI',
       price: 45000000,
       category: 'Công nghệ & Phần mềm',
-      description: 'Giải pháp tổng thể quản trị hội viên, danh thiếp số thông minh, tự động hóa hội phí và báo cáo tài chính.',
+      description: 'Giải pháp tổng thể quản trị Học viên, danh thiếp số thông minh, tự động hóa hội phí và báo cáo tài chính.',
       emoji: '🚀'
     },
     {

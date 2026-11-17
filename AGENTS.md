@@ -16,7 +16,7 @@
 - **QUY TẮC LƯU DỮ LIỆU BẮT BUỘC (WRITE RULE)**:
   - Khi sửa, viết mới hoặc kiểm tra bất kỳ chức năng lưu dữ liệu nào (INSERT, UPDATE, DELETE, RPC) từ hệ thống Backend NestJS, Web CRM Quản trị, hay Mobile App CEO HN10: **TUYỆT ĐỐI PHẢI LƯU ĐÚNG VÀO DATABASE `113.20.107.184:6432`**, KHÔNG LƯU VÀO DATABASE KHÁC.
 - **QUY TẮC LẤY DỮ LIỆU HIỂN THỊ GIAO DIỆN (READ RULE)**:
-  - Mọi dữ liệu hiển thị về giao diện Web CRM và Mobile App (Hội viên, Sự kiện, B2B Connect, Lịch, Nhật ký, Cuộc họp, Tin tức bài viết, Quyền hạn RBAC, Tài chính): **TUYỆT ĐỐI PHẢI LẤY TỪ `113.20.107.184:6432` RA ĐỂ HIỆN VỀ GIAO DIỆN**.
+  - Mọi dữ liệu hiển thị về giao diện Web CRM và Mobile App (Học viên, Sự kiện, B2B Connect, Lịch, Nhật ký, Cuộc họp, Tin tức bài viết, Quyền hạn RBAC, Tài chính): **TUYỆT ĐỐI PHẢI LẤY TỪ `113.20.107.184:6432` RA ĐỂ HIỆN VỀ GIAO DIỆN**.
 - **TUYỆT ĐỐI NGHIÊM CẤM LƯU / TRỎ SANG DATABASE KHÁC**:
   - Máy chủ `14.225.217.232:5436` KHÔNG PHẢI là database chuẩn của dự án.
   - Tuyệt đối không cấu hình biến môi trường, không viết script, không redirect dữ liệu sang bất kỳ database nào khác ngoài `113.20.107.184:6432`.
@@ -43,7 +43,7 @@ Mỗi khi nhận bất kỳ câu lệnh (prompt), yêu cầu tính năng mới, 
 ### 📍 BƯỚC 1: XÁC ĐỊNH RÕ PHÂN HỆ MỤC TIÊU
 - Phân tích yêu cầu thuộc về:
   1. **Web CRM Quản Trị** (Dành cho Chủ tịch, Ban Điều Hành, Ban Thư Ký, Kế toán, Admin; Giao diện Desktop, Sidebar, Bảng Excel, Recharts).
-  2. **CEO HN10 Mobile App** (Dành cho Hội viên doanh nhân; Giao diện Di động, MemberShell, Bottom Nav, Thẻ QR, B2B Connect).
+  2. **CEO HN10 Mobile App** (Dành cho Học viên doanh nhân; Giao diện Di động, MemberShell, Bottom Nav, Thẻ QR, B2B Connect).
   3. **Hạ Tầng Dùng Chung (Core / Backend / DevOps)** (Auth, CSDL PostgreSQL, Socket.IO, Deploy Docker Nginx).
 - *Nếu yêu cầu của người dùng chưa rõ ràng giữa CRM hay Mobile App, Agent phải xác định hoặc hỏi lại, TUYỆT ĐỐI KHÔNG ĐƯỢC ĐOÁN MÒ để rồi code nhầm phân hệ.*
 

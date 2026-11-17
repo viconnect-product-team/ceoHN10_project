@@ -651,7 +651,7 @@ public class MainActivity extends BridgeActivity {
                 "Cuộc gọi đến CEO 1983",
                 NotificationManager.IMPORTANCE_HIGH
             );
-            callChannel.setDescription("Thông báo cuộc gọi thoại & video trực tiếp từ hội viên");
+            callChannel.setDescription("Thông báo cuộc gọi thoại & video trực tiếp từ Học viên");
             callChannel.enableVibration(true);
             callChannel.setVibrationPattern(new long[]{0, 500, 250, 500, 250, 500});
             callChannel.setLockscreenVisibility(android.app.Notification.VISIBILITY_PUBLIC);
@@ -663,7 +663,7 @@ public class MainActivity extends BridgeActivity {
                 "Tin nhắn CEO 1983",
                 NotificationManager.IMPORTANCE_HIGH
             );
-            msgChannel.setDescription("Thông báo tin nhắn đối tác và hội viên");
+            msgChannel.setDescription("Thông báo tin nhắn đối tác và Học viên");
             msgChannel.enableVibration(true);
             msgChannel.setVibrationPattern(new long[]{0, 200, 100, 200});
             msgChannel.setLockscreenVisibility(android.app.Notification.VISIBILITY_PUBLIC);

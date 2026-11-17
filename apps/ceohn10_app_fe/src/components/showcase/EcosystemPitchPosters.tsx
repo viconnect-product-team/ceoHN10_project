@@ -60,16 +60,16 @@ export function EcosystemPitchPosters() {
     version === "cosmic_executive"
       ? "pin_multi_device"
       : version === "minimalist_enterprise"
-      ? "pin_hand_watermark"
-      : version;
+        ? "pin_hand_watermark"
+        : version;
 
   // Toggle Presentation Fullscreen
   const toggleFullscreen = () => {
     if (!document.fullscreenElement) {
-      posterContainerRef.current?.requestFullscreen?.().catch(() => {});
+      posterContainerRef.current?.requestFullscreen?.().catch(() => { });
       setIsFullscreen(true);
     } else {
-      document.exitFullscreen?.().catch(() => {});
+      document.exitFullscreen?.().catch(() => { });
       setIsFullscreen(false);
     }
   };
@@ -140,11 +140,10 @@ export function EcosystemPitchPosters() {
             <button
               type="button"
               onClick={() => setVersion("pin_multi_device")}
-              className={`px-2.5 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
-                activeTemplate === "pin_multi_device"
+              className={`px-2.5 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${activeTemplate === "pin_multi_device"
                   ? "bg-[#003B95] text-white shadow-sm"
                   : "text-slate-600 dark:text-slate-300 hover:text-slate-900"
-              }`}
+                }`}
             >
               <Crown className="size-3 text-amber-300" />
               <span>Mẫu 1: Đa Thiết Bị 3D</span>
@@ -153,11 +152,10 @@ export function EcosystemPitchPosters() {
             <button
               type="button"
               onClick={() => setVersion("pin_hand_watermark")}
-              className={`px-2.5 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
-                activeTemplate === "pin_hand_watermark"
+              className={`px-2.5 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${activeTemplate === "pin_hand_watermark"
                   ? "bg-[#003B95] text-white shadow-sm"
                   : "text-slate-600 dark:text-slate-300 hover:text-slate-900"
-              }`}
+                }`}
             >
               <Smartphone className="size-3 text-cyan-300" />
               <span>Mẫu 2: Watermark &amp; Trụ Sở</span>
@@ -166,11 +164,10 @@ export function EcosystemPitchPosters() {
             <button
               type="button"
               onClick={() => setVersion("pin_neon_pedestal")}
-              className={`px-2.5 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
-                activeTemplate === "pin_neon_pedestal"
+              className={`px-2.5 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${activeTemplate === "pin_neon_pedestal"
                   ? "bg-[#003B95] text-white shadow-sm"
                   : "text-slate-600 dark:text-slate-300 hover:text-slate-900"
-              }`}
+                }`}
             >
               <Cpu className="size-3 text-purple-300" />
               <span>Mẫu 3: Bục Neon &amp; Trợ Lý</span>
@@ -179,11 +176,10 @@ export function EcosystemPitchPosters() {
             <button
               type="button"
               onClick={() => setVersion("pin_grid_screens")}
-              className={`px-2.5 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
-                activeTemplate === "pin_grid_screens"
+              className={`px-2.5 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${activeTemplate === "pin_grid_screens"
                   ? "bg-[#003B95] text-white shadow-sm"
                   : "text-slate-600 dark:text-slate-300 hover:text-slate-900"
-              }`}
+                }`}
             >
               <Layers className="size-3 text-emerald-300" />
               <span>Mẫu 4: 4 Màn Glassmorphism</span>
@@ -192,11 +188,10 @@ export function EcosystemPitchPosters() {
             <button
               type="button"
               onClick={() => setVersion("pin_design_system")}
-              className={`px-2.5 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
-                activeTemplate === "pin_design_system"
+              className={`px-2.5 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${activeTemplate === "pin_design_system"
                   ? "bg-[#003B95] text-white shadow-sm"
                   : "text-slate-600 dark:text-slate-300 hover:text-slate-900"
-              }`}
+                }`}
             >
               <Palette className="size-3 text-rose-300" />
               <span>Mẫu 5: Design System</span>
@@ -273,7 +268,7 @@ export function EcosystemPitchPosters() {
 
               <p className="text-sm sm:text-base lg:text-lg text-slate-300 max-w-2xl mx-auto font-normal leading-relaxed drop-shadow-sm">
                 Đồng bộ hoàn hảo giữa <strong className="text-amber-300 font-bold">Cổng Quản Trị Web CRM</strong> và{" "}
-                <strong className="text-sky-300 font-bold">Ứng Dụng Di Động Hội Viên</strong>: Thẻ Doanh Nhân Số,
+                <strong className="text-sky-300 font-bold">Ứng Dụng Di Động Học viên</strong>: Thẻ Doanh Nhân Số,
                 cổng thanh toán QR Napas247, điểm danh QR Gate và sàn kết nối giao thương B2B tự động.
               </p>
             </div>
@@ -388,9 +383,9 @@ export function EcosystemPitchPosters() {
 
               <div className="p-4 rounded-2xl bg-slate-900/60 border border-slate-800 hover:border-emerald-400/40 transition">
                 <Award className="size-6 text-emerald-400 mb-2" />
-                <h3 className="text-sm font-bold text-white">Đặc Quyền Hội Viên</h3>
+                <h3 className="text-sm font-bold text-white">Đặc Quyền Học viên</h3>
                 <p className="text-xs text-slate-400 mt-1 leading-relaxed">
-                  Kho voucher ưu đãi độc quyền, thẻ hội viên điện tử nhận diện 3 màu thương hiệu.
+                  Kho voucher ưu đãi độc quyền, thẻ Học viên điện tử nhận diện 3 màu thương hiệu.
                 </p>
               </div>
 
@@ -446,7 +441,7 @@ export function EcosystemPitchPosters() {
               <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-900/90 border border-cyan-400/40 shadow-[0_0_24px_rgba(34,211,238,0.2)] backdrop-blur-md">
                 <Zap className="size-4 text-cyan-400 animate-pulse" />
                 <span className="text-[11px] sm:text-xs font-black uppercase tracking-[0.16em] text-cyan-300">
-                  MOBILE APP CHÍNH THỨC CỦA HỘI VIÊN
+                  MOBILE APP CHÍNH THỨC CỦA Học viên
                 </span>
                 <span className="w-1.5 h-1.5 rounded-full bg-cyan-400" />
                 <span className="text-[11px] text-slate-300 font-semibold">Cộng Đồng HanoiBA</span>
@@ -582,7 +577,7 @@ export function EcosystemPitchPosters() {
 
                     <div className="p-3 rounded-2xl bg-purple-950/40 border border-purple-400/30">
                       <div className="text-[10px] text-purple-300 font-bold">Gợi ý kết nối thông minh hôm nay:</div>
-                      <div className="text-xs font-black text-white mt-1">Hội viên cùng ngành Xây Dựng &amp; Nội Thất</div>
+                      <div className="text-xs font-black text-white mt-1">Học viên cùng ngành Xây Dựng &amp; Nội Thất</div>
                       <div className="text-[9px] text-slate-300 mt-1">3 đối tác tiềm năng đang tìm kiếm nhà cung cấp</div>
                     </div>
 
@@ -611,7 +606,7 @@ export function EcosystemPitchPosters() {
                     <span className="text-xs font-black text-white">Thẻ Doanh Nhân Số</span>
                   </div>
                   <div className="text-[10px] text-slate-300">
-                    Quẹt mã QR định danh, kết nối NFC 1 chạm và bảo lưu hồ sơ hội viên an toàn.
+                    Quẹt mã QR định danh, kết nối NFC 1 chạm và bảo lưu hồ sơ Học viên an toàn.
                   </div>
                 </div>
 
@@ -632,7 +627,7 @@ export function EcosystemPitchPosters() {
 
         {/* ──────────────────────────────────────────────────────────────────
             MẪU 4: PINTEREST 1108378158348955419 (2X2 FROSTED GLASS APP SCREENS)
-            "TRẢI NGHIỆM MOBILE APP HỘI VIÊN CHUẨN MỰC QUỐC TẾ"
+            "TRẢI NGHIỆM MOBILE APP Học viên CHUẨN MỰC QUỐC TẾ"
         ────────────────────────────────────────────────────────────────── */}
         {activeTemplate === "pin_grid_screens" && (
           <div className="w-full bg-[#040817] text-white relative overflow-hidden px-4 sm:px-8 lg:px-14 py-12 lg:py-16 selection:bg-cyan-500 selection:text-black">
@@ -657,7 +652,7 @@ export function EcosystemPitchPosters() {
               </div>
 
               <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black uppercase tracking-tight leading-[1.1] text-transparent bg-clip-text bg-gradient-to-b from-white via-slate-100 to-cyan-200 drop-shadow-[0_4px_24px_rgba(0,0,0,0.8)]">
-                TRẢI NGHIỆM MOBILE APP HỘI VIÊN CHUẨN MỰC
+                TRẢI NGHIỆM MOBILE APP Học viên CHUẨN MỰC
               </h1>
 
               <p className="text-sm sm:text-base lg:text-lg text-slate-300 max-w-2xl mx-auto font-normal leading-relaxed">
@@ -679,14 +674,14 @@ export function EcosystemPitchPosters() {
                 </div>
                 <div>
                   <h3 className="text-xs font-black text-white">1. Màn Khởi Động &amp; Bản Sắc</h3>
-                  <p className="text-[10px] text-slate-400 mt-0.5">Khẳng định vị thế và niềm tự hào hội viên</p>
+                  <p className="text-[10px] text-slate-400 mt-0.5">Khẳng định vị thế và niềm tự hào Học viên</p>
                 </div>
               </div>
 
               {/* Screen 2: Executive Dashboard */}
               <div className="p-3.5 rounded-3xl bg-slate-900/70 backdrop-blur-xl border border-amber-500/30 shadow-xl space-y-3 hover:border-amber-400 transition-all">
                 <div className="aspect-[9/16] rounded-2xl bg-gradient-to-b from-[#0c1a30] to-black p-3 flex flex-col justify-between relative overflow-hidden">
-                  <div className="text-[10px] font-mono text-amber-400">TRANG CHỦ HỘI VIÊN</div>
+                  <div className="text-[10px] font-mono text-amber-400">TRANG CHỦ Học viên</div>
                   <div className="p-2.5 rounded-xl bg-amber-500/15 border border-amber-400/40">
                     <div className="text-[8px] text-slate-300">THẺ DOANH NHÂN SỐ</div>
                     <div className="text-xs font-black text-white">Nguyễn Hoàng Long</div>
@@ -808,7 +803,7 @@ export const theme = {
                 {/* Phone 2: Mobile App Member Experience */}
                 <div className="relative w-[240px] sm:w-[280px] aspect-[9/18.5] bg-slate-950 rounded-[40px] p-2 border-[3px] border-amber-500/60 shadow-2xl overflow-hidden transform rotate-3 hover:rotate-0 transition-transform">
                   <div className="w-full h-full rounded-[32px] bg-gradient-to-b from-[#1f1402] to-black p-3 flex flex-col justify-between">
-                    <div className="text-[9px] font-mono text-amber-400">APP HỘI VIÊN CHÍNH THỨC</div>
+                    <div className="text-[9px] font-mono text-amber-400">APP Học viên CHÍNH THỨC</div>
                     <div className="p-2 rounded-xl bg-amber-950/40 border border-amber-400/30">
                       <div className="text-[8px] text-slate-400">THẺ ĐIỆN TỬ DOANH NHÂN</div>
                       <div className="text-sm font-black text-white">Chủ tịch Phạm Vũ</div>

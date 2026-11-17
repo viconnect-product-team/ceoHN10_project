@@ -19,7 +19,7 @@ Tài liệu Đặc tả Yêu cầu Phần mềm (Software Requirements Specifica
 
 ### 1.2. Phạm Vi Tài Liệu (Document Scope)
 
-Tài liệu này bao gồm đặc tả chi tiết của 31 trường hợp sử dụng (Use Cases) tương ứng với phạm vi chức năng bàn giao, áp dụng nguyên tắc MECE (Mutually Exclusive, Collectively Exhaustive) để tuyệt đối không trùng lặp và không bỏ sót bất kỳ luồng tác nghiệp nào của Hội đồng Điều hành và Hội viên CLB Doanh Nhân CEO HN10.
+Tài liệu này bao gồm đặc tả chi tiết của 31 trường hợp sử dụng (Use Cases) tương ứng với phạm vi chức năng bàn giao, áp dụng nguyên tắc MECE (Mutually Exclusive, Collectively Exhaustive) để tuyệt đối không trùng lặp và không bỏ sót bất kỳ luồng tác nghiệp nào của Hội đồng Điều hành và Học viên CLB Doanh Nhân CEO HN10.
 
 ### 1.3. Định Nghĩa & Viết Tắt (Definitions & Acronyms)
 
@@ -29,7 +29,7 @@ Tài liệu này bao gồm đặc tả chi tiết của 31 trường hợp sử 
 | CLB CEO HN10 | CEO HN10 Business Club | Câu lạc bộ các nhà lãnh đạo doanh nghiệp CLB Doanh Nhân CEO HN10 (CEO Hà Nội 10). |
 | BQT | Board of Management | Ban Quản Trị CLB Doanh Nhân CEO HN10. |
 | BTK | Secretariat Committee | Ban Thư Ký CLB, cơ quan điều hành hành chính văn phòng. |
-| BTV | Membership Committee | Ban Thành Viên, cơ quan độc quyền thẩm định và duyệt kết nạp hội viên. |
+| BTV | Membership Committee | Ban Thành Viên, cơ quan độc quyền thẩm định và duyệt kết nạp Học viên. |
 | BTN | Charity Committee | Ban Thiện Nguyện & An Sinh Xã Hội. |
 | BTT | Media & Event Committee | Ban Truyền Thông & Sự Kiện. |
 | BXT | Trade Promotion Committee | Ban Xúc Tiến Thương Mại & Đầu Tư. |
@@ -47,10 +47,10 @@ Tài liệu này bao gồm đặc tả chi tiết của 31 trường hợp sử 
 | Mã Role | Tên Vai Trò | Đối Tượng Áp Dụng | Mô Tả Quyền Hạn Cốt Lõi |
 | --- | --- | --- | --- |
 | quan_tri | Ban Quản Trị Tối Cao (Superadmin) | Chủ tịch CLB, Ban Thường Trực CLB Doanh Nhân CEO HN10 | Toàn quyền: Xem (Read), Tạo (Create), Chỉnh sửa (Update), Xóa (Delete), Phê duyệt (Approve), Cấu hình (Configure) trên tất cả 30 màn hình và API. |
-| admin | Quản Trị Vận Hành (Executive Admin) | Phó Chủ tịch Thường trực, Giám đốc Điều hành CLB | Quyền Xem, Tạo, Sửa, Duyệt trên các phân hệ Hội viên, Sự kiện, Cuộc họp, Sàn B2B, Công việc. Không có quyền xóa dữ liệu kiểm toán và hạ quyền Superadmin. |
-| tong_thu_ky | Tổng Thư Ký / Ban Thư Ký (Secretariat) | Tổng Thư Ký, Phó Tổng Thư Ký, Chánh Văn Phòng CLB | Toàn quyền trên phân hệ Cuộc họp, Phòng họp Sapphire Hub, Lịch công tác, Giao việc và Quản trị Kênh Thông Báo Ban Thư Ký ghim trên Mobile App. Bị chặn ở API duyệt hội viên. |
+| admin | Quản Trị Vận Hành (Executive Admin) | Phó Chủ tịch Thường trực, Giám đốc Điều hành CLB | Quyền Xem, Tạo, Sửa, Duyệt trên các phân hệ Học viên, Sự kiện, Cuộc họp, Sàn B2B, Công việc. Không có quyền xóa dữ liệu kiểm toán và hạ quyền Superadmin. |
+| tong_thu_ky | Tổng Thư Ký / Ban Thư Ký (Secretariat) | Tổng Thư Ký, Phó Tổng Thư Ký, Chánh Văn Phòng CLB | Toàn quyền trên phân hệ Cuộc họp, Phòng họp Sapphire Hub, Lịch công tác, Giao việc và Quản trị Kênh Thông Báo Ban Thư Ký ghim trên Mobile App. Bị chặn ở API duyệt Học viên. |
 | truong_ban | Trưởng Ban Chuyên Môn (Committee Heads) | Trưởng/Phó các ban: Ban Thành Viên (BTV), Ban Thiện Nguyện (BTN), Ban Truyền Thông (BTT), Ban Xúc Tiến (BXT), Ban Tài Chính (BTC) | Phân quyền theo phạm vi chuyên trách (Scope-based RBAC) của từng ban. Không truy cập chéo vào các chức năng đặc thù của ban khác. |
-| member | Hội Viên Chính Thức (Official Member) | 500+ Doanh nhân CEO HN10 chính danh (Đã được BTV duyệt và có trạng thái phí 'paid') | Quyền truy cập đầy đủ các chức năng dành cho hội viên trên Mobile App. Bị giới hạn không truy cập vào Cổng Web CRM Quản trị. |
+| member | Học viên Chính Thức (Official Member) | 500+ Doanh nhân CEO HN10 chính danh (Đã được BTV duyệt và có trạng thái phí 'paid') | Quyền truy cập đầy đủ các chức năng dành cho Học viên trên Mobile App. Bị giới hạn không truy cập vào Cổng Web CRM Quản trị. |
 | guest | Khách Vãng Lai & Ứng Viên (Guest / Applicant) | Doanh nhân CEO HN10 đang nộp hồ sơ gia nhập, Khách mời sự kiện | Chỉ truy cập các màn hình và API công khai (`/landing`, `/card/:slug`, `/events/public`). |
 
 
@@ -67,41 +67,41 @@ Bước 2: Ứng viên điền biểu mẫu điện tử gồm 9 trường: Họ
 
 Bước 3: Nhấn nút 'Gửi Đơn Đăng Ký'. Hệ thống kiểm tra hợp lệ client/server, lưu bản ghi vào CSDL ở trạng thái pending, máy chủ SMTP tự động gửi Thư điện tử xác nhận tiếp nhận kèm Mã tra cứu đến email ứng viên.
 
-Bước 4: Cán bộ Ban Thành Viên (ceo.thanhvien@ceohn10.com) đăng nhập Web CRM, vào màn hình 'Quản Lý Hội Viên' (/members), mở ngăn kéo xem chi tiết hồ sơ ứng viên.
+Bước 4: Cán bộ Ban Thành Viên (ceo.thanhvien@ceohn10.com) đăng nhập Web CRM, vào màn hình 'Quản Lý Học viên' (/members), mở ngăn kéo xem chi tiết hồ sơ ứng viên.
 
 Bước 5: BTV đối soát thông tin pháp nhân trên Cổng ĐKKD quốc gia, kiểm tra MST và uy tín doanh nghiệp. Nhấn nút 'Phê Duyệt Kết Nạp'.
 
-Bước 6: Hệ thống kiểm tra quyền hạn BTV, tự động sinh Mã hội viên chuẩn HN10-xxxx, kích hoạt tài khoản status = 'active', tạo mật khẩu ngẫu nhiên bảo mật cao và gửi Email Chào mừng kèm thông tin đăng nhập.
+Bước 6: Hệ thống kiểm tra quyền hạn BTV, tự động sinh Mã Học viên chuẩn HN10-xxxx, kích hoạt tài khoản status = 'active', tạo mật khẩu ngẫu nhiên bảo mật cao và gửi Email Chào mừng kèm thông tin đăng nhập.
 
-Bước 7: Hội viên tải và mở Ứng dụng Di động CEO HN10, đăng nhập bằng Email/SĐT và mật khẩu tạm. Hệ thống chuyển hướng bắt buộc đổi mật khẩu mới tại QuickProfileEditModal trước khi vào trang chủ.
+Bước 7: Học viên tải và mở Ứng dụng Di động CEO HN10, đăng nhập bằng Email/SĐT và mật khẩu tạm. Hệ thống chuyển hướng bắt buộc đổi mật khẩu mới tại QuickProfileEditModal trước khi vào trang chủ.
 
 #### UJ-02: Hành Trình Thông Báo Hội Phí ➔ Thanh Toán Mã QR Ngân Hàng 24/7 ➔ Kế Toán Đối Soát Gạch Nợ (+365 Ngày)
 
-**Đối tượng trải nghiệm:** Hội viên chính thức, Ban Tài Chính / Kế Toán
+**Đối tượng trải nghiệm:** Học viên chính thức, Ban Tài Chính / Kế Toán
 
 Bước 1: Hệ thống tự động quét ngày hết hạn thẻ doanh nhân số (term_end). Trước 30 ngày, hệ thống kích hoạt thông báo đẩy trên Mobile App và email thông báo nộp hội phí thường niên (5.000.000 VNĐ/năm).
 
-Bước 2: Hội viên mở mục 'Hội Phí' trên Mobile App, nhấn nút 'Thanh Toán Mã QR Ngân Hàng'.
+Bước 2: Học viên mở mục 'Hội Phí' trên Mobile App, nhấn nút 'Thanh Toán Mã QR Ngân Hàng'.
 
 Bước 3: Hệ thống sinh mã QR ngân hàng động chuẩn Napas 24/7 chứa sẵn: Số tiền (5.000.000 VNĐ), Số tài khoản thụ hưởng của CLB CEO HN10 và Cú pháp: HOIPHI CEO HN10 [MÃ_HV] [HỌ_TÊN].
 
-Bước 4: Hội viên sử dụng ứng dụng Mobile Banking của ngân hàng cá nhân, quét mã QR và chuyển khoản thành công.
+Bước 4: Học viên sử dụng ứng dụng Mobile Banking của ngân hàng cá nhân, quét mã QR và chuyển khoản thành công.
 
 Bước 5: Kế toán câu lạc bộ mở màn hình 'Quản Lý Hội Phí' (/fees) trên Web CRM, kiểm tra giao dịch tương ứng trên sao kê tài khoản ngân hàng thực tế.
 
 Bước 6: Khi thông tin khớp đúng, kế toán bấm nút 'Duyệt Gạch Nợ'.
 
-Bước 7: Hệ thống chuyển trạng thái sang paid, cộng dồn +365 ngày vào hạn dùng của thẻ hội viên điện tử (term_end), sinh hóa đơn điện tử (invoices) và gửi thông báo xác nhận thành công cho hội viên.
+Bước 7: Hệ thống chuyển trạng thái sang paid, cộng dồn +365 ngày vào hạn dùng của thẻ Học viên điện tử (term_end), sinh hóa đơn điện tử (invoices) và gửi thông báo xác nhận thành công cho Học viên.
 
 #### UJ-03: Hành Trình Khởi Tạo Sự Kiện Gala ➔ Thiết Kế Sơ Đồ Ghế ➔ Phát Hành E-Ticket ➔ Soát Vé Gate Check-in QR (< 0.2s)
 
-**Đối tượng trải nghiệm:** Ban Truyền Thông (BTT), Ban Thư Ký (BTK), Hội viên tham dự
+**Đối tượng trải nghiệm:** Ban Truyền Thông (BTT), Ban Thư Ký (BTK), Học viên tham dự
 
-Bước 1: Ban Truyền Thông khởi tạo sự kiện Gala trên Web CRM (/events), thiết lập timeline chương trình, diễn giả VIP và cấu hình các hạng vé (VIP Đại biểu, Hội viên chính thức, Khách mời có phí).
+Bước 1: Ban Truyền Thông khởi tạo sự kiện Gala trên Web CRM (/events), thiết lập timeline chương trình, diễn giả VIP và cấu hình các hạng vé (VIP Đại biểu, Học viên chính thức, Khách mời có phí).
 
-Bước 2: Mở công cụ 'Cinema Seating Map' (/events/seating), kéo thả bố trí bàn tiệc tròn 10 chỗ (Bàn VIP 1 đến VIP 6 cho Lãnh đạo Thành ủy, HanoiBA), dãy ghế đại biểu danh dự và các bàn hội viên.
+Bước 2: Mở công cụ 'Cinema Seating Map' (/events/seating), kéo thả bố trí bàn tiệc tròn 10 chỗ (Bàn VIP 1 đến VIP 6 cho Lãnh đạo Thành ủy, HanoiBA), dãy ghế đại biểu danh dự và các bàn Học viên.
 
-Bước 3: Hội viên mở Mobile App, xem thông tin sự kiện Gala, chọn vị trí ngồi và nhấn 'Đăng Ký Tham Dự'.
+Bước 3: Học viên mở Mobile App, xem thông tin sự kiện Gala, chọn vị trí ngồi và nhấn 'Đăng Ký Tham Dự'.
 
 Bước 4: Hệ thống phát hành Vé điện tử E-Ticket QR lưu trong mục 'Vé Của Tôi' (hỗ trợ hiển thị offline). Vé chứa mã QR mã hóa bảo mật độc bản và mã số may mắn (#LUCKY-xxxx).
 
@@ -113,9 +113,9 @@ Bước 7: Danh sách đại biểu ĐÃ CHECK-IN THỰC TẾ tự động đồ
 
 #### UJ-04: Hành Trình Kết Nối Giao Thương B2B ➔ Chạm Danh Thiếp NFC ➔ Trao Đổi Cơ Hội Cung - Cầu 1-on-1
 
-**Đối tượng trải nghiệm:** Hội viên Doanh nhân CEO HN10
+**Đối tượng trải nghiệm:** Học viên Doanh nhân CEO HN10
 
-Bước 1: Hai hội viên gặp gỡ trực tiếp, chạm mặt sau thẻ thông minh NFC vào điện thoại đối tác.
+Bước 1: Hai Học viên gặp gỡ trực tiếp, chạm mặt sau thẻ thông minh NFC vào điện thoại đối tác.
 
 Bước 2: Điện thoại đối tác tự động mở trang Danh thiếp số công khai (/card/:code) hiển thị đầy đủ thông tin: Họ tên, Chức vụ, Logo công ty, Hồ sơ năng lực, Sản phẩm tiêu biểu và Nút 'Lưu Danh Bạ'.
 
@@ -123,31 +123,31 @@ Bước 3: Đối tác bấm 'Lưu Danh Bạ', hệ thống xuất ngay tệp vC
 
 Bước 4: Đối tác bấm 'Kết Nối B2B', chọn nhu cầu hợp tác và gửi lời mời kết nối kinh doanh 1-on-1.
 
-Bước 5: Hội viên nhận được thông báo đẩy, mở Hộp Thư Messenger #0084FF và bấm 'Chấp Nhận Lời Mời'.
+Bước 5: Học viên nhận được thông báo đẩy, mở Hộp Thư Messenger #0084FF và bấm 'Chấp Nhận Lời Mời'.
 
-Bước 6: Hai hội viên trao đổi tin nhắn, tài liệu báo giá thời gian thực hoặc đăng bài lên Bảng tin Cơ hội Cung - Cầu để hiệp hội bảo chứng giao dịch.
+Bước 6: Hai Học viên trao đổi tin nhắn, tài liệu báo giá thời gian thực hoặc đăng bài lên Bảng tin Cơ hội Cung - Cầu để hiệp hội bảo chứng giao dịch.
 
 #### UJ-05: Hành Trình Đại Hội Toàn Thể ➔ Biểu Quyết Trực Tuyến ➔ Công Bố Kết Quả Thời Gian Thực (Live 1s)
 
-**Đối tượng trải nghiệm:** Ban Thư Ký (BTK), Hội viên chính thức
+**Đối tượng trải nghiệm:** Ban Thư Ký (BTK), Học viên chính thức
 
 Bước 1: Ban Thư Ký tạo phiên biểu quyết trên Web CRM: Nhập tiêu đề nghị quyết đại hội, danh sách ứng viên Ban Chấp Hành nhiệm kỳ mới và thiết lập thời gian mở/đóng hòm phiếu.
 
-Bước 2: Khi Chủ tọa đại hội phát lệnh, Ban Thư Ký bấm 'Kích Hoạt Phiên Bầu Cử'. Toàn bộ 500+ hội viên chính thức nhận được thông báo đẩy trên Mobile App.
+Bước 2: Khi Chủ tọa đại hội phát lệnh, Ban Thư Ký bấm 'Kích Hoạt Phiên Bầu Cử'. Toàn bộ 500+ Học viên chính thức nhận được thông báo đẩy trên Mobile App.
 
-Bước 3: Hội viên mở màn hình Biểu Quyết (/association/voting), xem chi tiết tờ trình nghị quyết, tích chọn các phương án (Đồng ý / Không đồng ý / Ý kiến khác) và bấm 'Xác Nhận Bỏ Phiếu'.
+Bước 3: Học viên mở màn hình Biểu Quyết (/association/voting), xem chi tiết tờ trình nghị quyết, tích chọn các phương án (Đồng ý / Không đồng ý / Ý kiến khác) và bấm 'Xác Nhận Bỏ Phiếu'.
 
-Bước 4: Hệ thống mã hóa một chiều phiếu bầu (Đảm bảo nguyên tắc 1 người 1 phiếu và ẩn danh tuyệt đối), khóa nút biểu quyết trên máy hội viên.
+Bước 4: Hệ thống mã hóa một chiều phiếu bầu (Đảm bảo nguyên tắc 1 người 1 phiếu và ẩn danh tuyệt đối), khóa nút biểu quyết trên máy Học viên.
 
 Bước 5: Máy chủ Socket.IO tổng hợp kết quả tức thời. Màn hình LED trung tâm của Đại hội hiển thị biểu đồ tỷ lệ phần trăm (%) nhảy động thời gian thực với độ trễ dưới 1 giây, công bố kết quả minh bạch 100%.
 
 #### UJ-06: Hành Trình Tương Tác Giọng Nói Với Trợ Lý AI ➔ Tra Cứu Dữ Liệu Thực Tế ➔ Dẫn Đường Lái Màn Hình Trực Tiếp GPS Turn-by-Turn HUD (32 Tính Năng)
 
-**Đối tượng trải nghiệm:** Hội viên chính thức, Ban Quản Trị, Cán bộ các Ban Chuyên Môn
+**Đối tượng trải nghiệm:** Học viên chính thức, Ban Quản Trị, Cán bộ các Ban Chuyên Môn
 
 Bước 1: Người dùng chạm biểu tượng Robot Trợ lý AI ở góc màn hình hoặc dùng phím tắt nổi.
 
-Bước 2: Hệ thống tự động gọi API `/api/ai/live-context`, tải tức thời thông tin phiên đăng nhập: Họ tên, Mã hội viên, Hạng thẻ doanh nhân số, Tình trạng hội phí thường niên, Số lượng thông báo chưa đọc, Danh sách sự kiện đã có vé tham dự và Top 5 sự kiện đông nhất.
+Bước 2: Hệ thống tự động gọi API `/api/ai/live-context`, tải tức thời thông tin phiên đăng nhập: Họ tên, Mã Học viên, Hạng thẻ doanh nhân số, Tình trạng hội phí thường niên, Số lượng thông báo chưa đọc, Danh sách sự kiện đã có vé tham dự và Top 5 sự kiện đông nhất.
 
 Bước 3: Người dùng ra lệnh bằng giọng nói tiếng Việt (Microphone) hoặc nhập câu hỏi: 'Sự kiện nào đang được nhiều người đăng ký nhất?', 'Tôi có thông báo nào chưa đọc?' hoặc 'Hướng dẫn tôi đăng ký sự kiện như nào'.
 
@@ -211,7 +211,7 @@ Bước 2: Hệ thống tải tài nguyên tĩnh, render Banner nhận diện th
 
 Bước 3: Hiển thị thông điệp Chủ tịch CLB, Tôn chỉ 'Bản lĩnh - Tiên phong - Kết nối - Phát triển'.
 
-Bước 4: Hiển thị thông tin giới thiệu 6 Ban chuyên môn tác nghiệp và các số liệu thống kê quy mô (500+ hội viên, tổng giá trị giao thương).
+Bước 4: Hiển thị thông tin giới thiệu 6 Ban chuyên môn tác nghiệp và các số liệu thống kê quy mô (500+ Học viên, tổng giá trị giao thương).
 
 Bước 5: Hiển thị các khối nội dung: Sự kiện sắp diễn ra, Tin tức hoạt động và Nút CTA 'Đăng Ký Gia Nhập'.
 
@@ -223,12 +223,12 @@ Bước A1: Người dùng chuyển đổi ngôn ngữ hiển thị (Tiếng Vi�
 
 Bước E1: Mất kết nối mạng Internet -> Trình duyệt kích hoạt Service Worker hiển thị màn hình Offline thân thiện.
 
-### [UC-PUB-02] Nộp Hồ Sơ Đăng Ký Gia Nhập Hội Viên Chính Thức (e-Form CEO HN10)
+### [UC-PUB-02] Nộp Hồ Sơ Đăng Ký Gia Nhập Học viên Chính Thức (e-Form CEO HN10)
 
 | Thuộc Tính | Đặc Tả Kỹ Thuật Chi Tiết |
 | --- | --- |
 | Mã Use Case | UC-PUB-02 |
-| Tên Chức Năng | Nộp Hồ Sơ Đăng Ký Gia Nhập Hội Viên Chính Thức (e-Form CEO HN10) |
+| Tên Chức Năng | Nộp Hồ Sơ Đăng Ký Gia Nhập Học viên Chính Thức (e-Form CEO HN10) |
 | Phân Hệ / Module | Phân hệ 1: Cổng Thông Tin Công Khai & Tiếp Nhận Ứng Viên |
 | Mục Tiêu Nghiệp Vụ | Tiếp nhận đơn đăng ký gia nhập câu lạc bộ từ các doanh nhân CEO HN10 thông qua biểu mẫu chuẩn hóa e-Form. |
 | Tác Nhân (Actors) | Doanh nhân ứng viên CLB Doanh Nhân CEO HN10 |
@@ -305,7 +305,7 @@ Bước E3: Định dạng mã số thuế không hợp lệ -> Báo lỗi: 'Mã
 
 | Trường Dữ Liệu | Kiểu Dữ Liệu | Bắt Buộc | Quy Tắc Kiểm Tra & Định Dạng (Validation) |
 | --- | --- | --- | --- |
-| recipientEmail | String | BẮT BUỘC | Email ứng viên/hội viên nhận thư |
+| recipientEmail | String | BẮT BUỘC | Email ứng viên/Học viên nhận thư |
 | applicantName | String | BẮT BUỘC | Họ và tên người nhận |
 | applicationId | String UUID | BẮT BUỘC | Mã định danh giao dịch/hồ sơ hệ thống cấp |
 
@@ -341,18 +341,18 @@ Bước E1: Gửi thư thất bại ngay lần đầu (mã lỗi 5xx, Recipient 
 
 Bước E2: Lỗi xác thực SMTP mật khẩu ứng dụng Google -> Ghi nhận log cảnh báo quản trị viên kiểm tra cấu hình biến môi trường `SMTP_PASS`.
 
-### [UC-PUB-04] Tra Cứu Danh Bạ Doanh Nghiệp Hội Viên Công Khai (Chống Lộ SĐT)
+### [UC-PUB-04] Tra Cứu Danh Bạ Doanh Nghiệp Học viên Công Khai (Chống Lộ SĐT)
 
 | Thuộc Tính | Đặc Tả Kỹ Thuật Chi Tiết |
 | --- | --- |
 | Mã Use Case | UC-PUB-04 |
-| Tên Chức Năng | Tra Cứu Danh Bạ Doanh Nghiệp Hội Viên Công Khai (Chống Lộ SĐT) |
+| Tên Chức Năng | Tra Cứu Danh Bạ Doanh Nghiệp Học viên Công Khai (Chống Lộ SĐT) |
 | Phân Hệ / Module | Phân hệ 1: Cổng Thông Tin Công Khai & Tiếp Nhận Ứng Viên |
 | Mục Tiêu Nghiệp Vụ | Cho phép đối tác và công chúng tra cứu thông tin năng lực cung ứng của các doanh nghiệp thành viên chính thức. |
 | Tác Nhân (Actors) | Khách vãng lai, Đối tác tìm kiếm nhà cung cấp |
 | Tiền Điều Kiện (Pre-conditions) | Cổng thông tin công khai đang hoạt động. |
 | Hậu Điều Kiện (Post-conditions) | Đối tác tiếp cận được thông tin doanh nghiệp thành viên uy tín. |
-| Quy Tắc Nghiệp Vụ (Business Rules) | Chỉ hiển thị doanh nghiệp của hội viên chính thức đã được Ban Thành Viên xác thực. |
+| Quy Tắc Nghiệp Vụ (Business Rules) | Chỉ hiển thị doanh nghiệp của Học viên chính thức đã được Ban Thành Viên xác thực. |
 | Ánh Xạ Kỹ Thuật (Tech Mapping) | API: `GET /api/association/public-directory` | Table: `companies`, `members` |
 
 
@@ -449,7 +449,7 @@ Bước E1: Sự kiện đã hết số lượng vé khách mời -> Báo lỗi:
 
 | Trường Dữ Liệu | Kiểu Dữ Liệu | Bắt Buộc | Quy Tắc Kiểm Tra & Định Dạng (Validation) |
 | --- | --- | --- | --- |
-| usernameOrEmail | String | BẮT BUỘC | Email công vụ hoặc Mã hội viên quản trị |
+| usernameOrEmail | String | BẮT BUỘC | Email công vụ hoặc Mã Học viên quản trị |
 | password | String | BẮT BUỘC | Mật khẩu quản trị (Tối thiểu 8 ký tự) |
 
 
@@ -493,7 +493,7 @@ Bước E3: Tài khoản có vai trò member cố tình đăng nhập CRM -> Bá
 | Mã Use Case | UC-CRM-DASH-01 |
 | Tên Chức Năng | Bàn Làm Việc Tổng Quan (Dashboard KPI & Cơ Cấu 6 Chuyên Ban) |
 | Phân Hệ / Module | Phân hệ 2: Cổng Quản Trị Điều Hành Trung Tâm (Web CRM) |
-| Mục Tiêu Nghiệp Vụ | Hiển thị bức tranh toàn cảnh về tình hình hoạt động của hiệp hội: Quy mô hội viên, tiến độ thu hội phí, giá trị giao thương B2B và các sự kiện sắp tới. |
+| Mục Tiêu Nghiệp Vụ | Hiển thị bức tranh toàn cảnh về tình hình hoạt động của hiệp hội: Quy mô Học viên, tiến độ thu hội phí, giá trị giao thương B2B và các sự kiện sắp tới. |
 | Tác Nhân (Actors) | Ban Quản Trị, Ban Thư Ký, Trưởng các Ban chuyên môn |
 | Tiền Điều Kiện (Pre-conditions) | Đã đăng nhập thành công vào Cổng Quản trị CRM. |
 | Hậu Điều Kiện (Post-conditions) | Lãnh đạo nắm bắt kịp thời các chỉ số điều hành then chốt. |
@@ -516,13 +516,13 @@ Bước 1: Người dùng mở trang chủ Dashboard CRM (`/` hoặc `/dashboard
 
 Bước 2: Hệ thống truy vấn song song dữ liệu từ các phân hệ:
 
-   - Tổng số hội viên chính thức và tỷ lệ tăng trưởng trong tháng.
+   - Tổng số Học viên chính thức và tỷ lệ tăng trưởng trong tháng.
 
    - Tỷ lệ hoàn thành nghĩa vụ hội phí thường niên (Số tiền đã thu / Kế hoạch năm).
 
    - Tổng giá trị kết nối giao thương B2B nội bộ được ghi nhận.
 
-   - Biểu đồ phân bổ hội viên theo 6 Ban chuyên môn và theo phân khúc ngành nghề.
+   - Biểu đồ phân bổ Học viên theo 6 Ban chuyên môn và theo phân khúc ngành nghề.
 
 Bước 3: Hiển thị danh sách các việc cần xử lý ngay: Hồ sơ chờ BTV duyệt, Phiếu chi chờ duyệt, Lịch họp sắp diễn ra.
 
@@ -532,17 +532,17 @@ Bước 4: Người dùng bấm vào từng thẻ KPI để điều hướng nha
 
 Bước E1: Lỗi kết nối dịch vụ thống kê -> Hiển thị thông báo và nút 'Tải lại dữ liệu'.
 
-### [UC-CRM-MBR-01] Quản Lý Danh Sách Hội Viên Đa Chiều & Bộ Lọc Nâng Cao
+### [UC-CRM-MBR-01] Quản Lý Danh Sách Học viên Đa Chiều & Bộ Lọc Nâng Cao
 
 | Thuộc Tính | Đặc Tả Kỹ Thuật Chi Tiết |
 | --- | --- |
 | Mã Use Case | UC-CRM-MBR-01 |
-| Tên Chức Năng | Quản Lý Danh Sách Hội Viên Đa Chiều & Bộ Lọc Nâng Cao |
+| Tên Chức Năng | Quản Lý Danh Sách Học viên Đa Chiều & Bộ Lọc Nâng Cao |
 | Phân Hệ / Module | Phân hệ 2: Cổng Quản Trị Điều Hành Trung Tâm (Web CRM) |
-| Mục Tiêu Nghiệp Vụ | Cung cấp bảng dữ liệu toàn diện 500+ hội viên với bộ lọc đa điều kiện, hỗ trợ cuộn ngang chuẩn với Cột STT cố định bên trái và Cột Thao tác cố định bên phải. |
+| Mục Tiêu Nghiệp Vụ | Cung cấp bảng dữ liệu toàn diện 500+ Học viên với bộ lọc đa điều kiện, hỗ trợ cuộn ngang chuẩn với Cột STT cố định bên trái và Cột Thao tác cố định bên phải. |
 | Tác Nhân (Actors) | Ban Quản Trị, Ban Thành Viên, Ban Thư Ký |
-| Tiền Điều Kiện (Pre-conditions) | Đăng nhập Cổng Quản trị CRM với vai trò có quyền xem danh sách hội viên. |
-| Hậu Điều Kiện (Post-conditions) | Cán bộ quản lý nắm bắt chính xác dữ liệu hội viên phục vụ điều hành. |
+| Tiền Điều Kiện (Pre-conditions) | Đăng nhập Cổng Quản trị CRM với vai trò có quyền xem danh sách Học viên. |
+| Hậu Điều Kiện (Post-conditions) | Cán bộ quản lý nắm bắt chính xác dữ liệu Học viên phục vụ điều hành. |
 | Quy Tắc Nghiệp Vụ (Business Rules) | Bảng dữ liệu phải có thiết kế cuộn ngang mượt mà, không bị che khuất nút thao tác. |
 | Ánh Xạ Kỹ Thuật (Tech Mapping) | Route: `/members` | API: `GET /api/association/members` | Table: `members` |
 
@@ -554,7 +554,7 @@ Bước E1: Lỗi kết nối dịch vụ thống kê -> Hiển thị thông bá
 | --- | --- | --- | --- |
 | committee | String | Tùy chọn | Lọc theo 1 trong 6 ban chuyên môn |
 | paymentStatus | String | Tùy chọn | Lọc: Tất cả / Đã đóng (paid) / Chưa đóng (unpaid) |
-| tier | String | Tùy chọn | Hạng hội viên: Kim Cương / Vàng / Bạc / Tiêu Chuẩn |
+| tier | String | Tùy chọn | Hạng Học viên: Kim Cương / Vàng / Bạc / Tiêu Chuẩn |
 | keyword | String | Tùy chọn | Tìm kiếm theo Họ tên, Mã HV, SĐT, Tên công ty, MST |
 | page | Integer | Tùy chọn | Số trang phân trang (Mặc định: 1, 20 bản ghi/trang) |
 
@@ -562,11 +562,11 @@ Bước E1: Lỗi kết nối dịch vụ thống kê -> Hiển thị thông bá
 
 #### Luồng Sự Kiện Chính (Step-by-step Main Flow)
 
-Bước 1: Người dùng mở màn hình 'Danh Sách Hội Viên' (/members) trên CRM.
+Bước 1: Người dùng mở màn hình 'Danh Sách Học viên' (/members) trên CRM.
 
-Bước 2: Hệ thống tải danh sách hội viên kèm các chỉ số KPI tóm tắt trên đầu trang (Tổng số hội viên, Số hội viên mới tháng này, Tỷ lệ hoàn thành hội phí).
+Bước 2: Hệ thống tải danh sách Học viên kèm các chỉ số KPI tóm tắt trên đầu trang (Tổng số Học viên, Số Học viên mới tháng này, Tỷ lệ hoàn thành hội phí).
 
-Bước 3: Hiển thị bảng dữ liệu: Cột STT ghim cố định bên trái; các cột dữ liệu: Mã HV, Họ tên, Chức vụ, Tên doanh nghiệp, SĐT, Ban chuyên môn, Trạng thái hội phí, Hạng hội viên; Cột 'Thao Tác' ghim cố định bên phải.
+Bước 3: Hiển thị bảng dữ liệu: Cột STT ghim cố định bên trái; các cột dữ liệu: Mã HV, Họ tên, Chức vụ, Tên doanh nghiệp, SĐT, Ban chuyên môn, Trạng thái hội phí, Hạng Học viên; Cột 'Thao Tác' ghim cố định bên phải.
 
 Bước 4: Người dùng áp dụng các bộ lọc hoặc nhập từ khóa tìm kiếm.
 
@@ -580,18 +580,18 @@ Bước A1: Người dùng nhấn nút 'Xuất Excel' -> Hệ thống xuất fil
 
 Bước E1: Không tìm thấy bản ghi phù hợp -> Hiển thị hình ảnh trạng thái rỗng và nút 'Đặt lại bộ lọc'.
 
-### [UC-CRM-MBR-02] Thẩm Định & Phê Duyệt Kết Nạp Hội Viên Mới (Độc Quyền BTV)
+### [UC-CRM-MBR-02] Thẩm Định & Phê Duyệt Kết Nạp Học viên Mới (Độc Quyền BTV)
 
 | Thuộc Tính | Đặc Tả Kỹ Thuật Chi Tiết |
 | --- | --- |
 | Mã Use Case | UC-CRM-MBR-02 |
-| Tên Chức Năng | Thẩm Định & Phê Duyệt Kết Nạp Hội Viên Mới (Độc Quyền BTV) |
+| Tên Chức Năng | Thẩm Định & Phê Duyệt Kết Nạp Học viên Mới (Độc Quyền BTV) |
 | Phân Hệ / Module | Phân hệ 2: Cổng Quản Trị Điều Hành Trung Tâm (Web CRM) |
-| Mục Tiêu Nghiệp Vụ | Thẩm định tính hợp lệ của hồ sơ ứng viên và phê duyệt kết nạp chính thức, cấp mã hội viên định danh HN10-xxxx. Chức năng ĐỘC QUYỀN của Ban Thành Viên. |
+| Mục Tiêu Nghiệp Vụ | Thẩm định tính hợp lệ của hồ sơ ứng viên và phê duyệt kết nạp chính thức, cấp mã Học viên định danh HN10-xxxx. Chức năng ĐỘC QUYỀN của Ban Thành Viên. |
 | Tác Nhân (Actors) | Trưởng Ban Thành Viên (ceo.thanhvien@ceohn10.com) hoặc Superadmin |
 | Tiền Điều Kiện (Pre-conditions) | Hồ sơ ứng viên đang ở trạng thái pending trong danh sách chờ duyệt. |
-| Hậu Điều Kiện (Post-conditions) | Ứng viên chính thức trở thành Hội viên CLB CEO HN10, có mã định danh, tài khoản di động và danh thiếp số. |
-| Quy Tắc Nghiệp Vụ (Business Rules) | RULE-AUTH-BTV-EXCLUSIVE: Nghiêm cấm tuyệt đối Ban Thư Ký phê duyệt hội viên. |
+| Hậu Điều Kiện (Post-conditions) | Ứng viên chính thức trở thành Học viên CLB CEO HN10, có mã định danh, tài khoản di động và danh thiếp số. |
+| Quy Tắc Nghiệp Vụ (Business Rules) | RULE-AUTH-BTV-EXCLUSIVE: Nghiêm cấm tuyệt đối Ban Thư Ký phê duyệt Học viên. |
 | Ánh Xạ Kỹ Thuật (Tech Mapping) | API: `POST /api/association/members/:id/approve` | Tables: `members`, `vione_users`, `member_business_cards` |
 
 
@@ -602,13 +602,13 @@ Bước E1: Không tìm thấy bản ghi phù hợp -> Hiển thị hình ảnh 
 | --- | --- | --- | --- |
 | memberId | String | BẮT BUỘC | Mã định danh hồ sơ cần duyệt |
 | assignedCommittee | String | BẮT BUỘC | Chuyên ban chỉ định sinh hoạt (1 trong 6 ban) |
-| memberTier | String | BẮT BUỘC | Hạng hội viên ban đầu (Mặc định: Tiêu Chuẩn) |
+| memberTier | String | BẮT BUỘC | Hạng Học viên ban đầu (Mặc định: Tiêu Chuẩn) |
 
 
 
 #### Luồng Sự Kiện Chính (Step-by-step Main Flow)
 
-Bước 1: Cán bộ BTV mở tab 'Chờ Thẩm Định' trên màn hình Quản lý hội viên.
+Bước 1: Cán bộ BTV mở tab 'Chờ Thẩm Định' trên màn hình Quản lý Học viên.
 
 Bước 2: Bấm vào hồ sơ ứng viên để mở Ngăn kéo chi tiết (Drawer) hiển thị toàn bộ thông tin đăng ký.
 
@@ -620,7 +620,7 @@ Bước 5: Hệ thống kiểm tra quyền hạn của người thực hiện (B
 
 Bước 6: Hệ thống thực hiện chuỗi giao dịch nguyên tử (Atomic Transaction):
 
-   - Tự động sinh Mã hội viên chuẩn: HN10-xxxx (Tìm số lớn nhất hiện tại + 1, ví dụ: HN10-008).
+   - Tự động sinh Mã Học viên chuẩn: HN10-xxxx (Tìm số lớn nhất hiện tại + 1, ví dụ: HN10-008).
 
    - Cập nhật bản ghi trong `members`: status = 'active', code = 'HN10-xxxx', joined_at = NOW().
 
@@ -628,7 +628,7 @@ Bước 6: Hệ thống thực hiện chuỗi giao dịch nguyên tử (Atomic T
 
    - Tạo bản ghi Thẻ doanh nhân điện tử trong `member_business_cards` với slug công khai /card/ceo83xxx.
 
-Bước 7: Kích hoạt dịch vụ SMTP Mailer gửi Email Chào mừng chính thức gia nhập CLB CEO HN10 kèm thông tin đăng nhập đến hòm thư hội viên.
+Bước 7: Kích hoạt dịch vụ SMTP Mailer gửi Email Chào mừng chính thức gia nhập CLB CEO HN10 kèm thông tin đăng nhập đến hòm thư Học viên.
 
 Bước 8: Ghi nhật ký phê duyệt vào bảng `activity_log`.
 
@@ -640,21 +640,21 @@ Bước A1: Hồ sơ không đủ điều kiện -> BTV bấm nút 'Từ Chối 
 
 #### Luồng Ngoại Lệ & Xử Lý Lỗi (Exception Flows)
 
-Bước E1: Tài khoản Ban Thư Ký hoặc ban khác bấm duyệt -> Hệ thống chặn ngay lập tức, trả về mã lỗi HTTP 403 Forbidden: 'Ban Thư Ký không có thẩm quyền phê duyệt kết nạp hội viên. Thẩm quyền này thuộc về Ban Thành Viên'.
+Bước E1: Tài khoản Ban Thư Ký hoặc ban khác bấm duyệt -> Hệ thống chặn ngay lập tức, trả về mã lỗi HTTP 403 Forbidden: 'Ban Thư Ký không có thẩm quyền phê duyệt kết nạp Học viên. Thẩm quyền này thuộc về Ban Thành Viên'.
 
-Bước E2: Trùng lặp mã hội viên trong transaction -> Hệ thống tự động rollback và thử lại với số thứ tự kế tiếp.
+Bước E2: Trùng lặp mã Học viên trong transaction -> Hệ thống tự động rollback và thử lại với số thứ tự kế tiếp.
 
-### [UC-CRM-MBR-03] Hồ Sơ Hội Viên 360 Độ & Lịch Sử Tương Tác Đa Chiều
+### [UC-CRM-MBR-03] Hồ Sơ Học viên 360 Độ & Lịch Sử Tương Tác Đa Chiều
 
 | Thuộc Tính | Đặc Tả Kỹ Thuật Chi Tiết |
 | --- | --- |
 | Mã Use Case | UC-CRM-MBR-03 |
-| Tên Chức Năng | Hồ Sơ Hội Viên 360 Độ & Lịch Sử Tương Tác Đa Chiều |
+| Tên Chức Năng | Hồ Sơ Học viên 360 Độ & Lịch Sử Tương Tác Đa Chiều |
 | Phân Hệ / Module | Phân hệ 2: Cổng Quản Trị Điều Hành Trung Tâm (Web CRM) |
-| Mục Tiêu Nghiệp Vụ | Cung cấp góc nhìn toàn cảnh 360 độ về một hội viên: Thông tin pháp nhân, lịch sử đóng hội phí, lịch sử tham gia sự kiện Gala, điểm danh cuộc họp, các sản phẩm B2B đang bán và điểm cống hiến. |
+| Mục Tiêu Nghiệp Vụ | Cung cấp góc nhìn toàn cảnh 360 độ về một Học viên: Thông tin pháp nhân, lịch sử đóng hội phí, lịch sử tham gia sự kiện Gala, điểm danh cuộc họp, các sản phẩm B2B đang bán và điểm cống hiến. |
 | Tác Nhân (Actors) | Ban Quản Trị, Ban Thành Viên, Ban Thư Ký |
-| Tiền Điều Kiện (Pre-conditions) | Hội viên đã có mã định danh trong hệ thống. |
-| Hậu Điều Kiện (Post-conditions) | Cán bộ quản lý có đầy đủ thông tin để đánh giá mức độ tích cực và tiềm năng của hội viên. |
+| Tiền Điều Kiện (Pre-conditions) | Học viên đã có mã định danh trong hệ thống. |
+| Hậu Điều Kiện (Post-conditions) | Cán bộ quản lý có đầy đủ thông tin để đánh giá mức độ tích cực và tiềm năng của Học viên. |
 | Quy Tắc Nghiệp Vụ (Business Rules) | Dữ liệu được tổng hợp thời gian thực từ 6 bảng CSDL liên quan. |
 | Ánh Xạ Kỹ Thuật (Tech Mapping) | Route: `/members/$memberId` | API: `GET /api/association/members/:id/full-profile` |
 
@@ -664,15 +664,15 @@ Bước E2: Trùng lặp mã hội viên trong transaction -> Hệ thống tự 
 
 | Trường Dữ Liệu | Kiểu Dữ Liệu | Bắt Buộc | Quy Tắc Kiểm Tra & Định Dạng (Validation) |
 | --- | --- | --- | --- |
-| memberId | String | BẮT BUỘC | Mã định danh hoặc Mã số hội viên (HN10-xxxx) |
+| memberId | String | BẮT BUỘC | Mã định danh hoặc Mã số Học viên (HN10-xxxx) |
 
 
 
 #### Luồng Sự Kiện Chính (Step-by-step Main Flow)
 
-Bước 1: Người dùng bấm vào dòng hội viên trên bảng danh sách.
+Bước 1: Người dùng bấm vào dòng Học viên trên bảng danh sách.
 
-Bước 2: Hệ thống mở trang Chi tiết Hội viên 360 độ (/members/$memberId).
+Bước 2: Hệ thống mở trang Chi tiết Học viên 360 độ (/members/$memberId).
 
 Bước 3: Hiển thị khối thông tin tổng quan: Avatar, Họ tên, Chức vụ, Tên công ty, Mã HV, Ban chuyên môn, Hạng thẻ doanh nhân số.
 
@@ -692,20 +692,20 @@ Bước 4: Hiển thị các tab dữ liệu chuyên sâu:
 
 #### Luồng Ngoại Lệ & Xử Lý Lỗi (Exception Flows)
 
-Bước E1: Hội viên không tồn tại -> Hiển thị thông báo 404 và nút quay lại danh sách.
+Bước E1: Học viên không tồn tại -> Hiển thị thông báo 404 và nút quay lại danh sách.
 
-### [UC-CRM-MBR-04] Phân Khúc Hội Viên & Xếp Hạng Điểm Cống Hiến Thường Niên
+### [UC-CRM-MBR-04] Phân Khúc Học viên & Xếp Hạng Điểm Cống Hiến Thường Niên
 
 | Thuộc Tính | Đặc Tả Kỹ Thuật Chi Tiết |
 | --- | --- |
 | Mã Use Case | UC-CRM-MBR-04 |
-| Tên Chức Năng | Phân Khúc Hội Viên & Xếp Hạng Điểm Cống Hiến Thường Niên |
+| Tên Chức Năng | Phân Khúc Học viên & Xếp Hạng Điểm Cống Hiến Thường Niên |
 | Phân Hệ / Module | Phân hệ 2: Cổng Quản Trị Điều Hành Trung Tâm (Web CRM) |
-| Mục Tiêu Nghiệp Vụ | Phân loại hội viên theo tiêu chí đóng góp, chuyên cần và khối ngành nghề; tự động xếp hạng thẻ doanh nhân số Kim Cương, Vàng, Bạc. |
+| Mục Tiêu Nghiệp Vụ | Phân loại Học viên theo tiêu chí đóng góp, chuyên cần và khối ngành nghề; tự động xếp hạng thẻ doanh nhân số Kim Cương, Vàng, Bạc. |
 | Tác Nhân (Actors) | Ban Thành Viên (BTV), Ban Quản Trị |
-| Tiền Điều Kiện (Pre-conditions) | Dữ liệu hoạt động của hội viên được cập nhật đầy đủ. |
-| Hậu Điều Kiện (Post-conditions) | Hội viên được nâng cấp hạng thẻ doanh nhân số tương ứng trên Mobile App. |
-| Quy Tắc Nghiệp Vụ (Business Rules) | Hội viên nợ hội phí không được xét hạng Kim Cương. |
+| Tiền Điều Kiện (Pre-conditions) | Dữ liệu hoạt động của Học viên được cập nhật đầy đủ. |
+| Hậu Điều Kiện (Post-conditions) | Học viên được nâng cấp hạng thẻ doanh nhân số tương ứng trên Mobile App. |
+| Quy Tắc Nghiệp Vụ (Business Rules) | Học viên nợ hội phí không được xét hạng Kim Cương. |
 | Ánh Xạ Kỹ Thuật (Tech Mapping) | Route: `/segments` | API: `POST /api/association/members/evaluate-tiers` |
 
 
@@ -733,7 +733,7 @@ Bước 2: Hệ thống tính toán điểm cống hiến tự động theo côn
 
    - Điểm giao thương B2B nội bộ (Tối đa 25 điểm).
 
-Bước 3: Tự động phân hạng hội viên:
+Bước 3: Tự động phân hạng Học viên:
 
    - Từ 90 - 100 điểm: Hạng Kim Cương (Diamond Member).
 
@@ -752,9 +752,9 @@ Bước 4: BTV xác nhận và công bố bảng xếp hạng thường niên.
 | Mã Use Case | UC-CRM-MBR-05 |
 | Tên Chức Năng | Kích Hoạt, Khóa Tài Khoản & Cấp Lại Mật Khẩu Khởi Tạo |
 | Phân Hệ / Module | Phân hệ 2: Cổng Quản Trị Điều Hành Trung Tâm (Web CRM) |
-| Mục Tiêu Nghiệp Vụ | Quản trị trạng thái hoạt động của tài khoản hội viên: Tạm khóa, mở khóa, hoặc cấp lại mật khẩu khởi tạo khi hội viên quên. |
+| Mục Tiêu Nghiệp Vụ | Quản trị trạng thái hoạt động của tài khoản Học viên: Tạm khóa, mở khóa, hoặc cấp lại mật khẩu khởi tạo khi Học viên quên. |
 | Tác Nhân (Actors) | Ban Quản Trị, Ban Thành Viên |
-| Tiền Điều Kiện (Pre-conditions) | Tài khoản hội viên tồn tại trong hệ thống. |
+| Tiền Điều Kiện (Pre-conditions) | Tài khoản Học viên tồn tại trong hệ thống. |
 | Hậu Điều Kiện (Post-conditions) | Trạng thái tài khoản được cập nhật tức thời trên toàn hệ thống. |
 | Quy Tắc Nghiệp Vụ (Business Rules) | Mọi thao tác khóa/mở khóa bắt buộc nhập lý do chi tiết. |
 | Ánh Xạ Kỹ Thuật (Tech Mapping) | API: `POST /api/association/members/:id/account-action` | Table: `vione_users` |
@@ -765,7 +765,7 @@ Bước 4: BTV xác nhận và công bố bảng xếp hạng thường niên.
 
 | Trường Dữ Liệu | Kiểu Dữ Liệu | Bắt Buộc | Quy Tắc Kiểm Tra & Định Dạng (Validation) |
 | --- | --- | --- | --- |
-| memberId | String | BẮT BUỘC | Mã hội viên cần thao tác |
+| memberId | String | BẮT BUỘC | Mã Học viên cần thao tác |
 | actionType | Enum | BẮT BUỘC | lock | unlock | reset_password |
 | reason | String | BẮT BUỘC | Lý do thao tác phục vụ kiểm toán |
 
@@ -773,7 +773,7 @@ Bước 4: BTV xác nhận và công bố bảng xếp hạng thường niên.
 
 #### Luồng Sự Kiện Chính (Step-by-step Main Flow)
 
-Bước 1: Cán bộ quản lý tìm kiếm hội viên trên màn hình Quản lý hội viên.
+Bước 1: Cán bộ quản lý tìm kiếm Học viên trên màn hình Quản lý Học viên.
 
 Bước 2: Chọn menu thao tác bên phải dòng dữ liệu, chọn 'Khóa Tài Khoản' hoặc 'Cấp Lại Mật Khẩu'.
 
@@ -783,7 +783,7 @@ Bước 4: Hệ thống thực thi:
 
    - Nếu Khóa: Cập nhật `status = 'suspended'`, thu hồi toàn bộ Refresh Token đang hoạt động.
 
-   - Nếu Cấp lại mật khẩu: Sinh mật khẩu ngẫu nhiên mới, băm Bcrypt, bật cờ `must_change_password = true`, gửi email chứa mật khẩu mới đến hòm thư hội viên.
+   - Nếu Cấp lại mật khẩu: Sinh mật khẩu ngẫu nhiên mới, băm Bcrypt, bật cờ `must_change_password = true`, gửi email chứa mật khẩu mới đến hòm thư Học viên.
 
 Bước 5: Ghi nhận nhật ký vào `audit_logs`.
 
@@ -860,11 +860,11 @@ Bước E3: Trùng địa điểm với sự kiện khác đang hoạt động -
 | Mã Use Case | UC-CRM-EVT-02 |
 | Tên Chức Năng | Cấu Hình Đa Gói Vé E-Ticket (VIP, Tiêu Chuẩn, Khách Mời) |
 | Phân Hệ / Module | Phân hệ 2: Cổng Quản Trị Điều Hành Trung Tâm (Web CRM) |
-| Mục Tiêu Nghiệp Vụ | Thiết lập các loại vé mời khác nhau cho sự kiện: Vé VIP miễn phí cho Lãnh đạo, Vé đặc quyền hội viên, Vé khách mời có phụ thu. |
+| Mục Tiêu Nghiệp Vụ | Thiết lập các loại vé mời khác nhau cho sự kiện: Vé VIP miễn phí cho Lãnh đạo, Vé đặc quyền Học viên, Vé khách mời có phụ thu. |
 | Tác Nhân (Actors) | Ban Truyền Thông (BTT), Ban Tài Chính |
 | Tiền Điều Kiện (Pre-conditions) | Sự kiện đã được khởi tạo. |
 | Hậu Điều Kiện (Post-conditions) | Các gói vé sẵn sàng mở bán và đăng ký trên Mobile App. |
-| Quy Tắc Nghiệp Vụ (Business Rules) | Hội viên chính thức hoàn thành hội phí luôn được đăng ký vé VIP 0 VNĐ. |
+| Quy Tắc Nghiệp Vụ (Business Rules) | Học viên chính thức hoàn thành hội phí luôn được đăng ký vé VIP 0 VNĐ. |
 | Ánh Xạ Kỹ Thuật (Tech Mapping) | API: `POST /api/association/events/:id/ticket-types` | Table: `event_ticket_types` |
 
 
@@ -873,7 +873,7 @@ Bước E3: Trùng địa điểm với sự kiện khác đang hoạt động -
 
 | Trường Dữ Liệu | Kiểu Dữ Liệu | Bắt Buộc | Quy Tắc Kiểm Tra & Định Dạng (Validation) |
 | --- | --- | --- | --- |
-| ticketName | String | BẮT BUỘC | Tên gói vé (Vé VIP Đại Biểu / Vé Hội Viên / Vé Khách) |
+| ticketName | String | BẮT BUỘC | Tên gói vé (Vé VIP Đại Biểu / Vé Học viên / Vé Khách) |
 | price | Decimal | BẮT BUỘC | Giá vé (0 VNĐ hoặc 1.500.000 VNĐ) |
 | quantity | Integer | BẮT BUỘC | Số lượng vé tối đa phát hành |
 | description | String | Tùy chọn | Quyền lợi đính kèm gói vé |
@@ -886,7 +886,7 @@ Bước 1: Tại bước Cấu hình vé của Sự kiện, bấm 'Thêm Gói V�
 
 Bước 2: Cấu hình Gói 'Vé VIP Đại Biểu': Giá 0 VNĐ, số lượng 50 vé, dành cho Lãnh đạo Thành ủy, HanoiBA.
 
-Bước 3: Cấu hình Gói 'Vé Hội Viên Chính Thức': Giá 0 VNĐ, số lượng 350 vé, tự động nhận diện hội viên.
+Bước 3: Cấu hình Gói 'Vé Học viên Chính Thức': Giá 0 VNĐ, số lượng 350 vé, tự động nhận diện Học viên.
 
 Bước 4: Cấu hình Gói 'Vé Khách Mời Mở Rộng': Giá 1.500.000 VNĐ, số lượng 100 vé, có phụ thu tiệc tối.
 
@@ -929,9 +929,9 @@ Bước 2: Giao diện trực quan hiển thị Sân khấu chính (Main Stage) 
 
 Bước 3: Thêm các Cụm Bàn Tròn Gala VIP (Mỗi bàn 10 ghế): Bàn VIP 1 đến VIP 6 đặt sát sân khấu dành cho Lãnh đạo.
 
-Bước 4: Thêm các Cụm Bàn Hội viên (Bàn 7 đến Bàn 40) ở các khu vực kế tiếp.
+Bước 4: Thêm các Cụm Bàn Học viên (Bàn 7 đến Bàn 40) ở các khu vực kế tiếp.
 
-Bước 5: Kéo thả phân bổ tên đại biểu VIP vào các ghế định danh hoặc thiết lập chế độ hội viên tự chọn chỗ khi đăng ký vé.
+Bước 5: Kéo thả phân bổ tên đại biểu VIP vào các ghế định danh hoặc thiết lập chế độ Học viên tự chọn chỗ khi đăng ký vé.
 
 Bước 6: Nhấn nút 'Lưu Sơ Đồ Chỗ Ngồi'.
 
@@ -1117,7 +1117,7 @@ Bước E1: Phát hiện xung đột phòng họp vật lý (Sapphire Hub hoặc
 | Mục Tiêu Nghiệp Vụ | Điểm danh đại biểu có mặt tại cuộc họp bằng mã QR tự động thay đổi sau mỗi 30 giây, chống gian lận chụp ảnh gửi điểm danh hộ từ xa. |
 | Tác Nhân (Actors) | Ban Thư Ký (Hiển thị mã), Đại biểu tham dự (Quét mã) |
 | Tiền Điều Kiện (Pre-conditions) | Cuộc họp đang diễn ra (status = 'in_progress'). |
-| Hậu Điều Kiện (Post-conditions) | Dữ liệu chuyên cần được ghi nhận chính xác vào hồ sơ hội viên. |
+| Hậu Điều Kiện (Post-conditions) | Dữ liệu chuyên cần được ghi nhận chính xác vào hồ sơ Học viên. |
 | Quy Tắc Nghiệp Vụ (Business Rules) | Mã QR động có cơ chế bảo vệ chống gian lận điểm danh từ xa tuyệt đối. |
 | Ánh Xạ Kỹ Thuật (Tech Mapping) | Route: `/meetings/:id/attendance` | Algorithm: TOTP HMAC-SHA256 |
 
@@ -1286,10 +1286,10 @@ Bước 4: Ban Thư Ký kiểm tra kết quả và bấm nút 'Nghiệm Thu Hoà
 | Mã Use Case | UC-CRM-FIN-01 |
 | Tên Chức Năng | Quản Lý Công Nợ & Thu Hội Phí Thường Niên Mã QR Ngân Hàng Napas 24/7 |
 | Phân Hệ / Module | Phân hệ 2: Cổng Quản Trị Điều Hành Trung Tâm (Web CRM) |
-| Mục Tiêu Nghiệp Vụ | Hệ thống theo dõi công nợ hội phí thường niên (5.000.000 VNĐ/năm), tự động sinh mã QR ngân hàng động định danh cho từng hội viên. |
+| Mục Tiêu Nghiệp Vụ | Hệ thống theo dõi công nợ hội phí thường niên (5.000.000 VNĐ/năm), tự động sinh mã QR ngân hàng động định danh cho từng Học viên. |
 | Tác Nhân (Actors) | Ban Tài Chính, Thủ quỹ, Kế toán |
-| Tiền Điều Kiện (Pre-conditions) | Hội viên có thẻ hội viên sắp hết hạn hoặc trong kỳ thu hội phí thường niên. |
-| Hậu Điều Kiện (Post-conditions) | Thông báo nộp hội phí được phát hành đến toàn thể hội viên. |
+| Tiền Điều Kiện (Pre-conditions) | Học viên có thẻ Học viên sắp hết hạn hoặc trong kỳ thu hội phí thường niên. |
+| Hậu Điều Kiện (Post-conditions) | Thông báo nộp hội phí được phát hành đến toàn thể Học viên. |
 | Quy Tắc Nghiệp Vụ (Business Rules) | Mức hội phí thường niên ấn định là 5.000.000 VNĐ/năm. |
 | Ánh Xạ Kỹ Thuật (Tech Mapping) | Route: `/fees` | API: `GET /api/association/fees` | Table: `members` |
 
@@ -1299,7 +1299,7 @@ Bước 4: Ban Thư Ký kiểm tra kết quả và bấm nút 'Nghiệm Thu Hoà
 
 | Trường Dữ Liệu | Kiểu Dữ Liệu | Bắt Buộc | Quy Tắc Kiểm Tra & Định Dạng (Validation) |
 | --- | --- | --- | --- |
-| memberCode | String | BẮT BUỘC | Mã hội viên (HN10-xxxx) |
+| memberCode | String | BẮT BUỘC | Mã Học viên (HN10-xxxx) |
 | fiscalYear | Integer | BẮT BUỘC | Năm tài chính thu hội phí (VD: 2026) |
 
 
@@ -1308,11 +1308,11 @@ Bước 4: Ban Thư Ký kiểm tra kết quả và bấm nút 'Nghiệm Thu Hoà
 
 Bước 1: Kế toán mở màn hình 'Quản Lý Hội Phí' (/fees) trên CRM.
 
-Bước 2: Hệ thống liệt kê bảng công nợ: Hội viên đã đóng (Xanh lá) và Hội viên chưa đóng (Cam/Đỏ).
+Bước 2: Hệ thống liệt kê bảng công nợ: Học viên đã đóng (Xanh lá) và Học viên chưa đóng (Cam/Đỏ).
 
 Bước 3: Kế toán bấm 'Gửi Thông Báo Thu Hội Phí' hàng loạt.
 
-Bước 4: Hệ thống tự động tạo mã QR ngân hàng động chứa sẵn số tiền 5.000.000 VNĐ và cú pháp chuyển khoản gửi đến Mobile App của hội viên.
+Bước 4: Hệ thống tự động tạo mã QR ngân hàng động chứa sẵn số tiền 5.000.000 VNĐ và cú pháp chuyển khoản gửi đến Mobile App của Học viên.
 
 Bước 5: Theo dõi trạng thái nộp tiền thời gian thực trên bảng danh sách.
 
@@ -1326,7 +1326,7 @@ Bước 5: Theo dõi trạng thái nộp tiền thời gian thực trên bảng 
 | Mục Tiêu Nghiệp Vụ | Kế toán kiểm tra biến động số dư tài khoản ngân hàng thực tế và bấm duyệt gạch nợ trên CRM để gia hạn thẻ doanh nhân số +365 ngày. |
 | Tác Nhân (Actors) | Kế toán / Thủ quỹ CLB Doanh Nhân CEO HN10 |
 | Tiền Điều Kiện (Pre-conditions) | Có giao dịch chuyển khoản hội phí vào tài khoản ngân hàng của CLB. |
-| Hậu Điều Kiện (Post-conditions) | Hội viên được gạch nợ sạch sẽ, thẻ doanh nhân số kéo dài hiệu lực thêm 1 năm. |
+| Hậu Điều Kiện (Post-conditions) | Học viên được gạch nợ sạch sẽ, thẻ doanh nhân số kéo dài hiệu lực thêm 1 năm. |
 | Quy Tắc Nghiệp Vụ (Business Rules) | RULE-FEE-MÃ QR NGÂN HÀNG-AUTO-MATCH: Kế toán bắt buộc kiểm tra sao kê thực tế trước khi bấm duyệt. |
 | Ánh Xạ Kỹ Thuật (Tech Mapping) | Route: `/fees` | API: `POST /api/association/fees/:memberId/pay` | Tables: `members`, `invoices` |
 
@@ -1336,7 +1336,7 @@ Bước 5: Theo dõi trạng thái nộp tiền thời gian thực trên bảng 
 
 | Trường Dữ Liệu | Kiểu Dữ Liệu | Bắt Buộc | Quy Tắc Kiểm Tra & Định Dạng (Validation) |
 | --- | --- | --- | --- |
-| memberId | String | BẮT BUỘC | Mã hội viên được đối soát |
+| memberId | String | BẮT BUỘC | Mã Học viên được đối soát |
 | bankTransactionCode | String | Tùy chọn | Mã giao dịch ngân hàng / Ủy nhiệm chi |
 
 
@@ -1345,7 +1345,7 @@ Bước 5: Theo dõi trạng thái nộp tiền thời gian thực trên bảng 
 
 Bước 1: Kế toán kiểm tra sổ phụ hoặc tin nhắn biến động số dư tài khoản ngân hàng CLB.
 
-Bước 2: Tìm kiếm hội viên tương ứng theo Mã HV hoặc Họ tên trên màn hình Quản lý hội phí.
+Bước 2: Tìm kiếm Học viên tương ứng theo Mã HV hoặc Họ tên trên màn hình Quản lý hội phí.
 
 Bước 3: Khớp đúng số tiền 5.000.000 VNĐ và nội dung chuyển khoản.
 
@@ -1359,7 +1359,7 @@ Bước 5: Hệ thống thực hiện chuỗi cập nhật:
 
    - Sinh bản ghi hóa đơn thu tiền trong bảng `invoices`.
 
-Bước 6: Gửi hóa đơn điện tử và thông báo xác nhận đã hoàn thành nghĩa vụ tài chính đến Mobile App của hội viên.
+Bước 6: Gửi hóa đơn điện tử và thông báo xác nhận đã hoàn thành nghĩa vụ tài chính đến Mobile App của Học viên.
 
 #### Luồng Ngoại Lệ & Xử Lý Lỗi (Exception Flows)
 
@@ -1423,7 +1423,7 @@ Bước E1: Số tiền chi vượt quá số dư khả dụng của quỹ -> H�
 | Mã Use Case | UC-CRM-FIN-04 |
 | Tên Chức Năng | Quản Lý Quỹ An Sinh Xã Hội & Thiện Nguyện (Sao Kê Minh Bạch Realtime) |
 | Phân Hệ / Module | Phân hệ 2: Cổng Quản Trị Điều Hành Trung Tâm (Web CRM) |
-| Mục Tiêu Nghiệp Vụ | Quản trị nguồn quỹ an sinh xã hội chuyên biệt, tự động cập nhật và công khai sao kê tài chính thời gian thực cho toàn thể hội viên. |
+| Mục Tiêu Nghiệp Vụ | Quản trị nguồn quỹ an sinh xã hội chuyên biệt, tự động cập nhật và công khai sao kê tài chính thời gian thực cho toàn thể Học viên. |
 | Tác Nhân (Actors) | Ban Thiện Nguyện (BTN), Ban Tài Chính |
 | Tiền Điều Kiện (Pre-conditions) | Có chương trình phát động thiện nguyện hoặc giải ngân cứu trợ. |
 | Hậu Điều Kiện (Post-conditions) | Minh bạch 100% tài chính quỹ thiện nguyện, nâng cao uy tín xã hội của HanoiBA. |
@@ -1447,11 +1447,11 @@ Bước 1: Ban Thiện Nguyện tạo chiến dịch thiện nguyện mới trê
 
 Bước 2: Thiết lập mục tiêu kinh phí và thông tin tài khoản chuyên dụng.
 
-Bước 3: Khi có hội viên ủng hộ, thủ quỹ đối soát và cập nhật vào sổ thu thiện nguyện.
+Bước 3: Khi có Học viên ủng hộ, thủ quỹ đối soát và cập nhật vào sổ thu thiện nguyện.
 
 Bước 4: Khi giải ngân, thực hiện quy trình chi tiêu 3 cấp [UC-CRM-FIN-03].
 
-Bước 5: Toàn bộ bảng sao kê thu chi tự động đồng bộ sang màn hình Thiện nguyện trên Mobile App để toàn thể hội viên cùng giám sát.
+Bước 5: Toàn bộ bảng sao kê thu chi tự động đồng bộ sang màn hình Thiện nguyện trên Mobile App để toàn thể Học viên cùng giám sát.
 
 ### [UC-CRM-B2B-01] Kiểm Duyệt Sản Phẩm Sàn B2B Có Trợ Giá Nội Bộ (Ban Xúc Tiến BXT)
 
@@ -1462,7 +1462,7 @@ Bước 5: Toàn bộ bảng sao kê thu chi tự động đồng bộ sang màn
 | Phân Hệ / Module | Phân hệ 2: Cổng Quản Trị Điều Hành Trung Tâm (Web CRM) |
 | Mục Tiêu Nghiệp Vụ | Ban Xúc Tiến Thương Mại kiểm định chất lượng sản phẩm và chính sách trợ giá nội bộ (>= 5%) trước khi cho phép hiển thị trên Sàn B2B. |
 | Tác Nhân (Actors) | Trưởng Ban Xúc Tiến Thương Mại (ceo.xuctien@ceohn10.com) |
-| Tiền Điều Kiện (Pre-conditions) | Có sản phẩm do hội viên gửi lên ở trạng thái `pending_review`. |
+| Tiền Điều Kiện (Pre-conditions) | Có sản phẩm do Học viên gửi lên ở trạng thái `pending_review`. |
 | Hậu Điều Kiện (Post-conditions) | Sản phẩm được bảo chứng chất lượng bởi Ban Xúc Tiến hiệp hội. |
 | Quy Tắc Nghiệp Vụ (Business Rules) | RULE-B2B-INTERNAL-DISCOUNT: Bắt buộc mức chiết khấu trợ giá nội bộ >= 5%. |
 | Ánh Xạ Kỹ Thuật (Tech Mapping) | API: `PUT /api/association/products/:id/review` | Table: `products` |
@@ -1485,7 +1485,7 @@ Bước 1: Cán bộ BXT mở màn hình 'Kiểm Duyệt Sàn B2B' trên Web CRM
 
 Bước 2: Xem chi tiết sản phẩm: Ảnh, Mô tả kỹ thuật, Giá thị trường và Mức chiết khấu trợ giá nội bộ.
 
-Bước 3: Xác minh tỷ lệ trợ giá: Bắt buộc từ 5% trở lên dành riêng cho hội viên CEO HN10.
+Bước 3: Xác minh tỷ lệ trợ giá: Bắt buộc từ 5% trở lên dành riêng cho Học viên CEO HN10.
 
 Bước 4: Bấm nút 'Phê Duyệt Niêm Yết'.
 
@@ -1528,7 +1528,7 @@ Bước 2: Nhận diện các nhu cầu lớn, kết nối trực tiếp lãnh �
 
 Bước 3: Khi hai bên ký kết hợp đồng, BXT ghi nhận doanh số giao thương vào bảng tổng kết.
 
-Bước 4: Điểm thành tích giao thương được cộng vào hồ sơ 360 độ của cả 2 hội viên.
+Bước 4: Điểm thành tích giao thương được cộng vào hồ sơ 360 độ của cả 2 Học viên.
 
 ### [UC-CRM-SEC-01] Quản Trị Ma Trận Phân Quyền Vai Trò RBAC (Nhóm Menu Độc Lập & URL Sync)
 
@@ -1541,7 +1541,7 @@ Bước 4: Điểm thành tích giao thương được cộng vào hồ sơ 360 
 | Tác Nhân (Actors) | Ban Quản Trị tối cao (quan_tri) |
 | Tiền Điều Kiện (Pre-conditions) | Đăng nhập bằng tài khoản Superadmin (admin@connect.vn). |
 | Hậu Điều Kiện (Post-conditions) | Ma trận phân quyền mới có hiệu lực ngay lập tức trên toàn bộ Web CRM và Mobile App mà không cần người dùng đăng xuất. |
-| Quy Tắc Nghiệp Vụ (Business Rules) | RULE-RBAC-DEDICATED-MENU-GROUP: Nhóm menu độc lập 'PHÂN QUYỀN'; RULE-AUTH-BTV-EXCLUSIVE: Độc quyền duyệt hội viên của BTV. |
+| Quy Tắc Nghiệp Vụ (Business Rules) | RULE-RBAC-DEDICATED-MENU-GROUP: Nhóm menu độc lập 'PHÂN QUYỀN'; RULE-AUTH-BTV-EXCLUSIVE: Độc quyền duyệt Học viên của BTV. |
 | Ánh Xạ Kỹ Thuật (Tech Mapping) | Route: `/permissions` | Nav Group: `nav.group.permissions` | Component: `permissions.tsx`, `Sidebar.tsx` |
 
 
@@ -1575,7 +1575,7 @@ Bước 4: Tại Tab Ma Trận, Superadmin tích chọn hoặc hủy chọn các
 
 Bước 5: Bấm nút 'Lưu Ma Trận Phân Quyền'.
 
-Bước 6: Hệ thống kiểm tra tính toàn vẹn (Không cho phép tước quyền quản trị của chính vai trò quan_tri, chặn cứng quyền duyệt hội viên của Ban Thư Ký).
+Bước 6: Hệ thống kiểm tra tính toàn vẹn (Không cho phép tước quyền quản trị của chính vai trò quan_tri, chặn cứng quyền duyệt Học viên của Ban Thư Ký).
 
 Bước 7: Cập nhật các bản ghi trong bảng `role_permissions` và làm mới bộ đệm phân quyền (Permission Cache) tức thời.
 
@@ -1591,7 +1591,7 @@ Bước A2: Quản trị viên truy cập từ đường dẫn cũ `/settings/ro
 
 Bước E1: Cố tình tước quyền truy cập module Phân quyền của vai trò quan_tri -> Hệ thống chặn và báo lỗi an toàn: 'Không thể tước quyền quản trị tối cao của Superadmin'.
 
-Bước E2: Cố tình cấp quyền duyệt hội viên cho Ban Thư Ký -> Hệ thống từ chối theo RULE-AUTH-BTV-EXCLUSIVE.
+Bước E2: Cố tình cấp quyền duyệt Học viên cho Ban Thư Ký -> Hệ thống từ chối theo RULE-AUTH-BTV-EXCLUSIVE.
 
 ### [UC-CRM-SEC-02] Nhật Ký Kiểm Toán Hoạt Động Hệ Thống (Audit Logs Bất Biến)
 
@@ -1637,14 +1637,14 @@ Bước 5: Bản ghi kiểm toán được khóa chống chỉnh sửa, chỉ ch
 
 Bước E1: Lỗi ghi log không được làm gián đoạn giao dịch chính nhưng phải kích hoạt cảnh báo giám sát hệ thống.
 
-### [UC-CRM-AI-01] Trợ Lý AI Điều Hành & Dẫn Đường Thao Tác Quản Trị CRM (Sự Kiện, Duyệt Hội Viên, Kế Toán, Giao Việc, Phân Quyền)
+### [UC-CRM-AI-01] Trợ Lý AI Điều Hành & Dẫn Đường Thao Tác Quản Trị CRM (Sự Kiện, Duyệt Học viên, Kế Toán, Giao Việc, Phân Quyền)
 
 | Thuộc Tính | Đặc Tả Kỹ Thuật Chi Tiết |
 | --- | --- |
 | Mã Use Case | UC-CRM-AI-01 |
-| Tên Chức Năng | Trợ Lý AI Điều Hành & Dẫn Đường Thao Tác Quản Trị CRM (Sự Kiện, Duyệt Hội Viên, Kế Toán, Giao Việc, Phân Quyền) |
+| Tên Chức Năng | Trợ Lý AI Điều Hành & Dẫn Đường Thao Tác Quản Trị CRM (Sự Kiện, Duyệt Học viên, Kế Toán, Giao Việc, Phân Quyền) |
 | Phân Hệ / Module | Phân hệ 2: Cổng Quản Trị Điều Hành Trung Tâm (Web CRM) |
-| Mục Tiêu Nghiệp Vụ | Hỗ trợ cán bộ quản trị CRM hướng dẫn và dẫn đường trực tiếp các nghiệp vụ điều hành phức tạp: Tạo sự kiện mới, thẩm định duyệt hội viên, quản trị tài chính hội phí, giao việc bảng Kanban, phân quyền RBAC và quản lý nhà tài trợ. |
+| Mục Tiêu Nghiệp Vụ | Hỗ trợ cán bộ quản trị CRM hướng dẫn và dẫn đường trực tiếp các nghiệp vụ điều hành phức tạp: Tạo sự kiện mới, thẩm định duyệt Học viên, quản trị tài chính hội phí, giao việc bảng Kanban, phân quyền RBAC và quản lý nhà tài trợ. |
 | Tác Nhân (Actors) | Ban Quản Trị, Ban Thư Ký, Ban Thành Viên, Ban Tài Chính, Ban Sự Kiện |
 | Tiền Điều Kiện (Pre-conditions) | Cán bộ quản trị đã đăng nhập Cổng Web CRM (`/events`, `/members`, `/fees`, `/tasks`, `/permissions`, `/sponsors`, `/documents`). |
 | Hậu Điều Kiện (Post-conditions) | Cán bộ các ban thực hiện tác nghiệp quản trị chính xác 100%, tuân thủ đúng phân định thẩm quyền và quy chế hiệp hội. |
@@ -1663,7 +1663,7 @@ Bước E1: Lỗi ghi log không được làm gián đoạn giao dịch chính 
 
 #### Luồng Sự Kiện Chính (Step-by-step Main Flow)
 
-Bước 1: Cán bộ quản lý hỏi trợ lý AI về thao tác CRM (Ví dụ: 'Tạo sự kiện mới cho Ban Tổ Chức kiểu gì', 'Duyệt hồ sơ kết nạp hội viên ở đâu', 'Giao việc cho ban chuyên môn như nào').
+Bước 1: Cán bộ quản lý hỏi trợ lý AI về thao tác CRM (Ví dụ: 'Tạo sự kiện mới cho Ban Tổ Chức kiểu gì', 'Duyệt hồ sơ kết nạp Học viên ở đâu', 'Giao việc cho ban chuyên môn như nào').
 
 Bước 2: AI phân tích và trình bày các bước tác nghiệp chuẩn theo Quy chế hoạt động của Hiệp hội HanoiBA.
 
@@ -1699,7 +1699,7 @@ Bước E1: Tài khoản không đủ quyền hạn RBAC đối với tính năn
 
 3. Tự động khóa tài khoản tạm thời trong 15 phút nếu nhập sai mật khẩu quá 5 lần.
 
-4. Phân quyền theo vai trò RBAC 5 cấp bậc nghiêm ngặt kết hợp chặn cứng quyền duyệt hội viên của Ban Thư Ký.
+4. Phân quyền theo vai trò RBAC 5 cấp bậc nghiêm ngặt kết hợp chặn cứng quyền duyệt Học viên của Ban Thư Ký.
 
 ### Độ Tin Cậy & Tính Sẵn Sàng (Reliability & High Availability)
 
@@ -1719,7 +1719,7 @@ Bước E1: Tài khoản không đủ quyền hạn RBAC đối với tính năn
   - Chip NFC tần số 13.56MHz tương thích chuẩn ISO/IEC 14443 Type A.
   - Chạm mặt sau thẻ vào smartphone để mở liên kết công khai `/card/:slug`.
 * Kiến Trúc Cơ Sở Dữ Liệu PostgreSQL (Prisma ORM):
-  - Bảng hội viên: `members` (liên kết `vione_users` qua `user_id`).
+  - Bảng Học viên: `members` (liên kết `vione_users` qua `user_id`).
   - Bảng danh thiếp số: `member_business_cards` (chứa slug, branding, liên kết mạng xã hội).
   - Bảng sự kiện: `events`, `event_ticket_types`, `event_registrations`, `member_checkins`.
   - Bảng tài chính & hội phí: `invoices`, `associations`.

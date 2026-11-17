@@ -24,12 +24,12 @@ export const Route = createFileRoute("/platform/renewal-audit")({
       {
         name: "description",
         content:
-          "Tra cứu toàn bộ lần thanh toán gia hạn hội viên theo hội viên hoặc hiệp hội, kèm trạng thái thanh toán, bấm lặp và thất bại.",
+          "Tra cứu toàn bộ lần thanh toán gia hạn Học viên theo Học viên hoặc hiệp hội, kèm trạng thái thanh toán, bấm lặp và thất bại.",
       },
       { property: "og:title", content: "Tra cứu nhật ký gia hạn" },
       {
         property: "og:description",
-        content: "Lịch sử tất cả lần thanh toán gia hạn theo hội viên và hiệp hội.",
+        content: "Lịch sử tất cả lần thanh toán gia hạn theo Học viên và hiệp hội.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -71,14 +71,14 @@ function RenewalAuditAdminPage() {
     () =>
       allowed
         ? (search({
-            data: {
-              associationId: associationId || null,
-              search: needle || null,
-              eventType: eventType || null,
-              from: from || null,
-              to: to || null,
-            },
-          }) as Promise<AdminRenewalAuditRow[]>)
+          data: {
+            associationId: associationId || null,
+            search: needle || null,
+            eventType: eventType || null,
+            from: from || null,
+            to: to || null,
+          },
+        }) as Promise<AdminRenewalAuditRow[]>)
         : Promise.resolve(EMPTY_ROWS),
     EMPTY_ROWS,
   );

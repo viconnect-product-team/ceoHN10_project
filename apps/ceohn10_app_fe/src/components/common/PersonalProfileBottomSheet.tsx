@@ -174,12 +174,12 @@ export function PersonalProfileBottomSheet({
 
   const initials = profile.displayName
     ? profile.displayName
-        .trim()
-        .split(/\s+/)
-        .map((w) => w[0])
-        .slice(-2)
-        .join("")
-        .toUpperCase()
+      .trim()
+      .split(/\s+/)
+      .map((w) => w[0])
+      .slice(-2)
+      .join("")
+      .toUpperCase()
     : "CEO";
 
   const resolvedAvatar = profile.avatarUrl
@@ -204,7 +204,7 @@ export function PersonalProfileBottomSheet({
       try {
         await navigator.share({
           title: `${profile.displayName} — Danh thiếp số CLB Doanh Nhân CEO HN10`,
-          text: `${profile.displayName} • ${profile.jobTitle || "Hội viên"} tại ${profile.companyName || "CLB CEO HN10"}`,
+          text: `${profile.displayName} • ${profile.jobTitle || "Học viên"} tại ${profile.companyName || "CLB CEO HN10"}`,
           url,
         });
         return;
@@ -235,18 +235,16 @@ export function PersonalProfileBottomSheet({
     <div
       role="dialog"
       aria-modal="true"
-      className={`fixed inset-0 z-[9999] flex items-end justify-center bg-black/60 backdrop-blur-sm p-0 overflow-hidden transition-opacity duration-200 ${
-        isClosing ? "opacity-0 pointer-events-none" : "opacity-100 animate-in fade-in"
-      }`}
+      className={`fixed inset-0 z-[9999] flex items-end justify-center bg-black/60 backdrop-blur-sm p-0 overflow-hidden transition-opacity duration-200 ${isClosing ? "opacity-0 pointer-events-none" : "opacity-100 animate-in fade-in"
+        }`}
       onClick={onClose}
     >
       <div
         ref={sheetRef}
-        className={`relative w-full max-w-lg max-h-[88vh] h-[82vh] flex flex-col rounded-t-[28px] border-t border-slate-200/80 dark:border-slate-800 bg-white dark:bg-[#0A1224] text-slate-900 dark:text-white shadow-2xl overflow-hidden pb-[calc(max(env(safe-area-inset-bottom,0px),16px)+16px)] ${
-          isDragging
+        className={`relative w-full max-w-lg max-h-[88vh] h-[82vh] flex flex-col rounded-t-[28px] border-t border-slate-200/80 dark:border-slate-800 bg-white dark:bg-[#0A1224] text-slate-900 dark:text-white shadow-2xl overflow-hidden pb-[calc(max(env(safe-area-inset-bottom,0px),16px)+16px)] ${isDragging
             ? "transition-none"
             : "transition-transform duration-250 ease-[cubic-bezier(0.32,0.72,0,1)]"
-        } animate-in slide-in-from-bottom`}
+          } animate-in slide-in-from-bottom`}
         style={{
           transform: dragY > 0 ? `translateY(${dragY}px)` : undefined,
         }}
@@ -298,7 +296,7 @@ export function PersonalProfileBottomSheet({
             {/* Huy hiệu thành viên góc bìa */}
             <div className="absolute top-2 left-3 flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-white/20 backdrop-blur-md border border-white/30 text-white text-[10px] font-bold shadow-xs">
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              <span>{profile.memberCode || "HỘI VIÊN CHÍNH THỨC"}</span>
+              <span>{profile.memberCode || "Học viên CHÍNH THỨC"}</span>
             </div>
           </div>
 
@@ -463,7 +461,7 @@ export function PersonalProfileBottomSheet({
                 <div className="flex items-center gap-3">
                   <div className="h-9 w-9 rounded-xl bg-[#1877F2] text-white grid place-items-center shadow-sm">
                     <svg className="h-5 w-5 fill-current" viewBox="0 0 24 24">
-                      <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                      <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
                     </svg>
                   </div>
                   <div>
@@ -482,7 +480,7 @@ export function PersonalProfileBottomSheet({
                 <div className="flex items-center gap-3">
                   <div className="h-9 w-9 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-400 grid place-items-center">
                     <svg className="h-5 w-5 fill-current" viewBox="0 0 24 24">
-                      <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                      <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
                     </svg>
                   </div>
                   <span>Chưa cập nhật liên kết Facebook</span>
@@ -510,7 +508,7 @@ export function PersonalProfileBottomSheet({
                 <div className="flex items-center gap-3">
                   <div className="h-9 w-9 rounded-xl bg-[#0A66C2] text-white grid place-items-center shadow-sm">
                     <svg className="h-5 w-5 fill-current" viewBox="0 0 24 24">
-                      <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+                      <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
                     </svg>
                   </div>
                   <div>
@@ -529,7 +527,7 @@ export function PersonalProfileBottomSheet({
                 <div className="flex items-center gap-3">
                   <div className="h-9 w-9 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-400 grid place-items-center">
                     <svg className="h-5 w-5 fill-current" viewBox="0 0 24 24">
-                      <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+                      <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
                     </svg>
                   </div>
                   <span>Chưa cập nhật LinkedIn</span>

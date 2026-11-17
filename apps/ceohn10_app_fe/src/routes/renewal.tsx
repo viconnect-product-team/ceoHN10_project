@@ -45,13 +45,13 @@ export const Route = createFileRoute("/renewal")({
       if (Array.isArray(clientRes) && clientRes.length > 0) {
         return clientRes.filter(isApprovedMember).map((r) => toRecord(r as Row));
       }
-    } catch {}
+    } catch { }
     try {
       const serverRes = await listRenewalsFn().catch(() => []);
       if (Array.isArray(serverRes) && serverRes.length > 0) {
         return serverRes.map((r: any) => (r.member ? r : toRecord(r as Row)));
       }
-    } catch {}
+    } catch { }
     return [];
   },
   component: RenewalPage,
@@ -216,7 +216,7 @@ function RenewalPage() {
         if (Array.isArray(serverRes) && serverRes.length > 0) {
           return serverRes.map((r: any) => (r.member ? r : toRecord(r as Row)));
         }
-      } catch {}
+      } catch { }
       return loaderRecords;
     },
     placeholderData: loaderRecords,
@@ -361,16 +361,16 @@ function RenewalPage() {
 
   const handleExport = () => {
     exportToExcel<RenewalRecord>({
-      title: "BÁO CÁO THEO DÕI GIA HẠN TƯ CÁCH HỘI VIÊN THƯỜNG NIÊN",
+      title: "BÁO CÁO THEO DÕI GIA HẠN TƯ CÁCH Học viên THƯỜNG NIÊN",
       subtitle: "Hiệp Hội Doanh Nhân CEO HN10 - HanoiBA",
       filename: "theo-doi-gia-han-hoi-vien",
       sheetName: "Theo_Doi_Gia_Han",
       data: filtered,
       columns: [
-        { header: "Mã hội viên", key: "code", width: 16, value: (r) => r.member.code },
-        { header: "Họ và tên hội viên", key: "name", width: 28, value: (r) => r.member.name },
+        { header: "Mã Học viên", key: "code", width: 16, value: (r) => r.member.code },
+        { header: "Họ và tên Học viên", key: "name", width: 28, value: (r) => r.member.name },
         { header: "Email liên hệ", key: "email", width: 26, value: (r) => r.member.email },
-        { header: "Hạng hội viên", key: "level", width: 18, value: (r) => r.member.level },
+        { header: "Hạng Học viên", key: "level", width: 18, value: (r) => r.member.level },
         { header: "Hạn nhiệm kỳ hiện tại", key: "currentTermEnd", width: 20, value: (r) => formatDisplayDate(r.currentTermEnd) },
         { header: "Số ngày còn lại", key: "daysLeft", width: 16, value: (r) => (r.daysLeft < 0 ? `Quá hạn ${Math.abs(r.daysLeft)} ngày` : `${r.daysLeft} ngày`) },
         { header: "Trạng thái gia hạn", key: "status", width: 18, value: (r) => (r.status === "renewed" ? "Đã gia hạn" : r.status === "overdue" ? "Quá hạn" : r.status === "due" ? "Đến hạn" : "Sắp tới") },
@@ -381,11 +381,11 @@ function RenewalPage() {
         { header: "Hạn nhiệm kỳ mới", key: "newTermEnd", width: 18, value: (r) => formatDisplayDate(r.newTermEnd) },
       ],
       summaryRows: [
-        ["TỔNG SỐ HỒ SƠ THEO DÕI:", "", "", "", "", "", "", "", "", "", "", `${filtered.length} hội viên`],
+        ["TỔNG SỐ HỒ SƠ THEO DÕI:", "", "", "", "", "", "", "", "", "", "", `${filtered.length} Học viên`],
       ],
-      signerTitles: ["NGƯỜI LẬP BIỂU", "TRƯỞNG BAN HỘI VIÊN", "CHỦ TỊCH CLB CEO HN10"],
+      signerTitles: ["NGƯỜI LẬP BIỂU", "TRƯỞNG BAN Học viên", "CHỦ TỊCH CLB CEO HN10"],
     });
-    toast.success("Đã xuất báo cáo gia hạn hội viên chuẩn doanh nghiệp CEO HN10 (.xlsx)!");
+    toast.success("Đã xuất báo cáo gia hạn Học viên chuẩn doanh nghiệp CEO HN10 (.xlsx)!");
   };
 
   const counts: Record<RenewalStatus | "all", number> = {
@@ -490,11 +490,10 @@ function RenewalPage() {
             <button
               key={tb.key}
               onClick={() => setTab(tb.key)}
-              className={`rounded-md px-3 py-1.5 transition ${
-                tab === tb.key
+              className={`rounded-md px-3 py-1.5 transition ${tab === tb.key
                   ? "bg-secondary text-foreground"
                   : "text-muted-foreground hover:text-foreground"
-              }`}
+                }`}
             >
               {t(tb.label)}
               <span className="ml-1.5 rounded bg-background/60 px-1.5 py-0.5 text-[10px] text-muted-foreground">
@@ -633,7 +632,7 @@ function RenewalPage() {
                       </div>
                       <div className="min-w-0">
                         <div className="truncate font-semibold text-foreground">
-                          {r.member?.name || "Hội viên"}
+                          {r.member?.name || "Học viên"}
                         </div>
                         <div className="truncate text-[11px] text-muted-foreground">
                           {r.member?.email || r.member?.phone || "—"}

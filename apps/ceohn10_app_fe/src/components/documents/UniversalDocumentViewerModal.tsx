@@ -176,7 +176,7 @@ export function UniversalDocumentViewerModal({
                   if (zipWorkbook && zipWorkbook.SheetNames.length > 0) {
                     // In some environments, zip can be read
                   }
-                } catch {}
+                } catch { }
 
                 // Text decode fallback
                 const decoder = new TextDecoder("utf-8", { fatal: false });
@@ -192,7 +192,7 @@ export function UniversalDocumentViewerModal({
                   extractedText = paragraphs;
                 }
               }
-            } catch {}
+            } catch { }
           }
 
           if (!extractedText) {
@@ -214,7 +214,7 @@ export function UniversalDocumentViewerModal({
             try {
               const res = await fetch(fileUrl);
               if (res.ok) text = await res.text();
-            } catch {}
+            } catch { }
           }
           if (!text) text = `Tài liệu: ${docName}\nPhân loại: ${docCategory}\nNgười tải: ${docUploadedBy}\nThời gian: ${docUploadedAt}`;
           if (isCancelled) return;
@@ -306,9 +306,8 @@ export function UniversalDocumentViewerModal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-md p-2 sm:p-4 animate-in fade-in duration-200">
       <div
-        className={`bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 flex flex-col overflow-hidden transition-all duration-300 ${
-          isFullscreen ? "w-full h-full rounded-none" : "w-full max-w-6xl h-[90vh] max-h-[920px]"
-        }`}
+        className={`bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 flex flex-col overflow-hidden transition-all duration-300 ${isFullscreen ? "w-full h-full rounded-none" : "w-full max-w-6xl h-[90vh] max-h-[920px]"
+          }`}
       >
         {/* ── TOP HEADER ── */}
         <div className="flex items-center justify-between px-4 sm:px-6 py-3.5 border-b border-slate-200 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-900/80">
@@ -422,33 +421,30 @@ export function UniversalDocumentViewerModal({
                 <button
                   type="button"
                   onClick={() => setWordViewerMode("native")}
-                  className={`px-2.5 py-1 rounded-md font-bold transition ${
-                    wordViewerMode === "native"
-                      ? "bg-[#003B95] text-white shadow-xs"
+                  className={`px-2.5 py-1 rounded-md font-bold transition ${wordViewerMode === "native"
+                      ? "bg-[#334155] text-white shadow-xs"
                       : "text-slate-600 dark:text-slate-400 hover:text-slate-900"
-                  }`}
+                    }`}
                 >
                   Văn bản số (Native)
                 </button>
                 <button
                   type="button"
                   onClick={() => setWordViewerMode("office")}
-                  className={`px-2.5 py-1 rounded-md font-bold transition ${
-                    wordViewerMode === "office"
-                      ? "bg-[#003B95] text-white shadow-xs"
+                  className={`px-2.5 py-1 rounded-md font-bold transition ${wordViewerMode === "office"
+                      ? "bg-[#334155] text-white shadow-xs"
                       : "text-slate-600 dark:text-slate-400 hover:text-slate-900"
-                  }`}
+                    }`}
                 >
                   Office Online
                 </button>
                 <button
                   type="button"
                   onClick={() => setWordViewerMode("google")}
-                  className={`px-2.5 py-1 rounded-md font-bold transition ${
-                    wordViewerMode === "google"
-                      ? "bg-[#003B95] text-white shadow-xs"
+                  className={`px-2.5 py-1 rounded-md font-bold transition ${wordViewerMode === "google"
+                      ? "bg-[#334155] text-white shadow-xs"
                       : "text-slate-600 dark:text-slate-400 hover:text-slate-900"
-                  }`}
+                    }`}
                 >
                   Google Docs
                 </button>
@@ -463,11 +459,10 @@ export function UniversalDocumentViewerModal({
                     key={sheet.name}
                     type="button"
                     onClick={() => setActiveSheetIdx(idx)}
-                    className={`px-3 py-1 rounded-lg text-xs font-bold whitespace-nowrap transition cursor-pointer flex items-center gap-1.5 ${
-                      activeSheetIdx === idx
+                    className={`px-3 py-1 rounded-lg text-xs font-bold whitespace-nowrap transition cursor-pointer flex items-center gap-1.5 ${activeSheetIdx === idx
                         ? "bg-emerald-600 text-white shadow-xs"
                         : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200"
-                    }`}
+                      }`}
                   >
                     <TableIcon className="size-3" />
                     <span>{sheet.name}</span>
@@ -570,11 +565,10 @@ export function UniversalDocumentViewerModal({
                       return (
                         <tr
                           key={rIdx}
-                          className={`transition ${
-                            isHeaderRow
+                          className={`transition ${isHeaderRow
                               ? "bg-slate-50 dark:bg-slate-800/80 font-bold text-slate-900 dark:text-white"
                               : "hover:bg-blue-50/40 dark:hover:bg-blue-950/20 text-slate-700 dark:text-slate-300"
-                          }`}
+                            }`}
                         >
                           <td className="px-2 py-2 text-center text-slate-400 font-semibold border-r border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/40 select-none">
                             {rIdx + 1}
@@ -731,7 +725,7 @@ export function UniversalDocumentViewerModal({
 function generateFallbackWorkbook(name: string): XLSX.WorkBook {
   const wb = XLSX.utils.book_new();
   const sampleData = [
-    ["MÃ SỐ", "HỌ VÀ TÊN HỘI VIÊN", "DOANH NGHIỆP", "CHỨC VỤ", "NGÀNH NGHỀ", "SỐ ĐIỆN THOẠI", "TRẠNG THÁI GIAO THƯƠNG"],
+    ["MÃ SỐ", "HỌ VÀ TÊN Học viên", "DOANH NGHIỆP", "CHỨC VỤ", "NGÀNH NGHỀ", "SỐ ĐIỆN THOẠI", "TRẠNG THÁI GIAO THƯƠNG"],
     ["HN10-001", "Phạm Văn Vũ", "Công Ty Cổ Phần Công Nghệ ViConnect", "Tổng Giám Đốc", "Công nghệ thông tin & CĐS", "0983101010", "Hoạt động tích cực"],
     ["HN10-002", "Nguyễn Văn Hùng", "Hùng Vương Group", "Chủ Tịch HĐQT", "Xây dựng & Bất động sản", "0912345678", "Đã chốt 2 thương vụ"],
     ["HN10-003", "Trần Hải Nam", "Nam Hải Logistics", "Giám Đốc Điều Hành", "Vận tải & Kho bãi", "0908765432", "Đang kết nối B2B"],
@@ -739,7 +733,7 @@ function generateFallbackWorkbook(name: string): XLSX.WorkBook {
     ["HN10-005", "Đỗ Minh Thành", "Green Farm Tech", "Giám Đốc Dự Án", "Nông nghiệp công nghệ cao", "0977889900", "Đã ký biên bản ghi nhớ"],
   ];
   const ws1 = XLSX.utils.aoa_to_sheet(sampleData);
-  XLSX.utils.book_append_sheet(wb, ws1, "Danh Sách Hội Viên");
+  XLSX.utils.book_append_sheet(wb, ws1, "Danh Sách Học viên");
 
   const financialData = [
     ["KỲ BÁO CÁO", "DOANH SỐ GIAO THƯƠNG (VNĐ)", "SỐ LƯỢT KẾT NỐI", "CUỘC HẸN 1-1 B2B", "CƠ HỘI ĐÃ CHỐT"],
@@ -754,5 +748,5 @@ function generateFallbackWorkbook(name: string): XLSX.WorkBook {
 }
 
 function generateFallbackDocxText(name: string): string {
-  return `CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM\nĐộc lập - Tự do - Hạnh phúc\n\nCLB DOANH NHÂN CEO HN10 (HANOIBA)\nSố: 1983/QĐ-BĐH-2026\n\nQUY CHẾ HOẠT ĐỘNG VÀ ĐIỀU LỆ GIAO THƯƠNG B2B\n\nĐiều 1: Mục đích và Tôn chỉ hoạt động\nCâu Lạc Bộ Doanh Nhân CEO HN10 trực thuộc Hội Doanh Nghiệp Trẻ Hà Nội (HanoiBA) là tổ chức liên kết các doanh nhân, chủ doanh nghiệp CEO Hà Nội 10 nhằm mục tiêu tăng cường hợp tác kinh doanh, chia sẻ cơ hội giao thương B2B, hỗ trợ đào tạo quản trị và xúc tiến thương mại đa phương diện.\n\nĐiều 2: Tiêu chuẩn và Quyền lợi của Hội viên chính thức\n1. Hội viên được cấp thẻ danh thiếp điện tử thông minh CEO HN10 tích hợp mã QR cá nhân hóa.\n2. Được ưu tiên tham gia các phiên kết nối giao thương 1-on-1 hàng tuần và diễn đàn CEO định kỳ.\n3. Được đăng tải tối đa 5 sản phẩm/dịch vụ tiêu biểu lên sàn thương mại nội bộ CLB.\n4. Được vinh danh và nhận các gói tài trợ truyền thông số từ Ban Điều Hành.\n\nĐiều 3: Nghĩa vụ tài chính và niên liễm\nMỗi hội viên có nghĩa vụ đóng hội phí niên liễm đầy đủ theo quy định của Ban Tài chính và tham gia tối thiểu 70% các kỳ sinh hoạt chính thức của Câu Lạc Bộ.\n\nTM. BAN ĐIỀU HÀNH CLB DOANH NHÂN CEO HN10\nCHỦ TỊCH HỘI ĐỒNG\n(Đã ký và đóng dấu điện tử)`;
+  return `CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM\nĐộc lập - Tự do - Hạnh phúc\n\nCLB DOANH NHÂN CEO HN10 (HANOIBA)\nSố: 1983/QĐ-BĐH-2026\n\nQUY CHẾ HOẠT ĐỘNG VÀ ĐIỀU LỆ GIAO THƯƠNG B2B\n\nĐiều 1: Mục đích và Tôn chỉ hoạt động\nCâu Lạc Bộ Doanh Nhân CEO HN10 trực thuộc Hội Doanh Nghiệp Trẻ Hà Nội (HanoiBA) là tổ chức liên kết các doanh nhân, chủ doanh nghiệp CEO Hà Nội 10 nhằm mục tiêu tăng cường hợp tác kinh doanh, chia sẻ cơ hội giao thương B2B, hỗ trợ đào tạo quản trị và xúc tiến thương mại đa phương diện.\n\nĐiều 2: Tiêu chuẩn và Quyền lợi của Học viên chính thức\n1. Học viên được cấp thẻ danh thiếp điện tử thông minh CEO HN10 tích hợp mã QR cá nhân hóa.\n2. Được ưu tiên tham gia các phiên kết nối giao thương 1-on-1 hàng tuần và diễn đàn CEO định kỳ.\n3. Được đăng tải tối đa 5 sản phẩm/dịch vụ tiêu biểu lên sàn thương mại nội bộ CLB.\n4. Được vinh danh và nhận các gói tài trợ truyền thông số từ Ban Điều Hành.\n\nĐiều 3: Nghĩa vụ tài chính và niên liễm\nMỗi Học viên có nghĩa vụ đóng hội phí niên liễm đầy đủ theo quy định của Ban Tài chính và tham gia tối thiểu 70% các kỳ sinh hoạt chính thức của Câu Lạc Bộ.\n\nTM. BAN ĐIỀU HÀNH CLB DOANH NHÂN CEO HN10\nCHỦ TỊCH HỘI ĐỒNG\n(Đã ký và đóng dấu điện tử)`;
 }

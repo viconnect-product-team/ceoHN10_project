@@ -1,4 +1,4 @@
-# TÀI LIỆU ĐẶC TẢ YÊU CẦU PHẦN MỀM (SRS) — PHÂN HỆ ỨNG DỤNG DI ĐỘNG HỘI VIÊN & PWA
+# TÀI LIỆU ĐẶC TẢ YÊU CẦU PHẦN MỀM (SRS) — PHÂN HỆ ỨNG DỤNG DI ĐỘNG Học viên & PWA
 
 ## HỆ SINH THÁI SỐ HÓA HIỆP HỘI DOANH NHÂN CEO HN10 (HANOIBA)
 
@@ -19,7 +19,7 @@ Tài liệu Đặc tả Yêu cầu Phần mềm (Software Requirements Specifica
 
 ### 1.2. Phạm Vi Tài Liệu (Document Scope)
 
-Tài liệu này bao gồm đặc tả chi tiết của 28 trường hợp sử dụng (Use Cases) tương ứng với phạm vi chức năng bàn giao, áp dụng nguyên tắc MECE (Mutually Exclusive, Collectively Exhaustive) để tuyệt đối không trùng lặp và không bỏ sót bất kỳ luồng tác nghiệp nào của Hội đồng Điều hành và Hội viên CLB Doanh Nhân CEO HN10.
+Tài liệu này bao gồm đặc tả chi tiết của 28 trường hợp sử dụng (Use Cases) tương ứng với phạm vi chức năng bàn giao, áp dụng nguyên tắc MECE (Mutually Exclusive, Collectively Exhaustive) để tuyệt đối không trùng lặp và không bỏ sót bất kỳ luồng tác nghiệp nào của Hội đồng Điều hành và Học viên CLB Doanh Nhân CEO HN10.
 
 ### 1.3. Định Nghĩa & Viết Tắt (Definitions & Acronyms)
 
@@ -29,7 +29,7 @@ Tài liệu này bao gồm đặc tả chi tiết của 28 trường hợp sử 
 | CLB CEO HN10 | CEO HN10 Business Club | Câu lạc bộ các nhà lãnh đạo doanh nghiệp CLB Doanh Nhân CEO HN10 (CEO Hà Nội 10). |
 | BQT | Board of Management | Ban Quản Trị CLB Doanh Nhân CEO HN10. |
 | BTK | Secretariat Committee | Ban Thư Ký CLB, cơ quan điều hành hành chính văn phòng. |
-| BTV | Membership Committee | Ban Thành Viên, cơ quan độc quyền thẩm định và duyệt kết nạp hội viên. |
+| BTV | Membership Committee | Ban Thành Viên, cơ quan độc quyền thẩm định và duyệt kết nạp Học viên. |
 | BTN | Charity Committee | Ban Thiện Nguyện & An Sinh Xã Hội. |
 | BTT | Media & Event Committee | Ban Truyền Thông & Sự Kiện. |
 | BXT | Trade Promotion Committee | Ban Xúc Tiến Thương Mại & Đầu Tư. |
@@ -47,10 +47,10 @@ Tài liệu này bao gồm đặc tả chi tiết của 28 trường hợp sử 
 | Mã Role | Tên Vai Trò | Đối Tượng Áp Dụng | Mô Tả Quyền Hạn Cốt Lõi |
 | --- | --- | --- | --- |
 | quan_tri | Ban Quản Trị Tối Cao (Superadmin) | Chủ tịch CLB, Ban Thường Trực CLB Doanh Nhân CEO HN10 | Toàn quyền: Xem (Read), Tạo (Create), Chỉnh sửa (Update), Xóa (Delete), Phê duyệt (Approve), Cấu hình (Configure) trên tất cả 30 màn hình và API. |
-| admin | Quản Trị Vận Hành (Executive Admin) | Phó Chủ tịch Thường trực, Giám đốc Điều hành CLB | Quyền Xem, Tạo, Sửa, Duyệt trên các phân hệ Hội viên, Sự kiện, Cuộc họp, Sàn B2B, Công việc. Không có quyền xóa dữ liệu kiểm toán và hạ quyền Superadmin. |
-| tong_thu_ky | Tổng Thư Ký / Ban Thư Ký (Secretariat) | Tổng Thư Ký, Phó Tổng Thư Ký, Chánh Văn Phòng CLB | Toàn quyền trên phân hệ Cuộc họp, Phòng họp Sapphire Hub, Lịch công tác, Giao việc và Quản trị Kênh Thông Báo Ban Thư Ký ghim trên Mobile App. Bị chặn ở API duyệt hội viên. |
+| admin | Quản Trị Vận Hành (Executive Admin) | Phó Chủ tịch Thường trực, Giám đốc Điều hành CLB | Quyền Xem, Tạo, Sửa, Duyệt trên các phân hệ Học viên, Sự kiện, Cuộc họp, Sàn B2B, Công việc. Không có quyền xóa dữ liệu kiểm toán và hạ quyền Superadmin. |
+| tong_thu_ky | Tổng Thư Ký / Ban Thư Ký (Secretariat) | Tổng Thư Ký, Phó Tổng Thư Ký, Chánh Văn Phòng CLB | Toàn quyền trên phân hệ Cuộc họp, Phòng họp Sapphire Hub, Lịch công tác, Giao việc và Quản trị Kênh Thông Báo Ban Thư Ký ghim trên Mobile App. Bị chặn ở API duyệt Học viên. |
 | truong_ban | Trưởng Ban Chuyên Môn (Committee Heads) | Trưởng/Phó các ban: Ban Thành Viên (BTV), Ban Thiện Nguyện (BTN), Ban Truyền Thông (BTT), Ban Xúc Tiến (BXT), Ban Tài Chính (BTC) | Phân quyền theo phạm vi chuyên trách (Scope-based RBAC) của từng ban. Không truy cập chéo vào các chức năng đặc thù của ban khác. |
-| member | Hội Viên Chính Thức (Official Member) | 500+ Doanh nhân CEO HN10 chính danh (Đã được BTV duyệt và có trạng thái phí 'paid') | Quyền truy cập đầy đủ các chức năng dành cho hội viên trên Mobile App. Bị giới hạn không truy cập vào Cổng Web CRM Quản trị. |
+| member | Học viên Chính Thức (Official Member) | 500+ Doanh nhân CEO HN10 chính danh (Đã được BTV duyệt và có trạng thái phí 'paid') | Quyền truy cập đầy đủ các chức năng dành cho Học viên trên Mobile App. Bị giới hạn không truy cập vào Cổng Web CRM Quản trị. |
 | guest | Khách Vãng Lai & Ứng Viên (Guest / Applicant) | Doanh nhân CEO HN10 đang nộp hồ sơ gia nhập, Khách mời sự kiện | Chỉ truy cập các màn hình và API công khai (`/landing`, `/card/:slug`, `/events/public`). |
 
 
@@ -67,41 +67,41 @@ Bước 2: Ứng viên điền biểu mẫu điện tử gồm 9 trường: Họ
 
 Bước 3: Nhấn nút 'Gửi Đơn Đăng Ký'. Hệ thống kiểm tra hợp lệ client/server, lưu bản ghi vào CSDL ở trạng thái pending, máy chủ SMTP tự động gửi Thư điện tử xác nhận tiếp nhận kèm Mã tra cứu đến email ứng viên.
 
-Bước 4: Cán bộ Ban Thành Viên (ceo.thanhvien@ceohn10.com) đăng nhập Web CRM, vào màn hình 'Quản Lý Hội Viên' (/members), mở ngăn kéo xem chi tiết hồ sơ ứng viên.
+Bước 4: Cán bộ Ban Thành Viên (ceo.thanhvien@ceohn10.com) đăng nhập Web CRM, vào màn hình 'Quản Lý Học viên' (/members), mở ngăn kéo xem chi tiết hồ sơ ứng viên.
 
 Bước 5: BTV đối soát thông tin pháp nhân trên Cổng ĐKKD quốc gia, kiểm tra MST và uy tín doanh nghiệp. Nhấn nút 'Phê Duyệt Kết Nạp'.
 
-Bước 6: Hệ thống kiểm tra quyền hạn BTV, tự động sinh Mã hội viên chuẩn HN10-xxxx, kích hoạt tài khoản status = 'active', tạo mật khẩu ngẫu nhiên bảo mật cao và gửi Email Chào mừng kèm thông tin đăng nhập.
+Bước 6: Hệ thống kiểm tra quyền hạn BTV, tự động sinh Mã Học viên chuẩn HN10-xxxx, kích hoạt tài khoản status = 'active', tạo mật khẩu ngẫu nhiên bảo mật cao và gửi Email Chào mừng kèm thông tin đăng nhập.
 
-Bước 7: Hội viên tải và mở Ứng dụng Di động CEO HN10, đăng nhập bằng Email/SĐT và mật khẩu tạm. Hệ thống chuyển hướng bắt buộc đổi mật khẩu mới tại QuickProfileEditModal trước khi vào trang chủ.
+Bước 7: Học viên tải và mở Ứng dụng Di động CEO HN10, đăng nhập bằng Email/SĐT và mật khẩu tạm. Hệ thống chuyển hướng bắt buộc đổi mật khẩu mới tại QuickProfileEditModal trước khi vào trang chủ.
 
 #### UJ-02: Hành Trình Thông Báo Hội Phí ➔ Thanh Toán Mã QR Ngân Hàng 24/7 ➔ Kế Toán Đối Soát Gạch Nợ (+365 Ngày)
 
-**Đối tượng trải nghiệm:** Hội viên chính thức, Ban Tài Chính / Kế Toán
+**Đối tượng trải nghiệm:** Học viên chính thức, Ban Tài Chính / Kế Toán
 
 Bước 1: Hệ thống tự động quét ngày hết hạn thẻ doanh nhân số (term_end). Trước 30 ngày, hệ thống kích hoạt thông báo đẩy trên Mobile App và email thông báo nộp hội phí thường niên (5.000.000 VNĐ/năm).
 
-Bước 2: Hội viên mở mục 'Hội Phí' trên Mobile App, nhấn nút 'Thanh Toán Mã QR Ngân Hàng'.
+Bước 2: Học viên mở mục 'Hội Phí' trên Mobile App, nhấn nút 'Thanh Toán Mã QR Ngân Hàng'.
 
 Bước 3: Hệ thống sinh mã QR ngân hàng động chuẩn Napas 24/7 chứa sẵn: Số tiền (5.000.000 VNĐ), Số tài khoản thụ hưởng của CLB CEO HN10 và Cú pháp: HOIPHI CEO HN10 [MÃ_HV] [HỌ_TÊN].
 
-Bước 4: Hội viên sử dụng ứng dụng Mobile Banking của ngân hàng cá nhân, quét mã QR và chuyển khoản thành công.
+Bước 4: Học viên sử dụng ứng dụng Mobile Banking của ngân hàng cá nhân, quét mã QR và chuyển khoản thành công.
 
 Bước 5: Kế toán câu lạc bộ mở màn hình 'Quản Lý Hội Phí' (/fees) trên Web CRM, kiểm tra giao dịch tương ứng trên sao kê tài khoản ngân hàng thực tế.
 
 Bước 6: Khi thông tin khớp đúng, kế toán bấm nút 'Duyệt Gạch Nợ'.
 
-Bước 7: Hệ thống chuyển trạng thái sang paid, cộng dồn +365 ngày vào hạn dùng của thẻ hội viên điện tử (term_end), sinh hóa đơn điện tử (invoices) và gửi thông báo xác nhận thành công cho hội viên.
+Bước 7: Hệ thống chuyển trạng thái sang paid, cộng dồn +365 ngày vào hạn dùng của thẻ Học viên điện tử (term_end), sinh hóa đơn điện tử (invoices) và gửi thông báo xác nhận thành công cho Học viên.
 
 #### UJ-03: Hành Trình Khởi Tạo Sự Kiện Gala ➔ Thiết Kế Sơ Đồ Ghế ➔ Phát Hành E-Ticket ➔ Soát Vé Gate Check-in QR (< 0.2s)
 
-**Đối tượng trải nghiệm:** Ban Truyền Thông (BTT), Ban Thư Ký (BTK), Hội viên tham dự
+**Đối tượng trải nghiệm:** Ban Truyền Thông (BTT), Ban Thư Ký (BTK), Học viên tham dự
 
-Bước 1: Ban Truyền Thông khởi tạo sự kiện Gala trên Web CRM (/events), thiết lập timeline chương trình, diễn giả VIP và cấu hình các hạng vé (VIP Đại biểu, Hội viên chính thức, Khách mời có phí).
+Bước 1: Ban Truyền Thông khởi tạo sự kiện Gala trên Web CRM (/events), thiết lập timeline chương trình, diễn giả VIP và cấu hình các hạng vé (VIP Đại biểu, Học viên chính thức, Khách mời có phí).
 
-Bước 2: Mở công cụ 'Cinema Seating Map' (/events/seating), kéo thả bố trí bàn tiệc tròn 10 chỗ (Bàn VIP 1 đến VIP 6 cho Lãnh đạo Thành ủy, HanoiBA), dãy ghế đại biểu danh dự và các bàn hội viên.
+Bước 2: Mở công cụ 'Cinema Seating Map' (/events/seating), kéo thả bố trí bàn tiệc tròn 10 chỗ (Bàn VIP 1 đến VIP 6 cho Lãnh đạo Thành ủy, HanoiBA), dãy ghế đại biểu danh dự và các bàn Học viên.
 
-Bước 3: Hội viên mở Mobile App, xem thông tin sự kiện Gala, chọn vị trí ngồi và nhấn 'Đăng Ký Tham Dự'.
+Bước 3: Học viên mở Mobile App, xem thông tin sự kiện Gala, chọn vị trí ngồi và nhấn 'Đăng Ký Tham Dự'.
 
 Bước 4: Hệ thống phát hành Vé điện tử E-Ticket QR lưu trong mục 'Vé Của Tôi' (hỗ trợ hiển thị offline). Vé chứa mã QR mã hóa bảo mật độc bản và mã số may mắn (#LUCKY-xxxx).
 
@@ -113,9 +113,9 @@ Bước 7: Danh sách đại biểu ĐÃ CHECK-IN THỰC TẾ tự động đồ
 
 #### UJ-04: Hành Trình Kết Nối Giao Thương B2B ➔ Chạm Danh Thiếp NFC ➔ Trao Đổi Cơ Hội Cung - Cầu 1-on-1
 
-**Đối tượng trải nghiệm:** Hội viên Doanh nhân CEO HN10
+**Đối tượng trải nghiệm:** Học viên Doanh nhân CEO HN10
 
-Bước 1: Hai hội viên gặp gỡ trực tiếp, chạm mặt sau thẻ thông minh NFC vào điện thoại đối tác.
+Bước 1: Hai Học viên gặp gỡ trực tiếp, chạm mặt sau thẻ thông minh NFC vào điện thoại đối tác.
 
 Bước 2: Điện thoại đối tác tự động mở trang Danh thiếp số công khai (/card/:code) hiển thị đầy đủ thông tin: Họ tên, Chức vụ, Logo công ty, Hồ sơ năng lực, Sản phẩm tiêu biểu và Nút 'Lưu Danh Bạ'.
 
@@ -123,31 +123,31 @@ Bước 3: Đối tác bấm 'Lưu Danh Bạ', hệ thống xuất ngay tệp vC
 
 Bước 4: Đối tác bấm 'Kết Nối B2B', chọn nhu cầu hợp tác và gửi lời mời kết nối kinh doanh 1-on-1.
 
-Bước 5: Hội viên nhận được thông báo đẩy, mở Hộp Thư Messenger #0084FF và bấm 'Chấp Nhận Lời Mời'.
+Bước 5: Học viên nhận được thông báo đẩy, mở Hộp Thư Messenger #0084FF và bấm 'Chấp Nhận Lời Mời'.
 
-Bước 6: Hai hội viên trao đổi tin nhắn, tài liệu báo giá thời gian thực hoặc đăng bài lên Bảng tin Cơ hội Cung - Cầu để hiệp hội bảo chứng giao dịch.
+Bước 6: Hai Học viên trao đổi tin nhắn, tài liệu báo giá thời gian thực hoặc đăng bài lên Bảng tin Cơ hội Cung - Cầu để hiệp hội bảo chứng giao dịch.
 
 #### UJ-05: Hành Trình Đại Hội Toàn Thể ➔ Biểu Quyết Trực Tuyến ➔ Công Bố Kết Quả Thời Gian Thực (Live 1s)
 
-**Đối tượng trải nghiệm:** Ban Thư Ký (BTK), Hội viên chính thức
+**Đối tượng trải nghiệm:** Ban Thư Ký (BTK), Học viên chính thức
 
 Bước 1: Ban Thư Ký tạo phiên biểu quyết trên Web CRM: Nhập tiêu đề nghị quyết đại hội, danh sách ứng viên Ban Chấp Hành nhiệm kỳ mới và thiết lập thời gian mở/đóng hòm phiếu.
 
-Bước 2: Khi Chủ tọa đại hội phát lệnh, Ban Thư Ký bấm 'Kích Hoạt Phiên Bầu Cử'. Toàn bộ 500+ hội viên chính thức nhận được thông báo đẩy trên Mobile App.
+Bước 2: Khi Chủ tọa đại hội phát lệnh, Ban Thư Ký bấm 'Kích Hoạt Phiên Bầu Cử'. Toàn bộ 500+ Học viên chính thức nhận được thông báo đẩy trên Mobile App.
 
-Bước 3: Hội viên mở màn hình Biểu Quyết (/association/voting), xem chi tiết tờ trình nghị quyết, tích chọn các phương án (Đồng ý / Không đồng ý / Ý kiến khác) và bấm 'Xác Nhận Bỏ Phiếu'.
+Bước 3: Học viên mở màn hình Biểu Quyết (/association/voting), xem chi tiết tờ trình nghị quyết, tích chọn các phương án (Đồng ý / Không đồng ý / Ý kiến khác) và bấm 'Xác Nhận Bỏ Phiếu'.
 
-Bước 4: Hệ thống mã hóa một chiều phiếu bầu (Đảm bảo nguyên tắc 1 người 1 phiếu và ẩn danh tuyệt đối), khóa nút biểu quyết trên máy hội viên.
+Bước 4: Hệ thống mã hóa một chiều phiếu bầu (Đảm bảo nguyên tắc 1 người 1 phiếu và ẩn danh tuyệt đối), khóa nút biểu quyết trên máy Học viên.
 
 Bước 5: Máy chủ Socket.IO tổng hợp kết quả tức thời. Màn hình LED trung tâm của Đại hội hiển thị biểu đồ tỷ lệ phần trăm (%) nhảy động thời gian thực với độ trễ dưới 1 giây, công bố kết quả minh bạch 100%.
 
 #### UJ-06: Hành Trình Tương Tác Giọng Nói Với Trợ Lý AI ➔ Tra Cứu Dữ Liệu Thực Tế ➔ Dẫn Đường Lái Màn Hình Trực Tiếp GPS Turn-by-Turn HUD (32 Tính Năng)
 
-**Đối tượng trải nghiệm:** Hội viên chính thức, Ban Quản Trị, Cán bộ các Ban Chuyên Môn
+**Đối tượng trải nghiệm:** Học viên chính thức, Ban Quản Trị, Cán bộ các Ban Chuyên Môn
 
 Bước 1: Người dùng chạm biểu tượng Robot Trợ lý AI ở góc màn hình hoặc dùng phím tắt nổi.
 
-Bước 2: Hệ thống tự động gọi API `/api/ai/live-context`, tải tức thời thông tin phiên đăng nhập: Họ tên, Mã hội viên, Hạng thẻ doanh nhân số, Tình trạng hội phí thường niên, Số lượng thông báo chưa đọc, Danh sách sự kiện đã có vé tham dự và Top 5 sự kiện đông nhất.
+Bước 2: Hệ thống tự động gọi API `/api/ai/live-context`, tải tức thời thông tin phiên đăng nhập: Họ tên, Mã Học viên, Hạng thẻ doanh nhân số, Tình trạng hội phí thường niên, Số lượng thông báo chưa đọc, Danh sách sự kiện đã có vé tham dự và Top 5 sự kiện đông nhất.
 
 Bước 3: Người dùng ra lệnh bằng giọng nói tiếng Việt (Microphone) hoặc nhập câu hỏi: 'Sự kiện nào đang được nhiều người đăng ký nhất?', 'Tôi có thông báo nào chưa đọc?' hoặc 'Hướng dẫn tôi đăng ký sự kiện như nào'.
 
@@ -185,12 +185,12 @@ Bước 8: Lớp phủ Voice GPS HUD Overlay kích hoạt hiệu ứng Spotlight
 | --- | --- |
 | Mã Use Case | UC-APP-AUTH-01 |
 | Tên Chức Năng | Đăng Nhập Ứng Dụng Di Động CEO HN10 Bằng SĐT/Email |
-| Phân Hệ / Module | Phân hệ 3: Ứng Dụng Di Động Hội Viên CEO HN10 |
-| Mục Tiêu Nghiệp Vụ | Xác thực danh tính hội viên chính thức trên ứng dụng di động (Mobile App / PWA). |
-| Tác Nhân (Actors) | Hội viên chính thức CLB Doanh Nhân CEO HN10 |
-| Tiền Điều Kiện (Pre-conditions) | Hồ sơ hội viên đã được Ban Thành Viên phê duyệt (status = 'active'). |
-| Hậu Điều Kiện (Post-conditions) | Hội viên truy cập thành công vào các tiện ích dành riêng cho thành viên. |
-| Quy Tắc Nghiệp Vụ (Business Rules) | Chỉ những hội viên có trạng thái active mới được phép đăng nhập ứng dụng. |
+| Phân Hệ / Module | Phân hệ 3: Ứng Dụng Di Động Học viên CEO HN10 |
+| Mục Tiêu Nghiệp Vụ | Xác thực danh tính Học viên chính thức trên ứng dụng di động (Mobile App / PWA). |
+| Tác Nhân (Actors) | Học viên chính thức CLB Doanh Nhân CEO HN10 |
+| Tiền Điều Kiện (Pre-conditions) | Hồ sơ Học viên đã được Ban Thành Viên phê duyệt (status = 'active'). |
+| Hậu Điều Kiện (Post-conditions) | Học viên truy cập thành công vào các tiện ích dành riêng cho thành viên. |
+| Quy Tắc Nghiệp Vụ (Business Rules) | Chỉ những Học viên có trạng thái active mới được phép đăng nhập ứng dụng. |
 | Ánh Xạ Kỹ Thuật (Tech Mapping) | API: `POST /api/association/auth/login` | Tables: `vione_users`, `members` |
 
 
@@ -199,14 +199,14 @@ Bước 8: Lớp phủ Voice GPS HUD Overlay kích hoạt hiệu ứng Spotlight
 
 | Trường Dữ Liệu | Kiểu Dữ Liệu | Bắt Buộc | Quy Tắc Kiểm Tra & Định Dạng (Validation) |
 | --- | --- | --- | --- |
-| identifier | String | BẮT BUỘC | Số điện thoại di động hoặc Email hội viên |
-| password | String | BẮT BUỘC | Mật khẩu hội viên |
+| identifier | String | BẮT BUỘC | Số điện thoại di động hoặc Email Học viên |
+| password | String | BẮT BUỘC | Mật khẩu Học viên |
 
 
 
 #### Luồng Sự Kiện Chính (Step-by-step Main Flow)
 
-Bước 1: Hội viên mở ứng dụng di động CEO HN10.
+Bước 1: Học viên mở ứng dụng di động CEO HN10.
 
 Bước 2: Nhập Số điện thoại hoặc Email và Mật khẩu.
 
@@ -218,17 +218,17 @@ Bước 5: Kiểm tra trạng thái hồ sơ trong bảng `members`: Nếu statu
 
 Bước 6: Kiểm tra cờ must_change_password: Nếu là true, chuyển hướng ngay đến modal bắt buộc đổi mật khẩu.
 
-Bước 7: Nếu mật khẩu đã đổi, tải thông tin thẻ doanh nhân số 3D và chuyển hướng vào màn hình chính Hội viên (/association).
+Bước 7: Nếu mật khẩu đã đổi, tải thông tin thẻ doanh nhân số 3D và chuyển hướng vào màn hình chính Học viên (/association).
 
 #### Luồng Rẽ Nhánh / Thay Thế (Alternative Flows)
 
-Bước A1: Hội viên quên mật khẩu -> Nhấn 'Quên mật khẩu' để nhận liên kết khôi phục qua email đã đăng ký.
+Bước A1: Học viên quên mật khẩu -> Nhấn 'Quên mật khẩu' để nhận liên kết khôi phục qua email đã đăng ký.
 
 #### Luồng Ngoại Lệ & Xử Lý Lỗi (Exception Flows)
 
 Bước E1: Hồ sơ đang ở trạng thái Chờ thẩm định (pending) -> Báo lỗi: 'Hồ sơ của Quý anh/chị đang được Ban Thành Viên thẩm định. Vui lòng chờ thông báo chính thức'.
 
-Bước E2: Hồ sơ bị tạm đình chỉ hoặc khai trừ (suspended / terminated) -> Báo lỗi: 'Tư cách hội viên đang bị tạm dừng. Vui lòng liên hệ Ban Quản Trị'.
+Bước E2: Hồ sơ bị tạm đình chỉ hoặc khai trừ (suspended / terminated) -> Báo lỗi: 'Tư cách Học viên đang bị tạm dừng. Vui lòng liên hệ Ban Quản Trị'.
 
 ### [UC-APP-AUTH-02] Bắt Buộc Đổi Mật Khẩu Khởi Tạo Lần Đầu (QuickProfileEditModal)
 
@@ -236,9 +236,9 @@ Bước E2: Hồ sơ bị tạm đình chỉ hoặc khai trừ (suspended / term
 | --- | --- |
 | Mã Use Case | UC-APP-AUTH-02 |
 | Tên Chức Năng | Bắt Buộc Đổi Mật Khẩu Khởi Tạo Lần Đầu (QuickProfileEditModal) |
-| Phân Hệ / Module | Phân hệ 3: Ứng Dụng Di Động Hội Viên CEO HN10 |
-| Mục Tiêu Nghiệp Vụ | Buộc hội viên mới phải thay đổi mật khẩu do hệ thống cấp ngẫu nhiên thành mật khẩu cá nhân bảo mật cao trong lần đăng nhập đầu tiên. |
-| Tác Nhân (Actors) | Hội viên mới đăng nhập lần đầu |
+| Phân Hệ / Module | Phân hệ 3: Ứng Dụng Di Động Học viên CEO HN10 |
+| Mục Tiêu Nghiệp Vụ | Buộc Học viên mới phải thay đổi mật khẩu do hệ thống cấp ngẫu nhiên thành mật khẩu cá nhân bảo mật cao trong lần đăng nhập đầu tiên. |
+| Tác Nhân (Actors) | Học viên mới đăng nhập lần đầu |
 | Tiền Điều Kiện (Pre-conditions) | Tài khoản có cờ must_change_password = true. |
 | Hậu Điều Kiện (Post-conditions) | Tài khoản được bảo vệ bằng mật khẩu cá nhân, cờ must_change_password được gỡ bỏ. |
 | Quy Tắc Nghiệp Vụ (Business Rules) | Không cho phép người dùng đóng modal hoặc chuyển trang khi chưa đổi mật khẩu thành công. |
@@ -262,7 +262,7 @@ Bước 1: Hệ thống tự động mở cửa sổ ngăn chặn QuickProfileEd
 
 Bước 2: Hiển thị thông báo: 'Để đảm bảo an toàn, Quý anh/chị vui lòng đổi mật khẩu khởi tạo trong lần đầu tiên truy cập'.
 
-Bước 3: Hội viên nhập Mật khẩu hiện tại, Mật khẩu mới và Xác nhận mật khẩu mới.
+Bước 3: Học viên nhập Mật khẩu hiện tại, Mật khẩu mới và Xác nhận mật khẩu mới.
 
 Bước 4: Nhấn nút 'Lưu Mật Khẩu & Bắt Đầu'.
 
@@ -274,7 +274,7 @@ Bước 7: Băm mật khẩu mới bằng thuật toán bcrypt (Salt round 10) v
 
 Bước 8: Cập nhật cờ must_change_password = false.
 
-Bước 9: Đóng modal và chuyển hướng hội viên vào màn hình chính.
+Bước 9: Đóng modal và chuyển hướng Học viên vào màn hình chính.
 
 #### Luồng Ngoại Lệ & Xử Lý Lỗi (Exception Flows)
 
@@ -284,17 +284,17 @@ Bước E2: Xác nhận mật khẩu không khớp -> Báo lỗi: 'Mật khẩu 
 
 Bước E3: Mật khẩu mới trùng mật khẩu khởi tạo cũ -> Báo lỗi: 'Mật khẩu mới không được trùng mật khẩu cũ'.
 
-### [UC-APP-HOME-01] Trang Chủ Hội Viên VIP & Lưới Phím Tắt Tiện Ích Đẳng Cấp
+### [UC-APP-HOME-01] Trang Chủ Học viên VIP & Lưới Phím Tắt Tiện Ích Đẳng Cấp
 
 | Thuộc Tính | Đặc Tả Kỹ Thuật Chi Tiết |
 | --- | --- |
 | Mã Use Case | UC-APP-HOME-01 |
-| Tên Chức Năng | Trang Chủ Hội Viên VIP & Lưới Phím Tắt Tiện Ích Đẳng Cấp |
-| Phân Hệ / Module | Phân hệ 3: Ứng Dụng Di Động Hội Viên CEO HN10 |
-| Mục Tiêu Nghiệp Vụ | Cung cấp bảng điều khiển trung tâm dành cho hội viên: Thẻ Doanh Nhân Số danh dự, Lưới phím tắt tiện ích 8 mục, Sự kiện sắp tới, Ưu đãi và Marketplace. |
-| Tác Nhân (Actors) | Hội viên chính thức CLB Doanh Nhân CEO HN10 |
+| Tên Chức Năng | Trang Chủ Học viên VIP & Lưới Phím Tắt Tiện Ích Đẳng Cấp |
+| Phân Hệ / Module | Phân hệ 3: Ứng Dụng Di Động Học viên CEO HN10 |
+| Mục Tiêu Nghiệp Vụ | Cung cấp bảng điều khiển trung tâm dành cho Học viên: Thẻ Doanh Nhân Số danh dự, Lưới phím tắt tiện ích 8 mục, Sự kiện sắp tới, Ưu đãi và Marketplace. |
+| Tác Nhân (Actors) | Học viên chính thức CLB Doanh Nhân CEO HN10 |
 | Tiền Điều Kiện (Pre-conditions) | Đã đăng nhập thành công vào Mobile App. |
-| Hậu Điều Kiện (Post-conditions) | Hội viên tiếp cận mọi tính năng chỉ trong 1 lần chạm. |
+| Hậu Điều Kiện (Post-conditions) | Học viên tiếp cận mọi tính năng chỉ trong 1 lần chạm. |
 | Quy Tắc Nghiệp Vụ (Business Rules) | RULE-UI-ROYAL-NAVY-GOLD: Thiết kế giao diện sang trọng, không giật lag. |
 | Ánh Xạ Kỹ Thuật (Tech Mapping) | Route: `/association` | Component: `association.index.tsx` |
 
@@ -302,9 +302,9 @@ Bước E3: Mật khẩu mới trùng mật khẩu khởi tạo cũ -> Báo lỗ
 
 #### Luồng Sự Kiện Chính (Step-by-step Main Flow)
 
-Bước 1: Hội viên mở màn hình trang chủ (`/association`).
+Bước 1: Học viên mở màn hình trang chủ (`/association`).
 
-Bước 2: Hệ thống render thẻ hội viên điện tử 3D với mã QR định danh và huy hiệu chuyên ban.
+Bước 2: Hệ thống render thẻ Học viên điện tử 3D với mã QR định danh và huy hiệu chuyên ban.
 
 Bước 3: Hiển thị Lưới 8 tính năng nhanh cân đối: Danh thiếp số, Danh bạ CEO, Quét Check-in, Đặc quyền VIP, Biểu quyết số, Lịch sử hoạt động, Kho tài liệu, Hội phí.
 
@@ -314,25 +314,25 @@ Bước 5: Hiển thị Khối Giao thương B2B với tổng giá trị deals t
 
 Bước 6: Người dùng chạm vuốt nhẹ nhàng chuyển đổi giữa các mục.
 
-### [UC-APP-CARD-01] thẻ hội viên điện tử 3D Titanium Hiệu Ứng Lật 180 Độ & Quét QR
+### [UC-APP-CARD-01] thẻ Học viên điện tử 3D Titanium Hiệu Ứng Lật 180 Độ & Quét QR
 
 | Thuộc Tính | Đặc Tả Kỹ Thuật Chi Tiết |
 | --- | --- |
 | Mã Use Case | UC-APP-CARD-01 |
-| Tên Chức Năng | thẻ hội viên điện tử 3D Titanium Hiệu Ứng Lật 180 Độ & Quét QR |
-| Phân Hệ / Module | Phân hệ 3: Ứng Dụng Di Động Hội Viên CEO HN10 |
-| Mục Tiêu Nghiệp Vụ | Hiển thị thẻ hội viên điện tử 3D công nghệ cao lật 180 độ; hỗ trợ chia sẻ mã QR định danh độc bản tại các sự kiện giao thương. |
-| Tác Nhân (Actors) | Hội viên chính thức CLB Doanh Nhân CEO HN10 |
-| Tiền Điều Kiện (Pre-conditions) | Tài khoản hội viên có trạng thái phí `paid`. |
+| Tên Chức Năng | thẻ Học viên điện tử 3D Titanium Hiệu Ứng Lật 180 Độ & Quét QR |
+| Phân Hệ / Module | Phân hệ 3: Ứng Dụng Di Động Học viên CEO HN10 |
+| Mục Tiêu Nghiệp Vụ | Hiển thị thẻ Học viên điện tử 3D công nghệ cao lật 180 độ; hỗ trợ chia sẻ mã QR định danh độc bản tại các sự kiện giao thương. |
+| Tác Nhân (Actors) | Học viên chính thức CLB Doanh Nhân CEO HN10 |
+| Tiền Điều Kiện (Pre-conditions) | Tài khoản Học viên có trạng thái phí `paid`. |
 | Hậu Điều Kiện (Post-conditions) | Khẳng định đẳng cấp và uy tín cá nhân của doanh nhân CEO HN10. |
-| Quy Tắc Nghiệp Vụ (Business Rules) | Thẻ Doanh Nhân Số chỉ kích hoạt đầy đủ hiệu ứng 3D khi hội viên đã hoàn thành nghĩa vụ hội phí. |
+| Quy Tắc Nghiệp Vụ (Business Rules) | Thẻ Doanh Nhân Số chỉ kích hoạt đầy đủ hiệu ứng 3D khi Học viên đã hoàn thành nghĩa vụ hội phí. |
 | Ánh Xạ Kỹ Thuật (Tech Mapping) | Route: `/association/card` | Component: `DigitalBusinessCardModal.tsx` |
 
 
 
 #### Luồng Sự Kiện Chính (Step-by-step Main Flow)
 
-Bước 1: Hội viên chạm vào Thẻ Doanh Nhân Số tại trang chủ hoặc vào mục 'Thẻ Doanh Nhân Số' (`/association/card`).
+Bước 1: Học viên chạm vào Thẻ Doanh Nhân Số tại trang chủ hoặc vào mục 'Thẻ Doanh Nhân Số' (`/association/card`).
 
 Bước 2: thẻ doanh nhân số 3D hiển thị với chất liệu Titanium mạ vàng Amber Gold dập nổi logo CEO HN10.
 
@@ -348,10 +348,10 @@ Bước 5: Đối tác có thể quét trực tiếp mã QR trên thẻ để xe
 | --- | --- |
 | Mã Use Case | UC-APP-CARD-02 |
 | Tên Chức Năng | Chia Sẻ Một Chạm NFC Mở Trang Danh Thiếp Công Khai (/card/:code) |
-| Phân Hệ / Module | Phân hệ 3: Ứng Dụng Di Động Hội Viên CEO HN10 |
+| Phân Hệ / Module | Phân hệ 3: Ứng Dụng Di Động Học viên CEO HN10 |
 | Mục Tiêu Nghiệp Vụ | Chạm mặt sau thẻ vật lý NFC vào smartphone đối tác để mở ngay trang danh thiếp công khai trên web mà không cần cài app. |
-| Tác Nhân (Actors) | Hội viên sở hữu thẻ NFC, Đối tác tiếp nhận |
-| Tiền Điều Kiện (Pre-conditions) | Thẻ NFC đã được ghi mã định danh của hội viên. |
+| Tác Nhân (Actors) | Học viên sở hữu thẻ NFC, Đối tác tiếp nhận |
+| Tiền Điều Kiện (Pre-conditions) | Thẻ NFC đã được ghi mã định danh của Học viên. |
 | Hậu Điều Kiện (Post-conditions) | Đối tác tiếp nhận hồ sơ doanh nhân nhanh chóng và chuyên nghiệp. |
 | Quy Tắc Nghiệp Vụ (Business Rules) | Trang web danh thiếp số công khai phải tải siêu tốc < 1.0 giây. |
 | Ánh Xạ Kỹ Thuật (Tech Mapping) | Route: `/card/:slug` | Table: `member_business_cards` |
@@ -368,7 +368,7 @@ Bước 5: Đối tác có thể quét trực tiếp mã QR trên thẻ để xe
 
 #### Luồng Sự Kiện Chính (Step-by-step Main Flow)
 
-Bước 1: Hội viên chạm thẻ vật lý NFC vào mặt lưng điện thoại đối tác.
+Bước 1: Học viên chạm thẻ vật lý NFC vào mặt lưng điện thoại đối tác.
 
 Bước 2: Chip NFC truyền tần số 13.56MHz, điện thoại đối tác bật thông báo mở liên kết web.
 
@@ -380,7 +380,7 @@ Bước 5: Đối tác có thể xem toàn bộ hồ sơ mà không cần đăng
 
 #### Luồng Ngoại Lệ & Xử Lý Lỗi (Exception Flows)
 
-Bước E1: Điện thoại đối tác không bật NFC -> Hội viên hướng dẫn quét mã QR in trên mặt thẻ.
+Bước E1: Điện thoại đối tác không bật NFC -> Học viên hướng dẫn quét mã QR in trên mặt thẻ.
 
 ### [UC-APP-CARD-03] Xuất File vCard (.vcf) Tự Động Nhập Danh Bạ Điện Thoại Trong 1 Giây
 
@@ -388,11 +388,11 @@ Bước E1: Điện thoại đối tác không bật NFC -> Hội viên hướng
 | --- | --- |
 | Mã Use Case | UC-APP-CARD-03 |
 | Tên Chức Năng | Xuất File vCard (.vcf) Tự Động Nhập Danh Bạ Điện Thoại Trong 1 Giây |
-| Phân Hệ / Module | Phân hệ 3: Ứng Dụng Di Động Hội Viên CEO HN10 |
+| Phân Hệ / Module | Phân hệ 3: Ứng Dụng Di Động Học viên CEO HN10 |
 | Mục Tiêu Nghiệp Vụ | Cho phép đối tác bấm nút 'Lưu Danh Bạ' trên trang web danh thiếp để tự động tải file vCard (.vcf) lưu trọn vẹn thông tin vào điện thoại. |
 | Tác Nhân (Actors) | Đối tác xem danh thiếp |
 | Tiền Điều Kiện (Pre-conditions) | Đang mở trang danh thiếp công khai `/card/:slug`. |
-| Hậu Điều Kiện (Post-conditions) | Thông tin liên lạc của hội viên được lưu vĩnh viễn trong danh bạ đối tác. |
+| Hậu Điều Kiện (Post-conditions) | Thông tin liên lạc của Học viên được lưu vĩnh viễn trong danh bạ đối tác. |
 | Quy Tắc Nghiệp Vụ (Business Rules) | File vCard phải tương thích 100% cả Apple iOS Contacts và Google Contacts. |
 | Ánh Xạ Kỹ Thuật (Tech Mapping) | API: `GET /api/cards/:slug/vcf` | Format: MIME `text/vcard` |
 
@@ -416,11 +416,11 @@ Bước 5: Đối tác bấm 'Lưu' hoàn tất trong đúng 1 giây mà không 
 | --- | --- |
 | Mã Use Case | UC-APP-CARD-04 |
 | Tên Chức Năng | Chỉnh Sửa Nhanh Hồ Sơ Cá Nhân & Năng Lực Doanh Nghiệp |
-| Phân Hệ / Module | Phân hệ 3: Ứng Dụng Di Động Hội Viên CEO HN10 |
-| Mục Tiêu Nghiệp Vụ | Hội viên chủ động cập nhật ảnh đại diện, ảnh bìa, giới thiệu doanh nghiệp và các dịch vụ cung ứng qua Bottom Sheet tiện lợi. |
-| Tác Nhân (Actors) | Hội viên chính thức CLB Doanh Nhân CEO HN10 |
+| Phân Hệ / Module | Phân hệ 3: Ứng Dụng Di Động Học viên CEO HN10 |
+| Mục Tiêu Nghiệp Vụ | Học viên chủ động cập nhật ảnh đại diện, ảnh bìa, giới thiệu doanh nghiệp và các dịch vụ cung ứng qua Bottom Sheet tiện lợi. |
+| Tác Nhân (Actors) | Học viên chính thức CLB Doanh Nhân CEO HN10 |
 | Tiền Điều Kiện (Pre-conditions) | Đã đăng nhập vào tài khoản cá nhân. |
-| Hậu Điều Kiện (Post-conditions) | Hồ sơ năng lực của hội viên luôn được cập nhật mới nhất. |
+| Hậu Điều Kiện (Post-conditions) | Hồ sơ năng lực của Học viên luôn được cập nhật mới nhất. |
 | Quy Tắc Nghiệp Vụ (Business Rules) | Hỗ trợ cử chỉ vuốt xuống (Swipe down to dismiss) đóng Bottom Sheet mượt mà. |
 | Ánh Xạ Kỹ Thuật (Tech Mapping) | Component: `PersonalProfileBottomSheet.tsx` | Storage: MinIO |
 
@@ -439,7 +439,7 @@ Bước 5: Đối tác bấm 'Lưu' hoàn tất trong đúng 1 giây mà không 
 
 #### Luồng Sự Kiện Chính (Step-by-step Main Flow)
 
-Bước 1: Tại trang chủ, hội viên chạm vào Thẻ Doanh Nhân Số để mở `PersonalProfileBottomSheet` vuốt xuống.
+Bước 1: Tại trang chủ, Học viên chạm vào Thẻ Doanh Nhân Số để mở `PersonalProfileBottomSheet` vuốt xuống.
 
 Bước 2: Bấm nút 'Chỉnh Sửa Hồ Sơ'.
 
@@ -453,17 +453,17 @@ Bước 5: Dữ liệu tự động đồng bộ vào CSDL và cập nhật tứ
 
 Bước E1: Ảnh tải lên vượt quá 10MB -> Hệ thống tự động nén ảnh phía client trước khi upload.
 
-### [UC-APP-MBR-01] Tra Cứu Danh Bạ 500+ CEO Hội Viên & Lọc Theo 6 Chuyên Ban
+### [UC-APP-MBR-01] Tra Cứu Danh Bạ 500+ CEO Học viên & Lọc Theo 6 Chuyên Ban
 
 | Thuộc Tính | Đặc Tả Kỹ Thuật Chi Tiết |
 | --- | --- |
 | Mã Use Case | UC-APP-MBR-01 |
-| Tên Chức Năng | Tra Cứu Danh Bạ 500+ CEO Hội Viên & Lọc Theo 6 Chuyên Ban |
-| Phân Hệ / Module | Phân hệ 3: Ứng Dụng Di Động Hội Viên CEO HN10 |
+| Tên Chức Năng | Tra Cứu Danh Bạ 500+ CEO Học viên & Lọc Theo 6 Chuyên Ban |
+| Phân Hệ / Module | Phân hệ 3: Ứng Dụng Di Động Học viên CEO HN10 |
 | Mục Tiêu Nghiệp Vụ | Khám phá danh bạ toàn thể các nhà lãnh đạo thành viên CEO HN10, lọc thông minh theo chuyên ban và ngành nghề kinh doanh. |
-| Tác Nhân (Actors) | Hội viên chính thức CLB Doanh Nhân CEO HN10 |
+| Tác Nhân (Actors) | Học viên chính thức CLB Doanh Nhân CEO HN10 |
 | Tiền Điều Kiện (Pre-conditions) | Đã đăng nhập vào Mobile App. |
-| Hậu Điều Kiện (Post-conditions) | Hội viên tìm thấy đối tác tiềm năng trong câu lạc bộ chỉ trong vài giây. |
+| Hậu Điều Kiện (Post-conditions) | Học viên tìm thấy đối tác tiềm năng trong câu lạc bộ chỉ trong vài giây. |
 | Quy Tắc Nghiệp Vụ (Business Rules) | Nút 'Mời vào CLB' trên thanh công cụ di động tự co giãn không tràn màn hình. |
 | Ánh Xạ Kỹ Thuật (Tech Mapping) | Route: `/association/members` | Component: `association.members.tsx` |
 
@@ -480,15 +480,15 @@ Bước E1: Ảnh tải lên vượt quá 10MB -> Hệ thống tự động nén
 
 #### Luồng Sự Kiện Chính (Step-by-step Main Flow)
 
-Bước 1: Hội viên mở mục 'Danh Bạ CEO' (`/association/members`).
+Bước 1: Học viên mở mục 'Danh Bạ CEO' (`/association/members`).
 
 Bước 2: Hệ thống hiển thị thanh tìm kiếm nhạy bén và hàng chip lọc theo 6 Ban chuyên môn.
 
 Bước 3: Nhập từ khóa hoặc chạm chọn chuyên ban.
 
-Bước 4: Danh sách hội viên hiển thị dạng thẻ card sang trọng: Avatar, Họ tên, Chức vụ, Tên công ty, Huy hiệu chuyên ban và Hạng thẻ doanh nhân số.
+Bước 4: Danh sách Học viên hiển thị dạng thẻ card sang trọng: Avatar, Họ tên, Chức vụ, Tên công ty, Huy hiệu chuyên ban và Hạng thẻ doanh nhân số.
 
-Bước 5: Bấm vào hội viên bất kỳ để mở hồ sơ chi tiết và các tùy chọn kết nối (Gọi điện, Nhắn tin, Hẹn gặp 1-1).
+Bước 5: Bấm vào Học viên bất kỳ để mở hồ sơ chi tiết và các tùy chọn kết nối (Gọi điện, Nhắn tin, Hẹn gặp 1-1).
 
 ### [UC-APP-MBR-02] Đặt Lịch Hẹn Gặp Kết Nối Kinh Doanh 1-on-1 (Connection Appointments)
 
@@ -496,12 +496,12 @@ Bước 5: Bấm vào hội viên bất kỳ để mở hồ sơ chi tiết và 
 | --- | --- |
 | Mã Use Case | UC-APP-MBR-02 |
 | Tên Chức Năng | Đặt Lịch Hẹn Gặp Kết Nối Kinh Doanh 1-on-1 (Connection Appointments) |
-| Phân Hệ / Module | Phân hệ 3: Ứng Dụng Di Động Hội Viên CEO HN10 |
+| Phân Hệ / Module | Phân hệ 3: Ứng Dụng Di Động Học viên CEO HN10 |
 | Mục Tiêu Nghiệp Vụ | Gửi lời mời hẹn gặp gỡ giao thương trực tiếp hoặc online giữa 2 chủ doanh nghiệp trong câu lạc bộ. |
-| Tác Nhân (Actors) | Hội viên khởi xướng, Hội viên nhận lời mời |
-| Tiền Điều Kiện (Pre-conditions) | Cả hai đều là hội viên chính thức. |
+| Tác Nhân (Actors) | Học viên khởi xướng, Học viên nhận lời mời |
+| Tiền Điều Kiện (Pre-conditions) | Cả hai đều là Học viên chính thức. |
 | Hậu Điều Kiện (Post-conditions) | Cuộc hẹn kinh doanh được xác lập chính thức, nâng cao hiệu quả kết nối hiệp hội. |
-| Quy Tắc Nghiệp Vụ (Business Rules) | Cuộc gặp 1-on-1 được ghi nhận vào chỉ số gắn kết của hội viên. |
+| Quy Tắc Nghiệp Vụ (Business Rules) | Cuộc gặp 1-on-1 được ghi nhận vào chỉ số gắn kết của Học viên. |
 | Ánh Xạ Kỹ Thuật (Tech Mapping) | API: `POST /api/association/appointments` | Table: `appointments` |
 
 
@@ -510,7 +510,7 @@ Bước 5: Bấm vào hội viên bất kỳ để mở hồ sơ chi tiết và 
 
 | Trường Dữ Liệu | Kiểu Dữ Liệu | Bắt Buộc | Quy Tắc Kiểm Tra & Định Dạng (Validation) |
 | --- | --- | --- | --- |
-| targetMemberId | String | BẮT BUỘC | Mã hội viên muốn hẹn gặp |
+| targetMemberId | String | BẮT BUỘC | Mã Học viên muốn hẹn gặp |
 | appointmentDate | DateTime | BẮT BUỘC | Ngày giờ dự kiến gặp mặt |
 | location | String | BẮT BUỘC | Địa điểm cà phê / Văn phòng / Phòng họp Sapphire Hub / Zoom |
 | purpose | String | BẮT BUỘC | Mục đích kết nối kinh doanh (Trao đổi cơ hội, Tìm hiểu sản phẩm) |
@@ -519,7 +519,7 @@ Bước 5: Bấm vào hội viên bất kỳ để mở hồ sơ chi tiết và 
 
 #### Luồng Sự Kiện Chính (Step-by-step Main Flow)
 
-Bước 1: Tại hồ sơ của một hội viên trong danh bạ, bấm 'Đặt Lịch Hẹn Gặp 1-1'.
+Bước 1: Tại hồ sơ của một Học viên trong danh bạ, bấm 'Đặt Lịch Hẹn Gặp 1-1'.
 
 Bước 2: Chọn ngày, giờ và địa điểm đề xuất (Offline hoặc Online).
 
@@ -541,11 +541,11 @@ Bước E1: Trùng lịch với cuộc hẹn khác đã xác nhận -> Cảnh b�
 | --- | --- |
 | Mã Use Case | UC-APP-MBR-03 |
 | Tên Chức Năng | Xem Lịch Sử Cuộc Gặp 1-on-1 Đã Diễn Ra & Sắp Diễn Ra |
-| Phân Hệ / Module | Phân hệ 3: Ứng Dụng Di Động Hội Viên CEO HN10 |
-| Mục Tiêu Nghiệp Vụ | Theo dõi toàn bộ nhật ký các cuộc gặp gỡ giao thương đã thực hiện trong tab chuyên biệt tại Danh bạ hội viên. |
-| Tác Nhân (Actors) | Hội viên chính thức CLB Doanh Nhân CEO HN10 |
+| Phân Hệ / Module | Phân hệ 3: Ứng Dụng Di Động Học viên CEO HN10 |
+| Mục Tiêu Nghiệp Vụ | Theo dõi toàn bộ nhật ký các cuộc gặp gỡ giao thương đã thực hiện trong tab chuyên biệt tại Danh bạ Học viên. |
+| Tác Nhân (Actors) | Học viên chính thức CLB Doanh Nhân CEO HN10 |
 | Tiền Điều Kiện (Pre-conditions) | Đã có tương tác hẹn gặp trên hệ thống. |
-| Hậu Điều Kiện (Post-conditions) | Hội viên quản lý lịch trình kết nối giao thương chặt chẽ. |
+| Hậu Điều Kiện (Post-conditions) | Học viên quản lý lịch trình kết nối giao thương chặt chẽ. |
 | Quy Tắc Nghiệp Vụ (Business Rules) | Dữ liệu cuộc gặp được lưu vết phục vụ đánh giá điểm cống hiến. |
 | Ánh Xạ Kỹ Thuật (Tech Mapping) | Route: `/association/members` (Tab `meetings`) |
 
@@ -553,7 +553,7 @@ Bước E1: Trùng lịch với cuộc hẹn khác đã xác nhận -> Cảnh b�
 
 #### Luồng Sự Kiện Chính (Step-by-step Main Flow)
 
-Bước 1: Hội viên vào màn hình Danh bạ, chọn tab 'Lịch Sử Cuộc Gặp' (`/association/members?tab=meetings`).
+Bước 1: Học viên vào màn hình Danh bạ, chọn tab 'Lịch Sử Cuộc Gặp' (`/association/members?tab=meetings`).
 
 Bước 2: Hệ thống hiển thị danh sách cuộc hẹn phân chia: 'Sắp Diễn Ra' và 'Đã Diễn Ra'.
 
@@ -567,10 +567,10 @@ Bước 4: Bấm nút 'Nhắn tin nhanh' để mở ngay cuộc trò chuyện v�
 | --- | --- |
 | Mã Use Case | UC-APP-MSG-01 |
 | Tên Chức Năng | Hộp Thư Trò Chuyện Thời Gian Thực Doanh Nhân Messenger #0084FF |
-| Phân Hệ / Module | Phân hệ 3: Ứng Dụng Di Động Hội Viên CEO HN10 |
+| Phân Hệ / Module | Phân hệ 3: Ứng Dụng Di Động Học viên CEO HN10 |
 | Mục Tiêu Nghiệp Vụ | Nhắn tin trao đổi kinh doanh thời gian thực qua WebSocket, hỗ trợ gửi ảnh, tài liệu năng lực và hiển thị trạng thái đã xem. |
-| Tác Nhân (Actors) | Hội viên chính thức CLB Doanh Nhân CEO HN10 |
-| Tiền Điều Kiện (Pre-conditions) | Hai hội viên có nhu cầu trao đổi thông tin. |
+| Tác Nhân (Actors) | Học viên chính thức CLB Doanh Nhân CEO HN10 |
+| Tiền Điều Kiện (Pre-conditions) | Hai Học viên có nhu cầu trao đổi thông tin. |
 | Hậu Điều Kiện (Post-conditions) | Thông tin liên lạc nội bộ được bảo mật tuyệt đối. |
 | Quy Tắc Nghiệp Vụ (Business Rules) | Huy hiệu số lượng tin nhắn chưa đọc có hiệu ứng gợn sóng animate-ping nhấp nháy. |
 | Ánh Xạ Kỹ Thuật (Tech Mapping) | Route: `/association/messages` | Engine: Socket.IO Gateway |
@@ -588,7 +588,7 @@ Bước 4: Bấm nút 'Nhắn tin nhanh' để mở ngay cuộc trò chuyện v�
 
 #### Luồng Sự Kiện Chính (Step-by-step Main Flow)
 
-Bước 1: Hội viên mở tab 'Tin Nhắn' trên thanh điều hướng dưới đáy Mobile App.
+Bước 1: Học viên mở tab 'Tin Nhắn' trên thanh điều hướng dưới đáy Mobile App.
 
 Bước 2: Hệ thống tải Hộp thư Messenger phong cách hiện đại với màu chủ đạo #0084FF.
 
@@ -610,11 +610,11 @@ Bước E1: Mất mạng Internet -> Lưu tin nhắn vào bộ nhớ đệm và 
 | --- | --- |
 | Mã Use Case | UC-APP-MSG-02 |
 | Tên Chức Năng | Kênh Thông Báo Ban Thư Ký Ghim Trên Cùng & Thẻ Liên Kết Zalo OA |
-| Phân Hệ / Module | Phân hệ 3: Ứng Dụng Di Động Hội Viên CEO HN10 |
+| Phân Hệ / Module | Phân hệ 3: Ứng Dụng Di Động Học viên CEO HN10 |
 | Mục Tiêu Nghiệp Vụ | Kênh truyền thông điều hành chính thức của Ban Thư Ký luôn được ghim cố định ở vị trí số 1 trong Hộp thư, tích hợp thẻ kết nối Zalo Official Account. |
-| Tác Nhân (Actors) | Ban Thư Ký (Phát thông báo), Hội viên (Tiếp nhận) |
-| Tiền Điều Kiện (Pre-conditions) | Hội viên truy cập Hộp thư tin nhắn. |
-| Hậu Điều Kiện (Post-conditions) | 100% hội viên tiếp cận thông điệp chỉ đạo của Ban Thường Trực kịp thời. |
+| Tác Nhân (Actors) | Ban Thư Ký (Phát thông báo), Học viên (Tiếp nhận) |
+| Tiền Điều Kiện (Pre-conditions) | Học viên truy cập Hộp thư tin nhắn. |
+| Hậu Điều Kiện (Post-conditions) | 100% Học viên tiếp cận thông điệp chỉ đạo của Ban Thường Trực kịp thời. |
 | Quy Tắc Nghiệp Vụ (Business Rules) | Kênh Ban Thư Ký là kênh hệ thống bất biến, không thể bị xóa hay ẩn đi. |
 | Ánh Xạ Kỹ Thuật (Tech Mapping) | Component: `ChatDrawer.tsx` | Room: `system:secretariat` |
 
@@ -622,7 +622,7 @@ Bước E1: Mất mạng Internet -> Lưu tin nhắn vào bộ nhớ đệm và 
 
 #### Luồng Sự Kiện Chính (Step-by-step Main Flow)
 
-Bước 1: Hội viên mở màn hình Tin nhắn.
+Bước 1: Học viên mở màn hình Tin nhắn.
 
 Bước 2: Kênh 'Ban Thư Ký CEO HN10' luôn hiển thị trên cùng với huy hiệu Tích xanh xác thực.
 
@@ -636,11 +636,11 @@ Bước 4: Chạm vào Thẻ liên kết Zalo OA để chuyển tiếp nhanh san
 | --- | --- |
 | Mã Use Case | UC-APP-EVT-01 |
 | Tên Chức Năng | Khám Phá Sự Kiện Hội Thảo & Đêm Gala Dinner Thường Niên |
-| Phân Hệ / Module | Phân hệ 3: Ứng Dụng Di Động Hội Viên CEO HN10 |
+| Phân Hệ / Module | Phân hệ 3: Ứng Dụng Di Động Học viên CEO HN10 |
 | Mục Tiêu Nghiệp Vụ | Xem chi tiết chương trình sự kiện, danh sách diễn giả VIP, timeline khung giờ và chính sách vé mời tham dự. |
-| Tác Nhân (Actors) | Hội viên chính thức CLB Doanh Nhân CEO HN10 |
+| Tác Nhân (Actors) | Học viên chính thức CLB Doanh Nhân CEO HN10 |
 | Tiền Điều Kiện (Pre-conditions) | Có sự kiện đang mở đăng ký. |
-| Hậu Điều Kiện (Post-conditions) | Hội viên nắm rõ kế hoạch sự kiện để chủ động sắp xếp lịch công tác. |
+| Hậu Điều Kiện (Post-conditions) | Học viên nắm rõ kế hoạch sự kiện để chủ động sắp xếp lịch công tác. |
 | Quy Tắc Nghiệp Vụ (Business Rules) | Icon Sự kiện có huy hiệu số lượng sự kiện mới kèm hiệu ứng animate-pulse. |
 | Ánh Xạ Kỹ Thuật (Tech Mapping) | Route: `/association/events` | Component: `association.events.tsx` |
 
@@ -648,7 +648,7 @@ Bước 4: Chạm vào Thẻ liên kết Zalo OA để chuyển tiếp nhanh san
 
 #### Luồng Sự Kiện Chính (Step-by-step Main Flow)
 
-Bước 1: Hội viên mở mục 'Sự Kiện' trên thanh điều hướng (`/association/events`).
+Bước 1: Học viên mở mục 'Sự Kiện' trên thanh điều hướng (`/association/events`).
 
 Bước 2: Hệ thống hiển thị Carousel Sự kiện nổi bật với ảnh banner 16:9 và bộ đếm ngược.
 
@@ -662,11 +662,11 @@ Bước 4: Bấm vào một sự kiện để mở màn hình chi tiết: Địa
 | --- | --- |
 | Mã Use Case | UC-APP-EVT-02 |
 | Tên Chức Năng | Đăng Ký Vé Sự Kiện & Cảnh Báo Trùng Khung Giờ (confirmOverlap) |
-| Phân Hệ / Module | Phân hệ 3: Ứng Dụng Di Động Hội Viên CEO HN10 |
-| Mục Tiêu Nghiệp Vụ | Hội viên đăng ký vé tham dự sự kiện Gala 0 VNĐ, chọn vị trí bàn tiệc VIP; hệ thống phát hiện trùng lịch và yêu cầu xác nhận trước khi cấp vé. |
-| Tác Nhân (Actors) | Hội viên chính thức CLB Doanh Nhân CEO HN10 |
+| Phân Hệ / Module | Phân hệ 3: Ứng Dụng Di Động Học viên CEO HN10 |
+| Mục Tiêu Nghiệp Vụ | Học viên đăng ký vé tham dự sự kiện Gala 0 VNĐ, chọn vị trí bàn tiệc VIP; hệ thống phát hiện trùng lịch và yêu cầu xác nhận trước khi cấp vé. |
+| Tác Nhân (Actors) | Học viên chính thức CLB Doanh Nhân CEO HN10 |
 | Tiền Điều Kiện (Pre-conditions) | Sự kiện có thiết kế sơ đồ ghế và đang mở đăng ký chỗ ngồi. |
-| Hậu Điều Kiện (Post-conditions) | Hội viên sở hữu vé sự kiện định danh chính xác, có xác nhận chủ động nếu tham gia nhiều sự kiện cùng buổi. |
+| Hậu Điều Kiện (Post-conditions) | Học viên sở hữu vé sự kiện định danh chính xác, có xác nhận chủ động nếu tham gia nhiều sự kiện cùng buổi. |
 | Quy Tắc Nghiệp Vụ (Business Rules) | RULE-EVT-USER-OVERLAP-WARNING: Cảnh báo xác nhận trùng lịch; RULE-EVENT-SINGLE-CHECKIN: Mỗi vé chỉ check-in 1 lần. |
 | Ánh Xạ Kỹ Thuật (Tech Mapping) | API: `POST /api/association/events/:id/register` | Table: `event_registrations` | Component: `association.events.tsx`, `m.events.tsx` |
 
@@ -678,33 +678,33 @@ Bước 4: Bấm vào một sự kiện để mở màn hình chi tiết: Địa
 | --- | --- | --- | --- |
 | eventId | String | BẮT BUỘC | Mã sự kiện tham dự |
 | selectedSeatId | String | Tùy chọn | Mã ghế được chọn trên sơ đồ (VD: Bàn 03 - Ghế 08) |
-| confirmOverlap | Boolean | Tùy chọn | Mặc định false; true khi hội viên xác nhận đăng ký trùng khung giờ |
+| confirmOverlap | Boolean | Tùy chọn | Mặc định false; true khi Học viên xác nhận đăng ký trùng khung giờ |
 
 
 
 #### Luồng Sự Kiện Chính (Step-by-step Main Flow)
 
-Bước 1: Tại trang chi tiết sự kiện, hội viên bấm 'Đăng Ký Tham Dự'.
+Bước 1: Tại trang chi tiết sự kiện, Học viên bấm 'Đăng Ký Tham Dự'.
 
-Bước 2: Hệ thống tự động nhận diện tư cách hội viên chính thức, áp dụng giá vé VIP 0 VNĐ.
+Bước 2: Hệ thống tự động nhận diện tư cách Học viên chính thức, áp dụng giá vé VIP 0 VNĐ.
 
-Bước 3: Hệ thống kiểm tra danh sách các sự kiện mà hội viên này đã đăng ký trước đó:
+Bước 3: Hệ thống kiểm tra danh sách các sự kiện mà Học viên này đã đăng ký trước đó:
 
    - Nếu trùng ngày và khung giờ tổ chức với một sự kiện khác: Kích hoạt cảnh báo xác nhận overlap.
 
 Bước 4: Mở màn hình Sơ Đồ Ghế Ngồi Cinema Seating Map trên điện thoại (nếu sự kiện có sơ đồ ghế).
 
-Bước 5: Hội viên chạm chọn bàn tiệc và ghế còn trống (Ghế đã có người chọn hiển thị màu xám khóa).
+Bước 5: Học viên chạm chọn bàn tiệc và ghế còn trống (Ghế đã có người chọn hiển thị màu xám khóa).
 
 Bước 6: Bấm 'Xác Nhận Giữ Chỗ'.
 
-Bước 7: Hệ thống khóa ghế và phát hành Vé điện tử E-Ticket tức thì vào Ví vé của hội viên.
+Bước 7: Hệ thống khóa ghế và phát hành Vé điện tử E-Ticket tức thì vào Ví vé của Học viên.
 
 #### Luồng Rẽ Nhánh / Thay Thế (Alternative Flows)
 
-Bước A1: Hội viên đã đăng ký sự kiện A (VD: Hội thảo Xúc tiến đầu tư 08:30 - 11:30 ngày 15/10 tại KS Daewoo), tiếp tục đăng ký sự kiện B (Tọa đàm Chuyển đổi số 09:00 - 11:00 ngày 15/10 tại Khách sạn Lotte) -> Hệ thống hiển thị Modal cảnh báo: 'Bạn đang đăng ký sự kiện "Tọa đàm Chuyển đổi số" cùng thời gian với sự kiện "Hội thảo Xúc tiến đầu tư" (08:30 15/10/2026). Bạn có chắc muốn đăng ký thêm không?'.
+Bước A1: Học viên đã đăng ký sự kiện A (VD: Hội thảo Xúc tiến đầu tư 08:30 - 11:30 ngày 15/10 tại KS Daewoo), tiếp tục đăng ký sự kiện B (Tọa đàm Chuyển đổi số 09:00 - 11:00 ngày 15/10 tại Khách sạn Lotte) -> Hệ thống hiển thị Modal cảnh báo: 'Bạn đang đăng ký sự kiện "Tọa đàm Chuyển đổi số" cùng thời gian với sự kiện "Hội thảo Xúc tiến đầu tư" (08:30 15/10/2026). Bạn có chắc muốn đăng ký thêm không?'.
 
-Bước A2: Hội viên bấm 'Tiếp Tục Đăng Ký' -> Client gửi API với tham số `confirmOverlap: true` -> Backend lưu vé thành công.
+Bước A2: Học viên bấm 'Tiếp Tục Đăng Ký' -> Client gửi API với tham số `confirmOverlap: true` -> Backend lưu vé thành công.
 
 #### Luồng Ngoại Lệ & Xử Lý Lỗi (Exception Flows)
 
@@ -718,9 +718,9 @@ Bước E2: Đăng ký trùng giờ nhưng không có cờ `confirmOverlap: true
 | --- | --- |
 | Mã Use Case | UC-APP-EVT-03 |
 | Tên Chức Năng | Ví Vé Điện Tử E-Ticket Offline & Mã Check-in QR Khổ Lớn (#LUCKY-xxxx) |
-| Phân Hệ / Module | Phân hệ 3: Ứng Dụng Di Động Hội Viên CEO HN10 |
+| Phân Hệ / Module | Phân hệ 3: Ứng Dụng Di Động Học viên CEO HN10 |
 | Mục Tiêu Nghiệp Vụ | Lưu trữ vé sự kiện offline trong điện thoại, hiển thị mã QR khổ lớn và mã số bốc thăm may mắn để qua cổng an ninh đón tiếp. |
-| Tác Nhân (Actors) | Hội viên tham dự sự kiện Gala |
+| Tác Nhân (Actors) | Học viên tham dự sự kiện Gala |
 | Tiền Điều Kiện (Pre-conditions) | Đã đăng ký vé sự kiện thành công. |
 | Hậu Điều Kiện (Post-conditions) | Đại biểu hoàn tất thủ tục check-in nhanh gọn, không cần xếp hàng tìm tên trên giấy. |
 | Quy Tắc Nghiệp Vụ (Business Rules) | Vé điện tử được lưu cache offline, hoạt động bình thường cả khi hội trường nghẽn mạng. |
@@ -730,7 +730,7 @@ Bước E2: Đăng ký trùng giờ nhưng không có cờ `confirmOverlap: true
 
 #### Luồng Sự Kiện Chính (Step-by-step Main Flow)
 
-Bước 1: Khi đến hội trường sự kiện, hội viên mở mục 'Vé Của Tôi' trên Mobile App.
+Bước 1: Khi đến hội trường sự kiện, Học viên mở mục 'Vé Của Tôi' trên Mobile App.
 
 Bước 2: Vé điện tử E-Ticket hiển thị toàn màn hình với nhận diện Hoàng gia Navy & Gold.
 
@@ -738,7 +738,7 @@ Bước 3: Hiển thị nổi bật: Mã QR Check-in khổ lớn, Họ tên, Tê
 
 Bước 4: Đưa mã QR trước máy quét tại Cổng an ninh đón tiếp.
 
-Bước 5: Cổng an ninh xác thực thành công trong 0.2s, hội viên bước vào hội trường dự tiệc.
+Bước 5: Cổng an ninh xác thực thành công trong 0.2s, Học viên bước vào hội trường dự tiệc.
 
 ### [UC-APP-FEE-01] Tra Cứu Tình Trạng Hội Phí & Sinh mã QR ngân hàng Động 5.000.000 VNĐ Napas 24/7
 
@@ -746,11 +746,11 @@ Bước 5: Cổng an ninh xác thực thành công trong 0.2s, hội viên bư�
 | --- | --- |
 | Mã Use Case | UC-APP-FEE-01 |
 | Tên Chức Năng | Tra Cứu Tình Trạng Hội Phí & Sinh mã QR ngân hàng Động 5.000.000 VNĐ Napas 24/7 |
-| Phân Hệ / Module | Phân hệ 3: Ứng Dụng Di Động Hội Viên CEO HN10 |
-| Mục Tiêu Nghiệp Vụ | Hội viên xem thời hạn hiệu lực của thẻ doanh nhân số và thanh toán hội phí thường niên nhanh 24/7 qua mã QR ngân hàng động. |
-| Tác Nhân (Actors) | Hội viên chính thức CLB Doanh Nhân CEO HN10 |
-| Tiền Điều Kiện (Pre-conditions) | Hội viên truy cập ứng dụng di động. |
-| Hậu Điều Kiện (Post-conditions) | Hội viên thực hiện nghĩa vụ tài chính thuận tiện, không cần gõ tay số tài khoản hay cú pháp. |
+| Phân Hệ / Module | Phân hệ 3: Ứng Dụng Di Động Học viên CEO HN10 |
+| Mục Tiêu Nghiệp Vụ | Học viên xem thời hạn hiệu lực của thẻ doanh nhân số và thanh toán hội phí thường niên nhanh 24/7 qua mã QR ngân hàng động. |
+| Tác Nhân (Actors) | Học viên chính thức CLB Doanh Nhân CEO HN10 |
+| Tiền Điều Kiện (Pre-conditions) | Học viên truy cập ứng dụng di động. |
+| Hậu Điều Kiện (Post-conditions) | Học viên thực hiện nghĩa vụ tài chính thuận tiện, không cần gõ tay số tài khoản hay cú pháp. |
 | Quy Tắc Nghiệp Vụ (Business Rules) | RULE-TERMINOLOGY-HOIPHI: Dùng thuật ngữ Hội phí thường niên, cấm dùng 'niên liễm'. |
 | Ánh Xạ Kỹ Thuật (Tech Mapping) | Route: `/association/renew` | Component: `association.renew.tsx` |
 
@@ -758,7 +758,7 @@ Bước 5: Cổng an ninh xác thực thành công trong 0.2s, hội viên bư�
 
 #### Luồng Sự Kiện Chính (Step-by-step Main Flow)
 
-Bước 1: Hội viên mở mục 'Hội Phí' trên Mobile App (`/association/renew`).
+Bước 1: Học viên mở mục 'Hội Phí' trên Mobile App (`/association/renew`).
 
 Bước 2: Màn hình hiển thị: Ngày hết hạn thẻ doanh nhân số hiện tại, Tình trạng công nợ (Đã đóng / Đến hạn).
 
@@ -766,7 +766,7 @@ Bước 3: Nhấn nút 'Thanh Toán Mã QR Ngân Hàng'.
 
 Bước 4: Hệ thống sinh mã QR ngân hàng động chuẩn Napas 24/7 chứa sẵn: 5.000.000 VNĐ, Tên tài khoản CLB CEO HN10 và Cú pháp: `HOIPHI CEO HN10 [MÃ_HV] [HỌ_TÊN]`.
 
-Bước 5: Hội viên mở app ngân hàng quét mã hoặc bấm 'Lưu ảnh QR' để chuyển khoản.
+Bước 5: Học viên mở app ngân hàng quét mã hoặc bấm 'Lưu ảnh QR' để chuyển khoản.
 
 Bước 6: Sau khi chuyển tiền, kế toán đối soát sao kê và duyệt gạch nợ trên CRM gia hạn thẻ +365 ngày.
 
@@ -776,10 +776,10 @@ Bước 6: Sau khi chuyển tiền, kế toán đối soát sao kê và duyệt 
 | --- | --- |
 | Mã Use Case | UC-APP-FEE-02 |
 | Tên Chức Năng | Xem Lịch Sử Đóng Hội Phí & Tải Hóa Đơn Điện Tử |
-| Phân Hệ / Module | Phân hệ 3: Ứng Dụng Di Động Hội Viên CEO HN10 |
+| Phân Hệ / Module | Phân hệ 3: Ứng Dụng Di Động Học viên CEO HN10 |
 | Mục Tiêu Nghiệp Vụ | Tra cứu lại toàn bộ các kỳ hội phí đã nộp trong suốt quá trình tham gia hiệp hội và tải hóa đơn điện tử. |
-| Tác Nhân (Actors) | Hội viên chính thức CLB Doanh Nhân CEO HN10 |
-| Tiền Điều Kiện (Pre-conditions) | Hội viên đã có ít nhất một giao dịch hội phí được gạch nợ. |
+| Tác Nhân (Actors) | Học viên chính thức CLB Doanh Nhân CEO HN10 |
+| Tiền Điều Kiện (Pre-conditions) | Học viên đã có ít nhất một giao dịch hội phí được gạch nợ. |
 | Hậu Điều Kiện (Post-conditions) | Doanh nghiệp có đầy đủ chứng từ quyết toán hợp lệ. |
 | Quy Tắc Nghiệp Vụ (Business Rules) | Hóa đơn điện tử được lưu trữ vĩnh viễn trên hệ thống. |
 | Ánh Xạ Kỹ Thuật (Tech Mapping) | Route: `/association/renew/history` | Table: `invoices` |
@@ -788,7 +788,7 @@ Bước 6: Sau khi chuyển tiền, kế toán đối soát sao kê và duyệt 
 
 #### Luồng Sự Kiện Chính (Step-by-step Main Flow)
 
-Bước 1: Tại mục Hội phí, hội viên chọn tab 'Lịch Sử Giao Dịch'.
+Bước 1: Tại mục Hội phí, Học viên chọn tab 'Lịch Sử Giao Dịch'.
 
 Bước 2: Hệ thống liệt kê danh sách các năm đã đóng: Năm tài chính, Số tiền 5.000.000 VNĐ, Ngày thanh toán, Trạng thái 'Đã Hoàn Thành'.
 
@@ -800,11 +800,11 @@ Bước 3: Bấm vào kỳ bất kỳ để xem và tải Hóa đơn điện t�
 | --- | --- |
 | Mã Use Case | UC-APP-B2B-01 |
 | Tên Chức Năng | Khám Phá Sàn Thương Mại B2B & Xem Chi Tiết Báo Giá Sản Phẩm |
-| Phân Hệ / Module | Phân hệ 3: Ứng Dụng Di Động Hội Viên CEO HN10 |
+| Phân Hệ / Module | Phân hệ 3: Ứng Dụng Di Động Học viên CEO HN10 |
 | Mục Tiêu Nghiệp Vụ | Khám phá chợ giao thương nội khối, tìm kiếm nhà cung cấp tin cậy trong các bạn thành viên CEO HN10 và yêu cầu báo giá ưu đãi. |
-| Tác Nhân (Actors) | Hội viên chính thức CLB Doanh Nhân CEO HN10 |
+| Tác Nhân (Actors) | Học viên chính thức CLB Doanh Nhân CEO HN10 |
 | Tiền Điều Kiện (Pre-conditions) | Đã đăng nhập vào Mobile App. |
-| Hậu Điều Kiện (Post-conditions) | Hội viên tiếp cận nguồn hàng chất lượng cao với giá ưu đãi độc quyền. |
+| Hậu Điều Kiện (Post-conditions) | Học viên tiếp cận nguồn hàng chất lượng cao với giá ưu đãi độc quyền. |
 | Quy Tắc Nghiệp Vụ (Business Rules) | Loại bỏ hoàn toàn các hành vi B2C e-commerce (trái tim wishlist lặp đi lặp lại) khỏi sàn B2B. |
 | Ánh Xạ Kỹ Thuật (Tech Mapping) | Route: `/association/products` | Component: `association.products.tsx` |
 
@@ -820,7 +820,7 @@ Bước 3: Bấm vào kỳ bất kỳ để xem và tải Hóa đơn điện t�
 
 #### Luồng Sự Kiện Chính (Step-by-step Main Flow)
 
-Bước 1: Hội viên mở mục 'Chợ B2B' (`/association/products`).
+Bước 1: Học viên mở mục 'Chợ B2B' (`/association/products`).
 
 Bước 2: Hệ thống hiển thị 2 tab lớn: 'Chợ Giao Thương B2B' và 'Gian Hàng Của Tôi'.
 
@@ -836,10 +836,10 @@ Bước 5: Bấm nút 'Báo Giá ->' để mở cuộc đàm phán 1-on-1 trực
 | --- | --- |
 | Mã Use Case | UC-APP-B2B-02 |
 | Tên Chức Năng | Đăng Bán Sản Phẩm/Dịch Vụ Trợ Giá Nội Bộ Cho Hiệp Hội |
-| Phân Hệ / Module | Phân hệ 3: Ứng Dụng Di Động Hội Viên CEO HN10 |
+| Phân Hệ / Module | Phân hệ 3: Ứng Dụng Di Động Học viên CEO HN10 |
 | Mục Tiêu Nghiệp Vụ | Doanh nghiệp thành viên đưa sản phẩm thế mạnh lên sàn B2B để tiếp cận 500+ khách hàng doanh nghiệp tiềm năng trong CLB. |
-| Tác Nhân (Actors) | Hội viên doanh nghiệp cung ứng |
-| Tiền Điều Kiện (Pre-conditions) | Tài khoản hội viên đang hoạt động hợp lệ. |
+| Tác Nhân (Actors) | Học viên doanh nghiệp cung ứng |
+| Tiền Điều Kiện (Pre-conditions) | Tài khoản Học viên đang hoạt động hợp lệ. |
 | Hậu Điều Kiện (Post-conditions) | Sản phẩm được gửi đến Hội đồng kiểm duyệt Ban Xúc Tiến. |
 | Quy Tắc Nghiệp Vụ (Business Rules) | RULE-B2B-INTERNAL-DISCOUNT: Bắt buộc trợ giá nội bộ. |
 | Ánh Xạ Kỹ Thuật (Tech Mapping) | API: `POST /api/association/products` | Table: `products` |
@@ -879,10 +879,10 @@ Bước E1: Mức chiết khấu < 5% -> Báo lỗi yêu cầu tối thiểu 5% 
 | --- | --- |
 | Mã Use Case | UC-APP-B2B-03 |
 | Tên Chức Năng | Quản Lý Gian Hàng Của Tôi (Chỉnh Sửa, Cập Nhật Giá, Ẩn Sản Phẩm) |
-| Phân Hệ / Module | Phân hệ 3: Ứng Dụng Di Động Hội Viên CEO HN10 |
+| Phân Hệ / Module | Phân hệ 3: Ứng Dụng Di Động Học viên CEO HN10 |
 | Mục Tiêu Nghiệp Vụ | Quản trị danh mục sản phẩm đang chào bán của doanh nghiệp mình trên sàn giao thương hiệp hội. |
-| Tác Nhân (Actors) | Hội viên sở hữu gian hàng |
-| Tiền Điều Kiện (Pre-conditions) | Hội viên đã có sản phẩm đăng trên sàn. |
+| Tác Nhân (Actors) | Học viên sở hữu gian hàng |
+| Tiền Điều Kiện (Pre-conditions) | Học viên đã có sản phẩm đăng trên sàn. |
 | Hậu Điều Kiện (Post-conditions) | Thông tin gian hàng luôn phản ánh đúng năng lực cung ứng hiện tại. |
 | Quy Tắc Nghiệp Vụ (Business Rules) | Chỉ chủ sở hữu sản phẩm hoặc Ban Xúc Tiến mới có quyền chỉnh sửa/ẩn sản phẩm. |
 | Ánh Xạ Kỹ Thuật (Tech Mapping) | Route: `/association/products` (Tab `my-store`) |
@@ -899,7 +899,7 @@ Bước E1: Mức chiết khấu < 5% -> Báo lỗi yêu cầu tối thiểu 5% 
 
 #### Luồng Sự Kiện Chính (Step-by-step Main Flow)
 
-Bước 1: Hội viên vào tab 'Gian Hàng Của Tôi' trên màn hình Chợ B2B.
+Bước 1: Học viên vào tab 'Gian Hàng Của Tôi' trên màn hình Chợ B2B.
 
 Bước 2: Xem danh sách các sản phẩm của công ty mình và số lượt quan tâm báo giá.
 
@@ -915,9 +915,9 @@ Bước 5: Nhấn 'Lưu Cập Nhật'.
 | --- | --- |
 | Mã Use Case | UC-APP-OPP-01 |
 | Tên Chức Năng | Khám Phá Bảng Tin Cơ Hội Kinh Doanh Cung - Cầu (Cần Mua / Cần Bán) |
-| Phân Hệ / Module | Phân hệ 3: Ứng Dụng Di Động Hội Viên CEO HN10 |
+| Phân Hệ / Module | Phân hệ 3: Ứng Dụng Di Động Học viên CEO HN10 |
 | Mục Tiêu Nghiệp Vụ | Xem dòng thời gian các nhu cầu tìm kiếm đối tác, mua sắm vật tư thiết bị hoặc hợp tác đầu tư của các thành viên. |
-| Tác Nhân (Actors) | Hội viên chính thức CLB Doanh Nhân CEO HN10 |
+| Tác Nhân (Actors) | Học viên chính thức CLB Doanh Nhân CEO HN10 |
 | Tiền Điều Kiện (Pre-conditions) | Đã đăng nhập vào Mobile App. |
 | Hậu Điều Kiện (Post-conditions) | Nắm bắt nhanh các cơ hội kinh doanh thực tế trong hiệp hội. |
 | Quy Tắc Nghiệp Vụ (Business Rules) | Tin đăng phải rõ ràng, nghiêm túc, không spam quảng cáo rác. |
@@ -935,7 +935,7 @@ Bước 5: Nhấn 'Lưu Cập Nhật'.
 
 #### Luồng Sự Kiện Chính (Step-by-step Main Flow)
 
-Bước 1: Hội viên mở mục 'Cơ Hội Hợp Tác' (`/association/opportunities`).
+Bước 1: Học viên mở mục 'Cơ Hội Hợp Tác' (`/association/opportunities`).
 
 Bước 2: Hệ thống hiển thị Bảng tin Cung - Cầu thời gian thực phong cách mạng xã hội doanh nhân.
 
@@ -949,10 +949,10 @@ Bước 4: Bấm vào tin đăng để xem chi tiết và thảo luận.
 | --- | --- |
 | Mã Use Case | UC-APP-OPP-02 |
 | Tên Chức Năng | Đăng Tin Nhu Cầu Giao Thương Mới Lên Bảng Tin Hiệp Hội |
-| Phân Hệ / Module | Phân hệ 3: Ứng Dụng Di Động Hội Viên CEO HN10 |
+| Phân Hệ / Module | Phân hệ 3: Ứng Dụng Di Động Học viên CEO HN10 |
 | Mục Tiêu Nghiệp Vụ | Phát đi nhu cầu tìm kiếm nhà cung cấp hoặc chào bán đơn hàng số lượng lớn đến toàn thể cộng đồng CEO HN10. |
-| Tác Nhân (Actors) | Hội viên có nhu cầu giao thương |
-| Tiền Điều Kiện (Pre-conditions) | Tài khoản hội viên đang hoạt động hợp lệ. |
+| Tác Nhân (Actors) | Học viên có nhu cầu giao thương |
+| Tiền Điều Kiện (Pre-conditions) | Tài khoản Học viên đang hoạt động hợp lệ. |
 | Hậu Điều Kiện (Post-conditions) | Cơ hội kinh doanh được lan tỏa đến 500+ chủ doanh nghiệp. |
 | Quy Tắc Nghiệp Vụ (Business Rules) | Tin Cần Mua được ưu tiên hiển thị nổi bật trên Bảng tin. |
 | Ánh Xạ Kỹ Thuật (Tech Mapping) | API: `POST /api/association/opportunities` | Table: `business_card_needs` |
@@ -972,7 +972,7 @@ Bước 4: Bấm vào tin đăng để xem chi tiết và thảo luận.
 
 #### Luồng Sự Kiện Chính (Step-by-step Main Flow)
 
-Bước 1: Tại Bảng tin Cơ hội, hội viên bấm nút 'Đăng Tin Mới'.
+Bước 1: Tại Bảng tin Cơ hội, Học viên bấm nút 'Đăng Tin Mới'.
 
 Bước 2: Chọn loại tin: 'Cần Mua' hoặc 'Cần Bán'.
 
@@ -980,7 +980,7 @@ Bước 3: Nhập tiêu đề, mô tả yêu cầu, ngân sách dự kiến và 
 
 Bước 4: Nhấn nút 'Đăng Tin Ngay'.
 
-Bước 5: Tin đăng lập tức hiển thị trên bảng tin của toàn thể hội viên và gửi thông báo đến Ban Xúc Tiến.
+Bước 5: Tin đăng lập tức hiển thị trên bảng tin của toàn thể Học viên và gửi thông báo đến Ban Xúc Tiến.
 
 ### [UC-APP-OPP-03] Tiếp Nhận Cơ Hội Hợp Tác (Claim Opportunity) & Mở Phòng Trao Đổi 1-1
 
@@ -988,7 +988,7 @@ Bước 5: Tin đăng lập tức hiển thị trên bảng tin của toàn th�
 | --- | --- |
 | Mã Use Case | UC-APP-OPP-03 |
 | Tên Chức Năng | Tiếp Nhận Cơ Hội Hợp Tác (Claim Opportunity) & Mở Phòng Trao Đổi 1-1 |
-| Phân Hệ / Module | Phân hệ 3: Ứng Dụng Di Động Hội Viên CEO HN10 |
+| Phân Hệ / Module | Phân hệ 3: Ứng Dụng Di Động Học viên CEO HN10 |
 | Mục Tiêu Nghiệp Vụ | Doanh nghiệp có năng lực bấm tiếp nhận cơ hội kinh doanh để mở ngay kênh đàm phán hợp tác chính danh với bên đăng tin. |
 | Tác Nhân (Actors) | Doanh nghiệp cung ứng quan tâm cơ hội |
 | Tiền Điều Kiện (Pre-conditions) | Có tin Cung - Cầu đang mở tiếp nhận. |
@@ -1009,7 +1009,7 @@ Bước 5: Tin đăng lập tức hiển thị trên bảng tin của toàn th�
 
 #### Luồng Sự Kiện Chính (Step-by-step Main Flow)
 
-Bước 1: Khi xem một tin đăng Cần Mua phù hợp năng lực, hội viên bấm nút 'Tiếp Nhận Cơ Hội' (Claim Opportunity).
+Bước 1: Khi xem một tin đăng Cần Mua phù hợp năng lực, Học viên bấm nút 'Tiếp Nhận Cơ Hội' (Claim Opportunity).
 
 Bước 2: Nhập tóm tắt năng lực cung ứng và cam kết chính sách ưu đãi.
 
@@ -1025,12 +1025,12 @@ Bước 5: Ghi nhận sự kiện kết nối vào bảng theo dõi của Ban X�
 | --- | --- |
 | Mã Use Case | UC-APP-VOT-01 |
 | Tên Chức Năng | Biểu Quyết & Bầu Cử Đại Hội Điện Tử Trực Tuyến 1 Người 1 Phiếu |
-| Phân Hệ / Module | Phân hệ 3: Ứng Dụng Di Động Hội Viên CEO HN10 |
+| Phân Hệ / Module | Phân hệ 3: Ứng Dụng Di Động Học viên CEO HN10 |
 | Mục Tiêu Nghiệp Vụ | Thực hiện bỏ phiếu bầu cử Ban Chấp Hành hoặc biểu quyết thông qua nghị quyết đại hội trên điện thoại di động với độ trễ live 1 giây. |
-| Tác Nhân (Actors) | Hội viên chính thức CLB Doanh Nhân CEO HN10 |
-| Tiền Điều Kiện (Pre-conditions) | Phiên biểu quyết đang được kích hoạt mở hòm phiếu (status = 'open') và hội viên có `fee_paid = true`. |
+| Tác Nhân (Actors) | Học viên chính thức CLB Doanh Nhân CEO HN10 |
+| Tiền Điều Kiện (Pre-conditions) | Phiên biểu quyết đang được kích hoạt mở hòm phiếu (status = 'open') và Học viên có `fee_paid = true`. |
 | Hậu Điều Kiện (Post-conditions) | Kết quả kiểm phiếu đại hội chính xác 100%, minh bạch tuyệt đối, rút ngắn thời gian kiểm phiếu từ 3 giờ xuống còn 1 giây. |
-| Quy Tắc Nghiệp Vụ (Business Rules) | RULE-VOTING-ONE-PERSON-ONE-VOTE: Mỗi hội viên có đúng 1 phiếu bầu, không thể sửa đổi sau khi nộp. |
+| Quy Tắc Nghiệp Vụ (Business Rules) | RULE-VOTING-ONE-PERSON-ONE-VOTE: Mỗi Học viên có đúng 1 phiếu bầu, không thể sửa đổi sau khi nộp. |
 | Ánh Xạ Kỹ Thuật (Tech Mapping) | Route: `/association/voting` | API: `POST /api/association/voting/submit` |
 
 
@@ -1048,7 +1048,7 @@ Bước 5: Ghi nhận sự kiện kết nối vào bảng theo dõi của Ban X�
 
 Bước 1: Khi Chủ tọa đại hội phát lệnh, Ban Thư Ký mở hòm phiếu biểu quyết trên Web CRM.
 
-Bước 2: Toàn bộ hội viên chính thức nhận được thông báo đẩy trên Mobile App, mở màn hình Biểu Quyết (/association/voting).
+Bước 2: Toàn bộ Học viên chính thức nhận được thông báo đẩy trên Mobile App, mở màn hình Biểu Quyết (/association/voting).
 
 Bước 3: Xem nội dung tờ trình, chọn phương án biểu quyết và bấm 'Xác Nhận Bỏ Phiếu'.
 
@@ -1056,7 +1056,7 @@ Bước 4: Hệ thống kiểm tra tư cách cử tri: Bắt buộc tài khoản
 
 Bước 5: Hệ thống mã hóa một chiều phiếu bầu (Đảm bảo nguyên tắc bỏ phiếu kín ẩn danh).
 
-Bước 6: Khóa nút bỏ phiếu trên điện thoại của hội viên, hiển thị thông báo 'Quý anh/chị đã hoàn thành biểu quyết'.
+Bước 6: Khóa nút bỏ phiếu trên điện thoại của Học viên, hiển thị thông báo 'Quý anh/chị đã hoàn thành biểu quyết'.
 
 Bước 7: Máy chủ tổng hợp phiếu bầu tức thời qua Socket.IO.
 
@@ -1066,7 +1066,7 @@ Bước 8: Màn hình lớn trung tâm của Đại hội hiển thị biểu đ
 
 Bước E1: Cố tình bỏ phiếu lần thứ hai -> Hệ thống chặn ngay lập tức: 'Quý đại biểu đã thực hiện bỏ phiếu trong phiên này'.
 
-Bước E2: Hội viên chưa hoàn thành hội phí thường niên -> Hệ thống thông báo: 'Chỉ hội viên hoàn thành nghĩa vụ hội phí mới có quyền biểu quyết đại hội'.
+Bước E2: Học viên chưa hoàn thành hội phí thường niên -> Hệ thống thông báo: 'Chỉ Học viên hoàn thành nghĩa vụ hội phí mới có quyền biểu quyết đại hội'.
 
 ### [UC-APP-NOTIF-01] Trung Tâm Thông Báo Đẩy Thời Gian Thực (Push Notifications)
 
@@ -1074,11 +1074,11 @@ Bước E2: Hội viên chưa hoàn thành hội phí thường niên -> Hệ th
 | --- | --- |
 | Mã Use Case | UC-APP-NOTIF-01 |
 | Tên Chức Năng | Trung Tâm Thông Báo Đẩy Thời Gian Thực (Push Notifications) |
-| Phân Hệ / Module | Phân hệ 3: Ứng Dụng Di Động Hội Viên CEO HN10 |
+| Phân Hệ / Module | Phân hệ 3: Ứng Dụng Di Động Học viên CEO HN10 |
 | Mục Tiêu Nghiệp Vụ | Nhận thông báo tức thì về lịch họp, sự kiện mới, nhắc nộp hội phí, tin nhắn messenger và biến động cơ hội kinh doanh. |
-| Tác Nhân (Actors) | Hội viên chính thức CLB Doanh Nhân CEO HN10 |
-| Tiền Điều Kiện (Pre-conditions) | Hội viên cho phép nhận thông báo trên thiết bị di động. |
-| Hậu Điều Kiện (Post-conditions) | Hội viên không bao giờ bỏ lỡ các thông tin điều hành quan trọng. |
+| Tác Nhân (Actors) | Học viên chính thức CLB Doanh Nhân CEO HN10 |
+| Tiền Điều Kiện (Pre-conditions) | Học viên cho phép nhận thông báo trên thiết bị di động. |
+| Hậu Điều Kiện (Post-conditions) | Học viên không bao giờ bỏ lỡ các thông tin điều hành quan trọng. |
 | Quy Tắc Nghiệp Vụ (Business Rules) | Thông báo đẩy được truyền tải qua Web Push API và WebSocket thời gian thực. |
 | Ánh Xạ Kỹ Thuật (Tech Mapping) | Component: `NotificationDrawer.tsx` | Engine: Web Push Protocol |
 
@@ -1086,7 +1086,7 @@ Bước E2: Hội viên chưa hoàn thành hội phí thường niên -> Hệ th
 
 #### Luồng Sự Kiện Chính (Step-by-step Main Flow)
 
-Bước 1: Hội viên chạm vào biểu tượng Chuông thông báo ở góc trên bên phải màn hình.
+Bước 1: Học viên chạm vào biểu tượng Chuông thông báo ở góc trên bên phải màn hình.
 
 Bước 2: Trung tâm thông báo mở ra, hiển thị các thông báo chia theo danh mục: Hệ thống, Sự kiện, Giao thương, Tin nhắn.
 
@@ -1102,11 +1102,11 @@ Bước 5: Bấm 'Đánh dấu tất cả đã đọc' để xóa các huy hiệ
 | --- | --- |
 | Mã Use Case | UC-APP-SET-01 |
 | Tên Chức Năng | Cài Đặt Ứng Dụng PWA Màn Hình Chính iOS & Android 1-Chạm |
-| Phân Hệ / Module | Phân hệ 3: Ứng Dụng Di Động Hội Viên CEO HN10 |
+| Phân Hệ / Module | Phân hệ 3: Ứng Dụng Di Động Học viên CEO HN10 |
 | Mục Tiêu Nghiệp Vụ | Cơ chế tự động hỏi 'Bạn muốn thêm ứng dụng CEO HN10 vào màn hình chính không?' khi mở link chia sẻ, hướng dẫn cài đặt PWA chuẩn icon và tên thương hiệu. |
-| Tác Nhân (Actors) | Hội viên sử dụng smartphone iOS hoặc Android |
+| Tác Nhân (Actors) | Học viên sử dụng smartphone iOS hoặc Android |
 | Tiền Điều Kiện (Pre-conditions) | Mở ứng dụng trên trình duyệt web di động (Safari iOS hoặc Chrome Android). |
-| Hậu Điều Kiện (Post-conditions) | Ứng dụng CEO HN10 được cài đặt hoàn chỉnh trên màn hình chính của hội viên. |
+| Hậu Điều Kiện (Post-conditions) | Ứng dụng CEO HN10 được cài đặt hoàn chỉnh trên màn hình chính của Học viên. |
 | Quy Tắc Nghiệp Vụ (Business Rules) | Khi người dùng đã bấm tắt, tuyệt đối không được tự ý hiện lại popup làm phiền. |
 | Ánh Xạ Kỹ Thuật (Tech Mapping) | Component: `IosInstallPrompt.tsx` | WebClip: `/ceohn10.mobileconfig` |
 
@@ -1114,7 +1114,7 @@ Bước 5: Bấm 'Đánh dấu tất cả đã đọc' để xóa các huy hiệ
 
 #### Luồng Sự Kiện Chính (Step-by-step Main Flow)
 
-Bước 1: Khi hội viên mở liên kết web app lần đầu hoặc bấm vào link chia sẻ `?install=ios`, hệ thống kích hoạt hộp thoại trang trọng: 'Bạn muốn thêm ứng dụng CEO HN10 vào màn hình chính không?'.
+Bước 1: Khi Học viên mở liên kết web app lần đầu hoặc bấm vào link chia sẻ `?install=ios`, hệ thống kích hoạt hộp thoại trang trọng: 'Bạn muốn thêm ứng dụng CEO HN10 vào màn hình chính không?'.
 
 Bước 2: Hộp thoại hiển thị biểu tượng Logo chuẩn CEO HN10 và 2 nút: `[Có, thêm luôn]` và `[Để sau]`.
 
@@ -1126,7 +1126,7 @@ Bước 5: Biểu tượng ứng dụng 'CEO HN10' xuất hiện trên màn hìn
 
 #### Luồng Rẽ Nhánh / Thay Thế (Alternative Flows)
 
-Bước A1: Hội viên bấm '[Để sau]' -> Ghi nhớ vĩnh viễn vào `localStorage`, không tự ý hiện lại làm phiền người dùng.
+Bước A1: Học viên bấm '[Để sau]' -> Ghi nhớ vĩnh viễn vào `localStorage`, không tự ý hiện lại làm phiền người dùng.
 
 #### Luồng Ngoại Lệ & Xử Lý Lỗi (Exception Flows)
 
@@ -1138,11 +1138,11 @@ Bước E1: Mở qua trình duyệt In-App của Zalo / Facebook Messenger -> H�
 | --- | --- |
 | Mã Use Case | UC-APP-AI-01 |
 | Tên Chức Năng | Trợ Lý AI Giọng Nói Tiếng Việt & Nắm Bắt Động Phiên Đăng Nhập (Live Context) |
-| Phân Hệ / Module | Phân hệ 3: Ứng Dụng Di Động Hội Viên CEO HN10 |
-| Mục Tiêu Nghiệp Vụ | Trợ lý AI tự động nhận diện danh tính hội viên, tình trạng nợ hội phí Mã QR Ngân Hàng, thông báo mới chưa đọc, vé sự kiện đã đặt và Top 5 sự kiện có số người đăng ký đông nhất; phản hồi ngôn ngữ tự nhiên bằng văn bản Markdown và giọng đọc tiếng Việt 100% miễn phí. |
-| Tác Nhân (Actors) | Hội viên chính thức, Ban Quản Trị, Cán bộ các Ban Chuyên Môn |
-| Tiền Điều Kiện (Pre-conditions) | Hội viên đã đăng nhập vào Ứng dụng Hiệp hội (`/association/*`) và thiết bị hỗ trợ Web Speech API. |
-| Hậu Điều Kiện (Post-conditions) | Hội viên nắm bắt tức thì mọi thông tin hoạt động hiệp hội mà không cần mở nhiều màn hình tra cứu. |
+| Phân Hệ / Module | Phân hệ 3: Ứng Dụng Di Động Học viên CEO HN10 |
+| Mục Tiêu Nghiệp Vụ | Trợ lý AI tự động nhận diện danh tính Học viên, tình trạng nợ hội phí Mã QR Ngân Hàng, thông báo mới chưa đọc, vé sự kiện đã đặt và Top 5 sự kiện có số người đăng ký đông nhất; phản hồi ngôn ngữ tự nhiên bằng văn bản Markdown và giọng đọc tiếng Việt 100% miễn phí. |
+| Tác Nhân (Actors) | Học viên chính thức, Ban Quản Trị, Cán bộ các Ban Chuyên Môn |
+| Tiền Điều Kiện (Pre-conditions) | Học viên đã đăng nhập vào Ứng dụng Hiệp hội (`/association/*`) và thiết bị hỗ trợ Web Speech API. |
+| Hậu Điều Kiện (Post-conditions) | Học viên nắm bắt tức thì mọi thông tin hoạt động hiệp hội mà không cần mở nhiều màn hình tra cứu. |
 | Quy Tắc Nghiệp Vụ (Business Rules) | RULE-AI-32-FEATURES-TWO-PHASE-GPS-GUIDE: Model AI 100% miễn phí; dữ liệu phiên đăng nhập luôn cập nhật thời gian thực. |
 | Ánh Xạ Kỹ Thuật (Tech Mapping) | API: `GET /api/ai/live-context`, `POST /api/ai/ask` | Component: `VoiceNavAssistant.tsx` |
 
@@ -1159,11 +1159,11 @@ Bước E1: Mở qua trình duyệt In-App của Zalo / Facebook Messenger -> H�
 
 #### Luồng Sự Kiện Chính (Step-by-step Main Flow)
 
-Bước 1: Hội viên chạm vào biểu tượng Robot Trợ lý AI ở góc màn hình hoặc dùng phím tắt nổi.
+Bước 1: Học viên chạm vào biểu tượng Robot Trợ lý AI ở góc màn hình hoặc dùng phím tắt nổi.
 
 Bước 2: Hệ thống tự động kích hoạt API `GET /api/ai/live-context`, trích xuất thông tin phiên đăng nhập theo thời gian thực.
 
-Bước 3: Hội viên bấm Micro và nói câu hỏi (Ví dụ: 'Sự kiện nào đang được nhiều người đăng ký nhất?', 'Tôi có thông báo nào chưa đọc không?', 'Hội phí của tôi thế nào?').
+Bước 3: Học viên bấm Micro và nói câu hỏi (Ví dụ: 'Sự kiện nào đang được nhiều người đăng ký nhất?', 'Tôi có thông báo nào chưa đọc không?', 'Hội phí của tôi thế nào?').
 
 Bước 4: Trình duyệt chuyển giọng nói thành văn bản qua Web Speech Recognition (`lang = vi-VN`).
 
@@ -1175,9 +1175,9 @@ Bước 7: Ứng dụng hiển thị bong bóng chat sinh động và Web Speech
 
 #### Luồng Rẽ Nhánh / Thay Thế (Alternative Flows)
 
-Bước A1: Hội viên nhập câu hỏi bằng bàn phím thay vì nói qua Micro.
+Bước A1: Học viên nhập câu hỏi bằng bàn phím thay vì nói qua Micro.
 
-Bước A2: Hội viên chạm vào các chip hỏi nhanh (Quick Prompts) được đề xuất sẵn ở đầu giao diện chat.
+Bước A2: Học viên chạm vào các chip hỏi nhanh (Quick Prompts) được đề xuất sẵn ở đầu giao diện chat.
 
 #### Luồng Ngoại Lệ & Xử Lý Lỗi (Exception Flows)
 
@@ -1191,9 +1191,9 @@ Bước E2: Mất kết nối API ngoài -> Smart Hybrid Engine nội bộ tự 
 | --- | --- |
 | Mã Use Case | UC-APP-AI-02 |
 | Tên Chức Năng | Bộ Máy Hướng Dẫn 32 Tính Năng & Cơ Chế 2 Pha Chỉ Dẫn Trực Tiếp (Turn-by-Turn Voice GPS HUD) |
-| Phân Hệ / Module | Phân hệ 3: Ứng Dụng Di Động Hội Viên CEO HN10 |
+| Phân Hệ / Module | Phân hệ 3: Ứng Dụng Di Động Học viên CEO HN10 |
 | Mục Tiêu Nghiệp Vụ | Bộ máy điều hướng thông minh giải thích cặn kẽ thao tác của 32 tính năng trong/ngoài và tự động lái màn hình, chiếu Spotlight viền vàng nhấp nháy dẫn đường từng bước như Google Maps khi người dùng đồng ý. |
-| Tác Nhân (Actors) | Hội viên chính thức, Doanh nhân CEO HN10, Cán bộ tác nghiệp |
+| Tác Nhân (Actors) | Học viên chính thức, Doanh nhân CEO HN10, Cán bộ tác nghiệp |
 | Tiền Điều Kiện (Pre-conditions) | Người dùng mở Trợ lý AI và hỏi về cách thao tác một chức năng bất kỳ (Ví dụ: 'Đăng ký sự kiện như nào', 'Ghi thẻ NFC ra sao', 'Cách quét card visit AI'). |
 | Hậu Điều Kiện (Post-conditions) | Người dùng thao tác thành công tính năng trên thực tế mà không cần ghi nhớ tài liệu hướng dẫn phức tạp. |
 | Quy Tắc Nghiệp Vụ (Business Rules) | RULE-AI-32-FEATURES-TWO-PHASE-GPS-GUIDE: Bắt buộc áp dụng cơ chế 2 pha (Giải thích -> Hỏi ý kiến -> Lái màn hình khi Đồng ý); bao phủ trọn vẹn 32 tính năng. |
@@ -1256,7 +1256,7 @@ Bước E1: Phần tử đích trên màn hình chưa kịp tải xong -> Bộ �
 
 3. Tự động khóa tài khoản tạm thời trong 15 phút nếu nhập sai mật khẩu quá 5 lần.
 
-4. Phân quyền theo vai trò RBAC 5 cấp bậc nghiêm ngặt kết hợp chặn cứng quyền duyệt hội viên của Ban Thư Ký.
+4. Phân quyền theo vai trò RBAC 5 cấp bậc nghiêm ngặt kết hợp chặn cứng quyền duyệt Học viên của Ban Thư Ký.
 
 ### Độ Tin Cậy & Tính Sẵn Sàng (Reliability & High Availability)
 
@@ -1276,7 +1276,7 @@ Bước E1: Phần tử đích trên màn hình chưa kịp tải xong -> Bộ �
   - Chip NFC tần số 13.56MHz tương thích chuẩn ISO/IEC 14443 Type A.
   - Chạm mặt sau thẻ vào smartphone để mở liên kết công khai `/card/:slug`.
 * Kiến Trúc Cơ Sở Dữ Liệu PostgreSQL (Prisma ORM):
-  - Bảng hội viên: `members` (liên kết `vione_users` qua `user_id`).
+  - Bảng Học viên: `members` (liên kết `vione_users` qua `user_id`).
   - Bảng danh thiếp số: `member_business_cards` (chứa slug, branding, liên kết mạng xã hội).
   - Bảng sự kiện: `events`, `event_ticket_types`, `event_registrations`, `member_checkins`.
   - Bảng tài chính & hội phí: `invoices`, `associations`.

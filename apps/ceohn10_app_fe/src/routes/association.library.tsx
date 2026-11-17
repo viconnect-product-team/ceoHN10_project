@@ -244,11 +244,10 @@ function LibraryScreen() {
           <button
             type="button"
             onClick={() => setScopeTab("association")}
-            className={`flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-              scopeTab === "association"
+            className={`flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${scopeTab === "association"
                 ? "bg-amber-500 text-white shadow-md shadow-amber-500/20"
                 : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
-            }`}
+              }`}
           >
             <ShieldCheck className="h-4 w-4" />
             <span>Tài liệu Hiệp Hội</span>
@@ -257,11 +256,10 @@ function LibraryScreen() {
           <button
             type="button"
             onClick={() => setScopeTab("enterprise")}
-            className={`flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-              scopeTab === "enterprise"
+            className={`flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${scopeTab === "enterprise"
                 ? "bg-[#003B95] text-white shadow-md shadow-blue-500/20"
                 : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
-            }`}
+              }`}
           >
             <Building className="h-4 w-4" />
             <span>Tài liệu Doanh Nghiệp</span>
@@ -277,7 +275,7 @@ function LibraryScreen() {
                 ? canManageAssociation
                   ? "Quyền: Quản trị / Trưởng ban — xem, upload, sửa và xóa."
                   : "Quyền: Thành viên thường — chỉ có quyền xem & tải về."
-                : "Tài liệu doanh nghiệp: Hội viên quản lý hồ sơ & catalogue của mình."}
+                : "Tài liệu doanh nghiệp: Học viên quản lý hồ sơ & catalogue của mình."}
             </span>
           </div>
           <span className="font-bold shrink-0 text-[10px] uppercase px-1.5 py-0.5 rounded bg-amber-500/20">
@@ -306,11 +304,11 @@ function LibraryScreen() {
               <X className="h-3.5 w-3.5" />
             </button>
           )}
-      <MemberGoogleDriveSyncModal
-        isOpen={Boolean(driveSyncDoc)}
-        onClose={() => setDriveSyncDoc(null)}
-        targetDoc={driveSyncDoc ? { id: driveSyncDoc.id, name: driveSyncDoc.name, type: driveSyncDoc.type, size: driveSyncDoc.size } : null}
-      />
+          <MemberGoogleDriveSyncModal
+            isOpen={Boolean(driveSyncDoc)}
+            onClose={() => setDriveSyncDoc(null)}
+            targetDoc={driveSyncDoc ? { id: driveSyncDoc.id, name: driveSyncDoc.name, type: driveSyncDoc.type, size: driveSyncDoc.size } : null}
+          />
         </div>
 
         {/* Format Filter & Sort Toggle */}
@@ -324,11 +322,10 @@ function LibraryScreen() {
                   key={f.id}
                   type="button"
                   onClick={() => setSelectedFormat(f.id)}
-                  className={`px-2.5 py-1 rounded-xl text-[11px] font-bold shrink-0 transition cursor-pointer ${
-                    isSelected
+                  className={`px-2.5 py-1 rounded-xl text-[11px] font-bold shrink-0 transition cursor-pointer ${isSelected
                       ? "bg-amber-500 text-white shadow-xs"
                       : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700"
-                  }`}
+                    }`}
                 >
                   {f.label}
                 </button>
@@ -356,11 +353,10 @@ function LibraryScreen() {
                 key={c.id}
                 type="button"
                 onClick={() => setSelectedCommittee(c.id)}
-                className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-bold shrink-0 transition cursor-pointer border ${
-                  isSelected
+                className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-bold shrink-0 transition cursor-pointer border ${isSelected
                     ? "bg-[#003B95] text-white border-[#003B95] shadow-xs"
                     : "bg-white dark:bg-[var(--vba-bg-2)] text-slate-600 dark:text-slate-300 border-slate-200/80 dark:border-slate-800 hover:border-amber-400"
-                }`}
+                  }`}
               >
                 <span>{c.label}</span>
               </button>
@@ -381,9 +377,8 @@ function LibraryScreen() {
                   <button
                     type="button"
                     onClick={() => setCurrentFolderId(crumb.id)}
-                    className={`shrink-0 truncate max-w-[130px] transition cursor-pointer ${
-                      isLast ? "text-amber-600 dark:text-amber-400 font-extrabold" : "text-slate-600 dark:text-slate-400 hover:text-amber-500"
-                    }`}
+                    className={`shrink-0 truncate max-w-[130px] transition cursor-pointer ${isLast ? "text-amber-600 dark:text-amber-400 font-extrabold" : "text-slate-600 dark:text-slate-400 hover:text-amber-500"
+                      }`}
                   >
                     {idx === 0 ? "📁 Drive CLB" : crumb.name}
                   </button>
@@ -487,15 +482,14 @@ function LibraryScreen() {
             >
               <div className="flex items-center gap-3 min-w-0 flex-1">
                 <span
-                  className={`grid h-11 w-11 shrink-0 place-items-center rounded-xl font-black text-[11px] shadow-xs ${
-                    isPdf
+                  className={`grid h-11 w-11 shrink-0 place-items-center rounded-xl font-black text-[11px] shadow-xs ${isPdf
                       ? "bg-rose-50 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400 border border-rose-200/60 dark:border-rose-900/60"
                       : isXls
-                      ? "bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-900/60"
-                      : isPpt
-                      ? "bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400 border border-amber-200/60 dark:border-amber-900/60"
-                      : "bg-blue-50 dark:bg-blue-950/50 text-[#003B95] dark:text-blue-400 border border-blue-200/60 dark:border-blue-900/60"
-                  }`}
+                        ? "bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-900/60"
+                        : isPpt
+                          ? "bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400 border border-amber-200/60 dark:border-amber-900/60"
+                          : "bg-blue-50 dark:bg-blue-950/50 text-[#003B95] dark:text-blue-400 border border-blue-200/60 dark:border-blue-900/60"
+                    }`}
                 >
                   {ext}
                 </span>
@@ -592,14 +586,14 @@ function LibraryScreen() {
               )}
               <div className="flex gap-2">
                 <button
-                type="button"
-                onClick={() => setDriveSyncDoc(selectedDoc)}
-                className="w-full flex items-center justify-center gap-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white py-2.5 text-xs font-bold shadow-sm active:scale-98 transition cursor-pointer mb-2"
-              >
-                <HardDrive className="h-4 w-4" />
-                <span>Đồng bộ về Google Drive cá nhân</span>
-              </button>
-              <button
+                  type="button"
+                  onClick={() => setDriveSyncDoc(selectedDoc)}
+                  className="w-full flex items-center justify-center gap-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white py-2.5 text-xs font-bold shadow-sm active:scale-98 transition cursor-pointer mb-2"
+                >
+                  <HardDrive className="h-4 w-4" />
+                  <span>Đồng bộ về Google Drive cá nhân</span>
+                </button>
+                <button
                   type="button"
                   onClick={() => handleDownload(selectedDoc)}
                   disabled={downloading}

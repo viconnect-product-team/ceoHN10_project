@@ -87,7 +87,7 @@ export function InvitationSetupManager() {
   const [currentAttendeeAvatar, setCurrentAttendeeAvatar] = useState<string>("");
   const [currentAttendeeName, setCurrentAttendeeName] = useState<string>("Quý Doanh Nghiệp, Quý Đối Tác");
   const [currentAttendeePosition, setCurrentAttendeePosition] = useState<string>("Đại Biểu Danh Dự");
-  const [currentAttendeeCompany, setCurrentAttendeeCompany] = useState<string>("Doanh Nghiệp Hội Viên CEO HN10");
+  const [currentAttendeeCompany, setCurrentAttendeeCompany] = useState<string>("Doanh Nghiệp Học viên CEO HN10");
 
   // ── 3. DỮ LIỆU NỘI DUNG THƯ MỜI CHUẨN THEO ẢNH 2 ──
   // Header logos text
@@ -251,16 +251,16 @@ export function InvitationSetupManager() {
           applyActivityToFields(first);
         }
       })
-      .catch(() => {})
+      .catch(() => { })
       .finally(() => setIsLoadingActivities(false));
 
-    // Nạp toàn bộ danh sách hội viên làm danh sách người nhận dự phòng
+    // Nạp toàn bộ danh sách Học viên làm danh sách người nhận dự phòng
     fetchNestApi<any[]>("/members")
       .then((res) => {
         if (Array.isArray(res)) {
           const mapped: SetupRecipient[] = res.map((m: any) => ({
             id: m.id || m.userId,
-            name: m.name || m.full_name || m.contact || "Hội viên CEO HN10",
+            name: m.name || m.full_name || m.contact || "Học viên CEO HN10",
             email: m.email,
             phone: m.phone,
             company: m.company || m.company_name || "Doanh nghiệp CLB",
@@ -270,7 +270,7 @@ export function InvitationSetupManager() {
           setAllMembers(mapped);
         }
       })
-      .catch(() => {});
+      .catch(() => { });
   }, []);
 
   // Hàm điền tự động dữ liệu sự kiện vào thư mời
@@ -301,7 +301,7 @@ export function InvitationSetupManager() {
         const mins = String(d.getMinutes()).padStart(2, "0");
         setEventTimeRange(`${hours}h${mins} – 22h00`);
         setEventDateString(`Thứ Bảy, ngày ${d.getDate()}/${d.getMonth() + 1}/${d.getFullYear()}`);
-      } catch {}
+      } catch { }
     }
   };
 
@@ -334,7 +334,7 @@ export function InvitationSetupManager() {
           }
         } else {
           setRegisteredAttendees([]);
-          // Nếu sự kiện chưa có người đăng ký, sử dụng danh sách hội viên CLB để chọn thử avatar
+          // Nếu sự kiện chưa có người đăng ký, sử dụng danh sách Học viên CLB để chọn thử avatar
           if (allMembers.length > 0) {
             applyAttendeeToInvitation(allMembers[0]);
           }
@@ -347,7 +347,7 @@ export function InvitationSetupManager() {
       .finally(() => setIsLoadingAttendees(false));
   }, [selectedActivityId, activities, allMembers]);
 
-  // ── KHI CHỌN HỘI VIÊN ĐĂNG KÝ XONG ➔ TỰ ĐỘNG HIỆN AVATAR VÀO KHUNG AVATAR TRÊN THƯ MỜI ──
+  // ── KHI CHỌN Học viên ĐĂNG KÝ XONG ➔ TỰ ĐỘNG HIỆN AVATAR VÀO KHUNG AVATAR TRÊN THƯ MỜI ──
   const applyAttendeeToInvitation = (attendee: SetupRecipient) => {
     setSelectedAttendeeId(attendee.id);
     setCurrentAttendeeName(attendee.name);
@@ -409,7 +409,7 @@ export function InvitationSetupManager() {
       await fetchNestApi("/admin/invitation-templates", {
         method: "POST",
         body: JSON.stringify({ template: payload }),
-      }).catch(() => {});
+      }).catch(() => { });
 
       if (typeof window !== "undefined") {
         localStorage.setItem("ceohn10_custom_invitation_config", JSON.stringify(payload));
@@ -439,7 +439,7 @@ export function InvitationSetupManager() {
             Quản Lý & Thiết Kế Thư Mời Sự Kiện - Cuộc Họp - Đào Tạo
           </h1>
           <p className="text-xs sm:text-sm text-blue-100/90 mt-1 max-w-2xl">
-            Tự do tùy biến từng trường thông tin, di chuyển vị trí, xóa trường tùy ý. Tự động đồng bộ Avatar hội viên đăng ký vào khung Avatar mạ vàng trên thư mời.
+            Tự do tùy biến từng trường thông tin, di chuyển vị trí, xóa trường tùy ý. Tự động đồng bộ Avatar Học viên đăng ký vào khung Avatar mạ vàng trên thư mời.
           </p>
         </div>
 
@@ -518,11 +518,10 @@ export function InvitationSetupManager() {
                   key={cat.id}
                   type="button"
                   onClick={() => setActivityCategory(cat.id as any)}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer ${
-                    activityCategory === cat.id
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer ${activityCategory === cat.id
                       ? "bg-[#003B95] text-white shadow-xs"
                       : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200"
-                  }`}
+                    }`}
                 >
                   {cat.label}
                 </button>
@@ -544,8 +543,8 @@ export function InvitationSetupManager() {
                     act.type === "training"
                       ? "[ĐÀO TẠO]"
                       : act.type === "meeting"
-                      ? "[HỌP BAN]"
-                      : "[SỰ KIỆN]";
+                        ? "[HỌP BAN]"
+                        : "[SỰ KIỆN]";
                   return (
                     <option key={act.id} value={act.id}>
                       {tag} {act.title} {act.start_time ? `(${new Date(act.start_time).toLocaleDateString("vi-VN")})` : ""}
@@ -568,7 +567,7 @@ export function InvitationSetupManager() {
                     2. Chọn người đăng ký tham dự để gán Avatar
                   </h2>
                   <p className="text-[11px] text-slate-500">
-                    Chọn hội viên đăng ký xong ➔ Tự động Avatar hiện vào khung Avatar mạ vàng trên thư mời
+                    Chọn Học viên đăng ký xong ➔ Tự động Avatar hiện vào khung Avatar mạ vàng trên thư mời
                   </p>
                 </div>
               </div>
@@ -600,7 +599,7 @@ export function InvitationSetupManager() {
               >
                 {displayAttendees.map((att) => (
                   <option key={att.id} value={att.id}>
-                    👤 {att.name} · {att.position || "Hội viên"} ({att.company || "CEO HN10"})
+                    👤 {att.name} · {att.position || "Học viên"} ({att.company || "CEO HN10"})
                   </option>
                 ))}
               </select>
@@ -685,11 +684,10 @@ export function InvitationSetupManager() {
                   <div
                     key={f.id}
                     onClick={() => setActiveSelectedField(f.id)}
-                    className={`p-3 rounded-2xl border flex items-center justify-between gap-3 transition cursor-pointer ${
-                      isSelected
+                    className={`p-3 rounded-2xl border flex items-center justify-between gap-3 transition cursor-pointer ${isSelected
                         ? "border-[#003B95] bg-blue-50/40 dark:bg-blue-950/20"
                         : "border-slate-200/80 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/40"
-                    } ${!f.visible ? "opacity-50 bg-slate-100/50" : ""}`}
+                      } ${!f.visible ? "opacity-50 bg-slate-100/50" : ""}`}
                   >
                     <div className="flex items-center gap-2.5">
                       <span className={`size-2 rounded-full ${f.visible ? "bg-emerald-500" : "bg-slate-300"}`} />
@@ -731,11 +729,10 @@ export function InvitationSetupManager() {
                       <button
                         type="button"
                         onClick={() => toggleFieldVisibility(f.id)}
-                        className={`p-1.5 rounded-lg cursor-pointer transition ${
-                          f.visible
+                        className={`p-1.5 rounded-lg cursor-pointer transition ${f.visible
                             ? "bg-red-50 text-red-600 hover:bg-red-100"
                             : "bg-emerald-50 text-emerald-600 hover:bg-emerald-100"
-                        }`}
+                          }`}
                         title={f.visible ? "Xóa / Ẩn trường này khỏi thư mời" : "Khôi phục lại trường này"}
                       >
                         {f.visible ? <Trash2 className="size-3.5" /> : <Eye className="size-3.5" />}
@@ -1090,7 +1087,7 @@ export function InvitationSetupManager() {
                       <div className="relative">
                         {/* Cành nguyệt quế vàng kim bọc quanh */}
                         <div className="absolute -inset-2.5 rounded-full border-2 border-amber-300/80 pointer-events-none" />
-                        
+
                         <div className="size-24 sm:size-28 rounded-full p-1 bg-gradient-to-tr from-amber-300 via-yellow-400 to-amber-500 shadow-xl overflow-hidden ring-4 ring-white">
                           {currentAttendeeAvatar ? (
                             <img

@@ -34,7 +34,7 @@ export const Route = createFileRoute("/activity-logs")({
       { title: "Nhật Ký Thao Tác Hệ Thống (Audit Logs) | CEO HN10" },
       {
         name: "description",
-        content: "Kiểm soát toàn bộ lịch sử thao tác, đăng nhập và biến động dữ liệu của hội viên dành cho Chủ tịch và Admin",
+        content: "Kiểm soát toàn bộ lịch sử thao tác, đăng nhập và biến động dữ liệu của Học viên dành cho Chủ tịch và Admin",
       },
     ],
   }),
@@ -132,7 +132,7 @@ function ActivityLogsPage() {
           new Date(l.created_at).toLocaleString("vi-VN"),
           l.actor_name,
           l.actor_email || "",
-          l.department || "Hội viên",
+          l.department || "Học viên",
           l.action,
           l.target_type,
           l.ip_address || "127.0.0.1",
@@ -200,7 +200,7 @@ function ActivityLogsPage() {
     },
     {
       key: "actor",
-      label: "Hội Viên Thực Hiện",
+      label: "Học viên Thực Hiện",
       minWidth: 180,
       render: (log: AuditLogItem) => (
         <div className="flex items-center gap-2.5">
@@ -260,7 +260,7 @@ function ActivityLogsPage() {
     <AppShell>
       <div className="space-y-6 font-sans">
         <PageHeader
-          title="Nhật Ký Thao Tác Hệ Thống & Kiểm Soát Hội Viên (Audit Logs)"
+          title="Nhật Ký Thao Tác Hệ Thống & Kiểm Soát Học viên (Audit Logs)"
           subtitle="Dành riêng cho Chủ tịch, Admin và Ban Quản Trị: Giám sát toàn bộ hoạt động đăng nhập, tạo cơ hội, giao dịch và cập nhật hồ sơ"
           actions={
             <div className="flex items-center gap-2.5">
@@ -328,7 +328,7 @@ function ActivityLogsPage() {
 
           <Card className="p-4 border-l-4 border-l-cyan-600 flex items-center justify-between">
             <div>
-              <span className="text-xs font-bold text-slate-500 uppercase">Hội viên tương tác</span>
+              <span className="text-xs font-bold text-slate-500 uppercase">Học viên tương tác</span>
               <div className="text-xl font-black text-emerald-600 mt-1">
                 {stats.uniqueActors || new Set(logs.map(l => l.actor_name)).size} tài khoản
               </div>
@@ -346,7 +346,7 @@ function ActivityLogsPage() {
             <Search className="size-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
             <input
               type="text"
-              placeholder="Tìm theo tên hội viên, email, mã thao tác..."
+              placeholder="Tìm theo tên Học viên, email, mã thao tác..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && fetchLogs()}
@@ -377,7 +377,7 @@ function ActivityLogsPage() {
               <option value="AUTH">Hệ thống Auth</option>
               <option value="OPPORTUNITY">Cơ hội kinh doanh</option>
               <option value="EVENT">Sự kiện & Họp</option>
-              <option value="MEMBER">Hội viên</option>
+              <option value="MEMBER">Học viên</option>
             </select>
 
             <button

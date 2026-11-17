@@ -29,7 +29,7 @@ export const CATEGORY_TREE_DATA: CategoryTreeNode[] = [
       { id: "NEWS_BND", label: "Ban Nội Dung & Sự Kiện", category: "NEWS", department: "Ban Nội Dung & Sự Kiện" },
       { id: "NEWS_BXT", label: "Ban Xúc Tiến Thương Mại", category: "NEWS", department: "Ban Xúc Tiến Thương Mại" },
       { id: "NEWS_BDT", label: "Ban Đào Tạo & Phát Triển", category: "NEWS", department: "Ban Đào Tạo & Phát Triển" },
-      { id: "NEWS_BHV", label: "Ban Hội Viên & Thi Đua", category: "NEWS", department: "Ban Hội Viên & Thi Đua" },
+      { id: "NEWS_BHV", label: "Ban Học viên & Thi Đua", category: "NEWS", department: "Ban Học viên & Thi Đua" },
       { id: "NEWS_BTC", label: "Ban Tài Chính", category: "NEWS", department: "Ban Tài Chính" },
       { id: "NEWS_BTT_EXEC", label: "Ban Thường Trực", category: "NEWS", department: "Ban Thường Trực" },
     ],
@@ -75,7 +75,7 @@ export const CATEGORY_TREE_DATA: CategoryTreeNode[] = [
     icon: ShoppingBag,
     children: [
       { id: "MARKET_ALL", label: "Tất cả sản phẩm & dịch vụ", category: "MARKETPLACE", department: "ALL" },
-      { id: "MARKET_VIP", label: "Ưu Đãi Độc Quyền Hội Viên CEO HN10", category: "MARKETPLACE", department: "Ưu Đãi Đặc Quyền" },
+      { id: "MARKET_VIP", label: "Ưu Đãi Độc Quyền Học viên CEO HN10", category: "MARKETPLACE", department: "Ưu Đãi Đặc Quyền" },
       { id: "MARKET_PROD", label: "Sản phẩm công nghệ & dịch vụ", category: "MARKETPLACE", department: "Sản Phẩm & Dịch Vụ" },
     ],
   },
@@ -175,11 +175,10 @@ export function CategoryTreeModal({
                 {/* Parent Node */}
                 <div
                   onClick={() => handleSelect(parent)}
-                  className={`w-full p-2.5 rounded-xl flex items-center justify-between cursor-pointer transition text-xs font-bold ${
-                    isParentSelected
+                  className={`w-full p-2.5 rounded-xl flex items-center justify-between cursor-pointer transition text-xs font-bold ${isParentSelected
                       ? "bg-blue-50 dark:bg-blue-950/40 text-[#003B95] dark:text-blue-300 border border-blue-200 dark:border-blue-900/50"
                       : "text-slate-800 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
-                  }`}
+                    }`}
                 >
                   <div className="flex items-center gap-2.5">
                     {hasChildren && (
@@ -215,11 +214,10 @@ export function CategoryTreeModal({
                         <div
                           key={child.id}
                           onClick={() => handleSelect(child)}
-                          className={`w-full p-2 rounded-lg flex items-center justify-between cursor-pointer transition text-xs ${
-                            isChildSelected
+                          className={`w-full p-2 rounded-lg flex items-center justify-between cursor-pointer transition text-xs ${isChildSelected
                               ? "bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-300 font-bold border border-amber-200 dark:border-amber-900/40"
                               : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
-                          }`}
+                            }`}
                         >
                           <span className="truncate">{child.label}</span>
                           {isChildSelected && (

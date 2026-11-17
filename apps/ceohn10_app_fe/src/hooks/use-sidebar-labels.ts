@@ -5,9 +5,9 @@ export const SIDEBAR_LABELS_STORAGE_KEY = "ceohn10_dynamic_sidebar_labels";
 
 export const DEFAULT_SIDEBAR_LABELS: Record<string, string> = {
   "/": "Tổng quan",
-  "/members": "Hội viên",
+  "/members": "Học viên",
   "/companies": "Doanh nghiệp",
-  "/renewal": "Gia hạn hội viên",
+  "/renewal": "Gia hạn Học viên",
   "/events": "Sự kiện",
   "/events-overview": "Tổng quan sự kiện",
   "/meetings": "Cuộc họp",
@@ -43,7 +43,7 @@ export const DEFAULT_SIDEBAR_LABELS: Record<string, string> = {
   "/templates": "Quản lý mẫu trang",
   // Group keys:
   "nav.group.overview": "Tổng quan",
-  "nav.group.members": "Hội viên",
+  "nav.group.members": "Học viên",
   "nav.group.events": "Sự kiện & Họp",
   "nav.group.sponsors": "Tài trợ",
   "nav.group.finance": "Tài chính",
@@ -72,7 +72,7 @@ export function useSidebarLabels() {
             return { ...DEFAULT_SIDEBAR_LABELS, ...parsed };
           }
         }
-      } catch {}
+      } catch { }
     }
     return DEFAULT_SIDEBAR_LABELS;
   });
@@ -87,7 +87,7 @@ export function useSidebarLabels() {
           localStorage.setItem(SIDEBAR_LABELS_STORAGE_KEY, JSON.stringify(merged));
         }
       }
-    } catch {}
+    } catch { }
   }, []);
 
   useEffect(() => {
@@ -102,7 +102,7 @@ export function useSidebarLabels() {
             setLabels((prev) => ({ ...prev, ...parsed }));
           }
         }
-      } catch {}
+      } catch { }
     };
 
     if (typeof window !== "undefined") {

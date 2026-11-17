@@ -143,7 +143,7 @@ export function ExecutiveHome() {
       .then((res) => {
         if (active) setCrmEventsData(res);
       })
-      .catch(() => {});
+      .catch(() => { });
 
     fetchNestApi("/meetings?limit=20")
       .then((res: any) => {
@@ -151,7 +151,7 @@ export function ExecutiveHome() {
         const list = Array.isArray(res) ? res : res?.data || res?.items || [];
         setMeetingsData(list);
       })
-      .catch(() => {});
+      .catch(() => { });
 
     return () => {
       active = false;
@@ -236,7 +236,7 @@ export function ExecutiveHome() {
       list.push({
         id: `meeting-${m.id}`,
         type: "meeting",
-        title: m.title || `Cuộc gặp 1-1: ${m.partnerName || m.counterpart || "Hội viên Doanh nhân"}`,
+        title: m.title || `Cuộc gặp 1-1: ${m.partnerName || m.counterpart || "Học viên Doanh nhân"}`,
         counterpart: m.partnerName || m.counterpart || "Doanh nhân đối tác",
         phone: m.phone || m.partnerPhone,
         date: mDate,
@@ -353,11 +353,10 @@ export function ExecutiveHome() {
                       ? { background: "var(--bc-mobile-accent-grad)" }
                       : undefined
                   }
-                  className={`flex-1 py-1.5 text-xs rounded-lg transition-all text-center cursor-pointer ${
-                    scheduleTab === "today"
+                  className={`flex-1 py-1.5 text-xs rounded-lg transition-all text-center cursor-pointer ${scheduleTab === "today"
                       ? "text-[#050c15] font-bold shadow-xs"
                       : "text-slate-400 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white font-medium"
-                  }`}
+                    }`}
                 >
                   Hôm nay {todayItems.length > 0 ? `(${todayItems.length})` : ""}
                 </button>
@@ -369,20 +368,18 @@ export function ExecutiveHome() {
                       ? { background: "var(--bc-mobile-accent-grad)" }
                       : undefined
                   }
-                  className={`flex-1 py-1.5 text-xs rounded-lg transition-all flex items-center justify-center gap-1 cursor-pointer ${
-                    scheduleTab === "upcoming"
+                  className={`flex-1 py-1.5 text-xs rounded-lg transition-all flex items-center justify-center gap-1 cursor-pointer ${scheduleTab === "upcoming"
                       ? "text-[#050c15] font-bold shadow-xs"
                       : "text-slate-400 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white font-medium"
-                  }`}
+                    }`}
                 >
                   <span>Sắp tới</span>
                   {upcomingEvents.length > 0 && (
                     <span
-                      className={`px-1.5 py-0.5 rounded-full text-[10px] leading-none ${
-                        scheduleTab === "upcoming"
+                      className={`px-1.5 py-0.5 rounded-full text-[10px] leading-none ${scheduleTab === "upcoming"
                           ? "bg-[#050c15]/20 text-[#050c15] font-bold"
                           : "bg-[var(--bc-mobile-accent-soft)] text-[var(--bc-mobile-accent)] font-semibold"
-                      }`}
+                        }`}
                     >
                       {upcomingEvents.length}
                     </span>
@@ -396,20 +393,18 @@ export function ExecutiveHome() {
                       ? { background: "var(--bc-mobile-accent-grad)" }
                       : undefined
                   }
-                  className={`flex-1 py-1.5 text-xs rounded-lg transition-all flex items-center justify-center gap-1 cursor-pointer ${
-                    scheduleTab === "reminders"
+                  className={`flex-1 py-1.5 text-xs rounded-lg transition-all flex items-center justify-center gap-1 cursor-pointer ${scheduleTab === "reminders"
                       ? "text-[#050c15] font-bold shadow-xs"
                       : "text-slate-400 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white font-medium"
-                  }`}
+                    }`}
                 >
                   <span>Nhắc lịch</span>
                   {remindersList.length > 0 && (
                     <span
-                      className={`px-1.5 py-0.5 rounded-full text-[10px] leading-none ${
-                        scheduleTab === "reminders"
+                      className={`px-1.5 py-0.5 rounded-full text-[10px] leading-none ${scheduleTab === "reminders"
                           ? "bg-[#050c15]/20 text-[#050c15] font-bold"
                           : "bg-amber-500/20 text-amber-500 font-semibold"
-                      }`}
+                        }`}
                     >
                       {remindersList.length}
                     </span>
@@ -655,9 +650,9 @@ function TodayTimelineRow({ item }: { item: BcMobileTodayItem }) {
   const title = hasTKey(item.titleKey) ? t(item.titleKey as TKey) : item.titleKey;
   const time = item.startsAt
     ? new Date(item.startsAt).toLocaleTimeString(fmt.locale, {
-        hour: "2-digit",
-        minute: "2-digit",
-      })
+      hour: "2-digit",
+      minute: "2-digit",
+    })
     : item.dueAt
       ? new Date(item.dueAt).toLocaleDateString(fmt.locale, { day: "numeric", month: "short" })
       : null;
@@ -773,14 +768,14 @@ function InsightCard() {
         {isEmpty
           ? t("bc.mobile.home.insight.emptyHeadline")
           : parts.map((part, index) =>
-              /^\d+$/.test(part) ? (
-                <span key={index} className="text-[var(--bc-mobile-accent)] font-extrabold">
-                  {part}
-                </span>
-              ) : (
-                part
-              ),
-            )}
+            /^\d+$/.test(part) ? (
+              <span key={index} className="text-[var(--bc-mobile-accent)] font-extrabold">
+                {part}
+              </span>
+            ) : (
+              part
+            ),
+          )}
       </p>
       <p className="relative z-10 mt-2 max-w-[22ch] text-[13.5px] leading-relaxed text-[var(--bc-mobile-muted)]">
         {isEmpty ? t("bc.mobile.home.insight.emptyBody") : t("bc.mobile.home.insight.body")}
@@ -828,7 +823,7 @@ function Greeting({ identity }: { identity: BcMobileHomeIdentity }) {
     try {
       const raw = localStorage.getItem("ceohn10_custom_profile");
       if (raw) return JSON.parse(raw);
-    } catch {}
+    } catch { }
     return null;
   }, [profileVersion]);
 
@@ -1239,11 +1234,11 @@ function UpcomingEventTimelineRow({ event, onSelect }: { event: CrmEvent; onSele
   const dt = getEventDate(event);
   const dateFormatted = dt
     ? dt.toLocaleDateString(fmt.locale, {
-        weekday: "short",
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric",
-      })
+      weekday: "short",
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    })
     : "Sắp diễn ra";
 
   const timeFormatted =

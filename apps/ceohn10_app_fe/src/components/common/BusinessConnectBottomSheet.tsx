@@ -88,7 +88,7 @@ export function BusinessConnectBottomSheet({
         if (p.phone) setSenderPhone(p.phone);
         if (p.company) setSenderCompany(p.company);
       }
-    } catch {}
+    } catch { }
 
     // Load member's active opportunities for linking
     void (async () => {
@@ -97,7 +97,7 @@ export function BusinessConnectBottomSheet({
         if (Array.isArray(opps)) {
           setMyOpportunities(opps);
         }
-      } catch {}
+      } catch { }
     })();
   }, [isOpen, fetchMyOppFn]);
 
@@ -107,7 +107,7 @@ export function BusinessConnectBottomSheet({
     "Hẹn gặp trao đổi cơ hội hợp tác kinh doanh",
     "Bàn chiến lược liên kết chuỗi cung ứng B2B",
     "Chia sẻ nhu cầu thương vụ & đầu tư",
-    "Gặp gỡ giao lưu cà phê kết nối hội viên",
+    "Gặp gỡ giao lưu cà phê kết nối Học viên",
   ];
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -163,7 +163,7 @@ export function BusinessConnectBottomSheet({
           status: "sent",
         };
         localStorage.setItem(targetThreadKey, JSON.stringify([...existingMsgs, newMsg]));
-      } catch {}
+      } catch { }
 
       // Update recent conversations list
       try {
@@ -182,7 +182,7 @@ export function BusinessConnectBottomSheet({
           ...filtered,
         ];
         localStorage.setItem("vba.recent_conversations", JSON.stringify(updatedRecent));
-      } catch {}
+      } catch { }
 
       // Lưu chi tiết vào lịch sử kết nối vba_sent_connection_requests
       try {
@@ -196,7 +196,7 @@ export function BusinessConnectBottomSheet({
           targetCode: target.code,
           targetName: target.name,
           targetCompany: target.company || "CLB Doanh Nhân CEO HN10",
-          targetTitle: target.title || "Hội viên CEO HN10",
+          targetTitle: target.title || "Học viên CEO HN10",
           targetAvatar: target.avatar,
           targetUserId: target.userId,
           purpose: purpose.trim(),
@@ -210,7 +210,7 @@ export function BusinessConnectBottomSheet({
           sentList.unshift(record);
         }
         localStorage.setItem("vba_sent_connection_requests", JSON.stringify(sentList));
-      } catch {}
+      } catch { }
 
       // Mark pending connection status
       try {
@@ -220,7 +220,7 @@ export function BusinessConnectBottomSheet({
           pendingList.push(target.code.toLowerCase());
           localStorage.setItem("vba.pending_requests", JSON.stringify(pendingList));
         }
-      } catch {}
+      } catch { }
 
       window.dispatchEvent(new Event("vba.connection.changed"));
 
@@ -234,7 +234,7 @@ export function BusinessConnectBottomSheet({
             },
           });
         }
-      } catch {}
+      } catch { }
 
       try {
         const effectiveVenue = meetingMode === "offline" ? offlineVenue.trim() : onlineUrl.trim();
@@ -278,7 +278,7 @@ export function BusinessConnectBottomSheet({
             hostCompany: senderCompany.trim() || "Doanh nghiệp CEO HN10",
             hostPhone: senderPhone.trim(),
             partnerName: target.name.trim(),
-            partnerCompany: target.company || "Hội viên CEO HN10",
+            partnerCompany: target.company || "Học viên CEO HN10",
             partnerCode: target.code,
             partnerPhone: (target as any).phone,
             partnerAvatar: target.avatar,
@@ -294,7 +294,7 @@ export function BusinessConnectBottomSheet({
           const curAppointments = JSON.parse(localStorage.getItem("vba_connection_appointments") || "[]");
           curAppointments.unshift(appointmentItem);
           localStorage.setItem("vba_connection_appointments", JSON.stringify(curAppointments));
-        } catch {}
+        } catch { }
 
         // 2. Đẩy thông báo lời mời hẹn gặp vào hộp thư vba_notifications
         try {
@@ -322,13 +322,13 @@ export function BusinessConnectBottomSheet({
           rawNotifs.unshift(notifObj);
           localStorage.setItem("vba_notifications", JSON.stringify(rawNotifs.slice(0, 50)));
           window.dispatchEvent(new CustomEvent("notifications-updated"));
-        } catch {}
+        } catch { }
       } catch (err: any) {
         console.warn("Lưu cuộc gặp lên CRM lỗi:", err?.message);
       }
 
       toast.success(`Đã gửi lời mời hẹn gặp giao thương tới ${target.name}!`, {
-        description: "Thông điệp và thông tin hẹn gặp đã được chuyển tới hộp thư của hội viên và đồng bộ vào CRM.",
+        description: "Thông điệp và thông tin hẹn gặp đã được chuyển tới hộp thư của Học viên và đồng bộ vào CRM.",
       });
 
       onSuccess?.();
@@ -375,7 +375,7 @@ export function BusinessConnectBottomSheet({
                 <Sparkles className="h-3.5 w-3.5 text-amber-500 dark:text-amber-400" />
               </h3>
               <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                Gửi thông điệp đề xuất hợp tác trực tiếp tới hội viên
+                Gửi thông điệp đề xuất hợp tác trực tiếp tới Học viên
               </p>
             </div>
           </div>
@@ -524,11 +524,10 @@ export function BusinessConnectBottomSheet({
               <button
                 type="button"
                 onClick={() => setMeetingMode("offline")}
-                className={`flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl border text-xs font-bold transition cursor-pointer ${
-                  meetingMode === "offline"
+                className={`flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl border text-xs font-bold transition cursor-pointer ${meetingMode === "offline"
                     ? "border-amber-500 bg-amber-500/10 text-amber-700 dark:text-amber-300 ring-2 ring-amber-500/30 font-extrabold"
                     : "border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-400"
-                }`}
+                  }`}
               >
                 <MapPin className="h-4 w-4 text-amber-600 dark:text-amber-400" />
                 <span>🏢 Trực tiếp (Offline)</span>
@@ -537,11 +536,10 @@ export function BusinessConnectBottomSheet({
               <button
                 type="button"
                 onClick={() => setMeetingMode("online")}
-                className={`flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl border text-xs font-bold transition cursor-pointer ${
-                  meetingMode === "online"
+                className={`flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl border text-xs font-bold transition cursor-pointer ${meetingMode === "online"
                     ? "border-blue-500 bg-blue-500/10 text-blue-700 dark:text-blue-300 ring-2 ring-blue-500/30 font-extrabold"
                     : "border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-400"
-                }`}
+                  }`}
               >
                 <Video className="h-4 w-4 text-blue-600 dark:text-blue-400" />
                 <span>📹 Trực tuyến (Online)</span>

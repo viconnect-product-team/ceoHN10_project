@@ -93,7 +93,7 @@ export function FinanceUnitTreeSection({
     };
 
     const boardTx = filterTx(["điều hành", "ban điều hành", "đại hội", "tiếp khách", "hội đồng", "chiến lược", "văn phòng"]);
-    const memberTx = filterTx(["thành viên", "hội phí", "hội viên", "kết nạp", "gia hạn", "thẻ"]);
+    const memberTx = filterTx(["thành viên", "hội phí", "Học viên", "kết nạp", "gia hạn", "thẻ"]);
     const tradeTx = filterTx(["xúc tiến", "giao thương", "b2b", "thương mại", "diễn đàn", "hội chợ", "kết nối"]);
     const mediaTx = filterTx(["truyền thông", "sự kiện", "gala", "kỷ yếu", "báo chí", "vé", "ấn phẩm", "quà tặng"]);
     const financeTx = filterTx(["tài chính", "sổ quỹ", "ngân hàng", "lãi", "kiểm toán", "vận hành"]);
@@ -145,9 +145,9 @@ export function FinanceUnitTreeSection({
         },
         {
           id: "membership",
-          name: "Ban Thành Viên & Phát Triển Hội Viên",
+          name: "Ban Thành Viên & Phát Triển Học viên",
           code: "DEPT-BTV",
-          roleDesc: "Phụ trách thu Hội phí niên liễm, thẩm định hồ sơ kết nạp và gia hạn hội viên",
+          roleDesc: "Phụ trách thu Hội phí niên liễm, thẩm định hồ sơ kết nạp và gia hạn Học viên",
           icon: Users,
           color: "text-blue-600 dark:text-blue-400",
           bgColor: "bg-blue-50 dark:bg-blue-950/50 border-blue-200 dark:border-blue-900/50",
@@ -251,7 +251,7 @@ export function FinanceUnitTreeSection({
               id: "sponsor-silver",
               name: "Gói Tài Trợ Bạc & Đồng (Silver/Bronze)",
               code: "PKG-SILVER-BRONZE",
-              roleDesc: "Đồng hành giao thương và quà tặng hội viên",
+              roleDesc: "Đồng hành giao thương và quà tặng Học viên",
               icon: Layers,
               color: "text-slate-500",
               bgColor: "bg-slate-50 dark:bg-slate-900 border-slate-200",
@@ -277,15 +277,15 @@ export function FinanceUnitTreeSection({
       type === "income"
         ? node.totalIncome
         : type === "expense"
-        ? node.totalExpense
-        : node.totalIncome - node.totalExpense;
+          ? node.totalExpense
+          : node.totalIncome - node.totalExpense;
 
     const baseTotal =
       type === "income"
         ? treeData.totalIncome || 1
         : type === "expense"
-        ? treeData.totalExpense || 1
-        : treeData.totalIncome || 1;
+          ? treeData.totalExpense || 1
+          : treeData.totalIncome || 1;
 
     const percent = Math.min(100, Math.round((Math.abs(relevantAmount) / baseTotal) * 100)) || 0;
 
@@ -297,11 +297,10 @@ export function FinanceUnitTreeSection({
             setSelectedNodeId(node.id);
             if (onSelectUnit) onSelectUnit(node.name);
           }}
-          className={`p-4 rounded-2xl border transition-all cursor-pointer select-none mb-2.5 ${
-            isSelected
+          className={`p-4 rounded-2xl border transition-all cursor-pointer select-none mb-2.5 ${isSelected
               ? "ring-2 ring-[#003B95] dark:ring-amber-400 bg-white dark:bg-slate-800 shadow-md"
               : "bg-white dark:bg-slate-900/90 hover:bg-slate-50 dark:hover:bg-slate-800/60 shadow-xs border-slate-200 dark:border-slate-800"
-          }`}
+            }`}
           style={{ marginLeft: `${depth * 28}px` }}
         >
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
@@ -345,15 +344,14 @@ export function FinanceUnitTreeSection({
                 <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
                   {type === "income" ? "Thực thu" : type === "expense" ? "Thực chi" : "Dòng tiền"}
                 </span>
-                <span className={`text-base font-black font-mono ${
-                  type === "income"
+                <span className={`text-base font-black font-mono ${type === "income"
                     ? "text-emerald-600 dark:text-emerald-400"
                     : type === "expense"
-                    ? "text-rose-600 dark:text-rose-400"
-                    : relevantAmount >= 0
-                    ? "text-blue-600 dark:text-blue-400"
-                    : "text-rose-600 dark:text-rose-400"
-                }`}>
+                      ? "text-rose-600 dark:text-rose-400"
+                      : relevantAmount >= 0
+                        ? "text-blue-600 dark:text-blue-400"
+                        : "text-rose-600 dark:text-rose-400"
+                  }`}>
                   {fmt.money(relevantAmount)}
                 </span>
               </div>

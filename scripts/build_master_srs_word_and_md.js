@@ -339,9 +339,9 @@ function generateMarkdown() {
 1. **Giới Thiệu Chung & Mục Đích Tài Liệu**
 2. **Kiến Trúc Tổng Thể & Bối Cảnh Hệ Thống**
 3. **Danh Mục 138 Use Cases Chi Tiết Theo 3 Khối Nghiệp Vụ:**
-   - **Phần I: Cổng Thông Tin Công Khai & Đăng Ký Hội Viên (10 Use Cases: UC-PUB-01 -> UC-PUB-10)**
+   - **Phần I: Cổng Thông Tin Công Khai & Đăng Ký Học viên (10 Use Cases: UC-PUB-01 -> UC-PUB-10)**
    - **Phần II: Cổng Điều Hành & Quản Trị Ban Chấp Hành (78 Use Cases: UC-CRM-01 -> UC-CRM-78)**
-   - **Phần III: Ứng Dụng Hội Viên Doanh Nhân CEO HN10 (50 Use Cases: UC-APP-01 -> UC-APP-50)**
+   - **Phần III: Ứng Dụng Học viên Doanh Nhân CEO HN10 (50 Use Cases: UC-APP-01 -> UC-APP-50)**
 4. **Yêu Cầu Phi Chức Năng (Hiệu Năng, An Toàn Thông Tin, Sao Lưu Dữ Liệu)**
 5. **Yêu Cầu Giao Diện & Trải Nghiệm Người Dùng (UI/UX Design Tokens)**
 6. **Phụ Lục Minh Chứng Hình Ảnh Chụp Thực Tế Toàn Diện**
@@ -356,13 +356,13 @@ Tài liệu Đặc tả Yêu cầu Kỹ thuật và Nghiệp vụ (SRS) này xá
 ### 3.2. Phạm vi hệ thống (Project Scope)
 Hệ sinh thái Số hóa CLB Doanh Nhân CEO HN10 là nền tảng số hóa quản trị và giao thương nội bộ chuyên biệt dành riêng cho cộng đồng các nhà lãnh đạo, chủ tịch hội đồng quản trị, tổng giám đốc sinh năm Quý Hợi 1983. Hệ thống kết nối đồng bộ 3 cấu phần cốt lõi:
 * **Cổng Thông Tin Công Khai & Tiếp Nhận Đơn Đăng Ký:** Giới thiệu tôn chỉ mục đích, cơ cấu 6 Ban điều hành, tiếp nhận hồ sơ gia nhập trực tuyến từ ứng viên đại diện (\`vupv090120@gmail.com\`) tại [Cổng Tiếp Nhận Hồ Sơ Gia Nhập CLB Doanh Nhân CEO HN10 Trực Tuyến](https://14.225.217.232:5444/landing?apply=%22true%22) (Bảo mật biểu mẫu điện tử chuẩn hóa, tự động gửi email thông báo tiếp nhận hồ sơ).
-* **Cổng Điều Hành & Quản Trị Ban Chấp Hành:** Nền tảng quản trị trung tâm hỗ trợ 6 Ban chuyên môn (Ban Quản Trị, Ban Thư Ký, Ban Thành Viên, Ban Thiện Nguyện, Ban Truyền Thông, Ban Xúc Tiến Thương Mại) với phân quyền RBAC nghiêm ngặt: thẩm định hội viên 360 độ, phát hành vé QR Pass sự kiện Gala, quản lý sơ đồ ghế Cinema Seating Map, điều hành cuộc họp, kiểm duyệt sàn B2B, quản lý sổ quỹ thu chi minh bạch và đối soát tài chính tự động.
-* **Ứng Dụng Doanh Nhân CEO HN10:** Ứng dụng số hóa cao cấp dành riêng cho Hội viên chính thức với Thẻ VIP Hoàng gia Navy & Amber Gold, Danh thiếp điện tử NFC chạm 1 giây, Danh bạ doanh nhân, Gian hàng B2B Doanh nhân CEO HN10, Kết nối Cung - Cầu realtime, Biểu quyết đại hội điện tử và Thanh toán gia hạn hội phí siêu tốc qua VietQR Napas 24/7 tự động gạch nợ.
+* **Cổng Điều Hành & Quản Trị Ban Chấp Hành:** Nền tảng quản trị trung tâm hỗ trợ 6 Ban chuyên môn (Ban Quản Trị, Ban Thư Ký, Ban Thành Viên, Ban Thiện Nguyện, Ban Truyền Thông, Ban Xúc Tiến Thương Mại) với phân quyền RBAC nghiêm ngặt: thẩm định Học viên 360 độ, phát hành vé QR Pass sự kiện Gala, quản lý sơ đồ ghế Cinema Seating Map, điều hành cuộc họp, kiểm duyệt sàn B2B, quản lý sổ quỹ thu chi minh bạch và đối soát tài chính tự động.
+* **Ứng Dụng Doanh Nhân CEO HN10:** Ứng dụng số hóa cao cấp dành riêng cho Học viên chính thức với Thẻ VIP Hoàng gia Navy & Amber Gold, Danh thiếp điện tử NFC chạm 1 giây, Danh bạ doanh nhân, Gian hàng B2B Doanh nhân CEO HN10, Kết nối Cung - Cầu realtime, Biểu quyết đại hội điện tử và Thanh toán gia hạn hội phí siêu tốc qua VietQR Napas 24/7 tự động gạch nợ.
 
 ### 3.3. Thuật ngữ và định nghĩa chuẩn hóa (Definitions & Terminology)
 * **HanoiBA:** Hội Doanh Nhân Trẻ Hà Nội.
 * **CLB Doanh Nhân CEO HN10:** Câu lạc bộ Doanh nhân 1983 trực thuộc Hội Doanh Nhân Trẻ Hà Nội.
-* **Hội viên Chính thức:** Doanh nhân sinh năm 1983, đại diện pháp nhân doanh nghiệp, được Ban Thành Viên thẩm định và Ban Chấp Hành ban hành quyết định kết nạp kèm cấp Mã hội viên độc bản (ví dụ: CEO-83007).
+* **Học viên Chính thức:** Doanh nhân sinh năm 1983, đại diện pháp nhân doanh nghiệp, được Ban Thành Viên thẩm định và Ban Chấp Hành ban hành quyết định kết nạp kèm cấp Mã Học viên độc bản (ví dụ: CEO-83007).
 * **Gian hàng B2B Doanh nhân CEO HN10:** Không gian giao thương và giới thiệu sản phẩm dịch vụ độc quyền giữa các doanh nghiệp thành viên với cam kết chiết khấu nội bộ ưu đãi.
 * **VietQR:** Chuẩn thanh toán mã QR liên ngân hàng quốc gia Napas 24/7 tự động đối soát và gạch nợ tức thì.
 
@@ -374,11 +374,11 @@ Hệ sinh thái Số hóa CLB Doanh Nhân CEO HN10 là nền tảng số hóa qu
 Hệ thống được thiết kế theo mô hình Client-Server hiện đại, phân tầng rõ ràng giữa hiển thị giao diện và logic xử lý nghiệp vụ trung tâm:
 * **Tầng Trải nghiệm Người dùng (Frontend Layer):** Cổng Thông Tin Điện Tử, Cổng Quản Trị Ban Chấp Hành và Ứng Dụng Doanh Nhân CEO HN10 với trải nghiệm đa nền tảng tối ưu (Web, Mobile App PWA).
 * **Tầng Nghiệp vụ Trung tâm (Business Services Layer):** Bộ máy xử lý quy trình phê duyệt hồ sơ 3 cấp, Máy chủ thư tín tự động (SMTP Mailer Engine), Dịch vụ sinh vé QR Pass chống giả mạo, Dịch vụ Webhook đối soát tài chính ngân hàng.
-* **Tầng Dữ liệu & Lưu trữ (Data Persistence Layer):** Cơ sở dữ liệu quan hệ quản lý thông tin hội viên, doanh nghiệp, sổ quỹ, giao dịch B2B và nhật ký kiểm toán hệ thống (Audit Trails).
+* **Tầng Dữ liệu & Lưu trữ (Data Persistence Layer):** Cơ sở dữ liệu quan hệ quản lý thông tin Học viên, doanh nghiệp, sổ quỹ, giao dịch B2B và nhật ký kiểm toán hệ thống (Audit Trails).
 
 ### 4.2. Các trụ cột chức năng trọng yếu (Core Pillars)
-1. **Quản trị Hội viên 360° & Tiếp nhận Onboarding:** Đăng ký trực tuyến, tự động gửi thư tiếp nhận, thẩm định hồ sơ doanh nghiệp và cấp mật khẩu an toàn gửi về hòm thư đại diện \`vupv090120@gmail.com\`.
-2. **Thẻ Hội Viên VIP & Danh Thiếp Số Độc Bản:** Thẻ nhận diện danh dự Navy & Amber Gold, công nghệ NFC 1 chạm truyền danh bạ kinh doanh.
+1. **Quản trị Học viên 360° & Tiếp nhận Onboarding:** Đăng ký trực tuyến, tự động gửi thư tiếp nhận, thẩm định hồ sơ doanh nghiệp và cấp mật khẩu an toàn gửi về hòm thư đại diện \`vupv090120@gmail.com\`.
+2. **Thẻ Học viên VIP & Danh Thiếp Số Độc Bản:** Thẻ nhận diện danh dự Navy & Amber Gold, công nghệ NFC 1 chạm truyền danh bạ kinh doanh.
 3. **Quản Trị Sự Kiện Gala & Soát Vé An Ninh QR:** Sơ đồ vị trí bàn tiệc Cinema Seating Map, đăng ký vé VIP, vé miễn phí, cấp vé điện tử E-Ticket QR và hệ thống camera quét vé chống gian lận tại cổng đón tiếp.
 4. **Điều Hành Cuộc Họp Ban Chấp Hành:** Lên lịch giao ban, tự động đồng bộ lịch vào ứng dụng đại biểu và quản lý biên bản họp điện tử.
 5. **Gian Hàng B2B Doanh Nhân CEO HN10 & Khớp Lệnh Giao Thương:** Quảng bá hàng hóa, thẩm định chất lượng sản phẩm nội bộ và hỗ trợ kết nối cung - cầu 1-1 giữa các CEO thành viên.
@@ -549,7 +549,7 @@ async function buildDocxFile(outputPath) {
       spacing: { before: 40, after: 40, line: 260 },
       children: [
         new TextRun({
-          text: 'Cổng Đăng Ký Hội Viên Trực Tuyến: Ứng viên nộp hồ sơ xét duyệt chính thức tại ',
+          text: 'Cổng Đăng Ký Học viên Trực Tuyến: Ứng viên nộp hồ sơ xét duyệt chính thức tại ',
           font: FONT_FAMILY,
           size: 24,
           color: COLOR_DARK,
@@ -575,19 +575,19 @@ async function buildDocxFile(outputPath) {
         }),
       ],
     }),
-    createBullet('Cổng Điều Hành & Quản Trị Ban Chấp Hành: Nền tảng quản trị trung tâm hỗ trợ 6 Ban chuyên môn (Ban Quản Trị, Ban Thư Ký, Ban Thành Viên, Ban Thiện Nguyện, Ban Truyền Thông, Ban Xúc Tiến Thương Mại) với phân quyền RBAC nghiêm ngặt: thẩm định hội viên 360 độ, phát hành vé QR Pass sự kiện Gala, quản lý sơ đồ ghế Cinema Seating Map, điều hành cuộc họp, kiểm duyệt sàn B2B, quản lý sổ quỹ thu chi minh bạch và đối soát tài chính tự động.'),
-    createBullet('Ứng Dụng Doanh Nhân CEO HN10: Ứng dụng số hóa cao cấp dành riêng cho Hội viên chính thức với Thẻ VIP Hoàng gia Navy & Amber Gold, Danh thiếp điện tử NFC chạm 1 giây, Danh bạ doanh nhân, Gian hàng B2B Doanh nhân CEO HN10, Kết nối Cung - Cầu realtime, Biểu quyết đại hội điện tử và Thanh toán gia hạn hội phí siêu tốc qua VietQR Napas 24/7 tự động gạch nợ.')
+    createBullet('Cổng Điều Hành & Quản Trị Ban Chấp Hành: Nền tảng quản trị trung tâm hỗ trợ 6 Ban chuyên môn (Ban Quản Trị, Ban Thư Ký, Ban Thành Viên, Ban Thiện Nguyện, Ban Truyền Thông, Ban Xúc Tiến Thương Mại) với phân quyền RBAC nghiêm ngặt: thẩm định Học viên 360 độ, phát hành vé QR Pass sự kiện Gala, quản lý sơ đồ ghế Cinema Seating Map, điều hành cuộc họp, kiểm duyệt sàn B2B, quản lý sổ quỹ thu chi minh bạch và đối soát tài chính tự động.'),
+    createBullet('Ứng Dụng Doanh Nhân CEO HN10: Ứng dụng số hóa cao cấp dành riêng cho Học viên chính thức với Thẻ VIP Hoàng gia Navy & Amber Gold, Danh thiếp điện tử NFC chạm 1 giây, Danh bạ doanh nhân, Gian hàng B2B Doanh nhân CEO HN10, Kết nối Cung - Cầu realtime, Biểu quyết đại hội điện tử và Thanh toán gia hạn hội phí siêu tốc qua VietQR Napas 24/7 tự động gạch nợ.')
   );
 
   // ==================== 2. MÔ TẢ TỔNG QUAN ====================
   docChildren.push(
     createHeading1('2. MÔ TẢ TỔNG QUAN HỆ THỐNG (System Perspective)'),
     createHeading2('2.1. Kiến trúc phân tầng và luồng dữ liệu nghiệp vụ'),
-    createParagraph('Hệ thống hoạt động theo mô hình phân tầng hiện đại, phân tách hoàn toàn giữa giao diện tương tác người dùng và logic xử lý nghiệp vụ trung tâm. Toàn bộ thông tin hội viên, trạng thái thẩm định, đăng ký sự kiện, đơn hàng B2B và sổ quỹ tài chính đều được đồng bộ tức thời.'),
+    createParagraph('Hệ thống hoạt động theo mô hình phân tầng hiện đại, phân tách hoàn toàn giữa giao diện tương tác người dùng và logic xử lý nghiệp vụ trung tâm. Toàn bộ thông tin Học viên, trạng thái thẩm định, đăng ký sự kiện, đơn hàng B2B và sổ quỹ tài chính đều được đồng bộ tức thời.'),
     createHeading2('2.2. Các trụ cột nghiệp vụ cốt lõi'),
-    createBullet('Quản trị Hội viên 360° & Onboarding: Nộp đơn trực tuyến, tự động gửi email tiếp nhận ngay, thẩm định doanh nghiệp và cấp mật khẩu an toàn.'),
+    createBullet('Quản trị Học viên 360° & Onboarding: Nộp đơn trực tuyến, tự động gửi email tiếp nhận ngay, thẩm định doanh nghiệp và cấp mật khẩu an toàn.'),
     createBullet('Thẻ VIP 3D & Danh thiếp số độc bản: Thẻ nhận diện mạ vàng sang trọng, chạm NFC 1-giây truyền dữ liệu doanh bạ.'),
-    createBullet('Sự kiện Gala & Soát vé QR: Đăng ký vé miễn phí / có phí VietQR 1.500.000đ, vé Hội viên VIP, sơ đồ Cinema Seating Map và camera quét vé chống gian lận.'),
+    createBullet('Sự kiện Gala & Soát vé QR: Đăng ký vé miễn phí / có phí VietQR 1.500.000đ, vé Học viên VIP, sơ đồ Cinema Seating Map và camera quét vé chống gian lận.'),
     createBullet('Điều hành Lịch họp: Lên lịch họp giao ban Ban Chấp Hành, chống trùng phòng họp và điểm danh mã QR.'),
     createBullet('Gian hàng B2B Doanh nhân CEO HN10: Không gian giao thương tiêu chuẩn B2B, thẩm định chất lượng sản phẩm và ưu đãi nội bộ.'),
     createBullet('Kết nối Cơ hội Cung - Cầu: Bảng tin realtime, lưu bookmark quan tâm và đặt lịch hẹn gặp 1-1 giữa các CEO thành viên.'),

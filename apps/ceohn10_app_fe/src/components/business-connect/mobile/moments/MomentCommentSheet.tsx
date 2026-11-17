@@ -99,7 +99,7 @@ export function MomentCommentSheet({
     setReplyTarget(null);
   };
 
-  const nameToDisplay = postPreview?.authorName || authorName || "Hội viên";
+  const nameToDisplay = postPreview?.authorName || authorName || "Học viên";
 
   return (
     <div
@@ -117,7 +117,7 @@ export function MomentCommentSheet({
 
       {/* Centered Facebook-style Popup Container */}
       <div className="relative z-10 flex max-h-[92vh] sm:max-h-[88vh] w-full max-w-2xl flex-col rounded-2xl sm:rounded-3xl border border-slate-200 dark:border-[#D8B282]/35 bg-white dark:bg-[#080E1B] text-slate-900 dark:text-slate-100 shadow-[0_25px_70px_rgba(0,0,0,0.35)] dark:shadow-[0_25px_70px_rgba(0,0,0,0.95)] animate-in fade-in zoom-in-95 duration-200 overflow-hidden">
-        
+
         {/* Modal Header: Facebook Style Centered Title + Close Button */}
         <div className="flex items-center justify-between px-4 sm:px-5 py-3 border-b border-slate-200 dark:border-[#1E293B] bg-slate-50/95 dark:bg-[#0A1224]/90 backdrop-blur-md relative">
           <div className="w-8 shrink-0" />
@@ -161,9 +161,8 @@ export function MomentCommentSheet({
 
             {/* Scrollable thread */}
             <div
-              className={`space-y-4 pb-2 ${
-                totalComments > 5 ? "max-h-[48vh] overflow-y-auto pr-1" : ""
-              }`}
+              className={`space-y-4 pb-2 ${totalComments > 5 ? "max-h-[48vh] overflow-y-auto pr-1" : ""
+                }`}
             >
               {isLoadingComments ? (
                 <div className="flex flex-col items-center justify-center py-12 text-slate-500 dark:text-slate-400">

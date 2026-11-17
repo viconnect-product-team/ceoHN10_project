@@ -422,7 +422,7 @@ function createCoverPageElements(docInfo) {
       spacing: { before: 800, after: 0 },
       children: [
         new TextRun({
-          text: 'Lưu hành nội bộ Ban Lãnh Đạo CLB Doanh Nhân CEO HN10 & Doanh Nghiệp Hội Viên',
+          text: 'Lưu hành nội bộ Ban Lãnh Đạo CLB Doanh Nhân CEO HN10 & Doanh Nghiệp Học viên',
           italics: true,
           font: FONT_FAMILY,
           size: 18,

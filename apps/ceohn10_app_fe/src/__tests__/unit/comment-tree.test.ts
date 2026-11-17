@@ -74,7 +74,7 @@ describe("Feed Threaded Comment Tree & Mention Processing", () => {
         id: "comment-orphan",
         postId: "post-1",
         authorId: "user-5",
-        authorName: "Hội viên E",
+        authorName: "Học viên E",
         authorAvatar: "",
         content: "Bình luận độc lập",
         parentId: "non-existent-parent",

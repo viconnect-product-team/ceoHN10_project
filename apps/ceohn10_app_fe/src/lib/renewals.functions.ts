@@ -10,7 +10,7 @@ const getDb = (ctx?: any) => ctx?.supabase || supabaseAdmin;
 const codeFromId = (id: string) => id.replace(/^RNW-/, "");
 
 const NO_PERMISSION =
-  "Không thể cập nhật hội viên — bạn không có quyền quản trị trong không gian làm việc này.";
+  "Không thể cập nhật Học viên — bạn không có quyền quản trị trong không gian làm việc này.";
 
 import { fetchNestApiFromServer } from "@/lib/api-client";
 
@@ -59,7 +59,7 @@ export const renewMembershipFn = createServerFn({ method: "POST" })
       .eq("code", code)
       .maybeSingle();
     if (cErr) throw new Error(cErr.message);
-    if (!cur) throw new Error("Không tìm thấy hội viên.");
+    if (!cur) throw new Error("Không tìm thấy Học viên.");
     const base = (cur as Row).term_end ? new Date((cur as Row).term_end as string) : new Date();
     const newEnd = addOneYear(base).toISOString().slice(0, 10);
 
@@ -141,7 +141,7 @@ export const sendRenewalReminderFn = createServerFn({ method: "POST" })
       .eq("code", code)
       .maybeSingle();
     if (cErr) throw new Error(cErr.message);
-    if (!cur) throw new Error("Không tìm thấy hội viên.");
+    if (!cur) throw new Error("Không tìm thấy Học viên.");
     const next = (((cur as Row).reminder_count as number) ?? 0) + 1;
     const { data: row, error } = await getDb(context)
       .from("members")

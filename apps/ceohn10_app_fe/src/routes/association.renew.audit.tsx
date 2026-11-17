@@ -26,7 +26,7 @@ export const Route = createFileRoute("/association/renew/audit")({
       {
         name: "description",
         content:
-          "Xem toàn bộ lần thanh toán gia hạn hội viên, phân biệt lần thực sự thanh toán với lần bấm lặp (idempotent) và lần thất bại.",
+          "Xem toàn bộ lần thanh toán gia hạn Học viên, phân biệt lần thực sự thanh toán với lần bấm lặp (idempotent) và lần thất bại.",
       },
       { property: "og:title", content: "Nhật ký gia hạn" },
       {
@@ -201,11 +201,10 @@ function RenewalAuditLogScreen() {
                 type="button"
                 onClick={() => setFilter(f.key)}
                 aria-pressed={active}
-                className={`rounded-full border px-3 py-1.5 text-xs transition ${
-                  active
+                className={`rounded-full border px-3 py-1.5 text-xs transition ${active
                     ? "border-[var(--vba-gold,#f4c063)] bg-[var(--vba-gold,#f4c063)]/15 text-[var(--vba-gold,#f4c063)]"
                     : "border-border/10 bg-card/5 text-primary-foreground/70 hover:bg-card/10"
-                }`}
+                  }`}
               >
                 {f.label}
               </button>
@@ -298,9 +297,8 @@ function RenewalAuditLogScreen() {
                     {r.metadata.reason === "renewed_today"
                       ? "Đã gia hạn hôm nay"
                       : r.metadata.reason === "already_paid_for_year"
-                        ? `Đã có hóa đơn thanh toán cho năm ${
-                            (r.metadata as any).target_year ?? ""
-                          }`
+                        ? `Đã có hóa đơn thanh toán cho năm ${(r.metadata as any).target_year ?? ""
+                        }`
                         : String(r.metadata.reason)}
                   </div>
                 )}

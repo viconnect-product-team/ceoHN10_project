@@ -55,12 +55,12 @@ TARGET_FILES.forEach((file) => {
   let content = fs.readFileSync(filePath, 'utf8');
 
   // Quy tắc thay thế nghiêm ngặt:
-  content = content.replace(/NFC và thẻ 3D/gi, 'Thẻ Hội Viên Điện Tử QR Code và Danh Thiếp Số vCard');
-  content = content.replace(/thẻ 3D Titanium/gi, 'Thẻ Hội Viên VIP Mạ Vàng Warm Amber Gold');
-  content = content.replace(/thẻ 3D/gi, 'Thẻ Hội Viên Điện Tử VIP');
-  content = content.replace(/Thẻ 3D/g, 'Thẻ Hội Viên Điện Tử VIP');
-  content = content.replace(/Thẻ VIP 3D/g, 'Thẻ Hội Viên VIP Thông Minh');
-  content = content.replace(/thẻ VIP 3D/gi, 'Thẻ Hội Viên VIP Thông Minh');
+  content = content.replace(/NFC và thẻ 3D/gi, 'Thẻ Học viên Điện Tử QR Code và Danh Thiếp Số vCard');
+  content = content.replace(/thẻ 3D Titanium/gi, 'Thẻ Học viên VIP Mạ Vàng Warm Amber Gold');
+  content = content.replace(/thẻ 3D/gi, 'Thẻ Học viên Điện Tử VIP');
+  content = content.replace(/Thẻ 3D/g, 'Thẻ Học viên Điện Tử VIP');
+  content = content.replace(/Thẻ VIP 3D/g, 'Thẻ Học viên VIP Thông Minh');
+  content = content.replace(/thẻ VIP 3D/gi, 'Thẻ Học viên VIP Thông Minh');
   content = content.replace(/hiệu ứng 3D/gi, 'hiệu ứng xoay lật 2 mặt hoàng gia');
   content = content.replace(/đồ họa 3D/gi, 'đồ họa kỹ thuật số sắc nét');
   content = content.replace(/khán phòng 3D/gi, 'sơ đồ xếp chỗ Cinema Seating Studio');
@@ -69,7 +69,7 @@ TARGET_FILES.forEach((file) => {
   content = content.replace(/quét mã NFC/gi, 'quét mã QR Code');
   content = content.replace(/soát vé QR\/NFC/gi, 'soát vé mã QR Code');
   content = content.replace(/chíp NFC/gi, 'mã QR định danh bảo mật');
-  content = content.replace(/thẻ NFC/gi, 'thẻ hội viên điện tử');
+  content = content.replace(/thẻ NFC/gi, 'thẻ Học viên điện tử');
   content = content.replace(/\bNFC\b/g, 'QR Code');
 
   fs.writeFileSync(filePath, content, 'utf8');
@@ -95,12 +95,12 @@ if (fs.existsSync(crmBrdPath)) {
 ### 1. Quy Trình Sơ Đồ Xếp Chỗ Rạp Chiếu Phim (Cinema Seating Studio)
 - **Mục tiêu**: Bố trí không gian khán phòng chuyên nghiệp cho các sự kiện Đại hội, Gala và Diễn đàn kinh tế, loại bỏ hoàn toàn việc nhầm lẫn hoặc tranh chấp vị trí ghế ngồi.
 - **Quy tắc vận hành**:
-  - Giao diện mô phỏng sân khấu trung tâm (Stage Screen) và hệ thống hàng ghế A, B, C, D... được phân khu trực quan bằng màu sắc: Ghế Khách Mời VIP (Vàng Amber), Ghế Ban Chấp Hành (Xanh Cobalt), Ghế Hội Viên Chính Thức (Xanh ngọc) và Ghế Dự Bị.
+  - Giao diện mô phỏng sân khấu trung tâm (Stage Screen) và hệ thống hàng ghế A, B, C, D... được phân khu trực quan bằng màu sắc: Ghế Khách Mời VIP (Vàng Amber), Ghế Ban Chấp Hành (Xanh Cobalt), Ghế Học viên Chính Thức (Xanh ngọc) và Ghế Dự Bị.
   - Ban Tổ Chức có thể chọn từng ghế để gán đại biểu hoặc đổi chỗ tức thì; hệ thống tự động khóa ghế đang được chọn để tránh trùng lặp.
   - Khi đại biểu check-in thành công tại cổng, hệ thống hiển thị chính xác vị trí hàng ghế và số ghế để lễ tân hướng dẫn chu đáo.
 
 ### 2. Cổng Soát Vé Gatekeeper & Standee Mã QR Quét Zalo Cho Khách Mời Ngoài
-- **Mục tiêu**: Tối ưu hóa khâu đón tiếp khách mời, đại biểu ngoài và doanh nhân tham dự lần đầu mà chưa có tài khoản hội viên.
+- **Mục tiêu**: Tối ưu hóa khâu đón tiếp khách mời, đại biểu ngoài và doanh nhân tham dự lần đầu mà chưa có tài khoản Học viên.
 - **Quy tắc vận hành**:
   - Tại khu vực sảnh đón tiếp, Ban Tổ Chức in Standee chứa Mã QR công khai: Khách mời sử dụng ứng dụng Zalo hoặc camera điện thoại quét mã sẽ mở ngay Cổng đăng ký tham dự trực tuyến (\`/events/:eventId/register?source=zalo_guest\`).
   - Hộp thoại Cổng soát vé Gatekeeper tại bàn lễ tân hiển thị đồng thời: Camera quét vé QR tốc độ cao, danh sách đại biểu vừa qua cổng theo thời gian thực và nút xuất mã QR standee tải về in ấn.
@@ -120,7 +120,7 @@ if (fs.existsSync(crmBrdPath)) {
 - **Quy tắc vận hành**: Bảng ma trận áp dụng công nghệ Sticky 2 cột cố định (Cột Vai trò & Cột Nhóm chức năng) giúp cán bộ quản trị cuộn ngang/dọc xem và tích chọn quyền mượt mà, không bao giờ bị trôi tiêu đề cột hay tên vai trò.
 
 ### 5. Sàn Giao Thương B2B Phân Trang Động & Bộ Lọc Ngành Nghề
-- **Mục tiêu**: Thúc đẩy kết nối giao thương giữa hàng trăm doanh nghiệp hội viên mà không gây quá tải giao diện hay chậm trễ đường truyền.
+- **Mục tiêu**: Thúc đẩy kết nối giao thương giữa hàng trăm doanh nghiệp Học viên mà không gây quá tải giao diện hay chậm trễ đường truyền.
 - **Quy tắc vận hành**: Hệ thống phân trang tự động 12 sản phẩm/trang kết hợp bộ lọc danh mục ngành nghề linh hoạt (Bất động sản, Xây dựng, Tài chính, Công nghệ...).
 `;
     crmBrd += supplementBrd;
@@ -208,7 +208,7 @@ const profileMdContent = `# HỒ SƠ NĂNG LỰC & HỆ SINH THÁI CHUYỂN Đ�
 - **Cơ quan chủ quản**: Trực thuộc Hội Doanh Nhân Trẻ Hà Nội (HanoiBA)
 - **Thành viên sáng lập**: Cộng đồng các Chủ tịch HĐQT, Tổng Giám đốc, Nhà sáng lập doanh nghiệp sinh năm Quý Hợi 1983.
 - **Tôn chỉ hoạt động**: **"HỘI TỤ BẢN LĨNH - KẾT NỐI TINH HOA - NÂNG TẦM DOANH NGHIỆP"**
-- **Quy mô hệ sinh thái**: Hơn 500+ doanh nghiệp hội viên chính thức trên toàn quốc với tổng doanh thu kết nối giao thương hàng năm vượt 2.500+ tỷ đồng.
+- **Quy mô hệ sinh thái**: Hơn 500+ doanh nghiệp Học viên chính thức trên toàn quốc với tổng doanh thu kết nối giao thương hàng năm vượt 2.500+ tỷ đồng.
 
 ---
 
@@ -222,10 +222,10 @@ Trở thành câu lạc bộ doanh nhân mẫu mực hàng đầu Việt Nam v�
 3. **Lan tỏa Giá trị Nhân văn**: Thực hiện các chương trình thiện nguyện, an sinh xã hội và nâng đỡ thế hệ doanh nhân trẻ khởi nghiệp.
 
 ### 5 Giá Trị Cốt Lõi
-- **CHÍNH DANH**: 100% hội viên được thẩm định pháp lý doanh nghiệp minh bạch và cấp mã định danh duy nhất.
+- **CHÍNH DANH**: 100% Học viên được thẩm định pháp lý doanh nghiệp minh bạch và cấp mã định danh duy nhất.
 - **KỶ CƯƠNG**: Hoạt động theo quy chế dân chủ, tôn trọng pháp luật và quy chuẩn ứng xử văn hóa doanh nhân HanoiBA.
 - **TIÊN PHONG**: Dẫn đầu ứng dụng công nghệ số và trí tuệ nhân tạo (AI) trong quản trị hiệp hội.
-- **TIN CẬY**: Chia sẻ cơ hội kinh doanh bằng chữ TÍN, bảo vệ bí mật kinh doanh của hội viên.
+- **TIN CẬY**: Chia sẻ cơ hội kinh doanh bằng chữ TÍN, bảo vệ bí mật kinh doanh của Học viên.
 - **PHỤNG SỰ**: Gắn kết trách nhiệm doanh nghiệp với sự phồn vinh của cộng đồng và xã hội.
 
 ---
@@ -237,19 +237,19 @@ Hệ sinh thái chuyển đổi số của CLB Doanh Nhân CEO HN10 được ngh
 - **Tên nền tảng**: Hệ Thống Quản Trị Hiệp Hội Doanh Nhân CEO HN10
 - **Đối tượng sử dụng**: Chủ tịch, Ban Điều Hành, Tổng Thư Ký, Các Trưởng Ban Chuyên Môn và Kế Toán.
 - **Tính năng đột phá**:
-  - **Quản trị Hội viên & Hồ sơ Doanh nghiệp 360°**: Quản lý dữ liệu chính ngạch, phân loại ngành nghề, theo dõi nhiệm kỳ và thẩm định hồ sơ gia nhập.
+  - **Quản trị Học viên & Hồ sơ Doanh nghiệp 360°**: Quản lý dữ liệu chính ngạch, phân loại ngành nghề, theo dõi nhiệm kỳ và thẩm định hồ sơ gia nhập.
   - **Sơ Đồ Xếp Chỗ Rạp Chiếu Phim (Cinema Seating Studio)**: Bố trí phân khu VIP, hàng ghế A-D trực quan, gán chỗ tự động và chống nhầm chỗ tại các đại tiệc Gala.
   - **Cổng Soát Vé QR Gatekeeper & Standee Zalo**: Soát vé camera 0.1 giây, quản lý danh sách đại biểu trực tiếp theo thời gian thực.
   - **Ma Trận Phân Quyền Cố Định (Sticky RBAC Matrix)**: 10 vai trò quản trị hành chính, 11 module chức năng, chống trôi bảng tiêu đề.
   - **Kế Toán Hội Phí & Quản Trị Tài Chính Minh Bạch**: Tự động sinh mã VietQR theo chuẩn Napas 247, đối soát nộp phí và báo cáo thu chi tự động.
   - **Điều Hành Công Việc Kanban & Biểu Quyết Số**: Giao việc theo chuyên ban, nhắc việc tự động và bỏ phiếu tín nhiệm bảo mật cao.
 
-### Trụ Cột 2: Ứng Dụng Di Động Hội Viên Kết Nối Giao Thương (CEO HN10 Mobile App)
+### Trụ Cột 2: Ứng Dụng Di Động Học viên Kết Nối Giao Thương (CEO HN10 Mobile App)
 - **Tên ứng dụng**: CEO HN10 - Hiệp Hội Doanh Nhân Bỏ Túi
-- **Đối tượng sử dụng**: Toàn thể Hội viên chính thức và Doanh nhân thành viên.
+- **Đối tượng sử dụng**: Toàn thể Học viên chính thức và Doanh nhân thành viên.
 - **Tính năng đột phá**:
-  - **Thẻ Hội Viên Điện Tử VIP Mạ Vàng & Danh Thiếp Số vCard**: Thẻ định danh số sang trọng Warm Amber Gold & Cobalt Navy; chạm nhẹ lật 2 mặt hiển thị Mã QR Code động độc bản, hỗ trợ lưu danh bạ 1 chạm (.vcf) thẳng vào điện thoại đối tác mà không cần cài app.
-  - **Sàn Giao Thương B2B Khớp Nối Cung Cầu**: Niêm yết sản phẩm giải pháp với chính sách ưu đãi đặc quyền hội viên; phân trang và tìm kiếm theo ngành nghề thông minh.
+  - **Thẻ Học viên Điện Tử VIP Mạ Vàng & Danh Thiếp Số vCard**: Thẻ định danh số sang trọng Warm Amber Gold & Cobalt Navy; chạm nhẹ lật 2 mặt hiển thị Mã QR Code động độc bản, hỗ trợ lưu danh bạ 1 chạm (.vcf) thẳng vào điện thoại đối tác mà không cần cài app.
+  - **Sàn Giao Thương B2B Khớp Nối Cung Cầu**: Niêm yết sản phẩm giải pháp với chính sách ưu đãi đặc quyền Học viên; phân trang và tìm kiếm theo ngành nghề thông minh.
   - **Lịch Hẹn Cà Phê Giao Thương 1-on-1**: Đặt lịch kết nối trực tiếp, đồng bộ tự động vào lịch công tác điện thoại của hai doanh nhân.
   - **Ví Vé Điện Tử E-Ticket & Mã Bốc Thăm Lucky Draw**: Lưu cuống vé sự kiện, hiển thị số ghế ngồi và mã quay thưởng may mắn tại Gala.
   - **Đàm Thoại Nội Bộ Mã Hóa & Thông Báo Cuộc Gọi Nền**: Đàm thoại thoại/video sắc nét, đổ chuông ngay trên màn hình khóa kể cả khi tắt app.
@@ -260,8 +260,8 @@ Hệ sinh thái chuyển đổi số của CLB Doanh Nhân CEO HN10 được ngh
 ## 4. LỢI ÍCH ĐẶC QUYỀN DÀNH CHO CÁC BÊN THAM GIA
 | Đối Tượng | Giá Trị & Lợi Ích Nhận Được |
 | :--- | :--- |
-| **Hội Viên Doanh Nhân** | • Sở hữu Thẻ Hội Viên Điện Tử VIP và Danh thiếp số vCard chuyên nghiệp.<br>• Tiếp cận mạng lưới 500+ CEO cùng trang lứa, mở rộng kênh bán hàng B2B.<br>• Được bảo vệ quyền lợi thương mại, ưu tiên nhận gói thầu và hợp đồng nội bộ.<br>• Tham gia các sự kiện kết nối đỉnh cao với vị trí ngồi VIP trân trọng. |
-| **Ban Điều Hành & Ban Thư Ký** | • Giảm 85% thời gian xử lý thủ tục hành chính, giấy tờ và đối soát hội phí.<br>• Nắm bắt bức tranh tài chính, tiến độ công việc và tỷ lệ gắn kết của hội viên theo thời gian thực.<br>• Điều hành đại hội và biểu quyết minh bạch, chuẩn xác đến từng phần trăm. |
+| **Học viên Doanh Nhân** | • Sở hữu Thẻ Học viên Điện Tử VIP và Danh thiếp số vCard chuyên nghiệp.<br>• Tiếp cận mạng lưới 500+ CEO cùng trang lứa, mở rộng kênh bán hàng B2B.<br>• Được bảo vệ quyền lợi thương mại, ưu tiên nhận gói thầu và hợp đồng nội bộ.<br>• Tham gia các sự kiện kết nối đỉnh cao với vị trí ngồi VIP trân trọng. |
+| **Ban Điều Hành & Ban Thư Ký** | • Giảm 85% thời gian xử lý thủ tục hành chính, giấy tờ và đối soát hội phí.<br>• Nắm bắt bức tranh tài chính, tiến độ công việc và tỷ lệ gắn kết của Học viên theo thời gian thực.<br>• Điều hành đại hội và biểu quyết minh bạch, chuẩn xác đến từng phần trăm. |
 | **Nhà Tài Trợ & Đối Tác Chiến Lược** | • Tiếp cận trực tiếp 500+ chủ doanh nghiệp có năng lực quyết định chi tiêu cao.<br>• Quảng bá thương hiệu trên các vị trí danh dự của ứng dụng và sự kiện Gala.<br>• Báo cáo hiệu quả tài trợ (Sponsorship Analytics) minh bạch và lượng hóa chi tiết. |
 
 ---
@@ -270,7 +270,7 @@ Hệ sinh thái chuyển đổi số của CLB Doanh Nhân CEO HN10 được ngh
 - **Văn phòng CLB**: Tầng 6, Tòa nhà Doanh Nhân Trẻ Hà Nội, Số 19 Cầu Giấy, Hà Nội
 - **Hotline Ban Thư Ký**: 0983 1983 83 / 0988 66 55 44
 - **Cổng Quản Trị CRM**: https://crm.ceohn10.viconnect.vn
-- **Cổng Hội Viên Mobile**: https://ceohn10.viconnect.vn
+- **Cổng Học viên Mobile**: https://ceohn10.viconnect.vn
 - **Email chính thức**: vanphong@ceohn10.com / bantruyenthong@ceohn10.com
 `;
 
@@ -346,7 +346,7 @@ async function buildProfileDocx() {
             spacing: { before: 100, after: 100, line: 276 },
             children: [
               new TextRun({
-                text: 'Hệ sinh thái chuyển đổi số kép CEO HN10 bao gồm Hệ thống Quản trị Web CRM và Ứng dụng Di động Mobile App Hội viên được thiết kế độc bản, loại bỏ các thủ tục rườm rà, kết nối giao thương B2B trực tiếp và nâng tầm thương hiệu doanh nhân Việt Nam.',
+                text: 'Hệ sinh thái chuyển đổi số kép CEO HN10 bao gồm Hệ thống Quản trị Web CRM và Ứng dụng Di động Mobile App Học viên được thiết kế độc bản, loại bỏ các thủ tục rườm rà, kết nối giao thương B2B trực tiếp và nâng tầm thương hiệu doanh nhân Việt Nam.',
                 font: FONT_FAMILY,
                 size: 24,
                 color: COLOR_DARK,

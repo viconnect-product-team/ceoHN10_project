@@ -87,7 +87,7 @@ export const Route = createFileRoute("/analytics")({
       { title: "Báo Cáo & Thống Kê Quản Trị CLB CEO HN10" },
       {
         name: "description",
-        content: "Hệ thống thống kê, phân tích chỉ số giao thương và xếp hạng hội viên CLB CEO HN10",
+        content: "Hệ thống thống kê, phân tích chỉ số giao thương và xếp hạng Học viên CLB CEO HN10",
       },
     ],
   }),
@@ -298,7 +298,7 @@ export function AnalyticsDashboardPage() {
     let socket: any = null;
     try {
       socket = getConnectAppSocket();
-    } catch {}
+    } catch { }
 
     const handleRealtimeUpdate = () => {
       const params = new URLSearchParams({
@@ -314,7 +314,7 @@ export function AnalyticsDashboardPage() {
             setServerData(res);
           }
         })
-        .catch(() => {});
+        .catch(() => { });
     };
 
     if (socket) {
@@ -344,7 +344,7 @@ export function AnalyticsDashboardPage() {
     return CATEGORIES.find((c) => c.id === selectedCat) || CATEGORIES[0];
   }, [selectedCat]);
 
-  // Dữ liệu gắn kết hội viên
+  // Dữ liệu gắn kết Học viên
   const sentimentStats = useMemo(() => {
     if (serverData?.memberActivitySentiment) {
       return serverData.memberActivitySentiment;
@@ -416,7 +416,7 @@ export function AnalyticsDashboardPage() {
 
         return [
           {
-            label: "Tổng hoạt động hội viên",
+            label: "Tổng hoạt động Học viên",
             value: `${totalActivities} lượt`,
             delta: "100%",
             isUp: true,
@@ -441,7 +441,7 @@ export function AnalyticsDashboardPage() {
             value: `${totalRefClicks} lượt click`,
             delta: `${Math.round((totalRefClicks / (totalActivities || 1)) * 100)}%`,
             isUp: true,
-            desc: "Click link mời gia nhập hội viên mới",
+            desc: "Click link mời gia nhập Học viên mới",
           },
         ];
       }
@@ -454,9 +454,9 @@ export function AnalyticsDashboardPage() {
         const avgConn = totalMems > 0 ? (totalConns / totalMems).toFixed(1) : "0";
         return [
           { label: "Tổng lượt kết nối", value: `${totalConns} lượt`, delta: "Thời gian thực", isUp: true, desc: "Giao lưu 1-on-1 trong kỳ" },
-          { label: "Tỷ lệ hội viên kết nối", value: `${connectRate}%`, delta: `${connectedCount} / ${totalMems} CEO`, isUp: true, desc: "Độ phủ mạng lưới giao thương" },
+          { label: "Tỷ lệ Học viên kết nối", value: `${connectRate}%`, delta: `${connectedCount} / ${totalMems} CEO`, isUp: true, desc: "Độ phủ mạng lưới giao thương" },
           { label: "Quán quân kết nối", value: top1?.name || "Chưa có", delta: `${top1?.connectionsCount || 0} lượt`, isUp: true, desc: "Top 1 kết nối năng động" },
-          { label: "Trung bình mỗi hội viên", value: `${avgConn} lượt`, delta: "Theo CSDL", isUp: true, desc: "Mức tương tác trung bình" },
+          { label: "Trung bình mỗi Học viên", value: `${avgConn} lượt`, delta: "Theo CSDL", isUp: true, desc: "Mức tương tác trung bình" },
         ];
       }
       case "top_opportunities": {
@@ -491,8 +491,8 @@ export function AnalyticsDashboardPage() {
         const totalRefs = serverData?.topReferrals?.reduce((acc: number, m: any) => acc + (m.referralsCount || 0), 0) || 0;
         const totalScore = serverData?.topReferrals?.reduce((acc: number, m: any) => acc + (m.interactionScore || 0), 0) || 0;
         return [
-          { label: "Hội viên mới giới thiệu", value: `${totalRefs} CEO`, delta: "Thời gian thực", isUp: true, desc: "Gia nhập qua mạng lưới hội viên" },
-          { label: "Độ phủ giới thiệu", value: `${serverData?.topReferrals?.length || 0} người`, delta: "Đại sứ kết nối", isUp: true, desc: "Hội viên tham gia kết nạp" },
+          { label: "Học viên mới giới thiệu", value: `${totalRefs} CEO`, delta: "Thời gian thực", isUp: true, desc: "Gia nhập qua mạng lưới Học viên" },
+          { label: "Độ phủ giới thiệu", value: `${serverData?.topReferrals?.length || 0} người`, delta: "Đại sứ kết nối", isUp: true, desc: "Học viên tham gia kết nạp" },
           { label: "Quán quân giới thiệu", value: top1?.name || "Chưa có", delta: `${top1?.referralsCount || top1?.connectionsCount || 0} CEO`, isUp: true, desc: "Đại sứ kết nối xuất sắc" },
           { label: "Điểm thi đua ghi nhận", value: `${totalScore.toLocaleString("vi-VN")} đ`, delta: "Tích lũy", isUp: true, desc: "Ghi nhận theo quy chế khen thưởng" },
         ];
@@ -506,10 +506,10 @@ export function AnalyticsDashboardPage() {
       if (!list || list.length === 0) return [];
       return list.map((item: any, idx: number) => ({
         rank: item.rank || idx + 1,
-        name: item.name || "Hội viên",
+        name: item.name || "Học viên",
         company: item.company || "CLB CEO HN10",
-        role: item.title || item.role || "Hội viên",
-        dept: item.department || item.dept || "Hội viên ceohn10",
+        role: item.title || item.role || "Học viên",
+        dept: item.department || item.dept || "Học viên ceohn10",
         score: item.score || `${item[metricKey] || 0} ${scoreSuffix}`,
         metric: item[metricKey] || 0,
         phone: item.phone || "0983 198 383",
@@ -537,7 +537,7 @@ export function AnalyticsDashboardPage() {
     }
     // selectedCat === "top_referrals"
     if (serverData?.topReferrals?.length) {
-      return mapItems(serverData.topReferrals, "Hội viên giới thiệu", "referralsCount");
+      return mapItems(serverData.topReferrals, "Học viên giới thiệu", "referralsCount");
     }
     return [];
   }, [selectedCat, serverData]);
@@ -622,22 +622,22 @@ export function AnalyticsDashboardPage() {
       timelineUnit: "Lượt",
     },
     top_referrals: {
-      unit: "Hội viên",
+      unit: "Học viên",
       col1Label: "Đã kết nạp chính thức",
       col1Color: "#003B95",
-      col1Unit: "Hội viên",
+      col1Unit: "Học viên",
       col2Label: "Chờ kết nạp",
       col2Color: "#10B981",
-      col2Unit: "Hội viên",
-      col3Label: "Hội viên giới thiệu",
+      col2Unit: "Học viên",
+      col3Label: "Học viên giới thiệu",
       col3Color: "#F59E0B",
-      col3Unit: "Hội viên",
+      col3Unit: "Học viên",
       col4Label: "Hoàn thành nhiệm vụ",
       col4Color: "#EC4899",
       col4Unit: "Mốc",
-      timelineLabel: "Tổng hội viên mới",
+      timelineLabel: "Tổng Học viên mới",
       timelineColor: "#0284C7",
-      timelineUnit: "Hội viên",
+      timelineUnit: "Học viên",
     },
     member_activities: {
       unit: "Lượt",
@@ -652,7 +652,7 @@ export function AnalyticsDashboardPage() {
       col3Unit: "Lượt",
       col4Label: undefined as any,
       col4Color: undefined as any,
-      timelineLabel: "Tổng hoạt động hội viên",
+      timelineLabel: "Tổng hoạt động Học viên",
       timelineColor: "#DC2626",
       timelineUnit: "Lượt",
     },
@@ -669,7 +669,7 @@ export function AnalyticsDashboardPage() {
       col3Unit: "Lượt",
       col4Label: undefined as any,
       col4Color: undefined as any,
-      timelineLabel: "Tổng hoạt động hội viên",
+      timelineLabel: "Tổng hoạt động Học viên",
       timelineColor: "#DC2626",
       timelineUnit: "Lượt",
     },
@@ -784,7 +784,7 @@ export function AnalyticsDashboardPage() {
           subtitle={activeCategoryMeta.subLabel}
           actions={
             <div className="flex items-center gap-2">
-              {/* Mốc Thưởng & Nhiệm Vụ Thưởng: CHỈ HIỂN THỊ Ở DANH MỤC PHÁT TRIỂN HỘI VIÊN */}
+              {/* Mốc Thưởng & Nhiệm Vụ Thưởng: CHỈ HIỂN THỊ Ở DANH MỤC PHÁT TRIỂN Học viên */}
               {selectedCat === "top_referrals" && (
                 <button
                   type="button"
@@ -1002,22 +1002,20 @@ export function AnalyticsDashboardPage() {
                   <button
                     type="button"
                     onClick={() => setSubView("default")}
-                    className={`px-3 py-1 rounded-lg text-xs font-bold transition cursor-pointer ${
-                      subView === "default"
+                    className={`px-3 py-1 rounded-lg text-xs font-bold transition cursor-pointer ${subView === "default"
                         ? "bg-[#003B95] text-white shadow-xs"
                         : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
-                    }`}
+                      }`}
                   >
                     Đầy đủ các ngày trong tháng (28-31 ngày)
                   </button>
                   <button
                     type="button"
                     onClick={() => setSubView("alt")}
-                    className={`px-3 py-1 rounded-lg text-xs font-bold transition cursor-pointer ${
-                      subView === "alt"
+                    className={`px-3 py-1 rounded-lg text-xs font-bold transition cursor-pointer ${subView === "alt"
                         ? "bg-[#003B95] text-white shadow-xs"
                         : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
-                    }`}
+                      }`}
                   >
                     Tổng hợp 5 tuần trong tháng
                   </button>
@@ -1028,22 +1026,20 @@ export function AnalyticsDashboardPage() {
                   <button
                     type="button"
                     onClick={() => setSubView("default")}
-                    className={`px-3 py-1 rounded-lg text-xs font-bold transition cursor-pointer ${
-                      subView === "default"
+                    className={`px-3 py-1 rounded-lg text-xs font-bold transition cursor-pointer ${subView === "default"
                         ? "bg-[#003B95] text-white shadow-xs"
                         : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
-                    }`}
+                      }`}
                   >
                     Đầy đủ các tuần trong quý (13 tuần)
                   </button>
                   <button
                     type="button"
                     onClick={() => setSubView("alt")}
-                    className={`px-3 py-1 rounded-lg text-xs font-bold transition cursor-pointer ${
-                      subView === "alt"
+                    className={`px-3 py-1 rounded-lg text-xs font-bold transition cursor-pointer ${subView === "alt"
                         ? "bg-[#003B95] text-white shadow-xs"
                         : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
-                    }`}
+                      }`}
                   >
                     Tổng hợp 3 tháng trong quý
                   </button>
@@ -1054,22 +1050,20 @@ export function AnalyticsDashboardPage() {
                   <button
                     type="button"
                     onClick={() => setSubView("default")}
-                    className={`px-3 py-1 rounded-lg text-xs font-bold transition cursor-pointer ${
-                      subView === "default"
+                    className={`px-3 py-1 rounded-lg text-xs font-bold transition cursor-pointer ${subView === "default"
                         ? "bg-[#003B95] text-white shadow-xs"
                         : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
-                    }`}
+                      }`}
                   >
                     Đầy đủ 12 tháng trong năm
                   </button>
                   <button
                     type="button"
                     onClick={() => setSubView("alt")}
-                    className={`px-3 py-1 rounded-lg text-xs font-bold transition cursor-pointer ${
-                      subView === "alt"
+                    className={`px-3 py-1 rounded-lg text-xs font-bold transition cursor-pointer ${subView === "alt"
                         ? "bg-[#003B95] text-white shadow-xs"
                         : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
-                    }`}
+                      }`}
                   >
                     Tổng hợp 4 quý trong năm
                   </button>
@@ -1364,16 +1358,16 @@ export function AnalyticsDashboardPage() {
           </div>
         </div>
 
-        {/* Danh sách Hội viên cần hỗ trợ kết nối (Khi chọn tab Hoạt động hội viên) */}
+        {/* Danh sách Học viên cần hỗ trợ kết nối (Khi chọn tab Hoạt động Học viên) */}
         {(selectedCat === "member_activities" || selectedCat === "activity_sentiment") && (
           <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs space-y-4">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 pb-3 border-b border-slate-100 dark:border-slate-800">
               <div>
                 <h3 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider">
-                  Hội Viên Cần Hỗ Trợ Kết Nối
+                  Học viên Cần Hỗ Trợ Kết Nối
                 </h3>
                 <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                  Danh sách hội viên cần Ban Thư Ký liên hệ thăm hỏi và tạo cơ hội giao thương
+                  Danh sách Học viên cần Ban Thư Ký liên hệ thăm hỏi và tạo cơ hội giao thương
                 </p>
               </div>
               <span className="px-3 py-1 rounded-full bg-red-50 text-red-700 dark:bg-red-950/60 dark:text-red-400 font-bold text-xs border border-red-200 dark:border-red-900">
@@ -1457,7 +1451,7 @@ export function AnalyticsDashboardPage() {
                   </p>
                 </div>
                 <span className="px-3 py-1 rounded-full bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-400 font-bold text-xs border border-amber-200 dark:border-amber-900">
-                  Top 3 Hội Viên
+                  Top 3 Học viên
                 </span>
               </div>
 
@@ -1471,7 +1465,7 @@ export function AnalyticsDashboardPage() {
                     Chưa có dữ liệu vinh danh thực tế trong kỳ này
                   </h4>
                   <p className="text-xs text-slate-500 max-w-md mt-1">
-                    Bảng xếp hạng sẽ tự động cập nhật ngay khi hội viên có số lượng, giá trị giao thương hoặc lượt tương tác thật được ghi nhận trong cơ sở dữ liệu.
+                    Bảng xếp hạng sẽ tự động cập nhật ngay khi Học viên có số lượng, giá trị giao thương hoặc lượt tương tác thật được ghi nhận trong cơ sở dữ liệu.
                   </p>
                 </div>
               ) : (
@@ -1558,7 +1552,7 @@ export function AnalyticsDashboardPage() {
                     Bảng Xếp Hạng (Từ Top 4 Đến Top 10)
                   </h3>
                   <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                    Hội viên tích cực trong kỳ báo cáo ({activeCategoryMeta.label})
+                    Học viên tích cực trong kỳ báo cáo ({activeCategoryMeta.label})
                   </p>
                 </div>
                 <span className="px-2.5 py-1 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-xs font-medium">
@@ -1617,7 +1611,7 @@ export function AnalyticsDashboardPage() {
                 </div>
               ) : (
                 <div className="py-8 text-center text-xs text-slate-500">
-                  Chưa có hội viên nào trong danh sách Top 4 - 10 kỳ này.
+                  Chưa có Học viên nào trong danh sách Top 4 - 10 kỳ này.
                 </div>
               )}
             </div>
@@ -1638,7 +1632,7 @@ export function AnalyticsDashboardPage() {
           isOpen={showImportModal}
           onClose={() => setShowImportModal(false)}
           onSuccess={() => {
-            toast.success("Dữ liệu hội viên đã được đồng bộ vào hệ thống!");
+            toast.success("Dữ liệu Học viên đã được đồng bộ vào hệ thống!");
           }}
         />
 

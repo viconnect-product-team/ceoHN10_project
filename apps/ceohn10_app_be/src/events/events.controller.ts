@@ -182,7 +182,11 @@ export class EventsController {
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('platform_admin', 'superadmin', 'adm', 'admin', 'bqt', 'btt')
+  @Roles(
+    'platform_admin', 'superadmin', 'adm', 'admin', 'bqt', 'btt',
+    'chu_tich', 'lop_truong', 'lop_pho', 'ban_su_kien', 'ban_thien_nguyen', 'truong_ban', 'quan_tri',
+    'member', 'hoi_vien'
+  )
   @Post()
   async createEvent(@Request() req: any, @Body() body: CreateEventDto) {
     return this.eventsService.createEvent(req.user.id, body);

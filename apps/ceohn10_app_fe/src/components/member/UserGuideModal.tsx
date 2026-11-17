@@ -172,7 +172,7 @@ export function UserGuideModal({ open, onClose, defaultScreenId }: UserGuideModa
     try {
       localStorage.setItem("ceohn10_active_screen_tour", screen.id);
       localStorage.setItem("ceohn10_trigger_tour_on_mount", "1");
-    } catch {}
+    } catch { }
     toast.success(`Đang chuyển tới ${screen.title} & khởi động chỉ dẫn tương tác!`);
     onClose();
     if (typeof window !== "undefined") {
@@ -239,7 +239,7 @@ export function UserGuideModal({ open, onClose, defaultScreenId }: UserGuideModa
                 </h3>
               </div>
               <p className="text-[11px] text-sky-200">
-                Chỉ dẫn thao tác 10 màn hình di động, chạm thẻ NFC, quét card visit AI và quyền lợi Hội viên CEO HN10
+                Chỉ dẫn thao tác 10 màn hình di động, chạm thẻ NFC, quét card visit AI và quyền lợi Học viên CEO HN10
               </p>
             </div>
           </div>
@@ -270,11 +270,10 @@ export function UserGuideModal({ open, onClose, defaultScreenId }: UserGuideModa
           <button
             type="button"
             onClick={() => setActiveTab("screens")}
-            className={`pb-2.5 px-3 text-xs font-bold border-b-2 transition cursor-pointer flex items-center gap-1.5 ${
-              activeTab === "screens"
+            className={`pb-2.5 px-3 text-xs font-bold border-b-2 transition cursor-pointer flex items-center gap-1.5 ${activeTab === "screens"
                 ? "border-[#003B95] text-[#003B95] dark:border-sky-400 dark:text-sky-300"
                 : "border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white"
-            }`}
+              }`}
           >
             <Smartphone className="h-3.5 w-3.5" />
             <span>10 Màn Hình App CEO HN10</span>
@@ -283,11 +282,10 @@ export function UserGuideModal({ open, onClose, defaultScreenId }: UserGuideModa
           <button
             type="button"
             onClick={() => setActiveTab("pdf")}
-            className={`pb-2.5 px-3 text-xs font-bold border-b-2 transition cursor-pointer flex items-center gap-1.5 ${
-              activeTab === "pdf"
+            className={`pb-2.5 px-3 text-xs font-bold border-b-2 transition cursor-pointer flex items-center gap-1.5 ${activeTab === "pdf"
                 ? "border-[#003B95] text-[#003B95] dark:border-sky-400 dark:text-sky-300"
                 : "border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white"
-            }`}
+              }`}
           >
             <FileText className="h-3.5 w-3.5" />
             <span>Sổ Tay PDF App CEO HN10 &amp; Hotline</span>
@@ -341,36 +339,32 @@ export function UserGuideModal({ open, onClose, defaultScreenId }: UserGuideModa
                         setActiveStepIndex(0);
                         setMobileView("steps");
                       }}
-                      className={`w-full text-left p-2.5 rounded-2xl transition cursor-pointer flex items-center justify-between gap-2.5 border touch-manipulation active:scale-[0.99] ${
-                        isSelected
+                      className={`w-full text-left p-2.5 rounded-2xl transition cursor-pointer flex items-center justify-between gap-2.5 border touch-manipulation active:scale-[0.99] ${isSelected
                           ? "bg-[#003B95]/10 dark:bg-[#003B95]/25 border-[#003B95]/60 shadow-sm"
                           : "border-transparent hover:bg-slate-100 dark:hover:bg-white/[0.04]"
-                      }`}
+                        }`}
                     >
                       <div className="flex items-center gap-2.5 min-w-0">
                         <div
-                          className={`h-9 w-9 rounded-xl grid place-items-center shrink-0 border transition ${
-                            isSelected
+                          className={`h-9 w-9 rounded-xl grid place-items-center shrink-0 border transition ${isSelected
                               ? "bg-gradient-to-br from-[#003B95] to-[#002B70] text-white border-amber-400/40"
                               : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-white/10"
-                          }`}
+                            }`}
                         >
                           <Icon className="h-4.5 w-4.5" />
                         </div>
                         <div className="min-w-0">
                           <div className="flex items-center gap-1.5">
                             <span
-                              className={`text-[9.5px] font-black uppercase tracking-wider ${
-                                isSelected ? "text-[#003B95] dark:text-amber-400" : "text-slate-400"
-                              }`}
+                              className={`text-[9.5px] font-black uppercase tracking-wider ${isSelected ? "text-[#003B95] dark:text-amber-400" : "text-slate-400"
+                                }`}
                             >
                               {screen.badge}
                             </span>
                           </div>
                           <h4
-                            className={`text-xs font-bold truncate leading-tight ${
-                              isSelected ? "text-slate-900 dark:text-white" : "text-slate-700 dark:text-slate-300"
-                            }`}
+                            className={`text-xs font-bold truncate leading-tight ${isSelected ? "text-slate-900 dark:text-white" : "text-slate-700 dark:text-slate-300"
+                              }`}
                           >
                             {screen.title}
                           </h4>
@@ -380,9 +374,8 @@ export function UserGuideModal({ open, onClose, defaultScreenId }: UserGuideModa
                         </div>
                       </div>
                       <ChevronRight
-                        className={`h-4 w-4 shrink-0 transition ${
-                          isSelected ? "text-[#003B95] dark:text-amber-400 translate-x-0.5" : "text-slate-300 dark:text-slate-600"
-                        }`}
+                        className={`h-4 w-4 shrink-0 transition ${isSelected ? "text-[#003B95] dark:text-amber-400 translate-x-0.5" : "text-slate-300 dark:text-slate-600"
+                          }`}
                       />
                     </button>
                   );
@@ -461,19 +454,17 @@ export function UserGuideModal({ open, onClose, defaultScreenId }: UserGuideModa
                           e.preventDefault();
                           setActiveStepIndex(idx);
                         }}
-                        className={`p-2.5 rounded-2xl border text-left transition cursor-pointer flex flex-col justify-between gap-1 shadow-xs touch-manipulation select-none active:scale-95 ${
-                          isStepActive
+                        className={`p-2.5 rounded-2xl border text-left transition cursor-pointer flex flex-col justify-between gap-1 shadow-xs touch-manipulation select-none active:scale-95 ${isStepActive
                             ? "bg-[#003B95]/10 dark:bg-[#003B95]/20 border-[#003B95] text-slate-900 dark:text-white"
                             : "bg-white dark:bg-slate-900/60 border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-400 hover:border-slate-300"
-                        }`}
+                          }`}
                       >
                         <div className="flex items-center justify-between">
                           <span
-                            className={`h-5 w-5 rounded-full grid place-items-center text-[10px] font-black ${
-                              isStepActive
+                            className={`h-5 w-5 rounded-full grid place-items-center text-[10px] font-black ${isStepActive
                                 ? "bg-[#003B95] text-white font-black shadow-xs"
                                 : "bg-slate-100 dark:bg-slate-800 text-slate-500"
-                            }`}
+                              }`}
                           >
                             {idx + 1}
                           </span>
@@ -506,11 +497,10 @@ export function UserGuideModal({ open, onClose, defaultScreenId }: UserGuideModa
                           `Bước ${activeStepIndex + 1}: ${activeStep.title}. ${activeStep.description}. Thao tác: ${activeStep.instruction}. Phản hồi: ${activeStep.systemResponse}`
                         )
                       }
-                      className={`px-3 py-1 rounded-xl text-xs font-bold flex items-center gap-1.5 transition active:scale-95 cursor-pointer shadow-xs ${
-                        isSpeaking
+                      className={`px-3 py-1 rounded-xl text-xs font-bold flex items-center gap-1.5 transition active:scale-95 cursor-pointer shadow-xs ${isSpeaking
                           ? "bg-rose-500 text-white animate-pulse"
                           : "bg-amber-400/20 hover:bg-amber-400/30 text-amber-700 dark:text-amber-300 border border-amber-400/40"
-                      }`}
+                        }`}
                       title={isSpeaking ? "Dừng đọc" : "Đọc to hướng dẫn này"}
                     >
                       {isSpeaking ? (
@@ -644,7 +634,7 @@ export function UserGuideModal({ open, onClose, defaultScreenId }: UserGuideModa
                   Danh Bạ Trưởng Ban Chuyên Môn
                 </h3>
                 <p className="text-[11px] text-slate-500">
-                  Liên hệ khi cần trợ giúp thủ tục hội viên, soát vé sự kiện hoặc kết nối xúc tiến
+                  Liên hệ khi cần trợ giúp thủ tục Học viên, soát vé sự kiện hoặc kết nối xúc tiến
                 </p>
               </div>
 

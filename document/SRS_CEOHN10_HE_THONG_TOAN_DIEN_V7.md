@@ -23,8 +23,8 @@ Hệ thống giải quyết triệt để bài toán phân mảnh trong quản t
 
 ### 1.2 Phạm Vi Dự Án (Scope)
 Hệ thống bàn giao bao gồm 3 phân hệ cốt lõi hoạt động đồng bộ:
-1. **Web CRM Quản Trị Hiệp Hội (Executive Web CRM)**: Dành cho Chủ tịch, Ban Thường Trực, 6 Ban Chuyên Môn, Ban Thư Ký và Kế toán. Chạy trên nền tảng Web Desktop (React 19, Vite, TanStack Router), cung cấp Dashboard thời gian thực, quản lý 500+ doanh nghiệp hội viên 360 độ, quản trị sự kiện, phê duyệt giao thương, quản lý tài chính thu chi, phân quyền ma trận RBAC, cấu hình AI đa hãng và xuất báo cáo/hóa đơn điện tử.
-2. **Ứng Dụng Di Động Hội Viên CEO HN10 (CEO HN10 Mobile App)**: Dành cho hội viên doanh nhân chính thức. Đóng gói đa nền tảng (iOS, Android qua Capacitor 8 và Progressive Web App), mang giao diện chuẩn di động (Mobile-first Shell, TabBar, TopHeader), tích hợp thẻ hội viên điện tử số, quét NFC/QR, sàn giao thương B2B, điểm danh sự kiện, kho quyền lợi hội viên và kết nối bạn bè 2 cấp.
+1. **Web CRM Quản Trị Hiệp Hội (Executive Web CRM)**: Dành cho Chủ tịch, Ban Thường Trực, 6 Ban Chuyên Môn, Ban Thư Ký và Kế toán. Chạy trên nền tảng Web Desktop (React 19, Vite, TanStack Router), cung cấp Dashboard thời gian thực, quản lý 500+ doanh nghiệp Học viên 360 độ, quản trị sự kiện, phê duyệt giao thương, quản lý tài chính thu chi, phân quyền ma trận RBAC, cấu hình AI đa hãng và xuất báo cáo/hóa đơn điện tử.
+2. **Ứng Dụng Di Động Học viên CEO HN10 (CEO HN10 Mobile App)**: Dành cho Học viên doanh nhân chính thức. Đóng gói đa nền tảng (iOS, Android qua Capacitor 8 và Progressive Web App), mang giao diện chuẩn di động (Mobile-first Shell, TabBar, TopHeader), tích hợp thẻ Học viên điện tử số, quét NFC/QR, sàn giao thương B2B, điểm danh sự kiện, kho quyền lợi Học viên và kết nối bạn bè 2 cấp.
 3. **Hạ Tầng Dùng Chung (Core Backend, AI Engine & DevOps)**: Backend NestJS 3 tầng thuần khiết, ORM Prisma kết nối PostgreSQL 16, giao thức thời gian thực WebSocket Socket.IO, hệ thống AI đa model (Gemini 2.0 Flash, OpenAI, Claude, DeepSeek) có cơ chế Fallback và đo lường Quota Token, Docker Nginx Reverse Proxy và SSL Let's Encrypt.
 
 **Những gì phần mềm KHÔNG làm (Out of Scope):**
@@ -82,13 +82,13 @@ graph TD
     subgraph "NGƯỜI DÙNG CHÍNH (ACTORS)"
         A1["Chủ tịch & Ban Thường Trực"]
         A2["Trưởng/Phó 6 Ban Chuyên Môn"]
-        A3["Hội Viên Doanh Nhân CEO HN10"]
+        A3["Học viên Doanh Nhân CEO HN10"]
         A4["Khách Mời & Đối Tác B2B"]
     end
 
     subgraph "HỆ THỐNG TRUNG TÂM CEO HN10"
         SYS1["Cổng Web CRM Quản Trị<br/>(Desktop / Admin Hub)"]
-        SYS2["Ứng Dụng Di Động Hội Viên<br/>(iOS, Android, PWA)"]
+        SYS2["Ứng Dụng Di Động Học viên<br/>(iOS, Android, PWA)"]
         SYS3["Hạ Tầng Core Backend API & Socket<br/>(NestJS / PostgreSQL 16)"]
         SYS4["Trợ Lý AI Điều Hành Toàn Diện<br/>(AI Executive Engine)"]
     end
@@ -101,7 +101,7 @@ graph TD
         EXT5["Bộ Thu Thập Dữ Liệu Crawler<br/>(Facebook Bot, Zalo Bot, Googlebot)"]
     end
 
-    A1 -->|Điều hành, Duyệt hội viên, Xem AI Analytics| SYS1
+    A1 -->|Điều hành, Duyệt Học viên, Xem AI Analytics| SYS1
     A2 -->|Quản trị nghiệp vụ Ban, Soát vé, Duyệt cơ hội| SYS1
     A3 -->|Quẹt thẻ NFC, Đăng cơ hội, Điểm danh QR| SYS2
     A4 -->|Xem Landing Web, Gửi hồ sơ đăng ký| SYS2
@@ -119,14 +119,14 @@ graph TD
 
 ### 2.2 Chức Năng Sản Phẩm (Product Functions Summary)
 Hệ thống được tổ chức thành 11 nhóm chức năng lớn (Epics):
-1. **Epic-01: Định Danh Doanh Nhân & Thẻ Doanh Nhân Số Thông Minh**: Cấp mã hội viên duy nhất, thẻ hội viên số tích hợp mã QR động chống gian lận, chip NFC một chạm trao đổi danh thiếp số.
+1. **Epic-01: Định Danh Doanh Nhân & Thẻ Doanh Nhân Số Thông Minh**: Cấp mã Học viên duy nhất, thẻ Học viên số tích hợp mã QR động chống gian lận, chip NFC một chạm trao đổi danh thiếp số.
 2. **Epic-02: Sàn Giao Thương B2B & Cơ Hội Kinh Doanh**: Đăng tải nhu cầu hợp tác, deal chào giá trực tiếp người đăng, bộ 6 chỉ số nền trắng minh bạch, popup dẫn chứng thực tế.
 3. **Epic-03: Quản Lý Sự Kiện & Điểm Danh Check-in QR 1s**: Tạo sự kiện, phát hành vé điện tử mã hóa, quét QR xác thực check-in trong 1 giây, bốc thăm trúng thưởng (Lucky Draw).
 4. **Epic-04: Danh Bạ Doanh Nhân CEO HN10 & Kết Nối Bạn Bè 2 Cấp**: Bộ lọc Đã kết nối / Chưa kết nối, hiển thị người mới kết nối nhất trên đầu, bộ 3 nút tối giản (Nhắn tin, Profile, Gọi điện).
 5. **Epic-05: Trợ Lý AI Điều Hành CRM & Xuất Báo Cáo Con**: Phân tích toàn diện sức khỏe hệ thống (Health Score 94/100), xuất báo cáo thu chi Excel/PDF, xuất Phiếu thu / Hóa đơn điện tử chuẩn mẫu 01-TT có mã QR và chữ ký số.
 6. **Epic-06: Cấu Hình AI Đa Model & Cảnh Báo Sắp Hết Quota**: Quản lý API Key đa hãng (Gemini, OpenAI, Claude, DeepSeek), thanh đo hạn mức 3 cấp (Xanh - Vàng - Đỏ), tự động kích hoạt Fallback Model khi cạn quota, bảng Audit Log minh bạch.
 7. **Epic-07: Trang Giới Thiệu Chính Thức (`/intro`) & Đăng Ký Online**: Landing Web hoàn chỉnh có Header thanh menu cố định, Hero Banner, Về CLB, 6 Ban chuyên môn, Form Đăng ký gia nhập trực tuyến gửi thẳng về CRM.
-8. **Epic-08: Kho Tài Liệu Số Đồng Bộ Google Drive 2 Chiều**: Lưu cấu hình Drive cá nhân của từng hội viên, nạp tài liệu từ Google Drive (Import from Drive) và xuất/đồng bộ tài liệu từ hệ thống về Google Drive cá nhân (Sync to Drive).
+8. **Epic-08: Kho Tài Liệu Số Đồng Bộ Google Drive 2 Chiều**: Lưu cấu hình Drive cá nhân của từng Học viên, nạp tài liệu từ Google Drive (Import from Drive) và xuất/đồng bộ tài liệu từ hệ thống về Google Drive cá nhân (Sync to Drive).
 9. **Epic-09: Chia Sẻ Public Đa Kênh Chuẩn OpenGraph Động**: Endpoint preview `/api/share/preview` sinh thẻ meta HTML động cho bài viết, cơ hội, sự kiện; tự động redirect khi người dùng nhấp link, triệt tiêu lỗi hiển thị screenshot CRM.
 10. **Epic-10: Quản Lý Tài Chính, Thu Chi & Hội Phí Niên Liễm**: Theo dõi nguồn thu hội phí, tiền tài trợ kim cương/vàng, chi phí vận hành, quỹ ngân sách thặng dư an toàn.
 11. **Epic-11: Cấu Hình Hệ Thống, Giao Diện Theme Studio & Phân Quyền RBAC**: Quản lý tên miền, cấu hình logo, màu sắc thương hiệu, ma trận phân quyền 6 Ban chuyên môn.
@@ -138,7 +138,7 @@ Hệ thống được tổ chức thành 11 nhóm chức năng lớn (Epics):
 | **Chủ tịch & Ban Quản Trị** | Chủ tịch CLB, Phó Chủ tịch thường trực; người quyết định chiến lược và chuẩn y ngân sách. | Web CRM (Desktop) | Hàng ngày: Theo dõi Dashboard, xem phân tích AI, chuẩn y chi ngân sách, xem báo cáo giao thương B2B. |
 | **Ban Thư Ký & Pháp Chế** | Thư ký hành chính, văn phòng CLB; tiếp nhận hồ sơ, điều phối kỳ họp. | Web CRM + Mobile App | Toàn thời gian: Tiếp nhận hồ sơ đăng ký, phát hành thông báo Zalo OA/App, quản lý phòng họp, nạp tài liệu Google Drive. |
 | **Trưởng/Phó 6 Ban Chuyên Môn** | Trưởng các Ban (Thành Viên, Tài Chính, Xúc Tiến, Truyền Thông, Thiện Nguyện, Đối Ngoại). | Web CRM + Mobile App | Hàng tuần: Thẩm định hồ sơ kết nạp, duyệt bài chia sẻ cơ hội B2B, soát vé sự kiện, lập phiếu thu chi. |
-| **Hội Viên Doanh Nhân CEO HN10** | Chủ doanh nghiệp CLB Doanh Nhân CEO HN10 đã hoàn thành nghĩa vụ hội phí. | CEO HN10 Mobile App | Hàng ngày: Quẹt danh thiếp NFC, đăng/nhận cơ hội kinh doanh, nhắn tin bạn bè, check-in sự kiện, lưu tài liệu về Google Drive. |
+| **Học viên Doanh Nhân CEO HN10** | Chủ doanh nghiệp CLB Doanh Nhân CEO HN10 đã hoàn thành nghĩa vụ hội phí. | CEO HN10 Mobile App | Hàng ngày: Quẹt danh thiếp NFC, đăng/nhận cơ hội kinh doanh, nhắn tin bạn bè, check-in sự kiện, lưu tài liệu về Google Drive. |
 | **Khách Mời & Ứng Viên** | Doanh nhân CEO HN10 quan tâm tham gia, đối tác khách mời sự kiện. | Web Landing (`/intro`) + Mobile Web | Định kỳ: Xem thông tin hiệp hội, nộp hồ sơ gia nhập trực tuyến, đăng ký vé sự kiện mở rộng. |
 
 ### 2.4 Môi Trường Vận Hành (Operating Environment)
@@ -166,7 +166,7 @@ Hệ thống được tổ chức thành 11 nhóm chức năng lớn (Epics):
 
 ### 2.6 Tài Liệu Cho Người Dùng (User Documentation)
 - Sổ tay Hướng dẫn Sử dụng Web CRM dành cho Ban Điều Hành (`HDSD_Web_CRM_CEO HN10.pdf`).
-- Cẩm nang Trải nghiệm Ứng dụng Di động dành cho Hội viên Doanh nhân (`HDSD_Mobile_App_CEO HN10.pdf`).
+- Cẩm nang Trải nghiệm Ứng dụng Di động dành cho Học viên Doanh nhân (`HDSD_Mobile_App_CEO HN10.pdf`).
 - Bộ video clip ngắn 60s hướng dẫn: Quẹt thẻ NFC, Đăng cơ hội B2B, Check-in QR sự kiện và Đồng bộ Google Drive.
 
 ### 2.7 Giả Định và Phụ Thuộc (Assumptions and Dependencies)
@@ -210,8 +210,8 @@ Hệ thống được tổ chức thành 11 nhóm chức năng lớn (Epics):
 
 ```mermaid
 graph TD
-    subgraph "HỘI VIÊN DOANH NHÂN"
-        ActorMember["Hội Viên CEO HN10"]
+    subgraph "Học viên DOANH NHÂN"
+        ActorMember["Học viên CEO HN10"]
     end
 
     subgraph "BAN ĐIỀU HÀNH & ADMIN"
@@ -249,41 +249,41 @@ graph TD
 
 ---
 
-### Module 4.1: Quản Lý Định Danh Hội Viên, Thẻ Doanh Nhân Số Số & NFC Tap-to-Connect
+### Module 4.1: Quản Lý Định Danh Học viên, Thẻ Doanh Nhân Số Số & NFC Tap-to-Connect
 
 #### 4.1.1 Mô Tả Tính Năng
-Cung cấp cho mỗi hội viên một thẻ hội viên điện tử số độc bản tích hợp chip NFC vật lý và mã QR động bảo mật. Khi hội viên gặp gỡ đối tác, chỉ cần chạm thẻ NFC vào điện thoại đối tác hoặc đưa mã QR cho đối tác quét, toàn bộ hồ sơ năng lực doanh nghiệp, danh mục sản phẩm, liên hệ và chức vị trong CLB CEO HN10 sẽ được truyền tải tức thì mà không cần cài ứng dụng.
+Cung cấp cho mỗi Học viên một thẻ Học viên điện tử số độc bản tích hợp chip NFC vật lý và mã QR động bảo mật. Khi Học viên gặp gỡ đối tác, chỉ cần chạm thẻ NFC vào điện thoại đối tác hoặc đưa mã QR cho đối tác quét, toàn bộ hồ sơ năng lực doanh nghiệp, danh mục sản phẩm, liên hệ và chức vị trong CLB CEO HN10 sẽ được truyền tải tức thì mà không cần cài ứng dụng.
 
 #### 4.1.2 Biểu Đồ Ca Sử Dụng & Kịch Bản Chi Tiết
 
 ```mermaid
 flowchart TD
-    Actor["Hội Viên CEO HN10"] --> UC_Card["Chạm Thẻ NFC / Xuất Trình Mã QR"]
+    Actor["Học viên CEO HN10"] --> UC_Card["Chạm Thẻ NFC / Xuất Trình Mã QR"]
     UC_Card --> Validate_Card{"Kiểm tra Trạng thái Thẻ"}
     Validate_Card -->|Hợp lệ & Đã duyệt phí| Show_VIP["Hiển thị Danh thiếp VIP & Lưu Danh Bạ"]
     Validate_Card -->|Chưa đóng phí| Show_Pending["Hiển thị Nhắc nhở Tái tục"]
     Validate_Card -->|Thẻ bị khóa/thu hồi| Show_Blocked["Báo lỗi: Thẻ không khả dụng"]
 ```
 
-- **Actor**: Hội viên chính thức, Đối tác khách mời quét thẻ.
-- **Pre-conditions**: Hội viên đã đăng nhập và được BTV phê duyệt hồ sơ với trạng thái `status = 'paid'`.
+- **Actor**: Học viên chính thức, Đối tác khách mời quét thẻ.
+- **Pre-conditions**: Học viên đã đăng nhập và được BTV phê duyệt hồ sơ với trạng thái `status = 'paid'`.
 - **Post-conditions**: Đối tác nhận được thông tin liên hệ và tệp `.vcf` danh bạ; hệ thống ghi nhận 1 lượt tương tác danh thiếp.
 - **Basic Flow**:
-  1. Hội viên mở App, chọn tab "Danh thiếp" hoặc chạm mặt lưng thẻ NFC vật lý vào điện thoại đối tác.
+  1. Học viên mở App, chọn tab "Danh thiếp" hoặc chạm mặt lưng thẻ NFC vật lý vào điện thoại đối tác.
   2. Điện thoại đối tác nhận sóng NFC NDEF URI và tự động mở trình duyệt tải trang danh thiếp công khai `/card/:code`.
   3. Hệ thống kiểm tra tính hợp lệ của mã thẻ trong bảng `business_cards` và `vione_users`.
-  4. Hiển thị giao diện danh thiếp sang trọng với ảnh đại diện, chức danh, tên doanh nghiệp, huy hiệu hội viên CEO HN10 HanoiBA.
+  4. Hiển thị giao diện danh thiếp sang trọng với ảnh đại diện, chức danh, tên doanh nghiệp, huy hiệu Học viên CEO HN10 HanoiBA.
   5. Đối tác nhấn nút "Lưu vào Danh bạ", hệ thống tải về tệp vCard chuẩn để thêm liên hệ vào danh bạ điện thoại của đối tác.
-  6. Hệ thống gửi thông báo realtime qua Socket.IO tới App hội viên: "Đối tác vừa quét danh thiếp của bạn".
+  6. Hệ thống gửi thông báo realtime qua Socket.IO tới App Học viên: "Đối tác vừa quét danh thiếp của bạn".
 - **Alternative Flows**:
-  - Đối tác không có NFC: Hội viên chuyển sang chế độ "Mã QR Danh Thiếp", đối tác dùng camera thường quét mã QR.
+  - Đối tác không có NFC: Học viên chuyển sang chế độ "Mã QR Danh Thiếp", đối tác dùng camera thường quét mã QR.
 - **Exception Flows**:
   - Thẻ bị thu hồi (`status = 'revoked'`): Hệ thống hiển thị cảnh báo "Thẻ danh thiếp số đã được thu hồi bởi Ban Thư Ký CLB".
 
 #### 4.1.3 Quy Tắc Nghiệp Vụ (Business Rules)
-- **BR-CARD-01**: Mỗi tài khoản hội viên chỉ gắn duy nhất 01 mã thẻ định danh số hoạt động chính thức (Primary Active Card).
+- **BR-CARD-01**: Mỗi tài khoản Học viên chỉ gắn duy nhất 01 mã thẻ định danh số hoạt động chính thức (Primary Active Card).
 - **BR-CARD-02**: Mã QR trên thẻ có cơ chế salt timestamp chống chụp màn hình gian lận khi điểm danh sự kiện VIP.
-- **BR-CARD-03**: Khi hội viên hết hạn niên liễm quá 30 ngày mà chưa gia hạn, thẻ số tự động chuyển sang trạng thái tạm khóa tính năng trao đổi danh thiếp nâng cao.
+- **BR-CARD-03**: Khi Học viên hết hạn niên liễm quá 30 ngày mà chưa gia hạn, thẻ số tự động chuyển sang trạng thái tạm khóa tính năng trao đổi danh thiếp nâng cao.
 
 #### 4.1.4 Thiết Kế Dữ Liệu Tính Năng
 - **Bảng CSDL liên quan**: `public.business_cards`, `public.vione_users`, `public.card_analytics`.
@@ -295,35 +295,35 @@ flowchart TD
 ### Module 4.2: Sàn Giao Thương B2B, Chia Sẻ Cơ Hội Kinh Doanh & Deal Chào Giá
 
 #### 4.2.1 Mô Tả Tính Năng
-Không gian xúc tiến thương mại nội bộ dành cho các doanh nhân CEO HN10. Cho phép hội viên đăng tải nhu cầu tìm mua, tìm nhà cung cấp, kêu gọi đầu tư hoặc chào hàng độc quyền. Hệ thống hiển thị 6 khối chỉ số minh bạch nền trắng tuyệt đối, popup dẫn chứng vắn tắt và cơ chế "Deal chào giá" gửi trực tiếp đến đúng tài khoản người đăng cơ hội.
+Không gian xúc tiến thương mại nội bộ dành cho các doanh nhân CEO HN10. Cho phép Học viên đăng tải nhu cầu tìm mua, tìm nhà cung cấp, kêu gọi đầu tư hoặc chào hàng độc quyền. Hệ thống hiển thị 6 khối chỉ số minh bạch nền trắng tuyệt đối, popup dẫn chứng vắn tắt và cơ chế "Deal chào giá" gửi trực tiếp đến đúng tài khoản người đăng cơ hội.
 
 #### 4.2.2 Biểu Đồ Ca Sử Dụng & Kịch Bản Chi Tiết
 
 ```mermaid
 flowchart TD
-    Actor["Hội Viên Đăng Cơ Hội"] --> Post_Opp["Đăng Cơ Hội Kinh Doanh Mới"]
+    Actor["Học viên Đăng Cơ Hội"] --> Post_Opp["Đăng Cơ Hội Kinh Doanh Mới"]
     Post_Opp --> Select_Scope{"Chọn Phạm Vi Nhận"}
     Select_Scope -->|Toàn hệ thống| Public_Feed["Hiển thị Toàn CLB CEO HN10"]
-    Select_Scope -->|Theo Ban chuyên môn| Dept_Feed["Chỉ Hội viên Ban được chọn"]
+    Select_Scope -->|Theo Ban chuyên môn| Dept_Feed["Chỉ Học viên Ban được chọn"]
     Select_Scope -->|CEO Bạn bè| Friends_Feed["Chỉ Bạn bè đã kết nối"]
     
-    Actor2["Hội Viên Đối Tác"] --> Deal_Bid["Gửi Deal Chào Giá / Hợp Tác"]
+    Actor2["Học viên Đối Tác"] --> Deal_Bid["Gửi Deal Chào Giá / Hợp Tác"]
     Deal_Bid --> Check_Author["Xác thực Người Đăng"]
     Check_Author --> Notify_Author["Gửi thông báo & tin nhắn đúng người đăng"]
 ```
 
-- **Actor**: Hội viên đăng tin, Hội viên tham gia chào deal.
-- **Pre-conditions**: Cả hai hội viên đều có tài khoản hợp lệ, không bị khóa quyền giao thương.
+- **Actor**: Học viên đăng tin, Học viên tham gia chào deal.
+- **Pre-conditions**: Cả hai Học viên đều có tài khoản hợp lệ, không bị khóa quyền giao thương.
 - **Post-conditions**: Cơ hội được đăng lên sàn; lượt gửi deal chuyển thành cuộc hội thoại B2B riêng tư giữa 2 chủ doanh nghiệp; số liệu thống kê realtime cập nhật.
 - **Basic Flow**:
-  1. Hội viên mở App, truy cập màn hình "Cơ Hội Hợp Tác" (`/association/opportunities`).
+  1. Học viên mở App, truy cập màn hình "Cơ Hội Hợp Tác" (`/association/opportunities`).
   2. Hệ thống tải 6 khối chỉ số kinh doanh thực tế (Cơ hội đang mở, Tổng giá trị, Tôi đã chia sẻ, Tôi đang deal, Giá trị đã nhận, Deal đã fail) với giao diện nền trắng (`bg-white dark:bg-[#131a26]`).
   3. Khi bấm vào ô "Cơ hội đang mở", hệ thống mở popup hiển thị danh sách các cơ hội thực tế đang hoạt động kèm giá trị, ngành nghề và người đăng.
-  4. Để tạo mới hoặc chỉnh sửa cơ hội, hội viên nhấn "Đăng cơ hội" hoặc icon Chỉnh sửa. Modal `OpportunityEditModal` hiển thị đầy đủ các trường: Tải lên nhiều ảnh, Người giới thiệu, Số điện thoại giới thiệu, Mức hoa hồng kết nối (%), Phạm vi đối tượng nhận (Công khai / Theo ban / Theo bạn bè), Mô tả chi tiết, Link Fanpage/Website.
-  5. Hội viên hoàn tất và nhấn "Lưu cơ hội". Hệ thống ghi nhận vào bảng `opportunities`.
-  6. Hội viên khác khi xem cơ hội nhấn "Deal Chào Giá", hệ thống tự động trích xuất `author_id` và mở phiên kết nối trực tiếp đến đúng tài khoản của người đăng cơ hội, tuyệt đối không gửi nhầm người khác.
+  4. Để tạo mới hoặc chỉnh sửa cơ hội, Học viên nhấn "Đăng cơ hội" hoặc icon Chỉnh sửa. Modal `OpportunityEditModal` hiển thị đầy đủ các trường: Tải lên nhiều ảnh, Người giới thiệu, Số điện thoại giới thiệu, Mức hoa hồng kết nối (%), Phạm vi đối tượng nhận (Công khai / Theo ban / Theo bạn bè), Mô tả chi tiết, Link Fanpage/Website.
+  5. Học viên hoàn tất và nhấn "Lưu cơ hội". Hệ thống ghi nhận vào bảng `opportunities`.
+  6. Học viên khác khi xem cơ hội nhấn "Deal Chào Giá", hệ thống tự động trích xuất `author_id` và mở phiên kết nối trực tiếp đến đúng tài khoản của người đăng cơ hội, tuyệt đối không gửi nhầm người khác.
 - **Alternative Flows**:
-  - Hội viên chỉnh sửa cơ hội hiện có: Hệ thống nạp lại toàn bộ dữ liệu ban đầu, cho phép xóa/bổ sung ảnh và cập nhật lại mức hoa hồng.
+  - Học viên chỉnh sửa cơ hội hiện có: Hệ thống nạp lại toàn bộ dữ liệu ban đầu, cho phép xóa/bổ sung ảnh và cập nhật lại mức hoa hồng.
 - **Exception Flows**:
   - Cơ hội đã đóng (`status = 'closed'`): Nút "Deal Chào Giá" chuyển sang trạng thái "Cơ hội đã kết nối thành công (Đã đóng)" và vô hiệu hóa gửi deal mới.
 
@@ -343,14 +343,14 @@ flowchart TD
 ### Module 4.3: Quản Lý Sự Kiện, Diễn Đàn & Điểm Danh Check-in QR 1 Giây (Vé Điện Tử)
 
 #### 4.3.1 Mô Tả Tính Năng
-Quản lý toàn bộ vòng đời sự kiện của CLB: từ khởi tạo diễn đàn kinh tế, hội thảo chuyên đề, gala dinner, phát hành vé điện tử cho hội viên, gửi thiệp mời trực tuyến đến khâu kiểm soát vé tại cửa bằng camera quét mã QR trong đúng 1 giây (1s Check-in).
+Quản lý toàn bộ vòng đời sự kiện của CLB: từ khởi tạo diễn đàn kinh tế, hội thảo chuyên đề, gala dinner, phát hành vé điện tử cho Học viên, gửi thiệp mời trực tuyến đến khâu kiểm soát vé tại cửa bằng camera quét mã QR trong đúng 1 giây (1s Check-in).
 
 #### 4.3.2 Biểu Đồ Ca Sử Dụng & Kịch Bản Chi Tiết
 
 ```mermaid
 flowchart TD
     ActorAdmin["Ban Tổ Chức Sự Kiện"] --> Create_Event["Tạo Sự Kiện & Cấu Hình Vé"]
-    ActorMember["Hội Viên Doanh Nhân"] --> Reg_Event["Đăng Ký Tham Dự"]
+    ActorMember["Học viên Doanh Nhân"] --> Reg_Event["Đăng Ký Tham Dự"]
     Reg_Event --> Gen_Ticket["Sinh Vé Điện Tử & QR Pass Bảo Mật"]
     
     ActorMember --> Arrive_Door["Đến Cửa Hội Trường"]
@@ -361,26 +361,26 @@ flowchart TD
     Check_Valid -->|Mã vé không tồn tại| Show_Invalid["Báo lỗi: Vé không hợp lệ!"]
 ```
 
-- **Actor**: Ban Tổ Chức (BTC), Hội viên tham dự, Ban Lễ Tân kiểm soát vé.
-- **Pre-conditions**: Sự kiện đã được xuất bản trên hệ thống; hội viên đã đăng ký vé thành công.
+- **Actor**: Ban Tổ Chức (BTC), Học viên tham dự, Ban Lễ Tân kiểm soát vé.
+- **Pre-conditions**: Sự kiện đã được xuất bản trên hệ thống; Học viên đã đăng ký vé thành công.
 - **Post-conditions**: Trạng thái vé chuyển sang `is_checked_in = true`, thời gian điểm danh được lưu trữ, số ghế VIP được hiển thị.
 - **Basic Flow**:
   1. Ban Tổ Chức tạo sự kiện trên CRM (`/events`), cấu hình thời gian, địa điểm, banner, hạn mức vé và lịch trình (Agenda).
-  2. Hội viên mở App, vào mục "Sự Kiện", xem chi tiết và nhấn "Đăng ký tham dự".
+  2. Học viên mở App, vào mục "Sự Kiện", xem chi tiết và nhấn "Đăng ký tham dự".
   3. Hệ thống tạo bản ghi trong `event_registrations`, sinh mã vé duy nhất (ví dụ: `TICKET-HN10-8888`) và tạo mã QR Pass bảo mật.
-  4. Tại ngày diễn ra sự kiện, hội viên mở vé điện tử trên App.
-  5. Ban Lễ Tân sử dụng tính năng "Quét QR Check-in" trên CRM hoặc App quét mã vé của hội viên.
+  4. Tại ngày diễn ra sự kiện, Học viên mở vé điện tử trên App.
+  5. Ban Lễ Tân sử dụng tính năng "Quét QR Check-in" trên CRM hoặc App quét mã vé của Học viên.
   6. Hệ thống đối soát mã trong cơ sở dữ liệu: Xác nhận đúng người, đúng sự kiện, chưa điểm danh; chuyển trạng thái `checked_in = true` và phát âm thanh "Tít" thành công trong vòng dưới 1 giây.
-  7. Màn hình lễ tân hiện thông tin hội viên, tên công ty và số bàn/số ghế được Ban Tổ Chức phân công.
+  7. Màn hình lễ tân hiện thông tin Học viên, tên công ty và số bàn/số ghế được Ban Tổ Chức phân công.
 - **Alternative Flows**:
-  - Hội viên quên mở App: Lễ tân tra cứu nhanh bằng Số điện thoại hoặc Tên doanh nghiệp trên ô tìm kiếm check-in và nhấn "Điểm danh thủ công".
+  - Học viên quên mở App: Lễ tân tra cứu nhanh bằng Số điện thoại hoặc Tên doanh nghiệp trên ô tìm kiếm check-in và nhấn "Điểm danh thủ công".
 - **Exception Flows**:
   - Mã vé đã được check-in trước đó: Hệ thống bật còi báo đỏ "CẢNH BÁO: Vé này đã được check-in vào lúc 18:05:22 bởi người khác!", ngăn chặn tình trạng gian lận vé trùng.
 
 #### 4.3.3 Quy Tắc Nghiệp Vụ (Business Rules)
 - **BR-EVT-01**: Mỗi mã vé điện tử chỉ được điểm danh thành công duy nhất 01 lần.
 - **BR-EVT-02**: Khi sự kiện đạt số lượng đăng ký tối đa (`max_attendees`), hệ thống tự động khóa cổng đăng ký và chuyển sang trạng thái "Hết vé".
-- **BR-EVT-03**: Tính năng Bốc thăm may mắn (Lucky Draw) chỉ được phép quay thưởng trên danh sách những hội viên ĐÃ CHECK-IN thực tế tại sự kiện.
+- **BR-EVT-03**: Tính năng Bốc thăm may mắn (Lucky Draw) chỉ được phép quay thưởng trên danh sách những Học viên ĐÃ CHECK-IN thực tế tại sự kiện.
 
 #### 4.3.4 Thiết Kế Dữ Liệu Tính Năng
 - **Bảng CSDL liên quan**: `public.events`, `public.event_registrations`, `public.lucky_draw_winners`.
@@ -398,30 +398,30 @@ Danh bạ số thông minh của toàn thể doanh nhân CLB CEO HN10. Hệ th�
 
 ```mermaid
 flowchart TD
-    Actor["Hội Viên"] --> Open_Directory["Mở Danh Bạ CEO HN10"]
+    Actor["Học viên"] --> Open_Directory["Mở Danh Bạ CEO HN10"]
     Open_Directory --> Filter_Level1{"Chọn Bộ Lọc Cấp 1"}
     
     Filter_Level1 -->|Đã kết nối| Show_Connected["Hiển thị Danh mục Bạn bè lên đầu"]
     Show_Connected --> Show_Latest["Khối nổi bật: Vừa kết nối mới nhất"]
     Show_Connected --> Action_Friends["3 Nút Thao Tác: Nhắn tin - Profile - Gọi điện"]
     
-    Filter_Level1 -->|Chưa kết nối| Show_Unconnected["Hiển thị Toàn bộ Hội viên Chưa kết nối"]
+    Filter_Level1 -->|Chưa kết nối| Show_Unconnected["Hiển thị Toàn bộ Học viên Chưa kết nối"]
     Show_Unconnected --> Send_Request["Nhấn Nút Kết Nối"]
     Send_Request --> State_Pending["Đổi thành Nút 'Hủy Yêu Cầu' & Chuyển vào mục 'Đã gửi'"]
 ```
 
-- **Actor**: Hội viên doanh nhân CEO HN10.
+- **Actor**: Học viên doanh nhân CEO HN10.
 - **Pre-conditions**: Người dùng đã đăng nhập vào Mobile App.
 - **Post-conditions**: Lời mời kết nối được gửi hoặc hủy; danh sách bạn bè được cập nhật realtime.
 - **Basic Flow**:
-  1. Hội viên mở tab "Danh bạ" (`/association/members`).
+  1. Học viên mở tab "Danh bạ" (`/association/members`).
   2. Người dùng chuyển đổi giữa 2 tab lớn: **(Đã kết nối)** và **(Chưa kết nối)**.
   3. Tại tab **Đã kết nối**:
      - Danh mục Bạn bè hiển thị đầu tiên, ngay trên đầu là khối "✨ Vừa kết nối mới nhất" hiển thị người bạn doanh nhân vừa kết nối thành công gần nhất.
      - Mỗi thẻ bạn bè chỉ gồm 3 nút thao tác cùng 1 màu tối giản: Nhắn tin (`MessageSquare`), Xem Profile (`User`), Gọi điện (`PhoneCall`) + 1 nút Hủy kết nối (`UserX`) màu riêng biệt.
      - Không bị lỗi lặp tên: Nếu tên người và tên công ty giống nhau, hệ thống tự động ẩn dòng tên phụ bên dưới.
   4. Tại tab **Chưa kết nối**:
-     - Hiển thị danh sách tất cả các hội viên trong CLB mà tài khoản chưa kết nối.
+     - Hiển thị danh sách tất cả các Học viên trong CLB mà tài khoản chưa kết nối.
      - Người dùng nhấn nút "Kết nối": Hệ thống gửi thông báo mời kết nối, nút chuyển ngay thành nút "Hủy" (hủy yêu cầu chờ xác nhận), và bản ghi xuất hiện trong mục "Đã gửi".
 - **Alternative Flows**:
   - Đối phương bấm "Đồng ý" lời mời kết nối: Hệ thống kích hoạt event Socket `vba:connection_accepted`, cập nhật `vba_latest_connected_id` vào LocalStorage và đưa người đó lên khối "Vừa kết nối mới nhất" của cả hai bên.
@@ -442,7 +442,7 @@ flowchart TD
 ### Module 4.5: Trợ Lý AI Điều Hành Toàn Diện CRM & Xuất Báo Cáo Con
 
 #### 4.5.1 Mô Tả Tính Năng
-Hệ thống Trí tuệ Nhân tạo phục vụ trực tiếp cho Chủ tịch và Ban Điều Hành tại Cổng Quản trị CRM (`/ai-assistant`). AI quét và phân tích sâu toàn bộ cơ sở dữ liệu thực tế: hội viên, biến động tài chính, lịch họp ban, giao thương B2B và nhật ký thao tác `activity_log`. Hỗ trợ xuất báo cáo theo từng chức năng con: Báo cáo thu chi tổng hợp (Excel/PDF) và Xuất Phiếu thu / Hóa đơn điện tử chuẩn mẫu 01-TT của Bộ Tài Chính có mã QR và chữ ký số.
+Hệ thống Trí tuệ Nhân tạo phục vụ trực tiếp cho Chủ tịch và Ban Điều Hành tại Cổng Quản trị CRM (`/ai-assistant`). AI quét và phân tích sâu toàn bộ cơ sở dữ liệu thực tế: Học viên, biến động tài chính, lịch họp ban, giao thương B2B và nhật ký thao tác `activity_log`. Hỗ trợ xuất báo cáo theo từng chức năng con: Báo cáo thu chi tổng hợp (Excel/PDF) và Xuất Phiếu thu / Hóa đơn điện tử chuẩn mẫu 01-TT của Bộ Tài Chính có mã QR và chữ ký số.
 
 #### 4.5.2 Biểu Đồ Ca Sử Dụng & Kịch Bản Chi Tiết
 
@@ -467,7 +467,7 @@ flowchart TD
 - **Post-conditions**: Dữ liệu phân tích được cập nhật; tệp Excel báo cáo được tải về hoặc Phiếu thu điện tử được in ra.
 - **Basic Flow**:
   1. Người dùng mở menu "Trợ Lý AI Điều Hành" trên Sidebar CRM.
-  2. Tab 1 - "Phân Tích Thông Minh CRM": Nhấn nút "Quét & Phân Tích Realtime". AI Engine gọi API `GET /api/ai/crm/analyze`, tổng hợp số liệu thực tế: Tổng số hội viên, Quỹ thặng dư hiện tại, Số kỳ họp đã tổ chức, Tổng giá trị giao thương B2B và 20 hoạt động mới nhất trong `activity_log`.
+  2. Tab 1 - "Phân Tích Thông Minh CRM": Nhấn nút "Quét & Phân Tích Realtime". AI Engine gọi API `GET /api/ai/crm/analyze`, tổng hợp số liệu thực tế: Tổng số Học viên, Quỹ thặng dư hiện tại, Số kỳ họp đã tổ chức, Tổng giá trị giao thương B2B và 20 hoạt động mới nhất trong `activity_log`.
   3. Màn hình hiển thị: Điểm số sức khỏe CLB (ví dụ: 94/100), Tóm tắt điều hành (Executive Summary), 4 khối trụ cột, Điểm mạnh nổi bật, Điểm nghẽn cần khắc phục và 3 Khuyến nghị hành động chiến lược.
   4. Tab 2 - "Báo Cáo Thu Chi & Ngân Sách": Hiển thị bảng cân đối ngân sách, cơ cấu nguồn thu (hội phí, tài trợ) và cơ cấu khoản chi. Người dùng nhấn "Xuất File Excel", hệ thống tải về tệp `.xlsx` định dạng chuẩn.
   5. Tab 3 - "Xuất Hóa Đơn / Phiếu Thu Điện Tử": Người dùng nhập thông tin người nộp, công ty, mã số thuế, số tiền nộp và lý do. Nhấn "Cập Nhật & Xem Trước".
@@ -557,8 +557,8 @@ flowchart TD
 - **Post-conditions**: Hồ sơ đăng ký được tạo trong bảng `membership_applications` hoặc `vione_users` với trạng thái chờ duyệt; Ban Thư Ký nhận thông báo trên CRM.
 - **Basic Flow**:
   1. Khách truy cập `https://ceohn10.viconnect.vn/intro`.
-  2. Header cố định hiển thị: Logo HanoiBA & CLB CEO HN10, Menu điều hướng (Trang Chủ, Về Chúng Tôi, 6 Ban Chuyên Môn, Sự Kiện, Sàn B2B, Đặc Quyền, Đăng Ký Gia Nhập), Nút "Đăng Nhập" và "Mở App Hội Viên".
-  3. Khách khám phá Hero Banner với 4 chỉ số nổi bật (500+ Hội viên, 1.850+ Tỷ giao thương, 60+ Sự kiện, 6 Ban chuyên môn).
+  2. Header cố định hiển thị: Logo HanoiBA & CLB CEO HN10, Menu điều hướng (Trang Chủ, Về Chúng Tôi, 6 Ban Chuyên Môn, Sự Kiện, Sàn B2B, Đặc Quyền, Đăng Ký Gia Nhập), Nút "Đăng Nhập" và "Mở App Học viên".
+  3. Khách khám phá Hero Banner với 4 chỉ số nổi bật (500+ Học viên, 1.850+ Tỷ giao thương, 60+ Sự kiện, 6 Ban chuyên môn).
   4. Khách nhấp vào "Đăng Ký Gia Nhập", trang tự động cuộn mượt đến Section Form đăng ký trực tuyến.
   5. Khách điền thông tin: Họ tên, Số điện thoại, Email, Chức vụ, Ngày sinh, Tên công ty, Mã số thuế, Lĩnh vực kinh doanh, Quy mô nhân sự và Mã giới thiệu (nếu có).
   6. Nhấn "Gửi Hồ Sơ Gia Nhập". Hệ thống kiểm tra hợp lệ, tải file đính kèm (giấy ĐKKD nếu có) và lưu hồ sơ vào hệ thống CRM.
@@ -575,15 +575,15 @@ flowchart TD
 ### Module 4.8: Kho Tài Liệu Số Đồng Bộ Google Drive 2 Chiều (CRM & Mobile App)
 
 #### 4.8.1 Mô Tả Tính Năng
-Liên kết Kho tài liệu nội bộ của Hiệp hội với tài khoản Google Drive cá nhân của từng hội viên. Cung cấp 2 hành động trọng tâm:
+Liên kết Kho tài liệu nội bộ của Hiệp hội với tài khoản Google Drive cá nhân của từng Học viên. Cung cấp 2 hành động trọng tâm:
 1. **Nạp từ Google Drive (Import from Drive)**: Nhập liên kết file hoặc thư mục Google Drive để trích xuất thông tin và lưu ngay vào kho tài liệu hệ thống mà không cần download về máy rồi upload lại.
-2. **Đồng bộ về Drive (Sync to Drive)**: Cho phép hội viên bấm nút "Đồng bộ về Drive" trên bất kỳ văn bản/biểu mẫu nào (ở CRM hoặc Mobile App) để chuyển bản sao tài liệu vào Google Drive cá nhân của mình chỉ với 1 cú click.
+2. **Đồng bộ về Drive (Sync to Drive)**: Cho phép Học viên bấm nút "Đồng bộ về Drive" trên bất kỳ văn bản/biểu mẫu nào (ở CRM hoặc Mobile App) để chuyển bản sao tài liệu vào Google Drive cá nhân của mình chỉ với 1 cú click.
 
 #### 4.8.2 Biểu Đồ Ca Sử Dụng & Kịch Bản Chi Tiết
 
 ```mermaid
 flowchart TD
-    Actor["Hội Viên / Admin"] --> Open_Docs["Truy Cập Kho Tài Liệu (CRM hoặc App)"]
+    Actor["Học viên / Admin"] --> Open_Docs["Truy Cập Kho Tài Liệu (CRM hoặc App)"]
     Open_Docs --> Choice{"Lựa Chọn Thao Tác"}
     
     Choice -->|Chuyển Tài Liệu Về Drive| Click_Sync["Nhấn Nút 'Đồng Bộ Drive' Trên Văn Bản"]
@@ -600,7 +600,7 @@ flowchart TD
     Extract_Info --> Save_System_Doc["Lưu Vào Kho Tài Liệu CLB CEO HN10"]
 ```
 
-- **Actor**: Hội viên doanh nhân, Ban Thư Ký.
+- **Actor**: Học viên doanh nhân, Ban Thư Ký.
 - **Pre-conditions**: Người dùng có tài khoản Google Drive cá nhân.
 - **Post-conditions**: Tài liệu được chuyển về thư mục Google Drive cá nhân hoặc liên kết Drive được lưu vào kho tài liệu chung.
 - **Basic Flow (Sync to Drive)**:
@@ -613,10 +613,10 @@ flowchart TD
   1. Người dùng nhấn "Nạp từ Google Drive" trên thanh công cụ.
   2. Người dùng dán liên kết chia sẻ từ Google Drive (`https://drive.google.com/file/d/...`).
   3. Nhập tên hiển thị văn bản và chọn danh mục. Nhấn "Nạp Tài Liệu Vào Kho".
-  4. Hệ thống lưu tài liệu dạng `driveUrl`, toàn thể hội viên có quyền xem có thể mở trực tiếp mà không tốn dung lượng máy chủ nội bộ.
+  4. Hệ thống lưu tài liệu dạng `driveUrl`, toàn thể Học viên có quyền xem có thể mở trực tiếp mà không tốn dung lượng máy chủ nội bộ.
 
 #### 4.8.3 Quy Tắc Nghiệp Vụ (Business Rules)
-- **BR-DRIVE-01**: Cấu hình Google Drive cá nhân của hội viên được lưu trữ an toàn trong LocalStorage (`ceohn10_member_drive_config`) và đồng bộ về hồ sơ người dùng.
+- **BR-DRIVE-01**: Cấu hình Google Drive cá nhân của Học viên được lưu trữ an toàn trong LocalStorage (`ceohn10_member_drive_config`) và đồng bộ về hồ sơ người dùng.
 - **BR-DRIVE-02**: Khi mở tài liệu có `driveUrl`, hệ thống mở liên kết an toàn trên tab mới với cờ `noopener noreferrer`.
 
 ---
@@ -624,14 +624,14 @@ flowchart TD
 ### Module 4.9: Chia Sẻ Mạng Xã Hội Đa Kênh Với Thẻ OpenGraph Preview Động
 
 #### 4.9.1 Mô Tả Tính Năng
-Khắc phục triệt để lỗi khi hội viên chia sẻ bài viết, cơ hội, sự kiện, khóa đào tạo lên các nền tảng mạng xã hội (Facebook, Zalo, LinkedIn, Telegram) bị hiển thị ảnh chụp màn hình CRM Dashboard cũ. Hệ thống cung cấp endpoint chuyên trách `@Get('api/share/preview')` tại Backend NestJS sinh thẻ siêu dữ liệu HTML OpenGraph động chuẩn mực 1200x630px và tự động chuyển hướng người dùng khi nhấp link vào ứng dụng.
+Khắc phục triệt để lỗi khi Học viên chia sẻ bài viết, cơ hội, sự kiện, khóa đào tạo lên các nền tảng mạng xã hội (Facebook, Zalo, LinkedIn, Telegram) bị hiển thị ảnh chụp màn hình CRM Dashboard cũ. Hệ thống cung cấp endpoint chuyên trách `@Get('api/share/preview')` tại Backend NestJS sinh thẻ siêu dữ liệu HTML OpenGraph động chuẩn mực 1200x630px và tự động chuyển hướng người dùng khi nhấp link vào ứng dụng.
 
 #### 4.9.2 Biểu Đồ Ca Sử Dụng & Kịch Bản Chi Tiết
 
 ```mermaid
 sequenceDiagram
     autonumber
-    actor Member as Hội Viên CEO HN10
+    actor Member as Học viên CEO HN10
     participant App as Mobile App / Web
     actor SocialUser as Bạn Bè Trên Facebook / Zalo
     participant Crawler as Facebook / Zalo Crawler Bot
@@ -654,13 +654,13 @@ sequenceDiagram
     SocialUser->>App: Mở đúng trang chi tiết cơ hội trên App CEO HN10!
 ```
 
-- **Actor**: Hội viên chia sẻ, Bot cào dữ liệu mạng xã hội (Crawlers), Người dùng nhấp link.
+- **Actor**: Học viên chia sẻ, Bot cào dữ liệu mạng xã hội (Crawlers), Người dùng nhấp link.
 - **Pre-conditions**: Bài viết/cơ hội/sự kiện đang ở trạng thái công khai.
 - **Post-conditions**: Card mạng xã hội hiển thị hình ảnh đại diện chính thức; người nhấp link được chuyển thẳng vào App.
 - **Basic Flow**:
-  1. Hội viên nhấn nút "Chia sẻ" trên thẻ cơ hội hoặc sự kiện.
+  1. Học viên nhấn nút "Chia sẻ" trên thẻ cơ hội hoặc sự kiện.
   2. Hàm `executeShare` trong `share-helper.ts` tạo URL động: `https://ceohn10.viconnect.vn/api/share/preview?type=opportunity&id=...`.
-  3. Hội viên đăng link lên Facebook hoặc Zalo.
+  3. Học viên đăng link lên Facebook hoặc Zalo.
   4. Facebook/Zalo Crawler gửi request lấy dữ liệu.
   5. Endpoint `@Get('api/share/preview')` của Backend NestJS nhận request, truy vấn cơ sở dữ liệu lấy ảnh thực tế, tiêu đề và mô tả; sinh mã HTML đầy đủ các thẻ `og:image`, `og:title`, `og:description`, `og:url` và `twitter:card`.
   6. Facebook/Zalo hiển thị ảnh preview chuẩn, sắc nét, mang thương hiệu CEO HN10.
@@ -684,7 +684,7 @@ flowchart TD
     ActorBTC["Ban Tài Chính"] --> Open_Finance["Mở Phân Hệ Tài Chính (/fees, /income, /expenses)"]
     Open_Finance --> Record_Type{"Loại Nghiệp Vụ"}
     
-    Record_Type -->|Thu Hội Phí| Scan_Fee["Kiểm Tra Danh Sách Hội Viên Đến Hạn"]
+    Record_Type -->|Thu Hội Phí| Scan_Fee["Kiểm Tra Danh Sách Học viên Đến Hạn"]
     Scan_Fee --> Gen_Mã QR Ngân Hàng["Tạo mã QR ngân hàng Đóng Phí Kèm Cú Pháp Tự Động"]
     Gen_Mã QR Ngân Hàng --> Verify_Paid["Đối Soát & Xác Nhận Đã Đóng Phí"]
     Verify_Paid --> Active_Member["Gia Hạn Thẻ Doanh Nhân Số Số Thêm 1 Năm"]
@@ -700,7 +700,7 @@ flowchart TD
 - **Basic Flow**:
   1. Ban Tài Chính thiết lập kỳ thu hội phí năm 2026.
   2. Hệ thống gửi thông báo nhắc đóng phí kèm mã QR ngân hàng tự động qua Zalo OA và App.
-  3. Khi hội viên chuyển khoản thành công, hệ thống đối soát tự động cập nhật trạng thái `paid` và tự động gia hạn thẻ hội viên điện tử thêm 365 ngày.
+  3. Khi Học viên chuyển khoản thành công, hệ thống đối soát tự động cập nhật trạng thái `paid` và tự động gia hạn thẻ Học viên điện tử thêm 365 ngày.
   4. Đối với các khoản chi (thuê địa điểm Gala, quà tặng): Ban Tài Chính lập phiếu chi trên CRM, đính kèm chứng từ hóa đơn và trình Chủ tịch phê duyệt.
   5. Sau khi Chủ tịch chuẩn y, số dư quỹ thặng dư trên CRM tự động cập nhật.
 
@@ -843,8 +843,8 @@ erDiagram
 ```mermaid
 sequenceDiagram
     autonumber
-    actor MemberA as Hội Viên A (Người Đăng)
-    actor MemberB as Hội Viên B (Người Chào Deal)
+    actor MemberA as Học viên A (Người Đăng)
+    actor MemberB as Học viên B (Người Chào Deal)
     participant MobileApp as CEO HN10 Mobile App
     participant Backend as NestJS API Server
     participant DB as PostgreSQL Database
@@ -857,12 +857,12 @@ sequenceDiagram
     Backend->>Socket: Emit sự kiện "opportunity:new"
     Socket-->>MobileApp: Cập nhật sàn cơ hội B2B realtime cho toàn mạng lưới
 
-    MemberB->>MobileApp: Xem sàn B2B, chọn cơ hội của Hội Viên A
+    MemberB->>MobileApp: Xem sàn B2B, chọn cơ hội của Học viên A
     MemberB->>MobileApp: Nhấn nút "Deal Chào Giá" & nhập báo giá
     MobileApp->>Backend: POST /api/opportunities/:id/deal
     Backend->>DB: INSERT INTO opportunity_deals (sender_id, author_id, amount)
     DB-->>Backend: Xác nhận deal đã tạo
-    Backend->>Socket: Emit "deal:received" tới đúng phòng của Hội Viên A
+    Backend->>Socket: Emit "deal:received" tới đúng phòng của Học viên A
     Socket-->>MemberA: Hiển thị Push Notification: "Doanh nhân B vừa gửi deal chào giá cho cơ hội của bạn"
     MemberA->>MobileApp: Mở xem deal và bắt đầu trao đổi trực tiếp
 ```
@@ -872,7 +872,7 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     autonumber
-    actor Attendee as Hội Viên Điểm Danh
+    actor Attendee as Học viên Điểm Danh
     actor Checker as Lễ Tân Soát Vé
     participant ScannerApp as App Soát Vé / Máy Quét
     participant Backend as NestJS Server
@@ -907,7 +907,7 @@ sequenceDiagram
 
     Admin->>CRM: Nhấn "Quét & Phân Tích Realtime"
     CRM->>Backend: GET /api/ai/crm/analyze
-    Backend->>DB: Quét hội viên, số dư quỹ, sự kiện, cơ hội B2B & activity_log
+    Backend->>DB: Quét Học viên, số dư quỹ, sự kiện, cơ hội B2B & activity_log
     DB-->>Backend: Toàn bộ dữ liệu tổng hợp
     Backend->>AI: Gửi Context Prompt phân tích sức khỏe & khuyến nghị điều hành
     AI-->>Backend: Trả về JSON Health Score (94), Strengths, Bottlenecks, Recommendations
@@ -927,7 +927,7 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     autonumber
-    actor Member as Hội Viên Doanh Nhân
+    actor Member as Học viên Doanh Nhân
     participant App as App / CRM Thư Viện
     participant Modal as MemberGoogleDriveSyncModal
     participant GoogleDrive as Google Drive API / Cloud Storage
@@ -976,13 +976,13 @@ sequenceDiagram
 | Nhóm Phân Hệ | Mã Node ID | Tên Chức Năng Cốt Lõi | Thành Phần Frontend | Controller / Service Backend | Trạng Thái Kiểm Thử |
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | **CRM** | `[NODE-CRM-001]` | Tổng quan Dashboard & Thống Kê | `routes/index.tsx`, `routes/analytics.tsx` | `AnalyticsController`, `AnalyticsService` | ✅ Pass (0 errors) |
-| **CRM** | `[NODE-CRM-002]` | Quản lý Hội viên 360 & Tái tục | `routes/members.tsx`, `routes/renewal.tsx` | `MembersController`, `MembersService` | ✅ Pass (0 errors) |
+| **CRM** | `[NODE-CRM-002]` | Quản lý Học viên 360 & Tái tục | `routes/members.tsx`, `routes/renewal.tsx` | `MembersController`, `MembersService` | ✅ Pass (0 errors) |
 | **CRM** | `[NODE-CRM-004]` | Quản lý Sự kiện & Check-in QR | `routes/events.tsx`, `EventDetailModal.tsx` | `EventsController`, `EventsService` | ✅ Pass (0 errors) |
 | **CRM** | `[NODE-CRM-009]` | Quản trị Tài chính & Thu chi | `routes/fees.tsx`, `routes/income.tsx` | `PaymentController`, `PaymentService` | ✅ Pass (0 errors) |
 | **CRM** | `[NODE-CRM-011]` | Cấu hình Hệ thống, AI & Tên miền | `routes/settings.tsx`, `AiConfigSection.tsx` | `AiController`, `AiCrmAnalyticsService` | ✅ Pass (0 errors) |
 | **CRM** | `[NODE-CRM-015]` | Trợ lý AI Điều Hành & Báo Cáo Con | `routes/ai-assistant.tsx` | `AiController`, `AiCrmAnalyticsService` | ✅ Pass (0 errors) |
 | **App** | `[NODE-APP-001]` | Trang chủ Doanh nhân & Bottom Bar | `routes/association.index.tsx`, `MemberShell.tsx` | `ConnectAppController`, `ConnectAppService` | ✅ Pass (0 errors) |
-| **App** | `[NODE-APP-003]` | thẻ hội viên điện tử Số & NFC | `routes/association.card.tsx`, `card.$code.tsx` | `BusinessCardController`, `BusinessCardService` | ✅ Pass (0 errors) |
+| **App** | `[NODE-APP-003]` | thẻ Học viên điện tử Số & NFC | `routes/association.card.tsx`, `card.$code.tsx` | `BusinessCardController`, `BusinessCardService` | ✅ Pass (0 errors) |
 | **App** | `[NODE-APP-004]` | Danh bạ 2 cấp & Bạn bè kết nối | `routes/association.members.tsx` | `ConnectAppController`, `ConnectAppService` | ✅ Pass (0 errors) |
 | **App** | `[NODE-APP-007]` | Sàn Giao thương B2B & Deal chào giá | `routes/association.opportunities.tsx` | `ConnectAppController`, `ConnectAppService` | ✅ Pass (0 errors) |
 | **App** | `[NODE-APP-010]` | Sự kiện & Vé điện tử QR Pass | `routes/association.events.tsx` | `EventsController`, `EventsService` | ✅ Pass (0 errors) |

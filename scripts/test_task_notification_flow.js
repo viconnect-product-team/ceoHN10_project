@@ -44,7 +44,7 @@ async function testTaskNotification() {
     console.log(`2. Tìm thấy tài khoản PostgreSQL thành công:`);
     console.log(`   - user_id (vione_users): ${targetUserId}`);
     console.log(`   - member_id (members): ${targetMemberId}`);
-    console.log(`   - Tên hội viên: ${userRes.rows[0].member_name}`);
+    console.log(`   - Tên Học viên: ${userRes.rows[0].member_name}`);
     console.log(`   - Email tài khoản app: ${userRes.rows[0].user_email}`);
   } else {
     throw new Error(`Không tìm thấy user cho email ${email}`);

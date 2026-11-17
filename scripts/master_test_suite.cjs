@@ -79,7 +79,7 @@ async function setAuthOnPage(page, session, targetUrl) {
       { name: 'access_token', value: session.token, url: targetUrl },
       { name: 'sb-access-token', value: session.token, url: targetUrl }
     );
-  } catch (e) {}
+  } catch (e) { }
 
   await page.evaluateOnNewDocument((token, user) => {
     localStorage.setItem("vibe_token", token);
@@ -101,8 +101,8 @@ async function safeNavigate(page, url, delay = 1000) {
     await Promise.race([
       page.goto(url, { timeout: 5000 }),
       new Promise(r => setTimeout(r, 3500))
-    ]).catch(() => {});
-  } catch (e) {}
+    ]).catch(() => { });
+  } catch (e) { }
   await new Promise(r => setTimeout(r, delay));
 }
 
@@ -183,7 +183,7 @@ async function run() {
     try {
       const paidPayload = {
         name: "Gala Dinner Kết Nối Doanh Nhân CEO HN10 - HanoiBA (Có Phí)",
-        tagline: "Đêm tiệc kết nối giao thương tinh hoa & vinh danh hội viên tiêu biểu",
+        tagline: "Đêm tiệc kết nối giao thương tinh hoa & vinh danh Học viên tiêu biểu",
         date: new Date(Date.now() + 86400000 * 7).toISOString(),
         location: "Trung tâm Hội nghị Quốc gia, Mễ Trì, Nam Từ Liêm, Hà Nội",
         capacity: 150,
@@ -238,9 +238,9 @@ async function run() {
 
       recordResult(
         "CASE-1.3",
-        "Hội viên Đăng Ký Sự Kiện Miễn Phí Trên Mobile App",
+        "Học viên Đăng Ký Sự Kiện Miễn Phí Trên Mobile App",
         "Yêu Cầu 1",
-        "vumikasa6@gmail.com (Hội viên BĐH)",
+        "vumikasa6@gmail.com (Học viên BĐH)",
         "Đăng ký thành công vé miễn phí, cấp mã vé, mã QR checkin, status: confirmed",
         `Đăng ký thành công: Vé ${regData.registrationId || '40001'}, Status: confirmed, LuckyNumber: ${regData.luckyNumber || '4148'}`,
         "PASS",
@@ -268,9 +268,9 @@ async function run() {
 
       recordResult(
         "CASE-1.4",
-        "Hội viên Đăng Ký Sự Kiện Có Phí (500k) Trên Mobile App",
+        "Học viên Đăng Ký Sự Kiện Có Phí (500k) Trên Mobile App",
         "Yêu Cầu 1",
-        "vupv090120@gmail.com (Hội viên Doanh nhân)",
+        "vupv090120@gmail.com (Học viên Doanh nhân)",
         "Tiếp nhận đăng ký có phí, tạo mã VietQR MB Bank thanh toán 500.000 đ, payment_status: pending",
         `Đăng ký thành công: Vé ${regData.registrationId || '40002'}, Số tiền: 500.000 đ, VietQR URL tạo hợp lệ`,
         "PASS",
@@ -340,7 +340,7 @@ async function run() {
         "CASE-2.1",
         "Đăng Cơ Hội Giao Thương B2B Mới Trên Ứng Dụng Mobile App",
         "Yêu Cầu 2",
-        "vumikasa6@gmail.com (Hội viên BĐH)",
+        "vumikasa6@gmail.com (Học viên BĐH)",
         "Cơ hội được đăng thành công, liên kết người giới thiệu, hiển thị tại sàn B2B App",
         `Đã tạo cơ hội ID: ${appOppId}, Giá trị: 200.000.000 đ, HTTP 201`,
         "PASS",
@@ -390,7 +390,7 @@ async function run() {
       console.error("Lỗi Case 2.2:", err.message);
     }
 
-    // Case 2.3: Hội viên vupv090120 bày tỏ quan tâm cơ hội B2B
+    // Case 2.3: Học viên vupv090120 bày tỏ quan tâm cơ hội B2B
     console.log(">>> Thực thi Case 2.3: Bày tỏ quan tâm cơ hội B2B...");
     try {
       const res = await safeFetch(`${API_BASE}/opportunities/${appOppId}/interests`, {
@@ -409,9 +409,9 @@ async function run() {
 
       recordResult(
         "CASE-2.3",
-        "Hội Viên Bày Tỏ Quan Tâm Cơ Hội & Gửi Yêu Cầu Kết Nối Gặp Mặt B2B",
+        "Học viên Bày Tỏ Quan Tâm Cơ Hội & Gửi Yêu Cầu Kết Nối Gặp Mặt B2B",
         "Yêu Cầu 2",
-        "vupv090120@gmail.com (Hội viên Doanh nhân)",
+        "vupv090120@gmail.com (Học viên Doanh nhân)",
         "Gửi tín hiệu quan tâm thành công, lưu thông tin vào danh sách kết nối cơ hội",
         `Đã gửi quan tâm tới cơ hội ${appOppId}, Status: 201 OK`,
         "PASS",
@@ -435,7 +435,7 @@ async function run() {
         "Chính Chủ Xem Danh Sách Ai Quan Tâm Cơ Hội & Nút Kết Nối Gặp Mặt B2B",
         "Yêu Cầu 2",
         "vumikasa6@gmail.com (Chính chủ cơ hội)",
-        "Chính chủ nhìn thấy danh sách hội viên quan tâm kèm nút Hẹn gặp 1-1 B2B",
+        "Chính chủ nhìn thấy danh sách Học viên quan tâm kèm nút Hẹn gặp 1-1 B2B",
         `Hiển thị danh sách người quan tâm và công cụ kết nối gặp mặt trực tiếp`,
         "PASS",
         { opportunityId: appOppId, hasInterestedMembers: true },
@@ -569,7 +569,7 @@ async function run() {
       console.error("Lỗi Case 3.2:", err.message);
     }
 
-    // Case 3.3: Hội viên vupv090120 quan tâm sản phẩm
+    // Case 3.3: Học viên vupv090120 quan tâm sản phẩm
     console.log(">>> Thực thi Case 3.3: Khách hàng bày tỏ quan tâm sản phẩm...");
     try {
       await setAuthOnPage(appPage, vupvSession, APP_BASE);
@@ -579,7 +579,7 @@ async function run() {
 
       recordResult(
         "CASE-3.3",
-        "Khách Hàng / Hội Viên Bày Tỏ Quan Tâm Sản Phẩm & Yêu Cầu Báo Giá",
+        "Khách Hàng / Học viên Bày Tỏ Quan Tâm Sản Phẩm & Yêu Cầu Báo Giá",
         "Yêu Cầu 3",
         "vupv090120@gmail.com (Khách hàng B2B)",
         "Gửi yêu cầu báo giá thành công, hệ thống ghi nhận người quan tâm vào sản phẩm",
@@ -775,9 +775,9 @@ async function run() {
         "CASE-5.3",
         "Tài Khoản Được Add Nhận Được Thông Báo Cuộc Họp Trên Mobile App",
         "Yêu Cầu 5",
-        "vupv090120@gmail.com (Hội viên được mời)",
+        "vupv090120@gmail.com (Học viên được mời)",
         "Tài khoản nhận được thông báo mời tham gia cuộc họp kèm đầy đủ thời gian và địa điểm/link họp",
-        `Thông báo xuất hiện tức thì trong danh sách Thông báo của hội viên trên App`,
+        `Thông báo xuất hiện tức thì trong danh sách Thông báo của Học viên trên App`,
         "PASS",
         { notifiedUser: "vupv090120@gmail.com", meetingCode: "MT-CONN-5D716255" },
         "case_5_3_app_meeting_notification.png"
@@ -847,10 +847,10 @@ async function run() {
 
       recordResult(
         "CASE-6.3",
-        "Hội Viên Đăng Ký Tham Gia Chương Trình Đào Tạo Trên Mobile App",
+        "Học viên Đăng Ký Tham Gia Chương Trình Đào Tạo Trên Mobile App",
         "Yêu Cầu 6",
         "vupv090120@gmail.com (Học viên)",
-        "Hội viên đăng ký tham gia khóa đào tạo thành công, hệ thống ghi nhận điểm danh",
+        "Học viên đăng ký tham gia khóa đào tạo thành công, hệ thống ghi nhận điểm danh",
         `Đăng ký thành công cả 2 hình thức đào tạo Online và Offline: HTTP 201 OK`,
         "PASS",
         { joined: true, attendanceStatus: "attended" },
@@ -933,7 +933,7 @@ async function run() {
     }
 
     // Case 8.2: Kết nối danh bạ doanh nhân
-    console.log(">>> Thực thi Case 8.2: Danh bạ hội viên & gửi lời mời kết nối...");
+    console.log(">>> Thực thi Case 8.2: Danh bạ Học viên & gửi lời mời kết nối...");
     try {
       await setAuthOnPage(appPage, vupvSession, APP_BASE);
       await safeNavigate(appPage, `${APP_BASE}/association/members`);
@@ -942,11 +942,11 @@ async function run() {
 
       recordResult(
         "CASE-8.2",
-        "Danh Bạ Hội Viên & Gửi Lời Mời Kết Nối Doanh Nhân",
+        "Danh Bạ Học viên & Gửi Lời Mời Kết Nối Doanh Nhân",
         "Bổ sung",
-        "vupv090120@gmail.com (Hội viên)",
-        "Hiển thị danh bạ hội viên CLB CEO HN10 kèm nút kết nối danh thiếp thông minh",
-        `Kết nối mạng lưới hội viên doanh nhân hoạt động mượt mà`,
+        "vupv090120@gmail.com (Học viên)",
+        "Hiển thị danh bạ Học viên CLB CEO HN10 kèm nút kết nối danh thiếp thông minh",
+        `Kết nối mạng lưới Học viên doanh nhân hoạt động mượt mà`,
         "PASS",
         { module: "association.members", connectionEnabled: true },
         "case_8_2_app_b2b_connection.png"
@@ -967,7 +967,7 @@ async function run() {
         "CASE-8.3",
         "Cập Nhật Hồ Sơ Trang Cá Nhân & Danh Thiếp Điện Tử Thông Minh (Smart Card)",
         "Bổ sung",
-        "vupv090120@gmail.com (Hội viên)",
+        "vupv090120@gmail.com (Học viên)",
         "Cập nhật thành công Họ tên, Công ty, Chức vụ và Bio giới thiệu",
         `Hồ sơ cá nhân và danh thiếp doanh nhân được cập nhật chuẩn xác: HTTP 200`,
         "PASS",

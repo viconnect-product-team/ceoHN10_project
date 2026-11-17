@@ -90,7 +90,7 @@ export const REDIS_SPECIFICATION = {
   cachingKeys: [
     { key: "ceohn10:cache:rooms:list", ttl: "3600s", desc: "Danh sách phòng họp & trang thiết bị" },
     { key: "ceohn10:cache:events:active", ttl: "600s", desc: "Danh sách sự kiện đang mở đăng ký" },
-    { key: "ceohn10:cache:user:{id}:profile", ttl: "1800s", desc: "Thông tin hội viên & danh thiếp điện tử" },
+    { key: "ceohn10:cache:user:{id}:profile", ttl: "1800s", desc: "Thông tin Học viên & danh thiếp điện tử" },
     { key: "ceohn10:lock:room:booking:{roomId}:{slot}", ttl: "30s", desc: "Distributed Lock chống trùng lịch đặt phòng" },
     { key: "ceohn10:lock:event:seat:{eventId}:{seatId}", ttl: "20s", desc: "Distributed Lock chống tranh chấp bàn tiệc/ghế ngồi" },
   ],

@@ -15,7 +15,7 @@ export class ConnectNetworkService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly gateway: ConnectAppGateway,
-  ) {}
+  ) { }
 
   async resolvePublicCounterparts(userIds: string[]) {
     if (!Array.isArray(userIds) || userIds.length === 0) return [];
@@ -73,7 +73,7 @@ export class ConnectNetworkService {
           authUser?.full_name ||
           authUser?.name ||
           member?.name ||
-          'Hội viên CEO HN10';
+          'Học viên CEO HN10';
 
         const avatarUrl =
           card?.avatar_url ||
@@ -114,7 +114,7 @@ export class ConnectNetworkService {
       } catch (err) {
         summaries.push({
           userId: uid,
-          displayName: 'Hội viên CEO HN10',
+          displayName: 'Học viên CEO HN10',
           avatarUrl: null,
           headline: null,
           companyName: null,
@@ -147,8 +147,8 @@ export class ConnectNetworkService {
       return {
         id: c.id,
         counterpartUserId,
-        name: s?.displayName || 'Hội viên CEO HN10',
-        displayName: s?.displayName || 'Hội viên CEO HN10',
+        name: s?.displayName || 'Học viên CEO HN10',
+        displayName: s?.displayName || 'Học viên CEO HN10',
         avatar: s?.avatarUrl || null,
         avatarUrl: s?.avatarUrl || null,
         companyName: s?.companyName || null,
@@ -394,7 +394,7 @@ export class ConnectNetworkService {
       const company = row.company_name || 'Doanh nghiệp đối tác';
       const city = row.city || 'Việt Nam';
       const headline = row.headline || 'Doanh nhân';
-      const displayName = row.display_name || 'Hội viên';
+      const displayName = row.display_name || 'Học viên';
 
       let score = 20; // base potential score
       const near = isNearby(city);
@@ -710,8 +710,8 @@ export class ConnectNetworkService {
       if (m.storage_path) {
         signed[m.storage_path] =
           m.storage_path.startsWith('http') ||
-          m.storage_path.startsWith('data:') ||
-          m.storage_path.startsWith('blob:')
+            m.storage_path.startsWith('data:') ||
+            m.storage_path.startsWith('blob:')
             ? m.storage_path
             : m.storage_path.startsWith('/')
               ? m.storage_path
@@ -749,7 +749,7 @@ export class ConnectNetworkService {
       const ownerDisplayName =
         row.owner_display_name ||
         row.owner_email?.split('@')[0] ||
-        'Hội viên CEO HN10';
+        'Học viên CEO HN10';
       const targetDisplayName =
         row.target_display_name ||
         row.card_display_name ||
@@ -776,12 +776,12 @@ export class ConnectNetworkService {
         },
         target: targetDisplayName
           ? {
-              personId,
-              displayName: targetDisplayName,
-              avatarUrl: targetAvatarUrl,
-              headline: targetHeadline,
-              companyName: targetCompanyName,
-            }
+            personId,
+            displayName: targetDisplayName,
+            avatarUrl: targetAvatarUrl,
+            headline: targetHeadline,
+            companyName: targetCompanyName,
+          }
           : null,
         personId,
         occurredAt: row.occurred_at
@@ -898,9 +898,9 @@ export class ConnectNetworkService {
         organizationLabel: null,
         daysLeft: o.deadline
           ? Math.ceil(
-              (new Date(o.deadline).getTime() - Date.now()) /
-                (1000 * 3600 * 24),
-            )
+            (new Date(o.deadline).getTime() - Date.now()) /
+            (1000 * 3600 * 24),
+          )
           : null,
       })),
     };
@@ -1012,7 +1012,7 @@ export class ConnectNetworkService {
       // If in terminated state (declined, cancelled): delete stale row to prevent trigger violations
       await this.prisma.$executeRaw`
         DELETE FROM public.user_connections WHERE id = ${conn.id}::uuid
-      `.catch(() => {});
+      `.catch(() => { });
 
       await this.prisma.$executeRaw`
         INSERT INTO public.user_connections (id, requester_user_id, recipient_user_id, status, source_type, requested_at, created_at, updated_at)
@@ -1053,7 +1053,7 @@ export class ConnectNetworkService {
         const mem = await this.prisma.$queryRaw<any[]>`
           SELECT name FROM public.members WHERE user_id = ${userId}::uuid LIMIT 1
         `.catch(() => []);
-        requesterDisplayName = mem[0]?.name || 'Hội viên CEO HN10';
+        requesterDisplayName = mem[0]?.name || 'Học viên CEO HN10';
       }
 
       // Fetch privacy settings and contact info of Account A (requester)
@@ -1073,7 +1073,7 @@ export class ConnectNetworkService {
             requesterDisplayName || memA[0].contact || memA[0].name;
           requesterCompanyName = requesterCompanyName || memA[0].name;
         }
-      } catch {}
+      } catch { }
 
       // Query Account A's privacy settings
       let aSettings: any = null;
@@ -1083,7 +1083,7 @@ export class ConnectNetworkService {
           FROM public.card_settings WHERE user_id = ${userId}::uuid LIMIT 1
         `.catch(() => []);
         if (sRows[0]) aSettings = sRows[0];
-      } catch {}
+      } catch { }
 
       const showName = aSettings ? aSettings.show_name !== false : true;
       const showCompany = aSettings ? aSettings.show_company !== false : true;
@@ -1094,9 +1094,9 @@ export class ConnectNetworkService {
       const requester = {
         userId,
         memberCode: requesterMemberCode,
-        display_name: showName ? requesterDisplayName : 'Hội viên CEO HN10',
+        display_name: showName ? requesterDisplayName : 'Học viên CEO HN10',
         avatar_url: showPhoto ? requesterAvatarUrl : null,
-        job_title: showCompany ? requesterJobTitle : 'Hội viên CLB CEO HN10',
+        job_title: showCompany ? requesterJobTitle : 'Học viên CLB CEO HN10',
         company_name: showCompany
           ? requesterCompanyName
           : 'Đã ẩn theo cài đặt riêng tư',
@@ -1186,9 +1186,9 @@ export class ConnectNetworkService {
               ${reqId},
               ${now}
             )
-          `.catch(() => {});
+          `.catch(() => { });
         }
-      } catch {}
+      } catch { }
 
       const notifPayload = {
         id: notifId,
@@ -1328,7 +1328,7 @@ export class ConnectNetworkService {
           INSERT INTO public.user_connections (id, requester_user_id, recipient_user_id, status, source_type, requested_at, responded_at, created_at, updated_at)
           VALUES (${actualConnId}::uuid, ${requesterUserId}::uuid, ${resolvedUserId}::uuid, 'accepted'::public.global_connection_status, 'qr_scan'::public.global_connection_source_type, ${now}, ${now}, ${now}, ${now})
           ON CONFLICT (id) DO UPDATE SET status = 'accepted'::public.global_connection_status, responded_at = ${now}, updated_at = ${now}
-        `.catch(() => {});
+        `.catch(() => { });
       }
     } else {
       await this.prisma.$executeRaw`
@@ -1352,7 +1352,7 @@ export class ConnectNetworkService {
           updated_at = ${now}
           WHERE source_record_id = ${actualConnId}::text
              OR (safe_display_data->>'connectionId') = ${actualConnId}::text
-        `.catch(() => {});
+        `.catch(() => { });
       }
       if (isConnUuid) {
         await this.prisma.$executeRaw`
@@ -1365,9 +1365,9 @@ export class ConnectNetworkService {
           read_at = COALESCE(read_at, ${now}),
           updated_at = ${now}
           WHERE id = ${rawConnId}::uuid
-        `.catch(() => {});
+        `.catch(() => { });
       }
-    } catch {}
+    } catch { }
 
     // Safely update member_notifications
     try {
@@ -1376,16 +1376,16 @@ export class ConnectNetworkService {
           UPDATE public.member_notifications
           SET read = true
           WHERE ref_id = ${actualConnId}::text
-        `.catch(() => {});
+        `.catch(() => { });
       }
       if (isConnUuid) {
         await this.prisma.$executeRaw`
           UPDATE public.member_notifications
           SET read = true
           WHERE id = ${rawConnId}::uuid
-        `.catch(() => {});
+        `.catch(() => { });
       }
-    } catch {}
+    } catch { }
 
     // Emit realtime event
     this.gateway.server?.to(`user:${userId}`).emit('notification:updated', {
@@ -1412,11 +1412,11 @@ export class ConnectNetworkService {
           LIMIT 1
         `.catch(() => [] as any[]);
         const accepter = accepterProfiles[0] || {
-          display_name: 'Hội viên CEO HN10',
+          display_name: 'Học viên CEO HN10',
         };
         const notifId = crypto.randomUUID();
         const safeData = JSON.stringify({
-          counterpartDisplayName: accepter.display_name || 'Hội viên CEO HN10',
+          counterpartDisplayName: accepter.display_name || 'Học viên CEO HN10',
           avatarUrl: accepter.avatar_url || null,
           connectionId: actualConnId,
           connectionStatus: 'accepted',
@@ -1438,7 +1438,7 @@ export class ConnectNetworkService {
             ${safeData}::jsonb, 'open_route', 'bc.notif.action.view', ${actionTarget}::jsonb,
             'normal', 'delivered', ${now}, ${now}, ${dedupeKey}
           )
-        `.catch(() => {});
+        `.catch(() => { });
 
         // Đẩy thêm vào member_notifications cho người gửi lời mời
         try {
@@ -1452,16 +1452,16 @@ export class ConnectNetworkService {
             ) VALUES (
               ${crypto.randomUUID()}::uuid,
               ${String(requesterMemberId)}::text,
-              ${`${accepter.display_name || 'Hội viên'} đã đồng ý lời mời kết nối`},
-              ${`Bạn và ${accepter.display_name || 'Hội viên'} đã trở thành bạn bè. Hãy trao đổi và kết nối cơ hội kinh doanh!`},
+              ${`${accepter.display_name || 'Học viên'} đã đồng ý lời mời kết nối`},
+              ${`Bạn và ${accepter.display_name || 'Học viên'} đã trở thành bạn bè. Hãy trao đổi và kết nối cơ hội kinh doanh!`},
               false,
               false,
               'connection',
               ${actualConnId}::text,
               ${now}
             )
-          `.catch(() => {});
-        } catch {}
+          `.catch(() => { });
+        } catch { }
 
         const notifPayload = {
           id: notifId,
@@ -1529,13 +1529,13 @@ export class ConnectNetworkService {
       updated_at = ${now}
       WHERE (source_record_id = ${actualConnId}::text OR id = ${body.connectionId}::uuid OR (safe_display_data->>'connectionId') = ${actualConnId}::text)
         AND recipient_user_id = ${userId}::uuid
-    `.catch(() => {});
+    `.catch(() => { });
 
     await this.prisma.$executeRaw`
       UPDATE public.member_notifications
       SET read = true
       WHERE (ref_id = ${actualConnId}::text OR id = ${body.connectionId}::uuid)
-    `.catch(() => {});
+    `.catch(() => { });
 
     // Phát sự kiện realtime cho người nhận
     this.gateway.server?.to(`user:${userId}`).emit('notification:updated', {
@@ -1558,7 +1558,7 @@ export class ConnectNetworkService {
           declinerUser?.display_name ||
           declinerUser?.full_name ||
           declinerUser?.company_name ||
-          'Hội viên CEO HN10';
+          'Học viên CEO HN10';
 
         const notifId = crypto.randomUUID();
         const safeData = JSON.stringify({
@@ -1580,7 +1580,7 @@ export class ConnectNetworkService {
             ${safeData}::jsonb, 'none', 'bc.notif.action.dismiss',
             'low', 'delivered', ${now}, ${now}, ${dedupeKey}
           )
-        `.catch(() => {});
+        `.catch(() => { });
 
         // Đẩy thêm vào member_notifications cho người gửi lời mời
         try {
@@ -1602,8 +1602,8 @@ export class ConnectNetworkService {
               ${actualConnId}::text,
               ${now}
             )
-          `.catch(() => {});
-        } catch {}
+          `.catch(() => { });
+        } catch { }
 
         this.gateway.emitConnectionDeclined(
           requesterUserId,
@@ -1678,7 +1678,7 @@ export class ConnectNetworkService {
         UPDATE public.business_notifications
         SET status = 'cancelled', updated_at = ${now}
         WHERE source_record_id = ${connId}
-      `.catch(() => {});
+      `.catch(() => { });
     }
 
     if (recipientUserId) {
@@ -1917,7 +1917,7 @@ export class ConnectNetworkService {
           targetUserId = foundIdentity.owner_user_id;
         }
       }
-    } catch {}
+    } catch { }
 
     // 1b. Nếu chưa tìm thấy, kiểm tra business_cards (theo slug hoặc id)
     if (!targetUserId) {
@@ -1941,7 +1941,7 @@ export class ConnectNetworkService {
           foundCard = cards[0];
           targetUserId = foundCard.user_id;
         }
-      } catch {}
+      } catch { }
     }
 
     // 1b1. Kiểm tra JWT token (ey...) nếu là Signed QR của Membership Pass
@@ -2019,7 +2019,7 @@ export class ConnectNetworkService {
             }
           }
         }
-      } catch {}
+      } catch { }
     }
 
     // 1b2. Kiểm tra member_identity_passes (theo pass_serial hoặc id)
@@ -2052,7 +2052,7 @@ export class ConnectNetworkService {
             targetUserId = foundMember.user_id || foundMember.id;
           }
         }
-      } catch {}
+      } catch { }
     }
 
     // 1c. Nếu chưa tìm thấy, kiểm tra members (theo code hoặc id)
@@ -2077,7 +2077,7 @@ export class ConnectNetworkService {
           foundMember = members[0];
           targetUserId = foundMember.user_id || foundMember.id;
         }
-      } catch {}
+      } catch { }
     }
 
     // 1d. Nếu chưa tìm thấy, kiểm tra business_identities (theo id hoặc owner_user_id)
@@ -2098,7 +2098,7 @@ export class ConnectNetworkService {
             targetUserId = foundIdentity.owner_user_id;
           }
         }
-      } catch {}
+      } catch { }
     }
 
     // 1e. Nếu chưa tìm thấy, kiểm tra profiles (theo id)
@@ -2119,7 +2119,7 @@ export class ConnectNetworkService {
             targetUserId = foundProfile.id;
           }
         }
-      } catch {}
+      } catch { }
     }
 
     // 1f. Check public.vione_users by username or email
@@ -2133,7 +2133,7 @@ export class ConnectNetworkService {
         if (u.length > 0) {
           targetUserId = u[0].id;
         }
-      } catch {}
+      } catch { }
     }
 
     // 1g. Check public.members by phone or name
@@ -2148,7 +2148,7 @@ export class ConnectNetworkService {
           targetUserId = m[0].user_id || m[0].id;
           foundMember = m[0];
         }
-      } catch {}
+      } catch { }
     }
 
     // Không tìm thấy user hợp lệ
@@ -2182,7 +2182,7 @@ export class ConnectNetworkService {
           ORDER BY is_primary DESC, updated_at DESC LIMIT 1
         `;
         if (c.length > 0) foundCard = c[0];
-      } catch {}
+      } catch { }
     }
     if (!foundIdentity) {
       try {
@@ -2192,7 +2192,7 @@ export class ConnectNetworkService {
           LIMIT 1
         `;
         if (ids.length > 0) foundIdentity = ids[0];
-      } catch {}
+      } catch { }
     }
     if (!foundMember) {
       try {
@@ -2202,7 +2202,7 @@ export class ConnectNetworkService {
           LIMIT 1
         `;
         if (m.length > 0) foundMember = m[0];
-      } catch {}
+      } catch { }
     }
     if (!foundProfile) {
       try {
@@ -2212,7 +2212,7 @@ export class ConnectNetworkService {
           LIMIT 1
         `;
         if (p.length > 0) foundProfile = p[0];
-      } catch {}
+      } catch { }
     }
 
     // 2. Tra cứu quan hệ connection hiện tại giữa 2 user
@@ -2249,7 +2249,7 @@ export class ConnectNetworkService {
           WHERE identity_id = ${foundIdentity.id}::uuid
         `;
         for (const r of visibilityRows) vis[r.field_key] = r.visibility;
-      } catch {}
+      } catch { }
     }
     const isConnected = state === 'connected' || targetUserId === userId;
     const show = (key: string) => {
@@ -2265,7 +2265,7 @@ export class ConnectNetworkService {
       foundMember?.name ||
       foundMember?.full_name ||
       foundProfile?.display_name ||
-      'Hội viên CEO HN10';
+      'Học viên CEO HN10';
 
     const avatarUrl =
       foundIdentity?.avatar_url ||
@@ -2310,9 +2310,9 @@ export class ConnectNetworkService {
       (show('primaryPhone') ? foundIdentity?.primary_phone : null) ||
       (show('primaryPhone')
         ? foundCard?.phone ||
-          foundMember?.phone ||
-          foundMember?.contact ||
-          foundProfile?.phone
+        foundMember?.phone ||
+        foundMember?.contact ||
+        foundProfile?.phone
         : null) ||
       null;
 
@@ -2363,7 +2363,7 @@ export class ConnectNetworkService {
       ],
       talents: foundMember?.executive_role
         ? `Lãnh đạo ${foundMember?.department || 'Ban'} CLB CEO HN10`
-        : 'Doanh nhân hội viên chính thức',
+        : 'Doanh nhân Học viên chính thức',
       verifiedBadge: true,
     };
 
@@ -2420,7 +2420,7 @@ export class ConnectNetworkService {
       // Terminated connection: delete stale row to prevent PostgreSQL trigger violations
       await this.prisma.$executeRaw`
         DELETE FROM public.user_connections WHERE id = ${conn.id}::uuid
-      `.catch(() => {});
+      `.catch(() => { });
 
       reqId = crypto.randomUUID();
       try {
@@ -2452,14 +2452,14 @@ export class ConnectNetworkService {
     if (shareLinkId) {
       this.prisma.$executeRaw`
         UPDATE public.identity_share_links SET last_used_at = ${now} WHERE id = ${shareLinkId}::uuid
-      `.catch(() => {});
+      `.catch(() => { });
     }
 
     // Lấy thông tin người gửi để đưa vào thông báo
     const requesterSummaries = await this.resolvePublicCounterparts([userId]);
     const requester = requesterSummaries[0] || {
       userId,
-      displayName: 'Hội viên CEO HN10',
+      displayName: 'Học viên CEO HN10',
       avatarUrl: null,
       headline: null,
       companyName: null,
@@ -2468,7 +2468,7 @@ export class ConnectNetworkService {
     // 6. Lưu thông báo vào Business Notifications
     const notifId = crypto.randomUUID();
     const safeDataObj = {
-      counterpartDisplayName: requester.displayName || 'Hội viên CEO HN10',
+      counterpartDisplayName: requester.displayName || 'Học viên CEO HN10',
       avatarUrl: requester.avatarUrl || null,
       jobTitle: requester.headline || null,
       companyName: requester.companyName || null,
@@ -2498,13 +2498,13 @@ export class ConnectNetworkService {
       console.warn('Could not insert business notification for tap:', err),
     );
 
-    // 7. Lưu thông báo vào Member Notifications (để trang Thông báo Hội viên cũng thấy)
+    // 7. Lưu thông báo vào Member Notifications (để trang Thông báo Học viên cũng thấy)
     try {
       const targetMembers = await this.prisma.$queryRaw<any[]>`
         SELECT id FROM public.members WHERE user_id = ${targetUserId}::uuid LIMIT 1
       `.catch(() => []);
       const memberRecipientId = targetMembers[0]?.id || targetUserId;
-      const notifTitle = `${requester.displayName || 'Một hội viên'} muốn kết nối với bạn`;
+      const notifTitle = `${requester.displayName || 'Một Học viên'} muốn kết nối với bạn`;
       const notifBody = message
         ? `${message}`
         : requester.headline
@@ -2525,8 +2525,8 @@ export class ConnectNetworkService {
           ${reqId},
           ${now}
         )
-      `.catch(() => {});
-    } catch {}
+      `.catch(() => { });
+    } catch { }
 
     // 8. PHÁT WEBSOCKET EVENTS TỨC THÌ ĐẾN targetUserId
     try {

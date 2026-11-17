@@ -1,5 +1,5 @@
 /**
- * USER ACTIVITY LOGGER (Nhật Ký Thao Tác & Hoạt Động Hội Viên CEO HN10)
+ * USER ACTIVITY LOGGER (Nhật Ký Thao Tác & Hoạt Động Học viên CEO HN10)
  * Lưu trữ nhật ký hành động cục bộ & gửi đồng bộ lên Backend audit_logs
  */
 import { fetchNestApi } from "@/lib/api-client";
@@ -24,7 +24,7 @@ function getStorageKey(userId?: string): string {
       const u = JSON.parse(raw);
       if (u?.id) return `${STORAGE_PREFIX}${u.id}`;
     }
-  } catch {}
+  } catch { }
   return `${STORAGE_PREFIX}default`;
 }
 
@@ -66,7 +66,7 @@ export function getUserActivityHistory(userId?: string): UserActivityItem[] {
         }));
       }
     }
-  } catch {}
+  } catch { }
 
   // Danh mục khởi tạo mẫu nếu chưa có dữ liệu thao tác
   return [
@@ -97,7 +97,7 @@ export function getUserActivityHistory(userId?: string): UserActivityItem[] {
     {
       id: "init_4",
       action: "QR_SCAN",
-      title: "Quét mã QR danh thiếp số hội viên CLB",
+      title: "Quét mã QR danh thiếp số Học viên CLB",
       time: "22/10/2026",
       badge: "Mạng lưới",
       createdAt: Date.now() - 3600000 * 24 * 7,
@@ -138,7 +138,7 @@ export function recordUserActivity(params: {
         try {
           const parsed = JSON.parse(recentRaw);
           if (Array.isArray(parsed)) recentList = parsed;
-        } catch {}
+        } catch { }
       }
       const historyItem = {
         id: newItem.id,
@@ -160,7 +160,7 @@ export function recordUserActivity(params: {
       );
       window.dispatchEvent(new Event("vba.history.changed"));
       window.dispatchEvent(new Event("storage"));
-    } catch {}
+    } catch { }
   }
 
   // Đồng bộ lên backend audit log (không chặn luồng UI)
@@ -175,8 +175,8 @@ export function recordUserActivity(params: {
           ...params.metadata,
         },
       }),
-    }).catch(() => {});
-  } catch {}
+    }).catch(() => { });
+  } catch { }
 
   return newItem;
 }

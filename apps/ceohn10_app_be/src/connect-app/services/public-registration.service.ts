@@ -16,7 +16,7 @@ export class ConnectPublicRegistrationService {
     private readonly prisma: PrismaService,
     private readonly mailService?: MailService,
     private readonly gateway?: ConnectAppGateway,
-  ) {}
+  ) { }
 
   async getPublicAssociationBySlug(slug: string) {
     try {
@@ -377,7 +377,7 @@ export class ConnectPublicRegistrationService {
         });
       }
 
-      // Gửi email thông báo tài khoản với mật khẩu ngẫu nhiên tới hòm thư hội viên mới
+      // Gửi email thông báo tài khoản với mật khẩu ngẫu nhiên tới hòm thư Học viên mới
       if (this.mailService && email && email.includes('@')) {
         void this.mailService.sendRegistrationAccountEmail({
           to: email,
@@ -402,7 +402,7 @@ export class ConnectPublicRegistrationService {
       if (targetAssocId) {
         // Trigger Realtime Notifications to Association Admins & Web CRM
         void this.notifyAssociationAdmins(targetAssocId, {
-          title: `Đăng ký hội viên mới: ${fullName} - ${company}`,
+          title: `Đăng ký Học viên mới: ${fullName} - ${company}`,
           body: `Ứng viên ${fullName} (${title}) vừa nộp hồ sơ xin gia nhập CLB CEO HN10. Hệ thống đã tạo tài khoản và gửi email mật khẩu tạm thời.`,
           targetRoute: `/members?status=pending`,
           type: 'club_registration_received',

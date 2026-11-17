@@ -84,7 +84,7 @@ export function useUnreadNotifications() {
       try {
         const raw = localStorage.getItem("vba_crm_read_notif_ids");
         if (raw) readIds = new Set(JSON.parse(raw));
-      } catch {}
+      } catch { }
 
       const unreadList = items.filter((n) => {
         if (n.id && readIds.has(String(n.id))) return false;
@@ -105,14 +105,14 @@ export function useUnreadNotifications() {
           catCounts[n.targetRoute] = (catCounts[n.targetRoute] || 0) + 1;
         }
 
-        // 1. Hội viên mới gia nhập / nộp hồ sơ
+        // 1. Học viên mới gia nhập / nộp hồ sơ
         if (
-          text.includes("hội viên") ||
+          text.includes("Học viên") ||
           text.includes("kết nạp") ||
           text.includes("gia nhập") ||
           text.includes("đăng ký") ||
           text.includes("hồ sơ") ||
-          text.includes("hội viên mới")
+          text.includes("Học viên mới")
         ) {
           catCounts["/members"] = (catCounts["/members"] || 0) + 1;
           catCounts["/notifications?filter=new_members"] = (catCounts["/notifications?filter=new_members"] || 0) + 1;

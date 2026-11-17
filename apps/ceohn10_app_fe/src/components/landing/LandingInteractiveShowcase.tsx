@@ -131,7 +131,7 @@ const DEFAULT_SLIDES: ShowcaseSlide[] = [
     title: "Kho Đặc Quyền & Ưu Đãi Nội Bộ Độc Quyền",
     subtitle: "Voucher đối tác khách sạn 5 sao, tài chính & logistics",
     description:
-      "Mạng lưới ưu đãi chéo giữa các doanh nghiệp hội viên: giảm giá 15% - 50% các dịch vụ golf, phòng chờ thương gia, khách sạn cao cấp, tư vấn thuế và kiểm toán độc quyền.",
+      "Mạng lưới ưu đãi chéo giữa các doanh nghiệp Học viên: giảm giá 15% - 50% các dịch vụ golf, phòng chờ thương gia, khách sạn cao cấp, tư vấn thuế và kiểm toán độc quyền.",
     peekStat: "⚡ Tiết kiệm 15% - 50%",
     peekHighlight: "Phòng chờ VIP sân bay & Mastermind kín",
     highlights: [
@@ -305,19 +305,18 @@ export function LandingInteractiveShowcase({ themeMode = "light" }: { themeMode?
               className="relative cursor-pointer group"
             >
               <div
-                className={`relative rounded-2xl p-4 transition-all duration-300 flex flex-col justify-between overflow-hidden animate-vibrate-glow ${
-                  isActive
+                className={`relative rounded-2xl p-4 transition-all duration-300 flex flex-col justify-between overflow-hidden animate-vibrate-glow ${isActive
                     ? themeClass(
-                        `border-2 ${slide.activeBorder} ${slide.activeBg} scale-[1.02]`,
-                        `border-2 ${slide.activeBorder} bg-white shadow-[0_10px_25px_rgba(140,101,59,0.2)] text-[#181512] scale-[1.02]`,
-                        "border-2 border-yellow-400 bg-black text-yellow-300"
-                      )
+                      `border-2 ${slide.activeBorder} ${slide.activeBg} scale-[1.02]`,
+                      `border-2 ${slide.activeBorder} bg-white shadow-[0_10px_25px_rgba(140,101,59,0.2)] text-[#181512] scale-[1.02]`,
+                      "border-2 border-yellow-400 bg-black text-yellow-300"
+                    )
                     : themeClass(
-                        "border border-white/12 bg-white/[0.04] hover:bg-white/[0.08] hover:border-white/40 text-slate-300",
-                        "border border-slate-200 bg-slate-50 hover:bg-white text-slate-700 hover:border-slate-400",
-                        "border border-yellow-400/40 bg-zinc-950 text-yellow-200"
-                      )
-                }`}
+                      "border border-white/12 bg-white/[0.04] hover:bg-white/[0.08] hover:border-white/40 text-slate-300",
+                      "border border-slate-200 bg-slate-50 hover:bg-white text-slate-700 hover:border-slate-400",
+                      "border border-yellow-400/40 bg-zinc-950 text-yellow-200"
+                    )
+                  }`}
               >
                 {/* Glowing Top Edge Reflection */}
                 <div className="absolute top-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-transparent via-white/70 to-transparent" />
@@ -325,30 +324,27 @@ export function LandingInteractiveShowcase({ themeMode = "light" }: { themeMode?
                 <div className="flex items-center gap-3">
                   {/* Inner Square Icon with Silver-Tinted Metallic Finish */}
                   <div
-                    className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl transition-all shadow-md ${
-                      isActive
+                    className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl transition-all shadow-md ${isActive
                         ? slide.iconBg
                         : themeClass(
-                            "bg-white/10 text-white/80 group-hover:text-white group-hover:bg-white/20",
-                            "bg-slate-200 text-slate-800",
-                            "bg-zinc-800 text-yellow-300"
-                          )
-                    }`}
+                          "bg-white/10 text-white/80 group-hover:text-white group-hover:bg-white/20",
+                          "bg-slate-200 text-slate-800",
+                          "bg-zinc-800 text-yellow-300"
+                        )
+                      }`}
                   >
                     <TabIcon className="h-5 w-5" />
                   </div>
                   <div className="min-w-0 flex-1 text-left">
                     <p
-                      className={`text-xs sm:text-sm font-black truncate leading-tight ${
-                        isActive ? themeClass("text-white", "text-[#181512]", "text-yellow-300") : "text-slate-300"
-                      }`}
+                      className={`text-xs sm:text-sm font-black truncate leading-tight ${isActive ? themeClass("text-white", "text-[#181512]", "text-yellow-300") : "text-slate-300"
+                        }`}
                     >
                       {slide.tabLabel}
                     </p>
                     <p
-                      className={`text-[10.5px] font-mono tracking-wider font-bold mt-0.5 ${
-                        isActive ? "text-slate-300" : "text-slate-400"
-                      }`}
+                      className={`text-[10.5px] font-mono tracking-wider font-bold mt-0.5 ${isActive ? "text-slate-300" : "text-slate-400"
+                        }`}
                     >
                       0{idx + 1} / 04
                     </p>
@@ -589,7 +585,7 @@ export function LandingInteractiveShowcase({ themeMode = "light" }: { themeMode?
               >
                 <div className="flex items-center justify-between pb-3 border-b border-[#D8B282]/20">
                   <span className="text-xs font-mono font-bold text-[#F6E1C3] flex items-center gap-1.5">
-                    <Crown className="w-4 h-4 text-[#D8B282]" /> ĐẶC QUYỀN HỘI VIÊN VIP
+                    <Crown className="w-4 h-4 text-[#D8B282]" /> ĐẶC QUYỀN Học viên VIP
                   </span>
                   <span className="text-[10px] px-3 py-1 rounded-full bg-[#D8B282]/30 border border-[#D8B282]/40 text-[#F6E1C3] font-mono font-bold">
                     Mở Khóa 100%

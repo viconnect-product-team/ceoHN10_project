@@ -153,10 +153,10 @@ function UnifiedCheckinManagementPage() {
               res.map((r: any, idx: number) => ({
                 id: r.id || `att-${idx}`,
                 code: r.code || r.memberCode || `CEO-${1000 + idx}`,
-                name: r.name || r.fullName || "Đại biểu Hội viên",
+                name: r.name || r.fullName || "Đại biểu Học viên",
                 phone: r.phone || "",
                 company: r.company || "Doanh nghiệp CEO HN10",
-                title: r.title || r.role || "Hội viên",
+                title: r.title || r.role || "Học viên",
                 checkedIn: Boolean(r.checkedIn || r.checked_in || r.status === "attended"),
                 checkedInAt: r.checkedInAt || r.checked_in_at || (r.checkedIn ? "08:45" : undefined),
                 ticketCode: r.ticketCode || `TKT-${1000 + idx}`,
@@ -167,14 +167,14 @@ function UnifiedCheckinManagementPage() {
           }
         }
 
-        // Tải danh sách hội viên mặc định và gán trạng thái
+        // Tải danh sách Học viên mặc định và gán trạng thái
         const members = await fetchNestApi<any[]>("/members").catch(() => []);
         if (Array.isArray(members) && members.length > 0) {
           setAttendees(
             members.slice(0, 25).map((m: any, idx: number) => ({
               id: m.id,
               code: m.code || `CEO-${1000 + idx}`,
-              name: m.name || m.contact || "Hội viên Doanh nhân",
+              name: m.name || m.contact || "Học viên Doanh nhân",
               phone: m.phone || "",
               company: m.company || m.name || "Doanh nghiệp CEO HN10",
               title: m.executiveRole || "CEO / Tổng Giám Đốc",
@@ -249,14 +249,14 @@ function UnifiedCheckinManagementPage() {
         await fetchNestApi(`/checkin`, {
           method: "POST",
           body: JSON.stringify({ attendeeId, eventId: selectedSessionId }),
-        }).catch(() => {});
+        }).catch(() => { });
       } else if (activeScope === "meetings") {
         await fetchNestApi(`/meetings/${selectedSessionId}/checkin`, {
           method: "POST",
           body: JSON.stringify({ attendeeId }),
-        }).catch(() => {});
+        }).catch(() => { });
       }
-    } catch {}
+    } catch { }
   };
 
   // Hủy Check-in (Undo)
@@ -278,7 +278,7 @@ function UnifiedCheckinManagementPage() {
     if (!code) return;
     const cleanCode = code.trim().toLowerCase();
 
-    // Tìm kiếm đại biểu theo mã vé, SĐT hoặc mã hội viên
+    // Tìm kiếm đại biểu theo mã vé, SĐT hoặc mã Học viên
     const found = attendees.find(
       (a) =>
         (a.ticketCode && a.ticketCode.toLowerCase() === cleanCode) ||
@@ -303,7 +303,7 @@ function UnifiedCheckinManagementPage() {
   const handleExportExcel = () => {
     const rows = attendees.map((a, idx) => ({
       STT: idx + 1,
-      "Mã Hội Viên": a.code || "",
+      "Mã Học viên": a.code || "",
       "Họ và Tên": a.name,
       "Số Điện Thoại": a.phone || "",
       "Doanh Nghiệp": a.company || "",
@@ -320,7 +320,7 @@ function UnifiedCheckinManagementPage() {
       filename: `Diem_Danh_${activeScope.toUpperCase()}_${currentSession?.title?.replace(/\s+/g, "_") || "CEO HN10"}`,
       sheetName: "DiemDanh",
       columns: [
-        { header: "Mã Hội Viên", key: "code", value: (r: any) => r["Mã Hội Viên"] },
+        { header: "Mã Học viên", key: "code", value: (r: any) => r["Mã Học viên"] },
         { header: "Họ và Tên", key: "name", value: (r: any) => r["Họ và Tên"] },
         { header: "Số Điện Thoại", key: "phone", value: (r: any) => r["Số Điện Thoại"] },
         { header: "Doanh Nghiệp", key: "company", value: (r: any) => r["Doanh Nghiệp"] },
@@ -360,11 +360,10 @@ function UnifiedCheckinManagementPage() {
           <button
             type="button"
             onClick={() => setActiveScope("events")}
-            className={`flex-1 min-w-[180px] py-2.5 px-4 rounded-xl text-xs font-black transition flex items-center justify-center gap-2 cursor-pointer ${
-              activeScope === "events"
+            className={`flex-1 min-w-[180px] py-2.5 px-4 rounded-xl text-xs font-black transition flex items-center justify-center gap-2 cursor-pointer ${activeScope === "events"
                 ? "bg-[#003B95] text-white shadow-md shadow-[#003B95]/30"
                 : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
-            }`}
+              }`}
           >
             <Calendar className="size-4" />
             <span>Sự Kiện CLB (Events)</span>
@@ -373,11 +372,10 @@ function UnifiedCheckinManagementPage() {
           <button
             type="button"
             onClick={() => setActiveScope("forums")}
-            className={`flex-1 min-w-[180px] py-2.5 px-4 rounded-xl text-xs font-black transition flex items-center justify-center gap-2 cursor-pointer ${
-              activeScope === "forums"
+            className={`flex-1 min-w-[180px] py-2.5 px-4 rounded-xl text-xs font-black transition flex items-center justify-center gap-2 cursor-pointer ${activeScope === "forums"
                 ? "bg-[#003B95] text-white shadow-md shadow-[#003B95]/30"
                 : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
-            }`}
+              }`}
           >
             <GraduationCap className="size-4" />
             <span>Diễn Đàn & Đào Tạo (Forums)</span>
@@ -386,11 +384,10 @@ function UnifiedCheckinManagementPage() {
           <button
             type="button"
             onClick={() => setActiveScope("meetings")}
-            className={`flex-1 min-w-[180px] py-2.5 px-4 rounded-xl text-xs font-black transition flex items-center justify-center gap-2 cursor-pointer ${
-              activeScope === "meetings"
+            className={`flex-1 min-w-[180px] py-2.5 px-4 rounded-xl text-xs font-black transition flex items-center justify-center gap-2 cursor-pointer ${activeScope === "meetings"
                 ? "bg-[#003B95] text-white shadow-md shadow-[#003B95]/30"
                 : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
-            }`}
+              }`}
           >
             <Users className="size-4" />
             <span>Cuộc Họp Ban (Meetings)</span>
@@ -442,7 +439,7 @@ function UnifiedCheckinManagementPage() {
           <div className="p-3.5 rounded-2xl bg-white dark:bg-card border border-slate-200 dark:border-slate-800 shadow-2xs">
             <span className="text-[10.5px] font-bold text-slate-400 block uppercase">Tổng đại biểu</span>
             <span className="text-2xl font-black text-slate-900 dark:text-white">{totalCount}</span>
-            <span className="text-[10.5px] text-slate-500 block mt-0.5">Hội viên & Khách mời</span>
+            <span className="text-[10.5px] text-slate-500 block mt-0.5">Học viên & Khách mời</span>
           </div>
 
           <div className="p-3.5 rounded-2xl bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800/40 shadow-2xs">
@@ -512,27 +509,24 @@ function UnifiedCheckinManagementPage() {
                   <button
                     type="button"
                     onClick={() => setActiveTab("all")}
-                    className={`px-3 py-1.5 rounded-lg transition cursor-pointer ${
-                      activeTab === "all" ? "bg-white dark:bg-card text-slate-900 dark:text-white shadow-2xs" : "text-slate-500 hover:text-slate-900"
-                    }`}
+                    className={`px-3 py-1.5 rounded-lg transition cursor-pointer ${activeTab === "all" ? "bg-white dark:bg-card text-slate-900 dark:text-white shadow-2xs" : "text-slate-500 hover:text-slate-900"
+                      }`}
                   >
                     Tất cả ({totalCount})
                   </button>
                   <button
                     type="button"
                     onClick={() => setActiveTab("checked_in")}
-                    className={`px-3 py-1.5 rounded-lg transition cursor-pointer ${
-                      activeTab === "checked_in" ? "bg-white dark:bg-card text-emerald-600 shadow-2xs" : "text-slate-500 hover:text-slate-900"
-                    }`}
+                    className={`px-3 py-1.5 rounded-lg transition cursor-pointer ${activeTab === "checked_in" ? "bg-white dark:bg-card text-emerald-600 shadow-2xs" : "text-slate-500 hover:text-slate-900"
+                      }`}
                   >
                     Đã đến ({checkedInCount})
                   </button>
                   <button
                     type="button"
                     onClick={() => setActiveTab("waiting")}
-                    className={`px-3 py-1.5 rounded-lg transition cursor-pointer ${
-                      activeTab === "waiting" ? "bg-white dark:bg-card text-amber-600 shadow-2xs" : "text-slate-500 hover:text-slate-900"
-                    }`}
+                    className={`px-3 py-1.5 rounded-lg transition cursor-pointer ${activeTab === "waiting" ? "bg-white dark:bg-card text-amber-600 shadow-2xs" : "text-slate-500 hover:text-slate-900"
+                      }`}
                   >
                     Chưa đến ({waitingCount})
                   </button>
@@ -561,19 +555,17 @@ function UnifiedCheckinManagementPage() {
                   filteredAttendees.map((att) => (
                     <div
                       key={att.id}
-                      className={`p-3 rounded-2xl border transition flex items-center justify-between gap-3 ${
-                        att.checkedIn
+                      className={`p-3 rounded-2xl border transition flex items-center justify-between gap-3 ${att.checkedIn
                           ? "bg-emerald-50/60 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-800/40"
                           : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800"
-                      }`}
+                        }`}
                     >
                       <div className="flex items-center gap-3 min-w-0">
                         <div
-                          className={`size-10 rounded-xl grid place-items-center shrink-0 font-bold text-xs ${
-                            att.checkedIn
+                          className={`size-10 rounded-xl grid place-items-center shrink-0 font-bold text-xs ${att.checkedIn
                               ? "bg-emerald-600 text-white"
                               : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300"
-                          }`}
+                            }`}
                         >
                           {att.checkedIn ? <Check className="size-5 stroke-[3]" /> : <Users className="size-5" />}
                         </div>

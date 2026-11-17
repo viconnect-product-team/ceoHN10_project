@@ -157,9 +157,9 @@ export interface LandingWebConfig {
   subdomain?: string;
   isPublished: boolean;
   template:
-    | 'timed_cards_opening'
-    | 'ceohn10_executive'
-    | 'startup_mobile_showcase';
+  | 'timed_cards_opening'
+  | 'ceohn10_executive'
+  | 'startup_mobile_showcase';
   theme: {
     primaryColor: string;
     secondaryColor?: string;
@@ -198,7 +198,7 @@ export const DEFAULT_STARTUP_MOBILE_CONFIG: StartupMobileTemplateConfig = {
       'https://v1.pinimg.com/videos/iht/expMp4/v2/92/8a/ca/928aca8b8e476ade2d17a603c7e62015_720w.mp4',
     floatingBadge1: {
       title: '500+ Doanh Nghiệp',
-      subtitle: 'Hội viên chính thức HanoiBA',
+      subtitle: 'Học viên chính thức HanoiBA',
     },
     floatingBadge2: {
       title: '+105.8 Tỷ VNĐ',
@@ -208,13 +208,13 @@ export const DEFAULT_STARTUP_MOBILE_CONFIG: StartupMobileTemplateConfig = {
   ribbonStats: [
     {
       value: '1.983+',
-      label: 'Hội Viên Doanh Nhân',
+      label: 'Học viên Doanh Nhân',
       desc: 'Doanh nhân 1983 toàn quốc',
     },
     {
       value: '500+',
       label: 'Doanh Nghiệp Thành Viên',
-      desc: 'Hội viên chính thức HanoiBA',
+      desc: 'Học viên chính thức HanoiBA',
     },
     {
       value: '100+ Tỷ',
@@ -230,7 +230,7 @@ export const DEFAULT_STARTUP_MOBILE_CONFIG: StartupMobileTemplateConfig = {
   appTabs: {
     b2b: {
       title: 'Sàn Thương Mại B2B',
-      desc: 'Niêm yết hơn 500+ sản phẩm & dịch vụ độc quyền từ các doanh nghiệp hội viên',
+      desc: 'Niêm yết hơn 500+ sản phẩm & dịch vụ độc quyền từ các doanh nghiệp Học viên',
       stat: '500+ Sản phẩm B2B',
       items: [
         {
@@ -274,12 +274,12 @@ export const DEFAULT_STARTUP_MOBILE_CONFIG: StartupMobileTemplateConfig = {
     },
     card: {
       title: 'Thẻ Doanh Nhân Số & QR',
-      desc: 'Trao danh thiếp thông minh, quét mã định danh xác thực hội viên chính thức',
+      desc: 'Trao danh thiếp thông minh, quét mã định danh xác thực Học viên chính thức',
       stat: 'Định danh Chuẩn',
       items: [
         {
           name: 'Doanh nhân: Trần Tuấn Anh',
-          price: 'Hội viên Vàng',
+          price: 'Học viên Vàng',
           author: 'ViConnect Group',
         },
         {
@@ -321,7 +321,7 @@ export const DEFAULT_STARTUP_MOBILE_CONFIG: StartupMobileTemplateConfig = {
     {
       id: 'hanoi',
       name: 'Hà Nội — Trụ Sở Chính',
-      count: '1.250+ Hội viên',
+      count: '1.250+ Học viên',
       desc: 'Cung Tri Thức, Số 1 Tôn Thất Thuyết, Cầu Giấy',
       x: '48%',
       y: '22%',
@@ -329,7 +329,7 @@ export const DEFAULT_STARTUP_MOBILE_CONFIG: StartupMobileTemplateConfig = {
     {
       id: 'haiphong',
       name: 'Hải Phòng & Quảng Ninh',
-      count: '210+ Hội viên',
+      count: '210+ Học viên',
       desc: 'Cụm Công nghiệp & Cảng biển Logistics Đông Bắc',
       x: '55%',
       y: '27%',
@@ -337,7 +337,7 @@ export const DEFAULT_STARTUP_MOBILE_CONFIG: StartupMobileTemplateConfig = {
     {
       id: 'danang',
       name: 'Đà Nẵng & Miền Trung',
-      count: '185+ Hội viên',
+      count: '185+ Học viên',
       desc: 'Trung tâm xúc tiến đầu tư Du lịch & Dịch vụ',
       x: '57%',
       y: '48%',
@@ -345,7 +345,7 @@ export const DEFAULT_STARTUP_MOBILE_CONFIG: StartupMobileTemplateConfig = {
     {
       id: 'hcm',
       name: 'TP. Hồ Chí Minh',
-      count: '320+ Hội viên',
+      count: '320+ Học viên',
       desc: 'VP Đại diện Phía Nam & Kết nối thị trường tài chính',
       x: '52%',
       y: '78%',
@@ -353,7 +353,7 @@ export const DEFAULT_STARTUP_MOBILE_CONFIG: StartupMobileTemplateConfig = {
     {
       id: 'cantho',
       name: 'Cần Thơ & ĐBSCL',
-      count: '95+ Hội viên',
+      count: '95+ Học viên',
       desc: 'Mạng lưới kết nối Nông sản & Xuất khẩu',
       x: '46%',
       y: '85%',
@@ -408,7 +408,7 @@ export const DEFAULT_STARTUP_MOBILE_CONFIG: StartupMobileTemplateConfig = {
   testimonials: [
     {
       quote:
-        'Nền tảng số hóa của CLB giúp các hội viên trao đổi cơ hội kinh doanh chỉ trong 1 chạm. Qua các phiên Business Matching và chia sẻ cơ hội B2B, doanh nghiệp tôi đã kết nối thành công nhiều hợp đồng chiến lược giá trị cao.',
+        'Nền tảng số hóa của CLB giúp các Học viên trao đổi cơ hội kinh doanh chỉ trong 1 chạm. Qua các phiên Business Matching và chia sẻ cơ hội B2B, doanh nghiệp tôi đã kết nối thành công nhiều hợp đồng chiến lược giá trị cao.',
       author: 'Trần Tuấn Anh',
       role: 'Phó Chủ Tịch CLB, CEO ViConnect Tech',
       company: 'Ban Điều Hành CEO HN10',
@@ -438,7 +438,7 @@ export const DEFAULT_STARTUP_MOBILE_CONFIG: StartupMobileTemplateConfig = {
     },
     {
       quote:
-        'Các chương trình CEO Talk, Business Tour và tọa đàm chuyên đề mang lại giá trị tri thức thực chiến vô cùng quý báu, giúp các doanh nghiệp hội viên tự tin tháo gỡ điểm nghẽn và bứt phá mạnh mẽ.',
+        'Các chương trình CEO Talk, Business Tour và tọa đàm chuyên đề mang lại giá trị tri thức thực chiến vô cùng quý báu, giúp các doanh nghiệp Học viên tự tin tháo gỡ điểm nghẽn và bứt phá mạnh mẽ.',
       author: 'Đỗ Minh Đức',
       role: 'Trưởng Ban Đào Tạo & Doanh Trí',
       company: 'Ban Chuyên Môn CEO HN10',
@@ -460,13 +460,13 @@ export const DEFAULT_STARTUP_MOBILE_CONFIG: StartupMobileTemplateConfig = {
         'Sứ mệnh của CLB là kiến tạo cộng đồng doanh nhân bản lĩnh, trí tuệ và nhân văn. Các hoạt động cốt lõi gồm: Xúc tiến giao thương B2B (Business Matching & Business Tour), Đào tạo nâng tầm quản trị (CEO Talk & CEO Exchange), Đặt lịch hẹn 1-on-1 giữa các lãnh đạo và các hoạt động trách nhiệm xã hội CSR (Áo ấm vùng cao, xây nhà tình nghĩa).',
     },
     {
-      question: 'Điều kiện để gia nhập trở thành Hội viên chính thức của CLB?',
+      question: 'Điều kiện để gia nhập trở thành Học viên chính thức của CLB?',
       answer:
-        'Hội viên là các Doanh nhân, Chủ tịch HĐQT, CEO, Tổng giám đốc hoặc Cấp quản lý doanh nghiệp sinh năm 1983 (Quý Hợi). Hồ sơ gia nhập sẽ được Ban Thẩm định và Ban Điều hành phê duyệt theo đúng quy chế hiệp hội của HanoiBA.',
+        'Học viên là các Doanh nhân, Chủ tịch HĐQT, CEO, Tổng giám đốc hoặc Cấp quản lý doanh nghiệp sinh năm 1983 (Quý Hợi). Hồ sơ gia nhập sẽ được Ban Thẩm định và Ban Điều hành phê duyệt theo đúng quy chế hiệp hội của HanoiBA.',
     },
     {
       question:
-        'Ứng dụng di động CEO HN10 mang lại những lợi ích gì cho hội viên?',
+        'Ứng dụng di động CEO HN10 mang lại những lợi ích gì cho Học viên?',
       answer:
         'Ứng dụng cung cấp trọn vẹn giải pháp số hóa: Thẻ Doanh nhân số & mã QR định danh cá nhân, Sàn thương mại B2B niêm yết sản phẩm/dịch vụ ưu đãi nội khối 15-30%, công cụ đặt lịch hẹn kết nối 1-on-1 trực tiếp, biểu đồ thống kê cơ hội minh bạch và thông báo đẩy lịch sự kiện thời gian thực.',
     },
@@ -474,7 +474,7 @@ export const DEFAULT_STARTUP_MOBILE_CONFIG: StartupMobileTemplateConfig = {
       question:
         'Làm thế nào để doanh nghiệp tôi có thể niêm yết sản phẩm trên Sàn B2B?',
       answer:
-        'Sau khi hoàn tất đăng ký hội viên chính thức và được Ban Thẩm định hồ sơ thông qua, doanh nghiệp được cấp tài khoản định danh để tự động đăng tải sản phẩm/dịch vụ lên Sàn B2B.',
+        'Sau khi hoàn tất đăng ký Học viên chính thức và được Ban Thẩm định hồ sơ thông qua, doanh nghiệp được cấp tài khoản định danh để tự động đăng tải sản phẩm/dịch vụ lên Sàn B2B.',
     },
   ],
   footer: {
@@ -679,7 +679,7 @@ const DEFAULT_SUB_SCREENS: LandingSubScreen[] = [
     subtitle:
       'Chương trình hợp tác độc quyền cùng Hiệp hội Doanh nhân CEO HN10',
     layout: 'article',
-    contentHtml: `<p>Nhận ngay ưu đãi 25% cho tất cả hội viên CEO HN10 khi đặt dịch vụ nghỉ dưỡng cao cấp và tour khám phá quốc tế.</p>`,
+    contentHtml: `<p>Nhận ngay ưu đãi 25% cho tất cả Học viên CEO HN10 khi đặt dịch vụ nghỉ dưỡng cao cấp và tour khám phá quốc tế.</p>`,
     ctaButton: { label: 'Nhận Mã Ưu Đãi', action: 'claim_offer' },
   },
   {
@@ -695,7 +695,7 @@ const SETTINGS_KEY = 'crm_landing_webs_configs';
 
 @Injectable()
 export class LandingService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   /**
    * Lấy toàn bộ danh sách Landing Web đã cấu hình
@@ -812,9 +812,9 @@ export class LandingService {
     slug: string;
     subdomain?: string;
     template?:
-      | 'timed_cards_opening'
-      | 'ceohn10_executive'
-      | 'startup_mobile_showcase';
+    | 'timed_cards_opening'
+    | 'ceohn10_executive'
+    | 'startup_mobile_showcase';
   }): Promise<LandingWebConfig> {
     const list = await this.getAllLandingWebs();
 
@@ -1199,119 +1199,119 @@ export class LandingService {
       navMenu:
         isCeo || isStartupMobile
           ? [
-              {
-                id: 'm-1',
-                label: 'Trang Chủ',
-                active: true,
-                type: 'link',
-                url: '#home',
-              },
-              {
-                id: 'm-2',
-                label: 'Hệ Sinh Thái App',
-                type: 'tree_dropdown',
-                children: [
-                  {
-                    id: 'm-2-1',
-                    label: 'Sàn Thương Mại B2B',
-                    badge: 'Hot',
-                    type: 'modal_screen',
-                    subScreenId: 'scr-b2b',
-                    children: [
-                      {
-                        id: 'm-2-1-1',
-                        label: 'Phần mềm & Chuyển đổi số',
-                        type: 'modal_screen',
-                        subScreenId: 'scr-erp',
-                      },
-                      {
-                        id: 'm-2-1-2',
-                        label: 'Thiết bị & Vật tư IoT',
-                        type: 'modal_screen',
-                        subScreenId: 'scr-iot',
-                      },
-                    ],
-                  },
-                  {
-                    id: 'm-2-2',
-                    label: 'Lịch Gặp & Kết Nối 1-on-1',
-                    type: 'modal_screen',
-                    subScreenId: 'scr-connect',
-                  },
-                  {
-                    id: 'm-2-3',
-                    label: 'Thẻ Doanh Nhân Số & QR',
-                    type: 'modal_screen',
-                    subScreenId: 'scr-card',
-                  },
-                ],
-              },
-              {
-                id: 'm-3',
-                label: 'Ban Điều Hành',
-                type: 'modal_screen',
-                subScreenId: 'scr-board',
-              },
-              { id: 'm-4', label: 'Hỏi Đáp FAQ', type: 'link', url: '#faq' },
-              {
-                id: 'm-5',
-                label: 'Tải Ứng Dụng',
-                type: 'link',
-                url: '#download',
-              },
-            ]
+            {
+              id: 'm-1',
+              label: 'Trang Chủ',
+              active: true,
+              type: 'link',
+              url: '#home',
+            },
+            {
+              id: 'm-2',
+              label: 'Hệ Sinh Thái App',
+              type: 'tree_dropdown',
+              children: [
+                {
+                  id: 'm-2-1',
+                  label: 'Sàn Thương Mại B2B',
+                  badge: 'Hot',
+                  type: 'modal_screen',
+                  subScreenId: 'scr-b2b',
+                  children: [
+                    {
+                      id: 'm-2-1-1',
+                      label: 'Phần mềm & Chuyển đổi số',
+                      type: 'modal_screen',
+                      subScreenId: 'scr-erp',
+                    },
+                    {
+                      id: 'm-2-1-2',
+                      label: 'Thiết bị & Vật tư IoT',
+                      type: 'modal_screen',
+                      subScreenId: 'scr-iot',
+                    },
+                  ],
+                },
+                {
+                  id: 'm-2-2',
+                  label: 'Lịch Gặp & Kết Nối 1-on-1',
+                  type: 'modal_screen',
+                  subScreenId: 'scr-connect',
+                },
+                {
+                  id: 'm-2-3',
+                  label: 'Thẻ Doanh Nhân Số & QR',
+                  type: 'modal_screen',
+                  subScreenId: 'scr-card',
+                },
+              ],
+            },
+            {
+              id: 'm-3',
+              label: 'Ban Điều Hành',
+              type: 'modal_screen',
+              subScreenId: 'scr-board',
+            },
+            { id: 'm-4', label: 'Hỏi Đáp FAQ', type: 'link', url: '#faq' },
+            {
+              id: 'm-5',
+              label: 'Tải Ứng Dụng',
+              type: 'link',
+              url: '#download',
+            },
+          ]
           : DEFAULT_TIMED_CARDS_NAV,
       slides: isCeo
         ? [
-            {
-              id: 's-1',
-              place: 'HÀ NỘI — VIỆT NAM',
-              title1: 'KẾT NỐI',
-              title2: 'DOANH NHÂN 1983',
-              description:
-                'Cộng đồng Doanh nhân CEO HN10 quy tụ các nhà sáng lập, lãnh đạo doanh nghiệp sinh năm 1983 tiên phong đổi mới, cùng nhau kiến tạo chuỗi giá trị và liên kết giao thương bền vững trực thuộc HanoiBA.',
-              image:
-                'https://ceohn10.viconnect.vn/ceohn10_hero_daylight_skyline.jpg',
-              ctaText: 'Gia Nhập Ngay',
-              ctaLink: '#register',
-            },
-            {
-              id: 's-2',
-              place: 'SÀN THƯƠNG MẠI NỘI KHỐI',
-              title1: 'SẢN PHẨM',
-              title2: 'TIÊU BIỂU B2B',
-              description:
-                'Không gian kết nối giao thương nội khối, giới thiệu sản phẩm dịch vụ tiêu biểu và chuyển giao công nghệ giữa các thành viên với chính sách ưu đãi đặc quyền tối ưu.',
-              image:
-                'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?q=80&w=1600',
-              ctaText: 'Xem Gian Hàng',
-              ctaLink: '#products',
-            },
-            {
-              id: 's-3',
-              place: 'DIỄN ĐÀN THƯỜNG NIÊN',
-              title1: 'LEADERSHIP',
-              title2: 'SUMMIT 2026',
-              description:
-                'Sự kiện thường niên hội tụ các chuyên gia kinh tế, nhà hoạch định chiến lược và hơn 500 doanh nhân tiêu biểu thảo luận về xu hướng thị trường và cơ hội chuyển đổi số.',
-              image:
-                'https://images.unsplash.com/photo-1511578314322-379afb476865?q=80&w=1600',
-              ctaText: 'Đăng Ký Tham Dự',
-              ctaLink: '#events',
-            },
-            {
-              id: 's-4',
-              place: 'HỢP TÁC CHIẾN LƯỢC',
-              title1: 'GIAO THƯƠNG',
-              title2: 'B2B MATCHING',
-              description:
-                'Cơ chế ghép cặp B2B 1-on-1, trao đổi cơ hội kinh doanh thực chiến và thúc đẩy các gói hợp đồng giao thương quy mô hàng chục tỷ đồng minh bạch, hiệu quả.',
-              image:
-                'https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=1600',
-              ctaText: 'Lên Lịch Kết Nối',
-              ctaLink: '#matching',
-            },
-          ]
+          {
+            id: 's-1',
+            place: 'HÀ NỘI — VIỆT NAM',
+            title1: 'KẾT NỐI',
+            title2: 'DOANH NHÂN 1983',
+            description:
+              'Cộng đồng Doanh nhân CEO HN10 quy tụ các nhà sáng lập, lãnh đạo doanh nghiệp sinh năm 1983 tiên phong đổi mới, cùng nhau kiến tạo chuỗi giá trị và liên kết giao thương bền vững trực thuộc HanoiBA.',
+            image:
+              'https://ceohn10.viconnect.vn/ceohn10_hero_daylight_skyline.jpg',
+            ctaText: 'Gia Nhập Ngay',
+            ctaLink: '#register',
+          },
+          {
+            id: 's-2',
+            place: 'SÀN THƯƠNG MẠI NỘI KHỐI',
+            title1: 'SẢN PHẨM',
+            title2: 'TIÊU BIỂU B2B',
+            description:
+              'Không gian kết nối giao thương nội khối, giới thiệu sản phẩm dịch vụ tiêu biểu và chuyển giao công nghệ giữa các thành viên với chính sách ưu đãi đặc quyền tối ưu.',
+            image:
+              'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?q=80&w=1600',
+            ctaText: 'Xem Gian Hàng',
+            ctaLink: '#products',
+          },
+          {
+            id: 's-3',
+            place: 'DIỄN ĐÀN THƯỜNG NIÊN',
+            title1: 'LEADERSHIP',
+            title2: 'SUMMIT 2026',
+            description:
+              'Sự kiện thường niên hội tụ các chuyên gia kinh tế, nhà hoạch định chiến lược và hơn 500 doanh nhân tiêu biểu thảo luận về xu hướng thị trường và cơ hội chuyển đổi số.',
+            image:
+              'https://images.unsplash.com/photo-1511578314322-379afb476865?q=80&w=1600',
+            ctaText: 'Đăng Ký Tham Dự',
+            ctaLink: '#events',
+          },
+          {
+            id: 's-4',
+            place: 'HỢP TÁC CHIẾN LƯỢC',
+            title1: 'GIAO THƯƠNG',
+            title2: 'B2B MATCHING',
+            description:
+              'Cơ chế ghép cặp B2B 1-on-1, trao đổi cơ hội kinh doanh thực chiến và thúc đẩy các gói hợp đồng giao thương quy mô hàng chục tỷ đồng minh bạch, hiệu quả.',
+            image:
+              'https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=1600',
+            ctaText: 'Lên Lịch Kết Nối',
+            ctaLink: '#matching',
+          },
+        ]
         : DEFAULT_TIMED_CARDS_SLIDES,
       subScreens: DEFAULT_SUB_SCREENS,
       apiConfig: {

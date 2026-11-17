@@ -103,7 +103,7 @@ export const MemberPerkCreateModal: React.FC<MemberPerkCreateModalProps> = ({
   const [percentRate, setPercentRate] = useState("20");
   const [cashAmount, setCashAmount] = useState("500000");
   const [giftDetail, setGiftDetail] = useState("Tặng 01 Bộ Quà Doanh Nhân Cao Cấp");
-  const [partner, setPartner] = useState(defaultCompanyName || "Doanh Nghiệp Hội Viên CEO HN10");
+  const [partner, setPartner] = useState(defaultCompanyName || "Doanh Nghiệp Học viên CEO HN10");
   const [category, setCategory] = useState(CATEGORIES[0]);
   const [productName, setProductName] = useState("");
   const [applicableLocation, setApplicableLocation] = useState("Tại Trụ sở & Tất cả chi nhánh trên toàn quốc");
@@ -176,7 +176,7 @@ export const MemberPerkCreateModal: React.FC<MemberPerkCreateModalProps> = ({
         validFrom,
         validUntil,
         qrPayload,
-        creatorName: defaultMemberName || "Hội viên CEO HN10",
+        creatorName: defaultMemberName || "Học viên CEO HN10",
         status: "active",
         createdAt: new Date().toISOString(),
       };
@@ -187,9 +187,9 @@ export const MemberPerkCreateModal: React.FC<MemberPerkCreateModalProps> = ({
         const list: MemberPerkFormData[] = existing ? JSON.parse(existing) : [];
         list.unshift(newPerk);
         localStorage.setItem("vba_member_custom_perks", JSON.stringify(list));
-      } catch {}
+      } catch { }
 
-      toast.success("✓ Đã đăng ưu đãi doanh nghiệp thành công cho toàn thể Hội viên CEO HN10!");
+      toast.success("✓ Đã đăng ưu đãi doanh nghiệp thành công cho toàn thể Học viên CEO HN10!");
       onSuccess(newPerk);
       onClose();
     } catch {
@@ -218,7 +218,7 @@ export const MemberPerkCreateModal: React.FC<MemberPerkCreateModalProps> = ({
                 </span>
               </h3>
               <p className="text-[11px] text-blue-200">
-                Chia sẻ đặc quyền ưu đãi dành riêng cho cộng đồng Hội viên
+                Chia sẻ đặc quyền ưu đãi dành riêng cho cộng đồng Học viên
               </p>
             </div>
           </div>
@@ -278,11 +278,10 @@ export const MemberPerkCreateModal: React.FC<MemberPerkCreateModalProps> = ({
                     key={dt.id}
                     type="button"
                     onClick={() => setDiscountType(dt.id)}
-                    className={`p-2.5 rounded-xl border text-left flex flex-col gap-1 transition cursor-pointer ${
-                      isSelected
+                    className={`p-2.5 rounded-xl border text-left flex flex-col gap-1 transition cursor-pointer ${isSelected
                         ? "bg-[#003B95]/10 dark:bg-blue-900/30 border-[#003B95] text-[#003B95] dark:text-blue-300 ring-1 ring-[#003B95]"
                         : "bg-slate-50 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100"
-                    }`}
+                      }`}
                   >
                     <div className="flex items-center justify-between">
                       <Icon className="size-4" />
@@ -306,11 +305,10 @@ export const MemberPerkCreateModal: React.FC<MemberPerkCreateModalProps> = ({
                     key={rate}
                     type="button"
                     onClick={() => setPercentRate(rate)}
-                    className={`px-2.5 py-1 rounded-lg text-xs font-black transition cursor-pointer ${
-                      percentRate === rate
+                    className={`px-2.5 py-1 rounded-lg text-xs font-black transition cursor-pointer ${percentRate === rate
                         ? "bg-[#DC2626] text-white shadow-sm"
                         : "bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-200"
-                    }`}
+                      }`}
                   >
                     {rate}%
                   </button>
@@ -505,7 +503,7 @@ export const MemberPerkCreateModal: React.FC<MemberPerkCreateModalProps> = ({
               rows={3}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Mô tả quyền lợi chi tiết dành cho hội viên CEO HN10, hướng dẫn xuất trình mã QR hoặc đọc mã voucher khi liên hệ..."
+              placeholder="Mô tả quyền lợi chi tiết dành cho Học viên CEO HN10, hướng dẫn xuất trình mã QR hoặc đọc mã voucher khi liên hệ..."
               className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#003B95]"
               required
             />
@@ -524,7 +522,7 @@ export const MemberPerkCreateModal: React.FC<MemberPerkCreateModalProps> = ({
                 {voucherCode} - {currentDiscountValue}
               </p>
               <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                Hội viên khác quét mã này tại điểm bán để nhận ưu đãi tức thì
+                Học viên khác quét mã này tại điểm bán để nhận ưu đãi tức thì
               </p>
             </div>
           </div>

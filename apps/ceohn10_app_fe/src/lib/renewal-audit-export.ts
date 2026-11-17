@@ -131,14 +131,14 @@ export async function exportRenewalAuditPDF(
 
   setFont("bold");
   doc.setFontSize(16);
-  doc.text(T("Nhật ký gia hạn hội viên"), margin, y);
+  doc.text(T("Nhật ký gia hạn Học viên"), margin, y);
   y += 20;
 
   setFont("normal");
   doc.setFontSize(10);
   doc.setTextColor(90);
   if (meta.memberLabel) {
-    doc.text(T(`Hội viên: ${meta.memberLabel}`), margin, y);
+    doc.text(T(`Học viên: ${meta.memberLabel}`), margin, y);
     y += 13;
   }
   doc.text(T(`Xuất lúc: ${new Date(generatedAt).toLocaleString("vi-VN")}`), margin, y);
@@ -158,8 +158,8 @@ export async function exportRenewalAuditPDF(
   doc.text(
     T(
       `Tổng: ${rows.length} sự kiện · Thanh toán: ${payments.length} (${fmtVND(total)}) · ` +
-        `Bấm lặp: ${rows.filter((r) => r.eventType === "idempotent_noop").length} · ` +
-        `Thất bại: ${rows.filter((r) => r.eventType === "failure").length}`,
+      `Bấm lặp: ${rows.filter((r) => r.eventType === "idempotent_noop").length} · ` +
+      `Thất bại: ${rows.filter((r) => r.eventType === "failure").length}`,
     ),
     margin,
     y,
@@ -179,14 +179,14 @@ export async function exportRenewalAuditPDF(
     lines.push(`${fmtDateTime(r.createdAt)} — ${EVENT_LABEL[r.eventType]}`);
     lines.push(
       `Mã tham chiếu: ${r.reference}` +
-        (r.method ? ` · Phương thức: ${r.method}` : "") +
-        (r.invoiceNo ? ` · Hóa đơn: ${r.invoiceNo}` : ""),
+      (r.method ? ` · Phương thức: ${r.method}` : "") +
+      (r.invoiceNo ? ` · Hóa đơn: ${r.invoiceNo}` : ""),
     );
     if (r.eventType === "payment" || r.amountPaid > 0) {
       lines.push(`Số tiền: ${fmtVND(r.amountPaid)}`);
     }
     if (r.previousTermEnd || r.newTermEnd) {
-      lines.push(`Hạn hội viên: ${r.previousTermEnd ?? "—"} → ${r.newTermEnd ?? "—"}`);
+      lines.push(`Hạn Học viên: ${r.previousTermEnd ?? "—"} → ${r.newTermEnd ?? "—"}`);
     }
     if (r.eventType === "idempotent_noop" && typeof r.metadata?.reason === "string") {
       lines.push(`Lý do không phát sinh: ${r.metadata.reason}`);

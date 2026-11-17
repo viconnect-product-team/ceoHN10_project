@@ -14,7 +14,7 @@ export class TasksRepository implements OnModuleInit {
   );
   private memoryCache: TaskItem[] = [];
 
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   async onModuleInit() {
     await this.ensureInitialized();
@@ -370,7 +370,7 @@ export class TasksRepository implements OnModuleInit {
 
       if (members.length === 0) {
         const vUsers = await this.prisma.$queryRaw<any[]>`
-          SELECT id, name, email, phone, avatar_url, 'Ban Điều Hành' as department, 'Hội viên' as position, '' as company, id as user_id
+          SELECT id, name, email, phone, avatar_url, 'Ban Điều Hành' as department, 'Học viên' as position, '' as company, id as user_id
           FROM public.vione_users
           LIMIT 100
         `.catch(() => []);

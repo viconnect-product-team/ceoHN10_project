@@ -39,8 +39,8 @@ export const Route = createFileRoute("/association/renew/result")({
 
 const ERROR_MESSAGES: Record<string, string> = {
   "gateway-declined": "Cổng thanh toán từ chối giao dịch. Chưa có khoản tiền nào bị trừ.",
-  "no-member": "Không tìm thấy hồ sơ hội viên tương ứng với tài khoản của bạn.",
-  timeout: "Giao dịch quá thời gian chờ. Hạn hội viên chưa được gia hạn.",
+  "no-member": "Không tìm thấy hồ sơ Học viên tương ứng với tài khoản của bạn.",
+  timeout: "Giao dịch quá thời gian chờ. Hạn Học viên chưa được gia hạn.",
   network: "Không kết nối được máy chủ thanh toán. Vui lòng thử lại.",
 };
 
@@ -128,11 +128,10 @@ function ResultScreen() {
 
       <div className="flex flex-col items-center px-4 pt-10 text-center">
         <span
-          className={`grid h-20 w-20 place-items-center rounded-full ${
-            ok
+          className={`grid h-20 w-20 place-items-center rounded-full ${ok
               ? "bg-[var(--vba-success,#4ade80)]/15 text-[var(--vba-success,#4ade80)]"
               : "bg-destructive/15 text-destructive"
-          }`}
+            }`}
         >
           {ok ? <CheckCircle2 className="h-11 w-11" /> : <XCircle className="h-11 w-11" />}
         </span>

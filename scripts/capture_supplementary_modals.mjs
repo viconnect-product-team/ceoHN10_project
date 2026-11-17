@@ -34,7 +34,7 @@ async function main() {
     await crmPage.waitForTimeout(2000);
     await crmPage.screenshot({ path: path.join(screenshotsDir, 'crm_03_department_create_modal.png') });
     const closeBtn = crmPage.locator('button:has-text("Hủy"), button[aria-label="Close"], button:has-text("Đóng")').first();
-    if (await closeBtn.isVisible().catch(() => false)) await closeBtn.click().catch(() => {});
+    if (await closeBtn.isVisible().catch(() => false)) await closeBtn.click().catch(() => { });
   }
 
   // 2. Modal Thêm Tài Khoản Vận Hành
@@ -47,11 +47,11 @@ async function main() {
     await crmPage.waitForTimeout(2000);
     await crmPage.screenshot({ path: path.join(screenshotsDir, 'crm_04_account_create_modal.png') });
     const closeBtn = crmPage.locator('button:has-text("Hủy"), button[aria-label="Close"], button:has-text("Đóng")').first();
-    if (await closeBtn.isVisible().catch(() => false)) await closeBtn.click().catch(() => {});
+    if (await closeBtn.isVisible().catch(() => false)) await closeBtn.click().catch(() => { });
   }
 
-  // 3. Chi tiết Hội viên / Duyệt hồ sơ
-  console.log('3. Chụp Chi Tiết Hội Viên...');
+  // 3. Chi tiết Học viên / Duyệt hồ sơ
+  console.log('3. Chụp Chi Tiết Học viên...');
   await crmPage.goto('https://crm.ceohn10.viconnect.vn/members', { waitUntil: 'networkidle', timeout: 30000 });
   await crmPage.waitForTimeout(3500);
   const viewMemberBtn = crmPage.locator('table tr a, table tr button[title*="Xem"], table tr button:has-text("Xem"), table tr td:first-child').first();
@@ -86,7 +86,7 @@ async function main() {
   await crmContext.close();
 
   // Mobile: Cuộn xuống form đăng ký gia nhập
-  console.log('6. Chụp Mobile Đơn Đăng Ký Hội Viên...');
+  console.log('6. Chụp Mobile Đơn Đăng Ký Học viên...');
   const mobileContext = await browser.newContext({
     viewport: { width: 390, height: 844 },
     deviceScaleFactor: 2,

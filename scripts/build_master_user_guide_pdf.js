@@ -220,7 +220,7 @@ function generateMasterHtml() {
         <span class="sub">TÀI LIỆU HƯỚNG DẪN SỬ DỤNG CHI TIẾT CRM & MOBILE APP</span>
       </h1>
       <p class="subtitle">
-        Tài liệu đào tạo và vận hành chuẩn mực trên toàn hệ sinh thái số hóa (bao gồm <a href="https://14.225.217.232:5444/landing?apply=%22true%22" target="_blank" style="color: #FFD700; text-decoration: underline; font-weight: 700;">Cổng Tiếp Nhận Hồ Sơ Gia Nhập CLB Doanh Nhân CEO HN10 Trực Tuyến</a>, Cổng Quản Trị Trung Tâm Web CRM và Ứng Dụng Di Động Hội Viên PWA). Hướng dẫn chi tiết đầy đủ 16 phân hệ: Tiếp nhận nộp đơn gửi email ngay (<code>vuvp090120@gmail.com</code>), Admin duyệt cấp mã CEO-83xxx, Khách ngoài (<code>thuylt313@gmail.com</code>) đăng ký vé miễn phí / có phí VietQR 1.500.000đ, Hội viên đăng ký vé VIP giữ ghế Cinema Seating Map, Soát vé an ninh QR, Thẻ VIP NFC 3D, Chợ B2B Marketplace, Bảng tin Cung - Cầu 1-on-1, Banner Marketing, Quản lý Lịch họp, Biểu quyết trực tuyến và Sổ quỹ Thu - Chi Cashbook.
+        Tài liệu đào tạo và vận hành chuẩn mực trên toàn hệ sinh thái số hóa (bao gồm <a href="https://14.225.217.232:5444/landing?apply=%22true%22" target="_blank" style="color: #FFD700; text-decoration: underline; font-weight: 700;">Cổng Tiếp Nhận Hồ Sơ Gia Nhập CLB Doanh Nhân CEO HN10 Trực Tuyến</a>, Cổng Quản Trị Trung Tâm Web CRM và Ứng Dụng Di Động Học viên PWA). Hướng dẫn chi tiết đầy đủ 16 phân hệ: Tiếp nhận nộp đơn gửi email ngay (<code>vuvp090120@gmail.com</code>), Admin duyệt cấp mã CEO-83xxx, Khách ngoài (<code>thuylt313@gmail.com</code>) đăng ký vé miễn phí / có phí VietQR 1.500.000đ, Học viên đăng ký vé VIP giữ ghế Cinema Seating Map, Soát vé an ninh QR, Thẻ VIP NFC 3D, Chợ B2B Marketplace, Bảng tin Cung - Cầu 1-on-1, Banner Marketing, Quản lý Lịch họp, Biểu quyết trực tuyến và Sổ quỹ Thu - Chi Cashbook.
       </p>
       
       <div class="meta-info">
@@ -239,7 +239,7 @@ function generateMasterHtml() {
           </tr>
           <tr>
             <td class="label">Đối tượng sử dụng:</td>
-            <td><strong>Ban Điều Hành, Ban Thư Ký, 7 Ban Chuyên Môn, Hội Viên VIP & Khách Mời Doanh Nhân</strong></td>
+            <td><strong>Ban Điều Hành, Ban Thư Ký, 7 Ban Chuyên Môn, Học viên VIP & Khách Mời Doanh Nhân</strong></td>
           </tr>
           <tr>
             <td class="label">Phiên bản tài liệu:</td>
@@ -266,11 +266,11 @@ function generateMasterHtml() {
       <a class="toc-item" href="#sec-03"><span class="toc-index">03</span><span class="toc-text">Đăng Nhập Lần Đầu, Quy Trình Onboarding & Cập Nhật Hồ Sơ Doanh Nhân VIP Trên App</span><span class="toc-page">Chương 03</span></a>
       <a class="toc-item" href="#sec-04"><span class="toc-index">04</span><span class="toc-text">Sự Kiện Luồng 1: Khách Ngoài (thuylt313@gmail.com) Đăng Ký Vé Miễn Phí (Mã E-Ticket & QR Mail)</span><span class="toc-page">Chương 04</span></a>
       <a class="toc-item" href="#sec-05"><span class="toc-index">05</span><span class="toc-text">Sự Kiện Luồng 2: Khách Ngoài (thuylt313@gmail.com) Đăng Ký Vé Có Phí (VietQR Napas 1.500.000đ)</span><span class="toc-page">Chương 05</span></a>
-      <a class="toc-item" href="#sec-06"><span class="toc-index">06</span><span class="toc-text">Sự Kiện Luồng 3: Hội Viên Chính Thức (Đã Đăng Nhập) Đăng Ký Vé VIP & Giữ Chỗ Tự Động</span><span class="toc-page">Chương 06</span></a>
+      <a class="toc-item" href="#sec-06"><span class="toc-index">06</span><span class="toc-text">Sự Kiện Luồng 3: Học viên Chính Thức (Đã Đăng Nhập) Đăng Ký Vé VIP & Giữ Chỗ Tự Động</span><span class="toc-page">Chương 06</span></a>
       <a class="toc-item" href="#sec-07"><span class="toc-index">07</span><span class="toc-text">Sơ Đồ Chỗ Ngồi Cinema Seating Map & Phân Khu Xếp Bàn Tiệc Gala VIP Trên Cổng CRM</span><span class="toc-page">Chương 07</span></a>
       <a class="toc-item" href="#sec-08"><span class="toc-index">08</span><span class="toc-text">Soát Vé An Ninh Check-in Cổng Thông Minh (Xanh Hợp Lệ 0.5s / Đỏ Cảnh Báo Trùng Vé)</span><span class="toc-page">Chương 08</span></a>
-      <a class="toc-item" href="#sec-09"><span class="toc-index">09</span><span class="toc-text">Thẻ Hội Viên VIP 3D Hoàng Gia, Danh Thiếp Số Độc Bản & Kết Nối Chạm Chạm NFC 1-Giây</span><span class="toc-page">Chương 09</span></a>
-      <a class="toc-item" href="#sec-10"><span class="toc-index">10</span><span class="toc-text">Sàn Giao Thương B2B Shopee-Style: Hội Viên Đăng Bán & CRM Phê Duyệt Xuất Bản Sản Phẩm</span><span class="toc-page">Chương 10</span></a>
+      <a class="toc-item" href="#sec-09"><span class="toc-index">09</span><span class="toc-text">Thẻ Học viên VIP 3D Hoàng Gia, Danh Thiếp Số Độc Bản & Kết Nối Chạm Chạm NFC 1-Giây</span><span class="toc-page">Chương 09</span></a>
+      <a class="toc-item" href="#sec-10"><span class="toc-index">10</span><span class="toc-text">Sàn Giao Thương B2B Shopee-Style: Học viên Đăng Bán & CRM Phê Duyệt Xuất Bản Sản Phẩm</span><span class="toc-page">Chương 10</span></a>
       <a class="toc-item" href="#sec-11"><span class="toc-index">11</span><span class="toc-text">Bảng Tin Cơ Hội Kinh Doanh Cung - Cầu & Đặt Lịch Hẹn Giao Thương 1-on-1 Meeting</span><span class="toc-page">Chương 11</span></a>
       <a class="toc-item" href="#sec-12"><span class="toc-index">12</span><span class="toc-text">Phân Hệ Marketing, Quản Trị Banner Carousel Tự Động & Gói Tài Trợ Kim Cương/Vàng/Bạc</span><span class="toc-page">Chương 12</span></a>
       <a class="toc-item" href="#sec-13"><span class="toc-index">13</span><span class="toc-text">Điều Hành Lịch Họp Giao Ban Tập Trung, Chống Trùng Phòng Họp & Điểm Danh QR Code</span><span class="toc-page">Chương 13</span></a>
@@ -284,10 +284,10 @@ function generateMasterHtml() {
   <section class="trn-section" id="sec-01">
     <span class="trn-tag">CHƯƠNG 01</span>
     <h2 class="trn-h2">Tổng Quan Hệ Sinh Thái Đa Nền Tảng & Ma Trận Phân Quyền RBAC</h2>
-    <span class="trn-h3">Kiến trúc kết nối thời gian thực giữa Cổng Quản Trị Web CRM và Ứng Dụng Di Động Hội Viên PWA</span>
+    <span class="trn-h3">Kiến trúc kết nối thời gian thực giữa Cổng Quản Trị Web CRM và Ứng Dụng Di Động Học viên PWA</span>
     
     <div class="trn-goal">
-      <strong>MỤC TIÊU NGHIỆP VỤ:</strong> Nắm vững cấu trúc kết nối đa nền tảng giữa Web CRM dành cho Ban Quản Trị và Mobile App dành cho Hội viên, cùng ma trận phân định quyền hạn 10 nhóm vai trò (RBAC) để vận hành chính xác, tránh chồng chéo thẩm quyền.
+      <strong>MỤC TIÊU NGHIỆP VỤ:</strong> Nắm vững cấu trúc kết nối đa nền tảng giữa Web CRM dành cho Ban Quản Trị và Mobile App dành cho Học viên, cùng ma trận phân định quyền hạn 10 nhóm vai trò (RBAC) để vận hành chính xác, tránh chồng chéo thẩm quyền.
     </div>
 
     <div class="trn-path">
@@ -297,7 +297,7 @@ function generateMasterHtml() {
     <div class="trn-sec-title">1. Hai Cấu Phần Nền Tảng Trong Hệ Sinh Thái CEO HN10</div>
     <ul class="trn-steps">
       <li><strong>Cổng Quản Trị Trung Tâm (Web CRM):</strong> Dành riêng cho Ban Điều Hành, Ban Thư Ký và Ban Quản Trị. Cung cấp bộ công cụ thẩm định hồ sơ kết nạp, cấu hình vé sự kiện, thiết kế sơ đồ ghế Cinema Seating Map, quản lý sổ quỹ thu - chi 3 cấp, mở đợt biểu quyết đại hội và giám sát an ninh.</li>
-      <li><strong>Ứng Dụng Di Động Hội Viên (CEO HN10 Mobile App):</strong> Văn phòng số bỏ túi cho từng chủ doanh nghiệp: Thẻ hội viên VIP 3D, danh thiếp số chạm NFC, chợ B2B Shopee-style, bảng tin cơ hội cung - cầu, đặt lịch hẹn 1-on-1, nhận vé sự kiện điện tử và biểu quyết trực tuyến.</li>
+      <li><strong>Ứng Dụng Di Động Học viên (CEO HN10 Mobile App):</strong> Văn phòng số bỏ túi cho từng chủ doanh nghiệp: Thẻ Học viên VIP 3D, danh thiếp số chạm NFC, chợ B2B Shopee-style, bảng tin cơ hội cung - cầu, đặt lịch hẹn 1-on-1, nhận vé sự kiện điện tử và biểu quyết trực tuyến.</li>
     </ul>
     
     <div class="shot-wrap">
@@ -307,7 +307,7 @@ function generateMasterHtml() {
       </figure>
       <figure class="shot">
         <img src="${getImgSrc('live_05_crm_dashboard_overview.png')}" alt="Dashboard Tổng quan Web CRM">
-        <figcaption><strong>Hình 1.2:</strong> Dashboard Trung tâm Chỉ huy Web CRM tổng hợp các chỉ số KPI: Tổng số hội viên, Hội viên hoạt động, Doanh số giao thương B2B và Sổ quỹ hội phí thường niên theo thời gian thực.</figcaption>
+        <figcaption><strong>Hình 1.2:</strong> Dashboard Trung tâm Chỉ huy Web CRM tổng hợp các chỉ số KPI: Tổng số Học viên, Học viên hoạt động, Doanh số giao thương B2B và Sổ quỹ hội phí thường niên theo thời gian thực.</figcaption>
       </figure>
       <figure class="shot">
         <img src="${getImgSrc('live_35_crm_rbac_roles_permissions.png')}" alt="Ma trận phân quyền RBAC trên Web CRM">
@@ -335,7 +335,7 @@ function generateMasterHtml() {
         <tr>
           <td><strong>THANH_VIEN_BAN</strong></td>
           <td>Ban Thành Viên (BTV)</td>
-          <td><strong>Thẩm định hồ sơ kết nạp, kiểm duyệt hội viên, cấp mã M1983 và kích hoạt tài khoản</strong> (Đơn vị duy nhất có thẩm quyền duyệt).</td>
+          <td><strong>Thẩm định hồ sơ kết nạp, kiểm duyệt Học viên, cấp mã M1983 và kích hoạt tài khoản</strong> (Đơn vị duy nhất có thẩm quyền duyệt).</td>
           <td>CRM & Mobile App</td>
         </tr>
         <tr>
@@ -364,7 +364,7 @@ function generateMasterHtml() {
         </tr>
         <tr>
           <td><strong>HOI_VIEN</strong></td>
-          <td>Hội Viên Doanh Nhân Chính Thức</td>
+          <td>Học viên Doanh Nhân Chính Thức</td>
           <td>Sở hữu Thẻ VIP 3D, danh thiếp số công khai, đăng bán B2B, đăng cơ hội Cung - Cầu, đặt hẹn 1-1, bỏ phiếu bầu cử.</td>
           <td>Mobile App</td>
         </tr>
@@ -396,14 +396,14 @@ function generateMasterHtml() {
           <td><code>ceo.tongthuky@ceohn10.com</code></td>
           <td><code>123456</code></td>
           <td><span class="role-badge role-admin">BTK</span></td>
-          <td>Điều phối lịch họp giao ban, chống trùng phòng họp, điểm danh QR, văn bản hành chính (<strong>TUYỆT ĐỐI KHÔNG duyệt hội viên</strong>).</td>
+          <td>Điều phối lịch họp giao ban, chống trùng phòng họp, điểm danh QR, văn bản hành chính (<strong>TUYỆT ĐỐI KHÔNG duyệt Học viên</strong>).</td>
         </tr>
         <tr>
           <td><strong>Ban Thành Viên</strong></td>
           <td><code>ceo.thanhvien@ceohn10.com</code></td>
           <td><code>123456</code></td>
           <td><span class="role-badge role-admin">BTV</span></td>
-          <td><strong>THẨM ĐỊNH & PHÊ DUYỆT HỘI VIÊN KẾT NẠP</strong>, cấp mã M1983, tự động kích hoạt tài khoản và gửi email mật khẩu cho tân hội viên.</td>
+          <td><strong>THẨM ĐỊNH & PHÊ DUYỆT Học viên KẾT NẠP</strong>, cấp mã M1983, tự động kích hoạt tài khoản và gửi email mật khẩu cho tân Học viên.</td>
         </tr>
         <tr>
           <td><strong>Ban Thiện Nguyện</strong></td>
@@ -437,7 +437,7 @@ function generateMasterHtml() {
     <span class="trn-h3">Toàn trình từ nộp đơn trên Landing Page, tự động gửi email tiếp nhận, đến Ban Thành Viên thẩm định phê duyệt cấp mã M1983</span>
     
     <div class="trn-goal">
-      <strong>MỤC TIÊU NGHIỆP VỤ:</strong> Đảm bảo ứng viên khi nộp đơn gia nhập trên Landing Page ngay lập tức nhận được Email xác nhận tiếp nhận hồ sơ tại <code>vuvp090120@gmail.com</code>; đồng thời trên CRM, <strong>Ban Thành Viên</strong> (tài khoản <code>ceo.thanhvien@ceohn10.com</code> hoặc Ban Quản Trị) kiểm tra đối soát hồ sơ doanh nghiệp, nhấp duyệt kết nạp và hệ thống tự động bắn Email cấp tài khoản & mật khẩu ngẫu nhiên cho tân hội viên. Ban Thư Ký và các ban khác không có quyền duyệt kết nạp.
+      <strong>MỤC TIÊU NGHIỆP VỤ:</strong> Đảm bảo ứng viên khi nộp đơn gia nhập trên Landing Page ngay lập tức nhận được Email xác nhận tiếp nhận hồ sơ tại <code>vuvp090120@gmail.com</code>; đồng thời trên CRM, <strong>Ban Thành Viên</strong> (tài khoản <code>ceo.thanhvien@ceohn10.com</code> hoặc Ban Quản Trị) kiểm tra đối soát hồ sơ doanh nghiệp, nhấp duyệt kết nạp và hệ thống tự động bắn Email cấp tài khoản & mật khẩu ngẫu nhiên cho tân Học viên. Ban Thư Ký và các ban khác không có quyền duyệt kết nạp.
     </div>
 
     <div class="trn-path">
@@ -483,28 +483,28 @@ function generateMasterHtml() {
 
     <div class="trn-sec-title">Thao Tác 2: Ban Thẩm Định Phê Duyệt Hồ Sơ Trên Cổng CRM</div>
     <ol class="trn-steps">
-      <li>Cán bộ Ban Quản Trị đăng nhập Cổng Web CRM, vào phân hệ <strong>"Quản Lý Hội Viên"</strong> (<code>/members</code>).</li>
+      <li>Cán bộ Ban Quản Trị đăng nhập Cổng Web CRM, vào phân hệ <strong>"Quản Lý Học viên"</strong> (<code>/members</code>).</li>
       <li>Chọn bộ lọc trạng thái <strong>"Chờ Thẩm Định"</strong> để thấy hồ sơ của ứng viên Vũ Văn Phúc.</li>
       <li>Nhấp vào bản ghi để mở ngăn kéo chi tiết (Drawer Detail), thẩm định hồ sơ pháp lý công ty.</li>
-      <li>Nhấp nút <strong>"Phê Duyệt Kết Nạp"</strong>. Hệ thống kích hoạt cấp mã hội viên chính thức <code>HN10-089</code>, sinh mật khẩu khởi tạo ngẫu nhiên, tạo tài khoản trong <code>vione_users</code> và kích hoạt email cấp thông tin tài khoản.</li>
+      <li>Nhấp nút <strong>"Phê Duyệt Kết Nạp"</strong>. Hệ thống kích hoạt cấp mã Học viên chính thức <code>HN10-089</code>, sinh mật khẩu khởi tạo ngẫu nhiên, tạo tài khoản trong <code>vione_users</code> và kích hoạt email cấp thông tin tài khoản.</li>
     </ol>
 
     <div class="shot-wrap">
       <figure class="shot">
-        <img src="${getImgSrc('live_06_crm_members_pending_list.png')}" alt="Danh sách hội viên chờ duyệt trên CRM">
-        <figcaption><strong>Hình 2.4:</strong> Danh sách hội viên trên Cổng Web CRM (Địa chỉ: <code>/</code>) hiển thị hồ sơ ứng viên Vũ Văn Phúc ở trạng thái chờ thẩm định.</figcaption>
+        <img src="${getImgSrc('live_06_crm_members_pending_list.png')}" alt="Danh sách Học viên chờ duyệt trên CRM">
+        <figcaption><strong>Hình 2.4:</strong> Danh sách Học viên trên Cổng Web CRM (Địa chỉ: <code>/</code>) hiển thị hồ sơ ứng viên Vũ Văn Phúc ở trạng thái chờ thẩm định.</figcaption>
       </figure>
       <figure class="shot">
-        <img src="${getImgSrc('live_07_crm_member_detail_drawer.png')}" alt="Ngăn kéo chi tiết hồ sơ hội viên">
+        <img src="${getImgSrc('live_07_crm_member_detail_drawer.png')}" alt="Ngăn kéo chi tiết hồ sơ Học viên">
         <figcaption><strong>Hình 2.5:</strong> Cửa sổ Drawer hiển thị chi tiết hồ sơ thẩm định doanh nghiệp của ứng viên Vũ Văn Phúc.</figcaption>
       </figure>
       <figure class="shot">
         <img src="${getImgSrc('live_08_crm_member_approved_credentials_toast.png')}" alt="Thông báo phê duyệt kết nạp thành công">
-        <figcaption><strong>Hình 2.6:</strong> Thao tác phê duyệt hồ sơ thành công, hệ thống cấp mã hội viên <code>HN10-089</code> và thông báo toast thành công.</figcaption>
+        <figcaption><strong>Hình 2.6:</strong> Thao tác phê duyệt hồ sơ thành công, hệ thống cấp mã Học viên <code>HN10-089</code> và thông báo toast thành công.</figcaption>
       </figure>
       <figure class="shot">
         <img src="${getImgSrc('live_09_email_template_credentials_sent_vu.png')}" alt="Email template chúc mừng kết nạp gửi về vuvp090120@gmail.com">
-        <figcaption><strong>Hình 2.7:</strong> Giao diện Email Template chào mừng hội viên mới gửi về hòm thư <code>vuvp090120@gmail.com</code> kèm mã hội viên <code>HN10-089</code> và mật khẩu khởi tạo an toàn.</figcaption>
+        <figcaption><strong>Hình 2.7:</strong> Giao diện Email Template chào mừng Học viên mới gửi về hòm thư <code>vuvp090120@gmail.com</code> kèm mã Học viên <code>HN10-089</code> và mật khẩu khởi tạo an toàn.</figcaption>
       </figure>
     </div>
   </section>
@@ -516,7 +516,7 @@ function generateMasterHtml() {
     <span class="trn-h3">Kích hoạt tài khoản trên ứng dụng di động, đổi mật khẩu khởi tạo và thiết lập danh thiếp số</span>
     
     <div class="trn-goal">
-      <strong>MỤC TIÊU NGHIỆP VỤ:</strong> Hướng dẫn hội viên mới sử dụng tài khoản được cấp trong email để đăng nhập App CEO HN10, trải qua luồng Onboarding bắt buộc đổi mật khẩu an toàn và hoàn thiện hồ sơ danh thiếp số.
+      <strong>MỤC TIÊU NGHIỆP VỤ:</strong> Hướng dẫn Học viên mới sử dụng tài khoản được cấp trong email để đăng nhập App CEO HN10, trải qua luồng Onboarding bắt buộc đổi mật khẩu an toàn và hoàn thiện hồ sơ danh thiếp số.
     </div>
 
     <div class="trn-path">
@@ -682,30 +682,30 @@ function generateMasterHtml() {
   <!-- ==================== CHƯƠNG 06 ==================== -->
   <section class="trn-section" id="sec-06">
     <span class="trn-tag">CHƯƠNG 06</span>
-    <h2 class="trn-h2">Sự Kiện Luồng 3: Hội Viên Chính Thức Đăng Ký Vé VIP & Giữ Chỗ Tự Động</h2>
-    <span class="trn-h3">Quy trình hội viên đã đăng nhập nhận đặc quyền miễn phí vé hội viên, chọn vị trí ngồi và lưu vé vào Ví App</span>
+    <h2 class="trn-h2">Sự Kiện Luồng 3: Học viên Chính Thức Đăng Ký Vé VIP & Giữ Chỗ Tự Động</h2>
+    <span class="trn-h3">Quy trình Học viên đã đăng nhập nhận đặc quyền miễn phí vé Học viên, chọn vị trí ngồi và lưu vé vào Ví App</span>
     
     <div class="trn-goal">
-      <strong>MỤC TIÊU NGHIỆP VỤ:</strong> Hướng dẫn hội viên chính thức của CLB (đã đăng nhập vào App CEO HN10) đăng ký tham gia sự kiện nội bộ: Hệ thống tự động nhận diện tư cách hội viên, áp dụng chính sách miễn phí 100% hoặc giá ưu đãi nội bộ, chọn ghế VIP trên sơ đồ và lưu vé vào Ví vé điện tử trong App.
+      <strong>MỤC TIÊU NGHIỆP VỤ:</strong> Hướng dẫn Học viên chính thức của CLB (đã đăng nhập vào App CEO HN10) đăng ký tham gia sự kiện nội bộ: Hệ thống tự động nhận diện tư cách Học viên, áp dụng chính sách miễn phí 100% hoặc giá ưu đãi nội bộ, chọn ghế VIP trên sơ đồ và lưu vé vào Ví vé điện tử trong App.
     </div>
 
     <div class="trn-path">
-      <strong>ĐƯỜNG DẪN THAO TÁC:</strong> Mobile App: <code>/association/events</code> ➔ Chọn Sự Kiện ➔ Nhấp "Đăng Ký Vé Hội Viên VIP" ➔ Chọn Ghế Trên Sơ Đồ ➔ Ví Vé Điện Tử <code>/association/events/my-tickets</code>.
+      <strong>ĐƯỜNG DẪN THAO TÁC:</strong> Mobile App: <code>/association/events</code> ➔ Chọn Sự Kiện ➔ Nhấp "Đăng Ký Vé Học viên VIP" ➔ Chọn Ghế Trên Sơ Đồ ➔ Ví Vé Điện Tử <code>/association/events/my-tickets</code>.
     </div>
     
-    <div class="trn-sec-title">Các Bước Hội Viên Đăng Ký Vé Sự Kiện Trên Mobile App</div>
+    <div class="trn-sec-title">Các Bước Học viên Đăng Ký Vé Sự Kiện Trên Mobile App</div>
     <ol class="trn-steps">
-      <li>Hội viên mở App CEO HN10, vào mục <strong>"Sự Kiện"</strong> (<code>/association/events</code>).</li>
+      <li>Học viên mở App CEO HN10, vào mục <strong>"Sự Kiện"</strong> (<code>/association/events</code>).</li>
       <li>Chọn sự kiện mong muốn (Ví dụ: Diễn Đàn Doanh Nhân CEO HN10 & Gala Kết Nối Giao Thương).</li>
-      <li>Hệ thống tự động hiển thị nhãn <strong>"Đặc Quyền Hội Viên: Miễn Phí 100%"</strong> (tiết kiệm 1.500.000đ so với khách ngoài).</li>
-      <li>Hội viên chọn số lượng vé (1 vé chính thức + vé mời đối tác nếu có), bấm nút <strong>"Chọn Ghế Ngồi VIP"</strong>.</li>
-      <li>Giao diện Cinema Seating Map mở ra, hội viên chọn vị trí tại Bàn Chủ Tịch / Dãy Ghế VIP Hàng A.</li>
-      <li>Nhấp <strong>"Xác Nhận Đặt Vé & Ghế"</strong>. Vé được phát hành tức thì, lưu trực tiếp vào Ví vé trên ứng dụng và gửi email xác nhận kèm mã QR check-in về email hội viên (<code>vuvp090120@gmail.com</code>).</li>
+      <li>Hệ thống tự động hiển thị nhãn <strong>"Đặc Quyền Học viên: Miễn Phí 100%"</strong> (tiết kiệm 1.500.000đ so với khách ngoài).</li>
+      <li>Học viên chọn số lượng vé (1 vé chính thức + vé mời đối tác nếu có), bấm nút <strong>"Chọn Ghế Ngồi VIP"</strong>.</li>
+      <li>Giao diện Cinema Seating Map mở ra, Học viên chọn vị trí tại Bàn Chủ Tịch / Dãy Ghế VIP Hàng A.</li>
+      <li>Nhấp <strong>"Xác Nhận Đặt Vé & Ghế"</strong>. Vé được phát hành tức thì, lưu trực tiếp vào Ví vé trên ứng dụng và gửi email xác nhận kèm mã QR check-in về email Học viên (<code>vuvp090120@gmail.com</code>).</li>
     </ol>
 
     <div class="box-blue">
-      <strong>ĐẶC QUYỀN HỘI VIÊN CHÍNH THỨC:</strong>
-      Vé của hội viên được gán trực tiếp với Mã định danh hội viên <code>HN10-089</code>. Khi quét check-in tại cổng, hệ thống sẽ phát âm báo VIP đặc biệt và tự động kích hoạt lời chào mừng hiển thị trên màn hình LED sảnh chính đón tiếp!
+      <strong>ĐẶC QUYỀN Học viên CHÍNH THỨC:</strong>
+      Vé của Học viên được gán trực tiếp với Mã định danh Học viên <code>HN10-089</code>. Khi quét check-in tại cổng, hệ thống sẽ phát âm báo VIP đặc biệt và tự động kích hoạt lời chào mừng hiển thị trên màn hình LED sảnh chính đón tiếp!
     </div>
   </section>
 
@@ -729,7 +729,7 @@ function generateMasterHtml() {
       <li>Nhấp tab <strong>"Cinema Seating Map"</strong>.</li>
       <li>Chọn mẫu sơ đồ:
         <ul style="margin-top: 4px; padding-left: 20px;">
-          <li><strong>Layout Rạp Chiếu Phim / Hội Nghị:</strong> Dãy A (Hàng 1 - VIP Lãnh đạo), Dãy B-C (Hội viên chính thức), Dãy D-F (Đại biểu khách mời).</li>
+          <li><strong>Layout Rạp Chiếu Phim / Hội Nghị:</strong> Dãy A (Hàng 1 - VIP Lãnh đạo), Dãy B-C (Học viên chính thức), Dãy D-F (Đại biểu khách mời).</li>
           <li><strong>Layout Tiệc Gala Bàn Tròn:</strong> Bàn Danh Dự VIP 01, Bàn 02-10 (Bàn tròn 10 người theo Ban Chuyên Môn).</li>
         </ul>
       </li>
@@ -786,11 +786,11 @@ function generateMasterHtml() {
   <!-- ==================== CHƯƠNG 09 ==================== -->
   <section class="trn-section" id="sec-09">
     <span class="trn-tag">CHƯƠNG 09</span>
-    <h2 class="trn-h2">Thẻ Hội Viên VIP 3D Hoàng Gia, Danh Thiếp Số Độc Bản & Kết Nối Chạm NFC</h2>
+    <h2 class="trn-h2">Thẻ Học viên VIP 3D Hoàng Gia, Danh Thiếp Số Độc Bản & Kết Nối Chạm NFC</h2>
     <span class="trn-h3">Danh thiếp điện tử thông minh: Chạm thẻ NFC 1-giây truyền dữ liệu doanh nghiệp và mã QR nhận diện đẳng cấp</span>
     
     <div class="trn-goal">
-      <strong>MỤC TIÊU NGHIỆP VỤ:</strong> Hướng dẫn hội viên kích hoạt và khai thác Thẻ Doanh Nhân Số VIP 3D Hoàng Gia: Lật mặt trước/mặt sau thẻ 3D, chia sẻ danh thiếp công khai chuẩn Web (SEO-ready) và chạm thẻ NFC vật lý vào smartphone của đối tác để trao đổi danh thiếp không chạm trong 1 giây.
+      <strong>MỤC TIÊU NGHIỆP VỤ:</strong> Hướng dẫn Học viên kích hoạt và khai thác Thẻ Doanh Nhân Số VIP 3D Hoàng Gia: Lật mặt trước/mặt sau thẻ 3D, chia sẻ danh thiếp công khai chuẩn Web (SEO-ready) và chạm thẻ NFC vật lý vào smartphone của đối tác để trao đổi danh thiếp không chạm trong 1 giây.
     </div>
 
     <div class="trn-path">
@@ -799,7 +799,7 @@ function generateMasterHtml() {
     
     <div class="trn-sec-title">Tính Năng Danh Thiếp Số Độc Bản & Thẻ VIP 3D</div>
     <ul class="trn-steps">
-      <li><strong>Mặt Trước Thẻ VIP 3D:</strong> Thiết kế nền xanh bóng đêm kết hợp hoa văn mạ vàng dập nổi, hiển thị Họ tên Doanh nhân, Chức danh, Tên Doanh nghiệp, Mã số hội viên <code>HN10-089</code> và Logo HanoiBA.</li>
+      <li><strong>Mặt Trước Thẻ VIP 3D:</strong> Thiết kế nền xanh bóng đêm kết hợp hoa văn mạ vàng dập nổi, hiển thị Họ tên Doanh nhân, Chức danh, Tên Doanh nghiệp, Mã số Học viên <code>HN10-089</code> và Logo HanoiBA.</li>
       <li><strong>Mặt Sau Thẻ VIP 3D:</strong> Hiển thị Mã QR định danh cá nhân độc bản, tích hợp chip NFC ảo giúp đối tác chỉ cần quét camera là tự động lưu toàn bộ danh bạ (VCF Contact) vào điện thoại mà không cần gõ phím.</li>
       <li><strong>Trang Danh Thiếp Số Công Khai:</strong> Được tối ưu hiển thị mượt mà trên mọi trình duyệt web máy tính và điện thoại, tích hợp đầy đủ nút gọi điện thoại, nhắn tin Zalo, mở vị trí bản đồ công ty và liên kết gian hàng B2B.</li>
     </ul>
@@ -807,14 +807,14 @@ function generateMasterHtml() {
     <div class="shot-mobile-grid">
       <div class="shot-mobile-card">
         <div class="phone-mockup">
-          <img src="${getImgSrc('live_24_app_vip_card_front.png')}" alt="Mặt trước Thẻ Hội Viên VIP 3D trên Mobile">
+          <img src="${getImgSrc('live_24_app_vip_card_front.png')}" alt="Mặt trước Thẻ Học viên VIP 3D trên Mobile">
         </div>
-        <div class="phone-caption"><strong>Hình 9.1:</strong> Mặt trước Thẻ Doanh Nhân VIP 3D Hoàng Gia của Hội viên Vũ Văn Phúc (Mã: HN10-089).</div>
+        <div class="phone-caption"><strong>Hình 9.1:</strong> Mặt trước Thẻ Doanh Nhân VIP 3D Hoàng Gia của Học viên Vũ Văn Phúc (Mã: HN10-089).</div>
       </div>
       
       <div class="shot-mobile-card">
         <div class="phone-mockup">
-          <img src="${getImgSrc('live_25_app_vip_card_back.png')}" alt="Mặt sau Thẻ Hội Viên VIP 3D trên Mobile">
+          <img src="${getImgSrc('live_25_app_vip_card_back.png')}" alt="Mặt sau Thẻ Học viên VIP 3D trên Mobile">
         </div>
         <div class="phone-caption"><strong>Hình 9.2:</strong> Mặt sau Thẻ VIP tích hợp Mã QR Chạm kết nối NFC 1-giây lưu danh bạ tức thì.</div>
       </div>
@@ -831,22 +831,22 @@ function generateMasterHtml() {
   <!-- ==================== CHƯƠNG 10 ==================== -->
   <section class="trn-section" id="sec-10">
     <span class="trn-tag">CHƯƠNG 10</span>
-    <h2 class="trn-h2">Sàn Giao Thương B2B Shopee-Style: Hội Viên Đăng Bán & CRM Kiểm Duyệt</h2>
+    <h2 class="trn-h2">Sàn Giao Thương B2B Shopee-Style: Học viên Đăng Bán & CRM Kiểm Duyệt</h2>
     <span class="trn-h3">Mô hình chợ thương mại nội bộ: Đăng tải sản phẩm ưu đãi thành viên, thẩm định pháp lý và xuất bản lên Sàn</span>
     
     <div class="trn-goal">
-      <strong>MỤC TIÊU NGHIỆP VỤ:</strong> Hướng dẫn hội viên đưa sản phẩm, dịch vụ của doanh nghiệp mình lên Sàn Giao Thương B2B nội bộ; và hướng dẫn Ban Xúc Tiến Thương Mại trên CRM kiểm duyệt chất lượng, gán nhãn chứng nhận "Đã Thẩm Định CEO HN10" và xuất bản lên chợ.
+      <strong>MỤC TIÊU NGHIỆP VỤ:</strong> Hướng dẫn Học viên đưa sản phẩm, dịch vụ của doanh nghiệp mình lên Sàn Giao Thương B2B nội bộ; và hướng dẫn Ban Xúc Tiến Thương Mại trên CRM kiểm duyệt chất lượng, gán nhãn chứng nhận "Đã Thẩm Định CEO HN10" và xuất bản lên chợ.
     </div>
 
     <div class="trn-path">
       <strong>ĐƯỜNG DẪN THAO TÁC:</strong> Mobile App: <code>/association/products</code> (Đăng bán sản phẩm) ➔ Web CRM: <code>/</code> (Kiểm duyệt & Xuất bản).
     </div>
     
-    <div class="trn-sec-title">Thao Tác 1: Hội Viên Đăng Tải Sản Phẩm Lên Gian Hàng Nội Bộ</div>
+    <div class="trn-sec-title">Thao Tác 1: Học viên Đăng Tải Sản Phẩm Lên Gian Hàng Nội Bộ</div>
     <ol class="trn-steps">
-      <li>Hội viên vào mục <strong>"Gian Hàng B2B"</strong> trên App (<code>/association/products</code>), chọn <strong>"Đăng Sản Phẩm Mới"</strong>.</li>
+      <li>Học viên vào mục <strong>"Gian Hàng B2B"</strong> trên App (<code>/association/products</code>), chọn <strong>"Đăng Sản Phẩm Mới"</strong>.</li>
       <li>Tải lên hình ảnh sản phẩm độ phân giải cao, nhập tên sản phẩm, danh mục ngành nghề (Vật liệu xây dựng, Công nghệ, Thời trang, F&B, Tư vấn pháp lý...).</li>
-      <li>Nhập giá niêm yết thị trường và <strong>Mức giá ưu đãi độc quyền dành riêng cho Hội viên CLB CEO HN10</strong> (Ví dụ: Chiết khấu 15% - 25%).</li>
+      <li>Nhập giá niêm yết thị trường và <strong>Mức giá ưu đãi độc quyền dành riêng cho Học viên CLB CEO HN10</strong> (Ví dụ: Chiết khấu 15% - 25%).</li>
       <li>Nhập cam kết chất lượng, bảo hành và chính sách hoa hồng giới thiệu khách hàng (Referral Commission). Bấm <strong>"Gửi Duyệt Sản Phẩm"</strong>.</li>
     </ol>
 
@@ -862,14 +862,14 @@ function generateMasterHtml() {
         <div class="phone-mockup">
           <img src="${getImgSrc('live_28_app_b2b_marketplace_feed.png')}" alt="Sàn giao thương B2B Shopee-Style trên Mobile App">
         </div>
-        <div class="phone-caption"><strong>Hình 10.1:</strong> Giao diện Sàn Giao Thương B2B Shopee-Style trên App di động hiển thị sản phẩm hội viên.</div>
+        <div class="phone-caption"><strong>Hình 10.1:</strong> Giao diện Sàn Giao Thương B2B Shopee-Style trên App di động hiển thị sản phẩm Học viên.</div>
       </div>
       
       <div class="shot-mobile-card">
         <div class="phone-mockup">
-          <img src="${getImgSrc('live_29_app_b2b_product_detail.png')}" alt="Chi tiết sản phẩm B2B có ưu đãi hội viên">
+          <img src="${getImgSrc('live_29_app_b2b_product_detail.png')}" alt="Chi tiết sản phẩm B2B có ưu đãi Học viên">
         </div>
-        <div class="phone-caption"><strong>Hình 10.2:</strong> Chi tiết sản phẩm B2B hiển thị giá ưu đãi hội viên và nút "Liên hệ báo giá B2B".</div>
+        <div class="phone-caption"><strong>Hình 10.2:</strong> Chi tiết sản phẩm B2B hiển thị giá ưu đãi Học viên và nút "Liên hệ báo giá B2B".</div>
       </div>
     </div>
 
@@ -888,7 +888,7 @@ function generateMasterHtml() {
     <span class="trn-h3">Mạng lưới kết nối giao thương: Chia sẻ nhu cầu mua/bán, ghim tin tiêu biểu và đặt lịch hẹn 1-on-1 meeting</span>
     
     <div class="trn-goal">
-      <strong>MỤC TIÊU NGHIỆP VỤ:</strong> Hướng dẫn hội viên đăng tin Cần Mua (Cầu) hoặc Cần Bán (Cung), lưu bài viết quan tâm (Bookmark) và sử dụng công cụ Đặt lịch hẹn 1-on-1 Business Meeting trực tiếp qua Bottom Sheet để chốt hợp đồng.
+      <strong>MỤC TIÊU NGHIỆP VỤ:</strong> Hướng dẫn Học viên đăng tin Cần Mua (Cầu) hoặc Cần Bán (Cung), lưu bài viết quan tâm (Bookmark) và sử dụng công cụ Đặt lịch hẹn 1-on-1 Business Meeting trực tiếp qua Bottom Sheet để chốt hợp đồng.
     </div>
 
     <div class="trn-path">
@@ -897,10 +897,10 @@ function generateMasterHtml() {
     
     <div class="trn-sec-title">Quy Trình Đăng Tin Cung - Cầu & Hẹn Gặp 1-1</div>
     <ol class="trn-steps">
-      <li>Hội viên vào mục <strong>"Cơ Hội Giao Thương"</strong> (<code>/association/opportunities</code>) trên App.</li>
+      <li>Học viên vào mục <strong>"Cơ Hội Giao Thương"</strong> (<code>/association/opportunities</code>) trên App.</li>
       <li>Chọn loại tin: <strong>[CẦN MUA]</strong> (Ví dụ: <em>Cần tìm tổng thầu xây dựng nhà xưởng 5.000m2 tại KCN Quế Võ, ngân sách 35 tỷ</em>) hoặc <strong>[CUNG CẤP]</strong> (Ví dụ: <em>Cung ứng giải pháp bao bì carton xuất khẩu chuẩn ISO</em>).</li>
       <li>Đăng tải thông tin chi tiết kèm hình ảnh catalogue.</li>
-      <li>Hội viên khác khi đọc tin, nhấp nút <strong>"Hẹn Gặp 1-1 (1-on-1 Meeting)"</strong>.</li>
+      <li>Học viên khác khi đọc tin, nhấp nút <strong>"Hẹn Gặp 1-1 (1-on-1 Meeting)"</strong>.</li>
       <li>Một cửa sổ Bottom Sheet mở lên cho phép chọn: Ngày gặp, Khung giờ (09:00 - 10:30), Địa điểm (Văn phòng CLB CEO HN10 hoặc Họp trực tuyến Google Meet), và Lời nhắn hợp tác.</li>
       <li>Hệ thống gửi thông báo đẩy in-app và email đến đối tác, tự động đưa lịch hẹn vào Lịch công tác của hai bên.</li>
     </ol>
@@ -936,7 +936,7 @@ function generateMasterHtml() {
       <li>Tải lên Logo doanh nghiệp tài trợ, liên kết website chính thức và tài liệu giới thiệu sản phẩm.</li>
       <li>Trong mục <strong>"Banner Ads Manager"</strong>: Tải lên ảnh banner tỷ lệ 16:9 hoặc 21:9 chuẩn HD.</li>
       <li>Thiết lập thời gian hiển thị: Chọn thời lượng chuyển slide tự động (mặc định 4.0 giây), chọn trang đích xuất hiện (Trang chủ App, Đầu trang Sàn B2B, Trang chi tiết sự kiện).</li>
-      <li>Bấm <strong>"Kích Hoạt Banner"</strong>: Hệ thống đồng bộ thời gian thực qua WebSocket, banner hiển thị ngay lập tức trên điện thoại của toàn bộ hội viên.</li>
+      <li>Bấm <strong>"Kích Hoạt Banner"</strong>: Hệ thống đồng bộ thời gian thực qua WebSocket, banner hiển thị ngay lập tức trên điện thoại của toàn bộ Học viên.</li>
     </ol>
 
     <div class="box-green">
@@ -984,7 +984,7 @@ function generateMasterHtml() {
     <span class="trn-h3">Phòng bỏ phiếu số hóa: Kiểm soát tỷ lệ đại biểu tối thiểu, mã hóa phiếu bầu bảo mật và đếm phiếu thời gian thực</span>
     
     <div class="trn-goal">
-      <strong>MỤC TIÊU NGHIỆP VỤ:</strong> Hướng dẫn Ban Quản Trị thiết lập đợt biểu quyết / bầu cử Ban Chấp Hành trên CRM; và hướng dẫn hội viên truy cập hòm phiếu trên App di động để thực hiện quyền dân chủ với cơ chế bảo mật tuyệt đối 1 người 1 phiếu.
+      <strong>MỤC TIÊU NGHIỆP VỤ:</strong> Hướng dẫn Ban Quản Trị thiết lập đợt biểu quyết / bầu cử Ban Chấp Hành trên CRM; và hướng dẫn Học viên truy cập hòm phiếu trên App di động để thực hiện quyền dân chủ với cơ chế bảo mật tuyệt đối 1 người 1 phiếu.
     </div>
 
     <div class="trn-path">
@@ -996,7 +996,7 @@ function generateMasterHtml() {
       <li>Ban Quản Trị vào mục <strong>"Biểu Quyết & Bầu Cử"</strong> (<code>/voting</code>) trên CRM, nhấp <strong>"Tạo Đợt Biểu Quyết Mới"</strong>.</li>
       <li>Nhập tiêu đề (Ví dụ: <em>Bầu Cử Bổ Sung Ban Chấp Hành Nhiệm Kỳ 2026 - 2029</em>), danh sách ứng cử viên, tỷ lệ biểu quyết tối thiểu (Ví dụ: 50% hoặc 66%).</li>
       <li>Thiết lập thời gian mở hòm phiếu và thời gian khóa hòm phiếu. Nhấp <strong>"Phát Lệnh Mở Hòm Phiếu"</strong>.</li>
-      <li>Hội viên mở App CEO HN10 vào mục <strong>"Bỏ Phiếu"</strong> (<code>/association/voting</code>): Xem danh sách ứng viên, lựa chọn phương án và nhấp <strong>"Xác Nhận Bỏ Phiếu"</strong>.</li>
+      <li>Học viên mở App CEO HN10 vào mục <strong>"Bỏ Phiếu"</strong> (<code>/association/voting</code>): Xem danh sách ứng viên, lựa chọn phương án và nhấp <strong>"Xác Nhận Bỏ Phiếu"</strong>.</li>
       <li>Sau khi xác nhận, hệ thống khóa vĩnh viễn quyền bỏ phiếu của tài khoản đó cho đợt này (One-Member One-Vote Lock), chống hoàn toàn việc bỏ phiếu hai lần.</li>
       <li>Kết quả kiểm phiếu được trực quan hóa bằng biểu đồ cột thời gian thực trên màn hình hội trường lớn và tự động xuất biên bản kiểm phiếu PDF chuẩn pháp lý đại hội.</li>
     </ol>
@@ -1032,11 +1032,11 @@ function generateMasterHtml() {
       <strong>ĐƯỜNG DẪN THAO TÁC:</strong> Web CRM: <code>/</code> (Hội phí thường niên) ➔ <code>/expenses</code> (Phiếu chi) ➔ <code>/income</code> (Phiếu thu).
     </div>
     
-    <div class="trn-sec-title">1. Quản Lý Hội Phí Thường Niên Hội Viên Tự Động Qua VietQR</div>
+    <div class="trn-sec-title">1. Quản Lý Hội Phí Thường Niên Học viên Tự Động Qua VietQR</div>
     <ul class="trn-steps">
-      <li>Vào mục <strong>"Quản Lý Hội Phí"</strong> (<code>/fees</code>) trên CRM: Tạo đợt thu hội phí thường niên năm 2026 (Mức phí: 10.000.000 VNĐ / hội viên).</li>
-      <li>Hệ thống tự động phát hành hóa đơn điện tử cho toàn bộ hội viên, gắn kèm mã VietQR Napas 24/7 với cú pháp <code>HP[MãHộiViên]</code> (Ví dụ: <code>HPHN10-089</code>).</li>
-      <li>Hội viên mở App vào mục <strong>"Gia Hạn Hội Phí"</strong> (<code>/association/renew</code>), quét mã chuyển khoản. Hệ thống tự động gạch nợ sang trạng thái <strong>"Đã Thanh Toán"</strong> sau 3 giây, tự động gia hạn quyền lợi hội viên thêm 365 ngày.</li>
+      <li>Vào mục <strong>"Quản Lý Hội Phí"</strong> (<code>/fees</code>) trên CRM: Tạo đợt thu hội phí thường niên năm 2026 (Mức phí: 10.000.000 VNĐ / Học viên).</li>
+      <li>Hệ thống tự động phát hành hóa đơn điện tử cho toàn bộ Học viên, gắn kèm mã VietQR Napas 24/7 với cú pháp <code>HP[MãHộiViên]</code> (Ví dụ: <code>HPHN10-089</code>).</li>
+      <li>Học viên mở App vào mục <strong>"Gia Hạn Hội Phí"</strong> (<code>/association/renew</code>), quét mã chuyển khoản. Hệ thống tự động gạch nợ sang trạng thái <strong>"Đã Thanh Toán"</strong> sau 3 giây, tự động gia hạn quyền lợi Học viên thêm 365 ngày.</li>
     </ul>
 
     <div class="trn-sec-title">2. Quy Trình Phê Duyệt Phiếu Chi Ngân Sách 3 Cấp (Cashbook)</div>

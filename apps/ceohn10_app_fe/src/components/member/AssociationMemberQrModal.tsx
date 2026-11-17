@@ -66,7 +66,7 @@ export function AssociationMemberQrModal({
   onClose,
   defaultTab = "my_qr",
   memberCode = "",
-  memberName = "Hội viên CLB CEO HN10",
+  memberName = "Học viên CLB CEO HN10",
   memberTitle = "Doanh nhân CEO HN10",
   memberCompany = "CLB Doanh Nhân CEO HN10",
   memberAvatar = null,
@@ -153,7 +153,7 @@ export function AssociationMemberQrModal({
     if (navigator.share) {
       try {
         await navigator.share({
-          title: `Mã QR Hội Viên CEO HN10 - ${memberName}`,
+          title: `Mã QR Học viên CEO HN10 - ${memberName}`,
           text: `${memberName} · ${memberTitle} · ${memberCompany}`,
           url: qrUrl,
         });
@@ -211,10 +211,10 @@ export function AssociationMemberQrModal({
         if (scanRes && (scanRes.attendeeName || scanRes.ticketCode || scanRes.success)) {
           setScannedTicket({
             ticketCode: scanRes.ticketCode || raw.trim(),
-            attendeeName: scanRes.attendeeName || "Hội viên",
+            attendeeName: scanRes.attendeeName || "Học viên",
             attendeePhone: scanRes.attendeePhone || "",
             attendeeCompany: scanRes.attendeeCompany || "CLB Doanh Nhân CEO HN10",
-            attendeePosition: scanRes.attendeePosition || "Hội viên chính thức",
+            attendeePosition: scanRes.attendeePosition || "Học viên chính thức",
             attendeeAvatar: scanRes.attendeeAvatar || null,
             memberCode: scanRes.memberCode || "",
             eventId: scanRes.eventId,
@@ -295,7 +295,7 @@ export function AssociationMemberQrModal({
     }
 
     if (!code) {
-      setErrorMsg("Mã QR không đúng định dạng hội viên CEO HN10");
+      setErrorMsg("Mã QR không đúng định dạng Học viên CEO HN10");
       return;
     }
 
@@ -305,24 +305,24 @@ export function AssociationMemberQrModal({
       const partnerData =
         res && (res.name || res.contact)
           ? {
-              code: res.code || code,
-              name: res.name || res.contact || "Hội viên CEO HN10",
-              company: res.companyName || res.company || "CLB Doanh Nhân CEO HN10",
-              title: res.title || res.job_title || res.professional_title || "Hội viên Doanh nhân",
-              avatar: res.avatar || res.avatarUrl ? resolveMediaUrl(res.avatar || res.avatarUrl) || res.avatar || res.avatarUrl : null,
-              phone: res.phone || null,
-              email: res.email || null,
-              industry: res.industry || null,
-              userId: res.userId || res.user_id || res.id || null,
-            }
+            code: res.code || code,
+            name: res.name || res.contact || "Học viên CEO HN10",
+            company: res.companyName || res.company || "CLB Doanh Nhân CEO HN10",
+            title: res.title || res.job_title || res.professional_title || "Học viên Doanh nhân",
+            avatar: res.avatar || res.avatarUrl ? resolveMediaUrl(res.avatar || res.avatarUrl) || res.avatar || res.avatarUrl : null,
+            phone: res.phone || null,
+            email: res.email || null,
+            industry: res.industry || null,
+            userId: res.userId || res.user_id || res.id || null,
+          }
           : {
-              code,
-              name: `Hội viên ${code}`,
-              company: "CLB Doanh Nhân CEO HN10",
-              title: "Doanh nhân CEO HN10",
-              avatar: null,
-              userId: null,
-            };
+            code,
+            name: `Học viên ${code}`,
+            company: "CLB Doanh Nhân CEO HN10",
+            title: "Doanh nhân CEO HN10",
+            avatar: null,
+            userId: null,
+          };
 
       setScannedPartner(partnerData);
 
@@ -370,7 +370,7 @@ export function AssociationMemberQrModal({
     } catch {
       setScannedPartner({
         code,
-        name: `Hội viên ${code}`,
+        name: `Học viên ${code}`,
         company: "CLB Doanh Nhân CEO HN10",
         title: "Doanh nhân CEO HN10",
         avatar: null,
@@ -403,7 +403,7 @@ export function AssociationMemberQrModal({
     setConnecting(true);
     try {
       const peerCode = scannedPartner.code || scannedPartner.userId || "MEMBER";
-      const peerName = scannedPartner.name || "Hội viên";
+      const peerName = scannedPartner.name || "Học viên";
       const messageText =
         customNote.trim() ||
         `Chào bạn! Tôi đã quét mã QR của bạn và rất mong được kết nối giao thương trong CLB CEO HN10.`;
@@ -417,7 +417,7 @@ export function AssociationMemberQrModal({
           targetCompany: scannedPartner.company,
           targetTitle: scannedPartner.title,
         }),
-      }).catch(() => {});
+      }).catch(() => { });
 
       const qrConnectionId =
         typeof crypto !== "undefined" && crypto.randomUUID
@@ -442,7 +442,7 @@ export function AssociationMemberQrModal({
           },
           message: messageText,
         });
-      } catch {}
+      } catch { }
 
       // Đồng thời gọi REST API lưu dữ liệu vĩnh viễn và bắn notification
       await fetchNestApi("/network/requests", {
@@ -462,7 +462,7 @@ export function AssociationMemberQrModal({
             memberCode: scannedPartner.code,
             message: messageText,
           }),
-        }).catch(() => {});
+        }).catch(() => { });
       });
 
       // 3. Khởi tạo hội thoại qua DM API trên backend (để backend tạo thread chat chuẩn)
@@ -472,7 +472,7 @@ export function AssociationMemberQrModal({
           peerCode: peerCode,
           text: messageText,
         }),
-      }).catch(() => {});
+      }).catch(() => { });
 
       setConnected(true);
       toast.success("Đã gửi lời mời kết nối thành công!");
@@ -493,7 +493,7 @@ export function AssociationMemberQrModal({
         notifs.unshift(newNotif);
         localStorage.setItem("vba_notifications", JSON.stringify(notifs.slice(0, 50)));
 
-        // Lưu vào danh sách hội viên đã kết nối
+        // Lưu vào danh sách Học viên đã kết nối
         const rawConnected = localStorage.getItem("vba_connected_members");
         const connectedList: string[] = rawConnected ? JSON.parse(rawConnected) : [];
         if (!connectedList.includes(peerCode)) connectedList.push(peerCode);
@@ -590,7 +590,7 @@ export function AssociationMemberQrModal({
             </div>
             <div>
               <h3 className="text-sm font-extrabold text-slate-900 dark:text-white leading-tight">
-                Mã QR Hội Viên
+                Mã QR Học viên
               </h3>
               <p className="text-[10.5px] text-amber-700 dark:text-amber-400 font-semibold">
                 CLB Doanh Nhân CEO HN10
@@ -616,11 +616,10 @@ export function AssociationMemberQrModal({
                 setActiveTab("my_qr");
                 setScannedPartner(null);
               }}
-              className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer ${
-                activeTab === "my_qr"
+              className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer ${activeTab === "my_qr"
                   ? "bg-[#003B95] hover:bg-[#002B70] text-white text-amber-300 border border-amber-400/50 shadow-sm"
                   : "text-slate-600 dark:text-slate-300 hover:text-amber-500"
-              }`}
+                }`}
             >
               <QrCode className="w-3.5 h-3.5" />
               <span>Mã QR của tôi</span>
@@ -628,11 +627,10 @@ export function AssociationMemberQrModal({
             <button
               type="button"
               onClick={() => setActiveTab("scan_qr")}
-              className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer ${
-                activeTab === "scan_qr"
+              className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer ${activeTab === "scan_qr"
                   ? "bg-[#003B95] hover:bg-[#002B70] text-white text-amber-300 border border-amber-400/50 shadow-sm"
                   : "text-slate-600 dark:text-slate-300 hover:text-amber-500"
-              }`}
+                }`}
             >
               <Camera className="w-3.5 h-3.5" />
               <span>Quét QR</span>
@@ -961,11 +959,10 @@ export function AssociationMemberQrModal({
                     <button
                       type="button"
                       onClick={() => setTorch(!torch)}
-                      className={`flex h-9 w-9 items-center justify-center rounded-full border transition active:scale-95 cursor-pointer ${
-                        torch
+                      className={`flex h-9 w-9 items-center justify-center rounded-full border transition active:scale-95 cursor-pointer ${torch
                           ? "bg-amber-500 text-white border-amber-400 shadow-md"
                           : "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700"
-                      }`}
+                        }`}
                       title="Bật/tắt đèn flash"
                     >
                       {torch ? <Zap className="h-4 w-4" /> : <ZapOff className="h-4 w-4" />}
@@ -1040,10 +1037,10 @@ export function AssociationMemberQrModal({
             setScannedTicket((prev) =>
               prev
                 ? {
-                    ...prev,
-                    isCheckedIn: true,
-                    checkedInAt: nowStr,
-                  }
+                  ...prev,
+                  isCheckedIn: true,
+                  checkedInAt: nowStr,
+                }
                 : null
             );
             toast.success(`Đã xác nhận điểm danh thành công cho ${t.attendeeName}!`, {

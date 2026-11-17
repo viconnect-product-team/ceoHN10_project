@@ -108,13 +108,13 @@ function PerksAdminPage() {
       if (stored) {
         return JSON.parse(stored);
       }
-    } catch {}
+    } catch { }
     return [
       {
         id: "perk-mem-seed-1",
         voucherCode: "CEO83-DESIGN30",
         title: "Giảm 30% Chi Phí Thiết Kế Kiến Trúc & Thi Công Nội Thất",
-        description: "Áp dụng cho doanh nghiệp Hội viên CEO HN10 khi ký hợp đồng thi công văn phòng, biệt thự.",
+        description: "Áp dụng cho doanh nghiệp Học viên CEO HN10 khi ký hợp đồng thi công văn phòng, biệt thự.",
         discountType: "percent",
         discountValue: "Giảm 30%",
         partner: "Công Ty CP Kiến Trúc Xanh An Phát",
@@ -158,7 +158,7 @@ function PerksAdminPage() {
       const updated = prev.map((item) => (item.id === id ? { ...item, status: newStatus } : item));
       try {
         localStorage.setItem("vba_member_custom_perks", JSON.stringify(updated));
-      } catch {}
+      } catch { }
       return updated;
     });
     toast.success(newStatus === "active" ? "Đã duyệt và hiển thị ưu đãi lên App!" : "Đã tạm gỡ/ẩn ưu đãi khỏi App!");
@@ -170,7 +170,7 @@ function PerksAdminPage() {
       const updated = prev.filter((item) => item.id !== id);
       try {
         localStorage.setItem("vba_member_custom_perks", JSON.stringify(updated));
-      } catch {}
+      } catch { }
       return updated;
     });
     toast.success("Đã xóa ưu đãi thành công!");
@@ -332,21 +332,19 @@ function PerksAdminPage() {
             <div className="inline-flex rounded-xl border border-border bg-card p-0.5 shadow-[var(--shadow-card)]">
               <button
                 onClick={() => setView("table")}
-                className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
-                  view === "table"
+                className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${view === "table"
                     ? "bg-secondary text-foreground"
                     : "text-muted-foreground hover:text-foreground"
-                }`}
+                  }`}
               >
                 <List className="h-3.5 w-3.5" /> Bảng
               </button>
               <button
                 onClick={() => setView("cards")}
-                className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
-                  view === "cards"
+                className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${view === "cards"
                     ? "bg-secondary text-foreground"
                     : "text-muted-foreground hover:text-foreground"
-                }`}
+                  }`}
               >
                 <LayoutGrid className="h-3.5 w-3.5" /> Thẻ
               </button>
@@ -371,16 +369,15 @@ function PerksAdminPage() {
       {/* Birthday Promotion & Perks Policy Managed by Association CRM */}
       <BirthdayPromoManager />
 
-      {/* Tab Switch: Hệ Thống vs Hội Viên Tự Đăng B2B */}
+      {/* Tab Switch: Hệ Thống vs Học viên Tự Đăng B2B */}
       <div className="mb-5 flex items-center gap-2 border-b border-border pb-3">
         <button
           type="button"
           onClick={() => setActiveTab("system")}
-          className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 cursor-pointer ${
-            activeTab === "system"
+          className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 cursor-pointer ${activeTab === "system"
               ? "bg-[#003B95] text-white shadow-sm"
               : "bg-secondary text-muted-foreground hover:text-foreground"
-          }`}
+            }`}
         >
           <Building2 className="size-4" />
           <span>Ưu Đãi Đối Tác / Hiệp Hội ({perks.length})</span>
@@ -388,14 +385,13 @@ function PerksAdminPage() {
         <button
           type="button"
           onClick={() => setActiveTab("member_perks")}
-          className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 cursor-pointer ${
-            activeTab === "member_perks"
+          className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 cursor-pointer ${activeTab === "member_perks"
               ? "bg-gradient-to-r from-[#DC2626] to-[#B8860B] text-white shadow-sm"
               : "bg-secondary text-muted-foreground hover:text-foreground"
-          }`}
+            }`}
         >
           <Gift className="size-4" />
-          <span>Ưu Đãi Do Hội Viên Đăng B2B ({memberPerks.length})</span>
+          <span>Ưu Đãi Do Học viên Đăng B2B ({memberPerks.length})</span>
         </button>
       </div>
 
@@ -404,7 +400,7 @@ function PerksAdminPage() {
           {/* Member Perks KPI Cards */}
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
             <StatCard
-              label="Tổng ưu đãi B2B Hội viên đăng"
+              label="Tổng ưu đãi B2B Học viên đăng"
               value={memberPerks.length}
               icon={<Gift className="h-4 w-4 text-[#DC2626]" />}
             />
@@ -427,10 +423,10 @@ function PerksAdminPage() {
             <div className="p-4 border-b border-border flex items-center justify-between">
               <div>
                 <h3 className="text-sm font-bold text-foreground">
-                  Danh Sách Ưu Đãi Doanh Nghiệp Do Hội Viên Đăng
+                  Danh Sách Ưu Đãi Doanh Nghiệp Do Học viên Đăng
                 </h3>
                 <p className="text-xs text-muted-foreground">
-                  Quyền Quản Trị / Ban Điều Hành: Kiểm duyệt, gỡ bỏ hoặc kích hoạt mã ưu đãi của Hội viên
+                  Quyền Quản Trị / Ban Điều Hành: Kiểm duyệt, gỡ bỏ hoặc kích hoạt mã ưu đãi của Học viên
                 </p>
               </div>
             </div>
@@ -446,7 +442,7 @@ function PerksAdminPage() {
                     <th className="px-4 py-3 border-b border-border">Ưu Đãi & Doanh Nghiệp</th>
                     <th className="px-4 py-3 border-b border-border">Hình thức & Mức giảm</th>
                     <th className="px-4 py-3 border-b border-border">Sản phẩm & Nơi áp dụng</th>
-                    <th className="px-4 py-3 border-b border-border">Hội viên đăng</th>
+                    <th className="px-4 py-3 border-b border-border">Học viên đăng</th>
                     <th className="px-4 py-3 border-b border-border">Hạn dùng</th>
                     <th className="px-4 py-3 border-b border-border">Trạng thái</th>
                     <th className="sticky right-0 z-20 min-w-[150px] bg-secondary px-4 py-3 text-right border-l border-b border-border">
@@ -458,7 +454,7 @@ function PerksAdminPage() {
                   {memberPerks.length === 0 ? (
                     <tr>
                       <td colSpan={9} className="py-8 text-center text-xs text-muted-foreground">
-                        Chưa có ưu đãi B2B nào được hội viên gửi lên.
+                        Chưa có ưu đãi B2B nào được Học viên gửi lên.
                       </td>
                     </tr>
                   ) : (
@@ -486,7 +482,7 @@ function PerksAdminPage() {
                           <div className="text-[11px] text-muted-foreground">{mp.applicableLocation}</div>
                         </td>
                         <td className="px-4 py-3 border-b border-border text-xs">
-                          <div className="font-medium text-foreground">{mp.creatorName || "Hội viên"}</div>
+                          <div className="font-medium text-foreground">{mp.creatorName || "Học viên"}</div>
                           <div className="text-[11px] text-blue-600 font-mono">{mp.hotline}</div>
                         </td>
                         <td className="px-4 py-3 border-b border-border text-xs font-mono text-muted-foreground">
@@ -560,170 +556,170 @@ function PerksAdminPage() {
             />
           </div>
 
-      {/* Filters */}
-      <div className="mb-5 flex flex-wrap items-center gap-3">
-        <div className="relative min-w-[260px] flex-1">
-          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <input
-            value={q}
-            onChange={(e) => setQ(e.target.value)}
-            placeholder="Tìm kiếm ưu đãi theo tiêu đề, đối tác, danh mục..."
-            className="h-10 w-full rounded-lg border border-border bg-card pl-9 pr-3 text-sm text-foreground placeholder:text-muted-foreground shadow-[var(--shadow-card)] focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/20"
-          />
-        </div>
-      </div>
-
-      {loading ? (
-        <p className="py-10 text-center text-sm text-muted-foreground">{t("common.empty")}</p>
-      ) : tc.pageRows.length === 0 ? (
-        <p className="py-10 text-center text-sm text-muted-foreground">{t("perks.empty")}</p>
-      ) : view === "table" ? (
-        <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-[var(--shadow-card)]">
-          <div className="overflow-x-auto relative">
-            <table className="w-full text-sm border-separate border-spacing-0">
-              <thead>
-                <tr className="border-b border-border bg-secondary/80 text-left text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
-                  <th className="sticky left-0 z-20 w-[56px] min-w-[56px] max-w-[56px] bg-secondary px-3 py-3 text-center border-r border-b border-border">
-                    STT
-                  </th>
-                  <th className="sticky left-[56px] z-20 min-w-[100px] bg-secondary px-4 py-3 border-r border-b border-border shadow-[4px_0_6px_-2px_rgba(0,0,0,0.05)]">
-                    Mã
-                  </th>
-                  <th className="px-4 py-3 border-b border-border">Ưu đãi & Đối tác</th>
-                  <th className="px-4 py-3 border-b border-border">Danh mục</th>
-                  <th className="px-4 py-3 border-b border-border">Mức giảm</th>
-                  <th className="px-4 py-3 border-b border-border">Trạng thái</th>
-                  <th className="px-4 py-3 border-b border-border text-center">Thứ tự</th>
-                  <th className="sticky right-0 z-20 min-w-[120px] bg-secondary px-4 py-3 text-right border-l border-b border-border shadow-[-4px_0_6px_-2px_rgba(0,0,0,0.08)]">
-                    Thao tác
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {tc.pageRows.map((p, idx) => (
-                  <tr
-                    key={p.id}
-                    className="group border-b border-border transition-all duration-150 hover:bg-secondary/60"
-                  >
-                    <td className="sticky left-0 z-10 w-[56px] min-w-[56px] max-w-[56px] bg-card group-hover:bg-muted/70 px-3 py-3 text-center text-xs font-medium text-muted-foreground border-r border-b border-border transition-colors">
-                      {(tc.page - 1) * tc.pageSize + idx + 1}
-                    </td>
-                    <td className="sticky left-[56px] z-10 min-w-[100px] bg-card group-hover:bg-muted/70 px-4 py-3 font-mono text-[12px] font-semibold text-primary border-r border-b border-border shadow-[4px_0_6px_-2px_rgba(0,0,0,0.05)] transition-colors">
-                      UD-{String(p.sortOrder).padStart(3, "0")}
-                    </td>
-                    <td className="px-4 py-3 border-b border-border">
-                      <div className="font-semibold text-foreground text-xs">{p.title}</div>
-                      <div className="text-[11px] text-muted-foreground">{p.partner || p.summary}</div>
-                    </td>
-                    <td className="px-4 py-3 text-xs text-primary font-medium border-b border-border">
-                      {p.category || "—"}
-                    </td>
-                    <td className="px-4 py-3 text-xs font-semibold text-primary border-b border-border">
-                      {p.discount || "—"}
-                    </td>
-                    <td className="px-4 py-3 border-b border-border">
-                      <Pill color={p.status === "active" ? "success" : "neutral"}>
-                        {p.status === "active" ? t("perks.status.active") : t("perks.status.inactive")}
-                      </Pill>
-                    </td>
-                    <td className="px-4 py-3 text-center font-mono text-xs text-foreground border-b border-border">
-                      #{p.sortOrder}
-                    </td>
-                    <td className="sticky right-0 z-10 min-w-[120px] bg-card group-hover:bg-muted/70 px-4 py-3 text-right border-l border-b border-border shadow-[-4px_0_6px_-2px_rgba(0,0,0,0.08)] transition-colors">
-                      <div className="inline-flex items-center gap-1">
-                        <button
-                          onClick={() => {
-                            setEditing(p);
-                            setOpen(true);
-                          }}
-                          className="inline-flex items-center gap-1 rounded-lg border border-border bg-background px-2.5 py-1.5 text-xs font-medium text-foreground hover:bg-muted"
-                        >
-                          <Pencil className="h-3.5 w-3.5" />
-                          {t("common.edit")}
-                        </button>
-                        <button
-                          onClick={() => onDelete(p)}
-                          disabled={deletingId === p.id}
-                          className="inline-flex items-center gap-1 rounded-lg border border-destructive/20 bg-background px-2.5 py-1.5 text-xs font-medium text-destructive hover:bg-destructive/10 disabled:opacity-50"
-                        >
-                          <Trash2 className="h-3.5 w-3.5" />
-                          {t("common.delete")}
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          {/* Filters */}
+          <div className="mb-5 flex flex-wrap items-center gap-3">
+            <div className="relative min-w-[260px] flex-1">
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <input
+                value={q}
+                onChange={(e) => setQ(e.target.value)}
+                placeholder="Tìm kiếm ưu đãi theo tiêu đề, đối tác, danh mục..."
+                className="h-10 w-full rounded-lg border border-border bg-card pl-9 pr-3 text-sm text-foreground placeholder:text-muted-foreground shadow-[var(--shadow-card)] focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/20"
+              />
+            </div>
           </div>
-          <Pagination
-            page={tc.page}
-            pageCount={tc.pageCount}
-            pageSize={tc.pageSize}
-            total={tc.total}
-            from={tc.from}
-            to={tc.to}
-            onPage={tc.setPage}
-            onPageSize={tc.setPageSize}
-          />
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {tc.pageRows.map((p) => (
-            <Card key={p.id} className="p-5 transition hover:shadow-[var(--shadow-glow)]">
-              <div className="mb-2 flex items-center justify-between">
-                <span className="text-[11px] font-bold uppercase tracking-wider text-primary">
-                  {p.category || "—"}
-                </span>
-                <Pill color={p.status === "active" ? "success" : "neutral"}>
-                  {p.status === "active" ? t("perks.status.active") : t("perks.status.inactive")}
-                </Pill>
+
+          {loading ? (
+            <p className="py-10 text-center text-sm text-muted-foreground">{t("common.empty")}</p>
+          ) : tc.pageRows.length === 0 ? (
+            <p className="py-10 text-center text-sm text-muted-foreground">{t("perks.empty")}</p>
+          ) : view === "table" ? (
+            <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-[var(--shadow-card)]">
+              <div className="overflow-x-auto relative">
+                <table className="w-full text-sm border-separate border-spacing-0">
+                  <thead>
+                    <tr className="border-b border-border bg-secondary/80 text-left text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+                      <th className="sticky left-0 z-20 w-[56px] min-w-[56px] max-w-[56px] bg-secondary px-3 py-3 text-center border-r border-b border-border">
+                        STT
+                      </th>
+                      <th className="sticky left-[56px] z-20 min-w-[100px] bg-secondary px-4 py-3 border-r border-b border-border shadow-[4px_0_6px_-2px_rgba(0,0,0,0.05)]">
+                        Mã
+                      </th>
+                      <th className="px-4 py-3 border-b border-border">Ưu đãi & Đối tác</th>
+                      <th className="px-4 py-3 border-b border-border">Danh mục</th>
+                      <th className="px-4 py-3 border-b border-border">Mức giảm</th>
+                      <th className="px-4 py-3 border-b border-border">Trạng thái</th>
+                      <th className="px-4 py-3 border-b border-border text-center">Thứ tự</th>
+                      <th className="sticky right-0 z-20 min-w-[120px] bg-secondary px-4 py-3 text-right border-l border-b border-border shadow-[-4px_0_6px_-2px_rgba(0,0,0,0.08)]">
+                        Thao tác
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {tc.pageRows.map((p, idx) => (
+                      <tr
+                        key={p.id}
+                        className="group border-b border-border transition-all duration-150 hover:bg-secondary/60"
+                      >
+                        <td className="sticky left-0 z-10 w-[56px] min-w-[56px] max-w-[56px] bg-card group-hover:bg-muted/70 px-3 py-3 text-center text-xs font-medium text-muted-foreground border-r border-b border-border transition-colors">
+                          {(tc.page - 1) * tc.pageSize + idx + 1}
+                        </td>
+                        <td className="sticky left-[56px] z-10 min-w-[100px] bg-card group-hover:bg-muted/70 px-4 py-3 font-mono text-[12px] font-semibold text-primary border-r border-b border-border shadow-[4px_0_6px_-2px_rgba(0,0,0,0.05)] transition-colors">
+                          UD-{String(p.sortOrder).padStart(3, "0")}
+                        </td>
+                        <td className="px-4 py-3 border-b border-border">
+                          <div className="font-semibold text-foreground text-xs">{p.title}</div>
+                          <div className="text-[11px] text-muted-foreground">{p.partner || p.summary}</div>
+                        </td>
+                        <td className="px-4 py-3 text-xs text-primary font-medium border-b border-border">
+                          {p.category || "—"}
+                        </td>
+                        <td className="px-4 py-3 text-xs font-semibold text-primary border-b border-border">
+                          {p.discount || "—"}
+                        </td>
+                        <td className="px-4 py-3 border-b border-border">
+                          <Pill color={p.status === "active" ? "success" : "neutral"}>
+                            {p.status === "active" ? t("perks.status.active") : t("perks.status.inactive")}
+                          </Pill>
+                        </td>
+                        <td className="px-4 py-3 text-center font-mono text-xs text-foreground border-b border-border">
+                          #{p.sortOrder}
+                        </td>
+                        <td className="sticky right-0 z-10 min-w-[120px] bg-card group-hover:bg-muted/70 px-4 py-3 text-right border-l border-b border-border shadow-[-4px_0_6px_-2px_rgba(0,0,0,0.08)] transition-colors">
+                          <div className="inline-flex items-center gap-1">
+                            <button
+                              onClick={() => {
+                                setEditing(p);
+                                setOpen(true);
+                              }}
+                              className="inline-flex items-center gap-1 rounded-lg border border-border bg-background px-2.5 py-1.5 text-xs font-medium text-foreground hover:bg-muted"
+                            >
+                              <Pencil className="h-3.5 w-3.5" />
+                              {t("common.edit")}
+                            </button>
+                            <button
+                              onClick={() => onDelete(p)}
+                              disabled={deletingId === p.id}
+                              className="inline-flex items-center gap-1 rounded-lg border border-destructive/20 bg-background px-2.5 py-1.5 text-xs font-medium text-destructive hover:bg-destructive/10 disabled:opacity-50"
+                            >
+                              <Trash2 className="h-3.5 w-3.5" />
+                              {t("common.delete")}
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
-              <h3 className="mb-1 line-clamp-2 text-base font-semibold text-foreground">
-                {p.title}
-              </h3>
-              {p.discount && (
-                <span className="text-xs font-semibold text-primary">{p.discount}</span>
-              )}
-              <p className="mt-2 line-clamp-2 text-xs text-muted-foreground">{p.summary}</p>
-              <div className="mt-2 flex items-center justify-between text-[11px] text-muted-foreground">
-                <span>{p.partner || "—"}</span>
-                {p.link && (
-                  <a
-                    href={p.link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 text-primary"
-                  >
-                    <ExternalLink className="h-3 w-3" /> Link
-                  </a>
-                )}
-              </div>
-              <div className="mt-3 flex items-center justify-end gap-1 border-t border-border pt-3">
-                <button
-                  onClick={() => {
-                    setEditing(p);
-                    setOpen(true);
-                  }}
-                  className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-medium text-muted-foreground hover:bg-muted hover:text-foreground"
-                >
-                  <Pencil className="h-3.5 w-3.5" />
-                  {t("common.edit")}
-                </button>
-                <button
-                  onClick={() => onDelete(p)}
-                  disabled={deletingId === p.id}
-                  className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-medium text-muted-foreground hover:bg-destructive/10 hover:text-destructive disabled:opacity-50"
-                >
-                  <Trash2 className="h-3.5 w-3.5" />
-                  {t("common.delete")}
-                </button>
-              </div>
-            </Card>
-          ))}
-        </div>
-      )}
-      </>
+              <Pagination
+                page={tc.page}
+                pageCount={tc.pageCount}
+                pageSize={tc.pageSize}
+                total={tc.total}
+                from={tc.from}
+                to={tc.to}
+                onPage={tc.setPage}
+                onPageSize={tc.setPageSize}
+              />
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+              {tc.pageRows.map((p) => (
+                <Card key={p.id} className="p-5 transition hover:shadow-[var(--shadow-glow)]">
+                  <div className="mb-2 flex items-center justify-between">
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-primary">
+                      {p.category || "—"}
+                    </span>
+                    <Pill color={p.status === "active" ? "success" : "neutral"}>
+                      {p.status === "active" ? t("perks.status.active") : t("perks.status.inactive")}
+                    </Pill>
+                  </div>
+                  <h3 className="mb-1 line-clamp-2 text-base font-semibold text-foreground">
+                    {p.title}
+                  </h3>
+                  {p.discount && (
+                    <span className="text-xs font-semibold text-primary">{p.discount}</span>
+                  )}
+                  <p className="mt-2 line-clamp-2 text-xs text-muted-foreground">{p.summary}</p>
+                  <div className="mt-2 flex items-center justify-between text-[11px] text-muted-foreground">
+                    <span>{p.partner || "—"}</span>
+                    {p.link && (
+                      <a
+                        href={p.link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 text-primary"
+                      >
+                        <ExternalLink className="h-3 w-3" /> Link
+                      </a>
+                    )}
+                  </div>
+                  <div className="mt-3 flex items-center justify-end gap-1 border-t border-border pt-3">
+                    <button
+                      onClick={() => {
+                        setEditing(p);
+                        setOpen(true);
+                      }}
+                      className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-medium text-muted-foreground hover:bg-muted hover:text-foreground"
+                    >
+                      <Pencil className="h-3.5 w-3.5" />
+                      {t("common.edit")}
+                    </button>
+                    <button
+                      onClick={() => onDelete(p)}
+                      disabled={deletingId === p.id}
+                      className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-medium text-muted-foreground hover:bg-destructive/10 hover:text-destructive disabled:opacity-50"
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                      {t("common.delete")}
+                    </button>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          )}
+        </>
       )}
 
       {/* Modal Xem Mã QR Ưu Đãi B2B */}

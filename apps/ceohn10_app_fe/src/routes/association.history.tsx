@@ -228,8 +228,8 @@ function HistoryScreen() {
           checkedIn: Boolean(r.checkedIn),
           ticketCode: r.ticketCode || "EV-VIP-01",
           luckyNumber: r.luckyNumber || "#1983",
-          ticketType: r.ticketType || "Hội viên chính thức",
-          seat: r.seat || "Khu vực Hội viên",
+          ticketType: r.ticketType || "Học viên chính thức",
+          seat: r.seat || "Khu vực Học viên",
           image: r.image || "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&auto=format&fit=crop&q=80",
           qrCodeUrl: r.qrCodeUrl,
         });
@@ -390,8 +390,8 @@ function HistoryScreen() {
                 setSearchQuery("");
               }}
               className={`flex shrink-0 items-center justify-center gap-1.5 rounded-xl border px-3.5 py-2 text-[12.5px] font-semibold transition outline-none focus:outline-none cursor-pointer ${active
-                  ? "border-[#001B54] bg-[#001B54] text-white shadow-sm font-bold"
-                  : "border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:border-slate-300"
+                ? "border-[#001B54] bg-[#001B54] text-white shadow-sm font-bold"
+                : "border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:border-slate-300"
                 }`}
             >
               <Icon className="h-3.5 w-3.5 shrink-0" />
@@ -440,8 +440,8 @@ function HistoryScreen() {
                 type="button"
                 onClick={() => setConnectionFilter("all")}
                 className={`px-2.5 py-1 rounded-lg border transition cursor-pointer ${connectionFilter === "all"
-                    ? "bg-[#001B54] text-white border-[#001B54] font-bold"
-                    : "bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800"
+                  ? "bg-[#001B54] text-white border-[#001B54] font-bold"
+                  : "bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800"
                   }`}
               >
                 Tất cả ({allConnections.length})
@@ -450,8 +450,8 @@ function HistoryScreen() {
                 type="button"
                 onClick={() => setConnectionFilter("accepted")}
                 className={`px-2.5 py-1 rounded-lg border transition cursor-pointer ${connectionFilter === "accepted"
-                    ? "bg-[#001B54] text-white border-[#001B54] font-bold"
-                    : "bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800"
+                  ? "bg-[#001B54] text-white border-[#001B54] font-bold"
+                  : "bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800"
                   }`}
               >
                 Đã kết nối ({allConnections.filter((c) => c.status === "accepted").length})
@@ -460,8 +460,8 @@ function HistoryScreen() {
                 type="button"
                 onClick={() => setConnectionFilter("pending")}
                 className={`px-2.5 py-1 rounded-lg border transition cursor-pointer ${connectionFilter === "pending"
-                    ? "bg-[#001B54] text-white border-[#001B54] font-bold"
-                    : "bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800"
+                  ? "bg-[#001B54] text-white border-[#001B54] font-bold"
+                  : "bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800"
                   }`}
               >
                 Đang chờ ({allConnections.filter((c) => c.status === "pending").length})
@@ -475,8 +475,8 @@ function HistoryScreen() {
                 type="button"
                 onClick={() => setEventFilter("all")}
                 className={`px-2.5 py-1 rounded-lg border transition cursor-pointer ${eventFilter === "all"
-                    ? "bg-[#001B54] text-white border-[#001B54] font-bold"
-                    : "bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800"
+                  ? "bg-[#001B54] text-white border-[#001B54] font-bold"
+                  : "bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800"
                   }`}
               >
                 Tất cả ({allEvents.length})
@@ -485,8 +485,8 @@ function HistoryScreen() {
                 type="button"
                 onClick={() => setEventFilter("upcoming")}
                 className={`px-2.5 py-1 rounded-lg border transition cursor-pointer ${eventFilter === "upcoming"
-                    ? "bg-[#001B54] text-white border-[#001B54] font-bold"
-                    : "bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800"
+                  ? "bg-[#001B54] text-white border-[#001B54] font-bold"
+                  : "bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800"
                   }`}
               >
                 Sắp diễn ra ({allEvents.filter((e) => !e.checkedIn).length})
@@ -495,8 +495,8 @@ function HistoryScreen() {
                 type="button"
                 onClick={() => setEventFilter("checkedIn")}
                 className={`px-2.5 py-1 rounded-lg border transition cursor-pointer ${eventFilter === "checkedIn"
-                    ? "bg-[#001B54] text-white border-[#001B54] font-bold"
-                    : "bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800"
+                  ? "bg-[#001B54] text-white border-[#001B54] font-bold"
+                  : "bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800"
                   }`}
               >
                 Đã tham gia ({allEvents.filter((e) => e.checkedIn).length})
@@ -510,8 +510,8 @@ function HistoryScreen() {
                 type="button"
                 onClick={() => setActivityFilter("all")}
                 className={`px-2.5 py-1 rounded-lg border transition cursor-pointer whitespace-nowrap ${activityFilter === "all"
-                    ? "bg-[#001B54] text-white border-[#001B54] font-bold"
-                    : "bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800"
+                  ? "bg-[#001B54] text-white border-[#001B54] font-bold"
+                  : "bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800"
                   }`}
               >
                 Tất cả ({allActivities.length})
@@ -520,8 +520,8 @@ function HistoryScreen() {
                 type="button"
                 onClick={() => setActivityFilter("giao thương")}
                 className={`px-2.5 py-1 rounded-lg border transition cursor-pointer whitespace-nowrap ${activityFilter === "giao thương"
-                    ? "bg-[#001B54] text-white border-[#001B54] font-bold"
-                    : "bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800"
+                  ? "bg-[#001B54] text-white border-[#001B54] font-bold"
+                  : "bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800"
                   }`}
               >
                 Cơ hội / Deal
@@ -530,8 +530,8 @@ function HistoryScreen() {
                 type="button"
                 onClick={() => setActivityFilter("sự kiện")}
                 className={`px-2.5 py-1 rounded-lg border transition cursor-pointer whitespace-nowrap ${activityFilter === "sự kiện"
-                    ? "bg-[#001B54] text-white border-[#001B54] font-bold"
-                    : "bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800"
+                  ? "bg-[#001B54] text-white border-[#001B54] font-bold"
+                  : "bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800"
                   }`}
               >
                 Sự kiện
@@ -540,8 +540,8 @@ function HistoryScreen() {
                 type="button"
                 onClick={() => setActivityFilter("kết nối")}
                 className={`px-2.5 py-1 rounded-lg border transition cursor-pointer whitespace-nowrap ${activityFilter === "kết nối"
-                    ? "bg-[#001B54] text-white border-[#001B54] font-bold"
-                    : "bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800"
+                  ? "bg-[#001B54] text-white border-[#001B54] font-bold"
+                  : "bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800"
                   }`}
               >
                 Kết nối
@@ -550,8 +550,8 @@ function HistoryScreen() {
                 type="button"
                 onClick={() => setActivityFilter("tin nhắn")}
                 className={`px-2.5 py-1 rounded-lg border transition cursor-pointer whitespace-nowrap ${activityFilter === "tin nhắn"
-                    ? "bg-[#001B54] text-white border-[#001B54] font-bold"
-                    : "bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800"
+                  ? "bg-[#001B54] text-white border-[#001B54] font-bold"
+                  : "bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800"
                   }`}
               >
                 Tin nhắn
@@ -560,8 +560,8 @@ function HistoryScreen() {
                 type="button"
                 onClick={() => setActivityFilter("bình luận")}
                 className={`px-2.5 py-1 rounded-lg border transition cursor-pointer whitespace-nowrap ${activityFilter === "bình luận"
-                    ? "bg-[#001B54] text-white border-[#001B54] font-bold"
-                    : "bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800"
+                  ? "bg-[#001B54] text-white border-[#001B54] font-bold"
+                  : "bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800"
                   }`}
               >
                 Bình luận
@@ -586,14 +586,14 @@ function HistoryScreen() {
               <p className="text-[12px] text-slate-500 dark:text-slate-400 max-w-xs mx-auto">
                 {searchQuery
                   ? "Không có kết quả phù hợp với từ khóa tìm kiếm của bạn."
-                  : "Khi bạn gửi lời mời hẹn gặp & giao thương tới các hội viên, lịch sử chi tiết sẽ được ghi nhận tại đây."}
+                  : "Khi bạn gửi lời mời hẹn gặp & giao thương tới các Học viên, lịch sử chi tiết sẽ được ghi nhận tại đây."}
               </p>
               <button
                 type="button"
                 onClick={() => navigate({ to: "/association/members" })}
                 className="inline-flex items-center gap-1.5 rounded-xl bg-[#001B54] hover:bg-[#002B70] text-white px-4 py-2 text-[12px] font-bold transition shadow-xs active:scale-95 cursor-pointer"
               >
-                <span>Khám phá danh bạ hội viên</span>
+                <span>Khám phá danh bạ Học viên</span>
                 <ArrowRight className="h-3.5 w-3.5" />
               </button>
             </div>
@@ -625,7 +625,7 @@ function HistoryScreen() {
                     <div className="flex items-center justify-between gap-1 flex-wrap">
                       <div className="flex items-center gap-1.5">
                         <span className="text-[13px] font-bold text-slate-900 dark:text-white truncate">
-                          {item.targetName || "Hội viên CEO HN10"}
+                          {item.targetName || "Học viên CEO HN10"}
                         </span>
                         {item.targetCode && (
                           <span className="rounded-md bg-blue-50 dark:bg-blue-950/50 border border-blue-100 dark:border-blue-900/50 px-1.5 py-0.5 text-[9px] font-bold text-[#001B54] dark:text-blue-300">

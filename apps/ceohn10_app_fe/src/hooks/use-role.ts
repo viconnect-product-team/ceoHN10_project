@@ -107,7 +107,7 @@ export function useRole(): RoleState {
     if (typeof window !== "undefined") {
       try {
         localStorage.removeItem("vba_crm_role_override");
-      } catch {}
+      } catch { }
     }
 
     // 0. ƯU TIÊN TUYỆT ĐỐI: Vai trò được phân bổ trực tiếp cho tài khoản từ CSDL (members.executive_role) hoặc Quản lý tài khoản (vba_managed_accounts_v2)
@@ -166,7 +166,7 @@ export function useRole(): RoleState {
       execRole === "pho_chu_tich" ||
       execRole === "vice_president" ||
       execRole.includes("phó chủ tịch") ||
-      (execRole.includes("điều hành") && !execRole.includes("hội viên")) ||
+      (execRole.includes("điều hành") && !execRole.includes("Học viên")) ||
       (dept.includes("điều hành") && (execRole.includes("trưởng") || execRole.includes("phó") || !execRole)) ||
       rList.includes("ban_dieu_hanh") ||
       rList.includes("bqt")
@@ -205,7 +205,7 @@ export function useRole(): RoleState {
       primaryRole === "truong_ban_thanh_vien" ||
       execRole === "truong_ban_thanh_vien" ||
       (execRole.includes("trưởng ban") && dept.includes("thành viên")) ||
-      (execRole.includes("thành viên") && (execRole.includes("trưởng") || execRole.includes("phó")) && !execRole.includes("hội viên"))
+      (execRole.includes("thành viên") && (execRole.includes("trưởng") || execRole.includes("phó")) && !execRole.includes("Học viên"))
     ) {
       return "truong_ban_thanh_vien";
     }
@@ -255,7 +255,7 @@ export function useRole(): RoleState {
       primaryRole === "ban_thu_ky" ||
       execRole === "ban_thu_ky" ||
       (execRole.includes("thư ký") && !execRole.includes("phó")) ||
-      (dept.includes("thư ký") && !execRole.includes("hội viên"))
+      (dept.includes("thư ký") && !execRole.includes("Học viên"))
     ) {
       return "ban_thu_ky";
     }
@@ -281,7 +281,7 @@ export function useRole(): RoleState {
       rList.includes("quan_tri") ||
       rList.includes("superadmin")
     ) {
-      // Nếu tài khoản được phân vai trò rõ ràng là hội viên thường hoặc ban chuyên môn thì không coi là admin
+      // Nếu tài khoản được phân vai trò rõ ràng là Học viên thường hoặc ban chuyên môn thì không coi là admin
       if (
         execRole === "member" ||
         execRole === "hoi_vien" ||
@@ -297,7 +297,7 @@ export function useRole(): RoleState {
       return "admin";
     }
 
-    // 8. Nếu là hội viên chính thức hoặc thường
+    // 8. Nếu là Học viên chính thức hoặc thường
     if (execRole === "member" || execRole === "hoi_vien" || primaryRole === "member") {
       return "HVT";
     }
@@ -305,16 +305,16 @@ export function useRole(): RoleState {
     // 9. Fallback mặc định cho tài khoản admin root/seed khi chưa cấu hình vai trò cụ thể
     if (
       (userEmail === "admin@viconnect.vn" ||
-      userEmail === "admin@connect.vn" ||
-      userEmail === "admin1@connect.vn" ||
-      userEmail.startsWith("admin")) &&
+        userEmail === "admin@connect.vn" ||
+        userEmail === "admin1@connect.vn" ||
+        userEmail.startsWith("admin")) &&
       execRole !== "member" &&
       execRole !== "hoi_vien"
     ) {
       return "admin";
     }
 
-    // Mặc định: HVT (Hội Viên Thường)
+    // Mặc định: HVT (Học viên Thường)
     return "HVT";
   };
 
@@ -472,7 +472,7 @@ export function useRole(): RoleState {
           if (k.toLowerCase() === mCode.toLowerCase()) return map[k];
         }
       }
-    } catch {}
+    } catch { }
     return null;
   }, [user?.code, matrixVersion]);
 
@@ -481,7 +481,7 @@ export function useRole(): RoleState {
     if (typeof window !== "undefined") {
       try {
         localStorage.removeItem("vba_crm_role_override");
-      } catch {}
+      } catch { }
       window.dispatchEvent(new Event("role-changed"));
     }
   };
@@ -567,7 +567,7 @@ export function useRole(): RoleState {
 
   const can = useCallback(
     (permission: Permission | string): boolean => {
-      // 1. Kiểm tra trực tiếp phân quyền từng hội viên từ vba_member_permissions (ưu tiên cao nhất nếu bị thu hồi):
+      // 1. Kiểm tra trực tiếp phân quyền từng Học viên từ vba_member_permissions (ưu tiên cao nhất nếu bị thu hồi):
       // Nếu Admin đã bỏ chọn (false), lập tức thu hồi quyền và ẩn chức năng trên giao diện
       if (memberPermProfile) {
         if (memberPermProfile.canView === false && (permission.includes(":view") || permission.endsWith("_VIEW") || permission.endsWith(":read"))) {
@@ -660,7 +660,7 @@ export function useRole(): RoleState {
         try {
           const rawMem = localStorage.getItem("vba_my_member");
           if (rawMem) mCode = JSON.parse(rawMem)?.code;
-        } catch {}
+        } catch { }
       }
 
       const dept = (user as any)?.department || (memberPermProfile as any)?.department;

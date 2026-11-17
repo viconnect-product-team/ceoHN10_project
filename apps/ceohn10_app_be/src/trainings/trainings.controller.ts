@@ -16,7 +16,7 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @Controller()
 export class TrainingsController {
-  constructor(private readonly trainingsService: TrainingsService) {}
+  constructor(private readonly trainingsService: TrainingsService) { }
 
   @Get('trainings')
   async listTrainings(
@@ -68,6 +68,12 @@ export class TrainingsController {
     return this.trainingsService.createTraining(body, req.user?.id);
   }
 
+  @Post('association/trainings')
+  @UseGuards(JwtAuthGuard)
+  async createAssociationTraining(@Body() body: any, @Request() req: any) {
+    return this.trainingsService.createTraining(body, req.user?.id);
+  }
+
   @Put('trainings/:id')
   @UseGuards(JwtAuthGuard)
   async updateTraining(@Param('id') id: string, @Body() body: any) {
@@ -101,7 +107,7 @@ export class TrainingsController {
     @Body() body: any,
   ) {
     const attendeeData = {
-      userName: req.user?.name || body?.name || 'Hội viên',
+      userName: req.user?.name || body?.name || 'Học viên',
       email: req.user?.email || body?.email || '',
       phone: req.user?.phone || body?.phone || '',
       memberId: req.user?.memberId || req.user?.id,

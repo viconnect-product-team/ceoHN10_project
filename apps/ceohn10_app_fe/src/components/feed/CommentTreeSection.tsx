@@ -130,7 +130,7 @@ export function renderMentionableText(text: string) {
         <span
           key={idx}
           className="inline-flex items-center text-[#003B95] dark:text-blue-400 font-bold bg-blue-50 dark:bg-blue-950/50 px-1 py-0.5 rounded cursor-pointer hover:underline mx-0.5"
-          title={`Hội viên được nhắc tên: ${part}`}
+          title={`Học viên được nhắc tên: ${part}`}
         >
           {part}
         </span>
@@ -218,7 +218,7 @@ export function CommentTreeNodeItem({
           >
             <div className="flex items-center gap-1.5 flex-wrap mb-0.5">
               <span className="font-bold text-slate-900 dark:text-white text-[12px] truncate">
-                {node.authorName || "Hội viên CEO HN10"}
+                {node.authorName || "Học viên CEO HN10"}
               </span>
 
               {node.replyToAuthorName && (
@@ -299,9 +299,8 @@ export function CommentTreeNodeItem({
                 type="button"
                 onClick={() => onReact(node.id, matchedEmotion ? "" : "like")}
                 onMouseEnter={() => setActiveReactionCommentId(node.id)}
-                className={`font-semibold cursor-pointer hover:underline transition ${
-                  matchedEmotion ? "text-[#003B95] dark:text-blue-400 font-bold" : "text-slate-600 dark:text-slate-400"
-                }`}
+                className={`font-semibold cursor-pointer hover:underline transition ${matchedEmotion ? "text-[#003B95] dark:text-blue-400 font-bold" : "text-slate-600 dark:text-slate-400"
+                  }`}
               >
                 {matchedEmotion ? `${matchedEmotion.emoji} ${matchedEmotion.label}` : "Thích"}
               </button>
@@ -526,7 +525,7 @@ export function CommentTreeSection({
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [activeReactionCommentId, setActiveReactionCommentId] = useState<string | null>(null);
 
-  // @Mention Connected Members State (Chỉ lấy hội viên ĐÃ KẾT NỐI 1-on-1, không lấy toàn bộ hệ thống)
+  // @Mention Connected Members State (Chỉ lấy Học viên ĐÃ KẾT NỐI 1-on-1, không lấy toàn bộ hệ thống)
   const [connectedMembers, setConnectedMembers] = useState<ConnectedMemberSummary[]>([]);
   const [taggedMembers, setTaggedMembers] = useState<ConnectedMemberSummary[]>([]);
   const [mentionQuery, setMentionQuery] = useState<string | null>(null);
@@ -534,7 +533,7 @@ export function CommentTreeSection({
   const [showMentionPicker, setShowMentionPicker] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Tải danh sách hội viên ĐÃ KẾT NỐI để phục vụ @mention (Tuyệt đối không fallback toàn bộ danh bạ hay mock data)
+  // Tải danh sách Học viên ĐÃ KẾT NỐI để phục vụ @mention (Tuyệt đối không fallback toàn bộ danh bạ hay mock data)
   useEffect(() => {
     let isMounted = true;
     async function loadConnectedMembers() {
@@ -548,10 +547,10 @@ export function CommentTreeSection({
           const formatted: ConnectedMemberSummary[] = list.map((m: any) => ({
             id: m.id || m.userId || m.code || "",
             userId: m.userId || m.user_id || m.id || null,
-            name: m.contact || m.name || m.personName || "Hội viên CEO",
+            name: m.contact || m.name || m.personName || "Học viên CEO",
             company: m.companyName || m.company || "",
             avatarUrl: m.avatarUrl || m.avatar || "/ceohn10-emblem-8.png",
-            role: m.role || m.personTitle || "Hội viên",
+            role: m.role || m.personTitle || "Học viên",
           }));
           setConnectedMembers(formatted);
         }
@@ -605,7 +604,7 @@ export function CommentTreeSection({
       .slice(0, 10);
   }, [connectedMembers, mentionQuery, showMentionPicker]);
 
-  // Xử lý khi gõ phím trong input: phát hiện ký tự @ để mở danh sách hội viên kết nối
+  // Xử lý khi gõ phím trong input: phát hiện ký tự @ để mở danh sách Học viên kết nối
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
     setInputText(val);
@@ -627,7 +626,7 @@ export function CommentTreeSection({
     setShowMentionPicker(false);
   };
 
-  // Chọn hội viên từ gợi ý @mention và thêm vào danh sách chip đã gắn thẻ
+  // Chọn Học viên từ gợi ý @mention và thêm vào danh sách chip đã gắn thẻ
   const handleSelectMention = (member: ConnectedMemberSummary) => {
     const cursorPos = inputRef.current?.selectionStart || inputText.length;
     const textBeforeCursor = inputText.substring(0, cursorPos);
@@ -665,7 +664,7 @@ export function CommentTreeSection({
     }, 50);
   };
 
-  // Xóa nhanh một thẻ hội viên khỏi danh sách tag
+  // Xóa nhanh một thẻ Học viên khỏi danh sách tag
   const handleRemoveTaggedMember = (memberId: string, memberName: string) => {
     setTaggedMembers((prev) => prev.filter((m) => m.id !== memberId && m.userId !== memberId));
     setMentionedUserIds((prev) => prev.filter((id) => id !== memberId));
@@ -749,7 +748,7 @@ export function CommentTreeSection({
 
     setSubmitting(true);
     try {
-      const realAuthorName = user?.name || (user as any)?.contact || "Hội viên CEO HN10";
+      const realAuthorName = user?.name || (user as any)?.contact || "Học viên CEO HN10";
       const realAuthorAvatar = user?.avatar || (user as any)?.avatarUrl || "/ceohn10-emblem-8.png";
 
       const payload = {
@@ -761,7 +760,7 @@ export function CommentTreeSection({
         mediaType: attachedMedia?.type || null,
         authorName: realAuthorName,
         authorAvatar: realAuthorAvatar,
-        mentionedUserIds, // Gửi danh sách ID hội viên được tag để BE dispatch push notification!
+        mentionedUserIds, // Gửi danh sách ID Học viên được tag để BE dispatch push notification!
       };
 
       const res = await fetchNestApi<any>(`/feed/${postId}/comments`, {
@@ -935,7 +934,7 @@ export function CommentTreeSection({
 
           {/* KHUNG NHẬP BÌNH LUẬN KIỂU FACEBOOK + AUTOCOMPLETE @MENTION */}
           <div className="relative pt-1">
-            {/* DANH SÁCH HỘI VIÊN ĐÃ GẮN THẺ ĐA THÀNH VIÊN KÈM NÚT XÓA NHANH X */}
+            {/* DANH SÁCH Học viên ĐÃ GẮN THẺ ĐA THÀNH VIÊN KÈM NÚT XÓA NHANH X */}
             {taggedMembers.length > 0 && (
               <div className="flex flex-wrap items-center gap-1.5 px-1 pb-1.5 animate-in fade-in duration-100">
                 <span className="text-[10.5px] font-bold text-slate-400">Đã gắn thẻ:</span>
@@ -958,13 +957,13 @@ export function CommentTreeSection({
               </div>
             )}
 
-            {/* DROPDOWN GỢI Ý @MENTION HỘI VIÊN ĐÃ KẾT NỐI */}
+            {/* DROPDOWN GỢI Ý @MENTION Học viên ĐÃ KẾT NỐI */}
             {showMentionPicker && (
               <div className="absolute bottom-full left-0 right-0 mb-2 max-h-56 overflow-y-auto rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-2xl z-40 p-1.5 space-y-1 animate-in fade-in-50 zoom-in-95 duration-100">
                 <div className="flex items-center justify-between px-2.5 py-1 text-[11px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100 dark:border-slate-800">
                   <span className="flex items-center gap-1 text-[#003B95] dark:text-blue-400">
                     <AtSign className="size-3" />
-                    <span>Hội viên đã kết nối 1-on-1</span>
+                    <span>Học viên đã kết nối 1-on-1</span>
                   </span>
                   <button
                     type="button"
@@ -976,7 +975,7 @@ export function CommentTreeSection({
                 </div>
                 {filteredMentionMembers.length === 0 ? (
                   <div className="py-3 px-2 text-center text-xs text-slate-500 dark:text-slate-400">
-                    Chưa có hội viên trong mạng lưới kết nối 1-on-1. Hãy kết nối thêm hội viên để gắn thẻ @.
+                    Chưa có Học viên trong mạng lưới kết nối 1-on-1. Hãy kết nối thêm Học viên để gắn thẻ @.
                   </div>
                 ) : (
                   filteredMentionMembers.map((m) => (
@@ -1042,7 +1041,7 @@ export function CommentTreeSection({
                   placeholder={
                     replyingTo
                       ? `Phản hồi @${replyingTo.authorName}...`
-                      : "Viết bình luận công khai, gõ @ để nhắc tên hội viên..."
+                      : "Viết bình luận công khai, gõ @ để nhắc tên Học viên..."
                   }
                   className="flex-1 bg-transparent text-xs text-slate-900 dark:text-white placeholder:text-slate-400 outline-none py-1 border-none focus:outline-none focus:ring-0"
                 />

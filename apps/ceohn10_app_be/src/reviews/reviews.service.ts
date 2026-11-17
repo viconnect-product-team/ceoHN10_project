@@ -11,7 +11,7 @@ export { CreateReviewDto, UpdateReviewDto };
 
 @Injectable()
 export class ReviewsService {
-  constructor(private readonly reviewsRepo: ReviewsRepository) {}
+  constructor(private readonly reviewsRepo: ReviewsRepository) { }
 
   async listReviews(
     filter:
@@ -28,8 +28,8 @@ export class ReviewsService {
       productId: r.product_id,
       companyName: r.company_name,
       reviewerId: r.reviewer_id,
-      reviewerName: r.reviewer_name || 'Hội viên',
-      reviewerRole: r.reviewer_role || 'Hội viên CLB CEO HN10',
+      reviewerName: r.reviewer_name || 'Học viên',
+      reviewerRole: r.reviewer_role || 'Học viên CLB CEO HN10',
       reviewerAvatar: r.reviewer_avatar || '',
       rating: Number(r.rating || 5),
       comment: r.comment || '',
@@ -57,7 +57,7 @@ export class ReviewsService {
     const reviewerName =
       data.reviewerName ||
       (await this.reviewsRepo.findReviewerName(reviewerId, userId)) ||
-      'Hội viên CEO HN10';
+      'Học viên CEO HN10';
 
     const r = await this.reviewsRepo.insertReview({
       id,

@@ -96,24 +96,24 @@ export const CAPABILITIES: Capability[] = [
   },
   {
     id: "member",
-    label: "Trợ lý Hội viên",
+    label: "Trợ lý Học viên",
     icon: Users,
-    description: "Tìm kiếm và phân nhóm hội viên theo ngành, khu vực, cấp độ.",
+    description: "Tìm kiếm và phân nhóm Học viên theo ngành, khu vực, cấp độ.",
     minRole: "member",
     contextSources: ["members"],
-    keywords: ["hội viên", "thành viên", "ngành", "khu vực", "danh bạ", "member", "doanh nghiệp"],
+    keywords: ["Học viên", "thành viên", "ngành", "khu vực", "danh bạ", "member", "doanh nghiệp"],
     suggestedPrompts: [
-      "Tìm hội viên ngành Logistics",
-      "Danh sách hội viên mới gia nhập gần đây",
-      "Hội viên nào ở Hà Nội?",
+      "Tìm Học viên ngành Logistics",
+      "Danh sách Học viên mới gia nhập gần đây",
+      "Học viên nào ở Hà Nội?",
     ],
-    actions: [{ label: "Mở Danh bạ hội viên", to: "/members" }],
+    actions: [{ label: "Mở Danh bạ Học viên", to: "/members" }],
     relatedModules: [
-      { label: "Hội viên", to: "/members" },
+      { label: "Học viên", to: "/members" },
       { label: "Phân nhóm", to: "/segments" },
     ],
     cardFields: [
-      { label: "Số hội viên", hint: "Theo phạm vi bạn thấy" },
+      { label: "Số Học viên", hint: "Theo phạm vi bạn thấy" },
       { label: "Ngành nghề", hint: "Sẽ hiển thị khi kết nối dữ liệu" },
       { label: "Khu vực", hint: "Sẽ hiển thị khi kết nối dữ liệu" },
     ],
@@ -122,12 +122,12 @@ export const CAPABILITIES: Capability[] = [
     id: "networking",
     label: "Trợ lý Kết nối",
     icon: Handshake,
-    description: "Gợi ý kết nối và cơ hội hợp tác giữa các hội viên.",
+    description: "Gợi ý kết nối và cơ hội hợp tác giữa các Học viên.",
     minRole: "member",
     contextSources: ["members", "marketplace"],
     keywords: ["kết nối", "hợp tác", "networking", "cơ hội", "giới thiệu", "đối tác"],
     suggestedPrompts: [
-      "Gợi ý hội viên phù hợp để kết nối với doanh nghiệp logistics",
+      "Gợi ý Học viên phù hợp để kết nối với doanh nghiệp logistics",
       "Các cơ hội hợp tác mới được chia sẻ gần đây",
       "Ai nên kết nối với nhau trong ngành công nghệ?",
     ],
@@ -163,7 +163,7 @@ export const CAPABILITIES: Capability[] = [
     ],
     suggestedPrompts: [
       "Hội phí tháng này còn bao nhiêu chưa thu?",
-      "Nhóm hội viên nào cần nhắc đóng hội phí?",
+      "Nhóm Học viên nào cần nhắc đóng hội phí?",
       "Tỷ lệ thu hội phí quý này là bao nhiêu?",
     ],
     actions: [
@@ -248,7 +248,7 @@ export const CAPABILITIES: Capability[] = [
     contextSources: ["notifications"],
     keywords: ["soạn", "viết", "thông báo mời", "email", "truyền thông", "draft", "nội dung"],
     suggestedPrompts: [
-      "Viết thông báo mời hội viên tham dự sự kiện tuần sau",
+      "Viết thông báo mời Học viên tham dự sự kiện tuần sau",
       "Soạn thông báo nhắc đóng hội phí với giọng trang trọng",
     ],
     actions: [{ label: "Mở Thông báo", to: "/notifications" }],
@@ -274,7 +274,7 @@ export const CAPABILITIES: Capability[] = [
     ],
     suggestedPrompts: [
       "Tạo báo cáo ngắn cho Chủ tịch Hiệp hội trong tuần này",
-      "Tổng hợp tăng trưởng hội viên và thu hội phí tháng này",
+      "Tổng hợp tăng trưởng Học viên và thu hội phí tháng này",
       "Những việc nào đang chờ phê duyệt?",
     ],
     actions: [
@@ -329,7 +329,7 @@ export const CAPABILITY_MEMORY: Record<CapabilityId, CapabilityMemoryPolicy> = {
       "Lọc tiếp theo tỉnh/thành",
       "Tạo thông báo cho nhóm này",
       "Xuất danh sách",
-      "Mở hồ sơ hội viên",
+      "Mở hồ sơ Học viên",
     ],
   },
   networking: {

@@ -56,8 +56,8 @@ async function run() {
     method: "POST",
     headers: { "Content-Type": "application/json", "Authorization": `Bearer ${adminToken}` },
     body: JSON.stringify({
-      name: "Tài Liệu Hướng Dẫn Hội Viên CEO HN10.docx",
-      title: "Tài Liệu Hướng Dẫn Hội Viên CEO HN10.docx",
+      name: "Tài Liệu Hướng Dẫn Học viên CEO HN10.docx",
+      title: "Tài Liệu Hướng Dẫn Học viên CEO HN10.docx",
       type: "docx",
       category: "Văn bản & Quy chế",
       file_path: "https://crm.ceohn10.viconnect.vn/uploads/sample_doc.docx",
@@ -74,7 +74,7 @@ async function run() {
       method: "PUT",
       headers: { "Content-Type": "application/json", "Authorization": `Bearer ${adminToken}` },
       body: JSON.stringify({
-        name: "Tài Liệu Hướng Dẫn Hội Viên CEO HN10 [ĐÃ CẬP NHẬT].docx"
+        name: "Tài Liệu Hướng Dẫn Học viên CEO HN10 [ĐÃ CẬP NHẬT].docx"
       })
     });
     console.log("Edit Doc Status:", editDoc.status, await editDoc.text());

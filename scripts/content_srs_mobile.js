@@ -3,7 +3,7 @@
 // Nghiêm cấm dùng từ NFC, thay bằng Thẻ thông minh doanh nhân / Công nghệ chạm thẻ thông minh 1 chạm
 function getAppSrsMarkdown() {
   return `# TÀI LIỆU ĐẶC TẢ YÊU CẦU PHẦN MỀM ỨNG DỤNG DI ĐỘNG (SRS - MOBILE APP)
-## ỨNG DỤNG DI ĐỘNG HỘI VIÊN CLB DOANH NHÂN CEO HN10 (HANOIBA)
+## ỨNG DỤNG DI ĐỘNG Học viên CLB DOANH NHÂN CEO HN10 (HANOIBA)
 *Tiêu chuẩn: IEEE 830-1998 - Phiên bản: 5.0 Hoàn thiện - Phát hành: Tháng 10/2026*
 
 ---
@@ -18,7 +18,7 @@ Tài liệu Đặc tả Yêu cầu Phần mềm (Software Requirements Specifica
 - **Tấm Danh Thiếp Số Quyền Năng**: Đại diện cho phong thái, đẳng cấp và uy tín thương hiệu của từng chủ doanh nghiệp sinh năm Quý Hợi 1983.
 - **Văn Phòng Điều Hành Bỏ Túi**: Giúp doanh nhân nhận chỉ đạo, duyệt tiến độ công việc, tham dự sự kiện và giao thương B2B mọi lúc, mọi nơi ngay trên chiếc điện thoại di động.
 
-*Tài liệu cam kết tuân thủ nghiêm ngặt quy định: Chuẩn hóa toàn bộ công nghệ kết nối hội viên bằng cụm từ chính thức: "Thẻ thông minh doanh nhân / Công nghệ chạm thẻ thông minh 1 chạm", sử dụng văn phong quản trị hiệp hội sang trọng.*
+*Tài liệu cam kết tuân thủ nghiêm ngặt quy định: Chuẩn hóa toàn bộ công nghệ kết nối Học viên bằng cụm từ chính thức: "Thẻ thông minh doanh nhân / Công nghệ chạm thẻ thông minh 1 chạm", sử dụng văn phong quản trị hiệp hội sang trọng.*
 
 ---
 
@@ -31,7 +31,7 @@ Tài liệu Đặc tả Yêu cầu Phần mềm (Software Requirements Specifica
 - **Tầng Nhận diện Giọng nói Tiếng Việt (Dual-Engine Voice AI)**: Tích hợp trợ lý giọng nói thông minh nhận lệnh tiếng Việt tự nhiên và điều hướng màn hình tức thì.
 
 ### 2.2. Cơ chế Đồng bộ Hai Chiều với Web CRM
-Mọi dữ liệu cá nhân, trạng thái hội phí, nhiệm vụ được giao và vé mời sự kiện đều được đồng bộ hai chiều liên tục với Cổng Quản trị CRM Hiệp hội. Nếu Quản trị viên thay đổi phân quyền của hội viên trên CRM, ứng dụng di động lập tức nhận diện và cập nhật thẩm quyền mà không làm gián đoạn phiên làm việc.
+Mọi dữ liệu cá nhân, trạng thái hội phí, nhiệm vụ được giao và vé mời sự kiện đều được đồng bộ hai chiều liên tục với Cổng Quản trị CRM Hiệp hội. Nếu Quản trị viên thay đổi phân quyền của Học viên trên CRM, ứng dụng di động lập tức nhận diện và cập nhật thẩm quyền mà không làm gián đoạn phiên làm việc.
 
 ---
 
@@ -46,7 +46,7 @@ Mọi dữ liệu cá nhân, trạng thái hội phí, nhiệm vụ được gia
 ### 3.1.2. Màn hình
 - **3.1.2.1. Lựa chọn hình thức đăng nhập**: Màn hình chào mừng sang trọng Deep Cobalt Navy kết hợp viền vàng Warm Amber Gold, cho phép chọn phương thức xác thực.
 - **3.1.2.2. Danh sách tài khoản đã ghi nhớ**: Danh sách các tài khoản doanh nhân đã lưu trên máy để đăng nhập nhanh.
-- **3.1.2.3. Đăng ký tài khoản hội viên mới**: Biểu mẫu ứng tuyển kết nạp ban đầu cho chủ doanh nghiệp.
+- **3.1.2.3. Đăng ký tài khoản Học viên mới**: Biểu mẫu ứng tuyển kết nạp ban đầu cho chủ doanh nghiệp.
 - **3.1.2.4. Đổi số điện thoại / Thiết lập FaceID**: Cập nhật phương thức bảo mật cá nhân.
 - **3.1.2.5. Chỉ định người trợ giúp kích hoạt thẻ**: Nút gọi nhanh hotline hỗ trợ của Ban Thư Ký.
 - **3.1.2.6. Lịch sử đăng nhập & Thiết bị**: Bảng kê khai các thiết bị đã từng truy cập tài khoản.
@@ -103,9 +103,9 @@ Mọi dữ liệu cá nhân, trạng thái hội phí, nhiệm vụ được gia
 
 ### 3.1.5. Đặc tả tương tác giao tiếp dữ liệu / API
 - **3.1.5.1. Gửi yêu cầu xác thực thẻ thông minh**: Gửi chuỗi mã hóa đọc từ chip thẻ thông minh; Máy chủ xác minh tính hợp lệ và trả về thông tin đăng nhập.
-- **3.1.5.2. Gửi mã OTP đăng nhập**: Gửi số điện thoại; Máy chủ kiểm tra danh bạ hội viên chính danh và gửi mã SMS OTP 6 số.
+- **3.1.5.2. Gửi mã OTP đăng nhập**: Gửi số điện thoại; Máy chủ kiểm tra danh bạ Học viên chính danh và gửi mã SMS OTP 6 số.
 - **3.1.5.3. Xác thực mã OTP**: Gửi mã OTP; Máy chủ xác nhận và trả về mã phiên đăng nhập an toàn.
-- **3.1.5.4. Kích hoạt liên kết thẻ thông minh mới**: Ghi nhận mã thẻ thông minh vào hồ sơ hội viên.
+- **3.1.5.4. Kích hoạt liên kết thẻ thông minh mới**: Ghi nhận mã thẻ thông minh vào hồ sơ Học viên.
 - **3.1.5.5. Cập nhật trạng thái sinh trắc học**: Đồng bộ trạng thái bảo mật của thiết bị.
 - **3.1.5.6. Làm mới phiên đăng nhập (Refresh Session)**: Tự động duy trì phiên làm việc không bị gián đoạn.
 - **3.1.5.7. Hủy phiên làm việc (Đăng xuất)**: Thu hồi mã truy cập trên máy chủ.
@@ -126,7 +126,7 @@ Mọi dữ liệu cá nhân, trạng thái hội phí, nhiệm vụ được gia
 - **3.2.2.4. Chỉnh sửa thông tin danh thiếp**: Cập nhật khẩu hiệu kinh doanh, liên kết mạng xã hội (LinkedIn, Zalo, Website).
 - **3.2.2.5. Chỉ định thông tin ưu tiên chia sẻ**: Chọn những thông tin được phép công khai khi chạm thẻ với đối tác mới.
 - **3.2.2.6. Lịch sử chạm thẻ & Kết nối**: Thống kê số lượt đối tác đã chạm thẻ hoặc quét mã xem danh thiếp của doanh nhân.
-- **3.2.2.7. Tạm khóa thẻ thông minh**: Chức năng khóa tức thời chip thẻ thông minh nếu hội viên làm thất lạc thẻ vật lý.
+- **3.2.2.7. Tạm khóa thẻ thông minh**: Chức năng khóa tức thời chip thẻ thông minh nếu Học viên làm thất lạc thẻ vật lý.
 - **3.2.2.8. Màn hình Chạm Thẻ Chia sẻ 1 Chạm**: Màn hình kích hoạt sẵn sàng truyền tải dữ liệu 1 chạm sang điện thoại đối tác.
 
 ### 3.2.3. Mô tả chi tiết màn hình
@@ -144,12 +144,12 @@ Mọi dữ liệu cá nhân, trạng thái hội phí, nhiệm vụ được gia
 | \`zaloLink\` | Liên kết Zalo Official | Số điện thoại | Có | Số điện thoại chính | 10 số | Liên kết chat nhanh Zalo |
 | \`showTaxId\` | Hiển thị Mã số thuế | Bật/Tắt | Có | Bật | Bật hoặc Tắt | Minh bạch hồ sơ pháp nhân |
 | \`showFinanceReport\`| Hiển thị Hồ sơ năng lực | Bật/Tắt | Có | Tắt | Bật hoặc Tắt | Xem quy tắc giao diện động |
-| \`privacyMode\` | Mức độ riêng tư | Chọn một | Có | Công khai cho hội viên| Công khai toàn bộ, Chỉ hội viên CEO HN10| Xem quy tắc giao diện động |
+| \`privacyMode\` | Mức độ riêng tư | Chọn một | Có | Công khai cho Học viên| Công khai toàn bộ, Chỉ Học viên CEO HN10| Xem quy tắc giao diện động |
 
 - **Hành vi tương tác giao diện động theo giá trị chọn (Select-State UI Dependencies)**:
   - *Khi chọn "Phong cách thiết kế thẻ" = "Vàng Kim HanoiBA"*:
     - Thẻ danh thiếp đổi sang tông màu Deep Cobalt Navy kết hợp viền hoa văn vàng mạ Warm Amber Gold sang trọng.
-  - *Khi chọn "Mức độ riêng tư" = "Chỉ hội viên CEO HN10"*:
+  - *Khi chọn "Mức độ riêng tư" = "Chỉ Học viên CEO HN10"*:
     - Hệ thống **tự động ẩn số điện thoại cá nhân** khi người chạm thẻ là khách bên ngoài câu lạc bộ; chỉ hiển thị địa chỉ email và trang web công ty.
   - *Khi bật "Hiển thị Hồ sơ năng lực"* = Bật:
     - Ứng dụng **hiển thị thêm nút bấm**: *[Tải lên Profile Công ty (PDF)]* (tối đa 20MB).
@@ -175,7 +175,7 @@ Mọi dữ liệu cá nhân, trạng thái hội phí, nhiệm vụ được gia
 - **3.2.4.3. Kích hoạt Chạm Thẻ Thông Minh 1 Chạm**: Đưa thẻ hoặc lưng điện thoại chạm nhẹ vào điện thoại đối tác -> Màn hình điện thoại đối tác tự động bật trang danh thiếp đầy đủ.
 - **3.2.4.4. Tạm khóa chip thẻ**: Khóa thẻ khi bị rơi mất.
 - **3.2.4.5. Xem chi tiết thông tin đối tác**: Lưu đối tác vào danh bạ điện thoại bằng 1 chạm (.vcf).
-- **3.2.4.6. Đồng bộ danh bạ hội viên**: Tự động cập nhật danh bạ các doanh nhân mới kết nạp vào máy.
+- **3.2.4.6. Đồng bộ danh bạ Học viên**: Tự động cập nhật danh bạ các doanh nhân mới kết nạp vào máy.
 
 ### 3.2.5. Đặc tả tương tác giao tiếp dữ liệu / API
 - **3.2.5.1. Lấy dữ liệu danh thiếp số cá nhân**: Trả về toàn bộ thông tin cá nhân, doanh nghiệp và liên kết mạng xã hội.
@@ -235,7 +235,7 @@ Mọi dữ liệu cá nhân, trạng thái hội phí, nhiệm vụ được gia
 - Yêu cầu nhập lý do từ chối để chuyển tiếp tới cán bộ khác trong ban.
 
 #### 3.3.3.6. Popup Chọn người phối hợp trong ban
-- Danh sách hội viên trong cùng ban chuyên môn có sẵn số điện thoại để bấm gọi trao đổi nhanh.
+- Danh sách Học viên trong cùng ban chuyên môn có sẵn số điện thoại để bấm gọi trao đổi nhanh.
 
 #### 3.3.3.7. Xem chi tiết tệp đính kèm di động
 - Trình xem trước tệp trực tiếp trong ứng dụng: Hỗ trợ phóng to thu nhỏ bảng tính Excel dự toán và văn bản Word chỉ đạo.
@@ -263,13 +263,13 @@ Mọi dữ liệu cá nhân, trạng thái hội phí, nhiệm vụ được gia
 ## 3.4. Phân hệ Sàn Giao Thương Doanh Nghiệp B2B & Khớp Nối Cung Cầu Trực Tiếp
 
 ### 3.4.1. Thông tin chung
-- **Mục tiêu**: Mở ra một sàn thương mại điện tử nội bộ B2B đẳng cấp ngay trên điện thoại của hội viên. Cho phép doanh nhân tìm kiếm nhà cung cấp uy tín, mua sắm sản phẩm với mức giá chiết khấu đặc quyền chỉ dành riêng cho hội viên CEO HN10, và đăng tải sản phẩm của chính doanh nghiệp mình tiếp cận hàng trăm chủ doanh nghiệp khác.
+- **Mục tiêu**: Mở ra một sàn thương mại điện tử nội bộ B2B đẳng cấp ngay trên điện thoại của Học viên. Cho phép doanh nhân tìm kiếm nhà cung cấp uy tín, mua sắm sản phẩm với mức giá chiết khấu đặc quyền chỉ dành riêng cho Học viên CEO HN10, và đăng tải sản phẩm của chính doanh nghiệp mình tiếp cận hàng trăm chủ doanh nghiệp khác.
 - **Chính sách kết nối giao thương trực tiếp**: Không qua trung gian thương mại, hai chủ doanh nghiệp kết nối trực tiếp với nhau thông qua cuộc gọi mã hóa nội bộ hoặc đặt lịch hẹn cà phê 1-on-1.
 
 ### 3.4.2. Màn hình
 - **3.4.2.1. Tìm kiếm sản phẩm B2B**: Thanh tìm kiếm thông minh hỗ trợ tìm kiếm bằng giọng nói tiếng Việt, lọc theo 12 nhóm ngành nghề, khoảng giá và vị trí địa lý doanh nghiệp.
-- **3.4.2.2. Danh sách sản phẩm nổi bật**: Danh sách sản phẩm hiển thị dạng lưới thẻ 2 cột hiện đại: Ảnh sản phẩm sắc nét, Tên doanh nghiệp thành viên, Giá niêm yết, Giá ưu đãi đặc quyền cho hội viên CEO HN10 và Huy hiệu uy tín.
-- **3.4.2.3. Đăng sản phẩm mới từ điện thoại**: Biểu mẫu đăng tải nhanh: Chụp ảnh sản phẩm bằng camera, nhập mức chiết khấu cho hội viên, chọn ngành nghề và gửi Ban Xúc tiến thương mại kiểm duyệt.
+- **3.4.2.2. Danh sách sản phẩm nổi bật**: Danh sách sản phẩm hiển thị dạng lưới thẻ 2 cột hiện đại: Ảnh sản phẩm sắc nét, Tên doanh nghiệp thành viên, Giá niêm yết, Giá ưu đãi đặc quyền cho Học viên CEO HN10 và Huy hiệu uy tín.
+- **3.4.2.3. Đăng sản phẩm mới từ điện thoại**: Biểu mẫu đăng tải nhanh: Chụp ảnh sản phẩm bằng camera, nhập mức chiết khấu cho Học viên, chọn ngành nghề và gửi Ban Xúc tiến thương mại kiểm duyệt.
 - **3.4.2.4. Quản lý gian hàng của tôi**: Màn hình quản lý các sản phẩm của doanh nghiệp mình đang niêm yết trên sàn.
 - **3.4.2.5. Chỉ định người phụ trách kinh doanh**: Chọn cán bộ kinh doanh của công ty để tiếp nhận các cuộc gọi hỏi mua hàng.
 - **3.4.2.6. Lịch sử yêu cầu báo giá & Giao dịch**: Theo dõi các cơ hội Cung - Cầu đã gửi đi và nhận về.
@@ -287,20 +287,20 @@ Mọi dữ liệu cá nhân, trạng thái hội phí, nhiệm vụ được gia
 | \`productTitle\` | Tên sản phẩm / Dịch vụ | Văn bản ngắn | Có | Rỗng | 5 - 150 ký tự | Tự động cắt khoảng trắng thừa |
 | \`industryId\` | Nhóm ngành nghề | Chọn một | Có | Xây dựng - Vật liệu | 12 nhóm ngành chính thức | Bắt buộc chọn đúng ngành |
 | \`regularPrice\` | Giá niêm yết thị trường | Số tiền tệ | Có | 0 | 0 đến 50 tỷ VNĐ | Nhập số tiền VNĐ |
-| \`memberPrice\` | Giá đặc quyền cho hội viên| Số tiền tệ | Có | 0 | Phải nhỏ hơn giá thị trường | Xem quy tắc giao diện động |
+| \`memberPrice\` | Giá đặc quyền cho Học viên| Số tiền tệ | Có | 0 | Phải nhỏ hơn giá thị trường | Xem quy tắc giao diện động |
 | \`minOrderQty\` | Số lượng đặt hàng tối thiểu| Văn bản ngắn | Có | 1 | Tối đa 50 ký tự | Ví dụ: 10 cái, 1 container |
 | \`productPhotos\`| Ảnh chụp sản phẩm | Chụp ảnh camera | Có | Rỗng | Tối thiểu 1 ảnh, tối đa 8 ảnh | Chụp sản phẩm rõ nét |
 | \`warrantyTerm\` | Thời hạn bảo hành / Hỗ trợ| Văn bản ngắn | Không | 12 tháng | Tối đa 100 ký tự | Cam kết uy tín doanh nhân |
 
 - **Hành vi tương tác giao diện động theo giá trị chọn (Select-State UI Dependencies)**:
-  - *Khi nhập "Giá đặc quyền cho hội viên"*:
+  - *Khi nhập "Giá đặc quyền cho Học viên"*:
     - Hệ thống **tự động tính toán tỷ lệ % chiết khấu** hiển thị ngay bên cạnh.
     - Nếu "Giá đặc quyền" >= "Giá niêm yết thị trường", ô nhập hiện viền đỏ cảnh báo vi phạm quy chế ưu đãi nội bộ.
-  - *Khi người xem là Hội viên chính danh đã đăng nhập*:
+  - *Khi người xem là Học viên chính danh đã đăng nhập*:
     - Màn hình sản phẩm hiển thị nổi bật **Mức giá ưu đãi đặc quyền màu vàng Amber Gold** kèm số tiền tiết kiệm được.
 
 #### 3.4.3.3. Danh sách sản phẩm dạng thẻ lưới
-- Thẻ sản phẩm có gắn logo doanh nghiệp hội viên mạ vàng, giá bán rõ ràng và biểu tượng ngành nghề.
+- Thẻ sản phẩm có gắn logo doanh nghiệp Học viên mạ vàng, giá bán rõ ràng và biểu tượng ngành nghề.
 
 #### 3.4.3.4. Lịch sử yêu cầu báo giá
 - Danh sách các doanh nghiệp đã bấm "Gửi yêu cầu báo giá" kèm số điện thoại để liên hệ chăm sóc.
@@ -337,12 +337,12 @@ Mọi dữ liệu cá nhân, trạng thái hội phí, nhiệm vụ được gia
 ## 3.5. Phân hệ Danh Bạ Doanh Nhân Chính Danh & Lịch Hẹn Giao Thương 1-on-1
 
 ### 3.5.1. Thông tin chung
-- **Mục tiêu**: Cung cấp cuốn danh bạ điện tử tin cậy 100% về toàn thể các chủ doanh nghiệp trong hiệp hội. Giúp hội viên dễ dàng tra cứu thông tin đối tác theo ngành hàng, chức vụ hoặc ban chuyên môn.
+- **Mục tiêu**: Cung cấp cuốn danh bạ điện tử tin cậy 100% về toàn thể các chủ doanh nghiệp trong hiệp hội. Giúp Học viên dễ dàng tra cứu thông tin đối tác theo ngành hàng, chức vụ hoặc ban chuyên môn.
 - **Tính năng Đặt lịch hẹn cà phê 1-on-1**: Cho phép chọn khung giờ rảnh và gửi lời mời kết nối cà phê giao thương 1-on-1; lịch hẹn tự động được ghi nhận vào Lịch công tác của cả hai doanh nhân.
 
 ### 3.5.2. Màn hình
-- **3.5.2.1. Tìm kiếm hội viên**: Thanh tìm kiếm theo tên, số điện thoại, tên công ty hoặc ngành nghề; bộ lọc theo Ban chuyên môn.
-- **3.5.2.2. Danh sách danh bạ hội viên**: Thẻ danh bạ sang trọng có avatar, họ tên, tên doanh nghiệp, chức vụ và 3 nút thao tác: Gọi điện thoại, Nhắn tin, Đặt lịch 1-on-1.
+- **3.5.2.1. Tìm kiếm Học viên**: Thanh tìm kiếm theo tên, số điện thoại, tên công ty hoặc ngành nghề; bộ lọc theo Ban chuyên môn.
+- **3.5.2.2. Danh sách danh bạ Học viên**: Thẻ danh bạ sang trọng có avatar, họ tên, tên doanh nghiệp, chức vụ và 3 nút thao tác: Gọi điện thoại, Nhắn tin, Đặt lịch 1-on-1.
 - **3.5.2.3. Tạo lời mời lịch hẹn 1-on-1**: Biểu mẫu thiết lập cuộc hẹn: Chọn đối tác, Thời gian hẹn, Địa điểm, Nội dung kết nối giao thương.
 - **3.5.2.4. Đổi lịch hẹn / Gia hạn**: Đề xuất dời thời gian cuộc hẹn nếu có lịch công tác đột xuất.
 - **3.5.2.5. Chỉ định địa điểm gặp gỡ**: Bản đồ gợi ý các quán cà phê sang trọng của hiệp hội.
@@ -357,7 +357,7 @@ Mọi dữ liệu cá nhân, trạng thái hội phí, nhiệm vụ được gia
 #### 3.5.3.2. Biểu mẫu Đặt lịch hẹn Giao thương 1-on-1
 | Tên trường | Nhãn hiển thị | Kiểu dữ liệu | Bắt buộc | Giá trị mặc định | Dải giá trị cho phép | Quy tắc kiểm tra (Validation) |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| \`partnerId\` | Doanh nhân đối tác | Chọn một | Có | Đã chọn trước | Danh sách hội viên chính danh | Bắt buộc chọn đúng hội viên |
+| \`partnerId\` | Doanh nhân đối tác | Chọn một | Có | Đã chọn trước | Danh sách Học viên chính danh | Bắt buộc chọn đúng Học viên |
 | \`meetingSubject\`| Chủ đề kết nối giao thương| Văn bản ngắn | Có | Cà phê giao thương 1-on-1 | 5 - 150 ký tự | Nêu rõ mục tiêu hợp tác |
 | \`appointmentDate\`| Ngày hẹn gặp | Ngày tháng | Có | Ngày mai | Từ ngày mai trở đi | Không hẹn ngày trong quá khứ |
 | \`timeSlot\` | Khung giờ hẹn | Chọn một | Có | 09:00 - 10:30 | 08:00 - 11:30, 14:00 - 17:00 | Chọn khung giờ hành chính |
@@ -384,15 +384,15 @@ Mọi dữ liệu cá nhân, trạng thái hội phí, nhiệm vụ được gia
 - Tiểu sử doanh nhân, hành trình lập nghiệp, sản phẩm kinh doanh và đánh giá uy tín.
 
 ### 3.5.4. Luồng nghiệp vụ
-- **3.5.4.1. Tra cứu danh bạ**: Tìm kiếm hội viên theo ngành nghề.
+- **3.5.4.1. Tra cứu danh bạ**: Tìm kiếm Học viên theo ngành nghề.
 - **3.5.4.2. Lưu nháp lịch hẹn**: Soạn thảo lời mời hẹn gặp lưu tạm.
 - **3.5.4.3. Gửi lời mời lịch hẹn chính thức**: Phát thông báo tới điện thoại đối tác -> Đối tác bấm đồng ý -> Xác nhận cuộc hẹn thành công.
 - **3.5.4.4. Hủy lịch hẹn**: Hủy cuộc hẹn khi có việc bận đột xuất.
 - **3.5.4.5. Xem chi tiết kết quả cuộc hẹn**: Ghi lại biên bản tóm tắt cơ hội hợp tác sau buổi gặp gỡ.
-- **3.5.4.6. Đồng bộ danh bạ máy**: Lưu toàn bộ danh bạ hội viên vào danh bạ điện thoại di động.
+- **3.5.4.6. Đồng bộ danh bạ máy**: Lưu toàn bộ danh bạ Học viên vào danh bạ điện thoại di động.
 
 ### 3.5.5. Đặc tả tương tác giao tiếp dữ liệu / API
-- **3.5.5.1. Tra cứu danh bạ hội viên**: Trả về danh sách hội viên chính danh kèm thông tin liên lạc được phép công khai.
+- **3.5.5.1. Tra cứu danh bạ Học viên**: Trả về danh sách Học viên chính danh kèm thông tin liên lạc được phép công khai.
 - **3.5.5.2. Lấy hồ sơ chi tiết doanh nhân 360°**: Tải đầy đủ thông tin cá nhân và doanh nghiệp.
 - **3.5.5.3. Gửi lời mời lịch hẹn 1-on-1**: Gửi thông tin lời mời tới máy chủ; phát thông báo đẩy tới đối tác.
 - **3.5.5.4. Lưu nháp cuộc hẹn**: Lưu dự thảo lịch hẹn.
@@ -429,7 +429,7 @@ Mọi dữ liệu cá nhân, trạng thái hội phí, nhiệm vụ được gia
 | Tên trường | Nhãn hiển thị | Kiểu dữ liệu | Bắt buộc | Giá trị mặc định | Dải giá trị cho phép | Quy tắc kiểm tra (Validation) |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | \`eventId\` | Sự kiện tham gia | Chọn một | Có | Đã chọn trước | Danh sách sự kiện mở đăng ký | Bắt buộc chọn sự kiện hợp lệ |
-| \`delegateName\` | Họ và tên đại biểu | Văn bản ngắn | Có | Họ tên doanh nhân | 2 - 100 ký tự | Tự động điền tên hội viên |
+| \`delegateName\` | Họ và tên đại biểu | Văn bản ngắn | Có | Họ tên doanh nhân | 2 - 100 ký tự | Tự động điền tên Học viên |
 | \`ticketClass\` | Hạng vé tham dự | Chọn một | Có | Đại biểu VIP | Đại biểu VIP, Đại biểu Tiêu chuẩn | Xem quy tắc giao diện động |
 | \`hasGuest\` | Đăng ký khách mời kèm | Bật/Tắt | Có | Tắt | Bật hoặc Tắt | Xem quy tắc giao diện động |
 | \`guestName\` | Họ tên khách mời | Văn bản ngắn | Không | Rỗng | 2 - 100 ký tự | Bắt buộc nếu bật đăng ký kèm |
@@ -450,7 +450,7 @@ Mọi dữ liệu cá nhân, trạng thái hội phí, nhiệm vụ được gia
 - Dòng thời gian chương trình: Đón khách -> Khai mạc -> Khai tiệc -> Giao lưu -> Quay số may mắn.
 
 #### 3.6.3.5. Hộp thoại Hủy vé sự kiện
-- Cho phép hủy vé trước giờ khai mạc tối thiểu 24h để nhường quyền tham dự cho hội viên khác.
+- Cho phép hủy vé trước giờ khai mạc tối thiểu 24h để nhường quyền tham dự cho Học viên khác.
 
 #### 3.6.3.6. Popup Chọn bàn tiệc giao thương mong muốn
 - Sơ đồ bàn tiệc tròn trực quan cho phép chọn bàn có các doanh nghiệp cùng ngành để tiện trao đổi.
@@ -488,13 +488,13 @@ Mọi dữ liệu cá nhân, trạng thái hội phí, nhiệm vụ được gia
 - **Trợ lý giọng nói doanh nhân thông minh (Voice AI)**: Cho phép ra lệnh bằng giọng nói tiếng Việt tự nhiên: "Mở danh sách sự kiện", "Xem hội phí", "Tìm doanh nghiệp xây dựng"; hệ thống tự động chuyển hướng màn hình tức thì.
 
 ### 3.7.2. Màn hình
-- **3.7.2.1. Tìm kiếm hội viên để đàm thoại**: Tìm nhanh bạn đồng môn theo tên hoặc số điện thoại trong danh bạ nội bộ.
+- **3.7.2.1. Tìm kiếm Học viên để đàm thoại**: Tìm nhanh bạn đồng môn theo tên hoặc số điện thoại trong danh bạ nội bộ.
 - **3.7.2.2. Lịch sử cuộc gọi nội bộ**: Danh sách các cuộc gọi đi, cuộc gọi đến và cuộc gọi nhỡ kèm thời lượng đàm thoại.
 - **3.7.2.3. Màn hình Đàm thoại Thoại / Video (Active Call)**: Giao diện đàm thoại toàn màn hình sang trọng Deep Cobalt Navy, hiển thị ảnh đại diện doanh nhân, thời gian kết nối, nút Bật/Tắt Mic, Bật/Tắt Camera, Chuyển loa ngoài và nút Kết thúc cuộc gọi màu đỏ.
 - **3.7.2.4. Màn hình Đổ chuông Khóa màn hình (Native Incoming Call)**: Giao diện chuông cuộc gọi nền native trên điện thoại.
 - **3.7.2.5. Chỉ định thiết bị âm thanh**: Chọn đàm thoại qua tai nghe Bluetooth, loa thoại hoặc loa ngoài.
 - **3.7.2.6. Nhật ký chất lượng cuộc gọi**: Đánh giá chất lượng âm thanh 5 sao sau khi kết thúc cuộc đàm thoại.
-- **3.7.2.7. Chặn cuộc gọi làm phiền**: Tùy chọn chỉ nhận cuộc gọi từ các hội viên trong danh bạ chính danh.
+- **3.7.2.7. Chặn cuộc gọi làm phiền**: Tùy chọn chỉ nhận cuộc gọi từ các Học viên trong danh bạ chính danh.
 - **3.7.2.8. Màn hình Trợ lý Giọng nói Doanh nhân (Voice AI Dialog)**: Màn hình kích hoạt trợ lý AI với quả cầu sóng âm phát sáng ánh kim Warm Amber Gold chuyển động theo giọng nói tiếng Việt.
 
 ### 3.7.3. Mô tả chi tiết màn hình
@@ -555,7 +555,7 @@ Mọi dữ liệu cá nhân, trạng thái hội phí, nhiệm vụ được gia
 ## 3.8. Phân hệ Trung Tâm Thông Báo Đẩy Thời Gian Thực & Tin Tức Hiệp Hội
 
 ### 3.8.1. Thông tin chung
-- **Mục tiêu**: Đảm bảo mọi hội viên không bao giờ bỏ lỡ các thông báo quan trọng, chỉ đạo công việc khẩn hoặc các cơ hội giao thương mới.
+- **Mục tiêu**: Đảm bảo mọi Học viên không bao giờ bỏ lỡ các thông báo quan trọng, chỉ đạo công việc khẩn hoặc các cơ hội giao thương mới.
 - **Kênh thông báo đa tầng**: Thông báo đẩy (Push Notification) hiển thị trên màn hình khóa, âm thanh chuông báo khẩn và danh sách thông báo phân loại trong ứng dụng.
 
 ### 3.8.2. Màn hình
@@ -577,7 +577,7 @@ Mọi dữ liệu cá nhân, trạng thái hội phí, nhiệm vụ được gia
 | \`vibrateMode\` | Bật/Tắt | Bật | Rung điện thoại khi có lời mời giao thương mới |
 
 ### 3.8.4. Luồng nghiệp vụ
-- CRM phát hành thông báo -> Máy chủ gửi tín hiệu đẩy -> Điện thoại rung chuông -> Hội viên chạm mở xem chi tiết.
+- CRM phát hành thông báo -> Máy chủ gửi tín hiệu đẩy -> Điện thoại rung chuông -> Học viên chạm mở xem chi tiết.
 
 ### 3.8.5. Đặc tả tương tác giao tiếp dữ liệu / API
 - Lấy danh sách thông báo phân trang; Cập nhật trạng thái đã đọc; Đăng ký mã thiết bị nhận thông báo đẩy.
@@ -587,7 +587,7 @@ Mọi dữ liệu cá nhân, trạng thái hội phí, nhiệm vụ được gia
 ## 3.9. Phân hệ Hòm Thư Góp Ý & Tâm Thư Trực Tiếp Tới Ban Điều Hành
 
 ### 3.9.1. Thông tin chung
-- **Mục tiêu**: Xây dựng kênh giao tiếp dân chủ, cởi mở và bảo mật giữa từng hội viên với Chủ tịch và Ban Điều Hành. Cho phép gửi sáng kiến phát triển hiệp hội hoặc phản ánh vướng mắc một cách trân trọng.
+- **Mục tiêu**: Xây dựng kênh giao tiếp dân chủ, cởi mở và bảo mật giữa từng Học viên với Chủ tịch và Ban Điều Hành. Cho phép gửi sáng kiến phát triển hiệp hội hoặc phản ánh vướng mắc một cách trân trọng.
 - **Bảo mật người gửi**: Cho phép tùy chọn gửi ẩn danh hoặc công khai danh tính.
 
 ### 3.9.2. Màn hình
@@ -602,10 +602,10 @@ Mọi dữ liệu cá nhân, trạng thái hội phí, nhiệm vụ được gia
 | \`feedbackTitle\` | Tiêu đề góp ý | Văn bản ngắn | Có | Rỗng | 10 - 200 ký tự | Tự động cắt khoảng trắng |
 | \`targetBan\` | Kính gửi Ban lãnh đạo | Chọn một | Có | Chủ tịch & Ban Điều Hành| Chủ tịch, Ban Thành Viên, Ban Tài chính| Chọn ban tiếp nhận |
 | \`feedbackContent\`| Nội dung tâm thư | Đoạn văn bản | Có | Rỗng | 20 - 3000 ký tự | Nêu rõ giải pháp, tâm tư |
-| \`isAnonymous\` | Gửi dưới dạng ẩn danh | Bật/Tắt | Có | Tắt | Bật hoặc Tắt | Bảo vệ danh tính hội viên |
+| \`isAnonymous\` | Gửi dưới dạng ẩn danh | Bật/Tắt | Có | Tắt | Bật hoặc Tắt | Bảo vệ danh tính Học viên |
 
 ### 3.9.4. Luồng nghiệp vụ
-- Hội viên soạn tâm thư -> Bấm gửi -> Chỉ có Chủ tịch và Thư ký được phân công mới có quyền đọc -> Gửi thư hồi đáp lại hội viên.
+- Học viên soạn tâm thư -> Bấm gửi -> Chỉ có Chủ tịch và Thư ký được phân công mới có quyền đọc -> Gửi thư hồi đáp lại Học viên.
 
 ### 3.9.5. Đặc tả tương tác giao tiếp dữ liệu / API
 - Gửi tâm thư bảo mật; Lấy lịch sử phản hồi; Cập nhật trạng thái đã xử lý.
@@ -629,7 +629,7 @@ Mọi dữ liệu cá nhân, trạng thái hội phí, nhiệm vụ được gia
 2. **Gác máy Tức thì Không Độ trễ (0ms Latency Hangup)**: Khi một bên gác máy hoặc từ chối cuộc gọi, hệ thống máy chủ lập tức giải phóng kênh và ra lệnh cho thiết bị bên kia dừng chuông và đóng modal ngay tức thì, triệt tiêu hoàn toàn lỗi chuông ảo tiếp tục đổ.
 
 ### 4.4. Yêu cầu về Tính sẵn sàng Ngoại tuyến (Offline-First Capability)
-1. **Lưu trữ Danh bạ & Danh thiếp Ngoại tuyến**: Thông tin danh bạ hội viên đã kết nối và tấm danh thiếp số cá nhân được lưu trữ an toàn trong bộ nhớ máy, cho phép tra cứu và chạm thẻ chia sẻ ngay cả khi ở trên máy bay hoặc vùng mất sóng di động.
+1. **Lưu trữ Danh bạ & Danh thiếp Ngoại tuyến**: Thông tin danh bạ Học viên đã kết nối và tấm danh thiếp số cá nhân được lưu trữ an toàn trong bộ nhớ máy, cho phép tra cứu và chạm thẻ chia sẻ ngay cả khi ở trên máy bay hoặc vùng mất sóng di động.
 2. **Ví vé Sự kiện Ngoại tuyến**: Mã QR vé sự kiện và thông tin bàn tiệc VIP được lưu sẵn trong ví vé, sẵn sàng xuất trình check-in tại hội trường mà không phụ thuộc vào tốc độ mạng 4G.
 
 ### 4.5. Yêu cầu về Thiết kế Giao diện & Trải nghiệm Doanh nhân (Design & UX Standards)

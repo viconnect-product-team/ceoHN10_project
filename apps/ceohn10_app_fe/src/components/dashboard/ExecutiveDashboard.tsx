@@ -88,34 +88,34 @@ type Tone = "navy" | "gold" | "green" | "amber" | "rose" | "blue";
 
 const gradientCardStyles: Record<Tone, { bg: string; textTitle: string; iconBg: string }> = {
   navy: {
-    bg: "bg-white dark:bg-[#000000] border border-purple-100 dark:border-[#18181B]",
-    textTitle: "text-[#7C2D82] dark:text-[#FFFFFF]",
-    iconBg: "bg-purple-600/10 text-[#7C2D82]",
+    bg: "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800",
+    textTitle: "text-[#334155] dark:text-slate-100",
+    iconBg: "bg-slate-100 text-[#334155] dark:bg-slate-800 dark:text-slate-200",
   },
   blue: {
-    bg: "bg-white dark:bg-[#000000] border border-purple-100 dark:border-[#18181B]",
-    textTitle: "text-[#7C2D82] dark:text-[#FFFFFF]",
-    iconBg: "bg-purple-600/10 text-[#7C2D82]",
+    bg: "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800",
+    textTitle: "text-[#334155] dark:text-slate-100",
+    iconBg: "bg-slate-100 text-[#334155] dark:bg-slate-800 dark:text-slate-200",
   },
   gold: {
-    bg: "bg-white dark:bg-[#000000] border border-pink-100 dark:border-[#18181B]",
-    textTitle: "text-[#D61F69] dark:text-[#FFFFFF]",
-    iconBg: "bg-pink-500/10 text-[#D61F69]",
+    bg: "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800",
+    textTitle: "text-[#475569] dark:text-slate-100",
+    iconBg: "bg-slate-100 text-[#475569] dark:bg-slate-800 dark:text-slate-200",
   },
   green: {
-    bg: "bg-white dark:bg-[#000000] border border-purple-100 dark:border-[#18181B]",
-    textTitle: "text-[#7C2D82] dark:text-[#FFFFFF]",
-    iconBg: "bg-purple-600/10 text-[#7C2D82]",
+    bg: "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800",
+    textTitle: "text-emerald-700 dark:text-emerald-400",
+    iconBg: "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300",
   },
   amber: {
-    bg: "bg-white dark:bg-[#000000] border border-pink-100 dark:border-[#18181B]",
-    textTitle: "text-[#D61F69] dark:text-[#FFFFFF]",
-    iconBg: "bg-pink-500/10 text-[#D61F69]",
+    bg: "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800",
+    textTitle: "text-amber-700 dark:text-amber-400",
+    iconBg: "bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300",
   },
   rose: {
-    bg: "bg-white dark:bg-[#000000] border border-pink-100 dark:border-[#18181B]",
-    textTitle: "text-[#D61F69] dark:text-[#FFFFFF]",
-    iconBg: "bg-pink-500/10 text-[#D61F69]",
+    bg: "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800",
+    textTitle: "text-rose-700 dark:text-rose-400",
+    iconBg: "bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-300",
   },
 };
 
@@ -244,7 +244,7 @@ function GrowthArea({ data }: { data: DashboardStats["growth"] }) {
           <Tooltip
             content={
               <ChartAdaptiveTooltip
-                formatter={(val: number) => [`${val} hội viên`, "Quy mô"]}
+                formatter={(val: number) => [`${val} Học viên`, "Quy mô"]}
               />
             }
           />
@@ -398,7 +398,7 @@ export function ExecutiveDashboard({ authReady }: { authReady: boolean }) {
     enabled: authReady,
   });
 
-  // Mục I.1 & UC-3: Khóa học hội viên tham gia
+  // Mục I.1 & UC-3: Khóa học Học viên tham gia
   const myEnrolledQ = useQuery({
     queryKey: ["dashboard-my-enrolled-trainings"],
     queryFn: async () => {
@@ -412,7 +412,7 @@ export function ExecutiveDashboard({ authReady }: { authReady: boolean }) {
     enabled: authReady,
   });
 
-  // Mục I.1 & UC-2: Sự kiện hội viên tham gia
+  // Mục I.1 & UC-2: Sự kiện Học viên tham gia
   const myEventsQ = useQuery({
     queryKey: ["dashboard-my-events"],
     queryFn: async () => {
@@ -450,7 +450,7 @@ export function ExecutiveDashboard({ authReady }: { authReady: boolean }) {
 
     if (!base && clientMembers.length === 0) return undefined;
 
-    // Lọc bỏ các hội viên đã bị xóa hoặc không hợp lệ (chỉ tính hội viên đang dùng)
+    // Lọc bỏ các Học viên đã bị xóa hoặc không hợp lệ (chỉ tính Học viên đang dùng)
     const nonDeletedMembers = clientMembers.filter((m: any) => {
       const st = String(m.status || "").toLowerCase();
       return st !== "deleted" && st !== "cancelled" && !m.deleted_at && !m.deletedAt;
@@ -473,7 +473,7 @@ export function ExecutiveDashboard({ authReady }: { authReady: boolean }) {
     const individuals = members.filter((m: any) => m.type === "individual" || m.type === "personal" || !m.type).length;
     const pendingRenewals = members.filter((m: any) => m.status === "expired" || m.status === "pending" || m.status === "pending_approval").length;
 
-    // Đếm chính xác số hội viên mới gia nhập trong vòng 30 ngày (dữ liệu thật từ CSDL)
+    // Đếm chính xác số Học viên mới gia nhập trong vòng 30 ngày (dữ liệu thật từ CSDL)
     const days30Time = Date.now() - 30 * 24 * 3600 * 1000;
     const newMembers30d = members.filter((m: any) => {
       const timeVal = m.joinedAt || m.joined_at || m.createdAt || m.created_at;
@@ -509,7 +509,7 @@ export function ExecutiveDashboard({ authReady }: { authReady: boolean }) {
     const upcomingEvents = upcoming.length;
     const openOpportunities = recentTrainings.length;
 
-    // Biểu đồ tăng trưởng thực tế thể hiện quy mô hội viên qua các tháng
+    // Biểu đồ tăng trưởng thực tế thể hiện quy mô Học viên qua các tháng
     const gList: { month: string; count: number }[] = [];
     for (let i = 5; i >= 0; i--) {
       const d = new Date();
@@ -587,7 +587,7 @@ export function ExecutiveDashboard({ authReady }: { authReady: boolean }) {
       {/* Bộ lọc trạng thái trực tiếp theo cơ sở dữ liệu */}
       <div className="flex flex-wrap items-center justify-between gap-3 p-3.5 rounded-2xl border border-border bg-card shadow-xs">
         <div className="flex items-center gap-2 text-xs font-semibold text-foreground">
-          <Filter className="h-4 w-4 text-[#7C2D82]" />
+          <Filter className="h-4 w-4 text-[#334155] dark:text-slate-300" />
           <span>Lọc Trạng Thái Dashboard:</span>
         </div>
         <div className="flex flex-wrap items-center gap-1.5">
@@ -619,7 +619,7 @@ export function ExecutiveDashboard({ authReady }: { authReady: boolean }) {
               type="button"
               onClick={() => setStatusFilter(tab.key)}
               className={`px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${statusFilter === tab.key
-                ? "bg-gradient-to-r from-[#7C2D82] to-[#D61F69] text-white shadow-xs"
+                ? "bg-[#334155] text-white shadow-xs"
                 : "bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground"
                 }`}
             >
@@ -743,7 +743,7 @@ export function ExecutiveDashboard({ authReady }: { authReady: boolean }) {
                 </div>
                 <div>
                   <h4 className="text-sm font-bold text-foreground">Túi Quỹ Chung CEO HN10</h4>
-                  <p className="text-[11px] text-muted-foreground">Tổng hợp từ hội phí hội viên</p>
+                  <p className="text-[11px] text-muted-foreground">Tổng hợp từ hội phí Học viên</p>
                 </div>
               </div>
               <span className="px-2 py-0.5 rounded-full text-[10.5px] font-bold bg-purple-600/10 text-purple-700 dark:text-purple-300 border border-purple-600/20">
@@ -854,9 +854,9 @@ export function ExecutiveDashboard({ authReady }: { authReady: boolean }) {
         </div>
       </Panel>
 
-      {/* ── KHÓA HỌC & SỰ KIỆN TÔI THAM GIA (HỘI VIÊN - MỤC I.1 & UC-3) ── */}
+      {/* ── KHÓA HỌC & SỰ KIỆN TÔI THAM GIA (Học viên - MỤC I.1 & UC-3) ── */}
       <Panel
-        title="Khóa Học &amp; Sự Kiện Tôi Tham Gia (Hội Viên)"
+        title="Khóa Học &amp; Sự Kiện Tôi Tham Gia (Học viên)"
         sub="Theo dõi các khóa đào tạo định kỳ Thứ 7 và sự kiện bạn đã đăng ký hoặc tham dự, tải slide bài giảng &amp; đóng góp ý kiến"
         action={
           <div className="flex items-center gap-2">
@@ -912,11 +912,10 @@ export function ExecutiveDashboard({ authReady }: { authReady: boolean }) {
                         <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-600/10 text-purple-700 dark:text-purple-300">
                           {tr.isFixed ? "Cố định (Thứ 7 hàng tuần)" : "Chuyên đề linh hoạt"}
                         </span>
-                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                          tr.myStatus === "attended"
+                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${tr.myStatus === "attended"
                             ? "bg-emerald-500/10 text-emerald-600"
                             : "bg-blue-500/10 text-blue-600"
-                        }`}>
+                          }`}>
                           {tr.myStatus === "attended" ? "Đã điểm danh" : "Đã đăng ký"}
                         </span>
                       </div>
@@ -1167,10 +1166,10 @@ export function ExecutiveDashboard({ authReady }: { authReady: boolean }) {
         </Panel>
       </div>
 
-      {/* Realtime Live Feed: Hội viên mới & Sản phẩm Marketplace mới nhất */}
+      {/* Realtime Live Feed: Học viên mới & Sản phẩm Marketplace mới nhất */}
       <div className="grid gap-5 lg:grid-cols-2">
         <Panel
-          title="Hội viên mới gia nhập"
+          title="Học viên mới gia nhập"
           action={<ViewAll to="/members" label={t("exec.viewAll")} />}
         >
           {membersQ.isLoading ? (
@@ -1188,7 +1187,7 @@ export function ExecutiveDashboard({ authReady }: { authReady: boolean }) {
                     className="flex items-center justify-between gap-3 rounded-xl border border-border bg-background p-3 transition-colors hover:border-primary/40 hover:bg-muted/40"
                   >
                     {(() => {
-                      const pName = (m as any).personName || m.contact || m.name || "Hội viên";
+                      const pName = (m as any).personName || m.contact || m.name || "Học viên";
                       const cName = (m as any).company || (m.type === 'company' ? m.name : '') || (m as any).companyName || m.industry || "Doanh nghiệp thành viên";
                       return (
                         <div className="flex items-center gap-3 min-w-0">
@@ -1238,7 +1237,7 @@ export function ExecutiveDashboard({ authReady }: { authReady: boolean }) {
                     className="flex items-center justify-between gap-3 rounded-xl border border-border bg-background p-3 transition-colors hover:border-primary/40 hover:bg-muted/40"
                   >
                     <div className="flex items-center gap-3 min-w-0">
-                      <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-purple-500/10 text-base text-[#7C2D82]">
+                      <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-slate-100 dark:bg-slate-800 text-base text-slate-700 dark:text-slate-300">
                         <GraduationCap className="h-5 w-5" />
                       </span>
                       <div className="min-w-0">
@@ -1285,7 +1284,7 @@ export function ExecutiveDashboard({ authReady }: { authReady: boolean }) {
                     to="/documents"
                     className="flex h-full items-start gap-3 rounded-xl border border-border bg-background p-3 transition-colors hover:border-primary/40 hover:bg-muted/40"
                   >
-                    <span className="p-2 rounded-lg bg-purple-500/10 text-[#7C2D82]">
+                    <span className="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
                       <FolderOpen className="h-5 w-5" />
                     </span>
                     <div className="min-w-0 flex-1">

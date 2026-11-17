@@ -1,5 +1,5 @@
 // BC-Mobile — Event Detail & Registration Sheet.
-// Hiển thị chi tiết đầy đủ sự kiện trên Mobile và cho phép hội viên bấm Tham gia sự kiện trực tiếp.
+// Hiển thị chi tiết đầy đủ sự kiện trên Mobile và cho phép Học viên bấm Tham gia sự kiện trực tiếp.
 
 import {
   CalendarDays,
@@ -80,7 +80,7 @@ export function EventDetailMobileSheet({
           }
         }
       })
-      .catch(() => {});
+      .catch(() => { });
 
     return () => {
       active = false;
@@ -111,11 +111,11 @@ export function EventDetailMobileSheet({
 
   const dateFormatted = isValidDate
     ? dt.toLocaleDateString(fmt.locale, {
-        weekday: "long",
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric",
-      })
+      weekday: "long",
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    })
     : "Thời gian thông báo sau";
 
   const timeFormatted =
@@ -132,12 +132,12 @@ export function EventDetailMobileSheet({
     try {
       await fetchNestApi(`/events/${encodeURIComponent(eventId)}/register`, {
         method: "POST",
-      }).catch(() => {});
+      }).catch(() => { });
 
       // Persist registration state
       try {
         localStorage.setItem(`bc_event_reg_${eventId}`, "true");
-      } catch {}
+      } catch { }
 
       setIsRegistered(true);
       toast.success("Đăng ký tham gia sự kiện thành công!", {
@@ -147,7 +147,7 @@ export function EventDetailMobileSheet({
     } catch {
       try {
         localStorage.setItem(`bc_event_reg_${eventId}`, "true");
-      } catch {}
+      } catch { }
       setIsRegistered(true);
       toast.success("Đã ghi nhận đăng ký tham gia sự kiện!");
       onRegisteredChange?.(eventId, true);
@@ -161,11 +161,11 @@ export function EventDetailMobileSheet({
     try {
       await fetchNestApi(`/events/${encodeURIComponent(eventId)}/register`, {
         method: "DELETE",
-      }).catch(() => {});
+      }).catch(() => { });
 
       try {
         localStorage.removeItem(`bc_event_reg_${eventId}`);
-      } catch {}
+      } catch { }
 
       setIsRegistered(false);
       setShowCancelConfirm(false);
@@ -174,7 +174,7 @@ export function EventDetailMobileSheet({
     } catch {
       try {
         localStorage.removeItem(`bc_event_reg_${eventId}`);
-      } catch {}
+      } catch { }
       setIsRegistered(false);
       setShowCancelConfirm(false);
       toast.info("Đã hủy đăng ký sự kiện.");
@@ -229,11 +229,10 @@ export function EventDetailMobileSheet({
         <div className="flex items-center justify-between px-5 py-2 border-b border-[var(--bc-mobile-border)]">
           <div className="inline-flex items-center gap-2">
             <span
-              className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold tracking-wide uppercase ${
-                isOnline
+              className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold tracking-wide uppercase ${isOnline
                   ? "bg-amber-500/15 text-amber-500 border border-amber-500/30"
                   : "bg-[var(--bc-mobile-accent-soft)] text-[var(--bc-mobile-accent)] border border-[var(--bc-mobile-border)]"
-              }`}
+                }`}
             >
               {isOnline ? <Video className="h-3 w-3" /> : <Users className="h-3 w-3" />}
               {isOnline ? "Trực tuyến" : "Trực tiếp"}
@@ -403,11 +402,10 @@ export function EventDetailMobileSheet({
                 <button
                   type="button"
                   onClick={handleAddToCalendar}
-                  className={`flex-1 py-3 px-4 rounded-xl text-xs font-semibold border flex items-center justify-center gap-2 transition-all cursor-pointer ${
-                    isSaved
+                  className={`flex-1 py-3 px-4 rounded-xl text-xs font-semibold border flex items-center justify-center gap-2 transition-all cursor-pointer ${isSaved
                       ? "border-emerald-500/50 bg-emerald-500/15 text-emerald-300 shadow-xs"
                       : "border-[var(--bc-mobile-border)] bg-[var(--bc-mobile-surface-2)] text-[var(--bc-mobile-text)] hover:border-[var(--bc-mobile-accent)]"
-                  }`}
+                    }`}
                 >
                   <CalendarPlus className="h-4 w-4 text-[var(--bc-mobile-accent)]" />
                   <span>{isSaved ? "Đã lưu vào lịch ✓" : "Lưu vào lịch"}</span>
@@ -427,11 +425,10 @@ export function EventDetailMobileSheet({
                 <button
                   type="button"
                   onClick={handleAddToCalendar}
-                  className={`py-3 px-3.5 rounded-xl text-xs font-semibold border flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
-                    isSaved
+                  className={`py-3 px-3.5 rounded-xl text-xs font-semibold border flex items-center justify-center gap-1.5 transition-all cursor-pointer ${isSaved
                       ? "border-emerald-500/50 bg-emerald-500/15 text-emerald-300 shadow-xs"
                       : "border-[var(--bc-mobile-border)] bg-[var(--bc-mobile-surface-2)] text-[var(--bc-mobile-text)] hover:border-[var(--bc-mobile-accent)]"
-                  }`}
+                    }`}
                 >
                   <CalendarPlus className="h-4 w-4 text-[var(--bc-mobile-accent)]" />
                   <span>{isSaved ? "Đã lưu" : "Lưu vào lịch"}</span>

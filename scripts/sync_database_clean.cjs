@@ -13,7 +13,7 @@ async function main() {
   if (!vupvUserId) {
     vupvUserId = crypto.randomUUID();
     const passwordHash = '$2b$10$EEPv7J0KuOAUguc3JF9pp.A0T1IPXcc7FDNX7OCj9SsbOBsxVGlGy'; // 123456
-    
+
     // First in auth.users
     await client.query(`
       INSERT INTO auth.users (id, email, role)
@@ -42,7 +42,7 @@ async function main() {
   // vupv090120@gmail.com
   await client.query(`
     UPDATE members 
-    SET user_id = $1::uuid, name = 'Phạm An Nam', executive_role = 'member', department = 'Hội viên ceohn10', status = 'active', updated_at = NOW()
+    SET user_id = $1::uuid, name = 'Phạm An Nam', executive_role = 'member', department = 'Học viên ceohn10', status = 'active', updated_at = NOW()
     WHERE email = 'vupv090120@gmail.com'
   `, [vupvUserId]);
 
@@ -63,7 +63,7 @@ async function main() {
   // info@viconnect.vn
   await client.query(`
     UPDATE members 
-    SET name = 'Phạm hồng Nguyên', executive_role = 'member', department = 'Hội viên ceohn10', status = 'active', updated_at = NOW()
+    SET name = 'Phạm hồng Nguyên', executive_role = 'member', department = 'Học viên ceohn10', status = 'active', updated_at = NOW()
     WHERE email = 'info@viconnect.vn'
   `);
 

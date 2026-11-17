@@ -201,7 +201,7 @@ function createTable(headers, rowsData, widths = []) {
     }
     return Math.round(TOTAL_TABLE_WIDTH_DXA / headers.length);
   });
-  
+
   // Đảm bảo tổng chiều rộng các cột chuẩn xác bằng TOTAL_TABLE_WIDTH_DXA (9200 twips)
   const allocated = colWidthsDxa.slice(0, -1).reduce((a, b) => a + b, 0);
   colWidthsDxa[colWidthsDxa.length - 1] = TOTAL_TABLE_WIDTH_DXA - allocated;
@@ -362,18 +362,18 @@ async function buildCodeReadySrsDocx() {
       'Hệ thống thiếu tính toán thời gian giải phóng mặt bằng (Next Available Time = Event Time + 2 giờ phục vụ tiệc/dọn dẹp). Khi báo lỗi, hệ thống chỉ báo chung chung "Địa điểm đã tồn tại", không cung cấp mốc thời gian cụ thể mà người dùng có thể đặt lại.',
       'Hậu quả vận hành:'
     ),
-    createHeading2('1.2. Luồng Đăng Ký Sự Kiện & Hội Viên Đặt Chỗ (Event Registration Overlap)'),
+    createHeading2('1.2. Luồng Đăng Ký Sự Kiện & Học viên Đặt Chỗ (Event Registration Overlap)'),
     createBullet(
-      'Hội viên có thể vô tình hoặc cố ý đăng ký tham dự 2 sự kiện khác nhau diễn ra cùng một ngày/giờ (ví dụ: Sự kiện A tại Hà Nội và Sự kiện B tại TP. Hồ Chí Minh). Hệ thống trước đây chỉ kiểm tra trùng theo cặp (member_id, event_id), hoàn toàn không kiểm tra xung đột thời gian (Date/Time Overlap) giữa các sự kiện khác nhau mà hội viên đã đăng ký.',
+      'Học viên có thể vô tình hoặc cố ý đăng ký tham dự 2 sự kiện khác nhau diễn ra cùng một ngày/giờ (ví dụ: Sự kiện A tại Hà Nội và Sự kiện B tại TP. Hồ Chí Minh). Hệ thống trước đây chỉ kiểm tra trùng theo cặp (member_id, event_id), hoàn toàn không kiểm tra xung đột thời gian (Date/Time Overlap) giữa các sự kiện khác nhau mà Học viên đã đăng ký.',
       'Lỗ hổng logic (GAP-02):'
     ),
     createBullet(
-      'Nếu chặn cứng (Hard Block), hội viên là chủ doanh nghiệp muốn đăng ký cho đại diện ủy quyền hoặc nhân sự đi thay sẽ bị tước quyền tham dự. Nếu không chặn, báo cáo quân số ảo và lãng phí ghế ngồi VIP.',
+      'Nếu chặn cứng (Hard Block), Học viên là chủ doanh nghiệp muốn đăng ký cho đại diện ủy quyền hoặc nhân sự đi thay sẽ bị tước quyền tham dự. Nếu không chặn, báo cáo quân số ảo và lãng phí ghế ngồi VIP.',
       'Đứt gãy luồng nghiệp vụ:'
     ),
     createHeading2('1.3. Luồng Gửi Email Giao Dịch & Khắc Phục Mailer-Daemon Bounce Loop'),
     createBullet(
-      'Hệ thống gửi thư tự động qua tài khoản Gmail SMTP (Nodemailer). Khi chạy test script hoặc hội viên nhập email ảo/sai cú pháp (ví dụ: ceo.test5137_...@ceohn10.com), máy chủ Gmail cố gắng kết nối tới MX record của miền không tồn tại, rơi vào vòng lặp chờ phản hồi kéo dài 47 giờ (Google Mailer-Daemon deferral warning).',
+      'Hệ thống gửi thư tự động qua tài khoản Gmail SMTP (Nodemailer). Khi chạy test script hoặc Học viên nhập email ảo/sai cú pháp (ví dụ: ceo.test5137_...@ceohn10.com), máy chủ Gmail cố gắng kết nối tới MX record của miền không tồn tại, rơi vào vòng lặp chờ phản hồi kéo dài 47 giờ (Google Mailer-Daemon deferral warning).',
       'Lỗ hổng kỹ thuật (GAP-03):'
     ),
     createBullet(
@@ -405,7 +405,7 @@ async function buildCodeReadySrsDocx() {
         [
           'GAP-02',
           'Đăng ký Sự kiện',
-          'Hội viên đăng ký trùng lịch 2 sự kiện khác nhau không có cảnh báo.',
+          'Học viên đăng ký trùng lịch 2 sự kiện khác nhau không có cảnh báo.',
           'Bổ sung cảnh báo xác nhận: "Bạn đang đăng ký sự kiện [...] cùng thời gian với sự kiện [...]. Bạn có chắc muốn đăng ký thêm không?" kèm cờ confirmOverlap.',
           'Nghiêm trọng (P1)',
         ],
@@ -497,30 +497,30 @@ async function buildCodeReadySrsDocx() {
     createCallout(
       'SCENARIO BDD: Từ chối tạo sự kiện trùng địa điểm',
       'GIVEN Admin đang ở màn hình tạo sự kiện (/events)\n' +
-      'AND đã có sự kiện "Đại hội Hội viên CLB CEO HN10" tổ chức vào ngày 15/10/2026 lúc 08:30 tại "Khách sạn Daewoo, Hà Nội"\n' +
+      'AND đã có sự kiện "Đại hội Học viên CLB CEO HN10" tổ chức vào ngày 15/10/2026 lúc 08:30 tại "Khách sạn Daewoo, Hà Nội"\n' +
       'WHEN Admin nhập thông tin sự kiện mới "Giao thương B2B" vào ngày 15/10/2026 với địa điểm "Khách sạn Daewoo, Hà Nội"\n' +
       'AND bấm nút "Lưu sự kiện"\n' +
-      'THEN Hệ thống hiển thị thông báo lỗi màu đỏ: "Địa điểm này đang trùng với sự kiện "Đại hội Hội viên CLB CEO HN10", sau thời gian 10:30 ngày 15/10/2026 có thể đăng ký được."\n' +
+      'THEN Hệ thống hiển thị thông báo lỗi màu đỏ: "Địa điểm này đang trùng với sự kiện "Đại hội Học viên CLB CEO HN10", sau thời gian 10:30 ngày 15/10/2026 có thể đăng ký được."\n' +
       'AND Sự kiện mới KHÔNG được tạo trong cơ sở dữ liệu.',
       'danger'
     ),
-    createHeading2('2.3. Đặc Tả Chi Tiết Use Case 02: Hội Viên Đăng Ký Sự Kiện (Cảnh Báo & Xác Nhận Trùng Lịch)'),
-    createPara('• Mã Use Case: UC-REG-02\n• Tên Use Case: Đăng ký vé tham gia sự kiện có cảnh báo xung đột lịch trình cá nhân.\n• Actor: Hội viên chính thức (MEMBER), Khách mời doanh nhân.\n• Tiền điều kiện: Hội viên đã đăng nhập tài khoản. Sự kiện mục tiêu còn chỗ trống (registered < capacity).\n• Hậu điều kiện: Bản ghi đăng ký được lưu vào public.event_registrations. Tạo mã vé, số quay thưởng may mắn và gửi vé QR.'),
+    createHeading2('2.3. Đặc Tả Chi Tiết Use Case 02: Học viên Đăng Ký Sự Kiện (Cảnh Báo & Xác Nhận Trùng Lịch)'),
+    createPara('• Mã Use Case: UC-REG-02\n• Tên Use Case: Đăng ký vé tham gia sự kiện có cảnh báo xung đột lịch trình cá nhân.\n• Actor: Học viên chính thức (MEMBER), Khách mời doanh nhân.\n• Tiền điều kiện: Học viên đã đăng nhập tài khoản. Sự kiện mục tiêu còn chỗ trống (registered < capacity).\n• Hậu điều kiện: Bản ghi đăng ký được lưu vào public.event_registrations. Tạo mã vé, số quay thưởng may mắn và gửi vé QR.'),
     createHeading3('Quy tắc nghiệp vụ cứng:'),
-    createBullet('BR-REG-01: Một hội viên được phép đăng ký nhiều sự kiện khác nhau. Tuy nhiên, nếu hội viên đăng ký một sự kiện có CÙNG THỜI GIAN (cùng ngày) với sự kiện đã đăng ký trước đó (status != "cancelled"), hệ thống BẮT BUỘC hiển thị hộp thoại cảnh báo: "Bạn đang đăng ký sự kiện [Sự kiện mới] cùng thời gian với sự kiện [Sự kiện cũ]. Bạn có chắc muốn đăng ký thêm không?".', 'Quy tắc 1:'),
+    createBullet('BR-REG-01: Một Học viên được phép đăng ký nhiều sự kiện khác nhau. Tuy nhiên, nếu Học viên đăng ký một sự kiện có CÙNG THỜI GIAN (cùng ngày) với sự kiện đã đăng ký trước đó (status != "cancelled"), hệ thống BẮT BUỘC hiển thị hộp thoại cảnh báo: "Bạn đang đăng ký sự kiện [Sự kiện mới] cùng thời gian với sự kiện [Sự kiện cũ]. Bạn có chắc muốn đăng ký thêm không?".', 'Quy tắc 1:'),
     createBullet('BR-REG-02: Nếu người dùng chọn "Hủy / Cancel", hủy bỏ giao dịch đăng ký, giữ nguyên trạng thái cũ. Nếu người dùng chọn "Xác nhận / OK", gửi cờ confirmOverlap: true lên Backend để hoàn tất đăng ký.', 'Quy tắc 2:'),
     createHeading3('Tiêu chí chấp nhận BDD:'),
     createCallout(
       'SCENARIO BDD: Cảnh báo xác nhận khi đăng ký 2 sự kiện cùng ngày',
-      'GIVEN Hội viên Nguyễn Văn Cường đã đăng ký thành công sự kiện "Đại hội Toàn thể" diễn ra ngày 20/11/2026\n' +
-      'WHEN Hội viên bấm đăng ký tiếp sự kiện "Gala Dinner Thượng Đỉnh" cũng diễn ra vào ngày 20/11/2026\n' +
+      'GIVEN Học viên Nguyễn Văn Cường đã đăng ký thành công sự kiện "Đại hội Toàn thể" diễn ra ngày 20/11/2026\n' +
+      'WHEN Học viên bấm đăng ký tiếp sự kiện "Gala Dinner Thượng Đỉnh" cũng diễn ra vào ngày 20/11/2026\n' +
       'THEN Hệ thống bật hộp thoại xác nhận: "Bạn đang đăng ký sự kiện "Gala Dinner Thượng Đỉnh" cùng thời gian với sự kiện "Đại hội Toàn thể". Bạn có chắc muốn đăng ký thêm không?"\n' +
-      'WHEN Hội viên bấm "OK"\n' +
+      'WHEN Học viên bấm "OK"\n' +
       'THEN Hệ thống cấp vé thành công, sinh mã vé VietQR và số may mắn cho sự kiện mới.',
       'info'
     ),
     createHeading2('2.4. Đặc Tả Chi Tiết Use Case 03: Khởi Tạo & Đăng Ký Cuộc Họp / Cuộc Gặp 1-on-1'),
-    createPara('• Mã Use Case: UC-MEET-03\n• Tương tự luồng sự kiện: Áp dụng quy tắc kiểm tra trùng lặp phòng họp vật lý (offline) tại văn phòng CLB CEO HN10, thông báo rõ giờ giải phóng phòng họp.\n• Đối với hội viên: Khi lên lịch hẹn 1-on-1 với đối tác trùng khung giờ với cuộc họp khác đã hẹn trước, hiển thị cảnh báo xác nhận tương tự luồng sự kiện.'),
+    createPara('• Mã Use Case: UC-MEET-03\n• Tương tự luồng sự kiện: Áp dụng quy tắc kiểm tra trùng lặp phòng họp vật lý (offline) tại văn phòng CLB CEO HN10, thông báo rõ giờ giải phóng phòng họp.\n• Đối với Học viên: Khi lên lịch hẹn 1-on-1 với đối tác trùng khung giờ với cuộc họp khác đã hẹn trước, hiển thị cảnh báo xác nhận tương tự luồng sự kiện.'),
     createHeading2('2.5. Đặc Tả Chi Tiết Use Case 04: Bộ Điều Phối Email Giao Dịch & Danh Sách Chặn (Mail Suppression)'),
     createPara('• Mã Use Case: UC-MAIL-04\n• Tên Use Case: Gửi email giao dịch an toàn, chống lặp lỗi Mailer-Daemon.\n• Giải thuật thực thi (Engine Architecture):'),
     createBullet('BR-MAIL-01: Kiểm tra tiền trạm: Nếu email kết thúc bằng @ceohn10.com hoặc chứa chuỗi test, mock, dummy, dev, 5137 -> Bỏ qua lệnh gửi SMTP thật, ghi log [MAIL FILTER DUMMY] và trả về kết quả thành công ảo để không làm gián đoạn luồng test.', 'Lọc email test:'),
@@ -529,7 +529,7 @@ async function buildCodeReadySrsDocx() {
     createHeading2('2.6. Đặc Tả Chi Tiết Use Case 05: Phân Nhóm & Ma Trận Phân Quyền Đa Cấp Bậc (RBAC Matrix)'),
     createPara('• Mã Use Case: UC-RBAC-05\n• Tên Use Case: Điều hướng và phân nhóm chức năng phân quyền độc lập.\n• Cấu trúc cây menu mới: Nhóm "PHÂN QUYỀN" (Role & Permission Management) được đặt làm nhóm menu cấp 1 độc lập trên Sidebar và Drawer di động, bao gồm:\n  1. Ma trận phân quyền (/permissions?tab=matrix)\n  2. Phân quyền tài khoản (/permissions?tab=user_actions)\n  3. Thẩm quyền Ban & Cấp bậc (/permissions?tab=role_groups)'),
     createHeading2('2.7. Đặc Tả Chi Tiết Use Case 06: Trợ Lý AI Điều Hành 32 Tính Năng & Cơ Chế 2 Pha Chỉ Dẫn Trực Tiếp (Turn-by-Turn Voice GPS HUD)'),
-    createPara('• Mã Use Case: UC-AI-06\n• Tên Use Case: Trợ lý AI điều hành thông minh, giải thích và dẫn đường trực tiếp cho 32 tính năng.\n• Mô hình công nghệ: Google Gemini 2.0 Flash Free Tier (100% miễn phí) kết hợp Web Speech API vi-VN và Smart Hybrid NLP Engine dự phòng nội bộ.\n• Ma trận 32 tính năng: 24 phân hệ hội viên nội bộ (Sự kiện, Vé QR, Thẻ NFC, Quét card visit AI, Danh bạ CEO, Lịch hẹn 1-on-1, Sàn B2B, Biểu quyết, Quay số Gala, Hội phí VietQR, Thư viện, v.v.) và 8 phân hệ quản trị CRM (Tạo sự kiện, Duyệt hội viên, Kế toán hội phí, Giao việc Kanban, Phân quyền RBAC, Nhà tài trợ, Kho văn bản, Trung tâm thông báo).\n• Cơ chế 2 pha tương tác:\n  - Pha 1 (Giải thích + Mời dẫn đường): AI phân tích câu hỏi, giải thích các bước thao tác và hỏi: "Quý Anh/Chị có muốn tôi hướng dẫn thao tác trực tiếp trên màn hình không? Tôi sẽ dẫn đường từng bước cho Anh/Chị." kèm 2 nút [👉 Có, hướng dẫn trực tiếp ngay] và [Để sau].\n  - Pha 2 (Lái màn hình tự động): Khi người dùng bấm "Có" hoặc nói "Có" / "Đồng ý" / "OK" / "Bắt đầu", hệ thống tự đóng modal, điều hướng URL đến đúng trang đích và kích hoạt lớp phủ Voice GPS HUD Overlay chiếu Spotlight hào quang vàng nhấp nháy vào đúng nút cần chạm kèm thuyết minh giọng nói từng bước.'),
+    createPara('• Mã Use Case: UC-AI-06\n• Tên Use Case: Trợ lý AI điều hành thông minh, giải thích và dẫn đường trực tiếp cho 32 tính năng.\n• Mô hình công nghệ: Google Gemini 2.0 Flash Free Tier (100% miễn phí) kết hợp Web Speech API vi-VN và Smart Hybrid NLP Engine dự phòng nội bộ.\n• Ma trận 32 tính năng: 24 phân hệ Học viên nội bộ (Sự kiện, Vé QR, Thẻ NFC, Quét card visit AI, Danh bạ CEO, Lịch hẹn 1-on-1, Sàn B2B, Biểu quyết, Quay số Gala, Hội phí VietQR, Thư viện, v.v.) và 8 phân hệ quản trị CRM (Tạo sự kiện, Duyệt Học viên, Kế toán hội phí, Giao việc Kanban, Phân quyền RBAC, Nhà tài trợ, Kho văn bản, Trung tâm thông báo).\n• Cơ chế 2 pha tương tác:\n  - Pha 1 (Giải thích + Mời dẫn đường): AI phân tích câu hỏi, giải thích các bước thao tác và hỏi: "Quý Anh/Chị có muốn tôi hướng dẫn thao tác trực tiếp trên màn hình không? Tôi sẽ dẫn đường từng bước cho Anh/Chị." kèm 2 nút [👉 Có, hướng dẫn trực tiếp ngay] và [Để sau].\n  - Pha 2 (Lái màn hình tự động): Khi người dùng bấm "Có" hoặc nói "Có" / "Đồng ý" / "OK" / "Bắt đầu", hệ thống tự đóng modal, điều hướng URL đến đúng trang đích và kích hoạt lớp phủ Voice GPS HUD Overlay chiếu Spotlight hào quang vàng nhấp nháy vào đúng nút cần chạm kèm thuyết minh giọng nói từng bước.'),
     new Paragraph({ spacing: { before: 200, after: 200 } })
   );
 

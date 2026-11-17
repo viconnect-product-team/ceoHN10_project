@@ -20,7 +20,7 @@ const srsContent = `# ĐẶC TẢ YÊU CẦU PHẦN MỀM HỆ THỐNG CEO HN10 
    - 1.5. Tổng quan cấu trúc tài liệu
 2. **MÔ TẢ TỔNG THỂ (OVERALL DESCRIPTION)**
    - 2.1. Mô hình kiến trúc phân tầng (3-Tier Monorepo Architecture)
-   - 2.2. Phân hệ Web CRM Quản trị & Phân hệ Mobile App Hội viên
+   - 2.2. Phân hệ Web CRM Quản trị & Phân hệ Mobile App Học viên
    - 2.3. Đặc điểm người dùng & 9 nhóm vai trò hệ thống
    - 2.4. Môi trường vận hành và hạ tầng triển khai
    - 2.5. Ràng buộc thiết kế và hiện thực hóa (STRICT DATABASE & NO-MOCK)
@@ -58,8 +58,8 @@ Tài liệu Đặc tả Yêu cầu Phần mềm (SRS) này xác định đầy �
 
 ### 1.2. Phạm vi sản phẩm (Product Scope)
 Hệ sinh thái phần mềm CEO HN10 gồm 2 phân hệ chính hoạt động trên một cơ sở dữ liệu dùng chung:
-1. **Cổng Thông Tin Web CRM Quản Trị**: Dành cho Ban Chủ tịch, Ban Điều Hành, Ban Thư Ký, Ban Tài Chính và các Trưởng/Phó Ban chuyên môn quản lý hội viên, sự kiện, khóa học, 2 túi quỹ, tài liệu và phân quyền.
-2. **Ứng Dụng Di Động CEO HN10 Mobile App**: Dành cho các Hội viên doanh nhân tra cứu danh bạ doanh nghiệp, đăng ký sự kiện, ghi danh 30 khóa học, tải slide bài giảng, gửi góp ý phản hồi và kết nối kinh doanh B2B.
+1. **Cổng Thông Tin Web CRM Quản Trị**: Dành cho Ban Chủ tịch, Ban Điều Hành, Ban Thư Ký, Ban Tài Chính và các Trưởng/Phó Ban chuyên môn quản lý Học viên, sự kiện, khóa học, 2 túi quỹ, tài liệu và phân quyền.
+2. **Ứng Dụng Di Động CEO HN10 Mobile App**: Dành cho các Học viên doanh nhân tra cứu danh bạ doanh nghiệp, đăng ký sự kiện, ghi danh 30 khóa học, tải slide bài giảng, gửi góp ý phản hồi và kết nối kinh doanh B2B.
 
 ### 1.3. Định nghĩa và từ viết tắt
 - **HanoiBA**: Hội Doanh Nghiệp Trẻ Hà Nội.
@@ -67,7 +67,7 @@ Hệ sinh thái phần mềm CEO HN10 gồm 2 phân hệ chính hoạt động t
 - **RBAC**: Role-Based Access Control (Kiểm soát truy cập dựa trên vai trò).
 - **JWT**: JSON Web Token.
 - **RESTful API**: Giao diện lập trình ứng dụng tuân thủ kiến trúc REST qua HTTP/JSON.
-- **Túi Quỹ Chung**: Quỹ tài chính hình thành từ hội phí thường niên của hội viên.
+- **Túi Quỹ Chung**: Quỹ tài chính hình thành từ hội phí thường niên của Học viên.
 - **Túi Quỹ Tài Trợ**: Quỹ tài chính tiếp nhận tiền mặt và kho hiện vật do các Nhà tài trợ đóng góp.
 - **Agenda Slots**: Khung thời gian chi tiết các tiết học trong một buổi đào tạo.
 - **Capacity**: Sức chứa tối đa của một sự kiện/lớp học.
@@ -95,12 +95,12 @@ Hệ sinh thái phần mềm CEO HN10 gồm 2 phân hệ chính hoạt động t
 1. \`admin\` / \`quan_tri\`: Quản trị viên hệ thống, toàn quyền cấu hình và phân quyền.
 2. \`chu_tich\`: Chủ tịch CLB, phê duyệt ngân sách, phê duyệt chi và chỉ đạo toàn diện.
 3. \`ban_dieu_hanh\`: Ban Điều Hành / Phó Chủ tịch, giám sát hoạt động.
-4. \`ban_thu_ky\`: Ban Thư Ký / Tổng Thư Ký, quản lý công văn, danh bạ hội viên, thông báo.
+4. \`ban_thu_ky\`: Ban Thư Ký / Tổng Thư Ký, quản lý công văn, danh bạ Học viên, thông báo.
 5. \`ban_tai_chinh\`: Ban Tài Chính, quản trị 2 túi quỹ, lập phiếu chi, báo cáo tài chính.
 6. \`ban_su_kien\`: Ban Sự Kiện & Hậu Cần, tạo sự kiện, khai báo vật dụng hỗ trợ.
 7. \`ban_dao_tao\`: Ban Đào Tạo, điều hành 30 khóa học, điểm danh, phát slide.
 8. \`ban_truyen_thong\`: Ban Truyền Thông, quản lý thư viện ảnh, bài đăng, bản tin.
-9. \`member\` / \`hoi_vien\`: Hội viên doanh nhân, người dùng đầu cuối trên Mobile App và cổng hội viên.
+9. \`member\` / \`hoi_vien\`: Học viên doanh nhân, người dùng đầu cuối trên Mobile App và cổng Học viên.
 
 ### 2.3. Ràng buộc thiết kế và hiện thực hóa (STRICT DATABASE & NO-MOCK)
 - **Cơ sở dữ liệu duy nhất**: \`113.20.107.184:6432\` (database \`ceohn10_project\`). Tuyệt đối không trỏ sang CSDL khác.
@@ -139,7 +139,7 @@ Hệ sinh thái phần mềm CEO HN10 gồm 2 phân hệ chính hoạt động t
 - **SFR-02.3**: **Kiểm tra giới hạn số lượng**: Khi số lượng người đã đăng ký bằng với \`capacity\`, hệ thống khóa form đăng ký và hiển thị cảnh báo: **"Sự kiện đã đủ chỗ"**.
 - **SFR-02.4**: Cung cấp API tải lên danh sách đường link album ảnh và media tư liệu (\`POST /api/events/:id/media\`), tự động lưu bản ghi vào bảng \`public.documents\` với danh mục \`event_media\`.
 - **SFR-02.5**: Cung cấp API đánh giá phản hồi sự kiện (\`POST /api/events/:id/feedbacks\`), lưu điểm sao (1 - 5) và ý kiến của người tham gia.
-- **SFR-02.6**: Cung cấp API \`GET /api/events/my-events\` trả về danh sách các sự kiện mà hội viên đang đăng nhập đã tham gia để hiển thị trên Dashboard.
+- **SFR-02.6**: Cung cấp API \`GET /api/events/my-events\` trả về danh sách các sự kiện mà Học viên đang đăng nhập đã tham gia để hiển thị trên Dashboard.
 
 ### 4.3. SFR-03: Phân hệ Quản lý Khóa học / Buổi học (UC-3)
 - **SFR-03.1**: Cho phép tạo khóa học/buổi học với các thuộc tính: Tên khóa học, chuyên đề, giảng viên, loại hình (Cố định vào Thứ 7 hàng tuần hoặc linh hoạt), thời gian, địa điểm, danh sách khung giờ chi tiết (\`agenda slots\`).
@@ -148,7 +148,7 @@ Hệ sinh thái phần mềm CEO HN10 gồm 2 phân hệ chính hoạt động t
 - **SFR-03.4**: **Nút Gửi Slide**: Cung cấp API \`POST /api/trainings/:id/send-slides\` tự động gửi slide bài giảng cho học viên và lưu trữ tài liệu vào \`public.documents\` với danh mục \`training_materials\`.
 - **SFR-03.5**: Cho phép học viên đóng góp ý kiến sau buổi học qua \`POST /api/trainings/:id/feedbacks\`, hỗ trợ gửi phản hồi bằng văn bản hoặc đính kèm tệp tin.
 - **SFR-03.6**: Cho phép đính kèm link video/ảnh buổi học qua \`POST /api/trainings/:id/media\` và tự động lưu vào \`public.documents\`.
-- **SFR-03.7**: Cung cấp API \`GET /api/trainings/my/enrolled\` trả về các khóa học hội viên đã tham gia để hiển thị trên Dashboard cá nhân kèm nút "Tải Slide" và "Góp ý".
+- **SFR-03.7**: Cung cấp API \`GET /api/trainings/my/enrolled\` trả về các khóa học Học viên đã tham gia để hiển thị trên Dashboard cá nhân kèm nút "Tải Slide" và "Góp ý".
 
 ### 4.4. SFR-04: Phân hệ Khai báo Vật dụng hỗ trợ Hậu cần (UC-4)
 - **SFR-04.1**: Cung cấp chức năng cho Ban Sự Kiện & Hậu Cần khai báo vật tư hỗ trợ tại từng sự kiện và từng buổi học qua \`POST /api/supplies\`.
@@ -158,7 +158,7 @@ Hệ sinh thái phần mềm CEO HN10 gồm 2 phân hệ chính hoạt động t
 
 ### 4.5. SFR-05: Phân hệ Quản lý 2 Túi Quỹ & Phiếu chi PDF 5 chữ ký (UC-5)
 - **SFR-05.1**: Hệ thống quản lý tài chính độc lập trên 2 Túi Quỹ:
-  - **Túi Quỹ Chung**: Tổng hợp từ hội phí hội viên và nguồn thu thường xuyên. Phục vụ chi phí sự kiện, họp ban, hiếu hỷ Ban Đời Sống.
+  - **Túi Quỹ Chung**: Tổng hợp từ hội phí Học viên và nguồn thu thường xuyên. Phục vụ chi phí sự kiện, họp ban, hiếu hỷ Ban Đời Sống.
   - **Túi Quỹ Tài Trợ**: Phân chia thành 2 mục rõ ràng: (1) Tiền mặt tài trợ, (2) Kho hiện vật tài trợ.
 - **SFR-05.2**: Cung cấp API tổng quan quỹ \`GET /api/admin/funds-overview\` trả về số dư realtime, tổng thu, tổng chi của cả 2 túi quỹ.
 - **SFR-05.3**: **Báo cáo chi bắt buộc**: Mỗi bản ghi chi tiêu (\`expenses\`) bắt buộc chỉ rõ: Thuộc sự kiện nào (\`targetEventName\`), thuộc ban chuyên môn nào (\`targetDepartment\`), lý do chi, và **ai là người nhận tiền** (\`recipientName\`).
@@ -183,13 +183,13 @@ Hệ sinh thái phần mềm CEO HN10 gồm 2 phân hệ chính hoạt động t
 - **SFR-07.3**: Phân quyền 2 tầng: Tài liệu công khai toàn CLB và Tài liệu bảo mật nội bộ Ban Điều Hành.
 
 ### 4.8. SFR-08: Phân hệ Tiếp nhận Phản ánh, Góp ý & Khảo sát
-- **SFR-08.1**: Tiếp nhận ý kiến phản hồi của hội viên về hoạt động của CLB.
+- **SFR-08.1**: Tiếp nhận ý kiến phản hồi của Học viên về hoạt động của CLB.
 - **SFR-08.2**: Phân loại phản ánh theo ban chuyên môn giải quyết: Ban Đào Tạo, Ban Sự Kiện, Ban Tài Chính, Ban Đời Sống.
-- **SFR-08.3**: Cập nhật trạng thái xử lý: Mới tiếp nhận -> Đang xử lý -> Đã giải quyết -> Phản hồi hội viên.
+- **SFR-08.3**: Cập nhật trạng thái xử lý: Mới tiếp nhận -> Đang xử lý -> Đã giải quyết -> Phản hồi Học viên.
 
 ### 4.9. SFR-09: Phân hệ Biểu quyết điện tử & Thăm dò ý kiến
 - **SFR-09.1**: Ban Điều Hành tạo cuộc biểu quyết: Tiêu đề, nội dung, danh sách phương án lựa chọn, thời gian bắt đầu và kết thúc.
-- **SFR-09.2**: Hội viên hợp lệ thực hiện bỏ phiếu (mỗi hội viên chỉ được bỏ phiếu 1 lần đối với mỗi cuộc biểu quyết).
+- **SFR-09.2**: Học viên hợp lệ thực hiện bỏ phiếu (mỗi Học viên chỉ được bỏ phiếu 1 lần đối với mỗi cuộc biểu quyết).
 - **SFR-09.3**: Tự động thống kê số phiếu, tỷ lệ phần trăm và hiển thị biểu đồ kết quả trực quan.
 
 ### 4.10. SFR-10: Phân hệ Quản lý Mẫu thông báo tùy biến động
@@ -212,7 +212,7 @@ Hệ sinh thái phần mềm CEO HN10 gồm 2 phân hệ chính hoạt động t
 ### 4.13. SFR-13: Phân hệ Dashboard Tổng quan nhanh
 - **SFR-13.1**: Khởi tạo mặc định 4 sự kiện và 30 khóa học hạt nhân của CEO HN10.
 - **SFR-13.2**: Hiển thị widget "Ví 2 Túi Quỹ CEO HN10" kết nối realtime CSDL gồm Túi Quỹ Chung và Túi Quỹ Tài Trợ (Tiền mặt + Kho hiện vật).
-- **SFR-13.3**: Hiển thị widget "Khóa Học & Sự Kiện Tôi Tham Gia" dành cho hội viên kèm nút "Tải Slide" và "Góp ý / Đánh giá".
+- **SFR-13.3**: Hiển thị widget "Khóa Học & Sự Kiện Tôi Tham Gia" dành cho Học viên kèm nút "Tải Slide" và "Góp ý / Đánh giá".
 
 ---
 

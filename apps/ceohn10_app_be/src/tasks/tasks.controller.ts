@@ -19,7 +19,7 @@ import { TaskItem, TaskFilterDto, CreateTaskDto, UpdateTaskDto } from './dto';
 @Controller('tasks')
 @UseGuards(OptionalJwtAuthGuard)
 export class TasksController {
-  constructor(private readonly tasksService: TasksService) {}
+  constructor(private readonly tasksService: TasksService) { }
 
   @Get('assignment-history')
   async getAssignmentHistory() {
@@ -85,8 +85,8 @@ export class TasksController {
     @Param('id') id: string,
     @Body() body: { content: string; authorName?: string; authorRole?: string },
   ) {
-    const authorName = body.authorName || req?.user?.fullName || 'Hội viên';
-    const authorRole = body.authorRole || req?.user?.role || 'Hội viên';
+    const authorName = body.authorName || req?.user?.fullName || 'Học viên';
+    const authorRole = body.authorRole || req?.user?.role || 'Học viên';
     return this.tasksService.addComment(id, {
       content: body.content,
       authorName,

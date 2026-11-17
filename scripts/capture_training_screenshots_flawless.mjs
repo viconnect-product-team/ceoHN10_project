@@ -64,7 +64,7 @@ async function main() {
   await crmPage.screenshot({ path: path.join(screenshotsDir, 'crm_05_permissions.png') });
 
   // CRM 06: Members List
-  console.log('6. Chụp CRM Danh sách Hội viên...');
+  console.log('6. Chụp CRM Danh sách Học viên...');
   await crmPage.goto('https://crm.ceohn10.viconnect.vn/members', { waitUntil: 'networkidle', timeout: 45000 });
   await crmPage.waitForTimeout(4000);
   await crmPage.screenshot({ path: path.join(screenshotsDir, 'crm_06_members.png') });
@@ -79,11 +79,11 @@ async function main() {
   console.log('8. Chụp CRM Tạo Sự Kiện Mới...');
   const createEvtBtn = crmPage.locator('button:has-text("+ Tạo sự kiện"), button:has-text("Tạo sự kiện mới"), button:has-text("+ Tạo")').first();
   if (await createEvtBtn.isVisible().catch(() => false)) {
-    await createEvtBtn.click().catch(() => {});
+    await createEvtBtn.click().catch(() => { });
     await crmPage.waitForTimeout(2000);
     await crmPage.screenshot({ path: path.join(screenshotsDir, 'crm_08_event_create_modal.png') });
     const closeBtn = crmPage.locator('button:has-text("Hủy"), button[aria-label="Close"], button:has-text("Đóng")').first();
-    if (await closeBtn.isVisible().catch(() => false)) await closeBtn.click().catch(() => {});
+    if (await closeBtn.isVisible().catch(() => false)) await closeBtn.click().catch(() => { });
     await crmPage.waitForTimeout(1000);
   }
 
@@ -103,11 +103,11 @@ async function main() {
   console.log('11. Chụp CRM Modal Thêm Công việc mới...');
   const addTaskBtn = crmPage.locator('button:has-text("Thêm công việc"), button:has-text("+ Thêm công việc mới"), button:has-text("+ Thêm")').first();
   if (await addTaskBtn.isVisible().catch(() => false)) {
-    await addTaskBtn.click().catch(() => {});
+    await addTaskBtn.click().catch(() => { });
     await crmPage.waitForTimeout(2000);
     await crmPage.screenshot({ path: path.join(screenshotsDir, 'crm_11_task_create_modal.png') });
     const closeBtn = crmPage.locator('button:has-text("Hủy"), button[aria-label="Close"], button:has-text("Đóng")').first();
-    if (await closeBtn.isVisible().catch(() => false)) await closeBtn.click().catch(() => {});
+    if (await closeBtn.isVisible().catch(() => false)) await closeBtn.click().catch(() => { });
     await crmPage.waitForTimeout(1000);
   }
 
@@ -168,7 +168,7 @@ async function main() {
   await mobilePage.waitForTimeout(4000);
   // Đóng prompt nếu xuất hiện
   const dismissBtn = mobilePage.locator('button:has-text("Để sau"), button:has-text("Đã hiểu")').first();
-  if (await dismissBtn.isVisible().catch(() => false)) await dismissBtn.click().catch(() => {});
+  if (await dismissBtn.isVisible().catch(() => false)) await dismissBtn.click().catch(() => { });
   await mobilePage.waitForTimeout(1000);
   await mobilePage.screenshot({ path: path.join(screenshotsDir, 'app_01_landing.png') });
 
@@ -176,7 +176,7 @@ async function main() {
   console.log('2. Chụp Mobile Đăng nhập...');
   await mobilePage.goto('https://ceohn10.viconnect.vn/association/login', { waitUntil: 'networkidle', timeout: 45000 });
   await mobilePage.waitForTimeout(4000);
-  if (await dismissBtn.isVisible().catch(() => false)) await dismissBtn.click().catch(() => {});
+  if (await dismissBtn.isVisible().catch(() => false)) await dismissBtn.click().catch(() => { });
   await mobilePage.screenshot({ path: path.join(screenshotsDir, 'app_02_login.png') });
 
   // Đăng nhập Mobile
@@ -202,13 +202,13 @@ async function main() {
   console.log('5. Chụp Mobile Thẻ VIP Mặt sau (QR Code)...');
   const cardFlipEl = mobilePage.locator('.cursor-pointer, [data-card-flip], button:has-text("Lật thẻ"), button:has-text("Mã QR")').first();
   if (await cardFlipEl.isVisible().catch(() => false)) {
-    await cardFlipEl.click().catch(() => {});
+    await cardFlipEl.click().catch(() => { });
     await mobilePage.waitForTimeout(1500);
   }
   await mobilePage.screenshot({ path: path.join(screenshotsDir, 'app_05_card_back.png') });
 
   // Mobile 06: Members Directory
-  console.log('6. Chụp Mobile Danh bạ Hội viên...');
+  console.log('6. Chụp Mobile Danh bạ Học viên...');
   await mobilePage.goto('https://ceohn10.viconnect.vn/association/members', { waitUntil: 'networkidle', timeout: 45000 });
   await mobilePage.waitForTimeout(4000);
   await mobilePage.screenshot({ path: path.join(screenshotsDir, 'app_06_members.png') });

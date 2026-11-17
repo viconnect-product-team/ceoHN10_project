@@ -122,7 +122,7 @@ export function AssociationAnalyticsScreen() {
 
   // ── 3 DANH MỤC THỐNG KÊ CHUẨN YÊU CẦU ──
   // 1. 3 thành viên kết nối nhiều nhất (tháng, quý, năm)
-  // 2. Hội viên chia sẻ cơ hội nhiều nhất (tháng, quý, năm) - Chỉ tính cơ hội public
+  // 2. Học viên chia sẻ cơ hội nhiều nhất (tháng, quý, năm) - Chỉ tính cơ hội public
   // 3. 3 thành viên tham gia nhiều sự kiện, cuộc họp nhất và tương tác nhiều nhất
   const [activeCategory, setActiveCategory] = useState<AnalyticsCategory>("member_activities");
   const [reportModalOpen, setReportModalOpen] = useState(false);
@@ -159,7 +159,7 @@ export function AssociationAnalyticsScreen() {
           analyticsOverviewMemoryCache.set(cacheKey, parsed);
           return parsed;
         }
-      } catch {}
+      } catch { }
     }
     return null;
   });
@@ -237,7 +237,7 @@ export function AssociationAnalyticsScreen() {
       .then((res) => {
         if (res && res.id) setCurrentMember(res);
       })
-      .catch(() => {});
+      .catch(() => { });
   }, []);
 
   // Fetch real opportunities for high-level general stats
@@ -258,7 +258,7 @@ export function AssociationAnalyticsScreen() {
           setOppStats({ totalOpps, totalValue, wonCount });
         }
       })
-      .catch(() => {});
+      .catch(() => { });
   }, []);
 
   // Fetch overview from NestJS backend theo Tháng / Quý / Năm và kỳ lịch sử với SWR Cache
@@ -282,7 +282,7 @@ export function AssociationAnalyticsScreen() {
             setLoading(false);
             foundInSession = true;
           }
-        } catch {}
+        } catch { }
       }
       if (!foundInSession) {
         setServerData(null);
@@ -304,7 +304,7 @@ export function AssociationAnalyticsScreen() {
           analyticsOverviewMemoryCache.set(currentKey, res);
           try {
             sessionStorage.setItem(`vba_cache_${currentKey}`, JSON.stringify(res));
-          } catch {}
+          } catch { }
           setServerData(res);
         }
       } catch (err) {
@@ -324,7 +324,7 @@ export function AssociationAnalyticsScreen() {
     let socket: any = null;
     try {
       socket = getConnectAppSocket();
-    } catch {}
+    } catch { }
 
     const handleRealtimeUpdate = () => {
       analyticsOverviewMemoryCache.clear();
@@ -337,7 +337,7 @@ export function AssociationAnalyticsScreen() {
           }
         }
         keysToRemove.forEach((k) => sessionStorage.removeItem(k));
-      } catch {}
+      } catch { }
 
       const params = new URLSearchParams({
         granularity,
@@ -352,7 +352,7 @@ export function AssociationAnalyticsScreen() {
             setServerData(res);
           }
         })
-        .catch(() => {});
+        .catch(() => { });
     };
 
     if (socket) {
@@ -409,7 +409,7 @@ export function AssociationAnalyticsScreen() {
         rewardTitle: "Hộp Quà Trà Cổ Thụ & Bộ Cốc Sứ Mạ Vàng CEO HN10",
         rewardVoucherCode: "TASK-MILESTONE-2",
         rewardDiscount: "Tặng 100%",
-        rewardDesc: "Mở khóa gói quà tặng cao cấp khi hoàn thành 7 nhiệm vụ tương tác, đăng cơ hội và giới thiệu hội viên.",
+        rewardDesc: "Mở khóa gói quà tặng cao cấp khi hoàn thành 7 nhiệm vụ tương tác, đăng cơ hội và giới thiệu Học viên.",
         perkData: {
           id: "milestone-reward-02",
           title: "Hộp Quà Trà Cổ Thụ & Bộ Cốc Sứ Mạ Vàng CEO HN10",
@@ -479,7 +479,7 @@ export function AssociationAnalyticsScreen() {
       }
 
       window.dispatchEvent(new CustomEvent("vba:saved_perks_updated"));
-    } catch {}
+    } catch { }
 
     toast.success(`Đã nhận thành công "${node.rewardTitle}" và lưu vào Ưu đãi của tôi!`);
     setSelectedMilestone(null);
@@ -521,7 +521,7 @@ export function AssociationAnalyticsScreen() {
           {
             label: "Click link giới thiệu",
             value: `${totalRefClicks} lượt`,
-            subtext: "Click link mời hội viên mới",
+            subtext: "Click link mời Học viên mới",
             isUp: totalRefClicks > 0,
             icon: UserPlus,
           },
@@ -551,7 +551,7 @@ export function AssociationAnalyticsScreen() {
             icon: Users,
           },
           {
-            label: "Hội viên đang hoạt động",
+            label: "Học viên đang hoạt động",
             value: `${activeCeo} CEO`,
             subtext: "Đã thiết lập mạng lưới",
             isUp: activeCeo > 0,
@@ -579,8 +579,8 @@ export function AssociationAnalyticsScreen() {
             value: oppValue >= 1000000000
               ? `${(oppValue / 1000000000).toFixed(1)} Tỷ đ`
               : oppValue > 0
-              ? `${(oppValue / 1000000).toFixed(0)} Tr đ`
-              : "0 đ",
+                ? `${(oppValue / 1000000).toFixed(0)} Tr đ`
+                : "0 đ",
             subtext: "Ngân sách cơ hội thực tế",
             isUp: oppValue > 0,
             icon: Coins,
@@ -636,7 +636,7 @@ export function AssociationAnalyticsScreen() {
       default:
         return [
           {
-            label: "Hội viên đã kết nạp",
+            label: "Học viên đã kết nạp",
             value: `${activeCeo} CEO`,
             subtext: "Quy mô thành viên chính thức",
             isUp: activeCeo > 0,
@@ -700,7 +700,7 @@ export function AssociationAnalyticsScreen() {
             defaultCurrent = parsed[myCode];
           }
         }
-      } catch {}
+      } catch { }
       unitLabel = "người";
       actionVerb = "giới thiệu";
     }
@@ -821,22 +821,22 @@ export function AssociationAnalyticsScreen() {
       timelineUnit: "Lượt",
     },
     top_referrals: {
-      unit: "Hội viên",
-      col1Label: "Hội viên giới thiệu",
+      unit: "Học viên",
+      col1Label: "Học viên giới thiệu",
       col1Color: "#003B95",
-      col1Unit: "Hội viên",
+      col1Unit: "Học viên",
       col2Label: "Đã kết nạp",
       col2Color: "#059669",
-      col2Unit: "Hội viên",
+      col2Unit: "Học viên",
       col3Label: "Nhiệm vụ thưởng",
       col3Color: "#F59E0B",
       col3Unit: "Nhiệm vụ",
       col4Label: "Điểm thưởng (x10)",
       col4Color: "#EC4899",
       col4Unit: "Điểm",
-      timelineLabel: "Tổng hội viên mới",
+      timelineLabel: "Tổng Học viên mới",
       timelineColor: "#0284C7",
-      timelineUnit: "Hội viên",
+      timelineUnit: "Học viên",
     },
     external_shares: {
       unit: "Lượt click",
@@ -902,8 +902,8 @@ export function AssociationAnalyticsScreen() {
       granularity === "year"
         ? (subView === "alt" ? ["Q1", "Q2", "Q3", "Q4"] : ["T1", "T2", "T3", "T4", "T5", "T6", "T7", "T8", "T9", "T10", "T11", "T12"])
         : granularity === "quarter"
-        ? (subView === "alt" ? ["Tháng 1", "Tháng 2", "Tháng 3"] : ["W1", "W2", "W3", "W4", "W5", "W6", "W7", "W8", "W9", "W10", "W11", "W12", "W13"])
-        : (subView === "alt" ? ["Tuần 1", "Tuần 2", "Tuần 3", "Tuần 4", "Tuần 5"] : Array.from({ length: 31 }, (_, i) => `N${i + 1}`));
+          ? (subView === "alt" ? ["Tháng 1", "Tháng 2", "Tháng 3"] : ["W1", "W2", "W3", "W4", "W5", "W6", "W7", "W8", "W9", "W10", "W11", "W12", "W13"])
+          : (subView === "alt" ? ["Tuần 1", "Tuần 2", "Tuần 3", "Tuần 4", "Tuần 5"] : Array.from({ length: 31 }, (_, i) => `N${i + 1}`));
 
     const totalBuckets = bucketLabels.length;
 
@@ -1119,9 +1119,9 @@ export function AssociationAnalyticsScreen() {
     }
 
     if (catList && catList.length > 0) {
-      // LOẠI BỎ TRIỆT ĐỂ CÁC HỘI VIÊN LÂU KHÔNG HOẠT ĐỘNG VÀ DỮ LIỆU BẰNG 0
+      // LOẠI BỎ TRIỆT ĐỂ CÁC Học viên LÂU KHÔNG HOẠT ĐỘNG VÀ DỮ LIỆU BẰNG 0
       const activeOnly = catList.filter((m: any) => {
-        // Loại trừ hội viên lâu không hoạt động
+        // Loại trừ Học viên lâu không hoạt động
         if (m.isInactive || m.status === 'inactive' || m.status === 'dormant' || m.dormant) {
           return false;
         }
@@ -1150,7 +1150,7 @@ export function AssociationAnalyticsScreen() {
         tierCode: m.tierCode || (idx === 0 ? "DIAMOND" : idx === 1 ? "PLATINUM" : idx === 2 ? "GOLD" : "TOP_HONOR"),
         name: m.name,
         company: m.company,
-        title: m.title || "Hội viên",
+        title: m.title || "Học viên",
         dept: m.department || "Ban Điều Hành",
         avatar: m.avatar || "/ceohn10-emblem-8.png",
         valueStr: m.valueStr || `${m.activityCount || m.connectionsCount || m.publicOppsShared || m.eventsAttended || 0} lượt`,
@@ -1224,7 +1224,7 @@ export function AssociationAnalyticsScreen() {
     return allRankedList.slice(3, 10);
   }, [allRankedList]);
 
-  // Custom Dot hiển thị Avatar & Huy hiệu của Hội viên đứng Top 1 ở đỉnh đường kẻ biểu đồ
+  // Custom Dot hiển thị Avatar & Huy hiệu của Học viên đứng Top 1 ở đỉnh đường kẻ biểu đồ
   const renderTopAvatarDot = (props: any) => {
     const { cx, cy, payload, index } = props;
     if (payload?.isTop) {
@@ -1341,7 +1341,7 @@ export function AssociationAnalyticsScreen() {
         {[
           {
             id: "member_activities",
-            shortLabel: "Hoạt Động Hội Viên",
+            shortLabel: "Hoạt Động Học viên",
             icon: Activity,
           },
           {
@@ -1367,11 +1367,10 @@ export function AssociationAnalyticsScreen() {
               key={tab.id}
               type="button"
               onClick={() => setActiveCategory(tab.id as AnalyticsCategory)}
-              className={`shrink-0 px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center cursor-pointer whitespace-nowrap ${
-                isActive
+              className={`shrink-0 px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center cursor-pointer whitespace-nowrap ${isActive
                   ? "text-white shadow-xs font-extrabold"
                   : "bg-slate-100 dark:bg-white/5 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-800 hover:bg-slate-200"
-              }`}
+                }`}
               style={isActive ? { backgroundColor: colorTheme.primaryColor, color: "#ffffff" } : undefined}
             >
               <span style={isActive ? { color: "#ffffff" } : undefined}>{tab.shortLabel}</span>
@@ -1398,11 +1397,10 @@ export function AssociationAnalyticsScreen() {
               key={f.id}
               type="button"
               onClick={() => setMoneyRange(f.id as any)}
-              className={`px-2.5 py-1 rounded-lg text-[10px] font-bold whitespace-nowrap transition cursor-pointer border ${
-                moneyRange === f.id
+              className={`px-2.5 py-1 rounded-lg text-[10px] font-bold whitespace-nowrap transition cursor-pointer border ${moneyRange === f.id
                   ? "bg-amber-500 text-white border-amber-600 shadow-xs"
                   : "bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-white/10 hover:border-amber-400"
-              }`}
+                }`}
             >
               {f.label}
             </button>
@@ -1460,838 +1458,822 @@ export function AssociationAnalyticsScreen() {
         ) : (
           <>
             {/* ── 1. BIỂU ĐỒ CỘT & ĐƯỜNG CÂN ĐỐI KÈM CHỌN DẠNG TRÒN VÀ SOI THỜI GIAN THỰC ── */}
-        <div className="p-4 rounded-2xl bg-white dark:bg-[#131a26] border border-slate-200/80 dark:border-white/10 shadow-xs space-y-3">
-          <div className="flex items-center justify-between gap-2 flex-wrap">
-            <div>
-              <div className="flex flex-col gap-1">
-                <h4 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                  <BarChart3 className="size-4 text-[#003B95] dark:text-blue-400" />
-                  <span>
-                    {chartViewMode === "composed" ? "Biểu Đồ Cột" : "Cơ Cấu Phân Bổ (Hình Tròn)"} ({selectedPeriodLabel})
-                  </span>
-                </h4>
-                {/* Banner nổi bật Hội viên dẫn đầu Top 1 */}
-                {allRankedList[0] && (
-                  <div className="flex items-center gap-2 pt-0.5">
-                    <span className="text-[11px] text-slate-600 dark:text-slate-300 font-medium flex items-center gap-1.5">
-                      <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] bg-blue-100 dark:bg-blue-950 text-[#003B95] dark:text-blue-300 font-bold border border-blue-200 dark:border-blue-800">
-                        Top 1: {allRankedList[0].name}
+            <div className="p-4 rounded-2xl bg-white dark:bg-[#131a26] border border-slate-200/80 dark:border-white/10 shadow-xs space-y-3">
+              <div className="flex items-center justify-between gap-2 flex-wrap">
+                <div>
+                  <div className="flex flex-col gap-1">
+                    <h4 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                      <BarChart3 className="size-4 text-[#003B95] dark:text-blue-400" />
+                      <span>
+                        {chartViewMode === "composed" ? "Biểu Đồ Cột" : "Cơ Cấu Phân Bổ (Hình Tròn)"} ({selectedPeriodLabel})
                       </span>
-                      <span className="text-[10.5px] text-slate-500 font-normal">({allRankedList[0].valueStr})</span>
+                    </h4>
+                    {/* Banner nổi bật Học viên dẫn đầu Top 1 */}
+                    {allRankedList[0] && (
+                      <div className="flex items-center gap-2 pt-0.5">
+                        <span className="text-[11px] text-slate-600 dark:text-slate-300 font-medium flex items-center gap-1.5">
+                          <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] bg-blue-100 dark:bg-blue-950 text-[#003B95] dark:text-blue-300 font-bold border border-blue-200 dark:border-blue-800">
+                            Top 1: {allRankedList[0].name}
+                          </span>
+                          <span className="text-[10.5px] text-slate-500 font-normal">({allRankedList[0].valueStr})</span>
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Chuyển đổi dạng biểu đồ: Cột vs Tròn Donut */}
+                <div className="flex items-center gap-1.5 bg-slate-100 dark:bg-white/5 p-1 rounded-xl border border-slate-200/60 dark:border-white/10">
+                  <button
+                    type="button"
+                    onClick={() => setChartViewMode("composed")}
+                    className={`px-2 py-1 rounded-lg text-[10.5px] font-bold flex items-center gap-1 transition cursor-pointer ${chartViewMode === "composed"
+                        ? "bg-[#003B95] text-white shadow-xs"
+                        : "text-slate-600 dark:text-slate-300 hover:text-slate-900"
+                      }`}
+                  >
+                    <BarChart3 className="size-3" />
+                    <span>Biểu đồ Cột</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setChartViewMode("donut")}
+                    className={`px-2 py-1 rounded-lg text-[10.5px] font-bold flex items-center gap-1 transition cursor-pointer ${chartViewMode === "donut"
+                        ? "bg-[#003B95] text-white shadow-xs"
+                        : "text-slate-600 dark:text-slate-300 hover:text-slate-900"
+                      }`}
+                  >
+                    <PieIcon className="size-3" />
+                    <span>Hình tròn</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Lựa chọn xem chi tiết & Bộ điều khiển Phóng to / Thu nhỏ / Vuốt ngang */}
+              <div className="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-slate-100 dark:border-white/5">
+                {/* Sub-view selection buttons */}
+                <div className="flex items-center gap-1 bg-slate-100 dark:bg-white/5 p-0.5 rounded-lg border border-slate-200/60 dark:border-white/10 text-[10.5px] font-bold">
+                  {granularity === "month" && (
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => setSubView("default")}
+                        className={`px-2 py-0.5 rounded-md transition cursor-pointer ${subView === "default"
+                            ? "bg-[#003B95] text-white shadow-xs"
+                            : "text-slate-600 dark:text-slate-400 hover:text-slate-900"
+                          }`}
+                      >
+                        Tất cả ngày (28-31)
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setSubView("alt")}
+                        className={`px-2 py-0.5 rounded-md transition cursor-pointer ${subView === "alt"
+                            ? "bg-[#003B95] text-white shadow-xs"
+                            : "text-slate-600 dark:text-slate-400 hover:text-slate-900"
+                          }`}
+                      >
+                        5 tuần trong tháng
+                      </button>
+                    </>
+                  )}
+                  {granularity === "quarter" && (
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => setSubView("default")}
+                        className={`px-2 py-0.5 rounded-md transition cursor-pointer ${subView === "default"
+                            ? "bg-[#003B95] text-white shadow-xs"
+                            : "text-slate-600 dark:text-slate-400 hover:text-slate-900"
+                          }`}
+                      >
+                        13 tuần trong quý
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setSubView("alt")}
+                        className={`px-2 py-0.5 rounded-md transition cursor-pointer ${subView === "alt"
+                            ? "bg-[#003B95] text-white shadow-xs"
+                            : "text-slate-600 dark:text-slate-400 hover:text-slate-900"
+                          }`}
+                      >
+                        3 tháng trong quý
+                      </button>
+                    </>
+                  )}
+                  {granularity === "year" && (
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => setSubView("default")}
+                        className={`px-2 py-0.5 rounded-md transition cursor-pointer ${subView === "default"
+                            ? "bg-[#003B95] text-white shadow-xs"
+                            : "text-slate-600 dark:text-slate-400 hover:text-slate-900"
+                          }`}
+                      >
+                        12 tháng trong năm
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setSubView("alt")}
+                        className={`px-2 py-0.5 rounded-md transition cursor-pointer ${subView === "alt"
+                            ? "bg-[#003B95] text-white shadow-xs"
+                            : "text-slate-600 dark:text-slate-400 hover:text-slate-900"
+                          }`}
+                      >
+                        4 quý trong năm
+                      </button>
+                    </>
+                  )}
+                </div>
+
+                {/* Zoom toolbar */}
+                {chartViewMode === "composed" && (
+                  <div className="flex items-center gap-1 bg-slate-100 dark:bg-white/5 p-0.5 rounded-lg border border-slate-200/60 dark:border-white/10">
+                    <span className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 px-1 flex items-center gap-0.5">
+                      <Maximize2 className="size-2.5 text-[#003B95] dark:text-blue-400" />
+                      <span>Zoom:</span>
                     </span>
+                    <button
+                      type="button"
+                      onClick={() => setZoomLevel((z) => Math.max(1, Number((z - 0.5).toFixed(1))))}
+                      disabled={zoomLevel <= 1}
+                      className="p-1 rounded bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 disabled:opacity-40 transition cursor-pointer"
+                      title="Thu nhỏ"
+                    >
+                      <ZoomOut className="size-3" />
+                    </button>
+                    <span className="text-[10px] font-mono font-bold text-[#003B95] dark:text-amber-400 px-1 min-w-[32px] text-center">
+                      {Math.round(zoomLevel * 100)}%
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setZoomLevel((z) => Math.min(3, Number((z + 0.5).toFixed(1))))}
+                      disabled={zoomLevel >= 3}
+                      className="p-1 rounded bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 disabled:opacity-40 transition cursor-pointer"
+                      title="Phóng to"
+                    >
+                      <ZoomIn className="size-3" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setZoomLevel(1)}
+                      className="px-1.5 py-0.5 rounded text-[9.5px] font-bold bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 transition cursor-pointer"
+                      title="Đặt lại 100%"
+                    >
+                      Reset
+                    </button>
                   </div>
                 )}
               </div>
-            </div>
 
-            {/* Chuyển đổi dạng biểu đồ: Cột vs Tròn Donut */}
-            <div className="flex items-center gap-1.5 bg-slate-100 dark:bg-white/5 p-1 rounded-xl border border-slate-200/60 dark:border-white/10">
-              <button
-                type="button"
-                onClick={() => setChartViewMode("composed")}
-                className={`px-2 py-1 rounded-lg text-[10.5px] font-bold flex items-center gap-1 transition cursor-pointer ${
-                  chartViewMode === "composed"
-                    ? "bg-[#003B95] text-white shadow-xs"
-                    : "text-slate-600 dark:text-slate-300 hover:text-slate-900"
-                }`}
-              >
-                <BarChart3 className="size-3" />
-                <span>Biểu đồ Cột</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setChartViewMode("donut")}
-                className={`px-2 py-1 rounded-lg text-[10.5px] font-bold flex items-center gap-1 transition cursor-pointer ${
-                  chartViewMode === "donut"
-                    ? "bg-[#003B95] text-white shadow-xs"
-                    : "text-slate-600 dark:text-slate-300 hover:text-slate-900"
-                }`}
-              >
-                <PieIcon className="size-3" />
-                <span>Hình tròn</span>
-              </button>
-            </div>
-          </div>
-
-          {/* Lựa chọn xem chi tiết & Bộ điều khiển Phóng to / Thu nhỏ / Vuốt ngang */}
-          <div className="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-slate-100 dark:border-white/5">
-            {/* Sub-view selection buttons */}
-            <div className="flex items-center gap-1 bg-slate-100 dark:bg-white/5 p-0.5 rounded-lg border border-slate-200/60 dark:border-white/10 text-[10.5px] font-bold">
-              {granularity === "month" && (
-                <>
-                  <button
-                    type="button"
-                    onClick={() => setSubView("default")}
-                    className={`px-2 py-0.5 rounded-md transition cursor-pointer ${
-                      subView === "default"
-                        ? "bg-[#003B95] text-white shadow-xs"
-                        : "text-slate-600 dark:text-slate-400 hover:text-slate-900"
-                    }`}
-                  >
-                    Tất cả ngày (28-31)
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setSubView("alt")}
-                    className={`px-2 py-0.5 rounded-md transition cursor-pointer ${
-                      subView === "alt"
-                        ? "bg-[#003B95] text-white shadow-xs"
-                        : "text-slate-600 dark:text-slate-400 hover:text-slate-900"
-                    }`}
-                  >
-                    5 tuần trong tháng
-                  </button>
-                </>
-              )}
-              {granularity === "quarter" && (
-                <>
-                  <button
-                    type="button"
-                    onClick={() => setSubView("default")}
-                    className={`px-2 py-0.5 rounded-md transition cursor-pointer ${
-                      subView === "default"
-                        ? "bg-[#003B95] text-white shadow-xs"
-                        : "text-slate-600 dark:text-slate-400 hover:text-slate-900"
-                    }`}
-                  >
-                    13 tuần trong quý
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setSubView("alt")}
-                    className={`px-2 py-0.5 rounded-md transition cursor-pointer ${
-                      subView === "alt"
-                        ? "bg-[#003B95] text-white shadow-xs"
-                        : "text-slate-600 dark:text-slate-400 hover:text-slate-900"
-                    }`}
-                  >
-                    3 tháng trong quý
-                  </button>
-                </>
-              )}
-              {granularity === "year" && (
-                <>
-                  <button
-                    type="button"
-                    onClick={() => setSubView("default")}
-                    className={`px-2 py-0.5 rounded-md transition cursor-pointer ${
-                      subView === "default"
-                        ? "bg-[#003B95] text-white shadow-xs"
-                        : "text-slate-600 dark:text-slate-400 hover:text-slate-900"
-                    }`}
-                  >
-                    12 tháng trong năm
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setSubView("alt")}
-                    className={`px-2 py-0.5 rounded-md transition cursor-pointer ${
-                      subView === "alt"
-                        ? "bg-[#003B95] text-white shadow-xs"
-                        : "text-slate-600 dark:text-slate-400 hover:text-slate-900"
-                    }`}
-                  >
-                    4 quý trong năm
-                  </button>
-                </>
-              )}
-            </div>
-
-            {/* Zoom toolbar */}
-            {chartViewMode === "composed" && (
-              <div className="flex items-center gap-1 bg-slate-100 dark:bg-white/5 p-0.5 rounded-lg border border-slate-200/60 dark:border-white/10">
-                <span className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 px-1 flex items-center gap-0.5">
-                  <Maximize2 className="size-2.5 text-[#003B95] dark:text-blue-400" />
-                  <span>Zoom:</span>
-                </span>
-                <button
-                  type="button"
-                  onClick={() => setZoomLevel((z) => Math.max(1, Number((z - 0.5).toFixed(1))))}
-                  disabled={zoomLevel <= 1}
-                  className="p-1 rounded bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 disabled:opacity-40 transition cursor-pointer"
-                  title="Thu nhỏ"
-                >
-                  <ZoomOut className="size-3" />
-                </button>
-                <span className="text-[10px] font-mono font-bold text-[#003B95] dark:text-amber-400 px-1 min-w-[32px] text-center">
-                  {Math.round(zoomLevel * 100)}%
-                </span>
-                <button
-                  type="button"
-                  onClick={() => setZoomLevel((z) => Math.min(3, Number((z + 0.5).toFixed(1))))}
-                  disabled={zoomLevel >= 3}
-                  className="p-1 rounded bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 disabled:opacity-40 transition cursor-pointer"
-                  title="Phóng to"
-                >
-                  <ZoomIn className="size-3" />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setZoomLevel(1)}
-                  className="px-1.5 py-0.5 rounded text-[9.5px] font-bold bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 transition cursor-pointer"
-                  title="Đặt lại 100%"
-                >
-                  Reset
-                </button>
-              </div>
-            )}
-          </div>
-
-          {/* Recharts Canvas */}
-          <div className="h-72 w-full pt-1 relative">
-            {chartViewMode === "donut" ? (
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart margin={{ top: 10, right: 30, left: 10, bottom: 10 }}>
-                  <Pie
-                    data={pieChartData}
-                    dataKey="value"
-                    nameKey="name"
-                    cx="45%"
-                    cy="50%"
-                    innerRadius={45}
-                    outerRadius={75}
-                    paddingAngle={3}
-                  >
-                    {pieChartData.map((entry: any, index: number) => (
-                      <Cell key={`cell-${index}`} fill={entry.fill || (entry.color || ["#003B95", "#10B981", "#F59E0B", "#8B5CF6"][index % 4])} />
-                    ))}
-                  </Pie>
-                  <Tooltip
-                    content={({ active, payload }: any) => {
-                      if (active && payload && payload.length) {
-                        const d = payload[0].payload;
-                        return (
-                          <div className="p-2.5 rounded-xl bg-white dark:bg-slate-900 text-slate-800 dark:text-white text-xs shadow-xl border border-slate-200 dark:border-slate-800 space-y-1">
-                            <p className="font-bold text-slate-900 dark:text-white">{d.name}</p>
-                            <p className="text-[#003B95] dark:text-amber-400 font-bold">{d.value}% phân bổ tỷ trọng</p>
-                            {d.raw !== undefined && (
-                              <p className="text-[10.5px] text-slate-500 dark:text-slate-400 font-mono">Giá trị: {d.raw} {d.unit}</p>
-                            )}
-                          </div>
-                        );
-                      }
-                      return null;
-                    }}
-                  />
-                  <Legend layout="vertical" verticalAlign="middle" align="right" wrapperStyle={{ fontSize: '10.5px' }} />
-                </PieChart>
-              </ResponsiveContainer>
-            ) : isChartEmpty ? (
-              <div className="h-full w-full flex flex-col items-center justify-center text-center p-4 bg-slate-50/50 dark:bg-slate-900/30 rounded-2xl border border-dashed border-slate-200 dark:border-slate-800">
-                <BarChart3 className="size-8 text-slate-300 dark:text-slate-600 mb-2" />
-                <p className="text-xs font-bold text-slate-600 dark:text-slate-400">
-                  Chưa có biến động dữ liệu ghi nhận trong mốc thời gian này
-                </p>
-                <p className="text-[10.5px] text-slate-400 dark:text-slate-500 mt-0.5">
-                  Hệ thống không hiển thị số liệu ảo khi cơ sở dữ liệu thực tế bằng 0
-                </p>
-              </div>
-            ) : (
-              <div className="w-full h-full overflow-x-auto overflow-y-hidden pb-1 select-none touch-pan-x scrollbar-thin">
-                <div
-                  style={{
-                    minWidth: `${Math.max(100, Math.round((chartData.length * 32 * zoomLevel) / 4))}%`,
-                    width: `${Math.max(100, Math.round((chartData.length * 32 * zoomLevel) / 4))}%`,
-                    height: "100%",
-                  }}
-                >
-                  <ResponsiveContainer width="100%" height={260}>
-                    <ComposedChart data={chartData} margin={{ top: 15, right: 25, left: -15, bottom: 20 }}>
-                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(150,150,150,0.15)" />
-                      <XAxis
-                        dataKey="name"
-                        stroke="#888888"
-                        fontSize={10}
-                        tickLine={false}
-                        axisLine={{ stroke: "rgba(150,150,150,0.2)" }}
-                        angle={-35}
-                        textAnchor="end"
-                        height={45}
-                        interval={0}
-                        dx={-4}
-                        dy={4}
-                      />
-                      <YAxis
-                        stroke="#888888"
-                        fontSize={10}
-                        tickLine={false}
-                        axisLine={{ stroke: "rgba(150,150,150,0.2)" }}
-                        allowDecimals={false}
-                        domain={[0, 'auto']}
-                      />
+              {/* Recharts Canvas */}
+              <div className="h-72 w-full pt-1 relative">
+                {chartViewMode === "donut" ? (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart margin={{ top: 10, right: 30, left: 10, bottom: 10 }}>
+                      <Pie
+                        data={pieChartData}
+                        dataKey="value"
+                        nameKey="name"
+                        cx="45%"
+                        cy="50%"
+                        innerRadius={45}
+                        outerRadius={75}
+                        paddingAngle={3}
+                      >
+                        {pieChartData.map((entry: any, index: number) => (
+                          <Cell key={`cell-${index}`} fill={entry.fill || (entry.color || ["#003B95", "#10B981", "#F59E0B", "#8B5CF6"][index % 4])} />
+                        ))}
+                      </Pie>
                       <Tooltip
-                        content={({ active, payload, label }) => {
+                        content={({ active, payload }: any) => {
                           if (active && payload && payload.length) {
+                            const d = payload[0].payload;
                             return (
-                              <div className="p-2.5 rounded-xl bg-white dark:bg-slate-900 text-slate-800 dark:text-white text-xs shadow-xl border border-slate-200 dark:border-slate-800 min-w-[170px] space-y-1.5 z-50">
-                                <p className="font-bold border-b border-slate-100 dark:border-slate-800 pb-1 mb-1 text-slate-900 dark:text-slate-100">{label}</p>
-                                {payload.map((p: any, idx: number) => {
-                                  let itemUnit = "";
-                                  if (activeCategory === "top_opportunities") {
-                                    if (p.dataKey === "col1" || p.dataKey === "timelineVal") {
-                                      itemUnit = "Cơ hội";
-                                    } else if (p.dataKey === "col2" || p.dataKey === "col3") {
-                                      itemUnit = "Tỷ VNĐ";
-                                    } else if (p.dataKey === "col4") {
-                                      itemUnit = "Deal";
-                                    }
-                                  } else if (activeCategory === "member_activities") {
-                                    if (p.dataKey === "col1" || p.dataKey === "timelineVal") {
-                                      itemUnit = "Bình luận";
-                                    } else if (p.dataKey === "col2") {
-                                      itemUnit = "Lượt share";
-                                    } else if (p.dataKey === "col3") {
-                                      itemUnit = "Lượt click";
-                                    }
-                                  } else {
-                                    const rawUnit = p.dataKey === 'col1' ? (activeChartMeta.col1Unit || activeChartMeta.unit)
-                                      : p.dataKey === 'col2' ? (activeChartMeta.col2Unit || activeChartMeta.unit)
-                                      : p.dataKey === 'col3' ? (activeChartMeta.col3Unit || activeChartMeta.unit)
-                                      : p.dataKey === 'col4' ? (activeChartMeta.col4Unit || activeChartMeta.unit)
-                                      : (activeChartMeta.timelineUnit || activeChartMeta.unit);
-                                    itemUnit = rawUnit || "";
-                                  }
-
-                                  return (
-                                    <div key={idx} className="flex items-center justify-between gap-3 text-[11px]">
-                                      <span className="flex items-center gap-1.5" style={{ color: p.color || p.stroke || p.fill }}>
-                                        <span className="size-2 rounded-xs shrink-0" style={{ backgroundColor: p.color || p.stroke || p.fill }} />
-                                        <span className="text-slate-600 dark:text-slate-300">{p.name}:</span>
-                                      </span>
-                                      <span className="font-bold text-slate-900 dark:text-white">{p.value} {itemUnit}</span>
-                                    </div>
-                                  );
-                                })}
+                              <div className="p-2.5 rounded-xl bg-white dark:bg-slate-900 text-slate-800 dark:text-white text-xs shadow-xl border border-slate-200 dark:border-slate-800 space-y-1">
+                                <p className="font-bold text-slate-900 dark:text-white">{d.name}</p>
+                                <p className="text-[#003B95] dark:text-amber-400 font-bold">{d.value}% phân bổ tỷ trọng</p>
+                                {d.raw !== undefined && (
+                                  <p className="text-[10.5px] text-slate-500 dark:text-slate-400 font-mono">Giá trị: {d.raw} {d.unit}</p>
+                                )}
                               </div>
                             );
                           }
                           return null;
                         }}
                       />
-                      <Bar
-                        dataKey="col1"
-                        name={activeChartMeta.col1Label}
-                        fill={activeChartMeta.col1Color}
-                        radius={[5, 5, 0, 0]}
-                        maxBarSize={22}
-                      />
-                      <Bar
-                        dataKey="col2"
-                        name={activeChartMeta.col2Label}
-                        fill={activeChartMeta.col2Color}
-                        radius={[5, 5, 0, 0]}
-                        maxBarSize={22}
-                      />
-                      {activeChartMeta.col3Label && (
-                        <Bar
-                          dataKey="col3"
-                          name={activeChartMeta.col3Label}
-                          fill={activeChartMeta.col3Color}
-                          radius={[5, 5, 0, 0]}
-                          maxBarSize={22}
-                        />
-                      )}
-                      {activeChartMeta.col4Label && (
-                        <Bar
-                          dataKey="col4"
-                          name={activeChartMeta.col4Label}
-                          fill={activeChartMeta.col4Color}
-                          radius={[5, 5, 0, 0]}
-                          maxBarSize={22}
-                        />
-                      )}
-                      <Bar
-                        dataKey="timelineVal"
-                        name={activeChartMeta.timelineLabel}
-                        fill={activeChartMeta.timelineColor || "#DC2626"}
-                        radius={[5, 5, 0, 0]}
-                        maxBarSize={22}
-                      />
-                      {chartData.length > 8 && (
-                        <Brush
-                          dataKey="name"
-                          height={20}
-                          stroke="#003B95"
-                          fill="rgba(0, 59, 149, 0.05)"
-                        />
-                      )}
-                    </ComposedChart>
+                      <Legend layout="vertical" verticalAlign="middle" align="right" wrapperStyle={{ fontSize: '10.5px' }} />
+                    </PieChart>
                   </ResponsiveContainer>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Thanh chú thích thu gọn chuẩn mobile (chỉ hiện đúng các cột chỉ số thành phần) */}
-          <div className="flex items-center justify-center gap-1.5 pt-2 border-t border-slate-100 dark:border-slate-800 text-[10px] overflow-x-auto no-scrollbar py-0.5 select-none">
-            <div className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-slate-50 dark:bg-slate-800/60 shrink-0 border border-slate-200/50 dark:border-slate-700/50">
-              <span className="size-2 rounded-xs shrink-0" style={{ backgroundColor: activeChartMeta.col1Color }} />
-              <span className="text-slate-700 dark:text-slate-300 font-medium whitespace-nowrap">{activeChartMeta.col1Label.replace("Lượt ", "")}</span>
-            </div>
-            <div className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-slate-50 dark:bg-slate-800/60 shrink-0 border border-slate-200/50 dark:border-slate-700/50">
-              <span className="size-2 rounded-xs shrink-0" style={{ backgroundColor: activeChartMeta.col2Color }} />
-              <span className="text-slate-700 dark:text-slate-300 font-medium whitespace-nowrap">{activeChartMeta.col2Label.replace("Lượt ", "")}</span>
-            </div>
-            {activeChartMeta.col3Label && (
-              <div className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-slate-50 dark:bg-slate-800/60 shrink-0 border border-slate-200/50 dark:border-slate-700/50">
-                <span className="size-2 rounded-xs shrink-0" style={{ backgroundColor: activeChartMeta.col3Color }} />
-                <span className="text-slate-700 dark:text-slate-300 font-medium whitespace-nowrap">{activeChartMeta.col3Label.replace("Lượt ", "")}</span>
-              </div>
-            )}
-            {activeChartMeta.col4Label && (
-              <div className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-slate-50 dark:bg-slate-800/60 shrink-0 border border-slate-200/50 dark:border-slate-700/50">
-                <span className="size-2 rounded-xs shrink-0" style={{ backgroundColor: activeChartMeta.col4Color }} />
-                <span className="text-slate-700 dark:text-slate-300 font-medium whitespace-nowrap">{activeChartMeta.col4Label.replace("Lượt ", "")}</span>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* ── 2. 4 THẺ KPI CHI TIẾT THEO DANH MỤC ĐANG CHỌN (kpiCards - BẤM VÀO ĐỂ XEM DẪN CHỨNG MINH THỰC TẾ) ── */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1">
-          {kpiCards.map((kpi, idx) => {
-            const Icon = kpi.icon;
-            return (
-              <button
-                key={idx}
-                type="button"
-                onClick={() => {
-                  let items: any[] = [];
-                  if (activeCategory === "top_opportunities") {
-                    items = rawOpportunities.map((o: any, i: number) => {
-                      const val = Number(o.budgetMax || o.budgetMin || 0);
-                      const formattedVal = val > 0
-                        ? (val >= 1_000_000_000 ? `${(val / 1_000_000_000).toFixed(1)} Tỷ đ` : `${(val / 1_000_000).toFixed(0)} Tr đ`)
-                        : "Thỏa thuận B2B";
-                      return {
-                        id: o.id || `opp-${i}`,
-                        title: o.title || `Cơ hội kinh doanh B2B #${i + 1}`,
-                        subtitle: `Người đăng: ${o.posterName || o.contactName || "Hội viên CEO HN10"} · ${o.company || "Doanh nghiệp hội viên"}`,
-                        value: formattedVal,
-                        time: o.createdAt ? new Date(o.createdAt).toLocaleDateString("vi-VN") : "Gần đây",
-                        verified: true,
-                      };
-                    });
-                    if (items.length === 0) {
-                      items = [];
-                    }
-                  } else if (activeCategory === "top_connections") {
-                    items = (allRankedList.length > 0 ? allRankedList : []).map((m: any, i: number) => ({
-                      id: `conn-${i}`,
-                      title: `Kết nối giao thương 1-on-1: ${m.name}`,
-                      subtitle: `${m.company} · ${m.title || "Lãnh đạo Doanh nghiệp"}`,
-                      value: m.valueStr || "Đã kết nối",
-                      time: "Ghi nhận hệ thống",
-                      verified: true,
-                    }));
-                  } else if (activeCategory === "top_events_meetings") {
-                    items = (allRankedList.length > 0 ? allRankedList : []).map((m: any, i: number) => ({
-                      id: `ev-${i}`,
-                      title: `Tham gia sự kiện & họp ban: ${m.name}`,
-                      subtitle: `${m.company} · ${m.title || "Đại biểu chính thức"}`,
-                      value: m.valueStr || "Đã điểm danh",
-                      time: "Hệ thống ghi nhận",
-                      verified: true,
-                    }));
-                  } else {
-                    items = (allRankedList.length > 0 ? allRankedList : []).map((m: any, i: number) => ({
-                      id: `ref-${i}`,
-                      title: `Phát triển hội viên mới: ${m.name}`,
-                      subtitle: `${m.company} · Giới thiệu gia nhập CLB CEO HN10`,
-                      value: `${m.score || 0} điểm kết nối`,
-                      time: "Đã kết nạp chính thức",
-                      verified: true,
-                    }));
-                  }
-
-                  setSelectedKpiProof({
-                    label: kpi.label,
-                    value: kpi.value,
-                    subtext: kpi.subtext,
-                    items,
-                  });
-                }}
-                className="p-3 rounded-2xl bg-white dark:bg-[#131a26] border border-slate-200/80 dark:border-slate-800 shadow-2xs space-y-1 text-left hover:border-[#003B95] dark:hover:border-blue-500 hover:shadow-xs active:scale-[0.98] transition cursor-pointer group"
-                title="Bấm để xem dẫn chứng minh chứng thực tế"
-              >
-                <div className="flex items-start justify-between text-slate-500 gap-1 w-full">
-                  <span className="text-[11px] font-bold text-slate-700 dark:text-slate-300 leading-snug line-clamp-2 min-h-[32px] group-hover:text-[#003B95] dark:group-hover:text-blue-400 transition">{kpi.label}</span>
-                  <div className="p-1 rounded-md bg-blue-50 dark:bg-blue-950/60 shrink-0 mt-0.5 group-hover:bg-[#003B95] group-hover:text-white transition">
-                    <Icon className="size-3.5 text-[#003B95] dark:text-blue-300 group-hover:text-white" />
+                ) : isChartEmpty ? (
+                  <div className="h-full w-full flex flex-col items-center justify-center text-center p-4 bg-slate-50/50 dark:bg-slate-900/30 rounded-2xl border border-dashed border-slate-200 dark:border-slate-800">
+                    <BarChart3 className="size-8 text-slate-300 dark:text-slate-600 mb-2" />
+                    <p className="text-xs font-bold text-slate-600 dark:text-slate-400">
+                      Chưa có biến động dữ liệu ghi nhận trong mốc thời gian này
+                    </p>
+                    <p className="text-[10.5px] text-slate-400 dark:text-slate-500 mt-0.5">
+                      Hệ thống không hiển thị số liệu ảo khi cơ sở dữ liệu thực tế bằng 0
+                    </p>
                   </div>
-                </div>
-                <div className="text-base font-black text-slate-900 dark:text-white leading-tight pt-0.5">
-                  {kpi.value}
-                </div>
-                <div className="flex items-center justify-between text-[10px] font-bold text-[#003B95] dark:text-blue-400 leading-tight">
-                  <span className="line-clamp-1">{kpi.subtext}</span>
-                  <ChevronRight className="size-3 text-slate-400 group-hover:translate-x-0.5 transition-transform" />
-                </div>
-              </button>
-            );
-          })}
-        </div>
+                ) : (
+                  <div className="w-full h-full overflow-x-auto overflow-y-hidden pb-1 select-none touch-pan-x scrollbar-thin">
+                    <div
+                      style={{
+                        minWidth: `${Math.max(100, Math.round((chartData.length * 32 * zoomLevel) / 4))}%`,
+                        width: `${Math.max(100, Math.round((chartData.length * 32 * zoomLevel) / 4))}%`,
+                        height: "100%",
+                      }}
+                    >
+                      <ResponsiveContainer width="100%" height={260}>
+                        <ComposedChart data={chartData} margin={{ top: 15, right: 25, left: -15, bottom: 20 }}>
+                          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(150,150,150,0.15)" />
+                          <XAxis
+                            dataKey="name"
+                            stroke="#888888"
+                            fontSize={10}
+                            tickLine={false}
+                            axisLine={{ stroke: "rgba(150,150,150,0.2)" }}
+                            angle={-35}
+                            textAnchor="end"
+                            height={45}
+                            interval={0}
+                            dx={-4}
+                            dy={4}
+                          />
+                          <YAxis
+                            stroke="#888888"
+                            fontSize={10}
+                            tickLine={false}
+                            axisLine={{ stroke: "rgba(150,150,150,0.2)" }}
+                            allowDecimals={false}
+                            domain={[0, 'auto']}
+                          />
+                          <Tooltip
+                            content={({ active, payload, label }) => {
+                              if (active && payload && payload.length) {
+                                return (
+                                  <div className="p-2.5 rounded-xl bg-white dark:bg-slate-900 text-slate-800 dark:text-white text-xs shadow-xl border border-slate-200 dark:border-slate-800 min-w-[170px] space-y-1.5 z-50">
+                                    <p className="font-bold border-b border-slate-100 dark:border-slate-800 pb-1 mb-1 text-slate-900 dark:text-slate-100">{label}</p>
+                                    {payload.map((p: any, idx: number) => {
+                                      let itemUnit = "";
+                                      if (activeCategory === "top_opportunities") {
+                                        if (p.dataKey === "col1" || p.dataKey === "timelineVal") {
+                                          itemUnit = "Cơ hội";
+                                        } else if (p.dataKey === "col2" || p.dataKey === "col3") {
+                                          itemUnit = "Tỷ VNĐ";
+                                        } else if (p.dataKey === "col4") {
+                                          itemUnit = "Deal";
+                                        }
+                                      } else if (activeCategory === "member_activities") {
+                                        if (p.dataKey === "col1" || p.dataKey === "timelineVal") {
+                                          itemUnit = "Bình luận";
+                                        } else if (p.dataKey === "col2") {
+                                          itemUnit = "Lượt share";
+                                        } else if (p.dataKey === "col3") {
+                                          itemUnit = "Lượt click";
+                                        }
+                                      } else {
+                                        const rawUnit = p.dataKey === 'col1' ? (activeChartMeta.col1Unit || activeChartMeta.unit)
+                                          : p.dataKey === 'col2' ? (activeChartMeta.col2Unit || activeChartMeta.unit)
+                                            : p.dataKey === 'col3' ? (activeChartMeta.col3Unit || activeChartMeta.unit)
+                                              : p.dataKey === 'col4' ? (activeChartMeta.col4Unit || activeChartMeta.unit)
+                                                : (activeChartMeta.timelineUnit || activeChartMeta.unit);
+                                        itemUnit = rawUnit || "";
+                                      }
 
-        {/* ── 3. KHỐI TIẾN TRÌNH NHIỆM VỤ THƯỞNG: CHỈ HIỂN THỊ Ở DANH MỤC HOẠT ĐỘNG HỘI VIÊN (MEMBER_ACTIVITIES) ── */}
-        {activeCategory === "member_activities" && (
-        <div id="analytics-task-milestones" className="p-4 rounded-3xl bg-white dark:bg-[#131a26] border border-slate-200 dark:border-slate-800 shadow-xs relative overflow-hidden">
-          <style>{`
+                                      return (
+                                        <div key={idx} className="flex items-center justify-between gap-3 text-[11px]">
+                                          <span className="flex items-center gap-1.5" style={{ color: p.color || p.stroke || p.fill }}>
+                                            <span className="size-2 rounded-xs shrink-0" style={{ backgroundColor: p.color || p.stroke || p.fill }} />
+                                            <span className="text-slate-600 dark:text-slate-300">{p.name}:</span>
+                                          </span>
+                                          <span className="font-bold text-slate-900 dark:text-white">{p.value} {itemUnit}</span>
+                                        </div>
+                                      );
+                                    })}
+                                  </div>
+                                );
+                              }
+                              return null;
+                            }}
+                          />
+                          <Bar
+                            dataKey="col1"
+                            name={activeChartMeta.col1Label}
+                            fill={activeChartMeta.col1Color}
+                            radius={[5, 5, 0, 0]}
+                            maxBarSize={22}
+                          />
+                          <Bar
+                            dataKey="col2"
+                            name={activeChartMeta.col2Label}
+                            fill={activeChartMeta.col2Color}
+                            radius={[5, 5, 0, 0]}
+                            maxBarSize={22}
+                          />
+                          {activeChartMeta.col3Label && (
+                            <Bar
+                              dataKey="col3"
+                              name={activeChartMeta.col3Label}
+                              fill={activeChartMeta.col3Color}
+                              radius={[5, 5, 0, 0]}
+                              maxBarSize={22}
+                            />
+                          )}
+                          {activeChartMeta.col4Label && (
+                            <Bar
+                              dataKey="col4"
+                              name={activeChartMeta.col4Label}
+                              fill={activeChartMeta.col4Color}
+                              radius={[5, 5, 0, 0]}
+                              maxBarSize={22}
+                            />
+                          )}
+                          <Bar
+                            dataKey="timelineVal"
+                            name={activeChartMeta.timelineLabel}
+                            fill={activeChartMeta.timelineColor || "#DC2626"}
+                            radius={[5, 5, 0, 0]}
+                            maxBarSize={22}
+                          />
+                          {chartData.length > 8 && (
+                            <Brush
+                              dataKey="name"
+                              height={20}
+                              stroke="#003B95"
+                              fill="rgba(0, 59, 149, 0.05)"
+                            />
+                          )}
+                        </ComposedChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Thanh chú thích thu gọn chuẩn mobile (chỉ hiện đúng các cột chỉ số thành phần) */}
+              <div className="flex items-center justify-center gap-1.5 pt-2 border-t border-slate-100 dark:border-slate-800 text-[10px] overflow-x-auto no-scrollbar py-0.5 select-none">
+                <div className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-slate-50 dark:bg-slate-800/60 shrink-0 border border-slate-200/50 dark:border-slate-700/50">
+                  <span className="size-2 rounded-xs shrink-0" style={{ backgroundColor: activeChartMeta.col1Color }} />
+                  <span className="text-slate-700 dark:text-slate-300 font-medium whitespace-nowrap">{activeChartMeta.col1Label.replace("Lượt ", "")}</span>
+                </div>
+                <div className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-slate-50 dark:bg-slate-800/60 shrink-0 border border-slate-200/50 dark:border-slate-700/50">
+                  <span className="size-2 rounded-xs shrink-0" style={{ backgroundColor: activeChartMeta.col2Color }} />
+                  <span className="text-slate-700 dark:text-slate-300 font-medium whitespace-nowrap">{activeChartMeta.col2Label.replace("Lượt ", "")}</span>
+                </div>
+                {activeChartMeta.col3Label && (
+                  <div className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-slate-50 dark:bg-slate-800/60 shrink-0 border border-slate-200/50 dark:border-slate-700/50">
+                    <span className="size-2 rounded-xs shrink-0" style={{ backgroundColor: activeChartMeta.col3Color }} />
+                    <span className="text-slate-700 dark:text-slate-300 font-medium whitespace-nowrap">{activeChartMeta.col3Label.replace("Lượt ", "")}</span>
+                  </div>
+                )}
+                {activeChartMeta.col4Label && (
+                  <div className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-slate-50 dark:bg-slate-800/60 shrink-0 border border-slate-200/50 dark:border-slate-700/50">
+                    <span className="size-2 rounded-xs shrink-0" style={{ backgroundColor: activeChartMeta.col4Color }} />
+                    <span className="text-slate-700 dark:text-slate-300 font-medium whitespace-nowrap">{activeChartMeta.col4Label.replace("Lượt ", "")}</span>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* ── 2. 4 THẺ KPI CHI TIẾT THEO DANH MỤC ĐANG CHỌN (kpiCards - BẤM VÀO ĐỂ XEM DẪN CHỨNG MINH THỰC TẾ) ── */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1">
+              {kpiCards.map((kpi, idx) => {
+                const Icon = kpi.icon;
+                return (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => {
+                      let items: any[] = [];
+                      if (activeCategory === "top_opportunities") {
+                        items = rawOpportunities.map((o: any, i: number) => {
+                          const val = Number(o.budgetMax || o.budgetMin || 0);
+                          const formattedVal = val > 0
+                            ? (val >= 1_000_000_000 ? `${(val / 1_000_000_000).toFixed(1)} Tỷ đ` : `${(val / 1_000_000).toFixed(0)} Tr đ`)
+                            : "Thỏa thuận B2B";
+                          return {
+                            id: o.id || `opp-${i}`,
+                            title: o.title || `Cơ hội kinh doanh B2B #${i + 1}`,
+                            subtitle: `Người đăng: ${o.posterName || o.contactName || "Học viên CEO HN10"} · ${o.company || "Doanh nghiệp Học viên"}`,
+                            value: formattedVal,
+                            time: o.createdAt ? new Date(o.createdAt).toLocaleDateString("vi-VN") : "Gần đây",
+                            verified: true,
+                          };
+                        });
+                        if (items.length === 0) {
+                          items = [];
+                        }
+                      } else if (activeCategory === "top_connections") {
+                        items = (allRankedList.length > 0 ? allRankedList : []).map((m: any, i: number) => ({
+                          id: `conn-${i}`,
+                          title: `Kết nối giao thương 1-on-1: ${m.name}`,
+                          subtitle: `${m.company} · ${m.title || "Lãnh đạo Doanh nghiệp"}`,
+                          value: m.valueStr || "Đã kết nối",
+                          time: "Ghi nhận hệ thống",
+                          verified: true,
+                        }));
+                      } else if (activeCategory === "top_events_meetings") {
+                        items = (allRankedList.length > 0 ? allRankedList : []).map((m: any, i: number) => ({
+                          id: `ev-${i}`,
+                          title: `Tham gia sự kiện & họp ban: ${m.name}`,
+                          subtitle: `${m.company} · ${m.title || "Đại biểu chính thức"}`,
+                          value: m.valueStr || "Đã điểm danh",
+                          time: "Hệ thống ghi nhận",
+                          verified: true,
+                        }));
+                      } else {
+                        items = (allRankedList.length > 0 ? allRankedList : []).map((m: any, i: number) => ({
+                          id: `ref-${i}`,
+                          title: `Phát triển Học viên mới: ${m.name}`,
+                          subtitle: `${m.company} · Giới thiệu gia nhập CLB CEO HN10`,
+                          value: `${m.score || 0} điểm kết nối`,
+                          time: "Đã kết nạp chính thức",
+                          verified: true,
+                        }));
+                      }
+
+                      setSelectedKpiProof({
+                        label: kpi.label,
+                        value: kpi.value,
+                        subtext: kpi.subtext,
+                        items,
+                      });
+                    }}
+                    className="p-3 rounded-2xl bg-white dark:bg-[#131a26] border border-slate-200/80 dark:border-slate-800 shadow-2xs space-y-1 text-left hover:border-[#003B95] dark:hover:border-blue-500 hover:shadow-xs active:scale-[0.98] transition cursor-pointer group"
+                    title="Bấm để xem dẫn chứng minh chứng thực tế"
+                  >
+                    <div className="flex items-start justify-between text-slate-500 gap-1 w-full">
+                      <span className="text-[11px] font-bold text-slate-700 dark:text-slate-300 leading-snug line-clamp-2 min-h-[32px] group-hover:text-[#003B95] dark:group-hover:text-blue-400 transition">{kpi.label}</span>
+                      <div className="p-1 rounded-md bg-blue-50 dark:bg-blue-950/60 shrink-0 mt-0.5 group-hover:bg-[#003B95] group-hover:text-white transition">
+                        <Icon className="size-3.5 text-[#003B95] dark:text-blue-300 group-hover:text-white" />
+                      </div>
+                    </div>
+                    <div className="text-base font-black text-slate-900 dark:text-white leading-tight pt-0.5">
+                      {kpi.value}
+                    </div>
+                    <div className="flex items-center justify-between text-[10px] font-bold text-[#003B95] dark:text-blue-400 leading-tight">
+                      <span className="line-clamp-1">{kpi.subtext}</span>
+                      <ChevronRight className="size-3 text-slate-400 group-hover:translate-x-0.5 transition-transform" />
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* ── 3. KHỐI TIẾN TRÌNH NHIỆM VỤ THƯỞNG: CHỈ HIỂN THỊ Ở DANH MỤC HOẠT ĐỘNG Học viên (MEMBER_ACTIVITIES) ── */}
+            {activeCategory === "member_activities" && (
+              <div id="analytics-task-milestones" className="p-4 rounded-3xl bg-white dark:bg-[#131a26] border border-slate-200 dark:border-slate-800 shadow-xs relative overflow-hidden">
+                <style>{`
             @keyframes gentleWiggle {
               0%, 100% { transform: rotate(-5deg) scale(1.05); }
               50% { transform: rotate(5deg) scale(1.05); }
             }
           `}</style>
-          <div className="flex items-center justify-between gap-2 mb-2">
-            <div className="flex items-center gap-2">
-              <div className="size-8 rounded-xl bg-[#003B95] flex items-center justify-center text-white shadow-xs font-black">
-                <Trophy className="size-4 text-white" />
-              </div>
-              <div>
-                <h4 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider">
-                  Nhiệm Vụ &amp; Mốc Thống Kê
-                </h4>
-                <p className="text-[10.5px] text-slate-500 dark:text-slate-400">
-                  Hoàn thành <strong className="text-[#003B95] dark:text-blue-400 font-bold">{currentTaskCompletedCount}/10</strong> nhiệm vụ
-                </p>
-              </div>
-            </div>
-            <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-blue-50 dark:bg-blue-950/60 text-[#003B95] dark:text-blue-300 border border-blue-200 dark:border-blue-800">
-              3 Mốc Nhận Thưởng
-            </span>
-          </div>
-
-          {/* ĐƯỜNG NGANG DUY NHẤT CHIA 3 NOTE */}
-          <div className="relative pt-12 pb-6 px-4">
-            {/* Thanh ngang nền */}
-            <div className="absolute left-10 right-10 top-[76px] h-2 bg-slate-200 dark:bg-slate-800 rounded-full z-0 overflow-hidden">
-              <div
-                className="h-full bg-[#003B95] rounded-full transition-all duration-700 shadow-xs"
-                style={{ width: `${Math.min(100, (currentTaskCompletedCount / 10) * 100)}%` }}
-              />
-            </div>
-
-            {/* 3 Notes phân bố đều trên đường ngang */}
-            <div className="relative z-10 flex items-center justify-between">
-              {MILESTONES.map((m) => {
-                const isPassed = currentTaskCompletedCount >= m.targetCount;
-                const isClaimed = claimedMilestones[m.id];
-                return (
-                  <div
-                    key={m.id}
-                    data-milestone-id={m.id}
-                    onClick={() => setSelectedMilestone(m)}
-                    className="flex flex-col items-center cursor-pointer group"
-                    style={{ width: "30%" }}
-                  >
-                    {/* Hộp quà phía trên note với hiệu ứng rung rung khi qua note (Chuẩn Xanh Navy & Trắng) */}
-                    <div className="relative mb-3">
-                      <div
-                        className={`size-11 rounded-2xl flex items-center justify-center p-2 transition-all shadow-md ${
-                          isPassed
-                            ? "bg-gradient-to-tr from-[#003B95] via-[#1E3A8A] to-[#0052CC] border-2 border-[#002B66] text-white group-hover:scale-110"
-                            : "bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-400 grayscale"
-                        }`}
-                        style={
-                          isPassed && !isClaimed
-                            ? { animation: "gentleWiggle 1s ease-in-out infinite" }
-                            : undefined
-                        }
-                      >
-                        <Gift className={`size-6 ${isPassed ? "text-white fill-white/20" : "text-slate-400"}`} />
-                      </div>
-                      {isPassed && !isClaimed && (
-                        <span className="absolute -top-1 -right-1 flex h-3 w-3">
-                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
-                          <span className="relative inline-flex rounded-full h-3 w-3 bg-[#0284C7]"></span>
-                        </span>
-                      )}
+                <div className="flex items-center justify-between gap-2 mb-2">
+                  <div className="flex items-center gap-2">
+                    <div className="size-8 rounded-xl bg-[#003B95] flex items-center justify-center text-white shadow-xs font-black">
+                      <Trophy className="size-4 text-white" />
                     </div>
-
-                    {/* Note marker trên đường ngang */}
-                    <div
-                      className={`size-7 rounded-full flex items-center justify-center font-bold text-xs border-2 shadow-xs transition-transform group-hover:scale-110 z-10 ${
-                        isClaimed
-                          ? "bg-slate-900 border-white text-white"
-                          : isPassed
-                          ? "bg-[#003B95] border-white text-white ring-2 ring-blue-300"
-                          : "bg-white dark:bg-slate-800 border-slate-300 text-slate-500"
-                      }`}
-                    >
-                      {isClaimed ? "✓" : m.id}
-                    </div>
-
-                    {/* Tiêu đề & Trạng thái note */}
-                    <div className="mt-2 text-center">
-                      <p className="text-[11px] font-black text-slate-900 dark:text-white line-clamp-1">
-                        Note {m.id}: {m.targetCount} NV
+                    <div>
+                      <h4 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider">
+                        Nhiệm Vụ &amp; Mốc Thống Kê
+                      </h4>
+                      <p className="text-[10.5px] text-slate-500 dark:text-slate-400">
+                        Hoàn thành <strong className="text-[#003B95] dark:text-blue-400 font-bold">{currentTaskCompletedCount}/10</strong> nhiệm vụ
                       </p>
-                      <span
-                        className={`inline-block mt-0.5 px-2 py-0.5 rounded-full text-[9.5px] font-bold ${
-                          isClaimed
-                            ? "bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200"
-                            : isPassed
-                            ? "bg-blue-50 dark:bg-blue-950 text-[#003B95] dark:text-blue-300 border border-blue-200 dark:border-blue-800 font-black animate-pulse"
-                            : "bg-slate-100 dark:bg-slate-800 text-slate-500"
-                        }`}
-                      >
-                        {isClaimed ? "Đã nhận" : isPassed ? "Nhận quà!" : "Chưa đạt"}
-                      </span>
                     </div>
                   </div>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-        )}
+                  <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-blue-50 dark:bg-blue-950/60 text-[#003B95] dark:text-blue-300 border border-blue-200 dark:border-blue-800">
+                    3 Mốc Nhận Thưởng
+                  </span>
+                </div>
 
-
-
-        {/* ── BỤC VINH DANH TOP 3 HỘI VIÊN XUẤT SẮC: HẠNG 1 (GIỮA) - HẠNG 2 (TRÁI) - HẠNG 3 (PHẢI) ── */}
-        <div className="p-4 rounded-2xl bg-white dark:bg-[#131a26] border border-slate-200/80 dark:border-white/10 shadow-xs space-y-4">
-          <div className="text-center">
-            <h4 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider">
-              {podiumTop3.length >= 3
-                ? "Vinh Danh Top 3 Xuất Sắc Nhất"
-                : podiumTop3.length === 2
-                ? "Vinh Danh Top 2 Xuất Sắc Nhất"
-                : podiumTop3.length === 1
-                ? "Vinh Danh Hội Viên Xuất Sắc Nhất"
-                : "Bảng Vinh Danh"}
-            </h4>
-            <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
-              {podiumTop3.length >= 3
-                ? "Hạng 1 ở giữa cao nhất • Hạng 2 bên trái • Hạng 3 bên phải"
-                : podiumTop3.length === 2
-                ? "Hạng 1 & Hạng 2 dẫn đầu kết quả giao thương kỳ này"
-                : podiumTop3.length === 1
-                ? "Hạng 1 dẫn đầu — Ghi nhận hội viên duy nhất có phát sinh dữ liệu giao thương trong kỳ"
-                : "Chưa ghi nhận hoạt động phát sinh dữ liệu trong kỳ này"}
-            </p>
-          </div>
-
-          {/* Dàn cột hiển thị theo số lượng người thực tế có dữ liệu hoặc Empty State */}
-          {podiumTop3.length > 0 ? (
-            <div
-              className={`grid ${
-                podiumTop3.length === 1
-                  ? "grid-cols-1 max-w-xs mx-auto"
-                  : podiumTop3.length === 2
-                  ? "grid-cols-2 max-w-md mx-auto"
-                  : "grid-cols-3"
-              } gap-2 items-end pt-3 pb-1`}
-            >
-              {podiumTop3.map((performer) => {
-                const isTop1 = performer.rank === 1;
-                const isTop2 = performer.rank === 2;
-                const isTop3 = performer.rank === 3;
-
-                return (
-                  <div
-                    key={performer.rank}
-                    className={`flex flex-col items-center text-center transition-all ${
-                      podiumTop3.length === 3
-                        ? isTop1
-                          ? "order-2 -mt-4 z-10"
-                          : isTop2
-                          ? "order-1"
-                          : "order-3"
-                        : "order-1"
-                    }`}
-                  >
-                    <div className="relative mb-2 flex flex-col items-center">
-                      <div
-                        className={`relative rounded-full overflow-hidden p-0.5 shadow-sm ${
-                          isTop1
-                            ? "size-15 ring-3 ring-[#003B95] shadow-md"
-                            : isTop2
-                            ? "size-12 ring-2 ring-slate-400"
-                            : "size-12 ring-2 ring-slate-300"
-                        }`}
-                      >
-                        <img
-                          src={performer.avatar}
-                          alt={performer.name}
-                          className="w-full h-full rounded-full object-cover"
-                          onError={(e) => {
-                            e.currentTarget.src = "/ceohn10-logo.png";
-                          }}
-                        />
-                      </div>
-
-                      <span
-                        className={`absolute -bottom-1 px-2 py-0.5 rounded-full text-[9px] font-black text-white ${
-                          isTop1
-                            ? "bg-[#003B95] border border-white"
-                            : isTop2
-                            ? "bg-slate-700"
-                            : "bg-slate-500"
-                        }`}
-                      >
-                        {isTop1 ? "Hạng 1" : isTop2 ? "Hạng 2" : "Hạng 3"}
-                      </span>
-                    </div>
-
-                    {/* Thông tin đại biểu */}
-                    <h5 className="text-[12px] font-bold text-slate-900 dark:text-white truncate w-full px-1">
-                      {performer.name}
-                    </h5>
-                    <p className="text-[10px] text-slate-500 dark:text-slate-400 truncate w-full px-1">
-                      {performer.company}
-                    </p>
-                    <p className="text-[10.5px] font-bold text-[#003B95] dark:text-blue-400 truncate w-full px-1 mt-0.5">
-                      {performer.valueStr}
-                    </p>
-
-                    {/* Bục Bậc Thang chuẩn màu */}
+                {/* ĐƯỜNG NGANG DUY NHẤT CHIA 3 NOTE */}
+                <div className="relative pt-12 pb-6 px-4">
+                  {/* Thanh ngang nền */}
+                  <div className="absolute left-10 right-10 top-[76px] h-2 bg-slate-200 dark:bg-slate-800 rounded-full z-0 overflow-hidden">
                     <div
-                      className={`w-full rounded-t-xl flex flex-col items-center justify-center mt-2.5 border-t border-x ${
-                        isTop1
-                          ? "h-24 bg-[#003B95] text-white border-[#002B66] shadow-xs"
-                          : isTop2
-                          ? "h-16 bg-slate-100 dark:bg-slate-800 border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200"
-                          : "h-14 bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400"
-                      }`}
-                    >
-                      <span className="font-black text-xs text-inherit">
-                        {isTop1 ? "Kim Cương 💎" : isTop2 ? "Bạch Kim 🪙" : "Vàng 🥇"}
-                      </span>
-                      <span className="text-[9px] font-medium opacity-80">#{performer.rank}</span>
-                    </div>
+                      className="h-full bg-[#003B95] rounded-full transition-all duration-700 shadow-xs"
+                      style={{ width: `${Math.min(100, (currentTaskCompletedCount / 10) * 100)}%` }}
+                    />
                   </div>
-                );
-              })}
-            </div>
-          ) : (
-            <div className="py-8 flex flex-col items-center justify-center text-center">
-              <div className="size-12 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 flex items-center justify-center mb-2">
-                <Trophy className="size-6 text-amber-500" />
-              </div>
-              <p className="text-xs font-bold text-slate-800 dark:text-slate-200">
-                Chưa có dữ liệu vinh danh thực tế trong kỳ này
-              </p>
-              <p className="text-[11px] text-slate-500 max-w-xs mt-0.5">
-                Bảng xếp hạng sẽ tự động hiển thị khi hội viên có số lượng và giá trị giao thương thật trong CSDL.
-              </p>
-            </div>
-          )}
-        </div>
 
-        {/* ── BẢNG XẾP HẠNG TOP 4 - 10: DẠNG THU GỌN ACCORDION (AI THÍCH THÌ BẤM MỞ) ── */}
-        <div className="rounded-3xl bg-white dark:bg-[#131a26] border border-slate-200/80 dark:border-white/10 shadow-sm overflow-hidden">
-          <button
-            type="button"
-            onClick={() => setShowTop10Expanded((prev) => !prev)}
-            className="w-full p-4 flex items-center justify-between text-left hover:bg-slate-50 dark:hover:bg-white/5 transition cursor-pointer"
-          >
-            <div className="flex items-center gap-2.5">
-              <span className="p-1.5 rounded-xl bg-slate-100 dark:bg-white/5 text-slate-700 dark:text-slate-300">
-                <Medal className="size-4 text-amber-500" />
-              </span>
-              <div>
-                <h4 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-tight">
-                  Bảng Xếp Hạng: Từ Top 4 Đến Top 10
+                  {/* 3 Notes phân bố đều trên đường ngang */}
+                  <div className="relative z-10 flex items-center justify-between">
+                    {MILESTONES.map((m) => {
+                      const isPassed = currentTaskCompletedCount >= m.targetCount;
+                      const isClaimed = claimedMilestones[m.id];
+                      return (
+                        <div
+                          key={m.id}
+                          data-milestone-id={m.id}
+                          onClick={() => setSelectedMilestone(m)}
+                          className="flex flex-col items-center cursor-pointer group"
+                          style={{ width: "30%" }}
+                        >
+                          {/* Hộp quà phía trên note với hiệu ứng rung rung khi qua note (Chuẩn Xanh Navy & Trắng) */}
+                          <div className="relative mb-3">
+                            <div
+                              className={`size-11 rounded-2xl flex items-center justify-center p-2 transition-all shadow-md ${isPassed
+                                  ? "bg-gradient-to-tr from-[#003B95] via-[#1E3A8A] to-[#0052CC] border-2 border-[#002B66] text-white group-hover:scale-110"
+                                  : "bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-400 grayscale"
+                                }`}
+                              style={
+                                isPassed && !isClaimed
+                                  ? { animation: "gentleWiggle 1s ease-in-out infinite" }
+                                  : undefined
+                              }
+                            >
+                              <Gift className={`size-6 ${isPassed ? "text-white fill-white/20" : "text-slate-400"}`} />
+                            </div>
+                            {isPassed && !isClaimed && (
+                              <span className="absolute -top-1 -right-1 flex h-3 w-3">
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
+                                <span className="relative inline-flex rounded-full h-3 w-3 bg-[#0284C7]"></span>
+                              </span>
+                            )}
+                          </div>
+
+                          {/* Note marker trên đường ngang */}
+                          <div
+                            className={`size-7 rounded-full flex items-center justify-center font-bold text-xs border-2 shadow-xs transition-transform group-hover:scale-110 z-10 ${isClaimed
+                                ? "bg-slate-900 border-white text-white"
+                                : isPassed
+                                  ? "bg-[#003B95] border-white text-white ring-2 ring-blue-300"
+                                  : "bg-white dark:bg-slate-800 border-slate-300 text-slate-500"
+                              }`}
+                          >
+                            {isClaimed ? "✓" : m.id}
+                          </div>
+
+                          {/* Tiêu đề & Trạng thái note */}
+                          <div className="mt-2 text-center">
+                            <p className="text-[11px] font-black text-slate-900 dark:text-white line-clamp-1">
+                              Note {m.id}: {m.targetCount} NV
+                            </p>
+                            <span
+                              className={`inline-block mt-0.5 px-2 py-0.5 rounded-full text-[9.5px] font-bold ${isClaimed
+                                  ? "bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200"
+                                  : isPassed
+                                    ? "bg-blue-50 dark:bg-blue-950 text-[#003B95] dark:text-blue-300 border border-blue-200 dark:border-blue-800 font-black animate-pulse"
+                                    : "bg-slate-100 dark:bg-slate-800 text-slate-500"
+                                }`}
+                            >
+                              {isClaimed ? "Đã nhận" : isPassed ? "Nhận quà!" : "Chưa đạt"}
+                            </span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            )}
+
+
+
+            {/* ── BỤC VINH DANH TOP 3 Học viên XUẤT SẮC: HẠNG 1 (GIỮA) - HẠNG 2 (TRÁI) - HẠNG 3 (PHẢI) ── */}
+            <div className="p-4 rounded-2xl bg-white dark:bg-[#131a26] border border-slate-200/80 dark:border-white/10 shadow-xs space-y-4">
+              <div className="text-center">
+                <h4 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider">
+                  {podiumTop3.length >= 3
+                    ? "Vinh Danh Top 3 Xuất Sắc Nhất"
+                    : podiumTop3.length === 2
+                      ? "Vinh Danh Top 2 Xuất Sắc Nhất"
+                      : podiumTop3.length === 1
+                        ? "Vinh Danh Học viên Xuất Sắc Nhất"
+                        : "Bảng Vinh Danh"}
                 </h4>
-                <p className="text-[10px] text-slate-500 dark:text-slate-400">
-                  {showTop10Expanded ? "Bấm để thu gọn danh sách" : "Bấm để xem thêm 7 hội viên xếp hạng tiếp theo"}
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                  {podiumTop3.length >= 3
+                    ? "Hạng 1 ở giữa cao nhất • Hạng 2 bên trái • Hạng 3 bên phải"
+                    : podiumTop3.length === 2
+                      ? "Hạng 1 & Hạng 2 dẫn đầu kết quả giao thương kỳ này"
+                      : podiumTop3.length === 1
+                        ? "Hạng 1 dẫn đầu — Ghi nhận Học viên duy nhất có phát sinh dữ liệu giao thương trong kỳ"
+                        : "Chưa ghi nhận hoạt động phát sinh dữ liệu trong kỳ này"}
                 </p>
               </div>
-            </div>
 
-            <div className="flex items-center gap-2">
-              <span className="px-2 py-0.5 rounded-full bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-slate-300 text-[10px] font-bold">
-                {showTop10Expanded ? "Thu gọn ▴" : "Xem thêm ▾"}
-              </span>
-            </div>
-          </button>
+              {/* Dàn cột hiển thị theo số lượng người thực tế có dữ liệu hoặc Empty State */}
+              {podiumTop3.length > 0 ? (
+                <div
+                  className={`grid ${podiumTop3.length === 1
+                      ? "grid-cols-1 max-w-xs mx-auto"
+                      : podiumTop3.length === 2
+                        ? "grid-cols-2 max-w-md mx-auto"
+                        : "grid-cols-3"
+                    } gap-2 items-end pt-3 pb-1`}
+                >
+                  {podiumTop3.map((performer) => {
+                    const isTop1 = performer.rank === 1;
+                    const isTop2 = performer.rank === 2;
+                    const isTop3 = performer.rank === 3;
 
-          {showTop10Expanded && (
-            <div className="px-4 pb-4 pt-1 border-t border-slate-100 dark:border-white/5 divide-y divide-slate-100 dark:divide-white/5 animate-in fade-in duration-200">
-              {remainingTop4To10.length > 0 ? (
-                remainingTop4To10.map((member: any) => (
-                  <div
-                    key={member.rank}
-                    className="py-2.5 flex items-center justify-between gap-2.5 hover:bg-slate-50 dark:hover:bg-white/5 px-1.5 rounded-xl transition"
-                  >
-                    <div className="flex items-center gap-2.5 min-w-0 flex-1">
-                      <div className="size-6 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-black text-[11px] flex items-center justify-center shrink-0">
-                        #{member.rank}
-                      </div>
-                      <div className="size-9 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 shrink-0">
-                        <img
-                          src={member.avatar}
-                          alt={member.name}
-                          className="size-full object-cover"
-                          onError={(e) => {
-                            e.currentTarget.src = "/ceohn10-logo.png";
-                          }}
-                        />
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <h5 className="text-xs font-bold text-slate-900 dark:text-white truncate">
-                          {member.name}
+                    return (
+                      <div
+                        key={performer.rank}
+                        className={`flex flex-col items-center text-center transition-all ${podiumTop3.length === 3
+                            ? isTop1
+                              ? "order-2 -mt-4 z-10"
+                              : isTop2
+                                ? "order-1"
+                                : "order-3"
+                            : "order-1"
+                          }`}
+                      >
+                        <div className="relative mb-2 flex flex-col items-center">
+                          <div
+                            className={`relative rounded-full overflow-hidden p-0.5 shadow-sm ${isTop1
+                                ? "size-15 ring-3 ring-[#003B95] shadow-md"
+                                : isTop2
+                                  ? "size-12 ring-2 ring-slate-400"
+                                  : "size-12 ring-2 ring-slate-300"
+                              }`}
+                          >
+                            <img
+                              src={performer.avatar}
+                              alt={performer.name}
+                              className="w-full h-full rounded-full object-cover"
+                              onError={(e) => {
+                                e.currentTarget.src = "/ceohn10-logo.png";
+                              }}
+                            />
+                          </div>
+
+                          <span
+                            className={`absolute -bottom-1 px-2 py-0.5 rounded-full text-[9px] font-black text-white ${isTop1
+                                ? "bg-[#003B95] border border-white"
+                                : isTop2
+                                  ? "bg-slate-700"
+                                  : "bg-slate-500"
+                              }`}
+                          >
+                            {isTop1 ? "Hạng 1" : isTop2 ? "Hạng 2" : "Hạng 3"}
+                          </span>
+                        </div>
+
+                        {/* Thông tin đại biểu */}
+                        <h5 className="text-[12px] font-bold text-slate-900 dark:text-white truncate w-full px-1">
+                          {performer.name}
                         </h5>
-                        <p className="text-[10.5px] text-slate-500 dark:text-slate-400 truncate">
-                          {member.company}
+                        <p className="text-[10px] text-slate-500 dark:text-slate-400 truncate w-full px-1">
+                          {performer.company}
                         </p>
-                      </div>
-                    </div>
+                        <p className="text-[10.5px] font-bold text-[#003B95] dark:text-blue-400 truncate w-full px-1 mt-0.5">
+                          {performer.valueStr}
+                        </p>
 
-                    <div className="flex items-center gap-2 shrink-0">
-                      <div className="text-right">
-                        <div className="text-xs font-black text-[#003B95] dark:text-cyan-400 font-mono">
-                          {member.valueStr}
-                        </div>
-                        <div className="text-[9.5px] text-amber-600 dark:text-amber-400 font-semibold">
-                          {member.dept || "CLB CEO HN10"}
-                        </div>
-                      </div>
-
-                      {member.phone && (
-                        <a
-                          href={`tel:${member.phone}`}
-                          onClick={() => toast.success(`Đang gọi tới ${member.name} (${member.phone})...`)}
-                          className="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 transition"
-                          title="Gọi điện"
+                        {/* Bục Bậc Thang chuẩn màu */}
+                        <div
+                          className={`w-full rounded-t-xl flex flex-col items-center justify-center mt-2.5 border-t border-x ${isTop1
+                              ? "h-24 bg-[#003B95] text-white border-[#002B66] shadow-xs"
+                              : isTop2
+                                ? "h-16 bg-slate-100 dark:bg-slate-800 border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200"
+                                : "h-14 bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400"
+                            }`}
                         >
-                          <Phone className="size-3.5" />
-                        </a>
-                      )}
-                    </div>
-                  </div>
-                ))
+                          <span className="font-black text-xs text-inherit">
+                            {isTop1 ? "Kim Cương 💎" : isTop2 ? "Bạch Kim 🪙" : "Vàng 🥇"}
+                          </span>
+                          <span className="text-[9px] font-medium opacity-80">#{performer.rank}</span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
               ) : (
-                <div className="py-6 text-center text-xs text-slate-500">
-                  Chưa có hội viên nào trong danh sách Top 4 - 10 kỳ này.
+                <div className="py-8 flex flex-col items-center justify-center text-center">
+                  <div className="size-12 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 flex items-center justify-center mb-2">
+                    <Trophy className="size-6 text-amber-500" />
+                  </div>
+                  <p className="text-xs font-bold text-slate-800 dark:text-slate-200">
+                    Chưa có dữ liệu vinh danh thực tế trong kỳ này
+                  </p>
+                  <p className="text-[11px] text-slate-500 max-w-xs mt-0.5">
+                    Bảng xếp hạng sẽ tự động hiển thị khi Học viên có số lượng và giá trị giao thương thật trong CSDL.
+                  </p>
                 </div>
               )}
             </div>
-          )}
-        </div>
 
-        {/* ── SECTION BÌNH LUẬN & THẢO LUẬN DƯỚI THỐNG KÊ (YÊU CẦU 1: TREE FACEBOOK, @MENTIONS, MỚI NHẤT LÊN ĐẦU) ── */}
-        <div className="p-4 rounded-3xl bg-white dark:bg-[#131a26] border border-slate-200/80 dark:border-white/10 shadow-sm space-y-3.5">
-          <CommentTreeSection
-            postId="19830000-0000-4000-a000-000000000001"
-            title="Thảo Luận & Bình Luận Về Thống Kê"
-            defaultOpen={true}
-          />
-        </div>
+            {/* ── BẢNG XẾP HẠNG TOP 4 - 10: DẠNG THU GỌN ACCORDION (AI THÍCH THÌ BẤM MỞ) ── */}
+            <div className="rounded-3xl bg-white dark:bg-[#131a26] border border-slate-200/80 dark:border-white/10 shadow-sm overflow-hidden">
+              <button
+                type="button"
+                onClick={() => setShowTop10Expanded((prev) => !prev)}
+                className="w-full p-4 flex items-center justify-between text-left hover:bg-slate-50 dark:hover:bg-white/5 transition cursor-pointer"
+              >
+                <div className="flex items-center gap-2.5">
+                  <span className="p-1.5 rounded-xl bg-slate-100 dark:bg-white/5 text-slate-700 dark:text-slate-300">
+                    <Medal className="size-4 text-amber-500" />
+                  </span>
+                  <div>
+                    <h4 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-tight">
+                      Bảng Xếp Hạng: Từ Top 4 Đến Top 10
+                    </h4>
+                    <p className="text-[10px] text-slate-500 dark:text-slate-400">
+                      {showTop10Expanded ? "Bấm để thu gọn danh sách" : "Bấm để xem thêm 7 Học viên xếp hạng tiếp theo"}
+                    </p>
+                  </div>
+                </div>
 
-        {/* Nút Xuất Báo Cáo Nhanh Cuối Trang (Yêu cầu 7) */}
-        <div className="pt-2 text-center">
-          <button
-            type="button"
-            onClick={() => {
-              setExportAuditTime(new Date().toLocaleString("vi-VN"));
-              setReportModalOpen(true);
-            }}
-            className="w-full py-3.5 px-4 rounded-2xl bg-[#003B95] hover:bg-[#002B70] text-white font-black text-xs shadow-md shadow-blue-900/20 flex items-center justify-center gap-2 active:scale-95 transition cursor-pointer"
-          >
-            <Download className="size-4 text-amber-400" />
-            <span className="uppercase tracking-wider">Trích xuất báo cáo thống kê có xác thực bằng chứng</span>
-          </button>
-        </div>
+                <div className="flex items-center gap-2">
+                  <span className="px-2 py-0.5 rounded-full bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-slate-300 text-[10px] font-bold">
+                    {showTop10Expanded ? "Thu gọn ▴" : "Xem thêm ▾"}
+                  </span>
+                </div>
+              </button>
+
+              {showTop10Expanded && (
+                <div className="px-4 pb-4 pt-1 border-t border-slate-100 dark:border-white/5 divide-y divide-slate-100 dark:divide-white/5 animate-in fade-in duration-200">
+                  {remainingTop4To10.length > 0 ? (
+                    remainingTop4To10.map((member: any) => (
+                      <div
+                        key={member.rank}
+                        className="py-2.5 flex items-center justify-between gap-2.5 hover:bg-slate-50 dark:hover:bg-white/5 px-1.5 rounded-xl transition"
+                      >
+                        <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                          <div className="size-6 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-black text-[11px] flex items-center justify-center shrink-0">
+                            #{member.rank}
+                          </div>
+                          <div className="size-9 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 shrink-0">
+                            <img
+                              src={member.avatar}
+                              alt={member.name}
+                              className="size-full object-cover"
+                              onError={(e) => {
+                                e.currentTarget.src = "/ceohn10-logo.png";
+                              }}
+                            />
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <h5 className="text-xs font-bold text-slate-900 dark:text-white truncate">
+                              {member.name}
+                            </h5>
+                            <p className="text-[10.5px] text-slate-500 dark:text-slate-400 truncate">
+                              {member.company}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-2 shrink-0">
+                          <div className="text-right">
+                            <div className="text-xs font-black text-[#003B95] dark:text-cyan-400 font-mono">
+                              {member.valueStr}
+                            </div>
+                            <div className="text-[9.5px] text-amber-600 dark:text-amber-400 font-semibold">
+                              {member.dept || "CLB CEO HN10"}
+                            </div>
+                          </div>
+
+                          {member.phone && (
+                            <a
+                              href={`tel:${member.phone}`}
+                              onClick={() => toast.success(`Đang gọi tới ${member.name} (${member.phone})...`)}
+                              className="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 transition"
+                              title="Gọi điện"
+                            >
+                              <Phone className="size-3.5" />
+                            </a>
+                          )}
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="py-6 text-center text-xs text-slate-500">
+                      Chưa có Học viên nào trong danh sách Top 4 - 10 kỳ này.
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* ── SECTION BÌNH LUẬN & THẢO LUẬN DƯỚI THỐNG KÊ (YÊU CẦU 1: TREE FACEBOOK, @MENTIONS, MỚI NHẤT LÊN ĐẦU) ── */}
+            <div className="p-4 rounded-3xl bg-white dark:bg-[#131a26] border border-slate-200/80 dark:border-white/10 shadow-sm space-y-3.5">
+              <CommentTreeSection
+                postId="19830000-0000-4000-a000-000000000001"
+                title="Thảo Luận & Bình Luận Về Thống Kê"
+                defaultOpen={true}
+              />
+            </div>
+
+            {/* Nút Xuất Báo Cáo Nhanh Cuối Trang (Yêu cầu 7) */}
+            <div className="pt-2 text-center">
+              <button
+                type="button"
+                onClick={() => {
+                  setExportAuditTime(new Date().toLocaleString("vi-VN"));
+                  setReportModalOpen(true);
+                }}
+                className="w-full py-3.5 px-4 rounded-2xl bg-[#003B95] hover:bg-[#002B70] text-white font-black text-xs shadow-md shadow-blue-900/20 flex items-center justify-center gap-2 active:scale-95 transition cursor-pointer"
+              >
+                <Download className="size-4 text-amber-400" />
+                <span className="uppercase tracking-wider">Trích xuất báo cáo thống kê có xác thực bằng chứng</span>
+              </button>
+            </div>
           </>
         )}
       </div>
@@ -2413,7 +2395,7 @@ export function AssociationAnalyticsScreen() {
                   <div>
                     <span className="text-slate-400">Người trích xuất: </span>
                     <strong className="text-[#003B95] dark:text-amber-400">
-                      {currentMember?.name || (user as any)?.name || (user as any)?.username || "Hội viên CLB"}
+                      {currentMember?.name || (user as any)?.name || (user as any)?.username || "Học viên CLB"}
                     </strong>
                   </div>
                   <div>
@@ -2426,8 +2408,8 @@ export function AssociationAnalyticsScreen() {
                       {currentMember?.department
                         ? `Ban ${currentMember.department.replace(/^Ban\s+/i, "")}`
                         : currentMember?.role === "admin"
-                        ? "Ban Điều Hành / Quản Trị"
-                        : "Hội viên chính thức CEO HN10"}
+                          ? "Ban Điều Hành / Quản Trị"
+                          : "Học viên chính thức CEO HN10"}
                     </strong>
                   </div>
                   <div>
@@ -2449,11 +2431,10 @@ export function AssociationAnalyticsScreen() {
                   <button
                     type="button"
                     onClick={() => setExportFormat("excel")}
-                    className={`p-2.5 rounded-xl border text-center flex flex-col items-center gap-1 transition cursor-pointer ${
-                      exportFormat === "excel"
+                    className={`p-2.5 rounded-xl border text-center flex flex-col items-center gap-1 transition cursor-pointer ${exportFormat === "excel"
                         ? "bg-[#1F3864] text-white border-[#1F3864] shadow-sm font-bold"
                         : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300"
-                    }`}
+                      }`}
                   >
                     <FileSpreadsheet className="size-4 text-emerald-400" />
                     <span className="text-[11px]">Excel (.xlsx)</span>
@@ -2462,11 +2443,10 @@ export function AssociationAnalyticsScreen() {
                   <button
                     type="button"
                     onClick={() => setExportFormat("pdf")}
-                    className={`p-2.5 rounded-xl border text-center flex flex-col items-center gap-1 transition cursor-pointer ${
-                      exportFormat === "pdf"
+                    className={`p-2.5 rounded-xl border text-center flex flex-col items-center gap-1 transition cursor-pointer ${exportFormat === "pdf"
                         ? "bg-[#1F3864] text-white border-[#1F3864] shadow-sm font-bold"
                         : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300"
-                    }`}
+                      }`}
                   >
                     <FileText className="size-4 text-rose-400" />
                     <span className="text-[11px]">Văn bản PDF</span>
@@ -2475,11 +2455,10 @@ export function AssociationAnalyticsScreen() {
                   <button
                     type="button"
                     onClick={() => setExportFormat("image")}
-                    className={`p-2.5 rounded-xl border text-center flex flex-col items-center gap-1 transition cursor-pointer ${
-                      exportFormat === "image"
+                    className={`p-2.5 rounded-xl border text-center flex flex-col items-center gap-1 transition cursor-pointer ${exportFormat === "image"
                         ? "bg-[#1F3864] text-white border-[#1F3864] shadow-sm font-bold"
                         : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300"
-                    }`}
+                      }`}
                   >
                     <ImageIcon className="size-4 text-amber-400" />
                     <span className="text-[11px]">Hình ảnh PNG</span>
@@ -2521,7 +2500,7 @@ export function AssociationAnalyticsScreen() {
                 <div>
                   <p className="font-bold">NGƯỜI XUẤT BÁO CÁO</p>
                   <p className="font-medium text-slate-700 dark:text-slate-300 mt-1">
-                    {currentMember?.name || (user as any)?.name || "Hội viên"}
+                    {currentMember?.name || (user as any)?.name || "Học viên"}
                   </p>
                   <p className="italic text-[9.5px] mt-4">(Ký điện tử xác thực)</p>
                 </div>
@@ -2545,10 +2524,10 @@ export function AssociationAnalyticsScreen() {
               <button
                 type="button"
                 onClick={() => {
-                  const exporter = currentMember?.name || (user as any)?.name || "Hội viên";
+                  const exporter = currentMember?.name || (user as any)?.name || "Học viên";
                   const role = currentMember?.department
                     ? `Ban ${currentMember.department.replace(/^Ban\s+/i, "")}`
-                    : "Hội viên chính thức";
+                    : "Học viên chính thức";
                   if (exportFormat === "pdf") {
                     toast.success(`Đang tạo bản in PDF chứng thực bởi ${exporter} (${role})...`);
                     setTimeout(() => window.print(), 300);
@@ -2618,10 +2597,10 @@ export function AssociationAnalyticsScreen() {
                     {currentAwardProgress.mappedCat === "top_referrals"
                       ? "Top Người Giới Thiệu"
                       : currentAwardProgress.mappedCat === "top_connect"
-                      ? "Kết Nối 1-on-1"
-                      : currentAwardProgress.mappedCat === "top_opportunities"
-                      ? "Cơ Hội Giao Thương B2B"
-                      : "Sự Kiện & Họp Ban"}
+                        ? "Kết Nối 1-on-1"
+                        : currentAwardProgress.mappedCat === "top_opportunities"
+                          ? "Cơ Hội Giao Thương B2B"
+                          : "Sự Kiện & Họp Ban"}
                   </p>
                 </div>
               </div>
@@ -2636,20 +2615,18 @@ export function AssociationAnalyticsScreen() {
                   return (
                     <div
                       key={aw.id || index}
-                      className={`p-3.5 rounded-2xl border transition-all ${
-                        isReached
+                      className={`p-3.5 rounded-2xl border transition-all ${isReached
                           ? "bg-emerald-500/10 border-emerald-500/30"
                           : "bg-slate-50 dark:bg-slate-900/60 border-slate-200 dark:border-slate-800"
-                      }`}
+                        }`}
                     >
                       <div className="flex items-center justify-between gap-2">
                         <div className="flex items-center gap-2">
                           <div
-                            className={`size-7 rounded-xl flex items-center justify-center text-xs font-black ${
-                              isReached
+                            className={`size-7 rounded-xl flex items-center justify-center text-xs font-black ${isReached
                                 ? "bg-emerald-600 text-white"
                                 : "bg-amber-500 text-slate-950"
-                            }`}
+                              }`}
                           >
                             #{index + 1}
                           </div>

@@ -102,7 +102,7 @@ export const EVENT_DEPARTMENTS = [
   { value: "all", label: "Tất cả các Ban", color: "bg-slate-100 text-slate-700 border-slate-200" },
   { value: "ban_thien_nguyen", label: "Ban Thiện Nguyện", color: "bg-teal-50 text-teal-700 border-teal-200" },
   { value: "ban_hoc_tap", label: "Ban Học tập", color: "bg-blue-50 text-blue-700 border-blue-200" },
-  { value: "ban_su_kien", label: "Ban Sự kiện & Hậu cần", color: "bg-purple-50 text-purple-700 border-purple-200" },
+  { value: "ban_su_kien", label: "Ban Sự kiện & Hậu cần", color: "bg-slate-100 text-slate-700 border-slate-200" },
   { value: "ban_tai_chinh", label: "Ban Tài chính & Tài trợ", color: "bg-yellow-50 text-yellow-700 border-yellow-200" },
   { value: "ban_truyen_thong", label: "Ban Truyền thông", color: "bg-rose-50 text-rose-700 border-rose-200" },
   { value: "ban_cong_nghe", label: "Ban Công nghệ", color: "bg-indigo-50 text-indigo-700 border-indigo-200" },
@@ -114,7 +114,7 @@ export const EVENT_DEPARTMENTS = [
 export const DEPARTMENT_LABELS: Record<string, { label: string; color: string }> = {
   ban_thien_nguyen: { label: "Ban Thiện Nguyện", color: "bg-teal-100 text-teal-800 border-teal-200" },
   ban_hoc_tap: { label: "Ban Học tập", color: "bg-blue-100 text-blue-800 border-blue-200" },
-  ban_su_kien: { label: "Ban Sự kiện & Hậu cần", color: "bg-purple-100 text-purple-800 border-purple-200" },
+  ban_su_kien: { label: "Ban Sự kiện & Hậu cần", color: "bg-slate-100 text-slate-800 border-slate-200" },
   ban_tai_chinh: { label: "Ban Tài chính & Tài trợ", color: "bg-yellow-100 text-yellow-800 border-yellow-200" },
   ban_truyen_thong: { label: "Ban Truyền thông", color: "bg-rose-100 text-rose-800 border-rose-200" },
   ban_cong_nghe: { label: "Ban Công nghệ", color: "bg-indigo-100 text-indigo-800 border-indigo-200" },
@@ -313,7 +313,7 @@ function EventsPage() {
           await createNotif({
             data: {
               title: `[Sự kiện mới] ${(payload as any).name || "Sự kiện Hiệp hội CEO HN10"}`,
-              body: `Sự kiện "${(payload as any).name || ""}" diễn ra vào ${(payload as any).startDate || (payload as any).date || "sắp tới"} tại ${(payload as any).location || "Hội trường CLB CEO HN10"}. Kính mời toàn thể Quý Hội viên đăng ký tham gia!`,
+              body: `Sự kiện "${(payload as any).name || ""}" diễn ra vào ${(payload as any).startDate || (payload as any).date || "sắp tới"} tại ${(payload as any).location || "Hội trường CLB CEO HN10"}. Kính mời toàn thể Quý Học viên đăng ký tham gia!`,
               category: "event",
               audience: "all",
               channel: "inapp",
@@ -517,7 +517,7 @@ ${e.name}
 
 ⏰ Thời gian: ${new Date(e.date).toLocaleString("vi-VN")}
 📍 Địa điểm: ${e.location || "Trụ sở CLB CEO HN10"}
-🎟️ Vé tham dự: ${e.ticketPrice && Number(e.ticketPrice) > 0 ? Number(e.ticketPrice).toLocaleString("vi-VN") + " VNĐ" : "Miễn phí dành cho Hội viên"}
+🎟️ Vé tham dự: ${e.ticketPrice && Number(e.ticketPrice) > 0 ? Number(e.ticketPrice).toLocaleString("vi-VN") + " VNĐ" : "Miễn phí dành cho Học viên"}
 
 ${(e as any).description ? `📝 Chi tiết: ${(e as any).description}\n\n` : ""}👉 Quý Doanh nhân bấm vào mã QR hoặc truy cập đường link để đăng ký tham gia: ${regUrl}`,
           category: "EVENT_MEETING",
@@ -596,639 +596,634 @@ ${(e as any).description ? `📝 Chi tiết: ${(e as any).description}\n\n` : ""
           />
         </div>
 
-      <div className="mb-5 grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <StatCard
-          label={t("events.kpi.total")}
-          value={events.length}
-          icon={<CalendarDays className="h-4 w-4" aria-hidden="true" />}
-        />
-        <StatCard
-          label={t("events.kpi.upcoming")}
-          value={events.filter((e: any) => getEffectiveStatus(e) === "upcoming").length}
-          tone="info"
-          icon={<CalendarDays className="h-4 w-4" aria-hidden="true" />}
-        />
-        <StatCard
-          label={t("events.kpi.totalReg")}
-          value={fmt.num(totalReg)}
-          hint={
-            totalCap > 0
-              ? t("events.kpi.fillRate", { n: Math.round((totalReg / totalCap) * 100) })
-              : undefined
-          }
-          tone="success"
-          icon={<Users className="h-4 w-4" aria-hidden="true" />}
-        />
-        <StatCard
-          label={t("events.kpi.capacity")}
-          value={fmt.num(totalCap)}
-          tone="warning"
-          icon={<Users className="h-4 w-4" aria-hidden="true" />}
-        />
-      </div>
-
-      {/* Featured event */}
-      {featured && (
-        <FeaturedCard
-          event={featured}
-          onOpen={() =>
-            router.navigate({ to: "/events/$eventId", params: { eventId: featured.id } })
-          }
-        />
-      )}
-
-      {/* Sticky search + controls */}
-      <div className="sm:sticky sm:top-18 z-20 mb-5 rounded-2xl border border-border bg-card/90 p-3 shadow-[var(--shadow-card)] backdrop-blur">
-        <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
-          <div className="relative w-full min-w-0 sm:min-w-[220px] sm:flex-1">
-            <Search
-              className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
-              aria-hidden="true"
-            />
-            <input
-              value={q}
-              onChange={(e) => setQ(e.target.value)}
-              placeholder={t("events.searchPh")}
-              className="h-11 w-full rounded-lg border border-border bg-background pl-9 pr-3 text-sm focus-visible:border-ring focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/30 sm:h-10"
-            />
-          </div>
-          <div className="grid grid-cols-2 gap-3 sm:flex sm:items-center">
-            <select
-              value={departmentFilter}
-              onChange={(e) => setDepartmentFilter(e.target.value)}
-              className="h-11 min-w-0 rounded-lg border border-border bg-background px-3 text-sm font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/30 sm:h-10 text-slate-800 dark:text-slate-200"
-            >
-              {EVENT_DEPARTMENTS.map((d) => (
-                <option key={d.value} value={d.value}>
-                  {d.label}
-                </option>
-              ))}
-            </select>
-            <select
-              value={type}
-              onChange={(e) => setType(e.target.value as EventItem["type"] | "all")}
-              className="h-11 min-w-0 rounded-lg border border-border bg-background px-3 text-sm font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/30 sm:h-10"
-            >
-              <option value="all">{t("events.filter.allTypes")}</option>
-              <option value="forum">{t("events.type.forum")}</option>
-              <option value="workshop">{t("events.type.workshop")}</option>
-              <option value="networking">{t("events.type.networking")}</option>
-              <option value="training">{t("events.type.training")}</option>
-              <option value="charity">Thiện nguyện (CSR)</option>
-            </select>
-            <select
-              value={status}
-              onChange={(e) => setStatus(e.target.value as EventItem["status"] | "all")}
-              className="h-11 min-w-0 rounded-lg border border-border bg-background px-3 text-sm font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/30 sm:h-10"
-            >
-              <option value="all">{t("common.allStatuses")}</option>
-              <option value="upcoming">{t("events.status.upcoming")}</option>
-              <option value="ongoing">{t("events.status.ongoing")}</option>
-              <option value="completed">{t("events.status.completed")}</option>
-              <option value="cancelled">{t("events.status.cancelled")}</option>
-            </select>
-
-            {/* View toggle */}
-            <div className="col-span-2 flex items-center gap-1 rounded-lg border border-border bg-background p-1 sm:col-span-1">
-              <button
-                type="button"
-                onClick={() => changeView("table")}
-                aria-label="Xem bảng"
-                aria-pressed={view === "table"}
-                title="Xem bảng"
-                className={`grid h-9 flex-1 place-items-center rounded-md transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/30 sm:h-8 sm:w-8 sm:flex-none ${
-                  view === "table"
-                    ? "bg-primary text-primary-foreground"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                <List className="h-4 w-4" aria-hidden="true" />
-              </button>
-              <button
-                type="button"
-                onClick={() => changeView("cards")}
-                aria-label={t("events.view.cards")}
-                aria-pressed={view === "cards"}
-                title={t("events.view.cards")}
-                className={`grid h-9 flex-1 place-items-center rounded-md transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/30 sm:h-8 sm:w-8 sm:flex-none ${
-                  view === "cards"
-                    ? "bg-primary text-primary-foreground"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                <LayoutGrid className="h-4 w-4" aria-hidden="true" />
-              </button>
-              <button
-                type="button"
-                onClick={() => changeView("calendar")}
-                aria-label={t("events.view.calendar")}
-                aria-pressed={view === "calendar"}
-                title={t("events.view.calendar")}
-                className={`grid h-9 flex-1 place-items-center rounded-md transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/30 sm:h-8 sm:w-8 sm:flex-none ${
-                  view === "calendar"
-                    ? "bg-primary text-primary-foreground"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                <CalendarDays className="h-4 w-4" aria-hidden="true" />
-              </button>
-            </div>
-          </div>
+        <div className="mb-5 grid grid-cols-2 gap-4 lg:grid-cols-4">
+          <StatCard
+            label={t("events.kpi.total")}
+            value={events.length}
+            icon={<CalendarDays className="h-4 w-4" aria-hidden="true" />}
+          />
+          <StatCard
+            label={t("events.kpi.upcoming")}
+            value={events.filter((e: any) => getEffectiveStatus(e) === "upcoming").length}
+            tone="info"
+            icon={<CalendarDays className="h-4 w-4" aria-hidden="true" />}
+          />
+          <StatCard
+            label={t("events.kpi.totalReg")}
+            value={fmt.num(totalReg)}
+            hint={
+              totalCap > 0
+                ? t("events.kpi.fillRate", { n: Math.round((totalReg / totalCap) * 100) })
+                : undefined
+            }
+            tone="success"
+            icon={<Users className="h-4 w-4" aria-hidden="true" />}
+          />
+          <StatCard
+            label={t("events.kpi.capacity")}
+            value={fmt.num(totalCap)}
+            tone="warning"
+            icon={<Users className="h-4 w-4" aria-hidden="true" />}
+          />
         </div>
 
-        {/* Department quick filter bar */}
-        <div className="mt-3 flex items-center gap-1.5 overflow-x-auto pb-1 pt-1.5 border-t border-border/50 no-scrollbar">
-          <span className="text-xs font-bold text-muted-foreground shrink-0 mr-1">Ban phụ trách:</span>
-          {EVENT_DEPARTMENTS.map((d) => (
-            <button
-              key={d.value}
-              type="button"
-              onClick={() => setDepartmentFilter(d.value)}
-              className={`px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition cursor-pointer border ${
-                departmentFilter === d.value
-                  ? "bg-[#003B95] text-white border-[#003B95] shadow-xs"
-                  : "bg-muted/50 hover:bg-muted text-muted-foreground border-border"
-              }`}
-            >
-              {d.label}
-            </button>
-          ))}
-        </div>
-
-        {/* Time buckets */}
-        <div className="-mx-3 mt-3 flex items-center gap-2 overflow-x-auto px-3 pb-1 no-scrollbar sm:mx-0 sm:flex-wrap sm:px-0 sm:pb-0">
-          {buckets.map((b) => (
-            <button
-              key={b.key}
-              type="button"
-              onClick={() => setBucket(b.key)}
-              aria-pressed={bucket === b.key}
-              className={`shrink-0 rounded-full px-3.5 py-2 text-xs font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/30 sm:py-1.5 ${
-                bucket === b.key
-                  ? "bg-primary text-primary-foreground"
-                  : "border border-border bg-background text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              {t(b.label)} ({bucketCounts[b.key]})
-            </button>
-          ))}
-          <span className="ml-auto shrink-0 pl-2 text-xs text-muted-foreground">
-            {t("events.results", { n: filtered.length })}
-          </span>
-        </div>
-
-        {/* Saved filters */}
-        <div className="mt-3 flex flex-wrap items-center gap-2">
-          {savedFilters.map((f) => (
-            <span
-              key={f.id}
-              className="inline-flex items-center gap-1 rounded-full border border-border bg-background py-1 pl-3 pr-1 text-xs font-medium text-foreground"
-            >
-              <button type="button" onClick={() => applySaved(f)} className="hover:text-primary">
-                {f.name}
-              </button>
-              <button
-                type="button"
-                onClick={() => onDeleteFilter(f.id)}
-                aria-label={t("events.filterDeleted")}
-                className="grid h-5 w-5 place-items-center rounded-full text-muted-foreground hover:bg-muted hover:text-destructive"
-              >
-                <X className="h-3 w-3" aria-hidden="true" />
-              </button>
-            </span>
-          ))}
-          {hasActiveFilter && (
-            <>
-              <button
-                type="button"
-                onClick={onSaveFilter}
-                className="inline-flex items-center gap-1 rounded-full border border-dashed border-border px-3 py-1 text-xs font-medium text-muted-foreground hover:text-foreground"
-              >
-                <Star className="h-3 w-3" aria-hidden="true" /> {t("events.saveFilter")}
-              </button>
-              <button
-                type="button"
-                onClick={clearFilters}
-                className="inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-medium text-muted-foreground hover:text-foreground"
-              >
-                <X className="h-3 w-3" aria-hidden="true" /> {t("mdetail.reviews.clear")}
-              </button>
-            </>
-          )}
-        </div>
-      </div>
-
-      {/* Content */}
-      {filtered.length === 0 ? (
-        hasActiveFilter ? (
-          <NoSearchResult />
-        ) : (
-          <EmptyState
-            icon={<CalendarDays className="h-6 w-6" />}
-            title={t("events.empty")}
-            action={
-              <button
-                onClick={() => {
-                  setWizardOpen(true);
-                }}
-                className="inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold text-primary-foreground"
-                style={{ background: "var(--gradient-primary)" }}
-              >
-                <Plus className="h-4 w-4" /> {t("events.create")}
-              </button>
+        {/* Featured event */}
+        {featured && (
+          <FeaturedCard
+            event={featured}
+            onOpen={() =>
+              router.navigate({ to: "/events/$eventId", params: { eventId: featured.id } })
             }
           />
-        )
-      ) : view === "table" ? (
-        <div className="self-stretch relative bg-white dark:bg-card rounded-[20px] outline outline-1 outline-slate-200 dark:outline-slate-800 flex flex-col justify-start items-start overflow-hidden shadow-xs">
-          <div className="overflow-x-auto relative w-full">
-            <table className="w-full min-w-[1200px] whitespace-nowrap text-sm border-collapse">
-              <thead>
-                <tr className="h-16 bg-blue-50/70 dark:bg-blue-950/40 border-b border-slate-200 dark:border-slate-800 text-xs font-bold text-slate-900 dark:text-slate-100">
-                  <th className="sticky left-0 z-20 w-[56px] min-w-[56px] max-w-[56px] bg-blue-50/90 dark:bg-blue-950/90 px-3 py-3 text-center border-r border-b border-slate-200 dark:border-slate-800 select-none">
-                    STT
-                  </th>
-                  <th className="sticky left-[56px] z-20 min-w-[100px] bg-blue-50/90 dark:bg-blue-950/90 px-4 py-3 border-r border-b border-slate-200 dark:border-slate-800 shadow-[4px_0_6px_-2px_rgba(0,0,0,0.05)] text-left">
-                    Mã
-                  </th>
-                  <SortHeader
-                    label="Tên sự kiện"
-                    columnKey="name"
-                    sortKey={tc.sortKey}
-                    sortDir={tc.sortDir}
-                    onSort={tc.toggleSort}
-                    width={260}
-                    className="border-r border-slate-200 dark:border-slate-800"
-                  />
-                  <SortHeader
-                    label="Thời gian"
-                    columnKey="date"
-                    sortKey={tc.sortKey}
-                    sortDir={tc.sortDir}
-                    onSort={tc.toggleSort}
-                    width={130}
-                    className="border-r border-slate-200 dark:border-slate-800"
-                  />
-                  <SortHeader
-                    label="Địa điểm"
-                    columnKey="location"
-                    sortKey={tc.sortKey}
-                    sortDir={tc.sortDir}
-                    onSort={tc.toggleSort}
-                    width={220}
-                    className="border-r border-slate-200 dark:border-slate-800"
-                  />
-                  <SortHeader
-                    label="Phân loại"
-                    columnKey="type"
-                    sortKey={tc.sortKey}
-                    sortDir={tc.sortDir}
-                    onSort={tc.toggleSort}
-                    width={130}
-                    className="border-r border-slate-200 dark:border-slate-800"
-                  />
-                  <th className="px-4 py-3 border-r border-b border-slate-200 dark:border-slate-800 text-left min-w-[150px]">
-                    Ban phụ trách
-                  </th>
-                  <SortHeader
-                    label="Giá vé / Phí"
-                    columnKey="ticketPrice"
-                    sortKey={tc.sortKey}
-                    sortDir={tc.sortDir}
-                    onSort={tc.toggleSort}
-                    width={140}
-                    className="border-r border-slate-200 dark:border-slate-800"
-                  />
-                  <th className="px-4 py-3 border-r border-b border-slate-200 dark:border-slate-800 text-left min-w-[150px]">
-                    Đăng ký / Sức chứa
-                  </th>
-                  <SortHeader
-                    label="Trạng thái"
-                    columnKey="status"
-                    sortKey={tc.sortKey}
-                    sortDir={tc.sortDir}
-                    onSort={tc.toggleSort}
-                    width={130}
-                    className="border-r border-slate-200 dark:border-slate-800"
-                  />
-                  <th className="sticky right-0 z-20 min-w-[170px] bg-blue-50/90 dark:bg-blue-950/90 px-4 py-3 text-right border-l border-b border-slate-200 dark:border-slate-800 shadow-[-4px_0_6px_-2px_rgba(0,0,0,0.08)]">
-                    Thao tác
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-200 dark:divide-slate-800 text-xs">
-                {tc.pageRows.map((e: any, idx: number) => {
-                  const tone =
-                    STATUS_TONE[e.status as keyof typeof STATUS_TONE] ?? STATUS_TONE.upcoming;
-                  const d = new Date(e.date);
-                  return (
-                    <tr
-                      key={e.id}
-                      className="group border-b border-slate-200 dark:border-slate-800 transition-colors hover:bg-slate-50/80 dark:hover:bg-slate-800/40 cursor-pointer"
-                      onClick={(evt) => {
-                        if ((evt.target as HTMLElement).closest("a,button")) return;
-                        router.navigate({ to: "/events/$eventId", params: { eventId: e.id } });
-                      }}
-                    >
-                      <td className="sticky left-0 z-10 w-[56px] min-w-[56px] max-w-[56px] bg-card group-hover:bg-muted/70 px-3 py-3.5 text-center text-xs font-medium text-muted-foreground border-r border-b border-slate-200 dark:border-slate-800 transition-colors">
-                        {(tc.page - 1) * tc.pageSize + idx + 1}
-                      </td>
-                      <td className="sticky left-[56px] z-10 min-w-[100px] bg-card group-hover:bg-muted/70 px-4 py-3.5 font-mono text-[12px] font-semibold text-primary border-r border-b border-slate-200 dark:border-slate-800 shadow-[4px_0_6px_-2px_rgba(0,0,0,0.05)] transition-colors whitespace-nowrap">
-                        EV-{e.id.slice(0, 6).toUpperCase()}
-                      </td>
-                      <td className="px-4 py-3.5 border-r border-b border-slate-200 dark:border-slate-800 whitespace-nowrap">
-                        <TruncatedText
-                          text={e.name}
-                          maxWidth="max-w-[280px]"
-                          className="font-semibold text-foreground text-xs"
-                        />
-                      </td>
-                      <td className="px-4 py-3.5 text-xs border-r border-b border-slate-200 dark:border-slate-800 whitespace-nowrap">
-                        <span className="font-semibold text-foreground text-xs">
-                          {d.toLocaleDateString("vi-VN")}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3.5 text-xs border-r border-b border-slate-200 dark:border-slate-800 whitespace-nowrap">
-                        <div className="flex items-center gap-1.5 text-muted-foreground">
-                          <MapPin className="h-3.5 w-3.5 text-amber-500 shrink-0" />
-                          <TruncatedText text={e.location || "Online / Khách Sạn Daewoo"} maxWidth="max-w-[240px]" className="text-foreground font-medium text-xs" />
-                        </div>
-                      </td>
-                      <td className="px-4 py-3.5 border-r border-b border-slate-200 dark:border-slate-800 whitespace-nowrap">
-                        <span className="inline-flex rounded-md bg-secondary px-2 py-0.5 text-xs font-medium text-muted-foreground">
-                          {t(TYPE_KEY[e.type as EventItem["type"]] ?? "events.type.forum")}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3.5 border-r border-b border-slate-200 dark:border-slate-800 whitespace-nowrap">
-                        {(() => {
-                          const dept = e.department || "ban_su_kien";
-                          const deptInfo = DEPARTMENT_LABELS[dept] || { label: "Ban Sự Kiện", color: "bg-rose-100 text-rose-800 border-rose-200" };
-                          return (
-                            <span className={`inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-xs font-semibold border ${deptInfo.color}`}>
-                              {deptInfo.label}
+        )}
+
+        {/* Sticky search + controls */}
+        <div className="sm:sticky sm:top-18 z-20 mb-5 rounded-2xl border border-border bg-card/90 p-3 shadow-[var(--shadow-card)] backdrop-blur">
+          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+            <div className="relative w-full min-w-0 sm:min-w-[220px] sm:flex-1">
+              <Search
+                className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
+                aria-hidden="true"
+              />
+              <input
+                value={q}
+                onChange={(e) => setQ(e.target.value)}
+                placeholder={t("events.searchPh")}
+                className="h-11 w-full rounded-lg border border-border bg-background pl-9 pr-3 text-sm focus-visible:border-ring focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/30 sm:h-10"
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-3 sm:flex sm:items-center">
+              <select
+                value={departmentFilter}
+                onChange={(e) => setDepartmentFilter(e.target.value)}
+                className="h-11 min-w-0 rounded-lg border border-border bg-background px-3 text-sm font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/30 sm:h-10 text-slate-800 dark:text-slate-200"
+              >
+                {EVENT_DEPARTMENTS.map((d) => (
+                  <option key={d.value} value={d.value}>
+                    {d.label}
+                  </option>
+                ))}
+              </select>
+              <select
+                value={type}
+                onChange={(e) => setType(e.target.value as EventItem["type"] | "all")}
+                className="h-11 min-w-0 rounded-lg border border-border bg-background px-3 text-sm font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/30 sm:h-10"
+              >
+                <option value="all">{t("events.filter.allTypes")}</option>
+                <option value="forum">{t("events.type.forum")}</option>
+                <option value="workshop">{t("events.type.workshop")}</option>
+                <option value="networking">{t("events.type.networking")}</option>
+                <option value="training">{t("events.type.training")}</option>
+                <option value="charity">Thiện nguyện (CSR)</option>
+              </select>
+              <select
+                value={status}
+                onChange={(e) => setStatus(e.target.value as EventItem["status"] | "all")}
+                className="h-11 min-w-0 rounded-lg border border-border bg-background px-3 text-sm font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/30 sm:h-10"
+              >
+                <option value="all">{t("common.allStatuses")}</option>
+                <option value="upcoming">{t("events.status.upcoming")}</option>
+                <option value="ongoing">{t("events.status.ongoing")}</option>
+                <option value="completed">{t("events.status.completed")}</option>
+                <option value="cancelled">{t("events.status.cancelled")}</option>
+              </select>
+
+              {/* View toggle */}
+              <div className="col-span-2 flex items-center gap-1 rounded-lg border border-border bg-background p-1 sm:col-span-1">
+                <button
+                  type="button"
+                  onClick={() => changeView("table")}
+                  aria-label="Xem bảng"
+                  aria-pressed={view === "table"}
+                  title="Xem bảng"
+                  className={`grid h-9 flex-1 place-items-center rounded-md transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/30 sm:h-8 sm:w-8 sm:flex-none ${view === "table"
+                      ? "bg-primary text-primary-foreground"
+                      : "text-muted-foreground hover:text-foreground"
+                    }`}
+                >
+                  <List className="h-4 w-4" aria-hidden="true" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => changeView("cards")}
+                  aria-label={t("events.view.cards")}
+                  aria-pressed={view === "cards"}
+                  title={t("events.view.cards")}
+                  className={`grid h-9 flex-1 place-items-center rounded-md transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/30 sm:h-8 sm:w-8 sm:flex-none ${view === "cards"
+                      ? "bg-primary text-primary-foreground"
+                      : "text-muted-foreground hover:text-foreground"
+                    }`}
+                >
+                  <LayoutGrid className="h-4 w-4" aria-hidden="true" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => changeView("calendar")}
+                  aria-label={t("events.view.calendar")}
+                  aria-pressed={view === "calendar"}
+                  title={t("events.view.calendar")}
+                  className={`grid h-9 flex-1 place-items-center rounded-md transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/30 sm:h-8 sm:w-8 sm:flex-none ${view === "calendar"
+                      ? "bg-primary text-primary-foreground"
+                      : "text-muted-foreground hover:text-foreground"
+                    }`}
+                >
+                  <CalendarDays className="h-4 w-4" aria-hidden="true" />
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Department quick filter bar */}
+          <div className="mt-3 flex items-center gap-1.5 overflow-x-auto pb-1 pt-1.5 border-t border-border/50 no-scrollbar">
+            <span className="text-xs font-bold text-muted-foreground shrink-0 mr-1">Ban phụ trách:</span>
+            {EVENT_DEPARTMENTS.map((d) => (
+              <button
+                key={d.value}
+                type="button"
+                onClick={() => setDepartmentFilter(d.value)}
+                className={`px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition cursor-pointer border ${departmentFilter === d.value
+                    ? "bg-[#003B95] text-white border-[#003B95] shadow-xs"
+                    : "bg-muted/50 hover:bg-muted text-muted-foreground border-border"
+                  }`}
+              >
+                {d.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Time buckets */}
+          <div className="-mx-3 mt-3 flex items-center gap-2 overflow-x-auto px-3 pb-1 no-scrollbar sm:mx-0 sm:flex-wrap sm:px-0 sm:pb-0">
+            {buckets.map((b) => (
+              <button
+                key={b.key}
+                type="button"
+                onClick={() => setBucket(b.key)}
+                aria-pressed={bucket === b.key}
+                className={`shrink-0 rounded-full px-3.5 py-2 text-xs font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/30 sm:py-1.5 ${bucket === b.key
+                    ? "bg-primary text-primary-foreground"
+                    : "border border-border bg-background text-muted-foreground hover:text-foreground"
+                  }`}
+              >
+                {t(b.label)} ({bucketCounts[b.key]})
+              </button>
+            ))}
+            <span className="ml-auto shrink-0 pl-2 text-xs text-muted-foreground">
+              {t("events.results", { n: filtered.length })}
+            </span>
+          </div>
+
+          {/* Saved filters */}
+          <div className="mt-3 flex flex-wrap items-center gap-2">
+            {savedFilters.map((f) => (
+              <span
+                key={f.id}
+                className="inline-flex items-center gap-1 rounded-full border border-border bg-background py-1 pl-3 pr-1 text-xs font-medium text-foreground"
+              >
+                <button type="button" onClick={() => applySaved(f)} className="hover:text-primary">
+                  {f.name}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onDeleteFilter(f.id)}
+                  aria-label={t("events.filterDeleted")}
+                  className="grid h-5 w-5 place-items-center rounded-full text-muted-foreground hover:bg-muted hover:text-destructive"
+                >
+                  <X className="h-3 w-3" aria-hidden="true" />
+                </button>
+              </span>
+            ))}
+            {hasActiveFilter && (
+              <>
+                <button
+                  type="button"
+                  onClick={onSaveFilter}
+                  className="inline-flex items-center gap-1 rounded-full border border-dashed border-border px-3 py-1 text-xs font-medium text-muted-foreground hover:text-foreground"
+                >
+                  <Star className="h-3 w-3" aria-hidden="true" /> {t("events.saveFilter")}
+                </button>
+                <button
+                  type="button"
+                  onClick={clearFilters}
+                  className="inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-medium text-muted-foreground hover:text-foreground"
+                >
+                  <X className="h-3 w-3" aria-hidden="true" /> {t("mdetail.reviews.clear")}
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+
+        {/* Content */}
+        {filtered.length === 0 ? (
+          hasActiveFilter ? (
+            <NoSearchResult />
+          ) : (
+            <EmptyState
+              icon={<CalendarDays className="h-6 w-6" />}
+              title={t("events.empty")}
+              action={
+                <button
+                  onClick={() => {
+                    setWizardOpen(true);
+                  }}
+                  className="inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold text-primary-foreground"
+                  style={{ background: "var(--gradient-primary)" }}
+                >
+                  <Plus className="h-4 w-4" /> {t("events.create")}
+                </button>
+              }
+            />
+          )
+        ) : view === "table" ? (
+          <div className="self-stretch relative bg-white dark:bg-card rounded-[20px] outline outline-1 outline-slate-200 dark:outline-slate-800 flex flex-col justify-start items-start overflow-hidden shadow-xs">
+            <div className="overflow-x-auto relative w-full">
+              <table className="w-full min-w-[1200px] whitespace-nowrap text-sm border-collapse">
+                <thead>
+                  <tr className="h-16 bg-blue-50/70 dark:bg-blue-950/40 border-b border-slate-200 dark:border-slate-800 text-xs font-bold text-slate-900 dark:text-slate-100">
+                    <th className="sticky left-0 z-20 w-[56px] min-w-[56px] max-w-[56px] bg-blue-50/90 dark:bg-blue-950/90 px-3 py-3 text-center border-r border-b border-slate-200 dark:border-slate-800 select-none">
+                      STT
+                    </th>
+                    <th className="sticky left-[56px] z-20 min-w-[100px] bg-blue-50/90 dark:bg-blue-950/90 px-4 py-3 border-r border-b border-slate-200 dark:border-slate-800 shadow-[4px_0_6px_-2px_rgba(0,0,0,0.05)] text-left">
+                      Mã
+                    </th>
+                    <SortHeader
+                      label="Tên sự kiện"
+                      columnKey="name"
+                      sortKey={tc.sortKey}
+                      sortDir={tc.sortDir}
+                      onSort={tc.toggleSort}
+                      width={260}
+                      className="border-r border-slate-200 dark:border-slate-800"
+                    />
+                    <SortHeader
+                      label="Thời gian"
+                      columnKey="date"
+                      sortKey={tc.sortKey}
+                      sortDir={tc.sortDir}
+                      onSort={tc.toggleSort}
+                      width={130}
+                      className="border-r border-slate-200 dark:border-slate-800"
+                    />
+                    <SortHeader
+                      label="Địa điểm"
+                      columnKey="location"
+                      sortKey={tc.sortKey}
+                      sortDir={tc.sortDir}
+                      onSort={tc.toggleSort}
+                      width={220}
+                      className="border-r border-slate-200 dark:border-slate-800"
+                    />
+                    <SortHeader
+                      label="Phân loại"
+                      columnKey="type"
+                      sortKey={tc.sortKey}
+                      sortDir={tc.sortDir}
+                      onSort={tc.toggleSort}
+                      width={130}
+                      className="border-r border-slate-200 dark:border-slate-800"
+                    />
+                    <th className="px-4 py-3 border-r border-b border-slate-200 dark:border-slate-800 text-left min-w-[150px]">
+                      Ban phụ trách
+                    </th>
+                    <SortHeader
+                      label="Giá vé / Phí"
+                      columnKey="ticketPrice"
+                      sortKey={tc.sortKey}
+                      sortDir={tc.sortDir}
+                      onSort={tc.toggleSort}
+                      width={140}
+                      className="border-r border-slate-200 dark:border-slate-800"
+                    />
+                    <th className="px-4 py-3 border-r border-b border-slate-200 dark:border-slate-800 text-left min-w-[150px]">
+                      Đăng ký / Sức chứa
+                    </th>
+                    <SortHeader
+                      label="Trạng thái"
+                      columnKey="status"
+                      sortKey={tc.sortKey}
+                      sortDir={tc.sortDir}
+                      onSort={tc.toggleSort}
+                      width={130}
+                      className="border-r border-slate-200 dark:border-slate-800"
+                    />
+                    <th className="sticky right-0 z-20 min-w-[170px] bg-blue-50/90 dark:bg-blue-950/90 px-4 py-3 text-right border-l border-b border-slate-200 dark:border-slate-800 shadow-[-4px_0_6px_-2px_rgba(0,0,0,0.08)]">
+                      Thao tác
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-200 dark:divide-slate-800 text-xs">
+                  {tc.pageRows.map((e: any, idx: number) => {
+                    const tone =
+                      STATUS_TONE[e.status as keyof typeof STATUS_TONE] ?? STATUS_TONE.upcoming;
+                    const d = new Date(e.date);
+                    return (
+                      <tr
+                        key={e.id}
+                        className="group border-b border-slate-200 dark:border-slate-800 transition-colors hover:bg-slate-50/80 dark:hover:bg-slate-800/40 cursor-pointer"
+                        onClick={(evt) => {
+                          if ((evt.target as HTMLElement).closest("a,button")) return;
+                          router.navigate({ to: "/events/$eventId", params: { eventId: e.id } });
+                        }}
+                      >
+                        <td className="sticky left-0 z-10 w-[56px] min-w-[56px] max-w-[56px] bg-card group-hover:bg-muted/70 px-3 py-3.5 text-center text-xs font-medium text-muted-foreground border-r border-b border-slate-200 dark:border-slate-800 transition-colors">
+                          {(tc.page - 1) * tc.pageSize + idx + 1}
+                        </td>
+                        <td className="sticky left-[56px] z-10 min-w-[100px] bg-card group-hover:bg-muted/70 px-4 py-3.5 font-mono text-[12px] font-semibold text-primary border-r border-b border-slate-200 dark:border-slate-800 shadow-[4px_0_6px_-2px_rgba(0,0,0,0.05)] transition-colors whitespace-nowrap">
+                          EV-{e.id.slice(0, 6).toUpperCase()}
+                        </td>
+                        <td className="px-4 py-3.5 border-r border-b border-slate-200 dark:border-slate-800 whitespace-nowrap">
+                          <TruncatedText
+                            text={e.name}
+                            maxWidth="max-w-[280px]"
+                            className="font-semibold text-foreground text-xs"
+                          />
+                        </td>
+                        <td className="px-4 py-3.5 text-xs border-r border-b border-slate-200 dark:border-slate-800 whitespace-nowrap">
+                          <span className="font-semibold text-foreground text-xs">
+                            {d.toLocaleDateString("vi-VN")}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3.5 text-xs border-r border-b border-slate-200 dark:border-slate-800 whitespace-nowrap">
+                          <div className="flex items-center gap-1.5 text-muted-foreground">
+                            <MapPin className="h-3.5 w-3.5 text-amber-500 shrink-0" />
+                            <TruncatedText text={e.location || "Online / Khách Sạn Daewoo"} maxWidth="max-w-[240px]" className="text-foreground font-medium text-xs" />
+                          </div>
+                        </td>
+                        <td className="px-4 py-3.5 border-r border-b border-slate-200 dark:border-slate-800 whitespace-nowrap">
+                          <span className="inline-flex rounded-md bg-secondary px-2 py-0.5 text-xs font-medium text-muted-foreground">
+                            {t(TYPE_KEY[e.type as EventItem["type"]] ?? "events.type.forum")}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3.5 border-r border-b border-slate-200 dark:border-slate-800 whitespace-nowrap">
+                          {(() => {
+                            const dept = e.department || "ban_su_kien";
+                            const deptInfo = DEPARTMENT_LABELS[dept] || { label: "Ban Sự Kiện", color: "bg-rose-100 text-rose-800 border-rose-200" };
+                            return (
+                              <span className={`inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-xs font-semibold border ${deptInfo.color}`}>
+                                {deptInfo.label}
+                              </span>
+                            );
+                          })()}
+                        </td>
+                        <td className="px-4 py-3.5 border-r border-b border-slate-200 dark:border-slate-800 whitespace-nowrap">
+                          {e.ticketPrice && Number(e.ticketPrice) > 0 ? (
+                            <span className="inline-flex items-center rounded-full bg-amber-500/15 px-2.5 py-0.5 text-xs font-bold text-amber-700 dark:text-amber-400">
+                              {fmt.money(Number(e.ticketPrice))}
                             </span>
-                          );
-                        })()}
-                      </td>
-                      <td className="px-4 py-3.5 border-r border-b border-slate-200 dark:border-slate-800 whitespace-nowrap">
-                        {e.ticketPrice && Number(e.ticketPrice) > 0 ? (
-                          <span className="inline-flex items-center rounded-full bg-amber-500/15 px-2.5 py-0.5 text-xs font-bold text-amber-700 dark:text-amber-400">
-                            {fmt.money(Number(e.ticketPrice))}
-                          </span>
-                        ) : (
-                          <span className="inline-flex items-center rounded-full bg-emerald-500/15 px-2.5 py-0.5 text-xs font-bold text-emerald-700 dark:text-emerald-400">
-                            Miễn phí
-                          </span>
-                        )}
-                      </td>
-                      <td className="px-4 py-3.5 border-r border-b border-slate-200 dark:border-slate-800 whitespace-nowrap">
-                        <div className="text-xs font-semibold text-foreground">
-                          {e.registered} / {e.capacity}
-                        </div>
-                        <div className="h-1.5 w-24 overflow-hidden rounded-full bg-secondary mt-1">
-                          <div
-                            className="h-full rounded-full bg-primary"
-                            style={{
-                              width: `${Math.min(100, Math.round((e.registered / (e.capacity || 1)) * 100))}%`,
-                            }}
-                          />
-                        </div>
-                      </td>
-                      <td className="px-4 py-3.5 border-r border-b border-slate-200 dark:border-slate-800">
-                        <span
-                          className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold"
-                          style={{ background: tone.bg, color: tone.fg }}
-                        >
-                          <span
-                            className="h-1.5 w-1.5 rounded-full"
-                            style={{ background: tone.fg }}
-                          />
-                          {t(
-                            STATUS_KEY[e.status as EventItem["status"]] ?? "events.status.upcoming",
+                          ) : (
+                            <span className="inline-flex items-center rounded-full bg-emerald-500/15 px-2.5 py-0.5 text-xs font-bold text-emerald-700 dark:text-emerald-400">
+                              Miễn phí
+                            </span>
                           )}
-                        </span>
-                      </td>
-                      <td className="sticky right-0 z-10 min-w-[170px] bg-card group-hover:bg-muted/70 px-4 py-3.5 text-right border-l border-b border-slate-200 dark:border-slate-800 shadow-[-4px_0_6px_-2px_rgba(0,0,0,0.08)] transition-colors">
-                        <div className="inline-flex items-center gap-1">
-                          <button
-                            type="button"
-                            title="Bắn chi tiết sự kiện kèm Poster & QR xuống Mạng lưới"
-                            onClick={(evt) => {
-                              evt.stopPropagation();
-                              handleBroadcastEventToFeed(e);
-                            }}
-                            className="inline-flex items-center gap-1 rounded-lg border border-blue-500/40 bg-blue-500/10 px-2 py-1.5 text-xs font-semibold text-blue-600 hover:bg-blue-500/20 transition"
+                        </td>
+                        <td className="px-4 py-3.5 border-r border-b border-slate-200 dark:border-slate-800 whitespace-nowrap">
+                          <div className="text-xs font-semibold text-foreground">
+                            {e.registered} / {e.capacity}
+                          </div>
+                          <div className="h-1.5 w-24 overflow-hidden rounded-full bg-secondary mt-1">
+                            <div
+                              className="h-full rounded-full bg-primary"
+                              style={{
+                                width: `${Math.min(100, Math.round((e.registered / (e.capacity || 1)) * 100))}%`,
+                              }}
+                            />
+                          </div>
+                        </td>
+                        <td className="px-4 py-3.5 border-r border-b border-slate-200 dark:border-slate-800">
+                          <span
+                            className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold"
+                            style={{ background: tone.bg, color: tone.fg }}
                           >
-                            <Send className="h-3.5 w-3.5" />
-                            <span className="hidden xl:inline text-[11px]">Bắn Mạng Lưới</span>
-                          </button>
-                          {canScanEventQr(user, e) && (
+                            <span
+                              className="h-1.5 w-1.5 rounded-full"
+                              style={{ background: tone.fg }}
+                            />
+                            {t(
+                              STATUS_KEY[e.status as EventItem["status"]] ?? "events.status.upcoming",
+                            )}
+                          </span>
+                        </td>
+                        <td className="sticky right-0 z-10 min-w-[170px] bg-card group-hover:bg-muted/70 px-4 py-3.5 text-right border-l border-b border-slate-200 dark:border-slate-800 shadow-[-4px_0_6px_-2px_rgba(0,0,0,0.08)] transition-colors">
+                          <div className="inline-flex items-center gap-1">
                             <button
                               type="button"
-                              title="Quản lý Check-in & QR Gatekeeper"
+                              title="Bắn chi tiết sự kiện kèm Poster & QR xuống Mạng lưới"
                               onClick={(evt) => {
                                 evt.stopPropagation();
-                                setQrGatekeeperEvent(e);
+                                handleBroadcastEventToFeed(e);
+                              }}
+                              className="inline-flex items-center gap-1 rounded-lg border border-blue-500/40 bg-blue-500/10 px-2 py-1.5 text-xs font-semibold text-blue-600 hover:bg-blue-500/20 transition"
+                            >
+                              <Send className="h-3.5 w-3.5" />
+                              <span className="hidden xl:inline text-[11px]">Bắn Mạng Lưới</span>
+                            </button>
+                            {canScanEventQr(user, e) && (
+                              <button
+                                type="button"
+                                title="Quản lý Check-in & QR Gatekeeper"
+                                onClick={(evt) => {
+                                  evt.stopPropagation();
+                                  setQrGatekeeperEvent(e);
+                                }}
+                                className="inline-flex items-center gap-1 rounded-lg border border-amber-500/40 bg-amber-500/10 px-2 py-1.5 text-xs font-semibold text-amber-600 hover:bg-amber-500/20 transition"
+                              >
+                                <QrCode className="h-3.5 w-3.5" />
+                                <span className="hidden xl:inline text-[11px]">QR Gate</span>
+                              </button>
+                            )}
+                            <button
+                              type="button"
+                              title="Khai báo vật dụng hỗ trợ sự kiện - Ban Hậu Cần & Sự Kiện"
+                              onClick={(evt) => {
+                                evt.stopPropagation();
+                                setSelectedSupplyEvent(e);
+                              }}
+                              className="inline-flex items-center gap-1 rounded-lg border border-indigo-500/40 bg-indigo-500/10 px-2 py-1.5 text-xs font-semibold text-indigo-600 hover:bg-indigo-500/20 transition"
+                            >
+                              <Package className="h-3.5 w-3.5" />
+                              <span className="hidden xl:inline text-[11px]">Hậu cần</span>
+                            </button>
+                            <button
+                              type="button"
+                              title="Đánh giá & phản hồi sự kiện"
+                              onClick={(evt) => {
+                                evt.stopPropagation();
+                                setFeedbackModalEvent(e);
                               }}
                               className="inline-flex items-center gap-1 rounded-lg border border-amber-500/40 bg-amber-500/10 px-2 py-1.5 text-xs font-semibold text-amber-600 hover:bg-amber-500/20 transition"
                             >
-                              <QrCode className="h-3.5 w-3.5" />
-                              <span className="hidden xl:inline text-[11px]">QR Gate</span>
+                              <MessageSquare className="h-3.5 w-3.5" />
+                              <span className="hidden xl:inline text-[11px]">Đánh giá</span>
                             </button>
-                          )}
-                          <button
-                            type="button"
-                            title="Khai báo vật dụng hỗ trợ sự kiện - Ban Hậu Cần & Sự Kiện"
-                            onClick={(evt) => {
-                              evt.stopPropagation();
-                              setSelectedSupplyEvent(e);
-                            }}
-                            className="inline-flex items-center gap-1 rounded-lg border border-indigo-500/40 bg-indigo-500/10 px-2 py-1.5 text-xs font-semibold text-indigo-600 hover:bg-indigo-500/20 transition"
-                          >
-                            <Package className="h-3.5 w-3.5" />
-                            <span className="hidden xl:inline text-[11px]">Hậu cần</span>
-                          </button>
-                          <button
-                            type="button"
-                            title="Đánh giá & phản hồi sự kiện"
-                            onClick={(evt) => {
-                              evt.stopPropagation();
-                              setFeedbackModalEvent(e);
-                            }}
-                            className="inline-flex items-center gap-1 rounded-lg border border-amber-500/40 bg-amber-500/10 px-2 py-1.5 text-xs font-semibold text-amber-600 hover:bg-amber-500/20 transition"
-                          >
-                            <MessageSquare className="h-3.5 w-3.5" />
-                            <span className="hidden xl:inline text-[11px]">Đánh giá</span>
-                          </button>
-                          <button
-                            type="button"
-                            title="Tư liệu & media sự kiện - Tự động đồng bộ Quản lý tài liệu"
-                            onClick={(evt) => {
-                              evt.stopPropagation();
-                              setMediaModalEvent(e);
-                            }}
-                            className="inline-flex items-center gap-1 rounded-lg border border-emerald-500/40 bg-emerald-500/10 px-2 py-1.5 text-xs font-semibold text-emerald-600 hover:bg-emerald-500/20 transition"
-                          >
-                            <Camera className="h-3.5 w-3.5" />
-                            <span className="hidden xl:inline text-[11px]">Ảnh/Media</span>
-                          </button>
-                          <Link
-                            to="/events/$eventId"
-                            params={{ eventId: e.id }}
-                            className="inline-flex items-center gap-1 rounded-lg border border-border bg-background px-2.5 py-1.5 text-xs font-medium text-foreground hover:bg-muted"
-                          >
-                            <Eye className="h-3.5 w-3.5" />
-                          </Link>
-                          {can(PERMISSIONS.EVENT_EDIT) && (
                             <button
-                              onClick={() => {
-                                setEditing(e);
-                                setOpen(true);
+                              type="button"
+                              title="Tư liệu & media sự kiện - Tự động đồng bộ Quản lý tài liệu"
+                              onClick={(evt) => {
+                                evt.stopPropagation();
+                                setMediaModalEvent(e);
                               }}
+                              className="inline-flex items-center gap-1 rounded-lg border border-emerald-500/40 bg-emerald-500/10 px-2 py-1.5 text-xs font-semibold text-emerald-600 hover:bg-emerald-500/20 transition"
+                            >
+                              <Camera className="h-3.5 w-3.5" />
+                              <span className="hidden xl:inline text-[11px]">Ảnh/Media</span>
+                            </button>
+                            <Link
+                              to="/events/$eventId"
+                              params={{ eventId: e.id }}
                               className="inline-flex items-center gap-1 rounded-lg border border-border bg-background px-2.5 py-1.5 text-xs font-medium text-foreground hover:bg-muted"
                             >
-                              <Pencil className="h-3.5 w-3.5" />
-                            </button>
-                          )}
-                          {can(PERMISSIONS.EVENT_DELETE) && (
-                            <button
-                              onClick={() => onDelete(e)}
-                              disabled={deletingId === e.id}
-                              className="inline-flex items-center gap-1 rounded-lg border border-destructive/20 bg-background px-2.5 py-1.5 text-xs font-medium text-destructive hover:bg-destructive/10 disabled:opacity-50"
-                            >
-                              <Trash2 className="h-3.5 w-3.5" />
-                            </button>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+                              <Eye className="h-3.5 w-3.5" />
+                            </Link>
+                            {can(PERMISSIONS.EVENT_EDIT) && (
+                              <button
+                                onClick={() => {
+                                  setEditing(e);
+                                  setOpen(true);
+                                }}
+                                className="inline-flex items-center gap-1 rounded-lg border border-border bg-background px-2.5 py-1.5 text-xs font-medium text-foreground hover:bg-muted"
+                              >
+                                <Pencil className="h-3.5 w-3.5" />
+                              </button>
+                            )}
+                            {can(PERMISSIONS.EVENT_DELETE) && (
+                              <button
+                                onClick={() => onDelete(e)}
+                                disabled={deletingId === e.id}
+                                className="inline-flex items-center gap-1 rounded-lg border border-destructive/20 bg-background px-2.5 py-1.5 text-xs font-medium text-destructive hover:bg-destructive/10 disabled:opacity-50"
+                              >
+                                <Trash2 className="h-3.5 w-3.5" />
+                              </button>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+            <Pagination
+              page={tc.page}
+              pageCount={tc.pageCount}
+              pageSize={tc.pageSize}
+              total={tc.total}
+              from={tc.from}
+              to={tc.to}
+              onPage={tc.setPage}
+              onPageSize={tc.setPageSize}
+            />
           </div>
-          <Pagination
-            page={tc.page}
-            pageCount={tc.pageCount}
-            pageSize={tc.pageSize}
-            total={tc.total}
-            from={tc.from}
-            to={tc.to}
-            onPage={tc.setPage}
-            onPageSize={tc.setPageSize}
-          />
-        </div>
-      ) : view === "cards" ? (
-        <div className="space-y-6">
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
-            {tc.pageRows.map((e: any) => (
-              <EventCard
-                key={e.id}
-                event={e}
-                deleting={deletingId === e.id}
-                onEdit={() => {
-                  setEditing(e);
-                  setOpen(true);
-                }}
-                onDelete={() => onDelete(e)}
-                onQrGatekeeper={() => setQrGatekeeperEvent(e)}
-                onBroadcastToFeed={() => handleBroadcastEventToFeed(e)}
-                onSupply={() => setSelectedSupplyEvent(e)}
-                onFeedback={() => setFeedbackModalEvent(e)}
-                onMedia={() => setMediaModalEvent(e)}
-              />
-            ))}
+        ) : view === "cards" ? (
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
+              {tc.pageRows.map((e: any) => (
+                <EventCard
+                  key={e.id}
+                  event={e}
+                  deleting={deletingId === e.id}
+                  onEdit={() => {
+                    setEditing(e);
+                    setOpen(true);
+                  }}
+                  onDelete={() => onDelete(e)}
+                  onQrGatekeeper={() => setQrGatekeeperEvent(e)}
+                  onBroadcastToFeed={() => handleBroadcastEventToFeed(e)}
+                  onSupply={() => setSelectedSupplyEvent(e)}
+                  onFeedback={() => setFeedbackModalEvent(e)}
+                  onMedia={() => setMediaModalEvent(e)}
+                />
+              ))}
+            </div>
+            <Pagination
+              page={tc.page}
+              pageCount={tc.pageCount}
+              pageSize={tc.pageSize}
+              total={tc.total}
+              from={tc.from}
+              to={tc.to}
+              onPage={tc.setPage}
+              onPageSize={tc.setPageSize}
+            />
           </div>
-          <Pagination
-            page={tc.page}
-            pageCount={tc.pageCount}
-            pageSize={tc.pageSize}
-            total={tc.total}
-            from={tc.from}
-            to={tc.to}
-            onPage={tc.setPage}
-            onPageSize={tc.setPageSize}
-          />
-        </div>
-      ) : (
-        <CalendarView events={filtered} />
-      )}
+        ) : (
+          <CalendarView events={filtered} />
+        )}
 
-      <CrudModal
-        open={open}
-        title={editing ? t("common.editTitle") : t("events.create")}
-        fields={fields}
-        initial={
-          editing
-            ? ({
+        <CrudModal
+          open={open}
+          title={editing ? t("common.editTitle") : t("events.create")}
+          fields={fields}
+          initial={
+            editing
+              ? ({
                 ...editing,
                 sponsors: editing.sponsors || [],
                 qrStaff: (editing as any).qrStaff || (editing as any).qrScanners || [],
               } as unknown as CrudValues)
-            : { sponsors: [], qrStaff: [] }
-        }
-        submitting={submitting}
-        submitLabel={editing ? t("common.save") : t("common.create")}
-        cancelLabel={t("common.cancel")}
-        onSubmit={onSubmit}
-        onClose={() => {
-          setOpen(false);
-          setEditing(null);
-        }}
-      />
-
-      <EventWizard
-        open={wizardOpen}
-        initialType={wizardInitialType}
-        onClose={() => {
-          setWizardOpen(false);
-          setWizardInitialType(undefined);
-        }}
-        onCreated={(ev) => {
-          setWizardOpen(false);
-          setWizardInitialType(undefined);
-          router.invalidate();
-          router.navigate({ to: "/events/$eventId", params: { eventId: ev.id } });
-        }}
-      />
-
-      <EventCheckinGatekeeperModal
-        open={!!qrGatekeeperEvent}
-        event={qrGatekeeperEvent}
-        onClose={() => setQrGatekeeperEvent(null)}
-        onUpdateEvent={() => router.invalidate()}
-      />
-
-      {selectedSupplyEvent && (
-        <SupplyDeclarationModal
-          open={!!selectedSupplyEvent}
-          targetType="event"
-          targetId={selectedSupplyEvent.id}
-          targetName={selectedSupplyEvent.name}
-          department="Ban Sự Kiện & Hậu Cần"
-          onClose={() => setSelectedSupplyEvent(null)}
+              : { sponsors: [], qrStaff: [] }
+          }
+          submitting={submitting}
+          submitLabel={editing ? t("common.save") : t("common.create")}
+          cancelLabel={t("common.cancel")}
+          onSubmit={onSubmit}
+          onClose={() => {
+            setOpen(false);
+            setEditing(null);
+          }}
         />
-      )}
 
-      {feedbackModalEvent && (
-        <EventFeedbackModal
-          open={!!feedbackModalEvent}
-          eventId={feedbackModalEvent.id}
-          eventName={feedbackModalEvent.name}
-          onClose={() => setFeedbackModalEvent(null)}
+        <EventWizard
+          open={wizardOpen}
+          initialType={wizardInitialType}
+          onClose={() => {
+            setWizardOpen(false);
+            setWizardInitialType(undefined);
+          }}
+          onCreated={(ev) => {
+            setWizardOpen(false);
+            setWizardInitialType(undefined);
+            router.invalidate();
+            router.navigate({ to: "/events/$eventId", params: { eventId: ev.id } });
+          }}
         />
-      )}
 
-      {mediaModalEvent && (
-        <EventMediaModal
-          open={!!mediaModalEvent}
-          eventId={mediaModalEvent.id}
-          eventName={mediaModalEvent.name}
-          existingGalleryUrl={(mediaModalEvent as any).photoGalleryUrl || (mediaModalEvent as any).photo_gallery_url}
-          onClose={() => setMediaModalEvent(null)}
-          onUpdated={() => router.invalidate()}
+        <EventCheckinGatekeeperModal
+          open={!!qrGatekeeperEvent}
+          event={qrGatekeeperEvent}
+          onClose={() => setQrGatekeeperEvent(null)}
+          onUpdateEvent={() => router.invalidate()}
         />
-      )}
+
+        {selectedSupplyEvent && (
+          <SupplyDeclarationModal
+            open={!!selectedSupplyEvent}
+            targetType="event"
+            targetId={selectedSupplyEvent.id}
+            targetName={selectedSupplyEvent.name}
+            department="Ban Sự Kiện & Hậu Cần"
+            onClose={() => setSelectedSupplyEvent(null)}
+          />
+        )}
+
+        {feedbackModalEvent && (
+          <EventFeedbackModal
+            open={!!feedbackModalEvent}
+            eventId={feedbackModalEvent.id}
+            eventName={feedbackModalEvent.name}
+            onClose={() => setFeedbackModalEvent(null)}
+          />
+        )}
+
+        {mediaModalEvent && (
+          <EventMediaModal
+            open={!!mediaModalEvent}
+            eventId={mediaModalEvent.id}
+            eventName={mediaModalEvent.name}
+            existingGalleryUrl={(mediaModalEvent as any).photoGalleryUrl || (mediaModalEvent as any).photo_gallery_url}
+            onClose={() => setMediaModalEvent(null)}
+            onUpdated={() => router.invalidate()}
+          />
+        )}
       </div>
     </AppShell>
   );
@@ -1633,9 +1628,8 @@ function CalendarView({ events }: { events: EventItem[] }) {
           return (
             <div
               key={date.toISOString()}
-              className={`min-h-[52px] rounded-lg border p-1 text-left sm:min-h-[76px] sm:p-1.5 ${
-                isToday ? "border-primary bg-primary/5" : "border-border bg-background"
-              }`}
+              className={`min-h-[52px] rounded-lg border p-1 text-left sm:min-h-[76px] sm:p-1.5 ${isToday ? "border-primary bg-primary/5" : "border-border bg-background"
+                }`}
             >
               <span
                 className={`text-[11px] font-semibold ${isToday ? "text-primary" : "text-muted-foreground"}`}

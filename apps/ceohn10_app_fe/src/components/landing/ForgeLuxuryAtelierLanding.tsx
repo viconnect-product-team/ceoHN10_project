@@ -195,7 +195,7 @@ export function ForgeLuxuryAtelierLanding({
               { label: "01. Giới Thiệu Atelier", href: "#hero" },
               { label: "02. Triết Lý Chế Tác", href: "#approach" },
               { label: "03. Phân Hệ Tinh Hoa", href: "#specialties" },
-              { label: "04. Dự Án & Hội Viên Tiêu Biểu", href: "#previous-builds" },
+              { label: "04. Dự Án & Học viên Tiêu Biểu", href: "#previous-builds" },
               { label: "05. Cơ Hội Giao Thương Đang Mở", href: "#available-stock" },
               { label: "06. Liên Hệ & Đăng Ký", href: "#enquire" },
             ].map((item, idx) => (
@@ -659,7 +659,7 @@ export function ForgeLuxuryAtelierLanding({
                   <option value="Capital & Fund / Quỹ Đầu Tư">Capital & Growth — Dòng Tiền & Quỹ Đầu Tư</option>
                   <option value="Executive Atelier / Quản Trị AI">Executive Atelier — Quản Trị Tinh Gọn & AI</option>
                   <option value="Exclusive Stock / Gói Đầu Tư Có Sẵn">Tham Gia Cơ Hội Hợp Tác Sẵn Có</option>
-                  <option value="Full Membership / Hội Viên Chính Thức">Gia Nhập Hội Viên Chính Thức CEO HN10</option>
+                  <option value="Full Membership / Học viên Chính Thức">Gia Nhập Học viên Chính Thức CEO HN10</option>
                 </select>
               </div>
 

@@ -1,11 +1,11 @@
-# TÀI LIỆU YÊU CẦU NGHIỆP VỤ ỨNG DỤNG DI ĐỘNG HỘI VIÊN (BRD - MOBILE APP)
+# TÀI LIỆU YÊU CẦU NGHIỆP VỤ ỨNG DỤNG DI ĐỘNG Học viên (BRD - MOBILE APP)
 ## HỆ SINH THÁI DOANH NHÂN CLB CEO HN10 (TRỰC THUỘC HANOIBA)
 *Phiên bản: 4.0 - Phát hành: Tháng 10/2026 - Ngôn ngữ: Tiếng Việt (Doanh nghiệp chuẩn)*
 
 ---
 
 ### LỜI MỞ ĐẦU & TÔN CHỈ THIẾT KẾ
-Ứng dụng di động **CLB Doanh Nhân CEO HN10** được thiết kế độc bản dành riêng cho các doanh nhân thuộc CLB Doanh Nhân CEO HN10. Ứng dụng là chiếc cầu nối không khoảng cách giữa các hội viên với nhau và giữa hội viên với Ban Điều Hành hiệp hội.
+Ứng dụng di động **CLB Doanh Nhân CEO HN10** được thiết kế độc bản dành riêng cho các doanh nhân thuộc CLB Doanh Nhân CEO HN10. Ứng dụng là chiếc cầu nối không khoảng cách giữa các Học viên với nhau và giữa Học viên với Ban Điều Hành hiệp hội.
 
 Trọng tâm thiết kế hướng tới: **Sang trọng, Tối giản, Mượt mà và Đậm chất Doanh nhân bản lĩnh**. Mọi thao tác đều được tối ưu hóa cho màn hình cảm ứng di động với thời gian phản hồi tức thì.
 
@@ -14,18 +14,18 @@ Trọng tâm thiết kế hướng tới: **Sang trọng, Tối giản, Mượt 
 ### CHƯƠNG 1: ĐỊNH VỊ & ĐẶC QUYỀN ỨNG DỤNG DI ĐỘNG CEO HN10
 1. **Định vị sản phẩm**:
    - Không chỉ là một ứng dụng tra cứu thông tin, đây là danh thiếp số quyền năng và văn phòng bỏ túi của từng lãnh đạo doanh nghiệp.
-2. **Đặc quyền dành riêng cho hội viên**:
-   - Sở hữu tấm thẻ hội viên VIP điện tử mạ vàng độc bản.
+2. **Đặc quyền dành riêng cho Học viên**:
+   - Sở hữu tấm thẻ Học viên VIP điện tử mạ vàng độc bản.
    - Nhận thông báo việc làm và chỉ đạo điều hành ngay lập tức.
    - Nhận vé mời sự kiện, check-in không cần chạm giấy tờ.
    - Kết nối đàm thoại nội bộ chất lượng cao không bị làm phiền bởi cuộc gọi rác.
 
 ---
 
-### CHƯƠNG 2: THẺ HỘI VIÊN ĐIỆN TỬ VIP & DANH THIẾP SỐ CHẠM NFC
-1. **Thẻ hội viên VIP kỹ thuật số**:
+### CHƯƠNG 2: THẺ Học viên ĐIỆN TỬ VIP & DANH THIẾP SỐ CHẠM NFC
+1. **Thẻ Học viên VIP kỹ thuật số**:
    - Thiết kế ánh kim vàng sang trọng trên nền xanh Classic Navy của hiệp hội.
-   - Thể hiện đầy đủ mã hội viên chính danh, họ tên, chức vụ, công ty và logo CEO HN10.
+   - Thể hiện đầy đủ mã Học viên chính danh, họ tên, chức vụ, công ty và logo CEO HN10.
 2. **Công nghệ chạm danh thiếp điện tử 1 chạm (NFC)**:
    - Tích hợp công nghệ chạm NFC NTAG213/215: Chỉ cần chạm lưng điện thoại vào đối tác là toàn bộ thông tin doanh nghiệp, website, sản phẩm được truyền tải trọn vẹn trong 1 giây.
    - Mã QR cá nhân hóa động cho phép quét nhanh khi gặp gỡ tại các diễn đàn kinh tế.
@@ -34,7 +34,7 @@ Trọng tâm thiết kế hướng tới: **Sang trọng, Tối giản, Mượt 
 
 ### CHƯƠNG 3: NHẬN NHIỆM VỤ, NỘP BÁO CÁO & XỬ LÝ CÔNG VIỆC DI ĐỘNG
 1. **Nhận việc tức thời từ lãnh đạo**:
-   - Khi Chủ tịch, Ban Điều Hành, Tổng thư ký hoặc Trưởng ban giao việc, điện thoại hội viên lập tức phát chuông và hiển thị thông báo nhiệm vụ mới.
+   - Khi Chủ tịch, Ban Điều Hành, Tổng thư ký hoặc Trưởng ban giao việc, điện thoại Học viên lập tức phát chuông và hiển thị thông báo nhiệm vụ mới.
 2. **Tra cứu tài liệu đính kèm**:
    - Xem và tải trực tiếp các tệp văn bản Word, bảng tính Excel dự toán và tệp PDF kế hoạch hành động.
 3. **Cập nhật tiến độ & nộp kết quả**:
@@ -46,7 +46,7 @@ Trọng tâm thiết kế hướng tới: **Sang trọng, Tối giản, Mượt 
 ---
 
 ### CHƯƠNG 4: DANH BẠ DOANH NHÂN & LỊCH HẸN GIAO THƯƠNG 1-ON-1
-1. **Danh bạ hội viên tin cậy 100% chính danh**:
+1. **Danh bạ Học viên tin cậy 100% chính danh**:
    - Tìm kiếm đối tác theo lĩnh vực kinh doanh, khu vực địa lý hoặc sở thích kết nối.
    - Xem hồ sơ năng lực doanh nghiệp, lịch sử hợp tác và đánh giá uy tín.
 2. **Đặt lịch hẹn gặp gỡ 1-on-1**:
@@ -77,13 +77,13 @@ Trọng tâm thiết kế hướng tới: **Sang trọng, Tối giản, Mượt 
 1. **Đăng tải sản phẩm dịch vụ**:
    - Mỗi doanh nghiệp sở hữu một gian hàng số giới thiệu các thế mạnh mũi nhọn.
 2. **Giao dịch đặc quyền B2B**:
-   - Ưu đãi giảm giá đặc biệt dành riêng cho hội viên CEO HN10.
+   - Ưu đãi giảm giá đặc biệt dành riêng cho Học viên CEO HN10.
    - Nhận yêu cầu báo giá và kết nối trực tiếp với phòng mua hàng của các doanh nghiệp thành viên.
 
 ---
 
 ### CHƯƠNG 8: KÊNH ĐÓNG GÓP Ý KIẾN TỚI CHỦ TỊCH & BAN ĐIỀU HÀNH
-- Hội viên có thể gửi tâm thư, đề xuất giải pháp phát triển câu lạc bộ hoặc phản ánh vướng mắc trực tiếp tới Ban Điều Hành.
+- Học viên có thể gửi tâm thư, đề xuất giải pháp phát triển câu lạc bộ hoặc phản ánh vướng mắc trực tiếp tới Ban Điều Hành.
 - Ban Điều Hành tiếp nhận và phản hồi chính thức, tạo môi trường sinh hoạt gắn kết và dân chủ.
 
 ---

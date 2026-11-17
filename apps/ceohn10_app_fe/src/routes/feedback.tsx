@@ -146,7 +146,7 @@ function FeedbackManagementPage() {
       "STT",
       "Phân Loại",
       "Hoạt Động / Khóa Học",
-      "Hội Viên Phản Ánh",
+      "Học viên Phản Ánh",
       "Đánh Giá (Sao)",
       "Nội Dung Góp Ý",
       "Thời Gian",
@@ -187,11 +187,10 @@ function FeedbackManagementPage() {
         const isEvent = r.targetType === "event";
         return (
           <span
-            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-bold border ${
-              isEvent
+            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-bold border ${isEvent
                 ? "bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/30"
                 : "bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-500/30"
-            }`}
+              }`}
           >
             {isEvent ? <Calendar className="h-3.5 w-3.5" /> : <GraduationCap className="h-3.5 w-3.5" />}
             <span>{r.targetCategory}</span>
@@ -212,7 +211,7 @@ function FeedbackManagementPage() {
     },
     {
       key: "respondentName",
-      label: "HỘI VIÊN GỬI",
+      label: "Học viên GỬI",
       width: 170,
       render: (r) => (
         <div className="flex items-center gap-2">
@@ -233,9 +232,8 @@ function FeedbackManagementPage() {
           {Array.from({ length: 5 }).map((_, i) => (
             <Star
               key={i}
-              className={`h-3.5 w-3.5 ${
-                i < r.rating ? "fill-amber-400 text-amber-400" : "text-muted-foreground/30"
-              }`}
+              className={`h-3.5 w-3.5 ${i < r.rating ? "fill-amber-400 text-amber-400" : "text-muted-foreground/30"
+                }`}
             />
           ))}
           <span className="ml-1 text-xs font-bold text-foreground">{r.rating}/5</span>
@@ -283,7 +281,7 @@ function FeedbackManagementPage() {
     <AppShell>
       <div className="space-y-6 p-4 sm:p-6 lg:p-8">
         <PageHeader
-          title="Quản lý Phản ánh & Góp ý Hội viên"
+          title="Quản lý Phản ánh & Góp ý Học viên"
           subtitle="Hệ thống tiếp nhận, tổng hợp và lắng nghe ý kiến đánh giá sau mỗi sự kiện, buổi đào tạo của CLB Doanh Nhân CEO HN10."
           actions={
             <div className="flex items-center gap-2">
@@ -342,7 +340,7 @@ function FeedbackManagementPage() {
 
         {/* ── TOOLBAR BỘ LỌC ── */}
         <CrmToolbar
-          searchPlaceholder="Tìm theo tên hội viên, nội dung phản ánh..."
+          searchPlaceholder="Tìm theo tên Học viên, nội dung phản ánh..."
           searchQuery={searchTerm}
           onSearchChange={setSearchTerm}
         >
@@ -447,7 +445,7 @@ function FeedbackManagementPage() {
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <span className="font-bold text-muted-foreground">Hội viên phản ánh:</span>
+                    <span className="font-bold text-muted-foreground">Học viên phản ánh:</span>
                     <p className="font-semibold text-foreground mt-0.5">{selectedFeedback.respondentName}</p>
                   </div>
                   <div>
@@ -493,7 +491,7 @@ function FeedbackManagementPage() {
                 <button
                   type="button"
                   onClick={() => {
-                    toast.success("Đã ghi nhận tiếp thu phản ánh của hội viên!");
+                    toast.success("Đã ghi nhận tiếp thu phản ánh của Học viên!");
                     setSelectedFeedback(null);
                   }}
                   className="rounded-xl bg-primary px-4 py-2 text-xs font-bold text-primary-foreground hover:bg-primary/90 transition shadow-sm"

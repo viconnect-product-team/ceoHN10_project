@@ -473,7 +473,7 @@ async function main() {
   await generatePdfFromMarkdown(
     path.join(DOC_DIR, 'HUONG_DAN_SU_DUNG_APP_MOBILE_CHI_TIET.md'),
     path.join(OUT_PDF_DIR, 'HUONG_DAN_SU_DUNG_APP_MOBILE_CEO HN10.pdf'),
-    'CẨM NANG HƯỚNG DẪN SỬ DỤNG ỨNG DỤNG DI ĐỘNG HỘI VIÊN',
+    'CẨM NANG HƯỚNG DẪN SỬ DỤNG ỨNG DỤNG DI ĐỘNG Học viên',
     'Hệ Thống Giao Thương B2B, Thẻ VIP Số & Sinh Hoạt Hiệp Hội (17 Functional Nodes)',
     'mobile'
   );
@@ -483,7 +483,7 @@ async function main() {
     path.join(DOC_DIR, 'BO_HUONG_DAN_SU_DUNG_HE_THONG_CEO HN10_TOAN_DIEN.md'),
     path.join(OUT_PDF_DIR, 'BO_HUONG_DAN_SU_DUNG_TOAN_DIEN_CEO HN10.pdf'),
     'BỘ HƯỚNG DẪN SỬ DỤNG TOÀN DIỆN HỆ SINH THÁI SỐ CEO HN10',
-    'Tài Liệu Vận Hành Đồng Bộ 2 Subdomain: Web CRM Quản Trị & Mobile App Hội Viên',
+    'Tài Liệu Vận Hành Đồng Bộ 2 Subdomain: Web CRM Quản Trị & Mobile App Học viên',
     'both'
   );
 

@@ -124,7 +124,7 @@
 
 .bg-crm-system {
   background: #F8FAFC;
-  background-image: 
+  background-image:
     radial-gradient(at 0% 0%, rgba(100, 116, 139, 0.04) 0px, transparent 55%),
     radial-gradient(at 100% 0%, rgba(71, 85, 105, 0.03) 0px, transparent 50%),
     linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%);
@@ -493,15 +493,15 @@ html.dark [class*="bg-card"] {
   --popover: oklch(0.13 0.03 265);
   --popover-foreground: oklch(1 0 0);
 
-  --primary: oklch(0.78 0.18 285);
-  --primary-foreground: oklch(0.1 0.02 265);
-  --primary-glow: oklch(0.86 0.14 290);
+  --primary: #334155;
+  --primary-foreground: #FFFFFF;
+  --primary-glow: #64748B;
 
   --secondary: oklch(0.22 0.04 265);
   --secondary-foreground: oklch(1 0 0);
   --muted: oklch(0.2 0.04 265);
   --muted-foreground: oklch(0.92 0.01 260);
-  --accent: oklch(0.3 0.09 285);
+  --accent: #475569;
   --accent-foreground: oklch(1 0 0);
 
   --destructive: oklch(0.75 0.21 25);
@@ -515,7 +515,7 @@ html.dark [class*="bg-card"] {
 
   --border: oklch(0.85 0.02 260);
   --input: oklch(0.85 0.02 260);
-  --ring: oklch(0.9 0.16 290);
+  --ring: #334155;
 
   --sidebar: #000000;
   --sidebar-foreground: #ffffff;
@@ -590,106 +590,84 @@ html.dark [class*="bg-card"] {
    ============================================================ */
 .association-tone,
 .ceohn10-tone {
-  color-scheme: dark;
+  color-scheme: light;
 
-  /* ── Base surfaces ── */
-  --background: #08091a;
-  /* deep slate-navy */
-  --foreground: #eeedf5;
-  --card: #0d0e23;
-  /* midnight card */
-  --card-foreground: #eeedf5;
-  --popover: #11122a;
-  --popover-foreground: #eeedf5;
+  /* ── Base surfaces: Chuẩn sáng Executive Slate ── */
+  --background: #FFFFFF;
+  --foreground: #0F172A;
+  --card: #FFFFFF;
+  --card-foreground: #0F172A;
+  --popover: #FFFFFF;
+  --popover-foreground: #0F172A;
 
-  /* ── Brand: electric indigo + purple ── */
-  --primary: #7C6FE0;
-  /* indigo-violet */
+  /* ── Brand: Executive Slate ── */
+  --primary: #334155;
   --primary-foreground: #ffffff;
-  --primary-glow: #a393f5;
-  /* lighter purple glow */
+  --primary-glow: #64748B;
 
-  /* ── Gradient accents (CSS variables for use in inline styles) ── */
-  --grad-hero: linear-gradient(135deg, #7C6FE0 0%, #a855f7 50%, #6366f1 100%);
-  --grad-cta: linear-gradient(135deg, #7C6FE0, #6366f1);
+  /* ── Gradient accents: Xám doanh nhân tối giản ── */
+  --grad-hero: linear-gradient(135deg, #334155 0%, #475569 50%, #64748B 100%);
+  --grad-cta: linear-gradient(135deg, #334155, #475569);
 
-  --secondary: #11132a;
-  --secondary-foreground: #eeedf5;
-  --muted: #11132a;
-  --muted-foreground: #8a8eb5;
-  /* cool slate muted */
-  --accent: #1a1d40;
-  --accent-foreground: #a393f5;
+  --secondary: #F8FAFC;
+  --secondary-foreground: #0F172A;
+  --muted: #F1F5F9;
+  --muted-foreground: #475569;
+  --accent: #E2E8F0;
+  --accent-foreground: #0F172A;
 
-  --success: #34d89b;
-  --success-foreground: #08091a;
-  --warning: #f59e0b;
-  --warning-foreground: #08091a;
-  --info: #60a5fa;
-  --info-foreground: #08091a;
-  --destructive: #f87171;
-  --destructive-foreground: #eeedf5;
+  --success: #10B981;
+  --success-foreground: #FFFFFF;
+  --warning: #F59E0B;
+  --warning-foreground: #FFFFFF;
+  --info: #0EA5E9;
+  --info-foreground: #FFFFFF;
+  --destructive: #EF4444;
+  --destructive-foreground: #FFFFFF;
 
-  --border: #1e2048;
-  /* indigo-tinted border */
-  --input: #1e2048;
-  --ring: #7C6FE0;
+  --border: #E2E8F0;
+  --input: #E2E8F0;
+  --ring: #334155;
 
-  --sidebar: #0d0e23;
-  --sidebar-foreground: #eeedf5;
-  --sidebar-primary: #7C6FE0;
+  --sidebar: #FFFFFF;
+  --sidebar-foreground: #0F172A;
+  --sidebar-primary: #334155;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #11132a;
-  --sidebar-accent-foreground: #a393f5;
-  --sidebar-border: #1e2048;
-  --sidebar-ring: #7C6FE0;
+  --sidebar-accent: #F8FAFC;
+  --sidebar-accent-foreground: #0F172A;
+  --sidebar-border: #E2E8F0;
+  --sidebar-ring: #334155;
 }
 
 /* ============================================================
    Unified enterprise theme (navy / warm gold) for the member app.
    Legacy .vba-* class names are kept as aliases so every screen
 /* ============================================================
-   CEO HN10 Official Theme: Royal Purple & Crisp White (Canva Brandbook)
-   ============================================================ */
-/* ============================================================
-   CEO HN10 OFFICIAL THEME: STRICT 5-COLOR SYSTEM
-   1. Tím (Royal Purple): #7C2D82
-   2. Hồng (Vibrant Magenta): #D61F69
-      => Gradient chính: linear-gradient(135deg, #7C2D82 0%, #D61F69 100%)
-   3. Đen (Carbon Black): #000000 (Nền chính, thẻ tối, thanh bên)
-   4. Trắng (Crisp Pure White): #FFFFFF (Toàn bộ chữ hiển thị, icon tương phản)
-   5. Đen xám viền (Dark Slate Border): #18181B (Đường viền biên giới, bề mặt phân cách)
-   TUYỆT ĐỐI KHÔNG DÙNG BẤT KỲ MÀU NÀO KHÁC!
-   ============================================================ */
-/* ============================================================
-   CEO HN10 THEME: PHÂN BIỆT RÕ RÀNG THEME SÁNG & THEME TỐI
-   Theme Sáng: Nền Trắng, Card Trắng, Chữ Đen Tương Phản Rõ Nét
-   Theme Tối: Nền Đen Tuyền, Card Đen, Chữ Trắng Tinh Khôi
-   Điểm nhấn: Gradient Tím - Hồng & Chữ Trắng trên Gradient
+   CEO HN10 Official Theme: Executive Slate & Pure White
    ============================================================ */
 
-/* Theme Sáng: Nền Trắng / Tím hoa cà siêu nhạt, chữ đen rõ nét */
+/* Theme Sáng: Nền Trắng, Card Trắng, Chữ Đen Tương Phản Rõ Nét, Điểm nhấn Slate Xám */
 html:not(.dark) .vba-app {
   --vba-bg: #FFFFFF;
-  --vba-bg-2: #FAF5FF;
+  --vba-bg-2: #F8FAFC;
   --vba-surface: #FFFFFF;
-  --vba-surface-2: #F4F4F5;
-  --vba-border: #E4E4E7;
-  --vba-border-soft: #F4F4F5;
-  --vba-border-accent: #7C2D82;
-  --vba-gold: #D61F69;
-  --vba-gold-2: #7C2D82;
-  --vba-gold-soft: rgba(214, 31, 105, 0.12);
-  --vba-gold-glow: 0 4px 16px -2px rgba(124, 45, 130, 0.15);
-  --vba-navy: #7C2D82;
-  --vba-navy-deep: #4A1C6E;
-  --vba-navy-light: #D61F69;
-  --vba-brand-orange: #D61F69;
+  --vba-surface-2: #F1F5F9;
+  --vba-border: #E2E8F0;
+  --vba-border-soft: #F1F5F9;
+  --vba-border-accent: #475569;
+  --vba-gold: #64748B;
+  --vba-gold-2: #475569;
+  --vba-gold-soft: rgba(71, 85, 105, 0.12);
+  --vba-gold-glow: 0 4px 16px -2px rgba(51, 65, 85, 0.15);
+  --vba-navy: #334155;
+  --vba-navy-deep: #1E293B;
+  --vba-navy-light: #475569;
+  --vba-brand-orange: #475569;
   --vba-text: #0F172A;
   --vba-text-muted: #475569;
   --vba-text-dim: #64748B;
-  --vba-success: #7C2D82;
-  --vba-danger: #D61F69;
+  --vba-success: #10B981;
+  --vba-danger: #EF4444;
   --popover: #FFFFFF;
   --popover-foreground: #0F172A;
   --card: #FFFFFF;
@@ -704,56 +682,56 @@ html:not(.dark) .vba-app {
 html:not(.dark) .vba-card {
   background: #FFFFFF !important;
   color: #0F172A !important;
-  border: 1px solid #E4E4E7 !important;
-  box-shadow: 0 2px 10px -2px rgba(124, 45, 130, 0.08) !important;
+  border: 1px solid #E2E8F0 !important;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05) !important;
   border-radius: 0.75rem;
 }
 
-/* Theme Tối: Nền Đen tuyền, viền đen xám #18181B, chữ trắng */
+/* Theme Tối: Giữ nền sáng sạch, chữ rõ nét, Slate trung tính */
 html.dark .vba-app,
 .dark .vba-app {
-  --vba-bg: #000000;
-  --vba-bg-2: #000000;
-  --vba-surface: #000000;
-  --vba-surface-2: #18181B;
-  --vba-border: #18181B;
-  --vba-border-soft: #18181B;
-  --vba-border-accent: #7C2D82;
-  --vba-gold: #D61F69;
-  --vba-gold-2: #7C2D82;
-  --vba-gold-soft: rgba(214, 31, 105, 0.15);
-  --vba-gold-glow: 0 4px 16px -2px rgba(214, 31, 105, 0.35);
-  --vba-navy: #7C2D82;
-  --vba-navy-deep: #000000;
-  --vba-navy-light: #D61F69;
-  --vba-brand-orange: #D61F69;
-  --vba-text: #FFFFFF;
-  --vba-text-muted: #FFFFFF;
-  --vba-text-dim: #FFFFFF;
-  --vba-success: #7C2D82;
-  --vba-danger: #D61F69;
-  --popover: #000000;
-  --popover-foreground: #FFFFFF;
-  --card: #000000;
-  --card-foreground: #FFFFFF;
+  --vba-bg: #FFFFFF;
+  --vba-bg-2: #F8FAFC;
+  --vba-surface: #FFFFFF;
+  --vba-surface-2: #F1F5F9;
+  --vba-border: #E2E8F0;
+  --vba-border-soft: #F1F5F9;
+  --vba-border-accent: #475569;
+  --vba-gold: #64748B;
+  --vba-gold-2: #475569;
+  --vba-gold-soft: rgba(71, 85, 105, 0.12);
+  --vba-gold-glow: 0 4px 16px -2px rgba(51, 65, 85, 0.15);
+  --vba-navy: #334155;
+  --vba-navy-deep: #1E293B;
+  --vba-navy-light: #475569;
+  --vba-brand-orange: #475569;
+  --vba-text: #0F172A;
+  --vba-text-muted: #475569;
+  --vba-text-dim: #64748B;
+  --vba-success: #10B981;
+  --vba-danger: #EF4444;
+  --popover: #FFFFFF;
+  --popover-foreground: #0F172A;
+  --card: #FFFFFF;
+  --card-foreground: #0F172A;
 
-  background: #000000 !important;
-  color: #FFFFFF !important;
+  background: #FFFFFF !important;
+  color: #0F172A !important;
   min-height: 100dvh;
   font-family: var(--font-sans);
 }
 
 html.dark .vba-card,
 .dark .vba-card {
-  background: #000000 !important;
-  color: #FFFFFF !important;
-  border: 1px solid #18181B !important;
-  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.6) !important;
+  background: #FFFFFF !important;
+  color: #0F172A !important;
+  border: 1px solid #E2E8F0 !important;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05) !important;
   border-radius: 0.75rem;
 }
 
 .vba-gold-text {
-  background: linear-gradient(135deg, #7C2D82 0%, #D61F69 100%);
+  background: linear-gradient(135deg, #334155 0%, #475569 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent !important;
@@ -762,45 +740,45 @@ html.dark .vba-card,
 
 .vba-gold-grad,
 .vba-navy-gold-btn {
-  background: linear-gradient(135deg, #7C2D82 0%, #D61F69 100%) !important;
+  background: linear-gradient(135deg, #334155 0%, #475569 100%) !important;
   color: #FFFFFF !important;
-  border: 1px solid #7C2D82 !important;
+  border: 1px solid #334155 !important;
   font-weight: 700;
-  box-shadow: 0 4px 14px -2px rgba(214, 31, 105, 0.4) !important;
+  box-shadow: 0 4px 14px -2px rgba(51, 65, 85, 0.3) !important;
 }
 
 /* ============================================================
    CEO HN10 COLOR STANDARDS & CONTRAST (Light & Dark Mode)
    ============================================================ */
-/* Purple brand buttons & highlights in Light Mode */
-html:not(.dark) [class*="bg-[#7C2D82]"],
-html:not(.dark) [class*="bg-[#003B95]"],
+/* Executive Slate buttons & highlights in Light Mode */
+html:not(.dark) [class*="bg-[#7C2D82]"]:not([class*="/"]),
+html:not(.dark) [class*="bg-[#003B95]"]:not([class*="/"]):not([class*="group-hover"]):not([class*="hover"]),
 html:not(.dark) [class*="hover:bg-[#7C2D82]"]:hover,
 html:not(.dark) [class*="hover:bg-[#003B95]"]:hover {
-  background-color: #7C2D82;
-  color: #ffffff;
+  background-color: #334155 !important;
+  color: #ffffff !important;
 }
 
-html:not(.dark) [class*="bg-[#7C2D82]"] *,
-html:not(.dark) [class*="bg-[#003B95]"] *,
+html:not(.dark) [class*="bg-[#7C2D82]"]:not([class*="/"]) *,
+html:not(.dark) [class*="bg-[#003B95]"]:not([class*="/"]):not([class*="group-hover"]):not([class*="hover"]) *,
 html:not(.dark) [class*="hover:bg-[#7C2D82]"]:hover *,
 html:not(.dark) [class*="hover:bg-[#003B95]"]:hover * {
-  color: #ffffff;
-  stroke: #ffffff;
+  color: #ffffff !important;
+  stroke: #ffffff !important;
 }
 
-/* Purple brand buttons & highlights in Dark Mode */
-.dark [class*="bg-[#7C2D82]"],
-.dark [class*="bg-[#003B95]"],
+/* Executive Slate buttons & highlights in Dark Mode */
+.dark [class*="bg-[#7C2D82]"]:not([class*="/"]),
+.dark [class*="bg-[#003B95]"]:not([class*="/"]):not([class*="group-hover"]):not([class*="hover"]),
 .dark [class*="hover:bg-[#7C2D82]"]:hover,
 .dark [class*="hover:bg-[#003B95]"]:hover {
-  background-color: #7C2D82 !important;
+  background-color: #334155 !important;
   color: #ffffff !important;
-  border-color: rgba(168, 85, 247, 0.45) !important;
+  border-color: #475569 !important;
 }
 
-.dark [class*="bg-[#7C2D82]"] *,
-.dark [class*="bg-[#003B95]"] *,
+.dark [class*="bg-[#7C2D82]"]:not([class*="/"]) *,
+.dark [class*="bg-[#003B95]"]:not([class*="/"]):not([class*="group-hover"]):not([class*="hover"]) *,
 .dark [class*="hover:bg-[#7C2D82]"]:hover *,
 .dark [class*="hover:bg-[#003B95]"]:hover * {
   color: #ffffff !important;
@@ -816,26 +794,26 @@ html:not(.dark) button.bg-white * {
 
 .dark button.bg-white,
 .dark button[class*="dark:bg-"] {
-  color: #FFFFFF !important;
+  color: #0F172A !important;
 }
 
 .dark button.bg-white *,
 .dark button[class*="dark:bg-"] * {
-  color: #FFFFFF !important;
-  stroke: #FFFFFF !important;
+  color: #0F172A !important;
+  stroke: #0F172A !important;
 }
 
-/* Nút Đăng nhập CRM: luôn nền Tím - Hồng gradient đặc + chữ trắng đậm */
+/* Nút Đăng nhập CRM: luôn nền Executive Slate gradient đặc + chữ trắng đậm */
 button.ceo-login-submit {
-  background: linear-gradient(135deg, #7C2D82 0%, #D61F69 100%) !important;
+  background: linear-gradient(135deg, #334155 0%, #475569 100%) !important;
   color: #FFFFFF !important;
-  border: 1px solid #7C2D82 !important;
-  box-shadow: 0 4px 14px -2px rgba(214, 31, 105, 0.45) !important;
+  border: 1px solid #334155 !important;
+  box-shadow: 0 4px 14px -2px rgba(51, 65, 85, 0.45) !important;
 }
 
 button.ceo-login-submit:hover:not(:disabled) {
-  background: linear-gradient(135deg, #D61F69 0%, #7C2D82 100%) !important;
-  border-color: #D61F69 !important;
+  background: linear-gradient(135deg, #475569 0%, #334155 100%) !important;
+  border-color: #475569 !important;
 }
 
 button.ceo-login-submit *,
@@ -848,8 +826,8 @@ button.ceo-login-submit svg {
 }
 
 /* ============================================================
-   QUY CHUẨN 5 MÀU ĐỘC QUYỀN CEO HN10 (BRANDBOOK GUIDELINES)
-   Tím (#7C2D82), Hồng (#D61F69), Đen (#000000), Trắng (#FFFFFF), Đen xám viền (#18181B)
+   QUY CHUẨN MÀU ĐỘC QUYỀN CEO HN10: EXECUTIVE SLATE & PURE WHITE
+   Xám Đậm (#334155), Xám Titan (#475569), Nền Trắng (#FFFFFF), Viền Bạc (#E2E8F0)
    ============================================================ */
 
 [data-app-color-theme],
@@ -862,67 +840,67 @@ button.ceo-login-submit svg {
 .dark[data-app-color-theme="obsidian-gold"],
 [data-app-color-theme="ruby-gold"],
 .dark[data-app-color-theme="ruby-gold"] {
-  --vba-bg: #000000;
-  --vba-bg-2: #000000;
-  --vba-surface: #000000;
-  --vba-surface-2: #18181B;
-  --vba-navy: #7C2D82;
-  --vba-navy-deep: #000000;
-  --vba-gold: #D61F69;
-  --vba-gold-2: #7C2D82;
-  --vba-border: #18181B;
-  --vba-border-soft: #18181B;
-  --theme-icon-color: #D61F69;
-  --theme-primary-gradient: linear-gradient(135deg, #7C2D82 0%, #D61F69 100%);
-  --theme-card-gradient: linear-gradient(135deg, #7C2D82 0%, #D61F69 100%);
-  --bc-mobile-accent: #7C2D82;
-  --bc-mobile-accent-grad: linear-gradient(135deg, #7C2D82 0%, #D61F69 100%);
+  --vba-bg: #FFFFFF;
+  --vba-bg-2: #F8FAFC;
+  --vba-surface: #FFFFFF;
+  --vba-surface-2: #F1F5F9;
+  --vba-navy: #334155;
+  --vba-navy-deep: #1E293B;
+  --vba-gold: #64748B;
+  --vba-gold-2: #475569;
+  --vba-border: #E2E8F0;
+  --vba-border-soft: #F1F5F9;
+  --theme-icon-color: #334155;
+  --theme-primary-gradient: linear-gradient(135deg, #334155 0%, #475569 100%);
+  --theme-card-gradient: linear-gradient(135deg, #334155 0%, #475569 100%);
+  --bc-mobile-accent: #334155;
+  --bc-mobile-accent-grad: linear-gradient(135deg, #334155 0%, #475569 100%);
 }
 
 /* ============================================================
-   CEO HN10 DARK THEME STANDARDS (DÂY CHUYỀN MÀU THEO THEME CHUẨN)
+   CEO HN10 BRIGHT THEME STANDARDS (Nền sáng thanh lịch toàn app)
    ============================================================ */
 .dark .vba-app,
 .vba-app {
-  background-color: var(--vba-bg) !important;
-  color: #FFFFFF !important;
+  background-color: #FFFFFF !important;
+  color: #0F172A !important;
 }
 
 .dark .vba-app .bg-slate-950,
 .vba-app .bg-slate-950 {
-  background-color: var(--vba-bg) !important;
+  background-color: #FFFFFF !important;
 }
 
 .dark .vba-app .bg-slate-900,
 .vba-app .bg-slate-900 {
-  background-color: var(--vba-surface) !important;
+  background-color: #FFFFFF !important;
 }
 
 .dark .vba-app .bg-slate-800,
 .vba-app .bg-slate-800 {
-  background-color: var(--vba-surface-2) !important;
+  background-color: #F8FAFC !important;
 }
 
 .dark .vba-app .border-slate-800,
 .dark .vba-app .border-slate-700,
 .vba-app .border-slate-800,
 .vba-app .border-slate-700 {
-  border-color: var(--vba-border-soft) !important;
+  border-color: #E2E8F0 !important;
 }
 
 /* Biến đổi màu chủ đạo và accent linh hoạt trong vba-app */
 .vba-app .bg-\[\#003B95\],
-.vba-app [class*="bg-[#003B95]"] {
+.vba-app [class*="bg-[#003B95]"]:not([class*="/"]):not([class*="group-hover"]):not([class*="hover"]) {
   background-color: var(--vba-navy) !important;
 }
 
 .vba-app .text-\[\#003B95\],
-.vba-app [class*="text-[#003B95]"] {
+.vba-app [class*="text-[#003B95]"]:not([class*="/"]) {
   color: var(--vba-navy) !important;
 }
 
 .vba-app .border-\[\#003B95\],
-.vba-app [class*="border-[#003B95]"] {
+.vba-app [class*="border-[#003B95]"]:not([class*="/"]) {
   border-color: var(--vba-navy) !important;
 }
 
@@ -3049,7 +3027,7 @@ body:has(.vba-app),
   -webkit-overflow-scrolling: touch;
 }
 
-/* 2. Khử bôi đen văn bản và bóng chạm khó chịu trên toàn bộ app hội viên */
+/* 2. Khử bôi đen văn bản và bóng chạm khó chịu trên toàn bộ app Học viên */
 .vba-app {
   user-select: none;
   -webkit-user-select: none;
@@ -3236,7 +3214,7 @@ html {
 }
 
 html.dark {
-  background-color: var(--vba-bg, #070D1A);
+  background-color: var(--vba-bg, #F8FAFC);
 }
 
 body {
@@ -3246,7 +3224,7 @@ body {
 
 .dark body,
 body.dark {
-  background-color: var(--vba-bg, #070D1A);
+  background-color: var(--vba-bg, #F8FAFC);
 }
 
 @media all and (display-mode: standalone) {
@@ -3255,7 +3233,7 @@ body.dark {
   }
 
   html.dark {
-    background-color: var(--vba-bg, #070D1A);
+    background-color: var(--vba-bg, #F8FAFC);
   }
 
   body {
@@ -3397,19 +3375,19 @@ body.dark {
 
 /* 1. Recolor elements based on active brand theme across entire application */
 [data-app-color-theme] .bg-\[\#7C2D82\],
-[data-app-color-theme] .bg-\[\#003B95\],
+[data-app-color-theme] .bg-\[\#003B95\]:not([class*="/"]),
 [data-app-color-theme] .vba-btn-primary,
 [data-app-color-theme] .vba-active-tab {
   background-color: var(--vba-navy) !important;
 }
 
 [data-app-color-theme] .text-\[\#7C2D82\],
-[data-app-color-theme] .text-\[\#003B95\] {
+[data-app-color-theme] .text-\[\#003B95\]:not([class*="/"]) {
   color: var(--vba-navy) !important;
 }
 
 [data-app-color-theme] .border-\[\#7C2D82\],
-[data-app-color-theme] .border-\[\#003B95\] {
+[data-app-color-theme] .border-\[\#003B95\]:not([class*="/"]) {
   border-color: var(--vba-navy) !important;
 }
 
@@ -3418,21 +3396,21 @@ body.dark {
   --tw-gradient-from: var(--vba-navy) var(--tw-gradient-from-position) !important;
 }
 
-/* 2. Text TRẮNG TUYỆT ĐỐI trên toàn bộ nền tím / màu chính */
+/* 2. Text TRẮNG trên toàn bộ nút / thẻ có nền primary đặc */
 .bg-\[\#7C2D82\],
 .bg-\[\#6B21A8\],
 .bg-\[\#581C87\],
 .bg-\[\#4A1C6E\],
-.bg-\[\#003B95\],
-.bg-\[\#002B66\],
-.bg-\[\#1E3A8A\],
-.bg-\[\#1F3864\],
-.bg-\[\#2E3192\],
+.bg-\[\#003B95\]:not([class*="/"]),
+.bg-\[\#002B66\]:not([class*="/"]),
+.bg-\[\#1E3A8A\]:not([class*="/"]),
+.bg-\[\#1F3864\]:not([class*="/"]),
+.bg-\[\#2E3192\]:not([class*="/"]),
 .bg-\[\#991B1B\],
 html.dark .dark\:bg-\[\#7C2D82\],
-html.dark .dark\:bg-\[\#003B95\],
+html.dark .dark\:bg-\[\#003B95\]:not([class*="/"]),
 [data-app-color-theme] .bg-\[\#7C2D82\],
-[data-app-color-theme] .bg-\[\#003B95\],
+[data-app-color-theme] .bg-\[\#003B95\]:not([class*="/"]),
 [data-app-color-theme] .vba-btn-primary {
   color: #FFFFFF !important;
 }
@@ -3441,16 +3419,16 @@ html.dark .dark\:bg-\[\#003B95\],
 .bg-\[\#6B21A8\] *,
 .bg-\[\#581C87\] *,
 .bg-\[\#4A1C6E\] *,
-.bg-\[\#003B95\] *,
-.bg-\[\#002B66\] *,
-.bg-\[\#1E3A8A\] *,
-.bg-\[\#1F3864\] *,
-.bg-\[\#2E3192\] *,
+.bg-\[\#003B95\]:not([class*="/"]) *,
+.bg-\[\#002B66\]:not([class*="/"]) *,
+.bg-\[\#1E3A8A\]:not([class*="/"]) *,
+.bg-\[\#1F3864\]:not([class*="/"]) *,
+.bg-\[\#2E3192\]:not([class*="/"]) *,
 .bg-\[\#991B1B\] *,
 html.dark .dark\:bg-\[\#7C2D82\] *,
-html.dark .dark\:bg-\[\#003B95\] *,
+html.dark .dark\:bg-\[\#003B95\]:not([class*="/"]) *,
 [data-app-color-theme] .bg-\[\#7C2D82\] *,
-[data-app-color-theme] .bg-\[\#003B95\] *,
+[data-app-color-theme] .bg-\[\#003B95\]:not([class*="/"]) *,
 [data-app-color-theme] .vba-btn-primary * {
   color: #FFFFFF !important;
   stroke: #FFFFFF !important;
@@ -3577,26 +3555,123 @@ button.bg-\[\#003b95\] *:not([class*="bg-"]) {
    QUY CHUẨN XÁM DOANH NHÂN: CHUYỂN TRIỆT ĐỂ MÀU TÍM & GRADIENT VỀ MÀU XÁM
    ============================================================ */
 [class*="text-purple-"],
-[class*="text-violet-"] {
-  color: #475569 !important;
-}
-
-[class*="bg-purple-"],
-[class*="bg-violet-"] {
-  background-color: #F1F5F9 !important;
+[class*="text-violet-"],
+.text-\[\#7C2D82\],
+.text-\[\#7c2d82\],
+[class*="text-[#7C2D82]" i]:not([class*="/"]),
+[class*="text-[#7c2d82]" i]:not([class*="/"]) {
   color: #334155 !important;
 }
 
-[class*="border-purple-"],
-[class*="border-violet-"] {
+/* 1. Solid dark buttons & containers: Chuyển sang Executive Slate tối */
+.bg-purple-600,
+.bg-purple-700,
+.bg-purple-800,
+.bg-purple-900,
+.bg-violet-600,
+.bg-violet-700,
+.bg-violet-800,
+.bg-violet-900,
+.bg-\[\#7C2D82\],
+.bg-\[\#7c2d82\],
+.bg-\[\#6B21A8\],
+.bg-\[\#581C87\],
+.bg-\[\#4A1C6E\],
+button[class*="bg-purple-"],
+button[class*="bg-violet-"],
+[class*="bg-[#7C2D82]" i]:not([class*="/"]):not([class*="text-"]),
+[class*="bg-[#7c2d82]" i]:not([class*="/"]):not([class*="text-"]),
+[class*="bg-[#6B21A8]" i]:not([class*="/"]):not([class*="text-"]),
+[class*="bg-[#581C87]" i]:not([class*="/"]):not([class*="text-"]) {
+  background-color: #334155 !important;
+  color: #FFFFFF !important;
+}
+
+.bg-purple-600 *,
+.bg-purple-700 *,
+.bg-purple-800 *,
+.bg-purple-900 *,
+.bg-violet-600 *,
+.bg-violet-700 *,
+.bg-violet-800 *,
+.bg-violet-900 *,
+.bg-\[\#7C2D82\] *,
+.bg-\[\#7c2d82\] *,
+.bg-\[\#6B21A8\] *,
+.bg-\[\#581C87\] *,
+button[class*="bg-purple-"] *,
+button[class*="bg-violet-"] *,
+[class*="bg-[#7C2D82]" i]:not([class*="/"]) * {
+  color: #FFFFFF !important;
+  stroke: #FFFFFF !important;
+}
+
+/* 2. Light soft badges & chips (50, 100, 200, 300, 400, 500 hoặc có độ mờ opacity /): Chuyển sang xám sáng trang nhã */
+.bg-purple-50,
+.bg-purple-100,
+.bg-purple-200,
+.bg-purple-300,
+.bg-purple-400,
+.bg-purple-500,
+.bg-violet-50,
+.bg-violet-100,
+.bg-violet-200,
+.bg-violet-300,
+.bg-violet-400,
+.bg-violet-500,
+[class*="bg-purple-"][class*="/"],
+[class*="bg-violet-"][class*="/"],
+[class*="bg-[#7C2D82]/"],
+[class*="bg-[#7c2d82]/"],
+[class*="bg-[#003B95]/"],
+[class*="bg-[#1E3A8A]/"] {
+  background-color: #F1F5F9 !important;
+  color: #334155 !important;
   border-color: #CBD5E1 !important;
 }
 
-/* Các badge có opacity /10, /15, /20 được định dạng xám sáng trang nhã */
-[class*="bg-[#003B95]/"],
-[class*="bg-[#1E3A8A]/"],
-[class*="bg-[#7C2D82]/"] {
-  background-color: #F1F5F9 !important;
+.bg-purple-50 *,
+.bg-purple-100 *,
+.bg-purple-200 *,
+.bg-purple-300 *,
+.bg-purple-400 *,
+.bg-purple-500 *,
+.bg-violet-50 *,
+.bg-violet-100 *,
+.bg-violet-200 *,
+.bg-violet-300 *,
+.bg-violet-400 *,
+.bg-violet-500 *,
+[class*="bg-purple-"][class*="/"] *,
+[class*="bg-violet-"][class*="/"] *,
+[class*="bg-[#7C2D82]/"] *,
+[class*="bg-[#7c2d82]/"] *,
+[class*="bg-[#003B95]/"] *,
+[class*="bg-[#1E3A8A]/"] * {
   color: #334155 !important;
-  border-color: #E2E8F0 !important;
+  stroke: #334155 !important;
+}
+
+[class*="border-purple-"],
+[class*="border-violet-"],
+.border-\[\#7C2D82\],
+.border-\[\#7c2d82\],
+[class*="border-[#7C2D82]" i]:not([class*="/"]),
+[class*="border-[#7c2d82]" i]:not([class*="/"]) {
+  border-color: #CBD5E1 !important;
+}
+
+/* Chuyển các gradient tím/hồng sang Executive Slate */
+[class*="from-[#7C2D82]" i],
+[class*="from-[#7c2d82]" i] {
+  --tw-gradient-from: #334155 var(--tw-gradient-from-position) !important;
+  --tw-gradient-to: #475569 var(--tw-gradient-to-position) !important;
+  --tw-gradient-stops: var(--tw-gradient-from), #475569 var(--tw-gradient-to-position) !important;
+}
+
+[class*="to-[#D61F69]" i],
+[class*="to-[#d61f69]" i],
+[class*="to-[#9333EA]" i],
+[class*="to-[#9333ea]" i] {
+  --tw-gradient-to: #475569 var(--tw-gradient-to-position) !important;
 }

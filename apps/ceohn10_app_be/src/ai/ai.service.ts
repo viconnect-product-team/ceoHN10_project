@@ -3,7 +3,7 @@ import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class AiService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   /** Lấy roles của user (user_roles + memberships) để phân quyền AI */
   async getUserRoles(userId: string): Promise<{
@@ -191,7 +191,7 @@ export class AiService {
 
       return {
         userId: String(r.user_id),
-        userName: r.user_name || 'Hội viên',
+        userName: r.user_name || 'Học viên',
         userEmail: r.user_email || '',
         usedCount,
         maxLimit,
@@ -208,7 +208,7 @@ export class AiService {
     }
 
     // Khởi tạo hạn mức ban đầu cho tài khoản mới (mặc định 50 câu)
-    let userName = 'Hội viên';
+    let userName = 'Học viên';
     let userEmail = '';
     try {
       const u = await this.prisma
@@ -220,7 +220,7 @@ export class AiService {
         userName = u[0].name || userName;
         userEmail = u[0].email || userEmail;
       }
-    } catch {}
+    } catch { }
 
     await this.prisma
       .$executeRawUnsafe(
@@ -231,7 +231,7 @@ export class AiService {
         userName,
         userEmail,
       )
-      .catch(() => {});
+      .catch(() => { });
 
     return {
       userId: String(userId),
@@ -320,12 +320,12 @@ export class AiService {
       .$executeRawUnsafe(
         `
       INSERT INTO public.ai_user_quotas (user_id, user_name, user_email, used_count, max_limit, extra_granted, is_blocked)
-      SELECT u.id::text, COALESCE(u.name, 'Hội viên'), COALESCE(u.email, ''), 0, 50, 0, false
+      SELECT u.id::text, COALESCE(u.name, 'Học viên'), COALESCE(u.email, ''), 0, 50, 0, false
       FROM public.vione_users u
       ON CONFLICT (user_id) DO NOTHING
     `,
       )
-      .catch(() => {});
+      .catch(() => { });
 
     const rows = await this.prisma
       .$queryRawUnsafe<any[]>(
@@ -355,9 +355,9 @@ export class AiService {
 
       return {
         userId: String(r.user_id),
-        userName: r.user_name || 'Hội viên',
+        userName: r.user_name || 'Học viên',
         userEmail: r.user_email || '',
-        company: r.company || 'Doanh nghiệp Hội viên',
+        company: r.company || 'Doanh nghiệp Học viên',
         position: r.position || 'Thành viên',
         memberCode: r.member_code || '',
         usedCount,
@@ -467,8 +467,8 @@ export class AiService {
   }
 
   /**
-   * Lấy toàn bộ ngữ cảnh động của hội viên tại phiên đăng nhập:
-   * - Hồ sơ định danh (Tên, mã hội viên, doanh nghiệp, chức vụ, ban bệ)
+   * Lấy toàn bộ ngữ cảnh động của Học viên tại phiên đăng nhập:
+   * - Hồ sơ định danh (Tên, mã Học viên, doanh nghiệp, chức vụ, ban bệ)
    * - Hội phí & Hóa đơn (Chưa đóng, đã đóng, số tiền nợ, hạn nộp)
    * - Thông báo chưa đọc (Số lượng & nội dung mới nhất)
    * - Sự kiện của tôi (Danh sách sự kiện đã đăng ký vé)
@@ -709,15 +709,15 @@ export class AiService {
 
     const roleInfo = isUuid
       ? await this.getUserRoles(userId).catch(() => ({
-          globalRoles: [] as string[],
-          associationId: null,
-          membershipRoles: [] as string[],
-        }))
+        globalRoles: [] as string[],
+        associationId: null,
+        membershipRoles: [] as string[],
+      }))
       : {
-          globalRoles: [] as string[],
-          associationId: null,
-          membershipRoles: [] as string[],
-        };
+        globalRoles: [] as string[],
+        associationId: null,
+        membershipRoles: [] as string[],
+      };
     const allRoles = [...roleInfo.globalRoles, ...roleInfo.membershipRoles].map(
       (r) => String(r || '').toLowerCase(),
     );
@@ -737,8 +737,8 @@ export class AiService {
     const roleLabel = isAdminLike
       ? 'Quản trị / Admin / Chủ tịch'
       : member?.department
-        ? `Hội viên — ${member.department}`
-        : 'Hội viên';
+        ? `Học viên — ${member.department}`
+        : 'Học viên';
 
     return {
       roleLabel,
@@ -750,12 +750,12 @@ export class AiService {
           member?.name ||
           member?.full_name ||
           user?.name ||
-          'Hội viên CEO HN10',
+          'Học viên CEO HN10',
         code: memberCode || 'HN10-MEMBER',
-        company: member?.company || 'Doanh nghiệp Hội viên',
+        company: member?.company || 'Doanh nghiệp Học viên',
         title: member?.position || member?.title || 'Lãnh đạo Doanh nghiệp',
         level: member?.level || member?.membership_tier || 'VIP Gold',
-        department: member?.department || 'Ban Hội viên',
+        department: member?.department || 'Ban Học viên',
         email: userEmail,
       },
       dues: {
@@ -835,11 +835,11 @@ export class AiService {
       const posted = context.myOpportunities;
       const lines = list.length
         ? list
-            .map(
-              (o, i) =>
-                `${i + 1}. **${o.title}**${o.deadline ? ` — hạn ${o.deadline}` : ''}`,
-            )
-            .join('\n')
+          .map(
+            (o, i) =>
+              `${i + 1}. **${o.title}**${o.deadline ? ` — hạn ${o.deadline}` : ''}`,
+          )
+          .join('\n')
         : '_Anh/Chị chưa quan tâm cơ hội nào._';
       return {
         ...base,
@@ -856,11 +856,11 @@ export class AiService {
       const upcoming = context.myMeetings.filter((m) => m.upcoming);
       const lines = context.myMeetings.length
         ? context.myMeetings
-            .map(
-              (m, i) =>
-                `${i + 1}. **${m.title || 'Cuộc hẹn'}** — ${m.startAt ? new Date(m.startAt).toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' }) : 'chưa chốt giờ'} (${m.status})`,
-            )
-            .join('\n')
+          .map(
+            (m, i) =>
+              `${i + 1}. **${m.title || 'Cuộc hẹn'}** — ${m.startAt ? new Date(m.startAt).toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' }) : 'chưa chốt giờ'} (${m.status})`,
+          )
+          .join('\n')
         : '_Chưa có cuộc hẹn nào._';
       return {
         ...base,
@@ -877,11 +877,11 @@ export class AiService {
       const ev = context.myEvents;
       const lines = ev.length
         ? ev
-            .map(
-              (e, i) =>
-                `${i + 1}. **${e.name}** — ${e.date} ${e.time} tại ${e.location} (${e.ticketCount} vé)`,
-            )
-            .join('\n')
+          .map(
+            (e, i) =>
+              `${i + 1}. **${e.name}** — ${e.date} ${e.time} tại ${e.location} (${e.ticketCount} vé)`,
+          )
+          .join('\n')
         : '_Anh/Chị chưa đăng ký sự kiện nào._';
       return {
         ...base,
@@ -902,11 +902,11 @@ export class AiService {
       const d = context.dues;
       const lines = d.unpaidInvoices.length
         ? d.unpaidInvoices
-            .map(
-              (i: any, idx: number) =>
-                `${idx + 1}. ${i.invoiceNo || 'Hóa đơn'} — kỳ ${i.year ?? ''}: **${fmtVnd(i.amount)} đ**${i.dueDate ? ` (hạn ${i.dueDate})` : ''}`,
-            )
-            .join('\n')
+          .map(
+            (i: any, idx: number) =>
+              `${idx + 1}. ${i.invoiceNo || 'Hóa đơn'} — kỳ ${i.year ?? ''}: **${fmtVnd(i.amount)} đ**${i.dueDate ? ` (hạn ${i.dueDate})` : ''}`,
+          )
+          .join('\n')
         : '_Không có hóa đơn nào chưa thanh toán._';
       return {
         ...base,
@@ -925,11 +925,11 @@ export class AiService {
       const p = context.myProducts;
       const lines = p.length
         ? p
-            .map(
-              (x, i) =>
-                `${i + 1}. **${x.name}** — ${fmtVnd(x.price)} đ (${x.status || 'active'})`,
-            )
-            .join('\n')
+          .map(
+            (x, i) =>
+              `${i + 1}. **${x.name}** — ${fmtVnd(x.price)} đ (${x.status || 'active'})`,
+          )
+          .join('\n')
         : '_Anh/Chị chưa đăng sản phẩm nào._';
       return {
         ...base,
@@ -946,14 +946,13 @@ export class AiService {
       const n = context.notifications;
       return {
         ...base,
-        answer: `🔔 Anh/Chị có **${n.unreadCount}** thông báo chưa đọc.${
-          n.unreadList.length
+        answer: `🔔 Anh/Chị có **${n.unreadCount}** thông báo chưa đọc.${n.unreadList.length
             ? `\n\n${n.unreadList
-                .slice(0, 5)
-                .map((x: any, i: number) => `${i + 1}. ${x.title}`)
-                .join('\n')}`
+              .slice(0, 5)
+              .map((x: any, i: number) => `${i + 1}. ${x.title}`)
+              .join('\n')}`
             : ''
-        }`,
+          }`,
         speechText: `Anh chị có ${n.unreadCount} thông báo chưa đọc.`,
         route: '/association/notifications',
         featureName: 'Thông báo',
@@ -993,7 +992,7 @@ export class AiService {
     ).length;
     return [
       `👤 **${u.name}** — ${u.title} tại **${u.company}**`,
-      `- Mã hội viên: \`${u.code}\` | Vai trò: **${context.roleLabel}**`,
+      `- Mã Học viên: \`${u.code}\` | Vai trò: **${context.roleLabel}**`,
       `- Hội phí: ${context.dues.feePaid ? '✅ đã thanh toán đầy đủ' : `⚠️ còn nợ **${fmtVnd(context.dues.totalOutstanding)} đ** (${context.dues.unpaidInvoices.length} hóa đơn)`}`,
       `- Sự kiện đã đăng ký: **${context.myEvents.length}**`,
       `- Bạn bè đã kết nối: **${context.connections.friendsCount}** (chờ duyệt ${context.connections.pendingIncoming})`,
@@ -1005,7 +1004,7 @@ export class AiService {
   }
 
   /**
-   * SUPER PREMIUM AI: Phân tích Dòng Tiền Hội Viên, Thẩm Định Cơ Hội Đầu Tư
+   * SUPER PREMIUM AI: Phân tích Dòng Tiền Học viên, Thẩm Định Cơ Hội Đầu Tư
    * & Khuyến Nghị Mức Deal Tối Ưu (ROI, P&L, Due Diligence, Negotiation Strategy)
    */
   async analyzeCashflowAndDealOpportunities(
@@ -1070,7 +1069,7 @@ export class AiService {
     // Nếu không nói rõ số tiền nhưng hỏi cơ hội phù hợp, gán mặc định mẫu 50.000.000 VNĐ để minh họa
     const capitalUsed = capitalAmount || 50000000;
 
-    // 2. TRUY VẤN DÒNG TIỀN HỘI VIÊN TRONG CƠ SỞ DỮ LIỆU
+    // 2. TRUY VẤN DÒNG TIỀN Học viên TRONG CƠ SỞ DỮ LIỆU
     const memberId = context.user.id;
     const memberCode = context.user.code;
     const userEmail = context.user.email;
@@ -1088,7 +1087,7 @@ export class AiService {
         ORDER BY date DESC NULLS LAST, created_at DESC
         LIMIT 50
       `.catch(() => [] as any[]),
-      // Cơ hội hội viên đã tham gia / chốt deal
+      // Cơ hội Học viên đã tham gia / chốt deal
       this.prisma.$queryRaw<any[]>`
         SELECT oi.id, oi.opportunity_id, oi.deal_value, oi.deal_percent, oi.status, oi.created_at,
                o.title, o.budget_max, o.value
@@ -1098,7 +1097,7 @@ export class AiService {
         ORDER BY oi.created_at DESC
         LIMIT 20
       `.catch(() => [] as any[]),
-      // Cơ hội do chính hội viên đăng lên CLB
+      // Cơ hội do chính Học viên đăng lên CLB
       this.prisma.$queryRaw<any[]>`
         SELECT id, title, budget_min, budget_max, value, status, created_at
         FROM public.opportunities
@@ -1192,9 +1191,9 @@ export class AiService {
     const capitalFmt = fmtVnd(capitalUsed);
     const oppTitle = targetOpp ? targetOpp.title : 'Hợp tác phân phối chuỗi cung ứng OCOP & B2B CEO HN10';
     const posterName = targetOpp?.poster_name || 'Lãnh đạo Ban Giao Thương';
-    const posterCompany = targetOpp?.poster_company || 'Tập đoàn Hội viên CLB CEO HN10';
+    const posterCompany = targetOpp?.poster_company || 'Tập đoàn Học viên CLB CEO HN10';
     const posterPosition = targetOpp?.poster_position || 'Chủ tịch HĐQT / CEO';
-    const posterLevel = targetOpp?.poster_level || 'Hội viên Kim Cương';
+    const posterLevel = targetOpp?.poster_level || 'Học viên Kim Cương';
     const establishedYear = targetOpp?.established_year ? Number(targetOpp.established_year) : 2018;
     const companyAge = 2026 - establishedYear;
     const companyCapital = targetOpp?.company_capital ? fmtVnd(Number(targetOpp.company_capital)) : '15.000.000.000';
@@ -1214,10 +1213,10 @@ export class AiService {
     // Xây dựng câu trả lời phân tích chuyên sâu
     const answerMarkdown = [
       `💎 **BÁO CÁO PHÂN TÍCH TÀI CHÍNH & KHUYẾN NGHỊ ĐÀM PHÁN DEAL B2B (SUPER PREMIUM AI)**`,
-      `*Dành riêng cho Hội viên: **${context.user.name}** | Nền tảng Doanh nhân CEO HN10 (HanoiBA)*`,
+      `*Dành riêng cho Học viên: **${context.user.name}** | Nền tảng Doanh nhân CEO HN10 (HanoiBA)*`,
       ``,
       `---`,
-      `### 📊 PHẦN 1: BÁO CÁO DÒNG TIỀN HỘI VIÊN & HIỆU QUẢ ĐẦU TƯ CLB`,
+      `### 📊 PHẦN 1: BÁO CÁO DÒNG TIỀN Học viên & HIỆU QUẢ ĐẦU TƯ CLB`,
       `| Hạng Mục Dòng Tiền | Số Tiền Đã Chi / Thu | Trạng Thái Ghi Nhận | Đánh Giá Hiệu Quả |`,
       `| :--- | :--- | :--- | :--- |`,
       `| **1. Hội phí đã chi** | **${fmtVnd(totalFeePaid)} VNĐ** | ${context.dues.feePaid ? '✅ Đã hoàn thành nghĩa vụ' : '⚠️ Có kỳ hạn cần đối soát'} | Đầu tư mở rộng mạng lưới uy tín HanoiBA |`,
@@ -1225,7 +1224,7 @@ export class AiService {
       `| **3. Tổng chi phí gia nhập**| **${fmtVnd(totalCashSpent)} VNĐ** | Dòng tiền chi ra thực tế | Suất đầu tư quan hệ chiến lược |`,
       `| **4. Cơ hội B2B đã chia sẻ**| **${myPostedOppRows.length} cơ hội** (${fmtVnd(totalOppPostedValue)} VNĐ) | Đã công khai trên Sàn B2B | Tạo phễu đón nhận dòng tiền liên danh |`,
       `| **5. Giá trị Deal thu về** | **${fmtVnd(totalDealValueGenerated)} VNĐ** | ${completedDeals.length} thương vụ thành công | Hoa hồng/Lợi nhuận ròng: **${fmtVnd(totalCommissionEarned)} VNĐ** |`,
-      `| **HỆ SỐ ROI HỘI VIÊN** | **${membershipRoiMultiplier}x Lần** | Tỷ suất hoàn vốn đầu tư CLB | **Cực kỳ hiệu quả** (Sinh lời từ kết nối nội khối) |`,
+      `| **HỆ SỐ ROI Học viên** | **${membershipRoiMultiplier}x Lần** | Tỷ suất hoàn vốn đầu tư CLB | **Cực kỳ hiệu quả** (Sinh lời từ kết nối nội khối) |`,
       ``,
       `---`,
       `### 🎯 PHẦN 2: KHỚP NỐI VỐN ĐẦU TƯ VÀ CƠ HỘI KINH DOANH PHÙ HỢP`,
@@ -1362,7 +1361,7 @@ export class AiService {
         answer:
           `Dạ em là **Trợ lý AI của CLB Doanh Nhân CEO HN10**, nắm toàn bộ dữ liệu tài khoản của Anh/Chị **${name}** và các tính năng của app. Em có thể:\n\n` +
           `1. 📊 **Tra cứu tài khoản của Anh/Chị**: sự kiện đã đăng ký & vé, hội phí/hóa đơn chưa thanh toán, số bạn bè & lời mời kết nối, lịch hẹn B2B, cơ hội đang quan tâm/đã đăng, sản phẩm đang bán, thông báo chưa đọc.\n` +
-          `2. 🔎 **Tìm kiếm trong CLB**: hội viên/doanh nghiệp, sản phẩm trên sàn, cơ hội giao thương, sự kiện, văn bản – điều lệ, thông tin các Ban.\n` +
+          `2. 🔎 **Tìm kiếm trong CLB**: Học viên/doanh nghiệp, sản phẩm trên sàn, cơ hội giao thương, sự kiện, văn bản – điều lệ, thông tin các Ban.\n` +
           `3. 🧭 **Hướng dẫn & mở nhanh tính năng**: đăng ký sự kiện, danh thiếp số, quét QR check-in, đăng sản phẩm/cơ hội, nhắn tin, thanh toán hội phí VietQR.\n` +
           `4. 💬 **Tư vấn, soạn nội dung** kinh doanh – networking.\n\n` +
           `**Tình hình tài khoản hiện tại:**\n${this.buildAccountOverview(context)}\n\nAnh/Chị muốn em hỗ trợ việc gì trước ạ?`,
@@ -1450,7 +1449,7 @@ export class AiService {
                 { role: 'system', content: sysPrompt },
                 {
                   role: 'user',
-                  content: `CÂU HỎI CỦA HỘI VIÊN: "${userPrompt}"\n\nChỉ trả về đúng 1 object JSON theo định dạng yêu cầu.`,
+                  content: `CÂU HỎI CỦA Học viên: "${userPrompt}"\n\nChỉ trả về đúng 1 object JSON theo định dạng yêu cầu.`,
                 },
               ],
             }),
@@ -1535,11 +1534,11 @@ export class AiService {
       };
     }
 
-    // 1. Danh bạ & Hội viên (kèm tìm kiếm tên/công ty nếu có)
+    // 1. Danh bạ & Học viên (kèm tìm kiếm tên/công ty nếu có)
     if (
       q.includes('danh bạ') ||
       q.includes('danh ba') ||
-      q.includes('hội viên') ||
+      q.includes('Học viên') ||
       q.includes('thành viên') ||
       q.includes('hẹn gặp') ||
       q.includes('1-on-1') ||
@@ -1569,7 +1568,7 @@ export class AiService {
         const ignoreWords = [
           'danh bạ',
           'danh ba',
-          'hội viên',
+          'Học viên',
           'thành viên',
           'hệ thống',
           'tất cả',
@@ -1588,7 +1587,7 @@ export class AiService {
         ? `/association/members?search=${encodeURIComponent(keyword)}`
         : '/association/members';
       const featureName = keyword
-        ? `Danh Bạ Hội Viên (Tìm: ${keyword})`
+        ? `Danh Bạ Học viên (Tìm: ${keyword})`
         : 'Danh Bạ 200+ CEO & Hẹn 1-on-1';
       return {
         route,
@@ -1646,7 +1645,7 @@ export class AiService {
       q.includes('thẻ nfc') ||
       q.includes('ghi thẻ') ||
       q.includes('quét card') ||
-      q.includes('thẻ hội viên') ||
+      q.includes('thẻ Học viên') ||
       q.includes('namecard') ||
       q.includes('name card') ||
       q.includes('quét danh thiếp') ||
@@ -1655,7 +1654,7 @@ export class AiService {
     ) {
       return {
         route: '/association/card',
-        featureName: 'Thẻ Hội Viên & Danh Thiếp Số NFC',
+        featureName: 'Thẻ Học viên & Danh Thiếp Số NFC',
         tourId: 'association-card',
         actionType: 'navigate',
       };
@@ -1852,7 +1851,7 @@ export class AiService {
 
   /**
    * Tra cứu tri thức & Dữ liệu động toàn diện trên hệ thống CEO HN10:
-   * Tìm kiếm song song: Danh bạ hội viên & Lãnh đạo, Sản phẩm Marketplace, Cơ hội giao thương B2B,
+   * Tìm kiếm song song: Danh bạ Học viên & Lãnh đạo, Sản phẩm Marketplace, Cơ hội giao thương B2B,
    * Lịch sự kiện & Đại hội, Kho văn bản & Kỷ yếu, Cơ cấu 7 Ban chuyên trách, Chính sách hội phí & MB Bank.
    */
   async searchAssociationData(rawPrompt: string, userId: string) {
@@ -1954,16 +1953,16 @@ export class AiService {
         name: 'Ban Thành viên',
         leadership: 'Nguyễn Văn Cường (Trưởng ban)',
         scope:
-          'Phát triển hội viên mới, tiếp nhận hồ sơ gia nhập, thẩm định tư cách và cấp mã định danh M1983.',
+          'Phát triển Học viên mới, tiếp nhận hồ sơ gia nhập, thẩm định tư cách và cấp mã định danh M1983.',
         contact: 'Hotline Ban Thành viên: 0983 198 301',
         route: '/association/members',
         keywords: [
           'thành viên',
-          'hội viên',
+          'Học viên',
           'kết nạp',
           'gia nhập',
           'hồ sơ',
-          'mã hội viên',
+          'mã Học viên',
           'cường',
         ],
       },
@@ -2100,10 +2099,10 @@ export class AiService {
       bankName: 'Ngân hàng Quân Đội (MB Bank)',
       accountNo: '1010000000',
       accountName: 'CLB DOANH NHAN CEO HN10',
-      standardTier: '10.000.000 VNĐ / năm (Hội viên Chính thức)',
-      goldTier: '20.000.000 VNĐ / năm (Hội viên VIP Gold)',
-      diamondTier: '50.000.000 VNĐ / năm (Hội viên Kim cương)',
-      syntax: '[Mã Hội Viên] HP2026 hoặc [Họ Tên] HP2026',
+      standardTier: '10.000.000 VNĐ / năm (Học viên Chính thức)',
+      goldTier: '20.000.000 VNĐ / năm (Học viên VIP Gold)',
+      diamondTier: '50.000.000 VNĐ / năm (Học viên Kim cương)',
+      syntax: '[Mã Học viên] HP2026 hoặc [Họ Tên] HP2026',
       route: '/association/profile',
     };
 
@@ -2193,12 +2192,12 @@ export class AiService {
     answer: string;
     speechText: string;
     intent:
-      | 'chat'
-      | 'query_data'
-      | 'start_tour'
-      | 'feature_guide'
-      | 'navigate'
-      | 'action';
+    | 'chat'
+    | 'query_data'
+    | 'start_tour'
+    | 'feature_guide'
+    | 'navigate'
+    | 'action';
     tourId?: string;
     route?: string;
     featureName?: string;
@@ -2233,12 +2232,12 @@ export class AiService {
     // Lịch sử hội thoại gần nhất (client gửi lên) để LLM hiểu câu hỏi nối tiếp
     const historyText = Array.isArray(clientContext?.history)
       ? (clientContext.history as any[])
-          .slice(-6)
-          .map(
-            (m) =>
-              `${m?.role === 'assistant' ? 'Trợ lý' : 'Hội viên'}: ${String(m?.content || '').slice(0, 400)}`,
-          )
-          .join('\n')
+        .slice(-6)
+        .map(
+          (m) =>
+            `${m?.role === 'assistant' ? 'Trợ lý' : 'Học viên'}: ${String(m?.content || '').slice(0, 400)}`,
+        )
+        .join('\n')
       : '';
 
     // 0. Xử lý phản hồi khẳng định ("Có", "Đồng ý", "OK", "Hướng dẫn đi", "Bắt đầu")
@@ -2282,7 +2281,7 @@ export class AiService {
       };
     }
 
-    // 0.4. SUPER PREMIUM AI: Phân tích Dòng Tiền Hội Viên, Khớp Vốn Cơ Hội & Đàm Phán Mức Deal P&L / ROI
+    // 0.4. SUPER PREMIUM AI: Phân tích Dòng Tiền Học viên, Khớp Vốn Cơ Hội & Đàm Phán Mức Deal P&L / ROI
     const dealAdvisorAnswer = await this.analyzeCashflowAndDealOpportunities(
       userId,
       rawPrompt,
@@ -2329,7 +2328,7 @@ export class AiService {
         };
       }
 
-      // Nếu là tìm kiếm hội viên có từ khóa cụ thể:
+      // Nếu là tìm kiếm Học viên có từ khóa cụ thể:
       if (
         voiceNav.searchKeyword &&
         voiceNav.route.includes('/association/members')
@@ -2353,7 +2352,7 @@ export class AiService {
             .join('\n');
 
           return {
-            answer: `🔍 **Tìm thấy ${matched.length} hội viên khớp với từ khóa "${voiceNav.searchKeyword}":**\n\n${listStr}\n\n⚡ **Đang tự động chuyển màn hình sang Danh Bạ Hội Viên...**`,
+            answer: `🔍 **Tìm thấy ${matched.length} Học viên khớp với từ khóa "${voiceNav.searchKeyword}":**\n\n${listStr}\n\n⚡ **Đang tự động chuyển màn hình sang Danh Bạ Học viên...**`,
             speechText: `Em đã tìm thấy ${matched[0].name || matched[0].full_name} và đang tự động mở Danh bạ cho Quý Anh/Chị ngay bây giờ ạ!`,
             intent: 'navigate',
             tourId: voiceNav.tourId,
@@ -2405,7 +2404,7 @@ export class AiService {
 Phong cách: Tinh tế, sắc sảo, đĩnh đạc, thấu cảm và cực kỳ thông minh của một Giám đốc Trợ lý Điều hành Cấp cao (Senior Executive Assistant). Luôn xưng "Em" và gọi người dùng là "Quý Anh/Chị" hoặc theo tên riêng "${context.user.name}".
 
 BẢN ĐỒ TOÀN BỘ 19 MODULE HỆ THỐNG & API BACKEND CEO HN10 (API CATALOGUE & KNOWLEDGE GRAPH):
-1. Module Hội viên (/api/members): Quản lý 200+ CEO, danh bạ hồ sơ 360°, chức vụ, doanh nghiệp, phê duyệt hội viên. (Route: /association/members, Tour: association-members)
+1. Module Học viên (/api/members): Quản lý 200+ CEO, danh bạ hồ sơ 360°, chức vụ, doanh nghiệp, phê duyệt Học viên. (Route: /association/members, Tour: association-members)
 2. Module Sự kiện (/api/events): Lịch sự kiện, hội nghị, workshop, đăng ký tham dự, sơ đồ bàn VIP, danh sách đại biểu. (Route: /association/events, Tour: association-events)
 3. Module Vé & Check-in (/api/events/checkin, /api/events/tickets): Vé điện tử, mã QR động, camera/NFC quét vé cổng, điểm danh realtime. (Route: /association/checkin, Tour: association-checkin)
 4. Module Danh thiếp số (/api/business-card): Card visit điện tử 5.0, chạm thẻ NFC 1 giây, quét danh thiếp AI OCR, trao đổi contact. (Route: /association/card, Tour: association-card)
@@ -2425,8 +2424,8 @@ BẢN ĐỒ TOÀN BỘ 19 MODULE HỆ THỐNG & API BACKEND CEO HN10 (API CATALO
 18. Module Hồ sơ Cá nhân (/api/users/me, /api/users/profile): Cập nhật thông tin CEO, doanh nghiệp, ngành nghề, avatar, đổi mật khẩu. (Route: /association/profile, Tour: association-profile)
 19. Module Cấu hình Hệ thống (/api/app-settings): Cấu hình cổng thanh toán VietQR, AI Engine, thông tin CLB. (Route: /settings, Tour: settings-admin)
 
-DỮ LIỆU ĐỘNG THỜI GIAN THỰC CỦA HỘI VIÊN ĐANG ĐĂNG NHẬP:
-- Họ tên: ${context.user.name} | Mã hội viên: ${context.user.code}
+DỮ LIỆU ĐỘNG THỜI GIAN THỰC CỦA Học viên ĐANG ĐĂNG NHẬP:
+- Họ tên: ${context.user.name} | Mã Học viên: ${context.user.code}
 - Công ty: ${context.user.company} | Chức vụ: ${context.user.title} | Cấp bậc: ${context.user.level}
 - Trạng thái hội phí: ${context.dues.feePaid ? 'ĐÃ ĐÓNG ĐẦY ĐỦ' : `CHƯA ĐÓNG - Còn nợ ${new Intl.NumberFormat('vi-VN').format(context.dues.totalOutstanding)} đ (Kỳ ${context.dues.feeYear})`}
 - Thông báo chưa đọc: ${context.notifications.unreadCount} thông báo
@@ -2444,7 +2443,7 @@ KHI NGƯỜI DÙNG HỎI VỀ TÀI KHOẢN CỦA HỌ (sự kiện của tôi, b
 DỮ LIỆU ĐỘNG THỜI GIAN THỰC ĐƯỢC TRÍCH XUẤT TỪ HỆ THỐNG (RAG GROUND TRUTH):
 - Ban chuyên trách: ${JSON.stringify(searchData?.matchedCommittees || [])}
 - Chính sách hội phí & MB Bank: ${JSON.stringify(searchData?.feePolicy || {})}
-- Danh bạ hội viên / Lãnh đạo tìm thấy: ${JSON.stringify(searchData?.members || [])}
+- Danh bạ Học viên / Lãnh đạo tìm thấy: ${JSON.stringify(searchData?.members || [])}
 - Sản phẩm Marketplace: ${JSON.stringify(searchData?.products || [])}
 - Cơ hội giao thương B2B: ${JSON.stringify(searchData?.opportunities || [])}
 - Sự kiện & Hội nghị: ${JSON.stringify(searchData?.events || [])}
@@ -2456,7 +2455,7 @@ ${historyText || '(chưa có)'}
 QUY TẮC HIỂU ĐÚNG Ý ĐỊNH (QUAN TRỌNG NHẤT):
 - "bạn"/"em" trong câu hỏi thường là GỌI TRỢ LÝ, KHÔNG phải "bạn bè". Ví dụ "bạn làm được gì" = hỏi năng lực trợ lý.
 - Chỉ trả lời đúng điều được hỏi; KHÔNG liệt kê dữ liệu RAG không liên quan. Dữ liệu RAG chỉ là tham khảo, có thể không khớp câu hỏi.
-- Câu hỏi về tài khoản: dùng DỮ LIỆU THẬT của hội viên ở trên; nếu số liệu = 0 thì nói rõ là chưa có, không bịa.
+- Câu hỏi về tài khoản: dùng DỮ LIỆU THẬT của Học viên ở trên; nếu số liệu = 0 thì nói rõ là chưa có, không bịa.
 - Quyền: vai trò hiện tại là "${context.roleLabel}". Chỉ Quản trị / Admin / Chủ tịch mới được phân quyền, sửa/xóa tin tức; người khác hỏi thì giải thích lịch sự.
 
 QUY TẮC PHÂN TÍCH NGỮ CẢNH CÂU HỎI (BẮT BUỘC):
@@ -2522,7 +2521,7 @@ QUY TẮC PHÂN TÍCH NGỮ CẢNH CÂU HỎI (BẮT BUỘC):
                     {
                       parts: [
                         {
-                          text: `${sysPrompt}\n\nCÂU HỎI CỦA HỘI VIÊN: "${prompt}"`,
+                          text: `${sysPrompt}\n\nCÂU HỎI CỦA Học viên: "${prompt}"`,
                         },
                       ],
                     },
@@ -2613,13 +2612,13 @@ QUY TẮC PHÂN TÍCH NGỮ CẢNH CÂU HỎI (BẮT BUỘC):
       };
     }
 
-    // 2.3. Tra cứu Hội viên & Lãnh đạo (Members & Business Directory)
+    // 2.3. Tra cứu Học viên & Lãnh đạo (Members & Business Directory)
     if (
       searchData &&
       searchData.members.length > 0 &&
       (/(^|\s)(ai|tìm)(\s|$|\?)/.test(q) ||
         q.includes('thành viên') ||
-        q.includes('hội viên') ||
+        q.includes('Học viên') ||
         q.includes('công ty') ||
         q.includes('doanh nghiệp') ||
         q.includes('giám đốc') ||
@@ -2631,12 +2630,12 @@ QUY TẮC PHÂN TÍCH NGỮ CẢNH CÂU HỎI (BẮT BUỘC):
       const list = searchData.members
         .map(
           (m: any, idx: number) =>
-            `${idx + 1}. **${m.name || m.full_name}** (${m.code || 'HN10'})\n   - Chức vụ: **${m.position || m.title || 'Lãnh đạo'}** tại **${m.company || 'Doanh nghiệp Hội viên'}**\n   - Phân ban: ${m.department || 'Ban Hội viên'} | Hạng: ${m.level || 'Chính thức'}`,
+            `${idx + 1}. **${m.name || m.full_name}** (${m.code || 'HN10'})\n   - Chức vụ: **${m.position || m.title || 'Lãnh đạo'}** tại **${m.company || 'Doanh nghiệp Học viên'}**\n   - Phân ban: ${m.department || 'Ban Học viên'} | Hạng: ${m.level || 'Chính thức'}`,
         )
         .join('\n\n');
 
-      const answer = `👥 **Tìm thấy ${searchData.members.length} hội viên doanh nhân phù hợp:**\n\n${list}\n\n👉 *Quý Anh/Chị có muốn tôi mở **Danh Bạ Hội Viên** để gửi lời mời hẹn gặp 1-on-1 hoặc xem hồ sơ năng lực 360° không?*`;
-      const speechText = `Tôi đã tìm thấy ${searchData.members.length} hội viên doanh nhân phù hợp trong hệ thống, bao gồm anh chị ${searchData.members[0].name || searchData.members[0].full_name} tại ${searchData.members[0].company || 'doanh nghiệp'}. Quý anh chị có muốn tôi mở Danh bạ để kết nối ngay không ạ?`;
+      const answer = `👥 **Tìm thấy ${searchData.members.length} Học viên doanh nhân phù hợp:**\n\n${list}\n\n👉 *Quý Anh/Chị có muốn tôi mở **Danh Bạ Học viên** để gửi lời mời hẹn gặp 1-on-1 hoặc xem hồ sơ năng lực 360° không?*`;
+      const speechText = `Tôi đã tìm thấy ${searchData.members.length} Học viên doanh nhân phù hợp trong hệ thống, bao gồm anh chị ${searchData.members[0].name || searchData.members[0].full_name} tại ${searchData.members[0].company || 'doanh nghiệp'}. Quý anh chị có muốn tôi mở Danh bạ để kết nối ngay không ạ?`;
       return {
         answer,
         speechText,
@@ -2669,7 +2668,7 @@ QUY TẮC PHÂN TÍCH NGỮ CẢNH CÂU HỎI (BẮT BUỘC):
           const priceStr = p.price
             ? new Intl.NumberFormat('vi-VN').format(p.price) + ' VNĐ'
             : 'Liên hệ đàm phán';
-          return `${idx + 1}. 🛍️ **${p.name || p.title}**\n   - Giá niêm yết: **${priceStr}**\n   - Doanh nghiệp cung cấp: **${p.company || 'Hội viên CEO HN10'}**\n   - Danh mục: ${p.category || 'Sản phẩm B2B'}`;
+          return `${idx + 1}. 🛍️ **${p.name || p.title}**\n   - Giá niêm yết: **${priceStr}**\n   - Doanh nghiệp cung cấp: **${p.company || 'Học viên CEO HN10'}**\n   - Danh mục: ${p.category || 'Sản phẩm B2B'}`;
         })
         .join('\n\n');
 
@@ -2706,7 +2705,7 @@ QUY TẮC PHÂN TÍCH NGỮ CẢNH CÂU HỎI (BẮT BUỘC):
           const valStr = o.valuation
             ? new Intl.NumberFormat('vi-VN').format(o.valuation) + ' VNĐ'
             : 'Thỏa thuận';
-          return `${idx + 1}. 💼 **${o.title}**\n   - Loại hình: **${o.type === 'buy' ? 'Chào mua' : o.type === 'sell' ? 'Chào bán' : 'Hợp tác'}**\n   - Quy mô / Định giá: **${valStr}**\n   - Ngành nghề: ${o.target_industry || o.category || 'Đa ngành'}\n   - Người đăng: ${o.poster_name || 'Hội viên'} (${o.poster_company || 'Doanh nghiệp'})`;
+          return `${idx + 1}. 💼 **${o.title}**\n   - Loại hình: **${o.type === 'buy' ? 'Chào mua' : o.type === 'sell' ? 'Chào bán' : 'Hợp tác'}**\n   - Quy mô / Định giá: **${valStr}**\n   - Ngành nghề: ${o.target_industry || o.category || 'Đa ngành'}\n   - Người đăng: ${o.poster_name || 'Học viên'} (${o.poster_company || 'Doanh nghiệp'})`;
         })
         .join('\n\n');
 
@@ -2771,17 +2770,16 @@ QUY TẮC PHÂN TÍCH NGỮ CẢNH CÂU HỎI (BẮT BUỘC):
     ) {
       if (context.topEvents.length > 0) {
         const top1 = context.topEvents[0];
-        const answer = `🏆 **Sự kiện đang có nhiều người đăng ký nhất:**\n\n- **Tên sự kiện:** ${top1.name}\n- **Số lượng đã đăng ký:** **${top1.registeredCount} / ${top1.capacity} đại biểu**\n- **Thời gian:** ${top1.date}\n- **Địa điểm:** ${top1.location}\n\n${
-          context.topEvents.length > 1
+        const answer = `🏆 **Sự kiện đang có nhiều người đăng ký nhất:**\n\n- **Tên sự kiện:** ${top1.name}\n- **Số lượng đã đăng ký:** **${top1.registeredCount} / ${top1.capacity} đại biểu**\n- **Thời gian:** ${top1.date}\n- **Địa điểm:** ${top1.location}\n\n${context.topEvents.length > 1
             ? `*Các sự kiện tiếp theo:* \n${context.topEvents
-                .slice(1, 3)
-                .map(
-                  (e, idx) =>
-                    `${idx + 2}. **${e.name}** (${e.registeredCount} người đăng ký - ${e.date})`,
-                )
-                .join('\n')}`
+              .slice(1, 3)
+              .map(
+                (e, idx) =>
+                  `${idx + 2}. **${e.name}** (${e.registeredCount} người đăng ký - ${e.date})`,
+              )
+              .join('\n')}`
             : ''
-        }\n\n👉 **Quý Anh/Chị có muốn tôi hướng dẫn thao tác trực tiếp đăng ký vé không? Tôi sẽ lái màn hình và chỉ dẫn từng bước cho Quý Anh/Chị!**`;
+          }\n\n👉 **Quý Anh/Chị có muốn tôi hướng dẫn thao tác trực tiếp đăng ký vé không? Tôi sẽ lái màn hình và chỉ dẫn từng bước cho Quý Anh/Chị!**`;
 
         const speechText = `Dạ thưa Quý anh chị, sự kiện đang có nhiều người đăng ký nhất là "${top1.name}" với ${top1.registeredCount} đại biểu tham dự vào ngày ${top1.date}. Quý anh chị có muốn tôi hướng dẫn thao tác trực tiếp đăng ký vé không? Hãy chọn Có hoặc nói Có nhé!`;
 
@@ -2935,8 +2933,8 @@ QUY TẮC PHÂN TÍCH NGỮ CẢNH CÂU HỎI (BẮT BUỘC):
           model: 'rule-nlp-v3',
         };
       } else {
-        const answer = `✅ **Hội phí hoàn tất:** Quý Anh/Chị đã hoàn thành đầy đủ nghĩa vụ hội phí thường niên. Thẻ hội viên **${context.user.level}** của Quý Anh/Chị đang ở trạng thái Hoạt động chuẩn mực 5 sao!`;
-        const speechText = `Tuyệt vời! Quý anh chị đã đóng đầy đủ toàn bộ hội phí thường niên. Thẻ hội viên của anh chị đang hoạt động rất tốt!`;
+        const answer = `✅ **Hội phí hoàn tất:** Quý Anh/Chị đã hoàn thành đầy đủ nghĩa vụ hội phí thường niên. Thẻ Học viên **${context.user.level}** của Quý Anh/Chị đang ở trạng thái Hoạt động chuẩn mực 5 sao!`;
+        const speechText = `Tuyệt vời! Quý anh chị đã đóng đầy đủ toàn bộ hội phí thường niên. Thẻ Học viên của anh chị đang hoạt động rất tốt!`;
 
         return {
           answer,
@@ -2961,701 +2959,701 @@ QUY TẮC PHÂN TÍCH NGỮ CẢNH CÂU HỎI (BẮT BUỘC):
       proTip: string;
       speechSummary: string;
     }> = [
-      // 1. Đăng ký sự kiện
-      {
-        id: 'event-register',
-        keywords: [
-          'đăng ký sự kiện',
-          'sự kiện như nào',
-          'đăng ký vé',
-          'mua vé sự kiện',
-          'lấy vé',
-          'tham gia sự kiện',
-          'lịch sự kiện',
-        ],
-        featureName: 'Đăng Ký Vé Sự Kiện & Hội Nghị',
-        tourId: 'association-events',
-        route: '/association/events',
-        steps: [
-          'Vào màn hình **Sự kiện** từ thanh điều hướng dưới đáy ứng dụng.',
-          'Xem danh sách sự kiện sắp diễn ra, chạm vào thẻ sự kiện bạn quan tâm để xem chi tiết địa điểm, trang phục và sơ đồ bàn tiệc VIP.',
-          'Bấm nút **"Đăng ký tham dự"** ở chân thẻ sự kiện, xác nhận số lượng đại biểu đi cùng.',
-          'Hệ thống tự động cấp mã vé điện tử REG-xxx và hiển thị ngay tại màn hình **Vé Check-in**.',
-        ],
-        proTip:
-          'Hội viên chính thức được miễn phí vé Standard và ưu tiên xếp bàn tiệc VIP gần sân khấu.',
-        speechSummary:
-          'Để đăng ký sự kiện: Bước một, vào mục Sự kiện. Bước hai, chọn sự kiện sắp diễn ra. Bước ba, bấm nút Đăng ký tham dự và xác nhận số lượng vé.',
-      },
-      // 2. Vé Check-in QR & Bàn VIP
-      {
-        id: 'checkin-ticket',
-        keywords: [
-          'vé checkin',
-          'vé check in',
-          'mã qr vé',
-          'bàn vip',
-          'số ghế',
-          'vị trí ngồi',
-          'xuất trình vé',
-        ],
-        featureName: 'Vé Check-in QR & Tra Cứu Bàn Tiệc VIP',
-        tourId: 'association-checkin',
-        route: '/association/checkin',
-        steps: [
-          'Mở màn hình **Vé Check-in** từ phím tắt tiện ích trên Trang chủ.',
-          'Xuất trình mã QR động trên thẻ vé VIP cho lễ tân hoặc Ban Truyền Thông quét tại cửa sảnh.',
-          'Xem số bàn tiệc VIP (VD: Bàn VIP 02 - Ghế 04) và mã may mắn tham gia Lucky Draw Gala.',
-        ],
-        proTip:
-          'Khi được quét thành công, vé sẽ đóng mộc xanh ĐÃ CHECK-IN kèm âm thanh xác nhận tức thì.',
-        speechSummary:
-          'Để xuất trình vé check in: Mở mục Vé Check in, đưa mã QR cho lễ tân quét, và xem vị trí bàn tiệc VIP của bạn.',
-      },
-      // 3. Soát vé sự kiện (Ban Truyền Thông)
-      {
-        id: 'checkin-scanner',
-        keywords: [
-          'soát vé',
-          'quét vé',
-          'máy quét',
-          'camera soát vé',
-          'kiểm tra vé',
-          'lễ tân soát',
-        ],
-        featureName: 'Máy Quét Camera & NFC Soát Vé Cổng Sự Kiện',
-        tourId: 'association-checkin',
-        route: '/association/checkin',
-        steps: [
-          'Mở màn hình **Check-in**, hệ thống tự nhận diện nếu bạn thuộc Ban Truyền Thông hoặc Ban Tổ Chức.',
-          'Chuyển sang chế độ **"Máy Quét Camera Check-in"**.',
-          'Hướng ống kính camera vào mã vé QR của đại biểu, màn hình sẽ hiển thị họ tên, doanh nghiệp và số bàn VIP trong 0.5 giây.',
-          'Bấm **"Xác Nhận Check-In"** để hoàn tất đón tiếp đại biểu.',
-        ],
-        proTip:
-          'Máy quét có hỗ trợ chế độ Offline tự lưu nếu sảnh tiệc bị mất kết nối mạng Wifi.',
-        speechSummary:
-          'Để soát vé: Mở mục Check in, bật máy quét camera, lia vào mã vé đại biểu và bấm Xác nhận.',
-      },
-      // 4. Danh thiếp số 5.0 chia sẻ QR
-      {
-        id: 'card-show',
-        keywords: [
-          'danh thiếp số',
-          'card visit',
-          'chia sẻ danh thiếp',
-          'mã qr danh thiếp',
-          'danh thiếp điện tử',
-        ],
-        featureName: 'Thẻ Danh Thiếp Số 5.0 & Chia Sẻ QR',
-        tourId: 'association-card',
-        route: '/association/card',
-        steps: [
-          'Vào màn hình **Danh thiếp** trên thanh điều hướng.',
-          'Chạm vào mã QR trên thẻ danh thiếp 3D để phóng to.',
-          'Đưa cho đối tác dùng camera iPhone hoặc Zalo quét để lưu danh bạ trong 1 giây mà không cần cài app.',
-          'Bấm **"Sao chép liên kết"** để gửi link danh thiếp qua Zalo hoặc SMS.',
-        ],
-        proTip:
-          'Bấm vào logo công ty ở góc phải để cập nhật logo thương hiệu doanh nghiệp của bạn.',
-        speechSummary:
-          'Để chia sẻ danh thiếp số: Vào mục Danh thiếp, chạm mã QR phóng to cho đối tác quét hoặc bấm Sao chép liên kết.',
-      },
-      // 5. Ghi thẻ thông minh NFC
-      {
-        id: 'card-nfc',
-        keywords: [
-          'ghi thẻ nfc',
-          'chạm nfc',
-          'thẻ thông minh nfc',
-          'thẻ kim loại',
-          'ghi chip nfc',
-        ],
-        featureName: 'Ghi Thẻ Thông Minh Không Dây NFC',
-        tourId: 'association-card',
-        route: '/association/card',
-        steps: [
-          'Vào màn hình **Danh thiếp** và chọn mục **"Ghi thẻ NFC"**.',
-          'Bấm nút **"Bắt đầu ghi thẻ"**.',
-          'Áp chiếc thẻ kim loại CEO HN10 vào mặt lưng điện thoại khoảng 2 giây cho đến khi có âm báo thành công.',
-          'Khi chạm thẻ vào lưng điện thoại đối tác, danh thiếp của bạn sẽ tự động bật lên.',
-        ],
-        proTip:
-          'Một chiếc thẻ NFC có thể ghi đè cập nhật lại thông tin hàng triệu lần miễn phí.',
-        speechSummary:
-          'Để ghi thẻ NFC: Vào mục Danh thiếp, bấm Ghi thẻ NFC và áp thẻ vào mặt lưng điện thoại khoảng 2 giây.',
-      },
-      // 6. Quét & bóc tách card visit giấy bằng AI
-      {
-        id: 'card-ai-scan',
-        keywords: [
-          'quét danh thiếp giấy',
-          'chụp danh thiếp',
-          'ai bóc tách',
-          'ocr danh thiếp',
-          'quét card visit ai',
-          'chụp card',
-        ],
-        featureName: 'Chụp & Bóc Tách Card Visit Giấy Bằng AI Vision OCR',
-        tourId: 'association-card',
-        route: '/association/card',
-        steps: [
-          'Vào màn hình **Danh thiếp**, bấm nút **"Chụp danh thiếp"**.',
-          'Hướng camera vào tấm danh thiếp giấy của đối tác hoặc chọn ảnh từ thư viện.',
-          'AI Vision OCR tự động nhận diện và bóc tách: Họ tên, Số điện thoại, Email, Chức vụ và Công ty.',
-          'Kiểm tra lại thông tin và bấm **"Lưu vào danh bạ đối tác"**.',
-        ],
-        proTip:
-          'Giúp số hóa toàn bộ cọc danh thiếp giấy chỉ sau 5 phút hội thảo.',
-        speechSummary:
-          'Để quét card visit bằng AI: Vào Danh thiếp, bấm Chụp danh thiếp, hướng camera chụp card giấy để AI tự bóc tách thông tin.',
-      },
-      // 7. Cài đặt quyền riêng tư danh thiếp
-      {
-        id: 'card-privacy',
-        keywords: [
-          'quyền riêng tư',
-          'bảo mật danh thiếp',
-          'ẩn số điện thoại',
-          'ẩn zalo',
-          'cài đặt danh thiếp',
-        ],
-        featureName: 'Cài Đặt Quyền Riêng Tư & Bảo Mật Danh Thiếp',
-        tourId: 'association-card',
-        route: '/association/card',
-        steps: [
-          'Vào màn hình **Danh thiếp**, bấm nút **"Chỉnh sửa / Quyền riêng tư"**.',
-          'Chủ động bật hoặc tắt hiển thị Số điện thoại di động, Zalo, Email công khai trên web.',
-          'Bấm **"Lưu cài đặt"** để cập nhật ngay lập tức.',
-        ],
-        proTip:
-          'Bạn có thể chọn chỉ hiển thị số máy bàn công ty thay vì số di động cá nhân.',
-        speechSummary:
-          'Để cài đặt quyền riêng tư danh thiếp: Vào Danh thiếp, bấm Chỉnh sửa, bật tắt ẩn hiện số điện thoại và email rồi lưu lại.',
-      },
-      // 8. Tìm kiếm & Tra cứu danh bạ 200+ CEO
-      {
-        id: 'member-search',
-        keywords: [
-          'tìm kiếm hội viên',
-          'danh bạ',
-          'tìm người',
-          'tra cứu ceo',
-          'tìm đối tác',
-          'danh bạ hội viên',
-        ],
-        featureName: 'Tra Cứu Danh Bạ 200+ Lãnh Đạo Doanh Nghiệp',
-        tourId: 'association-members',
-        route: '/association/members',
-        steps: [
-          'Vào màn hình **Danh bạ** từ thanh menu.',
-          'Gõ tên doanh nhân, tên công ty hoặc ngành nghề vào thanh tìm kiếm trên đầu trang.',
-          'Hệ thống lọc tức thì kết quả tìm kiếm theo thời gian thực có dấu và không dấu.',
-          'Chạm vào tên hội viên để xem hồ sơ năng lực 360°.',
-        ],
-        proTip:
-          'Bạn có thể gõ mã hội viên (VD: HN10-001) để tìm đúng lãnh đạo câu lạc bộ.',
-        speechSummary:
-          'Để tìm hội viên: Vào mục Danh bạ, gõ tên lãnh đạo hoặc tên công ty vào thanh tìm kiếm để xem hồ sơ năng lực.',
-      },
-      // 9. Lọc hội viên theo Ban chuyên môn & Ngành nghề
-      {
-        id: 'member-filter',
-        keywords: [
-          'lọc hội viên',
-          'lọc ban',
-          'lọc ngành nghề',
-          'ban truyền thông',
-          'ban tài chính',
-          'xây dựng',
-          'bất động sản',
-        ],
-        featureName: 'Bộ Lọc Hội Viên Theo Ban Chuyên Môn & Ngành Nghề',
-        tourId: 'association-members',
-        route: '/association/members',
-        steps: [
-          'Mở màn hình **Danh bạ**.',
-          'Vuốt ngang hàng nút bộ lọc ở dưới thanh tìm kiếm.',
-          'Chạm vào ban hoặc ngành nghề cần tìm: Ban Truyền Thông, Ban Tài Chính, Xây dựng, Công nghệ, F&B...',
-          'Danh sách chỉ hiển thị các CEO đang hoạt động trong lĩnh vực đó.',
-        ],
-        proTip: 'Bấm nút "Tất cả" để quay lại danh bạ đầy đủ 200+ thành viên.',
-        speechSummary:
-          'Để lọc hội viên: Vào Danh bạ, vuốt ngang các tag bộ lọc để chọn Ban chuyên môn hoặc Ngành nghề kinh doanh.',
-      },
-      // 10. Hẹn gặp giao thương 1-on-1
-      {
-        id: 'meeting-1on1',
-        keywords: [
-          'hẹn gặp 1-1',
-          'hẹn 1-on-1',
-          'kết nối giao thương',
-          'đặt lịch hẹn',
-          'gặp gỡ đối tác',
-          'bắt tay',
-        ],
-        featureName: 'Gửi Thư Mời Hẹn Giao Thương 1-on-1 Có Mục Đích',
-        tourId: 'association-members',
-        route: '/association/members',
-        steps: [
-          'Mở màn hình **Danh bạ**, tìm hội viên bạn muốn hẹn gặp.',
-          'Bấm biểu tượng **Bắt tay / Kết nối** màu vàng trên góc thẻ hội viên.',
-          'Nhập mục đích cuộc hẹn (VD: Trao đổi hợp tác cung ứng vật liệu) và thời gian đề xuất.',
-          'Bấm **"Gửi thư mời"**. Hệ thống sẽ gửi thông báo đẩy trực tiếp vào hộp thư đối tác.',
-        ],
-        proTip:
-          'Văn hóa CEO HN10: Không hẹn vu vơ, mọi cuộc gặp đều có mục tiêu giao thương rõ ràng.',
-        speechSummary:
-          'Để hẹn gặp một-một: Tìm hội viên trong danh bạ, bấm nút Bắt tay, nhập mục đích cuộc hẹn và bấm Gửi thư mời.',
-      },
-      // 11. Sàn Cơ hội kinh doanh B2B
-      {
-        id: 'opportunity-post',
-        keywords: [
-          'đăng cơ hội',
-          'sàn cơ hội',
-          'cung cầu',
-          'tìm mua hàng',
-          'chào bán dự án',
-          'hợp tác kinh doanh',
-        ],
-        featureName: 'Sàn Cơ Hội Kinh Doanh & Đăng Tin Cung - Cầu B2B',
-        tourId: 'association-opportunities',
-        route: '/association/opportunities',
-        steps: [
-          'Vào màn hình **Cơ hội** từ thanh điều hướng.',
-          'Xem các tab phân loại: Tất cả, Cung cấp (Supply), Tìm mua (Demand) và Hợp tác.',
-          'Bấm nút **"Đăng cơ hội ngay →"** ở chân trang.',
-          'Nhập tiêu đề, mô tả nhu cầu, ngân sách dự kiến, tải ảnh minh họa và bấm Đăng tin.',
-        ],
-        proTip:
-          'Các cơ hội từ 500 triệu trở lên được Ban Xúc Tiến Thương Mại hỗ trợ bảo trợ pháp lý.',
-        speechSummary:
-          'Để đăng cơ hội kinh doanh: Vào mục Cơ hội, bấm Đăng cơ hội ngay, nhập nhu cầu cung cầu cùng ngân sách và đăng tin.',
-      },
-      // 12. Chợ B2B Marketplace & Gian hàng số
-      {
-        id: 'b2b-explore',
-        keywords: [
-          'chợ b2b',
-          'sàn b2b',
-          'marketplace',
-          'gian hàng',
-          'sản phẩm sỉ',
-          'chiết khấu vip',
-          'mua hàng nội khối',
-        ],
-        featureName: 'Chợ B2B Marketplace & Ưu Đãi Độc Quyền CEO HN10',
-        tourId: 'association-products',
-        route: '/association/products',
-        steps: [
-          'Vào màn hình **Sản phẩm** trên thanh menu.',
-          'Duyệt tìm sản phẩm thiết bị, nguyên vật liệu hoặc dịch vụ đang giảm giá ưu đãi.',
-          'Xem chi tiết tỷ lệ chiết khấu dành riêng cho hội viên có thẻ VIP Gold.',
-          'Bấm **"Yêu cầu báo giá"** hoặc **"Nhắn tin"** để thương lượng trực tiếp với CEO đơn vị bán.',
-        ],
-        proTip:
-          'Ưu tiên dùng hàng của nhau, gia tăng doanh số và tạo dòng tiền nội khối.',
-        speechSummary:
-          'Để mua sắm trên Chợ B2B: Vào mục Sản phẩm, duyệt gian hàng, xem chiết khấu VIP và bấm Nhắn tin để thương lượng.',
-      },
-      // 13. Đăng bán sản phẩm lên sàn B2B
-      {
-        id: 'b2b-sell',
-        keywords: [
-          'đăng bán sản phẩm',
-          'bán hàng b2b',
-          'tạo sản phẩm mới',
-          'đăng tin bán',
-          'mục của tôi',
-        ],
-        featureName: 'Đăng Bán Sản Phẩm Mới Lên Gian Hàng B2B',
-        tourId: 'association-products',
-        route: '/association/products',
-        steps: [
-          'Vào màn hình **Sản phẩm**, chuyển sang tab **"Mục của tôi"**.',
-          'Bấm nút **"Đăng bán sản phẩm"**.',
-          'Chụp ảnh sản phẩm vuông 1:1, điền tên mặt hàng, giá niêm yết và tỷ lệ chiết khấu cho CLB.',
-          'Bấm **"Lưu và đăng bán"**. Sản phẩm xuất hiện ngay lập tức trên Marketplace.',
-        ],
-        proTip:
-          'Mở rộng kênh phân phối chất lượng cao với chi phí marketing 0 đồng.',
-        speechSummary:
-          'Để đăng bán sản phẩm: Vào mục Sản phẩm, chuyển sang tab Mục của tôi, bấm Đăng bán sản phẩm và nhập thông tin giá bán.',
-      },
-      // 14. Biểu quyết Đại hội & Bầu cử BCH
-      {
-        id: 'voting-poll',
-        keywords: [
-          'biểu quyết',
-          'bỏ phiếu',
-          'bầu cử',
-          'bầu ban chấp hành',
-          'bầu bch',
-          'nghị quyết',
-        ],
-        featureName: 'Biểu Quyết Đại Hội & Bỏ Phiếu Số Kín',
-        tourId: 'association-voting',
-        route: '/association/voting',
-        steps: [
-          'Mở màn hình **Biểu quyết** từ Trang chủ.',
-          'Xem các cuộc bỏ phiếu đang mở, đọc lý lịch trích ngang của ứng viên hoặc nội dung đề án sửa đổi Điều lệ.',
-          'Tích chọn ứng cử viên bạn tín nhiệm và nhập ý kiến đóng góp.',
-          'Bấm **"Gửi phiếu bầu"** an toàn, bảo mật tuyệt đối danh tính.',
-        ],
-        proTip:
-          'Mỗi hội viên chính thức không nợ phí có 01 phiếu bầu duy nhất theo nguyên tắc dân chủ.',
-        speechSummary:
-          'Để biểu quyết: Mở mục Biểu quyết, xem danh sách ứng viên, tích chọn người bạn tín nhiệm và bấm Gửi phiếu bầu.',
-      },
-      // 15. Vòng quay may mắn Lucky Draw Gala
-      {
-        id: 'voting-lucky',
-        keywords: [
-          'lucky draw',
-          'vòng quay may mắn',
-          'quay số',
-          'trúng thưởng',
-          'bốc thăm gala',
-          'quà tặng',
-        ],
-        featureName: 'Vòng Quay Số May Mắn Lucky Draw Gala Dinner',
-        tourId: 'association-voting',
-        route: '/association/voting',
-        steps: [
-          'Vào màn hình **Biểu quyết**, chuyển sang tab **"Quay số trúng thưởng"**.',
-          'Theo dõi vòng quay số may mắn thời gian thực kết nối với màn hình LED sân khấu chính.',
-          'Mã số vé may mắn tại Màn hình Vé Check-in của bạn sẽ tự động nằm trong thùng phiếu điện tử.',
-          'Nếu trúng giải, màn hình điện thoại của bạn sẽ nổ pháo hoa chúc mừng!',
-        ],
-        proTip:
-          'Giữ kết nối Wifi/4G ổn định để nhận thông báo trúng giải ngay tức thì.',
-        speechSummary:
-          'Để tham gia Lucky Draw: Vào mục Biểu quyết, chuyển sang tab Quay số trúng thưởng và theo dõi màn hình khi MC quay số.',
-      },
-      // 16. Đóng hội phí thường niên VietQR MB Bank
-      {
-        id: 'dues-pay',
-        keywords: [
-          'đóng hội phí',
-          'nộp tiền hội phí',
-          'quét vietqr',
-          'chuyển khoản mb',
-          'phí niên liễm',
-          'thanh toán hội phí',
-        ],
-        featureName: 'Tra Cứu & Đóng Hội Phí Thường Niên Qua VietQR MB Bank',
-        tourId: 'association-profile',
-        route: '/association/profile',
-        steps: [
-          'Vào màn hình **Cá nhân** (Hồ sơ), chạm vào mục **"Hội phí & Hóa đơn"**.',
-          'Kiểm tra số tiền niên liễm chưa đóng và hạn thanh toán.',
-          'Bấm nút **"Quét mã VietQR"**.',
-          'Mở app ngân hàng bất kỳ (MB Bank, Vietcombank...) quét mã QR, hệ thống tự động điền STK 1010000000, số tiền và cú pháp.',
-          'Sau khi chuyển khoản, thẻ hội viên tự động cập nhật trạng thái Đã Hoàn Thành.',
-        ],
-        proTip:
-          'MB Bank là ngân hàng đối tác chiến lược của CEO HN10 với đầu số tài khoản VIP 1010000000.',
-        speechSummary:
-          'Để đóng hội phí: Vào mục Cá nhân, chọn Hội phí, bấm Quét mã VietQR và dùng app ngân hàng quét mã chuyển khoản tự động.',
-      },
-      // 17. Kho Văn bản, Điều lệ & Kỷ yếu
-      {
-        id: 'documents-download',
-        keywords: [
-          'tải điều lệ',
-          'quy chế',
-          'kỷ yếu',
-          'văn bản',
-          'tài liệu',
-          'thư viện',
-          'nghị quyết bch',
-        ],
-        featureName: 'Kho Văn Bản, Điều Lệ & Kỷ Yếu Doanh Nhân',
-        tourId: 'association-library',
-        route: '/association/library',
-        steps: [
-          'Vào màn hình **Tài liệu** (Thư viện số) trên menu.',
-          'Gõ từ khóa vào ô tìm kiếm: "Điều lệ", "Quy chế" hoặc "Kỷ yếu".',
-          'Chạm vào tên văn bản để xem tóm tắt nội dung và đơn vị ban hành.',
-          'Bấm icon **Tải xuống** để lưu file PDF về máy điện thoại hoặc bấm **Chia sẻ** qua Zalo.',
-        ],
-        proTip:
-          'Toàn bộ văn bản pháp quy chính thức được số hóa và ký duyệt số.',
-        speechSummary:
-          'Để xem tài liệu: Vào mục Thư viện tài liệu, tìm văn bản Điều lệ hoặc Kỷ yếu và bấm nút Tải xuống PDF.',
-      },
-      // 18. Đổi ảnh đại diện & ảnh bìa thẻ VIP Gold
-      {
-        id: 'profile-avatar',
-        keywords: [
-          'đổi ảnh đại diện',
-          'đổi avatar',
-          'ảnh bìa',
-          'sửa hồ sơ',
-          'cập nhật ảnh',
-          'thay ảnh',
-        ],
-        featureName: 'Cập Nhật Ảnh Đại Diện & Ảnh Bìa Thẻ VIP Gold',
-        tourId: 'association-profile',
-        route: '/association/profile',
-        steps: [
-          'Mở màn hình **Cá nhân** hoặc Trang chủ.',
-          'Bấm icon cây bút chì ở góc dưới bên phải thẻ hội viên VIP.',
-          'Chọn **"Đổi ảnh đại diện"** hoặc **"Đổi ảnh bìa"** từ thư viện ảnh máy.',
-          'Cắt chỉnh ảnh theo ý muốn và bấm **"Lưu thay đổi"**.',
-        ],
-        proTip:
-          'Chọn ảnh chân dung doanh nhân sang trọng để đối tác ấn tượng ngay khi quét danh thiếp.',
-        speechSummary:
-          'Để đổi ảnh đại diện: Vào mục Cá nhân, bấm biểu tượng bút chì trên thẻ hội viên, chọn ảnh mới từ máy và bấm Lưu.',
-      },
-      // 19. Tùy biến giao diện Sáng / Tối / Chủ đề Lễ Hội
-      {
-        id: 'profile-theme',
-        keywords: [
-          'đổi giao diện',
-          'chủ đề lễ hội',
-          'giao diện tối',
-          'chủ đề tết',
-          'dark mode',
-          'chủ đề',
-        ],
-        featureName: 'Tùy Biến Giao Diện Sáng / Tối & Chủ Đề Lễ Hội',
-        tourId: 'association-profile',
-        route: '/association/profile',
-        steps: [
-          'Vào màn hình **Cá nhân**, chọn mục **"Chủ đề giao diện"**.',
-          'Chọn phong cách yêu thích: Giao diện Sáng (Executive Light), Tối (CEO Dark) hoặc Chủ đề Lễ Hội (Festival Gala).',
-          'Màu sắc ứng dụng sẽ biến đổi ngay lập tức.',
-        ],
-        proTip:
-          'Vào dịp Tết Nguyên Đán, chủ đề Lễ Hội sẽ có hiệu ứng hoa đào và pháo hoa rực rỡ.',
-        speechSummary:
-          'Để đổi giao diện: Vào mục Cá nhân, chọn Chủ đề giao diện, chọn Sáng, Tối hoặc Lễ hội theo sở thích của bạn.',
-      },
-      // 20. Cài đặt PWA lên màn hình điện thoại
-      {
-        id: 'pwa-install',
-        keywords: [
-          'cài đặt app',
-          'cài pwa',
-          'thêm vào màn hình chính',
-          'tải app',
-          'cài đặt ứng dụng',
-        ],
-        featureName: 'Cài Đặt Ứng Dụng PWA Lên Màn Hình Chính Điện Thoại',
-        tourId: 'association-profile',
-        route: '/association/profile',
-        steps: [
-          'Nếu dùng iPhone: Bấm nút **Chia sẻ** trên trình duyệt Safari, cuộn xuống chọn **"Thêm vào Màn hình chính"** (Add to Home Screen).',
-          'Nếu dùng Android: Bấm icon 3 chấm trên trình duyệt Chrome, chọn **"Cài đặt ứng dụng"**.',
-          'Icon CEO HN10 sẽ xuất hiện trên màn hình điện thoại, mở lên dùng mượt mà toàn màn hình không có thanh địa chỉ.',
-        ],
-        proTip:
-          'Công nghệ Progressive Web App giúp cập nhật tính năng mới tự động mà không cần vào App Store.',
-        speechSummary:
-          'Để cài app: Mở Safari chọn Chia sẻ rồi Thêm vào màn hình chính, hoặc trên Chrome chọn Cài đặt ứng dụng.',
-      },
-      // 21. Hotline 5 Ban Chuyên Môn
-      {
-        id: 'hotline-support',
-        keywords: [
-          'hotline',
-          'liên hệ ban',
-          'số điện thoại hỗ trợ',
-          'ban chuyên môn',
-          'trợ giúp',
-          'tổng đài',
-        ],
-        featureName: 'Hotline Trực Tiếp 5 Ban Chuyên Môn Hiệp Hội',
-        tourId: 'association-profile',
-        route: '/association/profile',
-        steps: [
-          'Vào màn hình **Cá nhân**, chọn mục **"Liên hệ 5 Ban Chuyên Môn"**.',
-          'Chọn ban phụ trách vấn đề bạn cần: Ban Truyền Thông (soát vé), Ban Thư Ký (hồ sơ), Ban Tài Chính (hội phí)...',
-          'Bấm gọi điện thoại trực tiếp hoặc mở chat Zalo OA với Trưởng ban.',
-        ],
-        proTip:
-          'Ban Thư Ký túc trực 24/7 để giải đáp mọi thắc mắc của quý hội viên.',
-        speechSummary:
-          'Để gọi hotline: Vào mục Cá nhân, chọn Liên hệ Ban chuyên môn, chọn ban cần hỗ trợ và bấm nút gọi điện hoặc Zalo.',
-      },
-      // 22. Tạo sự kiện mới & Quản lý vé (Ban Tổ Chức) - CRM NGOÀI
-      {
-        id: 'event-create',
-        keywords: [
-          'tạo sự kiện',
-          'quản trị sự kiện',
-          'thêm sự kiện',
-          'ban tổ chức sự kiện',
-          'tạo hội nghị',
-          'crm sự kiện',
-        ],
-        featureName: 'Tạo Sự Kiện Mới & Quản Trị Đại Biểu (Ban Tổ Chức)',
-        tourId: 'events-admin',
-        route: '/events',
-        steps: [
-          'Truy cập màn hình **Quản trị Sự kiện** (/events).',
-          'Bấm nút **"Tạo sự kiện"** màu xanh ở góc trên bên phải.',
-          'Điền Tên sự kiện, Thời gian khai mạc, Địa điểm tổ chức, Sức chứa đại biểu và Trang phục (Dresscode).',
-          'Cấu hình gói tài trợ và bấm **"Lưu sự kiện"**. Hệ thống mở bán vé ngay lập tức.',
-        ],
-        proTip:
-          'Bạn có thể xuất danh sách khách mời đăng ký dạng Excel để in thẻ đeo trước giờ G.',
-        speechSummary:
-          'Để tạo sự kiện mới: Vào trang Quản trị sự kiện, bấm Tạo sự kiện mới, điền thông tin địa điểm thời gian và bấm Lưu.',
-      },
-      // 23. Quản lý hội viên CRM & Phê duyệt kết nạp - CRM NGOÀI
-      {
-        id: 'members-crm',
-        keywords: [
-          'quản lý hội viên crm',
-          'phê duyệt hội viên',
-          'kết nạp hội viên',
-          'cấp mã m1983',
-          'thẩm định hội viên',
-        ],
-        featureName:
-          'Quản Lý Hồ Sơ Hội Viên CRM & Phê Duyệt Kết Nạp (Ban Hội Viên)',
-        tourId: 'members-admin',
-        route: '/members',
-        steps: [
-          'Truy cập màn hình **Quản lý Hội viên** (/members).',
-          'Kiểm tra danh sách hồ sơ ở cột "Chờ phê duyệt".',
-          'Xem thông tin doanh nghiệp, xác nhận năm sinh 1983 và bấm **"Phê duyệt"**.',
-          'Hệ thống tự động cấp mã định danh HN10-xxx và gửi email chào mừng chính thức.',
-        ],
-        proTip:
-          'Chỉ định đúng ban chuyên môn để hội viên tham gia các buổi sinh hoạt chuyên sâu.',
-        speechSummary:
-          'Để quản lý hội viên: Vào Quản lý hội viên, kiểm tra hồ sơ chờ duyệt, xác nhận thông tin và bấm Phê duyệt cấp mã M1983.',
-      },
-      // 24. Quản trị hội phí & Thu chi - CRM NGOÀI
-      {
-        id: 'finance-mgmt',
-        keywords: [
-          'quản trị hội phí',
-          'tạo đợt thu',
-          'kế toán hiệp hội',
-          'báo cáo tài chính',
-          'đối soát ngân hàng',
-          'thu chi',
-        ],
-        featureName:
-          'Quản Trị Hội Phí & Kế Toán Thu Chi Minh Bạch (Ban Tài Chính)',
-        tourId: 'fees-admin',
-        route: '/fees',
-        steps: [
-          'Truy cập màn hình **Quản lý Hội phí** (/fees).',
-          'Bấm **"Tạo đợt thu mới"**, nhập mức niên liễm năm và phát hành cho toàn thể hội viên.',
-          'Theo dõi tỷ lệ thanh toán thời gian thực qua biểu đồ trực quan.',
-          'Bấm **"Báo cáo thu chi"** để xuất tệp Excel gửi Ban Chấp Hành.',
-        ],
-        proTip:
-          'Hệ thống tự động đối soát giao dịch VietQR MB Bank mà không cần kiểm tra sao kê thủ công.',
-        speechSummary:
-          'Để quản trị hội phí: Vào mục Quản lý hội phí, tạo đợt thu niên liễm mới, theo dõi tỷ lệ thanh toán và xuất báo cáo kế toán.',
-      },
-      // 25. Giao việc & Quản lý nhiệm vụ điều hành - CRM NGOÀI
-      {
-        id: 'tasks-mgmt',
-        keywords: [
-          'giao việc',
-          'quản lý công việc',
-          'nhiệm vụ điều hành',
-          'bảng kanban',
-          'ban thư ký giao việc',
-        ],
-        featureName:
-          'Giao Việc & Theo Dõi Nhiệm Vụ Điều Hành Liên Ban (Ban Thư Ký)',
-        tourId: 'tasks-admin',
-        route: '/tasks',
-        steps: [
-          'Truy cập màn hình **Quản lý Công việc** (/tasks).',
-          'Bấm **"Giao việc mới"**, nhập tiêu đề nhiệm vụ, chọn Ban chịu trách nhiệm và hạn chót hoàn thành.',
-          'Theo dõi tiến độ trên bảng Kanban trực quan: Cần làm - Đang làm - Đã hoàn thành.',
-          'Kéo thả thẻ nhiệm vụ khi hoàn thành từng khâu chuẩn bị.',
-        ],
-        proTip:
-          'Hệ thống tự động gửi thông báo nhắc việc trước 24 giờ khi sắp đến hạn deadline.',
-        speechSummary:
-          'Để giao việc: Vào Quản lý công việc, bấm Giao việc mới, chọn Ban phụ trách và theo dõi tiến độ trên bảng Kanban.',
-      },
-      // 26. Phân quyền RBAC & Ma trận thẩm quyền - CRM NGOÀI
-      {
-        id: 'permissions-mgmt',
-        keywords: [
-          'phân quyền',
-          'phân quyền rbac',
-          'ma trận quyền',
-          'cấp quyền soát vé',
-          'vai trò quản trị',
-        ],
-        featureName:
-          'Quản Trị Phân Quyền RBAC & Ma Trận Thẩm Quyền (Ban Quản Trị)',
-        tourId: 'permissions-admin',
-        route: '/permissions',
-        steps: [
-          'Truy cập màn hình **Phân quyền** (/permissions).',
-          'Chọn vai trò cần cấu hình: Ban Chấp Hành, Trưởng Ban Truyền Thông, Ban Thư Ký, Hội Viên...',
-          'Gạt bật/tắt các công tắc quyền: Tạo sự kiện, Soát vé, Duyệt hội viên, Xem tài chính...',
-          'Bấm **"Lưu thay đổi"** để áp dụng chính sách bảo mật tức thì trên toàn hệ thống.',
-        ],
-        proTip:
-          'Cấp quyền event:checkin cho nhân sự lễ tân để họ mở được camera soát vé trên app di động.',
-        speechSummary:
-          'Để phân quyền: Vào Quản trị phân quyền, chọn vai trò cần cấu hình, gạt bật tắt các quyền nghiệp vụ và bấm Lưu thay đổi.',
-      },
-      // 27. Quản lý nhà tài trợ & Quyền lợi - CRM NGOÀI
-      {
-        id: 'sponsors-mgmt',
-        keywords: [
-          'nhà tài trợ',
-          'gói tài trợ',
-          'tài trợ kim cương',
-          'quyền lợi tài trợ',
-          'quản lý tài trợ',
-        ],
-        featureName: 'Quản Lý Nhà Tài Trợ & Nghiệm Thu Quyền Lợi (Ban Tài Trợ)',
-        tourId: 'sponsors-admin',
-        route: '/sponsors',
-        steps: [
-          'Truy cập màn hình **Nhà tài trợ** (/sponsors).',
-          'Bấm **"Thêm nhà tài trợ"**, nhập tên doanh nghiệp, người đại diện và gói tài trợ (Kim Cương, Vàng, Bạc).',
-          'Tải lên logo PNG trong suốt để tự động hiển thị trên banner sự kiện và backdrop.',
-          'Bấm **"Báo cáo nghiệm thu"** để xuất file chứng nhận quyền lợi gửi đối tác.',
-        ],
-        proTip:
-          'Đảm bảo thực hiện đầy đủ cam kết quyền lợi để xây dựng mối quan hệ đồng hành bền vững.',
-        speechSummary:
-          'Để quản lý tài trợ: Vào Nhà tài trợ, thêm đơn vị đồng hành mới, tải logo thương hiệu và xuất báo cáo nghiệm thu quyền lợi.',
-      },
-      // 28. Tin nhắn & Hộp thư B2B
-      {
-        id: 'messages-b2b',
-        keywords: [
-          'tin nhắn',
-          'hộp thư',
-          'nhóm ban',
-          'chat b2b',
-          'trò chuyện đối tác',
-        ],
-        featureName: 'Hộp Thư B2B & Nhóm Thảo Luận Ban Chuyên Môn',
-        tourId: 'association-messages',
-        route: '/association/messages',
-        steps: [
-          'Vào mục **Tin nhắn** trên thanh điều hướng.',
-          'Xem các cuộc hội thoại 1-1 với đối tác hoặc chuyển sang tab Nhóm ban chuyên môn.',
-          'Bấm icon kẹp giấy để gửi nhanh danh thiếp điện tử hoặc file báo giá PDF.',
-          'Bấm nút bút soạn tin ở góc phải nếu muốn tạo nhóm thảo luận dự án mới.',
-        ],
-        proTip:
-          '100% đối tác trò chuyện đều là hội viên CEO đã xác thực danh tính.',
-        speechSummary:
-          'Để nhắn tin: Vào mục Tin nhắn, chọn cuộc trò chuyện đối tác, gửi tài liệu báo giá hoặc vào nhóm thảo luận của ban.',
-      },
-    ];
+        // 1. Đăng ký sự kiện
+        {
+          id: 'event-register',
+          keywords: [
+            'đăng ký sự kiện',
+            'sự kiện như nào',
+            'đăng ký vé',
+            'mua vé sự kiện',
+            'lấy vé',
+            'tham gia sự kiện',
+            'lịch sự kiện',
+          ],
+          featureName: 'Đăng Ký Vé Sự Kiện & Hội Nghị',
+          tourId: 'association-events',
+          route: '/association/events',
+          steps: [
+            'Vào màn hình **Sự kiện** từ thanh điều hướng dưới đáy ứng dụng.',
+            'Xem danh sách sự kiện sắp diễn ra, chạm vào thẻ sự kiện bạn quan tâm để xem chi tiết địa điểm, trang phục và sơ đồ bàn tiệc VIP.',
+            'Bấm nút **"Đăng ký tham dự"** ở chân thẻ sự kiện, xác nhận số lượng đại biểu đi cùng.',
+            'Hệ thống tự động cấp mã vé điện tử REG-xxx và hiển thị ngay tại màn hình **Vé Check-in**.',
+          ],
+          proTip:
+            'Học viên chính thức được miễn phí vé Standard và ưu tiên xếp bàn tiệc VIP gần sân khấu.',
+          speechSummary:
+            'Để đăng ký sự kiện: Bước một, vào mục Sự kiện. Bước hai, chọn sự kiện sắp diễn ra. Bước ba, bấm nút Đăng ký tham dự và xác nhận số lượng vé.',
+        },
+        // 2. Vé Check-in QR & Bàn VIP
+        {
+          id: 'checkin-ticket',
+          keywords: [
+            'vé checkin',
+            'vé check in',
+            'mã qr vé',
+            'bàn vip',
+            'số ghế',
+            'vị trí ngồi',
+            'xuất trình vé',
+          ],
+          featureName: 'Vé Check-in QR & Tra Cứu Bàn Tiệc VIP',
+          tourId: 'association-checkin',
+          route: '/association/checkin',
+          steps: [
+            'Mở màn hình **Vé Check-in** từ phím tắt tiện ích trên Trang chủ.',
+            'Xuất trình mã QR động trên thẻ vé VIP cho lễ tân hoặc Ban Truyền Thông quét tại cửa sảnh.',
+            'Xem số bàn tiệc VIP (VD: Bàn VIP 02 - Ghế 04) và mã may mắn tham gia Lucky Draw Gala.',
+          ],
+          proTip:
+            'Khi được quét thành công, vé sẽ đóng mộc xanh ĐÃ CHECK-IN kèm âm thanh xác nhận tức thì.',
+          speechSummary:
+            'Để xuất trình vé check in: Mở mục Vé Check in, đưa mã QR cho lễ tân quét, và xem vị trí bàn tiệc VIP của bạn.',
+        },
+        // 3. Soát vé sự kiện (Ban Truyền Thông)
+        {
+          id: 'checkin-scanner',
+          keywords: [
+            'soát vé',
+            'quét vé',
+            'máy quét',
+            'camera soát vé',
+            'kiểm tra vé',
+            'lễ tân soát',
+          ],
+          featureName: 'Máy Quét Camera & NFC Soát Vé Cổng Sự Kiện',
+          tourId: 'association-checkin',
+          route: '/association/checkin',
+          steps: [
+            'Mở màn hình **Check-in**, hệ thống tự nhận diện nếu bạn thuộc Ban Truyền Thông hoặc Ban Tổ Chức.',
+            'Chuyển sang chế độ **"Máy Quét Camera Check-in"**.',
+            'Hướng ống kính camera vào mã vé QR của đại biểu, màn hình sẽ hiển thị họ tên, doanh nghiệp và số bàn VIP trong 0.5 giây.',
+            'Bấm **"Xác Nhận Check-In"** để hoàn tất đón tiếp đại biểu.',
+          ],
+          proTip:
+            'Máy quét có hỗ trợ chế độ Offline tự lưu nếu sảnh tiệc bị mất kết nối mạng Wifi.',
+          speechSummary:
+            'Để soát vé: Mở mục Check in, bật máy quét camera, lia vào mã vé đại biểu và bấm Xác nhận.',
+        },
+        // 4. Danh thiếp số 5.0 chia sẻ QR
+        {
+          id: 'card-show',
+          keywords: [
+            'danh thiếp số',
+            'card visit',
+            'chia sẻ danh thiếp',
+            'mã qr danh thiếp',
+            'danh thiếp điện tử',
+          ],
+          featureName: 'Thẻ Danh Thiếp Số 5.0 & Chia Sẻ QR',
+          tourId: 'association-card',
+          route: '/association/card',
+          steps: [
+            'Vào màn hình **Danh thiếp** trên thanh điều hướng.',
+            'Chạm vào mã QR trên thẻ danh thiếp 3D để phóng to.',
+            'Đưa cho đối tác dùng camera iPhone hoặc Zalo quét để lưu danh bạ trong 1 giây mà không cần cài app.',
+            'Bấm **"Sao chép liên kết"** để gửi link danh thiếp qua Zalo hoặc SMS.',
+          ],
+          proTip:
+            'Bấm vào logo công ty ở góc phải để cập nhật logo thương hiệu doanh nghiệp của bạn.',
+          speechSummary:
+            'Để chia sẻ danh thiếp số: Vào mục Danh thiếp, chạm mã QR phóng to cho đối tác quét hoặc bấm Sao chép liên kết.',
+        },
+        // 5. Ghi thẻ thông minh NFC
+        {
+          id: 'card-nfc',
+          keywords: [
+            'ghi thẻ nfc',
+            'chạm nfc',
+            'thẻ thông minh nfc',
+            'thẻ kim loại',
+            'ghi chip nfc',
+          ],
+          featureName: 'Ghi Thẻ Thông Minh Không Dây NFC',
+          tourId: 'association-card',
+          route: '/association/card',
+          steps: [
+            'Vào màn hình **Danh thiếp** và chọn mục **"Ghi thẻ NFC"**.',
+            'Bấm nút **"Bắt đầu ghi thẻ"**.',
+            'Áp chiếc thẻ kim loại CEO HN10 vào mặt lưng điện thoại khoảng 2 giây cho đến khi có âm báo thành công.',
+            'Khi chạm thẻ vào lưng điện thoại đối tác, danh thiếp của bạn sẽ tự động bật lên.',
+          ],
+          proTip:
+            'Một chiếc thẻ NFC có thể ghi đè cập nhật lại thông tin hàng triệu lần miễn phí.',
+          speechSummary:
+            'Để ghi thẻ NFC: Vào mục Danh thiếp, bấm Ghi thẻ NFC và áp thẻ vào mặt lưng điện thoại khoảng 2 giây.',
+        },
+        // 6. Quét & bóc tách card visit giấy bằng AI
+        {
+          id: 'card-ai-scan',
+          keywords: [
+            'quét danh thiếp giấy',
+            'chụp danh thiếp',
+            'ai bóc tách',
+            'ocr danh thiếp',
+            'quét card visit ai',
+            'chụp card',
+          ],
+          featureName: 'Chụp & Bóc Tách Card Visit Giấy Bằng AI Vision OCR',
+          tourId: 'association-card',
+          route: '/association/card',
+          steps: [
+            'Vào màn hình **Danh thiếp**, bấm nút **"Chụp danh thiếp"**.',
+            'Hướng camera vào tấm danh thiếp giấy của đối tác hoặc chọn ảnh từ thư viện.',
+            'AI Vision OCR tự động nhận diện và bóc tách: Họ tên, Số điện thoại, Email, Chức vụ và Công ty.',
+            'Kiểm tra lại thông tin và bấm **"Lưu vào danh bạ đối tác"**.',
+          ],
+          proTip:
+            'Giúp số hóa toàn bộ cọc danh thiếp giấy chỉ sau 5 phút hội thảo.',
+          speechSummary:
+            'Để quét card visit bằng AI: Vào Danh thiếp, bấm Chụp danh thiếp, hướng camera chụp card giấy để AI tự bóc tách thông tin.',
+        },
+        // 7. Cài đặt quyền riêng tư danh thiếp
+        {
+          id: 'card-privacy',
+          keywords: [
+            'quyền riêng tư',
+            'bảo mật danh thiếp',
+            'ẩn số điện thoại',
+            'ẩn zalo',
+            'cài đặt danh thiếp',
+          ],
+          featureName: 'Cài Đặt Quyền Riêng Tư & Bảo Mật Danh Thiếp',
+          tourId: 'association-card',
+          route: '/association/card',
+          steps: [
+            'Vào màn hình **Danh thiếp**, bấm nút **"Chỉnh sửa / Quyền riêng tư"**.',
+            'Chủ động bật hoặc tắt hiển thị Số điện thoại di động, Zalo, Email công khai trên web.',
+            'Bấm **"Lưu cài đặt"** để cập nhật ngay lập tức.',
+          ],
+          proTip:
+            'Bạn có thể chọn chỉ hiển thị số máy bàn công ty thay vì số di động cá nhân.',
+          speechSummary:
+            'Để cài đặt quyền riêng tư danh thiếp: Vào Danh thiếp, bấm Chỉnh sửa, bật tắt ẩn hiện số điện thoại và email rồi lưu lại.',
+        },
+        // 8. Tìm kiếm & Tra cứu danh bạ 200+ CEO
+        {
+          id: 'member-search',
+          keywords: [
+            'tìm kiếm Học viên',
+            'danh bạ',
+            'tìm người',
+            'tra cứu ceo',
+            'tìm đối tác',
+            'danh bạ Học viên',
+          ],
+          featureName: 'Tra Cứu Danh Bạ 200+ Lãnh Đạo Doanh Nghiệp',
+          tourId: 'association-members',
+          route: '/association/members',
+          steps: [
+            'Vào màn hình **Danh bạ** từ thanh menu.',
+            'Gõ tên doanh nhân, tên công ty hoặc ngành nghề vào thanh tìm kiếm trên đầu trang.',
+            'Hệ thống lọc tức thì kết quả tìm kiếm theo thời gian thực có dấu và không dấu.',
+            'Chạm vào tên Học viên để xem hồ sơ năng lực 360°.',
+          ],
+          proTip:
+            'Bạn có thể gõ mã Học viên (VD: HN10-001) để tìm đúng lãnh đạo câu lạc bộ.',
+          speechSummary:
+            'Để tìm Học viên: Vào mục Danh bạ, gõ tên lãnh đạo hoặc tên công ty vào thanh tìm kiếm để xem hồ sơ năng lực.',
+        },
+        // 9. Lọc Học viên theo Ban chuyên môn & Ngành nghề
+        {
+          id: 'member-filter',
+          keywords: [
+            'lọc Học viên',
+            'lọc ban',
+            'lọc ngành nghề',
+            'ban truyền thông',
+            'ban tài chính',
+            'xây dựng',
+            'bất động sản',
+          ],
+          featureName: 'Bộ Lọc Học viên Theo Ban Chuyên Môn & Ngành Nghề',
+          tourId: 'association-members',
+          route: '/association/members',
+          steps: [
+            'Mở màn hình **Danh bạ**.',
+            'Vuốt ngang hàng nút bộ lọc ở dưới thanh tìm kiếm.',
+            'Chạm vào ban hoặc ngành nghề cần tìm: Ban Truyền Thông, Ban Tài Chính, Xây dựng, Công nghệ, F&B...',
+            'Danh sách chỉ hiển thị các CEO đang hoạt động trong lĩnh vực đó.',
+          ],
+          proTip: 'Bấm nút "Tất cả" để quay lại danh bạ đầy đủ 200+ thành viên.',
+          speechSummary:
+            'Để lọc Học viên: Vào Danh bạ, vuốt ngang các tag bộ lọc để chọn Ban chuyên môn hoặc Ngành nghề kinh doanh.',
+        },
+        // 10. Hẹn gặp giao thương 1-on-1
+        {
+          id: 'meeting-1on1',
+          keywords: [
+            'hẹn gặp 1-1',
+            'hẹn 1-on-1',
+            'kết nối giao thương',
+            'đặt lịch hẹn',
+            'gặp gỡ đối tác',
+            'bắt tay',
+          ],
+          featureName: 'Gửi Thư Mời Hẹn Giao Thương 1-on-1 Có Mục Đích',
+          tourId: 'association-members',
+          route: '/association/members',
+          steps: [
+            'Mở màn hình **Danh bạ**, tìm Học viên bạn muốn hẹn gặp.',
+            'Bấm biểu tượng **Bắt tay / Kết nối** màu vàng trên góc thẻ Học viên.',
+            'Nhập mục đích cuộc hẹn (VD: Trao đổi hợp tác cung ứng vật liệu) và thời gian đề xuất.',
+            'Bấm **"Gửi thư mời"**. Hệ thống sẽ gửi thông báo đẩy trực tiếp vào hộp thư đối tác.',
+          ],
+          proTip:
+            'Văn hóa CEO HN10: Không hẹn vu vơ, mọi cuộc gặp đều có mục tiêu giao thương rõ ràng.',
+          speechSummary:
+            'Để hẹn gặp một-một: Tìm Học viên trong danh bạ, bấm nút Bắt tay, nhập mục đích cuộc hẹn và bấm Gửi thư mời.',
+        },
+        // 11. Sàn Cơ hội kinh doanh B2B
+        {
+          id: 'opportunity-post',
+          keywords: [
+            'đăng cơ hội',
+            'sàn cơ hội',
+            'cung cầu',
+            'tìm mua hàng',
+            'chào bán dự án',
+            'hợp tác kinh doanh',
+          ],
+          featureName: 'Sàn Cơ Hội Kinh Doanh & Đăng Tin Cung - Cầu B2B',
+          tourId: 'association-opportunities',
+          route: '/association/opportunities',
+          steps: [
+            'Vào màn hình **Cơ hội** từ thanh điều hướng.',
+            'Xem các tab phân loại: Tất cả, Cung cấp (Supply), Tìm mua (Demand) và Hợp tác.',
+            'Bấm nút **"Đăng cơ hội ngay →"** ở chân trang.',
+            'Nhập tiêu đề, mô tả nhu cầu, ngân sách dự kiến, tải ảnh minh họa và bấm Đăng tin.',
+          ],
+          proTip:
+            'Các cơ hội từ 500 triệu trở lên được Ban Xúc Tiến Thương Mại hỗ trợ bảo trợ pháp lý.',
+          speechSummary:
+            'Để đăng cơ hội kinh doanh: Vào mục Cơ hội, bấm Đăng cơ hội ngay, nhập nhu cầu cung cầu cùng ngân sách và đăng tin.',
+        },
+        // 12. Chợ B2B Marketplace & Gian hàng số
+        {
+          id: 'b2b-explore',
+          keywords: [
+            'chợ b2b',
+            'sàn b2b',
+            'marketplace',
+            'gian hàng',
+            'sản phẩm sỉ',
+            'chiết khấu vip',
+            'mua hàng nội khối',
+          ],
+          featureName: 'Chợ B2B Marketplace & Ưu Đãi Độc Quyền CEO HN10',
+          tourId: 'association-products',
+          route: '/association/products',
+          steps: [
+            'Vào màn hình **Sản phẩm** trên thanh menu.',
+            'Duyệt tìm sản phẩm thiết bị, nguyên vật liệu hoặc dịch vụ đang giảm giá ưu đãi.',
+            'Xem chi tiết tỷ lệ chiết khấu dành riêng cho Học viên có thẻ VIP Gold.',
+            'Bấm **"Yêu cầu báo giá"** hoặc **"Nhắn tin"** để thương lượng trực tiếp với CEO đơn vị bán.',
+          ],
+          proTip:
+            'Ưu tiên dùng hàng của nhau, gia tăng doanh số và tạo dòng tiền nội khối.',
+          speechSummary:
+            'Để mua sắm trên Chợ B2B: Vào mục Sản phẩm, duyệt gian hàng, xem chiết khấu VIP và bấm Nhắn tin để thương lượng.',
+        },
+        // 13. Đăng bán sản phẩm lên sàn B2B
+        {
+          id: 'b2b-sell',
+          keywords: [
+            'đăng bán sản phẩm',
+            'bán hàng b2b',
+            'tạo sản phẩm mới',
+            'đăng tin bán',
+            'mục của tôi',
+          ],
+          featureName: 'Đăng Bán Sản Phẩm Mới Lên Gian Hàng B2B',
+          tourId: 'association-products',
+          route: '/association/products',
+          steps: [
+            'Vào màn hình **Sản phẩm**, chuyển sang tab **"Mục của tôi"**.',
+            'Bấm nút **"Đăng bán sản phẩm"**.',
+            'Chụp ảnh sản phẩm vuông 1:1, điền tên mặt hàng, giá niêm yết và tỷ lệ chiết khấu cho CLB.',
+            'Bấm **"Lưu và đăng bán"**. Sản phẩm xuất hiện ngay lập tức trên Marketplace.',
+          ],
+          proTip:
+            'Mở rộng kênh phân phối chất lượng cao với chi phí marketing 0 đồng.',
+          speechSummary:
+            'Để đăng bán sản phẩm: Vào mục Sản phẩm, chuyển sang tab Mục của tôi, bấm Đăng bán sản phẩm và nhập thông tin giá bán.',
+        },
+        // 14. Biểu quyết Đại hội & Bầu cử BCH
+        {
+          id: 'voting-poll',
+          keywords: [
+            'biểu quyết',
+            'bỏ phiếu',
+            'bầu cử',
+            'bầu ban chấp hành',
+            'bầu bch',
+            'nghị quyết',
+          ],
+          featureName: 'Biểu Quyết Đại Hội & Bỏ Phiếu Số Kín',
+          tourId: 'association-voting',
+          route: '/association/voting',
+          steps: [
+            'Mở màn hình **Biểu quyết** từ Trang chủ.',
+            'Xem các cuộc bỏ phiếu đang mở, đọc lý lịch trích ngang của ứng viên hoặc nội dung đề án sửa đổi Điều lệ.',
+            'Tích chọn ứng cử viên bạn tín nhiệm và nhập ý kiến đóng góp.',
+            'Bấm **"Gửi phiếu bầu"** an toàn, bảo mật tuyệt đối danh tính.',
+          ],
+          proTip:
+            'Mỗi Học viên chính thức không nợ phí có 01 phiếu bầu duy nhất theo nguyên tắc dân chủ.',
+          speechSummary:
+            'Để biểu quyết: Mở mục Biểu quyết, xem danh sách ứng viên, tích chọn người bạn tín nhiệm và bấm Gửi phiếu bầu.',
+        },
+        // 15. Vòng quay may mắn Lucky Draw Gala
+        {
+          id: 'voting-lucky',
+          keywords: [
+            'lucky draw',
+            'vòng quay may mắn',
+            'quay số',
+            'trúng thưởng',
+            'bốc thăm gala',
+            'quà tặng',
+          ],
+          featureName: 'Vòng Quay Số May Mắn Lucky Draw Gala Dinner',
+          tourId: 'association-voting',
+          route: '/association/voting',
+          steps: [
+            'Vào màn hình **Biểu quyết**, chuyển sang tab **"Quay số trúng thưởng"**.',
+            'Theo dõi vòng quay số may mắn thời gian thực kết nối với màn hình LED sân khấu chính.',
+            'Mã số vé may mắn tại Màn hình Vé Check-in của bạn sẽ tự động nằm trong thùng phiếu điện tử.',
+            'Nếu trúng giải, màn hình điện thoại của bạn sẽ nổ pháo hoa chúc mừng!',
+          ],
+          proTip:
+            'Giữ kết nối Wifi/4G ổn định để nhận thông báo trúng giải ngay tức thì.',
+          speechSummary:
+            'Để tham gia Lucky Draw: Vào mục Biểu quyết, chuyển sang tab Quay số trúng thưởng và theo dõi màn hình khi MC quay số.',
+        },
+        // 16. Đóng hội phí thường niên VietQR MB Bank
+        {
+          id: 'dues-pay',
+          keywords: [
+            'đóng hội phí',
+            'nộp tiền hội phí',
+            'quét vietqr',
+            'chuyển khoản mb',
+            'phí niên liễm',
+            'thanh toán hội phí',
+          ],
+          featureName: 'Tra Cứu & Đóng Hội Phí Thường Niên Qua VietQR MB Bank',
+          tourId: 'association-profile',
+          route: '/association/profile',
+          steps: [
+            'Vào màn hình **Cá nhân** (Hồ sơ), chạm vào mục **"Hội phí & Hóa đơn"**.',
+            'Kiểm tra số tiền niên liễm chưa đóng và hạn thanh toán.',
+            'Bấm nút **"Quét mã VietQR"**.',
+            'Mở app ngân hàng bất kỳ (MB Bank, Vietcombank...) quét mã QR, hệ thống tự động điền STK 1010000000, số tiền và cú pháp.',
+            'Sau khi chuyển khoản, thẻ Học viên tự động cập nhật trạng thái Đã Hoàn Thành.',
+          ],
+          proTip:
+            'MB Bank là ngân hàng đối tác chiến lược của CEO HN10 với đầu số tài khoản VIP 1010000000.',
+          speechSummary:
+            'Để đóng hội phí: Vào mục Cá nhân, chọn Hội phí, bấm Quét mã VietQR và dùng app ngân hàng quét mã chuyển khoản tự động.',
+        },
+        // 17. Kho Văn bản, Điều lệ & Kỷ yếu
+        {
+          id: 'documents-download',
+          keywords: [
+            'tải điều lệ',
+            'quy chế',
+            'kỷ yếu',
+            'văn bản',
+            'tài liệu',
+            'thư viện',
+            'nghị quyết bch',
+          ],
+          featureName: 'Kho Văn Bản, Điều Lệ & Kỷ Yếu Doanh Nhân',
+          tourId: 'association-library',
+          route: '/association/library',
+          steps: [
+            'Vào màn hình **Tài liệu** (Thư viện số) trên menu.',
+            'Gõ từ khóa vào ô tìm kiếm: "Điều lệ", "Quy chế" hoặc "Kỷ yếu".',
+            'Chạm vào tên văn bản để xem tóm tắt nội dung và đơn vị ban hành.',
+            'Bấm icon **Tải xuống** để lưu file PDF về máy điện thoại hoặc bấm **Chia sẻ** qua Zalo.',
+          ],
+          proTip:
+            'Toàn bộ văn bản pháp quy chính thức được số hóa và ký duyệt số.',
+          speechSummary:
+            'Để xem tài liệu: Vào mục Thư viện tài liệu, tìm văn bản Điều lệ hoặc Kỷ yếu và bấm nút Tải xuống PDF.',
+        },
+        // 18. Đổi ảnh đại diện & ảnh bìa thẻ VIP Gold
+        {
+          id: 'profile-avatar',
+          keywords: [
+            'đổi ảnh đại diện',
+            'đổi avatar',
+            'ảnh bìa',
+            'sửa hồ sơ',
+            'cập nhật ảnh',
+            'thay ảnh',
+          ],
+          featureName: 'Cập Nhật Ảnh Đại Diện & Ảnh Bìa Thẻ VIP Gold',
+          tourId: 'association-profile',
+          route: '/association/profile',
+          steps: [
+            'Mở màn hình **Cá nhân** hoặc Trang chủ.',
+            'Bấm icon cây bút chì ở góc dưới bên phải thẻ Học viên VIP.',
+            'Chọn **"Đổi ảnh đại diện"** hoặc **"Đổi ảnh bìa"** từ thư viện ảnh máy.',
+            'Cắt chỉnh ảnh theo ý muốn và bấm **"Lưu thay đổi"**.',
+          ],
+          proTip:
+            'Chọn ảnh chân dung doanh nhân sang trọng để đối tác ấn tượng ngay khi quét danh thiếp.',
+          speechSummary:
+            'Để đổi ảnh đại diện: Vào mục Cá nhân, bấm biểu tượng bút chì trên thẻ Học viên, chọn ảnh mới từ máy và bấm Lưu.',
+        },
+        // 19. Tùy biến giao diện Sáng / Tối / Chủ đề Lễ Hội
+        {
+          id: 'profile-theme',
+          keywords: [
+            'đổi giao diện',
+            'chủ đề lễ hội',
+            'giao diện tối',
+            'chủ đề tết',
+            'dark mode',
+            'chủ đề',
+          ],
+          featureName: 'Tùy Biến Giao Diện Sáng / Tối & Chủ Đề Lễ Hội',
+          tourId: 'association-profile',
+          route: '/association/profile',
+          steps: [
+            'Vào màn hình **Cá nhân**, chọn mục **"Chủ đề giao diện"**.',
+            'Chọn phong cách yêu thích: Giao diện Sáng (Executive Light), Tối (CEO Dark) hoặc Chủ đề Lễ Hội (Festival Gala).',
+            'Màu sắc ứng dụng sẽ biến đổi ngay lập tức.',
+          ],
+          proTip:
+            'Vào dịp Tết Nguyên Đán, chủ đề Lễ Hội sẽ có hiệu ứng hoa đào và pháo hoa rực rỡ.',
+          speechSummary:
+            'Để đổi giao diện: Vào mục Cá nhân, chọn Chủ đề giao diện, chọn Sáng, Tối hoặc Lễ hội theo sở thích của bạn.',
+        },
+        // 20. Cài đặt PWA lên màn hình điện thoại
+        {
+          id: 'pwa-install',
+          keywords: [
+            'cài đặt app',
+            'cài pwa',
+            'thêm vào màn hình chính',
+            'tải app',
+            'cài đặt ứng dụng',
+          ],
+          featureName: 'Cài Đặt Ứng Dụng PWA Lên Màn Hình Chính Điện Thoại',
+          tourId: 'association-profile',
+          route: '/association/profile',
+          steps: [
+            'Nếu dùng iPhone: Bấm nút **Chia sẻ** trên trình duyệt Safari, cuộn xuống chọn **"Thêm vào Màn hình chính"** (Add to Home Screen).',
+            'Nếu dùng Android: Bấm icon 3 chấm trên trình duyệt Chrome, chọn **"Cài đặt ứng dụng"**.',
+            'Icon CEO HN10 sẽ xuất hiện trên màn hình điện thoại, mở lên dùng mượt mà toàn màn hình không có thanh địa chỉ.',
+          ],
+          proTip:
+            'Công nghệ Progressive Web App giúp cập nhật tính năng mới tự động mà không cần vào App Store.',
+          speechSummary:
+            'Để cài app: Mở Safari chọn Chia sẻ rồi Thêm vào màn hình chính, hoặc trên Chrome chọn Cài đặt ứng dụng.',
+        },
+        // 21. Hotline 5 Ban Chuyên Môn
+        {
+          id: 'hotline-support',
+          keywords: [
+            'hotline',
+            'liên hệ ban',
+            'số điện thoại hỗ trợ',
+            'ban chuyên môn',
+            'trợ giúp',
+            'tổng đài',
+          ],
+          featureName: 'Hotline Trực Tiếp 5 Ban Chuyên Môn Hiệp Hội',
+          tourId: 'association-profile',
+          route: '/association/profile',
+          steps: [
+            'Vào màn hình **Cá nhân**, chọn mục **"Liên hệ 5 Ban Chuyên Môn"**.',
+            'Chọn ban phụ trách vấn đề bạn cần: Ban Truyền Thông (soát vé), Ban Thư Ký (hồ sơ), Ban Tài Chính (hội phí)...',
+            'Bấm gọi điện thoại trực tiếp hoặc mở chat Zalo OA với Trưởng ban.',
+          ],
+          proTip:
+            'Ban Thư Ký túc trực 24/7 để giải đáp mọi thắc mắc của quý Học viên.',
+          speechSummary:
+            'Để gọi hotline: Vào mục Cá nhân, chọn Liên hệ Ban chuyên môn, chọn ban cần hỗ trợ và bấm nút gọi điện hoặc Zalo.',
+        },
+        // 22. Tạo sự kiện mới & Quản lý vé (Ban Tổ Chức) - CRM NGOÀI
+        {
+          id: 'event-create',
+          keywords: [
+            'tạo sự kiện',
+            'quản trị sự kiện',
+            'thêm sự kiện',
+            'ban tổ chức sự kiện',
+            'tạo hội nghị',
+            'crm sự kiện',
+          ],
+          featureName: 'Tạo Sự Kiện Mới & Quản Trị Đại Biểu (Ban Tổ Chức)',
+          tourId: 'events-admin',
+          route: '/events',
+          steps: [
+            'Truy cập màn hình **Quản trị Sự kiện** (/events).',
+            'Bấm nút **"Tạo sự kiện"** màu xanh ở góc trên bên phải.',
+            'Điền Tên sự kiện, Thời gian khai mạc, Địa điểm tổ chức, Sức chứa đại biểu và Trang phục (Dresscode).',
+            'Cấu hình gói tài trợ và bấm **"Lưu sự kiện"**. Hệ thống mở bán vé ngay lập tức.',
+          ],
+          proTip:
+            'Bạn có thể xuất danh sách khách mời đăng ký dạng Excel để in thẻ đeo trước giờ G.',
+          speechSummary:
+            'Để tạo sự kiện mới: Vào trang Quản trị sự kiện, bấm Tạo sự kiện mới, điền thông tin địa điểm thời gian và bấm Lưu.',
+        },
+        // 23. Quản lý Học viên CRM & Phê duyệt kết nạp - CRM NGOÀI
+        {
+          id: 'members-crm',
+          keywords: [
+            'quản lý Học viên crm',
+            'phê duyệt Học viên',
+            'kết nạp Học viên',
+            'cấp mã m1983',
+            'thẩm định Học viên',
+          ],
+          featureName:
+            'Quản Lý Hồ Sơ Học viên CRM & Phê Duyệt Kết Nạp (Ban Học viên)',
+          tourId: 'members-admin',
+          route: '/members',
+          steps: [
+            'Truy cập màn hình **Quản lý Học viên** (/members).',
+            'Kiểm tra danh sách hồ sơ ở cột "Chờ phê duyệt".',
+            'Xem thông tin doanh nghiệp, xác nhận năm sinh 1983 và bấm **"Phê duyệt"**.',
+            'Hệ thống tự động cấp mã định danh HN10-xxx và gửi email chào mừng chính thức.',
+          ],
+          proTip:
+            'Chỉ định đúng ban chuyên môn để Học viên tham gia các buổi sinh hoạt chuyên sâu.',
+          speechSummary:
+            'Để quản lý Học viên: Vào Quản lý Học viên, kiểm tra hồ sơ chờ duyệt, xác nhận thông tin và bấm Phê duyệt cấp mã M1983.',
+        },
+        // 24. Quản trị hội phí & Thu chi - CRM NGOÀI
+        {
+          id: 'finance-mgmt',
+          keywords: [
+            'quản trị hội phí',
+            'tạo đợt thu',
+            'kế toán hiệp hội',
+            'báo cáo tài chính',
+            'đối soát ngân hàng',
+            'thu chi',
+          ],
+          featureName:
+            'Quản Trị Hội Phí & Kế Toán Thu Chi Minh Bạch (Ban Tài Chính)',
+          tourId: 'fees-admin',
+          route: '/fees',
+          steps: [
+            'Truy cập màn hình **Quản lý Hội phí** (/fees).',
+            'Bấm **"Tạo đợt thu mới"**, nhập mức niên liễm năm và phát hành cho toàn thể Học viên.',
+            'Theo dõi tỷ lệ thanh toán thời gian thực qua biểu đồ trực quan.',
+            'Bấm **"Báo cáo thu chi"** để xuất tệp Excel gửi Ban Chấp Hành.',
+          ],
+          proTip:
+            'Hệ thống tự động đối soát giao dịch VietQR MB Bank mà không cần kiểm tra sao kê thủ công.',
+          speechSummary:
+            'Để quản trị hội phí: Vào mục Quản lý hội phí, tạo đợt thu niên liễm mới, theo dõi tỷ lệ thanh toán và xuất báo cáo kế toán.',
+        },
+        // 25. Giao việc & Quản lý nhiệm vụ điều hành - CRM NGOÀI
+        {
+          id: 'tasks-mgmt',
+          keywords: [
+            'giao việc',
+            'quản lý công việc',
+            'nhiệm vụ điều hành',
+            'bảng kanban',
+            'ban thư ký giao việc',
+          ],
+          featureName:
+            'Giao Việc & Theo Dõi Nhiệm Vụ Điều Hành Liên Ban (Ban Thư Ký)',
+          tourId: 'tasks-admin',
+          route: '/tasks',
+          steps: [
+            'Truy cập màn hình **Quản lý Công việc** (/tasks).',
+            'Bấm **"Giao việc mới"**, nhập tiêu đề nhiệm vụ, chọn Ban chịu trách nhiệm và hạn chót hoàn thành.',
+            'Theo dõi tiến độ trên bảng Kanban trực quan: Cần làm - Đang làm - Đã hoàn thành.',
+            'Kéo thả thẻ nhiệm vụ khi hoàn thành từng khâu chuẩn bị.',
+          ],
+          proTip:
+            'Hệ thống tự động gửi thông báo nhắc việc trước 24 giờ khi sắp đến hạn deadline.',
+          speechSummary:
+            'Để giao việc: Vào Quản lý công việc, bấm Giao việc mới, chọn Ban phụ trách và theo dõi tiến độ trên bảng Kanban.',
+        },
+        // 26. Phân quyền RBAC & Ma trận thẩm quyền - CRM NGOÀI
+        {
+          id: 'permissions-mgmt',
+          keywords: [
+            'phân quyền',
+            'phân quyền rbac',
+            'ma trận quyền',
+            'cấp quyền soát vé',
+            'vai trò quản trị',
+          ],
+          featureName:
+            'Quản Trị Phân Quyền RBAC & Ma Trận Thẩm Quyền (Ban Quản Trị)',
+          tourId: 'permissions-admin',
+          route: '/permissions',
+          steps: [
+            'Truy cập màn hình **Phân quyền** (/permissions).',
+            'Chọn vai trò cần cấu hình: Ban Chấp Hành, Trưởng Ban Truyền Thông, Ban Thư Ký, Học viên...',
+            'Gạt bật/tắt các công tắc quyền: Tạo sự kiện, Soát vé, Duyệt Học viên, Xem tài chính...',
+            'Bấm **"Lưu thay đổi"** để áp dụng chính sách bảo mật tức thì trên toàn hệ thống.',
+          ],
+          proTip:
+            'Cấp quyền event:checkin cho nhân sự lễ tân để họ mở được camera soát vé trên app di động.',
+          speechSummary:
+            'Để phân quyền: Vào Quản trị phân quyền, chọn vai trò cần cấu hình, gạt bật tắt các quyền nghiệp vụ và bấm Lưu thay đổi.',
+        },
+        // 27. Quản lý nhà tài trợ & Quyền lợi - CRM NGOÀI
+        {
+          id: 'sponsors-mgmt',
+          keywords: [
+            'nhà tài trợ',
+            'gói tài trợ',
+            'tài trợ kim cương',
+            'quyền lợi tài trợ',
+            'quản lý tài trợ',
+          ],
+          featureName: 'Quản Lý Nhà Tài Trợ & Nghiệm Thu Quyền Lợi (Ban Tài Trợ)',
+          tourId: 'sponsors-admin',
+          route: '/sponsors',
+          steps: [
+            'Truy cập màn hình **Nhà tài trợ** (/sponsors).',
+            'Bấm **"Thêm nhà tài trợ"**, nhập tên doanh nghiệp, người đại diện và gói tài trợ (Kim Cương, Vàng, Bạc).',
+            'Tải lên logo PNG trong suốt để tự động hiển thị trên banner sự kiện và backdrop.',
+            'Bấm **"Báo cáo nghiệm thu"** để xuất file chứng nhận quyền lợi gửi đối tác.',
+          ],
+          proTip:
+            'Đảm bảo thực hiện đầy đủ cam kết quyền lợi để xây dựng mối quan hệ đồng hành bền vững.',
+          speechSummary:
+            'Để quản lý tài trợ: Vào Nhà tài trợ, thêm đơn vị đồng hành mới, tải logo thương hiệu và xuất báo cáo nghiệm thu quyền lợi.',
+        },
+        // 28. Tin nhắn & Hộp thư B2B
+        {
+          id: 'messages-b2b',
+          keywords: [
+            'tin nhắn',
+            'hộp thư',
+            'nhóm ban',
+            'chat b2b',
+            'trò chuyện đối tác',
+          ],
+          featureName: 'Hộp Thư B2B & Nhóm Thảo Luận Ban Chuyên Môn',
+          tourId: 'association-messages',
+          route: '/association/messages',
+          steps: [
+            'Vào mục **Tin nhắn** trên thanh điều hướng.',
+            'Xem các cuộc hội thoại 1-1 với đối tác hoặc chuyển sang tab Nhóm ban chuyên môn.',
+            'Bấm icon kẹp giấy để gửi nhanh danh thiếp điện tử hoặc file báo giá PDF.',
+            'Bấm nút bút soạn tin ở góc phải nếu muốn tạo nhóm thảo luận dự án mới.',
+          ],
+          proTip:
+            '100% đối tác trò chuyện đều là Học viên CEO đã xác thực danh tính.',
+          speechSummary:
+            'Để nhắn tin: Vào mục Tin nhắn, chọn cuộc trò chuyện đối tác, gửi tài liệu báo giá hoặc vào nhóm thảo luận của ban.',
+        },
+      ];
 
     // Duyệt qua ma trận tính năng để tìm tính năng khớp với câu hỏi người dùng
     for (const fg of FEATURE_GUIDES) {
@@ -3694,7 +3692,7 @@ QUY TẮC PHÂN TÍCH NGỮ CẢNH CÂU HỎI (BẮT BUỘC):
       q.includes('ở đâu') ||
       q.includes('tính năng')
     ) {
-      const answer = `🗺️ **Trung Tâm Hướng Dẫn Sử Dụng CLB Doanh Nhân CEO HN10:**\n\nỨng dụng hỗ trợ đầy đủ toàn bộ chức năng trong và ngoài:\n1. 🎟️ **Sự kiện & Hội nghị:** Đăng ký vé, xem lịch sinh hoạt ban, sơ đồ bàn VIP.\n2. 🎫 **Vé Check-in:** Quét QR tại cổng, máy quét dành cho Ban Truyền Thông.\n3. 📇 **Danh thiếp số 5.0:** Chạm thẻ thông minh NFC, quét card visit bằng AI.\n4. 👥 **Danh bạ 200+ CEO:** Lọc ngành nghề, gửi thư mời hẹn gặp 1-on-1.\n5. 💼 **Sàn Giao thương B2B & Chợ Marketplace:** Đăng tin Cung - Cầu, bán sản phẩm.\n6. 🗳️ **Biểu quyết & Lucky Draw:** Bỏ phiếu bầu BCH, quay số may mắn Gala.\n7. 💳 **Hội phí & Hóa đơn:** Đóng phí niên liễm qua VietQR MB Bank tự động.\n8. 🏛️ **Quản trị CRM Ngoài:** Tạo sự kiện mới, duyệt hội viên, giao việc, phân quyền RBAC.\n\n⚡ **Đang tự động chuyển màn hình sang Trang Chủ để Quý Anh/Chị thao tác ngay...**`;
+      const answer = `🗺️ **Trung Tâm Hướng Dẫn Sử Dụng CLB Doanh Nhân CEO HN10:**\n\nỨng dụng hỗ trợ đầy đủ toàn bộ chức năng trong và ngoài:\n1. 🎟️ **Sự kiện & Hội nghị:** Đăng ký vé, xem lịch sinh hoạt ban, sơ đồ bàn VIP.\n2. 🎫 **Vé Check-in:** Quét QR tại cổng, máy quét dành cho Ban Truyền Thông.\n3. 📇 **Danh thiếp số 5.0:** Chạm thẻ thông minh NFC, quét card visit bằng AI.\n4. 👥 **Danh bạ 200+ CEO:** Lọc ngành nghề, gửi thư mời hẹn gặp 1-on-1.\n5. 💼 **Sàn Giao thương B2B & Chợ Marketplace:** Đăng tin Cung - Cầu, bán sản phẩm.\n6. 🗳️ **Biểu quyết & Lucky Draw:** Bỏ phiếu bầu BCH, quay số may mắn Gala.\n7. 💳 **Hội phí & Hóa đơn:** Đóng phí niên liễm qua VietQR MB Bank tự động.\n8. 🏛️ **Quản trị CRM Ngoài:** Tạo sự kiện mới, duyệt Học viên, giao việc, phân quyền RBAC.\n\n⚡ **Đang tự động chuyển màn hình sang Trang Chủ để Quý Anh/Chị thao tác ngay...**`;
 
       const speechText = `Ứng dụng CEO HN10 hỗ trợ đầy đủ các tính năng: Đăng ký sự kiện, Danh thiếp NFC, Check in vé QR, Danh bạ 200 CEO, Sàn B2B, Biểu quyết và Đóng hội phí VietQR. Em chuyển sang Trang chủ cho Quý Anh/Chị ngay đây ạ!`;
 
@@ -3715,11 +3713,11 @@ QUY TẮC PHÂN TÍCH NGỮ CẢNH CÂU HỎI (BẮT BUỘC):
     if (
       q.includes('tôi là ai') ||
       q.includes('thông tin của tôi') ||
-      q.includes('mã hội viên') ||
+      q.includes('mã Học viên') ||
       q.includes('hồ sơ của tôi')
     ) {
-      const answer = `👤 **Hồ sơ Hội viên của Quý Anh/Chị:**\n\n- **Họ tên:** **${context.user.name}**\n- **Mã hội viên:** \`${context.user.code}\`\n- **Doanh nghiệp:** ${context.user.company}\n- **Chức vụ:** ${context.user.title}\n- **Hạng thẻ:** ⭐ **${context.user.level}**\n- **Ban chuyên môn:** ${context.user.department}\n- **Trạng thái:** ${context.dues.feePaid ? '🟢 Đã nộp hội phí' : '🟡 Còn khoản phí chờ nộp'}\n\n👉 **Quý Anh/Chị có muốn tôi hướng dẫn thao tác trực tiếp xem và chỉnh sửa hồ sơ không?**`;
-      const speechText = `Xin chào ${context.user.name}, mã hội viên của anh chị là ${context.user.code}, chức vụ ${context.user.title} tại ${context.user.company}. Anh chị có muốn tôi hướng dẫn thao tác trực tiếp xem hồ sơ không?`;
+      const answer = `👤 **Hồ sơ Học viên của Quý Anh/Chị:**\n\n- **Họ tên:** **${context.user.name}**\n- **Mã Học viên:** \`${context.user.code}\`\n- **Doanh nghiệp:** ${context.user.company}\n- **Chức vụ:** ${context.user.title}\n- **Hạng thẻ:** ⭐ **${context.user.level}**\n- **Ban chuyên môn:** ${context.user.department}\n- **Trạng thái:** ${context.dues.feePaid ? '🟢 Đã nộp hội phí' : '🟡 Còn khoản phí chờ nộp'}\n\n👉 **Quý Anh/Chị có muốn tôi hướng dẫn thao tác trực tiếp xem và chỉnh sửa hồ sơ không?**`;
+      const speechText = `Xin chào ${context.user.name}, mã Học viên của anh chị là ${context.user.code}, chức vụ ${context.user.title} tại ${context.user.company}. Anh chị có muốn tôi hướng dẫn thao tác trực tiếp xem hồ sơ không?`;
 
       return {
         answer,
@@ -3771,7 +3769,7 @@ QUY TẮC PHÂN TÍCH NGỮ CẢNH CÂU HỎI (BẮT BUỘC):
       q.includes('khó khăn') ||
       q.includes('vất vả')
     ) {
-      const answer = `☕ **Dạ em rất thấu hiểu và chia sẻ cùng Quý Anh/Chị ${context.user.name}!**\n\nLàm người đứng đầu doanh nghiệp, lèo lái con thuyền trong thương trường luôn đối diện với muôn vàn khó khăn và áp lực. Anh/Chị hãy hít một hơi thật sâu, uống một ngụm nước ấm hoặc tách cà phê để thư giãn nhé!\n\nTinh thần doanh nhân **CEO HN10** - tuổi Quý Hợi kiên cường, bản lĩnh - luôn đồng hành và sẻ chia cùng nhau qua phương châm *"Gắn kết bền - Phát triển vững"*. Khi mệt mỏi, Anh/Chị có thể gặp gỡ anh em hội viên kết nối 1-on-1 hoặc tham gia các buổi Cà phê Doanh nhân để cùng tìm giải pháp và nạp lại năng lượng nhé ạ!`;
+      const answer = `☕ **Dạ em rất thấu hiểu và chia sẻ cùng Quý Anh/Chị ${context.user.name}!**\n\nLàm người đứng đầu doanh nghiệp, lèo lái con thuyền trong thương trường luôn đối diện với muôn vàn khó khăn và áp lực. Anh/Chị hãy hít một hơi thật sâu, uống một ngụm nước ấm hoặc tách cà phê để thư giãn nhé!\n\nTinh thần doanh nhân **CEO HN10** - tuổi Quý Hợi kiên cường, bản lĩnh - luôn đồng hành và sẻ chia cùng nhau qua phương châm *"Gắn kết bền - Phát triển vững"*. Khi mệt mỏi, Anh/Chị có thể gặp gỡ anh em Học viên kết nối 1-on-1 hoặc tham gia các buổi Cà phê Doanh nhân để cùng tìm giải pháp và nạp lại năng lượng nhé ạ!`;
       const speechText = `Em hiểu làm lãnh đạo doanh nghiệp luôn đối diện nhiều áp lực. Anh chị hãy thư giãn, uống một tách trà nhé! Tinh thần anh em CEO HN10 luôn đồng hành và sẻ chia cùng anh chị ạ!`;
 
       return {
@@ -3816,7 +3814,7 @@ QUY TẮC PHÂN TÍCH NGỮ CẢNH CÂU HỎI (BẮT BUỘC):
       q.includes('quán ăn') ||
       q.includes('nhà hàng')
     ) {
-      const answer = `🍽️ **Gợi ý không gian tiếp khách & giao lưu cho Doanh nhân:**\n\n- ☕ **Cà phê kết nối nhanh:** Các không gian yên tĩnh, lịch sự gần Duy Tân, Cầu Giấy hoặc Trung Hòa Nhân Chính (Highlands, The Coffee House, Trung Nguyên Legend).\n- 🍱 **Ăn trưa & Ăn tối tiếp đối tác:** Nhà hàng tiệc sang trọng tại Trống Đồng Palace, Trung tâm Hội nghị Quốc gia, hoặc các nhà hàng ẩm thực cao cấp quanh khu vực Tây Hồ.\n- 🤝 **Hẹn 1-on-1 trực tiếp:** Anh/Chị có thể vào mục **"Danh bạ"** để chọn hội viên và đặt lịch hẹn kết nối 1-on-1 chính thức!\n\n👉 *Quý Anh/Chị có muốn em dẫn đường mở Danh bạ hội viên để hẹn gặp đối tác ngay không ạ?*`;
+      const answer = `🍽️ **Gợi ý không gian tiếp khách & giao lưu cho Doanh nhân:**\n\n- ☕ **Cà phê kết nối nhanh:** Các không gian yên tĩnh, lịch sự gần Duy Tân, Cầu Giấy hoặc Trung Hòa Nhân Chính (Highlands, The Coffee House, Trung Nguyên Legend).\n- 🍱 **Ăn trưa & Ăn tối tiếp đối tác:** Nhà hàng tiệc sang trọng tại Trống Đồng Palace, Trung tâm Hội nghị Quốc gia, hoặc các nhà hàng ẩm thực cao cấp quanh khu vực Tây Hồ.\n- 🤝 **Hẹn 1-on-1 trực tiếp:** Anh/Chị có thể vào mục **"Danh bạ"** để chọn Học viên và đặt lịch hẹn kết nối 1-on-1 chính thức!\n\n👉 *Quý Anh/Chị có muốn em dẫn đường mở Danh bạ Học viên để hẹn gặp đối tác ngay không ạ?*`;
       const speechText = `Em gợi ý anh chị các điểm hẹn yên tĩnh tại Cầu Giấy hoặc Tây Hồ để tiếp đối tác. Anh chị có thể mở mục Danh bạ để đặt lịch hẹn kết nối một một nhé ạ!`;
 
       return {
@@ -3842,7 +3840,7 @@ QUY TẮC PHÂN TÍCH NGỮ CẢNH CÂU HỎI (BẮT BUỘC):
       q.includes('hợp tác') ||
       q.includes('cơ hội kinh doanh')
     ) {
-      const answer = `🤝 **Chiến lược Kết nối & Khai thác Mạng lưới 200+ CEO HN10:**\n\nCộng đồng CEO HN10 quy tụ các doanh nhân tinh hoa trong nhiều lĩnh vực: Bất động sản, Xây dựng, Công nghệ, Y tế, Giáo dục, Dịch vụ... Em gợi ý Anh/Chị:\n1. 📇 **Xuất trình Danh thiếp số & Chạm thẻ NFC:** Giới thiệu nhanh hồ sơ năng lực doanh nghiệp khi tham gia các buổi sinh hoạt.\n2. 🛍️ **Đăng sản phẩm lên Chợ B2B:** Đưa sản phẩm chủ lực vào Sàn giao thương với chính sách ưu đãi dành riêng cho hội viên.\n3. 📅 **Chủ động đặt lịch hẹn 1-on-1:** Kết nối sâu với từng doanh nghiệp cùng hệ sinh thái để tìm tiếng nói chung và mở ra cơ hội hợp tác lâu dài.\n\n👉 *Quý Anh/Chị có muốn em dẫn đường mở ngay Sàn Giao Thương B2B không ạ?*`;
+      const answer = `🤝 **Chiến lược Kết nối & Khai thác Mạng lưới 200+ CEO HN10:**\n\nCộng đồng CEO HN10 quy tụ các doanh nhân tinh hoa trong nhiều lĩnh vực: Bất động sản, Xây dựng, Công nghệ, Y tế, Giáo dục, Dịch vụ... Em gợi ý Anh/Chị:\n1. 📇 **Xuất trình Danh thiếp số & Chạm thẻ NFC:** Giới thiệu nhanh hồ sơ năng lực doanh nghiệp khi tham gia các buổi sinh hoạt.\n2. 🛍️ **Đăng sản phẩm lên Chợ B2B:** Đưa sản phẩm chủ lực vào Sàn giao thương với chính sách ưu đãi dành riêng cho Học viên.\n3. 📅 **Chủ động đặt lịch hẹn 1-on-1:** Kết nối sâu với từng doanh nghiệp cùng hệ sinh thái để tìm tiếng nói chung và mở ra cơ hội hợp tác lâu dài.\n\n👉 *Quý Anh/Chị có muốn em dẫn đường mở ngay Sàn Giao Thương B2B không ạ?*`;
       const speechText = `Để mở rộng đối tác, anh chị nên tận dụng mạng lưới hai trăm CEO bằng cách đăng sản phẩm lên Chợ Bê hai Bê và đặt lịch hẹn một một. Em có thể mở Chợ giao thương cho anh chị ngay bây giờ nhé!`;
 
       return {
@@ -3908,7 +3906,7 @@ QUY TẮC PHÂN TÍCH NGỮ CẢNH CÂU HỎI (BẮT BUỘC):
       q.includes('hiệp hội ceo 1983') ||
       q.includes('giới thiệu clb')
     ) {
-      const answer = `🏛️ **Thông Tin Ban Lãnh Đạo, Lịch Sử & Tôn Chỉ CLB Doanh Nhân CEO HN10 (HanoiBA):**\n\nKính gửi Quý Anh/Chị **${userName}**, em xin gửi thông tin chuẩn mực và đầy đủ nhất về Hiệp hội:\n\n1. 👑 **Chủ Tịch Hiệp Hội:**\n   - **Anh Lê Phụng Thắng** — Chủ tịch HĐQT kiêm Tổng Giám đốc Tập đoàn Thép Citicom, Phó Chủ tịch Thường trực Hội Doanh nghiệp Trẻ Hà Nội (HanoiBA).\n   - Là người đặt nền móng kiến tạo, định hình tầm nhìn chiến lược và văn hóa đoàn kết, hào sảng, phụng sự cộng đồng doanh nhân.\n2. 🌟 **Tôn Chỉ Hoạt Động:**\n   - *"Gắn kết doanh nhân — Chia sẻ cơ hội — Phát triển bền vững"*.\n   - Nơi hội tụ các nhà lãnh đạo tài năng sinh năm 1983 (tuổi Quý Hợi) — thế hệ doanh nhân chín muồi về bản lĩnh, khát vọng và tinh thần đổi mới sáng tạo.\n3. 🏢 **Tổ Chức Chủ Quản & Trụ Sở:**\n   - Trực thuộc **Hội Doanh nghiệp Trẻ Hà Nội (HanoiBA)**.\n   - **Trụ sở:** Cung Trí Thức Hà Nội, Số 1 Tôn Thất Thuyết, Cầu Giấy, TP. Hà Nội.\n   - **Hotline Ban Thư Ký:** **0983 198 307** (Hỗ trợ 24/7).\n4. ⚙️ **Cơ Cấu 6 Ban Chuyên Môn:**\n   - **Ban Điều Hành & Ban Thư Ký:** Điều phối chung và vận hành nền tảng số.\n   - **Ban Thành Viên:** Kết nạp, thẩm định và chăm sóc quyền lợi hội viên.\n   - **Ban Xúc Tiến Thương Mại:** Điều phối giao thương B2B và chuỗi giá trị.\n   - **Ban Truyền Thông:** Xây dựng thương hiệu cá nhân CEO và kỷ yếu số.\n   - **Ban Tài Chính:** Quản lý quỹ, hội phí niên liễm MB Bank \`1010000000\`.\n   - **Ban Thiện Nguyện:** Các chương trình an sinh xã hội và CSR cộng đồng.\n\n👉 *Quý Anh/Chị có muốn em mở mục Danh Bạ Ban Điều Hành hoặc kết nối Ban Thư Ký ngay không ạ?*`;
+      const answer = `🏛️ **Thông Tin Ban Lãnh Đạo, Lịch Sử & Tôn Chỉ CLB Doanh Nhân CEO HN10 (HanoiBA):**\n\nKính gửi Quý Anh/Chị **${userName}**, em xin gửi thông tin chuẩn mực và đầy đủ nhất về Hiệp hội:\n\n1. 👑 **Chủ Tịch Hiệp Hội:**\n   - **Anh Lê Phụng Thắng** — Chủ tịch HĐQT kiêm Tổng Giám đốc Tập đoàn Thép Citicom, Phó Chủ tịch Thường trực Hội Doanh nghiệp Trẻ Hà Nội (HanoiBA).\n   - Là người đặt nền móng kiến tạo, định hình tầm nhìn chiến lược và văn hóa đoàn kết, hào sảng, phụng sự cộng đồng doanh nhân.\n2. 🌟 **Tôn Chỉ Hoạt Động:**\n   - *"Gắn kết doanh nhân — Chia sẻ cơ hội — Phát triển bền vững"*.\n   - Nơi hội tụ các nhà lãnh đạo tài năng sinh năm 1983 (tuổi Quý Hợi) — thế hệ doanh nhân chín muồi về bản lĩnh, khát vọng và tinh thần đổi mới sáng tạo.\n3. 🏢 **Tổ Chức Chủ Quản & Trụ Sở:**\n   - Trực thuộc **Hội Doanh nghiệp Trẻ Hà Nội (HanoiBA)**.\n   - **Trụ sở:** Cung Trí Thức Hà Nội, Số 1 Tôn Thất Thuyết, Cầu Giấy, TP. Hà Nội.\n   - **Hotline Ban Thư Ký:** **0983 198 307** (Hỗ trợ 24/7).\n4. ⚙️ **Cơ Cấu 6 Ban Chuyên Môn:**\n   - **Ban Điều Hành & Ban Thư Ký:** Điều phối chung và vận hành nền tảng số.\n   - **Ban Thành Viên:** Kết nạp, thẩm định và chăm sóc quyền lợi Học viên.\n   - **Ban Xúc Tiến Thương Mại:** Điều phối giao thương B2B và chuỗi giá trị.\n   - **Ban Truyền Thông:** Xây dựng thương hiệu cá nhân CEO và kỷ yếu số.\n   - **Ban Tài Chính:** Quản lý quỹ, hội phí niên liễm MB Bank \`1010000000\`.\n   - **Ban Thiện Nguyện:** Các chương trình an sinh xã hội và CSR cộng đồng.\n\n👉 *Quý Anh/Chị có muốn em mở mục Danh Bạ Ban Điều Hành hoặc kết nối Ban Thư Ký ngay không ạ?*`;
       const speechText = `Chủ tịch CLB Doanh Nhân CEO HN10 là anh Lê Phụng Thắng, Chủ tịch HĐQT Citicom kiêm Phó Chủ tịch Thường trực HanoiBA. CLB hoạt động theo tôn chỉ Gắn kết doanh nhân, Chia sẻ cơ hội, Phát triển bền vững ạ!`;
 
       return {
@@ -3918,13 +3916,13 @@ QUY TẮC PHÂN TÍCH NGỮ CẢNH CÂU HỎI (BẮT BUỘC):
         suggestTour: true,
         tourId: 'association-members',
         route: '/association/members',
-        featureName: 'Ban Điều Hành & Hội Viên CEO HN10',
+        featureName: 'Ban Điều Hành & Học viên CEO HN10',
         provider: 'ceohn10-executive-core',
         model: 'executive-charter-v2',
       };
     }
 
-    // 0.2. Tri thức Chuyên Sâu: Quy Trình Kết Nạp, Điều Kiện Gia Nhập & Quyền Lợi Hội Viên
+    // 0.2. Tri thức Chuyên Sâu: Quy Trình Kết Nạp, Điều Kiện Gia Nhập & Quyền Lợi Học viên
     if (
       q.includes('kết nạp') ||
       q.includes('ket nap') ||
@@ -3932,13 +3930,13 @@ QUY TẮC PHÂN TÍCH NGỮ CẢNH CÂU HỎI (BẮT BUỘC):
       q.includes('gia nhap') ||
       q.includes('điều kiện') ||
       q.includes('dieu kien') ||
-      q.includes('đăng ký hội viên') ||
-      q.includes('quy chế hội viên') ||
-      q.includes('trở thành hội viên') ||
+      q.includes('đăng ký Học viên') ||
+      q.includes('quy chế Học viên') ||
+      q.includes('trở thành Học viên') ||
       q.includes('hồ sơ kết nạp')
     ) {
-      const answer = `📝 **Quy Trình Kết Nạp, Tiêu Chuẩn & Quyền Lợi Hội Viên CEO HN10:**\n\nKính gửi Quý Anh/Chị **${userName}**, quy trình gia nhập CLB được chuẩn hóa 3 bước chặt chẽ:\n\n1. 🎯 **Tiêu Chuẩn Gia Nhập:**\n   - Lãnh đạo, Chủ tịch, Tổng giám đốc, Cổ đông sáng lập sinh năm 1983 (tuổi Quý Hợi) hoặc lãnh đạo doanh nghiệp liên kết uy tín.\n   - Doanh nghiệp có pháp nhân minh bạch, tuân thủ pháp luật và đạo đức kinh doanh.\n2. 📋 **Quy Trình 3 Bước Kết Nạp Chính Thức:**\n   - **Bước 1 — Đăng ký Online:** Điền đơn đăng ký trên cổng thông tin CLB CEO HN10, tải ảnh chân dung và thông tin doanh nghiệp.\n   - **Bước 2 — Thẩm định & Xác minh:** Ban Thành Viên liên hệ gặp gỡ, xác minh thông tin doanh nghiệp trong vòng 48h làm việc.\n   - **Bước 3 — Phê duyệt & Cấp Mã:** Ban Điều Hành họp xét duyệt, cấp Mã Hội viên chính thức (\`HN10-xxx\`), kích hoạt Thẻ Thông Minh Smart Card NFC và cấp tài khoản CRM/App di động.\n3. 💎 **Đặc Quyền Vượt Trội Của Hội Viên Chính Thức:**\n   - Sở hữu **Danh Thiếp Số 5.0** và thẻ thông minh NFC chạm là kết nối.\n   - Tiếp cận mạng lưới **200+ CEO** tinh hoa, đăng bán sản phẩm miễn phí trên Sàn B2B Marketplace.\n   - Tham gia định kỳ các buổi Cà phê Doanh nhân, Gala thường niên, diễn đàn đào tạo quản trị cấp cao và các giải Golf giao hữu.\n\n👉 *Quý Anh/Chị có muốn em dẫn đường mở ngay form Đăng Ký Hội Viên mới không ạ?*`;
-      const speechText = `Quy trình kết nạp CEO HN10 gồm ba bước: Đăng ký online, Ban Thành viên thẩm định và Ban Điều hành phê duyệt cấp mã hội viên. Hội viên được cấp Thẻ thông minh NFC và tham gia toàn bộ mạng lưới giao thương B2B ạ!`;
+      const answer = `📝 **Quy Trình Kết Nạp, Tiêu Chuẩn & Quyền Lợi Học viên CEO HN10:**\n\nKính gửi Quý Anh/Chị **${userName}**, quy trình gia nhập CLB được chuẩn hóa 3 bước chặt chẽ:\n\n1. 🎯 **Tiêu Chuẩn Gia Nhập:**\n   - Lãnh đạo, Chủ tịch, Tổng giám đốc, Cổ đông sáng lập sinh năm 1983 (tuổi Quý Hợi) hoặc lãnh đạo doanh nghiệp liên kết uy tín.\n   - Doanh nghiệp có pháp nhân minh bạch, tuân thủ pháp luật và đạo đức kinh doanh.\n2. 📋 **Quy Trình 3 Bước Kết Nạp Chính Thức:**\n   - **Bước 1 — Đăng ký Online:** Điền đơn đăng ký trên cổng thông tin CLB CEO HN10, tải ảnh chân dung và thông tin doanh nghiệp.\n   - **Bước 2 — Thẩm định & Xác minh:** Ban Thành Viên liên hệ gặp gỡ, xác minh thông tin doanh nghiệp trong vòng 48h làm việc.\n   - **Bước 3 — Phê duyệt & Cấp Mã:** Ban Điều Hành họp xét duyệt, cấp Mã Học viên chính thức (\`HN10-xxx\`), kích hoạt Thẻ Thông Minh Smart Card NFC và cấp tài khoản CRM/App di động.\n3. 💎 **Đặc Quyền Vượt Trội Của Học viên Chính Thức:**\n   - Sở hữu **Danh Thiếp Số 5.0** và thẻ thông minh NFC chạm là kết nối.\n   - Tiếp cận mạng lưới **200+ CEO** tinh hoa, đăng bán sản phẩm miễn phí trên Sàn B2B Marketplace.\n   - Tham gia định kỳ các buổi Cà phê Doanh nhân, Gala thường niên, diễn đàn đào tạo quản trị cấp cao và các giải Golf giao hữu.\n\n👉 *Quý Anh/Chị có muốn em dẫn đường mở ngay form Đăng Ký Học viên mới không ạ?*`;
+      const speechText = `Quy trình kết nạp CEO HN10 gồm ba bước: Đăng ký online, Ban Thành viên thẩm định và Ban Điều hành phê duyệt cấp mã Học viên. Học viên được cấp Thẻ thông minh NFC và tham gia toàn bộ mạng lưới giao thương B2B ạ!`;
 
       return {
         answer,
@@ -3947,7 +3945,7 @@ QUY TẮC PHÂN TÍCH NGỮ CẢNH CÂU HỎI (BẮT BUỘC):
         suggestTour: true,
         tourId: 'association-profile',
         route: '/association/profile',
-        featureName: 'Hồ Sơ & Thủ Tục Hội Viên',
+        featureName: 'Hồ Sơ & Thủ Tục Học viên',
         provider: 'ceohn10-executive-core',
         model: 'executive-membership-v2',
       };
@@ -3963,7 +3961,7 @@ QUY TẮC PHÂN TÍCH NGỮ CẢNH CÂU HỎI (BẮT BUỘC):
       q.includes('quy chế giao thương') ||
       q.includes('kết nối đối tác')
     ) {
-      const answer = `🤝 **Quy Chế Kết Nối 1-on-1 & Giao Thương B2B Thực Chiến (CEO HN10 Standards):**\n\nKính gửi Quý Anh/Chị **${userName}**, kết nối 1-on-1 là "đặc sản" hiệu quả nhất để xây dựng niềm tin và chốt các thương vụ lớn:\n\n1. 🔍 **Bước 1 — Tìm Kiếm & Nghiên Cứu Đối Tác:**\n   - Mở mục **Danh Bạ Hội Viên** trên App CEO HN10, lọc theo ngành nghề hoặc từ khóa kinh doanh.\n   - Xem trước hồ sơ năng lực 360°, ngành nghề thế mạnh và nhu cầu cung - cầu của đối tác.\n2. 📅 **Bước 2 — Gửi Lời Mời Hẹn Gặp:**\n   - Bấm nút **"Hẹn gặp 1-on-1"**, chọn thời gian (sáng/chiều), địa điểm (trụ sở công ty hoặc các điểm hẹn doanh nhân trang nhã).\n   - Ghi rõ nội dung mục tiêu buổi gặp: Giới thiệu giải pháp, tìm kiếm nguồn cung hoặc liên minh dự án.\n3. 📇 **Bước 3 — Phiên Làm Việc Thực Chiến (45 - 60 phút):**\n   - 15 phút đầu: Chạm thẻ NFC chia sẻ danh thiếp số, giới thiệu câu chuyện thành lập doanh nghiệp.\n   - 30 phút giữa: Trình bày chi tiết sản phẩm, dịch vụ và điểm nghẽn có thể tương hỗ cho nhau.\n   - 15 phút cuối: Thống nhất kế hoạch hành động cụ thể (Action Items) và thời hạn phản hồi.\n4. 📈 **Bước 4 — Báo Cáo & Tích Lũy Chỉ Số KPI:**\n   - Sau buổi gặp, vào App bấm **"Xác nhận đã gặp"** để hệ thống tự động ghi nhận điểm gắn kết và đề xuất cơ hội giao thương tương ứng.\n\n👉 *Quý Anh/Chị có muốn em mở Danh Bạ Hội Viên để chọn đối tác hẹn gặp 1-on-1 ngay bây giờ không ạ?*`;
+      const answer = `🤝 **Quy Chế Kết Nối 1-on-1 & Giao Thương B2B Thực Chiến (CEO HN10 Standards):**\n\nKính gửi Quý Anh/Chị **${userName}**, kết nối 1-on-1 là "đặc sản" hiệu quả nhất để xây dựng niềm tin và chốt các thương vụ lớn:\n\n1. 🔍 **Bước 1 — Tìm Kiếm & Nghiên Cứu Đối Tác:**\n   - Mở mục **Danh Bạ Học viên** trên App CEO HN10, lọc theo ngành nghề hoặc từ khóa kinh doanh.\n   - Xem trước hồ sơ năng lực 360°, ngành nghề thế mạnh và nhu cầu cung - cầu của đối tác.\n2. 📅 **Bước 2 — Gửi Lời Mời Hẹn Gặp:**\n   - Bấm nút **"Hẹn gặp 1-on-1"**, chọn thời gian (sáng/chiều), địa điểm (trụ sở công ty hoặc các điểm hẹn doanh nhân trang nhã).\n   - Ghi rõ nội dung mục tiêu buổi gặp: Giới thiệu giải pháp, tìm kiếm nguồn cung hoặc liên minh dự án.\n3. 📇 **Bước 3 — Phiên Làm Việc Thực Chiến (45 - 60 phút):**\n   - 15 phút đầu: Chạm thẻ NFC chia sẻ danh thiếp số, giới thiệu câu chuyện thành lập doanh nghiệp.\n   - 30 phút giữa: Trình bày chi tiết sản phẩm, dịch vụ và điểm nghẽn có thể tương hỗ cho nhau.\n   - 15 phút cuối: Thống nhất kế hoạch hành động cụ thể (Action Items) và thời hạn phản hồi.\n4. 📈 **Bước 4 — Báo Cáo & Tích Lũy Chỉ Số KPI:**\n   - Sau buổi gặp, vào App bấm **"Xác nhận đã gặp"** để hệ thống tự động ghi nhận điểm gắn kết và đề xuất cơ hội giao thương tương ứng.\n\n👉 *Quý Anh/Chị có muốn em mở Danh Bạ Học viên để chọn đối tác hẹn gặp 1-on-1 ngay bây giờ không ạ?*`;
       const speechText = `Quy trình một một chuẩn của CEO HN10 gồm bốn bước: Tra cứu danh bạ, gửi lời mời hẹn gặp, làm việc thực chiến và xác nhận kết quả trên app. Em có thể mở Danh bạ để Quý Anh/Chị kết nối ngay ạ!`;
 
       return {
@@ -4055,7 +4053,7 @@ QUY TẮC PHÂN TÍCH NGỮ CẢNH CÂU HỎI (BẮT BUỘC):
       q.includes('tiếp cận') ||
       q.includes('doanh thu')
     ) {
-      const answer = `🤝 **Chiến lược Tăng trưởng Doanh thu B2B & Đàm phán Thương mại Cấp cao:**\n\nKính gửi Quý Anh/Chị **${userName}**, bán hàng B2B giữa các doanh nghiệp đòi hỏi sự tin cậy tuyệt đối và giải pháp giá trị toàn diện:\n\n1. 🎯 **Chiến lược Tiếp cận Tài khoản Trọng điểm (Account-Based Marketing - ABM):** Thay vì tiếp cận đại trà, hãy lập danh sách 20-50 doanh nghiệp mục tiêu hàng đầu. Phân tích sâu điểm nghẽn (Pain points) của Chủ tịch/Tổng giám đốc đối tác để chuẩn bị giải pháp "may đo".\n2. 💼 **Đàm phán Thương mại Win-Win:**\n   - Không bao giờ nhượng bộ giá mà không đòi hỏi lại điều kiện đối ứng (như thanh toán sớm hơn, tăng khối lượng hợp đồng hoặc hợp đồng dài hạn).\n   - Bán tổng chi phí sở hữu (Total Cost of Ownership - TCO) và giá trị gia tăng chứ không chỉ cạnh tranh giá thành đơn thuần.\n3. 🌐 **Đòn bẩy Mạng lưới Hiệp hội CEO HN10:**\n   - Đăng tải sản phẩm lên **Chợ B2B Marketplace** của CLB để tiếp cận mạng lưới 200+ chủ doanh nghiệp uy tín.\n   - Đặt lịch hẹn **1-on-1** thông qua Danh bạ Hội viên để tìm kiếm cơ hội hợp tác chiến lược, chia sẻ khách hàng chéo trong cùng hệ sinh thái.\n\n👉 *Quý Anh/Chị có muốn em dẫn đường mở ngay Sàn Sản Phẩm B2B để đăng bán hoặc tìm kiếm đối tác không ạ?*`;
+      const answer = `🤝 **Chiến lược Tăng trưởng Doanh thu B2B & Đàm phán Thương mại Cấp cao:**\n\nKính gửi Quý Anh/Chị **${userName}**, bán hàng B2B giữa các doanh nghiệp đòi hỏi sự tin cậy tuyệt đối và giải pháp giá trị toàn diện:\n\n1. 🎯 **Chiến lược Tiếp cận Tài khoản Trọng điểm (Account-Based Marketing - ABM):** Thay vì tiếp cận đại trà, hãy lập danh sách 20-50 doanh nghiệp mục tiêu hàng đầu. Phân tích sâu điểm nghẽn (Pain points) của Chủ tịch/Tổng giám đốc đối tác để chuẩn bị giải pháp "may đo".\n2. 💼 **Đàm phán Thương mại Win-Win:**\n   - Không bao giờ nhượng bộ giá mà không đòi hỏi lại điều kiện đối ứng (như thanh toán sớm hơn, tăng khối lượng hợp đồng hoặc hợp đồng dài hạn).\n   - Bán tổng chi phí sở hữu (Total Cost of Ownership - TCO) và giá trị gia tăng chứ không chỉ cạnh tranh giá thành đơn thuần.\n3. 🌐 **Đòn bẩy Mạng lưới Hiệp hội CEO HN10:**\n   - Đăng tải sản phẩm lên **Chợ B2B Marketplace** của CLB để tiếp cận mạng lưới 200+ chủ doanh nghiệp uy tín.\n   - Đặt lịch hẹn **1-on-1** thông qua Danh bạ Học viên để tìm kiếm cơ hội hợp tác chiến lược, chia sẻ khách hàng chéo trong cùng hệ sinh thái.\n\n👉 *Quý Anh/Chị có muốn em dẫn đường mở ngay Sàn Sản Phẩm B2B để đăng bán hoặc tìm kiếm đối tác không ạ?*`;
       const speechText = `Thưa Quý Anh/Chị ${userName}, bán hàng B2B hiệu quả nhất là tập trung vào tài khoản trọng điểm và bán giải pháp tổng thể thay vì cạnh tranh giá. Em có thể mở Chợ B2B để Quý Anh/Chị kết nối với hai trăm CEO trong hiệp hội ngay ạ!`;
 
       return {
@@ -4111,8 +4109,8 @@ QUY TẮC PHÂN TÍCH NGỮ CẢNH CÂU HỎI (BẮT BUỘC):
       q.includes('hà nội') ||
       q.includes('ăn tối')
     ) {
-      const answer = `🍷 **Địa điểm Tiếp khách VIP & Sân Golf Đẳng cấp tại Hà Nội:**\n\nKính gửi Quý Anh/Chị **${userName}**, một không gian ẩm thực riêng tư, đẳng cấp là tiền đề quan trọng cho những hợp đồng thành công:\n\n1. 🏛️ **Nhà hàng Tiếp đối tác VIP có phòng riêng sang trọng:**\n   - **French Grill (JW Marriott Hà Nội):** Đẳng cấp quốc tế, hải sản cao cấp và bò Wagyu thượng hạng, phòng riêng bảo mật cao.\n   - **Gia Restaurant & Chapter Grill:** Ẩm thực đương đại tinh tế, phù hợp tiếp các đối tác nước ngoài và lãnh đạo cấp cao.\n   - **Tầm Vị & Quán Ăn Ngon VIP Room:** Hương vị ẩm thực Việt truyền thống đậm đà bản sắc Tràng An, không gian ấm cúng, tao nhã.\n   - **Long Đình (Quán Sứ):** Ẩm thực Hong Kong đỉnh cao, điểm hẹn quen thuộc của giới doanh nhân thủ đô.\n2. ⛳ **Sân Golf Tiêu biểu Kết nối Giao thương:**\n   - **Long Biên Golf Course:** Ngay nội đô, thuận tiện cho các trận đánh chiều sau giờ làm việc.\n   - **Sky Lake Resort & Golf Club (Chương Mỹ):** Độ thử thách cao, cảnh quan thiên nhiên tuyệt mỹ.\n   - **BRG Kings Island Golf Resort (Đồng Mô):** Đẳng cấp sân đảo nước độc đáo, không khí trong lành.\n\n👉 *Quý Anh/Chị có muốn mở Danh bạ Hội viên để mời anh chị em trong Hiệp hội cùng giao lưu kết nối 1-on-1 không ạ?*`;
-      const speechText = `Em gợi ý các địa điểm tiếp khách sang trọng như French Grill tại JW Marriott, hoặc giao lưu trên sân Long Biên và Sky Lake. Em có thể mở Danh bạ để Quý Anh/Chị mời hội viên giao lưu ngay ạ!`;
+      const answer = `🍷 **Địa điểm Tiếp khách VIP & Sân Golf Đẳng cấp tại Hà Nội:**\n\nKính gửi Quý Anh/Chị **${userName}**, một không gian ẩm thực riêng tư, đẳng cấp là tiền đề quan trọng cho những hợp đồng thành công:\n\n1. 🏛️ **Nhà hàng Tiếp đối tác VIP có phòng riêng sang trọng:**\n   - **French Grill (JW Marriott Hà Nội):** Đẳng cấp quốc tế, hải sản cao cấp và bò Wagyu thượng hạng, phòng riêng bảo mật cao.\n   - **Gia Restaurant & Chapter Grill:** Ẩm thực đương đại tinh tế, phù hợp tiếp các đối tác nước ngoài và lãnh đạo cấp cao.\n   - **Tầm Vị & Quán Ăn Ngon VIP Room:** Hương vị ẩm thực Việt truyền thống đậm đà bản sắc Tràng An, không gian ấm cúng, tao nhã.\n   - **Long Đình (Quán Sứ):** Ẩm thực Hong Kong đỉnh cao, điểm hẹn quen thuộc của giới doanh nhân thủ đô.\n2. ⛳ **Sân Golf Tiêu biểu Kết nối Giao thương:**\n   - **Long Biên Golf Course:** Ngay nội đô, thuận tiện cho các trận đánh chiều sau giờ làm việc.\n   - **Sky Lake Resort & Golf Club (Chương Mỹ):** Độ thử thách cao, cảnh quan thiên nhiên tuyệt mỹ.\n   - **BRG Kings Island Golf Resort (Đồng Mô):** Đẳng cấp sân đảo nước độc đáo, không khí trong lành.\n\n👉 *Quý Anh/Chị có muốn mở Danh bạ Học viên để mời anh chị em trong Hiệp hội cùng giao lưu kết nối 1-on-1 không ạ?*`;
+      const speechText = `Em gợi ý các địa điểm tiếp khách sang trọng như French Grill tại JW Marriott, hoặc giao lưu trên sân Long Biên và Sky Lake. Em có thể mở Danh bạ để Quý Anh/Chị mời Học viên giao lưu ngay ạ!`;
 
       return {
         answer,
@@ -4121,7 +4119,7 @@ QUY TẮC PHÂN TÍCH NGỮ CẢNH CÂU HỎI (BẮT BUỘC):
         suggestTour: true,
         tourId: 'association-members',
         route: '/association/members',
-        featureName: 'Danh Bạ Hội Viên 200+ CEO',
+        featureName: 'Danh Bạ Học viên 200+ CEO',
         provider: 'ceohn10-executive-core',
         model: 'executive-lifestyle-v2',
       };
@@ -4204,12 +4202,12 @@ QUY TẮC PHÂN TÍCH NGỮ CẢNH CÂU HỎI (BẮT BUỘC):
     answer: string;
     speechText: string;
     intent:
-      | 'chat'
-      | 'query_data'
-      | 'start_tour'
-      | 'feature_guide'
-      | 'navigate'
-      | 'action';
+    | 'chat'
+    | 'query_data'
+    | 'start_tour'
+    | 'feature_guide'
+    | 'navigate'
+    | 'action';
     tourId?: string;
     route?: string;
     featureName?: string;
@@ -4243,10 +4241,10 @@ QUY TẮC PHÂN TÍCH NGỮ CẢNH CÂU HỎI (BẮT BUỘC):
 Nhiệm vụ của bạn:
 1. Hãy lắng nghe đoạn ghi âm giọng nói tiếng Việt được cung cấp và chuyển thành văn bản chính xác nhất vào trường "userSpeech".
 2. Trả lời câu hỏi một cách thông minh, ấm áp, lịch thiệp, phong cách người thật xưng 'Em' gọi 'Quý Anh/Chị' ${context.user.name}.
-3. Tận dụng dữ liệu thời gian thực của hội viên: Tên ${context.user.name}, Công ty ${context.user.company}, Cấp bậc ${context.user.level}, Trạng thái hội phí ${context.dues.feePaid ? 'Đã đóng' : 'Chưa đóng'}.
+3. Tận dụng dữ liệu thời gian thực của Học viên: Tên ${context.user.name}, Công ty ${context.user.company}, Cấp bậc ${context.user.level}, Trạng thái hội phí ${context.dues.feePaid ? 'Đã đóng' : 'Chưa đóng'}.
 4. Trả về JSON theo định dạng:
 {
-  "userSpeech": "câu nói của hội viên nhận diện được",
+  "userSpeech": "câu nói của Học viên nhận diện được",
   "answer": "nội dung câu trả lời chi tiết định dạng markdown đẹp",
   "speechText": "câu đọc ngắn gọn truyền cảm để phát âm qua loa",
   "intent": "chat" | "query_data" | "feature_guide" | "start_tour",
@@ -4291,7 +4289,7 @@ Nhiệm vụ của bạn:
           if (jsonText) {
             const parsed = JSON.parse(jsonText);
             return {
-              userSpeech: parsed.userSpeech || 'Giọng nói hội viên',
+              userSpeech: parsed.userSpeech || 'Giọng nói Học viên',
               answer: parsed.answer || '',
               speechText: parsed.speechText || parsed.answer || '',
               intent: parsed.intent || 'chat',
@@ -4406,10 +4404,10 @@ Nhiệm vụ của bạn:
         { id: 'bxt-02', name: 'Vũ Đức Long', role: 'Phó Ban Xúc Tiến Thương Mại' },
         { id: 'bxt-03', name: 'Nguyễn Thanh Hải', role: 'Ủy viên Xúc Tiến' },
       ],
-      'Ban Phát Triển Hội Viên': [
-        { id: 'btv-01', name: 'Hoàng Minh Quân', role: 'Trưởng Ban Phát Triển Hội Viên' },
-        { id: 'btv-02', name: 'Lê Thị Thảo', role: 'Phó Ban Phát Triển Hội Viên' },
-        { id: 'btv-03', name: 'Đặng Quốc Cường', role: 'Ủy viên Chăm Sóc Hội Viên' },
+      'Ban Phát Triển Học viên': [
+        { id: 'btv-01', name: 'Hoàng Minh Quân', role: 'Trưởng Ban Phát Triển Học viên' },
+        { id: 'btv-02', name: 'Lê Thị Thảo', role: 'Phó Ban Phát Triển Học viên' },
+        { id: 'btv-03', name: 'Đặng Quốc Cường', role: 'Ủy viên Chăm Sóc Học viên' },
       ],
       'Ban Truyền Thông & Sự Kiện': [
         { id: 'btt-01', name: 'Đỗ Thu Hà', role: 'Trưởng Ban Truyền Thông & Sự Kiện' },
@@ -4437,7 +4435,7 @@ Nhiệm vụ của bạn:
       })
       .map((m) => ({
         id: String(m.id),
-        name: m.name || 'Hội viên',
+        name: m.name || 'Học viên',
         role: m.role || 'Thành viên Ban',
       }));
 
@@ -4462,7 +4460,7 @@ Nhiệm vụ của bạn:
         const val = setting[0]?.value as { key?: string; apiKey?: string } | string | null;
         if (typeof val === 'string') geminiKey = val;
         else if (val && typeof val === 'object') geminiKey = val.key || val.apiKey || null;
-      } catch {}
+      } catch { }
     }
 
     const todayStr = new Date().toISOString().split('T')[0];
@@ -4573,10 +4571,10 @@ YÊU CẦU BẮT BUỘC:
                     deliverables: t.deliverables || '',
                     subtasks: Array.isArray(t.subtasks)
                       ? t.subtasks.map((st: any, sIdx: number) => ({
-                          id: `st-${Date.now()}-${sIdx}`,
-                          title: typeof st === 'string' ? st : st.title || `Đầu việc ${sIdx + 1}`,
-                          completed: false,
-                        }))
+                        id: `st-${Date.now()}-${sIdx}`,
+                        title: typeof st === 'string' ? st : st.title || `Đầu việc ${sIdx + 1}`,
+                        completed: false,
+                      }))
                       : [],
                   };
                 });
@@ -4588,10 +4586,10 @@ YÊU CẦU BẮT BUỘC:
                   suggestedSolutions: Array.isArray(parsed.suggestedSolutions)
                     ? parsed.suggestedSolutions
                     : [
-                        'Thành lập tổ phản ứng nhanh giải quyết các đầu việc cấp thiết',
-                        'Phân công phụ trách đích danh từng nhân sự kèm deadline cụ thể',
-                        'Thiết lập báo cáo tiến độ định kỳ hàng tuần trên hệ thống CRM',
-                      ],
+                      'Thành lập tổ phản ứng nhanh giải quyết các đầu việc cấp thiết',
+                      'Phân công phụ trách đích danh từng nhân sự kèm deadline cụ thể',
+                      'Thiết lập báo cáo tiến độ định kỳ hàng tuần trên hệ thống CRM',
+                    ],
                   department: targetDept,
                   assignedMembersCount: new Set(formattedTasks.map((t: any) => t.assignee.name)).size,
                   extractedTasks: formattedTasks,
@@ -4684,11 +4682,11 @@ YÊU CẦU BẮT BUỘC:
       detectedPoints.length >= 3
         ? detectedPoints.slice(0, 8)
         : [
-            `Tổng hợp ý kiến đóng góp và hoàn thiện biên bản họp ${department}`,
-            `Xây dựng kế hoạch hành động và phân công lộ trình thực thi theo ý kiến cuộc họp`,
-            `Rà soát danh mục các vướng mắc, liên hệ các bên liên quan để tháo gỡ`,
-            `Báo cáo tiến độ triển khai giai đoạn 1 cho Ban Lãnh đạo CLB CEO HN10`,
-          ];
+          `Tổng hợp ý kiến đóng góp và hoàn thiện biên bản họp ${department}`,
+          `Xây dựng kế hoạch hành động và phân công lộ trình thực thi theo ý kiến cuộc họp`,
+          `Rà soát danh mục các vướng mắc, liên hệ các bên liên quan để tháo gỡ`,
+          `Báo cáo tiến độ triển khai giai đoạn 1 cho Ban Lãnh đạo CLB CEO HN10`,
+        ];
 
     const extractedTasks = taskCandidates.map((point, idx) => {
       const assignee = availableAssignees[idx % availableAssignees.length] || {
@@ -4702,8 +4700,8 @@ YÊU CẦU BẮT BUỘC:
       const priority: 'CRITICAL' | 'HIGH' | 'MEDIUM' | 'LOW' = isCritical
         ? 'CRITICAL'
         : isHigh
-        ? 'HIGH'
-        : 'MEDIUM';
+          ? 'HIGH'
+          : 'MEDIUM';
 
       const days = isCritical ? 3 : isHigh ? 5 : 7 + idx * 2;
       const due = new Date(Date.now() + days * 86400000).toISOString().split('T')[0];

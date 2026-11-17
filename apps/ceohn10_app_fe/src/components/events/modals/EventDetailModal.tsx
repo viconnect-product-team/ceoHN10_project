@@ -221,7 +221,7 @@ export const EventDetailModal: React.FC<EventDetailModalProps> = ({
             <div className="px-1">
               <span className="text-[9.5px] uppercase font-bold text-slate-400 block">Đối tượng</span>
               <span className="text-[10.5px] font-medium text-slate-600 dark:text-slate-300 line-clamp-1">
-                {selectedEvent.audience || "Hội viên & Khách mời"}
+                {selectedEvent.audience || "Học viên & Khách mời"}
               </span>
             </div>
           </div>
@@ -328,7 +328,7 @@ export const EventDetailModal: React.FC<EventDetailModalProps> = ({
                 </span>
               </div>
 
-              {/* Link ảnh sự kiện (Google Drive / Cloud storage) dành cho hội viên và ban truyền thông - Ẩn hoàn toàn nếu chưa có link hợp lệ */}
+              {/* Link ảnh sự kiện (Google Drive / Cloud storage) dành cho Học viên và ban truyền thông - Ẩn hoàn toàn nếu chưa có link hợp lệ */}
               {validDriveUrl && (
                 <div className="pt-2 border-t border-amber-300/40">
                   <a
@@ -344,14 +344,14 @@ export const EventDetailModal: React.FC<EventDetailModalProps> = ({
               )}
             </div>
 
-            {/* MÃ QR SỰ KIỆN CHO NGƯỜI NGOÀI KHÔNG PHẢI HỘI VIÊN QUÉT ĐĂNG KÝ */}
+            {/* MÃ QR SỰ KIỆN CHO NGƯỜI NGOÀI KHÔNG PHẢI Học viên QUÉT ĐĂNG KÝ */}
             <div className="rounded-2xl border-2 border-dashed border-amber-500/50 bg-gradient-to-b from-amber-50/50 to-transparent dark:bg-amber-950/20 p-4 text-center space-y-2.5">
               <div className="flex items-center justify-center gap-2 text-amber-800 dark:text-amber-300 font-bold text-xs uppercase tracking-wider">
                 <QrCode className="h-4 w-4 text-amber-600 dark:text-amber-400" />
                 <span>Mã QR Đăng Ký Dành Cho Khách Mời (Người Ngoài)</span>
               </div>
               <p className="text-[11.5px] text-slate-600 dark:text-slate-400 leading-relaxed">
-                Người ngoài không phải hội viên quét mã QR bằng Zalo hoặc Camera điện thoại để mở form đăng ký tham gia sự kiện.
+                Người ngoài không phải Học viên quét mã QR bằng Zalo hoặc Camera điện thoại để mở form đăng ký tham gia sự kiện.
               </p>
               <div className="mx-auto w-40 h-40 p-2 bg-white rounded-2xl border border-amber-300/80 shadow-sm flex items-center justify-center">
                 <img
@@ -391,44 +391,44 @@ export const EventDetailModal: React.FC<EventDetailModalProps> = ({
               (selectedEvent as any)?.article_url ||
               (selectedEvent as any)?.fanpage_url
             ) && (
-              <div className="rounded-2xl bg-blue-50/70 dark:bg-blue-950/30 p-3.5 border border-blue-200/60 dark:border-blue-900/60 text-[12px] space-y-2">
-                <div className="flex items-center gap-1.5 font-bold text-blue-900 dark:text-blue-300">
-                  <Globe className="h-4 w-4 text-[#003B95] dark:text-amber-400 shrink-0" />
-                  <span>Bài viết Fanpage / Website sự kiện</span>
-                </div>
-                <div className="flex items-center gap-2 pt-0.5">
-                  <a
-                    href={
-                      selectedEvent?.fanpageUrl ||
-                      (selectedEvent as any)?.webArticleUrl ||
-                      (selectedEvent as any)?.article_url ||
-                      (selectedEvent as any)?.fanpage_url
-                    }
-                    target="_blank"
-                    rel="noreferrer"
-                    className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-xs transition"
-                  >
-                    <span>Mở bài viết Fanpage / Website</span>
-                    <ExternalLink className="size-3.5" />
-                  </a>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const u =
+                <div className="rounded-2xl bg-blue-50/70 dark:bg-blue-950/30 p-3.5 border border-blue-200/60 dark:border-blue-900/60 text-[12px] space-y-2">
+                  <div className="flex items-center gap-1.5 font-bold text-blue-900 dark:text-blue-300">
+                    <Globe className="h-4 w-4 text-[#003B95] dark:text-amber-400 shrink-0" />
+                    <span>Bài viết Fanpage / Website sự kiện</span>
+                  </div>
+                  <div className="flex items-center gap-2 pt-0.5">
+                    <a
+                      href={
                         selectedEvent?.fanpageUrl ||
                         (selectedEvent as any)?.webArticleUrl ||
                         (selectedEvent as any)?.article_url ||
-                        (selectedEvent as any)?.fanpage_url;
-                      navigator.clipboard.writeText(u);
-                      toast.success("Đã sao chép link bài viết!");
-                    }}
-                    className="px-3 py-2 rounded-xl border border-blue-300 dark:border-blue-800 bg-white dark:bg-slate-800 text-blue-700 dark:text-blue-300 font-bold text-xs transition cursor-pointer"
-                  >
-                    Sao chép
-                  </button>
+                        (selectedEvent as any)?.fanpage_url
+                      }
+                      target="_blank"
+                      rel="noreferrer"
+                      className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-xs transition"
+                    >
+                      <span>Mở bài viết Fanpage / Website</span>
+                      <ExternalLink className="size-3.5" />
+                    </a>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const u =
+                          selectedEvent?.fanpageUrl ||
+                          (selectedEvent as any)?.webArticleUrl ||
+                          (selectedEvent as any)?.article_url ||
+                          (selectedEvent as any)?.fanpage_url;
+                        navigator.clipboard.writeText(u);
+                        toast.success("Đã sao chép link bài viết!");
+                      }}
+                      className="px-3 py-2 rounded-xl border border-blue-300 dark:border-blue-800 bg-white dark:bg-slate-800 text-blue-700 dark:text-blue-300 font-bold text-xs transition cursor-pointer"
+                    >
+                      Sao chép
+                    </button>
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
 
             {/* CHIA SẺ PUBLIC RA NGOÀI (FACEBOOK, ZALO, WEB) */}
             <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-900/50 p-3.5 space-y-2.5">
@@ -442,7 +442,7 @@ export const EventDetailModal: React.FC<EventDetailModalProps> = ({
                 </span>
               </div>
               <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                Người ngoài không phải hội viên vẫn xem được bản giới thiệu tóm tắt. Khi bấm xem chi tiết sẽ chuyển đến màn hình đăng nhập / đăng ký và ghi nhận thống kê click.
+                Người ngoài không phải Học viên vẫn xem được bản giới thiệu tóm tắt. Khi bấm xem chi tiết sẽ chuyển đến màn hình đăng nhập / đăng ký và ghi nhận thống kê click.
               </p>
               <div className="grid grid-cols-2 gap-2 pt-0.5">
                 <button
@@ -515,7 +515,7 @@ export const EventDetailModal: React.FC<EventDetailModalProps> = ({
                   <span>Kênh kết nối &amp; Thảo luận</span>
                 </div>
                 <p className="text-slate-600 dark:text-slate-300">
-                  Hội viên tham dự vui lòng gia nhập nhóm Zalo để nhận tài liệu diễn giả và cập nhật thông báo:
+                  Học viên tham dự vui lòng gia nhập nhóm Zalo để nhận tài liệu diễn giả và cập nhật thông báo:
                 </p>
                 <div className="pt-1">
                   <a

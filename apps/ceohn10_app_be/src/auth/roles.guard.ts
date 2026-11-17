@@ -13,7 +13,7 @@ export class RolesGuard implements CanActivate {
   constructor(
     private reflector: Reflector,
     private prisma: PrismaService,
-  ) {}
+  ) { }
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const requiredRoles = this.reflector.getAllAndOverride<string[]>(
@@ -61,7 +61,7 @@ export class RolesGuard implements CanActivate {
           const m = memberRows[0];
           if (m.executive_role) dbRoles.push(m.executive_role);
           if (m.department) dbRoles.push(m.department);
-          // Nếu hội viên bị đình chỉ hoặc vô hiệu hóa trong DB, lập tức chặn
+          // Nếu Học viên bị đình chỉ hoặc vô hiệu hóa trong DB, lập tức chặn
           if (
             m.status === 'suspended' ||
             m.status === 'inactive' ||
@@ -206,7 +206,7 @@ export class RolesGuard implements CanActivate {
             }
           }
         }
-      } catch {}
+      } catch { }
     }
 
     if (!hasPermission) {

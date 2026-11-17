@@ -90,10 +90,10 @@ export const EventRegisteredTicketsModal: React.FC<EventRegisteredTicketsModalPr
               const lucky = `#${(1000 + (evIdx >= 0 ? evIdx : 1) * 337) % 9000 + 1000}`;
               const isFree = isEventFree(e);
               const agenda = getEventAgenda(e, evIdx >= 0 ? evIdx : idx);
-              const attendeeName = member?.name || user?.name || "Hội viên CEO HN10";
+              const attendeeName = member?.name || user?.name || "Học viên CEO HN10";
               const attendeePhone = member?.phone || "";
               const attendeeCompany = (member as any)?.companyName || "CLB Doanh Nhân CEO HN10";
-              const attendeePosition = member?.title || "Hội viên chính thức";
+              const attendeePosition = member?.title || "Học viên chính thức";
               const seatAssignment = (e as any).seatAssignment || (e as any).seat || "Chờ Ban Truyền Thông xếp chỗ";
               const qrUrl = makeTicketQrUrl({
                 ticketCode: invoiceCode,
@@ -126,17 +126,15 @@ export const EventRegisteredTicketsModal: React.FC<EventRegisteredTicketsModalPr
               return (
                 <div
                   key={e.id}
-                  className={`relative rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm overflow-hidden border-l-4 ${
-                    borderColors[idx % borderColors.length]
-                  }`}
+                  className={`relative rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm overflow-hidden border-l-4 ${borderColors[idx % borderColors.length]
+                    }`}
                 >
                   {/* Header phân biệt rõ ràng vé sự kiện số mấy */}
                   <div className="flex items-center justify-between px-4 py-2.5 bg-slate-50/80 dark:bg-slate-800/60 border-b border-slate-100 dark:border-slate-800">
                     <div className="flex items-center gap-2">
                       <span
-                        className={`px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider shadow-2xs ${
-                          badgeBgs[idx % badgeBgs.length]
-                        }`}
+                        className={`px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider shadow-2xs ${badgeBgs[idx % badgeBgs.length]
+                          }`}
                       >
                         Sự kiện #{idx + 1}
                       </span>

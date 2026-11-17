@@ -11,12 +11,12 @@
 
 ### BÀI 2: QUẢN TRỊ PHÂN QUYỀN MA TRẬN & THEO BAN CHUYÊN MÔN
 1. **Phân quyền theo Ban chuyên môn (Tab 1)**:
-   - Danh sách hội viên được nhóm trực quan theo 7 Ban: Ban Điều Hành, Ban Thư Ký, Ban Thành Viên, Ban Xúc Tiến Thương Mại, Ban Truyền Thông, Ban Tài Chính, Ban Thiện Nguyện.
-   - Khi hội viên được gán vào ban, quyền hạn tương ứng của ban đó tự động được kế thừa tức thời.
+   - Danh sách Học viên được nhóm trực quan theo 7 Ban: Ban Điều Hành, Ban Thư Ký, Ban Thành Viên, Ban Xúc Tiến Thương Mại, Ban Truyền Thông, Ban Tài Chính, Ban Thiện Nguyện.
+   - Khi Học viên được gán vào ban, quyền hạn tương ứng của ban đó tự động được kế thừa tức thời.
    - Thao tác nhanh: Tìm kiếm theo tên/email, lọc nhanh theo ban, đổi ban hoặc vai trò trực tiếp (`PATCH /api/members/:id/role-dept`).
 2. **Ma trận Phân quyền Nâng cao (Tab 2)**:
    - Tích chọn hoặc bỏ tích các quyền thao tác cho từng vai trò theo 5 quyền cốt lõi (Xem, Thêm, Sửa, Xóa, Duyệt).
-   - Bao quát toàn bộ 10 nhóm tính năng ứng dụng di động: Profile & Thẻ danh thiếp số, Danh bạ hội viên & Tìm kiếm đối tác, Kết nối giao thương 1-on-1, Moments mạng xã hội nội bộ B2B, Tin tức & Thông báo hiệp hội, Sự kiện & Quét vé QR, Họp BCH & Điểm danh Sapphire Hub, Gian hàng Marketplace & Báo giá, Quản lý công việc & Giao việc Kanban, Khảo sát & Biểu quyết số.
+   - Bao quát toàn bộ 10 nhóm tính năng ứng dụng di động: Profile & Thẻ danh thiếp số, Danh bạ Học viên & Tìm kiếm đối tác, Kết nối giao thương 1-on-1, Moments mạng xã hội nội bộ B2B, Tin tức & Thông báo hiệp hội, Sự kiện & Quét vé QR, Họp BCH & Điểm danh Sapphire Hub, Gian hàng Marketplace & Báo giá, Quản lý công việc & Giao việc Kanban, Khảo sát & Biểu quyết số.
 3. **Quản lý phòng ban/ban chuyên môn (Tab 3)**:
    - Xem cấu trúc, số lượng thành viên và trưởng ban phụ trách từng ban chuyên trách.
 
@@ -29,13 +29,13 @@
    - Nhập Dự toán kinh phí và các Tiêu chí nghiệm thu công việc.
 2. Bấm "Khởi tạo công việc": Người được giao việc sẽ lập tức nhận thông báo trên điện thoại.
 
-### BÀI 4: QUẢN TRỊ HỘI VIÊN CHUẨN & QUY TRÌNH KẾT NẠP AN TOÀN
+### BÀI 4: QUẢN TRỊ Học viên CHUẨN & QUY TRÌNH KẾT NẠP AN TOÀN
 1. **Quy chuẩn tiếp nhận duy nhất**:
-   - Để đảm bảo tính minh bạch và bảo mật dữ liệu, hệ thống **không cho phép tạo hội viên tùy tiện thủ công trong CRM**.
-   - 100% hồ sơ hội viên mới phải đăng ký công khai qua Cổng thông tin Hiệp hội (`/register` hoặc `/landing`).
+   - Để đảm bảo tính minh bạch và bảo mật dữ liệu, hệ thống **không cho phép tạo Học viên tùy tiện thủ công trong CRM**.
+   - 100% hồ sơ Học viên mới phải đăng ký công khai qua Cổng thông tin Hiệp hội (`/register` hoặc `/landing`).
 2. **Duyệt hồ sơ & Cấp tài khoản tự động**:
-   - Ban Thư Ký và Ban Thành Viên vào danh sách Hội viên duyệt hồ sơ (`approveMemberAndSendCredentials`).
-   - Hệ thống tự động khởi tạo tài khoản với cờ `must_change_password = true`, sinh mật khẩu tạm thời ngẫu nhiên an toàn và gửi thư kích hoạt kèm mã QR và hướng dẫn đăng nhập đến email hội viên.
+   - Ban Thư Ký và Ban Thành Viên vào danh sách Học viên duyệt hồ sơ (`approveMemberAndSendCredentials`).
+   - Hệ thống tự động khởi tạo tài khoản với cờ `must_change_password = true`, sinh mật khẩu tạm thời ngẫu nhiên an toàn và gửi thư kích hoạt kèm mã QR và hướng dẫn đăng nhập đến email Học viên.
 
 ### BÀI 5: XUẤT NHẬP DỮ LIỆU EXCEL BÁO CÁO TÀI CHÍNH & NHÀ TÀI TRỢ
 1. **Báo cáo Thu - Chi & Sổ quỹ Tài chính (`/finance-report`)**:
@@ -72,25 +72,25 @@
 
 ### BÀI 7: QUẢN TRỊ ĐĂNG KÝ SỰ KIỆN, ĐỐI SOÁT & KÍCH HOẠT VÉ QR BẮN EMAIL E-TICKET
 1. **Quy Trình Kiểm Soát Vé Sự Kiện Có Phí**:
-   - Khi hội viên hoặc khách mời đăng ký tham dự sự kiện có phí qua App hoặc Web, hệ thống chỉ ghi nhận đăng ký tạm thời với trạng thái chưa thanh toán (`registered: false`).
+   - Khi Học viên hoặc khách mời đăng ký tham dự sự kiện có phí qua App hoặc Web, hệ thống chỉ ghi nhận đăng ký tạm thời với trạng thái chưa thanh toán (`registered: false`).
    - Lúc này hệ thống **tuyệt đối không sinh mã QR vé check-in** nhằm phòng ngừa gian lận hoặc check-in nhầm; người dùng chỉ nhận được mã QR ngân hàng thanh toán tài khoản MB Bank 1000000000 kèm cú pháp chuyển khoản.
 2. **Thao Tác Của Ban Truyền Thông / Kế Toán Tại Web CRM (`/event-registrations`)**:
    - **Nút [✓ Đã thanh toán]**: Khi đối soát thấy tiền đã vào tài khoản, quản trị viên nhấp nút `[✓ Đã thanh toán]`. Hệ thống lập tức:
      * Cập nhật trạng thái thanh toán sang `paid` và kích hoạt vé chính thức (`registered: true`).
-     * Tự động sinh mã QR vé tham dự theo chuẩn `makeTicketQrUrl(...)` chứa đầy đủ thông tin hội viên, doanh nghiệp, hạng vé và chỗ ngồi.
+     * Tự động sinh mã QR vé tham dự theo chuẩn `makeTicketQrUrl(...)` chứa đầy đủ thông tin Học viên, doanh nghiệp, hạng vé và chỗ ngồi.
      * Backend NestJS tự động tạo và gửi email E-ticket HTML cao cấp kèm mã QR vé check-in đến địa chỉ email của người tham gia.
    - **Nút [🔍 Đối soát]**: Mở modal đối soát chi tiết dòng tiền, xem mã hóa đơn, mã tham chiếu ngân hàng, số tiền thực nhận và thời điểm đối soát.
 
 ### BÀI 8: MẠNG XÃ HỘI DOANH NHÂN WEB CRM & LÊN LỊCH GẶP 1-ON-1 TRỰC TIẾP (`/network`)
 1. **Cấu Trúc 3 Tab Chuyên Biệt Màn Kết Nối**:
-   - 📰 **Tab 1: Bảng tin (Feed)**: Dòng thời gian tổng hợp các bài đăng thời gian thực từ cộng đồng hội viên:
+   - 📰 **Tab 1: Bảng tin (Feed)**: Dòng thời gian tổng hợp các bài đăng thời gian thực từ cộng đồng Học viên:
      * Sản phẩm & Dịch vụ tiêu biểu mới đăng tải.
      * Cơ hội hợp tác kinh doanh, chào mua / chào bán B2B.
      * Tin tức, thông báo và phóng sự hoạt động từ Hiệp hội.
    - 💬 **Tab 2: Nhắn tin (Messages)**: Hệ thống hội thoại công việc, phân loại chat cá nhân 1-on-1 và chat nhóm chuyên môn.
    - 👥 **Tab 3: Kết nối (Thành viên theo Ban chuyên môn)**: Danh bạ doanh nhân với bộ lọc theo 7 Ban chuyên môn, hiển thị chức vụ, doanh nghiệp và số lượng nhân sự từng ban.
 2. **Tính Năng Lên Lịch Gặp 1-on-1 Trực Tiếp Trên Web CRM**:
-   - Trên mỗi bài đăng ở Bảng tin, quản trị viên hoặc hội viên có thể bấm nút **[🤝 Lên lịch cuộc gặp 1-on-1]**.
+   - Trên mỗi bài đăng ở Bảng tin, quản trị viên hoặc Học viên có thể bấm nút **[🤝 Lên lịch cuộc gặp 1-on-1]**.
    - Popup `ScheduleMeetingModal` mở ra trực tiếp trên Web CRM cho phép chọn ngày, giờ, hình thức gặp (Trực tiếp tại văn phòng hiệp hội / Quán cafe / Online Google Meet / Zoom), địa điểm và nội dung trao đổi.
    - Sau khi xác nhận, hệ thống tự động khởi tạo thread tin nhắn 1-on-1 và gửi lời mời lịch hẹn trang trọng kèm thông điệp chi tiết đến đối tác.
 
@@ -114,19 +114,19 @@
    - Tuyệt đối không chỉ lưu tạm ở bộ nhớ trình duyệt (`localStorage`); khi tải lại trang (`F5`) hoặc đăng nhập từ thiết bị khác, dữ liệu phân quyền luôn được nạp đầy đủ và chính xác từ cơ sở dữ liệu.
    - Tự động làm mới cache hồ sơ người dùng (`clearMeCache`), phát thông báo thay đổi quyền hạn `role-changed` giúp thanh điều hướng và menu chức năng cập nhật thẩm quyền mới ngay tức thì mà không cần đăng xuất.
 
-### BÀI 11: QUY CHUẨN BẢNG DASHBOARD CO DÃN CỘT EXCEL, CHỈNH SỬA HỘI VIÊN - DOANH NGHIỆP & GIA HẠN HỘI VIÊN
+### BÀI 11: QUY CHUẨN BẢNG DASHBOARD CO DÃN CỘT EXCEL, CHỈNH SỬA Học viên - DOANH NGHIỆP & GIA HẠN Học viên
 1. **Co dãn cột Dashboard như Excel & Rút gọn Ellipsis Tooltip**:
    - Mọi bảng dashboard (Quản lý Thu `/income`, Quản lý Chi `/expenses`, Đăng ký sự kiện `/event-registrations`): Hỗ trợ thanh kéo `resizer` ở từng tiêu đề cột, người dùng rê chuột kéo giãn co hẹp độ rộng cột tự do như bảng tính Excel.
    - Các trường nội dung dài (Nội dung thu/chi, Người nộp/nhận, Danh mục,...) tự động cắt rút gọn `...` và hiển thị Tooltip sắc nét phong cách Ant Design (nền đen #1f1f1f, chữ trắng, mũi tên định hướng) khi rê chuột vào, tuyệt đối không làm tràn vỡ dòng hay lệch cấu trúc bảng.
-2. **Tách biệt Chỉnh sửa Hội viên & Doanh nghiệp**:
+2. **Tách biệt Chỉnh sửa Học viên & Doanh nghiệp**:
    - **Chỉnh sửa Doanh nghiệp (`/companies`)**: Cột 3 bảng Doanh nghiệp hiển thị Tên doanh nghiệp; Modal chỉnh sửa chỉ hiển thị các trường liên quan đến doanh nghiệp (Tên DN, Mã số thuế, Ngành nghề, Quy mô, Website, Địa chỉ, Hội phí).
-   - **Chỉnh sửa Hội viên (`/members`)**: Modal chỉnh sửa chỉ hiển thị thông tin cá nhân của hội viên (Họ tên, SĐT, Email, Chức vụ, Hạng, Vùng, Trạng thái, Địa chỉ, Giới thiệu).
-   - **Xóa Hội viên với 2 Lựa chọn minh bạch**:
-     * Lựa chọn 1: *Xóa doanh nghiệp trước* (`company_only`): Hủy liên kết doanh nghiệp, xóa thông tin doanh nghiệp nhưng vẫn giữ lại hồ sơ hội viên và tài khoản. Sau đó có thể tiếp tục thao tác xóa hội viên nếu muốn.
-     * Lựa chọn 2: *Xóa cả hội viên và doanh nghiệp* (`all`): Cascade xóa sạch toàn bộ hồ sơ hội viên, doanh nghiệp, thẻ điện tử, tư cách hội viên và tài khoản đăng nhập `vione_users`/`auth.users`.
-3. **Quản lý Gia Hạn Hội Viên (`/renewal`)**:
-   - Khắc phục triệt để lỗi CSDL ép kiểu UUID khi xử lý mã hội viên; dữ liệu gia hạn luôn liên kết với bản ghi tài khoản `vione_users` mới nhất.
-   - Thao tác "Gia hạn hội viên" và "Gửi nhắc nhở" hoạt động ổn định và chính xác; chân trang phân trang được bao phủ toàn màn hình chuyên nghiệp.
+   - **Chỉnh sửa Học viên (`/members`)**: Modal chỉnh sửa chỉ hiển thị thông tin cá nhân của Học viên (Họ tên, SĐT, Email, Chức vụ, Hạng, Vùng, Trạng thái, Địa chỉ, Giới thiệu).
+   - **Xóa Học viên với 2 Lựa chọn minh bạch**:
+     * Lựa chọn 1: *Xóa doanh nghiệp trước* (`company_only`): Hủy liên kết doanh nghiệp, xóa thông tin doanh nghiệp nhưng vẫn giữ lại hồ sơ Học viên và tài khoản. Sau đó có thể tiếp tục thao tác xóa Học viên nếu muốn.
+     * Lựa chọn 2: *Xóa cả Học viên và doanh nghiệp* (`all`): Cascade xóa sạch toàn bộ hồ sơ Học viên, doanh nghiệp, thẻ điện tử, tư cách Học viên và tài khoản đăng nhập `vione_users`/`auth.users`.
+3. **Quản lý Gia Hạn Học viên (`/renewal`)**:
+   - Khắc phục triệt để lỗi CSDL ép kiểu UUID khi xử lý mã Học viên; dữ liệu gia hạn luôn liên kết với bản ghi tài khoản `vione_users` mới nhất.
+   - Thao tác "Gia hạn Học viên" và "Gửi nhắc nhở" hoạt động ổn định và chính xác; chân trang phân trang được bao phủ toàn màn hình chuyên nghiệp.
 4. **Phân Quyền Ma Trận 2 Tab & Chọn Ban Điều Hành Nhanh**:
    - Ma trận phân quyền (`/permissions`) chia làm 2 tab: Tab CRM Web và Tab App CEO HN10 Mobile.
    - Khi chọn Ban Điều Hành tại Quản lý tài khoản (`/accounts`), hệ thống hiển thị đầy đủ 5 vai trò cốt lõi ngay từ lần click đầu tiên mà không cần chọn ban khác rồi quay lại.

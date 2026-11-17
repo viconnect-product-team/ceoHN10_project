@@ -140,7 +140,7 @@ export function isUserAssignedToEvent(user: any, event: any, member?: any): bool
  *
  * @param user Tài khoản người dùng hiện tại
  * @param eventOrEvents Sự kiện cụ thể hoặc danh sách tất cả các sự kiện
- * @param member Hồ sơ hội viên gắn với tài khoản
+ * @param member Hồ sơ Học viên gắn với tài khoản
  */
 export function canScanEventQr(user: any, eventOrEvents?: any | any[], member?: any): boolean {
   // 1. Quản trị, Chủ tịch, Admin: Luôn luôn có quyền quét mã check-in

@@ -46,7 +46,7 @@ export function AssociationCardCaptureModal({
   const [analyzing, setAnalyzing] = useState(false);
   const [memberStatus, setMemberStatus] = useState<"idle" | "member_found" | "non_member">("idle");
 
-  // Thông tin liên hệ hội viên: Họ Tên, Số Điện Thoại và Email
+  // Thông tin liên hệ Học viên: Họ Tên, Số Điện Thoại và Email
   const [contactName, setContactName] = useState<string>("");
   const [contactPhone, setContactPhone] = useState<string>("");
   const [contactEmail, setContactEmail] = useState<string>("");
@@ -60,7 +60,7 @@ export function AssociationCardCaptureModal({
   const { scanImageFile } = useQrScanner({
     active: false,
     torch: false,
-    onDetect: () => {},
+    onDetect: () => { },
   });
 
   useEffect(() => {
@@ -175,7 +175,7 @@ export function AssociationCardCaptureModal({
     return (email || "").trim().toLowerCase();
   };
 
-  // Hàm đối soát hội viên: (Tên + SĐT) HOẶC (Email + SĐT)
+  // Hàm đối soát Học viên: (Tên + SĐT) HOẶC (Email + SĐT)
   const checkMemberMatch = (
     membersList: any[],
     inputName: string,
@@ -239,7 +239,7 @@ export function AssociationCardCaptureModal({
         }
       }
 
-      // 2. Lấy danh sách hội viên chính thức của Hiệp hội CEO HN10 để đối soát
+      // 2. Lấy danh sách Học viên chính thức của Hiệp hội CEO HN10 để đối soát
       let directoryMembers: any[] = [];
       try {
         const fetched = await fetchNestApi<any[]>("/members/directory").catch(() => null);
@@ -253,7 +253,7 @@ export function AssociationCardCaptureModal({
         // fallback
       }
 
-      // Danh sách hội viên mẫu mặc định của CLB CEO HN10 (có đầy đủ Tên, SĐT, Email)
+      // Danh sách Học viên mẫu mặc định của CLB CEO HN10 (có đầy đủ Tên, SĐT, Email)
       const defaultMembers = [
         { code: "HN10-001", name: "Platform Administrator", phone: "0901000001", email: "admin@ceohn10.vn" },
         { code: "HN10-002", name: "Quản trị viên Hệ thống", phone: "0901000002", email: "quantri@ceohn10.vn" },
@@ -333,7 +333,7 @@ export function AssociationCardCaptureModal({
 
       // NGUYÊN TẮC BẮT BUỘC:
       // Kiểm tra xem (Tên và Số điện thoại) HAY (Email và Số điện thoại) trên danh thiếp
-      // có trùng với hội viên chính thức của Hiệp hội hay không.
+      // có trùng với Học viên chính thức của Hiệp hội hay không.
       let matchedMember: any = null;
 
       if (rawPhone) {
@@ -346,11 +346,11 @@ export function AssociationCardCaptureModal({
         setContactEmail(matchedMember.email || rawEmail);
         setMemberCode(matchedMember.code || foundMemberCode || `HN10-${Date.now().toString().slice(-4)}`);
         setMemberStatus("member_found");
-        toast.success(`Xác thực thành công: Hội viên ${matchedMember.name} (${matchedMember.phone}) thuộc Hiệp hội CEO HN10!`);
+        toast.success(`Xác thực thành công: Học viên ${matchedMember.name} (${matchedMember.phone}) thuộc Hiệp hội CEO HN10!`);
         return;
       }
 
-      // NẾU KHÔNG TRÙNG (TÊN + SĐT) HAY (EMAIL + SĐT) VỚI BẤT KỲ HỘI VIÊN NÀO
+      // NẾU KHÔNG TRÙNG (TÊN + SĐT) HAY (EMAIL + SĐT) VỚI BẤT KỲ Học viên NÀO
       // -> Chuyển sang trạng thái non_member, hiển thị thông báo hướng dẫn cài đặt app ViOne
       setMemberStatus("non_member");
       setContactName(rawName);
@@ -414,10 +414,10 @@ export function AssociationCardCaptureModal({
         setContactEmail(matchedMember.email || contactEmail);
         setMemberCode(matchedMember.code || `HN10-${Date.now().toString().slice(-4)}`);
         setMemberStatus("member_found");
-        toast.success(`Xác thực thành công: Hội viên ${matchedMember.name} (${matchedMember.phone}) thuộc Hiệp hội CEO HN10!`);
+        toast.success(`Xác thực thành công: Học viên ${matchedMember.name} (${matchedMember.phone}) thuộc Hiệp hội CEO HN10!`);
       } else {
         setMemberStatus("non_member");
-        toast.error("Không tìm thấy hội viên khớp (Họ tên + Số điện thoại) hoặc (Email + Số điện thoại) trong danh bạ Hiệp Hội!");
+        toast.error("Không tìm thấy Học viên khớp (Họ tên + Số điện thoại) hoặc (Email + Số điện thoại) trong danh bạ Hiệp Hội!");
       }
     } finally {
       setAnalyzing(false);
@@ -491,7 +491,7 @@ export function AssociationCardCaptureModal({
     reader.readAsDataURL(file);
   };
 
-  // Lưu danh bạ số: CHỈ LƯU HỘI VIÊN THUỘC HIỆP HỘI
+  // Lưu danh bạ số: CHỈ LƯU Học viên THUỘC HIỆP HỘI
   const handleSaveToDigitalContacts = async () => {
     if (memberStatus !== "member_found" || !memberCode || memberCode === "NON_MEMBER") {
       toast.error("Tính năng không áp dụng cho người không thuộc app hiệp hội!");
@@ -499,7 +499,7 @@ export function AssociationCardCaptureModal({
     }
 
     if (!contactName.trim()) {
-      toast.error("Vui lòng nhập tên hội viên");
+      toast.error("Vui lòng nhập tên Học viên");
       return;
     }
     if (!contactPhone.trim()) {
@@ -542,7 +542,7 @@ export function AssociationCardCaptureModal({
           targetName: cleanName,
           targetPhone: cleanPhone,
         }),
-      }).catch(() => {});
+      }).catch(() => { });
 
       // 3. Tải file vCard .vcf CHỈ CHỨA TÊN VÀ SỐ ĐIỆN THOẠI (Không có TITLE, không có NOTE/mô tả)
       const vcardContent = `BEGIN:VCARD\nVERSION:3.0\nFN:${cleanName}\nTEL:${cleanPhone}\nEND:VCARD`;
@@ -612,7 +612,7 @@ export function AssociationCardCaptureModal({
                 Chụp Ảnh Danh Thiếp
               </h3>
               <p className="text-[11px] text-amber-200/90 font-medium">
-                Kiểm tra hội viên & thêm tên + số điện thoại vào danh bạ
+                Kiểm tra Học viên & thêm tên + số điện thoại vào danh bạ
               </p>
             </div>
           </div>
@@ -636,11 +636,10 @@ export function AssociationCardCaptureModal({
                   setActiveTab("camera");
                   setCapturedImage(null);
                 }}
-                className={`flex-1 py-2 rounded-xl flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
-                  activeTab === "camera"
+                className={`flex-1 py-2 rounded-xl flex items-center justify-center gap-1.5 transition-all cursor-pointer ${activeTab === "camera"
                     ? "bg-[#003B95] text-white font-bold shadow-md"
                     : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
-                }`}
+                  }`}
               >
                 <Camera className="w-3.5 h-3.5" />
                 <span>Máy Ảnh Trực Tiếp</span>
@@ -651,11 +650,10 @@ export function AssociationCardCaptureModal({
                   setActiveTab("upload");
                   stopCamera();
                 }}
-                className={`flex-1 py-2 rounded-xl flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
-                  activeTab === "upload"
+                className={`flex-1 py-2 rounded-xl flex items-center justify-center gap-1.5 transition-all cursor-pointer ${activeTab === "upload"
                     ? "bg-[#003B95] text-white font-bold shadow-md"
                     : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
-                }`}
+                  }`}
               >
                 <Upload className="w-3.5 h-3.5" />
                 <span>Tải Ảnh Từ Máy</span>
@@ -679,20 +677,20 @@ export function AssociationCardCaptureModal({
                   <div className="absolute inset-0 bg-black/70 backdrop-blur-sm flex flex-col items-center justify-center gap-2 text-white">
                     <RefreshCw className="w-6 h-6 animate-spin text-amber-400" />
                     <span className="text-xs font-semibold">
-                      Đang kiểm tra thông tin hội viên...
+                      Đang kiểm tra thông tin Học viên...
                     </span>
                   </div>
                 )}
               </div>
 
-              {/* ── TRƯỜNG HỢP 1: LÀ HỘI VIÊN HIỆP HỘI CEO HN10 ── */}
+              {/* ── TRƯỜNG HỢP 1: LÀ Học viên HIỆP HỘI CEO HN10 ── */}
               {/* HIỂN THỊ TÊN, SỐ ĐIỆN THOẠI VÀ EMAIL (NẾU CÓ) */}
               {memberStatus === "member_found" && (
                 <div className="w-full max-w-sm bg-white dark:bg-slate-900 rounded-2xl p-4 border border-emerald-500/40 shadow-lg animate-scale-in text-slate-900 dark:text-white">
                   <div className="flex items-center justify-between pb-2.5 border-b border-slate-100 dark:border-white/10">
                     <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 text-[11px] font-bold border border-emerald-500/30">
                       <UserCheck className="w-3.5 h-3.5" />
-                      <span>Hội Viên CEO HN10</span>
+                      <span>Học viên CEO HN10</span>
                     </span>
                     <span className="text-[11px] font-bold text-amber-600 dark:text-amber-400">
                       {memberCode}
@@ -739,7 +737,7 @@ export function AssociationCardCaptureModal({
                           type="email"
                           value={contactEmail}
                           onChange={(e) => setContactEmail(e.target.value)}
-                          placeholder="Email hội viên"
+                          placeholder="Email Học viên"
                           className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
                       </div>
@@ -785,7 +783,7 @@ export function AssociationCardCaptureModal({
 
                   {/* Thông báo chuẩn nghiệp vụ Hiệp Hội Doanh Nhân CEO HN10 */}
                   <p className="text-xs text-slate-700 dark:text-slate-200 mt-2 px-1 font-semibold leading-relaxed">
-                    Chức năng lưu danh thiếp tự động dành riêng cho Hội viên CLB Doanh Nhân CEO HN10. Nếu bạn là doanh nhân mong muốn kết nối &amp; mở rộng giao thương, hãy đăng ký gia nhập Hiệp hội.
+                    Chức năng lưu danh thiếp tự động dành riêng cho Học viên CLB Doanh Nhân CEO HN10. Nếu bạn là doanh nhân mong muốn kết nối &amp; mở rộng giao thương, hãy đăng ký gia nhập Hiệp hội.
                   </p>
 
                   {/* Nút liên kết nội bộ đăng ký gia nhập Hiệp Hội CEO HN10 */}
@@ -810,7 +808,7 @@ export function AssociationCardCaptureModal({
                   {/* Đối soát thủ công nếu danh thiếp mờ hoặc quét chưa trúng */}
                   <div className="mt-4 pt-3 border-t border-slate-100 dark:border-white/10 text-left">
                     <p className="text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">
-                      Đối soát trực tiếp thông tin hội viên:
+                      Đối soát trực tiếp thông tin Học viên:
                     </p>
                     <p className="text-[10px] text-slate-500 dark:text-slate-400 mb-2">
                       (Hệ thống kiểm tra trùng Tên + SĐT hoặc Email + SĐT)
@@ -820,21 +818,21 @@ export function AssociationCardCaptureModal({
                         type="text"
                         value={contactName}
                         onChange={(e) => setContactName(e.target.value)}
-                        placeholder="Họ và tên hội viên"
+                        placeholder="Họ và tên Học viên"
                         className="w-full px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs font-medium text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#003B95]"
                       />
                       <input
                         type="tel"
                         value={contactPhone}
                         onChange={(e) => setContactPhone(e.target.value)}
-                        placeholder="Số điện thoại hội viên (*)"
+                        placeholder="Số điện thoại Học viên (*)"
                         className="w-full px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs font-medium text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#003B95]"
                       />
                       <input
                         type="email"
                         value={contactEmail}
                         onChange={(e) => setContactEmail(e.target.value)}
-                        placeholder="Email hội viên"
+                        placeholder="Email Học viên"
                         className="w-full px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs font-medium text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#003B95]"
                       />
                       <button
@@ -844,7 +842,7 @@ export function AssociationCardCaptureModal({
                         className="w-full py-2 rounded-lg bg-[#003B95] hover:bg-[#002b70] text-white font-bold text-xs flex items-center justify-center gap-1.5 transition active:scale-98 cursor-pointer"
                       >
                         {analyzing ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <UserCheck className="w-3.5 h-3.5" />}
-                        <span>Đối Soát Hội Viên</span>
+                        <span>Đối Soát Học viên</span>
                       </button>
                     </div>
                   </div>
@@ -859,9 +857,8 @@ export function AssociationCardCaptureModal({
                 playsInline
                 muted
                 autoPlay
-                className={`absolute inset-0 w-full h-full object-cover ${
-                  facingMode === "user" ? "scale-x-[-1]" : ""
-                }`}
+                className={`absolute inset-0 w-full h-full object-cover ${facingMode === "user" ? "scale-x-[-1]" : ""
+                  }`}
               />
 
               <div className="absolute inset-0 bg-black/60 pointer-events-none" />
@@ -886,11 +883,10 @@ export function AssociationCardCaptureModal({
                   <button
                     type="button"
                     onClick={toggleTorch}
-                    className={`p-2.5 rounded-full backdrop-blur-md transition-all cursor-pointer ${
-                      torchOn
+                    className={`p-2.5 rounded-full backdrop-blur-md transition-all cursor-pointer ${torchOn
                         ? "bg-amber-400 text-slate-950 shadow-md shadow-amber-400/40"
                         : "bg-black/60 text-white hover:bg-black/80 border border-white/10"
-                    }`}
+                      }`}
                   >
                     <Zap className="w-4 h-4" />
                   </button>
@@ -913,7 +909,7 @@ export function AssociationCardCaptureModal({
               </div>
               <h4 className="font-bold text-base text-white">Tải Ảnh Danh Thiếp</h4>
               <p className="text-xs text-slate-400 mt-1 leading-relaxed">
-                Chọn ảnh danh thiếp từ thiết bị. Hệ thống sẽ tự động kiểm tra hội viên và lưu tên +
+                Chọn ảnh danh thiếp từ thiết bị. Hệ thống sẽ tự động kiểm tra Học viên và lưu tên +
                 số điện thoại vào danh bạ.
               </p>
 

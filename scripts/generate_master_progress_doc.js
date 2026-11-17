@@ -115,7 +115,7 @@ const WORK_PACKAGES = [
   {
     phase: 'Giai Đoạn 2: Xác Thực & Phân Quyền',
     id: 'WP-07',
-    task: 'Cơ chế bảo mật Strict RBAC: Phân định quyền hạn, bảo đảm chỉ Ban Thành Viên có quyền duyệt hội viên',
+    task: 'Cơ chế bảo mật Strict RBAC: Phân định quyền hạn, bảo đảm chỉ Ban Thành Viên có quyền duyệt Học viên',
     owner: 'Backend Team',
     startDate: '18/09/2026',
     endDate: '20/09/2026',
@@ -137,9 +137,9 @@ const WORK_PACKAGES = [
     notes: 'Tự động phục hồi kết nối, hỗ trợ test đồng thời 2 port'
   },
 
-  // Giai đoạn 3: Web CRM Quản Trị Hội Viên 360 Độ
+  // Giai đoạn 3: Web CRM Quản Trị Học viên 360 Độ
   {
-    phase: 'Giai Đoạn 3: Quản Trị Hội Viên CRM',
+    phase: 'Giai Đoạn 3: Quản Trị Học viên CRM',
     id: 'WP-09',
     task: 'Xây dựng Landing Page CLB CEO HN10 & Form nộp hồ sơ gia nhập trực tuyến',
     owner: 'Frontend Team',
@@ -151,7 +151,7 @@ const WORK_PACKAGES = [
     notes: 'Form có đầy đủ MST, công ty, email, chuyên ban nguyện vọng'
   },
   {
-    phase: 'Giai Đoạn 3: Quản Trị Hội Viên CRM',
+    phase: 'Giai Đoạn 3: Quản Trị Học viên CRM',
     id: 'WP-10',
     task: 'Tích hợp Mailer tự động gửi email tiếp nhận hồ sơ qua Google SMTP (Port 465 SSL)',
     owner: 'Backend Team',
@@ -163,7 +163,7 @@ const WORK_PACKAGES = [
     notes: 'Đã gửi thực tế thành công tới ứng viên'
   },
   {
-    phase: 'Giai Đoạn 3: Quản Trị Hội Viên CRM',
+    phase: 'Giai Đoạn 3: Quản Trị Học viên CRM',
     id: 'WP-11',
     task: 'Xây dựng phân hệ Thẩm định & Phê duyệt kết nạp độc quyền Ban Thành Viên (/members)',
     owner: 'Fullstack Team',
@@ -175,9 +175,9 @@ const WORK_PACKAGES = [
     notes: 'Cấp mã CEO-83xxx, tạo tài khoản auth.users & vione_users, gửi credentials'
   },
   {
-    phase: 'Giai Đoạn 3: Quản Trị Hội Viên CRM',
+    phase: 'Giai Đoạn 3: Quản Trị Học viên CRM',
     id: 'WP-12',
-    task: 'Xây dựng trang xem chi tiết hồ sơ hội viên 360 độ (/members/$memberId)',
+    task: 'Xây dựng trang xem chi tiết hồ sơ Học viên 360 độ (/members/$memberId)',
     owner: 'Frontend Team',
     startDate: '24/09/2026',
     endDate: '25/09/2026',
@@ -187,9 +187,9 @@ const WORK_PACKAGES = [
     notes: 'Tổng hợp lịch sử sự kiện, giao thương B2B, điểm danh và cống hiến'
   },
   {
-    phase: 'Giai Đoạn 3: Quản Trị Hội Viên CRM',
+    phase: 'Giai Đoạn 3: Quản Trị Học viên CRM',
     id: 'WP-13',
-    task: 'Chức năng Quản trị tài khoản hội viên: Reset mật khẩu, kích hoạt, khóa/mở khóa',
+    task: 'Chức năng Quản trị tài khoản Học viên: Reset mật khẩu, kích hoạt, khóa/mở khóa',
     owner: 'Backend Team',
     startDate: '25/09/2026',
     endDate: '25/09/2026',
@@ -199,9 +199,9 @@ const WORK_PACKAGES = [
     notes: 'Kiểm soát tài khoản tức thời, vô hiệu hóa JWT khi khóa'
   },
   {
-    phase: 'Giai Đoạn 3: Quản Trị Hội Viên CRM',
+    phase: 'Giai Đoạn 3: Quản Trị Học viên CRM',
     id: 'WP-14',
-    task: 'Chấm điểm hoạt động, xếp hạng hội viên (Kim Cương/Vàng/Bạc) & Phân khúc ngành nghề',
+    task: 'Chấm điểm hoạt động, xếp hạng Học viên (Kim Cương/Vàng/Bạc) & Phân khúc ngành nghề',
     owner: 'Fullstack Team',
     startDate: '25/09/2026',
     endDate: '26/09/2026',
@@ -211,9 +211,9 @@ const WORK_PACKAGES = [
     notes: 'Biểu đồ phân khúc /segments và xếp hạng thi đua'
   },
   {
-    phase: 'Giai Đoạn 3: Quản Trị Hội Viên CRM',
+    phase: 'Giai Đoạn 3: Quản Trị Học viên CRM',
     id: 'WP-15',
-    task: 'Xuất dữ liệu danh bạ hội viên ra Excel & Nhập danh bạ hàng loạt từ file mẫu',
+    task: 'Xuất dữ liệu danh bạ Học viên ra Excel & Nhập danh bạ hàng loạt từ file mẫu',
     owner: 'Backend Team',
     startDate: '26/09/2026',
     endDate: '26/09/2026',
@@ -239,7 +239,7 @@ const WORK_PACKAGES = [
   {
     phase: 'Giai Đoạn 4: Quản Trị Sự Kiện CRM',
     id: 'WP-17',
-    task: 'Cấu hình đa dạng gói vé: Vé VIP tiệc tối (1.5M), Vé tiêu chuẩn (0đ), Vé hội viên (0đ)',
+    task: 'Cấu hình đa dạng gói vé: Vé VIP tiệc tối (1.5M), Vé tiêu chuẩn (0đ), Vé Học viên (0đ)',
     owner: 'Backend Team',
     startDate: '27/09/2026',
     endDate: '27/09/2026',
@@ -258,7 +258,7 @@ const WORK_PACKAGES = [
     progress: '100%',
     status: 'Hoàn thành',
     verifier: 'Solution Architect',
-    notes: 'Phân khu Bàn VIP A, Bàn Hội viên B-D, gán đại biểu vào từng ghế'
+    notes: 'Phân khu Bàn VIP A, Bàn Học viên B-D, gán đại biểu vào từng ghế'
   },
   {
     phase: 'Giai Đoạn 4: Quản Trị Sự Kiện CRM',
@@ -394,7 +394,7 @@ const WORK_PACKAGES = [
     progress: '100%',
     status: 'Hoàn thành',
     verifier: 'Product Owner',
-    notes: 'Sao kê nguồn tiền thời gian thực cho toàn bộ hội viên'
+    notes: 'Sao kê nguồn tiền thời gian thực cho toàn bộ Học viên'
   },
   {
     phase: 'Giai Đoạn 6: Tài Chính & Sổ Quỹ CRM',
@@ -421,7 +421,7 @@ const WORK_PACKAGES = [
     notes: 'Lưu trực tiếp vào CSDL PostgreSQL, kiểm soát truy cập tuyệt đối'
   },
 
-  // Giai đoạn 7: Mobile App Hiệp Hội (Cổng Thông Tin Hội Viên)
+  // Giai đoạn 7: Mobile App Hiệp Hội (Cổng Thông Tin Học viên)
   {
     phase: 'Giai Đoạn 7: Mobile App Hiệp Hội',
     id: 'WP-32',
@@ -449,7 +449,7 @@ const WORK_PACKAGES = [
   {
     phase: 'Giai Đoạn 7: Mobile App Hiệp Hội',
     id: 'WP-34',
-    task: 'Thẻ Hội Viên VIP Titanium 3D hiệu ứng xoay lật hoàng gia & Mã QR định danh cá nhân (/card)',
+    task: 'Thẻ Học viên VIP Titanium 3D hiệu ứng xoay lật hoàng gia & Mã QR định danh cá nhân (/card)',
     owner: 'Frontend Team',
     startDate: '01/10/2026',
     endDate: '01/10/2026',
@@ -581,7 +581,7 @@ async function buildExcelProgress(outputPath) {
 
   // Subtitle
   ws.mergeCells('A2:J2');
-  ws.getCell('A2').value = 'Đơn vị: CLB Doanh Nhân CEO HN10 (HanoiBA) · Cổng Quản Trị Web CRM & Ứng Dụng Di Động Hội Viên (PWA)';
+  ws.getCell('A2').value = 'Đơn vị: CLB Doanh Nhân CEO HN10 (HanoiBA) · Cổng Quản Trị Web CRM & Ứng Dụng Di Động Học viên (PWA)';
   ws.getCell('A2').font = { name: 'Times New Roman', size: 11, italic: true, color: { argb: 'FF475569' } };
   ws.getCell('A2').alignment = { vertical: 'middle', horizontal: 'center' };
   ws.getRow(2).height = 24;
@@ -663,7 +663,7 @@ async function buildExcelProgress(outputPath) {
 // 2. Tạo file Markdown (.md)
 function buildMarkdownProgress() {
   let md = `# BÁO CÁO TIẾN ĐỘ THỰC HIỆN DỰ ÁN HỆ SINH THÁI SỐ HÓA CEO HN10
-## HỆ THỐNG CỔNG QUẢN TRỊ TRUNG TÂM (WEB CRM) & ỨNG DỤNG DI ĐỘNG HỘI VIÊN (PWA)
+## HỆ THỐNG CỔNG QUẢN TRỊ TRUNG TÂM (WEB CRM) & ỨNG DỤNG DI ĐỘNG Học viên (PWA)
 *Đơn vị chủ trì: CLB Doanh Nhân CEO HN10 (Trực thuộc Hội Doanh Nhân Trẻ Hà Nội - HanoiBA)*
 
 ---
@@ -697,7 +697,7 @@ function buildMarkdownProgress() {
    - Kiểm tra Type Check (\`tsc --noEmit\`): **0 errors (100% PASS)** cả Frontend lẫn Backend.
    - Kiểm tra cú pháp AST: **100% file không có lỗi cú pháp**.
 2. **Quy Chuẩn Nghiệp Vụ & Bảo Mật:**
-   - Ban Thành Viên độc quyền thẩm quyền duyệt hội viên; Ban Thư Ký không có quyền duyệt đúng quy chế hiệp hội.
+   - Ban Thành Viên độc quyền thẩm quyền duyệt Học viên; Ban Thư Ký không có quyền duyệt đúng quy chế hiệp hội.
    - Triệt tiêu 100% từ "niên liễm", chuyển đổi chuẩn mực sang "hội phí thường niên".
    - Bảng biểu Word DOCX được căn chỉnh bằng kích thước DXA cố định (\`TABLE_WIDTH_DXA = 9200\`), triệt tiêu 100% lỗi cột dọc 1 ký tự.
 3. **Bộ Tài Liệu Master Đầy Đủ:**
@@ -721,18 +721,26 @@ async function buildDocxProgress(outputPath) {
 
   // Title
   docChildren.push(
-    new Paragraph({ spacing: { before: 400, after: 100 }, alignment: AlignmentType.CENTER, children: [
-      new TextRun({ text: 'HỘI DOANH NHÂN TRẺ HÀ NỘI (HANOIBA)', font: FONT_FAMILY, size: 24, bold: true, color: '64748B' })
-    ]}),
-    new Paragraph({ spacing: { before: 80, after: 200 }, alignment: AlignmentType.CENTER, children: [
-      new TextRun({ text: 'CLB DOANH NHÂN CEO HN10', font: FONT_FAMILY, size: 28, bold: true, color: 'D97706' })
-    ]}),
-    new Paragraph({ spacing: { before: 100, after: 100 }, alignment: AlignmentType.CENTER, children: [
-      new TextRun({ text: 'BÁO CÁO TIẾN ĐỘ THỰC HIỆN DỰ ÁN HỆ SINH THÁI SỐ HÓA CEO HN10', font: FONT_FAMILY, size: 30, bold: true, color: COLOR_NAVY })
-    ]}),
-    new Paragraph({ spacing: { before: 80, after: 400 }, alignment: AlignmentType.CENTER, children: [
-      new TextRun({ text: 'Phân Rã 42 Gói Công Việc (WBS) Qua 8 Giai Đoạn Dự Án · Tiến Độ 100% Hoàn Thành', font: FONT_FAMILY, size: 22, italics: true, color: '475569' })
-    ]})
+    new Paragraph({
+      spacing: { before: 400, after: 100 }, alignment: AlignmentType.CENTER, children: [
+        new TextRun({ text: 'HỘI DOANH NHÂN TRẺ HÀ NỘI (HANOIBA)', font: FONT_FAMILY, size: 24, bold: true, color: '64748B' })
+      ]
+    }),
+    new Paragraph({
+      spacing: { before: 80, after: 200 }, alignment: AlignmentType.CENTER, children: [
+        new TextRun({ text: 'CLB DOANH NHÂN CEO HN10', font: FONT_FAMILY, size: 28, bold: true, color: 'D97706' })
+      ]
+    }),
+    new Paragraph({
+      spacing: { before: 100, after: 100 }, alignment: AlignmentType.CENTER, children: [
+        new TextRun({ text: 'BÁO CÁO TIẾN ĐỘ THỰC HIỆN DỰ ÁN HỆ SINH THÁI SỐ HÓA CEO HN10', font: FONT_FAMILY, size: 30, bold: true, color: COLOR_NAVY })
+      ]
+    }),
+    new Paragraph({
+      spacing: { before: 80, after: 400 }, alignment: AlignmentType.CENTER, children: [
+        new TextRun({ text: 'Phân Rã 42 Gói Công Việc (WBS) Qua 8 Giai Đoạn Dự Án · Tiến Độ 100% Hoàn Thành', font: FONT_FAMILY, size: 22, italics: true, color: '475569' })
+      ]
+    })
   );
 
   // Table
@@ -792,9 +800,11 @@ async function buildDocxProgress(outputPath) {
 
   // Conclusion notes
   docChildren.push(
-    new Paragraph({ spacing: { before: 300, after: 100 }, children: [
-      new TextRun({ text: 'Kết Luận Nghiệm Thu: Toàn bộ 42 gói công việc đã hoàn tất 100% đạt chuẩn chất lượng không lỗi code, sẵn sàng bàn giao vận hành.', font: FONT_FAMILY, size: 22, bold: true, color: '0A2540' })
-    ]})
+    new Paragraph({
+      spacing: { before: 300, after: 100 }, children: [
+        new TextRun({ text: 'Kết Luận Nghiệm Thu: Toàn bộ 42 gói công việc đã hoàn tất 100% đạt chuẩn chất lượng không lỗi code, sẵn sàng bàn giao vận hành.', font: FONT_FAMILY, size: 22, bold: true, color: '0A2540' })
+      ]
+    })
   );
 
   const doc = new Document({

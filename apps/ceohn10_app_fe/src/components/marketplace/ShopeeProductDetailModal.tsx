@@ -62,7 +62,7 @@ export function ShopeeProductDetailModal({
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [newRating, setNewRating] = useState(5);
   const [newReviewerName, setNewReviewerName] = useState(user?.name || "");
-  const [newReviewerRole, setNewReviewerRole] = useState(user?.title || "Hội viên CLB CEO HN10");
+  const [newReviewerRole, setNewReviewerRole] = useState(user?.title || "Học viên CLB CEO HN10");
   const [newComment, setNewComment] = useState("");
   const [submittingReview, setSubmittingReview] = useState(false);
 
@@ -85,7 +85,7 @@ export function ShopeeProductDetailModal({
             productId: String(d.productId || d.product_id || productId),
             sellerId: d.sellerId || d.seller_id,
             companyName: d.companyName || d.company_name || companyName,
-            userName: d.reviewerName || d.reviewer_name || "Hội viên CLB",
+            userName: d.reviewerName || d.reviewer_name || "Học viên CLB",
             userRole: d.reviewerRole || d.reviewer_role || "Lãnh đạo Doanh nghiệp",
             userAvatar: d.reviewerAvatar || d.reviewer_avatar || "",
             rating: Number(d.rating) || 5,
@@ -166,7 +166,7 @@ export function ShopeeProductDetailModal({
         productId,
         sellerId: product.sellerId || product.seller_id || undefined,
         companyName,
-        reviewerName: newReviewerName.trim() || user?.name || "Hội viên CLB CEO HN10",
+        reviewerName: newReviewerName.trim() || user?.name || "Học viên CLB CEO HN10",
         reviewerRole: newReviewerRole.trim() || "Lãnh đạo Doanh nghiệp",
         reviewerAvatar: user?.avatar_url || undefined,
         rating: newRating,
@@ -243,7 +243,7 @@ export function ShopeeProductDetailModal({
               VBA MALL
             </span>
             <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 truncate max-w-[240px] sm:max-w-md">
-              {product.category || "Sản Phẩm & Dịch Vụ Hội Viên"}
+              {product.category || "Sản Phẩm & Dịch Vụ Học viên"}
             </span>
           </div>
           <div className="flex items-center gap-1.5">
@@ -288,11 +288,10 @@ export function ShopeeProductDetailModal({
                       key={idx}
                       type="button"
                       onClick={() => setActiveImageIdx(idx)}
-                      className={`relative size-14 shrink-0 rounded-xl overflow-hidden border-2 transition ${
-                        activeImageIdx === idx
+                      className={`relative size-14 shrink-0 rounded-xl overflow-hidden border-2 transition ${activeImageIdx === idx
                           ? "border-[#003B95] ring-2 ring-[#003B95]/30"
                           : "border-slate-200 dark:border-slate-700 opacity-70 hover:opacity-100"
-                      }`}
+                        }`}
                     >
                       <img src={img} alt="" className="w-full h-full object-cover" />
                     </button>
@@ -323,11 +322,10 @@ export function ShopeeProductDetailModal({
                       {[1, 2, 3, 4, 5].map((s) => (
                         <Star
                           key={s}
-                          className={`size-3.5 ${
-                            s <= Math.round(productRatingStats.average)
+                          className={`size-3.5 ${s <= Math.round(productRatingStats.average)
                               ? "fill-amber-400 text-amber-400"
                               : "text-slate-300 dark:text-slate-600"
-                          }`}
+                            }`}
                         />
                       ))}
                     </div>
@@ -348,7 +346,7 @@ export function ShopeeProductDetailModal({
 
                 {/* Price Box */}
                 <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60 space-y-1">
-                  <div className="text-[11px] font-medium text-slate-400">Giá ưu đãi đặc quyền Hội viên:</div>
+                  <div className="text-[11px] font-medium text-slate-400">Giá ưu đãi đặc quyền Học viên:</div>
                   <div className="flex items-baseline gap-3 flex-wrap">
                     <span className="text-xl sm:text-2xl font-black text-[#003B95] dark:text-blue-400">
                       {typeof product.price === "number"
@@ -375,7 +373,7 @@ export function ShopeeProductDetailModal({
                 {/* Description snippet */}
                 <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed line-clamp-3">
                   {product.description ||
-                    "Giải pháp chất lượng cao cung cấp bởi doanh nghiệp hội viên CLB CEO HN10, hướng tới tăng trưởng đột phá và kết nối thương mại bền vững."}
+                    "Giải pháp chất lượng cao cung cấp bởi doanh nghiệp Học viên CLB CEO HN10, hướng tới tăng trưởng đột phá và kết nối thương mại bền vững."}
                 </p>
 
                 {/* Video Giới thiệu Sản phẩm (nếu có) */}
@@ -405,11 +403,10 @@ export function ShopeeProductDetailModal({
                 <button
                   type="button"
                   onClick={onToggleInterest}
-                  className={`size-10 rounded-xl border flex items-center justify-center transition cursor-pointer shrink-0 ${
-                    isInterested
+                  className={`size-10 rounded-xl border flex items-center justify-center transition cursor-pointer shrink-0 ${isInterested
                       ? "bg-rose-50 dark:bg-rose-950/40 border-rose-300 text-rose-600"
                       : "bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-500 hover:text-rose-500"
-                  }`}
+                    }`}
                   title={isInterested ? "Bỏ quan tâm" : "Lưu vào giỏ quan tâm"}
                 >
                   <Heart className={`size-4.5 ${isInterested ? "fill-rose-600" : ""}`} />
@@ -493,7 +490,7 @@ export function ShopeeProductDetailModal({
                     </span>
                   </div>
                   <p className="text-xs text-slate-500 dark:text-slate-400">
-                    Đại diện: <strong className="text-slate-700 dark:text-slate-200">{product.sellerName || "Hội viên"}</strong>
+                    Đại diện: <strong className="text-slate-700 dark:text-slate-200">{product.sellerName || "Học viên"}</strong>
                   </p>
                   <div className="flex items-center gap-2 text-[11px] text-slate-400">
                     <span className="size-2 rounded-full bg-emerald-500 inline-block animate-pulse" />
@@ -535,7 +532,7 @@ export function ShopeeProductDetailModal({
               <div className="space-y-0.5">
                 <span className="text-slate-400 text-[11px]">Sản Phẩm & Dịch Vụ:</span>
                 <div className="text-sm font-black text-slate-900 dark:text-white">
-                  Doanh nghiệp Hội viên
+                  Doanh nghiệp Học viên
                 </div>
                 <div className="text-[10.5px] text-slate-400">Đã kiểm duyệt B2B</div>
               </div>
@@ -551,7 +548,7 @@ export function ShopeeProductDetailModal({
               <div className="space-y-0.5">
                 <span className="text-slate-400 text-[11px]">Hệ Thống CEO HN10:</span>
                 <div className="text-sm font-black text-slate-900 dark:text-white">
-                  Hội viên Chính thức
+                  Học viên Chính thức
                 </div>
                 <div className="text-[10.5px] text-blue-600 dark:text-blue-400 font-semibold">Bảo chứng kết nối</div>
               </div>
@@ -590,11 +587,10 @@ export function ShopeeProductDetailModal({
                   {[1, 2, 3, 4, 5].map((s) => (
                     <Star
                       key={s}
-                      className={`size-4 ${
-                        s <= Math.round(productRatingStats.average)
+                      className={`size-4 ${s <= Math.round(productRatingStats.average)
                           ? "fill-amber-400 text-amber-400"
                           : "text-slate-300 dark:text-slate-600"
-                      }`}
+                        }`}
                     />
                   ))}
                 </div>
@@ -621,11 +617,10 @@ export function ShopeeProductDetailModal({
                     key={String(item.key)}
                     type="button"
                     onClick={() => setActiveFilterStar(item.key as any)}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition cursor-pointer ${
-                      activeFilterStar === item.key
+                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition cursor-pointer ${activeFilterStar === item.key
                         ? "bg-[#003B95] text-white border-[#003B95] shadow-xs"
                         : "bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-700 hover:bg-slate-50"
-                    }`}
+                      }`}
                   >
                     {item.label}
                   </button>
@@ -637,7 +632,7 @@ export function ShopeeProductDetailModal({
             {showReviewForm && (
               <form onSubmit={handleSubmitReview} className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 space-y-3 animate-in fade-in">
                 <h4 className="text-xs font-bold text-slate-900 dark:text-white">Gửi nhận xét đánh giá thực tế (Lưu trực tiếp vào CSDL)</h4>
-                
+
                 {/* Rating selection */}
                 <div className="flex items-center gap-2">
                   <span className="text-xs text-slate-500">Mức độ hài lòng:</span>
@@ -650,9 +645,8 @@ export function ShopeeProductDetailModal({
                         className="p-1 hover:scale-110 transition cursor-pointer"
                       >
                         <Star
-                          className={`size-5 ${
-                            s <= newRating ? "fill-amber-400 text-amber-400" : "text-slate-300 dark:text-slate-600"
-                          }`}
+                          className={`size-5 ${s <= newRating ? "fill-amber-400 text-amber-400" : "text-slate-300 dark:text-slate-600"
+                            }`}
                         />
                       </button>
                     ))}
@@ -685,7 +679,7 @@ export function ShopeeProductDetailModal({
                   rows={3}
                   value={newComment}
                   onChange={(e) => setNewComment(e.target.value)}
-                  placeholder="Chia sẻ trải nghiệm thực tế của bạn khi sử dụng sản phẩm / dịch vụ này cho các hội viên khác tham khảo..."
+                  placeholder="Chia sẻ trải nghiệm thực tế của bạn khi sử dụng sản phẩm / dịch vụ này cho các Học viên khác tham khảo..."
                   className="w-full p-3 rounded-xl text-xs bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 outline-none resize-none"
                 />
 
@@ -733,7 +727,7 @@ export function ShopeeProductDetailModal({
                     onClick={() => setShowReviewForm(true)}
                     className="text-[#003B95] hover:underline font-bold text-xs"
                   >
-                    Hãy là hội viên đầu tiên gửi đánh giá!
+                    Hãy là Học viên đầu tiên gửi đánh giá!
                   </button>
                 </div>
               ) : (
@@ -754,7 +748,7 @@ export function ShopeeProductDetailModal({
                                 {rev.userName}
                               </span>
                               <span className="text-[10px] text-blue-700 dark:text-blue-300 font-semibold px-1.5 py-0.2 rounded bg-blue-50 dark:bg-blue-950/40">
-                                Hội viên
+                                Học viên
                               </span>
                             </div>
                             <div className="text-[11px] text-slate-400">
@@ -771,9 +765,8 @@ export function ShopeeProductDetailModal({
                         {[1, 2, 3, 4, 5].map((s) => (
                           <Star
                             key={s}
-                            className={`size-3.5 ${
-                              s <= rev.rating ? "fill-amber-400 text-amber-400" : "text-slate-300 dark:text-slate-600"
-                            }`}
+                            className={`size-3.5 ${s <= rev.rating ? "fill-amber-400 text-amber-400" : "text-slate-300 dark:text-slate-600"
+                              }`}
                           />
                         ))}
                         {rev.productVariant && (

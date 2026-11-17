@@ -69,7 +69,7 @@ export class TasksService implements OnModuleInit {
   async refreshTasks() {
     try {
       this.tasks = await this.tasksRepo.getAll();
-    } catch (e) {}
+    } catch (e) { }
   }
 
   private ensureInitialized() {
@@ -95,7 +95,7 @@ export class TasksService implements OnModuleInit {
 
   private async saveToFile() {
     for (const t of this.tasks) {
-      await this.tasksRepo.insert(t).catch(() => {});
+      await this.tasksRepo.insert(t).catch(() => { });
     }
     try {
       fs.writeFileSync(
@@ -184,7 +184,7 @@ export class TasksService implements OnModuleInit {
       leaderDepartment = 'Ban Thiện nguyện';
     else if (isDepartmentLeader && currentDept) leaderDepartment = currentDept;
 
-    // Nếu người dùng chọn một Ban cụ thể trên form tạo việc, ưu tiên lấy danh sách hội viên thuộc Ban đó
+    // Nếu người dùng chọn một Ban cụ thể trên form tạo việc, ưu tiên lấy danh sách Học viên thuộc Ban đó
     if (requestedDept && requestedDept !== 'ALL') {
       const deptKeyword = requestedDept.replace(/^Ban\s+/i, '').trim();
       const filteredDeptMembers =
@@ -245,7 +245,7 @@ export class TasksService implements OnModuleInit {
       };
     }
 
-    // 4. Hội viên: Chỉ giao việc trong ban của mình nếu được ủy quyền
+    // 4. Học viên: Chỉ giao việc trong ban của mình nếu được ủy quyền
     const memberDept = currentDept || 'Ban Thành viên';
     const deptKeyword = memberDept.replace(/^Ban\s+/i, '').trim();
     const deptMembers =
@@ -270,7 +270,7 @@ export class TasksService implements OnModuleInit {
   ): Promise<TaskItem[]> {
     try {
       this.tasks = await this.tasksRepo.getAll();
-    } catch {}
+    } catch { }
     let list = [...this.tasks];
 
     // PHÂN QUYỀN DỮ LIỆU (Data Authorization)
@@ -380,7 +380,7 @@ export class TasksService implements OnModuleInit {
             return isOwnDept || isAssigned || isSupervised || isCollab;
           });
         } else {
-          // Hội viên: Chỉ xem các công việc mà mình được phân công, phối hợp hoặc tạo
+          // Học viên: Chỉ xem các công việc mà mình được phân công, phối hợp hoặc tạo
           list = list.filter((t) => {
             const isAssigned =
               (t.assignee?.id && t.assignee.id === userId) ||
@@ -538,9 +538,9 @@ export class TasksService implements OnModuleInit {
       customFields: data.customFields || [],
       assignee: data.assignee ||
         (data.assignees && data.assignees[0]) || {
-          name: effectiveCreatorName,
-          role: 'Phụ trách',
-        },
+        name: effectiveCreatorName,
+        role: 'Phụ trách',
+      },
       assignees:
         data.assignees && data.assignees.length > 0
           ? data.assignees
@@ -825,7 +825,7 @@ export class TasksService implements OnModuleInit {
           }
         }
 
-        // 3. Tìm theo Tên hội viên
+        // 3. Tìm theo Tên Học viên
         if (!targetUserId && name && name.trim()) {
           const u = await this.tasksRepo.findUserAndMemberByName(name.trim());
           if (u.length && u[0].user_id) {
@@ -881,7 +881,7 @@ export class TasksService implements OnModuleInit {
           );
         }
 
-        // 2. Ghi vào public.member_notifications (hiển thị cho Hội viên trên CRM và Mobile App)
+        // 2. Ghi vào public.member_notifications (hiển thị cho Học viên trên CRM và Mobile App)
         const memberRecipientId = targetMemberId || targetUserId || assigneeId;
         if (memberRecipientId) {
           await this.tasksRepo.insertMemberNotification(
@@ -1017,7 +1017,7 @@ export class TasksService implements OnModuleInit {
     const newComment: TaskComment = {
       id: `cm-${Date.now()}`,
       authorName: comment.authorName || 'Thành viên',
-      authorRole: comment.authorRole || 'Hội viên',
+      authorRole: comment.authorRole || 'Học viên',
       content: comment.content,
       createdAt: new Date().toISOString().replace('T', ' ').substring(0, 16),
     };
@@ -1223,7 +1223,7 @@ export class TasksService implements OnModuleInit {
     ).catch((err) => {
       this.logger.warn(`Reminder notification error: ${err?.message}`);
     });
-    this.dispatchTaskReminderEmail(task, actorName, newCount).catch(() => {});
+    this.dispatchTaskReminderEmail(task, actorName, newCount).catch(() => { });
 
     return task;
   }
@@ -1288,7 +1288,7 @@ export class TasksService implements OnModuleInit {
       actorName,
       task.delegation?.reminderCount || 1,
       `${assessmentLabels[evalItem.statusAssessment] || evalItem.statusAssessment}: ${evalItem.feedback}`,
-    ).catch(() => {});
+    ).catch(() => { });
 
     return task;
   }
@@ -1377,7 +1377,7 @@ export class TasksService implements OnModuleInit {
   }
 
   async deleteTask(id: string): Promise<{ success: boolean }> {
-    await this.tasksRepo.delete(id).catch(() => {});
+    await this.tasksRepo.delete(id).catch(() => { });
     const initialLen = this.tasks.length;
     this.tasks = this.tasks.filter((t) => t.id !== id && t.code !== id);
     this.saveToFile();

@@ -194,8 +194,8 @@ function MessagesScreen() {
             setUnreadNotifCount(unread);
           }
         })
-        .catch(() => {});
-    } catch {}
+        .catch(() => { });
+    } catch { }
 
     // 2. Unread messages
     try {
@@ -208,7 +208,7 @@ function MessagesScreen() {
           setUnreadMsgCount(totalUnread);
         }
       }
-    } catch {}
+    } catch { }
   }, [user?.id]);
 
   useEffect(() => {
@@ -255,9 +255,9 @@ function MessagesScreen() {
     };
   }, [refreshUnreadCounters]);
 
-  // Set document title chuẩn mực cho Mạng Lưới Hội Viên & Bản Tin Doanh Nhân CEO HN10
+  // Set document title chuẩn mực cho Mạng Lưới Học viên & Bản Tin Doanh Nhân CEO HN10
   useEffect(() => {
-    document.title = "Mạng Lưới Hội Viên & Bản Tin Doanh Nhân CEO HN10";
+    document.title = "Mạng Lưới Học viên & Bản Tin Doanh Nhân CEO HN10";
   }, []);
 
   // Close dropdown menu when clicking outside
@@ -364,7 +364,7 @@ function MessagesScreen() {
                       {menuOpen && (
                         <div className="absolute left-0 top-11 z-50 w-64 bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 py-2 px-1 flex flex-col gap-1 animate-in fade-in slide-in-from-top-2 duration-150">
                           <div className="px-3 py-1.5 text-[11px] font-extrabold uppercase tracking-wider text-slate-400 dark:text-slate-500 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
-                            <span className="truncate">Mạng Lưới Hội Viên & Bản Tin CEO HN10</span>
+                            <span className="truncate">Mạng Lưới Học viên & Bản Tin CEO HN10</span>
                             <span className="size-1.5 rounded-full bg-red-500 shrink-0"></span>
                           </div>
 
@@ -393,7 +393,7 @@ function MessagesScreen() {
                             <ChevronRight className="size-4 text-slate-300 group-hover:text-red-500 group-hover:translate-x-0.5 transition" />
                           </button>
 
-                          {/* 2. Cơ hội mà hội viên public ra */}
+                          {/* 2. Cơ hội mà Học viên public ra */}
                           <button
                             type="button"
                             onClick={() => {
@@ -408,7 +408,7 @@ function MessagesScreen() {
                               </div>
                               <div>
                                 <p className="text-xs font-bold text-slate-800 dark:text-white group-hover:text-blue-600 transition-colors">
-                                  Cơ hội hội viên public
+                                  Cơ hội Học viên public
                                 </p>
                                 <p className="text-[10px] text-slate-500 dark:text-slate-400">
                                   Sàn giao thương B2B CEO HN10

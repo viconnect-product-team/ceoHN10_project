@@ -79,7 +79,7 @@ async function main() {
 
   const endpoints = [
     { name: 'Sự kiện (Events)', path: '/api/events' },
-    { name: 'Danh bạ Hội viên (Members)', path: '/api/members' },
+    { name: 'Danh bạ Học viên (Members)', path: '/api/members' },
     { name: 'Sản phẩm Chợ B2B (Products)', path: '/api/marketplace/products' },
     { name: 'Cơ hội Giao thương (Opportunities)', path: '/api/opportunities' },
     { name: 'Tin tức CLB (News)', path: '/api/news' },
@@ -98,12 +98,12 @@ async function main() {
     const resMobile = await fetchApi(mobileUrl, ep.path, mobileToken);
     const resCrm = await fetchApi(crmUrl, ep.path, crmToken);
 
-    const countMobile = Array.isArray(resMobile.data) 
-      ? resMobile.data.length 
+    const countMobile = Array.isArray(resMobile.data)
+      ? resMobile.data.length
       : (resMobile.data?.items?.length ?? (resMobile.data ? 1 : 0));
 
-    const countCrm = Array.isArray(resCrm.data) 
-      ? resCrm.data.length 
+    const countCrm = Array.isArray(resCrm.data)
+      ? resCrm.data.length
       : (resCrm.data?.items?.length ?? (resCrm.data ? 1 : 0));
 
     const matched = countMobile === countCrm && resMobile.status === 200 && resCrm.status === 200;

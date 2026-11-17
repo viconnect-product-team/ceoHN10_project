@@ -1,6 +1,6 @@
 /**
  * BUILD_CUSTOMER_FEEDBACK_FILE.JS
- * Tạo file phiếu đánh giá và thu thập phản hồi của khách hàng/hội viên
+ * Tạo file phiếu đánh giá và thu thập phản hồi của khách hàng/Học viên
  * trong quá trình trải nghiệm Hệ Sinh Thái CEO HN10 (Web CRM & Mobile App)
  *
  * Xuất bản:
@@ -76,7 +76,7 @@ async function buildExcelFeedback() {
 
   sheet.mergeCells('A2:E2');
   const subCell = sheet.getCell('A2');
-  subCell.value = 'CLB DOANH NHÂN CEO HN10 (HANOIBA) · CỔNG QUẢN TRỊ CRM & MOBILE APP HỘI VIÊN';
+  subCell.value = 'CLB DOANH NHÂN CEO HN10 (HANOIBA) · CỔNG QUẢN TRỊ CRM & MOBILE APP Học viên';
   subCell.font = { name: 'Calibri', size: 11, bold: true, color: { argb: 'FF' + GOLD } };
   subCell.alignment = { horizontal: 'center', vertical: 'middle' };
   sheet.getRow(2).height = 24;
@@ -93,7 +93,7 @@ async function buildExcelFeedback() {
   const infoRows = [
     ['Họ và tên:', 'Nguyễn Văn A', 'Số điện thoại:', '0988xxxxxx', ''],
     ['Đơn vị công tác:', 'Công ty CP...', 'Chức vụ:', 'Chủ tịch HĐQT / TGĐ', ''],
-    ['Vai trò sử dụng:', 'Hội viên chính thức (hoặc Ban Điều Hành / Khách mời)', 'Ngày đánh giá:', '.../.../2026', ''],
+    ['Vai trò sử dụng:', 'Học viên chính thức (hoặc Ban Điều Hành / Khách mời)', 'Ngày đánh giá:', '.../.../2026', ''],
   ];
 
   infoRows.forEach((r) => {
@@ -145,7 +145,7 @@ async function buildExcelFeedback() {
     { cat: '2. Tốc Độ & Hiệu Năng', name: 'Thao tác vuốt chạm trên Mobile App nhạy bén, mượt mà 60 FPS', score: 5 },
 
     // Nhóm 3: Mobile App
-    { cat: '3. Ứng Dụng Mobile App', name: 'Thẻ Hội Viên VIP mạ vàng hiệu ứng xoay lật 2 mặt đẹp mắt, sang trọng', score: 5 },
+    { cat: '3. Ứng Dụng Mobile App', name: 'Thẻ Học viên VIP mạ vàng hiệu ứng xoay lật 2 mặt đẹp mắt, sang trọng', score: 5 },
     { cat: '3. Ứng Dụng Mobile App', name: 'Mã QR chia sẻ danh thiếp & tính năng Lưu danh bạ vCard 1 chạm thuận tiện', score: 5 },
     { cat: '3. Ứng Dụng Mobile App', name: 'Sàn giao thương B2B niêm yết sản phẩm, phân trang và tìm kiếm nhanh', score: 5 },
     { cat: '3. Ứng Dụng Mobile App', name: 'Tính năng đặt lịch hẹn cà phê 1-on-1 đồng bộ tự động vào lịch điện thoại', score: 5 },
@@ -154,8 +154,8 @@ async function buildExcelFeedback() {
     { cat: '3. Ứng Dụng Mobile App', name: 'Trợ lý giọng nói Voice AI tiếng Việt nhận diện chuẩn và tự động mở trang', score: 5 },
 
     // Nhóm 4: Web CRM
-    { cat: '4. Hệ Thống Web CRM', name: 'Dashboard tổng quan trực quan, nắm bắt ngay số lượng hội viên và tài chính', score: 5 },
-    { cat: '4. Hệ Thống Web CRM', name: 'Quản lý hội viên & hồ sơ doanh nghiệp 360°, duyệt hồ sơ gia nhập minh bạch', score: 5 },
+    { cat: '4. Hệ Thống Web CRM', name: 'Dashboard tổng quan trực quan, nắm bắt ngay số lượng Học viên và tài chính', score: 5 },
+    { cat: '4. Hệ Thống Web CRM', name: 'Quản lý Học viên & hồ sơ doanh nghiệp 360°, duyệt hồ sơ gia nhập minh bạch', score: 5 },
     { cat: '4. Hệ Thống Web CRM', name: 'Sơ đồ xếp chỗ Cinema Seating Map phân khu hàng ghế trực quan, không nhầm lẫn', score: 5 },
     { cat: '4. Hệ Thống Web CRM', name: 'Cổng soát vé Gatekeeper QR camera siêu tốc & Standee mã QR Zalo cho khách', score: 5 },
     { cat: '4. Hệ Thống Web CRM', name: 'Quản trị hội phí VietQR tự động sinh mã Napas 247, gạch nợ tức thời 24/7', score: 5 },
@@ -219,7 +219,7 @@ async function buildExcelFeedback() {
 
   sheet2.mergeCells('A1:C1');
   const s2Title = sheet2.getCell('A1');
-  s2Title.value = 'CÂU HỎI THU THẬP Ý KIẾN ĐÓNG GÓP CHI TIẾT TỪ HỘI VIÊN & ĐẠI BIỂU';
+  s2Title.value = 'CÂU HỎI THU THẬP Ý KIẾN ĐÓNG GÓP CHI TIẾT TỪ Học viên & ĐẠI BIỂU';
   s2Title.font = { name: 'Calibri', size: 14, bold: true, color: { argb: 'FFFFFFFF' } };
   s2Title.alignment = { horizontal: 'center', vertical: 'middle' };
   s2Title.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF' + NAVY } };
@@ -230,7 +230,7 @@ async function buildExcelFeedback() {
   const questions = [
     {
       q: '1. Tính năng nào trên Web CRM hoặc Mobile App mà Anh/Chị cảm thấy ấn tượng và hữu ích nhất?',
-      a: 'Thẻ Hội Viên VIP mạ vàng hiệu ứng lật 2 mặt rất sang trọng, tính năng lưu danh bạ vCard 1 chạm và Sơ đồ xếp chỗ Cinema Map cực kỳ tiện lợi cho các sự kiện Gala.',
+      a: 'Thẻ Học viên VIP mạ vàng hiệu ứng lật 2 mặt rất sang trọng, tính năng lưu danh bạ vCard 1 chạm và Sơ đồ xếp chỗ Cinema Map cực kỳ tiện lợi cho các sự kiện Gala.',
     },
     {
       q: '2. Trong quá trình thao tác, có bước nào gây khó hiểu hoặc cần tối giản hơn không?',
@@ -238,7 +238,7 @@ async function buildExcelFeedback() {
     },
     {
       q: '3. Anh/Chị có mong muốn bổ sung thêm tính năng hoặc tiện ích kết nối giao thương nào cho CLB không?',
-      a: 'Đề xuất bổ sung thêm tính năng thông báo chúc mừng sinh nhật doanh nghiệp hội viên tự động.',
+      a: 'Đề xuất bổ sung thêm tính năng thông báo chúc mừng sinh nhật doanh nghiệp Học viên tự động.',
     },
     {
       q: '4. Mức độ sẵn sàng giới thiệu nền tảng số CEO HN10 cho các doanh nhân khác trong và ngoài HanoiBA?',
@@ -303,7 +303,7 @@ function buildMarkdownFeedback() {
 - **Số điện thoại**: ........................................................................
 - **Đơn vị công tác**: ......................................................................
 - **Chức vụ**: .............................................................................
-- **Vai trò trong hệ sinh thái**: [ ] Ban Điều Hành  [ ] Hội Viên Chính Thức  [ ] Khách Mời Sự Kiện
+- **Vai trò trong hệ sinh thái**: [ ] Ban Điều Hành  [ ] Học viên Chính Thức  [ ] Khách Mời Sự Kiện
 - **Ngày đánh giá**: ...... / ...... / 2026
 
 ---
@@ -318,15 +318,15 @@ function buildMarkdownFeedback() {
 | **3** | **Giao Diện & Thẩm Mỹ** | Bố cục đa dạng, câu từ ngắn gọn, thông minh, dễ hiểu | [ 5 ] | Súc tích, mạch lạc |
 | **4** | **Tốc Độ & Hiệu Năng** | Tốc độ tải trang dưới 1.5s, phản hồi tức thì | [ 5 ] | Tải nhanh |
 | **5** | **Tốc Độ & Hiệu Năng** | Thao tác vuốt chạm trên Mobile App mượt mà, không giật trễ | [ 5 ] | 60 FPS rất mượt |
-| **6** | **Mobile App** | Thẻ Hội Viên VIP mạ vàng hiệu ứng lật 2 mặt hoàng gia sang trọng | [ 5 ] | Độc bản, tự hào |
+| **6** | **Mobile App** | Thẻ Học viên VIP mạ vàng hiệu ứng lật 2 mặt hoàng gia sang trọng | [ 5 ] | Độc bản, tự hào |
 | **7** | **Mobile App** | Chia sẻ mã QR & Lưu danh bạ vCard 1 chạm không cần cài app | [ 5 ] | Rất tiện lợi |
 | **8** | **Mobile App** | Sàn giao thương B2B niêm yết sản phẩm, phân trang & lọc ngành nghề | [ 5 ] | Mua bán trực tiếp |
 | **9** | **Mobile App** | Đặt lịch hẹn cà phê 1-on-1 tự động đồng bộ lịch công tác điện thoại | [ 5 ] | Tiết kiệm thời gian |
 | **10** | **Mobile App** | Ví vé E-Ticket kèm vị trí số ghế VIP và mã bốc thăm Lucky Draw | [ 5 ] | Check-in 0.1s |
 | **11** | **Mobile App** | Đàm thoại nội bộ bảo mật, thông báo cuộc gọi nền native khi tắt app | [ 5 ] | Không lỡ cuộc gọi |
 | **12** | **Mobile App** | Trợ lý giọng nói Voice AI tiếng Việt điều hướng màn hình tức thì | [ 5 ] | Nhận diện giọng chuẩn |
-| **13** | **Web CRM** | Dashboard tổng quan theo dõi biến động hội viên và thu chi tài chính | [ 5 ] | Số liệu thời gian thực |
-| **14** | **Web CRM** | Quản lý hội viên & hồ sơ doanh nghiệp 360°, duyệt hội viên 3 cấp | [ 5 ] | Chặt chẽ, chính danh |
+| **13** | **Web CRM** | Dashboard tổng quan theo dõi biến động Học viên và thu chi tài chính | [ 5 ] | Số liệu thời gian thực |
+| **14** | **Web CRM** | Quản lý Học viên & hồ sơ doanh nghiệp 360°, duyệt Học viên 3 cấp | [ 5 ] | Chặt chẽ, chính danh |
 | **15** | **Web CRM** | Sơ đồ xếp chỗ Cinema Seating Map phân khu khán phòng trực quan | [ 5 ] | Tránh nhầm chỗ Gala |
 | **16** | **Web CRM** | Cổng soát vé Gatekeeper QR siêu tốc & Standee Zalo cho khách ngoài | [ 5 ] | Đón tiếp chuyên nghiệp |
 | **17** | **Web CRM** | Thu phí VietQR Napas 247 tự động gạch nợ tức thời 24/7 | [ 5 ] | Kế toán minh bạch |
@@ -345,7 +345,7 @@ function buildMarkdownFeedback() {
    > *Trả lời*: Hệ thống vận hành rất trơn tru, mong muốn tiếp tục duy trì tính ổn định cao như hiện nay.
 
 3. **Ý tưởng hoặc tính năng mới Anh/Chị muốn đề xuất phát triển trong phiên bản tiếp theo?**
-   > *Trả lời*: Có thể bổ sung thêm tính năng nhắc nhở lịch sinh nhật doanh nghiệp của hội viên tự động.
+   > *Trả lời*: Có thể bổ sung thêm tính năng nhắc nhở lịch sinh nhật doanh nghiệp của Học viên tự động.
 
 ---
 

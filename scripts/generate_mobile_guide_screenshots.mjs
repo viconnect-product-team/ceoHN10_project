@@ -57,20 +57,20 @@ async function runMobileCapture() {
   await page.fill('input[type="text"], input[type="email"]', 'admin@connect.vn');
   await page.fill('input[type="password"]', '123456');
   await page.click('button[type="submit"]');
-  await page.waitForNavigation({ waitUntil: 'networkidle', timeout: 15000 }).catch(() => {});
+  await page.waitForNavigation({ waitUntil: 'networkidle', timeout: 15000 }).catch(() => { });
   await page.waitForTimeout(2000);
 
-  console.log('>>> [4/18] Chụp Trang Chủ Hội Viên CEO HN10 Mobile...');
+  console.log('>>> [4/18] Chụp Trang Chủ Học viên CEO HN10 Mobile...');
   await page.goto('https://ceohn10.viconnect.vn/association', { waitUntil: 'networkidle', timeout: 30000 });
   await page.waitForTimeout(1500);
   await page.screenshot({ path: path.join(outputDir, '04_trang_chu_mobile.png') });
 
-  console.log('>>> [5/18] Chụp Thẻ Hội Viên VIP Mặt Trước...');
+  console.log('>>> [5/18] Chụp Thẻ Học viên VIP Mặt Trước...');
   await page.goto('https://ceohn10.viconnect.vn/association/card', { waitUntil: 'networkidle', timeout: 30000 });
   await page.waitForTimeout(1500);
   await page.screenshot({ path: path.join(outputDir, '05_the_hoi_vien_vip_mat_truoc.png') });
 
-  console.log('>>> [6/18] Chụp Thẻ Hội Viên VIP Mặt Sau & QR Code...');
+  console.log('>>> [6/18] Chụp Thẻ Học viên VIP Mặt Sau & QR Code...');
   // Click vào thẻ để lật hoặc tìm nút lật thẻ
   const cardElement = page.locator('.cursor-pointer, [data-card-flip], button:has-text("Lật thẻ"), button:has-text("Mã QR")').first();
   if (await cardElement.isVisible().catch(() => false)) {
@@ -79,16 +79,16 @@ async function runMobileCapture() {
   }
   await page.screenshot({ path: path.join(outputDir, '06_the_hoi_vien_vip_mat_sau_qr.png') });
 
-  console.log('>>> [7/18] Chụp Danh Bạ Hội Viên...');
+  console.log('>>> [7/18] Chụp Danh Bạ Học viên...');
   await page.goto('https://ceohn10.viconnect.vn/association/members', { waitUntil: 'networkidle', timeout: 30000 });
   await page.waitForTimeout(1500);
   await page.screenshot({ path: path.join(outputDir, '07_danh_ba_hoi_vien.png') });
 
   console.log('>>> [8/18] Chụp Chi Tiết Hồ Sơ Doanh Nhân...');
-  // Click vào thẻ hội viên đầu tiên
+  // Click vào thẻ Học viên đầu tiên
   const firstMemberCard = page.locator('div[class*="member"], div[class*="card"], a[href*="members/"]').first();
   if (await firstMemberCard.isVisible().catch(() => false)) {
-    await firstMemberCard.click().catch(() => {});
+    await firstMemberCard.click().catch(() => { });
     await page.waitForTimeout(1500);
   }
   await page.screenshot({ path: path.join(outputDir, '08_chi_tiet_ho_so_hoi_vien.png') });
@@ -101,7 +101,7 @@ async function runMobileCapture() {
   console.log('>>> [10/18] Chụp Chi Tiết Sự Kiện & Form Đăng Ký...');
   const firstEventBtn = page.locator('button:has-text("Đăng ký"), button:has-text("Xem chi tiết"), a:has-text("Đăng ký")').first();
   if (await firstEventBtn.isVisible().catch(() => false)) {
-    await firstEventBtn.click().catch(() => {});
+    await firstEventBtn.click().catch(() => { });
     await page.waitForTimeout(1500);
   }
   await page.screenshot({ path: path.join(outputDir, '10_chi_tiet_su_kien_va_dang_ky.png') });
@@ -111,7 +111,7 @@ async function runMobileCapture() {
   await page.waitForTimeout(1500);
   await page.screenshot({ path: path.join(outputDir, '11_ve_dien_tu_qr_checkin.png') });
 
-  console.log('>>> [12/18] Chụp Sàn Giao Thương B2B & Sản Phẩm Hội Viên...');
+  console.log('>>> [12/18] Chụp Sàn Giao Thương B2B & Sản Phẩm Học viên...');
   await page.goto('https://ceohn10.viconnect.vn/association/products', { waitUntil: 'networkidle', timeout: 30000 });
   await page.waitForTimeout(1500);
   await page.screenshot({ path: path.join(outputDir, '12_san_giao_thuong_b2b.png') });
@@ -119,7 +119,7 @@ async function runMobileCapture() {
   console.log('>>> [13/18] Chụp Modal Đăng Sản Phẩm Mới...');
   const addProductBtn = page.locator('button:has-text("Đăng sản phẩm"), button:has-text("Thêm sản phẩm"), button:has-text("+")').first();
   if (await addProductBtn.isVisible().catch(() => false)) {
-    await addProductBtn.click().catch(() => {});
+    await addProductBtn.click().catch(() => { });
     await page.waitForTimeout(1000);
   }
   await page.screenshot({ path: path.join(outputDir, '13_modal_dang_san_pham_moi.png') });

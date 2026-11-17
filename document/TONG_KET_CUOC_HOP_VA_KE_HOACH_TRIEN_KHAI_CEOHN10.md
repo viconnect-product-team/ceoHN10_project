@@ -17,8 +17,8 @@
 - **Ngày T+3 (Thứ Bảy):** Đóng gói bộ cài APK chính thức cho Android và TestFlight cho iOS.
 - **Ngày T+4 (Chủ Nhật):** Sao lưu dữ liệu, bảo mật cổng truyền thông và kiểm thử an toàn thông tin.
 - **Ngày T+5 (Thứ Hai):** Tập huấn chuyên sâu quản trị Web CRM cho Ban Thư ký & Kế toán.
-- **Ngày T+6 (Thứ Ba):** Phát động chiến dịch kích hoạt thẻ hội viên số cho 100+ CEO trong CLB.
-- **Ngày T+7 (Thứ Tư tuần sau):** CHÍNH THỨC CÔNG BỐ GO-LIVE TẠI KỲ SINH HOẠT HỘI VIÊN.
+- **Ngày T+6 (Thứ Ba):** Phát động chiến dịch kích hoạt thẻ Học viên số cho 100+ CEO trong CLB.
+- **Ngày T+7 (Thứ Tư tuần sau):** CHÍNH THỨC CÔNG BỐ GO-LIVE TẠI KỲ SINH HOẠT Học viên.
 
 ---
 

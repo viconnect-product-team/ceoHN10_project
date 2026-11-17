@@ -19,7 +19,7 @@ export class BusinessCardService {
   constructor(
     private prisma: PrismaService,
     private readonly cardRepo: BusinessCardRepository,
-  ) {}
+  ) { }
 
   async listMyCards(userId: string) {
     let cards = await this.prisma
@@ -45,7 +45,7 @@ export class BusinessCardService {
       const baseCode = (m.code || userId.slice(0, 8) || 'ceohn10')
         .toLowerCase()
         .replace(/[^a-z0-9]/g, '-');
-      const name = m.name || m.user_full_name || 'Hội viên CLB CEO HN10';
+      const name = m.name || m.user_full_name || 'Học viên CLB CEO HN10';
       const phone = m.phone || m.user_phone || null;
       const email = m.email || m.user_email || null;
       const avatar = m.avatar || m.user_avatar || null;
@@ -77,16 +77,16 @@ export class BusinessCardService {
           primarySlug,
           name,
           (m as any).title ||
-            (m as any).professional_title ||
-            (m as any).job_title ||
-            'Hội viên chính thức CLB CEO HN10',
+          (m as any).professional_title ||
+          (m as any).job_title ||
+          'Học viên chính thức CLB CEO HN10',
           'CLB Doanh Nhân CEO HN10',
           avatar,
           phone,
           email,
           m.address || 'Trụ sở CLB Doanh Nhân CEO HN10, Hà Nội',
           m.website || 'https://ceohn10club.com',
-          m.about || 'Hội viên chính thức CLB Doanh Nhân CEO HN10',
+          m.about || 'Học viên chính thức CLB Doanh Nhân CEO HN10',
           defaultVis,
           userId,
           m.id ? m.id : null,
@@ -1138,12 +1138,12 @@ export class BusinessCardService {
         userRow?.full_name ||
         userRow?.name ||
         (m.type === 'individual' ? m.name : m.contact) ||
-        'Hội viên CLB Doanh Nhân CEO HN10';
+        'Học viên CLB Doanh Nhân CEO HN10';
       if (
         resolvedPersonName.toLowerCase() === 'admin' ||
         resolvedPersonName.toLowerCase() === 'platform administrator'
       ) {
-        resolvedPersonName = 'Hội viên CLB Doanh Nhân CEO HN10';
+        resolvedPersonName = 'Học viên CLB Doanh Nhân CEO HN10';
       }
     }
 
@@ -1160,7 +1160,7 @@ export class BusinessCardService {
       resolvedCompanyName = 'CLB Doanh Nhân CEO HN10';
     }
 
-    // Resolve Title - Ưu tiên tuyệt đối chức danh nghề nghiệp/doanh nghiệp của hội viên, KHÔNG ghi đè mã quyền hay vai trò CLB
+    // Resolve Title - Ưu tiên tuyệt đối chức danh nghề nghiệp/doanh nghiệp của Học viên, KHÔNG ghi đè mã quyền hay vai trò CLB
     const resolvedTitle =
       cardRow?.professional_title ||
       m.title ||
@@ -1168,16 +1168,16 @@ export class BusinessCardService {
       (m as any).job_title ||
       (m as any).position ||
       (m.type === 'company'
-        ? 'Đại diện Doanh nghiệp Hội viên'
-        : 'Lãnh đạo Doanh nghiệp Hội viên');
+        ? 'Đại diện Doanh nghiệp Học viên'
+        : 'Lãnh đạo Doanh nghiệp Học viên');
 
     // Resolve Photo
     const resolvedPhoto = showPhoto
       ? cardRow?.avatar_url ||
-        settings?.photo_url ||
-        m.avatar ||
-        userRow?.avatar_url ||
-        null
+      settings?.photo_url ||
+      m.avatar ||
+      userRow?.avatar_url ||
+      null
       : null;
 
     // Resolve Company Logo
@@ -1202,8 +1202,8 @@ export class BusinessCardService {
 
     const resolvedAddress = showAddress
       ? cardRow?.address ||
-        m.address ||
-        'Trụ sở CLB Doanh Nhân CEO HN10, Hà Nội'
+      m.address ||
+      'Trụ sở CLB Doanh Nhân CEO HN10, Hà Nội'
       : 'Đã ẩn theo cài đặt riêng tư';
 
     const isActive =
@@ -1213,7 +1213,7 @@ export class BusinessCardService {
       found: true,
       code: m.code || cardRow?.slug || code,
       cardKind: cardRow?.card_kind || 'primary',
-      name: showName ? resolvedPersonName : 'Hội viên CLB Doanh Nhân CEO HN10',
+      name: showName ? resolvedPersonName : 'Học viên CLB Doanh Nhân CEO HN10',
       company: showCompany
         ? resolvedCompanyName
         : 'Đã ẩn theo cài đặt riêng tư',
@@ -1228,8 +1228,8 @@ export class BusinessCardService {
       taxCode: null,
       industry: showCompany
         ? m.industry ||
-          cardRow?.headline ||
-          'Công nghệ thông tin & Đổi mới sáng tạo'
+        cardRow?.headline ||
+        'Công nghệ thông tin & Đổi mới sáng tạo'
         : 'Đã ẩn',
       region: showCompany ? m.region || 'Miền Bắc (Hà Nội)' : null,
       address: resolvedAddress,
@@ -1241,9 +1241,9 @@ export class BusinessCardService {
       bio: cardRow?.bio || null,
       zaloUrl: showSocial
         ? cardRow?.zalo_url ||
-          (resolvedPhone
-            ? `https://zalo.me/${resolvedPhone.replace(/\D/g, '')}`
-            : null)
+        (resolvedPhone
+          ? `https://zalo.me/${resolvedPhone.replace(/\D/g, '')}`
+          : null)
         : null,
       linkedinUrl: showSocial ? cardRow?.linkedin_url || null : null,
       facebookUrl: showSocial ? cardRow?.facebook_url || null : null,

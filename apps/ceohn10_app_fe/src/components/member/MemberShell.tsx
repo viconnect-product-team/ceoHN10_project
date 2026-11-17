@@ -116,7 +116,7 @@ export function MemberScreen({ children }: { children: ReactNode }) {
 
     const handleConnectionAccepted = (data: any) => {
       const partnerName =
-        data?.accepterProfile?.display_name || data?.accepterProfile?.name || "Hội viên CEO HN10";
+        data?.accepterProfile?.display_name || data?.accepterProfile?.name || "Học viên CEO HN10";
       const partnerAvatar = data?.accepterProfile?.avatar_url || data?.accepterProfile?.avatar;
       const partnerCode = data?.accepterProfile?.memberCode || data?.accepterProfile?.code;
       const partnerUserId = data?.accepterProfile?.userId;
@@ -177,7 +177,7 @@ export function MemberScreen({ children }: { children: ReactNode }) {
 
     const handleConnectionDeclined = (data: any) => {
       const declinerName =
-        data?.declinerProfile?.display_name || data?.declinerProfile?.name || "Hội viên CEO HN10";
+        data?.declinerProfile?.display_name || data?.declinerProfile?.name || "Học viên CEO HN10";
       try {
         const newNotif = {
           id: `conn_dec_${Date.now()}`,
@@ -201,7 +201,7 @@ export function MemberScreen({ children }: { children: ReactNode }) {
     };
 
     const handleMeetingRequested = (data: any) => {
-      const hostName = data?.host?.name || "Hội viên CEO HN10";
+      const hostName = data?.host?.name || "Học viên CEO HN10";
       try {
         const newNotif = {
           id: `meet_req_${Date.now()}`,
@@ -350,7 +350,7 @@ export function MemberScreen({ children }: { children: ReactNode }) {
     };
   }, [navigate]);
 
-  // Tự động đăng ký native push user khi có thông tin hội viên
+  // Tự động đăng ký native push user khi có thông tin Học viên
   useEffect(() => {
     if (user?.id) {
       registerNativePushUser(user.id);
@@ -358,21 +358,7 @@ export function MemberScreen({ children }: { children: ReactNode }) {
   }, [user?.id]);
 
   return (
-    <div className="vba-app fixed inset-0 h-full w-full overflow-hidden bg-white dark:bg-[var(--vba-bg)] text-[var(--vba-text)] transition-colors duration-200 flex flex-col items-center">
-      {/* Dynamic Background Mesh Overlay — only in dark luxury mode */}
-      {!isLight && (
-        <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden" aria-hidden="true">
-          <img
-            src={authBg}
-            alt=""
-            width={1024}
-            height={640}
-            className="pointer-events-none absolute inset-x-0 top-0 h-[640px] w-full select-none object-cover opacity-35"
-          />
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-transparent via-[var(--vba-bg)]/80 to-[var(--vba-bg)]" />
-        </div>
-      )}
-
+    <div className="vba-app fixed inset-0 h-full w-full overflow-hidden bg-[#F8FAFC] text-slate-900 transition-colors duration-200 flex flex-col items-center">
       {/* Dải Edge Guard vô hình 2 bên mép: Đảm bảo pointer-events-none để không chặn cảm ứng người dùng */}
       <div
         className="fixed left-0 top-0 bottom-0 w-3 z-40 pointer-events-none touch-none select-none opacity-0"
@@ -384,8 +370,7 @@ export function MemberScreen({ children }: { children: ReactNode }) {
       />
 
       <div
-        className={`relative z-10 flex h-full w-full max-w-[480px] flex-col justify-between overflow-hidden border-x border-[var(--vba-border-soft)]/30 ${isLight ? "bg-white" : "bg-[var(--vba-bg)]"
-          } shadow-[0_0_50px_-10px_rgba(0,0,0,0.5)]`}
+        className="relative z-10 flex h-full w-full max-w-[480px] flex-col justify-between overflow-hidden border-x border-slate-200 bg-white shadow-[0_0_50px_-10px_rgba(0,0,0,0.1)]"
       >
         <OfflineBanner />
         <PwaInstallBanner />
@@ -498,7 +483,7 @@ function PwaInstallBanner() {
             setShowBanner(false);
             try {
               sessionStorage.setItem("ceohn10_pwa_banner_dismissed", "true");
-            } catch {}
+            } catch { }
           }}
           className="grid h-6 w-6 place-items-center rounded-full text-slate-400 hover:text-white transition cursor-pointer"
           aria-label="Đóng"
@@ -777,7 +762,7 @@ function MemberTabBar() {
         if (m?.name) return m.name;
       }
     } catch { }
-    return user?.full_name || user?.name || "Hội viên CLB CEO HN10";
+    return user?.full_name || user?.name || "Học viên CLB CEO HN10";
   }, [user]);
 
   const memberCompany = useMemo(() => {
@@ -801,7 +786,7 @@ function MemberTabBar() {
         }
       }
     } catch { }
-    return user?.title || "Hội viên chính thức";
+    return user?.title || "Học viên chính thức";
   }, [user]);
 
   const memberAvatar = useMemo(() => {
@@ -1006,10 +991,10 @@ function MemberTabBar() {
             };
 
             if (tab.center) {
-              const primaryColor = brandColorTheme?.primaryColor || "#003B95";
-              const primaryDeep = brandColorTheme?.primaryDeep || "#001D4A";
-              const accentLight = brandColorTheme?.accentLight || "#FBBF24";
-              const accentColor = brandColorTheme?.accentColor || "#F59E0B";
+              const primaryColor = brandColorTheme?.primaryColor || "#334155";
+              const primaryDeep = brandColorTheme?.primaryDeep || "#1E293B";
+              const accentLight = brandColorTheme?.accentLight || "#94A3B8";
+              const accentColor = brandColorTheme?.accentColor || "#64748B";
 
               return (
                 <div key={tab.to} className="relative flex flex-1 flex-col items-center justify-center">
@@ -1023,13 +1008,13 @@ function MemberTabBar() {
                     aria-label="Quét mã QR Check-in"
                     className="-mt-6 relative flex flex-col items-center group active:scale-95 transition-transform cursor-pointer border-0 bg-transparent p-0 outline-none"
                   >
-                    {/* Nút tròn Quét mã QR: Nền radial đổi màu tự động theo cài đặt hệ thống tại màn cá nhân */}
+                    {/* Nút tròn Quét mã QR: Nền gradient Executive Slate sang trọng */}
                     <span
                       className="relative grid h-14 w-14 place-items-center rounded-full shadow-lg group-hover:scale-105 group-active:scale-95 transition-all overflow-hidden p-2.5"
                       style={{
-                        background: `radial-gradient(circle at 45% 35%, ${accentLight} 0%, ${primaryColor} 60%, ${primaryDeep} 100%)`,
-                        border: `2.5px solid ${accentColor}`,
-                        boxShadow: `0 6px 18px ${primaryColor}66`,
+                        background: `linear-gradient(135deg, ${primaryColor} 0%, ${primaryDeep} 100%)`,
+                        border: `2.5px solid #FFFFFF`,
+                        boxShadow: `0 4px 14px rgba(51, 65, 85, 0.4)`,
                       }}
                     >
                       {/* Icon Quét Scan khi đang quét -> Icon Mã QR tĩnh 2s khi quét xong (Yêu cầu 1) */}
@@ -1065,14 +1050,14 @@ function MemberTabBar() {
                           {activeThemeOption.id === "tet"
                             ? "🧧"
                             : activeThemeOption.id === "christmas"
-                            ? "🔔"
-                            : activeThemeOption.id === "national-day"
-                            ? "🇻🇳"
-                            : activeThemeOption.id === "mid-autumn"
-                            ? "🌕"
-                            : activeThemeOption.id === "ceohn10-birthday"
-                            ? "🎂"
-                            : activeThemeOption.iconEmoji || "✨"}
+                              ? "🔔"
+                              : activeThemeOption.id === "national-day"
+                                ? "🇻🇳"
+                                : activeThemeOption.id === "mid-autumn"
+                                  ? "🌕"
+                                  : activeThemeOption.id === "ceohn10-birthday"
+                                    ? "🎂"
+                                    : activeThemeOption.iconEmoji || "✨"}
                         </span>
                       )}
                     </span>
@@ -1183,9 +1168,8 @@ function MemberTabBar() {
                   {notificationBadge || seasonalBadge}
                 </div>
                 <span
-                  className={`text-xs transition-colors select-none font-['Inter'] leading-4 ${
-                    active ? "font-semibold" : "font-normal text-slate-500 dark:text-slate-400"
-                  }`}
+                  className={`text-xs transition-colors select-none font-['Inter'] leading-4 ${active ? "font-semibold" : "font-normal text-slate-500 dark:text-slate-400"
+                    }`}
                   style={active ? { color: brandColorTheme?.primaryColor || "var(--vba-navy)" } : undefined}
                 >
                   {lang === "en"

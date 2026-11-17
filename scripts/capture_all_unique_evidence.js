@@ -88,7 +88,7 @@ async function runCapture() {
         '04_crm_members_management.png',
         'sub_07_crm_members_list.png',
         'crm_03_members_list.png'
-      ], 'CRM: Danh sách Quản lý Hội viên dạng thẻ');
+      ], 'CRM: Danh sách Quản lý Học viên dạng thẻ');
     } catch (e) { console.error('  Err 3:', e.message); }
 
     // 4. CRM Member Detail Drawer & 5. Approve Action
@@ -102,7 +102,7 @@ async function runCapture() {
         saveSnap(buf, [
           'sub_08_crm_member_detail_drawer.png',
           'crm_04_member_detail_drawer.png'
-        ], 'CRM: Drawer Chi Tiết Hồ Sơ Hội Viên 360 độ');
+        ], 'CRM: Drawer Chi Tiết Hồ Sơ Học viên 360 độ');
 
         const approveBtn = crm.locator('button:has-text("Phê duyệt"), button:has-text("Duyệt")').first();
         if (await approveBtn.count() > 0) {
@@ -113,7 +113,7 @@ async function runCapture() {
         saveSnap(buf, [
           'sub_09_crm_approve_action.png',
           '05_crm_member_approved.png'
-        ], 'CRM: Thao tác Bấm nút Phê duyệt (Approve) Hội viên');
+        ], 'CRM: Thao tác Bấm nút Phê duyệt (Approve) Học viên');
       }
     } catch (e) { console.error('  Err 4-5:', e.message); }
 
@@ -137,7 +137,7 @@ async function runCapture() {
     // 7. CRM Roles & Permissions Matrix
     try {
       console.log('7. CRM Roles & Permissions Matrix...');
-      await crm.goto(`${CRM_BASE}/platform/permissions`, { waitUntil: 'networkidle', timeout: 30000 }).catch(() => {});
+      await crm.goto(`${CRM_BASE}/platform/permissions`, { waitUntil: 'networkidle', timeout: 30000 }).catch(() => { });
       await crm.waitForTimeout(1500);
       if (!crm.url().includes('permissions')) {
         await crm.goto(`${CRM_BASE}/members`, { waitUntil: 'networkidle', timeout: 30000 });
@@ -352,14 +352,14 @@ async function runCapture() {
       console.log('24. Landing Registration Modal...');
       await landing.goto(`${APP_BASE}/landing/ceohn10`, { waitUntil: 'networkidle', timeout: 30000 });
       await landing.waitForTimeout(1000);
-      const regModalBtn = landing.locator('button:has-text("ĐĂNG KÝ HỘI VIÊN VIP"), button:has-text("NỘP HỒ SƠ XÉT DUYỆT VIP NGAY"), button:has-text("ĐĂNG KÝ GIA NHẬP CLB VIP")').first();
+      const regModalBtn = landing.locator('button:has-text("ĐĂNG KÝ Học viên VIP"), button:has-text("NỘP HỒ SƠ XÉT DUYỆT VIP NGAY"), button:has-text("ĐĂNG KÝ GIA NHẬP CLB VIP")').first();
       if (await regModalBtn.count() > 0) {
         await regModalBtn.click();
         await landing.waitForTimeout(1500);
         let buf = await landing.screenshot();
         saveSnap(buf, [
           'sub_03_landing_registration_modal.png'
-        ], 'Modal Tiếp nhận Form Đăng ký Hội viên Mới');
+        ], 'Modal Tiếp nhận Form Đăng ký Học viên Mới');
       }
     } catch (e) { console.error('  Err 24:', e.message); }
 
@@ -463,7 +463,7 @@ async function runCapture() {
         'sub_12_app_home_top_banner.png',
         '08_app_home_dashboard.png',
         'app_02_home_dashboard.png'
-      ], 'Giao diện Trang chủ Hội viên CEO HN10');
+      ], 'Giao diện Trang chủ Học viên CEO HN10');
     } catch (e) { console.error('  Err 30:', e.message); }
 
     // 31. App Home Compact Events Carousel (Scrolled)
@@ -487,7 +487,7 @@ async function runCapture() {
       saveSnap(buf, [
         'sub_13_app_vip_card_front.png',
         '09_app_vip_card.png'
-      ], 'Thẻ Hội Viên VIP Kỹ Thuật Số CLB Doanh Nhân CEO HN10');
+      ], 'Thẻ Học viên VIP Kỹ Thuật Số CLB Doanh Nhân CEO HN10');
     } catch (e) { console.error('  Err 32:', e.message); }
 
     // 33. Public Digital Business Card Landing
@@ -616,7 +616,7 @@ async function runCapture() {
         let buf = await app.screenshot();
         saveSnap(buf, [
           'sub_36_app_product_detail_modal.png'
-        ], 'Modal Xem Chi Tiết Sản Phẩm & Giá Ưu Đãi Hội Viên');
+        ], 'Modal Xem Chi Tiết Sản Phẩm & Giá Ưu Đãi Học viên');
       }
     } catch (e) { console.error('  Err 42:', e.message); }
 
@@ -699,7 +699,7 @@ async function runCapture() {
         'sub_16_app_members_directory.png',
         '23_app_members_directory.png',
         'app_12_members_directory.png'
-      ], 'Danh bạ Hội viên Doanh nhân Hiệp hội CEO HN10');
+      ], 'Danh bạ Học viên Doanh nhân Hiệp hội CEO HN10');
     } catch (e) { console.error('  Err 47:', e.message); }
 
     // 48. Member Profile 360 Modal & 49. Connection Toggle
@@ -714,7 +714,7 @@ async function runCapture() {
           'sub_17_app_member_profile_modal.png',
           '10_app_profile_view.png',
           'app_13_member_profile_modal.png'
-        ], 'Hồ sơ Doanh nghiệp Chi tiết 360 độ của Hội viên');
+        ], 'Hồ sơ Doanh nghiệp Chi tiết 360 độ của Học viên');
 
         console.log('49. Connection Toggle Action...');
         const connectBtn = app.locator('button:has-text("Kết nối"), button:has-text("Đã kết nối")').first();
@@ -725,7 +725,7 @@ async function runCapture() {
         buf = await app.screenshot();
         saveSnap(buf, [
           'sub_18_app_connection_toggle.png'
-        ], 'Thao tác Bật/Tắt Kết nối Hội viên');
+        ], 'Thao tác Bật/Tắt Kết nối Học viên');
       }
     } catch (e) { console.error('  Err 48-49:', e.message); }
 
@@ -741,7 +741,7 @@ async function runCapture() {
         let buf = await app.screenshot();
         saveSnap(buf, [
           'sub_19_app_invite_member_modal.png'
-        ], 'Modal Mời Hội Viên Mới Gia Nhập Hiệp Hội kèm mã giới thiệu');
+        ], 'Modal Mời Học viên Mới Gia Nhập Hiệp Hội kèm mã giới thiệu');
       }
     } catch (e) { console.error('  Err 50:', e.message); }
 
@@ -800,7 +800,7 @@ async function runCapture() {
         console.log('55. Chat Location Pin...');
         const locBtn = app.locator('button:has-text("Vị trí"), button:has(svg.lucide-map-pin)').first();
         if (await locBtn.count() > 0) {
-          await locBtn.click().catch(() => {});
+          await locBtn.click().catch(() => { });
           await app.waitForTimeout(800);
         }
         buf = await app.screenshot();
@@ -843,7 +843,7 @@ async function runCapture() {
       let buf = await app.screenshot();
       saveSnap(buf, [
         'sub_43_app_profile_menu.png'
-      ], 'Menu Quản trị Cá nhân và Tài khoản Hội viên');
+      ], 'Menu Quản trị Cá nhân và Tài khoản Học viên');
     } catch (e) { console.error('  Err 58:', e.message); }
 
     // 59. Digital Business Cards Wallet

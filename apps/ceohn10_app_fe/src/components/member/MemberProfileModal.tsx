@@ -253,7 +253,7 @@ function parseMemberAbout(rawAbout?: string | null): string {
       if (parsed.staffSize) parts.push(`Quy mô nhân sự: ${parsed.staffSize}`);
       if (parsed.needs) parts.push(`Nhu cầu kết nối: ${parsed.needs}`);
       if (parsed.offers) parts.push(`Thế mạnh cung cấp: ${parsed.offers}`);
-      return parts.length > 0 ? parts.join("\n") : "Hội viên chính thức CLB Doanh Nhân CEO HN10.";
+      return parts.length > 0 ? parts.join("\n") : "Học viên chính thức CLB Doanh Nhân CEO HN10.";
     } catch {
       return trimmed;
     }
@@ -282,7 +282,7 @@ export function MemberProfileModal({
           return list.some((item) => keys.includes(String(item).toLowerCase()));
         }
       }
-    } catch {}
+    } catch { }
     return false;
   };
 
@@ -297,7 +297,7 @@ export function MemberProfileModal({
           return list.some((item) => keys.includes(String(item).toLowerCase()));
         }
       }
-    } catch {}
+    } catch { }
     return false;
   };
 
@@ -373,11 +373,11 @@ export function MemberProfileModal({
             detail: { memberCode: member.code, userId: member.userId, connected: false },
           }),
         );
-      } catch {}
+      } catch { }
 
       setConnected(false);
       setRequestSent(false);
-      toast.success(`Đã hủy kết nối với hội viên ${displayName}`);
+      toast.success(`Đã hủy kết nối với Học viên ${displayName}`);
       if (onDisconnect) onDisconnect(member);
       return;
     }
@@ -396,7 +396,7 @@ export function MemberProfileModal({
         return lower !== mCode && lower !== mUserId;
       });
       localStorage.setItem("vba.disconnected_members", JSON.stringify(nextD));
-    } catch {}
+    } catch { }
 
     setRequestSent(true);
     toast.success(`Đã gửi lời mời kết nối tới ${displayName}. Đang chờ đối phương đồng ý.`);
@@ -414,7 +414,7 @@ export function MemberProfileModal({
       >
         {/* Scrollable Center Content */}
         <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
-          
+
           {/* 1. Header with Cover Photo (Ảnh bìa) */}
           <div className="relative w-full h-32 sm:h-36 bg-gradient-to-r from-[#001B54] via-[#003B95] to-[#B8860B] overflow-hidden">
             {coverUrl ? (
@@ -448,7 +448,7 @@ export function MemberProfileModal({
 
             {/* Badge Hiệp Hội CEO HN10 top-left */}
             <div className="absolute top-3 left-3 bg-[#001B54]/85 backdrop-blur-xs border border-amber-400/40 text-amber-300 font-black text-[9px] uppercase px-2.5 py-0.5 rounded-full shadow-xs">
-              Hội Viên CLB CEO HN10
+              Học viên CLB CEO HN10
             </div>
           </div>
 
@@ -626,13 +626,12 @@ export function MemberProfileModal({
             <button
               type="button"
               onClick={handleToggleConnection}
-              className={`flex-1 flex items-center justify-center gap-1.5 rounded-xl py-2.5 text-[12.5px] font-bold transition active:scale-95 cursor-pointer shadow-md ${
-                connected
+              className={`flex-1 flex items-center justify-center gap-1.5 rounded-xl py-2.5 text-[12.5px] font-bold transition active:scale-95 cursor-pointer shadow-md ${connected
                   ? "border border-rose-200 dark:border-rose-900/50 bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 hover:bg-rose-100 dark:hover:bg-rose-900/60 shadow-rose-500/10"
                   : requestSent
                     ? "border border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-400 shadow-amber-500/10"
                     : "bg-[#003B95] hover:bg-[#002B70] text-white shadow-blue-900/20"
-              }`}
+                }`}
             >
               {connected ? (
                 <>

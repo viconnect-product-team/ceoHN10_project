@@ -58,7 +58,7 @@ export class ConnectMarketplaceService {
                  NULLIF(u.name, ''),
                  NULLIF(m.name, ''),
                  NULLIF(m.contact, ''),
-                 'Hội viên CLB'
+                 'Học viên CLB'
                ) as seller_name,
                COALESCE(
                  NULLIF(up.avatar_url, ''),
@@ -249,7 +249,7 @@ export class ConnectMarketplaceService {
                NULLIF(u.name, ''),
                NULLIF(m.name, ''),
                NULLIF(m.contact, ''),
-               'Hội viên CLB'
+               'Học viên CLB'
              ) as seller_name,
              COALESCE(
                NULLIF(up.avatar_url, ''),
@@ -330,7 +330,7 @@ export class ConnectMarketplaceService {
                NULLIF(u.name, ''),
                NULLIF(m.name, ''),
                NULLIF(m.contact, ''),
-               'Hội viên CLB'
+               'Học viên CLB'
              ) as seller_name,
              COALESCE(
                NULLIF(up.avatar_url, ''),
@@ -366,7 +366,7 @@ export class ConnectMarketplaceService {
 
     const quotes = await this.prisma.$queryRaw<any[]>`
       SELECT q.*,
-             COALESCE(m.contact, m.name, u.name, 'Hội viên CLB') as buyer_name,
+             COALESCE(m.contact, m.name, u.name, 'Học viên CLB') as buyer_name,
              COALESCE(m.cover_url, u.avatar_url, '') as buyer_avatar,
              COALESCE(m.phone, q.contact, '') as buyer_phone,
              COALESCE(m.name, bi.company_name, '') as buyer_company
@@ -653,7 +653,7 @@ export class ConnectMarketplaceService {
       const rows = await this.prisma.$queryRaw<any[]>`
         SELECT q.id, q.product_id, q.buyer_id, q.quantity, q.message, q.contact, q.status, q.created_at,
                p.title as product_title, p.price as product_price, p.image_url as product_image,
-               COALESCE(m.name, u.name, 'Hội viên CLB') as buyer_name,
+               COALESCE(m.name, u.name, 'Học viên CLB') as buyer_name,
                COALESCE(m.avatar_url, u.avatar_url, '') as buyer_avatar,
                COALESCE(m.company_name, '') as buyer_company,
                COALESCE(q.contact, m.phone, u.phone, '') as buyer_phone,
@@ -799,7 +799,7 @@ export class ConnectMarketplaceService {
     }
 
     // 1. Query buyer info for CRM Lead
-    let buyerName = 'Hội viên CEO HN10';
+    let buyerName = 'Học viên CEO HN10';
     let buyerPhone = data.contact || '';
     try {
       const buyerRows = await this.prisma.$queryRaw<any[]>`
@@ -817,7 +817,7 @@ export class ConnectMarketplaceService {
     try {
       await this.notifyAssociationAdmins(assocId, {
         title: `[CRM Báo giá] Yêu cầu báo giá mới: ${prodTitle}`,
-        body: `Khách hàng/Hội viên ${buyerName} (SĐT: ${buyerPhone || 'Chưa cung cấp'}) gửi yêu cầu báo giá cho sản phẩm "${prodTitle}" (SL: ${data.quantity ?? 1}). Ghi chú: "${(data.message || '').slice(0, 120)}"`,
+        body: `Khách hàng/Học viên ${buyerName} (SĐT: ${buyerPhone || 'Chưa cung cấp'}) gửi yêu cầu báo giá cho sản phẩm "${prodTitle}" (SL: ${data.quantity ?? 1}). Ghi chú: "${(data.message || '').slice(0, 120)}"`,
         targetRoute: '/marketplace',
         type: 'crm_quote_lead',
         sourceRecordId: id,
@@ -916,7 +916,7 @@ export class ConnectMarketplaceService {
 🔢 Số lượng: ${data.quantity ?? 1}
 👤 Người yêu cầu: ${buyerName}
 📞 Số điện thoại: ${buyerPhone || 'Chưa cung cấp'}
-💬 Lời nhắn: ${data.message ? data.message : 'Tôi quan tâm đến sản phẩm này, vui lòng gửi báo giá chi tiết và chính sách ưu đãi cho hội viên CLB CEO HN10.'}
+💬 Lời nhắn: ${data.message ? data.message : 'Tôi quan tâm đến sản phẩm này, vui lòng gửi báo giá chi tiết và chính sách ưu đãi cho Học viên CLB CEO HN10.'}
 ───────────────
 ⚡ Thời gian gửi: ${new Date().toLocaleString('vi-VN')}
 🆔 Mã báo giá: ${id}`;

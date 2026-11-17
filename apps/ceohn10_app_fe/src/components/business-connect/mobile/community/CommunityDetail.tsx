@@ -79,10 +79,10 @@ export function CommunityDetail({ communityId }: { communityId: string }) {
 
   const visuals = detail?.community
     ? getCommunityVisuals(
-        detail.community.name,
-        detail.community.logoUrl,
-        detail.community.bannerUrl,
-      )
+      detail.community.name,
+      detail.community.logoUrl,
+      detail.community.bannerUrl,
+    )
     : null;
 
   return (
@@ -185,7 +185,7 @@ export function CommunityDetail({ communityId }: { communityId: string }) {
                     Gia nhập cộng đồng
                   </p>
                   <p className="text-[12px] text-[var(--bc-mobile-muted)]">
-                    Tham gia để kết nối hội viên và cập nhật tin tức, sự kiện mới nhất.
+                    Tham gia để kết nối Học viên và cập nhật tin tức, sự kiện mới nhất.
                   </p>
                 </div>
                 <button
@@ -244,17 +244,16 @@ export function CommunityDetail({ communityId }: { communityId: string }) {
                 },
                 { id: "news", label: "Bài viết & Tin tức" },
                 { id: "events", label: `Sự kiện (${detail.upcomingEvents.length || 0})` },
-                { id: "members", label: "Hội viên" },
+                { id: "members", label: "Học viên" },
               ].map((tab) => (
                 <button
                   key={tab.id}
                   type="button"
                   onClick={() => setActiveTab(tab.id as any)}
-                  className={`whitespace-nowrap px-3.5 py-2 text-[12.5px] font-bold rounded-t-xl transition-all border-b-2 cursor-pointer ${
-                    activeTab === tab.id
+                  className={`whitespace-nowrap px-3.5 py-2 text-[12.5px] font-bold rounded-t-xl transition-all border-b-2 cursor-pointer ${activeTab === tab.id
                       ? "border-[#D8B282] text-[#D8B282] bg-[#D8B282]/10"
                       : "border-transparent text-[var(--bc-mobile-muted)] hover:text-[var(--bc-mobile-text)]"
-                  }`}
+                    }`}
                 >
                   {tab.label}
                 </button>
@@ -426,7 +425,7 @@ function StreamlinedOpportunitiesSection({
 
                     {/* Organization / Poster */}
                     <div className="mt-1 text-[11.5px] text-[var(--bc-mobile-muted)] flex items-center gap-2">
-                      <span>{o.organizationLabel || "Hội viên hiệp hội"}</span>
+                      <span>{o.organizationLabel || "Học viên hiệp hội"}</span>
                       {isClaimed ? (
                         <span className="inline-flex items-center gap-1 text-[11px] font-bold text-amber-600 dark:text-[#D8B282]">
                           <CheckCircle2 className="w-3 h-3" />

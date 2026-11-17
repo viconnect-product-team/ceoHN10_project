@@ -335,7 +335,7 @@ function TasksPage() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-slate-200/80 pb-5 dark:border-slate-800">
           <div>
             <div className="flex items-center gap-2">
-              <div className="p-2 rounded-xl bg-[#003B95] text-white shadow-md">
+              <div className="p-2 rounded-xl bg-[#334155] text-white shadow-md">
                 <CheckSquare className="w-5 h-5" />
               </div>
               <div>
@@ -353,7 +353,7 @@ function TasksPage() {
             <button
               type="button"
               onClick={() => setAiExtractorOpen(true)}
-              className="inline-flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-[#003B95] hover:bg-[#002B70] text-white text-xs font-bold shadow-sm transition cursor-pointer"
+              className="inline-flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-[#334155] hover:bg-[#1E293B] text-white text-xs font-bold shadow-sm transition cursor-pointer"
               title="Tự động bóc tách task, gợi ý giải pháp và phân công nhân sự các Ban từ file Word/Excel/văn bản họp"
             >
               <Sparkles className="w-4 h-4 text-amber-300" />
@@ -405,7 +405,7 @@ function TasksPage() {
             <button
               type="button"
               onClick={() => handleOpenCreate('TODO')}
-              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#DC2626] hover:bg-[#B91C1C] text-white text-xs font-bold shadow-sm transition cursor-pointer"
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#0F172A] hover:bg-[#1E293B] text-white text-xs font-bold shadow-sm transition cursor-pointer"
             >
               <Plus className="w-4 h-4 text-white" />
               Thêm công việc mới
@@ -521,7 +521,7 @@ function TasksPage() {
                 placeholder="Tìm theo tên, mã CV, người làm..."
                 value={searchKeyword}
                 onChange={(e) => setSearchKeyword(e.target.value)}
-                className="w-full pl-9 pr-3 py-1.5 text-xs rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:border-[#003B95] outline-none"
+                className="w-full pl-9 pr-3 py-1.5 text-xs rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:border-slate-500 outline-none"
               />
             </div>
 

@@ -314,9 +314,9 @@ function generateProfileCrmHtml() {
     <!-- ==================== KHÔNG GIAN SHOWROOM 3D & 5 CỬA SỔ BAY ==================== -->
     <div class="relative z-30 my-auto grid grid-cols-12 gap-6 items-center pt-2">
       
-      <!-- CỘT TRÁI: 2 CỬA SỔ PHỐI CẢNH 3D (HỘI VIÊN 360 & SỰ KIỆN GALA) -->
+      <!-- CỘT TRÁI: 2 CỬA SỔ PHỐI CẢNH 3D (Học viên 360 & SỰ KIỆN GALA) -->
       <div class="col-span-3 space-y-6" style="perspective: 1200px;">
-        <!-- Window 1: Hội Viên 360 (Nghiêng 3D quay vào tâm) -->
+        <!-- Window 1: Học viên 360 (Nghiêng 3D quay vào tâm) -->
         <div class="floating-window-3d" style="transform: rotateY(14deg) rotateX(4deg) translateZ(40px);">
           <div class="window-header-mac">
             <div class="window-dots">
@@ -324,15 +324,15 @@ function generateProfileCrmHtml() {
               <div class="window-dot bg-amber-400"></div>
               <div class="window-dot bg-green-400"></div>
             </div>
-            <div class="text-[11px] font-extrabold text-blue-900 tracking-wide uppercase">01. HỒ SƠ HỘI VIÊN 360°</div>
+            <div class="text-[11px] font-extrabold text-blue-900 tracking-wide uppercase">01. HỒ SƠ Học viên 360°</div>
             <span class="text-[10px] font-mono text-cyan-700 bg-cyan-50 px-2 py-0.5 rounded font-bold">500+ CEO</span>
           </div>
           <div class="p-2 bg-slate-100">
-            <img src="${CRM_03}" class="w-full h-36 object-cover object-top rounded-xl border border-slate-200" alt="Hội viên 360" />
+            <img src="${CRM_03}" class="w-full h-36 object-cover object-top rounded-xl border border-slate-200" alt="Học viên 360" />
           </div>
           <div class="p-3 bg-white">
             <div class="text-xs font-black text-slate-900">Quản Trị Hồ Sơ Doanh Nghiệp Toàn Diện</div>
-            <div class="text-[11px] text-slate-600 mt-0.5 font-medium">Tra cứu ngành nghề, phân khúc, phê duyệt hội viên mới 2 lớp.</div>
+            <div class="text-[11px] text-slate-600 mt-0.5 font-medium">Tra cứu ngành nghề, phân khúc, phê duyệt Học viên mới 2 lớp.</div>
           </div>
         </div>
 
@@ -405,7 +405,7 @@ function generateProfileCrmHtml() {
           </div>
           <div class="p-2.5 bg-white">
             <div class="text-xs font-black text-slate-900">Gạch Nợ Tức Thì Qua Webhook</div>
-            <div class="text-[10px] text-slate-600 mt-0.5 font-medium">Mã QR động từng hội viên, minh bạch sổ quỹ hiệp hội.</div>
+            <div class="text-[10px] text-slate-600 mt-0.5 font-medium">Mã QR động từng Học viên, minh bạch sổ quỹ hiệp hội.</div>
           </div>
         </div>
 
@@ -669,7 +669,7 @@ function generatePosterAppHtml() {
 
       <div class="flex items-center gap-4">
         <div class="text-right">
-          <div class="text-[11px] font-extrabold uppercase tracking-widest text-cyan-300">NỀN TẢNG SỐ HỘI VIÊN</div>
+          <div class="text-[11px] font-extrabold uppercase tracking-widest text-cyan-300">NỀN TẢNG SỐ Học viên</div>
           <div class="text-sm font-black text-white">PHIÊN BẢN DOANH NHÂN 2026</div>
         </div>
         <div class="px-5 py-2.5 rounded-full bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-950 font-black text-xs uppercase tracking-wider shadow-lg shadow-amber-500/30 flex items-center gap-2">
@@ -691,23 +691,23 @@ function generatePosterAppHtml() {
       </h1>
 
       <p class="text-base text-blue-100 font-medium max-w-3xl mx-auto leading-relaxed drop-shadow">
-        Giải pháp chuyển đổi số toàn diện: Định danh số hội viên VIP, khớp lệnh giao thương B2B bảo mật và quản lý sự kiện thông minh ngay trên chiếc điện thoại thông minh.
+        Giải pháp chuyển đổi số toàn diện: Định danh số Học viên VIP, khớp lệnh giao thương B2B bảo mật và quản lý sự kiện thông minh ngay trên chiếc điện thoại thông minh.
       </p>
     </div>
 
     <!-- ==================== 3 MÀN HÌNH CHÍNH 3D TRƯNG BÀY NỔI BẬT ==================== -->
     <div class="relative z-30 perspective-stage my-4 flex items-center justify-center gap-8 px-4">
       
-      <!-- CỘT 1: THẺ HỘI VIÊN VIP (NGHIÊNG TRÁI 3D) -->
+      <!-- CỘT 1: THẺ Học viên VIP (NGHIÊNG TRÁI 3D) -->
       <div class="relative flex flex-col items-center" style="transform: rotateY(16deg) rotateZ(-2deg) translateZ(-30px);">
         <div class="absolute -top-7 z-50 px-5 py-2.5 rounded-2xl bg-gradient-to-r from-amber-500 to-yellow-500 text-slate-950 font-black text-xs uppercase tracking-wider shadow-2xl border-2 border-yellow-200 flex items-center gap-2">
-          <span>💳</span> 01. THẺ HỘI VIÊN SỐ VIP
+          <span>💳</span> 01. THẺ Học viên SỐ VIP
         </div>
 
         <div class="phone-mockup-3d w-[360px] h-[730px]">
           <div class="phone-inner w-full h-full">
             <div class="phone-notch"><div class="phone-camera"></div></div>
-            <img src="${APP_02}" class="w-full h-full object-cover object-top" alt="Thẻ Hội Viên VIP" />
+            <img src="${APP_02}" class="w-full h-full object-cover object-top" alt="Thẻ Học viên VIP" />
           </div>
         </div>
 

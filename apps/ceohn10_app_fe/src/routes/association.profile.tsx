@@ -155,7 +155,7 @@ export default function ProfileScreen() {
   const { isSuperAdmin } = useRole();
   const fetchMember = useServerFn(getMyMember);
 
-  // Đọc ngay thông tin hội viên đã lưu từ localStorage để render tức thời, triệt tiêu hoàn toàn nháy giao diện cũ
+  // Đọc ngay thông tin Học viên đã lưu từ localStorage để render tức thời, triệt tiêu hoàn toàn nháy giao diện cũ
   const initialCachedMember = useMemo<MyMember | null>(() => {
     if (typeof window === "undefined") return null;
     try {
@@ -167,7 +167,7 @@ export default function ProfileScreen() {
         return {
           id: u.id || u.sub,
           name: u.name || u.full_name || u.user_metadata?.full_name,
-          title: u.title || u.user_metadata?.title || "Hội viên chính thức",
+          title: u.title || u.user_metadata?.title || "Học viên chính thức",
           companyName: u.company || u.company_name || u.user_metadata?.company,
           avatar: u.avatar || u.avatar_url,
           phone: u.phone,
@@ -189,7 +189,7 @@ export default function ProfileScreen() {
   const { data: myEventsList = [] } = useServerData<MyEvent[]>(() => fetchEvents(), []);
   const { data: myOppsList = [] } = useServerData<MyOpportunity[]>(() => fetchOpps(), []);
 
-  // Lịch sử hoạt động hội viên (Ý kiến cuộc họp - Item 15)
+  // Lịch sử hoạt động Học viên (Ý kiến cuộc họp - Item 15)
   const participatedEvents = useMemo(() => {
     return (myEventsList || []).filter((e) => e.registered);
   }, [myEventsList]);
@@ -207,7 +207,7 @@ export default function ProfileScreen() {
   const [showLocationEditor, setShowLocationEditor] = useState(false);
   const [systemSettingsOpen, setSystemSettingsOpen] = useState(false);
 
-  // Bài viết mạng lưới của hội viên (Yêu cầu 1, 3)
+  // Bài viết mạng lưới của Học viên (Yêu cầu 1, 3)
   const [myPosts, setMyPosts] = useState<any[]>([]);
   const [loadingPosts, setLoadingPosts] = useState(false);
   const [createPostOpen, setCreatePostOpen] = useState(false);
@@ -352,7 +352,7 @@ export default function ProfileScreen() {
   // Cuộc gặp 1-on-1 (Giao lưu, hợp tác kinh doanh)
   const meetings1on1 = useMemo<any[]>(() => [], []);
 
-  // Lịch sử thao tác hội viên (Audit Log sống động - Yêu cầu 3)
+  // Lịch sử thao tác Học viên (Audit Log sống động - Yêu cầu 3)
   const [auditHistory, setAuditHistory] = useState<UserActivityItem[]>(() =>
     getUserActivityHistory(user?.id)
   );
@@ -838,7 +838,7 @@ export default function ProfileScreen() {
   const displayBio =
     localProfile?.bio?.trim() ||
     rawBio ||
-    "Hội viên tích cực CLB Doanh Nhân CEO HN10 (HanoiBA). Sẵn sàng giao lưu kết nối, hợp tác kinh doanh và mở rộng chuỗi cung ứng B2B bền vững.";
+    "Học viên tích cực CLB Doanh Nhân CEO HN10 (HanoiBA). Sẵn sàng giao lưu kết nối, hợp tác kinh doanh và mở rộng chuỗi cung ứng B2B bền vững.";
 
   const displayCompanySize =
     localProfile?.companySize?.trim() ||
@@ -877,7 +877,7 @@ export default function ProfileScreen() {
     if (navigator.share) {
       try {
         await navigator.share({
-          title: `Hồ sơ Hội viên: ${displayName}`,
+          title: `Hồ sơ Học viên: ${displayName}`,
           text: `${displayName} — ${displayTitle} tại ${displayCompany} (CLB Doanh Nhân CEO HN10)`,
           url: shareUrl,
         });
@@ -993,7 +993,7 @@ export default function ProfileScreen() {
             </button>
           </div>
 
-          {/* Avatar & Thông tin Hội viên đè lên ảnh bìa */}
+          {/* Avatar & Thông tin Học viên đè lên ảnh bìa */}
           <div className="w-full px-4 -mt-10 flex flex-col justify-start items-center z-10">
             <div className="size-20 relative flex flex-col justify-start items-start mb-1">
               <div className="size-20 rounded-full outline outline-4 outline-offset-[-4px] outline-white dark:outline-[#0F172A] inline-flex justify-center items-center overflow-hidden bg-slate-900 shadow-md">
@@ -1022,7 +1022,7 @@ export default function ProfileScreen() {
               </button>
             </div>
 
-            {/* Tên Hội viên kèm Tích xác thực */}
+            {/* Tên Học viên kèm Tích xác thực */}
             <div className="inline-flex items-center gap-1.5">
               <h1 className="text-lg font-semibold text-slate-900 dark:text-white font-['Inter'] leading-5">
                 {displayName}
@@ -1096,8 +1096,8 @@ export default function ProfileScreen() {
                 type="button"
                 onClick={() => setActiveTab("overview")}
                 className={`flex-1 py-3 relative flex flex-col justify-center items-center gap-2 cursor-pointer transition ${activeTab === "overview"
-                    ? "font-semibold"
-                    : "text-slate-600 dark:text-slate-400 font-normal hover:text-slate-900 dark:hover:text-white"
+                  ? "font-semibold"
+                  : "text-slate-600 dark:text-slate-400 font-normal hover:text-slate-900 dark:hover:text-white"
                   }`}
                 style={activeTab === "overview" ? { color: brandColorTheme.primaryColor } : undefined}
               >
@@ -1110,8 +1110,8 @@ export default function ProfileScreen() {
                 type="button"
                 onClick={() => setActiveTab("activities")}
                 className={`flex-1 py-3 relative flex flex-col justify-center items-center gap-2 cursor-pointer transition ${activeTab === "activities"
-                    ? "font-semibold"
-                    : "text-slate-600 dark:text-slate-400 font-normal hover:text-slate-900 dark:hover:text-white"
+                  ? "font-semibold"
+                  : "text-slate-600 dark:text-slate-400 font-normal hover:text-slate-900 dark:hover:text-white"
                   }`}
                 style={activeTab === "activities" ? { color: brandColorTheme.primaryColor } : undefined}
               >
@@ -1133,8 +1133,8 @@ export default function ProfileScreen() {
                 type="button"
                 onClick={() => setSubTab("business")}
                 className={`flex-1 px-1 py-2 rounded-[99px] outline outline-1 outline-offset-[-1px] flex justify-center items-center gap-1.5 transition cursor-pointer ${subTab === "business"
-                    ? "font-semibold shadow-2xs"
-                    : "bg-white dark:bg-slate-800/60 outline-Border-default text-Text-default font-normal hover:bg-slate-50"
+                  ? "font-semibold shadow-2xs"
+                  : "bg-white dark:bg-slate-800/60 outline-Border-default text-Text-default font-normal hover:bg-slate-50"
                   }`}
                 style={
                   subTab === "business"
@@ -1152,8 +1152,8 @@ export default function ProfileScreen() {
                 type="button"
                 onClick={() => setSubTab("posts")}
                 className={`flex-1 px-1 py-2 rounded-[99px] outline outline-1 outline-offset-[-1px] flex justify-center items-center gap-1.5 transition cursor-pointer ${subTab === "posts"
-                    ? "font-semibold shadow-2xs"
-                    : "bg-white dark:bg-slate-800/60 outline-Border-default text-Text-default font-normal hover:bg-slate-50"
+                  ? "font-semibold shadow-2xs"
+                  : "bg-white dark:bg-slate-800/60 outline-Border-default text-Text-default font-normal hover:bg-slate-50"
                   }`}
                 style={
                   subTab === "posts"
@@ -1189,7 +1189,7 @@ export default function ProfileScreen() {
                         Giới thiệu năng lực doanh nhân &amp; doanh nghiệp
                       </div>
                       <div className="pt-1 text-Text-description text-sm font-normal font-['Inter'] leading-5 whitespace-pre-line">
-                        {displayBio || "Hội viên tích cực CLB Doanh Nhân CEO HN10 (HanoiBA). Sẵn sàng giao lưu kết nối, hợp tác kinh doanh và mở rộng chuỗi cung ứng B2B bền vững."}
+                        {displayBio || "Học viên tích cực CLB Doanh Nhân CEO HN10 (HanoiBA). Sẵn sàng giao lưu kết nối, hợp tác kinh doanh và mở rộng chuỗi cung ứng B2B bền vững."}
                       </div>
                     </div>
 
@@ -1806,7 +1806,7 @@ export default function ProfileScreen() {
                               {opp.title}
                             </h5>
                             <p className="text-[10.5px] text-slate-500 dark:text-slate-400 truncate">
-                              {opp.company || "Hội viên CLB"} • {opp.value || "Thỏa thuận B2B"}
+                              {opp.company || "Học viên CLB"} • {opp.value || "Thỏa thuận B2B"}
                             </p>
                           </div>
                           <span className="px-2 py-0.5 rounded-full bg-orange-50 dark:bg-orange-950/60 text-orange-600 dark:text-orange-300 text-[10px] font-extrabold shrink-0 border border-orange-200">
@@ -2028,8 +2028,8 @@ export default function ProfileScreen() {
                     type="button"
                     onClick={() => setEditPrivacy("public")}
                     className={`p-2 rounded-xl border text-center flex flex-col items-center gap-1 transition cursor-pointer ${editPrivacy === "public"
-                        ? "border-[#003B95] bg-blue-50/80 dark:bg-blue-950/40 text-[#003B95] dark:text-blue-300 font-bold"
-                        : "border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400"
+                      ? "border-[#003B95] bg-blue-50/80 dark:bg-blue-950/40 text-[#003B95] dark:text-blue-300 font-bold"
+                      : "border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400"
                       }`}
                   >
                     <Globe className="size-3.5" />
@@ -2039,8 +2039,8 @@ export default function ProfileScreen() {
                     type="button"
                     onClick={() => setEditPrivacy("friends")}
                     className={`p-2 rounded-xl border text-center flex flex-col items-center gap-1 transition cursor-pointer ${editPrivacy === "friends"
-                        ? "border-[#003B95] bg-blue-50/80 dark:bg-blue-950/40 text-[#003B95] dark:text-blue-300 font-bold"
-                        : "border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400"
+                      ? "border-[#003B95] bg-blue-50/80 dark:bg-blue-950/40 text-[#003B95] dark:text-blue-300 font-bold"
+                      : "border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400"
                       }`}
                   >
                     <Users className="size-3.5" />
@@ -2050,8 +2050,8 @@ export default function ProfileScreen() {
                     type="button"
                     onClick={() => setEditPrivacy("only_me")}
                     className={`p-2 rounded-xl border text-center flex flex-col items-center gap-1 transition cursor-pointer ${editPrivacy === "only_me"
-                        ? "border-[#003B95] bg-blue-50/80 dark:bg-blue-950/40 text-[#003B95] dark:text-blue-300 font-bold"
-                        : "border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400"
+                      ? "border-[#003B95] bg-blue-50/80 dark:bg-blue-950/40 text-[#003B95] dark:text-blue-300 font-bold"
+                      : "border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400"
                       }`}
                   >
                     <Lock className="size-3.5" />
@@ -2247,8 +2247,8 @@ export default function ProfileScreen() {
                       toast.success("Đã chuyển sang Tiếng Việt");
                     }}
                     className={`py-2 px-3 rounded-xl border text-xs font-bold flex items-center justify-center gap-2 transition cursor-pointer ${lang === "vi"
-                        ? "border-[#003B95] dark:border-amber-400 bg-blue-50 dark:bg-amber-950/40 text-[#003B95] dark:text-amber-400 shadow-2xs font-extrabold"
-                        : "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400"
+                      ? "border-[#003B95] dark:border-amber-400 bg-blue-50 dark:bg-amber-950/40 text-[#003B95] dark:text-amber-400 shadow-2xs font-extrabold"
+                      : "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400"
                       }`}
                   >
                     <span>🇻🇳 Tiếng Việt</span>
@@ -2260,8 +2260,8 @@ export default function ProfileScreen() {
                       toast.success("Switched to English");
                     }}
                     className={`py-2 px-3 rounded-xl border text-xs font-bold flex items-center justify-center gap-2 transition cursor-pointer ${lang === "en"
-                        ? "border-[#003B95] dark:border-amber-400 bg-blue-50 dark:bg-amber-950/40 text-[#003B95] dark:text-amber-400 shadow-2xs font-extrabold"
-                        : "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400"
+                      ? "border-[#003B95] dark:border-amber-400 bg-blue-50 dark:bg-amber-950/40 text-[#003B95] dark:text-amber-400 shadow-2xs font-extrabold"
+                      : "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400"
                       }`}
                   >
                     <span>🇬🇧 English</span>
@@ -2539,7 +2539,7 @@ export default function ProfileScreen() {
         }}
       />
 
-      {/* Modal 3: Mã QR Hội viên CEO HN10 */}
+      {/* Modal 3: Mã QR Học viên CEO HN10 */}
       {qrModalOpen && (
         <AssociationMemberQrModal
           open={qrModalOpen}

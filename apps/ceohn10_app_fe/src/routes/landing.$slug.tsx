@@ -102,7 +102,7 @@ const FALLBACK_V2_CONFIG: LandingWebConfig = {
     { id: "m1", label: "Trang chủ", url: "#home" },
     { id: "m2", label: "Tính năng App", url: "#features" },
     { id: "m3", label: "Giao thương B2B", url: "#b2b" },
-    { id: "m4", label: "Hội viên tiêu biểu", url: "#network" },
+    { id: "m4", label: "Học viên tiêu biểu", url: "#network" },
     { id: "m5", label: "Hỏi đáp FAQ", url: "#faq" },
   ],
   slides: [],
@@ -138,7 +138,7 @@ const FALLBACK_V3_CONFIG: LandingWebConfig = {
     { id: "m1", label: "Triết Lý", url: "#approach" },
     { id: "m2", label: "Phân Hệ Atelier", url: "#specialties" },
     { id: "m3", label: "Dự Án Đỉnh Cao", url: "#builds" },
-    { id: "m4", label: "Đặc Quyền Hội Viên", url: "#stock" },
+    { id: "m4", label: "Đặc Quyền Học viên", url: "#stock" },
     { id: "m5", label: "Liên Hệ", url: "#enquire" },
   ],
   slides: [],
@@ -175,7 +175,7 @@ const FALLBACK_V4_CONFIG: LandingWebConfig = {
     { id: "m1", label: "Bộ Sưu Tập", url: "#portfolio" },
     { id: "m2", label: "Kiến Trúc & Thủ Công", url: "#philosophy" },
     { id: "m3", label: "360° Virtual Tour", url: "#virtual-tour" },
-    { id: "m4", label: "Đặc Quyền Hội Viên", url: "#privileges" },
+    { id: "m4", label: "Đặc Quyền Học viên", url: "#privileges" },
   ],
   slides: [],
   subScreens: [],
@@ -227,12 +227,12 @@ function PublicLandingPage() {
     (["web-v4", "web4", "web-4", "v4", "estate", "real-estate", "residence", "luxury-estate"].includes(cleanSlug)
       ? FALLBACK_V4_CONFIG
       : ["web-v3", "web3", "web-3", "v3", "forge-atelier", "luxury-atelier"].includes(cleanSlug)
-      ? FALLBACK_V3_CONFIG
-      : ["web-v2", "web2", "web-2", "v2", "app-ceohn10", "startup-mobile-showcase"].includes(cleanSlug)
-      ? FALLBACK_V2_CONFIG
-      : ["web-v1", "web1", "web-1", "v1", "kham-pha-toan-cau", "timed-cards-opening"].includes(cleanSlug)
-      ? FALLBACK_V1_CONFIG
-      : null);
+        ? FALLBACK_V3_CONFIG
+        : ["web-v2", "web2", "web-2", "v2", "app-ceohn10", "startup-mobile-showcase"].includes(cleanSlug)
+          ? FALLBACK_V2_CONFIG
+          : ["web-v1", "web1", "web-1", "v1", "kham-pha-toan-cau", "timed-cards-opening"].includes(cleanSlug)
+            ? FALLBACK_V1_CONFIG
+            : null);
 
   if (!effectiveConfig) {
     return (

@@ -91,7 +91,7 @@ async function main() {
   console.log(`✓ Tài khoản ${targetEmail} sẵn sàng với ID: ${userId}`);
 
   // Fetch token trực tiếp qua HTTPS API
-  console.log('Đang lấy token đăng nhập cho Hội viên qua API...');
+  console.log('Đang lấy token đăng nhập cho Học viên qua API...');
   const appLoginResp = await fetch(`${APP_URL}/api/auth/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -137,14 +137,14 @@ async function main() {
 
   const appPage = await mobileContext.newPage();
 
-  // 1. Màn Đăng ký Hội viên
-  console.log('1. Chụp màn đăng ký hội viên...');
+  // 1. Màn Đăng ký Học viên
+  console.log('1. Chụp màn đăng ký Học viên...');
   await appPage.goto(`${APP_URL}/association/login?register=true`, { waitUntil: 'domcontentloaded', timeout: 30000 });
   await appPage.waitForTimeout(2000);
-  await snap(appPage, 'step_01_app_register_form.png', 'Màn hình Tiếp nhận Đăng ký Hội viên CLB CEO HN10');
+  await snap(appPage, 'step_01_app_register_form.png', 'Màn hình Tiếp nhận Đăng ký Học viên CLB CEO HN10');
 
-  // 2. Màn Đăng nhập Hội viên
-  console.log('2. Chụp màn đăng nhập hội viên...');
+  // 2. Màn Đăng nhập Học viên
+  console.log('2. Chụp màn đăng nhập Học viên...');
   await appPage.goto(`${APP_URL}/association/login`, { waitUntil: 'domcontentloaded', timeout: 30000 });
   await appPage.waitForTimeout(1000);
   try {
@@ -152,8 +152,8 @@ async function main() {
     if (emailInput) await emailInput.fill(targetEmail);
     const pwdInput = await appPage.$('input[type="password"]');
     if (pwdInput) await pwdInput.fill('••••••••••••');
-  } catch {}
-  await snap(appPage, 'step_02_app_login_screen.png', 'Màn hình Đăng nhập App Hiệp Hội với Email / Mã Hội viên');
+  } catch { }
+  await snap(appPage, 'step_02_app_login_screen.png', 'Màn hình Đăng nhập App Hiệp Hội với Email / Mã Học viên');
 
   // Thiết lập Cookies và LocalStorage phiên đăng nhập cho App
   await mobileContext.addCookies([
@@ -174,17 +174,17 @@ async function main() {
   await appPage.waitForTimeout(2500);
   await snap(appPage, 'step_03_app_home_dashboard.png', 'Trang chủ App Doanh Nhân: Thẻ VIP, Banner Sự Kiện & Tiện Ích');
 
-  // 4. Hồ sơ hội viên
-  console.log('4. Chụp Màn hình Hồ sơ Hội viên...');
+  // 4. Hồ sơ Học viên
+  console.log('4. Chụp Màn hình Hồ sơ Học viên...');
   await appPage.goto(`${APP_URL}/association/profile`, { waitUntil: 'networkidle', timeout: 30000 });
   await appPage.waitForTimeout(2500);
-  await snap(appPage, 'step_04_app_profile_update.png', 'Hồ sơ Doanh nhân & Thông tin Doanh nghiệp Hội viên');
+  await snap(appPage, 'step_04_app_profile_update.png', 'Hồ sơ Doanh nhân & Thông tin Doanh nghiệp Học viên');
 
-  // 5. Danh bạ hội viên
-  console.log('5. Chụp Danh bạ Hội viên & Tìm kiếm đối tác...');
+  // 5. Danh bạ Học viên
+  console.log('5. Chụp Danh bạ Học viên & Tìm kiếm đối tác...');
   await appPage.goto(`${APP_URL}/association/members`, { waitUntil: 'networkidle', timeout: 30000 });
   await appPage.waitForTimeout(2500);
-  await snap(appPage, 'step_05_app_members_directory.png', 'Danh bạ Hội viên & Kết nối Giao thương B2B');
+  await snap(appPage, 'step_05_app_members_directory.png', 'Danh bạ Học viên & Kết nối Giao thương B2B');
 
   // 6. Nhắn tin B2B
   console.log('6. Chụp Màn hình Tin nhắn Kết nối B2B...');
@@ -208,7 +208,7 @@ async function main() {
   console.log('9. Chụp Gian hàng Marketplace B2B...');
   await appPage.goto(`${APP_URL}/association/products`, { waitUntil: 'networkidle', timeout: 30000 });
   await appPage.waitForTimeout(2500);
-  await snap(appPage, 'step_09_app_products_marketplace.png', 'Sàn Giao dịch & Gian hàng Sản phẩm Hội viên Ưu đãi');
+  await snap(appPage, 'step_09_app_products_marketplace.png', 'Sàn Giao dịch & Gian hàng Sản phẩm Học viên Ưu đãi');
 
   // 10. Mở Modal Đăng sản phẩm
   console.log('10. Mở Modal Đăng sản phẩm mới...');
@@ -218,7 +218,7 @@ async function main() {
       await postProdBtn.click();
       await appPage.waitForTimeout(1500);
     }
-  } catch {}
+  } catch { }
   await snap(appPage, 'step_10_app_product_submitted.png', 'Biểu mẫu Đăng sản phẩm & Dịch vụ Doanh nghiệp lên Sàn');
 
   // 11. Trao cơ hội B2B
@@ -235,7 +235,7 @@ async function main() {
       await postOppBtn.click();
       await appPage.waitForTimeout(1500);
     }
-  } catch {}
+  } catch { }
   await snap(appPage, 'step_12_app_opportunity_submitted.png', 'Biểu mẫu Đăng cơ hội Hợp tác & Tiếp nhận Nhu cầu Giao thương');
 
   // 13. Cổng Đóng Hội Phí Thường Niên
@@ -269,7 +269,7 @@ async function main() {
     if (emailInput) await emailInput.fill('admin@connect.vn');
     const pwdInput = await crmPage.$('input[type="password"]');
     if (pwdInput) await pwdInput.fill('••••••');
-  } catch {}
+  } catch { }
   await snap(crmPage, 'step_14_crm_login_screen.png', 'Màn hình Đăng nhập Hệ thống Quản trị Web CRM');
 
   // Thiết lập Cookies và LocalStorage phiên đăng nhập Admin cho CRM
@@ -289,13 +289,13 @@ async function main() {
   console.log('15. Chụp CRM Dashboard KPI...');
   await crmPage.goto(`${CRM_URL}/dashboard`, { waitUntil: 'networkidle', timeout: 30000 });
   await crmPage.waitForTimeout(2500);
-  await snap(crmPage, 'step_15_crm_dashboard_kpi.png', 'Trung tâm Giám sát Chỉ số KPI Hội viên, Sự kiện & Quỹ Hội');
+  await snap(crmPage, 'step_15_crm_dashboard_kpi.png', 'Trung tâm Giám sát Chỉ số KPI Học viên, Sự kiện & Quỹ Hội');
 
-  // 16. Danh sách Hội viên & Phê duyệt
-  console.log('16. Chụp CRM Quản lý Hội viên...');
+  // 16. Danh sách Học viên & Phê duyệt
+  console.log('16. Chụp CRM Quản lý Học viên...');
   await crmPage.goto(`${CRM_URL}/members`, { waitUntil: 'networkidle', timeout: 30000 });
   await crmPage.waitForTimeout(2500);
-  await snap(crmPage, 'step_16_crm_members_approval.png', 'Quản trị Danh sách Hội viên, Phân hạng & Phê duyệt Kết nạp');
+  await snap(crmPage, 'step_16_crm_members_approval.png', 'Quản trị Danh sách Học viên, Phân hạng & Phê duyệt Kết nạp');
 
   // 17. Quản trị Sự kiện
   console.log('17. Chụp CRM Quản trị Sự kiện...');

@@ -282,7 +282,7 @@ export function AssociationTrainingScreen() {
         method: "POST",
         body: JSON.stringify({
           memberId: user?.id,
-          userName: user?.name || "Hội viên CEO HN10",
+          userName: user?.name || "Học viên CEO HN10",
           email: user?.email || "",
           phone: user?.phone || "",
         }),
@@ -313,9 +313,9 @@ export function AssociationTrainingScreen() {
         dateStr: (training.start_time || new Date().toISOString()).split("T")[0],
         timeStr: training.start_time
           ? new Date(training.start_time).toLocaleTimeString("vi-VN", {
-              hour: "2-digit",
-              minute: "2-digit",
-            })
+            hour: "2-digit",
+            minute: "2-digit",
+          })
           : "09:00",
         location: training.location || "Phòng họp trực tuyến Jitsi Meet",
         details: `Giảng viên / Lãnh đạo lớp: ${training.instructor_name || "CEO HN10"}`,
@@ -468,11 +468,10 @@ export function AssociationTrainingScreen() {
           <button
             type="button"
             onClick={() => setActiveTab("all")}
-            className={`flex-1 py-1.5 px-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1 cursor-pointer ${
-              activeTab === "all"
+            className={`flex-1 py-1.5 px-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1 cursor-pointer ${activeTab === "all"
                 ? "bg-[#1F3864] text-white shadow-xs"
                 : "text-slate-600 dark:text-slate-300 hover:text-slate-900"
-            }`}
+              }`}
           >
             <span>Tất cả</span>
             <span className="text-[10px] opacity-80">({trainings.length})</span>
@@ -481,11 +480,10 @@ export function AssociationTrainingScreen() {
           <button
             type="button"
             onClick={() => setActiveTab("ongoing")}
-            className={`flex-1 py-1.5 px-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1 cursor-pointer ${
-              activeTab === "ongoing"
+            className={`flex-1 py-1.5 px-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1 cursor-pointer ${activeTab === "ongoing"
                 ? "bg-emerald-600 text-white shadow-xs"
                 : "text-slate-600 dark:text-slate-300 hover:text-slate-900"
-            }`}
+              }`}
           >
             <span className="size-1.5 rounded-full bg-emerald-400 animate-pulse" />
             <span>Đang diễn ra</span>
@@ -495,11 +493,10 @@ export function AssociationTrainingScreen() {
           <button
             type="button"
             onClick={() => setActiveTab("upcoming")}
-            className={`flex-1 py-1.5 px-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1 cursor-pointer ${
-              activeTab === "upcoming"
+            className={`flex-1 py-1.5 px-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1 cursor-pointer ${activeTab === "upcoming"
                 ? "bg-[#B8860B] text-white shadow-xs"
                 : "text-slate-600 dark:text-slate-300 hover:text-slate-900"
-            }`}
+              }`}
           >
             <span>Sắp diễn ra</span>
           </button>
@@ -507,11 +504,10 @@ export function AssociationTrainingScreen() {
           <button
             type="button"
             onClick={() => setActiveTab("completed")}
-            className={`flex-1 py-1.5 px-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1 cursor-pointer ${
-              activeTab === "completed"
+            className={`flex-1 py-1.5 px-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1 cursor-pointer ${activeTab === "completed"
                 ? "bg-slate-700 text-white shadow-xs"
                 : "text-slate-600 dark:text-slate-300 hover:text-slate-900"
-            }`}
+              }`}
           >
             <span>Đã học</span>
           </button>
@@ -526,11 +522,10 @@ export function AssociationTrainingScreen() {
                 key={cat}
                 type="button"
                 onClick={() => setSelectedCategory(cat)}
-                className={`px-3 py-1 rounded-full text-[11px] font-bold whitespace-nowrap transition cursor-pointer shrink-0 ${
-                  isSelected
+                className={`px-3 py-1 rounded-full text-[11px] font-bold whitespace-nowrap transition cursor-pointer shrink-0 ${isSelected
                     ? "bg-[#1F3864] text-white shadow-xs"
                     : "bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800 hover:border-amber-400"
-                }`}
+                  }`}
               >
                 {cat}
               </button>
@@ -672,11 +667,10 @@ export function AssociationTrainingScreen() {
                       <button
                         type="button"
                         onClick={() => setActiveMeeting(t)}
-                        className={`flex-1 min-w-[130px] py-2.5 px-3 rounded-2xl text-xs font-bold inline-flex items-center justify-center gap-1.5 shadow-xs transition active:scale-95 cursor-pointer ${
-                          isLive
+                        className={`flex-1 min-w-[130px] py-2.5 px-3 rounded-2xl text-xs font-bold inline-flex items-center justify-center gap-1.5 shadow-xs transition active:scale-95 cursor-pointer ${isLive
                             ? "bg-emerald-600 hover:bg-emerald-700 text-white"
                             : "bg-[#1F3864] hover:bg-[#152747] text-white"
-                        }`}
+                          }`}
                       >
                         <PhoneCall className="size-3.5" />
                         <span>{isLive ? "Vào Học Live" : "Vào Buổi Học"}</span>
@@ -699,11 +693,10 @@ export function AssociationTrainingScreen() {
                       type="button"
                       disabled={isCheckedIn || joiningId === t.id}
                       onClick={() => handleJoinTraining(t)}
-                      className={`py-2.5 px-3 rounded-2xl text-xs font-bold inline-flex items-center justify-center gap-1.5 transition cursor-pointer ${
-                        isCheckedIn
+                      className={`py-2.5 px-3 rounded-2xl text-xs font-bold inline-flex items-center justify-center gap-1.5 transition cursor-pointer ${isCheckedIn
                           ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-300"
                           : "bg-[#B8860B] hover:bg-[#9a7009] text-white shadow-xs active:scale-95"
-                      }`}
+                        }`}
                     >
                       <CheckCircle2 className="size-3.5" />
                       <span>{isCheckedIn ? "Đã Điểm Danh" : "Điểm Danh"}</span>
@@ -733,9 +726,9 @@ export function AssociationTrainingScreen() {
                           dateStr: (t.start_time || new Date().toISOString()).split("T")[0],
                           timeStr: t.start_time
                             ? new Date(t.start_time).toLocaleTimeString("vi-VN", {
-                                hour: "2-digit",
-                                minute: "2-digit",
-                              })
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            })
                             : "09:00",
                           location: t.location || "Phòng họp trực tuyến Jitsi Meet",
                           details: `Chuyên gia: ${t.instructor_name || "CEO HN10"}`,

@@ -48,7 +48,7 @@ export function EventQrStaffSelector({
         try {
           const parsed = JSON.parse(value);
           if (Array.isArray(parsed)) return parsed.map(String);
-        } catch {}
+        } catch { }
       }
       return value.split(",").map((s) => s.trim()).filter(Boolean);
     }
@@ -80,7 +80,7 @@ export function EventQrStaffSelector({
           setLoading(false);
         }
       }
-    } catch {}
+    } catch { }
 
     async function loadMembers() {
       try {
@@ -302,7 +302,7 @@ export function EventQrStaffSelector({
                 <input
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
-                  placeholder="Tìm nhân sự theo tên, số điện thoại, mã hội viên..."
+                  placeholder="Tìm nhân sự theo tên, số điện thoại, mã Học viên..."
                   className="h-8 w-full rounded-lg border border-border bg-muted/40 pl-8 pr-3 text-xs focus:border-ring focus:outline-none"
                   onClick={(e) => e.stopPropagation()}
                 />
@@ -343,11 +343,10 @@ export function EventQrStaffSelector({
                     <div
                       key={m.id}
                       onClick={() => handleToggleMember(m)}
-                      className={`flex items-center justify-between gap-3 p-2 rounded-lg text-xs cursor-pointer transition select-none ${
-                        isChecked
+                      className={`flex items-center justify-between gap-3 p-2 rounded-lg text-xs cursor-pointer transition select-none ${isChecked
                           ? "bg-purple-500/10 border border-purple-500/30 text-purple-900 dark:text-purple-200 font-medium"
                           : "hover:bg-muted/80 text-foreground"
-                      }`}
+                        }`}
                     >
                       <div className="flex items-center gap-2.5 min-w-0 flex-1">
                         <div className="shrink-0 text-purple-600">

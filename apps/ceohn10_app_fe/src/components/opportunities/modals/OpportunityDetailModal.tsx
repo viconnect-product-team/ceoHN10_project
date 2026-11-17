@@ -154,9 +154,8 @@ export const OpportunityDetailModal: React.FC<OpportunityDetailModalProps> = ({
                 key={idx}
                 type="button"
                 onClick={() => setActiveImgIdx(idx)}
-                className={`size-11 rounded-lg overflow-hidden shrink-0 border-2 transition cursor-pointer ${
-                  activeImgIdx === idx ? "border-[#003B95] ring-2 ring-[#003B95]/30" : "border-transparent opacity-60 hover:opacity-100"
-                }`}
+                className={`size-11 rounded-lg overflow-hidden shrink-0 border-2 transition cursor-pointer ${activeImgIdx === idx ? "border-[#003B95] ring-2 ring-[#003B95]/30" : "border-transparent opacity-60 hover:opacity-100"
+                  }`}
               >
                 <img
                   src={resolveMediaUrl(img) || img}
@@ -191,7 +190,7 @@ export const OpportunityDetailModal: React.FC<OpportunityDetailModalProps> = ({
               Đối tượng
             </span>
             <span className="text-[10.5px] font-medium text-slate-600 dark:text-slate-300 line-clamp-1">
-              Hội viên CEO HN10
+              Học viên CEO HN10
             </span>
           </div>
         </div>
@@ -205,7 +204,7 @@ export const OpportunityDetailModal: React.FC<OpportunityDetailModalProps> = ({
             </h4>
             <div className="text-slate-600 dark:text-slate-300 text-[12.5px] leading-relaxed whitespace-pre-line">
               {selectedOpp.description ||
-                "Cơ hội hợp tác kinh doanh, chuyển giao công nghệ và mở rộng mạng lưới đối tác chiến lược dành riêng cho cộng đồng doanh nhân và hội viên CLB CEO HN10."}
+                "Cơ hội hợp tác kinh doanh, chuyển giao công nghệ và mở rộng mạng lưới đối tác chiến lược dành riêng cho cộng đồng doanh nhân và Học viên CLB CEO HN10."}
             </div>
           </div>
 
@@ -247,7 +246,7 @@ export const OpportunityDetailModal: React.FC<OpportunityDetailModalProps> = ({
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2 font-bold text-[13px] text-slate-900 dark:text-amber-300">
                   <Users className="h-4 w-4 text-amber-500" />
-                  <span>Hội viên đã quan tâm ({interestedMembers.length})</span>
+                  <span>Học viên đã quan tâm ({interestedMembers.length})</span>
                 </div>
                 <span className="text-[10.5px] font-bold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-600 dark:text-amber-400">
                   CRM Realtime
@@ -260,7 +259,7 @@ export const OpportunityDetailModal: React.FC<OpportunityDetailModalProps> = ({
                 </p>
               ) : interestedMembers.length === 0 ? (
                 <p className="text-xs text-slate-500 dark:text-slate-400 py-2 italic text-center">
-                  Chưa có hội viên nào bấm quan tâm cơ hội này. Khi có người quan tâm, thông
+                  Chưa có Học viên nào bấm quan tâm cơ hội này. Khi có người quan tâm, thông
                   tin liên hệ sẽ hiển thị tại đây.
                 </p>
               ) : (
@@ -279,7 +278,7 @@ export const OpportunityDetailModal: React.FC<OpportunityDetailModalProps> = ({
                             {m.name}
                           </div>
                           <div className="text-[11px] text-slate-500 dark:text-slate-400 truncate">
-                            {m.company || "Hội viên CLB CEO HN10"}
+                            {m.company || "Học viên CLB CEO HN10"}
                           </div>
                           {m.expressedAt && (
                             <div className="text-[10px] text-amber-600 dark:text-amber-400">
@@ -346,52 +345,52 @@ export const OpportunityDetailModal: React.FC<OpportunityDetailModalProps> = ({
               (selectedOpp as any).status === "negotiating" ||
               (selectedOpp as any).status === "claimed")
           ) && (
-            <div className="rounded-2xl border border-emerald-500/40 bg-emerald-50/50 dark:bg-emerald-950/20 p-3.5 space-y-2">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2 font-bold text-[13px] text-emerald-800 dark:text-emerald-300">
-                  <Handshake className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
-                  <span>Hội viên đang deal cơ hội này</span>
-                </div>
-                <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-emerald-500 text-white shadow-xs">
-                  Đang thương thảo
-                </span>
-              </div>
-              <div className="p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-emerald-300 dark:border-emerald-800 flex items-center justify-between">
-                <div className="flex items-center gap-2 min-w-0">
-                  <div className="w-8 h-8 rounded-full bg-emerald-600 text-white font-black flex items-center justify-center text-xs shrink-0">
-                    {((selectedOpp as any).claimedByName || (selectedOpp as any).claimed_by_name || "D").charAt(0)}
+              <div className="rounded-2xl border border-emerald-500/40 bg-emerald-50/50 dark:bg-emerald-950/20 p-3.5 space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 font-bold text-[13px] text-emerald-800 dark:text-emerald-300">
+                    <Handshake className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                    <span>Học viên đang deal cơ hội này</span>
                   </div>
-                  <div className="min-w-0">
-                    <div className="font-bold text-xs text-slate-900 dark:text-white truncate">
-                      {(selectedOpp as any).claimedByName || (selectedOpp as any).claimed_by_name || "Đối tác B2B"}
+                  <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-emerald-500 text-white shadow-xs">
+                    Đang thương thảo
+                  </span>
+                </div>
+                <div className="p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-emerald-300 dark:border-emerald-800 flex items-center justify-between">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <div className="w-8 h-8 rounded-full bg-emerald-600 text-white font-black flex items-center justify-center text-xs shrink-0">
+                      {((selectedOpp as any).claimedByName || (selectedOpp as any).claimed_by_name || "D").charAt(0)}
                     </div>
-                    <div className="text-[11px] text-slate-500 dark:text-slate-400 truncate">
-                      {(selectedOpp as any).claimedCompany || (selectedOpp as any).claimed_company || "Doanh nghiệp thành viên"}
+                    <div className="min-w-0">
+                      <div className="font-bold text-xs text-slate-900 dark:text-white truncate">
+                        {(selectedOpp as any).claimedByName || (selectedOpp as any).claimed_by_name || "Đối tác B2B"}
+                      </div>
+                      <div className="text-[11px] text-slate-500 dark:text-slate-400 truncate">
+                        {(selectedOpp as any).claimedCompany || (selectedOpp as any).claimed_company || "Doanh nghiệp thành viên"}
+                      </div>
                     </div>
                   </div>
-                </div>
-                <div className="flex items-center gap-1 shrink-0 ml-2">
-                  <button
-                    type="button"
-                    onClick={() => onNegotiate(selectedOpp)}
-                    className="px-2.5 py-1 rounded-lg bg-[#003B95] hover:bg-blue-900 text-white text-[11px] font-bold shadow-xs cursor-pointer flex items-center gap-1"
-                  >
-                    <Handshake className="size-3.5" />
-                    <span>Lịch hẹn 1-1</span>
-                  </button>
-                  {Boolean((selectedOpp as any).claimedPhone || (selectedOpp as any).claimed_phone) && (
-                    <a
-                      href={`tel:${(selectedOpp as any).claimedPhone || (selectedOpp as any).claimed_phone}`}
-                      className="p-1.5 rounded-lg bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300"
-                      title="Gọi điện trực tiếp"
+                  <div className="flex items-center gap-1 shrink-0 ml-2">
+                    <button
+                      type="button"
+                      onClick={() => onNegotiate(selectedOpp)}
+                      className="px-2.5 py-1 rounded-lg bg-[#003B95] hover:bg-blue-900 text-white text-[11px] font-bold shadow-xs cursor-pointer flex items-center gap-1"
                     >
-                      <Phone className="size-3.5" />
-                    </a>
-                  )}
+                      <Handshake className="size-3.5" />
+                      <span>Lịch hẹn 1-1</span>
+                    </button>
+                    {Boolean((selectedOpp as any).claimedPhone || (selectedOpp as any).claimed_phone) && (
+                      <a
+                        href={`tel:${(selectedOpp as any).claimedPhone || (selectedOpp as any).claimed_phone}`}
+                        className="p-1.5 rounded-lg bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300"
+                        title="Gọi điện trực tiếp"
+                      >
+                        <Phone className="size-3.5" />
+                      </a>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
+            )}
 
           {/* Highlighted Key Points (Image 4 Style) */}
           <div className="space-y-2 text-[12.5px] bg-amber-50/40 dark:bg-amber-950/20 p-3.5 rounded-2xl border border-amber-500/20">
@@ -414,7 +413,7 @@ export const OpportunityDetailModal: React.FC<OpportunityDetailModalProps> = ({
               <Briefcase className="h-4 w-4 text-[#003B95] dark:text-amber-400 shrink-0 mt-0.5" />
               <span>
                 <strong>Hình thức:</strong> {normalizeTag(selectedOpp.tag)} · Ưu đãi độc quyền
-                hội viên CEO HN10
+                Học viên CEO HN10
               </span>
             </div>
 
@@ -425,7 +424,7 @@ export const OpportunityDetailModal: React.FC<OpportunityDetailModalProps> = ({
                   <strong>Người đăng / Đầu mối:</strong>{" "}
                   {selectedOpp.posterName ||
                     selectedOpp.contactName ||
-                    "Hội viên CLB CEO HN10"}{" "}
+                    "Học viên CLB CEO HN10"}{" "}
                   {selectedOpp.contactTitle ? `(${selectedOpp.contactTitle})` : ""}
                 </span>
                 {selectedOpp.company && (
@@ -455,44 +454,44 @@ export const OpportunityDetailModal: React.FC<OpportunityDetailModalProps> = ({
             (selectedOpp as any).fanpageUrl ||
             (selectedOpp as any).articleUrl
           ) && (
-            <div className="rounded-2xl border border-blue-200 dark:border-blue-900 bg-blue-50/50 dark:bg-blue-950/20 p-3.5 space-y-2">
-              <div className="flex items-center gap-1.5 font-bold text-xs text-blue-900 dark:text-blue-300">
-                <Globe className="size-4 text-blue-600 dark:text-blue-400" />
-                <span>Bài viết Fanpage / Website giới thiệu</span>
-              </div>
-              <div className="flex items-center gap-2 pt-0.5">
-                <a
-                  href={
-                    (selectedOpp as any).externalUrl ||
-                    (selectedOpp as any).externalLink ||
-                    (selectedOpp as any).fanpageUrl ||
-                    (selectedOpp as any).articleUrl
-                  }
-                  target="_blank"
-                  rel="noreferrer"
-                  className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-xs transition"
-                >
-                  <span>Mở bài viết Fanpage / Website</span>
-                  <ExternalLink className="size-3.5" />
-                </a>
-                <button
-                  type="button"
-                  onClick={() => {
-                    const u =
+              <div className="rounded-2xl border border-blue-200 dark:border-blue-900 bg-blue-50/50 dark:bg-blue-950/20 p-3.5 space-y-2">
+                <div className="flex items-center gap-1.5 font-bold text-xs text-blue-900 dark:text-blue-300">
+                  <Globe className="size-4 text-blue-600 dark:text-blue-400" />
+                  <span>Bài viết Fanpage / Website giới thiệu</span>
+                </div>
+                <div className="flex items-center gap-2 pt-0.5">
+                  <a
+                    href={
                       (selectedOpp as any).externalUrl ||
                       (selectedOpp as any).externalLink ||
                       (selectedOpp as any).fanpageUrl ||
-                      (selectedOpp as any).articleUrl;
-                    navigator.clipboard.writeText(u);
-                    toast.success("Đã sao chép link bài viết!");
-                  }}
-                  className="px-3 py-2 rounded-xl border border-blue-300 dark:border-blue-800 bg-white dark:bg-slate-800 text-blue-700 dark:text-blue-300 font-bold text-xs transition cursor-pointer"
-                >
-                  Sao chép
-                </button>
+                      (selectedOpp as any).articleUrl
+                    }
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-xs transition"
+                  >
+                    <span>Mở bài viết Fanpage / Website</span>
+                    <ExternalLink className="size-3.5" />
+                  </a>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const u =
+                        (selectedOpp as any).externalUrl ||
+                        (selectedOpp as any).externalLink ||
+                        (selectedOpp as any).fanpageUrl ||
+                        (selectedOpp as any).articleUrl;
+                      navigator.clipboard.writeText(u);
+                      toast.success("Đã sao chép link bài viết!");
+                    }}
+                    className="px-3 py-2 rounded-xl border border-blue-300 dark:border-blue-800 bg-white dark:bg-slate-800 text-blue-700 dark:text-blue-300 font-bold text-xs transition cursor-pointer"
+                  >
+                    Sao chép
+                  </button>
+                </div>
               </div>
-            </div>
-          )}
+            )}
 
           {/* CHIA SẺ PUBLIC RA NGOÀI (FACEBOOK, ZALO) */}
           <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-900/50 p-3.5 space-y-2.5">
@@ -506,7 +505,7 @@ export const OpportunityDetailModal: React.FC<OpportunityDetailModalProps> = ({
               </span>
             </div>
             <p className="text-[11px] text-slate-500 dark:text-slate-400">
-              Người ngoài không phải hội viên vẫn xem được bản tóm tắt cơ hội này. Khi bấm xem chi tiết sẽ chuyển đến màn hình đăng nhập và ghi nhận thống kê click.
+              Người ngoài không phải Học viên vẫn xem được bản tóm tắt cơ hội này. Khi bấm xem chi tiết sẽ chuyển đến màn hình đăng nhập và ghi nhận thống kê click.
             </p>
             <div className="grid grid-cols-2 gap-2 pt-0.5">
               <button
@@ -639,7 +638,7 @@ export const OpportunityDetailModal: React.FC<OpportunityDetailModalProps> = ({
                   };
                   try {
                     localStorage.setItem("vba_pending_chat_inquiry", JSON.stringify(inquiry));
-                  } catch {}
+                  } catch { }
                   onClose();
                   navigate({
                     to: "/association/messages" as any,

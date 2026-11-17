@@ -20,7 +20,7 @@ function seed(id: string) {
 
 const COMMENTS_VI = [
   "Hợp tác chuyên nghiệp, phản hồi nhanh và đúng cam kết.",
-  "Sản phẩm chất lượng, ưu đãi tốt cho hội viên.",
+  "Sản phẩm chất lượng, ưu đãi tốt cho Học viên.",
   "Đội ngũ tư vấn nhiệt tình, sẽ tiếp tục đồng hành.",
   "Giao hàng đúng hẹn, đóng gói cẩn thận.",
   "Quy trình bài bản, đáng để giới thiệu trong hội.",
@@ -68,8 +68,8 @@ export type Interaction = {
 };
 
 const INT_POOL: Omit<Interaction, "id" | "at">[] = [
-  { type: "connect", title: "Đã kết nối trong mạng lưới hội viên" },
-  { type: "message", title: "Nhắn tin trao đổi", detail: "Đã trao đổi qua hộp thư hội viên." },
+  { type: "connect", title: "Đã kết nối trong mạng lưới Học viên" },
+  { type: "message", title: "Nhắn tin trao đổi", detail: "Đã trao đổi qua hộp thư Học viên." },
   { type: "quote", title: "Yêu cầu báo giá sản phẩm", detail: "Gửi RFQ qua trang Marketplace." },
   { type: "meeting", title: "Họp 1-1 trong sự kiện CEO Networking" },
   { type: "event", title: "Cùng tham dự Diễn đàn Doanh nghiệp 2026" },

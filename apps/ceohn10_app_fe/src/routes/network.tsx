@@ -122,7 +122,7 @@ function mapApiMemberRow(r: Record<string, any>): Member | null {
   return {
     id,
     code: String(r?.code ?? id),
-    name: String(r?.name ?? r?.personName ?? "Hội viên CEO HN10"),
+    name: String(r?.name ?? r?.personName ?? "Học viên CEO HN10"),
     contact: String(r?.contact ?? r?.companyName ?? r?.company ?? ""),
     email: String(r?.email ?? ""),
     phone: String(r?.phone ?? ""),
@@ -163,8 +163,8 @@ export function getMemberCommittee(m: Member): string {
   if (s.includes("xúc tiến") || s.includes("thương mại") || s.includes("b2b") || s.includes("bxt")) return "Ban Xúc Tiến";
   if (s.includes("tài chính") || s.includes("kế toán") || s.includes("ngân quỹ") || s.includes("btc")) return "Ban Tài Chính";
   if (s.includes("thiện nguyện") || s.includes("an sinh") || s.includes("btn") || s.includes("xã hội")) return "Ban Thiện Nguyện";
-  if (s.includes("thành viên") && !s.includes("hội viên") && !s.includes("ceo")) return "Ban Thành Viên";
-  if (d && d !== "—" && d !== "undefined" && d !== "null" && d.length > 2 && !s.includes("hội viên ceo")) return String(d);
+  if (s.includes("thành viên") && !s.includes("Học viên") && !s.includes("ceo")) return "Ban Thành Viên";
+  if (d && d !== "—" && d !== "undefined" && d !== "null" && d.length > 2 && !s.includes("Học viên ceo")) return String(d);
 
   // Check executiveRole
   const ex = String(m?.executiveRole || (m as any)?.role || "").toLowerCase();
@@ -209,8 +209,8 @@ export const Route = createFileRoute("/network")({
   ssr: false,
   head: () => ({
     meta: [
-      { title: "Mạng Lưới Hội Viên & Bản Tin Doanh Nhân CEO HN10" },
-      { property: "og:title", content: "Mạng Lưới Hội Viên & Bản Tin Doanh Nhân CEO HN10" },
+      { title: "Mạng Lưới Học viên & Bản Tin Doanh Nhân CEO HN10" },
+      { property: "og:title", content: "Mạng Lưới Học viên & Bản Tin Doanh Nhân CEO HN10" },
       { name: "description", content: "Mạng lưới kết nối giao thương B2B, trao đổi hợp tác và bản tin hiệp hội doanh nhân CEO HN10 (HanoiBA)." },
     ],
   }),
@@ -380,7 +380,7 @@ export function getCleanMemberSubtitle(member: Member): string {
   if (industry) {
     return industry.startsWith("ind.") ? industry.replace("ind.", "") : industry;
   }
-  return "Hội viên Doanh nhân";
+  return "Học viên Doanh nhân";
 }
 
 function MemberCard({
@@ -951,15 +951,15 @@ function ChatPanel({
 
               <div
                 className={`max-w-[80%] rounded-2xl px-3.5 py-2 text-sm shadow-sm ${mine
-                    ? "rounded-br-sm text-primary-foreground"
-                    : "rounded-bl-sm bg-secondary text-foreground"
+                  ? "rounded-br-sm text-primary-foreground"
+                  : "rounded-bl-sm bg-secondary text-foreground"
                   } ${m.pinned ? "ring-2 ring-amber-400/80" : ""}`}
                 style={mine ? { background: "var(--gradient-primary)" } : undefined}
               >
                 {/* Group message sender identification */}
                 {isGroup && !mine && (
                   <div className="mb-1 flex items-center gap-1.5 text-[11px] font-semibold text-muted-foreground border-b border-border/40 pb-0.5">
-                    <span className="font-bold text-foreground">{sender?.name || "Hội viên"}</span>
+                    <span className="font-bold text-foreground">{sender?.name || "Học viên"}</span>
                     {sender && (
                       <span className="rounded bg-primary/10 px-1 py-0.2 text-[9px] font-medium text-primary">
                         {getMemberCommittee(sender)}
@@ -1006,8 +1006,8 @@ function ChatPanel({
                         ) : (
                           <div
                             className={`flex items-center justify-between gap-2 rounded-lg border p-2 text-xs ${mine
-                                ? "bg-white/10 border-white/20 text-primary-foreground"
-                                : "bg-card border-border text-foreground"
+                              ? "bg-white/10 border-white/20 text-primary-foreground"
+                              : "bg-card border-border text-foreground"
                               }`}
                           >
                             <div className="flex items-center gap-2 min-w-0 flex-1">
@@ -1192,7 +1192,7 @@ function NewChatDialog({
             <span>Bắt đầu cuộc trao đổi công việc mới</span>
           </AlertDialogTitle>
           <AlertDialogDescription>
-            Chọn bất kỳ nhân sự hoặc hội viên nào trong các Ban để nhắn tin trao đổi công việc ngay lập tức.
+            Chọn bất kỳ nhân sự hoặc Học viên nào trong các Ban để nhắn tin trao đổi công việc ngay lập tức.
           </AlertDialogDescription>
         </AlertDialogHeader>
 
@@ -1202,7 +1202,7 @@ function NewChatDialog({
             <input
               value={q}
               onChange={(e) => setQ(e.target.value)}
-              placeholder="Tìm theo tên, mã hội viên..."
+              placeholder="Tìm theo tên, mã Học viên..."
               className="flex-1 bg-transparent text-sm outline-none"
             />
           </div>
@@ -1214,8 +1214,8 @@ function NewChatDialog({
                 type="button"
                 onClick={() => setComm(c)}
                 className={`rounded-full px-2.5 py-0.5 text-[11px] font-medium transition ${comm === c
-                    ? "bg-primary text-primary-foreground font-semibold"
-                    : "bg-secondary text-muted-foreground hover:bg-secondary/80"
+                  ? "bg-primary text-primary-foreground font-semibold"
+                  : "bg-secondary text-muted-foreground hover:bg-secondary/80"
                   }`}
               >
                 {c}
@@ -1227,7 +1227,7 @@ function NewChatDialog({
         <div className="flex-1 overflow-y-auto max-h-[320px] space-y-1.5 divide-y divide-border/40">
           {filtered.length === 0 ? (
             <div className="py-8 text-center text-xs text-muted-foreground">
-              Không tìm thấy nhân sự hoặc hội viên nào
+              Không tìm thấy nhân sự hoặc Học viên nào
             </div>
           ) : (
             filtered.map((m) => (
@@ -1417,8 +1417,8 @@ function NewGroupChatDialog({
                   type="button"
                   onClick={() => setComm(c)}
                   className={`rounded-full px-2.5 py-0.5 text-[11px] font-medium transition ${comm === c
-                      ? "bg-primary text-primary-foreground font-semibold"
-                      : "bg-secondary text-muted-foreground hover:bg-secondary/80"
+                    ? "bg-primary text-primary-foreground font-semibold"
+                    : "bg-secondary text-muted-foreground hover:bg-secondary/80"
                     }`}
                 >
                   {c}
@@ -1432,7 +1432,7 @@ function NewGroupChatDialog({
         <div className="flex-1 overflow-y-auto max-h-[240px] space-y-1.5 divide-y divide-border/40">
           {filtered.length === 0 ? (
             <div className="py-8 text-center text-xs text-muted-foreground">
-              Không tìm thấy nhân sự hoặc hội viên nào
+              Không tìm thấy nhân sự hoặc Học viên nào
             </div>
           ) : (
             filtered.map((m) => {
@@ -1726,8 +1726,8 @@ function ScheduleMeetingModal({
                   setLocation("Văn phòng CEO HN10 hoặc Cafe Doanh nhân");
                 }}
                 className={`py-2 px-3 rounded-xl border text-xs font-semibold flex items-center justify-center gap-2 transition cursor-pointer ${type === "offline"
-                    ? "border-primary bg-primary/10 text-primary shadow-xs"
-                    : "border-border bg-card text-muted-foreground hover:bg-muted"
+                  ? "border-primary bg-primary/10 text-primary shadow-xs"
+                  : "border-border bg-card text-muted-foreground hover:bg-muted"
                   }`}
               >
                 <MapPin className="h-3.5 w-3.5" />
@@ -1740,8 +1740,8 @@ function ScheduleMeetingModal({
                   setLocation("Google Meet (sẽ gửi link họp)");
                 }}
                 className={`py-2 px-3 rounded-xl border text-xs font-semibold flex items-center justify-center gap-2 transition cursor-pointer ${type === "online"
-                    ? "border-primary bg-primary/10 text-primary shadow-xs"
-                    : "border-border bg-card text-muted-foreground hover:bg-muted"
+                  ? "border-primary bg-primary/10 text-primary shadow-xs"
+                  : "border-border bg-card text-muted-foreground hover:bg-muted"
                   }`}
               >
                 <Video className="h-3.5 w-3.5" />
@@ -2159,11 +2159,10 @@ function FeedCard({
           <button
             type="button"
             onClick={() => setShowComments(!showComments)}
-            className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border text-xs font-semibold transition cursor-pointer ${
-              showComments
+            className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border text-xs font-semibold transition cursor-pointer ${showComments
                 ? "bg-[#003B95] text-white border-[#003B95]"
                 : "border-border bg-card hover:bg-muted text-foreground"
-            }`}
+              }`}
           >
             <MessageCircle className="h-3.5 w-3.5" />
             <span>Bình luận ({commentCount})</span>
@@ -2190,7 +2189,7 @@ function FeedCard({
         </div>
       </div>
 
-      {/* ── BÌNH LUẬN DẠNG CÂY FACEBOOK, TAG @MENTION HỘI VIÊN KẾT NỐI, MỚI NHẤT LÊN ĐẦU ── */}
+      {/* ── BÌNH LUẬN DẠNG CÂY FACEBOOK, TAG @MENTION Học viên KẾT NỐI, MỚI NHẤT LÊN ĐẦU ── */}
       {showComments && (
         <div className="pt-3 mt-3 border-t border-border/70">
           <CommentTreeSection
@@ -2282,11 +2281,11 @@ function NetworkPage() {
           const merged = Array.from(prevMap.values());
           try {
             localStorage.setItem("vba_network_feed_posts", JSON.stringify(merged));
-          } catch {}
+          } catch { }
           return merged;
         });
       })
-      .catch(() => {});
+      .catch(() => { });
     return () => {
       isMounted = false;
     };
@@ -2314,7 +2313,7 @@ function NetworkPage() {
         : [updatedPost, ...prev];
       try {
         localStorage.setItem("vba_network_feed_posts", JSON.stringify(next));
-      } catch {}
+      } catch { }
       return next;
     });
   };
@@ -2339,8 +2338,8 @@ function NetworkPage() {
   const handleDeletePost = async (postId: string) => {
     if (!window.confirm("Bạn có chắc chắn muốn xóa vĩnh viễn bài viết này khỏi hệ thống?")) return;
     try {
-      await fetchNestApi(`/feed/${postId}`, { method: "DELETE" }).catch(() => {});
-    } catch {}
+      await fetchNestApi(`/feed/${postId}`, { method: "DELETE" }).catch(() => { });
+    } catch { }
     setCustomPosts((prev) => {
       const updated = prev.filter((p) => p.id !== postId);
       try {
@@ -2366,7 +2365,7 @@ function NetworkPage() {
   const [debouncedQuery, setDebouncedQuery] = useState("");
 
   useEffect(() => {
-    document.title = "Mạng Lưới Hội Viên & Bản Tin Doanh Nhân CEO HN10";
+    document.title = "Mạng Lưới Học viên & Bản Tin Doanh Nhân CEO HN10";
   }, []);
 
   useEffect(() => {
@@ -2518,7 +2517,7 @@ function NetworkPage() {
         id: `prod-${p.id}`,
         type: "product",
         title: p.title,
-        content: p.description || rawP.fullDescription || "Sản phẩm - Dịch vụ tiêu biểu từ Hội viên Doanh nhân CEO HN10",
+        content: p.description || rawP.fullDescription || "Sản phẩm - Dịch vụ tiêu biểu từ Học viên Doanh nhân CEO HN10",
         authorId: mem.id,
         authorName: p.sellerName || mem.name,
         authorSubtitle: rawP.sellerCompany || rawP.company || getCleanMemberSubtitle(mem),
@@ -2600,21 +2599,21 @@ function NetworkPage() {
       list.push({
         id: cp.id,
         type: isShared ? "shared_link" : "member_post",
-        title: cp.title || (isShared ? cp.sharedArticle.title : "Bài chia sẻ từ hội viên"),
+        title: cp.title || (isShared ? cp.sharedArticle.title : "Bài chia sẻ từ Học viên"),
         content: cp.content || "",
         authorId: cp.authorId || authorMem.id,
         authorName: cp.authorName || authorMem.name,
-        authorSubtitle: cp.authorTitle || authorMem.contact || "Hội viên CLB CEO HN10",
+        authorSubtitle: cp.authorTitle || authorMem.contact || "Học viên CLB CEO HN10",
         authorCommittee: cp.department || getMemberCommittee(authorMem),
         authorAvatar: cp.authorAvatar || (authorMem as any)?.avatar || "",
         createdAt: cp.createdAt || new Date().toISOString(),
         badge: isShared
           ? {
             label: "🔗 Chia sẻ ngoài",
-            colorCls: "bg-purple-500/10 text-purple-700 dark:text-purple-300 border-purple-500/20",
+            colorCls: "bg-slate-100 text-slate-800 dark:text-slate-200 border-slate-300",
           }
           : {
-            label: "📝 Hội viên đăng",
+            label: "📝 Học viên đăng",
             colorCls: "bg-sky-500/10 text-sky-700 dark:text-sky-300 border-sky-500/20",
           },
         images: cp.images || [],
@@ -2712,7 +2711,7 @@ function NetworkPage() {
           icon={<Newspaper className="h-4 w-4" />}
         />
         <StatCard
-          label="Tổng nhân sự & Hội viên"
+          label="Tổng nhân sự & Học viên"
           value={fmt.num(MEMBERS.filter((m) => m.id !== CURRENT_USER_ID).length)}
           tone="success"
           icon={<Users className="h-4 w-4" />}
@@ -2743,8 +2742,8 @@ function NetworkPage() {
                 setQuery("");
               }}
               className={`relative -mb-px border-b-2 px-4 py-2.5 text-sm font-semibold transition flex items-center gap-2 cursor-pointer ${active
-                  ? "border-primary text-primary"
-                  : "border-transparent text-muted-foreground hover:text-foreground"
+                ? "border-primary text-primary"
+                : "border-transparent text-muted-foreground hover:text-foreground"
                 }`}
             >
               {tb.icon}
@@ -2787,7 +2786,7 @@ function NetworkPage() {
                 },
                 {
                   key: "member_post",
-                  label: "📝 Bài viết hội viên",
+                  label: "📝 Bài viết Học viên",
                   count: feedItems.filter((i) => i.type === "member_post").length,
                 },
                 {
@@ -2803,15 +2802,15 @@ function NetworkPage() {
                     type="button"
                     onClick={() => setFeedTypeFilter(item.key as typeof feedTypeFilter)}
                     className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition cursor-pointer ${isSelected
-                        ? "bg-primary text-primary-foreground shadow-sm"
-                        : "bg-secondary/70 text-muted-foreground hover:bg-secondary hover:text-foreground"
+                      ? "bg-primary text-primary-foreground shadow-sm"
+                      : "bg-secondary/70 text-muted-foreground hover:bg-secondary hover:text-foreground"
                       }`}
                   >
                     <span>{item.label}</span>
                     <span
                       className={`rounded-full px-1.5 py-0.2 text-[10px] ${isSelected
-                          ? "bg-primary-foreground/25 text-primary-foreground font-bold"
-                          : "bg-muted text-muted-foreground"
+                        ? "bg-primary-foreground/25 text-primary-foreground font-bold"
+                        : "bg-muted text-muted-foreground"
                         }`}
                     >
                       {item.count}
@@ -2940,15 +2939,15 @@ function NetworkPage() {
                   key={comm}
                   onClick={() => setSelectedCommittee(comm)}
                   className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold transition cursor-pointer ${isSelected
-                      ? "bg-primary text-primary-foreground shadow-sm"
-                      : "bg-secondary/70 text-muted-foreground hover:bg-secondary hover:text-foreground"
+                    ? "bg-primary text-primary-foreground shadow-sm"
+                    : "bg-secondary/70 text-muted-foreground hover:bg-secondary hover:text-foreground"
                     }`}
                 >
                   <span>{comm}</span>
                   <span
                     className={`rounded-full px-1.5 py-0.2 text-[10px] ${isSelected
-                        ? "bg-primary-foreground/25 text-primary-foreground font-bold"
-                        : "bg-muted text-muted-foreground"
+                      ? "bg-primary-foreground/25 text-primary-foreground font-bold"
+                      : "bg-muted text-muted-foreground"
                       }`}
                   >
                     {count}
@@ -2964,7 +2963,7 @@ function NetworkPage() {
             <input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Tìm kiếm nhân sự theo tên, doanh nghiệp, mã hội viên, ngành nghề..."
+              placeholder="Tìm kiếm nhân sự theo tên, doanh nghiệp, mã Học viên, ngành nghề..."
               className="flex-1 bg-transparent text-sm outline-none"
             />
             {query && (
@@ -2980,7 +2979,7 @@ function NetworkPage() {
           <div className="mb-4 flex flex-wrap items-center justify-between gap-2 pt-1">
             <div className="text-xs text-muted-foreground">
               {selectedCommittee !== "Tất cả các ban" ? `${selectedCommittee} · ` : ""}
-              Hiển thị {fmt.num(discoverFiltered.length)} nhân sự / hội viên
+              Hiển thị {fmt.num(discoverFiltered.length)} nhân sự / Học viên
             </div>
             <label className="flex items-center gap-2 text-sm">
               <span className="text-muted-foreground">{t("net.sort.label")}</span>
@@ -2998,7 +2997,7 @@ function NetworkPage() {
 
           {discoverFiltered.length === 0 ? (
             <Card className="p-10 text-center text-sm text-muted-foreground">
-              Không tìm thấy nhân sự hoặc hội viên nào trong danh mục đã chọn.
+              Không tìm thấy nhân sự hoặc Học viên nào trong danh mục đã chọn.
             </Card>
           ) : (
             <>
@@ -3097,8 +3096,8 @@ function NetworkPage() {
                   type="button"
                   onClick={() => setChatSubFilter("all")}
                   className={`flex-1 py-1 rounded-md text-center transition cursor-pointer ${chatSubFilter === "all"
-                      ? "bg-card text-foreground font-bold shadow-xs"
-                      : "text-muted-foreground hover:text-foreground"
+                    ? "bg-card text-foreground font-bold shadow-xs"
+                    : "text-muted-foreground hover:text-foreground"
                     }`}
                 >
                   Tất cả ({messageList.length + groupList.length})
@@ -3107,8 +3106,8 @@ function NetworkPage() {
                   type="button"
                   onClick={() => setChatSubFilter("group")}
                   className={`flex-1 py-1 rounded-md text-center transition flex items-center justify-center gap-1 cursor-pointer ${chatSubFilter === "group"
-                      ? "bg-card text-amber-600 dark:text-amber-400 font-bold shadow-xs"
-                      : "text-muted-foreground hover:text-foreground"
+                    ? "bg-card text-amber-600 dark:text-amber-400 font-bold shadow-xs"
+                    : "text-muted-foreground hover:text-foreground"
                     }`}
                 >
                   <Users className="h-3 w-3" />
@@ -3118,8 +3117,8 @@ function NetworkPage() {
                   type="button"
                   onClick={() => setChatSubFilter("direct")}
                   className={`flex-1 py-1 rounded-md text-center transition cursor-pointer ${chatSubFilter === "direct"
-                      ? "bg-card text-foreground font-bold shadow-xs"
-                      : "text-muted-foreground hover:text-foreground"
+                    ? "bg-card text-foreground font-bold shadow-xs"
+                    : "text-muted-foreground hover:text-foreground"
                     }`}
                 >
                   Cá nhân ({messageList.length})

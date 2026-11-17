@@ -296,7 +296,7 @@ async function main() {
             new TableCell({
               borders: BORDER_THIN,
               shading: { fill: 'F8FAFC', type: ShadingType.CLEAR },
-              children: [createPara('Kênh hỗ trợ hội viên', { bold: true, size: 22 })],
+              children: [createPara('Kênh hỗ trợ Học viên', { bold: true, size: 22 })],
             }),
             new TableCell({
               borders: BORDER_THIN,
@@ -316,20 +316,20 @@ async function main() {
     ),
 
     // CHƯƠNG 1
-    createHeading1('CHƯƠNG 1: ĐĂNG NHẬP, ĐỊNH DANH & THẺ HỘI VIÊN SỐ'),
+    createHeading1('CHƯƠNG 1: ĐĂNG NHẬP, ĐỊNH DANH & THẺ Học viên SỐ'),
     createPara(
-      'Mỗi hội viên khi gia nhập CLB được Ban Thư Ký cấp một Mã Hội Viên định danh duy nhất (định dạng HN10-xxx) gắn liền với Số điện thoại và Hồ sơ pháp nhân doanh nghiệp.'
+      'Mỗi Học viên khi gia nhập CLB được Ban Thư Ký cấp một Mã Học viên định danh duy nhất (định dạng HN10-xxx) gắn liền với Số điện thoại và Hồ sơ pháp nhân doanh nghiệp.'
     ),
     ...createStep(
       1,
       'Truy cập cổng ứng dụng Doanh nhân',
-      'Mở trình duyệt trên điện thoại hoặc máy tính theo đường dẫn https://vione.vn/association/login (hoặc bấm biểu tượng App trên màn hình chính). Nhập Số điện thoại hoặc Mã hội viên cùng mật khẩu được cấp.',
+      'Mở trình duyệt trên điện thoại hoặc máy tính theo đường dẫn https://vione.vn/association/login (hoặc bấm biểu tượng App trên màn hình chính). Nhập Số điện thoại hoặc Mã Học viên cùng mật khẩu được cấp.',
       'Nếu là lần đầu đăng nhập, nhấn "Quên mật khẩu / Kích hoạt lần đầu" để nhận mã OTP SMS qua số điện thoại đã đăng ký với Ban Thư Ký.'
     ),
     ...createStep(
       2,
-      'Kích hoạt Thẻ hội viên điện tử VIP',
-      'Sau khi đăng nhập thành công, hệ thống hiển thị Thẻ Hội Viên Số Doanh Nhân với dải màu Navy & Gold sang trọng, huy hiệu "Hội viên chính thức" có dấu tích xanh xác thực và mã QR động chứa thông tin liên hệ vCard.',
+      'Kích hoạt Thẻ Học viên điện tử VIP',
+      'Sau khi đăng nhập thành công, hệ thống hiển thị Thẻ Học viên Số Doanh Nhân với dải màu Navy & Gold sang trọng, huy hiệu "Học viên chính thức" có dấu tích xanh xác thực và mã QR động chứa thông tin liên hệ vCard.',
       'Có thể đổi giao diện thẻ giữa các phong cách: Cổ Điển (Classic Navy), Doanh Nhân (Golden VIP) hoặc Tối Giản (Modern Dark).'
     ),
     ...createStep(
@@ -338,7 +338,7 @@ async function main() {
       'Trên iOS (Safari), bấm nút Chia sẻ (Share) -> chọn "Thêm vào màn hình chính" (Add to Home Screen). Trên Android (Chrome), bấm biểu tượng dấu ba chấm -> chọn "Cài đặt ứng dụng" (Install App).',
       'Ứng dụng sẽ hoạt động mượt mà như app gốc không cần tải qua App Store / Google Play.'
     ),
-    ...createImageBlock(pngBuffers['demo_auth_card'], 'Giao diện Đăng nhập & Thẻ Hội viên số VIP CLB CEO HN10'),
+    ...createImageBlock(pngBuffers['demo_auth_card'], 'Giao diện Đăng nhập & Thẻ Học viên số VIP CLB CEO HN10'),
 
     // CHƯƠNG 2
     createHeading1('CHƯƠNG 2: CÔNG NGHỆ CHẠM THẺ NFC TRAO ĐỔI LIÊN HỆ B2B'),
@@ -348,7 +348,7 @@ async function main() {
     ...createStep(
       1,
       'Bật tính năng Chạm thẻ NFC trên ứng dụng',
-      'Tại tab "Trang cá nhân" hoặc "Thẻ hội viên", bấm nút "Chạm Thẻ NFC" (biểu tượng sóng NFC phát xạ). Cửa sổ popup mô phỏng radar quét NFC sẽ kích hoạt.',
+      'Tại tab "Trang cá nhân" hoặc "Thẻ Học viên", bấm nút "Chạm Thẻ NFC" (biểu tượng sóng NFC phát xạ). Cửa sổ popup mô phỏng radar quét NFC sẽ kích hoạt.',
       'Đối với thiết bị Android hỗ trợ Web NFC, trình duyệt sẽ tự động bật bộ thu sóng NFC phần cứng.'
     ),
     ...createStep(
@@ -360,7 +360,7 @@ async function main() {
     ...createStep(
       3,
       'Ghi thông tin danh thiếp vào thẻ NFC mới',
-      'Hội viên có thể bấm "Ghi thẻ NFC" trong phần Quản lý danh thiếp để nạp mã URL danh thiếp số cá nhân vào các loại thẻ card visit thông minh bằng kim loại hoặc gỗ ép cao cấp của CLB.',
+      'Học viên có thể bấm "Ghi thẻ NFC" trong phần Quản lý danh thiếp để nạp mã URL danh thiếp số cá nhân vào các loại thẻ card visit thông minh bằng kim loại hoặc gỗ ép cao cấp của CLB.',
       'Dữ liệu thẻ được khóa mã hóa một chiều để chống ghi đè trái phép.'
     ),
     ...createImageBlock(pngBuffers['demo_nfc_card'], 'Quy trình chạm thẻ NFC một chạm trao đổi liên hệ B2B'),
@@ -378,7 +378,7 @@ async function main() {
     ...createStep(
       1,
       'Mở cuộc trò chuyện hoặc tạo tin nhắn mới',
-      'Tại thanh điều hướng dưới cùng, chọn biểu tượng Tin nhắn. Bấm vào cuộc trò chuyện có sẵn hoặc bấm dấu "+" để tìm kiếm hội viên theo tên hoặc mã số doanh nhân.',
+      'Tại thanh điều hướng dưới cùng, chọn biểu tượng Tin nhắn. Bấm vào cuộc trò chuyện có sẵn hoặc bấm dấu "+" để tìm kiếm Học viên theo tên hoặc mã số doanh nhân.',
       ''
     ),
     ...createStep(
@@ -396,30 +396,30 @@ async function main() {
     ...createImageBlock(pngBuffers['demo_messenger_chat'], 'Giao diện Chat Messenger VIP & Cơ chế thu hồi tin nhắn nhảy top'),
 
     // CHƯƠNG 4
-    createHeading1('CHƯƠNG 4: DANH BẠ HỘI VIÊN & QUẢN LÝ KẾT NỐI THÔNG MINH'),
+    createHeading1('CHƯƠNG 4: DANH BẠ Học viên & QUẢN LÝ KẾT NỐI THÔNG MINH'),
     createPara(
-      'Danh bạ hội viên là kho tài nguyên quý giá nhất của CLB CEO HN10, quy tụ hơn 500+ chủ tịch HĐQT, Tổng giám đốc và doanh nhân thuộc các ngành nghề trọng điểm.'
+      'Danh bạ Học viên là kho tài nguyên quý giá nhất của CLB CEO HN10, quy tụ hơn 500+ chủ tịch HĐQT, Tổng giám đốc và doanh nhân thuộc các ngành nghề trọng điểm.'
     ),
     ...createStep(
       1,
-      'Tra cứu và lọc hội viên theo lĩnh vực',
-      'Vào mục "Danh bạ hội viên". Dùng thanh tìm kiếm để gõ tên doanh nhân, tên công ty hoặc chọn nhanh theo ngành nghề (Bất động sản, Xây dựng, Tài chính, Công nghệ, F&B, Logistics...).',
+      'Tra cứu và lọc Học viên theo lĩnh vực',
+      'Vào mục "Danh bạ Học viên". Dùng thanh tìm kiếm để gõ tên doanh nhân, tên công ty hoặc chọn nhanh theo ngành nghề (Bất động sản, Xây dựng, Tài chính, Công nghệ, F&B, Logistics...).',
       'Hệ thống hỗ trợ tìm kiếm không dấu và gợi ý tự động.'
     ),
     ...createStep(
       2,
       'Xem hồ sơ năng lực & Trạng thái kết nối',
-      'Bấm vào ảnh đại diện (Avatar) của bất kỳ hội viên nào trong danh bạ hoặc trong cuộc trò chuyện để mở Popup Hồ sơ năng lực chi tiết.',
-      'Popup cung cấp thông tin: Chức vụ, Pháp nhân công ty, Lĩnh vực thế mạnh, Nhu cầu kết nối và Mã hội viên.'
+      'Bấm vào ảnh đại diện (Avatar) của bất kỳ Học viên nào trong danh bạ hoặc trong cuộc trò chuyện để mở Popup Hồ sơ năng lực chi tiết.',
+      'Popup cung cấp thông tin: Chức vụ, Pháp nhân công ty, Lĩnh vực thế mạnh, Nhu cầu kết nối và Mã Học viên.'
     ),
     ...createStep(
       3,
       'Kết nối và Hủy kết nối thông minh (1 Chạm)',
-      'Nếu bạn chưa kết nối với hội viên này: Nút hành động hiển thị "KẾT NỐI NGAY" (màu xanh dương). Bấm vào để gửi yêu cầu kết nối giao thương. ' +
-      'Nếu bạn ĐÃ KẾT NỐI với hội viên: Nút hành động sẽ tự động chuyển thành "HỦY KẾT NỐI" (viền đỏ nổi bật). Bấm vào sẽ hủy kết nối an toàn và loại khỏi danh bạ đối tác thân thiết.',
-      'Cơ chế chuyển đổi nút tức thời giúp hội viên chủ động quản lý mạng lưới quan hệ kinh doanh của mình.'
+      'Nếu bạn chưa kết nối với Học viên này: Nút hành động hiển thị "KẾT NỐI NGAY" (màu xanh dương). Bấm vào để gửi yêu cầu kết nối giao thương. ' +
+      'Nếu bạn ĐÃ KẾT NỐI với Học viên: Nút hành động sẽ tự động chuyển thành "HỦY KẾT NỐI" (viền đỏ nổi bật). Bấm vào sẽ hủy kết nối an toàn và loại khỏi danh bạ đối tác thân thiết.',
+      'Cơ chế chuyển đổi nút tức thời giúp Học viên chủ động quản lý mạng lưới quan hệ kinh doanh của mình.'
     ),
-    ...createImageBlock(pngBuffers['demo_directory_b2b'], 'Danh bạ hội viên và nút chuyển đổi Kết nối / Hủy kết nối thông minh'),
+    ...createImageBlock(pngBuffers['demo_directory_b2b'], 'Danh bạ Học viên và nút chuyển đổi Kết nối / Hủy kết nối thông minh'),
 
     // CHƯƠNG 5
     createHeading1('CHƯƠNG 5: SỰ KIỆN CLB, CHECK-IN QR & BIỂU QUYẾT TRỰC TIẾP'),
@@ -449,7 +449,7 @@ async function main() {
     // CHƯƠNG 6
     createHeading1('CHƯƠNG 6: THU & ĐÓNG HỘI PHÍ TỰ ĐỘNG QUA VIETQR NAPAS 247'),
     createPara(
-      'Hệ thống tích hợp cổng thanh toán VietQR Napas 247 chuẩn quốc gia, cho phép hội viên thanh toán hội phí nhanh chóng, gạch nợ tự động và nhận hóa đơn VAT điện tử.'
+      'Hệ thống tích hợp cổng thanh toán VietQR Napas 247 chuẩn quốc gia, cho phép Học viên thanh toán hội phí nhanh chóng, gạch nợ tự động và nhận hóa đơn VAT điện tử.'
     ),
     ...createStep(
       1,
@@ -460,21 +460,21 @@ async function main() {
     ...createStep(
       2,
       'Quét mã VietQR bằng bất kỳ App Ngân hàng nào',
-      'Hệ thống tự sinh mã QR chuẩn VietQR chứa đầy đủ: Số tài khoản CLB CEO HN10 tại Vietcombank/MBBank, Số tiền chính xác (VD: 5.000.000 VNĐ) và Cú pháp nội dung chuyển khoản tự động (CLB1983 [MÃ HỘI VIÊN]).',
-      'Hội viên mở bất kỳ ứng dụng ngân hàng nào (Vietcombank, Techcombank, BIDV, VPBank, MBBank, Cake...) quét mã mà KHÔNG CẦN nhập tay số tài khoản hay số tiền.'
+      'Hệ thống tự sinh mã QR chuẩn VietQR chứa đầy đủ: Số tài khoản CLB CEO HN10 tại Vietcombank/MBBank, Số tiền chính xác (VD: 5.000.000 VNĐ) và Cú pháp nội dung chuyển khoản tự động (CLB1983 [MÃ Học viên]).',
+      'Học viên mở bất kỳ ứng dụng ngân hàng nào (Vietcombank, Techcombank, BIDV, VPBank, MBBank, Cake...) quét mã mà KHÔNG CẦN nhập tay số tài khoản hay số tiền.'
     ),
     ...createStep(
       3,
-      'Gạch nợ tự động và nhận Thẻ Hội Viên kích hoạt tiếp niên khóa',
-      'Ngay sau khi ngân hàng báo chuyển khoản thành công, hệ thống tự động gạch nợ trong vòng 5 giây, gia hạn thời hạn hội viên thêm 12 tháng và phát hành biên lai thu tiền điện tử.',
-      'Hội viên có thể tải hóa đơn GTGT hoặc biên lai thu phí về máy trong tab Lịch sử thanh toán.'
+      'Gạch nợ tự động và nhận Thẻ Học viên kích hoạt tiếp niên khóa',
+      'Ngay sau khi ngân hàng báo chuyển khoản thành công, hệ thống tự động gạch nợ trong vòng 5 giây, gia hạn thời hạn Học viên thêm 12 tháng và phát hành biên lai thu tiền điện tử.',
+      'Học viên có thể tải hóa đơn GTGT hoặc biên lai thu phí về máy trong tab Lịch sử thanh toán.'
     ),
     ...createImageBlock(pngBuffers['demo_vietqr_fee'], 'Thanh toán hội phí niên khóa qua mã VietQR Napas 247 tự động'),
 
     // CHƯƠNG 7
     createHeading1('CHƯƠNG 7: SÀN CƠ HỘI GIAO THƯƠNG B2B & GIAN HÀNG SẢN PHẨM 2 CỘT E-COMMERCE'),
     createPara(
-      'Sàn giao thương nội bộ giúp hội viên kết nối cung cầu, tìm kiếm đối tác và tiếp cận nguồn hàng hóa/dịch vụ chất lượng cao với mức chiết khấu độc quyền.'
+      'Sàn giao thương nội bộ giúp Học viên kết nối cung cầu, tìm kiếm đối tác và tiếp cận nguồn hàng hóa/dịch vụ chất lượng cao với mức chiết khấu độc quyền.'
     ),
     ...createStep(
       1,
@@ -485,7 +485,7 @@ async function main() {
     ...createStep(
       2,
       'Mua sắm và trưng bày sản phẩm trên Gian hàng 2 cột E-Commerce',
-      'Vào mục "Gian hàng sản phẩm". Giao diện thiết kế theo lưới 2 cột hiện đại phong cách sàn thương mại điện tử: Ảnh tỉ lệ chuẩn, badge ưu đãi hội viên, giá niêm yết gạch ngang và giá VIP nổi bật.',
+      'Vào mục "Gian hàng sản phẩm". Giao diện thiết kế theo lưới 2 cột hiện đại phong cách sàn thương mại điện tử: Ảnh tỉ lệ chuẩn, badge ưu đãi Học viên, giá niêm yết gạch ngang và giá VIP nổi bật.',
       'Tab "Đã quan tâm" được cách ly độc lập theo từng tài khoản; tab "Sản phẩm tôi đăng" giúp theo dõi toàn bộ danh mục sản phẩm của doanh nghiệp mình.'
     ),
 
@@ -503,8 +503,8 @@ async function main() {
     ...createStep(
       2,
       'Cài đặt bảo mật, Đổi mật khẩu & Vô hiệu hóa tài khoản',
-      'Tại mục Cài đặt -> tab "Bảo mật": Hệ thống kết nối trực tiếp API đổi mật khẩu an toàn. Nút "Đăng xuất" được khóa chặt cho đến khi hoàn tất đổi mật khẩu trong phiên. Hội viên cũng có thể tạm khóa tài khoản an toàn qua tính năng "Vô hiệu hóa tài khoản" có xác thực mật khẩu.',
-      'Avatar hội viên được quản lý tập trung tại Trang cá nhân, loại bỏ form tải trùng lặp trong tab bảo mật.'
+      'Tại mục Cài đặt -> tab "Bảo mật": Hệ thống kết nối trực tiếp API đổi mật khẩu an toàn. Nút "Đăng xuất" được khóa chặt cho đến khi hoàn tất đổi mật khẩu trong phiên. Học viên cũng có thể tạm khóa tài khoản an toàn qua tính năng "Vô hiệu hóa tài khoản" có xác thực mật khẩu.',
+      'Avatar Học viên được quản lý tập trung tại Trang cá nhân, loại bỏ form tải trùng lặp trong tab bảo mật.'
     ),
 
     // CHƯƠNG 9
@@ -528,10 +528,10 @@ async function main() {
     // CHƯƠNG 10
     createHeading1('CHƯƠNG 10: LIÊN HỆ BAN THƯ KÝ & HỖ TRỢ KỸ THUẬT'),
     createPara(
-      'Trong quá trình sử dụng ứng dụng, nếu có bất kỳ thắc mắc nào về thủ tục hội viên, tài khoản hoặc sự cố kỹ thuật, hội viên có thể liên hệ ngay tại tab "Tài khoản":'
+      'Trong quá trình sử dụng ứng dụng, nếu có bất kỳ thắc mắc nào về thủ tục Học viên, tài khoản hoặc sự cố kỹ thuật, Học viên có thể liên hệ ngay tại tab "Tài khoản":'
     ),
     createPara('• Hotline thường trực 24/7: 098.333.1983'),
-    createPara('• Tổng đài hỗ trợ hội viên: 1900.6883'),
+    createPara('• Tổng đài hỗ trợ Học viên: 1900.6883'),
     createPara('• Kênh Zalo Official Account: CLB Doanh Nhân CEO HN10 (https://zalo.me/ceohn10)'),
     createPara('• Email Ban Thư Ký: banthuky@ceohn10.vn | kythuat@vione.vn'),
     createPara('• Văn phòng đại diện: Tầng 6, Tháp Doanh Nhân, Đường Phạm Hùng, Nam Từ Liêm, Hà Nội.'),
@@ -735,34 +735,34 @@ async function main() {
   }
 
   // Chapter 1
-  addPdfHeading1('1. ĐĂNG NHẬP, ĐỊNH DANH & THẺ HỘI VIÊN SỐ');
-  addPdfText('Mỗi hội viên khi gia nhập CLB được cấp Mã Hội Viên duy nhất (VD: HN10-007) gắn liền với số điện thoại và hồ sơ doanh nghiệp.');
-  addPdfStep(1, 'Truy cập và nhập thông tin định danh', 'Mở https://vione.vn/association/login trên Safari/Chrome hoặc mở app từ màn hình chính. Nhập số điện thoại hoặc mã hội viên.', 'Nếu chưa có mật khẩu, chọn "Quên mật khẩu" để nhận mã OTP SMS xác thực.');
-  addPdfStep(2, 'Kích hoạt Thẻ hội viên điện tử VIP', 'Sau khi đăng nhập thành công, thẻ điện tử doanh nhân hiển thị với dấu tích xanh xác thực, mã QR vCard và thông tin pháp nhân.', 'Có thể chuyển đổi giữa 3 mẫu thiết kế thẻ: Classic Navy, Golden VIP hoặc Modern Dark.');
+  addPdfHeading1('1. ĐĂNG NHẬP, ĐỊNH DANH & THẺ Học viên SỐ');
+  addPdfText('Mỗi Học viên khi gia nhập CLB được cấp Mã Học viên duy nhất (VD: HN10-007) gắn liền với số điện thoại và hồ sơ doanh nghiệp.');
+  addPdfStep(1, 'Truy cập và nhập thông tin định danh', 'Mở https://vione.vn/association/login trên Safari/Chrome hoặc mở app từ màn hình chính. Nhập số điện thoại hoặc mã Học viên.', 'Nếu chưa có mật khẩu, chọn "Quên mật khẩu" để nhận mã OTP SMS xác thực.');
+  addPdfStep(2, 'Kích hoạt Thẻ Học viên điện tử VIP', 'Sau khi đăng nhập thành công, thẻ điện tử doanh nhân hiển thị với dấu tích xanh xác thực, mã QR vCard và thông tin pháp nhân.', 'Có thể chuyển đổi giữa 3 mẫu thiết kế thẻ: Classic Navy, Golden VIP hoặc Modern Dark.');
   addPdfStep(3, 'Cài đặt PWA lên màn hình chính điện thoại', 'Trên iOS: Bấm Share -> "Thêm vào màn hình chính". Trên Android: Bấm menu -> "Cài đặt ứng dụng".', 'Hoạt động nhanh, mượt mà và không cần tải qua App Store.');
-  addPdfImage(pngBuffers['demo_auth_card'], 'Đăng nhập & Thẻ Hội viên số VIP');
+  addPdfImage(pngBuffers['demo_auth_card'], 'Đăng nhập & Thẻ Học viên số VIP');
 
   // Chapter 2
   addPdfHeading1('2. CÔNG NGHỆ CHẠM THẺ THÔNG MINH NFC');
   addPdfText('Ứng dụng tích hợp công nghệ chạm thẻ trường gần NFC chuẩn NTAG213/215, trao đổi danh thiếp số 1 chạm không cần cài app phụ.');
-  addPdfStep(1, 'Bật tính năng Chạm thẻ NFC', 'Tại màn hình Trang cá nhân hoặc Thẻ hội viên, bấm biểu tượng sóng phát xạ NFC.', 'Trình duyệt sẽ khởi động bộ thu phát sóng NFC.');
+  addPdfStep(1, 'Bật tính năng Chạm thẻ NFC', 'Tại màn hình Trang cá nhân hoặc Thẻ Học viên, bấm biểu tượng sóng phát xạ NFC.', 'Trình duyệt sẽ khởi động bộ thu phát sóng NFC.');
   addPdfStep(2, 'Chạm mặt lưng điện thoại vào thẻ', 'Áp sát mặt lưng điện thoại vào chip NFC của thẻ doanh nhân. Thông tin vCard được truyền tải tức thì sang máy đối tác.', 'Đối tác chỉ cần mở thông báo để lưu số điện thoại vào danh bạ.');
   addPdfImage(pngBuffers['demo_nfc_card'], 'Chạm thẻ thông minh NFC trao đổi danh thiếp');
 
   // Chapter 3
   addPdfHeading1('3. NHẮN TIN THỜI GIAN THỰC PHONG CÁCH MESSENGER');
   addPdfText('Giao diện nhắn tin được tối ưu hóa chuẩn mực phong cách Messenger với màu xanh #0084FF, bong bóng bo tròn mềm mại và cơ chế thu hồi tin nhắn nhảy top.');
-  addPdfStep(1, 'Tạo cuộc trò chuyện và gửi tin nhắn', 'Bấm vào biểu tượng Tin nhắn tại thanh điều hướng, chọn hội viên cần trao đổi và gửi tin nhắn văn bản, hình ảnh.', null);
+  addPdfStep(1, 'Tạo cuộc trò chuyện và gửi tin nhắn', 'Bấm vào biểu tượng Tin nhắn tại thanh điều hướng, chọn Học viên cần trao đổi và gửi tin nhắn văn bản, hình ảnh.', null);
   addPdfStep(2, 'Tương tác cảm xúc và tùy chọn nhanh', 'Rê chuột hoặc chạm vào tin nhắn để hiển thị thanh công cụ nằm ngang: Thả 6 cảm xúc (😊) và Tùy chọn (⋯).', 'Thao tác cực kỳ thuận tiện và không bị che khuất tầm nhìn.');
   addPdfStep(3, 'Thu hồi tin nhắn đã gửi (Recall)', 'Bấm vào dấu ba chấm -> Chọn "Thu hồi tin nhắn". Tin nhắn chuyển thành khung viền mỏng "Bạn đã thu hồi một tin nhắn", đồng thời cuộc trò chuyện nhảy lên đầu danh sách.', 'Trạng thái được đồng bộ thời gian thực qua WebSockets.');
   addPdfImage(pngBuffers['demo_messenger_chat'], 'Nhắn tin Messenger VIP & Thu hồi tin nhắn');
 
   // Chapter 4
-  addPdfHeading1('4. DANH BẠ HỘI VIÊN & NÚT KẾT NỐI / HỦY KẾT NỐI THÔNG MINH');
+  addPdfHeading1('4. DANH BẠ Học viên & NÚT KẾT NỐI / HỦY KẾT NỐI THÔNG MINH');
   addPdfText('Tra cứu hơn 500+ chủ tịch HĐQT, CEO các doanh nghiệp lớn. Quản lý trạng thái quan hệ kinh doanh bằng 1 chạm.');
-  addPdfStep(1, 'Tra cứu hội viên theo ngành nghề', 'Sử dụng bộ lọc đa năng để tìm kiếm theo Ngành hàng (BĐS, Xây dựng, Tài chính, F&B...) hoặc tỉnh thành.', null);
-  addPdfStep(2, 'Xem hồ sơ và Đổi trạng thái Kết nối / Hủy kết nối', 'Bấm vào Avatar của hội viên để mở Modal Profile. Nếu đã kết nối, nút hành động sẽ hiển thị "HỦY KẾT NỐI" (viền đỏ). Nếu chưa kết nối, hiển thị "KẾT NỐI NGAY" (màu xanh).', 'Thao tác chuyển đổi tức thì và bảo vệ quyền riêng tư cá nhân.');
-  addPdfImage(pngBuffers['demo_directory_b2b'], 'Danh bạ hội viên & Cơ chế Kết nối / Hủy kết nối');
+  addPdfStep(1, 'Tra cứu Học viên theo ngành nghề', 'Sử dụng bộ lọc đa năng để tìm kiếm theo Ngành hàng (BĐS, Xây dựng, Tài chính, F&B...) hoặc tỉnh thành.', null);
+  addPdfStep(2, 'Xem hồ sơ và Đổi trạng thái Kết nối / Hủy kết nối', 'Bấm vào Avatar của Học viên để mở Modal Profile. Nếu đã kết nối, nút hành động sẽ hiển thị "HỦY KẾT NỐI" (viền đỏ). Nếu chưa kết nối, hiển thị "KẾT NỐI NGAY" (màu xanh).', 'Thao tác chuyển đổi tức thì và bảo vệ quyền riêng tư cá nhân.');
+  addPdfImage(pngBuffers['demo_directory_b2b'], 'Danh bạ Học viên & Cơ chế Kết nối / Hủy kết nối');
 
   // Chapter 5
   addPdfHeading1('5. SỰ KIỆN CLB, CHECK-IN QR & BIỂU QUYẾT TRỰC TIẾP');
@@ -776,15 +776,15 @@ async function main() {
   addPdfHeading1('6. THU & ĐÓNG HỘI PHÍ TỰ ĐỘNG QUA VIETQR NAPAS 247');
   addPdfText('Tích hợp Napas 247 thanh toán hội phí niên khóa an toàn, nhanh chóng và tự động xuất biên lai.');
   addPdfStep(1, 'Mở hóa đơn nhắc hội phí', 'Bấm vào thông báo hóa đơn trong hộp thư để xem chi tiết khoản hội phí.', null);
-  addPdfStep(2, 'Quét mã VietQR bằng App Ngân hàng bất kỳ', 'Mã QR tự động điền Số tiền và Cú pháp (CLB1983 [MÃ HỘI VIÊN]). Quét và xác nhận thanh toán trong 3 giây.', null);
-  addPdfStep(3, 'Gạch nợ tự động trong 5 giây', 'Sau khi chuyển khoản thành công, hệ thống tự động gạch nợ, gia hạn thẻ hội viên thêm 12 tháng và cấp hóa đơn VAT.', null);
+  addPdfStep(2, 'Quét mã VietQR bằng App Ngân hàng bất kỳ', 'Mã QR tự động điền Số tiền và Cú pháp (CLB1983 [MÃ Học viên]). Quét và xác nhận thanh toán trong 3 giây.', null);
+  addPdfStep(3, 'Gạch nợ tự động trong 5 giây', 'Sau khi chuyển khoản thành công, hệ thống tự động gạch nợ, gia hạn thẻ Học viên thêm 12 tháng và cấp hóa đơn VAT.', null);
   addPdfImage(pngBuffers['demo_vietqr_fee'], 'Thanh toán hội phí niên khóa qua VietQR Napas 247');
 
   // Chapter 7
   addPdfHeading1('7. SÀN CƠ HỘI GIAO THƯƠNG B2B & GIAN HÀNG SẢN PHẨM 2 CỘT E-COMMERCE');
   addPdfText('Sàn kết nối B2B và Gian hàng sản phẩm 2 cột chuẩn e-commerce giúp các doanh nhân xúc tiến thương mại nội bộ hiệu quả.');
   addPdfStep(1, 'Đăng tin và tìm kiếm Cơ hội B2B', 'Vào mục "Cơ hội giao thương". Xem các tin Chào mua, Chào bán với hình ảnh thực tế, ngày đăng và tab "Cơ hội của tôi".', 'Tin mới nhất luôn được tự động sắp xếp lên đầu trang.');
-  addPdfStep(2, 'Gian hàng sản phẩm 2 cột e-commerce', 'Lưới 2 cột hiển thị đầy đủ hình ảnh, giá niêm yết, giá VIP hội viên; tab "Đã quan tâm" lưu độc lập cho từng tài khoản và tab "Sản phẩm tôi đăng" quản lý danh mục sản phẩm.', null);
+  addPdfStep(2, 'Gian hàng sản phẩm 2 cột e-commerce', 'Lưới 2 cột hiển thị đầy đủ hình ảnh, giá niêm yết, giá VIP Học viên; tab "Đã quan tâm" lưu độc lập cho từng tài khoản và tab "Sản phẩm tôi đăng" quản lý danh mục sản phẩm.', null);
 
   // Chapter 8
   addPdfHeading1('8. MENU CÁ NHÂN IMAGE 3, PHÍM TẮT (+) DANH THIẾP SỐ & CÀI ĐẶT BẢO MẬT');
@@ -800,7 +800,7 @@ async function main() {
 
   // Chapter 10
   addPdfHeading1('10. LIÊN HỆ BAN THƯ KÝ & HỖ TRỢ KỸ THUẬT');
-  addPdfText('Hội viên có thể liên hệ trực tiếp Ban Thư Ký CLB CEO HN10 qua các kênh:');
+  addPdfText('Học viên có thể liên hệ trực tiếp Ban Thư Ký CLB CEO HN10 qua các kênh:');
   addPdfText('• Hotline thường trực 24/7: 098.333.1983 | Tổng đài CSKH: 1900.6883');
   addPdfText('• Zalo Official Account: CLB Doanh Nhân CEO HN10 (https://zalo.me/ceohn10)');
   addPdfText('• Email hỗ trợ: banthuky@ceohn10.vn | kythuat@vione.vn');
@@ -822,10 +822,10 @@ async function main() {
 ---
 
 ## MỤC LỤC
-1. [Đăng Nhập, Định Danh & Thẻ Hội Viên Số](#1-đăng-nhập-định-danh--thẻ-hội-viên-số)
+1. [Đăng Nhập, Định Danh & Thẻ Học viên Số](#1-đăng-nhập-định-danh--thẻ-hội-viên-số)
 2. [Công Nghệ Chạm Thẻ Thông Minh NFC](#2-công-nghệ-chạm-thẻ-thông-minh-nfc)
 3. [Nhắn Tin Thời Gian Thực Phong Cách Messenger](#3-nhắn-tin-thời-gian-thực-phong-cách-messenger)
-4. [Danh Bạ Hội Viên & Nút Kết Nối / Hủy Kết Nối Thông Minh](#4-danh-bạ-hội-viên--nút-kết-nối--hủy-kết-nối-thông-minh)
+4. [Danh Bạ Học viên & Nút Kết Nối / Hủy Kết Nối Thông Minh](#4-danh-bạ-hội-viên--nút-kết-nối--hủy-kết-nối-thông-minh)
 5. [Sự Kiện CLB, Check-in QR, Thẻ Poster 2:3 & Biểu Quyết Trực Tiếp](#5-sự-kiện-clb-check-in-qr-thẻ-poster-23--biểu-quyết-trực-tiếp)
 6. [Thu & Đóng Hội Phí Tự Động Qua VietQR Napas 247](#6-thu--đóng-hội-phí-tự-động-qua-vietqr-napas-247)
 7. [Sàn Cơ Hội Giao Thương B2B & Gian Hàng Sản Phẩm 2 Cột E-Commerce](#7-sàn-cơ-hội-giao-thương-b2b--gian-hàng-sản-phẩm-2-cột-e-commerce)
@@ -835,17 +835,17 @@ async function main() {
 
 ---
 
-## 1. ĐĂNG NHẬP, ĐỊNH DANH & THẺ HỘI VIÊN SỐ
-Mỗi hội viên khi gia nhập CLB Doanh Nhân CEO HN10 được cấp một mã số định danh duy nhất (định dạng \`HN10-xxx\`) gắn liền với số điện thoại và hồ sơ pháp nhân doanh nghiệp.
+## 1. ĐĂNG NHẬP, ĐỊNH DANH & THẺ Học viên SỐ
+Mỗi Học viên khi gia nhập CLB Doanh Nhân CEO HN10 được cấp một mã số định danh duy nhất (định dạng \`HN10-xxx\`) gắn liền với số điện thoại và hồ sơ pháp nhân doanh nghiệp.
 
-![Đăng nhập & Thẻ Hội viên số VIP](/docs/images/demo_auth_card.svg)
+![Đăng nhập & Thẻ Học viên số VIP](/docs/images/demo_auth_card.svg)
 
 ### Các bước thao tác:
 - **Bước 1: Truy cập và nhập thông tin định danh**
-  Mở đường dẫn \`https://vione.vn/association/login\` trên trình duyệt Safari (iOS), Chrome (Android/PC) hoặc mở từ ứng dụng màn hình chính. Nhập Số điện thoại hoặc Mã hội viên cùng mật khẩu được cấp.
+  Mở đường dẫn \`https://vione.vn/association/login\` trên trình duyệt Safari (iOS), Chrome (Android/PC) hoặc mở từ ứng dụng màn hình chính. Nhập Số điện thoại hoặc Mã Học viên cùng mật khẩu được cấp.
   *Lưu ý:* Nếu vừa được phê duyệt từ Landing Page, hệ thống tự động điền sẵn Tên đăng nhập / Số điện thoại và yêu cầu nhập mật khẩu bảo mật (tuyệt đối không bypass đăng nhập để đảm bảo an toàn danh tính).
-- **Bước 2: Kích hoạt Thẻ hội viên điện tử VIP**
-  Hệ thống tự động liên kết dữ liệu CRM của CLB CEO HN10, cấp thẻ số doanh nhân với dải màu Navy & Gold sang trọng, huy hiệu *"Hội viên chính thức"* có dấu tích xanh xác thực và mã QR động chứa liên hệ vCard.
+- **Bước 2: Kích hoạt Thẻ Học viên điện tử VIP**
+  Hệ thống tự động liên kết dữ liệu CRM của CLB CEO HN10, cấp thẻ số doanh nhân với dải màu Navy & Gold sang trọng, huy hiệu *"Học viên chính thức"* có dấu tích xanh xác thực và mã QR động chứa liên hệ vCard.
 - **Bước 3: Cài đặt ứng dụng PWA lên màn hình chính**
   - **Trên iPhone / iPad (Safari):** Bấm nút Chia sẻ (Share) -> chọn *"Thêm vào màn hình chính"* (Add to Home Screen).
   - **Trên Android (Chrome):** Bấm biểu tượng menu (3 chấm) -> chọn *"Cài đặt ứng dụng"* (Install App).
@@ -860,11 +860,11 @@ Mỗi hội viên khi gia nhập CLB Doanh Nhân CEO HN10 được cấp một m
 
 ### Các bước thao tác:
 - **Bước 1: Bật tính năng Chạm thẻ NFC trên ứng dụng**
-  Tại tab Trang cá nhân hoặc Thẻ hội viên, bấm nút *"Chạm Thẻ NFC"*. Cửa sổ radar quét NFC sẽ kích hoạt.
+  Tại tab Trang cá nhân hoặc Thẻ Học viên, bấm nút *"Chạm Thẻ NFC"*. Cửa sổ radar quét NFC sẽ kích hoạt.
 - **Bước 2: Chạm mặt lưng điện thoại vào thẻ hoặc thiết bị đối tác**
   Đặt mặt lưng điện thoại sát vào chip NFC của thẻ doanh nhân CEO HN10. Hệ thống sẽ lập tức truyền tải đường dẫn định danh bảo mật vCard sang thiết bị đối tác mà đối tác không cần cài đặt bất kỳ ứng dụng nào.
 - **Bước 3: Ghi thông tin danh thiếp vào thẻ NFC vật lý**
-  Hội viên có thể bấm *"Ghi thẻ NFC"* trong phần Quản lý danh thiếp để nạp mã URL danh thiếp số cá nhân vào các loại thẻ card visit thông minh bằng kim loại hoặc gỗ ép cao cấp của CLB.
+  Học viên có thể bấm *"Ghi thẻ NFC"* trong phần Quản lý danh thiếp để nạp mã URL danh thiếp số cá nhân vào các loại thẻ card visit thông minh bằng kim loại hoặc gỗ ép cao cấp của CLB.
 
 ---
 
@@ -882,16 +882,16 @@ Hệ thống tin nhắn Doanh nhân được thiết kế chuẩn mực 100% pho
 
 ---
 
-## 4. DANH BẠ HỘI VIÊN & NÚT KẾT NỐI / HỦY KẾT NỐI THÔNG MINH
+## 4. DANH BẠ Học viên & NÚT KẾT NỐI / HỦY KẾT NỐI THÔNG MINH
 Tra cứu hơn 500+ chủ tịch HĐQT, CEO và doanh nhân hàng đầu. Quản lý trạng thái quan hệ kinh doanh linh hoạt.
 
-![Danh bạ hội viên & Kết nối / Hủy kết nối](/docs/images/demo_directory_b2b.svg)
+![Danh bạ Học viên & Kết nối / Hủy kết nối](/docs/images/demo_directory_b2b.svg)
 
 ### Các bước thao tác:
-- **Bước 1: Tra cứu hội viên theo ngành nghề**
+- **Bước 1: Tra cứu Học viên theo ngành nghề**
   Dùng thanh tìm kiếm lọc theo Ngành hàng (Bất động sản, Xây dựng, Tài chính, Logistics, F&B...) hoặc tỉnh thành.
 - **Bước 2: Xem hồ sơ năng lực chi tiết**
-  Bấm vào Avatar của hội viên để mở Modal Profile xem Chức vụ, Pháp nhân công ty, Lĩnh vực thế mạnh và Nhu cầu kết nối.
+  Bấm vào Avatar của Học viên để mở Modal Profile xem Chức vụ, Pháp nhân công ty, Lĩnh vực thế mạnh và Nhu cầu kết nối.
 - **Bước 3: Chuyển đổi trạng thái Kết nối / Hủy kết nối (1 Chạm)**
   - Nếu **chưa kết nối**: Hiển thị nút **"KẾT NỐI NGAY"** màu xanh. Bấm vào để gửi yêu cầu kết nối giao thương.
   - Nếu **đã kết nối**: Hiển thị nút **"HỦY KẾT NỐI"** viền đỏ. Bấm vào để hủy kết nối an toàn và loại khỏi danh bạ đối tác thân thiết.
@@ -922,9 +922,9 @@ Tích hợp cổng Napas 247 thanh toán hội phí an toàn, nhanh chóng và t
 - **Bước 1: Nhận thông báo nhắc hội phí**
   Bấm vào hóa đơn niên khóa trong hòm thư để xem chi tiết nghĩa vụ hội phí.
 - **Bước 2: Quét mã VietQR bằng App Ngân hàng bất kỳ**
-  Hệ thống tự sinh mã QR chuẩn VietQR chứa đầy đủ: Số tài khoản CLB, Số tiền chính xác và Cú pháp chuyển khoản tự động (\`CLB1983 [MÃ HỘI VIÊN]\`). Quét và xác nhận thanh toán trong 3 giây.
+  Hệ thống tự sinh mã QR chuẩn VietQR chứa đầy đủ: Số tài khoản CLB, Số tiền chính xác và Cú pháp chuyển khoản tự động (\`CLB1983 [MÃ Học viên]\`). Quét và xác nhận thanh toán trong 3 giây.
 - **Bước 3: Gạch nợ tự động trong 5 giây**
-  Sau khi ngân hàng báo chuyển khoản thành công, hệ thống tự động gạch nợ trong vòng 5 giây, gia hạn thời hạn hội viên thêm 12 tháng và phát hành hóa đơn điện tử.
+  Sau khi ngân hàng báo chuyển khoản thành công, hệ thống tự động gạch nợ trong vòng 5 giây, gia hạn thời hạn Học viên thêm 12 tháng và phát hành hóa đơn điện tử.
 
 ---
 
@@ -937,7 +937,7 @@ Tích hợp cổng Napas 247 thanh toán hội phí an toàn, nhanh chóng và t
   - Đồng bộ sản phẩm 2 chiều với Web CRM.
   - Cách ly danh sách *"Đã quan tâm"* theo từng tài khoản (tài khoản mới khởi tạo 0 sản phẩm, không bị trùng lặp).
   - Bổ sung tab *"Sản phẩm tôi đăng"*.
-  - Redesign lưới 2 cột phong cách sàn thương mại điện tử hiện đại, phân cấp giá niêm yết và giá VIP hội viên rõ nét.
+  - Redesign lưới 2 cột phong cách sàn thương mại điện tử hiện đại, phân cấp giá niêm yết và giá VIP Học viên rõ nét.
 
 ---
 
@@ -961,7 +961,7 @@ Tích hợp cổng Napas 247 thanh toán hội phí an toàn, nhanh chóng và t
 
 ## 10. LIÊN HỆ BAN THƯ KÝ & HỖ TRỢ KỸ THUẬT
 - **Hotline thường trực 24/7:** 098.333.1983
-- **Tổng đài hỗ trợ hội viên:** 1900.6883
+- **Tổng đài hỗ trợ Học viên:** 1900.6883
 - **Zalo Official Account:** CLB Doanh Nhân CEO HN10 (https://zalo.me/ceohn10)
 - **Email Ban Thư Ký:** banthuky@ceohn10.vn | kythuat@vione.vn
 - **Văn phòng đại diện:** Tầng 6, Tháp Doanh Nhân, Đường Phạm Hùng, Nam Từ Liêm, Hà Nội.

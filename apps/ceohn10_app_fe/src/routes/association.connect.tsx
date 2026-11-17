@@ -167,7 +167,7 @@ export function AssociationConnectScreen() {
           list.unshift(targetMeeting);
         }
         localStorage.setItem("vba_connection_appointments", JSON.stringify(list));
-      } catch {}
+      } catch { }
 
       // Bắn event đồng bộ tức thì sang Lịch trình và Màn Sự kiện & Hoạt động
       window.dispatchEvent(new Event("vba.connection.changed"));
@@ -194,7 +194,7 @@ export function AssociationConnectScreen() {
 
   const handleConfirmCancelMeeting = async () => {
     if (!cancellingMeeting) return;
-    const reason = cancelReasonText.trim() || "Hội viên bận công tác đột xuất";
+    const reason = cancelReasonText.trim() || "Học viên bận công tác đột xuất";
     setSubmittingCancel(true);
     try {
       await fetchNestApi(`/meetings/connection-appointments/${cancellingMeeting.id}/cancel`, {
@@ -220,7 +220,7 @@ export function AssociationConnectScreen() {
           );
           localStorage.setItem("vba_connection_appointments", JSON.stringify(updated));
         }
-      } catch {}
+      } catch { }
 
       window.dispatchEvent(new Event("vba.connection.changed"));
       window.dispatchEvent(new Event("vba.meeting.changed"));
@@ -278,7 +278,7 @@ export function AssociationConnectScreen() {
         if (!Array.isArray(list)) list = [];
         list.unshift(newAppointment);
         localStorage.setItem("vba_connection_appointments", JSON.stringify(list));
-      } catch {}
+      } catch { }
 
       window.dispatchEvent(new Event("vba.connection.changed"));
       window.dispatchEvent(new Event("vba.meeting.changed"));
@@ -369,8 +369,8 @@ export function AssociationConnectScreen() {
       activeTab === "my_meetings"
         ? myMeetingsList
         : activeTab === "sent_meetings"
-        ? sentMeetingsList
-        : cancelledMeetingsList;
+          ? sentMeetingsList
+          : cancelledMeetingsList;
 
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
@@ -394,11 +394,10 @@ export function AssociationConnectScreen() {
           <button
             type="button"
             onClick={() => setMainSection("feed")}
-            className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer ${
-              mainSection === "feed"
+            className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer ${mainSection === "feed"
                 ? "bg-[#003B95] text-white shadow-xs"
                 : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
-            }`}
+              }`}
           >
             <MessageSquare className="size-3.5" />
             <span>📢 Bảng Tin Kết Nối B2B</span>
@@ -406,11 +405,10 @@ export function AssociationConnectScreen() {
           <button
             type="button"
             onClick={() => setMainSection("meetings")}
-            className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer ${
-              mainSection === "meetings"
+            className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer ${mainSection === "meetings"
                 ? "bg-[#003B95] text-white shadow-xs"
                 : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
-            }`}
+              }`}
           >
             <Handshake className="size-3.5" />
             <span>🤝 Hẹn Gặp 1-1 ({myMeetingsList.length})</span>
@@ -425,322 +423,318 @@ export function AssociationConnectScreen() {
       ) : (
         <>
           {/* Top Banner & Quick KPI */}
-      <div className="px-4 pt-3 space-y-3 max-w-2xl mx-auto">
-        <div className="p-4 rounded-3xl bg-gradient-to-r from-[#003B95] via-[#002766] to-[#001433] text-white shadow-xl border border-amber-400/40 flex items-center justify-between">
-          <div>
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-400/20 text-amber-300 text-[10.5px] font-bold border border-amber-400/30 mb-1">
-              <Sparkles className="size-3.5 text-amber-400" />
-              <span>Giao Thương 1-on-1 Nội Khối</span>
-            </div>
-            <h2 className="text-base font-black">Đặt Lịch &amp; Ghi Nhận Deal B2B</h2>
-            <p className="text-xs text-slate-300 mt-0.5">
-              Kết nối trực tiếp giữa các nhà lãnh đạo doanh nghiệp CEO HN10
-            </p>
-          </div>
+          <div className="px-4 pt-3 space-y-3 max-w-2xl mx-auto">
+            <div className="p-4 rounded-3xl bg-gradient-to-r from-[#003B95] via-[#002766] to-[#001433] text-white shadow-xl border border-amber-400/40 flex items-center justify-between">
+              <div>
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-400/20 text-amber-300 text-[10.5px] font-bold border border-amber-400/30 mb-1">
+                  <Sparkles className="size-3.5 text-amber-400" />
+                  <span>Giao Thương 1-on-1 Nội Khối</span>
+                </div>
+                <h2 className="text-base font-black">Đặt Lịch &amp; Ghi Nhận Deal B2B</h2>
+                <p className="text-xs text-slate-300 mt-0.5">
+                  Kết nối trực tiếp giữa các nhà lãnh đạo doanh nghiệp CEO HN10
+                </p>
+              </div>
 
-          <button
-            type="button"
-            onClick={() => setCreateModalOpen(true)}
-            className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white text-xs font-black inline-flex items-center gap-1.5 shadow-md active:scale-95 transition cursor-pointer shrink-0"
-          >
-            <Plus className="size-4" />
-            <span>Hẹn gặp 1-1</span>
-          </button>
-        </div>
-
-        {/* 3 Metric Cards */}
-        <div className="grid grid-cols-3 gap-2 text-center">
-          <div className="p-3 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs">
-            <span className="text-[10px] font-bold text-slate-400 uppercase">Cuộc gặp của tôi</span>
-            <div className="text-base font-black text-[#003B95] dark:text-blue-400 mt-0.5">
-              {myMeetingsList.length}
-            </div>
-          </div>
-          <div className="p-3 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs">
-            <span className="text-[10px] font-bold text-slate-400 uppercase">Cuộc gặp đã gửi</span>
-            <div className="text-base font-black text-amber-600 mt-0.5">
-              {sentMeetingsList.length}
-            </div>
-          </div>
-          <div className="p-3 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs">
-            <span className="text-[10px] font-bold text-slate-400 uppercase">Cuộc gặp đã hủy</span>
-            <div className="text-base font-black text-rose-600 mt-0.5">
-              {cancelledMeetingsList.length}
-            </div>
-          </div>
-        </div>
-
-        {/* Search bar */}
-        <div className="relative">
-          <Search className="size-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-          <input
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Tìm theo tên đối tác, doanh nghiệp, nội dung gặp..."
-            className="w-full pl-8 pr-3 py-2 text-xs rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 outline-none focus:border-[#003B95] text-slate-800 dark:text-slate-100 shadow-2xs"
-          />
-        </div>
-
-        {/* 3 Danh Mục Chuẩn Case 3: Cuộc gặp của tôi | Cuộc gặp đã gửi | Lịch sử cuộc gặp */}
-        <div className="p-1 bg-slate-200/80 dark:bg-slate-800/80 rounded-2xl flex items-center gap-1 shadow-inner">
-          <button
-            type="button"
-            onClick={() => setActiveTab("my_meetings")}
-            className={`flex-1 py-2 px-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
-              activeTab === "my_meetings"
-                ? "bg-[#003B95] text-white shadow-md shadow-blue-900/20"
-                : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
-            }`}
-          >
-            <Calendar className="size-3.5" />
-            <span>Cuộc gặp của tôi ({myMeetingsList.length})</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setActiveTab("sent_meetings")}
-            className={`flex-1 py-2 px-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
-              activeTab === "sent_meetings"
-                ? "bg-amber-500 text-white shadow-md shadow-amber-900/20"
-                : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
-            }`}
-          >
-            <Users className="size-3.5" />
-            <span>Cuộc gặp đã gửi ({sentMeetingsList.length})</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setActiveTab("cancelled")}
-            className={`flex-1 py-2 px-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
-              activeTab === "cancelled"
-                ? "bg-rose-600 text-white shadow-md shadow-rose-900/20"
-                : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
-            }`}
-          >
-            <Clock className="size-3.5" />
-            <span>Cuộc gặp đã hủy ({cancelledMeetingsList.length})</span>
-          </button>
-        </div>
-
-        {/* Meeting Cards List */}
-        <div className="space-y-3 pt-1">
-          {loading ? (
-            <div className="py-12 flex flex-col items-center justify-center gap-2 text-slate-400">
-              <Loader2 className="size-6 animate-spin text-[#003B95]" />
-              <span className="text-xs">Đang tải danh sách gặp gỡ...</span>
-            </div>
-          ) : filteredCurrentList.length === 0 ? (
-            <div className="p-8 text-center bg-white dark:bg-slate-900 rounded-3xl border border-dashed border-slate-200 dark:border-slate-800 text-xs text-slate-400 space-y-2">
-              <Handshake className="size-8 mx-auto text-slate-300 dark:text-slate-600" />
-              <p>Chưa có cuộc hẹn kết nối nào trong danh mục này.</p>
               <button
                 type="button"
                 onClick={() => setCreateModalOpen(true)}
-                className="px-4 py-2 rounded-xl bg-[#003B95] text-white font-bold text-xs inline-flex items-center gap-1.5 shadow-xs"
+                className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white text-xs font-black inline-flex items-center gap-1.5 shadow-md active:scale-95 transition cursor-pointer shrink-0"
               >
-                <Plus className="size-3.5" />
-                <span>Thiết lập cuộc hẹn đầu tiên</span>
+                <Plus className="size-4" />
+                <span>Hẹn gặp 1-1</span>
               </button>
             </div>
-          ) : (
-            filteredCurrentList.map((m) => (
-              <div
-                key={m.id}
-                className="p-4 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col gap-3 hover:border-amber-400 transition"
-              >
-                {/* Header: Partner Info & Status */}
-                <div className="flex items-start justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="size-12 rounded-2xl bg-[#003B95] text-amber-300 font-black flex items-center justify-center text-sm shadow-xs shrink-0 ring-1 ring-amber-400/40">
-                      {m.partnerAvatar ? (
-                        <img
-                          src={resolveMediaUrl(m.partnerAvatar) || m.partnerAvatar}
-                          alt={m.partnerName}
-                          className="size-full object-cover rounded-2xl"
-                        />
-                      ) : (
-                        (m.partnerName || "CEO")[0]
-                      )}
-                    </div>
-                    <div>
-                      <h4 className="text-sm font-extrabold text-slate-900 dark:text-white">
-                        {m.partnerName}
-                      </h4>
-                      <p className="text-xs text-slate-500 dark:text-slate-400">
-                        {m.partnerCompany || "Doanh nghiệp CEO HN10"}
-                      </p>
-                    </div>
-                  </div>
 
-                  <span
-                    className={`px-2.5 py-0.5 rounded-full text-[10.5px] font-bold ${
-                      m.status === "completed"
-                        ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-300"
-                        : m.status === "confirmed"
-                        ? "bg-blue-50 text-[#003B95] dark:bg-blue-950/60 dark:text-blue-300 border border-blue-200"
-                        : "bg-amber-50 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-300"
-                    }`}
-                  >
-                    {m.status === "completed"
-                      ? "✓ Đã hoàn thành"
-                      : m.status === "confirmed"
-                      ? "Đã xác nhận"
-                      : "Chờ phản hồi"}
-                  </span>
+            {/* 3 Metric Cards */}
+            <div className="grid grid-cols-3 gap-2 text-center">
+              <div className="p-3 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs">
+                <span className="text-[10px] font-bold text-slate-400 uppercase">Cuộc gặp của tôi</span>
+                <div className="text-base font-black text-[#003B95] dark:text-blue-400 mt-0.5">
+                  {myMeetingsList.length}
                 </div>
-
-                {/* Meeting Title & Notes */}
-                <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 text-xs space-y-1.5">
-                  <div className="font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
-                    <Handshake className="size-3.5 text-amber-500" />
-                    <span>{m.title}</span>
-                  </div>
-                  {m.notes && <p className="text-[11px] text-slate-500 dark:text-slate-400">{m.notes}</p>}
-
-                  {/* Time & Venue */}
-                  <div className="flex flex-wrap items-center gap-3 pt-1 text-[11px] text-slate-600 dark:text-slate-300 font-semibold border-t border-slate-200/60 dark:border-slate-700">
-                    <span className="flex items-center gap-1">
-                      <Calendar className="size-3 text-[#003B95] dark:text-blue-400" />
-                      <span>{m.date}</span>
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <Clock className="size-3 text-amber-500" />
-                      <span>{m.time}</span>
-                    </span>
-                    <span className="flex items-center gap-1">
-                      {m.venueType === "online" ? (
-                        <>
-                          <Video className="size-3 text-emerald-600" />
-                          <span>Họp Online Jitsi</span>
-                        </>
-                      ) : (
-                        <>
-                          <MapPin className="size-3 text-emerald-600" />
-                          <span className="truncate max-w-[160px]">{m.venue || "Hà Nội"}</span>
-                        </>
-                      )}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Action Buttons for Confirmed / Active Meeting in My Meetings */}
-                {activeTab === "my_meetings" && m.status === "confirmed" && (
-                  <div className="flex flex-wrap items-center gap-2 pt-1">
-                    {/* Call Online Video Call Button */}
-                    {m.venueType === "online" && (
-                      <button
-                        type="button"
-                        onClick={() => setVideoCallMeeting(m)}
-                        className="py-2 px-3 rounded-xl bg-[#003B95] hover:bg-[#002f77] text-white text-xs font-bold inline-flex items-center gap-1.5 shadow-xs transition cursor-pointer"
-                      >
-                        <Video className="size-3.5 text-amber-300" />
-                        <span>Vào phòng họp</span>
-                      </button>
-                    )}
-
-                    {/* Offline Map Navigation Link */}
-                    {m.venueType === "offline" && m.venue && (
-                      <a
-                        href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(m.venue)}`}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold inline-flex items-center gap-1.5 shadow-xs transition"
-                      >
-                        <Navigation className="size-3.5" />
-                        <span>Chỉ đường</span>
-                      </a>
-                    )}
-
-                    {/* Hotline Phone call */}
-                    {m.partnerPhone && (
-                      <a
-                        href={`tel:${m.partnerPhone}`}
-                        className="py-2 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-200 text-xs font-bold inline-flex items-center gap-1 transition"
-                      >
-                        <Phone className="size-3.5" />
-                        <span>Gọi điện</span>
-                      </a>
-                    )}
-
-                    {/* Log Won Deal Button */}
-                    <button
-                      type="button"
-                      onClick={() => setDealModalMeeting(m)}
-                      className="py-2 px-3 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white text-xs font-bold inline-flex items-center gap-1 shadow-xs transition cursor-pointer"
-                    >
-                      <DollarSign className="size-3.5" />
-                      <span>Ghi nhận Deal</span>
-                    </button>
-
-                    {/* Nút Hủy Hẹn khi đã lên lịch giữa 2 tài khoản */}
-                    <button
-                      type="button"
-                      onClick={() => handleOpenCancelModal(m)}
-                      className="py-2 px-3 rounded-xl border border-rose-200 dark:border-rose-900/60 bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/60 text-rose-600 dark:text-rose-400 text-xs font-bold inline-flex items-center gap-1 transition cursor-pointer"
-                    >
-                      <XCircle className="size-3.5" />
-                      <span>Hủy hẹn</span>
-                    </button>
-                  </div>
-                )}
-
-                {/* Action Buttons for Incoming Invitation in My Meetings */}
-                {activeTab === "my_meetings" && m.status === "pending" && (
-                  <div className="flex items-center gap-2 pt-1">
-                    <button
-                      type="button"
-                      onClick={() => handleRespond(m.id, "accept")}
-                      className="flex-1 py-2 px-3 rounded-xl bg-[#003B95] hover:bg-[#002f77] text-white text-xs font-bold shadow-xs transition cursor-pointer flex items-center justify-center gap-1.5"
-                    >
-                      <CheckCircle2 className="size-3.5 text-emerald-400" />
-                      <span>Đồng ý lịch hẹn</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleOpenCancelModal(m)}
-                      className="py-2 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-bold transition cursor-pointer"
-                    >
-                      Từ chối / Hủy
-                    </button>
-                  </div>
-                )}
-
-                {/* Notice for Cancelled Meeting */}
-                {activeTab === "cancelled" && (
-                  <div className="pt-2 text-[11px] text-rose-600 dark:text-rose-400 font-semibold space-y-1 border-t border-rose-100 dark:border-rose-950">
-                    <div className="flex items-center gap-1.5">
-                      <XCircle className="size-3.5 shrink-0" />
-                      <span>{m.status === "declined" ? "Lời mời đã bị từ chối" : "Cuộc gặp đã bị hủy"}</span>
-                    </div>
-                    {((m as any).cancelReason || (m as any).cancel_reason) && (
-                      <p className="text-slate-600 dark:text-slate-300 text-[11px] pl-5 font-normal">
-                        Lý do: <span className="italic font-medium">{(m as any).cancelReason || (m as any).cancel_reason}</span>
-                      </p>
-                    )}
-                  </div>
-                )}
-
-                {/* Action Buttons for Sent Invitation */}
-                {activeTab === "sent_meetings" && m.status === "pending" && (
-                  <div className="flex items-center justify-between pt-1 text-xs">
-                    <span className="text-slate-400">Đang đợi đối tác CEO phản hồi</span>
-                    <button
-                      type="button"
-                      onClick={() => handleOpenCancelModal(m)}
-                      className="px-3 py-1.5 rounded-xl border border-rose-200 dark:border-rose-900/60 bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/60 text-rose-600 dark:text-rose-400 font-bold transition cursor-pointer inline-flex items-center gap-1"
-                    >
-                      <XCircle className="size-3" />
-                      <span>Hủy lời mời</span>
-                    </button>
-                  </div>
-                )}
               </div>
-            ))
-          )}
-        </div>
-      </div>
-      </>
+              <div className="p-3 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs">
+                <span className="text-[10px] font-bold text-slate-400 uppercase">Cuộc gặp đã gửi</span>
+                <div className="text-base font-black text-amber-600 mt-0.5">
+                  {sentMeetingsList.length}
+                </div>
+              </div>
+              <div className="p-3 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs">
+                <span className="text-[10px] font-bold text-slate-400 uppercase">Cuộc gặp đã hủy</span>
+                <div className="text-base font-black text-rose-600 mt-0.5">
+                  {cancelledMeetingsList.length}
+                </div>
+              </div>
+            </div>
+
+            {/* Search bar */}
+            <div className="relative">
+              <Search className="size-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+              <input
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Tìm theo tên đối tác, doanh nghiệp, nội dung gặp..."
+                className="w-full pl-8 pr-3 py-2 text-xs rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 outline-none focus:border-[#003B95] text-slate-800 dark:text-slate-100 shadow-2xs"
+              />
+            </div>
+
+            {/* 3 Danh Mục Chuẩn Case 3: Cuộc gặp của tôi | Cuộc gặp đã gửi | Lịch sử cuộc gặp */}
+            <div className="p-1 bg-slate-200/80 dark:bg-slate-800/80 rounded-2xl flex items-center gap-1 shadow-inner">
+              <button
+                type="button"
+                onClick={() => setActiveTab("my_meetings")}
+                className={`flex-1 py-2 px-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${activeTab === "my_meetings"
+                    ? "bg-[#003B95] text-white shadow-md shadow-blue-900/20"
+                    : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+                  }`}
+              >
+                <Calendar className="size-3.5" />
+                <span>Cuộc gặp của tôi ({myMeetingsList.length})</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setActiveTab("sent_meetings")}
+                className={`flex-1 py-2 px-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${activeTab === "sent_meetings"
+                    ? "bg-amber-500 text-white shadow-md shadow-amber-900/20"
+                    : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+                  }`}
+              >
+                <Users className="size-3.5" />
+                <span>Cuộc gặp đã gửi ({sentMeetingsList.length})</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setActiveTab("cancelled")}
+                className={`flex-1 py-2 px-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${activeTab === "cancelled"
+                    ? "bg-rose-600 text-white shadow-md shadow-rose-900/20"
+                    : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+                  }`}
+              >
+                <Clock className="size-3.5" />
+                <span>Cuộc gặp đã hủy ({cancelledMeetingsList.length})</span>
+              </button>
+            </div>
+
+            {/* Meeting Cards List */}
+            <div className="space-y-3 pt-1">
+              {loading ? (
+                <div className="py-12 flex flex-col items-center justify-center gap-2 text-slate-400">
+                  <Loader2 className="size-6 animate-spin text-[#003B95]" />
+                  <span className="text-xs">Đang tải danh sách gặp gỡ...</span>
+                </div>
+              ) : filteredCurrentList.length === 0 ? (
+                <div className="p-8 text-center bg-white dark:bg-slate-900 rounded-3xl border border-dashed border-slate-200 dark:border-slate-800 text-xs text-slate-400 space-y-2">
+                  <Handshake className="size-8 mx-auto text-slate-300 dark:text-slate-600" />
+                  <p>Chưa có cuộc hẹn kết nối nào trong danh mục này.</p>
+                  <button
+                    type="button"
+                    onClick={() => setCreateModalOpen(true)}
+                    className="px-4 py-2 rounded-xl bg-[#003B95] text-white font-bold text-xs inline-flex items-center gap-1.5 shadow-xs"
+                  >
+                    <Plus className="size-3.5" />
+                    <span>Thiết lập cuộc hẹn đầu tiên</span>
+                  </button>
+                </div>
+              ) : (
+                filteredCurrentList.map((m) => (
+                  <div
+                    key={m.id}
+                    className="p-4 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col gap-3 hover:border-amber-400 transition"
+                  >
+                    {/* Header: Partner Info & Status */}
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="size-12 rounded-2xl bg-[#003B95] text-amber-300 font-black flex items-center justify-center text-sm shadow-xs shrink-0 ring-1 ring-amber-400/40">
+                          {m.partnerAvatar ? (
+                            <img
+                              src={resolveMediaUrl(m.partnerAvatar) || m.partnerAvatar}
+                              alt={m.partnerName}
+                              className="size-full object-cover rounded-2xl"
+                            />
+                          ) : (
+                            (m.partnerName || "CEO")[0]
+                          )}
+                        </div>
+                        <div>
+                          <h4 className="text-sm font-extrabold text-slate-900 dark:text-white">
+                            {m.partnerName}
+                          </h4>
+                          <p className="text-xs text-slate-500 dark:text-slate-400">
+                            {m.partnerCompany || "Doanh nghiệp CEO HN10"}
+                          </p>
+                        </div>
+                      </div>
+
+                      <span
+                        className={`px-2.5 py-0.5 rounded-full text-[10.5px] font-bold ${m.status === "completed"
+                            ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-300"
+                            : m.status === "confirmed"
+                              ? "bg-blue-50 text-[#003B95] dark:bg-blue-950/60 dark:text-blue-300 border border-blue-200"
+                              : "bg-amber-50 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-300"
+                          }`}
+                      >
+                        {m.status === "completed"
+                          ? "✓ Đã hoàn thành"
+                          : m.status === "confirmed"
+                            ? "Đã xác nhận"
+                            : "Chờ phản hồi"}
+                      </span>
+                    </div>
+
+                    {/* Meeting Title & Notes */}
+                    <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 text-xs space-y-1.5">
+                      <div className="font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
+                        <Handshake className="size-3.5 text-amber-500" />
+                        <span>{m.title}</span>
+                      </div>
+                      {m.notes && <p className="text-[11px] text-slate-500 dark:text-slate-400">{m.notes}</p>}
+
+                      {/* Time & Venue */}
+                      <div className="flex flex-wrap items-center gap-3 pt-1 text-[11px] text-slate-600 dark:text-slate-300 font-semibold border-t border-slate-200/60 dark:border-slate-700">
+                        <span className="flex items-center gap-1">
+                          <Calendar className="size-3 text-[#003B95] dark:text-blue-400" />
+                          <span>{m.date}</span>
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Clock className="size-3 text-amber-500" />
+                          <span>{m.time}</span>
+                        </span>
+                        <span className="flex items-center gap-1">
+                          {m.venueType === "online" ? (
+                            <>
+                              <Video className="size-3 text-emerald-600" />
+                              <span>Họp Online Jitsi</span>
+                            </>
+                          ) : (
+                            <>
+                              <MapPin className="size-3 text-emerald-600" />
+                              <span className="truncate max-w-[160px]">{m.venue || "Hà Nội"}</span>
+                            </>
+                          )}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Action Buttons for Confirmed / Active Meeting in My Meetings */}
+                    {activeTab === "my_meetings" && m.status === "confirmed" && (
+                      <div className="flex flex-wrap items-center gap-2 pt-1">
+                        {/* Call Online Video Call Button */}
+                        {m.venueType === "online" && (
+                          <button
+                            type="button"
+                            onClick={() => setVideoCallMeeting(m)}
+                            className="py-2 px-3 rounded-xl bg-[#003B95] hover:bg-[#002f77] text-white text-xs font-bold inline-flex items-center gap-1.5 shadow-xs transition cursor-pointer"
+                          >
+                            <Video className="size-3.5 text-amber-300" />
+                            <span>Vào phòng họp</span>
+                          </button>
+                        )}
+
+                        {/* Offline Map Navigation Link */}
+                        {m.venueType === "offline" && m.venue && (
+                          <a
+                            href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(m.venue)}`}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold inline-flex items-center gap-1.5 shadow-xs transition"
+                          >
+                            <Navigation className="size-3.5" />
+                            <span>Chỉ đường</span>
+                          </a>
+                        )}
+
+                        {/* Hotline Phone call */}
+                        {m.partnerPhone && (
+                          <a
+                            href={`tel:${m.partnerPhone}`}
+                            className="py-2 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-200 text-xs font-bold inline-flex items-center gap-1 transition"
+                          >
+                            <Phone className="size-3.5" />
+                            <span>Gọi điện</span>
+                          </a>
+                        )}
+
+                        {/* Log Won Deal Button */}
+                        <button
+                          type="button"
+                          onClick={() => setDealModalMeeting(m)}
+                          className="py-2 px-3 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white text-xs font-bold inline-flex items-center gap-1 shadow-xs transition cursor-pointer"
+                        >
+                          <DollarSign className="size-3.5" />
+                          <span>Ghi nhận Deal</span>
+                        </button>
+
+                        {/* Nút Hủy Hẹn khi đã lên lịch giữa 2 tài khoản */}
+                        <button
+                          type="button"
+                          onClick={() => handleOpenCancelModal(m)}
+                          className="py-2 px-3 rounded-xl border border-rose-200 dark:border-rose-900/60 bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/60 text-rose-600 dark:text-rose-400 text-xs font-bold inline-flex items-center gap-1 transition cursor-pointer"
+                        >
+                          <XCircle className="size-3.5" />
+                          <span>Hủy hẹn</span>
+                        </button>
+                      </div>
+                    )}
+
+                    {/* Action Buttons for Incoming Invitation in My Meetings */}
+                    {activeTab === "my_meetings" && m.status === "pending" && (
+                      <div className="flex items-center gap-2 pt-1">
+                        <button
+                          type="button"
+                          onClick={() => handleRespond(m.id, "accept")}
+                          className="flex-1 py-2 px-3 rounded-xl bg-[#003B95] hover:bg-[#002f77] text-white text-xs font-bold shadow-xs transition cursor-pointer flex items-center justify-center gap-1.5"
+                        >
+                          <CheckCircle2 className="size-3.5 text-emerald-400" />
+                          <span>Đồng ý lịch hẹn</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleOpenCancelModal(m)}
+                          className="py-2 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-bold transition cursor-pointer"
+                        >
+                          Từ chối / Hủy
+                        </button>
+                      </div>
+                    )}
+
+                    {/* Notice for Cancelled Meeting */}
+                    {activeTab === "cancelled" && (
+                      <div className="pt-2 text-[11px] text-rose-600 dark:text-rose-400 font-semibold space-y-1 border-t border-rose-100 dark:border-rose-950">
+                        <div className="flex items-center gap-1.5">
+                          <XCircle className="size-3.5 shrink-0" />
+                          <span>{m.status === "declined" ? "Lời mời đã bị từ chối" : "Cuộc gặp đã bị hủy"}</span>
+                        </div>
+                        {((m as any).cancelReason || (m as any).cancel_reason) && (
+                          <p className="text-slate-600 dark:text-slate-300 text-[11px] pl-5 font-normal">
+                            Lý do: <span className="italic font-medium">{(m as any).cancelReason || (m as any).cancel_reason}</span>
+                          </p>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Action Buttons for Sent Invitation */}
+                    {activeTab === "sent_meetings" && m.status === "pending" && (
+                      <div className="flex items-center justify-between pt-1 text-xs">
+                        <span className="text-slate-400">Đang đợi đối tác CEO phản hồi</span>
+                        <button
+                          type="button"
+                          onClick={() => handleOpenCancelModal(m)}
+                          className="px-3 py-1.5 rounded-xl border border-rose-200 dark:border-rose-900/60 bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/60 text-rose-600 dark:text-rose-400 font-bold transition cursor-pointer inline-flex items-center gap-1"
+                        >
+                          <XCircle className="size-3" />
+                          <span>Hủy lời mời</span>
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </>
       )}
 
       {/* ── CREATE 1-ON-1 MEETING MODAL ── */}
@@ -762,7 +756,7 @@ export function AssociationConnectScreen() {
                   <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase">
                     Đặt Lịch Hẹn Gặp 1-on-1
                   </h3>
-                  <p className="text-[11px] text-slate-400">Kết nối B2B với hội viên CEO HN10</p>
+                  <p className="text-[11px] text-slate-400">Kết nối B2B với Học viên CEO HN10</p>
                 </div>
               </div>
               <button
@@ -777,7 +771,7 @@ export function AssociationConnectScreen() {
             <form onSubmit={handleCreateMeeting} className="space-y-3 text-xs">
               <div>
                 <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
-                  Tên Hội Viên / Đối Tác CEO *
+                  Tên Học viên / Đối Tác CEO *
                 </label>
                 <input
                   required
@@ -848,11 +842,10 @@ export function AssociationConnectScreen() {
                   <button
                     type="button"
                     onClick={() => setFormVenueType("online")}
-                    className={`py-2 px-3 rounded-xl font-bold flex items-center justify-center gap-1.5 border transition cursor-pointer ${
-                      formVenueType === "online"
+                    className={`py-2 px-3 rounded-xl font-bold flex items-center justify-center gap-1.5 border transition cursor-pointer ${formVenueType === "online"
                         ? "bg-[#003B95] text-white border-[#003B95]"
                         : "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-transparent"
-                    }`}
+                      }`}
                   >
                     <Video className="size-3.5 text-amber-300" />
                     <span>Online (Jitsi Call)</span>
@@ -860,11 +853,10 @@ export function AssociationConnectScreen() {
                   <button
                     type="button"
                     onClick={() => setFormVenueType("offline")}
-                    className={`py-2 px-3 rounded-xl font-bold flex items-center justify-center gap-1.5 border transition cursor-pointer ${
-                      formVenueType === "offline"
+                    className={`py-2 px-3 rounded-xl font-bold flex items-center justify-center gap-1.5 border transition cursor-pointer ${formVenueType === "offline"
                         ? "bg-[#003B95] text-white border-[#003B95]"
                         : "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-transparent"
-                    }`}
+                      }`}
                   >
                     <MapPin className="size-3.5 text-emerald-400" />
                     <span>Offline (Cafe/VP)</span>
@@ -1126,11 +1118,10 @@ export function AssociationConnectScreen() {
                     key={chip}
                     type="button"
                     onClick={() => setCancelReasonText(chip)}
-                    className={`px-2.5 py-1 rounded-full text-[10.5px] font-semibold transition cursor-pointer border ${
-                      cancelReasonText === chip
+                    className={`px-2.5 py-1 rounded-full text-[10.5px] font-semibold transition cursor-pointer border ${cancelReasonText === chip
                         ? "bg-rose-500 text-white border-rose-500"
                         : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-slate-300"
-                    }`}
+                      }`}
                   >
                     {chip}
                   </button>
@@ -1329,7 +1320,7 @@ export function AssociationConnectScreen() {
                 onClick={() => {
                   try {
                     sessionStorage.setItem("vba_events_active_tab", "activities");
-                  } catch {}
+                  } catch { }
                   setAcceptedSuccessMeeting(null);
                 }}
                 className="py-2.5 px-3 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 text-xs font-bold text-center flex items-center justify-center gap-1.5 shadow-xs transition"

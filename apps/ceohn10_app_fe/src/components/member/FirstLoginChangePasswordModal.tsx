@@ -24,10 +24,10 @@ export function FirstLoginChangePasswordModal({
             u.mustChangePassword = false;
             u.must_change_password = false;
             localStorage.setItem("auth_user", JSON.stringify(u));
-          } catch {}
+          } catch { }
         }
       }
-    } catch {}
+    } catch { }
 
     toast.success("✓ Đổi mật khẩu lần đầu thành công!", {
       description: "Vì lý do bảo mật, Quý Anh/Chị vui lòng đăng nhập lại với mật khẩu mới.",
@@ -63,7 +63,7 @@ export function FirstLoginChangePasswordModal({
 
           <div className="space-y-1">
             <span className="text-[11px] font-extrabold tracking-widest text-amber-600 uppercase">
-              Bảo Mật Tài Khoản Hội Viên
+              Bảo Mật Tài Khoản Học viên
             </span>
             <h2 id="first-login-title" className="text-lg sm:text-xl font-black text-slate-900 leading-snug">
               Bắt Buộc Đổi Mật Khẩu Lần Đầu
@@ -71,7 +71,7 @@ export function FirstLoginChangePasswordModal({
           </div>
 
           <p className="text-xs text-slate-600 leading-relaxed px-1">
-            Chào mừng Quý Hội viên đến với CLB Doanh Nhân CEO HN10. Vì lý do an toàn bảo mật, bạn <strong>bắt buộc phải đổi mật khẩu khởi tạo</strong>. Sau khi đổi thành công, hệ thống sẽ yêu cầu bạn <strong>đăng nhập lại</strong> với mật khẩu mới.
+            Chào mừng Quý Học viên đến với CLB Doanh Nhân CEO HN10. Vì lý do an toàn bảo mật, bạn <strong>bắt buộc phải đổi mật khẩu khởi tạo</strong>. Sau khi đổi thành công, hệ thống sẽ yêu cầu bạn <strong>đăng nhập lại</strong> với mật khẩu mới.
           </p>
         </div>
 

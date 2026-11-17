@@ -29,7 +29,7 @@ async function main() {
     body: JSON.stringify({
       name: 'Gói Chuyển Đổi Số Doanh Nghiệp 4.0 - Test',
       title: 'Gói Chuyển Đổi Số Doanh Nghiệp 4.0 - Test',
-      description: 'Hỗ trợ tự động hóa quy trình quản trị doanh nghiệp hội viên CEO HN10',
+      description: 'Hỗ trợ tự động hóa quy trình quản trị doanh nghiệp Học viên CEO HN10',
       company: 'Tập đoàn Công nghệ Alpha',
       category: 'Công nghệ & Phần mềm',
       price: 15000000,

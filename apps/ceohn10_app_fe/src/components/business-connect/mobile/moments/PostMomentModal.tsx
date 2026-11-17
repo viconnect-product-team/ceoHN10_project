@@ -326,11 +326,10 @@ export function PostMomentModal({
                 <button
                   type="button"
                   onClick={() => setVisibility("public")}
-                  className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold transition-all cursor-pointer ${
-                    visibility === "public"
+                  className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold transition-all cursor-pointer ${visibility === "public"
                       ? "bg-[#D8B282]/20 border border-[#D8B282] text-[#F6E1C3] shadow-xs"
                       : "bg-[var(--bc-mobile-surface-2)] border border-[var(--bc-mobile-border)] text-[var(--bc-mobile-muted)] hover:text-[var(--bc-mobile-text)]"
-                  }`}
+                    }`}
                 >
                   <Globe className="h-3 w-3 text-amber-400" />
                   <span>Công khai</span>
@@ -339,11 +338,10 @@ export function PostMomentModal({
                 <button
                   type="button"
                   onClick={() => setVisibility("friends")}
-                  className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold transition-all cursor-pointer ${
-                    visibility === "friends"
+                  className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold transition-all cursor-pointer ${visibility === "friends"
                       ? "bg-[#D8B282]/20 border border-[#D8B282] text-[#F6E1C3] shadow-xs"
                       : "bg-[var(--bc-mobile-surface-2)] border border-[var(--bc-mobile-border)] text-[var(--bc-mobile-muted)] hover:text-[var(--bc-mobile-text)]"
-                  }`}
+                    }`}
                 >
                   <Users className="h-3 w-3 text-amber-400" />
                   <span>Bạn bè</span>
@@ -352,11 +350,10 @@ export function PostMomentModal({
                 <button
                   type="button"
                   onClick={() => setVisibility("private")}
-                  className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold transition-all cursor-pointer ${
-                    visibility === "private"
+                  className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold transition-all cursor-pointer ${visibility === "private"
                       ? "bg-[#D8B282]/20 border border-[#D8B282] text-[#F6E1C3] shadow-xs"
                       : "bg-[var(--bc-mobile-surface-2)] border border-[var(--bc-mobile-border)] text-[var(--bc-mobile-muted)] hover:text-[var(--bc-mobile-text)]"
-                  }`}
+                    }`}
                 >
                   <Lock className="h-3 w-3 text-rose-400" />
                   <span>Chỉ mình tôi</span>
@@ -379,13 +376,12 @@ export function PostMomentModal({
 
           {/* Photos Preview Grid */}
           {photos.length > 0 && (
-            <div className={`grid gap-2 rounded-2xl overflow-hidden ${
-              photos.length === 1
+            <div className={`grid gap-2 rounded-2xl overflow-hidden ${photos.length === 1
                 ? "grid-cols-1"
                 : photos.length === 2
                   ? "grid-cols-2"
                   : "grid-cols-3"
-            }`}>
+              }`}>
               {photos.map((photo, index) => (
                 <div
                   key={index}
@@ -442,11 +438,10 @@ export function PostMomentModal({
                       setSelectedFeeling(f.id);
                       setActiveSubView("none");
                     }}
-                    className={`flex items-center gap-2 px-2.5 py-1.5 rounded-xl text-left text-xs transition-colors cursor-pointer ${
-                      selectedFeeling === f.id
+                    className={`flex items-center gap-2 px-2.5 py-1.5 rounded-xl text-left text-xs transition-colors cursor-pointer ${selectedFeeling === f.id
                         ? "bg-[#D8B282]/20 text-[#E8C986] font-bold border border-[#D8B282]/50"
                         : "hover:bg-white/10 text-white/80"
-                    }`}
+                      }`}
                   >
                     <span className="text-base">{f.emoji}</span>
                     <span className="truncate">{f.label}</span>
@@ -491,9 +486,8 @@ export function PostMomentModal({
                         key={person.personId}
                         type="button"
                         onClick={() => toggleTagPerson(person)}
-                        className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-xl text-left transition-colors cursor-pointer ${
-                          isSelected ? "bg-[#D8B282]/20 border border-[#D8B282]/40" : "hover:bg-white/5"
-                        }`}
+                        className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-xl text-left transition-colors cursor-pointer ${isSelected ? "bg-[#D8B282]/20 border border-[#D8B282]/40" : "hover:bg-white/5"
+                          }`}
                       >
                         <div className="flex items-center gap-2.5 min-w-0">
                           <img
@@ -504,7 +498,7 @@ export function PostMomentModal({
                           <div className="min-w-0">
                             <p className="text-xs font-bold text-white truncate">{person.displayName}</p>
                             <p className="text-[10px] text-white/50 truncate">
-                              {person.headline || person.companyName || "Hội viên CEO HN10"}
+                              {person.headline || person.companyName || "Học viên CEO HN10"}
                             </p>
                           </div>
                         </div>
@@ -550,11 +544,10 @@ export function PostMomentModal({
                       setLocation(loc);
                       setActiveSubView("none");
                     }}
-                    className={`px-2.5 py-1 rounded-full text-[11px] font-medium border transition-colors cursor-pointer ${
-                      location === loc
+                    className={`px-2.5 py-1 rounded-full text-[11px] font-medium border transition-colors cursor-pointer ${location === loc
                         ? "bg-[#D8B282] text-slate-950 border-[#D8B282] font-bold"
                         : "border-white/15 bg-white/5 text-white/80 hover:bg-white/10"
-                    }`}
+                      }`}
                   >
                     📍 {loc}
                   </button>

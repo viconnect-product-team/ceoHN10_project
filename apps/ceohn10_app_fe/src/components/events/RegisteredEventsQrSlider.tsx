@@ -44,10 +44,10 @@ export const RegisteredEventsQrSlider: React.FC<RegisteredEventsQrSliderProps> =
     const evIdx = events.findIndex((x) => x.id === regEvt.id);
     const invoiceCode = String(regEvt.regId || regEvt.ticketCode || regEvt.id || `REG-${(regEvt.id || "EVT").slice(0, 8).toUpperCase()}`);
     const lucky = regEvt.luckyNumber || `#${(1000 + (evIdx >= 0 ? evIdx : idx + 1) * 337) % 9000 + 1000}`;
-    const attendeeName = member?.name || user?.name || "Hội viên CEO HN10";
+    const attendeeName = member?.name || user?.name || "Học viên CEO HN10";
     const attendeePhone = member?.phone || "";
     const attendeeCompany = (member as any)?.companyName || "CLB Doanh Nhân CEO HN10";
-    const attendeePosition = member?.title || "Hội viên chính thức CEO HN10";
+    const attendeePosition = member?.title || "Học viên chính thức CEO HN10";
     const isFree = isEventFree(regEvt);
     const dateStr = regEvt.date ? formatDisplayDate(regEvt.date) : "Sắp diễn ra";
     const locationStr = regEvt.place || "Địa điểm tổ chức sự kiện";

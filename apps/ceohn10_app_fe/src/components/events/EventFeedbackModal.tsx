@@ -93,7 +93,7 @@ export function EventFeedbackModal({
           comment: comment.trim(),
           fileUrl,
           fileName,
-          userName: userName.trim() || user?.name || "Hội viên CEO HN10",
+          userName: userName.trim() || user?.name || "Học viên CEO HN10",
           email: email.trim() || user?.email || "",
           phone: user?.phone || "",
         }),
@@ -156,7 +156,7 @@ export function EventFeedbackModal({
               <span className="text-xs font-bold text-slate-900 dark:text-white block">
                 {feedbacks.length} lượt đánh giá
               </span>
-              <span className="text-[11px] text-slate-500">từ đại biểu &amp; hội viên</span>
+              <span className="text-[11px] text-slate-500">từ đại biểu &amp; Học viên</span>
             </div>
           </div>
 
@@ -177,11 +177,10 @@ export function EventFeedbackModal({
                   className="p-1 hover:scale-110 transition cursor-pointer"
                 >
                   <Star
-                    className={`h-5 w-5 ${
-                      s <= rating
+                    className={`h-5 w-5 ${s <= rating
                         ? "text-amber-500 fill-amber-500"
                         : "text-slate-300 dark:text-slate-600"
-                    }`}
+                      }`}
                   />
                 </button>
               ))}
@@ -206,19 +205,19 @@ export function EventFeedbackModal({
                 </label>
               </div>
               <div className="flex items-center justify-end">
-              <button
-                type="submit"
-                disabled={submitting}
-                className="px-4 py-2 rounded-xl bg-[#003B95] text-white font-bold text-xs shadow-xs hover:bg-[#002f78] transition flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
-              >
-                {submitting ? (
-                  <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                ) : (
-                  <Send className="h-3.5 w-3.5" />
-                )}
-                <span>Gửi Đánh Giá</span>
-              </button>
-            </div>
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  className="px-4 py-2 rounded-xl bg-[#003B95] text-white font-bold text-xs shadow-xs hover:bg-[#002f78] transition flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+                >
+                  {submitting ? (
+                    <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  ) : (
+                    <Send className="h-3.5 w-3.5" />
+                  )}
+                  <span>Gửi Đánh Giá</span>
+                </button>
+              </div>
             </div>
           </form>
 

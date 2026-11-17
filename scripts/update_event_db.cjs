@@ -8,7 +8,7 @@ const client = new Client({
 async function run() {
   await client.connect();
   const bannerUrl = '/upload/file/avatars/00000000-0000-4000-8000-000000000002-1794424072529-tx43wu.jpg';
-  const desc = 'Chương trình Kỷ niệm 4 năm Thành lập Viện Doanh Trí & Tọa đàm Kinh tế: Doanh Nghiệp Việt 2027 kết hợp Tri ân Ngày Nhà giáo Việt Nam 20/11. Chủ đề: Củng cố nội lực - Tạo đà tăng trưởng | Thị trường - Dòng tiền - Năng suất trong kỷ nguyên AI. Thời gian: 15:00 - 22:00 | Thứ Bảy, 21/11/2026. Địa điểm: Nhà hàng Long Phụng - Tầng 2, Tòa nhà 29T2, Hoàng Đạo Thúy, Cầu Giấy, Hà Nội. Phí tham dự: 0 VNĐ (Miễn phí cho Hội viên CEO HN10 & Khách mời danh dự).';
+  const desc = 'Chương trình Kỷ niệm 4 năm Thành lập Viện Doanh Trí & Tọa đàm Kinh tế: Doanh Nghiệp Việt 2027 kết hợp Tri ân Ngày Nhà giáo Việt Nam 20/11. Chủ đề: Củng cố nội lực - Tạo đà tăng trưởng | Thị trường - Dòng tiền - Năng suất trong kỷ nguyên AI. Thời gian: 15:00 - 22:00 | Thứ Bảy, 21/11/2026. Địa điểm: Nhà hàng Long Phụng - Tầng 2, Tòa nhà 29T2, Hoàng Đạo Thúy, Cầu Giấy, Hà Nội. Phí tham dự: 0 VNĐ (Miễn phí cho Học viên CEO HN10 & Khách mời danh dự).';
 
   await client.query(`
     UPDATE public.events

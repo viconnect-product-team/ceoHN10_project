@@ -154,7 +154,7 @@ export function OmnichannelBroadcastModal({
                 </span>
               </h3>
               <p className="text-xs text-slate-400">
-                Lựa chọn 1, 2 hoặc tất cả các kênh truyền thông để gửi thư mời tới Hội viên
+                Lựa chọn 1, 2 hoặc tất cả các kênh truyền thông để gửi thư mời tới Học viên
               </p>
             </div>
           </div>
@@ -239,11 +239,10 @@ export function OmnichannelBroadcastModal({
             <div className="grid grid-cols-1 gap-2.5">
               {/* KÊNH 1: GỬI VÀO APP */}
               <label
-                className={`relative flex items-start gap-3.5 p-3.5 rounded-xl border transition cursor-pointer select-none ${
-                  sendToApp
+                className={`relative flex items-start gap-3.5 p-3.5 rounded-xl border transition cursor-pointer select-none ${sendToApp
                     ? "border-blue-500/80 bg-blue-950/30 ring-1 ring-blue-500/40"
                     : "border-slate-800 bg-slate-900/60 hover:border-slate-700"
-                }`}
+                  }`}
               >
                 <div className="pt-0.5">
                   <input
@@ -266,18 +265,17 @@ export function OmnichannelBroadcastModal({
                     </span>
                   </div>
                   <p className="text-xs text-slate-400 mt-1 pl-6">
-                    Bắn thông báo Push Notification tới thiết bị Hội viên &amp; tự động tạo bài viết phát thanh kèm poster lên Bảng tin Mạng lưới Hội viên.
+                    Bắn thông báo Push Notification tới thiết bị Học viên &amp; tự động tạo bài viết phát thanh kèm poster lên Bảng tin Mạng lưới Học viên.
                   </p>
                 </div>
               </label>
 
               {/* KÊNH 2: GỬI VÀO ZALO OA */}
               <label
-                className={`relative flex items-start gap-3.5 p-3.5 rounded-xl border transition cursor-pointer select-none ${
-                  sendToZalo
+                className={`relative flex items-start gap-3.5 p-3.5 rounded-xl border transition cursor-pointer select-none ${sendToZalo
                     ? "border-cyan-500/80 bg-cyan-950/30 ring-1 ring-cyan-500/40"
                     : "border-slate-800 bg-slate-900/60 hover:border-slate-700"
-                }`}
+                  }`}
               >
                 <div className="pt-0.5">
                   <input
@@ -300,18 +298,17 @@ export function OmnichannelBroadcastModal({
                     </span>
                   </div>
                   <p className="text-xs text-slate-400 mt-1 pl-6">
-                    Gửi tin nhắn Zalo OA trực tiếp tới SĐT / Zalo UID của Hội viên kèm link mở vé tham dự và xác nhận check-in.
+                    Gửi tin nhắn Zalo OA trực tiếp tới SĐT / Zalo UID của Học viên kèm link mở vé tham dự và xác nhận check-in.
                   </p>
                 </div>
               </label>
 
               {/* KÊNH 3: GỬI VÀO EMAIL */}
               <label
-                className={`relative flex items-start gap-3.5 p-3.5 rounded-xl border transition cursor-pointer select-none ${
-                  sendToEmail
+                className={`relative flex items-start gap-3.5 p-3.5 rounded-xl border transition cursor-pointer select-none ${sendToEmail
                     ? "border-amber-500/80 bg-amber-950/30 ring-1 ring-amber-500/40"
                     : "border-slate-800 bg-slate-900/60 hover:border-slate-700"
-                }`}
+                  }`}
               >
                 <div className="pt-0.5">
                   <input
@@ -351,24 +348,22 @@ export function OmnichannelBroadcastModal({
               <button
                 type="button"
                 onClick={() => setTargetAudience("all")}
-                className={`p-2.5 rounded-lg border text-left text-xs font-medium transition cursor-pointer ${
-                  targetAudience === "all"
+                className={`p-2.5 rounded-lg border text-left text-xs font-medium transition cursor-pointer ${targetAudience === "all"
                     ? "border-amber-500 bg-amber-950/30 text-amber-200"
                     : "border-slate-800 bg-slate-900/60 text-slate-400 hover:text-slate-200"
-                }`}
+                  }`}
               >
-                <div className="font-bold">Toàn bộ Hội viên CLB</div>
-                <div className="text-[10px] text-slate-400">Tất cả hội viên chính thức</div>
+                <div className="font-bold">Toàn bộ Học viên CLB</div>
+                <div className="text-[10px] text-slate-400">Tất cả Học viên chính thức</div>
               </button>
 
               <button
                 type="button"
                 onClick={() => setTargetAudience("executives")}
-                className={`p-2.5 rounded-lg border text-left text-xs font-medium transition cursor-pointer ${
-                  targetAudience === "executives"
+                className={`p-2.5 rounded-lg border text-left text-xs font-medium transition cursor-pointer ${targetAudience === "executives"
                     ? "border-amber-500 bg-amber-950/30 text-amber-200"
                     : "border-slate-800 bg-slate-900/60 text-slate-400 hover:text-slate-200"
-                }`}
+                  }`}
               >
                 <div className="font-bold">Ban Điều Hành &amp; Trưởng Ban</div>
                 <div className="text-[10px] text-slate-400">Lãnh đạo &amp; Thường trực CLB</div>
@@ -377,11 +372,10 @@ export function OmnichannelBroadcastModal({
               <button
                 type="button"
                 onClick={() => setTargetAudience("department")}
-                className={`p-2.5 rounded-lg border text-left text-xs font-medium transition cursor-pointer ${
-                  targetAudience === "department"
+                className={`p-2.5 rounded-lg border text-left text-xs font-medium transition cursor-pointer ${targetAudience === "department"
                     ? "border-amber-500 bg-amber-950/30 text-amber-200"
                     : "border-slate-800 bg-slate-900/60 text-slate-400 hover:text-slate-200"
-                }`}
+                  }`}
               >
                 <div className="font-bold">Theo Ban Chuyên Môn</div>
                 <div className="text-[10px] text-slate-400">Chỉ gửi cho 1 ban chuyên môn</div>
@@ -390,13 +384,12 @@ export function OmnichannelBroadcastModal({
               <button
                 type="button"
                 onClick={() => setTargetAudience("registered")}
-                className={`p-2.5 rounded-lg border text-left text-xs font-medium transition cursor-pointer ${
-                  targetAudience === "registered"
+                className={`p-2.5 rounded-lg border text-left text-xs font-medium transition cursor-pointer ${targetAudience === "registered"
                     ? "border-amber-500 bg-amber-950/30 text-amber-200"
                     : "border-slate-800 bg-slate-900/60 text-slate-400 hover:text-slate-200"
-                }`}
+                  }`}
               >
-                <div className="font-bold">Hội viên Đã Đăng Ký</div>
+                <div className="font-bold">Học viên Đã Đăng Ký</div>
                 <div className="text-[10px] text-slate-400">Gửi nhắc hẹn &amp; xác nhận</div>
               </button>
             </div>
@@ -443,11 +436,10 @@ export function OmnichannelBroadcastModal({
               type="button"
               disabled={isSending || totalChannelsSelected === 0}
               onClick={handleBroadcast}
-              className={`flex items-center gap-2 px-5 py-2 text-xs font-bold rounded-lg transition shadow-lg cursor-pointer ${
-                isSending || totalChannelsSelected === 0
+              className={`flex items-center gap-2 px-5 py-2 text-xs font-bold rounded-lg transition shadow-lg cursor-pointer ${isSending || totalChannelsSelected === 0
                   ? "bg-slate-800 text-slate-500 cursor-not-allowed"
                   : "bg-linear-to-r from-amber-500 via-amber-600 to-amber-700 text-slate-950 hover:brightness-110 shadow-amber-500/20"
-              }`}
+                }`}
             >
               <Send className="size-3.5" />
               <span>{isSending ? "Đang phát thư mời..." : "Áp Dụng & Gửi Ngay"}</span>

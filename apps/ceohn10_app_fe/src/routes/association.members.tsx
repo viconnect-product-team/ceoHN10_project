@@ -209,7 +209,7 @@ function MembersScreen() {
     return null;
   });
 
-  // 4 Danh mục chuẩn: Tất cả hội viên | Bạn bè | Lịch hẹn | Danh thiếp đã quét
+  // 4 Danh mục chuẩn: Tất cả Học viên | Bạn bè | Lịch hẹn | Danh thiếp đã quét
   const [tab, setTab] = useState<FilterTab>(() => {
     if (typeof window !== "undefined") {
       const t = new URLSearchParams(window.location.search).get("tab");
@@ -406,7 +406,7 @@ function MembersScreen() {
     try {
       await fetchNestApi(`/meetings/connection-appointments/${cancelMeetingTarget.id}/cancel`, {
         method: "POST",
-        body: JSON.stringify({ reason: meetingCancelReason || "Hủy theo yêu cầu hội viên" }),
+        body: JSON.stringify({ reason: meetingCancelReason || "Hủy theo yêu cầu Học viên" }),
       });
       setMeetingsList((prev) =>
         prev.map((item) =>
@@ -420,12 +420,12 @@ function MembersScreen() {
           const list = JSON.parse(stored);
           const updated = list.map((item: any) =>
             item.id === cancelMeetingTarget.id
-              ? { ...item, status: "cancelled", cancelReason: meetingCancelReason || "Hủy theo yêu cầu hội viên" }
+              ? { ...item, status: "cancelled", cancelReason: meetingCancelReason || "Hủy theo yêu cầu Học viên" }
               : item,
           );
           localStorage.setItem("vba_connection_appointments", JSON.stringify(updated));
         }
-      } catch {}
+      } catch { }
 
       toast.success("Đã hủy lịch hẹn gặp gỡ thành công!");
       setCancelMeetingTarget(null);
@@ -627,7 +627,7 @@ function MembersScreen() {
         id: req.id,
         member: m || null,
         code: m?.code || uidClean,
-        name: m?.contact || m?.personName || m?.name || "Hội viên CEO HN10",
+        name: m?.contact || m?.personName || m?.name || "Học viên CEO HN10",
         company: (m?.type === "company" ? m?.name : m?.company) || "CLB Doanh Nhân CEO HN10",
         title: m?.personTitle || m?.industry || "Doanh nhân",
         avatar: m?.avatar ? resolveMediaUrl(m.avatar) : null,
@@ -664,7 +664,7 @@ function MembersScreen() {
         if (latestId) {
           localStorage.setItem("vba_latest_connected_id", latestId);
         }
-      } catch {}
+      } catch { }
 
       setConnectedSet((prev) => {
         const next = new Set(prev);
@@ -710,7 +710,7 @@ function MembersScreen() {
     return Boolean(m.userId && connectedMap.has(mUserId));
   };
 
-  // 0. Tất cả hội viên (Danh mục Tất cả hội viên - Yêu cầu 4)
+  // 0. Tất cả Học viên (Danh mục Tất cả Học viên - Yêu cầu 4)
   const allMembers = useMemo(() => {
     return members.filter((m) => {
       if (myMember?.code && m.code.toLowerCase() === myMember.code.toLowerCase()) return false;
@@ -758,7 +758,7 @@ function MembersScreen() {
     });
   }, [members, myMember, disconnectedSet, connectedSet, backendConnectedUserIds, connectedMap]);
 
-  // 2. Danh sách hội viên CHƯA KẾT NỐI (Hiển thị ở Tab Khám phá / Tìm kiếm để gửi kết nối)
+  // 2. Danh sách Học viên CHƯA KẾT NỐI (Hiển thị ở Tab Khám phá / Tìm kiếm để gửi kết nối)
   const discoverMembers = useMemo(() => {
     return members.filter((m) => {
       if (myMember?.code && m.code.toLowerCase() === myMember.code.toLowerCase()) return false;
@@ -824,7 +824,7 @@ function MembersScreen() {
     );
   }, [members, latestConnectedId]);
 
-  // Các chữ cái thực tế có hội viên trong danh bạ
+  // Các chữ cái thực tế có Học viên trong danh bạ
   const existingLetters = useMemo(() => {
     return Object.keys(groupedConnected).sort((a, b) => {
       if (a === "#") return 1;
@@ -957,7 +957,7 @@ function MembersScreen() {
         id: req.id,
         member: m || null,
         code: m?.code || tidClean,
-        name: m?.contact || m?.personName || m?.name || "Hội viên CEO HN10",
+        name: m?.contact || m?.personName || m?.name || "Học viên CEO HN10",
         company: (m?.type === "company" ? m?.name : m?.company) || "CLB Doanh Nhân CEO HN10",
         title: m?.personTitle || m?.industry || "Doanh nhân",
         avatar: m?.avatar ? resolveMediaUrl(m.avatar) : null,
@@ -984,7 +984,7 @@ function MembersScreen() {
           member: m || null,
           code: m?.code || l.targetCode,
           name:
-            m?.contact || m?.personName || m?.name || (l as any).targetName || "Hội viên CEO HN10",
+            m?.contact || m?.personName || m?.name || (l as any).targetName || "Học viên CEO HN10",
           company:
             (m?.type === "company" ? m?.name : m?.company) ||
             (l as any).targetCompany ||
@@ -1105,7 +1105,7 @@ function MembersScreen() {
         (c) => String(c).toLowerCase() !== mCode && String(c).toLowerCase() !== mUserId,
       );
       localStorage.setItem("vba.disconnected_members", JSON.stringify(nextD));
-    } catch {}
+    } catch { }
 
     setDisconnectedSet((prev) => {
       const next = new Set(prev);
@@ -1150,21 +1150,21 @@ function MembersScreen() {
         targetUserId: m.userId || m.code,
         targetMemberCode: m.code,
         requesterProfile: {
-          display_name: myMember?.name || "Hội viên CEO HN10",
-          name: myMember?.name || "Hội viên CEO HN10",
+          display_name: myMember?.name || "Học viên CEO HN10",
+          name: myMember?.name || "Học viên CEO HN10",
           avatar_url: myMember?.avatar,
           memberCode: myMember?.code,
           userId: myMember?.userId,
           company_name: (myMember as any)?.company || "CLB Doanh Nhân CEO HN10",
-          job_title: (myMember as any)?.title || "Hội viên Chính thức",
+          job_title: (myMember as any)?.title || "Học viên Chính thức",
           targetMemberCode: m.code,
           targetMemberId: m.userId,
         },
         connectionId: reqId,
       });
-    } catch {}
+    } catch { }
 
-    const messageText = `Xin chào, tôi là ${myMember?.name || "Hội viên"} thuộc Hiệp hội Doanh nhân CEO HN10. Rất mong được kết nối cùng bạn!`;
+    const messageText = `Xin chào, tôi là ${myMember?.name || "Học viên"} thuộc Hiệp hội Doanh nhân CEO HN10. Rất mong được kết nối cùng bạn!`;
 
     try {
       await fetchNestApi<any>("/network/requests", {
@@ -1247,7 +1247,7 @@ function MembersScreen() {
 
   const handleCallPhone = (phone?: string | null, name?: string) => {
     if (!phone) {
-      toast.info(`Hội viên ${name || ""} chưa công khai số điện thoại`);
+      toast.info(`Học viên ${name || ""} chưa công khai số điện thoại`);
       return;
     }
     window.location.href = `tel:${phone.replace(/\s+/g, "")}`;
@@ -1281,7 +1281,7 @@ function MembersScreen() {
                 ? "Tìm theo tên CEO, công ty, SĐT trong danh bạ bạn bè..."
                 : tab === "scanned_cards"
                   ? "Tìm danh thiếp CEO đã quét theo tên, công ty, SĐT..."
-                  : "Tìm kiếm hội viên, ngành nghề..."
+                  : "Tìm kiếm Học viên, ngành nghề..."
             }
             className="w-full min-w-0 bg-transparent text-[13px] text-slate-900 dark:text-white border-0 outline-none ring-0 placeholder:text-slate-400 whitespace-normal break-words"
           />
@@ -1306,11 +1306,10 @@ function MembersScreen() {
               setConnectionFilter("connected");
               handleSelectTab(connectedSubTab);
             }}
-            className={`py-2 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer ${
-              connectionFilter === "connected"
+            className={`py-2 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer ${connectionFilter === "connected"
                 ? "bg-[#003B95] text-white shadow-xs font-black"
                 : "text-slate-600 dark:text-slate-400 hover:text-slate-900"
-            }`}
+              }`}
           >
             <UserCheck className="size-3.5" />
             <span>Đã kết nối ({connectedMembers.length})</span>
@@ -1321,11 +1320,10 @@ function MembersScreen() {
               setConnectionFilter("unconnected");
               handleSelectTab("all");
             }}
-            className={`py-2 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer ${
-              connectionFilter === "unconnected"
+            className={`py-2 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer ${connectionFilter === "unconnected"
                 ? "bg-[#003B95] text-white shadow-xs font-black"
                 : "text-slate-600 dark:text-slate-400 hover:text-slate-900"
-            }`}
+              }`}
           >
             <Users className="size-3.5" />
             <span>Chưa kết nối ({discoverMembers.length})</span>
@@ -1340,11 +1338,10 @@ function MembersScreen() {
           <button
             type="button"
             onClick={() => handleSelectTab("friends")}
-            className={`shrink-0 whitespace-nowrap rounded-xl px-3.5 py-1.5 text-[12px] font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
-              tab === "friends"
+            className={`shrink-0 whitespace-nowrap rounded-xl px-3.5 py-1.5 text-[12px] font-bold transition-all flex items-center gap-1.5 cursor-pointer ${tab === "friends"
                 ? "bg-[#003B95] text-white font-black shadow-md shadow-blue-900/25"
                 : "bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-white/10"
-            }`}
+              }`}
           >
             <UserCheck className={`h-3.5 w-3.5 ${tab === "friends" ? "text-white" : "text-[#003B95] dark:text-blue-400"}`} />
             <span>Bạn bè ({connectedMembers.length})</span>
@@ -1354,11 +1351,10 @@ function MembersScreen() {
           <button
             type="button"
             onClick={() => handleSelectTab("invitations")}
-            className={`shrink-0 whitespace-nowrap rounded-xl px-3.5 py-1.5 text-[12px] font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
-              tab === "invitations"
+            className={`shrink-0 whitespace-nowrap rounded-xl px-3.5 py-1.5 text-[12px] font-bold transition-all flex items-center gap-1.5 cursor-pointer ${tab === "invitations"
                 ? "bg-[#003B95] text-white font-black shadow-md shadow-blue-900/25"
                 : "bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-white/10"
-            }`}
+              }`}
           >
             <UserPlus className={`h-3.5 w-3.5 ${tab === "invitations" ? "text-white" : "text-[#003B95] dark:text-blue-400"}`} />
             <span>Lời mời</span>
@@ -1373,11 +1369,10 @@ function MembersScreen() {
           <button
             type="button"
             onClick={() => handleSelectTab("sent")}
-            className={`shrink-0 whitespace-nowrap rounded-xl px-3.5 py-1.5 text-[12px] font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
-              tab === "sent"
+            className={`shrink-0 whitespace-nowrap rounded-xl px-3.5 py-1.5 text-[12px] font-bold transition-all flex items-center gap-1.5 cursor-pointer ${tab === "sent"
                 ? "bg-[#003B95] text-white font-black shadow-md shadow-blue-900/25"
                 : "bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-white/10"
-            }`}
+              }`}
           >
             <Clock className={`h-3.5 w-3.5 ${tab === "sent" ? "text-white" : "text-[#003B95] dark:text-blue-400"}`} />
             <span>Đã gửi</span>
@@ -1392,11 +1387,10 @@ function MembersScreen() {
           <button
             type="button"
             onClick={() => handleSelectTab("scanned_cards")}
-            className={`shrink-0 whitespace-nowrap rounded-xl px-3.5 py-1.5 text-[12px] font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
-              tab === "scanned_cards"
+            className={`shrink-0 whitespace-nowrap rounded-xl px-3.5 py-1.5 text-[12px] font-bold transition-all flex items-center gap-1.5 cursor-pointer ${tab === "scanned_cards"
                 ? "bg-[#003B95] text-white font-bold shadow-xs ring-1 ring-blue-600"
                 : "bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-white/10"
-            }`}
+              }`}
           >
             <QrCode className={`h-3.5 w-3.5 ${tab === "scanned_cards" ? "text-white" : "text-[#003B95] dark:text-blue-400"}`} />
             <span>Danh thiếp đã lưu ({scannedCards.length})</span>
@@ -1415,7 +1409,7 @@ function MembersScreen() {
 
 
 
-        {/* ── TAB CHƯA KẾT NỐI / TẤT CẢ HỘI VIÊN (Yêu cầu 2: Chưa kết nối sẽ có danh mục tất cả tài khoản chưa kết nối) ── */}
+        {/* ── TAB CHƯA KẾT NỐI / TẤT CẢ Học viên (Yêu cầu 2: Chưa kết nối sẽ có danh mục tất cả tài khoản chưa kết nối) ── */}
         {tab === "all" && !loading && (
           <div className="space-y-3">
             {(connectionFilter === "unconnected" ? filteredDiscover.length : filteredAllMembers.length) === 0 ? (
@@ -1423,8 +1417,8 @@ function MembersScreen() {
                 <Users className="h-10 w-10 mx-auto text-slate-300 dark:text-slate-600 mb-2" />
                 <p className="text-[13px] font-medium text-slate-500">
                   {q
-                    ? "Không tìm thấy hội viên phù hợp với từ khóa."
-                    : "Chưa có dữ liệu hội viên."}
+                    ? "Không tìm thấy Học viên phù hợp với từ khóa."
+                    : "Chưa có dữ liệu Học viên."}
                 </p>
               </div>
             ) : (
@@ -1435,7 +1429,7 @@ function MembersScreen() {
                   m.personName ||
                   (m.type === "individual" ? m.name : "Đại diện Doanh nghiệp");
                 const rawCompany = m.type === "company" ? m.name : (m as any).companyName || m.company || "";
-                // Yêu cầu 2: Khắc phục triệt để lỗi double tên hội viên trong danh bạ
+                // Yêu cầu 2: Khắc phục triệt để lỗi double tên Học viên trong danh bạ
                 const companyDisplayName =
                   rawCompany && rawCompany.trim().toLowerCase() !== personDisplayName.trim().toLowerCase()
                     ? rawCompany
@@ -1495,7 +1489,7 @@ function MembersScreen() {
                           </p>
                         )}
                         <p className="whitespace-normal break-words text-[11px] text-slate-400 mt-0.5">
-                          {m.personTitle || m.industry || "Hội viên CEO HN10"}
+                          {m.personTitle || m.industry || "Học viên CEO HN10"}
                         </p>
                       </div>
                     </div>
@@ -1699,7 +1693,7 @@ function MembersScreen() {
                 <div className="space-y-1">
                   <p className="text-sm font-bold text-slate-800 dark:text-white">Chưa có lời mời nào đang chờ</p>
                   <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto">
-                    Khi bạn gửi lời mời kết nối tới các hội viên khác, yêu cầu đang chờ xác nhận sẽ hiển thị tại đây để bạn có thể xem lại hoặc hủy khi cần.
+                    Khi bạn gửi lời mời kết nối tới các Học viên khác, yêu cầu đang chờ xác nhận sẽ hiển thị tại đây để bạn có thể xem lại hoặc hủy khi cần.
                   </p>
                 </div>
               </div>
@@ -1756,7 +1750,7 @@ function MembersScreen() {
           </div>
         )}
 
-                {/* ── TAB 2: BẠN BÈ CEO (CHỈ HIỆN NGƯỜI ĐÃ KẾT NỐI, NHÓM A-Z) ── */}
+        {/* ── TAB 2: BẠN BÈ CEO (CHỈ HIỆN NGƯỜI ĐÃ KẾT NỐI, NHÓM A-Z) ── */}
         {tab === "friends" && !loading && (
           <div className="relative">
             {/* ── KHỐI NỔI BẬT: NGƯỜI VỪA KẾT NỐI MỚI NHẤT (Yêu cầu 1) ── */}
@@ -1832,7 +1826,7 @@ function MembersScreen() {
                             </p>
                           ) : null}
                           <p className="text-[11px] text-slate-400 mt-0.5">
-                            {m.personTitle || m.industry || "Hội viên CEO HN10"}
+                            {m.personTitle || m.industry || "Học viên CEO HN10"}
                           </p>
                         </div>
                       </div>
@@ -1888,11 +1882,10 @@ function MembersScreen() {
                     key={char}
                     type="button"
                     onClick={() => scrollToLetter(char)}
-                    className={`h-7 min-w-[28px] px-1.5 rounded-lg text-[11px] font-black transition-all flex items-center justify-center shrink-0 cursor-pointer active:scale-95 ${
-                      activeAlphabet === char
+                    className={`h-7 min-w-[28px] px-1.5 rounded-lg text-[11px] font-black transition-all flex items-center justify-center shrink-0 cursor-pointer active:scale-95 ${activeAlphabet === char
                         ? "bg-amber-400 text-slate-950 shadow-xs scale-105"
                         : "bg-slate-100 dark:bg-white/5 text-[#003B95] dark:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-950/40"
-                    }`}
+                      }`}
                   >
                     {char}
                   </button>
@@ -1962,7 +1955,7 @@ function MembersScreen() {
                             m.personName ||
                             (m.type === "individual" ? m.name : "Đại diện Doanh nghiệp");
                           const rawCompany = m.type === "company" ? m.name : m.company || "";
-                          // Yêu cầu 2: Khắc phục triệt để lỗi double tên hội viên trong danh bạ
+                          // Yêu cầu 2: Khắc phục triệt để lỗi double tên Học viên trong danh bạ
                           const companyDisplayName =
                             rawCompany && rawCompany.trim().toLowerCase() !== personDisplayName.trim().toLowerCase()
                               ? rawCompany
@@ -2025,7 +2018,7 @@ function MembersScreen() {
 
                                   <div className="flex items-center gap-2 mt-0.5 text-[11px] text-slate-400">
                                     <span className="whitespace-normal break-words">
-                                      {m.personTitle || m.industry || "Hội viên CEO HN10"}
+                                      {m.personTitle || m.industry || "Học viên CEO HN10"}
                                     </span>
                                     {m.phone && (
                                       <>
@@ -2110,13 +2103,12 @@ function MembersScreen() {
                       type="button"
                       disabled={!hasEntries}
                       onClick={() => scrollToLetter(char)}
-                      className={`h-4.5 w-4.5 rounded-full flex items-center justify-center transition-all cursor-pointer ${
-                        activeAlphabet === char
+                      className={`h-4.5 w-4.5 rounded-full flex items-center justify-center transition-all cursor-pointer ${activeAlphabet === char
                           ? "bg-amber-400 text-slate-950 font-bold scale-125"
                           : hasEntries
                             ? "text-[#003B95] dark:text-amber-300 hover:scale-115 font-bold"
                             : "text-slate-300 dark:text-slate-600 opacity-40 cursor-default"
-                      }`}
+                        }`}
                     >
                       {char}
                     </button>
@@ -2127,7 +2119,7 @@ function MembersScreen() {
           </div>
         )}
 
-        
+
         {/* ── TAB 4: DANH THIẾP ĐÃ QUÉT (Yêu cầu 10) ── */}
         {tab === "scanned_cards" && !loading && (
           <div className="space-y-3">
@@ -2167,7 +2159,7 @@ function MembersScreen() {
                 <p className="text-xs text-slate-500 dark:text-slate-400 max-w-xs mx-auto mt-1 mb-4 leading-relaxed whitespace-normal break-words">
                   {q
                     ? `Không tìm thấy danh thiếp nào khớp với từ khóa "${q}".`
-                    : "Quét mã QR Thẻ 83 của các hội viên CEO HN10 để tự động lưu vào danh mục này. Danh thiếp không thuộc CEO HN10 sẽ được gợi ý lưu vào danh bạ thiết bị hoặc kết nối Zalo."}
+                    : "Quét mã QR Thẻ 83 của các Học viên CEO HN10 để tự động lưu vào danh mục này. Danh thiếp không thuộc CEO HN10 sẽ được gợi ý lưu vào danh bạ thiết bị hoặc kết nối Zalo."}
                 </p>
                 <button
                   type="button"
@@ -2184,12 +2176,12 @@ function MembersScreen() {
                   const avatarResolved = card.avatar ? resolveMediaUrl(card.avatar) : null;
                   const formattedDate = card.scannedAt
                     ? new Date(card.scannedAt).toLocaleDateString("vi-VN", {
-                        day: "2-digit",
-                        month: "2-digit",
-                        year: "numeric",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })
+                      day: "2-digit",
+                      month: "2-digit",
+                      year: "numeric",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })
                     : "";
 
                   return (
@@ -2222,7 +2214,7 @@ function MembersScreen() {
                             </span>
                             <span className="inline-flex items-center gap-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 px-2 py-0.5 text-[10px] font-bold text-emerald-600 dark:text-emerald-400">
                               <BadgeCheck className="size-2.5" />
-                              <span>Hội viên CEO HN10</span>
+                              <span>Học viên CEO HN10</span>
                             </span>
                           </div>
 
@@ -2373,7 +2365,7 @@ function MembersScreen() {
         </div>
       )}
 
-      {/* Footer Cố Định: Nút Giới Thiệu Hội Viên (Yêu cầu 4) */}
+      {/* Footer Cố Định: Nút Giới Thiệu Học viên (Yêu cầu 4) */}
       <div className="sticky bottom-0 z-20 bg-white/95 dark:bg-[#001B54]/95 backdrop-blur-md border-t border-slate-200 dark:border-white/10 px-4 py-3 shadow-lg flex items-center justify-between gap-3">
         <div className="min-w-0">
           <p className="text-xs font-bold text-slate-800 dark:text-white truncate">
@@ -2389,7 +2381,7 @@ function MembersScreen() {
           className="shrink-0 flex items-center gap-1.5 rounded-xl bg-[#003B95] hover:bg-[#002B70] text-white font-bold px-4 py-2 text-xs shadow-sm active:scale-95 transition cursor-pointer"
         >
           <UserPlus className="h-4 w-4" />
-          <span>Giới thiệu hội viên</span>
+          <span>Giới thiệu Học viên</span>
         </button>
       </div>
 
@@ -2400,9 +2392,9 @@ function MembersScreen() {
         isPending={
           selectedMember
             ? Boolean(
-                (selectedMember.userId && outgoingMap.has(selectedMember.userId.toLowerCase())) ||
-                  localPending.has((selectedMember.userId || selectedMember.code).toLowerCase()),
-              )
+              (selectedMember.userId && outgoingMap.has(selectedMember.userId.toLowerCase())) ||
+              localPending.has((selectedMember.userId || selectedMember.code).toLowerCase()),
+            )
             : false
         }
         onClose={() => setSelectedMember(null)}

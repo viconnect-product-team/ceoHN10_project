@@ -69,7 +69,7 @@ const initialIncomeColWidths: Record<IncomeColKey, number> = {
 function getCategoryLabel(cat: string) {
   switch (cat) {
     case "membership_fee":
-      return "Phí hội viên";
+      return "Phí Học viên";
     case "event_ticket":
       return "Vé sự kiện";
     case "event_walkin":
@@ -281,14 +281,14 @@ function IncomePage() {
   const getRecipientName = (tx: Transaction) => {
     if (tx.recipient && tx.recipient.trim() && tx.recipient !== "—") return tx.recipient;
     if (tx.description) {
-      const match = tx.description.match(/Hội viên:\s*([^,\-\.\n]+)/i);
+      const match = tx.description.match(/Học viên:\s*([^,\-\.\n]+)/i);
       if (match && match[1]) return match[1].trim();
       if (tx.description.includes("Vũ Phan Vũ")) return "Vũ Phan Vũ";
       if (tx.description.includes("Lê Thị Dung")) return "Lê Thị Dung";
       if (tx.description.includes("Đặng Quốc Bảo")) return "Đặng Quốc Bảo";
       if (tx.description.includes("Nguyễn Văn Hùng")) return "Nguyễn Văn Hùng";
     }
-    return "Hội viên nộp quỹ";
+    return "Học viên nộp quỹ";
   };
 
   // Only consider income transactions
@@ -495,9 +495,9 @@ function IncomePage() {
         sampleVoucher: {
           code: tc.sorted[0]?.id || "PT-2026-001",
           date: formatDisplayDate(tc.sorted[0]?.date || new Date()),
-          personName: tc.sorted[0]?.recipient || "Đại diện Hội viên nộp quỹ",
+          personName: tc.sorted[0]?.recipient || "Đại diện Học viên nộp quỹ",
           address: "Hà Nội",
-          reason: tc.sorted[0]?.description || "Thu nộp hội phí hội viên CLB Doanh Nhân CEO HN10",
+          reason: tc.sorted[0]?.description || "Thu nộp hội phí Học viên CLB Doanh Nhân CEO HN10",
           amount: tc.sorted[0]?.amount || 50000000,
           attachedDocs: "01 Giấy báo có / Biên lai nộp tiền",
           debitAccount: tc.sorted[0]?.method === "cash" ? "111" : "112",
@@ -512,7 +512,7 @@ function IncomePage() {
     <AppShell>
       <PageHeader
         title="Quản Lý Thu"
-        subtitle="Theo dõi toàn bộ nguồn thu quỹ, phí hội viên, vé sự kiện, thu đột xuất tiền mặt tại bàn đón tiếp & chuyển khoản ngân hàng"
+        subtitle="Theo dõi toàn bộ nguồn thu quỹ, phí Học viên, vé sự kiện, thu đột xuất tiền mặt tại bàn đón tiếp & chuyển khoản ngân hàng"
         actions={
           <div className="flex flex-wrap items-center gap-2">
             <button
@@ -538,7 +538,7 @@ function IncomePage() {
             </button>
             <button
               onClick={() => openCreate("event_walkin", "cash")}
-              className="inline-flex items-center gap-1.5 rounded-xl bg-[#003B95] hover:bg-[#002B70] px-3.5 py-2 text-xs font-bold text-white shadow-xs cursor-pointer transition"
+              className="inline-flex items-center gap-1.5 rounded-xl bg-[#334155] hover:bg-[#1E293B] px-3.5 py-2 text-xs font-bold text-white shadow-xs cursor-pointer transition"
             >
               <Banknote className="h-4 w-4" />
               <span>Thu Tiền Mặt Trực Tiếp</span>
@@ -599,8 +599,8 @@ function IncomePage() {
             {/* Card 1: Tổng thu quỹ (Xanh Navy) */}
             <div className="p-4 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 flex flex-col justify-between gap-2 shadow-xs">
               <div className="flex items-center justify-between">
-                <span className="text-[#003B95] dark:text-blue-400 text-xs font-bold uppercase tracking-wider">TỔNG THU QUỸ</span>
-                <span className="size-2 rounded-full bg-[#003B95]" />
+                <span className="text-slate-800 dark:text-slate-200 text-xs font-bold uppercase tracking-wider">TỔNG THU QUỸ</span>
+                <span className="size-2 rounded-full bg-slate-700" />
               </div>
               <div className="text-slate-900 dark:text-slate-100 text-2xl font-black">
                 {fmt.money(totalIncome)}
@@ -733,7 +733,7 @@ function IncomePage() {
                   className={`rounded-lg px-3 py-1 text-xs font-semibold transition-colors ${categoryFilter === "membership_fee" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
                     }`}
                 >
-                  Phí hội viên
+                  Phí Học viên
                 </button>
                 <button
                   onClick={() => setCategoryFilter("event_ticket")}
@@ -948,7 +948,7 @@ function IncomePage() {
               {editing ? "Sửa Phiếu Thu" : "Lập Phiếu Thu Mới"}
             </h3>
             <p className="mt-1 text-xs text-muted-foreground">
-              Ghi nhận nguồn thu quỹ, phí hội viên hoặc thanh toán tiền mặt trực tiếp tại sự kiện
+              Ghi nhận nguồn thu quỹ, phí Học viên hoặc thanh toán tiền mặt trực tiếp tại sự kiện
             </p>
 
             <form onSubmit={onSubmit} className="mt-4 space-y-4">
@@ -970,7 +970,7 @@ function IncomePage() {
                     onChange={(e) => setFormCategory(e.target.value)}
                     className="mt-1 w-full rounded-xl border border-input bg-background px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-primary"
                   >
-                    <option value="membership_fee">Phí hội viên thường niên</option>
+                    <option value="membership_fee">Phí Học viên thường niên</option>
                     <option value="event_ticket">Vé tham gia sự kiện</option>
                     <option value="event_walkin">Thu tiền mặt trực tiếp (Đột xuất tại sự kiện)</option>
                     <option value="sponsor">Tài trợ sự kiện / hiệp hội</option>

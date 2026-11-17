@@ -7,7 +7,7 @@ export class AppController {
   constructor(
     private readonly appService: AppService,
     private readonly prisma: PrismaService,
-  ) {}
+  ) { }
 
   @Get()
   getHello(): string {
@@ -198,7 +198,7 @@ export class AppController {
             try {
               const d = new Date(item.event_date);
               details.push(`Thời gian: ${d.toLocaleDateString('vi-VN')}`);
-            } catch {}
+            } catch { }
           }
           if (item.location) {
             details.push(`Địa điểm: ${item.location}`);
@@ -303,13 +303,13 @@ export class AppController {
                   parsedArticle.thumbnail ||
                   parsedArticle.image;
               }
-            } catch {}
+            } catch { }
           }
 
           richPostData = {
             authorName: item.author_name || 'Doanh nhân CEO HN10',
             authorCompany: item.author_company || 'CLB Doanh Nhân CEO HN10',
-            authorRole: item.author_role || 'Hội viên chính thức',
+            authorRole: item.author_role || 'Học viên chính thức',
             authorAvatar: item.author_avatar
               ? item.author_avatar.startsWith('http')
                 ? item.author_avatar
@@ -317,12 +317,12 @@ export class AppController {
               : 'https://ceohn10.viconnect.vn/logo_ceohn10_round.png',
             createdAt: item.created_at
               ? new Date(item.created_at).toLocaleDateString('vi-VN', {
-                  hour: '2-digit',
-                  minute: '2-digit',
-                  day: '2-digit',
-                  month: '2-digit',
-                  year: 'numeric',
-                })
+                hour: '2-digit',
+                minute: '2-digit',
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+              })
               : '',
             contentFormattedHtml: formattedHtml,
             images: parsedImages,
@@ -361,15 +361,15 @@ export class AppController {
           const escapedContent = rawContent.startsWith('<')
             ? rawContent
             : rawContent
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .split('\n\n')
-                .map(
-                  (p: string) =>
-                    `<p style="margin: 0 0 12px 0; line-height: 1.65; font-size: 15px; color: #1e293b;">${p.replace(/\n/g, '<br/>')}</p>`,
-                )
-                .join('');
+              .replace(/&/g, '&amp;')
+              .replace(/</g, '&lt;')
+              .replace(/>/g, '&gt;')
+              .split('\n\n')
+              .map(
+                (p: string) =>
+                  `<p style="margin: 0 0 12px 0; line-height: 1.65; font-size: 15px; color: #1e293b;">${p.replace(/\n/g, '<br/>')}</p>`,
+              )
+              .join('');
 
           richPostData = {
             authorName: item.author || 'Ban Truyền Thông CEO HN10',
@@ -506,7 +506,7 @@ export class AppController {
                 <span class="author-name">${richPostData.authorName}</span>
                 <span class="verified-badge">✓</span>
               </div>
-              <div class="author-sub">${richPostData.authorCompany ? `${richPostData.authorCompany} · ` : ''}${richPostData.authorRole || 'Hội viên chính thức'}</div>
+              <div class="author-sub">${richPostData.authorCompany ? `${richPostData.authorCompany} · ` : ''}${richPostData.authorRole || 'Học viên chính thức'}</div>
               ${richPostData.createdAt ? `<div class="post-time">🕒 ${richPostData.createdAt}</div>` : ''}
             </div>
           </div>

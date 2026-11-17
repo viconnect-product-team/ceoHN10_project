@@ -59,7 +59,7 @@ function convertMarkdownToHtml(mdText, docTitle, subtitle) {
     if (line.trim().startsWith('|') && line.trim().endsWith('|')) {
       closeList();
       const cells = line.split('|').map(c => c.trim()).slice(1, -1);
-      
+
       // Bỏ qua dòng phân cách |:---|---|:---:|
       if (cells.every(c => /^:?-+:?$/.test(c))) {
         tableHeaderParsed = true;
@@ -393,10 +393,10 @@ async function main() {
   const appHtml = convertMarkdownToHtml(
     appMd,
     'HƯỚNG DẪN THAO TÁC & VẬN HÀNH ỨNG DỤNG HIỆP HỘI DOANH NHÂN CEO HN10',
-    'Phân hệ Di động (Mobile App iOS & Android) & Cổng Đăng Ký Hội Viên Trực Tuyến'
+    'Phân hệ Di động (Mobile App iOS & Android) & Cổng Đăng Ký Học viên Trực Tuyến'
   );
   const outPdfApp = path.join(OUT_DIR, 'HUONG_DAN_SU_DUNG_APP_HIEP_HOI.pdf');
-  await renderPdf(appHtml, outPdfApp, 'Hướng Dẫn Sử Dụng App Hiệp Hội', 'Ứng Dụng Di Động Hội Viên');
+  await renderPdf(appHtml, outPdfApp, 'Hướng Dẫn Sử Dụng App Hiệp Hội', 'Ứng Dụng Di Động Học viên');
   fs.copyFileSync(outPdfApp, path.join(FE_DOCS_DIR, 'HUONG_DAN_SU_DUNG_APP_HIEP_HOI.pdf'));
 
   // 2. PDF Hướng dẫn CRM Quản Trị

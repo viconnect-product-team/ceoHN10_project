@@ -34,7 +34,7 @@ const DEPARTMENTS = [
   "Ban Xúc Tiến",
   "Ban Tài Chính",
   "Ban Thiện Nguyện",
-  "Toàn thể Hội viên chính thức",
+  "Toàn thể Học viên chính thức",
 ];
 
 export const DriveShareModal: React.FC<DriveShareModalProps> = ({
@@ -119,11 +119,11 @@ export const DriveShareModal: React.FC<DriveShareModalProps> = ({
 
   const filteredMembers = searchMember.trim()
     ? members.filter(
-        (m) =>
-          m.name?.toLowerCase().includes(searchMember.toLowerCase()) ||
-          m.email?.toLowerCase().includes(searchMember.toLowerCase()) ||
-          m.company?.toLowerCase().includes(searchMember.toLowerCase())
-      ).slice(0, 6)
+      (m) =>
+        m.name?.toLowerCase().includes(searchMember.toLowerCase()) ||
+        m.email?.toLowerCase().includes(searchMember.toLowerCase()) ||
+        m.company?.toLowerCase().includes(searchMember.toLowerCase())
+    ).slice(0, 6)
     : [];
 
   return (
@@ -166,12 +166,12 @@ export const DriveShareModal: React.FC<DriveShareModalProps> = ({
                 type="text"
                 value={searchMember}
                 onChange={(e) => setSearchMember(e.target.value)}
-                placeholder="Nhập tên hội viên, email hoặc chọn Ban bệ bên dưới..."
+                placeholder="Nhập tên Học viên, email hoặc chọn Ban bệ bên dưới..."
                 className="w-full rounded-xl border border-border bg-background pl-9 pr-4 py-2.5 text-sm focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20"
               />
             </div>
 
-            {/* Gợi ý hội viên khi gõ */}
+            {/* Gợi ý Học viên khi gõ */}
             {filteredMembers.length > 0 && (
               <div className="mt-2 rounded-xl border border-border bg-background p-1.5 shadow-lg space-y-1">
                 {filteredMembers.map((m) => (
@@ -183,7 +183,7 @@ export const DriveShareModal: React.FC<DriveShareModalProps> = ({
                     <div>
                       <div className="text-sm font-semibold text-foreground">{m.name}</div>
                       <div className="text-xs text-muted-foreground">
-                        {m.company || m.email || "Hội viên CLB"}
+                        {m.company || m.email || "Học viên CLB"}
                       </div>
                     </div>
                     <span className="text-xs font-bold text-amber-600 dark:text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-md">
@@ -249,7 +249,7 @@ export const DriveShareModal: React.FC<DriveShareModalProps> = ({
                     <div>
                       <div className="text-sm font-semibold text-foreground">{item.name}</div>
                       <div className="text-xs text-muted-foreground">
-                        {item.type === "dept" ? "Ban bệ nội bộ" : "Hội viên được chỉ định"}
+                        {item.type === "dept" ? "Ban bệ nội bộ" : "Học viên được chỉ định"}
                       </div>
                     </div>
                   </div>

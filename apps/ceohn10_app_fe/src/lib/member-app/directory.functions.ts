@@ -55,7 +55,7 @@ export const listMembers = createServerFn({ method: "GET" })
       companyName: m.company || m.about || "CLB Doanh Nhân CEO HN10",
       contact: m.contact || m.name,
       personName: m.contact || m.name,
-      personTitle: m.executiveRole || "Hội viên chính thức",
+      personTitle: m.executiveRole || "Học viên chính thức",
       email: m.email,
       phone: m.phone,
       about: m.about,
@@ -84,6 +84,6 @@ export const listConnectedMembers = createServerFn({ method: "GET" })
       return data;
     }
 
-    // Nếu chưa có kết nối nào hoặc backend chưa trả về, lấy danh sách hội viên chung
+    // Nếu chưa có kết nối nào hoặc backend chưa trả về, lấy danh sách Học viên chung
     return listMembers();
   });

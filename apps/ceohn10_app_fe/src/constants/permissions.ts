@@ -54,7 +54,7 @@ export const STANDARD_7_COMMITTEES = [
   "Ban thư ký",
   "Ban điều hành",
   "Ban tài chính",
-  "Hội viên ceohn10",
+  "Học viên ceohn10",
 ] as const;
 
 export type SrsRole =

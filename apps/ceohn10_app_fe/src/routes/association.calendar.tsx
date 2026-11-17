@@ -205,7 +205,7 @@ export function CalendarScreen() {
     try {
       const stored = localStorage.getItem("vba_calendar_reminders");
       if (stored) return JSON.parse(stored);
-    } catch {}
+    } catch { }
     return {};
   });
 
@@ -215,7 +215,7 @@ export function CalendarScreen() {
     try {
       const stored = localStorage.getItem("vba_calendar_activity_media");
       if (stored) return JSON.parse(stored);
-    } catch {}
+    } catch { }
     return {};
   });
 
@@ -225,7 +225,7 @@ export function CalendarScreen() {
     try {
       const stored = localStorage.getItem("vba_calendar_diary_notes");
       if (stored) return JSON.parse(stored);
-    } catch {}
+    } catch { }
     return {};
   });
 
@@ -237,21 +237,21 @@ export function CalendarScreen() {
   useEffect(() => {
     try {
       localStorage.setItem("vba_calendar_reminders", JSON.stringify(reminders));
-    } catch {}
+    } catch { }
   }, [reminders]);
 
   // Sync activity photos to localStorage
   useEffect(() => {
     try {
       localStorage.setItem("vba_calendar_activity_media", JSON.stringify(activityPhotosMap));
-    } catch {}
+    } catch { }
   }, [activityPhotosMap]);
 
   // Sync diary notes to localStorage
   useEffect(() => {
     try {
       localStorage.setItem("vba_calendar_diary_notes", JSON.stringify(diaryNotesMap));
-    } catch {}
+    } catch { }
   }, [diaryNotesMap]);
 
   // Helper: compute start time in ms
@@ -332,7 +332,7 @@ export function CalendarScreen() {
             }
           }
         }
-      } catch {}
+      } catch { }
 
       // 2. Load 1-on-1 appointments (CHỈ lưu và hiển thị vào Lịch khi đối phương ĐÃ ĐỒNG Ý)
       try {
@@ -354,7 +354,7 @@ export function CalendarScreen() {
               location: a.venue || a.location || "Highlands Coffee Cầu Giấy, Hà Nội",
               isOnline: a.venueType === "online" || Boolean(a.onlineUrl),
               onlineLink: a.onlineUrl,
-              partnerName: a.partnerName || a.hostName || "Hội viên CLB",
+              partnerName: a.partnerName || a.hostName || "Học viên CLB",
               partnerCompany: a.partnerCompany || a.hostCompany || "Doanh nghiệp CLB",
               partnerPhone: a.partnerPhone || a.hostPhone || "0901234567",
               partnerAvatar: a.partnerAvatar || a.hostAvatar,
@@ -364,7 +364,7 @@ export function CalendarScreen() {
             combined.push(...mapped1on1);
           }
         }
-      } catch {}
+      } catch { }
 
       // 3. Load Committee meetings user actually registered for
       try {
@@ -388,7 +388,7 @@ export function CalendarScreen() {
             combined.push(...mappedMeetings);
           }
         }
-      } catch {}
+      } catch { }
 
       // 4. Load Training sessions
       try {
@@ -416,7 +416,7 @@ export function CalendarScreen() {
             });
           });
         }
-      } catch {}
+      } catch { }
 
       // 5. Load Opportunities
       try {
@@ -443,7 +443,7 @@ export function CalendarScreen() {
             });
           });
         }
-      } catch {}
+      } catch { }
 
       // Fallback defaults if list is completely empty
       if (combined.length === 0) {
@@ -580,7 +580,7 @@ export function CalendarScreen() {
 
   const handleConfirmCancel1on1 = async () => {
     if (!cancelling1on1Target) return;
-    const reason = cancel1on1Reason.trim() || "Hội viên bận công tác đột xuất";
+    const reason = cancel1on1Reason.trim() || "Học viên bận công tác đột xuất";
     setSubmittingCancel1on1(true);
     try {
       await fetchNestApi(`/meetings/connection-appointments/${cancelling1on1Target.id}/cancel`, {
@@ -601,7 +601,7 @@ export function CalendarScreen() {
           );
           localStorage.setItem("vba_connection_appointments", JSON.stringify(updated));
         }
-      } catch {}
+      } catch { }
 
       window.dispatchEvent(new Event("vba.connection.changed"));
       window.dispatchEvent(new Event("vba.meeting.changed"));
@@ -852,11 +852,10 @@ export function CalendarScreen() {
           <button
             type="button"
             onClick={() => setActiveMainTab("schedule")}
-            className={`py-2 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 cursor-pointer ${
-              activeMainTab === "schedule"
+            className={`py-2 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 cursor-pointer ${activeMainTab === "schedule"
                 ? "bg-white dark:bg-slate-900 text-[#003B95] dark:text-white shadow-xs font-black"
                 : "text-slate-600 dark:text-slate-400 hover:text-slate-900"
-            }`}
+              }`}
           >
             <CalendarIcon className="size-4" />
             <span>Lịch trình hoạt động</span>
@@ -865,11 +864,10 @@ export function CalendarScreen() {
           <button
             type="button"
             onClick={() => setActiveMainTab("diary")}
-            className={`py-2 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 cursor-pointer ${
-              activeMainTab === "diary"
+            className={`py-2 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 cursor-pointer ${activeMainTab === "diary"
                 ? "bg-white dark:bg-slate-900 text-amber-600 dark:text-amber-400 shadow-xs font-black"
                 : "text-slate-600 dark:text-slate-400 hover:text-slate-900"
-            }`}
+              }`}
           >
             <BookOpen className="size-4" />
             <span>Nhật ký ở lịch</span>
@@ -945,11 +943,10 @@ export function CalendarScreen() {
               <button
                 type="button"
                 onClick={() => setFilterType(filterType === "EVENT" ? "ALL" : "EVENT")}
-                className={`p-2 rounded-xl border text-center transition cursor-pointer ${
-                  filterType === "EVENT"
+                className={`p-2 rounded-xl border text-center transition cursor-pointer ${filterType === "EVENT"
                     ? "bg-red-500/15 border-red-500/60 text-red-600 dark:text-red-400 font-black"
                     : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300"
-                }`}
+                  }`}
               >
                 <Ticket className="size-3.5 mx-auto text-red-500" />
                 <span className="text-[9px] font-bold block mt-1">Sự kiện</span>
@@ -961,11 +958,10 @@ export function CalendarScreen() {
               <button
                 type="button"
                 onClick={() => setFilterType(filterType === "OPPORTUNITY" ? "ALL" : "OPPORTUNITY")}
-                className={`p-2 rounded-xl border text-center transition cursor-pointer ${
-                  filterType === "OPPORTUNITY"
+                className={`p-2 rounded-xl border text-center transition cursor-pointer ${filterType === "OPPORTUNITY"
                     ? "bg-emerald-500/15 border-emerald-500/60 text-emerald-600 dark:text-emerald-400 font-black"
                     : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300"
-                }`}
+                  }`}
               >
                 <TrendingUp className="size-3.5 mx-auto text-emerald-500" />
                 <span className="text-[9px] font-bold block mt-1">Cơ hội</span>
@@ -977,11 +973,10 @@ export function CalendarScreen() {
               <button
                 type="button"
                 onClick={() => setFilterType(filterType === "MEETING_1ON1" ? "ALL" : "MEETING_1ON1")}
-                className={`p-2 rounded-xl border text-center transition cursor-pointer ${
-                  filterType === "MEETING_1ON1"
+                className={`p-2 rounded-xl border text-center transition cursor-pointer ${filterType === "MEETING_1ON1"
                     ? "bg-blue-500/15 border-blue-500/60 text-blue-600 dark:text-blue-400 font-black"
                     : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300"
-                }`}
+                  }`}
               >
                 <Handshake className="size-3.5 mx-auto text-blue-500" />
                 <span className="text-[9px] font-bold block mt-1">Gặp B2B</span>
@@ -993,11 +988,10 @@ export function CalendarScreen() {
               <button
                 type="button"
                 onClick={() => setFilterType(filterType === "MEETING_COMMITTEE" ? "ALL" : "MEETING_COMMITTEE")}
-                className={`p-2 rounded-xl border text-center transition cursor-pointer ${
-                  filterType === "MEETING_COMMITTEE"
+                className={`p-2 rounded-xl border text-center transition cursor-pointer ${filterType === "MEETING_COMMITTEE"
                     ? "bg-amber-500/15 border-amber-500/60 text-amber-600 dark:text-amber-400 font-black"
                     : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300"
-                }`}
+                  }`}
               >
                 <Users className="size-3.5 mx-auto text-amber-500" />
                 <span className="text-[9px] font-bold block mt-1">Họp ban</span>
@@ -1009,11 +1003,10 @@ export function CalendarScreen() {
               <button
                 type="button"
                 onClick={() => setFilterType(filterType === "TRAINING" ? "ALL" : "TRAINING")}
-                className={`p-2 rounded-xl border text-center transition cursor-pointer ${
-                  filterType === "TRAINING"
+                className={`p-2 rounded-xl border text-center transition cursor-pointer ${filterType === "TRAINING"
                     ? "bg-blue-500/15 border-blue-500/60 text-[#003B95] font-black"
                     : "bg-white border-slate-200 text-slate-600"
-                }`}
+                  }`}
               >
                 <GraduationCap className="size-3.5 mx-auto text-[#003B95]" />
                 <span className="text-[9px] font-bold block mt-1">Đào tạo</span>
@@ -1067,11 +1060,10 @@ export function CalendarScreen() {
                   <button
                     type="button"
                     onClick={() => setViewMode("month_grid")}
-                    className={`p-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1 cursor-pointer ${
-                      viewMode === "month_grid"
+                    className={`p-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1 cursor-pointer ${viewMode === "month_grid"
                         ? "bg-white dark:bg-slate-900 text-[#003B95] dark:text-white shadow-xs"
                         : "text-slate-500 hover:text-slate-800 dark:hover:text-slate-200"
-                    }`}
+                      }`}
                     title="Chế độ Lưới cả tháng"
                   >
                     <Grid3X3 className="size-3.5" />
@@ -1081,11 +1073,10 @@ export function CalendarScreen() {
                   <button
                     type="button"
                     onClick={() => setViewMode("month_list")}
-                    className={`p-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1 cursor-pointer ${
-                      viewMode === "month_list"
+                    className={`p-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1 cursor-pointer ${viewMode === "month_list"
                         ? "bg-white dark:bg-slate-900 text-[#003B95] dark:text-white shadow-xs"
                         : "text-slate-500 hover:text-slate-800 dark:hover:text-slate-200"
-                    }`}
+                      }`}
                     title="Chế độ Danh sách tháng"
                   >
                     <ListIcon className="size-3.5" />
@@ -1095,11 +1086,10 @@ export function CalendarScreen() {
                   <button
                     type="button"
                     onClick={() => setViewMode("strip")}
-                    className={`p-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1 cursor-pointer ${
-                      viewMode === "strip"
+                    className={`p-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1 cursor-pointer ${viewMode === "strip"
                         ? "bg-white dark:bg-slate-900 text-[#003B95] dark:text-white shadow-xs"
                         : "text-slate-500 hover:text-slate-800 dark:hover:text-slate-200"
-                    }`}
+                      }`}
                     title="Chế độ Dải ngày"
                   >
                     <CalendarDays className="size-3.5" />
@@ -1136,20 +1126,18 @@ export function CalendarScreen() {
                             }
                           }}
                           disabled={!cell.isCurrentMonth}
-                          className={`aspect-square p-1 rounded-2xl flex flex-col items-center justify-between transition cursor-pointer relative ${
-                            !cell.isCurrentMonth
+                          className={`aspect-square p-1 rounded-2xl flex flex-col items-center justify-between transition cursor-pointer relative ${!cell.isCurrentMonth
                               ? "opacity-25 pointer-events-none"
                               : isSelected
-                              ? "bg-[#003B95] text-white shadow-md scale-102 ring-2 ring-blue-400"
-                              : cell.isToday
-                              ? "bg-amber-500/15 border border-amber-500/50 text-amber-700 dark:text-amber-300 font-black"
-                              : "bg-slate-50 dark:bg-slate-800/60 hover:bg-slate-100 text-slate-700 dark:text-slate-200"
-                          }`}
+                                ? "bg-[#003B95] text-white shadow-md scale-102 ring-2 ring-blue-400"
+                                : cell.isToday
+                                  ? "bg-amber-500/15 border border-amber-500/50 text-amber-700 dark:text-amber-300 font-black"
+                                  : "bg-slate-50 dark:bg-slate-800/60 hover:bg-slate-100 text-slate-700 dark:text-slate-200"
+                            }`}
                         >
                           <span
-                            className={`text-xs leading-none font-bold ${
-                              isSelected ? "text-white" : cell.isToday ? "text-amber-600 dark:text-amber-400" : ""
-                            }`}
+                            className={`text-xs leading-none font-bold ${isSelected ? "text-white" : cell.isToday ? "text-amber-600 dark:text-amber-400" : ""
+                              }`}
                           >
                             {cell.dayNum}
                           </span>
@@ -1214,13 +1202,12 @@ export function CalendarScreen() {
                           key={day.dateStr}
                           type="button"
                           onClick={() => setSelectedDate(isSelected ? null : day.dateStr)}
-                          className={`flex flex-col items-center justify-center min-w-[50px] py-2 px-1.5 rounded-2xl border transition-all cursor-pointer ${
-                            isSelected
+                          className={`flex flex-col items-center justify-center min-w-[50px] py-2 px-1.5 rounded-2xl border transition-all cursor-pointer ${isSelected
                               ? "bg-[#003B95] text-white border-[#003B95] shadow-md shadow-blue-900/25 scale-102"
                               : day.isToday
-                              ? "bg-amber-500/10 border-amber-500/40 text-amber-700 dark:text-amber-300 font-bold"
-                              : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-50"
-                          }`}
+                                ? "bg-amber-500/10 border-amber-500/40 text-amber-700 dark:text-amber-300 font-bold"
+                                : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-50"
+                            }`}
                         >
                           <span className={`text-[10px] uppercase font-bold ${isSelected ? "text-amber-300" : "text-slate-400"}`}>
                             {day.isToday ? "Nay" : day.weekDay}
@@ -1547,11 +1534,10 @@ export function CalendarScreen() {
                       toast.success("Đã lưu thời gian nhắc nhở!");
                       setReminderModalTarget(null);
                     }}
-                    className={`w-full p-2.5 rounded-2xl border text-left transition flex items-center justify-between cursor-pointer ${
-                      isSelected
+                    className={`w-full p-2.5 rounded-2xl border text-left transition flex items-center justify-between cursor-pointer ${isSelected
                         ? "bg-amber-500/10 border-amber-500/50 text-amber-900 dark:text-amber-200"
                         : "bg-slate-50 dark:bg-slate-800/50 border-slate-200/80 dark:border-slate-700/80 text-slate-700 dark:text-slate-300 hover:bg-slate-100"
-                    }`}
+                      }`}
                   >
                     <div>
                       <p className="text-xs font-bold">{opt.label}</p>
@@ -1689,27 +1675,25 @@ export function CalendarScreen() {
     return (
       <div
         key={item.id}
-        className={`p-4 rounded-3xl bg-white dark:bg-slate-900 border transition-all space-y-3 shadow-xs ${
-          isToday
+        className={`p-4 rounded-3xl bg-white dark:bg-slate-900 border transition-all space-y-3 shadow-xs ${isToday
             ? "border-amber-400/80 ring-1 ring-amber-400/50"
             : "border-slate-200 dark:border-slate-800 hover:border-slate-300"
-        }`}
+          }`}
       >
         {/* Item Header: Badge, Status, Countdown */}
         <div className="flex items-start justify-between gap-2">
           <div className="flex items-center gap-1.5 flex-wrap">
             <span
-              className={`px-2 py-0.5 rounded-md text-[9.5px] font-black uppercase tracking-wider ${
-                item.type === "event"
+              className={`px-2 py-0.5 rounded-md text-[9.5px] font-black uppercase tracking-wider ${item.type === "event"
                   ? "bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-300 border border-red-300/40"
                   : item.type === "opportunity"
-                  ? "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-300/40"
-                  : item.type === "training"
-                  ? "bg-blue-50 text-[#003B95] border border-blue-300/40"
-                  : item.type === "meeting_committee"
-                  ? "bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border border-amber-300/40"
-                  : "bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border border-blue-300/40"
-              }`}
+                    ? "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-300/40"
+                    : item.type === "training"
+                      ? "bg-blue-50 text-[#003B95] border border-blue-300/40"
+                      : item.type === "meeting_committee"
+                        ? "bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border border-amber-300/40"
+                        : "bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border border-blue-300/40"
+                }`}
             >
               {item.categoryLabel}
             </span>
@@ -1751,11 +1735,10 @@ export function CalendarScreen() {
                 }));
                 toast.success(nextEnabled ? "Đã bật nhắc lịch!" : "Đã tắt nhắc lịch.");
               }}
-              className={`p-1.5 rounded-xl transition cursor-pointer flex items-center gap-1 text-[10.5px] font-bold ${
-                isReminderOn
+              className={`p-1.5 rounded-xl transition cursor-pointer flex items-center gap-1 text-[10.5px] font-bold ${isReminderOn
                   ? "bg-amber-500/15 text-amber-700 dark:text-amber-400 border border-amber-500/30"
                   : "bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-slate-600"
-              }`}
+                }`}
               title={isReminderOn ? "Bấm để tắt hoặc cài đặt nhắc nhở" : "Bật nhắc lịch hẹn"}
             >
               {isReminderOn ? (
@@ -1765,12 +1748,12 @@ export function CalendarScreen() {
                     {reminder?.timing === "exact"
                       ? "Đúng giờ"
                       : reminder?.timing === "15min"
-                      ? "Trước 15p"
-                      : reminder?.timing === "1hour"
-                      ? "Trước 1h"
-                      : reminder?.timing === "3days"
-                      ? "Trước 3 ngày"
-                      : "Trước 1 ngày"}
+                        ? "Trước 15p"
+                        : reminder?.timing === "1hour"
+                          ? "Trước 1h"
+                          : reminder?.timing === "3days"
+                            ? "Trước 3 ngày"
+                            : "Trước 1 ngày"}
                   </span>
                 </>
               ) : (
@@ -2040,17 +2023,16 @@ export function CalendarScreen() {
           <div>
             <div className="flex items-center gap-1.5 flex-wrap">
               <span
-                className={`px-2 py-0.5 rounded-md text-[9.5px] font-black uppercase tracking-wider ${
-                  item.type === "event"
+                className={`px-2 py-0.5 rounded-md text-[9.5px] font-black uppercase tracking-wider ${item.type === "event"
                     ? "bg-red-50 text-red-600 border border-red-300/40"
                     : item.type === "opportunity"
-                    ? "bg-emerald-50 text-emerald-700 border border-emerald-300/40"
-                    : item.type === "training"
-                    ? "bg-blue-50 text-[#003B95] border border-blue-300/40"
-                    : item.type === "meeting_committee"
-                    ? "bg-amber-50 text-amber-700 border border-amber-300/40"
-                    : "bg-blue-50 text-blue-700 border border-blue-300/40"
-                }`}
+                      ? "bg-emerald-50 text-emerald-700 border border-emerald-300/40"
+                      : item.type === "training"
+                        ? "bg-blue-50 text-[#003B95] border border-blue-300/40"
+                        : item.type === "meeting_committee"
+                          ? "bg-amber-50 text-amber-700 border border-amber-300/40"
+                          : "bg-blue-50 text-blue-700 border border-blue-300/40"
+                  }`}
               >
                 {item.categoryLabel}
               </span>

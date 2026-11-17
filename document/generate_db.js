@@ -17,7 +17,7 @@ const dbContent = `# THIẾT KẾ CƠ SỞ DỮ LIỆU POSTGRESQL HỆ THỐNG C
    - 1.2. Nguyên tắc toàn vẹn dữ liệu (STRICT DATABASE LAW & NO-MOCK)
    - 1.3. Sơ đồ quan hệ thực thể (Entity Relationship Diagram - ERD)
 2. **ĐẶC TẢ CHI TIẾT CÁC BẢNG DỮ LIỆU (DATABASE SCHEMAS)**
-   - 2.1. Nhóm Người dùng & Hội viên (\`vione_users\`, \`members\`, \`companies\`)
+   - 2.1. Nhóm Người dùng & Học viên (\`vione_users\`, \`members\`, \`companies\`)
    - 2.2. Nhóm Phân hệ Sự kiện (\`events\`, \`event_registrations\`)
    - 2.3. Nhóm Phân hệ Khóa học / Buổi học (\`trainings\`, \`training_attendees\`)
    - 2.4. Nhóm Khai báo Vật tư Hậu cần (\`supplies\`)
@@ -56,7 +56,7 @@ const dbContent = `# THIẾT KẾ CƠ SỞ DỮ LIỆU POSTGRESQL HỆ THỐNG C
 
 \`\`\`mermaid
 erDiagram
-    vione_users ||--o| members : "hồ sơ hội viên"
+    vione_users ||--o| members : "hồ sơ Học viên"
     members }|--|| companies : "thuộc doanh nghiệp"
     vione_users ||--o{ user_roles : "gán vai trò"
     user_roles }|--|| role_permissions : "quyền hạn vai trò"
@@ -85,7 +85,7 @@ erDiagram
 
 ## 2. ĐẶC TẢ CHI TIẾT CÁC BẢNG DỮ LIỆU (DATABASE SCHEMAS)
 
-### 2.1. Nhóm Người dùng & Hội viên
+### 2.1. Nhóm Người dùng & Học viên
 
 #### Bảng \`public.vione_users\` (Tài khoản người dùng cơ sở)
 | Tên cột | Kiểu dữ liệu | Khóa | Cho phép NULL | Giá trị mặc định | Mô tả ý nghĩa |
@@ -100,13 +100,13 @@ erDiagram
 | \`created_at\` | \`timestamptz\` | | Không | \`CURRENT_TIMESTAMP\` | Thời điểm khởi tạo |
 | \`updated_at\` | \`timestamptz\` | | Không | \`CURRENT_TIMESTAMP\` | Thời điểm cập nhật cuối |
 
-#### Bảng \`public.members\` (Hồ sơ 360 độ Hội viên Doanh nhân)
+#### Bảng \`public.members\` (Hồ sơ 360 độ Học viên Doanh nhân)
 | Tên cột | Kiểu dữ liệu | Khóa | Cho phép NULL | Giá trị mặc định | Mô tả ý nghĩa |
 | :--- | :--- | :---: | :---: | :--- | :--- |
-| \`id\` | \`uuid\` | PK | Không | \`gen_random_uuid()\` | Định danh hồ sơ hội viên |
+| \`id\` | \`uuid\` | PK | Không | \`gen_random_uuid()\` | Định danh hồ sơ Học viên |
 | \`user_id\` | \`uuid\` | FK | Có | | Liên kết \`vione_users(id)\` |
-| \`member_code\` | \`varchar(50)\` | UQ | Không | | Mã hội viên (VD: HN10-001) |
-| \`full_name\` | \`varchar(150)\` | | Không | | Họ tên hội viên |
+| \`member_code\` | \`varchar(50)\` | UQ | Không | | Mã Học viên (VD: HN10-001) |
+| \`full_name\` | \`varchar(150)\` | | Không | | Họ tên Học viên |
 | \`company_id\` | \`uuid\` | FK | Có | | Liên kết \`companies(id)\` |
 | \`position\` | \`varchar(100)\` | | Có | | Chức danh trong doanh nghiệp |
 | \`phone\` | \`varchar(20)\` | | Có | | Số điện thoại cá nhân |
@@ -114,7 +114,7 @@ erDiagram
 | \`avatar_url\` | \`text\` | | Có | | Đường dẫn ảnh đại diện |
 | \`bio\` | \`text\` | | Có | | Tiểu sử / Giới thiệu năng lực |
 | \`join_date\` | \`date\` | | Có | | Ngày kết nạp vào CLB |
-| \`status\` | \`varchar(50)\` | | Không | \`'active'\` | Trạng thái sinh hoạt hội viên |
+| \`status\` | \`varchar(50)\` | | Không | \`'active'\` | Trạng thái sinh hoạt Học viên |
 
 #### Bảng \`public.companies\` (Hồ sơ Doanh nghiệp thành viên)
 | Tên cột | Kiểu dữ liệu | Khóa | Cho phép NULL | Giá trị mặc định | Mô tả ý nghĩa |
@@ -156,7 +156,7 @@ erDiagram
 | :--- | :--- | :---: | :---: | :--- | :--- |
 | \`id\` | \`uuid\` | PK | Không | \`gen_random_uuid()\` | Định danh vé đăng ký |
 | \`event_id\` | \`uuid\` | FK | Không | | Liên kết \`events(id)\` |
-| \`user_id\` | \`uuid\` | FK | Có | | Liên kết \`vione_users(id)\` (nếu là hội viên) |
+| \`user_id\` | \`uuid\` | FK | Có | | Liên kết \`vione_users(id)\` (nếu là Học viên) |
 | \`guest_name\` | \`varchar(150)\` | | Không | | Họ tên người tham dự |
 | \`guest_phone\` | \`varchar(20)\` | | Có | | Số điện thoại người tham dự |
 | \`guest_email\` | \`varchar(255)\` | | Có | | Email nhận mã vé QR |
@@ -302,7 +302,7 @@ erDiagram
 
 ### 2.8. Nhóm Phản ánh, Góp ý & Đánh giá
 
-#### Bảng \`public.feedbacks\` (Ý kiến hội viên, Đánh giá sao sự kiện & khóa học)
+#### Bảng \`public.feedbacks\` (Ý kiến Học viên, Đánh giá sao sự kiện & khóa học)
 | Tên cột | Kiểu dữ liệu | Khóa | Cho phép NULL | Giá trị mặc định | Mô tả ý nghĩa |
 | :--- | :--- | :---: | :---: | :--- | :--- |
 | \`id\` | \`uuid\` | PK | Không | \`gen_random_uuid()\` | Định danh phản ánh |
@@ -322,7 +322,7 @@ erDiagram
 
 #### Bảng \`public.votes\` & \`public.vote_submissions\`
 - **\`votes\`**: Lưu thông tin cuộc biểu quyết (\`id\`, \`title\`, \`description\`, \`options\` JSONB, \`start_time\`, \`end_time\`, \`is_closed\`, \`created_by\`).
-- **\`vote_submissions\`**: Lưu lượt bỏ phiếu của hội viên (\`id\`, \`vote_id\`, \`user_id\`, \`selected_option\`, \`submitted_at\`), có ràng buộc Unique \`(vote_id, user_id)\` đảm bảo mỗi hội viên chỉ bỏ phiếu 1 lần.
+- **\`vote_submissions\`**: Lưu lượt bỏ phiếu của Học viên (\`id\`, \`vote_id\`, \`user_id\`, \`selected_option\`, \`submitted_at\`), có ràng buộc Unique \`(vote_id, user_id)\` đảm bảo mỗi Học viên chỉ bỏ phiếu 1 lần.
 
 ---
 

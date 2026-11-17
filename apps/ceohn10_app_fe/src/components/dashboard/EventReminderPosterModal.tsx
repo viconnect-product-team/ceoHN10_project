@@ -86,7 +86,7 @@ export function EventReminderPosterModal({
           setSelectedEventId(firstEv);
         }
       })
-      .catch(() => {})
+      .catch(() => { })
       .finally(() => {
         if (isMounted) setLoadingEvents(false);
       });
@@ -126,13 +126,13 @@ export function EventReminderPosterModal({
           const evName = res.event.name || "Sự kiện CEO HN10";
           const dStr = res.event.date
             ? new Date(res.event.date).toLocaleDateString("vi-VN", {
-                weekday: "long",
-                day: "2-digit",
-                month: "2-digit",
-                year: "numeric",
-                hour: "2-digit",
-                minute: "2-digit",
-              })
+              weekday: "long",
+              day: "2-digit",
+              month: "2-digit",
+              year: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+            })
             : "Sắp diễn ra";
 
           setTitle(`[NHẮC LỊCH SỰ KIỆN] ${evName}`);
@@ -196,7 +196,7 @@ export function EventReminderPosterModal({
     } else {
       setTitle(`[ĐẶC QUYỀN VIP & VỊ TRÍ BÀN] ${evName}`);
       setBody(
-        `Trân trọng kính gửi Quý Hội viên đã đăng ký thành công chương trình "${evName}".\n\nBan Tổ Chức đã chuẩn bị sẵn sơ đồ vị trí bàn tiệc và hồ sơ giao thương kết nối 1-on-1 theo ngành nghề của Quý Anh/Chị. Chi tiết vị trí ghế ngồi và mã vé đại biểu đã được cập nhật trực tiếp trong tin nhắn này.`,
+        `Trân trọng kính gửi Quý Học viên đã đăng ký thành công chương trình "${evName}".\n\nBan Tổ Chức đã chuẩn bị sẵn sơ đồ vị trí bàn tiệc và hồ sơ giao thương kết nối 1-on-1 theo ngành nghề của Quý Anh/Chị. Chi tiết vị trí ghế ngồi và mã vé đại biểu đã được cập nhật trực tiếp trong tin nhắn này.`,
       );
     }
     toast.info("Đã áp dụng mẫu tin nhắn mẫu!");
@@ -237,7 +237,7 @@ export function EventReminderPosterModal({
 
       if (res?.ok) {
         toast.success(`Bắn tin nhắc sự kiện kèm poster thành công!`, {
-          description: `Đã gửi thông báo và poster tới ${res.recipientCount} hội viên đã đăng ký sự kiện "${res.eventName}".`,
+          description: `Đã gửi thông báo và poster tới ${res.recipientCount} Học viên đã đăng ký sự kiện "${res.eventName}".`,
         });
         onSuccess?.();
         onClose();
@@ -285,11 +285,11 @@ export function EventReminderPosterModal({
                   Gửi Thông Báo Kèm Poster Sự Kiện
                 </h2>
                 <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase bg-blue-50 text-[#003B95] dark:bg-blue-950 dark:text-blue-400 border border-blue-200 dark:border-blue-900">
-                  Thông Báo Hội Viên
+                  Thông Báo Học viên
                 </span>
               </div>
               <p className="text-xs text-muted-foreground mt-0.5">
-                Gửi thông báo đẩy và nội dung thư mời kèm poster tới các hội viên đăng ký sự kiện
+                Gửi thông báo đẩy và nội dung thư mời kèm poster tới các Học viên đăng ký sự kiện
               </p>
             </div>
           </div>
@@ -337,10 +337,10 @@ export function EventReminderPosterModal({
                       <span className="truncate">
                         {eventData.date
                           ? new Date(eventData.date).toLocaleDateString("vi-VN", {
-                              day: "2-digit",
-                              month: "2-digit",
-                              year: "numeric",
-                            })
+                            day: "2-digit",
+                            month: "2-digit",
+                            year: "numeric",
+                          })
                           : "Chưa định ngày"}
                       </span>
                     </div>
@@ -360,12 +360,12 @@ export function EventReminderPosterModal({
             </div>
           </div>
 
-          {/* 2. Đối tượng nhận & Thống kê hội viên */}
+          {/* 2. Đối tượng nhận & Thống kê Học viên */}
           <div className="p-4 rounded-2xl bg-card border border-border space-y-3">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
               <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
                 <Users className="size-4 text-amber-500" />
-                <span>2. Hội Viên Nhận Tin ({activeRecipientsCount} người)</span>
+                <span>2. Học viên Nhận Tin ({activeRecipientsCount} người)</span>
               </label>
 
               {/* Bộ lọc người nhận */}
@@ -373,22 +373,20 @@ export function EventReminderPosterModal({
                 <button
                   type="button"
                   onClick={() => setTargetFilter("all_registered")}
-                  className={`px-3 py-1 rounded-lg text-xs font-semibold transition cursor-pointer ${
-                    targetFilter === "all_registered"
+                  className={`px-3 py-1 rounded-lg text-xs font-semibold transition cursor-pointer ${targetFilter === "all_registered"
                       ? "bg-amber-500 text-white shadow-xs font-bold"
                       : "bg-muted text-muted-foreground hover:text-foreground"
-                  }`}
+                    }`}
                 >
                   Tất cả đăng ký ({totalCount})
                 </button>
                 <button
                   type="button"
                   onClick={() => setTargetFilter("confirmed_only")}
-                  className={`px-3 py-1 rounded-lg text-xs font-semibold transition cursor-pointer ${
-                    targetFilter === "confirmed_only"
+                  className={`px-3 py-1 rounded-lg text-xs font-semibold transition cursor-pointer ${targetFilter === "confirmed_only"
                       ? "bg-emerald-600 text-white shadow-xs font-bold"
                       : "bg-muted text-muted-foreground hover:text-foreground"
-                  }`}
+                    }`}
                 >
                   Chỉ người đã xác nhận ({confirmedCount})
                 </button>
@@ -436,11 +434,10 @@ export function EventReminderPosterModal({
                             {att.seat || att.ticketCode || "VIP"}
                           </span>
                           <span
-                            className={`text-[9.5px] px-1.5 py-0.2 rounded font-bold ${
-                              att.status === "confirmed"
+                            className={`text-[9.5px] px-1.5 py-0.2 rounded font-bold ${att.status === "confirmed"
                                 ? "bg-emerald-500/10 text-emerald-500"
                                 : "bg-amber-500/10 text-amber-500"
-                            }`}
+                              }`}
                           >
                             {att.status === "confirmed" ? "Đã duyệt" : "Chờ duyệt"}
                           </span>
@@ -519,7 +516,7 @@ export function EventReminderPosterModal({
                 <div className="p-2.5 rounded-xl bg-blue-500/10 border border-blue-500/20 text-[11px] text-blue-600 dark:text-blue-400 flex items-start gap-2">
                   <Sparkles className="size-4 shrink-0 text-blue-500 mt-0.5" />
                   <span>
-                    Tấm poster này sẽ được đính kèm vào tin nhắn cá nhân của từng hội viên và hiển thị nổi bật trong trung tâm thông báo của Mobile App CEO HN10.
+                    Tấm poster này sẽ được đính kèm vào tin nhắn cá nhân của từng Học viên và hiển thị nổi bật trong trung tâm thông báo của Mobile App CEO HN10.
                   </span>
                 </div>
               </div>
@@ -627,7 +624,7 @@ export function EventReminderPosterModal({
           <div className="text-xs text-muted-foreground flex items-center gap-1.5">
             <Bell className="size-4 text-emerald-500" />
             <span>
-              Sẽ gửi đến: <strong className="text-foreground">{activeRecipientsCount} hội viên</strong>
+              Sẽ gửi đến: <strong className="text-foreground">{activeRecipientsCount} Học viên</strong>
             </span>
           </div>
 

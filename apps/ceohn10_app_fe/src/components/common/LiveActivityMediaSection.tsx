@@ -68,7 +68,7 @@ export const LiveActivityMediaSection: React.FC<LiveActivityMediaSectionProps> =
       if (saved) {
         setHistoryMedia(JSON.parse(saved));
       }
-    } catch {}
+    } catch { }
   };
 
   useEffect(() => {
@@ -149,7 +149,7 @@ export const LiveActivityMediaSection: React.FC<LiveActivityMediaSectionProps> =
       setHistoryMedia(updatedHistory);
       try {
         localStorage.setItem(storageKey, JSON.stringify(updatedHistory));
-      } catch {}
+      } catch { }
 
       // Nếu có quyền và chọn Đẩy sang màn mạng lưới (Feed)
       let pushed = false;
@@ -162,9 +162,8 @@ export const LiveActivityMediaSection: React.FC<LiveActivityMediaSectionProps> =
             connect: "Giao lưu kết nối B2B",
           };
           const typeName = typeLabelMap[activityType] || "Hoạt động";
-          const feedContent = `📸 [Khoảnh khắc trực tiếp: ${typeName}] ${activityTitle}\n${
-            note.trim() ? `\n"${note.trim()}"\n` : ""
-          }\n✨ Tư liệu hình ảnh & video ghi nhận trực tiếp trong quá trình diễn ra.`;
+          const feedContent = `📸 [Khoảnh khắc trực tiếp: ${typeName}] ${activityTitle}\n${note.trim() ? `\n"${note.trim()}"\n` : ""
+            }\n✨ Tư liệu hình ảnh & video ghi nhận trực tiếp trong quá trình diễn ra.`;
 
           await fetchNestApi("/feed", {
             method: "POST",
@@ -183,8 +182,7 @@ export const LiveActivityMediaSection: React.FC<LiveActivityMediaSectionProps> =
       }
 
       toast.success(
-        `Đã lưu ${uploadedUrls.length} ảnh/video vào lịch sử ${
-          pushed ? "và chia sẻ lên Mạng lưới!" : "thành công!"
+        `Đã lưu ${uploadedUrls.length} ảnh/video vào lịch sử ${pushed ? "và chia sẻ lên Mạng lưới!" : "thành công!"
         }`
       );
 
@@ -321,7 +319,7 @@ export const LiveActivityMediaSection: React.FC<LiveActivityMediaSectionProps> =
               />
               <span className="flex items-center gap-1">
                 <Globe className="size-3.5 text-blue-500" />
-                <span>Đẩy khoảnh khắc này sang màn Mạng Lưới (Feed) của Hội viên</span>
+                <span>Đẩy khoảnh khắc này sang màn Mạng Lưới (Feed) của Học viên</span>
               </span>
             </label>
 

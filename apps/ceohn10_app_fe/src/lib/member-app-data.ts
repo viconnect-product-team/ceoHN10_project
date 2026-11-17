@@ -3,7 +3,7 @@
 export const member = {
   name: "Nguyễn Văn Minh",
   company: "Công ty TNHH Minh Phát",
-  status: "Hội viên chính thức",
+  status: "Học viên chính thức",
   code: "HV123456",
   validUntil: "31/12/2025",
   verified: true,
@@ -144,7 +144,7 @@ export const events: AppEvent[] = [
     id: "e3",
     day: "15",
     month: "AUG",
-    title: "Gặp gỡ giao lưu Hội viên Hiệp hội",
+    title: "Gặp gỡ giao lưu Học viên Hiệp hội",
     time: "18:00 - 21:00",
     place: "Khách sạn Lotte Hà Nội",
   },
@@ -181,7 +181,7 @@ export const notifications: AppNotification[] = [
   {
     id: "n3",
     title: "Nhắc gia hạn hội phí",
-    body: "Thẻ hội viên của bạn còn hiệu lực đến 31/12/2025.",
+    body: "Thẻ Học viên của bạn còn hiệu lực đến 31/12/2025.",
     time: "1 ngày trước",
     unread: false,
     type: "fee",

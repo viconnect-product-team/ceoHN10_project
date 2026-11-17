@@ -17,10 +17,10 @@ export interface BirthdayPromoPolicy {
 
 const DEFAULT_BIRTHDAY_POLICY: BirthdayPromoPolicy = {
   enabled: true,
-  title: "Chúc Mừng Sinh Nhật Hội Viên CLB Doanh Nhân CEO HN10! 🎂🎉",
+  title: "Chúc Mừng Sinh Nhật Học viên CLB Doanh Nhân CEO HN10! 🎂🎉",
   greetingMessage:
-    "Ban Chấp Hành và toàn thể Hội viên CLB CEO HN10 kính chúc Quý Anh/Chị tuổi mới dồi dào sức khỏe, gia đình thịnh vượng, doanh nghiệp bứt phá và luôn đồng hành gắn kết cùng Hiệp hội!",
-  giftTitle: "Voucher Ưu Đãi Độc Quyền Hội Viên & Quà Tặng Sự Kiện",
+    "Ban Chấp Hành và toàn thể Học viên CLB CEO HN10 kính chúc Quý Anh/Chị tuổi mới dồi dào sức khỏe, gia đình thịnh vượng, doanh nghiệp bứt phá và luôn đồng hành gắn kết cùng Hiệp hội!",
+  giftTitle: "Voucher Ưu Đãi Độc Quyền Học viên & Quà Tặng Sự Kiện",
   voucherCode: "CEO HN10-BDAY-VIP",
   discountValue: "2,000,000 đ hoặc Giảm 20% Dịch vụ Thành viên",
   bannerUrl:
@@ -35,7 +35,7 @@ export function BirthdayPromoManager() {
     try {
       const raw = localStorage.getItem("ceohn10_birthday_policy");
       if (raw) return { ...DEFAULT_BIRTHDAY_POLICY, ...JSON.parse(raw) };
-    } catch {}
+    } catch { }
     return DEFAULT_BIRTHDAY_POLICY;
   });
 
@@ -70,20 +70,19 @@ export function BirthdayPromoManager() {
           <div>
             <div className="flex items-center gap-2">
               <h3 className="text-base font-bold text-slate-900 dark:text-white">
-                Chính Sách & Ưu Đãi Sinh Nhật Hội Viên
+                Chính Sách & Ưu Đãi Sinh Nhật Học viên
               </h3>
               <span
-                className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[11px] font-bold ${
-                  policy.enabled
+                className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[11px] font-bold ${policy.enabled
                     ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-950/50 dark:text-emerald-300"
                     : "bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-300"
-                }`}
+                  }`}
               >
                 {policy.enabled ? "Đang Bật Trên App" : "Đang Tạm Dừng"}
               </span>
             </div>
             <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">
-              Cấu hình tại CRM Hiệp hội. Tự động hiển thị popup chúc mừng & tặng quà khi hội viên có sinh nhật mở App Hiệp hội.
+              Cấu hình tại CRM Hiệp hội. Tự động hiển thị popup chúc mừng & tặng quà khi Học viên có sinh nhật mở App Hiệp hội.
             </p>
           </div>
         </div>
@@ -257,7 +256,7 @@ export function BirthdayPromoManager() {
             {/* 2. Main Content Body */}
             <div className="px-5 pt-8 pb-5 flex flex-col items-center text-center">
               <h3 className="text-lg font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-amber-400 to-amber-100 tracking-tight leading-snug">
-                {policy.title || "Chúc Mừng Sinh Nhật Hội Viên!"}
+                {policy.title || "Chúc Mừng Sinh Nhật Học viên!"}
               </h3>
 
               <div className="mt-1 inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-400/10 border border-amber-400/30 text-[11px] font-bold text-amber-300">

@@ -42,7 +42,7 @@ function request(method, path, body = null, token = null) {
           let data = raw;
           try {
             data = JSON.parse(raw);
-          } catch {}
+          } catch { }
           resolve({ status: res.statusCode, headers: res.headers, data });
         });
       }
@@ -257,7 +257,7 @@ async function run() {
       type: 'income',
       category: 'Hội phí',
       amount: 2000000,
-      description: 'Thu phí gia nhập hội viên 2026 - Vũ Minh Kas',
+      description: 'Thu phí gia nhập Học viên 2026 - Vũ Minh Kas',
       method: 'bank',
       recipient: 'CLB Doanh Nhân CEO HN10',
     }, adminToken);
@@ -415,7 +415,7 @@ async function run() {
       title: 'Tìm kiếm đối tác cung ứng giải pháp ERP khối sản xuất ' + Date.now().toString().slice(-4),
       dealValue: 500000000,
       stage: 'open',
-      notes: 'Chúng tôi cần kết nối với doanh nghiệp hội viên có năng lực triển khai hệ thống ERP và IoT nhà máy.',
+      notes: 'Chúng tôi cần kết nối với doanh nghiệp Học viên có năng lực triển khai hệ thống ERP và IoT nhà máy.',
     }, member1Token);
     const ok = (res.status === 200 || res.status === 201) && !!res.data?.id;
     oppId = res.data?.id || '';
@@ -462,7 +462,7 @@ async function run() {
       description: 'Hệ thống quản trị bán hàng, khách hàng CRM, nhân sự và kế toán tích hợp AI',
       status: 'active',
     }, member1Token);
-    
+
     // Check if created successfully or strictly capped at 5 products limit
     if ((res.status === 200 || res.status === 201) && (res.data?.id || res.data?.product?.id)) {
       prodId = res.data?.id || res.data?.product?.id || '';
@@ -610,7 +610,7 @@ async function run() {
   try {
     const res = await request('POST', '/voting/polls', {
       title: 'Khảo sát địa điểm tổ chức Caravan Doanh Nhân Mùa Thu 2026',
-      description: 'Lấy ý kiến biểu quyết toàn thể Hội viên',
+      description: 'Lấy ý kiến biểu quyết toàn thể Học viên',
       options: ['Hạ Long - Quảng Ninh', 'Sapa - Lào Cai', 'Đà Lạt - Lâm Đồng'],
     }, adminToken);
     const ok = (res.status === 200 || res.status === 201) && !!res.data?.id;

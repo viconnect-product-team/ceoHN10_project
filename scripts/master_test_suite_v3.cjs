@@ -29,7 +29,7 @@ async function run() {
   console.log("✅ Xác thực thành công 3 tài khoản kiểm thử chính thức:");
   console.log("   1. admin@connect.vn     [Superadmin CRM - Quyền tối cao]");
   console.log("   2. vumikasa6@gmail.com  [Ban Điều Hành / Seller / Đối tác]");
-  console.log("   3. vupv090120@gmail.com [Hội viên Doanh nhân / Buyer]\n");
+  console.log("   3. vupv090120@gmail.com [Học viên Doanh nhân / Buyer]\n");
 
   const browser = await puppeteer.launch({
     executablePath: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
@@ -158,7 +158,7 @@ async function run() {
     }
 
     // 1.3 Đăng ký sự kiện Miễn Phí trên Mobile App, sinh QR vé gửi mail
-    console.log(">>> Case 1.3: Hội viên Đăng ký Sự kiện Miễn Phí trên Mobile App, gửi QR vé...");
+    console.log(">>> Case 1.3: Học viên Đăng ký Sự kiện Miễn Phí trên Mobile App, gửi QR vé...");
     try {
       const payload = {
         fullName: "Phạm Vũ - Doanh nhân 1983",
@@ -188,7 +188,7 @@ async function run() {
       recordResult({
         caseId: "CASE-1.3",
         flow: "1. Sự Kiện (Events)",
-        title: "Hội viên Đăng Ký Sự Kiện Miễn Phí Trên Mobile App, Sinh Vé QR & Gửi Mail",
+        title: "Học viên Đăng Ký Sự Kiện Miễn Phí Trên Mobile App, Sinh Vé QR & Gửi Mail",
         actor: "vupv090120@gmail.com",
         input: {
           method: "POST",
@@ -212,7 +212,7 @@ async function run() {
     }
 
     // 1.4 Đăng ký sự kiện Có Phí (500k) trên Mobile App
-    console.log(">>> Case 1.4: Hội viên Đăng ký Sự kiện Có Phí trên Mobile App...");
+    console.log(">>> Case 1.4: Học viên Đăng ký Sự kiện Có Phí trên Mobile App...");
     try {
       const payload = {
         fullName: "Vũ Mikasa - Ban Điều Hành",
@@ -242,7 +242,7 @@ async function run() {
       recordResult({
         caseId: "CASE-1.4",
         flow: "1. Sự Kiện (Events)",
-        title: "Hội viên Đăng Ký Sự Kiện Có Phí (500k) Trên Mobile App",
+        title: "Học viên Đăng Ký Sự Kiện Có Phí (500k) Trên Mobile App",
         actor: "vumikasa6@gmail.com",
         input: {
           method: "POST",
@@ -830,10 +830,10 @@ async function run() {
     }
 
     // 2.9 Tạo Ưu đãi / Quyền lợi sự kiện mới (Perks & Discounts)
-    console.log(">>> Case 2.9: Tạo Ưu đãi / Quyền lợi hội viên mới...");
+    console.log(">>> Case 2.9: Tạo Ưu đãi / Quyền lợi Học viên mới...");
     try {
       const payload = {
-        title: `Ưu Đãi Hội Viên CEO HN10 - Giảm 20% Dịch Vụ Văn Phòng [${Date.now().toString().slice(-4)}]`,
+        title: `Ưu Đãi Học viên CEO HN10 - Giảm 20% Dịch Vụ Văn Phòng [${Date.now().toString().slice(-4)}]`,
         category: "Dịch vụ Doanh nghiệp",
         partner: "ViConnect Holding",
         summary: "Ưu đãi voucher giải pháp phần mềm chuyển đổi số trị giá 20 triệu đồng",
@@ -859,7 +859,7 @@ async function run() {
       recordResult({
         caseId: "CASE-2.9",
         flow: "2. Nhà Tài Trợ & Gói Tài Trợ",
-        title: "Tạo Ưu Đãi / Quyền Lợi Hội Viên Mới (Perks & Discounts)",
+        title: "Tạo Ưu Đãi / Quyền Lợi Học viên Mới (Perks & Discounts)",
         actor: "admin@connect.vn",
         input: {
           method: "POST",
@@ -876,7 +876,7 @@ async function run() {
           screenshotFile: shot
         },
         status: (res.status === 200 || res.status === 201) && dbRows.length > 0 ? "PASS" : "BUG",
-        note: "Đã tạo thành công ưu đãi hội viên trong hệ thống và đồng bộ tức thì."
+        note: "Đã tạo thành công ưu đãi Học viên trong hệ thống và đồng bộ tức thì."
       });
     } catch (e) {
       console.error("Lỗi Case 2.9:", e);
@@ -910,7 +910,7 @@ async function run() {
       recordResult({
         caseId: "CASE-2.10",
         flow: "2. Nhà Tài Trợ & Gói Tài Trợ",
-        title: "Xem Chi Tiết, Chỉnh Sửa & Xóa Ưu Đãi Hội Viên",
+        title: "Xem Chi Tiết, Chỉnh Sửa & Xóa Ưu Đãi Học viên",
         actor: "admin@connect.vn",
         input: {
           method: "GET, PATCH & DELETE",
@@ -941,8 +941,8 @@ async function run() {
     let onlineMeetingId = "";
     let offlineMeetingId = "";
 
-    // 3.1 Tạo cuộc gặp 1-on-1 B2B giữa 2 hội viên
-    console.log(">>> Case 3.1: Tạo cuộc gặp 1-on-1 B2B giữa 2 hội viên...");
+    // 3.1 Tạo cuộc gặp 1-on-1 B2B giữa 2 Học viên
+    console.log(">>> Case 3.1: Tạo cuộc gặp 1-on-1 B2B giữa 2 Học viên...");
     try {
       const payload = {
         partnerId: "00000000-0000-4000-8000-000000000002",
@@ -1030,8 +1030,8 @@ async function run() {
       console.error("Lỗi Case 3.2:", e);
     }
 
-    // 3.3 Hội viên đối tác phản hồi/đồng ý lịch hẹn gặp 1-1
-    console.log(">>> Case 3.3: Hội viên đối tác phản hồi/đồng ý lịch hẹn gặp 1-1...");
+    // 3.3 Học viên đối tác phản hồi/đồng ý lịch hẹn gặp 1-1
+    console.log(">>> Case 3.3: Học viên đối tác phản hồi/đồng ý lịch hẹn gặp 1-1...");
     try {
       const payload = { status: "confirmed" };
       const res = await safeFetch(`${API_BASE}/meetings/connection-appointments/${apptId}/respond`, {
@@ -1310,7 +1310,7 @@ async function run() {
     let appProdId = "";
     try {
       await prisma.$executeRawUnsafe("UPDATE public.products SET status = 'archived' WHERE seller_id = 'c65f9ffe-64aa-4145-a06e-89fda579024d' AND id NOT IN (5, 6, 7)");
-    } catch (e) {}
+    } catch (e) { }
     let crmProdId = "";
 
     // 4.1 Đăng sản phẩm từ Mobile App
@@ -1434,7 +1434,7 @@ async function run() {
       recordResult({
         caseId: "CASE-4.3",
         flow: "4. Sàn Thương Mại B2B",
-        title: "Xem Chi Tiết Sản Phẩm & Chính Sách Giá Ưu Đãi Hội Viên",
+        title: "Xem Chi Tiết Sản Phẩm & Chính Sách Giá Ưu Đãi Học viên",
         actor: "vupv090120@gmail.com",
         input: {
           method: "GET",
@@ -1650,7 +1650,7 @@ async function run() {
     try {
       const payload = {
         title: `Tìm Nhà Thầu Thi Công Nội Thất Văn Phòng CLB 1983 [${Date.now().toString().slice(-4)}]`,
-        content: "Ban Điều Hành thông báo cơ hội hợp tác thi công hoàn thiện chuỗi văn phòng hội viên.",
+        content: "Ban Điều Hành thông báo cơ hội hợp tác thi công hoàn thiện chuỗi văn phòng Học viên.",
         category: "Xây dựng",
         expected_value: 600000000,
         target_industry: "Xây dựng & Nội thất"
@@ -1733,8 +1733,8 @@ async function run() {
       console.error("Lỗi Case 5.3:", e);
     }
 
-    // 5.4 Hội viên bày tỏ quan tâm cơ hội B2B
-    console.log(">>> Case 5.4: Hội viên bày tỏ quan tâm cơ hội B2B...");
+    // 5.4 Học viên bày tỏ quan tâm cơ hội B2B
+    console.log(">>> Case 5.4: Học viên bày tỏ quan tâm cơ hội B2B...");
     try {
       const payload = {
         interestLevel: "high",
@@ -1754,7 +1754,7 @@ async function run() {
       recordResult({
         caseId: "CASE-5.4",
         flow: "5. Cơ Hội Giao Thương B2B",
-        title: "Hội Viên Bày Tỏ Quan Tâm Cơ Hội Giao Thương B2B",
+        title: "Học viên Bày Tỏ Quan Tâm Cơ Hội Giao Thương B2B",
         actor: "vupv090120@gmail.com",
         input: {
           method: "POST",
@@ -2070,7 +2070,7 @@ async function run() {
         instructor: "Ban Điều Hành & Các Chuyên Gia Cố Vấn",
         format: "offline",
         location: "Hội Trường Tầng 3 Cung Tri Thức, Cầu Giấy, Hà Nội",
-        description: "Diễn đàn kết nối trực tiếp, giải quyết bài toán chuỗi cung ứng giữa các doanh nghiệp hội viên.",
+        description: "Diễn đàn kết nối trực tiếp, giải quyết bài toán chuỗi cung ứng giữa các doanh nghiệp Học viên.",
         duration: "4 giờ",
         category: "Diễn đàn doanh nhân"
       };
@@ -2114,8 +2114,8 @@ async function run() {
       console.error("Lỗi Case 7.2:", e);
     }
 
-    // 7.3 Hội viên đăng ký tham gia khóa đào tạo / diễn đàn
-    console.log(">>> Case 7.3: Hội viên đăng ký tham gia đào tạo / diễn đàn...");
+    // 7.3 Học viên đăng ký tham gia khóa đào tạo / diễn đàn
+    console.log(">>> Case 7.3: Học viên đăng ký tham gia đào tạo / diễn đàn...");
     try {
       const res = await safeFetch(`${API_BASE}/trainings/${onlineTrId}/register`, {
         method: "POST",
@@ -2131,7 +2131,7 @@ async function run() {
       recordResult({
         caseId: "CASE-7.3",
         flow: "7. Đào Tạo & Diễn Đàn Gặp Mặt",
-        title: "Hội Viên Đăng Ký Tham Gia Chương Trình Đào Tạo / Diễn Đàn",
+        title: "Học viên Đăng Ký Tham Gia Chương Trình Đào Tạo / Diễn Đàn",
         actor: "vupv090120@gmail.com",
         input: {
           method: "POST",
@@ -2396,7 +2396,7 @@ async function run() {
           screenshotFile: shot
         },
         status: (res.status === 200 || res.status === 201) && dbRows.length > 0 ? "PASS" : "BUG",
-        note: "Tài liệu được chuyển trực tiếp vào luồng trao đổi của hội viên trên CRM."
+        note: "Tài liệu được chuyển trực tiếp vào luồng trao đổi của Học viên trên CRM."
       });
     } catch (e) {
       console.error("Lỗi Case 8.5:", e);
@@ -2456,7 +2456,7 @@ async function run() {
     console.log("\n=================== FLOW 9: NHẮC NHỞ & BÁO LỊCH ===================");
 
     // 9.1 Nhắc hội phí thường niên (Membership Fee Reminder)
-    console.log(">>> Case 9.1: Nhắc hội phí thường niên tới hội viên...");
+    console.log(">>> Case 9.1: Nhắc hội phí thường niên tới Học viên...");
     try {
       const payload = {
         channel: "email",
@@ -2496,7 +2496,7 @@ async function run() {
           screenshotFile: shot
         },
         status: (res.status === 200 || res.status === 201) && dbRows.length > 0 ? "PASS" : "BUG",
-        note: "Hệ thống tự động kích hoạt email nhắc hội phí và thông báo đẩy tới hộp thư của hội viên."
+        note: "Hệ thống tự động kích hoạt email nhắc hội phí và thông báo đẩy tới hộp thư của Học viên."
       });
     } catch (e) {
       console.error("Lỗi Case 9.1:", e);
@@ -2526,7 +2526,7 @@ async function run() {
       recordResult({
         caseId: "CASE-9.2",
         flow: "9. Nhắc Nhở & Báo Lịch",
-        title: "Nhắc Báo Lịch Sự Kiện Đã Đăng Ký Tới Toàn Bộ Hội Viên",
+        title: "Nhắc Báo Lịch Sự Kiện Đã Đăng Ký Tới Toàn Bộ Học viên",
         actor: "admin@connect.vn",
         input: {
           method: "POST",
@@ -2576,7 +2576,7 @@ async function run() {
           screenshotFile: shot
         },
         status: "PASS",
-        note: "Hội viên nhận được thông báo nhắc lịch rõ ràng thời gian, đối tác và địa điểm hình thức Online/Offline."
+        note: "Học viên nhận được thông báo nhắc lịch rõ ràng thời gian, đối tác và địa điểm hình thức Online/Offline."
       });
     } catch (e) {
       console.error("Lỗi Case 9.3:", e);
@@ -2686,8 +2686,8 @@ async function run() {
       console.error("Lỗi Case 10.2:", e);
     }
 
-    // 10.3 Đăng nhập Hội viên Doanh nhân (vupv090120@gmail.com)
-    console.log(">>> Case 10.3: Kiểm tra giao diện Hội viên Doanh nhân (Member Mode)...");
+    // 10.3 Đăng nhập Học viên Doanh nhân (vupv090120@gmail.com)
+    console.log(">>> Case 10.3: Kiểm tra giao diện Học viên Doanh nhân (Member Mode)...");
     try {
       const shot = await navigateAndCapture(appPage, vupvSession, `${APP_BASE}/association/card`, "case_10_3_app_member_ui.png", {
         caseId: "CASE-10.3", actor: "vupv090120@gmail.com", route: "/association/card (Member Mode)", status: "PASS"
@@ -2696,7 +2696,7 @@ async function run() {
       recordResult({
         caseId: "CASE-10.3",
         flow: "10. Phân Quyền RBAC Theo Ban",
-        title: "Giao Diện Hội Viên Doanh Nhân (Member Mode Đầy Đủ Tính Năng Kết Nối)",
+        title: "Giao Diện Học viên Doanh Nhân (Member Mode Đầy Đủ Tính Năng Kết Nối)",
         actor: "vupv090120@gmail.com",
         input: {
           method: "POST",
@@ -2713,7 +2713,7 @@ async function run() {
           screenshotFile: shot
         },
         status: "PASS",
-        note: "Giao diện chuyển đổi sang MemberShell: Thẻ hội viên, Kết nối B2B, Đăng cơ hội, Đăng sản phẩm trong hạn mức, ẩn hoàn toàn các quyền nhạy cảm."
+        note: "Giao diện chuyển đổi sang MemberShell: Thẻ Học viên, Kết nối B2B, Đăng cơ hội, Đăng sản phẩm trong hạn mức, ẩn hoàn toàn các quyền nhạy cảm."
       });
     } catch (e) {
       console.error("Lỗi Case 10.3:", e);

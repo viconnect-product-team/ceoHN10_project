@@ -8,11 +8,11 @@
 
 Hệ thống CLB Doanh Nhân CEO HN10 đã hoàn tất tích hợp chuẩn cổng thanh toán **MoMo Payment Gateway v2 (All In One)**, hoạt động song song với cổng **VNPAY-QR**. 
 
-Cổng MoMo phục vụ các giao dịch trọng yếu của hội viên:
+Cổng MoMo phục vụ các giao dịch trọng yếu của Học viên:
 1. **Đóng Hội phí định kỳ**: Đóng hội phí năm, nâng hạng gói thành viên (Member, Premium, Diamond).
 2. **Mua vé & Đăng ký sự kiện (Events)**: Hội thảo xúc tiến thương mại, gala kết nối, giải golf, caravan.
-3. **Ủng hộ & Tài trợ Quỹ từ thiện**: Quỹ Trẻ Em Vùng Cao, Quỹ Phát Triển Hội Viên CEO HN10.
-4. **Gian hàng B2B & Voucher ưu đãi**: Thanh toán trực tuyến sản phẩm, dịch vụ giữa các doanh nghiệp hội viên.
+3. **Ủng hộ & Tài trợ Quỹ từ thiện**: Quỹ Trẻ Em Vùng Cao, Quỹ Phát Triển Học viên CEO HN10.
+4. **Gian hàng B2B & Voucher ưu đãi**: Thanh toán trực tuyến sản phẩm, dịch vụ giữa các doanh nghiệp Học viên.
 
 ---
 
@@ -42,7 +42,7 @@ Trên MoMo Merchant Portal, cấu hình 2 đường dẫn callback:
   *(MoMo sẽ gửi kết quả thanh toán tức thời ngầm về URL này, hệ thống sẽ xác thực chữ ký HMAC-SHA256 và kích hoạt vé/hội phí tự động)*.
 - **Redirect / Return URL (Client URL)**:
   `https://app.ceohn10.vn/payment-return`
-  *(Sau khi hội viên thanh toán xong trên MoMo, trình duyệt sẽ tự động chuyển hướng về trang này để hiển thị thông báo thành công)*.
+  *(Sau khi Học viên thanh toán xong trên MoMo, trình duyệt sẽ tự động chuyển hướng về trang này để hiển thị thông báo thành công)*.
 
 ---
 
@@ -68,7 +68,7 @@ MOMO_SECRET_KEY=K951B6PE1waDMi640xX0huBt3C0/Pars_SAMPLE
 # - Môi trường Production: https://payment.momo.vn/v2/gateway/api/create
 MOMO_ENDPOINT=https://test-payment.momo.vn/v2/gateway/api/create
 
-# Đường dẫn URL chuyển hướng hội viên sau khi thanh toán trên MoMo
+# Đường dẫn URL chuyển hướng Học viên sau khi thanh toán trên MoMo
 MOMO_RETURN_URL=https://app.ceohn10.vn/payment-return
 
 # Đường dẫn URL nhận Webhook IPN từ máy chủ MoMo
@@ -86,7 +86,7 @@ Hệ thống được thiết kế theo mô hình **Design Pattern: Strategy Pat
 
 ```mermaid
 flowchart TD
-    User([Hội Viên CEO HN10]) -->|Chọn Sự Kiện / Hội Phí| Modal[VnpayPaymentModal\nChọn VNPAY hoặc MoMo]
+    User([Học viên CEO HN10]) -->|Chọn Sự Kiện / Hội Phí| Modal[VnpayPaymentModal\nChọn VNPAY hoặc MoMo]
     Modal -->|Chọn Tab MoMo| FeCall[Frontend Client]
     FeCall -->|POST /payment/momo-create-url| NestController[PaymentController]
     NestController -->|Gọi MoMoPaymentStrategy| PayService[PaymentService]
@@ -106,7 +106,7 @@ flowchart TD
     DB -->|Cập nhật vé| T3[event_registrations: PAID]
     DB -->|Cộng slot| T4[events: current_participants + 1]
     
-    PayService -->|Bắn Socket.IO & Email| Notify[Thông báo tức thì Hội Viên & Ban Thư Ký]
+    PayService -->|Bắn Socket.IO & Email| Notify[Thông báo tức thì Học viên & Ban Thư Ký]
 ```
 
 ### Các Endpoint Backend Đã Xây Dựng:
@@ -132,7 +132,7 @@ flowchart TD
 Thành phần `VnpayPaymentModal.tsx` đã được nâng cấp thành **Modal Đa Cổng Thanh Toán Chuẩn Thương Hiệu**:
 - **Tab Cổng VNPAY-QR**: Nhận diện màu xanh Navy hoàng gia CEO HN10 `#003B95`, hỗ trợ hơn 40 ứng dụng ngân hàng tại Việt Nam.
 - **Tab Ví Điện Tử MoMo**: Nhận diện màu hồng cánh sen đặc trưng của MoMo `#A50064`, hỗ trợ:
-  - **Mã QR MoMo**: Hội viên có thể dùng điện thoại khác mở MoMo quét ngay.
+  - **Mã QR MoMo**: Học viên có thể dùng điện thoại khác mở MoMo quét ngay.
   - **Nút "Mở ứng dụng MoMo thanh toán"**: Tự động gọi Deep link `momo://app?...` mở thẳng MoMo trên điện thoại người dùng không cần quét QR.
   - **Tự động bắt trạng thái thành công**: Ngay khi giao dịch hoàn tất trên MoMo, popup tự động đóng và chuyển người dùng đến vé điện tử hoặc xác nhận đăng ký.
 

@@ -52,7 +52,7 @@ const ROWS: Row[] = [
     member: "none",
   },
   {
-    feature: { vi: "Hội viên & doanh nghiệp", en: "Members & companies" },
+    feature: { vi: "Học viên & doanh nghiệp", en: "Members & companies" },
     platform_admin: "full",
     admin: "scoped",
     member: "own",
@@ -100,7 +100,7 @@ const ROWS: Row[] = [
     member: "own",
   },
   {
-    feature: { vi: "Thẻ hội viên & check-in", en: "Member card & check-in" },
+    feature: { vi: "Thẻ Học viên & check-in", en: "Member card & check-in" },
     platform_admin: "full",
     admin: "scoped",
     member: "own",

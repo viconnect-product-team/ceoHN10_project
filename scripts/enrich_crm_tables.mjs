@@ -42,10 +42,10 @@ const tableC13 = `
           <td>Bảo vệ cấp cao cho tài khoản Chủ tịch, Tổng Thư ký và Ban Tài chính.</td>
         </tr>
         <tr>
-          <td><strong>Chỉ số Tổng Hội viên Chính thức</strong></td>
+          <td><strong>Chỉ số Tổng Học viên Chính thức</strong></td>
           <td>Hiển thị tự động</td>
           <td><code>Counter (Số nguyên)</code></td>
-          <td>Ví dụ: 128 Hội viên (Tăng trưởng +12% so với cùng kỳ năm trước).</td>
+          <td>Ví dụ: 128 Học viên (Tăng trưởng +12% so với cùng kỳ năm trước).</td>
           <td>Giám sát quy mô và sức mạnh kết nối của mạng lưới doanh nhân CEO HN10.</td>
         </tr>
         <tr>
@@ -53,7 +53,7 @@ const tableC13 = `
           <td>Hiển thị tự động (Cảnh báo)</td>
           <td><code>Counter Badge</code></td>
           <td>Ví dụ: 5 hồ sơ mới nộp trực tuyến cần duyệt.</td>
-          <td>Đôn đốc Ban Hội viên thẩm tra thông tin kịp thời, không để tồn đọng hồ sơ.</td>
+          <td>Đôn đốc Ban Học viên thẩm tra thông tin kịp thời, không để tồn đọng hồ sơ.</td>
         </tr>
         <tr>
           <td><strong>Chỉ số Tổng Quỹ Niên Liễm Đã Thu</strong></td>
@@ -133,7 +133,7 @@ const tableC15 = `
           <td><strong>Đơn vị / Ban Chuyên môn Trực thuộc</strong></td>
           <td class="req">Bắt buộc (*)</td>
           <td><code>Select Dropdown</code></td>
-          <td>Chọn Ban Thường trực, Ban Xúc tiến TM, Ban Sự kiện, Ban Hội viên...</td>
+          <td>Chọn Ban Thường trực, Ban Xúc tiến TM, Ban Sự kiện, Ban Học viên...</td>
           <td>Giới hạn phạm vi dữ liệu cán bộ được phép xem và xử lý theo đúng chức năng.</td>
         </tr>
         <tr>
@@ -154,9 +154,9 @@ const tableC15 = `
     </table>
 `;
 
-// Bảng Chương 16: Quản lý Hồ sơ & Quy trình Thẩm định Phê duyệt Hội viên
+// Bảng Chương 16: Quản lý Hồ sơ & Quy trình Thẩm định Phê duyệt Học viên
 const tableC16 = `
-    <div class="trn-sec-title">2. Đặc tả Chi tiết các Trường Hồ Sơ Doanh Nhân & Tiêu Chí Thẩm Định Hội Viên:</div>
+    <div class="trn-sec-title">2. Đặc tả Chi tiết các Trường Hồ Sơ Doanh Nhân & Tiêu Chí Thẩm Định Học viên:</div>
     <table class="tb">
       <thead>
         <tr>
@@ -169,7 +169,7 @@ const tableC16 = `
       </thead>
       <tbody>
         <tr>
-          <td><strong>Mã Số Hội Viên Định Danh</strong></td>
+          <td><strong>Mã Số Học viên Định Danh</strong></td>
           <td>Sinh tự động (*)</td>
           <td><code>Code</code></td>
           <td>Định dạng: <code>CEO HN10-HN-0088</code> (Gồm tiền tố hiệp hội + số thứ tự).</td>
@@ -180,7 +180,7 @@ const tableC16 = `
           <td class="req">Bắt buộc (*)</td>
           <td><code>Text</code></td>
           <td>Ví dụ: Nguyễn Văn Hưng. Viết hoa chuẩn tiếng Việt có dấu.</td>
-          <td>Định danh cá nhân hội viên trong danh bạ, kỷ yếu và giấy chứng nhận hội viên.</td>
+          <td>Định danh cá nhân Học viên trong danh bạ, kỷ yếu và giấy chứng nhận Học viên.</td>
         </tr>
         <tr>
           <td><strong>Năm Sinh & Giới tính</strong></td>
@@ -222,7 +222,7 @@ const tableC16 = `
           <td class="req">Bắt buộc (*)</td>
           <td><code>Action Buttons</code></td>
           <td>Nút: <em>[Phê Duyệt Chính Thức]</em> hoặc <em>[Từ Chối Kèm Lý Do]</em>.</td>
-          <td>Ban Hội viên chốt kết quả thẩm tra; hệ thống tự động gửi email thông báo chúc mừng.</td>
+          <td>Ban Học viên chốt kết quả thẩm tra; hệ thống tự động gửi email thông báo chúc mừng.</td>
         </tr>
         <tr>
           <td><strong>Ghi chú Nhận xét Thẩm tra</strong></td>

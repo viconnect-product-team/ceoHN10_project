@@ -10,7 +10,7 @@ if (idx !== -1) {
         {
           type: "post",
           id: post.id,
-          title: \`[Mạng Lưới CEO HN10] \${post.title || \`Bài viết từ Doanh nhân \${post.author?.name || "Hội viên"}\`}\`,
+          title: \`[Mạng Lưới CEO HN10] \${post.title || \`Bài viết từ Doanh nhân \${post.author?.name || "Học viên"}\`}\`,
           desc: post.content?.slice(0, 200),
           image: post.images?.[0] || undefined,
           targetPath: \`/association/messages?post=\${post.id}\`,

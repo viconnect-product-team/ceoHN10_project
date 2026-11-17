@@ -63,17 +63,17 @@ async function main() {
 
   try {
     await c.query('DELETE FROM public.opportunity_interests');
-  } catch (e) {}
+  } catch (e) { }
 
-  console.log('\n=== 3. ĐỒNG BỘ ĐÚNG 4 TÀI KHOẢN HỘI VIÊN ===');
+  console.log('\n=== 3. ĐỒNG BỘ ĐÚNG 4 TÀI KHOẢN Học viên ===');
   const passRes = await c.query("SELECT password FROM public.vione_users WHERE email = 'vumikasa6@gmail.com' LIMIT 1");
   const defaultHash = passRes.rows[0]?.password || (await bcrypt.hash('123456', 10));
 
   const targetAccounts = [
     { email: 'admin@connect.vn', name: 'Jame Nguyễn (Chủ Tịch HĐQT)', role: 'Chủ Tịch HĐQT', dept: 'Ban Quản Trị', code: 'HN10-268' },
     { email: 'vumikasa6@gmail.com', name: 'Phạm Văn Vũ', role: 'truong_ban_truyen_thong', dept: 'Ban truyền thông', code: 'CEO HN10-000003' },
-    { email: 'info@viconnect.vn', name: 'Phạm hồng Nguyên', role: 'member', dept: 'Hội viên ceohn10', code: 'CEO HN10-000001' },
-    { email: 'vupv090120@gmail.com', name: 'Phạm An Nam', role: 'member', dept: 'Hội viên ceohn10', code: 'CEO HN10-000002' }
+    { email: 'info@viconnect.vn', name: 'Phạm hồng Nguyên', role: 'member', dept: 'Học viên ceohn10', code: 'CEO HN10-000001' },
+    { email: 'vupv090120@gmail.com', name: 'Phạm An Nam', role: 'member', dept: 'Học viên ceohn10', code: 'CEO HN10-000002' }
   ];
 
   const emailsList = targetAccounts.map(a => `'${a.email}'`).join(', ');

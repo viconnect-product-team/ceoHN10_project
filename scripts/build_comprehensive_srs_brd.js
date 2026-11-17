@@ -66,7 +66,7 @@ async function buildOfficialDocuments() {
     },
     {
       title: 'TÀI LIỆU ĐẶC TẢ YÊU CẦU PHẦN MỀM ỨNG DỤNG DI ĐỘNG (SRS - MOBILE APP)',
-      sub: 'ỨNG DỤNG DI ĐỘNG HỘI VIÊN CLB DOANH NHÂN CEO HN10 (HANOIBA)',
+      sub: 'ỨNG DỤNG DI ĐỘNG Học viên CLB DOANH NHÂN CEO HN10 (HANOIBA)',
       md: appSrsMd,
       outName: 'SRS_MOBILE_APP_CEOHN10.docx',
     },
@@ -77,7 +77,7 @@ async function buildOfficialDocuments() {
       outName: 'BRD_WEB_CRM_CEOHN10.docx',
     },
     {
-      title: 'TÀI LIỆU YÊU CẦU NGHIỆP VỤ ỨNG DỤNG DI ĐỘNG HỘI VIÊN (BRD - MOBILE APP)',
+      title: 'TÀI LIỆU YÊU CẦU NGHIỆP VỤ ỨNG DỤNG DI ĐỘNG Học viên (BRD - MOBILE APP)',
       sub: 'ỨNG DỤNG DI ĐỘNG CLB DOANH NHÂN CEO HN10 (HANOIBA)',
       md: appBrdMd,
       outName: 'BRD_MOBILE_APP_CEOHN10.docx',

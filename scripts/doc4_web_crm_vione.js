@@ -156,9 +156,9 @@ function buildDoc4() {
   children.push(createTable(leadColHeaders, leadColRows, [20, 18, 12, 18, 32]));
 
   // 3.2 Báo giá B2B & Hợp đồng
-  children.push(createHeading2('3.2 Quản Lý Báo Giá B2B, Hợp Đồng & Chiết Khấu Hội Viên (Quotations & Deals)'));
+  children.push(createHeading2('3.2 Quản Lý Báo Giá B2B, Hợp Đồng & Chiết Khấu Học viên (Quotations & Deals)'));
   children.push(
-    createPara('Soạn thảo và xuất bản báo giá B2B chuyên nghiệp có kèm chiết khấu hội viên CLB CEO HN10, tự động tính tổng tiền và tạo hợp đồng cung ứng:')
+    createPara('Soạn thảo và xuất bản báo giá B2B chuyên nghiệp có kèm chiết khấu Học viên CLB CEO HN10, tự động tính tổng tiền và tạo hợp đồng cung ứng:')
   );
 
   const quoteApiHeaders = ['API Endpoint', 'Phương Thức', 'Mô Tả Chức Năng', 'Bảng CSDL Chính', 'Bảng Nối (JOIN)'];

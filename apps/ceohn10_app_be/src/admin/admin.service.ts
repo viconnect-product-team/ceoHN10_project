@@ -33,7 +33,7 @@ export class AdminService implements OnModuleInit {
     private readonly gateway: ConnectAppGateway,
     private readonly adminRepo: AdminRepository,
     @Optional() private readonly mailService?: MailService,
-  ) {}
+  ) { }
 
   async onModuleInit() {
     try {
@@ -41,7 +41,7 @@ export class AdminService implements OnModuleInit {
       await this.prisma.$executeRawUnsafe(`
         ALTER TABLE public.expense_requests ADD COLUMN IF NOT EXISTS voucher_code TEXT;
         ALTER TABLE public.expense_requests ADD COLUMN IF NOT EXISTS in_kind_deducted BOOLEAN DEFAULT false;
-      `).catch(() => {});
+      `).catch(() => { });
     } catch (e) {
       console.warn('Could not ensure notifications table:', e);
     }
@@ -197,7 +197,7 @@ export class AdminService implements OnModuleInit {
           (r.member_id
             ? `MB-${String(r.member_id).slice(0, 6).toUpperCase()}`
             : 'MB-CHUA-CO'),
-        name: r.member_name || r.member_contact || r.member_email || 'Hội viên',
+        name: r.member_name || r.member_contact || r.member_email || 'Học viên',
         contact: r.member_contact || r.member_name || '',
         email: r.member_email || '',
         phone: r.member_phone || '',
@@ -244,7 +244,7 @@ export class AdminService implements OnModuleInit {
         SELECT 
           i.*,
           COALESCE(m.code, '') as member_code,
-          COALESCE(m.name, u.name, u.email, 'Hội viên') as member_name,
+          COALESCE(m.name, u.name, u.email, 'Học viên') as member_name,
           COALESCE(m.contact, u.name, '') as member_contact,
           COALESCE(m.email, u.email, '') as member_email,
           COALESCE(m.phone, '') as member_phone,
@@ -307,14 +307,14 @@ export class AdminService implements OnModuleInit {
               m.name || '',
               m.email || '',
               m.phone || ''
-            ).catch(() => {});
+            ).catch(() => { });
           }
 
           rows = await this.prisma.$queryRaw<any[]>`
             SELECT 
               i.*,
               COALESCE(m.code, '') as member_code,
-              COALESCE(m.name, u.name, u.email, 'Hội viên') as member_name,
+              COALESCE(m.name, u.name, u.email, 'Học viên') as member_name,
               COALESCE(m.contact, u.name, '') as member_contact,
               COALESCE(m.email, u.email, '') as member_email,
               COALESCE(m.phone, '') as member_phone,
@@ -467,7 +467,7 @@ export class AdminService implements OnModuleInit {
               safeData,
               dedupeKey,
             )
-            .catch(() => {});
+            .catch(() => { });
 
           await this.prisma
             .$executeRawUnsafe(
@@ -483,7 +483,7 @@ export class AdminService implements OnModuleInit {
               notifBody,
               id,
             )
-            .catch(() => {});
+            .catch(() => { });
         }
       } catch (e: any) {
         console.warn(
@@ -507,7 +507,7 @@ export class AdminService implements OnModuleInit {
         process.env.ADMIN_NOTIFY_EMAIL ||
         'vupv090120@gmail.com'
       ).trim();
-      const memberName = existing.invoice.member?.name || 'Quý Hội viên';
+      const memberName = existing.invoice.member?.name || 'Quý Học viên';
 
       this.mailService
         .sendMembershipFeeSuccessEmail({
@@ -577,7 +577,7 @@ export class AdminService implements OnModuleInit {
             existing.invoice.amount || 0,
           ).toLocaleString('vi-VN');
           const notifTitle = `[Nhắc nhở] Quá hạn thanh toán hội phí`;
-          const notifBody = `Hóa đơn ${existing.invoice.invoiceNo || id} (Số tiền: ${formattedAmount} đ) của Quý hội viên đã quá hạn thanh toán ngày ${existing.invoice.dueDate || 'gần nhất'}. Vui lòng kiểm tra và hoàn tất thanh toán.`;
+          const notifBody = `Hóa đơn ${existing.invoice.invoiceNo || id} (Số tiền: ${formattedAmount} đ) của Quý Học viên đã quá hạn thanh toán ngày ${existing.invoice.dueDate || 'gần nhất'}. Vui lòng kiểm tra và hoàn tất thanh toán.`;
           const dedupeKey = `reminder-${id}-${Date.now()}`;
           const safeDisplayData = JSON.stringify({
             title: notifTitle,
@@ -634,7 +634,7 @@ export class AdminService implements OnModuleInit {
                 notifBody,
                 id,
               )
-              .catch(() => {});
+              .catch(() => { });
           }
           if (targetUserId) {
             await this.prisma
@@ -651,7 +651,7 @@ export class AdminService implements OnModuleInit {
                 notifBody,
                 id,
               )
-              .catch(() => {});
+              .catch(() => { });
           }
 
           // 3. Đẩy template tin nhắn tương tác (Actionable template) kèm VNPAY-QR trực tiếp vào tin nhắn
@@ -664,7 +664,7 @@ export class AdminService implements OnModuleInit {
             await this.prisma.$executeRaw`
               INSERT INTO public.messages (id, from_id, to_id, text, created_at)
               VALUES (gen_random_uuid(), 'ADMIN', ${String(memberCode).toLowerCase()}, ${actionMsg}, NOW())
-            `.catch(() => {});
+            `.catch(() => { });
           }
 
           if (this.mailService) {
@@ -681,7 +681,7 @@ export class AdminService implements OnModuleInit {
             const recipientEmail = (mem?.email || '').trim();
 
             if (recipientEmail && !isMemInactive) {
-              const memberName = mem?.name || 'Quý Hội viên';
+              const memberName = mem?.name || 'Quý Học viên';
 
               this.mailService
                 .sendMembershipFeeNotificationEmail({
@@ -756,7 +756,7 @@ export class AdminService implements OnModuleInit {
       const recipientEmail = (created.invoice.member?.email || '').trim();
 
       if (recipientEmail && !isMemInactive) {
-        const memberName = created.invoice.member?.name || 'Quý Hội viên';
+        const memberName = created.invoice.member?.name || 'Quý Học viên';
 
         this.mailService
           .sendMembershipFeeNotificationEmail({
@@ -873,16 +873,16 @@ export class AdminService implements OnModuleInit {
 
   /**
    * Tự động quét và đồng bộ các cảnh báo hệ thống vào public.notifications:
-   * 1. 👤 Hồ sơ hội viên mới nộp đơn đang chờ duyệt (status = 'pending')
-   * 2. ⚠️ Hội viên quá hạn hội phí (fee_paid = false && (new_term_end || term_end) < NOW())
-   * 3. ⏳ Hội viên sắp đến hạn hội phí trong 30 ngày (term_end BETWEEN NOW() AND NOW() + 30 days)
+   * 1. 👤 Hồ sơ Học viên mới nộp đơn đang chờ duyệt (status = 'pending')
+   * 2. ⚠️ Học viên quá hạn hội phí (fee_paid = false && (new_term_end || term_end) < NOW())
+   * 3. ⏳ Học viên sắp đến hạn hội phí trong 30 ngày (term_end BETWEEN NOW() AND NOW() + 30 days)
    * 4. Tự động dọn dẹp các cảnh báo đã xử lý xong (đã duyệt hoặc đã nộp phí)
    */
   async syncSystemAlertNotifications(associationId?: string): Promise<void> {
     try {
       const validAssocId = isValidUuid(associationId) ? associationId : null;
 
-      // 1. Quét hồ sơ hội viên mới (status = 'pending')
+      // 1. Quét hồ sơ Học viên mới (status = 'pending')
       const pendingMembers = await this.prisma.$queryRaw<any[]>`
         SELECT id, code, name, company_name, created_at, association_id
         FROM public.members
@@ -893,8 +893,8 @@ export class AdminService implements OnModuleInit {
       for (const m of pendingMembers) {
         const notifCode = `NOTIF-MBR-PENDING-${m.id}`;
         const company = m.company_name || 'Doanh nghiệp mới';
-        const notifTitle = `👤 [Hồ sơ hội viên mới] Đăng ký: ${company}`;
-        const notifBody = `Hội viên ${m.name} (${company}) vừa nộp đơn đăng ký gia nhập CLB CEO HN10 và đang chờ Ban Quản Trị phê duyệt.`;
+        const notifTitle = `👤 [Hồ sơ Học viên mới] Đăng ký: ${company}`;
+        const notifBody = `Học viên ${m.name} (${company}) vừa nộp đơn đăng ký gia nhập CLB CEO HN10 và đang chờ Ban Quản Trị phê duyệt.`;
 
         await this.prisma
           .$executeRawUnsafe(
@@ -910,10 +910,10 @@ export class AdminService implements OnModuleInit {
             notifBody,
             m.association_id || validAssocId || null,
           )
-          .catch(() => {});
+          .catch(() => { });
       }
 
-      // Xóa thông báo pending cho các hội viên đã được duyệt hoặc từ chối
+      // Xóa thông báo pending cho các Học viên đã được duyệt hoặc từ chối
       await this.prisma
         .$executeRawUnsafe(
           `
@@ -924,9 +924,9 @@ export class AdminService implements OnModuleInit {
           )
       `,
         )
-        .catch(() => {});
+        .catch(() => { });
 
-      // 2. Quét hội viên quá hạn hội phí
+      // 2. Quét Học viên quá hạn hội phí
       const overdueMembers = await this.prisma.$queryRaw<any[]>`
         SELECT id, code, name, company_name, term_end, new_term_end, fee_paid, payment_status, association_id
         FROM public.members
@@ -940,12 +940,12 @@ export class AdminService implements OnModuleInit {
 
       for (const m of overdueMembers) {
         const notifCode = `NOTIF-FEE-OVERDUE-${m.id}`;
-        const company = m.company_name || m.code || 'Hội viên';
+        const company = m.company_name || m.code || 'Học viên';
         const dateStr = m.term_end
           ? new Date(m.term_end).toLocaleDateString('vi-VN')
           : 'kỳ trước';
         const notifTitle = `⚠️ [Quá hạn hội phí] ${m.name} (${company})`;
-        const notifBody = `Hội viên ${m.name} (${company}) đã quá hạn đóng phí niên liễm (Hạn đóng: ${dateStr}). Đề nghị Ban Thư Ký & Kế toán kiểm tra và đôn đốc thu phí.`;
+        const notifBody = `Học viên ${m.name} (${company}) đã quá hạn đóng phí niên liễm (Hạn đóng: ${dateStr}). Đề nghị Ban Thư Ký & Kế toán kiểm tra và đôn đốc thu phí.`;
 
         await this.prisma
           .$executeRawUnsafe(
@@ -961,10 +961,10 @@ export class AdminService implements OnModuleInit {
             notifBody,
             m.association_id || validAssocId || null,
           )
-          .catch(() => {});
+          .catch(() => { });
       }
 
-      // Xóa thông báo quá hạn nếu hội viên đã hoàn thành đóng phí
+      // Xóa thông báo quá hạn nếu Học viên đã hoàn thành đóng phí
       await this.prisma
         .$executeRawUnsafe(
           `
@@ -975,9 +975,9 @@ export class AdminService implements OnModuleInit {
           )
       `,
         )
-        .catch(() => {});
+        .catch(() => { });
 
-      // 3. Quét hội viên sắp đến hạn hội phí trong 30 ngày
+      // 3. Quét Học viên sắp đến hạn hội phí trong 30 ngày
       const soonExpiringMembers = await this.prisma.$queryRaw<any[]>`
         SELECT id, code, name, company_name, term_end, new_term_end, fee_paid, association_id,
                ROUND(EXTRACT(EPOCH FROM (COALESCE(new_term_end, term_end)::timestamp - NOW())) / 86400) as days_left
@@ -992,13 +992,13 @@ export class AdminService implements OnModuleInit {
 
       for (const m of soonExpiringMembers) {
         const notifCode = `NOTIF-FEE-SOON-${m.id}`;
-        const company = m.company_name || m.code || 'Hội viên';
+        const company = m.company_name || m.code || 'Học viên';
         const days = Math.max(1, Number(m.days_left || 0));
         const dateStr = m.term_end
           ? new Date(m.term_end).toLocaleDateString('vi-VN')
           : '';
         const notifTitle = `⏳ [Cảnh báo sắp hết hạn hội phí] ${m.name}`;
-        const notifBody = `Hội viên ${m.name} (${company}) sắp đến hạn đóng phí thường niên (còn ${days} ngày nữa, hạn: ${dateStr}). Đề nghị phát thông báo gia hạn hội phí.`;
+        const notifBody = `Học viên ${m.name} (${company}) sắp đến hạn đóng phí thường niên (còn ${days} ngày nữa, hạn: ${dateStr}). Đề nghị phát thông báo gia hạn hội phí.`;
 
         await this.prisma
           .$executeRawUnsafe(
@@ -1014,10 +1014,10 @@ export class AdminService implements OnModuleInit {
             notifBody,
             m.association_id || validAssocId || null,
           )
-          .catch(() => {});
+          .catch(() => { });
       }
 
-      // Xóa thông báo sắp đến hạn nếu hội viên đã hoàn thành đóng phí
+      // Xóa thông báo sắp đến hạn nếu Học viên đã hoàn thành đóng phí
       await this.prisma
         .$executeRawUnsafe(
           `
@@ -1028,7 +1028,7 @@ export class AdminService implements OnModuleInit {
           )
       `,
         )
-        .catch(() => {});
+        .catch(() => { });
       // 4. Quét sự kiện sắp diễn ra trong 2 ngày tới
       const upcomingEvents = await this.prisma.$queryRaw<any[]>`
         SELECT id, title, start_date, location, association_id
@@ -1044,7 +1044,7 @@ export class AdminService implements OnModuleInit {
         const notifCode = `NOTIF-EVT-UPCOMING-${ev.id}`;
         const dateStr = new Date(ev.start_date).toLocaleDateString('vi-VN');
         const notifTitle = `🌟 [Nhắc nhở sự kiện] ${ev.title}`;
-        const notifBody = `Sự kiện "${ev.title}" sắp diễn ra vào ngày ${dateStr} tại ${ev.location || 'Hà Nội'}. Kính mời Quý Hội viên chuẩn bị tham dự đúng giờ.`;
+        const notifBody = `Sự kiện "${ev.title}" sắp diễn ra vào ngày ${dateStr} tại ${ev.location || 'Hà Nội'}. Kính mời Quý Học viên chuẩn bị tham dự đúng giờ.`;
 
         await this.prisma.$executeRawUnsafe(
           `
@@ -1058,7 +1058,7 @@ export class AdminService implements OnModuleInit {
           notifTitle,
           notifBody,
           ev.association_id || validAssocId || null,
-        ).catch(() => {});
+        ).catch(() => { });
       }
 
       // 5. Quét lớp học & buổi đào tạo sắp diễn ra (Thứ 7 hàng tuần hoặc buổi học riêng)
@@ -1076,7 +1076,7 @@ export class AdminService implements OnModuleInit {
         const notifCode = `NOTIF-TRN-UPCOMING-${trn.id}`;
         const dateStr = new Date(trn.start_time).toLocaleDateString('vi-VN');
         const notifTitle = `🎓 [Lịch học sắp tới] ${trn.title}`;
-        const notifBody = `Buổi đào tạo "${trn.title}" (Giảng viên: ${trn.instructor_name || 'Chuyên gia HanoiBA'}) sẽ bắt đầu vào ngày ${dateStr}. Hội viên vui lòng tải tài liệu slide và quét mã điểm danh khi vào lớp.`;
+        const notifBody = `Buổi đào tạo "${trn.title}" (Giảng viên: ${trn.instructor_name || 'Chuyên gia HanoiBA'}) sẽ bắt đầu vào ngày ${dateStr}. Học viên vui lòng tải tài liệu slide và quét mã điểm danh khi vào lớp.`;
 
         await this.prisma.$executeRawUnsafe(
           `
@@ -1090,7 +1090,7 @@ export class AdminService implements OnModuleInit {
           notifTitle,
           notifBody,
           trn.association_id || validAssocId || null,
-        ).catch(() => {});
+        ).catch(() => { });
       }
 
       // 6. Quét hóa đơn & phiếu thu chi đang chờ thanh toán
@@ -1105,7 +1105,7 @@ export class AdminService implements OnModuleInit {
         const notifCode = `NOTIF-INV-PENDING-${inv.id}`;
         const amountStr = Number(inv.total_amount || 0).toLocaleString('vi-VN');
         const notifTitle = `🧾 [Hóa đơn chờ thanh toán] Số #${inv.invoice_number || inv.id}`;
-        const notifBody = `Hóa đơn thu phí / dịch vụ #${inv.invoice_number} cho ${inv.customer_name || 'Hội viên'} trị giá ${amountStr} đ đang chờ xử lý quyết toán.`;
+        const notifBody = `Hóa đơn thu phí / dịch vụ #${inv.invoice_number} cho ${inv.customer_name || 'Học viên'} trị giá ${amountStr} đ đang chờ xử lý quyết toán.`;
 
         await this.prisma.$executeRawUnsafe(
           `
@@ -1119,7 +1119,7 @@ export class AdminService implements OnModuleInit {
           notifTitle,
           notifBody,
           inv.association_id || validAssocId || null,
-        ).catch(() => {});
+        ).catch(() => { });
       }
 
       // 7. Quét công việc / nhiệm vụ được giao sắp đến hạn
@@ -1150,7 +1150,7 @@ export class AdminService implements OnModuleInit {
           notifTitle,
           notifBody,
           validAssocId || null,
-        ).catch(() => {});
+        ).catch(() => { });
       }
 
       // 8. Quét đề xuất xin duyệt chi quỹ đã được duyệt
@@ -1181,7 +1181,7 @@ export class AdminService implements OnModuleInit {
           notifTitle,
           notifBody,
           validAssocId || null,
-        ).catch(() => {});
+        ).catch(() => { });
       }
     } catch (err: any) {
       console.warn('[syncSystemAlertNotifications] Error:', err?.message);
@@ -1216,7 +1216,7 @@ export class AdminService implements OnModuleInit {
       for (const d of dRows) {
         if (d.id) dismissedIds.add(String(d.id));
       }
-    } catch {}
+    } catch { }
 
     // 1. Query broadcast notifications from public.notifications
     try {
@@ -1425,7 +1425,7 @@ export class AdminService implements OnModuleInit {
           const pendingId = `PENDING-MB-${m.id}`;
           if (dismissedIds.has(pendingId) || dismissedIds.has(String(m.id)))
             continue;
-          const title = `Đăng ký hội viên mới: ${m.contact || m.name} - ${m.name}`;
+          const title = `Đăng ký Học viên mới: ${m.contact || m.name} - ${m.name}`;
           const body = `Ứng viên ${m.contact || m.name} (${m.phone || m.email || 'CLB CEO HN10'}) vừa nộp hồ sơ xin gia nhập. Bấm để duyệt ngay.`;
           const key = `${title}:${body}`;
           if (!seenMap.has(key)) {
@@ -1579,7 +1579,7 @@ export class AdminService implements OnModuleInit {
       deptLower.includes('ket_nap')
     ) {
       targetChannel = 'channel_membership';
-      channelLabel = 'Ban Thành Viên & Hội Viên';
+      channelLabel = 'Ban Thành Viên & Học viên';
     } else if (
       deptLower.includes('xuc_tien') ||
       deptLower.includes('promotion') ||
@@ -1629,7 +1629,7 @@ export class AdminService implements OnModuleInit {
           targetUserId,
           directMsgText,
         )
-        .catch(() => {});
+        .catch(() => { });
 
       if (memCode && memCode !== targetUserId) {
         await this.prisma
@@ -1641,7 +1641,7 @@ export class AdminService implements OnModuleInit {
             String(memCode).toLowerCase(),
             directMsgText,
           )
-          .catch(() => {});
+          .catch(() => { });
       }
 
       // Realtime push notification & message event
@@ -1673,7 +1673,7 @@ export class AdminService implements OnModuleInit {
           targetChannel,
           broadcastMsgText,
         )
-        .catch(() => {});
+        .catch(() => { });
 
       // Ghi thêm vào kênh chung group_ceohn10_broadcast
       await this.prisma
@@ -1684,7 +1684,7 @@ export class AdminService implements OnModuleInit {
       `,
           broadcastMsgText,
         )
-        .catch(() => {});
+        .catch(() => { });
 
       // Phát realtime socket cho toàn bộ app
       this.gateway.emitToAll('dm:message_received', {
@@ -1700,7 +1700,7 @@ export class AdminService implements OnModuleInit {
         time: nowIso,
       });
 
-      // Thu thập danh sách hội viên nhận thông báo
+      // Thu thập danh sách Học viên nhận thông báo
       try {
         const validAssocId = isValidUuid(associationId) ? associationId : null;
         const members = validAssocId
@@ -1754,7 +1754,7 @@ export class AdminService implements OnModuleInit {
             body,
             code,
           )
-          .catch(() => {});
+          .catch(() => { });
       }
     }
 
@@ -1786,7 +1786,7 @@ export class AdminService implements OnModuleInit {
           appScope,
           appScope,
         )
-        .catch(() => {});
+        .catch(() => { });
     }
 
     this.gateway.emitToAll('notification:new', {
@@ -1920,7 +1920,7 @@ export class AdminService implements OnModuleInit {
           id,
         )
         .catch(() => null);
-    } catch {}
+    } catch { }
 
     await this.prisma
       .$executeRawUnsafe(
@@ -1985,7 +1985,7 @@ export class AdminService implements OnModuleInit {
         targetChannel,
         id,
       )
-      .catch(() => {});
+      .catch(() => { });
 
     // Also update business_notifications if matching
     await this.prisma
@@ -1997,12 +1997,12 @@ export class AdminService implements OnModuleInit {
     `,
         id,
       )
-      .catch(() => {});
+      .catch(() => { });
 
     // Post to public.messages
     const channelLabelMap: Record<string, string> = {
       channel_media: 'Ban Truyền Thông & Sự Kiện',
-      channel_membership: 'Ban Thành Viên & Hội Viên',
+      channel_membership: 'Ban Thành Viên & Học viên',
       channel_promotion: 'Ban Xúc Tiến Thương Mại & Marketplace',
       channel_secretariat: 'Ban Thư Ký & Ban Điều Hành',
       channel_deals: 'Kênh Cơ Hội & Deal B2B',
@@ -2021,7 +2021,7 @@ export class AdminService implements OnModuleInit {
         targetChannel,
         broadcastMsgText,
       )
-      .catch(() => {});
+      .catch(() => { });
 
     await this.prisma
       .$executeRawUnsafe(
@@ -2031,7 +2031,7 @@ export class AdminService implements OnModuleInit {
     `,
         broadcastMsgText,
       )
-      .catch(() => {});
+      .catch(() => { });
 
     const nowIso = new Date().toISOString();
     this.gateway.emitToAll('dm:message_received', {
@@ -2073,13 +2073,13 @@ export class AdminService implements OnModuleInit {
       return { event: null, attendees: [], totalCount: 0, confirmedCount: 0 };
     }
 
-    // 2. Lấy danh sách hội viên / đại biểu đã đăng ký sự kiện này
+    // 2. Lấy danh sách Học viên / đại biểu đã đăng ký sự kiện này
     const attendees: any[] =
       (await this.prisma.$queryRaw<any[]>`
       SELECT 
         er.id,
         er.event_id,
-        COALESCE(er.member_name, m.name, 'Hội viên CEO') as name,
+        COALESCE(er.member_name, m.name, 'Học viên CEO') as name,
         COALESCE(er.member_code, m.code, '') as code,
         COALESCE(er.email, m.email, '') as email,
         COALESCE(er.phone, m.phone, '') as phone,
@@ -2181,7 +2181,7 @@ export class AdminService implements OnModuleInit {
     const finalPosterUrl =
       posterUrl?.trim() || ev?.poster_url || ev?.banner_url || null;
 
-    // 2. Lấy danh sách hội viên thỏa mãn bộ lọc
+    // 2. Lấy danh sách Học viên thỏa mãn bộ lọc
     let filterCondition = `er.event_id = '${eventId}' AND er.status != 'cancelled'`;
     if (targetFilter === 'confirmed_only') {
       filterCondition += ` AND (er.status = 'confirmed' OR er.payment_status = 'paid' OR er.payment_status = 'free')`;
@@ -2195,7 +2195,7 @@ export class AdminService implements OnModuleInit {
           `
       SELECT 
         er.id,
-        COALESCE(er.member_name, m.name, 'Hội viên CEO') as name,
+        COALESCE(er.member_name, m.name, 'Học viên CEO') as name,
         COALESCE(er.member_code, m.code, '') as code,
         COALESCE(er.email, m.email, '') as email,
         COALESCE(er.phone, m.phone, '') as phone,
@@ -2236,13 +2236,13 @@ export class AdminService implements OnModuleInit {
         finalPosterUrl,
         eventId,
       )
-      .catch(() => {});
+      .catch(() => { });
 
-    // 4. Bắn tin nhắn và gửi thông báo trực tiếp tới từng hội viên đã đăng ký
+    // 4. Bắn tin nhắn và gửi thông báo trực tiếp tới từng Học viên đã đăng ký
     for (const att of attendees) {
       const targetUserId = att.user_id;
       const targetMemberCode = att.code;
-      const attendeeName = att.name || 'Quý Hội viên';
+      const attendeeName = att.name || 'Quý Học viên';
       const seatInfo = att.seat_assignment
         ? `Ghế/Bàn: ${att.seat_assignment}`
         : '';
@@ -2254,7 +2254,7 @@ export class AdminService implements OnModuleInit {
         ? `[image:${finalPosterUrl}|Poster ${title}]\n\n${textDetails}`
         : textDetails;
 
-      // A. Ghi vào public.messages của hội viên (Direct Chat Message)
+      // A. Ghi vào public.messages của Học viên (Direct Chat Message)
       if (targetUserId) {
         await this.prisma
           .$executeRawUnsafe(
@@ -2266,7 +2266,7 @@ export class AdminService implements OnModuleInit {
             directMsgText,
             finalPosterUrl,
           )
-          .catch(() => {});
+          .catch(() => { });
       }
       if (targetMemberCode && targetMemberCode !== targetUserId) {
         await this.prisma
@@ -2279,7 +2279,7 @@ export class AdminService implements OnModuleInit {
             directMsgText,
             finalPosterUrl,
           )
-          .catch(() => {});
+          .catch(() => { });
       }
 
       // B. Ghi vào public.member_notifications cho App Hiệp Hội
@@ -2300,7 +2300,7 @@ export class AdminService implements OnModuleInit {
             eventId,
             finalPosterUrl,
           )
-          .catch(() => {});
+          .catch(() => { });
       }
 
       // C. Ghi vào public.business_notifications
@@ -2336,7 +2336,7 @@ export class AdminService implements OnModuleInit {
             displayData,
             dedupeKey,
           )
-          .catch(() => {});
+          .catch(() => { });
       }
 
       // D. Phát realtime Socket tới phòng của người dùng
@@ -2585,7 +2585,7 @@ export class AdminService implements OnModuleInit {
 
   async getFundsOverview() {
     try {
-      // 1. Quỹ Chung CLB (General Fund) - Tổng hợp theo phí hội viên
+      // 1. Quỹ Chung CLB (General Fund) - Tổng hợp theo phí Học viên
       const duesRows = await this.prisma.$queryRawUnsafe<any[]>(`
         SELECT COALESCE(SUM(amount), 0) as total_dues, COUNT(*) as cnt
         FROM public.transactions
@@ -2669,7 +2669,7 @@ export class AdminService implements OnModuleInit {
       return {
         generalFund: {
           name: 'Quỹ Chung CLB CEO HN10',
-          source: 'Hội phí niên liễm hội viên',
+          source: 'Hội phí niên liễm Học viên',
           totalIncome: totalDues,
           totalExpense: totalGeneralExpense,
           balance: generalBalance,
@@ -2874,7 +2874,7 @@ export class AdminService implements OnModuleInit {
         fundType: r.fund_type,
         department: 'Ban Sự Kiện – Hậu Cần'
       })
-    ).catch(() => {});
+    ).catch(() => { });
 
     // 4. Tự động bắn thông báo sang Ban Truyền Thông và Ban Đối Ngoại & Giao Thương để đăng bài PR
     await this.prisma.$executeRawUnsafe(`
@@ -2895,7 +2895,7 @@ export class AdminService implements OnModuleInit {
         voucherCode,
         departments: ['Ban Truyền Thông', 'Ban Đối Ngoại & Giao Thương']
       })
-    ).catch(() => {});
+    ).catch(() => { });
 
     return {
       success: true,
@@ -2949,7 +2949,7 @@ export class AdminService implements OnModuleInit {
       r.fund_type || 'general',
       r.department,
       r.target_id || null,
-    ).catch(() => {});
+    ).catch(() => { });
 
     return { success: true, message: 'Đã giải ngân và cập nhật số dư quỹ thành công' };
   }
@@ -3007,19 +3007,19 @@ export class AdminService implements OnModuleInit {
     return [
       {
         id: 'cat_members',
-        name: 'HỘI VIÊN',
+        name: 'Học viên',
         iconName: 'Users',
         features: [
           {
             id: 'feat_members',
-            name: 'Hội viên',
+            name: 'Học viên',
             route: '/members',
-            description: 'Quản lý hồ sơ hội viên cá nhân',
+            description: 'Quản lý hồ sơ Học viên cá nhân',
             actions: [
-              { id: 'act_mem_view', name: 'Xem danh sách hội viên', code: 'MEM_VIEW', description: 'Tra cứu thông tin cá nhân', apiEndpoint: 'GET /api/members', roles: { ...allRolesGranted } },
-              { id: 'act_mem_add', name: 'Thêm mới hội viên', code: 'MEM_ADD', description: 'Tạo mới hồ sơ', apiEndpoint: 'POST /api/members', roles: { quan_tri: true, chu_tich: true, admin: true, truong_ban_thanh_vien: true } },
-              { id: 'act_mem_edit', name: 'Chỉnh sửa hội viên', code: 'MEM_EDIT', description: 'Cập nhật thông tin', apiEndpoint: 'PUT /api/members/:id', roles: { quan_tri: true, chu_tich: true, admin: true, truong_ban_thanh_vien: true } },
-              { id: 'act_mem_delete', name: 'Xóa hội viên', code: 'MEM_DELETE', description: 'Đình chỉ hoặc xóa', apiEndpoint: 'DELETE /api/members/:id', roles: { quan_tri: true, chu_tich: true } },
+              { id: 'act_mem_view', name: 'Xem danh sách Học viên', code: 'MEM_VIEW', description: 'Tra cứu thông tin cá nhân', apiEndpoint: 'GET /api/members', roles: { ...allRolesGranted } },
+              { id: 'act_mem_add', name: 'Thêm mới Học viên', code: 'MEM_ADD', description: 'Tạo mới hồ sơ', apiEndpoint: 'POST /api/members', roles: { quan_tri: true, chu_tich: true, admin: true, truong_ban_thanh_vien: true } },
+              { id: 'act_mem_edit', name: 'Chỉnh sửa Học viên', code: 'MEM_EDIT', description: 'Cập nhật thông tin', apiEndpoint: 'PUT /api/members/:id', roles: { quan_tri: true, chu_tich: true, admin: true, truong_ban_thanh_vien: true } },
+              { id: 'act_mem_delete', name: 'Xóa Học viên', code: 'MEM_DELETE', description: 'Đình chỉ hoặc xóa', apiEndpoint: 'DELETE /api/members/:id', roles: { quan_tri: true, chu_tich: true } },
             ],
           },
           {
@@ -3034,9 +3034,9 @@ export class AdminService implements OnModuleInit {
           },
           {
             id: 'feat_renewal',
-            name: 'Gia hạn hội viên',
+            name: 'Gia hạn Học viên',
             route: '/renewal',
-            description: 'Quản lý niên liễm hội viên',
+            description: 'Quản lý niên liễm Học viên',
             actions: [
               { id: 'act_ren_view', name: 'Xem gia hạn', code: 'REN_VIEW', description: 'Tra cứu hạn phí', apiEndpoint: 'GET /api/renewals', roles: { ...allRolesGranted } },
               { id: 'act_ren_process', name: 'Xử lý gia hạn', code: 'REN_PROCESS', description: 'Gia hạn niên liễm', apiEndpoint: 'POST /api/renewals/extend', roles: { quan_tri: true, chu_tich: true, admin: true, truong_ban_tai_chinh: true } },
@@ -3218,8 +3218,8 @@ export class AdminService implements OnModuleInit {
           'Web CRM',
           metaJson,
         )
-        .catch(() => {});
-    } catch {}
+        .catch(() => { });
+    } catch { }
   }
 
   async savePermissionMatrix(payload: any, userId?: string) {
@@ -3409,7 +3409,7 @@ export class AdminService implements OnModuleInit {
 
     return {
       success: true,
-      message: 'Cập nhật phân quyền tài khoản hội viên thành công',
+      message: 'Cập nhật phân quyền tài khoản Học viên thành công',
       permissionsMap,
       updatedAt: new Date().toISOString(),
     };
@@ -3487,7 +3487,7 @@ export class AdminService implements OnModuleInit {
           const title = prod.name || prod.title || 'Phần thưởng doanh nhân';
           const amt = BigInt(prod.price || 50000000);
           const valStr = `${Number(amt).toLocaleString('vi-VN')} VNĐ`;
-          const comp = prod.company || 'Doanh nghiệp Hội viên CEO HN10';
+          const comp = prod.company || 'Doanh nghiệp Học viên CEO HN10';
 
           await this.prisma.$executeRaw`
             INSERT INTO public.event_prizes (
@@ -3499,7 +3499,7 @@ export class AdminService implements OnModuleInit {
               'PRODUCT', ${prod.id}, ${comp}, ${prod.description || ''},
               ${rk.icon}, ${prod.image_url || null}, ${rk.color}, 'active', NOW(), NOW()
             )
-          `.catch(() => {});
+          `.catch(() => { });
         }
       }
 
@@ -3555,7 +3555,7 @@ export class AdminService implements OnModuleInit {
           const checkedInCandidates = await this.prisma.$queryRaw<any[]>`
             SELECT 
               COALESCE(er.lucky_number, er.id) as code,
-              COALESCE(er.member_name, m.name, 'Hội viên CEO') as name,
+              COALESCE(er.member_name, m.name, 'Học viên CEO') as name,
               COALESCE(m.company_name, 'Doanh nghiệp CEO HN10') as company,
               COALESCE(er.seat_assignment, 'VIP Bàn 01') as seat,
               er.checked_in_at,
@@ -3568,7 +3568,7 @@ export class AdminService implements OnModuleInit {
           `.catch(() => []);
 
           let candidates = checkedInCandidates.map((c) => ({
-            name: c.name || 'Hội viên CEO',
+            name: c.name || 'Học viên CEO',
             company: c.company || 'Doanh nghiệp CEO HN10',
             code: c.code
               ? String(c.code).startsWith('#')
@@ -3584,7 +3584,7 @@ export class AdminService implements OnModuleInit {
             const regCandidates = await this.prisma.$queryRaw<any[]>`
               SELECT 
                 COALESCE(er.lucky_number, er.id) as code,
-                COALESCE(er.member_name, m.name, 'Hội viên CEO') as name,
+                COALESCE(er.member_name, m.name, 'Học viên CEO') as name,
                 COALESCE(m.company_name, 'Doanh nghiệp CEO HN10') as company,
                 COALESCE(er.seat_assignment, 'VIP Bàn 01') as seat,
                 COALESCE(m.phone, '') as phone
@@ -3596,7 +3596,7 @@ export class AdminService implements OnModuleInit {
             `.catch(() => []);
 
             candidates = regCandidates.map((c) => ({
-              name: c.name || 'Hội viên CEO',
+              name: c.name || 'Học viên CEO',
               company: c.company || 'Doanh nghiệp CEO HN10',
               code: c.code
                 ? String(c.code).startsWith('#')
@@ -3690,9 +3690,9 @@ export class AdminService implements OnModuleInit {
             const title = String(prz.title);
             const value = String(
               prz.value ||
-                (amount > 0n
-                  ? `${Number(amount).toLocaleString('vi-VN')} VNĐ`
-                  : 'Đang cập nhật'),
+              (amount > 0n
+                ? `${Number(amount).toLocaleString('vi-VN')} VNĐ`
+                : 'Đang cập nhật'),
             );
             const quantity = Math.max(1, Math.round(Number(prz.quantity) || 1));
             const targetType = String(prz.targetType || 'PRODUCT');
@@ -3922,7 +3922,7 @@ export class AdminService implements OnModuleInit {
         subtitle: 'Thư Tri Ân & Thư Mời Đại Biểu Danh Dự',
         salutation: 'Kính gửi: Quý Doanh Nhân, Quý Đối Tác & Đại Biểu Danh Dự',
         bodyText:
-          'Nhân dịp sự kiện trọng đại của CLB Doanh Nhân CEO HN10 (HanoiBA), Ban Tổ Chức xin trân trọng gửi lời tri ân sâu sắc đến Quý Anh/Chị Hội viên và Quý Đối tác đã luôn đồng hành, cống hiến vì sự phát triển bền vững của cộng đồng doanh nhân.\n\nTrải qua hành trình gắn kết và bứt phá, mỗi thành viên chính là hạt nhân lan tỏa tinh thần tiên phong, sáng tạo và bản lĩnh thương trường. Chúng tôi tin tưởng rằng sự hiện diện của Quý Anh/Chị sẽ góp phần tạo nên một dấu ấn kết nối giao thương B2B đỉnh cao và thắt chặt tinh thần gắn kết CLB Doanh Nhân CEO HN10.\n\nKính chúc Quý Anh/Chị dồi dào sức khỏe, thành công rực rỡ và luôn giữ vững ngọn lửa nhiệt huyết tiên phong!',
+          'Nhân dịp sự kiện trọng đại của CLB Doanh Nhân CEO HN10 (HanoiBA), Ban Tổ Chức xin trân trọng gửi lời tri ân sâu sắc đến Quý Anh/Chị Học viên và Quý Đối tác đã luôn đồng hành, cống hiến vì sự phát triển bền vững của cộng đồng doanh nhân.\n\nTrải qua hành trình gắn kết và bứt phá, mỗi thành viên chính là hạt nhân lan tỏa tinh thần tiên phong, sáng tạo và bản lĩnh thương trường. Chúng tôi tin tưởng rằng sự hiện diện của Quý Anh/Chị sẽ góp phần tạo nên một dấu ấn kết nối giao thương B2B đỉnh cao và thắt chặt tinh thần gắn kết CLB Doanh Nhân CEO HN10.\n\nKính chúc Quý Anh/Chị dồi dào sức khỏe, thành công rực rỡ và luôn giữ vững ngọn lửa nhiệt huyết tiên phong!',
         date: '20:00 - Thứ Bảy, 20/11/2026',
         location: 'Trung tâm Hội nghị Quốc gia, Mễ Trì, Nam Từ Liêm, Hà Nội',
         signOff: 'Trân trọng,\nBAN TỔ CHỨC CLB DOANH NHÂN CEO HN10',
@@ -3941,7 +3941,7 @@ export class AdminService implements OnModuleInit {
         kicker: 'KẾT NỐI DOANH THƯƠNG B2B',
         title: 'CAFE DOANH NHÂN CEO HN10 - KẾT NỐI B2B',
         subtitle: 'Trao Đổi Cơ Hội - Hợp Tác Bứt Phá',
-        salutation: 'Kính gửi: Quý Anh/Chị Hội viên Doanh nhân CLB CEO HN10',
+        salutation: 'Kính gửi: Quý Anh/Chị Học viên Doanh nhân CLB CEO HN10',
         bodyText:
           'Trân trọng kính mời Quý Anh/Chị tham dự buổi Cafe Giao thương B2B định kỳ vào sáng Thứ Sáu. Đây là không gian ấm cúng, thiết thực để các CEO gặp gỡ, giới thiệu sản phẩm dịch vụ thế mạnh, trao đổi cơ hội kinh doanh và tìm kiếm đối tác chiến lược trong hệ sinh thái.\n\nSự tham gia tích cực và tinh thần cho đi của Quý Anh/Chị chính là chìa khóa mở ra những thương vụ hợp tác thành công!',
         date: '08:30 - Thứ Sáu Hàng Tuần',
@@ -3964,7 +3964,7 @@ export class AdminService implements OnModuleInit {
         subtitle: 'Triển Khai Kế Hoạch Quý & Quyết Nghị Trọng Tâm',
         salutation: 'Kính gửi: Các Thành Viên Ban Điều Hành & Trưởng 6 Ban Chuyên Môn',
         bodyText:
-          'Ban Thường trực CLB Doanh Nhân CEO HN10 kính mời Anh/Chị tham dự cuộc họp định kỳ của Ban Điều Hành nhằm rà soát tiến độ công việc, đánh giá kết quả triển khai phong trào hội viên và thống nhất các quyết sách quan trọng trong giai đoạn tới.\n\nYêu cầu các Ban chuyên môn chuẩn bị báo cáo ngắn gọn và các đề xuất cần phê duyệt trước buổi họp.',
+          'Ban Thường trực CLB Doanh Nhân CEO HN10 kính mời Anh/Chị tham dự cuộc họp định kỳ của Ban Điều Hành nhằm rà soát tiến độ công việc, đánh giá kết quả triển khai phong trào Học viên và thống nhất các quyết sách quan trọng trong giai đoạn tới.\n\nYêu cầu các Ban chuyên môn chuẩn bị báo cáo ngắn gọn và các đề xuất cần phê duyệt trước buổi họp.',
         date: '14:00 - Thứ Tư, 15/11/2026',
         location: 'Phòng Họp VIP HanoiBA & Trực Tuyến Jitsi Room CEO HN10',
         signOff: 'Chủ tịch & Tổng Thư Ký\nCLB DOANH NHÂN CEO HN10',
@@ -3978,16 +3978,16 @@ export class AdminService implements OnModuleInit {
       {
         id: 'tmpl-inv-company-visit',
         code: 'BUSINESS_TOUR',
-        name: 'Thư Mời Thăm Doanh Nghiệp Hội Viên (Business Tour)',
+        name: 'Thư Mời Thăm Doanh Nghiệp Học viên (Business Tour)',
         category: 'meeting',
         kicker: 'BUSINESS TOUR CEO HN10',
-        title: 'THĂM QUAN DOANH NGHIỆP HỘI VIÊN TIÊU BIỂU',
+        title: 'THĂM QUAN DOANH NGHIỆP Học viên TIÊU BIỂU',
         subtitle: 'Học Hỏi Mô Hình Quản Trị & Giao Lưu Thực Tế',
         salutation: 'Kính gửi: Quý Doanh Nhân CLB CEO HN10',
         bodyText:
-          'Chương trình Business Tour định kỳ đưa các CEO đến thăm trực tiếp trụ sở, văn phòng và nhà xưởng của Doanh nghiệp Hội viên tiêu biểu. Lắng nghe chia sẻ về mô hình kinh doanh, quy trình số hóa và cùng bàn thảo các phương án liên minh chuỗi cung ứng.\n\nKính mời Quý Anh/Chị đăng ký sớm do số lượng tham gia giới hạn nhằm đảm bảo chất lượng giao lưu.',
+          'Chương trình Business Tour định kỳ đưa các CEO đến thăm trực tiếp trụ sở, văn phòng và nhà xưởng của Doanh nghiệp Học viên tiêu biểu. Lắng nghe chia sẻ về mô hình kinh doanh, quy trình số hóa và cùng bàn thảo các phương án liên minh chuỗi cung ứng.\n\nKính mời Quý Anh/Chị đăng ký sớm do số lượng tham gia giới hạn nhằm đảm bảo chất lượng giao lưu.',
         date: '13:30 - Thứ Năm, 28/11/2026',
-        location: 'Trụ sở Doanh nghiệp Hội viên (Thông báo chi tiết sau đăng ký)',
+        location: 'Trụ sở Doanh nghiệp Học viên (Thông báo chi tiết sau đăng ký)',
         signOff: 'Ban Thành Viên & Ban Xúc Tiến\nCLB DOANH NHÂN CEO HN10',
         bgUrl: '/ceohn10_hero_daylight_skyline.jpg',
         themeGlowColor: 'gold',
@@ -4123,7 +4123,7 @@ export class AdminService implements OnModuleInit {
     // 3. KÊNH 3: GỬI VÀO EMAIL (Gửi HTML Email kèm poster)
     if (channels.sendToEmail && this.mailService) {
       try {
-        // Lấy danh sách hội viên thực sự HOẠT ĐỘNG (loại bỏ hoàn toàn tài khoản đã xóa/ngừng hoạt động)
+        // Lấy danh sách Học viên thực sự HOẠT ĐỘNG (loại bỏ hoàn toàn tài khoản đã xóa/ngừng hoạt động)
         const members = await this.prisma.$queryRawUnsafe<any[]>(
           `SELECT name, email, company_name FROM public.members 
            WHERE is_active = true 
@@ -4141,7 +4141,7 @@ export class AdminService implements OnModuleInit {
             </div>
             ${dto.posterUrl ? `<div style="text-align: center; padding: 12px 20px;"><img src="${dto.posterUrl}" alt="Poster Thư Mời" style="max-width: 100%; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.5);" /></div>` : ''}
             <div style="padding: 20px; font-size: 14px; line-height: 1.6; color: #e2e8f0;">
-              <p><strong>${dto.salutation || 'Kính gửi: Quý Anh/Chị Hội viên Doanh nhân,'}</strong></p>
+              <p><strong>${dto.salutation || 'Kính gửi: Quý Anh/Chị Học viên Doanh nhân,'}</strong></p>
               <p style="white-space: pre-line;">${dto.bodyText || 'Ban Tổ Chức CLB Doanh Nhân CEO HN10 trân trọng kính mời Quý Anh/Chị tham dự chương trình.'}</p>
               <div style="background: rgba(255,255,255,0.05); padding: 14px; border-radius: 8px; border-left: 4px solid #fbbf24; margin: 16px 0;">
                 <p style="margin: 0 0 6px;">📅 <strong>Thời gian:</strong> ${dto.date || ''} ${dto.time ? `(${dto.time})` : ''}</p>
@@ -4153,7 +4153,7 @@ export class AdminService implements OnModuleInit {
         `;
 
         if (members.length > 0) {
-          // Gửi trực tiếp tới các hội viên đầu mối
+          // Gửi trực tiếp tới các Học viên đầu mối
           for (const m of members.slice(0, 5)) {
             if (m.email) {
               await this.mailService.sendDirectEmail({
@@ -4187,7 +4187,7 @@ export class AdminService implements OnModuleInit {
           timestamp: new Date().toISOString(),
         }),
       );
-    } catch {}
+    } catch { }
 
     return {
       success: true,
@@ -4196,7 +4196,7 @@ export class AdminService implements OnModuleInit {
     };
   }
 
-  // ── NHẮC NHỞ THÔNG BÁO TỚI APP & EMAIL HỘI VIÊN (YÊU CẦU 1) ─────────────────
+  // ── NHẮC NHỞ THÔNG BÁO TỚI APP & EMAIL Học viên (YÊU CẦU 1) ─────────────────
   async remindNotification(notificationId: string) {
     const rows = await this.prisma.$queryRaw<any[]>`
       SELECT * FROM public.notifications WHERE id = ${notificationId}::uuid OR code = ${notificationId} LIMIT 1
@@ -4215,7 +4215,7 @@ export class AdminService implements OnModuleInit {
     }
 
     const emailsToSend = new Set<string>();
-    let targetName = 'Quý Hội viên CEO HN10';
+    let targetName = 'Quý Học viên CEO HN10';
 
     if (notif.code?.includes('NOTIF-MBR-') || notif.code?.includes('NOTIF-FEE-')) {
       const parts = notif.code.split('-');
@@ -4254,7 +4254,7 @@ export class AdminService implements OnModuleInit {
       }
     }
 
-    // Ghi vào member_notifications để App Hội viên nhận thông báo đẩy
+    // Ghi vào member_notifications để App Học viên nhận thông báo đẩy
     await this.prisma.$executeRawUnsafe(
       `
       INSERT INTO public.member_notifications (
@@ -4264,8 +4264,8 @@ export class AdminService implements OnModuleInit {
       )
     `,
       `🔔 [NHẮC NHỞ] ${notif.title || 'Thông báo CEO HN10'}`,
-      notif.body || 'Ban Điều Hành xin gửi thông báo nhắc nhở tới Quý Hội viên.',
-    ).catch(() => {});
+      notif.body || 'Ban Điều Hành xin gửi thông báo nhắc nhở tới Quý Học viên.',
+    ).catch(() => { });
 
     // Gửi email trực tiếp qua MailService
     if (this.mailService) {
@@ -4311,7 +4311,7 @@ export class AdminService implements OnModuleInit {
     `,
       notif.id,
       notif.code || '',
-    ).catch(() => {});
+    ).catch(() => { });
 
     if (this.gateway) {
       this.gateway.emitToAll('notification:reminded', {
@@ -4329,7 +4329,7 @@ export class AdminService implements OnModuleInit {
     };
   }
 
-  // ── TỔNG HỢP PHẢN ÁNH & GÓP Ý TỪ HỘI VIÊN (YÊU CẦU 4) ──────────────────────────
+  // ── TỔNG HỢP PHẢN ÁNH & GÓP Ý TỪ Học viên (YÊU CẦU 4) ──────────────────────────
   async listAllFeedbacks(query?: { category?: string; search?: string; minRating?: number }) {
     const list: any[] = [];
 
@@ -4354,7 +4354,7 @@ export class AdminService implements OnModuleInit {
           targetTitle: ef.targetTitle || 'Sự kiện CLB',
           targetType: 'event',
           targetCategory: 'Sự kiện',
-          respondentName: ef.respondentName || ef.respondentCode || 'Hội viên',
+          respondentName: ef.respondentName || ef.respondentCode || 'Học viên',
           rating: Number(ef.rating || 5),
           comment: ef.comment || '',
           recommendScore: ef.recommendScore,
@@ -4364,7 +4364,7 @@ export class AdminService implements OnModuleInit {
           createdAt: ef.createdAt,
         });
       }
-    } catch {}
+    } catch { }
 
     // 2. Lấy phản ánh từ Lớp Học / Buổi Đào Tạo (public.training_feedbacks)
     try {
@@ -4394,7 +4394,7 @@ export class AdminService implements OnModuleInit {
           createdAt: tf.createdAt,
         });
       }
-    } catch {}
+    } catch { }
 
     list.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
@@ -4409,8 +4409,8 @@ export class AdminService implements OnModuleInit {
       const s = query.search.toLowerCase();
       result = result.filter(
         item => item.respondentName.toLowerCase().includes(s) ||
-                item.targetTitle.toLowerCase().includes(s) ||
-                item.comment.toLowerCase().includes(s)
+          item.targetTitle.toLowerCase().includes(s) ||
+          item.comment.toLowerCase().includes(s)
       );
     }
 

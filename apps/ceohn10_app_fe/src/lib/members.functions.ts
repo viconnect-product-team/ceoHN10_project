@@ -1,6 +1,6 @@
 /**
  * members.functions.ts
- * Server functions cho quản lý hội viên — chỉ dùng NestJS REST API, không dùng Supabase.
+ * Server functions cho quản lý Học viên — chỉ dùng NestJS REST API, không dùng Supabase.
  */
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
@@ -74,7 +74,7 @@ function mapRow(r: Row): Member {
 
 // ── Server functions ───────────────────────────────────────────────────────────
 
-/** GET /api/members — Danh sách hội viên */
+/** GET /api/members — Danh sách Học viên */
 export const listMembersFn = createServerFn({ method: "GET" })
   .middleware([requireNestAuth])
   .handler(async ({ context }) => {
@@ -108,7 +108,7 @@ export const listPeersFn = createServerFn({ method: "GET" })
       const mapped = data.map((r: Row) => ({
         id: (r.id ?? r.userId ?? r.user_id ?? r.code) as string,
         code: (r.code as string) ?? "",
-        name: (r.name as string) ?? (r.personName as string) ?? "Hội viên CLB",
+        name: (r.name as string) ?? (r.personName as string) ?? "Học viên CLB",
         contact: (r.contact as string) ?? (r.personName as string) ?? (r.name as string) ?? "",
         email: (r.email as string) ?? "",
         phone: (r.phone as string) ?? "",
@@ -132,7 +132,7 @@ export const listPeersFn = createServerFn({ method: "GET" })
     return DEFAULT_MEMBERS;
   });
 
-/** POST /api/members — Tạo hội viên mới */
+/** POST /api/members — Tạo Học viên mới */
 export const createMemberFn = createServerFn({ method: "POST" })
   .middleware([requireNestAuth])
   .inputValidator((d: unknown) => MemberWriteSchema.parse(d))
@@ -143,7 +143,7 @@ export const createMemberFn = createServerFn({ method: "POST" })
     });
   });
 
-/** GET /api/members/:id — Chi tiết hội viên */
+/** GET /api/members/:id — Chi tiết Học viên */
 export const getMemberFn = createServerFn({ method: "GET" })
   .middleware([optionalNestAuth])
   .inputValidator((d: unknown) => IdSchema.parse(d))
@@ -184,7 +184,7 @@ export const getMemberFn = createServerFn({ method: "GET" })
     return null;
   });
 
-/** PUT /api/members/:id — Cập nhật hội viên */
+/** PUT /api/members/:id — Cập nhật Học viên */
 export const updateMemberFn = createServerFn({ method: "POST" })
   .middleware([requireNestAuth])
   .inputValidator((d: unknown) =>
@@ -198,7 +198,7 @@ export const updateMemberFn = createServerFn({ method: "POST" })
     });
   });
 
-/** DELETE /api/members/:id — Xóa hội viên */
+/** DELETE /api/members/:id — Xóa Học viên */
 export const deleteMemberFn = createServerFn({ method: "POST" })
   .middleware([requireNestAuth])
   .inputValidator((d: unknown) => IdSchema.parse(d))
@@ -229,7 +229,7 @@ export const updateMemberContactFn = createServerFn({ method: "POST" })
     });
   });
 
-/** PATCH /api/members/:id/renew — Gia hạn hội viên thêm 1 năm */
+/** PATCH /api/members/:id/renew — Gia hạn Học viên thêm 1 năm */
 export const renewMembershipFn = createServerFn({ method: "POST" })
   .middleware([requireNestAuth])
   .inputValidator((d: unknown) => IdSchema.parse(d))
@@ -276,7 +276,7 @@ export const updateMemberRoleAndDeptFn = createServerFn({ method: "POST" })
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const admin = supabaseAdmin as any;
-    
+
     // Update members
     await admin
       .from("members")

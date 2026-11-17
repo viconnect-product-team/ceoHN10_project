@@ -12,7 +12,7 @@ const transporter = nodemailer.createTransport({
 
 async function main() {
   console.log('--- TESTING SMTP CREDENTIALS & DISPATCH ---');
-  
+
   const verify = await transporter.verify();
   console.log('SMTP Verify Result:', verify);
 
@@ -34,7 +34,7 @@ async function main() {
         <li><strong>Email:</strong> vuvp090120@gmail.com</li>
         <li><strong>Ban mong muốn tham gia:</strong> Ban Thành Viên & Kết Nối Giao Thương</li>
       </ul>
-      <p>Hồ sơ của Anh/Chị đang được Ban Thành Viên & Ban Kiểm Soát CLB tiến hành thẩm định. Sau khi được phê duyệt chính thức, hệ thống sẽ tự động cấp mã hội viên và gửi mật khẩu đăng nhập tài khoản App Doanh Nhân CEO HN10 tới email này.</p>
+      <p>Hồ sơ của Anh/Chị đang được Ban Thành Viên & Ban Kiểm Soát CLB tiến hành thẩm định. Sau khi được phê duyệt chính thức, hệ thống sẽ tự động cấp mã Học viên và gửi mật khẩu đăng nhập tài khoản App Doanh Nhân CEO HN10 tới email này.</p>
       <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 20px 0;">
       <p style="font-size: 12px; color: #64748b;">Văn phòng Ban Thư Ký CLB Doanh Nhân CEO HN10 · Hotline: 0983 1983 83</p>
     </div>

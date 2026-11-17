@@ -697,20 +697,18 @@ function MemberDetailPage() {
             <button
               key={tb.key}
               onClick={() => setTab(tb.key)}
-              className={`inline-flex shrink-0 items-center justify-center gap-2 rounded-lg px-3.5 py-2 text-sm font-semibold transition-colors ${
-                active
+              className={`inline-flex shrink-0 items-center justify-center gap-2 rounded-lg px-3.5 py-2 text-sm font-semibold transition-colors ${active
                   ? "text-primary-foreground shadow-[var(--shadow-glow)]"
                   : "text-muted-foreground hover:bg-secondary hover:text-foreground"
-              }`}
+                }`}
               style={active ? { background: "var(--gradient-primary)" } : undefined}
             >
               <Icon className="h-4 w-4" />
               {t(tb.label)}
               {tb.count != null && (
                 <span
-                  className={`ml-1 rounded-full px-1.5 py-0.5 text-[10px] font-bold ${
-                    active ? "bg-card/25" : "bg-secondary text-foreground"
-                  }`}
+                  className={`ml-1 rounded-full px-1.5 py-0.5 text-[10px] font-bold ${active ? "bg-card/25" : "bg-secondary text-foreground"
+                    }`}
                 >
                   {tb.count}
                 </span>
@@ -749,7 +747,7 @@ function MemberDetailPage() {
                         </p>
                       ) : (
                         <p className="text-sm leading-relaxed text-muted-foreground">
-                          Hội viên chính thức Hiệp hội Doanh nhân CEO HN10 (HanoiBA). Sẵn sàng kết nối giao thương, hợp tác kinh doanh và phát triển chuỗi cung ứng bền vững.
+                          Học viên chính thức Hiệp hội Doanh nhân CEO HN10 (HanoiBA). Sẵn sàng kết nối giao thương, hợp tác kinh doanh và phát triển chuỗi cung ứng bền vững.
                         </p>
                       )}
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-2 border-t border-border/60">
@@ -834,7 +832,7 @@ function MemberDetailPage() {
                   try {
                     const parsed = JSON.parse(member.about);
                     if (parsed.staffSize) staffStr = parsed.staffSize;
-                  } catch {}
+                  } catch { }
                 }
                 const displayVal = staffStr || (member.employees && member.employees > 0 ? `${member.employees.toLocaleString("vi-VN")} nhân sự` : "10 - 50 nhân sự");
                 return (
@@ -1326,11 +1324,11 @@ function MemberDetailPage() {
                   {pagedReviews.map((r: any) => {
                     const ini = r.reviewerName
                       ? r.reviewerName
-                          .split(" ")
-                          .slice(-2)
-                          .map((p: string) => p[0])
-                          .join("")
-                          .toUpperCase()
+                        .split(" ")
+                        .slice(-2)
+                        .map((p: string) => p[0])
+                        .join("")
+                        .toUpperCase()
                       : "?";
                     return (
                       <div key={r.id} className="flex gap-3 py-4">

@@ -136,7 +136,7 @@ export function ViOneVoiceAssistant() {
         const res = await fetchNestApi<any>("/connect-app/network?limit=30");
         if (Array.isArray(res)) membersList = res;
         else if (res?.items) membersList = res.items;
-      } catch {}
+      } catch { }
 
       // Nếu API rỗng, lấy từ members hoặc danh sách dự phòng phong phú của ViOne
       if (membersList.length === 0) {
@@ -144,7 +144,7 @@ export function ViOneVoiceAssistant() {
           const resMem = await fetchNestApi<any>("/members?limit=30");
           if (Array.isArray(resMem)) membersList = resMem;
           else if (resMem?.items) membersList = resMem.items;
-        } catch {}
+        } catch { }
       }
 
       // Danh sách doanh nhân ViOne với toạ độ thực tế / phân bổ quanh vị trí người dùng
@@ -208,7 +208,7 @@ export function ViOneVoiceAssistant() {
             id: m.id || m.userId || String(idx),
             name: m.displayName || m.name || m.personName || "Doanh nhân ViOne",
             title: m.jobTitle || m.title || "Giám đốc điều hành",
-            company: m.companyName || m.company || "Hội viên ViOne",
+            company: m.companyName || m.company || "Học viên ViOne",
             avatarUrl: m.avatarUrl || m.avatar || null,
             phone: m.primaryPhone || m.phone || null,
             distanceMeters: dist,
@@ -297,7 +297,7 @@ export function ViOneVoiceAssistant() {
         return;
       }
 
-      // 5. Điều hướng: Thẻ hội viên / Danh thiếp số
+      // 5. Điều hướng: Thẻ Học viên / Danh thiếp số
       if (
         q.includes("danh thiếp của tôi") ||
         q.includes("thẻ của tôi") ||
@@ -365,7 +365,7 @@ export function ViOneVoiceAssistant() {
       if (recognitionRef.current) {
         try {
           recognitionRef.current.stop();
-        } catch {}
+        } catch { }
       }
       setIsListening(false);
       return;
@@ -480,7 +480,7 @@ export function ViOneVoiceAssistant() {
             if (recognitionRef.current) {
               try {
                 recognitionRef.current.stop();
-              } catch {}
+              } catch { }
             }
             setIsOpen(false);
           }}
@@ -525,11 +525,10 @@ export function ViOneVoiceAssistant() {
                     if (!next && synthRef.current) synthRef.current.cancel();
                     toast.success(next ? "Đã bật giọng nói phản hồi AI" : "Đã tắt giọng nói AI");
                   }}
-                  className={`grid h-8 w-8 place-items-center rounded-xl border transition cursor-pointer ${
-                    voiceEnabled
+                  className={`grid h-8 w-8 place-items-center rounded-xl border transition cursor-pointer ${voiceEnabled
                       ? "border-[#D8B282]/50 bg-[#D8B282]/15 text-[#F6E1C3]"
                       : "border-slate-800 bg-slate-900 text-slate-500"
-                  }`}
+                    }`}
                   title={voiceEnabled ? "Tắt giọng nói" : "Bật giọng nói"}
                 >
                   {voiceEnabled ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
@@ -542,7 +541,7 @@ export function ViOneVoiceAssistant() {
                     if (recognitionRef.current) {
                       try {
                         recognitionRef.current.stop();
-                      } catch {}
+                      } catch { }
                     }
                     setIsOpen(false);
                   }}
@@ -569,13 +568,12 @@ export function ViOneVoiceAssistant() {
 
                 <div
                   onClick={toggleListening}
-                  className={`relative flex h-20 w-20 items-center justify-center rounded-full transition-all duration-300 cursor-pointer ${
-                    isListening
+                  className={`relative flex h-20 w-20 items-center justify-center rounded-full transition-all duration-300 cursor-pointer ${isListening
                       ? "bg-gradient-to-tr from-red-600 via-rose-500 to-amber-500 shadow-[0_0_35px_rgba(239,68,68,0.7)] scale-110"
                       : isSpeaking
-                      ? "bg-gradient-to-tr from-[#C29B69] via-[#F6E1C3] to-[#D8B282] shadow-[0_0_35px_rgba(216,178,130,0.7)]"
-                      : "bg-gradient-to-tr from-[#1E293B] via-[#0F172A] to-[#1E293B] border-2 border-[#D8B282]/60 hover:border-[#D8B282]"
-                  }`}
+                        ? "bg-gradient-to-tr from-[#C29B69] via-[#F6E1C3] to-[#D8B282] shadow-[0_0_35px_rgba(216,178,130,0.7)]"
+                        : "bg-gradient-to-tr from-[#1E293B] via-[#0F172A] to-[#1E293B] border-2 border-[#D8B282]/60 hover:border-[#D8B282]"
+                    }`}
                 >
                   {isListening ? (
                     <Mic className="h-8 w-8 text-white animate-bounce" />
@@ -596,13 +594,12 @@ export function ViOneVoiceAssistant() {
                       height: isListening || isSpeaking ? `${h}px` : "4px",
                       transition: "height 0.15s ease",
                     }}
-                    className={`w-1 rounded-full ${
-                      isListening
+                    className={`w-1 rounded-full ${isListening
                         ? "bg-red-400 animate-pulse"
                         : isSpeaking
-                        ? "bg-[#D8B282] animate-pulse"
-                        : "bg-slate-700"
-                    }`}
+                          ? "bg-[#D8B282] animate-pulse"
+                          : "bg-slate-700"
+                      }`}
                   />
                 ))}
               </div>
@@ -776,11 +773,10 @@ export function ViOneVoiceAssistant() {
               <button
                 type="button"
                 onClick={toggleListening}
-                className={`grid h-10 w-10 shrink-0 place-items-center rounded-xl border transition cursor-pointer ${
-                  isListening
+                className={`grid h-10 w-10 shrink-0 place-items-center rounded-xl border transition cursor-pointer ${isListening
                     ? "bg-red-600 text-white border-red-500 animate-pulse"
                     : "bg-slate-900 border-slate-800 text-[#D8B282] hover:bg-slate-800"
-                }`}
+                  }`}
                 title={isListening ? "Dừng ghi âm" : "Nói câu lệnh"}
               >
                 {isListening ? <MicOff className="h-5 w-5" /> : <Mic className="h-5 w-5" />}

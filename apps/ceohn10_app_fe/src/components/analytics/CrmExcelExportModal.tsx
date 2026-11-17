@@ -41,7 +41,7 @@ export function CrmExcelExportModal({
   const [selectedMemberIds, setSelectedMemberIds] = useState<string[]>([]);
   const [isExporting, setIsExporting] = useState<boolean>(false);
 
-  // Danh sách hội viên mẫu từ serverData hoặc fallback danh sách chuẩn CLB CEO HN10
+  // Danh sách Học viên mẫu từ serverData hoặc fallback danh sách chuẩn CLB CEO HN10
   const membersList = React.useMemo(() => {
     const list: any[] = [];
     if (serverData?.rankedMembers && Array.isArray(serverData.rankedMembers)) {
@@ -51,7 +51,7 @@ export function CrmExcelExportModal({
           code: m.code || `CEO HN10-${100 + idx}`,
           name: m.name,
           company: m.company,
-          role: m.role || "Hội viên",
+          role: m.role || "Học viên",
           dept: m.dept || "Ban Thành Viên",
           phone: m.phone || "0912 345 678",
           email: m.email || `${m.id || 'member'}@ceohn10.com`,
@@ -142,10 +142,10 @@ export function CrmExcelExportModal({
           selectedPeriodType === "year"
             ? `NĂM ${selectedYear}`
             : selectedPeriodType === "quarter"
-            ? `QUÝ ${selectedPeriodValue} - NĂM ${selectedYear}`
-            : selectedPeriodValue === "all"
-            ? `TOÀN BỘ CÁC THÁNG - NĂM ${selectedYear}`
-            : `THÁNG ${selectedPeriodValue} - NĂM ${selectedYear}`;
+              ? `QUÝ ${selectedPeriodValue} - NĂM ${selectedYear}`
+              : selectedPeriodValue === "all"
+                ? `TOÀN BỘ CÁC THÁNG - NĂM ${selectedYear}`
+                : `THÁNG ${selectedPeriodValue} - NĂM ${selectedYear}`;
 
         const rows: any[][] = [
           ["HỆ THỐNG QUẢN TRỊ HIỆP HỘI & CLB DOANH NHÂN CEO HN10 - HANOIBA"],
@@ -154,7 +154,7 @@ export function CrmExcelExportModal({
           [],
           [
             "STT",
-            "MÃ HỘI VIÊN",
+            "MÃ Học viên",
             "HỌ VÀ TÊN",
             "DOANH NGHIỆP",
             "CHỨC DANH / VAI TRÒ",
@@ -238,7 +238,7 @@ export function CrmExcelExportModal({
         XLSX.writeFile(wb, fileName);
         toast.success(`Đã xuất báo cáo Excel thành công: ${fileName}`);
       } else if (exportMode === "individual") {
-        // MODE 2: XUẤT THEO TỪNG CÁ NHÂN HỘI VIÊN (HỒ SƠ GIAO THƯƠNG ĐỘC LẬP)
+        // MODE 2: XUẤT THEO TỪNG CÁ NHÂN Học viên (HỒ SƠ GIAO THƯƠNG ĐỘC LẬP)
         const targetMembers =
           selectedMemberIds.length > 0
             ? membersList.filter((m) => selectedMemberIds.includes(m.id))
@@ -248,7 +248,7 @@ export function CrmExcelExportModal({
           const sheetName = m.name.split(" ").slice(-2).join("_").replace(/[^\w]/g, "");
           const rows: any[][] = [
             [`HỒ SƠ GIAO THƯƠNG CHI TIẾT - DOANH NHÂN ${m.name.toUpperCase()}`],
-            [`Mã Hội Viên: ${m.code} | Công ty: ${m.company}`],
+            [`Mã Học viên: ${m.code} | Công ty: ${m.company}`],
             [`Chức vụ: ${m.role} | Ban: ${m.dept} | Ngành: ${m.industry}`],
             [`Liên hệ: ${m.phone} | Email: ${m.email}`],
             [],
@@ -285,12 +285,12 @@ export function CrmExcelExportModal({
 
         const fileName = `CEOHN10_HoSo_HoiVien_${Date.now()}.xlsx`;
         XLSX.writeFile(wb, fileName);
-        toast.success(`Đã xuất hồ sơ ${targetMembers.length} hội viên ra file Excel!`);
+        toast.success(`Đã xuất hồ sơ ${targetMembers.length} Học viên ra file Excel!`);
       } else {
-        // MODE 3: XUẤT BIẾN ĐỘNG CỦA TỪNG HỘI VIÊN (FLUCTUATIONS & TREND ANALYSIS)
+        // MODE 3: XUẤT BIẾN ĐỘNG CỦA TỪNG Học viên (FLUCTUATIONS & TREND ANALYSIS)
         const rows: any[][] = [
           ["HỆ THỐNG QUẢN TRỊ HIỆP HỘI & CLB DOANH NHÂN CEO HN10 - HANOIBA"],
-          ["BÁO CÁO PHÂN TÍCH BIẾN ĐỘNG & XU HƯỚNG TỪNG HỘI VIÊN (DELTA ANALYSIS)"],
+          ["BÁO CÁO PHÂN TÍCH BIẾN ĐỘNG & XU HƯỚNG TỪNG Học viên (DELTA ANALYSIS)"],
           [`Thời gian phân tích: So sánh Kỳ Hiện Tại so với Kỳ Liền Kề`],
           [],
           [
@@ -348,7 +348,7 @@ export function CrmExcelExportModal({
 
         const fileName = `CEOHN10_BaoCao_BienDong_HoiVien_${Date.now()}.xlsx`;
         XLSX.writeFile(wb, fileName);
-        toast.success(`Đã xuất báo cáo biến động hội viên thành công!`);
+        toast.success(`Đã xuất báo cáo biến động Học viên thành công!`);
       }
 
       setTimeout(() => {
@@ -400,11 +400,10 @@ export function CrmExcelExportModal({
           <button
             type="button"
             onClick={() => setExportMode("time")}
-            className={`py-2 px-3 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer ${
-              exportMode === "time"
+            className={`py-2 px-3 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer ${exportMode === "time"
                 ? "bg-white dark:bg-slate-900 text-[#003B95] dark:text-amber-400 shadow-xs"
                 : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
-            }`}
+              }`}
           >
             <Calendar className="size-3.5" />
             <span>1. Xuất theo thời gian</span>
@@ -413,11 +412,10 @@ export function CrmExcelExportModal({
           <button
             type="button"
             onClick={() => setExportMode("individual")}
-            className={`py-2 px-3 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer ${
-              exportMode === "individual"
+            className={`py-2 px-3 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer ${exportMode === "individual"
                 ? "bg-white dark:bg-slate-900 text-[#003B95] dark:text-amber-400 shadow-xs"
                 : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
-            }`}
+              }`}
           >
             <Users className="size-3.5" />
             <span>2. Xuất theo từng người</span>
@@ -426,14 +424,13 @@ export function CrmExcelExportModal({
           <button
             type="button"
             onClick={() => setExportMode("fluctuations")}
-            className={`py-2 px-3 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer ${
-              exportMode === "fluctuations"
+            className={`py-2 px-3 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer ${exportMode === "fluctuations"
                 ? "bg-white dark:bg-slate-900 text-[#003B95] dark:text-amber-400 shadow-xs"
                 : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
-            }`}
+              }`}
           >
             <TrendingUp className="size-3.5" />
-            <span>3. Xuất biến động hội viên</span>
+            <span>3. Xuất biến động Học viên</span>
           </button>
         </div>
 
@@ -511,7 +508,7 @@ export function CrmExcelExportModal({
             </div>
 
             <div className="p-3 bg-blue-50/70 dark:bg-blue-950/40 rounded-xl border border-blue-200 dark:border-blue-900/60 text-xs text-blue-900 dark:text-blue-300">
-              <span className="font-bold">✓ Cột dữ liệu xuất ra bao gồm:</span> STT, Mã Hội Viên, Họ Tên, Doanh Nghiệp, Ban Chuyên Môn, SĐT, Email, Lượt Kết Nối 1-on-1, Thương Vụ Đã Chốt, Tổng Doanh Số Giao Thương, Điểm Gắn Kết, Trạng Thái Hoạt Động.
+              <span className="font-bold">✓ Cột dữ liệu xuất ra bao gồm:</span> STT, Mã Học viên, Họ Tên, Doanh Nghiệp, Ban Chuyên Môn, SĐT, Email, Lượt Kết Nối 1-on-1, Thương Vụ Đã Chốt, Tổng Doanh Số Giao Thương, Điểm Gắn Kết, Trạng Thái Hoạt Động.
             </div>
           </div>
         )}
@@ -522,7 +519,7 @@ export function CrmExcelExportModal({
             <div className="flex items-center justify-between">
               <div className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 flex items-center gap-2">
                 <Users className="size-4 text-[#003B95]" />
-                <span>Chọn hội viên cần xuất hồ sơ giao thương chi tiết</span>
+                <span>Chọn Học viên cần xuất hồ sơ giao thương chi tiết</span>
               </div>
               <button
                 type="button"
@@ -539,7 +536,7 @@ export function CrmExcelExportModal({
                 type="text"
                 value={memberSearchQuery}
                 onChange={(e) => setMemberSearchQuery(e.target.value)}
-                placeholder="Tìm theo tên hội viên, doanh nghiệp hoặc số điện thoại..."
+                placeholder="Tìm theo tên Học viên, doanh nghiệp hoặc số điện thoại..."
                 className="w-full h-9 pl-9 pr-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs focus:outline-none focus:ring-1 focus:ring-[#003B95]"
               />
             </div>
@@ -579,22 +576,22 @@ export function CrmExcelExportModal({
             </div>
 
             <div className="text-[11px] text-slate-500">
-              Đã chọn: <strong>{selectedMemberIds.length}</strong> / {membersList.length} hội viên.
-              (Mỗi hội viên sẽ được tách thành 1 Sheet riêng trong file Excel kết xuất).
+              Đã chọn: <strong>{selectedMemberIds.length}</strong> / {membersList.length} Học viên.
+              (Mỗi Học viên sẽ được tách thành 1 Sheet riêng trong file Excel kết xuất).
             </div>
           </div>
         )}
 
-        {/* NỘI DUNG CHẾ ĐỘ 3: BIẾN ĐỘNG HỘI VIÊN */}
+        {/* NỘI DUNG CHẾ ĐỘ 3: BIẾN ĐỘNG Học viên */}
         {exportMode === "fluctuations" && (
           <div className="space-y-3 p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/20">
             <div className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 flex items-center gap-2">
               <TrendingUp className="size-4 text-[#003B95]" />
-              <span>Báo cáo biến động chỉ số & Phân loại xu hướng hội viên (Delta)</span>
+              <span>Báo cáo biến động chỉ số & Phân loại xu hướng Học viên (Delta)</span>
             </div>
 
             <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-              Tính năng chuyên biệt dành cho Ban Thư ký & Ban Điều Hành: So sánh biên độ tăng/giảm (% Delta) về số lượt kết nối, quy mô giao thương và điểm danh sự kiện của từng hội viên giữa các kỳ. Giúp nhận diện tức thì các hội viên bứt phá để khen thưởng, và các hội viên đang có dấu hiệu giảm tương tác để phân công Ủy viên BCH liên hệ hỗ trợ.
+              Tính năng chuyên biệt dành cho Ban Thư ký & Ban Điều Hành: So sánh biên độ tăng/giảm (% Delta) về số lượt kết nối, quy mô giao thương và điểm danh sự kiện của từng Học viên giữa các kỳ. Giúp nhận diện tức thì các Học viên bứt phá để khen thưởng, và các Học viên đang có dấu hiệu giảm tương tác để phân công Ủy viên BCH liên hệ hỗ trợ.
             </p>
 
             <div className="grid grid-cols-3 gap-2 pt-1 text-center font-mono">

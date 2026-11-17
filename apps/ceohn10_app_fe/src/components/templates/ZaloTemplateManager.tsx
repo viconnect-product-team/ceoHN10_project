@@ -81,7 +81,7 @@ Mã vé: {{ticket_code}} | Chỗ ngồi: {{seat_assignment}}`,
       templateId: "348913",
       name: "Thông Báo Nộp Hội Phí Thường Niên",
       category: "fee",
-      title: "THÔNG BÁO NIÊN LIỄM HỘI VIÊN CEO HN10",
+      title: "THÔNG BÁO NIÊN LIỄM Học viên CEO HN10",
       body: "Kính gửi Anh/Chị {{ho_ten}},\nKỳ hội phí thường niên năm 2026 của Anh/Chị tại CLB Doanh Nhân CEO HN10 sẽ đến hạn vào ngày {{ngay_den_han}}.\n\n- Số tiền: {{so_tien}} VNĐ\n- Cú pháp CK: CEO HN10 {{ma_hoi_vien}}\n\nKính mời Anh/Chị hoàn tất nghĩa vụ hội phí để tiếp tục duy trì trọn vẹn quyền lợi kết nối B2B.",
       ctaText: "Xem Mã VietQR Thanh Toán",
       ctaUrl: "https://ceohn10.viconnect.vn/association/renew",
@@ -101,9 +101,9 @@ Mã vé: {{ticket_code}} | Chỗ ngồi: {{seat_assignment}}`,
     {
       id: "zns-birthday",
       templateId: "348915",
-      name: "Chúc Mừng Sinh Nhật Hội Viên Doanh Nhân",
+      name: "Chúc Mừng Sinh Nhật Học viên Doanh Nhân",
       category: "birthday",
-      title: "CHÚC MỪNG SINH NHẬT HỘI VIÊN CEO HN10",
+      title: "CHÚC MỪNG SINH NHẬT Học viên CEO HN10",
       body: "CLB Doanh Nhân CEO HN10 (HanoiBA) xin gửi lời chúc mừng sinh nhật nồng nhiệt nhất đến Anh/Chị {{ho_ten}} - {{ten_doanh_nghiep}}!\n\nKính chúc Anh/Chị tuổi mới luôn tràn đầy năng lượng, sức khỏe dồi dào, doanh nghiệp bứt phá vươn tầm cao mới!",
       ctaText: "Nhận Quà Ưu Đãi Sinh Nhật",
       ctaUrl: "https://ceohn10.viconnect.vn/association/perks",
@@ -164,7 +164,7 @@ Mã vé: {{ticket_code}} | Chỗ ngồi: {{seat_assignment}}`,
               Quản Lý Mẫu Tin Nhắn Zalo OA &amp; ZNS
             </h3>
             <p className="max-w-2xl text-xs text-slate-500 dark:text-slate-400">
-              Tùy biến các mẫu thông báo Zalo OA ZNS gửi tới số điện thoại của hội viên CLB CEO HN10. Hỗ trợ chèn biến số động, xem trước mô phỏng trên màn hình điện thoại.
+              Tùy biến các mẫu thông báo Zalo OA ZNS gửi tới số điện thoại của Học viên CLB CEO HN10. Hỗ trợ chèn biến số động, xem trước mô phỏng trên màn hình điện thoại.
             </p>
           </div>
 
@@ -196,11 +196,10 @@ Mã vé: {{ticket_code}} | Chỗ ngồi: {{seat_assignment}}`,
                 <div
                   key={t.id}
                   onClick={() => setSelectedId(t.id)}
-                  className={`p-3 rounded-xl border text-left transition cursor-pointer ${
-                    selectedId === t.id
+                  className={`p-3 rounded-xl border text-left transition cursor-pointer ${selectedId === t.id
                       ? "border-cyan-500 bg-cyan-50/50 dark:bg-cyan-950/20 ring-1 ring-cyan-500/30"
                       : "border-slate-200 bg-slate-50/50 dark:border-slate-800 dark:bg-slate-950/40 hover:border-slate-300"
-                  }`}
+                    }`}
                 >
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-bold text-slate-900 dark:text-slate-100 line-clamp-1">

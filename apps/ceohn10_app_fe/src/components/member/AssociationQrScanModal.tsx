@@ -317,9 +317,9 @@ export function AssociationQrScanModal({
       if (noteMatch || (orgMatch && orgMatch[1].includes("1983")) || raw.includes("CEO HN10")) {
         const parsedPartner: ScannedPartner = {
           code: noteMatch ? noteMatch[1] : `HN10-${Date.now().toString().slice(-4)}`,
-          name: nameMatch ? nameMatch[1].trim() : "Hội viên Doanh nhân",
+          name: nameMatch ? nameMatch[1].trim() : "Học viên Doanh nhân",
           company: orgMatch ? orgMatch[1].trim() : "CLB Doanh Nhân CEO HN10",
-          title: "Hội viên CLB Doanh Nhân CEO HN10",
+          title: "Học viên CLB Doanh Nhân CEO HN10",
           avatar: null,
           phone: telMatch ? telMatch[1].trim() : null,
           email: emailMatch ? emailMatch[1].trim() : null,
@@ -367,9 +367,9 @@ export function AssociationQrScanModal({
         if (res && (res.found !== false || res.name || res.code)) {
           const partner: ScannedPartner = {
             code: res.code || code,
-            name: res.name || res.contact || "Hội viên CEO HN10",
+            name: res.name || res.contact || "Học viên CEO HN10",
             company: res.company || "CLB Doanh Nhân CEO HN10",
-            title: res.title || "Ban Thường Trực • Hội viên CEO HN10",
+            title: res.title || "Ban Thường Trực • Học viên CEO HN10",
             avatar: res.photoUrl || res.avatar || null,
             phone: res.phone || null,
             email: res.email || null,
@@ -393,9 +393,9 @@ export function AssociationQrScanModal({
       if (code.startsWith("HN10") || code.startsWith("CEO HN10")) {
         const fallbackPartner: ScannedPartner = {
           code,
-          name: `Hội viên CEO HN10 (${code})`,
+          name: `Học viên CEO HN10 (${code})`,
           company: "CLB Doanh Nhân CEO HN10",
-          title: "Hội viên Chính thức CLB CEO HN10",
+          title: "Học viên Chính thức CLB CEO HN10",
           avatar: null,
         };
         setScannedPartner(fallbackPartner);
@@ -458,13 +458,13 @@ export function AssociationQrScanModal({
           memberCode: user?.code,
           userId: user?.id,
           company_name: (user as any)?.company || "CLB Doanh Nhân CEO HN10",
-          job_title: (user as any)?.jobTitle || (user as any)?.title || "Hội viên Chính thức",
+          job_title: (user as any)?.jobTitle || (user as any)?.title || "Học viên Chính thức",
           targetMemberCode: scannedPartner.code,
           targetMemberId: scannedPartner.userId,
         },
         connectionId: connId,
       });
-    } catch {}
+    } catch { }
 
     try {
       await fetchNestApi("/network/requests", {
@@ -624,11 +624,10 @@ export function AssociationQrScanModal({
                 <button
                   type="button"
                   onClick={() => setTorch((t) => !t)}
-                  className={`grid h-10 w-10 place-items-center rounded-xl border transition cursor-pointer ${
-                    torch
+                  className={`grid h-10 w-10 place-items-center rounded-xl border transition cursor-pointer ${torch
                       ? "border-amber-400 bg-amber-400/20 text-amber-500"
                       : "border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300"
-                  }`}
+                    }`}
                   title="Bật/Tắt Đèn Flash"
                 >
                   {torch ? <Zap className="h-4 w-4" /> : <ZapOff className="h-4 w-4" />}
@@ -659,7 +658,7 @@ export function AssociationQrScanModal({
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
               <div className="absolute bottom-2 left-4 text-[10px] font-bold text-amber-300 tracking-wider">
-                XÁC THỰC DANH THIẾP HỘI VIÊN
+                XÁC THỰC DANH THIẾP Học viên
               </div>
             </div>
 
@@ -771,7 +770,7 @@ export function AssociationQrScanModal({
                 <span>Thông tin hiển thị theo cấu hình Quyền riêng tư của đối tác</span>
               </div>
 
-              {/* ── HỒ SƠ DOANH NGHIỆP 3D XUẤT HIỆN NGAY DƯỚI THÔNG TIN HỘI VIÊN KHI QUÉT QR (Req 5) ── */}
+              {/* ── HỒ SƠ DOANH NGHIỆP 3D XUẤT HIỆN NGAY DƯỚI THÔNG TIN Học viên KHI QUÉT QR (Req 5) ── */}
               <div className="pt-1 text-left">
                 <CompanyProfile3DTemplate
                   data={{
@@ -845,7 +844,7 @@ export function AssociationQrScanModal({
                         title: `Hồ sơ VIP: ${scannedPartner.name}`,
                         text: `${scannedPartner.name} - ${scannedPartner.title} (${scannedPartner.company}) | CLB Doanh Nhân CEO HN10`,
                         url: shareUrl,
-                      }).catch(() => {});
+                      }).catch(() => { });
                     } else {
                       navigator.clipboard.writeText(`${scannedPartner.name} - ${shareUrl}`);
                       toast.success("Đã sao chép liên kết hồ sơ danh thiếp!");
@@ -919,7 +918,7 @@ export function AssociationQrScanModal({
                   <span>Không thể lưu vào danh mục danh thiếp đã quét</span>
                 </p>
                 <p className="text-[11px] text-rose-600/90 dark:text-rose-400 leading-relaxed whitespace-normal break-words">
-                  Mã QR này không thuộc danh bạ hội viên chính thức CLB CEO HN10 (HanoiBA). Bạn chỉ có thể lưu liên hệ này vào danh bạ thiết bị hoặc kết nối qua Zalo.
+                  Mã QR này không thuộc danh bạ Học viên chính thức CLB CEO HN10 (HanoiBA). Bạn chỉ có thể lưu liên hệ này vào danh bạ thiết bị hoặc kết nối qua Zalo.
                 </p>
               </div>
             </div>

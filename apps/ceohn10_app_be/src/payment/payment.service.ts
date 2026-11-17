@@ -65,7 +65,7 @@ export class PaymentService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly mailService: MailService,
-  ) {}
+  ) { }
 
   /**
    * Định dạng thời gian theo chuẩn VNPay: YYYYMMDDHHmmss (Múi giờ GMT+7)
@@ -193,7 +193,7 @@ export class PaymentService {
       UPDATE public.event_registrations
       SET vnp_txn_ref = ${orderId}, payment_amount = ${amount}, payment_method = 'vnpay', updated_at = NOW()
       WHERE id = ${cleanRegId} OR id::text = ${cleanRegId}
-    `.catch(() => {});
+    `.catch(() => { });
 
     return this.createPaymentUrl(
       {
@@ -299,7 +299,7 @@ export class PaymentService {
    * 2. Tăng số lượng người tham dự sự kiện
    * 3. Ghi nhận tiền vào bảng public.transactions (Khoản Thu Doanh Thu Báo Cáo Tài Chính)
    * 4. Tạo hoặc cập nhật bản ghi hóa đơn chính thức public.invoices
-   * 5. Gửi email vé điện tử / hóa đơn & bắn thông báo realtime cho hội viên
+   * 5. Gửi email vé điện tử / hóa đơn & bắn thông báo realtime cho Học viên
    */
   async executePaymentSuccessTransaction(data: {
     orderId: string;
@@ -350,7 +350,7 @@ export class PaymentService {
               UPDATE public.events
               SET registered = COALESCE(registered, 0) + 1, updated_at = NOW()
               WHERE id = ${reg.event_id}::uuid OR id::text = ${reg.event_id}::text
-            `.catch(() => {});
+            `.catch(() => { });
           }
 
           // 3. Ghi nhận tiền vào Khoản Thu (public.transactions)
@@ -406,7 +406,7 @@ export class PaymentService {
               reg.phone || '',
               reg.association_id ? reg.association_id : null,
             )
-            .catch(() => {});
+            .catch(() => { });
 
           // 5. Gửi Email vé điện tử kèm mã QR
           const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(actualRegId)}`;
@@ -415,7 +415,7 @@ export class PaymentService {
             this.mailService
               .sendEventTicketEmail({
                 to: recipientEmail,
-                fullName: reg.member_name || 'Quý Hội viên',
+                fullName: reg.member_name || 'Quý Học viên',
                 eventTitle:
                   reg.event_name || reg.event_title || 'Sự kiện CLB CEO HN10',
                 eventDate: reg.event_date
@@ -450,11 +450,11 @@ export class PaymentService {
             await this.prisma.$executeRaw`
               INSERT INTO public.messages (id, from_id, to_id, text, created_at)
               VALUES (gen_random_uuid(), 'channel_media', ${String(reg.member_code).toLowerCase()}, ${confirmMsg}, NOW() - interval '1 second')
-            `.catch(() => {});
+            `.catch(() => { });
             await this.prisma.$executeRaw`
               INSERT INTO public.messages (id, from_id, to_id, text, created_at)
               VALUES (gen_random_uuid(), 'channel_media', ${String(reg.member_code).toLowerCase()}, ${ticketActionMsg}, NOW())
-            `.catch(() => {});
+            `.catch(() => { });
           }
 
           const memberRecipientId = reg.member_code || actualRegId;
@@ -471,7 +471,7 @@ export class PaymentService {
               confirmMsg,
               reg.event_id,
             )
-            .catch(() => {});
+            .catch(() => { });
         }
       }
 
@@ -504,7 +504,7 @@ export class PaymentService {
               UPDATE public.members
               SET fee_paid = true, updated_at = NOW()
               WHERE id = ${inv.member_id}::uuid OR code = ${inv.member_id} OR id::text = ${inv.member_id}
-            `.catch(() => {});
+            `.catch(() => { });
           }
 
           // 3. Ghi nhận tiền vào Khoản Thu (public.transactions)
@@ -517,13 +517,13 @@ export class PaymentService {
               ${txCode},
               CURRENT_DATE,
               'income',
-              'Hội phí hội viên',
-              ${'Thanh toán VNPAY hội phí thường niên: ' + (inv.member_name || 'Hội viên') + ' (' + (inv.invoice_no || actualInvId) + ')'},
+              'Hội phí Học viên',
+              ${'Thanh toán VNPAY hội phí thường niên: ' + (inv.member_name || 'Học viên') + ' (' + (inv.invoice_no || actualInvId) + ')'},
               ${finalAmount},
               'vnpay',
               'completed',
               ${inv.association_id ? inv.association_id : 'c1983000-0000-4000-8000-000000001983'}::uuid,
-              ${inv.member_name || 'Hội viên'},
+              ${inv.member_name || 'Học viên'},
               ${'/invoices/' + txCode + '.pdf'},
               'vnpay',
               ${transactionNo || orderId},
@@ -543,7 +543,7 @@ export class PaymentService {
             this.mailService
               .sendMembershipFeeSuccessEmail({
                 to: recipientEmail,
-                memberName: inv.member_name || 'Quý Hội viên',
+                memberName: inv.member_name || 'Quý Học viên',
                 invoiceNo: inv.invoice_no || actualInvId,
                 year: inv.year || new Date().getFullYear(),
                 amount: Number(finalAmount),
@@ -551,12 +551,12 @@ export class PaymentService {
                 paymentMethod:
                   'Cổng thanh toán điện tử VNPAY Gateway (HMAC-SHA512)',
               })
-              .catch(() => {});
+              .catch(() => { });
           }
 
           // 5. Gửi thông báo ứng dụng
           const notifTitle = 'Xác nhận thanh toán hội phí VNPAY thành công';
-          const notifBody = `Hóa đơn hội phí #${inv.invoice_no || actualInvId} trị giá ${finalAmount.toLocaleString('vi-VN')} đ đã được thanh toán thành công qua cổng VNPAY. Trạng thái hội viên VIP của Anh/Chị đã được kích hoạt!`;
+          const notifBody = `Hóa đơn hội phí #${inv.invoice_no || actualInvId} trị giá ${finalAmount.toLocaleString('vi-VN')} đ đã được thanh toán thành công qua cổng VNPAY. Trạng thái Học viên VIP của Anh/Chị đã được kích hoạt!`;
 
           if (inv.user_id) {
             await this.prisma
@@ -573,14 +573,14 @@ export class PaymentService {
                 notifBody,
                 actualInvId,
               )
-              .catch(() => {});
+              .catch(() => { });
           }
 
           if (inv.member_code) {
             await this.prisma.$executeRaw`
               INSERT INTO public.messages (id, from_id, to_id, text, created_at)
               VALUES (gen_random_uuid(), 'channel_membership', ${String(inv.member_code).toLowerCase()}, ${notifBody}, NOW())
-            `.catch(() => {});
+            `.catch(() => { });
           }
         }
       }

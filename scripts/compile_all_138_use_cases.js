@@ -65,7 +65,7 @@ const remainingCRM = [
 3. Đính kèm kế hoạch khảo sát thực địa, thư ngỏ kêu gọi và hình ảnh điểm trường cần hỗ trợ.
 4. Cấu hình số tài khoản chuyên dùng của Quỹ Thiện Nguyện CLB tại Ngân hàng TMCP Quân Đội (MB Bank).
 5. Bấm "Phát Động Chiến Dịch".
-6. Hệ thống xuất bản chiến dịch lên Ứng dụng Hội viên và Cổng thông tin điện tử công khai.`,
+6. Hệ thống xuất bản chiến dịch lên Ứng dụng Học viên và Cổng thông tin điện tử công khai.`,
     alternativeFlow: `- Ban Thiện Nguyện có thể gắn nhãn đối tác đồng hành tài trợ để ghi nhận sự đóng góp của các doanh nghiệp.`,
     postConditions: 'Chiến dịch thiện nguyện được kích hoạt, sẵn sàng tiếp nhận ủng hộ từ cộng đồng doanh nhân.',
     imageFile: 'btn_screen.png',
@@ -98,7 +98,7 @@ const remainingCRM = [
 3. Tải lên toàn bộ hồ sơ chứng từ: Hóa đơn mua áo ấm, sách vở, vật liệu xây dựng điểm trường, biên bản bàn giao có xác nhận của chính quyền địa phương sở tại.
 4. Nhập chi tiết các khoản chi thực tế và đối soát với số dư quỹ tiếp nhận.
 5. Bấm "Khóa Quyết Toán & Xuất Báo Cáo Giải Ngân".
-6. Báo cáo giải ngân được gửi đến Ban Thường Trực thẩm tra trước khi công khai cho toàn thể hội viên.`,
+6. Báo cáo giải ngân được gửi đến Ban Thường Trực thẩm tra trước khi công khai cho toàn thể Học viên.`,
     alternativeFlow: `- Nếu số dư quỹ còn thừa: Hệ thống tự động kết chuyển phần dư vào Quỹ Dự Phòng An Sinh Xã Hội để sử dụng cho chiến dịch khẩn cấp tiếp theo.`,
     postConditions: 'Hồ sơ giải ngân thiện nguyện được số hóa đầy đủ chứng từ pháp lý và minh bạch tuyệt đối.',
     imageFile: 'crm1983_13_expenses_management.png',
@@ -109,13 +109,13 @@ const remainingCRM = [
     category: 'Ban Xúc Tiến Thương Mại',
     name: 'Phê Duyệt & Thẩm Định Gian Hàng B2B Doanh Nghiệp Thành Viên Trên Sàn Giao Thương CEO HN10',
     actor: 'Ban Xúc Tiến Thương Mại',
-    preConditions: 'Hội viên chính thức gửi yêu cầu đăng ký sản phẩm / dịch vụ lên Gian hàng B2B.',
+    preConditions: 'Học viên chính thức gửi yêu cầu đăng ký sản phẩm / dịch vụ lên Gian hàng B2B.',
     mainFlow: `1. Ban Xúc Tiến Thương Mại mở danh sách "Sản Phẩm Chờ Phê Duyệt" trên Cổng Quản Trị.
-2. Rà soát thông tin sản phẩm: Tên hàng hóa dịch vụ, Hình ảnh chất lượng cao, Giá niêm yết công khai và Giá ưu đãi đặc quyền dành riêng cho hội viên CEO HN10 (Tối thiểu chiết khấu 10%).
+2. Rà soát thông tin sản phẩm: Tên hàng hóa dịch vụ, Hình ảnh chất lượng cao, Giá niêm yết công khai và Giá ưu đãi đặc quyền dành riêng cho Học viên CEO HN10 (Tối thiểu chiết khấu 10%).
 3. Kiểm tra tính pháp lý: Giấy phép kinh doanh, Giấy chứng nhận tiêu chuẩn chất lượng (ISO/HACCP/CO-CQ nếu có).
 4. Nhấn nút "Phê Duyệt & Đưa Lên Gian Hàng B2B".
-5. Hệ thống tự động kích hoạt sản phẩm trên Sàn Giao thương B2B của Ứng dụng Hội viên và gửi thông báo chúc mừng tới doanh nghiệp.`,
-    alternativeFlow: `- Nếu sản phẩm chưa đạt chuẩn hình ảnh hoặc thiếu chính sách ưu đãi nội bộ: Bấm "Yêu Cầu Bổ Sung" kèm ghi chú cụ thể để hội viên hiệu chỉnh lại.`,
+5. Hệ thống tự động kích hoạt sản phẩm trên Sàn Giao thương B2B của Ứng dụng Học viên và gửi thông báo chúc mừng tới doanh nghiệp.`,
+    alternativeFlow: `- Nếu sản phẩm chưa đạt chuẩn hình ảnh hoặc thiếu chính sách ưu đãi nội bộ: Bấm "Yêu Cầu Bổ Sung" kèm ghi chú cụ thể để Học viên hiệu chỉnh lại.`,
     postConditions: 'Sản phẩm được niêm yết trên Gian hàng B2B, đảm bảo uy tín và chất lượng thương hiệu CEO HN10.',
     imageFile: 'bxt_screen.png',
     imageCaption: 'Bảng điều khiển kiểm duyệt và thẩm định danh mục sản phẩm trên Gian hàng B2B của Ban Xúc Tiến'
@@ -123,12 +123,12 @@ const remainingCRM = [
   {
     id: 'UC-CRM-69',
     category: 'Ban Xúc Tiến Thương Mại',
-    name: 'Thẩm Định Nhu Cầu Mua Hàng & Khớp Lệnh Giao Thương Nội Bộ B2B Tự Động Giữa Các Hội Viên',
+    name: 'Thẩm Định Nhu Cầu Mua Hàng & Khớp Lệnh Giao Thương Nội Bộ B2B Tự Động Giữa Các Học viên',
     actor: 'Ban Xúc Tiến Thương Mại',
-    preConditions: 'Có hội viên đăng tải nhu cầu tìm nhà cung cấp hoặc cơ hội hợp tác kinh doanh.',
+    preConditions: 'Có Học viên đăng tải nhu cầu tìm nhà cung cấp hoặc cơ hội hợp tác kinh doanh.',
     mainFlow: `1. Ban Xúc Tiến mở bảng điều khiển "Khớp Lệnh Cung - Cầu".
 2. Hệ thống hiển thị các tin đăng: Cần tìm nhà thầu xây dựng văn phòng, Cần nguồn cung cấp thiết bị công nghệ, Cần hợp tác logistics.
-3. Chuyên viên Ban Xúc Tiến kiểm tra nhu cầu và sử dụng tính năng "Gợi Ý Đối Tác Phù Hợp" dựa trên danh bạ ngành nghề của các hội viên chính thức.
+3. Chuyên viên Ban Xúc Tiến kiểm tra nhu cầu và sử dụng tính năng "Gợi Ý Đối Tác Phù Hợp" dựa trên danh bạ ngành nghề của các Học viên chính thức.
 4. Bấm nút "Kết Nối Khớp Lệnh 1-1".
 5. Hệ thống gửi thông điệp kết nối giao thương trực tiếp đến lãnh đạo của hai doanh nghiệp qua tin nhắn ứng dụng.`,
     alternativeFlow: `- Ban Xúc Tiến có thể tổ chức buổi gặp gỡ trực tiếp (Business Matching Offline) tại văn phòng CLB để hỗ trợ hai bên ký kết hợp đồng.`,
@@ -163,7 +163,7 @@ const remainingCRM = [
 3. Trình soạn thảo văn bản đa phương tiện hiển thị: Nhập Tiêu đề, Tóm tắt bài viết, Nội dung chi tiết, Hình ảnh minh họa chất lượng cao và Video phóng sự đính kèm.
 4. Chọn chuyên mục: "Gương Mặt Doanh Nhân 1983" hoặc "Hoạt Động CLB & HanoiBA".
 5. Nhấn nút "Xuất Bản Bản Tin".
-6. Bài viết lập tức hiển thị trên Cổng thông tin điện tử và mục Tin Tức của Ứng dụng Hội viên.`,
+6. Bài viết lập tức hiển thị trên Cổng thông tin điện tử và mục Tin Tức của Ứng dụng Học viên.`,
     alternativeFlow: `- Bài viết có thể được lưu ở trạng thái "Bản nháp" để Trưởng Ban Truyền Thông kiểm duyệt trước khi phát hành.`,
     postConditions: 'Thông tin hoạt động và hình ảnh doanh nhân thành viên được lan tỏa rộng rãi, nâng tầm thương hiệu CLB.',
     imageFile: 'btt_screen.png',
@@ -178,7 +178,7 @@ const remainingCRM = [
     mainFlow: `1. Ban Truyền Thông mở mục "Quản Lý Quảng Cáo & Banner".
 2. Nhấn "Thêm Banner Mới".
 3. Tải lên hình ảnh banner chuẩn kích thước theo nhận diện thương hiệu sang trọng.
-4. Thiết lập vị trí hiển thị: Banner trang chủ Cổng thông tin, Banner đầu trang Ứng dụng Hội viên hoặc Banner trong Gian hàng B2B.
+4. Thiết lập vị trí hiển thị: Banner trang chủ Cổng thông tin, Banner đầu trang Ứng dụng Học viên hoặc Banner trong Gian hàng B2B.
 5. Cài đặt thời gian chạy chiến dịch và liên kết chuyển tiếp tới trang giới thiệu của Nhà tài trợ.
 6. Bấm "Kích Hoạt Banner".
 7. Hệ thống tự động phân phối hiển thị luân phiên (Carousel) mượt mà.`,
@@ -245,14 +245,14 @@ const remainingCRM = [
     actor: 'Ban Quản Trị, Ban Thư Ký',
     preConditions: 'Người quản trị truy cập Trung Tâm Cấu Hình Vận Hành Tự Động.',
     mainFlow: `1. Mở mục "Quy Tắc Tự Động Hóa (Automation Rules)" trên Cổng Quản Trị.
-2. Cấu hình kịch bản nhắc hội phí thường niên: Tự động gửi email và thông báo đẩy trước 30 ngày, 15 ngày và 3 ngày trước khi hết hạn hội viên kèm mã VietQR gạch nợ tự động.
-3. Cấu hình kịch bản Chúc mừng sinh nhật: Đúng 08:00 sáng ngày sinh nhật của từng hội viên, hệ thống tự động gửi thiệp chúc mừng điện tử mang dấu ấn CEO HN10 kèm thông báo chúc mừng trên bảng tin chung.
+2. Cấu hình kịch bản nhắc hội phí thường niên: Tự động gửi email và thông báo đẩy trước 30 ngày, 15 ngày và 3 ngày trước khi hết hạn Học viên kèm mã VietQR gạch nợ tự động.
+3. Cấu hình kịch bản Chúc mừng sinh nhật: Đúng 08:00 sáng ngày sinh nhật của từng Học viên, hệ thống tự động gửi thiệp chúc mừng điện tử mang dấu ấn CEO HN10 kèm thông báo chúc mừng trên bảng tin chung.
 4. Cấu hình nhắc lịch họp và nhắc giờ tham gia sự kiện Gala tự động.
 5. Nhấn nút "Lưu & Kích Hoạt Kịch Bản Vận Hành Tự Động".`,
     alternativeFlow: `- Quản trị viên có thể tùy biến mẫu nội dung thư và hình ảnh thiệp chúc mừng theo từng mùa sự kiện.`,
-    postConditions: 'Bộ máy vận hành CLB hoạt động tự động 24/7, mang lại trải nghiệm ấm áp và chu đáo tối đa cho hội viên.',
+    postConditions: 'Bộ máy vận hành CLB hoạt động tự động 24/7, mang lại trải nghiệm ấm áp và chu đáo tối đa cho Học viên.',
     imageFile: 'crm1983_19_email_marketing.png',
-    imageCaption: 'Thiết lập các chiến dịch thông điệp tự động, chăm sóc hội viên và marketing nội bộ'
+    imageCaption: 'Thiết lập các chiến dịch thông điệp tự động, chăm sóc Học viên và marketing nội bộ'
   },
   {
     id: 'UC-CRM-77',
@@ -267,7 +267,7 @@ const remainingCRM = [
 5. Xem nhật ký kiểm toán bảo mật (Security Audit Log) để phát hiện các truy cập bất thường.
 6. Xác nhận hệ thống đạt tiêu chuẩn bảo mật dữ liệu cấp doanh nghiệp.`,
     alternativeFlow: `- Trường hợp xảy ra sự cố phần cứng: Hệ thống hỗ trợ khôi phục dữ liệu nhanh (Disaster Recovery) với thời gian gián đoạn dưới 30 phút.`,
-    postConditions: 'Cơ sở dữ liệu hội viên và dữ liệu tài chính của CLB được bảo vệ an toàn tuyệt đối.',
+    postConditions: 'Cơ sở dữ liệu Học viên và dữ liệu tài chính của CLB được bảo vệ an toàn tuyệt đối.',
     imageFile: 'bqt_screen.png',
     imageCaption: 'Màn hình kiểm soát an toàn thông tin, sao lưu dữ liệu và nhật ký kiểm toán hệ thống của Ban Quản Trị'
   },
@@ -279,11 +279,11 @@ const remainingCRM = [
     preConditions: 'Kết thúc năm tài chính hoặc chuẩn bị tổ chức Đại hội nhiệm kỳ mới.',
     mainFlow: `1. Mở phân hệ "Tổng Kết Nhiệm Kỳ & Báo Cáo Đại Hội".
 2. Hệ thống tổng hợp tự động toàn bộ dữ liệu lịch sử hoạt động:
-   - Tăng trưởng số lượng hội viên từ ngày thành lập đến nay
+   - Tăng trưởng số lượng Học viên từ ngày thành lập đến nay
    - Tổng số sự kiện Gala, tọa đàm kinh tế và cuộc họp BCH đã tổ chức
    - Tổng doanh số giao thương nội bộ B2B đã tạo ra cho các doanh nghiệp thành viên
    - Tổng giá trị các chương trình an sinh xã hội, thiện nguyện đã thực hiện
-   - Mức độ tham gia và gắn kết trung bình của hội viên.
+   - Mức độ tham gia và gắn kết trung bình của Học viên.
 3. Bấm "Kết Xuất Tập Báo Cáo Toàn Diện (Bản In Sang Trọng & Slide Trình Chiếu)".
 4. Hồ sơ báo cáo được in ấn và gửi báo cáo Hội Doanh Nhân Trẻ Hà Nội (HanoiBA).`,
     alternativeFlow: `- Báo cáo có thể được đính kèm các phóng sự hình ảnh thực tế tự động từ kho tư liệu số của CLB.`,
@@ -299,8 +299,8 @@ const remainingAPP = [
     id: 'UC-APP-39',
     category: 'Giao Thương & Hợp Tác Doanh Nghiệp',
     name: 'Gửi Yêu Cầu Kết Nối Giao Thương 1-1 Với Doanh Nghiệp Thành Viên Kèm Lời Nhắn Hợp Tác',
-    actor: 'Hội viên chủ động tìm kiếm đối tác (Doanh nhân Phạm Văn Vũ)',
-    preConditions: 'Hội viên mở hồ sơ của một doanh nghiệp thành viên khác trong Danh bạ CLB.',
+    actor: 'Học viên chủ động tìm kiếm đối tác (Doanh nhân Phạm Văn Vũ)',
+    preConditions: 'Học viên mở hồ sơ của một doanh nghiệp thành viên khác trong Danh bạ CLB.',
     mainFlow: `1. Trên màn hình chi tiết doanh nghiệp đối tác, nhấn nút "Gửi Yêu Cầu Hẹn Gặp 1-1".
 2. Hộp thoại kết nối kinh doanh mở ra: Nhập Mục đích hợp tác kinh doanh, Đề xuất thời gian và địa điểm gặp mặt trực tiếp hoặc trực tuyến.
 3. Đính kèm hồ sơ năng lực (Profile) công ty của mình.
@@ -315,17 +315,17 @@ const remainingAPP = [
   {
     id: 'UC-APP-40',
     category: 'Giao Thương & Hợp Tác Doanh Nghiệp',
-    name: 'Tạo Phiếu Đặt Hàng B2B Trực Tiếp Cho Sản Phẩm Doanh Nghiệp Hội Viên Trên Ứng Dụng',
-    actor: 'Hội viên có nhu cầu mua sắm sản phẩm dịch vụ từ đồng nghiệp',
-    preConditions: 'Hội viên xem sản phẩm trên Gian hàng B2B của CLB.',
-    mainFlow: `1. Xem chi tiết sản phẩm: Quy cách, chứng nhận chất lượng và giá ưu đãi hội viên CEO HN10.
+    name: 'Tạo Phiếu Đặt Hàng B2B Trực Tiếp Cho Sản Phẩm Doanh Nghiệp Học viên Trên Ứng Dụng',
+    actor: 'Học viên có nhu cầu mua sắm sản phẩm dịch vụ từ đồng nghiệp',
+    preConditions: 'Học viên xem sản phẩm trên Gian hàng B2B của CLB.',
+    mainFlow: `1. Xem chi tiết sản phẩm: Quy cách, chứng nhận chất lượng và giá ưu đãi Học viên CEO HN10.
 2. Chọn số lượng cần đặt mua và ghi chú yêu cầu kỹ thuật.
 3. Bấm nút "Tạo Đơn Hàng B2B Nội Bộ".
 4. Điền địa chỉ giao hàng và thông tin xuất hóa đơn VAT của công ty mình.
 5. Bấm "Xác Nhận Đặt Hàng".
 6. Hệ thống gửi phiếu đặt hàng tới bộ phận kinh doanh của doanh nghiệp cung cấp để tiến hành ký kết hợp đồng thương mại và giao hàng.`,
-    alternativeFlow: `- Hội viên có thể bấm "Chat Ngay Với Giám Đốc Kinh Doanh" để thương thảo thêm về tiến độ giao hàng và các điều khoản riêng.`,
-    postConditions: 'Đơn hàng B2B nội bộ được khởi tạo nhanh chóng, hưởng trọn chính sách ưu đãi độc quyền dành cho hội viên.',
+    alternativeFlow: `- Học viên có thể bấm "Chat Ngay Với Giám Đốc Kinh Doanh" để thương thảo thêm về tiến độ giao hàng và các điều khoản riêng.`,
+    postConditions: 'Đơn hàng B2B nội bộ được khởi tạo nhanh chóng, hưởng trọn chính sách ưu đãi độc quyền dành cho Học viên.',
     imageFile: 'app_step_15_marketplace_grid.png',
     imageCaption: 'Màn hình duyệt danh mục và khởi tạo đơn hàng trên Gian hàng B2B Doanh nhân CEO HN10'
   },
@@ -333,9 +333,9 @@ const remainingAPP = [
     id: 'UC-APP-41',
     category: 'Giao Thương & Hợp Tác Doanh Nghiệp',
     name: 'Đánh Giá Tín Nhiệm & Nhận Xét 5 Sao Cho Đối Tác Sau Khi Hoàn Thành Giao Thương',
-    actor: 'Hội viên đã hoàn tất giao dịch mua sắm / hợp tác',
+    actor: 'Học viên đã hoàn tất giao dịch mua sắm / hợp tác',
     preConditions: 'Giao dịch B2B giữa hai doanh nghiệp được xác nhận hoàn tất thành công.',
-    mainFlow: `1. Hội viên mở mục "Lịch Sử Giao Dịch B2B" trên ứng dụng.
+    mainFlow: `1. Học viên mở mục "Lịch Sử Giao Dịch B2B" trên ứng dụng.
 2. Chọn giao dịch đã hoàn tất và bấm nút "Đánh Giá Đối Tác".
 3. Chọn số sao tín nhiệm (từ 1 đến 5 sao) theo các tiêu chí: Chất lượng sản phẩm, Tiến độ giao hàng và Thái độ phục vụ chuyên nghiệp.
 4. Viết cảm nhận thực tế: "Sản phẩm công nghệ của VIO CONNECT rất chuẩn chỉ, hỗ trợ nhiệt tình, xứng tầm doanh nhân 1983!".
@@ -350,9 +350,9 @@ const remainingAPP = [
     id: 'UC-APP-42',
     category: 'Sự Kiện & Triển Lãm Doanh Nghiệp',
     name: 'Đăng Ký Gian Hàng Triển Lãm Doanh Nghiệp Tại Sự Kiện Gala & Diễn Đàn Kinh Tế',
-    actor: 'Hội viên mong muốn quảng bá sản phẩm tại sự kiện lớn',
+    actor: 'Học viên mong muốn quảng bá sản phẩm tại sự kiện lớn',
     preConditions: 'Ban Tổ Chức mở cổng đăng ký gian hàng triển lãm cho sự kiện Gala.',
-    mainFlow: `1. Hội viên mở chi tiết sự kiện Gala Thường Niên trên ứng dụng.
+    mainFlow: `1. Học viên mở chi tiết sự kiện Gala Thường Niên trên ứng dụng.
 2. Chọn mục "Đăng Ký Gian Hàng Triển Lãm B2B".
 3. Xem sơ đồ vị trí gian hàng tại sảnh sự kiện: Khu vực Gian hàng Kim Cương, Gian hàng Tiêu Chuẩn.
 4. Chọn vị trí gian hàng mong muốn trên sơ đồ tương tác.
@@ -368,17 +368,17 @@ const remainingAPP = [
     id: 'UC-APP-43',
     category: 'Biểu Quyết & Sinh Hoạt Hiệp Hội',
     name: 'Bầu Chọn Doanh Nhân Tiêu Biểu & Biểu Quyết Nghị Quyết Đại Hội Trực Tuyến Trên App',
-    actor: 'Hội viên chính thức tham gia biểu quyết đại hội',
+    actor: 'Học viên chính thức tham gia biểu quyết đại hội',
     preConditions: 'Ban Chấp Hành kích hoạt phiên bỏ phiếu biểu quyết điện tử.',
-    mainFlow: `1. Hội viên nhận thông báo mời tham gia biểu quyết trên ứng dụng.
+    mainFlow: `1. Học viên nhận thông báo mời tham gia biểu quyết trên ứng dụng.
 2. Mở màn hình "Bỏ Phiếu Biểu Quyết Điện Tử".
 3. Đọc chi tiết nội dung tờ trình hoặc danh sách ứng viên đề cử Ban Chấp Hành nhiệm kỳ mới.
-4. Chọn phương án biểu quyết: "Đồng ý", "Không đồng ý" hoặc "Ý kiến khác" (Tuân thủ nguyên tắc 1 hội viên chỉ có 1 phiếu duy nhất).
+4. Chọn phương án biểu quyết: "Đồng ý", "Không đồng ý" hoặc "Ý kiến khác" (Tuân thủ nguyên tắc 1 Học viên chỉ có 1 phiếu duy nhất).
 5. Bấm "Xác Nhận Bỏ Phiếu".
 6. Hệ thống mã hóa lá phiếu và ghi nhận vào cơ sở dữ liệu kiểm toán.
 7. Màn hình hiển thị thông báo đã bỏ phiếu thành công kèm mã xác thực phiếu bầu.`,
     alternativeFlow: `- Khi Ban Tổ Chức công bố kết quả: Màn hình tự động hiển thị biểu đồ tỷ lệ biểu quyết trực quan thời gian thực.`,
-    postConditions: 'Quyền biểu quyết dân chủ của hội viên được thực hiện thuận tiện, chính xác và minh bạch 100%.',
+    postConditions: 'Quyền biểu quyết dân chủ của Học viên được thực hiện thuận tiện, chính xác và minh bạch 100%.',
     imageFile: 'app_step_14_voting_luckydraw.png',
     imageCaption: 'Giao diện bỏ phiếu bầu cử điện tử và biểu quyết nghị quyết trực tiếp trên ứng dụng'
   },
@@ -386,11 +386,11 @@ const remainingAPP = [
     id: 'UC-APP-44',
     category: 'Biểu Quyết & Sinh Hoạt Hiệp Hội',
     name: 'Tham Gia Vòng Quay May Mắn (Lucky Draw) Nhận Quà Tài Trợ Tại Sự Kiện Gala',
-    actor: 'Hội viên và khách mời có mặt tại sự kiện Gala',
+    actor: 'Học viên và khách mời có mặt tại sự kiện Gala',
     preConditions: 'Đại biểu đã hoàn tất thủ tục soát vé Check-in tại cổng sự kiện.',
     mainFlow: `1. MC chương trình kích hoạt phần quay thưởng may mắn Lucky Draw.
 2. Đại biểu mở mục "Vòng Quay May Mắn" trên ứng dụng di động.
-3. Hệ thống tự động gán mã quay thưởng chính là Mã số vé hoặc Mã hội viên của đại biểu.
+3. Hệ thống tự động gán mã quay thưởng chính là Mã số vé hoặc Mã Học viên của đại biểu.
 4. Màn hình hiển thị vòng quay sống động đồng bộ với màn hình LED sân khấu chính.
 5. Khi vòng quay dừng lại tại số của đại biểu, ứng dụng rung chuông thông báo chúc mừng trúng thưởng phần quà từ Nhà tài trợ.
 6. Đại biểu xuất trình mã trúng thưởng trên app để nhận quà tại bàn thư ký.`,
@@ -403,16 +403,16 @@ const remainingAPP = [
     id: 'UC-APP-45',
     category: 'Thiện Nguyện & An Sinh Xã Hội',
     name: 'Đóng Góp Ủng Hộ Quỹ Thiện Nguyện Bằng Mã VietQR Trực Tiếp Trên Ứng Dụng',
-    actor: 'Hội viên có tấm lòng hảo tâm (Doanh nhân Phạm Văn Vũ)',
-    preConditions: 'Hội viên xem thông tin chương trình thiện nguyện "Áo Ấm Cho Em" trên app.',
+    actor: 'Học viên có tấm lòng hảo tâm (Doanh nhân Phạm Văn Vũ)',
+    preConditions: 'Học viên xem thông tin chương trình thiện nguyện "Áo Ấm Cho Em" trên app.',
     mainFlow: `1. Bấm nút "Ủng Hộ Chiến Dịch Ngay".
 2. Chọn số tiền đóng góp (Ví dụ: 2.000.000 VNĐ, 5.000.000 VNĐ, 10.000.000 VNĐ hoặc nhập số tiền tùy tâm).
 3. Nhập lời chúc gửi đến các em nhỏ vùng cao.
 4. Bấm "Tạo Mã VietQR Ủng Hộ".
 5. Mã VietQR hiện ra với đúng thông tin tài khoản Quỹ Thiện Nguyện CLB và cú pháp giao dịch duy nhất.
-6. Hội viên quét mã thanh toán trên ứng dụng ngân hàng.
-7. Sau 1 giây, màn hình hiển thị Thư cảm ơn tấm lòng vàng và tên hội viên xuất hiện trang trọng trên Bảng vàng nhân ái.`,
-    alternativeFlow: `- Hội viên có thể bấm chia sẻ chứng nhận ủng hộ lên mạng xã hội để lan tỏa tinh thần nhân ái của CLB.`,
+6. Học viên quét mã thanh toán trên ứng dụng ngân hàng.
+7. Sau 1 giây, màn hình hiển thị Thư cảm ơn tấm lòng vàng và tên Học viên xuất hiện trang trọng trên Bảng vàng nhân ái.`,
+    alternativeFlow: `- Học viên có thể bấm chia sẻ chứng nhận ủng hộ lên mạng xã hội để lan tỏa tinh thần nhân ái của CLB.`,
     postConditions: 'Khoản đóng góp được chuyển thẳng vào Quỹ An Sinh Xã Hội của CLB một cách an toàn và minh bạch.',
     imageFile: 'app_step_20_annual_fee_renewal.png',
     imageCaption: 'Thao tác đóng góp ủng hộ chương trình thiện nguyện an sinh xã hội siêu tốc qua VietQR'
@@ -421,16 +421,16 @@ const remainingAPP = [
     id: 'UC-APP-46',
     category: 'Câu Lạc Bộ Thể Thao & Gắn Kết',
     name: 'Đăng Ký Tham Gia Các Câu Lạc Bộ Thể Thao: Golf 1983, Tennis, Chạy Bộ Phong Trào',
-    actor: 'Hội viên yêu thích hoạt động thể dục thể thao',
-    preConditions: 'Hội viên mở mục "CLB Thể Thao & Sở Thích" trên ứng dụng.',
+    actor: 'Học viên yêu thích hoạt động thể dục thể thao',
+    preConditions: 'Học viên mở mục "CLB Thể Thao & Sở Thích" trên ứng dụng.',
     mainFlow: `1. Xem danh sách các câu lạc bộ trực thuộc: CLB Golf Doanh Nhân 1983, CLB Tennis 1983, CLB Chạy Bộ Marathon.
 2. Xem lịch sinh hoạt định kỳ, địa điểm tập luyện và ban điều hành của từng CLB thể thao.
 3. Chọn câu lạc bộ phù hợp và bấm nút "Đăng Ký Gia Nhập CLB Thể Thao".
 4. Điền trình độ / Handicap (đối với Golf) và kích cỡ áo thi đấu.
 5. Bấm "Xác Nhận Gia Nhập".
-6. Hệ thống tự động thêm hội viên vào nhóm sinh hoạt thể thao nội bộ và cập nhật lịch giao lưu thể thao vào lịch cá nhân.`,
-    alternativeFlow: `- Hội viên có thể đăng ký tham gia các giải đấu giao hữu mở rộng do CLB phối hợp với HanoiBA tổ chức.`,
-    postConditions: 'Hội viên nâng cao sức khỏe, tăng cường tình bạn bè đồng niên qua các hoạt động thể thao văn minh.',
+6. Hệ thống tự động thêm Học viên vào nhóm sinh hoạt thể thao nội bộ và cập nhật lịch giao lưu thể thao vào lịch cá nhân.`,
+    alternativeFlow: `- Học viên có thể đăng ký tham gia các giải đấu giao hữu mở rộng do CLB phối hợp với HanoiBA tổ chức.`,
+    postConditions: 'Học viên nâng cao sức khỏe, tăng cường tình bạn bè đồng niên qua các hoạt động thể thao văn minh.',
     imageFile: 'app_step_11_events_list.png',
     imageCaption: 'Danh sách và lịch sinh hoạt các câu lạc bộ thể thao Golf, Tennis, Chạy bộ của CLB'
   },
@@ -438,32 +438,32 @@ const remainingAPP = [
     id: 'UC-APP-47',
     category: 'Góp Ý & Sáng Kiến Phát Triển',
     name: 'Gửi Đề Xuất & Sáng Kiến Phát Triển Tổ Chức Đến Trực Tiếp Ban Chấp Hành',
-    actor: 'Hội viên tâm huyết muốn đóng góp trí tuệ cho CLB',
-    preConditions: 'Hội viên mở mục "Hòm Thư Sáng Kiến / Góp Ý" trên ứng dụng.',
+    actor: 'Học viên tâm huyết muốn đóng góp trí tuệ cho CLB',
+    preConditions: 'Học viên mở mục "Hòm Thư Sáng Kiến / Góp Ý" trên ứng dụng.',
     mainFlow: `1. Bấm nút "Gửi Sáng Kiến Mới".
-2. Chọn chủ đề: "Đổi mới nội dung sinh hoạt", "Xúc tiến thương mại quốc tế", "Nâng cấp tính năng ứng dụng số" hoặc "Chính sách hỗ trợ hội viên".
+2. Chọn chủ đề: "Đổi mới nội dung sinh hoạt", "Xúc tiến thương mại quốc tế", "Nâng cấp tính năng ứng dụng số" hoặc "Chính sách hỗ trợ Học viên".
 3. Soạn thảo nội dung ý tưởng, giải pháp thực hiện và tính khả thi của đề xuất.
 4. Đính kèm tài liệu thuyết minh hoặc hình ảnh minh họa.
 5. Bấm "Gửi Tới Ban Chấp Hành".
-6. Hệ thống chuyển đề xuất vào hòm thư thẩm tra của Ban Thư Ký và Ban Quản Trị, đồng thời cấp mã tra cứu tiến độ xử lý cho hội viên.`,
-    alternativeFlow: `- Ban Thư Ký phản hồi kết quả xem xét sáng kiến trực tiếp trong hộp thoại tin nhắn của hội viên.`,
-    postConditions: 'Tạo cầu nối trực tiếp giữa Hội viên và Ban Lãnh Đạo, phát huy tối đa sức mạnh trí tuệ tập thể.',
+6. Hệ thống chuyển đề xuất vào hòm thư thẩm tra của Ban Thư Ký và Ban Quản Trị, đồng thời cấp mã tra cứu tiến độ xử lý cho Học viên.`,
+    alternativeFlow: `- Ban Thư Ký phản hồi kết quả xem xét sáng kiến trực tiếp trong hộp thoại tin nhắn của Học viên.`,
+    postConditions: 'Tạo cầu nối trực tiếp giữa Học viên và Ban Lãnh Đạo, phát huy tối đa sức mạnh trí tuệ tập thể.',
     imageFile: 'app_step_09_messages_inbox.png',
-    imageCaption: 'Hòm thư tiếp nhận sáng kiến và đối thoại trực tiếp giữa hội viên với Ban Chấp Hành'
+    imageCaption: 'Hòm thư tiếp nhận sáng kiến và đối thoại trực tiếp giữa Học viên với Ban Chấp Hành'
   },
   {
     id: 'UC-APP-48',
     category: 'Hồ Sơ Doanh Nghiệp & Thương Hiệu',
     name: 'Cập Nhật Giờ Làm Việc, Chi Nhánh & Danh Mục Sản Phẩm Mới Trên Trang Hồ Sơ Doanh Nghiệp',
-    actor: 'Hội viên đại diện doanh nghiệp (Doanh nhân Phạm Văn Vũ)',
-    preConditions: 'Hội viên đăng nhập ứng dụng và mở trang quản lý Hồ Sơ Doanh Nghiệp.',
+    actor: 'Học viên đại diện doanh nghiệp (Doanh nhân Phạm Văn Vũ)',
+    preConditions: 'Học viên đăng nhập ứng dụng và mở trang quản lý Hồ Sơ Doanh Nghiệp.',
     mainFlow: `1. Mở mục "Doanh Nghiệp Của Tôi" (Công ty Cổ phần Công nghệ VIO CONNECT).
 2. Chỉnh sửa thông tin giới thiệu: Tầm nhìn sứ mệnh, Năng lực công nghệ, Đội ngũ nhân sự.
 3. Bổ sung địa chỉ các văn phòng đại diện và chi nhánh mới.
 4. Cập nhật số điện thoại hotline, email chăm sóc khách hàng và giờ làm việc tiêu chuẩn.
 5. Tải lên Brochure giới thiệu sản phẩm định dạng PDF để các đối tác có thể tải về nghiên cứu.
 6. Nhấn "Lưu Thay Đổi".
-7. Thông tin doanh nghiệp lập tức được cập nhật đồng bộ trên toàn bộ Danh bạ Hội viên và Danh thiếp số công khai.`,
+7. Thông tin doanh nghiệp lập tức được cập nhật đồng bộ trên toàn bộ Danh bạ Học viên và Danh thiếp số công khai.`,
     alternativeFlow: `- Nếu thay đổi Mã số thuế hoặc Tên pháp nhân công ty: Hệ thống yêu cầu Ban Thành Viên xác thực lại giấy phép đăng ký kinh doanh mới.`,
     postConditions: 'Hồ sơ doanh nghiệp luôn tươi mới, chuẩn xác, tối ưu hóa cơ hội tiếp cận khách hàng tiềm năng.',
     imageFile: 'live_30_app_member_profile_edit.png',
@@ -471,38 +471,38 @@ const remainingAPP = [
   },
   {
     id: 'UC-APP-49',
-    category: 'Chứng Nhận & Danh Dự Hội Viên',
-    name: 'Tải Xuống Giấy Chứng Nhận Hội Viên Điện Tử Kèm Chữ Ký Số Của Ban Chấp Hành',
-    actor: 'Hội viên chính thức (Doanh nhân Phạm Văn Vũ - CEO-83007)',
-    preConditions: 'Hội viên đã được kết nạp chính thức và hoàn tất nghĩa vụ hội phí.',
-    mainFlow: `1. Mở mục "Chứng Nhận Hội Viên" trên màn hình Thẻ VIP.
-2. Hệ thống hiển thị bản xem trước của Giấy Chứng Nhận Hội Viên Chính Thức mang nhận diện Hoàng gia sang trọng:
+    category: 'Chứng Nhận & Danh Dự Học viên',
+    name: 'Tải Xuống Giấy Chứng Nhận Học viên Điện Tử Kèm Chữ Ký Số Của Ban Chấp Hành',
+    actor: 'Học viên chính thức (Doanh nhân Phạm Văn Vũ - CEO-83007)',
+    preConditions: 'Học viên đã được kết nạp chính thức và hoàn tất nghĩa vụ hội phí.',
+    mainFlow: `1. Mở mục "Chứng Nhận Học viên" trên màn hình Thẻ VIP.
+2. Hệ thống hiển thị bản xem trước của Giấy Chứng Nhận Học viên Chính Thức mang nhận diện Hoàng gia sang trọng:
    - Họ và tên: Phạm Văn Vũ
    - Chức danh: Tổng Giám Đốc - Công ty Cổ phần Công nghệ VIO CONNECT
-   - Mã số hội viên: CEO-83007
+   - Mã số Học viên: CEO-83007
    - Khóa sinh hoạt: Nhiệm kỳ Hội Doanh Nhân Trẻ Hà Nội
    - Chữ ký số và con dấu điện tử của Chủ tịch CLB Doanh Nhân CEO HN10
    - Mã QR xác thực nguồn gốc điện tử chống giả mạo.
 3. Bấm nút "Tải File PDF Chất Lượng Cao".
 4. Tệp chứng nhận được lưu về điện thoại, sẵn sàng in đóng khung treo tại phòng làm việc.`,
-    alternativeFlow: `- Bất kỳ ai khi quét mã QR trên bản in chứng nhận đều được dẫn tới trang xác thực công khai xác nhận hội viên thật 100%.`,
+    alternativeFlow: `- Bất kỳ ai khi quét mã QR trên bản in chứng nhận đều được dẫn tới trang xác thực công khai xác nhận Học viên thật 100%.`,
     postConditions: 'Khẳng định niềm tự hào và vị thế doanh nhân chính thức trong đại gia đình CEO HN10.',
     imageFile: 'app_identity_card_vip.png',
-    imageCaption: 'Mẫu Giấy Chứng Nhận Hội Viên Chính Thức điện tử có mã QR xác thực và chữ ký số'
+    imageCaption: 'Mẫu Giấy Chứng Nhận Học viên Chính Thức điện tử có mã QR xác thực và chữ ký số'
   },
   {
     id: 'UC-APP-50',
     category: 'Bảo Mật & Quản Trị Thiết Bị',
     name: 'Quản Lý Danh Sách Thiết Bị Đăng Nhập & Bật Xác Thực Hai Yếu Tố (2FA) Bảo Mật Đỉnh Cao',
-    actor: 'Hội viên bảo vệ tài khoản cá nhân',
-    preConditions: 'Hội viên mở mục Cài Đặt Bảo Mật trên ứng dụng.',
+    actor: 'Học viên bảo vệ tài khoản cá nhân',
+    preConditions: 'Học viên mở mục Cài Đặt Bảo Mật trên ứng dụng.',
     mainFlow: `1. Mở phân hệ "An Toàn & Bảo Mật Tài Khoản".
 2. Xem danh sách các thiết bị đang đăng nhập tài khoản của mình (Tên dòng máy điện thoại, Trình duyệt máy tính, Thời gian đăng nhập gần nhất).
 3. Bật tùy chọn "Xác Thực Hai Yếu Tố (2FA)".
 4. Quét mã QR vào ứng dụng xác thực Google Authenticator hoặc nhận mã OTP bảo mật qua SMS.
 5. Nhập 6 số xác nhận để kích hoạt thành công tính năng 2FA.
-6. Nếu phát hiện thiết bị lạ: Hội viên bấm "Đăng Xuất Khỏi Thiết Bị Này Ngay Lập Tức".`,
-    alternativeFlow: `- Hội viên có thể kích hoạt tính năng Đăng nhập sinh trắc học (FaceID / Vân tay) để mở app nhanh mà vẫn an toàn tuyệt đối.`,
+6. Nếu phát hiện thiết bị lạ: Học viên bấm "Đăng Xuất Khỏi Thiết Bị Này Ngay Lập Tức".`,
+    alternativeFlow: `- Học viên có thể kích hoạt tính năng Đăng nhập sinh trắc học (FaceID / Vân tay) để mở app nhanh mà vẫn an toàn tuyệt đối.`,
     postConditions: 'Tài khoản doanh nhân được bảo vệ đa lớp, ngăn chặn 100% nguy cơ xâm nhập trái phép.',
     imageFile: 'sub_47_app_settings_password_security.png',
     imageCaption: 'Màn hình quản lý thiết bị đăng nhập, cấu hình xác thực hai yếu tố và bảo mật tài khoản'
@@ -573,9 +573,9 @@ const fileHeader = `/**
  * DANH MỤC 138 USE CASES TOÀN DIỆN HỆ SINH THÁI SỐ CEO HN10
  * =========================================================
  * Chuẩn hóa 100% nghiệp vụ Hội Doanh Nhân Trẻ Hà Nội (HanoiBA) - CLB Doanh Nhân CEO HN10:
- * - PHẦN I: Cổng Thông Tin Công Khai & Đăng Ký Hội Viên (10 UCs: UC-PUB-01 đến UC-PUB-10)
+ * - PHẦN I: Cổng Thông Tin Công Khai & Đăng Ký Học viên (10 UCs: UC-PUB-01 đến UC-PUB-10)
  * - PHẦN II: Cổng Điều Hành & Quản Trị Ban Chấp Hành (78 UCs: UC-CRM-01 đến UC-CRM-78)
- * - PHẦN III: Ứng Dụng Hội Viên Doanh Nhân CEO HN10 (50 UCs: UC-APP-01 đến UC-APP-50)
+ * - PHẦN III: Ứng Dụng Học viên Doanh Nhân CEO HN10 (50 UCs: UC-APP-01 đến UC-APP-50)
  * 
  * Quy chuẩn:
  * - TUYỆT ĐỐI KHÔNG sử dụng đường dẫn URL dev, cổng port, hoặc tên thương mại sàn bán lẻ (Shopee/Tiki).

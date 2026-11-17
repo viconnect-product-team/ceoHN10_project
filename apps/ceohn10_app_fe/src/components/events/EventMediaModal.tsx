@@ -83,7 +83,7 @@ export function EventMediaModal({
           <div className="p-3.5 rounded-2xl bg-blue-50/70 dark:bg-blue-950/30 border border-blue-200/60 dark:border-blue-900/40 text-blue-900 dark:text-blue-200 flex items-start gap-2.5">
             <FolderOpen className="h-4 w-4 shrink-0 text-[#003B95] mt-0.5" />
             <div className="text-[11px] leading-relaxed">
-              <strong>Tự động tích hợp Quản Lý Tài Liệu:</strong> Khi Ban Sự Kiện / Truyền Thông lưu link ảnh hoặc video tại đây, hệ thống sẽ tự động tạo bản ghi lưu trữ vào đúng phân hệ Quản Lý Tài Liệu để hội viên tiện tra cứu sau sự kiện.
+              <strong>Tự động tích hợp Quản Lý Tài Liệu:</strong> Khi Ban Sự Kiện / Truyền Thông lưu link ảnh hoặc video tại đây, hệ thống sẽ tự động tạo bản ghi lưu trữ vào đúng phân hệ Quản Lý Tài Liệu để Học viên tiện tra cứu sau sự kiện.
             </div>
           </div>
 
@@ -104,11 +104,10 @@ export function EventMediaModal({
                     key={m.key}
                     type="button"
                     onClick={() => setMediaType(m.key as any)}
-                    className={`py-2 px-3 rounded-xl border text-center font-bold text-xs flex flex-col items-center gap-1 transition cursor-pointer ${
-                      isSelected
+                    className={`py-2 px-3 rounded-xl border text-center font-bold text-xs flex flex-col items-center gap-1 transition cursor-pointer ${isSelected
                         ? "border-[#003B95] bg-blue-50 dark:bg-blue-950/40 text-[#003B95] dark:text-blue-300 ring-2 ring-[#003B95]/20"
                         : "border-slate-200 dark:border-slate-800 bg-background text-slate-600 dark:text-slate-400 hover:bg-slate-50"
-                    }`}
+                      }`}
                   >
                     <Icon className="h-4 w-4" />
                     <span>{m.label}</span>

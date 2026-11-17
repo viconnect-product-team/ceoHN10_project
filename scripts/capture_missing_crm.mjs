@@ -69,10 +69,10 @@ async function captureMissingCrm() {
     console.log('Saved 22_mau_email_tu_dong.png');
   }
 
-  console.log('>>> [5/5] Chụp Chi Tiết Hồ Sơ & Phê Duyệt Hội Viên...');
+  console.log('>>> [5/5] Chụp Chi Tiết Hồ Sơ & Phê Duyệt Học viên...');
   await page.goto('https://crm.ceohn10.viconnect.vn/members', { waitUntil: 'networkidle' });
   await page.waitForTimeout(1000);
-  // Tìm link chi tiết hội viên hoặc click dòng đầu tiên
+  // Tìm link chi tiết Học viên hoặc click dòng đầu tiên
   const firstMemberRow = page.locator('table tbody tr').first();
   if (await firstMemberRow.isVisible()) {
     const viewBtn = firstMemberRow.locator('a, button').first();

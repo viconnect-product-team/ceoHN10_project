@@ -16,7 +16,7 @@ const path = require('path');
   // Đăng nhập qua /auth
   await page.goto('https://ceohn10.viconnect.vn/auth');
   await page.waitForTimeout(2000);
-  
+
   // Điền thông tin đăng nhập
   const emailInput = await page.$('input[autocomplete="username"], input[type="text"]');
   if (emailInput) {
@@ -30,7 +30,7 @@ const path = require('path');
   if (submitBtn) {
     await submitBtn.click();
   }
-  await page.waitForNavigation({ waitUntil: 'networkidle' }).catch(() => {});
+  await page.waitForNavigation({ waitUntil: 'networkidle' }).catch(() => { });
   await page.waitForTimeout(3000);
 
   // Set cờ tắt popup chào mừng cho tất cả các user ID khả dĩ
@@ -60,7 +60,7 @@ const path = require('path');
 
   // 1. Trang chủ
   await captureRoute('https://ceohn10.viconnect.vn/association', 'app_01_trangchu_doanhnhan.png');
-  // 2. Thẻ hội viên
+  // 2. Thẻ Học viên
   await captureRoute('https://ceohn10.viconnect.vn/association/card', 'app_02_the_hoivien_so_vip.png');
   // 3. Cơ hội & Sàn B2B
   await captureRoute('https://ceohn10.viconnect.vn/association/opportunities', 'app_04_san_giaothuong_b2b.png');

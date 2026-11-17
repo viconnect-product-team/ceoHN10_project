@@ -94,7 +94,7 @@ export function MemberPerksCarousel() {
 
   const userCode = (user as any)?.code || (user as any)?.user_metadata?.member_code || "CEO HN10-M83";
 
-  // ── ĐỒNG BỘ ƯU ĐÃI DO HỘI VIÊN ĐĂNG (LUÔN ĐƯA ƯU ĐÃI MỚI NHẤT LÊN ĐẦU SLIDE) ──
+  // ── ĐỒNG BỘ ƯU ĐÃI DO Học viên ĐĂNG (LUÔN ĐƯA ƯU ĐÃI MỚI NHẤT LÊN ĐẦU SLIDE) ──
   const [memberCustomSlides, setMemberCustomSlides] = useState<PerkSlide[]>(() => {
     if (typeof window === "undefined") return [];
     try {
@@ -104,18 +104,18 @@ export function MemberPerksCarousel() {
       return parsed.map((m) => ({
         id: String(m.id),
         type: "sponsor" as const,
-        category: m.category || "HỘI VIÊN ĐĂNG",
+        category: m.category || "Học viên ĐĂNG",
         categoryBadge: "ƯU ĐÃI NỘI KHỐI MỚI",
         categoryBadgeBg: "bg-blue-600 text-white font-black",
-        title: m.title || "Ưu đãi hội viên tài trợ",
+        title: m.title || "Ưu đãi Học viên tài trợ",
         subtitle: m.description ? m.description.slice(0, 90) : (m.summary || ""),
         discountTag: m.discountValue || m.discount || "ƯU ĐÃI VIP",
-        sponsorName: m.partner || m.creatorName || "Hội viên CEO HN10",
+        sponsorName: m.partner || m.creatorName || "Học viên CEO HN10",
         discountPercent: m.discountValue || m.discount || "10%",
         voucherCode: m.voucherCode || `CEO HN10-${String(m.id).toUpperCase()}`,
         validUntil: m.validUntil || "31/12/2026",
         image: m.image || "https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=900&auto=format&fit=crop&q=80",
-        details: m.description || m.summary || "Đặc quyền ưu đãi độc quyền dành cho hội viên CLB CEO HN10.",
+        details: m.description || m.summary || "Đặc quyền ưu đãi độc quyền dành cho Học viên CLB CEO HN10.",
         terms: [
           `Doanh nghiệp tài trợ: ${m.partner || m.creatorName || "CLB CEO HN10"}`,
           `Nơi áp dụng: ${m.applicableLocation || m.address || "Hà Nội & Hệ thống đối tác"}`,
@@ -150,7 +150,7 @@ export function MemberPerksCarousel() {
             image: p.image || "https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=900&auto=format&fit=crop&q=80",
             details: p.description || p.summary || "Ưu đãi đối tác đồng hành cùng CLB Doanh Nhân CEO HN10.",
             terms: [
-              "Áp dụng cho mọi hội viên chính thức thuộc CLB CEO HN10",
+              "Áp dụng cho mọi Học viên chính thức thuộc CLB CEO HN10",
               "Xuất trình mã QR ưu đãi hoặc voucher khi áp dụng",
             ],
           }));
@@ -160,7 +160,7 @@ export function MemberPerksCarousel() {
       .catch(() => { });
   }, []);
 
-  // Lắng nghe sự kiện khi có ưu đãi mới được hội viên đăng lên
+  // Lắng nghe sự kiện khi có ưu đãi mới được Học viên đăng lên
   useEffect(() => {
     const handleReloadCustomPerks = () => {
       try {
@@ -171,18 +171,18 @@ export function MemberPerksCarousel() {
             parsed.map((m) => ({
               id: String(m.id),
               type: "sponsor" as const,
-              category: m.category || "HỘI VIÊN ĐĂNG",
+              category: m.category || "Học viên ĐĂNG",
               categoryBadge: "ƯU ĐÃI NỘI KHỐI MỚI",
               categoryBadgeBg: "bg-blue-600 text-white font-black",
-              title: m.title || "Ưu đãi hội viên tài trợ",
+              title: m.title || "Ưu đãi Học viên tài trợ",
               subtitle: m.description ? m.description.slice(0, 90) : (m.summary || ""),
               discountTag: m.discountValue || m.discount || "ƯU ĐÃI VIP",
-              sponsorName: m.partner || m.creatorName || "Hội viên CEO HN10",
+              sponsorName: m.partner || m.creatorName || "Học viên CEO HN10",
               discountPercent: m.discountValue || m.discount || "10%",
               voucherCode: m.voucherCode || `CEO HN10-${String(m.id).toUpperCase()}`,
               validUntil: m.validUntil || "31/12/2026",
               image: m.image || "https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=900&auto=format&fit=crop&q=80",
-              details: m.description || m.summary || "Đặc quyền ưu đãi độc quyền dành cho hội viên CLB CEO HN10.",
+              details: m.description || m.summary || "Đặc quyền ưu đãi độc quyền dành cho Học viên CLB CEO HN10.",
               terms: [
                 `Doanh nghiệp tài trợ: ${m.partner || m.creatorName || "CLB CEO HN10"}`,
                 `Nơi áp dụng: ${m.applicableLocation || m.address || "Hà Nội & Hệ thống đối tác"}`,
@@ -204,7 +204,7 @@ export function MemberPerksCarousel() {
     };
   }, []);
 
-  // ── DANH SÁCH ƯU ĐÃI THỰC TẾ TỪ HỘI VIÊN & MÁY CHỦ (KHÔNG HARDCODE FAKE MOCK) ──
+  // ── DANH SÁCH ƯU ĐÃI THỰC TẾ TỪ Học viên & MÁY CHỦ (KHÔNG HARDCODE FAKE MOCK) ──
   const allSlides: PerkSlide[] = useMemo(() => {
     const rawOffers = [...memberCustomSlides, ...serverSlides];
     const uniqueMap = new Map<string, PerkSlide>();
@@ -340,7 +340,7 @@ export function MemberPerksCarousel() {
         <div className="flex items-center justify-between px-1">
           <div className="flex items-center gap-1.5">
             <span className="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-white">
-              ƯU ĐÃI & ĐẶC QUYỀN HỘI VIÊN
+              ƯU ĐÃI & ĐẶC QUYỀN Học viên
             </span>
           </div>
           <Link
@@ -357,7 +357,7 @@ export function MemberPerksCarousel() {
           <Gift className="size-6 text-amber-500/70 mb-1" />
           <p className="text-xs font-bold text-slate-700 dark:text-slate-300">Chưa có ưu đãi đặc quyền nào</p>
           <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
-            Chương trình ưu đãi độc quyền dành riêng cho hội viên CEO HN10 sẽ được cập nhật tại đây
+            Chương trình ưu đãi độc quyền dành riêng cho Học viên CEO HN10 sẽ được cập nhật tại đây
           </p>
         </div>
       </div>
@@ -376,7 +376,7 @@ export function MemberPerksCarousel() {
       <div className="flex items-center justify-between px-1">
         <div className="flex items-center gap-1.5">
           <span className="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-white">
-            ƯU ĐÃI & ĐẶC QUYỀN HỘI VIÊN
+            ƯU ĐÃI & ĐẶC QUYỀN Học viên
           </span>
         </div>
         <div className="flex items-center gap-1.5">
@@ -480,8 +480,8 @@ export function MemberPerksCarousel() {
                         type="button"
                         onClick={(e) => handleToggleSaveSlide(s, e)}
                         className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider shadow-md flex items-center gap-1 transition-all active:scale-95 cursor-pointer ${savedPerkIds.includes(s.id)
-                            ? "bg-rose-600 text-white ring-1 ring-white/50"
-                            : "bg-black/60 hover:bg-black/80 text-white/90 border border-white/30"
+                          ? "bg-rose-600 text-white ring-1 ring-white/50"
+                          : "bg-black/60 hover:bg-black/80 text-white/90 border border-white/30"
                           }`}
                         title={savedPerkIds.includes(s.id) ? "Bỏ lưu ưu đãi" : "Lưu ưu đãi & nhận mã voucher"}
                       >
@@ -624,8 +624,8 @@ export function MemberPerksCarousel() {
             type="button"
             onClick={() => setCurrentIndex(idx)}
             className={`transition-all duration-300 rounded-full cursor-pointer ${currentIndex === idx
-                ? "w-6 h-1.5 bg-amber-500"
-                : "w-1.5 h-1.5 bg-slate-300 dark:bg-slate-700 hover:bg-slate-400"
+              ? "w-6 h-1.5 bg-amber-500"
+              : "w-1.5 h-1.5 bg-slate-300 dark:bg-slate-700 hover:bg-slate-400"
               }`}
             title={`Slide ${idx + 1}`}
           />
@@ -650,8 +650,8 @@ export function MemberPerksCarousel() {
                     type="button"
                     onClick={(e) => handleToggleSaveSlide(detailModalSlide, e)}
                     className={`px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider flex items-center gap-1 transition cursor-pointer active:scale-95 ${savedPerkIds.includes(detailModalSlide.id)
-                        ? "bg-rose-600 text-white shadow-xs"
-                        : "bg-white/20 hover:bg-white/30 text-white border border-white/30"
+                      ? "bg-rose-600 text-white shadow-xs"
+                      : "bg-white/20 hover:bg-white/30 text-white border border-white/30"
                       }`}
                   >
                     <Heart className={`size-3 ${savedPerkIds.includes(detailModalSlide.id) ? "fill-white text-white" : "text-white"}`} />

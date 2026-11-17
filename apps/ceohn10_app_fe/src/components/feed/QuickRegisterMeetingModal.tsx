@@ -54,7 +54,7 @@ export function QuickRegisterMeetingModal({
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
   const [company, setCompany] = useState("");
-  const [role, setRole] = useState("Hội viên Doanh nhân");
+  const [role, setRole] = useState("Học viên Doanh nhân");
   const [joinMode, setJoinMode] = useState<"offline" | "online">("offline");
   const [note, setNote] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -66,7 +66,7 @@ export function QuickRegisterMeetingModal({
       setFullName((member as any)?.name || (user as any)?.name || (user as any)?.displayName || "");
       setPhone((member as any)?.phone || (user as any)?.phone || "");
       setCompany((member as any)?.company || (member as any)?.companyName || (user as any)?.company || "Doanh nghiệp CEO HN10");
-      setRole((member as any)?.executiveRole || (member as any)?.title || "Hội viên CLB");
+      setRole((member as any)?.executiveRole || (member as any)?.title || "Học viên CLB");
     }
     if (meeting.isOnline) {
       setJoinMode("online");
@@ -95,7 +95,7 @@ export function QuickRegisterMeetingModal({
         id: (user as any)?.id || (member as any)?.id || `att_${Date.now()}`,
         name: fullName.trim(),
         company: company.trim() || "CLB Doanh Nhân CEO HN10",
-        role: role.trim() || "Hội viên",
+        role: role.trim() || "Học viên",
         phone: phone.trim(),
         avatar: (member as any)?.avatar || (user as any)?.avatar || "/ceohn10-emblem-8.png",
         checkedIn: false,
@@ -107,7 +107,7 @@ export function QuickRegisterMeetingModal({
       regList.unshift(newAttendee);
       localStorage.setItem(regKey, JSON.stringify(regList));
 
-      // 2. Lưu vào Lịch hoạt động cá nhân của hội viên
+      // 2. Lưu vào Lịch hoạt động cá nhân của Học viên
       const calKey = "vba_my_registered_events";
       const calExisting = localStorage.getItem(calKey);
       const calList = calExisting ? JSON.parse(calExisting) : [];
@@ -269,8 +269,8 @@ export function QuickRegisterMeetingModal({
                   type="button"
                   onClick={() => setJoinMode("offline")}
                   className={`py-2 px-3 rounded-xl border text-xs font-bold flex items-center justify-center gap-1.5 transition cursor-pointer ${joinMode === "offline"
-                      ? "border-[#003B95] bg-blue-50 text-[#003B95] dark:border-amber-400 dark:bg-amber-950/40 dark:text-amber-300 shadow-2xs font-extrabold"
-                      : "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400"
+                    ? "border-[#003B95] bg-blue-50 text-[#003B95] dark:border-amber-400 dark:bg-amber-950/40 dark:text-amber-300 shadow-2xs font-extrabold"
+                    : "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400"
                     }`}
                 >
                   <Building2 className="size-3.5" />
@@ -280,8 +280,8 @@ export function QuickRegisterMeetingModal({
                   type="button"
                   onClick={() => setJoinMode("online")}
                   className={`py-2 px-3 rounded-xl border text-xs font-bold flex items-center justify-center gap-1.5 transition cursor-pointer ${joinMode === "online"
-                      ? "border-[#003B95] bg-blue-50 text-[#003B95] dark:border-amber-400 dark:bg-amber-950/40 dark:text-amber-300 shadow-2xs font-extrabold"
-                      : "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400"
+                    ? "border-[#003B95] bg-blue-50 text-[#003B95] dark:border-amber-400 dark:bg-amber-950/40 dark:text-amber-300 shadow-2xs font-extrabold"
+                    : "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400"
                     }`}
                 >
                   <Video className="size-3.5" />

@@ -114,7 +114,7 @@ export function CreateGroupChatModal({
           }
         }
       })
-      .catch(() => {});
+      .catch(() => { });
   }, [open]);
 
   // Read from BOTH vba_connected_members AND vba.connected_members
@@ -130,7 +130,7 @@ export function CreateGroupChatModal({
       if (Array.isArray(stored2)) {
         stored2.forEach((s) => res.add(String(s).toLowerCase()));
       }
-    } catch {}
+    } catch { }
     return res;
   }, [open]);
 
@@ -160,7 +160,7 @@ export function CreateGroupChatModal({
       if (typeof navigator !== "undefined" && navigator.vibrate) {
         navigator.vibrate(15);
       }
-    } catch {}
+    } catch { }
   };
 
   const toggleSelectMember = (member: DirectoryMember) => {
@@ -202,7 +202,7 @@ export function CreateGroupChatModal({
     const q = searchTerm.trim().toLowerCase();
     const connected = availableMembers.filter((m) => isMemberConnected(m));
 
-    // Nếu chọn tab "connected" nhưng danh sách connected trống, hiển thị toàn bộ hội viên
+    // Nếu chọn tab "connected" nhưng danh sách connected trống, hiển thị toàn bộ Học viên
     // để không bao giờ bị tình trạng trắng danh sách
     const baseList = activeTab === "connected" && connected.length > 0 ? connected : availableMembers;
 
@@ -219,7 +219,7 @@ export function CreateGroupChatModal({
 
   const handleCreate = () => {
     if (selectedMembers.length === 0) {
-      toast.error("Vui lòng chọn ít nhất 1 hội viên để tạo nhóm!");
+      toast.error("Vui lòng chọn ít nhất 1 Học viên để tạo nhóm!");
       return;
     }
 
@@ -253,7 +253,7 @@ export function CreateGroupChatModal({
           name: m.name,
           avatarUrl: m.avatar,
           code: m.code,
-          role: m.personTitle || "Hội viên CEO HN10",
+          role: m.personTitle || "Học viên CEO HN10",
         })),
       };
 
@@ -306,11 +306,10 @@ export function CreateGroupChatModal({
             type="button"
             onClick={handleCreate}
             disabled={selectedMembers.length === 0 || isSubmitting}
-            className={`px-4 py-1.5 rounded-full text-xs font-bold transition active:scale-95 flex items-center gap-1 cursor-pointer ${
-              selectedMembers.length > 0
+            className={`px-4 py-1.5 rounded-full text-xs font-bold transition active:scale-95 flex items-center gap-1 cursor-pointer ${selectedMembers.length > 0
                 ? "bg-[#003B95] hover:bg-[#002B70] text-white shadow-md"
                 : "bg-slate-100 dark:bg-white/10 text-slate-400 dark:text-slate-500 cursor-not-allowed"
-            }`}
+              }`}
           >
             <span>Tạo</span>
             {selectedMembers.length > 0 && (
@@ -330,11 +329,10 @@ export function CreateGroupChatModal({
               <div className="relative shrink-0">
                 <div
                   onClick={() => fileInputRef.current?.click()}
-                  className={`w-16 h-16 rounded-2xl flex items-center justify-center shadow-md border-2 border-white dark:border-slate-800 cursor-pointer overflow-hidden group transition-transform active:scale-95 ${
-                    customAvatarUrl
+                  className={`w-16 h-16 rounded-2xl flex items-center justify-center shadow-md border-2 border-white dark:border-slate-800 cursor-pointer overflow-hidden group transition-transform active:scale-95 ${customAvatarUrl
                       ? "bg-slate-100"
                       : `bg-gradient-to-tr ${selectedBadge.color}`
-                  }`}
+                    }`}
                   title="Nhấn để đổi ảnh nhóm"
                 >
                   {customAvatarUrl ? (
@@ -419,11 +417,10 @@ export function CreateGroupChatModal({
                       setCustomAvatarUrl(null);
                       setSelectedBadge(b);
                     }}
-                    className={`shrink-0 flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
-                      !customAvatarUrl && selectedBadge.id === b.id
+                    className={`shrink-0 flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${!customAvatarUrl && selectedBadge.id === b.id
                         ? "bg-[#003B95] text-white shadow-xs scale-105"
                         : "bg-white dark:bg-white/[0.05] border border-slate-200/80 dark:border-white/10 text-slate-700 dark:text-slate-300 hover:border-slate-300"
-                    }`}
+                      }`}
                   >
                     <span>{b.emoji}</span>
                     <span className="text-[11px]">{b.label}</span>
@@ -522,7 +519,7 @@ export function CreateGroupChatModal({
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Tìm hội viên theo tên, mã số, công ty..."
+                placeholder="Tìm Học viên theo tên, mã số, công ty..."
                 className="flex-1 bg-transparent text-[13px] border-none outline-none ring-0 focus:outline-none focus:ring-0 text-slate-900 dark:text-white placeholder:text-slate-400"
               />
               {searchTerm && (
@@ -546,11 +543,10 @@ export function CreateGroupChatModal({
                   triggerHaptic();
                   setActiveTab("connected");
                 }}
-                className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                  activeTab === "connected"
+                className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${activeTab === "connected"
                     ? "bg-[#003B95] text-white shadow-xs"
                     : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
-                }`}
+                  }`}
               >
                 <UserCheck className="w-3.5 h-3.5" />
                 <span>Đã kết nối ({connectedCount})</span>
@@ -561,18 +557,17 @@ export function CreateGroupChatModal({
                   triggerHaptic();
                   setActiveTab("all");
                 }}
-                className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                  activeTab === "all"
+                className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${activeTab === "all"
                     ? "bg-[#003B95] text-white shadow-xs"
                     : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
-                }`}
+                  }`}
               >
                 <Users className="w-3.5 h-3.5" />
-                <span>Tất cả hội viên ({availableMembers.length})</span>
+                <span>Tất cả Học viên ({availableMembers.length})</span>
               </button>
             </div>
             <span className="text-[10px] text-slate-400 font-medium">
-              {activeTab === "connected" && connectedCount === 0 ? "Tự động hiển thị danh bạ" : `${filteredMembers.length} hội viên`}
+              {activeTab === "connected" && connectedCount === 0 ? "Tự động hiển thị danh bạ" : `${filteredMembers.length} Học viên`}
             </span>
           </div>
 
@@ -581,7 +576,7 @@ export function CreateGroupChatModal({
             {filteredMembers.length === 0 ? (
               <div className="py-12 text-center text-slate-400">
                 <Users className="h-8 w-8 mx-auto mb-2 opacity-40" />
-                <p className="text-xs font-medium">Không tìm thấy hội viên phù hợp</p>
+                <p className="text-xs font-medium">Không tìm thấy Học viên phù hợp</p>
               </div>
             ) : (
               filteredMembers.map((m) => {
@@ -631,7 +626,7 @@ export function CreateGroupChatModal({
                           )}
                         </div>
                         <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate">
-                          {m.personTitle || m.company || m.industry || "Hội viên CEO HN10"}
+                          {m.personTitle || m.company || m.industry || "Học viên CEO HN10"}
                         </p>
                       </div>
                     </div>
@@ -639,11 +634,10 @@ export function CreateGroupChatModal({
                     {/* Messenger Checkbox Circle */}
                     <div className="shrink-0 pl-2">
                       <div
-                        className={`w-6 h-6 rounded-full flex items-center justify-center transition-all ${
-                          isSelected
+                        className={`w-6 h-6 rounded-full flex items-center justify-center transition-all ${isSelected
                             ? "bg-[#003B95] dark:bg-amber-500 text-white shadow-xs scale-105"
                             : "border-2 border-slate-300 dark:border-slate-600 bg-white dark:bg-transparent group-hover:border-slate-400"
-                        }`}
+                          }`}
                       >
                         {isSelected && <Check className="w-3.5 h-3.5 stroke-[3]" />}
                       </div>
@@ -661,11 +655,10 @@ export function CreateGroupChatModal({
             type="button"
             onClick={handleCreate}
             disabled={selectedMembers.length === 0 || isSubmitting}
-            className={`w-full py-3 rounded-xl text-xs font-black uppercase tracking-wider transition active:scale-98 shadow-md flex items-center justify-center gap-2 cursor-pointer ${
-              selectedMembers.length > 0
+            className={`w-full py-3 rounded-xl text-xs font-black uppercase tracking-wider transition active:scale-98 shadow-md flex items-center justify-center gap-2 cursor-pointer ${selectedMembers.length > 0
                 ? "bg-[#003B95] hover:bg-[#002B70] text-white shadow-md"
                 : "bg-slate-100 dark:bg-white/10 text-slate-400 dark:text-slate-500 cursor-not-allowed"
-            }`}
+              }`}
           >
             <Users className="h-4 w-4" />
             <span>

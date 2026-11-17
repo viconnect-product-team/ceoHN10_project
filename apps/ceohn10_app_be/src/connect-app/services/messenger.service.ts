@@ -15,7 +15,7 @@ export class ConnectMessengerService {
   constructor(
     private prisma: PrismaService,
     private gateway: ConnectAppGateway,
-  ) {}
+  ) { }
 
   async resolveMemberCodeForUser(userId: string): Promise<string> {
     try {
@@ -52,7 +52,7 @@ export class ConnectMessengerService {
           return byUser[0].code;
         }
 
-        // Tự động tạo hồ sơ hội viên cho tài khoản này
+        // Tự động tạo hồ sơ Học viên cho tài khoản này
         const userEmail = u.email || `${u.username || userId}@ceohn10.vn`;
         const newCode =
           'HN10-' + String(Math.floor(100 + Math.random() * 900));
@@ -62,9 +62,9 @@ export class ConnectMessengerService {
             status, joined_at, fee_year, fee_paid, address, about, payment_status,
             user_id, association_id, created_at, updated_at
           ) VALUES (
-            ${userId}::text, ${newCode}, ${u.name || 'Hội viên CEO HN10'}, ${u.name || 'Hội viên CEO HN10'},
+            ${userId}::text, ${newCode}, ${u.name || 'Học viên CEO HN10'}, ${u.name || 'Học viên CEO HN10'},
             ${userEmail}, '0983000000', 'corporate', 'standard', 'Kinh doanh & Quản lý', 'Hà Nội',
-            'active', CURRENT_DATE, 2026, true, 'Hà Nội', 'Hội viên CLB Doanh Nhân CEO HN10', 'paid',
+            'active', CURRENT_DATE, 2026, true, 'Hà Nội', 'Học viên CLB Doanh Nhân CEO HN10', 'paid',
             ${userId}::uuid, 'c1983000-0000-4000-8000-000000001983'::uuid, now(), now()
           ) ON CONFLICT (id) DO UPDATE SET user_id = ${userId}::uuid
         `.catch(() => null);
@@ -222,9 +222,9 @@ export class ConnectMessengerService {
         name: isSystem
           ? 'Ban Thư Ký CLB Doanh Nhân CEO HN10'
           : mem?.display_name ||
-            mem?.name ||
-            mem?.contact ||
-            peer.toUpperCase(),
+          mem?.name ||
+          mem?.contact ||
+          peer.toUpperCase(),
         avatarUrl: isSystem ? '/ceohn10-logo.png' : (mem?.avatar ?? null),
         last: latest.text,
         time: latest.created_at
@@ -284,7 +284,7 @@ export class ConnectMessengerService {
     const isGroup = peer.startsWith('group_');
     const isChannel = peer.startsWith('channel_');
 
-    // Tra cứu hội viên đối tác để lấy tất cả các alias (code, user_id, id)
+    // Tra cứu Học viên đối tác để lấy tất cả các alias (code, user_id, id)
     const peerMemRows = await this.prisma.$queryRaw<any[]>`
       SELECT m.id, m.code, m.user_id, m.name, m.contact,
              COALESCE(up.display_name, vu.name, bi.display_name, m.contact, m.name) as name,
@@ -375,27 +375,27 @@ export class ConnectMessengerService {
     if (isChannel && msgs.length === 0) {
       const channelSeeds: Record<string, string[]> = {
         channel_secretariat: [
-          'Chào mừng Quý Anh/Chị Hội viên đến với Kênh Ban Thư Ký & Ban Điều Hành CLB Doanh Nhân CEO HN10.',
+          'Chào mừng Quý Anh/Chị Học viên đến với Kênh Ban Thư Ký & Ban Điều Hành CLB Doanh Nhân CEO HN10.',
           '[action:meeting|title:H%E1%BB%8Dp%20Ban%20Ch%E1%BA%A5p%20H%C3%A0nh%20CEO%201983%20Th%C3%A1ng%203|time:14:00%20-%2028/03/2026|location:Trung%20t%C3%A2m%20H%E1%BB%99i%20Ngh%E1%BB%8B%20Qu%E1%BB%91c%20Gia%20H%C3%A0%20N%E1%BB%99i|link:https://meet.ceohn10.vn/ceohn10-bch|desc:Phi%C3%AAn%20h%E1%BB%8Dp%20chi%E1%BA%BFn%20l%C6%B0%E1%BB%A3c%20tri%E1%BB%83n%20khai%20giao%20th%C6%B0%C6%A1ng%20to%C3%A0n%20di%E1%BB%87n]',
-          'Văn bản chỉ đạo & kế hoạch hoạt động quý 1/2026 đã được Ban Thư Ký cập nhật. Kính mời Quý Hội viên theo dõi và đồng hành.',
+          'Văn bản chỉ đạo & kế hoạch hoạt động quý 1/2026 đã được Ban Thư Ký cập nhật. Kính mời Quý Học viên theo dõi và đồng hành.',
         ],
         channel_media: [
-          'Chào mừng Quý Hội viên đến với Kênh Ban Truyền Thông Hiệp Hội CEO HN10.',
-          'Bản tin hoạt động CLB: Đẩy mạnh các chiến dịch truyền thông nhận diện thương hiệu cho các doanh nghiệp hội viên trên đa nền tảng.',
+          'Chào mừng Quý Học viên đến với Kênh Ban Truyền Thông Hiệp Hội CEO HN10.',
+          'Bản tin hoạt động CLB: Đẩy mạnh các chiến dịch truyền thông nhận diện thương hiệu cho các doanh nghiệp Học viên trên đa nền tảng.',
           'Thông cáo báo chí: Chuỗi sự kiện Gala Doanh Nhân & Lễ tôn vinh Doanh nghiệp tiêu biểu 2026 chuẩn bị khởi động.',
         ],
         channel_promotion: [
-          'Chào mừng Quý Hội viên đến với Kênh Ban Xúc Tiến Giao Thương CLB CEO HN10.',
-          'Chương trình Matching B2B: Ban Xúc tiến mở cổng tiếp nhận nhu cầu liên kết chuỗi cung ứng giữa các doanh nghiệp hội viên.',
+          'Chào mừng Quý Học viên đến với Kênh Ban Xúc Tiến Giao Thương CLB CEO HN10.',
+          'Chương trình Matching B2B: Ban Xúc tiến mở cổng tiếp nhận nhu cầu liên kết chuỗi cung ứng giữa các doanh nghiệp Học viên.',
           'Cơ hội kết nối tuần này: Nhu cầu tìm đối tác tổng thầu thi công nội thất, cung cấp nguyên vật liệu và giải pháp công nghệ số.',
         ],
         channel_deals: [
-          'Chào mừng Quý Hội viên đến với Kênh Cơ Hội & Deal B2B CLB CEO HN10.',
+          'Chào mừng Quý Học viên đến với Kênh Cơ Hội & Deal B2B CLB CEO HN10.',
           'Tổng hợp các gói hợp tác kinh doanh độc quyền và chính sách chiết khấu ưu đãi nội bộ giữa các doanh nghiệp trong CLB.',
-          'Deal hot tháng 3: Gói tài trợ truyền thông và gian hàng triển lãm B2B dành riêng cho hội viên chính thức.',
+          'Deal hot tháng 3: Gói tài trợ truyền thông và gian hàng triển lãm B2B dành riêng cho Học viên chính thức.',
         ],
         channel_events: [
-          'Chào mừng Quý Hội viên đến với Kênh Ban Sự Kiện & Hội Nghị CLB CEO HN10.',
+          'Chào mừng Quý Học viên đến với Kênh Ban Sự Kiện & Hội Nghị CLB CEO HN10.',
           'Lịch sự kiện sắp tới: Đại hội thường niên CLB CEO HN10 và Diễn đàn Kinh tế Tư nhân 2026.',
           'Vé tham dự sự kiện và mã QR Check-in đã sẵn sàng trong mục Vé sự kiện của bạn.',
         ],
@@ -474,7 +474,7 @@ export class ConnectMessengerService {
     const isGroup = peerCode.toLowerCase().startsWith('group_');
     const isChannel = peerCode.toLowerCase().startsWith('channel_');
 
-    // Chuẩn hóa peerCode: nếu người gửi truyền user_id hoặc code viết hoa, phân giải về code hội viên
+    // Chuẩn hóa peerCode: nếu người gửi truyền user_id hoặc code viết hoa, phân giải về code Học viên
     let targetPeerCode = peerCode.toLowerCase();
     let targetUserId: string | null = null;
     if (
@@ -530,7 +530,7 @@ export class ConnectMessengerService {
           text.length > 80 ? text.slice(0, 80) + '...' : text,
           mine,
         )
-        .catch(() => {});
+        .catch(() => { });
     }
 
     if (this.gateway && this.gateway.server) {
@@ -734,7 +734,7 @@ export class ConnectMessengerService {
       });
     }
 
-    // Bổ sung các hội viên đã kết nối nhưng chưa phát sinh tin nhắn
+    // Bổ sung các Học viên đã kết nối nhưng chưa phát sinh tin nhắn
     for (const c of connections) {
       const counterpartId =
         String(c.requester_user_id).toLowerCase() === userId.toLowerCase()
@@ -842,7 +842,7 @@ export class ConnectMessengerService {
       if (conn.length > 0) {
         const otherId =
           String(conn[0].requester_user_id).toLowerCase() ===
-          userId.toLowerCase()
+            userId.toLowerCase()
             ? String(conn[0].recipient_user_id)
             : String(conn[0].requester_user_id);
         const openRes = await this.openMyDmThread(userId, otherId);
@@ -1177,7 +1177,7 @@ export class ConnectMessengerService {
 
     let results = identities.map((i) => ({
       userId: String(i.user_id),
-      displayName: i.display_name || 'Hội viên CEO HN10',
+      displayName: i.display_name || 'Học viên CEO HN10',
       avatarUrl: i.avatar_url || null,
       headline: i.headline || i.job_title || null,
       companyName: i.company_name || null,

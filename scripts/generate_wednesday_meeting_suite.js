@@ -390,8 +390,8 @@ async function generateFeedbackFormFiles() {
       'P0 - Bắt buộc', 'Duyệt áp dụng ngay', 'Trưởng nhóm Mobile ViConnect', '18:00 Thứ Năm'
     ],
     [
-      2, '09:58', 'Nguyễn Văn Cường (Trưởng Ban)', 'Ban Thành viên', 'Danh bạ CEO & Thẻ hội viên',
-      'Hồ sơ hội viên và ảnh bìa đại diện trên điện thoại phải hiển thị sắc nét, đồng bộ tên doanh nghiệp, chức vụ thật từ hệ cơ sở dữ liệu, không được sót chữ.',
+      2, '09:58', 'Nguyễn Văn Cường (Trưởng Ban)', 'Ban Thành viên', 'Danh bạ CEO & Thẻ Học viên',
+      'Hồ sơ Học viên và ảnh bìa đại diện trên điện thoại phải hiển thị sắc nét, đồng bộ tên doanh nghiệp, chức vụ thật từ hệ cơ sở dữ liệu, không được sót chữ.',
       'Chuẩn hóa dữ liệu & UI',
       'Đã vá triệt để: bổ sung cột cover_url, company_name vào database PostgreSQL, sửa lỗi initials lọc bỏ hậu tố admin, co giãn 2 dòng không bị cụt.',
       'P0 - Bắt buộc', 'Đã hoàn thành 100%', 'Trưởng nhóm Backend ViConnect', 'Đã xử lý'
@@ -405,28 +405,28 @@ async function generateFeedbackFormFiles() {
     ],
     [
       4, '10:18', 'Hoàng Minh Tuấn (Trưởng Ban)', 'Ban Xúc tiến TM', 'Mobile App & Web - Gian hàng B2B',
-      'Cho phép hội viên tự chụp ảnh sản phẩm từ camera điện thoại, đăng tải giá bán, ưu đãi độc quyền cho thành viên CLB và tạo cơ hội hợp tác kinh doanh.',
+      'Cho phép Học viên tự chụp ảnh sản phẩm từ camera điện thoại, đăng tải giá bán, ưu đãi độc quyền cho thành viên CLB và tạo cơ hội hợp tác kinh doanh.',
       'Tính năng nghiệp vụ',
       'Hệ sinh thái đã có sẵn mục Gian hàng & Cơ hội kinh doanh (Deals), đã kết nối MinIO lưu ảnh độ nét cao và thông báo real-time khi có đối tác quan tâm.',
       'P1 - Ưu tiên cao', 'Duyệt triển khai', 'Kỹ sư Fullstack ViConnect', '20:00 Thứ Sáu'
     ],
     [
       5, '10:28', 'Vũ Thu Trang (Trưởng Ban)', 'Ban Thiện nguyện', 'Cổng đóng góp & Quỹ thiện nguyện',
-      'Công khai danh sách ủng hộ chương trình từ thiện minh bạch theo thời gian thực, có mã QR ngân hàng tạo sẵn số tiền đóng góp để hội viên chuyển khoản nhanh.',
+      'Công khai danh sách ủng hộ chương trình từ thiện minh bạch theo thời gian thực, có mã QR ngân hàng tạo sẵn số tiền đóng góp để Học viên chuyển khoản nhanh.',
       'Minh bạch tài chính',
       'Đã tích hợp mã VietQR động theo từng chiến dịch thiện nguyện, webhook ngân hàng tự động cập nhật tên người ủng hộ và số tiền lên bảng vinh danh.',
       'P1 - Ưu tiên cao', 'Duyệt áp dụng', 'Kỹ sư Cổng thanh toán', 'Thứ Bảy'
     ],
     [
       6, '10:38', 'Đại diện Ban Kiểm tra', 'Ban Kiểm tra', 'Phân quyền & Bảo mật hệ thống',
-      'Đảm bảo dữ liệu số điện thoại, doanh thu và các deal nội bộ chỉ hội viên chính thức đã duyệt mới được xem; tài khoản khách vãng lai chỉ xem thông tin công khai.',
+      'Đảm bảo dữ liệu số điện thoại, doanh thu và các deal nội bộ chỉ Học viên chính thức đã duyệt mới được xem; tài khoản khách vãng lai chỉ xem thông tin công khai.',
       'Bảo mật & Phân quyền',
-      'Hệ thống áp dụng RBAC 4 cấp: SuperAdmin, Ban Chấp Hành, Hội viên chính thức (VIP), Khách. API kiểm soát JWT chặt chẽ ở tầng Backend.',
+      'Hệ thống áp dụng RBAC 4 cấp: SuperAdmin, Ban Chấp Hành, Học viên chính thức (VIP), Khách. API kiểm soát JWT chặt chẽ ở tầng Backend.',
       'P0 - Bắt buộc', 'Đã kiểm thử Pass', 'Chuyên gia An toàn thông tin', 'Đã bảo đảm'
     ],
     [
       7, '10:48', 'Phó Chủ tịch Phụ trách Đối ngoại', 'Thường trực BĐH', 'Sapphire Hub & Cẩm nang CLB',
-      'Cần mục lưu trữ các tài liệu chính sách, cẩm nang hội viên, quy chế văn hóa 1983 để tân hội viên cài app là mở xem và tải về được ngay.',
+      'Cần mục lưu trữ các tài liệu chính sách, cẩm nang Học viên, quy chế văn hóa 1983 để tân Học viên cài app là mở xem và tải về được ngay.',
       'Tiện ích tri thức',
       'Đã kích hoạt Sapphire Hub trên Mobile App và Web CRM, hỗ trợ xem trực tuyến file PDF, Word điều lệ và các mẫu văn bản hiệp hội.',
       'P2 - Trung bình', 'Duyệt đưa vào sử dụng', 'Nhóm Nội dung số', 'Đã sẵn sàng'
@@ -435,7 +435,7 @@ async function generateFeedbackFormFiles() {
       8, '10:58', 'Tổng Thư ký CLB', 'Ban Thư ký', 'Bầu cử & Biểu quyết số',
       'Trong các kỳ họp Đại hội thường niên, cần tính năng biểu quyết trực tuyến tại hội trường bằng điện thoại, chống gian lận và hiển thị kết quả ngay.',
       'Tính năng biểu quyết',
-      'Đã có sẵn module Biểu quyết số trên Mobile App, kiểm soát theo mã hội viên duy nhất (HN10-xxx), mỗi người 1 phiếu, hiển thị biểu đồ kết quả trực tiếp.',
+      'Đã có sẵn module Biểu quyết số trên Mobile App, kiểm soát theo mã Học viên duy nhất (HN10-xxx), mỗi người 1 phiếu, hiển thị biểu đồ kết quả trực tiếp.',
       'P1 - Ưu tiên cao', 'Duyệt cho Đại hội', 'Nhóm Giải pháp số', 'Đã sẵn sàng'
     ]
   ];
@@ -678,21 +678,21 @@ async function generateScopeFreezeMatrixFiles() {
       ]
     },
     {
-      groupName: 'NHÓM 2: HỒ SƠ HỘI VIÊN, THẺ HỘI VIÊN THÔNG MINH & DYNAMIC QR',
+      groupName: 'NHÓM 2: HỒ SƠ Học viên, THẺ Học viên THÔNG MINH & DYNAMIC QR',
       items: [
         ['HV-01', 'Danh bạ điện tử 100+ CEO HN10 với bộ lọc thông minh theo ngành nghề, khu vực, chức vụ', 'Web CRM & App', '100% Pass', 'ĐẠT YÊU CẦU', 'CHỐT GO-LIVE'],
-        ['HV-02', 'Thẻ hội viên điện tử thông minh tích hợp Dynamic QR code định danh cá nhân độc bản', 'Mobile App', '100% Pass', 'ĐẠT YÊU CẦU', 'CHỐT GO-LIVE'],
+        ['HV-02', 'Thẻ Học viên điện tử thông minh tích hợp Dynamic QR code định danh cá nhân độc bản', 'Mobile App', '100% Pass', 'ĐẠT YÊU CẦU', 'CHỐT GO-LIVE'],
         ['HV-03', 'Danh thiếp số (Digital Business Card Visit) chia sẻ 1-chạm qua QR, Link, Zalo, vCard', 'Mobile App & Web', '100% Pass', 'ĐẠT YÊU CẦU', 'CHỐT GO-LIVE'],
         ['HV-04', 'Đồng bộ avatar nét cao, ảnh bìa văn phòng, tên công ty chuẩn từ Database PostgreSQL', 'Toàn hệ thống', '100% Pass', 'ĐÃ SỬA TRIỆT ĐỂ', 'CHỐT GO-LIVE'],
-        ['HV-05', 'Phân hạng hội viên VIP, Ban Điều Hành, Hội viên liên kết và quản lý nhiệm kỳ 2024-2027', 'Web CRM & App', '100% Pass', 'ĐẠT YÊU CẦU', 'CHỐT GO-LIVE'],
-        ['HV-06', 'Quy trình tiếp nhận hồ sơ đăng ký hội viên mới, thẩm định hồ sơ và cấp mã hội viên HN10-xxx', 'Web CRM', '100% Pass', 'ĐẠT YÊU CẦU', 'CHỐT GO-LIVE'],
+        ['HV-05', 'Phân hạng Học viên VIP, Ban Điều Hành, Học viên liên kết và quản lý nhiệm kỳ 2024-2027', 'Web CRM & App', '100% Pass', 'ĐẠT YÊU CẦU', 'CHỐT GO-LIVE'],
+        ['HV-06', 'Quy trình tiếp nhận hồ sơ đăng ký Học viên mới, thẩm định hồ sơ và cấp mã Học viên HN10-xxx', 'Web CRM', '100% Pass', 'ĐẠT YÊU CẦU', 'CHỐT GO-LIVE'],
       ]
     },
     {
       groupName: 'NHÓM 3: QUẢN LÝ SỰ KIỆN, VÉ ĐIỆN TỬ & CHECK-IN QR CODE TỐC ĐỘ CAO',
       items: [
         ['SK-01', 'Tạo và công bố sự kiện CLB (Hội thảo, Gala, Tọa đàm BĐH, Giải Golf) kèm biểu phí tham gia', 'Web CRM & App', '100% Pass', 'ĐẠT YÊU CẦU', 'CHỐT GO-LIVE'],
-        ['SK-02', 'Đăng ký tham gia sự kiện và xuất vé điện tử kèm mã QR định danh cá nhân từng hội viên', 'Mobile App', '100% Pass', 'ĐẠT YÊU CẦU', 'CHỐT GO-LIVE'],
+        ['SK-02', 'Đăng ký tham gia sự kiện và xuất vé điện tử kèm mã QR định danh cá nhân từng Học viên', 'Mobile App', '100% Pass', 'ĐẠT YÊU CẦU', 'CHỐT GO-LIVE'],
         ['SK-03', 'Camera Scanner trên Mobile quét mã QR check-in siêu tốc < 1 giây tại cửa hội trường', 'Mobile App', '100% Pass', 'ĐẠT YÊU CẦU', 'CHỐT GO-LIVE'],
         ['SK-04', 'Cơ chế Check-in Offline lưu trữ cục bộ khi mất kết nối mạng và tự động đồng bộ khi có wifi/4G', 'Mobile App', '100% Pass', 'ĐẠT YÊU CẦU', 'CHỐT GO-LIVE'],
         ['SK-05', 'Sơ đồ chỗ ngồi hội trường (Cinema VIP Seating) phân khu BĐH, VIP và khách mời', 'Web CRM & App', '100% Pass', 'ĐẠT YÊU CẦU', 'CHỐT GO-LIVE'],
@@ -702,10 +702,10 @@ async function generateScopeFreezeMatrixFiles() {
     {
       groupName: 'NHÓM 4: XÚC TIẾN THƯƠNG MẠI, GIAO THƯƠNG B2B & SÀN CƠ HỘI KINH DOANH',
       items: [
-        ['TM-01', 'Gian hàng số doanh nghiệp hội viên giới thiệu năng lực sản phẩm, dịch vụ, bảng giá ưu đãi', 'Mobile App & Web', '100% Pass', 'ĐẠT YÊU CẦU', 'CHỐT GO-LIVE'],
+        ['TM-01', 'Gian hàng số doanh nghiệp Học viên giới thiệu năng lực sản phẩm, dịch vụ, bảng giá ưu đãi', 'Mobile App & Web', '100% Pass', 'ĐẠT YÊU CẦU', 'CHỐT GO-LIVE'],
         ['TM-02', 'Đăng tải cơ hội kinh doanh (Business Deals) cần mua / cần bán trong mạng lưới CEO HN10', 'Mobile App & Web', '100% Pass', 'ĐẠT YÊU CẦU', 'CHỐT GO-LIVE'],
         ['TM-03', 'Kết nối cung cầu (Matching engine) tự động ghép nối đối tác cùng ngành nghề liên quan', 'Web CRM & App', '100% Pass', 'ĐẠT YÊU CẦU', 'CHỐT GO-LIVE'],
-        ['TM-04', 'Ghi nhận và vinh danh giá trị giao thương chéo giữa các hội viên trong các kỳ sinh hoạt', 'Web CRM & App', '100% Pass', 'ĐẠT YÊU CẦU', 'CHỐT GO-LIVE'],
+        ['TM-04', 'Ghi nhận và vinh danh giá trị giao thương chéo giữa các Học viên trong các kỳ sinh hoạt', 'Web CRM & App', '100% Pass', 'ĐẠT YÊU CẦU', 'CHỐT GO-LIVE'],
         ['TM-05', 'Hệ thống đánh giá độ hài lòng và tín nhiệm đối tác kinh doanh nội bộ', 'Mobile App', '100% Pass', 'ĐẠT YÊU CẦU', 'CHỐT GO-LIVE'],
         ['TM-06', 'Kênh trao đổi tin nhắn trực tiếp giữa 2 CEO để đàm phán hợp đồng thương mại', 'Mobile App', '100% Pass', 'ĐẠT YÊU CẦU', 'CHỐT GO-LIVE'],
       ]
@@ -715,7 +715,7 @@ async function generateScopeFreezeMatrixFiles() {
       items: [
         ['CH-01', 'Sapphire Hub - Cẩm nang số lưu trữ quy chế, điều lệ CLB, biểu mẫu hành chính tải về', 'Mobile App & Web', '100% Pass', 'ĐẠT YÊU CẦU', 'CHỐT GO-LIVE'],
         ['CH-02', 'Bảng điều phối công việc Kanban cho 6 Ban chuyên môn theo dõi tiến độ công việc', 'Web CRM', '100% Pass', 'ĐẠT YÊU CẦU', 'CHỐT GO-LIVE'],
-        ['CH-03', 'Hệ thống Bầu cử & Biểu quyết số trực tuyến cho Đại hội toàn thể hội viên CLB', 'Mobile App', '100% Pass', 'ĐẠT YÊU CẦU', 'CHỐT GO-LIVE'],
+        ['CH-03', 'Hệ thống Bầu cử & Biểu quyết số trực tuyến cho Đại hội toàn thể Học viên CLB', 'Mobile App', '100% Pass', 'ĐẠT YÊU CẦU', 'CHỐT GO-LIVE'],
         ['CH-04', 'VoIP Hotline và kênh liên lạc khẩn cấp kết nối trực tiếp đến Ban Thư ký & BĐH', 'Mobile App', '100% Pass', 'ĐẠT YÊU CẦU', 'CHỐT GO-LIVE'],
         ['CH-05', 'Kho lưu trữ tài liệu số, kỷ yếu hình ảnh chất lượng cao các kỳ đại hội và sự kiện', 'Web CRM & App', '100% Pass', 'ĐẠT YÊU CẦU', 'CHỐT GO-LIVE'],
         ['CH-06', 'Trợ lý ảo thông minh CEO HN10 AI hỗ trợ giải đáp quy chế và tìm kiếm đối tác tức thì', 'Mobile App', '100% Pass', 'ĐẠT YÊU CẦU', 'CHỐT GO-LIVE'],
@@ -1095,23 +1095,23 @@ async function generateMeetingMinutesFiles() {
     createPara('3. Chủ tọa cuộc họp: Chủ tịch CLB Doanh Nhân CEO HN10 cùng Thường trực Ban Điều Hành.'),
     createPara('4. Thư ký cuộc họp: Ban Thư ký CLB CEO HN10.'),
     createPara('5. Thành phần tham dự:'),
-    createPara('   - Về phía CLB Doanh Nhân CEO HN10: Ban Lãnh đạo CLB, Tổng Thư ký và đầy đủ Trưởng/Phó 6 Ban chuyên môn (Ban Hội viên, Ban Sự kiện, Ban Tài chính, Ban Xúc tiến thương mại, Ban Truyền thông, Ban Thiện nguyện).'),
+    createPara('   - Về phía CLB Doanh Nhân CEO HN10: Ban Lãnh đạo CLB, Tổng Thư ký và đầy đủ Trưởng/Phó 6 Ban chuyên môn (Ban Học viên, Ban Sự kiện, Ban Tài chính, Ban Xúc tiến thương mại, Ban Truyền thông, Ban Thiện nguyện).'),
     createPara('   - Về phía Đơn vị phát triển ViConnect: Giám đốc dự án, Trưởng nhóm Backend, Trưởng nhóm Mobile và Đội ngũ Kỹ sư giải pháp số.'),
 
     createHeading1('II. NỘI DUNG VÀ TIẾN TRÌNH CUỘC HỌP (THEO ĐÚNG LỘ TRÌNH 3 TIẾNG)'),
 
     createHeading2('1. Giai đoạn 1 (09h00 - 09h45): Báo cáo thuyết trình & Demo trực tiếp sản phẩm'),
     createPara('- Đại diện Đơn vị phát triển ViConnect trình bày tổng quan kiến trúc hệ thống và trực tiếp demo trên thiết bị thật:'),
-    createPara('  + Demo Mobile App CEO HN10 (Android/iOS): Trình diễn Thẻ hội viên số Dynamic QR, Danh bạ 100+ CEO, quét mã QR check-in sự kiện cực nhanh, Gian hàng sản phẩm và tính năng Sapphire Hub.'),
-    createPara('  + Demo Web CRM Quản trị: Trình diễn Quản lý thu chi Sổ quỹ nội bộ chuẩn Thông tư 200/2014/TT-BTC, xuất báo cáo Excel/PDF mẫu S03a-DNN, quản trị danh sách hội viên đóng phí thường niên.'),
+    createPara('  + Demo Mobile App CEO HN10 (Android/iOS): Trình diễn Thẻ Học viên số Dynamic QR, Danh bạ 100+ CEO, quét mã QR check-in sự kiện cực nhanh, Gian hàng sản phẩm và tính năng Sapphire Hub.'),
+    createPara('  + Demo Web CRM Quản trị: Trình diễn Quản lý thu chi Sổ quỹ nội bộ chuẩn Thông tư 200/2014/TT-BTC, xuất báo cáo Excel/PDF mẫu S03a-DNN, quản trị danh sách Học viên đóng phí thường niên.'),
     createPara('  + Kiểm tra tính xác thực dữ liệu: Khẳng định 100% dữ liệu hiển thị được đồng bộ trực tiếp từ Database PostgreSQL, không có dữ liệu hard-coded, fake hay mock ở Frontend.'),
 
     createHeading2('2. Giai đoạn 2 (09h45 - 11h45): Thảo luận, chất vấn và ý kiến phát biểu của các Ban chuyên môn'),
     createPara('- Cuộc họp dành trọn vẹn 120 phút để các Trưởng Ban chuyên môn và đại biểu trải nghiệm thực tế trên điện thoại, đồng thời đặt câu hỏi chất vấn kỹ thuật:'),
     createPara('  + Ý kiến Ban Sự kiện (Anh Lê Hoàng Long): Yêu cầu camera quét vé QR hoạt động ổn định khi mạng yếu. Kỹ thuật ViConnect đã giải trình giải pháp cache offline tại chỗ và đồng bộ nền.'),
-    createPara('  + Ý kiến Ban Thành viên (Anh Nguyễn Văn Cường): Yêu cầu ảnh đại diện và ảnh bìa của hội viên phải hiển thị nét, đúng công ty thật trong hệ quản trị. Kỹ thuật đã vá triệt để và nạp đủ ảnh chuẩn doanh nhân.'),
+    createPara('  + Ý kiến Ban Thành viên (Anh Nguyễn Văn Cường): Yêu cầu ảnh đại diện và ảnh bìa của Học viên phải hiển thị nét, đúng công ty thật trong hệ quản trị. Kỹ thuật đã vá triệt để và nạp đủ ảnh chuẩn doanh nhân.'),
     createPara('  + Ý kiến Ban Tài chính (Anh Phạm Quang Huy): Đánh giá cao tính năng Sổ quỹ theo Thông tư 200, đề nghị bổ sung thêm hướng dẫn xuất file PDF có chữ ký điện tử. Kỹ thuật đã tích hợp hoàn tất.'),
-    createPara('  + Ý kiến Ban Xúc tiến Thương mại (Anh Hoàng Minh Tuấn): Đề nghị tối ưu luồng kết nối giao thương B2B để hội viên dễ dàng trao đổi các cơ hội kinh doanh. Kỹ thuật đã kích hoạt Deal Matching.'),
+    createPara('  + Ý kiến Ban Xúc tiến Thương mại (Anh Hoàng Minh Tuấn): Đề nghị tối ưu luồng kết nối giao thương B2B để Học viên dễ dàng trao đổi các cơ hội kinh doanh. Kỹ thuật đã kích hoạt Deal Matching.'),
     createPara('  + Ý kiến Ban Thiện nguyện (Chị Vũ Thu Trang): Đề xuất minh bạch dòng tiền đóng góp từ thiện bằng mã VietQR động. Kỹ thuật đã xác nhận webhook ngân hàng tự động cập nhật.'),
     createPara('- Thư ký đã ghi nhận chi tiết 15 ý kiến chất vấn vào Bảng biểu đính kèm. 100% các câu hỏi đều được đại diện ViConnect giải trình thỏa đáng và thống nhất phương án xử lý.'),
 
@@ -1126,7 +1126,7 @@ async function generateMeetingMinutesFiles() {
     createPara('   - Hoàn tất các tinh chỉnh giao diện minor đã thống nhất trong phiên họp trước 18h00 ngày hôm sau.'),
     createPara('   - Bàn giao trọn bộ tài liệu hướng dẫn sử dụng (HDSD Web CRM, HDSD Mobile App) định dạng PDF và video clip ngắn.'),
     createPara('   - Đóng gói bản cài đặt APK/IPA và hỗ trợ đưa ứng dụng lên Google Play Store và Apple App Store.'),
-    createPara('3. Ban Thư ký và Ban Truyền thông CLB lên kế hoạch phát động toàn thể hội viên cài đặt ứng dụng và tổ chức buổi đào tạo hướng dẫn sử dụng vào đầu tuần tới.'),
+    createPara('3. Ban Thư ký và Ban Truyền thông CLB lên kế hoạch phát động toàn thể Học viên cài đặt ứng dụng và tổ chức buổi đào tạo hướng dẫn sử dụng vào đầu tuần tới.'),
 
     new Paragraph({ spacing: { before: 300, after: 120 } }),
     createPara('Cuộc họp kết thúc vào hồi 12h00 cùng ngày. Biên bản đã được đọc lại cho toàn thể thành viên tham dự nghe và nhất trí ký tên dưới đây làm bằng chứng pháp lý.'),
@@ -1207,7 +1207,7 @@ async function generateMeetingMinutesFiles() {
 
 ### 1. Phần 1 (09h00 - 09h45): Báo cáo thuyết trình & Demo thực tế sản phẩm
 - ViConnect trình diễn trực tiếp Mobile App và Web CRM trên máy tính và điện thoại.
-- Kiểm tra luồng Sổ quỹ Thông tư 200, Điểm danh sự kiện QR, Thẻ hội viên số, Gian hàng B2B.
+- Kiểm tra luồng Sổ quỹ Thông tư 200, Điểm danh sự kiện QR, Thẻ Học viên số, Gian hàng B2B.
 - Dữ liệu hoàn toàn lấy trực tiếp từ Database PostgreSQL thật.
 
 ### 2. Phần 2 (09h45 - 11h45): Trao đổi, chất vấn kỹ thuật & Nhận xét trải nghiệm
@@ -1224,7 +1224,7 @@ async function generateMeetingMinutesFiles() {
 ## II. Nghị Quyết Ban Điều Hành
 1. **Nghiệm thu toàn diện:** Chấp thuận nghiệm thu hệ thống công nghệ số CEO HN10 giai đoạn 1.
 2. **Kế hoạch phát hành:** ViConnect hoàn tất đóng gói và phát hành ứng dụng lên Google Play & App Store.
-3. **Đào tạo & Ứng dụng:** Tổ chức buổi tập huấn sử dụng cho toàn thể hội viên và đưa vào vận hành chính thức trong kỳ sinh hoạt hiệp hội sắp tới.
+3. **Đào tạo & Ứng dụng:** Tổ chức buổi tập huấn sử dụng cho toàn thể Học viên và đưa vào vận hành chính thức trong kỳ sinh hoạt hiệp hội sắp tới.
 `;
   fs.writeFileSync(path.join(DOC_DIR, 'BIEN_BAN_CUOC_HOP_BDH_CLB_CEOHN10_THU_4.md'), meetingMd, 'utf8');
   fs.writeFileSync(path.join(FE_DOCS_DIR, 'BIEN_BAN_CUOC_HOP_BDH_CLB_CEOHN10_THU_4.md'), meetingMd, 'utf8');
@@ -1309,16 +1309,16 @@ async function generateActionPlanFiles() {
         new TableRow({
           children: [
             createDataCell('Ngày T+6\n(Thứ Ba)', 18, true, true, AlignmentType.CENTER),
-            createDataCell('Phát động chiến dịch cài đặt ứng dụng trên kênh truyền thông chính thức CLB, hỗ trợ 100+ CEO đăng nhập và kích hoạt thẻ hội viên số.', 44, true),
+            createDataCell('Phát động chiến dịch cài đặt ứng dụng trên kênh truyền thông chính thức CLB, hỗ trợ 100+ CEO đăng nhập và kích hoạt thẻ Học viên số.', 44, true),
             createDataCell('Ban Truyền thông & Thư ký CLB', 20, true),
-            createDataCell('100% Hội viên kích hoạt App', 18, true, true, AlignmentType.CENTER),
+            createDataCell('100% Học viên kích hoạt App', 18, true, true, AlignmentType.CENTER),
           ],
         }),
         new TableRow({
           children: [
             createDataCell('Ngày T+7\n(Thứ Tư tuần sau)', 18, false, true, AlignmentType.CENTER),
             createDataCell('CHÍNH THỨC CÔNG BỐ GO-LIVE HỆ SINH THÁI SỐ CEO HN10 tại kỳ sinh hoạt toàn thể CLB Doanh Nhân CEO HN10 - HanoiBA.', 44),
-            createDataCell('Chủ tịch CLB & Toàn thể Hội viên', 20),
+            createDataCell('Chủ tịch CLB & Toàn thể Học viên', 20),
             createDataCell('Lễ kích hoạt số thành công', 18, false, true, AlignmentType.CENTER),
           ],
         }),
@@ -1370,7 +1370,7 @@ async function generateActionPlanFiles() {
         }),
         new TableRow({
           children: [
-            createDataCell('Quản trị dữ liệu hội viên & tài chính Sổ quỹ', 34, true),
+            createDataCell('Quản trị dữ liệu Học viên & tài chính Sổ quỹ', 34, true),
             createDataCell('A (Giám sát)', 16, true, false, AlignmentType.CENTER),
             createDataCell('R (Ban Tài chính)', 16, true, true, AlignmentType.CENTER),
             createDataCell('R (Ban Thư ký)', 16, true, true, AlignmentType.CENTER),
@@ -1464,8 +1464,8 @@ async function generateActionPlanFiles() {
 - **Ngày T+3 (Thứ Bảy):** Đóng gói bộ cài APK chính thức cho Android và TestFlight cho iOS.
 - **Ngày T+4 (Chủ Nhật):** Sao lưu dữ liệu, bảo mật cổng truyền thông và kiểm thử an toàn thông tin.
 - **Ngày T+5 (Thứ Hai):** Tập huấn chuyên sâu quản trị Web CRM cho Ban Thư ký & Kế toán.
-- **Ngày T+6 (Thứ Ba):** Phát động chiến dịch kích hoạt thẻ hội viên số cho 100+ CEO trong CLB.
-- **Ngày T+7 (Thứ Tư tuần sau):** CHÍNH THỨC CÔNG BỐ GO-LIVE TẠI KỲ SINH HOẠT HỘI VIÊN.
+- **Ngày T+6 (Thứ Ba):** Phát động chiến dịch kích hoạt thẻ Học viên số cho 100+ CEO trong CLB.
+- **Ngày T+7 (Thứ Tư tuần sau):** CHÍNH THỨC CÔNG BỐ GO-LIVE TẠI KỲ SINH HOẠT Học viên.
 
 ---
 

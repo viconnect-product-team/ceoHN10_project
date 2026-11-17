@@ -64,7 +64,7 @@ export const ZaloOaConfigSection: React.FC = () => {
   const [customMessage, setCustomMessage] = useState("");
   const [isSendingTest, setIsSendingTest] = useState(false);
 
-  // Danh sách hội viên / người dùng đã quan tâm hoặc nhắn tin Zalo OA
+  // Danh sách Học viên / người dùng đã quan tâm hoặc nhắn tin Zalo OA
   const [subscribers, setSubscribers] = useState<any[]>([]);
   const [loadingSubs, setLoadingSubs] = useState(false);
   const [isSyncingFollowers, setIsSyncingFollowers] = useState(false);
@@ -294,7 +294,7 @@ export const ZaloOaConfigSection: React.FC = () => {
       const regUrl = "https://ceohn10.viconnect.vn/association/events?action=register";
       const qrImageUrl = `https://crm.ceohn10.viconnect.vn/api/events/qr?data=${encodeURIComponent(regUrl)}&size=320`;
       messageBody = `🎟️ [CLB DOANH NHÂN CEO HN10 - THƯ MỜI SỰ KIỆN & VÉ CHECK-IN ĐIỆN TỬ]
-Kính gửi Hội viên: ${testRecipientName} (SĐT: ${testPhone})
+Kính gửi Học viên: ${testRecipientName} (SĐT: ${testPhone})
 Ban Chấp Hành CLB Doanh Nhân CEO HN10 (HanoiBA) trân trọng kính mời Anh/Chị tham dự sự kiện:
 
 🌟 Tên sự kiện: Gala Doanh Nhân CEO HN10 & Kết Nối Giao Thương 2026
@@ -309,11 +309,11 @@ ${qrImageUrl}
 
 * Hướng dẫn Check-in: Anh/Chị vui lòng lưu mã QR hoặc mở tin nhắn Zalo này tại bàn Lễ tân / Cổng Check-in để quét mã nhận Thẻ đại biểu & Quà tặng chính thức.`;
     } else if (testType === "forum") {
-      messageBody = `[CLB CEO HN10] Kính gửi Hội viên ${testRecipientName}, Thường Trực CLB kính mời Anh/Chị tham dự Diễn Đàn Doanh Nhân & Xúc Tiến Thương Mại B2B 2026. Cơ hội kết nối 100+ Doanh chủ tiên phong.\n\n👉 Chi tiết & Đăng ký: https://ceohn10.viconnect.vn/association/events?action=register`;
+      messageBody = `[CLB CEO HN10] Kính gửi Học viên ${testRecipientName}, Thường Trực CLB kính mời Anh/Chị tham dự Diễn Đàn Doanh Nhân & Xúc Tiến Thương Mại B2B 2026. Cơ hội kết nối 100+ Doanh chủ tiên phong.\n\n👉 Chi tiết & Đăng ký: https://ceohn10.viconnect.vn/association/events?action=register`;
     } else if (testType === "meeting") {
-      messageBody = `[CLB CEO HN10] Kính gửi Hội viên ${testRecipientName}, Ban Điều Hành thông báo triệu tập Cuộc họp Ban Thường Trực định kỳ lúc 09:00 tại Văn phòng HanoiBA & trực tuyến qua Jitsi Meet.\n\n💻 Tham gia: https://meet.jit.si/CEOHN10_MEET_BAN_DIEU_HANH_14`;
+      messageBody = `[CLB CEO HN10] Kính gửi Học viên ${testRecipientName}, Ban Điều Hành thông báo triệu tập Cuộc họp Ban Thường Trực định kỳ lúc 09:00 tại Văn phòng HanoiBA & trực tuyến qua Jitsi Meet.\n\n💻 Tham gia: https://meet.jit.si/CEOHN10_MEET_BAN_DIEU_HANH_14`;
     } else if (testType === "fee") {
-      messageBody = `[CLB CEO HN10] Kính gửi Hội viên ${testRecipientName}, Ban Tài chính trân trọng thông báo kỳ thu hội phí thường niên năm 2026. Số tiền: 10.000.000 đ. Kính chúc Quý Doanh nghiệp ngày càng phát triển thịnh vượng!\n\n💳 Xem mã VietQR: https://ceohn10.viconnect.vn/association/profile`;
+      messageBody = `[CLB CEO HN10] Kính gửi Học viên ${testRecipientName}, Ban Tài chính trân trọng thông báo kỳ thu hội phí thường niên năm 2026. Số tiền: 10.000.000 đ. Kính chúc Quý Doanh nghiệp ngày càng phát triển thịnh vượng!\n\n💳 Xem mã VietQR: https://ceohn10.viconnect.vn/association/profile`;
     } else {
       messageBody = customMessage.trim() || `[CLB CEO HN10] Tin nhắn kiểm thử kết nối thành công từ Cổng Quản trị CRM CEO HN10 đến số ${testPhone}.`;
     }
@@ -331,7 +331,7 @@ ${qrImageUrl}
       if (res && (res.ok || res.success || res.error === 0)) {
         toast.success(`Đã gửi thành công tin nhắn kiểm thử tới số ${testPhone}!`);
       } else {
-        toast.error(res?.message || "Không thể gửi tin. Vui lòng kiểm tra hội viên đã quan tâm OA hoặc Token.");
+        toast.error(res?.message || "Không thể gửi tin. Vui lòng kiểm tra Học viên đã quan tâm OA hoặc Token.");
       }
     } catch (err: any) {
       toast.error(err?.message || "Lỗi khi gửi tin nhắn kiểm thử");
@@ -616,7 +616,7 @@ ${qrImageUrl}
               <span>Kiểm Thử Bắn Tin Nhắn Nhanh Qua Zalo OA</span>
             </h4>
             <p className="text-xs text-slate-500 dark:text-slate-400">
-              Kiểm tra khả năng gửi tin nhắn trực tiếp đến số điện thoại hội viên thực tế ngay trên hệ thống.
+              Kiểm tra khả năng gửi tin nhắn trực tiếp đến số điện thoại Học viên thực tế ngay trên hệ thống.
             </p>
           </div>
         </div>
@@ -636,10 +636,10 @@ ${qrImageUrl}
             />
           </div>
 
-          {/* Tên hội viên */}
+          {/* Tên Học viên */}
           <div>
             <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 block mb-1">
-              Họ tên hội viên
+              Họ tên Học viên
             </label>
             <input
               type="text"
@@ -711,7 +711,7 @@ ${qrImageUrl}
               </span>
             </h4>
             <p className="text-xs text-slate-500 dark:text-slate-400">
-              Quản lý danh bạ hội viên &amp; khách hàng đã tương tác qua Zalo OA. Bấm nút để gọi điện thoại hoặc gửi tin nhắn chăm sóc trực tiếp.
+              Quản lý danh bạ Học viên &amp; khách hàng đã tương tác qua Zalo OA. Bấm nút để gọi điện thoại hoặc gửi tin nhắn chăm sóc trực tiếp.
             </p>
           </div>
 

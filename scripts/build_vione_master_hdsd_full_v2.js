@@ -371,7 +371,7 @@ const HDSD_CHAPTERS = [
   {
     chapterNumber: 4,
     title: 'HƯỚNG DẪN QUẢN LÝ KHÁCH HÀNG & PHỄU CHUYỂN ĐỔI LEAD 360°',
-    intro: 'Phân hệ Khách hàng CRM là trái tim của hệ sinh thái, giúp quản lý toàn diện vòng đời khách hàng từ khi còn là Lead tiềm năng đến khi trở thành Hội viên VIP:',
+    intro: 'Phân hệ Khách hàng CRM là trái tim của hệ sinh thái, giúp quản lý toàn diện vòng đời khách hàng từ khi còn là Lead tiềm năng đến khi trở thành Học viên VIP:',
     fields: [
       ['Tên Doanh Nghiệp', 'Văn bản', 'Bắt buộc', 'Tên đầy đủ của công ty khách hàng theo ĐKKD'],
       ['Mã Số Thuế (MST)', 'Chuỗi số (10-13 số)', 'Bắt buộc', 'Mã số thuế doanh nghiệp, hệ thống tự động kiểm tra trùng lặp'],
@@ -636,7 +636,7 @@ const HDSD_CHAPTERS = [
     fieldHeaders: ['Thông Số Thanh Toán', 'Kiểu Dữ Liệu', 'Yêu Cầu', 'Mô Tả Chi Tiết'],
     callout: 'GẠCH NỢ TỰ ĐỘNG TRONG 1 GIÂY: Khách hàng không cần phải gõ tay số tài khoản hay nội dung chuyển khoản. Mọi thông tin đã được mã hóa sẵn trong mã VietQR động, đảm bảo thanh toán chuẩn xác 100%.',
     steps: [
-      'Bước 1: Khi có thông báo đóng phí hội viên hoặc thanh toán đơn hàng, mở hóa đơn trên app ViOne Connect.',
+      'Bước 1: Khi có thông báo đóng phí Học viên hoặc thanh toán đơn hàng, mở hóa đơn trên app ViOne Connect.',
       'Bước 2: Nhấn nút nổi bật "Thanh Toán Ngay Qua VietQR Napas 24/7".',
       'Bước 3: Màn hình hiển thị mã VietQR động sang trọng có gắn logo doanh nghiệp.',
       'Bước 4: Nhấn nút "Mở App Ngân Hàng"; hệ thống tự động kích hoạt liên kết sâu (Deep Link) mở ứng dụng ngân hàng của bạn.',
@@ -781,7 +781,7 @@ async function buildHdsdDocx() {
         ['Phiên Bản Phát Hành', 'Phiên bản 5.0 Master Release (14 Chương Hướng Dẫn Thực Chiến Toàn Diện)'],
         ['Ngày Phát Hành', '02/10/2026'],
         ['Đơn Vị Ban Hành', 'Ban Công Nghệ & Chuyển Đổi Số — VioConnect Corporation'],
-        ['Đối Tượng Áp Dụng', 'Toàn thể Lãnh đạo, Quản lý, Nhân viên và Hội viên Doanh nghiệp'],
+        ['Đối Tượng Áp Dụng', 'Toàn thể Lãnh đạo, Quản lý, Nhân viên và Học viên Doanh nghiệp'],
         ['Cấp Độ Bảo Mật', 'TÀI LIỆU LƯU HÀNH NỘI BỘ & KHÁCH HÀNG DOANH NGHIỆP'],
         ['Tình Trạng Thẩm Định', 'Đã kiểm thử thực địa 100%, tích hợp ảnh chụp minh chứng sắc nét']
       ],

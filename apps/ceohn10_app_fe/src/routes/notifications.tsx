@@ -119,7 +119,7 @@ function getNotificationCategory(n: Notification): {
   const title = (n.title || "").toLowerCase();
   const body = (n.body || "").toLowerCase();
 
-  // 0. Yêu cầu Quên mật khẩu từ Hội viên
+  // 0. Yêu cầu Quên mật khẩu từ Học viên
   const targetUrl = (n as any).target_url || (n as any).actionUrl;
   if (
     code.includes("PWD") ||
@@ -140,18 +140,18 @@ function getNotificationCategory(n: Notification): {
     };
   }
 
-  // 1. Hồ sơ hội viên mới
+  // 1. Hồ sơ Học viên mới
   if (
     code.includes("MBR") ||
     title.includes("hồ sơ đăng ký") ||
-    title.includes("hội viên mới") ||
+    title.includes("Học viên mới") ||
     title.includes("hồ sơ mới") ||
     body.includes("vừa nộp đơn đăng ký") ||
     body.includes("phê duyệt")
   ) {
     return {
       id: "new_members",
-      label: "Hội viên mới",
+      label: "Học viên mới",
       badgeBg: "bg-blue-500/10",
       badgeText: "text-[#003B95]",
       badgeBorder: "border-blue-500/25",
@@ -266,7 +266,7 @@ function NotifyPage() {
     } else {
       void fetchNestApi<Notification[]>("/admin/notifications").then((res) => {
         if (Array.isArray(res) && res.length > 0) setItems(res);
-      }).catch(() => {});
+      }).catch(() => { });
     }
   }, [loaderItems]);
 
@@ -338,12 +338,12 @@ function NotifyPage() {
         method: "POST",
         body: JSON.stringify({
           title: "📋 Nhắc nhở công việc cần thực hiện trong Ban Chuyên Môn",
-          message: `Hệ thống tự động nhắc nhở ${pendingTasks.length > 0 ? pendingTasks.length : 2} công việc đang chờ xử lý. Đề nghị Quý Hội viên kiểm tra danh mục công việc được giao và hoàn thành đúng tiến độ.`,
+          message: `Hệ thống tự động nhắc nhở ${pendingTasks.length > 0 ? pendingTasks.length : 2} công việc đang chờ xử lý. Đề nghị Quý Học viên kiểm tra danh mục công việc được giao và hoàn thành đúng tiến độ.`,
           audience: "all",
           type: "TASK_REMINDER",
           action_url: "/tasks",
         }),
-      }).catch(() => {});
+      }).catch(() => { });
 
       toast.success(`Đã quét và tự động gửi nhắc nhở công việc thành công (${pendingTasks.length > 0 ? pendingTasks.length : "tất cả"} nhiệm vụ)!`);
     } catch {
@@ -363,12 +363,12 @@ function NotifyPage() {
         method: "POST",
         body: JSON.stringify({
           title: "🎟️ Nhắc lịch sự kiện sắp diễn ra & Vé QR Check-in",
-          message: `CLB Doanh Nhân CEO HN10 nhắc nhở Quý Hội viên về sự kiện sắp diễn ra (${upcomingEvents.length > 0 ? upcomingEvents[0].name : "Diễn Đàn Doanh Nhân CEO HN10"}). Vui lòng chuẩn bị vé QR check-in và có mặt đúng giờ!`,
+          message: `CLB Doanh Nhân CEO HN10 nhắc nhở Quý Học viên về sự kiện sắp diễn ra (${upcomingEvents.length > 0 ? upcomingEvents[0].name : "Diễn Đàn Doanh Nhân CEO HN10"}). Vui lòng chuẩn bị vé QR check-in và có mặt đúng giờ!`,
           audience: "all",
           type: "EVENT_REMINDER",
           action_url: "/events",
         }),
-      }).catch(() => {});
+      }).catch(() => { });
 
       toast.success("Đã quét và tự động gửi nhắc nhở lịch sự kiện kèm vé QR & Poster cho toàn bộ người đăng ký!");
     } catch {
@@ -493,20 +493,20 @@ function NotifyPage() {
         method: "POST",
       });
       if (res?.success) {
-        toast.success(`🔔 Đã gửi nhắc nhở tới App hội viên và Email thành công! (Lần nhắc: ${res.reminder_count || 1})`);
+        toast.success(`🔔 Đã gửi nhắc nhở tới App Học viên và Email thành công! (Lần nhắc: ${res.reminder_count || 1})`);
         setItems((prev) =>
           prev.map((item) =>
             item.id === n.id
               ? {
-                  ...item,
-                  reminder_count: res.reminder_count || ((item as any).reminder_count || 0) + 1,
-                  last_reminded_at: new Date().toISOString(),
-                }
+                ...item,
+                reminder_count: res.reminder_count || ((item as any).reminder_count || 0) + 1,
+                last_reminded_at: new Date().toISOString(),
+              }
               : item
           )
         );
       } else {
-        toast.info("Đã phát tán tín hiệu nhắc nhở tới Hội viên!");
+        toast.info("Đã phát tán tín hiệu nhắc nhở tới Học viên!");
       }
     } catch (err: any) {
       toast.error(err?.message || "Không thể gửi nhắc nhở lúc này");
@@ -574,7 +574,7 @@ function NotifyPage() {
   const subFilters = useMemo(
     () => [
       { id: "all" as SubFilterType, label: "Tất cả thông báo", icon: Bell, count: items.length },
-      { id: "new_members" as SubFilterType, label: "Hội viên mới nộp hồ sơ", icon: UserCheck, count: newMembersCount },
+      { id: "new_members" as SubFilterType, label: "Học viên mới nộp hồ sơ", icon: UserCheck, count: newMembersCount },
       { id: "fee_alerts" as SubFilterType, label: "Cảnh báo & Quá hạn hội phí", icon: AlertTriangle, count: feeAlertsCount },
       { id: "admin_system" as SubFilterType, label: "BQT & Điều hành", icon: Building2, count: adminSystemCount },
       { id: "events_meetings" as SubFilterType, label: "Sự kiện & Cuộc họp", icon: Calendar, count: eventsMeetingsCount },
@@ -843,7 +843,7 @@ function NotifyPage() {
       type: "select",
       options: [
         { value: "none", label: "Không gửi qua Zalo" },
-        { value: "zalo_oa", label: "💬 Bắn tin Zalo OA tới Hội viên theo Mẫu thiết lập" },
+        { value: "zalo_oa", label: "💬 Bắn tin Zalo OA tới Học viên theo Mẫu thiết lập" },
       ],
     },
     {
@@ -852,7 +852,7 @@ function NotifyPage() {
       type: "select",
       options: [
         { value: "EVENT_INVITATION", label: "Thư mời tham gia sự kiện CLB (Template ZBS)" },
-        { value: "FEE_REMINDER", label: "Nhắc hạn đóng phí hội viên & niên liễm" },
+        { value: "FEE_REMINDER", label: "Nhắc hạn đóng phí Học viên & niên liễm" },
         { value: "GENERAL_ANNOUNCEMENT", label: "Thông báo chung từ Ban Điều Hành" },
         { value: "MEETING_SCHEDULE", label: "Thông báo lịch họp Ban Chuyên Môn" },
       ],
@@ -864,7 +864,7 @@ function NotifyPage() {
       options: [
         { value: "none", label: "Chỉ hiện chuông thông báo (Không đẩy vào tin nhắn)" },
         { value: "channel_media", label: "📢 Ban Truyền Thông (Sự kiện, Tin tức, Hình ảnh)" },
-        { value: "channel_membership", label: "👥 Ban Thành Viên (Hội viên, Hồ sơ, Gia hạn)" },
+        { value: "channel_membership", label: "👥 Ban Thành Viên (Học viên, Hồ sơ, Gia hạn)" },
         { value: "channel_promotion", label: "🤝 Ban Xúc Tiến Thương Mại (Marketplace & B2B)" },
         { value: "channel_secretariat", label: "🏛️ Ban Thư Ký & Ban Điều Hành (Lịch họp, Hành chính)" },
         { value: "channel_deals", label: "🎯 Kênh Cơ Hội & Deal B2B" },
@@ -943,7 +943,7 @@ function NotifyPage() {
             eventName: v.title,
             recipients: [
               { fullName: "Ban Điều Hành", phone: "84983101010" },
-              { fullName: "Hội viên CLB", phone: "84912345678" },
+              { fullName: "Học viên CLB", phone: "84912345678" },
             ],
             templateData: {
               title: v.title,
@@ -1019,8 +1019,8 @@ function NotifyPage() {
       <div
         key={n.id}
         className={`group flex gap-3 rounded-2xl border p-4 transition-all duration-200 ${unread
-            ? "border-blue-300 dark:border-blue-800 bg-blue-50/40 dark:bg-blue-950/20 shadow-xs"
-            : "border-slate-200 dark:border-slate-800 bg-white dark:bg-card hover:border-slate-300 dark:hover:border-slate-700"
+          ? "border-blue-300 dark:border-blue-800 bg-blue-50/40 dark:bg-blue-950/20 shadow-xs"
+          : "border-slate-200 dark:border-slate-800 bg-white dark:bg-card hover:border-slate-300 dark:hover:border-slate-700"
           }`}
       >
         <span
@@ -1155,7 +1155,7 @@ function NotifyPage() {
     <AppShell>
       <PageHeader
         title={t("notif.title")}
-        subtitle="Trung tâm điều hành và kiểm soát toàn bộ thông báo hệ thống, cảnh báo hội phí & hồ sơ hội viên mới"
+        subtitle="Trung tâm điều hành và kiểm soát toàn bộ thông báo hệ thống, cảnh báo hội phí & hồ sơ Học viên mới"
         actions={
           <div className="flex items-center gap-2">
             {unreadCount > 0 && (
@@ -1206,11 +1206,10 @@ function NotifyPage() {
         <button
           type="button"
           onClick={() => setMainTab("notifications")}
-          className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 cursor-pointer ${
-            mainTab === "notifications"
+          className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 cursor-pointer ${mainTab === "notifications"
               ? "bg-[#003B95] text-white shadow-xs"
               : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200"
-          }`}
+            }`}
         >
           <Bell className="size-4" />
           <span>Quản Lý Thông Báo</span>
@@ -1223,11 +1222,10 @@ function NotifyPage() {
         <button
           type="button"
           onClick={() => setMainTab("auto_reminders")}
-          className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 cursor-pointer ${
-            mainTab === "auto_reminders"
+          className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 cursor-pointer ${mainTab === "auto_reminders"
               ? "bg-[#003B95] text-white shadow-xs"
               : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200"
-          }`}
+            }`}
         >
           <Clock className="size-4" />
           <span>Thiết Lập Nhắc Tự Động</span>
@@ -1238,11 +1236,10 @@ function NotifyPage() {
         <button
           type="button"
           onClick={() => setMainTab("templates")}
-          className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 cursor-pointer ${
-            mainTab === "templates"
+          className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 cursor-pointer ${mainTab === "templates"
               ? "bg-[#003B95] text-white shadow-xs"
               : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200"
-          }`}
+            }`}
         >
           <Mail className="size-4" />
           <span>Mẫu Thông Báo (Email / Zalo / App)</span>
@@ -1269,7 +1266,7 @@ function NotifyPage() {
                 Quản Lý Mẫu Nhắc & Tự Động Hóa Thông Báo CEO HN10
               </h2>
               <p className="text-xs sm:text-sm text-slate-200 leading-relaxed">
-                Tự động hóa hoàn toàn quy trình gửi thông báo theo thời gian thực: Tự động nhắc nhở khi hội viên có công việc cần làm, tự động nhắc sự kiện đã đăng ký trước giờ khai mạc, và cung cấp trọn vẹn 4 mẫu nhắc nhở cốt lõi của Hiệp hội.
+                Tự động hóa hoàn toàn quy trình gửi thông báo theo thời gian thực: Tự động nhắc nhở khi Học viên có công việc cần làm, tự động nhắc sự kiện đã đăng ký trước giờ khai mạc, và cung cấp trọn vẹn 4 mẫu nhắc nhở cốt lõi của Hiệp hội.
               </p>
             </div>
           </div>
@@ -1301,7 +1298,7 @@ function NotifyPage() {
                         Tự Động Nhắc Công Việc Cần Làm
                       </h4>
                       <span className="text-[11px] text-muted-foreground block">
-                        Dành cho Hội viên có nhiệm vụ / công việc được giao
+                        Dành cho Học viên có nhiệm vụ / công việc được giao
                       </span>
                     </div>
                   </div>
@@ -1360,7 +1357,7 @@ function NotifyPage() {
                         Tự Động Nhắc Sự Kiện Đăng Ký Sắp Diễn Ra
                       </h4>
                       <span className="text-[11px] text-muted-foreground block">
-                        Dành cho Hội viên đã bấm Đăng ký tham gia
+                        Dành cho Học viên đã bấm Đăng ký tham gia
                       </span>
                     </div>
                   </div>
@@ -1581,11 +1578,11 @@ function NotifyPage() {
                   </span>
                 </div>
                 <p className="text-xs text-muted-foreground leading-relaxed">
-                  Bản tin điểm sáng mỗi sáng: Tổng hợp lịch hoạt động trong ngày, chúc mừng sinh nhật hội viên trong ngày, cơ hội kết nối B2B và chương trình đào tạo.
+                  Bản tin điểm sáng mỗi sáng: Tổng hợp lịch hoạt động trong ngày, chúc mừng sinh nhật Học viên trong ngày, cơ hội kết nối B2B và chương trình đào tạo.
                 </p>
                 <div className="p-2.5 rounded-xl bg-muted/40 border border-border/50 text-[11px] space-y-1">
                   <div className="font-semibold text-foreground">Trường biến tự động:</div>
-                  <div className="font-mono text-[10.5px] text-purple-700 dark:text-purple-300">
+                  <div className="font-mono text-[10.5px] text-slate-700 dark:text-slate-300 font-semibold">
                     {"{{today_date}}, {{activities_today}}, {{birthdays}}, {{b2b_opportunities}}"}
                   </div>
                 </div>
@@ -1607,266 +1604,266 @@ function NotifyPage() {
         </div>
       ) : (
         <>
-      {/* ── 4 KPI CARDS CHUẨN FIGMA EXACT GRADIENTS ── */}
-      <div className="mb-6">
-        <CrmMetricGrid>
-          <CrmMetricCard
-            label="Tổng thông báo"
-            value={items.length}
-            sub={`Đã phát tán: ${sent.length} thông báo`}
-            icon={Bell}
-            tone="sky"
-          />
-          <CrmMetricCard
-            label="Hồ sơ hội viên mới"
-            value={newMembersCount}
-            sub="Chờ Ban Quản Trị phê duyệt"
-            icon={UserCheck}
-            tone="violet"
-          />
-          <CrmMetricCard
-            label="Cảnh báo hội phí"
-            value={feeAlertsCount}
-            sub="Quá hạn & sắp đến hạn niên liễm"
-            icon={AlertTriangle}
-            tone="orange"
-          />
-          <CrmMetricCard
-            label="Thông báo chưa đọc"
-            value={unreadCount}
-            sub="Cần xử lý & theo dõi tức thì"
-            icon={Megaphone}
-            tone="green"
-          />
-        </CrmMetricGrid>
-      </div>
-
-      {/* ── BỘ LỌC CHUYÊN BIỆT ĐƯỢC ĐIỀU HƯỚNG TỪ MENU SIDEBAR ── */}
-      {activeSubFilter !== "all" && (
-        <div className="mb-4 flex items-center justify-between px-3.5 py-2 rounded-xl bg-blue-50/70 dark:bg-blue-950/30 border border-blue-200/80 dark:border-blue-900/50 text-xs">
-          <div className="flex items-center gap-2">
-            <span className="font-semibold text-slate-600 dark:text-slate-400">Phân hệ đang xem từ Sidebar:</span>
-            <span className="font-bold text-[#003B95] dark:text-blue-300">
-              {subFilters.find((s) => s.id === activeSubFilter)?.label || activeSubFilter}
-            </span>
-            <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-[#003B95] text-white">
-              {filtered.length} thông báo
-            </span>
-          </div>
-          <Link
-            to="/notifications"
-            className="text-[11px] font-bold text-[#003B95] dark:text-blue-400 hover:underline cursor-pointer"
-          >
-            Xem tất cả thông báo
-          </Link>
-        </div>
-      )}
-
-      {/* ── TOOLBAR TÌM KIẾM, BỘ LỌC PHẠM VI & CHUYỂN ĐỔI GIAO DIỆN ── */}
-      <div className="mb-4 bg-white dark:bg-card p-3 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-3">
-        <CrmToolbar
-          searchQuery={query}
-          onSearchChange={setQuery}
-          searchPlaceholder="Tìm theo tiêu đề, nội dung hoặc mã thông báo..."
-        >
-          {/* Lọc trạng thái đọc */}
-          <div className="flex items-center bg-slate-100 dark:bg-slate-800 p-0.5 rounded-xl border border-slate-200 dark:border-slate-700 text-xs">
-            <button
-              type="button"
-              onClick={() => setReadTab("all")}
-              className={`px-2.5 py-1 rounded-lg font-semibold transition cursor-pointer ${readTab === "all" ? "bg-white dark:bg-card text-slate-900 dark:text-white shadow-xs" : "text-slate-500 hover:text-slate-900"
-                }`}
-            >
-              Tất cả ({items.length})
-            </button>
-            <button
-              type="button"
-              onClick={() => setReadTab("unread")}
-              className={`px-2.5 py-1 rounded-lg font-semibold transition cursor-pointer ${readTab === "unread" ? "bg-white dark:bg-card text-blue-600 dark:text-blue-400 shadow-xs" : "text-slate-500 hover:text-slate-900"
-                }`}
-            >
-              Chưa đọc ({unreadCount})
-            </button>
-            <button
-              type="button"
-              onClick={() => setReadTab("read")}
-              className={`px-2.5 py-1 rounded-lg font-semibold transition cursor-pointer ${readTab === "read" ? "bg-white dark:bg-card text-slate-900 dark:text-white shadow-xs" : "text-slate-500 hover:text-slate-900"
-                }`}
-            >
-              Đã đọc
-            </button>
+          {/* ── 4 KPI CARDS CHUẨN FIGMA EXACT GRADIENTS ── */}
+          <div className="mb-6">
+            <CrmMetricGrid>
+              <CrmMetricCard
+                label="Tổng thông báo"
+                value={items.length}
+                sub={`Đã phát tán: ${sent.length} thông báo`}
+                icon={Bell}
+                tone="sky"
+              />
+              <CrmMetricCard
+                label="Hồ sơ Học viên mới"
+                value={newMembersCount}
+                sub="Chờ Ban Quản Trị phê duyệt"
+                icon={UserCheck}
+                tone="violet"
+              />
+              <CrmMetricCard
+                label="Cảnh báo hội phí"
+                value={feeAlertsCount}
+                sub="Quá hạn & sắp đến hạn niên liễm"
+                icon={AlertTriangle}
+                tone="orange"
+              />
+              <CrmMetricCard
+                label="Thông báo chưa đọc"
+                value={unreadCount}
+                sub="Cần xử lý & theo dõi tức thì"
+                icon={Megaphone}
+                tone="green"
+              />
+            </CrmMetricGrid>
           </div>
 
-          {/* Lọc hệ thống */}
-          <select
-            value={scope}
-            onChange={(e) => setScope(e.target.value)}
-            className="h-9 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-card px-2.5 text-xs font-semibold text-slate-700 dark:text-slate-200 outline-none"
-          >
-            <option value="all">🌐 Tất cả hệ thống</option>
-            <option value="crm">💻 CRM Quản trị</option>
-            <option value="association_app">📱 App Hiệp Hội CEO HN10</option>
-          </select>
-
-          {/* Lọc đối tượng */}
-          <select
-            value={audience}
-            onChange={(e) => setAudience(e.target.value as typeof audience)}
-            className="h-9 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-card px-2.5 text-xs font-semibold text-slate-700 dark:text-slate-200 outline-none"
-          >
-            <option value="all">👥 Mọi đối tượng</option>
-            <option value="members">Hội viên chính thức</option>
-            <option value="sponsors">Nhà tài trợ</option>
-            <option value="staff">Ban Thư Ký / BQT</option>
-          </select>
-
-          {/* Nút chuyển đổi View Table / Cards */}
-          <div className="flex items-center bg-slate-100 dark:bg-slate-800 p-0.5 rounded-xl border border-slate-200 dark:border-slate-700">
-            <button
-              type="button"
-              onClick={() => setViewMode("table")}
-              title="Dạng bảng chuẩn CustomTable"
-              className={`p-1.5 rounded-lg transition cursor-pointer ${viewMode === "table" ? "bg-white dark:bg-card text-blue-600 shadow-xs" : "text-slate-500 hover:text-slate-900"
-                }`}
-            >
-              <LayoutList className="h-4 w-4" />
-            </button>
-            <button
-              type="button"
-              onClick={() => setViewMode("cards")}
-              title="Dạng danh sách thẻ (Cards)"
-              className={`p-1.5 rounded-lg transition cursor-pointer ${viewMode === "cards" ? "bg-white dark:bg-card text-blue-600 shadow-xs" : "text-slate-500 hover:text-slate-900"
-                }`}
-            >
-              <LayoutGrid className="h-4 w-4" />
-            </button>
-          </div>
-        </CrmToolbar>
-      </div>
-
-      {/* ── NỘI DUNG HIỂN THỊ DỮ LIỆU ── */}
-      {filtered.length === 0 ? (
-        emptyView
-      ) : viewMode === "table" ? (
-        <CustomTable<Notification>
-          columns={columns}
-          data={pagedRows}
-          keyExtractor={(r) => r.id}
-          sortKey={sortKey}
-          sortDir={sortDir}
-          onSort={handleSort}
-          showStt={true}
-          page={page}
-          pageSize={pageSize}
-          total={sorted.length}
-          onPageChange={setPage}
-          onPageSizeChange={(newSize) => {
-            setPageSize(newSize);
-            setPage(1);
-          }}
-          actionColumn={{
-            title: "THAO TÁC",
-            width: 220,
-            render: (n) => {
-              const cat = getNotificationCategory(n);
-              const isPushed =
-                pushedMessageIds.has(n.id) ||
-                Boolean((n as any).code && pushedMessageIds.has((n as any).code)) ||
-                Boolean((n as any).pushedToMessages) ||
-                Boolean((n as any).targetChannel && (n as any).targetChannel !== "none");
-
-              return (
-                <div className="flex items-center gap-1.5 justify-end">
-                  {/* Quick Action Button theo phân hệ */}
-                  {cat.actionUrl && (
-                    <Link
-                      to={cat.actionUrl as any}
-                      className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/40 dark:hover:bg-blue-900/60 text-blue-700 dark:text-blue-300 text-xs font-bold border border-blue-200 dark:border-blue-800 transition"
-                    >
-                      <cat.icon className="h-3 w-3" />
-                      <span>{cat.actionLabel}</span>
-                    </Link>
-                  )}
-
-                  {/* Nút Nhắc nhở Đa kênh (Bắn về App Hội Viên + Gửi Email Hội Viên) */}
-                  <button
-                    type="button"
-                    onClick={() => handleRemind(n)}
-                    disabled={remindingId === n.id}
-                    title={`Gửi nhắc nhở trực tiếp về App và Email hội viên ${(n as any).reminder_count ? `(Đã nhắc ${(n as any).reminder_count} lần)` : ""}`}
-                    className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-amber-50 hover:bg-amber-100 dark:bg-amber-950/40 dark:hover:bg-amber-900/60 text-amber-700 dark:text-amber-300 text-xs font-bold border border-amber-300 dark:border-amber-700 transition cursor-pointer disabled:opacity-50"
-                  >
-                    <Bell className={`h-3 w-3 ${remindingId === n.id ? "animate-spin text-amber-900" : "animate-bounce text-amber-600"}`} />
-                    <span>Nhắc{(n as any).reminder_count ? ` (${(n as any).reminder_count})` : ""}</span>
-                  </button>
-
-                  {/* Nút Đẩy vào tin nhắn */}
-                  {isPushed ? (
-                    <span className="p-1 rounded-lg text-emerald-600 dark:text-emerald-400" title="Đã trong kênh tin nhắn">
-                      <CheckCircle2 className="h-4 w-4" />
-                    </span>
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={() => handlePushToMessages(n)}
-                      disabled={pushingId === n.id}
-                      title="Đưa vào tin nhắn Hiệp hội"
-                      className="p-1.5 rounded-lg border border-amber-300 bg-amber-50 hover:bg-amber-100 dark:border-amber-700 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 transition cursor-pointer disabled:opacity-50"
-                    >
-                      <MessageSquare className="h-3.5 w-3.5" />
-                    </button>
-                  )}
-
-                  {/* Nút sửa */}
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setEditing(n);
-                      setOpen(true);
-                    }}
-                    title="Chỉnh sửa"
-                    className="p-1.5 rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
-                  >
-                    <Pencil className="h-3.5 w-3.5" />
-                  </button>
-
-                  {/* Nút xóa */}
-                  <button
-                    type="button"
-                    onClick={() => onDelete(n)}
-                    disabled={busyId === n.id}
-                    title="Xóa / Ẩn"
-                    className="p-1.5 rounded-lg text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition cursor-pointer disabled:opacity-50"
-                  >
-                    <Trash2 className="h-3.5 w-3.5" />
-                  </button>
-                </div>
-              );
-            },
-          }}
-          emptyText="Không tìm thấy thông báo phù hợp"
-        />
-      ) : (
-        <div className="space-y-6">
-          {groups.map(
-            (g) =>
-              g.rows.length > 0 && (
-                <div key={g.key}>
-                  <div className="mb-2 px-1 text-[11px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
-                    <Clock className="h-3 w-3" />
-                    <span>{t(g.key)}</span>
-                  </div>
-                  <div className="space-y-3">{g.rows.map(renderCard)}</div>
-                </div>
-              ),
+          {/* ── BỘ LỌC CHUYÊN BIỆT ĐƯỢC ĐIỀU HƯỚNG TỪ MENU SIDEBAR ── */}
+          {activeSubFilter !== "all" && (
+            <div className="mb-4 flex items-center justify-between px-3.5 py-2 rounded-xl bg-blue-50/70 dark:bg-blue-950/30 border border-blue-200/80 dark:border-blue-900/50 text-xs">
+              <div className="flex items-center gap-2">
+                <span className="font-semibold text-slate-600 dark:text-slate-400">Phân hệ đang xem từ Sidebar:</span>
+                <span className="font-bold text-[#003B95] dark:text-blue-300">
+                  {subFilters.find((s) => s.id === activeSubFilter)?.label || activeSubFilter}
+                </span>
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-[#003B95] text-white">
+                  {filtered.length} thông báo
+                </span>
+              </div>
+              <Link
+                to="/notifications"
+                className="text-[11px] font-bold text-[#003B95] dark:text-blue-400 hover:underline cursor-pointer"
+              >
+                Xem tất cả thông báo
+              </Link>
+            </div>
           )}
-        </div>
-      )}
+
+          {/* ── TOOLBAR TÌM KIẾM, BỘ LỌC PHẠM VI & CHUYỂN ĐỔI GIAO DIỆN ── */}
+          <div className="mb-4 bg-white dark:bg-card p-3 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-3">
+            <CrmToolbar
+              searchQuery={query}
+              onSearchChange={setQuery}
+              searchPlaceholder="Tìm theo tiêu đề, nội dung hoặc mã thông báo..."
+            >
+              {/* Lọc trạng thái đọc */}
+              <div className="flex items-center bg-slate-100 dark:bg-slate-800 p-0.5 rounded-xl border border-slate-200 dark:border-slate-700 text-xs">
+                <button
+                  type="button"
+                  onClick={() => setReadTab("all")}
+                  className={`px-2.5 py-1 rounded-lg font-semibold transition cursor-pointer ${readTab === "all" ? "bg-white dark:bg-card text-slate-900 dark:text-white shadow-xs" : "text-slate-500 hover:text-slate-900"
+                    }`}
+                >
+                  Tất cả ({items.length})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setReadTab("unread")}
+                  className={`px-2.5 py-1 rounded-lg font-semibold transition cursor-pointer ${readTab === "unread" ? "bg-white dark:bg-card text-blue-600 dark:text-blue-400 shadow-xs" : "text-slate-500 hover:text-slate-900"
+                    }`}
+                >
+                  Chưa đọc ({unreadCount})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setReadTab("read")}
+                  className={`px-2.5 py-1 rounded-lg font-semibold transition cursor-pointer ${readTab === "read" ? "bg-white dark:bg-card text-slate-900 dark:text-white shadow-xs" : "text-slate-500 hover:text-slate-900"
+                    }`}
+                >
+                  Đã đọc
+                </button>
+              </div>
+
+              {/* Lọc hệ thống */}
+              <select
+                value={scope}
+                onChange={(e) => setScope(e.target.value)}
+                className="h-9 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-card px-2.5 text-xs font-semibold text-slate-700 dark:text-slate-200 outline-none"
+              >
+                <option value="all">🌐 Tất cả hệ thống</option>
+                <option value="crm">💻 CRM Quản trị</option>
+                <option value="association_app">📱 App Hiệp Hội CEO HN10</option>
+              </select>
+
+              {/* Lọc đối tượng */}
+              <select
+                value={audience}
+                onChange={(e) => setAudience(e.target.value as typeof audience)}
+                className="h-9 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-card px-2.5 text-xs font-semibold text-slate-700 dark:text-slate-200 outline-none"
+              >
+                <option value="all">👥 Mọi đối tượng</option>
+                <option value="members">Học viên chính thức</option>
+                <option value="sponsors">Nhà tài trợ</option>
+                <option value="staff">Ban Thư Ký / BQT</option>
+              </select>
+
+              {/* Nút chuyển đổi View Table / Cards */}
+              <div className="flex items-center bg-slate-100 dark:bg-slate-800 p-0.5 rounded-xl border border-slate-200 dark:border-slate-700">
+                <button
+                  type="button"
+                  onClick={() => setViewMode("table")}
+                  title="Dạng bảng chuẩn CustomTable"
+                  className={`p-1.5 rounded-lg transition cursor-pointer ${viewMode === "table" ? "bg-white dark:bg-card text-blue-600 shadow-xs" : "text-slate-500 hover:text-slate-900"
+                    }`}
+                >
+                  <LayoutList className="h-4 w-4" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setViewMode("cards")}
+                  title="Dạng danh sách thẻ (Cards)"
+                  className={`p-1.5 rounded-lg transition cursor-pointer ${viewMode === "cards" ? "bg-white dark:bg-card text-blue-600 shadow-xs" : "text-slate-500 hover:text-slate-900"
+                    }`}
+                >
+                  <LayoutGrid className="h-4 w-4" />
+                </button>
+              </div>
+            </CrmToolbar>
+          </div>
+
+          {/* ── NỘI DUNG HIỂN THỊ DỮ LIỆU ── */}
+          {filtered.length === 0 ? (
+            emptyView
+          ) : viewMode === "table" ? (
+            <CustomTable<Notification>
+              columns={columns}
+              data={pagedRows}
+              keyExtractor={(r) => r.id}
+              sortKey={sortKey}
+              sortDir={sortDir}
+              onSort={handleSort}
+              showStt={true}
+              page={page}
+              pageSize={pageSize}
+              total={sorted.length}
+              onPageChange={setPage}
+              onPageSizeChange={(newSize) => {
+                setPageSize(newSize);
+                setPage(1);
+              }}
+              actionColumn={{
+                title: "THAO TÁC",
+                width: 220,
+                render: (n) => {
+                  const cat = getNotificationCategory(n);
+                  const isPushed =
+                    pushedMessageIds.has(n.id) ||
+                    Boolean((n as any).code && pushedMessageIds.has((n as any).code)) ||
+                    Boolean((n as any).pushedToMessages) ||
+                    Boolean((n as any).targetChannel && (n as any).targetChannel !== "none");
+
+                  return (
+                    <div className="flex items-center gap-1.5 justify-end">
+                      {/* Quick Action Button theo phân hệ */}
+                      {cat.actionUrl && (
+                        <Link
+                          to={cat.actionUrl as any}
+                          className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/40 dark:hover:bg-blue-900/60 text-blue-700 dark:text-blue-300 text-xs font-bold border border-blue-200 dark:border-blue-800 transition"
+                        >
+                          <cat.icon className="h-3 w-3" />
+                          <span>{cat.actionLabel}</span>
+                        </Link>
+                      )}
+
+                      {/* Nút Nhắc nhở Đa kênh (Bắn về App Học viên + Gửi Email Học viên) */}
+                      <button
+                        type="button"
+                        onClick={() => handleRemind(n)}
+                        disabled={remindingId === n.id}
+                        title={`Gửi nhắc nhở trực tiếp về App và Email Học viên ${(n as any).reminder_count ? `(Đã nhắc ${(n as any).reminder_count} lần)` : ""}`}
+                        className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-amber-50 hover:bg-amber-100 dark:bg-amber-950/40 dark:hover:bg-amber-900/60 text-amber-700 dark:text-amber-300 text-xs font-bold border border-amber-300 dark:border-amber-700 transition cursor-pointer disabled:opacity-50"
+                      >
+                        <Bell className={`h-3 w-3 ${remindingId === n.id ? "animate-spin text-amber-900" : "animate-bounce text-amber-600"}`} />
+                        <span>Nhắc{(n as any).reminder_count ? ` (${(n as any).reminder_count})` : ""}</span>
+                      </button>
+
+                      {/* Nút Đẩy vào tin nhắn */}
+                      {isPushed ? (
+                        <span className="p-1 rounded-lg text-emerald-600 dark:text-emerald-400" title="Đã trong kênh tin nhắn">
+                          <CheckCircle2 className="h-4 w-4" />
+                        </span>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => handlePushToMessages(n)}
+                          disabled={pushingId === n.id}
+                          title="Đưa vào tin nhắn Hiệp hội"
+                          className="p-1.5 rounded-lg border border-amber-300 bg-amber-50 hover:bg-amber-100 dark:border-amber-700 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 transition cursor-pointer disabled:opacity-50"
+                        >
+                          <MessageSquare className="h-3.5 w-3.5" />
+                        </button>
+                      )}
+
+                      {/* Nút sửa */}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setEditing(n);
+                          setOpen(true);
+                        }}
+                        title="Chỉnh sửa"
+                        className="p-1.5 rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+                      >
+                        <Pencil className="h-3.5 w-3.5" />
+                      </button>
+
+                      {/* Nút xóa */}
+                      <button
+                        type="button"
+                        onClick={() => onDelete(n)}
+                        disabled={busyId === n.id}
+                        title="Xóa / Ẩn"
+                        className="p-1.5 rounded-lg text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition cursor-pointer disabled:opacity-50"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                  );
+                },
+              }}
+              emptyText="Không tìm thấy thông báo phù hợp"
+            />
+          ) : (
+            <div className="space-y-6">
+              {groups.map(
+                (g) =>
+                  g.rows.length > 0 && (
+                    <div key={g.key}>
+                      <div className="mb-2 px-1 text-[11px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+                        <Clock className="h-3 w-3" />
+                        <span>{t(g.key)}</span>
+                      </div>
+                      <div className="space-y-3">{g.rows.map(renderCard)}</div>
+                    </div>
+                  ),
+              )}
+            </div>
+          )}
 
         </>
       )}
 
-{/* Đã chuyển việc tạo thông báo sang Mẫu thông báo (đa kênh App, Email, Zalo OA) */}
+      {/* Đã chuyển việc tạo thông báo sang Mẫu thông báo (đa kênh App, Email, Zalo OA) */}
 
       {/* ── MODAL BẮN TIN NHẮC SỰ KIỆN KÈM POSTER ── */}
       <EventReminderPosterModal

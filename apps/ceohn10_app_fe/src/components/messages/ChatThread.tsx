@@ -141,7 +141,7 @@ export function ChatThread({
           });
         }
       })
-      .catch(() => {});
+      .catch(() => { });
   }, [peer.peerCode, peer.name]);
 
   useEffect(() => {
@@ -201,7 +201,7 @@ export function ChatThread({
           }
         }
       }
-    } catch {}
+    } catch { }
     return null;
   });
 
@@ -220,7 +220,7 @@ export function ChatThread({
             }
           }
         }
-      } catch {}
+      } catch { }
     };
     syncInquiry();
     window.addEventListener("storage", syncInquiry);
@@ -255,7 +255,7 @@ export function ChatThread({
       setPendingInquiry(null);
       try {
         localStorage.removeItem("vba_pending_chat_inquiry");
-      } catch {}
+      } catch { }
       fetchDirectMessages();
     } catch (err: any) {
       toast.error(err?.message || "Không thể gửi thông tin sản phẩm");
@@ -532,7 +532,7 @@ export function ChatThread({
                       (m.text || "").trim() === cleanText &&
                       Math.abs(
                         new Date(m.createdAt || m.time).getTime() -
-                          new Date(newMsg.createdAt).getTime(),
+                        new Date(newMsg.createdAt).getTime(),
                       ) < 30000),
                 )
               ) {
@@ -604,11 +604,11 @@ export function ChatThread({
     : peer.name && String(peer.name).trim().toLowerCase() !== peerCodeLower
       ? peer.name
       : matchedMember?.personName ||
-        matchedMember?.contact ||
-        matchedMember?.name ||
-        effectiveData?.peerName ||
-        peer.name ||
-        peer.peerCode;
+      matchedMember?.contact ||
+      matchedMember?.name ||
+      effectiveData?.peerName ||
+      peer.name ||
+      peer.peerCode;
 
   const handleOpenPeerProfile = () => {
     if (isGroup) {
@@ -627,7 +627,7 @@ export function ChatThread({
         name: displayName,
         personName: displayName,
         contact: displayName,
-        personTitle: "Hội viên CEO HN10",
+        personTitle: "Học viên CEO HN10",
         industry: "Kinh doanh & Quản lý",
         region: "Hà Nội",
         type: "individual",
@@ -764,38 +764,38 @@ export function ChatThread({
     if (all.length === 0 && peer.peerCode.startsWith("channel_")) {
       const channelDefaults: Record<string, string[]> = {
         channel_secretariat: [
-          "Chào mừng Quý Anh/Chị Hội viên đến với Kênh Ban Thư Ký & Ban Điều Hành CLB Doanh Nhân CEO HN10.",
+          "Chào mừng Quý Anh/Chị Học viên đến với Kênh Ban Thư Ký & Ban Điều Hành CLB Doanh Nhân CEO HN10.",
           "[action:meeting|title:H%E1%BB%8Dp%20Ban%20Ch%E1%BA%A5p%20H%C3%A0nh%20CEO%201983%20Th%C3%A1ng%203|time:14:00%20-%2028/03/2026|location:Trung%20t%C3%A2m%20H%E1%BB%99i%20Ngh%E1%BB%8B%20Qu%E1%BB%91c%20Gia%20H%C3%A0%20N%E1%BB%99i|link:https://meet.ceohn10.vn/ceohn10-bch|desc:Phi%C3%AAn%20h%E1%BB%8Dp%20chi%E1%BA%BFn%20l%C6%B0%E1%BB%A3c%20tri%E1%BB%83n%20khai%20giao%20th%C6%B0%C6%A1ng%20to%C3%A0n%20di%E1%BB%87n]",
-          "Văn bản chỉ đạo & kế hoạch hoạt động năm 2026 đã được Ban Thư Ký cập nhật. Kính mời Quý Hội viên theo dõi và đồng hành.",
+          "Văn bản chỉ đạo & kế hoạch hoạt động năm 2026 đã được Ban Thư Ký cập nhật. Kính mời Quý Học viên theo dõi và đồng hành.",
         ],
         channel_membership: [
-          "Chào mừng Quý Hội viên đến với Kênh Ban Thành Viên Hiệp Hội CEO HN10.",
-          "Ban Thành Viên thông báo: Công tác xét duyệt kết nạp hội viên mới và đồng bộ dữ liệu hồ sơ doanh nghiệp 3D đang được đẩy mạnh.",
-          "Kính chúc Quý Hội viên luôn gắn kết, mở rộng mạng lưới giao thương và cùng xây dựng cộng đồng CEO HN10 ngày càng vững mạnh.",
+          "Chào mừng Quý Học viên đến với Kênh Ban Thành Viên Hiệp Hội CEO HN10.",
+          "Ban Thành Viên thông báo: Công tác xét duyệt kết nạp Học viên mới và đồng bộ dữ liệu hồ sơ doanh nghiệp 3D đang được đẩy mạnh.",
+          "Kính chúc Quý Học viên luôn gắn kết, mở rộng mạng lưới giao thương và cùng xây dựng cộng đồng CEO HN10 ngày càng vững mạnh.",
         ],
         channel_media: [
-          "Chào mừng Quý Hội viên đến với Kênh Ban Truyền Thông Hiệp Hội CEO HN10.",
-          "Bản tin hoạt động CLB: Đẩy mạnh các chiến dịch truyền thông nhận diện thương hiệu cho các doanh nghiệp hội viên trên đa nền tảng.",
+          "Chào mừng Quý Học viên đến với Kênh Ban Truyền Thông Hiệp Hội CEO HN10.",
+          "Bản tin hoạt động CLB: Đẩy mạnh các chiến dịch truyền thông nhận diện thương hiệu cho các doanh nghiệp Học viên trên đa nền tảng.",
           "Thông cáo sự kiện: Ban Truyền Thông phụ trách cập nhật link kho ảnh Google Drive chất lượng cao sau mỗi sự kiện.",
         ],
         channel_promotion: [
-          "Chào mừng Quý Hội viên đến với Kênh Ban Xúc Tiến Thương Mại CLB CEO HN10.",
-          "Chương trình Matching B2B & Sàn Marketplace: Ban Xúc tiến mở cổng tiếp nhận nhu cầu liên kết chuỗi cung ứng giữa các doanh nghiệp hội viên.",
+          "Chào mừng Quý Học viên đến với Kênh Ban Xúc Tiến Thương Mại CLB CEO HN10.",
+          "Chương trình Matching B2B & Sàn Marketplace: Ban Xúc tiến mở cổng tiếp nhận nhu cầu liên kết chuỗi cung ứng giữa các doanh nghiệp Học viên.",
           "Cơ hội kết nối tuần này: Nhu cầu tìm đối tác tổng thầu thi công nội thất, cung cấp nguyên vật liệu và giải pháp công nghệ số.",
         ],
         channel_deals: [
-          "Chào mừng Quý Hội viên đến với Kênh Cơ Hội & Deal B2B CLB CEO HN10.",
+          "Chào mừng Quý Học viên đến với Kênh Cơ Hội & Deal B2B CLB CEO HN10.",
           "Tổng hợp các gói hợp tác kinh doanh độc quyền và chính sách chiết khấu ưu đãi nội bộ giữa các doanh nghiệp trong CLB.",
-          "Deal hot tháng 3: Gói tài trợ truyền thông và gian hàng triển lãm B2B dành riêng cho hội viên chính thức.",
+          "Deal hot tháng 3: Gói tài trợ truyền thông và gian hàng triển lãm B2B dành riêng cho Học viên chính thức.",
         ],
         channel_events: [
-          "Chào mừng Quý Hội viên đến với Kênh Ban Sự Kiện & Hội Nghị CLB CEO HN10.",
+          "Chào mừng Quý Học viên đến với Kênh Ban Sự Kiện & Hội Nghị CLB CEO HN10.",
           "Lịch sự kiện sắp tới: Đại hội thường niên CLB CEO HN10 và Diễn đàn Kinh tế Tư nhân 2026.",
           "Vé tham dự sự kiện và mã QR Check-in đã sẵn sàng trong mục Sự kiện & Vé của bạn.",
         ],
       };
       const seeds = channelDefaults[peer.peerCode] || [
-        `Chào mừng Quý Hội viên đến với Kênh ${peer.name}.`,
+        `Chào mừng Quý Học viên đến với Kênh ${peer.name}.`,
         "Thông báo và tài liệu mới từ Ban chuyên môn sẽ được gửi trực tiếp tại đây.",
       ];
       return seeds.map((s, idx): ChatMessage => ({
@@ -1246,11 +1246,11 @@ export function ChatThread({
         setDirectData((prev) =>
           prev
             ? {
-                ...prev,
-                messages: prev.messages.map((m) =>
-                  m.id === targetId ? { ...m, text: newText, isEdited: true, editedAt: new Date().toISOString() } : m
-                ),
-              }
+              ...prev,
+              messages: prev.messages.map((m) =>
+                m.id === targetId ? { ...m, text: newText, isEdited: true, editedAt: new Date().toISOString() } : m
+              ),
+            }
             : null
         );
       }
@@ -1476,7 +1476,7 @@ export function ChatThread({
           <div
             className="flex items-center gap-2.5 min-w-0 flex-1 cursor-pointer hover:opacity-90 transition"
             onClick={handleOpenPeerProfile}
-            title={isGroup ? "Bấm để xem danh sách thành viên nhóm" : "Bấm để xem profile hội viên"}
+            title={isGroup ? "Bấm để xem danh sách thành viên nhóm" : "Bấm để xem profile Học viên"}
           >
             <div className="relative shrink-0">
               {isGroup ? (
@@ -1545,18 +1545,16 @@ export function ChatThread({
                 ) : (
                   <>
                     <span
-                      className={`inline-block h-2 w-2 rounded-full shrink-0 ${
-                        connState.isConnected
+                      className={`inline-block h-2 w-2 rounded-full shrink-0 ${connState.isConnected
                           ? "bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.7)]"
                           : "bg-slate-400 dark:bg-slate-500"
-                      }`}
+                        }`}
                     />
                     <span
-                      className={`font-semibold ${
-                        connState.isConnected
+                      className={`font-semibold ${connState.isConnected
                           ? "text-emerald-600 dark:text-emerald-400"
                           : "text-slate-500 dark:text-slate-400"
-                      }`}
+                        }`}
                     >
                       {connState.isConnected ? "Mở trao đổi trực tiếp" : "Chưa kết nối"}
                     </span>
@@ -1664,7 +1662,7 @@ export function ChatThread({
           peerUserId={peer.userId || matchedMember?.userId || peer.peerCode}
           peerName={displayName}
           peerAvatar={resolvedAvatar}
-          peerTitle={(peer as any)?.title || (matchedMember as any)?.title || "Hội viên CEO HN10"}
+          peerTitle={(peer as any)?.title || (matchedMember as any)?.title || "Học viên CEO HN10"}
           onClose={() => setCallModal({ open: false, type: "audio" })}
           onEndCall={(result) => {
             // Chỉ người gọi (initiator) mới gửi bản ghi cuộc gọi vào thread để tránh bị xuất hiện 2 cuộc gọi
@@ -1692,7 +1690,7 @@ export function ChatThread({
             const isNewDay =
               !prevMsg ||
               new Date(m.createdAt || m.time).toDateString() !==
-                new Date(prevMsg.createdAt || prevMsg.time).toDateString();
+              new Date(prevMsg.createdAt || prevMsg.time).toDateString();
             const isRetracted = (m as any).retracted || retractedMsgIds.has(m.id);
             const reactions = msgReactions[m.id] || (m as any).reactions || [];
             const content = parseMessageContent(m.text);
@@ -1715,16 +1713,15 @@ export function ChatThread({
                   </div>
                 ) : (
                   <div
-                    className={`flex w-full ${
-                      m.mine ? "justify-end" : "justify-start"
-                    } items-end gap-2 group mb-2.5`}
+                    className={`flex w-full ${m.mine ? "justify-end" : "justify-start"
+                      } items-end gap-2 group mb-2.5`}
                   >
                     {/* Avatar đối phương bên trái cho tin nhắn đến (chuẩn Messenger) */}
                     {!m.mine && (
                       <div
                         className="shrink-0 mb-0.5 cursor-pointer"
                         onClick={handleOpenPeerProfile}
-                        title="Xem hồ sơ hội viên"
+                        title="Xem hồ sơ Học viên"
                       >
                         {peer.isSystem ? (
                           <img
@@ -1748,15 +1745,13 @@ export function ChatThread({
 
                     {/* Message Item Container: bubble row + seen avatar strictly OUTSIDE the border */}
                     <div
-                      className={`flex flex-col ${
-                        m.mine ? "items-end" : "items-start"
-                      } max-w-[85%] sm:max-w-[76%]`}
+                      className={`flex flex-col ${m.mine ? "items-end" : "items-start"
+                        } max-w-[85%] sm:max-w-[76%]`}
                     >
                       {/* Horizontal container: bubble + hover action buttons */}
                       <div
-                        className={`flex items-center gap-1.5 ${
-                          m.mine ? "flex-row-reverse" : "flex-row"
-                        }`}
+                        className={`flex items-center gap-1.5 ${m.mine ? "flex-row-reverse" : "flex-row"
+                          }`}
                       >
                         {/* The Message Bubble */}
                         {isRetracted ? (
@@ -1774,10 +1769,9 @@ export function ChatThread({
                                 activeContextMenuMsgId === m.id ? null : m.id,
                               );
                             }}
-                            className={`relative rounded-2xl shadow-xs transition-all select-none ${
-                              content.type === "action_payment" ||
-                              content.type === "b2b_connect_invite" ||
-                              content.type === "item_inquiry"
+                            className={`relative rounded-2xl shadow-xs transition-all select-none ${content.type === "action_payment" ||
+                                content.type === "b2b_connect_invite" ||
+                                content.type === "item_inquiry"
                                 ? "rounded-2xl bg-transparent border-0 shadow-none p-0 max-w-full"
                                 : content.type === "action_meeting"
                                   ? "max-w-full overflow-hidden border border-amber-500/30"
@@ -1786,16 +1780,15 @@ export function ChatThread({
                                     : m.mine
                                       ? "bg-[#0084FF] text-white rounded-tr-xs"
                                       : "bg-[#F0F2F5] dark:bg-[#303030] text-[#050505] dark:text-[#E4E6EB] rounded-tl-xs"
-                            }`}
+                              }`}
                           >
                             {/* Reply Quote Header Inside Bubble */}
                             {content.replyQuote && (
                               <div
-                                className={`mx-2.5 mt-2 mb-1 rounded-xl p-2 text-[12px] border-l-2 select-none ${
-                                  m.mine
+                                className={`mx-2.5 mt-2 mb-1 rounded-xl p-2 text-[12px] border-l-2 select-none ${m.mine
                                     ? "bg-white/20 text-white/95 border-white"
                                     : "bg-black/5 dark:bg-white/10 text-slate-800 dark:text-slate-200 border-[#0084FF]"
-                                }`}
+                                  }`}
                               >
                                 <div className="font-semibold text-[10.5px] opacity-85 flex items-center gap-1">
                                   <Reply className="h-3 w-3 inline" />
@@ -1810,21 +1803,19 @@ export function ChatThread({
                             {/* Messenger Call Log Bubble Card */}
                             {content.type === "call" ? (
                               <div
-                                className={`p-3.5 space-y-2.5 rounded-2xl min-w-[230px] max-w-xs ${
-                                  m.mine
+                                className={`p-3.5 space-y-2.5 rounded-2xl min-w-[230px] max-w-xs ${m.mine
                                     ? "bg-gradient-to-br from-blue-600 to-indigo-700 text-white shadow-md shadow-blue-500/20"
                                     : "bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white shadow-md"
-                                }`}
+                                  }`}
                               >
                                 <div className="flex items-center gap-3">
                                   <div
-                                    className={`grid h-10 w-10 shrink-0 place-items-center rounded-full ${
-                                      content.status === "missed"
+                                    className={`grid h-10 w-10 shrink-0 place-items-center rounded-full ${content.status === "missed"
                                         ? "bg-rose-500/20 text-rose-500"
                                         : m.mine
                                           ? "bg-white/20 text-white"
                                           : "bg-blue-500/15 text-blue-600 dark:text-blue-400"
-                                    }`}
+                                      }`}
                                   >
                                     {content.callType === "video" ? (
                                       <Video className="h-5 w-5" />
@@ -1844,17 +1835,16 @@ export function ChatThread({
                                       )}
                                     </h4>
                                     <p
-                                      className={`text-[11.5px] font-medium mt-0.5 ${
-                                        m.mine
+                                      className={`text-[11.5px] font-medium mt-0.5 ${m.mine
                                           ? "text-white/80"
                                           : "text-slate-500 dark:text-slate-400"
-                                      }`}
+                                        }`}
                                     >
                                       {content.status === "missed"
                                         ? "Không trả lời"
                                         : `${Math.floor(content.duration / 60)
-                                            .toString()
-                                            .padStart(2, "0")}:${(content.duration % 60)
+                                          .toString()
+                                          .padStart(2, "0")}:${(content.duration % 60)
                                             .toString()
                                             .padStart(2, "0")}`}
                                     </p>
@@ -1867,11 +1857,10 @@ export function ChatThread({
                                       evt.stopPropagation();
                                       setCallModal({ open: true, type: content.callType });
                                     }}
-                                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition active:scale-95 cursor-pointer shadow-xs ${
-                                      m.mine
+                                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition active:scale-95 cursor-pointer shadow-xs ${m.mine
                                         ? "bg-white text-blue-700 hover:bg-white/90"
                                         : "bg-blue-600 text-white hover:bg-blue-700"
-                                    }`}
+                                      }`}
                                   >
                                     {content.callType === "video" ? (
                                       <Video className="h-3.5 w-3.5" />
@@ -2233,16 +2222,14 @@ export function ChatThread({
                             ) : (
                               <div className="px-3.5 py-2 text-[14px]">
                                 <p
-                                  className={`whitespace-pre-wrap break-words leading-relaxed font-normal ${
-                                    m.mine ? "text-white" : "text-[#050505] dark:text-[#E4E6EB]"
-                                  }`}
+                                  className={`whitespace-pre-wrap break-words leading-relaxed font-normal ${m.mine ? "text-white" : "text-[#050505] dark:text-[#E4E6EB]"
+                                    }`}
                                 >
                                   {content.text}
                                 </p>
                                 <div
-                                  className={`flex items-center justify-end gap-1.5 pt-0.5 text-[10px] font-medium leading-none select-none ${
-                                    m.mine ? "text-white/80" : "text-slate-400 dark:text-zinc-400"
-                                  }`}
+                                  className={`flex items-center justify-end gap-1.5 pt-0.5 text-[10px] font-medium leading-none select-none ${m.mine ? "text-white/80" : "text-slate-400 dark:text-zinc-400"
+                                    }`}
                                 >
                                   <span>{formatMessageTime(m.createdAt || m.time)}</span>
                                   {(m as any).isEdited ? (
@@ -2255,9 +2242,8 @@ export function ChatThread({
                             {/* Floating Reactions Pill on Bubble Corner */}
                             {reactions.length > 0 && !isRetracted && (
                               <div
-                                className={`absolute -bottom-2.5 z-10 flex items-center gap-0.5 rounded-full bg-white dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 px-1.5 py-0.5 shadow-sm text-[11px] ${
-                                  m.mine ? "right-2" : "left-2"
-                                }`}
+                                className={`absolute -bottom-2.5 z-10 flex items-center gap-0.5 rounded-full bg-white dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 px-1.5 py-0.5 shadow-sm text-[11px] ${m.mine ? "right-2" : "left-2"
+                                  }`}
                               >
                                 {reactions.map((r, i) => (
                                   <span
@@ -2286,9 +2272,8 @@ export function ChatThread({
                                   }}
                                 />
                                 <div
-                                  className={`absolute z-35 flex flex-col gap-1.5 animate-in fade-in zoom-in-95 duration-150 ${
-                                    m.mine ? "right-0" : "left-0"
-                                  } ${contextMenuPlacement === "down" ? "top-full mt-2" : "bottom-full mb-2"}`}
+                                  className={`absolute z-35 flex flex-col gap-1.5 animate-in fade-in zoom-in-95 duration-150 ${m.mine ? "right-0" : "left-0"
+                                    } ${contextMenuPlacement === "down" ? "top-full mt-2" : "bottom-full mb-2"}`}
                                   onClick={(e) => e.stopPropagation()}
                                 >
                                   {/* 1. Emoji Reaction Bar */}
@@ -2441,9 +2426,8 @@ export function ChatThread({
                               </button>
                               {activeReactionPickerMsgId === m.id && (
                                 <div
-                                  className={`absolute ${reactionPickerPlacement === "down" ? "top-full mt-1.5" : "bottom-8"} z-35 flex items-center gap-1 rounded-full border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 p-1.5 shadow-xl backdrop-blur-md animate-in fade-in zoom-in-95 ${
-                                    m.mine ? "right-0" : "left-0"
-                                  }`}
+                                  className={`absolute ${reactionPickerPlacement === "down" ? "top-full mt-1.5" : "bottom-8"} z-35 flex items-center gap-1 rounded-full border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 p-1.5 shadow-xl backdrop-blur-md animate-in fade-in zoom-in-95 ${m.mine ? "right-0" : "left-0"
+                                    }`}
                                 >
                                   {QUICK_REACTIONS.map((emoji: string) => (
                                     <button
@@ -2475,9 +2459,8 @@ export function ChatThread({
                               </button>
                               {activeMenuMsgId === m.id && (
                                 <div
-                                  className={`absolute ${menuPlacement === "down" ? "top-full mt-1.5" : "bottom-8"} z-35 min-w-[140px] rounded-2xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 py-1 shadow-xl backdrop-blur-md animate-in fade-in zoom-in-95 ${
-                                    m.mine ? "right-0" : "left-0"
-                                  }`}
+                                  className={`absolute ${menuPlacement === "down" ? "top-full mt-1.5" : "bottom-8"} z-35 min-w-[140px] rounded-2xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 py-1 shadow-xl backdrop-blur-md animate-in fade-in zoom-in-95 ${m.mine ? "right-0" : "left-0"
+                                    }`}
                                 >
                                   <button
                                     type="button"
@@ -2693,7 +2676,7 @@ export function ChatThread({
                 setPendingInquiry(null);
                 try {
                   localStorage.removeItem("vba_pending_chat_inquiry");
-                } catch {}
+                } catch { }
               }}
               className="size-7 grid place-items-center rounded-full text-slate-400 hover:text-slate-600 dark:hover:text-white transition cursor-pointer"
             >
@@ -2721,11 +2704,10 @@ export function ChatThread({
               setUploadMenuOpen((prev) => !prev);
             }}
             disabled={isUploading}
-            className={`flex h-9 w-9 items-center justify-center rounded-full transition-all cursor-pointer ${
-              uploadMenuOpen
+            className={`flex h-9 w-9 items-center justify-center rounded-full transition-all cursor-pointer ${uploadMenuOpen
                 ? "bg-[#003B95] text-white rotate-45"
                 : "bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-white/15"
-            }`}
+              }`}
             title="Đính kèm phương tiện & vị trí"
           >
             <Plus className="h-5 w-5 transition-transform" />

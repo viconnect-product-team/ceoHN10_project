@@ -93,7 +93,7 @@ async function main() {
   console.log(`✓ Tài khoản ${targetEmail} sẵn sàng với ID: ${userId}`);
 
   // Fetch token trực tiếp qua HTTPS API
-  console.log('Đang lấy token đăng nhập cho Hội viên qua API...');
+  console.log('Đang lấy token đăng nhập cho Học viên qua API...');
   const appLoginResp = await fetch(`${APP_URL}/api/auth/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -146,7 +146,7 @@ async function main() {
     await appPage.waitForTimeout(1500);
     const regBtn = appPage.locator('button:has-text("Đăng Ký"), button:has-text("Gia nhập")').first();
     if (await regBtn.count() > 0) {
-      await regBtn.click().catch(() => {});
+      await regBtn.click().catch(() => { });
       await appPage.waitForTimeout(1000);
     }
   } catch (e) {
@@ -165,11 +165,11 @@ async function main() {
       if (inputs.length > 1) await inputs[1].fill('vumikasa6@gmail.com');
       if (inputs.length > 2) await inputs[2].fill('0988888888');
     }
-  } catch {}
-  await snap(appPage, 'app_step_02_app_register.png', 'Biểu mẫu Đăng ký Hội viên Mới trên App Hiệp Hội');
+  } catch { }
+  await snap(appPage, 'app_step_02_app_register.png', 'Biểu mẫu Đăng ký Học viên Mới trên App Hiệp Hội');
 
-  // 3. Màn Đăng nhập Hội viên
-  console.log('3. Đăng nhập Hội viên App...');
+  // 3. Màn Đăng nhập Học viên
+  console.log('3. Đăng nhập Học viên App...');
   await appPage.goto(`${APP_URL}/association/login`, { waitUntil: 'domcontentloaded', timeout: 30000 });
   await appPage.waitForTimeout(1200);
   try {
@@ -177,7 +177,7 @@ async function main() {
     if (emailInput) await emailInput.fill(targetEmail);
     const pwdInput = await appPage.$('input[type="password"]');
     if (pwdInput) await pwdInput.fill('••••••••••••');
-  } catch {}
+  } catch { }
   await snap(appPage, 'app_step_03_login_screen.png', 'Màn hình Đăng nhập App Hiệp Hội với Email & Mật khẩu');
 
   // Nạp session Token vào App
@@ -207,22 +207,22 @@ async function main() {
       await cardEl.click();
       await appPage.waitForTimeout(1200);
     }
-  } catch {}
-  await snap(appPage, 'app_step_05_vip_card_nfc.png', 'Thẻ Hội Viên VIP 3D & Công Nghệ Chạm Thẻ Danh Thiếp NFC 1-Chạm');
+  } catch { }
+  await snap(appPage, 'app_step_05_vip_card_nfc.png', 'Thẻ Học viên VIP 3D & Công Nghệ Chạm Thẻ Danh Thiếp NFC 1-Chạm');
 
   // 6. Hồ sơ Doanh nhân 360
   console.log('6. Hồ sơ Doanh nhân 360...');
   await appPage.goto(`${APP_URL}/association/profile`, { waitUntil: 'networkidle', timeout: 30000 });
   await appPage.waitForTimeout(2500);
-  await snap(appPage, 'app_step_06_profile_view.png', 'Hồ sơ Doanh nhân 360° & Thông tin Doanh nghiệp Hội viên');
+  await snap(appPage, 'app_step_06_profile_view.png', 'Hồ sơ Doanh nhân 360° & Thông tin Doanh nghiệp Học viên');
 
-  // 7. Danh bạ hội viên
-  console.log('7. Danh bạ Hội viên CLB CEO HN10...');
+  // 7. Danh bạ Học viên
+  console.log('7. Danh bạ Học viên CLB CEO HN10...');
   await appPage.goto(`${APP_URL}/association/members`, { waitUntil: 'networkidle', timeout: 30000 });
   await appPage.waitForTimeout(2500);
-  await snap(appPage, 'app_step_07_members_directory.png', 'Danh bạ Hội viên & Tra cứu Đối tác Giao thương B2B');
+  await snap(appPage, 'app_step_07_members_directory.png', 'Danh bạ Học viên & Tra cứu Đối tác Giao thương B2B');
 
-  // 8. Modal Chi tiết hội viên
+  // 8. Modal Chi tiết Học viên
   console.log('8. Modal Chi tiết Đối tác...');
   try {
     const firstMember = await appPage.$('div[role="button"], button:has-text("Xem"), div.cursor-pointer');
@@ -230,7 +230,7 @@ async function main() {
       await firstMember.click();
       await appPage.waitForTimeout(1500);
     }
-  } catch {}
+  } catch { }
   await snap(appPage, 'app_step_08_member_profile_modal.png', 'Chi tiết Hồ sơ Năng lực Đối tác & Kết nối 1-on-1');
 
   // 9. Hộp thư Tin nhắn B2B
@@ -247,7 +247,7 @@ async function main() {
       await firstChat.click();
       await appPage.waitForTimeout(1500);
     }
-  } catch {}
+  } catch { }
   await snap(appPage, 'app_step_10_chat_conversation.png', 'Hội thoại Chat Trực tiếp 1-on-1 & Gửi Tài liệu Doanh nghiệp');
 
   // 11. Lịch Sự kiện
@@ -264,7 +264,7 @@ async function main() {
       await eventCard.click();
       await appPage.waitForTimeout(1500);
     }
-  } catch {}
+  } catch { }
   await snap(appPage, 'app_step_12_event_detail_modal.png', 'Biểu mẫu Đăng ký Vé Tham dự Sự kiện & Chọn Hạng Vé');
 
   // 13. Vé điện tử QR Pass Check-in
@@ -283,14 +283,14 @@ async function main() {
       await voteTab.click();
       await appPage.waitForTimeout(1200);
     }
-  } catch {}
+  } catch { }
   await snap(appPage, 'app_step_14_voting_luckydraw.png', 'Phân hệ Bầu cử Tín nhiệm Trực tuyến & Vòng quay May mắn Sự kiện');
 
   // 15. Sàn Marketplace
   console.log('15. Sàn Marketplace B2B...');
   await appPage.goto(`${APP_URL}/association/products`, { waitUntil: 'networkidle', timeout: 30000 });
   await appPage.waitForTimeout(2500);
-  await snap(appPage, 'app_step_15_marketplace_grid.png', 'Sàn Giao dịch & Gian hàng Sản phẩm Hội viên Ưu đãi Nội bộ');
+  await snap(appPage, 'app_step_15_marketplace_grid.png', 'Sàn Giao dịch & Gian hàng Sản phẩm Học viên Ưu đãi Nội bộ');
 
   // 16. Modal Đăng sản phẩm mới
   console.log('16. Modal Đăng sản phẩm mới...');
@@ -302,7 +302,7 @@ async function main() {
       const nameInp = await appPage.$('input[placeholder*="tên"], input[name*="name"]');
       if (nameInp) await nameInp.fill('Giải Pháp Y Tế Số MediSocial 4.0');
     }
-  } catch {}
+  } catch { }
   await snap(appPage, 'app_step_16_product_create_modal.png', 'Biểu mẫu Đăng sản phẩm & Dịch vụ Doanh nghiệp lên Sàn');
 
   // 17. Modal Chi tiết sản phẩm
@@ -315,8 +315,8 @@ async function main() {
       await firstProduct.click();
       await appPage.waitForTimeout(1500);
     }
-  } catch {}
-  await snap(appPage, 'app_step_17_product_detail_modal.png', 'Chi tiết Sản phẩm, Báo giá Ưu đãi Hội viên & Yêu cầu Liên hệ');
+  } catch { }
+  await snap(appPage, 'app_step_17_product_detail_modal.png', 'Chi tiết Sản phẩm, Báo giá Ưu đãi Học viên & Yêu cầu Liên hệ');
 
   // 18. Bảng tin Trao Cơ Hội B2B
   console.log('18. Bảng tin Trao Cơ Hội B2B...');
@@ -334,7 +334,7 @@ async function main() {
       const titleInp = await appPage.$('input[placeholder*="tiêu đề"], input[name*="title"]');
       if (titleInp) await titleInp.fill('Tìm kiếm Đối tác Phân phối Thiết bị Y tế tại Hà Nội');
     }
-  } catch {}
+  } catch { }
   await snap(appPage, 'app_step_19_opportunity_create_modal.png', 'Biểu mẫu Đăng cơ hội Hợp tác & Tiếp nhận Nhu cầu Giao thương');
 
   // 20. Cổng Đóng Hội Phí Thường Niên VietQR
@@ -381,7 +381,7 @@ async function main() {
     if (emailInput) await emailInput.fill('admin@connect.vn');
     const pwdInput = await crmPage.$('input[type="password"]');
     if (pwdInput) await pwdInput.fill('••••••');
-  } catch {}
+  } catch { }
   await snap(crmPage, 'crm_step_01_login_screen.png', 'Màn hình Đăng nhập Quản trị Web CRM an toàn chuẩn Xanh Navy - Trắng');
 
   // Nạp session Admin vào CRM
@@ -401,23 +401,23 @@ async function main() {
   console.log('24. CRM Dashboard KPI có Live Response...');
   await crmPage.goto(`${CRM_URL}/dashboard`, { waitUntil: 'networkidle', timeout: 30000 });
   await crmPage.waitForTimeout(3000);
-  await snap(crmPage, 'crm_step_02_dashboard_kpi_live.png', 'Dashboard Trung tâm Chỉ huy: Chỉ số KPI Hội viên, Sự kiện & Quỹ Hội');
+  await snap(crmPage, 'crm_step_02_dashboard_kpi_live.png', 'Dashboard Trung tâm Chỉ huy: Chỉ số KPI Học viên, Sự kiện & Quỹ Hội');
 
-  // 25. CRM Quản trị Hội viên
-  console.log('25. CRM Quản trị Danh sách Hội viên...');
+  // 25. CRM Quản trị Học viên
+  console.log('25. CRM Quản trị Danh sách Học viên...');
   await crmPage.goto(`${CRM_URL}/members`, { waitUntil: 'networkidle', timeout: 30000 });
   await crmPage.waitForTimeout(3000);
-  await snap(crmPage, 'crm_step_03_members_management.png', 'Quản trị Danh sách Hội viên, Phân hạng & Bộ lọc Ban Chuyên môn');
+  await snap(crmPage, 'crm_step_03_members_management.png', 'Quản trị Danh sách Học viên, Phân hạng & Bộ lọc Ban Chuyên môn');
 
-  // 26. CRM Drawer Thẩm định & Duyệt Hội viên
-  console.log('26. CRM Drawer Chi tiết Thẩm định Hội viên...');
+  // 26. CRM Drawer Thẩm định & Duyệt Học viên
+  console.log('26. CRM Drawer Chi tiết Thẩm định Học viên...');
   try {
     const firstRow = await crmPage.$('tbody tr, [data-row-id], .cursor-pointer');
     if (firstRow) {
       await firstRow.click();
       await crmPage.waitForTimeout(2000);
     }
-  } catch {}
+  } catch { }
   await snap(crmPage, 'crm_step_04_member_approval_drawer.png', 'Drawer Thẩm định Hồ sơ Chi tiết, Phân bổ Ban & Phê duyệt Kết nạp');
 
   // Đóng Drawer
@@ -438,7 +438,7 @@ async function main() {
       await seatingTab.click();
       await crmPage.waitForTimeout(2000);
     }
-  } catch {}
+  } catch { }
   await snap(crmPage, 'crm_step_06_seating_cinema_map.png', 'Sơ đồ Bố trí Chỗ Ngồi Bàn VIP Gala Dinner & Xếp chỗ Đại biểu');
 
   // 29. CRM Cổng Soát Vé Check-in QR
