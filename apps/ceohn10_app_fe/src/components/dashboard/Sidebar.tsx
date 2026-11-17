@@ -69,68 +69,16 @@ import type { LucideIcon } from "lucide-react";
 type SubItem = { to: string; label: string; icon?: LucideIcon };
 type Item = { key: TKey; icon: LucideIcon; to?: string; label?: string; children?: SubItem[] };
 
+// 1. Menu Top-level: Tổng quan, Trợ lý AI, Học viên, Lớp học & Khóa học
 const overview: Item[] = [
-  { key: "nav.dashboard", icon: LayoutDashboard, to: "/" },
-  { key: "nav.aiAssistant" as TKey, icon: Sparkles, to: "/ai-assistant", label: "Trợ Lý AI Điều Hành" },
-];
-const members: Item[] = [
-  { key: "nav.members", icon: Users, to: "/members" },
-  { key: "nav.companies", icon: Building2, to: "/companies" },
-  { key: "nav.memberSeg", icon: Tags, to: "/segments" },
-  { key: "nav.renewal", icon: RefreshCw, to: "/renewal" },
-];
-const events: Item[] = [
-  { key: "nav.events", icon: Calendar, to: "/events" },
-  { key: "eventsOverview.title", icon: Calendar, to: "/events-overview" },
-  { key: "nav.governance", icon: Vote, to: "/voting" },
-  { key: "nav.eventReg", icon: ClipboardList, to: "/event-registrations" },
-  { key: "nav.luckyDraw" as TKey, icon: Gift, to: "/lucky-draw", label: "Bốc thăm trúng thưởng" },
-];
-const sponsors: Item[] = [
-  { key: "nav.sponsors", icon: Handshake, to: "/sponsors" },
-  { key: "nav.sponsorReport", icon: FileBarChart, to: "/sponsor-report" },
-];
-const finance: Item[] = [
-  {
-    key: "nav.analytics" as TKey,
-    icon: BarChart3,
-    to: "/analytics",
-    label: "Thống kê & Báo cáo",
-    children: [
-      { to: "/analytics?category=member_activities", label: "Hoạt động hội viên" },
-      { to: "/analytics?category=top_events_meetings", label: "Hoạt động sự kiện" },
-    ],
-  },
-  { key: "nav.fee", icon: Wallet, to: "/fees" },
-  { key: "nav.income", icon: ArrowDownCircle, to: "/income" },
-  { key: "nav.expenses" as TKey, icon: ArrowUpCircle, to: "/expenses" },
-  { key: "nav.financeReport", icon: PieChart, to: "/finance-report" },
-];
-const comm: Item[] = [
-  {
-    key: "nav.notify",
-    icon: Bell,
-    to: "/notifications",
-    label: "Thông báo hệ thống",
-    children: [
-      { to: "/notifications", label: "Tất cả thông báo" },
-      { to: "/notifications?filter=new_members", label: "Hội viên mới nộp hồ sơ" },
-      { to: "/notifications?filter=fee_alerts", label: "Nhắc hạn & quá hạn hội phí" },
-      { to: "/notifications?filter=admin_system", label: "Ban Điều hành & Quản trị" },
-      { to: "/notifications?filter=events_meetings", label: "Sự kiện" },
-    ],
-  },
-  { key: "nav.news", icon: Newspaper, to: "/news" },
-  { key: "nav.perks", icon: Gift, to: "/perks" },
-  { key: "nav.feedback" as TKey, icon: MessageSquare, to: "/feedback", label: "Phản ánh & Đóng góp ý kiến" },
-];
-const network: Item[] = [
-  { key: "nav.network", icon: MessageSquare, to: "/network", label: "Tin nhắn & Trao đổi công việc" },
+  { key: "nav.dashboard", icon: LayoutDashboard, to: "/", label: "Tổng quan" },
+  { key: "nav.aiAssistant" as TKey, icon: Sparkles, to: "/ai-assistant", label: "Trợ lý AI" },
+  { key: "nav.members", icon: Users, to: "/members", label: "Học viên" },
   {
     key: "nav.trainings" as TKey,
     icon: GraduationCap,
     to: "/trainings",
-    label: "Quản lý Lớp học & Khóa học",
+    label: "Lớp học & Khóa học",
     children: [
       { to: "/trainings?tab=all", label: "Tất cả lớp học / khóa học" },
       { to: "/trainings?tab=sessions", label: "Xem & Thiết lập buổi học" },
@@ -138,7 +86,79 @@ const network: Item[] = [
     ],
   },
 ];
-const system: Item[] = [
+
+// 2. Nhóm TRUYỀN THÔNG (Sự kiện)
+const events: Item[] = [
+  { key: "nav.events", icon: Calendar, to: "/events", label: "Sự kiện" },
+  { key: "eventsOverview.title" as TKey, icon: LayoutTemplate, to: "/events-overview", label: "Tổng quan sự kiện" },
+  { key: "nav.governance", icon: Vote, to: "/voting", label: "Biểu quyết" },
+  { key: "nav.eventReg", icon: ClipboardList, to: "/event-registrations", label: "Đăng ký sự kiện" },
+  { key: "nav.luckyDraw" as TKey, icon: Gift, to: "/lucky-draw", label: "Bốc thăm trúng thưởng" },
+];
+
+// 3. Nhóm TÀI TRỢ (Nhà tài trợ, Báo cáo tài trợ, Quỹ tài trợ: tiền mặt, hiện vật, thiện nguyện)
+const sponsors: Item[] = [
+  { key: "nav.sponsors", icon: Handshake, to: "/sponsors", label: "Nhà tài trợ" },
+  { key: "nav.sponsorReport", icon: FileBarChart, to: "/sponsor-report", label: "Báo cáo tài trợ" },
+  {
+    key: "nav.sponsorFunds" as TKey,
+    icon: Wallet,
+    to: "/sponsors?tab=funds",
+    label: "Quỹ tài trợ",
+    children: [
+      { to: "/sponsors?tab=funds&fund_type=cash", label: "Quỹ tiền mặt" },
+      { to: "/sponsors?tab=funds&fund_type=in_kind", label: "Quỹ hiện vật" },
+      { to: "/sponsors?tab=funds&fund_type=charity", label: "Quỹ dành cho thiện nguyện" },
+    ],
+  },
+];
+
+// 4. Nhóm TÀI CHÍNH (Thống kê báo cáo, Khoản thu, Khoản chi, Báo cáo tài chính)
+const finance: Item[] = [
+  {
+    key: "nav.analytics" as TKey,
+    icon: BarChart3,
+    to: "/analytics",
+    label: "Thống kê báo cáo",
+    children: [
+      { to: "/analytics?category=events", label: "Thống kê sự kiện" },
+      { to: "/analytics?category=csr", label: "Thống kê thiện nguyện (CSR)" },
+      { to: "/analytics?category=member_activities", label: "Hoạt động học viên" },
+    ],
+  },
+  { key: "nav.income", icon: ArrowDownCircle, to: "/income", label: "Khoản thu" },
+  { key: "nav.expenses" as TKey, icon: ArrowUpCircle, to: "/expenses", label: "Khoản chi" },
+  { key: "nav.financeReport", icon: PieChart, to: "/finance-report", label: "Báo cáo tài chính" },
+];
+
+// 5. Nhóm TRUYỀN THÔNG (Thông báo, Tin tức & Truyền thông, Quyền lợi & Ưu đãi)
+const comm: Item[] = [
+  {
+    key: "nav.notify",
+    icon: Bell,
+    to: "/notifications",
+    label: "Thông báo",
+    children: [
+      { to: "/notifications", label: "Tất cả thông báo" },
+      { to: "/notifications?filter=new_members", label: "Học viên mới" },
+      { to: "/notifications?filter=fee_alerts", label: "Nhắc hạn & quá hạn thu chi" },
+      { to: "/notifications?filter=admin_system", label: "Ban Cán sự & Quản trị" },
+      { to: "/notifications?filter=events_meetings", label: "Sự kiện & Buổi học" },
+    ],
+  },
+  { key: "nav.news", icon: Newspaper, to: "/news", label: "Tin tức & Truyền thông" },
+  { key: "nav.perks", icon: Gift, to: "/perks", label: "Quyền lợi & Ưu đãi" },
+];
+
+// 6. Nhóm KẾT NỐI GIAO THƯƠNG (Nhắn tin, Chia sẻ cơ hội, Giao thương B2B)
+const network: Item[] = [
+  { key: "nav.network", icon: MessageSquare, to: "/network", label: "Nhắn tin" },
+  { key: "nav.opportunities" as TKey, icon: Sparkles, to: "/opportunities", label: "Chia sẻ cơ hội" },
+  { key: "nav.b2bDeals" as TKey, icon: Store, to: "/marketplace", label: "Giao thương B2B" },
+];
+
+// 7. Nhóm HOẠT ĐỘNG (Quản lý công việc, Quản lý cuộc họp, Doanh nghiệp, Tài liệu biểu mẫu)
+const activities: Item[] = [
   {
     key: "nav.tasks" as TKey,
     icon: CheckSquare,
@@ -152,9 +172,18 @@ const system: Item[] = [
       { to: "/tasks?filter=overdue", label: "Công việc quá hạn" },
     ],
   },
-  { key: "nav.settings", icon: Settings, to: "/settings" },
-  { key: "nav.activity" as TKey, icon: Activity, to: "/activity", label: "Nhật ký hoạt động" },
+  { key: "nav.meetings" as TKey, icon: Users2, to: "/meetings", label: "Quản lý cuộc họp" },
+  { key: "nav.companies" as TKey, icon: Building2, to: "/companies", label: "Doanh nghiệp" },
+  { key: "nav.documents", icon: FolderOpen, to: "/documents", label: "Tài liệu biểu mẫu" },
 ];
+
+// 8. Nhóm HỆ THỐNG (Cài đặt hệ thống, Lịch sử hoạt động)
+const system: Item[] = [
+  { key: "nav.settings", icon: Settings, to: "/settings", label: "Cài đặt hệ thống" },
+  { key: "nav.activity" as TKey, icon: Activity, to: "/activity", label: "Lịch sử hoạt động" },
+];
+
+// 9. Nhóm PHÂN QUYỀN (Phân quyền hệ thống, Quản lý Ban Chuyên Môn, Quản trị người dùng)
 const permissionsGroup: Item[] = [
   {
     key: "nav.permissions" as TKey,
@@ -171,13 +200,9 @@ const permissionsGroup: Item[] = [
   {
     key: "nav.accounts" as TKey,
     icon: UserCog,
-    to: "/account-settings?tab=users",
+    to: "/accounts",
     label: "Quản trị người dùng",
   },
-];
-const pageTemplates: Item[] = [];
-const admin: Item[] = [
-  { key: "nav.documents", icon: FolderOpen, to: "/documents" },
 ];
 
 const COLLAPSE_KEY = "vba.sidebar.collapsed";
@@ -378,6 +403,7 @@ function NavItem({
 
 function Group({
   label,
+  customGroupLabel,
   items,
   pathname,
   searchStr,
@@ -386,7 +412,8 @@ function Group({
   badges,
   onDismissBadge,
 }: {
-  label?: TKey;
+  label?: TKey | string;
+  customGroupLabel?: string;
   items: Item[];
   pathname: string | undefined;
   searchStr?: string;
@@ -398,7 +425,7 @@ function Group({
   if (!items || items.length === 0) return null;
   const t = useT();
   const { getLabel, getGroupLabel } = useSidebarLabels();
-  const displayGroupLabel = label ? getGroupLabel(label, t(label)) : undefined;
+  const displayGroupLabel = customGroupLabel || (label ? getGroupLabel(label, (t as any)(label) || label) : undefined);
   return (
     <div className={collapsed ? "px-2.5" : "px-3"}>
       {displayGroupLabel &&
@@ -722,8 +749,6 @@ export function Sidebar({
   // Lọc chi tiết từng mục menu kết hợp Ma Trận Quyền RBAC
   const filteredOverview = overview.filter((it) => isAllowed(it.to));
 
-  const filteredMembers = members.filter((it) => isAllowed(it.to));
-
   const filteredEvents = events.filter((it) => isAllowed(it.to));
 
   const filteredSponsors = sponsors.filter((it) => isAllowed(it.to));
@@ -734,19 +759,7 @@ export function Sidebar({
 
   const filteredNetwork = network.filter((it) => isAllowed(it.to));
 
-  const filteredTemplates = pageTemplates.filter((it) => {
-    // Quản lý Thư Mời chỉ dành cho Quản trị viên, Thư ký, Ban Truyền thông và Ban Sự kiện
-    const srsRoleStr = String(srsRole || "");
-    const isTemplatesAllowedRole =
-      isPrivilegedAdmin ||
-      isTongThuKy ||
-      isBanThuKy ||
-      srsRoleStr === "truong_ban_truyen_thong" ||
-      srsRoleStr === "thanh_vien_ban_truyen_thong" ||
-      srsRoleStr === "thanh_vien_ban_su_kien" ||
-      srsRoleStr === "BTT";
-    return isTemplatesAllowedRole && isAllowed(it.to);
-  });
+  const filteredActivities = activities.filter((it) => isAllowed(it.to));
 
   const filteredSystem = system.filter((it) => isAllowed(it.to));
 
@@ -774,8 +787,6 @@ export function Sidebar({
     }
     return isPrivilegedAdmin && isAllowed(it.to || "/permissions");
   });
-
-  const filteredAdmin = admin.filter((it) => isAllowed(it.to));
 
   return (
     <aside
@@ -834,6 +845,7 @@ export function Sidebar({
         onScroll={handleScroll}
         className="sidebar-scroll flex-1 space-y-5 overflow-y-auto py-4"
       >
+        {/* 1. TOP-LEVEL: Tổng quan, Trợ lý AI, Học viên, Lớp học & Khóa học */}
         {filteredOverview.length > 0 && (
           <Group
             items={filteredOverview}
@@ -845,21 +857,11 @@ export function Sidebar({
             onDismissBadge={dismissBadge}
           />
         )}
-        {canViewMembers && filteredMembers.length > 0 && (
-          <Group
-            label="nav.group.members"
-            items={filteredMembers}
-            pathname={pathname}
-            searchStr={searchStr}
-            collapsed={isCollapsed}
-            onNavigate={onNavigate}
-            badges={effectiveBadges}
-            onDismissBadge={dismissBadge}
-          />
-        )}
+
+        {/* 2. NHÓM TRUYỀN THÔNG (Sự kiện, Tổng quan, Biểu quyết, Đăng ký, Bốc thăm) */}
         {canViewEvents && filteredEvents.length > 0 && (
           <Group
-            label="nav.group.events"
+            customGroupLabel="TRUYỀN THÔNG"
             items={filteredEvents}
             pathname={pathname}
             searchStr={searchStr}
@@ -869,9 +871,11 @@ export function Sidebar({
             onDismissBadge={dismissBadge}
           />
         )}
+
+        {/* 3. NHÓM TÀI TRỢ (Nhà tài trợ, Báo cáo tài trợ, Quỹ tài trợ) */}
         {canViewSponsors && filteredSponsors.length > 0 && (
           <Group
-            label="nav.group.sponsors"
+            customGroupLabel="TÀI TRỢ"
             items={filteredSponsors}
             pathname={pathname}
             searchStr={searchStr}
@@ -881,9 +885,11 @@ export function Sidebar({
             onDismissBadge={dismissBadge}
           />
         )}
+
+        {/* 4. NHÓM TÀI CHÍNH (Thống kê báo cáo, Khoản thu, Khoản chi, Báo cáo tài chính) */}
         {canViewFinance && filteredFinance.length > 0 && (
           <Group
-            label="nav.group.finance"
+            customGroupLabel="TÀI CHÍNH"
             items={filteredFinance}
             pathname={pathname}
             searchStr={searchStr}
@@ -893,9 +899,11 @@ export function Sidebar({
             onDismissBadge={dismissBadge}
           />
         )}
+
+        {/* 5. NHÓM TRUYỀN THÔNG (Thông báo, Tin tức & Truyền thông, Quyền lợi & Ưu đãi) */}
         {canViewComm && filteredComm.length > 0 && (
           <Group
-            label="nav.group.comm"
+            customGroupLabel="TRUYỀN THÔNG"
             items={filteredComm}
             pathname={pathname}
             searchStr={searchStr}
@@ -905,9 +913,11 @@ export function Sidebar({
             onDismissBadge={dismissBadge}
           />
         )}
+
+        {/* 6. NHÓM KẾT NỐI GIAO THƯƠNG (Nhắn tin, Chia sẻ cơ hội, Giao thương B2B) */}
         {canViewNetwork && filteredNetwork.length > 0 && (
           <Group
-            label="nav.group.network"
+            customGroupLabel="KẾT NỐI GIAO THƯƠNG"
             items={filteredNetwork}
             pathname={pathname}
             searchStr={searchStr}
@@ -917,10 +927,12 @@ export function Sidebar({
             onDismissBadge={dismissBadge}
           />
         )}
-        {filteredTemplates.length > 0 && (
+
+        {/* 7. NHÓM HOẠT ĐỘNG (Quản lý công việc, Quản lý cuộc họp, Tài liệu biểu mẫu) */}
+        {filteredActivities.length > 0 && (
           <Group
-            label="nav.group.pageTemplates"
-            items={filteredTemplates}
+            customGroupLabel="HOẠT ĐỘNG"
+            items={filteredActivities}
             pathname={pathname}
             searchStr={searchStr}
             collapsed={isCollapsed}
@@ -929,9 +941,11 @@ export function Sidebar({
             onDismissBadge={dismissBadge}
           />
         )}
+
+        {/* 8. NHÓM HỆ THỐNG (Cài đặt hệ thống, Lịch sử hoạt động) */}
         {canViewSystem && filteredSystem.length > 0 && (
           <Group
-            label="nav.group.system"
+            customGroupLabel="HỆ THỐNG"
             items={filteredSystem}
             pathname={pathname}
             searchStr={searchStr}
@@ -941,21 +955,11 @@ export function Sidebar({
             onDismissBadge={dismissBadge}
           />
         )}
-        {filteredAdmin.length > 0 && (
-          <Group
-            label="nav.group.admin"
-            items={filteredAdmin}
-            pathname={pathname}
-            searchStr={searchStr}
-            collapsed={isCollapsed}
-            onNavigate={onNavigate}
-            badges={effectiveBadges}
-            onDismissBadge={dismissBadge}
-          />
-        )}
+
+        {/* 9. NHÓM PHÂN QUYỀN (Phân quyền hệ thống, Quản lý Ban Chuyên Môn, Quản trị người dùng) */}
         {canViewPlatform && filteredPermissions.length > 0 && (
           <Group
-            label="nav.group.permissions"
+            customGroupLabel="PHÂN QUYỀN"
             items={filteredPermissions}
             pathname={pathname}
             searchStr={searchStr}

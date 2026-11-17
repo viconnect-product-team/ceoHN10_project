@@ -51,22 +51,24 @@ import { VndCurrencyInput, parseVndNumber } from "@/components/dashboard/VndCurr
 import { StandardDateInput, formatToDdmmyyyy } from "@/components/common/StandardDateInput";
 import { GoogleMapAddressPicker } from "@/components/common/GoogleMapAddressPicker";
 
-const TYPE_OPTS: EventType[] = ["forum", "workshop", "networking", "training"];
+const TYPE_OPTS: EventType[] = ["forum", "workshop", "networking", "training", "charity"];
 const STATUS_OPTS: EventStatus[] = ["upcoming", "ongoing", "completed", "cancelled"];
 
 export function EventWizard({
   open,
   onClose,
   onCreated,
+  initialType,
 }: {
   open: boolean;
   onClose: () => void;
   onCreated: (event: EventItem) => void;
+  initialType?: EventType;
 }) {
   // Chỉ render khi người dùng bấm "Tạo sự kiện" (open=true). Mỗi lần mở là 1 phiên mới (state reset).
   if (!open || typeof document === "undefined") return null;
   return createPortal(
-    <EventWizardDialog onClose={onClose} onCreated={onCreated} />,
+    <EventWizardDialog onClose={onClose} onCreated={onCreated} initialType={initialType} />,
     document.body,
   );
 }
@@ -74,9 +76,11 @@ export function EventWizard({
 function EventWizardDialog({
   onClose,
   onCreated,
+  initialType,
 }: {
   onClose: () => void;
   onCreated: (event: EventItem) => void;
+  initialType?: EventType;
 }) {
   const t = useT();
 
@@ -88,22 +92,22 @@ function EventWizardDialog({
       document.body.style.overflow = prev;
     };
   }, []);
-  const defaultTpl = EVENT_TYPE_TEMPLATES.forum;
+  const defaultTpl = EVENT_TYPE_TEMPLATES[(initialType as EventTypeKey) || "forum"] || EVENT_TYPE_TEMPLATES.forum;
 
   const [step, setStep] = useState<0 | 1 | 2>(0);
   const [submitting, setSubmitting] = useState(false);
   const [info, setInfo] = useState<Info>({
-    name: "",
+    name: initialType === "charity" ? defaultTpl.name : "",
     tagline: defaultTpl.tagline,
     date: "",
     startTime: "08:30",
     endTime: "11:30",
-    location: "",
-    capacity: "",
-    type: "forum",
+    location: initialType === "charity" ? defaultTpl.defaultLocation : "",
+    capacity: initialType === "charity" ? defaultTpl.defaultCapacity : "",
+    type: initialType || "forum",
     status: "upcoming",
     imageUrl: defaultTpl.bgImage,
-    description: "",
+    description: initialType === "charity" ? defaultTpl.description : "",
     qrStaff: [],
     sponsors: [],
     isFixed: false,
@@ -439,8 +443,8 @@ function InfoStep({
         <label className={labelCls}>
           Chọn loại sự kiện (Tự động áp dụng bố cục nội dung & banner đặc thù)
         </label>
-        <div className="grid grid-cols-2 gap-2">
-          {(["forum", "workshop", "networking", "training"] as EventTypeKey[]).map((key) => {
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+          {(["forum", "workshop", "networking", "training", "charity"] as EventTypeKey[]).map((key) => {
             const tpl = EVENT_TYPE_TEMPLATES[key];
             const isSelected = info.type === key;
             return (

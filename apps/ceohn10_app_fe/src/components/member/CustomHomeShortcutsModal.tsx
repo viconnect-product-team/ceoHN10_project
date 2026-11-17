@@ -148,8 +148,8 @@ export const ALL_SHORTCUT_OPTIONS: ShortcutItem[] = [
   },
   {
     id: "training",
-    name: "Đào tạo",
-    desc: "Khóa học, tài liệu & phòng họp video",
+    name: "Lịch học",
+    desc: "Lịch học, điểm danh QR & phòng họp video",
     to: "/association/training",
     iconName: "GraduationCap",
     badge: "Mới",

@@ -198,9 +198,9 @@ export function AllFeaturesModal({
     },
     {
       id: "training",
-      name: "Đào tạo",
+      name: "Lịch học",
       category: "Hoạt động & Sự kiện",
-      desc: "Khóa học quản trị, tài liệu & phòng họp video",
+      desc: "Lịch học, điểm danh QR & phòng họp trực tuyến",
       to: "/association/training",
       icon: GraduationCap,
     },

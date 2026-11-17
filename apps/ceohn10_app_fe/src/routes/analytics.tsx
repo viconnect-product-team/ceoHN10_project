@@ -126,10 +126,32 @@ interface CategoryMeta {
 
 const CATEGORIES: CategoryMeta[] = [
   {
+    id: "top_events_meetings",
+    alias: ["top_events", "top_events_meetings", "events"],
+    label: "Báo cáo sự kiện",
+    subLabel: "Số lượt đăng ký, tham gia thực tế và hiệu quả các chương trình sự kiện CLB",
+    metricLabel: "Đại biểu tham gia",
+    unit: "Đại biểu",
+    bar1Name: "Đại biểu thực tế",
+    bar2Name: "Chỉ tiêu sức chứa",
+    lineName: "Tỷ lệ lấp đầy (%)",
+  },
+  {
+    id: "external_shares",
+    alias: ["csr", "charity", "thien_nguyen", "external_shares", "shares"],
+    label: "Báo cáo thiện nguyện (CSR)",
+    subLabel: "Tổng nguồn lực vận động, quà tặng và hoạt động an sinh xã hội vì cộng đồng",
+    metricLabel: "Giá trị thiện nguyện",
+    unit: "Triệu VNĐ",
+    bar1Name: "Kinh phí thực hiện",
+    bar2Name: "Chỉ tiêu gây quỹ",
+    lineName: "Tỷ lệ hoàn thành (%)",
+  },
+  {
     id: "member_activities",
-    alias: ["member_activities", "activity_sentiment", "sentiment", "top_referrals", "external_shares", "shares", "referrals"],
-    label: "Hoạt động hội viên",
-    subLabel: "Thống kê lượt bình luận, share ra ngoài và click link giới thiệu hội viên",
+    alias: ["member_activities", "activity_sentiment", "sentiment", "top_referrals", "referrals"],
+    label: "Hoạt động học viên",
+    subLabel: "Thống kê lượt bình luận, share ra ngoài và click link giới thiệu",
     metricLabel: "Lượt hoạt động",
     unit: "Lượt",
     bar1Name: "Lượt bình luận",
@@ -157,17 +179,6 @@ const CATEGORIES: CategoryMeta[] = [
     bar1Name: "Cơ hội B2B chia sẻ",
     bar2Name: "Thương vụ đã chốt",
     lineName: "Tỷ lệ chuyển đổi",
-  },
-  {
-    id: "top_events_meetings",
-    alias: ["top_events", "top_events_meetings", "events"],
-    label: "Sự kiện & cuộc họp",
-    subLabel: "Số lượt tham gia sự kiện, họp ban chuyên môn và điểm danh",
-    metricLabel: "Lượt tham gia",
-    unit: "Lượt",
-    bar1Name: "Lượt tham gia thực tế",
-    bar2Name: "Số lượng dự kiến",
-    lineName: "Tỷ lệ tham dự đúng giờ",
   },
 ];
 
