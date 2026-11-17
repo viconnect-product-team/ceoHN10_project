@@ -1,6 +1,17 @@
 # ==============================================================================
 # BỘ LUẬT DỰ ÁN (PROJECT RULES & AI CODEGEN STANDARDS) - CEO HN10 PROJECT
 # Vai trò: Tech Lead | Định dạng: .cursorrules
+# 17/11/2026 (v12.16) — SỬA TRIỆT ĐỂ LỖI TYPESCRIPT TS2741 TRÊN GITHUB ACTIONS & TẬP TRUNG TÀI LIỆU TRÌNH CHIẾU VÀO 4 PHÂN HỆ (TỔNG QUAN, SỰ KIỆN, LỚP HỌC, TÀI CHÍNH):
+#   * [SỬA LỖI TYPESCRIPT GATES CI/CD]:
+#     - Bổ sung charity vào TYPE_KEY và TYPE_COVER trong apps/ceohn10_app_fe/src/routes/events.$eventId.tsx.
+#     - Đảm bảo chất lượng mã nguồn: npx tsc --noEmit tại cả Frontend và Backend đều trả về exit code 0 (0 errors).
+#   * [TÀI LIỆU TRÌNH CHIẾU CEO HN10 CHỈ CHỨA 4 PHÂN HỆ CỐT LÕI]:
+#     - Bộ slide (HTML, PDF, PPTX) được tái cấu trúc chỉ tập trung vào 4 phân hệ chính:
+#       1. TỔNG QUAN: Sơ đồ kiến trúc VOA hệ sinh thái CEO HN10 & Dashboard quản trị CRM.
+#       2. SỰ KIỆN: Quản lý sự kiện, 4 sự kiện cố định thường niên (Khai giảng 15/03, Team building 18/07, YEP 26/12, Bế giảng 16/01) & check-in QR.
+#       3. LỚP HỌC: Quản lý lớp học, thiết lập buổi học, điểm danh mã QR realtime cho lớp học.
+#       4. TÀI CHÍNH: Quản lý Thu - Chi, Hóa đơn chứng từ, Sổ quỹ hội 2.1 Tỷ VNĐ minh bạch.
+#   * [TUÂN THỦ CSDL & GIT]: CSDL duy nhất 113.20.107.184:6432 (ceohn10_project). Tuyệt đối không git commit / git push.
 # 17/11/2026 (v12.15) — THIẾT LẬP 4 SỰ KIỆN CỐ ĐỊNH CEO HN10, ĐƯA DOANH NGHIỆP VÀO NHÓM HOẠT ĐỘNG, KHỞI TẠO QUỸ 2.1 TỶ VNĐ, SỬA LỖI GIT DEPLOY & BỘ SLIDE CEO HN10 ĐA ĐỊNH DẠNG:
 #   * [4 SỰ KIỆN CỐ ĐỊNH THƯỜNG NIÊN LỚP CEO HN10]:
 #     1. Khai giảng (15/03) - Lễ khai giảng lớp doanh nhân CEO HN10 (evt-khai-giang-ceohn10, is_fixed=true).

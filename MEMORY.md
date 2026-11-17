@@ -1,5 +1,33 @@
 # System Memory & Architecture
 
+- **Bản cập nhật ngày 17/11/2026 (v12.16): Triệt Tiêu Lỗi TypeScript Gates CI/CD GitHub Actions & Tối Ưu Hóa Bộ Slide Trình Chiếu CEO HN10 Chỉ Bao Gồm 4 Phân Hệ Trọng Tâm (Tổng Quan, Sự Kiện, Lớp Học, Tài Chính) ([NODE-CRM-001], [NODE-CRM-002], [NODE-CRM-005], [NODE-CORE-001])**:
+  - **1. Triệt Tiêu Lỗi TypeScript TS2741 Khiến GitHub Actions Bị Đỏ (Exit Code 1 tại 1m 48s)**:
+    * **Nguyên nhân cốt lõi**: Trong commit trước, khi thêm phân loại sự kiện `charity` (thiện nguyện) vào `EventItem["type"]`, tệp `apps/ceohn10_app_fe/src/routes/events.$eventId.tsx` (dòng 114 & 120) chưa bổ sung ánh xạ `charity` cho `TYPE_KEY` và `TYPE_COVER`.
+    * Khi bước `quality-check` của GitHub Actions chạy `npx tsc --noEmit` trên runner ubuntu-latest, trình biên dịch bắt lỗi `error TS2741: Property 'charity' is missing in type ... but required in type 'Record<"charity" | ...>'` dẫn đến pipeline bị ngắt sau 1m 48s.
+    * **Giải pháp dứt điểm**:
+      - Bổ sung `charity: "events.type.charity" as TKey` vào `TYPE_KEY` trong `events.$eventId.tsx`.
+      - Bổ sung `charity: "linear-gradient(135deg, #0D9488, #047857)"` vào `TYPE_COVER` trong `events.$eventId.tsx`.
+      - Đã kiểm tra lại `npx tsc --noEmit` ở cả `apps/ceohn10_app_fe` và `apps/ceohn10_app_be`: **Cả hai đều vượt qua với exit code 0 (0 errors)**.
+  - **2. Tái Cấu Trúc Bộ Slide Trình Chiếu CEO HN10 Theo Yêu Cầu Tối Giản**:
+    * Theo yêu cầu của người dùng, toàn bộ tài liệu trình chiếu được thiết kế lại, **chỉ đưa vào các hình ảnh của 4 phân hệ trọng tâm**:
+      1. **TỔNG QUAN**:
+         - Sơ đồ kiến trúc VOA hệ sinh thái CEO HN10 (`slide_assets/voa_ceohn10.png`).
+         - Bàn điều hành & Dashboard Quản trị trung tâm CRM (`slide_assets/overview_dashboard.png`).
+      2. **SỰ KIỆN**:
+         - Màn hình Quản lý sự kiện, danh sách 4 sự kiện cố định thường niên và check-in vé QR (`slide_assets/events_management.png`).
+      3. **LỚP HỌC**:
+         - Màn hình Quản lý lớp học, thiết lập buổi học và hệ thống mã QR điểm danh lớn cho lớp học (`slide_assets/trainings_classes.png`).
+      4. **TÀI CHÍNH**:
+         - Màn hình Quản lý Thu, Quản lý Chi và Sổ Quỹ Hội 2.1 Tỷ VNĐ minh bạch (`slide_assets/crm_income.jpg` & `slide_assets/crm_expenses.jpg`).
+    * Đã loại bỏ hoàn toàn các hình ảnh công việc và sơ đồ không liên quan.
+    * Đã đồng bộ xuất đầy đủ 3 định dạng:
+      - Web HTML: `document/SLIDE_TRINH_BAY_PHAN_MEM_CEOHN10.html`
+      - PDF chất lượng cao (A4 Landscape): `document/SLIDE_TRINH_BAY_PHAN_MEM_CEOHN10.pdf` (~4.9 MB)
+      - PowerPoint (.pptx): `document/SLIDE_TRINH_BAY_PHAN_MEM_CEOHN10.pptx` (~5.2 MB)
+  - **3. Tuân Thủ Nghiêm Ngặt Quy Chuẩn**:
+    * CSDL chuẩn duy nhất: `113.20.107.184:6432` (`ceohn10_project`).
+    * Tuyệt đối không tự ý chạy `git commit` hay `git push`.
+
 - **Bản cập nhật ngày 17/11/2026 (v12.14): Tái Cấu Trúc Toàn Diện Sidebar Web CRM 9 Nhóm Chức Năng, Luồng Tạo Sự Kiện Thiện Nguyện Ban Thiện Nguyện, Báo Cáo Tài Chính Đa Định Dạng (Word/Excel/PDF), Quỹ Tài Trợ CSR & Chuyển Đổi Lịch Học Kèm Điểm Danh Mã QR Realtime Trên Mobile App ([NODE-CRM-001], [NODE-CRM-002], [NODE-CRM-005], [NODE-CRM-006], [NODE-CRM-018], [NODE-APP-003], [NODE-APP-008])**:
   - **1. Tái Cấu Trúc Toàn Diện Sidebar Web CRM Theo 9 Nhóm Chuẩn (`Sidebar.tsx`)**:
     * **Nhóm Đỉnh (Top-Level)**: Tổng quan (`/`), Trợ lý AI (`/ai-assistant`), Học viên (`/members`), Lớp học & Khóa học (`/trainings` - Menu Tree phân cấp: Tất cả lớp học, Xem & Thiết lập buổi học, Nhật ký buổi học đã diễn ra).
@@ -1858,6 +1886,34 @@
      - Tuân thủ nghiêm ngặt STRICT RULE 1: Tuyệt đối không tự động chạy `git push` hay `git commit`.
 
 # System Memory & Architecture
+
+- **Bản cập nhật ngày 17/11/2026 (v12.16): Triệt Tiêu Lỗi TypeScript Gates CI/CD GitHub Actions & Tối Ưu Hóa Bộ Slide Trình Chiếu CEO HN10 Chỉ Bao Gồm 4 Phân Hệ Trọng Tâm (Tổng Quan, Sự Kiện, Lớp Học, Tài Chính) ([NODE-CRM-001], [NODE-CRM-002], [NODE-CRM-005], [NODE-CORE-001])**:
+  - **1. Triệt Tiêu Lỗi TypeScript TS2741 Khiến GitHub Actions Bị Đỏ (Exit Code 1 tại 1m 48s)**:
+    * **Nguyên nhân cốt lõi**: Trong commit trước, khi thêm phân loại sự kiện `charity` (thiện nguyện) vào `EventItem["type"]`, tệp `apps/ceohn10_app_fe/src/routes/events.$eventId.tsx` (dòng 114 & 120) chưa bổ sung ánh xạ `charity` cho `TYPE_KEY` và `TYPE_COVER`.
+    * Khi bước `quality-check` của GitHub Actions chạy `npx tsc --noEmit` trên runner ubuntu-latest, trình biên dịch bắt lỗi `error TS2741: Property 'charity' is missing in type ... but required in type 'Record<"charity" | ...>'` dẫn đến pipeline bị ngắt sau 1m 48s.
+    * **Giải pháp dứt điểm**:
+      - Bổ sung `charity: "events.type.charity" as TKey` vào `TYPE_KEY` trong `events.$eventId.tsx`.
+      - Bổ sung `charity: "linear-gradient(135deg, #0D9488, #047857)"` vào `TYPE_COVER` trong `events.$eventId.tsx`.
+      - Đã kiểm tra lại `npx tsc --noEmit` ở cả `apps/ceohn10_app_fe` và `apps/ceohn10_app_be`: **Cả hai đều vượt qua với exit code 0 (0 errors)**.
+  - **2. Tái Cấu Trúc Bộ Slide Trình Chiếu CEO HN10 Theo Yêu Cầu Tối Giản**:
+    * Theo yêu cầu của người dùng, toàn bộ tài liệu trình chiếu được thiết kế lại, **chỉ đưa vào các hình ảnh của 4 phân hệ trọng tâm**:
+      1. **TỔNG QUAN**:
+         - Sơ đồ kiến trúc VOA hệ sinh thái CEO HN10 (`slide_assets/voa_ceohn10.png`).
+         - Bàn điều hành & Dashboard Quản trị trung tâm CRM (`slide_assets/overview_dashboard.png`).
+      2. **SỰ KIỆN**:
+         - Màn hình Quản lý sự kiện, danh sách 4 sự kiện cố định thường niên và check-in vé QR (`slide_assets/events_management.png`).
+      3. **LỚP HỌC**:
+         - Màn hình Quản lý lớp học, thiết lập buổi học và hệ thống mã QR điểm danh lớn cho lớp học (`slide_assets/trainings_classes.png`).
+      4. **TÀI CHÍNH**:
+         - Màn hình Quản lý Thu, Quản lý Chi và Sổ Quỹ Hội 2.1 Tỷ VNĐ minh bạch (`slide_assets/crm_income.jpg` & `slide_assets/crm_expenses.jpg`).
+    * Đã loại bỏ hoàn toàn các hình ảnh công việc và sơ đồ không liên quan.
+    * Đã đồng bộ xuất đầy đủ 3 định dạng:
+      - Web HTML: `document/SLIDE_TRINH_BAY_PHAN_MEM_CEOHN10.html`
+      - PDF chất lượng cao (A4 Landscape): `document/SLIDE_TRINH_BAY_PHAN_MEM_CEOHN10.pdf` (~4.9 MB)
+      - PowerPoint (.pptx): `document/SLIDE_TRINH_BAY_PHAN_MEM_CEOHN10.pptx` (~5.2 MB)
+  - **3. Tuân Thủ Nghiêm Ngặt Quy Chuẩn**:
+    * CSDL chuẩn duy nhất: `113.20.107.184:6432` (`ceohn10_project`).
+    * Tuyệt đối không tự ý chạy `git commit` hay `git push`.
 
 - **Bản cập nhật ngày 17/11/2026 (v12.14): Tái Cấu Trúc Toàn Diện Sidebar Web CRM 9 Nhóm Chức Năng, Luồng Tạo Sự Kiện Thiện Nguyện Ban Thiện Nguyện, Báo Cáo Tài Chính Đa Định Dạng (Word/Excel/PDF), Quỹ Tài Trợ CSR & Chuyển Đổi Lịch Học Kèm Điểm Danh Mã QR Realtime Trên Mobile App ([NODE-CRM-001], [NODE-CRM-002], [NODE-CRM-005], [NODE-CRM-006], [NODE-CRM-018], [NODE-APP-003], [NODE-APP-008])**:
   - **1. Tái Cấu Trúc Toàn Diện Sidebar Web CRM Theo 9 Nhóm Chuẩn (`Sidebar.tsx`)**:
@@ -4881,6 +4937,34 @@
      - Tuân thủ nghiêm ngặt STRICT RULE 1: Tuyệt đối không tự động chạy `git push` hay `git commit`.
 
 # System Memory & Architecture
+
+- **Bản cập nhật ngày 17/11/2026 (v12.16): Triệt Tiêu Lỗi TypeScript Gates CI/CD GitHub Actions & Tối Ưu Hóa Bộ Slide Trình Chiếu CEO HN10 Chỉ Bao Gồm 4 Phân Hệ Trọng Tâm (Tổng Quan, Sự Kiện, Lớp Học, Tài Chính) ([NODE-CRM-001], [NODE-CRM-002], [NODE-CRM-005], [NODE-CORE-001])**:
+  - **1. Triệt Tiêu Lỗi TypeScript TS2741 Khiến GitHub Actions Bị Đỏ (Exit Code 1 tại 1m 48s)**:
+    * **Nguyên nhân cốt lõi**: Trong commit trước, khi thêm phân loại sự kiện `charity` (thiện nguyện) vào `EventItem["type"]`, tệp `apps/ceohn10_app_fe/src/routes/events.$eventId.tsx` (dòng 114 & 120) chưa bổ sung ánh xạ `charity` cho `TYPE_KEY` và `TYPE_COVER`.
+    * Khi bước `quality-check` của GitHub Actions chạy `npx tsc --noEmit` trên runner ubuntu-latest, trình biên dịch bắt lỗi `error TS2741: Property 'charity' is missing in type ... but required in type 'Record<"charity" | ...>'` dẫn đến pipeline bị ngắt sau 1m 48s.
+    * **Giải pháp dứt điểm**:
+      - Bổ sung `charity: "events.type.charity" as TKey` vào `TYPE_KEY` trong `events.$eventId.tsx`.
+      - Bổ sung `charity: "linear-gradient(135deg, #0D9488, #047857)"` vào `TYPE_COVER` trong `events.$eventId.tsx`.
+      - Đã kiểm tra lại `npx tsc --noEmit` ở cả `apps/ceohn10_app_fe` và `apps/ceohn10_app_be`: **Cả hai đều vượt qua với exit code 0 (0 errors)**.
+  - **2. Tái Cấu Trúc Bộ Slide Trình Chiếu CEO HN10 Theo Yêu Cầu Tối Giản**:
+    * Theo yêu cầu của người dùng, toàn bộ tài liệu trình chiếu được thiết kế lại, **chỉ đưa vào các hình ảnh của 4 phân hệ trọng tâm**:
+      1. **TỔNG QUAN**:
+         - Sơ đồ kiến trúc VOA hệ sinh thái CEO HN10 (`slide_assets/voa_ceohn10.png`).
+         - Bàn điều hành & Dashboard Quản trị trung tâm CRM (`slide_assets/overview_dashboard.png`).
+      2. **SỰ KIỆN**:
+         - Màn hình Quản lý sự kiện, danh sách 4 sự kiện cố định thường niên và check-in vé QR (`slide_assets/events_management.png`).
+      3. **LỚP HỌC**:
+         - Màn hình Quản lý lớp học, thiết lập buổi học và hệ thống mã QR điểm danh lớn cho lớp học (`slide_assets/trainings_classes.png`).
+      4. **TÀI CHÍNH**:
+         - Màn hình Quản lý Thu, Quản lý Chi và Sổ Quỹ Hội 2.1 Tỷ VNĐ minh bạch (`slide_assets/crm_income.jpg` & `slide_assets/crm_expenses.jpg`).
+    * Đã loại bỏ hoàn toàn các hình ảnh công việc và sơ đồ không liên quan.
+    * Đã đồng bộ xuất đầy đủ 3 định dạng:
+      - Web HTML: `document/SLIDE_TRINH_BAY_PHAN_MEM_CEOHN10.html`
+      - PDF chất lượng cao (A4 Landscape): `document/SLIDE_TRINH_BAY_PHAN_MEM_CEOHN10.pdf` (~4.9 MB)
+      - PowerPoint (.pptx): `document/SLIDE_TRINH_BAY_PHAN_MEM_CEOHN10.pptx` (~5.2 MB)
+  - **3. Tuân Thủ Nghiêm Ngặt Quy Chuẩn**:
+    * CSDL chuẩn duy nhất: `113.20.107.184:6432` (`ceohn10_project`).
+    * Tuyệt đối không tự ý chạy `git commit` hay `git push`.
 
 - **Bản cập nhật ngày 17/11/2026 (v12.14): Tái Cấu Trúc Toàn Diện Sidebar Web CRM 9 Nhóm Chức Năng, Luồng Tạo Sự Kiện Thiện Nguyện Ban Thiện Nguyện, Báo Cáo Tài Chính Đa Định Dạng (Word/Excel/PDF), Quỹ Tài Trợ CSR & Chuyển Đổi Lịch Học Kèm Điểm Danh Mã QR Realtime Trên Mobile App ([NODE-CRM-001], [NODE-CRM-002], [NODE-CRM-005], [NODE-CRM-006], [NODE-CRM-018], [NODE-APP-003], [NODE-APP-008])**:
   - **1. Tái Cấu Trúc Toàn Diện Sidebar Web CRM Theo 9 Nhóm Chuẩn (`Sidebar.tsx`)**:
