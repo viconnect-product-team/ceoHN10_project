@@ -97,22 +97,24 @@ const TYPE_COVER: Record<EventItem["type"], string> = {
 
 export const EVENT_DEPARTMENTS = [
   { value: "all", label: "Tất cả các Ban", color: "bg-slate-100 text-slate-700 border-slate-200" },
-  { value: "ban_thien_nguyen", label: "Ban Thiện Nguyện & Đời Sống", color: "bg-teal-50 text-teal-700 border-teal-200" },
-  { value: "ban_su_kien", label: "Ban Sự Kiện & Hậu Cần", color: "bg-rose-50 text-rose-700 border-rose-200" },
-  { value: "ban_dao_tao", label: "Ban Đào Tạo & Phát Triển", color: "bg-blue-50 text-blue-700 border-blue-200" },
-  { value: "ban_b2b", label: "Ban B2B & Giao Thương", color: "bg-amber-50 text-amber-700 border-amber-200" },
-  { value: "ban_truyen_thong", label: "Ban Truyền Thông", color: "bg-orange-50 text-orange-700 border-orange-200" },
-  { value: "ban_dieu_hanh", label: "Ban Điều Hành", color: "bg-indigo-50 text-indigo-700 border-indigo-200" },
+  { value: "ban_hoc_tap", label: "Ban Học tập", color: "bg-blue-50 text-blue-700 border-blue-200" },
+  { value: "ban_su_kien", label: "Ban Sự kiện & Hậu cần", color: "bg-purple-50 text-purple-700 border-purple-200" },
+  { value: "ban_tai_chinh", label: "Ban Tài chính & Tài trợ", color: "bg-yellow-50 text-yellow-700 border-yellow-200" },
+  { value: "ban_truyen_thong", label: "Ban Truyền thông", color: "bg-rose-50 text-rose-700 border-rose-200" },
+  { value: "ban_cong_nghe", label: "Ban Công nghệ", color: "bg-indigo-50 text-indigo-700 border-indigo-200" },
+  { value: "ban_doi_ngoai", label: "Ban Đối ngoại & Giao thương", color: "bg-emerald-50 text-emerald-700 border-emerald-200" },
+  { value: "ban_doi_song", label: "Ban Đời sống & Gắn kết thành viên", color: "bg-amber-50 text-amber-700 border-amber-200" },
   { value: "chung", label: "Sự Kiện Chung Toàn CLB", color: "bg-sky-50 text-sky-700 border-sky-200" },
 ];
 
 export const DEPARTMENT_LABELS: Record<string, { label: string; color: string }> = {
-  ban_thien_nguyen: { label: "Ban Thiện Nguyện & Đời Sống", color: "bg-teal-100 text-teal-800 dark:bg-teal-950/60 dark:text-teal-300 border-teal-200" },
-  ban_su_kien: { label: "Ban Sự Kiện & Hậu Cần", color: "bg-rose-100 text-rose-800 dark:bg-rose-950/60 dark:text-rose-300 border-rose-200" },
-  ban_dao_tao: { label: "Ban Đào Tạo", color: "bg-blue-100 text-blue-800 dark:bg-blue-950/60 dark:text-blue-300 border-blue-200" },
-  ban_b2b: { label: "Ban B2B & Giao Thương", color: "bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300 border-amber-200" },
-  ban_truyen_thong: { label: "Ban Truyền Thông", color: "bg-orange-100 text-orange-800 border-orange-200" },
-  ban_dieu_hanh: { label: "Ban Điều Hành", color: "bg-indigo-100 text-indigo-800 dark:bg-indigo-950/60 dark:text-indigo-300 border-indigo-200" },
+  ban_hoc_tap: { label: "Ban Học tập", color: "bg-blue-100 text-blue-800 border-blue-200" },
+  ban_su_kien: { label: "Ban Sự kiện & Hậu cần", color: "bg-purple-100 text-purple-800 border-purple-200" },
+  ban_tai_chinh: { label: "Ban Tài chính & Tài trợ", color: "bg-yellow-100 text-yellow-800 border-yellow-200" },
+  ban_truyen_thong: { label: "Ban Truyền thông", color: "bg-rose-100 text-rose-800 border-rose-200" },
+  ban_cong_nghe: { label: "Ban Công nghệ", color: "bg-indigo-100 text-indigo-800 border-indigo-200" },
+  ban_doi_ngoai: { label: "Ban Đối ngoại & Giao thương", color: "bg-emerald-100 text-emerald-800 border-emerald-200" },
+  ban_doi_song: { label: "Ban Đời sống & Gắn kết thành viên", color: "bg-amber-100 text-amber-800 border-amber-200" },
   chung: { label: "Toàn CLB", color: "bg-sky-100 text-sky-800 dark:bg-sky-950/60 dark:text-sky-300 border-sky-200" },
 };
 

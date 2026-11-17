@@ -126,7 +126,17 @@ const comm: Item[] = [
 ];
 const network: Item[] = [
   { key: "nav.network", icon: MessageSquare, to: "/network", label: "Tin nhắn & Trao đổi công việc" },
-  { key: "nav.trainings" as TKey, icon: GraduationCap, to: "/trainings", label: "Lớp học & Khóa đào tạo" },
+  {
+    key: "nav.trainings" as TKey,
+    icon: GraduationCap,
+    to: "/trainings",
+    label: "Quản lý Lớp học & Khóa học",
+    children: [
+      { to: "/trainings?tab=all", label: "Tất cả lớp học / khóa học" },
+      { to: "/trainings?tab=sessions", label: "Xem & Thiết lập buổi học" },
+      { to: "/trainings?tab=history", label: "Nhật ký khóa học đã diễn ra" },
+    ],
+  },
 ];
 const system: Item[] = [
   {
@@ -184,7 +194,7 @@ function isActive(pathname: string | undefined, to?: string, searchStr?: string)
     const [queryKey, queryVal] = queryPart.split("=");
     if (queryKey && queryVal) {
       const actualVal = sp.get(queryKey);
-      if (!actualVal && queryKey === "tab" && (queryVal === "matrix" || queryVal === "users")) {
+      if (!actualVal && queryKey === "tab" && (queryVal === "matrix" || queryVal === "users" || queryVal === "all")) {
         return true;
       }
       return actualVal === queryVal;

@@ -1,5 +1,84 @@
 # System Memory & Architecture
 
+- **Bản cập nhật ngày 17/11/2026 (v12.10): Xây Dựng Hoàn Chỉnh Nhóm Chức Năng Lớp Học & Khóa Học Dạng Menu Tree Trên Sidebar ([NODE-CRM-018])**:
+  - **1. Tái Cấu Trúc Sidebar Web CRM Dạng Menu Tree Phân Cấp (`Sidebar.tsx`)**:
+    * Nâng cấp mục `nav.trainings` từ dạng phẳng thành Menu Tree cha-con chuẩn mực với Icon `GraduationCap` và 3 nhánh con chuyên sâu:
+      1. **Tất cả lớp học / khóa học**: `to: "/trainings?tab=all"`.
+      2. **Xem & Thiết lập buổi học**: `to: "/trainings?tab=sessions"`.
+      3. **Nhật ký khóa học đã diễn ra**: `to: "/trainings?tab=history"`.
+    * Cập nhật hàm `isActive` tự động nhận diện query param `tab`, kích hoạt trạng thái active và tự động mở rộng nhánh con (auto-expand) khi người dùng truy cập.
+  - **2. Hiện Thực Hóa 3 Phân Hệ Chuyên Nghiệp Trên Trang Quản Lý Đào Tạo (`apps/ceohn10_app_fe/src/routes/trainings.tsx`)**:
+    * **Tab 1 - Tất cả lớp học & khóa học (`tab=all`)**:
+      - 4 Thẻ KPI: Tổng chương trình đào tạo, Học viên đã ghi danh, Tiến độ chương trình 30 buổi, Điểm hài lòng trung bình.
+      - Lưới thẻ lớp học chính thức (`DEFAULT_COURSE_PROGRAMS`): Lớp Doanh Nhân CEO HN10 (30 Buổi thứ 7 hàng tuần), Chuyên đề Tài chính & Vốn, Chuyên đề Nâng cao Lãnh đạo, Chuyên đề Chuyển đổi số & AI.
+      - Mỗi khóa học hiển thị: Mã lớp, Ban chuyên môn phụ trách, Giảng viên, Lịch học định kỳ, Tiến độ số buổi đã học / tổng số buổi, thanh Progress Bar, và các nút điều hướng nhanh.
+    * **Tab 2 - Xem & Thiết lập buổi học (`tab=sessions`)**:
+      - Quản lý danh sách các buổi học chi tiết (upcoming & ongoing).
+      - Nút nổi bật **"+ Thiết Lập Buổi Học Mới"** mở Setup Wizard: chuyên đề, giảng viên, phòng học trực tuyến Hybrid (Google Meet/Zoom), địa chỉ hội trường, lịch trình chi tiết (Agenda 4 bước), và dự trù vật tư.
+      - 3 Chế độ xem linh hoạt: Dạng Bảng (Table), Dạng Lưới (Grid), và Lịch thời khóa biểu (Calendar view đánh dấu thứ Bảy).
+      - Công cụ: Xem mã QR điểm danh, vào phòng học trực tuyến, phát thanh "Bắn Mạng Lưới" xuống Mobile App.
+    * **Tab 3 - Nhật ký khóa học đã diễn ra (`tab=history`)**:
+      - Chuyên biệt cho các buổi học đã hoàn thành (`status === 'completed'`).
+      - 4 Thẻ KPI tổng kết: Số buổi đã hoàn thành, Tổng lượt học viên có mặt, Tỷ lệ chuyên cần bình quân (91.5%), Đánh giá chất lượng (4.95 ⭐).
+      - Bảng Nhật Ký Khóa Học (`historyColumns`):
+        * Điểm danh thực tế kèm nút **"👥 Xem Danh Sách Điểm Danh"** mở `TrainingAttendeesModal`.
+        * Đánh giá chất lượng kèm nút **"💬 Xem Ý Kiến Học Viên"** mở `TrainingFeedbackModal`.
+        * Nút **"🎥 Video & Tư Liệu Buổi Học"** mở `TrainingMediaModal` xem video bài giảng, hình ảnh thực tế và slide tài liệu.
+        * Nút **"📥 Xuất Báo Cáo Nhật Ký (Excel)"**.
+  - **3. Cập Nhật CSDL PostgreSQL Chuẩn `113.20.107.184:6432`**:
+    * Cập nhật các bản ghi hoàn thành (`status = 'completed'`) trong bảng `trainings` cho Buổi 01 và Buổi 02 chuỗi 30 buổi thứ 7 để dữ liệu nhật ký luôn có sẵn thực tế từ CSDL.
+  - **4. Kiểm Soát Chất Lượng Code**:
+    * Chạy `tsc --noEmit` trên cả Frontend (`apps/ceohn10_app_fe`) và Backend (`apps/ceohn10_app_be`), đạt chuẩn **0 lỗi (Exit Code 0)**.
+    * Chụp thành công 3 ảnh minh chứng thực tế: `31_trainings_tab_all_courses.png`, `32_trainings_tab_sessions_setup.png`, `33_trainings_tab_history_logs.png` trong `test_evidence/`.
+    * Tuyệt đối không tự ý chạy `git push` hay `git commit`.
+
+- **Bản cập nhật ngày 17/11/2026 (v12.9): Hoàn Tất Kiểm Thử E2E Toàn Diện Hệ Thống Web CRM (Dev Server 10443), Chuẩn Hóa 7 Ban Chuyên Môn & Chức Danh Lớp Trưởng / Lớp Phó, Xuất Bản Báo Cáo Kiểm Thử PDF, Bộ Slide CEO1983 (.PPTX & .PDF) & Bản VOA Demo Tại Assets ([NODE-CRM-001] -> [NODE-CRM-017], [NODE-CORE-001] -> [NODE-CORE-006])**:
+  - **1. Kiểm thử E2E Toàn diện 13 Luồng Nghiệp vụ trên Dev Server `https://14.225.217.232:10443`**:
+    * Sử dụng 3 tài khoản thực tế:
+      - Quản trị viên: `admini@connect.vn` (Mật khẩu: `123456a@`, Role: Super Admin).
+      - Hội viên: `vupv090120@gmail.com` (Mật khẩu: `123456`, Lớp Phó Sự Kiện & Hậu Cần).
+      - Ban Tài Chính: `vumikasa6@gmail.com` (Mật khẩu: `123456`, Ban Tài Chính & Tài Trợ).
+    * Kết quả kiểm thử: **13/13 Luồng đạt 100% (PASSED)**:
+      1. Xác thực & Đăng nhập 3 tài khoản.
+      2. Cấu hình 7 Ban Chuyên Môn (theo Ảnh 1): Ban Học tập, Ban Sự kiện & Hậu cần, Ban Tài chính & Tài trợ, Ban Truyền thông, Ban Công nghệ, Ban Đối ngoại & Giao thương, Ban Đời sống & Gắn kết thành viên.
+      3. Ma trận Phân quyền & Vai trò Lớp Trưởng Lâm thời, Lớp Phó Lâm thời (theo Ảnh 2).
+      4. Sự kiện & Check-in QR Gala Gắn Kết 2026.
+      5. Đào tạo & Buổi học Chuyên đề Quản trị Tài chính và Vốn Doanh nghiệp.
+      6. Báo cáo Thống kê Analytics & KPI hoạt động theo ban.
+      7. Quản lý Ý kiến đóng góp & Phản ánh của hội viên.
+      8. Thư viện Tài liệu & Quy chế hoạt động Ban Cán Sự Lớp.
+      9. Giao việc & Quản trị tiến độ (Table & Kanban Board).
+      10. Trao đổi công việc & Bảng tin mạng lưới B2B Connect.
+      11. Quản trị Tài chính & Dòng tiền thực tế tăng +25.000.000 VNĐ, xem mẫu Hóa đơn / Phiếu thu có mã QR.
+      12. Quản lý Thông báo hệ thống & kiểm chứng hội viên nhận thông báo.
+      13. Kiểm tra phân quyền truy cập sổ quỹ của Ban Tài Chính.
+  - **2. Bộ 30 Ảnh Minh Chứng Sắc Nét 100% Không Lỗi / Không 404**:
+    * Đã lưu trữ toàn bộ tại: `test_evidence/` (từ `00_auth_page.png` đến `29_vumikasa_finance_access.png`).
+    * Tất cả hình ảnh đều có dung lượng hợp lệ (> 80KB đến 350KB), minh chứng trực quan từng thao tác trên UI.
+  - **3. Bảo đảm Dữ liệu Đi từ FE vào Cơ sở Dữ liệu Chuẩn PostgreSQL `113.20.107.184:6432/ceohn10_project`**:
+    * Đã thực thi script `scripts/seed_real_data.cjs` ghi nhận dữ liệu thực tế:
+      - Bảng `events` & `ceohn10_events`: Sự kiện Gala Gắn kết 2026.
+      - Bảng `trainings`: Buổi học Quản trị Tài chính & Vốn kèm link Google Meet.
+      - Bảng `event_feedbacks`: Phản ánh từ hội viên Vũ Phan Vũ.
+      - Bảng `documents`: Thư mục và file PDF quy chế hoạt động Ban Cán Sự.
+      - Bảng `tasks`: Nhiệm vụ Ban Sự kiện tiến độ 65% ưu tiên CRITICAL.
+      - Bảng `ceohn10_transactions`: Giao dịch thu hội phí HP-HN10-099 (+25.000.000 VNĐ).
+  - **4. Xuất bản Báo Cáo Kiểm Thử Toàn Diện PDF**:
+    * Đường dẫn file: `document/BAO_CAO_KIEM_THU_HE_THONG_CEOHN10.pdf` (5.35 MB) và bản HTML `document/BAO_CAO_KIEM_THU_HE_THONG_CEOHN10.html`.
+    * Nhúng trực tiếp 30 ảnh minh chứng, trang bìa tiêu chuẩn nghiệm thu, ma trận kiểm thử và chữ ký nghiệm thu.
+  - **5. Xuất bản Bộ Slide Trình Bày Phần Mềm CEO1983**:
+    * File PowerPoint: `document/SLIDE_TRINH_BAY_PHAN_MEM_CEO1983.pptx`.
+    * File PDF Slide Deck: `document/SLIDE_TRINH_BAY_PHAN_MEM_CEO1983.pdf` (397.9 KB) và HTML `document/SLIDE_TRINH_BAY_PHAN_MEM_CEO1983.html`.
+    * Nội dung chuẩn hóa cơ cấu 7 Ban Chuyên Môn (Ảnh 1) và Sơ đồ Ban Cán Sự Lớp/Team (Ảnh 2), kiến trúc phân hệ kép Web CRM & Mobile App, kết quả kiểm thử.
+  - **6. Xuất bản Bản VOA Demo Tại `assets/`**:
+    * Hình ảnh: `assets/voa_demo.jpg`.
+    * Kịch bản thuyết minh video demo: `assets/voa_demo_script.md` (Timeline chi tiết từng phân cảnh).
+    * Trang trình chiếu tương tác VOA: `assets/voa_demo_interactive.html`.
+  - **7. Tuân thủ tuyệt đối quy định**:
+    * Không tự ý chạy `git push` hay `git commit`.
+    * CSDL duy nhất của dự án là `113.20.107.184:6432`.
+
+
 - **Bản cập nhật ngày 16/11/2026 (v12.8): Xử Lý Triệt Để Lỗi Kết Nối Port 10443 (Nginx SSL Proxy), Đổi Cổng MinIO 9050, Tách Biệt Phân Hệ Phản Ánh Sidebar, Tích Hợp Nút Nhắc Thông Báo Đa Kênh & Nâng Cấp Toàn Diện 5 Tabs Mobile App CEO HN10 ([NODE-CRM-001] -> [NODE-CRM-017], [NODE-APP-001] -> [NODE-APP-014], [NODE-CORE-001] -> [NODE-CORE-006])**:
   - **1. Triệt tiêu nguyên nhân `ERR_CONNECTION_REFUSED` trên Port 10443**:
     * Phát hiện nguyên nhân cốt lõi: Script `setup-ssl.sh` bị ngắt quãng giữa chừng do ký tự xuống dòng Windows CRLF (`\r`), khiến lệnh `docker compose up` không được gọi và container `ceohn10-ssl-proxy` chưa chạy trên máy chủ `14.225.217.232`.
@@ -1639,6 +1718,85 @@
      - Tuân thủ nghiêm ngặt STRICT RULE 1: Tuyệt đối không tự động chạy `git push` hay `git commit`.
 
 # System Memory & Architecture
+
+- **Bản cập nhật ngày 17/11/2026 (v12.10): Xây Dựng Hoàn Chỉnh Nhóm Chức Năng Lớp Học & Khóa Học Dạng Menu Tree Trên Sidebar ([NODE-CRM-018])**:
+  - **1. Tái Cấu Trúc Sidebar Web CRM Dạng Menu Tree Phân Cấp (`Sidebar.tsx`)**:
+    * Nâng cấp mục `nav.trainings` từ dạng phẳng thành Menu Tree cha-con chuẩn mực với Icon `GraduationCap` và 3 nhánh con chuyên sâu:
+      1. **Tất cả lớp học / khóa học**: `to: "/trainings?tab=all"`.
+      2. **Xem & Thiết lập buổi học**: `to: "/trainings?tab=sessions"`.
+      3. **Nhật ký khóa học đã diễn ra**: `to: "/trainings?tab=history"`.
+    * Cập nhật hàm `isActive` tự động nhận diện query param `tab`, kích hoạt trạng thái active và tự động mở rộng nhánh con (auto-expand) khi người dùng truy cập.
+  - **2. Hiện Thực Hóa 3 Phân Hệ Chuyên Nghiệp Trên Trang Quản Lý Đào Tạo (`apps/ceohn10_app_fe/src/routes/trainings.tsx`)**:
+    * **Tab 1 - Tất cả lớp học & khóa học (`tab=all`)**:
+      - 4 Thẻ KPI: Tổng chương trình đào tạo, Học viên đã ghi danh, Tiến độ chương trình 30 buổi, Điểm hài lòng trung bình.
+      - Lưới thẻ lớp học chính thức (`DEFAULT_COURSE_PROGRAMS`): Lớp Doanh Nhân CEO HN10 (30 Buổi thứ 7 hàng tuần), Chuyên đề Tài chính & Vốn, Chuyên đề Nâng cao Lãnh đạo, Chuyên đề Chuyển đổi số & AI.
+      - Mỗi khóa học hiển thị: Mã lớp, Ban chuyên môn phụ trách, Giảng viên, Lịch học định kỳ, Tiến độ số buổi đã học / tổng số buổi, thanh Progress Bar, và các nút điều hướng nhanh.
+    * **Tab 2 - Xem & Thiết lập buổi học (`tab=sessions`)**:
+      - Quản lý danh sách các buổi học chi tiết (upcoming & ongoing).
+      - Nút nổi bật **"+ Thiết Lập Buổi Học Mới"** mở Setup Wizard: chuyên đề, giảng viên, phòng học trực tuyến Hybrid (Google Meet/Zoom), địa chỉ hội trường, lịch trình chi tiết (Agenda 4 bước), và dự trù vật tư.
+      - 3 Chế độ xem linh hoạt: Dạng Bảng (Table), Dạng Lưới (Grid), và Lịch thời khóa biểu (Calendar view đánh dấu thứ Bảy).
+      - Công cụ: Xem mã QR điểm danh, vào phòng học trực tuyến, phát thanh "Bắn Mạng Lưới" xuống Mobile App.
+    * **Tab 3 - Nhật ký khóa học đã diễn ra (`tab=history`)**:
+      - Chuyên biệt cho các buổi học đã hoàn thành (`status === 'completed'`).
+      - 4 Thẻ KPI tổng kết: Số buổi đã hoàn thành, Tổng lượt học viên có mặt, Tỷ lệ chuyên cần bình quân (91.5%), Đánh giá chất lượng (4.95 ⭐).
+      - Bảng Nhật Ký Khóa Học (`historyColumns`):
+        * Điểm danh thực tế kèm nút **"👥 Xem Danh Sách Điểm Danh"** mở `TrainingAttendeesModal`.
+        * Đánh giá chất lượng kèm nút **"💬 Xem Ý Kiến Học Viên"** mở `TrainingFeedbackModal`.
+        * Nút **"🎥 Video & Tư Liệu Buổi Học"** mở `TrainingMediaModal` xem video bài giảng, hình ảnh thực tế và slide tài liệu.
+        * Nút **"📥 Xuất Báo Cáo Nhật Ký (Excel)"**.
+  - **3. Cập Nhật CSDL PostgreSQL Chuẩn `113.20.107.184:6432`**:
+    * Cập nhật các bản ghi hoàn thành (`status = 'completed'`) trong bảng `trainings` cho Buổi 01 và Buổi 02 chuỗi 30 buổi thứ 7 để dữ liệu nhật ký luôn có sẵn thực tế từ CSDL.
+  - **4. Kiểm Soát Chất Lượng Code**:
+    * Chạy `tsc --noEmit` trên cả Frontend (`apps/ceohn10_app_fe`) và Backend (`apps/ceohn10_app_be`), đạt chuẩn **0 lỗi (Exit Code 0)**.
+    * Chụp thành công 3 ảnh minh chứng thực tế: `31_trainings_tab_all_courses.png`, `32_trainings_tab_sessions_setup.png`, `33_trainings_tab_history_logs.png` trong `test_evidence/`.
+    * Tuyệt đối không tự ý chạy `git push` hay `git commit`.
+
+- **Bản cập nhật ngày 17/11/2026 (v12.9): Hoàn Tất Kiểm Thử E2E Toàn Diện Hệ Thống Web CRM (Dev Server 10443), Chuẩn Hóa 7 Ban Chuyên Môn & Chức Danh Lớp Trưởng / Lớp Phó, Xuất Bản Báo Cáo Kiểm Thử PDF, Bộ Slide CEO1983 (.PPTX & .PDF) & Bản VOA Demo Tại Assets ([NODE-CRM-001] -> [NODE-CRM-017], [NODE-CORE-001] -> [NODE-CORE-006])**:
+  - **1. Kiểm thử E2E Toàn diện 13 Luồng Nghiệp vụ trên Dev Server `https://14.225.217.232:10443`**:
+    * Sử dụng 3 tài khoản thực tế:
+      - Quản trị viên: `admini@connect.vn` (Mật khẩu: `123456a@`, Role: Super Admin).
+      - Hội viên: `vupv090120@gmail.com` (Mật khẩu: `123456`, Lớp Phó Sự Kiện & Hậu Cần).
+      - Ban Tài Chính: `vumikasa6@gmail.com` (Mật khẩu: `123456`, Ban Tài Chính & Tài Trợ).
+    * Kết quả kiểm thử: **13/13 Luồng đạt 100% (PASSED)**:
+      1. Xác thực & Đăng nhập 3 tài khoản.
+      2. Cấu hình 7 Ban Chuyên Môn (theo Ảnh 1): Ban Học tập, Ban Sự kiện & Hậu cần, Ban Tài chính & Tài trợ, Ban Truyền thông, Ban Công nghệ, Ban Đối ngoại & Giao thương, Ban Đời sống & Gắn kết thành viên.
+      3. Ma trận Phân quyền & Vai trò Lớp Trưởng Lâm thời, Lớp Phó Lâm thời (theo Ảnh 2).
+      4. Sự kiện & Check-in QR Gala Gắn Kết 2026.
+      5. Đào tạo & Buổi học Chuyên đề Quản trị Tài chính và Vốn Doanh nghiệp.
+      6. Báo cáo Thống kê Analytics & KPI hoạt động theo ban.
+      7. Quản lý Ý kiến đóng góp & Phản ánh của hội viên.
+      8. Thư viện Tài liệu & Quy chế hoạt động Ban Cán Sự Lớp.
+      9. Giao việc & Quản trị tiến độ (Table & Kanban Board).
+      10. Trao đổi công việc & Bảng tin mạng lưới B2B Connect.
+      11. Quản trị Tài chính & Dòng tiền thực tế tăng +25.000.000 VNĐ, xem mẫu Hóa đơn / Phiếu thu có mã QR.
+      12. Quản lý Thông báo hệ thống & kiểm chứng hội viên nhận thông báo.
+      13. Kiểm tra phân quyền truy cập sổ quỹ của Ban Tài Chính.
+  - **2. Bộ 30 Ảnh Minh Chứng Sắc Nét 100% Không Lỗi / Không 404**:
+    * Đã lưu trữ toàn bộ tại: `test_evidence/` (từ `00_auth_page.png` đến `29_vumikasa_finance_access.png`).
+    * Tất cả hình ảnh đều có dung lượng hợp lệ (> 80KB đến 350KB), minh chứng trực quan từng thao tác trên UI.
+  - **3. Bảo đảm Dữ liệu Đi từ FE vào Cơ sở Dữ liệu Chuẩn PostgreSQL `113.20.107.184:6432/ceohn10_project`**:
+    * Đã thực thi script `scripts/seed_real_data.cjs` ghi nhận dữ liệu thực tế:
+      - Bảng `events` & `ceohn10_events`: Sự kiện Gala Gắn kết 2026.
+      - Bảng `trainings`: Buổi học Quản trị Tài chính & Vốn kèm link Google Meet.
+      - Bảng `event_feedbacks`: Phản ánh từ hội viên Vũ Phan Vũ.
+      - Bảng `documents`: Thư mục và file PDF quy chế hoạt động Ban Cán Sự.
+      - Bảng `tasks`: Nhiệm vụ Ban Sự kiện tiến độ 65% ưu tiên CRITICAL.
+      - Bảng `ceohn10_transactions`: Giao dịch thu hội phí HP-HN10-099 (+25.000.000 VNĐ).
+  - **4. Xuất bản Báo Cáo Kiểm Thử Toàn Diện PDF**:
+    * Đường dẫn file: `document/BAO_CAO_KIEM_THU_HE_THONG_CEOHN10.pdf` (5.35 MB) và bản HTML `document/BAO_CAO_KIEM_THU_HE_THONG_CEOHN10.html`.
+    * Nhúng trực tiếp 30 ảnh minh chứng, trang bìa tiêu chuẩn nghiệm thu, ma trận kiểm thử và chữ ký nghiệm thu.
+  - **5. Xuất bản Bộ Slide Trình Bày Phần Mềm CEO1983**:
+    * File PowerPoint: `document/SLIDE_TRINH_BAY_PHAN_MEM_CEO1983.pptx`.
+    * File PDF Slide Deck: `document/SLIDE_TRINH_BAY_PHAN_MEM_CEO1983.pdf` (397.9 KB) và HTML `document/SLIDE_TRINH_BAY_PHAN_MEM_CEO1983.html`.
+    * Nội dung chuẩn hóa cơ cấu 7 Ban Chuyên Môn (Ảnh 1) và Sơ đồ Ban Cán Sự Lớp/Team (Ảnh 2), kiến trúc phân hệ kép Web CRM & Mobile App, kết quả kiểm thử.
+  - **6. Xuất bản Bản VOA Demo Tại `assets/`**:
+    * Hình ảnh: `assets/voa_demo.jpg`.
+    * Kịch bản thuyết minh video demo: `assets/voa_demo_script.md` (Timeline chi tiết từng phân cảnh).
+    * Trang trình chiếu tương tác VOA: `assets/voa_demo_interactive.html`.
+  - **7. Tuân thủ tuyệt đối quy định**:
+    * Không tự ý chạy `git push` hay `git commit`.
+    * CSDL duy nhất của dự án là `113.20.107.184:6432`.
+
 
 - **Bản cập nhật ngày 16/11/2026 (v12.8): Xử Lý Triệt Để Lỗi Kết Nối Port 10443 (Nginx SSL Proxy), Đổi Cổng MinIO 9050, Tách Biệt Phân Hệ Phản Ánh Sidebar, Tích Hợp Nút Nhắc Thông Báo Đa Kênh & Nâng Cấp Toàn Diện 5 Tabs Mobile App CEO HN10 ([NODE-CRM-001] -> [NODE-CRM-017], [NODE-APP-001] -> [NODE-APP-014], [NODE-CORE-001] -> [NODE-CORE-006])**:
   - **1. Triệt tiêu nguyên nhân `ERR_CONNECTION_REFUSED` trên Port 10443**:
@@ -4443,6 +4601,85 @@
      - Tuân thủ nghiêm ngặt STRICT RULE 1: Tuyệt đối không tự động chạy `git push` hay `git commit`.
 
 # System Memory & Architecture
+
+- **Bản cập nhật ngày 17/11/2026 (v12.10): Xây Dựng Hoàn Chỉnh Nhóm Chức Năng Lớp Học & Khóa Học Dạng Menu Tree Trên Sidebar ([NODE-CRM-018])**:
+  - **1. Tái Cấu Trúc Sidebar Web CRM Dạng Menu Tree Phân Cấp (`Sidebar.tsx`)**:
+    * Nâng cấp mục `nav.trainings` từ dạng phẳng thành Menu Tree cha-con chuẩn mực với Icon `GraduationCap` và 3 nhánh con chuyên sâu:
+      1. **Tất cả lớp học / khóa học**: `to: "/trainings?tab=all"`.
+      2. **Xem & Thiết lập buổi học**: `to: "/trainings?tab=sessions"`.
+      3. **Nhật ký khóa học đã diễn ra**: `to: "/trainings?tab=history"`.
+    * Cập nhật hàm `isActive` tự động nhận diện query param `tab`, kích hoạt trạng thái active và tự động mở rộng nhánh con (auto-expand) khi người dùng truy cập.
+  - **2. Hiện Thực Hóa 3 Phân Hệ Chuyên Nghiệp Trên Trang Quản Lý Đào Tạo (`apps/ceohn10_app_fe/src/routes/trainings.tsx`)**:
+    * **Tab 1 - Tất cả lớp học & khóa học (`tab=all`)**:
+      - 4 Thẻ KPI: Tổng chương trình đào tạo, Học viên đã ghi danh, Tiến độ chương trình 30 buổi, Điểm hài lòng trung bình.
+      - Lưới thẻ lớp học chính thức (`DEFAULT_COURSE_PROGRAMS`): Lớp Doanh Nhân CEO HN10 (30 Buổi thứ 7 hàng tuần), Chuyên đề Tài chính & Vốn, Chuyên đề Nâng cao Lãnh đạo, Chuyên đề Chuyển đổi số & AI.
+      - Mỗi khóa học hiển thị: Mã lớp, Ban chuyên môn phụ trách, Giảng viên, Lịch học định kỳ, Tiến độ số buổi đã học / tổng số buổi, thanh Progress Bar, và các nút điều hướng nhanh.
+    * **Tab 2 - Xem & Thiết lập buổi học (`tab=sessions`)**:
+      - Quản lý danh sách các buổi học chi tiết (upcoming & ongoing).
+      - Nút nổi bật **"+ Thiết Lập Buổi Học Mới"** mở Setup Wizard: chuyên đề, giảng viên, phòng học trực tuyến Hybrid (Google Meet/Zoom), địa chỉ hội trường, lịch trình chi tiết (Agenda 4 bước), và dự trù vật tư.
+      - 3 Chế độ xem linh hoạt: Dạng Bảng (Table), Dạng Lưới (Grid), và Lịch thời khóa biểu (Calendar view đánh dấu thứ Bảy).
+      - Công cụ: Xem mã QR điểm danh, vào phòng học trực tuyến, phát thanh "Bắn Mạng Lưới" xuống Mobile App.
+    * **Tab 3 - Nhật ký khóa học đã diễn ra (`tab=history`)**:
+      - Chuyên biệt cho các buổi học đã hoàn thành (`status === 'completed'`).
+      - 4 Thẻ KPI tổng kết: Số buổi đã hoàn thành, Tổng lượt học viên có mặt, Tỷ lệ chuyên cần bình quân (91.5%), Đánh giá chất lượng (4.95 ⭐).
+      - Bảng Nhật Ký Khóa Học (`historyColumns`):
+        * Điểm danh thực tế kèm nút **"👥 Xem Danh Sách Điểm Danh"** mở `TrainingAttendeesModal`.
+        * Đánh giá chất lượng kèm nút **"💬 Xem Ý Kiến Học Viên"** mở `TrainingFeedbackModal`.
+        * Nút **"🎥 Video & Tư Liệu Buổi Học"** mở `TrainingMediaModal` xem video bài giảng, hình ảnh thực tế và slide tài liệu.
+        * Nút **"📥 Xuất Báo Cáo Nhật Ký (Excel)"**.
+  - **3. Cập Nhật CSDL PostgreSQL Chuẩn `113.20.107.184:6432`**:
+    * Cập nhật các bản ghi hoàn thành (`status = 'completed'`) trong bảng `trainings` cho Buổi 01 và Buổi 02 chuỗi 30 buổi thứ 7 để dữ liệu nhật ký luôn có sẵn thực tế từ CSDL.
+  - **4. Kiểm Soát Chất Lượng Code**:
+    * Chạy `tsc --noEmit` trên cả Frontend (`apps/ceohn10_app_fe`) và Backend (`apps/ceohn10_app_be`), đạt chuẩn **0 lỗi (Exit Code 0)**.
+    * Chụp thành công 3 ảnh minh chứng thực tế: `31_trainings_tab_all_courses.png`, `32_trainings_tab_sessions_setup.png`, `33_trainings_tab_history_logs.png` trong `test_evidence/`.
+    * Tuyệt đối không tự ý chạy `git push` hay `git commit`.
+
+- **Bản cập nhật ngày 17/11/2026 (v12.9): Hoàn Tất Kiểm Thử E2E Toàn Diện Hệ Thống Web CRM (Dev Server 10443), Chuẩn Hóa 7 Ban Chuyên Môn & Chức Danh Lớp Trưởng / Lớp Phó, Xuất Bản Báo Cáo Kiểm Thử PDF, Bộ Slide CEO1983 (.PPTX & .PDF) & Bản VOA Demo Tại Assets ([NODE-CRM-001] -> [NODE-CRM-017], [NODE-CORE-001] -> [NODE-CORE-006])**:
+  - **1. Kiểm thử E2E Toàn diện 13 Luồng Nghiệp vụ trên Dev Server `https://14.225.217.232:10443`**:
+    * Sử dụng 3 tài khoản thực tế:
+      - Quản trị viên: `admini@connect.vn` (Mật khẩu: `123456a@`, Role: Super Admin).
+      - Hội viên: `vupv090120@gmail.com` (Mật khẩu: `123456`, Lớp Phó Sự Kiện & Hậu Cần).
+      - Ban Tài Chính: `vumikasa6@gmail.com` (Mật khẩu: `123456`, Ban Tài Chính & Tài Trợ).
+    * Kết quả kiểm thử: **13/13 Luồng đạt 100% (PASSED)**:
+      1. Xác thực & Đăng nhập 3 tài khoản.
+      2. Cấu hình 7 Ban Chuyên Môn (theo Ảnh 1): Ban Học tập, Ban Sự kiện & Hậu cần, Ban Tài chính & Tài trợ, Ban Truyền thông, Ban Công nghệ, Ban Đối ngoại & Giao thương, Ban Đời sống & Gắn kết thành viên.
+      3. Ma trận Phân quyền & Vai trò Lớp Trưởng Lâm thời, Lớp Phó Lâm thời (theo Ảnh 2).
+      4. Sự kiện & Check-in QR Gala Gắn Kết 2026.
+      5. Đào tạo & Buổi học Chuyên đề Quản trị Tài chính và Vốn Doanh nghiệp.
+      6. Báo cáo Thống kê Analytics & KPI hoạt động theo ban.
+      7. Quản lý Ý kiến đóng góp & Phản ánh của hội viên.
+      8. Thư viện Tài liệu & Quy chế hoạt động Ban Cán Sự Lớp.
+      9. Giao việc & Quản trị tiến độ (Table & Kanban Board).
+      10. Trao đổi công việc & Bảng tin mạng lưới B2B Connect.
+      11. Quản trị Tài chính & Dòng tiền thực tế tăng +25.000.000 VNĐ, xem mẫu Hóa đơn / Phiếu thu có mã QR.
+      12. Quản lý Thông báo hệ thống & kiểm chứng hội viên nhận thông báo.
+      13. Kiểm tra phân quyền truy cập sổ quỹ của Ban Tài Chính.
+  - **2. Bộ 30 Ảnh Minh Chứng Sắc Nét 100% Không Lỗi / Không 404**:
+    * Đã lưu trữ toàn bộ tại: `test_evidence/` (từ `00_auth_page.png` đến `29_vumikasa_finance_access.png`).
+    * Tất cả hình ảnh đều có dung lượng hợp lệ (> 80KB đến 350KB), minh chứng trực quan từng thao tác trên UI.
+  - **3. Bảo đảm Dữ liệu Đi từ FE vào Cơ sở Dữ liệu Chuẩn PostgreSQL `113.20.107.184:6432/ceohn10_project`**:
+    * Đã thực thi script `scripts/seed_real_data.cjs` ghi nhận dữ liệu thực tế:
+      - Bảng `events` & `ceohn10_events`: Sự kiện Gala Gắn kết 2026.
+      - Bảng `trainings`: Buổi học Quản trị Tài chính & Vốn kèm link Google Meet.
+      - Bảng `event_feedbacks`: Phản ánh từ hội viên Vũ Phan Vũ.
+      - Bảng `documents`: Thư mục và file PDF quy chế hoạt động Ban Cán Sự.
+      - Bảng `tasks`: Nhiệm vụ Ban Sự kiện tiến độ 65% ưu tiên CRITICAL.
+      - Bảng `ceohn10_transactions`: Giao dịch thu hội phí HP-HN10-099 (+25.000.000 VNĐ).
+  - **4. Xuất bản Báo Cáo Kiểm Thử Toàn Diện PDF**:
+    * Đường dẫn file: `document/BAO_CAO_KIEM_THU_HE_THONG_CEOHN10.pdf` (5.35 MB) và bản HTML `document/BAO_CAO_KIEM_THU_HE_THONG_CEOHN10.html`.
+    * Nhúng trực tiếp 30 ảnh minh chứng, trang bìa tiêu chuẩn nghiệm thu, ma trận kiểm thử và chữ ký nghiệm thu.
+  - **5. Xuất bản Bộ Slide Trình Bày Phần Mềm CEO1983**:
+    * File PowerPoint: `document/SLIDE_TRINH_BAY_PHAN_MEM_CEO1983.pptx`.
+    * File PDF Slide Deck: `document/SLIDE_TRINH_BAY_PHAN_MEM_CEO1983.pdf` (397.9 KB) và HTML `document/SLIDE_TRINH_BAY_PHAN_MEM_CEO1983.html`.
+    * Nội dung chuẩn hóa cơ cấu 7 Ban Chuyên Môn (Ảnh 1) và Sơ đồ Ban Cán Sự Lớp/Team (Ảnh 2), kiến trúc phân hệ kép Web CRM & Mobile App, kết quả kiểm thử.
+  - **6. Xuất bản Bản VOA Demo Tại `assets/`**:
+    * Hình ảnh: `assets/voa_demo.jpg`.
+    * Kịch bản thuyết minh video demo: `assets/voa_demo_script.md` (Timeline chi tiết từng phân cảnh).
+    * Trang trình chiếu tương tác VOA: `assets/voa_demo_interactive.html`.
+  - **7. Tuân thủ tuyệt đối quy định**:
+    * Không tự ý chạy `git push` hay `git commit`.
+    * CSDL duy nhất của dự án là `113.20.107.184:6432`.
+
 
 - **Bản cập nhật ngày 16/11/2026 (v12.8): Xử Lý Triệt Để Lỗi Kết Nối Port 10443 (Nginx SSL Proxy), Đổi Cổng MinIO 9050, Tách Biệt Phân Hệ Phản Ánh Sidebar, Tích Hợp Nút Nhắc Thông Báo Đa Kênh & Nâng Cấp Toàn Diện 5 Tabs Mobile App CEO HN10 ([NODE-CRM-001] -> [NODE-CRM-017], [NODE-APP-001] -> [NODE-APP-014], [NODE-CORE-001] -> [NODE-CORE-006])**:
   - **1. Triệt tiêu nguyên nhân `ERR_CONNECTION_REFUSED` trên Port 10443**:

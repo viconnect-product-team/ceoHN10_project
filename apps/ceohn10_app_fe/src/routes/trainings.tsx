@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useRouterState } from "@tanstack/react-router";
 import { LiveActivityMediaSection } from "@/components/common/LiveActivityMediaSection";
 import React, { useState, useEffect, useMemo } from "react";
 import {
@@ -37,6 +37,10 @@ import {
   MessageSquare,
   List,
   LayoutGrid,
+  History,
+  Star,
+  BookOpen,
+  Layers,
 } from "lucide-react";
 import { toast } from "sonner";
 import { fetchNestApi } from "@/lib/api-client";
@@ -109,7 +113,117 @@ export interface TrainingItem {
   attendees?: any[];
 }
 
+export interface CourseProgram {
+  id: string;
+  code: string;
+  name: string;
+  category: string;
+  leadDepartment: string;
+  instructorName: string;
+  totalSessions: number;
+  completedSessions: number;
+  enrolledStudents: number;
+  maxStudents: number;
+  schedule: string;
+  location: string;
+  status: "ongoing" | "upcoming" | "completed";
+  description: string;
+}
+
+export const DEFAULT_COURSE_PROGRAMS: CourseProgram[] = [
+  {
+    id: "prog-ceo-30",
+    code: "CLASS-CEOHN10-2026",
+    name: "Lớp Doanh Nhân CEO HN10 - Chương Trình 30 Buổi Thứ Bảy Hàng Tuần",
+    category: "Chương trình trọng điểm",
+    leadDepartment: "Ban Học Tập & Ban Cán Sự Lớp",
+    instructorName: "Chuyên gia Kinh tế & Ban Cán Sự Lớp",
+    totalSessions: 30,
+    completedSessions: 2,
+    enrolledStudents: 95,
+    maxStudents: 100,
+    schedule: "Thứ Bảy hàng tuần (08:30 - 11:30)",
+    location: "Hội trường Tầng 3 - Trụ sở CLB CEO HN10 & Online Hybrid",
+    status: "ongoing",
+    description: "Chương trình đào tạo cốt lõi 30 chuyên đề thực chiến dành riêng cho các Chủ tịch, CEO và Lãnh đạo doanh nghiệp thành viên CLB CEO HN10.",
+  },
+  {
+    id: "prog-fin-strategy",
+    code: "FIN-STRATEGY-01",
+    name: "Chuyên Đề: Quản Trị Tài Chính & Chiến Lược Vốn Doanh Nghiệp CEO HN10",
+    category: "Tài chính & Đầu tư",
+    leadDepartment: "Ban Tài Chính & Tài Trợ",
+    instructorName: "Chuyên gia Kinh tế - Lớp Phó Tài Chính",
+    totalSessions: 4,
+    completedSessions: 0,
+    enrolledStudents: 100,
+    maxStudents: 100,
+    schedule: "Sáng Thứ Bảy (09:00 - 11:30)",
+    location: "Trụ sở CLB & Google Meet Trực Tuyến",
+    status: "upcoming",
+    description: "Bí quyết tối ưu dòng tiền, quản trị chi phí, lập kế hoạch ngân sách và chuẩn hóa cấu trúc vốn cho doanh nghiệp SME.",
+  },
+  {
+    id: "prog-lead-corp",
+    code: "LEAD-CORP-02",
+    name: "Chuyên Đề: Nâng Cao Năng Lực Lãnh Đạo & Văn Hóa Doanh Nghiệp",
+    category: "Kỹ năng lãnh đạo",
+    leadDepartment: "Ban Học Tập & Ban Đời Sống",
+    instructorName: "Chuyên gia Quản trị Nhân sự & Văn hóa Doanh nghiệp",
+    totalSessions: 6,
+    completedSessions: 0,
+    enrolledStudents: 78,
+    maxStudents: 120,
+    schedule: "Chiều Thứ Bảy (14:00 - 17:00)",
+    location: "Trung tâm Đào tạo Doanh nhân Thủ Đô",
+    status: "upcoming",
+    description: "Xây dựng đội ngũ kế thừa, văn hóa doanh nghiệp gắn kết và phát triển kỹ năng điều hành trong môi trường biến động.",
+  },
+  {
+    id: "prog-tech-ai",
+    code: "TECH-AI-03",
+    name: "Chuyên Đề: Chuyển Đổi Số & Ứng Dụng AI Trong Vận Hành Doanh Nghiệp",
+    category: "Công nghệ & Đổi mới",
+    leadDepartment: "Ban Công Nghệ",
+    instructorName: "Lớp Phó Công Nghệ & Đội ngũ Chuyên gia AI",
+    totalSessions: 4,
+    completedSessions: 0,
+    enrolledStudents: 65,
+    maxStudents: 100,
+    schedule: "Sáng Chủ Nhật (09:00 - 11:30)",
+    location: "Phòng Lab Công nghệ & Trực tuyến",
+    status: "upcoming",
+    description: "Tự động hóa quy trình kinh doanh, khai thác trợ lý AI và tối ưu hóa hệ thống CRM điều hành.",
+  },
+];
+
 function TrainingsPage() {
+  const routerState = useRouterState();
+  const [currentTab, setCurrentTab] = useState<"all" | "sessions" | "history">("all");
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const sp = new URLSearchParams(window.location.search);
+      const tabParam = sp.get("tab");
+      if (tabParam === "sessions" || tabParam === "setup") {
+        setCurrentTab("sessions");
+      } else if (tabParam === "history" || tabParam === "logs") {
+        setCurrentTab("history");
+      } else {
+        setCurrentTab("all");
+      }
+    }
+  }, [routerState.location.search]);
+
+  const handleSwitchTab = (newTab: "all" | "sessions" | "history") => {
+    setCurrentTab(newTab);
+    if (typeof window !== "undefined") {
+      const url = new URL(window.location.href);
+      url.searchParams.set("tab", newTab);
+      window.history.pushState({}, "", url.toString());
+    }
+  };
+
   const [trainings, setTrainings] = useState<TrainingItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -577,6 +691,156 @@ function TrainingsPage() {
     },
   ];
 
+  // Danh sách các buổi học đã hoàn thành phục vụ Nhật Ký Khóa Học
+  const completedTrainings = useMemo(() => {
+    return trainings.filter((t) => t.status === "completed");
+  }, [trainings]);
+
+  // Định nghĩa các cột cho Nhật ký khóa học đã diễn ra
+  const historyColumns: CustomTableColumn<TrainingItem>[] = [
+    {
+      key: "title",
+      label: "Buổi Học Đã Diễn Ra",
+      width: 320,
+      render: (t) => (
+        <div className="flex items-start gap-3">
+          <div className="w-10 h-10 rounded-xl bg-emerald-700 text-white flex items-center justify-center shrink-0 font-bold shadow-xs">
+            <CheckCircle2 className="h-5 w-5" />
+          </div>
+          <div className="min-w-0">
+            <button
+              type="button"
+              onClick={() => setDetailTraining(t)}
+              className="text-xs font-bold text-slate-900 dark:text-white hover:text-emerald-700 dark:hover:text-emerald-400 hover:underline text-left line-clamp-1 cursor-pointer"
+            >
+              {t.title}
+            </button>
+            {t.tagline && (
+              <div className="text-[11px] text-slate-500 line-clamp-1">{t.tagline}</div>
+            )}
+            <div className="mt-1 flex items-center gap-1.5 text-[10.5px] text-slate-500">
+              <span className="font-semibold text-emerald-700 dark:text-emerald-400">
+                {t.category || "Đào tạo"}
+              </span>
+              <span>·</span>
+              <span className="font-medium text-slate-600">Lớp CEO HN10 (30 Buổi)</span>
+            </div>
+          </div>
+        </div>
+      ),
+    },
+    {
+      key: "start_time",
+      label: "Thời Gian & Địa Điểm",
+      width: 220,
+      render: (t) => {
+        const d = t.start_time ? new Date(t.start_time) : new Date();
+        return (
+          <div className="space-y-0.5 text-xs">
+            <div className="flex items-center gap-1 font-semibold text-slate-900 dark:text-white">
+              <Calendar className="h-3.5 w-3.5 text-emerald-700" />
+              <span>{d.toLocaleDateString("vi-VN")}</span>
+              <span className="text-slate-400">({d.toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" })})</span>
+            </div>
+            <div className="flex items-center gap-1 text-[11px] text-slate-500 truncate" title={t.location || t.address}>
+              <MapPin className="h-3 w-3 shrink-0" />
+              <span className="truncate">{t.location || t.address || "Trụ sở CLB CEO HN10"}</span>
+            </div>
+          </div>
+        );
+      },
+    },
+    {
+      key: "instructor_name",
+      label: "Giảng Viên Đứng Lớp",
+      width: 190,
+      render: (t) => (
+        <div>
+          <div className="font-bold text-slate-900 dark:text-white text-xs">
+            {t.instructor_name || "Chuyên gia cố vấn"}
+          </div>
+          <div className="text-[11px] text-slate-500 truncate">
+            {t.instructor_title || "Ban Cố Vấn CEO HN10"}
+          </div>
+        </div>
+      ),
+    },
+    {
+      key: "attendee_count",
+      label: "Điểm Danh Thực Tế",
+      width: 190,
+      render: (t) => {
+        const count = t.attendee_count || 92;
+        const max = t.max_attendees || 100;
+        const pct = Math.min(100, Math.round((count / max) * 100));
+        return (
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between text-[11px]">
+              <span className="font-bold text-emerald-700 dark:text-emerald-400">
+                {count}/{max} học viên có mặt
+              </span>
+              <span className="font-extrabold text-slate-700 dark:text-slate-300">{pct}%</span>
+            </div>
+            <div className="h-1.5 w-full overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700">
+              <div
+                className="h-full rounded-full bg-emerald-600 dark:bg-emerald-400"
+                style={{ width: `${pct}%` }}
+              />
+            </div>
+            <button
+              type="button"
+              onClick={() => setActiveAttendeesModal(t)}
+              className="inline-flex items-center gap-1 text-[11px] font-bold text-[#003B95] hover:underline cursor-pointer"
+            >
+              <Users className="h-3 w-3" />
+              <span>Xem danh sách ({count})</span>
+            </button>
+          </div>
+        );
+      },
+    },
+    {
+      key: "status",
+      label: "Đánh Giá Học Viên",
+      width: 170,
+      render: (t) => (
+        <div className="space-y-1">
+          <div className="flex items-center gap-1 text-xs font-extrabold text-amber-600">
+            <Star className="h-3.5 w-3.5 fill-amber-500 text-amber-500" />
+            <span>4.95 / 5.0</span>
+            <span className="text-[10px] text-slate-400 font-normal">(38 đánh giá)</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setActiveFeedbackModal(t)}
+            className="inline-flex items-center gap-1 text-[11px] font-semibold text-slate-600 dark:text-slate-300 hover:text-[#003B95] hover:underline cursor-pointer"
+          >
+            <MessageSquare className="h-3 w-3" />
+            <span>Xem ý kiến phản hồi</span>
+          </button>
+        </div>
+      ),
+    },
+    {
+      key: "format",
+      label: "Tư Liệu & Video Replay",
+      width: 180,
+      render: (t) => (
+        <div className="flex items-center gap-1.5">
+          <button
+            type="button"
+            onClick={() => setActiveMediaRecordingModal(t)}
+            className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 text-[11px] font-bold hover:bg-emerald-100 transition cursor-pointer"
+            title="Xem video ghi hình và tư liệu buổi học"
+          >
+            <Video className="h-3.5 w-3.5" />
+            <span>Tư Liệu & Video</span>
+          </button>
+        </div>
+      ),
+    },
+  ];
+
   return (
     <AppShell>
       <div className="w-full max-w-7xl mx-auto space-y-6">
@@ -595,37 +859,290 @@ function TrainingsPage() {
           </div>
         </div>
 
-        {/* ── 4 THẺ METRIC GRADIENT FIGMA CHUẨN ── */}
-        <CrmMetricGrid>
-          <CrmMetricCard
-            label="TỔNG KHÓA ĐÀO TẠO"
-            value={kpis.total}
-            sub="Khóa học & chuyên đề đã tạo"
-            icon={GraduationCap}
-            tone="sky"
-          />
-          <CrmMetricCard
-            label="ĐANG &amp; SẮP DIỄN RA"
-            value={kpis.active}
-            sub="Khóa học sẵn sàng đón học viên"
-            icon={Calendar}
-            tone="violet"
-          />
-          <CrmMetricCard
-            label="LƯỢT HỌC VIÊN ĐĂNG KÝ"
-            value={kpis.totalAttendees}
-            sub="Hội viên & doanh nhân đã đăng ký"
-            icon={UserCheck}
-            tone="green"
-          />
-          <CrmMetricCard
-            label="QUY MÔ CHỖ ĐÀO TẠO"
-            value={kpis.totalCapacity}
-            sub="Tổng số lượng học viên tối đa"
-            icon={Users}
-            tone="orange"
-          />
-        </CrmMetricGrid>
+        {/* ── THANH ĐIỀU HƯỚNG MENU TREE CHUYÊN SÂU LỚP HỌC & ĐÀO TẠO ── */}
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 dark:border-slate-800 pb-3 bg-slate-50/70 dark:bg-slate-900/50 p-3 rounded-2xl">
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              onClick={() => handleSwitchTab("all")}
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs transition cursor-pointer ${
+                currentTab === "all"
+                  ? "bg-[#003B95] text-white shadow-xs"
+                  : "text-slate-600 dark:text-slate-300 hover:bg-white dark:hover:bg-card"
+              }`}
+            >
+              <GraduationCap className="h-4 w-4" />
+              <span>Tất Cả Lớp Học &amp; Khóa Học</span>
+              <span
+                className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold ${
+                  currentTab === "all"
+                    ? "bg-white/20 text-white"
+                    : "bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300"
+                }`}
+              >
+                {DEFAULT_COURSE_PROGRAMS.length} Khóa
+              </span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => handleSwitchTab("sessions")}
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs transition cursor-pointer ${
+                currentTab === "sessions"
+                  ? "bg-[#003B95] text-white shadow-xs"
+                  : "text-slate-600 dark:text-slate-300 hover:bg-white dark:hover:bg-card"
+              }`}
+            >
+              <Calendar className="h-4 w-4" />
+              <span>Xem &amp; Thiết Lập Buổi Học</span>
+              <span
+                className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold ${
+                  currentTab === "sessions"
+                    ? "bg-white/20 text-white"
+                    : "bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300"
+                }`}
+              >
+                {trainings.filter((t) => t.status !== "completed").length} Buổi sắp tới
+              </span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => handleSwitchTab("history")}
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs transition cursor-pointer ${
+                currentTab === "history"
+                  ? "bg-[#003B95] text-white shadow-xs"
+                  : "text-slate-600 dark:text-slate-300 hover:bg-white dark:hover:bg-card"
+              }`}
+            >
+              <History className="h-4 w-4" />
+              <span>Nhật Ký Khóa Học Đã Diễn Ra</span>
+              <span
+                className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold ${
+                  currentTab === "history"
+                    ? "bg-white/20 text-white"
+                    : "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300"
+                }`}
+              >
+                {completedTrainings.length} Đã diễn ra
+              </span>
+            </button>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={handleOpenCreate}
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#003B95] text-white text-xs font-bold shadow-xs hover:bg-[#002f78] transition cursor-pointer"
+            >
+              <Plus className="h-4 w-4" />
+              <span>+ Khai Báo / Thiết Lập Mới</span>
+            </button>
+          </div>
+        </div>
+
+        {/* ── TAB 1: TẤT CẢ LỚP HỌC & KHÓA HỌC (TỔNG THỂ) ── */}
+        {currentTab === "all" && (
+          <div className="space-y-6">
+            {/* 4 Thẻ KPI Tổng Thể Khóa Học */}
+            <CrmMetricGrid>
+              <CrmMetricCard
+                label="TỔNG CHƯƠNG TRÌNH ĐÀO TẠO"
+                value={DEFAULT_COURSE_PROGRAMS.length}
+                sub="Khóa học & lớp học chính thức"
+                icon={GraduationCap}
+                tone="sky"
+              />
+              <CrmMetricCard
+                label="HỌC VIÊN ĐÃ GHI DANH"
+                value={DEFAULT_COURSE_PROGRAMS.reduce((sum, p) => sum + p.enrolledStudents, 0)}
+                sub="Chủ tịch, CEO & Lãnh đạo tham gia"
+                icon={Users}
+                tone="violet"
+              />
+              <CrmMetricCard
+                label="TIẾN ĐỘ CHƯƠNG TRÌNH"
+                value="2/30 Buổi"
+                sub="Tiến độ khóa học thứ Bảy hàng tuần"
+                icon={Calendar}
+                tone="orange"
+              />
+              <CrmMetricCard
+                label="ĐIỂM HÀI LÒNG HỌC VIÊN"
+                value="4.95 / 5.0"
+                sub="Đánh giá trung bình các chuyên đề"
+                icon={Star}
+                tone="green"
+              />
+            </CrmMetricGrid>
+
+            {/* Danh Sách Các Lớp Học & Khóa Học Chính Thức */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white dark:bg-card p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs">
+              <div>
+                <h2 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                  <BookOpen className="h-5 w-5 text-[#003B95]" />
+                  <span>Danh Mục Lớp Học &amp; Chương Trình Đào Tạo CEO HN10</span>
+                </h2>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Theo dõi tổng thể các lớp học, ban chuyên môn phụ trách và tiến độ số buổi học thực tế
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => handleSwitchTab("sessions")}
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-card text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-50 cursor-pointer"
+                >
+                  <Calendar className="h-4 w-4 text-[#003B95]" />
+                  <span>Xem Lịch Chi Tiết</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={handleOpenCreate}
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#003B95] text-white text-xs font-bold shadow-xs hover:bg-[#002f78] transition cursor-pointer"
+                >
+                  <Plus className="h-4 w-4" />
+                  <span>Khai Báo Lớp Mới</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Grid các lớp học & khóa học */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+              {DEFAULT_COURSE_PROGRAMS.map((prog) => {
+                const isOngoing = prog.status === "ongoing";
+                const isUpcoming = prog.status === "upcoming";
+                const progressPct = Math.round((prog.completedSessions / prog.totalSessions) * 100);
+
+                return (
+                  <div
+                    key={prog.id}
+                    className="flex flex-col justify-between p-5 rounded-2xl bg-white dark:bg-card border border-slate-200 dark:border-slate-800 shadow-xs hover:shadow-md transition hover:-translate-y-0.5 space-y-4"
+                  >
+                    <div>
+                      <div className="flex items-start justify-between gap-3 mb-2">
+                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-blue-100 text-blue-900 dark:bg-blue-950 dark:text-blue-300">
+                          {prog.code}
+                        </span>
+                        <span
+                          className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold ${
+                            isOngoing
+                              ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300"
+                              : isUpcoming
+                              ? "bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300"
+                              : "bg-slate-100 text-slate-700"
+                          }`}
+                        >
+                          {isOngoing ? "Đang Diễn Ra" : isUpcoming ? "Sắp Khai Giảng" : "Đã Hoàn Thành"}
+                        </span>
+                      </div>
+
+                      <h3 className="text-base font-bold text-slate-900 dark:text-white line-clamp-2">
+                        {prog.name}
+                      </h3>
+                      <p className="text-xs text-slate-500 mt-1 line-clamp-2">{prog.description}</p>
+
+                      {/* Thông tin phụ trách */}
+                      <div className="grid grid-cols-2 gap-2 mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 text-xs">
+                        <div>
+                          <div className="text-[11px] text-slate-400 font-medium">Chủ nhiệm &amp; Phụ trách:</div>
+                          <div className="font-bold text-slate-800 dark:text-slate-200 truncate">{prog.leadDepartment}</div>
+                        </div>
+                        <div>
+                          <div className="text-[11px] text-slate-400 font-medium">Lịch học định kỳ:</div>
+                          <div className="font-bold text-[#003B95] truncate">{prog.schedule}</div>
+                        </div>
+                      </div>
+
+                      {/* Tiến độ số buổi học */}
+                      <div className="mt-4 space-y-1.5 bg-slate-50 dark:bg-slate-900/40 p-3 rounded-xl border border-slate-100 dark:border-slate-800">
+                        <div className="flex items-center justify-between text-xs">
+                          <span className="font-medium text-slate-600 dark:text-slate-400">Tiến độ đào tạo:</span>
+                          <span className="font-extrabold text-[#003B95]">
+                            {prog.completedSessions}/{prog.totalSessions} buổi ({progressPct}%)
+                          </span>
+                        </div>
+                        <div className="h-2 w-full overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700">
+                          <div
+                            className="h-full rounded-full bg-[#003B95]"
+                            style={{ width: `${Math.max(5, progressPct)}%` }}
+                          />
+                        </div>
+                        <div className="flex items-center justify-between text-[11px] text-slate-500 pt-0.5">
+                          <span>Quy mô: <strong>{prog.enrolledStudents}/{prog.maxStudents}</strong> học viên</span>
+                          <span>Địa điểm: <strong className="truncate">{prog.location.split("&")[0]}</strong></span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Các nút hành động */}
+                    <div className="flex flex-wrap items-center justify-between gap-2 pt-3 border-t border-slate-100 dark:border-slate-800">
+                      <div className="flex items-center gap-1.5">
+                        <button
+                          type="button"
+                          onClick={() => handleSwitchTab("sessions")}
+                          className="px-3 py-1.5 rounded-lg bg-blue-50 dark:bg-blue-950/40 text-[#003B95] dark:text-blue-300 text-xs font-bold hover:bg-blue-100 transition cursor-pointer"
+                        >
+                          Xem Buổi Học ({prog.totalSessions})
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleSwitchTab("history")}
+                          className="px-3 py-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 text-xs font-bold hover:bg-emerald-100 transition cursor-pointer"
+                        >
+                          Nhật Ký Đã Học ({prog.completedSessions})
+                        </button>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={handleOpenCreate}
+                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 text-xs font-semibold text-slate-700 dark:text-slate-200 cursor-pointer"
+                      >
+                        <Plus className="h-3.5 w-3.5" />
+                        <span>Thiết Lập Buổi Học</span>
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* ── TAB 2: XEM & THIẾT LẬP BUỔI HỌC (SESSIONS) ── */}
+        {currentTab === "sessions" && (
+          <div className="space-y-6">
+            {/* 4 Thẻ Metric */}
+            <CrmMetricGrid>
+              <CrmMetricCard
+                label="TỔNG KHÓA ĐÀO TẠO"
+                value={kpis.total}
+                sub="Khóa học & chuyên đề đã tạo"
+                icon={GraduationCap}
+                tone="sky"
+              />
+              <CrmMetricCard
+                label="ĐANG &amp; SẮP DIỄN RA"
+                value={kpis.active}
+                sub="Khóa học sẵn sàng đón học viên"
+                icon={Calendar}
+                tone="violet"
+              />
+              <CrmMetricCard
+                label="LƯỢT HỌC VIÊN ĐĂNG KÝ"
+                value={kpis.totalAttendees}
+                sub="Hội viên & doanh nhân đã đăng ký"
+                icon={UserCheck}
+                tone="green"
+              />
+              <CrmMetricCard
+                label="QUY MÔ CHỖ ĐÀO TẠO"
+                value={kpis.totalCapacity}
+                sub="Tổng số lượng học viên tối đa"
+                icon={Users}
+                tone="orange"
+              />
+            </CrmMetricGrid>
 
         {/* ── TOOLBAR TÌM KIẾM CẠNH THÊM MỚI (FIGMA STYLE) ── */}
         <CrmToolbar
@@ -1247,6 +1764,83 @@ function TrainingsPage() {
             })()}
           </div>
         )}
+      </div>
+    )}
+
+    {/* ── TAB 3: NHẬT KÝ KHÓA HỌC ĐÃ DIỄN RA (COURSE LOGS) ── */}
+    {currentTab === "history" && (
+      <div className="space-y-6">
+        {/* 4 Thẻ KPI Tổng Kết Nhật Ký */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="p-4 rounded-2xl bg-white dark:bg-card border border-slate-200 dark:border-slate-800 shadow-xs space-y-1">
+            <div className="text-[11px] font-extrabold uppercase tracking-wider text-slate-500">BUỔI HỌC HOÀN THÀNH</div>
+            <div className="text-2xl font-black text-emerald-700 dark:text-emerald-400">
+              {completedTrainings.length} Buổi
+            </div>
+            <div className="text-xs text-slate-400">Đã diễn ra và lưu vết đầy đủ</div>
+          </div>
+          <div className="p-4 rounded-2xl bg-white dark:bg-card border border-slate-200 dark:border-slate-800 shadow-xs space-y-1">
+            <div className="text-[11px] font-extrabold uppercase tracking-wider text-slate-500">LƯỢT HỌC VIÊN CÓ MẶT</div>
+            <div className="text-2xl font-black text-[#003B95]">
+              {completedTrainings.reduce((sum, t) => sum + (t.attendee_count || 90), 0)} Lượt CEO
+            </div>
+            <div className="text-xs text-slate-400">Điểm danh điện tử QR Check-in</div>
+          </div>
+          <div className="p-4 rounded-2xl bg-white dark:bg-card border border-slate-200 dark:border-slate-800 shadow-xs space-y-1">
+            <div className="text-[11px] font-extrabold uppercase tracking-wider text-slate-500">TỶ LỆ CHUYÊN CẦN</div>
+            <div className="text-2xl font-black text-indigo-700 dark:text-indigo-400">
+              91.5%
+            </div>
+            <div className="text-xs text-slate-400">Trung bình các buổi đào tạo</div>
+          </div>
+          <div className="p-4 rounded-2xl bg-white dark:bg-card border border-slate-200 dark:border-slate-800 shadow-xs space-y-1">
+            <div className="text-[11px] font-extrabold uppercase tracking-wider text-slate-500">ĐÁNH GIÁ CHẤT LƯỢNG</div>
+            <div className="text-2xl font-black text-amber-600 flex items-center gap-1.5">
+              <Star className="h-6 w-6 fill-amber-500 text-amber-500" />
+              <span>4.95 / 5.0</span>
+            </div>
+            <div className="text-xs text-slate-400">Mức độ hài lòng của học viên</div>
+          </div>
+        </div>
+
+        {/* Toolbar Nhật Ký */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white dark:bg-card p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs">
+          <div>
+            <h2 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+              <History className="h-5 w-5 text-emerald-700" />
+              <span>Nhật Ký &amp; Biên Bản Các Buổi Đào Tạo Đã Diễn Ra</span>
+            </h2>
+            <p className="text-xs text-slate-500 mt-0.5">
+              Tra cứu danh sách điểm danh thực tế, đánh giá phản hồi và xem lại video tư liệu bài giảng
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => toast.success("Đang xuất biên bản nhật ký đào tạo ra file Excel...")}
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-700 text-white text-xs font-bold shadow-xs hover:bg-emerald-800 transition cursor-pointer"
+            >
+              <Download className="h-4 w-4" />
+              <span>Xuất Báo Cáo Nhật Ký (Excel)</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Bảng CustomTable Nhật ký */}
+        <CustomTable<TrainingItem>
+          columns={historyColumns}
+          data={completedTrainings}
+          keyExtractor={(t) => t.id}
+          showStt={true}
+          page={1}
+          pageSize={10}
+          total={completedTrainings.length}
+          onPageChange={() => {}}
+          onPageSizeChange={() => {}}
+          emptyText="Chưa có buổi học nào đã hoàn thành trong hệ thống"
+        />
+      </div>
+    )}
 
         {/* ── MODAL KHAI BÁO KHÓA ĐÀO TẠO (CHUẨN EVENT WIZARD, CÓ SỐ LƯỢNG & HẠNG VÉ, KHÔNG XẾP CHỖ) ── */}
         {showWizardModal && (

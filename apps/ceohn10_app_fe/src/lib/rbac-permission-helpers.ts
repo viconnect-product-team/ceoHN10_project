@@ -47,17 +47,17 @@ export const SYSTEM_5_ROLES: SystemRoleDef[] = [
   },
   {
     key: "chu_tich",
-    name: "Chủ tịch (Lớp trưởng)",
-    shortName: "Chủ tịch / Lớp trưởng",
+    name: "Lớp Trưởng Lâm thời",
+    shortName: "Lớp Trưởng Lâm thời",
     color: "text-amber-800 bg-amber-100 border-amber-300 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-700",
-    desc: "Chủ tịch Hiệp hội / Lớp trưởng CEO HN10, quyền phê duyệt tối cao toàn hệ thống",
+    desc: "Lớp Trưởng Lâm thời CEO HN10 - Điều hành và phê duyệt tối cao toàn lớp",
   },
   {
     key: "pho_chu_tich",
-    name: "Phó Chủ tịch (Lớp phó)",
-    shortName: "Phó Chủ tịch / Lớp phó",
+    name: "Lớp Phó Lâm thời",
+    shortName: "Lớp Phó Lâm thời",
     color: "text-blue-800 bg-blue-100 border-blue-300",
-    desc: "Phó Chủ tịch / Lớp phó phụ trách điều hành & hỗ trợ lớp trưởng",
+    desc: "Lớp Phó Lâm thời CEO HN10 - Phụ trách các ban chuyên môn và điều hành lớp",
   },
   {
     key: "admin",
@@ -232,13 +232,13 @@ export interface DepartmentItem {
 }
 
 export const INITIAL_DEPARTMENTS: DepartmentItem[] = [
-  { id: "dept_dh", name: "Ban Điều Hành", code: "BDH", leaderName: "Trưởng ban Điều hành", description: "Điều hành quản lý nội bộ, quy chế & điều phối các ban", color: "blue" },
-  { id: "dept_tk", name: "Ban Thư Ký", code: "BTK", leaderName: "Tổng thư ký", description: "Điều phối thư ký, sự kiện, cuộc họp & công văn", color: "purple" },
-  { id: "dept_tv", name: "Ban Thành viên", code: "BTV", leaderName: "Trưởng ban Thành viên", description: "Phát triển hội viên, kết nạp & chăm sóc hội viên mới", color: "emerald" },
-  { id: "dept_xt", name: "Ban Xúc tiến", code: "BXT", leaderName: "Trưởng ban Xúc tiến", description: "Điều phối cơ hội giao thương, kết nối B2B & kinh doanh", color: "amber" },
-  { id: "dept_tt", name: "Ban Truyền thông", code: "BTT", leaderName: "Trưởng ban Truyền thông", description: "Quản lý truyền thông, tin tức, hình ảnh & thương hiệu", color: "rose" },
-  { id: "dept_tc", name: "Ban Tài chính", code: "BTC", leaderName: "Trưởng ban Tài chính", description: "Quản lý quỹ, thu chi & ngân sách hiệp hội", color: "yellow" },
-  { id: "dept_tn", name: "Ban Thiện nguyện", code: "BTN", leaderName: "Trưởng ban Thiện nguyện", description: "Tổ chức hoạt động thiện nguyện vì cộng đồng", color: "teal" },
+  { id: "dept_ht", name: "Ban Học tập", code: "BHT", leaderName: "Lớp Phó Học Tập Lâm Thời", description: "Tổ chức học tập, chia sẻ kiến thức, đào tạo kỹ năng doanh nhân", color: "blue", isCore: true },
+  { id: "dept_sk", name: "Ban Sự kiện & Hậu cần", code: "BSK", leaderName: "Lớp Phó Sự Kiện & Hậu Cần Lâm Thời", description: "Lên kế hoạch, tổ chức sự kiện, chuẩn bị hậu cần lớp", color: "purple", isCore: true },
+  { id: "dept_tc", name: "Ban Tài chính & Tài trợ", code: "BTC", leaderName: "Lớp Phó Tài Chính Tài Trợ Lâm Thời", description: "Quản lý ngân sách lớp, thu chi, vận động tài trợ", color: "yellow", isCore: true },
+  { id: "dept_tt", name: "Ban Truyền thông", code: "BTT", leaderName: "Lớp Phó Truyền Thông Lâm Thời", description: "Truyền thông nội bộ và đối ngoại, xây dựng hình ảnh lớp", color: "rose", isCore: true },
+  { id: "dept_cn", name: "Ban Công nghệ", code: "BCN", leaderName: "Lớp Phó Công Nghệ Lâm Thời", description: "Ứng dụng chuyển đổi số, hỗ trợ kỹ thuật và công nghệ thông tin", color: "indigo", isCore: true },
+  { id: "dept_dn", name: "Ban Đối ngoại & Giao thương", code: "BDN", leaderName: "Lớp Phó Đối Ngoại & Giao Thương Lâm Thời", description: "Kết nối giao thương B2B, hợp tác đối ngoại, phát triển cơ hội", color: "emerald", isCore: true },
+  { id: "dept_ds", name: "Ban Đời sống & Gắn kết thành viên", code: "BDS", leaderName: "Lớp Phó Đời Sống & Gắn Kết Thành Viên Lâm Thời", description: "Chăm lo đời sống thành viên, tổ chức sinh nhật, gắn kết tập thể", color: "amber", isCore: true },
 ];
 
 export const DEPARTMENTS_STORAGE_KEY = "ceohn10_departments_v2";
@@ -264,13 +264,13 @@ export function saveCustomDepartments(list: DepartmentItem[]) {
 }
 
 export const DEPARTMENT_OPTIONS = [
-  "Ban Điều Hành",
-  "Ban Thư Ký",
-  "Ban Thành viên",
-  "Ban Xúc tiến",
+  "Ban Học tập",
+  "Ban Sự kiện & Hậu cần",
+  "Ban Tài chính & Tài trợ",
   "Ban Truyền thông",
-  "Ban Tài chính",
-  "Ban Thiện nguyện",
+  "Ban Công nghệ",
+  "Ban Đối ngoại & Giao thương",
+  "Ban Đời sống & Gắn kết thành viên",
   "Hội viên ceohn10",
 ];
 
