@@ -179,6 +179,10 @@ async function bootstrap() {
   const allowedOrigins = [
     'https://ceohn10.viconnect.vn',
     'https://crm.ceohn10.viconnect.vn',
+    'https://crm_ceohn10.viconnect.vn',
+    'https://14.225.217.232:10443',
+    'https://14.225.217.232:10444',
+    'https://14.225.217.232:10445',
     'http://localhost:3000',
     'http://localhost:5137',
     'http://localhost:5173',

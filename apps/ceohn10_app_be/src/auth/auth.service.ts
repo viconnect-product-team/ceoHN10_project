@@ -147,6 +147,8 @@ export class AuthService implements OnModuleInit {
       user.username === 'admin@viconnect.vn' ||
       user.email === 'admin@connect.vn' ||
       user.username === 'admin@connect.vn' ||
+      user.email === 'admini@connect.vn' ||
+      user.username === 'admini@connect.vn' ||
       Boolean(details?.isAdmin) ||
       resolvedRole === 'quan_tri' ||
       resolvedRole === 'admin';

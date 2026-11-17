@@ -2922,7 +2922,7 @@ function AdminLandingWebsPage() {
                           type="button"
                           onClick={handleTestApiConnector}
                           disabled={testingApi}
-                          className="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold transition flex items-center gap-2 cursor-pointer shadow-md disabled:opacity-50"
+                          className="px-4 py-2 rounded-xl bg-[#003B95] hover:bg-[#002B70] text-white text-xs font-bold transition flex items-center gap-2 cursor-pointer shadow-md disabled:opacity-50"
                         >
                           <Play className="size-3.5" />
                           <span>{testingApi ? "Đang gọi thử..." : "Kiểm Tra Kết Nối API Trực Tiếp"}</span>

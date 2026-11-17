@@ -2,6 +2,7 @@ import { createFileRoute, useRouter, Link } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   Bell,
+  BellRing,
   CheckCheck,
   CheckCircle2,
   AlertTriangle,
@@ -97,7 +98,7 @@ const AUDIENCE_KEY: Record<Notification["audience"], TKey> = {
 const SCOPE_CONFIG: Record<string, { label: string; bg: string; text: string; border: string }> = {
   crm: { label: "CRM Quản trị", bg: "bg-blue-500/10", text: "text-blue-600 dark:text-blue-400", border: "border-blue-500/20" },
   association_app: { label: "App Hiệp Hội CEO HN10", bg: "bg-emerald-500/10", text: "text-emerald-600 dark:text-emerald-400", border: "border-emerald-500/20" },
-  all: { label: "Toàn hệ thống", bg: "bg-purple-500/10", text: "text-purple-600 dark:text-purple-400", border: "border-purple-500/20" },
+  all: { label: "Toàn hệ thống", bg: "bg-blue-500/10", text: "text-[#003B95]", border: "border-blue-500/20" },
 };
 
 type SubFilterType = "all" | "new_members" | "fee_alerts" | "admin_system" | "events_meetings";
@@ -151,9 +152,9 @@ function getNotificationCategory(n: Notification): {
     return {
       id: "new_members",
       label: "Hội viên mới",
-      badgeBg: "bg-purple-500/10",
-      badgeText: "text-purple-600 dark:text-purple-400",
-      badgeBorder: "border-purple-500/25",
+      badgeBg: "bg-blue-500/10",
+      badgeText: "text-[#003B95]",
+      badgeBorder: "border-blue-500/25",
       icon: UserCheck,
       actionUrl: "/members?status=pending",
       actionLabel: "Duyệt hồ sơ",
@@ -479,6 +480,59 @@ function NotifyPage() {
       toast.error(e?.message || "Không thể đưa thông báo vào tin nhắn");
     } finally {
       setPushingId(null);
+    }
+  };
+
+  const [remindingId, setRemindingId] = useState<string | null>(null);
+  const [syncingDaily, setSyncingDaily] = useState(false);
+
+  const handleRemind = async (n: Notification) => {
+    setRemindingId(n.id);
+    try {
+      const res: any = await fetchNestApi(`/admin/notifications/${n.id}/remind`, {
+        method: "POST",
+      });
+      if (res?.success) {
+        toast.success(`🔔 Đã gửi nhắc nhở tới App hội viên và Email thành công! (Lần nhắc: ${res.reminder_count || 1})`);
+        setItems((prev) =>
+          prev.map((item) =>
+            item.id === n.id
+              ? {
+                  ...item,
+                  reminder_count: res.reminder_count || ((item as any).reminder_count || 0) + 1,
+                  last_reminded_at: new Date().toISOString(),
+                }
+              : item
+          )
+        );
+      } else {
+        toast.info("Đã phát tán tín hiệu nhắc nhở tới Hội viên!");
+      }
+    } catch (err: any) {
+      toast.error(err?.message || "Không thể gửi nhắc nhở lúc này");
+    } finally {
+      setRemindingId(null);
+    }
+  };
+
+  const handleDailySyncAndDispatch = async () => {
+    setSyncingDaily(true);
+    try {
+      const res: any = await fetchNestApi("/admin/notifications/daily-sync-and-dispatch", {
+        method: "POST",
+      });
+      toast.success(
+        `✅ Đã quét đồng bộ và gửi thông báo nhắc nhở đầu ngày! (${res?.dispatchedCount ?? res?.createdCount ?? "Toàn bộ"} thông báo đã phát tán)`
+      );
+      const refreshed = await fetchNestApi<Notification[]>("/admin/notifications").catch(() => []);
+      if (Array.isArray(refreshed) && refreshed.length > 0) {
+        setItems(refreshed);
+      }
+      await router.invalidate();
+    } catch (err: any) {
+      toast.error(err?.message || "Không thể đồng bộ thông báo đầu ngày");
+    } finally {
+      setSyncingDaily(false);
     }
   };
 
@@ -1116,6 +1170,16 @@ function NotifyPage() {
             )}
             <button
               type="button"
+              onClick={handleDailySyncAndDispatch}
+              disabled={syncingDaily}
+              className="inline-flex min-h-10 items-center gap-2 rounded-xl px-3.5 py-2 text-xs font-bold text-amber-950 bg-amber-400 hover:bg-amber-300 dark:bg-amber-500 dark:text-slate-950 shadow-xs transition cursor-pointer disabled:opacity-50"
+              title="Quét và tự động phát tán nhắc nhở đầu ngày: học phí, sự kiện, buổi học, hóa đơn, nhiệm vụ, đề xuất quỹ"
+            >
+              <BellRing className={`h-4 w-4 ${syncingDaily ? "animate-spin text-amber-900" : "animate-bounce"}`} />
+              <span>{syncingDaily ? "Đang quét..." : "Quét & Nhắc Đầu Ngày"}</span>
+            </button>
+            <button
+              type="button"
               onClick={() => setEventReminderModalOpen(true)}
               className="inline-flex min-h-10 items-center gap-2 rounded-xl px-4 py-2 text-xs font-bold text-white bg-[#003B95] hover:bg-[#002B70] shadow-sm transition cursor-pointer"
             >
@@ -1500,7 +1564,7 @@ function NotifyPage() {
               <div className="p-5 rounded-2xl border border-border bg-card shadow-xs space-y-3 hover:shadow-md transition">
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-2.5">
-                    <div className="size-9 rounded-xl bg-purple-500/10 text-purple-600 dark:text-purple-400 flex items-center justify-center">
+                    <div className="size-9 rounded-xl bg-amber-500/10 text-amber-600 flex items-center justify-center">
                       <Sparkles className="size-5" />
                     </div>
                     <div>
@@ -1512,7 +1576,7 @@ function NotifyPage() {
                       </span>
                     </div>
                   </div>
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-100 text-purple-800 dark:bg-purple-950 dark:text-purple-300">
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800">
                     Bản tin ngày
                   </span>
                 </div>
@@ -1723,6 +1787,18 @@ function NotifyPage() {
                       <span>{cat.actionLabel}</span>
                     </Link>
                   )}
+
+                  {/* Nút Nhắc nhở Đa kênh (Bắn về App Hội Viên + Gửi Email Hội Viên) */}
+                  <button
+                    type="button"
+                    onClick={() => handleRemind(n)}
+                    disabled={remindingId === n.id}
+                    title={`Gửi nhắc nhở trực tiếp về App và Email hội viên ${(n as any).reminder_count ? `(Đã nhắc ${(n as any).reminder_count} lần)` : ""}`}
+                    className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-amber-50 hover:bg-amber-100 dark:bg-amber-950/40 dark:hover:bg-amber-900/60 text-amber-700 dark:text-amber-300 text-xs font-bold border border-amber-300 dark:border-amber-700 transition cursor-pointer disabled:opacity-50"
+                  >
+                    <Bell className={`h-3 w-3 ${remindingId === n.id ? "animate-spin text-amber-900" : "animate-bounce text-amber-600"}`} />
+                    <span>Nhắc{(n as any).reminder_count ? ` (${(n as any).reminder_count})` : ""}</span>
+                  </button>
 
                   {/* Nút Đẩy vào tin nhắn */}
                   {isPushed ? (

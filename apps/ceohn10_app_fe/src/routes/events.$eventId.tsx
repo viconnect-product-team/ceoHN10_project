@@ -24,6 +24,8 @@ import {
   Maximize2,
   Copy,
   Camera,
+  Package,
+  MessageSquare,
 } from "lucide-react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/dashboard/AppShell";
@@ -33,6 +35,9 @@ import { EventRegistrationPanel } from "@/components/dashboard/EventRegistration
 import { EventCheckinPanel } from "@/components/dashboard/EventCheckinPanel";
 import { EventAttendees } from "@/components/dashboard/EventAttendees";
 import { EventAgenda } from "@/components/dashboard/EventAgenda";
+import { SupplyDeclarationModal } from "@/components/dashboard/SupplyDeclarationModal";
+import { EventFeedbackModal } from "@/components/events/EventFeedbackModal";
+import { EventMediaModal } from "@/components/events/EventMediaModal";
 import { EventSponsors } from "@/components/dashboard/EventSponsors";
 import { EventFeed } from "@/components/dashboard/EventFeed";
 import { LiveActivityMediaSection } from "@/components/common/LiveActivityMediaSection";
@@ -181,6 +186,9 @@ function EventDetailPage() {
   const [cancelling, setCancelling] = useState(false);
   const [guestQrOpen, setGuestQrOpen] = useState(false);
   const [posterOpen, setPosterOpen] = useState(false);
+  const [supplyModalOpen, setSupplyModalOpen] = useState(false);
+  const [feedbackModalOpen, setFeedbackModalOpen] = useState(false);
+  const [mediaModalOpen, setMediaModalOpen] = useState(false);
 
   const countdown = useCountdown(event.date, event.status);
   const s = STATUS_TONE[event.status] ?? STATUS_TONE.upcoming;
@@ -518,6 +526,30 @@ function EventDetailPage() {
             )}
             {canManage && (
               <>
+                <button
+                  type="button"
+                  onClick={() => setSupplyModalOpen(true)}
+                  className="inline-flex items-center gap-2 rounded-xl border border-indigo-500/40 bg-indigo-500/10 px-4 py-2 text-sm font-semibold text-indigo-700 dark:text-indigo-300 hover:bg-indigo-500/20 transition cursor-pointer"
+                >
+                  <Package className="h-4 w-4" />
+                  Khai báo vật dụng
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setFeedbackModalOpen(true)}
+                  className="inline-flex items-center gap-2 rounded-xl border border-amber-500/40 bg-amber-500/10 px-4 py-2 text-sm font-semibold text-amber-700 dark:text-amber-300 hover:bg-amber-500/20 transition cursor-pointer"
+                >
+                  <MessageSquare className="h-4 w-4" />
+                  Đánh giá
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setMediaModalOpen(true)}
+                  className="inline-flex items-center gap-2 rounded-xl border border-emerald-500/40 bg-emerald-500/10 px-4 py-2 text-sm font-semibold text-emerald-700 dark:text-emerald-300 hover:bg-emerald-500/20 transition cursor-pointer"
+                >
+                  <Camera className="h-4 w-4" />
+                  Kho ảnh &amp; Media
+                </button>
                 <Link
                   to="/event-registrations"
                   className="inline-flex items-center gap-2 rounded-xl border border-border bg-card px-4 py-2 text-sm font-medium text-foreground hover:bg-muted"
@@ -896,6 +928,37 @@ function EventDetailPage() {
           }
         }}
       />
+
+      {supplyModalOpen && (
+        <SupplyDeclarationModal
+          open={supplyModalOpen}
+          targetType="event"
+          targetId={event.id}
+          targetName={event.name}
+          department="Ban Sự Kiện & Hậu Cần"
+          onClose={() => setSupplyModalOpen(false)}
+        />
+      )}
+
+      {feedbackModalOpen && (
+        <EventFeedbackModal
+          open={feedbackModalOpen}
+          eventId={event.id}
+          eventName={event.name}
+          onClose={() => setFeedbackModalOpen(false)}
+        />
+      )}
+
+      {mediaModalOpen && (
+        <EventMediaModal
+          open={mediaModalOpen}
+          eventId={event.id}
+          eventName={event.name}
+          existingGalleryUrl={(event as any).photoGalleryUrl || (event as any).photo_gallery_url}
+          onClose={() => setMediaModalOpen(false)}
+          onUpdated={() => router.invalidate()}
+        />
+      )}
     </AppShell>
   );
 }

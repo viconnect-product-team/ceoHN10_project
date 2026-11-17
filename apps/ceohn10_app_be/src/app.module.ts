@@ -28,6 +28,7 @@ import { ZaloModule } from './zalo/zalo.module';
 import { PaymentModule } from './payment/payment.module';
 import { SyndicationModule } from './syndication/syndication.module';
 import { LandingModule } from './landing/landing.module';
+import { SuppliesModule } from './supplies/supplies.module';
 
 @Module({
   imports: [
@@ -60,6 +61,7 @@ import { LandingModule } from './landing/landing.module';
     PaymentModule,
     SyndicationModule,
     LandingModule,
+    SuppliesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

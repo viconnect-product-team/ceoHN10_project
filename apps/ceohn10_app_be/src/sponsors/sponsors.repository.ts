@@ -144,10 +144,23 @@ export class SponsorsRepository {
     since: string,
     status: string,
     associationId: string,
+    birthDate?: string | null,
+    age?: number | null,
+    website?: string | null,
+    companyName?: string | null,
+    inKindItems?: any[],
   ): Promise<void> {
+    const inKindJson = inKindItems ? JSON.stringify(inKindItems) : '[]';
     await this.prisma.$executeRawUnsafe(
-      `INSERT INTO public.sponsors (id, name, tier, sponsor_type, package_type, in_kind_description, contact, email, phone, amount, events, since, status, association_id, created_at, updated_at)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12::date, $13, $14::uuid, NOW(), NOW())`,
+      `INSERT INTO public.sponsors (
+        id, name, tier, sponsor_type, package_type, in_kind_description,
+        contact, email, phone, amount, events, since, status, association_id,
+        birth_date, age, website, company_name, in_kind_items, created_at, updated_at
+      ) VALUES (
+        $1, $2, $3, $4, $5, $6,
+        $7, $8, $9, $10, $11, $12::date, $13, $14::uuid,
+        $15::date, $16, $17, $18, $19::jsonb, NOW(), NOW()
+      )`,
       id,
       name,
       tier,
@@ -162,6 +175,11 @@ export class SponsorsRepository {
       since,
       status,
       associationId,
+      birthDate || null,
+      age || null,
+      website || null,
+      companyName || null,
+      inKindJson,
     );
   }
 

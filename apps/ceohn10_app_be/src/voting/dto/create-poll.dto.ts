@@ -7,4 +7,7 @@ export class CreatePollDto {
   endDate?: string;
   targetAudience?: string; // 'all' | 'members' | 'non_members'
   eventId?: string;
+  trainingId?: string;
+  targetType?: 'event' | 'training';
+  targetId?: string;
 }

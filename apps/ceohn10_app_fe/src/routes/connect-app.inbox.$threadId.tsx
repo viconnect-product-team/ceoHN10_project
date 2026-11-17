@@ -150,7 +150,7 @@ function getFileBadgeInfo(fileName: string) {
     return { label: "PPT", color: "bg-amber-500/20 text-amber-400 border-amber-500/30" };
   }
   if (["zip", "rar", "7z", "tar", "gz"].includes(ext)) {
-    return { label: "ZIP", color: "bg-purple-500/20 text-purple-400 border-purple-500/30" };
+    return { label: "ZIP", color: "bg-blue-500/20 text-[#003B95] border-blue-500/30" };
   }
   return {
     label: ext.toUpperCase().slice(0, 4) || "FILE",

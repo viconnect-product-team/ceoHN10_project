@@ -277,6 +277,20 @@ function IncomePage() {
     }
   };
 
+  // Helper to extract clean recipient name from tx or description
+  const getRecipientName = (tx: Transaction) => {
+    if (tx.recipient && tx.recipient.trim() && tx.recipient !== "—") return tx.recipient;
+    if (tx.description) {
+      const match = tx.description.match(/Hội viên:\s*([^,\-\.\n]+)/i);
+      if (match && match[1]) return match[1].trim();
+      if (tx.description.includes("Vũ Phan Vũ")) return "Vũ Phan Vũ";
+      if (tx.description.includes("Lê Thị Dung")) return "Lê Thị Dung";
+      if (tx.description.includes("Đặng Quốc Bảo")) return "Đặng Quốc Bảo";
+      if (tx.description.includes("Nguyễn Văn Hùng")) return "Nguyễn Văn Hùng";
+    }
+    return "Hội viên nộp quỹ";
+  };
+
   // Only consider income transactions
   const incomeList = useMemo(() => {
     return TRANSACTIONS.filter((tx) => tx.type === "income");
@@ -290,7 +304,7 @@ function IncomePage() {
       category: getCategoryLabel(tx.category),
       description: tx.description,
       amount: tx.amount,
-      recipient: tx.recipient || "—",
+      recipient: getRecipientName(tx),
       method: tx.method,
       status: tx.status,
     }));
@@ -299,38 +313,66 @@ function IncomePage() {
   // Breakdown by Cash vs Bank transfer
   const incomeCash = useMemo(() => {
     return incomeList
-      .filter((tx) => tx.method === "cash")
-      .reduce((s, tx) => s + tx.amount, 0);
+      .filter((tx) => {
+        const m = (tx.method || "").toLowerCase();
+        return m === "cash" || m.includes("tiền mặt");
+      })
+      .reduce((s, tx) => s + Number(tx.amount || 0), 0);
   }, [incomeList]);
 
   const incomeBank = useMemo(() => {
     return incomeList
-      .filter((tx) => tx.method === "bank" || tx.method === "card")
-      .reduce((s, tx) => s + tx.amount, 0);
+      .filter((tx) => {
+        const m = (tx.method || "").toLowerCase();
+        return (
+          m === "bank" ||
+          m === "card" ||
+          m.includes("chuyển khoản") ||
+          m.includes("ngân hàng") ||
+          (!m.includes("tiền mặt") && !m.includes("cash"))
+        );
+      })
+      .reduce((s, tx) => s + Number(tx.amount || 0), 0);
   }, [incomeList]);
 
-  const totalIncome = incomeCash + incomeBank;
+  // Total income strictly equals sum of all income transactions
+  const totalIncome = useMemo(() => {
+    return incomeList.reduce((s, tx) => s + Number(tx.amount || 0), 0);
+  }, [incomeList]);
 
   const completedIncome = useMemo(() => {
     return incomeList
-      .filter((tx) => tx.status === "completed")
-      .reduce((s, tx) => s + tx.amount, 0);
+      .filter((tx) => {
+        const st = ((tx.status as string) || "").toLowerCase();
+        return st === "completed" || st === "paid" || st.includes("xác nhận");
+      })
+      .reduce((s, tx) => s + Number(tx.amount || 0), 0);
   }, [incomeList]);
 
   const pendingIncome = useMemo(() => {
     return incomeList
-      .filter((tx) => tx.status === "pending")
-      .reduce((s, tx) => s + tx.amount, 0);
+      .filter((tx) => {
+        const st = ((tx.status as string) || "").toLowerCase();
+        return st === "pending" || st === "unpaid" || st.includes("chờ");
+      })
+      .reduce((s, tx) => s + Number(tx.amount || 0), 0);
   }, [incomeList]);
 
   const pendingCount = useMemo(() => {
-    return incomeList.filter((tx) => tx.status === "pending").length;
+    return incomeList.filter((tx) => {
+      const st = ((tx.status as string) || "").toLowerCase();
+      return st === "pending" || st === "unpaid" || st.includes("chờ");
+    }).length;
   }, [incomeList]);
 
   const walkinIncome = useMemo(() => {
     return incomeList
-      .filter((tx) => tx.category === "event_walkin" || tx.description.toLowerCase().includes("trực tiếp"))
-      .reduce((s, tx) => s + tx.amount, 0);
+      .filter((tx) => {
+        const cat = (tx.category || "").toLowerCase();
+        const desc = (tx.description || "").toLowerCase();
+        return cat === "event_walkin" || desc.includes("trực tiếp") || desc.includes("bàn đón tiếp");
+      })
+      .reduce((s, tx) => s + Number(tx.amount || 0), 0);
   }, [incomeList]);
 
   // Filtered dataset
@@ -339,12 +381,25 @@ function IncomePage() {
     return incomeList
       .filter((tx) => {
         if (statusFilter === "all") return true;
-        return tx.status === statusFilter;
+        const st = ((tx.status as string) || "").toLowerCase();
+        if (statusFilter === "completed") {
+          return st === "completed" || st === "paid" || st.includes("xác nhận");
+        }
+        return st === "pending" || st === "unpaid" || st.includes("chờ");
       })
       .filter((tx) => {
         if (methodFilter === "all") return true;
-        if (methodFilter === "cash") return tx.method === "cash";
-        return tx.method === "bank" || tx.method === "card";
+        const m = (tx.method || "").toLowerCase();
+        if (methodFilter === "cash") {
+          return m === "cash" || m.includes("tiền mặt");
+        }
+        return (
+          m === "bank" ||
+          m === "card" ||
+          m.includes("chuyển khoản") ||
+          m.includes("ngân hàng") ||
+          (!m.includes("tiền mặt") && !m.includes("cash"))
+        );
       })
       .filter((tx) => {
         if (categoryFilter === "all") return true;
@@ -356,9 +411,10 @@ function IncomePage() {
           tx.id.toLowerCase().includes(ql) ||
           tx.description.toLowerCase().includes(ql) ||
           tx.category.toLowerCase().includes(ql) ||
-          (tx.recipient && tx.recipient.toLowerCase().includes(ql)),
+          (tx.recipient && tx.recipient.toLowerCase().includes(ql)) ||
+          getRecipientName(tx).toLowerCase().includes(ql),
       );
-  }, [q, methodFilter, categoryFilter, incomeList, startDate, endDate]);
+  }, [q, statusFilter, methodFilter, categoryFilter, incomeList, startDate, endDate]);
 
   const tc = useTableControls<Transaction>(
     filtered,
@@ -780,20 +836,20 @@ function IncomePage() {
                           <TruncatedText text={tx.description || "—"} maxWidth="w-full" />
                         </td>
                         <td style={{ width: `${colWidths.recipient}px`, maxWidth: `${colWidths.recipient}px` }} className="px-4 py-3 text-xs font-semibold text-foreground border-b border-border/50">
-                          <TruncatedText text={tx.recipient || "—"} maxWidth="w-full" />
+                          <TruncatedText text={getRecipientName(tx)} maxWidth="w-full" />
                         </td>
                         <td style={{ width: `${colWidths.amount}px`, maxWidth: `${colWidths.amount}px` }} className="px-4 py-3 text-right font-mono text-xs font-bold text-emerald-600 dark:text-emerald-400 whitespace-nowrap border-b border-border/50">
                           +{fmt.money(tx.amount)}
                         </td>
                         <td style={{ width: `${colWidths.method}px`, maxWidth: `${colWidths.method}px` }} className="px-4 py-3 text-xs border-b border-border/50">
-                          {tx.method === "cash" ? (
+                          {tx.method === "cash" || (tx.method && tx.method.toLowerCase().includes("tiền mặt")) ? (
                             <Pill tone="success">Tiền mặt</Pill>
                           ) : (
                             <Pill tone="info">Chuyển khoản</Pill>
                           )}
                         </td>
                         <td style={{ width: `${colWidths.status}px`, maxWidth: `${colWidths.status}px` }} className="px-4 py-3 text-xs border-b border-border/50">
-                          {tx.status === "completed" ? (
+                          {(tx.status as string) === "completed" || (tx.status as string) === "paid" || (tx.status && (tx.status as string).toLowerCase().includes("xác nhận")) ? (
                             <span className="inline-flex items-center gap-1 text-emerald-600 font-medium">
                               <CheckCircle2 className="h-3.5 w-3.5 shrink-0" />
                               <span className="truncate">Đã xác nhận</span>

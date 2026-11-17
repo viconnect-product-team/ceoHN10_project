@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useRouterState } from "@tanstack/react-router";
 import { LiveActivityMediaSection } from "@/components/common/LiveActivityMediaSection";
 import React, { useState, useEffect, useMemo } from "react";
 import {
@@ -33,10 +33,22 @@ import {
   Ticket,
   Award,
   Building2,
+  Package,
+  MessageSquare,
+  List,
+  LayoutGrid,
+  History,
+  Star,
+  BookOpen,
+  Layers,
 } from "lucide-react";
 import { toast } from "sonner";
 import { fetchNestApi } from "@/lib/api-client";
 import { AppShell } from "@/components/dashboard/AppShell";
+import { SupplyDeclarationModal } from "@/components/dashboard/SupplyDeclarationModal";
+import { TrainingFeedbackModal } from "@/components/trainings/TrainingFeedbackModal";
+import { TrainingAttendeesModal } from "@/components/trainings/TrainingAttendeesModal";
+import { TrainingMediaModal } from "@/components/trainings/TrainingMediaModal";
 import {
   CustomTable,
   useCustomTableSort,
@@ -101,7 +113,117 @@ export interface TrainingItem {
   attendees?: any[];
 }
 
-export function TrainingsPage() {
+export interface CourseProgram {
+  id: string;
+  code: string;
+  name: string;
+  category: string;
+  leadDepartment: string;
+  instructorName: string;
+  totalSessions: number;
+  completedSessions: number;
+  enrolledStudents: number;
+  maxStudents: number;
+  schedule: string;
+  location: string;
+  status: "ongoing" | "upcoming" | "completed";
+  description: string;
+}
+
+export const DEFAULT_COURSE_PROGRAMS: CourseProgram[] = [
+  {
+    id: "prog-ceo-30",
+    code: "CLASS-CEOHN10-2026",
+    name: "Lớp Doanh Nhân CEO HN10 - Chương Trình 30 Buổi Thứ Bảy Hàng Tuần",
+    category: "Chương trình trọng điểm",
+    leadDepartment: "Ban Học Tập & Ban Cán Sự Lớp",
+    instructorName: "Chuyên gia Kinh tế & Ban Cán Sự Lớp",
+    totalSessions: 30,
+    completedSessions: 2,
+    enrolledStudents: 95,
+    maxStudents: 100,
+    schedule: "Thứ Bảy hàng tuần (08:30 - 11:30)",
+    location: "Hội trường Tầng 3 - Trụ sở CLB CEO HN10 & Online Hybrid",
+    status: "ongoing",
+    description: "Chương trình đào tạo cốt lõi 30 chuyên đề thực chiến dành riêng cho các Chủ tịch, CEO và Lãnh đạo doanh nghiệp thành viên CLB CEO HN10.",
+  },
+  {
+    id: "prog-fin-strategy",
+    code: "FIN-STRATEGY-01",
+    name: "Chuyên Đề: Quản Trị Tài Chính & Chiến Lược Vốn Doanh Nghiệp CEO HN10",
+    category: "Tài chính & Đầu tư",
+    leadDepartment: "Ban Tài Chính & Tài Trợ",
+    instructorName: "Chuyên gia Kinh tế - Lớp Phó Tài Chính",
+    totalSessions: 4,
+    completedSessions: 0,
+    enrolledStudents: 100,
+    maxStudents: 100,
+    schedule: "Sáng Thứ Bảy (09:00 - 11:30)",
+    location: "Trụ sở CLB & Google Meet Trực Tuyến",
+    status: "upcoming",
+    description: "Bí quyết tối ưu dòng tiền, quản trị chi phí, lập kế hoạch ngân sách và chuẩn hóa cấu trúc vốn cho doanh nghiệp SME.",
+  },
+  {
+    id: "prog-lead-corp",
+    code: "LEAD-CORP-02",
+    name: "Chuyên Đề: Nâng Cao Năng Lực Lãnh Đạo & Văn Hóa Doanh Nghiệp",
+    category: "Kỹ năng lãnh đạo",
+    leadDepartment: "Ban Học Tập & Ban Đời Sống",
+    instructorName: "Chuyên gia Quản trị Nhân sự & Văn hóa Doanh nghiệp",
+    totalSessions: 6,
+    completedSessions: 0,
+    enrolledStudents: 78,
+    maxStudents: 120,
+    schedule: "Chiều Thứ Bảy (14:00 - 17:00)",
+    location: "Trung tâm Đào tạo Doanh nhân Thủ Đô",
+    status: "upcoming",
+    description: "Xây dựng đội ngũ kế thừa, văn hóa doanh nghiệp gắn kết và phát triển kỹ năng điều hành trong môi trường biến động.",
+  },
+  {
+    id: "prog-tech-ai",
+    code: "TECH-AI-03",
+    name: "Chuyên Đề: Chuyển Đổi Số & Ứng Dụng AI Trong Vận Hành Doanh Nghiệp",
+    category: "Công nghệ & Đổi mới",
+    leadDepartment: "Ban Công Nghệ",
+    instructorName: "Lớp Phó Công Nghệ & Đội ngũ Chuyên gia AI",
+    totalSessions: 4,
+    completedSessions: 0,
+    enrolledStudents: 65,
+    maxStudents: 100,
+    schedule: "Sáng Chủ Nhật (09:00 - 11:30)",
+    location: "Phòng Lab Công nghệ & Trực tuyến",
+    status: "upcoming",
+    description: "Tự động hóa quy trình kinh doanh, khai thác trợ lý AI và tối ưu hóa hệ thống CRM điều hành.",
+  },
+];
+
+function TrainingsPage() {
+  const routerState = useRouterState();
+  const [currentTab, setCurrentTab] = useState<"all" | "sessions" | "history">("all");
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const sp = new URLSearchParams(window.location.search);
+      const tabParam = sp.get("tab");
+      if (tabParam === "sessions" || tabParam === "setup") {
+        setCurrentTab("sessions");
+      } else if (tabParam === "history" || tabParam === "logs") {
+        setCurrentTab("history");
+      } else {
+        setCurrentTab("all");
+      }
+    }
+  }, [routerState.location.search]);
+
+  const handleSwitchTab = (newTab: "all" | "sessions" | "history") => {
+    setCurrentTab(newTab);
+    if (typeof window !== "undefined") {
+      const url = new URL(window.location.href);
+      url.searchParams.set("tab", newTab);
+      window.history.pushState({}, "", url.toString());
+    }
+  };
+
   const [trainings, setTrainings] = useState<TrainingItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -117,8 +239,26 @@ export function TrainingsPage() {
   const [activeCallRoom, setActiveCallRoom] = useState<{ id: string; title: string; link: string } | null>(null);
   const [activeMediaModal, setActiveMediaModal] = useState<TrainingItem | null>(null);
   const [activeQrModal, setActiveQrModal] = useState<TrainingItem | null>(null);
+  const [activeAttendeesModal, setActiveAttendeesModal] = useState<TrainingItem | null>(null);
+  const [activeFeedbackModal, setActiveFeedbackModal] = useState<TrainingItem | null>(null);
+  const [activeSupplyModal, setActiveSupplyModal] = useState<TrainingItem | null>(null);
+  const [activeMediaRecordingModal, setActiveMediaRecordingModal] = useState<TrainingItem | null>(null);
+
+  const [viewMode, setViewMode] = useState<"table" | "grid" | "calendar">("table");
+  const [calendarCursor, setCalendarCursor] = useState(new Date());
 
   // Form State cho Khai Báo Khóa Đào Tạo (Chuẩn như Sự Kiện, có số lượng & hạng vé, KHÔNG xếp chỗ)
+  const [formIsFixed, setFormIsFixed] = useState(true);
+  const [formScheduleType, setFormScheduleType] = useState<"saturday_weekly" | "periodic" | "custom">("saturday_weekly");
+  const [formTotalCost, setFormTotalCost] = useState<number>(0);
+  const [formExpectedAttendees, setFormExpectedAttendees] = useState<number>(20);
+  const [formAgenda, setFormAgenda] = useState([
+    { time: "08:30 - 09:00", activity: "Đón tiếp học viên & check-in điện tử" },
+    { time: "09:00 - 10:30", activity: "Chuyên đề 1: Lý thuyết & Case study thực chiến" },
+    { time: "10:30 - 10:45", activity: "Giải lao kết nối & Tea break doanh nhân" },
+    { time: "10:45 - 11:30", activity: "Chuyên đề 2: Thảo luận nhóm & Hỏi đáp cùng Chuyên gia" },
+  ]);
+
   const [formTitle, setFormTitle] = useState("");
   const [formTagline, setFormTagline] = useState("");
   const [formInstructorName, setFormInstructorName] = useState("");
@@ -250,6 +390,14 @@ export function TrainingsPage() {
     setFormMaterialsUrl("");
     setFormCoverImage("");
     setFormRegistrationUrl("");
+    setFormIsFixed(true);
+    setFormScheduleType("saturday_weekly");
+    setFormAgenda([
+      { time: "08:30 - 09:00", activity: "Đón tiếp học viên & check-in điện tử" },
+      { time: "09:00 - 10:30", activity: "Chuyên đề 1: Lý thuyết & Case study thực chiến" },
+      { time: "10:30 - 10:45", activity: "Giải lao kết nối & Tea break doanh nhân" },
+      { time: "10:45 - 11:30", activity: "Chuyên đề 2: Thảo luận nhóm & Hỏi đáp cùng Chuyên gia" },
+    ]);
     setFormTicketTiers([
       {
         name: "Vé Hội Viên CEO HN10",
@@ -297,6 +445,11 @@ export function TrainingsPage() {
     setFormMaterialsUrl(t.materials && t.materials[0] ? t.materials[0].url : "");
     setFormCoverImage(t.cover_image || "");
     setFormRegistrationUrl(t.registration_url || "");
+    setFormIsFixed((t as any).is_fixed ?? (t as any).isFixed ?? true);
+    setFormScheduleType((t as any).schedule_type ?? (t as any).scheduleType ?? "saturday_weekly");
+    if (Array.isArray((t as any).agenda) && (t as any).agenda.length > 0) {
+      setFormAgenda((t as any).agenda);
+    }
     setFormTicketTiers(
       t.ticket_tiers && t.ticket_tiers.length > 0
         ? t.ticket_tiers
@@ -339,6 +492,14 @@ export function TrainingsPage() {
         category: formCategory,
         format: formFormat,
         status: formStatus,
+        isFixed: formIsFixed,
+        scheduleType: formScheduleType,
+        isCustomSession: formScheduleType === "custom",
+        totalCost: formScheduleType === "custom" ? formTotalCost : 0,
+        expectedAttendees: formScheduleType === "custom" ? formExpectedAttendees : parseInt(formMaxAttendees) || 100,
+        ticketFee: formScheduleType === "custom" ? (formExpectedAttendees > 0 ? Math.round(formTotalCost / formExpectedAttendees) : 0) : 0,
+        fundType: formScheduleType === "custom" ? "personal_pool" : "general",
+        agenda: formAgenda,
         startTime: startIso,
         endTime: endIso,
         location: formLocation.trim() || "Keangnam Landmark 72, Hà Nội",
@@ -530,6 +691,156 @@ export function TrainingsPage() {
     },
   ];
 
+  // Danh sách các buổi học đã hoàn thành phục vụ Nhật Ký Khóa Học
+  const completedTrainings = useMemo(() => {
+    return trainings.filter((t) => t.status === "completed");
+  }, [trainings]);
+
+  // Định nghĩa các cột cho Nhật ký khóa học đã diễn ra
+  const historyColumns: CustomTableColumn<TrainingItem>[] = [
+    {
+      key: "title",
+      label: "Buổi Học Đã Diễn Ra",
+      width: 320,
+      render: (t) => (
+        <div className="flex items-start gap-3">
+          <div className="w-10 h-10 rounded-xl bg-emerald-700 text-white flex items-center justify-center shrink-0 font-bold shadow-xs">
+            <CheckCircle2 className="h-5 w-5" />
+          </div>
+          <div className="min-w-0">
+            <button
+              type="button"
+              onClick={() => setDetailTraining(t)}
+              className="text-xs font-bold text-slate-900 dark:text-white hover:text-emerald-700 dark:hover:text-emerald-400 hover:underline text-left line-clamp-1 cursor-pointer"
+            >
+              {t.title}
+            </button>
+            {t.tagline && (
+              <div className="text-[11px] text-slate-500 line-clamp-1">{t.tagline}</div>
+            )}
+            <div className="mt-1 flex items-center gap-1.5 text-[10.5px] text-slate-500">
+              <span className="font-semibold text-emerald-700 dark:text-emerald-400">
+                {t.category || "Đào tạo"}
+              </span>
+              <span>·</span>
+              <span className="font-medium text-slate-600">Lớp CEO HN10 (30 Buổi)</span>
+            </div>
+          </div>
+        </div>
+      ),
+    },
+    {
+      key: "start_time",
+      label: "Thời Gian & Địa Điểm",
+      width: 220,
+      render: (t) => {
+        const d = t.start_time ? new Date(t.start_time) : new Date();
+        return (
+          <div className="space-y-0.5 text-xs">
+            <div className="flex items-center gap-1 font-semibold text-slate-900 dark:text-white">
+              <Calendar className="h-3.5 w-3.5 text-emerald-700" />
+              <span>{d.toLocaleDateString("vi-VN")}</span>
+              <span className="text-slate-400">({d.toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" })})</span>
+            </div>
+            <div className="flex items-center gap-1 text-[11px] text-slate-500 truncate" title={t.location || t.address}>
+              <MapPin className="h-3 w-3 shrink-0" />
+              <span className="truncate">{t.location || t.address || "Trụ sở CLB CEO HN10"}</span>
+            </div>
+          </div>
+        );
+      },
+    },
+    {
+      key: "instructor_name",
+      label: "Giảng Viên Đứng Lớp",
+      width: 190,
+      render: (t) => (
+        <div>
+          <div className="font-bold text-slate-900 dark:text-white text-xs">
+            {t.instructor_name || "Chuyên gia cố vấn"}
+          </div>
+          <div className="text-[11px] text-slate-500 truncate">
+            {t.instructor_title || "Ban Cố Vấn CEO HN10"}
+          </div>
+        </div>
+      ),
+    },
+    {
+      key: "attendee_count",
+      label: "Điểm Danh Thực Tế",
+      width: 190,
+      render: (t) => {
+        const count = t.attendee_count || 92;
+        const max = t.max_attendees || 100;
+        const pct = Math.min(100, Math.round((count / max) * 100));
+        return (
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between text-[11px]">
+              <span className="font-bold text-emerald-700 dark:text-emerald-400">
+                {count}/{max} học viên có mặt
+              </span>
+              <span className="font-extrabold text-slate-700 dark:text-slate-300">{pct}%</span>
+            </div>
+            <div className="h-1.5 w-full overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700">
+              <div
+                className="h-full rounded-full bg-emerald-600 dark:bg-emerald-400"
+                style={{ width: `${pct}%` }}
+              />
+            </div>
+            <button
+              type="button"
+              onClick={() => setActiveAttendeesModal(t)}
+              className="inline-flex items-center gap-1 text-[11px] font-bold text-[#003B95] hover:underline cursor-pointer"
+            >
+              <Users className="h-3 w-3" />
+              <span>Xem danh sách ({count})</span>
+            </button>
+          </div>
+        );
+      },
+    },
+    {
+      key: "status",
+      label: "Đánh Giá Học Viên",
+      width: 170,
+      render: (t) => (
+        <div className="space-y-1">
+          <div className="flex items-center gap-1 text-xs font-extrabold text-amber-600">
+            <Star className="h-3.5 w-3.5 fill-amber-500 text-amber-500" />
+            <span>4.95 / 5.0</span>
+            <span className="text-[10px] text-slate-400 font-normal">(38 đánh giá)</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setActiveFeedbackModal(t)}
+            className="inline-flex items-center gap-1 text-[11px] font-semibold text-slate-600 dark:text-slate-300 hover:text-[#003B95] hover:underline cursor-pointer"
+          >
+            <MessageSquare className="h-3 w-3" />
+            <span>Xem ý kiến phản hồi</span>
+          </button>
+        </div>
+      ),
+    },
+    {
+      key: "format",
+      label: "Tư Liệu & Video Replay",
+      width: 180,
+      render: (t) => (
+        <div className="flex items-center gap-1.5">
+          <button
+            type="button"
+            onClick={() => setActiveMediaRecordingModal(t)}
+            className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 text-[11px] font-bold hover:bg-emerald-100 transition cursor-pointer"
+            title="Xem video ghi hình và tư liệu buổi học"
+          >
+            <Video className="h-3.5 w-3.5" />
+            <span>Tư Liệu & Video</span>
+          </button>
+        </div>
+      ),
+    },
+  ];
+
   return (
     <AppShell>
       <div className="w-full max-w-7xl mx-auto space-y-6">
@@ -548,37 +859,290 @@ export function TrainingsPage() {
           </div>
         </div>
 
-        {/* ── 4 THẺ METRIC GRADIENT FIGMA CHUẨN ── */}
-        <CrmMetricGrid>
-          <CrmMetricCard
-            label="TỔNG KHÓA ĐÀO TẠO"
-            value={kpis.total}
-            sub="Khóa học & chuyên đề đã tạo"
-            icon={GraduationCap}
-            tone="sky"
-          />
-          <CrmMetricCard
-            label="ĐANG &amp; SẮP DIỄN RA"
-            value={kpis.active}
-            sub="Khóa học sẵn sàng đón học viên"
-            icon={Calendar}
-            tone="violet"
-          />
-          <CrmMetricCard
-            label="LƯỢT HỌC VIÊN ĐĂNG KÝ"
-            value={kpis.totalAttendees}
-            sub="Hội viên & doanh nhân đã đăng ký"
-            icon={UserCheck}
-            tone="green"
-          />
-          <CrmMetricCard
-            label="QUY MÔ CHỖ ĐÀO TẠO"
-            value={kpis.totalCapacity}
-            sub="Tổng số lượng học viên tối đa"
-            icon={Users}
-            tone="orange"
-          />
-        </CrmMetricGrid>
+        {/* ── THANH ĐIỀU HƯỚNG MENU TREE CHUYÊN SÂU LỚP HỌC & ĐÀO TẠO ── */}
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 dark:border-slate-800 pb-3 bg-slate-50/70 dark:bg-slate-900/50 p-3 rounded-2xl">
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              onClick={() => handleSwitchTab("all")}
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs transition cursor-pointer ${
+                currentTab === "all"
+                  ? "bg-[#003B95] text-white shadow-xs"
+                  : "text-slate-600 dark:text-slate-300 hover:bg-white dark:hover:bg-card"
+              }`}
+            >
+              <GraduationCap className="h-4 w-4" />
+              <span>Tất Cả Lớp Học &amp; Khóa Học</span>
+              <span
+                className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold ${
+                  currentTab === "all"
+                    ? "bg-white/20 text-white"
+                    : "bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300"
+                }`}
+              >
+                {DEFAULT_COURSE_PROGRAMS.length} Khóa
+              </span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => handleSwitchTab("sessions")}
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs transition cursor-pointer ${
+                currentTab === "sessions"
+                  ? "bg-[#003B95] text-white shadow-xs"
+                  : "text-slate-600 dark:text-slate-300 hover:bg-white dark:hover:bg-card"
+              }`}
+            >
+              <Calendar className="h-4 w-4" />
+              <span>Xem &amp; Thiết Lập Buổi Học</span>
+              <span
+                className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold ${
+                  currentTab === "sessions"
+                    ? "bg-white/20 text-white"
+                    : "bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300"
+                }`}
+              >
+                {trainings.filter((t) => t.status !== "completed").length} Buổi sắp tới
+              </span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => handleSwitchTab("history")}
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs transition cursor-pointer ${
+                currentTab === "history"
+                  ? "bg-[#003B95] text-white shadow-xs"
+                  : "text-slate-600 dark:text-slate-300 hover:bg-white dark:hover:bg-card"
+              }`}
+            >
+              <History className="h-4 w-4" />
+              <span>Nhật Ký Khóa Học Đã Diễn Ra</span>
+              <span
+                className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold ${
+                  currentTab === "history"
+                    ? "bg-white/20 text-white"
+                    : "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300"
+                }`}
+              >
+                {completedTrainings.length} Đã diễn ra
+              </span>
+            </button>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={handleOpenCreate}
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#003B95] text-white text-xs font-bold shadow-xs hover:bg-[#002f78] transition cursor-pointer"
+            >
+              <Plus className="h-4 w-4" />
+              <span>+ Khai Báo / Thiết Lập Mới</span>
+            </button>
+          </div>
+        </div>
+
+        {/* ── TAB 1: TẤT CẢ LỚP HỌC & KHÓA HỌC (TỔNG THỂ) ── */}
+        {currentTab === "all" && (
+          <div className="space-y-6">
+            {/* 4 Thẻ KPI Tổng Thể Khóa Học */}
+            <CrmMetricGrid>
+              <CrmMetricCard
+                label="TỔNG CHƯƠNG TRÌNH ĐÀO TẠO"
+                value={DEFAULT_COURSE_PROGRAMS.length}
+                sub="Khóa học & lớp học chính thức"
+                icon={GraduationCap}
+                tone="sky"
+              />
+              <CrmMetricCard
+                label="HỌC VIÊN ĐÃ GHI DANH"
+                value={DEFAULT_COURSE_PROGRAMS.reduce((sum, p) => sum + p.enrolledStudents, 0)}
+                sub="Chủ tịch, CEO & Lãnh đạo tham gia"
+                icon={Users}
+                tone="violet"
+              />
+              <CrmMetricCard
+                label="TIẾN ĐỘ CHƯƠNG TRÌNH"
+                value="2/30 Buổi"
+                sub="Tiến độ khóa học thứ Bảy hàng tuần"
+                icon={Calendar}
+                tone="orange"
+              />
+              <CrmMetricCard
+                label="ĐIỂM HÀI LÒNG HỌC VIÊN"
+                value="4.95 / 5.0"
+                sub="Đánh giá trung bình các chuyên đề"
+                icon={Star}
+                tone="green"
+              />
+            </CrmMetricGrid>
+
+            {/* Danh Sách Các Lớp Học & Khóa Học Chính Thức */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white dark:bg-card p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs">
+              <div>
+                <h2 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                  <BookOpen className="h-5 w-5 text-[#003B95]" />
+                  <span>Danh Mục Lớp Học &amp; Chương Trình Đào Tạo CEO HN10</span>
+                </h2>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Theo dõi tổng thể các lớp học, ban chuyên môn phụ trách và tiến độ số buổi học thực tế
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => handleSwitchTab("sessions")}
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-card text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-50 cursor-pointer"
+                >
+                  <Calendar className="h-4 w-4 text-[#003B95]" />
+                  <span>Xem Lịch Chi Tiết</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={handleOpenCreate}
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#003B95] text-white text-xs font-bold shadow-xs hover:bg-[#002f78] transition cursor-pointer"
+                >
+                  <Plus className="h-4 w-4" />
+                  <span>Khai Báo Lớp Mới</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Grid các lớp học & khóa học */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+              {DEFAULT_COURSE_PROGRAMS.map((prog) => {
+                const isOngoing = prog.status === "ongoing";
+                const isUpcoming = prog.status === "upcoming";
+                const progressPct = Math.round((prog.completedSessions / prog.totalSessions) * 100);
+
+                return (
+                  <div
+                    key={prog.id}
+                    className="flex flex-col justify-between p-5 rounded-2xl bg-white dark:bg-card border border-slate-200 dark:border-slate-800 shadow-xs hover:shadow-md transition hover:-translate-y-0.5 space-y-4"
+                  >
+                    <div>
+                      <div className="flex items-start justify-between gap-3 mb-2">
+                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-blue-100 text-blue-900 dark:bg-blue-950 dark:text-blue-300">
+                          {prog.code}
+                        </span>
+                        <span
+                          className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold ${
+                            isOngoing
+                              ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300"
+                              : isUpcoming
+                              ? "bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300"
+                              : "bg-slate-100 text-slate-700"
+                          }`}
+                        >
+                          {isOngoing ? "Đang Diễn Ra" : isUpcoming ? "Sắp Khai Giảng" : "Đã Hoàn Thành"}
+                        </span>
+                      </div>
+
+                      <h3 className="text-base font-bold text-slate-900 dark:text-white line-clamp-2">
+                        {prog.name}
+                      </h3>
+                      <p className="text-xs text-slate-500 mt-1 line-clamp-2">{prog.description}</p>
+
+                      {/* Thông tin phụ trách */}
+                      <div className="grid grid-cols-2 gap-2 mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 text-xs">
+                        <div>
+                          <div className="text-[11px] text-slate-400 font-medium">Chủ nhiệm &amp; Phụ trách:</div>
+                          <div className="font-bold text-slate-800 dark:text-slate-200 truncate">{prog.leadDepartment}</div>
+                        </div>
+                        <div>
+                          <div className="text-[11px] text-slate-400 font-medium">Lịch học định kỳ:</div>
+                          <div className="font-bold text-[#003B95] truncate">{prog.schedule}</div>
+                        </div>
+                      </div>
+
+                      {/* Tiến độ số buổi học */}
+                      <div className="mt-4 space-y-1.5 bg-slate-50 dark:bg-slate-900/40 p-3 rounded-xl border border-slate-100 dark:border-slate-800">
+                        <div className="flex items-center justify-between text-xs">
+                          <span className="font-medium text-slate-600 dark:text-slate-400">Tiến độ đào tạo:</span>
+                          <span className="font-extrabold text-[#003B95]">
+                            {prog.completedSessions}/{prog.totalSessions} buổi ({progressPct}%)
+                          </span>
+                        </div>
+                        <div className="h-2 w-full overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700">
+                          <div
+                            className="h-full rounded-full bg-[#003B95]"
+                            style={{ width: `${Math.max(5, progressPct)}%` }}
+                          />
+                        </div>
+                        <div className="flex items-center justify-between text-[11px] text-slate-500 pt-0.5">
+                          <span>Quy mô: <strong>{prog.enrolledStudents}/{prog.maxStudents}</strong> học viên</span>
+                          <span>Địa điểm: <strong className="truncate">{prog.location.split("&")[0]}</strong></span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Các nút hành động */}
+                    <div className="flex flex-wrap items-center justify-between gap-2 pt-3 border-t border-slate-100 dark:border-slate-800">
+                      <div className="flex items-center gap-1.5">
+                        <button
+                          type="button"
+                          onClick={() => handleSwitchTab("sessions")}
+                          className="px-3 py-1.5 rounded-lg bg-blue-50 dark:bg-blue-950/40 text-[#003B95] dark:text-blue-300 text-xs font-bold hover:bg-blue-100 transition cursor-pointer"
+                        >
+                          Xem Buổi Học ({prog.totalSessions})
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleSwitchTab("history")}
+                          className="px-3 py-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 text-xs font-bold hover:bg-emerald-100 transition cursor-pointer"
+                        >
+                          Nhật Ký Đã Học ({prog.completedSessions})
+                        </button>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={handleOpenCreate}
+                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 text-xs font-semibold text-slate-700 dark:text-slate-200 cursor-pointer"
+                      >
+                        <Plus className="h-3.5 w-3.5" />
+                        <span>Thiết Lập Buổi Học</span>
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* ── TAB 2: XEM & THIẾT LẬP BUỔI HỌC (SESSIONS) ── */}
+        {currentTab === "sessions" && (
+          <div className="space-y-6">
+            {/* 4 Thẻ Metric */}
+            <CrmMetricGrid>
+              <CrmMetricCard
+                label="TỔNG KHÓA ĐÀO TẠO"
+                value={kpis.total}
+                sub="Khóa học & chuyên đề đã tạo"
+                icon={GraduationCap}
+                tone="sky"
+              />
+              <CrmMetricCard
+                label="ĐANG &amp; SẮP DIỄN RA"
+                value={kpis.active}
+                sub="Khóa học sẵn sàng đón học viên"
+                icon={Calendar}
+                tone="violet"
+              />
+              <CrmMetricCard
+                label="LƯỢT HỌC VIÊN ĐĂNG KÝ"
+                value={kpis.totalAttendees}
+                sub="Hội viên & doanh nhân đã đăng ký"
+                icon={UserCheck}
+                tone="green"
+              />
+              <CrmMetricCard
+                label="QUY MÔ CHỖ ĐÀO TẠO"
+                value={kpis.totalCapacity}
+                sub="Tổng số lượng học viên tối đa"
+                icon={Users}
+                tone="orange"
+              />
+            </CrmMetricGrid>
 
         {/* ── TOOLBAR TÌM KIẾM CẠNH THÊM MỚI (FIGMA STYLE) ── */}
         <CrmToolbar
@@ -619,113 +1183,664 @@ export function TrainingsPage() {
               <option value="ongoing">Đang diễn ra</option>
               <option value="completed">Đã kết thúc</option>
             </select>
+
+            {/* Chuyển đổi giao diện Bảng / Lưới / Lịch */}
+            <div className="flex items-center gap-1 rounded-[100px] border border-slate-200 dark:border-slate-700 bg-white dark:bg-card p-0.5">
+              <button
+                type="button"
+                onClick={() => setViewMode("table")}
+                title="Dạng bảng chi tiết"
+                className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold transition cursor-pointer ${
+                  viewMode === "table"
+                    ? "bg-[#003B95] text-white shadow-xs"
+                    : "text-slate-600 dark:text-slate-300 hover:text-foreground"
+                }`}
+              >
+                <List className="h-3.5 w-3.5" />
+                <span className="hidden sm:inline">Bảng</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewMode("grid")}
+                title="Dạng lưới thẻ"
+                className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold transition cursor-pointer ${
+                  viewMode === "grid"
+                    ? "bg-[#003B95] text-white shadow-xs"
+                    : "text-slate-600 dark:text-slate-300 hover:text-foreground"
+                }`}
+              >
+                <LayoutGrid className="h-3.5 w-3.5" />
+                <span className="hidden sm:inline">Lưới</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewMode("calendar")}
+                title="Dạng lịch đào tạo"
+                className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold transition cursor-pointer ${
+                  viewMode === "calendar"
+                    ? "bg-[#003B95] text-white shadow-xs"
+                    : "text-slate-600 dark:text-slate-300 hover:text-foreground"
+                }`}
+              >
+                <Calendar className="h-3.5 w-3.5" />
+                <span className="hidden sm:inline">Lịch</span>
+              </button>
+            </div>
           </div>
         </CrmToolbar>
 
-        {/* ── CUSTOM TABLE VỚI SẮP XẾP 3 TRẠNG THÁI & PHÂN TRANG ── */}
-        <CustomTable<TrainingItem>
-          columns={columns}
-          data={pagedTrainings}
-          keyExtractor={(t) => t.id}
-          sortKey={sortKey}
-          sortDir={sortDir}
-          onSort={handleSort}
-          showStt={true}
-          page={page}
-          pageSize={pageSize}
-          total={sortedTrainings.length}
-          onPageChange={setPage}
-          onPageSizeChange={(newSize) => {
-            setPageSize(newSize);
-            setPage(1);
-          }}
-          actionColumn={{
-            title: "THAO TÁC",
-            width: 220,
-            render: (t) => (
-              <div className="flex items-center justify-center gap-1.5">
-                {/* Vào phòng Video Call */}
-                {t.room_url && (
+        {/* ── BỘ HIỂN THỊ ĐA DẠNG: BẢNG / LƯỚI / LỊCH ── */}
+        {viewMode === "table" ? (
+          <CustomTable<TrainingItem>
+            columns={columns}
+            data={pagedTrainings}
+            keyExtractor={(t) => t.id}
+            sortKey={sortKey}
+            sortDir={sortDir}
+            onSort={handleSort}
+            showStt={true}
+            page={page}
+            pageSize={pageSize}
+            total={sortedTrainings.length}
+            onPageChange={setPage}
+            onPageSizeChange={(newSize) => {
+              setPageSize(newSize);
+              setPage(1);
+            }}
+            actionColumn={{
+              title: "THAO TÁC",
+              width: 320,
+              render: (t) => (
+                <div className="flex items-center justify-center gap-1.5">
+                  {/* Quản lý danh sách học viên, điểm danh & gửi slide */}
                   <button
                     type="button"
-                    onClick={() =>
-                      setActiveCallRoom({
-                        id: t.id,
-                        title: t.title,
-                        link: t.room_url || `https://meet.jit.si/${t.room_id || t.id}`,
-                      })
-                    }
-                    className="p-1.5 rounded-lg bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-300 hover:bg-blue-100 transition cursor-pointer"
-                    title="Vào phòng họp Video Call trực tuyến"
+                    onClick={() => setActiveAttendeesModal(t)}
+                    className="p-1.5 rounded-lg bg-indigo-50 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300 hover:bg-indigo-100 transition cursor-pointer"
+                    title="Danh sách học viên, điểm danh & gửi slide bài giảng"
                   >
-                    <Video className="h-4 w-4" />
+                    <Users className="h-4 w-4" />
                   </button>
-                )}
 
-                {/* Tư liệu & Khoảnh khắc đào tạo trực tiếp (User Directive 9) */}
+                  {/* Phản hồi & Đóng góp ý kiến sau buổi học */}
+                  <button
+                    type="button"
+                    onClick={() => setActiveFeedbackModal(t)}
+                    className="p-1.5 rounded-lg bg-blue-50 text-[#003B95] hover:bg-blue-100 transition cursor-pointer"
+                    title="Xem & gửi đánh giá phản hồi sau buổi học"
+                  >
+                    <MessageSquare className="h-4 w-4" />
+                  </button>
+
+                  {/* Khai báo vật dụng hỗ trợ (Ban Sự Kiện & Hậu Cần) */}
+                  <button
+                    type="button"
+                    onClick={() => setActiveSupplyModal(t)}
+                    className="p-1.5 rounded-lg bg-amber-50 text-amber-700 dark:bg-amber-950 dark:text-amber-300 hover:bg-amber-100 transition cursor-pointer"
+                    title="Khai báo vật dụng hỗ trợ buổi học (Ban Sự Kiện & Hậu Cần)"
+                  >
+                    <Package className="h-4 w-4" />
+                  </button>
+
+                  {/* Tư liệu quay phim chụp ảnh (Lưu vào Quản Lý Tài Liệu) */}
+                  <button
+                    type="button"
+                    onClick={() => setActiveMediaRecordingModal(t)}
+                    className="p-1.5 rounded-lg bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 hover:bg-emerald-100 transition cursor-pointer"
+                    title="Quay phim & chụp ảnh - Tự động đồng bộ vào Quản Lý Tài Liệu"
+                  >
+                    <Camera className="h-4 w-4" />
+                  </button>
+
+                  {/* Vào phòng Video Call */}
+                  {t.room_url && (
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setActiveCallRoom({
+                          id: t.id,
+                          title: t.title,
+                          link: t.room_url || `https://meet.jit.si/${t.room_id || t.id}`,
+                        })
+                      }
+                      className="p-1.5 rounded-lg bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-300 hover:bg-blue-100 transition cursor-pointer"
+                      title="Vào phòng họp Video Call trực tuyến"
+                    >
+                      <Video className="h-4 w-4" />
+                    </button>
+                  )}
+
+                  {/* Điểm danh QR */}
+                  <button
+                    type="button"
+                    onClick={() => setActiveQrModal(t)}
+                    className="p-1.5 rounded-lg bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 hover:bg-emerald-100 transition cursor-pointer"
+                    title="Mã QR Điểm danh học viên điện tử"
+                  >
+                    <QrCode className="h-4 w-4" />
+                  </button>
+
+                  {/* Chi tiết */}
+                  <button
+                    type="button"
+                    onClick={() => setDetailTraining(t)}
+                    className="p-1.5 rounded-lg bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 hover:bg-slate-200 transition cursor-pointer"
+                    title="Xem chi tiết khóa học"
+                  >
+                    <Eye className="h-4 w-4" />
+                  </button>
+
+                  {/* Sửa */}
+                  <button
+                    type="button"
+                    onClick={() => handleOpenEdit(t)}
+                    className="p-1.5 rounded-lg bg-amber-50 text-amber-700 dark:bg-amber-950 dark:text-amber-300 hover:bg-amber-100 transition cursor-pointer"
+                    title="Chỉnh sửa khóa học"
+                  >
+                    <Pencil className="h-4 w-4" />
+                  </button>
+
+                  {/* Xóa */}
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteTraining(t)}
+                    className="p-1.5 rounded-lg bg-rose-50 text-rose-700 dark:bg-rose-950 dark:text-rose-300 hover:bg-rose-100 transition cursor-pointer"
+                    title="Xóa khóa học"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                </div>
+              ),
+            }}
+            emptyText="Chưa có khóa đào tạo nào phù hợp bộ lọc."
+            emptyAction={
+              <button
+                type="button"
+                onClick={handleOpenCreate}
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#003B95] text-white text-xs font-bold shadow-xs hover:bg-[#002f78] transition cursor-pointer"
+              >
+                <Plus className="h-4 w-4" />
+                <span>Khai Báo Khóa Học Mới Ngay</span>
+              </button>
+            }
+          />
+        ) : viewMode === "grid" ? (
+          /* ── GRID VIEW (DẠNG LƯỚI THẺ) ── */
+          <div className="space-y-6">
+            {pagedTrainings.length === 0 ? (
+              <div className="py-16 text-center rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-card p-6">
+                <GraduationCap className="h-12 w-12 mx-auto text-slate-400 mb-3" />
+                <h3 className="text-base font-bold text-slate-900 dark:text-white">Không tìm thấy khóa đào tạo nào</h3>
+                <p className="text-xs text-slate-500 mt-1 mb-4">Hãy thử tìm kiếm với từ khóa khác hoặc xóa bộ lọc</p>
                 <button
                   type="button"
-                  onClick={() => setActiveMediaModal(t)}
-                  className="p-1.5 rounded-lg bg-amber-50 text-amber-700 dark:bg-amber-950 dark:text-amber-300 hover:bg-amber-100 transition cursor-pointer"
-                  title="Chụp ảnh trực tiếp hoặc tải ảnh/video khoảnh khắc đào tạo lưu vào lịch sử và đẩy lên mạng lưới"
+                  onClick={handleOpenCreate}
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#003B95] text-white text-xs font-bold shadow-xs hover:bg-[#002f78] transition cursor-pointer"
                 >
-                  <Camera className="h-4 w-4" />
-                </button>
-
-                {/* Điểm danh QR */}
-                <button
-                  type="button"
-                  onClick={() => setActiveQrModal(t)}
-                  className="p-1.5 rounded-lg bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 hover:bg-emerald-100 transition cursor-pointer"
-                  title="Mã QR Điểm danh học viên điện tử"
-                >
-                  <QrCode className="h-4 w-4" />
-                </button>
-
-                {/* Chi tiết */}
-                <button
-                  type="button"
-                  onClick={() => setDetailTraining(t)}
-                  className="p-1.5 rounded-lg bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 hover:bg-slate-200 transition cursor-pointer"
-                  title="Xem chi tiết khóa học"
-                >
-                  <Eye className="h-4 w-4" />
-                </button>
-
-                {/* Sửa */}
-                <button
-                  type="button"
-                  onClick={() => handleOpenEdit(t)}
-                  className="p-1.5 rounded-lg bg-amber-50 text-amber-700 dark:bg-amber-950 dark:text-amber-300 hover:bg-amber-100 transition cursor-pointer"
-                  title="Chỉnh sửa khóa học"
-                >
-                  <Pencil className="h-4 w-4" />
-                </button>
-
-                {/* Xóa */}
-                <button
-                  type="button"
-                  onClick={() => handleDeleteTraining(t)}
-                  className="p-1.5 rounded-lg bg-rose-50 text-rose-700 dark:bg-rose-950 dark:text-rose-300 hover:bg-rose-100 transition cursor-pointer"
-                  title="Xóa khóa học"
-                >
-                  <Trash2 className="h-4 w-4" />
+                  <Plus className="h-4 w-4" />
+                  <span>Khai Báo Khóa Học Mới</span>
                 </button>
               </div>
-            ),
-          }}
-          emptyText="Chưa có khóa đào tạo nào phù hợp bộ lọc."
-          emptyAction={
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                {pagedTrainings.map((t) => {
+                  const count = t.attendee_count || 0;
+                  const max = t.max_attendees || 100;
+                  const pct = Math.min(100, Math.round((count / max) * 100));
+                  const isOngoing = t.status === "ongoing";
+                  const isUpcoming = t.status === "upcoming";
+                  const isCompleted = t.status === "completed";
+                  const isFixed = (t as any).is_fixed ?? (t as any).isFixed ?? true;
+                  const img = t.cover_image || "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=1200&q=80";
+
+                  return (
+                    <div
+                      key={t.id}
+                      className="group flex flex-col rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-card overflow-hidden shadow-xs hover:shadow-md transition hover:-translate-y-0.5"
+                    >
+                      {/* Cover Image & Badges */}
+                      <div className="relative h-44 w-full overflow-hidden bg-slate-100 dark:bg-slate-900">
+                        <img
+                          src={img}
+                          alt={t.title}
+                          className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=1200&q=80";
+                          }}
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-black/30" />
+
+                        {/* Status badge */}
+                        <div className="absolute top-3 left-3">
+                          <span
+                            className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold shadow-xs ${
+                              isOngoing
+                                ? "bg-rose-500 text-white animate-pulse"
+                                : isUpcoming
+                                ? "bg-[#003B95] text-white"
+                                : isCompleted
+                                ? "bg-slate-700 text-slate-200"
+                                : "bg-amber-600 text-white"
+                            }`}
+                          >
+                            {isOngoing && <Radio className="h-3 w-3 animate-spin" />}
+                            {isOngoing ? "Đang Diễn Ra" : isUpcoming ? "Sắp Diễn Ra" : isCompleted ? "Đã Kết Thúc" : "Đã Hủy"}
+                          </span>
+                        </div>
+
+                        {/* Format & Fixed Badges */}
+                        <div className="absolute top-3 right-3 flex items-center gap-1.5">
+                          {isFixed && (
+                            <span className="px-2 py-0.5 rounded-full text-[10.5px] font-bold bg-amber-500 text-slate-950 shadow-xs">
+                              Thứ 7 Hàng Tuần
+                            </span>
+                          )}
+                          <span className="px-2 py-0.5 rounded-full text-[10.5px] font-bold bg-white/90 text-slate-900 backdrop-blur shadow-xs">
+                            {t.format === "online" ? "🌐 Online" : t.format === "offline" ? "🏢 Offline" : "⚡ Hybrid"}
+                          </span>
+                        </div>
+
+                        {/* Course Category */}
+                        <div className="absolute bottom-3 left-3">
+                          <span className="px-2.5 py-1 rounded-md text-[11px] font-bold bg-black/60 text-white backdrop-blur border border-white/20">
+                            {t.category || "Kỹ năng lãnh đạo"}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Body */}
+                      <div className="p-4 flex-1 flex flex-col justify-between space-y-3">
+                        <div>
+                          <button
+                            type="button"
+                            onClick={() => setDetailTraining(t)}
+                            className="text-sm font-bold text-slate-900 dark:text-white hover:text-[#003B95] dark:hover:text-blue-400 text-left line-clamp-2 hover:underline cursor-pointer"
+                          >
+                            {t.title}
+                          </button>
+                          {t.tagline && (
+                            <p className="text-[11px] text-slate-500 line-clamp-1 mt-0.5">{t.tagline}</p>
+                          )}
+                        </div>
+
+                        {/* Instructor Info */}
+                        <div className="flex items-center gap-2.5 p-2 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-100 dark:border-slate-800">
+                          <div className="w-8 h-8 rounded-full bg-blue-800 text-white flex items-center justify-center font-bold text-xs shrink-0">
+                            {(t.instructor_name || "BĐT").slice(0, 2).toUpperCase()}
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <div className="text-xs font-bold text-slate-900 dark:text-white truncate">
+                              {t.instructor_name || "Ban Đào Tạo CLB CEO HN10"}
+                            </div>
+                            <div className="text-[10px] text-slate-500 truncate">
+                              {t.instructor_title || "Chuyên gia đào tạo"} {t.instructor_company ? `• ${t.instructor_company}` : ""}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Date, Time & Venue */}
+                        <div className="space-y-1.5 text-xs text-slate-600 dark:text-slate-300">
+                          <div className="flex items-center gap-2">
+                            <Calendar className="h-3.5 w-3.5 text-[#003B95] shrink-0" />
+                            <span className="font-semibold text-slate-900 dark:text-white">
+                              {t.start_time ? formatToDdmmyyyy(t.start_time) : "Thứ Bảy hàng tuần"}
+                            </span>
+                            <span className="text-slate-400">•</span>
+                            <Clock className="h-3.5 w-3.5 text-amber-500 shrink-0" />
+                            <span>
+                              {t.start_time ? new Date(t.start_time).toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" }) : "08:30"} - {t.end_time ? new Date(t.end_time).toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" }) : "11:30"}
+                            </span>
+                          </div>
+                          <div className="flex items-start gap-2">
+                            <MapPin className="h-3.5 w-3.5 text-rose-500 shrink-0 mt-0.5" />
+                            <span className="line-clamp-1">{t.location || "Keangnam Landmark 72, Hà Nội"}</span>
+                          </div>
+                        </div>
+
+                        {/* Attendee capacity progress */}
+                        <div className="space-y-1 pt-1 border-t border-slate-100 dark:border-slate-800">
+                          <div className="flex items-center justify-between text-[11px]">
+                            <span className="font-bold text-slate-900 dark:text-white">
+                              {count}/{max} học viên
+                            </span>
+                            <span className="text-slate-500 font-semibold">{pct}%</span>
+                          </div>
+                          <div className="h-1.5 w-full overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700">
+                            <div
+                              className="h-full rounded-full bg-[#003B95] dark:bg-blue-400"
+                              style={{ width: `${pct}%` }}
+                            />
+                          </div>
+                        </div>
+
+                        {/* Action buttons toolbar */}
+                        <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800">
+                          <div className="flex items-center gap-1">
+                            <button
+                              type="button"
+                              onClick={() => setActiveAttendeesModal(t)}
+                              className="p-1.5 rounded-lg bg-indigo-50 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300 hover:bg-indigo-100 transition cursor-pointer"
+                              title="Điểm danh & gửi slide"
+                            >
+                              <Users className="h-4 w-4" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setActiveFeedbackModal(t)}
+                              className="p-1.5 rounded-lg bg-blue-50 text-[#003B95] hover:bg-blue-100 transition cursor-pointer"
+                              title="Ý kiến phản hồi"
+                            >
+                              <MessageSquare className="h-4 w-4" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setActiveSupplyModal(t)}
+                              className="p-1.5 rounded-lg bg-amber-50 text-amber-700 dark:bg-amber-950 dark:text-amber-300 hover:bg-amber-100 transition cursor-pointer"
+                              title="Vật dụng hỗ trợ"
+                            >
+                              <Package className="h-4 w-4" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setActiveMediaRecordingModal(t)}
+                              className="p-1.5 rounded-lg bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 hover:bg-emerald-100 transition cursor-pointer"
+                              title="Quay phim chụp ảnh"
+                            >
+                              <Camera className="h-4 w-4" />
+                            </button>
+                            {t.room_url && (
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  setActiveCallRoom({
+                                    id: t.id,
+                                    title: t.title,
+                                    link: t.room_url || `https://meet.jit.si/${t.room_id || t.id}`,
+                                  })
+                                }
+                                className="p-1.5 rounded-lg bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-300 hover:bg-blue-100 transition cursor-pointer"
+                                title="Vào phòng Video"
+                              >
+                                <Video className="h-4 w-4" />
+                              </button>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <button
+                              type="button"
+                              onClick={() => setDetailTraining(t)}
+                              className="p-1.5 rounded-lg bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 hover:bg-slate-200 transition cursor-pointer"
+                              title="Xem chi tiết"
+                            >
+                              <Eye className="h-4 w-4" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleOpenEdit(t)}
+                              className="p-1.5 rounded-lg bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-300 hover:bg-blue-100 transition cursor-pointer"
+                              title="Sửa khóa học"
+                            >
+                              <Pencil className="h-4 w-4" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteTraining(t)}
+                              className="p-1.5 rounded-lg bg-rose-50 text-rose-700 dark:bg-rose-950 dark:text-rose-300 hover:bg-rose-100 transition cursor-pointer"
+                              title="Xóa khóa học"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            {/* Pagination cho Grid */}
+            {sortedTrainings.length > pageSize && (
+              <div className="flex items-center justify-between border-t border-slate-200 dark:border-slate-800 pt-4">
+                <div className="text-xs text-slate-500">
+                  Hiển thị {(page - 1) * pageSize + 1} - {Math.min(page * pageSize, sortedTrainings.length)} trên tổng số {sortedTrainings.length} khóa học
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    disabled={page <= 1}
+                    onClick={() => setPage((p) => Math.max(1, p - 1))}
+                    className="px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-xs font-semibold disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer"
+                  >
+                    Trang trước
+                  </button>
+                  <span className="text-xs font-bold px-2">
+                    Trang {page} / {Math.ceil(sortedTrainings.length / pageSize)}
+                  </span>
+                  <button
+                    type="button"
+                    disabled={page >= Math.ceil(sortedTrainings.length / pageSize)}
+                    onClick={() => setPage((p) => p + 1)}
+                    className="px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-xs font-semibold disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer"
+                  >
+                    Trang tiếp
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        ) : (
+          /* ── CALENDAR VIEW (DẠNG LỊCH THÁNG) ── */
+          <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-card p-4 shadow-xs space-y-4">
+            {/* Calendar Nav */}
+            <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
+              <div className="flex items-center gap-3">
+                <h3 className="text-base font-bold text-slate-900 dark:text-white capitalize">
+                  {calendarCursor.toLocaleDateString("vi-VN", { month: "long", year: "numeric" })}
+                </h3>
+                <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300">
+                  {filteredTrainings.length} khóa học
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setCalendarCursor(new Date(calendarCursor.getFullYear(), calendarCursor.getMonth() - 1, 1))}
+                  className="px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-xs font-semibold hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer"
+                >
+                  ‹ Tháng trước
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setCalendarCursor(new Date())}
+                  className="px-3 py-1.5 rounded-lg bg-[#003B95] text-white text-xs font-semibold hover:bg-[#002f78] cursor-pointer"
+                >
+                  Hôm nay
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setCalendarCursor(new Date(calendarCursor.getFullYear(), calendarCursor.getMonth() + 1, 1))}
+                  className="px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-xs font-semibold hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer"
+                >
+                  Tháng sau ›
+                </button>
+              </div>
+            </div>
+
+            {/* Days Grid */}
+            {(() => {
+              const year = calendarCursor.getFullYear();
+              const month = calendarCursor.getMonth();
+              const firstDay = new Date(year, month, 1);
+              const startWeekday = (firstDay.getDay() + 6) % 7; // Monday-first
+              const daysInMonth = new Date(year, month + 1, 0).getDate();
+              const cells: (Date | null)[] = [];
+              for (let i = 0; i < startWeekday; i++) cells.push(null);
+              for (let d = 1; d <= daysInMonth; d++) cells.push(new Date(year, month, d));
+
+              const weekdays = ["Thứ Hai", "Thứ Ba", "Thứ Tư", "Thứ Năm", "Thứ Sáu", "Thứ Bảy (Lịch Học)", "Chủ Nhật"];
+              const todayStr = new Date().toISOString().split("T")[0];
+
+              return (
+                <div className="space-y-1">
+                  <div className="grid grid-cols-7 gap-1.5 text-center text-xs font-bold text-slate-600 dark:text-slate-400 py-1">
+                    {weekdays.map((w, idx) => (
+                      <div key={w} className={`py-1 rounded-md ${idx === 5 ? "bg-amber-100 text-amber-900 font-extrabold" : ""}`}>
+                        {w}
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="grid grid-cols-7 gap-1.5">
+                    {cells.map((date, idx) => {
+                      if (!date) {
+                        return <div key={`empty-${idx}`} className="min-h-[105px] rounded-xl bg-slate-50/50 dark:bg-slate-900/20" />;
+                      }
+                      const dateIso = date.toISOString().split("T")[0];
+                      const isToday = dateIso === todayStr;
+                      const isSaturday = date.getDay() === 6;
+
+                      // Find trainings on this date (or fixed weekly saturday courses)
+                      const dayTrainings = filteredTrainings.filter((t) => {
+                        if (t.start_time) {
+                          const tDate = new Date(t.start_time).toISOString().split("T")[0];
+                          if (tDate === dateIso) return true;
+                        }
+                        const isFixed = (t as any).is_fixed ?? (t as any).isFixed ?? true;
+                        if (isFixed && isSaturday) return true;
+                        return false;
+                      });
+
+                      return (
+                        <div
+                          key={dateIso}
+                          className={`min-h-[105px] rounded-xl border p-2 flex flex-col justify-between transition ${
+                            isToday
+                              ? "border-[#003B95] bg-blue-50/40 dark:bg-blue-950/30"
+                              : isSaturday
+                              ? "border-amber-200 dark:border-amber-900/40 bg-amber-50/30 dark:bg-amber-950/10"
+                              : "border-slate-200 dark:border-slate-800 bg-white dark:bg-card"
+                          }`}
+                        >
+                          <div className="flex items-center justify-between">
+                            <span className={`text-xs font-bold ${isToday ? "text-[#003B95] dark:text-blue-400 font-black" : isSaturday ? "text-amber-800 font-extrabold" : "text-slate-700 dark:text-slate-300"}`}>
+                              {date.getDate()}
+                            </span>
+                            {isSaturday && (
+                              <span className="text-[10px] font-bold text-amber-700 dark:text-amber-400">
+                                Lớp cố định
+                              </span>
+                            )}
+                          </div>
+
+                          <div className="space-y-1 my-1 overflow-y-auto max-h-[85px] no-scrollbar">
+                            {dayTrainings.slice(0, 3).map((t) => (
+                              <button
+                                key={t.id}
+                                type="button"
+                                onClick={() => setDetailTraining(t)}
+                                className="w-full text-left p-1 rounded-md text-[10.5px] font-semibold truncate block transition cursor-pointer bg-blue-100 text-blue-900 dark:bg-blue-900/60 dark:text-blue-200 hover:bg-blue-200"
+                                title={`${t.title} - ${t.instructor_name || ""}`}
+                              >
+                                🎓 {t.title}
+                              </button>
+                            ))}
+                            {dayTrainings.length > 3 && (
+                              <div className="text-[10px] font-bold text-slate-400 text-center">
+                                +{dayTrainings.length - 3} khóa khác
+                              </div>
+                            )}
+                          </div>
+
+                          <div className="text-[10px] text-right text-slate-400">
+                            {dayTrainings.length > 0 ? `${dayTrainings.length} buổi` : ""}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })()}
+          </div>
+        )}
+      </div>
+    )}
+
+    {/* ── TAB 3: NHẬT KÝ KHÓA HỌC ĐÃ DIỄN RA (COURSE LOGS) ── */}
+    {currentTab === "history" && (
+      <div className="space-y-6">
+        {/* 4 Thẻ KPI Tổng Kết Nhật Ký */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="p-4 rounded-2xl bg-white dark:bg-card border border-slate-200 dark:border-slate-800 shadow-xs space-y-1">
+            <div className="text-[11px] font-extrabold uppercase tracking-wider text-slate-500">BUỔI HỌC HOÀN THÀNH</div>
+            <div className="text-2xl font-black text-emerald-700 dark:text-emerald-400">
+              {completedTrainings.length} Buổi
+            </div>
+            <div className="text-xs text-slate-400">Đã diễn ra và lưu vết đầy đủ</div>
+          </div>
+          <div className="p-4 rounded-2xl bg-white dark:bg-card border border-slate-200 dark:border-slate-800 shadow-xs space-y-1">
+            <div className="text-[11px] font-extrabold uppercase tracking-wider text-slate-500">LƯỢT HỌC VIÊN CÓ MẶT</div>
+            <div className="text-2xl font-black text-[#003B95]">
+              {completedTrainings.reduce((sum, t) => sum + (t.attendee_count || 90), 0)} Lượt CEO
+            </div>
+            <div className="text-xs text-slate-400">Điểm danh điện tử QR Check-in</div>
+          </div>
+          <div className="p-4 rounded-2xl bg-white dark:bg-card border border-slate-200 dark:border-slate-800 shadow-xs space-y-1">
+            <div className="text-[11px] font-extrabold uppercase tracking-wider text-slate-500">TỶ LỆ CHUYÊN CẦN</div>
+            <div className="text-2xl font-black text-indigo-700 dark:text-indigo-400">
+              91.5%
+            </div>
+            <div className="text-xs text-slate-400">Trung bình các buổi đào tạo</div>
+          </div>
+          <div className="p-4 rounded-2xl bg-white dark:bg-card border border-slate-200 dark:border-slate-800 shadow-xs space-y-1">
+            <div className="text-[11px] font-extrabold uppercase tracking-wider text-slate-500">ĐÁNH GIÁ CHẤT LƯỢNG</div>
+            <div className="text-2xl font-black text-amber-600 flex items-center gap-1.5">
+              <Star className="h-6 w-6 fill-amber-500 text-amber-500" />
+              <span>4.95 / 5.0</span>
+            </div>
+            <div className="text-xs text-slate-400">Mức độ hài lòng của học viên</div>
+          </div>
+        </div>
+
+        {/* Toolbar Nhật Ký */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white dark:bg-card p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs">
+          <div>
+            <h2 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+              <History className="h-5 w-5 text-emerald-700" />
+              <span>Nhật Ký &amp; Biên Bản Các Buổi Đào Tạo Đã Diễn Ra</span>
+            </h2>
+            <p className="text-xs text-slate-500 mt-0.5">
+              Tra cứu danh sách điểm danh thực tế, đánh giá phản hồi và xem lại video tư liệu bài giảng
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
             <button
               type="button"
-              onClick={handleOpenCreate}
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#003B95] text-white text-xs font-bold shadow-xs hover:bg-[#002f78] transition cursor-pointer"
+              onClick={() => toast.success("Đang xuất biên bản nhật ký đào tạo ra file Excel...")}
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-700 text-white text-xs font-bold shadow-xs hover:bg-emerald-800 transition cursor-pointer"
             >
-              <Plus className="h-4 w-4" />
-              <span>Khai Báo Khóa Học Mới Ngay</span>
+              <Download className="h-4 w-4" />
+              <span>Xuất Báo Cáo Nhật Ký (Excel)</span>
             </button>
-          }
+          </div>
+        </div>
+
+        {/* Bảng CustomTable Nhật ký */}
+        <CustomTable<TrainingItem>
+          columns={historyColumns}
+          data={completedTrainings}
+          keyExtractor={(t) => t.id}
+          showStt={true}
+          page={1}
+          pageSize={10}
+          total={completedTrainings.length}
+          onPageChange={() => {}}
+          onPageSizeChange={() => {}}
+          emptyText="Chưa có buổi học nào đã hoàn thành trong hệ thống"
         />
+      </div>
+    )}
 
         {/* ── MODAL KHAI BÁO KHÓA ĐÀO TẠO (CHUẨN EVENT WIZARD, CÓ SỐ LƯỢNG & HẠNG VÉ, KHÔNG XẾP CHỖ) ── */}
         {showWizardModal && (
@@ -910,6 +2025,180 @@ export function TrainingsPage() {
                         <option value="completed">Đã kết thúc</option>
                         <option value="cancelled">Đã hủy</option>
                       </select>
+                    </div>
+                  </div>
+
+                  {/* UC-3: Tính chất buổi học (Cố định thứ 7 hàng tuần vs Không cố định) */}
+                  <div className="p-3 rounded-xl border border-blue-200 dark:border-blue-900/60 bg-blue-50/50 dark:bg-blue-950/20 space-y-2">
+                    <label className="block text-xs font-bold text-blue-900 dark:text-blue-200">
+                      Tính Chất Khóa Đào Tạo (UC-3)
+                    </label>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setFormIsFixed(true);
+                          setFormScheduleType("saturday_weekly");
+                        }}
+                        className={`py-2 px-3 rounded-xl border text-xs font-bold text-left transition cursor-pointer ${
+                          formIsFixed && formScheduleType === "saturday_weekly"
+                            ? "border-[#003B95] bg-blue-100/70 dark:bg-blue-900/50 text-[#003B95] dark:text-blue-300 ring-2 ring-[#003B95]/20"
+                            : "border-slate-300 dark:border-slate-700 bg-background text-slate-600 dark:text-slate-400"
+                        }`}
+                      >
+                        <div>📅 Cố Định (Thứ 7 Hàng Tuần)</div>
+                        <div className="text-[10.5px] font-normal text-slate-500 mt-0.5">
+                          Định kỳ sinh hoạt nâng cao năng lực hội viên mỗi sáng Thứ 7
+                        </div>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setFormIsFixed(false);
+                          setFormScheduleType("custom");
+                        }}
+                        className={`py-2 px-3 rounded-xl border text-xs font-bold text-left transition cursor-pointer ${
+                          !formIsFixed
+                            ? "border-[#003B95] bg-blue-100/70 dark:bg-blue-900/50 text-[#003B95] dark:text-blue-300 ring-2 ring-[#003B95]/20"
+                            : "border-slate-300 dark:border-slate-700 bg-background text-slate-600 dark:text-slate-400"
+                        }`}
+                      >
+                        <div>⚡ Buổi Học Riêng (Quỹ cá nhân)</div>
+                        <div className="text-[10.5px] font-normal text-slate-500 mt-0.5">
+                          Khóa học riêng tự chia đều kinh phí theo đầu người, tách biệt Quỹ chung
+                        </div>
+                      </button>
+                    </div>
+
+                    {!formIsFixed && (
+                      <div className="mt-3 p-3.5 rounded-xl border border-amber-200/80 dark:border-amber-900/40 bg-amber-50/60 dark:bg-amber-950/20 space-y-3">
+                        <div className="text-[11px] font-bold text-amber-800 dark:text-amber-300 flex items-center gap-1.5">
+                          <span>💰 Thiết Lập Kinh Phí & Chia Đều Tiền Vé (Quỹ Cá Nhân Riêng)</span>
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          <div>
+                            <label className="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                              Tổng kinh phí dự toán buổi học riêng (VNĐ)
+                            </label>
+                            <input
+                              type="number"
+                              min="0"
+                              step="50000"
+                              value={formTotalCost || ""}
+                              onChange={(e) => {
+                                const cost = Number(e.target.value) || 0;
+                                setFormTotalCost(cost);
+                                const fee = formExpectedAttendees > 0 ? Math.round(cost / formExpectedAttendees) : 0;
+                                setFormTicketTiers([
+                                  {
+                                    name: "Vé Buổi Học Riêng (Quỹ cá nhân)",
+                                    price: fee,
+                                    quantity: formExpectedAttendees,
+                                    description: `Tự động chia đều: ${fee.toLocaleString('vi-VN')} đ/người. Quỹ cá nhân riêng biệt.`
+                                  }
+                                ]);
+                              }}
+                              placeholder="VD: 10000000"
+                              className="w-full h-8 px-2.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-background text-xs font-semibold"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                              Số lượng người dự kiến tham gia
+                            </label>
+                            <input
+                              type="number"
+                              min="1"
+                              value={formExpectedAttendees || ""}
+                              onChange={(e) => {
+                                const count = Math.max(1, Number(e.target.value) || 1);
+                                setFormExpectedAttendees(count);
+                                const fee = Math.round(formTotalCost / count);
+                                setFormTicketTiers([
+                                  {
+                                    name: "Vé Buổi Học Riêng (Quỹ cá nhân)",
+                                    price: fee,
+                                    quantity: count,
+                                    description: `Tự động chia đều: ${fee.toLocaleString('vi-VN')} đ/người. Quỹ cá nhân riêng biệt.`
+                                  }
+                                ]);
+                              }}
+                              placeholder="VD: 20"
+                              className="w-full h-8 px-2.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-background text-xs font-semibold"
+                            />
+                          </div>
+                        </div>
+                        <div className="flex items-center justify-between text-xs font-bold pt-1 border-t border-amber-200/60 dark:border-amber-900/40">
+                          <span className="text-slate-600 dark:text-slate-400">Tiền vé tự động chia đều:</span>
+                          <span className="text-emerald-600 dark:text-emerald-400 font-extrabold text-sm">
+                            {formExpectedAttendees > 0 ? Math.round(formTotalCost / formExpectedAttendees).toLocaleString('vi-VN') : 0} đ / người
+                          </span>
+                        </div>
+                        <p className="text-[10px] text-amber-700/80 dark:text-amber-400/80 italic">
+                          * Lưu ý: Dòng tiền của buổi học riêng sẽ tính vào Quỹ cá nhân riêng, tách hoàn toàn khỏi Quỹ chung CEO HN10.
+                        </p>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* UC-3: Phân rã mốc thời gian trong 1 buổi học (Agenda Timetable) */}
+                  <div className="p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-background space-y-2">
+                    <div className="flex items-center justify-between">
+                      <label className="text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+                        <Clock className="h-3.5 w-3.5 text-[#003B95]" />
+                        <span>Khung Thời Gian Chi Tiết Trong Buổi Học (Agenda Slots)</span>
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setFormAgenda([
+                            ...formAgenda,
+                            { time: "11:30 - 12:00", activity: "Hoạt động mới" },
+                          ])
+                        }
+                        className="text-[11px] font-bold text-[#003B95] dark:text-blue-400 hover:underline inline-flex items-center gap-1"
+                      >
+                        <Plus className="h-3 w-3" /> Thêm mốc giờ
+                      </button>
+                    </div>
+                    <div className="space-y-1.5">
+                      {formAgenda.map((slot, sIdx) => (
+                        <div key={sIdx} className="flex items-center gap-2">
+                          <input
+                            type="text"
+                            value={slot.time}
+                            onChange={(e) => {
+                              const next = [...formAgenda];
+                              next[sIdx].time = e.target.value;
+                              setFormAgenda(next);
+                            }}
+                            placeholder="08:30 - 09:00"
+                            className="w-28 h-8 px-2.5 rounded-lg border border-slate-300 dark:border-slate-700 text-xs font-mono font-semibold"
+                          />
+                          <input
+                            type="text"
+                            value={slot.activity}
+                            onChange={(e) => {
+                              const next = [...formAgenda];
+                              next[sIdx].activity = e.target.value;
+                              setFormAgenda(next);
+                            }}
+                            placeholder="Nội dung hoạt động chi tiết..."
+                            className="flex-1 h-8 px-2.5 rounded-lg border border-slate-300 dark:border-slate-700 text-xs"
+                          />
+                          {formAgenda.length > 1 && (
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setFormAgenda(formAgenda.filter((_, i) => i !== sIdx))
+                              }
+                              className="p-1 text-slate-400 hover:text-rose-500"
+                            >
+                              <X className="h-3.5 w-3.5" />
+                            </button>
+                          )}
+                        </div>
+                      ))}
                     </div>
                   </div>
 
@@ -1328,6 +2617,56 @@ export function TrainingsPage() {
               </button>
             </div>
           </div>
+        )}
+
+        {/* Modal Quản lý Học Viên, Điểm danh & Gửi slide bài giảng (UC-3) */}
+        {activeAttendeesModal && (
+          <TrainingAttendeesModal
+            open={!!activeAttendeesModal}
+            trainingId={activeAttendeesModal.id}
+            trainingTitle={activeAttendeesModal.title}
+            initialSlideUrl={(activeAttendeesModal as any).slide_url || (activeAttendeesModal as any).materials?.[0]?.url}
+            onClose={() => setActiveAttendeesModal(null)}
+            onUpdateCount={(count) => {
+              setTrainings((prev) =>
+                prev.map((tr) => (tr.id === activeAttendeesModal.id ? { ...tr, attendee_count: count } : tr))
+              );
+            }}
+          />
+        )}
+
+        {/* Modal Phản Hồi & Đóng Góp Ý Kiến Sau Buổi Học (UC-3) */}
+        {activeFeedbackModal && (
+          <TrainingFeedbackModal
+            open={!!activeFeedbackModal}
+            trainingId={activeFeedbackModal.id}
+            trainingTitle={activeFeedbackModal.title}
+            onClose={() => setActiveFeedbackModal(null)}
+          />
+        )}
+
+        {/* Modal Khai Báo Vật Dụng Hậu Cần Buổi Học (UC-4) */}
+        {activeSupplyModal && (
+          <SupplyDeclarationModal
+            open={!!activeSupplyModal}
+            targetType="training"
+            targetId={activeSupplyModal.id}
+            targetName={activeSupplyModal.title}
+            department="Ban Đào Tạo & Ban Hậu Cần"
+            onClose={() => setActiveSupplyModal(null)}
+          />
+        )}
+
+        {/* Modal Quay Phim & Chụp Ảnh Tư Liệu Buổi Học (UC-3: Tự động lưu Quản lý tài liệu) */}
+        {activeMediaRecordingModal && (
+          <TrainingMediaModal
+            open={!!activeMediaRecordingModal}
+            trainingId={activeMediaRecordingModal.id}
+            trainingTitle={activeMediaRecordingModal.title}
+            existingMediaUrl={(activeMediaRecordingModal as any).media_url}
+            onClose={() => setActiveMediaRecordingModal(null)}
+            onUpdated={() => fetchTrainings()}
+          />
         )}
 
         {/* ── MODAL PHÒNG HỌP TRỰC TUYẾN (IFRAME VIDEO CALL JITSI) ── */}

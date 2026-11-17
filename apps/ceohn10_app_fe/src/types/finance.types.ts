@@ -11,5 +11,11 @@ export type Transaction = {
   refundAmount?: number;
   invoiceUrl?: string;
   recipient?: string;
+  targetDepartment?: string;
+  targetEventId?: string;
+  targetEventName?: string;
+  fundType?: "general" | "sponsorship_cash" | "sponsorship_in_kind" | string;
+  department?: string;
+  eventName?: string;
 };
 

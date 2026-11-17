@@ -47,6 +47,7 @@ import {
   IdCard,
   Monitor,
   Smartphone,
+  GraduationCap,
 } from "lucide-react";
 import { toast } from "sonner";
 import { fetchNestApi } from "@/lib/api-client";
@@ -112,11 +113,13 @@ export interface CommitteeRole {
 export const COMMITTEES: CommitteeRole[] = [
   { key: "dieu_hanh", name: "Ban Điều Hành", shortName: "Ban Điều Hành", color: "text-blue-700 bg-blue-50 border-blue-200 dark:bg-blue-950/50 dark:text-blue-300 dark:border-blue-800" },
   { key: "thu_ky", name: "Ban Thư Ký", shortName: "Ban Thư Ký", color: "text-purple-700 bg-purple-50 border-purple-200 dark:bg-purple-950/50 dark:text-purple-300 dark:border-purple-800" },
-  { key: "thanh_vien", name: "Ban Thành Viên", shortName: "Ban Thành Viên", color: "text-emerald-700 bg-emerald-50 border-emerald-200 dark:bg-emerald-950/50 dark:text-emerald-300 dark:border-emerald-800" },
-  { key: "xuc_tien", name: "Ban Xúc Tiến Thương Mại", shortName: "Ban Xúc Tiến TM", color: "text-amber-700 bg-amber-50 border-amber-200 dark:bg-amber-950/50 dark:text-amber-300 dark:border-amber-800" },
-  { key: "truyen_thong", name: "Ban Truyền Thông", shortName: "Ban Truyền Thông", color: "text-rose-700 bg-rose-50 border-rose-200 dark:bg-rose-950/50 dark:text-rose-300 dark:border-rose-800" },
   { key: "tai_chinh", name: "Ban Tài Chính", shortName: "Ban Tài Chính", color: "text-yellow-700 bg-yellow-50 border-yellow-200 dark:bg-yellow-950/50 dark:text-yellow-300 dark:border-yellow-800" },
-  { key: "thien_nguyen", name: "Ban Thiện Nguyện", shortName: "Ban Thiện Nguyện", color: "text-teal-700 bg-teal-50 border-teal-200 dark:bg-teal-950/50 dark:text-teal-300 dark:border-teal-800" },
+  { key: "su_kien", name: "Ban Sự Kiện & Hậu Cần", shortName: "Ban Sự Kiện", color: "text-rose-700 bg-rose-50 border-rose-200 dark:bg-rose-950/50 dark:text-rose-300 dark:border-rose-800" },
+  { key: "dao_tao", name: "Ban Đào Tạo & Phát Triển", shortName: "Ban Đào Tạo", color: "text-blue-700 bg-blue-50 border-blue-200 dark:bg-blue-950/50 dark:text-blue-300 dark:border-blue-800" },
+  { key: "thien_nguyen", name: "Ban Thiện Nguyện & Đời Sống", shortName: "Ban Thiện Nguyện", color: "text-teal-700 bg-teal-50 border-teal-200 dark:bg-teal-950/50 dark:text-teal-300 dark:border-teal-800" },
+  { key: "truyen_thong", name: "Ban Truyền Thông", shortName: "Ban Truyền Thông", color: "text-rose-700 bg-rose-50 border-rose-200 dark:bg-rose-950/50 dark:text-rose-300 dark:border-rose-800" },
+  { key: "xuc_tien", name: "Ban B2B & Xúc Tiến Thương Mại", shortName: "Ban B2B", color: "text-amber-700 bg-amber-50 border-amber-200 dark:bg-amber-950/50 dark:text-amber-300 dark:border-amber-800" },
+  { key: "thanh_vien", name: "Ban Thành Viên", shortName: "Ban Thành Viên", color: "text-emerald-700 bg-emerald-50 border-emerald-200 dark:bg-emerald-950/50 dark:text-emerald-300 dark:border-emerald-800" },
 ];
 
 // ── HỆ THỐNG ROLE: CHỦ TỊCH -> ADMIN -> BAN ĐIỀU HÀNH -> TỔNG THƯ KÝ -> TRƯỞNG BAN ──
@@ -130,11 +133,32 @@ export interface SystemRole {
 
 export const SYSTEM_ROLES: SystemRole[] = [
   { key: "quan_tri", name: "Quản trị", shortName: "Quản trị", color: "text-indigo-700 bg-indigo-50 border-indigo-200 dark:bg-indigo-950/50 dark:text-indigo-300 dark:border-indigo-800", desc: "Toàn quyền hệ thống & phân quyền cao nhất" },
-  { key: "chu_tich", name: "Chủ tịch", shortName: "Chủ tịch", color: "text-amber-800 bg-amber-100 border-amber-300 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-700", desc: "Chủ tịch Hiệp hội, quyền phê duyệt tối cao toàn hệ thống" },
+  { key: "chu_tich", name: "Lớp Trưởng Lâm thời", shortName: "Lớp Trưởng", color: "text-amber-800 bg-amber-100 border-amber-300 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-700", desc: "Lớp Trưởng Lâm thời CEO HN10, quyền phê duyệt tối cao toàn lớp" },
+  { key: "pho_chu_tich", name: "Lớp Phó Lâm thời", shortName: "Lớp Phó", color: "text-blue-800 bg-blue-100 border-blue-300 dark:bg-blue-950/60 dark:text-blue-300 dark:border-blue-700", desc: "Lớp Phó Lâm thời CEO HN10, điều hành & phụ trách ban chuyên môn" },
+  { key: "lop_pho_hoc_tap", name: "Lớp Phó Học Tập Lâm Thời", shortName: "LP Học Tập", color: "text-blue-700 bg-blue-50 border-blue-200 dark:bg-blue-950/50 dark:text-blue-300 dark:border-blue-800", desc: "Lớp Phó phụ trách Ban Học Tập" },
+  { key: "lop_pho_su_kien", name: "Lớp Phó Sự Kiện & Hậu Cần Lâm Thời", shortName: "LP Sự Kiện", color: "text-rose-700 bg-rose-50 border-rose-200 dark:bg-rose-950/50 dark:text-rose-300 dark:border-rose-800", desc: "Lớp Phó phụ trách Ban Sự kiện & Hậu cần" },
+  { key: "lop_pho_tai_chinh", name: "Lớp Phó Tài Chính Tài Trợ Lâm Thời", shortName: "LP Tài Chính", color: "text-yellow-700 bg-yellow-50 border-yellow-200 dark:bg-yellow-950/50 dark:text-yellow-300 dark:border-yellow-800", desc: "Lớp Phó phụ trách Ban Tài chính & Tài trợ" },
+  { key: "lop_pho_truyen_thong", name: "Lớp Phó Truyền Thông Lâm Thời", shortName: "LP Truyền Thông", color: "text-rose-700 bg-rose-50 border-rose-200 dark:bg-rose-950/50 dark:text-rose-300 dark:border-rose-800", desc: "Lớp Phó phụ trách Ban Truyền thông" },
+  { key: "lop_pho_cong_nghe", name: "Lớp Phó Công Nghệ Lâm Thời", shortName: "LP Công Nghệ", color: "text-indigo-700 bg-indigo-50 border-indigo-200 dark:bg-indigo-950/50 dark:text-indigo-300 dark:border-indigo-800", desc: "Lớp Phó phụ trách Ban Công nghệ" },
+  { key: "lop_pho_doi_ngoai", name: "Lớp Phó Đối Ngoại & Giao Thương Lâm Thời", shortName: "LP Đối Ngoại", color: "text-emerald-700 bg-emerald-50 border-emerald-200 dark:bg-emerald-950/50 dark:text-emerald-300 dark:border-emerald-800", desc: "Lớp Phó phụ trách Ban Đối ngoại & Giao thương" },
+  { key: "lop_pho_doi_song", name: "Lớp Phó Đời Sống & Gắn Kết Thành Viên Lâm Thời", shortName: "LP Đời Sống", color: "text-amber-700 bg-amber-50 border-amber-200 dark:bg-amber-950/50 dark:text-amber-300 dark:border-amber-800", desc: "Lớp Phó phụ trách Ban Đời sống & Gắn kết thành viên" },
+  { key: "truong_team_lt", name: "Trưởng Team LT", shortName: "Trưởng Team", color: "text-purple-700 bg-purple-50 border-purple-200 dark:bg-purple-950/50 dark:text-purple-300 dark:border-purple-800", desc: "Trưởng Team Lâm thời" },
+  { key: "pho_team_lt", name: "2 Phó Team LT", shortName: "Phó Team LT", color: "text-blue-700 bg-blue-50 border-blue-200 dark:bg-blue-950/50 dark:text-blue-300 dark:border-blue-800", desc: "2 Phó Team Lâm thời" },
+  { key: "pho_team_tap_su", name: "3 Phó Team Tập sự", shortName: "Phó Team TS", color: "text-cyan-700 bg-cyan-50 border-cyan-200 dark:bg-cyan-950/50 dark:text-cyan-300 dark:border-cyan-800", desc: "3 Phó Team Tập sự" },
+  { key: "tb_hoc_tap_tap_su", name: "Trưởng Ban Học Tập Tập sự", shortName: "TB Học Tập TS", color: "text-blue-700 bg-blue-50 border-blue-200 dark:bg-blue-950/50 dark:text-blue-300 dark:border-blue-800", desc: "Trưởng Ban Học Tập Tập sự" },
+  { key: "tb_su_kien_tap_su", name: "Trưởng Ban Sự Kiện & Hậu Cần Tập sự", shortName: "TB Sự Kiện TS", color: "text-rose-700 bg-rose-50 border-rose-200 dark:bg-rose-950/50 dark:text-rose-300 dark:border-rose-800", desc: "Trưởng Ban Sự Kiện & Hậu Cần Tập sự" },
+  { key: "tb_tai_chinh_tap_su", name: "Trưởng Ban Tài Chính Tài Trợ Tập sự", shortName: "TB Tài Chính TS", color: "text-yellow-700 bg-yellow-50 border-yellow-200 dark:bg-yellow-950/50 dark:text-yellow-300 dark:border-yellow-800", desc: "Trưởng Ban Tài Chính Tài Trợ Tập sự" },
+  { key: "tb_truyen_thong_tap_su", name: "Trưởng Ban Truyền Thông Tập sự", shortName: "TB Truyền Thông TS", color: "text-rose-700 bg-rose-50 border-rose-200 dark:bg-rose-950/50 dark:text-rose-300 dark:border-rose-800", desc: "Trưởng Ban Truyền Thông Tập sự" },
+  { key: "tb_cong_nghe_tap_su", name: "Trưởng Ban Công Nghệ Tập sự", shortName: "TB Công Nghệ TS", color: "text-indigo-700 bg-indigo-50 border-indigo-200 dark:bg-indigo-950/50 dark:text-indigo-300 dark:border-indigo-800", desc: "Trưởng Ban Công Nghệ Tập sự" },
+  { key: "tb_doi_ngoai_tap_su", name: "Trưởng Ban Đối Ngoại & Giao Thương Tập sự", shortName: "TB Đối Ngoại TS", color: "text-emerald-700 bg-emerald-50 border-emerald-200 dark:bg-emerald-950/50 dark:text-emerald-300 dark:border-emerald-800", desc: "Trưởng Ban Đối Ngoại & Giao Thương Tập sự" },
+  { key: "tb_doi_song_tap_su", name: "Trưởng Ban Đời Sống & Gắn Kết Thành Viên Tập sự", shortName: "TB Đời Sống TS", color: "text-amber-700 bg-amber-50 border-amber-200 dark:bg-amber-950/50 dark:text-amber-300 dark:border-amber-800", desc: "Trưởng Ban Đời Sống & Gắn Kết Thành Viên Tập sự" },
   { key: "admin", name: "Admin", shortName: "Admin", color: "text-purple-700 bg-purple-50 border-purple-200 dark:bg-purple-950/50 dark:text-purple-300 dark:border-purple-800", desc: "Quản trị viên vận hành nghiệp vụ CRM" },
   { key: "truong_ban_dieu_hanh", name: "Trưởng ban điều hành", shortName: "Trưởng ban Điều Hành", color: "text-blue-700 bg-blue-50 border-blue-200 dark:bg-blue-950/50 dark:text-blue-300 dark:border-blue-800", desc: "Điều hành quản lý nội bộ, quy chế & điều phối các ban" },
   { key: "thanh_vien_ban_dieu_hanh", name: "Thành viên ban điều hành", shortName: "TV Ban Điều Hành", color: "text-blue-700 bg-blue-50 border-blue-200 dark:bg-blue-950/50 dark:text-blue-300 dark:border-blue-800", desc: "Thành viên Ban Điều Hành Hiệp Hội" },
   { key: "tong_thu_ky", name: "Tổng thư ký", shortName: "Tổng thư ký", color: "text-amber-700 bg-amber-50 border-amber-200 dark:bg-amber-950/50 dark:text-amber-300 dark:border-amber-800", desc: "Điều phối thư ký, sự kiện, cuộc họp & công văn" },
+  { key: "truong_ban_su_kien", name: "Trưởng ban Sự kiện & Hậu cần", shortName: "Trưởng ban Sự Kiện", color: "text-rose-700 bg-rose-50 border-rose-200 dark:bg-rose-950/50 dark:text-rose-300 dark:border-rose-800", desc: "Tổ chức sự kiện, khai báo vật dụng hỗ trợ, e-ticket & check-in" },
+  { key: "truong_ban_dao_tao", name: "Trưởng ban Đào tạo & Phát triển", shortName: "Trưởng ban Đào Tạo", color: "text-blue-700 bg-blue-50 border-blue-200 dark:bg-blue-950/50 dark:text-blue-300 dark:border-blue-800", desc: "Quản lý khóa đào tạo doanh nhân, lớp học thứ 7 và học liệu" },
+  { key: "thanh_vien_ban_dao_tao", name: "Thành viên ban đào tạo", shortName: "Thành viên Ban Đào Tạo", color: "text-blue-600 bg-blue-50 border-blue-200 dark:bg-blue-950/50 dark:text-blue-300 dark:border-blue-800", desc: "Hỗ trợ tổ chức lớp học, điểm danh và quản lý học viên" },
   { key: "truong_ban_truyen_thong", name: "Trưởng ban truyền thông", shortName: "Trưởng ban Truyền Thông", color: "text-rose-700 bg-rose-50 border-rose-200 dark:bg-rose-950/50 dark:text-rose-300 dark:border-rose-800", desc: "Quản lý truyền thông, tin tức, hình ảnh & thương hiệu" },
   { key: "truong_ban_thanh_vien", name: "Trưởng ban thành viên", shortName: "Trưởng ban Thành Viên", color: "text-emerald-700 bg-emerald-50 border-emerald-200 dark:bg-emerald-950/50 dark:text-emerald-300 dark:border-emerald-800", desc: "Phát triển hội viên, kết nạp & chăm sóc hội viên mới" },
   { key: "truong_ban_xuc_tien", name: "Trưởng ban xúc tiến TM", shortName: "Trưởng ban Xúc Tiến TM", color: "text-orange-700 bg-orange-50 border-orange-200 dark:bg-orange-950/50 dark:text-orange-300 dark:border-orange-800", desc: "Điều phối cơ hội giao thương, kết nối B2B & kinh doanh" },
@@ -344,18 +368,6 @@ export const INITIAL_CATEGORIES: TreeCategory[] = [
         ],
       },
       {
-        id: "feat_sponsor_packages",
-        name: "Gói tài trợ",
-        route: "/sponsor-packages",
-        description: "Cấu hình danh mục các gói tài trợ và quyền lợi đối ứng",
-        actions: [
-          { id: "act_spk_view", name: "Xem danh mục gói tài trợ", code: "SPK_VIEW", description: "Xem giá trị định mức và quyền lợi các gói", apiEndpoint: "GET /api/sponsor-packages", roles: { bqt: true, thu_ky: true, xuc_tien: true, truyen_thong: true, quan_tri: true, admin: true, tong_thu_ky: true, ban_thu_ky: true } },
-          { id: "act_spk_add", name: "Tạo gói tài trợ mới", code: "SPK_ADD", description: "Thiết lập gói tài trợ kèm danh mục quyền lợi", apiEndpoint: "POST /api/sponsor-packages", roles: { bqt: true, thu_ky: true, xuc_tien: true, quan_tri: true, admin: true } },
-          { id: "act_spk_edit", name: "Chỉnh sửa gói tài trợ", code: "SPK_EDIT", description: "Điều chỉnh mức phí và quyền lợi đối ứng", apiEndpoint: "PUT /api/sponsor-packages/:id", roles: { bqt: true, thu_ky: true, xuc_tien: true, quan_tri: true, admin: true } },
-          { id: "act_spk_delete", name: "Xóa gói tài trợ", code: "SPK_DELETE", description: "Xóa gói tài trợ không còn áp dụng", apiEndpoint: "DELETE /api/sponsor-packages/:id", roles: { bqt: true, quan_tri: true, admin: true } },
-        ],
-      },
-      {
         id: "feat_sponsor_report",
         name: "Báo cáo tài trợ",
         route: "/sponsor-report",
@@ -480,18 +492,6 @@ export const INITIAL_CATEGORIES: TreeCategory[] = [
           { id: "act_prk_add", name: "Thêm đặc quyền mới", code: "PRK_ADD", description: "Tạo dịch vụ đặc quyền mới cho hiệp hội", apiEndpoint: "POST /api/perks", roles: { bqt: true, thu_ky: true, thanh_vien: true, quan_tri: true, admin: true } },
           { id: "act_prk_edit", name: "Chỉnh sửa đặc quyền", code: "PRK_EDIT", description: "Cập nhật điều kiện sử dụng đặc quyền", apiEndpoint: "PUT /api/perks/:id", roles: { bqt: true, thu_ky: true, thanh_vien: true, quan_tri: true, admin: true } },
           { id: "act_prk_delete", name: "Xóa đặc quyền", code: "PRK_DELETE", description: "Xóa đặc quyền không còn hiệu lực", apiEndpoint: "DELETE /api/perks/:id", roles: { bqt: true, quan_tri: true, admin: true } },
-        ],
-      },
-      {
-        id: "feat_benefits",
-        name: "Quyền lợi hội viên",
-        route: "/benefits",
-        description: "Quản lý chính sách quyền lợi các hạng thẻ hội viên",
-        actions: [
-          { id: "act_bnf_view", name: "Xem danh sách quyền lợi", code: "BNF_VIEW", description: "Tra cứu quyền lợi theo từng hạng thẻ hội viên", apiEndpoint: "GET /api/benefits", roles: { bqt: true, thu_ky: true, thanh_vien: true, xuc_tien: true, truyen_thong: true, thien_nguyen: true, quan_tri: true, admin: true, tong_thu_ky: true, ban_thu_ky: true, member: true } },
-          { id: "act_bnf_add", name: "Thêm quyền lợi mới", code: "BNF_ADD", description: "Bổ sung chính sách quyền lợi mới", apiEndpoint: "POST /api/benefits", roles: { bqt: true, thu_ky: true, thanh_vien: true, quan_tri: true, admin: true } },
-          { id: "act_bnf_edit", name: "Chỉnh sửa quyền lợi", code: "BNF_EDIT", description: "Điều chỉnh nội dung quyền lợi", apiEndpoint: "PUT /api/benefits/:id", roles: { bqt: true, thu_ky: true, thanh_vien: true, quan_tri: true, admin: true } },
-          { id: "act_bnf_delete", name: "Xóa quyền lợi", code: "BNF_DELETE", description: "Xóa chính sách quyền lợi", apiEndpoint: "DELETE /api/benefits/:id", roles: { bqt: true, quan_tri: true, admin: true } },
         ],
       },
     ],
@@ -757,6 +757,44 @@ export interface RbacPermissionMatrixProps {
   onDirtyChange?: (isDirty: boolean) => void;
   saveTriggerRef?: React.MutableRefObject<(() => Promise<boolean>) | null>;
   discardTriggerRef?: React.MutableRefObject<(() => void) | null>;
+}
+
+function getCategoryIcon(name?: string) {
+  switch (name) {
+    case "Users":
+    case "cat_members":
+      return <Users className="size-4" />;
+    case "Calendar":
+    case "cat_events":
+      return <Calendar className="size-4" />;
+    case "GraduationCap":
+    case "cat_trainings":
+      return <GraduationCap className="size-4" />;
+    case "Wallet":
+    case "cat_finance":
+      return <Wallet className="size-4" />;
+    case "Gift":
+    case "Handshake":
+    case "cat_sponsors":
+      return <Gift className="size-4" />;
+    case "Vote":
+    case "cat_voting":
+      return <Vote className="size-4" />;
+    case "FolderOpen":
+    case "cat_documents":
+      return <FolderOpen className="size-4" />;
+    case "Bell":
+    case "cat_notifications":
+      return <Bell className="size-4" />;
+    case "ClipboardList":
+    case "cat_tasks":
+      return <ClipboardList className="size-4" />;
+    case "Settings":
+    case "cat_settings":
+      return <Settings className="size-4" />;
+    default:
+      return <ShieldCheck className="size-4" />;
+  }
 }
 
 export function RbacPermissionMatrix({
@@ -1567,6 +1605,107 @@ export function RbacPermissionMatrix({
 
   // ── PHÂN CHIA 2 TAB: PHÂN QUYỀN CRM RIÊNG & PHÂN QUYỀN APP CEO HN10 RIÊNG ──
   const [matrixTab, setMatrixTab] = useState<"crm" | "app">("crm");
+  const [viewMode, setViewMode] = useState<"role_focused" | "matrix_grid">("role_focused");
+  const [selectedRoleKey, setSelectedRoleKey] = useState<string>("quan_tri");
+  const [roleSearchTerm, setRoleSearchTerm] = useState<string>("");
+  const [selectedCategoryTab, setSelectedCategoryTab] = useState<string>("all");
+
+  const handleToggleCategoryForRole = (catId: string, roleKey: string) => {
+    let catTotal = 0;
+    let catEnabled = 0;
+    categories.forEach((c) => {
+      if (c.id === catId) {
+        (c.features || []).forEach((f) => {
+          (f.actions || []).forEach((a) => {
+            catTotal++;
+            if (a.roles && a.roles[roleKey]) catEnabled++;
+          });
+        });
+      }
+    });
+
+    const targetValue = catEnabled < catTotal;
+
+    setCategories((prev) =>
+      prev.map((c) => {
+        if (c.id !== catId) return c;
+        return {
+          ...c,
+          features: (c.features || []).map((f) => ({
+            ...f,
+            actions: (f.actions || []).map((a) => ({
+              ...a,
+              roles: {
+                ...a.roles,
+                [roleKey]: targetValue,
+              },
+            })),
+          })),
+        };
+      })
+    );
+    toast.success(
+      targetValue
+        ? `Đã BẬT tất cả quyền trong phân hệ này cho vai trò!`
+        : `Đã TẮT tất cả quyền trong phân hệ này cho vai trò!`
+    );
+  };
+
+  const applyRolePreset = (
+    roleKey: string,
+    roleName: string,
+    preset: "all" | "none" | "view_only" | "manager"
+  ) => {
+    setCategories((prev) =>
+      prev.map((c) => ({
+        ...c,
+        features: (c.features || []).map((f) => ({
+          ...f,
+          actions: (f.actions || []).map((a) => {
+            let isAllowed = false;
+            const actCode = (a.code || "").toUpperCase();
+            const actName = (a.name || "").toUpperCase();
+
+            if (preset === "all") {
+              isAllowed = true;
+            } else if (preset === "none") {
+              isAllowed = false;
+            } else if (preset === "view_only") {
+              isAllowed =
+                actCode.includes("VIEW") ||
+                actCode.includes("XEM") ||
+                actName.includes("XEM") ||
+                actName.includes("TỔNG QUAN") ||
+                actCode.includes("LIST") ||
+                actCode.includes("GET");
+            } else if (preset === "manager") {
+              isAllowed =
+                !actCode.includes("DELETE") &&
+                !actName.includes("XÓA") &&
+                !actCode.includes("DESTROY");
+            }
+
+            return {
+              ...a,
+              roles: {
+                ...a.roles,
+                [roleKey]: isAllowed,
+              },
+            };
+          }),
+        })),
+      }))
+    );
+
+    const presetNames: Record<string, string> = {
+      all: "Toàn quyền quản trị",
+      none: "Thu hồi toàn bộ",
+      view_only: "Chỉ xem dữ liệu",
+      manager: "Quản trị viên tiêu chuẩn (không xóa)",
+    };
+
+    toast.success(`Đã áp dụng mẫu "${presetNames[preset]}" cho vai trò "${roleName}"!`);
+  };
 
   const crmCategories = useMemo(() => {
     return filteredCategories.filter(
@@ -1639,6 +1778,16 @@ export function RbacPermissionMatrix({
         <div className="flex justify-start items-center gap-2">
           <button
             type="button"
+            onClick={handleSaveAll}
+            disabled={saving}
+            className="h-9 px-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl flex justify-center items-center gap-1.5 cursor-pointer transition shadow-sm font-bold text-xs disabled:opacity-50"
+          >
+            <Save className="size-4" />
+            <span>{saving ? "Đang Lưu..." : "Lưu Cấu Hình"}</span>
+          </button>
+
+          <button
+            type="button"
             onClick={() => setAddFeatureOpen(true)}
             className="h-9 px-4 bg-gradient-to-r from-[#7C2D82] via-[#9333EA] to-[#6B21A8] hover:opacity-95 text-white rounded-xl flex justify-center items-center gap-1.5 cursor-pointer transition shadow-sm font-bold text-xs"
           >
@@ -1672,42 +1821,72 @@ export function RbacPermissionMatrix({
       </div>
 
       {/* ── 2 TAB PHÂN QUYỀN CHUYÊN BIỆT: CRM RIÊNG & APP CEO HN10 RIÊNG ── */}
-      <div className="self-stretch flex items-center gap-2 border-b border-purple-100 dark:border-purple-900/40 pb-3">
-        <button
-          type="button"
-          onClick={() => setMatrixTab("crm")}
-          className={`px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm flex items-center gap-2 transition cursor-pointer ${
-            matrixTab === "crm"
-              ? "bg-gradient-to-r from-[#7C2D82] to-[#9333EA] text-white shadow-md shadow-purple-900/25"
-              : "bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-purple-50 dark:hover:bg-slate-750 border border-purple-100 dark:border-purple-900/40"
-          }`}
-        >
-          <Monitor className="size-4" />
-          <span>PHÂN QUYỀN HỆ THỐNG CRM</span>
-          <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${
-            matrixTab === "crm" ? "bg-white/20 text-white" : "bg-purple-100/60 dark:bg-slate-700 text-purple-800 dark:text-purple-300"
-          }`}>
-            {crmCategories.reduce((acc, c) => acc + c.features.length, 0)} phân hệ
-          </span>
-        </button>
+      <div className="self-stretch flex flex-wrap items-center justify-between gap-3 border-b border-purple-100 dark:border-purple-900/40 pb-3">
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setMatrixTab("crm")}
+            className={`px-4 sm:px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm flex items-center gap-2 transition cursor-pointer ${
+              matrixTab === "crm"
+                ? "bg-gradient-to-r from-[#7C2D82] to-[#9333EA] text-white shadow-md shadow-purple-900/25"
+                : "bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-purple-50 dark:hover:bg-slate-750 border border-purple-100 dark:border-purple-900/40"
+            }`}
+          >
+            <Monitor className="size-4" />
+            <span>PHÂN QUYỀN HỆ THỐNG CRM</span>
+            <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${
+              matrixTab === "crm" ? "bg-white/20 text-white" : "bg-purple-100/60 dark:bg-slate-700 text-purple-800 dark:text-purple-300"
+            }`}>
+              {crmCategories.reduce((acc, c) => acc + c.features.length, 0)} phân hệ
+            </span>
+          </button>
 
-        <button
-          type="button"
-          onClick={() => setMatrixTab("app")}
-          className={`px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm flex items-center gap-2 transition cursor-pointer ${
-            matrixTab === "app"
-              ? "bg-gradient-to-r from-[#D61F69] to-[#9333EA] text-white shadow-md shadow-pink-900/25"
-              : "bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-pink-50 dark:hover:bg-slate-750 border border-purple-100 dark:border-purple-900/40"
-          }`}
-        >
-          <Smartphone className="size-4" />
-          <span>PHÂN QUYỀN APP CEO HN10</span>
-          <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${
-            matrixTab === "app" ? "bg-white/20 text-white" : "bg-pink-100/60 dark:bg-slate-700 text-pink-800 dark:text-pink-300"
-          }`}>
-            {appCategories.reduce((acc, c) => acc + c.features.length, 0)} chức năng
-          </span>
-        </button>
+          <button
+            type="button"
+            onClick={() => setMatrixTab("app")}
+            className={`px-4 sm:px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm flex items-center gap-2 transition cursor-pointer ${
+              matrixTab === "app"
+                ? "bg-gradient-to-r from-[#D61F69] to-[#9333EA] text-white shadow-md shadow-pink-900/25"
+                : "bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-pink-50 dark:hover:bg-slate-750 border border-purple-100 dark:border-purple-900/40"
+            }`}
+          >
+            <Smartphone className="size-4" />
+            <span>PHÂN QUYỀN APP CEO HN10</span>
+            <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${
+              matrixTab === "app" ? "bg-white/20 text-white" : "bg-pink-100/60 dark:bg-slate-700 text-pink-800 dark:text-pink-300"
+            }`}>
+              {appCategories.reduce((acc, c) => acc + c.features.length, 0)} chức năng
+            </span>
+          </button>
+        </div>
+
+        {/* BỘ CHUYỂN ĐỔI CHẾ ĐỘ XEM: THEO TỪNG VAI TRÒ (CHUẨN RBAC) VS BẢNG MA TRẬN TỔNG THỂ */}
+        <div className="flex items-center gap-1 p-1 bg-purple-50/90 dark:bg-slate-800 rounded-xl border border-purple-200/60 dark:border-purple-800">
+          <button
+            type="button"
+            onClick={() => setViewMode("role_focused")}
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
+              viewMode === "role_focused"
+                ? "bg-gradient-to-r from-[#7C2D82] to-[#9333EA] text-white shadow-xs"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            <ShieldCheck className="size-3.5" />
+            <span>Theo Từng Vai Trò (Chuẩn RBAC)</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setViewMode("matrix_grid")}
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
+              viewMode === "matrix_grid"
+                ? "bg-gradient-to-r from-[#7C2D82] to-[#9333EA] text-white shadow-xs"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            <FileBarChart className="size-3.5" />
+            <span>Bảng Ma Trận Đối Chiếu</span>
+          </button>
+        </div>
       </div>
 
       {/* ── CẢNH BÁO CHƯA LƯU QUYỀN TRÊN MA TRẬN ── */}
@@ -1747,8 +1926,368 @@ export function RbacPermissionMatrix({
         </div>
       )}
 
-      {/* ── BẢNG MA TRẬN PHÂN QUYỀN (FIGMA SNIPPET 1) ── */}
-      <div className="self-stretch relative bg-white dark:bg-slate-900 rounded-[20px] border border-purple-100 dark:border-purple-900/40 flex flex-col justify-start items-start overflow-x-auto shadow-xs">
+      {/* ── GIAO DIỆN PHÂN QUYỀN CHUẨN RBAC THEO TỪNG VAI TRÒ (DỄ DÙNG 100% TIẾNG VIỆT) ── */}
+      {viewMode === "role_focused" ? (
+        <div className="self-stretch grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+          {/* CỘT TRÁI (4 COLS): DANH SÁCH VAI TRÒ HỆ THỐNG */}
+          <div className="lg:col-span-4 rounded-2xl border border-purple-100 dark:border-purple-900/40 bg-white dark:bg-slate-900 p-4 space-y-3 shadow-xs sticky top-24">
+            <div className="flex items-center justify-between pb-2 border-b border-purple-100 dark:border-purple-900/30">
+              <div className="flex items-center gap-2">
+                <Users className="size-4 text-[#7C2D82] dark:text-purple-400" />
+                <h3 className="text-xs font-black uppercase tracking-wider text-foreground">
+                  Danh Sách Vai Trò ({orderedRoles.length})
+                </h3>
+              </div>
+              <span className="text-[10px] text-muted-foreground font-semibold">
+                Chọn để phân quyền
+              </span>
+            </div>
+
+            {/* Tìm kiếm vai trò */}
+            <div className="relative">
+              <Search className="size-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+              <input
+                type="text"
+                value={roleSearchTerm}
+                onChange={(e) => setRoleSearchTerm(e.target.value)}
+                placeholder="Tìm vai trò..."
+                className="h-8 w-full rounded-xl border border-purple-200/60 dark:border-purple-900/40 bg-purple-50/30 dark:bg-slate-800/60 pl-8 pr-3 text-xs text-foreground placeholder:text-muted-foreground outline-none focus:border-purple-500"
+              />
+            </div>
+
+            {/* Danh sách vai trò */}
+            <div className="space-y-1.5 max-h-[600px] overflow-y-auto pr-1">
+              {orderedRoles
+                .filter(
+                  (r) =>
+                    !roleSearchTerm.trim() ||
+                    r.name.toLowerCase().includes(roleSearchTerm.toLowerCase()) ||
+                    r.shortName.toLowerCase().includes(roleSearchTerm.toLowerCase()) ||
+                    r.desc.toLowerCase().includes(roleSearchTerm.toLowerCase())
+                )
+                .map((role) => {
+                  let totalActs = 0;
+                  let grantedActs = 0;
+                  currentTabCategories.forEach((cat) => {
+                    (cat?.features || []).forEach((feat) => {
+                      (feat?.actions || []).forEach((act) => {
+                        totalActs++;
+                        if (act.roles && act.roles[role.key]) grantedActs++;
+                      });
+                    });
+                  });
+                  const isSelected = selectedRoleKey === role.key;
+                  const pct = totalActs > 0 ? Math.round((grantedActs / totalActs) * 100) : 0;
+
+                  return (
+                    <button
+                      key={role.key}
+                      type="button"
+                      onClick={() => setSelectedRoleKey(role.key)}
+                      className={`w-full text-left p-3 rounded-xl border transition-all cursor-pointer flex flex-col gap-1.5 ${
+                        isSelected
+                          ? "border-[#7C2D82] bg-purple-50 dark:bg-purple-950/40 shadow-xs ring-1 ring-[#7C2D82]/30"
+                          : "border-border/60 bg-card hover:bg-muted/40 hover:border-purple-200"
+                      }`}
+                    >
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <span
+                            className={`size-7 rounded-lg flex items-center justify-center text-xs font-black shrink-0 ${
+                              isSelected
+                                ? "bg-gradient-to-r from-[#7C2D82] to-[#9333EA] text-white"
+                                : "bg-muted text-muted-foreground"
+                            }`}
+                          >
+                            {role.name.charAt(0)}
+                          </span>
+                          <span className="text-xs font-bold text-foreground truncate">
+                            {role.name}
+                          </span>
+                        </div>
+                        <span
+                          className={`px-2 py-0.5 rounded-full text-[10px] font-bold shrink-0 ${
+                            pct >= 90
+                              ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20"
+                              : pct >= 50
+                              ? "bg-purple-500/10 text-purple-700 dark:text-purple-300 border border-purple-500/20"
+                              : "bg-muted text-muted-foreground"
+                          }`}
+                        >
+                          {grantedActs}/{totalActs} quyền ({pct}%)
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-muted-foreground line-clamp-1">
+                        {role.desc}
+                      </p>
+                    </button>
+                  );
+                })}
+            </div>
+          </div>
+
+          {/* CỘT PHẢI (8 COLS): KHU VỰC CẤU HÌNH QUYỀN HẠN CHO VAI TRÒ ĐANG CHỌN */}
+          <div className="lg:col-span-8 space-y-4">
+            {(() => {
+              const activeRole = orderedRoles.find((r) => r.key === selectedRoleKey) || orderedRoles[0];
+              if (!activeRole) return null;
+
+              let roleTotalActs = 0;
+              let roleGrantedActs = 0;
+              currentTabCategories.forEach((cat) => {
+                (cat?.features || []).forEach((feat) => {
+                  (feat?.actions || []).forEach((act) => {
+                    roleTotalActs++;
+                    if (act.roles && act.roles[activeRole.key]) roleGrantedActs++;
+                  });
+                });
+              });
+
+              return (
+                <>
+                  {/* Card thông tin vai trò & Bộ gán nhanh */}
+                  <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 p-5 space-y-4 shadow-xs">
+                    <div className="flex flex-wrap items-center justify-between gap-3">
+                      <div className="flex items-center gap-3">
+                        <div className="size-11 rounded-2xl bg-gradient-to-r from-[#7C2D82] via-[#9333EA] to-[#D61F69] text-white flex items-center justify-center font-black text-lg shadow-sm">
+                          <ShieldCheck className="size-6" />
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <h2 className="text-base sm:text-lg font-black text-foreground">
+                              {activeRole.name}
+                            </h2>
+                            <span className={`px-2 py-0.5 rounded-full text-[10.5px] font-bold border ${activeRole.color}`}>
+                              {activeRole.shortName}
+                            </span>
+                          </div>
+                          <p className="text-xs text-muted-foreground mt-0.5">
+                            {activeRole.desc}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="text-right">
+                        <div className="text-xs font-bold text-foreground">
+                          Quyền hạn kích hoạt:{" "}
+                          <span className="text-[#7C2D82] dark:text-purple-300 font-black">
+                            {roleGrantedActs} / {roleTotalActs}
+                          </span>
+                        </div>
+                        <div className="text-[11px] text-muted-foreground">
+                          Phân hệ {matrixTab === "crm" ? "Cổng Quản Trị Web CRM" : "App CEO HN10"}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Bộ gán nhanh (Quick Presets) */}
+                    <div className="flex flex-wrap items-center justify-between gap-2 pt-3 border-t border-purple-100 dark:border-purple-900/30 text-xs">
+                      <div className="flex items-center gap-1.5 font-bold text-muted-foreground text-[11px]">
+                        <Sparkles className="size-3.5 text-amber-500" />
+                        <span>Mẫu Gán Nhanh:</span>
+                      </div>
+                      <div className="flex flex-wrap items-center gap-1.5">
+                        <button
+                          type="button"
+                          onClick={() => applyRolePreset(activeRole.key, activeRole.name, "all")}
+                          className="px-2.5 py-1 rounded-lg bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-500/20 font-bold text-[11px] transition cursor-pointer"
+                        >
+                          ✓ Cấp Toàn Quyền
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => applyRolePreset(activeRole.key, activeRole.name, "manager")}
+                          className="px-2.5 py-1 rounded-lg bg-purple-500/10 text-purple-700 dark:text-purple-300 hover:bg-purple-500/20 font-bold text-[11px] transition cursor-pointer"
+                        >
+                          ★ Quản Lý Chuẩn (Không Xóa)
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => applyRolePreset(activeRole.key, activeRole.name, "view_only")}
+                          className="px-2.5 py-1 rounded-lg bg-blue-500/10 text-blue-700 dark:text-blue-300 hover:bg-blue-500/20 font-bold text-[11px] transition cursor-pointer"
+                        >
+                          👁 Chỉ Xem Dữ Liệu
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => applyRolePreset(activeRole.key, activeRole.name, "none")}
+                          className="px-2.5 py-1 rounded-lg bg-rose-500/10 text-rose-700 dark:text-rose-300 hover:bg-rose-500/20 font-bold text-[11px] transition cursor-pointer"
+                        >
+                          ✕ Thu Hồi Toàn Bộ
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Lọc phân hệ */}
+                  <div className="flex flex-wrap items-center gap-1.5 pb-1">
+                    <button
+                      type="button"
+                      onClick={() => setSelectedCategoryTab("all")}
+                      className={`px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer ${
+                        selectedCategoryTab === "all"
+                          ? "bg-gradient-to-r from-[#7C2D82] to-[#9333EA] text-white shadow-xs"
+                          : "bg-card border border-border text-muted-foreground hover:bg-muted"
+                      }`}
+                    >
+                      Tất cả ({currentTabCategories.length} nhóm)
+                    </button>
+                    {currentTabCategories.map((cat) => (
+                      <button
+                        key={cat.id}
+                        type="button"
+                        onClick={() => setSelectedCategoryTab(cat.id)}
+                        className={`px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer ${
+                          selectedCategoryTab === cat.id
+                            ? "bg-gradient-to-r from-[#7C2D82] to-[#9333EA] text-white shadow-xs"
+                            : "bg-card border border-border text-muted-foreground hover:bg-muted"
+                        }`}
+                      >
+                        {cat.name}
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Danh sách các Cards Phân hệ & Quyền hạn */}
+                  <div className="space-y-4">
+                    {currentTabCategories
+                      .filter((cat) => selectedCategoryTab === "all" || cat.id === selectedCategoryTab)
+                      .map((cat) => {
+                        let catTotal = 0;
+                        let catGranted = 0;
+                        (cat.features || []).forEach((f) => {
+                          (f.actions || []).forEach((a) => {
+                            catTotal++;
+                            if (a.roles && a.roles[activeRole.key]) catGranted++;
+                          });
+                        });
+                        const isAllCatGranted = catTotal > 0 && catGranted === catTotal;
+
+                        return (
+                          <div
+                            key={cat.id}
+                            className="rounded-2xl border border-purple-100 dark:border-purple-900/40 bg-card overflow-hidden shadow-xs"
+                          >
+                            {/* Header nhóm phân hệ */}
+                            <div className="p-3.5 bg-gradient-to-r from-purple-50/70 via-purple-50/30 to-transparent dark:from-slate-800/80 dark:to-transparent border-b border-purple-100 dark:border-purple-900/30 flex items-center justify-between gap-3">
+                              <div className="flex items-center gap-2.5">
+                                <span className="size-8 rounded-xl bg-purple-600/10 text-purple-700 dark:text-purple-300 flex items-center justify-center font-bold">
+                                  {getCategoryIcon(cat.iconName)}
+                                </span>
+                                <div>
+                                  <h3 className="text-xs sm:text-sm font-black text-foreground">
+                                    {cat.name}
+                                  </h3>
+                                  <p className="text-[11px] text-muted-foreground">
+                                    Đã kích hoạt: {catGranted} / {catTotal} quyền
+                                  </p>
+                                </div>
+                              </div>
+
+                              <button
+                                type="button"
+                                onClick={() => handleToggleCategoryForRole(cat.id, activeRole.key)}
+                                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer flex items-center gap-1.5 ${
+                                  isAllCatGranted
+                                    ? "bg-rose-500/10 text-rose-700 dark:text-rose-300 hover:bg-rose-500/20"
+                                    : "bg-purple-600/10 text-purple-700 dark:text-purple-300 hover:bg-purple-600/20"
+                                }`}
+                              >
+                                {isAllCatGranted ? (
+                                  <>
+                                    <X className="size-3.5" />
+                                    <span>Tắt Hết Phân Hệ</span>
+                                  </>
+                                ) : (
+                                  <>
+                                    <Check className="size-3.5" />
+                                    <span>Bật Hết Phân Hệ</span>
+                                  </>
+                                )}
+                              </button>
+                            </div>
+
+                            {/* Danh sách tính năng & Thao tác quyền */}
+                            <div className="p-4 space-y-4">
+                              {(cat.features || []).map((feat) => (
+                                <div key={feat.id} className="space-y-2">
+                                  <div className="flex items-center justify-between text-xs font-bold text-foreground">
+                                    <div className="flex items-center gap-2">
+                                      <span className="size-2 rounded-full bg-[#7C2D82]"></span>
+                                      <span>{getSynchronizedFeatureName(feat.route, feat.name)}</span>
+                                      {feat.route && (
+                                        <span className="text-[10px] font-mono text-muted-foreground bg-muted px-1.5 py-0.2 rounded">
+                                          {feat.route}
+                                        </span>
+                                      )}
+                                    </div>
+                                  </div>
+
+                                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                                    {(feat.actions || []).map((act) => {
+                                      const isChecked = !!(act.roles && act.roles[activeRole.key]);
+
+                                      return (
+                                        <div
+                                          key={act.id}
+                                          onClick={() =>
+                                            handleTogglePermission(cat.id, feat.id, act.id, activeRole.key)
+                                          }
+                                          className={`p-3 rounded-xl border transition-all cursor-pointer flex items-start justify-between gap-3 ${
+                                            isChecked
+                                              ? "border-purple-300 dark:border-purple-800 bg-purple-50/30 dark:bg-purple-950/20 shadow-xs"
+                                              : "border-border/60 bg-background/50 hover:bg-muted/30 opacity-75"
+                                          }`}
+                                        >
+                                          <div className="min-w-0 space-y-0.5">
+                                            <div className="flex items-center gap-1.5">
+                                              <span
+                                                className={`size-2 rounded-full ${
+                                                  isChecked ? "bg-emerald-500" : "bg-slate-400"
+                                                }`}
+                                              ></span>
+                                              <span className="text-xs font-bold text-foreground">
+                                                {act.name}
+                                              </span>
+                                            </div>
+                                            <p className="text-[11px] text-muted-foreground line-clamp-1">
+                                              {act.description}
+                                            </p>
+                                            <span className="inline-block text-[9.5px] font-mono text-muted-foreground/80">
+                                              {act.code}
+                                            </span>
+                                          </div>
+
+                                          {/* Modern Toggle Switch */}
+                                          <div
+                                            className={`w-10 h-6 shrink-0 rounded-full transition-colors p-0.5 flex items-center cursor-pointer ${
+                                              isChecked
+                                                ? "bg-gradient-to-r from-[#7C2D82] to-[#9333EA] justify-end"
+                                                : "bg-slate-300 dark:bg-slate-700 justify-start"
+                                            }`}
+                                          >
+                                            <div className="size-5 rounded-full bg-white shadow-sm flex items-center justify-center text-[10px] text-purple-700">
+                                              {isChecked ? <Check className="size-3 stroke-[3]" /> : null}
+                                            </div>
+                                          </div>
+                                        </div>
+                                      );
+                                    })}
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        );
+                      })}
+                  </div>
+                </>
+              );
+            })()}
+          </div>
+        </div>
+      ) : (
+        <div className="self-stretch relative bg-white dark:bg-slate-900 rounded-[20px] border border-purple-100 dark:border-purple-900/40 flex flex-col justify-start items-start overflow-x-auto shadow-xs">
         {/* Hàng Header Bảng */}
         <div className="w-full min-w-max h-24 bg-gradient-to-r from-[#FAF5FF] via-[#F3E8FF]/60 to-[#FAF5FF] dark:from-slate-800/80 dark:to-slate-800/40 border-b border-purple-100 dark:border-purple-900/40 inline-flex justify-start items-start">
           <div className="sticky left-0 z-30 w-60 min-w-[240px] self-stretch pl-4 border-l border-r border-purple-100 dark:border-purple-900/40 flex justify-start items-center bg-[#FAF5FF] dark:bg-slate-800 shadow-[2px_0_5px_rgba(124,45,130,0.05)]">
@@ -1942,6 +2481,7 @@ export function RbacPermissionMatrix({
           );
         })}
       </div>
+      )}
 
       {/* ── MODAL 1: XEM CHI TIẾT QUYỀN / THAO TÁC CON ── */}
       {detailModalOpen && selectedDetail && (

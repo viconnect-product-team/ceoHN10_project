@@ -51,27 +51,27 @@
   --color-chart-4: var(--chart-4);
   --color-chart-5: var(--chart-5);
 
-  --shadow-card: 0 1px 3px 0 rgba(0, 0, 0, 0.4);
-  --shadow-elevated: 0 4px 16px -2px rgba(124, 45, 130, 0.25);
-  --shadow-glow: 0 8px 32px -8px rgba(214, 31, 105, 0.35);
+  --shadow-card: 0 1px 3px 0 rgba(0, 0, 0, 0.08);
+  --shadow-elevated: 0 4px 16px -2px rgba(71, 85, 105, 0.15);
+  --shadow-glow: 0 8px 32px -8px rgba(100, 116, 139, 0.2);
 
-  --gradient-primary: linear-gradient(135deg, #7C2D82 0%, #D61F69 100%);
-  --gradient-sidebar: linear-gradient(180deg, #000000 0%, #18181B 100%);
-  --gradient-card: linear-gradient(135deg, #7C2D82 0%, #D61F69 100%);
-  --gradient-ceohn10: linear-gradient(135deg, #7C2D82 0%, #D61F69 100%);
-  --gradient-purple-white: linear-gradient(135deg, #7C2D82 0%, #D61F69 100%);
+  --gradient-primary: linear-gradient(135deg, #334155 0%, #64748B 100%);
+  --gradient-sidebar: linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%);
+  --gradient-card: linear-gradient(135deg, #334155 0%, #475569 100%);
+  --gradient-ceohn10: linear-gradient(135deg, #334155 0%, #64748B 100%);
+  --gradient-purple-white: linear-gradient(135deg, #475569 0%, #64748B 100%);
 
-  --color-Backgrounds-Primary: #000000;
-  --color-Backgrounds-Secondary: #18181B;
-  --color-Fills-Secondary: #18181B;
-  --color-Grays-Black: #000000;
+  --color-Backgrounds-Primary: #F8FAFC;
+  --color-Backgrounds-Secondary: #FFFFFF;
+  --color-Fills-Secondary: #F1F5F9;
+  --color-Grays-Black: #0F172A;
   --color-Grays-White: #FFFFFF;
-  --color-Grays-Gray: #FFFFFF;
-  --color-Accents-Red: #D61F69;
-  --color-Accents-Orange: #D61F69;
-  --color-Accents-Mint: #7C2D82;
-  --color-Primary: #7C2D82;
-  --color-Labels-Secondary: #FFFFFF;
+  --color-Grays-Gray: #64748B;
+  --color-Accents-Red: #475569;
+  --color-Accents-Orange: #64748B;
+  --color-Accents-Mint: #334155;
+  --color-Primary: #334155;
+  --color-Labels-Secondary: #475569;
 }
 
 @keyframes subtle-bounce {
@@ -123,12 +123,11 @@
 }
 
 .bg-crm-system {
-  background: #FAF5FF;
+  background: #F8FAFC;
   background-image: 
-    radial-gradient(at 0% 0%, rgba(124, 45, 130, 0.08) 0px, transparent 55%),
-    radial-gradient(at 100% 0%, rgba(214, 31, 105, 0.06) 0px, transparent 50%),
-    radial-gradient(at 50% 100%, rgba(124, 45, 130, 0.04) 0px, transparent 50%),
-    linear-gradient(180deg, #FFFFFF 0%, #FAF5FF 60%, #F5EEFD 100%);
+    radial-gradient(at 0% 0%, rgba(100, 116, 139, 0.04) 0px, transparent 55%),
+    radial-gradient(at 100% 0%, rgba(71, 85, 105, 0.03) 0px, transparent 50%),
+    linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%);
   background-repeat: no-repeat;
   background-position: top center;
   background-size: cover;
@@ -139,50 +138,41 @@
 .dark .bg-crm-system,
 html.dark .bg-crm-system,
 [data-theme="dark"] .bg-crm-system {
-  background: #000000 !important;
-  background-image: 
-    radial-gradient(at 0% 0%, rgba(124, 45, 130, 0.25) 0px, transparent 55%),
-    radial-gradient(at 100% 0%, rgba(214, 31, 105, 0.20) 0px, transparent 50%),
-    radial-gradient(at 50% 100%, rgba(124, 45, 130, 0.15) 0px, transparent 50%),
-    linear-gradient(180deg, #000000 0%, #000000 100%) !important;
-  background-repeat: no-repeat;
-  background-position: top center;
-  background-size: cover;
-  background-attachment: fixed;
-  color: #FFFFFF !important;
+  background: #F8FAFC !important;
+  color: #0F172A !important;
 }
 
-/* Figma Brand Design Tokens for CEO HN10 Mobile App */
+/* Figma Brand Design Tokens for CEO HN10 Mobile App - Tone Xám Doanh Nhân */
 .bg-Primary-2-50 {
-  background-color: #FAF5FF !important;
+  background-color: #F8FAFC !important;
 }
 
 .dark .bg-Primary-2-50 {
-  background-color: rgba(124, 45, 130, 0.15) !important;
+  background-color: #F1F5F9 !important;
 }
 
 .bg-Primary-2-brand {
-  background-color: #7C2D82 !important;
+  background-color: #475569 !important;
 }
 
 .bg-Primary-1-50 {
-  background-color: #FAF5FF !important;
+  background-color: #F8FAFC !important;
 }
 
 .dark .bg-Primary-1-50 {
-  background-color: rgba(124, 45, 130, 0.25) !important;
+  background-color: #F1F5F9 !important;
 }
 
 .bg-Primary-1-brand {
-  background-color: #7C2D82 !important;
+  background-color: #475569 !important;
 }
 
 .bg-Dark-blue-700 {
-  background-color: #150B21 !important;
+  background-color: #334155 !important;
 }
 
 .bg-Surface-badge {
-  background-color: #D61F69 !important;
+  background-color: #64748B !important;
 }
 
 .bg-Neutral-white {
@@ -190,7 +180,7 @@ html.dark .bg-crm-system,
 }
 
 .dark .bg-Neutral-white {
-  background-color: #150B21 !important;
+  background-color: #FFFFFF !important;
 }
 
 .bg-Surface-default {
@@ -198,35 +188,35 @@ html.dark .bg-crm-system,
 }
 
 .dark .bg-Surface-default {
-  background-color: #150B21 !important;
+  background-color: #FFFFFF !important;
 }
 
 .bg-Surface-action {
-  background-color: #7C2D82 !important;
+  background-color: #334155 !important;
 }
 
 .bg-Primary-2-100 {
-  background-color: #F3E8FF !important;
+  background-color: #F1F5F9 !important;
 }
 
 .dark .bg-Primary-2-100 {
-  background-color: rgba(147, 51, 234, 0.25) !important;
+  background-color: #F1F5F9 !important;
 }
 
 .text-Text-default {
-  color: #1E1B4B !important;
+  color: #0F172A !important;
 }
 
 .dark .text-Text-default {
-  color: #F5EEFD !important;
+  color: #0F172A !important;
 }
 
 .text-Text-active {
-  color: #7C2D82 !important;
+  color: #334155 !important;
 }
 
 .dark .text-Text-active {
-  color: #C084FC !important;
+  color: #1E293B !important;
 }
 
 .text-Text-description {
@@ -234,15 +224,15 @@ html.dark .bg-crm-system,
 }
 
 .dark .text-Text-description {
-  color: #94A3B8 !important;
+  color: #64748B !important;
 }
 
 .text-Primary-2-brand {
-  color: #7C2D82 !important;
+  color: #334155 !important;
 }
 
 .outline-Primary-2-brand {
-  outline-color: #7C2D82 !important;
+  outline-color: #475569 !important;
 }
 
 .outline-Icon-default {
@@ -250,11 +240,11 @@ html.dark .bg-crm-system,
 }
 
 .outline-Icon-active {
-  outline-color: #7C2D82 !important;
+  outline-color: #334155 !important;
 }
 
 .outline-Icon-information {
-  outline-color: #7C2D82 !important;
+  outline-color: #475569 !important;
 }
 
 .outline-Icon-inactive {
@@ -266,31 +256,31 @@ html.dark .bg-crm-system,
 }
 
 .outline-Border-default {
-  outline-color: #F3E8FF !important;
+  outline-color: #E2E8F0 !important;
 }
 
 .dark .outline-Border-default {
-  outline-color: rgba(168, 85, 247, 0.25) !important;
+  outline-color: #E2E8F0 !important;
 }
 
 .border-Border-default {
-  border-color: #F3E8FF !important;
+  border-color: #E2E8F0 !important;
 }
 
 .dark .border-Border-default {
-  border-color: rgba(168, 85, 247, 0.25) !important;
+  border-color: #E2E8F0 !important;
 }
 
 .outline-Border-action {
-  outline-color: #7C2D82 !important;
+  outline-color: #475569 !important;
 }
 
 .border-Border-action {
-  border-color: #7C2D82 !important;
+  border-color: #475569 !important;
 }
 
 .outline-Orange-700 {
-  outline-color: #581C87 !important;
+  outline-color: #334155 !important;
 }
 
 :root {
@@ -309,122 +299,120 @@ html.dark .bg-crm-system,
   --popover: #FFFFFF;
   --popover-foreground: #0F172A;
 
-  /* CEO HN10 Brand Colors */
-  --primary: #7C2D82;
+  /* CEO HN10 Brand Colors - Chuẩn Màu Xám Doanh Nhân Sang Trọng */
+  --primary: #334155;
   --primary-foreground: #FFFFFF;
-  --primary-glow: #D61F69;
+  --primary-glow: #64748B;
 
-  --secondary: #FAF5FF;
-  --secondary-foreground: #7C2D82;
+  --secondary: #F1F5F9;
+  --secondary-foreground: #1E293B;
 
-  --muted: #F4F4F5;
-  --muted-foreground: #71717A;
+  --muted: #F8FAFC;
+  --muted-foreground: #64748B;
 
-  --accent: #D61F69;
+  --accent: #475569;
   --accent-foreground: #FFFFFF;
 
-  --destructive: #D61F69;
+  --destructive: #EF4444;
   --destructive-foreground: #FFFFFF;
 
-  --success: #7C2D82;
+  --success: #10B981;
   --success-foreground: #FFFFFF;
 
-  --warning: #D61F69;
+  --warning: #F59E0B;
   --warning-foreground: #FFFFFF;
 
-  --info: #7C2D82;
+  --info: #3B82F6;
   --info-foreground: #FFFFFF;
 
-  --border: #E4E4E7;
-  --input: #E4E4E7;
-  --ring: #7C2D82;
+  --border: #E2E8F0;
+  --input: #E2E8F0;
+  --ring: #64748B;
 
   /* Sidebar — Light mode: White with crisp light border */
   --sidebar: #FFFFFF;
   --sidebar-foreground: #0F172A;
-  --sidebar-primary: #7C2D82;
+  --sidebar-primary: #334155;
   --sidebar-primary-foreground: #FFFFFF;
-  --sidebar-accent: #FAF5FF;
-  --sidebar-accent-foreground: #7C2D82;
-  --sidebar-border: #E4E4E7;
-  --sidebar-ring: #7C2D82;
-  --gradient-sidebar: linear-gradient(180deg, #FFFFFF 0%, #FAF5FF 100%);
+  --sidebar-accent: #F1F5F9;
+  --sidebar-accent-foreground: #1E293B;
+  --sidebar-border: #E2E8F0;
+  --sidebar-ring: #64748B;
+  --gradient-sidebar: #FFFFFF;
 
-  --chart-1: #7C2D82;
-  --chart-2: #D61F69;
-  --chart-3: #0F172A;
-  --chart-4: #E4E4E7;
-  --chart-5: #7C2D82;
+  --chart-1: #334155;
+  --chart-2: #475569;
+  --chart-3: #64748B;
+  --chart-4: #94A3B8;
+  --chart-5: #CBD5E1;
 
-  --gradient-primary: linear-gradient(135deg, #7C2D82 0%, #D61F69 100%);
-  --gradient-card: linear-gradient(135deg, #7C2D82 0%, #D61F69 100%);
-  --gradient-ceohn10: linear-gradient(135deg, #7C2D82 0%, #D61F69 100%);
+  --gradient-primary: linear-gradient(135deg, #334155 0%, #64748B 100%);
+  --gradient-card: linear-gradient(135deg, #334155 0%, #475569 100%);
+  --gradient-ceohn10: linear-gradient(135deg, #334155 0%, #64748B 100%);
 }
 
 .dark {
   /* ============================================================
-     CEO HN10 DARK THEME (CHUẨN TỐI): Nền Đen Tuyền, Card Đen, Chữ Trắng Rõ Nét
-     Điểm nhấn: Gradient Tím - Hồng & Viền Đen Xám #18181B
+     CEO HN10 THEME: Luôn duy trì giao diện sáng thanh khiết, không bị đen nền
      ============================================================ */
-  --background: #000000;
-  --foreground: #FFFFFF;
+  --background: #F8FAFC;
+  --foreground: #0F172A;
 
-  --card: #000000;
-  --card-foreground: #FFFFFF;
+  --card: #FFFFFF;
+  --card-foreground: #0F172A;
 
-  --popover: #000000;
-  --popover-foreground: #FFFFFF;
+  --popover: #FFFFFF;
+  --popover-foreground: #0F172A;
 
   /* CEO HN10 Brand Colors */
-  --primary: #7C2D82;
+  --primary: #334155;
   --primary-foreground: #FFFFFF;
-  --primary-glow: #D61F69;
+  --primary-glow: #64748B;
 
-  --secondary: #18181B;
-  --secondary-foreground: #FFFFFF;
+  --secondary: #F1F5F9;
+  --secondary-foreground: #1E293B;
 
-  --muted: #18181B;
-  --muted-foreground: rgba(255, 255, 255, 0.7);
+  --muted: #F8FAFC;
+  --muted-foreground: #64748B;
 
-  --accent: #D61F69;
+  --accent: #475569;
   --accent-foreground: #FFFFFF;
 
-  --destructive: #D61F69;
+  --destructive: #EF4444;
   --destructive-foreground: #FFFFFF;
 
-  --success: #7C2D82;
+  --success: #10B981;
   --success-foreground: #FFFFFF;
 
-  --warning: #D61F69;
+  --warning: #F59E0B;
   --warning-foreground: #FFFFFF;
 
-  --info: #7C2D82;
+  --info: #3B82F6;
   --info-foreground: #FFFFFF;
 
-  --border: #18181B;
-  --input: #18181B;
-  --ring: #D61F69;
+  --border: #E2E8F0;
+  --input: #E2E8F0;
+  --ring: #64748B;
 
-  /* Sidebar — Dark mode: Pure Black with dark slate border */
-  --sidebar: #000000;
-  --sidebar-foreground: #FFFFFF;
-  --sidebar-primary: #7C2D82;
+  --sidebar: #FFFFFF;
+  --sidebar-foreground: #0F172A;
+  --sidebar-primary: #334155;
   --sidebar-primary-foreground: #FFFFFF;
-  --sidebar-accent: #18181B;
-  --sidebar-accent-foreground: #FFFFFF;
-  --sidebar-border: #18181B;
-  --sidebar-ring: #D61F69;
-  --gradient-sidebar: linear-gradient(180deg, #000000 0%, #18181B 100%);
+  --sidebar-accent: #F1F5F9;
+  --sidebar-accent-foreground: #1E293B;
+  --sidebar-border: #E2E8F0;
+  --sidebar-ring: #64748B;
+  --gradient-sidebar: linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%);
 
-  --chart-1: #7C2D82;
-  --chart-2: #D61F69;
-  --chart-3: #FFFFFF;
-  --chart-4: #18181B;
-  --chart-5: #7C2D82;
+  --chart-1: #334155;
+  --chart-2: #475569;
+  --chart-3: #64748B;
+  --chart-4: #94A3B8;
+  --chart-5: #CBD5E1;
 
-  --gradient-primary: linear-gradient(135deg, #7C2D82 0%, #D61F69 100%);
-  --gradient-card: linear-gradient(135deg, #7C2D82 0%, #D61F69 100%);
-  --gradient-ceohn10: linear-gradient(135deg, #7C2D82 0%, #D61F69 100%);
+  --gradient-primary: linear-gradient(135deg, #334155 0%, #64748B 100%);
+  --gradient-card: linear-gradient(135deg, #334155 0%, #475569 100%);
+  --gradient-ceohn10: linear-gradient(135deg, #334155 0%, #64748B 100%);
 }
 
 /* ============================================================
@@ -3583,4 +3571,32 @@ button.bg-\[\#003b95\] *:not([class*="bg-"]) {
   bottom: 0px !important;
   margin-bottom: 0px !important;
   transform: translateZ(0);
+}
+
+/* ============================================================
+   QUY CHUẨN XÁM DOANH NHÂN: CHUYỂN TRIỆT ĐỂ MÀU TÍM & GRADIENT VỀ MÀU XÁM
+   ============================================================ */
+[class*="text-purple-"],
+[class*="text-violet-"] {
+  color: #475569 !important;
+}
+
+[class*="bg-purple-"],
+[class*="bg-violet-"] {
+  background-color: #F1F5F9 !important;
+  color: #334155 !important;
+}
+
+[class*="border-purple-"],
+[class*="border-violet-"] {
+  border-color: #CBD5E1 !important;
+}
+
+/* Các badge có opacity /10, /15, /20 được định dạng xám sáng trang nhã */
+[class*="bg-[#003B95]/"],
+[class*="bg-[#1E3A8A]/"],
+[class*="bg-[#7C2D82]/"] {
+  background-color: #F1F5F9 !important;
+  color: #334155 !important;
+  border-color: #E2E8F0 !important;
 }

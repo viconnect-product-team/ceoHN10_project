@@ -248,6 +248,24 @@ export class VotingService {
           dedupeKey,
           'interactive_poll',
         );
+
+        if (this.mailService && u.email && u.email.includes('@')) {
+          this.mailService.sendDirectEmail({
+            to: u.email,
+            subject: `[CEO HN10] Mời tham gia biểu quyết: ${data.title}`,
+            html: `
+              <div style="font-family: Arial, sans-serif; padding: 20px; color: #1e293b; max-width: 600px; margin: 0 auto;">
+                <h2 style="color: #003B95; margin-bottom: 12px;">Phiên Biểu Quyết Mới - CEO HN10</h2>
+                <p>Kính gửi Anh/Chị,</p>
+                <p>Hệ thống CEO HN10 vừa mở phiên biểu quyết mới: <strong>${data.title}</strong>.</p>
+                ${data.description ? `<p style="background: #f1f5f9; padding: 12px; border-radius: 8px; border-left: 4px solid #003B95;">${data.description}</p>` : ''}
+                <p>Kính mời Anh/Chị mở ứng dụng Di động CEO HN10 hoặc Cổng Web CRM để tham gia biểu quyết ý kiến.</p>
+                <p style="margin-top: 20px; font-size: 12px; color: #64748b;">Trân trọng,<br/>Ban Điều Hành CLB Doanh Nhân CEO HN10 (HanoiBA)</p>
+              </div>
+            `,
+            fromName: 'CLB Doanh Nhân CEO HN10',
+          }).catch(() => {});
+        }
       }
     } catch (err: any) {
       console.warn(

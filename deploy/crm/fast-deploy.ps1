@@ -62,11 +62,11 @@ try {
                 Write-Host "`n[0/5] Bo qua Build Frontend (Web) cuc bo (-SkipWebBuild)..." -ForegroundColor Yellow
             } else {
                 Write-Host "`n[0/5] Build Frontend CRM Platform (Web) cuc bo voi Scope = crm_platform..." -ForegroundColor Cyan
-                $env:NODE_OPTIONS = "--max-old-space-size=4096"
+                $env:NODE_OPTIONS = "--max-old-space-size=6144"
                 $env:VITE_APP_SCOPE = "crm_platform"
                 $env:VITE_APP_NAME = "CEO HN10 CRM Admin"
                 if ($EnableHttps) {
-                    $env:VITE_PUBLIC_APP_URL = "https://crm.ceohn10.viconnect.vn"
+                    $env:VITE_PUBLIC_APP_URL = "https://crm_ceohn10.viconnect.vn"
                 } else {
                     $env:VITE_PUBLIC_APP_URL = "http://14.225.217.232:5004"
                 }
@@ -112,13 +112,13 @@ try {
         }
 
         if ($buildBE) {
-            Invoke-CheckedCommand -Description "Xay dung Backend Image (crm-backend)" -Action {
-                docker build -t crm-backend:latest -f Dockerfile.backend .
+            Invoke-CheckedCommand -Description "Xay dung Backend Image (ceohn10-crm-backend)" -Action {
+                docker build -t ceohn10-crm-backend:latest -f Dockerfile.backend .
             }
         }
         if ($buildFE) {
-            Invoke-CheckedCommand -Description "Xay dung Frontend Image (crm-frontend)" -Action {
-                docker build --no-cache -t crm-frontend:latest -f "$DEPLOY_DIR/Dockerfile.frontend" .
+            Invoke-CheckedCommand -Description "Xay dung Frontend Image (ceohn10-crm-frontend)" -Action {
+                docker build --no-cache -t ceohn10-crm-frontend:latest -f "$DEPLOY_DIR/Dockerfile.frontend" .
             }
         }
 
@@ -149,12 +149,12 @@ try {
         Write-Host "`n[2/5] Xuat va nen Gzip (.tar.gz) toc do cao cho Web CRM Platform..." -ForegroundColor Cyan
         if ($buildBE) {
             Invoke-CheckedCommand -Description "Xuat & Nen Backend Image (.tar.gz)" -Action {
-                Save-And-Compress-DockerImage -ImageName "crm-backend:latest" -OutGzPath "crm-backend.tar.gz"
+                Save-And-Compress-DockerImage -ImageName "ceohn10-crm-backend:latest" -OutGzPath "ceohn10-crm-backend.tar.gz"
             }
         }
         if ($buildFE) {
-            Invoke-CheckedCommand -Description "Xuat & Nen Frontend Image (.tar.gz)" -Action {
-                Save-And-Compress-DockerImage -ImageName "crm-frontend:latest" -OutGzPath "crm-frontend.tar.gz"
+            Invoke-CheckedCommand -Description "Xay dung & Nen Frontend Image (.tar.gz)" -Action {
+                Save-And-Compress-DockerImage -ImageName "ceohn10-crm-frontend:latest" -OutGzPath "ceohn10-crm-frontend.tar.gz"
             }
         }
     } else {
@@ -178,8 +178,8 @@ try {
         (Resolve-Path "$DEPLOY_DIR/docker-compose.yml").Path
     )
     if (-not $SkipBuild) {
-        if ($buildBE -and (Test-Path "crm-backend.tar.gz")) { $filesToUpload += (Resolve-Path "crm-backend.tar.gz").Path }
-        if ($buildFE -and (Test-Path "crm-frontend.tar.gz")) { $filesToUpload += (Resolve-Path "crm-frontend.tar.gz").Path }
+        if ($buildBE -and (Test-Path "ceohn10-crm-backend.tar.gz")) { $filesToUpload += (Resolve-Path "ceohn10-crm-backend.tar.gz").Path }
+        if ($buildFE -and (Test-Path "ceohn10-crm-frontend.tar.gz")) { $filesToUpload += (Resolve-Path "ceohn10-crm-frontend.tar.gz").Path }
     }
 
     $scpArgs = @() + $SSH_OPTS + $filesToUpload + "${SERVER_USER}@${SERVER_IP}:${REMOTE_PATH}/"
@@ -190,21 +190,21 @@ try {
     Write-Host "`n[4/5] Kich hoat Docker Compose rieng cho Web CRM Platform tu xa thong qua SSH..." -ForegroundColor Cyan
 
     $remoteLoadCmd = ""
-    if ($buildBE -and (Test-Path "crm-backend.tar.gz")) {
-        $remoteLoadCmd += "docker load -i crm-backend.tar.gz; rm -f crm-backend.tar.gz; "
+    if ($buildBE -and (Test-Path "ceohn10-crm-backend.tar.gz")) {
+        $remoteLoadCmd += "if [ -f ceohn10-crm-backend.tar.gz ]; then docker load -i ceohn10-crm-backend.tar.gz && rm -f ceohn10-crm-backend.tar.gz; fi; "
     }
-    if ($buildFE -and (Test-Path "crm-frontend.tar.gz")) {
-        $remoteLoadCmd += "docker load -i crm-frontend.tar.gz; rm -f crm-frontend.tar.gz; "
+    if ($buildFE -and (Test-Path "ceohn10-crm-frontend.tar.gz")) {
+        $remoteLoadCmd += "if [ -f ceohn10-crm-frontend.tar.gz ]; then docker load -i ceohn10-crm-frontend.tar.gz && rm -f ceohn10-crm-frontend.tar.gz; fi; "
     }
 
-    $REMOTE_CMD = "cd $REMOTE_PATH; cp -f .env.production .env.crm 2>/dev/null || true; touch .env.crm; sed -i 's/\r//g' .env.crm docker-compose.yml; docker network create ceohn10-network 2>/dev/null || true; $remoteLoadCmd docker compose -f docker-compose.yml stop 2>/dev/null || true; docker rm -f crm-frontend-prod crm-backend-prod 2>/dev/null || true; docker compose -f docker-compose.yml up -d --force-recreate"
+    $REMOTE_CMD = "cd $REMOTE_PATH; cp -f .env.production .env.crm 2>/dev/null || true; touch .env.crm; sed -i 's/\r//g' .env.crm docker-compose.yml; docker network create ceohn10-network 2>/dev/null || true; $remoteLoadCmd docker compose -f docker-compose.yml stop 2>/dev/null || true; docker rm -f ceohn10-crm-frontend-prod ceohn10-crm-backend-prod 2>/dev/null || true; docker compose -f docker-compose.yml up -d --force-recreate"
 
     Invoke-CheckedCommand -Description "Thuc thi cau truc container doc lap Web CRM Platform" -MaxRetries 3 -Action {
         ssh @SSH_OPTS "${SERVER_USER}@${SERVER_IP}" $REMOTE_CMD
     }
 
     Write-Host "`n[5/5] Don dep bo nho dem tam thoi tai may cuc bo..." -ForegroundColor Cyan
-    Remove-Item crm-backend.tar.gz, crm-frontend.tar.gz, crm-backend.tar, crm-frontend.tar -ErrorAction SilentlyContinue
+    Remove-Item ceohn10-crm-backend.tar.gz, ceohn10-crm-frontend.tar.gz, ceohn10-crm-backend.tar, ceohn10-crm-frontend.tar, crm-backend.tar.gz, crm-frontend.tar.gz -ErrorAction SilentlyContinue
 
     if ($EnableHttps) {
         Write-Host "`n[BO SUNG] Dong bo Nginx Reverse Proxy SSL / HTTPS..." -ForegroundColor Magenta
@@ -214,13 +214,15 @@ try {
     Write-Host "=================================================================" -ForegroundColor Green
     Write-Host "TRIEN KHAI DOC LAP WEB CRM PLATFORM VA LANDING CEO HN10 THANH CONG!" -ForegroundColor Green
     if ($EnableHttps) {
-        Write-Host "Cong Frontend CRM (HTTPS): https://${SERVER_IP}:5443" -ForegroundColor Yellow
-        Write-Host "Cong Frontend CRM (HTTP) : http://${SERVER_IP}:5004" -ForegroundColor DarkGray
+        Write-Host "Cong Frontend CRM (HTTPS): https://${SERVER_IP}:10443" -ForegroundColor Yellow
+        Write-Host "Cong Dang Nhap Web CRM   : https://${SERVER_IP}:10443/auth" -ForegroundColor Green
+        Write-Host "Cong Frontend CRM (HTTP) : http://${SERVER_IP}:5022" -ForegroundColor DarkGray
     } else {
-        Write-Host "Cong Frontend CRM : http://${SERVER_IP}:5004" -ForegroundColor Yellow
+        Write-Host "Cong Frontend CRM : http://${SERVER_IP}:5022" -ForegroundColor Yellow
     }
-    Write-Host "Cong Backend CRM  : http://${SERVER_IP}:5005" -ForegroundColor Yellow
+    Write-Host "Cong Backend CRM  : http://${SERVER_IP}:5023" -ForegroundColor Yellow
     Write-Host "=================================================================" -ForegroundColor Green
+    $global:LASTEXITCODE = 0
 } finally {
     Pop-Location
 }

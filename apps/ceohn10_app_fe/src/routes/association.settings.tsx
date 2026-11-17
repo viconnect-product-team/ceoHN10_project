@@ -144,7 +144,7 @@ function AssociationSettingsScreen() {
         {/* 1. ĐIỀU HƯỚNG SANG CHỨC NĂNG RIÊNG: CẤU HÌNH HỆ THỐNG (MÀU SẮC, AI, NGÔN NGỮ) */}
         <Link
           to="/association/system-config"
-          className="p-4 rounded-3xl bg-gradient-to-r from-orange-50 via-amber-50 to-white dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 border border-orange-200 dark:border-amber-400/30 flex items-center justify-between shadow-xs hover:scale-[1.01] active:scale-[0.99] transition cursor-pointer group"
+          className="p-4 rounded-3xl bg-gradient-to-r from-orange-50 to-amber-100/60 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 border border-orange-200 dark:border-amber-400/30 flex items-center justify-between shadow-xs hover:scale-[1.01] active:scale-[0.99] transition cursor-pointer group"
         >
           <div className="flex items-center gap-3.5 min-w-0">
             <div className="size-11 rounded-2xl bg-gradient-to-tr from-orange-500 to-amber-500 text-white grid place-items-center shrink-0 shadow-md">

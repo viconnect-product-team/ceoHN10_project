@@ -1,3 +1,4 @@
+name: ceohn10-crm
 services:
   ceohn10-crm-frontend:
     image: ${ASSOCIATION_FE_IMAGE:-ceohn10-crm-frontend}:latest

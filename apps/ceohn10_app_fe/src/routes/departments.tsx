@@ -52,10 +52,10 @@ const COLOR_MAP: Record<string, { bg: string; text: string; border: string; badg
     badge: "bg-blue-100 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300",
   },
   purple: {
-    bg: "bg-purple-500/10",
-    text: "text-purple-600 dark:text-purple-400",
-    border: "border-purple-200 dark:border-purple-800/60",
-    badge: "bg-purple-100 text-purple-700 dark:bg-purple-950/60 dark:text-purple-300",
+    bg: "bg-slate-500/10",
+    text: "text-slate-600 dark:text-slate-400",
+    border: "border-slate-200 dark:border-slate-800/60",
+    badge: "bg-slate-100 text-slate-700 dark:bg-slate-950/60 dark:text-slate-300",
   },
   emerald: {
     bg: "bg-emerald-500/10",
@@ -97,7 +97,7 @@ const COLOR_MAP: Record<string, { bg: string; text: string; border: string; badg
 
 const AVAILABLE_COLORS = [
   { key: "blue", label: "Xanh dương" },
-  { key: "purple", label: "Tím" },
+  { key: "purple", label: "Xám doanh nhân" },
   { key: "emerald", label: "Xanh lá" },
   { key: "amber", label: "Cam hổ phách" },
   { key: "rose", label: "Hồng cánh sen" },

@@ -23,6 +23,8 @@ export type EventItem = {
   id: string;
   name: string;
   tagline?: string | null;
+  department?: string | null;
+  category?: string | null;
   date: string;
   location: string;
   capacity: number;

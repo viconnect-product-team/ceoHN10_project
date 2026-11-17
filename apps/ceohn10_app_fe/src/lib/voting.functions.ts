@@ -146,6 +146,9 @@ export const createVoteFn = createServerFn({ method: "POST" })
     const startsAt = String(d.startsAt ?? "").trim();
     const endsAt = String(d.endsAt ?? "").trim();
     const eventId = d.eventId ? String(d.eventId).trim() : null;
+    const trainingId = d.trainingId ? String(d.trainingId).trim() : null;
+    const targetType = d.targetType ? String(d.targetType).trim() : null;
+    const targetId = d.targetId ? String(d.targetId).trim() : (trainingId || eventId || null);
     const options = Array.isArray(d.options)
       ? (d.options as unknown[]).map((o: any) => String(o).trim()).filter(Boolean)
       : [];
@@ -170,7 +173,7 @@ export const createVoteFn = createServerFn({ method: "POST" })
     if (options.length < 2) throw new Error("Cần ít nhất 2 lựa chọn");
     if (options.length > 20) throw new Error("Tối đa 20 lựa chọn");
     if (!["policy", "election", "amendment"].includes(type)) throw new Error("Loại không hợp lệ");
-    return { title, type, targetAudience, startsAt: finalStartsAt, endsAt: finalEndsAt, options, eventId };
+    return { title, type, targetAudience, startsAt: finalStartsAt, endsAt: finalEndsAt, options, eventId, trainingId, targetType, targetId };
   })
   .handler(async ({ data, context }) => {
     return fetchNestApiFromServer("/voting/polls", context.token, {

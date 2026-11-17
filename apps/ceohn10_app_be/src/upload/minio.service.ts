@@ -25,25 +25,20 @@ export class MinioService implements OnModuleInit {
     // 1. Env configured endpoint
     if (envEndpoint) {
       candidateConfigs.push({
-        name: `env(${envEndpoint}:${envPort || 9000})`,
+        name: `env(${envEndpoint}:${envPort || 9050})`,
         endPoint: envEndpoint,
-        port: envPort || 9000,
+        port: envPort || 9050,
       });
     }
 
-    // 2. Direct server public IP on port 9000 (Primary MinIO for dev and local)
+    // 2. Direct server public IP on port 9050 (CEO HN10 dedicated MinIO port, avoiding port 9000 used by another project)
     candidateConfigs.push({
-      name: 'server-dev(14.225.217.232:9000)',
+      name: 'server-dev(14.225.217.232:9050)',
       endPoint: '14.225.217.232',
-      port: 9000,
+      port: envPort || 9050,
     });
 
-    // 3. Localhost on port 9000 or 9050
-    candidateConfigs.push({
-      name: 'local(127.0.0.1:9000)',
-      endPoint: '127.0.0.1',
-      port: 9000,
-    });
+    // 3. Localhost on port 9050
     candidateConfigs.push({
       name: 'local(127.0.0.1:9050)',
       endPoint: '127.0.0.1',

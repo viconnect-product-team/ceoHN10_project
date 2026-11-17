@@ -2652,7 +2652,7 @@ export function ChatThread({
 
       {/* Shopee Style Product / Opportunity Inquiry Floating Banner */}
       {pendingInquiry && (
-        <div className="border-t border-orange-200 dark:border-orange-950/60 bg-gradient-to-r from-orange-50 via-amber-50 to-white dark:from-orange-950/40 dark:via-slate-900 dark:to-slate-900 px-3.5 py-2.5 flex items-center justify-between gap-3 shadow-md animate-in slide-in-from-bottom-2 duration-200">
+        <div className="border-t border-orange-200 dark:border-orange-950/60 bg-gradient-to-r from-orange-50 to-amber-100/60 dark:from-orange-950/40 dark:via-slate-900 dark:to-slate-900 px-3.5 py-2.5 flex items-center justify-between gap-3 shadow-md animate-in slide-in-from-bottom-2 duration-200">
           <div className="flex items-center gap-2.5 min-w-0 flex-1">
             <div className="relative size-12 rounded-xl overflow-hidden bg-white dark:bg-slate-800 border border-orange-300 dark:border-orange-800 shrink-0 shadow-xs">
               <img

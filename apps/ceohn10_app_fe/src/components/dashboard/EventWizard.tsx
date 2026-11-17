@@ -40,6 +40,9 @@ type Info = {
   description?: string;
   qrStaff: string[];
   sponsors: EventSponsorItem[];
+  isFixed?: boolean;
+  recurrenceRule?: string;
+  isPaid?: boolean;
 };
 
 const emptyTicket = (): TicketDraft => ({ name: "", price: "", quantity: "", description: "" });
@@ -103,6 +106,9 @@ function EventWizardDialog({
     description: "",
     qrStaff: [],
     sponsors: [],
+    isFixed: false,
+    recurrenceRule: "Hàng tháng",
+    isPaid: false,
   });
   const [tickets, setTickets] = useState<TicketDraft[]>([]);
   const [qrFields, setQrFields] = useState<QrField[]>(["registration_code"]);
@@ -123,6 +129,9 @@ function EventWizardDialog({
       description: "",
       qrStaff: [],
       sponsors: [],
+      isFixed: false,
+      recurrenceRule: "Hàng tháng",
+      isPaid: false,
     });
     setTickets([]);
     setQrFields(["registration_code"]);
@@ -230,6 +239,9 @@ function EventWizardDialog({
           image: info.imageUrl,
           banner: info.imageUrl,
           photoGalleryUrl: info.photoGalleryUrl || "",
+          isFixed: !!info.isFixed,
+          recurrenceRule: info.recurrenceRule || "",
+          isPaid: info.isPaid ?? (computedTicketPrice > 0),
           ticketPrice: computedTicketPrice,
           fee: computedTicketPrice,
           description: info.description || "",
@@ -728,6 +740,85 @@ function InfoStep({
               </option>
             ))}
           </select>
+        </div>
+      </div>
+
+      {/* UC-2: TÍNH CHẤT SỰ KIỆN CỐ ĐỊNH & THU PHÍ */}
+      <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-card border border-border space-y-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {/* Cố định vs Không cố định */}
+          <div>
+            <label className={labelCls}>Tính chất sự kiện</label>
+            <div className="flex items-center gap-2 mt-1">
+              <button
+                type="button"
+                onClick={() => setInfo({ ...info, isFixed: false })}
+                className={`flex-1 py-2 px-3 rounded-xl border text-xs font-bold transition cursor-pointer ${
+                  !info.isFixed
+                    ? "border-primary bg-primary/10 text-primary"
+                    : "border-border bg-background text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                Không cố định (Đột xuất)
+              </button>
+              <button
+                type="button"
+                onClick={() => setInfo({ ...info, isFixed: true })}
+                className={`flex-1 py-2 px-3 rounded-xl border text-xs font-bold transition cursor-pointer ${
+                  info.isFixed
+                    ? "border-primary bg-primary/10 text-primary"
+                    : "border-border bg-background text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                Cố định (Định kỳ)
+              </button>
+            </div>
+            {info.isFixed && (
+              <div className="mt-2">
+                <input
+                  type="text"
+                  className={inputCls}
+                  placeholder="Quy luật lặp lại (VD: Thứ 6 tuần thứ 2 hàng tháng)..."
+                  value={info.recurrenceRule || ""}
+                  onChange={(e) => setInfo({ ...info, recurrenceRule: e.target.value })}
+                />
+              </div>
+            )}
+          </div>
+
+          {/* Có phí vs Miễn phí */}
+          <div>
+            <label className={labelCls}>Chính sách vé tham gia</label>
+            <div className="flex items-center gap-2 mt-1">
+              <button
+                type="button"
+                onClick={() => setInfo({ ...info, isPaid: false })}
+                className={`flex-1 py-2 px-3 rounded-xl border text-xs font-bold transition cursor-pointer ${
+                  !info.isPaid
+                    ? "border-emerald-500 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400"
+                    : "border-border bg-background text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                Miễn phí (Free)
+              </button>
+              <button
+                type="button"
+                onClick={() => setInfo({ ...info, isPaid: true })}
+                className={`flex-1 py-2 px-3 rounded-xl border text-xs font-bold transition cursor-pointer ${
+                  info.isPaid
+                    ? "border-amber-500 bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400"
+                    : "border-border bg-background text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                Có thu phí (Vé)
+              </button>
+            </div>
+            <p className="mt-1 text-[11px] text-muted-foreground">
+              {info.isPaid
+                ? "Thiết lập chi tiết các hạng vé và mức phí ở Bước 2 tiếp theo."
+                : "Hội viên và khách mời đăng ký tham dự miễn phí 100%."}
+            </p>
+          </div>
         </div>
       </div>
 

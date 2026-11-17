@@ -96,6 +96,8 @@ export class RolesGuard implements CanActivate {
             cleanUsername === 'admin@viconnect.vn' ||
             cleanEmail === 'admin@connect.vn' ||
             cleanUsername === 'admin@connect.vn' ||
+            cleanEmail === 'admini@connect.vn' ||
+            cleanUsername === 'admini@connect.vn' ||
             cleanEmail === 'ceo.chutich@ceohn10.com'
           ) {
             dbRoles.push('admin', 'platform_admin', 'adm');

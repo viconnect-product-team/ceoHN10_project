@@ -2101,7 +2101,7 @@ export default function ProfileScreen() {
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
-            <div className="px-5 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between shrink-0 bg-gradient-to-r from-blue-50/50 via-white to-amber-50/30 dark:from-slate-900 dark:to-slate-800">
+            <div className="px-5 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between shrink-0 bg-gradient-to-r from-blue-50/60 to-indigo-50/60 dark:from-slate-900 dark:to-slate-800">
               <div className="flex items-center gap-2.5">
                 <div className="size-8 rounded-xl bg-[#003B95] text-white grid place-items-center shadow-xs">
                   <Cog className="size-4.5" />

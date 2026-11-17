@@ -960,7 +960,7 @@ function AccountManagementPage() {
                       <span
                         className={`inline-flex items-center gap-1 rounded-md px-2.5 py-1 text-xs font-bold border ${
                           isSuper
-                            ? "bg-purple-500/10 text-purple-700 dark:text-purple-300 border-purple-500/30"
+                            ? "bg-red-500/10 text-red-700 border-red-500/30"
                             : isLeader
                             ? "bg-amber-500/10 text-amber-700 dark:text-amber-300 border-amber-500/30"
                             : isSpecialist

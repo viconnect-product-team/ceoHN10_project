@@ -227,11 +227,11 @@ export const Route = createRootRoute({
 
 function RootShell({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="vi" suppressHydrationWarning>
+    <html lang="vi" className="light" data-theme="light" suppressHydrationWarning>
       <head>
         <HeadContent />
       </head>
-      <body suppressHydrationWarning>
+      <body className="bg-background text-foreground" suppressHydrationWarning>
         {children}
         <Scripts />
       </body>

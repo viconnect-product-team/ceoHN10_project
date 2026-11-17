@@ -27,50 +27,20 @@ type ThemeCtx = {
 
 const ThemeContext = createContext<ThemeCtx | null>(null);
 
-function applyTheme(theme: Theme) {
+function applyTheme(_theme: Theme) {
   if (typeof document === "undefined") return;
   const root = document.documentElement;
 
-  // Nếu đang ở App CEO HN10 Mobile (/association), LUÔN LUÔN là theme sáng (Light Theme) theo yêu cầu
-  if (isAssociationApp()) {
-    root.classList.remove("dark");
-    root.classList.remove("hc");
-    root.classList.add("light");
-    root.dataset.theme = "light";
-    root.style.colorScheme = "light";
-    applyCeo1983ColorTheme(getActiveCeo1983ColorThemeId());
-    return;
-  }
-
-  // Trên CRM Web: Hỗ trợ chuyển đổi Theme sáng / tối theo lựa chọn của quản trị viên
-  if (theme === "dark") {
-    root.classList.add("dark");
-    root.classList.remove("light");
-    root.dataset.theme = "dark";
-    root.style.colorScheme = "dark";
-  } else {
-    root.classList.remove("dark");
-    root.classList.add("light");
-    root.dataset.theme = "light";
-    root.style.colorScheme = "light";
-  }
-
-  // Re-apply CEO HN10 Color theme variables so brand colors remain vibrant
+  // QUY CHUẨN TỐI CAO: TOÀN BỘ HỆ THỐNG CRM VÀ MOBILE APP CEO HN10 CỐ ĐỊNH 100% LIGHT THEME (Theme Sáng)
+  root.classList.remove("dark");
+  root.classList.remove("hc");
+  root.classList.add("light");
+  root.dataset.theme = "light";
+  root.style.colorScheme = "light";
   applyCeo1983ColorTheme(getActiveCeo1983ColorThemeId());
 }
 
 function readInitial(): Theme {
-  if (typeof window !== "undefined") {
-    if (isAssociationApp()) {
-      return "light";
-    }
-    try {
-      const stored = localStorage.getItem(CRM_THEME_KEY) || localStorage.getItem(STORAGE_KEY);
-      if (stored === "dark" || stored === "light") return stored;
-    } catch {
-      /* ignore */
-    }
-  }
   return "light";
 }
 
@@ -95,17 +65,12 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     return () => window.removeEventListener(COLOR_THEME_EVENT, handleColorChanged);
   }, []);
 
-  const setTheme = (t: Theme) => {
-    if (isAssociationApp()) {
-      setThemeState("light");
-      applyTheme("light");
-      return;
-    }
-    setThemeState(t);
-    applyTheme(t);
+  const setTheme = (_t: Theme) => {
+    setThemeState("light");
+    applyTheme("light");
     try {
-      localStorage.setItem(CRM_THEME_KEY, t);
-      localStorage.setItem(STORAGE_KEY, t);
+      localStorage.setItem(CRM_THEME_KEY, "light");
+      localStorage.setItem(STORAGE_KEY, "light");
     } catch {
       /* ignore */
     }
@@ -117,8 +82,8 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   };
 
   const toggle = () => {
-    if (isAssociationApp()) return;
-    setTheme(theme === "dark" ? "light" : "dark");
+    // Luôn luôn là light theme theo quy chuẩn
+    setTheme("light");
   };
 
   return (

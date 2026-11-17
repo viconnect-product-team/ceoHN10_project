@@ -146,7 +146,7 @@ export function QuickRegisterMeetingModal({
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-4 py-3.5 border-b border-slate-100 dark:border-slate-800 bg-gradient-to-r from-blue-50/80 via-white to-amber-50/40 dark:from-slate-900 dark:via-[#0B132B] dark:to-amber-950/20">
+        <div className="flex items-center justify-between px-4 py-3.5 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900">
           <div className="flex items-center gap-2">
             <span className="p-1.5 rounded-xl bg-[#003B95] text-amber-300 shadow-xs">
               <Calendar className="size-4.5" />
@@ -186,7 +186,7 @@ export function QuickRegisterMeetingModal({
             </div>
 
             {/* Mã QR Check-in Điểm Danh Cá Nhân */}
-            <div className="p-4 rounded-2xl bg-gradient-to-b from-amber-50 to-white dark:from-slate-900 dark:to-slate-800/90 border-2 border-amber-400/50 shadow-md flex flex-col items-center space-y-2.5">
+            <div className="p-4 rounded-2xl bg-amber-50/70 dark:bg-slate-900 border-2 border-amber-400/50 shadow-md flex flex-col items-center space-y-2.5">
               <div className="px-2 py-0.5 rounded-full bg-[#003B95] text-amber-300 text-[10px] font-extrabold uppercase">
                 MÃ VÉ CHECK-IN: {ticketCode}
               </div>

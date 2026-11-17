@@ -603,8 +603,13 @@ function VoteModal({ vote, onClose }: { vote?: Vote; onClose: () => void }) {
   const [title, setTitle] = useState(vote?.title ?? "");
   const [type, setType] = useState<Vote["type"]>(vote?.type ?? "policy");
   const [targetAudience, setTargetAudience] = useState("all");
+  const [targetType, setTargetType] = useState<"none" | "event" | "training">(
+    (vote as any)?.trainingId ? "training" : ((vote?.eventId ? "event" : "none"))
+  );
   const [eventId, setEventId] = useState(vote?.eventId ?? "");
+  const [trainingId, setTrainingId] = useState<string>((vote as any)?.trainingId ?? "");
   const [eventsList, setEventsList] = useState<Array<{ id: string; title: string; eventDate?: string; status?: string }>>([]);
+  const [trainingsList, setTrainingsList] = useState<Array<{ id: string; title: string; startTime?: string }>>([]);
   const [startsAt, setStartsAt] = useState(
     vote?.startsAt ? vote.startsAt.slice(0, 10) : "",
   );
@@ -622,6 +627,12 @@ function VoteModal({ vote, onClose }: { vote?: Vote; onClose: () => void }) {
       .then((res) => {
         const items = Array.isArray(res) ? res : res?.items || [];
         setEventsList(items);
+      })
+      .catch(() => {});
+    fetchNestApi<any>("/trainings?page=1&size=100")
+      .then((res) => {
+        const items = Array.isArray(res) ? res : res?.items || [];
+        setTrainingsList(items);
       })
       .catch(() => {});
   }, []);
@@ -648,7 +659,20 @@ function VoteModal({ vote, onClose }: { vote?: Vote; onClose: () => void }) {
       if (vote) {
         await updateVote({ data: { id: vote.id, title, type, startsAt: finalStartsAt, endsAt: finalEndsAt, options, eventId: eventId || null } });
       } else {
-        await createVote({ data: { title, type, targetAudience, startsAt: finalStartsAt, endsAt: finalEndsAt, options, eventId: eventId || null } });
+        await createVote({
+          data: {
+            title,
+            type,
+            targetAudience,
+            startsAt: finalStartsAt,
+            endsAt: finalEndsAt,
+            options,
+            eventId: targetType === "event" ? eventId : null,
+            trainingId: targetType === "training" ? trainingId : null,
+            targetType: targetType !== "none" ? targetType : null,
+            targetId: targetType === "training" ? trainingId : (targetType === "event" ? eventId : null),
+          } as any,
+        });
       }
       await router.invalidate();
       onClose();

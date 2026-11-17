@@ -1,3 +1,4 @@
+name: ceohn10
 version: '3.8'
 
 services:
@@ -35,7 +36,8 @@ services:
       DATABASE_URL: ${DATABASE_URL:-postgresql://app1:ceohn10_secure_pass_2026@ceohn10-db:5432/ceohn10_project}
       JWT_SECRET: ${JWT_SECRET:-super-secret-jwt-key-ceohn10}
       MINIO_ENDPOINT: ${MINIO_ENDPOINT:-minio}
-      MINIO_PORT: ${MINIO_PORT:-9000}
+      MINIO_PORT: ${MINIO_PORT:-9050}
+      MINIO_BUCKET: ${MINIO_BUCKET:-ceohn10-bucket}
       APP_URL: ${APP_URL:-https://ceohn10.viconnect.vn}
       CRM_URL: ${CRM_URL:-https://crm.ceohn10.viconnect.vn}
     ports:

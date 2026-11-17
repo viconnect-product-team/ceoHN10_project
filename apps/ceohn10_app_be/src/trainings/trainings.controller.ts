@@ -3,6 +3,7 @@ import {
   Get,
   Post,
   Put,
+  Patch,
   Delete,
   Body,
   Param,
@@ -21,16 +22,34 @@ export class TrainingsController {
   async listTrainings(
     @Query('status') status?: string,
     @Query('search') search?: string,
+    @Query('format') format?: string,
+    @Query('category') category?: string,
+    @Query('isFixed') isFixed?: string,
   ) {
-    return this.trainingsService.listTrainings({ status, search });
+    return this.trainingsService.listTrainings({
+      status,
+      search,
+      format,
+      category,
+      isFixed,
+    });
   }
 
   @Get('association/trainings')
   async listAssociationTrainings(
     @Query('status') status?: string,
     @Query('search') search?: string,
+    @Query('isFixed') isFixed?: string,
   ) {
-    return this.trainingsService.listTrainings({ status, search });
+    return this.trainingsService.listTrainings({ status, search, isFixed });
+  }
+
+  @Get('trainings/my/enrolled')
+  @UseGuards(JwtAuthGuard)
+  async getMyTrainings(@Request() req: any) {
+    const memberId = req.user?.memberId || req.user?.id || req.user?.sub;
+    const email = req.user?.email;
+    return this.trainingsService.getMyAttendedTrainings(memberId || email);
   }
 
   @Get('trainings/:id')
@@ -61,6 +80,19 @@ export class TrainingsController {
     return this.trainingsService.deleteTraining(id);
   }
 
+  // ── ATTENDEES & CHECK-IN ──
+
+  @Get('trainings/:id/attendees')
+  @UseGuards(JwtAuthGuard)
+  async listAttendees(@Param('id') id: string) {
+    return this.trainingsService.listAttendees(id);
+  }
+
+  @Post('trainings/:id/register')
+  async registerTraining(@Param('id') id: string, @Body() body: any) {
+    return this.trainingsService.registerAttendee(id, body);
+  }
+
   @Post('trainings/:id/join')
   @UseGuards(JwtAuthGuard)
   async joinTraining(
@@ -68,29 +100,56 @@ export class TrainingsController {
     @Request() req: any,
     @Body() body: any,
   ) {
-    const memberId = body.memberId || req.user?.id;
-    return this.trainingsService.joinTraining(id, memberId, req.user?.id);
+    const attendeeData = {
+      userName: req.user?.name || body?.name || 'Hội viên',
+      email: req.user?.email || body?.email || '',
+      phone: req.user?.phone || body?.phone || '',
+      memberId: req.user?.memberId || req.user?.id,
+    };
+    return this.trainingsService.registerAttendee(id, attendeeData);
   }
 
-  @Post('trainings/:id/register')
+  @Patch('trainings/:id/attendees/:attendeeId/checkin')
   @UseGuards(JwtAuthGuard)
-  async registerTraining(
+  async checkinAttendee(
     @Param('id') id: string,
-    @Request() req: any,
-    @Body() body: any,
+    @Param('attendeeId') attendeeId: string,
   ) {
-    const memberId = body.memberId || req.user?.id;
-    return this.trainingsService.joinTraining(id, memberId, req.user?.id);
+    return this.trainingsService.checkinAttendee(id, attendeeId);
   }
 
-  @Post('association/trainings/:id/join')
+  // ── SEND SLIDES ──
+
+  @Post('trainings/:id/send-slides')
   @UseGuards(JwtAuthGuard)
-  async joinAssociationTraining(
+  async sendSlides(@Param('id') id: string, @Body('slideUrl') slideUrl?: string) {
+    return this.trainingsService.sendSlides(id, slideUrl);
+  }
+
+  // ── FEEDBACKS ──
+
+  @Get('trainings/:id/feedbacks')
+  async listFeedbacks(@Param('id') id: string) {
+    return this.trainingsService.listFeedbacks(id);
+  }
+
+  @Post('trainings/:id/feedbacks')
+  async submitFeedback(@Param('id') id: string, @Body() body: any) {
+    return this.trainingsService.submitFeedback(id, body);
+  }
+
+  // ── MEDIA (PHOTO/VIDEO ARCHIVE TO DOCUMENTS) ──
+
+  @Post('trainings/:id/media')
+  @UseGuards(JwtAuthGuard)
+  async attachMedia(
     @Param('id') id: string,
-    @Request() req: any,
-    @Body() body: any,
+    @Body('mediaUrl') mediaUrl: string,
+    @Body('description') description?: string,
+    @Body('department') department?: string,
+    @Body('uploaderName') uploaderName?: string,
+    @Body('docType') docType?: 'slide' | 'video' | 'photo' | 'media',
   ) {
-    const memberId = body.memberId || req.user?.id;
-    return this.trainingsService.joinTraining(id, memberId, req.user?.id);
+    return this.trainingsService.attachMedia(id, mediaUrl, description, department, uploaderName, docType);
   }
 }

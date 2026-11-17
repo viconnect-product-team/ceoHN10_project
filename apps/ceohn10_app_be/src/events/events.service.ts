@@ -64,6 +64,13 @@ export class EventsService implements OnModuleInit {
         `
       ALTER TABLE public.events ADD COLUMN IF NOT EXISTS photo_gallery_url text DEFAULT '';
       ALTER TABLE public.events ADD COLUMN IF NOT EXISTS tagline text DEFAULT '';
+      ALTER TABLE public.events ADD COLUMN IF NOT EXISTS department text DEFAULT 'ban_su_kien';
+      ALTER TABLE public.events ADD COLUMN IF NOT EXISTS category text DEFAULT 'su_kien_clb';
+      ALTER TABLE public.events ADD COLUMN IF NOT EXISTS is_custom_event boolean DEFAULT false;
+      ALTER TABLE public.events ADD COLUMN IF NOT EXISTS total_cost numeric DEFAULT 0;
+      ALTER TABLE public.events ADD COLUMN IF NOT EXISTS expected_attendees integer DEFAULT 1;
+      ALTER TABLE public.events ADD COLUMN IF NOT EXISTS ticket_fee numeric DEFAULT 0;
+      ALTER TABLE public.events ADD COLUMN IF NOT EXISTS fund_type text DEFAULT 'general';
     `,
       )
       .catch(() => {});
@@ -307,6 +314,8 @@ export class EventsService implements OnModuleInit {
             : 0,
       createdAt: r.created_at,
       updatedAt: r.updated_at,
+      department: r.department || 'ban_su_kien',
+      category: r.category || 'su_kien_clb',
       associationId: r.association_id,
       associationName: r.association_name ?? null,
       communityName: r.association_name ?? null,
@@ -699,15 +708,19 @@ export class EventsService implements OnModuleInit {
       Array.isArray(rawAgenda) ? rawAgenda : [],
     );
     const checkinQr = data.checkinQr ? String(data.checkinQr).trim() : null;
+    const department = data.department ? String(data.department).trim() : 'ban_su_kien';
+    const category = data.category ? String(data.category).trim() : 'su_kien_clb';
 
     try {
       await this.prisma.$executeRaw`
         INSERT INTO public.events (
-          id, name, tagline, date, location, capacity, registered, status, type, qr_fields, association_id, image, banner, ticket_price, fee, description, photo_gallery_url, qr_scanners, sponsors, start_time, end_time, agenda, checkin_qr, created_at, updated_at
+          id, name, tagline, department, category, date, location, capacity, registered, status, type, qr_fields, association_id, image, banner, ticket_price, fee, description, photo_gallery_url, qr_scanners, sponsors, start_time, end_time, agenda, checkin_qr, created_at, updated_at
         ) VALUES (
           ${eventId},
           ${data.name},
           ${tagline},
+          ${department},
+          ${category},
           ${safeDate}::date,
           ${data.location ?? ''},
           ${safeCapacity},
@@ -736,10 +749,12 @@ export class EventsService implements OnModuleInit {
       try {
         await this.prisma.$executeRaw`
           INSERT INTO public.events (
-            id, name, date, location, capacity, registered, status, type, qr_fields, association_id, image, banner, ticket_price, fee, description, photo_gallery_url, qr_scanners, sponsors, created_at, updated_at
+            id, name, department, category, date, location, capacity, registered, status, type, qr_fields, association_id, image, banner, ticket_price, fee, description, photo_gallery_url, qr_scanners, sponsors, created_at, updated_at
           ) VALUES (
             ${eventId},
             ${data.name},
+            ${department},
+            ${category},
             ${safeDate}::date,
             ${data.location ?? ''},
             ${safeCapacity},
@@ -763,10 +778,12 @@ export class EventsService implements OnModuleInit {
       } catch {
         await this.prisma.$executeRaw`
           INSERT INTO public.events (
-            id, name, date, location, capacity, registered, status, type, association_id, created_at, updated_at
+            id, name, department, category, date, location, capacity, registered, status, type, association_id, created_at, updated_at
           ) VALUES (
             ${eventId},
             ${data.name},
+            ${department},
+            ${category},
             ${safeDate}::date,
             ${data.location ?? ''},
             ${safeCapacity},
@@ -814,6 +831,44 @@ export class EventsService implements OnModuleInit {
         });
       }
     }
+
+    // Update custom event fields if present
+    const isCustomEvent = Boolean((data as any).isCustomEvent || (data as any).is_custom_event);
+    const totalCost = Math.max(0, Number((data as any).totalCost || 0));
+    const expectedAttendees = Math.max(1, Number((data as any).expectedAttendees || data.capacity || 1));
+    const calculatedFee = isCustomEvent && totalCost > 0 ? Math.round(totalCost / expectedAttendees) : Number(ticketPrice || 0);
+    const fundType = (data as any).fundType || (isCustomEvent ? 'personal_pool' : 'general');
+
+    await this.prisma.$executeRawUnsafe(`
+      UPDATE public.events SET
+        is_custom_event = $1,
+        total_cost = $2,
+        expected_attendees = $3,
+        ticket_fee = $4,
+        fund_type = $5
+      WHERE id = $6;
+    `, isCustomEvent, totalCost, expectedAttendees, calculatedFee, fundType, eventId).catch(() => {});
+
+    // Tự động bắn thông báo cho Ban Sự Kiện & Hậu Cần lập dự toán & chuẩn bị vật tư
+    await this.prisma.$executeRawUnsafe(`
+      INSERT INTO public.business_notifications (
+        id, source_domain, source_record_id, event_kind, notification_kind,
+        title_key, body_key, safe_display_data, priority, status, app_scope, target_app, created_at, updated_at
+      ) VALUES (
+        gen_random_uuid(), 'events', $1, 'event_created', 'task_request',
+        $2, $3, $4::jsonb, 'high', 'delivered', 'crm_platform', 'crm_platform', now(), now()
+      );
+    `,
+      eventId,
+      `Sự kiện mới được khởi tạo: ${data.name.trim()}`,
+      `Kính mời Ban Sự Kiện & Hậu Cần lập dự trù vật tư, thiết bị cần thiết và lên báo cáo chuẩn bị cho sự kiện.`,
+      JSON.stringify({
+        targetRoute: '/association/events',
+        eventId,
+        eventName: data.name.trim(),
+        department: 'Ban Sự Kiện – Hậu Cần'
+      })
+    ).catch(() => {});
 
     // Activity log
     await this.prisma.$executeRaw`
@@ -955,12 +1010,22 @@ export class EventsService implements OnModuleInit {
           ? String(data.checkinQr).trim()
           : null
         : current.checkin_qr;
+    const department =
+      data.department !== undefined
+        ? String(data.department).trim()
+        : (current.department ?? 'ban_su_kien');
+    const category =
+      data.category !== undefined
+        ? String(data.category).trim()
+        : (current.category ?? 'su_kien_clb');
 
     try {
       await this.prisma.$executeRaw`
         UPDATE public.events SET
           name = ${name},
           tagline = ${tagline},
+          department = ${department},
+          category = ${category},
           date = ${safeDate}::date,
           location = ${location},
           capacity = ${safeCapacity},
@@ -989,6 +1054,8 @@ export class EventsService implements OnModuleInit {
         await this.prisma.$executeRaw`
           UPDATE public.events SET
             name = ${name},
+            department = ${department},
+            category = ${category},
             date = ${safeDate}::date,
             location = ${location},
             capacity = ${safeCapacity},
@@ -3257,6 +3324,11 @@ export class EventsService implements OnModuleInit {
       eventDate,
       eventLocation,
       ticketType,
+      ticketFee: Number(eventRow?.ticket_fee || (eventRow as any)?.ticketPrice || reg?.ticket_price || 0),
+      fundType: (eventRow as any)?.fund_type || 'general',
+      fundNote: (eventRow as any)?.fund_type === 'personal_pool' || (eventRow as any)?.is_custom_event
+        ? 'Dòng tiền tính vào quỹ cá nhân riêng, tách hoàn toàn quỹ chung của CEO HN10.'
+        : 'Quỹ chung CEO HN10',
       seatAssignment,
       luckyNumber,
       ticketCount: 1,
@@ -3806,5 +3878,96 @@ export class EventsService implements OnModuleInit {
     }
 
     return { ok: true, deleted: true, id: registrationId };
+  }
+
+  // ── EVENT FEEDBACK & RATINGS (UC-2) ──────────────────────────────────────
+
+  async listEventFeedbacks(eventId: string) {
+    const rows = await this.prisma.$queryRawUnsafe<any[]>(`
+      SELECT * FROM public.event_feedbacks
+      WHERE event_id = $1
+      ORDER BY created_at DESC;
+    `, eventId).catch(() => []);
+
+    return rows.map((r) => ({
+      id: r.id,
+      eventId: r.event_id,
+      memberId: r.member_id,
+      userName: r.user_name,
+      userEmail: r.user_email || '',
+      userPhone: r.user_phone || '',
+      rating: Number(r.rating || 5),
+      comment: r.comment || '',
+      createdAt: r.created_at,
+    }));
+  }
+
+  async submitEventFeedback(eventId: string, data: any) {
+    if (!data.comment?.trim()) {
+      throw new BadRequestException('Vui lòng nhập nội dung đánh giá / phản hồi cho sự kiện');
+    }
+
+    const userName = (data.userName || data.name || 'Đại biểu CEO HN10').trim();
+    const userEmail = (data.userEmail || data.email || '').trim().toLowerCase();
+    const userPhone = (data.userPhone || data.phone || '').trim();
+    const rating = Math.min(5, Math.max(1, Number(data.rating) || 5));
+    const memberId = data.memberId && data.memberId.length === 36 ? `'${data.memberId}'::uuid` : 'NULL';
+
+    await this.prisma.$executeRawUnsafe(`
+      INSERT INTO public.event_feedbacks (
+        event_id, member_id, user_name, user_email, user_phone, rating, comment, created_at
+      ) VALUES (
+        $1, ${memberId}, $2, $3, $4, $5, $6, now()
+      );
+    `, eventId, userName, userEmail, userPhone, rating, data.comment.trim());
+
+    return {
+      success: true,
+      message: 'Cảm ơn Anh/Chị đã gửi đánh giá phản hồi về sự kiện!',
+    };
+  }
+
+  // ── ATTACH MEDIA & ARCHIVE TO DOCUMENTS (UC-2) ──────────────────────────
+
+  async attachEventMedia(eventId: string, mediaUrl: string, description?: string) {
+    if (!mediaUrl?.trim()) {
+      throw new BadRequestException('Vui lòng cung cấp link hình ảnh hoặc video sự kiện');
+    }
+
+    const event = await this.prisma.$queryRawUnsafe<any[]>(`
+      SELECT * FROM public.events WHERE id = $1 LIMIT 1;
+    `, eventId).catch(() => []);
+
+    const evTitle = event[0]?.name || 'Sự kiện CEO HN10';
+
+    // 1. Cập nhật photo_gallery_url trong events
+    await this.prisma.$executeRawUnsafe(`
+      UPDATE public.events 
+      SET photo_gallery_url = $1, updated_at = now() 
+      WHERE id = $2;
+    `, mediaUrl.trim(), eventId);
+
+    // 2. Lưu link media vào Kho Tài Liệu CLB (public.documents)
+    await this.prisma.$executeRawUnsafe(`
+      INSERT INTO public.documents (
+        title, name, code, category, file_url, file_path, file_type, type,
+        event_id, description, uploaded_by_name, uploaded_by, uploaded_at
+      ) VALUES (
+        $1, $1, $2, 'event_media', $3, $3, 'media_link', 'media_link',
+        $4, $5, 'Ban Truyền Thông & Sự Kiện', 'Ban Truyền Thông & Sự Kiện', now()
+      );
+    `,
+      `[Media Sự Kiện] ${evTitle}`,
+      `EV-MEDIA-${Math.random().toString(36).slice(2, 8).toUpperCase()}`,
+      mediaUrl.trim(),
+      eventId,
+      description || `Bộ ảnh và media tư liệu ghi hình sự kiện "${evTitle}".`,
+    ).catch(() => {});
+
+    return {
+      success: true,
+      message: 'Đã đính kèm link tư liệu ảnh/media sự kiện và lưu trữ vào Kho Tài Liệu CLB!',
+      mediaUrl: mediaUrl.trim(),
+    };
   }
 }

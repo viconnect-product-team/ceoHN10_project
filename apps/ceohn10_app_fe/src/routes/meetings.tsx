@@ -47,6 +47,7 @@ import {
   Handshake,
   Search,
   Building,
+  Building2,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useServerFn } from "@tanstack/react-start";
@@ -704,7 +705,7 @@ function MeetingsPage() {
         {/* Card 1: Tổng số cuộc họp (Sky gradient - Blue) */}
         <div className="h-32 p-4 bg-gradient-to-b from-sky-100 to-slate-50 dark:from-sky-950/40 dark:to-slate-900 rounded-[20px] outline outline-[0.50px] outline-slate-200 dark:outline-slate-800 flex flex-col justify-start items-start gap-2.5 overflow-hidden shadow-xs">
           <div className="h-8 flex items-center gap-2">
-            <img src="/icons/ceohn10_icon_2/users-round-1.svg" className="h-4 w-4" alt="meetings" onError={(e) => { (e.currentTarget as HTMLElement).style.display = 'none'; }} />
+            <Users className="h-4 w-4 text-blue-600 dark:text-blue-400" />
             <div className="text-blue-600 dark:text-blue-400 text-xs font-semibold font-['Inter']">TỔNG SỐ CUỘC HỌP</div>
           </div>
           <div className="text-slate-900 dark:text-slate-100 text-2xl font-bold font-['Inter'] leading-7">
@@ -715,10 +716,10 @@ function MeetingsPage() {
           </div>
         </div>
 
-        {/* Card 2: Chờ Quản Trị Duyệt (Violet gradient - Indigo) */}
-        <div className="h-32 p-4 bg-gradient-to-b from-violet-100 to-white dark:from-violet-950/40 dark:to-slate-900 rounded-[20px] outline outline-[0.50px] outline-slate-200 dark:outline-slate-800 flex flex-col justify-start items-start gap-2.5 overflow-hidden shadow-xs">
+        {/* Card 2: Chờ Quản Trị Duyệt */}
+        <div className="h-32 p-4 bg-white rounded-[20px] outline outline-[0.50px] outline-slate-200 flex flex-col justify-start items-start gap-2.5 overflow-hidden shadow-xs">
           <div className="h-8 flex items-center gap-2">
-            <img src="/icons/ceohn10_icon_2/shield-check.svg" className="h-4 w-4" alt="pending" onError={(e) => { (e.currentTarget as HTMLElement).style.display = 'none'; }} />
+            <ShieldCheck className="h-4 w-4 text-indigo-500 dark:text-indigo-400" />
             <div className="text-indigo-500 dark:text-indigo-400 text-xs font-semibold font-['Inter']">CHỜ QUẢN TRỊ DUYỆT</div>
           </div>
           <div className="text-slate-900 dark:text-slate-100 text-2xl font-bold font-['Inter'] leading-7">
@@ -730,9 +731,9 @@ function MeetingsPage() {
         </div>
 
         {/* Card 3: Sắp diễn ra (Orange gradient - Orange) */}
-        <div className="h-32 p-4 bg-gradient-to-b from-orange-100 to-white dark:from-orange-950/40 dark:to-slate-900 rounded-[20px] outline outline-[0.50px] outline-slate-200 dark:outline-slate-800 flex flex-col justify-start items-start gap-2.5 overflow-hidden shadow-xs">
+        <div className="h-32 p-4 bg-gradient-to-b from-orange-100 to-orange-50 dark:from-orange-950/40 dark:to-slate-900 rounded-[20px] outline outline-[0.50px] outline-slate-200 dark:outline-slate-800 flex flex-col justify-start items-start gap-2.5 overflow-hidden shadow-xs">
           <div className="h-8 flex items-center gap-2">
-            <img src="/icons/ceohn10_icon_2/building-2-1.svg" className="h-4 w-4" alt="upcoming" onError={(e) => { (e.currentTarget as HTMLElement).style.display = 'none'; }} />
+            <Building2 className="h-4 w-4 text-orange-500 dark:text-orange-400" />
             <div className="text-orange-500 dark:text-orange-400 text-xs font-semibold font-['Inter']">SẮP DIỄN RA</div>
           </div>
           <div className="text-slate-900 dark:text-slate-100 text-2xl font-bold font-['Inter'] leading-7">
@@ -744,9 +745,9 @@ function MeetingsPage() {
         </div>
 
         {/* Card 4: Đã hoàn tất (Green gradient - Emerald) */}
-        <div className="h-32 p-4 bg-gradient-to-b from-green-100 to-white dark:from-green-950/40 dark:to-slate-900 rounded-[20px] outline outline-[0.50px] outline-slate-200 dark:outline-slate-800 flex flex-col justify-start items-start gap-2.5 overflow-hidden shadow-xs">
+        <div className="h-32 p-4 bg-gradient-to-b from-green-100 to-emerald-50 dark:from-green-950/40 dark:to-slate-900 rounded-[20px] outline outline-[0.50px] outline-slate-200 dark:outline-slate-800 flex flex-col justify-start items-start gap-2.5 overflow-hidden shadow-xs">
           <div className="h-8 flex items-center gap-2">
-            <img src="/icons/ceohn10_icon_2/circle-check.svg" className="h-4 w-4" alt="completed" onError={(e) => { (e.currentTarget as HTMLElement).style.display = 'none'; }} />
+            <CheckCircle2 className="h-4 w-4 text-emerald-500 dark:text-emerald-400" />
             <div className="text-emerald-500 dark:text-emerald-400 text-xs font-semibold font-['Inter']">ĐÃ HOÀN TẤT</div>
           </div>
           <div className="text-slate-900 dark:text-slate-100 text-2xl font-bold font-['Inter'] leading-7">
@@ -1054,7 +1055,7 @@ function MeetingsPage() {
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                   {[
                     { role: "QUẢN_TRỊ", label: "Quản trị", color: "border-blue-600 bg-blue-600/10 text-blue-900 dark:text-blue-300" },
-                    { role: "ADMIN", label: "Admin", color: "border-purple-500 bg-purple-500/10 text-purple-900 dark:text-purple-300" },
+                    { role: "ADMIN", label: "Admin", color: "border-slate-500 bg-slate-500/10 text-slate-800 dark:text-slate-200" },
                     { role: "TỔNG_THƯ_KÝ", label: "Tổng thư ký", color: "border-amber-500 bg-amber-500/10 text-amber-900 dark:text-amber-300" },
                     { role: "TRƯỞNG_BAN", label: "Trưởng ban", color: "border-emerald-500 bg-emerald-500/10 text-emerald-900 dark:text-emerald-300" },
                   ].map((item) => (

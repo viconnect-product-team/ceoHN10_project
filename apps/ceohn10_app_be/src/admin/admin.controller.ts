@@ -149,6 +149,35 @@ export class AdminController {
     return this.adminService.sendNotification(id);
   }
 
+  // ── NHẮC NHỞ HỘI VIÊN QUA APP & EMAIL (YÊU CẦU 1) ──
+  @Post('notifications/:id/remind')
+  @UseGuards(JwtAuthGuard)
+  async remindNotification(@Param('id') id: string) {
+    return this.adminService.remindNotification(id);
+  }
+
+  @Post('notifications/daily-sync-and-dispatch')
+  @UseGuards(JwtAuthGuard)
+  async dailySyncAndDispatchNotifications(@Query('associationId') associationId?: string) {
+    await this.adminService.syncSystemAlertNotifications(associationId);
+    return {
+      success: true,
+      message: 'Đã hoàn tất quét và đồng bộ các thông báo nhắc nhở đầu ngày',
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+  // ── TỔNG HỢP PHẢN ÁNH & GÓP Ý (YÊU CẦU 4) ──
+  @Get('feedbacks')
+  @UseGuards(JwtAuthGuard)
+  async listFeedbacks(
+    @Query('category') category?: string,
+    @Query('search') search?: string,
+    @Query('minRating') minRating?: number,
+  ) {
+    return this.adminService.listAllFeedbacks({ category, search, minRating });
+  }
+
   @Post('notifications/:id/push-messages')
   @UseGuards(JwtAuthGuard)
   async pushNotificationToMessages(
@@ -233,6 +262,50 @@ export class AdminController {
   @Delete('transactions/:id')
   async deleteTransaction(@Param('id') id: string) {
     return this.adminService.deleteTransaction(id);
+  }
+
+  // ── 2 TÚI QUỸ TÀI CHÍNH & YÊU CẦU CHI (UC-5) ──
+
+  @Get('funds-overview')
+  async getFundsOverview() {
+    return this.adminService.getFundsOverview();
+  }
+
+  @Get('expense-requests')
+  async listExpenseRequests(
+    @Query('status') status?: string,
+    @Query('department') department?: string,
+    @Query('fundType') fundType?: string,
+  ) {
+    return this.adminService.listExpenseRequests({ status, department, fundType });
+  }
+
+  @Post('expense-requests')
+  @UseGuards(JwtAuthGuard)
+  async createExpenseRequest(@Body() body: any, @Request() req: any) {
+    const userId = req.user?.id || req.user?.sub;
+    const userName = req.user?.name || req.user?.username || 'Ban Hậu cần';
+    return this.adminService.createExpenseRequest(body, userId, userName);
+  }
+
+  @Patch('expense-requests/:id/approve-finance')
+  @UseGuards(JwtAuthGuard)
+  async approveFinanceExpenseRequest(@Param('id') id: string, @Request() req: any) {
+    const approverName = req.user?.name || 'Trưởng Ban Tài Chính';
+    return this.adminService.approveFinanceExpenseRequest(id, approverName);
+  }
+
+  @Patch('expense-requests/:id/approve-leader')
+  @UseGuards(JwtAuthGuard)
+  async approveLeaderExpenseRequest(@Param('id') id: string, @Request() req: any) {
+    const approverName = req.user?.name || 'Chủ Tịch CLB';
+    return this.adminService.approveLeaderExpenseRequest(id, approverName);
+  }
+
+  @Post('expense-requests/:id/pay')
+  @UseGuards(JwtAuthGuard)
+  async disburseExpenseRequest(@Param('id') id: string) {
+    return this.adminService.disburseExpenseRequest(id);
   }
 
   // ── CRM PERMISSION MATRIX (RBAC) ──────────────────────────────────────────

@@ -24,6 +24,7 @@ import {
   Sparkles,
   ChevronLeft,
   ChevronRight,
+  ChevronDown,
   Save,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -45,6 +46,7 @@ import { Pagination, SortHeader } from "@/components/dashboard/DataTablePaginati
 import { sanitizePhoneNumber, handleNumericKeyDown } from "@/lib/utils";
 
 export const Route = createFileRoute("/accounts")({
+  ssr: false,
   beforeLoad: () => {
     throw redirect({
       to: "/account-settings",
@@ -999,7 +1001,7 @@ function AccountsPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <div className="h-32 p-4 bg-white dark:bg-card rounded-[20px] border border-slate-200 dark:border-slate-800 flex flex-col justify-start items-start gap-2.5 overflow-hidden shadow-xs">
             <div className="h-8 flex items-center gap-2">
-              <img src="/icons/ceohn10_icon_2/users-round-1.svg" className="h-4 w-4" alt="users" />
+              <Users className="h-4 w-4 text-[#003B95] dark:text-blue-400" />
               <div className="text-[#003B95] dark:text-blue-400 text-xs font-semibold font-['Inter']">TỔNG SỐ TÀI KHOẢN</div>
             </div>
             <div className="text-slate-900 dark:text-white text-2xl font-bold font-['Inter'] leading-7">{accounts.length}</div>
@@ -1008,7 +1010,7 @@ function AccountsPage() {
 
           <div className="h-32 p-4 bg-white dark:bg-card rounded-[20px] border border-slate-200 dark:border-slate-800 flex flex-col justify-start items-start gap-2.5 overflow-hidden shadow-xs">
             <div className="h-8 flex items-center gap-2">
-              <img src="/icons/ceohn10_icon_2/shield-check.svg" className="h-4 w-4" alt="shield" />
+              <ShieldCheck className="h-4 w-4 text-[#003B95] dark:text-blue-400" />
               <div className="text-[#003B95] dark:text-blue-400 text-xs font-semibold font-['Inter']">LÃNH ĐẠO &amp; QUẢN TRỊ</div>
             </div>
             <div className="text-slate-900 dark:text-white text-2xl font-bold font-['Inter'] leading-7">
@@ -1019,7 +1021,7 @@ function AccountsPage() {
 
           <div className="h-32 p-4 bg-white dark:bg-card rounded-[20px] border border-slate-200 dark:border-slate-800 flex flex-col justify-start items-start gap-2.5 overflow-hidden shadow-xs">
             <div className="h-8 flex items-center gap-2">
-              <img src="/icons/ceohn10_icon_2/building-2-1.svg" className="h-4 w-4" alt="building" />
+              <Building2 className="h-4 w-4 text-amber-600 dark:text-amber-400" />
               <div className="text-amber-600 dark:text-amber-400 text-xs font-semibold font-['Inter']">TRƯỞNG BAN CHUYÊN MÔN</div>
             </div>
             <div className="text-slate-900 dark:text-white text-2xl font-bold font-['Inter'] leading-7">
@@ -1030,7 +1032,7 @@ function AccountsPage() {
 
           <div className="h-32 p-4 bg-white dark:bg-card rounded-[20px] border border-slate-200 dark:border-slate-800 flex flex-col justify-start items-start gap-2.5 overflow-hidden shadow-xs">
             <div className="h-8 flex items-center gap-2">
-              <img src="/icons/ceohn10_icon_2/circle-check.svg" className="h-4 w-4" alt="check" />
+              <CheckCircle2 className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
               <div className="text-emerald-600 dark:text-emerald-400 text-xs font-semibold font-['Inter']">ĐANG HOẠT ĐỘNG</div>
             </div>
             <div className="text-slate-900 dark:text-white text-2xl font-bold font-['Inter'] leading-7">
@@ -1044,7 +1046,7 @@ function AccountsPage() {
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 shadow-[0px_2px_2px_0px_rgba(22,39,75,0.05)]">
           <div className="flex flex-1 items-center gap-2 max-w-xl">
             <div className="flex-1 h-9 px-3 bg-white dark:bg-card rounded-3xl outline outline-1 outline-slate-200 flex items-center gap-2.5 overflow-hidden">
-              <img src="/icons/ceohn10_icon_2/search.svg" className="h-4 w-4 shrink-0" alt="search" />
+              <Search className="h-4 w-4 shrink-0 text-slate-400" />
               <input
                 type="text"
                 value={searchQuery}
@@ -1064,7 +1066,7 @@ function AccountsPage() {
               onClick={handleOpenAdd}
               className="h-9 px-4 bg-blue-800 rounded-3xl shadow-sm flex items-center gap-2 text-white text-xs font-bold transition hover:bg-blue-900 shrink-0 cursor-pointer"
             >
-              <img src="/icons/ceohn10_icon_2/plus.svg" className="h-3.5 w-3.5" alt="plus" />
+              <Plus className="h-3.5 w-3.5" />
               <span>Thêm Tài Khoản</span>
             </button>
           </div>
@@ -1081,11 +1083,7 @@ function AccountsPage() {
                   <option key={dept} value={dept}>{dept}</option>
                 ))}
               </select>
-              <img
-                src="/icons/ceohn10_icon_2/chevron-down.svg"
-                className="h-3 w-3 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none"
-                alt="chevron"
-              />
+              <ChevronDown className="h-3.5 w-3.5 text-slate-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
             </div>
 
             <div className="relative">
@@ -1099,11 +1097,7 @@ function AccountsPage() {
                   <option key={opt.value} value={opt.value}>{opt.label}</option>
                 ))}
               </select>
-              <img
-                src="/icons/ceohn10_icon_2/chevron-down.svg"
-                className="h-3 w-3 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none"
-                alt="chevron"
-              />
+              <ChevronDown className="h-3.5 w-3.5 text-slate-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
             </div>
           </div>
         </div>

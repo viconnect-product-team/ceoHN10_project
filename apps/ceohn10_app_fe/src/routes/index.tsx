@@ -166,20 +166,36 @@ function Index() {
     try {
       if (hasCallback) return;
       const search = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
+      const port = typeof window !== "undefined" ? window.location.port : "";
+      const hostname = typeof window !== "undefined" ? window.location.hostname.toLowerCase() : "";
+      const isCrmScope =
+        (import.meta as any).env?.VITE_APP_SCOPE === "crm_platform" ||
+        hostname.includes("crm") ||
+        port === "10443" ||
+        port === "5022";
+
       const isCrmPortal =
+        isCrmScope ||
         search?.get("portal") === "crm" ||
         (typeof window !== "undefined" && sessionStorage.getItem("crm_portal") === "1");
-      const hostname = typeof window !== "undefined" ? window.location.hostname.toLowerCase() : "";
+
+      if (isCrmPortal && typeof window !== "undefined") {
+        sessionStorage.setItem("crm_portal", "1");
+      }
+
       const isCeo1983MobileDomain =
         hostname === "ceohn10.viconnect.vn" ||
         hostname.startsWith("dev-app.") ||
-        (hostname.includes("ceohn10") && !hostname.startsWith("crm."));
+        (hostname.includes("ceohn10") && !hostname.startsWith("crm.") && !hostname.startsWith("crm_") && !hostname.includes("crm"));
 
       const isPureMobileApp =
         typeof window !== "undefined" &&
         (import.meta.env.VITE_APP_SCOPE === "association_app" || isCeo1983MobileDomain) &&
         !isCrmPortal &&
-        hostname !== "crm.ceohn10.viconnect.vn";
+        hostname !== "crm.ceohn10.viconnect.vn" &&
+        hostname !== "crm_ceohn10.viconnect.vn" &&
+        !hostname.startsWith("crm_") &&
+        !hostname.includes("crm");
 
       if (isPureMobileApp && window.location.pathname === "/") {
         navigate({ to: "/association", replace: true });
@@ -260,16 +276,26 @@ function usePostLoginRedirect(redirectAnonToLanding = false) {
         return;
       }
 
+      const port = typeof window !== "undefined" ? window.location.port : "";
+      const hostname = typeof window !== "undefined" ? window.location.hostname.toLowerCase() : "";
+      const isCrmScope =
+        (import.meta as any).env?.VITE_APP_SCOPE === "crm_platform" ||
+        hostname.includes("crm") ||
+        port === "10443" ||
+        port === "5022";
+
       const isCrmPortal =
-        typeof window !== "undefined" &&
-        (new URLSearchParams(window.location.search).get("portal") === "crm" ||
-          sessionStorage.getItem("crm_portal") === "1");
+        isCrmScope ||
+        (typeof window !== "undefined" &&
+          (new URLSearchParams(window.location.search).get("portal") === "crm" ||
+            sessionStorage.getItem("crm_portal") === "1"));
 
-
+      if (isCrmPortal && typeof window !== "undefined") {
+        sessionStorage.setItem("crm_portal", "1");
+      }
 
       if (authStatus === 'out') {
-        const hostname = typeof window !== "undefined" ? window.location.hostname.toLowerCase() : "";
-        if (hostname === "crm.ceohn10.viconnect.vn" || isCrmPortal) {
+        if (isCrmPortal || hostname === "crm.ceohn10.viconnect.vn" || hostname.includes("crm") || port === "10443" || port === "5022") {
           setStatus("redirecting");
           navigate({ to: "/auth", search: { portal: "crm" } as any, replace: true });
           return;

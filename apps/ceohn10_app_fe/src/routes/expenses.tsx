@@ -28,7 +28,7 @@ import { FinanceChartsSection } from "@/components/dashboard/FinanceChartsSectio
 import { FinanceViewModeTabs, type FinanceViewMode } from "@/components/dashboard/FinanceViewModeTabs";
 import { FinanceUnitTreeSection } from "@/components/dashboard/FinanceUnitTreeSection";
 import type { Transaction } from "@/types/finance.types";
-import { downloadInvoiceVoucher } from "@/lib/invoice-receipt";
+import { downloadInvoiceVoucher, printOrExportExpensePdf } from "@/lib/invoice-receipt";
 import { useFmt, useT } from "@/lib/i18n";
 import { exportToExcel, formatDisplayDate, formatExcelCurrency, numberToVietnameseWords } from "@/lib/excel-export";
 import { useTableControls } from "@/hooks/use-table-controls";
@@ -91,7 +91,7 @@ export const Route = createFileRoute("/expenses")({
   ssr: false,
   loader: async () => {
     try {
-      const data = await fetchNestApi<Transaction[]>("/admin/transactions?type=expense");
+      const data = await fetchNestApi<Transaction[]>("/admin/transactions");
       return Array.isArray(data) ? data : [];
     } catch {
       return [];
@@ -117,7 +117,7 @@ function ExpensesPage() {
 
   const fetchLiveExpenses = async () => {
     try {
-      const res = await fetchNestApi<Transaction[]>("/admin/transactions?type=expense");
+      const res = await fetchNestApi<Transaction[]>("/admin/transactions");
       if (Array.isArray(res)) {
         setTransactionsList(res);
       }
@@ -169,6 +169,9 @@ function ExpensesPage() {
   const [formAdvanceAmount, setFormAdvanceAmount] = useState<number>(0);
   const [formRefundAmount, setFormRefundAmount] = useState<number>(0);
   const [formRecipient, setFormRecipient] = useState("");
+  const [formFundType, setFormFundType] = useState<string>("general");
+  const [formDepartment, setFormDepartment] = useState<string>("Ban Đời Sống");
+  const [formEventName, setFormEventName] = useState<string>("");
 
   const openCreate = (isAdvance: boolean = false) => {
     setEditing(null);
@@ -181,6 +184,9 @@ function ExpensesPage() {
     setFormAdvanceAmount(0);
     setFormRefundAmount(0);
     setFormRecipient("");
+    setFormFundType("general");
+    setFormDepartment("Ban Đời Sống");
+    setFormEventName("");
     setModalOpen(true);
   };
 
@@ -195,6 +201,9 @@ function ExpensesPage() {
     setFormAdvanceAmount(tx.advanceAmount || (tx.category === "advance" ? tx.amount : 0));
     setFormRefundAmount(tx.refundAmount || 0);
     setFormRecipient(tx.recipient || "");
+    setFormFundType(tx.fundType || "general");
+    setFormDepartment(tx.targetDepartment || tx.department || "Ban Đời Sống");
+    setFormEventName(tx.targetEventName || tx.eventName || "");
     setModalOpen(true);
   };
 
@@ -276,6 +285,9 @@ function ExpensesPage() {
         advanceAmount: isAdvance ? Number(formAdvanceAmount || formAmount) : 0,
         refundAmount: isAdvance ? Number(formRefundAmount) : 0,
         recipient: formRecipient,
+        fundType: formFundType || "general",
+        targetDepartment: formDepartment || "Ban Đời Sống",
+        targetEventName: formEventName,
         invoiceUrl: editing?.invoiceUrl || `/invoices/INV-CHI-${Date.now()}.pdf`,
       };
 
@@ -357,8 +369,7 @@ function ExpensesPage() {
   }, [TRANSACTIONS]);
 
   const totalIncomeFund = useMemo(() => {
-    const sum = incomeList.reduce((s, tx) => s + (tx.amount || 0), 0);
-    return sum > 0 ? sum : 1585000000;
+    return incomeList.reduce((s, tx) => s + (Number(tx.amount) || 0), 0);
   }, [incomeList]);
 
   // Accurate Calculation Formula:
@@ -915,12 +926,12 @@ function ExpensesPage() {
                             )}
                           </td>
 
-                          {/* Column Tải Hóa Đơn on every row (User requirement) */}
+                          {/* Column Tải Hóa Đơn & Xuất PDF theo từng ban & người nhận tiền (UC-5) */}
                           <td style={{ width: `${colWidths.invoice}px`, maxWidth: `${colWidths.invoice}px` }} className="px-4 py-3 text-center border-b border-border/50">
                             <button
                               type="button"
                               onClick={() =>
-                                downloadInvoiceVoucher({
+                                printOrExportExpensePdf({
                                   id: tx.id,
                                   date: tx.date,
                                   type: "expense",
@@ -932,13 +943,16 @@ function ExpensesPage() {
                                   recipient: tx.recipient,
                                   advanceAmount: tx.advanceAmount,
                                   refundAmount: tx.refundAmount,
+                                  targetDepartment: tx.targetDepartment || tx.department,
+                                  targetEventName: tx.targetEventName || tx.eventName,
+                                  fundType: tx.fundType,
                                 })
                               }
-                              title="Tải hóa đơn / Phiếu chi PDF"
-                              className="inline-flex items-center gap-1 rounded-lg border border-border bg-card px-2.5 py-1 text-xs font-medium text-foreground shadow-xs hover:bg-muted cursor-pointer transition-colors"
+                              title="In hoặc Lưu Báo Cáo Chi PDF (Kèm Ban, Sự Kiện & Người Nhận Tiền)"
+                              className="inline-flex items-center gap-1 rounded-lg border border-primary/30 bg-primary/10 px-2.5 py-1 text-xs font-bold text-primary shadow-xs hover:bg-primary/20 cursor-pointer transition-colors"
                             >
                               <FileDown className="h-3.5 w-3.5 text-primary shrink-0" />
-                              <span>Tải HĐ</span>
+                              <span>Xuất PDF</span>
                             </button>
                           </td>
 
@@ -1035,8 +1049,51 @@ function ExpensesPage() {
                 </div>
               </div>
 
+              {/* 2 Túi quỹ & Ban chuyên môn đề xuất (UC-5) */}
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs font-semibold text-foreground">Nguồn xuất chi (2 Túi quỹ)</label>
+                  <select
+                    value={formFundType}
+                    onChange={(e) => setFormFundType(e.target.value)}
+                    className="mt-1 w-full rounded-xl border border-input bg-background px-3 py-2 text-xs font-semibold text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                  >
+                    <option value="general">💼 Túi Quỹ Chung CLB (Từ Hội Phí)</option>
+                    <option value="sponsorship_cash">🎁 Túi Quỹ Tài Trợ (Từ Nhà Tài Trợ)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="text-xs font-semibold text-foreground">Ban đề xuất / Thụ hưởng</label>
+                  <select
+                    value={formDepartment}
+                    onChange={(e) => setFormDepartment(e.target.value)}
+                    className="mt-1 w-full rounded-xl border border-input bg-background px-3 py-2 text-xs font-semibold text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                  >
+                    <option value="Ban Đời Sống">Ban Đời Sống (Hiếu hỷ, tương trợ)</option>
+                    <option value="Ban Hậu Cần">Ban Hậu Cần (Vật dụng, thiết yếu phẩm)</option>
+                    <option value="Ban Sự Kiện">Ban Sự Kiện</option>
+                    <option value="Ban Xúc Tiến Thương Mại">Ban Xúc Tiến Thương Mại</option>
+                    <option value="Ban Đào Tạo">Ban Đào Tạo</option>
+                    <option value="Ban Truyền Thông">Ban Truyền Thông</option>
+                    <option value="Ban Điều Hành">Ban Điều Hành CLB</option>
+                  </select>
+                </div>
+              </div>
+
               <div>
-                <label className="text-xs font-semibold text-foreground">Người nhận / Đơn vị thụ hưởng</label>
+                <label className="text-xs font-semibold text-foreground">Sự kiện / Cuộc họp chi tiêu (nếu có)</label>
+                <input
+                  type="text"
+                  placeholder="Ví dụ: Sự kiện Thăm hỏi hiếu hỷ / Gặp mặt Ban điều hành quý 1..."
+                  value={formEventName}
+                  onChange={(e) => setFormEventName(e.target.value)}
+                  className="mt-1 w-full rounded-xl border border-input bg-background px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-primary"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-semibold text-foreground">Người nhận / Đơn vị thụ hưởng <span className="text-rose-500">*</span></label>
                 <input
                   type="text"
                   required

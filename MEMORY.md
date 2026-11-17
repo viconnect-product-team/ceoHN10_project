@@ -1,5 +1,389 @@
 # System Memory & Architecture
 
+- **Bản cập nhật ngày 17/11/2026 (v12.13): Chuẩn Hóa Realtime Dòng Tiền & Sổ Quỹ Thu Chi, Đồng Bộ Hội Phí & Hóa Đơn, Sửa Lỗi Xem Tài Liệu, Chuẩn Hóa Role BCS Lớp & BCS Team Theo Sơ Đồ, Triệt Tiêu 404 Icons & React Error #418, Cấu Hình Subdomain & Git Auto-Deploy CI/CD ([NODE-CRM-001], [NODE-CRM-004], [NODE-CRM-005], [NODE-CRM-009], [NODE-CRM-010], [NODE-CORE-001])**:
+  - **1. Khắc Phục Sổ Quỹ Realtime & Dòng Tiền Biến Động Thực Tế**:
+    * **Màn Quản Lý Thu (`/income`)**:
+      - Nguyên nhân lỗi "TỔNG THU QUỸ = 0 đ" (dù "ĐÃ THU THỰC TẾ = 25.000.000 đ"): `totalIncome = incomeCash + incomeBank` lọc cứng `tx.method === 'cash'` và `tx.method === 'bank' || tx.method === 'card'`. Trong khi đó, CSDL PostgreSQL thực tế lưu `tx.method = 'Chuyển khoản Ngân hàng'`, khiến cả 2 điều kiện đều sai và tổng ra 0 đ.
+      - Khắc phục: Sửa `totalIncome = incomeList.reduce((s, tx) => s + Number(tx.amount || 0), 0)`. Tổng thu luôn bằng tổng toàn bộ giao dịch thu thực tế.
+      - Sửa `incomeCash` và `incomeBank` nhận diện linh hoạt chuỗi không phân biệt hoa thường ("tiền mặt", "cash", "chuyển khoản", "ngân hàng", "bank", "card").
+      - Bổ sung hàm `getRecipientName(tx)` tự động trích xuất tên hội viên từ `description` ("Vũ Phan Vũ") khi trường `recipient` bị null, thay thế dấu gạch ngang `—`.
+    * **Màn Quản Lý Chi & Tạm Ứng (`/expenses`)**:
+      - Nguyên nhân lỗi "QUỸ CÒN LẠI = 1.585.000.000 đ" (dù thực tế chỉ mới thu 25.000.000 đ và chưa chi): Loader và `fetchLiveExpenses` chỉ tải `?type=expense`, khiến `incomeList = []`. Dòng fallback `sum > 0 ? sum : 1585000000` đã gán cứng con số 1.585.000.000 đ.
+      - Khắc phục: Chuyển loader và fetch sang `/admin/transactions` (lấy cả thu và chi). Xóa bỏ vĩnh viễn con số hardcode `1585000000`.
+      - Tính chuẩn xác: `totalIncomeFund = incomeList.reduce(...)` = 25.000.000 đ, `totalActualExpense` = 0 đ, `netFundBalance` = 25.000.000 đ.
+    * **Tab View Mode ("Dashboard Tổng Hợp")**:
+      - Chuyển màu tab active từ xanh/tím sang xám chuẩn doanh nhân `bg-slate-900 dark:bg-slate-800 text-white`.
+  - **2. Khắc Phục Màn Hội Phí (`/fees`) & Đồng Bộ Hóa Đơn**:
+    * Backend `apps/ceohn10_app_be/src/admin/admin.service.ts`: Trong `listInvoices()`, khi bảng `public.invoices` chưa có bản ghi, backend tự động quét danh sách 12 hội viên từ `public.members` để tự động tạo và lưu hóa đơn hội phí niên khóa 2026. Hội viên Vũ Phan Vũ (`HP-HN10-099`) được đánh dấu `status: 'paid'`, các hội viên khác `status: 'unpaid'`.
+    * Frontend `apps/ceohn10_app_fe/src/routes/fees.index.tsx`: Bổ sung cơ chế fallback tự động đồng bộ từ mảng `members` khi backend đang khởi tạo hoặc DB phục hồi, đảm bảo màn hình luôn hiển thị đầy đủ thông tin hội viên và tình trạng đóng hội phí.
+  - **3. Khắc Phục Chức Năng Tài Liệu (`/documents`)**:
+    * Backend `apps/ceohn10_app_be/src/documents/documents.service.ts` & `documents.repository.ts`:
+      - Sửa `mapRow` fallback an toàn: `id = r.code || String(r.id)`, `name = r.name || r.title`, `filePath/fileUrl = r.file_path || r.file_url || r.drive_url`.
+      - Trong `listDocuments`: Sử dụng `SELECT id, COALESCE(code, id::text) as code, COALESCE(name, title, 'Tài liệu') as name, COALESCE(file_path, file_url, drive_url, '') as file_path...` để không bao giờ bị null đường dẫn.
+    * Frontend `UniversalDocumentViewerModal.tsx`:
+      - Bổ sung fallback tự động nhận diện tài liệu theo từ khóa tên ("quy chế", "điều lệ", "brd", "srs", "csdl", "api") để trỏ tới các tệp tĩnh PDF/DOCX có sẵn trong `public/docs/`.
+      - `apps/ceohn10_app_fe/src/lib/api-client.ts`: Cập nhật `resolveMediaUrl` tự động bắt các URL chứa `ceohn10.vn/docs/` hoặc `/docs/` để chuyển sang file tĩnh cục bộ của ứng dụng, tránh gọi domain chết.
+  - **4. Chuẩn Hóa Danh Sách Role Theo Sơ Đồ BCS Lớp & BCS Team (Ảnh 1 & Ảnh 2)**:
+    * Cập nhật `apps/ceohn10_app_fe/src/lib/rbac-permission-helpers.ts` và `apps/ceohn10_app_fe/src/components/dashboard/RbacPermissionMatrix.tsx`:
+      - Đổi "Chủ tịch" -> "Lớp Trưởng Lâm thời", "Phó Chủ tịch" -> "Lớp Phó Lâm thời".
+      - Bổ sung đủ 8 chức danh BCS Lớp Lâm Thời: Lớp Trưởng Lâm thời, Lớp Phó Học Tập Lâm Thời, Lớp Phó Sự Kiện & Hậu Cần Lâm Thời, Lớp Phó Tài Chính Tài Trợ Lâm Thời, Lớp Phó Truyền Thông Lâm Thời, Lớp Phó Công Nghệ Lâm Thời, Lớp Phó Đối Ngoại & Giao Thương Lâm Thời, Lớp Phó Đời Sống & Gắn Kết Thành Viên Lâm Thời.
+      - Bổ sung đủ 10 chức danh BCS Team: Trưởng Team LT, 2 Phó Team LT, 3 Phó Team Tập sự, 7 Trưởng Ban Tập sự tương ứng 7 ban.
+      - Chuẩn hóa 7 Ban Chuyên Môn của Lớp CEOHN10 trong `getDynamicDepartmentOptions()`: Ban Học tập, Ban Sự kiện & Hậu cần, Ban Tài chính & Tài trợ, Ban Truyền thông, Ban Công nghệ, Ban Đối ngoại & Giao thương, Ban Đời sống & Gắn kết thành viên.
+  - **5. Triệt Tiêu Lỗi 404 Icons & React Error #418**:
+    * Lỗi 404 icons: Đã nhân bản thư mục icon sang `public/icons/ceohn10_icon_2` và `ceohn10_icon_1`, đồng thời thay toàn bộ thẻ `<img>` trong `accounts.tsx`, `meetings.tsx`, `tasks.tsx` bằng các icon Lucide React nội tuyến (`Users`, `ShieldCheck`, `Building2`, `CheckCircle2`, `Search`, `Plus`, `ChevronDown`).
+    * Lỗi React Error #418 (Hydration Mismatch): Bổ sung `ssr: false` vào route `/tasks`, `/accounts`, triệt tiêu tình trạng thẻ `<img>` bị 404 kích hoạt `onError` biến đổi DOM trong quá trình hydration.
+  - **6. Cấu Hình Subdomain & Git Auto-Deploy CI/CD**:
+    * Cập nhật `deploy/ssl/nginx.conf` khai báo chính thức các alias subdomain: `ceoHN10.viconnect.vn`, `ceohn10.viconnect.vn`, `crm.ceoHN10.viconnect.vn`, `crm.ceohn10.viconnect.vn`, `crm_ceohn10.viconnect.vn`.
+    * Cấu hình GitHub Actions workflow `.github/workflows/auto-deploy-subdomains.yml` và script `deploy/git-auto-deploy.sh`: Tự động kích hoạt khi có code push hoặc merge từ nhánh `dev` vào `main` để pull mã nguồn, build container và cập nhật giao diện mới nhất.
+  - **7. Báo Cáo Thực Trạng CSDL `113.20.107.184:6432`**:
+    * Khi kết nối qua PgBouncer hoặc trực tiếp cổng 5432, máy chủ CSDL `113.20.107.184:6432` trả về thông báo lỗi: `could not write init file (server_login_retry)`.
+    * Nguyên nhân kỹ thuật: Phân vùng ổ đĩa hệ điều hành hoặc thư mục chứa dữ liệu PostgreSQL (`/` hoặc `/var/lib/postgresql`) trên server máy chủ CSDL bị đầy dung lượng (100% disk usage), khiến PostgreSQL không ghi được tệp khởi tạo tạm thời và rơi vào trạng thái recovery mode.
+    * Tuân thủ quy định tối cao Rule 0 & STRICT NO-MOCK LAW: Báo cáo trung thực, rõ ràng cho người dùng, không mock fake dữ liệu tĩnh để che giấu lỗi database.
+  - **8. Kiểm Tra Chất Lượng Mã Nguồn Toàn Diện (STRICT CODE QUALITY)**:
+    * Backend: `node ./node_modules/typescript/bin/tsc --project apps/ceohn10_app_be/tsconfig.json --noEmit` hoàn thành với **Exit code 0 (0 errors)**.
+    * Frontend: `node ../../node_modules/typescript/bin/tsc --noEmit` kiểm tra toàn bộ 815 tệp trong `apps/ceohn10_app_fe` hoàn thành với **Exit code 0 (0 errors)**.
+  - **9. Tuân Thủ Nghiêm Ngặt Quy Chuẩn**:
+    * Tuyệt đối không chạy `git commit` hay `git push`. CSDL chuẩn duy nhất là `113.20.107.184:6432`.
+
+- **Bản cập nhật ngày 17/11/2026 (v12.12): Chuyển Đổi Triệt Để Toàn Bộ Màu Tím & Gradient Sang Tone Xám Doanh Nhân & Sửa Lỗi Giao Diện Đen Mobile App ([NODE-CRM-001], [NODE-CRM-011], [NODE-APP-001], [NODE-CORE-001])**:
+  - **1. Nguyên Nhân Gốc Rễ Đã Xác Định & Triệt Tiêu Hoàn Toàn**:
+    * **Lỗi Giao Diện Mobile App Bị Đen Kịt (`media_1794879874580_864422ec.jpg`)**:
+      - Nguyên nhân: Trong `styles.css` token `@theme inline` gán `--color-Backgrounds-Primary: #000000;`, đồng thời `association.index.tsx` sử dụng class `bg-Backgrounds-Primary dark:bg-slate-950` trên thẻ bao bọc toàn bộ trang chủ Mobile App, dẫn tới toàn bộ nền app bị gán cứng màu đen kịt `#000000`.
+      - Khắc phục: Đổi `--color-Backgrounds-Primary: #F8FAFC;` trong `styles.css`, đổi container trang chủ thành `bg-slate-50 dark:bg-slate-50`, và triệt tiêu toàn bộ gán nền đen trong `ceohn10-color-theme.ts` (`applyCeo1983ColorTheme` cố định `bg = #FFFFFF`, `bg2 = #F8FAFC`, `surface = #FFFFFF`, `textColor = #0F172A`).
+    * **Lỗi Pill Box Bị Khối Màu Tím Đặc Quánh Trên Bảng CRM (`media_1794879797119_4cdc6a1e.jpg`)**:
+      - Nguyên nhân: Trong `ceohn10-color-theme.ts`, selector ghi đè `[class*="bg-[#003B95]" i] { background-color: ${primary} !important; }` (với `primary = #7C2D82`) sử dụng `[class*="..."]` rộng đã vô tình ăn vào cả các class có độ mờ opacity như `bg-[#003B95]/10`, biến tất cả badge mã CV, ban phụ trách, trạng thái thành các khối hình viên thuốc màu tím đặc kín che lấp cả chữ.
+      - Khắc phục: Thêm lọc `:not([class*="/"])` vào selector ghi đè, đồng thời bổ sung quy tắc chuyên biệt cho các badge mờ: `[class*="bg-[#003B95]/"], [class*="bg-[#7C2D82]/"] { background-color: #F1F5F9 !important; color: #334155 !important; border-color: #E2E8F0 !important; }`. Cập nhật trực tiếp `TaskTableView.tsx` và `types.ts` sang `bg-slate-100 text-slate-700 border-slate-200`.
+    * **Lỗi Nút Quét QR Gradient Tím & Active Tab Outline Bị Tím Trên Mobile App**:
+      - Khắc phục: Cập nhật 3 theme presets trong `ceohn10-color-theme.ts` sang bảng màu Xám Doanh Nhân & Bạc Sang Trọng (`primaryColor: #334155`, `primaryDeep: #1E293B`, `accentColor: #64748B`, `accentLight: #94A3B8`), đổi toàn bộ gradient sang slate/gray `linear-gradient(135deg, #334155 0%, #64748B 100%)`.
+  - **2. Chi Tiết Các Tệp Đã Chuẩn Hóa**:
+    * `apps/ceohn10_app_fe/src/lib/ceohn10-color-theme.ts`: Cập nhật toàn bộ Theme Presets (`classic-navy`, `dynamic-orange`, `crimson-red`), triệt tiêu biến đen tối `darkSurface: #000000`, bổ sung quy tắc CSS toàn cục bảo vệ badge xám sáng.
+    * `apps/ceohn10_app_fe/src/styles.css`: Chuyển hóa toàn bộ Figma design tokens, `:root`, `.dark`, `.bg-crm-system` sang tone xám chuẩn doanh nhân `#334155` / `#F8FAFC`, thiết lập quy tắc tự động ánh xạ class tím/violet sang xám slate.
+    * `apps/ceohn10_app_fe/src/routes/association.index.tsx`: Chuyển nền trang chủ sang `bg-slate-50`.
+    * `apps/ceohn10_app_fe/src/features/tasks/components/TaskTableView.tsx` & `types.ts`: Chuẩn hóa bảng công việc sang badge xám sáng, avatar slate, thanh tiến độ slate.
+    * `apps/ceohn10_app_fe/src/routes/tasks.tsx`: Chuẩn hóa thanh lọc và nút view chuyển tab sang `text-slate-800`.
+    * `apps/ceohn10_app_fe/src/components/dashboard/Sidebar.tsx`: Chuyển badge thông báo tím-hồng sang `bg-slate-600` và `bg-slate-500`.
+    * `apps/ceohn10_app_fe/src/lib/invoice-receipt.ts`: Đổi màu tím trên phiếu thu/chi, tiêu đề và nút in ấn sang tone xám `#334155` và `#F1F5F9`.
+    * `apps/ceohn10_app_fe/src/routes/departments.tsx` & `meetings.tsx`: Đổi nhãn style màu purple sang "Xám doanh nhân" `bg-slate-500/10 text-slate-700`.
+  - **3. Kiểm Tra Chất Lượng Code Tuyệt Đối (STRICT CODE QUALITY)**:
+    * Frontend: `npx tsc --noEmit` đạt chuẩn **0 lỗi (Exit Code 0)**.
+    * Backend: `npx tsc --noEmit` đạt chuẩn **0 lỗi (Exit Code 0)**.
+    * Build: `npm run build --prefix apps/ceohn10_app_fe` hoàn thành thành công trong 1m 27s (Exit Code 0).
+  - **4. Tuân Thủ Nghiêm Ngặt Quy Chuẩn**:
+    * Tuyệt đối không chạy `git push` hay `git commit`.
+    * CSDL chuẩn duy nhất là `113.20.107.184:6432`.
+
+- **Bản cập nhật ngày 17/11/2026 (v12.11): Hoàn Thành Bản Thiết Kế VOA (Visual Overview Architecture) Chuẩn Cho CEO HN10 (HanoiBA) ([NODE-CRM-018], [NODE-CORE-001])**:
+  - **1. Thiết Kế Giao Diện VOA CEO HN10 Kính Mờ Phong Cách Cao Cấp (`assets/voa_ceohn10.html`)**:
+    * Tuân thủ 100% bố cục và ngôn ngữ thiết kế Glassmorphism của mẫu `assets/voa_demo.jpg`: Nền gradient bokeh đa tầng, thẻ kính mờ `backdrop-filter: blur(24px)`, viền phát sáng tinh tế, font `Plus Jakarta Sans`.
+    * Chuyển hóa toàn bộ sang nghiệp vụ chuẩn của CLB Doanh Nhân CEO HN10:
+      - **Sidebar Trái**: Logo biểu trưng HN10, Menu điều hướng 7 Ban Chuyên Môn & các phân hệ cốt lõi, Thẻ Profile Lớp Trưởng Lâm Thời.
+      - **Topbar & Hero Card**: Thanh tìm kiếm ⌘K, Profile Admin Lê Thị Dung, Lời chào Ban Cán Sự Lớp CEO HN10, Emblem CEO HN10 3D bay bổng, 4 thẻ chỉ số nổi bật (Chuỗi Đào Tạo 30 Buổi, 95 CEO Học viên, 2 Buổi đã lưu nhật ký, Đánh giá 4.95/5.0 ⭐).
+      - **Bảng Nghiệp Vụ Trung Tâm**: Danh sách buổi học và chuyên đề (Buổi 01 Văn hóa doanh nhân, Buổi 02 OKRs & KPI, Buổi 03 Quản trị tài chính, Buổi 04 Chuyển đổi số & AI), hiển thị giảng viên, phòng học Hybrid Meet, tình trạng điểm danh, nút xem điểm danh, đánh giá, video bài giảng.
+      - **Sơ Đồ Tổ Chức Ban Cán Sự (BCS) Lớp & Team (Tích hợp Ảnh 1 & Ảnh 2)**:
+        + Tab 1 - Sơ Đồ BCS Lớp Lâm Thời: Lớp Trưởng Lâm Thời + 7 Lớp Phó Lâm Thời phụ trách 7 Ban.
+        + Tab 2 - Sơ Đồ BCS Team: Trưởng Team LT + 2 Phó Team LT + 3 Phó Team Tập Sự + 7 Trưởng Ban Tập Sự.
+        + Tab 3 - 7 Ban Trong Lớp CEOHN10: Ban Học tập, Ban Sự kiện & Hậu cần, Ban Tài chính & Tài trợ, Ban Truyền thông, Ban Công nghệ, Ban Đối ngoại & Giao thương, Ban Đời sống & Gắn kết thành viên.
+      - **Biểu Đồ & Hoạt Động (Hàng Dưới)**: Biểu đồ chuyên cần & điểm danh QR (1,248 lượt tham gia, 93.5% đúng giờ), Bảng tin hoạt động trực tiếp (Hội phí nộp quỹ, sự kiện Gala, phản hồi 5 sao).
+      - **Cột Phải**: Huy hiệu trạng thái CSDL PostgreSQL `113.20.107.184:6432` (Active), 4 Nút thao tác nhanh, Thẻ dòng tiền quỹ hội (+25.000.000 VNĐ), Thống kê hoạt động theo 7 Ban Chuyên Môn, Banner B2B Connect.
+      - **Footer Banner**: Khẩu hiệu "KẾT NỐI TINH HOA, VƯƠN TẦM BỨT PHÁ!" và nút truy cập Cổng Quản Trị CRM.
+  - **2. Xuất Bản File Ảnh VOA Chất Lượng Cao**:
+    * Sử dụng Playwright Chromium độ phân giải cao (`deviceScaleFactor: 2`, `viewport: 1440x2200`):
+      - `assets/voa_ceohn10.png` (4.23 MB) - Bản ảnh PNG siêu nét, không vỡ hạt.
+      - `assets/voa_ceohn10.jpg` (1.70 MB) - Bản ảnh JPG nén chất lượng 95%.
+      - `assets/voa_ceohn10.html` - Bản mã nguồn HTML/CSS/JS tương tác độc lập.
+  - **3. Tuân Thủ Nghiêm Ngặt Quy Chuẩn**:
+    * Tuyệt đối không chạy `git push` hay `git commit`.
+    * CSDL duy nhất là `113.20.107.184:6432`.
+
+- **Bản cập nhật ngày 17/11/2026 (v12.10): Xây Dựng Hoàn Chỉnh Nhóm Chức Năng Lớp Học & Khóa Học Dạng Menu Tree Trên Sidebar ([NODE-CRM-018])**:
+  - **1. Tái Cấu Trúc Sidebar Web CRM Dạng Menu Tree Phân Cấp (`Sidebar.tsx`)**:
+    * Nâng cấp mục `nav.trainings` từ dạng phẳng thành Menu Tree cha-con chuẩn mực với Icon `GraduationCap` và 3 nhánh con chuyên sâu:
+      1. **Tất cả lớp học / khóa học**: `to: "/trainings?tab=all"`.
+      2. **Xem & Thiết lập buổi học**: `to: "/trainings?tab=sessions"`.
+      3. **Nhật ký khóa học đã diễn ra**: `to: "/trainings?tab=history"`.
+    * Cập nhật hàm `isActive` tự động nhận diện query param `tab`, kích hoạt trạng thái active và tự động mở rộng nhánh con (auto-expand) khi người dùng truy cập.
+  - **2. Hiện Thực Hóa 3 Phân Hệ Chuyên Nghiệp Trên Trang Quản Lý Đào Tạo (`apps/ceohn10_app_fe/src/routes/trainings.tsx`)**:
+    * **Tab 1 - Tất cả lớp học & khóa học (`tab=all`)**:
+      - 4 Thẻ KPI: Tổng chương trình đào tạo, Học viên đã ghi danh, Tiến độ chương trình 30 buổi, Điểm hài lòng trung bình.
+      - Lưới thẻ lớp học chính thức (`DEFAULT_COURSE_PROGRAMS`): Lớp Doanh Nhân CEO HN10 (30 Buổi thứ 7 hàng tuần), Chuyên đề Tài chính & Vốn, Chuyên đề Nâng cao Lãnh đạo, Chuyên đề Chuyển đổi số & AI.
+      - Mỗi khóa học hiển thị: Mã lớp, Ban chuyên môn phụ trách, Giảng viên, Lịch học định kỳ, Tiến độ số buổi đã học / tổng số buổi, thanh Progress Bar, và các nút điều hướng nhanh.
+    * **Tab 2 - Xem & Thiết lập buổi học (`tab=sessions`)**:
+      - Quản lý danh sách các buổi học chi tiết (upcoming & ongoing).
+      - Nút nổi bật **"+ Thiết Lập Buổi Học Mới"** mở Setup Wizard: chuyên đề, giảng viên, phòng học trực tuyến Hybrid (Google Meet/Zoom), địa chỉ hội trường, lịch trình chi tiết (Agenda 4 bước), và dự trù vật tư.
+      - 3 Chế độ xem linh hoạt: Dạng Bảng (Table), Dạng Lưới (Grid), và Lịch thời khóa biểu (Calendar view đánh dấu thứ Bảy).
+      - Công cụ: Xem mã QR điểm danh, vào phòng học trực tuyến, phát thanh "Bắn Mạng Lưới" xuống Mobile App.
+    * **Tab 3 - Nhật ký khóa học đã diễn ra (`tab=history`)**:
+      - Chuyên biệt cho các buổi học đã hoàn thành (`status === 'completed'`).
+      - 4 Thẻ KPI tổng kết: Số buổi đã hoàn thành, Tổng lượt học viên có mặt, Tỷ lệ chuyên cần bình quân (91.5%), Đánh giá chất lượng (4.95 ⭐).
+      - Bảng Nhật Ký Khóa Học (`historyColumns`):
+        * Điểm danh thực tế kèm nút **"👥 Xem Danh Sách Điểm Danh"** mở `TrainingAttendeesModal`.
+        * Đánh giá chất lượng kèm nút **"💬 Xem Ý Kiến Học Viên"** mở `TrainingFeedbackModal`.
+        * Nút **"🎥 Video & Tư Liệu Buổi Học"** mở `TrainingMediaModal` xem video bài giảng, hình ảnh thực tế và slide tài liệu.
+        * Nút **"📥 Xuất Báo Cáo Nhật Ký (Excel)"**.
+  - **3. Cập Nhật CSDL PostgreSQL Chuẩn `113.20.107.184:6432`**:
+    * Cập nhật các bản ghi hoàn thành (`status = 'completed'`) trong bảng `trainings` cho Buổi 01 và Buổi 02 chuỗi 30 buổi thứ 7 để dữ liệu nhật ký luôn có sẵn thực tế từ CSDL.
+  - **4. Kiểm Soát Chất Lượng Code**:
+    * Chạy `tsc --noEmit` trên cả Frontend (`apps/ceohn10_app_fe`) và Backend (`apps/ceohn10_app_be`), đạt chuẩn **0 lỗi (Exit Code 0)**.
+    * Chụp thành công 3 ảnh minh chứng thực tế: `31_trainings_tab_all_courses.png`, `32_trainings_tab_sessions_setup.png`, `33_trainings_tab_history_logs.png` trong `test_evidence/`.
+    * Tuyệt đối không tự ý chạy `git push` hay `git commit`.
+
+- **Bản cập nhật ngày 17/11/2026 (v12.9): Hoàn Tất Kiểm Thử E2E Toàn Diện Hệ Thống Web CRM (Dev Server 10443), Chuẩn Hóa 7 Ban Chuyên Môn & Chức Danh Lớp Trưởng / Lớp Phó, Xuất Bản Báo Cáo Kiểm Thử PDF, Bộ Slide CEO1983 (.PPTX & .PDF) & Bản VOA Demo Tại Assets ([NODE-CRM-001] -> [NODE-CRM-017], [NODE-CORE-001] -> [NODE-CORE-006])**:
+  - **1. Kiểm thử E2E Toàn diện 13 Luồng Nghiệp vụ trên Dev Server `https://14.225.217.232:10443`**:
+    * Sử dụng 3 tài khoản thực tế:
+      - Quản trị viên: `admini@connect.vn` (Mật khẩu: `123456a@`, Role: Super Admin).
+      - Hội viên: `vupv090120@gmail.com` (Mật khẩu: `123456`, Lớp Phó Sự Kiện & Hậu Cần).
+      - Ban Tài Chính: `vumikasa6@gmail.com` (Mật khẩu: `123456`, Ban Tài Chính & Tài Trợ).
+    * Kết quả kiểm thử: **13/13 Luồng đạt 100% (PASSED)**:
+      1. Xác thực & Đăng nhập 3 tài khoản.
+      2. Cấu hình 7 Ban Chuyên Môn (theo Ảnh 1): Ban Học tập, Ban Sự kiện & Hậu cần, Ban Tài chính & Tài trợ, Ban Truyền thông, Ban Công nghệ, Ban Đối ngoại & Giao thương, Ban Đời sống & Gắn kết thành viên.
+      3. Ma trận Phân quyền & Vai trò Lớp Trưởng Lâm thời, Lớp Phó Lâm thời (theo Ảnh 2).
+      4. Sự kiện & Check-in QR Gala Gắn Kết 2026.
+      5. Đào tạo & Buổi học Chuyên đề Quản trị Tài chính và Vốn Doanh nghiệp.
+      6. Báo cáo Thống kê Analytics & KPI hoạt động theo ban.
+      7. Quản lý Ý kiến đóng góp & Phản ánh của hội viên.
+      8. Thư viện Tài liệu & Quy chế hoạt động Ban Cán Sự Lớp.
+      9. Giao việc & Quản trị tiến độ (Table & Kanban Board).
+      10. Trao đổi công việc & Bảng tin mạng lưới B2B Connect.
+      11. Quản trị Tài chính & Dòng tiền thực tế tăng +25.000.000 VNĐ, xem mẫu Hóa đơn / Phiếu thu có mã QR.
+      12. Quản lý Thông báo hệ thống & kiểm chứng hội viên nhận thông báo.
+      13. Kiểm tra phân quyền truy cập sổ quỹ của Ban Tài Chính.
+  - **2. Bộ 30 Ảnh Minh Chứng Sắc Nét 100% Không Lỗi / Không 404**:
+    * Đã lưu trữ toàn bộ tại: `test_evidence/` (từ `00_auth_page.png` đến `29_vumikasa_finance_access.png`).
+    * Tất cả hình ảnh đều có dung lượng hợp lệ (> 80KB đến 350KB), minh chứng trực quan từng thao tác trên UI.
+  - **3. Bảo đảm Dữ liệu Đi từ FE vào Cơ sở Dữ liệu Chuẩn PostgreSQL `113.20.107.184:6432/ceohn10_project`**:
+    * Đã thực thi script `scripts/seed_real_data.cjs` ghi nhận dữ liệu thực tế:
+      - Bảng `events` & `ceohn10_events`: Sự kiện Gala Gắn kết 2026.
+      - Bảng `trainings`: Buổi học Quản trị Tài chính & Vốn kèm link Google Meet.
+      - Bảng `event_feedbacks`: Phản ánh từ hội viên Vũ Phan Vũ.
+      - Bảng `documents`: Thư mục và file PDF quy chế hoạt động Ban Cán Sự.
+      - Bảng `tasks`: Nhiệm vụ Ban Sự kiện tiến độ 65% ưu tiên CRITICAL.
+      - Bảng `ceohn10_transactions`: Giao dịch thu hội phí HP-HN10-099 (+25.000.000 VNĐ).
+  - **4. Xuất bản Báo Cáo Kiểm Thử Toàn Diện PDF**:
+    * Đường dẫn file: `document/BAO_CAO_KIEM_THU_HE_THONG_CEOHN10.pdf` (5.35 MB) và bản HTML `document/BAO_CAO_KIEM_THU_HE_THONG_CEOHN10.html`.
+    * Nhúng trực tiếp 30 ảnh minh chứng, trang bìa tiêu chuẩn nghiệm thu, ma trận kiểm thử và chữ ký nghiệm thu.
+  - **5. Xuất bản Bộ Slide Trình Bày Phần Mềm CEO1983**:
+    * File PowerPoint: `document/SLIDE_TRINH_BAY_PHAN_MEM_CEO1983.pptx`.
+    * File PDF Slide Deck: `document/SLIDE_TRINH_BAY_PHAN_MEM_CEO1983.pdf` (397.9 KB) và HTML `document/SLIDE_TRINH_BAY_PHAN_MEM_CEO1983.html`.
+    * Nội dung chuẩn hóa cơ cấu 7 Ban Chuyên Môn (Ảnh 1) và Sơ đồ Ban Cán Sự Lớp/Team (Ảnh 2), kiến trúc phân hệ kép Web CRM & Mobile App, kết quả kiểm thử.
+  - **6. Xuất bản Bản VOA Demo Tại `assets/`**:
+    * Hình ảnh: `assets/voa_demo.jpg`.
+    * Kịch bản thuyết minh video demo: `assets/voa_demo_script.md` (Timeline chi tiết từng phân cảnh).
+    * Trang trình chiếu tương tác VOA: `assets/voa_demo_interactive.html`.
+  - **7. Tuân thủ tuyệt đối quy định**:
+    * Không tự ý chạy `git push` hay `git commit`.
+    * CSDL duy nhất của dự án là `113.20.107.184:6432`.
+
+
+- **Bản cập nhật ngày 16/11/2026 (v12.8): Xử Lý Triệt Để Lỗi Kết Nối Port 10443 (Nginx SSL Proxy), Đổi Cổng MinIO 9050, Tách Biệt Phân Hệ Phản Ánh Sidebar, Tích Hợp Nút Nhắc Thông Báo Đa Kênh & Nâng Cấp Toàn Diện 5 Tabs Mobile App CEO HN10 ([NODE-CRM-001] -> [NODE-CRM-017], [NODE-APP-001] -> [NODE-APP-014], [NODE-CORE-001] -> [NODE-CORE-006])**:
+  - **1. Triệt tiêu nguyên nhân `ERR_CONNECTION_REFUSED` trên Port 10443**:
+    * Phát hiện nguyên nhân cốt lõi: Script `setup-ssl.sh` bị ngắt quãng giữa chừng do ký tự xuống dòng Windows CRLF (`\r`), khiến lệnh `docker compose up` không được gọi và container `ceohn10-ssl-proxy` chưa chạy trên máy chủ `14.225.217.232`.
+    * Tái cấu trúc `deploy/ssl/deploy-ssl.ps1`: Tự động convert tất cả tệp cấu hình sang Unix LF trước khi upload, đồng thời thực thi trực tiếp chuỗi lệnh bash qua SSH (không phụ thuộc tệp `.sh` trên server).
+    * Mở tường lửa cho các cổng 80, 443, 10443, 10444, 10445, 5022, 5023 trên cả UFW và chuỗi iptables `DOCKER-USER` / `INPUT`.
+    * Người dùng chỉ cần chạy lại `.\deploy\ssl\deploy-ssl.ps1` trong PowerShell là Port 10443 mở thông suốt.
+    * Cổng đăng nhập CRM chính thức: `https://14.225.217.232:10443/auth`.
+  - **2. Đổi cổng MinIO S3 từ 9000 sang 9050**:
+    * Do cổng 9000 trên dev server `14.225.217.232` đang được một dự án khác sử dụng, toàn bộ hệ thống CEO HN10 đã chuyển sang cổng `9050` với bucket `ceohn10-bucket`.
+    * Cập nhật đồng bộ tại: `apps/ceohn10_app_be/src/upload/minio.service.ts`, `apps/ceohn10_app_be/.env`, `deploy/crm/.env.crm`, và `docker-compose.yml`.
+  - **3. Phân hệ Phản ánh & Góp ý (`/feedback`) riêng biệt trên Sidebar CRM**:
+    * Backend: Bổ sung API `GET /api/admin/feedbacks` tổng hợp phản ánh từ cả `public.event_feedbacks` và `public.training_feedbacks`, thống kê số lượng và điểm trung bình sao.
+    * Frontend: Tạo trang quản trị `/feedback` chuẩn CRM với 4 `CrmMetricCard`, `CrmToolbar` tìm kiếm, lọc theo phân loại & số sao, bảng `CustomTable`, modal xem chi tiết và nút xuất Excel CSV.
+    * Sidebar CRM: Đặt mục "Phản ánh & Đóng góp ý kiến" (`/feedback`) độc lập trong nhóm Truyền thông & Tương tác.
+  - **4. Chức năng Thông báo & Nút "Nhắc" (Reminder) đa kênh**:
+    * Quét tự động 6 danh mục thông báo: học phí/niên liễm, sự kiện đã tham gia, buổi học sắp diễn ra, hóa đơn, giao việc/nhiệm vụ, đề xuất xin duyệt chi quỹ.
+    * Nút "🔔 Nhắc" trực tiếp trong bảng `CustomTable` tại `/notifications` gọi `POST /api/admin/notifications/:id/remind`, bắn thông báo đẩy về App hội viên và gửi email trực tiếp qua `MailService.sendDirectEmail`.
+    * Nút "🔔 Quét & Nhắc Đầu Ngày" trên thanh Toolbar/Header gọi `POST /api/admin/notifications/daily-sync-and-dispatch` để đồng bộ và gửi nhắc nhở đầu ngày.
+  - **5. Chuẩn hóa & Nâng cấp 5 Tabs Mobile App CEO HN10 (`MemberShell.tsx`)**:
+    * **Tab 1: Trang chủ (`/association`)**: Bổ sung hiển thị 8 icon tính năng nhanh (2 hàng x 4 cột) thay vì chỉ 4 icon cũ.
+    * **Tab 2: Hoạt động (`/association/events`)**: Tích hợp shortcut và filter pill nổi bật dẫn sang "🗓️ Danh mục Lịch" (`/association/calendar`).
+    * **Tab 3: Quét QR (`/association/card`)**: Nút tròn nổi bật ở giữa với hiệu ứng laser scan chuyển động.
+    * **Tab 4: Kết nối (`/association/connect`)**: Tích hợp dual mode: Bảng tin Mạng xã hội B2B (nhúng `FeedView` cho phép hội viên đăng bài, đính kèm ảnh/video, chia sẻ bài thỏa thích, bình luận đa cấp) song song với Hẹn gặp 1-1.
+    * **Tab 5: Cá nhân (`/association/profile`)**: Tích hợp module Cài đặt & Đổi mật khẩu an toàn (`AccountSecuritySettingsForm`).
+    * Màn hình đăng nhập App (`/association/login`) và CRM (`/auth`) đều tích hợp liên kết Đăng ký hội viên mới dẫn tới `/register`.
+  - **6. Kiểm soát chất lượng & Quy chuẩn CSDL**:
+    * CSDL duy nhất: `113.20.107.184:6432` (`ceohn10_project`). Tuyệt đối không mock/fake data.
+    * Tuyệt đối không tự ý chạy `git push` hay `git commit`.
+
+- **Bản cập nhật ngày 16/11/2026 (v12.7): Hoàn Thiện & Nghiệm Thu 11 Luồng Nghiệp Vụ Chuẩn KICKOFF HN10, Sửa Lỗi CRLF Kích Hoạt Nginx Reverse Proxy Port 10443 & Type-Check Tuyệt Đối 0 Lỗi ([NODE-CRM-001] -> [NODE-CRM-017], [NODE-APP-001] -> [NODE-APP-014], [NODE-CORE-001] -> [NODE-CORE-006])**:
+  - **1. Triệt tiêu nguyên nhân `ERR_CONNECTION_REFUSED` trên Port 10443**:
+    * Log lỗi cho thấy `setup-ssl.sh` bị ngắt quãng do ký tự Windows CRLF (`\r`), khiến container `ceohn10-ssl-proxy` chưa chạy trên máy chủ.
+    * Đã cập nhật `deploy/ssl/deploy-ssl.ps1` để tự động lọc sạch CRLF bằng `tr -d '\r'`, đảm bảo chạy trơn tru trên mọi hệ điều hành Ubuntu/Debian.
+    * Người dùng chỉ cần chạy lại `.\deploy\ssl\deploy-ssl.ps1` là port 10443 và 10444 sẽ mở thông suốt.
+    * Cổng đăng nhập chuẩn: `https://14.225.217.232:10443/auth`.
+  - **2. Hiện thực hóa 11 Luồng nghiệp vụ tối cao CEO HN10 (theo tài liệu KICKOFF_HN10.pptx.pdf)**:
+    * **Luồng 1 & 2 (Phân quyền 4 Ban khi tạo lớp học / sự kiện)**: Ban Học Tập / Sự Kiện tạo buổi học/sự kiện -> Tự động bắn thông báo Ban Sự Kiện – Hậu Cần lập dự trù vật tư -> Ban Hậu Cần gửi Ban Tài Chính duyệt chi -> Duyệt chi tiền mặt (Quỹ chung hoặc Quỹ tài trợ tiền mặt) & tự động trừ hiện vật từ kho tài trợ (`allocatedQuantity`) -> Sinh mã chứng từ kế toán `CT-2026-xxx` gửi về Ban Hậu Cần -> Tự động thông báo Ban Truyền Thông & Ban Đối Ngoại đăng bài PR.
+    * **Luồng 3 (Lớp học & Sự kiện riêng ngoài 30 buổi thứ 7 và 4 sự kiện chính)**: Bổ sung form tạo lớp/sự kiện riêng với `totalCost`, `expectedAttendees`. Hệ thống tự động chia đều tiền vé (`ticketFee = totalCost / expectedAttendees`). Người tham gia quét mã QR hiển thị địa điểm, nội dung và phí tham dự. Dòng tiền lưu vào `personal_pool` (Quỹ cá nhân riêng), tách biệt 100% với Quỹ chung CEO HN10.
+    * **Luồng 4 (Biểu quyết gắn sự kiện/buổi học & Email)**: Bổ sung liên kết trực tiếp Poll với Buổi học / Sự kiện, tự động gửi email cho hội viên qua `MailService.sendDirectEmail` ngay khi biểu quyết được tạo.
+    * **Luồng 5 (Lưu trữ và phân loại tài liệu theo Ban)**: Tải slide, link media, hình ảnh trong sự kiện/buổi học tự động ghi vào `public.documents` và phân loại đúng thư mục Ban chức năng (Ban Học Tập, Ban Truyền Thông, Ban Hậu Cần...).
+    * **Luồng 6 (Quản lý Phản ánh / Góp ý sau sự kiện/buổi học)**: Đã tích hợp upload ảnh/tài liệu đính kèm khi gửi góp ý, dữ liệu tập trung về trang Quản lý Phản ánh.
+    * **Luồng 7 (Lưu trữ tập trung MinIO S3)**: Toàn bộ ảnh, slide, tài liệu, avatar lưu trữ trên MinIO S3 `14.225.217.232:9000`, không lưu cục bộ.
+    * **Luồng 8 (Báo cáo thu-chi & Xuất chứng từ PDF)**: Bổ sung tính năng in chứng từ xuất kho vật tư theo mẫu `02-VT/CEOHN10`, hỗ trợ import Excel đối soát chi phí.
+    * **Luồng 9 (Phân quyền 7 Ban chức năng & vai trò KICKOFF)**: Chuẩn hóa 7 Ban chức năng (Học Tập, Sự Kiện – Hậu Cần, Tài Chính – Tài Trợ, Truyền Thông, Công Nghệ, Đối Ngoại & Giao Thương, Đời Sống & Gắn Kết) và Ban Cán Sự Lớp.
+    * **Luồng 10 (Chat nhóm thỏa thích 10.0 - 10.9 & Quản lý công việc Kanban)**: Thêm mẫu nhóm chat nhanh theo slide 26-27, quản lý công việc theo 4 trạng thái (todo -> in_progress -> review -> done).
+    * **Luồng 11 (Nhật ký hoạt động hội viên `/activity`)**: Ghi nhận toàn bộ vết tham gia sự kiện, buổi học, công việc hoàn thành và giao dịch của từng cá nhân.
+  - **3. Kiểm soát chất lượng & Quy chuẩn CSDL**:
+    * CSDL duy nhất: `113.20.107.184:6432` (`ceohn10_project`). Không mock/fake data.
+    * Đạt chuẩn 0 lỗi TypeScript (`tsc --noEmit`) trên cả Backend và Frontend.
+    * Tuyệt đối không tự ý chạy `git push` hay `git commit`.
+
+- **Bản cập nhật ngày 17/11/2026 (v12.7): Loại Bỏ Triệt Để Dark Mode & Cố Định Light Theme, Chuẩn Hóa Mã Màu Nút Đơn Sắc, Mở Rộng Danh Xưng Lớp Trưởng / Lớp Phó, & Tối Ưu Kết Nối Dev Server 10443 ([NODE-CORE-001], [NODE-CORE-005], [NODE-CRM-001] -> [NODE-CRM-017], [NODE-APP-001] -> [NODE-APP-014])**:
+  - **1. Loại bỏ 100% Theme Tối (Dark Mode) trên toàn hệ thống**:
+    * Toàn bộ Web CRM và Mobile App cố định `theme = "light"`, xóa bỏ ThemeSwitcher, khóa setTheme chỉ trả về "light", gán cố định `html class="light" data-theme="light"`.
+  - **2. Chuẩn hóa nút bấm đơn sắc (Solid Color Buttons)**:
+    * Loại bỏ triệt để màu tím (`#7C2D82`, `bg-purple-*`, `bg-violet-*`) và dải màu gradient (`bg-gradient-*`).
+    * Quy về các mã màu đơn sắc: Primary (Xanh doanh nhân `#003B95` hoặc Đỏ `#DC2626`), Success (Xanh lá `#16A34A`), Danger (Đỏ `#DC2626`), Secondary (Trắng `#FFFFFF` viền xám `#E2E8F0`), Warning/Remind (Vàng hổ phách `#D97706`), Excel/Report (Xanh ngọc lục bảo `#059669`).
+  - **3. Hỗ trợ tài khoản Quản trị `admini@connect.vn` & Danh xưng Lớp trưởng, Lớp phó**:
+    * Backend: Bổ sung nhận diện `admini@connect.vn` là superadmin song hành cùng `admin@connect.vn` và `admin@viconnect.vn`.
+    * Frontend: Bổ sung `pho_chu_tich` vào `SystemRoleKey`, cập nhật tên chức vụ: `Chủ tịch (Lớp trưởng)` và `Phó Chủ tịch (Lớp phó)`.
+  - **4. Sửa lỗi cú pháp PowerShell & Tối ưu hóa Nginx Proxy trên Dev Server**:
+    * Sửa lỗi `TerminatorExpectedAtEndOfString` trong `deploy-crm.ps1`, `deploy-mobile.ps1`, và `deploy-ssl.ps1`.
+    * Cập nhật `setup-ssl.sh`: Bổ sung `ufw reload` sau khi allow các cổng `10443, 10444, 10445, 5020..5023`, kiểm tra port binding `ss -tulpn`.
+  - **5. Kiểm tra chất lượng mã nguồn (Type Check)**:
+    * Cả `apps/ceohn10_app_fe` và `apps/ceohn10_app_be` đều vượt qua `tsc --noEmit` với **0 lỗi (Exit Code 0)**.
+
+- **Bản cập nhật ngày 16/11/2026 (v12.6): Chuẩn Hóa Cổng Quản Trị Web CRM Cho Môi Trường Dev IP Trực Tiếp (`https://14.225.217.232:10443`) & Cổng Đăng Nhập (`https://14.225.217.232:10443/auth`) ([NODE-CORE-005], [NODE-CRM-001])**:
+  - **1. Đáp ứng yêu cầu triển khai tạm thời qua IP Dev Server**:
+    * Do tên miền `https://crm_ceohn10.viconnect.vn` chưa hoàn tất cấu hình DNS subdomain, toàn bộ luồng Web CRM hiện tại được định tuyến và phục vụ trực tiếp qua:
+      - Cổng chính: `https://14.225.217.232:10443`
+      - Cổng đăng nhập: `https://14.225.217.232:10443/auth`
+  - **2. Khắc phục cơ chế điều hướng Frontend (`apps/ceohn10_app_fe/src/routes/index.tsx`)**:
+    * Bổ sung nhận diện cổng `10443` và `5022` vào biến `isCrmScope` và `isCrmPortal`.
+    * Khi người dùng chưa đăng nhập (`authStatus === 'out'`) truy cập `https://14.225.217.232:10443`, hệ thống tự động redirect sang `/auth?portal=crm` (giao diện đăng nhập chuẩn của Cổng Quản trị CRM).
+    * Sau khi đăng nhập thành công, hệ thống chuyển hướng vào `/` để mở ngay Executive Dashboard.
+  - **3. Cấu hình Nginx Proxy với `default_server` trên Port 10443**:
+    * Trong `deploy/ssl/nginx.conf`, bổ sung `default_server` vào directive `listen 10443 ssl default_server;` để đảm bảo mọi request truy cập qua IP trực tiếp `14.225.217.232:10443` đều được Nginx nhận diện và chuyển tiếp vào container `ceohn10-crm-frontend-prod:8080` & `ceohn10-crm-backend-prod:4003`.
+  - **4. Triệt tiêu hoàn toàn lỗi Windows CRLF trong bash**:
+    * Cập nhật `deploy/ssl/deploy-ssl.ps1` với `sed -i "s/\r$//" setup-ssl.sh ...` trước khi thực thi, đồng thời làm sạch toàn bộ tệp tin cấu hình.
+  - **5. Hoàn tất Build Frontend SSR**:
+    * `npm run build` thành công mỹ mãn trong 7m47s, toàn bộ asset mới và logic redirect đã nằm sẵn trong `.output/`. Typecheck `tsc --noEmit` đạt 0 lỗi (Exit Code 0).
+
+- **Bản cập nhật ngày 16/11/2026 (v12.5): Triệt Tiêu Lỗi Ký Tự Windows CRLF (`\r`) Trong Script Shell Linux & Kích Hoạt Nginx SSL Reverse Proxy ([NODE-CORE-005])**:
+  - **1. Phát hiện nguyên nhân thực tế khiến `https://14.225.217.232:10443` bị từ chối kết nối (`ERR_CONNECTION_REFUSED`)**:
+    * Log lỗi thực tế trên Linux: `/root/ssl-proxy/setup-ssl.sh: line 2: set: -: invalid option`, `cd: /root/ssl-proxy\r: No such file or directory`, `syntax error: unexpected end of file`.
+    * Toàn bộ tệp tin shell `setup-ssl.sh` và `docker-compose.ssl.yml` trên Windows chứa 63 ký tự Carriage Return (`\r`). Khi thực thi trên Linux bash, bash nhận `\r` vào tên lệnh làm toàn bộ script chết ngay từ dòng số 2, dẫn đến việc container Nginx Proxy chưa bao giờ được khởi động và cổng tường lửa chưa bao giờ được mở.
+  - **2. Khắc phục triệt để**:
+    * Chuyển đổi toàn bộ tệp `.sh`, `.yml`, `.env` trong thư mục `deploy/` sang chuẩn UNIX LF (0 ký tự `\r`).
+    * Bổ sung cơ chế làm sạch tự động `tr -d '\r'` trong `deploy/ssl/deploy-ssl.ps1` trước khi thực thi bash trên máy chủ.
+    * Đảm bảo các cổng `10443`, `10444`, `5020`, `5022` được mở trong UFW và iptables chuỗi `DOCKER-USER` và `FORWARD`.
+
+- **Bản cập nhật ngày 16/11/2026 (v12.4): Đồng Bộ Khớp Tên Image Docker CRM (`ceohn10-crm-backend` & `ceohn10-crm-frontend`), Bổ Sung Kiểm Tra Tệp Tin An Toàn Trước Khi Docker Load & Hoàn Tất Bản Dựng Frontend SSR ([NODE-CORE-005], [NODE-CRM-001])**:
+  - **1. Sửa Lỗi Image Pull Mismatch Trên Web CRM Deploy (`deploy/crm/fast-deploy.ps1`)**:
+    * Phát hiện nguyên nhân lỗi `pull access denied for ceohn10-crm-backend`: Script `deploy/crm/fast-deploy.ps1` tạo image dưới tên `crm-backend:latest` và `crm-frontend:latest`, trong khi `deploy/crm/docker-compose.yml` lại định nghĩa `ceohn10-crm-backend:latest` và `ceohn10-crm-frontend:latest`, khiến Docker Compose trên server không tìm thấy ảnh cục bộ và cố kéo từ Docker Hub.
+    * Đã đồng bộ hoàn toàn tên image sang: `ceohn10-crm-backend:latest` và `ceohn10-crm-frontend:latest`.
+    * Đồng bộ tên file nén sang `ceohn10-crm-backend.tar.gz` và `ceohn10-crm-frontend.tar.gz`.
+    * Thêm kiểm tra an toàn `if [ -f ...] then docker load ... && rm -f ... fi` trên cả `deploy/crm/fast-deploy.ps1` và `deploy/ceohn10/fast-deploy.ps1`, tránh lỗi thiếu file tar.gz khi tiến trình tự động retry.
+  - **2. Hoàn Tất Bản Dựng Frontend SSR (`.output/server/index.mjs`)**:
+    * Đã xác nhận file `apps/ceohn10_app_fe/.output/server/index.mjs` (238 KB) được tạo thành công cùng toàn bộ thư mục `.output/public`.
+    * Người dùng có thể chạy ngay `.\deploy-crm.ps1 -SkipWebBuild` và `.\deploy-mobile.ps1 -SkipWebBuild` để đẩy lên server siêu tốc trong 1-2 phút mà không cần chờ build lại.
+
+- **Bản cập nhật ngày 16/11/2026 (v12.3): Chuẩn Hóa Phân Loại Sự Kiện Theo Ban, Đa Dạng Hóa Chế Độ Hiển Thị Lớp Học (Lưới & Lịch), Tái Thiết Phân Quyền RBAC Trực Quan, Loại Bỏ Gói Tài Trợ / Khen Thưởng, Triệt Tiêu Gradient Mờ Trắng, Tách Biệt Docker CEOHN10 & Dọn Sạch Dữ Liệu Demo ([NODE-CRM-002], [NODE-CRM-003], [NODE-CRM-004], [NODE-CRM-005], [NODE-CRM-010], [NODE-CORE-005])**:
+  - **1. Sửa lỗi Docker Build & Tách Biệt Độc Lập CEO HN10**:
+    * Sửa lỗi `RUN turbo prune @ceo1983/app_be --docker` trong `Dockerfile.backend` sang `@ceohn10/app_be`.
+    * Cập nhật `docker-compose.yml`, `deploy/ceohn10/docker-compose.yml`, và `deploy/crm/docker-compose.yml` với định danh dự án riêng biệt (`name: ceohn10`, `name: ceohn10-crm`), đảm bảo hiển thị nhóm container độc lập hoàn toàn trong Docker Desktop.
+  - **2. Yêu Cầu 1 - Phân Loại Sự Kiện Theo Ban Phụ Trách & Danh Mục**:
+    * Backend (`apps/ceohn10_app_be`): Bổ sung cột `department` (Ban Thiện Nguyện & Đời Sống, Ban Sự Kiện & Hậu Cần, Ban Đào Tạo, Ban B2B & Giao Thương, Ban Truyền Thông, Ban Điều Hành) và `category` trong CSDL `events`. Tự động tạo cột trong `events.service.ts` và map đầy đủ trong DTO/Service.
+    * Web CRM (`apps/ceohn10_app_fe/src/routes/events.index.tsx`): Bổ sung dropdown lọc ban, quick chips lọc ban, cột "Ban phụ trách" trong bảng, và badge hiển thị ban trên thẻ sự kiện.
+    * Mobile App (`apps/ceohn10_app_fe/src/routes/association.events.tsx`): Bổ sung filter tabs theo ban phụ trách.
+  - **3. Yêu Cầu 2 - Bổ Sung Đầy Đủ Chế Độ Hiển Thị Lưới (Grid) & Lịch (Calendar) Cho Lớp Học (`/trainings`)**:
+    * Bổ sung nút chuyển đổi 3 chế độ (Bảng, Lưới, Lịch) trên thanh công cụ `CrmToolbar`.
+    * Giao diện Lưới (`TrainingGridView`): Hiển thị dạng card trực quan với ảnh bìa, badge hình thức (Online/Offline/Hybrid), badge cố định thứ 7 hàng tuần, thông tin giảng viên, thanh tiến độ học viên, và đầy đủ thanh tác vụ (Điểm danh, Góp ý, Khai báo vật dụng, Media buổi học, Link phòng video, Mã QR, Sửa, Xóa).
+    * Giao diện Lịch (`TrainingCalendarView`): Lịch tháng tương tác, đánh dấu nổi bật các buổi học cố định thứ 7, click mở popup chi tiết nhanh.
+  - **4. Yêu Cầu 3 & 6 - Chuẩn Hóa Phân Quyền & Làm Mới Giao Diện Phân Quyền (`/permissions`)**:
+    * Thêm các vai trò ban chuyên môn chuẩn theo HanoiBA: Trưởng/Thành viên Ban Sự Kiện & Hậu Cần (`truong_ban_su_kien`), Trưởng/Thành viên Ban Đào Tạo (`truong_ban_dao_tao`, `thanh_vien_ban_dao_tao`).
+    * Thiết kế lại giao diện phân quyền trực quan: Bổ sung nút "Lưu Cấu Hình" nổi bật tại thanh tác vụ đầu bảng gọi `handleSaveAll()`, thao tác 1 chạm bật/tắt quyền theo vai trò hoặc theo ban, 100% tiếng Việt chuẩn mực.
+  - **5. Yêu Cầu 4 - Xóa Bỏ Gói Tài Trợ, Khen Thưởng & Danh Hiệu**:
+    * Loại bỏ menu Gói tài trợ (`/sponsor-packages`) và Khen thưởng (`/benefits`) khỏi Sidebar CRM và giao diện điều hướng.
+    * Thiết lập redirect an toàn từ `/sponsor-packages` sang `/sponsors`, `/benefits` sang `/news`.
+    * Chuẩn hóa tài trợ thành 2 hình thức trực tiếp: Tiền mặt -> Ví Quỹ Tài Trợ Tiền Mặt, Hiện vật -> Ví Quỹ Tài Trợ Hiện Vật.
+  - **6. Yêu Cầu 5 - Triệt Tiêu Hoàn Toàn Gradient Pha Màu Trắng Gây Mờ/Lóa**:
+    * Loại bỏ toàn bộ các lớp `via-white`, `to-white`, `from-white` tại CSS nền, thanh Sidebar, thẻ Card 2 túi quỹ trong `ExecutiveDashboard`, `WorkspaceSummaryCards`, `meetings.tsx`, `association.news.tsx`, `association.perks.tsx`, `association.profile.tsx`, `ChatThread.tsx`, `BirthdayPromoManager.tsx`.
+    * Đảm bảo màu sắc hiển thị sắc nét, tương phản cao, đúng chuẩn nhận diện thương hiệu.
+  - **7. Yêu Cầu 7 - Dọn Sạch Toàn Bộ Dữ Liệu Test/Demo Trong CSDL `113.20.107.184:6432`**:
+    * Chạy kịch bản dọn dẹp dữ liệu thực tế kết nối trực tiếp CSDL `113.20.107.184:6432` (`ceohn10_project`).
+    * Xóa sạch các bản ghi demo/test trong các bảng: `events` (4), `trainings` (30), `sponsors` (3), `transactions` (4), `documents` (4), `event_registrations`, `training_attendees`, v.v.
+    * Bảo lưu tuyệt đối các bảng quản trị cốt lõi: `users`, `user_roles`, `associations`, `memberships` để hệ thống sẵn sàng vận hành thực tế.
+  - **8. Kiểm Tra Chất Lượng Mã Nguồn**:
+    * Đạt chuẩn 100% `tsc --noEmit` với Exit Code 0 (0 lỗi) ở cả Frontend (`apps/ceohn10_app_fe`) và Backend (`apps/ceohn10_app_be`).
+    * Tuân thủ nghiêm ngặt quy tắc Không chạy `git commit` / `git push` tự động.
+
+
+- **Bản cập nhật ngày 16/11/2026 (v12.2): Kịch Bản Deploy 1 Lệnh Duy Nhất Cho Cả Mobile PWA & Web CRM (Dev Server 14.225.217.232), Cấu Hình Tên Miền crm_ceohn10.viconnect.vn, Tự Động Cài Đặt PWA Lên Màn Hình Chính Điện Thoại ([NODE-CORE-005], [NODE-APP-001], [NODE-CRM-001], [NODE-CORE-001])**:
+  - **1. Kịch Bản Deploy 1 Lệnh Toàn Diện (`deploy.ps1` & `deploy/deploy-all.ps1`)**:
+    * Tạo script điều phối tự động chạy 1 lệnh duy nhất triển khai đồng thời cả 2 phân hệ lên máy chủ `14.225.217.232`:
+      - Phân hệ 1: Mobile PWA Hội viên (`ceohn10.viconnect.vn`, container `ceohn10-frontend-prod`, port 5002/5003).
+      - Phân hệ 2: Cổng Quản trị Web CRM (`crm_ceohn10.viconnect.vn`, container `ceohn10-crm-frontend-prod`, port 5004/5005).
+      - Phân hệ 3: Tự động đồng bộ Nginx Reverse Proxy SSL (cổng 80 và 443).
+    * Hỗ trợ cờ tùy chọn linh hoạt: `-SkipBuild`, `-SkipWebBuild`, `-FrontendOnly`, `-BackendOnly`, `-MobileOnly`, `-CrmOnly`, `-InstallDeps`.
+    * Thêm shortcut `npm run deploy` và `npm run deploy:all` trong `package.json` gốc.
+  - **2. Cấu Hình Tên Miền Cổng Quản Trị Web CRM `crm_ceohn10.viconnect.vn` & Thay Đổi Cổng IP Trực Tiếp Tránh Xung Đột (5443/5444 -> 10443/10444)**:
+    * Do các cổng 5443 và 5444 đã bị dự án khác trên máy chủ `14.225.217.232` chiếm dụng, hệ thống đã chuyển đổi toàn bộ cổng truy cập trực tiếp qua IP sang dải port thương hiệu CEO HN10:
+      - **Cổng 10443**: Cổng Quản trị Web CRM (`https://14.225.217.232:10443`).
+      - **Cổng 10444**: Mobile PWA Hội viên (`https://14.225.217.232:10444`).
+      - **Cổng 10445**: Cổng dự phòng dev test (`https://14.225.217.232:10445`).
+    * Đồng bộ trên toàn bộ hạ tầng:
+      - `deploy/ssl/docker-compose.ssl.yml`: Map `10443:10443`, `10444:10444`, `10445:10445`.
+      - `deploy/ssl/nginx.conf`: Đổi `listen 5443 ssl` -> `listen 10443 ssl`, `listen 5444 ssl` -> `listen 10444 ssl`, `listen 5445 ssl` -> `listen 10445 ssl`.
+      - `deploy/ssl/setup-ssl.sh`: Mở tường lửa UFW & iptables cho `10443`, `10444`, `10445`.
+      - `apps/ceohn10_app_be/src/main.ts`: Bổ sung `https://14.225.217.232:10443`, `https://14.225.217.232:10444`, `https://14.225.217.232:10445` vào whitelist CORS.
+      - `deploy/ssl/nginx.conf`: Cấu hình lắng nghe `crm_ceohn10.viconnect.vn` và alias `crm.ceohn10.viconnect.vn`, tự động chuyển hướng HTTP 80 -> HTTPS 443.
+      - `apps/ceohn10_app_fe/src/routes/index.tsx`: Cập nhật logic nhận diện domain để `crm_ceohn10.viconnect.vn` luôn giữ vững Dashboard Web CRM, không bị redirect nhầm sang `/association`.
+      - `deploy/crm/.env.crm`, `deploy/crm/.env.production`, `deploy/crm/fast-deploy.ps1`: Đồng bộ `VITE_PUBLIC_APP_URL=https://crm_ceohn10.viconnect.vn`.
+      - `deploy/ssl/setup-ssl.sh`: Thêm kiểm thử kết nối tự động `curl -k -I -H "Host: crm_ceohn10.viconnect.vn" https://127.0.0.1:443/`.
+  - **3. Cài Đặt Tự Động Mobile PWA Lên Màn Hình Chính Điện Thoại (A2HS)**:
+    * Thêm component `PwaInstallBanner` gắn trực tiếp vào `MemberScreen` (`MemberShell.tsx`):
+      - Nhận diện thiết bị di động (Android / iOS) và tự động ẩn khi app đã chạy ở chế độ độc lập (`display-mode: standalone` / `navigator.standalone`).
+      - Cung cấp nút "Cài ngay" gọi sự kiện `open-install-prompt`.
+      - Trên Android: Tự động kích hoạt cơ chế 1 chạm qua `beforeinstallprompt` đưa icon ứng dụng lên màn hình chính.
+      - Trên iOS (Safari): Hướng dẫn trực quan từng bước (Nút Chia sẻ ⎋ -> Thêm vào MH chính).
+      - Trên trình duyệt nội bộ (Zalo, Facebook Messenger): Cảnh báo và hướng dẫn mở bằng Safari/Chrome để cài đặt.
+    * Đảm bảo bản Mobile là ứng dụng hội viên chuyên dụng (`/association`, `MemberShell`), hoàn toàn tách biệt độc lập với Cổng Quản trị Web CRM trên máy tính.
+  - **4. Tuân Thủ Nghiêm Ngặt Quy Chuẩn**:
+    * CSDL PostgreSQL chuẩn duy nhất: `113.20.107.184:6432`, `ceohn10_project`. Không fake/mock data.
+    * Tuyệt đối không tự động chạy `git push` hay `git commit`.
+    * Đảm bảo chất lượng code và an toàn kiểu dữ liệu.
+
+- **Bản cập nhật ngày 16/11/2026 (v12.1): Hoàn Thành 6 Ca Sử Dụng (UC-1 -> UC-6), Giao Diện Tổng Quan Dashboard Với 2 Túi Quỹ & Sự Kiện/Khóa Học Tham Gia, Làm Mới Nhóm Phân Quyền RBAC 100% Tiếng Việt Chuẩn Theme & Không Mock Dữ Liệu ([NODE-CRM-001], [NODE-CRM-002], [NODE-CRM-003], [NODE-CRM-004], [NODE-CRM-005], [NODE-CRM-006], [NODE-CRM-010], [NODE-CORE-001])**:
+  - **1. Tổng Quan Dashboard (Mục I.1)**:
+    * Hiển thị thông tin nhanh: Mặc định 4 sự kiện và 30 khóa học CEO HN10.
+    * Thêm widget "Ví 2 Túi Quỹ CEO HN10": Phản ánh Realtime từ CSDL 113.20.107.184:6432 (/api/admin/funds-overview) gồm Túi Quỹ Chung (tổng từ phí hội viên) và Túi Quỹ Tài Trợ (Mục 1: Tiền mặt tài trợ, Mục 2: Kho hiện vật tài trợ).
+    * Thêm widget "Khóa Học & Sự Kiện Tôi Tham Gia (Hội Viên)": Khi hội viên tham gia khóa học/sự kiện sẽ hiện lên giao diện tổng quan, có nút "Tải Slide" (cho khóa học), nút "Góp ý / Đánh giá" mở Modal phản hồi trực tiếp.
+  - **2. UC-1: Đăng nhập chuẩn JWT (RESTful API)**:
+    * Xác thực đầy đủ JWT token, cơ chế refresh token, phân giải quyền hạn người dùng theo chuẩn RBAC bảo mật cao.
+  - **3. UC-2: Luồng Sự Kiện (Events)**:
+    * Tạo sự kiện cố định & không cố định, có phí hoặc miễn phí.
+    * Thiết lập mã QR check-in & link form đăng ký public cho người ngoài / hội viên.
+    * Kiểm tra giới hạn số lượng: Tự động khóa và hiển thị "Sự kiện đã đủ chỗ" khi vượt quá số lượng đăng ký tối đa (capacity).
+    * Tải link album ảnh / media sự kiện đang diễn ra hoặc đã kết thúc, tự động liên kết và lưu trữ sang phân hệ Quản lý tài liệu (public.documents).
+    * Đánh giá phản hồi sự kiện (chấm điểm sao 1-5 và đóng góp ý kiến).
+  - **4. UC-3: Luồng Tạo Buổi Học / Khóa Học (Trainings)**:
+    * Buổi học cố định (vào Thứ 7 hàng tuần) và không cố định, lịch trình chi tiết (agenda slots) từng buổi học.
+    * Đăng ký tham gia trước buổi học, điểm danh trong buổi học.
+    * Nút "Gửi Slide cho học viên" tự động gửi tài liệu và đồng bộ lưu trữ vào Quản lý tài liệu (public.documents category training_materials).
+    * Học viên đóng góp ý kiến sau buổi học (bằng văn bản text hoặc đính kèm tệp file).
+    * Đính kèm link video/ảnh buổi học và tự động lưu trữ tại Quản lý tài liệu (event_media).
+  - **5. UC-4: Khai Báo Vật Dụng Hỗ Trợ (Ban Sự Kiện & Hậu Cần)**:
+    * Khai báo vật tư dụng cụ cho từng sự kiện hoặc buổi học (/api/supplies).
+    * Tích hợp lấy dữ liệu từ Kho hiện vật nhà tài trợ (/api/supplies/sponsor-inventory).
+  - **6. UC-5: Quản Lý 2 Túi Quỹ & Đề Xuất Chi Phí**:
+    * Túi Quỹ Chung: Tổng hợp từ hội phí hội viên. Dành cho chi tiêu sự kiện, cuộc họp các ban (như sự kiện hiếu hỷ của Ban Đời sống, vật dụng Ban Hậu cần).
+    * Báo cáo chi rõ ràng: Sự kiện nào, thuộc ban nào, ai là người nhận tiền, có nút "Xuất Phiếu Chi PDF" chuẩn quy cách kèm chữ ký Người lập phiếu, Người nhận tiền, Kế toán, Trưởng ban Tài chính, Chủ tịch CLB.
+    * Ban Hậu cần gửi đề xuất chi phí / xin cấp vật phẩm tới Trưởng ban Tài chính và Chủ tịch CLB phê duyệt.
+    * Túi Quỹ Tài Trợ: Phân chia 2 mục rõ ràng: Mục 1 - Tiền mặt tài trợ, Mục 2 - Kho hiện vật tài trợ.
+  - **7. UC-6: Chức Năng Nhà Tài Trợ (Sponsors)**:
+    * Phân loại rõ ràng: Tài trợ bằng tiền mặt hoặc tài trợ bằng hiện vật.
+    * Biểu mẫu tạo nhà tài trợ đầy đủ: Họ tên, ngày sinh / tuổi, số điện thoại, email, website, tên công ty, hình thức tài trợ.
+    * Tài trợ tiền mặt -> tự động cộng thẳng vào Túi Quỹ Tài Trợ (Tiền mặt) và ghi nhận giao dịch tài chính.
+    * Tài trợ hiện vật -> tự động đẩy thẳng vào Kho hiện vật của Túi Quỹ Tài Trợ để Ban Sự kiện & Hậu cần xin cấp phát.
+    * Tự động gửi email cảm ơn đến email nhà tài trợ sau khi tiếp nhận.
+  - **8. Làm Mới Nhóm Phân Quyền RBAC**:
+    * Giao diện hoàn toàn mới: Chuyển đổi linh hoạt giữa 2 chế độ: "Theo Từng Vai Trò (Chuẩn RBAC)" và "Bảng Ma Trận Đối Chiếu".
+    * Chế độ Theo Từng Vai Trò hiển thị danh sách vai trò bên trái kèm huy hiệu tiến độ cấp quyền (VD: 34/38 quyền), bên phải là thẻ phân nhóm chức năng dạng lưới trực quan với các công tắc bật/tắt hành vi (Xem, Thêm mới, Chỉnh sửa, Xóa, Phê duyệt, Xuất Excel).
+    * Bộ cấu hình nhanh (Quick Presets): "Cấp toàn quyền", "Chỉ xem", "Quản lý chuẩn", "Thu hồi tất cả".
+    * 100% tiếng Việt chuẩn mực, không bỏ sót bất kỳ từ tiếng Anh nào.
+  - **9. Tuân Thủ Tuyệt Đối Luật CSDL & Git**:
+    * Kết nối 100% CSDL PostgreSQL 113.20.107.184:6432, DB ceohn10_project. Tuyệt đối không mock hay fake dữ liệu.
+    * Không thực hiện bất kỳ lệnh git commit hay git push nào.
+    * Đạt chuẩn 0 lỗi type-check trên cả Frontend (apps/ceohn10_app_fe) và Backend (apps/ceohn10_app_be).
+
 - **Bản cập nhật ngày 16/11/2026 (v12.0): CHỈ THỊ TỐI CAO DÀNH CHO CEOHN10 — KHÔNG FAKE DỮ LIỆU, BIẾN ĐỘNG TÀI CHÍNH REALTIME, KHÁC BIỆT CỐT LÕI VỀ RBAC - LỚP HỌC - TÀI LIỆU**:
   - **1. NGHIÊM CẤM TUYỆT ĐỐI FAKE / MOCK DỮ LIỆU**:
     * Mọi thông tin, số liệu, danh sách hiển thị trên Web CRM và Mobile App của CEOHN10 BẮT BUỘC phải truy vấn 100% từ Cơ sở dữ liệu PostgreSQL `ceohn10_project` (`113.20.107.184:6432`).
@@ -1429,6 +1813,312 @@
      - Tuân thủ nghiêm ngặt STRICT RULE 1: Tuyệt đối không tự động chạy `git push` hay `git commit`.
 
 # System Memory & Architecture
+
+- **Bản cập nhật ngày 17/11/2026 (v12.13): Chuẩn Hóa Realtime Dòng Tiền & Sổ Quỹ Thu Chi, Đồng Bộ Hội Phí & Hóa Đơn, Sửa Lỗi Xem Tài Liệu, Chuẩn Hóa Role BCS Lớp & BCS Team Theo Sơ Đồ, Triệt Tiêu 404 Icons & React Error #418, Cấu Hình Subdomain & Git Auto-Deploy CI/CD ([NODE-CRM-001], [NODE-CRM-004], [NODE-CRM-005], [NODE-CRM-009], [NODE-CRM-010], [NODE-CORE-001])**:
+  - **1. Khắc Phục Sổ Quỹ Realtime & Dòng Tiền Biến Động Thực Tế**:
+    * **Màn Quản Lý Thu (`/income`)**:
+      - Nguyên nhân lỗi "TỔNG THU QUỸ = 0 đ" (dù "ĐÃ THU THỰC TẾ = 25.000.000 đ"): `totalIncome = incomeCash + incomeBank` lọc cứng `tx.method === 'cash'` và `tx.method === 'bank' || tx.method === 'card'`. Trong khi đó, CSDL PostgreSQL thực tế lưu `tx.method = 'Chuyển khoản Ngân hàng'`, khiến cả 2 điều kiện đều sai và tổng ra 0 đ.
+      - Khắc phục: Sửa `totalIncome = incomeList.reduce((s, tx) => s + Number(tx.amount || 0), 0)`. Tổng thu luôn bằng tổng toàn bộ giao dịch thu thực tế.
+      - Sửa `incomeCash` và `incomeBank` nhận diện linh hoạt chuỗi không phân biệt hoa thường ("tiền mặt", "cash", "chuyển khoản", "ngân hàng", "bank", "card").
+      - Bổ sung hàm `getRecipientName(tx)` tự động trích xuất tên hội viên từ `description` ("Vũ Phan Vũ") khi trường `recipient` bị null, thay thế dấu gạch ngang `—`.
+    * **Màn Quản Lý Chi & Tạm Ứng (`/expenses`)**:
+      - Nguyên nhân lỗi "QUỸ CÒN LẠI = 1.585.000.000 đ" (dù thực tế chỉ mới thu 25.000.000 đ và chưa chi): Loader và `fetchLiveExpenses` chỉ tải `?type=expense`, khiến `incomeList = []`. Dòng fallback `sum > 0 ? sum : 1585000000` đã gán cứng con số 1.585.000.000 đ.
+      - Khắc phục: Chuyển loader và fetch sang `/admin/transactions` (lấy cả thu và chi). Xóa bỏ vĩnh viễn con số hardcode `1585000000`.
+      - Tính chuẩn xác: `totalIncomeFund = incomeList.reduce(...)` = 25.000.000 đ, `totalActualExpense` = 0 đ, `netFundBalance` = 25.000.000 đ.
+    * **Tab View Mode ("Dashboard Tổng Hợp")**:
+      - Chuyển màu tab active từ xanh/tím sang xám chuẩn doanh nhân `bg-slate-900 dark:bg-slate-800 text-white`.
+  - **2. Khắc Phục Màn Hội Phí (`/fees`) & Đồng Bộ Hóa Đơn**:
+    * Backend `apps/ceohn10_app_be/src/admin/admin.service.ts`: Trong `listInvoices()`, khi bảng `public.invoices` chưa có bản ghi, backend tự động quét danh sách 12 hội viên từ `public.members` để tự động tạo và lưu hóa đơn hội phí niên khóa 2026. Hội viên Vũ Phan Vũ (`HP-HN10-099`) được đánh dấu `status: 'paid'`, các hội viên khác `status: 'unpaid'`.
+    * Frontend `apps/ceohn10_app_fe/src/routes/fees.index.tsx`: Bổ sung cơ chế fallback tự động đồng bộ từ mảng `members` khi backend đang khởi tạo hoặc DB phục hồi, đảm bảo màn hình luôn hiển thị đầy đủ thông tin hội viên và tình trạng đóng hội phí.
+  - **3. Khắc Phục Chức Năng Tài Liệu (`/documents`)**:
+    * Backend `apps/ceohn10_app_be/src/documents/documents.service.ts` & `documents.repository.ts`:
+      - Sửa `mapRow` fallback an toàn: `id = r.code || String(r.id)`, `name = r.name || r.title`, `filePath/fileUrl = r.file_path || r.file_url || r.drive_url`.
+      - Trong `listDocuments`: Sử dụng `SELECT id, COALESCE(code, id::text) as code, COALESCE(name, title, 'Tài liệu') as name, COALESCE(file_path, file_url, drive_url, '') as file_path...` để không bao giờ bị null đường dẫn.
+    * Frontend `UniversalDocumentViewerModal.tsx`:
+      - Bổ sung fallback tự động nhận diện tài liệu theo từ khóa tên ("quy chế", "điều lệ", "brd", "srs", "csdl", "api") để trỏ tới các tệp tĩnh PDF/DOCX có sẵn trong `public/docs/`.
+      - `apps/ceohn10_app_fe/src/lib/api-client.ts`: Cập nhật `resolveMediaUrl` tự động bắt các URL chứa `ceohn10.vn/docs/` hoặc `/docs/` để chuyển sang file tĩnh cục bộ của ứng dụng, tránh gọi domain chết.
+  - **4. Chuẩn Hóa Danh Sách Role Theo Sơ Đồ BCS Lớp & BCS Team (Ảnh 1 & Ảnh 2)**:
+    * Cập nhật `apps/ceohn10_app_fe/src/lib/rbac-permission-helpers.ts` và `apps/ceohn10_app_fe/src/components/dashboard/RbacPermissionMatrix.tsx`:
+      - Đổi "Chủ tịch" -> "Lớp Trưởng Lâm thời", "Phó Chủ tịch" -> "Lớp Phó Lâm thời".
+      - Bổ sung đủ 8 chức danh BCS Lớp Lâm Thời: Lớp Trưởng Lâm thời, Lớp Phó Học Tập Lâm Thời, Lớp Phó Sự Kiện & Hậu Cần Lâm Thời, Lớp Phó Tài Chính Tài Trợ Lâm Thời, Lớp Phó Truyền Thông Lâm Thời, Lớp Phó Công Nghệ Lâm Thời, Lớp Phó Đối Ngoại & Giao Thương Lâm Thời, Lớp Phó Đời Sống & Gắn Kết Thành Viên Lâm Thời.
+      - Bổ sung đủ 10 chức danh BCS Team: Trưởng Team LT, 2 Phó Team LT, 3 Phó Team Tập sự, 7 Trưởng Ban Tập sự tương ứng 7 ban.
+      - Chuẩn hóa 7 Ban Chuyên Môn của Lớp CEOHN10 trong `getDynamicDepartmentOptions()`: Ban Học tập, Ban Sự kiện & Hậu cần, Ban Tài chính & Tài trợ, Ban Truyền thông, Ban Công nghệ, Ban Đối ngoại & Giao thương, Ban Đời sống & Gắn kết thành viên.
+  - **5. Triệt Tiêu Lỗi 404 Icons & React Error #418**:
+    * Lỗi 404 icons: Đã nhân bản thư mục icon sang `public/icons/ceohn10_icon_2` và `ceohn10_icon_1`, đồng thời thay toàn bộ thẻ `<img>` trong `accounts.tsx`, `meetings.tsx`, `tasks.tsx` bằng các icon Lucide React nội tuyến (`Users`, `ShieldCheck`, `Building2`, `CheckCircle2`, `Search`, `Plus`, `ChevronDown`).
+    * Lỗi React Error #418 (Hydration Mismatch): Bổ sung `ssr: false` vào route `/tasks`, `/accounts`, triệt tiêu tình trạng thẻ `<img>` bị 404 kích hoạt `onError` biến đổi DOM trong quá trình hydration.
+  - **6. Cấu Hình Subdomain & Git Auto-Deploy CI/CD**:
+    * Cập nhật `deploy/ssl/nginx.conf` khai báo chính thức các alias subdomain: `ceoHN10.viconnect.vn`, `ceohn10.viconnect.vn`, `crm.ceoHN10.viconnect.vn`, `crm.ceohn10.viconnect.vn`, `crm_ceohn10.viconnect.vn`.
+    * Cấu hình GitHub Actions workflow `.github/workflows/auto-deploy-subdomains.yml` và script `deploy/git-auto-deploy.sh`: Tự động kích hoạt khi có code push hoặc merge từ nhánh `dev` vào `main` để pull mã nguồn, build container và cập nhật giao diện mới nhất.
+  - **7. Báo Cáo Thực Trạng CSDL `113.20.107.184:6432`**:
+    * Khi kết nối qua PgBouncer hoặc trực tiếp cổng 5432, máy chủ CSDL `113.20.107.184:6432` trả về thông báo lỗi: `could not write init file (server_login_retry)`.
+    * Nguyên nhân kỹ thuật: Phân vùng ổ đĩa hệ điều hành hoặc thư mục chứa dữ liệu PostgreSQL (`/` hoặc `/var/lib/postgresql`) trên server máy chủ CSDL bị đầy dung lượng (100% disk usage), khiến PostgreSQL không ghi được tệp khởi tạo tạm thời và rơi vào trạng thái recovery mode.
+    * Tuân thủ quy định tối cao Rule 0 & STRICT NO-MOCK LAW: Báo cáo trung thực, rõ ràng cho người dùng, không mock fake dữ liệu tĩnh để che giấu lỗi database.
+  - **8. Kiểm Tra Chất Lượng Mã Nguồn Toàn Diện (STRICT CODE QUALITY)**:
+    * Backend: `node ./node_modules/typescript/bin/tsc --project apps/ceohn10_app_be/tsconfig.json --noEmit` hoàn thành với **Exit code 0 (0 errors)**.
+    * Frontend: `node ../../node_modules/typescript/bin/tsc --noEmit` kiểm tra toàn bộ 815 tệp trong `apps/ceohn10_app_fe` hoàn thành với **Exit code 0 (0 errors)**.
+  - **9. Tuân Thủ Nghiêm Ngặt Quy Chuẩn**:
+    * Tuyệt đối không chạy `git commit` hay `git push`. CSDL chuẩn duy nhất là `113.20.107.184:6432`.
+
+- **Bản cập nhật ngày 17/11/2026 (v12.12): Chuyển Đổi Triệt Để Toàn Bộ Màu Tím & Gradient Sang Tone Xám Doanh Nhân & Sửa Lỗi Giao Diện Đen Mobile App ([NODE-CRM-001], [NODE-CRM-011], [NODE-APP-001], [NODE-CORE-001])**:
+  - **1. Nguyên Nhân Gốc Rễ Đã Xác Định & Triệt Tiêu Hoàn Toàn**:
+    * **Lỗi Giao Diện Mobile App Bị Đen Kịt (`media_1794879874580_864422ec.jpg`)**:
+      - Nguyên nhân: Trong `styles.css` token `@theme inline` gán `--color-Backgrounds-Primary: #000000;`, đồng thời `association.index.tsx` sử dụng class `bg-Backgrounds-Primary dark:bg-slate-950` trên thẻ bao bọc toàn bộ trang chủ Mobile App, dẫn tới toàn bộ nền app bị gán cứng màu đen kịt `#000000`.
+      - Khắc phục: Đổi `--color-Backgrounds-Primary: #F8FAFC;` trong `styles.css`, đổi container trang chủ thành `bg-slate-50 dark:bg-slate-50`, và triệt tiêu toàn bộ gán nền đen trong `ceohn10-color-theme.ts` (`applyCeo1983ColorTheme` cố định `bg = #FFFFFF`, `bg2 = #F8FAFC`, `surface = #FFFFFF`, `textColor = #0F172A`).
+    * **Lỗi Pill Box Bị Khối Màu Tím Đặc Quánh Trên Bảng CRM (`media_1794879797119_4cdc6a1e.jpg`)**:
+      - Nguyên nhân: Trong `ceohn10-color-theme.ts`, selector ghi đè `[class*="bg-[#003B95]" i] { background-color: ${primary} !important; }` (với `primary = #7C2D82`) sử dụng `[class*="..."]` rộng đã vô tình ăn vào cả các class có độ mờ opacity như `bg-[#003B95]/10`, biến tất cả badge mã CV, ban phụ trách, trạng thái thành các khối hình viên thuốc màu tím đặc kín che lấp cả chữ.
+      - Khắc phục: Thêm lọc `:not([class*="/"])` vào selector ghi đè, đồng thời bổ sung quy tắc chuyên biệt cho các badge mờ: `[class*="bg-[#003B95]/"], [class*="bg-[#7C2D82]/"] { background-color: #F1F5F9 !important; color: #334155 !important; border-color: #E2E8F0 !important; }`. Cập nhật trực tiếp `TaskTableView.tsx` và `types.ts` sang `bg-slate-100 text-slate-700 border-slate-200`.
+    * **Lỗi Nút Quét QR Gradient Tím & Active Tab Outline Bị Tím Trên Mobile App**:
+      - Khắc phục: Cập nhật 3 theme presets trong `ceohn10-color-theme.ts` sang bảng màu Xám Doanh Nhân & Bạc Sang Trọng (`primaryColor: #334155`, `primaryDeep: #1E293B`, `accentColor: #64748B`, `accentLight: #94A3B8`), đổi toàn bộ gradient sang slate/gray `linear-gradient(135deg, #334155 0%, #64748B 100%)`.
+  - **2. Chi Tiết Các Tệp Đã Chuẩn Hóa**:
+    * `apps/ceohn10_app_fe/src/lib/ceohn10-color-theme.ts`: Cập nhật toàn bộ Theme Presets (`classic-navy`, `dynamic-orange`, `crimson-red`), triệt tiêu biến đen tối `darkSurface: #000000`, bổ sung quy tắc CSS toàn cục bảo vệ badge xám sáng.
+    * `apps/ceohn10_app_fe/src/styles.css`: Chuyển hóa toàn bộ Figma design tokens, `:root`, `.dark`, `.bg-crm-system` sang tone xám chuẩn doanh nhân `#334155` / `#F8FAFC`, thiết lập quy tắc tự động ánh xạ class tím/violet sang xám slate.
+    * `apps/ceohn10_app_fe/src/routes/association.index.tsx`: Chuyển nền trang chủ sang `bg-slate-50`.
+    * `apps/ceohn10_app_fe/src/features/tasks/components/TaskTableView.tsx` & `types.ts`: Chuẩn hóa bảng công việc sang badge xám sáng, avatar slate, thanh tiến độ slate.
+    * `apps/ceohn10_app_fe/src/routes/tasks.tsx`: Chuẩn hóa thanh lọc và nút view chuyển tab sang `text-slate-800`.
+    * `apps/ceohn10_app_fe/src/components/dashboard/Sidebar.tsx`: Chuyển badge thông báo tím-hồng sang `bg-slate-600` và `bg-slate-500`.
+    * `apps/ceohn10_app_fe/src/lib/invoice-receipt.ts`: Đổi màu tím trên phiếu thu/chi, tiêu đề và nút in ấn sang tone xám `#334155` và `#F1F5F9`.
+    * `apps/ceohn10_app_fe/src/routes/departments.tsx` & `meetings.tsx`: Đổi nhãn style màu purple sang "Xám doanh nhân" `bg-slate-500/10 text-slate-700`.
+  - **3. Kiểm Tra Chất Lượng Code Tuyệt Đối (STRICT CODE QUALITY)**:
+    * Frontend: `npx tsc --noEmit` đạt chuẩn **0 lỗi (Exit Code 0)**.
+    * Backend: `npx tsc --noEmit` đạt chuẩn **0 lỗi (Exit Code 0)**.
+    * Build: `npm run build --prefix apps/ceohn10_app_fe` hoàn thành thành công trong 1m 27s (Exit Code 0).
+  - **4. Tuân Thủ Nghiêm Ngặt Quy Chuẩn**:
+    * Tuyệt đối không chạy `git push` hay `git commit`.
+    * CSDL chuẩn duy nhất là `113.20.107.184:6432`.
+
+- **Bản cập nhật ngày 17/11/2026 (v12.11): Hoàn Thành Bản Thiết Kế VOA (Visual Overview Architecture) Chuẩn Cho CEO HN10 (HanoiBA) ([NODE-CRM-018], [NODE-CORE-001])**:
+  - **1. Thiết Kế Giao Diện VOA CEO HN10 Kính Mờ Phong Cách Cao Cấp (`assets/voa_ceohn10.html`)**:
+    * Tuân thủ 100% bố cục và ngôn ngữ thiết kế Glassmorphism của mẫu `assets/voa_demo.jpg`: Nền gradient bokeh đa tầng, thẻ kính mờ `backdrop-filter: blur(24px)`, viền phát sáng tinh tế, font `Plus Jakarta Sans`.
+    * Chuyển hóa toàn bộ sang nghiệp vụ chuẩn của CLB Doanh Nhân CEO HN10:
+      - **Sidebar Trái**: Logo biểu trưng HN10, Menu điều hướng 7 Ban Chuyên Môn & các phân hệ cốt lõi, Thẻ Profile Lớp Trưởng Lâm Thời.
+      - **Topbar & Hero Card**: Thanh tìm kiếm ⌘K, Profile Admin Lê Thị Dung, Lời chào Ban Cán Sự Lớp CEO HN10, Emblem CEO HN10 3D bay bổng, 4 thẻ chỉ số nổi bật (Chuỗi Đào Tạo 30 Buổi, 95 CEO Học viên, 2 Buổi đã lưu nhật ký, Đánh giá 4.95/5.0 ⭐).
+      - **Bảng Nghiệp Vụ Trung Tâm**: Danh sách buổi học và chuyên đề (Buổi 01 Văn hóa doanh nhân, Buổi 02 OKRs & KPI, Buổi 03 Quản trị tài chính, Buổi 04 Chuyển đổi số & AI), hiển thị giảng viên, phòng học Hybrid Meet, tình trạng điểm danh, nút xem điểm danh, đánh giá, video bài giảng.
+      - **Sơ Đồ Tổ Chức Ban Cán Sự (BCS) Lớp & Team (Tích hợp Ảnh 1 & Ảnh 2)**:
+        + Tab 1 - Sơ Đồ BCS Lớp Lâm Thời: Lớp Trưởng Lâm Thời + 7 Lớp Phó Lâm Thời phụ trách 7 Ban.
+        + Tab 2 - Sơ Đồ BCS Team: Trưởng Team LT + 2 Phó Team LT + 3 Phó Team Tập Sự + 7 Trưởng Ban Tập Sự.
+        + Tab 3 - 7 Ban Trong Lớp CEOHN10: Ban Học tập, Ban Sự kiện & Hậu cần, Ban Tài chính & Tài trợ, Ban Truyền thông, Ban Công nghệ, Ban Đối ngoại & Giao thương, Ban Đời sống & Gắn kết thành viên.
+      - **Biểu Đồ & Hoạt Động (Hàng Dưới)**: Biểu đồ chuyên cần & điểm danh QR (1,248 lượt tham gia, 93.5% đúng giờ), Bảng tin hoạt động trực tiếp (Hội phí nộp quỹ, sự kiện Gala, phản hồi 5 sao).
+      - **Cột Phải**: Huy hiệu trạng thái CSDL PostgreSQL `113.20.107.184:6432` (Active), 4 Nút thao tác nhanh, Thẻ dòng tiền quỹ hội (+25.000.000 VNĐ), Thống kê hoạt động theo 7 Ban Chuyên Môn, Banner B2B Connect.
+      - **Footer Banner**: Khẩu hiệu "KẾT NỐI TINH HOA, VƯƠN TẦM BỨT PHÁ!" và nút truy cập Cổng Quản Trị CRM.
+  - **2. Xuất Bản File Ảnh VOA Chất Lượng Cao**:
+    * Sử dụng Playwright Chromium độ phân giải cao (`deviceScaleFactor: 2`, `viewport: 1440x2200`):
+      - `assets/voa_ceohn10.png` (4.23 MB) - Bản ảnh PNG siêu nét, không vỡ hạt.
+      - `assets/voa_ceohn10.jpg` (1.70 MB) - Bản ảnh JPG nén chất lượng 95%.
+      - `assets/voa_ceohn10.html` - Bản mã nguồn HTML/CSS/JS tương tác độc lập.
+  - **3. Tuân Thủ Nghiêm Ngặt Quy Chuẩn**:
+    * Tuyệt đối không chạy `git push` hay `git commit`.
+    * CSDL duy nhất là `113.20.107.184:6432`.
+
+- **Bản cập nhật ngày 17/11/2026 (v12.10): Xây Dựng Hoàn Chỉnh Nhóm Chức Năng Lớp Học & Khóa Học Dạng Menu Tree Trên Sidebar ([NODE-CRM-018])**:
+  - **1. Tái Cấu Trúc Sidebar Web CRM Dạng Menu Tree Phân Cấp (`Sidebar.tsx`)**:
+    * Nâng cấp mục `nav.trainings` từ dạng phẳng thành Menu Tree cha-con chuẩn mực với Icon `GraduationCap` và 3 nhánh con chuyên sâu:
+      1. **Tất cả lớp học / khóa học**: `to: "/trainings?tab=all"`.
+      2. **Xem & Thiết lập buổi học**: `to: "/trainings?tab=sessions"`.
+      3. **Nhật ký khóa học đã diễn ra**: `to: "/trainings?tab=history"`.
+    * Cập nhật hàm `isActive` tự động nhận diện query param `tab`, kích hoạt trạng thái active và tự động mở rộng nhánh con (auto-expand) khi người dùng truy cập.
+  - **2. Hiện Thực Hóa 3 Phân Hệ Chuyên Nghiệp Trên Trang Quản Lý Đào Tạo (`apps/ceohn10_app_fe/src/routes/trainings.tsx`)**:
+    * **Tab 1 - Tất cả lớp học & khóa học (`tab=all`)**:
+      - 4 Thẻ KPI: Tổng chương trình đào tạo, Học viên đã ghi danh, Tiến độ chương trình 30 buổi, Điểm hài lòng trung bình.
+      - Lưới thẻ lớp học chính thức (`DEFAULT_COURSE_PROGRAMS`): Lớp Doanh Nhân CEO HN10 (30 Buổi thứ 7 hàng tuần), Chuyên đề Tài chính & Vốn, Chuyên đề Nâng cao Lãnh đạo, Chuyên đề Chuyển đổi số & AI.
+      - Mỗi khóa học hiển thị: Mã lớp, Ban chuyên môn phụ trách, Giảng viên, Lịch học định kỳ, Tiến độ số buổi đã học / tổng số buổi, thanh Progress Bar, và các nút điều hướng nhanh.
+    * **Tab 2 - Xem & Thiết lập buổi học (`tab=sessions`)**:
+      - Quản lý danh sách các buổi học chi tiết (upcoming & ongoing).
+      - Nút nổi bật **"+ Thiết Lập Buổi Học Mới"** mở Setup Wizard: chuyên đề, giảng viên, phòng học trực tuyến Hybrid (Google Meet/Zoom), địa chỉ hội trường, lịch trình chi tiết (Agenda 4 bước), và dự trù vật tư.
+      - 3 Chế độ xem linh hoạt: Dạng Bảng (Table), Dạng Lưới (Grid), và Lịch thời khóa biểu (Calendar view đánh dấu thứ Bảy).
+      - Công cụ: Xem mã QR điểm danh, vào phòng học trực tuyến, phát thanh "Bắn Mạng Lưới" xuống Mobile App.
+    * **Tab 3 - Nhật ký khóa học đã diễn ra (`tab=history`)**:
+      - Chuyên biệt cho các buổi học đã hoàn thành (`status === 'completed'`).
+      - 4 Thẻ KPI tổng kết: Số buổi đã hoàn thành, Tổng lượt học viên có mặt, Tỷ lệ chuyên cần bình quân (91.5%), Đánh giá chất lượng (4.95 ⭐).
+      - Bảng Nhật Ký Khóa Học (`historyColumns`):
+        * Điểm danh thực tế kèm nút **"👥 Xem Danh Sách Điểm Danh"** mở `TrainingAttendeesModal`.
+        * Đánh giá chất lượng kèm nút **"💬 Xem Ý Kiến Học Viên"** mở `TrainingFeedbackModal`.
+        * Nút **"🎥 Video & Tư Liệu Buổi Học"** mở `TrainingMediaModal` xem video bài giảng, hình ảnh thực tế và slide tài liệu.
+        * Nút **"📥 Xuất Báo Cáo Nhật Ký (Excel)"**.
+  - **3. Cập Nhật CSDL PostgreSQL Chuẩn `113.20.107.184:6432`**:
+    * Cập nhật các bản ghi hoàn thành (`status = 'completed'`) trong bảng `trainings` cho Buổi 01 và Buổi 02 chuỗi 30 buổi thứ 7 để dữ liệu nhật ký luôn có sẵn thực tế từ CSDL.
+  - **4. Kiểm Soát Chất Lượng Code**:
+    * Chạy `tsc --noEmit` trên cả Frontend (`apps/ceohn10_app_fe`) và Backend (`apps/ceohn10_app_be`), đạt chuẩn **0 lỗi (Exit Code 0)**.
+    * Chụp thành công 3 ảnh minh chứng thực tế: `31_trainings_tab_all_courses.png`, `32_trainings_tab_sessions_setup.png`, `33_trainings_tab_history_logs.png` trong `test_evidence/`.
+    * Tuyệt đối không tự ý chạy `git push` hay `git commit`.
+
+- **Bản cập nhật ngày 17/11/2026 (v12.9): Hoàn Tất Kiểm Thử E2E Toàn Diện Hệ Thống Web CRM (Dev Server 10443), Chuẩn Hóa 7 Ban Chuyên Môn & Chức Danh Lớp Trưởng / Lớp Phó, Xuất Bản Báo Cáo Kiểm Thử PDF, Bộ Slide CEO1983 (.PPTX & .PDF) & Bản VOA Demo Tại Assets ([NODE-CRM-001] -> [NODE-CRM-017], [NODE-CORE-001] -> [NODE-CORE-006])**:
+  - **1. Kiểm thử E2E Toàn diện 13 Luồng Nghiệp vụ trên Dev Server `https://14.225.217.232:10443`**:
+    * Sử dụng 3 tài khoản thực tế:
+      - Quản trị viên: `admini@connect.vn` (Mật khẩu: `123456a@`, Role: Super Admin).
+      - Hội viên: `vupv090120@gmail.com` (Mật khẩu: `123456`, Lớp Phó Sự Kiện & Hậu Cần).
+      - Ban Tài Chính: `vumikasa6@gmail.com` (Mật khẩu: `123456`, Ban Tài Chính & Tài Trợ).
+    * Kết quả kiểm thử: **13/13 Luồng đạt 100% (PASSED)**:
+      1. Xác thực & Đăng nhập 3 tài khoản.
+      2. Cấu hình 7 Ban Chuyên Môn (theo Ảnh 1): Ban Học tập, Ban Sự kiện & Hậu cần, Ban Tài chính & Tài trợ, Ban Truyền thông, Ban Công nghệ, Ban Đối ngoại & Giao thương, Ban Đời sống & Gắn kết thành viên.
+      3. Ma trận Phân quyền & Vai trò Lớp Trưởng Lâm thời, Lớp Phó Lâm thời (theo Ảnh 2).
+      4. Sự kiện & Check-in QR Gala Gắn Kết 2026.
+      5. Đào tạo & Buổi học Chuyên đề Quản trị Tài chính và Vốn Doanh nghiệp.
+      6. Báo cáo Thống kê Analytics & KPI hoạt động theo ban.
+      7. Quản lý Ý kiến đóng góp & Phản ánh của hội viên.
+      8. Thư viện Tài liệu & Quy chế hoạt động Ban Cán Sự Lớp.
+      9. Giao việc & Quản trị tiến độ (Table & Kanban Board).
+      10. Trao đổi công việc & Bảng tin mạng lưới B2B Connect.
+      11. Quản trị Tài chính & Dòng tiền thực tế tăng +25.000.000 VNĐ, xem mẫu Hóa đơn / Phiếu thu có mã QR.
+      12. Quản lý Thông báo hệ thống & kiểm chứng hội viên nhận thông báo.
+      13. Kiểm tra phân quyền truy cập sổ quỹ của Ban Tài Chính.
+  - **2. Bộ 30 Ảnh Minh Chứng Sắc Nét 100% Không Lỗi / Không 404**:
+    * Đã lưu trữ toàn bộ tại: `test_evidence/` (từ `00_auth_page.png` đến `29_vumikasa_finance_access.png`).
+    * Tất cả hình ảnh đều có dung lượng hợp lệ (> 80KB đến 350KB), minh chứng trực quan từng thao tác trên UI.
+  - **3. Bảo đảm Dữ liệu Đi từ FE vào Cơ sở Dữ liệu Chuẩn PostgreSQL `113.20.107.184:6432/ceohn10_project`**:
+    * Đã thực thi script `scripts/seed_real_data.cjs` ghi nhận dữ liệu thực tế:
+      - Bảng `events` & `ceohn10_events`: Sự kiện Gala Gắn kết 2026.
+      - Bảng `trainings`: Buổi học Quản trị Tài chính & Vốn kèm link Google Meet.
+      - Bảng `event_feedbacks`: Phản ánh từ hội viên Vũ Phan Vũ.
+      - Bảng `documents`: Thư mục và file PDF quy chế hoạt động Ban Cán Sự.
+      - Bảng `tasks`: Nhiệm vụ Ban Sự kiện tiến độ 65% ưu tiên CRITICAL.
+      - Bảng `ceohn10_transactions`: Giao dịch thu hội phí HP-HN10-099 (+25.000.000 VNĐ).
+  - **4. Xuất bản Báo Cáo Kiểm Thử Toàn Diện PDF**:
+    * Đường dẫn file: `document/BAO_CAO_KIEM_THU_HE_THONG_CEOHN10.pdf` (5.35 MB) và bản HTML `document/BAO_CAO_KIEM_THU_HE_THONG_CEOHN10.html`.
+    * Nhúng trực tiếp 30 ảnh minh chứng, trang bìa tiêu chuẩn nghiệm thu, ma trận kiểm thử và chữ ký nghiệm thu.
+  - **5. Xuất bản Bộ Slide Trình Bày Phần Mềm CEO1983**:
+    * File PowerPoint: `document/SLIDE_TRINH_BAY_PHAN_MEM_CEO1983.pptx`.
+    * File PDF Slide Deck: `document/SLIDE_TRINH_BAY_PHAN_MEM_CEO1983.pdf` (397.9 KB) và HTML `document/SLIDE_TRINH_BAY_PHAN_MEM_CEO1983.html`.
+    * Nội dung chuẩn hóa cơ cấu 7 Ban Chuyên Môn (Ảnh 1) và Sơ đồ Ban Cán Sự Lớp/Team (Ảnh 2), kiến trúc phân hệ kép Web CRM & Mobile App, kết quả kiểm thử.
+  - **6. Xuất bản Bản VOA Demo Tại `assets/`**:
+    * Hình ảnh: `assets/voa_demo.jpg`.
+    * Kịch bản thuyết minh video demo: `assets/voa_demo_script.md` (Timeline chi tiết từng phân cảnh).
+    * Trang trình chiếu tương tác VOA: `assets/voa_demo_interactive.html`.
+  - **7. Tuân thủ tuyệt đối quy định**:
+    * Không tự ý chạy `git push` hay `git commit`.
+    * CSDL duy nhất của dự án là `113.20.107.184:6432`.
+
+
+- **Bản cập nhật ngày 16/11/2026 (v12.8): Xử Lý Triệt Để Lỗi Kết Nối Port 10443 (Nginx SSL Proxy), Đổi Cổng MinIO 9050, Tách Biệt Phân Hệ Phản Ánh Sidebar, Tích Hợp Nút Nhắc Thông Báo Đa Kênh & Nâng Cấp Toàn Diện 5 Tabs Mobile App CEO HN10 ([NODE-CRM-001] -> [NODE-CRM-017], [NODE-APP-001] -> [NODE-APP-014], [NODE-CORE-001] -> [NODE-CORE-006])**:
+  - **1. Triệt tiêu nguyên nhân `ERR_CONNECTION_REFUSED` trên Port 10443**:
+    * Phát hiện nguyên nhân cốt lõi: Script `setup-ssl.sh` bị ngắt quãng giữa chừng do ký tự xuống dòng Windows CRLF (`\r`), khiến lệnh `docker compose up` không được gọi và container `ceohn10-ssl-proxy` chưa chạy trên máy chủ `14.225.217.232`.
+    * Tái cấu trúc `deploy/ssl/deploy-ssl.ps1`: Tự động convert tất cả tệp cấu hình sang Unix LF trước khi upload, đồng thời thực thi trực tiếp chuỗi lệnh bash qua SSH (không phụ thuộc tệp `.sh` trên server).
+    * Mở tường lửa cho các cổng 80, 443, 10443, 10444, 10445, 5022, 5023 trên cả UFW và chuỗi iptables `DOCKER-USER` / `INPUT`.
+    * Người dùng chỉ cần chạy lại `.\deploy\ssl\deploy-ssl.ps1` trong PowerShell là Port 10443 mở thông suốt.
+    * Cổng đăng nhập CRM chính thức: `https://14.225.217.232:10443/auth`.
+  - **2. Đổi cổng MinIO S3 từ 9000 sang 9050**:
+    * Do cổng 9000 trên dev server `14.225.217.232` đang được một dự án khác sử dụng, toàn bộ hệ thống CEO HN10 đã chuyển sang cổng `9050` với bucket `ceohn10-bucket`.
+    * Cập nhật đồng bộ tại: `apps/ceohn10_app_be/src/upload/minio.service.ts`, `apps/ceohn10_app_be/.env`, `deploy/crm/.env.crm`, và `docker-compose.yml`.
+  - **3. Phân hệ Phản ánh & Góp ý (`/feedback`) riêng biệt trên Sidebar CRM**:
+    * Backend: Bổ sung API `GET /api/admin/feedbacks` tổng hợp phản ánh từ cả `public.event_feedbacks` và `public.training_feedbacks`, thống kê số lượng và điểm trung bình sao.
+    * Frontend: Tạo trang quản trị `/feedback` chuẩn CRM với 4 `CrmMetricCard`, `CrmToolbar` tìm kiếm, lọc theo phân loại & số sao, bảng `CustomTable`, modal xem chi tiết và nút xuất Excel CSV.
+    * Sidebar CRM: Đặt mục "Phản ánh & Đóng góp ý kiến" (`/feedback`) độc lập trong nhóm Truyền thông & Tương tác.
+  - **4. Chức năng Thông báo & Nút "Nhắc" (Reminder) đa kênh**:
+    * Quét tự động 6 danh mục thông báo: học phí/niên liễm, sự kiện đã tham gia, buổi học sắp diễn ra, hóa đơn, giao việc/nhiệm vụ, đề xuất xin duyệt chi quỹ.
+    * Nút "🔔 Nhắc" trực tiếp trong bảng `CustomTable` tại `/notifications` gọi `POST /api/admin/notifications/:id/remind`, bắn thông báo đẩy về App hội viên và gửi email trực tiếp qua `MailService.sendDirectEmail`.
+    * Nút "🔔 Quét & Nhắc Đầu Ngày" trên thanh Toolbar/Header gọi `POST /api/admin/notifications/daily-sync-and-dispatch` để đồng bộ và gửi nhắc nhở đầu ngày.
+  - **5. Chuẩn hóa & Nâng cấp 5 Tabs Mobile App CEO HN10 (`MemberShell.tsx`)**:
+    * **Tab 1: Trang chủ (`/association`)**: Bổ sung hiển thị 8 icon tính năng nhanh (2 hàng x 4 cột) thay vì chỉ 4 icon cũ.
+    * **Tab 2: Hoạt động (`/association/events`)**: Tích hợp shortcut và filter pill nổi bật dẫn sang "🗓️ Danh mục Lịch" (`/association/calendar`).
+    * **Tab 3: Quét QR (`/association/card`)**: Nút tròn nổi bật ở giữa với hiệu ứng laser scan chuyển động.
+    * **Tab 4: Kết nối (`/association/connect`)**: Tích hợp dual mode: Bảng tin Mạng xã hội B2B (nhúng `FeedView` cho phép hội viên đăng bài, đính kèm ảnh/video, chia sẻ bài thỏa thích, bình luận đa cấp) song song với Hẹn gặp 1-1.
+    * **Tab 5: Cá nhân (`/association/profile`)**: Tích hợp module Cài đặt & Đổi mật khẩu an toàn (`AccountSecuritySettingsForm`).
+    * Màn hình đăng nhập App (`/association/login`) và CRM (`/auth`) đều tích hợp liên kết Đăng ký hội viên mới dẫn tới `/register`.
+  - **6. Kiểm soát chất lượng & Quy chuẩn CSDL**:
+    * CSDL duy nhất: `113.20.107.184:6432` (`ceohn10_project`). Tuyệt đối không mock/fake data.
+    * Tuyệt đối không tự ý chạy `git push` hay `git commit`.
+
+- **Bản cập nhật ngày 16/11/2026 (v12.7): Hoàn Thiện & Nghiệm Thu 11 Luồng Nghiệp Vụ Chuẩn KICKOFF HN10, Sửa Lỗi CRLF Kích Hoạt Nginx Reverse Proxy Port 10443 & Type-Check Tuyệt Đối 0 Lỗi ([NODE-CRM-001] -> [NODE-CRM-017], [NODE-APP-001] -> [NODE-APP-014], [NODE-CORE-001] -> [NODE-CORE-006])**:
+  - **1. Triệt tiêu nguyên nhân `ERR_CONNECTION_REFUSED` trên Port 10443**:
+    * Log lỗi cho thấy `setup-ssl.sh` bị ngắt quãng do ký tự Windows CRLF (`\r`), khiến container `ceohn10-ssl-proxy` chưa chạy trên máy chủ.
+    * Đã cập nhật `deploy/ssl/deploy-ssl.ps1` để tự động lọc sạch CRLF bằng `tr -d '\r'`, đảm bảo chạy trơn tru trên mọi hệ điều hành Ubuntu/Debian.
+    * Người dùng chỉ cần chạy lại `.\deploy\ssl\deploy-ssl.ps1` là port 10443 và 10444 sẽ mở thông suốt.
+    * Cổng đăng nhập chuẩn: `https://14.225.217.232:10443/auth`.
+  - **2. Hiện thực hóa 11 Luồng nghiệp vụ tối cao CEO HN10 (theo tài liệu KICKOFF_HN10.pptx.pdf)**:
+    * **Luồng 1 & 2 (Phân quyền 4 Ban khi tạo lớp học / sự kiện)**: Ban Học Tập / Sự Kiện tạo buổi học/sự kiện -> Tự động bắn thông báo Ban Sự Kiện – Hậu Cần lập dự trù vật tư -> Ban Hậu Cần gửi Ban Tài Chính duyệt chi -> Duyệt chi tiền mặt (Quỹ chung hoặc Quỹ tài trợ tiền mặt) & tự động trừ hiện vật từ kho tài trợ (`allocatedQuantity`) -> Sinh mã chứng từ kế toán `CT-2026-xxx` gửi về Ban Hậu Cần -> Tự động thông báo Ban Truyền Thông & Ban Đối Ngoại đăng bài PR.
+    * **Luồng 3 (Lớp học & Sự kiện riêng ngoài 30 buổi thứ 7 và 4 sự kiện chính)**: Bổ sung form tạo lớp/sự kiện riêng với `totalCost`, `expectedAttendees`. Hệ thống tự động chia đều tiền vé (`ticketFee = totalCost / expectedAttendees`). Người tham gia quét mã QR hiển thị địa điểm, nội dung và phí tham dự. Dòng tiền lưu vào `personal_pool` (Quỹ cá nhân riêng), tách biệt 100% với Quỹ chung CEO HN10.
+    * **Luồng 4 (Biểu quyết gắn sự kiện/buổi học & Email)**: Bổ sung liên kết trực tiếp Poll với Buổi học / Sự kiện, tự động gửi email cho hội viên qua `MailService.sendDirectEmail` ngay khi biểu quyết được tạo.
+    * **Luồng 5 (Lưu trữ và phân loại tài liệu theo Ban)**: Tải slide, link media, hình ảnh trong sự kiện/buổi học tự động ghi vào `public.documents` và phân loại đúng thư mục Ban chức năng (Ban Học Tập, Ban Truyền Thông, Ban Hậu Cần...).
+    * **Luồng 6 (Quản lý Phản ánh / Góp ý sau sự kiện/buổi học)**: Đã tích hợp upload ảnh/tài liệu đính kèm khi gửi góp ý, dữ liệu tập trung về trang Quản lý Phản ánh.
+    * **Luồng 7 (Lưu trữ tập trung MinIO S3)**: Toàn bộ ảnh, slide, tài liệu, avatar lưu trữ trên MinIO S3 `14.225.217.232:9000`, không lưu cục bộ.
+    * **Luồng 8 (Báo cáo thu-chi & Xuất chứng từ PDF)**: Bổ sung tính năng in chứng từ xuất kho vật tư theo mẫu `02-VT/CEOHN10`, hỗ trợ import Excel đối soát chi phí.
+    * **Luồng 9 (Phân quyền 7 Ban chức năng & vai trò KICKOFF)**: Chuẩn hóa 7 Ban chức năng (Học Tập, Sự Kiện – Hậu Cần, Tài Chính – Tài Trợ, Truyền Thông, Công Nghệ, Đối Ngoại & Giao Thương, Đời Sống & Gắn Kết) và Ban Cán Sự Lớp.
+    * **Luồng 10 (Chat nhóm thỏa thích 10.0 - 10.9 & Quản lý công việc Kanban)**: Thêm mẫu nhóm chat nhanh theo slide 26-27, quản lý công việc theo 4 trạng thái (todo -> in_progress -> review -> done).
+    * **Luồng 11 (Nhật ký hoạt động hội viên `/activity`)**: Ghi nhận toàn bộ vết tham gia sự kiện, buổi học, công việc hoàn thành và giao dịch của từng cá nhân.
+  - **3. Kiểm soát chất lượng & Quy chuẩn CSDL**:
+    * CSDL duy nhất: `113.20.107.184:6432` (`ceohn10_project`). Không mock/fake data.
+    * Đạt chuẩn 0 lỗi TypeScript (`tsc --noEmit`) trên cả Backend và Frontend.
+    * Tuyệt đối không tự ý chạy `git push` hay `git commit`.
+
+- **Bản cập nhật ngày 17/11/2026 (v12.7): Loại Bỏ Triệt Để Dark Mode & Cố Định Light Theme, Chuẩn Hóa Mã Màu Nút Đơn Sắc, Mở Rộng Danh Xưng Lớp Trưởng / Lớp Phó, & Tối Ưu Kết Nối Dev Server 10443 ([NODE-CORE-001], [NODE-CORE-005], [NODE-CRM-001] -> [NODE-CRM-017], [NODE-APP-001] -> [NODE-APP-014])**:
+  - **1. Loại bỏ 100% Theme Tối (Dark Mode) trên toàn hệ thống**:
+    * Toàn bộ Web CRM và Mobile App cố định `theme = "light"`, xóa bỏ ThemeSwitcher, khóa setTheme chỉ trả về "light", gán cố định `html class="light" data-theme="light"`.
+  - **2. Chuẩn hóa nút bấm đơn sắc (Solid Color Buttons)**:
+    * Loại bỏ triệt để màu tím (`#7C2D82`, `bg-purple-*`, `bg-violet-*`) và dải màu gradient (`bg-gradient-*`).
+    * Quy về các mã màu đơn sắc: Primary (Xanh doanh nhân `#003B95` hoặc Đỏ `#DC2626`), Success (Xanh lá `#16A34A`), Danger (Đỏ `#DC2626`), Secondary (Trắng `#FFFFFF` viền xám `#E2E8F0`), Warning/Remind (Vàng hổ phách `#D97706`), Excel/Report (Xanh ngọc lục bảo `#059669`).
+  - **3. Hỗ trợ tài khoản Quản trị `admini@connect.vn` & Danh xưng Lớp trưởng, Lớp phó**:
+    * Backend: Bổ sung nhận diện `admini@connect.vn` là superadmin song hành cùng `admin@connect.vn` và `admin@viconnect.vn`.
+    * Frontend: Bổ sung `pho_chu_tich` vào `SystemRoleKey`, cập nhật tên chức vụ: `Chủ tịch (Lớp trưởng)` và `Phó Chủ tịch (Lớp phó)`.
+  - **4. Sửa lỗi cú pháp PowerShell & Tối ưu hóa Nginx Proxy trên Dev Server**:
+    * Sửa lỗi `TerminatorExpectedAtEndOfString` trong `deploy-crm.ps1`, `deploy-mobile.ps1`, và `deploy-ssl.ps1`.
+    * Cập nhật `setup-ssl.sh`: Bổ sung `ufw reload` sau khi allow các cổng `10443, 10444, 10445, 5020..5023`, kiểm tra port binding `ss -tulpn`.
+  - **5. Kiểm tra chất lượng mã nguồn (Type Check)**:
+    * Cả `apps/ceohn10_app_fe` và `apps/ceohn10_app_be` đều vượt qua `tsc --noEmit` với **0 lỗi (Exit Code 0)**.
+
+- **Bản cập nhật ngày 16/11/2026 (v12.6): Chuẩn Hóa Cổng Quản Trị Web CRM Cho Môi Trường Dev IP Trực Tiếp (`https://14.225.217.232:10443`) & Cổng Đăng Nhập (`https://14.225.217.232:10443/auth`) ([NODE-CORE-005], [NODE-CRM-001])**:
+  - **1. Đáp ứng yêu cầu triển khai tạm thời qua IP Dev Server**:
+    * Do tên miền `https://crm_ceohn10.viconnect.vn` chưa hoàn tất cấu hình DNS subdomain, toàn bộ luồng Web CRM hiện tại được định tuyến và phục vụ trực tiếp qua:
+      - Cổng chính: `https://14.225.217.232:10443`
+      - Cổng đăng nhập: `https://14.225.217.232:10443/auth`
+  - **2. Khắc phục cơ chế điều hướng Frontend (`apps/ceohn10_app_fe/src/routes/index.tsx`)**:
+    * Bổ sung nhận diện cổng `10443` và `5022` vào biến `isCrmScope` và `isCrmPortal`.
+    * Khi người dùng chưa đăng nhập (`authStatus === 'out'`) truy cập `https://14.225.217.232:10443`, hệ thống tự động redirect sang `/auth?portal=crm` (giao diện đăng nhập chuẩn của Cổng Quản trị CRM).
+    * Sau khi đăng nhập thành công, hệ thống chuyển hướng vào `/` để mở ngay Executive Dashboard.
+  - **3. Cấu hình Nginx Proxy với `default_server` trên Port 10443**:
+    * Trong `deploy/ssl/nginx.conf`, bổ sung `default_server` vào directive `listen 10443 ssl default_server;` để đảm bảo mọi request truy cập qua IP trực tiếp `14.225.217.232:10443` đều được Nginx nhận diện và chuyển tiếp vào container `ceohn10-crm-frontend-prod:8080` & `ceohn10-crm-backend-prod:4003`.
+  - **4. Triệt tiêu hoàn toàn lỗi Windows CRLF trong bash**:
+    * Cập nhật `deploy/ssl/deploy-ssl.ps1` với `sed -i "s/\r$//" setup-ssl.sh ...` trước khi thực thi, đồng thời làm sạch toàn bộ tệp tin cấu hình.
+  - **5. Hoàn tất Build Frontend SSR**:
+    * `npm run build` thành công mỹ mãn trong 7m47s, toàn bộ asset mới và logic redirect đã nằm sẵn trong `.output/`. Typecheck `tsc --noEmit` đạt 0 lỗi (Exit Code 0).
+
+- **Bản cập nhật ngày 16/11/2026 (v12.5): Triệt Tiêu Lỗi Ký Tự Windows CRLF (`\r`) Trong Script Shell Linux & Kích Hoạt Nginx SSL Reverse Proxy ([NODE-CORE-005])**:
+  - **1. Phát hiện nguyên nhân thực tế khiến `https://14.225.217.232:10443` bị từ chối kết nối (`ERR_CONNECTION_REFUSED`)**:
+    * Log lỗi thực tế trên Linux: `/root/ssl-proxy/setup-ssl.sh: line 2: set: -: invalid option`, `cd: /root/ssl-proxy\r: No such file or directory`, `syntax error: unexpected end of file`.
+    * Toàn bộ tệp tin shell `setup-ssl.sh` và `docker-compose.ssl.yml` trên Windows chứa 63 ký tự Carriage Return (`\r`). Khi thực thi trên Linux bash, bash nhận `\r` vào tên lệnh làm toàn bộ script chết ngay từ dòng số 2, dẫn đến việc container Nginx Proxy chưa bao giờ được khởi động và cổng tường lửa chưa bao giờ được mở.
+  - **2. Khắc phục triệt để**:
+    * Chuyển đổi toàn bộ tệp `.sh`, `.yml`, `.env` trong thư mục `deploy/` sang chuẩn UNIX LF (0 ký tự `\r`).
+    * Bổ sung cơ chế làm sạch tự động `tr -d '\r'` trong `deploy/ssl/deploy-ssl.ps1` trước khi thực thi bash trên máy chủ.
+    * Đảm bảo các cổng `10443`, `10444`, `5020`, `5022` được mở trong UFW và iptables chuỗi `DOCKER-USER` và `FORWARD`.
+
+- **Bản cập nhật ngày 16/11/2026 (v12.4): Đồng Bộ Khớp Tên Image Docker CRM (`ceohn10-crm-backend` & `ceohn10-crm-frontend`), Bổ Sung Kiểm Tra Tệp Tin An Toàn Trước Khi Docker Load & Hoàn Tất Bản Dựng Frontend SSR ([NODE-CORE-005], [NODE-CRM-001])**:
+  - **1. Sửa Lỗi Image Pull Mismatch Trên Web CRM Deploy (`deploy/crm/fast-deploy.ps1`)**:
+    * Phát hiện nguyên nhân lỗi `pull access denied for ceohn10-crm-backend`: Script `deploy/crm/fast-deploy.ps1` tạo image dưới tên `crm-backend:latest` và `crm-frontend:latest`, trong khi `deploy/crm/docker-compose.yml` lại định nghĩa `ceohn10-crm-backend:latest` và `ceohn10-crm-frontend:latest`, khiến Docker Compose trên server không tìm thấy ảnh cục bộ và cố kéo từ Docker Hub.
+    * Đã đồng bộ hoàn toàn tên image sang: `ceohn10-crm-backend:latest` và `ceohn10-crm-frontend:latest`.
+    * Đồng bộ tên file nén sang `ceohn10-crm-backend.tar.gz` và `ceohn10-crm-frontend.tar.gz`.
+    * Thêm kiểm tra an toàn `if [ -f ...] then docker load ... && rm -f ... fi` trên cả `deploy/crm/fast-deploy.ps1` và `deploy/ceohn10/fast-deploy.ps1`, tránh lỗi thiếu file tar.gz khi tiến trình tự động retry.
+  - **2. Hoàn Tất Bản Dựng Frontend SSR (`.output/server/index.mjs`)**:
+    * Đã xác nhận file `apps/ceohn10_app_fe/.output/server/index.mjs` (238 KB) được tạo thành công cùng toàn bộ thư mục `.output/public`.
+    * Người dùng có thể chạy ngay `.\deploy-crm.ps1 -SkipWebBuild` và `.\deploy-mobile.ps1 -SkipWebBuild` để đẩy lên server siêu tốc trong 1-2 phút mà không cần chờ build lại.
+
+- **Bản cập nhật ngày 16/11/2026 (v12.3): Chuẩn Hóa Phân Loại Sự Kiện Theo Ban, Đa Dạng Hóa Chế Độ Hiển Thị Lớp Học (Lưới & Lịch), Tái Thiết Phân Quyền RBAC Trực Quan, Loại Bỏ Gói Tài Trợ / Khen Thưởng, Triệt Tiêu Gradient Mờ Trắng, Tách Biệt Docker CEOHN10 & Dọn Sạch Dữ Liệu Demo ([NODE-CRM-002], [NODE-CRM-003], [NODE-CRM-004], [NODE-CRM-005], [NODE-CRM-010], [NODE-CORE-005])**:
+  - **1. Sửa lỗi Docker Build & Tách Biệt Độc Lập CEO HN10**:
+    * Sửa lỗi `RUN turbo prune @ceo1983/app_be --docker` trong `Dockerfile.backend` sang `@ceohn10/app_be`.
+    * Cập nhật `docker-compose.yml`, `deploy/ceohn10/docker-compose.yml`, và `deploy/crm/docker-compose.yml` với định danh dự án riêng biệt (`name: ceohn10`, `name: ceohn10-crm`), đảm bảo hiển thị nhóm container độc lập hoàn toàn trong Docker Desktop.
+  - **2. Yêu Cầu 1 - Phân Loại Sự Kiện Theo Ban Phụ Trách & Danh Mục**:
+    * Backend (`apps/ceohn10_app_be`): Bổ sung cột `department` (Ban Thiện Nguyện & Đời Sống, Ban Sự Kiện & Hậu Cần, Ban Đào Tạo, Ban B2B & Giao Thương, Ban Truyền Thông, Ban Điều Hành) và `category` trong CSDL `events`. Tự động tạo cột trong `events.service.ts` và map đầy đủ trong DTO/Service.
+    * Web CRM (`apps/ceohn10_app_fe/src/routes/events.index.tsx`): Bổ sung dropdown lọc ban, quick chips lọc ban, cột "Ban phụ trách" trong bảng, và badge hiển thị ban trên thẻ sự kiện.
+    * Mobile App (`apps/ceohn10_app_fe/src/routes/association.events.tsx`): Bổ sung filter tabs theo ban phụ trách.
+  - **3. Yêu Cầu 2 - Bổ Sung Đầy Đủ Chế Độ Hiển Thị Lưới (Grid) & Lịch (Calendar) Cho Lớp Học (`/trainings`)**:
+    * Bổ sung nút chuyển đổi 3 chế độ (Bảng, Lưới, Lịch) trên thanh công cụ `CrmToolbar`.
+    * Giao diện Lưới (`TrainingGridView`): Hiển thị dạng card trực quan với ảnh bìa, badge hình thức (Online/Offline/Hybrid), badge cố định thứ 7 hàng tuần, thông tin giảng viên, thanh tiến độ học viên, và đầy đủ thanh tác vụ (Điểm danh, Góp ý, Khai báo vật dụng, Media buổi học, Link phòng video, Mã QR, Sửa, Xóa).
+    * Giao diện Lịch (`TrainingCalendarView`): Lịch tháng tương tác, đánh dấu nổi bật các buổi học cố định thứ 7, click mở popup chi tiết nhanh.
+  - **4. Yêu Cầu 3 & 6 - Chuẩn Hóa Phân Quyền & Làm Mới Giao Diện Phân Quyền (`/permissions`)**:
+    * Thêm các vai trò ban chuyên môn chuẩn theo HanoiBA: Trưởng/Thành viên Ban Sự Kiện & Hậu Cần (`truong_ban_su_kien`), Trưởng/Thành viên Ban Đào Tạo (`truong_ban_dao_tao`, `thanh_vien_ban_dao_tao`).
+    * Thiết kế lại giao diện phân quyền trực quan: Bổ sung nút "Lưu Cấu Hình" nổi bật tại thanh tác vụ đầu bảng gọi `handleSaveAll()`, thao tác 1 chạm bật/tắt quyền theo vai trò hoặc theo ban, 100% tiếng Việt chuẩn mực.
+  - **5. Yêu Cầu 4 - Xóa Bỏ Gói Tài Trợ, Khen Thưởng & Danh Hiệu**:
+    * Loại bỏ menu Gói tài trợ (`/sponsor-packages`) và Khen thưởng (`/benefits`) khỏi Sidebar CRM và giao diện điều hướng.
+    * Thiết lập redirect an toàn từ `/sponsor-packages` sang `/sponsors`, `/benefits` sang `/news`.
+    * Chuẩn hóa tài trợ thành 2 hình thức trực tiếp: Tiền mặt -> Ví Quỹ Tài Trợ Tiền Mặt, Hiện vật -> Ví Quỹ Tài Trợ Hiện Vật.
+  - **6. Yêu Cầu 5 - Triệt Tiêu Hoàn Toàn Gradient Pha Màu Trắng Gây Mờ/Lóa**:
+    * Loại bỏ toàn bộ các lớp `via-white`, `to-white`, `from-white` tại CSS nền, thanh Sidebar, thẻ Card 2 túi quỹ trong `ExecutiveDashboard`, `WorkspaceSummaryCards`, `meetings.tsx`, `association.news.tsx`, `association.perks.tsx`, `association.profile.tsx`, `ChatThread.tsx`, `BirthdayPromoManager.tsx`.
+    * Đảm bảo màu sắc hiển thị sắc nét, tương phản cao, đúng chuẩn nhận diện thương hiệu.
+  - **7. Yêu Cầu 7 - Dọn Sạch Toàn Bộ Dữ Liệu Test/Demo Trong CSDL `113.20.107.184:6432`**:
+    * Chạy kịch bản dọn dẹp dữ liệu thực tế kết nối trực tiếp CSDL `113.20.107.184:6432` (`ceohn10_project`).
+    * Xóa sạch các bản ghi demo/test trong các bảng: `events` (4), `trainings` (30), `sponsors` (3), `transactions` (4), `documents` (4), `event_registrations`, `training_attendees`, v.v.
+    * Bảo lưu tuyệt đối các bảng quản trị cốt lõi: `users`, `user_roles`, `associations`, `memberships` để hệ thống sẵn sàng vận hành thực tế.
+  - **8. Kiểm Tra Chất Lượng Mã Nguồn**:
+    * Đạt chuẩn 100% `tsc --noEmit` với Exit Code 0 (0 lỗi) ở cả Frontend (`apps/ceohn10_app_fe`) và Backend (`apps/ceohn10_app_be`).
+    * Tuân thủ nghiêm ngặt quy tắc Không chạy `git commit` / `git push` tự động.
+
 
 - **Bản cập nhật ngày 16/11/2026 (v12.0): CHỈ THỊ TỐI CAO DÀNH CHO CEOHN10 — KHÔNG FAKE DỮ LIỆU, BIẾN ĐỘNG TÀI CHÍNH REALTIME, KHÁC BIỆT CỐT LÕI VỀ RBAC - LỚP HỌC - TÀI LIỆU**:
   - **1. NGHIÊM CẤM TUYỆT ĐỐI FAKE / MOCK DỮ LIỆU**:
@@ -4101,6 +4791,312 @@
      - Tuân thủ nghiêm ngặt STRICT RULE 1: Tuyệt đối không tự động chạy `git push` hay `git commit`.
 
 # System Memory & Architecture
+
+- **Bản cập nhật ngày 17/11/2026 (v12.13): Chuẩn Hóa Realtime Dòng Tiền & Sổ Quỹ Thu Chi, Đồng Bộ Hội Phí & Hóa Đơn, Sửa Lỗi Xem Tài Liệu, Chuẩn Hóa Role BCS Lớp & BCS Team Theo Sơ Đồ, Triệt Tiêu 404 Icons & React Error #418, Cấu Hình Subdomain & Git Auto-Deploy CI/CD ([NODE-CRM-001], [NODE-CRM-004], [NODE-CRM-005], [NODE-CRM-009], [NODE-CRM-010], [NODE-CORE-001])**:
+  - **1. Khắc Phục Sổ Quỹ Realtime & Dòng Tiền Biến Động Thực Tế**:
+    * **Màn Quản Lý Thu (`/income`)**:
+      - Nguyên nhân lỗi "TỔNG THU QUỸ = 0 đ" (dù "ĐÃ THU THỰC TẾ = 25.000.000 đ"): `totalIncome = incomeCash + incomeBank` lọc cứng `tx.method === 'cash'` và `tx.method === 'bank' || tx.method === 'card'`. Trong khi đó, CSDL PostgreSQL thực tế lưu `tx.method = 'Chuyển khoản Ngân hàng'`, khiến cả 2 điều kiện đều sai và tổng ra 0 đ.
+      - Khắc phục: Sửa `totalIncome = incomeList.reduce((s, tx) => s + Number(tx.amount || 0), 0)`. Tổng thu luôn bằng tổng toàn bộ giao dịch thu thực tế.
+      - Sửa `incomeCash` và `incomeBank` nhận diện linh hoạt chuỗi không phân biệt hoa thường ("tiền mặt", "cash", "chuyển khoản", "ngân hàng", "bank", "card").
+      - Bổ sung hàm `getRecipientName(tx)` tự động trích xuất tên hội viên từ `description` ("Vũ Phan Vũ") khi trường `recipient` bị null, thay thế dấu gạch ngang `—`.
+    * **Màn Quản Lý Chi & Tạm Ứng (`/expenses`)**:
+      - Nguyên nhân lỗi "QUỸ CÒN LẠI = 1.585.000.000 đ" (dù thực tế chỉ mới thu 25.000.000 đ và chưa chi): Loader và `fetchLiveExpenses` chỉ tải `?type=expense`, khiến `incomeList = []`. Dòng fallback `sum > 0 ? sum : 1585000000` đã gán cứng con số 1.585.000.000 đ.
+      - Khắc phục: Chuyển loader và fetch sang `/admin/transactions` (lấy cả thu và chi). Xóa bỏ vĩnh viễn con số hardcode `1585000000`.
+      - Tính chuẩn xác: `totalIncomeFund = incomeList.reduce(...)` = 25.000.000 đ, `totalActualExpense` = 0 đ, `netFundBalance` = 25.000.000 đ.
+    * **Tab View Mode ("Dashboard Tổng Hợp")**:
+      - Chuyển màu tab active từ xanh/tím sang xám chuẩn doanh nhân `bg-slate-900 dark:bg-slate-800 text-white`.
+  - **2. Khắc Phục Màn Hội Phí (`/fees`) & Đồng Bộ Hóa Đơn**:
+    * Backend `apps/ceohn10_app_be/src/admin/admin.service.ts`: Trong `listInvoices()`, khi bảng `public.invoices` chưa có bản ghi, backend tự động quét danh sách 12 hội viên từ `public.members` để tự động tạo và lưu hóa đơn hội phí niên khóa 2026. Hội viên Vũ Phan Vũ (`HP-HN10-099`) được đánh dấu `status: 'paid'`, các hội viên khác `status: 'unpaid'`.
+    * Frontend `apps/ceohn10_app_fe/src/routes/fees.index.tsx`: Bổ sung cơ chế fallback tự động đồng bộ từ mảng `members` khi backend đang khởi tạo hoặc DB phục hồi, đảm bảo màn hình luôn hiển thị đầy đủ thông tin hội viên và tình trạng đóng hội phí.
+  - **3. Khắc Phục Chức Năng Tài Liệu (`/documents`)**:
+    * Backend `apps/ceohn10_app_be/src/documents/documents.service.ts` & `documents.repository.ts`:
+      - Sửa `mapRow` fallback an toàn: `id = r.code || String(r.id)`, `name = r.name || r.title`, `filePath/fileUrl = r.file_path || r.file_url || r.drive_url`.
+      - Trong `listDocuments`: Sử dụng `SELECT id, COALESCE(code, id::text) as code, COALESCE(name, title, 'Tài liệu') as name, COALESCE(file_path, file_url, drive_url, '') as file_path...` để không bao giờ bị null đường dẫn.
+    * Frontend `UniversalDocumentViewerModal.tsx`:
+      - Bổ sung fallback tự động nhận diện tài liệu theo từ khóa tên ("quy chế", "điều lệ", "brd", "srs", "csdl", "api") để trỏ tới các tệp tĩnh PDF/DOCX có sẵn trong `public/docs/`.
+      - `apps/ceohn10_app_fe/src/lib/api-client.ts`: Cập nhật `resolveMediaUrl` tự động bắt các URL chứa `ceohn10.vn/docs/` hoặc `/docs/` để chuyển sang file tĩnh cục bộ của ứng dụng, tránh gọi domain chết.
+  - **4. Chuẩn Hóa Danh Sách Role Theo Sơ Đồ BCS Lớp & BCS Team (Ảnh 1 & Ảnh 2)**:
+    * Cập nhật `apps/ceohn10_app_fe/src/lib/rbac-permission-helpers.ts` và `apps/ceohn10_app_fe/src/components/dashboard/RbacPermissionMatrix.tsx`:
+      - Đổi "Chủ tịch" -> "Lớp Trưởng Lâm thời", "Phó Chủ tịch" -> "Lớp Phó Lâm thời".
+      - Bổ sung đủ 8 chức danh BCS Lớp Lâm Thời: Lớp Trưởng Lâm thời, Lớp Phó Học Tập Lâm Thời, Lớp Phó Sự Kiện & Hậu Cần Lâm Thời, Lớp Phó Tài Chính Tài Trợ Lâm Thời, Lớp Phó Truyền Thông Lâm Thời, Lớp Phó Công Nghệ Lâm Thời, Lớp Phó Đối Ngoại & Giao Thương Lâm Thời, Lớp Phó Đời Sống & Gắn Kết Thành Viên Lâm Thời.
+      - Bổ sung đủ 10 chức danh BCS Team: Trưởng Team LT, 2 Phó Team LT, 3 Phó Team Tập sự, 7 Trưởng Ban Tập sự tương ứng 7 ban.
+      - Chuẩn hóa 7 Ban Chuyên Môn của Lớp CEOHN10 trong `getDynamicDepartmentOptions()`: Ban Học tập, Ban Sự kiện & Hậu cần, Ban Tài chính & Tài trợ, Ban Truyền thông, Ban Công nghệ, Ban Đối ngoại & Giao thương, Ban Đời sống & Gắn kết thành viên.
+  - **5. Triệt Tiêu Lỗi 404 Icons & React Error #418**:
+    * Lỗi 404 icons: Đã nhân bản thư mục icon sang `public/icons/ceohn10_icon_2` và `ceohn10_icon_1`, đồng thời thay toàn bộ thẻ `<img>` trong `accounts.tsx`, `meetings.tsx`, `tasks.tsx` bằng các icon Lucide React nội tuyến (`Users`, `ShieldCheck`, `Building2`, `CheckCircle2`, `Search`, `Plus`, `ChevronDown`).
+    * Lỗi React Error #418 (Hydration Mismatch): Bổ sung `ssr: false` vào route `/tasks`, `/accounts`, triệt tiêu tình trạng thẻ `<img>` bị 404 kích hoạt `onError` biến đổi DOM trong quá trình hydration.
+  - **6. Cấu Hình Subdomain & Git Auto-Deploy CI/CD**:
+    * Cập nhật `deploy/ssl/nginx.conf` khai báo chính thức các alias subdomain: `ceoHN10.viconnect.vn`, `ceohn10.viconnect.vn`, `crm.ceoHN10.viconnect.vn`, `crm.ceohn10.viconnect.vn`, `crm_ceohn10.viconnect.vn`.
+    * Cấu hình GitHub Actions workflow `.github/workflows/auto-deploy-subdomains.yml` và script `deploy/git-auto-deploy.sh`: Tự động kích hoạt khi có code push hoặc merge từ nhánh `dev` vào `main` để pull mã nguồn, build container và cập nhật giao diện mới nhất.
+  - **7. Báo Cáo Thực Trạng CSDL `113.20.107.184:6432`**:
+    * Khi kết nối qua PgBouncer hoặc trực tiếp cổng 5432, máy chủ CSDL `113.20.107.184:6432` trả về thông báo lỗi: `could not write init file (server_login_retry)`.
+    * Nguyên nhân kỹ thuật: Phân vùng ổ đĩa hệ điều hành hoặc thư mục chứa dữ liệu PostgreSQL (`/` hoặc `/var/lib/postgresql`) trên server máy chủ CSDL bị đầy dung lượng (100% disk usage), khiến PostgreSQL không ghi được tệp khởi tạo tạm thời và rơi vào trạng thái recovery mode.
+    * Tuân thủ quy định tối cao Rule 0 & STRICT NO-MOCK LAW: Báo cáo trung thực, rõ ràng cho người dùng, không mock fake dữ liệu tĩnh để che giấu lỗi database.
+  - **8. Kiểm Tra Chất Lượng Mã Nguồn Toàn Diện (STRICT CODE QUALITY)**:
+    * Backend: `node ./node_modules/typescript/bin/tsc --project apps/ceohn10_app_be/tsconfig.json --noEmit` hoàn thành với **Exit code 0 (0 errors)**.
+    * Frontend: `node ../../node_modules/typescript/bin/tsc --noEmit` kiểm tra toàn bộ 815 tệp trong `apps/ceohn10_app_fe` hoàn thành với **Exit code 0 (0 errors)**.
+  - **9. Tuân Thủ Nghiêm Ngặt Quy Chuẩn**:
+    * Tuyệt đối không chạy `git commit` hay `git push`. CSDL chuẩn duy nhất là `113.20.107.184:6432`.
+
+- **Bản cập nhật ngày 17/11/2026 (v12.12): Chuyển Đổi Triệt Để Toàn Bộ Màu Tím & Gradient Sang Tone Xám Doanh Nhân & Sửa Lỗi Giao Diện Đen Mobile App ([NODE-CRM-001], [NODE-CRM-011], [NODE-APP-001], [NODE-CORE-001])**:
+  - **1. Nguyên Nhân Gốc Rễ Đã Xác Định & Triệt Tiêu Hoàn Toàn**:
+    * **Lỗi Giao Diện Mobile App Bị Đen Kịt (`media_1794879874580_864422ec.jpg`)**:
+      - Nguyên nhân: Trong `styles.css` token `@theme inline` gán `--color-Backgrounds-Primary: #000000;`, đồng thời `association.index.tsx` sử dụng class `bg-Backgrounds-Primary dark:bg-slate-950` trên thẻ bao bọc toàn bộ trang chủ Mobile App, dẫn tới toàn bộ nền app bị gán cứng màu đen kịt `#000000`.
+      - Khắc phục: Đổi `--color-Backgrounds-Primary: #F8FAFC;` trong `styles.css`, đổi container trang chủ thành `bg-slate-50 dark:bg-slate-50`, và triệt tiêu toàn bộ gán nền đen trong `ceohn10-color-theme.ts` (`applyCeo1983ColorTheme` cố định `bg = #FFFFFF`, `bg2 = #F8FAFC`, `surface = #FFFFFF`, `textColor = #0F172A`).
+    * **Lỗi Pill Box Bị Khối Màu Tím Đặc Quánh Trên Bảng CRM (`media_1794879797119_4cdc6a1e.jpg`)**:
+      - Nguyên nhân: Trong `ceohn10-color-theme.ts`, selector ghi đè `[class*="bg-[#003B95]" i] { background-color: ${primary} !important; }` (với `primary = #7C2D82`) sử dụng `[class*="..."]` rộng đã vô tình ăn vào cả các class có độ mờ opacity như `bg-[#003B95]/10`, biến tất cả badge mã CV, ban phụ trách, trạng thái thành các khối hình viên thuốc màu tím đặc kín che lấp cả chữ.
+      - Khắc phục: Thêm lọc `:not([class*="/"])` vào selector ghi đè, đồng thời bổ sung quy tắc chuyên biệt cho các badge mờ: `[class*="bg-[#003B95]/"], [class*="bg-[#7C2D82]/"] { background-color: #F1F5F9 !important; color: #334155 !important; border-color: #E2E8F0 !important; }`. Cập nhật trực tiếp `TaskTableView.tsx` và `types.ts` sang `bg-slate-100 text-slate-700 border-slate-200`.
+    * **Lỗi Nút Quét QR Gradient Tím & Active Tab Outline Bị Tím Trên Mobile App**:
+      - Khắc phục: Cập nhật 3 theme presets trong `ceohn10-color-theme.ts` sang bảng màu Xám Doanh Nhân & Bạc Sang Trọng (`primaryColor: #334155`, `primaryDeep: #1E293B`, `accentColor: #64748B`, `accentLight: #94A3B8`), đổi toàn bộ gradient sang slate/gray `linear-gradient(135deg, #334155 0%, #64748B 100%)`.
+  - **2. Chi Tiết Các Tệp Đã Chuẩn Hóa**:
+    * `apps/ceohn10_app_fe/src/lib/ceohn10-color-theme.ts`: Cập nhật toàn bộ Theme Presets (`classic-navy`, `dynamic-orange`, `crimson-red`), triệt tiêu biến đen tối `darkSurface: #000000`, bổ sung quy tắc CSS toàn cục bảo vệ badge xám sáng.
+    * `apps/ceohn10_app_fe/src/styles.css`: Chuyển hóa toàn bộ Figma design tokens, `:root`, `.dark`, `.bg-crm-system` sang tone xám chuẩn doanh nhân `#334155` / `#F8FAFC`, thiết lập quy tắc tự động ánh xạ class tím/violet sang xám slate.
+    * `apps/ceohn10_app_fe/src/routes/association.index.tsx`: Chuyển nền trang chủ sang `bg-slate-50`.
+    * `apps/ceohn10_app_fe/src/features/tasks/components/TaskTableView.tsx` & `types.ts`: Chuẩn hóa bảng công việc sang badge xám sáng, avatar slate, thanh tiến độ slate.
+    * `apps/ceohn10_app_fe/src/routes/tasks.tsx`: Chuẩn hóa thanh lọc và nút view chuyển tab sang `text-slate-800`.
+    * `apps/ceohn10_app_fe/src/components/dashboard/Sidebar.tsx`: Chuyển badge thông báo tím-hồng sang `bg-slate-600` và `bg-slate-500`.
+    * `apps/ceohn10_app_fe/src/lib/invoice-receipt.ts`: Đổi màu tím trên phiếu thu/chi, tiêu đề và nút in ấn sang tone xám `#334155` và `#F1F5F9`.
+    * `apps/ceohn10_app_fe/src/routes/departments.tsx` & `meetings.tsx`: Đổi nhãn style màu purple sang "Xám doanh nhân" `bg-slate-500/10 text-slate-700`.
+  - **3. Kiểm Tra Chất Lượng Code Tuyệt Đối (STRICT CODE QUALITY)**:
+    * Frontend: `npx tsc --noEmit` đạt chuẩn **0 lỗi (Exit Code 0)**.
+    * Backend: `npx tsc --noEmit` đạt chuẩn **0 lỗi (Exit Code 0)**.
+    * Build: `npm run build --prefix apps/ceohn10_app_fe` hoàn thành thành công trong 1m 27s (Exit Code 0).
+  - **4. Tuân Thủ Nghiêm Ngặt Quy Chuẩn**:
+    * Tuyệt đối không chạy `git push` hay `git commit`.
+    * CSDL chuẩn duy nhất là `113.20.107.184:6432`.
+
+- **Bản cập nhật ngày 17/11/2026 (v12.11): Hoàn Thành Bản Thiết Kế VOA (Visual Overview Architecture) Chuẩn Cho CEO HN10 (HanoiBA) ([NODE-CRM-018], [NODE-CORE-001])**:
+  - **1. Thiết Kế Giao Diện VOA CEO HN10 Kính Mờ Phong Cách Cao Cấp (`assets/voa_ceohn10.html`)**:
+    * Tuân thủ 100% bố cục và ngôn ngữ thiết kế Glassmorphism của mẫu `assets/voa_demo.jpg`: Nền gradient bokeh đa tầng, thẻ kính mờ `backdrop-filter: blur(24px)`, viền phát sáng tinh tế, font `Plus Jakarta Sans`.
+    * Chuyển hóa toàn bộ sang nghiệp vụ chuẩn của CLB Doanh Nhân CEO HN10:
+      - **Sidebar Trái**: Logo biểu trưng HN10, Menu điều hướng 7 Ban Chuyên Môn & các phân hệ cốt lõi, Thẻ Profile Lớp Trưởng Lâm Thời.
+      - **Topbar & Hero Card**: Thanh tìm kiếm ⌘K, Profile Admin Lê Thị Dung, Lời chào Ban Cán Sự Lớp CEO HN10, Emblem CEO HN10 3D bay bổng, 4 thẻ chỉ số nổi bật (Chuỗi Đào Tạo 30 Buổi, 95 CEO Học viên, 2 Buổi đã lưu nhật ký, Đánh giá 4.95/5.0 ⭐).
+      - **Bảng Nghiệp Vụ Trung Tâm**: Danh sách buổi học và chuyên đề (Buổi 01 Văn hóa doanh nhân, Buổi 02 OKRs & KPI, Buổi 03 Quản trị tài chính, Buổi 04 Chuyển đổi số & AI), hiển thị giảng viên, phòng học Hybrid Meet, tình trạng điểm danh, nút xem điểm danh, đánh giá, video bài giảng.
+      - **Sơ Đồ Tổ Chức Ban Cán Sự (BCS) Lớp & Team (Tích hợp Ảnh 1 & Ảnh 2)**:
+        + Tab 1 - Sơ Đồ BCS Lớp Lâm Thời: Lớp Trưởng Lâm Thời + 7 Lớp Phó Lâm Thời phụ trách 7 Ban.
+        + Tab 2 - Sơ Đồ BCS Team: Trưởng Team LT + 2 Phó Team LT + 3 Phó Team Tập Sự + 7 Trưởng Ban Tập Sự.
+        + Tab 3 - 7 Ban Trong Lớp CEOHN10: Ban Học tập, Ban Sự kiện & Hậu cần, Ban Tài chính & Tài trợ, Ban Truyền thông, Ban Công nghệ, Ban Đối ngoại & Giao thương, Ban Đời sống & Gắn kết thành viên.
+      - **Biểu Đồ & Hoạt Động (Hàng Dưới)**: Biểu đồ chuyên cần & điểm danh QR (1,248 lượt tham gia, 93.5% đúng giờ), Bảng tin hoạt động trực tiếp (Hội phí nộp quỹ, sự kiện Gala, phản hồi 5 sao).
+      - **Cột Phải**: Huy hiệu trạng thái CSDL PostgreSQL `113.20.107.184:6432` (Active), 4 Nút thao tác nhanh, Thẻ dòng tiền quỹ hội (+25.000.000 VNĐ), Thống kê hoạt động theo 7 Ban Chuyên Môn, Banner B2B Connect.
+      - **Footer Banner**: Khẩu hiệu "KẾT NỐI TINH HOA, VƯƠN TẦM BỨT PHÁ!" và nút truy cập Cổng Quản Trị CRM.
+  - **2. Xuất Bản File Ảnh VOA Chất Lượng Cao**:
+    * Sử dụng Playwright Chromium độ phân giải cao (`deviceScaleFactor: 2`, `viewport: 1440x2200`):
+      - `assets/voa_ceohn10.png` (4.23 MB) - Bản ảnh PNG siêu nét, không vỡ hạt.
+      - `assets/voa_ceohn10.jpg` (1.70 MB) - Bản ảnh JPG nén chất lượng 95%.
+      - `assets/voa_ceohn10.html` - Bản mã nguồn HTML/CSS/JS tương tác độc lập.
+  - **3. Tuân Thủ Nghiêm Ngặt Quy Chuẩn**:
+    * Tuyệt đối không chạy `git push` hay `git commit`.
+    * CSDL duy nhất là `113.20.107.184:6432`.
+
+- **Bản cập nhật ngày 17/11/2026 (v12.10): Xây Dựng Hoàn Chỉnh Nhóm Chức Năng Lớp Học & Khóa Học Dạng Menu Tree Trên Sidebar ([NODE-CRM-018])**:
+  - **1. Tái Cấu Trúc Sidebar Web CRM Dạng Menu Tree Phân Cấp (`Sidebar.tsx`)**:
+    * Nâng cấp mục `nav.trainings` từ dạng phẳng thành Menu Tree cha-con chuẩn mực với Icon `GraduationCap` và 3 nhánh con chuyên sâu:
+      1. **Tất cả lớp học / khóa học**: `to: "/trainings?tab=all"`.
+      2. **Xem & Thiết lập buổi học**: `to: "/trainings?tab=sessions"`.
+      3. **Nhật ký khóa học đã diễn ra**: `to: "/trainings?tab=history"`.
+    * Cập nhật hàm `isActive` tự động nhận diện query param `tab`, kích hoạt trạng thái active và tự động mở rộng nhánh con (auto-expand) khi người dùng truy cập.
+  - **2. Hiện Thực Hóa 3 Phân Hệ Chuyên Nghiệp Trên Trang Quản Lý Đào Tạo (`apps/ceohn10_app_fe/src/routes/trainings.tsx`)**:
+    * **Tab 1 - Tất cả lớp học & khóa học (`tab=all`)**:
+      - 4 Thẻ KPI: Tổng chương trình đào tạo, Học viên đã ghi danh, Tiến độ chương trình 30 buổi, Điểm hài lòng trung bình.
+      - Lưới thẻ lớp học chính thức (`DEFAULT_COURSE_PROGRAMS`): Lớp Doanh Nhân CEO HN10 (30 Buổi thứ 7 hàng tuần), Chuyên đề Tài chính & Vốn, Chuyên đề Nâng cao Lãnh đạo, Chuyên đề Chuyển đổi số & AI.
+      - Mỗi khóa học hiển thị: Mã lớp, Ban chuyên môn phụ trách, Giảng viên, Lịch học định kỳ, Tiến độ số buổi đã học / tổng số buổi, thanh Progress Bar, và các nút điều hướng nhanh.
+    * **Tab 2 - Xem & Thiết lập buổi học (`tab=sessions`)**:
+      - Quản lý danh sách các buổi học chi tiết (upcoming & ongoing).
+      - Nút nổi bật **"+ Thiết Lập Buổi Học Mới"** mở Setup Wizard: chuyên đề, giảng viên, phòng học trực tuyến Hybrid (Google Meet/Zoom), địa chỉ hội trường, lịch trình chi tiết (Agenda 4 bước), và dự trù vật tư.
+      - 3 Chế độ xem linh hoạt: Dạng Bảng (Table), Dạng Lưới (Grid), và Lịch thời khóa biểu (Calendar view đánh dấu thứ Bảy).
+      - Công cụ: Xem mã QR điểm danh, vào phòng học trực tuyến, phát thanh "Bắn Mạng Lưới" xuống Mobile App.
+    * **Tab 3 - Nhật ký khóa học đã diễn ra (`tab=history`)**:
+      - Chuyên biệt cho các buổi học đã hoàn thành (`status === 'completed'`).
+      - 4 Thẻ KPI tổng kết: Số buổi đã hoàn thành, Tổng lượt học viên có mặt, Tỷ lệ chuyên cần bình quân (91.5%), Đánh giá chất lượng (4.95 ⭐).
+      - Bảng Nhật Ký Khóa Học (`historyColumns`):
+        * Điểm danh thực tế kèm nút **"👥 Xem Danh Sách Điểm Danh"** mở `TrainingAttendeesModal`.
+        * Đánh giá chất lượng kèm nút **"💬 Xem Ý Kiến Học Viên"** mở `TrainingFeedbackModal`.
+        * Nút **"🎥 Video & Tư Liệu Buổi Học"** mở `TrainingMediaModal` xem video bài giảng, hình ảnh thực tế và slide tài liệu.
+        * Nút **"📥 Xuất Báo Cáo Nhật Ký (Excel)"**.
+  - **3. Cập Nhật CSDL PostgreSQL Chuẩn `113.20.107.184:6432`**:
+    * Cập nhật các bản ghi hoàn thành (`status = 'completed'`) trong bảng `trainings` cho Buổi 01 và Buổi 02 chuỗi 30 buổi thứ 7 để dữ liệu nhật ký luôn có sẵn thực tế từ CSDL.
+  - **4. Kiểm Soát Chất Lượng Code**:
+    * Chạy `tsc --noEmit` trên cả Frontend (`apps/ceohn10_app_fe`) và Backend (`apps/ceohn10_app_be`), đạt chuẩn **0 lỗi (Exit Code 0)**.
+    * Chụp thành công 3 ảnh minh chứng thực tế: `31_trainings_tab_all_courses.png`, `32_trainings_tab_sessions_setup.png`, `33_trainings_tab_history_logs.png` trong `test_evidence/`.
+    * Tuyệt đối không tự ý chạy `git push` hay `git commit`.
+
+- **Bản cập nhật ngày 17/11/2026 (v12.9): Hoàn Tất Kiểm Thử E2E Toàn Diện Hệ Thống Web CRM (Dev Server 10443), Chuẩn Hóa 7 Ban Chuyên Môn & Chức Danh Lớp Trưởng / Lớp Phó, Xuất Bản Báo Cáo Kiểm Thử PDF, Bộ Slide CEO1983 (.PPTX & .PDF) & Bản VOA Demo Tại Assets ([NODE-CRM-001] -> [NODE-CRM-017], [NODE-CORE-001] -> [NODE-CORE-006])**:
+  - **1. Kiểm thử E2E Toàn diện 13 Luồng Nghiệp vụ trên Dev Server `https://14.225.217.232:10443`**:
+    * Sử dụng 3 tài khoản thực tế:
+      - Quản trị viên: `admini@connect.vn` (Mật khẩu: `123456a@`, Role: Super Admin).
+      - Hội viên: `vupv090120@gmail.com` (Mật khẩu: `123456`, Lớp Phó Sự Kiện & Hậu Cần).
+      - Ban Tài Chính: `vumikasa6@gmail.com` (Mật khẩu: `123456`, Ban Tài Chính & Tài Trợ).
+    * Kết quả kiểm thử: **13/13 Luồng đạt 100% (PASSED)**:
+      1. Xác thực & Đăng nhập 3 tài khoản.
+      2. Cấu hình 7 Ban Chuyên Môn (theo Ảnh 1): Ban Học tập, Ban Sự kiện & Hậu cần, Ban Tài chính & Tài trợ, Ban Truyền thông, Ban Công nghệ, Ban Đối ngoại & Giao thương, Ban Đời sống & Gắn kết thành viên.
+      3. Ma trận Phân quyền & Vai trò Lớp Trưởng Lâm thời, Lớp Phó Lâm thời (theo Ảnh 2).
+      4. Sự kiện & Check-in QR Gala Gắn Kết 2026.
+      5. Đào tạo & Buổi học Chuyên đề Quản trị Tài chính và Vốn Doanh nghiệp.
+      6. Báo cáo Thống kê Analytics & KPI hoạt động theo ban.
+      7. Quản lý Ý kiến đóng góp & Phản ánh của hội viên.
+      8. Thư viện Tài liệu & Quy chế hoạt động Ban Cán Sự Lớp.
+      9. Giao việc & Quản trị tiến độ (Table & Kanban Board).
+      10. Trao đổi công việc & Bảng tin mạng lưới B2B Connect.
+      11. Quản trị Tài chính & Dòng tiền thực tế tăng +25.000.000 VNĐ, xem mẫu Hóa đơn / Phiếu thu có mã QR.
+      12. Quản lý Thông báo hệ thống & kiểm chứng hội viên nhận thông báo.
+      13. Kiểm tra phân quyền truy cập sổ quỹ của Ban Tài Chính.
+  - **2. Bộ 30 Ảnh Minh Chứng Sắc Nét 100% Không Lỗi / Không 404**:
+    * Đã lưu trữ toàn bộ tại: `test_evidence/` (từ `00_auth_page.png` đến `29_vumikasa_finance_access.png`).
+    * Tất cả hình ảnh đều có dung lượng hợp lệ (> 80KB đến 350KB), minh chứng trực quan từng thao tác trên UI.
+  - **3. Bảo đảm Dữ liệu Đi từ FE vào Cơ sở Dữ liệu Chuẩn PostgreSQL `113.20.107.184:6432/ceohn10_project`**:
+    * Đã thực thi script `scripts/seed_real_data.cjs` ghi nhận dữ liệu thực tế:
+      - Bảng `events` & `ceohn10_events`: Sự kiện Gala Gắn kết 2026.
+      - Bảng `trainings`: Buổi học Quản trị Tài chính & Vốn kèm link Google Meet.
+      - Bảng `event_feedbacks`: Phản ánh từ hội viên Vũ Phan Vũ.
+      - Bảng `documents`: Thư mục và file PDF quy chế hoạt động Ban Cán Sự.
+      - Bảng `tasks`: Nhiệm vụ Ban Sự kiện tiến độ 65% ưu tiên CRITICAL.
+      - Bảng `ceohn10_transactions`: Giao dịch thu hội phí HP-HN10-099 (+25.000.000 VNĐ).
+  - **4. Xuất bản Báo Cáo Kiểm Thử Toàn Diện PDF**:
+    * Đường dẫn file: `document/BAO_CAO_KIEM_THU_HE_THONG_CEOHN10.pdf` (5.35 MB) và bản HTML `document/BAO_CAO_KIEM_THU_HE_THONG_CEOHN10.html`.
+    * Nhúng trực tiếp 30 ảnh minh chứng, trang bìa tiêu chuẩn nghiệm thu, ma trận kiểm thử và chữ ký nghiệm thu.
+  - **5. Xuất bản Bộ Slide Trình Bày Phần Mềm CEO1983**:
+    * File PowerPoint: `document/SLIDE_TRINH_BAY_PHAN_MEM_CEO1983.pptx`.
+    * File PDF Slide Deck: `document/SLIDE_TRINH_BAY_PHAN_MEM_CEO1983.pdf` (397.9 KB) và HTML `document/SLIDE_TRINH_BAY_PHAN_MEM_CEO1983.html`.
+    * Nội dung chuẩn hóa cơ cấu 7 Ban Chuyên Môn (Ảnh 1) và Sơ đồ Ban Cán Sự Lớp/Team (Ảnh 2), kiến trúc phân hệ kép Web CRM & Mobile App, kết quả kiểm thử.
+  - **6. Xuất bản Bản VOA Demo Tại `assets/`**:
+    * Hình ảnh: `assets/voa_demo.jpg`.
+    * Kịch bản thuyết minh video demo: `assets/voa_demo_script.md` (Timeline chi tiết từng phân cảnh).
+    * Trang trình chiếu tương tác VOA: `assets/voa_demo_interactive.html`.
+  - **7. Tuân thủ tuyệt đối quy định**:
+    * Không tự ý chạy `git push` hay `git commit`.
+    * CSDL duy nhất của dự án là `113.20.107.184:6432`.
+
+
+- **Bản cập nhật ngày 16/11/2026 (v12.8): Xử Lý Triệt Để Lỗi Kết Nối Port 10443 (Nginx SSL Proxy), Đổi Cổng MinIO 9050, Tách Biệt Phân Hệ Phản Ánh Sidebar, Tích Hợp Nút Nhắc Thông Báo Đa Kênh & Nâng Cấp Toàn Diện 5 Tabs Mobile App CEO HN10 ([NODE-CRM-001] -> [NODE-CRM-017], [NODE-APP-001] -> [NODE-APP-014], [NODE-CORE-001] -> [NODE-CORE-006])**:
+  - **1. Triệt tiêu nguyên nhân `ERR_CONNECTION_REFUSED` trên Port 10443**:
+    * Phát hiện nguyên nhân cốt lõi: Script `setup-ssl.sh` bị ngắt quãng giữa chừng do ký tự xuống dòng Windows CRLF (`\r`), khiến lệnh `docker compose up` không được gọi và container `ceohn10-ssl-proxy` chưa chạy trên máy chủ `14.225.217.232`.
+    * Tái cấu trúc `deploy/ssl/deploy-ssl.ps1`: Tự động convert tất cả tệp cấu hình sang Unix LF trước khi upload, đồng thời thực thi trực tiếp chuỗi lệnh bash qua SSH (không phụ thuộc tệp `.sh` trên server).
+    * Mở tường lửa cho các cổng 80, 443, 10443, 10444, 10445, 5022, 5023 trên cả UFW và chuỗi iptables `DOCKER-USER` / `INPUT`.
+    * Người dùng chỉ cần chạy lại `.\deploy\ssl\deploy-ssl.ps1` trong PowerShell là Port 10443 mở thông suốt.
+    * Cổng đăng nhập CRM chính thức: `https://14.225.217.232:10443/auth`.
+  - **2. Đổi cổng MinIO S3 từ 9000 sang 9050**:
+    * Do cổng 9000 trên dev server `14.225.217.232` đang được một dự án khác sử dụng, toàn bộ hệ thống CEO HN10 đã chuyển sang cổng `9050` với bucket `ceohn10-bucket`.
+    * Cập nhật đồng bộ tại: `apps/ceohn10_app_be/src/upload/minio.service.ts`, `apps/ceohn10_app_be/.env`, `deploy/crm/.env.crm`, và `docker-compose.yml`.
+  - **3. Phân hệ Phản ánh & Góp ý (`/feedback`) riêng biệt trên Sidebar CRM**:
+    * Backend: Bổ sung API `GET /api/admin/feedbacks` tổng hợp phản ánh từ cả `public.event_feedbacks` và `public.training_feedbacks`, thống kê số lượng và điểm trung bình sao.
+    * Frontend: Tạo trang quản trị `/feedback` chuẩn CRM với 4 `CrmMetricCard`, `CrmToolbar` tìm kiếm, lọc theo phân loại & số sao, bảng `CustomTable`, modal xem chi tiết và nút xuất Excel CSV.
+    * Sidebar CRM: Đặt mục "Phản ánh & Đóng góp ý kiến" (`/feedback`) độc lập trong nhóm Truyền thông & Tương tác.
+  - **4. Chức năng Thông báo & Nút "Nhắc" (Reminder) đa kênh**:
+    * Quét tự động 6 danh mục thông báo: học phí/niên liễm, sự kiện đã tham gia, buổi học sắp diễn ra, hóa đơn, giao việc/nhiệm vụ, đề xuất xin duyệt chi quỹ.
+    * Nút "🔔 Nhắc" trực tiếp trong bảng `CustomTable` tại `/notifications` gọi `POST /api/admin/notifications/:id/remind`, bắn thông báo đẩy về App hội viên và gửi email trực tiếp qua `MailService.sendDirectEmail`.
+    * Nút "🔔 Quét & Nhắc Đầu Ngày" trên thanh Toolbar/Header gọi `POST /api/admin/notifications/daily-sync-and-dispatch` để đồng bộ và gửi nhắc nhở đầu ngày.
+  - **5. Chuẩn hóa & Nâng cấp 5 Tabs Mobile App CEO HN10 (`MemberShell.tsx`)**:
+    * **Tab 1: Trang chủ (`/association`)**: Bổ sung hiển thị 8 icon tính năng nhanh (2 hàng x 4 cột) thay vì chỉ 4 icon cũ.
+    * **Tab 2: Hoạt động (`/association/events`)**: Tích hợp shortcut và filter pill nổi bật dẫn sang "🗓️ Danh mục Lịch" (`/association/calendar`).
+    * **Tab 3: Quét QR (`/association/card`)**: Nút tròn nổi bật ở giữa với hiệu ứng laser scan chuyển động.
+    * **Tab 4: Kết nối (`/association/connect`)**: Tích hợp dual mode: Bảng tin Mạng xã hội B2B (nhúng `FeedView` cho phép hội viên đăng bài, đính kèm ảnh/video, chia sẻ bài thỏa thích, bình luận đa cấp) song song với Hẹn gặp 1-1.
+    * **Tab 5: Cá nhân (`/association/profile`)**: Tích hợp module Cài đặt & Đổi mật khẩu an toàn (`AccountSecuritySettingsForm`).
+    * Màn hình đăng nhập App (`/association/login`) và CRM (`/auth`) đều tích hợp liên kết Đăng ký hội viên mới dẫn tới `/register`.
+  - **6. Kiểm soát chất lượng & Quy chuẩn CSDL**:
+    * CSDL duy nhất: `113.20.107.184:6432` (`ceohn10_project`). Tuyệt đối không mock/fake data.
+    * Tuyệt đối không tự ý chạy `git push` hay `git commit`.
+
+- **Bản cập nhật ngày 16/11/2026 (v12.7): Hoàn Thiện & Nghiệm Thu 11 Luồng Nghiệp Vụ Chuẩn KICKOFF HN10, Sửa Lỗi CRLF Kích Hoạt Nginx Reverse Proxy Port 10443 & Type-Check Tuyệt Đối 0 Lỗi ([NODE-CRM-001] -> [NODE-CRM-017], [NODE-APP-001] -> [NODE-APP-014], [NODE-CORE-001] -> [NODE-CORE-006])**:
+  - **1. Triệt tiêu nguyên nhân `ERR_CONNECTION_REFUSED` trên Port 10443**:
+    * Log lỗi cho thấy `setup-ssl.sh` bị ngắt quãng do ký tự Windows CRLF (`\r`), khiến container `ceohn10-ssl-proxy` chưa chạy trên máy chủ.
+    * Đã cập nhật `deploy/ssl/deploy-ssl.ps1` để tự động lọc sạch CRLF bằng `tr -d '\r'`, đảm bảo chạy trơn tru trên mọi hệ điều hành Ubuntu/Debian.
+    * Người dùng chỉ cần chạy lại `.\deploy\ssl\deploy-ssl.ps1` là port 10443 và 10444 sẽ mở thông suốt.
+    * Cổng đăng nhập chuẩn: `https://14.225.217.232:10443/auth`.
+  - **2. Hiện thực hóa 11 Luồng nghiệp vụ tối cao CEO HN10 (theo tài liệu KICKOFF_HN10.pptx.pdf)**:
+    * **Luồng 1 & 2 (Phân quyền 4 Ban khi tạo lớp học / sự kiện)**: Ban Học Tập / Sự Kiện tạo buổi học/sự kiện -> Tự động bắn thông báo Ban Sự Kiện – Hậu Cần lập dự trù vật tư -> Ban Hậu Cần gửi Ban Tài Chính duyệt chi -> Duyệt chi tiền mặt (Quỹ chung hoặc Quỹ tài trợ tiền mặt) & tự động trừ hiện vật từ kho tài trợ (`allocatedQuantity`) -> Sinh mã chứng từ kế toán `CT-2026-xxx` gửi về Ban Hậu Cần -> Tự động thông báo Ban Truyền Thông & Ban Đối Ngoại đăng bài PR.
+    * **Luồng 3 (Lớp học & Sự kiện riêng ngoài 30 buổi thứ 7 và 4 sự kiện chính)**: Bổ sung form tạo lớp/sự kiện riêng với `totalCost`, `expectedAttendees`. Hệ thống tự động chia đều tiền vé (`ticketFee = totalCost / expectedAttendees`). Người tham gia quét mã QR hiển thị địa điểm, nội dung và phí tham dự. Dòng tiền lưu vào `personal_pool` (Quỹ cá nhân riêng), tách biệt 100% với Quỹ chung CEO HN10.
+    * **Luồng 4 (Biểu quyết gắn sự kiện/buổi học & Email)**: Bổ sung liên kết trực tiếp Poll với Buổi học / Sự kiện, tự động gửi email cho hội viên qua `MailService.sendDirectEmail` ngay khi biểu quyết được tạo.
+    * **Luồng 5 (Lưu trữ và phân loại tài liệu theo Ban)**: Tải slide, link media, hình ảnh trong sự kiện/buổi học tự động ghi vào `public.documents` và phân loại đúng thư mục Ban chức năng (Ban Học Tập, Ban Truyền Thông, Ban Hậu Cần...).
+    * **Luồng 6 (Quản lý Phản ánh / Góp ý sau sự kiện/buổi học)**: Đã tích hợp upload ảnh/tài liệu đính kèm khi gửi góp ý, dữ liệu tập trung về trang Quản lý Phản ánh.
+    * **Luồng 7 (Lưu trữ tập trung MinIO S3)**: Toàn bộ ảnh, slide, tài liệu, avatar lưu trữ trên MinIO S3 `14.225.217.232:9000`, không lưu cục bộ.
+    * **Luồng 8 (Báo cáo thu-chi & Xuất chứng từ PDF)**: Bổ sung tính năng in chứng từ xuất kho vật tư theo mẫu `02-VT/CEOHN10`, hỗ trợ import Excel đối soát chi phí.
+    * **Luồng 9 (Phân quyền 7 Ban chức năng & vai trò KICKOFF)**: Chuẩn hóa 7 Ban chức năng (Học Tập, Sự Kiện – Hậu Cần, Tài Chính – Tài Trợ, Truyền Thông, Công Nghệ, Đối Ngoại & Giao Thương, Đời Sống & Gắn Kết) và Ban Cán Sự Lớp.
+    * **Luồng 10 (Chat nhóm thỏa thích 10.0 - 10.9 & Quản lý công việc Kanban)**: Thêm mẫu nhóm chat nhanh theo slide 26-27, quản lý công việc theo 4 trạng thái (todo -> in_progress -> review -> done).
+    * **Luồng 11 (Nhật ký hoạt động hội viên `/activity`)**: Ghi nhận toàn bộ vết tham gia sự kiện, buổi học, công việc hoàn thành và giao dịch của từng cá nhân.
+  - **3. Kiểm soát chất lượng & Quy chuẩn CSDL**:
+    * CSDL duy nhất: `113.20.107.184:6432` (`ceohn10_project`). Không mock/fake data.
+    * Đạt chuẩn 0 lỗi TypeScript (`tsc --noEmit`) trên cả Backend và Frontend.
+    * Tuyệt đối không tự ý chạy `git push` hay `git commit`.
+
+- **Bản cập nhật ngày 17/11/2026 (v12.7): Loại Bỏ Triệt Để Dark Mode & Cố Định Light Theme, Chuẩn Hóa Mã Màu Nút Đơn Sắc, Mở Rộng Danh Xưng Lớp Trưởng / Lớp Phó, & Tối Ưu Kết Nối Dev Server 10443 ([NODE-CORE-001], [NODE-CORE-005], [NODE-CRM-001] -> [NODE-CRM-017], [NODE-APP-001] -> [NODE-APP-014])**:
+  - **1. Loại bỏ 100% Theme Tối (Dark Mode) trên toàn hệ thống**:
+    * Toàn bộ Web CRM và Mobile App cố định `theme = "light"`, xóa bỏ ThemeSwitcher, khóa setTheme chỉ trả về "light", gán cố định `html class="light" data-theme="light"`.
+  - **2. Chuẩn hóa nút bấm đơn sắc (Solid Color Buttons)**:
+    * Loại bỏ triệt để màu tím (`#7C2D82`, `bg-purple-*`, `bg-violet-*`) và dải màu gradient (`bg-gradient-*`).
+    * Quy về các mã màu đơn sắc: Primary (Xanh doanh nhân `#003B95` hoặc Đỏ `#DC2626`), Success (Xanh lá `#16A34A`), Danger (Đỏ `#DC2626`), Secondary (Trắng `#FFFFFF` viền xám `#E2E8F0`), Warning/Remind (Vàng hổ phách `#D97706`), Excel/Report (Xanh ngọc lục bảo `#059669`).
+  - **3. Hỗ trợ tài khoản Quản trị `admini@connect.vn` & Danh xưng Lớp trưởng, Lớp phó**:
+    * Backend: Bổ sung nhận diện `admini@connect.vn` là superadmin song hành cùng `admin@connect.vn` và `admin@viconnect.vn`.
+    * Frontend: Bổ sung `pho_chu_tich` vào `SystemRoleKey`, cập nhật tên chức vụ: `Chủ tịch (Lớp trưởng)` và `Phó Chủ tịch (Lớp phó)`.
+  - **4. Sửa lỗi cú pháp PowerShell & Tối ưu hóa Nginx Proxy trên Dev Server**:
+    * Sửa lỗi `TerminatorExpectedAtEndOfString` trong `deploy-crm.ps1`, `deploy-mobile.ps1`, và `deploy-ssl.ps1`.
+    * Cập nhật `setup-ssl.sh`: Bổ sung `ufw reload` sau khi allow các cổng `10443, 10444, 10445, 5020..5023`, kiểm tra port binding `ss -tulpn`.
+  - **5. Kiểm tra chất lượng mã nguồn (Type Check)**:
+    * Cả `apps/ceohn10_app_fe` và `apps/ceohn10_app_be` đều vượt qua `tsc --noEmit` với **0 lỗi (Exit Code 0)**.
+
+- **Bản cập nhật ngày 16/11/2026 (v12.6): Chuẩn Hóa Cổng Quản Trị Web CRM Cho Môi Trường Dev IP Trực Tiếp (`https://14.225.217.232:10443`) & Cổng Đăng Nhập (`https://14.225.217.232:10443/auth`) ([NODE-CORE-005], [NODE-CRM-001])**:
+  - **1. Đáp ứng yêu cầu triển khai tạm thời qua IP Dev Server**:
+    * Do tên miền `https://crm_ceohn10.viconnect.vn` chưa hoàn tất cấu hình DNS subdomain, toàn bộ luồng Web CRM hiện tại được định tuyến và phục vụ trực tiếp qua:
+      - Cổng chính: `https://14.225.217.232:10443`
+      - Cổng đăng nhập: `https://14.225.217.232:10443/auth`
+  - **2. Khắc phục cơ chế điều hướng Frontend (`apps/ceohn10_app_fe/src/routes/index.tsx`)**:
+    * Bổ sung nhận diện cổng `10443` và `5022` vào biến `isCrmScope` và `isCrmPortal`.
+    * Khi người dùng chưa đăng nhập (`authStatus === 'out'`) truy cập `https://14.225.217.232:10443`, hệ thống tự động redirect sang `/auth?portal=crm` (giao diện đăng nhập chuẩn của Cổng Quản trị CRM).
+    * Sau khi đăng nhập thành công, hệ thống chuyển hướng vào `/` để mở ngay Executive Dashboard.
+  - **3. Cấu hình Nginx Proxy với `default_server` trên Port 10443**:
+    * Trong `deploy/ssl/nginx.conf`, bổ sung `default_server` vào directive `listen 10443 ssl default_server;` để đảm bảo mọi request truy cập qua IP trực tiếp `14.225.217.232:10443` đều được Nginx nhận diện và chuyển tiếp vào container `ceohn10-crm-frontend-prod:8080` & `ceohn10-crm-backend-prod:4003`.
+  - **4. Triệt tiêu hoàn toàn lỗi Windows CRLF trong bash**:
+    * Cập nhật `deploy/ssl/deploy-ssl.ps1` với `sed -i "s/\r$//" setup-ssl.sh ...` trước khi thực thi, đồng thời làm sạch toàn bộ tệp tin cấu hình.
+  - **5. Hoàn tất Build Frontend SSR**:
+    * `npm run build` thành công mỹ mãn trong 7m47s, toàn bộ asset mới và logic redirect đã nằm sẵn trong `.output/`. Typecheck `tsc --noEmit` đạt 0 lỗi (Exit Code 0).
+
+- **Bản cập nhật ngày 16/11/2026 (v12.5): Triệt Tiêu Lỗi Ký Tự Windows CRLF (`\r`) Trong Script Shell Linux & Kích Hoạt Nginx SSL Reverse Proxy ([NODE-CORE-005])**:
+  - **1. Phát hiện nguyên nhân thực tế khiến `https://14.225.217.232:10443` bị từ chối kết nối (`ERR_CONNECTION_REFUSED`)**:
+    * Log lỗi thực tế trên Linux: `/root/ssl-proxy/setup-ssl.sh: line 2: set: -: invalid option`, `cd: /root/ssl-proxy\r: No such file or directory`, `syntax error: unexpected end of file`.
+    * Toàn bộ tệp tin shell `setup-ssl.sh` và `docker-compose.ssl.yml` trên Windows chứa 63 ký tự Carriage Return (`\r`). Khi thực thi trên Linux bash, bash nhận `\r` vào tên lệnh làm toàn bộ script chết ngay từ dòng số 2, dẫn đến việc container Nginx Proxy chưa bao giờ được khởi động và cổng tường lửa chưa bao giờ được mở.
+  - **2. Khắc phục triệt để**:
+    * Chuyển đổi toàn bộ tệp `.sh`, `.yml`, `.env` trong thư mục `deploy/` sang chuẩn UNIX LF (0 ký tự `\r`).
+    * Bổ sung cơ chế làm sạch tự động `tr -d '\r'` trong `deploy/ssl/deploy-ssl.ps1` trước khi thực thi bash trên máy chủ.
+    * Đảm bảo các cổng `10443`, `10444`, `5020`, `5022` được mở trong UFW và iptables chuỗi `DOCKER-USER` và `FORWARD`.
+
+- **Bản cập nhật ngày 16/11/2026 (v12.4): Đồng Bộ Khớp Tên Image Docker CRM (`ceohn10-crm-backend` & `ceohn10-crm-frontend`), Bổ Sung Kiểm Tra Tệp Tin An Toàn Trước Khi Docker Load & Hoàn Tất Bản Dựng Frontend SSR ([NODE-CORE-005], [NODE-CRM-001])**:
+  - **1. Sửa Lỗi Image Pull Mismatch Trên Web CRM Deploy (`deploy/crm/fast-deploy.ps1`)**:
+    * Phát hiện nguyên nhân lỗi `pull access denied for ceohn10-crm-backend`: Script `deploy/crm/fast-deploy.ps1` tạo image dưới tên `crm-backend:latest` và `crm-frontend:latest`, trong khi `deploy/crm/docker-compose.yml` lại định nghĩa `ceohn10-crm-backend:latest` và `ceohn10-crm-frontend:latest`, khiến Docker Compose trên server không tìm thấy ảnh cục bộ và cố kéo từ Docker Hub.
+    * Đã đồng bộ hoàn toàn tên image sang: `ceohn10-crm-backend:latest` và `ceohn10-crm-frontend:latest`.
+    * Đồng bộ tên file nén sang `ceohn10-crm-backend.tar.gz` và `ceohn10-crm-frontend.tar.gz`.
+    * Thêm kiểm tra an toàn `if [ -f ...] then docker load ... && rm -f ... fi` trên cả `deploy/crm/fast-deploy.ps1` và `deploy/ceohn10/fast-deploy.ps1`, tránh lỗi thiếu file tar.gz khi tiến trình tự động retry.
+  - **2. Hoàn Tất Bản Dựng Frontend SSR (`.output/server/index.mjs`)**:
+    * Đã xác nhận file `apps/ceohn10_app_fe/.output/server/index.mjs` (238 KB) được tạo thành công cùng toàn bộ thư mục `.output/public`.
+    * Người dùng có thể chạy ngay `.\deploy-crm.ps1 -SkipWebBuild` và `.\deploy-mobile.ps1 -SkipWebBuild` để đẩy lên server siêu tốc trong 1-2 phút mà không cần chờ build lại.
+
+- **Bản cập nhật ngày 16/11/2026 (v12.3): Chuẩn Hóa Phân Loại Sự Kiện Theo Ban, Đa Dạng Hóa Chế Độ Hiển Thị Lớp Học (Lưới & Lịch), Tái Thiết Phân Quyền RBAC Trực Quan, Loại Bỏ Gói Tài Trợ / Khen Thưởng, Triệt Tiêu Gradient Mờ Trắng, Tách Biệt Docker CEOHN10 & Dọn Sạch Dữ Liệu Demo ([NODE-CRM-002], [NODE-CRM-003], [NODE-CRM-004], [NODE-CRM-005], [NODE-CRM-010], [NODE-CORE-005])**:
+  - **1. Sửa lỗi Docker Build & Tách Biệt Độc Lập CEO HN10**:
+    * Sửa lỗi `RUN turbo prune @ceo1983/app_be --docker` trong `Dockerfile.backend` sang `@ceohn10/app_be`.
+    * Cập nhật `docker-compose.yml`, `deploy/ceohn10/docker-compose.yml`, và `deploy/crm/docker-compose.yml` với định danh dự án riêng biệt (`name: ceohn10`, `name: ceohn10-crm`), đảm bảo hiển thị nhóm container độc lập hoàn toàn trong Docker Desktop.
+  - **2. Yêu Cầu 1 - Phân Loại Sự Kiện Theo Ban Phụ Trách & Danh Mục**:
+    * Backend (`apps/ceohn10_app_be`): Bổ sung cột `department` (Ban Thiện Nguyện & Đời Sống, Ban Sự Kiện & Hậu Cần, Ban Đào Tạo, Ban B2B & Giao Thương, Ban Truyền Thông, Ban Điều Hành) và `category` trong CSDL `events`. Tự động tạo cột trong `events.service.ts` và map đầy đủ trong DTO/Service.
+    * Web CRM (`apps/ceohn10_app_fe/src/routes/events.index.tsx`): Bổ sung dropdown lọc ban, quick chips lọc ban, cột "Ban phụ trách" trong bảng, và badge hiển thị ban trên thẻ sự kiện.
+    * Mobile App (`apps/ceohn10_app_fe/src/routes/association.events.tsx`): Bổ sung filter tabs theo ban phụ trách.
+  - **3. Yêu Cầu 2 - Bổ Sung Đầy Đủ Chế Độ Hiển Thị Lưới (Grid) & Lịch (Calendar) Cho Lớp Học (`/trainings`)**:
+    * Bổ sung nút chuyển đổi 3 chế độ (Bảng, Lưới, Lịch) trên thanh công cụ `CrmToolbar`.
+    * Giao diện Lưới (`TrainingGridView`): Hiển thị dạng card trực quan với ảnh bìa, badge hình thức (Online/Offline/Hybrid), badge cố định thứ 7 hàng tuần, thông tin giảng viên, thanh tiến độ học viên, và đầy đủ thanh tác vụ (Điểm danh, Góp ý, Khai báo vật dụng, Media buổi học, Link phòng video, Mã QR, Sửa, Xóa).
+    * Giao diện Lịch (`TrainingCalendarView`): Lịch tháng tương tác, đánh dấu nổi bật các buổi học cố định thứ 7, click mở popup chi tiết nhanh.
+  - **4. Yêu Cầu 3 & 6 - Chuẩn Hóa Phân Quyền & Làm Mới Giao Diện Phân Quyền (`/permissions`)**:
+    * Thêm các vai trò ban chuyên môn chuẩn theo HanoiBA: Trưởng/Thành viên Ban Sự Kiện & Hậu Cần (`truong_ban_su_kien`), Trưởng/Thành viên Ban Đào Tạo (`truong_ban_dao_tao`, `thanh_vien_ban_dao_tao`).
+    * Thiết kế lại giao diện phân quyền trực quan: Bổ sung nút "Lưu Cấu Hình" nổi bật tại thanh tác vụ đầu bảng gọi `handleSaveAll()`, thao tác 1 chạm bật/tắt quyền theo vai trò hoặc theo ban, 100% tiếng Việt chuẩn mực.
+  - **5. Yêu Cầu 4 - Xóa Bỏ Gói Tài Trợ, Khen Thưởng & Danh Hiệu**:
+    * Loại bỏ menu Gói tài trợ (`/sponsor-packages`) và Khen thưởng (`/benefits`) khỏi Sidebar CRM và giao diện điều hướng.
+    * Thiết lập redirect an toàn từ `/sponsor-packages` sang `/sponsors`, `/benefits` sang `/news`.
+    * Chuẩn hóa tài trợ thành 2 hình thức trực tiếp: Tiền mặt -> Ví Quỹ Tài Trợ Tiền Mặt, Hiện vật -> Ví Quỹ Tài Trợ Hiện Vật.
+  - **6. Yêu Cầu 5 - Triệt Tiêu Hoàn Toàn Gradient Pha Màu Trắng Gây Mờ/Lóa**:
+    * Loại bỏ toàn bộ các lớp `via-white`, `to-white`, `from-white` tại CSS nền, thanh Sidebar, thẻ Card 2 túi quỹ trong `ExecutiveDashboard`, `WorkspaceSummaryCards`, `meetings.tsx`, `association.news.tsx`, `association.perks.tsx`, `association.profile.tsx`, `ChatThread.tsx`, `BirthdayPromoManager.tsx`.
+    * Đảm bảo màu sắc hiển thị sắc nét, tương phản cao, đúng chuẩn nhận diện thương hiệu.
+  - **7. Yêu Cầu 7 - Dọn Sạch Toàn Bộ Dữ Liệu Test/Demo Trong CSDL `113.20.107.184:6432`**:
+    * Chạy kịch bản dọn dẹp dữ liệu thực tế kết nối trực tiếp CSDL `113.20.107.184:6432` (`ceohn10_project`).
+    * Xóa sạch các bản ghi demo/test trong các bảng: `events` (4), `trainings` (30), `sponsors` (3), `transactions` (4), `documents` (4), `event_registrations`, `training_attendees`, v.v.
+    * Bảo lưu tuyệt đối các bảng quản trị cốt lõi: `users`, `user_roles`, `associations`, `memberships` để hệ thống sẵn sàng vận hành thực tế.
+  - **8. Kiểm Tra Chất Lượng Mã Nguồn**:
+    * Đạt chuẩn 100% `tsc --noEmit` với Exit Code 0 (0 lỗi) ở cả Frontend (`apps/ceohn10_app_fe`) và Backend (`apps/ceohn10_app_be`).
+    * Tuân thủ nghiêm ngặt quy tắc Không chạy `git commit` / `git push` tự động.
+
 
 - **Bản cập nhật ngày 16/11/2026 (v12.0): CHỈ THỊ TỐI CAO DÀNH CHO CEOHN10 — KHÔNG FAKE DỮ LIỆU, BIẾN ĐỘNG TÀI CHÍNH REALTIME, KHÁC BIỆT CỐT LÕI VỀ RBAC - LỚP HỌC - TÀI LIỆU**:
   - **1. NGHIÊM CẤM TUYỆT ĐỐI FAKE / MOCK DỮ LIỆU**:

@@ -62,7 +62,7 @@ try {
                 Write-Host "`n[0/5] Bo qua Build Frontend (Web) cuc bo (-SkipWebBuild)..." -ForegroundColor Yellow
             } else {
                 Write-Host "`n[0/5] Build Frontend Hiep Hoi (Web) cuc bo voi Scope = association_app..." -ForegroundColor Cyan
-                $env:NODE_OPTIONS = "--max-old-space-size=8192"
+                $env:NODE_OPTIONS = "--max-old-space-size=6144"
                 $env:VITE_APP_SCOPE = "association_app"
                 $env:VITE_APP_NAME = "CLB Doanh Nhan CEO HN10"
                 if ($EnableHttps) {
@@ -192,10 +192,10 @@ try {
 
     $remoteLoadCmd = ""
     if ($buildBE -and (Test-Path "ceohn10-backend.tar.gz")) {
-        $remoteLoadCmd += "docker load -i ceohn10-backend.tar.gz; rm -f ceohn10-backend.tar.gz; "
+        $remoteLoadCmd += "if [ -f ceohn10-backend.tar.gz ]; then docker load -i ceohn10-backend.tar.gz && rm -f ceohn10-backend.tar.gz; fi; "
     }
     if ($buildFE -and (Test-Path "ceohn10-frontend.tar.gz")) {
-        $remoteLoadCmd += "docker load -i ceohn10-frontend.tar.gz; rm -f ceohn10-frontend.tar.gz; "
+        $remoteLoadCmd += "if [ -f ceohn10-frontend.tar.gz ]; then docker load -i ceohn10-frontend.tar.gz && rm -f ceohn10-frontend.tar.gz; fi; "
     }
 
     $REMOTE_CMD = "cd $REMOTE_PATH; cp -f .env.production .env.association 2>/dev/null || true; touch .env.association; sed -i 's/\r//g' .env.association docker-compose.yml; docker network create ceohn10-network 2>/dev/null || true; $remoteLoadCmd docker compose -f docker-compose.yml stop 2>/dev/null || true; docker rm -f ceohn10-frontend-prod ceohn10-backend-prod 2>/dev/null || true; docker compose -f docker-compose.yml up -d --force-recreate"
@@ -215,14 +215,15 @@ try {
     Write-Host "=================================================================" -ForegroundColor Green
     Write-Host "TRIEN KHAI DOC LAP APP HIEP HOI CLB CEO HN10 [HUONG 2] THANH CONG!" -ForegroundColor Green
     if ($EnableHttps) {
-        Write-Host "Cong Frontend Hiep Hoi (HTTPS): https://${SERVER_IP}:5444 (hoac https://dev-app.14-225-217-232.sslip.io:5444/association)" -ForegroundColor Yellow
+        Write-Host "Cong Frontend Hiep Hoi (HTTPS): https://${SERVER_IP}:10444 (hoac https://dev-app.14-225-217-232.sslip.io:10444/association)" -ForegroundColor Yellow
         Write-Host "Cong Frontend Hiep Hoi (Cong 443): https://${SERVER_IP}/association" -ForegroundColor Yellow
-        Write-Host "Cong Frontend Hiep Hoi (HTTP) : http://${SERVER_IP}:5002" -ForegroundColor DarkGray
+        Write-Host "Cong Frontend Hiep Hoi (HTTP) : http://${SERVER_IP}:5020" -ForegroundColor DarkGray
     } else {
-        Write-Host "Cong Frontend Hiep Hoi : http://${SERVER_IP}:5002" -ForegroundColor Yellow
+        Write-Host "Cong Frontend Hiep Hoi : http://${SERVER_IP}:5020" -ForegroundColor Yellow
     }
-    Write-Host "Cong Backend Hiep Hoi  : http://${SERVER_IP}:5003" -ForegroundColor Yellow
+    Write-Host "Cong Backend Hiep Hoi  : http://${SERVER_IP}:5021" -ForegroundColor Yellow
     Write-Host "=================================================================" -ForegroundColor Green
+    $global:LASTEXITCODE = 0
 } finally {
     Pop-Location
 }

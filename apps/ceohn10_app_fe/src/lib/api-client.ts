@@ -130,6 +130,14 @@ export function resolveMediaUrl(url: string | null | undefined): string | null {
     return trimmed.replace(/^\/?uploads\//, "");
   }
 
+  // Tài liệu PDF/DOCX nội bộ thuộc Frontend (public/docs):
+  if (trimmed.includes("ceohn10.vn/docs/")) {
+    return trimmed.replace(/https?:\/\/ceohn10\.vn/, "");
+  }
+  if (trimmed.startsWith("/docs/") || trimmed.startsWith("docs/")) {
+    return trimmed.startsWith("/") ? trimmed : `/${trimmed}`;
+  }
+
   // Tệp tĩnh nội bộ thuộc Frontend (public folder): Không bao giờ chuyển đổi sang MinIO backend!
   if (
     trimmed.startsWith("/avatars/avatar-default") ||

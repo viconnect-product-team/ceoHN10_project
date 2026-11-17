@@ -123,14 +123,22 @@ export interface TaskItem {
 }
 
 export const TASK_DEPARTMENTS = [
-  'Ban Điều Hành',
-  'Ban Thư ký',
-  'Ban Sự kiện',
-  'Ban Truyền thông',
-  'Ban Xúc tiến',
-  'Ban Thành viên',
-  'Ban Tài chính',
-  'Ban Thiện nguyện',
+  'Ban Cán Sự Lớp',
+  'Ban Học Tập',
+  'Ban Sự Kiện – Hậu Cần',
+  'Ban Tài Chính – Tài Trợ',
+  'Ban Truyền Thông',
+  'Ban Công Nghệ',
+  'Ban Đối Ngoại & Giao Thương',
+  'Ban Đời Sống & Gắn Kết',
+  'Team 1',
+  'Team 2',
+  'Team 3',
+  'Team 4',
+  'Team 5',
+  'Team 6',
+  'Team 7',
+  'Team 8',
 ] as const;
 
 export class TaskFilterDto {

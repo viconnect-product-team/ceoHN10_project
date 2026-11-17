@@ -363,4 +363,28 @@ export class EventsController {
     const userId = req.user?.id || req.user?.sub || 'system';
     return this.eventsService.deleteEvent(userId, id);
   }
+
+  // ── EVENT FEEDBACK & RATINGS (UC-2) ──
+
+  @Get(':id/feedbacks')
+  async listEventFeedbacks(@Param('id') id: string) {
+    return this.eventsService.listEventFeedbacks(id);
+  }
+
+  @Post(':id/feedbacks')
+  async submitEventFeedback(@Param('id') id: string, @Body() body: any) {
+    return this.eventsService.submitEventFeedback(id, body);
+  }
+
+  // ── ATTACH MEDIA (PHOTO/VIDEO ARCHIVE TO DOCUMENTS) ──
+
+  @Post(':id/media')
+  @UseGuards(JwtAuthGuard)
+  async attachEventMedia(
+    @Param('id') id: string,
+    @Body('mediaUrl') mediaUrl: string,
+    @Body('description') description?: string,
+  ) {
+    return this.eventsService.attachEventMedia(id, mediaUrl, description);
+  }
 }
