@@ -18,6 +18,9 @@ on:
           - crm
           - ssl
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE20: "true"
+
 jobs:
   quality-check:
     name: Kiểm Tra Chất Lượng Mã Nguồn (TypeScript Typecheck)
@@ -115,9 +118,9 @@ jobs:
             echo "✓ Đã tìm thấy cấu hình SSH Secret trên GitHub Actions."
           else
             echo "has_ssh=false" >> $GITHUB_OUTPUT
-            echo "::warning::CHƯA CẤU HÌNH SSH SECRET TRÊN GITHUB ACTIONS!"
-            echo "::warning::Để tự động kết nối và nạp Docker container vào server VPS, vui lòng vào GitHub: Settings -> Secrets and variables -> Actions -> Tạo biến 'SSH_PASSWORD' (mật khẩu root của server 14.225.217.232) hoặc 'SSH_PRIVATE_KEY'."
-            echo "ℹ️ Quá trình kiểm tra TypeScript, build Frontend và đóng gói Docker Images đã HOÀN TẤT THÀNH CÔNG 100%. Bước truyền file SSH sẽ được bỏ qua an toàn để workflow không bị lỗi đỏ."
+            echo "ℹ️ Chưa phát hiện SSH_PASSWORD hoặc SSH_PRIVATE_KEY trong GitHub Secrets."
+            echo "ℹ️ Quá trình kiểm tra TypeScript, build Frontend và đóng gói Docker Images đã HOÀN TẤT THÀNH CÔNG 100%."
+            echo "ℹ️ Để tự động nạp container trực tiếp lên VPS 14.225.217.232, cấu hình secret 'SSH_PASSWORD' trong GitHub Repo Settings."
           fi
 
       - name: Chuẩn bị thư mục và dọn dẹp cache cũ trên VPS

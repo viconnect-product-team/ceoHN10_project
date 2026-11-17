@@ -762,7 +762,8 @@ export function Sidebar({
 
   const filteredNetwork = network.filter((it) => isAllowed(it.to));
 
-  const filteredActivities = activities.filter((it) => isAllowed(it.to));
+  // Nhóm Hoạt động (Công việc, Cuộc họp, Doanh nghiệp, Tài liệu) luôn hiển thị cho toàn bộ tài khoản
+  const filteredActivities = activities;
 
   const filteredSystem = system.filter((it) => isAllowed(it.to));
 
