@@ -1,6 +1,11 @@
 # ==============================================================================
 # BỘ LUẬT DỰ ÁN (PROJECT RULES & AI CODEGEN STANDARDS) - CEO HN10 PROJECT
 # Vai trò: Tech Lead | Định dạng: .cursorrules
+# 17/11/2026 (v12.12) — CHUYỂN ĐỔI TRIỆT ĐỂ MÀU TÍM & GRADIENT VỀ TONE XÁM DOANH NHÂN, SỬA LỖI MÀN HÌNH ĐEN MOBILE APP & SỬA LỖI BADGE CRM:
+#   * [LOẠI BỎ 100% MÀU TÍM & GRADIENT TÍM]: Loại bỏ hoàn toàn tone màu tím (#7C2D82, #FAF5FF, #F3E8FF, #581C87, #4A1C6E) và gradient tím-hồng trên toàn bộ hệ thống Web CRM và Mobile App. Chuyển đổi toàn bộ sang tone màu Xám Doanh Nhân & Bạc Sang Trọng (#334155, #475569, #64748B, #F8FAFC, #F1F5F9, #E2E8F0).
+#   * [SỬA LỖI GIAO DIỆN MOBILE APP BỊ ĐEN KỊT]: Sửa triệt để biến token CSS --color-Backgrounds-Primary từ #000000 thành #F8FAFC trong styles.css, thay đổi class bao bọc trang chủ Mobile App (/association) sang bg-slate-50, vô hiệu hóa gán nền đen tối trong theme engine.
+#   * [SỬA LỖI KHỐI TÍM ĐẶC QUÁNH BẢNG DỮ LIỆU CRM]: Bổ sung bộ lọc :not([class*="/"]) cho CSS injection trong ceohn10-color-theme.ts để ngăn selector ghi đè làm biến dạng các class có độ mờ (/10, /15, /20); chuẩn hóa badge TaskTableView.tsx và types.ts sang xám sáng thanh lịch bg-slate-100 text-slate-700 border-slate-200.
+#   * [TUÂN THỦ CSDL & GIT]: CSDL duy nhất 113.20.107.184:6432 (ceohn10_project). Tuyệt đối không git commit / git push. Exit code 0 cho tsc --noEmit ở cả FE và BE. Vite build hoàn tất thành công.
 # 16/11/2026 (v12.7) — HOÀN TẤT 11 LUỒNG NGHIỆP VỤ KICKOFF HN10, SỬA LỖI CRLF NGINX SSL PROXY PORT 10443 & KIỂM ĐỊNH 0 LỖI CODE:
 #   * [SỬA LỖI PORT 10443 ERR_CONNECTION_REFUSED]: setup-ssl.sh bị dính CRLF (\r) khiến bash trên Linux dừng ngay dòng 2. Đã xử lý tr -d '\r' trong deploy-ssl.ps1, kích hoạt Nginx reverse proxy port 10443 và 10444 thông suốt. Cổng đăng nhập chuẩn: https://14.225.217.232:10443/auth.
 #   * [11 LUỒNG NGHIỆP VỤ KICKOFF HN10]:

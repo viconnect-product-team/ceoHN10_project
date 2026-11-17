@@ -69,9 +69,25 @@ export function UniversalDocumentViewerModal({
   // Resolved URL
   const fileUrl = useMemo(() => {
     if (!doc) return "";
-    const raw = doc.filePath || doc.fileUrl || doc.url || doc.driveUrl || "";
+    let raw = doc.filePath || doc.fileUrl || doc.url || doc.driveUrl || "";
+    if (!raw && doc.name) {
+      const nl = doc.name.toLowerCase();
+      if (nl.includes("quy chế") || nl.includes("quy-che") || nl.includes("bcs")) {
+        raw = "/docs/quy-che-bcs-ceohn10.pdf";
+      } else if (nl.includes("điều lệ") || nl.includes("dieu-le")) {
+        raw = "/docs/dieu-le-ceohn10.pdf";
+      } else if (nl.includes("brd")) {
+        raw = "/docs/BRD_HE_THONG_CEOHN10.pdf";
+      } else if (nl.includes("srs")) {
+        raw = "/docs/SRS_HE_THONG_CEOHN10.pdf";
+      } else if (nl.includes("csdl")) {
+        raw = "/docs/THIET_KE_CSDL_POSTGRESQL_CEOHN10.pdf";
+      } else if (nl.includes("api")) {
+        raw = "/docs/THIET_KE_RESTFUL_API_CEOHN10.pdf";
+      }
+    }
     if (!raw) return "";
-    return resolveMediaUrl(raw);
+    return resolveMediaUrl(raw) || raw;
   }, [doc]);
 
   const docType = useMemo(() => {

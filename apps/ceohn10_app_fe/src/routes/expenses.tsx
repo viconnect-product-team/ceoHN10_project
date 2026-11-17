@@ -91,7 +91,7 @@ export const Route = createFileRoute("/expenses")({
   ssr: false,
   loader: async () => {
     try {
-      const data = await fetchNestApi<Transaction[]>("/admin/transactions?type=expense");
+      const data = await fetchNestApi<Transaction[]>("/admin/transactions");
       return Array.isArray(data) ? data : [];
     } catch {
       return [];
@@ -117,7 +117,7 @@ function ExpensesPage() {
 
   const fetchLiveExpenses = async () => {
     try {
-      const res = await fetchNestApi<Transaction[]>("/admin/transactions?type=expense");
+      const res = await fetchNestApi<Transaction[]>("/admin/transactions");
       if (Array.isArray(res)) {
         setTransactionsList(res);
       }
@@ -369,8 +369,7 @@ function ExpensesPage() {
   }, [TRANSACTIONS]);
 
   const totalIncomeFund = useMemo(() => {
-    const sum = incomeList.reduce((s, tx) => s + (tx.amount || 0), 0);
-    return sum > 0 ? sum : 1585000000;
+    return incomeList.reduce((s, tx) => s + (Number(tx.amount) || 0), 0);
   }, [incomeList]);
 
   // Accurate Calculation Formula:

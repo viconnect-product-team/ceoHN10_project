@@ -45,13 +45,13 @@ export function generateInvoiceVoucherHtml(tx: Transaction): string {
       padding: 40px; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08); border: 1px solid #e2e8f0;
     }
     .header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #cbd5e1; padding-bottom: 20px; margin-bottom: 24px; }
-    .brand { font-size: 20px; font-weight: 800; color: #7C2D82; letter-spacing: -0.5px; }
+    .brand { font-size: 20px; font-weight: 800; color: #334155; letter-spacing: -0.5px; }
     .sub-brand { font-size: 12px; color: #64748b; margin-top: 4px; }
     .voucher-meta { text-align: right; }
     .voucher-no { font-size: 16px; font-weight: 700; color: ${isThu ? "#059669" : "#dc2626"}; font-family: monospace; }
     .voucher-date { font-size: 12px; color: #64748b; margin-top: 4px; }
     .title { text-align: center; font-size: 22px; font-weight: 800; color: #0f172a; margin: 20px 0 25px; letter-spacing: 0.5px; text-transform: uppercase; }
-    .fund-badge { display: inline-block; padding: 4px 12px; border-radius: 9999px; background: #FAF5FF; color: #7C2D82; font-size: 12px; font-weight: 700; border: 1px solid #E9D5FF; margin-bottom: 15px; }
+    .fund-badge { display: inline-block; padding: 4px 12px; border-radius: 9999px; background: #F1F5F9; color: #334155; font-size: 12px; font-weight: 700; border: 1px solid #E2E8F0; margin-bottom: 15px; }
     .detail-table { width: 100%; border-collapse: collapse; margin-bottom: 24px; }
     .detail-table td { padding: 10px 12px; border-bottom: 1px solid #f1f5f9; font-size: 13.5px; }
     .detail-table td.label { width: 34%; font-weight: 600; color: #475569; background: #f8fafc; }
@@ -90,7 +90,7 @@ export function generateInvoiceVoucherHtml(tx: Transaction): string {
     <table class="detail-table">
       <tr>
         <td class="label">Nguồn xuất chi / Túi quỹ:</td>
-        <td class="val"><strong style="color: #7C2D82;">${fundLabel}</strong></td>
+        <td class="val"><strong style="color: #334155;">${fundLabel}</strong></td>
       </tr>
       <tr>
         <td class="label">Ban phụ trách / Đề xuất:</td>
@@ -169,7 +169,7 @@ export function generateInvoiceVoucherHtml(tx: Transaction): string {
     </div>
   </div>
   <div class="no-print" style="text-align: center; margin-top: 20px;">
-    <button onclick="window.print()" style="padding: 10px 24px; background: #7C2D82; color: #fff; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 13px;">In Báo Cáo hoặc Lưu Thành File PDF</button>
+    <button onclick="window.print()" style="padding: 10px 24px; background: #334155; color: #fff; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 13px;">In Báo Cáo hoặc Lưu Thành File PDF</button>
   </div>
 </body>
 </html>`;

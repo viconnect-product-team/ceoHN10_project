@@ -39,66 +39,66 @@ export interface Ceo1983ColorTheme {
 export const CEOHN10_COLOR_THEMES: Ceo1983ColorTheme[] = [
   {
     id: "classic-navy",
-    name: "Tím Hoàng Gia & Hồng Năng Động",
-    subtitle: "Nhận diện thương hiệu cốt lõi CEO HN10",
-    threeColors: ["#7C2D82", "#D61F69", "#000000"],
-    primaryColor: "#7C2D82",
-    primaryDeep: "#4A1C6E",
-    accentColor: "#D61F69",
-    accentLight: "#F43F5E",
-    lightBg: "#FAF5FF",
-    lightBorder: "#E9D5FF",
-    badgeBg: "bg-[#7C2D82]/15 text-[#7C2D82] dark:text-[#FFFFFF] border-[#7C2D82]/30",
-    gradientPrimary: "linear-gradient(135deg, #7C2D82 0%, #D61F69 100%)",
-    gradientCard: "linear-gradient(135deg, #7C2D82 0%, #D61F69 100%)",
-    darkSurface: "#000000",
-    darkSurface2: "#18181B",
-    darkBorder: "#18181B",
-    darkBorderSoft: "#18181B",
-    iconColor: "#7C2D82",
-    swatches: ["#7C2D82", "#D61F69", "#000000"],
+    name: "Xám Doanh Nhân & Bạc Sang Trọng",
+    subtitle: "Nhận diện xám chuẩn mực CEO HN10",
+    threeColors: ["#475569", "#64748B", "#F8FAFC"],
+    primaryColor: "#334155",
+    primaryDeep: "#1E293B",
+    accentColor: "#64748B",
+    accentLight: "#94A3B8",
+    lightBg: "#F8FAFC",
+    lightBorder: "#E2E8F0",
+    badgeBg: "bg-slate-100 text-slate-800 border-slate-200",
+    gradientPrimary: "linear-gradient(135deg, #334155 0%, #64748B 100%)",
+    gradientCard: "linear-gradient(135deg, #334155 0%, #475569 100%)",
+    darkSurface: "#FFFFFF",
+    darkSurface2: "#F8FAFC",
+    darkBorder: "#E2E8F0",
+    darkBorderSoft: "#F1F5F9",
+    iconColor: "#334155",
+    swatches: ["#334155", "#475569", "#94A3B8"],
   },
   {
     id: "dynamic-orange",
-    name: "Tím Hồng Sang Trọng",
-    subtitle: "Biến thể tinh hoa quản trị số",
-    threeColors: ["#7C2D82", "#D61F69", "#000000"],
-    primaryColor: "#7C2D82",
-    primaryDeep: "#4A1C6E",
-    accentColor: "#D61F69",
-    accentLight: "#F43F5E",
-    lightBg: "#FAF5FF",
-    lightBorder: "#E9D5FF",
-    badgeBg: "bg-[#D61F69]/15 text-[#D61F69] dark:text-[#FFFFFF] border-[#D61F69]/40",
-    gradientPrimary: "linear-gradient(135deg, #7C2D82 0%, #D61F69 100%)",
-    gradientCard: "linear-gradient(135deg, #7C2D82 0%, #D61F69 100%)",
-    darkSurface: "#000000",
-    darkSurface2: "#18181B",
-    darkBorder: "#18181B",
-    darkBorderSoft: "#18181B",
-    iconColor: "#7C2D82",
-    swatches: ["#7C2D82", "#D61F69", "#000000"],
+    name: "Xám Than Chì & Khói Trầm",
+    subtitle: "Biến thể xám than chì tối giản",
+    threeColors: ["#1E293B", "#334155", "#F8FAFC"],
+    primaryColor: "#1E293B",
+    primaryDeep: "#0F172A",
+    accentColor: "#475569",
+    accentLight: "#64748B",
+    lightBg: "#F8FAFC",
+    lightBorder: "#CBD5E1",
+    badgeBg: "bg-slate-100 text-slate-800 border-slate-300",
+    gradientPrimary: "linear-gradient(135deg, #1E293B 0%, #475569 100%)",
+    gradientCard: "linear-gradient(135deg, #1E293B 0%, #334155 100%)",
+    darkSurface: "#FFFFFF",
+    darkSurface2: "#F8FAFC",
+    darkBorder: "#E2E8F0",
+    darkBorderSoft: "#F1F5F9",
+    iconColor: "#1E293B",
+    swatches: ["#1E293B", "#334155", "#64748B"],
   },
   {
     id: "crimson-red",
-    name: "Tím Đen Huyền Bí",
-    subtitle: "Dạ tiệc doanh nhân & Vinh danh",
-    threeColors: ["#7C2D82", "#D61F69", "#000000"],
-    primaryColor: "#7C2D82",
-    primaryDeep: "#4A1C6E",
-    accentColor: "#D61F69",
-    accentLight: "#F43F5E",
-    lightBg: "#FAF5FF",
-    lightBorder: "#E9D5FF",
-    badgeBg: "bg-[#7C2D82]/15 text-[#7C2D82] dark:text-[#FFFFFF] border-[#7C2D82]/40",
-    gradientPrimary: "linear-gradient(135deg, #7C2D82 0%, #D61F69 100%)",
-    gradientCard: "linear-gradient(135deg, #7C2D82 0%, #D61F69 100%)",
-    darkSurface: "#000000",
-    darkSurface2: "#18181B",
-    darkBorder: "#18181B",
-    darkBorderSoft: "#18181B",
-    iconColor: "#7C2D82",
-    swatches: ["#7C2D82", "#D61F69", "#000000"],
+    name: "Xám Titan & Ánh Bạc",
+    subtitle: "Tone màu titan công nghệ sắc sảo",
+    threeColors: ["#475569", "#94A3B8", "#F8FAFC"],
+    primaryColor: "#475569",
+    primaryDeep: "#334155",
+    accentColor: "#64748B",
+    accentLight: "#94A3B8",
+    lightBg: "#F8FAFC",
+    lightBorder: "#E2E8F0",
+    badgeBg: "bg-slate-100 text-slate-700 border-slate-200",
+    gradientPrimary: "linear-gradient(135deg, #475569 0%, #94A3B8 100%)",
+    gradientCard: "linear-gradient(135deg, #475569 0%, #64748B 100%)",
+    darkSurface: "#FFFFFF",
+    darkSurface2: "#F8FAFC",
+    darkBorder: "#E2E8F0",
+    darkBorderSoft: "#F1F5F9",
+    iconColor: "#475569",
+    swatches: ["#475569", "#64748B", "#CBD5E1"],
   },
 ];
 
@@ -197,7 +197,7 @@ function injectGlobalThemeOverride(theme: Ceo1983ColorTheme): void {
       --vba-theme-light-border: ${lightBorder} !important;
     }
 
-    /* Đổi biến CSS đồng bộ khi ở Dark Mode */
+    /* Đổi biến CSS đồng bộ khi ở Dark Mode - Luôn duy trì nền sáng thanh lịch */
     html.dark,
     .dark {
       --primary: ${primary} !important;
@@ -205,79 +205,87 @@ function injectGlobalThemeOverride(theme: Ceo1983ColorTheme): void {
       --ring: ${accent} !important;
       --accent: ${accent} !important;
       --accent-foreground: #FFFFFF !important;
-      --background: #000000 !important;
-      --foreground: #FFFFFF !important;
-      --card: ${darkSurface} !important;
-      --card-foreground: #FFFFFF !important;
-      --popover: ${darkSurface} !important;
-      --popover-foreground: #FFFFFF !important;
-      --border: ${darkBorder} !important;
-      --input: ${darkBorderSoft} !important;
-      --sidebar: #000000 !important;
-      --sidebar-foreground: #FFFFFF !important;
-      --vba-border: ${darkBorder} !important;
-      --vba-surface: ${darkSurface} !important;
-      --vba-surface-2: ${darkSurface2} !important;
+      --background: #F8FAFC !important;
+      --foreground: #0F172A !important;
+      --card: #FFFFFF !important;
+      --card-foreground: #0F172A !important;
+      --popover: #FFFFFF !important;
+      --popover-foreground: #0F172A !important;
+      --border: ${lightBorder} !important;
+      --input: ${lightBorder} !important;
+      --sidebar: #FFFFFF !important;
+      --sidebar-foreground: #0F172A !important;
+      --vba-border: ${lightBorder} !important;
+      --vba-surface: #FFFFFF !important;
+      --vba-surface-2: #F8FAFC !important;
       --theme-primary-gradient: ${gradientPrimary} !important;
     }
 
-    /* 1. Recolor All Primary Buttons & Interactive Badges across all 3 brand colors */
-    [class*="bg-[#003B95]" i],
-    [class*="bg-[#002B66]" i],
-    [class*="bg-[#002d73]" i],
-    [class*="bg-[#0052CC]" i],
-    [class*="bg-[#1E3A8A]" i],
-    [class*="bg-[#1F3864]" i],
-    [class*="bg-[#EA580C]" i],
-    [class*="bg-[#C2410C]" i],
-    [class*="bg-[#9A3412]" i],
-    [class*="bg-[#F97316]" i],
-    [class*="bg-[#DC2626]" i],
-    [class*="bg-[#B91C1C]" i],
-    [class*="bg-[#7F1D1D]" i],
-    [class*="bg-[#EF4444]" i],
+    /* 1. Recolor All Primary Solid Buttons & Badges (KHÔNG đè lên các class có độ mờ opacity /10, /20) */
+    [class*="bg-[#003B95]"]:not([class*="/"]):not([class*="group-hover"]):not([class*="hover"]),
+    [class*="bg-[#002B66]"]:not([class*="/"]):not([class*="group-hover"]):not([class*="hover"]),
+    [class*="bg-[#002d73]"]:not([class*="/"]):not([class*="group-hover"]):not([class*="hover"]),
+    [class*="bg-[#0052CC]"]:not([class*="/"]):not([class*="group-hover"]):not([class*="hover"]),
+    [class*="bg-[#1E3A8A]"]:not([class*="/"]):not([class*="group-hover"]):not([class*="hover"]),
+    [class*="bg-[#1F3864]"]:not([class*="/"]):not([class*="group-hover"]):not([class*="hover"]),
     .bg-primary,
     .vba-btn-primary,
     .vba-active-tab {
       background-color: ${primary} !important;
       background-image: none !important;
-    }
-
-    /* Chỉ ép text trắng trên các nút bấm hoặc thẻ pill thực sự có nền primary */
-    button[class*="bg-[#003B95]" i],
-    button[class*="bg-[#002B66]" i],
-    button[class*="bg-[#002d73]" i],
-    button[class*="bg-[#EA580C]" i],
-    button[class*="bg-[#DC2626]" i],
-    button.bg-primary,
-    a.bg-primary,
-    .vba-btn-primary {
       color: #FFFFFF !important;
     }
 
-    /* 2. Recolor All Primary Texts across all 3 brand colors */
-    [class*="text-[#003B95]" i],
-    [class*="text-[#002B66]" i],
-    [class*="text-[#002d73]" i],
-    [class*="text-[#0052CC]" i],
-    [class*="text-[#1E3A8A]" i],
-    [class*="text-[#1F3864]" i],
-    [class*="text-[#EA580C]" i],
-    [class*="text-[#C2410C]" i],
-    [class*="text-[#9A3412]" i],
-    [class*="text-[#F97316]" i],
-    [class*="text-[#DC2626]" i],
-    [class*="text-[#B91C1C]" i],
-    [class*="text-[#7F1D1D]" i],
-    [class*="text-[#EF4444]" i],
+    /* Các badge mờ (opacity /10, /15, /20) chuyển về xám sáng thanh lịch chuẩn bảng dữ liệu */
+    [class*="bg-[#003B95]/"],
+    [class*="bg-[#1E3A8A]/"],
+    [class*="bg-[#7C2D82]/"] {
+      background-color: #F1F5F9 !important;
+      color: #334155 !important;
+      border-color: #E2E8F0 !important;
+    }
+
+    /* 2. Recolor All Primary Texts across all brand colors */
+    [class*="text-[#003B95]"]:not([class*="/"]),
+    [class*="text-[#002B66]"]:not([class*="/"]),
+    [class*="text-[#002d73]"]:not([class*="/"]),
+    [class*="text-[#0052CC]"]:not([class*="/"]),
+    [class*="text-[#1E3A8A]"]:not([class*="/"]),
+    [class*="text-[#1F3864]"]:not([class*="/"]),
     .text-primary {
       color: ${primary} !important;
     }
 
-    /* 3. Recolor All Borders across all 3 brand colors */
-    [class*="border-[#003B95]" i],
-    [class*="border-[#002B66]" i],
-    [class*="border-[#002d73]" i],
+    /* 3. Recolor All Borders */
+    [class*="border-[#003B95]"]:not([class*="/"]),
+    [class*="border-[#002B66]"]:not([class*="/"]),
+    [class*="border-[#1E3A8A]"]:not([class*="/"]),
+    .border-primary {
+      border-color: ${lightBorder} !important;
+    }
+
+    /* 4. Recolor Rings & Outlines */
+    [class*="ring-[#003B95]"],
+    [class*="outline-[#003B95]"],
+    .ring-primary {
+      --tw-ring-color: ${accent} !important;
+    }
+
+    /* 5. Chuyển triệt để mọi class màu tím / violet về màu xám trung tính */
+    [class*="bg-purple-"],
+    [class*="bg-violet-"] {
+      background-color: #F1F5F9 !important;
+      color: #334155 !important;
+      border-color: #CBD5E1 !important;
+    }
+    [class*="text-purple-"],
+    [class*="text-violet-"] {
+      color: #475569 !important;
+    }
+    [class*="border-purple-"],
+    [class*="border-violet-"] {
+      border-color: #CBD5E1 !important;
+    }
     [class*="border-[#0052CC]" i],
     [class*="border-[#1E3A8A]" i],
     [class*="border-[#1F3864]" i],
@@ -385,14 +393,13 @@ export function applyCeo1983ColorTheme(themeId: Ceo1983ColorThemeId): void {
     document.body.dataset.appColorTheme = theme.id;
   }
 
-  const isDark = root.classList.contains("dark") || (typeof localStorage !== "undefined" && localStorage.getItem("theme") === "dark");
-
-  const bg = isDark ? theme.threeColors[1] : "#FFFFFF";
-  const bg2 = isDark ? theme.darkSurface : "#F8FAFC";
-  const surface = isDark ? theme.darkSurface : "#FFFFFF";
-  const surface2 = isDark ? theme.darkSurface2 : "#F8FAFC";
-  const textColor = isDark ? "#FFFFFF" : "#0F172A";
-  const textMuted = isDark ? "#94A3B8" : "#475569";
+  // Đảm bảo toàn bộ hệ thống luôn giữ nền sáng thanh lịch (không bị đen nền)
+  const bg = "#FFFFFF";
+  const bg2 = "#F8FAFC";
+  const surface = "#FFFFFF";
+  const surface2 = "#F8FAFC";
+  const textColor = "#0F172A";
+  const textMuted = "#475569";
 
   // Áp dụng biến CSS thời gian thực
   root.style.setProperty("--vba-bg", bg);
@@ -405,8 +412,8 @@ export function applyCeo1983ColorTheme(themeId: Ceo1983ColorThemeId): void {
   root.style.setProperty("--vba-navy-deep", theme.primaryDeep);
   root.style.setProperty("--vba-gold", theme.accentColor);
   root.style.setProperty("--vba-gold-2", theme.accentLight);
-  root.style.setProperty("--vba-border", isDark ? theme.darkBorder : theme.lightBorder);
-  root.style.setProperty("--vba-border-soft", isDark ? theme.darkBorderSoft : theme.lightBorder);
+  root.style.setProperty("--vba-border", theme.lightBorder);
+  root.style.setProperty("--vba-border-soft", theme.lightBorder);
   root.style.setProperty("--theme-icon-color", theme.iconColor);
   root.style.setProperty("--theme-primary-gradient", theme.gradientPrimary);
   root.style.setProperty("--theme-card-gradient", theme.gradientCard);

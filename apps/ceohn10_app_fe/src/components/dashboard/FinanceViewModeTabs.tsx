@@ -47,7 +47,7 @@ export function FinanceViewModeTabs({
             onClick={() => onChange(tab.id)}
             className={`flex-1 py-2 px-3.5 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 cursor-pointer ${
               active
-                ? "bg-[#003B95] text-white shadow-sm ring-1 ring-blue-900"
+                ? "bg-slate-900 dark:bg-slate-800 text-white shadow-sm ring-1 ring-slate-800"
                 : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white/60 dark:hover:bg-slate-800/60"
             }`}
           >

@@ -1327,7 +1327,7 @@ function Home() {
 
   return (
     <div
-      className="w-full max-w-full min-h-screen relative bg-Backgrounds-Primary dark:bg-slate-950 flex flex-col justify-start items-start pb-6 transition-colors duration-300"
+      className="w-full max-w-full min-h-screen relative bg-slate-50 dark:bg-slate-50 flex flex-col justify-start items-start pb-6 transition-colors duration-300"
       style={{
         backgroundImage: "var(--festival-bg-image, none)",
         backgroundSize: "cover",

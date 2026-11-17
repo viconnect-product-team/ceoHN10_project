@@ -23,6 +23,8 @@ import {
   UserCheck,
   Send,
   Users,
+  ShieldCheck,
+  Building2,
   Sparkles,
 } from 'lucide-react';
 import { toast } from 'sonner';
@@ -62,6 +64,7 @@ interface TaskSearchParams {
 }
 
 export const Route = createFileRoute('/tasks')({
+  ssr: false,
   validateSearch: (search: Record<string, unknown>): TaskSearchParams => {
     const validViews = ['table', 'kanban', 'calendar', 'timeline', 'tree', 'history'];
     return {
@@ -412,10 +415,10 @@ function TasksPage() {
 
         {/* ── PHÂN HỆ CÔNG VIỆC ĐƯỢC CHỌN TỪ MENU SIDEBAR ── */}
         {currentScope !== 'all' && (
-          <div className="flex items-center justify-between px-3.5 py-2 rounded-xl bg-blue-50/70 dark:bg-blue-950/30 border border-blue-200/80 dark:border-blue-900/50 text-xs">
+          <div className="flex items-center justify-between px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-850 border border-slate-200/80 dark:border-slate-700/50 text-xs">
             <div className="flex items-center gap-2">
               <span className="font-semibold text-slate-600 dark:text-slate-400">Mục đang lọc từ Sidebar:</span>
-              <span className="font-bold text-[#003B95] dark:text-blue-300">
+              <span className="font-bold text-slate-800 dark:text-slate-200">
                 {currentScope === 'my_tasks'
                   ? 'Công việc của tôi'
                   : currentScope === 'assigned_by_me'
@@ -426,7 +429,7 @@ function TasksPage() {
                         ? 'Cần đôn đốc / Quá hạn'
                         : currentScope}
               </span>
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-[#003B95] text-white">
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-slate-700 text-white">
                 {filteredTasks.length} việc
               </span>
             </div>
@@ -441,7 +444,7 @@ function TasksPage() {
                   },
                 });
               }}
-              className="text-[11px] font-bold text-[#003B95] dark:text-blue-400 hover:underline cursor-pointer"
+              className="text-[11px] font-bold text-slate-700 dark:text-slate-300 hover:underline cursor-pointer"
             >
               Xem tất cả công việc
             </button>
@@ -453,7 +456,7 @@ function TasksPage() {
           {/* Card 1: Tổng công việc */}
           <div className="h-32 p-4 bg-card dark:bg-slate-900 rounded-[20px] border border-border flex flex-col justify-start items-start gap-2.5 overflow-hidden shadow-xs">
             <div className="h-8 flex items-center gap-2">
-              <img src="/icons/ceohn10_icon_2/users-round-1.svg" className="h-4 w-4" alt="tasks" onError={(e) => { (e.currentTarget as HTMLElement).style.display = 'none'; }} />
+              <Users className="h-4 w-4 text-blue-600 dark:text-blue-400" />
               <div className="text-blue-600 dark:text-blue-400 text-xs font-semibold font-['Inter']">TỔNG CÔNG VIỆC</div>
             </div>
             <div className="text-slate-900 dark:text-slate-100 text-2xl font-bold font-['Inter'] leading-7">
@@ -467,7 +470,7 @@ function TasksPage() {
           {/* Card 2: Đang thực hiện & Duyệt */}
           <div className="h-32 p-4 bg-card dark:bg-slate-900 rounded-[20px] border border-border flex flex-col justify-start items-start gap-2.5 overflow-hidden shadow-xs">
             <div className="h-8 flex items-center gap-2">
-              <img src="/icons/ceohn10_icon_2/shield-check.svg" className="h-4 w-4" alt="progress" onError={(e) => { (e.currentTarget as HTMLElement).style.display = 'none'; }} />
+              <ShieldCheck className="h-4 w-4 text-indigo-500 dark:text-indigo-400" />
               <div className="text-indigo-500 dark:text-indigo-400 text-xs font-semibold font-['Inter']">ĐANG THỰC HIỆN</div>
             </div>
             <div className="text-slate-900 dark:text-slate-100 text-2xl font-bold font-['Inter'] leading-7">
@@ -481,7 +484,7 @@ function TasksPage() {
           {/* Card 3: Cần đôn đốc / Quá hạn */}
           <div className="h-32 p-4 bg-card dark:bg-slate-900 rounded-[20px] border border-border flex flex-col justify-start items-start gap-2.5 overflow-hidden shadow-xs">
             <div className="h-8 flex items-center gap-2">
-              <img src="/icons/ceohn10_icon_2/building-2-1.svg" className="h-4 w-4" alt="overdue" onError={(e) => { (e.currentTarget as HTMLElement).style.display = 'none'; }} />
+              <Building2 className="h-4 w-4 text-orange-500 dark:text-orange-400" />
               <div className="text-orange-500 dark:text-orange-400 text-xs font-semibold font-['Inter']">CẦN ĐÔN ĐỐC / QUÁ HẠN</div>
             </div>
             <div className="text-slate-900 dark:text-slate-100 text-2xl font-bold font-['Inter'] leading-7">
@@ -495,7 +498,7 @@ function TasksPage() {
           {/* Card 4: Đã hoàn thành */}
           <div className="h-32 p-4 bg-card dark:bg-slate-900 rounded-[20px] border border-border flex flex-col justify-start items-start gap-2.5 overflow-hidden shadow-xs">
             <div className="h-8 flex items-center gap-2">
-              <img src="/icons/ceohn10_icon_2/circle-check.svg" className="h-4 w-4" alt="done" onError={(e) => { (e.currentTarget as HTMLElement).style.display = 'none'; }} />
+              <CheckCircle2 className="h-4 w-4 text-emerald-500 dark:text-emerald-400" />
               <div className="text-emerald-500 dark:text-emerald-400 text-xs font-semibold font-['Inter']">ĐÃ HOÀN THÀNH</div>
             </div>
             <div className="text-slate-900 dark:text-slate-100 text-2xl font-bold font-['Inter'] leading-7">
@@ -563,7 +566,7 @@ function TasksPage() {
               type="button"
               onClick={() => setViewMode('table')}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition ${viewMode === 'table'
-                  ? 'bg-white dark:bg-slate-700 text-[#003B95] dark:text-blue-300 shadow-xs font-bold'
+                  ? 'bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-200 shadow-xs font-bold'
                   : 'text-slate-500 hover:text-slate-800 dark:text-slate-400'
                 }`}
               title="Dạng bảng chi tiết"
@@ -576,7 +579,7 @@ function TasksPage() {
               type="button"
               onClick={() => setViewMode('kanban')}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition ${viewMode === 'kanban'
-                  ? 'bg-white dark:bg-slate-700 text-[#003B95] dark:text-blue-300 shadow-xs font-bold'
+                  ? 'bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-200 shadow-xs font-bold'
                   : 'text-slate-500 hover:text-slate-800 dark:text-slate-400'
                 }`}
               title="Dạng lưới thẻ Kanban"
@@ -589,7 +592,7 @@ function TasksPage() {
               type="button"
               onClick={() => setViewMode('calendar')}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition ${viewMode === 'calendar'
-                  ? 'bg-white dark:bg-slate-700 text-[#003B95] dark:text-blue-300 shadow-xs font-bold'
+                  ? 'bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-200 shadow-xs font-bold'
                   : 'text-slate-500 hover:text-slate-800 dark:text-slate-400'
                 }`}
               title="Dạng lịch tháng & họp"
@@ -602,7 +605,7 @@ function TasksPage() {
               type="button"
               onClick={() => setViewMode('timeline')}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer ${viewMode === 'timeline'
-                  ? 'bg-white dark:bg-slate-700 text-[#003B95] dark:text-blue-300 shadow-xs font-bold ring-1 ring-slate-200 dark:ring-slate-600'
+                  ? 'bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-200 shadow-xs font-bold ring-1 ring-slate-200 dark:ring-slate-600'
                   : 'text-slate-500 hover:text-slate-800 dark:text-slate-400'
                 }`}
               title="Dạng biểu đồ thống kê & phân tích tiến độ"
@@ -615,7 +618,7 @@ function TasksPage() {
               type="button"
               onClick={() => setViewMode('tree')}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition ${viewMode === 'tree'
-                  ? 'bg-white dark:bg-slate-700 text-[#003B95] dark:text-blue-300 shadow-xs font-bold'
+                  ? 'bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-200 shadow-xs font-bold'
                   : 'text-slate-500 hover:text-slate-800 dark:text-slate-400'
                 }`}
               title="Dạng cây phân cấp ban chuyên môn"

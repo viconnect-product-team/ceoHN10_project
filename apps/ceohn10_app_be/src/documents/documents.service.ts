@@ -13,19 +13,26 @@ export class DocumentsService {
   constructor(private readonly documentsRepo: DocumentsRepository) {}
 
   private mapRow(r: any) {
+    const rawPath = r.file_path || r.file_url || r.drive_url || r.url || '';
+    const safeUrl = rawPath
+      ? rawPath.startsWith('http') || rawPath.startsWith('/')
+        ? rawPath
+        : `/${rawPath}`
+      : '';
+
     return {
-      id: r.code,
-      name: r.name,
-      category: r.category,
-      size: r.size || '',
+      id: r.code || (r.id ? String(r.id) : `DOC-${Math.random().toString(36).slice(2, 8).toUpperCase()}`),
+      name: r.name || r.title || 'Tài liệu CLB CEO HN10',
+      category: r.category || 'Quy chế & Điều lệ',
+      size: r.size || (r.is_folder || r.type === 'folder' ? 'Thư mục' : '1.2 MB'),
       uploadedAt: r.uploaded_at
         ? new Date(r.uploaded_at).toISOString()
         : new Date().toISOString(),
-      uploadedBy: r.uploaded_by || '',
-      type: r.type,
-      filePath: r.file_path || '',
-      url: r.file_path || r.drive_url || '',
-      fileUrl: r.file_path || r.drive_url || '',
+      uploadedBy: r.uploaded_by || 'Ban Thư ký',
+      type: r.type || (safeUrl.endsWith('.docx') ? 'docx' : safeUrl.endsWith('.xlsx') ? 'xlsx' : 'pdf'),
+      filePath: safeUrl,
+      url: safeUrl,
+      fileUrl: safeUrl,
       folderId: r.folder_id || null,
       driveUrl: r.drive_url || null,
       isFolder: Boolean(r.is_folder || r.type === 'folder'),

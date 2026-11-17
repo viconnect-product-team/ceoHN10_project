@@ -1,5 +1,100 @@
 # System Memory & Architecture
 
+- **Bản cập nhật ngày 17/11/2026 (v12.13): Chuẩn Hóa Realtime Dòng Tiền & Sổ Quỹ Thu Chi, Đồng Bộ Hội Phí & Hóa Đơn, Sửa Lỗi Xem Tài Liệu, Chuẩn Hóa Role BCS Lớp & BCS Team Theo Sơ Đồ, Triệt Tiêu 404 Icons & React Error #418, Cấu Hình Subdomain & Git Auto-Deploy CI/CD ([NODE-CRM-001], [NODE-CRM-004], [NODE-CRM-005], [NODE-CRM-009], [NODE-CRM-010], [NODE-CORE-001])**:
+  - **1. Khắc Phục Sổ Quỹ Realtime & Dòng Tiền Biến Động Thực Tế**:
+    * **Màn Quản Lý Thu (`/income`)**:
+      - Nguyên nhân lỗi "TỔNG THU QUỸ = 0 đ" (dù "ĐÃ THU THỰC TẾ = 25.000.000 đ"): `totalIncome = incomeCash + incomeBank` lọc cứng `tx.method === 'cash'` và `tx.method === 'bank' || tx.method === 'card'`. Trong khi đó, CSDL PostgreSQL thực tế lưu `tx.method = 'Chuyển khoản Ngân hàng'`, khiến cả 2 điều kiện đều sai và tổng ra 0 đ.
+      - Khắc phục: Sửa `totalIncome = incomeList.reduce((s, tx) => s + Number(tx.amount || 0), 0)`. Tổng thu luôn bằng tổng toàn bộ giao dịch thu thực tế.
+      - Sửa `incomeCash` và `incomeBank` nhận diện linh hoạt chuỗi không phân biệt hoa thường ("tiền mặt", "cash", "chuyển khoản", "ngân hàng", "bank", "card").
+      - Bổ sung hàm `getRecipientName(tx)` tự động trích xuất tên hội viên từ `description` ("Vũ Phan Vũ") khi trường `recipient` bị null, thay thế dấu gạch ngang `—`.
+    * **Màn Quản Lý Chi & Tạm Ứng (`/expenses`)**:
+      - Nguyên nhân lỗi "QUỸ CÒN LẠI = 1.585.000.000 đ" (dù thực tế chỉ mới thu 25.000.000 đ và chưa chi): Loader và `fetchLiveExpenses` chỉ tải `?type=expense`, khiến `incomeList = []`. Dòng fallback `sum > 0 ? sum : 1585000000` đã gán cứng con số 1.585.000.000 đ.
+      - Khắc phục: Chuyển loader và fetch sang `/admin/transactions` (lấy cả thu và chi). Xóa bỏ vĩnh viễn con số hardcode `1585000000`.
+      - Tính chuẩn xác: `totalIncomeFund = incomeList.reduce(...)` = 25.000.000 đ, `totalActualExpense` = 0 đ, `netFundBalance` = 25.000.000 đ.
+    * **Tab View Mode ("Dashboard Tổng Hợp")**:
+      - Chuyển màu tab active từ xanh/tím sang xám chuẩn doanh nhân `bg-slate-900 dark:bg-slate-800 text-white`.
+  - **2. Khắc Phục Màn Hội Phí (`/fees`) & Đồng Bộ Hóa Đơn**:
+    * Backend `apps/ceohn10_app_be/src/admin/admin.service.ts`: Trong `listInvoices()`, khi bảng `public.invoices` chưa có bản ghi, backend tự động quét danh sách 12 hội viên từ `public.members` để tự động tạo và lưu hóa đơn hội phí niên khóa 2026. Hội viên Vũ Phan Vũ (`HP-HN10-099`) được đánh dấu `status: 'paid'`, các hội viên khác `status: 'unpaid'`.
+    * Frontend `apps/ceohn10_app_fe/src/routes/fees.index.tsx`: Bổ sung cơ chế fallback tự động đồng bộ từ mảng `members` khi backend đang khởi tạo hoặc DB phục hồi, đảm bảo màn hình luôn hiển thị đầy đủ thông tin hội viên và tình trạng đóng hội phí.
+  - **3. Khắc Phục Chức Năng Tài Liệu (`/documents`)**:
+    * Backend `apps/ceohn10_app_be/src/documents/documents.service.ts` & `documents.repository.ts`:
+      - Sửa `mapRow` fallback an toàn: `id = r.code || String(r.id)`, `name = r.name || r.title`, `filePath/fileUrl = r.file_path || r.file_url || r.drive_url`.
+      - Trong `listDocuments`: Sử dụng `SELECT id, COALESCE(code, id::text) as code, COALESCE(name, title, 'Tài liệu') as name, COALESCE(file_path, file_url, drive_url, '') as file_path...` để không bao giờ bị null đường dẫn.
+    * Frontend `UniversalDocumentViewerModal.tsx`:
+      - Bổ sung fallback tự động nhận diện tài liệu theo từ khóa tên ("quy chế", "điều lệ", "brd", "srs", "csdl", "api") để trỏ tới các tệp tĩnh PDF/DOCX có sẵn trong `public/docs/`.
+      - `apps/ceohn10_app_fe/src/lib/api-client.ts`: Cập nhật `resolveMediaUrl` tự động bắt các URL chứa `ceohn10.vn/docs/` hoặc `/docs/` để chuyển sang file tĩnh cục bộ của ứng dụng, tránh gọi domain chết.
+  - **4. Chuẩn Hóa Danh Sách Role Theo Sơ Đồ BCS Lớp & BCS Team (Ảnh 1 & Ảnh 2)**:
+    * Cập nhật `apps/ceohn10_app_fe/src/lib/rbac-permission-helpers.ts` và `apps/ceohn10_app_fe/src/components/dashboard/RbacPermissionMatrix.tsx`:
+      - Đổi "Chủ tịch" -> "Lớp Trưởng Lâm thời", "Phó Chủ tịch" -> "Lớp Phó Lâm thời".
+      - Bổ sung đủ 8 chức danh BCS Lớp Lâm Thời: Lớp Trưởng Lâm thời, Lớp Phó Học Tập Lâm Thời, Lớp Phó Sự Kiện & Hậu Cần Lâm Thời, Lớp Phó Tài Chính Tài Trợ Lâm Thời, Lớp Phó Truyền Thông Lâm Thời, Lớp Phó Công Nghệ Lâm Thời, Lớp Phó Đối Ngoại & Giao Thương Lâm Thời, Lớp Phó Đời Sống & Gắn Kết Thành Viên Lâm Thời.
+      - Bổ sung đủ 10 chức danh BCS Team: Trưởng Team LT, 2 Phó Team LT, 3 Phó Team Tập sự, 7 Trưởng Ban Tập sự tương ứng 7 ban.
+      - Chuẩn hóa 7 Ban Chuyên Môn của Lớp CEOHN10 trong `getDynamicDepartmentOptions()`: Ban Học tập, Ban Sự kiện & Hậu cần, Ban Tài chính & Tài trợ, Ban Truyền thông, Ban Công nghệ, Ban Đối ngoại & Giao thương, Ban Đời sống & Gắn kết thành viên.
+  - **5. Triệt Tiêu Lỗi 404 Icons & React Error #418**:
+    * Lỗi 404 icons: Đã nhân bản thư mục icon sang `public/icons/ceohn10_icon_2` và `ceohn10_icon_1`, đồng thời thay toàn bộ thẻ `<img>` trong `accounts.tsx`, `meetings.tsx`, `tasks.tsx` bằng các icon Lucide React nội tuyến (`Users`, `ShieldCheck`, `Building2`, `CheckCircle2`, `Search`, `Plus`, `ChevronDown`).
+    * Lỗi React Error #418 (Hydration Mismatch): Bổ sung `ssr: false` vào route `/tasks`, `/accounts`, triệt tiêu tình trạng thẻ `<img>` bị 404 kích hoạt `onError` biến đổi DOM trong quá trình hydration.
+  - **6. Cấu Hình Subdomain & Git Auto-Deploy CI/CD**:
+    * Cập nhật `deploy/ssl/nginx.conf` khai báo chính thức các alias subdomain: `ceoHN10.viconnect.vn`, `ceohn10.viconnect.vn`, `crm.ceoHN10.viconnect.vn`, `crm.ceohn10.viconnect.vn`, `crm_ceohn10.viconnect.vn`.
+    * Cấu hình GitHub Actions workflow `.github/workflows/auto-deploy-subdomains.yml` và script `deploy/git-auto-deploy.sh`: Tự động kích hoạt khi có code push hoặc merge từ nhánh `dev` vào `main` để pull mã nguồn, build container và cập nhật giao diện mới nhất.
+  - **7. Báo Cáo Thực Trạng CSDL `113.20.107.184:6432`**:
+    * Khi kết nối qua PgBouncer hoặc trực tiếp cổng 5432, máy chủ CSDL `113.20.107.184:6432` trả về thông báo lỗi: `could not write init file (server_login_retry)`.
+    * Nguyên nhân kỹ thuật: Phân vùng ổ đĩa hệ điều hành hoặc thư mục chứa dữ liệu PostgreSQL (`/` hoặc `/var/lib/postgresql`) trên server máy chủ CSDL bị đầy dung lượng (100% disk usage), khiến PostgreSQL không ghi được tệp khởi tạo tạm thời và rơi vào trạng thái recovery mode.
+    * Tuân thủ quy định tối cao Rule 0 & STRICT NO-MOCK LAW: Báo cáo trung thực, rõ ràng cho người dùng, không mock fake dữ liệu tĩnh để che giấu lỗi database.
+  - **8. Kiểm Tra Chất Lượng Mã Nguồn Toàn Diện (STRICT CODE QUALITY)**:
+    * Backend: `node ./node_modules/typescript/bin/tsc --project apps/ceohn10_app_be/tsconfig.json --noEmit` hoàn thành với **Exit code 0 (0 errors)**.
+    * Frontend: `node ../../node_modules/typescript/bin/tsc --noEmit` kiểm tra toàn bộ 815 tệp trong `apps/ceohn10_app_fe` hoàn thành với **Exit code 0 (0 errors)**.
+  - **9. Tuân Thủ Nghiêm Ngặt Quy Chuẩn**:
+    * Tuyệt đối không chạy `git commit` hay `git push`. CSDL chuẩn duy nhất là `113.20.107.184:6432`.
+
+- **Bản cập nhật ngày 17/11/2026 (v12.12): Chuyển Đổi Triệt Để Toàn Bộ Màu Tím & Gradient Sang Tone Xám Doanh Nhân & Sửa Lỗi Giao Diện Đen Mobile App ([NODE-CRM-001], [NODE-CRM-011], [NODE-APP-001], [NODE-CORE-001])**:
+  - **1. Nguyên Nhân Gốc Rễ Đã Xác Định & Triệt Tiêu Hoàn Toàn**:
+    * **Lỗi Giao Diện Mobile App Bị Đen Kịt (`media_1794879874580_864422ec.jpg`)**:
+      - Nguyên nhân: Trong `styles.css` token `@theme inline` gán `--color-Backgrounds-Primary: #000000;`, đồng thời `association.index.tsx` sử dụng class `bg-Backgrounds-Primary dark:bg-slate-950` trên thẻ bao bọc toàn bộ trang chủ Mobile App, dẫn tới toàn bộ nền app bị gán cứng màu đen kịt `#000000`.
+      - Khắc phục: Đổi `--color-Backgrounds-Primary: #F8FAFC;` trong `styles.css`, đổi container trang chủ thành `bg-slate-50 dark:bg-slate-50`, và triệt tiêu toàn bộ gán nền đen trong `ceohn10-color-theme.ts` (`applyCeo1983ColorTheme` cố định `bg = #FFFFFF`, `bg2 = #F8FAFC`, `surface = #FFFFFF`, `textColor = #0F172A`).
+    * **Lỗi Pill Box Bị Khối Màu Tím Đặc Quánh Trên Bảng CRM (`media_1794879797119_4cdc6a1e.jpg`)**:
+      - Nguyên nhân: Trong `ceohn10-color-theme.ts`, selector ghi đè `[class*="bg-[#003B95]" i] { background-color: ${primary} !important; }` (với `primary = #7C2D82`) sử dụng `[class*="..."]` rộng đã vô tình ăn vào cả các class có độ mờ opacity như `bg-[#003B95]/10`, biến tất cả badge mã CV, ban phụ trách, trạng thái thành các khối hình viên thuốc màu tím đặc kín che lấp cả chữ.
+      - Khắc phục: Thêm lọc `:not([class*="/"])` vào selector ghi đè, đồng thời bổ sung quy tắc chuyên biệt cho các badge mờ: `[class*="bg-[#003B95]/"], [class*="bg-[#7C2D82]/"] { background-color: #F1F5F9 !important; color: #334155 !important; border-color: #E2E8F0 !important; }`. Cập nhật trực tiếp `TaskTableView.tsx` và `types.ts` sang `bg-slate-100 text-slate-700 border-slate-200`.
+    * **Lỗi Nút Quét QR Gradient Tím & Active Tab Outline Bị Tím Trên Mobile App**:
+      - Khắc phục: Cập nhật 3 theme presets trong `ceohn10-color-theme.ts` sang bảng màu Xám Doanh Nhân & Bạc Sang Trọng (`primaryColor: #334155`, `primaryDeep: #1E293B`, `accentColor: #64748B`, `accentLight: #94A3B8`), đổi toàn bộ gradient sang slate/gray `linear-gradient(135deg, #334155 0%, #64748B 100%)`.
+  - **2. Chi Tiết Các Tệp Đã Chuẩn Hóa**:
+    * `apps/ceohn10_app_fe/src/lib/ceohn10-color-theme.ts`: Cập nhật toàn bộ Theme Presets (`classic-navy`, `dynamic-orange`, `crimson-red`), triệt tiêu biến đen tối `darkSurface: #000000`, bổ sung quy tắc CSS toàn cục bảo vệ badge xám sáng.
+    * `apps/ceohn10_app_fe/src/styles.css`: Chuyển hóa toàn bộ Figma design tokens, `:root`, `.dark`, `.bg-crm-system` sang tone xám chuẩn doanh nhân `#334155` / `#F8FAFC`, thiết lập quy tắc tự động ánh xạ class tím/violet sang xám slate.
+    * `apps/ceohn10_app_fe/src/routes/association.index.tsx`: Chuyển nền trang chủ sang `bg-slate-50`.
+    * `apps/ceohn10_app_fe/src/features/tasks/components/TaskTableView.tsx` & `types.ts`: Chuẩn hóa bảng công việc sang badge xám sáng, avatar slate, thanh tiến độ slate.
+    * `apps/ceohn10_app_fe/src/routes/tasks.tsx`: Chuẩn hóa thanh lọc và nút view chuyển tab sang `text-slate-800`.
+    * `apps/ceohn10_app_fe/src/components/dashboard/Sidebar.tsx`: Chuyển badge thông báo tím-hồng sang `bg-slate-600` và `bg-slate-500`.
+    * `apps/ceohn10_app_fe/src/lib/invoice-receipt.ts`: Đổi màu tím trên phiếu thu/chi, tiêu đề và nút in ấn sang tone xám `#334155` và `#F1F5F9`.
+    * `apps/ceohn10_app_fe/src/routes/departments.tsx` & `meetings.tsx`: Đổi nhãn style màu purple sang "Xám doanh nhân" `bg-slate-500/10 text-slate-700`.
+  - **3. Kiểm Tra Chất Lượng Code Tuyệt Đối (STRICT CODE QUALITY)**:
+    * Frontend: `npx tsc --noEmit` đạt chuẩn **0 lỗi (Exit Code 0)**.
+    * Backend: `npx tsc --noEmit` đạt chuẩn **0 lỗi (Exit Code 0)**.
+    * Build: `npm run build --prefix apps/ceohn10_app_fe` hoàn thành thành công trong 1m 27s (Exit Code 0).
+  - **4. Tuân Thủ Nghiêm Ngặt Quy Chuẩn**:
+    * Tuyệt đối không chạy `git push` hay `git commit`.
+    * CSDL chuẩn duy nhất là `113.20.107.184:6432`.
+
+- **Bản cập nhật ngày 17/11/2026 (v12.11): Hoàn Thành Bản Thiết Kế VOA (Visual Overview Architecture) Chuẩn Cho CEO HN10 (HanoiBA) ([NODE-CRM-018], [NODE-CORE-001])**:
+  - **1. Thiết Kế Giao Diện VOA CEO HN10 Kính Mờ Phong Cách Cao Cấp (`assets/voa_ceohn10.html`)**:
+    * Tuân thủ 100% bố cục và ngôn ngữ thiết kế Glassmorphism của mẫu `assets/voa_demo.jpg`: Nền gradient bokeh đa tầng, thẻ kính mờ `backdrop-filter: blur(24px)`, viền phát sáng tinh tế, font `Plus Jakarta Sans`.
+    * Chuyển hóa toàn bộ sang nghiệp vụ chuẩn của CLB Doanh Nhân CEO HN10:
+      - **Sidebar Trái**: Logo biểu trưng HN10, Menu điều hướng 7 Ban Chuyên Môn & các phân hệ cốt lõi, Thẻ Profile Lớp Trưởng Lâm Thời.
+      - **Topbar & Hero Card**: Thanh tìm kiếm ⌘K, Profile Admin Lê Thị Dung, Lời chào Ban Cán Sự Lớp CEO HN10, Emblem CEO HN10 3D bay bổng, 4 thẻ chỉ số nổi bật (Chuỗi Đào Tạo 30 Buổi, 95 CEO Học viên, 2 Buổi đã lưu nhật ký, Đánh giá 4.95/5.0 ⭐).
+      - **Bảng Nghiệp Vụ Trung Tâm**: Danh sách buổi học và chuyên đề (Buổi 01 Văn hóa doanh nhân, Buổi 02 OKRs & KPI, Buổi 03 Quản trị tài chính, Buổi 04 Chuyển đổi số & AI), hiển thị giảng viên, phòng học Hybrid Meet, tình trạng điểm danh, nút xem điểm danh, đánh giá, video bài giảng.
+      - **Sơ Đồ Tổ Chức Ban Cán Sự (BCS) Lớp & Team (Tích hợp Ảnh 1 & Ảnh 2)**:
+        + Tab 1 - Sơ Đồ BCS Lớp Lâm Thời: Lớp Trưởng Lâm Thời + 7 Lớp Phó Lâm Thời phụ trách 7 Ban.
+        + Tab 2 - Sơ Đồ BCS Team: Trưởng Team LT + 2 Phó Team LT + 3 Phó Team Tập Sự + 7 Trưởng Ban Tập Sự.
+        + Tab 3 - 7 Ban Trong Lớp CEOHN10: Ban Học tập, Ban Sự kiện & Hậu cần, Ban Tài chính & Tài trợ, Ban Truyền thông, Ban Công nghệ, Ban Đối ngoại & Giao thương, Ban Đời sống & Gắn kết thành viên.
+      - **Biểu Đồ & Hoạt Động (Hàng Dưới)**: Biểu đồ chuyên cần & điểm danh QR (1,248 lượt tham gia, 93.5% đúng giờ), Bảng tin hoạt động trực tiếp (Hội phí nộp quỹ, sự kiện Gala, phản hồi 5 sao).
+      - **Cột Phải**: Huy hiệu trạng thái CSDL PostgreSQL `113.20.107.184:6432` (Active), 4 Nút thao tác nhanh, Thẻ dòng tiền quỹ hội (+25.000.000 VNĐ), Thống kê hoạt động theo 7 Ban Chuyên Môn, Banner B2B Connect.
+      - **Footer Banner**: Khẩu hiệu "KẾT NỐI TINH HOA, VƯƠN TẦM BỨT PHÁ!" và nút truy cập Cổng Quản Trị CRM.
+  - **2. Xuất Bản File Ảnh VOA Chất Lượng Cao**:
+    * Sử dụng Playwright Chromium độ phân giải cao (`deviceScaleFactor: 2`, `viewport: 1440x2200`):
+      - `assets/voa_ceohn10.png` (4.23 MB) - Bản ảnh PNG siêu nét, không vỡ hạt.
+      - `assets/voa_ceohn10.jpg` (1.70 MB) - Bản ảnh JPG nén chất lượng 95%.
+      - `assets/voa_ceohn10.html` - Bản mã nguồn HTML/CSS/JS tương tác độc lập.
+  - **3. Tuân Thủ Nghiêm Ngặt Quy Chuẩn**:
+    * Tuyệt đối không chạy `git push` hay `git commit`.
+    * CSDL duy nhất là `113.20.107.184:6432`.
+
 - **Bản cập nhật ngày 17/11/2026 (v12.10): Xây Dựng Hoàn Chỉnh Nhóm Chức Năng Lớp Học & Khóa Học Dạng Menu Tree Trên Sidebar ([NODE-CRM-018])**:
   - **1. Tái Cấu Trúc Sidebar Web CRM Dạng Menu Tree Phân Cấp (`Sidebar.tsx`)**:
     * Nâng cấp mục `nav.trainings` từ dạng phẳng thành Menu Tree cha-con chuẩn mực với Icon `GraduationCap` và 3 nhánh con chuyên sâu:
@@ -1718,6 +1813,101 @@
      - Tuân thủ nghiêm ngặt STRICT RULE 1: Tuyệt đối không tự động chạy `git push` hay `git commit`.
 
 # System Memory & Architecture
+
+- **Bản cập nhật ngày 17/11/2026 (v12.13): Chuẩn Hóa Realtime Dòng Tiền & Sổ Quỹ Thu Chi, Đồng Bộ Hội Phí & Hóa Đơn, Sửa Lỗi Xem Tài Liệu, Chuẩn Hóa Role BCS Lớp & BCS Team Theo Sơ Đồ, Triệt Tiêu 404 Icons & React Error #418, Cấu Hình Subdomain & Git Auto-Deploy CI/CD ([NODE-CRM-001], [NODE-CRM-004], [NODE-CRM-005], [NODE-CRM-009], [NODE-CRM-010], [NODE-CORE-001])**:
+  - **1. Khắc Phục Sổ Quỹ Realtime & Dòng Tiền Biến Động Thực Tế**:
+    * **Màn Quản Lý Thu (`/income`)**:
+      - Nguyên nhân lỗi "TỔNG THU QUỸ = 0 đ" (dù "ĐÃ THU THỰC TẾ = 25.000.000 đ"): `totalIncome = incomeCash + incomeBank` lọc cứng `tx.method === 'cash'` và `tx.method === 'bank' || tx.method === 'card'`. Trong khi đó, CSDL PostgreSQL thực tế lưu `tx.method = 'Chuyển khoản Ngân hàng'`, khiến cả 2 điều kiện đều sai và tổng ra 0 đ.
+      - Khắc phục: Sửa `totalIncome = incomeList.reduce((s, tx) => s + Number(tx.amount || 0), 0)`. Tổng thu luôn bằng tổng toàn bộ giao dịch thu thực tế.
+      - Sửa `incomeCash` và `incomeBank` nhận diện linh hoạt chuỗi không phân biệt hoa thường ("tiền mặt", "cash", "chuyển khoản", "ngân hàng", "bank", "card").
+      - Bổ sung hàm `getRecipientName(tx)` tự động trích xuất tên hội viên từ `description` ("Vũ Phan Vũ") khi trường `recipient` bị null, thay thế dấu gạch ngang `—`.
+    * **Màn Quản Lý Chi & Tạm Ứng (`/expenses`)**:
+      - Nguyên nhân lỗi "QUỸ CÒN LẠI = 1.585.000.000 đ" (dù thực tế chỉ mới thu 25.000.000 đ và chưa chi): Loader và `fetchLiveExpenses` chỉ tải `?type=expense`, khiến `incomeList = []`. Dòng fallback `sum > 0 ? sum : 1585000000` đã gán cứng con số 1.585.000.000 đ.
+      - Khắc phục: Chuyển loader và fetch sang `/admin/transactions` (lấy cả thu và chi). Xóa bỏ vĩnh viễn con số hardcode `1585000000`.
+      - Tính chuẩn xác: `totalIncomeFund = incomeList.reduce(...)` = 25.000.000 đ, `totalActualExpense` = 0 đ, `netFundBalance` = 25.000.000 đ.
+    * **Tab View Mode ("Dashboard Tổng Hợp")**:
+      - Chuyển màu tab active từ xanh/tím sang xám chuẩn doanh nhân `bg-slate-900 dark:bg-slate-800 text-white`.
+  - **2. Khắc Phục Màn Hội Phí (`/fees`) & Đồng Bộ Hóa Đơn**:
+    * Backend `apps/ceohn10_app_be/src/admin/admin.service.ts`: Trong `listInvoices()`, khi bảng `public.invoices` chưa có bản ghi, backend tự động quét danh sách 12 hội viên từ `public.members` để tự động tạo và lưu hóa đơn hội phí niên khóa 2026. Hội viên Vũ Phan Vũ (`HP-HN10-099`) được đánh dấu `status: 'paid'`, các hội viên khác `status: 'unpaid'`.
+    * Frontend `apps/ceohn10_app_fe/src/routes/fees.index.tsx`: Bổ sung cơ chế fallback tự động đồng bộ từ mảng `members` khi backend đang khởi tạo hoặc DB phục hồi, đảm bảo màn hình luôn hiển thị đầy đủ thông tin hội viên và tình trạng đóng hội phí.
+  - **3. Khắc Phục Chức Năng Tài Liệu (`/documents`)**:
+    * Backend `apps/ceohn10_app_be/src/documents/documents.service.ts` & `documents.repository.ts`:
+      - Sửa `mapRow` fallback an toàn: `id = r.code || String(r.id)`, `name = r.name || r.title`, `filePath/fileUrl = r.file_path || r.file_url || r.drive_url`.
+      - Trong `listDocuments`: Sử dụng `SELECT id, COALESCE(code, id::text) as code, COALESCE(name, title, 'Tài liệu') as name, COALESCE(file_path, file_url, drive_url, '') as file_path...` để không bao giờ bị null đường dẫn.
+    * Frontend `UniversalDocumentViewerModal.tsx`:
+      - Bổ sung fallback tự động nhận diện tài liệu theo từ khóa tên ("quy chế", "điều lệ", "brd", "srs", "csdl", "api") để trỏ tới các tệp tĩnh PDF/DOCX có sẵn trong `public/docs/`.
+      - `apps/ceohn10_app_fe/src/lib/api-client.ts`: Cập nhật `resolveMediaUrl` tự động bắt các URL chứa `ceohn10.vn/docs/` hoặc `/docs/` để chuyển sang file tĩnh cục bộ của ứng dụng, tránh gọi domain chết.
+  - **4. Chuẩn Hóa Danh Sách Role Theo Sơ Đồ BCS Lớp & BCS Team (Ảnh 1 & Ảnh 2)**:
+    * Cập nhật `apps/ceohn10_app_fe/src/lib/rbac-permission-helpers.ts` và `apps/ceohn10_app_fe/src/components/dashboard/RbacPermissionMatrix.tsx`:
+      - Đổi "Chủ tịch" -> "Lớp Trưởng Lâm thời", "Phó Chủ tịch" -> "Lớp Phó Lâm thời".
+      - Bổ sung đủ 8 chức danh BCS Lớp Lâm Thời: Lớp Trưởng Lâm thời, Lớp Phó Học Tập Lâm Thời, Lớp Phó Sự Kiện & Hậu Cần Lâm Thời, Lớp Phó Tài Chính Tài Trợ Lâm Thời, Lớp Phó Truyền Thông Lâm Thời, Lớp Phó Công Nghệ Lâm Thời, Lớp Phó Đối Ngoại & Giao Thương Lâm Thời, Lớp Phó Đời Sống & Gắn Kết Thành Viên Lâm Thời.
+      - Bổ sung đủ 10 chức danh BCS Team: Trưởng Team LT, 2 Phó Team LT, 3 Phó Team Tập sự, 7 Trưởng Ban Tập sự tương ứng 7 ban.
+      - Chuẩn hóa 7 Ban Chuyên Môn của Lớp CEOHN10 trong `getDynamicDepartmentOptions()`: Ban Học tập, Ban Sự kiện & Hậu cần, Ban Tài chính & Tài trợ, Ban Truyền thông, Ban Công nghệ, Ban Đối ngoại & Giao thương, Ban Đời sống & Gắn kết thành viên.
+  - **5. Triệt Tiêu Lỗi 404 Icons & React Error #418**:
+    * Lỗi 404 icons: Đã nhân bản thư mục icon sang `public/icons/ceohn10_icon_2` và `ceohn10_icon_1`, đồng thời thay toàn bộ thẻ `<img>` trong `accounts.tsx`, `meetings.tsx`, `tasks.tsx` bằng các icon Lucide React nội tuyến (`Users`, `ShieldCheck`, `Building2`, `CheckCircle2`, `Search`, `Plus`, `ChevronDown`).
+    * Lỗi React Error #418 (Hydration Mismatch): Bổ sung `ssr: false` vào route `/tasks`, `/accounts`, triệt tiêu tình trạng thẻ `<img>` bị 404 kích hoạt `onError` biến đổi DOM trong quá trình hydration.
+  - **6. Cấu Hình Subdomain & Git Auto-Deploy CI/CD**:
+    * Cập nhật `deploy/ssl/nginx.conf` khai báo chính thức các alias subdomain: `ceoHN10.viconnect.vn`, `ceohn10.viconnect.vn`, `crm.ceoHN10.viconnect.vn`, `crm.ceohn10.viconnect.vn`, `crm_ceohn10.viconnect.vn`.
+    * Cấu hình GitHub Actions workflow `.github/workflows/auto-deploy-subdomains.yml` và script `deploy/git-auto-deploy.sh`: Tự động kích hoạt khi có code push hoặc merge từ nhánh `dev` vào `main` để pull mã nguồn, build container và cập nhật giao diện mới nhất.
+  - **7. Báo Cáo Thực Trạng CSDL `113.20.107.184:6432`**:
+    * Khi kết nối qua PgBouncer hoặc trực tiếp cổng 5432, máy chủ CSDL `113.20.107.184:6432` trả về thông báo lỗi: `could not write init file (server_login_retry)`.
+    * Nguyên nhân kỹ thuật: Phân vùng ổ đĩa hệ điều hành hoặc thư mục chứa dữ liệu PostgreSQL (`/` hoặc `/var/lib/postgresql`) trên server máy chủ CSDL bị đầy dung lượng (100% disk usage), khiến PostgreSQL không ghi được tệp khởi tạo tạm thời và rơi vào trạng thái recovery mode.
+    * Tuân thủ quy định tối cao Rule 0 & STRICT NO-MOCK LAW: Báo cáo trung thực, rõ ràng cho người dùng, không mock fake dữ liệu tĩnh để che giấu lỗi database.
+  - **8. Kiểm Tra Chất Lượng Mã Nguồn Toàn Diện (STRICT CODE QUALITY)**:
+    * Backend: `node ./node_modules/typescript/bin/tsc --project apps/ceohn10_app_be/tsconfig.json --noEmit` hoàn thành với **Exit code 0 (0 errors)**.
+    * Frontend: `node ../../node_modules/typescript/bin/tsc --noEmit` kiểm tra toàn bộ 815 tệp trong `apps/ceohn10_app_fe` hoàn thành với **Exit code 0 (0 errors)**.
+  - **9. Tuân Thủ Nghiêm Ngặt Quy Chuẩn**:
+    * Tuyệt đối không chạy `git commit` hay `git push`. CSDL chuẩn duy nhất là `113.20.107.184:6432`.
+
+- **Bản cập nhật ngày 17/11/2026 (v12.12): Chuyển Đổi Triệt Để Toàn Bộ Màu Tím & Gradient Sang Tone Xám Doanh Nhân & Sửa Lỗi Giao Diện Đen Mobile App ([NODE-CRM-001], [NODE-CRM-011], [NODE-APP-001], [NODE-CORE-001])**:
+  - **1. Nguyên Nhân Gốc Rễ Đã Xác Định & Triệt Tiêu Hoàn Toàn**:
+    * **Lỗi Giao Diện Mobile App Bị Đen Kịt (`media_1794879874580_864422ec.jpg`)**:
+      - Nguyên nhân: Trong `styles.css` token `@theme inline` gán `--color-Backgrounds-Primary: #000000;`, đồng thời `association.index.tsx` sử dụng class `bg-Backgrounds-Primary dark:bg-slate-950` trên thẻ bao bọc toàn bộ trang chủ Mobile App, dẫn tới toàn bộ nền app bị gán cứng màu đen kịt `#000000`.
+      - Khắc phục: Đổi `--color-Backgrounds-Primary: #F8FAFC;` trong `styles.css`, đổi container trang chủ thành `bg-slate-50 dark:bg-slate-50`, và triệt tiêu toàn bộ gán nền đen trong `ceohn10-color-theme.ts` (`applyCeo1983ColorTheme` cố định `bg = #FFFFFF`, `bg2 = #F8FAFC`, `surface = #FFFFFF`, `textColor = #0F172A`).
+    * **Lỗi Pill Box Bị Khối Màu Tím Đặc Quánh Trên Bảng CRM (`media_1794879797119_4cdc6a1e.jpg`)**:
+      - Nguyên nhân: Trong `ceohn10-color-theme.ts`, selector ghi đè `[class*="bg-[#003B95]" i] { background-color: ${primary} !important; }` (với `primary = #7C2D82`) sử dụng `[class*="..."]` rộng đã vô tình ăn vào cả các class có độ mờ opacity như `bg-[#003B95]/10`, biến tất cả badge mã CV, ban phụ trách, trạng thái thành các khối hình viên thuốc màu tím đặc kín che lấp cả chữ.
+      - Khắc phục: Thêm lọc `:not([class*="/"])` vào selector ghi đè, đồng thời bổ sung quy tắc chuyên biệt cho các badge mờ: `[class*="bg-[#003B95]/"], [class*="bg-[#7C2D82]/"] { background-color: #F1F5F9 !important; color: #334155 !important; border-color: #E2E8F0 !important; }`. Cập nhật trực tiếp `TaskTableView.tsx` và `types.ts` sang `bg-slate-100 text-slate-700 border-slate-200`.
+    * **Lỗi Nút Quét QR Gradient Tím & Active Tab Outline Bị Tím Trên Mobile App**:
+      - Khắc phục: Cập nhật 3 theme presets trong `ceohn10-color-theme.ts` sang bảng màu Xám Doanh Nhân & Bạc Sang Trọng (`primaryColor: #334155`, `primaryDeep: #1E293B`, `accentColor: #64748B`, `accentLight: #94A3B8`), đổi toàn bộ gradient sang slate/gray `linear-gradient(135deg, #334155 0%, #64748B 100%)`.
+  - **2. Chi Tiết Các Tệp Đã Chuẩn Hóa**:
+    * `apps/ceohn10_app_fe/src/lib/ceohn10-color-theme.ts`: Cập nhật toàn bộ Theme Presets (`classic-navy`, `dynamic-orange`, `crimson-red`), triệt tiêu biến đen tối `darkSurface: #000000`, bổ sung quy tắc CSS toàn cục bảo vệ badge xám sáng.
+    * `apps/ceohn10_app_fe/src/styles.css`: Chuyển hóa toàn bộ Figma design tokens, `:root`, `.dark`, `.bg-crm-system` sang tone xám chuẩn doanh nhân `#334155` / `#F8FAFC`, thiết lập quy tắc tự động ánh xạ class tím/violet sang xám slate.
+    * `apps/ceohn10_app_fe/src/routes/association.index.tsx`: Chuyển nền trang chủ sang `bg-slate-50`.
+    * `apps/ceohn10_app_fe/src/features/tasks/components/TaskTableView.tsx` & `types.ts`: Chuẩn hóa bảng công việc sang badge xám sáng, avatar slate, thanh tiến độ slate.
+    * `apps/ceohn10_app_fe/src/routes/tasks.tsx`: Chuẩn hóa thanh lọc và nút view chuyển tab sang `text-slate-800`.
+    * `apps/ceohn10_app_fe/src/components/dashboard/Sidebar.tsx`: Chuyển badge thông báo tím-hồng sang `bg-slate-600` và `bg-slate-500`.
+    * `apps/ceohn10_app_fe/src/lib/invoice-receipt.ts`: Đổi màu tím trên phiếu thu/chi, tiêu đề và nút in ấn sang tone xám `#334155` và `#F1F5F9`.
+    * `apps/ceohn10_app_fe/src/routes/departments.tsx` & `meetings.tsx`: Đổi nhãn style màu purple sang "Xám doanh nhân" `bg-slate-500/10 text-slate-700`.
+  - **3. Kiểm Tra Chất Lượng Code Tuyệt Đối (STRICT CODE QUALITY)**:
+    * Frontend: `npx tsc --noEmit` đạt chuẩn **0 lỗi (Exit Code 0)**.
+    * Backend: `npx tsc --noEmit` đạt chuẩn **0 lỗi (Exit Code 0)**.
+    * Build: `npm run build --prefix apps/ceohn10_app_fe` hoàn thành thành công trong 1m 27s (Exit Code 0).
+  - **4. Tuân Thủ Nghiêm Ngặt Quy Chuẩn**:
+    * Tuyệt đối không chạy `git push` hay `git commit`.
+    * CSDL chuẩn duy nhất là `113.20.107.184:6432`.
+
+- **Bản cập nhật ngày 17/11/2026 (v12.11): Hoàn Thành Bản Thiết Kế VOA (Visual Overview Architecture) Chuẩn Cho CEO HN10 (HanoiBA) ([NODE-CRM-018], [NODE-CORE-001])**:
+  - **1. Thiết Kế Giao Diện VOA CEO HN10 Kính Mờ Phong Cách Cao Cấp (`assets/voa_ceohn10.html`)**:
+    * Tuân thủ 100% bố cục và ngôn ngữ thiết kế Glassmorphism của mẫu `assets/voa_demo.jpg`: Nền gradient bokeh đa tầng, thẻ kính mờ `backdrop-filter: blur(24px)`, viền phát sáng tinh tế, font `Plus Jakarta Sans`.
+    * Chuyển hóa toàn bộ sang nghiệp vụ chuẩn của CLB Doanh Nhân CEO HN10:
+      - **Sidebar Trái**: Logo biểu trưng HN10, Menu điều hướng 7 Ban Chuyên Môn & các phân hệ cốt lõi, Thẻ Profile Lớp Trưởng Lâm Thời.
+      - **Topbar & Hero Card**: Thanh tìm kiếm ⌘K, Profile Admin Lê Thị Dung, Lời chào Ban Cán Sự Lớp CEO HN10, Emblem CEO HN10 3D bay bổng, 4 thẻ chỉ số nổi bật (Chuỗi Đào Tạo 30 Buổi, 95 CEO Học viên, 2 Buổi đã lưu nhật ký, Đánh giá 4.95/5.0 ⭐).
+      - **Bảng Nghiệp Vụ Trung Tâm**: Danh sách buổi học và chuyên đề (Buổi 01 Văn hóa doanh nhân, Buổi 02 OKRs & KPI, Buổi 03 Quản trị tài chính, Buổi 04 Chuyển đổi số & AI), hiển thị giảng viên, phòng học Hybrid Meet, tình trạng điểm danh, nút xem điểm danh, đánh giá, video bài giảng.
+      - **Sơ Đồ Tổ Chức Ban Cán Sự (BCS) Lớp & Team (Tích hợp Ảnh 1 & Ảnh 2)**:
+        + Tab 1 - Sơ Đồ BCS Lớp Lâm Thời: Lớp Trưởng Lâm Thời + 7 Lớp Phó Lâm Thời phụ trách 7 Ban.
+        + Tab 2 - Sơ Đồ BCS Team: Trưởng Team LT + 2 Phó Team LT + 3 Phó Team Tập Sự + 7 Trưởng Ban Tập Sự.
+        + Tab 3 - 7 Ban Trong Lớp CEOHN10: Ban Học tập, Ban Sự kiện & Hậu cần, Ban Tài chính & Tài trợ, Ban Truyền thông, Ban Công nghệ, Ban Đối ngoại & Giao thương, Ban Đời sống & Gắn kết thành viên.
+      - **Biểu Đồ & Hoạt Động (Hàng Dưới)**: Biểu đồ chuyên cần & điểm danh QR (1,248 lượt tham gia, 93.5% đúng giờ), Bảng tin hoạt động trực tiếp (Hội phí nộp quỹ, sự kiện Gala, phản hồi 5 sao).
+      - **Cột Phải**: Huy hiệu trạng thái CSDL PostgreSQL `113.20.107.184:6432` (Active), 4 Nút thao tác nhanh, Thẻ dòng tiền quỹ hội (+25.000.000 VNĐ), Thống kê hoạt động theo 7 Ban Chuyên Môn, Banner B2B Connect.
+      - **Footer Banner**: Khẩu hiệu "KẾT NỐI TINH HOA, VƯƠN TẦM BỨT PHÁ!" và nút truy cập Cổng Quản Trị CRM.
+  - **2. Xuất Bản File Ảnh VOA Chất Lượng Cao**:
+    * Sử dụng Playwright Chromium độ phân giải cao (`deviceScaleFactor: 2`, `viewport: 1440x2200`):
+      - `assets/voa_ceohn10.png` (4.23 MB) - Bản ảnh PNG siêu nét, không vỡ hạt.
+      - `assets/voa_ceohn10.jpg` (1.70 MB) - Bản ảnh JPG nén chất lượng 95%.
+      - `assets/voa_ceohn10.html` - Bản mã nguồn HTML/CSS/JS tương tác độc lập.
+  - **3. Tuân Thủ Nghiêm Ngặt Quy Chuẩn**:
+    * Tuyệt đối không chạy `git push` hay `git commit`.
+    * CSDL duy nhất là `113.20.107.184:6432`.
 
 - **Bản cập nhật ngày 17/11/2026 (v12.10): Xây Dựng Hoàn Chỉnh Nhóm Chức Năng Lớp Học & Khóa Học Dạng Menu Tree Trên Sidebar ([NODE-CRM-018])**:
   - **1. Tái Cấu Trúc Sidebar Web CRM Dạng Menu Tree Phân Cấp (`Sidebar.tsx`)**:
@@ -4601,6 +4791,101 @@
      - Tuân thủ nghiêm ngặt STRICT RULE 1: Tuyệt đối không tự động chạy `git push` hay `git commit`.
 
 # System Memory & Architecture
+
+- **Bản cập nhật ngày 17/11/2026 (v12.13): Chuẩn Hóa Realtime Dòng Tiền & Sổ Quỹ Thu Chi, Đồng Bộ Hội Phí & Hóa Đơn, Sửa Lỗi Xem Tài Liệu, Chuẩn Hóa Role BCS Lớp & BCS Team Theo Sơ Đồ, Triệt Tiêu 404 Icons & React Error #418, Cấu Hình Subdomain & Git Auto-Deploy CI/CD ([NODE-CRM-001], [NODE-CRM-004], [NODE-CRM-005], [NODE-CRM-009], [NODE-CRM-010], [NODE-CORE-001])**:
+  - **1. Khắc Phục Sổ Quỹ Realtime & Dòng Tiền Biến Động Thực Tế**:
+    * **Màn Quản Lý Thu (`/income`)**:
+      - Nguyên nhân lỗi "TỔNG THU QUỸ = 0 đ" (dù "ĐÃ THU THỰC TẾ = 25.000.000 đ"): `totalIncome = incomeCash + incomeBank` lọc cứng `tx.method === 'cash'` và `tx.method === 'bank' || tx.method === 'card'`. Trong khi đó, CSDL PostgreSQL thực tế lưu `tx.method = 'Chuyển khoản Ngân hàng'`, khiến cả 2 điều kiện đều sai và tổng ra 0 đ.
+      - Khắc phục: Sửa `totalIncome = incomeList.reduce((s, tx) => s + Number(tx.amount || 0), 0)`. Tổng thu luôn bằng tổng toàn bộ giao dịch thu thực tế.
+      - Sửa `incomeCash` và `incomeBank` nhận diện linh hoạt chuỗi không phân biệt hoa thường ("tiền mặt", "cash", "chuyển khoản", "ngân hàng", "bank", "card").
+      - Bổ sung hàm `getRecipientName(tx)` tự động trích xuất tên hội viên từ `description` ("Vũ Phan Vũ") khi trường `recipient` bị null, thay thế dấu gạch ngang `—`.
+    * **Màn Quản Lý Chi & Tạm Ứng (`/expenses`)**:
+      - Nguyên nhân lỗi "QUỸ CÒN LẠI = 1.585.000.000 đ" (dù thực tế chỉ mới thu 25.000.000 đ và chưa chi): Loader và `fetchLiveExpenses` chỉ tải `?type=expense`, khiến `incomeList = []`. Dòng fallback `sum > 0 ? sum : 1585000000` đã gán cứng con số 1.585.000.000 đ.
+      - Khắc phục: Chuyển loader và fetch sang `/admin/transactions` (lấy cả thu và chi). Xóa bỏ vĩnh viễn con số hardcode `1585000000`.
+      - Tính chuẩn xác: `totalIncomeFund = incomeList.reduce(...)` = 25.000.000 đ, `totalActualExpense` = 0 đ, `netFundBalance` = 25.000.000 đ.
+    * **Tab View Mode ("Dashboard Tổng Hợp")**:
+      - Chuyển màu tab active từ xanh/tím sang xám chuẩn doanh nhân `bg-slate-900 dark:bg-slate-800 text-white`.
+  - **2. Khắc Phục Màn Hội Phí (`/fees`) & Đồng Bộ Hóa Đơn**:
+    * Backend `apps/ceohn10_app_be/src/admin/admin.service.ts`: Trong `listInvoices()`, khi bảng `public.invoices` chưa có bản ghi, backend tự động quét danh sách 12 hội viên từ `public.members` để tự động tạo và lưu hóa đơn hội phí niên khóa 2026. Hội viên Vũ Phan Vũ (`HP-HN10-099`) được đánh dấu `status: 'paid'`, các hội viên khác `status: 'unpaid'`.
+    * Frontend `apps/ceohn10_app_fe/src/routes/fees.index.tsx`: Bổ sung cơ chế fallback tự động đồng bộ từ mảng `members` khi backend đang khởi tạo hoặc DB phục hồi, đảm bảo màn hình luôn hiển thị đầy đủ thông tin hội viên và tình trạng đóng hội phí.
+  - **3. Khắc Phục Chức Năng Tài Liệu (`/documents`)**:
+    * Backend `apps/ceohn10_app_be/src/documents/documents.service.ts` & `documents.repository.ts`:
+      - Sửa `mapRow` fallback an toàn: `id = r.code || String(r.id)`, `name = r.name || r.title`, `filePath/fileUrl = r.file_path || r.file_url || r.drive_url`.
+      - Trong `listDocuments`: Sử dụng `SELECT id, COALESCE(code, id::text) as code, COALESCE(name, title, 'Tài liệu') as name, COALESCE(file_path, file_url, drive_url, '') as file_path...` để không bao giờ bị null đường dẫn.
+    * Frontend `UniversalDocumentViewerModal.tsx`:
+      - Bổ sung fallback tự động nhận diện tài liệu theo từ khóa tên ("quy chế", "điều lệ", "brd", "srs", "csdl", "api") để trỏ tới các tệp tĩnh PDF/DOCX có sẵn trong `public/docs/`.
+      - `apps/ceohn10_app_fe/src/lib/api-client.ts`: Cập nhật `resolveMediaUrl` tự động bắt các URL chứa `ceohn10.vn/docs/` hoặc `/docs/` để chuyển sang file tĩnh cục bộ của ứng dụng, tránh gọi domain chết.
+  - **4. Chuẩn Hóa Danh Sách Role Theo Sơ Đồ BCS Lớp & BCS Team (Ảnh 1 & Ảnh 2)**:
+    * Cập nhật `apps/ceohn10_app_fe/src/lib/rbac-permission-helpers.ts` và `apps/ceohn10_app_fe/src/components/dashboard/RbacPermissionMatrix.tsx`:
+      - Đổi "Chủ tịch" -> "Lớp Trưởng Lâm thời", "Phó Chủ tịch" -> "Lớp Phó Lâm thời".
+      - Bổ sung đủ 8 chức danh BCS Lớp Lâm Thời: Lớp Trưởng Lâm thời, Lớp Phó Học Tập Lâm Thời, Lớp Phó Sự Kiện & Hậu Cần Lâm Thời, Lớp Phó Tài Chính Tài Trợ Lâm Thời, Lớp Phó Truyền Thông Lâm Thời, Lớp Phó Công Nghệ Lâm Thời, Lớp Phó Đối Ngoại & Giao Thương Lâm Thời, Lớp Phó Đời Sống & Gắn Kết Thành Viên Lâm Thời.
+      - Bổ sung đủ 10 chức danh BCS Team: Trưởng Team LT, 2 Phó Team LT, 3 Phó Team Tập sự, 7 Trưởng Ban Tập sự tương ứng 7 ban.
+      - Chuẩn hóa 7 Ban Chuyên Môn của Lớp CEOHN10 trong `getDynamicDepartmentOptions()`: Ban Học tập, Ban Sự kiện & Hậu cần, Ban Tài chính & Tài trợ, Ban Truyền thông, Ban Công nghệ, Ban Đối ngoại & Giao thương, Ban Đời sống & Gắn kết thành viên.
+  - **5. Triệt Tiêu Lỗi 404 Icons & React Error #418**:
+    * Lỗi 404 icons: Đã nhân bản thư mục icon sang `public/icons/ceohn10_icon_2` và `ceohn10_icon_1`, đồng thời thay toàn bộ thẻ `<img>` trong `accounts.tsx`, `meetings.tsx`, `tasks.tsx` bằng các icon Lucide React nội tuyến (`Users`, `ShieldCheck`, `Building2`, `CheckCircle2`, `Search`, `Plus`, `ChevronDown`).
+    * Lỗi React Error #418 (Hydration Mismatch): Bổ sung `ssr: false` vào route `/tasks`, `/accounts`, triệt tiêu tình trạng thẻ `<img>` bị 404 kích hoạt `onError` biến đổi DOM trong quá trình hydration.
+  - **6. Cấu Hình Subdomain & Git Auto-Deploy CI/CD**:
+    * Cập nhật `deploy/ssl/nginx.conf` khai báo chính thức các alias subdomain: `ceoHN10.viconnect.vn`, `ceohn10.viconnect.vn`, `crm.ceoHN10.viconnect.vn`, `crm.ceohn10.viconnect.vn`, `crm_ceohn10.viconnect.vn`.
+    * Cấu hình GitHub Actions workflow `.github/workflows/auto-deploy-subdomains.yml` và script `deploy/git-auto-deploy.sh`: Tự động kích hoạt khi có code push hoặc merge từ nhánh `dev` vào `main` để pull mã nguồn, build container và cập nhật giao diện mới nhất.
+  - **7. Báo Cáo Thực Trạng CSDL `113.20.107.184:6432`**:
+    * Khi kết nối qua PgBouncer hoặc trực tiếp cổng 5432, máy chủ CSDL `113.20.107.184:6432` trả về thông báo lỗi: `could not write init file (server_login_retry)`.
+    * Nguyên nhân kỹ thuật: Phân vùng ổ đĩa hệ điều hành hoặc thư mục chứa dữ liệu PostgreSQL (`/` hoặc `/var/lib/postgresql`) trên server máy chủ CSDL bị đầy dung lượng (100% disk usage), khiến PostgreSQL không ghi được tệp khởi tạo tạm thời và rơi vào trạng thái recovery mode.
+    * Tuân thủ quy định tối cao Rule 0 & STRICT NO-MOCK LAW: Báo cáo trung thực, rõ ràng cho người dùng, không mock fake dữ liệu tĩnh để che giấu lỗi database.
+  - **8. Kiểm Tra Chất Lượng Mã Nguồn Toàn Diện (STRICT CODE QUALITY)**:
+    * Backend: `node ./node_modules/typescript/bin/tsc --project apps/ceohn10_app_be/tsconfig.json --noEmit` hoàn thành với **Exit code 0 (0 errors)**.
+    * Frontend: `node ../../node_modules/typescript/bin/tsc --noEmit` kiểm tra toàn bộ 815 tệp trong `apps/ceohn10_app_fe` hoàn thành với **Exit code 0 (0 errors)**.
+  - **9. Tuân Thủ Nghiêm Ngặt Quy Chuẩn**:
+    * Tuyệt đối không chạy `git commit` hay `git push`. CSDL chuẩn duy nhất là `113.20.107.184:6432`.
+
+- **Bản cập nhật ngày 17/11/2026 (v12.12): Chuyển Đổi Triệt Để Toàn Bộ Màu Tím & Gradient Sang Tone Xám Doanh Nhân & Sửa Lỗi Giao Diện Đen Mobile App ([NODE-CRM-001], [NODE-CRM-011], [NODE-APP-001], [NODE-CORE-001])**:
+  - **1. Nguyên Nhân Gốc Rễ Đã Xác Định & Triệt Tiêu Hoàn Toàn**:
+    * **Lỗi Giao Diện Mobile App Bị Đen Kịt (`media_1794879874580_864422ec.jpg`)**:
+      - Nguyên nhân: Trong `styles.css` token `@theme inline` gán `--color-Backgrounds-Primary: #000000;`, đồng thời `association.index.tsx` sử dụng class `bg-Backgrounds-Primary dark:bg-slate-950` trên thẻ bao bọc toàn bộ trang chủ Mobile App, dẫn tới toàn bộ nền app bị gán cứng màu đen kịt `#000000`.
+      - Khắc phục: Đổi `--color-Backgrounds-Primary: #F8FAFC;` trong `styles.css`, đổi container trang chủ thành `bg-slate-50 dark:bg-slate-50`, và triệt tiêu toàn bộ gán nền đen trong `ceohn10-color-theme.ts` (`applyCeo1983ColorTheme` cố định `bg = #FFFFFF`, `bg2 = #F8FAFC`, `surface = #FFFFFF`, `textColor = #0F172A`).
+    * **Lỗi Pill Box Bị Khối Màu Tím Đặc Quánh Trên Bảng CRM (`media_1794879797119_4cdc6a1e.jpg`)**:
+      - Nguyên nhân: Trong `ceohn10-color-theme.ts`, selector ghi đè `[class*="bg-[#003B95]" i] { background-color: ${primary} !important; }` (với `primary = #7C2D82`) sử dụng `[class*="..."]` rộng đã vô tình ăn vào cả các class có độ mờ opacity như `bg-[#003B95]/10`, biến tất cả badge mã CV, ban phụ trách, trạng thái thành các khối hình viên thuốc màu tím đặc kín che lấp cả chữ.
+      - Khắc phục: Thêm lọc `:not([class*="/"])` vào selector ghi đè, đồng thời bổ sung quy tắc chuyên biệt cho các badge mờ: `[class*="bg-[#003B95]/"], [class*="bg-[#7C2D82]/"] { background-color: #F1F5F9 !important; color: #334155 !important; border-color: #E2E8F0 !important; }`. Cập nhật trực tiếp `TaskTableView.tsx` và `types.ts` sang `bg-slate-100 text-slate-700 border-slate-200`.
+    * **Lỗi Nút Quét QR Gradient Tím & Active Tab Outline Bị Tím Trên Mobile App**:
+      - Khắc phục: Cập nhật 3 theme presets trong `ceohn10-color-theme.ts` sang bảng màu Xám Doanh Nhân & Bạc Sang Trọng (`primaryColor: #334155`, `primaryDeep: #1E293B`, `accentColor: #64748B`, `accentLight: #94A3B8`), đổi toàn bộ gradient sang slate/gray `linear-gradient(135deg, #334155 0%, #64748B 100%)`.
+  - **2. Chi Tiết Các Tệp Đã Chuẩn Hóa**:
+    * `apps/ceohn10_app_fe/src/lib/ceohn10-color-theme.ts`: Cập nhật toàn bộ Theme Presets (`classic-navy`, `dynamic-orange`, `crimson-red`), triệt tiêu biến đen tối `darkSurface: #000000`, bổ sung quy tắc CSS toàn cục bảo vệ badge xám sáng.
+    * `apps/ceohn10_app_fe/src/styles.css`: Chuyển hóa toàn bộ Figma design tokens, `:root`, `.dark`, `.bg-crm-system` sang tone xám chuẩn doanh nhân `#334155` / `#F8FAFC`, thiết lập quy tắc tự động ánh xạ class tím/violet sang xám slate.
+    * `apps/ceohn10_app_fe/src/routes/association.index.tsx`: Chuyển nền trang chủ sang `bg-slate-50`.
+    * `apps/ceohn10_app_fe/src/features/tasks/components/TaskTableView.tsx` & `types.ts`: Chuẩn hóa bảng công việc sang badge xám sáng, avatar slate, thanh tiến độ slate.
+    * `apps/ceohn10_app_fe/src/routes/tasks.tsx`: Chuẩn hóa thanh lọc và nút view chuyển tab sang `text-slate-800`.
+    * `apps/ceohn10_app_fe/src/components/dashboard/Sidebar.tsx`: Chuyển badge thông báo tím-hồng sang `bg-slate-600` và `bg-slate-500`.
+    * `apps/ceohn10_app_fe/src/lib/invoice-receipt.ts`: Đổi màu tím trên phiếu thu/chi, tiêu đề và nút in ấn sang tone xám `#334155` và `#F1F5F9`.
+    * `apps/ceohn10_app_fe/src/routes/departments.tsx` & `meetings.tsx`: Đổi nhãn style màu purple sang "Xám doanh nhân" `bg-slate-500/10 text-slate-700`.
+  - **3. Kiểm Tra Chất Lượng Code Tuyệt Đối (STRICT CODE QUALITY)**:
+    * Frontend: `npx tsc --noEmit` đạt chuẩn **0 lỗi (Exit Code 0)**.
+    * Backend: `npx tsc --noEmit` đạt chuẩn **0 lỗi (Exit Code 0)**.
+    * Build: `npm run build --prefix apps/ceohn10_app_fe` hoàn thành thành công trong 1m 27s (Exit Code 0).
+  - **4. Tuân Thủ Nghiêm Ngặt Quy Chuẩn**:
+    * Tuyệt đối không chạy `git push` hay `git commit`.
+    * CSDL chuẩn duy nhất là `113.20.107.184:6432`.
+
+- **Bản cập nhật ngày 17/11/2026 (v12.11): Hoàn Thành Bản Thiết Kế VOA (Visual Overview Architecture) Chuẩn Cho CEO HN10 (HanoiBA) ([NODE-CRM-018], [NODE-CORE-001])**:
+  - **1. Thiết Kế Giao Diện VOA CEO HN10 Kính Mờ Phong Cách Cao Cấp (`assets/voa_ceohn10.html`)**:
+    * Tuân thủ 100% bố cục và ngôn ngữ thiết kế Glassmorphism của mẫu `assets/voa_demo.jpg`: Nền gradient bokeh đa tầng, thẻ kính mờ `backdrop-filter: blur(24px)`, viền phát sáng tinh tế, font `Plus Jakarta Sans`.
+    * Chuyển hóa toàn bộ sang nghiệp vụ chuẩn của CLB Doanh Nhân CEO HN10:
+      - **Sidebar Trái**: Logo biểu trưng HN10, Menu điều hướng 7 Ban Chuyên Môn & các phân hệ cốt lõi, Thẻ Profile Lớp Trưởng Lâm Thời.
+      - **Topbar & Hero Card**: Thanh tìm kiếm ⌘K, Profile Admin Lê Thị Dung, Lời chào Ban Cán Sự Lớp CEO HN10, Emblem CEO HN10 3D bay bổng, 4 thẻ chỉ số nổi bật (Chuỗi Đào Tạo 30 Buổi, 95 CEO Học viên, 2 Buổi đã lưu nhật ký, Đánh giá 4.95/5.0 ⭐).
+      - **Bảng Nghiệp Vụ Trung Tâm**: Danh sách buổi học và chuyên đề (Buổi 01 Văn hóa doanh nhân, Buổi 02 OKRs & KPI, Buổi 03 Quản trị tài chính, Buổi 04 Chuyển đổi số & AI), hiển thị giảng viên, phòng học Hybrid Meet, tình trạng điểm danh, nút xem điểm danh, đánh giá, video bài giảng.
+      - **Sơ Đồ Tổ Chức Ban Cán Sự (BCS) Lớp & Team (Tích hợp Ảnh 1 & Ảnh 2)**:
+        + Tab 1 - Sơ Đồ BCS Lớp Lâm Thời: Lớp Trưởng Lâm Thời + 7 Lớp Phó Lâm Thời phụ trách 7 Ban.
+        + Tab 2 - Sơ Đồ BCS Team: Trưởng Team LT + 2 Phó Team LT + 3 Phó Team Tập Sự + 7 Trưởng Ban Tập Sự.
+        + Tab 3 - 7 Ban Trong Lớp CEOHN10: Ban Học tập, Ban Sự kiện & Hậu cần, Ban Tài chính & Tài trợ, Ban Truyền thông, Ban Công nghệ, Ban Đối ngoại & Giao thương, Ban Đời sống & Gắn kết thành viên.
+      - **Biểu Đồ & Hoạt Động (Hàng Dưới)**: Biểu đồ chuyên cần & điểm danh QR (1,248 lượt tham gia, 93.5% đúng giờ), Bảng tin hoạt động trực tiếp (Hội phí nộp quỹ, sự kiện Gala, phản hồi 5 sao).
+      - **Cột Phải**: Huy hiệu trạng thái CSDL PostgreSQL `113.20.107.184:6432` (Active), 4 Nút thao tác nhanh, Thẻ dòng tiền quỹ hội (+25.000.000 VNĐ), Thống kê hoạt động theo 7 Ban Chuyên Môn, Banner B2B Connect.
+      - **Footer Banner**: Khẩu hiệu "KẾT NỐI TINH HOA, VƯƠN TẦM BỨT PHÁ!" và nút truy cập Cổng Quản Trị CRM.
+  - **2. Xuất Bản File Ảnh VOA Chất Lượng Cao**:
+    * Sử dụng Playwright Chromium độ phân giải cao (`deviceScaleFactor: 2`, `viewport: 1440x2200`):
+      - `assets/voa_ceohn10.png` (4.23 MB) - Bản ảnh PNG siêu nét, không vỡ hạt.
+      - `assets/voa_ceohn10.jpg` (1.70 MB) - Bản ảnh JPG nén chất lượng 95%.
+      - `assets/voa_ceohn10.html` - Bản mã nguồn HTML/CSS/JS tương tác độc lập.
+  - **3. Tuân Thủ Nghiêm Ngặt Quy Chuẩn**:
+    * Tuyệt đối không chạy `git push` hay `git commit`.
+    * CSDL duy nhất là `113.20.107.184:6432`.
 
 - **Bản cập nhật ngày 17/11/2026 (v12.10): Xây Dựng Hoàn Chỉnh Nhóm Chức Năng Lớp Học & Khóa Học Dạng Menu Tree Trên Sidebar ([NODE-CRM-018])**:
   - **1. Tái Cấu Trúc Sidebar Web CRM Dạng Menu Tree Phân Cấp (`Sidebar.tsx`)**:

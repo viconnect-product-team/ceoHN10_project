@@ -1,0 +1,1746 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>BẢN THIẾT KẾ VOA CEOHN10 - NỀN TẢNG CÔNG NGHỆ DOANH NHÂN</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh;
+      background: radial-gradient(circle at 10% 20%, rgba(90, 120, 160, 0.45) 0%, transparent 40%),
+                  radial-gradient(circle at 90% 80%, rgba(180, 120, 200, 0.35) 0%, transparent 40%),
+                  radial-gradient(circle at 50% 50%, rgba(120, 160, 220, 0.25) 0%, transparent 60%),
+                  linear-gradient(135deg, #7a8fa6 0%, #a4b4c4 30%, #b8a6be 70%, #8c9dae 100%);
+      background-attachment: fixed;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 40px 20px;
+      color: #1e293b;
+    }
+
+    /* Ambient background bokeh effect */
+    .bg-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-image: 
+        radial-gradient(rgba(255,255,255,0.4) 1px, transparent 1px),
+        radial-gradient(rgba(255,255,255,0.2) 2px, transparent 2px);
+      background-size: 40px 40px, 80px 80px;
+      background-position: 0 0, 20px 20px;
+      opacity: 0.3;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .dashboard-container {
+      position: relative;
+      z-index: 1;
+      width: 1360px;
+      display: grid;
+      grid-template-columns: 240px 1fr 340px;
+      gap: 20px;
+    }
+
+    /* GLASSMORPHISM CARD COMMON STYLE */
+    .glass-card {
+      background: rgba(255, 255, 255, 0.55);
+      backdrop-filter: blur(24px) saturate(180%);
+      -webkit-backdrop-filter: blur(24px) saturate(180%);
+      border: 1px solid rgba(255, 255, 255, 0.75);
+      box-shadow: 0 16px 40px -12px rgba(15, 23, 42, 0.12),
+                  0 0 0 1px rgba(255, 255, 255, 0.5) inset;
+      border-radius: 24px;
+      padding: 20px;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .glass-card:hover {
+      box-shadow: 0 20px 48px -10px rgba(15, 23, 42, 0.16),
+                  0 0 0 1px rgba(255, 255, 255, 0.8) inset;
+    }
+
+    /* ========================================================
+       1. SIDEBAR TRÁI
+       ======================================================== */
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: calc(100vh - 80px);
+      position: sticky;
+      top: 40px;
+    }
+
+    .brand-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 6px 8px 24px 8px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+      margin-bottom: 16px;
+    }
+    .brand-logo-icon {
+      width: 42px;
+      height: 42px;
+      background: linear-gradient(135deg, #003B95 0%, #1e3a8a 100%);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 800;
+      font-size: 18px;
+      box-shadow: 0 6px 14px rgba(0, 59, 149, 0.35);
+    }
+    .brand-info h2 {
+      font-size: 16px;
+      font-weight: 800;
+      color: #0f172a;
+      letter-spacing: -0.3px;
+      line-height: 1.2;
+    }
+    .brand-info p {
+      font-size: 11px;
+      font-weight: 600;
+      color: #dc2626;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .nav-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .nav-item a {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      border-radius: 14px;
+      text-decoration: none;
+      color: #334155;
+      font-size: 13px;
+      font-weight: 600;
+      transition: all 0.2s ease;
+    }
+    .nav-item a:hover {
+      background: rgba(255, 255, 255, 0.65);
+      color: #003B95;
+      transform: translateX(3px);
+    }
+    .nav-item.active a {
+      background: linear-gradient(135deg, rgba(0, 59, 149, 0.85) 0%, rgba(30, 58, 138, 0.95) 100%);
+      color: #ffffff;
+      box-shadow: 0 8px 20px -4px rgba(0, 59, 149, 0.4);
+    }
+    .nav-icon {
+      font-size: 16px;
+    }
+    .nav-badge {
+      margin-left: auto;
+      background: rgba(220, 38, 38, 0.15);
+      color: #dc2626;
+      font-size: 10px;
+      font-weight: 800;
+      padding: 2px 7px;
+      border-radius: 100px;
+    }
+    .nav-item.active .nav-badge {
+      background: rgba(255, 255, 255, 0.25);
+      color: #ffffff;
+    }
+
+    .user-profile-bottom {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.8);
+      margin-top: auto;
+    }
+    .user-avatar-wrap {
+      position: relative;
+    }
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      object-fit: cover;
+      border: 2px solid #ffffff;
+      background: #003B95;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+    }
+    .online-dot {
+      position: absolute;
+      bottom: -2px;
+      right: -2px;
+      width: 10px;
+      height: 10px;
+      background: #16a34a;
+      border: 2px solid #ffffff;
+      border-radius: 50%;
+    }
+    .user-details h4 {
+      font-size: 13px;
+      font-weight: 700;
+      color: #0f172a;
+    }
+    .user-details p {
+      font-size: 11px;
+      color: #64748b;
+      font-weight: 500;
+    }
+
+    /* ========================================================
+       2. CỘT CHÍNH (CENTER COLUMN)
+       ======================================================== */
+    .main-content {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* Top Search Bar */
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 10px 16px;
+    }
+    .search-box {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(255, 255, 255, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.8);
+      border-radius: 16px;
+      padding: 10px 16px;
+    }
+    .search-box input {
+      border: none;
+      background: transparent;
+      outline: none;
+      width: 100%;
+      font-size: 13px;
+      font-family: inherit;
+      color: #1e293b;
+    }
+    .search-box input::placeholder {
+      color: #94a3b8;
+    }
+    .kbd-shortcut {
+      background: rgba(255, 255, 255, 0.8);
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      padding: 2px 6px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #64748b;
+    }
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .icon-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.65);
+      border: 1px solid rgba(255, 255, 255, 0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 16px;
+      position: relative;
+    }
+    .icon-btn .badge-dot {
+      position: absolute;
+      top: 9px;
+      right: 9px;
+      width: 7px;
+      height: 7px;
+      background: #dc2626;
+      border-radius: 50%;
+    }
+    .top-user {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 4px 12px 4px 4px;
+      background: rgba(255, 255, 255, 0.65);
+      border: 1px solid rgba(255, 255, 255, 0.8);
+      border-radius: 14px;
+    }
+    .top-user img {
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+    }
+    .top-user span {
+      font-size: 12.5px;
+      font-weight: 700;
+      color: #0f172a;
+    }
+
+    /* Welcome Hero Card */
+    .hero-card {
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 220px;
+      padding: 28px;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.75) 0%, rgba(240, 245, 255, 0.55) 100%);
+    }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(0, 59, 149, 0.1);
+      color: #003B95;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 4px 12px;
+      border-radius: 100px;
+      margin-bottom: 10px;
+    }
+    .hero-card h1 {
+      font-size: 24px;
+      font-weight: 800;
+      color: #0f172a;
+      line-height: 1.3;
+    }
+    .hero-card p {
+      font-size: 13.5px;
+      color: #475569;
+      margin-top: 6px;
+      max-width: 580px;
+      line-height: 1.5;
+    }
+    .hero-art-box {
+      position: absolute;
+      right: 20px;
+      bottom: 20px;
+      width: 200px;
+      height: 160px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .floating-emblem {
+      width: 140px;
+      height: 140px;
+      object-fit: contain;
+      filter: drop-shadow(0 15px 25px rgba(0, 59, 149, 0.25));
+      animation: floatSlow 4s ease-in-out infinite;
+    }
+    @keyframes floatSlow {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-8px) rotate(2deg); }
+    }
+
+    /* 4 Stat Pills Horizontal */
+    .stats-pills-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-top: 24px;
+    }
+    .stat-pill {
+      background: rgba(255, 255, 255, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.9);
+      border-radius: 16px;
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .stat-pill-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 11px;
+      font-weight: 700;
+      color: #64748b;
+      text-transform: uppercase;
+    }
+    .stat-pill-num {
+      font-size: 20px;
+      font-weight: 800;
+      color: #0f172a;
+    }
+    .stat-trend {
+      font-size: 11px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 3px;
+    }
+    .stat-trend.up { color: #16a34a; }
+    .stat-trend.accent { color: #003B95; }
+
+    /* Table Listing Card */
+    .table-card {
+      padding: 24px;
+    }
+    .table-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .table-title h3 {
+      font-size: 17px;
+      font-weight: 800;
+      color: #0f172a;
+    }
+    .table-title p {
+      font-size: 12px;
+      color: #64748b;
+      margin-top: 2px;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #003B95 0%, #1e3a8a 100%);
+      color: white;
+      border: none;
+      border-radius: 14px;
+      padding: 10px 18px;
+      font-size: 12.5px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 8px 18px -4px rgba(0, 59, 149, 0.4);
+      transition: all 0.2s ease;
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 24px -4px rgba(0, 59, 149, 0.5);
+    }
+
+    /* Tabs Filter */
+    .tabs-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+      padding-bottom: 12px;
+      margin-bottom: 16px;
+    }
+    .tab-pill {
+      background: transparent;
+      border: none;
+      padding: 6px 14px;
+      border-radius: 10px;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: #64748b;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .tab-pill:hover {
+      color: #0f172a;
+      background: rgba(255, 255, 255, 0.5);
+    }
+    .tab-pill.active {
+      background: rgba(255, 255, 255, 0.9);
+      color: #003B95;
+      font-weight: 800;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    }
+
+    /* Filter Toolbar */
+    .filter-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .filter-input {
+      flex: 1;
+      background: rgba(255, 255, 255, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.9);
+      border-radius: 12px;
+      padding: 8px 14px;
+      font-size: 12px;
+      outline: none;
+    }
+    .filter-select {
+      background: rgba(255, 255, 255, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.9);
+      border-radius: 12px;
+      padding: 8px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #334155;
+      outline: none;
+      cursor: pointer;
+    }
+
+    /* Table */
+    .custom-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0 8px;
+    }
+    .custom-table th {
+      padding: 8px 12px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      text-align: left;
+    }
+    .custom-table tbody tr {
+      background: rgba(255, 255, 255, 0.65);
+      border-radius: 14px;
+      transition: all 0.2s ease;
+    }
+    .custom-table tbody tr:hover {
+      background: rgba(255, 255, 255, 0.95);
+      transform: scale(1.003);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+    }
+    .custom-table td {
+      padding: 12px;
+      font-size: 12.5px;
+      vertical-align: middle;
+      border-top: 1px solid rgba(255, 255, 255, 0.8);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.8);
+    }
+    .custom-table td:first-child {
+      border-left: 1px solid rgba(255, 255, 255, 0.8);
+      border-top-left-radius: 14px;
+      border-bottom-left-radius: 14px;
+    }
+    .custom-table td:last-child {
+      border-right: 1px solid rgba(255, 255, 255, 0.8);
+      border-top-right-radius: 14px;
+      border-bottom-right-radius: 14px;
+    }
+
+    .prod-cell {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .prod-thumb {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+    .prod-name {
+      font-weight: 700;
+      color: #0f172a;
+      line-height: 1.3;
+    }
+    .prod-code {
+      font-size: 11px;
+      color: #64748b;
+    }
+
+    .pill-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 10px;
+      border-radius: 100px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .pill-published {
+      background: #dcfce7;
+      color: #15803d;
+    }
+    .pill-upcoming {
+      background: #dbeafe;
+      color: #1e40af;
+    }
+    .pill-ongoing {
+      background: #fef3c7;
+      color: #b45309;
+    }
+
+    .table-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-action-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.8);
+      border: 1px solid #e2e8f0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .btn-action-icon:hover {
+      background: #003B95;
+      color: white;
+      border-color: #003B95;
+    }
+
+    /* Bottom Charts Grid (2 Col) */
+    .bottom-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    /* Performance Chart Mock */
+    .chart-card h4 {
+      font-size: 15px;
+      font-weight: 800;
+      color: #0f172a;
+      margin-bottom: 12px;
+    }
+    .chart-stats-summary {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 15px;
+      padding-top: 15px;
+      border-top: 1px solid rgba(226, 232, 240, 0.7);
+    }
+    .c-stat-box h5 {
+      font-size: 11px;
+      color: #64748b;
+      font-weight: 600;
+    }
+    .c-stat-box p {
+      font-size: 16px;
+      font-weight: 800;
+      color: #0f172a;
+    }
+
+    /* Recent Activity List */
+    .activity-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 10px;
+    }
+    .activity-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      font-size: 12px;
+    }
+    .act-icon {
+      width: 30px;
+      height: 30px;
+      border-radius: 10px;
+      background: #eff6ff;
+      color: #003B95;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      flex-shrink: 0;
+    }
+    .act-content p {
+      font-weight: 600;
+      color: #1e293b;
+      line-height: 1.3;
+    }
+    .act-content span {
+      font-size: 10.5px;
+      color: #94a3b8;
+    }
+
+    /* ========================================================
+       3. CỘT PHẢI (RIGHT COLUMN)
+       ======================================================== */
+    .right-col {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* Status Pill Badge */
+    .sys-status-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(220, 252, 231, 0.7);
+      border: 1px solid rgba(134, 239, 172, 0.8);
+      border-radius: 100px;
+      padding: 8px 16px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #15803d;
+    }
+    .pulse-dot {
+      width: 8px;
+      height: 8px;
+      background: #16a34a;
+      border-radius: 50%;
+      box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.3);
+      animation: pulseAnim 2s infinite;
+    }
+    @keyframes pulseAnim {
+      0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.5); }
+      70% { box-shadow: 0 0 0 8px rgba(34, 197, 94, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+    }
+
+    /* Quick Actions */
+    .quick-actions-card h4 {
+      font-size: 14px;
+      font-weight: 800;
+      color: #0f172a;
+      margin-bottom: 12px;
+    }
+    .quick-btn-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .quick-btn {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.9);
+      color: #1e293b;
+      font-size: 12.5px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+    .quick-btn:hover {
+      background: rgba(255, 255, 255, 0.95);
+      color: #003B95;
+      transform: translateX(3px);
+    }
+    .q-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background: #eff6ff;
+      color: #003B95;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+    }
+
+    /* Finance Fund Widget */
+    .finance-card h4 {
+      font-size: 14px;
+      font-weight: 800;
+      color: #0f172a;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .finance-val {
+      font-size: 26px;
+      font-weight: 800;
+      color: #0f172a;
+      margin: 8px 0 2px 0;
+      letter-spacing: -0.5px;
+    }
+    .finance-growth {
+      font-size: 12px;
+      font-weight: 700;
+      color: #16a34a;
+      margin-bottom: 12px;
+    }
+
+    /* 7 Bans List Widget */
+    .bans-widget h4 {
+      font-size: 14px;
+      font-weight: 800;
+      color: #0f172a;
+      margin-bottom: 12px;
+    }
+    .ban-item-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(226, 232, 240, 0.6);
+      font-size: 12px;
+    }
+    .ban-item-row:last-child {
+      border-bottom: none;
+    }
+    .ban-name {
+      font-weight: 700;
+      color: #1e293b;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .ban-trend {
+      font-weight: 700;
+      color: #16a34a;
+      font-size: 11px;
+    }
+
+    /* Grow Community Banner */
+    .b2b-banner {
+      background: linear-gradient(135deg, rgba(0, 59, 149, 0.85) 0%, rgba(30, 58, 138, 0.95) 100%);
+      color: white;
+      padding: 22px;
+      border-radius: 22px;
+      position: relative;
+      overflow: hidden;
+    }
+    .b2b-banner h4 {
+      font-size: 16px;
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+    .b2b-banner p {
+      font-size: 12px;
+      color: #cbd5e1;
+      line-height: 1.4;
+      margin-bottom: 14px;
+    }
+    .btn-b2b {
+      background: white;
+      color: #003B95;
+      font-weight: 800;
+      font-size: 12px;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-b2b:hover {
+      background: #f8fafc;
+      transform: translateY(-2px);
+    }
+
+    /* ========================================================
+       4. FOOTER BANNER
+       ======================================================== */
+    .footer-banner {
+      grid-column: 1 / -1;
+      background: linear-gradient(90deg, rgba(255, 255, 255, 0.75) 0%, rgba(240, 245, 255, 0.7) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 28px;
+      border-radius: 20px;
+    }
+    .footer-brand {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .footer-logo {
+      width: 44px;
+      height: 44px;
+      background: #003B95;
+      color: white;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 18px;
+    }
+    .footer-text h3 {
+      font-size: 15px;
+      font-weight: 800;
+      color: #0f172a;
+    }
+    .footer-text p {
+      font-size: 12px;
+      color: #475569;
+    }
+    .btn-footer {
+      background: #003B95;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 10px 20px;
+      font-size: 12.5px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0, 59, 149, 0.3);
+      transition: all 0.2s;
+    }
+    .btn-footer:hover {
+      background: #002f78;
+    }
+
+    /* SVG Mini Sparkline */
+    .sparkline {
+      width: 100%;
+      height: 60px;
+      overflow: visible;
+    }
+
+    /* ========================================================
+       5. ORGANIZATIONAL STRUCTURE TREE (BCS LỚP & TEAM)
+       ======================================================== */
+    .org-structure-card {
+      margin-top: 20px;
+    }
+    .org-tree-wrapper {
+      padding: 16px 8px 8px 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+    }
+    .tree-root-node {
+      background: linear-gradient(135deg, #e11d48 0%, #be123c 100%);
+      color: #ffffff;
+      padding: 12px 28px;
+      border-radius: 16px;
+      text-align: center;
+      box-shadow: 0 10px 25px -5px rgba(225, 29, 72, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      position: relative;
+      z-index: 2;
+    }
+    .tree-root-node.leader-node {
+      min-width: 260px;
+    }
+    .tree-root-node .role-badge {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      background: rgba(255, 255, 255, 0.25);
+      padding: 2px 10px;
+      border-radius: 999px;
+      margin-bottom: 4px;
+    }
+    .tree-root-node h4 {
+      font-size: 15px;
+      font-weight: 800;
+      letter-spacing: -0.2px;
+    }
+    .tree-root-node p {
+      font-size: 11px;
+      opacity: 0.9;
+    }
+    .team-roots-row {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+    }
+    .tree-root-node.leader-team-node {
+      min-width: 200px;
+    }
+    .tree-connector {
+      width: 2px;
+      height: 24px;
+      background: rgba(0, 59, 149, 0.35);
+      position: relative;
+    }
+    .tree-children-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      width: 100%;
+      position: relative;
+      padding-top: 14px;
+    }
+    .tree-children-grid::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 5%;
+      right: 5%;
+      height: 2px;
+      background: rgba(0, 59, 149, 0.25);
+    }
+    .tree-children-grid.team-grid {
+      grid-template-columns: repeat(4, 1fr);
+    }
+    .tree-child-node {
+      background: rgba(30, 58, 138, 0.88);
+      color: #ffffff;
+      padding: 12px 14px;
+      border-radius: 14px;
+      text-align: center;
+      box-shadow: 0 8px 20px -4px rgba(30, 58, 138, 0.25);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      transition: all 0.25s ease;
+      position: relative;
+    }
+    .tree-child-node::before {
+      content: '';
+      position: absolute;
+      top: -14px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 2px;
+      height: 14px;
+      background: rgba(0, 59, 149, 0.25);
+    }
+    .tree-child-node:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 28px -4px rgba(30, 58, 138, 0.35);
+      background: rgba(30, 58, 138, 0.98);
+    }
+    .tree-child-node .node-icon {
+      font-size: 16px;
+      display: block;
+      margin-bottom: 4px;
+    }
+    .tree-child-node h5 {
+      font-size: 11.5px;
+      font-weight: 700;
+      line-height: 1.35;
+      margin-bottom: 4px;
+    }
+    .tree-child-node p {
+      font-size: 10px;
+      opacity: 0.8;
+      line-height: 1.25;
+    }
+    .tree-child-node.team-child {
+      background: rgba(15, 23, 42, 0.85);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="bg-overlay"></div>
+
+  <div class="dashboard-container">
+
+    <!-- 1. SIDEBAR TRÁI (GLASSMORPHISM STYLE) -->
+    <aside class="sidebar glass-card">
+      <div>
+        <div class="brand-header">
+          <div class="brand-logo-icon">HN10</div>
+          <div class="brand-info">
+            <h2>CEO HN10</h2>
+            <p>HanoiBA Chapter</p>
+          </div>
+        </div>
+
+        <ul class="nav-list">
+          <li class="nav-item">
+            <a href="#overview">
+              <span class="nav-icon">🏠</span>
+              <span>Tổng quan CLB</span>
+            </a>
+          </li>
+          <li class="nav-item active">
+            <a href="#trainings">
+              <span class="nav-icon">🎓</span>
+              <span>Lớp học &amp; Đào tạo</span>
+              <span class="nav-badge">30</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="#events">
+              <span class="nav-icon">📅</span>
+              <span>Sự kiện &amp; Họp ban</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="#connect">
+              <span class="nav-icon">🤝</span>
+              <span>B2B Connect</span>
+              <span class="nav-badge">12</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="#members">
+              <span class="nav-icon">👥</span>
+              <span>Danh bạ Hội viên</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="#finance">
+              <span class="nav-icon">💰</span>
+              <span>Tài chính &amp; Quỹ</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="#analytics">
+              <span class="nav-icon">📊</span>
+              <span>Báo cáo &amp; KPI</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="#documents">
+              <span class="nav-icon">📁</span>
+              <span>Kho tài liệu số</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="#settings">
+              <span class="nav-icon">⚙️</span>
+              <span>Phân quyền 7 Ban</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <!-- User Profile Card -->
+      <div class="user-profile-bottom">
+        <div class="user-avatar-wrap">
+          <div class="user-avatar">LT</div>
+          <div class="online-dot"></div>
+        </div>
+        <div class="user-details">
+          <h4>Lớp Trưởng Lâm Thời</h4>
+          <p>Ban Cán Sự CEO HN10</p>
+        </div>
+      </div>
+    </aside>
+
+    <!-- 2. CỘT CHÍNH (MAIN DASHBOARD AREA) -->
+    <main class="main-content">
+      
+      <!-- Top Search & Profile Bar -->
+      <header class="topbar glass-card">
+        <div class="search-box">
+          <span>🔍</span>
+          <input type="text" placeholder="Tìm kiếm chuyên đề đào tạo, giảng viên, sự kiện Gala, hội viên CEO HN10..." />
+          <span class="kbd-shortcut">⌘ K</span>
+        </div>
+        <div class="topbar-actions">
+          <div class="icon-btn" title="Thông báo hệ thống">
+            <span>🔔</span>
+            <div class="badge-dot"></div>
+          </div>
+          <div class="top-user">
+            <div class="user-avatar" style="width:28px; height:28px; font-size:11px;">TD</div>
+            <span>Lê Thị Dung (Admin)</span>
+          </div>
+        </div>
+      </header>
+
+      <!-- Welcome Hero Banner -->
+      <section class="hero-card glass-card">
+        <div>
+          <div class="hero-badge">⚡ CHUYỂN ĐỔI SỐ TOÀN DIỆN CEO1983</div>
+          <h1>Chào buổi sáng, Ban Cán Sự Lớp CEO HN10 👋</h1>
+          <p>
+            Quản trị chuỗi đào tạo 30 buổi thứ 7 hàng tuần, theo dõi điểm danh chuyên cần QR tự động và vận hành đồng bộ 7 Ban Chuyên Môn trên CSDL PostgreSQL chuẩn 113.20.107.184.
+          </p>
+        </div>
+
+        <div class="hero-art-box">
+          <img src="ceohn10_emblem_fixed.png" alt="Emblem CEO HN10" class="floating-emblem" onerror="this.src='canva_screen.jpg'" />
+        </div>
+
+        <!-- 4 Stat Pills Horizontal -->
+        <div class="stats-pills-row">
+          <div class="stat-pill">
+            <div class="stat-pill-header">
+              <span>Chuỗi Đào Tạo</span>
+              <span>🎓</span>
+            </div>
+            <div class="stat-pill-num">30 Buổi</div>
+            <div class="stat-trend up">↑ 100% Theo Kế Hoạch</div>
+          </div>
+
+          <div class="stat-pill">
+            <div class="stat-pill-header">
+              <span>Sĩ Số Học Viên</span>
+              <span>👥</span>
+            </div>
+            <div class="stat-pill-num">95 CEO</div>
+            <div class="stat-trend up">↑ 95% Đã Ghi Danh</div>
+          </div>
+
+          <div class="stat-pill">
+            <div class="stat-pill-header">
+              <span>Đã Diễn Ra</span>
+              <span>📜</span>
+            </div>
+            <div class="stat-pill-num">2 Buổi</div>
+            <div class="stat-trend accent">● Lưu Nhật Ký Chuẩn</div>
+          </div>
+
+          <div class="stat-pill">
+            <div class="stat-pill-header">
+              <span>Đánh Giá Hài Lòng</span>
+              <span>⭐</span>
+            </div>
+            <div class="stat-pill-num">4.95 / 5.0</div>
+            <div class="stat-trend up">↑ 98.5% Hài Lòng</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Table Listing: Buổi Đào Tạo & Chuyên Đề -->
+      <section class="table-card glass-card">
+        <div class="table-header-row">
+          <div class="table-title">
+            <h3>Danh Sách Lớp Học &amp; Buổi Đào Tạo Doanh Nhân</h3>
+            <p>Quản lý lịch học thứ 7, phòng học Hybrid Google Meet, kiểm soát điểm danh QR và video bài giảng</p>
+          </div>
+          <button class="btn-primary" onclick="alert('Mở wizard thiết lập buổi đào tạo mới!');">
+            <span>➕</span>
+            <span>Thiết Lập Buổi Học Mới</span>
+          </button>
+        </div>
+
+        <!-- Sub Tabs -->
+        <div class="tabs-row">
+          <button class="tab-pill active">Tất Cả (30 Buổi)</button>
+          <button class="tab-pill">Sắp Diễn Ra (28)</button>
+          <button class="tab-pill">Đã Hoàn Thành (2)</button>
+          <button class="tab-pill">Lưu Kho Tư Liệu (4)</button>
+        </div>
+
+        <!-- Filter Bar -->
+        <div class="filter-bar">
+          <input type="text" class="filter-input" placeholder="🔍 Lọc theo tên buổi học, chuyên đề, giảng viên..." />
+          <select class="filter-select">
+            <option>Tất Cả 7 Ban Chuyên Môn</option>
+            <option>Ban Học Tập</option>
+            <option>Ban Sự Kiện &amp; Hậu Cần</option>
+            <option>Ban Tài Chính &amp; Tài Trợ</option>
+            <option>Ban Truyền Thông</option>
+            <option>Ban Công Nghệ</option>
+            <option>Ban Đối Ngoại &amp; Giao Thương</option>
+            <option>Ban Đời Sống &amp; Gắn Kết</option>
+          </select>
+          <select class="filter-select">
+            <option>Tất Cả Trạng Thái</option>
+            <option>Sắp diễn ra</option>
+            <option>Đang diễn ra</option>
+            <option>Đã hoàn thành</option>
+          </select>
+          <select class="filter-select">
+            <option>Sắp Xếp: Mới Nhất</option>
+            <option>Theo Lịch Thứ Bảy</option>
+          </select>
+        </div>
+
+        <!-- Table Content -->
+        <table class="custom-table">
+          <thead>
+            <tr>
+              <th style="width: 32px;"><input type="checkbox" /></th>
+              <th>Buổi Học &amp; Chuyên Đề</th>
+              <th>Giảng Viên / Cố Vấn</th>
+              <th>Thời Gian &amp; Địa Điểm</th>
+              <th>Sĩ Số</th>
+              <th>Trạng Thái</th>
+              <th>Thao Tác</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Row 1 -->
+            <tr>
+              <td><input type="checkbox" checked /></td>
+              <td>
+                <div class="prod-cell">
+                  <div class="prod-thumb">🎓</div>
+                  <div>
+                    <div class="prod-name">Buổi 01: Văn Hóa Doanh Nhân &amp; Chiến Lược Điều Hành</div>
+                    <div class="prod-code">Mã: CLASS-CEOHN10-B01 · Kỹ năng lãnh đạo</div>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <strong>Chuyên gia Đặng Thanh Vân</strong><br>
+                <span style="font-size:11px; color:#64748b;">Chuyên gia Chiến lược Thương hiệu</span>
+              </td>
+              <td>
+                <strong>08/11/2026</strong><br>
+                <span style="font-size:11px; color:#64748b;">Hội trường Tầng 3 - Trụ sở CLB</span>
+              </td>
+              <td><strong>92/100</strong> (92%)</td>
+              <td><span class="pill-status pill-published">✓ Đã Hoàn Thành</span></td>
+              <td>
+                <div class="table-actions">
+                  <button class="btn-action-icon" title="Xem danh sách điểm danh">👥</button>
+                  <button class="btn-action-icon" title="Xem đánh giá sao">⭐</button>
+                  <button class="btn-action-icon" title="Xem video bài giảng">🎥</button>
+                </div>
+              </td>
+            </tr>
+
+            <!-- Row 2 -->
+            <tr>
+              <td><input type="checkbox" checked /></td>
+              <td>
+                <div class="prod-cell">
+                  <div class="prod-thumb">📊</div>
+                  <div>
+                    <div class="prod-name">Buổi 02: Quản Trị Mục Tiêu OKRs &amp; KPI Thực Chiến</div>
+                    <div class="prod-code">Mã: CLASS-CEOHN10-B02 · Quản trị vận hành</div>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <strong>ThS. Nguyễn Hữu Long</strong><br>
+                <span style="font-size:11px; color:#64748b;">Chuyên gia Quản trị Nhân sự &amp; Hiệu suất</span>
+              </td>
+              <td>
+                <strong>15/11/2026</strong><br>
+                <span style="font-size:11px; color:#64748b;">Phòng Đào tạo A1 &amp; Online</span>
+              </td>
+              <td><strong>88/100</strong> (88%)</td>
+              <td><span class="pill-status pill-published">✓ Đã Hoàn Thành</span></td>
+              <td>
+                <div class="table-actions">
+                  <button class="btn-action-icon" title="Xem danh sách điểm danh">👥</button>
+                  <button class="btn-action-icon" title="Xem đánh giá sao">⭐</button>
+                  <button class="btn-action-icon" title="Xem video bài giảng">🎥</button>
+                </div>
+              </td>
+            </tr>
+
+            <!-- Row 3 -->
+            <tr>
+              <td><input type="checkbox" /></td>
+              <td>
+                <div class="prod-cell">
+                  <div class="prod-thumb">💰</div>
+                  <div>
+                    <div class="prod-name">Buổi 03: Quản Trị Tài Chính &amp; Chiến Lược Vốn Doanh Nghiệp</div>
+                    <div class="prod-code">Mã: CLASS-CEOHN10-B03 · Tài chính &amp; Đầu tư</div>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <strong>Lớp Phó Tài Chính</strong><br>
+                <span style="font-size:11px; color:#64748b;">Ban Tài Chính &amp; Tài Trợ</span>
+              </td>
+              <td>
+                <strong>25/11/2026 (09:00)</strong><br>
+                <span style="font-size:11px; color:#003B95;">🌐 Google Meet Hybrid</span>
+              </td>
+              <td><strong>100 CEO</strong> (Đầy chỗ)</td>
+              <td><span class="pill-status pill-upcoming">⏳ Sắp Diễn Ra</span></td>
+              <td>
+                <div class="table-actions">
+                  <button class="btn-action-icon" title="Vào phòng trực tuyến">🌐</button>
+                  <button class="btn-action-icon" title="Mã QR Check-in">📱</button>
+                  <button class="btn-action-icon" title="Chỉnh sửa buổi học">✏️</button>
+                </div>
+              </td>
+            </tr>
+
+            <!-- Row 4 -->
+            <tr>
+              <td><input type="checkbox" /></td>
+              <td>
+                <div class="prod-cell">
+                  <div class="prod-thumb">🤖</div>
+                  <div>
+                    <div class="prod-name">Buổi 04: Chuyển Đổi Số &amp; Ứng Dụng AI Trong Điều Hành</div>
+                    <div class="prod-code">Mã: CLASS-CEOHN10-B04 · Công nghệ số</div>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <strong>Lớp Phó Công Nghệ</strong><br>
+                <span style="font-size:11px; color:#64748b;">Ban Công Nghệ CEO HN10</span>
+              </td>
+              <td>
+                <strong>02/12/2026 (08:30)</strong><br>
+                <span style="font-size:11px; color:#64748b;">Trụ sở CLB CEO HN10</span>
+              </td>
+              <td><strong>85/100</strong> (Còn 15 chỗ)</td>
+              <td><span class="pill-status pill-upcoming">⏳ Sắp Diễn Ra</span></td>
+              <td>
+                <div class="table-actions">
+                  <button class="btn-action-icon" title="Mã QR Check-in">📱</button>
+                  <button class="btn-action-icon" title="Bắn mạng lưới Mobile">📢</button>
+                  <button class="btn-action-icon" title="Chỉnh sửa buổi học">✏️</button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- Bottom Row: Performance Chart & Recent Activity -->
+      <div class="bottom-grid">
+        <!-- Chuyên Cần & Điểm Danh Chart -->
+        <div class="chart-card glass-card">
+          <h4>Hiệu Suất Điểm Danh &amp; Chuyên Cần</h4>
+          <svg class="sparkline" viewBox="0 0 400 80">
+            <defs>
+              <linearGradient id="gradChart" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#003B95" stop-opacity="0.4"/>
+                <stop offset="100%" stop-color="#003B95" stop-opacity="0.0"/>
+              </linearGradient>
+            </defs>
+            <path d="M 0 60 Q 50 45, 100 50 T 200 25 T 300 15 T 400 10 L 400 80 L 0 80 Z" fill="url(#gradChart)" />
+            <path d="M 0 60 Q 50 45, 100 50 T 200 25 T 300 15 T 400 10" fill="none" stroke="#003B95" stroke-width="3" stroke-linecap="round" />
+            <circle cx="300" cy="15" r="5" fill="#003B95" stroke="#ffffff" stroke-width="2" />
+          </svg>
+          <div class="chart-stats-summary">
+            <div class="c-stat-box">
+              <h5>Tổng Lượt Tham Gia</h5>
+              <p>1,248 lượt</p>
+            </div>
+            <div class="c-stat-box">
+              <h5>Điểm Danh QR</h5>
+              <p>436 lượt</p>
+            </div>
+            <div class="c-stat-box">
+              <h5>Tỷ Lệ Đúng Giờ</h5>
+              <p style="color:#16a34a;">93.5%</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Activity Feed -->
+        <div class="glass-card">
+          <h4 style="font-size:15px; font-weight:800; color:#0f172a; margin-bottom:12px;">Hoạt Động Mới Nhất CLB</h4>
+          <div class="activity-list">
+            <div class="activity-item">
+              <div class="act-icon">💰</div>
+              <div class="act-content">
+                <p>Hội viên Vũ Phan Vũ đóng hội phí gia nhập CLB (+25.000.000 VNĐ)</p>
+                <span>2 phút trước · Mã giao dịch HP-HN10-099</span>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="act-icon">📅</div>
+              <div class="act-content">
+                <p>Khởi tạo sự kiện Gala CEO HN10 Gắn Kết &amp; Xúc Tiến Thương Mại 2026</p>
+                <span>15 phút trước · Ban Sự Kiện &amp; Hậu Cần</span>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="act-icon">⭐</div>
+              <div class="act-content">
+                <p>Học viên gửi 38 lượt đánh giá 5 sao cho Buổi 02 (OKRs &amp; KPI)</p>
+                <span>35 phút trước · Phản hồi học viên</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SƠ ĐỒ TỔ CHỨC BAN CÁN SỰ (BCS) LỚP & TEAM THEO CHUẨN CEO HN10 -->
+      <section class="org-structure-card glass-card">
+        <div class="table-header-row" style="margin-bottom: 16px;">
+          <div class="table-title">
+            <h3>Sơ Đồ Tổ Chức Ban Cán Sự Lớp &amp; Ban Cán Sự Team</h3>
+            <p>Cơ cấu phân nhiệm 7 Ban Chuyên Môn và phân cấp quản trị điều hành lớp CEO HN10</p>
+          </div>
+          <div class="tabs-row" style="margin-bottom:0;">
+            <button class="tab-pill active" id="btn-tab-bcs-lop" onclick="switchBcsTab('lop')">Sơ Đồ BCS Lớp</button>
+            <button class="tab-pill" id="btn-tab-bcs-team" onclick="switchBcsTab('team')">Sơ Đồ BCS Team</button>
+            <button class="tab-pill" id="btn-tab-bcs-7ban" onclick="switchBcsTab('7ban')">7 Ban Trong Lớp CEOHN10</button>
+          </div>
+        </div>
+
+        <!-- 1. SƠ ĐỒ BCS LỚP (Ảnh 2 - Trên) -->
+        <div id="tree-bcs-lop" class="org-tree-wrapper">
+          <div class="tree-root-node leader-node">
+            <span class="role-badge">LÃNH ĐẠO ĐIỀU HÀNH</span>
+            <h4>Lớp Trưởng Lâm Thời</h4>
+            <p>Chịu trách nhiệm toàn diện điều hành Lớp CEO HN10</p>
+          </div>
+          <div class="tree-connector"></div>
+          <div class="tree-children-grid">
+            <div class="tree-child-node">
+              <span class="node-icon">📚</span>
+              <h5>Lớp Phó Học Tập<br>Lâm Thời</h5>
+              <p>Phụ trách Ban Học Tập</p>
+            </div>
+            <div class="tree-child-node">
+              <span class="node-icon">🎪</span>
+              <h5>Lớp Phó Sự Kiện &amp; Hậu Cần<br>Lâm Thời</h5>
+              <p>Phụ trách Hậu Cần &amp; Gala</p>
+            </div>
+            <div class="tree-child-node">
+              <span class="node-icon">💰</span>
+              <h5>Lớp Phó Tài Chính<br>Tài Trợ Lâm Thời</h5>
+              <p>Phụ trách Quỹ &amp; Tài Trợ</p>
+            </div>
+            <div class="tree-child-node">
+              <span class="node-icon">📢</span>
+              <h5>Lớp Phó Truyền Thông<br>Lâm Thời</h5>
+              <p>Phụ trách Ấn Phẩm &amp; MXH</p>
+            </div>
+            <div class="tree-child-node">
+              <span class="node-icon">💻</span>
+              <h5>Lớp Phó Công Nghệ<br>Lâm Thời</h5>
+              <p>Phụ trách CRM &amp; App</p>
+            </div>
+            <div class="tree-child-node">
+              <span class="node-icon">🤝</span>
+              <h5>Lớp Phó Đối Ngoại &amp;<br>Giao Thương Lâm Thời</h5>
+              <p>Phụ trách B2B Connect</p>
+            </div>
+            <div class="tree-child-node" style="grid-column: span 2;">
+              <span class="node-icon">❤️</span>
+              <h5>Lớp Phó Đời Sống &amp; Gắn Kết Thành Viên Lâm Thời</h5>
+              <p>Phụ trách Văn Hóa, Hiếu Hỷ &amp; Gắn Kết 95 CEO Học Viên</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. SƠ ĐỒ BCS TEAM (Ảnh 2 - Dưới) -->
+        <div id="tree-bcs-team" class="org-tree-wrapper" style="display:none;">
+          <div class="team-roots-row">
+            <div class="tree-root-node leader-team-node">
+              <span class="role-badge">ĐIỀU HÀNH TEAM</span>
+              <h4>Trưởng Team LT</h4>
+              <p>Chỉ huy hoạt động toàn Team</p>
+            </div>
+            <div class="tree-root-node leader-team-node" style="background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); box-shadow: 0 10px 25px -5px rgba(2, 132, 199, 0.4);">
+              <span class="role-badge">PHÓ ĐIỀU HÀNH</span>
+              <h4>2 Phó Team LT</h4>
+              <p>Hỗ trợ chỉ huy &amp; đôn đốc kế hoạch</p>
+            </div>
+          </div>
+          <div class="tree-connector"></div>
+          <div class="tree-children-grid team-grid">
+            <div class="tree-child-node team-child">
+              <span class="node-icon">👥</span>
+              <h5>3 Phó Team<br>Tập Sự</h5>
+              <p>Điều phối tiểu ban</p>
+            </div>
+            <div class="tree-child-node team-child">
+              <span class="node-icon">📚</span>
+              <h5>Trưởng Ban Học Tập<br>Tập Sự</h5>
+              <p>Theo dõi học vụ</p>
+            </div>
+            <div class="tree-child-node team-child">
+              <span class="node-icon">🎪</span>
+              <h5>Trưởng Ban Sự Kiện &amp;<br>Hậu Cần Tập Sự</h5>
+              <p>Tổ chức hậu cần</p>
+            </div>
+            <div class="tree-child-node team-child">
+              <span class="node-icon">💰</span>
+              <h5>Trưởng Ban Tài Chính<br>Tài Trợ Tập Sự</h5>
+              <p>Quản lý thu chi</p>
+            </div>
+            <div class="tree-child-node team-child">
+              <span class="node-icon">📢</span>
+              <h5>Trưởng Ban Truyền Thông<br>Tập Sự</h5>
+              <p>Ấn phẩm &amp; hình ảnh</p>
+            </div>
+            <div class="tree-child-node team-child">
+              <span class="node-icon">💻</span>
+              <h5>Trưởng Ban Công Nghệ<br>Tập Sự</h5>
+              <p>Hỗ trợ kỹ thuật</p>
+            </div>
+            <div class="tree-child-node team-child">
+              <span class="node-icon">🤝</span>
+              <h5>Trưởng Ban Đối Ngoại &amp;<br>Giao Thương Tập Sự</h5>
+              <p>Giao thương B2B</p>
+            </div>
+            <div class="tree-child-node team-child">
+              <span class="node-icon">❤️</span>
+              <h5>Trưởng Ban Đời Sống &amp;<br>Gắn Kết TV Tập Sự</h5>
+              <p>Gắn kết thành viên</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. CÁC BAN TRONG LỚP CEOHN10 (Ảnh 1) -->
+        <div id="tree-bcs-7ban" class="org-tree-wrapper" style="display:none;">
+          <div class="tree-root-node leader-node" style="background: linear-gradient(135deg, #e11d48 0%, #be123c 100%);">
+            <span class="role-badge">TỔ CHỨC LỚP</span>
+            <h4>Các Ban Trong Lớp CEOHN10</h4>
+            <p>Hệ sinh thái 7 Ban Chuyên Môn tương hỗ, gắn kết &amp; phát triển bền vững</p>
+          </div>
+          <div class="tree-connector"></div>
+          <div class="tree-children-grid">
+            <div class="tree-child-node" style="background:rgba(29, 78, 216, 0.9);">
+              <span class="node-icon">📚</span>
+              <h5>Ban Học Tập</h5>
+              <p>Tổ chức 30 chuyên đề đào tạo &amp; tài liệu</p>
+            </div>
+            <div class="tree-child-node" style="background:rgba(29, 78, 216, 0.9);">
+              <span class="node-icon">🎪</span>
+              <h5>Ban Sự Kiện &amp; Hậu Cần</h5>
+              <p>Hội thảo, Gala, thăm quan doanh nghiệp</p>
+            </div>
+            <div class="tree-child-node" style="background:rgba(29, 78, 216, 0.9);">
+              <span class="node-icon">💰</span>
+              <h5>Ban Tài Chính &amp; Tài Trợ</h5>
+              <p>Thu chi minh bạch, vận động tài trợ lớp</p>
+            </div>
+            <div class="tree-child-node" style="background:rgba(29, 78, 216, 0.9);">
+              <span class="node-icon">📢</span>
+              <h5>Ban Truyền Thông</h5>
+              <p>Lan tỏa hình ảnh, thương hiệu CEO HN10</p>
+            </div>
+            <div class="tree-child-node" style="background:rgba(29, 78, 216, 0.9);">
+              <span class="node-icon">💻</span>
+              <h5>Ban Công Nghệ</h5>
+              <p>Chuyển đổi số CRM, Mobile App &amp; QR</p>
+            </div>
+            <div class="tree-child-node" style="background:rgba(29, 78, 216, 0.9);">
+              <span class="node-icon">🤝</span>
+              <h5>Ban Đối Ngoại &amp; Giao Thương</h5>
+              <p>Xúc tiến thương mại &amp; B2B Matching</p>
+            </div>
+            <div class="tree-child-node" style="background:rgba(29, 78, 216, 0.9); grid-column: span 2;">
+              <span class="node-icon">❤️</span>
+              <h5>Ban Đời Sống &amp; Gắn Kết Thành Viên</h5>
+              <p>Chăm lo đời sống tinh thần, hiếu hỷ &amp; gắn kết bền chặt các thành viên</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- 3. CỘT PHẢI (WIDGETS & STATS) -->
+    <aside class="right-col">
+
+      <!-- Status System Pill -->
+      <div class="sys-status-badge">
+        <div class="pulse-dot"></div>
+        <span>CSDL Chuẩn: 113.20.107.184 (Active)</span>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="quick-actions-card glass-card">
+        <h4>Thao Tác Nhanh Ban Cán Sự</h4>
+        <div class="quick-btn-grid">
+          <a class="quick-btn" onclick="alert('Thiết lập buổi học');">
+            <div class="q-icon">➕</div>
+            <span>Thiết Lập Buổi Học Mới</span>
+          </a>
+          <a class="quick-btn" onclick="alert('Tạo mã QR Check-in');">
+            <div class="q-icon">📱</div>
+            <span>Tạo QR Check-in Điểm Danh</span>
+          </a>
+          <a class="quick-btn" onclick="alert('Bắn thông báo Mobile App');">
+            <div class="q-icon">📢</div>
+            <span>Bắn Mạng Lưới Mobile App</span>
+          </a>
+          <a class="quick-btn" onclick="alert('Xuất báo cáo nhật ký');">
+            <div class="q-icon">📥</div>
+            <span>Xuất Nhật Ký Đào Tạo (Excel)</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Quỹ Hội & Tài Chính -->
+      <div class="finance-card glass-card">
+        <h4>
+          <span>Dòng Tiền Quỹ Hội</span>
+          <span style="font-size:11px; color:#64748b; font-weight:600;">Tháng 11/2026</span>
+        </h4>
+        <div class="finance-val">+25.000.000 đ</div>
+        <div class="finance-growth">↑ 18% so với tháng trước (Thu hội phí)</div>
+        <svg class="sparkline" viewBox="0 0 260 40">
+          <path d="M 0 35 Q 40 25, 80 30 T 160 15 T 260 5" fill="none" stroke="#16a34a" stroke-width="2.5" stroke-linecap="round" />
+        </svg>
+      </div>
+
+      <!-- Hoạt Động Theo 7 Ban Chuyên Môn -->
+      <div class="bans-widget glass-card">
+        <h4>Hoạt Động Theo 7 Ban Chuyên Môn</h4>
+        <div class="ban-item-row">
+          <div class="ban-name"><span>📚</span><span>Ban Học Tập</span></div>
+          <div class="ban-trend">30 Buổi (↑ 22%)</div>
+        </div>
+        <div class="ban-item-row">
+          <div class="ban-name"><span>🎪</span><span>Ban Sự Kiện &amp; Hậu Cần</span></div>
+          <div class="ban-trend">12 Sự kiện (↑ 16%)</div>
+        </div>
+        <div class="ban-item-row">
+          <div class="ban-name"><span>💰</span><span>Ban Tài Chính &amp; Tài Trợ</span></div>
+          <div class="ban-trend">Thu quỹ (↑ 12%)</div>
+        </div>
+        <div class="ban-item-row">
+          <div class="ban-name"><span>📢</span><span>Ban Truyền Thông</span></div>
+          <div class="ban-trend">48 Bài viết (↑ 28%)</div>
+        </div>
+        <div class="ban-item-row">
+          <div class="ban-name"><span>💻</span><span>Ban Công Nghệ</span></div>
+          <div class="ban-trend">CRM &amp; App (↑ 9%)</div>
+        </div>
+        <div class="ban-item-row">
+          <div class="ban-name"><span>🤝</span><span>Ban Đối Ngoại &amp; Giao Thương</span></div>
+          <div class="ban-trend">15 B2B Deal (↑ 15%)</div>
+        </div>
+        <div class="ban-item-row">
+          <div class="ban-name"><span>❤️</span><span>Ban Đời Sống &amp; Gắn Kết TV</span></div>
+          <div class="ban-trend">95 Hội viên (100%)</div>
+        </div>
+      </div>
+
+      <!-- B2B Connect Banner -->
+      <div class="b2b-banner glass-card">
+        <h4>Mạng Lưới Giao Thương B2B</h4>
+        <p>Kết nối 500+ cơ hội hợp tác kinh doanh nội bộ giữa các doanh nhân CEO HN10.</p>
+        <button class="btn-b2b" onclick="alert('Mở phân hệ B2B Connect');">Kết Nối Ngay →</button>
+      </div>
+
+    </aside>
+
+    <!-- 4. FOOTER BANNER DƯỚI CÙNG -->
+    <footer class="footer-banner glass-card">
+      <div class="footer-brand">
+        <div class="footer-logo">10</div>
+        <div class="footer-text">
+          <h3>CEO HN10 - KẾT NỐI TINH HOA, VƯƠN TẦM BỨT PHÁ!</h3>
+          <p>Nền tảng công nghệ toàn diện phục vụ cộng đồng doanh nhân trẻ Thủ đô (HanoiBA)</p>
+        </div>
+      </div>
+      <button class="btn-footer" onclick="window.open('https://14.225.217.232:10443', '_blank');">
+        Truy Cập Cổng Quản Trị CRM →
+      </button>
+    </footer>
+
+  </div>
+
+  <script>
+    function switchBcsTab(tab) {
+      document.getElementById('tree-bcs-lop').style.display = (tab === 'lop') ? 'flex' : 'none';
+      document.getElementById('tree-bcs-team').style.display = (tab === 'team') ? 'flex' : 'none';
+      document.getElementById('tree-bcs-7ban').style.display = (tab === '7ban') ? 'flex' : 'none';
+
+      document.getElementById('btn-tab-bcs-lop').classList.toggle('active', tab === 'lop');
+      document.getElementById('btn-tab-bcs-team').classList.toggle('active', tab === 'team');
+      document.getElementById('btn-tab-bcs-7ban').classList.toggle('active', tab === '7ban');
+    }
+  </script>
+</body>
+</html>

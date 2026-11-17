@@ -23,7 +23,10 @@ export class DocumentsRepository {
   async listDocuments(associationId?: string | null): Promise<any[]> {
     if (associationId) {
       return this.prisma.$queryRaw<any[]>`
-        SELECT code, name, category, size, uploaded_at, uploaded_by, type, file_path, association_id, folder_id, drive_url, is_folder,
+        SELECT id, COALESCE(code, id::text) as code, COALESCE(name, title, 'Tài liệu') as name,
+               category, size, uploaded_at, uploaded_by, type,
+               COALESCE(file_path, file_url, drive_url, '') as file_path,
+               association_id, folder_id, drive_url, is_folder,
                share_scope, share_role, shared_with, is_starred, color_tag, description, doc_scope, enterprise_name
         FROM public.documents
         WHERE association_id = ${associationId}::uuid
@@ -31,7 +34,10 @@ export class DocumentsRepository {
       `.catch(() => []);
     }
     return this.prisma.$queryRaw<any[]>`
-      SELECT code, name, category, size, uploaded_at, uploaded_by, type, file_path, association_id, folder_id, drive_url, is_folder,
+      SELECT id, COALESCE(code, id::text) as code, COALESCE(name, title, 'Tài liệu') as name,
+             category, size, uploaded_at, uploaded_by, type,
+             COALESCE(file_path, file_url, drive_url, '') as file_path,
+             association_id, folder_id, drive_url, is_folder,
              share_scope, share_role, shared_with, is_starred, color_tag, description, doc_scope, enterprise_name
       FROM public.documents
       ORDER BY is_folder DESC, uploaded_at DESC
