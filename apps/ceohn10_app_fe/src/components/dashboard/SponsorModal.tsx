@@ -4,29 +4,18 @@ import {
   Handshake,
   X,
   Sparkles,
-  Building2,
-  Package,
-  Check,
-  Plus,
-  AlertCircle,
   Coins,
   Gift,
-  Mail,
+  Heart,
+  Plus,
+  Building2,
+  AlertCircle,
   QrCode,
 } from "lucide-react";
 import { toast } from "sonner";
-import { useServerFn } from "@tanstack/react-start";
 import { useT } from "@/lib/i18n";
-import type { Sponsor, SponsorPackage, PackageType } from "@/lib/sponsors.functions";
-import {
-  listSponsorPackagesFn,
-  createSponsorPackageFn,
-} from "@/lib/sponsors.functions";
+import type { Sponsor, PackageType, InKindItem } from "@/lib/sponsors.functions";
 import { VndCurrencyInput } from "@/components/dashboard/VndCurrencyInput";
-import {
-  SponsorPackageModal,
-  type PackageDraft,
-} from "@/components/dashboard/SponsorPackageModal";
 
 export interface InKindItemDraft {
   name: string;
@@ -43,7 +32,7 @@ export interface SponsorDraft {
   age?: number;
   sponsorType: "regular" | "new";
   packageType: PackageType;
-  inKindDescription?: string;
+  inKindDescription?: string; // Nội dung / Diễn giải tài trợ mở rộng
   inKindItems?: InKindItemDraft[];
   tier: Sponsor["tier"];
   contact: string;
@@ -75,16 +64,6 @@ export function SponsorModal({
 }: SponsorModalProps) {
   const t = useT();
 
-  // Load available sponsor packages from API
-  const [packages, setPackages] = useState<SponsorPackage[]>([]);
-  const [loadingPackages, setLoadingPackages] = useState<boolean>(false);
-  const [selectedPkgId, setSelectedPkgId] = useState<string>("");
-
-  // Nested Package Creation Modal
-  const [createPkgModalOpen, setCreatePkgModalOpen] = useState<boolean>(false);
-  const [submittingNewPkg, setSubmittingNewPkg] = useState<boolean>(false);
-  const createPkgFn = useServerFn(createSponsorPackageFn);
-
   const [draft, setDraft] = useState<SponsorDraft>({
     name: "",
     companyName: "",
@@ -92,33 +71,20 @@ export function SponsorModal({
     birthDate: "",
     age: undefined,
     sponsorType: "regular",
-    packageType: "bank_transfer",
+    packageType: "cash",
     inKindDescription: "",
     inKindItems: [],
-    tier: "gold",
+    tier: "bronze",
     contact: "",
     email: "",
     phone: "",
-    amount: 50000000,
+    amount: 20000000,
     since: new Date().toISOString().slice(0, 10),
     status: "active",
   });
 
-  const loadPackages = async () => {
-    setLoadingPackages(true);
-    try {
-      const res = await listSponsorPackagesFn();
-      setPackages(Array.isArray(res) ? res : []);
-    } catch (err) {
-      console.error("[SponsorModal] Failed to fetch sponsor packages:", err);
-    } finally {
-      setLoadingPackages(false);
-    }
-  };
-
   useEffect(() => {
     if (open) {
-      loadPackages();
       if (initial) {
         setDraft({
           name: initial.name || "",
@@ -127,10 +93,10 @@ export function SponsorModal({
           birthDate: initial.birthDate || "",
           age: initial.age,
           sponsorType: initial.sponsorType || "regular",
-          packageType: initial.packageType || "bank_transfer",
+          packageType: initial.packageType || "cash",
           inKindDescription: initial.inKindDescription || "",
           inKindItems: initial.inKindItems || [],
-          tier: initial.tier || "gold",
+          tier: initial.tier || "bronze",
           contact: initial.contact || "",
           email: initial.email || "",
           phone: initial.phone || "",
@@ -138,7 +104,6 @@ export function SponsorModal({
           since: initial.since || new Date().toISOString().slice(0, 10),
           status: initial.status || "active",
         });
-        setSelectedPkgId("");
       } else {
         setDraft({
           name: "",
@@ -147,18 +112,17 @@ export function SponsorModal({
           birthDate: "",
           age: undefined,
           sponsorType: "regular",
-          packageType: "bank_transfer",
+          packageType: "cash",
           inKindDescription: "",
-          inKindItems: [{ name: "", quantity: 1, unit: "chiếc", estimatedValue: 0 }],
-          tier: "gold",
+          inKindItems: [],
+          tier: "bronze",
           contact: "",
           email: "",
           phone: "",
-          amount: 50000000,
+          amount: 20000000,
           since: new Date().toISOString().slice(0, 10),
           status: "active",
         });
-        setSelectedPkgId("");
       }
     }
   }, [open, initial]);
@@ -166,56 +130,17 @@ export function SponsorModal({
   if (!open) return null;
   if (typeof document === "undefined") return null;
 
-  // Filter packages by current contribution method
-  const matchingPackages = packages.filter(
-    (p) => (p.packageType || "bank_transfer") === draft.packageType
-  );
-
-  // Handle selecting an existing package to auto-populate fields
-  const handleSelectPackage = (pkgId: string) => {
-    setSelectedPkgId(pkgId);
-    if (!pkgId) return;
-
-    const pkg = packages.find((p) => p.id === pkgId);
-    if (pkg) {
-      setDraft((prev) => ({
-        ...prev,
-        tier: pkg.tier,
-        packageType: pkg.packageType || prev.packageType,
-        amount: pkg.price || 0,
-        inKindDescription: pkg.inKindDescription || prev.inKindDescription,
-      }));
-    }
-  };
-
-  // Quick create package on-the-fly from inside SponsorModal
-  const handleQuickCreatePackage = async (draftPkg: PackageDraft) => {
-    setSubmittingNewPkg(true);
-    try {
-      const created = await createPkgFn({ data: draftPkg });
-      toast.success("Đã tạo gói tài trợ mới thành công!");
-      await loadPackages();
-      setSelectedPkgId(created.id);
-      setDraft((prev) => ({
-        ...prev,
-        tier: created.tier,
-        packageType: created.packageType,
-        amount: created.price || 0,
-        inKindDescription: created.inKindDescription || prev.inKindDescription,
-      }));
-      setCreatePkgModalOpen(false);
-    } catch (err: any) {
-      console.error("[SponsorModal] Quick create package failed:", err);
-      toast.error(err?.message || "Không thể tạo gói tài trợ lúc này");
-    } finally {
-      setSubmittingNewPkg(false);
-    }
-  };
+  const isCurrentInKind = draft.packageType === "in_kind" || draft.packageType === "charity_in_kind";
+  const isCharity = draft.packageType === "charity_cash" || draft.packageType === "charity_in_kind";
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!draft.name.trim()) {
       toast.error("Vui lòng nhập tên Doanh nghiệp / Tổ chức tài trợ");
+      return;
+    }
+    if (!draft.inKindDescription?.trim()) {
+      toast.error("Vui lòng điền nội dung tài trợ cụ thể");
       return;
     }
     onSubmit(draft);
@@ -229,7 +154,7 @@ export function SponsorModal({
       onClick={() => !submitting && onClose()}
     >
       <div
-        className="relative flex flex-col w-full max-w-xl my-auto rounded-2xl border border-border bg-card shadow-2xl overflow-hidden max-h-[92vh] z-[10000]"
+        className="relative flex flex-col w-full max-w-2xl my-auto rounded-2xl border border-border bg-card shadow-2xl overflow-hidden max-h-[92vh] z-[10000]"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -240,12 +165,10 @@ export function SponsorModal({
             </div>
             <div>
               <h2 className="text-base font-bold text-foreground">
-                {initial ? "Chỉnh Sửa Nhà Tài Trợ" : "Thêm Mới Nhà Tài Trợ"}
+                {initial ? "Chỉnh Sửa Nhà Tài Trợ" : "Tiếp Nhận & Khai Báo Nhà Tài Trợ"}
               </h2>
               <p className="text-xs text-muted-foreground">
-                {initial
-                  ? "Cập nhật hồ sơ đối tác và giá trị tài trợ thực tế"
-                  : "Khởi tạo đối tác, chọn gói và tự động gửi email kèm mã VietQR"}
+                Phân loại chính xác nguồn Quỹ (Tiền mặt / Hiện vật / Quỹ Thiện nguyện) &amp; Nhập nội dung tài trợ mở rộng
               </p>
             </div>
           </div>
@@ -262,170 +185,144 @@ export function SponsorModal({
         {/* Scrollable Form Body */}
         <form onSubmit={handleSubmit} className="flex flex-col flex-1 overflow-hidden">
           <div className="flex-1 space-y-4 overflow-y-auto p-5 overscroll-contain">
-            {/* 1. HÌNH THỨC TÀI TRỢ CHIA RÕ RÀNG (CHUYỂN KHOẢN / TIỀN MẶT / HIỆN VẬT) */}
+            {/* 1. CHỌN LOẠI TÀI TRỢ (BẮT BUỘC): PHÂN ĐỊNH TIỀN MẶT, HIỆN VẬT, QUỸ THIỆN NGUYỆN */}
             <div>
-              <label className={labelCls}>
-                Hình Thức Đóng Góp Tài Trợ <span className="text-rose-500">*</span>
-              </label>
-              <div className="grid grid-cols-3 gap-2 sm:gap-2.5">
-                {/* Chuyển khoản */}
-                <button
-                  type="button"
-                  onClick={() => {
-                    setDraft((d) => ({ ...d, packageType: "bank_transfer" }));
-                    setSelectedPkgId("");
-                  }}
-                  className={`flex flex-col items-center justify-center p-3 rounded-xl border text-center transition cursor-pointer ${
-                    draft.packageType === "bank_transfer"
-                      ? "border-blue-600 bg-blue-500/10 text-blue-700 dark:text-blue-300 ring-2 ring-blue-500/30 font-bold"
-                      : "border-border bg-card hover:bg-muted text-muted-foreground"
-                  }`}
-                >
-                  <Building2 className="h-5 w-5 mb-1 text-blue-600 dark:text-blue-400" />
-                  <span className="text-xs font-bold leading-tight">Chuyển Khoản</span>
-                  <span className="text-[10px] opacity-75 font-normal mt-0.5">Bắn VietQR</span>
-                </button>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className={labelCls}>
+                  Loại Tài Trợ &amp; Mục Đích Quỹ <span className="text-rose-500">*</span>
+                </label>
+                <span className="text-[11px] text-muted-foreground font-medium">
+                  {isCharity ? "❤️ Quỹ Thiện Nguyện (CSR)" : "🏢 Quỹ Hoạt Động & Sự Kiện"}
+                </span>
+              </div>
 
-                {/* Tiền mặt */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                {/* 1. Quỹ Hoạt động - Tiền mặt */}
                 <button
                   type="button"
-                  onClick={() => {
-                    setDraft((d) => ({ ...d, packageType: "cash" }));
-                    setSelectedPkgId("");
-                  }}
+                  onClick={() => setDraft((d) => ({ ...d, packageType: "cash" }))}
                   className={`flex flex-col items-center justify-center p-3 rounded-xl border text-center transition cursor-pointer ${
-                    draft.packageType === "cash"
+                    draft.packageType === "cash" || draft.packageType === "bank_transfer"
                       ? "border-emerald-600 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 ring-2 ring-emerald-500/30 font-bold"
                       : "border-border bg-card hover:bg-muted text-muted-foreground"
                   }`}
                 >
                   <Coins className="h-5 w-5 mb-1 text-emerald-600 dark:text-emerald-400" />
-                  <span className="text-xs font-bold leading-tight">Tiền Mặt</span>
-                  <span className="text-[10px] opacity-75 font-normal mt-0.5">Trực tiếp</span>
+                  <span className="text-xs font-bold leading-tight">Quỹ Hoạt Động</span>
+                  <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold mt-0.5">
+                    Mục Tiền mặt
+                  </span>
                 </button>
 
-                {/* Hiện vật */}
+                {/* 2. Quỹ Hoạt động - Hiện vật */}
                 <button
                   type="button"
-                  onClick={() => {
-                    setDraft((d) => ({ ...d, packageType: "in_kind" }));
-                    setSelectedPkgId("");
-                  }}
+                  onClick={() => setDraft((d) => ({ ...d, packageType: "in_kind" }))}
                   className={`flex flex-col items-center justify-center p-3 rounded-xl border text-center transition cursor-pointer ${
                     draft.packageType === "in_kind"
-                      ? "border-purple-600 bg-purple-500/10 text-purple-700 dark:text-purple-300 ring-2 ring-purple-500/30 font-bold"
+                      ? "border-blue-600 bg-blue-500/10 text-blue-700 dark:text-blue-300 ring-2 ring-blue-500/30 font-bold"
                       : "border-border bg-card hover:bg-muted text-muted-foreground"
                   }`}
                 >
-                  <Gift className="h-5 w-5 mb-1 text-purple-600 dark:text-purple-400" />
-                  <span className="text-xs font-bold leading-tight">Hiện Vật</span>
-                  <span className="text-[10px] opacity-75 font-normal mt-0.5">Quà / Dịch vụ</span>
+                  <Gift className="h-5 w-5 mb-1 text-blue-600 dark:text-blue-400" />
+                  <span className="text-xs font-bold leading-tight">Quỹ Hoạt Động</span>
+                  <span className="text-[10px] text-blue-600 dark:text-blue-400 font-semibold mt-0.5">
+                    Mục Hiện vật
+                  </span>
+                </button>
+
+                {/* 3. Quỹ Thiện nguyện - Tiền mặt */}
+                <button
+                  type="button"
+                  onClick={() => setDraft((d) => ({ ...d, packageType: "charity_cash" }))}
+                  className={`flex flex-col items-center justify-center p-3 rounded-xl border text-center transition cursor-pointer ${
+                    draft.packageType === "charity_cash"
+                      ? "border-rose-600 bg-rose-500/10 text-rose-700 dark:text-rose-300 ring-2 ring-rose-500/30 font-bold"
+                      : "border-border bg-card hover:bg-muted text-muted-foreground"
+                  }`}
+                >
+                  <Heart className="h-5 w-5 mb-1 text-rose-600 dark:text-rose-400" />
+                  <span className="text-xs font-bold leading-tight">Quỹ Thiện Nguyện</span>
+                  <span className="text-[10px] text-rose-600 dark:text-rose-400 font-semibold mt-0.5">
+                    Mục Tiền mặt (CSR)
+                  </span>
+                </button>
+
+                {/* 4. Quỹ Thiện nguyện - Hiện vật */}
+                <button
+                  type="button"
+                  onClick={() => setDraft((d) => ({ ...d, packageType: "charity_in_kind" }))}
+                  className={`flex flex-col items-center justify-center p-3 rounded-xl border text-center transition cursor-pointer ${
+                    draft.packageType === "charity_in_kind"
+                      ? "border-amber-600 bg-amber-500/10 text-amber-700 dark:text-amber-300 ring-2 ring-amber-500/30 font-bold"
+                      : "border-border bg-card hover:bg-muted text-muted-foreground"
+                  }`}
+                >
+                  <Gift className="h-5 w-5 mb-1 text-amber-600 dark:text-amber-400" />
+                  <span className="text-xs font-bold leading-tight">Quỹ Thiện Nguyện</span>
+                  <span className="text-[10px] text-amber-600 dark:text-amber-400 font-semibold mt-0.5">
+                    Mục Hiện vật (CSR)
+                  </span>
                 </button>
               </div>
             </div>
 
-            {/* 2. GÓI TÀI TRỢ LINH HOẠT - KHÔNG BẮT BUỘC GÓI CỤ THỂ */}
-            {matchingPackages.length > 0 && (
-              <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30 p-3.5 space-y-2">
-                <div className="flex items-center justify-between">
-                  <label className="text-xs font-bold text-foreground flex items-center gap-1.5" htmlFor="select-pkg">
-                    <Package className="h-4 w-4 text-slate-500" />
-                    <span>Gợi ý gói tài trợ tham khảo (Tùy chọn, không bắt buộc)</span>
-                  </label>
-                  <button
-                    type="button"
-                    onClick={() => setCreatePkgModalOpen(true)}
-                    className="text-[11px] font-bold text-primary hover:underline flex items-center gap-1 cursor-pointer"
-                  >
-                    <Plus className="h-3 w-3" />
-                    <span>Tạo gói mới</span>
-                  </button>
-                </div>
-                <select
-                  id="select-pkg"
-                  value={selectedPkgId}
-                  onChange={(e) => handleSelectPackage(e.target.value)}
-                  className="h-10 w-full rounded-xl border border-border bg-background px-3 text-xs font-semibold text-foreground outline-none focus:border-primary cursor-pointer"
-                >
-                  <option value="">-- Tài trợ linh hoạt / Không theo gói cụ thể (Tự do nhập số tiền) --</option>
-                  {matchingPackages.map((pkg) => {
-                    const tierName =
-                      pkg.tier === "platinum"
-                        ? "Bạch kim"
-                        : pkg.tier === "gold"
-                        ? "Vàng"
-                        : pkg.tier === "silver"
-                        ? "Bạc"
-                        : "Đồng";
-                    return (
-                      <option key={pkg.id} value={pkg.id}>
-                        [{pkg.tier.toUpperCase()}] Gói {tierName} · {new Intl.NumberFormat("vi-VN").format(pkg.price)} VNĐ ({pkg.available - pkg.sold} suất)
-                      </option>
-                    );
-                  })}
-                </select>
-                {selectedPkgId && (
-                  <div className="flex items-center gap-1.5 text-[11px] font-medium text-emerald-600 dark:text-emerald-400">
-                    <Check className="h-3.5 w-3.5" />
-                    <span>Đã gợi ý định mức gói. Bạn vẫn có thể tùy biến số tiền thực tế bên dưới.</span>
-                  </div>
-                )}
+            {/* 2. MỞ RỘNG TỰ ĐIỀN NỘI DUNG TÀI TRỢ (BẮT BUỘC) */}
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className={labelCls} htmlFor="sp-content">
+                  Nội Dung / Diễn Giải Tài Trợ <span className="text-rose-500">*</span>
+                </label>
+                <span className="text-[10.5px] text-muted-foreground italic">
+                  Không áp đặt gói cứng, tự do mô tả chi tiết cam kết
+                </span>
               </div>
-            )}
+              <textarea
+                id="sp-content"
+                rows={3}
+                required
+                value={draft.inKindDescription || ""}
+                onChange={(e) => setDraft((d) => ({ ...d, inKindDescription: e.target.value }))}
+                placeholder={
+                  isCharity
+                    ? "Ví dụ: Tài trợ kinh phí xây dựng điểm trường Bản Mù Mù Cang Chải / 500 suất quà tết cho hộ nghèo..."
+                    : isCurrentInKind
+                    ? "Ví dụ: Tài trợ 200 áo đồng phục Gala kết nối, 50 lẵng hoa tươi và quà tặng đại biểu..."
+                    : "Ví dụ: Tài trợ kinh phí tổ chức sự kiện Business Matching HN10 Quý 3 / Hỗ trợ công tác truyền thông hiệp hội..."
+                }
+                className="w-full rounded-xl border border-border bg-background p-3 text-xs text-foreground focus-visible:border-ring focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/30"
+              />
+            </div>
 
-            {/* 3. NHẬP GIÁ TRỊ THỰC TẾ THEO SỐ TIỀN NHÀ TÀI TRỢ MUỐN */}
+            {/* 3. SỐ TIỀN / GIÁ TRỊ QUY ĐỔI HIỆN VẬT THỰC TẾ (VNĐ) */}
             <div>
               <div className="flex items-center justify-between mb-1.5">
                 <label className="text-xs font-semibold text-foreground" htmlFor="sp-amount">
-                  {draft.packageType === "in_kind"
-                    ? "Định giá quy đổi hiện vật thực tế (VNĐ)"
-                    : "Số tiền tài trợ thực tế mong muốn (VNĐ)"}{" "}
+                  {isCurrentInKind
+                    ? "Tổng Giá Trị Hiện Vật Quy Đổi Thực Tế (VNĐ)"
+                    : "Số Tiền Tài Trợ Thực Tế (VNĐ)"}{" "}
                   <span className="text-rose-500">*</span>
                 </label>
-                <span className="text-[10.5px] text-muted-foreground italic">
-                  Tự do nhập số tiền thực tế
+                <span className="text-[10.5px] text-muted-foreground">
+                  {isCharity ? "Ghi nhận vào Quỹ Thiện Nguyện (CSR)" : "Ghi nhận vào Quỹ Hoạt Động & Sự Kiện"}
                 </span>
               </div>
               <VndCurrencyInput
                 id="sp-amount"
                 value={draft.amount}
                 onChange={(val) => setDraft((d) => ({ ...d, amount: val }))}
-                placeholder="Nhập số tiền thực tế (Ví dụ: 100.000.000)"
+                placeholder="Nhập số tiền hoặc giá trị quy đổi (Ví dụ: 50.000.000)"
                 required
               />
-              <div className="mt-1.5 flex items-start gap-1.5 text-[11px] text-muted-foreground bg-muted/30 p-2 rounded-lg border border-border/50">
-                {draft.packageType === "bank_transfer" ? (
-                  <>
-                    <QrCode className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
-                    <span>
-                      Sau khi tạo, hệ thống sẽ <strong>tự động bắn email có mã VietQR</strong> đúng với số tiền <strong>{new Intl.NumberFormat("vi-VN").format(draft.amount || 0)} VNĐ</strong> này về email của nhà tài trợ.
-                    </span>
-                  </>
-                ) : draft.packageType === "cash" ? (
-                  <>
-                    <Coins className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
-                    <span>
-                      Sau khi tạo, hệ thống sẽ gửi email xác nhận khoản tài trợ tiền mặt và thông báo đến Ban Tài chính để tiếp nhận trực tiếp.
-                    </span>
-                  </>
-                ) : (
-                  <>
-                    <Gift className="h-3.5 w-3.5 text-purple-600 dark:text-purple-400 shrink-0 mt-0.5" />
-                    <span>
-                      Sau khi tạo, hệ thống sẽ gửi email hướng dẫn bàn giao hiện vật và quy đổi giá trị tài trợ vào biên bản nghiệm thu.
-                    </span>
-                  </>
-                )}
-              </div>
             </div>
 
-            {/* Chi tiết hiện vật tài trợ nếu chọn Hình thức Hiện vật (UC-6) */}
-            {draft.packageType === "in_kind" && (
-              <div className="space-y-2.5 rounded-xl border border-purple-200 dark:border-purple-800 bg-purple-50/40 dark:bg-purple-950/20 p-3.5">
+            {/* 4. KÊ KHAI DANH MỤC VẬT PHẨM NẾU CHỌN HIỆN VẬT */}
+            {isCurrentInKind && (
+              <div className="space-y-2.5 rounded-xl border border-amber-200 dark:border-amber-800 bg-amber-50/40 dark:bg-amber-950/20 p-3.5">
                 <div className="flex items-center justify-between">
-                  <label className="text-xs font-bold text-purple-900 dark:text-purple-300 flex items-center gap-1.5">
-                    <Gift className="h-4 w-4 text-purple-600" />
-                    <span>Danh Mục Vật Phẩm Hiện Vật Tài Trợ (Kho Hiện Vật Quỹ)</span>
+                  <label className="text-xs font-bold text-amber-900 dark:text-amber-300 flex items-center gap-1.5">
+                    <Gift className="h-4 w-4 text-amber-600" />
+                    <span>Danh Mục Vật Phẩm Hiện Vật Cụ Thể (Kho Quỹ Hiện Vật)</span>
                   </label>
                   <button
                     type="button"
@@ -439,7 +336,7 @@ export function SponsorModal({
                         ],
                       });
                     }}
-                    className="inline-flex items-center gap-1 text-[11px] font-bold text-purple-700 dark:text-purple-300 hover:underline cursor-pointer"
+                    className="inline-flex items-center gap-1 text-[11px] font-bold text-amber-700 dark:text-amber-300 hover:underline cursor-pointer"
                   >
                     <Plus className="h-3.5 w-3.5" />
                     <span>Thêm vật phẩm</span>
@@ -538,24 +435,10 @@ export function SponsorModal({
                     </div>
                   ))}
                 </div>
-
-                <div>
-                  <label className="block text-[11px] font-semibold text-muted-foreground mb-1" htmlFor="sp-inkind">
-                    Mô tả tổng quát hoặc ghi chú bàn giao hiện vật
-                  </label>
-                  <textarea
-                    id="sp-inkind"
-                    rows={2}
-                    value={draft.inKindDescription}
-                    onChange={(e) => setDraft({ ...draft, inKindDescription: e.target.value })}
-                    placeholder="Ghi chú thêm về quy cách đóng gói, địa điểm bàn giao hoặc đối tượng thụ hưởng..."
-                    className="w-full rounded-xl border border-border bg-background p-2.5 text-xs text-foreground focus-visible:border-ring focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/30"
-                  />
-                </div>
               </div>
             )}
 
-            {/* Tên Doanh Nghiệp Nhà Tài Trợ & Website */}
+            {/* 5. THÔNG TIN DOANH NGHIỆP / TỔ CHỨC TÀI TRỢ */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
               <div>
                 <label className={labelCls} htmlFor="sp-name">
@@ -573,29 +456,29 @@ export function SponsorModal({
                       companyName: draft.companyName || e.target.value,
                     })
                   }
-                  placeholder="Ví dụ: Tập đoàn SunTech Global"
+                  placeholder="Ví dụ: Công ty Cổ phần AlphaTech"
                   className={inputCls}
                 />
               </div>
 
               <div>
                 <label className={labelCls} htmlFor="sp-website">
-                  Website công ty / Cổng thông tin
+                  Website / Cổng thông tin
                 </label>
                 <input
                   id="sp-website"
                   type="url"
                   value={draft.website || ""}
                   onChange={(e) => setDraft({ ...draft, website: e.target.value })}
-                  placeholder="https://suntech.vn"
+                  placeholder="https://alphatech.vn"
                   className={inputCls}
                 />
               </div>
             </div>
 
-            {/* Người đại diện liên hệ, Ngày sinh & Tuổi (UC-6) */}
+            {/* 6. ĐẠI DIỆN LIÊN HỆ, EMAIL & SỐ ĐIỆN THOẠI */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
-              <div className="sm:col-span-1">
+              <div>
                 <label className={labelCls} htmlFor="sp-contact">
                   Họ tên người đại diện
                 </label>
@@ -609,57 +492,37 @@ export function SponsorModal({
                 />
               </div>
 
-              <div className="sm:col-span-1">
-                <label className={labelCls} htmlFor="sp-birthDate">
-                  Ngày sinh
+              <div>
+                <label className={labelCls} htmlFor="sp-email">
+                  Email liên hệ
                 </label>
                 <input
-                  id="sp-birthDate"
-                  type="date"
-                  value={draft.birthDate || ""}
-                  onChange={(e) => {
-                    const dateVal = e.target.value;
-                    let computedAge: number | undefined = undefined;
-                    if (dateVal) {
-                      const bDate = new Date(dateVal);
-                      if (!isNaN(bDate.getTime())) {
-                        const today = new Date();
-                        computedAge = today.getFullYear() - bDate.getFullYear();
-                        const m = today.getMonth() - bDate.getMonth();
-                        if (m < 0 || (m === 0 && today.getDate() < bDate.getDate())) {
-                          computedAge--;
-                        }
-                      }
-                    }
-                    setDraft({
-                      ...draft,
-                      birthDate: dateVal,
-                      age: computedAge !== undefined ? computedAge : draft.age,
-                    });
-                  }}
+                  id="sp-email"
+                  type="email"
+                  value={draft.email}
+                  onChange={(e) => setDraft({ ...draft, email: e.target.value })}
+                  placeholder="doitac@alphatech.vn"
                   className={inputCls}
                 />
               </div>
 
-              <div className="sm:col-span-1">
-                <label className={labelCls} htmlFor="sp-age">
-                  Tuổi
+              <div>
+                <label className={labelCls} htmlFor="sp-phone">
+                  Số điện thoại
                 </label>
                 <input
-                  id="sp-age"
-                  type="number"
-                  min={18}
-                  max={120}
-                  value={draft.age || ""}
-                  onChange={(e) => setDraft({ ...draft, age: Number(e.target.value) || undefined })}
-                  placeholder="Tự tính theo ngày sinh"
+                  id="sp-phone"
+                  type="tel"
+                  value={draft.phone}
+                  onChange={(e) => setDraft({ ...draft, phone: e.target.value })}
+                  placeholder="0912 345 678"
                   className={inputCls}
                 />
               </div>
             </div>
 
-            {/* Phân loại đối tác & Hạng tài trợ */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+            {/* 7. PHÂN LOẠI ĐỐI TÁC, NGÀY THAM GIA & TRẠNG THÁI */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
               <div>
                 <label className={labelCls} htmlFor="sp-type">
                   Phân loại đối tác
@@ -678,30 +541,8 @@ export function SponsorModal({
               </div>
 
               <div>
-                <label className={labelCls} htmlFor="sp-tier">
-                  Hạng tài trợ
-                </label>
-                <select
-                  id="sp-tier"
-                  value={draft.tier}
-                  onChange={(e) =>
-                    setDraft({ ...draft, tier: e.target.value as Sponsor["tier"] })
-                  }
-                  className={inputCls}
-                >
-                  <option value="platinum">Bạch kim (Platinum)</option>
-                  <option value="gold">Vàng (Gold)</option>
-                  <option value="silver">Bạc (Silver)</option>
-                  <option value="bronze">Đồng (Bronze)</option>
-                </select>
-              </div>
-            </div>
-
-            {/* Ngày tham gia & Trạng thái */}
-            <div className="grid grid-cols-2 gap-3.5">
-              <div>
                 <label className={labelCls} htmlFor="sp-since">
-                  Ngày tham gia
+                  Ngày tiếp nhận tài trợ
                 </label>
                 <input
                   id="sp-since"
@@ -724,8 +565,8 @@ export function SponsorModal({
                   }
                   className={inputCls}
                 >
-                  <option value="active">Đang hoạt động</option>
-                  <option value="expired">Đã hết hạn</option>
+                  <option value="active">Đang hiệu lực</option>
+                  <option value="expired">Đã tất toán / hết hạn</option>
                 </select>
               </div>
             </div>
@@ -735,7 +576,11 @@ export function SponsorModal({
           <div className="flex items-center justify-between gap-2.5 border-t border-border px-5 py-3.5 bg-muted/20 shrink-0">
             <span className="text-[11px] text-muted-foreground flex items-center gap-1">
               <Sparkles className="h-3.5 w-3.5 text-amber-500" />
-              <span>Tự động cộng vào Túi Quỹ Tài Trợ &amp; gửi Email tri ân</span>
+              <span>
+                {isCharity
+                  ? "Tự động cộng vào Quỹ Thiện Nguyện (CSR)"
+                  : "Tự động cộng vào Quỹ Hoạt Động &amp; Sự Kiện"}
+              </span>
             </span>
             <div className="flex items-center gap-2">
               <button
@@ -752,23 +597,12 @@ export function SponsorModal({
                 className="rounded-xl px-5 py-2 text-xs font-bold text-primary-foreground shadow-md transition cursor-pointer disabled:opacity-60"
                 style={{ background: "var(--gradient-primary)" }}
               >
-                {submitting ? "Đang lưu & gửi email..." : initial ? "Lưu thay đổi" : "Tạo & Bắn Email Tri Ân"}
+                {submitting ? "Đang lưu..." : initial ? "Lưu thay đổi" : "Khai Báo & Tiếp Nhận"}
               </button>
             </div>
           </div>
         </form>
       </div>
-
-      {/* Nested Create Sponsor Package Modal */}
-      {createPkgModalOpen && (
-        <SponsorPackageModal
-          open={createPkgModalOpen}
-          initial={null}
-          submitting={submittingNewPkg}
-          onClose={() => setCreatePkgModalOpen(false)}
-          onSubmit={handleQuickCreatePackage}
-        />
-      )}
     </div>,
     document.body
   );

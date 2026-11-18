@@ -74,17 +74,7 @@ const overview: Item[] = [
   { key: "nav.dashboard", icon: LayoutDashboard, to: "/", label: "Tổng quan" },
   { key: "nav.aiAssistant" as TKey, icon: Sparkles, to: "/ai-assistant", label: "Trợ lý AI" },
   { key: "nav.members", icon: Users, to: "/members", label: "Học viên" },
-  {
-    key: "nav.trainings" as TKey,
-    icon: GraduationCap,
-    to: "/trainings",
-    label: "Lớp học & Khóa học",
-    children: [
-      { to: "/trainings?tab=all", label: "Tất cả lớp học / khóa học" },
-      { to: "/trainings?tab=sessions", label: "Xem & Thiết lập buổi học" },
-      { to: "/trainings?tab=history", label: "Nhật ký khóa học đã diễn ra" },
-    ],
-  },
+  { key: "nav.trainings" as TKey, icon: GraduationCap, to: "/trainings", label: "Lớp học & Khóa học" },
 ];
 
 // 2. Nhóm TRUYỀN THÔNG (Sự kiện)
@@ -106,9 +96,10 @@ const sponsors: Item[] = [
     to: "/sponsors?tab=funds",
     label: "Quỹ tài trợ",
     children: [
-      { to: "/sponsors?tab=funds&fund_type=cash", label: "Quỹ tiền mặt" },
-      { to: "/sponsors?tab=funds&fund_type=in_kind", label: "Quỹ hiện vật" },
-      { to: "/sponsors?tab=funds&fund_type=charity", label: "Quỹ dành cho thiện nguyện" },
+      { to: "/sponsors?tab=funds&fund_type=general_cash", label: "Quỹ hoạt động: Tiền mặt" },
+      { to: "/sponsors?tab=funds&fund_type=general_in_kind", label: "Quỹ hoạt động: Hiện vật" },
+      { to: "/sponsors?tab=funds&fund_type=charity_cash", label: "Quỹ thiện nguyện: Tiền mặt" },
+      { to: "/sponsors?tab=funds&fund_type=charity_in_kind", label: "Quỹ thiện nguyện: Hiện vật" },
     ],
   },
 ];
@@ -190,25 +181,25 @@ const system: Item[] = [
   { key: "nav.activity" as TKey, icon: Activity, to: "/activity", label: "Lịch sử hoạt động" },
 ];
 
-// 9. Nhóm PHÂN QUYỀN (Phân quyền hệ thống, Quản lý Ban Chuyên Môn, Quản trị người dùng)
+// 9. Nhóm PHÂN QUYỀN (Quản lý ban, Quản lý phân quyền chức năng, Quản lý tài khoản người dùng)
 const permissionsGroup: Item[] = [
-  {
-    key: "nav.permissions" as TKey,
-    icon: ShieldCheck,
-    to: "/permissions",
-    label: "Phân quyền hệ thống",
-  },
   {
     key: "nav.departments" as TKey,
     icon: Building2,
     to: "/departments",
-    label: "Quản lý Ban Chuyên Môn",
+    label: "Quản lý ban",
+  },
+  {
+    key: "nav.permissions" as TKey,
+    icon: ShieldCheck,
+    to: "/permissions",
+    label: "Quản lý phân quyền chức năng",
   },
   {
     key: "nav.accounts" as TKey,
     icon: UserCog,
     to: "/accounts",
-    label: "Quản trị người dùng",
+    label: "Quản lý tài khoản người dùng",
   },
 ];
 
@@ -551,9 +542,11 @@ export function Sidebar({
   useEffect(() => {
     const handleUpdate = () => setMatrixRevision((v) => v + 1);
     window.addEventListener("crm_permissions_updated", handleUpdate);
+    window.addEventListener("rbac-matrix-synced", handleUpdate);
     window.addEventListener("role-changed", handleUpdate);
     return () => {
       window.removeEventListener("crm_permissions_updated", handleUpdate);
+      window.removeEventListener("rbac-matrix-synced", handleUpdate);
       window.removeEventListener("role-changed", handleUpdate);
     };
   }, []);
@@ -769,8 +762,8 @@ export function Sidebar({
 
   const filteredNetwork = network.filter((it) => isAllowed(it.to));
 
-  // Nhóm Hoạt động (Công việc, Cuộc họp, Doanh nghiệp, Tài liệu) luôn hiển thị cho toàn bộ tài khoản
-  const filteredActivities = activities;
+  // Nhóm Hoạt động (Cuộc họp, Tài liệu, Biểu mẫu) lọc theo phân quyền CSDL
+  const filteredActivities = activities.filter((it) => isAllowed(it.to));
 
   const filteredSystem = system.filter((it) => isAllowed(it.to));
 
@@ -926,7 +919,7 @@ export function Sidebar({
         )}
 
         {/* 6. NHÓM KẾT NỐI & GIAO THƯƠNG (Nhắn tin, Chia sẻ cơ hội, Giao thương B2B, Phân loại doanh nghiệp) */}
-        {canViewNetwork && filteredNetwork.length > 0 && (
+        {filteredNetwork.length > 0 && (
           <Group
             customGroupLabel="KẾT NỐI & GIAO THƯƠNG"
             items={filteredNetwork}

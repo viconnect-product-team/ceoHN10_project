@@ -12,8 +12,8 @@ export type EventSponsorItem = {
   sponsorName: string;
   packageId?: string;
   packageName?: string;
-  tier?: "platinum" | "gold" | "silver" | "bronze";
-  packageType?: "bank_transfer" | "cash" | "in_kind";
+  tier?: "platinum" | "gold" | "silver" | "bronze" | string;
+  packageType?: "bank_transfer" | "cash" | "in_kind" | "charity_cash" | "charity_in_kind" | string;
   amount?: number;
   inKindDescription?: string;
   benefits?: string[];

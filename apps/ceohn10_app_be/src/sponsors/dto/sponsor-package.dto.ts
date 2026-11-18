@@ -1,5 +1,5 @@
 export type SponsorTier = 'platinum' | 'gold' | 'silver' | 'bronze';
-export type PackageType = 'bank_transfer' | 'cash' | 'in_kind';
+export type PackageType = 'bank_transfer' | 'cash' | 'in_kind' | 'charity_cash' | 'charity_in_kind';
 
 export class CreateSponsorPackageDto {
   tier!: SponsorTier;

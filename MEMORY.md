@@ -1,5 +1,35 @@
 # System Memory & Architecture
 
+- **Bản cập nhật ngày 18/11/2026 (v12.20): Phân Quyền Sidebar Vào CSDL 113.20.107.184:6432, Khôi Phục Toàn Vẹn Mã Nguồn Sidebar, Cải Tiến Toàn Diện Nhà Tài Trợ, Quỹ Thiện Nguyện & Import Bóc Tách Sự Kiện**:
+  - **1. Phân Quyền và Điều Khiển Ẩn/Hiện Sidebar Hoàn Toàn Bằng CSDL (Rule 0 & Phân Quyền RBAC)**:
+    * **Khôi phục toàn vẹn mã nguồn trong `Sidebar.tsx`**: Tuyệt đối không xóa hay comment out code bất kỳ mục nào trên Sidebar. Đã đưa đầy đủ các mục `Lớp học & Khóa học` (`/trainings`), `Tin tức & Truyền thông` (`/news`), `Quyền lợi & Ưu đãi` (`/perks`), và mở lại nhóm `KẾT NỐI & GIAO THƯƠNG` (`/network`, `/opportunities`, `/marketplace`, `/companies`).
+    * **Kiểm soát động 100% qua Ma Trận Phân Quyền trong CSDL**: Mọi mục và nhóm trên Sidebar đều được lọc qua hàm `isAllowed(it.to)`.
+    * **Nâng cấp hàm `isRouteAllowedByMatrix` (`rbac-permission-helpers.ts`)**: Loại bỏ các đoạn code hardcode `return true` vô điều kiện. Hàm tra cứu trực tiếp Ma Trận Phân Quyền RBAC từ CSDL (`public.app_settings` key `crm_permission_matrix` / `localStorage`). Khi một tính năng bị tắt (`enabled === false`) hoặc tất cả các quyền vai trò của action `VIEW` đều là `false`, hàm sẽ trả về `false` và tự động ẩn mục đó khỏi Sidebar.
+    * **Cập nhật dữ liệu CSDL chuẩn `113.20.107.184:6432`**: Đã cập nhật bản ghi `crm_permission_matrix` trong bảng `public.app_settings`:
+      - *7 tính năng tạm ẩn*: Đặt `enabled: false` và toàn bộ vai trò `VIEW: false` cho `/trainings`, `/news`, `/perks`, `/network`, `/opportunities`, `/marketplace`, `/companies`.
+      - *Các tính năng được phép hiển thị*: Bật quyền `VIEW: true` cho: Tổng quan (`/`), Trợ lý AI (`/ai-assistant`), Học viên (`/members`), Sự kiện (`/events`), Tổng quan sự kiện (`/events-overview`), Biểu quyết (`/voting`), Đăng ký sự kiện (`/event-registrations`), Bốc thăm trúng thưởng (`/lucky-draw`), Nhà tài trợ & Quỹ tài trợ (`/sponsors`), Báo cáo tài trợ (`/sponsor-report`), Thống kê báo cáo (`/analytics`), Khoản thu (`/income`), Khoản chi (`/expenses`), Báo cáo tài chính (`/finance-report`), Thông báo (`/notifications`), Quản lý cuộc họp (`/meetings`), Tài liệu (`/documents`), Biểu mẫu (`/templates`), Cài đặt hệ thống (`/settings`), Lịch sử hoạt động (`/activity`), Quản lý ban (`/departments`), Quản lý phân quyền chức năng (`/permissions`), Quản lý tài khoản người dùng (`/accounts`).
+    * Đồng bộ hóa hàm `getDefaultTreeCategories` tại NestJS backend `admin.service.ts` để đồng nhất 100% cấu trúc 9 nhóm chức năng.
+  - **2. Xóa Bỏ Hoàn Toàn Gói Tài Trợ & Tách Biệt Quỹ Hoạt Động / Quỹ Thiện Nguyện (CSR)**:
+    * **Loại bỏ gói tài trợ cố định**: Khi khai báo nhà tài trợ mới (`SponsorModal.tsx`), xóa bỏ hoàn toàn các khái niệm gói Vàng, Bạc, Đồng... Thay bằng ô textarea mở rộng cho phép tự do điền nội dung, diễn giải tài trợ.
+    * **4 loại tài trợ bắt buộc**:
+      1. Quỹ Hoạt Động · Tiền mặt (`general_cash`)
+      2. Quỹ Hoạt Động · Hiện vật (`general_in_kind`)
+      3. Quỹ Thiện Nguyện · Tiền mặt (`charity_cash`)
+      4. Quỹ Thiện Nguyện · Hiện vật (`charity_in_kind`)
+    * **Thống kê tách biệt trên giao diện & Excel (`sponsors.tsx`)**: Chia rõ rệt 2 khối Quỹ Hoạt Động & Sự Kiện và Quỹ Thiện Nguyện CSR. Cả 2 khối đều phân định rạch ròi số tiền mặt và giá trị quy đổi hiện vật kèm danh mục vật phẩm.
+  - **3. Import File Word/Excel/PDF Tự Động Bóc Tách Vào Popup Tạo Sự Kiện (`EventWizard.tsx`)**:
+    * Xây dựng module parser `event-doc-parser.ts` hỗ trợ file Word (.docx), Excel (.xlsx, .xls, .csv), PDF và văn bản.
+    * Tự động trích xuất các trường: Tên sự kiện, Ngày diễn ra, Giờ bắt đầu/kết thúc, Địa điểm, Diễn giả (speaker), Sức chứa và Mô tả chi tiết để điền tự động vào form tạo sự kiện.
+  - **4. Đăng Ký Thành Viên Tham Dự Ngay Sau Khi Tạo Sự Kiện**:
+    * Tích hợp bước 3 ngay tại popup sau khi tạo sự kiện thành công trong `EventWizard.tsx`.
+    * Form đăng ký đại biểu gồm đầy đủ: Họ tên, Chức danh (*bắt buộc), Số điện thoại (*bắt buộc), Tên công ty/Doanh nghiệp, Email, Loại vé.
+    * Lưu trực tiếp vào CSDL PostgreSQL chuẩn `113.20.107.184:6432` qua API `/events/:id/attendees/add-or-checkin` và hiển thị danh sách đại biểu ngay tại popup.
+  - **5. Kiểm Tra Chất Lượng Code & Cơ Sở Dữ Liệu**:
+    * Database duy nhất: `113.20.107.184:6432/ceohn10_project`.
+    * Backend: `tsc --noEmit` đạt 0 lỗi (Exit code 0).
+    * Frontend: Đã khắc phục toàn bộ lỗi type, chạy `routes:gen` thành công.
+    * Tuyệt đối không tự ý chạy `git push` hay `git commit`.
+
 - **Bản cập nhật ngày 18/11/2026 (v12.19): Hoàn Thiện Triệt Để 5 Yêu Cầu Nâng Cấp Hệ Thống CRM CEO HN10**:
   - **1. Tái Cấu Trúc Toàn Diện Sidebar CRM CEO HN10**:
     * Chuẩn hóa 9 nhóm chức năng chính:
@@ -1962,6 +1992,36 @@
      - Tuân thủ nghiêm ngặt STRICT RULE 1: Tuyệt đối không tự động chạy `git push` hay `git commit`.
 
 # System Memory & Architecture
+
+- **Bản cập nhật ngày 18/11/2026 (v12.20): Phân Quyền Sidebar Vào CSDL 113.20.107.184:6432, Khôi Phục Toàn Vẹn Mã Nguồn Sidebar, Cải Tiến Toàn Diện Nhà Tài Trợ, Quỹ Thiện Nguyện & Import Bóc Tách Sự Kiện**:
+  - **1. Phân Quyền và Điều Khiển Ẩn/Hiện Sidebar Hoàn Toàn Bằng CSDL (Rule 0 & Phân Quyền RBAC)**:
+    * **Khôi phục toàn vẹn mã nguồn trong `Sidebar.tsx`**: Tuyệt đối không xóa hay comment out code bất kỳ mục nào trên Sidebar. Đã đưa đầy đủ các mục `Lớp học & Khóa học` (`/trainings`), `Tin tức & Truyền thông` (`/news`), `Quyền lợi & Ưu đãi` (`/perks`), và mở lại nhóm `KẾT NỐI & GIAO THƯƠNG` (`/network`, `/opportunities`, `/marketplace`, `/companies`).
+    * **Kiểm soát động 100% qua Ma Trận Phân Quyền trong CSDL**: Mọi mục và nhóm trên Sidebar đều được lọc qua hàm `isAllowed(it.to)`.
+    * **Nâng cấp hàm `isRouteAllowedByMatrix` (`rbac-permission-helpers.ts`)**: Loại bỏ các đoạn code hardcode `return true` vô điều kiện. Hàm tra cứu trực tiếp Ma Trận Phân Quyền RBAC từ CSDL (`public.app_settings` key `crm_permission_matrix` / `localStorage`). Khi một tính năng bị tắt (`enabled === false`) hoặc tất cả các quyền vai trò của action `VIEW` đều là `false`, hàm sẽ trả về `false` và tự động ẩn mục đó khỏi Sidebar.
+    * **Cập nhật dữ liệu CSDL chuẩn `113.20.107.184:6432`**: Đã cập nhật bản ghi `crm_permission_matrix` trong bảng `public.app_settings`:
+      - *7 tính năng tạm ẩn*: Đặt `enabled: false` và toàn bộ vai trò `VIEW: false` cho `/trainings`, `/news`, `/perks`, `/network`, `/opportunities`, `/marketplace`, `/companies`.
+      - *Các tính năng được phép hiển thị*: Bật quyền `VIEW: true` cho: Tổng quan (`/`), Trợ lý AI (`/ai-assistant`), Học viên (`/members`), Sự kiện (`/events`), Tổng quan sự kiện (`/events-overview`), Biểu quyết (`/voting`), Đăng ký sự kiện (`/event-registrations`), Bốc thăm trúng thưởng (`/lucky-draw`), Nhà tài trợ & Quỹ tài trợ (`/sponsors`), Báo cáo tài trợ (`/sponsor-report`), Thống kê báo cáo (`/analytics`), Khoản thu (`/income`), Khoản chi (`/expenses`), Báo cáo tài chính (`/finance-report`), Thông báo (`/notifications`), Quản lý cuộc họp (`/meetings`), Tài liệu (`/documents`), Biểu mẫu (`/templates`), Cài đặt hệ thống (`/settings`), Lịch sử hoạt động (`/activity`), Quản lý ban (`/departments`), Quản lý phân quyền chức năng (`/permissions`), Quản lý tài khoản người dùng (`/accounts`).
+    * Đồng bộ hóa hàm `getDefaultTreeCategories` tại NestJS backend `admin.service.ts` để đồng nhất 100% cấu trúc 9 nhóm chức năng.
+  - **2. Xóa Bỏ Hoàn Toàn Gói Tài Trợ & Tách Biệt Quỹ Hoạt Động / Quỹ Thiện Nguyện (CSR)**:
+    * **Loại bỏ gói tài trợ cố định**: Khi khai báo nhà tài trợ mới (`SponsorModal.tsx`), xóa bỏ hoàn toàn các khái niệm gói Vàng, Bạc, Đồng... Thay bằng ô textarea mở rộng cho phép tự do điền nội dung, diễn giải tài trợ.
+    * **4 loại tài trợ bắt buộc**:
+      1. Quỹ Hoạt Động · Tiền mặt (`general_cash`)
+      2. Quỹ Hoạt Động · Hiện vật (`general_in_kind`)
+      3. Quỹ Thiện Nguyện · Tiền mặt (`charity_cash`)
+      4. Quỹ Thiện Nguyện · Hiện vật (`charity_in_kind`)
+    * **Thống kê tách biệt trên giao diện & Excel (`sponsors.tsx`)**: Chia rõ rệt 2 khối Quỹ Hoạt Động & Sự Kiện và Quỹ Thiện Nguyện CSR. Cả 2 khối đều phân định rạch ròi số tiền mặt và giá trị quy đổi hiện vật kèm danh mục vật phẩm.
+  - **3. Import File Word/Excel/PDF Tự Động Bóc Tách Vào Popup Tạo Sự Kiện (`EventWizard.tsx`)**:
+    * Xây dựng module parser `event-doc-parser.ts` hỗ trợ file Word (.docx), Excel (.xlsx, .xls, .csv), PDF và văn bản.
+    * Tự động trích xuất các trường: Tên sự kiện, Ngày diễn ra, Giờ bắt đầu/kết thúc, Địa điểm, Diễn giả (speaker), Sức chứa và Mô tả chi tiết để điền tự động vào form tạo sự kiện.
+  - **4. Đăng Ký Thành Viên Tham Dự Ngay Sau Khi Tạo Sự Kiện**:
+    * Tích hợp bước 3 ngay tại popup sau khi tạo sự kiện thành công trong `EventWizard.tsx`.
+    * Form đăng ký đại biểu gồm đầy đủ: Họ tên, Chức danh (*bắt buộc), Số điện thoại (*bắt buộc), Tên công ty/Doanh nghiệp, Email, Loại vé.
+    * Lưu trực tiếp vào CSDL PostgreSQL chuẩn `113.20.107.184:6432` qua API `/events/:id/attendees/add-or-checkin` và hiển thị danh sách đại biểu ngay tại popup.
+  - **5. Kiểm Tra Chất Lượng Code & Cơ Sở Dữ Liệu**:
+    * Database duy nhất: `113.20.107.184:6432/ceohn10_project`.
+    * Backend: `tsc --noEmit` đạt 0 lỗi (Exit code 0).
+    * Frontend: Đã khắc phục toàn bộ lỗi type, chạy `routes:gen` thành công.
+    * Tuyệt đối không tự ý chạy `git push` hay `git commit`.
 
 - **Bản cập nhật ngày 18/11/2026 (v12.19): Hoàn Thiện Triệt Để 5 Yêu Cầu Nâng Cấp Hệ Thống CRM CEO HN10**:
   - **1. Tái Cấu Trúc Toàn Diện Sidebar CRM CEO HN10**:
@@ -5089,6 +5149,36 @@
      - Tuân thủ nghiêm ngặt STRICT RULE 1: Tuyệt đối không tự động chạy `git push` hay `git commit`.
 
 # System Memory & Architecture
+
+- **Bản cập nhật ngày 18/11/2026 (v12.20): Phân Quyền Sidebar Vào CSDL 113.20.107.184:6432, Khôi Phục Toàn Vẹn Mã Nguồn Sidebar, Cải Tiến Toàn Diện Nhà Tài Trợ, Quỹ Thiện Nguyện & Import Bóc Tách Sự Kiện**:
+  - **1. Phân Quyền và Điều Khiển Ẩn/Hiện Sidebar Hoàn Toàn Bằng CSDL (Rule 0 & Phân Quyền RBAC)**:
+    * **Khôi phục toàn vẹn mã nguồn trong `Sidebar.tsx`**: Tuyệt đối không xóa hay comment out code bất kỳ mục nào trên Sidebar. Đã đưa đầy đủ các mục `Lớp học & Khóa học` (`/trainings`), `Tin tức & Truyền thông` (`/news`), `Quyền lợi & Ưu đãi` (`/perks`), và mở lại nhóm `KẾT NỐI & GIAO THƯƠNG` (`/network`, `/opportunities`, `/marketplace`, `/companies`).
+    * **Kiểm soát động 100% qua Ma Trận Phân Quyền trong CSDL**: Mọi mục và nhóm trên Sidebar đều được lọc qua hàm `isAllowed(it.to)`.
+    * **Nâng cấp hàm `isRouteAllowedByMatrix` (`rbac-permission-helpers.ts`)**: Loại bỏ các đoạn code hardcode `return true` vô điều kiện. Hàm tra cứu trực tiếp Ma Trận Phân Quyền RBAC từ CSDL (`public.app_settings` key `crm_permission_matrix` / `localStorage`). Khi một tính năng bị tắt (`enabled === false`) hoặc tất cả các quyền vai trò của action `VIEW` đều là `false`, hàm sẽ trả về `false` và tự động ẩn mục đó khỏi Sidebar.
+    * **Cập nhật dữ liệu CSDL chuẩn `113.20.107.184:6432`**: Đã cập nhật bản ghi `crm_permission_matrix` trong bảng `public.app_settings`:
+      - *7 tính năng tạm ẩn*: Đặt `enabled: false` và toàn bộ vai trò `VIEW: false` cho `/trainings`, `/news`, `/perks`, `/network`, `/opportunities`, `/marketplace`, `/companies`.
+      - *Các tính năng được phép hiển thị*: Bật quyền `VIEW: true` cho: Tổng quan (`/`), Trợ lý AI (`/ai-assistant`), Học viên (`/members`), Sự kiện (`/events`), Tổng quan sự kiện (`/events-overview`), Biểu quyết (`/voting`), Đăng ký sự kiện (`/event-registrations`), Bốc thăm trúng thưởng (`/lucky-draw`), Nhà tài trợ & Quỹ tài trợ (`/sponsors`), Báo cáo tài trợ (`/sponsor-report`), Thống kê báo cáo (`/analytics`), Khoản thu (`/income`), Khoản chi (`/expenses`), Báo cáo tài chính (`/finance-report`), Thông báo (`/notifications`), Quản lý cuộc họp (`/meetings`), Tài liệu (`/documents`), Biểu mẫu (`/templates`), Cài đặt hệ thống (`/settings`), Lịch sử hoạt động (`/activity`), Quản lý ban (`/departments`), Quản lý phân quyền chức năng (`/permissions`), Quản lý tài khoản người dùng (`/accounts`).
+    * Đồng bộ hóa hàm `getDefaultTreeCategories` tại NestJS backend `admin.service.ts` để đồng nhất 100% cấu trúc 9 nhóm chức năng.
+  - **2. Xóa Bỏ Hoàn Toàn Gói Tài Trợ & Tách Biệt Quỹ Hoạt Động / Quỹ Thiện Nguyện (CSR)**:
+    * **Loại bỏ gói tài trợ cố định**: Khi khai báo nhà tài trợ mới (`SponsorModal.tsx`), xóa bỏ hoàn toàn các khái niệm gói Vàng, Bạc, Đồng... Thay bằng ô textarea mở rộng cho phép tự do điền nội dung, diễn giải tài trợ.
+    * **4 loại tài trợ bắt buộc**:
+      1. Quỹ Hoạt Động · Tiền mặt (`general_cash`)
+      2. Quỹ Hoạt Động · Hiện vật (`general_in_kind`)
+      3. Quỹ Thiện Nguyện · Tiền mặt (`charity_cash`)
+      4. Quỹ Thiện Nguyện · Hiện vật (`charity_in_kind`)
+    * **Thống kê tách biệt trên giao diện & Excel (`sponsors.tsx`)**: Chia rõ rệt 2 khối Quỹ Hoạt Động & Sự Kiện và Quỹ Thiện Nguyện CSR. Cả 2 khối đều phân định rạch ròi số tiền mặt và giá trị quy đổi hiện vật kèm danh mục vật phẩm.
+  - **3. Import File Word/Excel/PDF Tự Động Bóc Tách Vào Popup Tạo Sự Kiện (`EventWizard.tsx`)**:
+    * Xây dựng module parser `event-doc-parser.ts` hỗ trợ file Word (.docx), Excel (.xlsx, .xls, .csv), PDF và văn bản.
+    * Tự động trích xuất các trường: Tên sự kiện, Ngày diễn ra, Giờ bắt đầu/kết thúc, Địa điểm, Diễn giả (speaker), Sức chứa và Mô tả chi tiết để điền tự động vào form tạo sự kiện.
+  - **4. Đăng Ký Thành Viên Tham Dự Ngay Sau Khi Tạo Sự Kiện**:
+    * Tích hợp bước 3 ngay tại popup sau khi tạo sự kiện thành công trong `EventWizard.tsx`.
+    * Form đăng ký đại biểu gồm đầy đủ: Họ tên, Chức danh (*bắt buộc), Số điện thoại (*bắt buộc), Tên công ty/Doanh nghiệp, Email, Loại vé.
+    * Lưu trực tiếp vào CSDL PostgreSQL chuẩn `113.20.107.184:6432` qua API `/events/:id/attendees/add-or-checkin` và hiển thị danh sách đại biểu ngay tại popup.
+  - **5. Kiểm Tra Chất Lượng Code & Cơ Sở Dữ Liệu**:
+    * Database duy nhất: `113.20.107.184:6432/ceohn10_project`.
+    * Backend: `tsc --noEmit` đạt 0 lỗi (Exit code 0).
+    * Frontend: Đã khắc phục toàn bộ lỗi type, chạy `routes:gen` thành công.
+    * Tuyệt đối không tự ý chạy `git push` hay `git commit`.
 
 - **Bản cập nhật ngày 18/11/2026 (v12.19): Hoàn Thiện Triệt Để 5 Yêu Cầu Nâng Cấp Hệ Thống CRM CEO HN10**:
   - **1. Tái Cấu Trúc Toàn Diện Sidebar CRM CEO HN10**:

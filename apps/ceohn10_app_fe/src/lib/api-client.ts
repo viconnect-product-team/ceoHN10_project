@@ -1,4 +1,4 @@
-import { KY_NIEM_4_NAM_BANNER_URL } from "@/assets/ky_niem_4_nam_banner";
+ import { KY_NIEM_4_NAM_BANNER_URL } from "@/assets/ky_niem_4_nam_banner";
 
 export function getAuthToken(): string | null {
   if (typeof window === "undefined") return null;
@@ -45,7 +45,7 @@ export function getBaseApiUrl(): string {
   return (
     (typeof process !== "undefined" && (process.env?.NEST_API_URL || process.env?.VITE_API_URL)) ||
     (import.meta.env?.VITE_API_URL as string) ||
-    "http://127.0.0.1:4000"
+    "http://127.0.0.1:4003"
   );
 }
 
