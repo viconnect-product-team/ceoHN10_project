@@ -33,7 +33,7 @@ services:
     environment:
       NODE_ENV: production
       PORT: 4003
-      DATABASE_URL: ${DATABASE_URL:-postgresql://app1:ceohn10_secure_pass_2026@ceohn10-db:5432/ceohn10_project}
+      DATABASE_URL: ${DATABASE_URL:-postgresql://app1:5%5ES0CEpvYwC1%28%23YN1UoJ@113.20.107.184:6432/ceohn10_project?pgbouncer=true}
       JWT_SECRET: ${JWT_SECRET:-super-secret-jwt-key-ceohn10}
       MINIO_ENDPOINT: ${MINIO_ENDPOINT:-minio}
       MINIO_PORT: ${MINIO_PORT:-9050}

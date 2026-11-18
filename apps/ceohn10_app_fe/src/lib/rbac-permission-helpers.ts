@@ -555,6 +555,12 @@ export function isActionAllowedForRole(
   roleKey: string
 ): boolean {
   if (!actionRoles) return false;
+
+  // Nếu hành động này bị tắt toàn bộ (tất cả vai trò đều false), nghĩa là tính năng bị khóa/ẩn trong hệ thống
+  const values = Object.values(actionRoles);
+  const hasAnyTrue = values.some((v) => v === true);
+  if (!hasAnyTrue) return false;
+
   if (actionRoles[roleKey] === true) return true;
   if (actionRoles[roleKey] === false) return false;
 
@@ -614,121 +620,51 @@ export function getDynamicDepartmentOptions(): string[] {
 }
 
 /**
- * Kiểm tra 1 route có được phép hiển thị trên Sidebar/CRM theo vai trò người dùng hay không
+ * Kiểm tra 1 route có được phép hiển thị trên Sidebar/CRM theo ma trận phân quyền RBAC CSDL hay không
  */
 export function isRouteAllowedByMatrix(route: string, roleKey: SystemRoleKey): boolean {
-  // Quản trị viên cấp cao nhất (Super Admin), Admin và Lãnh đạo lớp luôn có quyền xem toàn bộ để tránh bị khóa hệ thống
-  if (
-    roleKey === "quan_tri" ||
-    roleKey === "admin" ||
-    roleKey === "chu_tich" ||
-    (roleKey as string) === "platform_admin" ||
-    (roleKey as string) === "president"
-  ) {
-    return true;
-  }
-
   // Làm sạch route (bỏ query parameters & hash fragment: ví dụ /permissions?tab=matrix -> /permissions)
   const cleanRoute = (route || "").split("?")[0].split("#")[0];
 
-  // Danh bạ Học viên, doanh nghiệp, kết nối giao thương B2B, chia sẻ cơ hội, cuộc họp, công việc, tài liệu mở cho toàn bộ tài khoản hợp lệ
-  if (
-    cleanRoute === "/members" ||
-    cleanRoute === "/companies" ||
-    cleanRoute === "/association/members" ||
-    cleanRoute === "/meetings" ||
-    cleanRoute === "/opportunities" ||
-    cleanRoute === "/marketplace" ||
-    cleanRoute === "/network" ||
-    cleanRoute === "/tasks" ||
-    cleanRoute === "/documents"
-  ) {
+  // Trang Tổng quan và Trợ lý AI luôn mở cho toàn bộ tài khoản đăng nhập
+  if (cleanRoute === "/" || cleanRoute === "/ai-assistant") {
     return true;
   }
 
-  if (typeof window === "undefined") return true;
-
   const sRole = String(roleKey);
 
+  // Bảo vệ khẩn cấp: Chỉ mở quyền quản trị tối cao đối với các phân hệ phân quyền và cài đặt để tránh admin tự khóa mình khỏi hệ thống
+  const isEmergencyAdminRoute =
+    cleanRoute.startsWith("/permissions") ||
+    cleanRoute.startsWith("/settings") ||
+    cleanRoute.startsWith("/accounts") ||
+    cleanRoute.startsWith("/departments");
+
   // 1. Kiểm tra quyền riêng của tài khoản hiện tại từ vba_member_permissions nếu có
-  try {
-    const rawUserPerms = localStorage.getItem("vba_member_permissions");
-    const rawMyMem = localStorage.getItem("vba_my_member");
-    if (rawUserPerms && rawMyMem) {
-      const myMem = JSON.parse(rawMyMem);
-      const mCode = myMem?.code;
-      if (mCode) {
-        const userMap = JSON.parse(rawUserPerms);
-        const userProfile = userMap[mCode] || userMap[mCode.toUpperCase()] || userMap[mCode.toLowerCase()];
-        if (userProfile) {
-          if (userProfile.canView === false) return false;
-          // canManageMembers dùng cho thao tác duyệt/sửa/xóa, không cấm xem danh bạ
-          if (cleanRoute === "/events" && userProfile.canManageEvents === false) return false;
-          if ((cleanRoute === "/finance" || cleanRoute === "/renewal") && userProfile.canManageFinance === false) return false;
-          if (cleanRoute === "/news" && userProfile.canManageNews === false) return false;
+  if (typeof window !== "undefined") {
+    try {
+      const rawUserPerms = localStorage.getItem("vba_member_permissions");
+      const rawMyMem = localStorage.getItem("vba_my_member");
+      if (rawUserPerms && rawMyMem) {
+        const myMem = JSON.parse(rawMyMem);
+        const mCode = myMem?.code;
+        if (mCode) {
+          const userMap = JSON.parse(rawUserPerms);
+          const userProfile = userMap[mCode] || userMap[mCode.toUpperCase()] || userMap[mCode.toLowerCase()];
+          if (userProfile) {
+            if (userProfile.canView === false) return false;
+            if (cleanRoute === "/events" && userProfile.canManageEvents === false) return false;
+            if ((cleanRoute === "/finance" || cleanRoute === "/renewal") && userProfile.canManageFinance === false) return false;
+            if (cleanRoute === "/news" && userProfile.canManageNews === false) return false;
+          }
         }
       }
-    }
-  } catch { }
+    } catch { }
 
-  // 2. Các route quản trị hệ thống nhạy cảm (Cấm tuyệt đối đối với thành viên ban thường và Học viên)
-  const isSystemAdminOnlyRoute =
-    cleanRoute.startsWith("/permissions") ||
-    cleanRoute.startsWith("/departments") ||
-    cleanRoute.startsWith("/settings") ||
-    cleanRoute.startsWith("/activity") ||
-    cleanRoute.startsWith("/admin");
-
-  if (isSystemAdminOnlyRoute) {
-    if (sRole === "quan_tri" || sRole === "admin" || sRole === "chu_tich" || sRole === "president" || sRole === "truong_ban_dieu_hanh") {
-      return true;
-    }
-    return false;
-  }
-
-  // Quản lý mẫu trang (Thư mời): Chỉ cho phép Ban Truyền thông, Ban Sự kiện, Tổng thư ký và Quản trị
-  if (cleanRoute.startsWith("/templates")) {
-    const isTemplatesAllowedRole =
-      sRole === "quan_tri" ||
-      sRole === "admin" ||
-      sRole === "chu_tich" ||
-      sRole === "president" ||
-      sRole === "tong_thu_ky" ||
-      sRole === "ban_thu_ky" ||
-      sRole === "truong_ban_truyen_thong" ||
-      sRole === "thanh_vien_ban_truyen_thong" ||
-      sRole === "truong_ban_su_kien" ||
-      sRole === "thanh_vien_ban_su_kien" ||
-      sRole === "BTT";
-    if (!isTemplatesAllowedRole) {
-      return false;
-    }
-  }
-
-  // Quản lý tài khoản & Quản trị người dùng (/accounts hoặc /account-settings): Cho phép Quản trị, Chủ tịch, Ban điều hành, Thư ký và Trưởng ban chuyên môn
-  if (cleanRoute.startsWith("/accounts") || cleanRoute.startsWith("/account-settings")) {
-    if (
-      sRole === "quan_tri" ||
-      sRole === "admin" ||
-      sRole === "chu_tich" ||
-      sRole === "president" ||
-      sRole === "truong_ban_dieu_hanh" ||
-      sRole === "tong_thu_ky" ||
-      sRole === "ban_thu_ky" ||
-      sRole.startsWith("truong_ban_") ||
-      sRole === "staff" ||
-      sRole === "moderator"
-    ) {
-      return true;
-    }
-    return false;
-  }
-
-  // 3. Tra cứu theo Ma Trận Phân Quyền (RBAC Matrix)
-  try {
-    const raw = localStorage.getItem(RBAC_MATRIX_STORAGE_KEY);
-    if (raw) {
-      try {
+    // 2. Tra cứu trực tiếp theo Ma Trận Phân Quyền CSDL (RBAC Matrix)
+    try {
+      const raw = localStorage.getItem(RBAC_MATRIX_STORAGE_KEY);
+      if (raw) {
         const categories = JSON.parse(raw);
         if (Array.isArray(categories) && categories.length > 0) {
           for (const cat of categories) {
@@ -740,136 +676,128 @@ export function isRouteAllowedByMatrix(route: string, roleKey: SystemRoleKey): b
                 featCleanRoute === cleanRoute ||
                 (cleanRoute !== "/" && featCleanRoute.startsWith(cleanRoute)) ||
                 (featCleanRoute !== "/" && cleanRoute.startsWith(featCleanRoute)) ||
-                // Cầu nối đồng bộ /accounts và /account-settings
                 ((featCleanRoute === "/accounts" || featCleanRoute === "/account-settings") &&
                   (cleanRoute === "/accounts" || cleanRoute === "/account-settings"));
+
               if (isMatch) {
+                // Nếu tính năng bị tắt trong ma trận (enabled === false)
+                if (feat.enabled === false) {
+                  return false;
+                }
+
                 if (!feat.actions || !Array.isArray(feat.actions) || feat.actions.length === 0) {
                   return true;
                 }
+
                 const viewAction = feat.actions.find(
                   (a: any) =>
                     (a.code && a.code.toUpperCase().endsWith("_VIEW")) ||
                     (a.id && a.id.toLowerCase().includes("_view"))
                 );
-                if (viewAction && viewAction.roles) {
-                  return isActionAllowedForRole(viewAction.roles, roleKey);
+
+                if (viewAction) {
+                  if (viewAction.enabled === false) return false;
+                  if (viewAction.roles) {
+                    return isActionAllowedForRole(viewAction.roles, roleKey);
+                  }
                 }
-                return feat.actions.some((a: any) => isActionAllowedForRole(a?.roles, roleKey));
+
+                return feat.actions.some((a: any) => a.enabled !== false && isActionAllowedForRole(a?.roles, roleKey));
               }
             }
           }
         }
-      } catch { }
-    }
-
-    // 4. Default RBAC rule fallback khi chưa tải ma trận hoặc route mới
-    if (sRole === "quan_tri" || sRole === "admin" || sRole === "chu_tich" || sRole === "president") return true;
-
-    // Phân quyền chuyên môn mặc định cho từng Ban
-    if (sRole === "thanh_vien_ban_truyen_thong") {
-      return (
-        cleanRoute.startsWith("/news") ||
-        cleanRoute.startsWith("/notifications") ||
-        cleanRoute.startsWith("/templates") ||
-        cleanRoute.startsWith("/documents") ||
-        cleanRoute.startsWith("/tasks") ||
-        cleanRoute === "/"
-      );
-    }
-
-    if (sRole === "thanh_vien_ban_xuc_tien") {
-      return (
-        cleanRoute.startsWith("/marketplace") ||
-        cleanRoute.startsWith("/opportunities") ||
-        cleanRoute.startsWith("/business-connect") ||
-        cleanRoute.startsWith("/network") ||
-        cleanRoute.startsWith("/trainings") ||
-        cleanRoute.startsWith("/tasks") ||
-        cleanRoute === "/"
-      );
-    }
-
-    if (sRole === "thanh_vien_ban_su_kien") {
-      return (
-        cleanRoute.startsWith("/events") ||
-        cleanRoute.startsWith("/templates") ||
-        cleanRoute.startsWith("/network") ||
-        cleanRoute.startsWith("/tasks") ||
-        cleanRoute === "/"
-      );
-    }
-
-    if (sRole === "thanh_vien_ban_thanh_vien") {
-      return (
-        cleanRoute.startsWith("/members") ||
-        cleanRoute.startsWith("/companies") ||
-        cleanRoute.startsWith("/segments") ||
-        cleanRoute.startsWith("/tasks") ||
-        cleanRoute === "/"
-      );
-    }
-
-    if (sRole === "thanh_vien_ban_tai_chinh") {
-      return (
-        cleanRoute.startsWith("/finance") ||
-        cleanRoute.startsWith("/income") ||
-        cleanRoute.startsWith("/expenses") ||
-        cleanRoute.startsWith("/fees") ||
-        cleanRoute.startsWith("/sponsor") ||
-        cleanRoute.startsWith("/tasks") ||
-        cleanRoute === "/"
-      );
-    }
-
-    if (sRole === "thanh_vien_ban_thien_nguyen") {
-      return (
-        cleanRoute.startsWith("/perks") ||
-        cleanRoute.startsWith("/benefits") ||
-        cleanRoute.startsWith("/network") ||
-        cleanRoute.startsWith("/tasks") ||
-        cleanRoute === "/"
-      );
-    }
-
-    if (sRole === "thanh_vien_ban_dieu_hanh") {
-      return !isSystemAdminOnlyRoute;
-    }
-
-    // Finance routes: Chỉ dành cho Ban Tài chính, Tổng thư ký, Ban Điều hành
-    const isFinanceRoute =
-      cleanRoute.startsWith("/finance") ||
-      cleanRoute.startsWith("/income") ||
-      cleanRoute.startsWith("/expenses") ||
-      cleanRoute.startsWith("/fees") ||
-      cleanRoute.startsWith("/sponsor");
-    if (isFinanceRoute) {
-      return (
-        roleKey === "truong_ban_tai_chinh" ||
-        roleKey === "thanh_vien_ban_tai_chinh" ||
-        roleKey === "tong_thu_ky" ||
-        roleKey === "truong_ban_dieu_hanh"
-      );
-    }
-
-    // Các route cấm đối với Học viên thường (member / HVT)
-    if (sRole === "member" || sRole === "HVT") {
-      if (
-        cleanRoute.startsWith("/segments") ||
-        cleanRoute.startsWith("/renewal") ||
-        cleanRoute.startsWith("/templates") ||
-        cleanRoute.startsWith("/analytics")
-      ) {
-        return false;
       }
-    }
+    } catch { }
+  }
 
-    return true;
-  } catch {
+  // 3. Danh sách các tính năng tạm ẩn theo chỉ đạo phân quyền hệ thống (khi chưa tải ma trận hoặc fallback)
+  const temporarilyHiddenRoutes = [
+    "/trainings",
+    "/news",
+    "/perks",
+    "/network",
+    "/opportunities",
+    "/marketplace",
+    "/companies",
+  ];
+  if (temporarilyHiddenRoutes.includes(cleanRoute)) {
+    return false;
+  }
+
+  // 4. Các route quản trị hệ thống nhạy cảm (Cấm đối với thành viên thường)
+  const isSystemAdminOnlyRoute =
+    cleanRoute.startsWith("/permissions") ||
+    cleanRoute.startsWith("/departments") ||
+    cleanRoute.startsWith("/settings") ||
+    cleanRoute.startsWith("/activity") ||
+    cleanRoute.startsWith("/admin") ||
+    cleanRoute.startsWith("/accounts") ||
+    cleanRoute.startsWith("/account-settings");
+
+  if (isSystemAdminOnlyRoute) {
+    return (
+      sRole === "quan_tri" ||
+      sRole === "admin" ||
+      sRole === "chu_tich" ||
+      sRole === "president" ||
+      sRole === "platform_admin" ||
+      sRole === "truong_ban_dieu_hanh" ||
+      sRole === "tong_thu_ky"
+    );
+  }
+
+  // Mẫu thư mời / Templates: Ban Truyền thông, Sự kiện, Thư ký và Quản trị
+  if (cleanRoute.startsWith("/templates")) {
+    return (
+      sRole === "quan_tri" ||
+      sRole === "admin" ||
+      sRole === "chu_tich" ||
+      sRole === "president" ||
+      sRole === "platform_admin" ||
+      sRole === "tong_thu_ky" ||
+      sRole === "ban_thu_ky" ||
+      sRole === "truong_ban_truyen_thong" ||
+      sRole === "thanh_vien_ban_truyen_thong" ||
+      sRole === "truong_ban_su_kien" ||
+      sRole === "thanh_vien_ban_su_kien" ||
+      sRole === "BTT"
+    );
+  }
+
+  // Quản trị viên cấp cao có quyền xem các phân hệ chung
+  if (
+    sRole === "quan_tri" ||
+    sRole === "admin" ||
+    sRole === "chu_tich" ||
+    sRole === "president" ||
+    (roleKey as string) === "platform_admin"
+  ) {
     return true;
   }
 
-  return true;
+  // 5. Quyền hiển thị cơ bản cho thành viên
+  if (
+    cleanRoute === "/members" ||
+    cleanRoute === "/events" ||
+    cleanRoute === "/events-overview" ||
+    cleanRoute === "/voting" ||
+    cleanRoute === "/event-registrations" ||
+    cleanRoute === "/lucky-draw" ||
+    cleanRoute === "/sponsors" ||
+    cleanRoute === "/sponsor-report" ||
+    cleanRoute === "/analytics" ||
+    cleanRoute === "/income" ||
+    cleanRoute === "/expenses" ||
+    cleanRoute === "/finance-report" ||
+    cleanRoute === "/notifications" ||
+    cleanRoute === "/meetings" ||
+    cleanRoute === "/documents"
+  ) {
+    return true;
+  }
+
+  return false;
 }
 
 export const PERMISSION_TO_MATRIX_CODES: Record<string, string[]> = {

@@ -183,14 +183,14 @@ function Index() {
         sessionStorage.setItem("crm_portal", "1");
       }
 
-      const isCeo1983MobileDomain =
+      const isCeoHn10MobileDomain =
         hostname === "ceohn10.viconnect.vn" ||
         hostname.startsWith("dev-app.") ||
         (hostname.includes("ceohn10") && !hostname.startsWith("crm.") && !hostname.startsWith("crm_") && !hostname.includes("crm"));
 
       const isPureMobileApp =
         typeof window !== "undefined" &&
-        (import.meta.env.VITE_APP_SCOPE === "association_app" || isCeo1983MobileDomain) &&
+        (import.meta.env.VITE_APP_SCOPE === "association_app" || isCeoHn10MobileDomain) &&
         !isCrmPortal &&
         hostname !== "crm.ceohn10.viconnect.vn" &&
         hostname !== "crm_ceohn10.viconnect.vn" &&

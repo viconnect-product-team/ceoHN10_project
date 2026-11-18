@@ -1,6 +1,18 @@
 # ==============================================================================
 # BỘ LUẬT DỰ ÁN (PROJECT RULES & AI CODEGEN STANDARDS) - CEO HN10 PROJECT
 # Vai trò: Tech Lead | Định dạng: .cursorrules
+# 18/11/2026 (v12.20) — PHÂN QUYỀN SIDEBAR VÀO CSDL 113.20.107.184:6432, KHÔI PHỤC TOÀN VẸN MÃ NGUỒN SIDEBAR, XÓA BỎ GÓI TÀI TRỢ, BÓC TÁCH FILE SỰ KIỆN:
+#   * [PHÂN QUYỀN SIDEBAR HOÀN TOÀN BẰNG CSDL (RULE 0 & RBAC MATRIX)]:
+#     - Khôi phục mã nguồn 100% trong Sidebar.tsx: Giữ nguyên code toàn bộ các menu (Lớp học, Tin tức, Quyền lợi, Nhóm Kết nối & Giao thương).
+#     - Ẩn/hiện động qua hàm isAllowed(it.to) kết hợp với Ma Trận Phân Quyền trong CSDL (app_settings.crm_permission_matrix).
+#     - Cập nhật hàm isRouteAllowedByMatrix (rbac-permission-helpers.ts) loại bỏ hardcode bypass, kiểm tra trực tiếp ma trận CSDL (enabled: false / all roles false -> return false).
+#     - Cập nhật CSDL 113.20.107.184:6432: Tắt quyền xem 7 tính năng tạm ẩn (/trainings, /news, /perks, /network, /opportunities, `/marketplace`, `/companies`) và bật đầy đủ các tính năng được chỉ định hiển thị.
+#   * [XÓA BỎ GÓI TÀI TRỢ & TÁCH BIỆT QUỸ THIỆN NGUYỆN CSR]:
+#     - Không còn gói tài trợ cứng (Vàng, Bạc, Đồng...). Khi khai báo nhà tài trợ (SponsorModal.tsx), mở rộng textarea tự do điền nội dung, bắt buộc chọn 1 trong 4 loại tài trợ (Quỹ Hoạt động Tiền/Hiện vật, Quỹ Thiện nguyện Tiền/Hiện vật).
+#   * [IMPORT FILE WORD/EXCEL/PDF BÓC TÁCH TẠO SỰ KIỆN & ĐĂNG KÝ THÀNH VIÊN]:
+#     - Tích hợp event-doc-parser.ts tại popup EventWizard.tsx tự động trích xuất Tên, Thời gian, Địa điểm, Diễn giả, Sức chứa, Mô tả.
+#     - Bổ sung bước đăng ký thành viên tham dự ngay sau khi tạo sự kiện, ghi nhận trực tiếp vào bảng public.event_registrations trên CSDL 113.20.107.184:6432.
+#   * [TUÂN THỦ CSDL & GIT]: CSDL duy nhất 113.20.107.184:6432 (ceohn10_project). Tuyệt đối không git commit / git push. Type check đạt 0 lỗi.
 # 17/11/2026 (v12.16) — SỬA TRIỆT ĐỂ LỖI TYPESCRIPT TS2741 TRÊN GITHUB ACTIONS & TẬP TRUNG TÀI LIỆU TRÌNH CHIẾU VÀO 4 PHÂN HỆ (TỔNG QUAN, SỰ KIỆN, LỚP HỌC, TÀI CHÍNH):
 #   * [SỬA LỖI TYPESCRIPT GATES CI/CD]:
 #     - Bổ sung charity vào TYPE_KEY và TYPE_COVER trong apps/ceohn10_app_fe/src/routes/events.$eventId.tsx.

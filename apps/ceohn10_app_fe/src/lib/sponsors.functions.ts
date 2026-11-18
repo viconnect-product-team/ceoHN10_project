@@ -15,7 +15,7 @@ export type AssignedEvent = {
   amount?: number;
 };
 
-export type PackageType = "bank_transfer" | "cash" | "in_kind";
+export type PackageType = "bank_transfer" | "cash" | "in_kind" | "charity_cash" | "charity_in_kind";
 
 export type InKindItem = {
   name: string;
@@ -94,7 +94,7 @@ const sponsorInput = z.object({
   companyName: z.string().optional(),
   tier: z.enum(["platinum", "gold", "silver", "bronze"]).default("bronze"),
   sponsorType: z.enum(["regular", "new"]).default("new"),
-  packageType: z.enum(["bank_transfer", "cash", "in_kind"]).default("bank_transfer"),
+  packageType: z.enum(["bank_transfer", "cash", "in_kind", "charity_cash", "charity_in_kind"]).default("bank_transfer"),
   inKindDescription: z.string().max(1000).optional().default(""),
   inKindItems: z
     .array(
@@ -159,7 +159,7 @@ export const sendSponsorThankYouEmailFn = createServerFn({ method: "POST" })
 const packageInput = z.object({
   tier: z.enum(["platinum", "gold", "silver", "bronze"]),
   price: z.number().min(0).max(1e12).default(0),
-  packageType: z.enum(["bank_transfer", "cash", "in_kind"]).default("bank_transfer"),
+  packageType: z.enum(["bank_transfer", "cash", "in_kind", "charity_cash", "charity_in_kind"]).default("bank_transfer"),
   inKindDescription: z.string().max(1000).optional().default(""),
   benefits: z.array(z.string().min(1).max(200)).max(30).default([]),
   available: z.number().int().min(0).max(100000).default(0),

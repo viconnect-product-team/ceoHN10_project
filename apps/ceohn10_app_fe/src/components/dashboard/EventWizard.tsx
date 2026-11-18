@@ -1,6 +1,25 @@
 import { useEffect, useMemo, useState, useRef } from "react";
 import { createPortal } from "react-dom";
-import { Check, ChevronLeft, ChevronRight, Plus, QrCode, Ticket, Trash2, X, ImagePlus, Sparkles, MapPin, Users, Award } from "lucide-react";
+import {
+  Check,
+  ChevronLeft,
+  ChevronRight,
+  Plus,
+  QrCode,
+  Ticket,
+  Trash2,
+  X,
+  ImagePlus,
+  Sparkles,
+  MapPin,
+  Users,
+  Award,
+  FileUp,
+  FileText,
+  UserPlus,
+  Loader2,
+  CheckCircle2,
+} from "lucide-react";
 import { toast } from "sonner";
 import {
   QR_FIELDS,
@@ -14,6 +33,7 @@ import { useT } from "@/lib/i18n";
 import { EVENT_TYPE_TEMPLATES, type EventTypeKey } from "@/lib/event-type-templates";
 import { EventQrStaffSelector } from "@/components/events/EventQrStaffSelector";
 import { EventSponsorPackageSelector } from "@/components/events/EventSponsorPackageSelector";
+import { parseEventDocument, type ParsedEventData } from "@/lib/event-doc-parser";
 
 type EventType = EventItem["type"];
 type EventStatus = EventItem["status"];
@@ -94,7 +114,8 @@ function EventWizardDialog({
   }, []);
   const defaultTpl = EVENT_TYPE_TEMPLATES[(initialType as EventTypeKey) || "forum"] || EVENT_TYPE_TEMPLATES.forum;
 
-  const [step, setStep] = useState<0 | 1 | 2>(0);
+  const [step, setStep] = useState<0 | 1 | 2 | 3>(0);
+  const [createdEvent, setCreatedEvent] = useState<EventItem | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [info, setInfo] = useState<Info>({
     name: initialType === "charity" ? defaultTpl.name : "",
@@ -119,6 +140,7 @@ function EventWizardDialog({
 
   const reset = () => {
     setStep(0);
+    setCreatedEvent(null);
     setInfo({
       name: "",
       tagline: defaultTpl.tagline,
@@ -261,9 +283,11 @@ function EventWizardDialog({
           })),
         }),
       });
-      toast.success(t("ewz.created"));
-      reset();
-      onCreated(res?.event || (res as unknown as EventItem));
+      const createdEv = res?.event || (res as unknown as EventItem);
+      setCreatedEvent(createdEv);
+      onCreated(createdEv);
+      setStep(3);
+      toast.success("Khởi tạo sự kiện thành công! Bạn có thể đăng ký đại biểu tham dự ngay dưới đây.");
     } catch (err: any) {
       console.error("[EventWizard] Create error:", err);
       toast.error(err?.message || t("ewz.error"));
@@ -272,10 +296,15 @@ function EventWizardDialog({
     }
   };
 
-  const steps = [t("ewz.step.info"), t("ewz.step.tickets"), t("ewz.step.qr")];
+  const steps = [
+    t("ewz.step.info"),
+    t("ewz.step.tickets"),
+    t("ewz.step.qr"),
+    "Đăng ký thành viên",
+  ];
   const announcement = submitting
     ? t("ewz.announce.submitting")
-    : t("ewz.announce.step", { n: step + 1, total: 3, label: steps[step] });
+    : t("ewz.announce.step", { n: step + 1, total: 4, label: steps[step] });
 
   return (
     <div
@@ -304,7 +333,7 @@ function EventWizardDialog({
           <div className="mb-3 flex items-center justify-between">
             <h2 className="text-base font-extrabold text-foreground flex items-center gap-2">
               <Sparkles className="h-4 w-4 text-[#003B95] dark:text-blue-400" />
-              <span>{t("ewz.title")}</span>
+              <span>{step === 3 ? "Đăng Ký Thành Viên Tham Dự Sự Kiện" : t("ewz.title")}</span>
             </h2>
             <button
               type="button"
@@ -317,23 +346,26 @@ function EventWizardDialog({
           </div>
           <ol
             className="flex items-center gap-2"
-            aria-label={t("ewz.step.of", { n: step + 1, total: 3 })}
+            aria-label={t("ewz.step.of", { n: step + 1, total: 4 })}
           >
             {steps.map((label, i) => (
               <li key={label} className="flex flex-1 items-center gap-2">
                 <span
-                  className={`grid h-7 w-7 shrink-0 place-items-center rounded-full text-xs font-semibold ${i < step
-                      ? "bg-[#003B95] text-white font-bold"
+                  className={`grid h-7 w-7 shrink-0 place-items-center rounded-full text-xs font-semibold ${
+                    i < step
+                      ? "bg-emerald-600 text-white font-bold"
                       : i === step
-                        ? "bg-[#003B95]/15 text-[#003B95] ring-2 ring-[#003B95] font-bold dark:text-blue-400 dark:ring-blue-400"
-                        : "bg-muted text-muted-foreground border border-border"
-                    }`}
+                      ? "bg-[#003B95]/15 text-[#003B95] ring-2 ring-[#003B95] font-bold dark:text-blue-400 dark:ring-blue-400"
+                      : "bg-muted text-muted-foreground border border-border"
+                  }`}
                   aria-current={i === step ? "step" : undefined}
                 >
                   {i < step ? <Check className="h-3.5 w-3.5" aria-hidden="true" /> : i + 1}
                 </span>
                 <span
-                  className={`truncate text-xs font-medium ${i === step ? "text-[#003B95] dark:text-blue-400 font-bold" : "text-muted-foreground"}`}
+                  className={`truncate text-xs font-medium ${
+                    i === step ? "text-[#003B95] dark:text-blue-400 font-bold" : "text-muted-foreground"
+                  }`}
                 >
                   {label}
                 </span>
@@ -350,42 +382,63 @@ function EventWizardDialog({
           {step === 0 && <InfoStep info={info} setInfo={setInfo} errors={errors} setErrors={setErrors} />}
           {step === 1 && <TicketStep tickets={tickets} setTickets={setTickets} errors={errors} setErrors={setErrors} />}
           {step === 2 && <QrStep qrFields={qrFields} toggleQr={toggleQr} sample={qrSample} />}
+          {step === 3 && createdEvent && (
+            <AttendeeRegistrationStep event={createdEvent} tickets={tickets} onClose={close} />
+          )}
         </div>
 
         {/* Footer */}
         <div className="flex items-center justify-between gap-2 border-t border-border bg-slate-50 dark:bg-card/90 p-4">
-          <button
-            type="button"
-            onClick={step === 0 ? close : back}
-            disabled={submitting}
-            className="inline-flex items-center gap-1.5 rounded-xl border border-border bg-card px-4 py-2 text-sm font-medium text-foreground hover:bg-muted disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 cursor-pointer"
-          >
-            {step === 0 ? (
-              t("ewz.cancel")
-            ) : (
-              <>
-                <ChevronLeft className="h-4 w-4" aria-hidden="true" /> {t("ewz.back")}
-              </>
-            )}
-          </button>
-          {step < 2 ? (
-            <button
-              type="button"
-              onClick={next}
-              className="inline-flex items-center gap-1.5 rounded-xl px-5 py-2 text-sm font-bold bg-[#003B95] hover:bg-[#002d73] text-white shadow-md shadow-[#003B95]/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 cursor-pointer transition active:scale-95"
-            >
-              {t("ewz.next")} <ChevronRight className="h-4 w-4" aria-hidden="true" />
-            </button>
+          {step === 3 ? (
+            <div className="flex items-center justify-between w-full">
+              <span className="text-xs text-muted-foreground">
+                Sự kiện đã được lưu an toàn vào hệ thống. Bạn có thể đóng bất kỳ lúc nào.
+              </span>
+              <button
+                type="button"
+                onClick={close}
+                className="inline-flex items-center gap-1.5 rounded-xl px-5 py-2 text-sm font-bold bg-[#003B95] hover:bg-[#002d73] text-white shadow-md shadow-[#003B95]/20 cursor-pointer transition active:scale-95"
+              >
+                <Check className="h-4 w-4" />
+                <span>Hoàn tất &amp; Đóng cửa sổ</span>
+              </button>
+            </div>
           ) : (
-            <button
-              type="button"
-              onClick={submit}
-              disabled={submitting}
-              className="inline-flex items-center gap-1.5 rounded-xl px-5 py-2 text-sm font-bold bg-[#003B95] hover:bg-[#002d73] text-white shadow-md shadow-[#003B95]/20 disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 cursor-pointer transition active:scale-95"
-            >
-              <Check className="h-4 w-4 text-white" aria-hidden="true" />
-              {submitting ? "Đang xử lý..." : t("ewz.create")}
-            </button>
+            <>
+              <button
+                type="button"
+                onClick={step === 0 ? close : back}
+                disabled={submitting}
+                className="inline-flex items-center gap-1.5 rounded-xl border border-border bg-card px-4 py-2 text-sm font-medium text-foreground hover:bg-muted disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 cursor-pointer"
+              >
+                {step === 0 ? (
+                  t("ewz.cancel")
+                ) : (
+                  <>
+                    <ChevronLeft className="h-4 w-4" aria-hidden="true" /> {t("ewz.back")}
+                  </>
+                )}
+              </button>
+              {step < 2 ? (
+                <button
+                  type="button"
+                  onClick={next}
+                  className="inline-flex items-center gap-1.5 rounded-xl px-5 py-2 text-sm font-bold bg-[#003B95] hover:bg-[#002d73] text-white shadow-md shadow-[#003B95]/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 cursor-pointer transition active:scale-95"
+                >
+                  {t("ewz.next")} <ChevronRight className="h-4 w-4" aria-hidden="true" />
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={submit}
+                  disabled={submitting}
+                  className="inline-flex items-center gap-1.5 rounded-xl px-5 py-2 text-sm font-bold bg-[#003B95] hover:bg-[#002d73] text-white shadow-md shadow-[#003B95]/20 disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 cursor-pointer transition active:scale-95"
+                >
+                  <Check className="h-4 w-4 text-white" aria-hidden="true" />
+                  {submitting ? "Đang xử lý..." : t("ewz.create")}
+                </button>
+              )}
+            </>
           )}
         </div>
       </div>
@@ -415,6 +468,56 @@ function InfoStep({
   const t = useT();
   const currentTpl = EVENT_TYPE_TEMPLATES[info.type as EventTypeKey] || EVENT_TYPE_TEMPLATES.forum;
 
+  const [parsingFile, setParsingFile] = useState(false);
+  const [extractedSummary, setExtractedSummary] = useState<string[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setParsingFile(true);
+    const toastId = toast.loading(`Đang đọc và bóc tách dữ liệu từ file ${file.name}...`);
+    try {
+      const parsed = await parseEventDocument(file);
+      setExtractedSummary(parsed.extractedFields);
+
+      setInfo({
+        ...info,
+        name: parsed.name || info.name,
+        date: parsed.date || info.date,
+        startTime: parsed.startTime || info.startTime,
+        endTime: parsed.endTime || info.endTime,
+        location: parsed.location || info.location,
+        capacity: parsed.capacity || info.capacity,
+        description: parsed.description || info.description,
+        tagline: parsed.tagline || info.tagline,
+        type: parsed.type || info.type,
+      });
+
+      // Clear validate errors for extracted fields
+      setErrors((prev) => {
+        const copy = { ...prev };
+        if (parsed.name) delete copy.name;
+        if (parsed.date) delete copy.date;
+        if (parsed.location) delete copy.location;
+        if (parsed.capacity) delete copy.capacity;
+        return copy;
+      });
+
+      toast.success(
+        `Bóc tách thành công! Đã trích xuất: ${parsed.extractedFields.join(", ")}`,
+        { id: toastId }
+      );
+    } catch (err: any) {
+      console.error("[InfoStep] File parse error:", err);
+      toast.error(err?.message || "Không thể bóc tách nội dung từ file này", { id: toastId });
+    } finally {
+      setParsingFile(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
+
   const handleSelectType = (newType: EventTypeKey) => {
     const tpl = EVENT_TYPE_TEMPLATES[newType];
     setInfo({
@@ -435,6 +538,72 @@ function InfoStep({
       <div>
         <h3 className="text-sm font-semibold text-foreground">{t("ewz.info.heading")}</h3>
         <p className="mt-0.5 text-xs text-muted-foreground">{t("ewz.info.hint")}</p>
+      </div>
+
+      {/* Trường Import File (Excel, Word, PDF) - Không require, tự động bóc tách */}
+      <div className="rounded-2xl border border-blue-200 dark:border-blue-900/60 bg-blue-50/50 dark:bg-blue-950/20 p-4 space-y-2.5">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <span className="grid h-8 w-8 place-items-center rounded-xl bg-[#003B95]/10 text-[#003B95] dark:text-blue-400">
+              <FileUp className="h-4 w-4" />
+            </span>
+            <div>
+              <span className="text-xs font-bold text-foreground">
+                Tự động bóc tách thông tin từ File (Excel, Word, PDF)
+              </span>
+              <span className="ml-1.5 rounded-full bg-slate-200 dark:bg-slate-800 px-2 py-0.5 text-[10px] font-semibold text-muted-foreground">
+                Tùy chọn
+              </span>
+            </div>
+          </div>
+          <div>
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={parsingFile}
+              className="inline-flex items-center gap-1.5 rounded-xl border border-blue-300 dark:border-blue-800 bg-white dark:bg-card px-3.5 py-2 text-xs font-bold text-[#003B95] dark:text-blue-300 shadow-xs hover:bg-blue-50 dark:hover:bg-muted transition cursor-pointer disabled:opacity-50"
+            >
+              {parsingFile ? (
+                <>
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  <span>Đang đọc &amp; bóc tách...</span>
+                </>
+              ) : (
+                <>
+                  <FileText className="h-3.5 w-3.5 text-[#003B95]" />
+                  <span>Chọn File Excel, Word hoặc PDF</span>
+                </>
+              )}
+            </button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".xlsx,.xls,.docx,.doc,.pdf,.txt,.csv"
+              className="hidden"
+              onChange={handleFileUpload}
+            />
+          </div>
+        </div>
+
+        <p className="text-[11px] text-muted-foreground leading-relaxed">
+          Đưa file kế hoạch sự kiện, công văn hoặc thông báo vào để hệ thống tự động bóc tách: <strong>Tên sự kiện</strong>, <strong>Lịch trình / Ngày giờ</strong>, <strong>Địa điểm</strong>, <strong>Diễn giả (speaker)</strong>, <strong>Sức chứa</strong> và <strong>Mô tả chi tiết</strong> rồi tự động điền vào các trường bên dưới.
+        </p>
+
+        {extractedSummary.length > 0 && (
+          <div className="flex flex-wrap items-center gap-1.5 pt-1">
+            <span className="text-[11px] font-bold text-emerald-700 dark:text-emerald-400 flex items-center gap-1">
+              <CheckCircle2 className="h-3.5 w-3.5" /> Đã bóc tách thành công:
+            </span>
+            {extractedSummary.map((field) => (
+              <span
+                key={field}
+                className="inline-flex items-center rounded-md bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 text-[10.5px] font-bold text-emerald-800 dark:text-emerald-300"
+              >
+                ✓ {field}
+              </span>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Event Type Grid Selector (Requirement 2: chọn loại sự kiện -> tự động hiện text & banner đúng) */}
@@ -1113,6 +1282,299 @@ function QrStep({
           </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+function AttendeeRegistrationStep({
+  event,
+  tickets,
+  onClose,
+}: {
+  event: EventItem;
+  tickets: TicketDraft[];
+  onClose: () => void;
+}) {
+  const [formData, setFormData] = useState({
+    memberName: "",
+    position: "",
+    phone: "",
+    company: "",
+    email: "",
+    ticketType: tickets[0]?.name || "Standard VIP",
+  });
+  const [submitting, setSubmitting] = useState(false);
+  const [attendeeList, setAttendeeList] = useState<
+    Array<{
+      id: string;
+      name: string;
+      position: string;
+      phone: string;
+      company?: string;
+      email?: string;
+      ticketType: string;
+      registeredAt: string;
+    }>
+  >([]);
+
+  const handleRegister = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!formData.memberName.trim()) {
+      toast.error("Vui lòng nhập họ và tên thành viên tham dự");
+      return;
+    }
+    if (!formData.position.trim()) {
+      toast.error("Vui lòng nhập chức danh / vị trí công tác");
+      return;
+    }
+    if (!formData.phone.trim()) {
+      toast.error("Vui lòng nhập số điện thoại liên hệ");
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      await fetchNestApi(`/events/${event.id}/attendees/add-or-checkin`, {
+        method: "POST",
+        body: JSON.stringify({
+          eventId: event.id,
+          memberName: formData.memberName.trim(),
+          position: formData.position.trim(),
+          phone: formData.phone.trim(),
+          company: formData.company.trim(),
+          email: formData.email.trim(),
+          ticketType: formData.ticketType,
+          checkedIn: false,
+          paymentStatus: "confirmed",
+        }),
+      });
+
+      const newAttendee = {
+        id: `ATT-${Date.now()}`,
+        name: formData.memberName.trim(),
+        position: formData.position.trim(),
+        phone: formData.phone.trim(),
+        company: formData.company.trim(),
+        email: formData.email.trim(),
+        ticketType: formData.ticketType,
+        registeredAt: new Date().toLocaleTimeString("vi-VN", {
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
+      };
+
+      setAttendeeList((prev) => [newAttendee, ...prev]);
+      toast.success(`Đã đăng ký tham dự thành công cho: ${formData.memberName}`);
+
+      setFormData({
+        memberName: "",
+        position: "",
+        phone: "",
+        company: "",
+        email: "",
+        ticketType: tickets[0]?.name || "Standard VIP",
+      });
+    } catch (err: any) {
+      console.error("[AttendeeRegistrationStep] Register failed:", err);
+      toast.error(err?.message || "Không thể đăng ký thành viên lúc này");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <div className="space-y-5">
+      {/* Banner chúc mừng khởi tạo thành công */}
+      <div className="rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-4 text-emerald-950 dark:text-emerald-200">
+        <div className="flex items-center gap-2.5">
+          <div className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-emerald-500 text-white font-bold shadow-xs">
+            <Check className="h-5 w-5" />
+          </div>
+          <div>
+            <h4 className="text-sm font-bold text-emerald-900 dark:text-emerald-300">
+              Khởi tạo sự kiện thành công: {event.name}
+            </h4>
+            <p className="text-xs text-emerald-700 dark:text-emerald-400 mt-0.5">
+              📅 {event.date} · ⏰ {(event as any).time || "08:30 - 11:30"} · 📍 {event.location || "CLB CEO HN10"}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Form đăng ký thành viên tham dự */}
+      <div className="rounded-2xl border border-border bg-card p-4 shadow-xs space-y-3.5">
+        <div className="flex items-center justify-between border-b border-border pb-3">
+          <div className="flex items-center gap-2">
+            <UserPlus className="h-4 w-4 text-[#003B95] dark:text-blue-400" />
+            <h3 className="text-sm font-bold text-foreground">Đăng Ký Thành Viên Tham Dự Sự Kiện</h3>
+          </div>
+          <span className="text-xs font-semibold text-muted-foreground">
+            Đã đăng ký: <strong className="text-primary">{attendeeList.length}</strong> đại biểu
+          </span>
+        </div>
+
+        <form onSubmit={handleRegister} className="space-y-3">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div>
+              <label className={labelCls} htmlFor="att-name">
+                Họ và tên thành viên <span className="text-rose-500">*</span>
+              </label>
+              <input
+                id="att-name"
+                type="text"
+                required
+                value={formData.memberName}
+                onChange={(e) => setFormData({ ...formData, memberName: e.target.value })}
+                placeholder="Nguyễn Văn A"
+                className={inputCls}
+              />
+            </div>
+
+            <div>
+              <label className={labelCls} htmlFor="att-pos">
+                Chức danh / Vị trí <span className="text-rose-500">*</span>
+              </label>
+              <input
+                id="att-pos"
+                type="text"
+                required
+                value={formData.position}
+                onChange={(e) => setFormData({ ...formData, position: e.target.value })}
+                placeholder="Chủ tịch / Tổng Giám Đốc"
+                className={inputCls}
+              />
+            </div>
+
+            <div>
+              <label className={labelCls} htmlFor="att-phone">
+                Số điện thoại <span className="text-rose-500">*</span>
+              </label>
+              <input
+                id="att-phone"
+                type="tel"
+                required
+                value={formData.phone}
+                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                placeholder="0912 345 678"
+                className={inputCls}
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div>
+              <label className={labelCls} htmlFor="att-company">
+                Tên công ty / Doanh nghiệp
+              </label>
+              <input
+                id="att-company"
+                type="text"
+                value={formData.company}
+                onChange={(e) => setFormData({ ...formData, company: e.target.value })}
+                placeholder="Công ty CP Tập đoàn Alpha"
+                className={inputCls}
+              />
+            </div>
+
+            <div>
+              <label className={labelCls} htmlFor="att-email">
+                Email liên hệ
+              </label>
+              <input
+                id="att-email"
+                type="email"
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                placeholder="alpha@ceo.vn"
+                className={inputCls}
+              />
+            </div>
+
+            <div>
+              <label className={labelCls} htmlFor="att-ticket">
+                Hạng vé / Quyền lợi
+              </label>
+              <select
+                id="att-ticket"
+                value={formData.ticketType}
+                onChange={(e) => setFormData({ ...formData, ticketType: e.target.value })}
+                className={inputCls}
+              >
+                {tickets.length > 0 ? (
+                  tickets.map((t, idx) => (
+                    <option key={idx} value={t.name}>
+                      {t.name}
+                    </option>
+                  ))
+                ) : (
+                  <>
+                    <option value="VIP Pass">Vé VIP Khách mời</option>
+                    <option value="Standard Pass">Vé Tiêu Chuẩn</option>
+                    <option value="Học viên CLB">Học viên CLB CEO HN10</option>
+                  </>
+                )}
+              </select>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-end pt-1">
+            <button
+              type="submit"
+              disabled={submitting}
+              className="inline-flex items-center gap-1.5 rounded-xl px-4 py-2 text-xs font-bold text-white shadow-sm transition hover:opacity-90 active:scale-95 cursor-pointer disabled:opacity-50"
+              style={{ background: "var(--gradient-primary)" }}
+            >
+              <UserPlus className="h-3.5 w-3.5" />
+              <span>{submitting ? "Đang ghi nhận..." : "Xác nhận đăng ký tham dự"}</span>
+            </button>
+          </div>
+        </form>
+      </div>
+
+      {/* Danh sách đại biểu vừa đăng ký */}
+      {attendeeList.length > 0 && (
+        <div className="rounded-2xl border border-border bg-card overflow-hidden shadow-xs">
+          <div className="p-3 bg-muted/40 border-b border-border flex items-center justify-between">
+            <span className="text-xs font-bold text-foreground">
+              Danh sách thành viên vừa đăng ký tham dự ({attendeeList.length})
+            </span>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs border-collapse">
+              <thead>
+                <tr className="border-b border-border bg-muted/20 text-[10.5px] uppercase font-bold text-muted-foreground">
+                  <th className="px-3 py-2 w-12 text-center">STT</th>
+                  <th className="px-3 py-2">Họ và tên</th>
+                  <th className="px-3 py-2">Chức danh</th>
+                  <th className="px-3 py-2">Số điện thoại</th>
+                  <th className="px-3 py-2">Công ty</th>
+                  <th className="px-3 py-2">Hạng vé</th>
+                  <th className="px-3 py-2 text-right">Giờ đăng ký</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {attendeeList.map((att, i) => (
+                  <tr key={att.id} className="hover:bg-muted/30">
+                    <td className="px-3 py-2 text-center font-mono text-muted-foreground">{i + 1}</td>
+                    <td className="px-3 py-2 font-bold text-foreground">{att.name}</td>
+                    <td className="px-3 py-2 text-muted-foreground">{att.position}</td>
+                    <td className="px-3 py-2 font-mono text-primary font-semibold">{att.phone}</td>
+                    <td className="px-3 py-2 text-muted-foreground">{att.company || "—"}</td>
+                    <td className="px-3 py-2">
+                      <span className="inline-flex rounded-full bg-blue-500/10 text-[#003B95] dark:text-blue-300 px-2 py-0.5 text-[10px] font-bold">
+                        {att.ticketType}
+                      </span>
+                    </td>
+                    <td className="px-3 py-2 text-right font-mono text-muted-foreground text-[11px]">
+                      {att.registeredAt}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
