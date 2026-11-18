@@ -797,7 +797,6 @@ export class AdminService implements OnModuleInit {
   async checkIsAdmin(userId: string, assocId?: string): Promise<boolean> {
     if (!userId) return false;
     if (
-      userId === 'mock-admin-id' ||
       userId === '00000000-0000-0000-0000-000000000000' ||
       userId === '00000000-0000-4000-8000-000000000001' ||
       userId === '00000000-0000-4000-8000-000000000002'
@@ -3050,7 +3049,7 @@ export class AdminService implements OnModuleInit {
             description: 'Bảng điều khiển tổng quan hệ thống',
             enabled: true,
             actions: [
-              { id: 'act_dash_view', name: 'Xem bảng điều khiển', code: 'DASH_VIEW', description: 'Xem tổng quan', roles: { ...allRolesGranted } },
+              { id: 'act_dash_view', name: '[Xem] Xem bảng điều khiển', code: 'DASH_VIEW', description: 'Xem tổng quan', roles: { ...allRolesGranted } },
             ],
           },
           {
@@ -3060,7 +3059,7 @@ export class AdminService implements OnModuleInit {
             description: 'Trợ lý AI thông minh CEO HN10',
             enabled: true,
             actions: [
-              { id: 'act_ai_view', name: 'Sử dụng Trợ lý AI', code: 'AI_VIEW', description: 'Truy cập trợ lý AI', roles: { ...allRolesGranted } },
+              { id: 'act_ai_view', name: '[Xem] Sử dụng Trợ lý AI', code: 'AI_VIEW', description: 'Truy cập trợ lý AI', roles: { ...allRolesGranted } },
             ],
           },
           {
@@ -3070,10 +3069,10 @@ export class AdminService implements OnModuleInit {
             description: 'Quản lý hồ sơ Học viên cá nhân',
             enabled: true,
             actions: [
-              { id: 'act_mem_view', name: 'Xem danh sách Học viên', code: 'MEM_VIEW', description: 'Tra cứu thông tin cá nhân', apiEndpoint: 'GET /api/members', roles: { ...allRolesGranted } },
-              { id: 'act_mem_add', name: 'Thêm mới Học viên', code: 'MEM_ADD', description: 'Tạo mới hồ sơ', apiEndpoint: 'POST /api/members', roles: { ...adminOnly } },
-              { id: 'act_mem_edit', name: 'Chỉnh sửa Học viên', code: 'MEM_EDIT', description: 'Cập nhật thông tin', apiEndpoint: 'PUT /api/members/:id', roles: { ...adminOnly } },
-              { id: 'act_mem_delete', name: 'Xóa Học viên', code: 'MEM_DELETE', description: 'Đình chỉ hoặc xóa', apiEndpoint: 'DELETE /api/members/:id', roles: { ...adminOnly } },
+              { id: 'act_mem_view', name: '[Xem] Xem danh sách Học viên', code: 'MEM_VIEW', description: 'Tra cứu thông tin cá nhân', apiEndpoint: 'GET /api/members', roles: { ...allRolesGranted } },
+              { id: 'act_mem_add', name: '[Thêm] Thêm mới Học viên', code: 'MEM_ADD', description: 'Tạo mới hồ sơ', apiEndpoint: 'POST /api/members', roles: { ...adminOnly } },
+              { id: 'act_mem_edit', name: '[Sửa] Chỉnh sửa Học viên', code: 'MEM_EDIT', description: 'Cập nhật thông tin', apiEndpoint: 'PUT /api/members/:id', roles: { ...adminOnly } },
+              { id: 'act_mem_delete', name: '[Xóa] Xóa Học viên', code: 'MEM_DELETE', description: 'Đình chỉ hoặc xóa', apiEndpoint: 'DELETE /api/members/:id', roles: { ...adminOnly } },
             ],
           },
           {
@@ -3083,7 +3082,10 @@ export class AdminService implements OnModuleInit {
             description: 'Quản lý lớp học và khóa đào tạo (Tạm ẩn qua phân quyền)',
             enabled: false,
             actions: [
-              { id: 'act_trn_view', name: 'Xem lớp học', code: 'TRN_VIEW', description: 'Xem khóa đào tạo', roles: { ...allDisabled } },
+              { id: 'act_trn_view', name: '[Xem] Xem lớp học', code: 'TRN_VIEW', description: 'Xem khóa đào tạo', roles: { ...allDisabled } },
+              { id: 'act_trn_add', name: '[Thêm] Thêm mới lớp học', code: 'TRN_ADD', description: 'Tạo khóa học mới', roles: { ...allDisabled } },
+              { id: 'act_trn_edit', name: '[Sửa] Sửa lớp học', code: 'TRN_EDIT', description: 'Chỉnh sửa khóa học', roles: { ...allDisabled } },
+              { id: 'act_trn_delete', name: '[Xóa] Xóa lớp học', code: 'TRN_DELETE', description: 'Xóa khóa học', roles: { ...allDisabled } },
             ],
           },
           {
@@ -3093,7 +3095,10 @@ export class AdminService implements OnModuleInit {
             description: 'Quản lý doanh nghiệp thành viên (Tạm ẩn qua phân quyền)',
             enabled: false,
             actions: [
-              { id: 'act_com_view', name: 'Xem doanh nghiệp', code: 'COM_VIEW', description: 'Tra cứu công ty', roles: { ...allDisabled } },
+              { id: 'act_com_view', name: '[Xem] Xem doanh nghiệp', code: 'COM_VIEW', description: 'Tra cứu công ty', roles: { ...allDisabled } },
+              { id: 'act_com_add', name: '[Thêm] Thêm doanh nghiệp', code: 'COM_ADD', description: 'Tạo mới công ty', roles: { ...allDisabled } },
+              { id: 'act_com_edit', name: '[Sửa] Sửa doanh nghiệp', code: 'COM_EDIT', description: 'Cập nhật công ty', roles: { ...allDisabled } },
+              { id: 'act_com_delete', name: '[Xóa] Xóa doanh nghiệp', code: 'COM_DELETE', description: 'Xóa công ty', roles: { ...allDisabled } },
             ],
           },
         ],
@@ -3110,9 +3115,10 @@ export class AdminService implements OnModuleInit {
             description: 'Quản lý sự kiện, hội thảo',
             enabled: true,
             actions: [
-              { id: 'act_evt_view', name: 'Xem sự kiện', code: 'EVT_VIEW', description: 'Xem chi tiết sự kiện', apiEndpoint: 'GET /api/events', roles: { ...allRolesGranted } },
-              { id: 'act_evt_add', name: 'Tạo sự kiện', code: 'EVT_ADD', description: 'Tạo chương trình mới', apiEndpoint: 'POST /api/events', roles: { ...adminOnly } },
-              { id: 'act_evt_edit', name: 'Sửa sự kiện', code: 'EVT_EDIT', description: 'Chỉnh sửa timeline', apiEndpoint: 'PUT /api/events/:id', roles: { ...adminOnly } },
+              { id: 'act_evt_view', name: '[Xem] Xem sự kiện', code: 'EVT_VIEW', description: 'Xem chi tiết sự kiện', apiEndpoint: 'GET /api/events', roles: { ...allRolesGranted } },
+              { id: 'act_evt_add', name: '[Thêm] Tạo sự kiện', code: 'EVT_ADD', description: 'Tạo chương trình mới', apiEndpoint: 'POST /api/events', roles: { ...adminOnly } },
+              { id: 'act_evt_edit', name: '[Sửa] Sửa sự kiện', code: 'EVT_EDIT', description: 'Chỉnh sửa timeline', apiEndpoint: 'PUT /api/events/:id', roles: { ...adminOnly } },
+              { id: 'act_evt_delete', name: '[Xóa] Xóa sự kiện', code: 'EVT_DELETE', description: 'Hủy hoặc xóa sự kiện', apiEndpoint: 'DELETE /api/events/:id', roles: { ...adminOnly } },
             ],
           },
           {
@@ -3122,7 +3128,7 @@ export class AdminService implements OnModuleInit {
             description: 'Báo cáo tổng quan hoạt động sự kiện',
             enabled: true,
             actions: [
-              { id: 'act_evto_view', name: 'Xem tổng quan sự kiện', code: 'EVTO_VIEW', description: 'Xem tổng quan', roles: { ...allRolesGranted } },
+              { id: 'act_evto_view', name: '[Xem] Xem tổng quan sự kiện', code: 'EVTO_VIEW', description: 'Xem tổng quan', roles: { ...allRolesGranted } },
             ],
           },
           {
@@ -3132,7 +3138,10 @@ export class AdminService implements OnModuleInit {
             description: 'Quản lý bỏ phiếu biểu quyết',
             enabled: true,
             actions: [
-              { id: 'act_vote_view', name: 'Xem biểu quyết', code: 'VOTE_VIEW', description: 'Xem kết quả bỏ phiếu', apiEndpoint: 'GET /api/voting', roles: { ...allRolesGranted } },
+              { id: 'act_vote_view', name: '[Xem] Xem biểu quyết', code: 'VOTE_VIEW', description: 'Xem kết quả bỏ phiếu', apiEndpoint: 'GET /api/voting', roles: { ...allRolesGranted } },
+              { id: 'act_vote_add', name: '[Thêm] Tạo biểu quyết', code: 'VOTE_ADD', description: 'Tạo cuộc biểu quyết', apiEndpoint: 'POST /api/voting', roles: { ...adminOnly } },
+              { id: 'act_vote_edit', name: '[Sửa] Sửa biểu quyết', code: 'VOTE_EDIT', description: 'Cập nhật câu hỏi/lựa chọn', apiEndpoint: 'PUT /api/voting/:id', roles: { ...adminOnly } },
+              { id: 'act_vote_delete', name: '[Xóa] Xóa biểu quyết', code: 'VOTE_DELETE', description: 'Hủy biểu quyết', apiEndpoint: 'DELETE /api/voting/:id', roles: { ...adminOnly } },
             ],
           },
           {
@@ -3142,7 +3151,9 @@ export class AdminService implements OnModuleInit {
             description: 'Danh sách đăng ký tham dự sự kiện',
             enabled: true,
             actions: [
-              { id: 'act_ereg_view', name: 'Xem đăng ký sự kiện', code: 'EREG_VIEW', description: 'Xem danh sách', roles: { ...allRolesGranted } },
+              { id: 'act_ereg_view', name: '[Xem] Xem đăng ký sự kiện', code: 'EREG_VIEW', description: 'Xem danh sách', roles: { ...allRolesGranted } },
+              { id: 'act_ereg_add', name: '[Thêm] Đăng ký đại biểu', code: 'EREG_ADD', description: 'Thêm đại biểu thủ công', roles: { ...adminOnly } },
+              { id: 'act_ereg_delete', name: '[Xóa] Xóa đăng ký', code: 'EREG_DELETE', description: 'Hủy vé đăng ký', roles: { ...adminOnly } },
             ],
           },
           {
@@ -3152,7 +3163,8 @@ export class AdminService implements OnModuleInit {
             description: 'Quay số may mắn và bốc thăm',
             enabled: true,
             actions: [
-              { id: 'act_lkd_view', name: 'Xem bốc thăm', code: 'LKD_VIEW', description: 'Xem bốc thăm', roles: { ...allRolesGranted } },
+              { id: 'act_lkd_view', name: '[Xem] Xem bốc thăm', code: 'LKD_VIEW', description: 'Xem bốc thăm', roles: { ...allRolesGranted } },
+              { id: 'act_lkd_edit', name: '[Sửa] Cấu hình giải thưởng & Quay số', code: 'LKD_EDIT', description: 'Quản lý giải', roles: { ...adminOnly } },
             ],
           },
         ],
@@ -3169,7 +3181,10 @@ export class AdminService implements OnModuleInit {
             description: 'Quản lý nhà tài trợ và quỹ hoạt động / thiện nguyện',
             enabled: true,
             actions: [
-              { id: 'act_spn_view', name: 'Xem nhà tài trợ & quỹ', code: 'SPN_VIEW', description: 'Tra cứu tài trợ', roles: { ...allRolesGranted } },
+              { id: 'act_spn_view', name: '[Xem] Xem nhà tài trợ & quỹ', code: 'SPN_VIEW', description: 'Tra cứu tài trợ', roles: { ...allRolesGranted } },
+              { id: 'act_spn_add', name: '[Thêm] Thêm nhà tài trợ', code: 'SPN_ADD', description: 'Khai báo tài trợ mới', apiEndpoint: 'POST /api/sponsors', roles: { ...adminOnly } },
+              { id: 'act_spn_edit', name: '[Sửa] Sửa nhà tài trợ', code: 'SPN_EDIT', description: 'Cập nhật tài trợ', apiEndpoint: 'PUT /api/sponsors/:id', roles: { ...adminOnly } },
+              { id: 'act_spn_delete', name: '[Xóa] Xóa nhà tài trợ', code: 'SPN_DELETE', description: 'Hủy tài trợ', apiEndpoint: 'DELETE /api/sponsors/:id', roles: { ...adminOnly } },
             ],
           },
           {
@@ -3179,7 +3194,7 @@ export class AdminService implements OnModuleInit {
             description: 'Báo cáo tài trợ và nghiệm thu',
             enabled: true,
             actions: [
-              { id: 'act_srp_view', name: 'Xem báo cáo tài trợ', code: 'SRP_VIEW', description: 'Báo cáo', roles: { ...allRolesGranted } },
+              { id: 'act_srp_view', name: '[Xem] Xem báo cáo tài trợ', code: 'SRP_VIEW', description: 'Báo cáo', roles: { ...allRolesGranted } },
             ],
           },
         ],
@@ -3196,7 +3211,7 @@ export class AdminService implements OnModuleInit {
             description: 'Thống kê báo cáo sự kiện, thiện nguyện CSR và tổng hợp',
             enabled: true,
             actions: [
-              { id: 'act_anl_view', name: 'Xem thống kê báo cáo', code: 'ANL_VIEW', description: 'Xem biểu đồ', roles: { ...allRolesGranted } },
+              { id: 'act_anl_view', name: '[Xem] Xem thống kê báo cáo', code: 'ANL_VIEW', description: 'Xem biểu đồ', roles: { ...allRolesGranted } },
             ],
           },
           {
@@ -3206,7 +3221,10 @@ export class AdminService implements OnModuleInit {
             description: 'Quản lý các khoản thu và hội phí',
             enabled: true,
             actions: [
-              { id: 'act_inc_view', name: 'Xem phiếu thu', code: 'INC_VIEW', description: 'Tra cứu phiếu thu', apiEndpoint: 'GET /api/finance/income', roles: { ...allRolesGranted } },
+              { id: 'act_inc_view', name: '[Xem] Xem phiếu thu', code: 'INC_VIEW', description: 'Tra cứu phiếu thu', apiEndpoint: 'GET /api/finance/income', roles: { ...allRolesGranted } },
+              { id: 'act_inc_add', name: '[Thêm] Tạo phiếu thu', code: 'INC_ADD', description: 'Tạo mới khoản thu', apiEndpoint: 'POST /api/finance/income', roles: { ...adminOnly } },
+              { id: 'act_inc_edit', name: '[Sửa] Sửa phiếu thu', code: 'INC_EDIT', description: 'Cập nhật khoản thu', apiEndpoint: 'PUT /api/finance/income/:id', roles: { ...adminOnly } },
+              { id: 'act_inc_delete', name: '[Xóa] Xóa phiếu thu', code: 'INC_DELETE', description: 'Hủy phiếu thu', apiEndpoint: 'DELETE /api/finance/income/:id', roles: { ...adminOnly } },
             ],
           },
           {
@@ -3216,7 +3234,10 @@ export class AdminService implements OnModuleInit {
             description: 'Quản lý chi tiêu và hoàn ứng',
             enabled: true,
             actions: [
-              { id: 'act_exp_view', name: 'Xem phiếu chi', code: 'EXP_VIEW', description: 'Tra cứu phiếu chi', apiEndpoint: 'GET /api/finance/expenses', roles: { ...allRolesGranted } },
+              { id: 'act_exp_view', name: '[Xem] Xem phiếu chi', code: 'EXP_VIEW', description: 'Tra cứu phiếu chi', apiEndpoint: 'GET /api/finance/expenses', roles: { ...allRolesGranted } },
+              { id: 'act_exp_add', name: '[Thêm] Tạo phiếu chi', code: 'EXP_ADD', description: 'Tạo mới khoản chi', apiEndpoint: 'POST /api/finance/expenses', roles: { ...adminOnly } },
+              { id: 'act_exp_edit', name: '[Sửa] Sửa phiếu chi', code: 'EXP_EDIT', description: 'Cập nhật khoản chi', apiEndpoint: 'PUT /api/finance/expenses/:id', roles: { ...adminOnly } },
+              { id: 'act_exp_delete', name: '[Xóa] Xóa phiếu chi', code: 'EXP_DELETE', description: 'Hủy phiếu chi', apiEndpoint: 'DELETE /api/finance/expenses/:id', roles: { ...adminOnly } },
             ],
           },
           {
@@ -3226,7 +3247,7 @@ export class AdminService implements OnModuleInit {
             description: 'Thống kê tổng hợp thu chi xuất theo sự kiện, lớp học, phí tham gia',
             enabled: true,
             actions: [
-              { id: 'act_frp_view', name: 'Xem báo cáo tài chính', code: 'FRP_VIEW', description: 'Biểu đồ dòng tiền', apiEndpoint: 'GET /api/finance/summary-report', roles: { ...allRolesGranted } },
+              { id: 'act_frp_view', name: '[Xem] Xem báo cáo tài chính', code: 'FRP_VIEW', description: 'Biểu đồ dòng tiền', apiEndpoint: 'GET /api/finance/summary-report', roles: { ...allRolesGranted } },
             ],
           },
         ],
@@ -3243,7 +3264,9 @@ export class AdminService implements OnModuleInit {
             description: 'Hệ thống thông báo sự kiện, lớp học',
             enabled: true,
             actions: [
-              { id: 'act_notif_view', name: 'Xem thông báo', code: 'NOTIF_VIEW', description: 'Tra cứu thông báo', apiEndpoint: 'GET /api/admin/notifications', roles: { ...allRolesGranted } },
+              { id: 'act_notif_view', name: '[Xem] Xem thông báo', code: 'NOTIF_VIEW', description: 'Tra cứu thông báo', apiEndpoint: 'GET /api/admin/notifications', roles: { ...allRolesGranted } },
+              { id: 'act_notif_add', name: '[Thêm] Tạo thông báo mới', code: 'NOTIF_ADD', description: 'Gửi thông báo', apiEndpoint: 'POST /api/admin/notifications', roles: { ...adminOnly } },
+              { id: 'act_notif_delete', name: '[Xóa] Xóa thông báo', code: 'NOTIF_DELETE', description: 'Hủy thông báo', apiEndpoint: 'DELETE /api/admin/notifications/:id', roles: { ...adminOnly } },
             ],
           },
           {
@@ -3253,7 +3276,10 @@ export class AdminService implements OnModuleInit {
             description: 'Quản lý tin tức bài viết (Tạm ẩn qua phân quyền)',
             enabled: false,
             actions: [
-              { id: 'act_nws_view', name: 'Xem tin tức', code: 'NWS_VIEW', description: 'Xem tin tức', roles: { ...allDisabled } },
+              { id: 'act_nws_view', name: '[Xem] Xem tin tức', code: 'NWS_VIEW', description: 'Xem tin tức', roles: { ...allDisabled } },
+              { id: 'act_nws_add', name: '[Thêm] Đăng bài viết', code: 'NWS_ADD', description: 'Tạo bài viết', roles: { ...allDisabled } },
+              { id: 'act_nws_edit', name: '[Sửa] Sửa bài viết', code: 'NWS_EDIT', description: 'Cập nhật bài viết', roles: { ...allDisabled } },
+              { id: 'act_nws_delete', name: '[Xóa] Xóa bài viết', code: 'NWS_DELETE', description: 'Gỡ bài viết', roles: { ...allDisabled } },
             ],
           },
           {
@@ -3263,7 +3289,10 @@ export class AdminService implements OnModuleInit {
             description: 'Đặc quyền thành viên (Tạm ẩn qua phân quyền)',
             enabled: false,
             actions: [
-              { id: 'act_prk_view', name: 'Xem quyền lợi & ưu đãi', code: 'PRK_VIEW', description: 'Xem quyền lợi', roles: { ...allDisabled } },
+              { id: 'act_prk_view', name: '[Xem] Xem quyền lợi & ưu đãi', code: 'PRK_VIEW', description: 'Xem quyền lợi', roles: { ...allDisabled } },
+              { id: 'act_prk_add', name: '[Thêm] Thêm ưu đãi', code: 'PRK_ADD', description: 'Tạo ưu đãi', roles: { ...allDisabled } },
+              { id: 'act_prk_edit', name: '[Sửa] Sửa ưu đãi', code: 'PRK_EDIT', description: 'Cập nhật ưu đãi', roles: { ...allDisabled } },
+              { id: 'act_prk_delete', name: '[Xóa] Xóa ưu đãi', code: 'PRK_DELETE', description: 'Xóa ưu đãi', roles: { ...allDisabled } },
             ],
           },
         ],
@@ -3280,7 +3309,7 @@ export class AdminService implements OnModuleInit {
             description: 'Nhắn tin giao lưu thành viên (Tạm ẩn qua phân quyền)',
             enabled: false,
             actions: [
-              { id: 'act_net_view', name: 'Xem nhắn tin', code: 'NET_VIEW', description: 'Nhắn tin', roles: { ...allDisabled } },
+              { id: 'act_net_view', name: '[Xem] Xem nhắn tin', code: 'NET_VIEW', description: 'Nhắn tin', roles: { ...allDisabled } },
             ],
           },
           {
@@ -3290,7 +3319,10 @@ export class AdminService implements OnModuleInit {
             description: 'Cơ hội kết nối kinh doanh (Tạm ẩn qua phân quyền)',
             enabled: false,
             actions: [
-              { id: 'act_opp_view', name: 'Xem chia sẻ cơ hội', code: 'OPP_VIEW', description: 'Cơ hội', roles: { ...allDisabled } },
+              { id: 'act_opp_view', name: '[Xem] Xem chia sẻ cơ hội', code: 'OPP_VIEW', description: 'Cơ hội', roles: { ...allDisabled } },
+              { id: 'act_opp_add', name: '[Thêm] Đăng cơ hội', code: 'OPP_ADD', description: 'Tạo cơ hội mới', roles: { ...allDisabled } },
+              { id: 'act_opp_edit', name: '[Sửa] Sửa cơ hội', code: 'OPP_EDIT', description: 'Cập nhật cơ hội', roles: { ...allDisabled } },
+              { id: 'act_opp_delete', name: '[Xóa] Xóa cơ hội', code: 'OPP_DELETE', description: 'Xóa cơ hội', roles: { ...allDisabled } },
             ],
           },
           {
@@ -3300,7 +3332,10 @@ export class AdminService implements OnModuleInit {
             description: 'Sàn giao thương B2B (Tạm ẩn qua phân quyền)',
             enabled: false,
             actions: [
-              { id: 'act_b2b_view', name: 'Xem giao thương B2B', code: 'B2B_VIEW', description: 'Gian hàng B2B', roles: { ...allDisabled } },
+              { id: 'act_b2b_view', name: '[Xem] Xem giao thương B2B', code: 'B2B_VIEW', description: 'Gian hàng B2B', roles: { ...allDisabled } },
+              { id: 'act_b2b_add', name: '[Thêm] Đăng sản phẩm B2B', code: 'B2B_ADD', description: 'Đăng sản phẩm', roles: { ...allDisabled } },
+              { id: 'act_b2b_edit', name: '[Sửa] Sửa sản phẩm B2B', code: 'B2B_EDIT', description: 'Cập nhật sản phẩm', roles: { ...allDisabled } },
+              { id: 'act_b2b_delete', name: '[Xóa] Xóa sản phẩm B2B', code: 'B2B_DELETE', description: 'Xóa sản phẩm', roles: { ...allDisabled } },
             ],
           },
         ],
@@ -3317,7 +3352,10 @@ export class AdminService implements OnModuleInit {
             description: 'Quản lý cuộc họp ban, lịch phòng',
             enabled: true,
             actions: [
-              { id: 'act_meet_view', name: 'Xem cuộc họp', code: 'MEET_VIEW', description: 'Xem lịch họp', apiEndpoint: 'GET /api/meetings', roles: { ...allRolesGranted } },
+              { id: 'act_meet_view', name: '[Xem] Xem cuộc họp', code: 'MEET_VIEW', description: 'Xem lịch họp', apiEndpoint: 'GET /api/meetings', roles: { ...allRolesGranted } },
+              { id: 'act_meet_add', name: '[Thêm] Tạo cuộc họp mới', code: 'MEET_ADD', description: 'Tạo lịch họp', apiEndpoint: 'POST /api/meetings', roles: { ...adminOnly } },
+              { id: 'act_meet_edit', name: '[Sửa] Sửa cuộc họp', code: 'MEET_EDIT', description: 'Cập nhật lịch họp', apiEndpoint: 'PUT /api/meetings/:id', roles: { ...adminOnly } },
+              { id: 'act_meet_delete', name: '[Xóa] Xóa cuộc họp', code: 'MEET_DELETE', description: 'Hủy cuộc họp', apiEndpoint: 'DELETE /api/meetings/:id', roles: { ...adminOnly } },
             ],
           },
           {
@@ -3327,7 +3365,10 @@ export class AdminService implements OnModuleInit {
             description: 'Kho lưu trữ tài liệu và điều lệ',
             enabled: true,
             actions: [
-              { id: 'act_doc_view', name: 'Xem tài liệu', code: 'DOC_VIEW', description: 'Tra cứu tài liệu', roles: { ...allRolesGranted } },
+              { id: 'act_doc_view', name: '[Xem] Xem tài liệu', code: 'DOC_VIEW', description: 'Tra cứu tài liệu', roles: { ...allRolesGranted } },
+              { id: 'act_doc_add', name: '[Thêm] Tải lên tài liệu', code: 'DOC_ADD', description: 'Thêm tài liệu mới', roles: { ...adminOnly } },
+              { id: 'act_doc_edit', name: '[Sửa] Sửa thông tin tài liệu', code: 'DOC_EDIT', description: 'Cập nhật tài liệu', roles: { ...adminOnly } },
+              { id: 'act_doc_delete', name: '[Xóa] Xóa tài liệu', code: 'DOC_DELETE', description: 'Xóa tài liệu', roles: { ...adminOnly } },
             ],
           },
           {
@@ -3337,7 +3378,10 @@ export class AdminService implements OnModuleInit {
             description: 'Quản lý biểu mẫu Word, Excel, PDF',
             enabled: true,
             actions: [
-              { id: 'act_tmpl_view', name: 'Xem biểu mẫu', code: 'TMPL_VIEW', description: 'Biểu mẫu định dạng', roles: { ...allRolesGranted } },
+              { id: 'act_tmpl_view', name: '[Xem] Xem biểu mẫu', code: 'TMPL_VIEW', description: 'Biểu mẫu định dạng', roles: { ...allRolesGranted } },
+              { id: 'act_tmpl_add', name: '[Thêm] Thêm biểu mẫu mới', code: 'TMPL_ADD', description: 'Tạo mẫu định dạng', roles: { ...adminOnly } },
+              { id: 'act_tmpl_edit', name: '[Sửa] Sửa biểu mẫu', code: 'TMPL_EDIT', description: 'Cập nhật định dạng', roles: { ...adminOnly } },
+              { id: 'act_tmpl_delete', name: '[Xóa] Xóa biểu mẫu', code: 'TMPL_DELETE', description: 'Xóa biểu mẫu', roles: { ...adminOnly } },
             ],
           },
         ],
@@ -3354,7 +3398,8 @@ export class AdminService implements OnModuleInit {
             description: 'Cấu hình hệ thống',
             enabled: true,
             actions: [
-              { id: 'act_set_view', name: 'Xem cài đặt hệ thống', code: 'SET_VIEW', description: 'Cài đặt', roles: { ...adminOnly } },
+              { id: 'act_set_view', name: '[Xem] Xem cài đặt hệ thống', code: 'SET_VIEW', description: 'Cài đặt', roles: { ...adminOnly } },
+              { id: 'act_set_edit', name: '[Sửa] Cập nhật cài đặt', code: 'SET_EDIT', description: 'Lưu cấu hình', roles: { ...adminOnly } },
             ],
           },
           {
@@ -3364,7 +3409,7 @@ export class AdminService implements OnModuleInit {
             description: 'Audit logs hệ thống',
             enabled: true,
             actions: [
-              { id: 'act_act_view', name: 'Xem nhật ký', code: 'ACT_VIEW', description: 'Tra cứu lịch sử', roles: { ...adminOnly } },
+              { id: 'act_act_view', name: '[Xem] Xem nhật ký hoạt động', code: 'ACT_VIEW', description: 'Tra cứu lịch sử', roles: { ...adminOnly } },
             ],
           },
         ],
@@ -3381,7 +3426,10 @@ export class AdminService implements OnModuleInit {
             description: 'Quản lý ban chuyên môn',
             enabled: true,
             actions: [
-              { id: 'act_dep_view', name: 'Xem quản lý ban', code: 'DEP_VIEW', description: 'Cơ cấu ban', roles: { ...adminOnly } },
+              { id: 'act_dep_view', name: '[Xem] Xem quản lý ban', code: 'DEP_VIEW', description: 'Cơ cấu ban', roles: { ...adminOnly } },
+              { id: 'act_dep_add', name: '[Thêm] Thêm ban mới', code: 'DEP_ADD', description: 'Tạo mới ban chuyên môn', roles: { ...adminOnly } },
+              { id: 'act_dep_edit', name: '[Sửa] Sửa thông tin ban', code: 'DEP_EDIT', description: 'Cập nhật ban', roles: { ...adminOnly } },
+              { id: 'act_dep_delete', name: '[Xóa] Xóa ban', code: 'DEP_DELETE', description: 'Giải thể ban', roles: { ...adminOnly } },
             ],
           },
           {
@@ -3391,7 +3439,8 @@ export class AdminService implements OnModuleInit {
             description: 'Cấu hình quyền RBAC',
             enabled: true,
             actions: [
-              { id: 'act_prm_view', name: 'Xem ma trận', code: 'PRM_VIEW', description: 'Tra cứu quyền', apiEndpoint: 'GET /api/admin/permission-matrix', roles: { ...adminOnly } },
+              { id: 'act_prm_view', name: '[Xem] Xem ma trận phân quyền', code: 'PRM_VIEW', description: 'Tra cứu quyền', apiEndpoint: 'GET /api/admin/permission-matrix', roles: { ...adminOnly } },
+              { id: 'act_prm_edit', name: '[Sửa] Cập nhật ma trận phân quyền', code: 'PRM_EDIT', description: 'Lưu thay đổi ma trận', apiEndpoint: 'PUT /api/admin/permission-matrix', roles: { ...adminOnly } },
             ],
           },
           {
@@ -3401,7 +3450,10 @@ export class AdminService implements OnModuleInit {
             description: 'Hồ sơ người dùng & phân vai trò ban',
             enabled: true,
             actions: [
-              { id: 'act_acc_view', name: 'Xem tài khoản', code: 'ACC_VIEW', description: 'Danh sách tài khoản', apiEndpoint: 'GET /api/users', roles: { ...adminOnly } },
+              { id: 'act_acc_view', name: '[Xem] Xem danh sách tài khoản', code: 'ACC_VIEW', description: 'Danh sách tài khoản', apiEndpoint: 'GET /api/users', roles: { ...adminOnly } },
+              { id: 'act_acc_add', name: '[Thêm] Tạo tài khoản mới', code: 'ACC_ADD', description: 'Thêm tài khoản', apiEndpoint: 'POST /api/users', roles: { ...adminOnly } },
+              { id: 'act_acc_edit', name: '[Sửa] Phân vai trò & Sửa tài khoản', code: 'ACC_EDIT', description: 'Phân quyền người dùng', apiEndpoint: 'PUT /api/users/:id', roles: { ...adminOnly } },
+              { id: 'act_acc_delete', name: '[Xóa] Khóa / Xóa tài khoản', code: 'ACC_DELETE', description: 'Đình chỉ tài khoản', apiEndpoint: 'DELETE /api/users/:id', roles: { ...adminOnly } },
             ],
           },
         ],

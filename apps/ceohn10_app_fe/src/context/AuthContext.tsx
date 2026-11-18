@@ -108,6 +108,8 @@ export interface AppUser {
   title?: string;
   phone?: string;
   permissions?: string[];
+  permissionsHash?: Record<string, boolean>;
+  allowedRoutes?: string[];
   /** Alias cho các nơi dùng user.user_metadata.full_name */
   user_metadata?: { full_name?: string; avatar_url?: string;[key: string]: any };
   [key: string]: any;
@@ -181,6 +183,9 @@ function tokenToUser(decoded: Record<string, any>): AppUser {
         ? ['admin:full_access', 'marketplace:manage', 'event:manage', 'news:manage', 'member:manage', 'event:scan_qr']
         : ['marketplace:view', 'marketplace:post', 'event:view', 'news:view', 'member:view'];
 
+  const permissionsHash = decoded.permissionsHash || {};
+  const allowedRoutes = Array.isArray(decoded.allowedRoutes) ? decoded.allowedRoutes : [];
+
   return {
     id: decoded.sub || decoded.id || '',
     email,
@@ -191,6 +196,8 @@ function tokenToUser(decoded: Record<string, any>): AppUser {
     roles,
     department,
     permissions,
+    permissionsHash,
+    allowedRoutes,
     boardName: decoded.boardName || '',
     title: decoded.title || '',
     phone: decoded.phone || '',
@@ -289,6 +296,15 @@ function mapApiUser(apiUser: any, accessToken: string): AppUser {
         ? ['admin:full_access', 'marketplace:manage', 'event:manage', 'news:manage', 'member:manage', 'event:scan_qr']
         : ['marketplace:view', 'marketplace:post', 'event:view', 'news:view', 'member:view'];
 
+  const permissionsHash: Record<string, boolean> =
+    apiUser?.permissionsHash || decoded.permissionsHash || {};
+
+  const allowedRoutes: string[] = Array.isArray(apiUser?.allowedRoutes)
+    ? apiUser.allowedRoutes
+    : Array.isArray(decoded.allowedRoutes)
+      ? decoded.allowedRoutes
+      : [];
+
   // TUYỆT ĐỐI KHÔNG lưu các cờ bảo mật (isAdmin, role, department) thành các key riêng lẻ ở localStorage
   // Dọn dẹp triệt để các key thừa nếu từng tồn tại để đảm bảo tuân thủ nghiêm ngặt về an toàn thông tin
   if (typeof window !== 'undefined') {
@@ -339,6 +355,8 @@ function mapApiUser(apiUser: any, accessToken: string): AppUser {
     role,
     roles,
     permissions,
+    permissionsHash,
+    allowedRoutes,
     executiveRole,
     executive_role: executiveRole,
     department,
@@ -359,6 +377,8 @@ function mapApiUser(apiUser: any, accessToken: string): AppUser {
       role,
       department,
       permissions,
+    permissionsHash,
+    allowedRoutes,
       ...(apiUser?.user_metadata || decoded.user_metadata || {}),
     },
   };
@@ -451,6 +471,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             name: fresh.name || sess.user.name,
             avatar_url: fresh.avatar_url || fresh.avatar || sess.user.avatar_url,
             permissions: Array.isArray(fresh.permissions) ? fresh.permissions : sess.user.permissions,
+            permissionsHash: fresh.permissionsHash || sess.user.permissionsHash || {},
+            allowedRoutes: Array.isArray(fresh.allowedRoutes) ? fresh.allowedRoutes : (sess.user.allowedRoutes || []),
             roles: Array.isArray(fresh.roles) ? fresh.roles : sess.user.roles,
             role: fresh.role || sess.user.role,
             department: fresh.department || sess.user.department,
@@ -581,7 +603,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const hasPermission = useCallback(
     (permission: string): boolean => {
       if (!user) return false;
-      if (user.isAdmin || user.permissions?.includes('admin:full_access')) return true;
+      // 1. Kiểm tra trực tiếp bảng băm permissionsHash do Backend tính toán từ CSDL
+      if (user.permissionsHash && typeof user.permissionsHash === 'object') {
+        if (user.permissionsHash[permission] !== undefined) {
+          return Boolean(user.permissionsHash[permission]);
+        }
+      }
+      if (user.isAdmin || user.permissions?.includes('admin:full_access') || user.permissions?.includes('*')) return true;
       return Boolean(user.permissions?.includes(permission));
     },
     [user],

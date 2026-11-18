@@ -217,6 +217,29 @@ export interface TreeCategory {
   features: TreeFeature[];
 }
 
+export function getCrudInfo(code?: string, name?: string): { tag: string; label: string; color: string } | null {
+  const c = (code || '').toUpperCase();
+  const n = (name || '').toLowerCase();
+  if (c.endsWith('_VIEW') || c.endsWith('_READ') || n.includes('[xem]') || n.startsWith('xem')) {
+    return { tag: 'XEM', label: 'Xem', color: 'bg-blue-100 text-blue-800 dark:bg-blue-950/70 dark:text-blue-300 border-blue-300 dark:border-blue-800' };
+  }
+  if (c.endsWith('_ADD') || c.endsWith('_CREATE') || n.includes('[thêm]') || n.startsWith('thêm') || n.startsWith('tạo')) {
+    return { tag: 'THÊM', label: 'Thêm', color: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/70 dark:text-emerald-300 border-emerald-300 dark:border-emerald-800' };
+  }
+  if (c.endsWith('_EDIT') || c.endsWith('_UPDATE') || n.includes('[sửa]') || n.startsWith('sửa') || n.startsWith('chỉnh sửa') || n.startsWith('cập nhật')) {
+    return { tag: 'SỬA', label: 'Sửa', color: 'bg-amber-100 text-amber-800 dark:bg-amber-950/70 dark:text-amber-300 border-amber-300 dark:border-amber-800' };
+  }
+  if (c.endsWith('_DELETE') || c.endsWith('_DEL') || n.includes('[xóa]') || n.startsWith('xóa') || n.startsWith('hủy') || n.startsWith('đình chỉ')) {
+    return { tag: 'XÓA', label: 'Xóa', color: 'bg-rose-100 text-rose-800 dark:bg-rose-950/70 dark:text-rose-300 border-rose-300 dark:border-rose-800' };
+  }
+  return null;
+}
+
+export function cleanActionName(name: string): string {
+  if (!name) return '';
+  return name.replace(/^\[(Xem|Thêm|Sửa|Xóa|READ|CREATE|UPDATE|DELETE|VIEW)\]\s*/i, '');
+}
+
 // ── CẤU TRÚC 8 NHÓM CHỨC NĂNG CHUẨN XÁC 100% THEO MENU SIDEBAR CRM HIỆP HỘI ──
 export const INITIAL_CATEGORIES: TreeCategory[] = [
   // NHÓM 1: Học viên
@@ -1249,7 +1272,7 @@ export function RbacPermissionMatrix({
       actions: [
         {
           id: `act_${Date.now()}_view`,
-          name: `Xem danh sách & chi tiết ${newFeatureName.trim()}`,
+          name: `[Xem] Xem danh sách & chi tiết ${newFeatureName.trim()}`,
           code: `${codePrefix}_VIEW`,
           description: "Tra cứu dữ liệu chức năng",
           apiEndpoint: `GET /api${newFeatureRoute.trim() || "/custom"}`,
@@ -1265,7 +1288,7 @@ export function RbacPermissionMatrix({
         },
         {
           id: `act_${Date.now()}_add`,
-          name: `Thêm mới ${newFeatureName.trim()}`,
+          name: `[Thêm] Thêm mới ${newFeatureName.trim()}`,
           code: `${codePrefix}_ADD`,
           description: "Tạo mới dữ liệu",
           apiEndpoint: `POST /api${newFeatureRoute.trim() || "/custom"}`,
@@ -1273,7 +1296,7 @@ export function RbacPermissionMatrix({
         },
         {
           id: `act_${Date.now()}_edit`,
-          name: `Chỉnh sửa ${newFeatureName.trim()}`,
+          name: `[Sửa] Chỉnh sửa ${newFeatureName.trim()}`,
           code: `${codePrefix}_EDIT`,
           description: "Cập nhật dữ liệu",
           apiEndpoint: `PUT /api${newFeatureRoute.trim() || "/custom"}/:id`,
@@ -1281,7 +1304,7 @@ export function RbacPermissionMatrix({
         },
         {
           id: `act_${Date.now()}_delete`,
-          name: `Xóa ${newFeatureName.trim()}`,
+          name: `[Xóa] Xóa ${newFeatureName.trim()}`,
           code: `${codePrefix}_DELETE`,
           description: "Xóa dữ liệu chức năng",
           apiEndpoint: `DELETE /api${newFeatureRoute.trim() || "/custom"}/:id`,
@@ -2227,13 +2250,21 @@ export function RbacPermissionMatrix({
                                             }`}
                                         >
                                           <div className="min-w-0 space-y-0.5">
-                                            <div className="flex items-center gap-1.5">
+                                            <div className="flex items-center gap-1.5 flex-wrap">
                                               <span
-                                                className={`size-2 rounded-full ${isChecked ? "bg-emerald-500" : "bg-slate-400"
+                                                className={`size-2 rounded-full shrink-0 ${isChecked ? "bg-emerald-500" : "bg-slate-400"
                                                   }`}
                                               ></span>
+                                              {(() => {
+                                                const crud = getCrudInfo(act.code, act.name);
+                                                return crud ? (
+                                                  <span className={`px-1.5 py-0.5 rounded text-[9.5px] font-black border shrink-0 ${crud.color}`}>
+                                                    {crud.tag}
+                                                  </span>
+                                                ) : null;
+                                              })()}
                                               <span className="text-xs font-bold text-foreground">
-                                                {act.name}
+                                                {cleanActionName(act.name)}
                                               </span>
                                             </div>
                                             <p className="text-[11px] text-muted-foreground line-clamp-1">
@@ -2390,10 +2421,18 @@ export function RbacPermissionMatrix({
                             >
                               <div className="sticky left-0 z-20 w-60 min-w-[240px] self-stretch pl-8 pr-4 border-r border-slate-200 dark:border-slate-800 flex justify-start items-center bg-white dark:bg-slate-900 shadow-[2px_0_5px_rgba(0,0,0,0.02)]">
                                 <div
-                                  className="flex-1 justify-start text-slate-900 dark:text-slate-200 text-xs font-semibold font-['Inter'] leading-4 truncate"
+                                  className="flex-1 flex items-center gap-1.5 text-slate-900 dark:text-slate-200 text-xs font-semibold font-['Inter'] leading-4 truncate"
                                   title={action.name}
                                 >
-                                  {action.name}
+                                  {(() => {
+                                    const crud = getCrudInfo(action.code, action.name);
+                                    return crud ? (
+                                      <span className={`px-1.5 py-0.5 rounded text-[9px] font-black border shrink-0 ${crud.color}`}>
+                                        {crud.tag}
+                                      </span>
+                                    ) : null;
+                                  })()}
+                                  <span className="truncate">{cleanActionName(action.name)}</span>
                                 </div>
                               </div>
 

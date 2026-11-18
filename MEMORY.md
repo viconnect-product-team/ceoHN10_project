@@ -1,5 +1,35 @@
 # System Memory & Architecture
 
+- **Bản cập nhật ngày 18/11/2026 (v12.21): Tái Cấu Trúc Toàn Diện Hệ Thống Phân Quyền Động (Dynamic Bidirectional RBAC Architecture), Xóa Bỏ Hoàn Toàn Hardcode Trên Frontend, Chuẩn Hóa Tên Quyền CRUD**:
+  - **1. Triệt Tiêu 100% Logic Phân Quyền Hardcode Trên Frontend**:
+    * Xóa bỏ hoàn toàn mảng tĩnh `temporarilyHiddenRoutes = [...]` và các logic ép quyền tĩnh trong `rbac-permission-helpers.ts`.
+    * Không còn bất kỳ đoạn mã hardcode ẩn/hiện route nào ở phía Client; trạng thái ẩn/hiện và quyền truy cập phụ thuộc hoàn toàn vào CSDL PostgreSQL chuẩn `113.20.107.184:6432`.
+  - **2. Luồng Phân Quyền 2 Chiều Chuẩn Mực (FE <-> BE <-> DB)**:
+    * **Chiều Ghi (Cấu hình quyền)**: Màn hình Phân quyền (`/permissions`) -> Gọi API `PUT /api/admin/permission-matrix` -> Backend lưu trực tiếp vào bảng `public.app_settings` (key `crm_permission_matrix`) trên CSDL `113.20.107.184:6432`.
+    * **Chiều Đọc & Tính toán (Tra cứu quyền)**: Khi đăng nhập hoặc gọi `/api/users/me`:
+      - Backend NestJS (`users.service.ts`) truy vấn CSDL, lấy Ma Trận Phân Quyền `crm_permission_matrix` và vai trò của tài khoản.
+      - Hàm `computeUserRbacEvaluation` tính toán toàn bộ quyền hạn cụ thể của người dùng thành:
+        1. `allowedRoutes: string[]`: Danh sách URL routes mà người dùng được phép xem trên Sidebar/CRM. Nếu một tính năng có `enabled === false` trong CSDL, tính năng đó sẽ bị loại khỏi `allowedRoutes` cho toàn bộ mọi người (kể cả admin).
+        2. `permissionsHash: Record<string, boolean>`: Bảng băm quyền O(1) gồm cả route URL và mã CRUD action.
+        3. `permissions: string[]`: Mảng mã quyền đầy đủ.
+    * **Chiều Thực thi phía Frontend**:
+      - `AuthContext.tsx`: Lưu trữ `permissionsHash` và `allowedRoutes` vào session của `user`. Hàm `hasPermission(permission)` kiểm tra O(1) qua `permissionsHash` mà không cần duyệt mảng.
+      - `Sidebar.tsx`: Hàm `isAllowed(route)` kiểm tra trực tiếp từ `user.allowedRoutes` và `user.permissionsHash` do Backend tính từ CSDL trả về, đạt tốc độ phản hồi tức thì và tính nhất quán tuyệt đối.
+  - **3. Chuẩn Hóa Danh Mục & Tên Quyền CRUD**:
+    * Tên hiển thị quyền được chuẩn hóa rõ ràng theo 4 nhóm CRUD:
+      - `[Xem]` Xem danh sách và chi tiết dữ liệu (Read/View)
+      - `[Thêm]` Thêm mới dữ liệu (Create/Add)
+      - `[Sửa]` Chỉnh sửa dữ liệu (Update/Edit)
+      - `[Xóa]` Xóa dữ liệu (Delete)
+    * Tự động sinh mã quyền CRUD chuẩn: `*_VIEW`, `*_CREATE` (kèm alias `*_ADD`), `*_UPDATE` (kèm alias `*_EDIT`), `*_DELETE` và scope chuẩn `resource:action`.
+    * Giao diện Ma Trận Phân Quyền (`RbacPermissionMatrix.tsx`): Hiển thị Badge CRUD chuyên nghiệp với 4 màu định danh trực quan (`[XEM]`, `[THÊM]`, `[SỬA]`, `[XÓA]`) trên cả chế độ xem theo vai trò và chế độ xem bảng tổng thể.
+    * Đã chạy migration cập nhật trực tiếp dữ liệu bản ghi `crm_permission_matrix` trong CSDL `113.20.107.184:6432` theo chuẩn tên quyền CRUD mới.
+  - **4. Kiểm Tra Chất Lượng Code Toàn Diện (Strict Zero-Error)**:
+    * Backend: `tsc --project apps/ceohn10_app_be/tsconfig.json --noEmit` -> **Exit code 0 (0 errors)**.
+    * Frontend: `tsc --project apps/ceohn10_app_fe/tsconfig.json --noEmit` trên toàn bộ 1,690+ tệp -> **Exit code 0 (0 errors)**.
+    * Tuân thủ nghiêm ngặt Rule 0 (CSDL duy nhất `113.20.107.184:6432`) và Rule 1 (Không tự ý `git commit` / `git push`).
+
+
 - **Bản cập nhật ngày 18/11/2026 (v12.20): Phân Quyền Sidebar Vào CSDL 113.20.107.184:6432, Khôi Phục Toàn Vẹn Mã Nguồn Sidebar, Cải Tiến Toàn Diện Nhà Tài Trợ, Quỹ Thiện Nguyện & Import Bóc Tách Sự Kiện**:
   - **1. Phân Quyền và Điều Khiển Ẩn/Hiện Sidebar Hoàn Toàn Bằng CSDL (Rule 0 & Phân Quyền RBAC)**:
     * **Khôi phục toàn vẹn mã nguồn trong `Sidebar.tsx`**: Tuyệt đối không xóa hay comment out code bất kỳ mục nào trên Sidebar. Đã đưa đầy đủ các mục `Lớp học & Khóa học` (`/trainings`), `Tin tức & Truyền thông` (`/news`), `Quyền lợi & Ưu đãi` (`/perks`), và mở lại nhóm `KẾT NỐI & GIAO THƯƠNG` (`/network`, `/opportunities`, `/marketplace`, `/companies`).
@@ -178,6 +208,38 @@
   - **7. Tuân Thủ Nghiêm Ngặt Quy Chuẩn**:
     * Tuyệt đối không tự ý chạy `git commit` hay `git push`.
     * Dữ liệu thực tế được lưu và truy xuất chuẩn mực từ CSDL duy nhất `113.20.107.184:6432`.
+
+- **Bản cập nhật ngày 18/11/2026 (v12.15): Rà Soát Toàn Diện, Xóa Bỏ Triệt Để Mock Data Trong Toàn Bộ Dự Án & Chuyển Hóa Về Chuẩn RESTful API ([NODE-CORE-001], [NODE-CORE-002], [NODE-CRM-001], [NODE-APP-001], [NODE-APP-003], [NODE-APP-008])**:
+  - **1. Dọn Dẹp Sạch Backend (NestJS)**:
+    * Loại bỏ hoàn toàn chuỗi `mock-admin-id` trong các file service cốt lõi:
+      - `apps/ceohn10_app_be/src/admin/admin.service.ts`: Xóa `mock-admin-id` khỏi guard `checkIsAdmin`.
+      - `apps/ceohn10_app_be/src/events/events.service.ts`: Xóa `mock-admin-id` khỏi `checkIsPlatformAdmin`.
+      - `apps/ceohn10_app_be/src/members/members.service.ts`: Xóa `mock-admin-id` khỏi `checkIsPlatformAdmin` và `checkCanApproveMember`.
+      - `apps/ceohn10_app_be/src/users/users.service.ts`: Xóa `mock-admin-id` khỏi `findById`, `checkIsAdmin` và guard xóa tài khoản `deleteUser`.
+    * Toàn bộ xác thực quyền hạn và thông tin người dùng được truy vấn trực tiếp từ bảng `public.vione_users`, `public.user_roles`, `public.app_settings` trên CSDL PostgreSQL chuẩn `113.20.107.184:6432`.
+  - **2. Xóa Bỏ Dữ Liệu Giả Lập & Fallback Fake Ở Frontend**:
+    * `apps/ceohn10_app_fe/src/routes/association.training.tsx`:
+      - Xóa bỏ hoàn toàn mảng `SAMPLE_TRAININGS` (130+ dòng mock các buổi học, giảng viên, tài liệu).
+      - Xóa bỏ logic fallback gán dữ liệu fake khi API rỗng hoặc lỗi (`setTrainings(SAMPLE_TRAININGS)`).
+      - Nối trực tiếp vào API `/api/trainings` của NestJS. Khi database rỗng, hiển thị Empty State chuẩn mực; khi lỗi máy chủ/DB, hiển thị thông báo lỗi rõ ràng qua `toast.error`, tuyệt đối không dùng fake data để che giấu lỗi DB.
+    * `apps/ceohn10_app_fe/src/components/events/GoogleFormEventRegistrationModal.tsx`:
+      - Thay đổi cơ chế đăng ký sự kiện: Không chỉ lưu vào localStorage mà gọi trực tiếp RESTful API `POST /api/events/:id/guest-register` lên backend NestJS để ghi nhận vào bảng `public.event_registrations` trong CSDL PostgreSQL `113.20.107.184:6432`.
+      - Cập nhật mã vé thực tế trả về từ máy chủ, báo lỗi kết nối rõ ràng nếu có sự cố.
+    * `apps/ceohn10_app_fe/src/components/business-connect/mobile/SectionHeaderInfo.tsx`:
+      - Xóa bỏ hoàn toàn các mảng dữ liệu hardcode tĩnh `aiMatches` và `nurtureConnections` với hình ảnh giả lập Unsplash.
+      - Chuyển sang nhận dữ liệu động qua component props, tự động hiển thị Empty State khi danh sách gợi ý rỗng.
+    * `apps/ceohn10_app_fe/src/integrations/supabase/auth-middleware.ts`:
+      - Chuẩn hóa định danh `mockUser` thành `authenticatedUser` phản ánh đúng đối tượng người dùng thực tế giải mã từ JWT token.
+    * `apps/ceohn10_app_fe/src/routes/__root.tsx`:
+      - Gỡ bỏ hoàn toàn thẻ `<MockModeBanner />` và câu lệnh import khỏi cây component toàn cục của ứng dụng.
+    * `apps/ceohn10_app_fe/src/lib/member-app-data.ts`:
+      - Dọn dẹp sạch toàn bộ các mảng dữ liệu mẫu `opportunities`, `products`, `events`, `notifications`, `conversations`, `checkinEvents`, chuyển đổi thành các mảng rỗng `[]` và chỉ giữ lại kiểu dữ liệu TypeScript Type Definitions.
+  - **3. Kiểm Tra Chất Lượng Mã Nguồn (STRICT CODE QUALITY)**:
+    * Type Check Backend (`apps/ceohn10_app_be`): **PASS 100% với 0 lỗi (0 errors)**.
+    * Type Check Frontend (`apps/ceohn10_app_fe`): **PASS 100% với 0 lỗi (0 errors)**.
+  - **4. Tuân Thủ Nghiêm Ngặt Quy Chuẩn**:
+    * Tuân thủ Rule 0 & STRICT NO-MOCK LAW: Mọi dữ liệu đọc/ghi đều thông qua RESTful API chuẩn của NestJS kết nối trực tiếp vào CSDL duy nhất `113.20.107.184:6432`.
+    * Tuân thủ Rule 1: Tuyệt đối không tự ý chạy `git commit` hay `git push`.
 
 - **Bản cập nhật ngày 17/11/2026 (v12.13): Chuẩn Hóa Realtime Dòng Tiền & Sổ Quỹ Thu Chi, Đồng Bộ Hội Phí & Hóa Đơn, Sửa Lỗi Xem Tài Liệu, Chuẩn Hóa Role BCS Lớp & BCS Team Theo Sơ Đồ, Triệt Tiêu 404 Icons & React Error #418, Cấu Hình Subdomain & Git Auto-Deploy CI/CD ([NODE-CRM-001], [NODE-CRM-004], [NODE-CRM-005], [NODE-CRM-009], [NODE-CRM-010], [NODE-CORE-001])**:
   - **1. Khắc Phục Sổ Quỹ Realtime & Dòng Tiền Biến Động Thực Tế**:
@@ -1993,6 +2055,36 @@
 
 # System Memory & Architecture
 
+- **Bản cập nhật ngày 18/11/2026 (v12.21): Tái Cấu Trúc Toàn Diện Hệ Thống Phân Quyền Động (Dynamic Bidirectional RBAC Architecture), Xóa Bỏ Hoàn Toàn Hardcode Trên Frontend, Chuẩn Hóa Tên Quyền CRUD**:
+  - **1. Triệt Tiêu 100% Logic Phân Quyền Hardcode Trên Frontend**:
+    * Xóa bỏ hoàn toàn mảng tĩnh `temporarilyHiddenRoutes = [...]` và các logic ép quyền tĩnh trong `rbac-permission-helpers.ts`.
+    * Không còn bất kỳ đoạn mã hardcode ẩn/hiện route nào ở phía Client; trạng thái ẩn/hiện và quyền truy cập phụ thuộc hoàn toàn vào CSDL PostgreSQL chuẩn `113.20.107.184:6432`.
+  - **2. Luồng Phân Quyền 2 Chiều Chuẩn Mực (FE <-> BE <-> DB)**:
+    * **Chiều Ghi (Cấu hình quyền)**: Màn hình Phân quyền (`/permissions`) -> Gọi API `PUT /api/admin/permission-matrix` -> Backend lưu trực tiếp vào bảng `public.app_settings` (key `crm_permission_matrix`) trên CSDL `113.20.107.184:6432`.
+    * **Chiều Đọc & Tính toán (Tra cứu quyền)**: Khi đăng nhập hoặc gọi `/api/users/me`:
+      - Backend NestJS (`users.service.ts`) truy vấn CSDL, lấy Ma Trận Phân Quyền `crm_permission_matrix` và vai trò của tài khoản.
+      - Hàm `computeUserRbacEvaluation` tính toán toàn bộ quyền hạn cụ thể của người dùng thành:
+        1. `allowedRoutes: string[]`: Danh sách URL routes mà người dùng được phép xem trên Sidebar/CRM. Nếu một tính năng có `enabled === false` trong CSDL, tính năng đó sẽ bị loại khỏi `allowedRoutes` cho toàn bộ mọi người (kể cả admin).
+        2. `permissionsHash: Record<string, boolean>`: Bảng băm quyền O(1) gồm cả route URL và mã CRUD action.
+        3. `permissions: string[]`: Mảng mã quyền đầy đủ.
+    * **Chiều Thực thi phía Frontend**:
+      - `AuthContext.tsx`: Lưu trữ `permissionsHash` và `allowedRoutes` vào session của `user`. Hàm `hasPermission(permission)` kiểm tra O(1) qua `permissionsHash` mà không cần duyệt mảng.
+      - `Sidebar.tsx`: Hàm `isAllowed(route)` kiểm tra trực tiếp từ `user.allowedRoutes` và `user.permissionsHash` do Backend tính từ CSDL trả về, đạt tốc độ phản hồi tức thì và tính nhất quán tuyệt đối.
+  - **3. Chuẩn Hóa Danh Mục & Tên Quyền CRUD**:
+    * Tên hiển thị quyền được chuẩn hóa rõ ràng theo 4 nhóm CRUD:
+      - `[Xem]` Xem danh sách và chi tiết dữ liệu (Read/View)
+      - `[Thêm]` Thêm mới dữ liệu (Create/Add)
+      - `[Sửa]` Chỉnh sửa dữ liệu (Update/Edit)
+      - `[Xóa]` Xóa dữ liệu (Delete)
+    * Tự động sinh mã quyền CRUD chuẩn: `*_VIEW`, `*_CREATE` (kèm alias `*_ADD`), `*_UPDATE` (kèm alias `*_EDIT`), `*_DELETE` và scope chuẩn `resource:action`.
+    * Giao diện Ma Trận Phân Quyền (`RbacPermissionMatrix.tsx`): Hiển thị Badge CRUD chuyên nghiệp với 4 màu định danh trực quan (`[XEM]`, `[THÊM]`, `[SỬA]`, `[XÓA]`) trên cả chế độ xem theo vai trò và chế độ xem bảng tổng thể.
+    * Đã chạy migration cập nhật trực tiếp dữ liệu bản ghi `crm_permission_matrix` trong CSDL `113.20.107.184:6432` theo chuẩn tên quyền CRUD mới.
+  - **4. Kiểm Tra Chất Lượng Code Toàn Diện (Strict Zero-Error)**:
+    * Backend: `tsc --project apps/ceohn10_app_be/tsconfig.json --noEmit` -> **Exit code 0 (0 errors)**.
+    * Frontend: `tsc --project apps/ceohn10_app_fe/tsconfig.json --noEmit` trên toàn bộ 1,690+ tệp -> **Exit code 0 (0 errors)**.
+    * Tuân thủ nghiêm ngặt Rule 0 (CSDL duy nhất `113.20.107.184:6432`) và Rule 1 (Không tự ý `git commit` / `git push`).
+
+
 - **Bản cập nhật ngày 18/11/2026 (v12.20): Phân Quyền Sidebar Vào CSDL 113.20.107.184:6432, Khôi Phục Toàn Vẹn Mã Nguồn Sidebar, Cải Tiến Toàn Diện Nhà Tài Trợ, Quỹ Thiện Nguyện & Import Bóc Tách Sự Kiện**:
   - **1. Phân Quyền và Điều Khiển Ẩn/Hiện Sidebar Hoàn Toàn Bằng CSDL (Rule 0 & Phân Quyền RBAC)**:
     * **Khôi phục toàn vẹn mã nguồn trong `Sidebar.tsx`**: Tuyệt đối không xóa hay comment out code bất kỳ mục nào trên Sidebar. Đã đưa đầy đủ các mục `Lớp học & Khóa học` (`/trainings`), `Tin tức & Truyền thông` (`/news`), `Quyền lợi & Ưu đãi` (`/perks`), và mở lại nhóm `KẾT NỐI & GIAO THƯƠNG` (`/network`, `/opportunities`, `/marketplace`, `/companies`).
@@ -2171,6 +2263,38 @@
   - **7. Tuân Thủ Nghiêm Ngặt Quy Chuẩn**:
     * Tuyệt đối không tự ý chạy `git commit` hay `git push`.
     * Dữ liệu thực tế được lưu và truy xuất chuẩn mực từ CSDL duy nhất `113.20.107.184:6432`.
+
+- **Bản cập nhật ngày 18/11/2026 (v12.15): Rà Soát Toàn Diện, Xóa Bỏ Triệt Để Mock Data Trong Toàn Bộ Dự Án & Chuyển Hóa Về Chuẩn RESTful API ([NODE-CORE-001], [NODE-CORE-002], [NODE-CRM-001], [NODE-APP-001], [NODE-APP-003], [NODE-APP-008])**:
+  - **1. Dọn Dẹp Sạch Backend (NestJS)**:
+    * Loại bỏ hoàn toàn chuỗi `mock-admin-id` trong các file service cốt lõi:
+      - `apps/ceohn10_app_be/src/admin/admin.service.ts`: Xóa `mock-admin-id` khỏi guard `checkIsAdmin`.
+      - `apps/ceohn10_app_be/src/events/events.service.ts`: Xóa `mock-admin-id` khỏi `checkIsPlatformAdmin`.
+      - `apps/ceohn10_app_be/src/members/members.service.ts`: Xóa `mock-admin-id` khỏi `checkIsPlatformAdmin` và `checkCanApproveMember`.
+      - `apps/ceohn10_app_be/src/users/users.service.ts`: Xóa `mock-admin-id` khỏi `findById`, `checkIsAdmin` và guard xóa tài khoản `deleteUser`.
+    * Toàn bộ xác thực quyền hạn và thông tin người dùng được truy vấn trực tiếp từ bảng `public.vione_users`, `public.user_roles`, `public.app_settings` trên CSDL PostgreSQL chuẩn `113.20.107.184:6432`.
+  - **2. Xóa Bỏ Dữ Liệu Giả Lập & Fallback Fake Ở Frontend**:
+    * `apps/ceohn10_app_fe/src/routes/association.training.tsx`:
+      - Xóa bỏ hoàn toàn mảng `SAMPLE_TRAININGS` (130+ dòng mock các buổi học, giảng viên, tài liệu).
+      - Xóa bỏ logic fallback gán dữ liệu fake khi API rỗng hoặc lỗi (`setTrainings(SAMPLE_TRAININGS)`).
+      - Nối trực tiếp vào API `/api/trainings` của NestJS. Khi database rỗng, hiển thị Empty State chuẩn mực; khi lỗi máy chủ/DB, hiển thị thông báo lỗi rõ ràng qua `toast.error`, tuyệt đối không dùng fake data để che giấu lỗi DB.
+    * `apps/ceohn10_app_fe/src/components/events/GoogleFormEventRegistrationModal.tsx`:
+      - Thay đổi cơ chế đăng ký sự kiện: Không chỉ lưu vào localStorage mà gọi trực tiếp RESTful API `POST /api/events/:id/guest-register` lên backend NestJS để ghi nhận vào bảng `public.event_registrations` trong CSDL PostgreSQL `113.20.107.184:6432`.
+      - Cập nhật mã vé thực tế trả về từ máy chủ, báo lỗi kết nối rõ ràng nếu có sự cố.
+    * `apps/ceohn10_app_fe/src/components/business-connect/mobile/SectionHeaderInfo.tsx`:
+      - Xóa bỏ hoàn toàn các mảng dữ liệu hardcode tĩnh `aiMatches` và `nurtureConnections` với hình ảnh giả lập Unsplash.
+      - Chuyển sang nhận dữ liệu động qua component props, tự động hiển thị Empty State khi danh sách gợi ý rỗng.
+    * `apps/ceohn10_app_fe/src/integrations/supabase/auth-middleware.ts`:
+      - Chuẩn hóa định danh `mockUser` thành `authenticatedUser` phản ánh đúng đối tượng người dùng thực tế giải mã từ JWT token.
+    * `apps/ceohn10_app_fe/src/routes/__root.tsx`:
+      - Gỡ bỏ hoàn toàn thẻ `<MockModeBanner />` và câu lệnh import khỏi cây component toàn cục của ứng dụng.
+    * `apps/ceohn10_app_fe/src/lib/member-app-data.ts`:
+      - Dọn dẹp sạch toàn bộ các mảng dữ liệu mẫu `opportunities`, `products`, `events`, `notifications`, `conversations`, `checkinEvents`, chuyển đổi thành các mảng rỗng `[]` và chỉ giữ lại kiểu dữ liệu TypeScript Type Definitions.
+  - **3. Kiểm Tra Chất Lượng Mã Nguồn (STRICT CODE QUALITY)**:
+    * Type Check Backend (`apps/ceohn10_app_be`): **PASS 100% với 0 lỗi (0 errors)**.
+    * Type Check Frontend (`apps/ceohn10_app_fe`): **PASS 100% với 0 lỗi (0 errors)**.
+  - **4. Tuân Thủ Nghiêm Ngặt Quy Chuẩn**:
+    * Tuân thủ Rule 0 & STRICT NO-MOCK LAW: Mọi dữ liệu đọc/ghi đều thông qua RESTful API chuẩn của NestJS kết nối trực tiếp vào CSDL duy nhất `113.20.107.184:6432`.
+    * Tuân thủ Rule 1: Tuyệt đối không tự ý chạy `git commit` hay `git push`.
 
 - **Bản cập nhật ngày 17/11/2026 (v12.13): Chuẩn Hóa Realtime Dòng Tiền & Sổ Quỹ Thu Chi, Đồng Bộ Hội Phí & Hóa Đơn, Sửa Lỗi Xem Tài Liệu, Chuẩn Hóa Role BCS Lớp & BCS Team Theo Sơ Đồ, Triệt Tiêu 404 Icons & React Error #418, Cấu Hình Subdomain & Git Auto-Deploy CI/CD ([NODE-CRM-001], [NODE-CRM-004], [NODE-CRM-005], [NODE-CRM-009], [NODE-CRM-010], [NODE-CORE-001])**:
   - **1. Khắc Phục Sổ Quỹ Realtime & Dòng Tiền Biến Động Thực Tế**:
@@ -5150,6 +5274,36 @@
 
 # System Memory & Architecture
 
+- **Bản cập nhật ngày 18/11/2026 (v12.21): Tái Cấu Trúc Toàn Diện Hệ Thống Phân Quyền Động (Dynamic Bidirectional RBAC Architecture), Xóa Bỏ Hoàn Toàn Hardcode Trên Frontend, Chuẩn Hóa Tên Quyền CRUD**:
+  - **1. Triệt Tiêu 100% Logic Phân Quyền Hardcode Trên Frontend**:
+    * Xóa bỏ hoàn toàn mảng tĩnh `temporarilyHiddenRoutes = [...]` và các logic ép quyền tĩnh trong `rbac-permission-helpers.ts`.
+    * Không còn bất kỳ đoạn mã hardcode ẩn/hiện route nào ở phía Client; trạng thái ẩn/hiện và quyền truy cập phụ thuộc hoàn toàn vào CSDL PostgreSQL chuẩn `113.20.107.184:6432`.
+  - **2. Luồng Phân Quyền 2 Chiều Chuẩn Mực (FE <-> BE <-> DB)**:
+    * **Chiều Ghi (Cấu hình quyền)**: Màn hình Phân quyền (`/permissions`) -> Gọi API `PUT /api/admin/permission-matrix` -> Backend lưu trực tiếp vào bảng `public.app_settings` (key `crm_permission_matrix`) trên CSDL `113.20.107.184:6432`.
+    * **Chiều Đọc & Tính toán (Tra cứu quyền)**: Khi đăng nhập hoặc gọi `/api/users/me`:
+      - Backend NestJS (`users.service.ts`) truy vấn CSDL, lấy Ma Trận Phân Quyền `crm_permission_matrix` và vai trò của tài khoản.
+      - Hàm `computeUserRbacEvaluation` tính toán toàn bộ quyền hạn cụ thể của người dùng thành:
+        1. `allowedRoutes: string[]`: Danh sách URL routes mà người dùng được phép xem trên Sidebar/CRM. Nếu một tính năng có `enabled === false` trong CSDL, tính năng đó sẽ bị loại khỏi `allowedRoutes` cho toàn bộ mọi người (kể cả admin).
+        2. `permissionsHash: Record<string, boolean>`: Bảng băm quyền O(1) gồm cả route URL và mã CRUD action.
+        3. `permissions: string[]`: Mảng mã quyền đầy đủ.
+    * **Chiều Thực thi phía Frontend**:
+      - `AuthContext.tsx`: Lưu trữ `permissionsHash` và `allowedRoutes` vào session của `user`. Hàm `hasPermission(permission)` kiểm tra O(1) qua `permissionsHash` mà không cần duyệt mảng.
+      - `Sidebar.tsx`: Hàm `isAllowed(route)` kiểm tra trực tiếp từ `user.allowedRoutes` và `user.permissionsHash` do Backend tính từ CSDL trả về, đạt tốc độ phản hồi tức thì và tính nhất quán tuyệt đối.
+  - **3. Chuẩn Hóa Danh Mục & Tên Quyền CRUD**:
+    * Tên hiển thị quyền được chuẩn hóa rõ ràng theo 4 nhóm CRUD:
+      - `[Xem]` Xem danh sách và chi tiết dữ liệu (Read/View)
+      - `[Thêm]` Thêm mới dữ liệu (Create/Add)
+      - `[Sửa]` Chỉnh sửa dữ liệu (Update/Edit)
+      - `[Xóa]` Xóa dữ liệu (Delete)
+    * Tự động sinh mã quyền CRUD chuẩn: `*_VIEW`, `*_CREATE` (kèm alias `*_ADD`), `*_UPDATE` (kèm alias `*_EDIT`), `*_DELETE` và scope chuẩn `resource:action`.
+    * Giao diện Ma Trận Phân Quyền (`RbacPermissionMatrix.tsx`): Hiển thị Badge CRUD chuyên nghiệp với 4 màu định danh trực quan (`[XEM]`, `[THÊM]`, `[SỬA]`, `[XÓA]`) trên cả chế độ xem theo vai trò và chế độ xem bảng tổng thể.
+    * Đã chạy migration cập nhật trực tiếp dữ liệu bản ghi `crm_permission_matrix` trong CSDL `113.20.107.184:6432` theo chuẩn tên quyền CRUD mới.
+  - **4. Kiểm Tra Chất Lượng Code Toàn Diện (Strict Zero-Error)**:
+    * Backend: `tsc --project apps/ceohn10_app_be/tsconfig.json --noEmit` -> **Exit code 0 (0 errors)**.
+    * Frontend: `tsc --project apps/ceohn10_app_fe/tsconfig.json --noEmit` trên toàn bộ 1,690+ tệp -> **Exit code 0 (0 errors)**.
+    * Tuân thủ nghiêm ngặt Rule 0 (CSDL duy nhất `113.20.107.184:6432`) và Rule 1 (Không tự ý `git commit` / `git push`).
+
+
 - **Bản cập nhật ngày 18/11/2026 (v12.20): Phân Quyền Sidebar Vào CSDL 113.20.107.184:6432, Khôi Phục Toàn Vẹn Mã Nguồn Sidebar, Cải Tiến Toàn Diện Nhà Tài Trợ, Quỹ Thiện Nguyện & Import Bóc Tách Sự Kiện**:
   - **1. Phân Quyền và Điều Khiển Ẩn/Hiện Sidebar Hoàn Toàn Bằng CSDL (Rule 0 & Phân Quyền RBAC)**:
     * **Khôi phục toàn vẹn mã nguồn trong `Sidebar.tsx`**: Tuyệt đối không xóa hay comment out code bất kỳ mục nào trên Sidebar. Đã đưa đầy đủ các mục `Lớp học & Khóa học` (`/trainings`), `Tin tức & Truyền thông` (`/news`), `Quyền lợi & Ưu đãi` (`/perks`), và mở lại nhóm `KẾT NỐI & GIAO THƯƠNG` (`/network`, `/opportunities`, `/marketplace`, `/companies`).
@@ -5328,6 +5482,38 @@
   - **7. Tuân Thủ Nghiêm Ngặt Quy Chuẩn**:
     * Tuyệt đối không tự ý chạy `git commit` hay `git push`.
     * Dữ liệu thực tế được lưu và truy xuất chuẩn mực từ CSDL duy nhất `113.20.107.184:6432`.
+
+- **Bản cập nhật ngày 18/11/2026 (v12.15): Rà Soát Toàn Diện, Xóa Bỏ Triệt Để Mock Data Trong Toàn Bộ Dự Án & Chuyển Hóa Về Chuẩn RESTful API ([NODE-CORE-001], [NODE-CORE-002], [NODE-CRM-001], [NODE-APP-001], [NODE-APP-003], [NODE-APP-008])**:
+  - **1. Dọn Dẹp Sạch Backend (NestJS)**:
+    * Loại bỏ hoàn toàn chuỗi `mock-admin-id` trong các file service cốt lõi:
+      - `apps/ceohn10_app_be/src/admin/admin.service.ts`: Xóa `mock-admin-id` khỏi guard `checkIsAdmin`.
+      - `apps/ceohn10_app_be/src/events/events.service.ts`: Xóa `mock-admin-id` khỏi `checkIsPlatformAdmin`.
+      - `apps/ceohn10_app_be/src/members/members.service.ts`: Xóa `mock-admin-id` khỏi `checkIsPlatformAdmin` và `checkCanApproveMember`.
+      - `apps/ceohn10_app_be/src/users/users.service.ts`: Xóa `mock-admin-id` khỏi `findById`, `checkIsAdmin` và guard xóa tài khoản `deleteUser`.
+    * Toàn bộ xác thực quyền hạn và thông tin người dùng được truy vấn trực tiếp từ bảng `public.vione_users`, `public.user_roles`, `public.app_settings` trên CSDL PostgreSQL chuẩn `113.20.107.184:6432`.
+  - **2. Xóa Bỏ Dữ Liệu Giả Lập & Fallback Fake Ở Frontend**:
+    * `apps/ceohn10_app_fe/src/routes/association.training.tsx`:
+      - Xóa bỏ hoàn toàn mảng `SAMPLE_TRAININGS` (130+ dòng mock các buổi học, giảng viên, tài liệu).
+      - Xóa bỏ logic fallback gán dữ liệu fake khi API rỗng hoặc lỗi (`setTrainings(SAMPLE_TRAININGS)`).
+      - Nối trực tiếp vào API `/api/trainings` của NestJS. Khi database rỗng, hiển thị Empty State chuẩn mực; khi lỗi máy chủ/DB, hiển thị thông báo lỗi rõ ràng qua `toast.error`, tuyệt đối không dùng fake data để che giấu lỗi DB.
+    * `apps/ceohn10_app_fe/src/components/events/GoogleFormEventRegistrationModal.tsx`:
+      - Thay đổi cơ chế đăng ký sự kiện: Không chỉ lưu vào localStorage mà gọi trực tiếp RESTful API `POST /api/events/:id/guest-register` lên backend NestJS để ghi nhận vào bảng `public.event_registrations` trong CSDL PostgreSQL `113.20.107.184:6432`.
+      - Cập nhật mã vé thực tế trả về từ máy chủ, báo lỗi kết nối rõ ràng nếu có sự cố.
+    * `apps/ceohn10_app_fe/src/components/business-connect/mobile/SectionHeaderInfo.tsx`:
+      - Xóa bỏ hoàn toàn các mảng dữ liệu hardcode tĩnh `aiMatches` và `nurtureConnections` với hình ảnh giả lập Unsplash.
+      - Chuyển sang nhận dữ liệu động qua component props, tự động hiển thị Empty State khi danh sách gợi ý rỗng.
+    * `apps/ceohn10_app_fe/src/integrations/supabase/auth-middleware.ts`:
+      - Chuẩn hóa định danh `mockUser` thành `authenticatedUser` phản ánh đúng đối tượng người dùng thực tế giải mã từ JWT token.
+    * `apps/ceohn10_app_fe/src/routes/__root.tsx`:
+      - Gỡ bỏ hoàn toàn thẻ `<MockModeBanner />` và câu lệnh import khỏi cây component toàn cục của ứng dụng.
+    * `apps/ceohn10_app_fe/src/lib/member-app-data.ts`:
+      - Dọn dẹp sạch toàn bộ các mảng dữ liệu mẫu `opportunities`, `products`, `events`, `notifications`, `conversations`, `checkinEvents`, chuyển đổi thành các mảng rỗng `[]` và chỉ giữ lại kiểu dữ liệu TypeScript Type Definitions.
+  - **3. Kiểm Tra Chất Lượng Mã Nguồn (STRICT CODE QUALITY)**:
+    * Type Check Backend (`apps/ceohn10_app_be`): **PASS 100% với 0 lỗi (0 errors)**.
+    * Type Check Frontend (`apps/ceohn10_app_fe`): **PASS 100% với 0 lỗi (0 errors)**.
+  - **4. Tuân Thủ Nghiêm Ngặt Quy Chuẩn**:
+    * Tuân thủ Rule 0 & STRICT NO-MOCK LAW: Mọi dữ liệu đọc/ghi đều thông qua RESTful API chuẩn của NestJS kết nối trực tiếp vào CSDL duy nhất `113.20.107.184:6432`.
+    * Tuân thủ Rule 1: Tuyệt đối không tự ý chạy `git commit` hay `git push`.
 
 - **Bản cập nhật ngày 17/11/2026 (v12.13): Chuẩn Hóa Realtime Dòng Tiền & Sổ Quỹ Thu Chi, Đồng Bộ Hội Phí & Hóa Đơn, Sửa Lỗi Xem Tài Liệu, Chuẩn Hóa Role BCS Lớp & BCS Team Theo Sơ Đồ, Triệt Tiêu 404 Icons & React Error #418, Cấu Hình Subdomain & Git Auto-Deploy CI/CD ([NODE-CRM-001], [NODE-CRM-004], [NODE-CRM-005], [NODE-CRM-009], [NODE-CRM-010], [NODE-CORE-001])**:
   - **1. Khắc Phục Sổ Quỹ Realtime & Dòng Tiền Biến Động Thực Tế**:

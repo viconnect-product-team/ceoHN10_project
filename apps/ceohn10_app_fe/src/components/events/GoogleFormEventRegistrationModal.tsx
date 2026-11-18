@@ -22,6 +22,7 @@ import { toast } from "sonner";
 import type { EventItem } from "@/lib/events.functions";
 import { NOTIFICATION_TEMPLATES, renderNotificationTemplate } from "@/lib/notification-templates";
 import { downloadIcs } from "@/lib/ics";
+import { fetchNestApi } from "@/lib/api-client";
 
 export interface GoogleFormRegistrationData {
   fullName: string;
@@ -105,27 +106,44 @@ export function GoogleFormEventRegistrationModal({
       const generatedTicket = `TKT-${Math.floor(1000 + Math.random() * 9000)}-${Date.now().toString(36).toUpperCase().slice(-3)}`;
       setTicketCode(generatedTicket);
 
+      // Gọi RESTful API lưu dữ liệu vào CSDL PostgreSQL chuẩn 113.20.107.184:6432
+      const apiRes = await fetchNestApi<any>(`/events/${event.id}/guest-register`, {
+        method: "POST",
+        body: {
+          fullName: form.fullName,
+          email: form.email,
+          phone: form.phone,
+          company: form.company,
+          position: form.jobTitle,
+          ticketCount: 1,
+          note: `Nhu cầu B2B: ${form.b2bNeeds || "Không"}; Câu hỏi diễn giả: ${form.speakerQuestions || "Không"}; Tiệc: ${form.banquetChoice || "Chưa chọn"}`,
+        },
+      });
+
+      const finalTicketCode = apiRes?.ticketCode || apiRes?.ticket_code || generatedTicket;
+      setTicketCode(finalTicketCode);
+
       // Render confirmation ticket email
       const tmpl = NOTIFICATION_TEMPLATES.find((t) => t.code === "EVENT_TICKET_CONFIRMATION");
       if (tmpl) {
         renderNotificationTemplate(tmpl, {
           attendeeName: form.fullName,
           eventName: event.name,
-          ticketCode: generatedTicket,
+          ticketCode: finalTicketCode,
           seatOrTable: form.banquetChoice,
           ticketType: form.role,
           eventTime: event.date,
           eventAddress: event.location || "Văn phòng Hiệp hội CEO HN10",
-          qrCodeDataUrl: `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=CEO HN10-${generatedTicket}`,
+          qrCodeDataUrl: `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=CEO HN10-${finalTicketCode}`,
         });
       }
 
-      // Save into local registration list for mock or real sync
+      // Lưu trữ đồng bộ local cache
       if (typeof window !== "undefined") {
         const stored = JSON.parse(localStorage.getItem("ceohn10_event_custom_registrations") || "[]");
         stored.unshift({
           eventId: event.id,
-          ticketCode: generatedTicket,
+          ticketCode: finalTicketCode,
           ...form,
           submittedAt: new Date().toISOString(),
         });
@@ -133,10 +151,11 @@ export function GoogleFormEventRegistrationModal({
       }
 
       setSubmitted(true);
-      toast.success("Đăng ký thành công! Vé điện tử và mã QR đã được gửi về email.");
-      if (onSuccess) onSuccess(form, generatedTicket);
-    } catch {
-      toast.error("Đã xảy ra lỗi khi gửi form đăng ký.");
+      toast.success("Đăng ký tham dự thành công! Thông tin vé đã được lưu vào hệ thống CSDL.");
+      if (onSuccess) onSuccess(form, finalTicketCode);
+    } catch (err: any) {
+      console.error("[Event Registration] Lỗi gửi form:", err);
+      toast.error(err?.message || "Đã xảy ra lỗi khi kết nối máy chủ gửi form đăng ký.");
     } finally {
       setSubmitting(false);
     }

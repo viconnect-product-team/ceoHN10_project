@@ -622,13 +622,35 @@ export function getDynamicDepartmentOptions(): string[] {
 /**
  * Kiểm tra 1 route có được phép hiển thị trên Sidebar/CRM theo ma trận phân quyền RBAC CSDL hay không
  */
-export function isRouteAllowedByMatrix(route: string, roleKey: SystemRoleKey): boolean {
+export function isRouteAllowedByMatrix(route: string, roleKey: SystemRoleKey, user?: any): boolean {
   // Làm sạch route (bỏ query parameters & hash fragment: ví dụ /permissions?tab=matrix -> /permissions)
   const cleanRoute = (route || "").split("?")[0].split("#")[0];
 
   // Trang Tổng quan và Trợ lý AI luôn mở cho toàn bộ tài khoản đăng nhập
   if (cleanRoute === "/" || cleanRoute === "/ai-assistant") {
     return true;
+  }
+
+  // 1. Luồng chuẩn API: Ưu tiên kiểm tra trực tiếp allowedRoutes do Backend tính từ CSDL
+  if (user?.allowedRoutes && Array.isArray(user.allowedRoutes) && user.allowedRoutes.length > 0) {
+    if (user.allowedRoutes.includes(cleanRoute)) {
+      return true;
+    }
+    const hasPrefixMatch = user.allowedRoutes.some(
+      (r: string) => r !== "/" && (cleanRoute.startsWith(r) || r.startsWith(cleanRoute))
+    );
+    if (hasPrefixMatch) {
+      return true;
+    }
+    // Nếu Backend đã trả allowedRoutes nhưng không có route này -> không được phép
+    return false;
+  }
+
+  // 2. Kiểm tra permissionsHash do Backend tính từ CSDL
+  if (user?.permissionsHash && typeof user.permissionsHash === "object") {
+    if (user.permissionsHash[cleanRoute] !== undefined) {
+      return Boolean(user.permissionsHash[cleanRoute]);
+    }
   }
 
   const sRole = String(roleKey);
@@ -640,7 +662,7 @@ export function isRouteAllowedByMatrix(route: string, roleKey: SystemRoleKey): b
     cleanRoute.startsWith("/accounts") ||
     cleanRoute.startsWith("/departments");
 
-  // 1. Kiểm tra quyền riêng của tài khoản hiện tại từ vba_member_permissions nếu có
+  // 3. Kiểm tra quyền riêng của tài khoản hiện tại từ vba_member_permissions nếu có
   if (typeof window !== "undefined") {
     try {
       const rawUserPerms = localStorage.getItem("vba_member_permissions");
@@ -661,7 +683,7 @@ export function isRouteAllowedByMatrix(route: string, roleKey: SystemRoleKey): b
       }
     } catch { }
 
-    // 2. Tra cứu trực tiếp theo Ma Trận Phân Quyền CSDL (RBAC Matrix)
+    // 4. Tra cứu trực tiếp theo Ma Trận Phân Quyền CSDL (RBAC Matrix) đồng bộ từ DB về localStorage
     try {
       const raw = localStorage.getItem(RBAC_MATRIX_STORAGE_KEY);
       if (raw) {
@@ -680,7 +702,7 @@ export function isRouteAllowedByMatrix(route: string, roleKey: SystemRoleKey): b
                   (cleanRoute === "/accounts" || cleanRoute === "/account-settings"));
 
               if (isMatch) {
-                // Nếu tính năng bị tắt trong ma trận (enabled === false)
+                // Nếu tính năng bị tắt trong ma trận (enabled === false): Tắt cho toàn bộ vai trò
                 if (feat.enabled === false) {
                   return false;
                 }
@@ -691,8 +713,8 @@ export function isRouteAllowedByMatrix(route: string, roleKey: SystemRoleKey): b
 
                 const viewAction = feat.actions.find(
                   (a: any) =>
-                    (a.code && a.code.toUpperCase().endsWith("_VIEW")) ||
-                    (a.id && a.id.toLowerCase().includes("_view"))
+                    (a.code && (a.code.toUpperCase().endsWith("_VIEW") || a.code.toUpperCase().endsWith("_READ"))) ||
+                    (a.id && (a.id.toLowerCase().includes("_view") || a.id.toLowerCase().includes("_read")))
                 );
 
                 if (viewAction) {
@@ -711,21 +733,7 @@ export function isRouteAllowedByMatrix(route: string, roleKey: SystemRoleKey): b
     } catch { }
   }
 
-  // 3. Danh sách các tính năng tạm ẩn theo chỉ đạo phân quyền hệ thống (khi chưa tải ma trận hoặc fallback)
-  const temporarilyHiddenRoutes = [
-    "/trainings",
-    "/news",
-    "/perks",
-    "/network",
-    "/opportunities",
-    "/marketplace",
-    "/companies",
-  ];
-  if (temporarilyHiddenRoutes.includes(cleanRoute)) {
-    return false;
-  }
-
-  // 4. Các route quản trị hệ thống nhạy cảm (Cấm đối với thành viên thường)
+  // 5. Các route quản trị hệ thống nhạy cảm (Cấm đối với thành viên thường)
   const isSystemAdminOnlyRoute =
     cleanRoute.startsWith("/permissions") ||
     cleanRoute.startsWith("/departments") ||
@@ -1062,10 +1070,34 @@ export function isActionAllowedByMatrix(
  * Dựa trên mảng permissions[] được cấp từ backend NestJS và JWT
  */
 export function hasPermission(
-  user: { permissions?: string[]; isAdmin?: boolean; role?: string } | null | undefined,
+  user: { permissions?: string[]; permissionsHash?: Record<string, boolean>; isAdmin?: boolean; role?: string } | null | undefined,
   permission: string
 ): boolean {
   if (!user) return false;
+
+  // 1. Kiểm tra nhanh O(1) qua bảng băm permissionsHash do Backend tính từ CSDL
+  if (user.permissionsHash && typeof user.permissionsHash === 'object') {
+    if (user.permissionsHash[permission] !== undefined) {
+      return Boolean(user.permissionsHash[permission]);
+    }
+    // Kiểm tra các biến thể CRUD chuẩn: create <-> add, update <-> edit, read <-> view
+    const permLower = permission.toLowerCase();
+    if (permLower.includes(':create')) {
+      const addVariant = permLower.replace(':create', ':add');
+      if (user.permissionsHash[addVariant] !== undefined) return Boolean(user.permissionsHash[addVariant]);
+    } else if (permLower.includes(':add')) {
+      const createVariant = permLower.replace(':add', ':create');
+      if (user.permissionsHash[createVariant] !== undefined) return Boolean(user.permissionsHash[createVariant]);
+    }
+    if (permLower.includes(':update')) {
+      const editVariant = permLower.replace(':update', ':edit');
+      if (user.permissionsHash[editVariant] !== undefined) return Boolean(user.permissionsHash[editVariant]);
+    } else if (permLower.includes(':edit')) {
+      const updateVariant = permLower.replace(':edit', ':update');
+      if (user.permissionsHash[updateVariant] !== undefined) return Boolean(user.permissionsHash[updateVariant]);
+    }
+  }
+
   if (user.isAdmin || user.role === 'admin' || user.role === 'quan_tri' || user.role === 'chu_tich' || user.role === 'president') {
     return true;
   }

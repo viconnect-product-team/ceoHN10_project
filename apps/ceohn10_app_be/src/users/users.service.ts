@@ -81,6 +81,303 @@ async function saveBase64AvatarDirectly(
   }
 }
 
+export interface UserRbacEvaluation {
+  permissions: string[];
+  permissionsHash: Record<string, boolean>;
+  allowedRoutes: string[];
+}
+
+export function generateCrudAliases(code: string, route?: string): string[] {
+  const aliases: string[] = [];
+  if (!code) return aliases;
+  const upper = code.trim().toUpperCase();
+
+  const parts = upper.split('_');
+  const prefix = parts.slice(0, -1).join('_');
+  const action = parts[parts.length - 1];
+
+  const prefixMap: Record<string, string> = {
+    MEM: 'members',
+    EVT: 'events',
+    MKT: 'marketplace',
+    OPP: 'opportunities',
+    FEE: 'finance',
+    INC: 'income',
+    EXP: 'expenses',
+    NWS: 'news',
+    DOC: 'documents',
+    VOTE: 'voting',
+    CHA: 'charity',
+    TRN: 'trainings',
+    COM: 'companies',
+    SEG: 'segments',
+    NOT: 'notifications',
+    NOTIF: 'notifications',
+    MEET: 'meetings',
+    TMPL: 'templates',
+    TPL: 'templates',
+    SET: 'settings',
+    PRM: 'permissions',
+    ACC: 'accounts',
+    DEP: 'departments',
+    DASH: 'dashboard',
+    AI: 'ai',
+    SPN: 'sponsors',
+    SRP: 'sponsor_report',
+    ANL: 'analytics',
+    FRP: 'finance_report',
+    EREG: 'event_registrations',
+    LKD: 'lucky_draw',
+    EVTO: 'events_overview',
+    ACT: 'activity',
+    PRK: 'perks',
+    NET: 'network',
+  };
+
+  const resource =
+    prefixMap[prefix] ||
+    (route ? route.replace(/^\//, '').replace(/\//g, ':').replace(/-/g, '_') : prefix.toLowerCase());
+
+  if (action === 'VIEW' || action === 'READ') {
+    aliases.push(`${prefix}_VIEW`, `${prefix}_READ`, `${resource}:view`, `${resource}:read`);
+  } else if (action === 'CREATE' || action === 'ADD') {
+    aliases.push(`${prefix}_CREATE`, `${prefix}_ADD`, `${resource}:create`, `${resource}:add`);
+  } else if (action === 'EDIT' || action === 'UPDATE') {
+    aliases.push(`${prefix}_UPDATE`, `${prefix}_EDIT`, `${resource}:update`, `${resource}:edit`);
+  } else if (action === 'DELETE' || action === 'DEL') {
+    aliases.push(`${prefix}_DELETE`, `${resource}:delete`);
+  } else if (action === 'EXPORT' || action === 'EXP') {
+    aliases.push(`${prefix}_EXPORT`, `${resource}:export`);
+  } else if (action === 'IMPORT' || action === 'IMP') {
+    aliases.push(`${prefix}_IMPORT`, `${resource}:import`);
+  } else if (action === 'APPROVE' || action === 'APP') {
+    aliases.push(`${prefix}_APPROVE`, `${resource}:approve`);
+  }
+
+  return Array.from(new Set(aliases));
+}
+
+export function computeUserRbacEvaluation(
+  role: string,
+  roles: string[] = [],
+  department: string = '',
+  isPresident: boolean = false,
+  isAdmin: boolean = false,
+  dynamicMatrix?: any,
+): UserRbacEvaluation {
+  const normRole = (role || '').toLowerCase().trim();
+  const rList = (roles || []).map((r) => r.toLowerCase().trim());
+  const dept = (department || '').toLowerCase().trim();
+  const allRoleKeys = Array.from(new Set([normRole, ...rList]));
+
+  const perms = new Set<string>([
+    'dashboard:view',
+    'ai:view',
+    'DASH_VIEW',
+    'AI_VIEW',
+    'profile:view',
+    'profile:manage_own',
+  ]);
+
+  const permissionsHash: Record<string, boolean> = {
+    '/': true,
+    '/ai-assistant': true,
+    'dashboard:view': true,
+    'ai:view': true,
+    'DASH_VIEW': true,
+    'AI_VIEW': true,
+    'profile:view': true,
+    'profile:manage_own': true,
+  };
+
+  const allowedRoutes = new Set<string>(['/', '/ai-assistant']);
+
+  // Map department sang committeeKey
+  let committeeKey = '';
+  if (dept.includes('sự kiện') || dept.includes('su_kien')) committeeKey = 'su_kien';
+  else if (dept.includes('đào tạo') || dept.includes('dao_tao') || dept.includes('học tập')) committeeKey = 'dao_tao';
+  else if (dept.includes('truyền thông') || dept.includes('truyen_thong')) committeeKey = 'truyen_thong';
+  else if (dept.includes('thành viên') || dept.includes('thanh_vien')) committeeKey = 'thanh_vien';
+  else if (dept.includes('xúc tiến') || dept.includes('xuc_tien') || dept.includes('thương mại')) committeeKey = 'xuc_tien';
+  else if (dept.includes('tài chính') || dept.includes('tai_chinh')) committeeKey = 'tai_chinh';
+  else if (dept.includes('thiện nguyện') || dept.includes('thien_nguyen')) committeeKey = 'thien_nguyen';
+  else if (dept.includes('điều hành') || dept.includes('dieu_hanh')) committeeKey = 'dieu_hanh';
+  else if (dept.includes('thư ký') || dept.includes('thu_ky')) committeeKey = 'thu_ky';
+
+  const isSuperAdmin =
+    normRole === 'quan_tri' ||
+    normRole === 'platform_admin' ||
+    normRole === 'superadmin' ||
+    normRole === 'adm';
+
+  const isEffectiveAdmin =
+    isAdmin ||
+    isSuperAdmin ||
+    normRole === 'admin' ||
+    normRole === 'chu_tich' ||
+    isPresident ||
+    rList.includes('admin') ||
+    rList.includes('quan_tri');
+
+  // Trích xuất cây ma trận từ app_settings
+  const categories =
+    dynamicMatrix?.categories ||
+    dynamicMatrix?.rows ||
+    (Array.isArray(dynamicMatrix) ? dynamicMatrix : null);
+
+  if (Array.isArray(categories) && categories.length > 0) {
+    for (const cat of categories) {
+      if (!cat?.features || !Array.isArray(cat.features)) continue;
+      for (const feat of cat.features) {
+        if (!feat) continue;
+        const featRoute = feat.route ? String(feat.route).split('?')[0].split('#')[0] : null;
+        const isFeatEnabled = feat.enabled !== false;
+
+        // 1. Nếu tính năng bị tắt trong CSDL (enabled: false):
+        // KHÓA CHO TOÀN BỘ VAI TRÒ (kể cả admin)
+        if (!isFeatEnabled) {
+          if (featRoute) {
+            permissionsHash[featRoute] = false;
+          }
+          if (feat.actions && Array.isArray(feat.actions)) {
+            for (const act of feat.actions) {
+              if (act?.code) {
+                permissionsHash[act.code] = false;
+                for (const alias of generateCrudAliases(act.code, featRoute || undefined)) {
+                  permissionsHash[alias] = false;
+                }
+              }
+              if (act?.id) permissionsHash[act.id] = false;
+            }
+          }
+          continue;
+        }
+
+        // 2. Tính năng được bật (enabled: true):
+        // Tìm thao tác VIEW để quyết định hiển thị Route trên Menu
+        const viewAction = (feat.actions || []).find((a: any) => {
+          const c = (a.code || '').toUpperCase();
+          const i = (a.id || '').toLowerCase();
+          return c.endsWith('_VIEW') || c.endsWith('_READ') || i.includes('view') || i.includes('read');
+        });
+
+        let canViewFeature = false;
+        if (viewAction) {
+          if (viewAction.enabled !== false) {
+            if (isSuperAdmin && viewAction.roles?.['quan_tri'] !== false) {
+              canViewFeature = true;
+            } else if (isEffectiveAdmin && viewAction.roles?.['admin'] !== false) {
+              canViewFeature = true;
+            } else {
+              canViewFeature =
+                allRoleKeys.some((k) => viewAction.roles?.[k] === true) ||
+                Boolean(committeeKey && viewAction.roles?.[committeeKey] === true);
+            }
+          }
+        } else {
+          // Nếu không có riêng view action, xem có bất kỳ thao tác nào được cấp quyền không
+          canViewFeature = (feat.actions || []).some((a: any) => {
+            if (a.enabled === false) return false;
+            if (isSuperAdmin && a.roles?.['quan_tri'] !== false) return true;
+            if (isEffectiveAdmin && a.roles?.['admin'] !== false) return true;
+            return (
+              allRoleKeys.some((k) => a.roles?.[k] === true) ||
+              Boolean(committeeKey && a.roles?.[committeeKey] === true)
+            );
+          });
+        }
+
+        // Bảo vệ cứu hộ khẩn cấp cho các phân hệ cấu hình quản trị
+        const isEmergencyAdminRoute =
+          featRoute &&
+          (featRoute.startsWith('/permissions') ||
+            featRoute.startsWith('/settings') ||
+            featRoute.startsWith('/accounts') ||
+            featRoute.startsWith('/departments'));
+
+        if (isEmergencyAdminRoute && (isSuperAdmin || isEffectiveAdmin)) {
+          canViewFeature = true;
+        }
+
+        if (featRoute) {
+          if (canViewFeature) {
+            allowedRoutes.add(featRoute);
+            permissionsHash[featRoute] = true;
+          } else {
+            permissionsHash[featRoute] = false;
+          }
+        }
+
+        // 3. Phân giải quyền cho từng action chi tiết (CRUD: VIEW, CREATE, UPDATE, DELETE)
+        if (feat.actions && Array.isArray(feat.actions)) {
+          for (const act of feat.actions) {
+            if (!act) continue;
+            const actCode = act.code ? String(act.code).toUpperCase() : '';
+            const actId = act.id ? String(act.id) : '';
+
+            if (act.enabled === false) {
+              if (actCode) {
+                permissionsHash[actCode] = false;
+                for (const alias of generateCrudAliases(actCode, featRoute || undefined)) {
+                  permissionsHash[alias] = false;
+                }
+              }
+              if (actId) permissionsHash[actId] = false;
+              continue;
+            }
+
+            let isActAllowed = false;
+            if (isSuperAdmin && act.roles?.['quan_tri'] !== false) {
+              isActAllowed = true;
+            } else if (isEffectiveAdmin && act.roles?.['admin'] !== false) {
+              isActAllowed = true;
+            } else {
+              isActAllowed =
+                allRoleKeys.some((k) => act.roles?.[k] === true) ||
+                Boolean(committeeKey && act.roles?.[committeeKey] === true);
+            }
+
+            if (isActAllowed) {
+              if (actCode) {
+                perms.add(actCode);
+                permissionsHash[actCode] = true;
+              }
+              if (actId) {
+                perms.add(actId);
+                permissionsHash[actId] = true;
+              }
+              for (const alias of generateCrudAliases(actCode, featRoute || undefined)) {
+                perms.add(alias);
+                permissionsHash[alias] = true;
+              }
+            } else {
+              if (actCode) {
+                permissionsHash[actCode] = false;
+                for (const alias of generateCrudAliases(actCode, featRoute || undefined)) {
+                  permissionsHash[alias] = false;
+                }
+              }
+              if (actId) permissionsHash[actId] = false;
+            }
+          }
+        }
+      }
+    }
+  } else {
+    // Fallback cơ bản khi chưa có ma trận trong DB
+    if (isEffectiveAdmin) {
+      perms.add('*');
+      perms.add('admin:full_access');
+    }
+  }
+
+  return {
+    permissions: Array.from(perms),
+    permissionsHash,
+    allowedRoutes: Array.from(allowedRoutes),
+  };
+}
+
 export function resolveUserPermissions(
   role: string,
   roles: string[] = [],
@@ -89,260 +386,14 @@ export function resolveUserPermissions(
   isAdmin: boolean = false,
   dynamicMatrix?: any,
 ): string[] {
-  const normRole = (role || '').toLowerCase().trim();
-  const rList = roles.map((r) => r.toLowerCase().trim());
-  const dept = (department || '').toLowerCase().trim();
-
-  // 1. Quản trị hệ thống, Admin, Chủ tịch -> Toàn quyền (Chỉ áp dụng khi không phải vai trò Học viên chuyên môn hoặc Học viên thường)
-  const isExplicitSpecialistOrMember =
-    normRole.startsWith('thanh_vien_ban_') ||
-    normRole === 'member' ||
-    normRole === 'hoi_vien' ||
-    normRole === 'hvt';
-
-  if (
-    !isExplicitSpecialistOrMember &&
-    (isAdmin ||
-      isPresident ||
-      normRole === 'admin' ||
-      normRole === 'quan_tri' ||
-      normRole === 'chu_tich' ||
-      normRole === 'president' ||
-      normRole === 'platform_admin' ||
-      rList.includes('admin') ||
-      rList.includes('quan_tri') ||
-      rList.includes('chu_tich'))
-  ) {
-    return [
-      '*',
-      'dashboard:view',
-      'members:view',
-      'members:manage',
-      'members:approve',
-      'members:delete',
-      'events:view',
-      'events:manage',
-      'events:checkin',
-      'events:export',
-      'marketplace:view',
-      'marketplace:manage',
-      'marketplace:approve',
-      'marketplace:delete',
-      'opportunities:view',
-      'opportunities:manage',
-      'finance:view',
-      'finance:manage',
-      'news:view',
-      'news:manage',
-      'documents:view',
-      'documents:manage',
-      'voting:view',
-      'voting:manage',
-      'settings:view',
-      'settings:manage',
-      'permissions:view',
-      'permissions:manage',
-      'system:manage',
-      'EVT_VIEW',
-      'EVT_ADD',
-      'EVT_EDIT',
-      'EVT_DELETE',
-      'CHK_SCAN',
-      'MEM_VIEW',
-      'MEM_ADD',
-      'MEM_EDIT',
-      'MEM_DELETE',
-      'MEM_APPROVE',
-      'MKT_VIEW',
-      'MKT_ADD',
-      'MKT_EDIT',
-      'MKT_DELETE',
-      'OPP_VIEW',
-      'OPP_ADD',
-      'OPP_EDIT',
-      'OPP_DELETE',
-      'FEE_VIEW',
-      'FEE_ADD',
-      'FEE_EDIT',
-      'FEE_DELETE',
-      'NWS_VIEW',
-      'NWS_ADD',
-      'NWS_EDIT',
-      'NWS_DELETE',
-      'DOC_VIEW',
-      'DOC_ADD',
-      'DOC_EDIT',
-      'DOC_DELETE',
-      'VOTE_VIEW',
-      'VOTE_ADD',
-      'VOTE_MANAGE',
-      'CHA_VIEW',
-      'CHA_ADD',
-      'CHA_MANAGE',
-    ];
-  }
-
-  // 2. Base member permissions for all authenticated accounts
-  const perms = new Set<string>([
-    'dashboard:view',
-    'members:view',
-    'events:view',
-    'events:register',
-    'marketplace:view',
-    'marketplace:create_own',
-    'opportunities:view',
-    'opportunities:create_own',
-    'news:view',
-    'voting:view',
-    'voting:participate',
-    'documents:view',
-    'meetings:view',
-    'meetings:create',
-    'profile:view',
-    'profile:manage_own',
-    'EVT_VIEW',
-    'MKT_VIEW',
-    'MKT_ADD',
-    'OPP_VIEW',
-    'OPP_ADD',
-    'MEM_VIEW',
-    'NET_CONNECT',
-  ]);
-
-  // 3. Tổng thư ký / Ban Thư ký
-  if (
-    normRole === 'tong_thu_ky' ||
-    normRole === 'ban_thu_ky' ||
-    dept.includes('thư ký')
-  ) {
-    [
-      'events:manage',
-      'events:checkin',
-      'news:manage',
-      'documents:manage',
-      'voting:manage',
-      'EVT_ADD',
-      'EVT_EDIT',
-      'CHK_SCAN',
-      'NWS_ADD',
-      'NWS_EDIT',
-      'DOC_ADD',
-      'DOC_EDIT',
-      'VOTE_ADD',
-    ].forEach((p) => perms.add(p));
-  }
-
-  // 4. Ban Truyền Thông (BTT)
-  if (normRole.includes('truyen_thong') || dept.includes('truyền thông')) {
-    [
-      'events:checkin',
-      'news:manage',
-      'media:manage',
-      'CHK_SCAN',
-      'NWS_ADD',
-      'NWS_EDIT',
-      'EVT_ADD',
-    ].forEach((p) => perms.add(p));
-  }
-
-  // 5. Ban Thành viên (BTV)
-  if (normRole.includes('thanh_vien') || dept.includes('thành viên')) {
-    [
-      'members:manage',
-      'members:approve',
-      'MEM_ADD',
-      'MEM_EDIT',
-      'MEM_APPROVE',
-    ].forEach((p) => perms.add(p));
-  }
-
-  // 6. Ban Xúc tiến thương mại (BXT)
-  if (normRole.includes('xuc_tien') || dept.includes('xúc tiến')) {
-    [
-      'marketplace:manage',
-      'opportunities:manage',
-      'MKT_EDIT',
-      'MKT_DELETE',
-      'OPP_EDIT',
-      'OPP_DELETE',
-    ].forEach((p) => perms.add(p));
-  }
-
-  // 7. Ban Tài chính (BTC)
-  if (normRole.includes('tai_chinh') || dept.includes('tài chính')) {
-    [
-      'finance:view',
-      'finance:manage',
-      'FEE_VIEW',
-      'FEE_ADD',
-      'FEE_EDIT',
-    ].forEach((p) => perms.add(p));
-  }
-
-  // 8. Ban Thiện nguyện (BTN)
-  if (normRole.includes('thien_nguyen') || dept.includes('thiện nguyện')) {
-    ['charity:manage', 'CHA_VIEW', 'CHA_ADD', 'CHA_MANAGE'].forEach((p) =>
-      perms.add(p),
-    );
-  }
-
-  // 9. Ban Điều Hành (BDH)
-  if (normRole === 'ban_dieu_hanh' || dept.includes('điều hành')) {
-    [
-      'events:manage',
-      'events:checkin',
-      'members:manage',
-      'marketplace:manage',
-      'opportunities:manage',
-      'news:manage',
-      'documents:manage',
-      'finance:view',
-      'CHK_SCAN',
-      'MEM_EDIT',
-      'EVT_ADD',
-      'EVT_EDIT',
-      'MKT_EDIT',
-      'OPP_EDIT',
-      'NWS_ADD',
-    ].forEach((p) => perms.add(p));
-  }
-
-  // 10. Dynamic RBAC Matrix from app_settings (Đồng bộ phân quyền thời gian thực)
-  if (dynamicMatrix) {
-    const categories =
-      dynamicMatrix.categories ||
-      dynamicMatrix.rows ||
-      (Array.isArray(dynamicMatrix) ? dynamicMatrix : []);
-    if (Array.isArray(categories)) {
-      const allRoleKeys = [normRole, ...rList];
-      for (const cat of categories) {
-        if (!cat?.features || !Array.isArray(cat.features)) continue;
-        for (const feat of cat.features) {
-          if (feat.route) {
-            const hasAnyAction = (feat.actions || []).some((a: any) =>
-              allRoleKeys.some((k) => a?.roles?.[k] === true),
-            );
-            if (hasAnyAction) {
-              perms.add(feat.route);
-            }
-          }
-          if (feat.actions && Array.isArray(feat.actions)) {
-            for (const act of feat.actions) {
-              const isAllowed = allRoleKeys.some(
-                (k) => act?.roles?.[k] === true,
-              );
-              if (isAllowed) {
-                if (act.code) perms.add(act.code);
-                if (act.id) perms.add(act.id);
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-
-  return Array.from(perms);
+  return computeUserRbacEvaluation(
+    role,
+    roles,
+    department,
+    isPresident,
+    isAdmin,
+    dynamicMatrix,
+  ).permissions;
 }
 
 @Injectable()
@@ -648,7 +699,6 @@ export class UsersService implements OnModuleInit {
     }
 
     if (
-      id === 'mock-admin-id' ||
       id === '00000000-0000-0000-0000-000000000000' ||
       id === '00000000-0000-4000-8000-000000000002'
     ) {
@@ -777,7 +827,6 @@ export class UsersService implements OnModuleInit {
 
     // 1. Root admin whitelist by ID / Fallback Admin UUID
     if (
-      userId === 'mock-admin-id' ||
       userId === '00000000-0000-0000-0000-000000000000' ||
       userId === '00000000-0000-4000-8000-000000000001' ||
       userId === '00000000-0000-4000-8000-000000000002'
@@ -1242,7 +1291,27 @@ export class UsersService implements OnModuleInit {
         isDepartmentLeader:
           !(primaryRole.startsWith('thanh_vien_ban_') || primaryRole === 'member' || primaryRole === 'hoi_vien') &&
           primaryRole.startsWith('truong_ban_'),
-        permissions: resolveUserPermissions(
+        permissions: (() => {
+          const evalRes = computeUserRbacEvaluation(
+            primaryRole,
+            (primaryRole.startsWith('thanh_vien_ban_') || primaryRole === 'member' || primaryRole === 'hoi_vien')
+              ? roleList.filter((r) => r !== 'admin' && r !== 'platform_admin' && r !== 'quan_tri')
+              : roleList,
+            normalizedDept,
+            !(primaryRole.startsWith('thanh_vien_ban_') || primaryRole === 'member' || primaryRole === 'hoi_vien') &&
+            (primaryRole === 'chu_tich' || roleList.includes('chu_tich')),
+            !(primaryRole.startsWith('thanh_vien_ban_') || primaryRole === 'member' || primaryRole === 'hoi_vien') &&
+            (primaryRole === 'admin' ||
+              primaryRole === 'chu_tich' ||
+              primaryRole === 'quan_tri' ||
+              primaryRole === 'platform_admin' ||
+              roleList.includes('admin') ||
+              roleList.includes('platform_admin')),
+            dynamicMatrix,
+          );
+          return evalRes.permissions;
+        })(),
+        permissionsHash: computeUserRbacEvaluation(
           primaryRole,
           (primaryRole.startsWith('thanh_vien_ban_') || primaryRole === 'member' || primaryRole === 'hoi_vien')
             ? roleList.filter((r) => r !== 'admin' && r !== 'platform_admin' && r !== 'quan_tri')
@@ -1258,7 +1327,24 @@ export class UsersService implements OnModuleInit {
             roleList.includes('admin') ||
             roleList.includes('platform_admin')),
           dynamicMatrix,
-        ),
+        ).permissionsHash,
+        allowedRoutes: computeUserRbacEvaluation(
+          primaryRole,
+          (primaryRole.startsWith('thanh_vien_ban_') || primaryRole === 'member' || primaryRole === 'hoi_vien')
+            ? roleList.filter((r) => r !== 'admin' && r !== 'platform_admin' && r !== 'quan_tri')
+            : roleList,
+          normalizedDept,
+          !(primaryRole.startsWith('thanh_vien_ban_') || primaryRole === 'member' || primaryRole === 'hoi_vien') &&
+          (primaryRole === 'chu_tich' || roleList.includes('chu_tich')),
+          !(primaryRole.startsWith('thanh_vien_ban_') || primaryRole === 'member' || primaryRole === 'hoi_vien') &&
+          (primaryRole === 'admin' ||
+            primaryRole === 'chu_tich' ||
+            primaryRole === 'quan_tri' ||
+            primaryRole === 'platform_admin' ||
+            roleList.includes('admin') ||
+            roleList.includes('platform_admin')),
+          dynamicMatrix,
+        ).allowedRoutes,
         permissionMatrix: dynamicMatrix,
       };
     } catch (err: any) {
@@ -1290,6 +1376,8 @@ export class UsersService implements OnModuleInit {
         roles: ['platform_admin', 'admin'],
         role: 'platform_admin',
         permissions: ['*'],
+        permissionsHash: { '/': true, '/ai-assistant': true, '/permissions': true, '/settings': true, '/accounts': true },
+        allowedRoutes: ['/', '/ai-assistant', '/permissions', '/settings', '/accounts'],
       };
     }
   }
@@ -2348,7 +2436,6 @@ export class UsersService implements OnModuleInit {
     if (
       cleanTargetId === '00000000-0000-0000-0000-000000000000' ||
       cleanTargetId === '00000000-0000-4000-8000-000000000002' ||
-      cleanTargetId === 'mock-admin-id' ||
       cleanTargetId.toUpperCase() === 'ADMIN-001'
     ) {
       throw new ForbiddenException('Không thể xóa tài khoản quản trị viên gốc');

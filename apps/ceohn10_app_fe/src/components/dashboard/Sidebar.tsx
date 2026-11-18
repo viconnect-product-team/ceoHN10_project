@@ -554,9 +554,9 @@ export function Sidebar({
   const isAllowed = useCallback(
     (route?: string): boolean => {
       if (!route) return true;
-      return isRouteAllowedByMatrix(route, currentRoleKey);
+      return isRouteAllowedByMatrix(route, currentRoleKey, user);
     },
-    [currentRoleKey, matrixRevision]
+    [currentRoleKey, matrixRevision, user]
   );
 
   // Scoped permissions according to the SRS RBAC matrix:

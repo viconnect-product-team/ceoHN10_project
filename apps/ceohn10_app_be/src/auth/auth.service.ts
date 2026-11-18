@@ -141,6 +141,8 @@ export class AuthService implements OnModuleInit {
       isGeneralSecretary: Boolean(details?.isGeneralSecretary),
       isDepartmentLeader: Boolean(details?.isDepartmentLeader),
       permissions,
+      permissionsHash: details?.permissionsHash || {},
+      allowedRoutes: details?.allowedRoutes || [],
     };
     const isSystemAdmin =
       user.email === 'admin@viconnect.vn' ||
@@ -179,6 +181,8 @@ export class AuthService implements OnModuleInit {
         isGeneralSecretary: Boolean(details?.isGeneralSecretary),
         isDepartmentLeader: Boolean(details?.isDepartmentLeader),
         permissions,
+        permissionsHash: details?.permissionsHash || {},
+        allowedRoutes: details?.allowedRoutes || [],
       },
     };
   }
