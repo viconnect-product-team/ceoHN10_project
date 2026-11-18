@@ -47,7 +47,6 @@ export class MembersService {
     if (!userId) return false;
     const cleanId = String(userId).trim().toLowerCase();
     if (
-      cleanId === 'mock-admin-id' ||
       cleanId === '00000000-0000-0000-0000-000000000000' ||
       cleanId === '00000000-0000-4000-8000-000000000002' ||
       cleanId === 'admin@connect.vn' ||
@@ -4256,7 +4255,6 @@ Trân trọng cảm ơn Anh/Chị!`;
     if (
       userId === '00000000-0000-4000-8000-000000000002' ||
       userId === '00000000-0000-4000-8000-000000000001' ||
-      userId === 'mock-admin-id' ||
       userId === '00000000-0000-0000-0000-000000000000'
     ) {
       return true;

@@ -118,7 +118,7 @@ export const requireSupabaseAuth = createMiddleware({ type: "function" }).server
       throw new Error("Unauthorized: Invalid local token");
     }
 
-    const mockUser = {
+    const authenticatedUser = {
       id: decoded.sub,
       email: decoded.username || decoded.email || "",
       role: "authenticated",
@@ -133,7 +133,7 @@ export const requireSupabaseAuth = createMiddleware({ type: "function" }).server
         supabase,
         userId: decoded.sub,
         userRole: "authenticated",
-        user: mockUser,
+        user: authenticatedUser,
         token,
       },
     });

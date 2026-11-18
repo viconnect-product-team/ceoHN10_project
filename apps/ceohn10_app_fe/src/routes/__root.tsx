@@ -45,7 +45,6 @@ function makeQueryClient() {
   });
 }
 import { Toaster } from "@/components/ui/sonner";
-import { MockModeBanner } from "@/components/MockModeBanner";
 import { VoiceNavAssistant } from "@/components/ai/VoiceNavAssistant";
 import { ViOneVoiceAssistant } from "@/components/ai/ViOneVoiceAssistant";
 import { IosInstallPrompt } from "@/components/member/IosInstallPrompt";
@@ -492,7 +491,6 @@ function RootComponent() {
             <div className="luxury-glow-1" />
             <div className="luxury-glow-2" />
           </div>
-          <MockModeBanner />
           <AuthProvider>
             <GlobalRealtimeNotifications />
             <GlobalVoiceNavAssistant />

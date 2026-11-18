@@ -76,135 +76,6 @@ export interface TrainingItem {
   created_at?: string;
 }
 
-const SAMPLE_TRAININGS: TrainingItem[] = [
-  {
-    id: "train_001",
-    title: "Tái Cấu Trúc Vận Hành Doanh Nghiệp & Tối Ưu Dòng Tiền Thời Kỳ Số",
-    description: "Chuyên đề chia sẻ thực chiến về phương pháp tinh gọn bộ máy nhân sự, kiểm soát dòng tiền và xây dựng kịch bản tài chính ứng phó biến động thị trường.",
-    instructor_name: "TS. Nguyễn Trọng Hải",
-    instructor_title: "Chuyên gia Cố vấn Chiến lược & Tái cấu trúc",
-    instructor_avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
-    category: "Chiến lược & Quản trị",
-    format: "online",
-    status: "ongoing",
-    start_time: new Date(Date.now() - 30 * 60 * 1000).toISOString(),
-    end_time: new Date(Date.now() + 90 * 60 * 1000).toISOString(),
-    location: "Phòng họp trực tuyến bảo mật Jitsi Meet",
-    room_id: "CEOHN10_TAICAUTRUC",
-    room_url: "https://meet.jit.si/CEOHN10_TAICAUTRUC",
-    attendee_count: 54,
-    max_attendees: 100,
-    materials: [
-      {
-        id: "mat_1",
-        title: "Slide bài giảng: 12 Bước Tái cấu trúc doanh nghiệp SME",
-        type: "pdf",
-        size: "4.8 MB",
-        url: "#",
-      },
-      {
-        id: "mat_2",
-        title: "Bảng tính Excel: Mô hình dự báo dòng tiền 12 tháng",
-        type: "excel",
-        size: "1.2 MB",
-        url: "#",
-      },
-    ],
-  },
-  {
-    id: "train_002",
-    title: "Ứng Dụng AI & Tự Động Hóa Dành Riêng Cho Lãnh Đạo Doanh Nghiệp CEO HN10",
-    description: "Hướng dẫn thực chiến tích hợp AI (Gemini, Claude, ChatGPT) vào tối ưu quy trình báo cáo, soạn thảo hợp đồng thương mại và chăm sóc khách hàng tự động.",
-    instructor_name: "Ban Đào Tạo & Chuyển Đổi Số",
-    instructor_title: "Hội đồng Chuyên gia Công nghệ CEO HN10",
-    category: "Chuyển đổi số & AI",
-    format: "online",
-    status: "upcoming",
-    start_time: new Date(Date.now() + 2 * 86400 * 1000 + 3600 * 1000).toISOString(),
-    end_time: new Date(Date.now() + 2 * 86400 * 1000 + 4 * 3600 * 1000).toISOString(),
-    location: "Phòng họp trực tuyến bảo mật Jitsi Meet",
-    room_id: "CEOHN10_AI_WORKSHOP",
-    room_url: "https://meet.jit.si/CEOHN10_AI_WORKSHOP",
-    attendee_count: 78,
-    max_attendees: 150,
-    materials: [
-      {
-        id: "mat_3",
-        title: "Bộ Prompt 100+ câu lệnh chuyên sâu cho CEO",
-        type: "pdf",
-        size: "3.2 MB",
-        url: "#",
-      },
-      {
-        id: "mat_4",
-        title: "Sổ tay kiến trúc tự động hóa quy trình nghiệp vụ",
-        type: "slides",
-        size: "6.5 MB",
-        url: "#",
-      },
-    ],
-  },
-  {
-    id: "train_003",
-    title: "Pháp Lý Hợp Đồng Thương Mại & Phòng Ngừa Rủi Ro Thuế Năm 2026",
-    description: "Cập nhật các quy định mới nhất về hóa đơn điện tử, chính sách thuế thu nhập doanh nghiệp và các điều khoản vàng bảo vệ chủ doanh nghiệp khi ký kết hợp tác.",
-    instructor_name: "Luật sư Trần Đình Hùng",
-    instructor_title: "Trọng tài viên VIAC, Luật sư cao cấp",
-    instructor_avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80",
-    category: "Pháp lý & Thuế",
-    format: "online",
-    status: "upcoming",
-    start_time: new Date(Date.now() + 5 * 86400 * 1000).toISOString(),
-    end_time: new Date(Date.now() + 5 * 86400 * 1000 + 2 * 3600 * 1000).toISOString(),
-    location: "Phòng họp trực tuyến bảo mật Jitsi Meet",
-    room_id: "CEOHN10_PHAPLY_THUE",
-    room_url: "https://meet.jit.si/CEOHN10_PHAPLY_THUE",
-    attendee_count: 62,
-    max_attendees: 120,
-    materials: [
-      {
-        id: "mat_5",
-        title: "Mẫu hợp đồng hợp tác kinh doanh đa phương (CEO HN10)",
-        type: "doc",
-        size: "820 KB",
-        url: "#",
-      },
-      {
-        id: "mat_6",
-        title: "Checklist 25 điểm rủi ro cần kiểm tra trước khi ký hợp đồng",
-        type: "pdf",
-        size: "2.1 MB",
-        url: "#",
-      },
-    ],
-  },
-  {
-    id: "train_004",
-    title: "Nghệ Thuật Đàm Phán & Chốt Deal Hợp Đồng Giá Trị Lớn (High-Ticket Sales)",
-    description: "Bộ quy tắc đàm phán dựa trên tâm lý lãnh đạo, kỹ thuật neo giá trị và xây dựng mối quan hệ đối tác chiến lược bền vững.",
-    instructor_name: "ThS. Lê Hoàng Long",
-    instructor_title: "Chuyên gia Đào tạo Bán hàng B2B",
-    category: "Bán hàng & B2B",
-    format: "offline",
-    status: "completed",
-    start_time: new Date(Date.now() - 7 * 86400 * 1000).toISOString(),
-    end_time: new Date(Date.now() - 7 * 86400 * 1000 + 3 * 3600 * 1000).toISOString(),
-    location: "Hội trường lớn CLB CEO HN10 - Tầng 8, Tháp Doanh Nhân, Hà Nội",
-    room_id: "CEOHN10_SALES_PRO",
-    attendee_count: 95,
-    max_attendees: 100,
-    materials: [
-      {
-        id: "mat_7",
-        title: "Tài liệu tổng kết: Chiến lược chốt Deal B2B thực chiến",
-        type: "pdf",
-        size: "5.4 MB",
-        url: "#",
-      },
-    ],
-  },
-];
-
 const CATEGORIES = [
   "Tất cả",
   "Chiến lược & Quản trị",
@@ -234,21 +105,18 @@ export function AssociationTrainingScreen() {
   const fetchTrainings = async () => {
     setLoading(true);
     try {
-      const res = await fetchNestApi<any>("/trainings").catch(() => null);
+      const res = await fetchNestApi<any>("/trainings");
       let list: TrainingItem[] = [];
       if (Array.isArray(res)) {
         list = res;
       } else if (res && Array.isArray(res.items)) {
         list = res.items;
       }
-
-      if (list.length > 0) {
-        setTrainings(list);
-      } else {
-        setTrainings(SAMPLE_TRAININGS);
-      }
-    } catch {
-      setTrainings(SAMPLE_TRAININGS);
+      setTrainings(list);
+    } catch (err: any) {
+      console.error("[Trainings] Lỗi tải dữ liệu khóa đào tạo:", err);
+      toast.error(err?.message || "Không thể kết nối đến cơ sở dữ liệu khóa đào tạo");
+      setTrainings([]);
     } finally {
       setLoading(false);
     }
