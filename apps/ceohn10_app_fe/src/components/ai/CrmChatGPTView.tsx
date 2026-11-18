@@ -676,7 +676,7 @@ export function CrmChatGPTView() {
             commandText: messageText,
             fileName: currentAttached?.fileName,
             recipients: currentAttached?.recipients || [],
-            extractedSummary: currentAttached?.extractedSummary,
+            extractedSummary: currentAttached?.extractedSummary || currentAttached?.summary || "",
           }),
         });
 
