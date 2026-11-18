@@ -82,7 +82,7 @@ export class KnowledgeBaseService {
         sizeBytes: 26191,
         summary: 'Lược đồ CSDL chi tiết cho toàn bộ các bảng trong ceohn10_project, ràng buộc toàn vẹn, chỉ mục tối ưu và quy chuẩn STRICT NO-MOCK.',
         keyTopics: [
-          'Bảng cốt lõi: vione_users, members, companies, user_roles',
+          'Bảng cốt lõi: ceohn10_users, members, companies, user_roles',
           'Bảng sự kiện: events, event_registrations, lucky_draw_participants',
           'Bảng đào tạo: trainings, training_attendees',
           'Bảng tài chính 2 túi quỹ: invoices, transactions, expenses, member_dues, sponsors',
@@ -141,7 +141,7 @@ Bạn đã được nạp đầy đủ và nắm vững 100% các tài liệu ng
 - Database Server duy nhất: 113.20.107.184:6432 (Database: ceohn10_project, user: app1).
 - Nguyên tắc bất di bất dịch: TUYỆT ĐỐI KHÔNG HARDCODE MOCK DATA, mọi thao tác lưu/đọc đều từ PostgreSQL này.
 - Các bảng CSDL cốt lõi:
-  * \`public.vione_users\`: Tài khoản người dùng, email, mật khẩu băm, role.
+  * \`public.ceohn10_users\`: Tài khoản người dùng, email, mật khẩu băm, role.
   * \`public.members\`: Hồ sơ Học viên doanh nhân, mã HV (code), chức vụ, doanh nghiệp, ban bệ, tình trạng hội phí.
   * \`public.events\`: Sự kiện, ngày giờ, địa điểm, kinh phí, loại quỹ (fund_type: general/csr), số vé.
   * \`public.event_registrations\`: Đăng ký sự kiện, mã vé, mã lucky draw, trạng thái điểm danh.

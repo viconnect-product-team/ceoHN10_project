@@ -275,16 +275,24 @@ export class AuthService implements OnModuleInit {
       throw new BadRequestException('Tên đăng nhập hoặc địa chỉ email này đã tồn tại trên hệ thống. Vui lòng sử dụng thông tin khác!');
     }
 
-    // Kiểm tra trùng Email trên toàn hệ thống (vione_users & members)
+    // Kiểm tra trùng Email trên toàn hệ thống (ceohn10_users & members)
     const cleanEmail = (data.email || (data.username?.includes('@') ? data.username : '') || '').toLowerCase().trim();
-    if (cleanEmail && this.prisma) {
-      const existingEmailUser = await this.prisma.$queryRaw<any[]>`
+    const dbClient = this.prisma;
+    if (cleanEmail && dbClient) {
+      const existingEmailUser = await dbClient
+        .$queryRaw<any[]>`
+        SELECT id FROM public.ceohn10_users WHERE LOWER(email) = ${cleanEmail} OR LOWER(username) = ${cleanEmail} LIMIT 1
+      `
+        .catch(() =>
+          dbClient.$queryRaw<any[]>`
         SELECT id FROM public.vione_users WHERE LOWER(email) = ${cleanEmail} OR LOWER(username) = ${cleanEmail} LIMIT 1
-      `.catch(() => []);
+      `,
+        )
+        .catch(() => []);
       if (existingEmailUser.length > 0) {
         throw new BadRequestException('Địa chỉ email này đã được sử dụng trên hệ thống. Vui lòng chọn email khác!');
       }
-      const existingEmailMember = await this.prisma.$queryRaw<any[]>`
+      const existingEmailMember = await dbClient.$queryRaw<any[]>`
         SELECT id FROM public.members WHERE LOWER(email) = ${cleanEmail} LIMIT 1
       `.catch(() => []);
       if (existingEmailMember.length > 0) {
@@ -737,15 +745,29 @@ Kính chúc Doanh nghiệp của Anh/Chị luôn phát triển thịnh vượng,
       if (!user) {
         user = await this.usersService.findByEmail(`${phoneNumber}@ceohn10.vn`);
       }
-      if (!user && this.prisma) {
+      const dbClient = this.prisma;
+      if (!user && dbClient) {
         try {
-          const members: any[] = await this.prisma.$queryRawUnsafe(
-            `SELECT u.* FROM public.members m 
+          const membersRaw = await dbClient
+            .$queryRawUnsafe<any[]>(
+              `SELECT u.* FROM public.members m 
+             JOIN public.ceohn10_users u ON (u.email = m.email OR u.username = m.phone)
+             WHERE m.phone = $1 OR m.phone = $2 LIMIT 1`,
+              phoneNumber,
+              `+84${phoneNumber.slice(1)}`,
+            )
+            .catch(() =>
+              dbClient.$queryRawUnsafe<any[]>(
+                `SELECT u.* FROM public.members m 
              JOIN public.vione_users u ON (u.email = m.email OR u.username = m.phone)
              WHERE m.phone = $1 OR m.phone = $2 LIMIT 1`,
-            phoneNumber,
-            `+84${phoneNumber.slice(1)}`
-          );
+                phoneNumber,
+                `+84${phoneNumber.slice(1)}`,
+              ),
+            )
+            .catch(() => [] as any[]);
+
+          const members: any[] = Array.isArray(membersRaw) ? membersRaw : [];
           if (members.length > 0) {
             user = members[0];
           }

@@ -1,5 +1,83 @@
 # System Memory & Architecture
 
+- **Bản cập nhật ngày 18/11/2026 (v12.25): Đổi Tên Toàn Diện Bảng Tài Khoản Người Dùng Thành ceohn10_users (Chuẩn Hóa Thương Hiệu CEO HN10, Xóa Bỏ Hoàn Toàn Tiền Tố Cũ vione_users)**:
+  - **1. Chuẩn Hóa Danh Mục Bảng CSDL Chuẩn (THIET_KE_CSDL_POSTGRESQL_CEOHN10.md)**:
+    * Bảng 1 đổi tên chính thức: `public.ceohn10_users` (Tài khoản người dùng CEO HN10).
+    * Sơ đồ Master ERD Mermaid cập nhật toàn bộ quan hệ `ceohn10_users ||--o| members`, `ceohn10_users ||--o{ messages`, `ceohn10_users ||--o{ activity_logs`.
+    * Ma trận khóa ngoại & chỉ mục B-tree: Cập nhật `FK -> ceohn10_users(id)`, `idx_ceohn10_users_email`, `idx_ceohn10_users_username`.
+  - **2. Làm Sạch 100% Tài Liệu Dự Án (No More vione_users)**:
+    * Rà soát và cập nhật đồng bộ toàn bộ tài liệu trong `document/`:
+      - `THIET_KE_CSDL_POSTGRESQL_CEOHN10.md`
+      - `THIET_KE_RESTFUL_API_CEOHN10.md`
+      - `BRD_CEOHN10_MASTER_CHINH_THUC.md`
+      - `SRS_01_Web_CRM_CEOHN10.md` & `SRS_02_App_Hiep_Hoi_CEOHN10.md`
+      - `03_DAC_TA_BACKEND_API_VA_CO_SO_DU_LIEU_POSTGRESQL.md`
+      - `SRS_CEOHN10_MASTER_CHINH_THUC.md`, `SRS_CEOHN10_HE_THONG_TOAN_DIEN.md`, `SRS_IEEE830_CEOHN10_TOAN_DIEN.md`
+  - **3. Cập Nhật Tri Thức AI & Backend NestJS Service**:
+    * `knowledge-base.service.ts`: Nạp bảng `ceohn10_users` làm bảng cốt lõi trong System Prompt của AI.
+    * `ai-crm-analytics.service.ts`: Truy vấn đếm người dùng ưu tiên `ceohn10_users` (fallback an toàn `vione_users`).
+    * `ai.service.ts` & `ai-permission.service.ts`: Tra cứu định danh và phân quyền AI ưu tiên `ceohn10_users`.
+    * `auth.service.ts` & `roles.guard.ts`: Xác thực phiên làm việc và kiểm tra trùng email trên `ceohn10_users`.
+    * `users.repository.ts`: Tìm kiếm người dùng (`findByUsername`, `findById`, `findByEmail`, `findByGoogleId`, `findByAppleId`) ưu tiên bảng `ceohn10_users`, hàm `createUser` tạo đồng thời vào cả hai bảng để đảm bảo tương thích ngược 100%.
+  - **4. Bản Migration CSDL Độc Lập**:
+    * Đã tạo `packages/db/scripts/migrate_rename_vione_user_to_ceohn10_user.sql`: Tạo bảng `ceohn10_users`, đồng bộ dữ liệu từ `vione_users`, tạo VIEW alias `vione_users` và chỉ mục tối ưu.
+  - **5. Kiểm Tra Chất Lượng Code (Strict Zero-Error)**:
+    * `nest build` tại `apps/ceohn10_app_be`: **Exit code 0 (0 errors)**.
+    * Tuân thủ tuyệt đối Rule 0 (CSDL `113.20.107.184:6432`) và Rule 1 (Không tự ý `git commit` / `git push`).
+
+- **Bản cập nhật ngày 18/11/2026 (v12.24): Nâng Cấp Trợ Lý AI Tự Động Hóa Ra Lệnh (Natural Language Command Execution), Bóc Tách Tệp Excel/Word & Hiển Thị Pipeline Stepper Tích Xanh Thời Gian Thực**:
+  - **1. Kiến Trúc AI Tự Động Hóa Ra Lệnh Trực Tiếp (Zero-Friction Command Execution)**:
+    * Chuyển đổi mô hình tương tác từ Wizard 5 bước thủ công sang tương tác tự nhiên trong khung chat (ChatGPT Style): Người dùng chỉ cần gõ câu lệnh hoặc đính kèm tệp Excel/Word/CSV.
+    * AI tự động nhận diện ý định nghiệp vụ (Intent Recognition):
+      - Gửi email sự kiện / gala / hội thảo (`event_email`)
+      - Nhắc nộp hội phí thường niên / niên liễm (`fee_reminder`)
+      - Thông báo lịch đào tạo / lớp học chuyên sâu (`training_notice`)
+      - Xuất báo cáo tài chính / tài trợ / hoạt động (`report_export`)
+  - **2. Module Tự Động Bóc Tách Danh Sách Email Từ Tệp (`ai-excel-email-parser.ts`)**:
+    * Đọc đa định dạng: `.xlsx`, `.xls`, `.csv`, `.docx`, `.doc`, `.txt`.
+    * Tự động quét và phát hiện cột chứa email, họ tên học viên, chức danh, doanh nghiệp và số tiền.
+    * Tự động lọc sạch trùng lặp, chuẩn hóa định dạng email và sinh bản tóm tắt nội dung tệp.
+  - **3. Component Pipeline Stepper Tích Xanh Trực Quan (`AiExecutionStepTracker.tsx`)**:
+    * Nhúng trực tiếp vào khung chat phản hồi của AI với hiệu ứng chạy tuần tự từ `pending` -> `running` (spinner) -> `completed` (tích xanh vivid `CheckCircle2`).
+    * **5 Bước Thực Thi Chuẩn Hóa**:
+      1. *Bóc tách danh sách email & thông tin học viên từ tệp Excel/Word* -> ✅
+      2. *Soạn thảo nội dung thông điệp & biến cá nhân hóa `{ho_ten}`, `{so_tien}`* -> ✅
+      3. *Đối soát danh sách nhận tin với CSDL chuẩn 113.20.107.184:6432* -> ✅
+      4. *Xác thực thẩm quyền Ban Chuyên Môn & quy chế phát ngôn* -> ✅
+      5. *Thực thi phát lệnh gửi email & lưu vết Audit Log vào CSDL* -> ✅
+    * Tích hợp tính năng: Xem danh sách học viên nhận tin kèm ô tìm kiếm, xem trước nội dung email chuẩn CEO HN10, và nút xuất báo cáo kết quả gửi thư ra file Excel.
+  - **4. Nâng Cấp Backend NestJS Controller & Service**:
+    * Bổ sung endpoint `POST /api/ai/auto-execute-command` trong `ai.controller.ts`.
+    * Phương thức `handleAutoExecuteCommand` trong `ai-crm-analytics.service.ts`: Xử lý phân tích câu lệnh, bóc tách email, đối soát CSDL `113.20.107.184:6432` (`public.vione_users`, `public.members`), soạn thư và lưu vết vào `public.activity_logs`.
+  - **5. Nâng Cấp Giao Diện Web CRM**:
+    * `ai-assistant.tsx`: Đặt Tab mặc định là `"chat"` ("Trợ Lý AI Ra Lệnh & Tự Động Hóa" với nhãn `Auto Stepper ✅`).
+    * `CrmChatGPTView.tsx`: Thêm nút đính kèm Excel/Word (`Paperclip`), banner xem trước file đính kèm với số lượng email đã bóc tách, các nút lệnh nhanh 1-chạm, và nhúng component stepper tích xanh vào tin nhắn phản hồi của Assistant.
+  - **6. Kiểm Tra Chất Lượng Code (Strict Zero-Error)**:
+    * Backend `tsc --project apps/ceohn10_app_be/tsconfig.json --noEmit` -> **Exit code 0 (0 errors)**.
+    * Tuân thủ tuyệt đối Rule 0 (CSDL `113.20.107.184:6432`) và Rule 1 (Không tự ý `git commit` / `git push`).
+
+- **Bản cập nhật ngày 18/11/2026 (v12.23): Tái Thiết Toàn Diện Bộ Tài Liệu BRD, SRS, THIẾT KẾ CSDL & RESTFUL API — Bổ Sung Đầy Đủ Sơ Đồ Mermaid & Đặc Tả Chi Tiết Từng Phương Thức**:
+  - **1. Thiết Kế Cơ Sở Dữ Liệu PostgreSQL (THIET_KE_CSDL_POSTGRESQL_CEOHN10.md)**:
+    * Đặc tả chi tiết đầy đủ 32 bảng dữ liệu thực tế kết nối qua PgBouncer `113.20.107.184:6432` (`vione_users`, `members`, `companies`, `departments`, `department_members`, `trainings`, `training_sessions`, `training_attendees`, `events`, `event_registrations`, `lucky_draw_prizes`, `lucky_draw_history`, `event_votes`, `event_vote_results`, `sponsors`, `sponsor_items`, `transactions`, `transaction_categories`, `finance_reports`, `templates`, `meetings`, `meeting_attendees`, `documents`, `b2b_opportunities`, `messages`, `notifications`, `notification_recipients`, `news`, `perks`, `activity_logs`, `app_settings`).
+    * Mỗi bảng gồm đầy đủ 6 cột chuẩn: Tên cột, Kiểu dữ liệu (Data Type), Ràng buộc (PK, FK, UQ), Cho phép NULL, Giá trị mặc định (Default), Mô tả ý nghĩa nghiệp vụ.
+    * Sơ đồ Master ERD Diagram bằng Mermaid thể hiện đầy đủ quan hệ thực thể.
+    * Bổ sung ma trận khóa ngoại (Foreign Keys), chiến lược đánh chỉ mục (B-tree, GIN cho JSONB) và Dữ liệu hạt nhân mồi sẵn (4 sự kiện cố định, Sổ quỹ 2.1 Tỷ VNĐ).
+  - **2. Thiết Kế Giao Diện Lập Trình RESTful API (THIET_KE_RESTFUL_API_CEOHN10.md)**:
+    * Đặc tả chi tiết 13 nhóm phân hệ API phục vụ Web CRM và Mobile App.
+    * Đầy đủ các phương thức HTTP: GET, POST, PUT, PATCH, DELETE.
+    * Với mỗi phương thức, liệt kê chi tiết: Bảng Query Parameters / Path Variables, Bảng Request Body (tên trường, kiểu, bắt buộc, mô tả) kèm ví dụ JSON thực tế, Bảng Response Body (tên trường, kiểu, mô tả) kèm ví dụ JSON thành công 200/201 và chuẩn lỗi RFC 7807 (400, 401, 403, 404, 500).
+    * Bổ sung 5 sơ đồ tuần tự Sequence Diagram bằng Mermaid: Xác thực & nạp quyền RBAC 2 chiều, Tạo sự kiện bóc tách file Word/Excel/PDF & đăng ký đại biểu, Điểm danh lớp học QR Realtime, Xuất báo cáo tài chính theo Biểu mẫu động, Trợ lý AI thực thi tác vụ 5 bước.
+  - **3. Tài Liệu Yêu Cầu Nghiệp Vụ Tổng Thể (BRD_CEOHN10_MASTER_CHINH_THUC.md)**:
+    * Cập nhật sơ đồ hệ sinh thái số hóa VOA CEO HN10 và sơ đồ cơ cấu tổ chức Ban Cán Sự & 7 Ban Chuyên Môn (bổ sung Ban Thiện Nguyện BTN).
+    * Bổ sung 11 sơ đồ quy trình nghiệp vụ kinh doanh chi tiết bằng Mermaid Flowcharts (Thẩm định học viên, Lớp học điểm danh QR, Sự kiện bóc tách file, Bốc thăm may mắn, Biểu quyết điện tử, Nhà tài trợ 4 nguồn quỹ, Tài chính thu chi 4 cấp 2.1 Tỷ VNĐ, Thiết lập Biểu mẫu động, Điều hành cuộc họp, Giao thương B2B, Phân quyền RBAC & AI, Trợ lý AI 5 bước).
+    * Cập nhật ma trận 30 Business Use Cases (15 CRM + 15 App) và tiêu chí nghiệm thu.
+  - **4. Tài Liệu Đặc Tả Phần Mềm SRS Web CRM & Mobile App (SRS_01 & SRS_02)**:
+    * Bổ sung mục 2.4 chứa các sơ đồ chức năng chi tiết bằng Mermaid cho toàn bộ các luồng tác nghiệp của cả Web CRM và Mobile App.
+    * Chuẩn hóa hạ tầng máy chủ CSDL trỏ duy nhất về `113.20.107.184:6432/ceohn10_project`.
+  - **5. Kiểm Tra Chất Lượng & Tuân Thủ Quy Chuẩn**:
+    * Backend `tsc --noEmit` đạt exit code 0 (0 errors).
+    * Tuân thủ tuyệt đối Rule 0 (CSDL chuẩn `113.20.107.184:6432`) và Rule 1 (Không tự ý `git commit` / `git push`).
+
 - **Bản cập nhật ngày 18/11/2026 (v12.22): Nạp Toàn Diện Tri Thức Kỹ Thuật (BRD, SRS, CSDL & RESTful API) Cho Trợ Lý AI & Tích Hợp Chức Năng Phân Quyền Trợ Lý AI Vào Nhóm Phân Quyền RBAC**:
   - **1. Lý Giải Hiện Tượng Giao Diện CRM Chưa Cập Nhật Trên Máy Người Dùng**:
     * Mã nguồn nâng cấp ở phiên trước đã được commit và push lên nhánh `dev` (`ad8ab12`).
@@ -2087,6 +2165,84 @@
      - Tuân thủ nghiêm ngặt STRICT RULE 1: Tuyệt đối không tự động chạy `git push` hay `git commit`.
 
 # System Memory & Architecture
+
+- **Bản cập nhật ngày 18/11/2026 (v12.25): Đổi Tên Toàn Diện Bảng Tài Khoản Người Dùng Thành ceohn10_users (Chuẩn Hóa Thương Hiệu CEO HN10, Xóa Bỏ Hoàn Toàn Tiền Tố Cũ vione_users)**:
+  - **1. Chuẩn Hóa Danh Mục Bảng CSDL Chuẩn (THIET_KE_CSDL_POSTGRESQL_CEOHN10.md)**:
+    * Bảng 1 đổi tên chính thức: `public.ceohn10_users` (Tài khoản người dùng CEO HN10).
+    * Sơ đồ Master ERD Mermaid cập nhật toàn bộ quan hệ `ceohn10_users ||--o| members`, `ceohn10_users ||--o{ messages`, `ceohn10_users ||--o{ activity_logs`.
+    * Ma trận khóa ngoại & chỉ mục B-tree: Cập nhật `FK -> ceohn10_users(id)`, `idx_ceohn10_users_email`, `idx_ceohn10_users_username`.
+  - **2. Làm Sạch 100% Tài Liệu Dự Án (No More vione_users)**:
+    * Rà soát và cập nhật đồng bộ toàn bộ tài liệu trong `document/`:
+      - `THIET_KE_CSDL_POSTGRESQL_CEOHN10.md`
+      - `THIET_KE_RESTFUL_API_CEOHN10.md`
+      - `BRD_CEOHN10_MASTER_CHINH_THUC.md`
+      - `SRS_01_Web_CRM_CEOHN10.md` & `SRS_02_App_Hiep_Hoi_CEOHN10.md`
+      - `03_DAC_TA_BACKEND_API_VA_CO_SO_DU_LIEU_POSTGRESQL.md`
+      - `SRS_CEOHN10_MASTER_CHINH_THUC.md`, `SRS_CEOHN10_HE_THONG_TOAN_DIEN.md`, `SRS_IEEE830_CEOHN10_TOAN_DIEN.md`
+  - **3. Cập Nhật Tri Thức AI & Backend NestJS Service**:
+    * `knowledge-base.service.ts`: Nạp bảng `ceohn10_users` làm bảng cốt lõi trong System Prompt của AI.
+    * `ai-crm-analytics.service.ts`: Truy vấn đếm người dùng ưu tiên `ceohn10_users` (fallback an toàn `vione_users`).
+    * `ai.service.ts` & `ai-permission.service.ts`: Tra cứu định danh và phân quyền AI ưu tiên `ceohn10_users`.
+    * `auth.service.ts` & `roles.guard.ts`: Xác thực phiên làm việc và kiểm tra trùng email trên `ceohn10_users`.
+    * `users.repository.ts`: Tìm kiếm người dùng (`findByUsername`, `findById`, `findByEmail`, `findByGoogleId`, `findByAppleId`) ưu tiên bảng `ceohn10_users`, hàm `createUser` tạo đồng thời vào cả hai bảng để đảm bảo tương thích ngược 100%.
+  - **4. Bản Migration CSDL Độc Lập**:
+    * Đã tạo `packages/db/scripts/migrate_rename_vione_user_to_ceohn10_user.sql`: Tạo bảng `ceohn10_users`, đồng bộ dữ liệu từ `vione_users`, tạo VIEW alias `vione_users` và chỉ mục tối ưu.
+  - **5. Kiểm Tra Chất Lượng Code (Strict Zero-Error)**:
+    * `nest build` tại `apps/ceohn10_app_be`: **Exit code 0 (0 errors)**.
+    * Tuân thủ tuyệt đối Rule 0 (CSDL `113.20.107.184:6432`) và Rule 1 (Không tự ý `git commit` / `git push`).
+
+- **Bản cập nhật ngày 18/11/2026 (v12.24): Nâng Cấp Trợ Lý AI Tự Động Hóa Ra Lệnh (Natural Language Command Execution), Bóc Tách Tệp Excel/Word & Hiển Thị Pipeline Stepper Tích Xanh Thời Gian Thực**:
+  - **1. Kiến Trúc AI Tự Động Hóa Ra Lệnh Trực Tiếp (Zero-Friction Command Execution)**:
+    * Chuyển đổi mô hình tương tác từ Wizard 5 bước thủ công sang tương tác tự nhiên trong khung chat (ChatGPT Style): Người dùng chỉ cần gõ câu lệnh hoặc đính kèm tệp Excel/Word/CSV.
+    * AI tự động nhận diện ý định nghiệp vụ (Intent Recognition):
+      - Gửi email sự kiện / gala / hội thảo (`event_email`)
+      - Nhắc nộp hội phí thường niên / niên liễm (`fee_reminder`)
+      - Thông báo lịch đào tạo / lớp học chuyên sâu (`training_notice`)
+      - Xuất báo cáo tài chính / tài trợ / hoạt động (`report_export`)
+  - **2. Module Tự Động Bóc Tách Danh Sách Email Từ Tệp (`ai-excel-email-parser.ts`)**:
+    * Đọc đa định dạng: `.xlsx`, `.xls`, `.csv`, `.docx`, `.doc`, `.txt`.
+    * Tự động quét và phát hiện cột chứa email, họ tên học viên, chức danh, doanh nghiệp và số tiền.
+    * Tự động lọc sạch trùng lặp, chuẩn hóa định dạng email và sinh bản tóm tắt nội dung tệp.
+  - **3. Component Pipeline Stepper Tích Xanh Trực Quan (`AiExecutionStepTracker.tsx`)**:
+    * Nhúng trực tiếp vào khung chat phản hồi của AI với hiệu ứng chạy tuần tự từ `pending` -> `running` (spinner) -> `completed` (tích xanh vivid `CheckCircle2`).
+    * **5 Bước Thực Thi Chuẩn Hóa**:
+      1. *Bóc tách danh sách email & thông tin học viên từ tệp Excel/Word* -> ✅
+      2. *Soạn thảo nội dung thông điệp & biến cá nhân hóa `{ho_ten}`, `{so_tien}`* -> ✅
+      3. *Đối soát danh sách nhận tin với CSDL chuẩn 113.20.107.184:6432* -> ✅
+      4. *Xác thực thẩm quyền Ban Chuyên Môn & quy chế phát ngôn* -> ✅
+      5. *Thực thi phát lệnh gửi email & lưu vết Audit Log vào CSDL* -> ✅
+    * Tích hợp tính năng: Xem danh sách học viên nhận tin kèm ô tìm kiếm, xem trước nội dung email chuẩn CEO HN10, và nút xuất báo cáo kết quả gửi thư ra file Excel.
+  - **4. Nâng Cấp Backend NestJS Controller & Service**:
+    * Bổ sung endpoint `POST /api/ai/auto-execute-command` trong `ai.controller.ts`.
+    * Phương thức `handleAutoExecuteCommand` trong `ai-crm-analytics.service.ts`: Xử lý phân tích câu lệnh, bóc tách email, đối soát CSDL `113.20.107.184:6432` (`public.vione_users`, `public.members`), soạn thư và lưu vết vào `public.activity_logs`.
+  - **5. Nâng Cấp Giao Diện Web CRM**:
+    * `ai-assistant.tsx`: Đặt Tab mặc định là `"chat"` ("Trợ Lý AI Ra Lệnh & Tự Động Hóa" với nhãn `Auto Stepper ✅`).
+    * `CrmChatGPTView.tsx`: Thêm nút đính kèm Excel/Word (`Paperclip`), banner xem trước file đính kèm với số lượng email đã bóc tách, các nút lệnh nhanh 1-chạm, và nhúng component stepper tích xanh vào tin nhắn phản hồi của Assistant.
+  - **6. Kiểm Tra Chất Lượng Code (Strict Zero-Error)**:
+    * Backend `tsc --project apps/ceohn10_app_be/tsconfig.json --noEmit` -> **Exit code 0 (0 errors)**.
+    * Tuân thủ tuyệt đối Rule 0 (CSDL `113.20.107.184:6432`) và Rule 1 (Không tự ý `git commit` / `git push`).
+
+- **Bản cập nhật ngày 18/11/2026 (v12.23): Tái Thiết Toàn Diện Bộ Tài Liệu BRD, SRS, THIẾT KẾ CSDL & RESTFUL API — Bổ Sung Đầy Đủ Sơ Đồ Mermaid & Đặc Tả Chi Tiết Từng Phương Thức**:
+  - **1. Thiết Kế Cơ Sở Dữ Liệu PostgreSQL (THIET_KE_CSDL_POSTGRESQL_CEOHN10.md)**:
+    * Đặc tả chi tiết đầy đủ 32 bảng dữ liệu thực tế kết nối qua PgBouncer `113.20.107.184:6432` (`vione_users`, `members`, `companies`, `departments`, `department_members`, `trainings`, `training_sessions`, `training_attendees`, `events`, `event_registrations`, `lucky_draw_prizes`, `lucky_draw_history`, `event_votes`, `event_vote_results`, `sponsors`, `sponsor_items`, `transactions`, `transaction_categories`, `finance_reports`, `templates`, `meetings`, `meeting_attendees`, `documents`, `b2b_opportunities`, `messages`, `notifications`, `notification_recipients`, `news`, `perks`, `activity_logs`, `app_settings`).
+    * Mỗi bảng gồm đầy đủ 6 cột chuẩn: Tên cột, Kiểu dữ liệu (Data Type), Ràng buộc (PK, FK, UQ), Cho phép NULL, Giá trị mặc định (Default), Mô tả ý nghĩa nghiệp vụ.
+    * Sơ đồ Master ERD Diagram bằng Mermaid thể hiện đầy đủ quan hệ thực thể.
+    * Bổ sung ma trận khóa ngoại (Foreign Keys), chiến lược đánh chỉ mục (B-tree, GIN cho JSONB) và Dữ liệu hạt nhân mồi sẵn (4 sự kiện cố định, Sổ quỹ 2.1 Tỷ VNĐ).
+  - **2. Thiết Kế Giao Diện Lập Trình RESTful API (THIET_KE_RESTFUL_API_CEOHN10.md)**:
+    * Đặc tả chi tiết 13 nhóm phân hệ API phục vụ Web CRM và Mobile App.
+    * Đầy đủ các phương thức HTTP: GET, POST, PUT, PATCH, DELETE.
+    * Với mỗi phương thức, liệt kê chi tiết: Bảng Query Parameters / Path Variables, Bảng Request Body (tên trường, kiểu, bắt buộc, mô tả) kèm ví dụ JSON thực tế, Bảng Response Body (tên trường, kiểu, mô tả) kèm ví dụ JSON thành công 200/201 và chuẩn lỗi RFC 7807 (400, 401, 403, 404, 500).
+    * Bổ sung 5 sơ đồ tuần tự Sequence Diagram bằng Mermaid: Xác thực & nạp quyền RBAC 2 chiều, Tạo sự kiện bóc tách file Word/Excel/PDF & đăng ký đại biểu, Điểm danh lớp học QR Realtime, Xuất báo cáo tài chính theo Biểu mẫu động, Trợ lý AI thực thi tác vụ 5 bước.
+  - **3. Tài Liệu Yêu Cầu Nghiệp Vụ Tổng Thể (BRD_CEOHN10_MASTER_CHINH_THUC.md)**:
+    * Cập nhật sơ đồ hệ sinh thái số hóa VOA CEO HN10 và sơ đồ cơ cấu tổ chức Ban Cán Sự & 7 Ban Chuyên Môn (bổ sung Ban Thiện Nguyện BTN).
+    * Bổ sung 11 sơ đồ quy trình nghiệp vụ kinh doanh chi tiết bằng Mermaid Flowcharts (Thẩm định học viên, Lớp học điểm danh QR, Sự kiện bóc tách file, Bốc thăm may mắn, Biểu quyết điện tử, Nhà tài trợ 4 nguồn quỹ, Tài chính thu chi 4 cấp 2.1 Tỷ VNĐ, Thiết lập Biểu mẫu động, Điều hành cuộc họp, Giao thương B2B, Phân quyền RBAC & AI, Trợ lý AI 5 bước).
+    * Cập nhật ma trận 30 Business Use Cases (15 CRM + 15 App) và tiêu chí nghiệm thu.
+  - **4. Tài Liệu Đặc Tả Phần Mềm SRS Web CRM & Mobile App (SRS_01 & SRS_02)**:
+    * Bổ sung mục 2.4 chứa các sơ đồ chức năng chi tiết bằng Mermaid cho toàn bộ các luồng tác nghiệp của cả Web CRM và Mobile App.
+    * Chuẩn hóa hạ tầng máy chủ CSDL trỏ duy nhất về `113.20.107.184:6432/ceohn10_project`.
+  - **5. Kiểm Tra Chất Lượng & Tuân Thủ Quy Chuẩn**:
+    * Backend `tsc --noEmit` đạt exit code 0 (0 errors).
+    * Tuân thủ tuyệt đối Rule 0 (CSDL chuẩn `113.20.107.184:6432`) và Rule 1 (Không tự ý `git commit` / `git push`).
 
 - **Bản cập nhật ngày 18/11/2026 (v12.22): Nạp Toàn Diện Tri Thức Kỹ Thuật (BRD, SRS, CSDL & RESTful API) Cho Trợ Lý AI & Tích Hợp Chức Năng Phân Quyền Trợ Lý AI Vào Nhóm Phân Quyền RBAC**:
   - **1. Lý Giải Hiện Tượng Giao Diện CRM Chưa Cập Nhật Trên Máy Người Dùng**:
@@ -5339,6 +5495,84 @@
      - Tuân thủ nghiêm ngặt STRICT RULE 1: Tuyệt đối không tự động chạy `git push` hay `git commit`.
 
 # System Memory & Architecture
+
+- **Bản cập nhật ngày 18/11/2026 (v12.25): Đổi Tên Toàn Diện Bảng Tài Khoản Người Dùng Thành ceohn10_users (Chuẩn Hóa Thương Hiệu CEO HN10, Xóa Bỏ Hoàn Toàn Tiền Tố Cũ vione_users)**:
+  - **1. Chuẩn Hóa Danh Mục Bảng CSDL Chuẩn (THIET_KE_CSDL_POSTGRESQL_CEOHN10.md)**:
+    * Bảng 1 đổi tên chính thức: `public.ceohn10_users` (Tài khoản người dùng CEO HN10).
+    * Sơ đồ Master ERD Mermaid cập nhật toàn bộ quan hệ `ceohn10_users ||--o| members`, `ceohn10_users ||--o{ messages`, `ceohn10_users ||--o{ activity_logs`.
+    * Ma trận khóa ngoại & chỉ mục B-tree: Cập nhật `FK -> ceohn10_users(id)`, `idx_ceohn10_users_email`, `idx_ceohn10_users_username`.
+  - **2. Làm Sạch 100% Tài Liệu Dự Án (No More vione_users)**:
+    * Rà soát và cập nhật đồng bộ toàn bộ tài liệu trong `document/`:
+      - `THIET_KE_CSDL_POSTGRESQL_CEOHN10.md`
+      - `THIET_KE_RESTFUL_API_CEOHN10.md`
+      - `BRD_CEOHN10_MASTER_CHINH_THUC.md`
+      - `SRS_01_Web_CRM_CEOHN10.md` & `SRS_02_App_Hiep_Hoi_CEOHN10.md`
+      - `03_DAC_TA_BACKEND_API_VA_CO_SO_DU_LIEU_POSTGRESQL.md`
+      - `SRS_CEOHN10_MASTER_CHINH_THUC.md`, `SRS_CEOHN10_HE_THONG_TOAN_DIEN.md`, `SRS_IEEE830_CEOHN10_TOAN_DIEN.md`
+  - **3. Cập Nhật Tri Thức AI & Backend NestJS Service**:
+    * `knowledge-base.service.ts`: Nạp bảng `ceohn10_users` làm bảng cốt lõi trong System Prompt của AI.
+    * `ai-crm-analytics.service.ts`: Truy vấn đếm người dùng ưu tiên `ceohn10_users` (fallback an toàn `vione_users`).
+    * `ai.service.ts` & `ai-permission.service.ts`: Tra cứu định danh và phân quyền AI ưu tiên `ceohn10_users`.
+    * `auth.service.ts` & `roles.guard.ts`: Xác thực phiên làm việc và kiểm tra trùng email trên `ceohn10_users`.
+    * `users.repository.ts`: Tìm kiếm người dùng (`findByUsername`, `findById`, `findByEmail`, `findByGoogleId`, `findByAppleId`) ưu tiên bảng `ceohn10_users`, hàm `createUser` tạo đồng thời vào cả hai bảng để đảm bảo tương thích ngược 100%.
+  - **4. Bản Migration CSDL Độc Lập**:
+    * Đã tạo `packages/db/scripts/migrate_rename_vione_user_to_ceohn10_user.sql`: Tạo bảng `ceohn10_users`, đồng bộ dữ liệu từ `vione_users`, tạo VIEW alias `vione_users` và chỉ mục tối ưu.
+  - **5. Kiểm Tra Chất Lượng Code (Strict Zero-Error)**:
+    * `nest build` tại `apps/ceohn10_app_be`: **Exit code 0 (0 errors)**.
+    * Tuân thủ tuyệt đối Rule 0 (CSDL `113.20.107.184:6432`) và Rule 1 (Không tự ý `git commit` / `git push`).
+
+- **Bản cập nhật ngày 18/11/2026 (v12.24): Nâng Cấp Trợ Lý AI Tự Động Hóa Ra Lệnh (Natural Language Command Execution), Bóc Tách Tệp Excel/Word & Hiển Thị Pipeline Stepper Tích Xanh Thời Gian Thực**:
+  - **1. Kiến Trúc AI Tự Động Hóa Ra Lệnh Trực Tiếp (Zero-Friction Command Execution)**:
+    * Chuyển đổi mô hình tương tác từ Wizard 5 bước thủ công sang tương tác tự nhiên trong khung chat (ChatGPT Style): Người dùng chỉ cần gõ câu lệnh hoặc đính kèm tệp Excel/Word/CSV.
+    * AI tự động nhận diện ý định nghiệp vụ (Intent Recognition):
+      - Gửi email sự kiện / gala / hội thảo (`event_email`)
+      - Nhắc nộp hội phí thường niên / niên liễm (`fee_reminder`)
+      - Thông báo lịch đào tạo / lớp học chuyên sâu (`training_notice`)
+      - Xuất báo cáo tài chính / tài trợ / hoạt động (`report_export`)
+  - **2. Module Tự Động Bóc Tách Danh Sách Email Từ Tệp (`ai-excel-email-parser.ts`)**:
+    * Đọc đa định dạng: `.xlsx`, `.xls`, `.csv`, `.docx`, `.doc`, `.txt`.
+    * Tự động quét và phát hiện cột chứa email, họ tên học viên, chức danh, doanh nghiệp và số tiền.
+    * Tự động lọc sạch trùng lặp, chuẩn hóa định dạng email và sinh bản tóm tắt nội dung tệp.
+  - **3. Component Pipeline Stepper Tích Xanh Trực Quan (`AiExecutionStepTracker.tsx`)**:
+    * Nhúng trực tiếp vào khung chat phản hồi của AI với hiệu ứng chạy tuần tự từ `pending` -> `running` (spinner) -> `completed` (tích xanh vivid `CheckCircle2`).
+    * **5 Bước Thực Thi Chuẩn Hóa**:
+      1. *Bóc tách danh sách email & thông tin học viên từ tệp Excel/Word* -> ✅
+      2. *Soạn thảo nội dung thông điệp & biến cá nhân hóa `{ho_ten}`, `{so_tien}`* -> ✅
+      3. *Đối soát danh sách nhận tin với CSDL chuẩn 113.20.107.184:6432* -> ✅
+      4. *Xác thực thẩm quyền Ban Chuyên Môn & quy chế phát ngôn* -> ✅
+      5. *Thực thi phát lệnh gửi email & lưu vết Audit Log vào CSDL* -> ✅
+    * Tích hợp tính năng: Xem danh sách học viên nhận tin kèm ô tìm kiếm, xem trước nội dung email chuẩn CEO HN10, và nút xuất báo cáo kết quả gửi thư ra file Excel.
+  - **4. Nâng Cấp Backend NestJS Controller & Service**:
+    * Bổ sung endpoint `POST /api/ai/auto-execute-command` trong `ai.controller.ts`.
+    * Phương thức `handleAutoExecuteCommand` trong `ai-crm-analytics.service.ts`: Xử lý phân tích câu lệnh, bóc tách email, đối soát CSDL `113.20.107.184:6432` (`public.vione_users`, `public.members`), soạn thư và lưu vết vào `public.activity_logs`.
+  - **5. Nâng Cấp Giao Diện Web CRM**:
+    * `ai-assistant.tsx`: Đặt Tab mặc định là `"chat"` ("Trợ Lý AI Ra Lệnh & Tự Động Hóa" với nhãn `Auto Stepper ✅`).
+    * `CrmChatGPTView.tsx`: Thêm nút đính kèm Excel/Word (`Paperclip`), banner xem trước file đính kèm với số lượng email đã bóc tách, các nút lệnh nhanh 1-chạm, và nhúng component stepper tích xanh vào tin nhắn phản hồi của Assistant.
+  - **6. Kiểm Tra Chất Lượng Code (Strict Zero-Error)**:
+    * Backend `tsc --project apps/ceohn10_app_be/tsconfig.json --noEmit` -> **Exit code 0 (0 errors)**.
+    * Tuân thủ tuyệt đối Rule 0 (CSDL `113.20.107.184:6432`) và Rule 1 (Không tự ý `git commit` / `git push`).
+
+- **Bản cập nhật ngày 18/11/2026 (v12.23): Tái Thiết Toàn Diện Bộ Tài Liệu BRD, SRS, THIẾT KẾ CSDL & RESTFUL API — Bổ Sung Đầy Đủ Sơ Đồ Mermaid & Đặc Tả Chi Tiết Từng Phương Thức**:
+  - **1. Thiết Kế Cơ Sở Dữ Liệu PostgreSQL (THIET_KE_CSDL_POSTGRESQL_CEOHN10.md)**:
+    * Đặc tả chi tiết đầy đủ 32 bảng dữ liệu thực tế kết nối qua PgBouncer `113.20.107.184:6432` (`vione_users`, `members`, `companies`, `departments`, `department_members`, `trainings`, `training_sessions`, `training_attendees`, `events`, `event_registrations`, `lucky_draw_prizes`, `lucky_draw_history`, `event_votes`, `event_vote_results`, `sponsors`, `sponsor_items`, `transactions`, `transaction_categories`, `finance_reports`, `templates`, `meetings`, `meeting_attendees`, `documents`, `b2b_opportunities`, `messages`, `notifications`, `notification_recipients`, `news`, `perks`, `activity_logs`, `app_settings`).
+    * Mỗi bảng gồm đầy đủ 6 cột chuẩn: Tên cột, Kiểu dữ liệu (Data Type), Ràng buộc (PK, FK, UQ), Cho phép NULL, Giá trị mặc định (Default), Mô tả ý nghĩa nghiệp vụ.
+    * Sơ đồ Master ERD Diagram bằng Mermaid thể hiện đầy đủ quan hệ thực thể.
+    * Bổ sung ma trận khóa ngoại (Foreign Keys), chiến lược đánh chỉ mục (B-tree, GIN cho JSONB) và Dữ liệu hạt nhân mồi sẵn (4 sự kiện cố định, Sổ quỹ 2.1 Tỷ VNĐ).
+  - **2. Thiết Kế Giao Diện Lập Trình RESTful API (THIET_KE_RESTFUL_API_CEOHN10.md)**:
+    * Đặc tả chi tiết 13 nhóm phân hệ API phục vụ Web CRM và Mobile App.
+    * Đầy đủ các phương thức HTTP: GET, POST, PUT, PATCH, DELETE.
+    * Với mỗi phương thức, liệt kê chi tiết: Bảng Query Parameters / Path Variables, Bảng Request Body (tên trường, kiểu, bắt buộc, mô tả) kèm ví dụ JSON thực tế, Bảng Response Body (tên trường, kiểu, mô tả) kèm ví dụ JSON thành công 200/201 và chuẩn lỗi RFC 7807 (400, 401, 403, 404, 500).
+    * Bổ sung 5 sơ đồ tuần tự Sequence Diagram bằng Mermaid: Xác thực & nạp quyền RBAC 2 chiều, Tạo sự kiện bóc tách file Word/Excel/PDF & đăng ký đại biểu, Điểm danh lớp học QR Realtime, Xuất báo cáo tài chính theo Biểu mẫu động, Trợ lý AI thực thi tác vụ 5 bước.
+  - **3. Tài Liệu Yêu Cầu Nghiệp Vụ Tổng Thể (BRD_CEOHN10_MASTER_CHINH_THUC.md)**:
+    * Cập nhật sơ đồ hệ sinh thái số hóa VOA CEO HN10 và sơ đồ cơ cấu tổ chức Ban Cán Sự & 7 Ban Chuyên Môn (bổ sung Ban Thiện Nguyện BTN).
+    * Bổ sung 11 sơ đồ quy trình nghiệp vụ kinh doanh chi tiết bằng Mermaid Flowcharts (Thẩm định học viên, Lớp học điểm danh QR, Sự kiện bóc tách file, Bốc thăm may mắn, Biểu quyết điện tử, Nhà tài trợ 4 nguồn quỹ, Tài chính thu chi 4 cấp 2.1 Tỷ VNĐ, Thiết lập Biểu mẫu động, Điều hành cuộc họp, Giao thương B2B, Phân quyền RBAC & AI, Trợ lý AI 5 bước).
+    * Cập nhật ma trận 30 Business Use Cases (15 CRM + 15 App) và tiêu chí nghiệm thu.
+  - **4. Tài Liệu Đặc Tả Phần Mềm SRS Web CRM & Mobile App (SRS_01 & SRS_02)**:
+    * Bổ sung mục 2.4 chứa các sơ đồ chức năng chi tiết bằng Mermaid cho toàn bộ các luồng tác nghiệp của cả Web CRM và Mobile App.
+    * Chuẩn hóa hạ tầng máy chủ CSDL trỏ duy nhất về `113.20.107.184:6432/ceohn10_project`.
+  - **5. Kiểm Tra Chất Lượng & Tuân Thủ Quy Chuẩn**:
+    * Backend `tsc --noEmit` đạt exit code 0 (0 errors).
+    * Tuân thủ tuyệt đối Rule 0 (CSDL chuẩn `113.20.107.184:6432`) và Rule 1 (Không tự ý `git commit` / `git push`).
 
 - **Bản cập nhật ngày 18/11/2026 (v12.22): Nạp Toàn Diện Tri Thức Kỹ Thuật (BRD, SRS, CSDL & RESTful API) Cho Trợ Lý AI & Tích Hợp Chức Năng Phân Quyền Trợ Lý AI Vào Nhóm Phân Quyền RBAC**:
   - **1. Lý Giải Hiện Tượng Giao Diện CRM Chưa Cập Nhật Trên Máy Người Dùng**:

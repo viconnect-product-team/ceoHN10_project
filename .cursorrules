@@ -1,6 +1,45 @@
 # ==============================================================================
 # BỘ LUẬT DỰ ÁN (PROJECT RULES & AI CODEGEN STANDARDS) - CEO HN10 PROJECT
 # Vai trò: Tech Lead | Định dạng: .cursorrules
+# 18/11/2026 (v12.25) — ĐỔI TÊN TOÀN DIỆN BẢNG TÀI KHOẢN THÀNH ceohn10_users (XÓA BỎ HOÀN TOÀN TIỀN TỐ vione_users):
+#   * [CHUẨN HÓA BẢNG TÀI KHOẢN NGƯỜI DÙNG CEO HN10 (ceohn10_users)]:
+#     - Bảng 1 trong THIET_KE_CSDL_POSTGRESQL_CEOHN10.md: public.ceohn10_users (Tài khoản người dùng CEO HN10).
+#     - Sơ đồ Master ERD Mermaid: Cập nhật quan hệ ceohn10_users ||--o| members, ceohn10_users ||--o{ messages, ceohn10_users ||--o{ activity_logs.
+#     - Khóa ngoại & Chỉ mục: FK -> ceohn10_users(id), idx_ceohn10_users_email, idx_ceohn10_users_username.
+#   * [LÀM SẠCH 100% TÀI LIỆU DỰ ÁN]:
+#     - Đã loại bỏ hoàn toàn mọi từ khóa vione_users trên toàn bộ kho tài liệu document/ (THIET_KE_CSDL, THIET_KE_API, BRD, SRS CRM, SRS App, IEEE830).
+#   * [BACKEND & TRI THỨC AI]:
+#     - knowledge-base.service.ts: Nạp ceohn10_users vào System Prompt của AI.
+#     - ai-crm-analytics.service.ts, ai.service.ts, ai-permission.service.ts, auth.service.ts, roles.guard.ts: Ưu tiên ceohn10_users (fallback vione_users).
+#     - users.repository.ts: Tìm kiếm và tạo người dùng ưu tiên ceohn10_users, tương thích 100% hai chiều.
+#   * [TUÂN THỦ CSDL & GIT]: CSDL duy nhất 113.20.107.184:6432 (ceohn10_project). Tuyệt đối không git commit / git push. Type check & build đạt 0 lỗi (Exit code 0).
+# 18/11/2026 (v12.24) — NÂNG CẤP TRỢ LÝ AI TỰ ĐỘNG HÓA RA LỆNH (NATURAL LANGUAGE COMMAND EXECUTION), BÓC TÁCH TỆP EXCEL/WORD & PIPELINE STEPPER TÍCH XANH THỜI GIAN THỰC:
+#   * [KIẾN TRÚC AI RA LỆNH TỰ ĐỘNG HÓA TRỰC TIẾP (ZERO-FRICTION COMMAND EXECUTION)]:
+#     - Người dùng ra lệnh tự nhiên trong khung chat hoặc đính kèm tệp Excel/Word/CSV.
+#     - AI tự động nhận diện ý định: Gửi mail sự kiện (event_email), Nhắc nộp hội phí (fee_reminder), Thông báo lớp học (training_notice), Xuất báo cáo (report_export).
+#   * [MODULE BÓC TÁCH EMAIL & HỌC VIÊN TỰ ĐỘNG (ai-excel-email-parser.ts)]:
+#     - Đọc các tệp .xlsx, .xls, .csv, .docx, .doc, .txt; tự động phát hiện cột email, regex quét địa chỉ, chuẩn hóa danh sách học viên, công ty, số tiền.
+#   * [COMPONENT PIPELINE STEPPER TÍCH XANH TRỰC QUAN (AiExecutionStepTracker.tsx)]:
+#     - Nhúng trực tiếp vào khung chat phản hồi của Assistant: 5 bước tuần tự pending -> running -> completed với tích xanh lá vivid (CheckCircle2).
+#     - Bước 1 (Bóc tách email) -> Bước 2 (Soạn thảo cá nhân hóa) -> Bước 3 (Đối soát CSDL 113.20.107.184) -> Bước 4 (Xác thực thẩm quyền) -> Bước 5 (Thực thi gửi thư & lưu vết Audit Log).
+#     - Hỗ trợ tra cứu danh sách học viên nhận thư, xem trước bản nháp email và tải file Excel báo cáo kết quả.
+#   * [BACKEND & GIAO DIỆN CRM]:
+#     - Endpoint POST /api/ai/auto-execute-command và handleAutoExecuteCommand trong NestJS.
+#     - ai-assistant.tsx: Tab mặc định là "chat" (Trợ Lý AI Ra Lệnh & Tự Động Hóa).
+#     - CrmChatGPTView.tsx: Nút Paperclip đính kèm tệp, banner file đính kèm với số lượng email đã bóc tách, các nút lệnh nhanh 1-chạm.
+#   * [TUÂN THỦ CSDL & GIT]: CSDL duy nhất 113.20.107.184:6432 (ceohn10_project). Tuyệt đối không git commit / git push. Type check đạt 0 lỗi.
+# 18/11/2026 (v12.23) — TÁI THIẾT TOÀN DIỆN BỘ TÀI LIỆU BRD, SRS, THIẾT KẾ CSDL & RESTFUL API (ĐỦ SƠ ĐỒ MERMAID & ĐỦ BẢNG ĐỦ TRƯỜNG):
+#   * [THIẾT KẾ CSDL POSTGRESQL (THIET_KE_CSDL_POSTGRESQL_CEOHN10.md)]:
+#     - Đặc tả chi tiết đầy đủ 32 bảng dữ liệu thực tế tại 113.20.107.184:6432 (ceohn10_project qua PgBouncer).
+#     - Mỗi bảng gồm đầy đủ 6 cột: Tên cột, Kiểu dữ liệu, Khóa PK/FK/UQ, Nullable, Default, Diễn giải nghiệp vụ.
+#     - Sơ đồ Master ERD Diagram bằng Mermaid, ma trận khóa ngoại và chiến lược đánh chỉ mục B-tree/GIN.
+#   * [THIẾT KẾ RESTFUL API (THIET_KE_RESTFUL_API_CEOHN10.md)]:
+#     - Đặc tả chi tiết 13 nhóm phân hệ API phục vụ CRM & Mobile App; đầy đủ các phương thức GET, POST, PUT, PATCH, DELETE.
+#     - Liệt kê đủ bảng trường cho Query Params, Path Variables, Request Body, Response Body (200/201 và RFC 7807 error).
+#     - 5 sơ đồ Sequence Diagram Mermaid cho các luồng xử lý trọng yếu.
+#   * [TÀI LIỆU YÊU CẦU NGHIỆP VỤ BRD & SRS (BRD_MASTER, SRS_01, SRS_02)]:
+#     - 11 sơ đồ Flowchart Mermaid cho từng nghiệp vụ: Học viên, Lớp học QR, Sự kiện bóc tách file, Bốc thăm, Biểu quyết, Nhà tài trợ 4 nguồn quỹ, Sổ quỹ 2.1 Tỷ VNĐ, Biểu mẫu động, Cuộc họp, B2B, Phân quyền RBAC & AI, Trợ lý AI 5 bước.
+#     - Chuẩn hóa CSDL duy nhất 113.20.107.184:6432 (Rule 0). Không tự ý git commit / git push (Rule 1). Zero code error (Rule 4 & 5).
 # 18/11/2026 (v12.22) — NẠP TOÀN BỘ TÀI LIỆU BRD/SRS/CSDL/API CHO AI & PHÂN QUYỀN TRỢ LÝ AI TRONG NHÓM PHÂN QUYỀN:
 #   * [NẠP TRI THỨC KỸ THUẬT CHO TRỢ LÝ AI (KNOWLEDGE BASE SERVICE)]:
 #     - Tạo mới KnowledgeBaseService (knowledge-base.service.ts): Đọc hiểu toàn bộ tài liệu dự án BRD_CEOHN10_MASTER_CHINH_THUC.md, SRS_01_Web_CRM_CEOHN10.md, SRS_02_App_Hiep_Hoi_CEOHN10.md, THIET_KE_CSDL_POSTGRESQL_CEOHN10.md, THIET_KE_RESTFUL_API_CEOHN10.md.

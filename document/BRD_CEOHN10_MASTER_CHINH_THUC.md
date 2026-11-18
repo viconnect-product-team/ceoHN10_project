@@ -1,456 +1,476 @@
 # HỆ SINH THÁI SỐ HÓA & QUẢN TRỊ HIỆP HỘI DOANH NHÂN CEO HN10 (HANOIBA)
-
 ## TÀI LIỆU YÊU CẦU NGHIỆP VỤ TỔNG THỂ CHÍNH THỨC
-*(BUSINESS REQUIREMENTS DOCUMENT - MASTER BRD)*
+*(BUSINESS REQUIREMENTS DOCUMENT - MASTER BRD - ENTERPRISE V10.0)*
 
 ---
 
-* **Mã tài liệu:** `BRD-CEO HN10-MASTER-CHINH-THUC`
-* **Phiên bản:** `Phiên bản 9.0 Toàn Diện (Bản Bàn Giao Khách Hàng, Ban Lãnh Đạo & Doanh Nghiệp)`
+* **Mã tài liệu:** `BRD-CEOHN10-MASTER-CHINH-THUC`
+* **Phiên bản:** `Phiên bản 10.0 Toàn Diện (Bản Bàn Giao Ban Lãnh Đạo, Ban Cán Sự & Doanh Nghiệp Thành Viên)`
 * **Cơ quan chủ quản:** Câu Lạc Bộ Doanh Nhân CEO HN10 — Trực thuộc Hội Doanh Nghiệp Trẻ Hà Nội (HanoiBA)
-* **Đơn vị tư vấn giải pháp:** VICONNECT - Nền tảng Chuyển đổi số Hiệp hội Doanh nhân
-* **Cấp độ bảo mật:** Lưu hành nội bộ Ban Lãnh Đạo & Doanh nghiệp Học viên
+* **Đơn vị phát triển giải pháp:** VICONNECT - Nền tảng Chuyển Đổi Số Hiệp Hội Doanh Nhân
+* **Cơ sở dữ liệu trung tâm:** PostgreSQL `113.20.107.184:6432` (ceohn10_project) qua PgBouncer
+* **Cấp độ bảo mật:** Lưu hành nội bộ Ban Lãnh Đạo, Ban Cán Sự & Học viên Doanh nhân CEO HN10
+* **Thời điểm ban hành:** Tháng 11/2026
 
 ---
 
-## MỤC LỤC TÀI LIỆU
+## MỤC LỤC TỔNG THỂ
 1. **CHƯƠNG 1: TỔNG QUAN, BỐI CẢNH VẬN HÀNH & MỤC TIÊU CHIẾN LƯỢC**
-2. **CHƯƠNG 2: MÔ HÌNH VẬN HÀNH & PHÂN ĐỊNH TRÁCH NHIỆM 6 CHUYÊN BAN**
-3. **CHƯƠNG 3: HỆ THỐNG SƠ ĐỒ QUY TRÌNH NGHIỆP VỤ KINH DOANH (8 BUSINESS FLOWCHARTS)**
-   - 3.1. Quy Trình Thẩm Định & Phê Duyệt Kết Nạp Học viên Mới
-   - 3.2. Quy Trình Giao Thương B2B & Đặt Lịch Hẹn 1-on-1 trong 3 Tình Huống
-   - 3.3. Quy Trình Tổ Chức Sự Kiện Gala & Lưu Vết Kỷ Niệm 5 Hạng Mục
-   - 3.4. Quy Trình Điều Hành Hoạt Động Họp Ban (Họp Cố Định vs Họp Bất Thường)
-   - 3.5. Quy Trình Thu Hội Phí Tự Động Qua Mã QR MoMo & Cổng VNPay
-   - 3.6. Quy Trình Đối Soát Biến Động & Xuất - Nhập Báo Cáo Bảng Tính
-   - 3.7. Quy Trình Đăng Bài Đa Kênh Truyền Thông 1-Chạm
-   - 3.8. Quy Trình Trợ Lý Số AI Chào Mừng & Hướng Dẫn Doanh Nhân
+   - 1.1. Bối cảnh thành lập & Sứ mệnh kết nối doanh nhân CEO HN10
+   - 1.2. Thách thức thực tế trước khi chuyển đổi số (Pain Points)
+   - 1.3. Mục tiêu chiến lược & Chỉ số đo lường hiệu quả (Strategic KPIs)
+   - 1.4. Sơ đồ kiến trúc tổng thể Hệ sinh thái VOA CEO HN10 (Mermaid Diagram)
+2. **CHƯƠNG 2: CƠ CẤU TỔ CHỨC & PHÂN ĐỊNH TRÁCH NHIỆM 7 BAN CHUYÊN MÔN**
+   - 2.1. Sơ đồ cơ cấu tổ chức Ban Cố Vấn, Ban Cán Sự & 7 Ban Chuyên Môn (Mermaid Diagram)
+   - 2.2. Ma trận chức năng, thẩm quyền & quy chế hoạt động của từng ban
+3. **CHƯƠNG 3: HỆ THỐNG SƠ ĐỒ QUY TRÌNH NGHIỆP VỤ KINH DOANH CHI TIẾT (11 BUSINESS FLOWCHARTS)**
+   - 3.1. Quy trình Thẩm định, Phê duyệt & Cấp Thẻ Doanh Nhân Số QR
+   - 3.2. Quy trình Quản lý Lớp học, Lịch học & Điểm danh QR Realtime
+   - 3.3. Quy trình Tổ chức Sự kiện, Import bóc tách file Word/Excel/PDF & Đăng ký đại biểu
+   - 3.4. Quy trình Bốc thăm trúng thưởng & Biểu quyết điện tử tại Sự kiện / Gala
+   - 3.5. Quy trình Vận động Nhà tài trợ & Phân bổ 4 Nguồn Quỹ (Không dùng gói cố định)
+   - 3.6. Quy trình Quản lý Tài chính Thu - Chi 4 Cấp, Sổ Quỹ 2.1 Tỷ VNĐ & Xuất Báo cáo
+   - 3.7. Quy trình Thiết lập Biểu mẫu (Templates) cấu hình định dạng Excel, Word, PDF động
+   - 3.8. Quy trình Điều hành Cuộc họp, Biên bản nghị quyết & Kho Lưu trữ học liệu
+   - 3.9. Quy trình Sàn giao thương B2B & Kết nối hợp tác doanh nghiệp nội khối
+   - 3.10. Quy trình Phân quyền Động RBAC 2 chiều & Phân quyền Trợ lý AI (8 năng lực)
+   - 3.11. Quy trình Trợ lý AI thực thi tác vụ 5 bước (Bóc tách -> Soạn thảo -> Chọn người nhận -> Xem trước -> Phê duyệt)
 4. **CHƯƠNG 4: MA TRẬN YÊU CẦU NGHIỆP VỤ & 30 BUSINESS USE CASES (BUC)**
-   - 4.1. Nhóm 15 Business Use Cases Quản Trị Hiệp Hội (`BUC-CRM-001` đến `BUC-CRM-015`)
-   - 4.2. Nhóm 15 Business Use Cases Học viên Doanh Nhân (`BUC-APP-001` đến `BUC-APP-015`)
-5. **CHƯƠNG 5: ĐẶC TẢ CHI TIẾT CÁC QUY TRÌNH NGHIỆP VỤ CỐT LÕI**
-6. **CHƯƠNG 6: QUY ĐỊNH PHƯƠNG THỨC THANH TOÁN (MÃ QR MOMO & CỔNG VNPAY)**
-7. **CHƯƠNG 7: TIÊU CHÍ NGHIỆM THU KINH DOANH (BUSINESS ACCEPTANCE CRITERIA)**
+   - 4.1. Nhóm 15 Use Cases Cổng Quản Trị Web CRM (`BUC-CRM-001` đến `BUC-CRM-015`)
+   - 4.2. Nhóm 15 Use Cases Mobile App Học Viên (`BUC-APP-001` đến `BUC-APP-015`)
+5. **CHƯƠNG 5: TIÊU CHÍ NGHIỆM THU NGHIỆP VỤ (BUSINESS ACCEPTANCE CRITERIA)**
 
 ---
 
 ## CHƯƠNG 1: TỔNG QUAN, BỐI CẢNH VẬN HÀNH & MỤC TIÊU CHIẾN LƯỢC
 
-### 1.1. Bối Cảnh Hình Thành & Sứ Mệnh CLB Doanh Nhân CEO HN10
-Câu lạc bộ Doanh nhân CEO HN10 được thành lập với tư cách là tổ chức thành viên trực thuộc Hội Doanh Nghiệp Trẻ Hà Nội (HanoiBA). Đây là nơi quy tụ hơn 500+ Chủ tịch Hội đồng Quản trị, Tổng Giám đốc, Nhà sáng lập và Lãnh đạo cấp cao của các doanh nghiệp tư nhân tiêu biểu thuộc CLB Doanh Nhân CEO HN10 (HN10) trên địa bàn Thủ đô Hà Nội và các tỉnh thành trên cả nước.
+### 1.1. Bối cảnh thành lập & Sứ mệnh kết nối doanh nhân CEO HN10
+Câu lạc bộ Doanh nhân CEO HN10 là tổ chức thành viên trực thuộc Hội Doanh Nghiệp Trẻ Hà Nội (HanoiBA). Đây là nơi hội tụ các Chủ tịch Hội đồng Quản trị, Tổng Giám đốc, Nhà sáng lập và Lãnh đạo cấp cao của các doanh nghiệp tư nhân tiêu biểu thuộc lớp CEO HN10 trên địa bàn Thủ đô Hà Nội.
 
-Với phương châm **"Gắn kết sức mạnh — Nâng tầm doanh nhân"**, CLB Doanh nhân CEO HN10 là một liên minh kinh tế thực chiến, thúc đẩy xúc tiến thương mại nội khối, hỗ trợ tiếp cận nguồn lực đầu tư, chuyển đổi số mô hình doanh nghiệp, đồng thời là hạt nhân tích cực trong các chương trình an sinh xã hội, thiện nguyện vì cộng đồng của Hội Doanh Nhân Trẻ Hà Nội.
-
-Nhằm đưa hoạt động của hiệp hội lên tầm cao mới, CLB triển khai Hệ sinh thái chuyển đổi số toàn diện bao gồm:
-1. **Cổng Quản Trị Điều Hành Trung Ương:** Phục vụ Chủ tịch, Ban Thường Trực, Ban Thư Ký, Kế toán và các Trưởng Ban chuyên môn quản lý hội đồng bộ, minh bạch và khoa học.
-2. **Ứng Dụng Di Động Dành Cho Học viên Doanh Nhân:** Phục vụ toàn thể Học viên giao lưu, trao đổi cơ hội hợp tác B2B, mở gian hàng sản phẩm, đặt lịch hẹn làm việc và sử dụng danh thiếp điện tử thông minh.
-3. **Cổng Thông Tin Công Khai & Trang Đích Đa Phân Hệ:** Kênh truyền thông đối ngoại, giới thiệu năng lực câu lạc bộ, đăng ký gia nhập và đồng bộ thông tin đa nền tảng.
+Với phương châm **"Gắn kết sức mạnh — Nâng tầm doanh nhân"**, CLB Doanh nhân CEO HN10 hướng tới mục tiêu:
+1. Xây dựng khối liên minh kinh tế nội bộ vững chắc, ưu tiên tiêu dùng và hợp tác thương mại chéo giữa các doanh nghiệp thành viên.
+2. Chuẩn hóa công tác quản trị và đào tạo lãnh đạo doanh nghiệp thông qua các khóa học thực chiến.
+3. Tổ chức các hoạt động an sinh xã hội, thiện nguyện vì cộng đồng (CSR) thể hiện trách nhiệm của đội ngũ doanh nhân Thủ đô.
 
 ---
 
-### 1.2. Thách Thức Nghiệp Vụ Thực Tế Trước Khi Số Hóa (Pain Points)
-
-| Mã Vấn Đề | Khó Khăn & Điểm Nghẽn Nghiệp Vụ Thực Tế | Tác Động Tiêu Cực & Rủi Ro Vận Hành |
-| :--- | :--- | :--- |
-| **PP-01** | **Dữ liệu Học viên Phân tán & Thất lạc Nghiêm trọng** | Trước khi số hóa, hồ sơ Học viên lưu rải rác trên nhiều file bảng tính cá nhân và các nhóm chat mạng xã hội. Khi lãnh đạo thay đổi số điện thoại, chuyển trụ sở hay mở rộng ngành nghề, dữ liệu không được cập nhật tập trung, gây mất dấu thông tin và cản trở việc kết nối giao thương nội khối. |
-| **PP-02** | **Chồng chéo Thẩm quyền & Quy trình Phê duyệt Kết nạp Thủ công** | Đơn đăng ký gia nhập diễn ra qua giấy tờ hoặc tin nhắn cá nhân, thiếu sự phân định rành mạch giữa vai trò hành chính của Ban Thư Ký và thẩm quyền thẩm định tư cách của Ban Thành Viên. Dễ dẫn đến việc duyệt sai thẩm quyền hoặc bỏ sót hồ sơ doanh nhân tiêu biểu. |
-| **PP-03** | **Chậm trễ & Khó khăn Trong Quản lý Hội phí Thường niên** | Hội phí duy trì hoạt động hằng năm được theo dõi bằng việc kế toán thủ công kiểm tra sao kê ngân hàng. Do các khoản nộp tiền không có mã định danh chuẩn hóa, thường xuyên xảy ra tình trạng chuyển khoản không rõ danh tính, tốn hàng chục ngày công đối soát mỗi kỳ đại hội. |
-| **PP-04** | **Ùn tắc Cửa Check-in & Sắp xếp Sơ đồ Hội nghị, Gala Đại hội** | Tại các sự kiện lớn từ 300 đến 600 đại biểu, việc tìm tên trên danh sách giấy gây ùn tắc kéo dài 30-45 phút tại sảnh đón tiếp. Việc bố trí bàn tiệc dành cho Lãnh đạo Thành ủy, HanoiBA và Học viên cao cấp dễ xảy ra nhầm lẫn, làm ảnh hưởng đến tính trang trọng của hội nghị. |
-| **PP-05** | **Kiểm phiếu Bầu cử & Biểu quyết Nghị quyết Chậm trễ** | Công tác bầu cử Ban Chấp Hành nhiệm kỳ mới và thông qua nghị quyết đại hội trước đây dùng phiếu giấy. Quá trình phát phiếu, thu phiếu và ban kiểm phiếu làm việc thủ công kéo dài nhiều giờ đồng hồ, gián đoạn chương trình và thiếu tính minh bạch tức thời. |
-| **PP-06** | **Thiếu Sàn Giao Thương B2B Chuyên Biệt & Cơ Chế Đặt Lịch Gặp** | Doanh nhân có nhu cầu tiêu dùng chéo và hợp tác cung ứng nhưng không có sàn thương mại nội bộ để niêm yết sản phẩm với chính sách ưu đãi thành viên. Việc hẹn gặp đối tác tốn thời gian nhắn tin qua lại, không có cơ chế lưu lịch và nhắc hẹn tự động. |
-| **PP-07** | **Bỡ ngỡ Trước Nhiều Nghiệp Vụ Số (Thiếu Trợ Lý Hướng Dẫn)** | Các chủ doanh nghiệp bận rộn không có thời gian đọc cẩm nang dài hàng trăm trang. Cán bộ văn phòng và Học viên mới thường xuyên phải gọi điện hỏi quy trình, gây quá tải cho bộ phận thư ký và làm giảm tần suất tương tác với nền tảng số. |
+### 1.2. Thách thức thực tế trước khi chuyển đổi số (Pain Points)
+- **PP-01: Dữ liệu học viên phân tán**: Hồ sơ doanh nghiệp và học viên lưu rời rạc trên nhiều file Excel cá nhân, gây thất lạc thông tin khi doanh nghiệp thay đổi trụ sở hoặc người đại diện.
+- **PP-02: Quy trình quản lý thu - chi thủ công**: Hội phí và các khoản tài trợ theo dõi thủ công qua sao kê ngân hàng, không phân định minh bạch giữa Quỹ hoạt động và Quỹ thiện nguyện CSR.
+- **PP-03: Ùn tắc soát vé sự kiện & nhầm lẫn sơ đồ bàn tiệc**: Tại các sự kiện Gala lớn từ 300 - 600 khách, việc tìm tên trên danh sách giấy mất 30 - 45 phút, gây ùn tắc tại sảnh đón tiếp.
+- **PP-04: Thiếu công cụ biểu quyết và bốc thăm minh bạch**: Biểu quyết và bầu cử Ban Cán Sự bằng giấy tốn nhiều thời gian kiểm phiếu, thiếu tính tức thời.
+- **PP-05: Khó khăn trong bóc tách văn bản và lập báo cáo**: Ban thư ký và ban tổ chức sự kiện mất nhiều giờ nhập liệu thủ công từ các file Word/Excel kế hoạch chương trình vào phần mềm quản lý.
 
 ---
 
-### 1.3. Mục Tiêu Chiến Lược & Chỉ Số Đo Lường Hiệu Quả (Strategic KPIs)
-1. **Số hóa 100% Hồ Sơ Doanh Nhân & Tổ Chức:** Cấp mã định danh điện tử chuẩn hóa cho toàn thể Học viên, quản lý 360 độ hồ sơ pháp lý, mã số thuế, năng lực sản phẩm và chức danh đại diện.
-2. **Thanh Toán Thu Phí Tự Động Qua Mã QR MoMo & Cổng VNPay:** Tự động tạo mã thanh toán QR MoMo và liên kết cổng VNPay chứa chính xác mã định danh Học viên và số tiền cần nộp; đối soát tự động gạch nợ tức thì, giảm 98% thao tác thủ công của kế toán.
-3. **Soát Vé Thông Minh Dưới 0.5 Giây/Đại Biểu:** Nhận diện vé mời điện tử mã QR tại cổng sự kiện dưới 500 mili-giây, định vị ngay vị trí bàn tiệc danh dự và triệt tiêu 100% gian lận vé trùng.
-4. **Tăng Trưởng Doanh Số Giao Thương B2B Nội Khối Tối Thiểu 100 Tỷ VNĐ:** Thúc đẩy giao thương giữa các Học viên thông qua Sàn thương mại nội bộ và cơ chế kết nối 1-on-1 tự động đồng bộ lịch hẹn.
-5. **Kiểm Phiếu Đại Hội Thời Gian Thực (1 Người - 1 Phiếu):** Đại biểu biểu quyết trực tiếp trên điện thoại cá nhân, tổng hợp kết quả chính xác 100% trong vòng 1 giây ngay sau khi đóng phiên bầu cử.
-6. **Trợ Lý Trí Tuệ Nhân Tạo Đồng Hành 24/7:** Hướng dẫn Học viên thao tác theo mô hình tương tác trực quan ("Giáo viên đứng cạnh bảng"), tự động chào đón và nhắc nhở lịch hẹn trong ngày đầu tiên tham gia.
+### 1.3. Mục tiêu chiến lược & Chỉ số đo lường hiệu quả (Strategic KPIs)
+1. **Số hóa 100% Hồ sơ Học viên**: Cấp mã định danh điện tử (`HN10-xxx`) và danh thiếp số thông minh tích hợp mã QR cá nhân cho toàn bộ học viên.
+2. **Quản trị minh bạch Sổ Quỹ Hội 2.1 Tỷ VNĐ**: Tự động hạch toán thu chi, hỗ trợ luồng duyệt 4 cấp và xuất báo cáo tài chính đa định dạng (Excel, Word, PDF) áp dụng mẫu biểu mẫu động.
+3. **Soát vé QR E-Ticket dưới 0.5 giây/đại biểu**: Tự động sinh mã vé QR ngay khi đăng ký, quét mã check-in thời gian thực, triệt tiêu 100% vé trùng lặp.
+4. **Điểm danh buổi học realtime 1 chạm**: Chiếu mã QR buổi học lên màn chiếu để học viên quét trên Mobile App, tự động cập nhật sĩ số có mặt.
+5. **Trợ lý AI hỗ trợ tự động hóa nghiệp vụ**: Tự động bóc tách file Word/Excel kế hoạch sự kiện và thông báo nộp phí, hỗ trợ quy trình 5 bước phê duyệt thông minh.
 
 ---
 
-## CHƯƠNG 2: MÔ HÌNH VẬN HÀNH & PHÂN ĐỊNH TRÁCH NHIỆM 6 CHUYÊN BAN
-
-Hệ thống được thiết kế bám sát điều lệ chính thức của CLB Doanh Nhân CEO HN10 trực thuộc Hội Doanh Nhân Trẻ Hà Nội, phân định rành mạch quyền hạn giữa Ban Quản Trị, Ban Thư Ký và 6 Ban chuyên trách:
-
-```
-                               ┌────────────────────────────────────────┐
-                               │   BAN QUẢN TRỊ / BAN THƯỜNG TRỰC       │
-                               │   - Phê duyệt chiến lược & ngân sách   │
-                               │   - Cấp quyền quản trị hệ thống        │
-                               └──────────────────┬─────────────────────┘
-                                                  │
-                                                  ▼
-                               ┌────────────────────────────────────────┐
-                               │   BAN THƯ KÝ ĐIỀU HÀNH                 │
-                               │   - Triệu tập cuộc họp, điều phối task │
-                               │   - Quản lý tài liệu & văn thư CLB     │
-                               └──────────────────┬─────────────────────┘
-                                                  │
-         ┌───────────────────┬────────────────────┼───────────────────┬───────────────────┐
-         ▼                   ▼                    ▼                   ▼                   ▼
-┌─────────────────┐ ┌─────────────────┐  ┌─────────────────┐ ┌─────────────────┐ ┌─────────────────┐
-│ BAN THÀNH VIÊN  │ │ BAN GIAO THƯƠNG │  │ BAN SỰ KIỆN     │ │ BAN TÀI CHÍNH   │ │ BAN TRUYỀN THÔNG│
-│ - Thẩm định đơn │ │ - Duyệt sàn B2B │  │ - Gala, Hội nghị│ │ - Thu hội phí   │ │ - Đăng tin tức  │
-│ - Duyệt kết nạp │ │ - Ghép cặp 1on1 │  │ - Sơ đồ bàn tiệc│ │ - Cổng VNPay/MoMo│ │ - Đồng bộ mạng  │
-│ - Xếp hạng HV   │ │ - Chỉ số GD     │  │ - Soát vé QR    │ │ - Minh bạch quỹ │ │ - Landing Web   │
-└─────────────────┘ └─────────────────┘  └─────────────────┘ └─────────────────┘ └─────────────────┘
-```
-
----
-
-## CHƯƠNG 3: HỆ THỐNG SƠ ĐỒ QUY TRÌNH NGHIỆP VỤ KINH DOANH (8 BUSINESS FLOWCHARTS)
-
-### 3.1. Quy Trình Thẩm Định & Phê Duyệt Kết Nạp Học viên Mới
+### 1.4. Sơ đồ kiến trúc tổng thể Hệ sinh thái VOA CEO HN10
 
 ```mermaid
 flowchart TD
-    A([Doanh nhân nộp hồ sơ trực tuyến]) --> B[Điền họ tên, CCCD, năm sinh HN10, MST, Tên doanh nghiệp]
-    B --> C[Ban Thư Ký tiếp nhận sơ tuyển hành chính]
-    C --> D{Kiểm tra tính hợp lệ cơ bản}
-    
-    D -->|Thiếu thông tin| E[Gửi thông báo yêu cầu bổ sung giấy tờ]
-    E --> B
-    
-    D -->|Hợp lệ| F[Chuyển hồ sơ sang Ban Thành Viên thẩm định]
-    F --> G[Xác minh tra cứu MST trên Cổng ĐKKD Quốc gia]
-    G --> H[Thẩm tra năm sinh CEO Hà Nội 10 & Tư cách đạo đức]
-    
-    H --> I{Quyết định phê duyệt của Ban Thành Viên}
-    I -->|Không đạt| J([Thông báo từ chối kết nạp lịch thiệp])
-    I -->|Đạt chuẩn| K[Bấm Duyệt Kết Nạp Chính Thức trên CRM]
-    
-    K --> L[Hệ thống tự động cấp Mã Học viên HN10-xxxx]
-    L --> M[Kích hoạt Thẻ doanh nhân điện tử & Mã QR định danh]
-    M --> N[Phát hành thư điện tử chúc mừng kèm thông tin đăng nhập]
-    N --> O([Học viên chính thức gia nhập CLB CEO HN10])
+    subgraph Users["NGƯỜI DÙNG & CHỦ THỂ HỆ THỐNG"]
+        LopTruong["Lớp Trưởng / Ban Cán Sự"]
+        BanChuyenMon["7 Ban Chuyên Môn (Học Tập, Sự Kiện, Tài Chính, Thiện Nguyện...)"]
+        HocVien["Học Viên Doanh Nhân CEO HN10"]
+    end
+
+    subgraph Access["CÁC CỔNG GIAO DIỆN TRUY CẬP"]
+        CRM["CỔNG QUẢN TRỊ WEB CRM<br/>(Desktop Executive Dashboard)"]
+        MobileApp["CEO HN10 MOBILE APP<br/>(iOS & Android Native / PWA)"]
+        AIWizard["TRỢ LÝ AI ĐIỀU HÀNH<br/>(AI Workflow Hub 5 Bước)"]
+    end
+
+    subgraph Core["HỆ THỐNG BACKEND & XỬ LÝ NGHIỆP VỤ"]
+        NestGateway["NestJS API Gateway & Guards<br/>(Port 5000 /api)"]
+        RBAC["Bộ Đánh Giá Phân Quyền Động RBAC 2 Chiều<br/>(computeUserRbacEvaluation)"]
+        AIEngine["AI Knowledge Base & Document Parser<br/>(Bóc tách Word, Excel, PDF)"]
+        SocketEngine["Socket.IO Realtime Engine<br/>(Điểm danh QR, Soát vé, Bốc thăm)"]
+    end
+
+    subgraph Database["CƠ SỞ DỮ LIỆU CHUẨN DUY NHẤT (RULE 0)"]
+        PgBouncer["PgBouncer Connection Pooler<br/>(113.20.107.184:6432)"]
+        PostgresDB[("PostgreSQL ceohn10_project<br/>User: app1<br/>32 Bảng Dữ Liệu Thực Tế")]
+    end
+
+    LopTruong --> CRM
+    BanChuyenMon --> CRM
+    HocVien --> MobileApp
+    LopTruong --> AIWizard
+
+    CRM --> NestGateway
+    MobileApp --> NestGateway
+    AIWizard --> NestGateway
+
+    NestGateway --> RBAC
+    NestGateway --> AIEngine
+    NestGateway --> SocketEngine
+
+    RBAC --> PgBouncer
+    AIEngine --> PgBouncer
+    SocketEngine --> PgBouncer
+    PgBouncer --> PostgresDB
 ```
 
 ---
 
-### 3.2. Quy Trình Giao Thương B2B & Đặt Lịch Hẹn 1-on-1 trong 3 Tình Huống
+## CHƯƠNG 2: CƠ CẤU TỔ CHỨC & PHÂN ĐỊNH TRÁCH NHIỆM 7 BAN CHUYÊN MÔN
+
+### 2.1. Sơ đồ cơ cấu tổ chức Ban Cố Vấn, Ban Cán Sự & 7 Ban Chuyên Môn
 
 ```mermaid
 flowchart TD
-    START([Bắt đầu nhu cầu kết nối giao thương]) --> CHOOSE_CASE{Lựa chọn 1 trong 3 tình huống}
+    HanoiBA["HỘI DOANH NGHIỆP TRẺ HÀ NỘI (HanoiBA)"]
+    BanCoVan["BAN CỐ VẤN LỚP CEO HN10"]
+    HanoiBA --- BanCoVan
 
-    CHOOSE_CASE -->|Tình huống 1: Tự do| CASE1[Tra cứu Danh bạ Doanh nhân theo ngành nghề<br/>Bấm 'Lên lịch gặp 1-on-1']
-    CHOOSE_CASE -->|Tình huống 2: Từ Cơ hội| CASE2[Đọc bài đăng chia sẻ cơ hội B2B<br/>Bấm 'Hẹn gặp trao đổi cơ hội'<br/>Khóa tiêu đề cơ hội vào nội dung]
-    CHOOSE_CASE -->|Tình huống 3: Từ Sản phẩm| CASE3[Xem giải pháp tại Gian hàng Sàn TMĐT<br/>Bấm 'Lên lịch làm việc B2B'<br/>Khóa tên sản phẩm vào nội dung]
+    subgraph BCS["BAN CÁN SỰ LÂM THỜI CEO HN10"]
+        LopTruong["Lớp Trưởng Lâm Thời<br/>(Phê duyệt tối cao toàn diện)"]
+        LopPho["Lớp Phó Lâm Thời<br/>(Điều hành khối chuyên môn)"]
+        TongThuKy["Tổng Thư Ký Lâm Thời<br/>(Điều phối văn phòng & tài liệu)"]
+    end
 
-    CASE1 --> FILL_FORM[Chọn ngày, giờ, hình thức: Trực tiếp / Trực tuyến Jitsi]
-    CASE2 --> FILL_FORM
-    CASE3 --> FILL_FORM
+    BanCoVan --> LopTruong
+    LopTruong --- LopPho
+    LopTruong --- TongThuKy
 
-    FILL_FORM --> SUBMIT[Bấm 'Xác Nhận Đặt Lịch Hẹn']
-    SUBMIT --> AUTO_MSG[Hệ thống tự động gửi 1 tin nhắn thông báo vào Hộp thư Trò chuyện 2 bên]
-    AUTO_MSG --> PUSH_NOTIF[Bắn thông báo đẩy đến điện thoại đối tác]
+    subgraph Committees["7 BAN CHUYÊN MÔN HOẠT ĐỘNG"]
+        BHT["1. BAN HỌC TẬP & ĐÀO TẠO (BHT)<br/>- Khóa học quản trị<br/>- Lịch học & Điểm danh QR"]
+        BSK["2. BAN SỰ KIỆN & HẬU CẦN (BSK)<br/>- 4 Sự kiện thường niên<br/>- Soát vé E-Ticket & Bốc thăm"]
+        BTC["3. BAN TÀI CHÍNH (BTC)<br/>- Sổ quỹ 2.1 Tỷ VNĐ<br/>- Thu chi & Báo cáo tài chính"]
+        BTN["4. BAN THIỆN NGUYỆN & ĐỜI SỐNG (BTN)<br/>- Quỹ Thiện nguyện CSR<br/>- Hoạt động an sinh xã hội"]
+        BTT["5. BAN TRUYỀN THÔNG (BTT)<br/>- Tin tức & Bài viết PR<br/>- Thông báo đa kênh"]
+        B2B["6. BAN B2B & XÚC TIẾN (B2B)<br/>- Kết nối giao thương<br/>- Chào mua, chào bán ưu đãi"]
+        BTV["7. BAN THÀNH VIÊN (BTV)<br/>- Thẩm định hồ sơ học viên<br/>- Danh thiếp số & Chăm sóc"]
+    end
 
-    PUSH_NOTIF --> PARTNER_DECISION{Đối tác nhận lời mời xử lý}
-    PARTNER_DECISION -->|Bấm Đồng Ý| CONFIRM_ACTION[Tự động gửi tin nhắn xác nhận vào luồng chat 2 bên]
-    CONFIRM_ACTION --> SYNC_CALENDAR[Tự động thêm vào Lịch công tác cá nhân & Hẹn giờ nhắc trước 30p]
-    SYNC_CALENDAR --> SUCCESS([Cuộc hẹn B2B sẵn sàng diễn ra])
+    LopPho --> BHT
+    LopPho --> BSK
+    LopPho --> BTC
+    LopPho --> BTN
+    LopPho --> BTT
+    LopPho --> B2B
+    LopPho --> BTV
+```
 
-    PARTNER_DECISION -->|Từ chối / Bận hẹn| REJECT_ACTION[Nhập lý do phản hồi vào luồng chat]
-    REJECT_ACTION --> END_REJECT([Thông báo lịch hẹn chưa thực hiện])
+### 2.2. Ma trận chức năng, thẩm quyền & quy chế hoạt động của từng ban
+
+| Mã Ban | Tên Ban Chuyên Môn | Vai Trò & Thẩm Quyền Nghiệp Vụ Cốt Lõi |
+| :---: | :--- | :--- |
+| **BDH** | **Ban Cán Sự (BCS)** | Lãnh đạo chung, phê duyệt kế hoạch tài chính, duyệt chi ngân sách lớn, quyết định bổ nhiệm nhân sự và kết nạp thành viên. |
+| **BHT** | **Ban Học Tập & Đào Tạo** | Xây dựng chương trình giảng dạy, mời giảng viên chuyên gia, thiết lập lịch buổi học, kiểm soát mã QR điểm danh realtime và tài liệu bài giảng. |
+| **BSK** | **Ban Sự Kiện & Hậu Cần** | Tổ chức 4 sự kiện cố định thường niên (15/03, 18/07, 26/12, 16/01), bóc tách kế hoạch sự kiện từ file Word/Excel, soát vé E-Ticket và điều khiển bốc thăm may mắn. |
+| **BTC** | **Ban Tài Chính** | Quản lý minh bạch Sổ Quỹ Hội 2.1 Tỷ VNĐ, theo dõi các khoản thu chi, lập phiếu thu/chi, đối soát chứng từ và xuất báo cáo tài chính đa định dạng. |
+| **BTN** | **Ban Thiện Nguyện & Đời Sống**| Vận động và điều phối Quỹ Thiện Nguyện CSR (tiền mặt & hiện vật), tổ chức các chương trình tương thân tương ái, chăm lo đời sống học viên. |
+| **BTT** | **Ban Truyền Thông** | Quản lý tin tức bài viết, truyền thông thương hiệu lớp CEO HN10, phát hành thông báo sự kiện/lớp học qua email và thông báo đẩy. |
+| **B2B** | **Ban B2B & Xúc Tiến Thương Mại**| Điều phối sàn giao thương B2B nội khối, thúc đẩy hợp tác tiêu dùng chéo giữa các doanh nghiệp học viên với chính sách chiết khấu ưu đãi. |
+| **BTV** | **Ban Thành Viên** | Thẩm định tư cách pháp nhân doanh nghiệp, quản lý hồ sơ học viên 360 độ, theo dõi tình trạng sinh hoạt và gia hạn niên liễm. |
+
+---
+
+## CHƯƠNG 3: HỆ THỐNG SƠ ĐỒ QUY TRÌNH NGHIỆP VỤ KINH DOANH CHI TIẾT (11 FLOWCHARTS)
+
+### 3.1. Quy trình Thẩm định, Phê duyệt & Cấp Thẻ Doanh Nhân Số QR
+
+```mermaid
+flowchart TD
+    Start([Doanh Nhân Đăng Ký Gia Nhập]) --> Step1[Điền Đơn Đăng Ký Trực Tuyến & Cung Cấp MST]
+    Step1 --> Step2[Ban Thành Viên BTV Tiếp Nhận Hồ Sơ]
+    Step2 --> Decision1{Xác Minh MST & Pháp Nhân Hợp Lệ?}
+    
+    Decision1 -- Không --> Reject[Thông Báo Bổ Sung Hoặc Từ Chối]
+    Decision1 -- Có --> Step3[Trình Lớp Trưởng Phê Duyệt Kết Nạp]
+    
+    Step3 --> Decision2{Lớp Trưởng Phê Duyệt?}
+    Decision2 -- Không --> Reject
+    Decision2 -- Có --> Step4[Backend Tạo Bản Ghi members & ceohn10_users]
+    
+    Step4 --> Step5[Tự Động Cấp Mã Học Viên HN10-xxx & Sinh QR Code Cá Nhân]
+    Step5 --> Step6[Gửi Email Chào Mừng Kèm Tài Khoản & Danh Thiếp Số]
+    Step6 --> End([Học Viên Đăng Nhập & Kích Hoạt Thẻ])
 ```
 
 ---
 
-### 3.3. Quy Trình Tổ Chức Sự Kiện Gala & Lưu Vết Kỷ Niệm 5 Hạng Mục
+### 3.2. Quy trình Quản lý Lớp học, Lịch học & Điểm danh QR Realtime
 
 ```mermaid
 flowchart TD
-    A([Ban Sự Kiện khởi tạo Sự Kiện mới trên CRM]) --> B[Cấu hình tên Gala, thời gian, địa điểm, hạn mức đại biểu]
-    B --> C[Phát hành vé mời điện tử có Mã QR Check-in đến Học viên]
-    C --> D[Học viên đăng ký vé & nhận vị trí bàn tiệc dự kiến]
+    Start([Ban Học Tập Lập Kế Hoạch Đào Tạo]) --> Step1[Tạo Khóa Học & Lập Danh Sách Các Buổi Học]
+    Step1 --> Step2[Hệ Thống Tự Động Bắn Thông Báo Lịch Học Đến Học Viên]
+    Step2 --> Step3[Đến Ngày Học: Cán Bộ Lớp Bấm 'Mở Điểm Danh Buổi Học' Trên CRM]
     
-    D --> E[Đến ngày diễn ra: Quét mã QR tại Cổng Check-in dưới 0.3s]
-    E --> F[Bế mạc sự kiện: Chuyển trạng thái ĐÃ KẾT THÚC]
+    Step3 --> Step4[Hệ Thống Sinh Mã QR Điểm Danh Realtime Ngẫu Nhiên]
+    Step4 --> Step5[Chiếu Mã QR Khổ Lớn Lên Máy Chiếu Hội Trường]
     
-    F --> G[Ban Tổ Chức nhập dữ liệu Lưu Vết Kỷ Niệm 5 Hạng Mục]
-    G --> H1[1. Thư mục ảnh: Gán link Google Drive tải 450+ ảnh RAW & Video 4K]
-    G --> H2[2. Nhà tài trợ: Lưu phân hạng Kim Cương, Vàng, Bạc, Đồng Hành]
-    G --> H3[3. Biểu quyết: Lưu kết quả 3 Nghị quyết thông qua tại đại hội]
-    G --> H4[4. Giải thưởng: Lưu danh sách Lucky Draw xe máy VinFast & Cúp vinh danh]
-    G --> H5[5. Sắp xếp chỗ ngồi: Lưu sơ đồ phân bổ Bàn Chủ tịch VIP 01 & A1-A3]
-
-    H1 --> I[Học viên mở màn Sự Kiện -> Chọn Lịch sử sự kiện]
-    H2 --> I
-    H3 --> I
-    H4 --> I
-    H5 --> I
-    I --> J[Bấm nút 'Biên bản & Kỷ niệm sự kiện' xem toàn bộ 5 khối dữ liệu]
+    Step5 --> Step6[Học Viên Mở Mobile App Quét Mã QR Trên Màn Chiếu]
+    Step6 --> Decision{Mã QR Hợp Lệ & Trong Giờ Học?}
+    
+    Decision -- Không --> Error[Báo Lỗi Quét Thất Bại]
+    Decision -- Có --> Success[Ghi Nhận Điểm Danh Vào CSDL 113.20.107.184:6432]
+    
+    Success --> Realtime[Socket.IO Tự Động Tăng Sĩ Số Có Mặt Trên CRM]
+    Realtime --> End([Cán Bộ Khóa Sổ Buổi Học & Xuất Nhật Ký Điểm Danh])
 ```
 
 ---
 
-### 3.4. Quy Trình Điều Hành Hoạt Động Họp Ban (Họp Cố Định vs Họp Bất Thường)
+### 3.3. Quy trình Tổ chức Sự kiện, Import bóc tách file Word/Excel/PDF & Đăng ký đại biểu
 
 ```mermaid
 flowchart TD
-    A([Ban Thư Ký tạo lịch họp mới trên CRM]) --> B{Phân định tính chất cuộc họp}
-
-    B -->|Họp định kỳ theo quy chế| C1[Phân loại: Cuộc Họp Cố Định Theo Ban<br/>- Họp Ban Điều Hành định kỳ<br/>- Họp Ban Xúc Tiến Thương Mại định kỳ<br/>- Gặp mặt Ban Thành Viên định kỳ]
-    C1 --> D1[Gắn Badge màu Xanh Navy nhận diện chuẩn CLB]
-
-    B -->|Phát sinh tình huống khẩn cấp| C2[Phân loại: Cuộc Họp Xảy Ra Bất Thường<br/>- Họp khẩn Ban Thường Trực cứu trợ bão lũ<br/>- Họp hiệp thương liên minh gói thầu B2B 50 tỷ]
-    C2 --> D2[Gắn Badge màu Hổ Phách & Icon Cảnh Báo khẩn]
-
-    D1 --> E[Đính kèm tài liệu văn thư & Khởi tạo link phòng họp Jitsi an toàn]
-    D2 --> E
-
-    E --> F[Phát hành lịch họp tới Học viên được triệu tập]
-    F --> G[Học viên mở Tab 'Hoạt Động' trên App -> Chọn bộ lọc con]
-    G --> H{Học viên lựa chọn thao tác}
-    H -->|Bấm Vào Phòng Họp Ngay| I[Mở phòng họp trực tuyến Jitsi Meet có mã hóa]
-    H -->|Bấm Xác Nhận Tham Dự| J[Hệ thống cập nhật danh sách đại biểu tham gia]
+    Start([Ban Sự Kiện Chuẩn Bị Tổ Chức Sự Kiện]) --> Choice{Phương Thức Khởi Tạo?}
+    
+    Choice -- Kéo Thả File --> ImportFile[Tải Lên File Kế Hoạch .docx / .xlsx / .pdf]
+    ImportFile --> Parser[event-doc-parser.ts Bóc Tách: Tên, Giờ, Địa Điểm, Diễn Giả, Sức Chứa]
+    Parser --> FillForm[Tự Động Điền Dữ Liệu Vào Popup EventWizard]
+    
+    Choice -- Nhập Tay --> FillForm
+    
+    FillForm --> SaveEvent[Bấm 'Tạo Sự Kiện' -> Ghi Vào Bảng events]
+    SaveEvent --> StepPopup[Popup Chuyển Sang Bước Đăng Ký Đại Biểu Tham Dự]
+    
+    StepPopup --> AddAttendee[Nhập: Họ Tên, Chức Danh, SĐT, Tên Doanh Nghiệp]
+    AddAttendee --> GenTicket[Hệ Thống Sinh Mã Vé TKT-xxx & QR E-Ticket]
+    GenTicket --> SaveAttendee[Ghi Vào Bảng event_registrations]
+    
+    SaveAttendee --> SendTicket[Gửi Vé Điện Tử E-Ticket Đến SĐT / Email Đại Biểu]
+    SendTicket --> EventDay[Đến Ngày Sự Kiện: Quét QR Soát Vé Tại Cổng Dưới 0.5s]
+    EventDay --> End([Ghi Nhận Check-in & Định Vị Bàn Tiệc])
 ```
 
 ---
 
-### 3.5. Quy Trình Thu Hội Phí Tự Động Qua Mã QR MoMo & Cổng VNPay
+### 3.4. Quy trình Bốc thăm trúng thưởng & Biểu quyết điện tử tại Sự kiện / Gala
 
 ```mermaid
 flowchart TD
-    A([Học viên nhận thông báo nộp hội phí thường niên 10.000.000 đ]) --> B[Bấm 'Thanh Toán Ngay' trên ứng dụng di động]
-    B --> C{Lựa chọn phương thức thanh toán}
-
-    C -->|Mã QR Ví MoMo| D1[Hệ thống sinh mã QR MoMo chứa sẵn Mã Học viên & Số tiền]
-    D1 --> E1[Quét mã trên App MoMo hoặc ứng dụng Ngân hàng liên kết]
-    E1 --> F1[Xác nhận thanh toán trên điện thoại]
-
-    C -->|Cổng Thanh Toán VNPay| D2[Chuyển hướng an toàn tới Cổng Quốc Gia VNPay]
-    D2 --> E2[Chọn thẻ ATM / Thẻ quốc tế Visa, Mastercard / Quét mã VNPay]
-    E2 --> F2[Xác thực OTP ngân hàng an toàn]
-
-    F1 --> G[Cổng thanh toán gửi tín hiệu xác nhận thành công tới hệ thống]
-    F2 --> G
-
-    G --> H[Hệ thống tự động thực thi Gạch Nợ Hội Phí tức thì]
-    H --> I[Cập nhật trạng thái thành viên: ĐÃ NỘP ĐỦ HỘI PHÍ THƯỜNG NIÊN]
-    I --> J[Tự động phát hành Biên Lai Thu Tiền Điện Tử có mã tra cứu]
-    J --> K[Kế toán CRM xem báo cáo đối soát tiền về tài khoản minh bạch 100%]
+    Start([Khai Mạc Phần Hội Gala / Đại Hội]) --> Split{Loại Tác Vụ?}
+    
+    Split -- Bốc Thăm May Mắn --> StepLD1[Thiết Lập Cơ Cấu Giải Thưởng (Đặc Biệt, Nhất, Nhì...)]
+    StepLD1 --> StepLD2[Lọc Danh Sách Đại Biểu Đã Check-in Thực Tế Tại Sự Kiện]
+    StepLD2 --> StepLD3[Bấm 'Quay Số May Mắn' -> Hiệu Ứng Trống & Vòng Xoay 3D]
+    StepLD3 --> StepLD4[Hiển Thị Họ Tên & Doanh Nghiệp Người Trúng Giải Lên Màn Hình Lớn]
+    StepLD4 --> StepLD5[Ghi Nhận Lịch Sử Vào lucky_draw_history & Trao Quà]
+    
+    Split -- Biểu Quyết Bầu Cử --> StepVote1[Ban Cán Sự Mở Phiên Biểu Quyết Trên CRM]
+    StepVote1 --> StepVote2[Màn Hình Mobile App Học Viên Hiện Popup Biểu Quyết]
+    StepVote2 --> StepVote3[Đại Biểu Bấm Chọn: Tán Thành / Không Tán Thành / Ý Kiến Khác]
+    StepVote3 --> StepVote4[Hệ Thống Kiểm Soát Ràng Buộc: 1 Người - 1 Phiếu Duy Nhất]
+    StepVote4 --> StepVote5[CRM Hiển Thị Biểu Đồ Tỷ Lệ Phiếu Realtime Sau Khi Đóng Phiên]
+    
+    StepLD5 --> End([Hoàn Tất Nghiệp Vụ])
+    StepVote5 --> End
 ```
 
 ---
 
-### 3.6. Quy Trình Đối Soát Biến Động & Xuất - Nhập Báo Cáo Bảng Tính
+### 3.5. Quy trình Vận động Nhà tài trợ & Phân bổ 4 Nguồn Quỹ (Không dùng gói cố định)
 
 ```mermaid
 flowchart TD
-    A([Kế toán mở Trung Tâm Thống Kê CRM]) --> B{Lựa chọn nghiệp vụ bảng tính}
-
-    B -->|Nghiệp vụ Xuất Báo Cáo| C1[Chọn 1 trong 3 chế độ xuất chuyên biệt]
-    C1 --> D1[Chế độ 1: Xuất theo chu kỳ Tháng / Quý / Năm]
-    C1 --> D2[Chế độ 2: Xuất chi tiết biến động từng Học viên]
-    C1 --> D3[Chế độ 3: Xuất báo cáo tăng trưởng & đối chiếu kỳ trước]
-    D1 --> E1[Tự động tạo file Excel có tiêu đề chuẩn và hàm tính tổng]
-    D2 --> E1
-    D3 --> E1
-    E1 --> F1([Tải file .xlsx về máy tính đối soát])
-
-    B -->|Nghiệp vụ Nhập Dữ Liệu| C2[Kéo thả tệp Excel danh bạ Học viên mới vào CRM]
-    C2 --> D4[Hệ thống tự động bóc tách hàng tiêu đề tiếng Việt]
-    D4 --> E2{Khớp cột dữ liệu?}
-    E2 -->|Không khớp| F2[Mở bảng ánh xạ cho cán bộ tự nối trường]
-    E2 -->|Khớp| G2[Chạy bộ máy kiểm tra trùng lặp SĐT & sai email]
-    F2 --> G2
-    G2 --> H2[Xem trước dữ liệu xanh sạch & Cảnh báo dòng lỗi]
-    H2 --> I2[Bấm 'Lưu Danh Bạ' -> Nạp an toàn vào danh bạ hiệp hội]
+    Start([Tiếp Nhận Cam Kết Tài Trợ]) --> Step1[Mở Màn Hình Khai Báo Nhà Tài Trợ]
+    Step1 --> Step2[Nhập Tên Nhà Tài Trợ & Ô Textarea Mở Rộng Điền Nội Dung]
+    Step2 --> Step3[BẮT BUỘC CHỌN 1 TRONG 4 NGUỒN QUỸ TÀI TRỢ]
+    
+    Step3 --> Branch{Phân Loại Nguồn Quỹ?}
+    
+    Branch -- Quỹ Hoạt Động · Tiền Mặt --> Fund1[Cộng Vào Quỹ Hoạt Động (Mục Tiền Mặt) -> Sinh Phiếu Thu]
+    Branch -- Quỹ Hoạt Động · Hiện Vật --> Fund2[Khai Báo Danh Mục Hiện Vật, Số Lượng & Giá Trị Quy Đổi VNĐ]
+    Branch -- Quỹ Thiện Nguyện · Tiền Mặt --> Fund3[Cộng Vào Quỹ Thiện Nguyện CSR (Mục Tiền Mặt)]
+    Branch -- Quỹ Thiện Nguyện · Hiện Vật --> Fund4[Khai Báo Vật Phẩm Từ Thiện (Áo Ấm, Quà Tặng CSR) & Nơi Lưu Kho]
+    
+    Fund1 --> SaveDB[Lưu Trực Tiếp Vào Bảng sponsors & sponsor_items]
+    Fund2 --> SaveDB
+    Fund3 --> SaveDB
+    Fund4 --> SaveDB
+    
+    SaveDB --> Report[Giao Diện sponsors.tsx & Báo Cáo Phân Tách Rạch Ròi 2 Khối Quỹ]
+    Report --> End([Xuất Thư Tri Ân & Vinh Danh Nhà Tài Trợ])
 ```
 
 ---
 
-### 3.7. Quy Trình Đăng Bài Đa Kênh Truyền Thông 1-Chạm
+### 3.6. Quy trình Quản lý Tài chính Thu - Chi 4 Cấp, Sổ Quỹ 2.1 Tỷ VNĐ & Xuất Báo Cáo
 
 ```mermaid
 flowchart TD
-    A([Ban Truyền Thông soạn thông cáo đại hội / tin tức sự kiện]) --> B[Nhập tiêu đề, nội dung tóm tắt, ảnh bìa trang trọng]
-    B --> C[Bấm 1 nút duy nhất: 'Đăng Bài Đa Kênh Truyền Thông']
+    Start([Phát Sinh Khoản Thu / Khoản Chi]) --> Step1[Kế Toán / Thủ Quỹ Lập Phiếu Trên CRM]
+    Step1 --> Step2[Nhập Số Hiệu Chứng Từ, Số Tiền, Diễn Giải & Tải Hóa Đơn]
+    Step2 --> Step3[Chọn Danh Mục: Niên Liễm, Sự Kiện, Lớp Học, Thiện Nguyện CSR, Vận Hành]
     
-    C --> D1[Xuất bản lên Cổng Tin Tức Website chính thức ceohn10.com]
-    C --> D2[Gửi bài đăng đồng bộ lên Fanpage & Nhóm Facebook Học viên]
-    C --> D3[Gửi tin nhắn thông báo chính thức đến Nhóm Zalo Ban Chấp Hành]
+    Step3 --> ApprovalFlow{Quy Trình Duyệt Chi 4 Cấp?}
     
-    D1 --> E[Hệ thống ghi nhận lịch sử phát hành thành công trong 1.2 giây]
-    D2 --> E
-    D3 --> E
-    E --> F([Toàn thể Học viên và đối tác cùng nhận được thông tin chuẩn xác])
+    ApprovalFlow -- Cấp 1 --> DeptCheck[Trưởng Ban Chuyên Môn Xác Nhận Dự Trù]
+    DeptCheck --> FinCheck[Trưởng Ban Tài Chính Kiểm Soát Định Mức]
+    FinCheck --> LeaderCheck[Lớp Trưởng Lâm Thời Phê Duyệt Cuối]
+    
+    LeaderCheck --> Decision{Được Duyệt?}
+    Decision -- Không --> Reject[Từ Chối Giải Ngân & Trả Về Kèm Lý Do]
+    Decision -- Có --> Approve[Cập Nhật approval_status = 'approved']
+    
+    Approve --> UpdateFund[Tự Động Cập Nhật Số Dư Sổ Quỹ Hội 2.1 Tỷ VNĐ]
+    UpdateFund --> ExportChoice[Chọn Xuất Báo Cáo Theo Danh Mục Chi Tiết]
+    
+    ExportChoice --> ApplyTemplate[Áp Dụng Mẫu Biểu Mẫu Định Dạng Đã Set Up]
+    ApplyTemplate --> ExportFile[Xuất File Hoàn Chỉnh: Excel, Word (.docx) hoặc PDF]
+    ExportFile --> End([Lưu Vào Lịch Sử finance_reports])
 ```
 
 ---
 
-### 3.8. Quy Trình Trợ Lý Số AI Chào Mừng & Hướng Dẫn Doanh Nhân
+### 3.7. Quy trình Thiết lập Biểu mẫu (Templates) cấu hình format định dạng Excel, Word, PDF
 
 ```mermaid
 flowchart TD
-    A([Học viên đăng nhập ứng dụng lần đầu tiên trong ngày]) --> B[Trợ lý AI tự động xuất hiện với giao diện Theme Sáng thanh lịch]
-    B --> C[Bỏ hoàn toàn viền bo cứng, bố trí gọn gàng, thân thiện]
-    C --> D{Kiểm tra lịch sự kiện & cơ hội trong ngày}
+    Start([Ban Thư Ký / Kế Toán Vào Phân Hệ Biểu Mẫu /templates]) --> Step1[Chọn Loại Biểu Mẫu: Tài Chính, Sự Kiện, Cuộc Họp, Thiện Nguyện]
+    Step1 --> Step2[Cấu Hình Phần Đầu Trang: Tên Hiệp Hội, Địa Chỉ, Quốc Hiệu Tiêu Ngữ, Số Hiệu Văn Bản]
+    Step2 --> Step3[Thiết Lập Danh Sách Cột: Đặt Tên Cột, Bật/Tắt Cột, Độ Rộng Cột, Định Dạng Tiền Tệ]
+    Step3 --> Step4[Cấu Hình Khối 3 Chữ Ký: Người Lập Biểu, Phụ Trách/Thủ Quỹ, Lớp Trưởng]
+    Step4 --> Step5[Bấm 'Lưu Biểu Mẫu' -> Ghi Vào CSDL Bảng templates (Dạng JSONB)]
+    Step5 --> Step6[Hệ Thống Tự Động Áp Dụng Cho Toàn Bộ Chức Năng Xuất Báo Cáo Không Hardcode]
+    Step6 --> End([Mọi Thay Đổi Format Chỉ Cần Chỉnh Tại Biểu Mẫu, Không Cần Sửa Code])
+```
+
+---
+
+### 3.8. Quy trình Điều hành Cuộc họp, Biên bản nghị quyết & Kho Lưu trữ học liệu
+
+```mermaid
+flowchart TD
+    Start([Ban Cán Sự Triệu Tập Cuộc Họp]) --> Step1[Tạo Lịch Họp Trên CRM: Thời Gian, Địa Điểm, Nội Dung Nghị Sự]
+    Step1 --> Step2[Chọn Danh Sách Đại Biểu Được Mời (Lớp Trưởng, Lớp Phó, 7 Trưởng Ban)]
+    Step2 --> Step3[Hệ Thống Tự Động Bắn Thông Báo Nhắc Lịch Họp Qua Mobile App]
+    Step3 --> Step4[Tổ Chức Họp & Thư Ký Soạn Thảo Biên Bản Trực Tiếp]
+    Step4 --> Step5[Tải Tệp Biên Bản Đã Ký Lên Phân Hệ Tài Liệu /documents]
+    Step5 --> Step6[Phân Quyền Truy Cập: Công Khai Cho Toàn Lớp Hoặc Giới Hạn Ban Cán Sự]
+    Step6 --> End([Lưu Vết Lịch Sử Tra Cứu Hoạt Động])
+```
+
+---
+
+### 3.9. Quy trình Sàn giao thương B2B & Kết nối hợp tác doanh nghiệp nội khối
+
+```mermaid
+flowchart TD
+    Start([Học Viên Có Sản Phẩm / Nhu Cầu Hợp Tác]) --> Step1[Mở Phân Hệ Giao Thương B2B Trên App]
+    Step1 --> Step2[Đăng Tin: Chào Bán Ưu Đãi (Offer) Hoặc Tìm Đối Tác (Demand)]
+    Step2 --> Step3[Điền Mức Chiết Khấu Đặc Quyền Dành Cho Lớp CEO HN10 (VD: 20% - 30%)]
+    Step3 --> Step4[Ban B2B Duyệt Nội Dung & Bài Đăng Hiển Thị Lên Bảng Tin]
+    Step4 --> Step5[Doanh Nghiệp Quan Tâm Bấm 'Kết Nối & Nhắn Tin 1-on-1' Trực Tiếp]
+    Step5 --> Step6[Hai Bên Thống Nhất Giao Dịch & Ghi Nhận Giá Trị Hợp Tác B2B Nội Khối]
+    Step6 --> End([Cộng Dồn Vào Chỉ Số Doanh Số Giao Thương Toàn Lớp])
+```
+
+---
+
+### 3.10. Quy trình Phân quyền Động RBAC 2 chiều & Phân quyền Trợ lý AI
+
+```mermaid
+flowchart TD
+    Start([Admin Vào Quản Lý Phân Quyền /permissions]) --> TabSelect{Chọn Tab Quản Trị?}
     
-    D -->|Hôm nay có sự kiện / cơ hội| E1[Hiển thị lời chào trang trọng kèm Lịch sự kiện & Cơ hội hôm nay]
-    D -->|Hôm nay chưa có lịch mới| E2[Hiển thị lời chúc thành công kèm Sự kiện sắp tới & Giao thương tiêu điểm]
+    TabSelect -- Tab 1: Phân Quyền CRM --> CRMGrid[Ma Trận 9 Nhóm Chức Năng x 7 Vai Trò]
+    TabSelect -- Tab 2: Phân Quyền Mobile App --> AppGrid[Ma Trận Tính Năng App x Vai Trò]
+    TabSelect -- Tab 3: Phân Quyền Trợ Lý AI --> AIGrid[Ma Trận 8 Năng Lực AI x 7 Vai Trò]
     
-    E1 --> F[Học viên bấm 'Bắt đầu ngày mới' để vào Trang chủ]
-    E2 --> F
+    CRMGrid --> EditChecks[Bật/Tắt Checkbox: [Xem], [Thêm], [Sửa], [Xóa]]
+    AppGrid --> EditChecks
+    AIGrid --> EditAIChecks[Bật/Tắt Năng Lực AI & Gán Cờ Bắt Buộc Duyệt]
     
-    F --> G[Trong quá trình sử dụng: Học viên cần hướng dẫn nghiệp vụ]
-    G --> H[Trợ lý AI mở mô hình 'Giáo viên đứng cạnh bảng']
-    H --> I[Hướng dẫn từng bước cách tạo cơ hội, đặt lịch hẹn 1-on-1, quét mã QR]
+    EditChecks --> SaveBtn[Bấm 'Lưu Thay Đổi']
+    EditAIChecks --> SaveBtn
+    
+    SaveBtn --> API[Gọi PUT /api/admin/permission-matrix hoặc PUT /api/ai/permissions/matrix]
+    API --> SaveDB[Ghi Vào Bảng app_settings (key: crm_permission_matrix, ai_permission_matrix)]
+    
+    SaveDB --> Eval[Khi User Đăng Nhập: computeUserRbacEvaluation Tính allowedRoutes & permissionsHash]
+    Eval --> ClientRender[Sidebar & Nút Chức Năng FE Tự Động Cập Nhật Tức Thì 100% Theo CSDL]
+    ClientRender --> End([Hoàn Toàn Không Hardcode Trên Code])
+```
+
+---
+
+### 3.11. Quy trình Trợ lý AI thực thi tác vụ 5 bước
+
+```mermaid
+flowchart TD
+    Start([Người Dùng Vào Trợ Lý AI Điều Hành]) --> Step1[BƯỚC 1: Chọn Tác Vụ (Nhắc Nộp Phí / Báo Cáo / Sự Kiện) & Kéo Thả File Word/Excel]
+    Step1 --> ParseAI[AI Tự Động Bóc Tách: Danh Sách Học Viên, Số Tiền, Email, SĐT]
+    
+    ParseAI --> Step2[BƯỚC 2: Soạn Thảo & Tối Ưu Giọng Văn Doanh Nhân]
+    Step2 --> Step3[BƯỚC 3: Chọn Người Nhận (Chọn 1 Người, Chọn Nhiều Người, Hoặc Checkbox 'Chọn Tất Cả')]
+    
+    Step3 --> Step4[BƯỚC 4: Xem Trước Giao Diện Email / Thông Báo Thực Tế]
+    Step4 --> Step5[BƯỚC 5: PHÊ DUYỆT & THỰC THI CUỐI CÙNG]
+    
+    Step5 --> ExecAction{Lựa Chọn Thao Tác?}
+    ExecAction -- Gửi Thông Báo --> SendNotif[Bấm 'Phê Duyệt & Gửi Thông Báo' -> Phát Hành Email & Thông Báo Đẩy]
+    ExecAction -- Xuất Báo Cáo --> ExportDocs[Bấm 'Duyệt & Xuất File' -> Tạo File Tự Động: Excel, Word, PDF Theo Biểu Mẫu]
+    
+    SendNotif --> End([Ghi Nhận Lịch Sử Vào Audit Log])
+    ExportDocs --> End
 ```
 
 ---
 
 ## CHƯƠNG 4: MA TRẬN YÊU CẦU NGHIỆP VỤ & 30 BUSINESS USE CASES (BUC)
 
-### 4.1. Nhóm 15 Business Use Cases Quản Trị Hiệp Hội (Cổng CRM)
+### 4.1. Nhóm 15 Business Use Cases Quản Trị Hiệp Hội (Web CRM)
 
-| Mã BUC | Tên Nghiệp Vụ Kinh Doanh | Đơn Vị Phụ Trách | Giá Trị Nghiệp Vụ Mang Lại |
-| :--- | :--- | :--- | :--- |
-| **BUC-CRM-001** | Thẩm tra & Phê duyệt Kết nạp Học viên | Ban Thành Viên | Chuẩn hóa quy trình kết nạp, đảm bảo uy tín và tư cách doanh nhân CEO HN10. |
-| **BUC-CRM-002** | Quản lý Hồ sơ 360 Độ & Phân ban | Ban Thư Ký | Quản lý thông tin pháp nhân, chi hội sinh hoạt và chức danh lãnh đạo. |
-| **BUC-CRM-003** | Giám sát Chỉ số Giao thương 5 Chu kỳ | Ban Quản Trị / BGT | Nắm bắt tổng quy mô giao dịch B2B, số cơ hội mở mới và chỉ số cống hiến. |
-| **BUC-CRM-004** | Xuất Báo cáo Bảng tính 3 Chế độ | Ban Tài Chính / Kế toán | Cung cấp số liệu tài chính minh bạch cho các kỳ họp Ban Chấp Hành. |
-| **BUC-CRM-005** | Nhập Danh bạ Bảng tính Thông minh | Ban Thành Viên | Tiết kiệm 95% thời gian nhập liệu danh bạ đại biểu sau mỗi kỳ xúc tiến. |
-| **BUC-CRM-006** | Quản lý Kênh Mạng Xã Hội Tích hợp | Ban Truyền Thông | Quản lý các điểm chạm truyền thông Fanpage, Group, Zalo OA của CLB. |
-| **BUC-CRM-007** | Đăng Bài Đa Kênh Đồng Loạt 1-Chạm | Ban Truyền Thông | Lan tỏa thông điệp đại hội nhanh chóng, không bị sót kênh đối ngoại. |
-| **BUC-CRM-008** | Quản trị Hệ thống Trang Đích Đa Mẫu | Ban Truyền Thông | Tùy biến mẫu Timed Cards Opening và Startup Mobile Showcase chuẩn nhận diện. |
-| **BUC-CRM-009** | Thiết lập Menu Phân Cấp & Subdomain | Ban Truyền Thông | Tạo trang con chuyên đề, gán tên miền phụ độc lập cho từng chiến dịch. |
-| **BUC-CRM-010** | Mở Xem Văn Bản & Tài Liệu Toàn Năng | Ban Thư Ký / Học viên | Xem trực tiếp điều lệ Word A4, bảng biểu Excel, văn bản chỉ đạo PDF. |
-| **BUC-CRM-011** | Bầu Cử Ban Chấp Hành & Biểu Quyết Số | Ban Kiểm Phiếu / Đại hội | Bầu cử 1 người 1 phiếu, tổng hợp kết quả chính xác 100% trong 1 giây. |
-| **BUC-CRM-012** | Phân Quyền Vai Trò Theo Chuyên Ban | Chủ Tịch / Superadmin | Đảm bảo tính bảo mật, chống can thiệp chéo giữa các ban chức năng. |
-| **BUC-CRM-013** | Kiểm Duyệt Sản Phẩm Sàn B2B Nội Khối | Ban Giao Thương | Kiểm soát chất lượng hàng hóa, duy trì giới hạn 5 sản phẩm tiêu biểu. |
-| **BUC-CRM-014** | Quản lý Thu Chi & Đối Soát QR MoMo/VNPay | Ban Tài Chính | Tự động hóa gạch nợ hội phí, minh bạch tuyệt đối sổ quỹ hiệp hội. |
-| **BUC-CRM-015** | Điều Phối Cuộc Họp Ban Cố Định & Bất Thường | Ban Thư Ký | Tổ chức kỳ họp định kỳ và phiên họp khẩn cấp có tài liệu và phòng họp. |
-
----
-
-### 4.2. Nhóm 15 Business Use Cases Học viên Doanh Nhân (Ứng Dụng Di Động)
-
-| Mã BUC | Tên Nghiệp Vụ Kinh Doanh | Đối Tượng Sử Dụng | Giá Trị Nghiệp Vụ Mang Lại |
-| :--- | :--- | :--- | :--- |
-| **BUC-APP-001** | Đăng ký Gia nhập Hiệp hội Trực tuyến | Doanh nhân ứng viên | Thủ tục nộp đơn thuận tiện ngay trên điện thoại, không cần giấy tờ in ấn. |
-| **BUC-APP-002** | Đăng nhập & Nhận Lời Chào AI Ngày Đầu | Doanh nhân Học viên | Trải nghiệm công nghệ đẳng cấp, nắm bắt sự kiện nổi bật trong ngày. |
-| **BUC-APP-003** | Danh Thiếp Điện Tử & Mã QR Cá Nhân | Doanh nhân Học viên | Giới thiệu doanh nghiệp chuyên nghiệp qua 1 lần chạm, quét vé vào Gala. |
-| **BUC-APP-004** | Đăng Tin Tìm Đối Tác & Chia Sẻ Cơ Hội | Doanh nhân Học viên | Mở rộng thị trường, gọi vốn hoặc tìm nhà cung ứng với quy mô Tỷ/Tr VNĐ. |
-| **BUC-APP-005** | Gian Hàng Giải Pháp & Sản Phẩm Nội Khối | Doanh nghiệp Học viên | Tiếp cận 500+ khách hàng tiềm năng là các CEO với chính sách ưu đãi. |
-| **BUC-APP-006** | Đặt Lịch Hẹn 1-on-1 Tự Do Doanh Nhân | Doanh nhân Học viên | Chủ động kết nối với lãnh đạo doanh nghiệp cùng ngành hoặc bổ trợ. |
-| **BUC-APP-007** | Đặt Lịch Hẹn Làm Việc Từ Tin Cơ Hội | Doanh nhân Học viên | Hẹn gặp đúng người đúng việc, nắm bắt cơ hội kinh doanh tức thời. |
-| **BUC-APP-008** | Đặt Lịch Đàm Phán Hợp Đồng Sản Phẩm | Doanh nhân Học viên | Thúc đẩy ký kết hợp đồng cung ứng trực tiếp từ gian hàng sàn TMĐT. |
-| **BUC-APP-009** | Tự Động Nhắn Tin & Đồng Bộ Lịch Công Tác | Doanh nhân Học viên | Không bỏ lỡ cuộc hẹn, nhận tin nhắn chính thức và chuông báo nhắc lịch. |
-| **BUC-APP-010** | Chia Sẻ Hoạt Động & Tin Tức Mục 'Khác' | Doanh nhân Học viên | Lan tỏa văn hóa doanh nghiệp, chia sẻ các hoạt động thiện nguyện ý nghĩa. |
-| **BUC-APP-011** | Bình Luận Cây Phản Hồi & Menu 3 Chấm | Doanh nhân Học viên | Thảo luận chuyên nghiệp, dễ dàng sao chép, chỉnh sửa hoặc xóa bình luận. |
-| **BUC-APP-012** | Nhắc Tên `@` Đối Tác Đã Kết Nối | Doanh nhân Học viên | Chỉ định đúng đối tác liên quan trong thảo luận, nhận thông báo tức thời. |
-| **BUC-APP-013** | Chia Sẻ Bài Viết Ra Mạng Xã Hội | Doanh nhân Học viên | Quảng bá năng lực doanh nghiệp ra ngoài với ảnh đại diện và tiêu đề chuẩn. |
-| **BUC-APP-014** | Đăng Ký Gala & Lưu Vết Kỷ Niệm 5 Khối | Doanh nhân Học viên | Xem lại kỷ yếu sự kiện: Nhà tài trợ, Nghị quyết, Giải thưởng, Ghế, Ảnh Drive. |
-| **BUC-APP-015** | Tham Gia Họp Ban & Nộp Phí MoMo/VNPay | Doanh nhân Học viên | Tham dự họp ban đúng thành phần và hoàn thành hội phí qua QR MoMo/VNPay. |
+| Mã BUC | Tên Nghiệp Vụ Use Case | Nhóm Phân Hệ | Diễn Giải Chi Tiết |
+| :---: | :--- | :--- | :--- |
+| `BUC-CRM-001` | Quản trị Dashboard Tổng quan & Ví Quỹ | Tổng quan | Theo dõi chỉ số toàn diện: Sĩ số học viên, Sổ quỹ 2.1 Tỷ VNĐ, 4 sự kiện thường niên. |
+| `BUC-CRM-002` | Trợ lý AI Điều hành & Workflow 5 Bước | Trợ lý AI | Bóc tách file Word/Excel/PDF, tối ưu copywriting doanh nhân, duyệt gửi thông báo và xuất báo cáo. |
+| `BUC-CRM-003` | Quản lý Hồ sơ 360 Độ Học viên | Học viên | Thẩm định, tạo mới, chỉnh sửa thông tin doanh nghiệp, xuất danh bạ học viên. |
+| `BUC-CRM-004` | Quản lý Lớp học & Điểm danh QR Realtime| Lớp học | Tạo khóa đào tạo, mở điểm danh buổi học bằng mã QR chiếu hội trường. |
+| `BUC-CRM-005` | Tổ chức Sự kiện & Import Bóc tách File | Sự kiện | Kéo thả file kế hoạch tạo sự kiện tự động, đăng ký đại biểu ngay tại popup. |
+| `BUC-CRM-006` | Biểu quyết điện tử & Kiểm phiếu Realtime| Sự kiện | Tạo phiên lấy ý kiến đại hội, kiểm soát 1 người - 1 phiếu, xem biểu đồ trực tiếp. |
+| `BUC-CRM-007` | Điều khiển Bốc thăm trúng thưởng Gala | Sự kiện | Thiết lập cơ cấu giải thưởng, quay số ngẫu nhiên đại biểu đã check-in. |
+| `BUC-CRM-008` | Quản lý Nhà tài trợ & 4 Nguồn Quỹ | Nhà tài trợ | Không dùng gói cứng, tự do điền nội dung, phân loại bắt buộc vào 4 nguồn quỹ. |
+| `BUC-CRM-009` | Quản trị Sổ Quỹ Hội 2.1 Tỷ VNĐ & Thu Chi | Tài chính | Lập phiếu thu, phiếu chi, đối soát hóa đơn chứng từ, luồng phê duyệt 4 cấp. |
+| `BUC-CRM-010` | Xuất Báo cáo Tài chính Đa Định Dạng | Tài chính | Chọn danh mục xuất (Sự kiện, Lớp học, Phí tham gia, CSR) xuất Word, Excel, PDF. |
+| `BUC-CRM-011` | Cấu hình Format Biểu mẫu Động | Biểu mẫu | Tùy biến mẫu báo cáo Word, Excel, PDF (tiêu ngữ, tên cột, 3 chữ ký) không hardcode. |
+| `BUC-CRM-012` | Quản lý Cuộc họp & Kho Lưu trữ số | Hoạt động | Lập lịch họp Ban Cán Sự, lưu trữ nghị quyết, quy chế, biên bản và học liệu. |
+| `BUC-CRM-013` | Cài đặt hệ thống & Nhật ký an ninh Audit | Hệ thống | Thiết lập thông số, theo dõi lịch sử thao tác của các tài khoản (đã bỏ ví VNPay/MoMo). |
+| `BUC-CRM-014` | Quản trị 7 Ban Chuyên Môn & Nhân sự | Phân quyền | Quản lý cơ cấu Ban Cán Sự và 7 Ban (bổ sung Ban Thiện Nguyện BTN). |
+| `BUC-CRM-015` | Ma trận Phân quyền Động RBAC & AI | Phân quyền | Điều khiển phân quyền 2 chiều cho CRM, App và 8 Năng lực Trợ Lý AI qua CSDL. |
 
 ---
 
-## CHƯƠNG 5: ĐẶC TẢ CHI TIẾT CÁC QUY TRÌNH NGHIỆP VỤ CỐT LÕI
+### 4.2. Nhóm 15 Business Use Cases Học Viên Doanh Nhân (Mobile App)
 
-### 5.1. Nghiệp Vụ Đặt Lịch Hẹn 1-on-1 trong 3 Tình Huống Kèm Nhắn Tin Tự Động
-Hệ thống thiết lập quy chuẩn tương tác kết nối kinh doanh văn minh giữa các lãnh đạo doanh nghiệp:
-* **Tình huống 1 (Hẹn gặp tự do từ danh bạ B2B):** Học viên mở Danh bạ kết nối, chọn một đối tác doanh nghiệp mong muốn thiết lập quan hệ. Bấm nút "Lên lịch gặp 1-on-1", hệ thống hiển thị biểu mẫu chọn ngày, giờ và địa điểm.
-* **Tình huống 2 (Hẹn gặp xuất phát từ Tin cơ hội):** Khi đọc một thông báo tìm kiếm nhà thầu, tìm đại lý phân phối hoặc kêu gọi hợp tác kinh doanh, Học viên bấm nút "Hẹn gặp trao đổi cơ hội". Hệ thống tự động khóa tiêu đề cơ hội vào nội dung cuộc hẹn để người nhận hiểu ngay mục đích cuộc gặp.
-* **Tình huống 3 (Hẹn gặp xuất phát từ Gian hàng sản phẩm):** Khi xem một sản phẩm cơ khí, vật liệu xây dựng, giải pháp công nghệ hoặc dịch vụ tư vấn trên sàn thương mại, Học viên bấm "Lên lịch làm việc B2B" để trao đổi chiết khấu hợp đồng.
-* **Quy chuẩn tự động hóa luồng tin nhắn:**
-  1. Khi người mời bấm xác nhận, hệ thống **tự động gửi một tin nhắn thông báo chính thức vào hộp thư trò chuyện** của người nhận kèm toàn bộ chi tiết thời gian, địa điểm và nội dung trao đổi.
-  2. Khi người nhận bấm "Đồng ý", hệ thống **tiếp tục gửi tin nhắn xác nhận vào luồng chat của cả hai bên** và tự động đồng bộ cuộc hẹn vào Lịch công tác cá nhân trên điện thoại kèm tính năng báo thức trước 30 phút.
-
----
-
-### 5.2. Nghiệp Vụ Sự Kiện Gala & Lưu Vết Kỷ Niệm 5 Hạng Mục
-Khắc phục triệt để tình trạng thất lạc tư liệu sau khi bế mạc các sự kiện tầm cỡ:
-* **Màn hình Sự kiện gồm 2 Danh mục chính:**
-  1. *Danh mục Sự Kiện:* Hiển thị danh sách các sự kiện sắp diễn ra để Học viên đăng ký nhận mã vé QR đón tiếp tại cổng. Khi sự kiện kết thúc, chuyển vào phân mục "Lịch sử sự kiện".
-  2. *Danh mục Hoạt Động:* Dành riêng cho các kỳ họp nội bộ.
-* **5 Khối Dữ Liệu Lưu Vết Kỷ Niệm Sự Kiện (Event History & Recap):**
-  1. **Thư Mục Ảnh Google Drive:** Nút bấm nổi bật mở trực tiếp kho lưu trữ Google Drive để Học viên tải về hơn 450+ hình ảnh chất lượng cao (ảnh RAW) và video phóng sự toàn cảnh sự kiện.
-  2. **Danh Sách Nhà Tài Trợ Đồng Hành:** Tôn vinh các doanh nghiệp tài trợ phân hạng rõ ràng: Kim Cương (Flamingo, Techcombank), Vàng (Eurowindow, MISA), Bạc (Sunhouse, Tân Á Đại Thành) và Đồng Hành B2B kèm Logo doanh nghiệp và số tiền tài trợ.
-  3. **Biểu Quyết & Nghị Quyết Đại Hội:** Lưu vết các nghị quyết chính thức đã được thông qua tại đại hội, tỷ lệ tán thành của đại biểu (98.6% - 100%) và trạng thái ban hành.
-  4. **Giải Thưởng & Vinh Danh:** Kết quả bốc thăm may mắn Lucky Draw (Giải đặc biệt xe máy điện VinFast Feliz S mã #HN10, laptop ThinkPad, voucher nghỉ dưỡng Flamingo) và các cúp vinh danh cống hiến.
-  5. **Sơ Đồ Phân Bổ Chỗ Ngồi:** Lưu trữ chính xác vị trí bàn tiệc (Bàn Đoàn Chủ tịch VIP 01, Bàn Doanh nghiệp A1-A3) kèm danh sách đại biểu từng ghế và ô tìm kiếm nhanh vị trí chỗ ngồi.
+| Mã BUC | Tên Nghiệp Vụ Use Case | Nhóm Phân Hệ | Diễn Giải Chi Tiết |
+| :---: | :--- | :--- | :--- |
+| `BUC-APP-001` | Đăng nhập an toàn & Xác thực sinh trắc | Tài khoản | Đăng nhập bằng Email/SĐT, hỗ trợ FaceID / Vân tay an toàn tiện lợi. |
+| `BUC-APP-002` | Thẻ Doanh Nhân Số & Danh Thiếp QR 1-Chạm | Trang chủ | Chạm để chia sẻ thông tin doanh nghiệp, quét mã kết nối danh bạ ngay tức thì. |
+| `BUC-APP-003` | Xem Lịch học & Quét QR Điểm danh Buổi học | Lớp học | Xem thời khóa biểu, tài liệu buổi học, quét mã QR trên máy chiếu để điểm danh. |
+| `BUC-APP-004` | Khám phá Sự kiện & Đăng ký Vé E-Ticket | Sự kiện | Xem lịch 4 sự kiện thường niên, đăng ký vé mời điện tử có mã QR soát vé. |
+| `BUC-APP-005` | Check-in Vào Cổng Gala Dưới 0.5 Giây | Sự kiện | Đưa mã vé QR E-Ticket cho ban lễ tân quét tại cổng, nhận vị trí bàn tiệc. |
+| `BUC-APP-006` | Biểu quyết điện tử trực tuyến | Sự kiện | Tham gia bầu cử Ban Cán Sự và biểu quyết nghị quyết trực tiếp trên điện thoại. |
+| `BUC-APP-007` | Tham gia Bốc thăm may mắn Gala | Sự kiện | Tự động có mã số may mắn khi check-in, nhận thông báo trúng giải ngay trên màn hình. |
+| `BUC-APP-008` | Đăng bài Giao thương B2B Nội Khối | Kết nối B2B | Niêm yết sản phẩm, dịch vụ với chính sách chiết khấu ưu đãi cho học viên. |
+| `BUC-APP-009` | Tìm kiếm Đối tác & Nhắn tin trao đổi | Kết nối B2B | Tìm kiếm doanh nghiệp theo ngành nghề, nhắn tin 1-on-1 bàn bạc cơ hội hợp tác. |
+| `BUC-APP-010` | Tra cứu Danh bạ Doanh nhân CEO HN10 | Danh bạ | Tìm kiếm thông tin liên hệ, chức vụ, lĩnh vực hoạt động của các chủ doanh nghiệp. |
+| `BUC-APP-011` | Đóng Hội Phí Niên Liễm & Lịch sử Tài chính| Cá nhân | Tra cứu tình trạng nộp hội phí cá nhân, nhận thông báo nhắc nộp từ thủ quỹ. |
+| `BUC-APP-012` | Đóng góp Quỹ Thiện Nguyện CSR | Thiện nguyện | Đồng hành cùng Ban Thiện Nguyện trong các hoạt động an sinh xã hội vì cộng đồng. |
+| `BUC-APP-013` | Đọc Tin tức & Truyền thông Hiệp hội | Truyền thông | Cập nhật tin hoạt động nội bộ, bài viết vinh danh doanh nhân tiêu biểu. |
+| `BUC-APP-014` | Khám phá Đặc quyền Quyền lợi & Ưu đãi | Ưu đãi | Sử dụng các voucher ưu đãi độc quyền từ các đối tác liên kết của CLB. |
+| `BUC-APP-015` | Tra cứu Văn bản, Quy chế & Kho Học liệu | Tài liệu | Tải và xem nghị quyết đại hội, slide bài giảng đào tạo mọi lúc mọi nơi. |
 
 ---
 
-### 5.3. Nghiệp Vụ Điều Hành Hoạt Động Họp Ban (Họp Cố Định vs Họp Bất Thường)
-Nhằm phục vụ công tác điều hành chuẩn mực theo mô hình các hiệp hội doanh nhân lớn:
-* **Cuộc Họp Cố Định Theo Ban:** Các kỳ họp được lên lịch định kỳ theo quy chế hoạt động của CLB (Kỳ họp Ban Điều Hành định kỳ, Họp Ban Xúc Tiến Thương Mại định kỳ, Gặp mặt định kỳ Ban Thành Viên). Hiển thị huy hiệu màu Xanh Navy trang trọng.
-* **Cuộc Họp Xảy Ra Bất Thường:** Các phiên họp đột xuất giải quyết công việc khẩn cấp (Họp khẩn Ban Thường Trực cứu trợ bão lũ, Họp hiệp thương liên minh gói thầu B2B 50 tỷ). Hiển thị huy hiệu màu Hổ Phách kèm biểu tượng cảnh báo.
-* Mỗi cuộc họp cung cấp đầy đủ thông tin: Cơ quan triệu tập, thành phần đại biểu, tài liệu đính kèm, nút "Vào phòng họp ngay" (kết nối phòng họp trực tuyến Jitsi an toàn) và nút "Xác nhận tham dự".
+## CHƯƠNG 5: TIÊU CHÍ NGHIỆM THU NGHIỆP VỤ (BUSINESS ACCEPTANCE CRITERIA)
 
----
-
-### 5.4. Nghiệp Vụ Giao Thương B2B, Hạn Mức Sàn TMĐT & Danh Mục Cơ Hội Quan Tâm
-* **Hạn Mức Niêm Yết Sàn B2B Nội Khối (Quota 5 Sản Phẩm/Doanh Nghiệp):** Mỗi doanh nghiệp Học viên được niêm yết tối đa 5 sản phẩm/dịch vụ tiêu biểu nhất. Cơ chế tự động kiểm tra số lượng hiện có, ngăn chặn tình trạng spam rác, đảm bảo chất lượng hàng hóa tinh hoa của CLB.
-* **Quy Trình Quan Tâm & Rút Quan Tâm Cơ Hội (B2B Express Interest & Uninterest):**
-  - Khi xem bài đăng cơ hội kinh doanh (mua sắm / hợp tác đầu tư), Học viên bấm "Tôi quan tâm" -> Hệ thống ghi nhận vào bảng `public.opportunity_interests` và bắn thông báo tới chủ cơ hội.
-  - Học viên có thể chủ động bấm "Bỏ quan tâm" bất kỳ lúc nào trên cả Mobile App và Cổng Quản Trị CRM. Hệ thống cập nhật đối soát xóa bản ghi qua UUID, mã Học viên và SĐT, phản hồi tức thời.
-  - Phân hệ hỗ trợ tab riêng "Cơ hội tôi quan tâm" giúp các CEO dễ dàng quản lý danh mục theo dõi.
-
----
-
-### 5.5. Nghiệp Vụ Quản Trị Thư Viện Tài Liệu Toàn Năng & Gửi Tài Liệu Vào Tin Nhắn CRM
-* **Xem Trực Tiếp Đa Định Dạng (Universal Document Viewer):**
-  - Tệp Word (.docx, .doc): Hiển thị chuẩn layout trang in văn bản hành chính A4 có căn lề, tiêu đề và điều lệ.
-  - Tệp Excel (.xlsx, .xls, .csv): Đọc và phân tích nhị phân đa sheet bằng SheetJS, hỗ trợ chuyển tab và bộ lọc tìm kiếm dòng trực tiếp trên trình duyệt.
-  - Tệp PDF (.pdf): Nhúng trình xem tài liệu đầy đủ chức năng phóng to/thu nhỏ, xoay trang và in ấn.
-* **Gửi Tài Liệu Trực Tiếp Vào Tin Nhắn Kết Nối CRM (`SendDocumentToMessageModal`):**
-  - Cán bộ CRM hoặc Học viên có thể chọn trực tiếp tệp tài liệu trong kho lưu trữ để gửi nhanh vào cuộc hội thoại kết nối B2B của Học viên nhận.
-  - Hệ thống tự động đóng gói tin nhắn dạng `[file:url|filename|size]`, cho phép người nhận tải về hoặc xem ngay tức thì.
-
----
-
-### 5.6. Nghiệp Vụ Bản Đồ Doanh Nghiệp 2D Google Maps & Tự Động Định Vị Tọa Độ
-* **Bản Đồ Doanh Nghiệp 2D Chuẩn Mực:** Khắc phục tình trạng phụ thuộc CDN bản đồ không ổn định, hệ thống chuyển sang sử dụng iframe nhúng Google Maps 2D chuẩn nét cao, hỗ trợ hiển thị địa chỉ đường phố tiếng Việt 100%.
-* **Tự Động Chuyển Đổi Địa Chỉ & Tọa Độ (Geocoding & Reverse-Geocoding):**
-  - Khi Học viên di chuyển con trỏ bản đồ trên giao diện sửa hồ sơ, hệ thống tự động gọi API reverse-geocode để cập nhật địa chỉ dạng chữ.
-  - Ngược lại, khi gõ địa chỉ văn phòng, hệ thống tự động tìm kiếm kinh độ / vĩ độ tương ứng và cập nhật vị trí ghim bản đồ, fallback an toàn về tọa độ trụ sở CLB tại Hà Nội (`21.016987, 105.784013`).
-
----
-
-### 5.7. Nghiệp Vụ Kiểm Duyệt & Quản Trị Bình Luận Tin Tức CRM
-* **Tab Kiểm Duyệt Bình Luận Chuyên Biệt:** Cung cấp cho Ban Truyền Thông và Quản trị viên cổng giám sát toàn diện mọi thảo luận trên các bài viết tin tức CLB.
-* **Quy Trình Kiểm Duyệt:** Cho phép tra cứu theo người bình luận, nội dung bài viết, thời gian gửi, và hỗ trợ nút bấm xóa bỏ vi phạm ngay lập tức nhằm bảo vệ không gian văn hóa chuẩn mực của hiệp hội.
-
----
-
-### 5.8. Quy Chuẩn Nhận Diện Thương Hiệu: Theme Cam Tiên Phong Mobile App & Bộ Biểu Tượng SVG
-* **Chủ Đề Màu Cam Tiên Phong (Pioneer Orange):** Mobile App Học viên triển khai đồng bộ tone màu vàng cam ấm áp (`#EA580C`, `#F97316`, `orange-500`, `orange-600`) từ bản thiết kế Figma: áp dụng trên Thẻ Doanh Nhân Hero Card, Quick Actions 4 cột, thanh Tab điều hướng và thẻ thông tin doanh nghiệp.
-* **Tích Hợp Trực Tiếp Bộ Biểu Tượng SVG Cục Bộ:** 100% các icon chức năng được nạp từ bộ SVG vector nội bộ tại `/icons/home/` và `/icons/profile/`, đảm bảo hiển thị sắc nét trên mọi mật độ điểm ảnh của smartphone.
-* **Quy Tắc Tuyệt Đối Không Dùng Nút Màu Đỏ & Nút Gradient:** Nút hành động chính tuân thủ màu nguyên khối nhận diện (Navy hoặc Vàng Kim), tuyệt đối không dùng nút màu đỏ hay gradient gây rối mắt.
-
----
-
-## CHƯƠNG 6: QUY ĐỊNH PHƯƠNG THỨC THANH TOÁN (MÃ QR MOMO & CỔNG VNPAY)
-
-Tài liệu và hệ thống phần mềm tuân thủ nghiêm ngặt quy định không đề cập hoặc sử dụng dịch vụ Mã QR Ngân Hàng, chuyển sang tích hợp trực tiếp 2 phương thức thanh toán điện tử độc lập:
-1. **Mã QR Ví Điện Tử MoMo:**
-   - Hệ thống tự động tạo mã thanh toán QR MoMo chứa sẵn mã định danh Học viên và số tiền cần nộp.
-   - Học viên quét mã nhanh trên ứng dụng MoMo hoặc các ứng dụng ngân hàng liên kết, không phải nhập số tài khoản thủ công.
-2. **Cổng Thanh Toán Trực Tuyến VNPay:**
-   - Hỗ trợ thanh toán đa kênh qua thẻ ATM nội địa của 40+ ngân hàng Việt Nam, thẻ quốc tế (Visa, Mastercard, JCB) và quét mã VNPay-QR.
-   - Tự động gạch nợ hội phí tức thời ngay khi giao dịch thành công, phát hành biên lai thu tiền điện tử có mã tra cứu minh bạch.
-
----
-
-## CHƯƠNG 7: TIÊU CHÍ NGHIỆM THU KINH DOANH (BUSINESS ACCEPTANCE CRITERIA)
-
-1. **Về Quản Trị Tổ Chức (CRM):**
-   - 100% hồ sơ Học viên mới được phân định quyền rõ ràng: Ban Thư Ký tiếp nhận sơ tuyển, Ban Thành Viên độc quyền phê duyệt.
-   - Xuất báo cáo bảng tính Excel chính xác theo 3 chế độ (Thời gian, Học viên, Biến động) trong vòng dưới 2 giây.
-   - Nhập Excel thông minh nhận diện đúng các cột tiếng Việt và cảnh báo chính xác các dòng lỗi trùng lặp.
-   - Tính năng đăng bài 1-chạm phát hành đồng thời thông cáo lên Web, Fanpage và Nhóm Zalo trong 1.2 giây.
-2. **Về Trải Nghiệm Học viên (Mobile App):**
-   - Lên lịch hẹn 1-on-1 trơn tru trên cả 3 tình huống (Tự do, Từ cơ hội, Từ sản phẩm), tự động gửi tin nhắn thông báo vào hộp thư chat.
-   - Màn hình Sự kiện phân định rõ "Sự kiện" và "Hoạt động". Sự kiện đã kết thúc lưu vết đầy đủ 5 khối dữ liệu và mở link Google Drive tải ảnh RAW.
-   - Menu bình luận 3 chấm chuẩn Facebook: Có tùy chọn "Sao chép" vào bộ nhớ tạm cho mọi bình luận; bình luận của chính mình có thêm "Chỉnh sửa" và "Xóa".
-   - Bảng xếp hạng Thống kê chỉ hiển thị các Học viên có số liệu thực tế (`> 0`), tuyệt đối không đưa người 0 cơ hội lên bục vinh danh hay top 4-10.
-   - Trợ lý AI chào mừng ngày đầu tiên với giao diện Theme Sáng không viền bo, hiển thị dữ liệu sống thời gian thực.
-3. **Về Nhận Diện Thương Hiệu:**
-   - 100% các nút bấm và điểm nhấn giao diện sử dụng màu Xanh Navy `#003B95` và ánh Vàng Gold `#F59E0B`. Loại bỏ hoàn toàn các nút có màu gradient.
+1. **Tuân thủ Cơ Sở Dữ Liệu Tối Cao (Rule 0)**: Toàn bộ dữ liệu ghi nhận và hiển thị bắt buộc lưu tại PostgreSQL `113.20.107.184:6432/ceohn10_project`. Tuyệt đối không hardcode, không dùng dữ liệu mock/fake che giấu lỗi.
+2. **Đồng bộ Ma Trận Phân Quyền 2 Chiều**: Khi thay đổi checkbox quyền trên CRM (`/permissions`), dữ liệu ghi vào CSDL và tự động áp dụng ngay cho quyền truy cập route của người dùng khi đăng nhập mà không cần sửa code.
+3. **Phân Quyền Trợ Lý AI Chặt Chẽ**: Trợ lý AI có 8 năng lực rõ ràng, các hành động gửi email nhắc nộp phí hoặc gửi thông báo sự kiện bắt buộc phải qua bước xem trước và phê duyệt cuối cùng (Approval Gate).
+4. **Không Dùng Gói Tài Trợ Cứng**: Phân hệ nhà tài trợ cho phép nhập nội dung mở rộng và phân bổ chính xác vào 4 nguồn quỹ (Quỹ hoạt động tiền/hiện vật, Quỹ thiện nguyện tiền/hiện vật).
+5. **Định Dạng Biểu Mẫu Linh Hoạt**: Báo cáo tài chính xuất ra các định dạng Word, Excel, PDF áp dụng đúng cấu hình đã thiết lập tại phân hệ Biểu mẫu (`/templates`).

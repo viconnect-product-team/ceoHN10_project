@@ -73,9 +73,16 @@ export class RolesGuard implements CanActivate {
           }
         }
 
-        const vUsers = await this.prisma.$queryRaw<any[]>`
+        const vUsers = await this.prisma
+          .$queryRaw<any[]>`
+          SELECT email, username, role, status FROM public.ceohn10_users WHERE id = ${user.id}::uuid LIMIT 1
+        `
+          .catch(() =>
+            this.prisma.$queryRaw<any[]>`
           SELECT email, username, role, status FROM public.vione_users WHERE id = ${user.id}::uuid LIMIT 1
-        `.catch(() => []);
+        `,
+          )
+          .catch(() => []);
         if (vUsers.length > 0) {
           const vu = vUsers[0];
           if (

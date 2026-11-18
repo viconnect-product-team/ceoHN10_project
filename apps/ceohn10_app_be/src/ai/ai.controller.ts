@@ -335,6 +335,26 @@ export class AiController {
     return res;
   }
 
+  /** POST /api/ai/auto-execute-command — Tự động ra lệnh & thực thi tác vụ AI theo lệnh người dùng (Gửi mail sự kiện, Nhắc phí, Lớp học, Xuất báo cáo...) */
+  @Post('auto-execute-command')
+  async autoExecuteCommand(
+    @Request() req: any,
+    @Body()
+    body: {
+      command: string;
+      taskType?: string;
+      fileName?: string;
+      recipients?: any[];
+      eventOrCourseName?: string;
+    },
+  ) {
+    const res = await this.crmAnalytics.handleAutoExecuteCommand(
+      req?.user?.id || 'admin',
+      body,
+    );
+    return res;
+  }
+
   // ==========================================
   // KNOWLEDGE BASE (BRD, SRS, DATABASE, RESTFUL API)
   // ==========================================

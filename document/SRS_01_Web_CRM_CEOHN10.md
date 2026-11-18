@@ -170,9 +170,121 @@ Bước 8: Lớp phủ Voice GPS HUD Overlay kích hoạt hiệu ứng Spotlight
   - Hệ điều hành máy chủ: Linux Ubuntu 22.04 LTS (Containerized Docker Architecture).
   - Web Server & Gateway: Nginx Reverse Proxy (SSL/TLS 1.3, HTTP/2, WSS Gateway Reverse Proxy).
   - Runtime Engine: Node.js v18.x LTS, NestJS Framework v10.x.
-  - Cơ sở dữ liệu: PostgreSQL v15+ kết hợp Prisma ORM (@vibe/db) và Connection Pooler PgBouncer.
-  - Lưu trữ tệp đối tượng: MinIO S3 Compatible Object Storage.
+  - Cơ sở dữ liệu trung tâm (Rule 0): PostgreSQL 113.20.107.184:6432 (Database: ceohn10_project, User: app1) kết nối qua PgBouncer Connection Pooler.
+  - Lưu trữ tệp đối tượng: MinIO S3 Compatible Object Storage / Local Asset Storage.
   - Động cơ thời gian thực: Socket.IO Gateway Engine.
+
+### 2.4. HỆ THỐNG SƠ ĐỒ LUỒNG CHỨC NĂNG CHI TIẾT (FUNCTIONAL MERMAID DIAGRAMS)
+
+#### 2.4.1. Sơ đồ Luồng Xác Thực & Phân Quyền Động RBAC 2 Chiều
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Admin as Lãnh Đạo / Admin
+    participant FE as Web CRM Frontend (Sidebar.tsx)
+    participant Nest as NestJS Backend (JwtAuthGuard & RolesGuard)
+    participant DB as PostgreSQL 113.20.107.184:6432
+
+    Admin->>FE: Đăng nhập Email/Mật khẩu
+    FE->>Nest: POST /api/auth/login
+    Nest->>DB: SELECT * FROM ceohn10_users WHERE email = $1
+    DB-->>Nest: Trả về thông tin user & bcrypt password
+    Nest-->>FE: 200 OK { accessToken, refreshToken, user }
+
+    FE->>Nest: GET /api/users/me (Header: Bearer Token)
+    Nest->>DB: SELECT value FROM app_settings WHERE key = 'crm_permission_matrix'
+    DB-->>Nest: Ma trận quyền lưu trữ trong CSDL
+    Nest->>Nest: computeUserRbacEvaluation() -> allowedRoutes & permissionsHash
+    Nest-->>FE: 200 OK { allowedRoutes, permissionsHash }
+    FE->>FE: Sidebar ẩn/hiện động menu theo allowedRoutes
+```
+
+#### 2.4.2. Sơ đồ Luồng Quản Lý Sự Kiện, Import File Word/Excel & Đăng Ký Đại Biểu
+```mermaid
+flowchart TD
+    Start([Ban Sự Kiện Mở Popup EventWizard]) --> Choice{Phương Thức Khởi Tạo?}
+    Choice -- Kéo Thả File --> DropDoc[Tải Lên File .docx / .xlsx / .pdf]
+    DropDoc --> ParseDoc[event-doc-parser.ts Tự Động Bóc Tách: Tên, Giờ, Địa Điểm, Diễn Giả]
+    ParseDoc --> FormAuto[Tự Động Điền Dữ Liệu Vào Form Tạo Sự Kiện]
+    Choice -- Nhập Tay --> FormAuto
+
+    FormAuto --> SaveEvent[Bấm 'Tạo Sự Kiện' -> Gửi POST /api/events]
+    SaveEvent --> DBEvent[(Lưu Vào PostgreSQL 113.20.107.184:6432 bảng events)]
+    DBEvent --> StepAttendee[Popup Chuyển Sang Bước Đăng Ký Đại Biểu Tham Dự]
+
+    StepAttendee --> InputAttendee[Nhập: Họ Tên, Chức Danh, SĐT, Tên Doanh Nghiệp]
+    InputAttendee --> PostAttendee[Gửi POST /api/events/:id/attendees]
+    PostAttendee --> GenTicket[Hệ Thống Tự Động Sinh Mã Vé TKT-xxx & QR E-Ticket]
+    GenTicket --> DBAttendee[(Lưu Vào bảng event_registrations)]
+    DBAttendee --> ShowTicket[Hiển Thị Thẻ Vé Ngay Trên Popup]
+```
+
+#### 2.4.3. Sơ đồ Luồng Quản Lý Nhà Tài Trợ & 4 Nguồn Quỹ
+```mermaid
+flowchart TD
+    Start([Mở Màn Hình Khai Báo Nhà Tài Trợ]) --> InputInfo[Nhập Tên Nhà Tài Trợ & Textarea Mở Rộng Điền Nội Dung]
+    InputInfo --> SelectFund[BẮT BUỘC CHỌN 1 TRONG 4 NGUỒN QUỸ]
+    
+    SelectFund --> FundType{4 Nguồn Quỹ Tài Trợ}
+    FundType -- general_cash --> FCash[Quỹ Hoạt Động · Tiền Mặt -> Cộng Vào Sổ Quỹ]
+    FundType -- general_in_kind --> FInKind[Quỹ Hoạt Động · Hiện Vật -> Nhập Danh Mục Vật Phẩm & Giá Trị Quy Đổi]
+    FundType -- charity_cash --> CCash[Quỹ Thiện Nguyện CSR · Tiền Mặt -> Phân Bổ Hoạt Động Từ Thiện]
+    FundType -- charity_in_kind --> CInKind[Quỹ Thiện Nguyện CSR · Hiện Vật -> Quà Tặng / Áo Ấm Vùng Cao]
+
+    FCash --> SaveSponsor[Gửi POST /api/sponsors]
+    FInKind --> SaveSponsor
+    CCash --> SaveSponsor
+    CInKind --> SaveSponsor
+
+    SaveSponsor --> DBSponsors[(Lưu Vào PostgreSQL bảng sponsors & sponsor_items)]
+    DBSponsors --> ViewReport[sponsors.tsx Hiển Thị Phân Tách 2 Khối Quỹ & Xuất Báo Cáo]
+```
+
+#### 2.4.4. Sơ đồ Luồng Quản Lý Sổ Quỹ 2.1 Tỷ VNĐ & Báo Cáo Tài Chính Đa Định Dạng
+```mermaid
+flowchart TD
+    Start([Ban Tài Chính Quản Trị Thu - Chi]) --> TransAction[Lập Phiếu Thu / Phiếu Chi Trên CRM]
+    TransAction --> InputTrans[Nhập Số Hiệu, Số Tiền, Diễn Giải & Phân Loại Danh Mục]
+    InputTrans --> Approval[Luồng Duyệt Chi 4 Cấp: Trưởng Ban -> Ban Tài Chính -> Lớp Trưởng]
+    Approval --> DBTrans[(Lưu Vào PostgreSQL bảng transactions)]
+    DBTrans --> BalanceUpdate[Cập Nhật Tức Thời Sổ Quỹ Hội 2.1 Tỷ VNĐ]
+
+    BalanceUpdate --> ExportReq[Bấm 'Xuất Báo Cáo Tài Chính']
+    ExportReq --> ChooseScope[Chọn Danh Mục: Sự Kiện / Lớp Học / Niên Liễm / Thiện Nguyện CSR / Tất Cả]
+    ChooseScope --> ChooseTpl[Chọn Mẫu Biểu Mẫu Đã Cấu Hình Tại /templates]
+    ChooseTpl --> ExportGen{Định Dạng Tệp}
+    ExportGen -- Excel --> OutExcel[Xuất File .xlsx Chuẩn Kế Toán]
+    ExportGen -- Word --> OutWord[Xuất File .docx Thể Thức Văn Bản Hành Chính 3 Chữ Ký]
+    ExportGen -- PDF --> OutPDF[Xuất File .pdf Ký Đóng Dấu]
+```
+
+#### 2.4.5. Sơ đồ Luồng Trợ Lý AI Workflow 5 Bước
+```mermaid
+flowchart TD
+    Start([Khởi Động Trợ Lý AI Điều Hành]) --> Step1[BƯỚC 1: Chọn Tác Vụ & Tải Lên File Word/Excel]
+    Step1 --> AIParsing[AI Bóc Tách Dữ Liệu: Danh Sách Học Viên, Khoản Phí, Email, SĐT]
+    AIParsing --> Step2[BƯỚC 2: Soạn Thảo & Tối Ưu Giọng Văn Doanh Nhân Trang Trọng]
+    Step2 --> Step3[BƯỚC 3: Chọn Người Nhận - Chọn 1, Chọn Nhiều Hoặc 'Chọn Tất Cả']
+    Step3 --> Step4[BƯỚC 4: Xem Trước Giao Diện Email & Tệp Đính Kèm]
+    Step4 --> Step5[BƯỚC 5: Phê Duyệt & Thực Thi]
+    
+    Step5 --> ExecAction{Hành Động Cuối}
+    ExecAction -- Gửi Thông Báo --> SendEmail[Phát Hành Thông Báo Đẩy & Gửi Email Hàng Loạt]
+    ExecAction -- Xuất File --> ExportFiles[Tự Động Tạo Toàn Bộ File: Word, Excel, PDF]
+```
+
+#### 2.4.6. Sơ đồ Luồng Ma Trận Phân Quyền Trợ Lý AI (8 Năng Lực)
+```mermaid
+flowchart TD
+    Start([Admin Vào Tab Phân Quyền Trợ Lý AI]) --> LoadMatrix[GET /api/ai/permissions/matrix]
+    LoadMatrix --> ShowTab[Hiển Thị Bảng Ma Trận 8 Năng Lực AI x 7 Vai Trò]
+    ShowTab --> ToggleChecks[Bật/Tắt Từng Năng Lực Cho Từng Role]
+    ToggleChecks --> ReviewCheck[Đánh Dấu Cờ 'requiresReviewStep' Cho Tác Vụ Nhạy Cảm]
+    ReviewCheck --> SaveMatrix[Bấm 'Lưu Cấu Hình AI']
+    SaveMatrix --> PutAPI[PUT /api/ai/permissions/matrix]
+    PutAPI --> DBMatrix[(Lưu Vào PostgreSQL bảng app_settings key ai_permission_matrix)]
+    DBMatrix --> End([Áp Dụng Tức Thì Khi User Sử Dụng Trợ Lý AI])
+```
 
 ## 3. YÊU CẦU CHỨC NĂNG CHI TIẾT (FUNCTIONAL REQUIREMENTS — 31 USE CASES)
 
@@ -441,7 +553,7 @@ Bước E1: Sự kiện đã hết số lượng vé khách mời -> Báo lỗi:
 | Tiền Điều Kiện (Pre-conditions) | Người dùng đã được cấp tài khoản quản trị và tài khoản ở trạng thái active. |
 | Hậu Điều Kiện (Post-conditions) | Cán bộ quản trị thiết lập phiên làm việc hợp lệ và truy cập các chức năng quản trị theo phân quyền. |
 | Quy Tắc Nghiệp Vụ (Business Rules) | Áp dụng cơ chế phòng vệ tự động chống dò quét mật khẩu (Rate Limiting). |
-| Ánh Xạ Kỹ Thuật (Tech Mapping) | API: `POST /api/auth/login` | Tables: `vione_users`, `user_roles`, `audit_logs` |
+| Ánh Xạ Kỹ Thuật (Tech Mapping) | API: `POST /api/auth/login` | Tables: `ceohn10_users`, `user_roles`, `audit_logs` |
 
 
 
@@ -462,7 +574,7 @@ Bước 2: Nhập Email/Tên đăng nhập và Mật khẩu.
 
 Bước 3: Bấm nút 'Đăng Nhập Hệ Thống'.
 
-Bước 4: Hệ thống truy vấn bảng `vione_users`, lấy chuỗi băm mật khẩu và so khớp bằng thuật toán `bcrypt.compare()`.
+Bước 4: Hệ thống truy vấn bảng `ceohn10_users`, lấy chuỗi băm mật khẩu và so khớp bằng thuật toán `bcrypt.compare()`.
 
 Bước 5: Kiểm tra vai trò tài khoản trong `user_roles`: Bắt buộc phải thuộc 1 trong các vai trò quản trị (quan_tri, admin, tong_thu_ky, truong_ban).
 
@@ -592,7 +704,7 @@ Bước E1: Không tìm thấy bản ghi phù hợp -> Hiển thị hình ảnh 
 | Tiền Điều Kiện (Pre-conditions) | Hồ sơ ứng viên đang ở trạng thái pending trong danh sách chờ duyệt. |
 | Hậu Điều Kiện (Post-conditions) | Ứng viên chính thức trở thành Học viên CLB CEO HN10, có mã định danh, tài khoản di động và danh thiếp số. |
 | Quy Tắc Nghiệp Vụ (Business Rules) | RULE-AUTH-BTV-EXCLUSIVE: Nghiêm cấm tuyệt đối Ban Thư Ký phê duyệt Học viên. |
-| Ánh Xạ Kỹ Thuật (Tech Mapping) | API: `POST /api/association/members/:id/approve` | Tables: `members`, `vione_users`, `member_business_cards` |
+| Ánh Xạ Kỹ Thuật (Tech Mapping) | API: `POST /api/association/members/:id/approve` | Tables: `members`, `ceohn10_users`, `member_business_cards` |
 
 
 
@@ -624,7 +736,7 @@ Bước 6: Hệ thống thực hiện chuỗi giao dịch nguyên tử (Atomic T
 
    - Cập nhật bản ghi trong `members`: status = 'active', code = 'HN10-xxxx', joined_at = NOW().
 
-   - Tạo tài khoản đăng nhập trong `vione_users` với mật khẩu khởi tạo ngẫu nhiên, bật cờ must_change_password = true.
+   - Tạo tài khoản đăng nhập trong `ceohn10_users` với mật khẩu khởi tạo ngẫu nhiên, bật cờ must_change_password = true.
 
    - Tạo bản ghi Thẻ doanh nhân điện tử trong `member_business_cards` với slug công khai /card/ceo83xxx.
 
@@ -757,7 +869,7 @@ Bước 4: BTV xác nhận và công bố bảng xếp hạng thường niên.
 | Tiền Điều Kiện (Pre-conditions) | Tài khoản Học viên tồn tại trong hệ thống. |
 | Hậu Điều Kiện (Post-conditions) | Trạng thái tài khoản được cập nhật tức thời trên toàn hệ thống. |
 | Quy Tắc Nghiệp Vụ (Business Rules) | Mọi thao tác khóa/mở khóa bắt buộc nhập lý do chi tiết. |
-| Ánh Xạ Kỹ Thuật (Tech Mapping) | API: `POST /api/association/members/:id/account-action` | Table: `vione_users` |
+| Ánh Xạ Kỹ Thuật (Tech Mapping) | API: `POST /api/association/members/:id/account-action` | Table: `ceohn10_users` |
 
 
 
@@ -1719,7 +1831,7 @@ Bước E1: Tài khoản không đủ quyền hạn RBAC đối với tính năn
   - Chip NFC tần số 13.56MHz tương thích chuẩn ISO/IEC 14443 Type A.
   - Chạm mặt sau thẻ vào smartphone để mở liên kết công khai `/card/:slug`.
 * Kiến Trúc Cơ Sở Dữ Liệu PostgreSQL (Prisma ORM):
-  - Bảng Học viên: `members` (liên kết `vione_users` qua `user_id`).
+  - Bảng Học viên: `members` (liên kết `ceohn10_users` qua `user_id`).
   - Bảng danh thiếp số: `member_business_cards` (chứa slug, branding, liên kết mạng xã hội).
   - Bảng sự kiện: `events`, `event_ticket_types`, `event_registrations`, `member_checkins`.
   - Bảng tài chính & hội phí: `invoices`, `associations`.

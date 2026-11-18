@@ -212,9 +212,16 @@ export class AiService {
     let userEmail = '';
     try {
       const u = await this.prisma
-        .$queryRawUnsafe<
-          any[]
-        >(`SELECT name, email FROM public.vione_users WHERE id::text = $1 LIMIT 1`, String(userId))
+        .$queryRawUnsafe<any[]>(
+          `SELECT name, email FROM public.ceohn10_users WHERE id::text = $1 LIMIT 1`,
+          String(userId),
+        )
+        .catch(() =>
+          this.prisma.$queryRawUnsafe<any[]>(
+            `SELECT name, email FROM public.vione_users WHERE id::text = $1 LIMIT 1`,
+            String(userId),
+          ),
+        )
         .catch(() => [] as any[]);
       if (u && u.length > 0) {
         userName = u[0].name || userName;
@@ -315,17 +322,28 @@ export class AiService {
   }> {
     await this.ensureAiQuotaTable();
 
-    // Đồng bộ người dùng từ vione_users vào bảng quota nếu chưa có
+    // Đồng bộ người dùng từ ceohn10_users (hoặc vione_users) vào bảng quota nếu chưa có
     await this.prisma
       .$executeRawUnsafe(
         `
       INSERT INTO public.ai_user_quotas (user_id, user_name, user_email, used_count, max_limit, extra_granted, is_blocked)
       SELECT u.id::text, COALESCE(u.name, 'Học viên'), COALESCE(u.email, ''), 0, 50, 0, false
-      FROM public.vione_users u
+      FROM public.ceohn10_users u
       ON CONFLICT (user_id) DO NOTHING
     `,
       )
-      .catch(() => { });
+      .catch(async () => {
+        await this.prisma
+          .$executeRawUnsafe(
+            `
+          INSERT INTO public.ai_user_quotas (user_id, user_name, user_email, used_count, max_limit, extra_granted, is_blocked)
+          SELECT u.id::text, COALESCE(u.name, 'Học viên'), COALESCE(u.email, ''), 0, 50, 0, false
+          FROM public.vione_users u
+          ON CONFLICT (user_id) DO NOTHING
+        `,
+          )
+          .catch(() => { });
+      });
 
     const rows = await this.prisma
       .$queryRawUnsafe<any[]>(
@@ -477,12 +495,18 @@ export class AiService {
   async getLiveMemberAssistantContext(userId: string) {
     const [userRows, memberRows] = await Promise.all([
       this.prisma.$queryRaw<any[]>`
-        SELECT id, name, email, phone FROM public.vione_users WHERE id::text = ${userId}::text LIMIT 1
-      `.catch(() => [] as any[]),
+        SELECT id, name, email, phone FROM public.ceohn10_users WHERE id::text = ${userId}::text LIMIT 1
+      `.catch(() =>
+        this.prisma.$queryRaw<any[]>`
+          SELECT id, name, email, phone FROM public.vione_users WHERE id::text = ${userId}::text LIMIT 1
+        `
+      ).catch(() => [] as any[]),
       this.prisma.$queryRaw<any[]>`
         SELECT id, code, name, full_name, email, contact, company, position, title, level, membership_tier, department, status, dues_status, joined_at
         FROM public.members
-        WHERE user_id::text = ${userId}::text OR id::text = ${userId}::text OR email IN (SELECT email FROM public.vione_users WHERE id::text = ${userId}::text)
+        WHERE user_id::text = ${userId}::text OR id::text = ${userId}::text 
+           OR email IN (SELECT email FROM public.ceohn10_users WHERE id::text = ${userId}::text)
+           OR email IN (SELECT email FROM public.vione_users WHERE id::text = ${userId}::text)
         LIMIT 1
       `.catch(() => [] as any[]),
     ]);

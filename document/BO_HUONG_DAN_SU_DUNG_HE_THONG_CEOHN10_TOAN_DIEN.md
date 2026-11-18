@@ -1,4 +1,4 @@
-# BỘ HƯỚNG DẪN SỬ DỤNG TOÀN DIỆN HỆ SINH THÁI SỐ CEO HN10
+﻿# BỘ HƯỚNG DẪN SỬ DỤNG TOÀN DIỆN HỆ SINH THÁI SỐ CEO HN10
 ## TÀI LIỆU VẬN HÀNH ĐỒNG BỘ 2 SUBDOMAIN: WEB CRM QUẢN TRỊ & MOBILE APP Học viên
 *Hiệp Hội Doanh Nhân CEO HN10 (HanoiBA) — Phiên bản: 5.0 (Năm 2026)*
 
@@ -38,7 +38,7 @@ Dưới đây là ma trận ánh xạ luồng tương tác thời gian thực gi
 
 | Luồng Nghiệp Vụ | Thao Tác Của Ban Điều Hành Trên Web CRM (`crm.ceohn10.viconnect.vn`) | Phản Hồi Thời Gian Thực Trên Mobile App (`ceohn10.viconnect.vn`) | Bảng Dữ Liệu PostgreSQL |
 | :--- | :--- | :--- | :--- |
-| **1. Kết Nạp Học viên** | Ban Thư Ký nhấp **[Phê duyệt & Cấp tài khoản]** tại `[NODE-CRM-003]` | Học viên nhận email kích hoạt, đăng nhập app thấy ngay Thẻ VIP số tại `[NODE-APP-002]` | `members`, `vione_users` |
+| **1. Kết Nạp Học viên** | Ban Thư Ký nhấp **[Phê duyệt & Cấp tài khoản]** tại `[NODE-CRM-003]` | Học viên nhận email kích hoạt, đăng nhập app thấy ngay Thẻ VIP số tại `[NODE-APP-002]` | `members`, `ceohn10_users` |
 | **2. Phân Quyền Ban** | Admin gán chức vụ Ban Chuyên Môn tại `[NODE-CRM-005]` | Huy hiệu chức vụ và quyền hạn trên app cập nhật ngay lập tức tại `[NODE-APP-011]` | `members.executive_role`, `departments` |
 | **3. Bắn Mạng Lưới Sự Kiện** | Ban Sự Kiện tạo sự kiện và bấm **[Bắn Mạng Lưới]** tại `[NODE-CRM-007]` | Bảng tin Mạng lưới (`Feed`) trên app hiện bài phát thanh kèm poster và nút đặt vé tại `[NODE-APP-010]` | `events`, `feed_posts` |
 | **4. Đối Soát Vé Sự Kiện** | Kế toán xác nhận **[✓ Đã thanh toán]** tại danh sách đăng ký vé | Học viên mở app thấy Thẻ vé QR Check-in chuyển từ Chờ nộp sang Kích hoạt chính thức tại `[NODE-APP-008]` | `event_registrations` |
@@ -158,4 +158,5 @@ Tất cả hình ảnh trong bộ tài liệu đều được chụp trực ti�
   - Cẩm nang chi tiết Web CRM: [HDSD_WEB_CRM_CHI_TIET.md](./HUONG_DAN_SU_DUNG_WEB_CRM_CHI_TIET.md)
   - Cẩm nang chi tiết Mobile App: [HDSD_APP_MOBILE_CHI_TIET.md](./HUONG_DAN_SU_DUNG_APP_MOBILE_CHI_TIET.md)
   - Ma trận Traceability Nodes: [.agents/rules/node-matrix.md](../.agents/rules/node-matrix.md)
+
 
