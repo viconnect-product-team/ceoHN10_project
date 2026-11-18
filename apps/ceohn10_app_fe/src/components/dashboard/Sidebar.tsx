@@ -121,14 +121,25 @@ const finance: Item[] = [
     to: "/analytics",
     label: "Thống kê báo cáo",
     children: [
-      { to: "/analytics?category=events", label: "Thống kê sự kiện" },
+      { to: "/analytics?category=events", label: "Thống kê báo cáo sự kiện" },
       { to: "/analytics?category=csr", label: "Thống kê thiện nguyện (CSR)" },
-      { to: "/analytics?category=member_activities", label: "Hoạt động học viên" },
+      { to: "/analytics", label: "Thống kê tổng hợp" },
     ],
   },
   { key: "nav.income", icon: ArrowDownCircle, to: "/income", label: "Khoản thu" },
   { key: "nav.expenses" as TKey, icon: ArrowUpCircle, to: "/expenses", label: "Khoản chi" },
-  { key: "nav.financeReport", icon: PieChart, to: "/finance-report", label: "Báo cáo tài chính" },
+  {
+    key: "nav.financeReport",
+    icon: PieChart,
+    to: "/finance-report",
+    label: "Báo cáo tài chính",
+    children: [
+      { to: "/finance-report?category=events", label: "Báo cáo cho sự kiện" },
+      { to: "/finance-report?category=classes", label: "Báo cáo cho lớp học" },
+      { to: "/finance-report?category=fees", label: "Báo cáo phí tham gia" },
+      { to: "/finance-report", label: "Báo cáo tổng hợp" },
+    ],
+  },
 ];
 
 // 5. Nhóm TRUYỀN THÔNG (Thông báo, Tin tức & Truyền thông, Quyền lợi & Ưu đãi)
@@ -139,42 +150,38 @@ const comm: Item[] = [
     to: "/notifications",
     label: "Thông báo",
     children: [
+      { to: "/notifications?filter=events", label: "Thông báo sự kiện" },
+      { to: "/notifications?filter=trainings", label: "Thông báo lớp học" },
       { to: "/notifications", label: "Tất cả thông báo" },
-      { to: "/notifications?filter=new_members", label: "Học viên mới" },
-      { to: "/notifications?filter=fee_alerts", label: "Nhắc hạn & quá hạn thu chi" },
-      { to: "/notifications?filter=admin_system", label: "Ban Cán sự & Quản trị" },
-      { to: "/notifications?filter=events_meetings", label: "Sự kiện & Buổi học" },
     ],
   },
   { key: "nav.news", icon: Newspaper, to: "/news", label: "Tin tức & Truyền thông" },
   { key: "nav.perks", icon: Gift, to: "/perks", label: "Quyền lợi & Ưu đãi" },
 ];
 
-// 6. Nhóm KẾT NỐI GIAO THƯƠNG (Nhắn tin, Chia sẻ cơ hội, Giao thương B2B)
+// 6. Nhóm KẾT NỐI & GIAO THƯƠNG (Nhắn tin, Chia sẻ cơ hội, Giao thương B2B, Phân loại doanh nghiệp)
 const network: Item[] = [
   { key: "nav.network", icon: MessageSquare, to: "/network", label: "Nhắn tin" },
   { key: "nav.opportunities" as TKey, icon: Sparkles, to: "/opportunities", label: "Chia sẻ cơ hội" },
   { key: "nav.b2bDeals" as TKey, icon: Store, to: "/marketplace", label: "Giao thương B2B" },
+  { key: "nav.companies" as TKey, icon: Building2, to: "/companies", label: "Phân loại doanh nghiệp" },
 ];
 
-// 7. Nhóm HOẠT ĐỘNG (Quản lý công việc, Quản lý cuộc họp, Doanh nghiệp, Tài liệu biểu mẫu)
+// 7. Nhóm HOẠT ĐỘNG (Quản lý cuộc họp, Tài liệu, Biểu mẫu)
 const activities: Item[] = [
+  { key: "nav.meetings" as TKey, icon: Users2, to: "/meetings", label: "Quản lý cuộc họp" },
+  { key: "nav.documents", icon: FolderOpen, to: "/documents", label: "Tài liệu" },
   {
-    key: "nav.tasks" as TKey,
-    icon: CheckSquare,
-    to: "/tasks",
-    label: "Quản lý công việc",
+    key: "nav.templates" as TKey,
+    icon: LayoutTemplate,
+    to: "/templates",
+    label: "Biểu mẫu",
     children: [
-      { to: "/tasks", label: "Tất cả công việc" },
-      { to: "/tasks?filter=my_tasks", label: "Công việc của tôi" },
-      { to: "/tasks?filter=assigned_by_me", label: "Công việc đã giao" },
-      { to: "/tasks?filter=by_department", label: "Phân công theo Ban" },
-      { to: "/tasks?filter=overdue", label: "Công việc quá hạn" },
+      { to: "/templates?type=excel", label: "Biểu mẫu Excel (Báo cáo & Thu chi)" },
+      { to: "/templates?type=word", label: "Biểu mẫu Word (Công văn & Thư mời)" },
+      { to: "/templates?type=pdf", label: "Biểu mẫu PDF (Hóa đơn & Quyết toán)" },
     ],
   },
-  { key: "nav.meetings" as TKey, icon: Users2, to: "/meetings", label: "Quản lý cuộc họp" },
-  { key: "nav.companies" as TKey, icon: Building2, to: "/companies", label: "Doanh nghiệp" },
-  { key: "nav.documents", icon: FolderOpen, to: "/documents", label: "Tài liệu biểu mẫu" },
 ];
 
 // 8. Nhóm HỆ THỐNG (Cài đặt hệ thống, Lịch sử hoạt động)
@@ -918,10 +925,10 @@ export function Sidebar({
           />
         )}
 
-        {/* 6. NHÓM KẾT NỐI GIAO THƯƠNG (Nhắn tin, Chia sẻ cơ hội, Giao thương B2B) */}
+        {/* 6. NHÓM KẾT NỐI & GIAO THƯƠNG (Nhắn tin, Chia sẻ cơ hội, Giao thương B2B, Phân loại doanh nghiệp) */}
         {canViewNetwork && filteredNetwork.length > 0 && (
           <Group
-            customGroupLabel="KẾT NỐI GIAO THƯƠNG"
+            customGroupLabel="KẾT NỐI & GIAO THƯƠNG"
             items={filteredNetwork}
             pathname={pathname}
             searchStr={searchStr}

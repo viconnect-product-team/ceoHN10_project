@@ -30,14 +30,15 @@ import { fetchNestApi } from "@/lib/api-client";
 import { toast } from "sonner";
 import { exportToExcel } from "@/lib/excel-export";
 import { CrmChatGPTView } from "@/components/ai/CrmChatGPTView";
-import { MessageSquare } from "lucide-react";
+import { AiTaskWorkflowWizard } from "@/components/ai/AiTaskWorkflowWizard";
+import { MessageSquare, Layers } from "lucide-react";
 
 export const Route = createFileRoute("/ai-assistant")({
   component: AiAssistantPage,
 });
 
 export function AiAssistantPage() {
-  const [activeTab, setActiveTab] = useState<"chat" | "analysis" | "finance_report" | "invoice" | "activity">("chat");
+  const [activeTab, setActiveTab] = useState<"workflow" | "chat" | "analysis" | "finance_report" | "invoice" | "activity">("workflow");
   const [analyzing, setAnalyzing] = useState(false);
   const [analysisData, setAnalysisData] = useState<any>(null);
 
@@ -170,6 +171,20 @@ export function AiAssistantPage() {
         <div className="flex border-b border-border gap-2 overflow-x-auto pb-px">
           <button
             type="button"
+            onClick={() => setActiveTab("workflow")}
+            className={`pb-3 px-4 text-xs font-bold transition flex items-center gap-2 border-b-2 cursor-pointer whitespace-nowrap ${activeTab === "workflow"
+                ? "border-primary text-primary"
+                : "border-transparent text-muted-foreground hover:text-foreground"
+              }`}
+          >
+            <Layers className="size-4 text-primary" />
+            <span>Quy Trình Tác Vụ AI (Workflow Hub)</span>
+            <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 font-bold">
+              5 Bước
+            </span>
+          </button>
+          <button
+            type="button"
             onClick={() => setActiveTab("chat")}
             className={`pb-3 px-4 text-xs font-bold transition flex items-center gap-2 border-b-2 cursor-pointer whitespace-nowrap ${activeTab === "chat"
                 ? "border-primary text-primary"
@@ -216,6 +231,13 @@ export function AiAssistantPage() {
             <span>Xuất Hóa Đơn / Phiếu Thu Điện Tử</span>
           </button>
         </div>
+
+        {/* ── NỘI DUNG TÁC VỤ AI ── */}
+        {activeTab === "workflow" && (
+          <div className="space-y-4">
+            <AiTaskWorkflowWizard />
+          </div>
+        )}
 
         {/* ── NỘI DUNG TAB 1: PHÂN TÍCH TOÀN BỘ CRM ── */}
         {activeTab === "chat" && (

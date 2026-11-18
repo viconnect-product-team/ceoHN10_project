@@ -1,5 +1,48 @@
 # System Memory & Architecture
 
+- **Bản cập nhật ngày 18/11/2026 (v12.19): Hoàn Thiện Triệt Để 5 Yêu Cầu Nâng Cấp Hệ Thống CRM CEO HN10**:
+  - **1. Tái Cấu Trúc Toàn Diện Sidebar CRM CEO HN10**:
+    * Chuẩn hóa 9 nhóm chức năng chính:
+      - **Top-Level**: Tổng quan (`/`), Trợ lý AI (`/ai-assistant`), Học viên (`/members`), Lớp học & Khóa học (`/trainings`).
+      - **Nhóm TRUYỀN THÔNG (Sự kiện)**: Sự kiện (`/events`), Tổng quan sự kiện (`/events-overview`), Biểu quyết (`/voting`), Đăng ký sự kiện (`/event-registrations`), Bốc thăm trúng thưởng (`/lucky-draw`).
+      - **Nhóm TÀI TRỢ**: Nhà tài trợ (`/sponsors` - tài trợ linh hoạt không bắt buộc gói cố định), Báo cáo tài trợ (`/sponsor-report`), Quỹ tài trợ (`/sponsors?tab=funds` - hiển thị chi tiết Quỹ tiền mặt, Quỹ hiện vật, Quỹ dành cho thiện nguyện).
+      - **Nhóm TÀI CHÍNH**: Thống kê báo cáo (`/analytics` - phân hệ báo cáo sự kiện, thiện nguyện CSR, tổng hợp), Khoản thu (`/income`), Khoản chi (`/expenses`), Báo cáo tài chính (`/finance-report` - bộ chọn xuất theo danh mục Sự kiện, Lớp học, Phí tham gia, Tổng hợp; hỗ trợ đầy đủ Excel, Word, PDF cả chiều nhập và xuất).
+      - **Nhóm TRUYỀN THÔNG**: Thông báo (`/notifications` - thông báo sự kiện, lớp học, tất cả), Tin tức & Truyền thông (`/news`), Quyền lợi & Ưu đãi (`/perks`).
+      - **Nhóm KẾT NỐI & GIAO THƯƠNG**: Đổi tên nhãn từ "KẾT NỐI" thành "KẾT NỐI & GIAO THƯƠNG", gồm Nhắn tin (`/network`), Chia sẻ cơ hội (`/opportunities`), Giao thương B2B (`/marketplace`), Phân loại doanh nghiệp (`/companies`).
+      - **Nhóm HOẠT ĐỘNG**: Quản lý cuộc họp (`/meetings`), Tài liệu (`/documents`), Biểu mẫu (`/templates` - gồm các menu con Excel, Word, PDF).
+      - **Nhóm HỆ THỐNG**: Cài đặt hệ thống (`/settings`), Lịch sử hoạt động (`/activity`).
+      - **Nhóm PHÂN QUYỀN**: Phân quyền hệ thống (`/permissions`), Quản lý Ban Chuyên Môn (`/departments`), Quản trị người dùng (`/accounts`).
+  - **2. Chuyển Đổi Màu Sắc Giao Diện Sang Tone Xám Doanh Nhân Trang Nhã**:
+    * Triệt để loại bỏ các dải màu gradient tím/violet (`from-purple-*`, `to-violet-*`, `from-[#7C2D82]`).
+    * Thay thế bằng phong cách Executive Slate (`#334155`, `#475569`, `bg-slate-100 dark:bg-slate-800`), đồng bộ với nhận diện ứng dụng CEO HN10.
+  - **3. Xây Dựng Trung Tâm Điều Hành Tác Vụ AI (AI Action Workflow Hub)**:
+    * Tạo mới component `AiTaskWorkflowWizard.tsx` và tích hợp làm tab trung tâm tại `apps/ceohn10_app_fe/src/routes/ai-assistant.tsx`.
+    * **Quy trình 5 bước tương tác trực quan**:
+      - *Bước 1 (Chọn tác vụ & Nạp file)*: Hỗ trợ 4 loại tác vụ (Thông báo nộp phí, Nhắc lịch sự kiện/lớp học, Xuất báo cáo đa định dạng, Bóc tách tài liệu Word/Excel). Vùng dropzone tiếp nhận file Word/Excel: AI tự động phân tích bóc tách cấu trúc bảng, danh sách học viên, khoản tiền, số điện thoại, email và nội dung hành động.
+      - *Bước 2 (Soạn thảo & Tối ưu AI)*: Tự động điền dữ liệu bóc tách, nút "✨ AI Tối Ưu Giọng Văn Doanh Nhân", lựa chọn định dạng file đính kèm xuất ra (Excel, Word, PDF).
+      - *Bước 3 (Danh sách người nhận)*: Tích hợp dữ liệu học viên từ database chuẩn `113.20.107.184:6432`, thanh tìm kiếm, bộ lọc theo ban, hỗ trợ chọn 1 người, chọn nhiều người và checkbox "Chọn tất cả" (Select All).
+      - *Bước 4 (Xem trước)*: Xem trước giao diện email thực tế thay thế biến cá nhân hóa và danh sách tệp đính kèm.
+      - *Bước 5 (Phê duyệt & Thực thi)*: Nút "Phê duyệt & Gửi thông báo" kích hoạt gửi email qua backend NestJS mail service và nút "Duyệt & Xuất tất cả file báo cáo (Word, Excel, PDF)" tự động tạo và tải về máy theo cấu hình Biểu mẫu.
+  - **4. Tùy Biến Format Định Dạng Biểu Mẫu (`/templates`) & Báo Cáo Tài Chính (`/finance-report`)**:
+    * Tạo mới `report-templates.ts` và `ReportTemplateEditor.tsx` tại `/templates`: Cho phép người dùng tùy biến và lưu trữ format mẫu Excel, Word, PDF (tên đơn vị, địa chỉ, tiêu đề, mã số hiệu thông tư, bật/tắt và đổi tên cột, khối 3 chữ ký: Người lập, Phụ trách/Thủ quỹ, Lớp Trưởng).
+    * Báo cáo tài chính (`/finance-report`) khi xuất file (Excel, Word, PDF) đọc trực tiếp cấu hình format từ Biểu mẫu thay vì hardcode trong source code.
+    * Hỗ trợ bộ chọn danh mục xuất chi tiết (Sự kiện, Lớp học, Phí tham gia / Niên liễm, Thiện nguyện CSR, Tổng hợp).
+  - **5. Gỡ Bỏ Cấu Hình Ví & Mẫu Thông Báo Tại Cài Đặt Hệ Thống (`/settings`)**:
+    * Gỡ bỏ các tab và component cấu hình ví VNPay, ví MoMo và Mẫu thông báo.
+  - **6. Khắc Phục Triệt Để Lỗi Subdomain Gọi Nhầm Database `ceo1983_project`**:
+    * **Nguyên nhân**: Script tự động triển khai `deploy/git-auto-deploy.sh` trước đây trỏ vào thư mục cũ `/root/crm` và `/root/association` của VPS `14.225.217.232` (vốn chứa `.env` cũ của CEO1983). Đồng thời trong `.cursorrules` còn tồn tại các đoạn tài liệu cũ nhắc đến `ceo1983_project` và cổng `5436`.
+    * **Giải pháp khắc phục**:
+      - Cập nhật `deploy/git-auto-deploy.sh` trỏ đúng vào `/root/ceohn10_crm` và `/root/ceohn10_association`.
+      - Xóa sạch toàn bộ các đoạn tham chiếu database cũ trong `.cursorrules`, khẳng định Rule 0 Tối cao: CSDL duy nhất của toàn bộ hệ thống là `113.20.107.184:6432/ceohn10_project?pgbouncer=true`.
+      - Xác minh toàn bộ các file cấu hình `.env` (`apps/ceohn10_app_be/.env`, `deploy/crm/.env.crm`, `deploy/ceohn10/.env.association`) đều đang trỏ đúng `113.20.107.184:6432/ceohn10_project`.
+  - **7. Chuẩn Hóa Phân Quyền & Vai Trò Lớp Trưởng, Lớp Phó, Ban Thiện Nguyện**:
+    * Thêm Ban Thiện Nguyện (`BTN`) vào `INITIAL_DEPARTMENTS`, `DEPARTMENT_OPTIONS`, `COMMITTEES`, `departments.tsx`, `RbacPermissionMatrix.tsx` và `account-settings.index.tsx`.
+    * Chuẩn hóa danh xưng vai trò "Lớp Trưởng (Chủ tịch)" và "Lớp Phó (Phó Chủ tịch)" trên toàn bộ ma trận phân quyền và quản trị người dùng.
+  - **8. Kiểm Tra Lỗi Code (Strict Type-Check)**:
+    * Backend (`apps/ceohn10_app_be`): `tsc --noEmit` -> Exit code 0 (0 errors).
+    * Frontend (`apps/ceohn10_app_fe`): `tsc --noEmit` -> Exit code 0 (0 errors).
+    * Tuyệt đối tuân thủ quy chuẩn: Không tự động chạy `git push` hay `git commit`.
+
 - **Bản cập nhật ngày 17/11/2026 (v12.18): Chuẩn Hóa Triệt Để Pipeline GitHub Actions, Triệt Tiêu Warning & Hướng Dẫn Tự Động Triển Khai Lên Subdomains VPS**:
   - **1. Triệt Tiêu Toàn Bộ Cảnh Báo (Annotations / Warnings) Trên GitHub Actions**:
     * Thêm biến môi trường `FORCE_JAVASCRIPT_ACTIONS_TO_NODE20: "true"` vào đầu tệp workflow `.github/workflows/auto-deploy-subdomains.yml` để triệt tiêu cảnh báo runtime Node.js 20 deprecation từ runner GitHub.
@@ -1919,6 +1962,49 @@
      - Tuân thủ nghiêm ngặt STRICT RULE 1: Tuyệt đối không tự động chạy `git push` hay `git commit`.
 
 # System Memory & Architecture
+
+- **Bản cập nhật ngày 18/11/2026 (v12.19): Hoàn Thiện Triệt Để 5 Yêu Cầu Nâng Cấp Hệ Thống CRM CEO HN10**:
+  - **1. Tái Cấu Trúc Toàn Diện Sidebar CRM CEO HN10**:
+    * Chuẩn hóa 9 nhóm chức năng chính:
+      - **Top-Level**: Tổng quan (`/`), Trợ lý AI (`/ai-assistant`), Học viên (`/members`), Lớp học & Khóa học (`/trainings`).
+      - **Nhóm TRUYỀN THÔNG (Sự kiện)**: Sự kiện (`/events`), Tổng quan sự kiện (`/events-overview`), Biểu quyết (`/voting`), Đăng ký sự kiện (`/event-registrations`), Bốc thăm trúng thưởng (`/lucky-draw`).
+      - **Nhóm TÀI TRỢ**: Nhà tài trợ (`/sponsors` - tài trợ linh hoạt không bắt buộc gói cố định), Báo cáo tài trợ (`/sponsor-report`), Quỹ tài trợ (`/sponsors?tab=funds` - hiển thị chi tiết Quỹ tiền mặt, Quỹ hiện vật, Quỹ dành cho thiện nguyện).
+      - **Nhóm TÀI CHÍNH**: Thống kê báo cáo (`/analytics` - phân hệ báo cáo sự kiện, thiện nguyện CSR, tổng hợp), Khoản thu (`/income`), Khoản chi (`/expenses`), Báo cáo tài chính (`/finance-report` - bộ chọn xuất theo danh mục Sự kiện, Lớp học, Phí tham gia, Tổng hợp; hỗ trợ đầy đủ Excel, Word, PDF cả chiều nhập và xuất).
+      - **Nhóm TRUYỀN THÔNG**: Thông báo (`/notifications` - thông báo sự kiện, lớp học, tất cả), Tin tức & Truyền thông (`/news`), Quyền lợi & Ưu đãi (`/perks`).
+      - **Nhóm KẾT NỐI & GIAO THƯƠNG**: Đổi tên nhãn từ "KẾT NỐI" thành "KẾT NỐI & GIAO THƯƠNG", gồm Nhắn tin (`/network`), Chia sẻ cơ hội (`/opportunities`), Giao thương B2B (`/marketplace`), Phân loại doanh nghiệp (`/companies`).
+      - **Nhóm HOẠT ĐỘNG**: Quản lý cuộc họp (`/meetings`), Tài liệu (`/documents`), Biểu mẫu (`/templates` - gồm các menu con Excel, Word, PDF).
+      - **Nhóm HỆ THỐNG**: Cài đặt hệ thống (`/settings`), Lịch sử hoạt động (`/activity`).
+      - **Nhóm PHÂN QUYỀN**: Phân quyền hệ thống (`/permissions`), Quản lý Ban Chuyên Môn (`/departments`), Quản trị người dùng (`/accounts`).
+  - **2. Chuyển Đổi Màu Sắc Giao Diện Sang Tone Xám Doanh Nhân Trang Nhã**:
+    * Triệt để loại bỏ các dải màu gradient tím/violet (`from-purple-*`, `to-violet-*`, `from-[#7C2D82]`).
+    * Thay thế bằng phong cách Executive Slate (`#334155`, `#475569`, `bg-slate-100 dark:bg-slate-800`), đồng bộ với nhận diện ứng dụng CEO HN10.
+  - **3. Xây Dựng Trung Tâm Điều Hành Tác Vụ AI (AI Action Workflow Hub)**:
+    * Tạo mới component `AiTaskWorkflowWizard.tsx` và tích hợp làm tab trung tâm tại `apps/ceohn10_app_fe/src/routes/ai-assistant.tsx`.
+    * **Quy trình 5 bước tương tác trực quan**:
+      - *Bước 1 (Chọn tác vụ & Nạp file)*: Hỗ trợ 4 loại tác vụ (Thông báo nộp phí, Nhắc lịch sự kiện/lớp học, Xuất báo cáo đa định dạng, Bóc tách tài liệu Word/Excel). Vùng dropzone tiếp nhận file Word/Excel: AI tự động phân tích bóc tách cấu trúc bảng, danh sách học viên, khoản tiền, số điện thoại, email và nội dung hành động.
+      - *Bước 2 (Soạn thảo & Tối ưu AI)*: Tự động điền dữ liệu bóc tách, nút "✨ AI Tối Ưu Giọng Văn Doanh Nhân", lựa chọn định dạng file đính kèm xuất ra (Excel, Word, PDF).
+      - *Bước 3 (Danh sách người nhận)*: Tích hợp dữ liệu học viên từ database chuẩn `113.20.107.184:6432`, thanh tìm kiếm, bộ lọc theo ban, hỗ trợ chọn 1 người, chọn nhiều người và checkbox "Chọn tất cả" (Select All).
+      - *Bước 4 (Xem trước)*: Xem trước giao diện email thực tế thay thế biến cá nhân hóa và danh sách tệp đính kèm.
+      - *Bước 5 (Phê duyệt & Thực thi)*: Nút "Phê duyệt & Gửi thông báo" kích hoạt gửi email qua backend NestJS mail service và nút "Duyệt & Xuất tất cả file báo cáo (Word, Excel, PDF)" tự động tạo và tải về máy theo cấu hình Biểu mẫu.
+  - **4. Tùy Biến Format Định Dạng Biểu Mẫu (`/templates`) & Báo Cáo Tài Chính (`/finance-report`)**:
+    * Tạo mới `report-templates.ts` và `ReportTemplateEditor.tsx` tại `/templates`: Cho phép người dùng tùy biến và lưu trữ format mẫu Excel, Word, PDF (tên đơn vị, địa chỉ, tiêu đề, mã số hiệu thông tư, bật/tắt và đổi tên cột, khối 3 chữ ký: Người lập, Phụ trách/Thủ quỹ, Lớp Trưởng).
+    * Báo cáo tài chính (`/finance-report`) khi xuất file (Excel, Word, PDF) đọc trực tiếp cấu hình format từ Biểu mẫu thay vì hardcode trong source code.
+    * Hỗ trợ bộ chọn danh mục xuất chi tiết (Sự kiện, Lớp học, Phí tham gia / Niên liễm, Thiện nguyện CSR, Tổng hợp).
+  - **5. Gỡ Bỏ Cấu Hình Ví & Mẫu Thông Báo Tại Cài Đặt Hệ Thống (`/settings`)**:
+    * Gỡ bỏ các tab và component cấu hình ví VNPay, ví MoMo và Mẫu thông báo.
+  - **6. Khắc Phục Triệt Để Lỗi Subdomain Gọi Nhầm Database `ceo1983_project`**:
+    * **Nguyên nhân**: Script tự động triển khai `deploy/git-auto-deploy.sh` trước đây trỏ vào thư mục cũ `/root/crm` và `/root/association` của VPS `14.225.217.232` (vốn chứa `.env` cũ của CEO1983). Đồng thời trong `.cursorrules` còn tồn tại các đoạn tài liệu cũ nhắc đến `ceo1983_project` và cổng `5436`.
+    * **Giải pháp khắc phục**:
+      - Cập nhật `deploy/git-auto-deploy.sh` trỏ đúng vào `/root/ceohn10_crm` và `/root/ceohn10_association`.
+      - Xóa sạch toàn bộ các đoạn tham chiếu database cũ trong `.cursorrules`, khẳng định Rule 0 Tối cao: CSDL duy nhất của toàn bộ hệ thống là `113.20.107.184:6432/ceohn10_project?pgbouncer=true`.
+      - Xác minh toàn bộ các file cấu hình `.env` (`apps/ceohn10_app_be/.env`, `deploy/crm/.env.crm`, `deploy/ceohn10/.env.association`) đều đang trỏ đúng `113.20.107.184:6432/ceohn10_project`.
+  - **7. Chuẩn Hóa Phân Quyền & Vai Trò Lớp Trưởng, Lớp Phó, Ban Thiện Nguyện**:
+    * Thêm Ban Thiện Nguyện (`BTN`) vào `INITIAL_DEPARTMENTS`, `DEPARTMENT_OPTIONS`, `COMMITTEES`, `departments.tsx`, `RbacPermissionMatrix.tsx` và `account-settings.index.tsx`.
+    * Chuẩn hóa danh xưng vai trò "Lớp Trưởng (Chủ tịch)" và "Lớp Phó (Phó Chủ tịch)" trên toàn bộ ma trận phân quyền và quản trị người dùng.
+  - **8. Kiểm Tra Lỗi Code (Strict Type-Check)**:
+    * Backend (`apps/ceohn10_app_be`): `tsc --noEmit` -> Exit code 0 (0 errors).
+    * Frontend (`apps/ceohn10_app_fe`): `tsc --noEmit` -> Exit code 0 (0 errors).
+    * Tuyệt đối tuân thủ quy chuẩn: Không tự động chạy `git push` hay `git commit`.
 
 - **Bản cập nhật ngày 17/11/2026 (v12.18): Chuẩn Hóa Triệt Để Pipeline GitHub Actions, Triệt Tiêu Warning & Hướng Dẫn Tự Động Triển Khai Lên Subdomains VPS**:
   - **1. Triệt Tiêu Toàn Bộ Cảnh Báo (Annotations / Warnings) Trên GitHub Actions**:
@@ -5003,6 +5089,49 @@
      - Tuân thủ nghiêm ngặt STRICT RULE 1: Tuyệt đối không tự động chạy `git push` hay `git commit`.
 
 # System Memory & Architecture
+
+- **Bản cập nhật ngày 18/11/2026 (v12.19): Hoàn Thiện Triệt Để 5 Yêu Cầu Nâng Cấp Hệ Thống CRM CEO HN10**:
+  - **1. Tái Cấu Trúc Toàn Diện Sidebar CRM CEO HN10**:
+    * Chuẩn hóa 9 nhóm chức năng chính:
+      - **Top-Level**: Tổng quan (`/`), Trợ lý AI (`/ai-assistant`), Học viên (`/members`), Lớp học & Khóa học (`/trainings`).
+      - **Nhóm TRUYỀN THÔNG (Sự kiện)**: Sự kiện (`/events`), Tổng quan sự kiện (`/events-overview`), Biểu quyết (`/voting`), Đăng ký sự kiện (`/event-registrations`), Bốc thăm trúng thưởng (`/lucky-draw`).
+      - **Nhóm TÀI TRỢ**: Nhà tài trợ (`/sponsors` - tài trợ linh hoạt không bắt buộc gói cố định), Báo cáo tài trợ (`/sponsor-report`), Quỹ tài trợ (`/sponsors?tab=funds` - hiển thị chi tiết Quỹ tiền mặt, Quỹ hiện vật, Quỹ dành cho thiện nguyện).
+      - **Nhóm TÀI CHÍNH**: Thống kê báo cáo (`/analytics` - phân hệ báo cáo sự kiện, thiện nguyện CSR, tổng hợp), Khoản thu (`/income`), Khoản chi (`/expenses`), Báo cáo tài chính (`/finance-report` - bộ chọn xuất theo danh mục Sự kiện, Lớp học, Phí tham gia, Tổng hợp; hỗ trợ đầy đủ Excel, Word, PDF cả chiều nhập và xuất).
+      - **Nhóm TRUYỀN THÔNG**: Thông báo (`/notifications` - thông báo sự kiện, lớp học, tất cả), Tin tức & Truyền thông (`/news`), Quyền lợi & Ưu đãi (`/perks`).
+      - **Nhóm KẾT NỐI & GIAO THƯƠNG**: Đổi tên nhãn từ "KẾT NỐI" thành "KẾT NỐI & GIAO THƯƠNG", gồm Nhắn tin (`/network`), Chia sẻ cơ hội (`/opportunities`), Giao thương B2B (`/marketplace`), Phân loại doanh nghiệp (`/companies`).
+      - **Nhóm HOẠT ĐỘNG**: Quản lý cuộc họp (`/meetings`), Tài liệu (`/documents`), Biểu mẫu (`/templates` - gồm các menu con Excel, Word, PDF).
+      - **Nhóm HỆ THỐNG**: Cài đặt hệ thống (`/settings`), Lịch sử hoạt động (`/activity`).
+      - **Nhóm PHÂN QUYỀN**: Phân quyền hệ thống (`/permissions`), Quản lý Ban Chuyên Môn (`/departments`), Quản trị người dùng (`/accounts`).
+  - **2. Chuyển Đổi Màu Sắc Giao Diện Sang Tone Xám Doanh Nhân Trang Nhã**:
+    * Triệt để loại bỏ các dải màu gradient tím/violet (`from-purple-*`, `to-violet-*`, `from-[#7C2D82]`).
+    * Thay thế bằng phong cách Executive Slate (`#334155`, `#475569`, `bg-slate-100 dark:bg-slate-800`), đồng bộ với nhận diện ứng dụng CEO HN10.
+  - **3. Xây Dựng Trung Tâm Điều Hành Tác Vụ AI (AI Action Workflow Hub)**:
+    * Tạo mới component `AiTaskWorkflowWizard.tsx` và tích hợp làm tab trung tâm tại `apps/ceohn10_app_fe/src/routes/ai-assistant.tsx`.
+    * **Quy trình 5 bước tương tác trực quan**:
+      - *Bước 1 (Chọn tác vụ & Nạp file)*: Hỗ trợ 4 loại tác vụ (Thông báo nộp phí, Nhắc lịch sự kiện/lớp học, Xuất báo cáo đa định dạng, Bóc tách tài liệu Word/Excel). Vùng dropzone tiếp nhận file Word/Excel: AI tự động phân tích bóc tách cấu trúc bảng, danh sách học viên, khoản tiền, số điện thoại, email và nội dung hành động.
+      - *Bước 2 (Soạn thảo & Tối ưu AI)*: Tự động điền dữ liệu bóc tách, nút "✨ AI Tối Ưu Giọng Văn Doanh Nhân", lựa chọn định dạng file đính kèm xuất ra (Excel, Word, PDF).
+      - *Bước 3 (Danh sách người nhận)*: Tích hợp dữ liệu học viên từ database chuẩn `113.20.107.184:6432`, thanh tìm kiếm, bộ lọc theo ban, hỗ trợ chọn 1 người, chọn nhiều người và checkbox "Chọn tất cả" (Select All).
+      - *Bước 4 (Xem trước)*: Xem trước giao diện email thực tế thay thế biến cá nhân hóa và danh sách tệp đính kèm.
+      - *Bước 5 (Phê duyệt & Thực thi)*: Nút "Phê duyệt & Gửi thông báo" kích hoạt gửi email qua backend NestJS mail service và nút "Duyệt & Xuất tất cả file báo cáo (Word, Excel, PDF)" tự động tạo và tải về máy theo cấu hình Biểu mẫu.
+  - **4. Tùy Biến Format Định Dạng Biểu Mẫu (`/templates`) & Báo Cáo Tài Chính (`/finance-report`)**:
+    * Tạo mới `report-templates.ts` và `ReportTemplateEditor.tsx` tại `/templates`: Cho phép người dùng tùy biến và lưu trữ format mẫu Excel, Word, PDF (tên đơn vị, địa chỉ, tiêu đề, mã số hiệu thông tư, bật/tắt và đổi tên cột, khối 3 chữ ký: Người lập, Phụ trách/Thủ quỹ, Lớp Trưởng).
+    * Báo cáo tài chính (`/finance-report`) khi xuất file (Excel, Word, PDF) đọc trực tiếp cấu hình format từ Biểu mẫu thay vì hardcode trong source code.
+    * Hỗ trợ bộ chọn danh mục xuất chi tiết (Sự kiện, Lớp học, Phí tham gia / Niên liễm, Thiện nguyện CSR, Tổng hợp).
+  - **5. Gỡ Bỏ Cấu Hình Ví & Mẫu Thông Báo Tại Cài Đặt Hệ Thống (`/settings`)**:
+    * Gỡ bỏ các tab và component cấu hình ví VNPay, ví MoMo và Mẫu thông báo.
+  - **6. Khắc Phục Triệt Để Lỗi Subdomain Gọi Nhầm Database `ceo1983_project`**:
+    * **Nguyên nhân**: Script tự động triển khai `deploy/git-auto-deploy.sh` trước đây trỏ vào thư mục cũ `/root/crm` và `/root/association` của VPS `14.225.217.232` (vốn chứa `.env` cũ của CEO1983). Đồng thời trong `.cursorrules` còn tồn tại các đoạn tài liệu cũ nhắc đến `ceo1983_project` và cổng `5436`.
+    * **Giải pháp khắc phục**:
+      - Cập nhật `deploy/git-auto-deploy.sh` trỏ đúng vào `/root/ceohn10_crm` và `/root/ceohn10_association`.
+      - Xóa sạch toàn bộ các đoạn tham chiếu database cũ trong `.cursorrules`, khẳng định Rule 0 Tối cao: CSDL duy nhất của toàn bộ hệ thống là `113.20.107.184:6432/ceohn10_project?pgbouncer=true`.
+      - Xác minh toàn bộ các file cấu hình `.env` (`apps/ceohn10_app_be/.env`, `deploy/crm/.env.crm`, `deploy/ceohn10/.env.association`) đều đang trỏ đúng `113.20.107.184:6432/ceohn10_project`.
+  - **7. Chuẩn Hóa Phân Quyền & Vai Trò Lớp Trưởng, Lớp Phó, Ban Thiện Nguyện**:
+    * Thêm Ban Thiện Nguyện (`BTN`) vào `INITIAL_DEPARTMENTS`, `DEPARTMENT_OPTIONS`, `COMMITTEES`, `departments.tsx`, `RbacPermissionMatrix.tsx` và `account-settings.index.tsx`.
+    * Chuẩn hóa danh xưng vai trò "Lớp Trưởng (Chủ tịch)" và "Lớp Phó (Phó Chủ tịch)" trên toàn bộ ma trận phân quyền và quản trị người dùng.
+  - **8. Kiểm Tra Lỗi Code (Strict Type-Check)**:
+    * Backend (`apps/ceohn10_app_be`): `tsc --noEmit` -> Exit code 0 (0 errors).
+    * Frontend (`apps/ceohn10_app_fe`): `tsc --noEmit` -> Exit code 0 (0 errors).
+    * Tuyệt đối tuân thủ quy chuẩn: Không tự động chạy `git push` hay `git commit`.
 
 - **Bản cập nhật ngày 17/11/2026 (v12.18): Chuẩn Hóa Triệt Để Pipeline GitHub Actions, Triệt Tiêu Warning & Hướng Dẫn Tự Động Triển Khai Lên Subdomains VPS**:
   - **1. Triệt Tiêu Toàn Bộ Cảnh Báo (Annotations / Warnings) Trên GitHub Actions**:

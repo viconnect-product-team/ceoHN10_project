@@ -324,43 +324,13 @@ export function SponsorModal({
               </div>
             </div>
 
-            {/* 2. CHỌN GÓI TÀI TRỢ HOẶC HIỂN THỊ "CHƯA CÓ GÓI" & NÚT BẤM TẠO GÓI NGAY */}
-            {matchingPackages.length === 0 ? (
-              <div className="rounded-xl border border-dashed border-amber-300 dark:border-amber-700/60 bg-amber-500/10 p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                <div className="space-y-0.5">
-                  <div className="flex items-center gap-1.5 text-xs font-bold text-amber-800 dark:text-amber-300">
-                    <AlertCircle className="h-4 w-4 text-amber-600 dark:text-amber-400 shrink-0" />
-                    <span>
-                      Chưa có gói tài trợ{" "}
-                      {draft.packageType === "bank_transfer"
-                        ? "Chuyển khoản"
-                        : draft.packageType === "cash"
-                        ? "Tiền mặt"
-                        : "Hiện vật"}{" "}
-                      nào trong hệ thống
-                    </span>
-                  </div>
-                  <p className="text-[11px] text-amber-700/80 dark:text-amber-400">
-                    Bạn có thể bấm nút bên cạnh để tạo gói định mức mới hoặc nhập số tiền thực tế bên dưới.
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setCreatePkgModalOpen(true)}
-                  className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-primary text-primary-foreground px-3.5 py-2 text-xs font-bold shadow-sm hover:brightness-105 transition cursor-pointer shrink-0"
-                >
-                  <Plus className="h-3.5 w-3.5" />
-                  <span>Tạo Gói Tài Trợ Ngay</span>
-                </button>
-              </div>
-            ) : (
-              <div className="rounded-xl border border-primary/25 bg-primary/5 p-3.5 space-y-2">
+            {/* 2. GÓI TÀI TRỢ LINH HOẠT - KHÔNG BẮT BUỘC GÓI CỤ THỂ */}
+            {matchingPackages.length > 0 && (
+              <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30 p-3.5 space-y-2">
                 <div className="flex items-center justify-between">
-                  <label className="text-xs font-bold text-primary flex items-center gap-1.5" htmlFor="select-pkg">
-                    <Package className="h-4 w-4" />
-                    <span>
-                      Chọn Gói Tài Trợ ({matchingPackages.length} gói khả dụng)
-                    </span>
+                  <label className="text-xs font-bold text-foreground flex items-center gap-1.5" htmlFor="select-pkg">
+                    <Package className="h-4 w-4 text-slate-500" />
+                    <span>Gợi ý gói tài trợ tham khảo (Tùy chọn, không bắt buộc)</span>
                   </label>
                   <button
                     type="button"
@@ -377,7 +347,7 @@ export function SponsorModal({
                   onChange={(e) => handleSelectPackage(e.target.value)}
                   className="h-10 w-full rounded-xl border border-border bg-background px-3 text-xs font-semibold text-foreground outline-none focus:border-primary cursor-pointer"
                 >
-                  <option value="">-- Chọn gói tài trợ định mức hoặc nhập tùy chỉnh bên dưới --</option>
+                  <option value="">-- Tài trợ linh hoạt / Không theo gói cụ thể (Tự do nhập số tiền) --</option>
                   {matchingPackages.map((pkg) => {
                     const tierName =
                       pkg.tier === "platinum"
@@ -397,7 +367,7 @@ export function SponsorModal({
                 {selectedPkgId && (
                   <div className="flex items-center gap-1.5 text-[11px] font-medium text-emerald-600 dark:text-emerald-400">
                     <Check className="h-3.5 w-3.5" />
-                    <span>Đã điền định mức gói. Bạn vẫn có thể tùy biến số tiền thực tế bên dưới.</span>
+                    <span>Đã gợi ý định mức gói. Bạn vẫn có thể tùy biến số tiền thực tế bên dưới.</span>
                   </div>
                 )}
               </div>
