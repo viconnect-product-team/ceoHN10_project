@@ -193,20 +193,24 @@ export function AiExecutionStepTracker({
   );
 
   const handleExportResultExcel = () => {
-    const dataToExport = displayRecipients.map((r, i) => ({
-      STT: i + 1,
-      "Họ và tên": r.name,
-      "Email nhận thư": r.email,
-      "Doanh nghiệp": r.company || "Học viên CEO HN10",
-      "Số điện thoại": r.phone || "",
-      "Thời gian gửi": new Date().toLocaleString("vi-VN"),
-      "Trạng thái": "Gửi thành công 100%",
-    }));
+    const title = `BÁO CÁO KẾT QUẢ GỬI EMAIL TỰ ĐỘNG - ${(taskType || "he_thong").toUpperCase()}`;
+    const subtitle = `CLB Doanh Nhân CEO HN10 (HanoiBA) | Tổng số: ${displayRecipients.length} học viên | Ngày: ${new Date().toLocaleDateString("vi-VN")}`;
 
     exportToExcel({
-      filename: `Bao_Cao_Gui_Email_${taskType}_${new Date().toISOString().slice(0, 10)}.xlsx`,
+      title,
+      subtitle,
+      filename: `Bao_Cao_Gui_Email_${taskType || "ceohn10"}_${new Date().toISOString().slice(0, 10)}`,
       sheetName: "Nhat_Ky_Gui_Email",
-      data: dataToExport,
+      data: displayRecipients,
+      columns: [
+        { header: "STT", key: "stt", width: 8, value: (_r, i) => i + 1 },
+        { header: "Họ và tên", key: "name", width: 28, value: (r) => r.name },
+        { header: "Email nhận thư", key: "email", width: 32, value: (r) => r.email },
+        { header: "Doanh nghiệp", key: "company", width: 30, value: (r) => r.company || "Học viên CEO HN10" },
+        { header: "Số điện thoại", key: "phone", width: 18, value: (r) => r.phone || "" },
+        { header: "Thời gian gửi", key: "time", width: 22, value: () => new Date().toLocaleString("vi-VN") },
+        { header: "Trạng thái", key: "status", width: 22, value: () => "Gửi thành công 100%" },
+      ],
     });
     toast.success("Đã xuất tệp báo cáo Excel nhật ký gửi email thành công!");
   };

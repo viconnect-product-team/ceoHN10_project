@@ -16,6 +16,7 @@ export interface ParsedFileResult {
   totalEmails: number;
   recipients: ParsedRecipientItem[];
   summary: string;
+  extractedSummary?: string;
   eventOrTopicHint?: string;
 }
 
@@ -185,6 +186,7 @@ async function parseExcelFile(file: File): Promise<ParsedFileResult> {
     totalEmails: recipients.length,
     recipients,
     summary,
+    extractedSummary: summary,
     eventOrTopicHint,
   };
 }
@@ -213,13 +215,15 @@ async function parseWordFile(file: File): Promise<ParsedFileResult> {
     }
   }
 
+  const summary = `Đã bóc tách ${recipients.length} địa chỉ email từ văn bản Word ${file.name}.`;
   return {
     fileName: file.name,
     fileSize: file.size,
     fileType: "word",
     totalEmails: recipients.length,
     recipients,
-    summary: `Đã bóc tách ${recipients.length} địa chỉ email từ văn bản Word ${file.name}.`,
+    summary,
+    extractedSummary: summary,
   };
 }
 
@@ -243,12 +247,14 @@ async function parseTextFile(file: File): Promise<ParsedFileResult> {
     }
   }
 
+  const summary = `Đã tìm thấy ${recipients.length} địa chỉ email trong tệp ${file.name}.`;
   return {
     fileName: file.name,
     fileSize: file.size,
     fileType: "text",
     totalEmails: recipients.length,
     recipients,
-    summary: `Đã tìm thấy ${recipients.length} địa chỉ email trong tệp ${file.name}.`,
+    summary,
+    extractedSummary: summary,
   };
 }
