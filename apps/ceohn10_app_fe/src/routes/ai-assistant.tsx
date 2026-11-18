@@ -38,7 +38,7 @@ export const Route = createFileRoute("/ai-assistant")({
 });
 
 export function AiAssistantPage() {
-  const [activeTab, setActiveTab] = useState<"workflow" | "chat" | "analysis" | "finance_report" | "invoice" | "activity">("workflow");
+  const [activeTab, setActiveTab] = useState<"chat" | "workflow" | "analysis" | "finance_report" | "invoice" | "activity">("chat");
   const [analyzing, setAnalyzing] = useState(false);
   const [analysisData, setAnalysisData] = useState<any>(null);
 
@@ -171,30 +171,30 @@ export function AiAssistantPage() {
         <div className="flex border-b border-border gap-2 overflow-x-auto pb-px">
           <button
             type="button"
-            onClick={() => setActiveTab("workflow")}
-            className={`pb-3 px-4 text-xs font-bold transition flex items-center gap-2 border-b-2 cursor-pointer whitespace-nowrap ${activeTab === "workflow"
-                ? "border-primary text-primary"
-                : "border-transparent text-muted-foreground hover:text-foreground"
-              }`}
-          >
-            <Layers className="size-4 text-primary" />
-            <span>Quy Trình Tác Vụ AI (Workflow Hub)</span>
-            <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 font-bold">
-              5 Bước
-            </span>
-          </button>
-          <button
-            type="button"
             onClick={() => setActiveTab("chat")}
             className={`pb-3 px-4 text-xs font-bold transition flex items-center gap-2 border-b-2 cursor-pointer whitespace-nowrap ${activeTab === "chat"
                 ? "border-primary text-primary"
                 : "border-transparent text-muted-foreground hover:text-foreground"
               }`}
           >
-            <MessageSquare className="size-4 text-primary" />
-            <span>Trò Chuyện AI (ChatGPT Style)</span>
+            <Sparkles className="size-4 text-primary animate-pulse" />
+            <span>Trợ Lý AI Ra Lệnh & Tự Động Hóa</span>
             <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-bold">
-              Model Free
+              Auto Stepper ✅
+            </span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab("workflow")}
+            className={`pb-3 px-4 text-xs font-bold transition flex items-center gap-2 border-b-2 cursor-pointer whitespace-nowrap ${activeTab === "workflow"
+                ? "border-primary text-primary"
+                : "border-transparent text-muted-foreground hover:text-foreground"
+              }`}
+          >
+            <Layers className="size-4 text-slate-500" />
+            <span>Quy Trình Thủ Công (Từng Bước)</span>
+            <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 font-bold">
+              5 Bước
             </span>
           </button>
           <button

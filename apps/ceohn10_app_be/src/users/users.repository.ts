@@ -19,9 +19,9 @@ export class UsersRepository {
       ? ['admin@connect.vn', 'admini@connect.vn', 'admin@viconnect.vn']
       : [input];
 
-    // 1. Direct match on username or email
-    const user = await this.prisma.vione_users
-      .findFirst({
+    // 1. Direct match on username or email (prioritize ceohn10_users)
+    let user = (await (this.prisma as any).ceohn10_users
+      ?.findFirst({
         where: {
           OR: [
             ...queryVariants.map((val) => ({ username: { equals: val, mode: 'insensitive' as const } })),
@@ -29,7 +29,20 @@ export class UsersRepository {
           ],
         },
       })
-      .catch(() => null);
+      .catch(() => null)) as vione_users | null;
+
+    if (!user) {
+      user = await this.prisma.vione_users
+        .findFirst({
+          where: {
+            OR: [
+              ...queryVariants.map((val) => ({ username: { equals: val, mode: 'insensitive' as const } })),
+              ...queryVariants.map((val) => ({ email: { equals: val, mode: 'insensitive' as const } })),
+            ],
+          },
+        })
+        .catch(() => null);
+    }
 
     if (user) return user;
 
@@ -93,6 +106,14 @@ export class UsersRepository {
     ) {
       return null;
     }
+
+    const ceohn10User = await (this.prisma as any).ceohn10_users
+      ?.findUnique({
+        where: { id: clean },
+      })
+      .catch(() => null);
+    if (ceohn10User) return ceohn10User as vione_users;
+
     return this.prisma.vione_users
       .findUnique({
         where: { id: clean },
@@ -101,6 +122,13 @@ export class UsersRepository {
   }
 
   async findByGoogleId(googleId: string): Promise<vione_users | null> {
+    const ceohn10User = await (this.prisma as any).ceohn10_users
+      ?.findUnique({
+        where: { google_id: googleId },
+      })
+      .catch(() => null);
+    if (ceohn10User) return ceohn10User as vione_users;
+
     return this.prisma.vione_users
       .findUnique({
         where: { google_id: googleId },
@@ -109,6 +137,13 @@ export class UsersRepository {
   }
 
   async findByAppleId(appleId: string): Promise<vione_users | null> {
+    const ceohn10User = await (this.prisma as any).ceohn10_users
+      ?.findUnique({
+        where: { apple_id: appleId },
+      })
+      .catch(() => null);
+    if (ceohn10User) return ceohn10User as vione_users;
+
     return this.prisma.vione_users
       .findUnique({
         where: { apple_id: appleId },
@@ -117,6 +152,13 @@ export class UsersRepository {
   }
 
   async findByEmail(email: string): Promise<vione_users | null> {
+    const ceohn10User = await (this.prisma as any).ceohn10_users
+      ?.findUnique({
+        where: { email },
+      })
+      .catch(() => null);
+    if (ceohn10User) return ceohn10User as vione_users;
+
     return this.prisma.vione_users
       .findUnique({
         where: { email },
@@ -125,6 +167,11 @@ export class UsersRepository {
   }
 
   async findFirst(where: any): Promise<vione_users | null> {
+    const ceohn10User = await (this.prisma as any).ceohn10_users
+      ?.findFirst({ where })
+      .catch(() => null);
+    if (ceohn10User) return ceohn10User as vione_users;
+
     return this.prisma.vione_users.findFirst({ where }).catch(() => null);
   }
 
@@ -138,18 +185,31 @@ export class UsersRepository {
     apple_id?: string | null;
     email_verified?: boolean;
   }): Promise<vione_users> {
-    return this.prisma.vione_users.create({
-      data: {
-        username: data.username,
-        password: data.password || '',
-        email: data.email || null,
-        name: data.name || null,
-        avatar_url: data.avatar_url || null,
-        google_id: data.google_id || null,
-        apple_id: data.apple_id || null,
-        email_verified: data.email_verified || false,
-      },
-    });
+    const payload = {
+      username: data.username,
+      password: data.password || '',
+      email: data.email || null,
+      name: data.name || null,
+      avatar_url: data.avatar_url || null,
+      google_id: data.google_id || null,
+      apple_id: data.apple_id || null,
+      email_verified: data.email_verified || false,
+    };
+
+    let ceohn10Res: any = null;
+    try {
+      ceohn10Res = await (this.prisma as any).ceohn10_users?.create({
+        data: payload,
+      });
+    } catch {}
+
+    const vioneRes = await this.prisma.vione_users
+      .create({
+        data: payload,
+      })
+      .catch(() => null);
+
+    return (ceohn10Res || vioneRes) as vione_users;
   }
 
   async syncToAuthUsers(id: string, email: string): Promise<void> {

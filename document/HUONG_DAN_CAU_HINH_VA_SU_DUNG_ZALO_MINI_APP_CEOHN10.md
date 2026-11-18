@@ -1,4 +1,4 @@
-# CẨM NANG HƯỚNG DẪN CẤU HÌNH & VẬN HÀNH ZALO MINI APP CLB DOANH NHÂN CEO HN10 (HANOIBA)
+﻿# CẨM NANG HƯỚNG DẪN CẤU HÌNH & VẬN HÀNH ZALO MINI APP CLB DOANH NHÂN CEO HN10 (HANOIBA)
 
 ---
 
@@ -60,7 +60,7 @@ Cung cấp các hàm tích hợp sẵn:
 - **Quy trình hoạt động**:
   1. Nhận `accessToken` và `phoneToken` từ Zalo Mini App gửi lên.
   2. Backend gọi Zalo Graph API `https://graph.zalo.me/v2.0/me/info` kết hợp cùng `ZALO_APP_SECRET` của CLB để giải mã ra số điện thoại thật (Ví dụ: `0912345678`).
-  3. Tra cứu số điện thoại trong bảng `public.vione_users` và `public.members`.
+  3. Tra cứu số điện thoại trong bảng `public.ceohn10_users` và `public.members`.
   4. Nếu tìm thấy Học viên: Trả về Access Token và Refresh Token JWT để đăng nhập ngay.
   5. Nếu là Học viên mới: Tự động khởi tạo tài khoản liên kết để Học viên hoàn thiện hồ sơ.
 
@@ -202,4 +202,5 @@ Sau khi Mini App được Zalo phê duyệt, bạn có thể triển khai vào c
 https://zalo.me/s/YOUR_ZALO_APP_ID/
 ```
 Gửi đường link này vào các nhóm Zalo Chat của CLB CEO HN10, Học viên chỉ cần bấm vào là ứng dụng bật lên ngay lập tức bên trong Zalo.
+
 

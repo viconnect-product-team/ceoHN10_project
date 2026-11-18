@@ -1,4 +1,4 @@
-# TÀI LIỆU YÊU CẦU NGHIỆP VỤ HỆ THỐNG CEO HN10 (HANOIBA)
+﻿# TÀI LIỆU YÊU CẦU NGHIỆP VỤ HỆ THỐNG CEO HN10 (HANOIBA)
 ## BUSINESS REQUIREMENTS DOCUMENT (BRD) - MASTER CHÍNH THỨC
 *Mã tài liệu: BRD-CEOHN10-ENTERPRISE-V1.0*  
 *Đơn vị chủ quản: CLB Doanh Nhân CEO HN10 — Trực thuộc Hội Doanh Nghiệp Trẻ Hà Nội (HanoiBA)*  
@@ -147,7 +147,7 @@ Câu Lạc Bộ Doanh Nhân CEO HN10 là tổ chức thành viên trực thuộc
 - **Tác nhân**: Toàn bộ người dùng hệ thống (Admin, Lãnh đạo, Học viên).
 - **Luồng nghiệp vụ chính**:
   1. Người dùng nhập Email/Tên đăng nhập và Mật khẩu.
-  2. Hệ thống kiểm tra thông tin trong bảng `public.vione_users` và mã băm bcrypt.
+  2. Hệ thống kiểm tra thông tin trong bảng `public.ceohn10_users` và mã băm bcrypt.
   3. Khi hợp lệ, hệ thống sinh cặp Access Token (JWT thời hạn ngắn) và Refresh Token (thời hạn dài).
   4. Hệ thống nạp thông tin vai trò từ `public.user_roles` và `executive_role`, đóng gói vào payload.
   5. Giao diện nhận diện quyền hạn và điều hướng người dùng tới Dashboard quản trị tương ứng.
@@ -259,3 +259,4 @@ Phân hệ Phân quyền tại `/permissions` được thiết kế lại toàn 
 
 ---
 *Tài liệu được phê duyệt và áp dụng chính thức cho toàn bộ dự án CEO HN10.*
+

@@ -1,4 +1,4 @@
-# TÀI LIỆU ĐẶC TẢ YÊU CẦU PHẦN MỀM (SRS)
+﻿# TÀI LIỆU ĐẶC TẢ YÊU CẦU PHẦN MỀM (SRS)
 ## SOFTWARE REQUIREMENTS SPECIFICATION
 
 **Tên dự án:** HỆ SINH THÁI SỐ HÓA HIỆP HỘI DOANH NHÂN CEO HN10 (HANOIBA)  
@@ -271,7 +271,7 @@ flowchart TD
 - **Basic Flow**:
   1. Học viên mở App, chọn tab "Danh thiếp" hoặc chạm mặt lưng thẻ NFC vật lý vào điện thoại đối tác.
   2. Điện thoại đối tác nhận sóng NFC NDEF URI và tự động mở trình duyệt tải trang danh thiếp công khai `/card/:code`.
-  3. Hệ thống kiểm tra tính hợp lệ của mã thẻ trong bảng `business_cards` và `vione_users`.
+  3. Hệ thống kiểm tra tính hợp lệ của mã thẻ trong bảng `business_cards` và `ceohn10_users`.
   4. Hiển thị giao diện danh thiếp sang trọng với ảnh đại diện, chức danh, tên doanh nghiệp, huy hiệu Học viên CEO HN10 HanoiBA.
   5. Đối tác nhấn nút "Lưu vào Danh bạ", hệ thống tải về tệp vCard chuẩn để thêm liên hệ vào danh bạ điện thoại của đối tác.
   6. Hệ thống gửi thông báo realtime qua Socket.IO tới App Học viên: "Đối tác vừa quét danh thiếp của bạn".
@@ -286,7 +286,7 @@ flowchart TD
 - **BR-CARD-03**: Khi Học viên hết hạn niên liễm quá 30 ngày mà chưa gia hạn, thẻ số tự động chuyển sang trạng thái tạm khóa tính năng trao đổi danh thiếp nâng cao.
 
 #### 4.1.4 Thiết Kế Dữ Liệu Tính Năng
-- **Bảng CSDL liên quan**: `public.business_cards`, `public.vione_users`, `public.card_analytics`.
+- **Bảng CSDL liên quan**: `public.business_cards`, `public.ceohn10_users`, `public.card_analytics`.
 - **Input Parameters**: `userId (UUID)`, `themeId (String)`, `customBio (String, max 500 ký tự)`, `socialLinks (JSON)`.
 - **Output Validation**: `code (String, unique 8-12 ký tự)`, `avatarUrl (Valid URL)`, `qrUrl (Valid SVG/PNG Data URI)`.
 
@@ -334,7 +334,7 @@ flowchart TD
 - **BR-B2B-04**: Khi một cơ hội chuyển sang trạng thái Đã đóng/Hủy, biểu đồ thống kê lập tức loại bỏ bản ghi này, không giữ lại số liệu ảo.
 
 #### 4.2.4 Thiết Kế Dữ Liệu Tính Năng
-- **Bảng CSDL liên quan**: `public.opportunities`, `public.opportunity_deals`, `public.vione_users`.
+- **Bảng CSDL liên quan**: `public.opportunities`, `public.opportunity_deals`, `public.ceohn10_users`.
 - **Input Parameters**: `title (String, 5-200 ký tự)`, `value (Numeric, >= 0)`, `images (Array<String>)`, `commissionRate (Numeric 0-50)`, `recipientType ('all' | 'departments' | 'friends')`, `recipientIds (Array<String>)`.
 - **Output Validation**: `id (UUID)`, `status ('open' | 'negotiating' | 'completed' | 'closed')`, `createdAt (ISO Timestamp)`.
 
@@ -433,7 +433,7 @@ flowchart TD
 - **BR-DIR-02**: Khi gửi kết nối chờ xác nhận, nút "Chờ xác nhận" phải được thay thế bằng nút "Hủy" để người gửi chủ động rút lại lời mời khi cần.
 
 #### 4.4.4 Thiết Kế Dữ Liệu Tính Năng
-- **Bảng CSDL liên quan**: `public.user_connections`, `public.vione_users`.
+- **Bảng CSDL liên quan**: `public.user_connections`, `public.ceohn10_users`.
 - **Input Parameters**: `requesterId (UUID)`, `receiverId (UUID)`, `status ('pending' | 'accepted' | 'declined')`.
 - **Output Validation**: `connectionId (UUID)`, `updatedAt (TIMESTAMPTZ)`.
 
@@ -554,7 +554,7 @@ flowchart TD
 
 - **Actor**: Khách vãng lai, Doanh nhân ứng viên HN10.
 - **Pre-conditions**: Khách có kết nối Internet và truy cập trình duyệt Web bất kỳ.
-- **Post-conditions**: Hồ sơ đăng ký được tạo trong bảng `membership_applications` hoặc `vione_users` với trạng thái chờ duyệt; Ban Thư Ký nhận thông báo trên CRM.
+- **Post-conditions**: Hồ sơ đăng ký được tạo trong bảng `membership_applications` hoặc `ceohn10_users` với trạng thái chờ duyệt; Ban Thư Ký nhận thông báo trên CRM.
 - **Basic Flow**:
   1. Khách truy cập `https://ceohn10.viconnect.vn/intro`.
   2. Header cố định hiển thị: Logo HanoiBA & CLB CEO HN10, Menu điều hướng (Trang Chủ, Về Chúng Tôi, 6 Ban Chuyên Môn, Sự Kiện, Sàn B2B, Đặc Quyền, Đăng Ký Gia Nhập), Nút "Đăng Nhập" và "Mở App Học viên".
@@ -755,17 +755,17 @@ Trung tâm đầu não cấu hình hệ thống dành cho Super Admin tại `/se
 
 ```mermaid
 erDiagram
-    VIONE_USERS ||--o{ BUSINESS_CARDS : "sở hữu"
-    VIONE_USERS ||--o{ OPPORTUNITIES : "đăng tải"
-    VIONE_USERS ||--o{ EVENT_REGISTRATIONS : "đăng ký vé"
-    VIONE_USERS ||--o{ USER_CONNECTIONS : "kết nối bạn bè"
-    VIONE_USERS ||--o{ ACTIVITY_LOG : "thực hiện"
-    VIONE_USERS ||--o{ AI_REQUEST_AUDIT : "gọi tác vụ AI"
+    ceohn10_users ||--o{ BUSINESS_CARDS : "sở hữu"
+    ceohn10_users ||--o{ OPPORTUNITIES : "đăng tải"
+    ceohn10_users ||--o{ EVENT_REGISTRATIONS : "đăng ký vé"
+    ceohn10_users ||--o{ USER_CONNECTIONS : "kết nối bạn bè"
+    ceohn10_users ||--o{ ACTIVITY_LOG : "thực hiện"
+    ceohn10_users ||--o{ AI_REQUEST_AUDIT : "gọi tác vụ AI"
 
     EVENTS ||--o{ EVENT_REGISTRATIONS : "phát hành vé"
     OPPORTUNITIES ||--o{ OPPORTUNITY_DEALS : "nhận chào deal"
 
-    VIONE_USERS {
+    ceohn10_users {
         uuid id PK
         string email
         string phone
@@ -992,4 +992,5 @@ sequenceDiagram
 
 ---
 *Tài liệu Đặc tả Yêu cầu Phần mềm (SRS V7.0) được phê duyệt chính thức bởi Ban Chấp Hành CLB Doanh Nhân CEO HN10 (HanoiBA). Mọi thay đổi kỹ thuật tiếp theo phải tuân thủ quy trình kiểm soát phiên bản và cập nhật đồng bộ vào Ma trận truy vết.*
+
 

@@ -20,7 +20,7 @@
    - 1.4. Bảng Ma Trận Quan Hệ Thực Thể Cốt Lõi (Entity Relational Matrix)
 
 2. **PHẦN II: THIẾT KẾ CHI TIẾT CƠ SỞ DỮ LIỆU POSTGRESQL (20+ BẢNG DOANH NGHIỆP)**
-   - 2.1. Bảng `ceohn10_users` & `vione_users`: Tài khoản người dùng cơ sở
+   - 2.1. Bảng `ceohn10_users`: Tài khoản người dùng cơ sở
    - 2.2. Bảng `members`: Hồ sơ 360 độ Học viên Doanh nhân CLB CEO HN10
    - 2.3. Bảng `companies`: Hồ sơ Doanh nghiệp thành viên & Pháp nhân
    - 2.4. Bảng `company_members`: Quan hệ thành viên trong doanh nghiệp
@@ -148,7 +148,7 @@ Toàn bộ hệ thống Web CRM, Mobile App, Backend API và các container Dock
 
 ## PHẦN II: THIẾT KẾ CHI TIẾT CƠ SỞ DỮ LIỆU POSTGRESQL (20+ BẢNG DOANH NGHIỆP)
 
-### 2.1. Bảng `public.ceohn10_users` & `vione_users` (Tài Khoản Đăng Nhập Hệ Thống)
+### 2.1. Bảng `public.ceohn10_users` (Tài Khoản Đăng Nhập Hệ Thống)
 *Mô tả nghiệp vụ:* Lưu trữ tài khoản đăng nhập cốt lõi, cơ chế băm mật khẩu Bcrypt và các khóa OAuth liên kết.
 
 | Tên Cột | Kiểu Dữ Liệu | Ràng Buộc | Giá Trị Mặc Định | Mô Tả Ý Nghĩa Nghiệp Vụ |

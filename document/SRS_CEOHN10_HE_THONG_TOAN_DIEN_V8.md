@@ -1,4 +1,4 @@
-# TÀI LIỆU ĐẶC TẢ YÊU CẦU PHẦN MỀM (SOFTWARE REQUIREMENTS SPECIFICATION - SRS)
+﻿# TÀI LIỆU ĐẶC TẢ YÊU CẦU PHẦN MỀM (SOFTWARE REQUIREMENTS SPECIFICATION - SRS)
 # HỆ THỐNG QUẢN TRỊ HIỆP HỘI CRM & MOBILE APP CLB DOANH NHÂN CEO HN10 (HANOIBA)
 **Phiên bản:** 8.0 (Master Release)  
 **Tổ chức:** CLB Doanh Nhân CEO HN10 — Trực thuộc Hội Doanh Nghiệp Trẻ Hà Nội (HanoiBA)  
@@ -108,11 +108,12 @@
 ## 3. ĐẶC TẢ DỮ LIỆU & AN TOÀN HỆ THỐNG
 ### 3.1. Dữ Liệu Sau Dọn Dẹp Thực Nghiệm (Database Hygiene)
 - Toàn bộ các bảng nghiệp vụ thử nghiệm đã được làm sạch:
-  - `vione_users`: 1 record duy nhất (`admin@connect.vn`, ID: `00000000-0000-4003-8000-000000000002`).
+  - `ceohn10_users`: 1 record duy nhất (`admin@connect.vn`, ID: `00000000-0000-4003-8000-000000000002`).
   - `members`: 1 record duy nhất (`Jame Nguyễn`, `admin@connect.vn`).
   - `feed_posts`, `messages`, `opportunities`, `products`, `events`, `member_notifications`: 0 records (sẵn sàng đón nhận dữ liệu thật).
 
 ### 3.2. Tiêu Chuẩn Chất Lượng & Ràng Buộc Kiểm Thử
 - **TypeScript Strict Compliance**: Toàn bộ mã nguồn Backend và Frontend đạt `npx tsc --noEmit` với exit code 0 (0 errors, 0 warnings).
 - **Tuân thủ Git Rule**: Không tự ý thực thi `git commit` hoặc `git push`.
+
 

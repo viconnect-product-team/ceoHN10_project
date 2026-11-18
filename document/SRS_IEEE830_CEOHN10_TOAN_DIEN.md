@@ -1,4 +1,4 @@
-# SOFTWARE REQUIREMENTS SPECIFICATION (SRS)
+﻿# SOFTWARE REQUIREMENTS SPECIFICATION (SRS)
 
 ## HỆ SINH THÁI SỐ HÓA & QUẢN TRỊ HIỆP HỘI DOANH NHÂN CEO HN10
 
@@ -441,7 +441,7 @@ Bước E1: Sự kiện đã hết số lượng vé khách mời -> Báo lỗi:
 | Tiền Điều Kiện (Pre-conditions) | Người dùng đã được cấp tài khoản quản trị và tài khoản ở trạng thái active. |
 | Hậu Điều Kiện (Post-conditions) | Cán bộ quản trị thiết lập phiên làm việc hợp lệ và truy cập các chức năng quản trị theo phân quyền. |
 | Quy Tắc Nghiệp Vụ (Business Rules) | Áp dụng cơ chế phòng vệ tự động chống dò quét mật khẩu (Rate Limiting). |
-| Ánh Xạ Kỹ Thuật (Tech Mapping) | API: `POST /api/auth/login` | Tables: `vione_users`, `user_roles`, `audit_logs` |
+| Ánh Xạ Kỹ Thuật (Tech Mapping) | API: `POST /api/auth/login` | Tables: `ceohn10_users`, `user_roles`, `audit_logs` |
 
 
 
@@ -462,7 +462,7 @@ Bước 2: Nhập Email/Tên đăng nhập và Mật khẩu.
 
 Bước 3: Bấm nút 'Đăng Nhập Hệ Thống'.
 
-Bước 4: Hệ thống truy vấn bảng `vione_users`, lấy chuỗi băm mật khẩu và so khớp bằng thuật toán `bcrypt.compare()`.
+Bước 4: Hệ thống truy vấn bảng `ceohn10_users`, lấy chuỗi băm mật khẩu và so khớp bằng thuật toán `bcrypt.compare()`.
 
 Bước 5: Kiểm tra vai trò tài khoản trong `user_roles`: Bắt buộc phải thuộc 1 trong các vai trò quản trị (quan_tri, admin, tong_thu_ky, truong_ban).
 
@@ -592,7 +592,7 @@ Bước E1: Không tìm thấy bản ghi phù hợp -> Hiển thị hình ảnh 
 | Tiền Điều Kiện (Pre-conditions) | Hồ sơ ứng viên đang ở trạng thái pending trong danh sách chờ duyệt. |
 | Hậu Điều Kiện (Post-conditions) | Ứng viên chính thức trở thành Học viên CLB CEO HN10, có mã định danh, tài khoản di động và danh thiếp số. |
 | Quy Tắc Nghiệp Vụ (Business Rules) | RULE-AUTH-BTV-EXCLUSIVE: Nghiêm cấm tuyệt đối Ban Thư Ký phê duyệt Học viên. |
-| Ánh Xạ Kỹ Thuật (Tech Mapping) | API: `POST /api/association/members/:id/approve` | Tables: `members`, `vione_users`, `member_business_cards` |
+| Ánh Xạ Kỹ Thuật (Tech Mapping) | API: `POST /api/association/members/:id/approve` | Tables: `members`, `ceohn10_users`, `member_business_cards` |
 
 
 
@@ -624,7 +624,7 @@ Bước 6: Hệ thống thực hiện chuỗi giao dịch nguyên tử (Atomic T
 
    - Cập nhật bản ghi trong `members`: status = 'active', code = 'HN10-xxxx', joined_at = NOW().
 
-   - Tạo tài khoản đăng nhập trong `vione_users` với mật khẩu khởi tạo ngẫu nhiên, bật cờ must_change_password = true.
+   - Tạo tài khoản đăng nhập trong `ceohn10_users` với mật khẩu khởi tạo ngẫu nhiên, bật cờ must_change_password = true.
 
    - Tạo bản ghi Thẻ doanh nhân điện tử trong `member_business_cards` với slug công khai /card/ceo83xxx.
 
@@ -757,7 +757,7 @@ Bước 4: BTV xác nhận và công bố bảng xếp hạng thường niên.
 | Tiền Điều Kiện (Pre-conditions) | Tài khoản Học viên tồn tại trong hệ thống. |
 | Hậu Điều Kiện (Post-conditions) | Trạng thái tài khoản được cập nhật tức thời trên toàn hệ thống. |
 | Quy Tắc Nghiệp Vụ (Business Rules) | Mọi thao tác khóa/mở khóa bắt buộc nhập lý do chi tiết. |
-| Ánh Xạ Kỹ Thuật (Tech Mapping) | API: `POST /api/association/members/:id/account-action` | Table: `vione_users` |
+| Ánh Xạ Kỹ Thuật (Tech Mapping) | API: `POST /api/association/members/:id/account-action` | Table: `ceohn10_users` |
 
 
 
@@ -1649,7 +1649,7 @@ Bước E1: Lỗi ghi log không được làm gián đoạn giao dịch chính 
 | Tiền Điều Kiện (Pre-conditions) | Hồ sơ Học viên đã được Ban Thành Viên phê duyệt (status = 'active'). |
 | Hậu Điều Kiện (Post-conditions) | Học viên truy cập thành công vào các tiện ích dành riêng cho thành viên. |
 | Quy Tắc Nghiệp Vụ (Business Rules) | Chỉ những Học viên có trạng thái active mới được phép đăng nhập ứng dụng. |
-| Ánh Xạ Kỹ Thuật (Tech Mapping) | API: `POST /api/association/auth/login` | Tables: `vione_users`, `members` |
+| Ánh Xạ Kỹ Thuật (Tech Mapping) | API: `POST /api/association/auth/login` | Tables: `ceohn10_users`, `members` |
 
 
 
@@ -1700,7 +1700,7 @@ Bước E2: Hồ sơ bị tạm đình chỉ hoặc khai trừ (suspended / term
 | Tiền Điều Kiện (Pre-conditions) | Tài khoản có cờ must_change_password = true. |
 | Hậu Điều Kiện (Post-conditions) | Tài khoản được bảo vệ bằng mật khẩu cá nhân, cờ must_change_password được gỡ bỏ. |
 | Quy Tắc Nghiệp Vụ (Business Rules) | Không cho phép người dùng đóng modal hoặc chuyển trang khi chưa đổi mật khẩu thành công. |
-| Ánh Xạ Kỹ Thuật (Tech Mapping) | API: `POST /api/auth/change-password` | Table: `vione_users` |
+| Ánh Xạ Kỹ Thuật (Tech Mapping) | API: `POST /api/auth/change-password` | Table: `ceohn10_users` |
 
 
 
@@ -2776,7 +2776,7 @@ Bước E1: Tài khoản không đủ quyền hạn RBAC đối với tính năn
   - Chip NFC tần số 13.56MHz tương thích chuẩn ISO/IEC 14443 Type A.
   - Chạm mặt sau thẻ vào smartphone để mở liên kết công khai `/card/:slug`.
 * Kiến Trúc Cơ Sở Dữ Liệu PostgreSQL (Prisma ORM):
-  - Bảng Học viên: `members` (liên kết `vione_users` qua `user_id`).
+  - Bảng Học viên: `members` (liên kết `ceohn10_users` qua `user_id`).
   - Bảng danh thiếp số: `member_business_cards` (chứa slug, branding, liên kết mạng xã hội).
   - Bảng sự kiện: `events`, `event_ticket_types`, `event_registrations`, `member_checkins`.
   - Bảng tài chính & hội phí: `invoices`, `associations`.
@@ -2784,4 +2784,5 @@ Bước E1: Tài khoản không đủ quyền hạn RBAC đối với tính năn
   - Cổng thanh toán Mã QR Ngân Hàng Napas 24/7 (Sinh mã QR động chuyển khoản liên ngân hàng).
   - Dịch vụ thư điện tử SMTP Gmail Relay (`smtp.gmail.com:465`).
   - Dịch vụ lưu trữ đối tượng MinIO S3 Compatible Object Storage.
+
 

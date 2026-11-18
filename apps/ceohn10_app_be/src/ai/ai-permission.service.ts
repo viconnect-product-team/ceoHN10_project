@@ -250,8 +250,12 @@ export class AiPermissionService {
     // 2. Tra cứu vai trò của người dùng
     const [vUsers, uRoles] = await Promise.all([
       this.prisma.$queryRaw<any[]>`
-        SELECT id, role, email FROM public.vione_users WHERE id::text = ${userId}::text LIMIT 1
-      `.catch(() => []),
+        SELECT id, role, email FROM public.ceohn10_users WHERE id::text = ${userId}::text LIMIT 1
+      `.catch(() =>
+        this.prisma.$queryRaw<any[]>`
+          SELECT id, role, email FROM public.vione_users WHERE id::text = ${userId}::text LIMIT 1
+        `
+      ).catch(() => []),
       this.prisma.$queryRaw<any[]>`
         SELECT role::text FROM public.user_roles WHERE user_id::text = ${userId}::text
       `.catch(() => []),

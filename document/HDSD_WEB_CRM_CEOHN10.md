@@ -1,4 +1,4 @@
-# HƯỚNG DẪN SỬ DỤNG HỆ THỐNG QUẢN TRỊ CRM (HDSD - WEB CRM)
+﻿# HƯỚNG DẪN SỬ DỤNG HỆ THỐNG QUẢN TRỊ CRM (HDSD - WEB CRM)
 ## DÀNH CHO LÃNH ĐẠO, BAN ĐIỀU HÀNH & BAN THƯ KÝ CEO HN10
 *Phiên bản: 4.0 - Phát hành: Tháng 10/2026*
 
@@ -123,13 +123,14 @@
    - **Chỉnh sửa Học viên (`/members`)**: Modal chỉnh sửa chỉ hiển thị thông tin cá nhân của Học viên (Họ tên, SĐT, Email, Chức vụ, Hạng, Vùng, Trạng thái, Địa chỉ, Giới thiệu).
    - **Xóa Học viên với 2 Lựa chọn minh bạch**:
      * Lựa chọn 1: *Xóa doanh nghiệp trước* (`company_only`): Hủy liên kết doanh nghiệp, xóa thông tin doanh nghiệp nhưng vẫn giữ lại hồ sơ Học viên và tài khoản. Sau đó có thể tiếp tục thao tác xóa Học viên nếu muốn.
-     * Lựa chọn 2: *Xóa cả Học viên và doanh nghiệp* (`all`): Cascade xóa sạch toàn bộ hồ sơ Học viên, doanh nghiệp, thẻ điện tử, tư cách Học viên và tài khoản đăng nhập `vione_users`/`auth.users`.
+     * Lựa chọn 2: *Xóa cả Học viên và doanh nghiệp* (`all`): Cascade xóa sạch toàn bộ hồ sơ Học viên, doanh nghiệp, thẻ điện tử, tư cách Học viên và tài khoản đăng nhập `ceohn10_users`/`auth.users`.
 3. **Quản lý Gia Hạn Học viên (`/renewal`)**:
-   - Khắc phục triệt để lỗi CSDL ép kiểu UUID khi xử lý mã Học viên; dữ liệu gia hạn luôn liên kết với bản ghi tài khoản `vione_users` mới nhất.
+   - Khắc phục triệt để lỗi CSDL ép kiểu UUID khi xử lý mã Học viên; dữ liệu gia hạn luôn liên kết với bản ghi tài khoản `ceohn10_users` mới nhất.
    - Thao tác "Gia hạn Học viên" và "Gửi nhắc nhở" hoạt động ổn định và chính xác; chân trang phân trang được bao phủ toàn màn hình chuyên nghiệp.
 4. **Phân Quyền Ma Trận 2 Tab & Chọn Ban Điều Hành Nhanh**:
    - Ma trận phân quyền (`/permissions`) chia làm 2 tab: Tab CRM Web và Tab App CEO HN10 Mobile.
    - Khi chọn Ban Điều Hành tại Quản lý tài khoản (`/accounts`), hệ thống hiển thị đầy đủ 5 vai trò cốt lõi ngay từ lần click đầu tiên mà không cần chọn ban khác rồi quay lại.
+
 
 
 

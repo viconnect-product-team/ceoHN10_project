@@ -727,7 +727,7 @@ flowchart LR
     SEC["Ban Thư Ký"] -->|"2. Thẩm tra giấy tờ & MST"| UI
     MEM_BOARD["Ban Thành Viên"] -->|"3. Bấm Phê Duyệt Kết Nạp"| UI
     UI -->|"4. PATCH /members/:id/approve"| BE["Backend NestJS (members.service)"]
-    BE -->|"5. Transaction nguyên tử"| DB[("PostgreSQL: members, vione_users, audit_logs")]
+    BE -->|"5. Transaction nguyên tử"| DB[("PostgreSQL: members, ceohn10_users, audit_logs")]
     BE -->|"6. Gửi email chào mừng & mã HN10-xxxx"| MAIL["Dịch Vụ Email / Zalo OA"]
 ```
 
@@ -752,7 +752,7 @@ flowchart LR
 * **Liên kết kỹ thuật (Technical Implementation):**
   - **Giao diện (Frontend UI):** `apps/ceohn10_app_fe/src/routes/members.index.tsx, MemberApprovalModal.tsx`
   - **Điểm cuối API (Endpoints):** `POST /members/:id/approve, POST /members/:id/reject, GET /members?status=pending`
-  - **Bảng CSDL PostgreSQL:** `public.members, public.vione_users, public.companies`
+  - **Bảng CSDL PostgreSQL:** `public.members, public.ceohn10_users, public.companies`
 
 ---
 
@@ -1414,7 +1414,7 @@ flowchart LR
     GUEST["Doanh Nhân CEO HN10"] -->|"1. Điền form đăng ký trên điện thoại"| APP["Mobile App (/register)"]
     APP -->|"2. Tải ảnh ĐKKD & CCCD"| STORAGE["File Storage Server"]
     APP -->|"3. POST /auth/register"| BE["Backend NestJS (auth.service)"]
-    BE -->|"4. Tạo tài khoản PENDING_APPROVAL"| DB[("PostgreSQL: vione_users, members")]
+    BE -->|"4. Tạo tài khoản PENDING_APPROVAL"| DB[("PostgreSQL: ceohn10_users, members")]
     BE -->|"5. Bắn thông báo đẩy hồ sơ mới"| NOTIF["Ban Thành Viên CRM"]
 ```
 
@@ -1439,7 +1439,7 @@ flowchart LR
 * **Liên kết kỹ thuật (Technical Implementation):**
   - **Giao diện (Frontend UI):** `apps/ceohn10_app_fe/src/routes/register.tsx, RegisterForm.tsx`
   - **Điểm cuối API (Endpoints):** `POST /auth/register, POST /api/upload/file?folder=kyc`
-  - **Bảng CSDL PostgreSQL:** `public.vione_users, public.members, public.companies`
+  - **Bảng CSDL PostgreSQL:** `public.ceohn10_users, public.members, public.companies`
 
 ---
 
@@ -1485,7 +1485,7 @@ flowchart TD
 * **Liên kết kỹ thuật (Technical Implementation):**
   - **Giao diện (Frontend UI):** `apps/ceohn10_app_fe/src/routes/login.tsx, FirstDayAiWelcomeModal.tsx`
   - **Điểm cuối API (Endpoints):** `POST /auth/login, GET /association/home-feed, GET /association/home-stats`
-  - **Bảng CSDL PostgreSQL:** `public.vione_users, public.members`
+  - **Bảng CSDL PostgreSQL:** `public.ceohn10_users, public.members`
 
 ---
 

@@ -170,9 +170,126 @@ Bước 8: Lớp phủ Voice GPS HUD Overlay kích hoạt hiệu ứng Spotlight
   - Hệ điều hành máy chủ: Linux Ubuntu 22.04 LTS (Containerized Docker Architecture).
   - Web Server & Gateway: Nginx Reverse Proxy (SSL/TLS 1.3, HTTP/2, WSS Gateway Reverse Proxy).
   - Runtime Engine: Node.js v18.x LTS, NestJS Framework v10.x.
-  - Cơ sở dữ liệu: PostgreSQL v15+ kết hợp Prisma ORM (@vibe/db) và Connection Pooler PgBouncer.
-  - Lưu trữ tệp đối tượng: MinIO S3 Compatible Object Storage.
+  - Cơ sở dữ liệu trung tâm (Rule 0): PostgreSQL 113.20.107.184:6432 (Database: ceohn10_project, User: app1) qua PgBouncer Connection Pooler.
+  - Lưu trữ tệp đối tượng: MinIO S3 Compatible Object Storage / Local Asset Storage.
   - Động cơ thời gian thực: Socket.IO Gateway Engine.
+
+### 2.4. HỆ THỐNG SƠ ĐỒ LUỒNG CHỨC NĂNG MOBILE APP (MERMAID FUNCTIONAL DIAGRAMS)
+
+#### 2.4.1. Sơ đồ Luồng Đăng Nhập & Thẻ Doanh Nhân Số QR
+```mermaid
+flowchart TD
+    Start([Học Viên Mở Mobile App]) --> AuthChoice{Trạng Thái Đăng Nhập?}
+    AuthChoice -- Đã Lưu Phiên --> BioCheck{Xác Thực Sinh Trắc FaceID/Vân Tay}
+    BioCheck -- Thành Công --> Home[Vào Màn Hình Trang Chủ Mobile App]
+    BioCheck -- Thất Bại / Lần Đầu --> Login[Nhập Email/SĐT & Mật Khẩu]
+    Login --> PostLogin[Gửi POST /api/auth/login]
+    PostLogin --> VerifyUser[(PostgreSQL 113.20.107.184:6432)]
+    VerifyUser --> Token[Cấp Access Token & Cập Nhật Session]
+    Token --> Home
+
+    Home --> TabCard[Chạm 'Thẻ Doanh Nhân Số QR']
+    TabCard --> RenderCard[Hiển Thị Họ Tên, Chức Danh, Logo Doanh Nghiệp & Mã QR Cá Nhân]
+    RenderCard --> NFCShare[Chạm NFC Hoặc Đưa Đối Tác Quét QR -> Xuất Danh Bạ vCard .vcf]
+```
+
+#### 2.4.2. Sơ đồ Luồng Lịch Học & Quét QR Điểm Danh Buổi Học Realtime
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Member as Học Viên Doanh Nhân
+    participant App as Mobile App CEO HN10
+    participant Screen as Màn Chiếu Lớp Học (CRM)
+    participant Nest as TrainingsController
+    participant DB as PostgreSQL 113.20.107.184:6432
+
+    Member->>App: Mở Tab 'Lịch Học' (/association/trainings)
+    App->>Nest: GET /api/trainings/my
+    Nest->>DB: Truy vấn lịch các buổi học
+    DB-->>Nest: Trả về danh sách buổi học
+    Nest-->>App: Hiển thị thời khóa biểu & tài liệu học tập
+
+    Note over Member,Screen: Khi tham gia buổi học tại hội trường
+    Screen->>Screen: Chiếu mã QR Điểm Danh Buổi Học
+    Member->>App: Bấm 'Quét Mã QR Điểm Danh' (Camera)
+    App->>Screen: Hướng camera quét mã QR
+    App->>Nest: POST /api/trainings/sessions/:id/checkin { qrCode: token }
+    Nest->>DB: INSERT INTO training_attendees (...) VALUES (...)
+    DB-->>Nest: Ghi nhận thành công
+    Nest-->>App: 200 OK "Điểm danh thành công! Chúc bạn buổi học nhiều giá trị"
+    App-->>Member: Hiển thị Badge Xanh ĐÃ ĐIỂM DANH
+```
+
+#### 2.4.3. Sơ đồ Luồng Đăng Ký Sự Kiện & Soát Vé E-Ticket QR
+```mermaid
+flowchart TD
+    Start([Học Viên Mở Tab Sự Kiện]) --> ViewEvents[Xem Danh Sách Sự Kiện & 4 Sự Kiện Cố Định Thường Niên]
+    ViewEvents --> ClickEvent[Chọn Sự Kiện Cần Tham Gia (Gala / Khai Giảng / Teambuilding)]
+    ClickEvent --> RegisterBtn[Bấm 'Đăng Ký Tham Dự']
+    RegisterBtn --> PostReg[Gửi POST /api/events/:id/attendees]
+    PostReg --> DBReg[(Lưu Vào PostgreSQL bảng event_registrations)]
+    DBReg --> GenTicket[Hệ Thống Cấp Vé Điện Tử E-Ticket QR TKT-xxx]
+    GenTicket --> MyTickets[Vé Lưu Vào 'Vé Của Tôi' (Hỗ Trợ Mở Offline)]
+
+    MyTickets --> AtEvent[Đến Sự Kiện: Xuất Trình Mã QR E-Ticket Tại Cổng]
+    AtEvent --> GateScan[Lễ Tân Quét QR < 0.5s -> Màn Hình Xanh & Định Vị Bàn Tiệc VIP]
+```
+
+#### 2.4.4. Sơ đồ Luồng Biểu Quyết Trực Tuyến & Xem Kết Quả Live
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Member as Học Viên Doanh Nhân
+    participant App as Mobile App CEO HN10
+    participant Socket as Socket.IO Gateway
+    participant Nest as VotingController
+    participant DB as PostgreSQL 113.20.107.184:6432
+
+    Socket-->>App: Push sự kiện 'VOTE_SESSION_OPENED'
+    App-->>Member: Hiển thị thông báo Popup Biểu Quyết Bầu Cử
+    Member->>App: Mở màn hình Biểu Quyết (/association/voting)
+    App->>Member: Hiển thị tờ trình đại hội & 3 phương án lựa chọn
+    Member->>App: Chọn: Tán Thành / Không Tán Thành / Ý Kiến Khác
+    App->>Nest: POST /api/voting/:id/cast { choice }
+    Nest->>DB: INSERT INTO event_vote_results (vote_id, member_id, choice)
+    DB-->>Nest: Ghi nhận thành công (Khóa quyền vote của member_id)
+    Nest-->>App: 200 OK "Bỏ phiếu thành công!"
+    Nest->>Socket: Phát kết quả cập nhật realtime
+    Socket-->>App: Hiển thị biểu đồ kết quả trực tiếp (% Tán Thành)
+```
+
+#### 2.4.5. Sơ đồ Luồng Sàn Giao Thương B2B & Tin Nhắn Kết Nối 1-on-1
+```mermaid
+flowchart TD
+    Start([Học Viên Vào Sàn B2B Connect]) --> ActionChoice{Mục Tiêu?}
+    ActionChoice -- Đăng Tin --> PostDeal[Đăng Sản Phẩm Ưu Đãi (Offer) Hoặc Tìm Nhà Cung Cấp (Demand)]
+    PostDeal --> InputDiscount[Điền Chiết Khấu Dành Riêng Học Viên CEO HN10 (20% - 30%)]
+    InputDiscount --> SaveDeal[(Lưu Vào PostgreSQL bảng b2b_opportunities)]
+    SaveDeal --> FeedShow[Hiển Thị Lên Bảng Tin B2B Toàn Lớp]
+
+    ActionChoice -- Tìm Kiếm --> FilterCat[Lọc Theo Ngành Nghề (BĐS, Xây Dựng, Công Nghệ...)]
+    FilterCat --> ViewDetail[Xem Hồ Sơ Năng Lực & Ưu Đãi Doanh Nghiệp]
+    ViewDetail --> MessageBtn[Bấm 'Nhắn Tin 1-on-1']
+    MessageBtn --> OpenChat[Mở Hộp Thoại Chat Trực Tiếp Giữa 2 Chủ Doanh Nghiệp]
+    OpenChat --> Transact[Thống Nhất Giao Thương & Ghi Nhận Giá Trị Hợp Tác Nội Khối]
+```
+
+#### 2.4.6. Sơ đồ Luồng Đồng Hành Quỹ Thiện Nguyện CSR Cùng Ban Thiện Nguyện BTN
+```mermaid
+flowchart TD
+    Start([Ban Thiện Nguyện Phát Động Chương Trình An Sinh]) --> AppNotif[Bắn Thông Báo Đến Toàn Bộ Học Viên Trên Mobile App]
+    AppNotif --> OpenCharity[Học Viên Mở Chi Tiết Chiến Dịch Thiện Nguyện]
+    OpenCharity --> ChoiceContribute{Hình Thức Đóng Góp?}
+    
+    ChoiceContribute -- Tiền Mặt --> CashTransfer[Chuyển Khoản Vào Quỹ Thiện Nguyện CSR (Mục Tiền Mặt)]
+    ChoiceContribute -- Hiện Vật --> InKindDonate[Đăng Ký Đóng Góp Hiện Vật: Quà Tặng, Áo Ấm, Học Bổng]
+    
+    CashTransfer --> DBCharity[(Ghi Nhận Vào PostgreSQL sponsors & transactions)]
+    InKindDonate --> DBCharity
+    
+    DBCharity --> Transparency[Bảng Sao Kê & Danh Sách Nhà Hảo Tâm Hiển Thị Minh Bạch 100%]
+    Transparency --> Certificate[Hệ Thống Xuất Thư Tri Ân Điện Tử Tặng Doanh Nghiệp]
+```
 
 ## 3. YÊU CẦU CHỨC NĂNG CHI TIẾT (FUNCTIONAL REQUIREMENTS — 28 USE CASES)
 
@@ -191,7 +308,7 @@ Bước 8: Lớp phủ Voice GPS HUD Overlay kích hoạt hiệu ứng Spotlight
 | Tiền Điều Kiện (Pre-conditions) | Hồ sơ Học viên đã được Ban Thành Viên phê duyệt (status = 'active'). |
 | Hậu Điều Kiện (Post-conditions) | Học viên truy cập thành công vào các tiện ích dành riêng cho thành viên. |
 | Quy Tắc Nghiệp Vụ (Business Rules) | Chỉ những Học viên có trạng thái active mới được phép đăng nhập ứng dụng. |
-| Ánh Xạ Kỹ Thuật (Tech Mapping) | API: `POST /api/association/auth/login` | Tables: `vione_users`, `members` |
+| Ánh Xạ Kỹ Thuật (Tech Mapping) | API: `POST /api/association/auth/login` | Tables: `ceohn10_users`, `members` |
 
 
 
@@ -242,7 +359,7 @@ Bước E2: Hồ sơ bị tạm đình chỉ hoặc khai trừ (suspended / term
 | Tiền Điều Kiện (Pre-conditions) | Tài khoản có cờ must_change_password = true. |
 | Hậu Điều Kiện (Post-conditions) | Tài khoản được bảo vệ bằng mật khẩu cá nhân, cờ must_change_password được gỡ bỏ. |
 | Quy Tắc Nghiệp Vụ (Business Rules) | Không cho phép người dùng đóng modal hoặc chuyển trang khi chưa đổi mật khẩu thành công. |
-| Ánh Xạ Kỹ Thuật (Tech Mapping) | API: `POST /api/auth/change-password` | Table: `vione_users` |
+| Ánh Xạ Kỹ Thuật (Tech Mapping) | API: `POST /api/auth/change-password` | Table: `ceohn10_users` |
 
 
 
@@ -1276,7 +1393,7 @@ Bước E1: Phần tử đích trên màn hình chưa kịp tải xong -> Bộ �
   - Chip NFC tần số 13.56MHz tương thích chuẩn ISO/IEC 14443 Type A.
   - Chạm mặt sau thẻ vào smartphone để mở liên kết công khai `/card/:slug`.
 * Kiến Trúc Cơ Sở Dữ Liệu PostgreSQL (Prisma ORM):
-  - Bảng Học viên: `members` (liên kết `vione_users` qua `user_id`).
+  - Bảng Học viên: `members` (liên kết `ceohn10_users` qua `user_id`).
   - Bảng danh thiếp số: `member_business_cards` (chứa slug, branding, liên kết mạng xã hội).
   - Bảng sự kiện: `events`, `event_ticket_types`, `event_registrations`, `member_checkins`.
   - Bảng tài chính & hội phí: `invoices`, `associations`.
