@@ -181,7 +181,7 @@ const system: Item[] = [
   { key: "nav.activity" as TKey, icon: Activity, to: "/activity", label: "Lịch sử hoạt động" },
 ];
 
-// 9. Nhóm PHÂN QUYỀN (Quản lý ban, Quản lý phân quyền chức năng, Quản lý tài khoản người dùng)
+// 9. Nhóm PHÂN QUYỀN (Quản lý ban, Quản lý phân quyền chức năng, Phân quyền Trợ lý AI, Quản lý tài khoản người dùng)
 const permissionsGroup: Item[] = [
   {
     key: "nav.departments" as TKey,
@@ -194,6 +194,12 @@ const permissionsGroup: Item[] = [
     icon: ShieldCheck,
     to: "/permissions",
     label: "Quản lý phân quyền chức năng",
+  },
+  {
+    key: "nav.aiPermissions" as TKey,
+    icon: Sparkles,
+    to: "/permissions?tab=ai",
+    label: "Phân quyền Trợ lý AI",
   },
   {
     key: "nav.accounts" as TKey,

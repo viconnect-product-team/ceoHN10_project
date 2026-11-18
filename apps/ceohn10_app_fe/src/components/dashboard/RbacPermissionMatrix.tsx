@@ -52,6 +52,7 @@ import {
 import { toast } from "sonner";
 import { fetchNestApi } from "@/lib/api-client";
 import { RBAC_MATRIX_STORAGE_KEY, normalizeActionRoles, dispatchPermissionSyncEvent, getCustomDepartments } from "@/lib/rbac-permission-helpers";
+import { AiPermissionMatrixTab } from "./AiPermissionMatrixTab";
 
 // ── 6 BAN CHUYÊN MÔN / BAN ĐIỀU HÀNH ──
 // ── ĐỒNG BỘ HÓA TỰ ĐỘNG TÊN CHỨC NĂNG THEO SIDEBAR & GIAO DIỆN HỆ THỐNG ──
@@ -1626,8 +1627,34 @@ export function RbacPermissionMatrix({
     return "w-28 min-w-[112px]";
   };
 
-  // ── PHÂN CHIA 2 TAB: PHÂN QUYỀN CRM RIÊNG & PHÂN QUYỀN APP CEO HN10 RIÊNG ──
-  const [matrixTab, setMatrixTab] = useState<"crm" | "app">("crm");
+  // ── PHÂN CHIA 3 TAB: PHÂN QUYỀN CRM, PHÂN QUYỀN APP CEO HN10 & PHÂN QUYỀN TRỢ LÝ AI ──
+  const [matrixTab, setMatrixTab] = useState<"crm" | "app" | "ai">(() => {
+    if (typeof window !== "undefined") {
+      const sp = new URLSearchParams(window.location.search);
+      if (sp.get("tab") === "ai" || sp.get("tab") === "ai-permissions") {
+        return "ai";
+      }
+      if (sp.get("tab") === "app") {
+        return "app";
+      }
+    }
+    return "crm";
+  });
+
+  useEffect(() => {
+    const handleUrlChange = () => {
+      if (typeof window !== "undefined") {
+        const sp = new URLSearchParams(window.location.search);
+        if (sp.get("tab") === "ai" || sp.get("tab") === "ai-permissions") {
+          setMatrixTab("ai");
+        } else if (sp.get("tab") === "app") {
+          setMatrixTab("app");
+        }
+      }
+    };
+    window.addEventListener("popstate", handleUrlChange);
+    return () => window.removeEventListener("popstate", handleUrlChange);
+  }, []);
   const [viewMode, setViewMode] = useState<"role_focused" | "matrix_grid">("role_focused");
   const [selectedRoleKey, setSelectedRoleKey] = useState<string>("quan_tri");
   const [roleSearchTerm, setRoleSearchTerm] = useState<string>("");
@@ -1798,49 +1825,51 @@ export function RbacPermissionMatrix({
           )}
         </div>
 
-        <div className="flex justify-start items-center gap-2">
-          <button
-            type="button"
-            onClick={handleSaveAll}
-            disabled={saving}
-            className="h-9 px-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl flex justify-center items-center gap-1.5 cursor-pointer transition shadow-sm font-bold text-xs disabled:opacity-50"
-          >
-            <Save className="size-4" />
-            <span>{saving ? "Đang Lưu..." : "Lưu Cấu Hình"}</span>
-          </button>
+        {matrixTab !== "ai" && (
+          <div className="flex justify-start items-center gap-2">
+            <button
+              type="button"
+              onClick={handleSaveAll}
+              disabled={saving}
+              className="h-9 px-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl flex justify-center items-center gap-1.5 cursor-pointer transition shadow-sm font-bold text-xs disabled:opacity-50"
+            >
+              <Save className="size-4" />
+              <span>{saving ? "Đang Lưu..." : "Lưu Cấu Hình"}</span>
+            </button>
 
-          <button
-            type="button"
-            onClick={() => setAddFeatureOpen(true)}
-            className="h-9 px-4 bg-gradient-to-r from-[#334155] via-[#475569] to-[#1E293B] hover:opacity-95 text-white rounded-xl flex justify-center items-center gap-1.5 cursor-pointer transition shadow-sm font-bold text-xs"
-          >
-            <FolderPlus className="size-4" />
-            <span>Thêm Chức Năng</span>
-          </button>
+            <button
+              type="button"
+              onClick={() => setAddFeatureOpen(true)}
+              className="h-9 px-4 bg-gradient-to-r from-[#334155] via-[#475569] to-[#1E293B] hover:opacity-95 text-white rounded-xl flex justify-center items-center gap-1.5 cursor-pointer transition shadow-sm font-bold text-xs"
+            >
+              <FolderPlus className="size-4" />
+              <span>Thêm Chức Năng</span>
+            </button>
 
-          <button
-            type="button"
-            onClick={() => {
-              if (allFeaturesList.length > 0 && !targetFeatId) {
-                setTargetFeatId(allFeaturesList[0].id);
-              }
-              setAddActionOpen(true);
-            }}
-            className="h-9 px-4 bg-gradient-to-r from-[#334155] via-[#475569] to-[#1E293B] hover:opacity-95 text-white rounded-xl flex justify-center items-center gap-1.5 cursor-pointer transition shadow-sm font-bold text-xs"
-          >
-            <KeyRound className="size-4" />
-            <span>Thêm Quyền</span>
-          </button>
+            <button
+              type="button"
+              onClick={() => {
+                if (allFeaturesList.length > 0 && !targetFeatId) {
+                  setTargetFeatId(allFeaturesList[0].id);
+                }
+                setAddActionOpen(true);
+              }}
+              className="h-9 px-4 bg-gradient-to-r from-[#334155] via-[#475569] to-[#1E293B] hover:opacity-95 text-white rounded-xl flex justify-center items-center gap-1.5 cursor-pointer transition shadow-sm font-bold text-xs"
+            >
+              <KeyRound className="size-4" />
+              <span>Thêm Quyền</span>
+            </button>
 
-          <button
-            type="button"
-            onClick={handleResetDefault}
-            title="Khôi phục mặc định ban đầu"
-            className="size-9 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 flex justify-center items-center hover:bg-slate-100 dark:hover:bg-slate-700 transition cursor-pointer"
-          >
-            <RotateCcw className="size-4" />
-          </button>
-        </div>
+            <button
+              type="button"
+              onClick={handleResetDefault}
+              title="Khôi phục mặc định ban đầu"
+              className="size-9 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 flex justify-center items-center hover:bg-slate-100 dark:hover:bg-slate-700 transition cursor-pointer"
+            >
+              <RotateCcw className="size-4" />
+            </button>
+          </div>
+        )}
       </div>
 
       {/* ── 2 TAB PHÂN QUYỀN CHUYÊN BIỆT: CRM RIÊNG & APP CEO HN10 RIÊNG ── */}
@@ -1877,37 +1906,55 @@ export function RbacPermissionMatrix({
               {appCategories.reduce((acc, c) => acc + c.features.length, 0)} chức năng
             </span>
           </button>
+
+          <button
+            type="button"
+            onClick={() => setMatrixTab("ai")}
+            className={`px-4 sm:px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm flex items-center gap-2 transition cursor-pointer ${matrixTab === "ai"
+                ? "bg-gradient-to-r from-amber-600 via-amber-700 to-amber-800 text-white shadow-md"
+                : "bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-750 border border-slate-200 dark:border-slate-800"
+              }`}
+          >
+            <Sparkles className="size-4" />
+            <span>PHÂN QUYỀN TRỢ LÝ AI</span>
+            <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${matrixTab === "ai" ? "bg-white/20 text-white" : "bg-slate-100 dark:bg-slate-700 text-slate-800 dark:text-slate-300"
+              }`}>
+              8 năng lực AI
+            </span>
+          </button>
         </div>
 
         {/* BỘ CHUYỂN ĐỔI CHẾ ĐỘ XEM: THEO TỪNG VAI TRÒ (CHUẨN RBAC) VS BẢNG MA TRẬN TỔNG THỂ */}
-        <div className="flex items-center gap-1 p-1 bg-slate-100 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
-          <button
-            type="button"
-            onClick={() => setViewMode("role_focused")}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${viewMode === "role_focused"
-                ? "bg-gradient-to-r from-[#334155] to-[#475569] text-white shadow-xs"
-                : "text-muted-foreground hover:text-foreground"
-              }`}
-          >
-            <ShieldCheck className="size-3.5" />
-            <span>Theo Từng Vai Trò (Chuẩn RBAC)</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => setViewMode("matrix_grid")}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${viewMode === "matrix_grid"
-                ? "bg-gradient-to-r from-[#334155] to-[#475569] text-white shadow-xs"
-                : "text-muted-foreground hover:text-foreground"
-              }`}
-          >
-            <FileBarChart className="size-3.5" />
-            <span>Bảng Ma Trận Đối Chiếu</span>
-          </button>
-        </div>
+        {matrixTab !== "ai" && (
+          <div className="flex items-center gap-1 p-1 bg-slate-100 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
+            <button
+              type="button"
+              onClick={() => setViewMode("role_focused")}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${viewMode === "role_focused"
+                  ? "bg-gradient-to-r from-[#334155] to-[#475569] text-white shadow-xs"
+                  : "text-muted-foreground hover:text-foreground"
+                }`}
+            >
+              <ShieldCheck className="size-3.5" />
+              <span>Theo Từng Vai Trò (Chuẩn RBAC)</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setViewMode("matrix_grid")}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${viewMode === "matrix_grid"
+                  ? "bg-gradient-to-r from-[#334155] to-[#475569] text-white shadow-xs"
+                  : "text-muted-foreground hover:text-foreground"
+                }`}
+            >
+              <FileBarChart className="size-3.5" />
+              <span>Bảng Ma Trận Đối Chiếu</span>
+            </button>
+          </div>
+        )}
       </div>
 
       {/* ── CẢNH BÁO CHƯA LƯU QUYỀN TRÊN MA TRẬN ── */}
-      {isDirty && (
+      {matrixTab !== "ai" && isDirty && (
         <div className="self-stretch rounded-2xl border border-amber-300 dark:border-amber-800 bg-amber-50/80 dark:bg-amber-950/30 p-4 flex flex-wrap items-center justify-between gap-3 text-xs">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-sm font-bold text-sm">
@@ -1943,8 +1990,10 @@ export function RbacPermissionMatrix({
         </div>
       )}
 
-      {/* ── GIAO DIỆN PHÂN QUYỀN CHUẨN RBAC THEO TỪNG VAI TRÒ (DỄ DÙNG 100% TIẾNG VIỆT) ── */}
-      {viewMode === "role_focused" ? (
+      {/* ── GIAO DIỆN PHÂN QUYỀN TRỢ LÝ AI (TAB AI) HOẶC PHÂN QUYỀN CHUẨN RBAC THEO VAI TRÒ ── */}
+      {matrixTab === "ai" ? (
+        <AiPermissionMatrixTab />
+      ) : viewMode === "role_focused" ? (
         <div className="self-stretch grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
           {/* CỘT TRÁI (4 COLS): DANH SÁCH VAI TRÒ HỆ THỐNG */}
           <div className="lg:col-span-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 space-y-3 shadow-xs sticky top-24">

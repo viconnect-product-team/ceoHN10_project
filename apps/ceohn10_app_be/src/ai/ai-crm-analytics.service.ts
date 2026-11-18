@@ -1,5 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { KnowledgeBaseService } from './knowledge-base.service';
 
 export interface AiSystemConfigDto {
   activeProvider: string;
@@ -33,7 +34,10 @@ export type AiPersonaType =
 export class AiCrmAnalyticsService {
   private readonly logger = new Logger(AiCrmAnalyticsService.name);
 
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly knowledgeBase: KnowledgeBaseService,
+  ) { }
 
   /**
    * Lấy cấu hình hệ thống AI, kiểm tra trạng thái các model và hạn mức cảnh báo
@@ -861,6 +865,49 @@ Anh/Chị có thể yêu cầu tôi:
 3. *"Tạo phòng họp trực tuyến và gửi mã tham gia"*
 
 Tôi sẽ lập tức tạo lịch và gửi thông báo đẩy đến ứng dụng của các đại biểu tham gia!`;
+      } else if (
+        lower.includes('brd') ||
+        lower.includes('srs') ||
+        lower.includes('database') ||
+        lower.includes('csdl') ||
+        lower.includes('api') ||
+        lower.includes('lược đồ') ||
+        lower.includes('bảng csdl') ||
+        lower.includes('luồng nghiệp vụ') ||
+        lower.includes('nghiệp vụ chức năng')
+      ) {
+        const docs = this.knowledgeBase.getRegisteredDocuments();
+        generatedReply = `### 📖 Báo Cáo Tri Thức Kỹ Thuật, BRD, SRS, CSDL & RESTful API Hệ Thống CEO HN10
+
+Kính gửi Anh/Chị, tôi đã nạp và lưu trữ có cấu trúc toàn bộ tài liệu kiến trúc, đặc tả chức năng và thiết kế CSDL của dự án:
+
+#### 1. Danh Mục Tài Liệu Kỹ Thuật Đã Nạp:
+${docs.map((d, i) => `${i + 1}. **${d.name}** (\`${d.code}\` - ${d.category.toUpperCase()})\n   - *Đường dẫn:* \`${d.path}\` (${(d.sizeBytes / 1024).toFixed(1)} KB)\n   - *Tóm tắt:* ${d.summary}\n   - *Chủ đề chính:* ${d.keyTopics.join(', ')}`).join('\n\n')}
+
+#### 2. Cơ Sở Dữ Liệu PostgreSQL Chuẩn (113.20.107.184:6432):
+- **Máy chủ trung tâm**: \`113.20.107.184:6432\` (Database: \`ceohn10_project\`, user: \`app1\` qua PgBouncer)
+- **Quy chuẩn tối cao**: Không dùng mock data. Toàn bộ bảng đã định danh:
+  * \`public.vione_users\`: Tài khoản người dùng, email, hashed password, role
+  * \`public.members\`: Hồ sơ Học viên doanh nhân, mã code, công ty, chức vụ, ban bệ
+  * \`public.events\`: Sự kiện, kinh phí, loại quỹ (fund_type: general/csr), số vé
+  * \`public.event_registrations\`: Đăng ký sự kiện, mã vé, lucky number, check-in
+  * \`public.trainings\`: 30 khóa học, lịch đào tạo, link phòng Jitsi Meet
+  * \`public.sponsors\`: Nhà tài trợ, loại tài trợ (tiền/hiện vật/thiện nguyện)
+  * \`public.invoices\` & \`public.transactions\`: Sổ quỹ thu chi 2 túi quỹ
+  * \`public.templates\`: Mẫu định dạng Excel, Word, PDF (không hardcode format)
+  * \`public.app_settings\`: Ma trận phân quyền CRM & Ma trận phân quyền Trợ Lý AI
+
+#### 3. Danh Mục RESTful API Chuẩn:
+- \`POST /api/auth/login\`: Xác thực danh tính & cấp JWT Token
+- \`GET /api/users/me\`: Lấy hồ sơ user, danh sách route được phép (\`allowedRoutes\`) và hash quyền (\`permissionsHash\`)
+- \`GET/POST /api/members\`: Quản lý danh sách học viên
+- \`GET/POST /api/events\`, \`POST /api/events/:id/guest-register\`: Quản lý & đăng ký vé sự kiện
+- \`GET/POST /api/trainings\`: Quản lý lịch học và điểm danh QR
+- \`GET /api/admin/transactions\`: Sổ quỹ thu chi thời gian thực
+- \`GET/PUT /api/admin/permission-matrix\`: Ma trận phân quyền RBAC
+- \`GET/PUT /api/ai/permissions/matrix\`: Ma trận phân quyền Trợ Lý AI
+
+Anh/Chị có thể yêu cầu tôi tra cứu cụ thể bất kỳ mã tài liệu nào hoặc xuất trích lục theo yêu cầu!`;
       } else {
         generatedReply = `### 🌟 Trợ Lý Điều Hành Cấp Cao CEO HN10 Kính Chào Anh/Chị!
 
