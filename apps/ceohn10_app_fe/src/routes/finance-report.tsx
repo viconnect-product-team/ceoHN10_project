@@ -29,6 +29,7 @@ import { fetchNestApi } from "@/lib/api-client";
 import type { Transaction } from "@/types/finance.types";
 import { useFmt, useT } from "@/lib/i18n";
 import { exportToExcel, exportToWord, formatDisplayDate, formatExcelCurrency, numberToVietnameseWords } from "@/lib/excel-export";
+import { getTemplateForExport, exportReportToPdf } from "@/lib/report-templates";
 import { toast } from "sonner";
 import { useTableControls } from "@/hooks/use-table-controls";
 import { Pagination } from "@/components/dashboard/DataTablePagination";
@@ -40,6 +41,9 @@ import { InvoiceExportModal, type InvoiceItem } from "@/components/dashboard/Inv
 
 export const Route = createFileRoute("/finance-report")({
   ssr: false,
+  validateSearch: (search: Record<string, unknown>): { category?: string } => ({
+    category: typeof search.category === "string" ? search.category : undefined,
+  }),
   loader: async () => {
     try {
       const data = await fetchNestApi<Transaction[]>("/admin/transactions");
@@ -56,6 +60,8 @@ type PeriodFilter = "all" | "day" | "week" | "month" | "year";
 function FinanceReport() {
   const t = useT();
   const fmt = useFmt();
+  const searchParams = Route.useSearch();
+  const queryCategory = searchParams.category;
   const rawTransactions = (Route.useLoaderData() as Transaction[]) || [];
 
   const [period, setPeriod] = useState<PeriodFilter>("all");
@@ -68,6 +74,14 @@ function FinanceReport() {
   const [exportModalOpen, setExportModalOpen] = useState(false);
   const [showImportModal, setShowImportModal] = useState(false);
   const [invoiceExportModalOpen, setInvoiceExportModalOpen] = useState(false);
+
+  const [selectedExportCategory, setSelectedExportCategory] = useState<string>(() => {
+    if (queryCategory === "events") return "Sự kiện";
+    if (queryCategory === "classes") return "Lớp học";
+    if (queryCategory === "fees") return "Hội phí";
+    if (queryCategory === "csr") return "Thiện nguyện";
+    return "all";
+  });
 
   const txQuery = useQuery({
     queryKey: ["finance-report-data", statusFilter],
@@ -241,14 +255,13 @@ function FinanceReport() {
     year: "Kỳ báo cáo: Theo Năm",
   };
 
-  const [selectedExportCategory, setSelectedExportCategory] = useState<string>("all");
-
   const getFilteredExportList = (catFilter = selectedExportCategory) => {
     if (catFilter === "all") return transactions;
     return transactions.filter((t) => {
       const c = (t.category || "").toLowerCase();
-      if (catFilter === "Hội phí") return c.includes("hội phí") || c.includes("niên");
+      if (catFilter === "Hội phí") return c.includes("hội phí") || c.includes("niên") || c.includes("phí tham gia") || c.includes("phí");
       if (catFilter === "Sự kiện") return c.includes("sự kiện") || c.includes("gala") || c.includes("vé");
+      if (catFilter === "Lớp học") return c.includes("lớp học") || c.includes("khóa học") || c.includes("đào tạo") || c.includes("học tập");
       if (catFilter === "Thiện nguyện") return c.includes("thiện nguyện") || c.includes("từ thiện") || c.includes("csr");
       if (catFilter === "Tài trợ") return c.includes("tài trợ") || c.includes("ủng hộ");
       if (catFilter === "Hoạt động") return c.includes("hoạt động") || c.includes("văn phòng") || c.includes("họp");
@@ -261,40 +274,45 @@ function FinanceReport() {
     const subIn = list.filter((t) => t.type === "income").reduce((s, tx) => s + tx.amount, 0);
     const subOut = list.filter((t) => t.type === "expense").reduce((s, tx) => s + tx.amount, 0);
     const net = subIn - subOut;
+    const template = getTemplateForExport("excel", selectedExportCategory);
+    const activeCols = template.columns.filter((c) => c.enabled);
 
     exportToExcel<Transaction>({
-      title: `BÁO CÁO TỔNG HỢP KIỂM TOÁN TÀI CHÍNH (${periodLabels[period].toUpperCase()})`,
-      subtitle: `${periodLabels[period]} | Danh mục: ${selectedExportCategory === "all" ? "Tất cả các nguồn quỹ" : selectedExportCategory} | CLB Doanh Nhân CEO HN10`,
+      title: template.title,
+      subtitle: `${template.subtitle} | Danh mục: ${selectedExportCategory === "all" ? "Tất cả các nguồn quỹ" : selectedExportCategory} | CLB Doanh Nhân CEO HN10`,
       filename: `bao-cao-tai-chinh-${selectedExportCategory}-${period}-ceohn10`,
       sheetName: "Nhat_Ky_Thu_Chi",
-      organization: "CLB DOANH NHÂN CEO HN10 (HANOIBA)",
-      address: "Tòa nhà HanoiBA, TP. Hà Nội",
-      circularCode: "Mẫu số S07-DN",
-      circularNote: "(Ban hành theo Thông tư số 200/2014/TT-BTC ngày 22/12/2014 của Bộ Tài chính)",
+      organization: template.organization,
+      address: template.address,
+      circularCode: template.circularCode,
+      circularNote: template.circularNote,
       fundType: selectedExportCategory === "all" ? "Quỹ hoạt động CLB Doanh Nhân CEO HN10" : `Quỹ ${selectedExportCategory}`,
-      currencyUnit: "VNĐ",
+      currencyUnit: template.currencyUnit || "VNĐ",
       data: list,
-      columns: [
-        { header: "Mã chứng từ", key: "id", width: 16, value: (tx) => tx.id },
-        { header: "Ngày ghi sổ", key: "date", width: 16, value: (tx) => formatDisplayDate(tx.date) },
-        { header: "Loại giao dịch", key: "type", width: 16, value: (tx) => (tx.type === "income" ? "Khoản Thu" : "Khoản Chi") },
-        { header: "Danh mục", key: "category", width: 22, value: (tx) => tx.category },
-        { header: "Nội dung hạch toán", key: "description", width: 38, value: (tx) => tx.description },
-        { header: "Hình thức", key: "method", width: 18, value: (tx) => (tx.method === "cash" ? "Tiền mặt" : tx.method === "bank" ? "Chuyển khoản" : "Thẻ ngân hàng") },
-        { header: "TK Đối ứng", key: "acc", width: 18, value: (tx) => (tx.method === "cash" ? "111 - Tiền mặt" : "112 - TG Ngân hàng") },
-        { header: "Số tiền (VNĐ)", key: "amount", width: 22, value: (tx) => formatExcelCurrency(tx.amount) },
-        { header: "Đối tác / Người nộp - nhận", key: "recipient", width: 30, value: (tx) => tx.recipient || "—" },
-        { header: "Trạng thái kiểm toán", key: "status", width: 18, value: (tx) => (tx.status === "completed" ? "Đã duyệt" : "Chờ duyệt") },
-      ],
+      columns: activeCols.map((c) => ({
+        header: c.header,
+        key: c.key,
+        width: c.width || 18,
+        value: (tx: any, idx: number) => {
+          if (c.key === "_index") return idx + 1;
+          if (c.key === "id") return tx.id;
+          if (c.key === "date") return formatDisplayDate(tx.date);
+          if (c.key === "type") return tx.type === "income" ? "Khoản Thu" : "Khoản Chi";
+          if (c.key === "amount") return formatExcelCurrency(tx.amount);
+          if (c.key === "method") return tx.method === "cash" ? "Tiền mặt" : tx.method === "bank" ? "Chuyển khoản" : "Thẻ ngân hàng";
+          if (c.key === "status") return tx.status === "completed" ? "Đã duyệt" : "Chờ duyệt";
+          return tx[c.key] ?? "";
+        },
+      })),
       summaryRows: [
         ["TỔNG CỘNG NGUỒN THU:", "", "", "", "", "", "", formatExcelCurrency(subIn) + " đ", "", ""],
         ["TỔNG CỘNG KHOẢN CHI:", "", "", "", "", "", "", formatExcelCurrency(subOut) + " đ", "", ""],
         ["TỒN QUỸ RÒNG / THẶNG DƯ:", "", "", "", "", "", "", formatExcelCurrency(net) + " đ", "", ""],
       ],
       amountInWords: numberToVietnameseWords(net >= 0 ? net : subIn),
-      signerTitles: ["NGƯỜI LẬP BÁO CÁO", "TRƯỞNG BAN TÀI CHÍNH", "CHỦ TỊCH CLB CEO HN10"],
+      signerTitles: template.signerTitles,
     });
-    toast.success(`Đã xuất báo cáo tài chính danh mục "${selectedExportCategory}" sang Excel (.xlsx)!`);
+    toast.success(`Đã xuất báo cáo tài chính danh mục "${selectedExportCategory}" sang Excel (.xlsx) theo format Biểu mẫu!`);
   };
 
   const handleExportWord = () => {
@@ -302,22 +320,33 @@ function FinanceReport() {
     const subIn = list.filter((t) => t.type === "income").reduce((s, tx) => s + tx.amount, 0);
     const subOut = list.filter((t) => t.type === "expense").reduce((s, tx) => s + tx.amount, 0);
     const net = subIn - subOut;
+    const template = getTemplateForExport("word", selectedExportCategory);
+    const activeCols = template.columns.filter((c) => c.enabled);
 
     exportToWord<Transaction>({
-      title: "BÁO CÁO THU CHI & QUYẾT TOÁN TÀI CHÍNH",
-      subtitle: `${periodLabels[period]} | Hệ thống quản trị tài chính CLB Doanh Nhân CEO HN10`,
+      title: template.title,
+      subtitle: `${template.subtitle} | Hệ thống quản trị tài chính CLB Doanh Nhân CEO HN10`,
       categoryName: selectedExportCategory === "all" ? "Tất cả các nguồn quỹ" : selectedExportCategory,
       filename: `bao-cao-tai-chinh-${selectedExportCategory}-${period}-ceohn10`,
-      columns: [
-        { header: "Mã CT", key: "id", value: (tx) => tx.id },
-        { header: "Ngày ghi sổ", key: "date", value: (tx) => formatDisplayDate(tx.date) },
-        { header: "Phân loại", key: "type", value: (tx) => (tx.type === "income" ? "Khoản Thu" : "Khoản Chi") },
-        { header: "Danh mục", key: "category", value: (tx) => tx.category },
-        { header: "Nội dung hạch toán", key: "description", value: (tx) => tx.description },
-        { header: "Số tiền (VNĐ)", key: "amount", value: (tx) => formatExcelCurrency(tx.amount) },
-        { header: "Người nộp / nhận", key: "recipient", value: (tx) => tx.recipient || "—" },
-        { header: "Hình thức", key: "method", value: (tx) => (tx.method === "cash" ? "Tiền mặt" : "Chuyển khoản") },
-      ],
+      organization: template.organization,
+      address: template.address,
+      circularCode: template.circularCode,
+      circularNote: template.circularNote,
+      currencyUnit: template.currencyUnit || "VNĐ",
+      columns: activeCols.map((c) => ({
+        header: c.header,
+        key: c.key,
+        value: (tx: any, idx: number) => {
+          if (c.key === "_index") return idx + 1;
+          if (c.key === "id") return tx.id;
+          if (c.key === "date") return formatDisplayDate(tx.date);
+          if (c.key === "type") return tx.type === "income" ? "Khoản Thu" : "Khoản Chi";
+          if (c.key === "amount") return formatExcelCurrency(tx.amount);
+          if (c.key === "method") return tx.method === "cash" ? "Tiền mặt" : "Chuyển khoản";
+          if (c.key === "status") return tx.status === "completed" ? "Đã duyệt" : "Chờ duyệt";
+          return tx[c.key] ?? "";
+        },
+      })),
       data: list,
       summaryRows: [
         ["TỔNG THU:", formatExcelCurrency(subIn) + " đ"],
@@ -325,9 +354,30 @@ function FinanceReport() {
         ["TỒN QUỸ RÒNG:", formatExcelCurrency(net) + " đ"],
       ],
       amountInWords: numberToVietnameseWords(net >= 0 ? net : subIn),
-      signerTitles: ["NGƯỜI LẬP BIỂU", "TRƯỞNG BAN TÀI CHÍNH", "CHỦ TỊCH CLB CEO HN10"],
+      signerTitles: template.signerTitles,
     });
-    toast.success(`Đã xuất báo cáo tài chính danh mục "${selectedExportCategory}" sang Word (.doc/.docx)!`);
+    toast.success(`Đã xuất báo cáo tài chính danh mục "${selectedExportCategory}" sang Word (.doc/.docx) theo format Biểu mẫu!`);
+  };
+
+  const handleDirectExportPdf = () => {
+    const list = getFilteredExportList();
+    const subIn = list.filter((t) => t.type === "income").reduce((s, tx) => s + tx.amount, 0);
+    const subOut = list.filter((t) => t.type === "expense").reduce((s, tx) => s + tx.amount, 0);
+    const net = subIn - subOut;
+    const template = getTemplateForExport("pdf", selectedExportCategory);
+
+    exportReportToPdf<Transaction>({
+      template,
+      data: list,
+      summaryRows: [
+        ["TỔNG CỘNG NGUỒN THU:", "", "", "", "", "", "", formatExcelCurrency(subIn) + " đ"],
+        ["TỔNG CỘNG KHOẢN CHI:", "", "", "", "", "", "", formatExcelCurrency(subOut) + " đ"],
+        ["TỒN QUỸ RÒNG / THẶNG DƯ:", "", "", "", "", "", "", formatExcelCurrency(net) + " đ"],
+      ],
+      amountInWords: numberToVietnameseWords(net >= 0 ? net : subIn),
+      filename: `bao-cao-tai-chinh-${selectedExportCategory}-${period}-ceohn10.pdf`,
+    });
+    toast.success(`Đã xuất báo cáo tài chính danh mục "${selectedExportCategory}" sang PDF (.pdf) theo format Biểu mẫu!`);
   };
 
   const handleExportPdf = () => {
@@ -351,11 +401,12 @@ function FinanceReport() {
                 className="bg-transparent text-xs font-bold text-foreground outline-none cursor-pointer"
               >
                 <option value="all">Tất cả danh mục quỹ</option>
-                <option value="Hội phí">Quỹ Hội Phí / Niên Liễm</option>
-                <option value="Sự kiện">Quỹ Sự Kiện & Hội Nghị</option>
-                <option value="Thiện nguyện">Quỹ Thiện Nguyện (CSR)</option>
-                <option value="Tài trợ">Quỹ Tài Trợ & Đóng Góp</option>
-                <option value="Hoạt động">Quỹ Chi Hoạt Động Lớp</option>
+                <option value="Sự kiện">Báo cáo cho sự kiện</option>
+                <option value="Lớp học">Báo cáo cho lớp học &amp; khóa đào tạo</option>
+                <option value="Hội phí">Báo cáo phí tham gia / Niên liễm</option>
+                <option value="Thiện nguyện">Báo cáo thiện nguyện (CSR)</option>
+                <option value="Tài trợ">Báo cáo quỹ tài trợ</option>
+                <option value="Hoạt động">Báo cáo chi hoạt động lớp</option>
               </select>
             </div>
 
@@ -372,7 +423,7 @@ function FinanceReport() {
               type="button"
               onClick={handleExportCsv}
               className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 px-3.5 py-2 text-xs font-bold text-white shadow-xs cursor-pointer transition"
-              title="Xuất file bảng tính Excel (.xlsx)"
+              title="Xuất file bảng tính Excel (.xlsx) theo format Biểu mẫu"
             >
               <FileSpreadsheet className="h-4 w-4" />
               <span>Xuất Excel (.xlsx)</span>
@@ -381,10 +432,19 @@ function FinanceReport() {
               type="button"
               onClick={handleExportWord}
               className="inline-flex items-center gap-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 px-3.5 py-2 text-xs font-bold text-white shadow-xs cursor-pointer transition"
-              title="Xuất văn bản báo cáo Word (.docx)"
+              title="Xuất văn bản báo cáo Word (.docx) theo format Biểu mẫu"
             >
               <FileText className="h-4 w-4" />
               <span>Xuất Word (.docx)</span>
+            </button>
+            <button
+              type="button"
+              onClick={handleDirectExportPdf}
+              className="inline-flex items-center gap-1.5 rounded-xl bg-rose-700 hover:bg-rose-800 px-3.5 py-2 text-xs font-bold text-white shadow-xs cursor-pointer transition"
+              title="Xuất file PDF (.pdf) theo format Biểu mẫu"
+            >
+              <Printer className="h-4 w-4" />
+              <span>Xuất PDF (.pdf)</span>
             </button>
             <button
               type="button"
@@ -392,16 +452,7 @@ function FinanceReport() {
               className="inline-flex items-center gap-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 px-3.5 py-2 text-xs font-bold text-slate-950 shadow-xs cursor-pointer transition"
             >
               <Receipt className="h-4 w-4" />
-              <span>Hóa Đơn & Bảng Kê</span>
-            </button>
-            <button
-              type="button"
-              onClick={handleExportPdf}
-              className="inline-flex items-center gap-1.5 rounded-xl bg-[#334155] hover:bg-[#1E293B] px-3.5 py-2 text-xs font-bold text-white shadow-xs cursor-pointer transition"
-              title="In hoặc tải xuống báo cáo dạng PDF"
-            >
-              <Printer className="h-4 w-4" />
-              <span>In / Lưu PDF</span>
+              <span>Hóa Đơn &amp; Bảng Kê</span>
             </button>
           </div>
         }

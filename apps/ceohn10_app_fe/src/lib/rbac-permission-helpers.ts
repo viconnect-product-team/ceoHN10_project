@@ -382,8 +382,8 @@ export function getRolesForDepartment(
   if (norm === "Ban Điều Hành" || deptName.toLowerCase().includes("điều hành") || deptName.toLowerCase().includes("quản trị")) {
     roles = [
       { value: "quan_tri", label: "Quản trị", desc: "Toàn quyền quản trị hệ thống" },
-      { value: "chu_tich", label: "Chủ tịch (Lớp trưởng)", desc: "Chủ tịch Hiệp hội / Lớp trưởng CEO HN10" },
-      { value: "pho_chu_tich", label: "Phó Chủ tịch (Lớp phó)", desc: "Phó Chủ tịch / Lớp phó phụ trách điều hành" },
+      { value: "chu_tich", label: "Lớp Trưởng (Chủ tịch)", desc: "Lớp Trưởng Lâm thời CEO HN10 / Điều hành & phê duyệt tối cao" },
+      { value: "pho_chu_tich", label: "Lớp Phó (Phó Chủ tịch)", desc: "Lớp Phó Lâm thời CEO HN10 / Phụ trách ban chuyên môn" },
       { value: "truong_ban_dieu_hanh", label: "Trưởng ban Điều hành", desc: "Điều hành quản lý nội bộ" },
       { value: "admin", label: "Admin", desc: "Quản trị viên kỹ thuật & dữ liệu" },
       { value: "thanh_vien_ban_dieu_hanh", label: "Thành viên ban điều hành", desc: "Thành viên Ban Điều Hành" },

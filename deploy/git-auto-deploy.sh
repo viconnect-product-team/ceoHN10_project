@@ -27,15 +27,27 @@ docker network create ceohn10-network 2>/dev/null || true
 docker network create vione-network 2>/dev/null || true
 
 echo ">>> [3/5] Khởi động lại container Mobile CEO HN10 (https://ceohn10.viconnect.vn)..."
-cd /root/association
+if [ -d "/root/ceohn10_association" ]; then
+    cd /root/ceohn10_association
+elif [ -d "$REPO_DIR/deploy/ceohn10" ]; then
+    cd "$REPO_DIR/deploy/ceohn10"
+else
+    cd /root/association
+fi
 docker compose -f docker-compose.yml stop 2>/dev/null || true
 docker rm -f ceohn10-frontend-prod ceohn10-backend-prod 2>/dev/null || true
 docker compose -f docker-compose.yml up -d --force-recreate
 
 echo ">>> [4/5] Khởi động lại container CRM Hiệp Hội (https://crm.ceohn10.viconnect.vn)..."
-cd /root/crm
+if [ -d "/root/ceohn10_crm" ]; then
+    cd /root/ceohn10_crm
+elif [ -d "$REPO_DIR/deploy/crm" ]; then
+    cd "$REPO_DIR/deploy/crm"
+else
+    cd /root/crm
+fi
 docker compose -f docker-compose.yml stop 2>/dev/null || true
-docker rm -f crm-frontend-prod crm-backend-prod 2>/dev/null || true
+docker rm -f ceohn10-crm-frontend-prod ceohn10-crm-backend-prod crm-frontend-prod crm-backend-prod 2>/dev/null || true
 docker compose -f docker-compose.yml up -d --force-recreate
 
 echo ">>> [5/5] Tải lại Nginx SSL Reverse Proxy..."

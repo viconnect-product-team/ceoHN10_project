@@ -27,10 +27,7 @@ import { AppShell } from "@/components/dashboard/AppShell";
 import { Card, PageHeader } from "@/components/dashboard/PageKit";
 import { AssociationLogoUploader } from "@/components/dashboard/AssociationLogoUploader";
 import { TrafficManagerSection } from "@/components/dashboard/TrafficManagerSection";
-import { OmnichannelTemplatesSection } from "@/components/dashboard/OmnichannelTemplatesSection";
 import { ZaloOaConfigSection } from "@/components/dashboard/ZaloOaConfigSection";
-import { VNPayConfigSection } from "@/components/dashboard/VNPayConfigSection";
-import { MoMoConfigSection } from "@/components/dashboard/MoMoConfigSection";
 import { ZaloMiniAppConfigSection } from "@/components/dashboard/ZaloMiniAppConfigSection";
 import { getSettingsFn, saveSettingsFn } from "@/lib/settings.functions";
 import { useLang, useT, type TKey } from "@/lib/i18n";
@@ -41,12 +38,9 @@ const TABS = [
   { key: "general", labelKey: "set.tab.general", defaultLabel: "Thông tin chung", icon: Building2 },
   { key: "ai_config", defaultLabel: "Cấu hình AI & Nhật ký", icon: Sparkles },
   { key: "traffic", defaultLabel: "Quản lý lượng truy cập", icon: Activity },
-  { key: "templates", defaultLabel: "Mẫu thông báo", icon: Mail },
   { key: "syndication", defaultLabel: "Đẩy tin đa kênh (Web, FB, Zalo)", icon: Share2 },
   { key: "zalo_oa", defaultLabel: "Cấu hình Zalo OA", icon: MessageSquareText },
   { key: "zalo_miniapp", defaultLabel: "Cấu hình Zalo Mini App", icon: Smartphone },
-  { key: "vnpay", defaultLabel: "Thanh toán VNPay", icon: CreditCard },
-  { key: "momo", defaultLabel: "Thanh toán MoMo", icon: Wallet },
   { key: "notifications", labelKey: "set.tab.notifications", defaultLabel: "Thông báo hệ thống", icon: Bell },
   { key: "security", labelKey: "set.tab.security", defaultLabel: "Bảo mật & Quyền", icon: Shield },
   { key: "integrations", labelKey: "set.tab.integrations", defaultLabel: "Tích hợp mở rộng", icon: Globe },
@@ -276,17 +270,8 @@ function SettingsPage() {
 
           {tab === "ai_config" && <AiConfigSection />}
           {tab === "traffic" && <TrafficManagerSection />}
-
-          {tab === "templates" && <OmnichannelTemplatesSection />}
-
           {tab === "syndication" && <SyndicationConfigSection />}
-
           {tab === "zalo_oa" && <ZaloOaConfigSection />}
-
-          {tab === "vnpay" && <VNPayConfigSection />}
-
-          {tab === "momo" && <MoMoConfigSection />}
-
           {tab === "zalo_miniapp" && <ZaloMiniAppConfigSection />}
 
           {tab === "notifications" && (
@@ -368,7 +353,6 @@ function SettingsPage() {
             </div>
           )}
 
-          {tab !== "zalo_oa" && tab !== "momo" && (
             <div className="mt-6 flex justify-end">
               <button
                 onClick={save}
@@ -380,7 +364,6 @@ function SettingsPage() {
                 {t("common.save")}
               </button>
             </div>
-          )}
         </Card>
       </div>
     </AppShell>

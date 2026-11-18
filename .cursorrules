@@ -176,18 +176,18 @@
 # ------------------------------------------------------------------------------
 # 0.0. QUY CHUẨN TỐI CAO BẤT DI BẤT DỊCH VỀ DATABASE: 113.20.107.184:6432 (STRICT DATABASE LAW)
 # ------------------------------------------------------------------------------
-# 1. CƠ SỞ DỮ LIỆU DUY NHẤT & CHUẨN MỰC CỦA DỰ ÁN CEO1983:
+# 1. CƠ SỞ DỮ LIỆU DUY NHẤT & CHUẨN MỰC CỦA DỰ ÁN CEO HN10:
 #    - Địa chỉ CSDL: 113.20.107.184:6432 (PgBouncer)
-#    - Database Name: ceo1983_project
+#    - Database Name: ceohn10_project
 #    - Credentials: app1 / 5^S0CEpvYwC1(#YN1UoJ
-#    - Connection String: postgresql://app1:5%5ES0CEpvYwC1%28%23YN1UoJ@113.20.107.184:6432/ceo1983_project?pgbouncer=true
-#    - JDBC: jdbc:postgresql://113.20.107.184:6432/ceo1983_project
+#    - Connection String: postgresql://app1:5%5ES0CEpvYwC1%28%23YN1UoJ@113.20.107.184:6432/ceohn10_project?pgbouncer=true
+#    - JDBC: jdbc:postgresql://113.20.107.184:6432/ceohn10_project
 # 2. RÀNG BUỘC GHI DỮ LIỆU (WRITE LAW):
 #    - Mọi chức năng lưu, thêm mới, cập nhật, xóa dữ liệu (INSERT, UPDATE, DELETE, RPC) từ hệ thống Backend NestJS,
-#      Web CRM Quản trị và Mobile App CEO 1983 TUYỆT ĐỐI PHẢI LƯU ĐÚNG VÀO DATABASE 113.20.107.184:6432.
+#      Web CRM Quản trị và Mobile App CEO HN10 TUYỆT ĐỐI PHẢI LƯU ĐÚNG VÀO DATABASE 113.20.107.184:6432.
 #    - TUYỆT ĐỐI KHÔNG LƯU VÀO DATABASE NÀO KHÁC.
 # 3. RÀNG BUỘC ĐỌC DỮ LIỆU (READ LAW):
-#    - Mọi chức năng lấy dữ liệu hiển thị về giao diện Web CRM và Mobile App CEO 1983 TUYỆT ĐỐI PHẢI LẤY TỪ 113.20.107.184:6432.
+#    - Mọi chức năng lấy dữ liệu hiển thị về giao diện Web CRM và Mobile App CEO HN10 TUYỆT ĐỐI PHẢI LẤY TỪ 113.20.107.184:6432.
 # 4. TUYỆT ĐỐI CẤM DATABASE KHÁC:
 #    - Cụm máy chủ 14.225.217.232:5436 KHÔNG PHẢI DATABASE CHUẨN CỦA DỰ ÁN.
 #    - Cấm cấu hình biến môi trường, cấm viết script, cấm trỏ luồng sang bất kỳ database nào ngoài 113.20.107.184:6432.
@@ -249,7 +249,7 @@
 # - Data Fetching & State: TanStack React Query (@tanstack/react-query), React Context (AuthContext).
 # - Styling & UI Components: Tailwind CSS, Radix UI Primitives, Lucide React, Framer Motion, Sonner Toast.
 # - PWA & Mobile: Progressive Web App (manifest.webmanifest, Service Worker, Apple Touch Icons), Capacitor / Cordova wrapper (mobile_ceo1983).
-# - Kiến trúc Thuần NestJS (Pure NestJS Architecture): 100% dữ liệu nghiệp vụ (Meetings, Opportunities, Marketplace, News, Events, Documents, Sponsors, Members) phải đi qua NestJS REST API (`fetchNestApiFromServer` / `fetchNestApi`) kết nối trực tiếp đến PostgreSQL `ceo1983_project` trên `14.225.217.232:5436`. TUYỆT ĐỐI KHÔNG dùng Supabase PostgREST client (`supabaseAdmin.from(...)`, `getDb.from(...)`) trong các server function nghiệp vụ nhằm tránh lỗi PostgREST schema cache.
+# - Kiến trúc Thuần NestJS (Pure NestJS Architecture): 100% dữ liệu nghiệp vụ (Meetings, Opportunities, Marketplace, News, Events, Documents, Sponsors, Members) phải đi qua NestJS REST API (`fetchNestApiFromServer` / `fetchNestApi`) kết nối trực tiếp đến PostgreSQL `ceohn10_project` trên `113.20.107.184:6432`. TUYỆT ĐỐI KHÔNG dùng Supabase PostgREST client (`supabaseAdmin.from(...)`, `getDb.from(...)`) trong các server function nghiệp vụ nhằm tránh lỗi PostgREST schema cache.
 # - Chuẩn Nhập Ngày Tháng Di Động & Mở Picker Native (Standard Date Input & Native Mobile Picker): Khi tạo trường nhập ngày tháng (`StandardDateInput`), BẮT BUỘC phải có cơ chế tự động mask/chèn dấu `/` khi người dùng gõ số trên bàn phím số di động (`inputMode="numeric"`) do iOS không có phím gạch chéo. Icon lịch BẮT BUỘC sử dụng Native `<input type="date">` overlay trong suốt (`opacity-0 absolute inset-0`) để cử chỉ chạm vật lý kích hoạt trực tiếp picker native của iOS/Android mà không bị WebKit chặn `.showPicker()`.
 # - Tiêu Chuẩn Responsive Di Động & Thanh Cuộn Danh Bạ (Mobile Responsiveness & Viewport Adaptability): Mọi màn hình danh bạ/danh sách dài TUYỆT ĐỐI KHÔNG dùng thanh dải chữ cái A-Z dọc cố định trên màn hình điện thoại (gây đè nội dung và lỗi chạm). Phải dùng thanh A-Z cuộn ngang (`sm:hidden overflow-x-auto`), thanh dọc chỉ hiện từ màn hình tablet/desktop (`hidden sm:flex`). Các nút thao tác trên thẻ Học viên phải dàn lưới cân đối (`grid grid-cols-5 sm:flex`), container phải responsive `flex-col sm:flex-row` để đảm bảo tương thích 100% các dòng điện thoại từ 320px đến 430px+.
 # - Quy Chuẩn Thanh Toán & Mã QR (Payment Standards - Strictly MoMo & VNPay): TUYỆT ĐỐI KHÔNG SỬ DỤNG THUẬT NGỮ "Mã QR Ngân Hàng" TRONG TOÀN BỘ TÀI LIỆU VÀ GIAO DIỆN. Mọi giao dịch thanh toán (hội phí, sự kiện, đóng góp) chỉ áp dụng mã QR MoMo và cổng thanh toán VNPay. Mọi email có mã QR thanh toán hoặc vé QR BẮT BUỘC phải đính kèm dưới dạng MIME Attachment Inline CID (`cid:payment_qr`, `cid:event_ticket_qr`) bằng thư viện `qrcode` hoặc tải buffer.
@@ -331,7 +331,7 @@
 #   + Lớp 6 (SQLi Parameter Sanitization): Middleware query-sanitizer chặn các ký tự độc hại trong query parameters (;, --, DROP, UNION) -> HTTP 400 Bad Request.
 #   + Thanh lọc hạ tầng: Toàn bộ Exception Filter bắt buộc redact IP (14.225.217.232, 113.20.107.184) và chuỗi kết nối CSDL trước khi trả về client.
 # - Quy Chuẩn Kiến Trúc Miền Monorepo (Monorepo Domain-Driven Architecture - Chuẩn 49-MONOREPO):
-#   + Phân định nghiêm ngặt 3 phân hệ: Web CRM Quản trị (Desktop PC, Sidebar, Master Data Tables, Recharts), CEO 1983 Mobile App (Mobile-first, MemberShell, Bottom Nav, Thẻ QR), Hạ tầng dùng chung (apps/ceo1983_app_be kết nối PostgreSQL 14.225.217.232:5436/ceo1983_project, packages/db, packages/shared).
+#   + Phân định nghiêm ngặt 3 phân hệ: Web CRM Quản trị (Desktop PC, Sidebar, Master Data Tables, Recharts), CEO HN10 Mobile App (Mobile-first, MemberShell, Bottom Nav, Thẻ QR), Hạ tầng dùng chung (apps/ceohn10_app_be kết nối PostgreSQL 113.20.107.184:6432/ceohn10_project, packages/db, packages/shared).
 #   + Tuyệt đối không import chéo UI giữa Web CRM và Mobile App; mọi logic nghiệp vụ dùng chung phải đóng gói vào backend REST API hoặc packages/shared.
 # - Quy Chuẩn Phân Quyền Tài Khoản & Đồng Bộ CSDL Tức Thời (Account Role Persistence & DB-First Sync):
 #   + Tại chức năng Quản lý tài khoản (`/accounts`): Mọi thay đổi vai trò (`role`) và ban chuyên môn (`department`) khi nhấn "Cập nhật tài khoản" hoặc "Lưu thay đổi" BẮT BUỘC phải gọi trực tiếp API `PATCH /members/:id/role-dept` để lưu vào CSDL PostgreSQL, tuyệt đối không chỉ lưu cục bộ ở `localStorage`.
@@ -437,7 +437,7 @@
 # ------------------------------------------------------------------------------
 # [BẮT BUỘC 1] Cách ly tuyệt đối (Project Isolation):
 #   - Tuyệt đối KHÔNG chỉnh sửa hoặc import code từ `vione_project/`.
-#   - 100% code thay đổi chỉ được phép nằm trong `ceo1983_project/`.
+#   - 100% code thay đổi chỉ được phép nằm trong `ceohn10_project/`.
 #
 # [BẮT BUỘC 2] Type-Safety (100% TypeScript):
 #   - Tuyệt đối KHÔNG dùng kiểu `any`. Mọi DTO, request, response, state và props phải có Type/Interface rõ ràng.
@@ -452,36 +452,26 @@
 # [BẮT BUỘC 4] Bảo mật & Phân quyền Chuẩn Hóa (Security, Strict RBAC & Permissions):
 #   - Phân cấp Vai trò Hệ thống & Ban Chuyên trách (Chuẩn Hóa Ma Trận RBAC):
 #     + Cấp 1 - Quản trị Hệ thống (`quan_tri`): Toàn quyền quản trị hệ thống và điều hành kỹ thuật, cấp phân quyền cao nhất.
-#     + Cấp 2 - Chủ tịch Hiệp hội (`chu_tich`): Cấp lãnh đạo tối cao, quyền phê duyệt tối cao toàn hiệp hội, giám sát toàn diện dữ liệu đa ban.
-#     + Cấp 3 - Admin Hệ thống (`admin`): Quản trị viên vận hành CRM, toàn quyền cấu hình và quản lý dữ liệu toàn hệ thống.
-#     + Cấp 4 - Ban Điều Hành (`ban_dieu_hanh`): Lãnh đạo liên ban, giám sát và điều hành toàn bộ hoạt động của các ban chuyên môn.
-#     + Cấp 5 - Tổng thư ký (`tong_thu_ky`): Điều phối Ban Thư Ký, điều hành cuộc họp, ban hành tài liệu và công văn hiệp hội.
+#     + Cấp 2 - Lớp Trưởng (Chủ tịch) (`chu_tich`): Cấp lãnh đạo tối cao, quyền phê duyệt tối cao toàn lớp/hiệp hội, giám sát toàn diện dữ liệu đa ban.
+#     + Cấp 3 - Lớp Phó (Phó Chủ tịch) (`pho_chu_tich`): Lãnh đạo lớp điều hành & phụ trách các ban chuyên môn.
+#     + Cấp 4 - Admin Hệ thống (`admin`): Quản trị viên vận hành CRM, cấu hình và quản lý dữ liệu toàn hệ thống.
+#     + Cấp 5 - Tổng thư ký (`tong_thu_ky`): Điều phối Ban Thư Ký, điều hành cuộc họp, ban hành tài liệu và công văn lớp/hiệp hội.
 #     + Cấp 6 - Trưởng ban Chuyên môn (`truong_ban_*`): Phân cấp chuyên trách cụ thể:
+#       * Trưởng ban Thiện nguyện (`truong_ban_thien_nguyen`): Quản lý các chiến dịch an sinh, từ thiện, quỹ cộng đồng (CSR).
 #       * Trưởng ban Truyền thông (`truong_ban_truyen_thong`): Quản lý tin tức, truyền thông, sự kiện, media CLB.
 #       * Trưởng ban Thành viên (`truong_ban_thanh_vien`): Quản lý hồ sơ, tiếp nhận, phát triển & thẩm định Học viên.
 #       * Trưởng ban Xúc tiến thương mại (`truong_ban_xuc_tien`): Quản lý cơ hội giao thương B2B, sản phẩm marketplace.
 #       * Trưởng ban Tài chính (`truong_ban_tai_chinh`): Quản lý ngân quỹ, niên liễm hội phí, thu chi và quyết toán.
-#       * Trưởng ban Thiện nguyện (`truong_ban_thien_nguyen`): Quản lý các chiến dịch an sinh, từ thiện, quỹ cộng đồng.
 #     + Cấp 7 - Ban Thư ký (`ban_thu_ky`): Thành viên ban thư ký, nhận việc trực tiếp từ Tổng thư ký và Ban Điều Hành.
-#     + Cấp 8 - Thành viên (`member`): Học viên doanh nhân CEO 1983.
+#     + Cấp 8 - Thành viên (`member`): Học viên doanh nhân CEO HN10.
 #   - 5 Thao tác Thẩm quyền Thực tế Cốt lõi (Phân hệ 2): Xem, Thêm, Sửa, Xóa, Duyệt (Thừa hưởng từ Ban & Ghi đè cá nhân).
-#   - Chuẩn hóa 6 Ban chuyên môn: Ban Thành viên, Ban Xúc tiến thương mại, Ban Thiện nguyện, Ban Truyền thông, Ban Điều Hành (thay Ban Quản trị), Ban Tài chính, Học viên CEO 1983.
-#   - Mặc định tài khoản mới tham gia: Vai trò luôn là "Thành viên", ban chuyên môn luôn là "Học viên CEO 1983".
-#   - Nhận diện vai trò chuẩn xác ngay khi đăng nhập: Backend cung cấp cờ boolean `isPresident`, `isAdmin`, `isExecutive`, `isGeneralSecretary`, `isDepartmentLeader` và `department` trong JWT payload và response đăng nhập; Frontend lưu trữ đồng bộ vào `localStorage` và `AuthContext` ngay tức thì.
-#   - Phân quyền gán ban & đổi vai trò: Chỉ tài khoản có vai trò Chủ tịch, Quản trị hoặc Admin mới có quyền chỉ định Học viên vào ban khác hoặc đổi vai trò (chặn cả frontend UI lẫn backend API, trả 403 Forbidden nếu không có quyền).
-#   - Tách biệt hoàn toàn Hồ sơ CRM (Profile Decoupling): Dữ liệu hồ sơ Admin CRM (avatar, họ tên, email, sđt) lưu độc lập (`crm_admin_profile`, `crm_admin_avatar`), tuyệt đối KHÔNG ghi đè vào hồ sơ thẻ Học viên hay avatar App Mobile CEO 1983.
-#   - Phân quyền Mobile App:
-#     + Tin tức CLB: Chỉ các vai trò `Quản trị`, `Admin`, `Chủ tịch`, `Trưởng ban` mới có quyền Đăng, Sửa, Xóa tin bài. Thành viên thông thường chỉ có quyền xem.
-#     + Quét mã Check-in Sự kiện: Phụ thuộc vào danh sách nhân sự được phân quyền quét mã từ CRM (`qrScanners` / `qrStaff`). Riêng `Quản trị`, `Chủ tịch`, `Admin` luôn có toàn quyền quét mã mọi sự kiện.
-#   - Chuẩn hóa Ô nhập Tiền tệ & Giá cả Toàn diện (Strict Currency & Price Input Standard):
-#     + Tuyệt đối không để `isComposingRef` chặn sự kiện gõ số trên `inputMode="numeric"`. Đảm bảo người dùng nhập số tiền mượt mà trên bàn phím số di động và các bộ gõ tiếng Việt.
-#     + Cơ Chế Auto-Select Khi Focus: Tất cả các component nhập tiền tệ (`StandardCurrencyInput`, `VndCurrencyInput`, `FormattedCurrencyInput`) và các ô nhập số/giá/ngân sách bắt buộc tích hợp `setTimeout(() => inputRef.current?.select(), 20)` khi `onFocus` để người dùng nhấp chuột hoặc chạm vào là bôi đen toàn bộ giá trị cũ, gõ phím mới là ghi đè ngay tức thì mà không cần phải xóa thủ công từng ký tự.
-#     + Loại Bỏ Số 0 Cản Trở Ở Đầu: Tuyệt đối không để số `0` mặc định che khuất placeholder; khi gõ số sau `0`, tự động bóc tách số `0` ở đầu (`clean = digits.replace(/^0+(?=\d)/, "")`) để không bị thành chuỗi số sai lệch (ví dụ gõ 5 vào 0 không bị thành 50 hay 05).
-#     + Bảo Toàn Vị Trí Con Trỏ (Caret Preservation): Khi định dạng dấu chấm ngăn cách hàng nghìn (`.`), tính toán chính xác số lượng chữ số đứng trước con trỏ để đặt lại vị trí con trỏ sau khi render, ngăn chặn hiện tượng nhảy con trỏ về cuối ô nhập.
-# [BẮT BUỘC 5] Cơ sở dữ liệu Chuẩn Duy nhất (`ceo1983_project`) & Đồng bộ 2 Chiều:
-#   - Máy chủ CSDL chuẩn duy nhất của dự án là PostgreSQL `ceo1983_project` tại `14.225.217.232:5436`.
-#   - Tuyệt đối KHÔNG trỏ về host cũ `113.20.107.184` và TUYỆT ĐỐI KHÔNG liên quan hay phụ thuộc vào CSDL `vione_app`.
-#   - Dữ liệu tạo từ CRM Hiệp hội thì App Mobile CEO 1983 đọc được đầy đủ, ngược lại dữ liệu tạo từ Mobile App thì CRM Hiệp hội hiển thị chuẩn xác (cùng chung schema và database).
+#   - Chuẩn hóa Ban chuyên môn: Ban Thiện nguyện, Ban Học tập, Ban Sự kiện & Hậu cần, Ban Tài chính & Tài trợ, Ban Truyền thông, Ban Công nghệ, Ban Đối ngoại & Giao thương, Ban Đời sống & Gắn kết thành viên, Học viên CEO HN10.
+#   - Mặc định tài khoản mới tham gia: Vai trò luôn là "Học viên", ban chuyên môn luôn là "Học viên CEO HN10".
+#
+# [BẮT BUỘC 5] Cơ sở dữ liệu Chuẩn Duy nhất (`ceohn10_project`) & Đồng bộ 2 Chiều:
+#   - Máy chủ CSDL chuẩn duy nhất của dự án là PostgreSQL `ceohn10_project` tại `113.20.107.184:6432`.
+#   - Tuyệt đối KHÔNG trỏ về cụm server khác `14.225.217.232:5436` và TUYỆT ĐỐI KHÔNG liên quan hay phụ thuộc vào CSDL `vione_app` hay `ceo1983_project`.
+#   - Dữ liệu tạo từ CRM Hiệp hội thì App Mobile CEO HN10 đọc được đầy đủ, ngược lại dữ liệu tạo từ Mobile App thì CRM Hiệp hội hiển thị chuẩn xác (cùng chung schema và database).
 #   - Mọi bản ghi Học viên, sự kiện, gói tài trợ, nhà tài trợ, cuộc họp, cơ hội, sản phẩm, tin tức, tài liệu phải liên kết với mã định danh hiệp hội chuẩn `c1983000-0000-4000-8000-000000001983`.
 #
 # [BẮT BUỘC 6] Khắc phục Schema Cache & Raw Queries An Toàn:
@@ -2212,12 +2202,12 @@
   + Sheet 2: `Tong_Hop_Danh_Muc` (Bảng tổng hợp theo danh mục thu/chi, số lượng món và tỷ trọng %).
   + Sheet 3 (Tùy chọn): `Phieu_Thu_Mau_01_TT` / `Phieu_Chi_Mau_02_TT` (Mẫu phiếu thu/chi đóng dấu theo Quyết định 15 / Thông tư 200).
 
-# [BẮT BUỘC 103] Quy Chuẩn Đồng Bộ Hạ Tầng Mạng Và Dữ Liệu Giữa CEO 1983 Mobile (Port 5444) Và CRM Quản Trị (Port 5443)
+# [BẮT BUỘC 103] Quy Chuẩn Đồng Bộ Hạ Tầng Mạng Và Dữ Liệu Giữa CEO HN10 Mobile (Port 5020) Và CRM Quản Trị (Port 5022)
 - Kết Nối Mạng Container Nginx Proxy Độc Lập:
-  + Tất cả container Backend và Frontend thuộc phân hệ CEO 1983 Mobile (`ceo1983-backend-prod`, `ceo1983-frontend-prod`) và CRM Quản trị (`crm-backend-prod`, `crm-frontend-prod`) BẮT BUỘC phải tham gia đồng thời cả 2 mạng Docker: `ceo1983-network` và `vione-network`.
-  + Nginx SSL Proxy (`vione-ssl-proxy`) nằm trên `vione-network`. Nếu thiếu mạng `vione-network`, proxy sẽ trả về lỗi HTTP 502 Bad Gateway khi người dùng truy cập cổng 5444.
+  + Tất cả container Backend và Frontend thuộc phân hệ CEO HN10 Mobile (`ceohn10-backend-prod`, `ceohn10-frontend-prod`) và CRM Quản trị (`ceohn10-crm-backend-prod`, `ceohn10-crm-frontend-prod`) BẮT BUỘC phải tham gia mạng Docker: `ceohn10-network` (và `vione-network`).
+  + Nginx SSL Proxy nằm trên mạng nội bộ.
 - Đảm Bảo 100% Đồng Nhất Cơ Sở Dữ Liệu Giữa Mobile Và CRM:
-  + Cả hai phân hệ Mobile và CRM BẮT BUỘC cùng trỏ vào một instance PostgreSQL duy nhất: `ceo1983-postgres-prod:5432/ceo1983_project` (Cơ sở dữ liệu độc lập của CLB Doanh Nhân CEO 1983, tuyệt đối không dùng chung `vione_app`).
+  + Cả hai phân hệ Mobile và CRM BẮT BUỘC cùng trỏ vào một instance PostgreSQL duy nhất: `113.20.107.184:6432/ceohn10_project` (Cơ sở dữ liệu chuẩn duy nhất của CLB Doanh Nhân CEO HN10, tuyệt đối không trỏ sang database khác).
   + Các API endpoint của Mobile (Port 5444) và CRM (Port 5443) gồm `/api/events`, `/api/members`, `/api/opportunities`, `/api/invoices`, `/api/voting/polls`, v.v. phải trả về cùng cấu trúc dữ liệu và số lượng bản ghi 100% trùng khớp nhau.
   + Kiểm thử định kỳ bằng script kiểm tra đồng bộ (`scripts/verify_all_data_flows.js`) để đảm bảo không xảy ra hiện tượng lệch schema hoặc cô lập dữ liệu.
 
@@ -2236,7 +2226,7 @@
 
 # [BẮT BUỘC 105] Quy Chuẩn Đồng Bộ 100% Dữ Liệu Thật Database PostgreSQL (Không Fake/Mock), Chuẩn Hóa Avatar/Cover/Tên Thẻ & Bộ 4 File Phiên Họp Thứ Tư (09:00 - 12:00)
 - Tuyệt Đối Không Dùng Fake / Mock / Hard-coded Data Ở Frontend:
-  + Toàn bộ thông tin Học viên (Họ tên, mã Học viên, chức vụ, ban điều hành, tên doanh nghiệp, số điện thoại, email, địa chỉ, ảnh đại diện avatar_url, ảnh bìa cover_url) BẮT BUỘC được nạp và lấy trực tiếp từ bảng `public.members`, `public.vione_users`, `public.member_business_cards` trong Database PostgreSQL (`14.225.217.232:5436/vione_app`).
+  + Toàn bộ thông tin Học viên (Họ tên, mã Học viên, chức vụ, ban điều hành, tên doanh nghiệp, số điện thoại, email, địa chỉ, ảnh đại diện avatar_url, ảnh bìa cover_url) BẮT BUỘC được nạp và lấy trực tiếp từ bảng `public.members`, `public.vione_users`, `public.member_business_cards` trong Database PostgreSQL (`113.20.107.184:6432/ceohn10_project`).
   + Không sử dụng placeholder data hay dữ liệu tĩnh cài cắm trong mã nguồn Frontend.
 - Quy Chuẩn Xử Lý Avatar Initials Tránh Lỗi Ký Tự Ngoặc `V(`:
   + Khi tên tài khoản có hậu tố ngoặc đơn như `"Phạm Văn Vũ (Admin)"`, hàm `initials(name)` BẮT BUỘC phải làm sạch chuỗi bằng `name.replace(/\([^)]*\)/g, '').replace(/\[[^\]]*\]/g, '').trim()` trước khi tách từ.
