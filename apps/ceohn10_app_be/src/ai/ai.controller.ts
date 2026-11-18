@@ -2,6 +2,7 @@ import {
   Controller,
   Get,
   Post,
+  Put,
   Delete,
   Body,
   Param,
@@ -11,6 +12,8 @@ import {
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { AiService } from './ai.service';
 import { AiCrmAnalyticsService } from './ai-crm-analytics.service';
+import { KnowledgeBaseService } from './knowledge-base.service';
+import { AiPermissionService } from './ai-permission.service';
 
 @Controller('ai')
 @UseGuards(JwtAuthGuard)
@@ -18,6 +21,8 @@ export class AiController {
   constructor(
     private readonly aiService: AiService,
     private readonly crmAnalytics: AiCrmAnalyticsService,
+    private readonly knowledgeBase: KnowledgeBaseService,
+    private readonly aiPermission: AiPermissionService,
   ) {}
 
   /** GET /api/ai/live-context — Ngữ cảnh động tài khoản phiên đăng nhập */
@@ -328,5 +333,55 @@ export class AiController {
       body.persona,
     );
     return res;
+  }
+
+  // ==========================================
+  // KNOWLEDGE BASE (BRD, SRS, DATABASE, RESTFUL API)
+  // ==========================================
+
+  /** GET /api/ai/knowledge/docs — Danh mục tài liệu kỹ thuật BRD, SRS, CSDL & API đã nạp cho AI */
+  @Get('knowledge/docs')
+  async listKnowledgeDocs() {
+    const docs = this.knowledgeBase.getRegisteredDocuments();
+    return { ok: true, data: docs };
+  }
+
+  /** GET /api/ai/knowledge/docs/:code — Tra cứu chi tiết tài liệu kỹ thuật theo mã code */
+  @Get('knowledge/docs/:code')
+  async getKnowledgeDocDetail(@Param('code') code: string) {
+    return this.knowledgeBase.queryTechnicalDocument(code);
+  }
+
+  // ==========================================
+  // PHÂN QUYỀN CHO AI (AI RBAC PERMISSIONS)
+  // ==========================================
+
+  /** GET /api/ai/permissions/matrix — Lấy ma trận phân quyền Trợ Lý AI từ CSDL PostgreSQL */
+  @Get('permissions/matrix')
+  async getAiPermissionMatrix() {
+    const matrixData = await this.aiPermission.getAiPermissionMatrix();
+    return { ok: true, data: matrixData };
+  }
+
+  /** PUT /api/ai/permissions/matrix — Cập nhật ma trận phân quyền Trợ Lý AI vào CSDL PostgreSQL */
+  @Put('permissions/matrix')
+  async updateAiPermissionMatrix(@Body() body: { matrix: Record<string, Record<string, boolean>> }) {
+    return this.aiPermission.saveAiPermissionMatrix(body.matrix);
+  }
+
+  /** GET /api/ai/permissions/my — Kiểm tra danh sách quyền hạn AI của người dùng phiên hiện tại */
+  @Get('permissions/my')
+  async getMyAiPermissions(@Request() req: any) {
+    const matrixData = await this.aiPermission.getAiPermissionMatrix();
+    const myAllowedCaps: string[] = [];
+
+    for (const cap of matrixData.capabilities) {
+      const allowed = await this.aiPermission.checkUserAiCapability(req.user.id, cap.code);
+      if (allowed) {
+        myAllowedCaps.push(cap.code);
+      }
+    }
+
+    return { ok: true, data: { allowedCapabilities: myAllowedCaps } };
   }
 }

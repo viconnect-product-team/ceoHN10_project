@@ -1,6 +1,16 @@
 # ==============================================================================
 # BỘ LUẬT DỰ ÁN (PROJECT RULES & AI CODEGEN STANDARDS) - CEO HN10 PROJECT
 # Vai trò: Tech Lead | Định dạng: .cursorrules
+# 18/11/2026 (v12.22) — NẠP TOÀN BỘ TÀI LIỆU BRD/SRS/CSDL/API CHO AI & PHÂN QUYỀN TRỢ LÝ AI TRONG NHÓM PHÂN QUYỀN:
+#   * [NẠP TRI THỨC KỸ THUẬT CHO TRỢ LÝ AI (KNOWLEDGE BASE SERVICE)]:
+#     - Tạo mới KnowledgeBaseService (knowledge-base.service.ts): Đọc hiểu toàn bộ tài liệu dự án BRD_CEOHN10_MASTER_CHINH_THUC.md, SRS_01_Web_CRM_CEOHN10.md, SRS_02_App_Hiep_Hoi_CEOHN10.md, THIET_KE_CSDL_POSTGRESQL_CEOHN10.md, THIET_KE_RESTFUL_API_CEOHN10.md.
+#     - Tự động nhận diện câu hỏi về nghiệp vụ, cấu trúc bảng CSDL PostgreSQL 113.20.107.184:6432, danh mục API và đưa vào ngữ cảnh trả lời của AI.
+#   * [PHÂN QUYỀN TRỢ LÝ AI TRONG NHÓM PHÂN QUYỀN (AI PERMISSION MATRIX)]:
+#     - Tạo mới AiPermissionService (ai-permission.service.ts): Quản lý 8 năng lực AI (Xem phân tích số liệu, Đọc tài liệu kỹ thuật, Bóc tách file Word/Excel, Soạn/Gửi nhắc nộp phí, Soạn/Gửi thông báo sự kiện, Xuất báo cáo đa định dạng, Truy vấn CSDL, Phê duyệt thực thi).
+#     - Lưu trữ trực tiếp CSDL 113.20.107.184:6432 trong bảng public.app_settings (key ai_permission_matrix).
+#     - Sidebar: Bổ sung mục "Phân quyền Trợ lý AI" (/permissions?tab=ai) trong Nhóm PHÂN QUYỀN.
+#     - RbacPermissionMatrix.tsx: Bổ sung Tab 3 "PHÂN QUYỀN TRỢ LÝ AI", tích hợp AiPermissionMatrixTab.tsx điều khiển bật/tắt quyền theo từng Role và cấu hình phê duyệt an toàn.
+#   * [TUÂN THỦ CSDL & GIT]: CSDL duy nhất 113.20.107.184:6432 (ceohn10_project). Tuyệt đối không git commit / git push. Type check đạt 0 lỗi (Exit code 0 trên cả BE và FE).
 # 18/11/2026 (v12.20) — PHÂN QUYỀN SIDEBAR VÀO CSDL 113.20.107.184:6432, KHÔI PHỤC TOÀN VẸN MÃ NGUỒN SIDEBAR, XÓA BỎ GÓI TÀI TRỢ, BÓC TÁCH FILE SỰ KIỆN:
 #   * [PHÂN QUYỀN SIDEBAR HOÀN TOÀN BẰNG CSDL (RULE 0 & RBAC MATRIX)]:
 #     - Khôi phục mã nguồn 100% trong Sidebar.tsx: Giữ nguyên code toàn bộ các menu (Lớp học, Tin tức, Quyền lợi, Nhóm Kết nối & Giao thương).

@@ -1,5 +1,38 @@
 # System Memory & Architecture
 
+- **Bản cập nhật ngày 18/11/2026 (v12.22): Nạp Toàn Diện Tri Thức Kỹ Thuật (BRD, SRS, CSDL & RESTful API) Cho Trợ Lý AI & Tích Hợp Chức Năng Phân Quyền Trợ Lý AI Vào Nhóm Phân Quyền RBAC**:
+  - **1. Lý Giải Hiện Tượng Giao Diện CRM Chưa Cập Nhật Trên Máy Người Dùng**:
+    * Mã nguồn nâng cấp ở phiên trước đã được commit và push lên nhánh `dev` (`ad8ab12`).
+    * Môi trường Subdomain Production (`crm.ceohn10.viconnect.vn` trên VPS `14.225.217.232`) được thiết lập chạy từ nhánh `main` hoặc cần chạy lệnh triển khai tự động `bash deploy/git-auto-deploy.sh dev`.
+    * Đối với môi trường Local: Cần khởi động lại Vite Dev Server và xóa cache trình duyệt (Hard Reload: `Ctrl + Shift + R` / `Cmd + Shift + R`).
+  - **2. Xây Dựng Knowledge Base Service Nạp Toàn Bộ Hồ Sơ Kỹ Thuật Cho Trợ Lý AI**:
+    * Tạo mới `apps/ceohn10_app_be/src/ai/knowledge-base.service.ts`:
+      - Nạp toàn bộ kho tài liệu chuẩn: `BRD_CEOHN10_MASTER_CHINH_THUC.md` (Nghiệp vụ BRD), `SRS_01_Web_CRM_CEOHN10.md` (SRS Web CRM), `SRS_02_App_Hiep_Hoi_CEOHN10.md` (SRS Mobile App), `THIET_KE_CSDL_POSTGRESQL_CEOHN10.md` (Schema PostgreSQL 113.20.107.184:6432), `THIET_KE_RESTFUL_API_CEOHN10.md` (Danh mục RESTful API).
+      - Hàm `getSystemKnowledgePrompt()`: Cung cấp tổng quan kiến trúc hệ thống, 7 ban chuyên môn, mô hình dữ liệu quan hệ và danh mục API chuẩn để đưa vào System Prompt của AI.
+      - Hàm `queryTechnicalDocument(docCode, topic)`: Tra cứu sâu từng tài liệu kỹ thuật khi người dùng hoặc ban lãnh đạo hỏi chi tiết.
+    * Tích hợp sâu vào `apps/ceohn10_app_be/src/ai/ai-crm-analytics.service.ts`: Trợ lý AI tự động nhận diện các câu hỏi về nghiệp vụ, BRD, SRS, bảng CSDL hoặc danh mục API để đưa ra câu trả lời chính xác 100%.
+  - **3. Xây Dựng Hệ Thống Phân Quyền Trợ Lý AI (AI Capabilities RBAC)**:
+    * Tạo mới `apps/ceohn10_app_be/src/ai/ai-permission.service.ts`:
+      - Danh mục 8 năng lực cốt lõi của Trợ lý AI:
+        1. `AI_READ_ANALYTICS`: Xem & phân tích số liệu tài chính, học viên, sự kiện
+        2. `AI_READ_TECHNICAL_DOCS`: Đọc & tra cứu hồ sơ kỹ thuật (BRD, SRS, CSDL, API)
+        3. `AI_EXTRACT_DOCUMENTS`: Bóc tách & phân tích tài liệu (Word, Excel, PDF)
+        4. `AI_SEND_FEE_REMINDERS`: Soạn & gửi email nhắc nộp niên liễm / học phí (Cần duyệt)
+        5. `AI_SEND_EVENT_NOTICES`: Soạn & gửi thông báo lịch sự kiện / lớp học (Cần duyệt)
+        6. `AI_EXPORT_REPORTS`: Tự động tạo & xuất báo cáo đa định dạng (Excel, Word, PDF)
+        7. `AI_QUERY_DATABASE`: Truy vấn thông tin CSDL trực tiếp (Chỉ đọc)
+        8. `AI_APPROVE_ACTIONS`: Quyền phê duyệt bước cuối để kích hoạt tác vụ AI
+      - Lưu trữ và tra cứu động từ bảng `public.app_settings` (key `ai_permission_matrix`) trên CSDL chuẩn `113.20.107.184:6432`.
+      - Các API quản trị: `GET /api/ai/permissions/matrix`, `PUT /api/ai/permissions/matrix`, `GET /api/ai/permissions/my`.
+  - **4. Tích Hợp Chức Năng Phân Quyền AI Vào Nhóm Phân Quyền Trên Frontend**:
+    * **Sidebar (`Sidebar.tsx`)**: Bổ sung mục "Phân quyền Trợ lý AI" (`/permissions?tab=ai`) với icon `Sparkles` trực tiếp trong Nhóm PHÂN QUYỀN.
+    * **Màn hình Phân quyền (`RbacPermissionMatrix.tsx`)**: Bổ sung Tab 3 "PHÂN QUYỀN TRỢ LÝ AI" (8 năng lực AI) bên cạnh Tab CRM và Tab Mobile App, tự động mở đúng tab khi truy cập qua URL query `?tab=ai`.
+    * **Bảng Ma Trận Năng Lực AI (`AiPermissionMatrixTab.tsx`)**: Cho phép bật/tắt quyền cho từng Role (`quan_tri`, `chu_tich`, `pho_chu_tich`, `tong_thu_ky`, `truong_ban_tai_chinh`, `truong_ban_truyen_thong`, `member`), hỗ trợ chọn tất cả theo cột Role, chọn tất cả theo hàng Năng lực, đánh dấu cờ `requiresReviewStep` cho các tác vụ nhạy cảm, khôi phục mặc định và lưu trực tiếp vào CSDL.
+  - **5. Kiểm Tra Chất Lượng Code Toàn Diện (Strict Zero-Error)**:
+    * Backend: `tsc --project apps/ceohn10_app_be/tsconfig.json --noEmit` -> **Exit code 0 (0 errors)**.
+    * Frontend: `tsc --project apps/ceohn10_app_fe/tsconfig.json --noEmit` trên toàn bộ 1,719 tệp -> **Exit code 0 (0 errors)**.
+    * Tuân thủ nghiêm ngặt Rule 0 (CSDL duy nhất `113.20.107.184:6432`) và Rule 1 (Không tự ý `git commit` / `git push`).
+
 - **Bản cập nhật ngày 18/11/2026 (v12.21): Tái Cấu Trúc Toàn Diện Hệ Thống Phân Quyền Động (Dynamic Bidirectional RBAC Architecture), Xóa Bỏ Hoàn Toàn Hardcode Trên Frontend, Chuẩn Hóa Tên Quyền CRUD**:
   - **1. Triệt Tiêu 100% Logic Phân Quyền Hardcode Trên Frontend**:
     * Xóa bỏ hoàn toàn mảng tĩnh `temporarilyHiddenRoutes = [...]` và các logic ép quyền tĩnh trong `rbac-permission-helpers.ts`.
@@ -2054,6 +2087,39 @@
      - Tuân thủ nghiêm ngặt STRICT RULE 1: Tuyệt đối không tự động chạy `git push` hay `git commit`.
 
 # System Memory & Architecture
+
+- **Bản cập nhật ngày 18/11/2026 (v12.22): Nạp Toàn Diện Tri Thức Kỹ Thuật (BRD, SRS, CSDL & RESTful API) Cho Trợ Lý AI & Tích Hợp Chức Năng Phân Quyền Trợ Lý AI Vào Nhóm Phân Quyền RBAC**:
+  - **1. Lý Giải Hiện Tượng Giao Diện CRM Chưa Cập Nhật Trên Máy Người Dùng**:
+    * Mã nguồn nâng cấp ở phiên trước đã được commit và push lên nhánh `dev` (`ad8ab12`).
+    * Môi trường Subdomain Production (`crm.ceohn10.viconnect.vn` trên VPS `14.225.217.232`) được thiết lập chạy từ nhánh `main` hoặc cần chạy lệnh triển khai tự động `bash deploy/git-auto-deploy.sh dev`.
+    * Đối với môi trường Local: Cần khởi động lại Vite Dev Server và xóa cache trình duyệt (Hard Reload: `Ctrl + Shift + R` / `Cmd + Shift + R`).
+  - **2. Xây Dựng Knowledge Base Service Nạp Toàn Bộ Hồ Sơ Kỹ Thuật Cho Trợ Lý AI**:
+    * Tạo mới `apps/ceohn10_app_be/src/ai/knowledge-base.service.ts`:
+      - Nạp toàn bộ kho tài liệu chuẩn: `BRD_CEOHN10_MASTER_CHINH_THUC.md` (Nghiệp vụ BRD), `SRS_01_Web_CRM_CEOHN10.md` (SRS Web CRM), `SRS_02_App_Hiep_Hoi_CEOHN10.md` (SRS Mobile App), `THIET_KE_CSDL_POSTGRESQL_CEOHN10.md` (Schema PostgreSQL 113.20.107.184:6432), `THIET_KE_RESTFUL_API_CEOHN10.md` (Danh mục RESTful API).
+      - Hàm `getSystemKnowledgePrompt()`: Cung cấp tổng quan kiến trúc hệ thống, 7 ban chuyên môn, mô hình dữ liệu quan hệ và danh mục API chuẩn để đưa vào System Prompt của AI.
+      - Hàm `queryTechnicalDocument(docCode, topic)`: Tra cứu sâu từng tài liệu kỹ thuật khi người dùng hoặc ban lãnh đạo hỏi chi tiết.
+    * Tích hợp sâu vào `apps/ceohn10_app_be/src/ai/ai-crm-analytics.service.ts`: Trợ lý AI tự động nhận diện các câu hỏi về nghiệp vụ, BRD, SRS, bảng CSDL hoặc danh mục API để đưa ra câu trả lời chính xác 100%.
+  - **3. Xây Dựng Hệ Thống Phân Quyền Trợ Lý AI (AI Capabilities RBAC)**:
+    * Tạo mới `apps/ceohn10_app_be/src/ai/ai-permission.service.ts`:
+      - Danh mục 8 năng lực cốt lõi của Trợ lý AI:
+        1. `AI_READ_ANALYTICS`: Xem & phân tích số liệu tài chính, học viên, sự kiện
+        2. `AI_READ_TECHNICAL_DOCS`: Đọc & tra cứu hồ sơ kỹ thuật (BRD, SRS, CSDL, API)
+        3. `AI_EXTRACT_DOCUMENTS`: Bóc tách & phân tích tài liệu (Word, Excel, PDF)
+        4. `AI_SEND_FEE_REMINDERS`: Soạn & gửi email nhắc nộp niên liễm / học phí (Cần duyệt)
+        5. `AI_SEND_EVENT_NOTICES`: Soạn & gửi thông báo lịch sự kiện / lớp học (Cần duyệt)
+        6. `AI_EXPORT_REPORTS`: Tự động tạo & xuất báo cáo đa định dạng (Excel, Word, PDF)
+        7. `AI_QUERY_DATABASE`: Truy vấn thông tin CSDL trực tiếp (Chỉ đọc)
+        8. `AI_APPROVE_ACTIONS`: Quyền phê duyệt bước cuối để kích hoạt tác vụ AI
+      - Lưu trữ và tra cứu động từ bảng `public.app_settings` (key `ai_permission_matrix`) trên CSDL chuẩn `113.20.107.184:6432`.
+      - Các API quản trị: `GET /api/ai/permissions/matrix`, `PUT /api/ai/permissions/matrix`, `GET /api/ai/permissions/my`.
+  - **4. Tích Hợp Chức Năng Phân Quyền AI Vào Nhóm Phân Quyền Trên Frontend**:
+    * **Sidebar (`Sidebar.tsx`)**: Bổ sung mục "Phân quyền Trợ lý AI" (`/permissions?tab=ai`) với icon `Sparkles` trực tiếp trong Nhóm PHÂN QUYỀN.
+    * **Màn hình Phân quyền (`RbacPermissionMatrix.tsx`)**: Bổ sung Tab 3 "PHÂN QUYỀN TRỢ LÝ AI" (8 năng lực AI) bên cạnh Tab CRM và Tab Mobile App, tự động mở đúng tab khi truy cập qua URL query `?tab=ai`.
+    * **Bảng Ma Trận Năng Lực AI (`AiPermissionMatrixTab.tsx`)**: Cho phép bật/tắt quyền cho từng Role (`quan_tri`, `chu_tich`, `pho_chu_tich`, `tong_thu_ky`, `truong_ban_tai_chinh`, `truong_ban_truyen_thong`, `member`), hỗ trợ chọn tất cả theo cột Role, chọn tất cả theo hàng Năng lực, đánh dấu cờ `requiresReviewStep` cho các tác vụ nhạy cảm, khôi phục mặc định và lưu trực tiếp vào CSDL.
+  - **5. Kiểm Tra Chất Lượng Code Toàn Diện (Strict Zero-Error)**:
+    * Backend: `tsc --project apps/ceohn10_app_be/tsconfig.json --noEmit` -> **Exit code 0 (0 errors)**.
+    * Frontend: `tsc --project apps/ceohn10_app_fe/tsconfig.json --noEmit` trên toàn bộ 1,719 tệp -> **Exit code 0 (0 errors)**.
+    * Tuân thủ nghiêm ngặt Rule 0 (CSDL duy nhất `113.20.107.184:6432`) và Rule 1 (Không tự ý `git commit` / `git push`).
 
 - **Bản cập nhật ngày 18/11/2026 (v12.21): Tái Cấu Trúc Toàn Diện Hệ Thống Phân Quyền Động (Dynamic Bidirectional RBAC Architecture), Xóa Bỏ Hoàn Toàn Hardcode Trên Frontend, Chuẩn Hóa Tên Quyền CRUD**:
   - **1. Triệt Tiêu 100% Logic Phân Quyền Hardcode Trên Frontend**:
@@ -5273,6 +5339,39 @@
      - Tuân thủ nghiêm ngặt STRICT RULE 1: Tuyệt đối không tự động chạy `git push` hay `git commit`.
 
 # System Memory & Architecture
+
+- **Bản cập nhật ngày 18/11/2026 (v12.22): Nạp Toàn Diện Tri Thức Kỹ Thuật (BRD, SRS, CSDL & RESTful API) Cho Trợ Lý AI & Tích Hợp Chức Năng Phân Quyền Trợ Lý AI Vào Nhóm Phân Quyền RBAC**:
+  - **1. Lý Giải Hiện Tượng Giao Diện CRM Chưa Cập Nhật Trên Máy Người Dùng**:
+    * Mã nguồn nâng cấp ở phiên trước đã được commit và push lên nhánh `dev` (`ad8ab12`).
+    * Môi trường Subdomain Production (`crm.ceohn10.viconnect.vn` trên VPS `14.225.217.232`) được thiết lập chạy từ nhánh `main` hoặc cần chạy lệnh triển khai tự động `bash deploy/git-auto-deploy.sh dev`.
+    * Đối với môi trường Local: Cần khởi động lại Vite Dev Server và xóa cache trình duyệt (Hard Reload: `Ctrl + Shift + R` / `Cmd + Shift + R`).
+  - **2. Xây Dựng Knowledge Base Service Nạp Toàn Bộ Hồ Sơ Kỹ Thuật Cho Trợ Lý AI**:
+    * Tạo mới `apps/ceohn10_app_be/src/ai/knowledge-base.service.ts`:
+      - Nạp toàn bộ kho tài liệu chuẩn: `BRD_CEOHN10_MASTER_CHINH_THUC.md` (Nghiệp vụ BRD), `SRS_01_Web_CRM_CEOHN10.md` (SRS Web CRM), `SRS_02_App_Hiep_Hoi_CEOHN10.md` (SRS Mobile App), `THIET_KE_CSDL_POSTGRESQL_CEOHN10.md` (Schema PostgreSQL 113.20.107.184:6432), `THIET_KE_RESTFUL_API_CEOHN10.md` (Danh mục RESTful API).
+      - Hàm `getSystemKnowledgePrompt()`: Cung cấp tổng quan kiến trúc hệ thống, 7 ban chuyên môn, mô hình dữ liệu quan hệ và danh mục API chuẩn để đưa vào System Prompt của AI.
+      - Hàm `queryTechnicalDocument(docCode, topic)`: Tra cứu sâu từng tài liệu kỹ thuật khi người dùng hoặc ban lãnh đạo hỏi chi tiết.
+    * Tích hợp sâu vào `apps/ceohn10_app_be/src/ai/ai-crm-analytics.service.ts`: Trợ lý AI tự động nhận diện các câu hỏi về nghiệp vụ, BRD, SRS, bảng CSDL hoặc danh mục API để đưa ra câu trả lời chính xác 100%.
+  - **3. Xây Dựng Hệ Thống Phân Quyền Trợ Lý AI (AI Capabilities RBAC)**:
+    * Tạo mới `apps/ceohn10_app_be/src/ai/ai-permission.service.ts`:
+      - Danh mục 8 năng lực cốt lõi của Trợ lý AI:
+        1. `AI_READ_ANALYTICS`: Xem & phân tích số liệu tài chính, học viên, sự kiện
+        2. `AI_READ_TECHNICAL_DOCS`: Đọc & tra cứu hồ sơ kỹ thuật (BRD, SRS, CSDL, API)
+        3. `AI_EXTRACT_DOCUMENTS`: Bóc tách & phân tích tài liệu (Word, Excel, PDF)
+        4. `AI_SEND_FEE_REMINDERS`: Soạn & gửi email nhắc nộp niên liễm / học phí (Cần duyệt)
+        5. `AI_SEND_EVENT_NOTICES`: Soạn & gửi thông báo lịch sự kiện / lớp học (Cần duyệt)
+        6. `AI_EXPORT_REPORTS`: Tự động tạo & xuất báo cáo đa định dạng (Excel, Word, PDF)
+        7. `AI_QUERY_DATABASE`: Truy vấn thông tin CSDL trực tiếp (Chỉ đọc)
+        8. `AI_APPROVE_ACTIONS`: Quyền phê duyệt bước cuối để kích hoạt tác vụ AI
+      - Lưu trữ và tra cứu động từ bảng `public.app_settings` (key `ai_permission_matrix`) trên CSDL chuẩn `113.20.107.184:6432`.
+      - Các API quản trị: `GET /api/ai/permissions/matrix`, `PUT /api/ai/permissions/matrix`, `GET /api/ai/permissions/my`.
+  - **4. Tích Hợp Chức Năng Phân Quyền AI Vào Nhóm Phân Quyền Trên Frontend**:
+    * **Sidebar (`Sidebar.tsx`)**: Bổ sung mục "Phân quyền Trợ lý AI" (`/permissions?tab=ai`) với icon `Sparkles` trực tiếp trong Nhóm PHÂN QUYỀN.
+    * **Màn hình Phân quyền (`RbacPermissionMatrix.tsx`)**: Bổ sung Tab 3 "PHÂN QUYỀN TRỢ LÝ AI" (8 năng lực AI) bên cạnh Tab CRM và Tab Mobile App, tự động mở đúng tab khi truy cập qua URL query `?tab=ai`.
+    * **Bảng Ma Trận Năng Lực AI (`AiPermissionMatrixTab.tsx`)**: Cho phép bật/tắt quyền cho từng Role (`quan_tri`, `chu_tich`, `pho_chu_tich`, `tong_thu_ky`, `truong_ban_tai_chinh`, `truong_ban_truyen_thong`, `member`), hỗ trợ chọn tất cả theo cột Role, chọn tất cả theo hàng Năng lực, đánh dấu cờ `requiresReviewStep` cho các tác vụ nhạy cảm, khôi phục mặc định và lưu trực tiếp vào CSDL.
+  - **5. Kiểm Tra Chất Lượng Code Toàn Diện (Strict Zero-Error)**:
+    * Backend: `tsc --project apps/ceohn10_app_be/tsconfig.json --noEmit` -> **Exit code 0 (0 errors)**.
+    * Frontend: `tsc --project apps/ceohn10_app_fe/tsconfig.json --noEmit` trên toàn bộ 1,719 tệp -> **Exit code 0 (0 errors)**.
+    * Tuân thủ nghiêm ngặt Rule 0 (CSDL duy nhất `113.20.107.184:6432`) và Rule 1 (Không tự ý `git commit` / `git push`).
 
 - **Bản cập nhật ngày 18/11/2026 (v12.21): Tái Cấu Trúc Toàn Diện Hệ Thống Phân Quyền Động (Dynamic Bidirectional RBAC Architecture), Xóa Bỏ Hoàn Toàn Hardcode Trên Frontend, Chuẩn Hóa Tên Quyền CRUD**:
   - **1. Triệt Tiêu 100% Logic Phân Quyền Hardcode Trên Frontend**:
