@@ -1,12 +1,13 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import type { ActivityLog } from "@/lib/extra-data";
-import { requireNestAuth } from "@/integrations/supabase/nest-auth-middleware";
+import { optionalNestAuth, requireNestAuth } from "@/integrations/supabase/nest-auth-middleware";
 import { fetchNestApiFromServer } from "@/lib/api-client";
 
 export const listActivityLogFn = createServerFn({ method: "GET" })
-  .middleware([requireNestAuth])
+  .middleware([optionalNestAuth])
   .handler(async ({ context }): Promise<ActivityLog[]> => {
+    if (!context.token) return [];
     const data = await fetchNestApiFromServer("/ai/activity-log", context.token) as any[];
     return (data ?? []).map((l: any) => ({
       id: l.code ?? l.id,

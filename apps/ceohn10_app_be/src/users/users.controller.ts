@@ -136,9 +136,16 @@ export class UsersController {
 
   @Post()
   async createUser(@Request() req: any, @Body() body: AdminCreateUserDto) {
-    const isAdmin = await this.checkIsAdminUser(req);
-    if (!isAdmin) {
-      throw new ForbiddenException('Bạn không có quyền tạo tài khoản mới');
+    const userEmail = (req.user?.email || req.user?.username || '').toLowerCase().trim();
+    const isMasterPlatformAdmin =
+      userEmail === 'admin@ceohn10.vn' ||
+      req.user?.role === 'platform_admin' ||
+      Boolean(req.user?.isPlatformAdmin);
+
+    if (!isMasterPlatformAdmin) {
+      throw new ForbiddenException(
+        'Chỉ duy nhất tài khoản Quản trị Nền tảng (admin@ceohn10.vn) có quyền tạo tài khoản quản trị mới và phân quyền',
+      );
     }
     return this.usersService.adminCreateUser(body);
   }

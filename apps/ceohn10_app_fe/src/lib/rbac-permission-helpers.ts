@@ -791,7 +791,10 @@ export function isRouteAllowedByMatrix(route: string, roleKey: SystemRoleKey, us
     cleanRoute === "/events-overview" ||
     cleanRoute === "/voting" ||
     cleanRoute === "/event-registrations" ||
+    cleanRoute === "/checkin-qr" ||
+    cleanRoute === "/templates" ||
     cleanRoute === "/lucky-draw" ||
+    cleanRoute === "/classes" ||
     cleanRoute === "/sponsors" ||
     cleanRoute === "/sponsor-report" ||
     cleanRoute === "/analytics" ||
@@ -799,10 +802,23 @@ export function isRouteAllowedByMatrix(route: string, roleKey: SystemRoleKey, us
     cleanRoute === "/expenses" ||
     cleanRoute === "/finance-report" ||
     cleanRoute === "/notifications" ||
+    cleanRoute === "/email-marketing" ||
     cleanRoute === "/meetings" ||
-    cleanRoute === "/documents"
+    cleanRoute === "/documents" ||
+    cleanRoute === "/ai-assistant"
   ) {
     return true;
+  }
+
+  // 6. Quyền truy cập Master Admin (chỉ admin / chủ tịch / platform admin)
+  if (cleanRoute === "/master") {
+    return (
+      roleKey === "quan_tri" ||
+      roleKey === "admin" ||
+      roleKey === "chu_tich" ||
+      (roleKey as string) === "platform_admin" ||
+      user?.email === "admin@ceohn10.vn"
+    );
   }
 
   return false;

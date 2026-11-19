@@ -4,6 +4,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { useAuth } from "@/context/AuthContext";
 import { useT } from "@/lib/i18n";
+import { usePermissions } from "@/hooks/use-permissions";
 import { fetchNestApi, resolveMediaUrl } from "@/lib/api-client";
 
 function initials(name: string) {
@@ -21,6 +22,7 @@ export function ProfileMenu() {
   const t = useT();
   const navigate = useNavigate();
   const { user, logout } = useAuth();
+  const { dataScopeLabel } = usePermissions();
   const ref = useRef<HTMLDivElement>(null);
 
   const [open, setOpen] = useState(false);
@@ -131,6 +133,10 @@ export function ProfileMenu() {
           role="menu"
           className="absolute right-0 z-50 mt-2 w-56 overflow-hidden rounded-xl border border-border bg-card p-1 shadow-lg"
         >
+          <div className="px-3 py-2 border-b border-border mb-1 bg-muted/40 rounded-lg">
+            <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Phân quyền dữ liệu</div>
+            <div className="text-xs font-semibold text-blue-600 dark:text-blue-400 mt-0.5 truncate">{dataScopeLabel}</div>
+          </div>
           <button
             onClick={() => {
               setOpen(false);

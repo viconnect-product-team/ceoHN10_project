@@ -175,8 +175,9 @@ export class AuthService implements OnModuleInit {
     const refreshPayload = { jti: refreshJti, sub: user.id, type: 'refresh' };
 
     return {
-      access_token: this.jwtService.sign(payload, { expiresIn: '60m' }),
-      refresh_token: this.jwtService.sign(refreshPayload, { expiresIn: '7d' }),
+      access_token: this.jwtService.sign(payload, { expiresIn: '7d' }),
+      refresh_token: this.jwtService.sign(refreshPayload, { expiresIn: '30d' }),
+      expires_in: 7 * 86400,
       mustChangePassword,
       user: {
         id: user.id,
@@ -259,8 +260,9 @@ export class AuthService implements OnModuleInit {
       };
       const newRefreshPayload = { jti: newRefreshJti, sub: user.id, type: 'refresh' };
       return {
-        access_token: this.jwtService.sign(payload, { expiresIn: '60m' }),
-        refresh_token: this.jwtService.sign(newRefreshPayload, { expiresIn: '7d' }),
+        access_token: this.jwtService.sign(payload, { expiresIn: '7d' }),
+        refresh_token: this.jwtService.sign(newRefreshPayload, { expiresIn: '30d' }),
+        expires_in: 7 * 86400,
         user: {
           id: user.id,
           username: user.username,

@@ -1,5 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import { requireNestAuth } from "@/integrations/supabase/nest-auth-middleware";
+import { optionalNestAuth } from "@/integrations/supabase/nest-auth-middleware";
 import { fetchNestApiFromServer } from "./api-client";
 
 export type DashboardStats = {
@@ -25,7 +25,7 @@ export type DashboardStats = {
 };
 
 export const getDashboardStatsFn = createServerFn({ method: "GET" })
-  .middleware([requireNestAuth])
+  .middleware([optionalNestAuth])
   .handler(async ({ context }): Promise<DashboardStats> => {
     const token = context.token;
     let nestMembers: any[] = [];

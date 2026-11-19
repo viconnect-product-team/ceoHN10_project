@@ -14,7 +14,7 @@ export function ensureSessionCookiesSync(token?: string | null): void {
     const isHttps = window.location.protocol === "https:";
     const secure = isHttps ? "; secure" : "";
     const domainAttr = getCookieDomain();
-    const maxAge = 86400; // 24 giờ
+    const maxAge = 2592000; // 30 ngày cho quản trị CRM
     const cookieStr = document.cookie || "";
     if (!cookieStr.includes(`sb-access-token=${t}`)) {
       document.cookie = `sb-access-token=${t}; path=/; max-age=${maxAge}; SameSite=Lax${secure}${domainAttr}`;
