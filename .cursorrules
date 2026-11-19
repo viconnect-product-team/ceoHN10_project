@@ -1,6 +1,19 @@
 # ==============================================================================
 # BỘ LUẬT DỰ ÁN (PROJECT RULES & AI CODEGEN STANDARDS) - CEO HN10 PROJECT
 # Vai trò: Tech Lead | Định dạng: .cursorrules
+# 19/11/2026 (v12.39) — XÁC LẬP admin@ceohn10.vn LÀ TÀI KHOẢN QUẢN TRỊ TỐI CAO (MASTER/PLATFORM ADMIN), CHO PHÉP TẠO TÀI KHOẢN KHÁC, PHÂN QUYỀN LINH HOẠT & MỞ RỘNG ĐĂNG NHẬP CHO CÁC TÀI KHOẢN HỢP LỆ:
+#   * [VỊ THẾ TÀI KHOẢN QUẢN TRỊ LỚN NHẤT (MASTER ADMIN - admin@ceohn10.vn)]:
+#     - admin@ceohn10.vn là tài khoản Quản trị lớn nhất (Master Platform Admin), mật khẩu khởi tạo 123456 trên CSDL PostgreSQL chuẩn 113.20.107.184:6432.
+#     - Tài khoản này có toàn quyền tạo mới tài khoản quản trị/học viên khác, phân bổ ban chuyên môn, gán vai trò RBAC, cập nhật trạng thái (active/locked) và đặt lại mật khẩu.
+#   * [GỠ BỎ RÀNG BUỘC CHẶN ĐĂNG NHẬP ĐƠN LẺ - CHO PHÉP TÀI KHOẢN HỢP LỆ ĐĂNG NHẬP]:
+#     - auth.service.ts -> validateUser(): Gỡ bỏ điều kiện chặn chỉ cho 1 tài khoản đăng nhập. Mọi tài khoản hợp lệ có trong bảng public.vione_users với mật khẩu Bcrypt chính xác đều được phép đăng nhập.
+#     - AuthContext.tsx: Gỡ bỏ logic cưỡng chế đăng xuất nếu không phải admin@ceohn10.vn, bảo vệ phiên đăng nhập hợp lệ cho các tài khoản được cấp phép.
+#   * [QUYỀN TẠO TÀI KHOẢN & PHÂN QUYỀN TOÀN DIỆN]:
+#     - users.controller.ts: Hàm checkIsAdminUser(req) xác thực quyền tối cao cho admin@ceohn10.vn và role platform_admin trên toàn bộ các endpoint /users (POST, PUT, PATCH, DELETE, reset-password).
+#     - users.service.ts: adminCreateUser() tự động lưu vào public.vione_users (Bcrypt hash salt 10), liên kết với public.members, gán vai trò trong public.user_roles và public.memberships.
+#     - accounts.tsx: Giao diện Thêm mới tài khoản gọi trực tiếp API Backend POST /users với mật khẩu khởi tạo (mặc định 123456), gán vai trò hệ thống và ban chuyên môn ngay lập tức vào CSDL.
+#     - accounts.tsx: Bổ sung chức năng Đặt lại mật khẩu (nút KeyRound) gọi POST /users/:id/reset-password cho từng tài khoản.
+#   * [TUÂN THỦ CSDL & GIT]: CSDL duy nhất 113.20.107.184:6432 (ceohn10_project). Tuyệt đối không git commit / git push. Type check đạt 0 lỗi (Exit code 0 trên cả BE và FE).
 # 19/11/2026 (v12.38) — KHẮC PHỤC TRIỆT ĐỂ LỖI "Unauthorized: No token provided" & THIẾT LẬP TÀI KHOẢN DUY NHẤT admin@ceohn10.vn (ROLE PLATFORM_ADMIN) CÓ QUYỀN ĐĂNG NHẬP:
 #   * [THIẾT LẬP CSDL CHUẨN 113.20.107.184:6432 (TUYỆT ĐỐI KHÔNG FAKE/MOCK)]:
 #     - Tạo và kích hoạt tài khoản Master Platform Admin duy nhất trên CSDL PostgreSQL:

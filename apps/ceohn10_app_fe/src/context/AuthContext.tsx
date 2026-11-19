@@ -165,13 +165,21 @@ export function isTokenValid(token: string): boolean {
 
 function tokenToUser(decoded: Record<string, any>): AppUser {
   const email = decoded.email || decoded.username || '';
-  const role = decoded.role || decoded.user_role || decoded.user_metadata?.role || (email.toLowerCase().includes('admin') ? 'admin' : 'member');
-  const department = decoded.department || '';
-  const roles = decoded.roles || [role];
-  const executiveRole = decoded.executive_role || decoded.executiveRole || '';
+  const isPlatformAdmin =
+    email.toLowerCase() === 'admin@ceohn10.vn' ||
+    decoded.role === 'platform_admin' ||
+    Boolean(decoded.isPlatformAdmin);
+  const role = isPlatformAdmin
+    ? 'platform_admin'
+    : (decoded.role || decoded.user_role || decoded.user_metadata?.role || (email.toLowerCase().includes('admin') ? 'admin' : 'member'));
+  const department = decoded.department || (isPlatformAdmin ? 'Ban Quản Trị Hệ Thống' : '');
+  const roles = isPlatformAdmin
+    ? Array.from(new Set(['platform_admin', 'admin', 'quan_tri', ...(decoded.roles || [])]))
+    : (decoded.roles || [role]);
+  const executiveRole = decoded.executive_role || decoded.executiveRole || (isPlatformAdmin ? 'platform_admin' : '');
   const isPresident = Boolean(decoded.isPresident || role === 'chu_tich' || role === 'president');
-  const isAdmin = Boolean(decoded.isAdmin || isPresident || role === 'admin' || role === 'quan_tri');
-  const isExecutive = Boolean(decoded.isExecutive || role === 'ban_dieu_hanh' || role === 'bqt');
+  const isAdmin = Boolean(decoded.isAdmin || isPresident || role === 'admin' || role === 'quan_tri' || isPlatformAdmin);
+  const isExecutive = Boolean(decoded.isExecutive || role === 'ban_dieu_hanh' || role === 'bqt' || isPlatformAdmin);
   const isGeneralSecretary = Boolean(decoded.isGeneralSecretary || role === 'tong_thu_ky');
   const isDepartmentLeader = Boolean(decoded.isDepartmentLeader || role.startsWith('truong_ban_'));
 
@@ -179,7 +187,7 @@ function tokenToUser(decoded: Record<string, any>): AppUser {
     ? decoded.permissions
     : Array.isArray(decoded.user_metadata?.permissions)
       ? decoded.user_metadata.permissions
-      : isAdmin
+      : (isAdmin || isPlatformAdmin)
         ? ['admin:full_access', 'marketplace:manage', 'event:manage', 'news:manage', 'member:manage', 'event:scan_qr']
         : ['marketplace:view', 'marketplace:post', 'event:view', 'news:view', 'member:view'];
 
@@ -207,6 +215,7 @@ function tokenToUser(decoded: Record<string, any>): AppUser {
     memberId: decoded.memberId || null,
     isPresident,
     isAdmin,
+    isPlatformAdmin,
     isExecutive,
     isGeneralSecretary,
     isDepartmentLeader,
@@ -299,13 +308,22 @@ async function apiRefresh(refreshToken: string): Promise<AppSession | null> {
 function mapApiUser(apiUser: any, accessToken: string): AppUser {
   const decoded = decodeJwt(accessToken) || {};
   const email = apiUser?.email || apiUser?.username || decoded.email || decoded.username || '';
-  const role = apiUser?.role || decoded.role || decoded.user_role || (email.toLowerCase().includes('admin') ? 'admin' : 'member');
-  const department = apiUser?.department || decoded.department || '';
-  const roles = apiUser?.roles || decoded.roles || [role];
-  const executiveRole = apiUser?.executive_role || apiUser?.executiveRole || decoded.executive_role || decoded.executiveRole || '';
+  const isPlatformAdmin =
+    email.toLowerCase() === 'admin@ceohn10.vn' ||
+    apiUser?.role === 'platform_admin' ||
+    decoded.role === 'platform_admin' ||
+    Boolean(apiUser?.isPlatformAdmin || decoded.isPlatformAdmin);
+  const role = isPlatformAdmin
+    ? 'platform_admin'
+    : (apiUser?.role || decoded.role || decoded.user_role || (email.toLowerCase().includes('admin') ? 'admin' : 'member'));
+  const department = apiUser?.department || decoded.department || (isPlatformAdmin ? 'Ban Quản Trị Hệ Thống' : '');
+  const roles = isPlatformAdmin
+    ? Array.from(new Set(['platform_admin', 'admin', 'quan_tri', ...(apiUser?.roles || decoded.roles || [])]))
+    : (apiUser?.roles || decoded.roles || [role]);
+  const executiveRole = apiUser?.executive_role || apiUser?.executiveRole || decoded.executive_role || decoded.executiveRole || (isPlatformAdmin ? 'platform_admin' : '');
   const isPresident = Boolean(apiUser?.isPresident || decoded.isPresident || role === 'chu_tich' || role === 'president');
-  const isAdmin = Boolean(apiUser?.isAdmin || decoded.isAdmin || isPresident || role === 'admin' || role === 'quan_tri');
-  const isExecutive = Boolean(apiUser?.isExecutive || decoded.isExecutive || role === 'ban_dieu_hanh' || role === 'bqt');
+  const isAdmin = Boolean(apiUser?.isAdmin || decoded.isAdmin || isPresident || role === 'admin' || role === 'quan_tri' || isPlatformAdmin);
+  const isExecutive = Boolean(apiUser?.isExecutive || decoded.isExecutive || role === 'ban_dieu_hanh' || role === 'bqt' || isPlatformAdmin);
   const isGeneralSecretary = Boolean(apiUser?.isGeneralSecretary || decoded.isGeneralSecretary || role === 'tong_thu_ky');
   const isDepartmentLeader = Boolean(apiUser?.isDepartmentLeader || decoded.isDepartmentLeader || role.startsWith('truong_ban_'));
 
@@ -313,7 +331,7 @@ function mapApiUser(apiUser: any, accessToken: string): AppUser {
     ? apiUser.permissions
     : Array.isArray(decoded.permissions)
       ? decoded.permissions
-      : isAdmin
+      : (isAdmin || isPlatformAdmin)
         ? ['admin:full_access', 'marketplace:manage', 'event:manage', 'news:manage', 'member:manage', 'event:scan_qr']
         : ['marketplace:view', 'marketplace:post', 'event:view', 'news:view', 'member:view'];
 
@@ -389,6 +407,7 @@ function mapApiUser(apiUser: any, accessToken: string): AppUser {
     memberId: apiUser?.memberId || decoded.memberId || null,
     isPresident,
     isAdmin,
+    isPlatformAdmin,
     isExecutive,
     isGeneralSecretary,
     isDepartmentLeader,
@@ -548,19 +567,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         } catch { }
       });
 
-      // QUY CHUẨN TỐI CAO: CHỈ DUY NHẤT TÀI KHOẢN admin@ceohn10.vn ĐƯỢC PHÉP ĐĂNG NHẬP
-      // Nếu bộ nhớ đệm chứa tài khoản khác (ví dụ admin@connect.vn cũ), lập tức thanh lọc triệt để.
-      try {
-        const storedUser = localStorage.getItem('vibe_user');
-        if (storedUser) {
-          const parsed = JSON.parse(storedUser);
-          const uEmail = (parsed?.email || parsed?.username || '').toLowerCase();
-          if (uEmail && uEmail !== 'admin@ceohn10.vn') {
-            console.warn(`[ZeroTrust Gate] Thu hồi phiên đăng nhập tài khoản cũ (${uEmail}). Hệ thống chỉ cho phép admin@ceohn10.vn.`);
-            clearUserSessionData();
-          }
-        }
-      } catch { }
     }
 
     // Khởi động: đọc token từ localStorage
@@ -568,15 +574,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const refreshToken = localStorage.getItem('vibe_refresh_token');
 
     if (accessToken && isTokenValid(accessToken)) {
-      // Token còn hạn — kiểm tra tài khoản hợp lệ
+      // Token còn hạn — tải thông tin người dùng hợp lệ
       const decoded = decodeJwt(accessToken)!;
-      const uEmail = (decoded?.email || decoded?.username || '').toLowerCase();
-      if (uEmail && uEmail !== 'admin@ceohn10.vn') {
-        console.warn(`[ZeroTrust Gate] Token không thuộc tài khoản admin@ceohn10.vn. Hủy phiên.`);
-        clearUserSessionData();
-        setStatus('out');
-        return;
-      }
       const appUser = tokenToUser(decoded);
       const sess = buildSession(accessToken, refreshToken ?? '', appUser);
       applySession(sess);
@@ -584,12 +583,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // Access token hết hạn nhưng còn refresh token — tự động làm mới
       apiRefresh(refreshToken).then((newSession) => {
         if (newSession) {
-          const uEmail = (newSession.user?.email || newSession.user?.username || '').toLowerCase();
-          if (uEmail && uEmail !== 'admin@ceohn10.vn') {
-            clearUserSessionData();
-            setStatus('out');
-            return;
-          }
           applySession(newSession);
         } else {
           localStorage.removeItem('vibe_token');

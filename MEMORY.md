@@ -1,5 +1,37 @@
 # System Memory & Architecture
 
+- **Bản cập nhật ngày 19/11/2026 (v12.39): Xác Lập `admin@ceohn10.vn` Là Tài Khoản Quản Trị Tối Cao (Master / Platform Admin), Cho Phép Tạo Tài Khoản Khác, Phân Quyền Linh Hoạt & Mở Rộng Quyền Đăng Nhập Cho Các Tài Khoản Hợp Lệ**:
+  - **1. Bối cảnh & Yêu cầu người dùng**:
+    * Không giới hạn chỉ duy nhất `admin@ceohn10.vn` được đăng nhập vào hệ thống.
+    * Tài khoản `admin@ceohn10.vn` (mật khẩu `123456`) giữ vị thế Quản Trị Lớn Nhất (Master Platform Admin / Supreme Admin).
+    * Tài khoản `admin@ceohn10.vn` có toàn quyền tạo mới tài khoản quản trị/học viên khác, gán ban chuyên môn, phân quyền vai trò (Role Assignment & RBAC), đổi trạng thái và đặt lại mật khẩu.
+    * Các tài khoản hợp lệ khác được tạo hoặc tồn tại trong CSDL `113.20.107.184:6432` đều được phép đăng nhập và sử dụng hệ thống theo đúng phân quyền tương ứng.
+  - **2. Backend NestJS (`apps/ceohn10_app_be`)**:
+    * `src/auth/auth.service.ts`:
+      - Tại `validateUser`: Gỡ bỏ hoàn toàn điều kiện chặn đơn lẻ (`normalizedIdentifier !== 'admin@ceohn10.vn'`). Cho phép tất cả người dùng hợp lệ trong bảng `public.vione_users` với mật khẩu bcrypt trùng khớp được đăng nhập bình thường.
+      - Tại `login`: Giữ vững cơ chế nhận diện `admin@ceohn10.vn` là `platform_admin` tối cao (`isPlatformAdmin: true`, `isAdmin: true`, `roles: ['platform_admin', 'admin', 'quan_tri']`), trong khi các tài khoản khác nhận diện vai trò thực tế từ CSDL.
+    * `src/users/users.controller.ts`:
+      - Triển khai phương thức kiểm tra quyền tập trung `checkIsAdminUser(req)`: Nhận diện `admin@ceohn10.vn`, `req.user?.role === 'platform_admin'`, `req.user?.isPlatformAdmin`, danh sách whitelist và `usersService.checkIsAdmin(userId)`.
+      - Áp dụng `checkIsAdminUser(req)` cho toàn bộ các endpoint quản trị tài khoản: `listUsers`, `getUserById`, `createUser`, `updateUser`, `toggleStatus`, `resetPassword`, `deleteUser`.
+    * `src/users/users.service.ts`:
+      - Tại `findById`: Bổ sung cơ chế tra cứu linh hoạt, nhận diện `admin@ceohn10.vn` và tra cứu ngược từ `public.members` sang `user_id` nếu người dùng truyền mã thành viên (code) hoặc email.
+      - Tại `adminCreateUser`: Sửa đổi kiểm tra trùng email (chỉ chặn khi email đó đã gắn với một tài khoản `user_id` khác). Tự động liên kết `user_id` với bản ghi `public.members` hiện hữu nếu chưa có tài khoản, hoặc khởi tạo mới bản ghi thành viên trong `public.members`. Mặc định mật khẩu khởi tạo là `123456` nếu không chỉ định.
+      - Tại `adminUpdateUser`: Đồng bộ trực tiếp thay đổi vai trò, phòng ban vào cả `public.vione_users`, `public.user_roles`, `public.members` và `public.memberships`.
+    * `src/users/dto/user.dto.ts`: Bổ sung các trường `code`, `phone`, `companyName` vào `AdminCreateUserDto` và `AdminUpdateUserDto`.
+  - **3. Frontend CRM Web (`apps/ceohn10_app_fe`)**:
+    * `src/context/AuthContext.tsx`:
+      - Gỡ bỏ logic cưỡng chế đăng xuất đối với tài khoản không phải `admin@ceohn10.vn`. Cho phép mọi phiên làm việc với JWT hợp lệ được duy trì bình thường.
+      - Nhận diện và thiết lập cờ `isPlatformAdmin` cho `admin@ceohn10.vn` và vai trò `platform_admin`.
+    * `src/routes/accounts.tsx`:
+      - Tại `handleCreateAccount`: Kết nối trực tiếp API Backend `POST /users`, lưu trữ tài khoản vào CSDL PostgreSQL (`public.vione_users`, `public.members`, `public.user_roles`) kèm mật khẩu khởi tạo và vai trò được phân bổ.
+      - Bổ sung ô nhập mật khẩu khởi tạo (`formPassword`, mặc định `123456`) trong Modal Thêm Mới Tài Khoản.
+      - Bổ sung chức năng Đặt Lại Mật Khẩu (nút `KeyRound` trên từng hàng và Modal Đặt Lại Mật Khẩu) gọi API `POST /users/:id/reset-password`.
+      - Cập nhật `handleUpdateAccount`: Đồng bộ cập nhật vai trò, phòng ban và trạng thái tài khoản vào cả `/members/:id/role-dept` và `/users/:id`.
+  - **4. Kiểm tra chất lượng (Verification)**:
+    * Backend `nest build`: Exit code 0 (0 errors).
+    * Frontend `tsc -p tsconfig.json --noEmit`: Exit code 0 (0 errors).
+    * Tuân thủ triệt để Rule 0 (CSDL 113.20.107.184:6432, No Mock) và Rule 1 (Tuyệt đối không git commit / git push).
+
 - **Bản cập nhật ngày 19/11/2026 (v12.38): Khắc Phục Triệt Để Sự Cố "Unauthorized: No token provided" & Thiết Lập Tài Khoản Duy Nhất `admin@ceohn10.vn` (Role `platform_admin`) Có Quyền Đăng Nhập Vào Hệ Thống**:
   - **1. Bối Cảnh & Nguyên Nhân Gốc Rễ Sự Cố Màn Hình Đỏ**:
     * **Nguyên nhân 1 (Phiên làm việc cũ tồn lưu trong LocalStorage)**: Trình duyệt của người dùng còn lưu trữ đối tượng `vibe_user` của tài khoản quản trị cũ (`admin@connect.vn`), khiến `useAuth().status` ở trạng thái `'in'` nhưng cookie xác thực JWT (`sb-access-token`) đã hết hạn hoặc bị xóa. Khi component `ExecutiveDashboard` tải trang, Server Function SSR (`useServerFn`) gửi request không có token hợp lệ, kích hoạt `requireNestAuth` ném ra lỗi `Unauthorized: No token provided`.
@@ -2576,6 +2608,38 @@
      - Tuân thủ nghiêm ngặt STRICT RULE 1: Tuyệt đối không tự động chạy `git push` hay `git commit`.
 
 # System Memory & Architecture
+
+- **Bản cập nhật ngày 19/11/2026 (v12.39): Xác Lập `admin@ceohn10.vn` Là Tài Khoản Quản Trị Tối Cao (Master / Platform Admin), Cho Phép Tạo Tài Khoản Khác, Phân Quyền Linh Hoạt & Mở Rộng Quyền Đăng Nhập Cho Các Tài Khoản Hợp Lệ**:
+  - **1. Bối cảnh & Yêu cầu người dùng**:
+    * Không giới hạn chỉ duy nhất `admin@ceohn10.vn` được đăng nhập vào hệ thống.
+    * Tài khoản `admin@ceohn10.vn` (mật khẩu `123456`) giữ vị thế Quản Trị Lớn Nhất (Master Platform Admin / Supreme Admin).
+    * Tài khoản `admin@ceohn10.vn` có toàn quyền tạo mới tài khoản quản trị/học viên khác, gán ban chuyên môn, phân quyền vai trò (Role Assignment & RBAC), đổi trạng thái và đặt lại mật khẩu.
+    * Các tài khoản hợp lệ khác được tạo hoặc tồn tại trong CSDL `113.20.107.184:6432` đều được phép đăng nhập và sử dụng hệ thống theo đúng phân quyền tương ứng.
+  - **2. Backend NestJS (`apps/ceohn10_app_be`)**:
+    * `src/auth/auth.service.ts`:
+      - Tại `validateUser`: Gỡ bỏ hoàn toàn điều kiện chặn đơn lẻ (`normalizedIdentifier !== 'admin@ceohn10.vn'`). Cho phép tất cả người dùng hợp lệ trong bảng `public.vione_users` với mật khẩu bcrypt trùng khớp được đăng nhập bình thường.
+      - Tại `login`: Giữ vững cơ chế nhận diện `admin@ceohn10.vn` là `platform_admin` tối cao (`isPlatformAdmin: true`, `isAdmin: true`, `roles: ['platform_admin', 'admin', 'quan_tri']`), trong khi các tài khoản khác nhận diện vai trò thực tế từ CSDL.
+    * `src/users/users.controller.ts`:
+      - Triển khai phương thức kiểm tra quyền tập trung `checkIsAdminUser(req)`: Nhận diện `admin@ceohn10.vn`, `req.user?.role === 'platform_admin'`, `req.user?.isPlatformAdmin`, danh sách whitelist và `usersService.checkIsAdmin(userId)`.
+      - Áp dụng `checkIsAdminUser(req)` cho toàn bộ các endpoint quản trị tài khoản: `listUsers`, `getUserById`, `createUser`, `updateUser`, `toggleStatus`, `resetPassword`, `deleteUser`.
+    * `src/users/users.service.ts`:
+      - Tại `findById`: Bổ sung cơ chế tra cứu linh hoạt, nhận diện `admin@ceohn10.vn` và tra cứu ngược từ `public.members` sang `user_id` nếu người dùng truyền mã thành viên (code) hoặc email.
+      - Tại `adminCreateUser`: Sửa đổi kiểm tra trùng email (chỉ chặn khi email đó đã gắn với một tài khoản `user_id` khác). Tự động liên kết `user_id` với bản ghi `public.members` hiện hữu nếu chưa có tài khoản, hoặc khởi tạo mới bản ghi thành viên trong `public.members`. Mặc định mật khẩu khởi tạo là `123456` nếu không chỉ định.
+      - Tại `adminUpdateUser`: Đồng bộ trực tiếp thay đổi vai trò, phòng ban vào cả `public.vione_users`, `public.user_roles`, `public.members` và `public.memberships`.
+    * `src/users/dto/user.dto.ts`: Bổ sung các trường `code`, `phone`, `companyName` vào `AdminCreateUserDto` và `AdminUpdateUserDto`.
+  - **3. Frontend CRM Web (`apps/ceohn10_app_fe`)**:
+    * `src/context/AuthContext.tsx`:
+      - Gỡ bỏ logic cưỡng chế đăng xuất đối với tài khoản không phải `admin@ceohn10.vn`. Cho phép mọi phiên làm việc với JWT hợp lệ được duy trì bình thường.
+      - Nhận diện và thiết lập cờ `isPlatformAdmin` cho `admin@ceohn10.vn` và vai trò `platform_admin`.
+    * `src/routes/accounts.tsx`:
+      - Tại `handleCreateAccount`: Kết nối trực tiếp API Backend `POST /users`, lưu trữ tài khoản vào CSDL PostgreSQL (`public.vione_users`, `public.members`, `public.user_roles`) kèm mật khẩu khởi tạo và vai trò được phân bổ.
+      - Bổ sung ô nhập mật khẩu khởi tạo (`formPassword`, mặc định `123456`) trong Modal Thêm Mới Tài Khoản.
+      - Bổ sung chức năng Đặt Lại Mật Khẩu (nút `KeyRound` trên từng hàng và Modal Đặt Lại Mật Khẩu) gọi API `POST /users/:id/reset-password`.
+      - Cập nhật `handleUpdateAccount`: Đồng bộ cập nhật vai trò, phòng ban và trạng thái tài khoản vào cả `/members/:id/role-dept` và `/users/:id`.
+  - **4. Kiểm tra chất lượng (Verification)**:
+    * Backend `nest build`: Exit code 0 (0 errors).
+    * Frontend `tsc -p tsconfig.json --noEmit`: Exit code 0 (0 errors).
+    * Tuân thủ triệt để Rule 0 (CSDL 113.20.107.184:6432, No Mock) và Rule 1 (Tuyệt đối không git commit / git push).
 
 - **Bản cập nhật ngày 19/11/2026 (v12.38): Khắc Phục Triệt Để Sự Cố "Unauthorized: No token provided" & Thiết Lập Tài Khoản Duy Nhất `admin@ceohn10.vn` (Role `platform_admin`) Có Quyền Đăng Nhập Vào Hệ Thống**:
   - **1. Bối Cảnh & Nguyên Nhân Gốc Rễ Sự Cố Màn Hình Đỏ**:
@@ -6317,6 +6381,38 @@
      - Tuân thủ nghiêm ngặt STRICT RULE 1: Tuyệt đối không tự động chạy `git push` hay `git commit`.
 
 # System Memory & Architecture
+
+- **Bản cập nhật ngày 19/11/2026 (v12.39): Xác Lập `admin@ceohn10.vn` Là Tài Khoản Quản Trị Tối Cao (Master / Platform Admin), Cho Phép Tạo Tài Khoản Khác, Phân Quyền Linh Hoạt & Mở Rộng Quyền Đăng Nhập Cho Các Tài Khoản Hợp Lệ**:
+  - **1. Bối cảnh & Yêu cầu người dùng**:
+    * Không giới hạn chỉ duy nhất `admin@ceohn10.vn` được đăng nhập vào hệ thống.
+    * Tài khoản `admin@ceohn10.vn` (mật khẩu `123456`) giữ vị thế Quản Trị Lớn Nhất (Master Platform Admin / Supreme Admin).
+    * Tài khoản `admin@ceohn10.vn` có toàn quyền tạo mới tài khoản quản trị/học viên khác, gán ban chuyên môn, phân quyền vai trò (Role Assignment & RBAC), đổi trạng thái và đặt lại mật khẩu.
+    * Các tài khoản hợp lệ khác được tạo hoặc tồn tại trong CSDL `113.20.107.184:6432` đều được phép đăng nhập và sử dụng hệ thống theo đúng phân quyền tương ứng.
+  - **2. Backend NestJS (`apps/ceohn10_app_be`)**:
+    * `src/auth/auth.service.ts`:
+      - Tại `validateUser`: Gỡ bỏ hoàn toàn điều kiện chặn đơn lẻ (`normalizedIdentifier !== 'admin@ceohn10.vn'`). Cho phép tất cả người dùng hợp lệ trong bảng `public.vione_users` với mật khẩu bcrypt trùng khớp được đăng nhập bình thường.
+      - Tại `login`: Giữ vững cơ chế nhận diện `admin@ceohn10.vn` là `platform_admin` tối cao (`isPlatformAdmin: true`, `isAdmin: true`, `roles: ['platform_admin', 'admin', 'quan_tri']`), trong khi các tài khoản khác nhận diện vai trò thực tế từ CSDL.
+    * `src/users/users.controller.ts`:
+      - Triển khai phương thức kiểm tra quyền tập trung `checkIsAdminUser(req)`: Nhận diện `admin@ceohn10.vn`, `req.user?.role === 'platform_admin'`, `req.user?.isPlatformAdmin`, danh sách whitelist và `usersService.checkIsAdmin(userId)`.
+      - Áp dụng `checkIsAdminUser(req)` cho toàn bộ các endpoint quản trị tài khoản: `listUsers`, `getUserById`, `createUser`, `updateUser`, `toggleStatus`, `resetPassword`, `deleteUser`.
+    * `src/users/users.service.ts`:
+      - Tại `findById`: Bổ sung cơ chế tra cứu linh hoạt, nhận diện `admin@ceohn10.vn` và tra cứu ngược từ `public.members` sang `user_id` nếu người dùng truyền mã thành viên (code) hoặc email.
+      - Tại `adminCreateUser`: Sửa đổi kiểm tra trùng email (chỉ chặn khi email đó đã gắn với một tài khoản `user_id` khác). Tự động liên kết `user_id` với bản ghi `public.members` hiện hữu nếu chưa có tài khoản, hoặc khởi tạo mới bản ghi thành viên trong `public.members`. Mặc định mật khẩu khởi tạo là `123456` nếu không chỉ định.
+      - Tại `adminUpdateUser`: Đồng bộ trực tiếp thay đổi vai trò, phòng ban vào cả `public.vione_users`, `public.user_roles`, `public.members` và `public.memberships`.
+    * `src/users/dto/user.dto.ts`: Bổ sung các trường `code`, `phone`, `companyName` vào `AdminCreateUserDto` và `AdminUpdateUserDto`.
+  - **3. Frontend CRM Web (`apps/ceohn10_app_fe`)**:
+    * `src/context/AuthContext.tsx`:
+      - Gỡ bỏ logic cưỡng chế đăng xuất đối với tài khoản không phải `admin@ceohn10.vn`. Cho phép mọi phiên làm việc với JWT hợp lệ được duy trì bình thường.
+      - Nhận diện và thiết lập cờ `isPlatformAdmin` cho `admin@ceohn10.vn` và vai trò `platform_admin`.
+    * `src/routes/accounts.tsx`:
+      - Tại `handleCreateAccount`: Kết nối trực tiếp API Backend `POST /users`, lưu trữ tài khoản vào CSDL PostgreSQL (`public.vione_users`, `public.members`, `public.user_roles`) kèm mật khẩu khởi tạo và vai trò được phân bổ.
+      - Bổ sung ô nhập mật khẩu khởi tạo (`formPassword`, mặc định `123456`) trong Modal Thêm Mới Tài Khoản.
+      - Bổ sung chức năng Đặt Lại Mật Khẩu (nút `KeyRound` trên từng hàng và Modal Đặt Lại Mật Khẩu) gọi API `POST /users/:id/reset-password`.
+      - Cập nhật `handleUpdateAccount`: Đồng bộ cập nhật vai trò, phòng ban và trạng thái tài khoản vào cả `/members/:id/role-dept` và `/users/:id`.
+  - **4. Kiểm tra chất lượng (Verification)**:
+    * Backend `nest build`: Exit code 0 (0 errors).
+    * Frontend `tsc -p tsconfig.json --noEmit`: Exit code 0 (0 errors).
+    * Tuân thủ triệt để Rule 0 (CSDL 113.20.107.184:6432, No Mock) và Rule 1 (Tuyệt đối không git commit / git push).
 
 - **Bản cập nhật ngày 19/11/2026 (v12.38): Khắc Phục Triệt Để Sự Cố "Unauthorized: No token provided" & Thiết Lập Tài Khoản Duy Nhất `admin@ceohn10.vn` (Role `platform_admin`) Có Quyền Đăng Nhập Vào Hệ Thống**:
   - **1. Bối Cảnh & Nguyên Nhân Gốc Rễ Sự Cố Màn Hình Đỏ**:

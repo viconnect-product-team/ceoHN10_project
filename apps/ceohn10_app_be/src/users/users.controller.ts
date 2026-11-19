@@ -77,16 +77,37 @@ export class UsersController {
 
   // ── ADMIN USER MANAGEMENT ──────────────────────────────────────────────────
 
+  private async checkIsAdminUser(req: any): Promise<boolean> {
+    const userEmail = (req.user?.email || req.user?.username || '').toLowerCase().trim();
+    const userId = req.user?.id || req.user?.sub || req.user?.userId;
+    const isPlatformAdmin =
+      userEmail === 'admin@ceohn10.vn' ||
+      req.user?.role === 'platform_admin' ||
+      Boolean(req.user?.isPlatformAdmin);
+    if (isPlatformAdmin) return true;
+
+    if (
+      [
+        'admin@ceohn10.vn',
+        'admin@viconnect.vn',
+        'infor@viconnect.vn',
+        'info@viconnect.vn',
+        'admin@connect.vn',
+      ].includes(userEmail)
+    ) {
+      return true;
+    }
+
+    if (userId && (await this.usersService.checkIsAdmin(userId))) {
+      return true;
+    }
+
+    return false;
+  }
+
   @Get()
   async listUsers(@Request() req: any, @Query() query: ListUsersQueryDto) {
-    const userEmail = (req.user?.email || '').toLowerCase().trim();
-    const userId = req.user?.id || req.user?.sub || req.user?.userId;
-    const isAdmin =
-      (userId ? await this.usersService.checkIsAdmin(userId) : false) ||
-      userEmail === 'admin@viconnect.vn' ||
-      userEmail === 'infor@viconnect.vn' ||
-      userEmail === 'info@viconnect.vn' ||
-      userEmail === 'admin@connect.vn';
+    const isAdmin = await this.checkIsAdminUser(req);
     if (!isAdmin) {
       throw new ForbiddenException(
         'Bạn không có quyền truy cập danh sách người dùng',
@@ -104,9 +125,7 @@ export class UsersController {
   @Get(':id')
   async getUserById(@Request() req: any, @Param('id') id: string) {
     const userId = req.user?.id || req.user?.sub || req.user?.userId;
-    const isAdmin =
-      (userId ? await this.usersService.checkIsAdmin(userId) : false) ||
-      ['admin@viconnect.vn', 'infor@viconnect.vn', 'admin@connect.vn'].includes((req.user?.email || '').toLowerCase().trim());
+    const isAdmin = await this.checkIsAdminUser(req);
     if (!isAdmin && userId !== id) {
       throw new ForbiddenException(
         'Không có quyền xem thông tin tài khoản này',
@@ -117,10 +136,7 @@ export class UsersController {
 
   @Post()
   async createUser(@Request() req: any, @Body() body: AdminCreateUserDto) {
-    const userId = req.user?.id || req.user?.sub || req.user?.userId;
-    const isAdmin =
-      (userId ? await this.usersService.checkIsAdmin(userId) : false) ||
-      ['admin@viconnect.vn', 'infor@viconnect.vn', 'admin@connect.vn'].includes((req.user?.email || '').toLowerCase().trim());
+    const isAdmin = await this.checkIsAdminUser(req);
     if (!isAdmin) {
       throw new ForbiddenException('Bạn không có quyền tạo tài khoản mới');
     }
@@ -133,10 +149,7 @@ export class UsersController {
     @Param('id') id: string,
     @Body() body: AdminUpdateUserDto,
   ) {
-    const userId = req.user?.id || req.user?.sub || req.user?.userId;
-    const isAdmin =
-      (userId ? await this.usersService.checkIsAdmin(userId) : false) ||
-      ['admin@viconnect.vn', 'infor@viconnect.vn', 'admin@connect.vn'].includes((req.user?.email || '').toLowerCase().trim());
+    const isAdmin = await this.checkIsAdminUser(req);
     if (!isAdmin) {
       throw new ForbiddenException(
         'Bạn không có quyền chỉnh sửa tài khoản này',
@@ -151,10 +164,7 @@ export class UsersController {
     @Param('id') id: string,
     @Body() body: AdminToggleStatusDto,
   ) {
-    const userId = req.user?.id || req.user?.sub || req.user?.userId;
-    const isAdmin =
-      (userId ? await this.usersService.checkIsAdmin(userId) : false) ||
-      ['admin@viconnect.vn', 'infor@viconnect.vn', 'admin@connect.vn'].includes((req.user?.email || '').toLowerCase().trim());
+    const isAdmin = await this.checkIsAdminUser(req);
     if (!isAdmin) {
       throw new ForbiddenException(
         'Bạn không có quyền thay đổi trạng thái tài khoản',
@@ -169,10 +179,7 @@ export class UsersController {
     @Param('id') id: string,
     @Body() body: AdminResetPasswordDto,
   ) {
-    const userId = req.user?.id || req.user?.sub || req.user?.userId;
-    const isAdmin =
-      (userId ? await this.usersService.checkIsAdmin(userId) : false) ||
-      ['admin@viconnect.vn', 'infor@viconnect.vn', 'admin@connect.vn'].includes((req.user?.email || '').toLowerCase().trim());
+    const isAdmin = await this.checkIsAdminUser(req);
     if (!isAdmin) {
       throw new ForbiddenException(
         'Bạn không có quyền đặt lại mật khẩu tài khoản này',
@@ -184,9 +191,7 @@ export class UsersController {
   @Delete(':id')
   async deleteUser(@Request() req: any, @Param('id') id: string) {
     const userId = req.user?.id || req.user?.sub || req.user?.userId;
-    const isAdmin =
-      (userId ? await this.usersService.checkIsAdmin(userId) : false) ||
-      ['admin@viconnect.vn', 'infor@viconnect.vn', 'admin@connect.vn'].includes((req.user?.email || '').toLowerCase().trim());
+    const isAdmin = await this.checkIsAdminUser(req);
     if (!isAdmin) {
       throw new ForbiddenException(
         'Bạn không có quyền xóa tài khoản người dùng',

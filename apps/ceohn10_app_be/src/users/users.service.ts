@@ -681,6 +681,17 @@ export class UsersService implements OnModuleInit {
       } as vione_users;
     }
 
+    if (this.prisma) {
+      const memRow = await this.prisma.$queryRaw<any[]>`
+        SELECT user_id FROM public.members 
+        WHERE (code = ${username} OR LOWER(email) = LOWER(${username})) AND user_id IS NOT NULL 
+        LIMIT 1
+      `.catch(() => []);
+      if (memRow.length > 0 && memRow[0].user_id) {
+        return this.usersRepo.findById(memRow[0].user_id);
+      }
+    }
+
     return null;
   }
 
@@ -695,6 +706,19 @@ export class UsersService implements OnModuleInit {
       const user = await this.usersRepo.findById(id);
       if (user) {
         return user;
+      }
+    }
+
+    if (
+      id === '00000000-0000-4000-8000-000000000001' ||
+      id === 'HN10-001' ||
+      id.toLowerCase() === 'admin@ceohn10.vn'
+    ) {
+      const platformAdmin =
+        (await this.usersRepo.findByUsername('admin@ceohn10.vn')) ||
+        (await this.usersRepo.findByEmail('admin@ceohn10.vn'));
+      if (platformAdmin) {
+        return platformAdmin;
       }
     }
 
@@ -755,6 +779,17 @@ export class UsersService implements OnModuleInit {
         created_at: new Date('2026-10-20'),
         updated_at: new Date(),
       } as vione_users;
+    }
+
+    if (this.prisma) {
+      const memRow = await this.prisma.$queryRaw<any[]>`
+        SELECT user_id FROM public.members 
+        WHERE (id::text = ${id} OR code = ${id} OR LOWER(email) = LOWER(${id})) AND user_id IS NOT NULL 
+        LIMIT 1
+      `.catch(() => []);
+      if (memRow.length > 0 && memRow[0].user_id) {
+        return this.usersRepo.findById(memRow[0].user_id);
+      }
     }
 
     return null;
@@ -2021,6 +2056,9 @@ export class UsersService implements OnModuleInit {
     email?: string;
     password?: string;
     name?: string;
+    code?: string;
+    phone?: string;
+    companyName?: string;
     role?: string | app_role;
     executiveRole?: string;
     department?: string;
@@ -2041,36 +2079,36 @@ export class UsersService implements OnModuleInit {
       throw new BadRequestException('Tên đăng nhập hoặc Email đã tồn tại');
     }
 
-    // Kiểm tra trùng email trong bảng members
+    // Kiểm tra trùng email trong bảng members nếu đã có user_id
     if (cleanEmail) {
       const existingMember = await this.prisma.$queryRaw<any[]>`
-        SELECT id FROM public.members WHERE LOWER(email) = ${cleanEmail} LIMIT 1
+        SELECT id, user_id FROM public.members WHERE LOWER(email) = ${cleanEmail} LIMIT 1
       `.catch(() => []);
-      if (existingMember.length > 0) {
+      if (existingMember.length > 0 && existingMember[0].user_id) {
         throw new BadRequestException(
-          'Địa chỉ Email này đã được sử dụng bởi một Học viên trên hệ thống',
+          'Địa chỉ Email này đã được sử dụng bởi một tài khoản khác trên hệ thống',
         );
       }
     }
 
     // Kiểm tra trùng số điện thoại nếu username là số điện thoại
-    const potentialPhone = username.replace(/[^0-9+]/g, '');
+    const potentialPhone = (data.phone || username).replace(/[^0-9+]/g, '');
     if (potentialPhone.length >= 9) {
       const existingPhone = await this.prisma.$queryRaw<any[]>`
-        SELECT id FROM public.members WHERE regexp_replace(phone, '[^0-9+]', '', 'g') = ${potentialPhone}
+        SELECT id FROM public.members WHERE regexp_replace(phone, '[^0-9+]', '', 'g') = ${potentialPhone} AND user_id IS NOT NULL
         UNION
         SELECT user_id as id FROM public.user_profiles WHERE regexp_replace(phone, '[^0-9+]', '', 'g') = ${potentialPhone}
         LIMIT 1
       `.catch(() => []);
       if (existingPhone.length > 0) {
         throw new BadRequestException(
-          'Số điện thoại này đã được sử dụng trên hệ thống',
+          'Số điện thoại này đã được sử dụng bởi một tài khoản khác trên hệ thống',
         );
       }
     }
 
     const rawPassword =
-      data.password && data.password.trim() ? data.password : 'CEO HN10@123';
+      data.password && data.password.trim() ? data.password.trim() : '123456';
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(rawPassword, salt);
 
@@ -2154,6 +2192,65 @@ export class UsersService implements OnModuleInit {
       rawDept,
       rawRole,
     ).catch(() => { });
+
+    // Đồng bộ vào bảng public.members
+    const memRows = cleanEmail
+      ? await this.prisma.$queryRaw<any[]>`
+          SELECT id, user_id FROM public.members WHERE LOWER(email) = ${cleanEmail} LIMIT 1
+        `.catch(() => [])
+      : [];
+
+    const memberCode =
+      (data.code && data.code.trim()) ||
+      `HN10-${Math.floor(100 + Math.random() * 900)}`;
+
+    if (memRows.length > 0) {
+      await this.prisma.$executeRaw`
+        UPDATE public.members
+        SET user_id = ${newUser.id}::uuid,
+            name = COALESCE(NULLIF(${data.name || ''}, ''), name),
+            phone = COALESCE(NULLIF(${potentialPhone || data.phone || ''}, ''), phone),
+            company_name = COALESCE(NULLIF(${data.companyName || ''}, ''), company_name),
+            department = COALESCE(NULLIF(${rawDept}, ''), department),
+            executive_role = COALESCE(NULLIF(${rawRole}, ''), executive_role),
+            status = 'active',
+            updated_at = NOW()
+        WHERE id = ${memRows[0].id}
+      `.catch(() => {});
+    } else {
+      await this.prisma.$executeRaw`
+        INSERT INTO public.members (
+          id, user_id, code, name, email, phone, company_name, department, executive_role, status,
+          association_id, type, level, industry, region, payment_status, fee_paid, created_at, updated_at
+        ) VALUES (
+          ${memberCode},
+          ${newUser.id}::uuid,
+          ${memberCode},
+          ${data.name ? data.name.trim() : username},
+          ${cleanEmail || `${username}@ceohn10.vn`},
+          ${potentialPhone || data.phone || null},
+          ${data.companyName ? data.companyName.trim() : 'CLB Doanh Nhân CEO HN10'},
+          ${rawDept},
+          ${rawRole},
+          'active',
+          ${assocId}::uuid,
+          'company',
+          'memberLevel.standard',
+          'ind.service',
+          'region.north',
+          'paid',
+          true,
+          NOW(),
+          NOW()
+        )
+        ON CONFLICT (id) DO UPDATE SET
+          user_id = ${newUser.id}::uuid,
+          department = EXCLUDED.department,
+          executive_role = EXCLUDED.executive_role,
+          name = EXCLUDED.name,
+          updated_at = NOW()
+      `.catch(() => {});
+    }
 
     return this.getAccountDetails(newUser.id);
   }

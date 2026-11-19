@@ -80,16 +80,10 @@ export class AuthService implements OnModuleInit {
     const cleanPass = (pass || '').trim();
     const normalizedPass = cleanPass.replace(/[\u200B-\u200D\uFEFF\u00A0\r\n\t]/g, '').trim();
 
-    // RÀNG BUỘC BẢO MẬT TỐI CAO THEO QUY CHUẨN CEO HN10 (STRICT NO-MOCK & SINGLE PLATFORM ADMIN LAW):
-    // Tuyệt đối không fake dữ liệu. Hiện tại chỉ cho phép duy nhất 1 tài khoản có role platform admin
-    // admin@ceohn10.vn / 123456 làm tài khoản duy nhất được phép đăng nhập vào hệ thống.
-    const normalizedIdentifier = cleanUser.toLowerCase();
-    if (normalizedIdentifier !== 'admin@ceohn10.vn') {
-      throw new UnauthorizedException(
-        'Hệ thống hiện tại chỉ cho phép duy nhất tài khoản Platform Admin (admin@ceohn10.vn) đăng nhập.',
-      );
-    }
-
+    // QUY CHUẨN CEO HN10:
+    // admin@ceohn10.vn là Platform Admin tối cao (Master Admin - Quản trị lớn nhất).
+    // admin@ceohn10.vn có toàn quyền tạo tài khoản và phân quyền cho các tài khoản khác.
+    // Các tài khoản hợp lệ khác trong CSDL vẫn được phép đăng nhập theo phân quyền tương ứng.
     const user = await this.usersService.findByUsername(cleanUser);
     if (!user || !user.password) {
       return null;
