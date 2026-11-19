@@ -108,7 +108,11 @@ function CrmAdminAuthPage() {
     const pref = getRememberPreference();
     setRemember(pref);
     const saved = getRememberedEmail();
-    if (saved) setEmail((v) => v || saved);
+    if (saved && saved.toLowerCase() === "admin@ceohn10.vn") {
+      setEmail(saved);
+    } else {
+      setEmail("admin@ceohn10.vn");
+    }
   }, []);
 
   useEffect(() => {
@@ -293,7 +297,7 @@ function CrmAdminAuthPage() {
                   autoComplete="username"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="admin@viconnect.vn hoặc email@domain.com"
+                  placeholder="admin@ceohn10.vn"
                   className="h-11 w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 pl-10 pr-4 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 outline-none transition-all focus:border-[#003B95] focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-[#003B95]/15"
                 />
               </div>

@@ -426,4 +426,82 @@ export class AdminController {
   async broadcastInvitation(@Request() req: any, @Body() body: any) {
     return this.adminService.broadcastInvitation(body, req.user?.id);
   }
+
+  // ── MASTER ADMIN: [1. TỔNG QUAN] ──────────────────────────────────────────
+  @Get('master-overview')
+  @UseGuards(JwtAuthGuard)
+  async getMasterOverview() {
+    const [health, fundSurplus] = await Promise.all([
+      this.adminService.getMasterPlatformHealth(),
+      this.adminService.getMasterFundSurplusReport(),
+    ]);
+    return {
+      success: true,
+      platformStatus: health,
+      fundSurplus,
+    };
+  }
+
+  @Get('platform-health')
+  @UseGuards(JwtAuthGuard)
+  async getPlatformHealth() {
+    return this.adminService.getMasterPlatformHealth();
+  }
+
+  @Get('fund-surplus')
+  @UseGuards(JwtAuthGuard)
+  async getFundSurplus() {
+    return this.adminService.getMasterFundSurplusReport();
+  }
+
+  // ── MASTER ADMIN: [2. QUẢN LÝ TÀI KHOẢN QUẢN TRỊ ĐƯỢC ĐĂNG NHẬP] ──────────
+  @Get('admin-sessions')
+  @UseGuards(JwtAuthGuard)
+  async getAdminSessions() {
+    return this.adminService.getAdminAccountsAndSessions();
+  }
+
+  @Post('admin-sessions/revoke')
+  @UseGuards(JwtAuthGuard)
+  async revokeAdminSession(@Request() req: any, @Body('sessionId') sessionId: string) {
+    return this.adminService.revokeAdminSession(sessionId, req.user?.id);
+  }
+
+  @Post('admin-accounts/:id/toggle-status')
+  @UseGuards(JwtAuthGuard)
+  async toggleAdminAccountStatus(
+    @Param('id') id: string,
+    @Body('isActive') isActive: boolean,
+  ) {
+    return this.adminService.toggleAdminAccountStatus(id, isActive);
+  }
+
+  // ── MASTER ADMIN: [3. NHÓM PHẦN MỀM] - CẤU HÌNH PHẦN MỀM NỀN TẢNG KHÁC ──
+  @Get('integrated-platforms')
+  @UseGuards(JwtAuthGuard)
+  async getIntegratedPlatforms() {
+    const platforms = await this.adminService.getIntegratedPlatforms();
+    return { success: true, platforms };
+  }
+
+  @Post('integrated-platforms')
+  @UseGuards(JwtAuthGuard)
+  async saveIntegratedPlatform(@Request() req: any, @Body() body: any) {
+    return this.adminService.saveIntegratedPlatform(body, req.user?.id);
+  }
+
+  @Delete('integrated-platforms/:id')
+  @UseGuards(JwtAuthGuard)
+  async deleteIntegratedPlatform(@Request() req: any, @Param('id') id: string) {
+    return this.adminService.deleteIntegratedPlatform(id, req.user?.id);
+  }
+
+  @Post('integrated-platforms/test')
+  @UseGuards(JwtAuthGuard)
+  async testPlatformConnection(
+    @Body('platformId') platformId: string,
+    @Body('endpointUrl') endpointUrl: string,
+  ) {
+    return this.adminService.testPlatformConnection(platformId, endpointUrl);
+  }
 }

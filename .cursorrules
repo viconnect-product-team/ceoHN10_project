@@ -1,6 +1,38 @@
 # ==============================================================================
 # BỘ LUẬT DỰ ÁN (PROJECT RULES & AI CODEGEN STANDARDS) - CEO HN10 PROJECT
 # Vai trò: Tech Lead | Định dạng: .cursorrules
+# 19/11/2026 (v12.38) — KHẮC PHỤC TRIỆT ĐỂ LỖI "Unauthorized: No token provided" & THIẾT LẬP TÀI KHOẢN DUY NHẤT admin@ceohn10.vn (ROLE PLATFORM_ADMIN) CÓ QUYỀN ĐĂNG NHẬP:
+#   * [THIẾT LẬP CSDL CHUẨN 113.20.107.184:6432 (TUYỆT ĐỐI KHÔNG FAKE/MOCK)]:
+#     - Tạo và kích hoạt tài khoản Master Platform Admin duy nhất trên CSDL PostgreSQL:
+#       + Bảng public.vione_users: id = '00000000-0000-4000-8000-000000000001', username / email = 'admin@ceohn10.vn', name = 'Master Platform Admin', password = bcrypt hash của 123456 ($2b$10$...).
+#       + Bảng public.members: id / user_id = '00000000-0000-4000-8000-000000000001', executive_role = 'platform_admin', department = 'Ban Quản Trị Hệ Thống', status = 'active'.
+#       + Bảng public.user_roles & public.memberships: Gán vai trò duy nhất 'platform_admin'.
+#   * [RÀNG BUỘC ĐỘC QUYỀN ĐĂNG NHẬP TẠI BACKEND (STRICT SINGLE-ACCOUNT GATE)]:
+#     - auth.service.ts -> validateUser(): Chặn đứng mọi tài khoản khác, chỉ cấp phép đăng nhập duy nhất cho admin@ceohn10.vn. Bất kỳ email nào khác lập tức bị từ chối với UnauthorizedException.
+#     - auth.service.ts -> login(): Cấp phát JWT token với role 'platform_admin', roleList ['platform_admin', 'admin', 'quan_tri'], cờ isPlatformAdmin: true, isAdmin: true.
+#     - users.service.ts -> getAccountDetails(): Cấp toàn quyền tối cao admin:full_access cho admin@ceohn10.vn.
+#   * [TỰ ĐỘNG THU HỒI PHIÊN CŨ & SỬA LỖI MÀN HÌNH ĐỎ FRONTEND]:
+#     - AuthContext.tsx: Tự động thanh lọc các token/user cũ lưu trong localStorage (như admin@connect.vn), đưa về trạng thái 'out' để redirect sạch sẽ sang trang /auth.
+#     - auth.tsx: Đặt mặc định và placeholder thành admin@ceohn10.vn.
+#     - StateKit.tsx: Nâng cấp ErrorState hiển thị nút "Đăng nhập lại (admin@ceohn10.vn)" khi gặp sự cố xác thực.
+#   * [CHUẨN HÓA NGINX REVERSE PROXY]:
+#     - deploy/ssl/nginx.conf: Thêm map $http_upgrade $connection_upgrade, thay thế proxy_set_header Connection "upgrade" bằng $connection_upgrade trên các API REST, triệt tiêu lỗi ERR_CONNECTION_CLOSED và ERR_HTTP2_PROTOCOL_ERROR.
+#   * [TUÂN THỦ CSDL & GIT]: CSDL duy nhất 113.20.107.184:6432 (ceohn10_project). Tuyệt đối không git commit / git push. Type check đạt 0 lỗi (Exit code 0 trên cả BE và FE).
+# 19/11/2026 (v12.37) — TÁI CẤU TRÚC KIẾN TRÚC MASTER ADMIN 3 TRỤ CỘT (`QUẢN TRỊ LỚN NHẤT - MASTER ADMIN - CEOHN10`) & QUẢN LÝ CẤU HÌNH CÁC PHẦN MỀM NỀN TẢNG KHÁC:
+#   * [TRỤ CỘT 1: 1. TỔNG QUAN]:
+#     - Danh sách & trạng thái các phần mềm nền tảng của CEOHN10 (Web CRM, Mobile App, API Gateway, PostgreSQL CSDL 113.20.107.184:6432, Realtime WebSocket Hub) qua MasterPlatformStatusBar.
+#     - Báo cáo quỹ còn tồn (MasterFundSurplusWidget): Tự động đối soát Số dư tự tính = Tổng thu thực tế - Tổng chi thực tế từ CSDL PostgreSQL (không fake/mock), phân bổ 4 túi quỹ, biểu đồ dòng tiền 6 tháng.
+#     - Cung cấp route /admin/platforms và hiển thị trực quan ngay tại màn hình tổng quan Dashboard (ExecutiveDashboard.tsx).
+#   * [TRỤ CỘT 2: 2. QUẢN LÝ TÀI KHOẢN QUẢN TRỊ ĐƯỢC ĐĂNG NHẬP]:
+#     - Quản lý tài khoản quản trị đang đăng nhập, danh sách phiên làm việc active (IP, thiết bị, thời điểm đăng nhập) qua AdminSessionsManager và route /admin/sessions.
+#     - Cung cấp chức năng Thu hồi phiên làm việc từ xa và Tạm khóa / Mở khóa tài khoản quản trị khẩn cấp.
+#   * [TRỤ CỘT 3: 3. NHÓM PHẦN MỀM]:
+#     - 3.1 [Hệ thống & App CEOHN10]: Học viên (/members), Sự kiện (/events), Khai giảng & Đào tạo (/trainings), Tài chính (/finance-report), Phân quyền (/permissions), Tra cứu & Thống kê (/analytics).
+#     - 3.2 [Các phần mềm có thể tích hợp A, B, C / Mini App / Module khác]: Cấu hình động phần mềm nền tảng qua IntegratedPlatformsManager và route /admin/integrations.
+#     - Cung cấp modal thêm/chỉnh sửa cấu hình (Tên, Mã, Phân loại, Endpoint, Healthcheck, API Key, Webhook, Modules được cấp phép), nút Test Ping kết nối và lưu vào public.app_settings (key: crm_integrated_platforms).
+#   * [TÁI CẤU TRÚC ĐIỀU HƯỚNG SIDEBAR (Sidebar.tsx)]:
+#     - Chuẩn hóa điều hướng thành 3 nhóm lớn: 1. TỔNG QUAN, 2. QUẢN LÝ TÀI KHOẢN ĐĂNG NHẬP, 3.1. HỆ THỐNG & APP CEOHN10, 3.2. PHẦN MỀM TÍCH HỢP (A, B, C...).
+#   * [TUÂN THỦ CSDL & GIT]: CSDL duy nhất 113.20.107.184:6432 (ceohn10_project). Tuyệt đối không git commit / git push. Type check đạt 0 lỗi (Exit code 0 trên cả BE và FE).
 # 19/11/2026 (v12.36) — BẢO VỆ PHIÊN ĐĂNG NHẬP, TỰ ĐỘNG ĐỒNG BỘ COOKIE DOMAIN *.viconnect.vn, CHỐNG CRASH "Unauthorized: No token provided" & KHẮC PHỤC TRIỆT ĐỂ LỖI HTTP2 app-icon.png TRÊN DOMAIN CRM:
 #   * [TỰ ĐỘNG TÁI ĐỒNG BỘ COOKIE SESSION (ensureSessionCookiesSync)]:
 #     - Bất cứ khi nào gọi getAuthToken() hoặc trước khi gọi API, tự động nạp lại sb-access-token, vibe_token, access_token vào document.cookie với domain=.viconnect.vn.

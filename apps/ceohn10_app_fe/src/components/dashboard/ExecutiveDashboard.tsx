@@ -62,6 +62,9 @@ import { EmptyState, ErrorState, ListSkeleton, Skeleton } from "@/components/das
 import { useRole } from "@/hooks/use-role";
 import { useUnreadNotifications } from "@/hooks/use-unread-notifications";
 import { DEFAULT_MEMBERS } from "@/lib/members-data";
+import { MasterPlatformStatusBar } from "@/components/dashboard/MasterPlatformStatusBar";
+import { MasterFundSurplusWidget } from "@/components/dashboard/MasterFundSurplusWidget";
+import { fetchMasterOverview } from "@/lib/master-admin.functions";
 
 /* ----------------------------- helpers ----------------------------- */
 
@@ -418,6 +421,14 @@ export function ExecutiveDashboard({ authReady }: { authReady: boolean }) {
     enabled: authReady,
   });
 
+  // Master Admin Overview: Trạng thái nền tảng & Báo cáo quỹ còn tồn
+  const masterOverviewQ = useQuery({
+    queryKey: ["master-admin-overview"],
+    queryFn: fetchMasterOverview,
+    staleTime: 30000,
+    enabled: authReady,
+  });
+
   // Mục I.1 & UC-3: Khóa học Học viên tham gia
   const myEnrolledQ = useQuery({
     queryKey: ["dashboard-my-enrolled-trainings"],
@@ -601,6 +612,20 @@ export function ExecutiveDashboard({ authReady }: { authReady: boolean }) {
           <p className="mt-1 text-sm text-muted-foreground">{t("dash.subtitle")}</p>
         </div>
       </div>
+
+      {/* ── MASTER ADMIN: [1. TỔNG QUAN] TRẠNG THÁI NỀN TẢNG CEOHN10 ── */}
+      <MasterPlatformStatusBar
+        corePlatforms={masterOverviewQ.data?.platformStatus?.corePlatforms}
+        integratedPlatforms={masterOverviewQ.data?.platformStatus?.integratedPlatformsSummary?.items}
+        onRefresh={() => masterOverviewQ.refetch()}
+        isLoading={masterOverviewQ.isFetching}
+      />
+
+      {/* ── MASTER ADMIN: [1. TỔNG QUAN] BÁO CÁO QUỸ CÒN TỒN & DÒNG TIỀN RÒNG ── */}
+      <MasterFundSurplusWidget
+        data={masterOverviewQ.data?.fundSurplus}
+        isLoading={masterOverviewQ.isFetching}
+      />
 
       {/* Bộ lọc trạng thái trực tiếp theo cơ sở dữ liệu */}
       <div className="flex flex-wrap items-center justify-between gap-3 p-3.5 rounded-2xl border border-border bg-card shadow-xs">

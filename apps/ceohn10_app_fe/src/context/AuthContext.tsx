@@ -343,6 +343,7 @@ function mapApiUser(apiUser: any, accessToken: string): AppUser {
   }
 
   const isSystemAdmin =
+    email.toLowerCase() === 'admin@ceohn10.vn' ||
     email.toLowerCase() === 'admin@viconnect.vn' ||
     email.toLowerCase() === 'admin@connect.vn' ||
     email.toLowerCase() === 'admin@ceohn10.com' ||
@@ -546,6 +547,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           localStorage.removeItem(k);
         } catch { }
       });
+
+      // QUY CHUẨN TỐI CAO: CHỈ DUY NHẤT TÀI KHOẢN admin@ceohn10.vn ĐƯỢC PHÉP ĐĂNG NHẬP
+      // Nếu bộ nhớ đệm chứa tài khoản khác (ví dụ admin@connect.vn cũ), lập tức thanh lọc triệt để.
+      try {
+        const storedUser = localStorage.getItem('vibe_user');
+        if (storedUser) {
+          const parsed = JSON.parse(storedUser);
+          const uEmail = (parsed?.email || parsed?.username || '').toLowerCase();
+          if (uEmail && uEmail !== 'admin@ceohn10.vn') {
+            console.warn(`[ZeroTrust Gate] Thu hồi phiên đăng nhập tài khoản cũ (${uEmail}). Hệ thống chỉ cho phép admin@ceohn10.vn.`);
+            clearUserSessionData();
+          }
+        }
+      } catch { }
     }
 
     // Khởi động: đọc token từ localStorage
@@ -553,8 +568,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const refreshToken = localStorage.getItem('vibe_refresh_token');
 
     if (accessToken && isTokenValid(accessToken)) {
-      // Token còn hạn — dùng ngay
+      // Token còn hạn — kiểm tra tài khoản hợp lệ
       const decoded = decodeJwt(accessToken)!;
+      const uEmail = (decoded?.email || decoded?.username || '').toLowerCase();
+      if (uEmail && uEmail !== 'admin@ceohn10.vn') {
+        console.warn(`[ZeroTrust Gate] Token không thuộc tài khoản admin@ceohn10.vn. Hủy phiên.`);
+        clearUserSessionData();
+        setStatus('out');
+        return;
+      }
       const appUser = tokenToUser(decoded);
       const sess = buildSession(accessToken, refreshToken ?? '', appUser);
       applySession(sess);
@@ -562,6 +584,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // Access token hết hạn nhưng còn refresh token — tự động làm mới
       apiRefresh(refreshToken).then((newSession) => {
         if (newSession) {
+          const uEmail = (newSession.user?.email || newSession.user?.username || '').toLowerCase();
+          if (uEmail && uEmail !== 'admin@ceohn10.vn') {
+            clearUserSessionData();
+            setStatus('out');
+            return;
+          }
           applySession(newSession);
         } else {
           localStorage.removeItem('vibe_token');

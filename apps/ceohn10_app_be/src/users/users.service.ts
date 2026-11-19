@@ -1130,9 +1130,12 @@ export class UsersService implements OnModuleInit {
         if (!roleList.includes('admin')) roleList.push('admin');
       } else if (isExplicitAdmin) {
         primaryRole =
-          exec === 'quan_tri' || exec.includes('quản trị')
-            ? 'quan_tri'
-            : 'admin';
+          exec === 'platform_admin' || roleList.includes('platform_admin') || userEmail === 'admin@ceohn10.vn'
+            ? 'platform_admin'
+            : exec === 'quan_tri' || exec.includes('quản trị')
+              ? 'quan_tri'
+              : 'admin';
+        if (!roleList.includes('platform_admin') && (exec === 'platform_admin' || userEmail === 'admin@ceohn10.vn')) roleList.push('platform_admin');
         if (!roleList.includes('admin')) roleList.push('admin');
         if (!roleList.includes('quan_tri')) roleList.push('quan_tri');
       } else if (isExplicitDeptLeader) {
@@ -1157,7 +1160,11 @@ export class UsersService implements OnModuleInit {
         // Fallback default for system root/seed accounts when no explicit member/role is assigned yet
         const isSystemAdminUser =
           user.id === '00000000-0000-0000-0000-000000000000' ||
+          user.id === '00000000-0000-4000-8000-000000000001' ||
           user.id === '00000000-0000-4000-8000-000000000002' ||
+          user.username === 'admin@ceohn10.vn' ||
+          user.email === 'admin@ceohn10.vn' ||
+          userEmail === 'admin@ceohn10.vn' ||
           user.username === 'admin@viconnect.vn' ||
           user.email === 'admin@viconnect.vn' ||
           userEmail === 'admin@viconnect.vn' ||
@@ -1167,7 +1174,8 @@ export class UsersService implements OnModuleInit {
           userEmail === 'admin1@connect.vn';
 
         if (isSystemAdminUser) {
-          primaryRole = 'admin';
+          primaryRole = userEmail === 'admin@ceohn10.vn' ? 'platform_admin' : 'admin';
+          if (userEmail === 'admin@ceohn10.vn' && !roleList.includes('platform_admin')) roleList.push('platform_admin');
           if (!roleList.includes('admin')) roleList.push('admin');
           if (!roleList.includes('quan_tri')) roleList.push('quan_tri');
           if (!roleList.includes('bqt')) roleList.push('bqt');
