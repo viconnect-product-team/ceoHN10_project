@@ -209,11 +209,15 @@ function AccountsPage() {
   const [selectedAccountIds, setSelectedAccountIds] = useState<Set<string>>(new Set());
   const [isBulkDeleteConfirmOpen, setIsBulkDeleteConfirmOpen] = useState(false);
   const [isDeleteAllConfirmOpen, setIsDeleteAllConfirmOpen] = useState(false);
+  const [resetPasswordAccount, setResetPasswordAccount] = useState<UserAccountItem | null>(null);
+  const [resetPasswordVal, setResetPasswordVal] = useState("123456");
+  const [resettingPassword, setResettingPassword] = useState(false);
 
   // Form state
   const [formName, setFormName] = useState("");
   const [formCode, setFormCode] = useState("");
   const [formEmail, setFormEmail] = useState("");
+  const [formPassword, setFormPassword] = useState("123456");
   const [formPhone, setFormPhone] = useState("");
   const [formCompany, setFormCompany] = useState("");
   const [formDepartment, setFormDepartment] = useState(DEPARTMENT_OPTIONS[0]);
@@ -508,6 +512,7 @@ function AccountsPage() {
     setFormName("");
     setFormCode(`HN10-${String(accounts.length + 1).padStart(3, "0")}`);
     setFormEmail("");
+    setFormPassword("123456");
     setFormPhone("");
     setFormCompany("");
     const defaultDept = departmentList[0] || "Ban Điều Hành";
@@ -539,33 +544,97 @@ function AccountsPage() {
     setIsViewOpen(true);
   };
 
-  const handleCreateAccount = (e: React.FormEvent) => {
+  const handleCreateAccount = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formName.trim() || !formEmail.trim()) {
       toast.error("Vui lòng điền đầy đủ họ tên và email!");
       return;
     }
 
-    const newAcc: UserAccountItem = {
-      id: `acc_${Date.now()}`,
-      name: formName.trim(),
-      code: formCode.trim().toUpperCase(),
-      email: formEmail.trim().toLowerCase(),
-      phone: formPhone.trim(),
-      companyName: formCompany.trim(),
-      department: formDepartment,
-      role: formRole,
-      status: formStatus,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
+    setSaving(true);
+    try {
+      const payload = {
+        username: formEmail.trim().toLowerCase(),
+        email: formEmail.trim().toLowerCase(),
+        password: formPassword.trim() || "123456",
+        name: formName.trim(),
+        code: formCode.trim().toUpperCase(),
+        phone: formPhone.trim(),
+        companyName: formCompany.trim(),
+        department: formDepartment,
+        executiveRole: formRole,
+        role: formRole,
+        account_status: formStatus,
+      };
 
-    const next = [newAcc, ...accounts];
-    setAccounts(next);
-    setHasUnsavedChanges(true);
-    setCurrentPage(1);
-    toast.success(`Đã thêm mới tài khoản "${newAcc.name}". Bấm 'Lưu Thay Đổi' để đồng bộ vào CSDL.`);
-    setIsAddOpen(false);
+      const res = await fetchNestApi<any>("/users", {
+        method: "POST",
+        body: JSON.stringify(payload),
+      });
+
+      const newId = res?.id || `acc_${Date.now()}`;
+      const newAcc: UserAccountItem = {
+        id: newId,
+        dbMemberId: res?.memberId || res?.id,
+        name: formName.trim(),
+        code: formCode.trim().toUpperCase(),
+        email: formEmail.trim().toLowerCase(),
+        phone: formPhone.trim(),
+        companyName: formCompany.trim(),
+        department: formDepartment,
+        role: formRole,
+        status: formStatus,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+
+      const next = [newAcc, ...accounts.filter((a) => a.email.toLowerCase() !== newAcc.email.toLowerCase())];
+      setAccounts(next);
+      setInitialAccountsStr(JSON.stringify(next));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+      setCurrentPage(1);
+
+      clearMeCache();
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new Event("role-changed"));
+        window.dispatchEvent(new Event("crm_permissions_updated"));
+        window.dispatchEvent(new Event("vba_auth_changed"));
+      }
+
+      toast.success(`Đã tạo tài khoản "${newAcc.name}" thành công vào CSDL với vai trò "${getRoleLabel(formRole)}"!`);
+      setIsAddOpen(false);
+    } catch (err: any) {
+      console.error("Lỗi khi tạo tài khoản:", err);
+      toast.error(err?.message || "Lỗi khi tạo tài khoản vào CSDL!");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleResetPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!resetPasswordAccount) return;
+    const targetId =
+      resetPasswordAccount.dbMemberId ||
+      resetPasswordAccount.id?.replace(/^acc_/, "") ||
+      resetPasswordAccount.email;
+    if (!targetId) return;
+
+    setResettingPassword(true);
+    try {
+      await fetchNestApi(`/users/${encodeURIComponent(targetId)}/reset-password`, {
+        method: "POST",
+        body: JSON.stringify({ newPassword: resetPasswordVal }),
+      });
+      toast.success(`Đã đặt lại mật khẩu cho tài khoản "${resetPasswordAccount.name}" thành công!`);
+      setResetPasswordAccount(null);
+      setResetPasswordVal("123456");
+    } catch (err: any) {
+      console.error("Lỗi đặt lại mật khẩu:", err);
+      toast.error(err?.message || "Lỗi khi đặt lại mật khẩu!");
+    } finally {
+      setResettingPassword(false);
+    }
   };
 
   const handleUpdateAccount = (e: React.FormEvent) => {
@@ -650,6 +719,21 @@ function AccountsPage() {
           }
         })
         .catch(() => { });
+
+      const actualUserId = selectedAccount.id && !selectedAccount.id.startsWith("acc_") ? selectedAccount.id : null;
+      if (actualUserId) {
+        fetchNestApi(`/users/${encodeURIComponent(actualUserId)}`, {
+          method: "PUT",
+          body: JSON.stringify({
+            name: formName.trim(),
+            email: formEmail.trim().toLowerCase(),
+            role: formRole,
+            executiveRole: formRole,
+            department: formDepartment,
+            account_status: formStatus,
+          }),
+        }).catch(() => {});
+      }
     }
 
     try {
@@ -1371,11 +1455,23 @@ function AccountsPage() {
                           <button
                             type="button"
                             onClick={() => handleOpenEdit(acc)}
-                            title="Chỉnh sửa"
-                            aria-label="Chỉnh sửa"
+                            title="Chỉnh sửa & Gán vai trò"
+                            aria-label="Chỉnh sửa & Gán vai trò"
                             className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-blue-200 bg-blue-50 text-blue-800 hover:bg-blue-100 hover:text-blue-900 transition cursor-pointer dark:bg-blue-950/50 dark:border-blue-800 dark:text-blue-300"
                           >
                             <Pencil className="h-4 w-4" strokeWidth={2.2} />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setResetPasswordAccount(acc);
+                              setResetPasswordVal("123456");
+                            }}
+                            title="Đặt lại mật khẩu"
+                            aria-label="Đặt lại mật khẩu"
+                            className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-amber-200 bg-amber-50 text-amber-800 hover:bg-amber-100 hover:text-amber-900 transition cursor-pointer dark:bg-amber-950/50 dark:border-amber-800 dark:text-amber-300"
+                          >
+                            <KeyRound className="h-4 w-4" strokeWidth={2.2} />
                           </button>
                           <button
                             type="button"
@@ -1568,6 +1664,24 @@ function AccountsPage() {
                   />
                 </div>
               </div>
+
+              {isAddOpen && (
+                <div>
+                  <label className="font-semibold text-foreground block mb-1">
+                    Mật Khẩu Khởi Tạo
+                  </label>
+                  <input
+                    type="text"
+                    value={formPassword}
+                    onChange={(e) => setFormPassword(e.target.value)}
+                    placeholder="Mặc định: 123456"
+                    className="w-full rounded-xl border border-border bg-background px-3 py-2 text-xs font-mono outline-none focus:border-[#003B95] focus:ring-1 focus:ring-[#003B95]"
+                  />
+                  <span className="text-[11px] text-muted-foreground mt-1 block">
+                    Mật khẩu đăng nhập lần đầu cho tài khoản (mặc định: <strong>123456</strong>).
+                  </span>
+                </div>
+              )}
 
               <div>
                 <label className="font-semibold text-foreground block mb-1">
@@ -1779,6 +1893,62 @@ function AccountsPage() {
                 Xác Nhận Xóa Tất Cả ({deletableAccounts.length})
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── MODAL 6: ĐẶT LẠI MẬT KHẨU TÀI KHOẢN (MASTER ADMIN) ── */}
+      {resetPasswordAccount && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-in fade-in duration-150">
+          <div className="w-full max-w-sm rounded-2xl border border-border bg-card p-6 shadow-xl space-y-4">
+            <div className="flex items-center gap-3 text-amber-600 dark:text-amber-400">
+              <div className="p-2.5 rounded-xl bg-amber-500/10">
+                <KeyRound className="h-6 w-6" />
+              </div>
+              <div>
+                <h3 className="font-bold text-foreground text-sm">Đặt Lại Mật Khẩu</h3>
+                <p className="text-muted-foreground text-xs font-mono">{resetPasswordAccount.email}</p>
+              </div>
+            </div>
+
+            <p className="text-xs text-muted-foreground">
+              Nhập mật khẩu mới cho tài khoản <strong className="text-foreground">"{resetPasswordAccount.name}"</strong>:
+            </p>
+
+            <form onSubmit={handleResetPassword} className="space-y-3.5 text-xs">
+              <div>
+                <label className="font-semibold text-foreground block mb-1">
+                  Mật khẩu mới (tối thiểu 6 ký tự) <span className="text-destructive">*</span>
+                </label>
+                <input
+                  type="text"
+                  required
+                  minLength={6}
+                  value={resetPasswordVal}
+                  onChange={(e) => setResetPasswordVal(e.target.value)}
+                  placeholder="Mật khẩu mới"
+                  className="w-full rounded-xl border border-border bg-background px-3 py-2 text-xs font-mono outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500"
+                />
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-2 border-t border-border">
+                <button
+                  type="button"
+                  disabled={resettingPassword}
+                  onClick={() => setResetPasswordAccount(null)}
+                  className="px-3.5 py-1.5 rounded-xl border border-border bg-background hover:bg-muted font-semibold text-xs text-foreground transition cursor-pointer"
+                >
+                  Hủy
+                </button>
+                <button
+                  type="submit"
+                  disabled={resettingPassword}
+                  className="px-4 py-1.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs shadow-md transition cursor-pointer"
+                >
+                  {resettingPassword ? "Đang lưu..." : "Xác Nhận Đổi Mật Khẩu"}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
