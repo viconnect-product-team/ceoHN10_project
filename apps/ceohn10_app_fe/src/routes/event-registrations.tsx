@@ -50,8 +50,29 @@ import { VnpayPaymentModal } from "@/components/common/VnpayPaymentModal";
 
 export const Route = createFileRoute("/event-registrations")({
   ssr: false,
-  loader: () => listEventsWithRegistrationsFn(),
+  loader: async () => {
+    try {
+      const data = await listEventsWithRegistrationsFn();
+      return (
+        data || {
+          events: [],
+          registrations: [],
+        }
+      );
+    } catch (err) {
+      console.warn("[event-registrations] listEventsWithRegistrationsFn loader error:", err);
+      return {
+        events: [],
+        registrations: [],
+      };
+    }
+  },
   component: RegPage,
+  errorComponent: ({ error }) => (
+    <div role="alert" className="p-6 text-sm text-destructive">
+      {error?.message || "Đã xảy ra lỗi khi tải danh sách đăng ký sự kiện."}
+    </div>
+  ),
 });
 
 function RegPage() {

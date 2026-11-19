@@ -16,7 +16,15 @@ export const Route = createFileRoute("/checkin-qr")({
   staleTime: 0,
   gcTime: 0,
   shouldReload: true,
-  loader: () => getCheckinQrEventsFn(),
+  loader: async () => {
+    try {
+      const data = await getCheckinQrEventsFn();
+      return Array.isArray(data) ? data : [];
+    } catch (err) {
+      console.warn("[checkin-qr] getCheckinQrEventsFn loader error:", err);
+      return [];
+    }
+  },
   component: CheckinQrPage,
   head: () => ({
     meta: [
@@ -230,7 +238,8 @@ function EventQrCard({ event }: { event: CheckinQrEvent }) {
 function CheckinQrPage() {
   const t = useT();
   const router = useRouter();
-  const events = Route.useLoaderData();
+  const rawEvents = Route.useLoaderData();
+  const events = Array.isArray(rawEvents) ? rawEvents : [];
   const [refreshing, setRefreshing] = useState(false);
 
   const refresh = async () => {

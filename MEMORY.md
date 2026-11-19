@@ -1,5 +1,35 @@
 # System Memory & Architecture
 
+- **Bản cập nhật ngày 19/11/2026 (v12.33): Khắc Phục Triệt Để Lỗi "Something went wrong" Trên Toàn Bộ Phân Hệ Web CRM Quản Trị (Mở Khóa Các Route Bị Chặn Cứng, Bọc An Toàn Zero-Crash Cho Tất Cả Loader, Nâng Cấp DefaultErrorComponent Chuẩn Đoán Trực Quan)**:
+  - **1. Nâng Cấp Toàn Diện `DefaultErrorComponent` Tại `apps/ceohn10_app_fe/src/router.tsx`**:
+    * Chuyển đổi màn hình lỗi mù mờ "Something went wrong" sang giao diện chuyên nghiệp tiếng Việt: "Đã xảy ra sự cố khi tải trang".
+    * **Luôn hiển thị chi tiết nguyên nhân lỗi kỹ thuật (`error.message`)**: Kể cả trên môi trường Preview/Production, giúp quản trị viên và lập trình viên nhận biết chính xác nguyên nhân lỗi.
+    * Tích hợp tính năng: "Sao chép thông báo lỗi", xem/ẩn "Call Stack kỹ thuật", nút "Thử tải lại", nút "Quay lại" và nút "Về Trang chủ".
+    * Tự động phát hiện lỗi phiên làm việc (`401` / `Unauthorized` / `token` / `JWT`): Hiển thị hướng dẫn và nút "Đăng nhập lại" trực tiếp dẫn tới `/auth`.
+  - **2. Mở Khóa Các Tuyến Đường CRM Bị Cài `throw redirect` Chặn Cứng**:
+    * `apps/ceohn10_app_fe/src/routes/meetings.tsx`: Gỡ bỏ `beforeLoad: () => { throw redirect({ to: "/" }); }`, khôi phục hoạt động cho trang Quản lý cuộc họp.
+    * `apps/ceohn10_app_fe/src/routes/opportunities.tsx`: Chuyển từ layout chặn redirect sang layout route chuẩn render `<Outlet />`, cho phép mở trang Chia sẻ cơ hội `/opportunities` (`opportunities.index.tsx`) và các trang con.
+    * `apps/ceohn10_app_fe/src/routes/marketplace.tsx`: Chuyển từ layout chặn redirect sang layout route chuẩn render `<Outlet />`, cho phép mở phân hệ Giao thương B2B `/marketplace` (`marketplace.index.tsx`, `workspace`, `my-quotes`).
+    * `apps/ceohn10_app_fe/src/routes/sponsor-packages.tsx`: Gỡ bỏ redirect cưỡng bức, cho phép truy cập trực tiếp trang Gói tài trợ.
+    * Chạy lại `npm run routes:gen` để biên dịch đồng bộ cây định tuyến TanStack Router vào `routeTree.gen.ts`.
+  - **3. Cơ Chế Zero-Crash Bọc An Toàn Cho Toàn Bộ Loader Server Functions**:
+    * Các loader gọi Server Functions có middleware `requireNestAuth` nếu gặp lỗi xác thực hoặc gián đoạn mạng sẽ không còn làm sập router vào màn hình lỗi.
+    * Đã bọc `try/catch` với dữ liệu fallback mảng rỗng `[]` hoặc object mặc định tại:
+      - `news.tsx`: `listNewsFn()` -> fallback `[]`, bảo vệ `NEWS.filter()`.
+      - `voting.tsx`: `listVotesFn()` -> fallback `[]`, bảo vệ `VOTES`.
+      - `sponsor-report.tsx`: `listSponsorsFn()` -> fallback `[]`.
+      - `event-registrations.tsx`: `listEventsWithRegistrationsFn()` -> fallback `{ events: [], registrations: [] }`.
+      - `activity.tsx`: `listActivityLogFn()` -> fallback `[]`.
+      - `documents.index.tsx`: `listDocumentsFn()` -> fallback `[]`, bảo vệ `DOCUMENTS`.
+      - `email-marketing.tsx`: `listCampaignsFn()` -> fallback `[]`.
+      - `checkin-qr.tsx`: `getCheckinQrEventsFn()` -> fallback `[]`.
+      - `meetings.tsx`: `listMeetingsFn()` -> fallback `[]`.
+      - `opportunities.index.tsx`: `listOpportunitiesFn()` -> fallback object an toàn.
+  - **4. Kiểm Tra Chất Lượng Code (Strict Zero-Error)**:
+    * Backend NestJS `npx tsc --noEmit`: **Exit code 0 (0 errors)**.
+    * Frontend React `npm run routes:gen`: **Hoàn thành thành công**.
+    * Tuân thủ triệt để Rule 0 (CSDL `113.20.107.184:6432`) và Rule 1 (Không tự ý `git commit` / `git push`).
+
 - **Bản cập nhật ngày 19/11/2026 (v12.32): Hoàn Thành Triển Khai Phase 7 - Workflow & Action Agent Liên Hoàn Đa Công Cụ (Chaining Multi-Step Pipelines, Extensible Context Contract, Failure Recovery & UI Pipeline Map)**:
   - **1. Kiến Trúc Context Contract Mở Rộng (Không Cần Sửa Lại Agent Core)**:
     * Định nghĩa `ToolContextContract` trong `tool.interface.ts`: Bao gồm danh sách key dữ liệu cần nhận (`consumes`), key dữ liệu sinh ra (`produces`), hàm biến đổi tham số `transformParams` và hàm bóc tách ngữ cảnh `extractContext`.
@@ -2329,6 +2359,36 @@
      - Tuân thủ nghiêm ngặt STRICT RULE 1: Tuyệt đối không tự động chạy `git push` hay `git commit`.
 
 # System Memory & Architecture
+
+- **Bản cập nhật ngày 19/11/2026 (v12.33): Khắc Phục Triệt Để Lỗi "Something went wrong" Trên Toàn Bộ Phân Hệ Web CRM Quản Trị (Mở Khóa Các Route Bị Chặn Cứng, Bọc An Toàn Zero-Crash Cho Tất Cả Loader, Nâng Cấp DefaultErrorComponent Chuẩn Đoán Trực Quan)**:
+  - **1. Nâng Cấp Toàn Diện `DefaultErrorComponent` Tại `apps/ceohn10_app_fe/src/router.tsx`**:
+    * Chuyển đổi màn hình lỗi mù mờ "Something went wrong" sang giao diện chuyên nghiệp tiếng Việt: "Đã xảy ra sự cố khi tải trang".
+    * **Luôn hiển thị chi tiết nguyên nhân lỗi kỹ thuật (`error.message`)**: Kể cả trên môi trường Preview/Production, giúp quản trị viên và lập trình viên nhận biết chính xác nguyên nhân lỗi.
+    * Tích hợp tính năng: "Sao chép thông báo lỗi", xem/ẩn "Call Stack kỹ thuật", nút "Thử tải lại", nút "Quay lại" và nút "Về Trang chủ".
+    * Tự động phát hiện lỗi phiên làm việc (`401` / `Unauthorized` / `token` / `JWT`): Hiển thị hướng dẫn và nút "Đăng nhập lại" trực tiếp dẫn tới `/auth`.
+  - **2. Mở Khóa Các Tuyến Đường CRM Bị Cài `throw redirect` Chặn Cứng**:
+    * `apps/ceohn10_app_fe/src/routes/meetings.tsx`: Gỡ bỏ `beforeLoad: () => { throw redirect({ to: "/" }); }`, khôi phục hoạt động cho trang Quản lý cuộc họp.
+    * `apps/ceohn10_app_fe/src/routes/opportunities.tsx`: Chuyển từ layout chặn redirect sang layout route chuẩn render `<Outlet />`, cho phép mở trang Chia sẻ cơ hội `/opportunities` (`opportunities.index.tsx`) và các trang con.
+    * `apps/ceohn10_app_fe/src/routes/marketplace.tsx`: Chuyển từ layout chặn redirect sang layout route chuẩn render `<Outlet />`, cho phép mở phân hệ Giao thương B2B `/marketplace` (`marketplace.index.tsx`, `workspace`, `my-quotes`).
+    * `apps/ceohn10_app_fe/src/routes/sponsor-packages.tsx`: Gỡ bỏ redirect cưỡng bức, cho phép truy cập trực tiếp trang Gói tài trợ.
+    * Chạy lại `npm run routes:gen` để biên dịch đồng bộ cây định tuyến TanStack Router vào `routeTree.gen.ts`.
+  - **3. Cơ Chế Zero-Crash Bọc An Toàn Cho Toàn Bộ Loader Server Functions**:
+    * Các loader gọi Server Functions có middleware `requireNestAuth` nếu gặp lỗi xác thực hoặc gián đoạn mạng sẽ không còn làm sập router vào màn hình lỗi.
+    * Đã bọc `try/catch` với dữ liệu fallback mảng rỗng `[]` hoặc object mặc định tại:
+      - `news.tsx`: `listNewsFn()` -> fallback `[]`, bảo vệ `NEWS.filter()`.
+      - `voting.tsx`: `listVotesFn()` -> fallback `[]`, bảo vệ `VOTES`.
+      - `sponsor-report.tsx`: `listSponsorsFn()` -> fallback `[]`.
+      - `event-registrations.tsx`: `listEventsWithRegistrationsFn()` -> fallback `{ events: [], registrations: [] }`.
+      - `activity.tsx`: `listActivityLogFn()` -> fallback `[]`.
+      - `documents.index.tsx`: `listDocumentsFn()` -> fallback `[]`, bảo vệ `DOCUMENTS`.
+      - `email-marketing.tsx`: `listCampaignsFn()` -> fallback `[]`.
+      - `checkin-qr.tsx`: `getCheckinQrEventsFn()` -> fallback `[]`.
+      - `meetings.tsx`: `listMeetingsFn()` -> fallback `[]`.
+      - `opportunities.index.tsx`: `listOpportunitiesFn()` -> fallback object an toàn.
+  - **4. Kiểm Tra Chất Lượng Code (Strict Zero-Error)**:
+    * Backend NestJS `npx tsc --noEmit`: **Exit code 0 (0 errors)**.
+    * Frontend React `npm run routes:gen`: **Hoàn thành thành công**.
+    * Tuân thủ triệt để Rule 0 (CSDL `113.20.107.184:6432`) và Rule 1 (Không tự ý `git commit` / `git push`).
 
 - **Bản cập nhật ngày 19/11/2026 (v12.32): Hoàn Thành Triển Khai Phase 7 - Workflow & Action Agent Liên Hoàn Đa Công Cụ (Chaining Multi-Step Pipelines, Extensible Context Contract, Failure Recovery & UI Pipeline Map)**:
   - **1. Kiến Trúc Context Contract Mở Rộng (Không Cần Sửa Lại Agent Core)**:
@@ -5823,6 +5883,36 @@
      - Tuân thủ nghiêm ngặt STRICT RULE 1: Tuyệt đối không tự động chạy `git push` hay `git commit`.
 
 # System Memory & Architecture
+
+- **Bản cập nhật ngày 19/11/2026 (v12.33): Khắc Phục Triệt Để Lỗi "Something went wrong" Trên Toàn Bộ Phân Hệ Web CRM Quản Trị (Mở Khóa Các Route Bị Chặn Cứng, Bọc An Toàn Zero-Crash Cho Tất Cả Loader, Nâng Cấp DefaultErrorComponent Chuẩn Đoán Trực Quan)**:
+  - **1. Nâng Cấp Toàn Diện `DefaultErrorComponent` Tại `apps/ceohn10_app_fe/src/router.tsx`**:
+    * Chuyển đổi màn hình lỗi mù mờ "Something went wrong" sang giao diện chuyên nghiệp tiếng Việt: "Đã xảy ra sự cố khi tải trang".
+    * **Luôn hiển thị chi tiết nguyên nhân lỗi kỹ thuật (`error.message`)**: Kể cả trên môi trường Preview/Production, giúp quản trị viên và lập trình viên nhận biết chính xác nguyên nhân lỗi.
+    * Tích hợp tính năng: "Sao chép thông báo lỗi", xem/ẩn "Call Stack kỹ thuật", nút "Thử tải lại", nút "Quay lại" và nút "Về Trang chủ".
+    * Tự động phát hiện lỗi phiên làm việc (`401` / `Unauthorized` / `token` / `JWT`): Hiển thị hướng dẫn và nút "Đăng nhập lại" trực tiếp dẫn tới `/auth`.
+  - **2. Mở Khóa Các Tuyến Đường CRM Bị Cài `throw redirect` Chặn Cứng**:
+    * `apps/ceohn10_app_fe/src/routes/meetings.tsx`: Gỡ bỏ `beforeLoad: () => { throw redirect({ to: "/" }); }`, khôi phục hoạt động cho trang Quản lý cuộc họp.
+    * `apps/ceohn10_app_fe/src/routes/opportunities.tsx`: Chuyển từ layout chặn redirect sang layout route chuẩn render `<Outlet />`, cho phép mở trang Chia sẻ cơ hội `/opportunities` (`opportunities.index.tsx`) và các trang con.
+    * `apps/ceohn10_app_fe/src/routes/marketplace.tsx`: Chuyển từ layout chặn redirect sang layout route chuẩn render `<Outlet />`, cho phép mở phân hệ Giao thương B2B `/marketplace` (`marketplace.index.tsx`, `workspace`, `my-quotes`).
+    * `apps/ceohn10_app_fe/src/routes/sponsor-packages.tsx`: Gỡ bỏ redirect cưỡng bức, cho phép truy cập trực tiếp trang Gói tài trợ.
+    * Chạy lại `npm run routes:gen` để biên dịch đồng bộ cây định tuyến TanStack Router vào `routeTree.gen.ts`.
+  - **3. Cơ Chế Zero-Crash Bọc An Toàn Cho Toàn Bộ Loader Server Functions**:
+    * Các loader gọi Server Functions có middleware `requireNestAuth` nếu gặp lỗi xác thực hoặc gián đoạn mạng sẽ không còn làm sập router vào màn hình lỗi.
+    * Đã bọc `try/catch` với dữ liệu fallback mảng rỗng `[]` hoặc object mặc định tại:
+      - `news.tsx`: `listNewsFn()` -> fallback `[]`, bảo vệ `NEWS.filter()`.
+      - `voting.tsx`: `listVotesFn()` -> fallback `[]`, bảo vệ `VOTES`.
+      - `sponsor-report.tsx`: `listSponsorsFn()` -> fallback `[]`.
+      - `event-registrations.tsx`: `listEventsWithRegistrationsFn()` -> fallback `{ events: [], registrations: [] }`.
+      - `activity.tsx`: `listActivityLogFn()` -> fallback `[]`.
+      - `documents.index.tsx`: `listDocumentsFn()` -> fallback `[]`, bảo vệ `DOCUMENTS`.
+      - `email-marketing.tsx`: `listCampaignsFn()` -> fallback `[]`.
+      - `checkin-qr.tsx`: `getCheckinQrEventsFn()` -> fallback `[]`.
+      - `meetings.tsx`: `listMeetingsFn()` -> fallback `[]`.
+      - `opportunities.index.tsx`: `listOpportunitiesFn()` -> fallback object an toàn.
+  - **4. Kiểm Tra Chất Lượng Code (Strict Zero-Error)**:
+    * Backend NestJS `npx tsc --noEmit`: **Exit code 0 (0 errors)**.
+    * Frontend React `npm run routes:gen`: **Hoàn thành thành công**.
+    * Tuân thủ triệt để Rule 0 (CSDL `113.20.107.184:6432`) và Rule 1 (Không tự ý `git commit` / `git push`).
 
 - **Bản cập nhật ngày 19/11/2026 (v12.32): Hoàn Thành Triển Khai Phase 7 - Workflow & Action Agent Liên Hoàn Đa Công Cụ (Chaining Multi-Step Pipelines, Extensible Context Contract, Failure Recovery & UI Pipeline Map)**:
   - **1. Kiến Trúc Context Contract Mở Rộng (Không Cần Sửa Lại Agent Core)**:

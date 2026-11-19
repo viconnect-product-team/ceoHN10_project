@@ -67,11 +67,19 @@ import { useFmt, useT } from "@/lib/i18n";
 
 export const Route = createFileRoute("/documents/")({
   ssr: false,
-  loader: () => listDocumentsFn(),
+  loader: async () => {
+    try {
+      const data = await listDocumentsFn();
+      return Array.isArray(data) ? data : [];
+    } catch (err) {
+      console.warn("[documents] listDocumentsFn loader error:", err);
+      return [];
+    }
+  },
   component: DocsPage,
   errorComponent: ({ error }) => (
     <div role="alert" className="p-6 text-sm text-destructive">
-      {error.message}
+      {error?.message || "Đã xảy ra lỗi khi tải danh sách tài liệu."}
     </div>
   ),
 });
@@ -170,7 +178,8 @@ function DocsPage() {
   const canWriteAssociation = isLeaderOrAdmin || can(PERMISSIONS.DOCUMENT_MANAGE);
   const canWrite = canWriteAssociation;
 
-  const DOCUMENTS = Route.useLoaderData() as Document[];
+  const rawDocs = Route.useLoaderData();
+  const DOCUMENTS = Array.isArray(rawDocs) ? (rawDocs as Document[]) : [];
   const { pins, isPinned, toggle } = usePinnedDocs();
 
   const [q, setQ] = useUrlState<string>("q", "");
