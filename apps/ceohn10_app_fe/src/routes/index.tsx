@@ -295,17 +295,8 @@ function usePostLoginRedirect(redirectAnonToLanding = false) {
       }
 
       if (authStatus === 'out') {
-        if (isCrmPortal || hostname === "crm.ceohn10.viconnect.vn" || hostname.includes("crm") || port === "10443" || port === "5022") {
-          setStatus("redirecting");
-          navigate({ to: "/auth", search: { portal: "crm" } as any, replace: true });
-          return;
-        }
-        if (redirectAnonToLanding) {
-          setStatus("redirecting");
-          navigate({ to: "/landing" });
-          return;
-        }
-        setStatus("idle");
+        setStatus("redirecting");
+        navigate({ to: "/auth", search: { portal: "crm" } as any, replace: true });
         return;
       }
       

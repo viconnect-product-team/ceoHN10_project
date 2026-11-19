@@ -20,20 +20,27 @@ export const listRenewalsFn = createServerFn({ method: "GET" })
     const token = (context as any)?.token;
     try {
       const nestMembers = await fetchNestApiFromServer<any[]>("/members", token);
-      if (Array.isArray(nestMembers) && nestMembers.length > 0) {
+      if (Array.isArray(nestMembers)) {
         return nestMembers.filter(isApprovedMember).map((r: any) => toRecord(r as Row));
       }
     } catch (e) {
-      console.warn("Fallback to db for listRenewals:", e);
+      console.warn("Nest API listRenewals error:", e);
     }
 
-    const { getActiveAssociationId } = await import("./assoc-scope.server");
-    const activeId = await getActiveAssociationId(getDb(context));
-    let query = getDb(context).from("members").select("*").order("code", { ascending: true });
-    if (activeId) query = query.eq("association_id", activeId);
-    const { data, error } = await query;
-    if (error) throw new Error(error.message);
-    return (data ?? []).filter(isApprovedMember).map((r: any) => toRecord(r as Row));
+    try {
+      const { getActiveAssociationId } = await import("./assoc-scope.server");
+      const activeId = await getActiveAssociationId(getDb(context));
+      let query = getDb(context).from("members").select("*").order("code", { ascending: true });
+      if (activeId) query = query.eq("association_id", activeId);
+      const { data, error } = await query;
+      if (!error && Array.isArray(data)) {
+        return data.filter(isApprovedMember).map((r: any) => toRecord(r as Row));
+      }
+    } catch (err) {
+      console.warn("Fallback to db for listRenewals failed:", err);
+    }
+
+    return [];
   });
 
 export const renewMembershipFn = createServerFn({ method: "POST" })

@@ -232,17 +232,38 @@ function buildSession(accessToken: string, refreshToken: string, user: AppUser):
   };
 }
 
+function getCookieDomain(): string {
+  if (typeof window === 'undefined') return '';
+  const hostname = window.location.hostname.toLowerCase();
+  if (hostname.endsWith('viconnect.vn')) {
+    return '; domain=.viconnect.vn';
+  }
+  return '';
+}
+
 function setSessionCookies(session: AppSession) {
   const isHttps = typeof window !== 'undefined' && window.location.protocol === 'https:';
   const secure = isHttps ? '; secure' : '';
   const maxAge = session.expires_in ?? 3600;
-  document.cookie = `sb-access-token=${session.access_token}; path=/; max-age=${maxAge}; SameSite=Lax${secure}`;
-  document.cookie = `vibe_token=${session.access_token}; path=/; max-age=${maxAge}; SameSite=Lax${secure}`;
-  document.cookie = `access_token=${session.access_token}; path=/; max-age=${maxAge}; SameSite=Lax${secure}`;
-  document.cookie = `sb-refresh-token=${session.refresh_token}; path=/; max-age=604800; SameSite=Lax${secure}`;
+  const domainAttr = getCookieDomain();
+  document.cookie = `sb-access-token=${session.access_token}; path=/; max-age=${maxAge}; SameSite=Lax${secure}${domainAttr}`;
+  document.cookie = `vibe_token=${session.access_token}; path=/; max-age=${maxAge}; SameSite=Lax${secure}${domainAttr}`;
+  document.cookie = `access_token=${session.access_token}; path=/; max-age=${maxAge}; SameSite=Lax${secure}${domainAttr}`;
+  document.cookie = `sb-refresh-token=${session.refresh_token}; path=/; max-age=604800; SameSite=Lax${secure}${domainAttr}`;
+  if (domainAttr) {
+    document.cookie = `sb-access-token=${session.access_token}; path=/; max-age=${maxAge}; SameSite=Lax${secure}`;
+    document.cookie = `vibe_token=${session.access_token}; path=/; max-age=${maxAge}; SameSite=Lax${secure}`;
+    document.cookie = `access_token=${session.access_token}; path=/; max-age=${maxAge}; SameSite=Lax${secure}`;
+  }
 }
 
 function clearSessionCookies() {
+  const domainAttr = getCookieDomain();
+  document.cookie = `sb-access-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT${domainAttr}`;
+  document.cookie = `vibe_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT${domainAttr}`;
+  document.cookie = `access_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT${domainAttr}`;
+  document.cookie = `sb-refresh-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT${domainAttr}`;
+
   document.cookie = 'sb-access-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
   document.cookie = 'vibe_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
   document.cookie = 'access_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';

@@ -1,6 +1,7 @@
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { useState, useMemo } from "react";
 import { useServerFn } from "@tanstack/react-start";
+import { useQuery } from "@tanstack/react-query";
 import { Mail, MousePointerClick, Plus, Send, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/dashboard/AppShell";
@@ -12,6 +13,7 @@ import {
   deleteCampaignFn,
   type Campaign,
 } from "@/lib/campaigns.functions";
+import { fetchNestApi } from "@/lib/api-client";
 import { useFmt, useT, type TKey } from "@/lib/i18n";
 
 export const Route = createFileRoute("/email-marketing")({
@@ -49,10 +51,37 @@ function EmailPage() {
   const fmt = useFmt();
   const router = useRouter();
   const rawCampaigns = Route.useLoaderData();
-  const CAMPAIGNS = Array.isArray(rawCampaigns) ? (rawCampaigns as Campaign[]) : [];
   const [showCreate, setShowCreate] = useState(false);
   const [busyId, setBusyId] = useState<string | null>(null);
   const deleteFn = useServerFn(deleteCampaignFn);
+
+  // Client-side query direct to Nest REST API fallback for 100% domain stability
+  const { data: clientCampaigns, refetch } = useQuery({
+    queryKey: ["admin-campaigns"],
+    queryFn: async () => {
+      const res = await fetchNestApi<any[]>("/admin/campaigns");
+      if (!Array.isArray(res)) return [];
+      return res.map((c: any) => ({
+        id: c.code || c.id,
+        name: c.name,
+        subject: c.subject ?? "",
+        audience: c.audience ?? "",
+        sent: Number(c.sent ?? 0),
+        opened: Number(c.opened ?? 0),
+        clicked: Number(c.clicked ?? 0),
+        sentAt: c.sentAt || c.sent_at || "—",
+        status: (c.status as Campaign["status"]) ?? "draft",
+      }));
+    },
+    initialData:
+      Array.isArray(rawCampaigns) && rawCampaigns.length > 0
+        ? (rawCampaigns as Campaign[])
+        : undefined,
+    enabled: typeof window !== "undefined",
+  });
+
+  const CAMPAIGNS =
+    clientCampaigns ?? (Array.isArray(rawCampaigns) ? (rawCampaigns as Campaign[]) : []);
   const sent = CAMPAIGNS.filter((c) => c.status === "sent");
   const totalSent = sent.reduce((s, c) => s + c.sent, 0);
   const totalOpen = sent.reduce((s, c) => s + c.opened, 0);
@@ -64,8 +93,13 @@ function EmailPage() {
     if (!window.confirm(t("email.deleteConfirm"))) return;
     setBusyId(c.id);
     try {
-      await deleteFn({ data: { id: c.id } });
+      try {
+        await deleteFn({ data: { id: c.id } });
+      } catch {
+        await fetchNestApi(`/admin/campaigns/${c.id}`, { method: "DELETE" });
+      }
       toast.success(t("email.deleted"));
+      refetch();
       await router.invalidate();
     } catch (e) {
       toast.error(String((e as Error).message ?? e));
@@ -223,7 +257,14 @@ function CreateCampaignModal({ onClose, onDone }: { onClose: () => void; onDone:
     if (!name.trim()) return;
     setSaving(true);
     try {
-      await createFn({ data: { name, subject, audience, status, time } });
+      try {
+        await createFn({ data: { name, subject, audience, status, time } });
+      } catch {
+        await fetchNestApi("/admin/campaigns", {
+          method: "POST",
+          body: JSON.stringify({ name, subject, audience, status, time }),
+        });
+      }
       toast.success(t("email.created"));
       onClose();
       await onDone();

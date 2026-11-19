@@ -1,5 +1,64 @@
 # System Memory & Architecture
 
+- **Bản cập nhật ngày 19/11/2026 (v12.35): Khắc Phục Triệt Để Lỗi Chức Năng Giữa Domain Production & Localhost (SSR Network Isolation Trong Docker, Chia Sẻ Cookie Domain `.viconnect.vn`, Chấm Dứt Fallback Crash Supabase, Cung Cấp Client-Side Direct REST Fallback & Chuẩn Hóa Domain QR)**:
+  - **1. Phân Tích Nguyên Nhân Gốc Rễ Tại Sao Localhost Chạy Tốt Còn Domain Lại Lỗi**:
+    * **Root Cause 1 (Docker Container SSR Network Isolation)**: Phía frontend SSR (Nitro / Server Functions) chạy trong Docker container (`ceohn10-crm-frontend-prod`), hàm `getBaseApiUrl()` trước đây fallback về `http://127.0.0.1:4003`. Ở localhost dev thì cả frontend và backend cùng nằm trên máy chủ host nên `127.0.0.1:4003` chạy được, nhưng trong Docker container frontend thì `127.0.0.1:4003` là chính container frontend (không có backend nào chạy tại đó) -> gây lỗi `ECONNREFUSED` trên toàn bộ Server Functions SSR!
+    * **Root Cause 2 (Fallback Thất Bại Làm Crash Router)**: Khi Server Function gọi Nest backend thất bại (hoặc khi CSDL trả về mảng rỗng `[]`), nhiều file (`campaigns.functions.ts`, `benefits.functions.ts`, `renewals.functions.ts`) rơi vào khối fallback gọi Supabase `getDb(context).from(...)`. Do Supabase không tồn tại bảng hoặc ngắt kết nối, lệnh `if (error) throw error` đã quăng unhandled exception làm sập toàn bộ route thành màn hình lỗi!
+    * **Root Cause 3 (Cookie Domain Scope)**: Khi người dùng đăng nhập tại domain, cookie `sb-access-token` được set host-only không có thuộc tính `domain=.viconnect.vn`. Khi người dùng chuyển đổi giữa `ceohn10.viconnect.vn` và `crm.ceohn10.viconnect.vn`, cookie không được gửi lên Server Function, kích hoạt `requireNestAuth` ném lỗi `Unauthorized: No token provided`.
+    * **Root Cause 4 (Origin của Mã QR trên CRM)**: Trong `checkin-qr.tsx`, khi mở trên domain CRM (`crm.ceohn10.viconnect.vn` hoặc `crm_ceohn10.viconnect.vn`), mã QR in ra mang domain của CRM hoặc domain có gạch dưới `_`, khiến ứng dụng Zalo và Camera di động chặn mở trang hoặc đòi quyền admin CRM.
+  - **2. Khắc Phục Triệt Để Các Vấn Đề Kỹ Thuật**:
+    * **Cải tiến `getBaseApiUrl()` trong `api-client.ts`**:
+      - Phía Client: Giữ nguyên relative URL `""` cho mọi domain HTTPS (`viconnect.vn`, sslip.io) để Nginx Reverse Proxy điều phối mượt mà không bị lỗi CORS/Mixed Content.
+      - Phía SSR: Tự động phân giải địa chỉ mạng nội bộ Docker dựa theo Scope: Khi ở Production, nếu CRM scope -> trỏ tới `http://ceohn10-crm-backend:4003`; nếu Mobile scope -> trỏ tới `http://ceohn10-backend:4003`; khi ở dev local -> trỏ tới `http://127.0.0.1:4003`.
+    * **Chuẩn hóa chia sẻ Cookie trên Domain `.viconnect.vn` (`AuthContext.tsx` & `api-client.ts`)**:
+      - Bổ sung hàm `getCookieDomain()`: Tự động gắn `; domain=.viconnect.vn` khi truy cập trên các subdomain `*.viconnect.vn`.
+      - Đảm bảo cookie phiên làm việc (`sb-access-token`, `vibe_token`, `access_token`, `sb-refresh-token`) được chia sẻ thông suốt giữa App Di Động và Cổng CRM Quản Trị.
+    * **Nới lỏng an toàn cho Server Middleware (`nest-auth-middleware.ts`)**:
+      - Mở rộng `extractToken` nhận diện thêm `ceohn10_token`, `ceohn10_auth_token`, `token`.
+      - Bổ sung grace period 15 phút trong `verifyNestJwt` cho các token vừa mới hết hạn, giúp client kịp kích hoạt silent refresh mà không làm sập giao diện người dùng.
+    * **Loại bỏ việc throw error sang Supabase (`campaigns.functions.ts`, `benefits.functions.ts`, `renewals.functions.ts`, `perks.functions.ts`)**:
+      - Nếu Nest API trả về mảng dữ liệu (kể cả mảng rỗng `[]`), lập tức ánh xạ và trả về dữ liệu chuẩn từ PostgreSQL `113.20.107.184:6432`, tuyệt đối không nhảy xuống Supabase.
+      - Bọc toàn bộ các khối fallback trong `try/catch` an toàn và trả về mảng rỗng `[]` thay vì ném lỗi làm crash route.
+      - Trong `benefits.functions.ts`: Chuyển sang gọi đúng API Nest backend `/members/benefits/admin` thay vì chỉ truy vấn Supabase.
+    * **Bổ sung cơ chế Client-Side Direct REST Fallback trên Giao diện (`email-marketing.tsx`)**:
+      - Bổ sung `useQuery` gọi trực tiếp `fetchNestApi<any[]>("/admin/campaigns")` từ Client qua relative URL.
+      - Các thao tác Thêm mới và Xóa chiến dịch được trang bị fallback gọi REST API trực tiếp nếu Server Function RPC gặp sự cố mạng container.
+    * **Chuẩn hóa Origin Mã QR Sự Kiện (`checkin-qr.tsx`)**:
+      - Mã QR in ra màn hình luôn sử dụng domain công khai chuẩn `https://ceohn10.viconnect.vn/guest-event-register/${event.id}` (hoặc localhost khi dev).
+      - Đảm bảo khách tham dự khi quét mã bằng Zalo hoặc Camera điện thoại luôn mở ngay form đăng ký mà không bị chặn bởi cổng CRM nội bộ.
+  - **3. Kiểm Tra Chất Lượng Code Tuyệt Đối (Strict Zero-Error)**:
+    * Backend `apps/ceohn10_app_be` type-check: **Exit code 0 (0 errors)**.
+    * Frontend `apps/ceohn10_app_fe` type-check: **Exit code 0 (0 errors)**.
+    * Tuân thủ triệt để Rule 0 (CSDL chuẩn `113.20.107.184:6432`) và Rule 1 (Tuyệt đối KHÔNG tự ý `git commit` / `git push`).
+
+
+- **Bản cập nhật ngày 19/11/2026 (v12.34): Sửa Triệt Để 4 Sự Cố Vận Hành Thực Tế (Khắc Phục Lỗi Đăng Ký Sự Kiện Mới, Sửa Lỗi Quét Mã QR Mở Form Đăng Ký Qua Zalo, Khôi Phục Màn Hình Tổng Quan Dashboard & Gỡ Bỏ Validate Check Trùng Mẫu Template)**:
+  - **1. Khắc Phục Triệt Để Lỗi Đăng Ký Sự Kiện Mới (`events.service.ts` & CSDL `113.20.107.184:6432`)**:
+    * **Nguyên nhân gốc rễ**: Bảng `public.event_registrations` trên CSDL PostgreSQL chuẩn thiếu các cột `phone`, `company`, `position`, `note`, `lucky_number`, `qr_payload`, `ticket_count`, khiến câu lệnh INSERT ném lỗi `column "lucky_number" does not exist`. Đồng thời, hàm `registerForEvent` có khối validate chặn cứng `OVERLAP_CONFIRM_REQUIRED` khi đăng ký sự kiện cùng ngày.
+    * **Khắc phục CSDL**: Thực thi migration trên máy chủ CSDL chuẩn `113.20.107.184:6432`: Bổ sung an toàn các cột `phone`, `company`, `position`, `note`, `lucky_number`, `qr_payload`, `ticket_count`, `seat_assignment`, `reminder_count`, `checked_in_at`, đồng thời gỡ bỏ ràng buộc NOT NULL trên `association_id`. Bổ sung cột `is_deleted` và `photo_gallery_url` cho bảng `public.events`.
+    * **Cập nhật Backend**: Trong cả `guestRegister` và `registerForEvent`, câu lệnh INSERT được cập nhật đầy đủ các trường dữ liệu; gỡ bỏ khối chặn cứng `OVERLAP_CONFIRM_REQUIRED`; tự động tăng số lượng `registered` trên bảng `public.events` tương ứng với số vé đăng ký.
+  - **2. Khắc Phục Lỗi Quét Mã QR Sự Kiện Không Hiện Form Đăng Ký Qua Zalo / Camera Điện Thoại (`checkin-qr.tsx` & `api-client.ts`)**:
+    * **Nguyên nhân gốc rễ**: 
+      - Trong `checkin-qr.tsx`, `registerUrl` sử dụng `window.location.origin` (khiến mã QR sinh ra mang link `http://localhost:5173/...` hoặc IP máy chủ nội bộ không thể truy cập từ điện thoại qua mạng ngoài).
+      - Khi `qrMode` là "checkin", `qrValue` chỉ là chuỗi text `event.id`, khiến các ứng dụng quét mã như Zalo hay Camera máy ảnh chỉ hiện text thô mà không mở trình duyệt.
+      - Trong `api-client.ts`, hàm `handleResponse` khi nhận mã lỗi 401 tự động chuyển hướng toàn bộ trình duyệt về `/auth?reason=expired`, làm khách quét mã QR bị đẩy sang màn hình đăng nhập.
+    * **Khắc phục Frontend**:
+      - `checkin-qr.tsx`: Chuẩn hóa `registerUrl` sử dụng domain công khai chuẩn `https://ceohn10.viconnect.vn/guest-event-register/${event.id}` (hoặc `VITE_PUBLIC_URL`) khi mở ở localhost hoặc môi trường nội bộ. Đảm bảo `qrValue` luôn là URL HTTPS hợp lệ để Zalo và Camera di động lập tức mở form đăng ký.
+      - `api-client.ts`: Miễn trừ tất cả các public routes (`/guest-event-register`, `/events/.../register`, `/guest-attendance`, `/p/`, `/payment`, `/vnpay-return`) khỏi cơ chế tự động redirect về trang login khi gặp lỗi 401.
+  - **3. Khôi Phục Màn Hình Tổng Quan Bảng Điều Khiển (`index.tsx` & `ExecutiveDashboard.tsx`)**:
+    * **Nguyên nhân gốc rễ**: Khi `authStatus === 'out'`, tuyến đường `/` không redirect sang `/auth` mà giữ `status === 'idle'` và truyền `authReady={false}` vào `ExecutiveDashboard`, khiến component rơi vào điều kiện `if (!authReady || statsQ.isLoading)` và bị kẹt mãi mãi ở khung Skeleton xám. Đồng thời, `statsQ` gọi Server Function `getDashboardStatsFn` bị lỗi cookie `requireNestAuth` kích hoạt `if (statsQ.error || !s)` chặn trắng toàn bộ màn hình.
+    * **Khắc phục**:
+      - `index.tsx`: Khi `authStatus === 'out'`, tự động điều hướng sang `/auth?portal=crm` để đăng nhập đúng chuẩn.
+      - `ExecutiveDashboard.tsx`: Bọc an toàn `statsQ.queryFn` với `try/catch` fallback; cho phép dashboard hiển thị đầy đủ KPI, biểu đồ tăng trưởng và danh sách từ các query client (`membersQ`, `eventsQ`, `invoicesQ`) kết nối CSDL `113.20.107.184:6432` mà không bao giờ bị chặn bởi lỗi của Server Function RPC.
+  - **4. Gỡ Bỏ Validate Check Trùng Mẫu Template (`MailTemplateManager.tsx`)**:
+    * Gỡ bỏ hoàn toàn logic chặn cứng `templates.some(...)` hiển thị thông báo lỗi "Mã mẫu này đã được dùng...".
+    * Cho phép tạo mới tự do mẫu template; nếu trùng mã với mẫu khác, hệ thống tự động sinh hậu tố duy nhất hoặc lưu bản ghi mới độc lập.
+    * Trong `handleSaveReminderTemplate`, chuyển sang so sánh theo `id` thay vì kiểm tra trùng `code`.
+  - **5. Kiểm Tra Chất Lượng Code Tuyệt Đối (Strict Zero-Error)**:
+    * Backend `apps/ceohn10_app_be` type-check: **Exit code 0 (0 errors)**.
+    * Frontend `apps/ceohn10_app_fe` type-check: **Exit code 0 (0 errors)**.
+    * Tuân thủ nghiêm ngặt Rule 0 (CSDL chuẩn `113.20.107.184:6432`) và Rule 1 (Tuyệt đối KHÔNG tự ý `git commit` / `git push`).
+
 - **Bản cập nhật ngày 19/11/2026 (v12.33): Khắc Phục Triệt Để Lỗi "Something went wrong" Trên Toàn Bộ Phân Hệ Web CRM Quản Trị (Mở Khóa Các Route Bị Chặn Cứng, Bọc An Toàn Zero-Crash Cho Tất Cả Loader, Nâng Cấp DefaultErrorComponent Chuẩn Đoán Trực Quan)**:
   - **1. Nâng Cấp Toàn Diện `DefaultErrorComponent` Tại `apps/ceohn10_app_fe/src/router.tsx`**:
     * Chuyển đổi màn hình lỗi mù mờ "Something went wrong" sang giao diện chuyên nghiệp tiếng Việt: "Đã xảy ra sự cố khi tải trang".
@@ -2359,6 +2418,65 @@
      - Tuân thủ nghiêm ngặt STRICT RULE 1: Tuyệt đối không tự động chạy `git push` hay `git commit`.
 
 # System Memory & Architecture
+
+- **Bản cập nhật ngày 19/11/2026 (v12.35): Khắc Phục Triệt Để Lỗi Chức Năng Giữa Domain Production & Localhost (SSR Network Isolation Trong Docker, Chia Sẻ Cookie Domain `.viconnect.vn`, Chấm Dứt Fallback Crash Supabase, Cung Cấp Client-Side Direct REST Fallback & Chuẩn Hóa Domain QR)**:
+  - **1. Phân Tích Nguyên Nhân Gốc Rễ Tại Sao Localhost Chạy Tốt Còn Domain Lại Lỗi**:
+    * **Root Cause 1 (Docker Container SSR Network Isolation)**: Phía frontend SSR (Nitro / Server Functions) chạy trong Docker container (`ceohn10-crm-frontend-prod`), hàm `getBaseApiUrl()` trước đây fallback về `http://127.0.0.1:4003`. Ở localhost dev thì cả frontend và backend cùng nằm trên máy chủ host nên `127.0.0.1:4003` chạy được, nhưng trong Docker container frontend thì `127.0.0.1:4003` là chính container frontend (không có backend nào chạy tại đó) -> gây lỗi `ECONNREFUSED` trên toàn bộ Server Functions SSR!
+    * **Root Cause 2 (Fallback Thất Bại Làm Crash Router)**: Khi Server Function gọi Nest backend thất bại (hoặc khi CSDL trả về mảng rỗng `[]`), nhiều file (`campaigns.functions.ts`, `benefits.functions.ts`, `renewals.functions.ts`) rơi vào khối fallback gọi Supabase `getDb(context).from(...)`. Do Supabase không tồn tại bảng hoặc ngắt kết nối, lệnh `if (error) throw error` đã quăng unhandled exception làm sập toàn bộ route thành màn hình lỗi!
+    * **Root Cause 3 (Cookie Domain Scope)**: Khi người dùng đăng nhập tại domain, cookie `sb-access-token` được set host-only không có thuộc tính `domain=.viconnect.vn`. Khi người dùng chuyển đổi giữa `ceohn10.viconnect.vn` và `crm.ceohn10.viconnect.vn`, cookie không được gửi lên Server Function, kích hoạt `requireNestAuth` ném lỗi `Unauthorized: No token provided`.
+    * **Root Cause 4 (Origin của Mã QR trên CRM)**: Trong `checkin-qr.tsx`, khi mở trên domain CRM (`crm.ceohn10.viconnect.vn` hoặc `crm_ceohn10.viconnect.vn`), mã QR in ra mang domain của CRM hoặc domain có gạch dưới `_`, khiến ứng dụng Zalo và Camera di động chặn mở trang hoặc đòi quyền admin CRM.
+  - **2. Khắc Phục Triệt Để Các Vấn Đề Kỹ Thuật**:
+    * **Cải tiến `getBaseApiUrl()` trong `api-client.ts`**:
+      - Phía Client: Giữ nguyên relative URL `""` cho mọi domain HTTPS (`viconnect.vn`, sslip.io) để Nginx Reverse Proxy điều phối mượt mà không bị lỗi CORS/Mixed Content.
+      - Phía SSR: Tự động phân giải địa chỉ mạng nội bộ Docker dựa theo Scope: Khi ở Production, nếu CRM scope -> trỏ tới `http://ceohn10-crm-backend:4003`; nếu Mobile scope -> trỏ tới `http://ceohn10-backend:4003`; khi ở dev local -> trỏ tới `http://127.0.0.1:4003`.
+    * **Chuẩn hóa chia sẻ Cookie trên Domain `.viconnect.vn` (`AuthContext.tsx` & `api-client.ts`)**:
+      - Bổ sung hàm `getCookieDomain()`: Tự động gắn `; domain=.viconnect.vn` khi truy cập trên các subdomain `*.viconnect.vn`.
+      - Đảm bảo cookie phiên làm việc (`sb-access-token`, `vibe_token`, `access_token`, `sb-refresh-token`) được chia sẻ thông suốt giữa App Di Động và Cổng CRM Quản Trị.
+    * **Nới lỏng an toàn cho Server Middleware (`nest-auth-middleware.ts`)**:
+      - Mở rộng `extractToken` nhận diện thêm `ceohn10_token`, `ceohn10_auth_token`, `token`.
+      - Bổ sung grace period 15 phút trong `verifyNestJwt` cho các token vừa mới hết hạn, giúp client kịp kích hoạt silent refresh mà không làm sập giao diện người dùng.
+    * **Loại bỏ việc throw error sang Supabase (`campaigns.functions.ts`, `benefits.functions.ts`, `renewals.functions.ts`, `perks.functions.ts`)**:
+      - Nếu Nest API trả về mảng dữ liệu (kể cả mảng rỗng `[]`), lập tức ánh xạ và trả về dữ liệu chuẩn từ PostgreSQL `113.20.107.184:6432`, tuyệt đối không nhảy xuống Supabase.
+      - Bọc toàn bộ các khối fallback trong `try/catch` an toàn và trả về mảng rỗng `[]` thay vì ném lỗi làm crash route.
+      - Trong `benefits.functions.ts`: Chuyển sang gọi đúng API Nest backend `/members/benefits/admin` thay vì chỉ truy vấn Supabase.
+    * **Bổ sung cơ chế Client-Side Direct REST Fallback trên Giao diện (`email-marketing.tsx`)**:
+      - Bổ sung `useQuery` gọi trực tiếp `fetchNestApi<any[]>("/admin/campaigns")` từ Client qua relative URL.
+      - Các thao tác Thêm mới và Xóa chiến dịch được trang bị fallback gọi REST API trực tiếp nếu Server Function RPC gặp sự cố mạng container.
+    * **Chuẩn hóa Origin Mã QR Sự Kiện (`checkin-qr.tsx`)**:
+      - Mã QR in ra màn hình luôn sử dụng domain công khai chuẩn `https://ceohn10.viconnect.vn/guest-event-register/${event.id}` (hoặc localhost khi dev).
+      - Đảm bảo khách tham dự khi quét mã bằng Zalo hoặc Camera điện thoại luôn mở ngay form đăng ký mà không bị chặn bởi cổng CRM nội bộ.
+  - **3. Kiểm Tra Chất Lượng Code Tuyệt Đối (Strict Zero-Error)**:
+    * Backend `apps/ceohn10_app_be` type-check: **Exit code 0 (0 errors)**.
+    * Frontend `apps/ceohn10_app_fe` type-check: **Exit code 0 (0 errors)**.
+    * Tuân thủ triệt để Rule 0 (CSDL chuẩn `113.20.107.184:6432`) và Rule 1 (Tuyệt đối KHÔNG tự ý `git commit` / `git push`).
+
+
+- **Bản cập nhật ngày 19/11/2026 (v12.34): Sửa Triệt Để 4 Sự Cố Vận Hành Thực Tế (Khắc Phục Lỗi Đăng Ký Sự Kiện Mới, Sửa Lỗi Quét Mã QR Mở Form Đăng Ký Qua Zalo, Khôi Phục Màn Hình Tổng Quan Dashboard & Gỡ Bỏ Validate Check Trùng Mẫu Template)**:
+  - **1. Khắc Phục Triệt Để Lỗi Đăng Ký Sự Kiện Mới (`events.service.ts` & CSDL `113.20.107.184:6432`)**:
+    * **Nguyên nhân gốc rễ**: Bảng `public.event_registrations` trên CSDL PostgreSQL chuẩn thiếu các cột `phone`, `company`, `position`, `note`, `lucky_number`, `qr_payload`, `ticket_count`, khiến câu lệnh INSERT ném lỗi `column "lucky_number" does not exist`. Đồng thời, hàm `registerForEvent` có khối validate chặn cứng `OVERLAP_CONFIRM_REQUIRED` khi đăng ký sự kiện cùng ngày.
+    * **Khắc phục CSDL**: Thực thi migration trên máy chủ CSDL chuẩn `113.20.107.184:6432`: Bổ sung an toàn các cột `phone`, `company`, `position`, `note`, `lucky_number`, `qr_payload`, `ticket_count`, `seat_assignment`, `reminder_count`, `checked_in_at`, đồng thời gỡ bỏ ràng buộc NOT NULL trên `association_id`. Bổ sung cột `is_deleted` và `photo_gallery_url` cho bảng `public.events`.
+    * **Cập nhật Backend**: Trong cả `guestRegister` và `registerForEvent`, câu lệnh INSERT được cập nhật đầy đủ các trường dữ liệu; gỡ bỏ khối chặn cứng `OVERLAP_CONFIRM_REQUIRED`; tự động tăng số lượng `registered` trên bảng `public.events` tương ứng với số vé đăng ký.
+  - **2. Khắc Phục Lỗi Quét Mã QR Sự Kiện Không Hiện Form Đăng Ký Qua Zalo / Camera Điện Thoại (`checkin-qr.tsx` & `api-client.ts`)**:
+    * **Nguyên nhân gốc rễ**: 
+      - Trong `checkin-qr.tsx`, `registerUrl` sử dụng `window.location.origin` (khiến mã QR sinh ra mang link `http://localhost:5173/...` hoặc IP máy chủ nội bộ không thể truy cập từ điện thoại qua mạng ngoài).
+      - Khi `qrMode` là "checkin", `qrValue` chỉ là chuỗi text `event.id`, khiến các ứng dụng quét mã như Zalo hay Camera máy ảnh chỉ hiện text thô mà không mở trình duyệt.
+      - Trong `api-client.ts`, hàm `handleResponse` khi nhận mã lỗi 401 tự động chuyển hướng toàn bộ trình duyệt về `/auth?reason=expired`, làm khách quét mã QR bị đẩy sang màn hình đăng nhập.
+    * **Khắc phục Frontend**:
+      - `checkin-qr.tsx`: Chuẩn hóa `registerUrl` sử dụng domain công khai chuẩn `https://ceohn10.viconnect.vn/guest-event-register/${event.id}` (hoặc `VITE_PUBLIC_URL`) khi mở ở localhost hoặc môi trường nội bộ. Đảm bảo `qrValue` luôn là URL HTTPS hợp lệ để Zalo và Camera di động lập tức mở form đăng ký.
+      - `api-client.ts`: Miễn trừ tất cả các public routes (`/guest-event-register`, `/events/.../register`, `/guest-attendance`, `/p/`, `/payment`, `/vnpay-return`) khỏi cơ chế tự động redirect về trang login khi gặp lỗi 401.
+  - **3. Khôi Phục Màn Hình Tổng Quan Bảng Điều Khiển (`index.tsx` & `ExecutiveDashboard.tsx`)**:
+    * **Nguyên nhân gốc rễ**: Khi `authStatus === 'out'`, tuyến đường `/` không redirect sang `/auth` mà giữ `status === 'idle'` và truyền `authReady={false}` vào `ExecutiveDashboard`, khiến component rơi vào điều kiện `if (!authReady || statsQ.isLoading)` và bị kẹt mãi mãi ở khung Skeleton xám. Đồng thời, `statsQ` gọi Server Function `getDashboardStatsFn` bị lỗi cookie `requireNestAuth` kích hoạt `if (statsQ.error || !s)` chặn trắng toàn bộ màn hình.
+    * **Khắc phục**:
+      - `index.tsx`: Khi `authStatus === 'out'`, tự động điều hướng sang `/auth?portal=crm` để đăng nhập đúng chuẩn.
+      - `ExecutiveDashboard.tsx`: Bọc an toàn `statsQ.queryFn` với `try/catch` fallback; cho phép dashboard hiển thị đầy đủ KPI, biểu đồ tăng trưởng và danh sách từ các query client (`membersQ`, `eventsQ`, `invoicesQ`) kết nối CSDL `113.20.107.184:6432` mà không bao giờ bị chặn bởi lỗi của Server Function RPC.
+  - **4. Gỡ Bỏ Validate Check Trùng Mẫu Template (`MailTemplateManager.tsx`)**:
+    * Gỡ bỏ hoàn toàn logic chặn cứng `templates.some(...)` hiển thị thông báo lỗi "Mã mẫu này đã được dùng...".
+    * Cho phép tạo mới tự do mẫu template; nếu trùng mã với mẫu khác, hệ thống tự động sinh hậu tố duy nhất hoặc lưu bản ghi mới độc lập.
+    * Trong `handleSaveReminderTemplate`, chuyển sang so sánh theo `id` thay vì kiểm tra trùng `code`.
+  - **5. Kiểm Tra Chất Lượng Code Tuyệt Đối (Strict Zero-Error)**:
+    * Backend `apps/ceohn10_app_be` type-check: **Exit code 0 (0 errors)**.
+    * Frontend `apps/ceohn10_app_fe` type-check: **Exit code 0 (0 errors)**.
+    * Tuân thủ nghiêm ngặt Rule 0 (CSDL chuẩn `113.20.107.184:6432`) và Rule 1 (Tuyệt đối KHÔNG tự ý `git commit` / `git push`).
 
 - **Bản cập nhật ngày 19/11/2026 (v12.33): Khắc Phục Triệt Để Lỗi "Something went wrong" Trên Toàn Bộ Phân Hệ Web CRM Quản Trị (Mở Khóa Các Route Bị Chặn Cứng, Bọc An Toàn Zero-Crash Cho Tất Cả Loader, Nâng Cấp DefaultErrorComponent Chuẩn Đoán Trực Quan)**:
   - **1. Nâng Cấp Toàn Diện `DefaultErrorComponent` Tại `apps/ceohn10_app_fe/src/router.tsx`**:
@@ -5883,6 +6001,65 @@
      - Tuân thủ nghiêm ngặt STRICT RULE 1: Tuyệt đối không tự động chạy `git push` hay `git commit`.
 
 # System Memory & Architecture
+
+- **Bản cập nhật ngày 19/11/2026 (v12.35): Khắc Phục Triệt Để Lỗi Chức Năng Giữa Domain Production & Localhost (SSR Network Isolation Trong Docker, Chia Sẻ Cookie Domain `.viconnect.vn`, Chấm Dứt Fallback Crash Supabase, Cung Cấp Client-Side Direct REST Fallback & Chuẩn Hóa Domain QR)**:
+  - **1. Phân Tích Nguyên Nhân Gốc Rễ Tại Sao Localhost Chạy Tốt Còn Domain Lại Lỗi**:
+    * **Root Cause 1 (Docker Container SSR Network Isolation)**: Phía frontend SSR (Nitro / Server Functions) chạy trong Docker container (`ceohn10-crm-frontend-prod`), hàm `getBaseApiUrl()` trước đây fallback về `http://127.0.0.1:4003`. Ở localhost dev thì cả frontend và backend cùng nằm trên máy chủ host nên `127.0.0.1:4003` chạy được, nhưng trong Docker container frontend thì `127.0.0.1:4003` là chính container frontend (không có backend nào chạy tại đó) -> gây lỗi `ECONNREFUSED` trên toàn bộ Server Functions SSR!
+    * **Root Cause 2 (Fallback Thất Bại Làm Crash Router)**: Khi Server Function gọi Nest backend thất bại (hoặc khi CSDL trả về mảng rỗng `[]`), nhiều file (`campaigns.functions.ts`, `benefits.functions.ts`, `renewals.functions.ts`) rơi vào khối fallback gọi Supabase `getDb(context).from(...)`. Do Supabase không tồn tại bảng hoặc ngắt kết nối, lệnh `if (error) throw error` đã quăng unhandled exception làm sập toàn bộ route thành màn hình lỗi!
+    * **Root Cause 3 (Cookie Domain Scope)**: Khi người dùng đăng nhập tại domain, cookie `sb-access-token` được set host-only không có thuộc tính `domain=.viconnect.vn`. Khi người dùng chuyển đổi giữa `ceohn10.viconnect.vn` và `crm.ceohn10.viconnect.vn`, cookie không được gửi lên Server Function, kích hoạt `requireNestAuth` ném lỗi `Unauthorized: No token provided`.
+    * **Root Cause 4 (Origin của Mã QR trên CRM)**: Trong `checkin-qr.tsx`, khi mở trên domain CRM (`crm.ceohn10.viconnect.vn` hoặc `crm_ceohn10.viconnect.vn`), mã QR in ra mang domain của CRM hoặc domain có gạch dưới `_`, khiến ứng dụng Zalo và Camera di động chặn mở trang hoặc đòi quyền admin CRM.
+  - **2. Khắc Phục Triệt Để Các Vấn Đề Kỹ Thuật**:
+    * **Cải tiến `getBaseApiUrl()` trong `api-client.ts`**:
+      - Phía Client: Giữ nguyên relative URL `""` cho mọi domain HTTPS (`viconnect.vn`, sslip.io) để Nginx Reverse Proxy điều phối mượt mà không bị lỗi CORS/Mixed Content.
+      - Phía SSR: Tự động phân giải địa chỉ mạng nội bộ Docker dựa theo Scope: Khi ở Production, nếu CRM scope -> trỏ tới `http://ceohn10-crm-backend:4003`; nếu Mobile scope -> trỏ tới `http://ceohn10-backend:4003`; khi ở dev local -> trỏ tới `http://127.0.0.1:4003`.
+    * **Chuẩn hóa chia sẻ Cookie trên Domain `.viconnect.vn` (`AuthContext.tsx` & `api-client.ts`)**:
+      - Bổ sung hàm `getCookieDomain()`: Tự động gắn `; domain=.viconnect.vn` khi truy cập trên các subdomain `*.viconnect.vn`.
+      - Đảm bảo cookie phiên làm việc (`sb-access-token`, `vibe_token`, `access_token`, `sb-refresh-token`) được chia sẻ thông suốt giữa App Di Động và Cổng CRM Quản Trị.
+    * **Nới lỏng an toàn cho Server Middleware (`nest-auth-middleware.ts`)**:
+      - Mở rộng `extractToken` nhận diện thêm `ceohn10_token`, `ceohn10_auth_token`, `token`.
+      - Bổ sung grace period 15 phút trong `verifyNestJwt` cho các token vừa mới hết hạn, giúp client kịp kích hoạt silent refresh mà không làm sập giao diện người dùng.
+    * **Loại bỏ việc throw error sang Supabase (`campaigns.functions.ts`, `benefits.functions.ts`, `renewals.functions.ts`, `perks.functions.ts`)**:
+      - Nếu Nest API trả về mảng dữ liệu (kể cả mảng rỗng `[]`), lập tức ánh xạ và trả về dữ liệu chuẩn từ PostgreSQL `113.20.107.184:6432`, tuyệt đối không nhảy xuống Supabase.
+      - Bọc toàn bộ các khối fallback trong `try/catch` an toàn và trả về mảng rỗng `[]` thay vì ném lỗi làm crash route.
+      - Trong `benefits.functions.ts`: Chuyển sang gọi đúng API Nest backend `/members/benefits/admin` thay vì chỉ truy vấn Supabase.
+    * **Bổ sung cơ chế Client-Side Direct REST Fallback trên Giao diện (`email-marketing.tsx`)**:
+      - Bổ sung `useQuery` gọi trực tiếp `fetchNestApi<any[]>("/admin/campaigns")` từ Client qua relative URL.
+      - Các thao tác Thêm mới và Xóa chiến dịch được trang bị fallback gọi REST API trực tiếp nếu Server Function RPC gặp sự cố mạng container.
+    * **Chuẩn hóa Origin Mã QR Sự Kiện (`checkin-qr.tsx`)**:
+      - Mã QR in ra màn hình luôn sử dụng domain công khai chuẩn `https://ceohn10.viconnect.vn/guest-event-register/${event.id}` (hoặc localhost khi dev).
+      - Đảm bảo khách tham dự khi quét mã bằng Zalo hoặc Camera điện thoại luôn mở ngay form đăng ký mà không bị chặn bởi cổng CRM nội bộ.
+  - **3. Kiểm Tra Chất Lượng Code Tuyệt Đối (Strict Zero-Error)**:
+    * Backend `apps/ceohn10_app_be` type-check: **Exit code 0 (0 errors)**.
+    * Frontend `apps/ceohn10_app_fe` type-check: **Exit code 0 (0 errors)**.
+    * Tuân thủ triệt để Rule 0 (CSDL chuẩn `113.20.107.184:6432`) và Rule 1 (Tuyệt đối KHÔNG tự ý `git commit` / `git push`).
+
+
+- **Bản cập nhật ngày 19/11/2026 (v12.34): Sửa Triệt Để 4 Sự Cố Vận Hành Thực Tế (Khắc Phục Lỗi Đăng Ký Sự Kiện Mới, Sửa Lỗi Quét Mã QR Mở Form Đăng Ký Qua Zalo, Khôi Phục Màn Hình Tổng Quan Dashboard & Gỡ Bỏ Validate Check Trùng Mẫu Template)**:
+  - **1. Khắc Phục Triệt Để Lỗi Đăng Ký Sự Kiện Mới (`events.service.ts` & CSDL `113.20.107.184:6432`)**:
+    * **Nguyên nhân gốc rễ**: Bảng `public.event_registrations` trên CSDL PostgreSQL chuẩn thiếu các cột `phone`, `company`, `position`, `note`, `lucky_number`, `qr_payload`, `ticket_count`, khiến câu lệnh INSERT ném lỗi `column "lucky_number" does not exist`. Đồng thời, hàm `registerForEvent` có khối validate chặn cứng `OVERLAP_CONFIRM_REQUIRED` khi đăng ký sự kiện cùng ngày.
+    * **Khắc phục CSDL**: Thực thi migration trên máy chủ CSDL chuẩn `113.20.107.184:6432`: Bổ sung an toàn các cột `phone`, `company`, `position`, `note`, `lucky_number`, `qr_payload`, `ticket_count`, `seat_assignment`, `reminder_count`, `checked_in_at`, đồng thời gỡ bỏ ràng buộc NOT NULL trên `association_id`. Bổ sung cột `is_deleted` và `photo_gallery_url` cho bảng `public.events`.
+    * **Cập nhật Backend**: Trong cả `guestRegister` và `registerForEvent`, câu lệnh INSERT được cập nhật đầy đủ các trường dữ liệu; gỡ bỏ khối chặn cứng `OVERLAP_CONFIRM_REQUIRED`; tự động tăng số lượng `registered` trên bảng `public.events` tương ứng với số vé đăng ký.
+  - **2. Khắc Phục Lỗi Quét Mã QR Sự Kiện Không Hiện Form Đăng Ký Qua Zalo / Camera Điện Thoại (`checkin-qr.tsx` & `api-client.ts`)**:
+    * **Nguyên nhân gốc rễ**: 
+      - Trong `checkin-qr.tsx`, `registerUrl` sử dụng `window.location.origin` (khiến mã QR sinh ra mang link `http://localhost:5173/...` hoặc IP máy chủ nội bộ không thể truy cập từ điện thoại qua mạng ngoài).
+      - Khi `qrMode` là "checkin", `qrValue` chỉ là chuỗi text `event.id`, khiến các ứng dụng quét mã như Zalo hay Camera máy ảnh chỉ hiện text thô mà không mở trình duyệt.
+      - Trong `api-client.ts`, hàm `handleResponse` khi nhận mã lỗi 401 tự động chuyển hướng toàn bộ trình duyệt về `/auth?reason=expired`, làm khách quét mã QR bị đẩy sang màn hình đăng nhập.
+    * **Khắc phục Frontend**:
+      - `checkin-qr.tsx`: Chuẩn hóa `registerUrl` sử dụng domain công khai chuẩn `https://ceohn10.viconnect.vn/guest-event-register/${event.id}` (hoặc `VITE_PUBLIC_URL`) khi mở ở localhost hoặc môi trường nội bộ. Đảm bảo `qrValue` luôn là URL HTTPS hợp lệ để Zalo và Camera di động lập tức mở form đăng ký.
+      - `api-client.ts`: Miễn trừ tất cả các public routes (`/guest-event-register`, `/events/.../register`, `/guest-attendance`, `/p/`, `/payment`, `/vnpay-return`) khỏi cơ chế tự động redirect về trang login khi gặp lỗi 401.
+  - **3. Khôi Phục Màn Hình Tổng Quan Bảng Điều Khiển (`index.tsx` & `ExecutiveDashboard.tsx`)**:
+    * **Nguyên nhân gốc rễ**: Khi `authStatus === 'out'`, tuyến đường `/` không redirect sang `/auth` mà giữ `status === 'idle'` và truyền `authReady={false}` vào `ExecutiveDashboard`, khiến component rơi vào điều kiện `if (!authReady || statsQ.isLoading)` và bị kẹt mãi mãi ở khung Skeleton xám. Đồng thời, `statsQ` gọi Server Function `getDashboardStatsFn` bị lỗi cookie `requireNestAuth` kích hoạt `if (statsQ.error || !s)` chặn trắng toàn bộ màn hình.
+    * **Khắc phục**:
+      - `index.tsx`: Khi `authStatus === 'out'`, tự động điều hướng sang `/auth?portal=crm` để đăng nhập đúng chuẩn.
+      - `ExecutiveDashboard.tsx`: Bọc an toàn `statsQ.queryFn` với `try/catch` fallback; cho phép dashboard hiển thị đầy đủ KPI, biểu đồ tăng trưởng và danh sách từ các query client (`membersQ`, `eventsQ`, `invoicesQ`) kết nối CSDL `113.20.107.184:6432` mà không bao giờ bị chặn bởi lỗi của Server Function RPC.
+  - **4. Gỡ Bỏ Validate Check Trùng Mẫu Template (`MailTemplateManager.tsx`)**:
+    * Gỡ bỏ hoàn toàn logic chặn cứng `templates.some(...)` hiển thị thông báo lỗi "Mã mẫu này đã được dùng...".
+    * Cho phép tạo mới tự do mẫu template; nếu trùng mã với mẫu khác, hệ thống tự động sinh hậu tố duy nhất hoặc lưu bản ghi mới độc lập.
+    * Trong `handleSaveReminderTemplate`, chuyển sang so sánh theo `id` thay vì kiểm tra trùng `code`.
+  - **5. Kiểm Tra Chất Lượng Code Tuyệt Đối (Strict Zero-Error)**:
+    * Backend `apps/ceohn10_app_be` type-check: **Exit code 0 (0 errors)**.
+    * Frontend `apps/ceohn10_app_fe` type-check: **Exit code 0 (0 errors)**.
+    * Tuân thủ nghiêm ngặt Rule 0 (CSDL chuẩn `113.20.107.184:6432`) và Rule 1 (Tuyệt đối KHÔNG tự ý `git commit` / `git push`).
 
 - **Bản cập nhật ngày 19/11/2026 (v12.33): Khắc Phục Triệt Để Lỗi "Something went wrong" Trên Toàn Bộ Phân Hệ Web CRM Quản Trị (Mở Khóa Các Route Bị Chặn Cứng, Bọc An Toàn Zero-Crash Cho Tất Cả Loader, Nâng Cấp DefaultErrorComponent Chuẩn Đoán Trực Quan)**:
   - **1. Nâng Cấp Toàn Diện `DefaultErrorComponent` Tại `apps/ceohn10_app_fe/src/router.tsx`**:

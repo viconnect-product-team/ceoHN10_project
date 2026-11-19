@@ -19,12 +19,15 @@ function extractToken(request: Request): string | null {
     return authHeader.slice(7);
   }
 
-  // 2. Cookie: sb-access-token | vibe_token | access_token
+  // 2. Cookie: sb-access-token | vibe_token | access_token | ceohn10_token | ceohn10_auth_token | token
   const cookieHeader = request.headers.get("cookie") ?? "";
   const match =
     cookieHeader.match(/sb-access-token=([^;]+)/) ??
     cookieHeader.match(/vibe_token=([^;]+)/) ??
-    cookieHeader.match(/access_token=([^;]+)/);
+    cookieHeader.match(/access_token=([^;]+)/) ??
+    cookieHeader.match(/ceohn10_token=([^;]+)/) ??
+    cookieHeader.match(/ceohn10_auth_token=([^;]+)/) ??
+    cookieHeader.match(/(?:^|;\s*)token=([^;]+)/);
   return match ? decodeURIComponent(match[1]) : null;
 }
 
@@ -51,9 +54,10 @@ function verifyNestJwt(token: string): Record<string, any> | null {
 
     const decoded = JSON.parse(Buffer.from(payload, "base64").toString("utf8"));
 
-    // Kiểm tra hết hạn
-    if (decoded.exp && decoded.exp * 1000 < Date.now()) {
-      return null; // Đã hết hạn
+    // Kiểm tra hết hạn: Cho phép grace period 15 phút để client thực hiện silent refresh mượt mà
+    const GRACE_PERIOD_MS = 15 * 60 * 1000;
+    if (decoded.exp && decoded.exp * 1000 + GRACE_PERIOD_MS < Date.now()) {
+      return null; // Đã hết hạn hoàn toàn quá thời hạn châm chước
     }
 
     return decoded;

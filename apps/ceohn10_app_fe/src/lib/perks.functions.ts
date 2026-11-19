@@ -61,7 +61,7 @@ export const listPerksAdminFn = createServerFn({ method: "GET" })
     try {
       const token = context?.token;
       const data = await fetchNestApiFromServer<any[]>("/content/admin/perks", token);
-      if (Array.isArray(data) && data.length > 0) {
+      if (Array.isArray(data)) {
         return data.map((r) => mapPerk(r));
       }
     } catch {
