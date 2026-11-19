@@ -1,6 +1,52 @@
 # ==============================================================================
 # BỘ LUẬT DỰ ÁN (PROJECT RULES & AI CODEGEN STANDARDS) - CEO HN10 PROJECT
 # Vai trò: Tech Lead | Định dạng: .cursorrules
+# 19/11/2026 (v12.32) — TRIỂN KHAI HOÀN THIỆN PHASE 7: WORKFLOW & ACTION AGENT LIÊN HOÀN ĐA CÔNG CỤ (CHAINING MULTI-STEP PIPELINES, EXTENSIBLE CONTEXT CONTRACT & FAILURE RECOVERY):
+#   * [KIẾN TRÚC CONTEXT CONTRACT MỞ RỘNG (KHÔNG CẦN SỬA LẠI AGENT CORE)]:
+#     - Định nghĩa ToolContextContract trong tool.interface.ts (consumes, produces, transformParams, extractContext).
+#     - Từng tool tự quản lý việc nhận/nạp dữ liệu vào workflowContext dùng chung.
+#     - Thêm tool mới không cần sửa lại Agent Core.
+#   * [CHAINING MULTI-STEP PIPELINE ENGINE (llm-provider.adapter.ts & agent-core.service.ts)]:
+#     - Tự động nhận diện và phối hợp liên hoàn đa công cụ:
+#       + Workflow 1: Bóc tách công văn/tài liệu ➔ Tạo lịch họp & Quét xung đột ➔ Tra cứu email đại biểu CSDL ➔ Soạn thư mời họp cá nhân hóa ➔ Phát hành email qua SMTP Gmail.
+#       + Workflow 2: Đối chiếu danh sách tệp với CSDL ➔ Soạn thư đôn đốc thành viên chưa nộp ➔ Phát hành email nhắc nhở qua SMTP.
+#       + Workflow 3: Quét lịch trống ➔ Tạo lịch cuộc họp ➔ Soạn thư mời đại biểu ➔ Phát hành email.
+#   * [FAILURE RECOVERY & STEP INTERCEPTION (RETRY, SKIP, ABORT)]:
+#     - Khi gặp sự cố, kế hoạch chuyển sang trạng thái "halted", không mất context.
+#     - Tích hợp 3 API và nút hành động trên UI: Thử lại bước này (retryStep), Bỏ qua & tiếp tục (skipStep), Hủy quy trình (abortTask).
+#   * [GIAO DIỆN UI WORKFLOW NÂNG CAO (AiExecutionStepTracker.tsx & CrmChatGPTView.tsx)]:
+#     - Sơ đồ tiến trình liên hoàn (Workflow Chaining Pipeline Map) hiển thị trực quan các mắt xích công cụ.
+#     - Thẻ chuyển giao dữ liệu liên hoàn (Data Handoff Card) và hộp thoại xử lý lỗi Failure Recovery.
+#     - Quick Prompt 1-chạm kích hoạt quy trình liên hoàn trong CrmChatGPTView.
+#   * [TUÂN THỦ CSDL & GIT]: CSDL duy nhất 113.20.107.184:6432 (ceohn10_project). Tuyệt đối không git commit / git push. Type check đạt 0 lỗi (Exit code 0 trên cả BE và FE).
+# 19/11/2026 (v12.31) — TRIỂN KHAI HOÀN THIỆN PHASE 6: DATA QUERY AGENT CHUYÊN SÂU & NATURAL LANGUAGE REPORTING (TRA CỨU DỮ LIỆU TỰ NHIÊN, BIỂU ĐỒ TRỰC QUAN & XUẤT EXCEL):
+#   * [TRIỂN KHAI TOOL 12 (query_system_analytics)]:
+#     - Tuyệt đối không cho LLM chạy raw SQL tự do trên production database để bảo vệ an toàn toàn diện hệ thống.
+#     - Hỗ trợ 6 template truy vấn nghiệp vụ kết nối trực tiếp CSDL 113.20.107.184:6432:
+#       + member_overview: Tổng học viên, đang hoạt động, chưa kích hoạt, chưa xác thực email, đăng ký mới hôm nay.
+#       + member_search_advanced: Tra cứu linh hoạt theo họ tên, email, tiền tố SĐT (09...), ban ngành.
+#       + finance_monthly_stats: Thống kê doanh thu, chi phí, dòng tiền thuần theo 12 tháng gần nhất từ public.transactions & public.invoices.
+#       + failed_transactions: Thống kê giao dịch thất bại, hóa đơn quá hạn cần xử lý.
+#       + department_distribution: Thống kê cơ cấu nhân sự các ban trong CLB.
+#       + system_kpi_summary: KPI tổng thể toàn diện hệ thống.
+#   * [PHÂN LOẠI NGÔN NGỮ TỰ NHIÊN (llm-provider.adapter.ts & agent-core.service.ts)]:
+#     - Tự động nhận diện Intent 0 cho các câu hỏi tra cứu dữ liệu tự nhiên.
+#     - Tự động định dạng số tiền VND, tỷ lệ % và sinh tóm tắt thông minh.
+#   * [GIAO DIỆN TRỰC QUAN (AiExecutionStepTracker.tsx & CrmChatGPTView.tsx)]:
+#     - Thẻ AnalyticsReportCard: KPI cards màu sắc, biểu đồ cột SVG tương tác 12 tháng (Thu vs Chi vs Dòng tiền), bảng phân trang chi tiết, nút Xuất Báo Cáo Excel (.xlsx) và nút Sao chép tóm tắt.
+#   * [TUÂN THỦ CSDL & GIT]: CSDL duy nhất 113.20.107.184:6432 (ceohn10_project). Tuyệt đối không git commit / git push. Type check đạt 0 lỗi (Exit code 0 trên cả BE và FE).
+# 19/11/2026 (v12.30) — TRIỂN KHAI HOÀN THIỆN PHASE 5: CALENDAR & EVENT AGENT (TẠO SỰ KIỆN, PHÁT HIỆN XUNG ĐỘT, TRA CỨU EMAIL TỰ ĐỘNG, GOOGLE CALENDAR 1-CLICK & HỖ TRỢ ĐA FILE):
+#   * [NÂNG CẤP TOOL 6 (create_calendar_meeting)]:
+#     - Nhận diện title, date, time, location, eventType, attendeeNames, attendeeEmails, checkConflict, isOnline.
+#     - Tự động tra cứu email từ CSDL public.members khi người dùng chỉ nhập họ tên đại biểu.
+#     - Kiểm tra xung đột lịch trình (Conflict Detection) giữa public.events và public.meetings.
+#     - Sinh phòng họp trực tuyến Jitsi/Meet bảo mật, sinh link Google Calendar (1-Click) và chuỗi iCalendar (.ics).
+#   * [BỔ SUNG TOOL 11 (check_calendar_availability)]:
+#     - Quét toàn bộ lịch bận trong CSDL và chia timeline 3 ca (Sáng, Chiều, Tối), tự động đề xuất khung giờ vàng trống.
+#   * [PIPELINE DATA HANDOFF LIÊN HOÀN (agent-core.service.ts)]:
+#     - Handoff tự động: Parse Document -> Calendar Tool -> Email Broadcast Preview -> Batch Dispatch.
+#   * [GIAO DIỆN TRỰC QUAN]: CalendarEventCard hiển thị thông tin sự kiện, link phòng họp, danh sách đại biểu kèm email CSDL, nút Google Calendar và nút tải file .ics.
+#   * [TUÂN THỦ CSDL & GIT]: CSDL duy nhất 113.20.107.184:6432 (ceohn10_project). Tuyệt đối không git commit / git push. Type check đạt 0 lỗi (Exit code 0 trên cả BE và FE).
 # 18/11/2026 (v12.25) — ĐỔI TÊN TOÀN DIỆN BẢNG TÀI KHOẢN THÀNH ceohn10_users (XÓA BỎ HOÀN TOÀN TIỀN TỐ vione_users):
 #   * [CHUẨN HÓA BẢNG TÀI KHOẢN NGƯỜI DÙNG CEO HN10 (ceohn10_users)]:
 #     - Bảng 1 trong THIET_KE_CSDL_POSTGRESQL_CEOHN10.md: public.ceohn10_users (Tài khoản người dùng CEO HN10).

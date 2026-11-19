@@ -865,3 +865,31 @@ sequenceDiagram
     }
   }
   ```
+
+#### 6. `POST /api/ai/agent/execute` — Khởi tạo & Điều phối Kế hoạch Hành Động Liên Hoàn (Multi-step Action Chaining)
+- **Request Body**:
+  | Tên Trường | Kiểu Dữ Liệu | Bắt Buộc | Mô Tả |
+  | :--- | :--- | :---: | :--- |
+  | `goal` | `string` | Có | Câu lệnh ngôn ngữ tự nhiên từ người dùng |
+  | `files` | `array` | Không | Mảng các tệp đính kèm (`name`, `type`, `text`, `base64`) |
+  | `approvedSteps` | `array` | Không | Danh sách ID bước đã được người dùng phê duyệt trước |
+- **Response 200 OK**:
+  `AgentTaskExecutionPlan` kèm danh sách `steps`, `workflowContext`, và `chainSummary`.
+
+#### 7. `POST /api/ai/agent/confirm-step` — Phê duyệt hoặc từ chối hành động có tác động bên ngoài (EXTERNAL_ACTION)
+- **Request Body**: `{ "taskId": "string", "stepId": "string", "approved": true }`
+
+#### 8. `POST /api/ai/agent/retry-step` — Thử lại bước bị lỗi trong chuỗi quy trình liên hoàn (Failure Recovery)
+- **Request Body**: `{ "taskId": "string", "stepId": "string", "modifiedParams": {} }`
+
+#### 9. `POST /api/ai/agent/skip-step` — Bỏ qua bước lỗi để chuỗi tiếp tục thực thi các bước sau (Skip & Continue)
+- **Request Body**: `{ "taskId": "string", "stepId": "string" }`
+
+#### 10. `POST /api/ai/agent/abort-task` — Hủy bỏ toàn bộ quy trình nhiệm vụ
+- **Request Body**: `{ "taskId": "string" }`
+
+#### 11. `GET /api/ai/agent/task/:taskId` — Lấy trạng thái tiến trình thực thi nhiệm vụ
+- **Response 200 OK**: `AgentTaskExecutionPlan` cập nhật theo thời gian thực.
+
+#### 12. `GET /api/ai/agent/tools` — Danh mục các công cụ nghiệp vụ sẵn có trong Tool Registry
+- **Response 200 OK**: Danh sách 12 ToolDefinition kèm cấp độ an toàn và tham số chi tiết.

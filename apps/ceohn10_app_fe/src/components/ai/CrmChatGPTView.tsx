@@ -32,12 +32,30 @@ import {
   Paperclip,
   X,
   FileSpreadsheet as FileSpreadsheetIcon,
+  Download,
+  BarChart3,
+  Eye,
+  EyeOff,
+  Printer,
+  FileDown,
+  UploadCloud,
+  Workflow,
+  RefreshCw,
+  SkipForward,
+  Ban,
 } from "lucide-react";
 import { toast } from "sonner";
 import { fetchNestApi } from "@/lib/api-client";
 import { ViOneAiTutorGuide } from "../common/ViOneAiTutorGuide";
-import { parseExcelOrDocForEmails, type ParsedFileResult, type ParsedRecipientItem } from "@/lib/ai-excel-email-parser";
-import { AiExecutionStepTracker } from "./AiExecutionStepTracker";
+import { parseMultipleFiles, parseSingleDocument, type ParsedFileResult, type ParsedRecipientItem } from "@/lib/ai-excel-email-parser";
+import { AiExecutionStepTracker, type AgentTaskExecutionPlan } from "./AiExecutionStepTracker";
+import {
+  exportToExcel,
+  formatDisplayDate,
+  formatExcelCurrency,
+  numberToVietnameseWords,
+} from "@/lib/excel-export";
+import * as XLSX from "xlsx";
 
 export type AiPersonaType = "general" | "opportunity" | "events" | "meetings" | "finance" | "documents";
 
@@ -51,18 +69,46 @@ export interface ChatMessage {
   persona?: AiPersonaType;
   evidence?: Array<{ title: string; countOrVal: string; source: string }>;
   proactiveAlert?: string;
+  agentPlan?: AgentTaskExecutionPlan;
   attachedFile?: {
     name: string;
     size: number;
     emailCount: number;
     recipients: ParsedRecipientItem[];
   };
+  attachedFiles?: Array<{
+    name: string;
+    size: number;
+    fileType: string;
+    emailCount: number;
+    recipients?: ParsedRecipientItem[];
+  }>;
   executionPipeline?: {
     taskType: "event_email" | "fee_reminder" | "training_notice" | "report_export" | "general";
     commandText: string;
     fileName?: string;
     recipients: ParsedRecipientItem[];
     emailDraft?: { subject: string; body: string };
+  };
+  interactiveActions?: {
+    type: "report_category_selector";
+    title: string;
+    subtitle?: string;
+    targetDate: string;
+    targetDateFormatted: string;
+    isTodayRecords?: boolean;
+    totalAvailableIncome?: number;
+    todayTotal?: number;
+    categories: Array<{
+      id: string;
+      title: string;
+      desc: string;
+      icon: string;
+      badge: string;
+      count: number;
+      totalAmount: number;
+      records: any[];
+    }>;
   };
 }
 
@@ -204,11 +250,43 @@ const QUICK_PROMPTS = [
     persona: "events" as AiPersonaType,
   },
   {
+    icon: FileSpreadsheet,
+    color: "from-amber-500/10 to-yellow-500/10 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-900/40",
+    title: "Xuất Báo Cáo Tiền Thu Hôm Nay",
+    desc: "Tự động phân loại 5 danh mục thu và tải file Excel chuẩn kế toán TT 200",
+    prompt: "Xuất file báo cáo tiền thu trong ngày hôm nay, hãy đưa ra danh mục để tôi chọn.",
+    persona: "finance" as AiPersonaType,
+  },
+  {
+    icon: Workflow,
+    color: "from-amber-500/10 to-orange-500/10 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-900/40",
+    title: "Quy Trình: Đọc File ➔ Lên Lịch ➔ Gửi Thư Mời",
+    desc: "Tự phối hợp bóc tách công văn, tạo sự kiện và gửi email mời đại biểu",
+    prompt: "Đọc file công văn này, tạo các sự kiện trong lịch họp, tìm email những người liên quan từ CSDL, sau đó chuẩn bị gửi thông báo thư mời cho tất cả mọi người.",
+    persona: "meetings" as AiPersonaType,
+  },
+  {
     icon: TrendingUp,
     color: "from-emerald-500/10 to-teal-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-900/40",
     title: "Đối soát Quỹ Ngân Sách",
     desc: "Trích xuất số dư tài chính thực tế 100% từ sổ kế toán",
     prompt: "Báo cáo chi tiết số dư quỹ hiệp hội và các giao dịch thực tế từ sổ kế toán, không lấy số liệu giả định.",
+    persona: "finance" as AiPersonaType,
+  },
+  {
+    icon: Calendar,
+    color: "from-blue-500/10 to-indigo-500/10 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-900/40",
+    title: "Lên Lịch Họp & Gửi Thư Mời",
+    desc: "Tự động kiểm tra xung đột, tra cứu email hội viên từ CSDL và tạo Google Calendar",
+    prompt: "Ngày 25/11/2026 tổ chức cuộc họp ban dự án lúc 9h tại phòng họp tầng 3. Thành phần tham dự gồm Nguyễn Văn A, Trần Văn B. Hãy kiểm tra lịch, tạo sự kiện và chuẩn bị thư mời.",
+    persona: "meetings" as AiPersonaType,
+  },
+  {
+    icon: BarChart3,
+    color: "from-emerald-500/10 to-teal-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-900/40",
+    title: "Thống Kê Doanh Thu 12 Tháng",
+    desc: "Tổng hợp biểu đồ doanh thu theo từng tháng và dòng tiền thuần",
+    prompt: "Thống kê doanh thu theo từng tháng trong năm 2026 và vẽ biểu đồ dòng tiền thu chi.",
     persona: "finance" as AiPersonaType,
   },
   {
@@ -391,6 +469,225 @@ function MarkdownRenderer({ content }: { content: string }) {
   return <div className="space-y-0.5">{renderedElements}</div>;
 }
 
+/**
+ * Thẻ tương tác Chọn Danh Mục Báo Cáo Tiền Thu thực tế 100% từ CSDL
+ */
+function ReportCategorySelectorCard({
+  interactiveActions,
+  onExportCategory,
+  onExportAll,
+}: {
+  interactiveActions: NonNullable<ChatMessage["interactiveActions"]>;
+  onExportCategory: (category: any) => void;
+  onExportAll: (categories: any[]) => void;
+}) {
+  const [expandedCatId, setExpandedCatId] = useState<string | null>(null);
+
+  const getCategoryIcon = (iconName: string) => {
+    switch (iconName) {
+      case "TrendingUp":
+        return TrendingUp;
+      case "Users":
+        return Users;
+      case "Calendar":
+        return Calendar;
+      case "Handshake":
+        return Handshake;
+      case "FileSpreadsheet":
+      default:
+        return FileSpreadsheet;
+    }
+  };
+
+  return (
+    <div className="rounded-2xl border border-amber-300/80 dark:border-amber-900/60 bg-gradient-to-b from-amber-500/10 via-amber-500/5 to-transparent p-4 sm:p-5 space-y-4 shadow-xs">
+      {/* Header Danh Mục */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-amber-200/80 dark:border-amber-900/50">
+        <div className="flex items-center gap-2.5">
+          <div className="size-9 rounded-xl bg-amber-500/20 text-amber-600 dark:text-amber-400 grid place-items-center shrink-0 border border-amber-400/40">
+            <FileSpreadsheet className="size-5" />
+          </div>
+          <div>
+            <h4 className="text-xs sm:text-sm font-black text-slate-950 dark:text-white uppercase tracking-tight flex flex-wrap items-center gap-2">
+              <span>{interactiveActions.title}</span>
+              <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500 text-slate-950 font-bold">
+                {interactiveActions.targetDateFormatted}
+              </span>
+            </h4>
+            <p className="text-[11px] text-slate-600 dark:text-slate-400 mt-0.5">
+              {interactiveActions.subtitle || "Chọn danh mục để hệ thống trích xuất số liệu thực tế và tải file Excel:"}
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2 self-start sm:self-auto shrink-0">
+          <span className="text-[10px] font-mono font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded-lg border border-emerald-500/20 flex items-center gap-1">
+            <CheckCircle2 className="size-3" />
+            <span>CSDL 113.20.107.184</span>
+          </span>
+        </div>
+      </div>
+
+      {/* Danh sách 5 danh mục */}
+      <div className="grid grid-cols-1 gap-2.5">
+        {interactiveActions.categories.map((cat, idx) => {
+          const CatIcon = getCategoryIcon(cat.icon);
+          const isExpanded = expandedCatId === cat.id;
+          const records = cat.records || [];
+
+          return (
+            <div
+              key={cat.id || idx}
+              className={`rounded-xl border transition-all duration-200 overflow-hidden ${
+                isExpanded
+                  ? "border-amber-400 dark:border-amber-700 bg-white dark:bg-slate-900 shadow-md"
+                  : "border-slate-200/90 dark:border-slate-800 bg-white/80 dark:bg-slate-900/60 hover:border-amber-300 dark:hover:border-amber-800 hover:shadow-2xs"
+              }`}
+            >
+              <div className="p-3 sm:p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div className="flex items-start gap-3 flex-1 min-w-0">
+                  <div className="size-9 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 grid place-items-center shrink-0 border border-slate-200 dark:border-slate-700 mt-0.5">
+                    <CatIcon className="size-4 text-amber-500" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="font-bold text-xs text-slate-900 dark:text-slate-100">
+                        {idx + 1}. {cat.title}
+                      </span>
+                      <span className="text-[10px] px-2 py-0.5 rounded-md font-semibold bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-400/20">
+                        {cat.badge}
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 line-clamp-1">
+                      {cat.desc}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Số tiền & Nút Hành Động */}
+                <div className="flex items-center justify-between sm:justify-end gap-2.5 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-100 dark:border-slate-800/80">
+                  <div className="text-right">
+                    <div className="text-xs font-black text-emerald-600 dark:text-emerald-400">
+                      {formatExcelCurrency(cat.totalAmount)} đ
+                    </div>
+                    <div className="text-[10px] text-muted-foreground font-medium">
+                      {cat.count} giao dịch
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      type="button"
+                      onClick={() => setExpandedCatId(isExpanded ? null : cat.id)}
+                      className="px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-[11px] font-semibold text-slate-700 dark:text-slate-300 transition flex items-center gap-1 cursor-pointer"
+                      title={isExpanded ? "Ẩn bảng chi tiết" : "Xem trước chi tiết giao dịch"}
+                    >
+                      {isExpanded ? <EyeOff className="size-3.5" /> : <Eye className="size-3.5" />}
+                      <span className="hidden sm:inline">{isExpanded ? "Đóng" : "Xem"}</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => onExportCategory(cat)}
+                      className="px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-600 active:scale-95 text-slate-950 font-bold text-[11px] transition flex items-center gap-1.5 shadow-2xs cursor-pointer group"
+                    >
+                      <Download className="size-3.5 group-hover:translate-y-0.5 transition-transform" />
+                      <span>Xuất Excel (.xlsx)</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Bảng Xem Trước Chi Tiết (Khi click "Xem") */}
+              {isExpanded && (
+                <div className="px-3.5 pb-3.5 pt-1 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/40">
+                  <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2 flex items-center justify-between">
+                    <span>Chi tiết các phiếu thu thực tế ({records.length} bản ghi):</span>
+                    <span className="text-primary font-mono font-normal">Định dạng chuẩn TT 200/2014/TT-BTC</span>
+                  </div>
+
+                  {records.length === 0 ? (
+                    <div className="py-4 text-center text-xs text-muted-foreground">
+                      Chưa có phát sinh trong danh mục này. File Excel sẽ xuất theo mẫu biểu chuẩn.
+                    </div>
+                  ) : (
+                    <div className="overflow-x-auto rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
+                      <table className="w-full text-left text-[11px]">
+                        <thead className="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold">
+                          <tr>
+                            <th className="px-2.5 py-1.5 border-b">STT</th>
+                            <th className="px-2.5 py-1.5 border-b">Mã Phiếu</th>
+                            <th className="px-2.5 py-1.5 border-b">Ngày</th>
+                            <th className="px-2.5 py-1.5 border-b">Người Nộp / Cty</th>
+                            <th className="px-2.5 py-1.5 border-b">Nội Dung</th>
+                            <th className="px-2.5 py-1.5 border-b text-right">Số Tiền (VNĐ)</th>
+                            <th className="px-2.5 py-1.5 border-b">Hình Thức</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                          {records.map((r: any, rIdx: number) => (
+                            <tr key={r.id || rIdx} className="hover:bg-slate-50 dark:hover:bg-slate-800/50">
+                              <td className="px-2.5 py-1.5 font-mono text-muted-foreground">{rIdx + 1}</td>
+                              <td className="px-2.5 py-1.5 font-mono font-bold text-primary">{r.code || r.id}</td>
+                              <td className="px-2.5 py-1.5">{formatDisplayDate(r.date)}</td>
+                              <td className="px-2.5 py-1.5 font-medium">{r.recipient || "Học viên CLB"}</td>
+                              <td className="px-2.5 py-1.5 max-w-[200px] truncate" title={r.description}>
+                                {r.description || r.category}
+                              </td>
+                              <td className="px-2.5 py-1.5 text-right font-mono font-bold text-emerald-600 dark:text-emerald-400">
+                                {formatExcelCurrency(r.amount)} đ
+                              </td>
+                              <td className="px-2.5 py-1.5">
+                                <span className="px-1.5 py-0.5 rounded text-[10px] bg-slate-100 dark:bg-slate-800">
+                                  {r.method === "bank" ? "VietQR" : "Tiền mặt"}
+                                </span>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                        <tfoot className="bg-slate-50 dark:bg-slate-800/80 font-bold text-slate-900 dark:text-white">
+                          <tr>
+                            <td colSpan={5} className="px-2.5 py-2 text-right uppercase text-[10px]">
+                              Tổng cộng danh mục:
+                            </td>
+                            <td className="px-2.5 py-2 text-right font-mono text-emerald-600 dark:text-emerald-400">
+                              {formatExcelCurrency(cat.totalAmount)} đ
+                            </td>
+                            <td />
+                          </tr>
+                        </tfoot>
+                      </table>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Footer Actions: Tải trọn bộ đa sheet */}
+      <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div className="text-[11px] text-muted-foreground flex items-center gap-1.5">
+          <ShieldCheck className="size-4 text-emerald-500" />
+          <span>Biểu mẫu hợp chuẩn Thông tư số 200/2014/TT-BTC của Bộ Tài chính</span>
+        </div>
+
+        <div className="flex items-center gap-2 w-full sm:w-auto">
+          <button
+            type="button"
+            onClick={() => onExportAll(interactiveActions.categories)}
+            className="flex-1 sm:flex-initial px-4 py-2 rounded-xl bg-gradient-to-r from-amber-500 via-amber-600 to-yellow-600 hover:from-amber-600 hover:to-yellow-700 text-slate-950 font-black text-xs transition flex items-center justify-center gap-2 shadow-sm cursor-pointer"
+          >
+            <Layers className="size-4" />
+            <span>Tải Trọn Bộ Sổ Quỹ Excel Đa Sheet</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function CrmChatGPTView() {
   const [sessions, setSessions] = useState<ChatSession[]>([]);
   const [currentSessionId, setCurrentSessionId] = useState<string>("");
@@ -402,36 +699,176 @@ export function CrmChatGPTView() {
   const [liveAlert, setLiveAlert] = useState<string | null>(null);
   const [isTutorOpen, setIsTutorOpen] = useState(false);
 
-  // Quản lý đính kèm tệp Excel / Word để AI bóc tách & tự động ra lệnh
-  const [attachedFile, setAttachedFile] = useState<ParsedFileResult | null>(null);
+  // Quản lý đính kèm đa tệp (Excel / Word / PDF / CSV / Text) để AI bóc tách & tự động ra lệnh
+  const [attachedFiles, setAttachedFiles] = useState<ParsedFileResult[]>([]);
+  const [isDraggingOver, setIsDraggingOver] = useState(false);
   const [isParsingFile, setIsParsingFile] = useState(false);
+
+  // Biến tương thích tệp đầu tiên
+  const attachedFile = attachedFiles[0] || null;
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Xử lý nạp và bóc tách tệp Excel / Word
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  // Xử lý nạp và bóc tách nhiều tệp Word / Excel / PDF / CSV
+  const handleProcessFiles = async (files: File[]) => {
+    if (!files.length) return;
 
     setIsParsingFile(true);
     try {
-      const parsed = await parseExcelOrDocForEmails(file);
-      setAttachedFile(parsed);
+      const parsedResults = await parseMultipleFiles(files);
+      setAttachedFiles((prev) => [...prev, ...parsedResults]);
+      const totalEmails = parsedResults.reduce((acc, f) => acc + f.totalEmails, 0);
       toast.success(
-        `Đã đọc tệp ${file.name}: Bóc tách thành công ${parsed.totalEmails} địa chỉ email!`
+        `Đã đọc thành công ${parsedResults.length} tệp: Bóc tách ${totalEmails} email & cấu trúc tài liệu!`
       );
       if (!inputMessage.trim()) {
-        setInputMessage(`Gửi mail thông tin sự kiện tới toàn bộ mail trong file excel này`);
+        if (parsedResults.length >= 2) {
+          setInputMessage(
+            `So sánh và đối chiếu dữ liệu giữa các file: ${parsedResults.map((f) => f.fileName).join(", ")}`
+          );
+        } else {
+          setInputMessage(
+            `Đọc tệp ${parsedResults[0].fileName} và gửi thông báo tới các học viên trong danh sách`
+          );
+        }
       }
-    } catch {
-      toast.error("Không thể đọc tệp. Vui lòng kiểm tra định dạng Excel/Word!");
+    } catch (err: any) {
+      toast.error(`Lỗi đọc tệp: ${err?.message || "Định dạng không hỗ trợ"}`);
     } finally {
       setIsParsingFile(false);
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
       }
+    }
+  };
+
+  // Xử lý khi chọn tệp từ nút đính kèm
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files ? Array.from(e.target.files) : [];
+    if (files.length > 0) {
+      await handleProcessFiles(files);
+    }
+  };
+
+  // Xuất file Excel cho 1 danh mục cụ thể
+  const handleExportCategoryToExcel = (category: any, targetDateFormatted?: string) => {
+    try {
+      const records = category.records || [];
+      const totalAmount = Number(category.totalAmount || 0);
+      const dateDisplay = targetDateFormatted || new Date().toLocaleDateString("vi-VN");
+
+      exportToExcel({
+        title: category.title.toUpperCase(),
+        subtitle: `CLB DOANH NHÂN CEO HN10 (HANOIBA) - NGÀY ${dateDisplay}`,
+        filename: `Bao_Cao_${category.id}_${new Date().toISOString().slice(0, 10)}`,
+        organization: "CLB DOANH NHÂN CEO HN10 (HANOIBA)",
+        templateType: category.id === "accounting_circular_200" ? "cashbook" : "standard",
+        circularCode: category.id === "accounting_circular_200" ? "Mẫu số S07-DN" : undefined,
+        circularNote:
+          category.id === "accounting_circular_200"
+            ? "(Ban hành theo Thông tư số 200/2014/TT-BTC ngày 22/12/2014 của Bộ Tài chính)"
+            : undefined,
+        columns: [
+          { header: "MÃ PHIẾU", key: "code", width: 16, value: (r: any) => r.code || r.id },
+          { header: "NGÀY GHI NHẬN", key: "date", width: 15, value: (r: any) => formatDisplayDate(r.date) },
+          {
+            header: "NGƯỜI NỘP / DOANH NGHIỆP",
+            key: "recipient",
+            width: 28,
+            value: (r: any) => r.recipient || "Học viên CLB CEO HN10",
+          },
+          { header: "DANH MỤC THU", key: "category", width: 22, value: (r: any) => r.category || "Hội phí" },
+          {
+            header: "NỘI DUNG DIỄN GIẢI",
+            key: "description",
+            width: 36,
+            value: (r: any) => r.description || "Nộp tiền vào quỹ CLB",
+          },
+          {
+            header: "SỐ TIỀN (VNĐ)",
+            key: "amount",
+            width: 18,
+            value: (r: any) => formatExcelCurrency(r.amount),
+          },
+          {
+            header: "HÌNH THỨC",
+            key: "method",
+            width: 18,
+            value: (r: any) => (r.method === "bank" ? "Chuyển khoản VietQR" : "Tiền mặt"),
+          },
+          {
+            header: "TRẠNG THÁI",
+            key: "status",
+            width: 16,
+            value: (r: any) => (r.status === "completed" ? "Đã ghi nhận quỹ" : "Đang chờ đối soát"),
+          },
+        ],
+        data: records,
+        summaryRows: [["", "", "", "", "TỔNG CỘNG:", formatExcelCurrency(totalAmount), "", ""]],
+        amountInWords: numberToVietnameseWords(totalAmount),
+        signerTitles: ["Người Lập Biểu", "Thủ Quỹ Kế Toán", "Chủ Tịch CLB CEO HN10"],
+      });
+
+      toast.success(`Đã xuất và tải file Excel thành công: ${category.title}!`);
+    } catch (err: any) {
+      toast.error(`Lỗi khi xuất file Excel: ${err?.message || "Vui lòng thử lại"}`);
+    }
+  };
+
+  // Xuất trọn bộ Sổ quỹ đa sheet (5 danh mục)
+  const handleExportAllWorkbook = (categories: any[]) => {
+    try {
+      const wb = XLSX.utils.book_new();
+
+      categories.forEach((cat) => {
+        const records = cat.records || [];
+        const sheetData: any[][] = [];
+        sheetData.push([`ĐƠN VỊ: CLB DOANH NHÂN CEO HN10 (HANOIBA)`]);
+        sheetData.push([cat.title.toUpperCase()]);
+        sheetData.push([`Ngày trích xuất: ${new Date().toLocaleDateString("vi-VN")}`]);
+        sheetData.push([]);
+        sheetData.push([
+          "STT",
+          "MÃ PHIẾU THU",
+          "NGÀY THU",
+          "NGƯỜI NỘP / DOANH NGHIỆP",
+          "DANH MỤC THU",
+          "NỘI DUNG DIỄN GIẢI",
+          "SỐ TIỀN (VNĐ)",
+          "HÌNH THỨC",
+          "TRẠNG THÁI",
+        ]);
+
+        records.forEach((r: any, idx: number) => {
+          sheetData.push([
+            idx + 1,
+            r.code || r.id,
+            formatDisplayDate(r.date),
+            r.recipient || "Học viên CLB",
+            r.category || cat.title,
+            r.description || "",
+            Number(r.amount || 0),
+            r.method === "bank" ? "Chuyển khoản VietQR" : "Tiền mặt",
+            r.status === "completed" ? "Đã ghi nhận" : "Chờ xử lý",
+          ]);
+        });
+
+        sheetData.push([]);
+        sheetData.push(["", "", "", "", "", "TỔNG CỘNG:", Number(cat.totalAmount || 0), "", ""]);
+        sheetData.push([`Số tiền bằng chữ: ${numberToVietnameseWords(cat.totalAmount)}`]);
+
+        const ws = XLSX.utils.aoa_to_sheet(sheetData);
+        const safeSheetName = cat.badge.replace(/[/\\?*[\]]/g, "_").slice(0, 31);
+        XLSX.utils.book_append_sheet(wb, ws, safeSheetName);
+      });
+
+      const todayStr = new Date().toISOString().slice(0, 10);
+      XLSX.writeFile(wb, `So_Quy_CEO_HN10_Tron_Bo_${todayStr}.xlsx`);
+      toast.success("Đã xuất trọn bộ sổ quỹ 5 danh mục thành công!");
+    } catch (err: any) {
+      toast.error(`Lỗi khi xuất trọn bộ sổ quỹ: ${err?.message}`);
     }
   };
 
@@ -532,6 +969,8 @@ export function CrmChatGPTView() {
           persona,
           evidence: res.evidence || [],
           proactiveAlert: res.proactiveAlert,
+          interactiveActions: res.interactiveActions,
+          executionPipeline: res.executionPipeline,
         };
 
         setSessions((prev) =>
@@ -600,31 +1039,155 @@ export function CrmChatGPTView() {
     }
   };
 
+  // Xác nhận hoặc từ chối một bước nhạy cảm của Action Agent
+  const handleConfirmAgentStep = async (taskId: string, stepId: string, approved: boolean) => {
+    try {
+      const res = await fetchNestApi<any>("/api/ai/agent/confirm-step", {
+        method: "POST",
+        body: JSON.stringify({ taskId, stepId, approved }),
+      });
+      if (res?.ok && res?.data) {
+        setSessions((prev) =>
+          prev.map((s) =>
+            s.id === currentSessionId
+              ? {
+                  ...s,
+                  messages: s.messages.map((m) =>
+                    m.agentPlan?.taskId === taskId
+                      ? {
+                          ...m,
+                          agentPlan: res.data,
+                          content: res.data.overallSummary || m.content,
+                        }
+                      : m
+                  ),
+                }
+              : s
+          )
+        );
+      }
+    } catch (err: any) {
+      toast.error(`Lỗi duyệt bước: ${err?.message}`);
+      throw err;
+    }
+  };
+
+  // Thử lại một bước bị lỗi của Action Agent (Failure Recovery)
+  const handleRetryAgentStep = async (taskId: string, stepId: string, modifiedParams?: Record<string, any>) => {
+    try {
+      const res = await fetchNestApi<any>("/api/ai/agent/retry-step", {
+        method: "POST",
+        body: JSON.stringify({ taskId, stepId, modifiedParams }),
+      });
+      if (res?.ok && res?.data) {
+        setSessions((prev) =>
+          prev.map((s) =>
+            s.id === currentSessionId
+              ? {
+                  ...s,
+                  messages: s.messages.map((m) =>
+                    m.agentPlan?.taskId === taskId
+                      ? {
+                          ...m,
+                          agentPlan: res.data,
+                          content: res.data.overallSummary || m.content,
+                        }
+                      : m
+                  ),
+                }
+              : s
+          )
+        );
+        toast.success("Đang khởi động lại bước...");
+      }
+    } catch (err: any) {
+      toast.error(`Lỗi khi thử lại: ${err?.message}`);
+      throw err;
+    }
+  };
+
+  // Bỏ qua một bước bị lỗi để tiếp tục chuỗi (Skip & Continue)
+  const handleSkipAgentStep = async (taskId: string, stepId: string) => {
+    try {
+      const res = await fetchNestApi<any>("/api/ai/agent/skip-step", {
+        method: "POST",
+        body: JSON.stringify({ taskId, stepId }),
+      });
+      if (res?.ok && res?.data) {
+        setSessions((prev) =>
+          prev.map((s) =>
+            s.id === currentSessionId
+              ? {
+                  ...s,
+                  messages: s.messages.map((m) =>
+                    m.agentPlan?.taskId === taskId
+                      ? {
+                          ...m,
+                          agentPlan: res.data,
+                          content: res.data.overallSummary || m.content,
+                        }
+                      : m
+                  ),
+                }
+              : s
+          )
+        );
+        toast.info("Đã bỏ qua bước và tiếp tục chuỗi.");
+      }
+    } catch (err: any) {
+      toast.error(`Lỗi khi bỏ qua: ${err?.message}`);
+      throw err;
+    }
+  };
+
+  // Hủy bỏ toàn bộ quy trình nhiệm vụ
+  const handleAbortAgentTask = async (taskId: string) => {
+    try {
+      const res = await fetchNestApi<any>("/api/ai/agent/abort-task", {
+        method: "POST",
+        body: JSON.stringify({ taskId }),
+      });
+      if (res?.ok && res?.data) {
+        setSessions((prev) =>
+          prev.map((s) =>
+            s.id === currentSessionId
+              ? {
+                  ...s,
+                  messages: s.messages.map((m) =>
+                    m.agentPlan?.taskId === taskId
+                      ? {
+                          ...m,
+                          agentPlan: res.data,
+                          content: "Nhiệm vụ đã bị hủy theo yêu cầu.",
+                        }
+                      : m
+                  ),
+                }
+              : s
+          )
+        );
+        toast.warning("Đã hủy bỏ quy trình.");
+      }
+    } catch (err: any) {
+      toast.error(`Lỗi khi hủy: ${err?.message}`);
+      throw err;
+    }
+  };
+
   // Gửi tin nhắn & Tự động nhận diện lệnh / File Excel
   const handleSendMessage = async (textToSend?: string, overridePersona?: AiPersonaType) => {
     const messageText = (textToSend || inputMessage).trim();
     if (!messageText || isGenerating || !currentSessionId) return;
 
     const usePersona = overridePersona || selectedPersona;
-    const currentAttached = attachedFile;
+    const currentAttachedList = [...attachedFiles];
 
-    // Kiểm tra xem câu lệnh có phải là lệnh tự động hóa không
-    const isAutomationCommand =
-      Boolean(currentAttached && currentAttached.recipients.length > 0) ||
-      /(gửi\s+mail|gửi\s+email|thông\s+báo\s+phí|nhắc\s+nộp\s+phí|hội\s+phí|xuất\s+báo\s+cáo|báo\s+cáo\s+sự\s+kiện|thông\s+báo\s+lớp)/i.test(
+    // Kiểm tra xem câu lệnh có phải là lệnh Action Agent thực thi không
+    const isActionAgentCommand =
+      currentAttachedList.length > 0 ||
+      /(gửi\s+mail|gửi\s+email|thông\s+báo\s+phí|nhắc\s+nộp\s+phí|hội\s+phí|tạo\s+lịch|tạo\s+sự\s+kiện|cuộc\s+họp|lên\s+lịch|kiểm\s+tra\s+lịch|lịch\s+trống|trùng\s+lịch|họp|hẹn\s+gặp|tìm\s+học\s+viên|tìm\s+hội\s+viên|danh\s+bạ|bóc\s+tách|phân\s+tích\s+file|so\s+sánh|đối\s+chiếu|doanh\s+thu|thất\s+bại|chưa\s+xác\s+thực|đang\s+hoạt\s+động|bao\s+nhiêu\s+người|bắt\s+đầu\s+bằng|đầu\s+số\s+09|đăng\s+ký\s+hôm\s+nay|cơ\s+cấu\s+ban|thống\s+kê)/i.test(
         messageText
       );
-
-    let detectedTaskType: "event_email" | "fee_reminder" | "training_notice" | "report_export" | "general" = "general";
-    if (/(phí|hội phí|nộp phí|tiền)/i.test(messageText)) {
-      detectedTaskType = "fee_reminder";
-    } else if (/(lớp học|khóa học|đào tạo|lịch học)/i.test(messageText)) {
-      detectedTaskType = "training_notice";
-    } else if (/(xuất báo cáo|báo cáo tài trợ|báo cáo tài chính|file báo cáo)/i.test(messageText)) {
-      detectedTaskType = "report_export";
-    } else if (/(sự kiện|event|hội thảo|gala|b2b)/i.test(messageText)) {
-      detectedTaskType = "event_email";
-    }
 
     const userMsg: ChatMessage = {
       id: `msg_u_${Date.now()}`,
@@ -632,12 +1195,19 @@ export function CrmChatGPTView() {
       content: messageText,
       createdAt: new Date().toISOString(),
       persona: usePersona,
-      attachedFile: currentAttached
+      attachedFiles: currentAttachedList.map((f) => ({
+        name: f.fileName,
+        size: f.fileSize,
+        fileType: f.fileType,
+        emailCount: f.totalEmails,
+        recipients: f.recipients,
+      })),
+      attachedFile: currentAttachedList[0]
         ? {
-            name: currentAttached.fileName,
-            size: currentAttached.fileSize,
-            emailCount: currentAttached.totalEmails,
-            recipients: currentAttached.recipients,
+            name: currentAttachedList[0].fileName,
+            size: currentAttachedList[0].fileSize,
+            emailCount: currentAttachedList[0].totalEmails,
+            recipients: currentAttachedList[0].recipients,
           }
         : undefined,
     };
@@ -661,58 +1231,47 @@ export function CrmChatGPTView() {
     );
 
     setInputMessage("");
-    setAttachedFile(null); // Clear sau khi đã đính kèm vào tin nhắn
+    setAttachedFiles([]); // Clear toàn bộ danh sách file sau khi gửi
     if (textareaRef.current) {
       textareaRef.current.style.height = "auto";
     }
     setIsGenerating(true);
 
     try {
-      if (isAutomationCommand) {
-        // GỌI ENDPOINT TỰ ĐỘNG HÓA AI
-        const res = await fetchNestApi<any>("/api/ai/auto-execute-command", {
+      if (isActionAgentCommand) {
+        // GỌI ENDPOINT ACTION AGENT CORE & TOOLS
+        const res = await fetchNestApi<any>("/api/ai/agent/execute", {
           method: "POST",
           body: JSON.stringify({
-            commandText: messageText,
-            fileName: currentAttached?.fileName,
-            recipients: currentAttached?.recipients || [],
-            extractedSummary: currentAttached?.extractedSummary || currentAttached?.summary || "",
+            goal: messageText,
+            files:
+              currentAttachedList.length > 0
+                ? currentAttachedList.map((f) => ({
+                    name: f.fileName,
+                    type: f.fileType,
+                    text: f.rawText || f.summary || "",
+                  }))
+                : undefined,
+            history: messages.slice(-4).map((m) => ({
+              role: m.role,
+              content: m.content,
+            })),
           }),
         });
 
-        if (res?.ok) {
+        if (res?.ok && res?.data) {
+          const plan: AgentTaskExecutionPlan = res.data;
           const assistantMsg: ChatMessage = {
             id: `msg_a_${Date.now()}`,
             role: "assistant",
             content:
-              res.summary ||
-              `✅ **Đã tiếp nhận và thực thi lệnh tự động hóa:** ${messageText}\n\nToàn bộ các bước xử lý (bóc tách danh sách, soạn thảo, đối soát CSDL, duyệt thẩm quyền và gửi thông báo) đã được tiến hành.`,
+              plan.overallSummary ||
+              `🤖 **AI Action Agent đã lập kế hoạch & điều phối thực thi:** "${messageText}"`,
             createdAt: new Date().toISOString(),
-            model: "CEO HN10 AI Automation Engine",
-            latencyMs: 180,
+            model: "CEO HN10 Action Agent Engine",
+            latencyMs: 220,
             persona: usePersona,
-            evidence: [
-              {
-                title: "Học viên nhận thư",
-                countOrVal: `${res.recipients?.length || currentAttached?.totalEmails || 0} địa chỉ`,
-                source: currentAttached?.fileName ? `File: ${currentAttached.fileName}` : "CSDL Hội viên",
-              },
-              {
-                title: "Trạng thái phê duyệt",
-                countOrVal: "Hợp lệ (Auto Validated)",
-                source: "Audit Log CSDL 113.20.107.184",
-              },
-            ],
-            executionPipeline: {
-              taskType: res.taskType || detectedTaskType,
-              commandText: messageText,
-              fileName: currentAttached?.fileName,
-              recipients:
-                res.recipients && res.recipients.length > 0
-                  ? res.recipients
-                  : currentAttached?.recipients || [],
-              emailDraft: res.emailDraft,
-            },
+            agentPlan: plan,
           };
 
           setSessions((prev) =>
@@ -726,10 +1285,10 @@ export function CrmChatGPTView() {
             )
           );
         } else {
-          toast.error("Không thể khởi chạy quy trình tự động hóa của AI");
+          toast.error("Không thể khởi chạy quy trình Action Agent");
         }
       } else {
-        // CHAT THƯỜNG
+        // CHAT THƯỜNG / TRUY VẤN TƯ VẤN DOANH NGHIỆP
         const historyPayload = messages.slice(-4).map((m) => ({
           role: m.role,
           content: m.content,
@@ -760,6 +1319,8 @@ export function CrmChatGPTView() {
             persona: usePersona,
             evidence: res.evidence || [],
             proactiveAlert: res.proactiveAlert,
+            interactiveActions: res.interactiveActions,
+            executionPipeline: res.executionPipeline,
           };
 
           setSessions((prev) =>
@@ -882,8 +1443,43 @@ export function CrmChatGPTView() {
         </div>
       </div>
 
-      {/* 2. KHUNG CHAT TRUNG TÂM (CHAT STREAM & INPUT) */}
-      <div className="flex-1 flex flex-col bg-white dark:bg-slate-950 min-w-0">
+      {/* 2. KHUNG CHAT TRUNG TÂM (CHAT STREAM & INPUT) KÈM VÙNG KÉO THẢ TỆP */}
+      <div
+        className="flex-1 flex flex-col bg-white dark:bg-slate-950 min-w-0 relative"
+        onDragOver={(e) => {
+          e.preventDefault();
+          setIsDraggingOver(true);
+        }}
+        onDragLeave={(e) => {
+          e.preventDefault();
+          setIsDraggingOver(false);
+        }}
+        onDrop={async (e) => {
+          e.preventDefault();
+          setIsDraggingOver(false);
+          const files = e.dataTransfer.files ? Array.from(e.dataTransfer.files) : [];
+          if (files.length > 0) {
+            await handleProcessFiles(files);
+          }
+        }}
+      >
+        {/* OVERLAY HIỆU ỨNG KÉO THẢ TỆP VÀO KHUNG CHAT */}
+        {isDraggingOver && (
+          <div className="absolute inset-0 z-50 bg-primary/10 backdrop-blur-xs border-2 border-dashed border-primary rounded-2xl grid place-items-center animate-fade-in pointer-events-none m-3">
+            <div className="text-center p-6 bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-primary/40 space-y-2 max-w-sm">
+              <div className="size-14 mx-auto rounded-full bg-primary/20 grid place-items-center text-primary shadow-sm">
+                <UploadCloud className="size-7 animate-bounce" />
+              </div>
+              <h3 className="text-sm font-bold text-slate-900 dark:text-white">Thả các tệp tài liệu vào đây</h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                AI Agent sẽ tự động bóc tách danh sách, đọc bảng biểu, phân tích sự kiện và lập kế hoạch thực thi.
+              </p>
+              <div className="flex items-center justify-center gap-1.5 pt-1 text-[11px] font-mono text-primary font-bold">
+                <span>.XLSX</span> • <span>.DOCX</span> • <span>.PDF</span> • <span>.CSV</span>
+              </div>
+            </div>
+          </div>
+        )}
         {/* Header Bar: Model Selector + Persona Selector */}
         <div className="px-4 py-2.5 border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-950/80 backdrop-blur-xs z-10 space-y-2">
           <div className="flex items-center justify-between gap-2">
@@ -1068,7 +1664,35 @@ export function CrmChatGPTView() {
                     >
                       {isUser ? (
                         <>
-                          {msg.attachedFile && (
+                          {/* Hiển thị danh sách tệp đính kèm đa nguồn */}
+                          {msg.attachedFiles && msg.attachedFiles.length > 0 ? (
+                            <div className="space-y-1.5 pt-0.5">
+                              {msg.attachedFiles.map((af, afIdx) => {
+                                const isExcel = af.fileType === "excel" || af.fileType === "csv";
+                                return (
+                                  <div
+                                    key={afIdx}
+                                    className="flex items-center gap-2 p-2 rounded-xl bg-black/15 dark:bg-white/10 text-[11px] font-medium border border-white/20"
+                                  >
+                                    {isExcel ? (
+                                      <FileSpreadsheetIcon className="size-3.5 shrink-0 text-emerald-300" />
+                                    ) : (
+                                      <FileText className="size-3.5 shrink-0 text-amber-200" />
+                                    )}
+                                    <div className="truncate flex-1">
+                                      <span className="font-semibold">{af.name}</span>
+                                      <span className="text-[10px] opacity-85 block">
+                                        {(af.size / 1024).toFixed(0)} KB • {af.emailCount} emails
+                                      </span>
+                                    </div>
+                                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/20 text-white font-bold shrink-0">
+                                      {af.emailCount} emails
+                                    </span>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          ) : msg.attachedFile ? (
                             <div className="flex items-center gap-2 p-2.5 rounded-xl bg-black/15 dark:bg-white/10 text-[11px] font-medium border border-white/20">
                               <FileSpreadsheetIcon className="size-4 shrink-0 text-emerald-300" />
                               <div className="truncate flex-1">
@@ -1081,7 +1705,7 @@ export function CrmChatGPTView() {
                                 {msg.attachedFile.emailCount} emails
                               </span>
                             </div>
-                          )}
+                          ) : null}
                           <p className="whitespace-pre-wrap leading-relaxed">{msg.content}</p>
                         </>
                       ) : (
@@ -1095,8 +1719,37 @@ export function CrmChatGPTView() {
 
                           <MarkdownRenderer content={msg.content} />
 
-                          {/* PIPELINE STEPPER TỰ ĐỘNG HÓA TÍCH XANH REAL-TIME */}
-                          {msg.executionPipeline && (
+                          {/* BẢNG CHỌN DANH MỤC BÁO CÁO TIỀN THU THEO YÊU CẦU */}
+                          {msg.interactiveActions?.type === "report_category_selector" && (
+                            <div className="pt-2">
+                              <ReportCategorySelectorCard
+                                interactiveActions={msg.interactiveActions}
+                                onExportCategory={(cat) =>
+                                  handleExportCategoryToExcel(
+                                    cat,
+                                    msg.interactiveActions?.targetDateFormatted
+                                  )
+                                }
+                                onExportAll={(cats) => handleExportAllWorkbook(cats)}
+                              />
+                            </div>
+                          )}
+
+                          {/* ACTION AGENT REAL EXECUTION PLAN PIPELINE */}
+                          {msg.agentPlan && (
+                            <div className="pt-2">
+                              <AiExecutionStepTracker
+                                plan={msg.agentPlan}
+                                onConfirmStep={handleConfirmAgentStep}
+                                onRetryStep={handleRetryAgentStep}
+                                onSkipStep={handleSkipAgentStep}
+                                onAbortTask={handleAbortAgentTask}
+                              />
+                            </div>
+                          )}
+
+                          {/* PIPELINE STEPPER TỰ ĐỘNG HÓA TÍCH XANH REAL-TIME (LEGACY FALLBACK) */}
+                          {msg.executionPipeline && !msg.agentPlan && (
                             <div className="pt-2">
                               <AiExecutionStepTracker
                                 taskType={msg.executionPipeline.taskType}
@@ -1169,56 +1822,107 @@ export function CrmChatGPTView() {
         {/* 3. FLOATING INPUT BAR PHONG CÁCH CHATGPT TỰ ĐỘNG HÓA */}
         <div className="p-3 sm:p-4 border-t border-slate-200 dark:border-slate-800 bg-white/95 dark:bg-slate-950/95 backdrop-blur-xs">
           <div className="max-w-3xl mx-auto space-y-2">
-            {/* Input file ẩn hỗ trợ Excel / Word / PDF */}
+            {/* Input file ẩn hỗ trợ đa tệp Excel / Word / PDF / CSV */}
             <input
               type="file"
               ref={fileInputRef}
               onChange={handleFileUpload}
-              accept=".xlsx,.xls,.csv,.docx,.doc,.txt"
+              multiple
+              accept=".xlsx,.xls,.csv,.docx,.doc,.pdf,.txt"
               className="hidden"
             />
 
-            {/* Banner hiển thị tệp Excel / Word đã bóc tách danh sách email */}
-            {attachedFile && (
-              <div className="p-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-700/60 flex items-center justify-between gap-3 text-xs shadow-2xs animate-fade-in">
-                <div className="flex items-center gap-2 text-emerald-800 dark:text-emerald-300 truncate min-w-0">
-                  <FileSpreadsheetIcon className="size-4 shrink-0 text-emerald-600 dark:text-emerald-400" />
-                  <span className="font-semibold truncate">{attachedFile.fileName}</span>
-                  <span className="text-[11px] px-2 py-0.5 rounded-full bg-emerald-200/80 dark:bg-emerald-800/60 text-emerald-900 dark:text-emerald-200 font-bold shrink-0">
-                    ✅ Đã bóc tách {attachedFile.totalEmails} emails
-                  </span>
+            {/* Banner hiển thị danh sách đa tệp đã bóc tách */}
+            {attachedFiles.length > 0 && (
+              <div className="p-3 rounded-2xl bg-emerald-50/90 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-700/60 space-y-2 text-xs shadow-2xs animate-fade-in">
+                <div className="flex items-center justify-between gap-2 pb-1.5 border-b border-emerald-200 dark:border-emerald-800/60">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-800 dark:text-emerald-300">
+                      Tài liệu đính kèm ({attachedFiles.length} tệp)
+                    </span>
+                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-200/80 dark:bg-emerald-800/60 text-emerald-900 dark:text-emerald-200 font-bold">
+                      Tổng {attachedFiles.reduce((acc, f) => acc + f.totalEmails, 0)} email
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-1.5">
+                    {attachedFiles.length >= 2 && (
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setInputMessage(
+                            `So sánh và đối chiếu dữ liệu giữa các file ${attachedFiles.map((f) => f.fileName).join(", ")}`
+                          )
+                        }
+                        className="px-2 py-1 rounded-md bg-white dark:bg-slate-800 hover:bg-emerald-100 text-[10px] text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700 font-bold transition cursor-pointer"
+                      >
+                        ⚖️ Đối chiếu các file
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => setAttachedFiles([])}
+                      className="px-2 py-1 rounded-md text-[10px] text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition cursor-pointer font-medium"
+                    >
+                      Gỡ tất cả
+                    </button>
+                  </div>
                 </div>
-                <div className="flex items-center gap-1.5 shrink-0">
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setInputMessage(
-                        `Gửi mail thông tin sự kiện Đại hội Hội viên CEO HN10 tới toàn bộ ${attachedFile.totalEmails} học viên trong file ${attachedFile.fileName}`
-                      )
-                    }
-                    className="px-2 py-1 rounded-md bg-white dark:bg-slate-800 hover:bg-emerald-100 text-[10px] text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700 font-medium transition cursor-pointer"
-                  >
-                    Lệnh gửi sự kiện
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setInputMessage(
-                        `Gửi thông báo nhắc nộp niên liễm hội phí tới toàn bộ ${attachedFile.totalEmails} học viên trong file ${attachedFile.fileName}`
-                      )
-                    }
-                    className="px-2 py-1 rounded-md bg-white dark:bg-slate-800 hover:bg-emerald-100 text-[10px] text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700 font-medium transition cursor-pointer"
-                  >
-                    Lệnh nhắc phí
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setAttachedFile(null)}
-                    className="p-1 rounded-md text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 transition cursor-pointer"
-                    title="Gỡ file đính kèm"
-                  >
-                    <X className="size-3.5" />
-                  </button>
+
+                {/* Danh sách từng tệp (File Chips) */}
+                <div className="flex flex-wrap gap-2 max-h-36 overflow-y-auto pr-1">
+                  {attachedFiles.map((f) => {
+                    const isExcel = f.fileType === "excel" || f.fileType === "csv";
+                    const isWord = f.fileType === "word";
+                    const isPdf = f.fileType === "pdf";
+
+                    return (
+                      <div
+                        key={f.id}
+                        className={`flex items-center gap-2 px-2.5 py-1.5 rounded-xl border bg-white dark:bg-slate-900 text-xs shadow-2xs ${
+                          isExcel
+                            ? "border-emerald-300 dark:border-emerald-800 text-emerald-900 dark:text-emerald-200"
+                            : isWord
+                            ? "border-blue-300 dark:border-blue-800 text-blue-900 dark:text-blue-200"
+                            : isPdf
+                            ? "border-rose-300 dark:border-rose-800 text-rose-900 dark:text-rose-200"
+                            : "border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200"
+                        }`}
+                      >
+                        {isExcel ? (
+                          <FileSpreadsheetIcon className="size-4 shrink-0 text-emerald-600 dark:text-emerald-400" />
+                        ) : (
+                          <FileText
+                            className={`size-4 shrink-0 ${
+                              isWord
+                                ? "text-blue-600 dark:text-blue-400"
+                                : isPdf
+                                ? "text-rose-600 dark:text-rose-400"
+                                : "text-slate-500"
+                            }`}
+                          />
+                        )}
+
+                        <div className="max-w-[150px] truncate">
+                          <span className="font-semibold block truncate" title={f.fileName}>
+                            {f.fileName}
+                          </span>
+                          <span className="text-[10px] text-slate-500 dark:text-slate-400">
+                            {(f.fileSize / 1024).toFixed(0)} KB • {f.totalEmails} email
+                          </span>
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={() => setAttachedFiles((prev) => prev.filter((item) => item.id !== f.id))}
+                          className="p-1 rounded-md text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition cursor-pointer ml-1"
+                          title="Gỡ tệp này"
+                        >
+                          <X className="size-3" />
+                        </button>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             )}
@@ -1233,24 +1937,32 @@ export function CrmChatGPTView() {
                 onKeyDown={handleKeyDown}
                 disabled={isGenerating || isParsingFile}
                 placeholder={
-                  attachedFile
-                    ? `Ra lệnh cho AI (Ví dụ: "Gửi mail thông tin sự kiện tới toàn bộ email trong file này")...`
-                    : `Hỏi hoặc ra lệnh cho ${activePersonaObj.name}... (Đính kèm Excel/Word hoặc gõ lệnh trực tiếp)`
+                  attachedFiles.length === 1
+                    ? `Ra lệnh cho AI từ tệp ${attachedFiles[0].fileName} (Ví dụ: "Gửi mail thông báo sự kiện tới danh sách")...`
+                    : attachedFiles.length > 1
+                    ? `Ra lệnh cho AI từ ${attachedFiles.length} tệp đã chọn (Ví dụ: "So sánh và đối chiếu dữ liệu giữa các file")...`
+                    : `Hỏi hoặc ra lệnh cho ${activePersonaObj.name}... (Kéo thả hoặc đính kèm Word/Excel/PDF/CSV)`
                 }
                 className="w-full px-4 py-3 text-xs bg-transparent border-none outline-none resize-none text-slate-900 dark:text-slate-100 placeholder:text-slate-400 max-h-44 min-h-[44px]"
               />
               <div className="flex items-center justify-between px-3 pb-2 pt-1 border-t border-slate-200/50 dark:border-slate-800/50">
                 <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
-                  {/* NÚT ĐÍNH KÈM EXCEL / WORD BÓC TÁCH EMAIL TỰ ĐỘNG */}
+                  {/* NÚT ĐÍNH KÈM ĐA TỆP EXCEL / WORD / PDF / CSV */}
                   <button
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
                     disabled={isParsingFile || isGenerating}
-                    title="Đính kèm file Excel (.xlsx, .xls, .csv) hoặc Word (.docx) để AI bóc tách danh sách email và tự động ra lệnh"
+                    title="Đính kèm một hoặc nhiều file Excel (.xlsx, .csv), Word (.docx) hoặc PDF (.pdf) để AI bóc tách và lập kế hoạch thực thi"
                     className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-200/80 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 text-[11px] font-semibold transition cursor-pointer disabled:opacity-50"
                   >
                     <Paperclip className="size-3.5 text-primary" />
-                    <span>{isParsingFile ? "Đang đọc tệp..." : "Đính kèm Excel / Word"}</span>
+                    <span>
+                      {isParsingFile
+                        ? "Đang đọc tệp..."
+                        : attachedFiles.length > 0
+                        ? `Thêm tệp (${attachedFiles.length})`
+                        : "Đính kèm tệp (Excel/Word/PDF)"}
+                    </span>
                   </button>
 
                   <span className="text-slate-300 dark:text-slate-700">•</span>
@@ -1262,7 +1974,7 @@ export function CrmChatGPTView() {
                 <button
                   type="button"
                   onClick={() => handleSendMessage()}
-                  disabled={(!inputMessage.trim() && !attachedFile) || isGenerating || isParsingFile}
+                  disabled={(!inputMessage.trim() && attachedFiles.length === 0) || isGenerating || isParsingFile}
                   className="size-7 rounded-xl bg-primary text-primary-foreground grid place-items-center hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed transition shadow-xs cursor-pointer"
                   title="Gửi câu lệnh thực thi tự động"
                 >
@@ -1272,7 +1984,7 @@ export function CrmChatGPTView() {
             </div>
           </div>
           <p className="text-[10px] text-center text-slate-400 mt-2">
-            CEO HN10 AI Automation Engine — Tự động bóc tách Email từ Excel/Word, đối soát CSDL chuẩn 113.20.107.184:6432 và thực thi theo thời gian thực.
+            CEO HN10 AI Action Agent — Tự động bóc tách Email & Bảng biểu từ Excel/Word/PDF/CSV, đối chiếu CSDL chuẩn 113.20.107.184:6432 và thực thi theo thời gian thực.
           </p>
         </div>
       </div>
