@@ -77,15 +77,20 @@ import {
 } from "@/lib/room-booking.functions";
 
 export const Route = createFileRoute("/meetings")({
-  beforeLoad: () => {
-    throw redirect({ to: "/" });
-  },
   ssr: false,
-  loader: () => listMeetingsFn(),
+  loader: async () => {
+    try {
+      const data = await listMeetingsFn();
+      return Array.isArray(data) ? data : [];
+    } catch (err) {
+      console.warn("[meetings] listMeetingsFn loader error:", err);
+      return [];
+    }
+  },
   component: MeetingsPage,
   errorComponent: ({ error }) => (
     <div role="alert" className="p-6 text-sm text-destructive">
-      {error.message}
+      {error?.message || "Đã xảy ra lỗi khi tải dữ liệu cuộc họp."}
     </div>
   ),
 });

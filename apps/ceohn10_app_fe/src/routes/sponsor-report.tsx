@@ -12,8 +12,21 @@ import { SponsorExcelImportModal } from "@/components/dashboard/SponsorExcelImpo
 
 export const Route = createFileRoute("/sponsor-report")({
   ssr: false,
-  loader: () => listSponsorsFn(),
+  loader: async () => {
+    try {
+      const data = await listSponsorsFn();
+      return Array.isArray(data) ? data : [];
+    } catch (err) {
+      console.warn("[sponsor-report] listSponsorsFn loader error:", err);
+      return [];
+    }
+  },
   component: ReportPage,
+  errorComponent: ({ error }) => (
+    <div role="alert" className="p-6 text-sm text-destructive">
+      {error?.message || "Đã xảy ra lỗi khi tải báo cáo tài trợ."}
+    </div>
+  ),
 });
 
 const TIER_KEY: Record<Sponsor["tier"], TKey> = {

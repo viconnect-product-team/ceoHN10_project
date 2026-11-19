@@ -21,8 +21,21 @@ import { useT, type TKey } from "@/lib/i18n";
 
 export const Route = createFileRoute("/activity")({
   ssr: false,
-  loader: () => listActivityLogFn(),
+  loader: async () => {
+    try {
+      const data = await listActivityLogFn();
+      return Array.isArray(data) ? data : [];
+    } catch (err) {
+      console.warn("[activity] listActivityLogFn loader error:", err);
+      return [];
+    }
+  },
   component: ActivityPage,
+  errorComponent: ({ error }) => (
+    <div role="alert" className="p-6 text-sm text-destructive">
+      {error?.message || "Đã xảy ra lỗi khi tải nhật ký hoạt động."}
+    </div>
+  ),
 });
 
 const CAT_KEY: Record<ActivityLog["category"], TKey> = {
@@ -53,7 +66,8 @@ const CAT_ICON: Record<ActivityLog["category"], typeof Shield> = {
 function ActivityPage() {
   const t = useT();
   const router = useRouter();
-  const ACTIVITY_LOG = Route.useLoaderData() as ActivityLog[];
+  const rawActivity = Route.useLoaderData();
+  const ACTIVITY_LOG = Array.isArray(rawActivity) ? (rawActivity as ActivityLog[]) : [];
   const [q, setQ] = useState("");
   const [cat, setCat] = useState<ActivityLog["category"] | "all">("all");
 

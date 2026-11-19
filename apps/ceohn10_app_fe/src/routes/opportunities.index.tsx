@@ -66,8 +66,31 @@ function formatCurrencyInput(val: string): string {
 
 export const Route = createFileRoute("/opportunities/")({
   ssr: false,
-  loader: () => listOpportunitiesFn(),
+  loader: async () => {
+    try {
+      const data = await listOpportunitiesFn();
+      return (
+        data || {
+          opportunities: [],
+          interests: [],
+          interestCounts: {},
+        }
+      );
+    } catch (err) {
+      console.warn("[opportunities] listOpportunitiesFn loader error:", err);
+      return {
+        opportunities: [],
+        interests: [],
+        interestCounts: {},
+      };
+    }
+  },
   component: OpportunitiesPage,
+  errorComponent: ({ error }) => (
+    <div role="alert" className="p-6 text-sm text-destructive">
+      {error?.message || "Đã xảy ra lỗi khi tải danh sách cơ hội giao thương."}
+    </div>
+  ),
 });
 
 const STATUS_COLOR: Record<OpportunityStatus, "success" | "neutral"> = {

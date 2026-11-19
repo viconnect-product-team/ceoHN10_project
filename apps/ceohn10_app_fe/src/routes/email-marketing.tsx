@@ -16,11 +16,19 @@ import { useFmt, useT, type TKey } from "@/lib/i18n";
 
 export const Route = createFileRoute("/email-marketing")({
   ssr: false,
-  loader: () => listCampaignsFn(),
+  loader: async () => {
+    try {
+      const data = await listCampaignsFn();
+      return Array.isArray(data) ? data : [];
+    } catch (err) {
+      console.warn("[email-marketing] listCampaignsFn loader error:", err);
+      return [];
+    }
+  },
   component: EmailPage,
   errorComponent: ({ error }) => (
     <div role="alert" className="p-6 text-sm text-destructive">
-      {error.message}
+      {error?.message || "Đã xảy ra lỗi khi tải danh sách chiến dịch email."}
     </div>
   ),
 });
@@ -40,7 +48,8 @@ function EmailPage() {
   const t = useT();
   const fmt = useFmt();
   const router = useRouter();
-  const CAMPAIGNS = Route.useLoaderData() as Campaign[];
+  const rawCampaigns = Route.useLoaderData();
+  const CAMPAIGNS = Array.isArray(rawCampaigns) ? (rawCampaigns as Campaign[]) : [];
   const [showCreate, setShowCreate] = useState(false);
   const [busyId, setBusyId] = useState<string | null>(null);
   const deleteFn = useServerFn(deleteCampaignFn);

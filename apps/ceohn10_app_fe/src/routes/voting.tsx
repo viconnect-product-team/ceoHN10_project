@@ -51,8 +51,21 @@ export const Route = createFileRoute("/voting")({
     const size = PAGE_SIZES.includes(Number(search.size)) ? Number(search.size) : 10;
     return { tab, page, size };
   },
-  loader: () => listVotesFn(),
+  loader: async () => {
+    try {
+      const data = await listVotesFn();
+      return Array.isArray(data) ? data : [];
+    } catch (err) {
+      console.warn("[voting] listVotesFn loader error:", err);
+      return [];
+    }
+  },
   component: VotingPage,
+  errorComponent: ({ error }) => (
+    <div role="alert" className="p-6 text-sm text-destructive">
+      {error?.message || "Đã xảy ra lỗi khi tải danh sách biểu quyết."}
+    </div>
+  ),
 });
 
 const STATUS_KEY: Record<Vote["status"], TKey> = {
@@ -156,7 +169,8 @@ function VotingPage() {
   const { user, logout } = useAuth();
   const userId = user?.id ?? null;
   const { tab: filter, page, size: PAGE_SIZE } = Route.useSearch();
-  const VOTES = Route.useLoaderData() as Vote[];
+  const rawVotes = Route.useLoaderData();
+  const VOTES = Array.isArray(rawVotes) ? (rawVotes as Vote[]) : [];
   const [open, setOpen] = useState(false);
   const [luckyDrawOpen, setLuckyDrawOpen] = useState(false);
   const [showLuckyDrawBanner, setShowLuckyDrawBanner] = useState(true);

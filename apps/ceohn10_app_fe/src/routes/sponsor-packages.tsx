@@ -31,9 +31,6 @@ import {
 import { useFmt, useT, type TKey } from "@/lib/i18n";
 
 export const Route = createFileRoute("/sponsor-packages")({
-  beforeLoad: () => {
-    throw redirect({ to: "/sponsors" });
-  },
   component: PackagesPage,
 });
 

@@ -15,8 +15,21 @@ import { Pagination } from "@/components/dashboard/DataTablePagination";
 
 export const Route = createFileRoute("/news")({
   ssr: false,
-  loader: () => listNewsFn(),
+  loader: async () => {
+    try {
+      const data = await listNewsFn();
+      return Array.isArray(data) ? data : [];
+    } catch (err) {
+      console.warn("[news] listNewsFn loader error:", err);
+      return [];
+    }
+  },
   component: NewsPage,
+  errorComponent: ({ error }) => (
+    <div role="alert" className="p-6 text-sm text-destructive">
+      {error?.message || "Đã xảy ra lỗi khi tải dữ liệu tin tức."}
+    </div>
+  ),
 });
 
 const STATUS_KEY: Record<NewsArticle["status"], TKey> = {
@@ -44,7 +57,8 @@ function NewsPage() {
     isTruongBanTruyenThong ||
     can(PERMISSIONS.MEDIA_MANAGE)
   );
-  const NEWS = Route.useLoaderData() as NewsArticle[];
+  const rawNews = Route.useLoaderData();
+  const NEWS = Array.isArray(rawNews) ? (rawNews as NewsArticle[]) : [];
   const published = NEWS.filter((n) => n.status === "published");
   const scheduled = NEWS.filter((n) => n.status === "scheduled");
   const drafts = NEWS.filter((n) => n.status === "draft");
