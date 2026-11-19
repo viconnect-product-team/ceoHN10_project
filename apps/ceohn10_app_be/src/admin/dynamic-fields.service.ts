@@ -1,0 +1,178 @@
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service';
+
+export interface DynamicFormField {
+  id: string;
+  schema_id: string;
+  field_name: string;
+  field_label: string;
+  field_type: 'text' | 'textarea' | 'select' | 'number' | 'date' | 'switch' | 'email' | 'phone';
+  options: string[] | { label: string; value: string }[];
+  placeholder?: string;
+  default_value?: any;
+  is_required: boolean;
+  is_enabled: boolean;
+  order_index: number;
+  metadata?: Record<string, any>;
+  created_at?: string;
+  updated_at?: string;
+}
+
+@Injectable()
+export class DynamicFieldsService {
+  constructor(private readonly prisma: PrismaService) {}
+
+  /**
+   * Lấy cấu hình schema & danh sách trường động theo entity_type (VD: 'member', 'event', 'class')
+   */
+  async getSchemaByEntityType(entityType: string) {
+    const schemas = await this.prisma.$queryRawUnsafe<any[]>(
+      `SELECT * FROM public.dynamic_form_schemas WHERE entity_type = $1 LIMIT 1`,
+      entityType,
+    );
+
+    let schema = schemas[0];
+    if (!schema) {
+      // Tự động khởi tạo schema nếu chưa tồn tại
+      const created = await this.prisma.$queryRawUnsafe<any[]>(
+        `INSERT INTO public.dynamic_form_schemas (id, entity_type, name, description, is_active, created_at, updated_at)
+         VALUES (gen_random_uuid(), $1, $2, $3, true, NOW(), NOW())
+         RETURNING *`,
+        entityType,
+        `Cấu hình trường động ${entityType}`,
+        `Hệ thống trường động tùy biến cho ${entityType} - Ban Công Nghệ CEOHN10`,
+      );
+      schema = created[0];
+    }
+
+    const fields = await this.prisma.$queryRawUnsafe<any[]>(
+      `SELECT * FROM public.dynamic_form_fields 
+       WHERE schema_id = $1::uuid 
+       ORDER BY order_index ASC, created_at ASC`,
+      schema.id,
+    );
+
+    return {
+      schema,
+      fields: fields.map((f) => ({
+        ...f,
+        options: Array.isArray(f.options) ? f.options : typeof f.options === 'string' ? JSON.parse(f.options || '[]') : [],
+        metadata: typeof f.metadata === 'string' ? JSON.parse(f.metadata || '{}') : (f.metadata || {}),
+      })),
+    };
+  }
+
+  /**
+   * Thêm trường động mới
+   */
+  async addField(data: {
+    schema_id?: string;
+    entity_type?: string;
+    field_name: string;
+    field_label: string;
+    field_type: string;
+    options?: any[];
+    placeholder?: string;
+    default_value?: any;
+    is_required?: boolean;
+    is_enabled?: boolean;
+    order_index?: number;
+    metadata?: any;
+  }) {
+    let schemaId = data.schema_id;
+    if (!schemaId && data.entity_type) {
+      const schemaData = await this.getSchemaByEntityType(data.entity_type);
+      schemaId = schemaData.schema.id;
+    }
+
+    if (!schemaId) {
+      throw new NotFoundException('Không tìm thấy schema tương ứng');
+    }
+
+    const optionsJson = JSON.stringify(data.options || []);
+    const metadataJson = JSON.stringify(data.metadata || {});
+
+    const rows = await this.prisma.$queryRawUnsafe<any[]>(
+      `INSERT INTO public.dynamic_form_fields (
+        id, schema_id, field_name, field_label, field_type, options, 
+        placeholder, default_value, is_required, is_enabled, order_index, metadata, created_at, updated_at
+      ) VALUES (
+        gen_random_uuid(), $1::uuid, $2, $3, $4, $5::jsonb,
+        $6, $7, $8, $9, $10, $11::jsonb, NOW(), NOW()
+      ) RETURNING *`,
+      schemaId,
+      data.field_name,
+      data.field_label,
+      data.field_type || 'text',
+      optionsJson,
+      data.placeholder || '',
+      data.default_value !== undefined ? String(data.default_value) : null,
+      Boolean(data.is_required),
+      data.is_enabled !== undefined ? Boolean(data.is_enabled) : true,
+      Number(data.order_index || 0),
+      metadataJson,
+    );
+
+    return rows[0];
+  }
+
+  /**
+   * Cập nhật trường động
+   */
+  async updateField(id: string, data: Partial<DynamicFormField>) {
+    const fields = await this.prisma.$queryRawUnsafe<any[]>(
+      `SELECT * FROM public.dynamic_form_fields WHERE id = $1::uuid LIMIT 1`,
+      id,
+    );
+    if (!fields[0]) {
+      throw new NotFoundException('Không tìm thấy trường cấu hình');
+    }
+
+    const current = fields[0];
+    const fieldLabel = data.field_label ?? current.field_label;
+    const fieldType = data.field_type ?? current.field_type;
+    const optionsJson = JSON.stringify(data.options ?? current.options ?? []);
+    const placeholder = data.placeholder ?? current.placeholder;
+    const isRequired = data.is_required !== undefined ? Boolean(data.is_required) : current.is_required;
+    const isEnabled = data.is_enabled !== undefined ? Boolean(data.is_enabled) : current.is_enabled;
+    const orderIndex = data.order_index !== undefined ? Number(data.order_index) : current.order_index;
+    const metadataJson = JSON.stringify(data.metadata ?? current.metadata ?? {});
+
+    const updated = await this.prisma.$queryRawUnsafe<any[]>(
+      `UPDATE public.dynamic_form_fields SET
+        field_label = $2,
+        field_type = $3,
+        options = $4::jsonb,
+        placeholder = $5,
+        is_required = $6,
+        is_enabled = $7,
+        order_index = $8,
+        metadata = $9::jsonb,
+        updated_at = NOW()
+       WHERE id = $1::uuid
+       RETURNING *`,
+      id,
+      fieldLabel,
+      fieldType,
+      optionsJson,
+      placeholder,
+      isRequired,
+      isEnabled,
+      orderIndex,
+      metadataJson,
+    );
+
+    return updated[0];
+  }
+
+  /**
+   * Xóa trường động
+   */
+  async deleteField(id: string) {
+    await this.prisma.$executeRawUnsafe(
+      `DELETE FROM public.dynamic_form_fields WHERE id = $1::uuid`,
+      id,
+    );
+    return { success: true, message: 'Đã xóa trường cấu hình thành công' };
+  }
+}

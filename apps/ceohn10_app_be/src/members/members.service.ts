@@ -643,6 +643,13 @@ export class MembersService {
       status?: string;
       associationId?: string;
     },
+    dataScope?: {
+      level: 'ALL' | 'DEPARTMENT' | 'CLASS' | 'SELF';
+      userId: string;
+      email: string;
+      department?: string;
+      memberId?: string;
+    },
   ) {
     const isPlatformAdmin = await this.checkIsPlatformAdmin(userId);
     const assocId = await this.getAssociationIdForUser(
@@ -694,6 +701,28 @@ export class MembersService {
     }
 
     let items = rows.map((r) => this.mapMemberRow(r));
+
+    // ── DATA SCOPE FILTERING (Phân quyền dữ liệu cấp độ hàng) ──
+    if (dataScope && dataScope.level && dataScope.level !== 'ALL') {
+      if (dataScope.level === 'DEPARTMENT' && dataScope.department) {
+        const userDept = dataScope.department.toLowerCase().trim();
+        items = items.filter(
+          (m) =>
+            m.department &&
+            m.department.toLowerCase().trim() === userDept,
+        );
+      } else if (dataScope.level === 'SELF') {
+        const userMid = (dataScope.memberId || '').toLowerCase().trim();
+        const userUid = (dataScope.userId || '').toLowerCase().trim();
+        const userEm = (dataScope.email || '').toLowerCase().trim();
+        items = items.filter(
+          (m) =>
+            (m.id && m.id.toLowerCase().trim() === userMid) ||
+            (m.userId && m.userId.toLowerCase().trim() === userUid) ||
+            (m.email && m.email.toLowerCase().trim() === userEm),
+        );
+      }
+    }
 
     if (filters?.q) {
       const ql = filters.q.trim().toLowerCase();
@@ -2203,133 +2232,16 @@ export class MembersService {
       }
     }
 
-    // CASE 1: Xóa chỉ dữ liệu doanh nghiệp liên kết
-    if (mode === 'company_only') {
-      if (companyName) {
-        await this.prisma.$executeRaw`
-          DELETE FROM public.companies
-          WHERE LOWER(name) = LOWER(${companyName})
-             OR (owner_id IS NOT NULL AND ${memberUserId ? memberUserId : '00000000-0000-0000-0000-000000000000'}::uuid = owner_id)
-        `.catch(() => { });
+    // XÓA HỌC VIÊN LÀ XÓA THẲNG Ở DATABASE KHÔNG PHẢI CHECK DOANH NGHIỆP NỮA (Quy chuẩn CEO HN10)
+    // 1. Xóa hồ sơ Học viên thẳng khỏi bảng public.members
+    await this.prisma.$executeRaw`
+      DELETE FROM public.members 
+      WHERE id = ${current.id} 
+         OR id::text = ${cleanId} 
+         OR code = ${current.code || cleanId}
+    `;
 
-        await this.prisma.$executeRaw`
-          DELETE FROM public.vione_companies
-          WHERE LOWER(name) = LOWER(${companyName})
-             OR (user_id IS NOT NULL AND ${memberUserId ? memberUserId : '00000000-0000-0000-0000-000000000000'}::uuid = user_id)
-        `.catch(() => { });
-      }
-      if (taxCode) {
-        await this.prisma.$executeRaw`
-          DELETE FROM public.companies WHERE tax_code = ${taxCode}
-        `.catch(() => { });
-      }
-      // Xóa bản ghi độc lập của công ty trong bảng members nếu có
-      await this.prisma.$executeRaw`
-        DELETE FROM public.members 
-        WHERE (type = 'company' OR type = 'enterprise') 
-          AND (LOWER(name) = LOWER(${companyName}) OR (code = ${current.code} AND id != ${current.id}))
-      `.catch(() => { });
-
-      // Xóa các trường doanh nghiệp khỏi hồ sơ Học viên cá nhân
-      await this.prisma.$executeRaw`
-        UPDATE public.members SET
-          company_name = NULL,
-          company_size = NULL,
-          company_logo_url = NULL,
-          tax_code = NULL,
-          website = NULL,
-          employees = NULL,
-          updated_at = now()
-        WHERE id = ${current.id}
-      `.catch(() => { });
-
-      const actorUserId =
-        userId && userId.length === 36
-          ? userId
-          : '00000000-0000-4000-8000-000000000002';
-      const actorEmailRow = (await this.prisma
-        .$queryRawUnsafe<
-          any[]
-        >(`SELECT email FROM public.vione_users WHERE id = $1::uuid LIMIT 1`, actorUserId)
-        .catch(() => [])) as any[];
-      const actorEmail = actorEmailRow[0]?.email || 'admin@connect.vn';
-      const effectiveAssoc =
-        current.association_id || 'c1983000-0000-4000-8000-000000001983';
-
-      // Ghi đồng bộ vào cả 2 bảng audit_logs (CRM Audit Logs) và activity_log (Chi tiết hệ thống)
-      await this.prisma
-        .$executeRawUnsafe(
-          `
-        INSERT INTO public.audit_logs (
-          id, actor_user_id, action, target_type, target_id, ip_address, user_agent, metadata, created_at
-        ) VALUES (
-          gen_random_uuid(),
-          $1::uuid,
-          'DELETE_COMPANY',
-          'COMPANY',
-          $2,
-          '127.0.0.1',
-          'Web CRM Quản Trị',
-          $3::jsonb,
-          now()
-        )
-      `,
-          actorUserId,
-          current.code || current.id,
-          JSON.stringify({
-            memberName: current.name,
-            companyName: companyName || current.company_name,
-            memberCode: current.code,
-            mode: 'company_only',
-          }),
-        )
-        .catch((e: any) =>
-          this.logger.warn(`Could not log to audit_logs: ${e?.message}`),
-        );
-
-      await this.logActivity(
-        'Xóa doanh nghiệp liên kết',
-        `${companyName || current.name} (${current.code || cleanId})`,
-        'company',
-        actorEmail,
-        effectiveAssoc,
-      );
-
-      return {
-        ok: true,
-        mode: 'company_only',
-        message: 'Đã xóa dữ liệu doanh nghiệp liên kết thành công',
-      };
-    }
-
-    // CASE 2: Xóa toàn diện cả Học viên và doanh nghiệp liên kết (mode === 'all')
-    // 1. Xóa doanh nghiệp liên quan (bảng companies và vione_companies)
-    if (companyName) {
-      await this.prisma.$executeRaw`
-        DELETE FROM public.companies
-        WHERE LOWER(name) = LOWER(${companyName})
-           OR (owner_id IS NOT NULL AND ${memberUserId ? memberUserId : '00000000-0000-0000-0000-000000000000'}::uuid = owner_id)
-      `.catch((e) =>
-        this.logger.warn(`Could not delete from companies: ${e?.message}`),
-      );
-
-      await this.prisma.$executeRaw`
-        DELETE FROM public.vione_companies
-        WHERE LOWER(name) = LOWER(${companyName})
-           OR (user_id IS NOT NULL AND ${memberUserId ? memberUserId : '00000000-0000-0000-0000-000000000000'}::uuid = user_id)
-      `.catch((e) =>
-        this.logger.warn(
-          `Could not delete from vione_companies: ${e?.message}`,
-        ),
-      );
-    }
-    if (taxCode) {
-      await this.prisma.$executeRaw`
-        DELETE FROM public.companies WHERE tax_code = ${taxCode}
-      `.catch(() => { });
-    }
-
-    // 2. Xóa danh thiếp và hồ sơ cá nhân
+    // 2. Dọn dẹp danh thiếp, quyền hạn liên quan nếu có tài khoản user
     if (memberUserId) {
       await this.prisma.$executeRaw`
         DELETE FROM public.member_business_cards
@@ -2347,17 +2259,7 @@ export class MembersService {
       `.catch(() => { });
 
       await this.prisma.$executeRaw`
-        DELETE FROM public.user_profiles
-        WHERE user_id = ${memberUserId}::uuid
-      `.catch(() => { });
-
-      await this.prisma.$executeRaw`
         DELETE FROM public.user_roles
-        WHERE user_id = ${memberUserId}::uuid
-      `.catch(() => { });
-
-      await this.prisma.$executeRaw`
-        DELETE FROM public.memberships
         WHERE user_id = ${memberUserId}::uuid
       `.catch(() => { });
 
@@ -2367,12 +2269,7 @@ export class MembersService {
       `.catch(() => { });
 
       await this.prisma.$executeRaw`
-        DELETE FROM public.business_appointments
-        WHERE host_user_id = ${memberUserId}::uuid OR invitee_user_id = ${memberUserId}::uuid
-      `.catch(() => { });
-
-      await this.prisma.$executeRaw`
-        DELETE FROM public.meeting_participants
+        DELETE FROM public.memberships
         WHERE user_id = ${memberUserId}::uuid
       `.catch(() => { });
 
@@ -2382,7 +2279,7 @@ export class MembersService {
            OR (${memberEmail !== ''} AND LOWER(email) = ${memberEmail})
       `.catch(() => { });
 
-      // 3. Xóa vĩnh viễn tài khoản trong vione_users và auth.users
+      // Xóa vĩnh viễn tài khoản trong vione_users và auth.users
       await this.prisma.$executeRaw`
         DELETE FROM public.vione_users
         WHERE id = ${memberUserId}::uuid
@@ -2410,16 +2307,7 @@ export class MembersService {
       `.catch(() => { });
     }
 
-    // 4. Xóa hồ sơ Học viên và các bản ghi công ty liên quan trong bảng members
-    await this.prisma.$executeRaw`
-      DELETE FROM public.members 
-      WHERE id = ${current.id} 
-         OR id::text = ${cleanId} 
-         OR code = ${current.code || cleanId}
-         OR (company_name IS NOT NULL AND LOWER(company_name) = LOWER(${companyName}))
-    `;
-
-    // 5. Ghi nhật ký hoạt động đồng bộ vào cả 2 bảng audit_logs (CRM) và activity_log (Hệ thống)
+    // 3. Ghi nhật ký hoạt động đồng bộ vào audit_logs và activity_log
     const actorUserId =
       userId && userId.length === 36
         ? userId
@@ -2429,7 +2317,7 @@ export class MembersService {
         any[]
       >(`SELECT email FROM public.vione_users WHERE id = $1::uuid LIMIT 1`, actorUserId)
       .catch(() => [])) as any[];
-    const actorEmail = actorEmailRow[0]?.email || 'admin@connect.vn';
+    const actorEmail = actorEmailRow[0]?.email || 'admin@ceohn10.vn';
     const effectiveAssoc =
       current.association_id || 'c1983000-0000-4000-8000-000000001983';
 
@@ -2456,7 +2344,7 @@ export class MembersService {
           memberName: current.name,
           companyName: companyName || current.company_name,
           memberCode: current.code,
-          mode: 'all',
+          mode: 'direct_delete',
         }),
       )
       .catch((e: any) =>
@@ -2464,8 +2352,8 @@ export class MembersService {
       );
 
     await this.logActivity(
-      'Xóa Học viên, tài khoản & doanh nghiệp liên quan',
-      `${current.name || companyName || 'Học viên'} (${current.code || cleanId})`,
+      'Xóa Học viên thẳng khỏi CSDL',
+      `${current.name || 'Học viên'} (${current.code || cleanId})`,
       'member',
       actorEmail,
       effectiveAssoc,
@@ -2473,9 +2361,10 @@ export class MembersService {
 
     return {
       ok: true,
-      mode: 'all',
-      message:
-        'Đã xóa Học viên, doanh nghiệp và tài khoản liên quan thành công',
+      id: current.id,
+      code: current.code,
+      mode: 'direct_delete',
+      message: 'Đã xóa Học viên thẳng khỏi cơ sở dữ liệu thành công',
     };
   }
 

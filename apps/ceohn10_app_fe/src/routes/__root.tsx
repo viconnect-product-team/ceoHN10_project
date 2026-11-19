@@ -29,6 +29,7 @@ import { AuthProvider, useAuth } from "@/context/AuthContext";
 import { registerServiceWorker } from "@/lib/register-sw";
 import { isTenantHost } from "@/lib/tenant";
 import { setupGlobalInputTrimmer } from "@/lib/input-trim-helper";
+import { ensureSessionCookiesSync } from "@/lib/api-client";
 
 const LANG_STORAGE_KEY = "vba.lang";
 
@@ -76,33 +77,69 @@ function NotFoundComponent() {
 
 function RootErrorComponent({ error, reset }: { error: unknown; reset: () => void }) {
   const router = useRouter();
+  const message = error instanceof Error ? error.message : String(error ?? "Unknown error");
+  const isAuthError = message.includes("Unauthorized") || message.includes("No token provided");
+
   useEffect(() => {
     // Log the raw thrown value: some throws are non-Error (undefined/null),
     // which otherwise surface as an opaque "Uncaught undefined".
     console.error("[root-error]", error);
-  }, [error]);
-
-  const message = error instanceof Error ? error.message : String(error ?? "Unknown error");
+    if (isAuthError && typeof window !== "undefined") {
+      const token =
+        localStorage.getItem("vibe_token") ||
+        localStorage.getItem("access_token") ||
+        localStorage.getItem("token");
+      if (token) {
+        ensureSessionCookiesSync(token);
+        const hasReloaded = sessionStorage.getItem("auth_token_reload_attempt") === "1";
+        if (!hasReloaded) {
+          sessionStorage.setItem("auth_token_reload_attempt", "1");
+          window.location.reload();
+          return;
+        }
+      }
+    }
+  }, [error, isAuthError]);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
-        <h1 className="text-xl font-semibold text-foreground">Đã xảy ra lỗi</h1>
-        <p className="mt-2 break-words text-sm text-muted-foreground">{message}</p>
+        <h1 className="text-xl font-semibold text-foreground">
+          {isAuthError ? "Yêu cầu đăng nhập hoặc phiên làm việc hết hạn" : "Đã xảy ra lỗi"}
+        </h1>
+        <p className="mt-2 break-words text-sm text-muted-foreground">
+          {isAuthError
+            ? "Phiên làm việc của bạn cần được xác thực lại để tiếp tục sử dụng hệ thống."
+            : message}
+        </p>
         <div className="mt-6 flex justify-center gap-3">
-          <button
-            type="button"
-            onClick={() => {
-              reset();
-              void router.invalidate();
-            }}
-            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
-          >
-            Thử lại
-          </button>
+          {isAuthError ? (
+            <a
+              href="/auth?portal=crm"
+              onClick={() => {
+                try {
+                  sessionStorage.removeItem("auth_token_reload_attempt");
+                } catch {}
+              }}
+              className="inline-flex items-center justify-center rounded-xl bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 shadow-sm"
+            >
+              Đăng nhập lại
+            </a>
+          ) : (
+            <button
+              type="button"
+              onClick={() => {
+                reset();
+                void router.invalidate();
+              }}
+              className="inline-flex items-center justify-center rounded-xl bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 shadow-sm"
+            >
+              Thử lại
+            </button>
+          )}
           <Link
             to="/"
-            className="inline-flex items-center justify-center rounded-md border border-border px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted"
+            className="inline-flex items-center justify-center rounded-xl border border-border px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted"
           >
             Về trang chủ
           </Link>

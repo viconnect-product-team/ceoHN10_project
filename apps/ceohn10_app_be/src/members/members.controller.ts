@@ -23,6 +23,8 @@ import {
 } from './dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { OptionalJwtAuthGuard } from '../auth/optional-jwt-auth.guard';
+import { RolesGuard } from '../auth/roles.guard';
+import { RequireActions, DataScopeLevel, Roles } from '../auth/roles.decorator';
 
 @Controller('members')
 export class MembersController {
@@ -39,7 +41,8 @@ export class MembersController {
   /**
    * Endpoint duyệt Học viên mới và gửi email tài khoản ngẫu nhiên
    */
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @RequireActions('MEM_APPROVE')
   @Post(':id/approve-and-send-credentials')
   async approveMemberAndSendCredentials(
     @Request() req: any,
@@ -49,7 +52,8 @@ export class MembersController {
     return this.membersService.approveMemberAndSendCredentials(adminUserId, id);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @RequireActions('MEM_APPROVE')
   @Patch(':id/approve-and-send-credentials')
   async approveMemberAndSendCredentialsPatch(
     @Request() req: any,
@@ -59,7 +63,8 @@ export class MembersController {
     return this.membersService.approveMemberAndSendCredentials(adminUserId, id);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @RequireActions('MEM_APPROVE')
   @Post(':id/approve-with-credentials')
   async approveMemberWithCredentialsPost(
     @Request() req: any,
@@ -69,7 +74,8 @@ export class MembersController {
     return this.membersService.approveMemberAndSendCredentials(adminUserId, id);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @RequireActions('MEM_APPROVE')
   @Patch(':id/approve-with-credentials')
   async approveMemberWithCredentialsPatch(
     @Request() req: any,
@@ -336,7 +342,7 @@ export class MembersController {
     return this.membersService.getMembersByDepartment();
   }
 
-  @UseGuards(OptionalJwtAuthGuard)
+  @UseGuards(OptionalJwtAuthGuard, RolesGuard)
   @Get()
   async listMembers(
     @Request() req: any,
@@ -348,14 +354,18 @@ export class MembersController {
     @Query('associationId') associationId?: string,
   ) {
     const userId = req.user?.id || '00000000-0000-0000-0000-000000000000';
-    return this.membersService.listMembers(userId, {
-      q,
-      type,
-      industry,
-      region,
-      status,
-      associationId,
-    });
+    return this.membersService.listMembers(
+      userId,
+      {
+        q,
+        type,
+        industry,
+        region,
+        status,
+        associationId,
+      },
+      req.dataScope,
+    );
   }
 
   @UseGuards(OptionalJwtAuthGuard)
@@ -402,13 +412,15 @@ export class MembersController {
     );
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @RequireActions('MEM_ADD')
   @Post()
   async createMember(@Request() req: any, @Body() body: CreateMemberDto) {
     return this.membersService.createMember(req.user.id, body);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @RequireActions('MEM_EDIT')
   @Put(':id')
   async updateMember(
     @Request() req: any,
@@ -418,7 +430,8 @@ export class MembersController {
     return this.membersService.updateMember(req.user.id, id, body);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @RequireActions('MEM_EDIT')
   @Patch(':id/contact')
   async updateMemberContact(
     @Request() req: any,
@@ -538,7 +551,8 @@ export class MembersController {
     );
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @RequireActions('MEM_DELETE')
   @Delete(':id')
   async deleteMember(
     @Request() req: any,

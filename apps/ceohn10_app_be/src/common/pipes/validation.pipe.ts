@@ -12,6 +12,29 @@ export class VietnameseValidationPipe implements PipeTransform {
       return value;
     }
 
+    // 1. Ưu tiên kiểm tra nếu DTO khai báo static Zod Schema (Nhanh, chuẩn RESTful, an toàn tuyệt đối)
+    const targetMeta = metadata.metatype as any;
+    if (targetMeta && targetMeta.schema && typeof targetMeta.schema.safeParse === 'function') {
+      const parsed = targetMeta.schema.safeParse(value);
+      if (!parsed.success) {
+        const errorMap: Record<string, string> = {};
+        const messages: string[] = [];
+        for (const issue of parsed.error.issues) {
+          const field = issue.path.join('.') || 'payload';
+          const msg = issue.message || `Trường "${field}" không hợp lệ.`;
+          errorMap[field] = msg;
+          messages.push(msg);
+        }
+        throw new BadRequestException({
+          statusCode: 400,
+          error: 'Bad Request',
+          message: messages.join('; ') || 'Dữ liệu gửi lên không đúng định dạng yêu cầu!',
+          errors: errorMap,
+        });
+      }
+      return parsed.data;
+    }
+
     try {
       // Safely try dynamic load if available in environment
       // eslint-disable-next-line @typescript-eslint/no-require-imports

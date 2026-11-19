@@ -22,14 +22,23 @@ import {
   UserCog,
   User,
   X,
+  Settings2,
+  SlidersHorizontal,
+  UserPlus,
+  ShieldCheck,
 } from "lucide-react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/dashboard/AppShell";
 import { CrudModal, type CrudField, type CrudValues } from "@/components/dashboard/CrudModal";
 import { MemberAccountModal } from "@/components/dashboard/MemberAccountModal";
+import { DynamicSchemaEditorModal } from "@/components/dynamic-form/DynamicSchemaEditorModal";
+import type { DynamicFieldDef } from "@/components/dynamic-form/DynamicFieldRenderer";
 import { EmptyState, NoSearchResult, ListSkeleton } from "@/components/dashboard/StateKit";
 import { useT, type TKey } from "@/lib/i18n";
 import { useRole, PERMISSIONS } from "@/hooks/use-role";
+import { usePermissions } from "@/hooks/use-permissions";
+import { PermissionGuard } from "@/components/auth/PermissionGuard";
+import { validateMemberForm } from "@/lib/validation";
 import { exportToExcel, formatDisplayDate } from "@/lib/excel-export";
 import { useUrlState } from "@/hooks/use-url-state";
 import { resolveMediaUrl } from "@/lib/api-client";
@@ -332,10 +341,13 @@ function MembersPage() {
     });
   }, [rawMembers, deletedIds]);
   const { isAdmin, canApproveMembers, isBTV, isBQT, isPlatformAdmin, can, loading: roleLoading } = useRole();
-  const canApprove = can(PERMISSIONS.MEMBER_APPROVE);
-  const canEdit = can(PERMISSIONS.MEMBER_EDIT);
-  const canDelete = can(PERMISSIONS.MEMBER_DELETE);
-  const canAccount = can(PERMISSIONS.SYSTEM_MANAGE) || can("PRM_EDIT");
+  const perm = usePermissions();
+  const canApprove = perm.can("MEM_APPROVE") || can(PERMISSIONS.MEMBER_APPROVE);
+  const canEdit = perm.can("MEM_EDIT") || can(PERMISSIONS.MEMBER_EDIT);
+  const canDelete = perm.can("MEM_DELETE") || can(PERMISSIONS.MEMBER_DELETE);
+  const canAdd = perm.can("MEM_ADD");
+  const canExport = perm.can("MEM_EXPORT");
+  const canAccount = can(PERMISSIONS.SYSTEM_MANAGE) || can("PRM_EDIT") || perm.isSuperAdmin;
   const { data: acctStatuses = {} } = useQuery({
     queryKey: ["member-account-statuses"],
     queryFn: async () => {
@@ -372,8 +384,22 @@ function MembersPage() {
   const [deleting, setDeleting] = useState<Member | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [accountFor, setAccountFor] = useState<Member | null>(null);
+  const [showDynamicSchemaModal, setShowDynamicSchemaModal] = useState(false);
 
-  const [deleteMode, setDeleteMode] = useState<"choose" | "confirm_member_only">("choose");
+  // Dynamic schema fields query for Ban Công Nghệ
+  const schemaQuery = useQuery({
+    queryKey: ["dynamic-schema", "member"],
+    queryFn: async () => {
+      try {
+        const res = await fetchNestApi<any>("/dynamic-fields/schema/member");
+        return Array.isArray(res?.fields) ? (res.fields as DynamicFieldDef[]) : [];
+      } catch {
+        return [];
+      }
+    },
+  });
+
+  const dynamicFields: DynamicFieldDef[] = schemaQuery.data || [];
 
   const fields: CrudField[] = [
     { name: "name", label: t("members.f.name"), type: "text", required: true },
@@ -425,6 +451,55 @@ function MembersPage() {
     { name: "about", label: "Giới thiệu / Ghi chú", type: "textarea" },
   ];
 
+  // Dynamic fields mapping: merges dynamic schema configured by Ban Công Nghệ
+  const activeFields: CrudField[] = useMemo(() => {
+    if (!dynamicFields || dynamicFields.length === 0) {
+      return fields;
+    }
+    return dynamicFields
+      .filter((df) => df.is_enabled !== false)
+      .map((df) => {
+        const key = df.field_name || (df as any).field_key;
+        const standard = fields.find((f) => f.name === key);
+        const fType = df.field_type === "textarea" ? "textarea" : df.field_type === "select" ? "select" : "text";
+
+        if (fType === "select") {
+          const rawOpts =
+            df.options && df.options.length > 0
+              ? df.options
+              : standard && "options" in standard && Array.isArray((standard as any).options)
+              ? (standard as any).options
+              : [];
+          const normalizedOpts = rawOpts.map((opt: any) =>
+            typeof opt === "string" ? { value: opt, label: opt } : { value: String(opt.value), label: String(opt.label) }
+          );
+          return {
+            name: key,
+            label: df.field_label || standard?.label || key,
+            type: "select" as const,
+            required: Boolean(df.is_required),
+            options: normalizedOpts,
+          };
+        }
+
+        if (fType === "textarea") {
+          return {
+            name: key,
+            label: df.field_label || standard?.label || key,
+            type: "textarea" as const,
+            required: Boolean(df.is_required),
+          };
+        }
+
+        return {
+          name: key,
+          label: df.field_label || standard?.label || key,
+          type: "text" as const,
+          required: Boolean(df.is_required),
+        };
+      });
+  }, [dynamicFields, fields]);
+
   const onSubmit = async (v: CrudValues) => {
     setSubmitting(true);
     try {
@@ -444,9 +519,23 @@ function MembersPage() {
         department: (v as any).department ? String((v as any).department).trim() : (editing?.department || undefined),
       };
 
-      if (editing) {
-        if (!can(PERMISSIONS.MEMBER_EDIT)) {
-          toast.error("Bạn không có quyền chỉnh sửa thông tin Học viên!");
+      // Client-side Form Validation
+      const formValidation = validateMemberForm({
+        name: payload.name,
+        phone: payload.phone,
+        email: payload.email,
+      });
+      if (!formValidation.isValid) {
+        const firstErr = Object.values(formValidation.errors)[0];
+        toast.error(firstErr);
+        setSubmitting(false);
+        return;
+      }
+
+      if (editing && editing.id) {
+        if (!canEdit) {
+          toast.error("Bạn không có quyền chỉnh sửa thông tin Học viên (MEM_EDIT)!");
+          setSubmitting(false);
           return;
         }
         await fetchNestApi(`/members/${editing.id}`, {
@@ -497,6 +586,18 @@ function MembersPage() {
 
         toast.success(t("members.updated") || "Cập nhật thông tin Học viên thành công");
         setEditing(null);
+      } else {
+        if (!canAdd) {
+          toast.error("Bạn không có quyền thêm mới Học viên vào CSDL (MEM_ADD)!");
+          setSubmitting(false);
+          return;
+        }
+        await fetchNestApi("/members", {
+          method: "POST",
+          body: JSON.stringify(payload),
+        });
+        toast.success("Thêm mới Học viên thành công vào CSDL!");
+        setEditing(null);
       }
       await qc.invalidateQueries({ queryKey: ["members"] });
       await qc.invalidateQueries({ queryKey: ["renewals"] });
@@ -509,8 +610,12 @@ function MembersPage() {
     }
   };
 
-  const onConfirmDeleteAll = async () => {
+  const onDirectDelete = async () => {
     if (!deleting) return;
+    if (!canDelete) {
+      toast.error("Bạn không có quyền xóa Học viên khỏi CSDL (MEM_DELETE)!");
+      return;
+    }
     const targetId = String(deleting.id);
     const targetCode = String(deleting.code || "");
     setDeletedIds((prev) => {
@@ -521,56 +626,9 @@ function MembersPage() {
     });
     setSubmitting(true);
     try {
-      await fetchNestApi(`/members/${targetId}?mode=all`, { method: "DELETE" });
-      toast.success(`Đã xóa vĩnh viễn Học viên "${deleting.name}", doanh nghiệp và tài khoản.`);
+      await fetchNestApi(`/members/${targetId}`, { method: "DELETE" });
+      toast.success(`Đã xóa thẳng Học viên "${deleting.name}" (${deleting.code}) ở database.`);
       setDeleting(null);
-      setDeleteMode("choose");
-      qc.setQueryData(["members"], (old: Member[] | undefined) =>
-        old ? old.filter((item) => String(item.id) !== targetId && (!targetCode || String(item.code) !== targetCode)) : [],
-      );
-      await qc.invalidateQueries({ queryKey: ["members"] });
-      await qc.invalidateQueries({ queryKey: ["renewals"] });
-      await refetch();
-    } catch (err: any) {
-      toast.error(err?.message || t("common.deleteError"));
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  const onConfirmDeleteCompanyFirst = async () => {
-    if (!deleting) return;
-    const targetId = String(deleting.id);
-    setSubmitting(true);
-    try {
-      await fetchNestApi(`/members/${targetId}?mode=company_only`, { method: "DELETE" });
-      toast.success(`Đã xóa thông tin doanh nghiệp của Học viên "${deleting.name}".`);
-      setDeleteMode("confirm_member_only");
-      await qc.invalidateQueries({ queryKey: ["members"] });
-      await refetch();
-    } catch (err: any) {
-      toast.error(err?.message || "Không thể xóa doanh nghiệp");
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  const onConfirmDeleteMemberOnly = async () => {
-    if (!deleting) return;
-    const targetId = String(deleting.id);
-    const targetCode = String(deleting.code || "");
-    setDeletedIds((prev) => {
-      const next = new Set(prev);
-      if (targetId) next.add(targetId);
-      if (targetCode) next.add(targetCode);
-      return next;
-    });
-    setSubmitting(true);
-    try {
-      await fetchNestApi(`/members/${targetId}?mode=all`, { method: "DELETE" });
-      toast.success(`Đã xóa hồ sơ Học viên và tài khoản "${deleting.name}" thành công.`);
-      setDeleting(null);
-      setDeleteMode("choose");
       qc.setQueryData(["members"], (old: Member[] | undefined) =>
         old ? old.filter((item) => String(item.id) !== targetId && (!targetCode || String(item.code) !== targetCode)) : [],
       );
@@ -877,6 +935,12 @@ function MembersPage() {
           <p className="mt-1 text-sm text-muted-foreground">{t("members.subtitle")}</p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
+          {/* Badge phân quyền dữ liệu (Data Scope) */}
+          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-xl bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300 border border-blue-200 dark:border-blue-800 shadow-xs">
+            <ShieldCheck className="h-3.5 w-3.5 text-blue-600" />
+            <span>{perm.dataScopeLabel}</span>
+          </span>
+
           <div className="inline-flex rounded-xl border border-border bg-card p-0.5 shadow-[var(--shadow-card)]">
             <button
               onClick={() => setView("cards")}
@@ -899,7 +963,18 @@ function MembersPage() {
               <List className="h-4 w-4" /> {t("mlist.viewTable")}
             </button>
           </div>
-          {can("MEM_EXPORT") && (
+
+          <PermissionGuard action="MEM_ADD">
+            <button
+              onClick={() => setEditing({} as any)}
+              className="inline-flex items-center gap-2 rounded-xl bg-[#003B95] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#002b70] cursor-pointer transition-colors"
+            >
+              <UserPlus className="h-4 w-4" />
+              <span>Thêm Học viên</span>
+            </button>
+          </PermissionGuard>
+
+          <PermissionGuard action="MEM_EXPORT">
             <button
               onClick={handleExport}
               className="inline-flex items-center gap-2 rounded-xl border border-border bg-card px-4 py-2 text-sm font-medium text-foreground shadow-[var(--shadow-card)] hover:bg-muted cursor-pointer"
@@ -907,7 +982,18 @@ function MembersPage() {
               <Download className="h-4 w-4 text-muted-foreground" />
               {t("members.export")}
             </button>
-          )}
+          </PermissionGuard>
+
+          <PermissionGuard action="SYS_DYNAMIC_FIELDS">
+            <button
+              onClick={() => setShowDynamicSchemaModal(true)}
+              className="inline-flex items-center gap-1.5 rounded-xl border border-indigo-200 dark:border-indigo-800 bg-indigo-50 dark:bg-indigo-950/40 px-3.5 py-2 text-xs font-bold text-indigo-700 dark:text-indigo-300 shadow-xs hover:bg-indigo-100 dark:hover:bg-indigo-900/60 cursor-pointer transition"
+              title="Ban Công Nghệ tùy chỉnh định dạng các trường (select, textarea, text...)"
+            >
+              <Settings2 className="h-4 w-4" />
+              <span>Cấu hình trường động (Ban Công Nghệ)</span>
+            </button>
+          </PermissionGuard>
         </div>
       </div>
 
@@ -1566,13 +1652,22 @@ function MembersPage() {
       <CrudModal
         open={!!editing}
         title={t("members.edit")}
-        fields={fields}
+        fields={activeFields}
         initial={editing ? editInitial(editing) : undefined}
         submitting={submitting}
         submitLabel={t("common.save")}
         cancelLabel={t("common.cancel")}
         onSubmit={onSubmit}
         onClose={() => setEditing(null)}
+      />
+
+      <DynamicSchemaEditorModal
+        isOpen={showDynamicSchemaModal}
+        onClose={() => setShowDynamicSchemaModal(false)}
+        entityType="member"
+        entityTitle="Hồ sơ Học viên CEO HN10"
+        fields={dynamicFields}
+        onFieldsUpdated={() => schemaQuery.refetch()}
       />
 
       {accountFor && (
@@ -1594,108 +1689,57 @@ function MembersPage() {
             onClick={() => {
               if (!submitting) {
                 setDeleting(null);
-                setDeleteMode("choose");
               }
             }}
           />
-          <div className="relative z-10 w-full max-w-lg rounded-2xl border border-border bg-card p-6 shadow-[var(--shadow-glow)] animate-in fade-in zoom-in-95">
-            {deleteMode === "choose" ? (
-              <>
-                <div className="flex items-center gap-3 text-destructive">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-destructive/10">
-                    <AlertTriangle className="h-5 w-5" />
-                  </div>
-                  <div>
-                    <h3 className="text-base font-bold text-foreground">Xác nhận xóa Học viên</h3>
-                    <p className="text-xs text-muted-foreground">Lựa chọn phương án xóa hồ sơ và dữ liệu liên kết</p>
-                  </div>
-                </div>
+          <div className="relative z-10 w-full max-w-md rounded-2xl border border-border bg-card p-6 shadow-2xl animate-in fade-in zoom-in-95">
+            <div className="flex items-center gap-3 text-destructive">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-destructive/10">
+                <Trash2 className="h-5 w-5" />
+              </div>
+              <div>
+                <h3 className="text-base font-bold text-foreground">Xóa thẳng Học viên</h3>
+                <p className="text-xs text-muted-foreground">Xóa trực tiếp ở cơ sở dữ liệu PostgreSQL</p>
+              </div>
+            </div>
 
-                <div className="mt-4 rounded-xl border border-border/80 bg-muted/30 p-3.5 space-y-2 text-xs">
-                  <div className="flex justify-between items-center">
-                    <span className="text-muted-foreground">Học viên:</span>
-                    <strong className="text-foreground font-semibold">{deleting.name} ({deleting.code})</strong>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-muted-foreground">Doanh nghiệp liên kết:</span>
-                    <span className="text-foreground font-medium">{deleting.companyName || deleting.company || deleting.name}</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-muted-foreground">Tài khoản đăng nhập:</span>
-                    <span className="text-foreground font-medium">{deleting.email || deleting.phone || "Có tài khoản liên kết"}</span>
-                  </div>
-                </div>
+            <div className="mt-4 rounded-xl border border-destructive/20 bg-destructive/5 p-3.5 space-y-2 text-xs">
+              <div className="flex justify-between items-center">
+                <span className="text-muted-foreground">Học viên:</span>
+                <strong className="text-foreground font-semibold">{deleting.name} ({deleting.code})</strong>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-muted-foreground">Chức vụ:</span>
+                <span className="text-foreground font-medium">{deleting.contact || "—"}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-muted-foreground">Email / SĐT:</span>
+                <span className="text-foreground font-medium">{deleting.email || deleting.phone || "—"}</span>
+              </div>
+            </div>
 
-                <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
-                  Học viên này đang gắn liền với dữ liệu doanh nghiệp và tài khoản quản trị/thành viên.
-                  Bạn có thể chọn <strong>xóa riêng doanh nghiệp trước</strong> (sau đó quay lại xóa Học viên) hoặc <strong>xóa toàn diện cả Học viên và doanh nghiệp</strong> ở cả 2 bảng.
-                </p>
+            <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
+              Hành động này sẽ <strong>xóa thẳng bản ghi Học viên ở database</strong> (không cần check doanh nghiệp nữa) cùng thẻ thành viên và tài khoản liên kết.
+            </p>
 
-                <div className="mt-5 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-end">
-                  <button
-                    onClick={() => {
-                      setDeleting(null);
-                      setDeleteMode("choose");
-                    }}
-                    disabled={submitting}
-                    className="order-3 sm:order-1 rounded-xl border border-border bg-card px-3.5 py-2 text-xs font-medium text-foreground hover:bg-muted disabled:opacity-50 cursor-pointer"
-                  >
-                    Hủy bỏ
-                  </button>
-                  <button
-                    onClick={onConfirmDeleteCompanyFirst}
-                    disabled={submitting}
-                    className="order-2 rounded-xl border border-amber-500/30 bg-amber-500/10 px-3.5 py-2 text-xs font-semibold text-amber-700 dark:text-amber-300 hover:bg-amber-500/20 disabled:opacity-50 cursor-pointer transition-colors"
-                  >
-                    1. Xóa doanh nghiệp trước
-                  </button>
-                  <button
-                    onClick={onConfirmDeleteAll}
-                    disabled={submitting}
-                    className="order-1 sm:order-3 rounded-xl bg-destructive px-3.5 py-2 text-xs font-semibold text-destructive-foreground hover:bg-destructive/90 disabled:opacity-50 cursor-pointer shadow-sm transition-colors"
-                  >
-                    2. Xóa cả Học viên và doanh nghiệp
-                  </button>
-                </div>
-              </>
-            ) : (
-              <>
-                <div className="flex items-center gap-3 text-emerald-600">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500/10">
-                    <CheckCircle2 className="h-5 w-5" />
-                  </div>
-                  <div>
-                    <h3 className="text-base font-bold text-foreground">Đã xóa doanh nghiệp liên kết</h3>
-                    <p className="text-xs text-muted-foreground">Tiến hành xóa hồ sơ Học viên và tài khoản</p>
-                  </div>
-                </div>
-
-                <div className="mt-4 rounded-xl border border-emerald-200 dark:border-emerald-900/50 bg-emerald-50/50 dark:bg-emerald-950/20 p-3.5 text-xs text-emerald-800 dark:text-emerald-200">
-                  Dữ liệu doanh nghiệp của Học viên <strong>{deleting.name}</strong> đã được gỡ bỏ khỏi bảng doanh nghiệp.
-                  Bạn có muốn tiếp tục xóa vĩnh viễn hồ sơ Học viên và tài khoản đăng nhập không?
-                </div>
-
-                <div className="mt-5 flex items-center justify-end gap-2">
-                  <button
-                    onClick={() => {
-                      setDeleting(null);
-                      setDeleteMode("choose");
-                    }}
-                    disabled={submitting}
-                    className="rounded-xl border border-border bg-card px-4 py-2 text-xs font-medium text-foreground hover:bg-muted disabled:opacity-50 cursor-pointer"
-                  >
-                    Giữ lại hồ sơ Học viên
-                  </button>
-                  <button
-                    onClick={onConfirmDeleteMemberOnly}
-                    disabled={submitting}
-                    className="rounded-xl bg-destructive px-4 py-2 text-xs font-semibold text-destructive-foreground hover:bg-destructive/90 disabled:opacity-50 cursor-pointer shadow-sm"
-                  >
-                    Xác nhận xóa Học viên &amp; tài khoản
-                  </button>
-                </div>
-              </>
-            )}
+            <div className="mt-5 flex items-center justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setDeleting(null)}
+                disabled={submitting}
+                className="rounded-xl border border-border bg-card px-4 py-2 text-xs font-medium text-foreground hover:bg-muted disabled:opacity-50 cursor-pointer"
+              >
+                Hủy bỏ
+              </button>
+              <button
+                type="button"
+                onClick={onDirectDelete}
+                disabled={submitting}
+                className="rounded-xl bg-destructive px-4 py-2 text-xs font-bold text-destructive-foreground hover:bg-destructive/90 disabled:opacity-50 cursor-pointer shadow-sm transition-colors"
+              >
+                {submitting ? "Đang xóa..." : "Xác nhận xóa thẳng ở Database"}
+              </button>
+            </div>
           </div>
         </div>
       )}

@@ -1,5 +1,69 @@
 # System Memory & Architecture
 
+- **Bản cập nhật ngày 19/11/2026 (v12.41): Triển Khai Hệ Thống Phân Quyền 3 Cấp Độ (Chức Năng, Thao Tác, Dữ Liệu), Bộ Validate FE & API Toàn Diện và Khắc Phục Triệt Để Sự Cố "Unauthorized: No token provided"**:
+  - **1. Hệ Thống Phân Quyền 3 Cấp Độ Chuyên Sâu (3-Tier Comprehensive Authorization)**:
+    * **Tầng 1 - Phân quyền chức năng (Functional / Screen / Route Level)**:
+      - Cổng Quản trị lớn nhất (`/master`): Khóa cứng bảo vệ đặc quyền, chỉ duy nhất tài khoản `admin@ceohn10.vn` (vai trò `platform_admin`) được phép truy cập và thực thi các nghiệp vụ hạ tầng/tài khoản cấp cao.
+      - 6 nhóm chức năng CRM CEOHN10 (Tổng quan, Sự kiện, Lớp học, Tài chính, Thông báo, Cài đặt hệ thống): Kiểm soát truy cập menu theo vai trò người dùng và ma trận động `crm_permission_matrix`.
+    * **Tầng 2 - Phân quyền thao tác (Action / Operation / Button Level)**:
+      - Mã định danh hành động chuẩn hóa:
+        + Học viên: `MEM_VIEW`, `MEM_ADD`, `MEM_EDIT`, `MEM_DELETE`, `MEM_APPROVE`, `MEM_EXPORT`.
+        + Tài chính: `FIN_VIEW`, `FIN_COL_ADD`, `FIN_COL_DELETE`, `FIN_ROW_ADD`, `FIN_ROW_EDIT`, `FIN_ROW_DELETE`, `FRP_EXPORT`.
+        + Sự kiện & Check-in: `EVT_VIEW`, `EVT_ADD`, `EVT_EDIT`, `EVT_DELETE`, `EVT_EXPORT`, `CHK_SCAN`.
+        + Lớp học: `CLS_VIEW`, `CLS_ADD`, `CLS_EDIT`, `CLS_DELETE`, `CLS_ATTEND`.
+        + Quản trị hệ thống: `SYS_SEPAY_CONFIG`, `SYS_PLATFORM_MANAGE`, `SYS_USER_CREATE`, `SYS_USER_PERM`, `SYS_DYNAMIC_FIELDS`.
+      - Frontend: Tích hợp hook `usePermissions()` và component `<PermissionGuard action="..." mode="hide"|"disable">` trên toàn bộ các nút bấm nghiệp vụ trọng yếu.
+      - Backend NestJS: Trang bị decorator `@RequireActions(...)` được kiểm tra chặt chẽ theo thời gian thực tại `RolesGuard`.
+    * **Tầng 3 - Phân quyền dữ liệu (Data Scope / Row-Level Scoping)**:
+      - 4 cấp độ phạm vi dữ liệu: `ALL` (Toàn hệ sinh thái), `DEPARTMENT` (Theo ban chuyên môn của người dùng), `CLASS` (Theo lớp học tham gia), `SELF` (Chỉ dữ liệu cá nhân).
+      - Backend: `RolesGuard` tự động phân giải và gắn `request.dataScope`, áp dụng bộ lọc trực tiếp trong `members.service.ts` và các truy vấn CSDL PostgreSQL `113.20.107.184:6432`.
+      - Frontend: Hiển thị huy hiệu trực quan `DataScopeBadge` tại Topbar / Profile Menu và Header các trang quản trị để người dùng nắm rõ phạm vi dữ liệu của mình.
+  - **2. Bộ Kiểm Tra Tính Hợp Lệ Dữ Liệu Toàn Diện (End-to-End FE & API Validation)**:
+    * **API Backend DTO Validation (Zod & Vietnamese Validation Pipe)**:
+      - Tận dụng `VietnameseValidationPipe` nạp tĩnh `static schema = z.object(...)` trên các DTO: `CreateMemberDto`, `UpdateMemberDto`, `PublicRegisterDto`, `AdminCreateUserDto`, `AddColumnDto`, `AddRowDto`...
+      - Tự động bản địa hóa toàn bộ thông báo lỗi trả về cho client bằng tiếng Việt rõ ràng, chuẩn ngữ cảnh.
+    * **Client-side Frontend Validation (`lib/validation.ts`)**:
+      - Kiểm tra định dạng số điện thoại Việt Nam (`isValidVietnamesePhone`), email (`isValidEmail`), mã định danh cột an toàn (`isValidColumnKey`).
+      - Xác thực trước khi gửi form tại `members.index.tsx`, `finance-report.tsx`, `master.index.tsx`.
+  - **3. Khắc Phục Triệt Để Sự Cố "Unauthorized: No token provided" & Lỗi Kết Nối**:
+    * Chuyển `getDashboardStatsFn` sang `optionalNestAuth` kèm cơ chế tính toán dự phòng từ CSDL Postgres, bảo vệ trang Tổng quan không bị vỡ giao diện khi cookie chưa sẵn sàng.
+    * Tự động tái đồng bộ cookie qua `ensureSessionCookiesSync` tại `__root.tsx` và `ExecutiveDashboard.tsx`.
+    * Cải tiến `StateKit.tsx` `ErrorState`: Khi phát hiện lỗi xác thực phiên, hiển thị thông báo thân thiện và nút "Đăng nhập lại" trực tiếp tới `/auth?portal=crm`.
+  - **4. Kiểm Tra Chất Lượng Mã Nguồn (Verification)**:
+    * Backend NestJS `apps/ceohn10_app_be`: `nest build` đạt 0 lỗi (Exit code 0).
+    * Frontend CRM `apps/ceohn10_app_fe`: `tsc -p tsconfig.json --noEmit` đạt 0 lỗi (Exit code 0).
+    * Tuân thủ tuyệt đối Rule 0 (CSDL 113.20.107.184:6432, No Mock) và Rule 1 (Tuyệt đối không git commit / git push).
+
+- **Bản cập nhật ngày 19/11/2026 (v12.40): Hoàn Thiện Toàn Diện Kiến Trúc Quản Trị Lớn Nhất (Master Admin Portal), Tái Cấu Trúc Menu CRM CEOHN10, Bảng Báo Cáo Tài Chính Động Tự Sinh Cột & Hệ Thống Dynamic Form Fields Cho Ban Công Nghệ**:
+  - **1. Kiến Trúc Cổng Quản Trị Lớn Nhất (Master Admin Portal - `/master`)**:
+    * **[1. TỔNG QUAN NỀN TẢNG]**: Trực quan hóa danh sách nền tảng cốt lõi (CRM Web, Mobile App) và danh mục mở rộng các phần mềm/mini app tích hợp (A, B, C...); tích hợp tự động tính toán Báo Cáo Quỹ Tồn (Tổng quỹ thu, Tổng chi, Tồn quỹ thực tế khả dụng, Dòng tiền ròng) đồng bộ với giao dịch thời gian thực.
+    * **[2. QUẢN LÝ TÀI KHOẢN ĐƯỢC ĐĂNG NHẬP]**: Quản lý phiên làm việc, trạng thái kích hoạt, phân quyền ma trận RBAC. **Quy định bất biến: Duy nhất tài khoản `admin@ceohn10.vn` (Master Platform Admin) mới có quyền tạo mới tài khoản quản trị và phân quyền cho tài khoản đó**.
+    * **[3. CÀI ĐẶT HỆ THỐNG BÊN NGOÀI DYNAMIC]**: Đưa toàn bộ cấu hình cài đặt hệ thống chung ra khỏi CRM để quản trị tập trung tại Cổng Master Admin; cung cấp hệ thống cấu hình **Sepay Dynamic** toàn diện (API Token, Webhook Secret, Số tài khoản ngân hàng, Tiền tố tự động kích hoạt `CEOHN10_HP`, `CEOHN10_SK`, `CEOHN10_LH`).
+  - **2. Tái Cấu Trúc Toàn Diện Menu Hệ Thống CRM CEOHN10 (`Sidebar.tsx`)**:
+    * Nút liên kết đặc quyền "CỔNG QUẢN TRỊ LỚN NHẤT (MASTER ADMIN)" nổi bật ở đỉnh Sidebar dành cho Quản trị viên/Chủ tịch/Admin.
+    * **TỔNG QUAN**: Tổng quan (`/`), Trợ lý AI (`/ai-assistant`), Học viên (`/members`).
+    * **Nhóm SỰ KIỆN**: Khai giảng (`/events`), Quản lý người đăng ký (`/event-registrations`), Quản lý cấu hình mã QR đăng ký & check-in vào cửa (`/checkin-qr`), Quản lý template (thư mời, form đăng ký) (`/templates`), Quản lý quay thưởng (`/lucky-draw`).
+    * **Nhóm Lớp CEOHN10**: Quản lý giáo viên (`/classes?tab=teachers`), Quản lý lớp học (`/classes?tab=courses`), Quản lý học viên đăng ký (`/classes?tab=enrollments`), Quản lý học viên trợ thính (`/classes?tab=auditors`), Quản lý mã QR điểm danh theo buổi học (`/classes?tab=attendance-qr`).
+    * **NHÓM TÀI CHÍNH**: Báo cáo tài chính (`/finance-report`) - Chỉ dùng 1 bảng duy nhất khai báo động.
+    * **NHÓM THÔNG BÁO**: Thông báo qua Zalo OA/ZBS (`/admin/integrations?tab=miniapp`), Thông báo đến Email (`/email-marketing`).
+    * **Nhóm Cài đặt hệ thống (CRM)**: Quản lý tài liệu (`/documents`), Quản lý biểu mẫu (`/templates`).
+    * Loại bỏ cấu hình cài đặt hệ thống chung khỏi menu CRM theo đúng yêu cầu đặc tả.
+  - **3. Báo Cáo Tài Chính Động Tự Sinh Cột & Lưu Trực Tiếp CSDL (`financial-report.tsx`)**:
+    * Kiến trúc 1 bảng tài chính duy nhất kết nối CSDL PostgreSQL `113.20.107.184:6432`: bảng `public.financial_report_columns` và `public.financial_report_rows`.
+    * Nút **"+ Thêm cột mới (Lưu vào DB)"**: Cho phép người dùng trực tiếp khai báo thêm cột mới (Tiêu đề, Loại dữ liệu text/number/currency/date/select, Độ rộng pixel), hệ thống gọi API `POST /api/financial-report/columns` lưu trữ vĩnh viễn vào CSDL và tự động render ngay cột mới lên bảng báo cáo.
+    * Hỗ trợ xóa cột động bằng 1 chạm (`DELETE /api/financial-report/columns/:id`).
+    * Nút **"+ Thêm chứng từ mới"**: Hỗ trợ ghi nhận chứng từ thu/chi và nhập liệu linh hoạt cho toàn bộ các cột động tùy biến đã tạo, lưu trực tiếp vào CSDL (`POST /api/financial-report/rows`).
+  - **4. Hệ Thống Dynamic Form Fields Cho Ban Công Nghệ (`DynamicSchemaEditorModal.tsx`)**:
+    * Cho phép Ban Công Nghệ tùy biến mọi trường dữ liệu trong form Thêm mới / Chỉnh sửa: text, textarea, select, number, date, switch, email, phone...
+    * Bảng CSDL chuyên biệt: `public.dynamic_form_schemas` và `public.dynamic_form_fields`.
+    * Nút "Cấu hình trường động (Ban Công Nghệ)" trên giao diện Học viên mở modal quản lý thời gian thực.
+  - **5. Tinh Gọn Logic Xóa Học Viên - Xóa Thẳng Ở Database**:
+    * Gỡ bỏ hoàn toàn logic kiểm tra phụ thuộc doanh nghiệp rườm rà. Khi xóa Học viên, hệ thống thực thi xóa trực tiếp ở CSDL (`DELETE /members/:id`), dọn dẹp các bản ghi liên kết sạch sẽ mà không chặn lại hay hỏi nhiều bước.
+  - **6. Kiểm Tra Chất Lượng Mã Nguồn (Verification)**:
+    * Backend NestJS `apps/ceohn10_app_be`: `nest build` đạt 0 lỗi (Exit code 0).
+    * Frontend CRM `apps/ceohn10_app_fe`: `tsc -p tsconfig.json --noEmit` đạt 0 lỗi (Exit code 0).
+    * Tuân thủ triệt để Rule 0 (CSDL 113.20.107.184:6432, No Mock Data) và Rule 1 (Tuyệt đối không git commit / git push).
+
 - **Bản cập nhật ngày 19/11/2026 (v12.39): Xác Lập `admin@ceohn10.vn` Là Tài Khoản Quản Trị Tối Cao (Master / Platform Admin), Cho Phép Tạo Tài Khoản Khác, Phân Quyền Linh Hoạt & Mở Rộng Quyền Đăng Nhập Cho Các Tài Khoản Hợp Lệ**:
   - **1. Bối cảnh & Yêu cầu người dùng**:
     * Không giới hạn chỉ duy nhất `admin@ceohn10.vn` được đăng nhập vào hệ thống.
@@ -2608,6 +2672,70 @@
      - Tuân thủ nghiêm ngặt STRICT RULE 1: Tuyệt đối không tự động chạy `git push` hay `git commit`.
 
 # System Memory & Architecture
+
+- **Bản cập nhật ngày 19/11/2026 (v12.41): Triển Khai Hệ Thống Phân Quyền 3 Cấp Độ (Chức Năng, Thao Tác, Dữ Liệu), Bộ Validate FE & API Toàn Diện và Khắc Phục Triệt Để Sự Cố "Unauthorized: No token provided"**:
+  - **1. Hệ Thống Phân Quyền 3 Cấp Độ Chuyên Sâu (3-Tier Comprehensive Authorization)**:
+    * **Tầng 1 - Phân quyền chức năng (Functional / Screen / Route Level)**:
+      - Cổng Quản trị lớn nhất (`/master`): Khóa cứng bảo vệ đặc quyền, chỉ duy nhất tài khoản `admin@ceohn10.vn` (vai trò `platform_admin`) được phép truy cập và thực thi các nghiệp vụ hạ tầng/tài khoản cấp cao.
+      - 6 nhóm chức năng CRM CEOHN10 (Tổng quan, Sự kiện, Lớp học, Tài chính, Thông báo, Cài đặt hệ thống): Kiểm soát truy cập menu theo vai trò người dùng và ma trận động `crm_permission_matrix`.
+    * **Tầng 2 - Phân quyền thao tác (Action / Operation / Button Level)**:
+      - Mã định danh hành động chuẩn hóa:
+        + Học viên: `MEM_VIEW`, `MEM_ADD`, `MEM_EDIT`, `MEM_DELETE`, `MEM_APPROVE`, `MEM_EXPORT`.
+        + Tài chính: `FIN_VIEW`, `FIN_COL_ADD`, `FIN_COL_DELETE`, `FIN_ROW_ADD`, `FIN_ROW_EDIT`, `FIN_ROW_DELETE`, `FRP_EXPORT`.
+        + Sự kiện & Check-in: `EVT_VIEW`, `EVT_ADD`, `EVT_EDIT`, `EVT_DELETE`, `EVT_EXPORT`, `CHK_SCAN`.
+        + Lớp học: `CLS_VIEW`, `CLS_ADD`, `CLS_EDIT`, `CLS_DELETE`, `CLS_ATTEND`.
+        + Quản trị hệ thống: `SYS_SEPAY_CONFIG`, `SYS_PLATFORM_MANAGE`, `SYS_USER_CREATE`, `SYS_USER_PERM`, `SYS_DYNAMIC_FIELDS`.
+      - Frontend: Tích hợp hook `usePermissions()` và component `<PermissionGuard action="..." mode="hide"|"disable">` trên toàn bộ các nút bấm nghiệp vụ trọng yếu.
+      - Backend NestJS: Trang bị decorator `@RequireActions(...)` được kiểm tra chặt chẽ theo thời gian thực tại `RolesGuard`.
+    * **Tầng 3 - Phân quyền dữ liệu (Data Scope / Row-Level Scoping)**:
+      - 4 cấp độ phạm vi dữ liệu: `ALL` (Toàn hệ sinh thái), `DEPARTMENT` (Theo ban chuyên môn của người dùng), `CLASS` (Theo lớp học tham gia), `SELF` (Chỉ dữ liệu cá nhân).
+      - Backend: `RolesGuard` tự động phân giải và gắn `request.dataScope`, áp dụng bộ lọc trực tiếp trong `members.service.ts` và các truy vấn CSDL PostgreSQL `113.20.107.184:6432`.
+      - Frontend: Hiển thị huy hiệu trực quan `DataScopeBadge` tại Topbar / Profile Menu và Header các trang quản trị để người dùng nắm rõ phạm vi dữ liệu của mình.
+  - **2. Bộ Kiểm Tra Tính Hợp Lệ Dữ Liệu Toàn Diện (End-to-End FE & API Validation)**:
+    * **API Backend DTO Validation (Zod & Vietnamese Validation Pipe)**:
+      - Tận dụng `VietnameseValidationPipe` nạp tĩnh `static schema = z.object(...)` trên các DTO: `CreateMemberDto`, `UpdateMemberDto`, `PublicRegisterDto`, `AdminCreateUserDto`, `AddColumnDto`, `AddRowDto`...
+      - Tự động bản địa hóa toàn bộ thông báo lỗi trả về cho client bằng tiếng Việt rõ ràng, chuẩn ngữ cảnh.
+    * **Client-side Frontend Validation (`lib/validation.ts`)**:
+      - Kiểm tra định dạng số điện thoại Việt Nam (`isValidVietnamesePhone`), email (`isValidEmail`), mã định danh cột an toàn (`isValidColumnKey`).
+      - Xác thực trước khi gửi form tại `members.index.tsx`, `finance-report.tsx`, `master.index.tsx`.
+  - **3. Khắc Phục Triệt Để Sự Cố "Unauthorized: No token provided" & Lỗi Kết Nối**:
+    * Chuyển `getDashboardStatsFn` sang `optionalNestAuth` kèm cơ chế tính toán dự phòng từ CSDL Postgres, bảo vệ trang Tổng quan không bị vỡ giao diện khi cookie chưa sẵn sàng.
+    * Tự động tái đồng bộ cookie qua `ensureSessionCookiesSync` tại `__root.tsx` và `ExecutiveDashboard.tsx`.
+    * Cải tiến `StateKit.tsx` `ErrorState`: Khi phát hiện lỗi xác thực phiên, hiển thị thông báo thân thiện và nút "Đăng nhập lại" trực tiếp tới `/auth?portal=crm`.
+  - **4. Kiểm Tra Chất Lượng Mã Nguồn (Verification)**:
+    * Backend NestJS `apps/ceohn10_app_be`: `nest build` đạt 0 lỗi (Exit code 0).
+    * Frontend CRM `apps/ceohn10_app_fe`: `tsc -p tsconfig.json --noEmit` đạt 0 lỗi (Exit code 0).
+    * Tuân thủ tuyệt đối Rule 0 (CSDL 113.20.107.184:6432, No Mock) và Rule 1 (Tuyệt đối không git commit / git push).
+
+- **Bản cập nhật ngày 19/11/2026 (v12.40): Hoàn Thiện Toàn Diện Kiến Trúc Quản Trị Lớn Nhất (Master Admin Portal), Tái Cấu Trúc Menu CRM CEOHN10, Bảng Báo Cáo Tài Chính Động Tự Sinh Cột & Hệ Thống Dynamic Form Fields Cho Ban Công Nghệ**:
+  - **1. Kiến Trúc Cổng Quản Trị Lớn Nhất (Master Admin Portal - `/master`)**:
+    * **[1. TỔNG QUAN NỀN TẢNG]**: Trực quan hóa danh sách nền tảng cốt lõi (CRM Web, Mobile App) và danh mục mở rộng các phần mềm/mini app tích hợp (A, B, C...); tích hợp tự động tính toán Báo Cáo Quỹ Tồn (Tổng quỹ thu, Tổng chi, Tồn quỹ thực tế khả dụng, Dòng tiền ròng) đồng bộ với giao dịch thời gian thực.
+    * **[2. QUẢN LÝ TÀI KHOẢN ĐƯỢC ĐĂNG NHẬP]**: Quản lý phiên làm việc, trạng thái kích hoạt, phân quyền ma trận RBAC. **Quy định bất biến: Duy nhất tài khoản `admin@ceohn10.vn` (Master Platform Admin) mới có quyền tạo mới tài khoản quản trị và phân quyền cho tài khoản đó**.
+    * **[3. CÀI ĐẶT HỆ THỐNG BÊN NGOÀI DYNAMIC]**: Đưa toàn bộ cấu hình cài đặt hệ thống chung ra khỏi CRM để quản trị tập trung tại Cổng Master Admin; cung cấp hệ thống cấu hình **Sepay Dynamic** toàn diện (API Token, Webhook Secret, Số tài khoản ngân hàng, Tiền tố tự động kích hoạt `CEOHN10_HP`, `CEOHN10_SK`, `CEOHN10_LH`).
+  - **2. Tái Cấu Trúc Toàn Diện Menu Hệ Thống CRM CEOHN10 (`Sidebar.tsx`)**:
+    * Nút liên kết đặc quyền "CỔNG QUẢN TRỊ LỚN NHẤT (MASTER ADMIN)" nổi bật ở đỉnh Sidebar dành cho Quản trị viên/Chủ tịch/Admin.
+    * **TỔNG QUAN**: Tổng quan (`/`), Trợ lý AI (`/ai-assistant`), Học viên (`/members`).
+    * **Nhóm SỰ KIỆN**: Khai giảng (`/events`), Quản lý người đăng ký (`/event-registrations`), Quản lý cấu hình mã QR đăng ký & check-in vào cửa (`/checkin-qr`), Quản lý template (thư mời, form đăng ký) (`/templates`), Quản lý quay thưởng (`/lucky-draw`).
+    * **Nhóm Lớp CEOHN10**: Quản lý giáo viên (`/classes?tab=teachers`), Quản lý lớp học (`/classes?tab=courses`), Quản lý học viên đăng ký (`/classes?tab=enrollments`), Quản lý học viên trợ thính (`/classes?tab=auditors`), Quản lý mã QR điểm danh theo buổi học (`/classes?tab=attendance-qr`).
+    * **NHÓM TÀI CHÍNH**: Báo cáo tài chính (`/finance-report`) - Chỉ dùng 1 bảng duy nhất khai báo động.
+    * **NHÓM THÔNG BÁO**: Thông báo qua Zalo OA/ZBS (`/admin/integrations?tab=miniapp`), Thông báo đến Email (`/email-marketing`).
+    * **Nhóm Cài đặt hệ thống (CRM)**: Quản lý tài liệu (`/documents`), Quản lý biểu mẫu (`/templates`).
+    * Loại bỏ cấu hình cài đặt hệ thống chung khỏi menu CRM theo đúng yêu cầu đặc tả.
+  - **3. Báo Cáo Tài Chính Động Tự Sinh Cột & Lưu Trực Tiếp CSDL (`financial-report.tsx`)**:
+    * Kiến trúc 1 bảng tài chính duy nhất kết nối CSDL PostgreSQL `113.20.107.184:6432`: bảng `public.financial_report_columns` và `public.financial_report_rows`.
+    * Nút **"+ Thêm cột mới (Lưu vào DB)"**: Cho phép người dùng trực tiếp khai báo thêm cột mới (Tiêu đề, Loại dữ liệu text/number/currency/date/select, Độ rộng pixel), hệ thống gọi API `POST /api/financial-report/columns` lưu trữ vĩnh viễn vào CSDL và tự động render ngay cột mới lên bảng báo cáo.
+    * Hỗ trợ xóa cột động bằng 1 chạm (`DELETE /api/financial-report/columns/:id`).
+    * Nút **"+ Thêm chứng từ mới"**: Hỗ trợ ghi nhận chứng từ thu/chi và nhập liệu linh hoạt cho toàn bộ các cột động tùy biến đã tạo, lưu trực tiếp vào CSDL (`POST /api/financial-report/rows`).
+  - **4. Hệ Thống Dynamic Form Fields Cho Ban Công Nghệ (`DynamicSchemaEditorModal.tsx`)**:
+    * Cho phép Ban Công Nghệ tùy biến mọi trường dữ liệu trong form Thêm mới / Chỉnh sửa: text, textarea, select, number, date, switch, email, phone...
+    * Bảng CSDL chuyên biệt: `public.dynamic_form_schemas` và `public.dynamic_form_fields`.
+    * Nút "Cấu hình trường động (Ban Công Nghệ)" trên giao diện Học viên mở modal quản lý thời gian thực.
+  - **5. Tinh Gọn Logic Xóa Học Viên - Xóa Thẳng Ở Database**:
+    * Gỡ bỏ hoàn toàn logic kiểm tra phụ thuộc doanh nghiệp rườm rà. Khi xóa Học viên, hệ thống thực thi xóa trực tiếp ở CSDL (`DELETE /members/:id`), dọn dẹp các bản ghi liên kết sạch sẽ mà không chặn lại hay hỏi nhiều bước.
+  - **6. Kiểm Tra Chất Lượng Mã Nguồn (Verification)**:
+    * Backend NestJS `apps/ceohn10_app_be`: `nest build` đạt 0 lỗi (Exit code 0).
+    * Frontend CRM `apps/ceohn10_app_fe`: `tsc -p tsconfig.json --noEmit` đạt 0 lỗi (Exit code 0).
+    * Tuân thủ triệt để Rule 0 (CSDL 113.20.107.184:6432, No Mock Data) và Rule 1 (Tuyệt đối không git commit / git push).
 
 - **Bản cập nhật ngày 19/11/2026 (v12.39): Xác Lập `admin@ceohn10.vn` Là Tài Khoản Quản Trị Tối Cao (Master / Platform Admin), Cho Phép Tạo Tài Khoản Khác, Phân Quyền Linh Hoạt & Mở Rộng Quyền Đăng Nhập Cho Các Tài Khoản Hợp Lệ**:
   - **1. Bối cảnh & Yêu cầu người dùng**:
@@ -6381,6 +6509,70 @@
      - Tuân thủ nghiêm ngặt STRICT RULE 1: Tuyệt đối không tự động chạy `git push` hay `git commit`.
 
 # System Memory & Architecture
+
+- **Bản cập nhật ngày 19/11/2026 (v12.41): Triển Khai Hệ Thống Phân Quyền 3 Cấp Độ (Chức Năng, Thao Tác, Dữ Liệu), Bộ Validate FE & API Toàn Diện và Khắc Phục Triệt Để Sự Cố "Unauthorized: No token provided"**:
+  - **1. Hệ Thống Phân Quyền 3 Cấp Độ Chuyên Sâu (3-Tier Comprehensive Authorization)**:
+    * **Tầng 1 - Phân quyền chức năng (Functional / Screen / Route Level)**:
+      - Cổng Quản trị lớn nhất (`/master`): Khóa cứng bảo vệ đặc quyền, chỉ duy nhất tài khoản `admin@ceohn10.vn` (vai trò `platform_admin`) được phép truy cập và thực thi các nghiệp vụ hạ tầng/tài khoản cấp cao.
+      - 6 nhóm chức năng CRM CEOHN10 (Tổng quan, Sự kiện, Lớp học, Tài chính, Thông báo, Cài đặt hệ thống): Kiểm soát truy cập menu theo vai trò người dùng và ma trận động `crm_permission_matrix`.
+    * **Tầng 2 - Phân quyền thao tác (Action / Operation / Button Level)**:
+      - Mã định danh hành động chuẩn hóa:
+        + Học viên: `MEM_VIEW`, `MEM_ADD`, `MEM_EDIT`, `MEM_DELETE`, `MEM_APPROVE`, `MEM_EXPORT`.
+        + Tài chính: `FIN_VIEW`, `FIN_COL_ADD`, `FIN_COL_DELETE`, `FIN_ROW_ADD`, `FIN_ROW_EDIT`, `FIN_ROW_DELETE`, `FRP_EXPORT`.
+        + Sự kiện & Check-in: `EVT_VIEW`, `EVT_ADD`, `EVT_EDIT`, `EVT_DELETE`, `EVT_EXPORT`, `CHK_SCAN`.
+        + Lớp học: `CLS_VIEW`, `CLS_ADD`, `CLS_EDIT`, `CLS_DELETE`, `CLS_ATTEND`.
+        + Quản trị hệ thống: `SYS_SEPAY_CONFIG`, `SYS_PLATFORM_MANAGE`, `SYS_USER_CREATE`, `SYS_USER_PERM`, `SYS_DYNAMIC_FIELDS`.
+      - Frontend: Tích hợp hook `usePermissions()` và component `<PermissionGuard action="..." mode="hide"|"disable">` trên toàn bộ các nút bấm nghiệp vụ trọng yếu.
+      - Backend NestJS: Trang bị decorator `@RequireActions(...)` được kiểm tra chặt chẽ theo thời gian thực tại `RolesGuard`.
+    * **Tầng 3 - Phân quyền dữ liệu (Data Scope / Row-Level Scoping)**:
+      - 4 cấp độ phạm vi dữ liệu: `ALL` (Toàn hệ sinh thái), `DEPARTMENT` (Theo ban chuyên môn của người dùng), `CLASS` (Theo lớp học tham gia), `SELF` (Chỉ dữ liệu cá nhân).
+      - Backend: `RolesGuard` tự động phân giải và gắn `request.dataScope`, áp dụng bộ lọc trực tiếp trong `members.service.ts` và các truy vấn CSDL PostgreSQL `113.20.107.184:6432`.
+      - Frontend: Hiển thị huy hiệu trực quan `DataScopeBadge` tại Topbar / Profile Menu và Header các trang quản trị để người dùng nắm rõ phạm vi dữ liệu của mình.
+  - **2. Bộ Kiểm Tra Tính Hợp Lệ Dữ Liệu Toàn Diện (End-to-End FE & API Validation)**:
+    * **API Backend DTO Validation (Zod & Vietnamese Validation Pipe)**:
+      - Tận dụng `VietnameseValidationPipe` nạp tĩnh `static schema = z.object(...)` trên các DTO: `CreateMemberDto`, `UpdateMemberDto`, `PublicRegisterDto`, `AdminCreateUserDto`, `AddColumnDto`, `AddRowDto`...
+      - Tự động bản địa hóa toàn bộ thông báo lỗi trả về cho client bằng tiếng Việt rõ ràng, chuẩn ngữ cảnh.
+    * **Client-side Frontend Validation (`lib/validation.ts`)**:
+      - Kiểm tra định dạng số điện thoại Việt Nam (`isValidVietnamesePhone`), email (`isValidEmail`), mã định danh cột an toàn (`isValidColumnKey`).
+      - Xác thực trước khi gửi form tại `members.index.tsx`, `finance-report.tsx`, `master.index.tsx`.
+  - **3. Khắc Phục Triệt Để Sự Cố "Unauthorized: No token provided" & Lỗi Kết Nối**:
+    * Chuyển `getDashboardStatsFn` sang `optionalNestAuth` kèm cơ chế tính toán dự phòng từ CSDL Postgres, bảo vệ trang Tổng quan không bị vỡ giao diện khi cookie chưa sẵn sàng.
+    * Tự động tái đồng bộ cookie qua `ensureSessionCookiesSync` tại `__root.tsx` và `ExecutiveDashboard.tsx`.
+    * Cải tiến `StateKit.tsx` `ErrorState`: Khi phát hiện lỗi xác thực phiên, hiển thị thông báo thân thiện và nút "Đăng nhập lại" trực tiếp tới `/auth?portal=crm`.
+  - **4. Kiểm Tra Chất Lượng Mã Nguồn (Verification)**:
+    * Backend NestJS `apps/ceohn10_app_be`: `nest build` đạt 0 lỗi (Exit code 0).
+    * Frontend CRM `apps/ceohn10_app_fe`: `tsc -p tsconfig.json --noEmit` đạt 0 lỗi (Exit code 0).
+    * Tuân thủ tuyệt đối Rule 0 (CSDL 113.20.107.184:6432, No Mock) và Rule 1 (Tuyệt đối không git commit / git push).
+
+- **Bản cập nhật ngày 19/11/2026 (v12.40): Hoàn Thiện Toàn Diện Kiến Trúc Quản Trị Lớn Nhất (Master Admin Portal), Tái Cấu Trúc Menu CRM CEOHN10, Bảng Báo Cáo Tài Chính Động Tự Sinh Cột & Hệ Thống Dynamic Form Fields Cho Ban Công Nghệ**:
+  - **1. Kiến Trúc Cổng Quản Trị Lớn Nhất (Master Admin Portal - `/master`)**:
+    * **[1. TỔNG QUAN NỀN TẢNG]**: Trực quan hóa danh sách nền tảng cốt lõi (CRM Web, Mobile App) và danh mục mở rộng các phần mềm/mini app tích hợp (A, B, C...); tích hợp tự động tính toán Báo Cáo Quỹ Tồn (Tổng quỹ thu, Tổng chi, Tồn quỹ thực tế khả dụng, Dòng tiền ròng) đồng bộ với giao dịch thời gian thực.
+    * **[2. QUẢN LÝ TÀI KHOẢN ĐƯỢC ĐĂNG NHẬP]**: Quản lý phiên làm việc, trạng thái kích hoạt, phân quyền ma trận RBAC. **Quy định bất biến: Duy nhất tài khoản `admin@ceohn10.vn` (Master Platform Admin) mới có quyền tạo mới tài khoản quản trị và phân quyền cho tài khoản đó**.
+    * **[3. CÀI ĐẶT HỆ THỐNG BÊN NGOÀI DYNAMIC]**: Đưa toàn bộ cấu hình cài đặt hệ thống chung ra khỏi CRM để quản trị tập trung tại Cổng Master Admin; cung cấp hệ thống cấu hình **Sepay Dynamic** toàn diện (API Token, Webhook Secret, Số tài khoản ngân hàng, Tiền tố tự động kích hoạt `CEOHN10_HP`, `CEOHN10_SK`, `CEOHN10_LH`).
+  - **2. Tái Cấu Trúc Toàn Diện Menu Hệ Thống CRM CEOHN10 (`Sidebar.tsx`)**:
+    * Nút liên kết đặc quyền "CỔNG QUẢN TRỊ LỚN NHẤT (MASTER ADMIN)" nổi bật ở đỉnh Sidebar dành cho Quản trị viên/Chủ tịch/Admin.
+    * **TỔNG QUAN**: Tổng quan (`/`), Trợ lý AI (`/ai-assistant`), Học viên (`/members`).
+    * **Nhóm SỰ KIỆN**: Khai giảng (`/events`), Quản lý người đăng ký (`/event-registrations`), Quản lý cấu hình mã QR đăng ký & check-in vào cửa (`/checkin-qr`), Quản lý template (thư mời, form đăng ký) (`/templates`), Quản lý quay thưởng (`/lucky-draw`).
+    * **Nhóm Lớp CEOHN10**: Quản lý giáo viên (`/classes?tab=teachers`), Quản lý lớp học (`/classes?tab=courses`), Quản lý học viên đăng ký (`/classes?tab=enrollments`), Quản lý học viên trợ thính (`/classes?tab=auditors`), Quản lý mã QR điểm danh theo buổi học (`/classes?tab=attendance-qr`).
+    * **NHÓM TÀI CHÍNH**: Báo cáo tài chính (`/finance-report`) - Chỉ dùng 1 bảng duy nhất khai báo động.
+    * **NHÓM THÔNG BÁO**: Thông báo qua Zalo OA/ZBS (`/admin/integrations?tab=miniapp`), Thông báo đến Email (`/email-marketing`).
+    * **Nhóm Cài đặt hệ thống (CRM)**: Quản lý tài liệu (`/documents`), Quản lý biểu mẫu (`/templates`).
+    * Loại bỏ cấu hình cài đặt hệ thống chung khỏi menu CRM theo đúng yêu cầu đặc tả.
+  - **3. Báo Cáo Tài Chính Động Tự Sinh Cột & Lưu Trực Tiếp CSDL (`financial-report.tsx`)**:
+    * Kiến trúc 1 bảng tài chính duy nhất kết nối CSDL PostgreSQL `113.20.107.184:6432`: bảng `public.financial_report_columns` và `public.financial_report_rows`.
+    * Nút **"+ Thêm cột mới (Lưu vào DB)"**: Cho phép người dùng trực tiếp khai báo thêm cột mới (Tiêu đề, Loại dữ liệu text/number/currency/date/select, Độ rộng pixel), hệ thống gọi API `POST /api/financial-report/columns` lưu trữ vĩnh viễn vào CSDL và tự động render ngay cột mới lên bảng báo cáo.
+    * Hỗ trợ xóa cột động bằng 1 chạm (`DELETE /api/financial-report/columns/:id`).
+    * Nút **"+ Thêm chứng từ mới"**: Hỗ trợ ghi nhận chứng từ thu/chi và nhập liệu linh hoạt cho toàn bộ các cột động tùy biến đã tạo, lưu trực tiếp vào CSDL (`POST /api/financial-report/rows`).
+  - **4. Hệ Thống Dynamic Form Fields Cho Ban Công Nghệ (`DynamicSchemaEditorModal.tsx`)**:
+    * Cho phép Ban Công Nghệ tùy biến mọi trường dữ liệu trong form Thêm mới / Chỉnh sửa: text, textarea, select, number, date, switch, email, phone...
+    * Bảng CSDL chuyên biệt: `public.dynamic_form_schemas` và `public.dynamic_form_fields`.
+    * Nút "Cấu hình trường động (Ban Công Nghệ)" trên giao diện Học viên mở modal quản lý thời gian thực.
+  - **5. Tinh Gọn Logic Xóa Học Viên - Xóa Thẳng Ở Database**:
+    * Gỡ bỏ hoàn toàn logic kiểm tra phụ thuộc doanh nghiệp rườm rà. Khi xóa Học viên, hệ thống thực thi xóa trực tiếp ở CSDL (`DELETE /members/:id`), dọn dẹp các bản ghi liên kết sạch sẽ mà không chặn lại hay hỏi nhiều bước.
+  - **6. Kiểm Tra Chất Lượng Mã Nguồn (Verification)**:
+    * Backend NestJS `apps/ceohn10_app_be`: `nest build` đạt 0 lỗi (Exit code 0).
+    * Frontend CRM `apps/ceohn10_app_fe`: `tsc -p tsconfig.json --noEmit` đạt 0 lỗi (Exit code 0).
+    * Tuân thủ triệt để Rule 0 (CSDL 113.20.107.184:6432, No Mock Data) và Rule 1 (Tuyệt đối không git commit / git push).
 
 - **Bản cập nhật ngày 19/11/2026 (v12.39): Xác Lập `admin@ceohn10.vn` Là Tài Khoản Quản Trị Tối Cao (Master / Platform Admin), Cho Phép Tạo Tài Khoản Khác, Phân Quyền Linh Hoạt & Mở Rộng Quyền Đăng Nhập Cho Các Tài Khoản Hợp Lệ**:
   - **1. Bối cảnh & Yêu cầu người dùng**:

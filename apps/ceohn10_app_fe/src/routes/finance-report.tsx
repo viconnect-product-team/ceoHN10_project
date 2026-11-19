@@ -21,11 +21,20 @@ import {
   X,
   Printer,
   Upload,
+  Plus,
+  PlusCircle,
+  Trash2,
+  Columns,
+  Settings2,
+  ShieldCheck,
 } from "lucide-react";
 import { AppShell } from "@/components/dashboard/AppShell";
 import { Card, PageHeader } from "@/components/dashboard/PageKit";
 import { useQuery } from "@tanstack/react-query";
 import { fetchNestApi } from "@/lib/api-client";
+import { usePermissions } from "@/hooks/use-permissions";
+import { PermissionGuard } from "@/components/auth/PermissionGuard";
+import { validateFinancialColumn, validateFinancialRow } from "@/lib/validation";
 import type { Transaction } from "@/types/finance.types";
 import { useFmt, useT } from "@/lib/i18n";
 import { exportToExcel, exportToWord, formatDisplayDate, formatExcelCurrency, numberToVietnameseWords } from "@/lib/excel-export";
@@ -38,6 +47,32 @@ import { FinanceChartsSection } from "@/components/dashboard/FinanceChartsSectio
 import { FinanceViewModeTabs, type FinanceViewMode } from "@/components/dashboard/FinanceViewModeTabs";
 import { FinanceUnitTreeSection } from "@/components/dashboard/FinanceUnitTreeSection";
 import { InvoiceExportModal, type InvoiceItem } from "@/components/dashboard/InvoiceExportModal";
+
+export interface FinancialColumn {
+  id: string;
+  column_key: string;
+  column_label: string;
+  column_type: "text" | "number" | "currency" | "date" | "select";
+  is_custom: boolean;
+  order_index: number;
+  options?: any[];
+  width_px?: number;
+  is_visible?: boolean;
+}
+
+export interface DynamicFinancialRow {
+  id: string;
+  transaction_date: string;
+  voucher_no?: string;
+  category: string;
+  description: string;
+  income_amount: number;
+  expense_amount: number;
+  balance_after?: number;
+  party_name?: string;
+  status: string;
+  custom_data?: Record<string, any>;
+}
 
 export const Route = createFileRoute("/finance-report")({
   ssr: false,
@@ -60,6 +95,7 @@ type PeriodFilter = "all" | "day" | "week" | "month" | "year";
 function FinanceReport() {
   const t = useT();
   const fmt = useFmt();
+  const perm = usePermissions();
   const searchParams = Route.useSearch();
   const queryCategory = searchParams.category;
   const rawTransactions = (Route.useLoaderData() as Transaction[]) || [];
@@ -74,6 +110,27 @@ function FinanceReport() {
   const [exportModalOpen, setExportModalOpen] = useState(false);
   const [showImportModal, setShowImportModal] = useState(false);
   const [invoiceExportModalOpen, setInvoiceExportModalOpen] = useState(false);
+
+  // Dynamic columns state
+  const [showAddColModal, setShowAddColModal] = useState(false);
+  const [newColLabel, setNewColLabel] = useState("");
+  const [newColType, setNewColType] = useState<"text" | "number" | "currency" | "date" | "select">("text");
+  const [newColWidth, setNewColWidth] = useState(160);
+  const [isSubmittingCol, setIsSubmittingCol] = useState(false);
+
+  // Dynamic row state
+  const [showAddRowModal, setShowAddRowModal] = useState(false);
+  const [newRowData, setNewRowData] = useState({
+    date: new Date().toISOString().slice(0, 10),
+    voucher_no: "",
+    type: "income" as "income" | "expense",
+    category: "Hội phí",
+    description: "",
+    amount: "",
+    recipient: "",
+  });
+  const [newRowCustomValues, setNewRowCustomValues] = useState<Record<string, any>>({});
+  const [isSubmittingRow, setIsSubmittingRow] = useState(false);
 
   const [selectedExportCategory, setSelectedExportCategory] = useState<string>(() => {
     if (queryCategory === "events") return "Sự kiện";
@@ -96,10 +153,40 @@ function FinanceReport() {
     initialData: rawTransactions,
   });
 
+  // Query dynamic columns from database
+  const columnsQuery = useQuery({
+    queryKey: ["financial-report-columns"],
+    queryFn: async () => {
+      try {
+        const res = await fetchNestApi<FinancialColumn[]>("/financial-report/columns");
+        if (Array.isArray(res)) return res;
+      } catch {}
+      return [];
+    },
+  });
+
+  // Query dynamic rows from database
+  const dynamicRowsQuery = useQuery({
+    queryKey: ["financial-report-rows"],
+    queryFn: async () => {
+      try {
+        const res = await fetchNestApi<DynamicFinancialRow[]>("/financial-report/rows");
+        if (Array.isArray(res)) return res;
+      } catch {}
+      return [];
+    },
+  });
+
+  const customColumns = useMemo(() => {
+    return (columnsQuery.data || []).filter((c) => c.is_custom);
+  }, [columnsQuery.data]);
+
   // Auto-update when cashflow changes (Requirement 6)
   useEffect(() => {
     const handleUpdate = () => {
       txQuery.refetch();
+      columnsQuery.refetch();
+      dynamicRowsQuery.refetch();
     };
     window.addEventListener("vba_transactions_changed", handleUpdate);
     window.addEventListener("finance-updated", handleUpdate);
@@ -107,9 +194,143 @@ function FinanceReport() {
       window.removeEventListener("vba_transactions_changed", handleUpdate);
       window.removeEventListener("finance-updated", handleUpdate);
     };
-  }, [txQuery]);
+  }, [txQuery, columnsQuery, dynamicRowsQuery]);
 
-  const activeRawTransactions = txQuery.data || rawTransactions;
+  const handleCreateColumn = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!perm.can("FIN_COL_ADD")) {
+      toast.error("Bạn không có quyền thêm cột Báo cáo tài chính (FIN_COL_ADD)");
+      return;
+    }
+    const val = validateFinancialColumn({
+      column_label: newColLabel,
+      column_key: newColLabel.trim().toLowerCase().replace(/[^a-z0-9]/g, "_"),
+      data_type: newColType,
+    });
+    if (!val.isValid) {
+      toast.error(Object.values(val.errors)[0]);
+      return;
+    }
+    setIsSubmittingCol(true);
+    try {
+      await fetchNestApi("/financial-report/columns", {
+        method: "POST",
+        body: JSON.stringify({
+          column_label: newColLabel.trim(),
+          column_type: newColType,
+          width_px: Number(newColWidth) || 160,
+        }),
+      });
+      toast.success(`Đã thêm cột "${newColLabel}" vào bảng và lưu trực tiếp dưới Database!`);
+      setNewColLabel("");
+      setShowAddColModal(false);
+      columnsQuery.refetch();
+    } catch (err: any) {
+      toast.error(`Lỗi thêm cột: ${err?.message || "Không thể tạo cột"}`);
+    } finally {
+      setIsSubmittingCol(false);
+    }
+  };
+
+  const handleDeleteColumn = async (colId: string, colLabel: string) => {
+    if (!perm.can("FIN_COL_DELETE")) {
+      toast.error("Bạn không có quyền xóa cột Báo cáo tài chính (FIN_COL_DELETE)");
+      return;
+    }
+    if (!confirm(`Bạn có chắc muốn xóa cột "${colLabel}" khỏi bảng Báo Cáo Tài Chính và CSDL không?`)) return;
+    try {
+      await fetchNestApi(`/financial-report/columns/${colId}`, { method: "DELETE" });
+      toast.success(`Đã xóa cột "${colLabel}" thành công!`);
+      columnsQuery.refetch();
+    } catch (err: any) {
+      toast.error(`Lỗi xóa cột: ${err?.message || "Không thể xóa cột"}`);
+    }
+  };
+
+  const handleCreateRow = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!perm.can("FIN_ROW_ADD")) {
+      toast.error("Bạn không có quyền thêm chứng từ tài chính (FIN_ROW_ADD)");
+      return;
+    }
+    if (!newRowData.description.trim() || !newRowData.amount) {
+      toast.error("Vui lòng nhập diễn giải và số tiền");
+      return;
+    }
+    const amt = Number(newRowData.amount.replace(/[^0-9]/g, "")) || 0;
+    const rowVal = validateFinancialRow({
+      description: newRowData.description,
+      income_amount: newRowData.type === "income" ? amt : 0,
+      expense_amount: newRowData.type === "expense" ? amt : 0,
+    });
+    if (!rowVal.isValid) {
+      toast.error(Object.values(rowVal.errors)[0]);
+      return;
+    }
+    setIsSubmittingRow(true);
+    try {
+      await fetchNestApi("/financial-report/rows", {
+        method: "POST",
+        body: JSON.stringify({
+          transaction_date: newRowData.date,
+          voucher_no: newRowData.voucher_no || `CT-${Date.now().toString().slice(-6)}`,
+          category: newRowData.category,
+          description: newRowData.description,
+          income_amount: newRowData.type === "income" ? amt : 0,
+          expense_amount: newRowData.type === "expense" ? amt : 0,
+          party_name: newRowData.recipient,
+          status: "completed",
+          custom_data: newRowCustomValues,
+        }),
+      });
+      toast.success("Đã ghi nhận chứng từ tài chính mới vào bảng!");
+      setShowAddRowModal(false);
+      setNewRowData({
+        date: new Date().toISOString().slice(0, 10),
+        voucher_no: "",
+        type: "income",
+        category: "Hội phí",
+        description: "",
+        amount: "",
+        recipient: "",
+      });
+      setNewRowCustomValues({});
+      dynamicRowsQuery.refetch();
+      txQuery.refetch();
+    } catch (err: any) {
+      toast.error(`Lỗi thêm chứng từ: ${err?.message || "Không thể lưu chứng từ"}`);
+    } finally {
+      setIsSubmittingRow(false);
+    }
+  };
+
+  const combinedTransactions = useMemo(() => {
+    const list = [...(txQuery.data || rawTransactions)];
+    const existingIds = new Set(list.map((t) => t.id));
+
+    if (dynamicRowsQuery.data && Array.isArray(dynamicRowsQuery.data)) {
+      for (const r of dynamicRowsQuery.data) {
+        const rowId = r.voucher_no || r.id;
+        if (!existingIds.has(rowId)) {
+          list.push({
+            id: rowId,
+            type: r.income_amount > 0 ? "income" : "expense",
+            category: r.category || "Khác",
+            description: r.description || "",
+            amount: r.income_amount > 0 ? r.income_amount : r.expense_amount,
+            date: r.transaction_date ? String(r.transaction_date).slice(0, 10) : "",
+            recipient: r.party_name || "",
+            method: "transfer",
+            status: (r.status as any) || "completed",
+            custom_data: r.custom_data,
+          } as any);
+        }
+      }
+    }
+    return list;
+  }, [txQuery.data, rawTransactions, dynamicRowsQuery.data]);
+
+  const activeRawTransactions = combinedTransactions;
 
   // Filtered by search, type, status & period (ngày, tuần, tháng, năm)
   const transactions = useMemo(() => {
@@ -392,6 +613,12 @@ function FinanceReport() {
         subtitle="Tổng hợp thu chi thực tế, cơ cấu ngân quỹ và số liệu kế toán minh bạch"
         actions={
           <div className="flex flex-wrap items-center gap-2">
+            {/* Badge Phân quyền dữ liệu (Data Scope) */}
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-xl bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300 border border-blue-200 dark:border-blue-800 shadow-xs">
+              <ShieldCheck className="h-3.5 w-3.5 text-blue-600" />
+              <span>{perm.dataScopeLabel}</span>
+            </span>
+
             {/* Bộ chọn danh mục xuất báo cáo */}
             <div className="flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800 rounded-xl px-2.5 py-1 border border-border">
               <span className="text-[11px] font-bold text-muted-foreground whitespace-nowrap">Danh mục xuất:</span>
@@ -419,33 +646,39 @@ function FinanceReport() {
               <Upload className="h-4 w-4" />
               <span>Nhập File (Excel / Word / PDF)</span>
             </button>
-            <button
-              type="button"
-              onClick={handleExportCsv}
-              className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 px-3.5 py-2 text-xs font-bold text-white shadow-xs cursor-pointer transition"
-              title="Xuất file bảng tính Excel (.xlsx) theo format Biểu mẫu"
-            >
-              <FileSpreadsheet className="h-4 w-4" />
-              <span>Xuất Excel (.xlsx)</span>
-            </button>
-            <button
-              type="button"
-              onClick={handleExportWord}
-              className="inline-flex items-center gap-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 px-3.5 py-2 text-xs font-bold text-white shadow-xs cursor-pointer transition"
-              title="Xuất văn bản báo cáo Word (.docx) theo format Biểu mẫu"
-            >
-              <FileText className="h-4 w-4" />
-              <span>Xuất Word (.docx)</span>
-            </button>
-            <button
-              type="button"
-              onClick={handleDirectExportPdf}
-              className="inline-flex items-center gap-1.5 rounded-xl bg-rose-700 hover:bg-rose-800 px-3.5 py-2 text-xs font-bold text-white shadow-xs cursor-pointer transition"
-              title="Xuất file PDF (.pdf) theo format Biểu mẫu"
-            >
-              <Printer className="h-4 w-4" />
-              <span>Xuất PDF (.pdf)</span>
-            </button>
+            <PermissionGuard action="FRP_EXPORT">
+              <button
+                type="button"
+                onClick={handleExportCsv}
+                className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 px-3.5 py-2 text-xs font-bold text-white shadow-xs cursor-pointer transition"
+                title="Xuất file bảng tính Excel (.xlsx) theo format Biểu mẫu"
+              >
+                <FileSpreadsheet className="h-4 w-4" />
+                <span>Xuất Excel (.xlsx)</span>
+              </button>
+            </PermissionGuard>
+            <PermissionGuard action="FRP_EXPORT">
+              <button
+                type="button"
+                onClick={handleExportWord}
+                className="inline-flex items-center gap-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 px-3.5 py-2 text-xs font-bold text-white shadow-xs cursor-pointer transition"
+                title="Xuất văn bản báo cáo Word (.docx) theo format Biểu mẫu"
+              >
+                <FileText className="h-4 w-4" />
+                <span>Xuất Word (.docx)</span>
+              </button>
+            </PermissionGuard>
+            <PermissionGuard action="FRP_EXPORT">
+              <button
+                type="button"
+                onClick={handleDirectExportPdf}
+                className="inline-flex items-center gap-1.5 rounded-xl bg-rose-700 hover:bg-rose-800 px-3.5 py-2 text-xs font-bold text-white shadow-xs cursor-pointer transition"
+                title="Xuất file PDF (.pdf) theo format Biểu mẫu"
+              >
+                <Printer className="h-4 w-4" />
+                <span>Xuất PDF (.pdf)</span>
+              </button>
+            </PermissionGuard>
             <button
               type="button"
               onClick={() => setInvoiceExportModalOpen(true)}
@@ -716,7 +949,7 @@ function FinanceReport() {
         <div className="p-4 border-b border-border flex items-center justify-between flex-wrap gap-2">
           <div>
             <h3 className="text-sm font-bold text-foreground">
-              Sổ Nhật Ký Giao Dịch & Hạch Toán Chi Tiết
+              Sổ Nhật Ký Giao Dịch & Hạch Toán Chi Tiết (Bảng Duy Nhất Khai Báo Động)
             </h3>
             <p className="text-xs text-muted-foreground">
               {transactions.length > 0
@@ -724,9 +957,32 @@ function FinanceReport() {
                 : "Hiển thị 0 chứng từ thu/chi trong hệ thống"}
             </p>
           </div>
-          <span className="text-xs font-mono font-bold px-2.5 py-1 rounded-full bg-muted text-foreground">
-            Tổng cộng: {transactions.length} chứng từ
-          </span>
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="text-xs font-mono font-bold px-2.5 py-1 rounded-full bg-muted text-foreground">
+              Tổng cộng: {transactions.length} chứng từ
+            </span>
+            <PermissionGuard action="FIN_ROW_ADD">
+              <button
+                type="button"
+                onClick={() => setShowAddRowModal(true)}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-xs transition cursor-pointer"
+              >
+                <Plus className="h-3.5 w-3.5" />
+                <span>+ Thêm chứng từ mới</span>
+              </button>
+            </PermissionGuard>
+            <PermissionGuard action="FIN_COL_ADD">
+              <button
+                type="button"
+                onClick={() => setShowAddColModal(true)}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-xs transition cursor-pointer"
+                title="Thêm cột động mới - Tự động tạo và lưu trữ vào database"
+              >
+                <Columns className="h-3.5 w-3.5" />
+                <span>+ Thêm cột mới (Lưu DB)</span>
+              </button>
+            </PermissionGuard>
+          </div>
         </div>
 
         <div className="overflow-x-auto">
@@ -742,12 +998,33 @@ function FinanceReport() {
                 <th className="px-4 py-3 text-right">Số tiền</th>
                 <th className="px-4 py-3">Hình thức</th>
                 <th className="px-4 py-3 text-center">Kiểm toán</th>
+                {customColumns.map((col) => (
+                  <th
+                    key={col.id}
+                    className="px-4 py-3 whitespace-nowrap bg-emerald-500/10 text-emerald-800 dark:text-emerald-300 font-bold"
+                    style={{ minWidth: col.width_px || 140 }}
+                  >
+                    <div className="flex items-center justify-between gap-1.5">
+                      <span>{col.column_label}</span>
+                      <PermissionGuard action="FIN_COL_DELETE">
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteColumn(col.id, col.column_label)}
+                          className="p-1 rounded text-red-500 hover:bg-red-100 dark:hover:bg-red-950/50 transition cursor-pointer"
+                          title={`Xóa cột "${col.column_label}" khỏi CSDL`}
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </button>
+                      </PermissionGuard>
+                    </div>
+                  </th>
+                ))}
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
               {tc.paged.length === 0 ? (
                 <tr>
-                  <td colSpan={9} className="py-12 text-center text-muted-foreground text-xs">
+                  <td colSpan={9 + customColumns.length} className="py-12 text-center text-muted-foreground text-xs">
                     Không tìm thấy chứng từ tài chính nào trong kỳ này.
                   </td>
                 </tr>
@@ -813,6 +1090,23 @@ function FinanceReport() {
                         </span>
                       )}
                     </td>
+                    {customColumns.map((col) => {
+                      const customVal =
+                        (tx as any).custom_data?.[col.column_key] ??
+                        (tx as any)[col.column_key];
+                      return (
+                        <td
+                          key={col.id}
+                          className="px-4 py-3 text-xs text-foreground whitespace-nowrap bg-emerald-500/5"
+                        >
+                          {customVal !== undefined && customVal !== null && customVal !== ""
+                            ? col.column_type === "currency"
+                              ? fmt.money(Number(customVal) || 0)
+                              : String(customVal)
+                            : "—"}
+                        </td>
+                      );
+                    })}
                   </tr>
                 ))
               )}
@@ -1004,6 +1298,299 @@ function FinanceReport() {
         onClose={() => setShowImportModal(false)}
         onImportSuccess={() => txQuery.refetch()}
       />
+
+      {/* Modal Thêm Cột Mới (Lưu CSDL Dynamic) */}
+      {showAddColModal && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200"
+          onClick={() => setShowAddColModal(false)}
+        >
+          <div
+            className="relative w-full max-w-md rounded-3xl border border-border bg-card p-6 shadow-2xl overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between pb-4 border-b border-border">
+              <div className="flex items-center gap-2.5">
+                <div className="p-2 rounded-xl bg-emerald-500/15 text-emerald-600">
+                  <Columns className="h-5 w-5" />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-foreground">
+                    Thêm Cột Mới Vào Báo Cáo
+                  </h3>
+                  <p className="text-[11px] text-muted-foreground">
+                    Cột mới sẽ được lưu trực tiếp xuống CSDL PostgreSQL
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowAddColModal(false)}
+                className="p-1.5 rounded-lg text-muted-foreground hover:bg-muted"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+
+            <form onSubmit={handleCreateColumn} className="space-y-4 pt-4">
+              <div>
+                <label className="block text-xs font-bold text-foreground mb-1">
+                  Tên tiêu đề cột <span className="text-rose-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="Ví dụ: Người phê duyệt, Mã hợp đồng, Thuế GTGT..."
+                  value={newColLabel}
+                  onChange={(e) => setNewColLabel(e.target.value)}
+                  className="w-full px-3 py-2 rounded-xl border border-input bg-background text-sm outline-none focus:ring-2 focus:ring-emerald-500/30"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-foreground mb-1">
+                    Định dạng dữ liệu
+                  </label>
+                  <select
+                    value={newColType}
+                    onChange={(e) => setNewColType(e.target.value as any)}
+                    className="w-full px-3 py-2 rounded-xl border border-input bg-background text-sm outline-none focus:ring-2 focus:ring-emerald-500/30"
+                  >
+                    <option value="text">Văn bản (Text)</option>
+                    <option value="number">Số lượng (Number)</option>
+                    <option value="currency">Tiền tệ (Currency)</option>
+                    <option value="date">Ngày tháng (Date)</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-foreground mb-1">
+                    Độ rộng cột (px)
+                  </label>
+                  <input
+                    type="number"
+                    min={80}
+                    max={400}
+                    value={newColWidth}
+                    onChange={(e) => setNewColWidth(Number(e.target.value))}
+                    className="w-full px-3 py-2 rounded-xl border border-input bg-background text-sm outline-none focus:ring-2 focus:ring-emerald-500/30"
+                  />
+                </div>
+              </div>
+
+              <div className="pt-2 flex items-center justify-end gap-2 border-t border-border">
+                <button
+                  type="button"
+                  onClick={() => setShowAddColModal(false)}
+                  className="px-4 py-2 rounded-xl border border-border bg-muted/40 text-xs font-bold text-foreground hover:bg-muted"
+                >
+                  Hủy
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSubmittingCol}
+                  className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-xs font-bold text-white shadow-xs disabled:opacity-50"
+                >
+                  {isSubmittingCol ? "Đang lưu CSDL..." : "Lưu cột mới vào CSDL"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Modal Thêm Chứng Từ Mới (Lưu CSDL Dynamic Rows) */}
+      {showAddRowModal && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200"
+          onClick={() => setShowAddRowModal(false)}
+        >
+          <div
+            className="relative w-full max-w-lg rounded-3xl border border-border bg-card p-6 shadow-2xl overflow-y-auto max-h-[90vh]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between pb-4 border-b border-border">
+              <div className="flex items-center gap-2.5">
+                <div className="p-2 rounded-xl bg-blue-500/15 text-blue-600">
+                  <Receipt className="h-5 w-5" />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-foreground">
+                    Ghi Nhận Chứng Từ Tài Chính Mới
+                  </h3>
+                  <p className="text-[11px] text-muted-foreground">
+                    Thêm chứng từ vào sổ nhật ký và lưu trữ trực tiếp vào CSDL
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowAddRowModal(false)}
+                className="p-1.5 rounded-lg text-muted-foreground hover:bg-muted"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+
+            <form onSubmit={handleCreateRow} className="space-y-4 pt-4">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-foreground mb-1">
+                    Ngày chứng từ
+                  </label>
+                  <input
+                    type="date"
+                    required
+                    value={newRowData.date}
+                    onChange={(e) => setNewRowData({ ...newRowData, date: e.target.value })}
+                    className="w-full px-3 py-2 rounded-xl border border-input bg-background text-sm outline-none focus:ring-2 focus:ring-blue-500/30"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-foreground mb-1">
+                    Mã chứng từ (tùy chọn)
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Tự sinh nếu để trống"
+                    value={newRowData.voucher_no}
+                    onChange={(e) => setNewRowData({ ...newRowData, voucher_no: e.target.value })}
+                    className="w-full px-3 py-2 rounded-xl border border-input bg-background text-sm outline-none focus:ring-2 focus:ring-blue-500/30"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-foreground mb-1">
+                    Loại chứng từ
+                  </label>
+                  <select
+                    value={newRowData.type}
+                    onChange={(e) => setNewRowData({ ...newRowData, type: e.target.value as any })}
+                    className="w-full px-3 py-2 rounded-xl border border-input bg-background text-sm outline-none focus:ring-2 focus:ring-blue-500/30"
+                  >
+                    <option value="income">Thu (+ Thặng dư)</option>
+                    <option value="expense">Chi (- Khoản chi)</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-foreground mb-1">
+                    Danh mục quỹ
+                  </label>
+                  <select
+                    value={newRowData.category}
+                    onChange={(e) => setNewRowData({ ...newRowData, category: e.target.value })}
+                    className="w-full px-3 py-2 rounded-xl border border-input bg-background text-sm outline-none focus:ring-2 focus:ring-blue-500/30"
+                  >
+                    <option value="Hội phí">Hội phí</option>
+                    <option value="Sự kiện">Sự kiện</option>
+                    <option value="Lớp học">Lớp học &amp; Đào tạo</option>
+                    <option value="Tài trợ">Tài trợ</option>
+                    <option value="Hoạt động">Chi hoạt động</option>
+                    <option value="Thiện nguyện">Thiện nguyện (CSR)</option>
+                    <option value="Khác">Khác</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-foreground mb-1">
+                  Diễn giải hạch toán <span className="text-rose-500">*</span>
+                </label>
+                <textarea
+                  required
+                  rows={2}
+                  placeholder="Diễn giải chi tiết nội dung giao dịch..."
+                  value={newRowData.description}
+                  onChange={(e) => setNewRowData({ ...newRowData, description: e.target.value })}
+                  className="w-full px-3 py-2 rounded-xl border border-input bg-background text-sm outline-none focus:ring-2 focus:ring-blue-500/30"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-foreground mb-1">
+                    Số tiền (VNĐ) <span className="text-rose-500">*</span>
+                  </label>
+                  <input
+                    type="number"
+                    required
+                    min={0}
+                    placeholder="VD: 5000000"
+                    value={newRowData.amount}
+                    onChange={(e) => setNewRowData({ ...newRowData, amount: e.target.value })}
+                    className="w-full px-3 py-2 rounded-xl border border-input bg-background text-sm outline-none focus:ring-2 focus:ring-blue-500/30"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-foreground mb-1">
+                    Đối tác / Người nộp-nhận
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Họ tên hoặc tên doanh nghiệp"
+                    value={newRowData.recipient}
+                    onChange={(e) => setNewRowData({ ...newRowData, recipient: e.target.value })}
+                    className="w-full px-3 py-2 rounded-xl border border-input bg-background text-sm outline-none focus:ring-2 focus:ring-blue-500/30"
+                  />
+                </div>
+              </div>
+
+              {/* Các trường động tùy biến (Custom Columns) */}
+              {customColumns.length > 0 && (
+                <div className="pt-2 border-t border-border/60 space-y-3">
+                  <div className="text-xs font-bold text-emerald-700 dark:text-emerald-400 flex items-center gap-1.5">
+                    <Columns className="h-3.5 w-3.5" />
+                    <span>Các trường động tùy chỉnh đã tạo ({customColumns.length})</span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    {customColumns.map((col) => (
+                      <div key={col.id}>
+                        <label className="block text-[11px] font-semibold text-foreground mb-1 truncate">
+                          {col.column_label}
+                        </label>
+                        <input
+                          type={col.column_type === "number" || col.column_type === "currency" ? "number" : col.column_type === "date" ? "date" : "text"}
+                          value={newRowCustomValues[col.column_key] || ""}
+                          onChange={(e) =>
+                            setNewRowCustomValues({
+                              ...newRowCustomValues,
+                              [col.column_key]: e.target.value,
+                            })
+                          }
+                          className="w-full px-3 py-1.5 rounded-xl border border-input bg-background text-xs outline-none focus:ring-2 focus:ring-emerald-500/30"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <div className="pt-2 flex items-center justify-end gap-2 border-t border-border">
+                <button
+                  type="button"
+                  onClick={() => setShowAddRowModal(false)}
+                  className="px-4 py-2 rounded-xl border border-border bg-muted/40 text-xs font-bold text-foreground hover:bg-muted"
+                >
+                  Hủy
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSubmittingRow}
+                  className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-xs font-bold text-white shadow-xs disabled:opacity-50"
+                >
+                  {isSubmittingRow ? "Đang lưu..." : "Lưu chứng từ vào CSDL"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* Invoice & Statement Export Modal (Total or By Category) */}
       <InvoiceExportModal
