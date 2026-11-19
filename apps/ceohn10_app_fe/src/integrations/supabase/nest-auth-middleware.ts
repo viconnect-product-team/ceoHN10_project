@@ -19,6 +19,12 @@ function extractToken(request: Request): string | null {
     return authHeader.slice(7);
   }
 
+  // 1.1 Custom token headers
+  const customHeader = request.headers.get("x-access-token") || request.headers.get("x-vibe-token");
+  if (customHeader) {
+    return customHeader;
+  }
+
   // 2. Cookie: sb-access-token | vibe_token | access_token | ceohn10_token | ceohn10_auth_token | token
   const cookieHeader = request.headers.get("cookie") ?? "";
   const match =
@@ -28,7 +34,20 @@ function extractToken(request: Request): string | null {
     cookieHeader.match(/ceohn10_token=([^;]+)/) ??
     cookieHeader.match(/ceohn10_auth_token=([^;]+)/) ??
     cookieHeader.match(/(?:^|;\s*)token=([^;]+)/);
-  return match ? decodeURIComponent(match[1]) : null;
+  if (match) {
+    return decodeURIComponent(match[1]);
+  }
+
+  // 3. Fallback: URL search params (e.g. ?token=...)
+  try {
+    const url = new URL(request.url);
+    const qToken = url.searchParams.get("token") || url.searchParams.get("access_token");
+    if (qToken) return qToken;
+  } catch {
+    /* ignore */
+  }
+
+  return null;
 }
 
 function verifyNestJwt(token: string): Record<string, any> | null {

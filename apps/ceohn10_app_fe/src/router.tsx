@@ -1,6 +1,7 @@
 import { createRouter, useRouter } from "@tanstack/react-router";
 import { useState } from "react";
 import { routeTree } from "./routeTree.gen";
+import { ensureSessionCookiesSync } from "@/lib/api-client";
 
 function DefaultErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   const router = useRouter();
@@ -103,6 +104,7 @@ function DefaultErrorComponent({ error, reset }: { error: Error; reset: () => vo
           <button
             type="button"
             onClick={() => {
+              ensureSessionCookiesSync();
               router.invalidate();
               reset();
             }}

@@ -11,6 +11,7 @@
     "dev": "vite dev",
     "prebuild": "node scripts/gen-routes.mjs",
     "build": "cross-env NODE_OPTIONS=--max-old-space-size=6144 vite build",
+    "postbuild": "node -e \"const fs = require('node:fs'); if (fs.existsSync('public') && fs.existsSync('.output/public')) { fs.cpSync('public', '.output/public', { recursive: true }); }\"",
     "prebuild:dev": "node scripts/gen-routes.mjs",
     "build:dev": "cross-env NODE_OPTIONS=--max-old-space-size=6144 vite build --mode development",
     "preview": "vite preview",

@@ -96,16 +96,18 @@ jobs:
         run: |
           # 1. Build Frontend Image từ bản build .output vừa hoàn thành
           docker build -t ceohn10-frontend:latest -f deploy/ceohn10/Dockerfile.frontend .
-          docker tag ceohn10-frontend:latest crm-frontend:latest
+          docker build -t ceohn10-crm-frontend:latest -f deploy/crm/Dockerfile.frontend .
+          docker tag ceohn10-crm-frontend:latest crm-frontend:latest
 
           # 2. Build Backend Image từ root Dockerfile.backend
           docker build -t ceohn10-backend:latest -f Dockerfile.backend .
+          docker tag ceohn10-backend:latest ceohn10-crm-backend:latest
           docker tag ceohn10-backend:latest crm-backend:latest
 
           # 3. Nén images thành tar.gz để truyền nhanh qua SSH
           mkdir -p dist-images
-          docker save ceohn10-frontend:latest crm-frontend:latest | gzip -1 > dist-images/frontend-images.tar.gz
-          docker save ceohn10-backend:latest crm-backend:latest | gzip -1 > dist-images/backend-images.tar.gz
+          docker save ceohn10-frontend:latest ceohn10-crm-frontend:latest crm-frontend:latest | gzip -1 > dist-images/frontend-images.tar.gz
+          docker save ceohn10-backend:latest ceohn10-crm-backend:latest crm-backend:latest | gzip -1 > dist-images/backend-images.tar.gz
 
       - name: Kiểm tra cấu hình SSH Secret trên GitHub
         id: check_ssh
@@ -200,7 +202,7 @@ jobs:
             cd /root/crm
             sed -i 's/\r$//' docker-compose.yml .env.crm .env.production 2>/dev/null || true
             docker compose -f docker-compose.yml stop 2>/dev/null || true
-            docker rm -f crm-frontend-prod crm-backend-prod 2>/dev/null || true
+            docker rm -f ceohn10-crm-frontend-prod ceohn10-crm-backend-prod crm-frontend-prod crm-backend-prod 2>/dev/null || true
             docker compose -f docker-compose.yml up -d --force-recreate
 
             echo ">>> [5/5] Cập nhật Nginx Reverse Proxy SSL..."

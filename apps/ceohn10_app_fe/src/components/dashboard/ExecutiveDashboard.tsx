@@ -54,7 +54,7 @@ import { EventFeedbackModal } from "@/components/events/EventFeedbackModal";
 import { useT, type TKey } from "@/lib/i18n";
 import { getDashboardStatsFn, type DashboardStats } from "@/lib/dashboard.functions";
 import type { EventItem } from "@/lib/events.functions";
-import { fetchNestApi } from "@/lib/api-client";
+import { fetchNestApi, ensureSessionCookiesSync } from "@/lib/api-client";
 import { listActivityLogFn } from "@/lib/activity.functions";
 import { REVIEW_SEARCH_RESET } from "@/lib/review-search";
 import type { ActivityLog } from "@/lib/extra-data";
@@ -278,6 +278,7 @@ export function ExecutiveDashboard({ authReady }: { authReady: boolean }) {
     queryKey: ["dashboard-stats", statusFilter],
     queryFn: async () => {
       try {
+        ensureSessionCookiesSync();
         const res = await getStats();
         return res;
       } catch (err) {
@@ -332,8 +333,18 @@ export function ExecutiveDashboard({ authReady }: { authReady: boolean }) {
   });
   const activityQ = useQuery({
     queryKey: ["dashboard-activity"],
-    queryFn: () => getActivity({}),
+    queryFn: async () => {
+      try {
+        ensureSessionCookiesSync();
+        const res = await getActivity({});
+        return Array.isArray(res) ? res : [];
+      } catch (err) {
+        console.warn("[ExecutiveDashboard] getActivity warning:", err);
+        return [];
+      }
+    },
     enabled: authReady,
+    retry: false,
   });
 
   const upcoming = useMemo<EventItem[]>(() => {
