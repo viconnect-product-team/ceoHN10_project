@@ -1,5 +1,169 @@
 # System Memory & Architecture
 
+- **Bản cập nhật ngày 19/11/2026 (v12.32): Hoàn Thành Triển Khai Phase 7 - Workflow & Action Agent Liên Hoàn Đa Công Cụ (Chaining Multi-Step Pipelines, Extensible Context Contract, Failure Recovery & UI Pipeline Map)**:
+  - **1. Kiến Trúc Context Contract Mở Rộng (Không Cần Sửa Lại Agent Core)**:
+    * Định nghĩa `ToolContextContract` trong `tool.interface.ts`: Bao gồm danh sách key dữ liệu cần nhận (`consumes`), key dữ liệu sinh ra (`produces`), hàm biến đổi tham số `transformParams` và hàm bóc tách ngữ cảnh `extractContext`.
+    * Từng công cụ nghiệp vụ (`parse_and_analyze_document`, `create_calendar_meeting`, `query_members`, `compare_and_reconcile_documents`, `prepare_email_broadcast`, `dispatch_batch_email`, `resend_failed_emails`, `query_system_analytics`) tự quản lý logic chuyển đổi dữ liệu của riêng mình.
+    * Khi bổ sung công cụ mới (Tool 13, 14...), hệ thống chỉ cần đăng ký kèm `contextContract` mà **hoàn toàn không cần sửa lại mã nguồn Agent Core**.
+  - **2. Động Cơ Phối Hợp Liên Hoàn Đa Công Cụ (Chaining Multi-Step Pipeline Engine)**:
+    * `llm-provider.adapter.ts` và `agent-core.service.ts` tự động nhận diện và thiết lập các chuỗi quy trình nghiệp vụ phức tạp:
+      - **Workflow 1 (Document ➔ Meeting ➔ Email)**: Bóc tách văn bản công văn ➔ Tạo lịch cuộc họp & Quét xung đột ➔ Tra cứu đại biểu CSDL ➔ Soạn thư mời họp cá nhân hóa ➔ Phát hành email qua SMTP Gmail.
+      - **Workflow 2 (Reconcile & Alert)**: Đối chiếu danh sách tệp với CSDL ➔ Soạn thư đôn đốc cho hội viên chưa hoàn thành ➔ Phát hành email nhắc nhở qua SMTP.
+      - **Workflow 3 (Calendar Check & Invite)**: Quét lịch trống ➔ Tạo lịch cuộc họp ➔ Soạn thư mời đại biểu ➔ Phát hành email.
+      - **Workflow 4 (Document Parse & Bulk Email)**: Bóc tách danh sách tài liệu Excel ➔ Loại bỏ email trùng lặp ➔ Soạn thư cá nhân hóa ➔ Chuẩn bị phát hành email qua SMTP Gmail.
+  - **3. Cơ Chế Phục Hồi Lỗi & Can Thiệp Từng Bước (Failure Recovery & Step Interception)**:
+    * Khi gặp sự cố tại bất kỳ bước nào trong chuỗi, kế hoạch chuyển sang trạng thái an toàn `"halted"` thay vì hủy bỏ, bảo toàn toàn bộ ngữ cảnh `workflowContext` đã tích lũy.
+    * Bổ sung 3 API điều phối tại `ai.controller.ts`:
+      - `POST /api/ai/agent/retry-step`: Cho phép thử lại bước lỗi với tham số điều chỉnh.
+      - `POST /api/ai/agent/skip-step`: Cho phép bỏ qua bước lỗi để chuỗi tiếp tục thực thi các bước sau.
+      - `POST /api/ai/agent/abort-task`: Cho phép hủy bỏ quy trình an toàn.
+  - **4. Nâng Cấp Giao Diện UI Workflow Tracker (AiExecutionStepTracker.tsx & CrmChatGPTView.tsx)**:
+    * **Sơ đồ tiến trình liên hoàn (Workflow Chaining Pipeline Map)**: Hiển thị trực quan toàn bộ các mắt xích công cụ với badge trạng thái màu sắc và icon mũi tên kết nối.
+    * **Thẻ chuyển giao dữ liệu (Data Handoff Card)**: Hiển thị rõ số lượng người nhận, ngày giờ sự kiện đã được chuyển giao từ bước trước sang bước sau.
+    * **Hộp thoại xử lý sự cố (Failure Recovery Action Box)**: Tích hợp nút "Thử lại bước này", "Bỏ qua & tiếp tục", "Hủy quy trình" trực tiếp trên từng step.
+    * **Quick Prompt 1-Chạm**: Bổ sung mẫu lệnh kích hoạt quy trình liên hoàn trong CrmChatGPTView.
+  - **5. Kiểm Tra Chất Lượng Code (Strict Zero-Error)**:
+    * Backend `npx tsc --noEmit`: **Exit code 0 (0 errors)**.
+    * Frontend `npx tsc --noEmit`: **Exit code 0 (0 errors)**.
+    * Tuân thủ triệt để Rule 0 (CSDL `113.20.107.184:6432`) và Rule 1 (Không tự ý `git commit` / `git push`).
+
+- **Bản cập nhật ngày 19/11/2026 (v12.31): Hoàn Thành Triển Khai Phase 6 - Data Query Agent Chuyên Sâu & Natural Language Reporting (Tra Cứu Dữ Liệu Nghiệp Vụ Tự Nhiên, Trực Quan Hóa Biểu Đồ Đa Chiều, Xuất Báo Cáo Excel)**:
+  - **1. Triển Khai Tool 12 (query_system_analytics - Data Query Action Tool)**:
+    * Tuyệt đối bảo mật: Không cho LLM chạy raw SQL tự do trên production database để triệt tiêu nguy cơ SQL Injection và phá hoại CSDL.
+    * Hỗ trợ 6 danh mục truy vấn nghiệp vụ chuyên sâu kết nối CSDL chuẩn `113.20.107.184:6432`:
+      - `member_overview`: Thống kê tổng số học viên, đang hoạt động (`active`), chưa kích hoạt, chưa xác thực email (`email_verified = false`), thành viên mới đăng ký hôm nay.
+      - `member_search_advanced`: Tra cứu nâng cao học viên theo họ tên, email, tiền tố số điện thoại (ví dụ: tìm số điện thoại bắt đầu bằng "09"), phòng ban ban ngành.
+      - `finance_monthly_stats`: Thống kê chi tiết tài chính doanh thu, chi phí, dòng tiền thuần theo 12 tháng gần nhất từ `public.transactions` và `public.invoices`.
+      - `failed_transactions`: Thống kê các giao dịch thất bại, hóa đơn quá hạn chưa thanh toán, các khoản công nợ cần đôn đốc.
+      - `department_distribution`: Thống kê cơ cấu phân bổ nhân sự, ban điều hành, ban thư ký, các ban chuyên môn trong CLB.
+      - `system_kpi_summary`: Báo cáo KPI tổng quan toàn hệ thống (Hội viên, Tài chính, Sự kiện, Cuộc họp, Tỷ lệ kích hoạt).
+  - **2. Bộ Phân Loại Ngôn Ngữ Tự Nhiên (llm-provider.adapter.ts & agent-core.service.ts)**:
+    * Nhận diện chính xác Intent 0 cho các câu hỏi ngôn ngữ tự nhiên: "Có bao nhiêu người dùng đang hoạt động?", "Tìm tất cả khách hàng chưa xác thực email", "Liệt kê các giao dịch thất bại trong tháng này", "Ai vừa đăng ký tài khoản hôm nay?", "Tìm người dùng có số điện thoại bắt đầu bằng 09", "Thống kê doanh thu theo từng tháng", "Cơ cấu ban ngành", "Báo cáo KPI hệ thống".
+    * Tự động sinh tóm tắt thông minh `overallSummary` và định dạng số tiền VND, tỷ lệ % trực quan.
+  - **3. Thẻ Trực Quan Hóa Dữ Liệu Đa Chiều (AiExecutionStepTracker.tsx)**:
+    * **KPI Cards**: Hiển thị các chỉ số trọng yếu dạng thẻ có màu sắc nhận diện (Doanh thu xanh ngọc, Chi phí cam đỏ, Dòng tiền tím, Học viên xanh dương).
+    * **Biểu Đồ Cột SVG Tương Tác 12 Tháng**: Trực quan hóa doanh thu vs chi phí 12 tháng trực tiếp trong giao diện chat (không cần thư viện nặng ngoài, hoàn toàn tương thích mobile & desktop).
+    * **Bảng Dữ Liệu Chi Tiết**: Phân trang / thu gọn mở rộng, hiển thị trạng thái badge xanh/đỏ cho học viên và giao dịch.
+    * **Nút Hành Động 1-Chạm**: Nút "Xuất Báo Cáo Excel (.xlsx)" tải file chuẩn định dạng kế toán ngay lập tức, nút "Sao chép tóm tắt số liệu".
+  - **4. Kiểm Tra Chất Lượng Code (Strict Zero-Error)**:
+    * Backend `npx tsc --noEmit`: **Exit code 0 (0 errors)**.
+    * Frontend `npx tsc --noEmit`: **Exit code 0 (0 errors)**.
+    * Tuân thủ triệt để Rule 0 (CSDL `113.20.107.184:6432`) và Rule 1 (Không tự ý `git commit` / `git push`).
+
+- **Bản cập nhật ngày 19/11/2026 (v12.30): Hoàn Thành Triển Khai Phase 5 - Calendar & Event Agent (Tạo Sự Kiện, Phát Hiện Xung Đột Lịch, Tra Cứu Email Đại Biểu Tự Động Từ CSDL, Tạo Google Calendar 1-Click & File iCalendar .ics, Liên Hoàn Handoff)**:
+  - **1. Nâng Cấp Toàn Diện Tool 6 (create_calendar_meeting - Calendar Action Tool)**:
+    * Hỗ trợ đầy đủ tham số: `title`, `scheduledAt`, `date`, `time`, `endTime`, `location`, `description`, `eventType` (`meeting` | `forum` | `workshop` | `b2b`), `attendeeNames`, `attendeeEmails`, `checkConflict`, `isOnline`.
+    * **Conflict Detection (Phát hiện xung đột lịch)**: Quét cả `public.events` và `public.meetings` trong cùng ngày/khung giờ, cảnh báo chi tiết nếu bị trùng lịch.
+    * **Tra cứu email tự động từ CSDL `public.members`**: Khi người dùng chỉ cung cấp họ tên đại biểu (ví dụ: "gồm Nguyễn Văn A, Trần Văn B"), AI tự động truy vấn tìm `email`, `phone`, `company`, `code` từ bảng `public.members` của CSDL chuẩn `113.20.107.184:6432`.
+    * **Ghi nhận CSDL thực tế**: Lưu vào `public.meetings` (nếu là cuộc họp) hoặc `public.events` (nếu là hội thảo/diễn đàn). Tự động ghi danh đại biểu có email vào `public.event_registrations`.
+    * **Sinh link họp trực tuyến & Lịch**: Tạo link Jitsi Meet / Google Meet bảo mật, sinh đường dẫn Google Calendar (`googleCalendarUrl`) để thêm sự kiện 1-click, và sinh nội dung iCalendar (`.ics`) chuẩn RFC 5545.
+    * **Tạo `preparedList` sẵn sàng Handoff**: Trả về danh sách đại biểu kèm email để bước tiếp theo gửi thư mời họp tự động mà không cần nhập lại.
+  - **2. Bổ Sung Tool 11 (check_calendar_availability - Quét Lịch Trống & Xung Đột)**:
+    * Quét toàn bộ sự kiện và cuộc họp trong CSDL cho một ngày hoặc cả tuần (`days: 1` hoặc `7`).
+    * Phân loại 3 khung giờ làm việc: Sáng (08:30 - 11:30), Chiều (13:30 - 17:00), Tối (18:30 - 21:00) thành trạng thái `available` hoặc `busy` kèm danh sách sự kiện bận.
+    * Tự động gợi ý khung giờ vàng khả dụng nhất (`suggestedFreeSlot`).
+  - **3. Tự Động Hóa Pipeline Handoff Liên Hoàn (agent-core.service.ts & llm-provider.adapter.ts)**:
+    * **Handoff 1**: Document Parse (`parse_and_analyze_document`) -> Calendar Tool (`create_calendar_meeting`): Nhận diện ngày giờ, địa điểm, thành phần đại biểu từ file Word/PDF truyền thẳng vào tham số tạo lịch.
+    * **Handoff 2**: Calendar Tool -> Email Broadcast (`prepare_email_broadcast`): Tự động nạp danh sách đại biểu đã tra cứu email từ CSDL vào mẫu thư mời kèm link phòng họp trực tuyến và link Google Calendar.
+    * **Semantic Intent Classifier**: Nhận diện ngôn ngữ tự nhiên lên lịch cuộc họp và kiểm tra lịch trống.
+  - **4. Nâng Cấp Giao Diện Web CRM (AiExecutionStepTracker.tsx & CrmChatGPTView.tsx)**:
+    * Thẻ sự kiện tương tác trực quan `CalendarEventCard`: Hiển thị tiêu đề, thời gian, địa điểm, badge trạng thái, link phòng họp trực tuyến, cảnh báo trùng lịch nếu có, danh sách chip đại biểu kèm email tra cứu từ CSDL.
+    * Tích hợp 2 nút hành động trực tiếp: "Thêm vào Google Calendar (1-Click)" và "Tải file iCalendar (.ics)".
+    * Thẻ kiểm tra lịch trình `CalendarAvailabilityCard`: Trực quan hóa timeline 3 ca trong ngày (Trống/Bận) và đề xuất khung giờ vàng.
+    * Bổ sung Quick Prompt và mở rộng bộ nhận diện lệnh Action Agent cho các từ khóa lịch họp.
+  - **5. Kiểm Tra Chất Lượng Code (Strict Zero-Error)**:
+    * Backend `npx tsc --noEmit`: **Exit code 0 (0 errors)**.
+    * Frontend `npx tsc --noEmit`: **Exit code 0 (0 errors)**.
+    * Tuân thủ triệt để Rule 0 (CSDL `113.20.107.184:6432`) và Rule 1 (Không tự ý `git commit` / `git push`).
+
+- **Bản cập nhật ngày 19/11/2026 (v12.29): Hoàn Thành Triển Khai Phase 4 - Email Agent Nâng Cao, Chống Gửi Trùng Lặp Idempotency, Nhật Ký CSDL & Cơ Chế Gửi Lại Email Thất Bại (Retry Failed Only)**:
+  - **1. Thiết Kế Bảng Nhật Ký CSDL Chuẩn (public.ai_email_dispatches)**:
+    * Khởi tạo bảng lưu vết bền vững trên máy chủ CSDL chuẩn `113.20.107.184:6432`:
+      - `id`: Mã định danh lượt gửi.
+      - `batch_id`: Mã mẻ phát hành thư.
+      - `idempotency_key`: Khóa phiên chống gửi trùng lặp.
+      - `recipient_email`, `recipient_name`, `company`: Thông tin người nhận.
+      - `subject`, `html_body`: Tiêu đề và nội dung thư cá nhân hóa.
+      - `status`: Trạng thái gửi (`sent` | `failed` | `pending`).
+      - `error_reason`: Nguyên nhân lỗi chi tiết nếu thất bại (hộp thư đầy, sai cú pháp, timeout).
+      - `retry_count`: Số lần thử gửi lại.
+      - `sent_at`, `created_at`: Dấu thời gian chuẩn xác.
+    * Tạo chỉ mục B-Tree tối ưu hiệu năng: `idx_ai_email_batch`, `idx_ai_email_idempotency`, `idx_ai_email_status`.
+  - **2. Nâng Cấp Tool 5 (dispatch_batch_email - External Action)**:
+    * Tích hợp kiểm tra Idempotency trước khi gọi SMTP: Nếu email người nhận đã có trạng thái `'sent'` với cùng `idempotency_key`, tự động bỏ qua và đánh dấu `already_sent`, tăng `alreadySentCount`.
+    * Gửi thực tế qua SMTP Gmail (`vumikasa6@gmail.com`) với cấu hình an toàn, cá nhân hóa `{ho_ten}`, `{cong_ty}`.
+    * Trả về kết quả phân loại chuẩn xác: `successCount`, `failCount`, `alreadySentCount`, danh sách `failedEmails` kèm chi tiết nguyên nhân lỗi.
+  - **3. Bổ Sung Tool 9 (resend_failed_emails - Gửi Lại Email Lỗi)**:
+    * Tra cứu trực tiếp từ CSDL các bản ghi có `status = 'failed'` theo `batch_id` hoặc `idempotency_key`.
+    * Cơ chế chọn lọc: CHỈ gửi lại cho những người chưa nhận được, tuyệt đối không gửi lại cho những người đã nhận thành công.
+    * Tự động tăng `retry_count`, chuyển trạng thái thành `sent` khi gửi lại thành công.
+  - **4. Bổ Sung Tool 10 (query_email_history - Tra Cứu Nhật Ký Thư)**:
+    * Truy vấn lịch sử email từ CSDL theo từ khóa, lọc theo trạng thái (`sent`, `failed`, `all`).
+    * Thống kê tổng số, tỷ lệ thành công và thất bại thực tế trong toàn hệ thống.
+  - **5. Nâng Cấp Giao Diện UI Tracker (AiExecutionStepTracker.tsx)**:
+    * Hiển thị trực quan: Badge số email gửi thành công (xanh lá), số email bỏ qua chống gửi trùng (xanh dương Idempotent), số email lỗi (đỏ cam).
+    * Hiển thị bảng chi tiết danh sách email thất bại kèm lý do cụ thể để Quản trị viên nắm bắt và xử lý.
+  - **6. Kiểm Tra Chất Lượng Code (Strict Zero-Error)**:
+    * Backend `npx tsc --noEmit`: **Exit code 0 (0 errors)**.
+    * Frontend `npx tsc --noEmit`: **Exit code 0 (0 errors)**.
+    * Tuân thủ triệt để Rule 0 (CSDL `113.20.107.184:6432`) và Rule 1 (Không tự ý `git commit` / `git push`).
+
+- **Bản cập nhật ngày 19/11/2026 (v12.28): Hoàn Thành Triển Khai Phase 3 - Giao Diện AI Agent Nâng Cao & Document Processing Đa Tệp (Word/Excel/PDF/CSV/Text OCR & Multi-File Drag & Drop)**:
+  - **1. Bộ Phân Tích & Bóc Tách Đa Tài Liệu Toàn Diện (ai-excel-email-parser.ts)**:
+    * `parseMultipleFiles(files)`: Đọc và giải mã song song mảng nhiều tệp tài liệu trong cùng một phiên.
+    * Hỗ trợ đầy đủ các định dạng:
+      - **Excel (.xlsx, .xls, .csv)**: Bóc tách đa sheet, trích xuất cấu trúc bảng biểu `tables` (headers, rows, totalRows), nhận diện cột họ tên, email, SĐT, công ty, chức vụ, số tiền hội phí.
+      - **Word (.docx, .doc)**: Giải mã nội dung văn bản, trích xuất email, phân đoạn công văn, phát hiện nội dung chỉ đạo.
+      - **PDF (.pdf)**: Trích xuất các luồng văn bản (Text stream), lọc bỏ mã điều khiển, nhận diện danh sách đại biểu và email.
+      - **Text (.txt)**: Quét toàn văn bản.
+    * Thuật toán bóc tách sự kiện thông minh (`extractEventDetailsFromText`): Tự động phát hiện ngày tháng (`\d{1,2}/\d{1,2}/\d{4}`), giờ họp (`9h`, `09:00`), địa điểm (`phòng họp`, `khách sạn`, `tầng...`), và thành phần tham dự từ văn bản tự nhiên.
+  - **2. Mở Rộng Danh Mục Tools Backend (tool-registry.service.ts)**:
+    * **Nâng cấp Tool 7 (`parse_and_analyze_document`)**: Hỗ trợ tham số `documents` nhận chuỗi JSON mảng nhiều tệp; trích xuất danh sách công việc (`taskItems`), đại biểu (`attendees`), email tổng hợp (`preparedList`) để chuyển tiếp trực tiếp sang các bước gửi thư.
+    * **Bổ sung Tool 8 (`compare_and_reconcile_documents`)**: So sánh đối chiếu danh sách giữa 2 tệp tài liệu hoặc giữa tệp đính kèm với cơ sở dữ liệu `public.members` (`113.20.107.184:6432`), phân loại chính xác số lượng trùng khớp (`matched`), số lượng thiếu (`missingInTarget`), và số lượng đăng ký mới (`newInTarget`).
+  - **3. Tự Động Hóa Pipeline & Handoff Đa Tệp (agent-core.service.ts)**:
+    * Tự động nhận diện ý định đối chiếu so sánh tài liệu (`isReconcileIntent`) khi người dùng đính kèm từ 2 tệp trở lên hoặc dùng các từ khóa "so sánh", "đối chiếu", "kiểm tra lệch".
+    * Handoff tự động: Kết quả `preparedList` từ bước bóc tách tài liệu tự động nạp làm đầu vào cho bước đối chiếu (`compare_and_reconcile_documents`) hoặc bước gửi email (`dispatch_batch_email`).
+  - **4. Nâng Cấp Giao Diện Web CRM Đa Tệp & Kéo Thả (CrmChatGPTView.tsx)**:
+    * **Drag & Drop Multi-file Zone**: Bắt sự kiện kéo thả trên toàn bộ vùng chat container kèm overlay hiệu ứng hoạt họa trực quan khi rê file qua ("Thả các tệp tài liệu vào đây...").
+    * **Multi-file Input & File Chips Grid**:
+      - Hỗ trợ chọn nhiều file cùng lúc qua thuộc tính `multiple accept=".xlsx,.xls,.csv,.docx,.doc,.pdf,.txt"`.
+      - Hiển thị danh sách tệp đính kèm với icon màu theo định dạng (Excel xanh ngọc, Word xanh dương, PDF đỏ cam, CSV/Text xám), tên tệp, dung lượng KB, số email/dòng bóc tách được.
+      - Nút xóa riêng cho từng tệp và nút "Gỡ tất cả".
+      - Nút hành động nhanh "⚖️ Đối chiếu các file" khi nạp từ 2 tệp trở lên.
+    * **Bóng chat người dùng**: Hiển thị đầy đủ danh sách các file đính kèm với số lượng email và dung lượng.
+  - **5. Kiểm Tra Chất Lượng Code (Strict Zero-Error)**:
+    * Backend `npx tsc --noEmit`: **Exit code 0 (0 errors)**.
+    * Frontend `npx tsc --noEmit`: **Exit code 0 (0 errors)**.
+    * Tuân thủ triệt để Rule 0 (CSDL `113.20.107.184:6432`) và Rule 1 (Không tự ý `git commit` / `git push`).
+
+- **Bản cập nhật ngày 18/11/2026 (v12.26): Khảo Sát Kiến Trúc Toàn Diện AI Agent Hệ Thống (Phase 1) & Triển Khai Tính Năng Xuất File Báo Cáo Tiền Thu Theo Yêu Cầu Kèm Danh Mục Lựa Chọn Trực Tuyến (Không Mock Dữ Liệu - Real CSDL 113.20.107.184:6432)**:
+  - **1. Hoàn Thành Khảo Sát Kiến Trúc Hiện Tại (Phase 1 Master Survey)**:
+    * **Frontend**: TanStack Router + Vite + Tailwind CSS + Lucide Icons. Module AI: `/ai-assistant` (`ai-assistant.tsx`), `CrmChatGPTView.tsx`, `AiExecutionStepTracker.tsx`. Tích hợp thư viện SheetJS `exportToExcel` chuẩn kế toán Thông tư 200/2014/TT-BTC.
+    * **Backend**: NestJS Monorepo (Port 4003). Module AI `apps/ceohn10_app_be/src/ai` (`ai.controller.ts`, `ai.service.ts`, `ai-crm-analytics.service.ts`, `ai-permission.service.ts`, `knowledge-base.service.ts`). Tích hợp `mail.service.ts` gửi SMTP Gmail thật (`vumikasa6@gmail.com`).
+    * **CSDL**: PostgreSQL duy nhất `113.20.107.184:6432/ceohn10_project` qua PgBouncer. Không dùng mock/fake data.
+    * **Xác thực & RBAC**: JWT Passport Guard, phân quyền 2 tab Web CRM và Mobile App, phân quyền năng lực AI trong `app_settings` (`crm_ai_permission_matrix`).
+  - **2. Triển Khai Ngay Tính Năng Xuất File Báo Cáo Tiền Thu Kèm Danh Mục Chọn Lựa (User Request)**:
+    * Nhận diện intent `isIncomeReportExportRequest`: Tự động nhận diện khi người dùng hỏi "xuất file báo cáo tiền thu trong ngày hôm nay", "xuất danh mục báo cáo tiền thu", "báo cáo tiền thu",...
+    * Truy vấn 100% dữ liệu sống từ `public.transactions` (WHERE type = 'income' OR amount > 0) và `public.invoices`.
+    * Phân tích ngày "hôm nay": Nếu có giao dịch hôm nay, tính toán chính xác tổng thu trong ngày. Nếu chưa có giao dịch phát sinh hôm nay, hiển thị trung thực và cung cấp danh mục giao dịch thực tế gần nhất trong tháng kèm số dư sổ quỹ.
+    * Tự động sinh thẻ tương tác **`ReportCategorySelectorCard`** với 5 danh mục chuyên biệt:
+      1. *Báo cáo Toàn Bộ Dòng Tiền Thu Sổ Quỹ (Tổng Hợp)* - Huy hiệu `Tổng Hợp Sổ Quỹ`.
+      2. *Báo cáo Thu Hội Phí Niên Liễm Học Viên* - Huy hiệu `Hội Phí 2026`.
+      3. *Báo cáo Tiền Thu Vé Sự Kiện & Hội Thảo* - Huy hiệu `Vé Sự Kiện`.
+      4. *Báo cáo Tiền Thu Tài Trợ & Quyên Góp Ban Chuyên Môn* - Huy hiệu `Tài Trợ & CSR`.
+      5. *Bản Kê Phiếu Thu Chuẩn Mực TT 200/2014/TT-BTC* - Huy hiệu `Mẫu TT 200 Chuẩn`.
+    * Mỗi danh mục tích hợp 2 nút hành động trực tiếp:
+      - Nút **"📊 Xuất Excel (.xlsx)"**: Gọi `exportToExcel` tạo file Excel chuẩn hoá có tiêu đề, STT, Mã phiếu, Ngày thu, Người nộp, Số tiền định dạng VNĐ, tổng cộng và số tiền bằng chữ tiếng Việt (`numberToVietnameseWords`), chữ ký 3 bên.
+      - Nút **"👁️ Xem số liệu"**: Bật tắt bảng xem trước chi tiết các giao dịch thực tế ngay trong khung chat.
+    * Nút lớn **"📥 Tải Trọn Bộ Sổ Quỹ Excel Đa Sheet"**: Sinh tệp workbook Excel chứa 5 sheet riêng biệt cho 5 danh mục.
+  - **3. Cập Nhật Backend Controller & Analytics Service**:
+    * `ai.controller.ts`: Mở rộng `POST /api/ai/crm/export-report` hỗ trợ loại `income_category`.
+    * `ai-crm-analytics.service.ts`: Cập nhật `exportSubReport` và `handleChatAssistant` trả về `interactiveActions` chứa đầy đủ 5 danh mục và danh sách bản ghi thực tế.
+  - **4. Kiểm Tra Chất Lượng Code (Strict Zero-Error)**:
+    * Backend `npx tsc --noEmit`: **Exit code 0 (0 errors)**.
+    * Frontend `npx tsc --noEmit`: Hoàn thành type-check thành công.
+    * Tuyệt đối tuân thủ Rule 0 (CSDL `113.20.107.184:6432`) và Rule 1 (Không tự ý `git commit` / `git push`).
+
 - **Bản cập nhật ngày 18/11/2026 (v12.25): Đổi Tên Toàn Diện Bảng Tài Khoản Người Dùng Thành ceohn10_users (Chuẩn Hóa Thương Hiệu CEO HN10, Xóa Bỏ Hoàn Toàn Tiền Tố Cũ vione_users)**:
   - **1. Chuẩn Hóa Danh Mục Bảng CSDL Chuẩn (THIET_KE_CSDL_POSTGRESQL_CEOHN10.md)**:
     * Bảng 1 đổi tên chính thức: `public.ceohn10_users` (Tài khoản người dùng CEO HN10).
@@ -2165,6 +2329,170 @@
      - Tuân thủ nghiêm ngặt STRICT RULE 1: Tuyệt đối không tự động chạy `git push` hay `git commit`.
 
 # System Memory & Architecture
+
+- **Bản cập nhật ngày 19/11/2026 (v12.32): Hoàn Thành Triển Khai Phase 7 - Workflow & Action Agent Liên Hoàn Đa Công Cụ (Chaining Multi-Step Pipelines, Extensible Context Contract, Failure Recovery & UI Pipeline Map)**:
+  - **1. Kiến Trúc Context Contract Mở Rộng (Không Cần Sửa Lại Agent Core)**:
+    * Định nghĩa `ToolContextContract` trong `tool.interface.ts`: Bao gồm danh sách key dữ liệu cần nhận (`consumes`), key dữ liệu sinh ra (`produces`), hàm biến đổi tham số `transformParams` và hàm bóc tách ngữ cảnh `extractContext`.
+    * Từng công cụ nghiệp vụ (`parse_and_analyze_document`, `create_calendar_meeting`, `query_members`, `compare_and_reconcile_documents`, `prepare_email_broadcast`, `dispatch_batch_email`, `resend_failed_emails`, `query_system_analytics`) tự quản lý logic chuyển đổi dữ liệu của riêng mình.
+    * Khi bổ sung công cụ mới (Tool 13, 14...), hệ thống chỉ cần đăng ký kèm `contextContract` mà **hoàn toàn không cần sửa lại mã nguồn Agent Core**.
+  - **2. Động Cơ Phối Hợp Liên Hoàn Đa Công Cụ (Chaining Multi-Step Pipeline Engine)**:
+    * `llm-provider.adapter.ts` và `agent-core.service.ts` tự động nhận diện và thiết lập các chuỗi quy trình nghiệp vụ phức tạp:
+      - **Workflow 1 (Document ➔ Meeting ➔ Email)**: Bóc tách văn bản công văn ➔ Tạo lịch cuộc họp & Quét xung đột ➔ Tra cứu đại biểu CSDL ➔ Soạn thư mời họp cá nhân hóa ➔ Phát hành email qua SMTP Gmail.
+      - **Workflow 2 (Reconcile & Alert)**: Đối chiếu danh sách tệp với CSDL ➔ Soạn thư đôn đốc cho hội viên chưa hoàn thành ➔ Phát hành email nhắc nhở qua SMTP.
+      - **Workflow 3 (Calendar Check & Invite)**: Quét lịch trống ➔ Tạo lịch cuộc họp ➔ Soạn thư mời đại biểu ➔ Phát hành email.
+      - **Workflow 4 (Document Parse & Bulk Email)**: Bóc tách danh sách tài liệu Excel ➔ Loại bỏ email trùng lặp ➔ Soạn thư cá nhân hóa ➔ Chuẩn bị phát hành email qua SMTP Gmail.
+  - **3. Cơ Chế Phục Hồi Lỗi & Can Thiệp Từng Bước (Failure Recovery & Step Interception)**:
+    * Khi gặp sự cố tại bất kỳ bước nào trong chuỗi, kế hoạch chuyển sang trạng thái an toàn `"halted"` thay vì hủy bỏ, bảo toàn toàn bộ ngữ cảnh `workflowContext` đã tích lũy.
+    * Bổ sung 3 API điều phối tại `ai.controller.ts`:
+      - `POST /api/ai/agent/retry-step`: Cho phép thử lại bước lỗi với tham số điều chỉnh.
+      - `POST /api/ai/agent/skip-step`: Cho phép bỏ qua bước lỗi để chuỗi tiếp tục thực thi các bước sau.
+      - `POST /api/ai/agent/abort-task`: Cho phép hủy bỏ quy trình an toàn.
+  - **4. Nâng Cấp Giao Diện UI Workflow Tracker (AiExecutionStepTracker.tsx & CrmChatGPTView.tsx)**:
+    * **Sơ đồ tiến trình liên hoàn (Workflow Chaining Pipeline Map)**: Hiển thị trực quan toàn bộ các mắt xích công cụ với badge trạng thái màu sắc và icon mũi tên kết nối.
+    * **Thẻ chuyển giao dữ liệu (Data Handoff Card)**: Hiển thị rõ số lượng người nhận, ngày giờ sự kiện đã được chuyển giao từ bước trước sang bước sau.
+    * **Hộp thoại xử lý sự cố (Failure Recovery Action Box)**: Tích hợp nút "Thử lại bước này", "Bỏ qua & tiếp tục", "Hủy quy trình" trực tiếp trên từng step.
+    * **Quick Prompt 1-Chạm**: Bổ sung mẫu lệnh kích hoạt quy trình liên hoàn trong CrmChatGPTView.
+  - **5. Kiểm Tra Chất Lượng Code (Strict Zero-Error)**:
+    * Backend `npx tsc --noEmit`: **Exit code 0 (0 errors)**.
+    * Frontend `npx tsc --noEmit`: **Exit code 0 (0 errors)**.
+    * Tuân thủ triệt để Rule 0 (CSDL `113.20.107.184:6432`) và Rule 1 (Không tự ý `git commit` / `git push`).
+
+- **Bản cập nhật ngày 19/11/2026 (v12.31): Hoàn Thành Triển Khai Phase 6 - Data Query Agent Chuyên Sâu & Natural Language Reporting (Tra Cứu Dữ Liệu Nghiệp Vụ Tự Nhiên, Trực Quan Hóa Biểu Đồ Đa Chiều, Xuất Báo Cáo Excel)**:
+  - **1. Triển Khai Tool 12 (query_system_analytics - Data Query Action Tool)**:
+    * Tuyệt đối bảo mật: Không cho LLM chạy raw SQL tự do trên production database để triệt tiêu nguy cơ SQL Injection và phá hoại CSDL.
+    * Hỗ trợ 6 danh mục truy vấn nghiệp vụ chuyên sâu kết nối CSDL chuẩn `113.20.107.184:6432`:
+      - `member_overview`: Thống kê tổng số học viên, đang hoạt động (`active`), chưa kích hoạt, chưa xác thực email (`email_verified = false`), thành viên mới đăng ký hôm nay.
+      - `member_search_advanced`: Tra cứu nâng cao học viên theo họ tên, email, tiền tố số điện thoại (ví dụ: tìm số điện thoại bắt đầu bằng "09"), phòng ban ban ngành.
+      - `finance_monthly_stats`: Thống kê chi tiết tài chính doanh thu, chi phí, dòng tiền thuần theo 12 tháng gần nhất từ `public.transactions` và `public.invoices`.
+      - `failed_transactions`: Thống kê các giao dịch thất bại, hóa đơn quá hạn chưa thanh toán, các khoản công nợ cần đôn đốc.
+      - `department_distribution`: Thống kê cơ cấu phân bổ nhân sự, ban điều hành, ban thư ký, các ban chuyên môn trong CLB.
+      - `system_kpi_summary`: Báo cáo KPI tổng quan toàn hệ thống (Hội viên, Tài chính, Sự kiện, Cuộc họp, Tỷ lệ kích hoạt).
+  - **2. Bộ Phân Loại Ngôn Ngữ Tự Nhiên (llm-provider.adapter.ts & agent-core.service.ts)**:
+    * Nhận diện chính xác Intent 0 cho các câu hỏi ngôn ngữ tự nhiên: "Có bao nhiêu người dùng đang hoạt động?", "Tìm tất cả khách hàng chưa xác thực email", "Liệt kê các giao dịch thất bại trong tháng này", "Ai vừa đăng ký tài khoản hôm nay?", "Tìm người dùng có số điện thoại bắt đầu bằng 09", "Thống kê doanh thu theo từng tháng", "Cơ cấu ban ngành", "Báo cáo KPI hệ thống".
+    * Tự động sinh tóm tắt thông minh `overallSummary` và định dạng số tiền VND, tỷ lệ % trực quan.
+  - **3. Thẻ Trực Quan Hóa Dữ Liệu Đa Chiều (AiExecutionStepTracker.tsx)**:
+    * **KPI Cards**: Hiển thị các chỉ số trọng yếu dạng thẻ có màu sắc nhận diện (Doanh thu xanh ngọc, Chi phí cam đỏ, Dòng tiền tím, Học viên xanh dương).
+    * **Biểu Đồ Cột SVG Tương Tác 12 Tháng**: Trực quan hóa doanh thu vs chi phí 12 tháng trực tiếp trong giao diện chat (không cần thư viện nặng ngoài, hoàn toàn tương thích mobile & desktop).
+    * **Bảng Dữ Liệu Chi Tiết**: Phân trang / thu gọn mở rộng, hiển thị trạng thái badge xanh/đỏ cho học viên và giao dịch.
+    * **Nút Hành Động 1-Chạm**: Nút "Xuất Báo Cáo Excel (.xlsx)" tải file chuẩn định dạng kế toán ngay lập tức, nút "Sao chép tóm tắt số liệu".
+  - **4. Kiểm Tra Chất Lượng Code (Strict Zero-Error)**:
+    * Backend `npx tsc --noEmit`: **Exit code 0 (0 errors)**.
+    * Frontend `npx tsc --noEmit`: **Exit code 0 (0 errors)**.
+    * Tuân thủ triệt để Rule 0 (CSDL `113.20.107.184:6432`) và Rule 1 (Không tự ý `git commit` / `git push`).
+
+- **Bản cập nhật ngày 19/11/2026 (v12.30): Hoàn Thành Triển Khai Phase 5 - Calendar & Event Agent (Tạo Sự Kiện, Phát Hiện Xung Đột Lịch, Tra Cứu Email Đại Biểu Tự Động Từ CSDL, Tạo Google Calendar 1-Click & File iCalendar .ics, Liên Hoàn Handoff)**:
+  - **1. Nâng Cấp Toàn Diện Tool 6 (create_calendar_meeting - Calendar Action Tool)**:
+    * Hỗ trợ đầy đủ tham số: `title`, `scheduledAt`, `date`, `time`, `endTime`, `location`, `description`, `eventType` (`meeting` | `forum` | `workshop` | `b2b`), `attendeeNames`, `attendeeEmails`, `checkConflict`, `isOnline`.
+    * **Conflict Detection (Phát hiện xung đột lịch)**: Quét cả `public.events` và `public.meetings` trong cùng ngày/khung giờ, cảnh báo chi tiết nếu bị trùng lịch.
+    * **Tra cứu email tự động từ CSDL `public.members`**: Khi người dùng chỉ cung cấp họ tên đại biểu (ví dụ: "gồm Nguyễn Văn A, Trần Văn B"), AI tự động truy vấn tìm `email`, `phone`, `company`, `code` từ bảng `public.members` của CSDL chuẩn `113.20.107.184:6432`.
+    * **Ghi nhận CSDL thực tế**: Lưu vào `public.meetings` (nếu là cuộc họp) hoặc `public.events` (nếu là hội thảo/diễn đàn). Tự động ghi danh đại biểu có email vào `public.event_registrations`.
+    * **Sinh link họp trực tuyến & Lịch**: Tạo link Jitsi Meet / Google Meet bảo mật, sinh đường dẫn Google Calendar (`googleCalendarUrl`) để thêm sự kiện 1-click, và sinh nội dung iCalendar (`.ics`) chuẩn RFC 5545.
+    * **Tạo `preparedList` sẵn sàng Handoff**: Trả về danh sách đại biểu kèm email để bước tiếp theo gửi thư mời họp tự động mà không cần nhập lại.
+  - **2. Bổ Sung Tool 11 (check_calendar_availability - Quét Lịch Trống & Xung Đột)**:
+    * Quét toàn bộ sự kiện và cuộc họp trong CSDL cho một ngày hoặc cả tuần (`days: 1` hoặc `7`).
+    * Phân loại 3 khung giờ làm việc: Sáng (08:30 - 11:30), Chiều (13:30 - 17:00), Tối (18:30 - 21:00) thành trạng thái `available` hoặc `busy` kèm danh sách sự kiện bận.
+    * Tự động gợi ý khung giờ vàng khả dụng nhất (`suggestedFreeSlot`).
+  - **3. Tự Động Hóa Pipeline Handoff Liên Hoàn (agent-core.service.ts & llm-provider.adapter.ts)**:
+    * **Handoff 1**: Document Parse (`parse_and_analyze_document`) -> Calendar Tool (`create_calendar_meeting`): Nhận diện ngày giờ, địa điểm, thành phần đại biểu từ file Word/PDF truyền thẳng vào tham số tạo lịch.
+    * **Handoff 2**: Calendar Tool -> Email Broadcast (`prepare_email_broadcast`): Tự động nạp danh sách đại biểu đã tra cứu email từ CSDL vào mẫu thư mời kèm link phòng họp trực tuyến và link Google Calendar.
+    * **Semantic Intent Classifier**: Nhận diện ngôn ngữ tự nhiên lên lịch cuộc họp và kiểm tra lịch trống.
+  - **4. Nâng Cấp Giao Diện Web CRM (AiExecutionStepTracker.tsx & CrmChatGPTView.tsx)**:
+    * Thẻ sự kiện tương tác trực quan `CalendarEventCard`: Hiển thị tiêu đề, thời gian, địa điểm, badge trạng thái, link phòng họp trực tuyến, cảnh báo trùng lịch nếu có, danh sách chip đại biểu kèm email tra cứu từ CSDL.
+    * Tích hợp 2 nút hành động trực tiếp: "Thêm vào Google Calendar (1-Click)" và "Tải file iCalendar (.ics)".
+    * Thẻ kiểm tra lịch trình `CalendarAvailabilityCard`: Trực quan hóa timeline 3 ca trong ngày (Trống/Bận) và đề xuất khung giờ vàng.
+    * Bổ sung Quick Prompt và mở rộng bộ nhận diện lệnh Action Agent cho các từ khóa lịch họp.
+  - **5. Kiểm Tra Chất Lượng Code (Strict Zero-Error)**:
+    * Backend `npx tsc --noEmit`: **Exit code 0 (0 errors)**.
+    * Frontend `npx tsc --noEmit`: **Exit code 0 (0 errors)**.
+    * Tuân thủ triệt để Rule 0 (CSDL `113.20.107.184:6432`) và Rule 1 (Không tự ý `git commit` / `git push`).
+
+- **Bản cập nhật ngày 19/11/2026 (v12.29): Hoàn Thành Triển Khai Phase 4 - Email Agent Nâng Cao, Chống Gửi Trùng Lặp Idempotency, Nhật Ký CSDL & Cơ Chế Gửi Lại Email Thất Bại (Retry Failed Only)**:
+  - **1. Thiết Kế Bảng Nhật Ký CSDL Chuẩn (public.ai_email_dispatches)**:
+    * Khởi tạo bảng lưu vết bền vững trên máy chủ CSDL chuẩn `113.20.107.184:6432`:
+      - `id`: Mã định danh lượt gửi.
+      - `batch_id`: Mã mẻ phát hành thư.
+      - `idempotency_key`: Khóa phiên chống gửi trùng lặp.
+      - `recipient_email`, `recipient_name`, `company`: Thông tin người nhận.
+      - `subject`, `html_body`: Tiêu đề và nội dung thư cá nhân hóa.
+      - `status`: Trạng thái gửi (`sent` | `failed` | `pending`).
+      - `error_reason`: Nguyên nhân lỗi chi tiết nếu thất bại (hộp thư đầy, sai cú pháp, timeout).
+      - `retry_count`: Số lần thử gửi lại.
+      - `sent_at`, `created_at`: Dấu thời gian chuẩn xác.
+    * Tạo chỉ mục B-Tree tối ưu hiệu năng: `idx_ai_email_batch`, `idx_ai_email_idempotency`, `idx_ai_email_status`.
+  - **2. Nâng Cấp Tool 5 (dispatch_batch_email - External Action)**:
+    * Tích hợp kiểm tra Idempotency trước khi gọi SMTP: Nếu email người nhận đã có trạng thái `'sent'` với cùng `idempotency_key`, tự động bỏ qua và đánh dấu `already_sent`, tăng `alreadySentCount`.
+    * Gửi thực tế qua SMTP Gmail (`vumikasa6@gmail.com`) với cấu hình an toàn, cá nhân hóa `{ho_ten}`, `{cong_ty}`.
+    * Trả về kết quả phân loại chuẩn xác: `successCount`, `failCount`, `alreadySentCount`, danh sách `failedEmails` kèm chi tiết nguyên nhân lỗi.
+  - **3. Bổ Sung Tool 9 (resend_failed_emails - Gửi Lại Email Lỗi)**:
+    * Tra cứu trực tiếp từ CSDL các bản ghi có `status = 'failed'` theo `batch_id` hoặc `idempotency_key`.
+    * Cơ chế chọn lọc: CHỈ gửi lại cho những người chưa nhận được, tuyệt đối không gửi lại cho những người đã nhận thành công.
+    * Tự động tăng `retry_count`, chuyển trạng thái thành `sent` khi gửi lại thành công.
+  - **4. Bổ Sung Tool 10 (query_email_history - Tra Cứu Nhật Ký Thư)**:
+    * Truy vấn lịch sử email từ CSDL theo từ khóa, lọc theo trạng thái (`sent`, `failed`, `all`).
+    * Thống kê tổng số, tỷ lệ thành công và thất bại thực tế trong toàn hệ thống.
+  - **5. Nâng Cấp Giao Diện UI Tracker (AiExecutionStepTracker.tsx)**:
+    * Hiển thị trực quan: Badge số email gửi thành công (xanh lá), số email bỏ qua chống gửi trùng (xanh dương Idempotent), số email lỗi (đỏ cam).
+    * Hiển thị bảng chi tiết danh sách email thất bại kèm lý do cụ thể để Quản trị viên nắm bắt và xử lý.
+  - **6. Kiểm Tra Chất Lượng Code (Strict Zero-Error)**:
+    * Backend `npx tsc --noEmit`: **Exit code 0 (0 errors)**.
+    * Frontend `npx tsc --noEmit`: **Exit code 0 (0 errors)**.
+    * Tuân thủ triệt để Rule 0 (CSDL `113.20.107.184:6432`) và Rule 1 (Không tự ý `git commit` / `git push`).
+
+- **Bản cập nhật ngày 19/11/2026 (v12.28): Hoàn Thành Triển Khai Phase 3 - Giao Diện AI Agent Nâng Cao & Document Processing Đa Tệp (Word/Excel/PDF/CSV/Text OCR & Multi-File Drag & Drop)**:
+  - **1. Bộ Phân Tích & Bóc Tách Đa Tài Liệu Toàn Diện (ai-excel-email-parser.ts)**:
+    * `parseMultipleFiles(files)`: Đọc và giải mã song song mảng nhiều tệp tài liệu trong cùng một phiên.
+    * Hỗ trợ đầy đủ các định dạng:
+      - **Excel (.xlsx, .xls, .csv)**: Bóc tách đa sheet, trích xuất cấu trúc bảng biểu `tables` (headers, rows, totalRows), nhận diện cột họ tên, email, SĐT, công ty, chức vụ, số tiền hội phí.
+      - **Word (.docx, .doc)**: Giải mã nội dung văn bản, trích xuất email, phân đoạn công văn, phát hiện nội dung chỉ đạo.
+      - **PDF (.pdf)**: Trích xuất các luồng văn bản (Text stream), lọc bỏ mã điều khiển, nhận diện danh sách đại biểu và email.
+      - **Text (.txt)**: Quét toàn văn bản.
+    * Thuật toán bóc tách sự kiện thông minh (`extractEventDetailsFromText`): Tự động phát hiện ngày tháng (`\d{1,2}/\d{1,2}/\d{4}`), giờ họp (`9h`, `09:00`), địa điểm (`phòng họp`, `khách sạn`, `tầng...`), và thành phần tham dự từ văn bản tự nhiên.
+  - **2. Mở Rộng Danh Mục Tools Backend (tool-registry.service.ts)**:
+    * **Nâng cấp Tool 7 (`parse_and_analyze_document`)**: Hỗ trợ tham số `documents` nhận chuỗi JSON mảng nhiều tệp; trích xuất danh sách công việc (`taskItems`), đại biểu (`attendees`), email tổng hợp (`preparedList`) để chuyển tiếp trực tiếp sang các bước gửi thư.
+    * **Bổ sung Tool 8 (`compare_and_reconcile_documents`)**: So sánh đối chiếu danh sách giữa 2 tệp tài liệu hoặc giữa tệp đính kèm với cơ sở dữ liệu `public.members` (`113.20.107.184:6432`), phân loại chính xác số lượng trùng khớp (`matched`), số lượng thiếu (`missingInTarget`), và số lượng đăng ký mới (`newInTarget`).
+  - **3. Tự Động Hóa Pipeline & Handoff Đa Tệp (agent-core.service.ts)**:
+    * Tự động nhận diện ý định đối chiếu so sánh tài liệu (`isReconcileIntent`) khi người dùng đính kèm từ 2 tệp trở lên hoặc dùng các từ khóa "so sánh", "đối chiếu", "kiểm tra lệch".
+    * Handoff tự động: Kết quả `preparedList` từ bước bóc tách tài liệu tự động nạp làm đầu vào cho bước đối chiếu (`compare_and_reconcile_documents`) hoặc bước gửi email (`dispatch_batch_email`).
+  - **4. Nâng Cấp Giao Diện Web CRM Đa Tệp & Kéo Thả (CrmChatGPTView.tsx)**:
+    * **Drag & Drop Multi-file Zone**: Bắt sự kiện kéo thả trên toàn bộ vùng chat container kèm overlay hiệu ứng hoạt họa trực quan khi rê file qua ("Thả các tệp tài liệu vào đây...").
+    * **Multi-file Input & File Chips Grid**:
+      - Hỗ trợ chọn nhiều file cùng lúc qua thuộc tính `multiple accept=".xlsx,.xls,.csv,.docx,.doc,.pdf,.txt"`.
+      - Hiển thị danh sách tệp đính kèm với icon màu theo định dạng (Excel xanh ngọc, Word xanh dương, PDF đỏ cam, CSV/Text xám), tên tệp, dung lượng KB, số email/dòng bóc tách được.
+      - Nút xóa riêng cho từng tệp và nút "Gỡ tất cả".
+      - Nút hành động nhanh "⚖️ Đối chiếu các file" khi nạp từ 2 tệp trở lên.
+    * **Bóng chat người dùng**: Hiển thị đầy đủ danh sách các file đính kèm với số lượng email và dung lượng.
+  - **5. Kiểm Tra Chất Lượng Code (Strict Zero-Error)**:
+    * Backend `npx tsc --noEmit`: **Exit code 0 (0 errors)**.
+    * Frontend `npx tsc --noEmit`: **Exit code 0 (0 errors)**.
+    * Tuân thủ triệt để Rule 0 (CSDL `113.20.107.184:6432`) và Rule 1 (Không tự ý `git commit` / `git push`).
+
+- **Bản cập nhật ngày 18/11/2026 (v12.26): Khảo Sát Kiến Trúc Toàn Diện AI Agent Hệ Thống (Phase 1) & Triển Khai Tính Năng Xuất File Báo Cáo Tiền Thu Theo Yêu Cầu Kèm Danh Mục Lựa Chọn Trực Tuyến (Không Mock Dữ Liệu - Real CSDL 113.20.107.184:6432)**:
+  - **1. Hoàn Thành Khảo Sát Kiến Trúc Hiện Tại (Phase 1 Master Survey)**:
+    * **Frontend**: TanStack Router + Vite + Tailwind CSS + Lucide Icons. Module AI: `/ai-assistant` (`ai-assistant.tsx`), `CrmChatGPTView.tsx`, `AiExecutionStepTracker.tsx`. Tích hợp thư viện SheetJS `exportToExcel` chuẩn kế toán Thông tư 200/2014/TT-BTC.
+    * **Backend**: NestJS Monorepo (Port 4003). Module AI `apps/ceohn10_app_be/src/ai` (`ai.controller.ts`, `ai.service.ts`, `ai-crm-analytics.service.ts`, `ai-permission.service.ts`, `knowledge-base.service.ts`). Tích hợp `mail.service.ts` gửi SMTP Gmail thật (`vumikasa6@gmail.com`).
+    * **CSDL**: PostgreSQL duy nhất `113.20.107.184:6432/ceohn10_project` qua PgBouncer. Không dùng mock/fake data.
+    * **Xác thực & RBAC**: JWT Passport Guard, phân quyền 2 tab Web CRM và Mobile App, phân quyền năng lực AI trong `app_settings` (`crm_ai_permission_matrix`).
+  - **2. Triển Khai Ngay Tính Năng Xuất File Báo Cáo Tiền Thu Kèm Danh Mục Chọn Lựa (User Request)**:
+    * Nhận diện intent `isIncomeReportExportRequest`: Tự động nhận diện khi người dùng hỏi "xuất file báo cáo tiền thu trong ngày hôm nay", "xuất danh mục báo cáo tiền thu", "báo cáo tiền thu",...
+    * Truy vấn 100% dữ liệu sống từ `public.transactions` (WHERE type = 'income' OR amount > 0) và `public.invoices`.
+    * Phân tích ngày "hôm nay": Nếu có giao dịch hôm nay, tính toán chính xác tổng thu trong ngày. Nếu chưa có giao dịch phát sinh hôm nay, hiển thị trung thực và cung cấp danh mục giao dịch thực tế gần nhất trong tháng kèm số dư sổ quỹ.
+    * Tự động sinh thẻ tương tác **`ReportCategorySelectorCard`** với 5 danh mục chuyên biệt:
+      1. *Báo cáo Toàn Bộ Dòng Tiền Thu Sổ Quỹ (Tổng Hợp)* - Huy hiệu `Tổng Hợp Sổ Quỹ`.
+      2. *Báo cáo Thu Hội Phí Niên Liễm Học Viên* - Huy hiệu `Hội Phí 2026`.
+      3. *Báo cáo Tiền Thu Vé Sự Kiện & Hội Thảo* - Huy hiệu `Vé Sự Kiện`.
+      4. *Báo cáo Tiền Thu Tài Trợ & Quyên Góp Ban Chuyên Môn* - Huy hiệu `Tài Trợ & CSR`.
+      5. *Bản Kê Phiếu Thu Chuẩn Mực TT 200/2014/TT-BTC* - Huy hiệu `Mẫu TT 200 Chuẩn`.
+    * Mỗi danh mục tích hợp 2 nút hành động trực tiếp:
+      - Nút **"📊 Xuất Excel (.xlsx)"**: Gọi `exportToExcel` tạo file Excel chuẩn hoá có tiêu đề, STT, Mã phiếu, Ngày thu, Người nộp, Số tiền định dạng VNĐ, tổng cộng và số tiền bằng chữ tiếng Việt (`numberToVietnameseWords`), chữ ký 3 bên.
+      - Nút **"👁️ Xem số liệu"**: Bật tắt bảng xem trước chi tiết các giao dịch thực tế ngay trong khung chat.
+    * Nút lớn **"📥 Tải Trọn Bộ Sổ Quỹ Excel Đa Sheet"**: Sinh tệp workbook Excel chứa 5 sheet riêng biệt cho 5 danh mục.
+  - **3. Cập Nhật Backend Controller & Analytics Service**:
+    * `ai.controller.ts`: Mở rộng `POST /api/ai/crm/export-report` hỗ trợ loại `income_category`.
+    * `ai-crm-analytics.service.ts`: Cập nhật `exportSubReport` và `handleChatAssistant` trả về `interactiveActions` chứa đầy đủ 5 danh mục và danh sách bản ghi thực tế.
+  - **4. Kiểm Tra Chất Lượng Code (Strict Zero-Error)**:
+    * Backend `npx tsc --noEmit`: **Exit code 0 (0 errors)**.
+    * Frontend `npx tsc --noEmit`: Hoàn thành type-check thành công.
+    * Tuyệt đối tuân thủ Rule 0 (CSDL `113.20.107.184:6432`) và Rule 1 (Không tự ý `git commit` / `git push`).
 
 - **Bản cập nhật ngày 18/11/2026 (v12.25): Đổi Tên Toàn Diện Bảng Tài Khoản Người Dùng Thành ceohn10_users (Chuẩn Hóa Thương Hiệu CEO HN10, Xóa Bỏ Hoàn Toàn Tiền Tố Cũ vione_users)**:
   - **1. Chuẩn Hóa Danh Mục Bảng CSDL Chuẩn (THIET_KE_CSDL_POSTGRESQL_CEOHN10.md)**:
@@ -5495,6 +5823,170 @@
      - Tuân thủ nghiêm ngặt STRICT RULE 1: Tuyệt đối không tự động chạy `git push` hay `git commit`.
 
 # System Memory & Architecture
+
+- **Bản cập nhật ngày 19/11/2026 (v12.32): Hoàn Thành Triển Khai Phase 7 - Workflow & Action Agent Liên Hoàn Đa Công Cụ (Chaining Multi-Step Pipelines, Extensible Context Contract, Failure Recovery & UI Pipeline Map)**:
+  - **1. Kiến Trúc Context Contract Mở Rộng (Không Cần Sửa Lại Agent Core)**:
+    * Định nghĩa `ToolContextContract` trong `tool.interface.ts`: Bao gồm danh sách key dữ liệu cần nhận (`consumes`), key dữ liệu sinh ra (`produces`), hàm biến đổi tham số `transformParams` và hàm bóc tách ngữ cảnh `extractContext`.
+    * Từng công cụ nghiệp vụ (`parse_and_analyze_document`, `create_calendar_meeting`, `query_members`, `compare_and_reconcile_documents`, `prepare_email_broadcast`, `dispatch_batch_email`, `resend_failed_emails`, `query_system_analytics`) tự quản lý logic chuyển đổi dữ liệu của riêng mình.
+    * Khi bổ sung công cụ mới (Tool 13, 14...), hệ thống chỉ cần đăng ký kèm `contextContract` mà **hoàn toàn không cần sửa lại mã nguồn Agent Core**.
+  - **2. Động Cơ Phối Hợp Liên Hoàn Đa Công Cụ (Chaining Multi-Step Pipeline Engine)**:
+    * `llm-provider.adapter.ts` và `agent-core.service.ts` tự động nhận diện và thiết lập các chuỗi quy trình nghiệp vụ phức tạp:
+      - **Workflow 1 (Document ➔ Meeting ➔ Email)**: Bóc tách văn bản công văn ➔ Tạo lịch cuộc họp & Quét xung đột ➔ Tra cứu đại biểu CSDL ➔ Soạn thư mời họp cá nhân hóa ➔ Phát hành email qua SMTP Gmail.
+      - **Workflow 2 (Reconcile & Alert)**: Đối chiếu danh sách tệp với CSDL ➔ Soạn thư đôn đốc cho hội viên chưa hoàn thành ➔ Phát hành email nhắc nhở qua SMTP.
+      - **Workflow 3 (Calendar Check & Invite)**: Quét lịch trống ➔ Tạo lịch cuộc họp ➔ Soạn thư mời đại biểu ➔ Phát hành email.
+      - **Workflow 4 (Document Parse & Bulk Email)**: Bóc tách danh sách tài liệu Excel ➔ Loại bỏ email trùng lặp ➔ Soạn thư cá nhân hóa ➔ Chuẩn bị phát hành email qua SMTP Gmail.
+  - **3. Cơ Chế Phục Hồi Lỗi & Can Thiệp Từng Bước (Failure Recovery & Step Interception)**:
+    * Khi gặp sự cố tại bất kỳ bước nào trong chuỗi, kế hoạch chuyển sang trạng thái an toàn `"halted"` thay vì hủy bỏ, bảo toàn toàn bộ ngữ cảnh `workflowContext` đã tích lũy.
+    * Bổ sung 3 API điều phối tại `ai.controller.ts`:
+      - `POST /api/ai/agent/retry-step`: Cho phép thử lại bước lỗi với tham số điều chỉnh.
+      - `POST /api/ai/agent/skip-step`: Cho phép bỏ qua bước lỗi để chuỗi tiếp tục thực thi các bước sau.
+      - `POST /api/ai/agent/abort-task`: Cho phép hủy bỏ quy trình an toàn.
+  - **4. Nâng Cấp Giao Diện UI Workflow Tracker (AiExecutionStepTracker.tsx & CrmChatGPTView.tsx)**:
+    * **Sơ đồ tiến trình liên hoàn (Workflow Chaining Pipeline Map)**: Hiển thị trực quan toàn bộ các mắt xích công cụ với badge trạng thái màu sắc và icon mũi tên kết nối.
+    * **Thẻ chuyển giao dữ liệu (Data Handoff Card)**: Hiển thị rõ số lượng người nhận, ngày giờ sự kiện đã được chuyển giao từ bước trước sang bước sau.
+    * **Hộp thoại xử lý sự cố (Failure Recovery Action Box)**: Tích hợp nút "Thử lại bước này", "Bỏ qua & tiếp tục", "Hủy quy trình" trực tiếp trên từng step.
+    * **Quick Prompt 1-Chạm**: Bổ sung mẫu lệnh kích hoạt quy trình liên hoàn trong CrmChatGPTView.
+  - **5. Kiểm Tra Chất Lượng Code (Strict Zero-Error)**:
+    * Backend `npx tsc --noEmit`: **Exit code 0 (0 errors)**.
+    * Frontend `npx tsc --noEmit`: **Exit code 0 (0 errors)**.
+    * Tuân thủ triệt để Rule 0 (CSDL `113.20.107.184:6432`) và Rule 1 (Không tự ý `git commit` / `git push`).
+
+- **Bản cập nhật ngày 19/11/2026 (v12.31): Hoàn Thành Triển Khai Phase 6 - Data Query Agent Chuyên Sâu & Natural Language Reporting (Tra Cứu Dữ Liệu Nghiệp Vụ Tự Nhiên, Trực Quan Hóa Biểu Đồ Đa Chiều, Xuất Báo Cáo Excel)**:
+  - **1. Triển Khai Tool 12 (query_system_analytics - Data Query Action Tool)**:
+    * Tuyệt đối bảo mật: Không cho LLM chạy raw SQL tự do trên production database để triệt tiêu nguy cơ SQL Injection và phá hoại CSDL.
+    * Hỗ trợ 6 danh mục truy vấn nghiệp vụ chuyên sâu kết nối CSDL chuẩn `113.20.107.184:6432`:
+      - `member_overview`: Thống kê tổng số học viên, đang hoạt động (`active`), chưa kích hoạt, chưa xác thực email (`email_verified = false`), thành viên mới đăng ký hôm nay.
+      - `member_search_advanced`: Tra cứu nâng cao học viên theo họ tên, email, tiền tố số điện thoại (ví dụ: tìm số điện thoại bắt đầu bằng "09"), phòng ban ban ngành.
+      - `finance_monthly_stats`: Thống kê chi tiết tài chính doanh thu, chi phí, dòng tiền thuần theo 12 tháng gần nhất từ `public.transactions` và `public.invoices`.
+      - `failed_transactions`: Thống kê các giao dịch thất bại, hóa đơn quá hạn chưa thanh toán, các khoản công nợ cần đôn đốc.
+      - `department_distribution`: Thống kê cơ cấu phân bổ nhân sự, ban điều hành, ban thư ký, các ban chuyên môn trong CLB.
+      - `system_kpi_summary`: Báo cáo KPI tổng quan toàn hệ thống (Hội viên, Tài chính, Sự kiện, Cuộc họp, Tỷ lệ kích hoạt).
+  - **2. Bộ Phân Loại Ngôn Ngữ Tự Nhiên (llm-provider.adapter.ts & agent-core.service.ts)**:
+    * Nhận diện chính xác Intent 0 cho các câu hỏi ngôn ngữ tự nhiên: "Có bao nhiêu người dùng đang hoạt động?", "Tìm tất cả khách hàng chưa xác thực email", "Liệt kê các giao dịch thất bại trong tháng này", "Ai vừa đăng ký tài khoản hôm nay?", "Tìm người dùng có số điện thoại bắt đầu bằng 09", "Thống kê doanh thu theo từng tháng", "Cơ cấu ban ngành", "Báo cáo KPI hệ thống".
+    * Tự động sinh tóm tắt thông minh `overallSummary` và định dạng số tiền VND, tỷ lệ % trực quan.
+  - **3. Thẻ Trực Quan Hóa Dữ Liệu Đa Chiều (AiExecutionStepTracker.tsx)**:
+    * **KPI Cards**: Hiển thị các chỉ số trọng yếu dạng thẻ có màu sắc nhận diện (Doanh thu xanh ngọc, Chi phí cam đỏ, Dòng tiền tím, Học viên xanh dương).
+    * **Biểu Đồ Cột SVG Tương Tác 12 Tháng**: Trực quan hóa doanh thu vs chi phí 12 tháng trực tiếp trong giao diện chat (không cần thư viện nặng ngoài, hoàn toàn tương thích mobile & desktop).
+    * **Bảng Dữ Liệu Chi Tiết**: Phân trang / thu gọn mở rộng, hiển thị trạng thái badge xanh/đỏ cho học viên và giao dịch.
+    * **Nút Hành Động 1-Chạm**: Nút "Xuất Báo Cáo Excel (.xlsx)" tải file chuẩn định dạng kế toán ngay lập tức, nút "Sao chép tóm tắt số liệu".
+  - **4. Kiểm Tra Chất Lượng Code (Strict Zero-Error)**:
+    * Backend `npx tsc --noEmit`: **Exit code 0 (0 errors)**.
+    * Frontend `npx tsc --noEmit`: **Exit code 0 (0 errors)**.
+    * Tuân thủ triệt để Rule 0 (CSDL `113.20.107.184:6432`) và Rule 1 (Không tự ý `git commit` / `git push`).
+
+- **Bản cập nhật ngày 19/11/2026 (v12.30): Hoàn Thành Triển Khai Phase 5 - Calendar & Event Agent (Tạo Sự Kiện, Phát Hiện Xung Đột Lịch, Tra Cứu Email Đại Biểu Tự Động Từ CSDL, Tạo Google Calendar 1-Click & File iCalendar .ics, Liên Hoàn Handoff)**:
+  - **1. Nâng Cấp Toàn Diện Tool 6 (create_calendar_meeting - Calendar Action Tool)**:
+    * Hỗ trợ đầy đủ tham số: `title`, `scheduledAt`, `date`, `time`, `endTime`, `location`, `description`, `eventType` (`meeting` | `forum` | `workshop` | `b2b`), `attendeeNames`, `attendeeEmails`, `checkConflict`, `isOnline`.
+    * **Conflict Detection (Phát hiện xung đột lịch)**: Quét cả `public.events` và `public.meetings` trong cùng ngày/khung giờ, cảnh báo chi tiết nếu bị trùng lịch.
+    * **Tra cứu email tự động từ CSDL `public.members`**: Khi người dùng chỉ cung cấp họ tên đại biểu (ví dụ: "gồm Nguyễn Văn A, Trần Văn B"), AI tự động truy vấn tìm `email`, `phone`, `company`, `code` từ bảng `public.members` của CSDL chuẩn `113.20.107.184:6432`.
+    * **Ghi nhận CSDL thực tế**: Lưu vào `public.meetings` (nếu là cuộc họp) hoặc `public.events` (nếu là hội thảo/diễn đàn). Tự động ghi danh đại biểu có email vào `public.event_registrations`.
+    * **Sinh link họp trực tuyến & Lịch**: Tạo link Jitsi Meet / Google Meet bảo mật, sinh đường dẫn Google Calendar (`googleCalendarUrl`) để thêm sự kiện 1-click, và sinh nội dung iCalendar (`.ics`) chuẩn RFC 5545.
+    * **Tạo `preparedList` sẵn sàng Handoff**: Trả về danh sách đại biểu kèm email để bước tiếp theo gửi thư mời họp tự động mà không cần nhập lại.
+  - **2. Bổ Sung Tool 11 (check_calendar_availability - Quét Lịch Trống & Xung Đột)**:
+    * Quét toàn bộ sự kiện và cuộc họp trong CSDL cho một ngày hoặc cả tuần (`days: 1` hoặc `7`).
+    * Phân loại 3 khung giờ làm việc: Sáng (08:30 - 11:30), Chiều (13:30 - 17:00), Tối (18:30 - 21:00) thành trạng thái `available` hoặc `busy` kèm danh sách sự kiện bận.
+    * Tự động gợi ý khung giờ vàng khả dụng nhất (`suggestedFreeSlot`).
+  - **3. Tự Động Hóa Pipeline Handoff Liên Hoàn (agent-core.service.ts & llm-provider.adapter.ts)**:
+    * **Handoff 1**: Document Parse (`parse_and_analyze_document`) -> Calendar Tool (`create_calendar_meeting`): Nhận diện ngày giờ, địa điểm, thành phần đại biểu từ file Word/PDF truyền thẳng vào tham số tạo lịch.
+    * **Handoff 2**: Calendar Tool -> Email Broadcast (`prepare_email_broadcast`): Tự động nạp danh sách đại biểu đã tra cứu email từ CSDL vào mẫu thư mời kèm link phòng họp trực tuyến và link Google Calendar.
+    * **Semantic Intent Classifier**: Nhận diện ngôn ngữ tự nhiên lên lịch cuộc họp và kiểm tra lịch trống.
+  - **4. Nâng Cấp Giao Diện Web CRM (AiExecutionStepTracker.tsx & CrmChatGPTView.tsx)**:
+    * Thẻ sự kiện tương tác trực quan `CalendarEventCard`: Hiển thị tiêu đề, thời gian, địa điểm, badge trạng thái, link phòng họp trực tuyến, cảnh báo trùng lịch nếu có, danh sách chip đại biểu kèm email tra cứu từ CSDL.
+    * Tích hợp 2 nút hành động trực tiếp: "Thêm vào Google Calendar (1-Click)" và "Tải file iCalendar (.ics)".
+    * Thẻ kiểm tra lịch trình `CalendarAvailabilityCard`: Trực quan hóa timeline 3 ca trong ngày (Trống/Bận) và đề xuất khung giờ vàng.
+    * Bổ sung Quick Prompt và mở rộng bộ nhận diện lệnh Action Agent cho các từ khóa lịch họp.
+  - **5. Kiểm Tra Chất Lượng Code (Strict Zero-Error)**:
+    * Backend `npx tsc --noEmit`: **Exit code 0 (0 errors)**.
+    * Frontend `npx tsc --noEmit`: **Exit code 0 (0 errors)**.
+    * Tuân thủ triệt để Rule 0 (CSDL `113.20.107.184:6432`) và Rule 1 (Không tự ý `git commit` / `git push`).
+
+- **Bản cập nhật ngày 19/11/2026 (v12.29): Hoàn Thành Triển Khai Phase 4 - Email Agent Nâng Cao, Chống Gửi Trùng Lặp Idempotency, Nhật Ký CSDL & Cơ Chế Gửi Lại Email Thất Bại (Retry Failed Only)**:
+  - **1. Thiết Kế Bảng Nhật Ký CSDL Chuẩn (public.ai_email_dispatches)**:
+    * Khởi tạo bảng lưu vết bền vững trên máy chủ CSDL chuẩn `113.20.107.184:6432`:
+      - `id`: Mã định danh lượt gửi.
+      - `batch_id`: Mã mẻ phát hành thư.
+      - `idempotency_key`: Khóa phiên chống gửi trùng lặp.
+      - `recipient_email`, `recipient_name`, `company`: Thông tin người nhận.
+      - `subject`, `html_body`: Tiêu đề và nội dung thư cá nhân hóa.
+      - `status`: Trạng thái gửi (`sent` | `failed` | `pending`).
+      - `error_reason`: Nguyên nhân lỗi chi tiết nếu thất bại (hộp thư đầy, sai cú pháp, timeout).
+      - `retry_count`: Số lần thử gửi lại.
+      - `sent_at`, `created_at`: Dấu thời gian chuẩn xác.
+    * Tạo chỉ mục B-Tree tối ưu hiệu năng: `idx_ai_email_batch`, `idx_ai_email_idempotency`, `idx_ai_email_status`.
+  - **2. Nâng Cấp Tool 5 (dispatch_batch_email - External Action)**:
+    * Tích hợp kiểm tra Idempotency trước khi gọi SMTP: Nếu email người nhận đã có trạng thái `'sent'` với cùng `idempotency_key`, tự động bỏ qua và đánh dấu `already_sent`, tăng `alreadySentCount`.
+    * Gửi thực tế qua SMTP Gmail (`vumikasa6@gmail.com`) với cấu hình an toàn, cá nhân hóa `{ho_ten}`, `{cong_ty}`.
+    * Trả về kết quả phân loại chuẩn xác: `successCount`, `failCount`, `alreadySentCount`, danh sách `failedEmails` kèm chi tiết nguyên nhân lỗi.
+  - **3. Bổ Sung Tool 9 (resend_failed_emails - Gửi Lại Email Lỗi)**:
+    * Tra cứu trực tiếp từ CSDL các bản ghi có `status = 'failed'` theo `batch_id` hoặc `idempotency_key`.
+    * Cơ chế chọn lọc: CHỈ gửi lại cho những người chưa nhận được, tuyệt đối không gửi lại cho những người đã nhận thành công.
+    * Tự động tăng `retry_count`, chuyển trạng thái thành `sent` khi gửi lại thành công.
+  - **4. Bổ Sung Tool 10 (query_email_history - Tra Cứu Nhật Ký Thư)**:
+    * Truy vấn lịch sử email từ CSDL theo từ khóa, lọc theo trạng thái (`sent`, `failed`, `all`).
+    * Thống kê tổng số, tỷ lệ thành công và thất bại thực tế trong toàn hệ thống.
+  - **5. Nâng Cấp Giao Diện UI Tracker (AiExecutionStepTracker.tsx)**:
+    * Hiển thị trực quan: Badge số email gửi thành công (xanh lá), số email bỏ qua chống gửi trùng (xanh dương Idempotent), số email lỗi (đỏ cam).
+    * Hiển thị bảng chi tiết danh sách email thất bại kèm lý do cụ thể để Quản trị viên nắm bắt và xử lý.
+  - **6. Kiểm Tra Chất Lượng Code (Strict Zero-Error)**:
+    * Backend `npx tsc --noEmit`: **Exit code 0 (0 errors)**.
+    * Frontend `npx tsc --noEmit`: **Exit code 0 (0 errors)**.
+    * Tuân thủ triệt để Rule 0 (CSDL `113.20.107.184:6432`) và Rule 1 (Không tự ý `git commit` / `git push`).
+
+- **Bản cập nhật ngày 19/11/2026 (v12.28): Hoàn Thành Triển Khai Phase 3 - Giao Diện AI Agent Nâng Cao & Document Processing Đa Tệp (Word/Excel/PDF/CSV/Text OCR & Multi-File Drag & Drop)**:
+  - **1. Bộ Phân Tích & Bóc Tách Đa Tài Liệu Toàn Diện (ai-excel-email-parser.ts)**:
+    * `parseMultipleFiles(files)`: Đọc và giải mã song song mảng nhiều tệp tài liệu trong cùng một phiên.
+    * Hỗ trợ đầy đủ các định dạng:
+      - **Excel (.xlsx, .xls, .csv)**: Bóc tách đa sheet, trích xuất cấu trúc bảng biểu `tables` (headers, rows, totalRows), nhận diện cột họ tên, email, SĐT, công ty, chức vụ, số tiền hội phí.
+      - **Word (.docx, .doc)**: Giải mã nội dung văn bản, trích xuất email, phân đoạn công văn, phát hiện nội dung chỉ đạo.
+      - **PDF (.pdf)**: Trích xuất các luồng văn bản (Text stream), lọc bỏ mã điều khiển, nhận diện danh sách đại biểu và email.
+      - **Text (.txt)**: Quét toàn văn bản.
+    * Thuật toán bóc tách sự kiện thông minh (`extractEventDetailsFromText`): Tự động phát hiện ngày tháng (`\d{1,2}/\d{1,2}/\d{4}`), giờ họp (`9h`, `09:00`), địa điểm (`phòng họp`, `khách sạn`, `tầng...`), và thành phần tham dự từ văn bản tự nhiên.
+  - **2. Mở Rộng Danh Mục Tools Backend (tool-registry.service.ts)**:
+    * **Nâng cấp Tool 7 (`parse_and_analyze_document`)**: Hỗ trợ tham số `documents` nhận chuỗi JSON mảng nhiều tệp; trích xuất danh sách công việc (`taskItems`), đại biểu (`attendees`), email tổng hợp (`preparedList`) để chuyển tiếp trực tiếp sang các bước gửi thư.
+    * **Bổ sung Tool 8 (`compare_and_reconcile_documents`)**: So sánh đối chiếu danh sách giữa 2 tệp tài liệu hoặc giữa tệp đính kèm với cơ sở dữ liệu `public.members` (`113.20.107.184:6432`), phân loại chính xác số lượng trùng khớp (`matched`), số lượng thiếu (`missingInTarget`), và số lượng đăng ký mới (`newInTarget`).
+  - **3. Tự Động Hóa Pipeline & Handoff Đa Tệp (agent-core.service.ts)**:
+    * Tự động nhận diện ý định đối chiếu so sánh tài liệu (`isReconcileIntent`) khi người dùng đính kèm từ 2 tệp trở lên hoặc dùng các từ khóa "so sánh", "đối chiếu", "kiểm tra lệch".
+    * Handoff tự động: Kết quả `preparedList` từ bước bóc tách tài liệu tự động nạp làm đầu vào cho bước đối chiếu (`compare_and_reconcile_documents`) hoặc bước gửi email (`dispatch_batch_email`).
+  - **4. Nâng Cấp Giao Diện Web CRM Đa Tệp & Kéo Thả (CrmChatGPTView.tsx)**:
+    * **Drag & Drop Multi-file Zone**: Bắt sự kiện kéo thả trên toàn bộ vùng chat container kèm overlay hiệu ứng hoạt họa trực quan khi rê file qua ("Thả các tệp tài liệu vào đây...").
+    * **Multi-file Input & File Chips Grid**:
+      - Hỗ trợ chọn nhiều file cùng lúc qua thuộc tính `multiple accept=".xlsx,.xls,.csv,.docx,.doc,.pdf,.txt"`.
+      - Hiển thị danh sách tệp đính kèm với icon màu theo định dạng (Excel xanh ngọc, Word xanh dương, PDF đỏ cam, CSV/Text xám), tên tệp, dung lượng KB, số email/dòng bóc tách được.
+      - Nút xóa riêng cho từng tệp và nút "Gỡ tất cả".
+      - Nút hành động nhanh "⚖️ Đối chiếu các file" khi nạp từ 2 tệp trở lên.
+    * **Bóng chat người dùng**: Hiển thị đầy đủ danh sách các file đính kèm với số lượng email và dung lượng.
+  - **5. Kiểm Tra Chất Lượng Code (Strict Zero-Error)**:
+    * Backend `npx tsc --noEmit`: **Exit code 0 (0 errors)**.
+    * Frontend `npx tsc --noEmit`: **Exit code 0 (0 errors)**.
+    * Tuân thủ triệt để Rule 0 (CSDL `113.20.107.184:6432`) và Rule 1 (Không tự ý `git commit` / `git push`).
+
+- **Bản cập nhật ngày 18/11/2026 (v12.26): Khảo Sát Kiến Trúc Toàn Diện AI Agent Hệ Thống (Phase 1) & Triển Khai Tính Năng Xuất File Báo Cáo Tiền Thu Theo Yêu Cầu Kèm Danh Mục Lựa Chọn Trực Tuyến (Không Mock Dữ Liệu - Real CSDL 113.20.107.184:6432)**:
+  - **1. Hoàn Thành Khảo Sát Kiến Trúc Hiện Tại (Phase 1 Master Survey)**:
+    * **Frontend**: TanStack Router + Vite + Tailwind CSS + Lucide Icons. Module AI: `/ai-assistant` (`ai-assistant.tsx`), `CrmChatGPTView.tsx`, `AiExecutionStepTracker.tsx`. Tích hợp thư viện SheetJS `exportToExcel` chuẩn kế toán Thông tư 200/2014/TT-BTC.
+    * **Backend**: NestJS Monorepo (Port 4003). Module AI `apps/ceohn10_app_be/src/ai` (`ai.controller.ts`, `ai.service.ts`, `ai-crm-analytics.service.ts`, `ai-permission.service.ts`, `knowledge-base.service.ts`). Tích hợp `mail.service.ts` gửi SMTP Gmail thật (`vumikasa6@gmail.com`).
+    * **CSDL**: PostgreSQL duy nhất `113.20.107.184:6432/ceohn10_project` qua PgBouncer. Không dùng mock/fake data.
+    * **Xác thực & RBAC**: JWT Passport Guard, phân quyền 2 tab Web CRM và Mobile App, phân quyền năng lực AI trong `app_settings` (`crm_ai_permission_matrix`).
+  - **2. Triển Khai Ngay Tính Năng Xuất File Báo Cáo Tiền Thu Kèm Danh Mục Chọn Lựa (User Request)**:
+    * Nhận diện intent `isIncomeReportExportRequest`: Tự động nhận diện khi người dùng hỏi "xuất file báo cáo tiền thu trong ngày hôm nay", "xuất danh mục báo cáo tiền thu", "báo cáo tiền thu",...
+    * Truy vấn 100% dữ liệu sống từ `public.transactions` (WHERE type = 'income' OR amount > 0) và `public.invoices`.
+    * Phân tích ngày "hôm nay": Nếu có giao dịch hôm nay, tính toán chính xác tổng thu trong ngày. Nếu chưa có giao dịch phát sinh hôm nay, hiển thị trung thực và cung cấp danh mục giao dịch thực tế gần nhất trong tháng kèm số dư sổ quỹ.
+    * Tự động sinh thẻ tương tác **`ReportCategorySelectorCard`** với 5 danh mục chuyên biệt:
+      1. *Báo cáo Toàn Bộ Dòng Tiền Thu Sổ Quỹ (Tổng Hợp)* - Huy hiệu `Tổng Hợp Sổ Quỹ`.
+      2. *Báo cáo Thu Hội Phí Niên Liễm Học Viên* - Huy hiệu `Hội Phí 2026`.
+      3. *Báo cáo Tiền Thu Vé Sự Kiện & Hội Thảo* - Huy hiệu `Vé Sự Kiện`.
+      4. *Báo cáo Tiền Thu Tài Trợ & Quyên Góp Ban Chuyên Môn* - Huy hiệu `Tài Trợ & CSR`.
+      5. *Bản Kê Phiếu Thu Chuẩn Mực TT 200/2014/TT-BTC* - Huy hiệu `Mẫu TT 200 Chuẩn`.
+    * Mỗi danh mục tích hợp 2 nút hành động trực tiếp:
+      - Nút **"📊 Xuất Excel (.xlsx)"**: Gọi `exportToExcel` tạo file Excel chuẩn hoá có tiêu đề, STT, Mã phiếu, Ngày thu, Người nộp, Số tiền định dạng VNĐ, tổng cộng và số tiền bằng chữ tiếng Việt (`numberToVietnameseWords`), chữ ký 3 bên.
+      - Nút **"👁️ Xem số liệu"**: Bật tắt bảng xem trước chi tiết các giao dịch thực tế ngay trong khung chat.
+    * Nút lớn **"📥 Tải Trọn Bộ Sổ Quỹ Excel Đa Sheet"**: Sinh tệp workbook Excel chứa 5 sheet riêng biệt cho 5 danh mục.
+  - **3. Cập Nhật Backend Controller & Analytics Service**:
+    * `ai.controller.ts`: Mở rộng `POST /api/ai/crm/export-report` hỗ trợ loại `income_category`.
+    * `ai-crm-analytics.service.ts`: Cập nhật `exportSubReport` và `handleChatAssistant` trả về `interactiveActions` chứa đầy đủ 5 danh mục và danh sách bản ghi thực tế.
+  - **4. Kiểm Tra Chất Lượng Code (Strict Zero-Error)**:
+    * Backend `npx tsc --noEmit`: **Exit code 0 (0 errors)**.
+    * Frontend `npx tsc --noEmit`: Hoàn thành type-check thành công.
+    * Tuyệt đối tuân thủ Rule 0 (CSDL `113.20.107.184:6432`) và Rule 1 (Không tự ý `git commit` / `git push`).
 
 - **Bản cập nhật ngày 18/11/2026 (v12.25): Đổi Tên Toàn Diện Bảng Tài Khoản Người Dùng Thành ceohn10_users (Chuẩn Hóa Thương Hiệu CEO HN10, Xóa Bỏ Hoàn Toàn Tiền Tố Cũ vione_users)**:
   - **1. Chuẩn Hóa Danh Mục Bảng CSDL Chuẩn (THIET_KE_CSDL_POSTGRESQL_CEOHN10.md)**:

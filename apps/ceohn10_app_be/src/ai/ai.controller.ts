@@ -14,6 +14,7 @@ import { AiService } from './ai.service';
 import { AiCrmAnalyticsService } from './ai-crm-analytics.service';
 import { KnowledgeBaseService } from './knowledge-base.service';
 import { AiPermissionService } from './ai-permission.service';
+import { AgentCoreService } from './tools/agent-core.service';
 
 @Controller('ai')
 @UseGuards(JwtAuthGuard)
@@ -23,6 +24,7 @@ export class AiController {
     private readonly crmAnalytics: AiCrmAnalyticsService,
     private readonly knowledgeBase: KnowledgeBaseService,
     private readonly aiPermission: AiPermissionService,
+    private readonly agentCore: AgentCoreService,
   ) {}
 
   /** GET /api/ai/live-context — Ngữ cảnh động tài khoản phiên đăng nhập */
@@ -295,13 +297,13 @@ export class AiController {
     return { ok: true, data: res };
   }
 
-  /** POST /api/ai/crm/export-report — Xuất báo cáo theo chức năng con (thu chi, hóa đơn/phiếu thu) */
+  /** POST /api/ai/crm/export-report — Xuất báo cáo theo chức năng con (thu chi, hóa đơn/phiếu thu, danh mục tiền thu) */
   @Post('crm/export-report')
   async exportSubReport(
     @Request() req: any,
     @Body()
     body: {
-      type: 'financial_summary' | 'invoice' | 'receipt' | 'events_report';
+      type: 'financial_summary' | 'invoice' | 'receipt' | 'events_report' | 'income_category';
       options?: any;
     },
   ) {
@@ -403,5 +405,142 @@ export class AiController {
     }
 
     return { ok: true, data: { allowedCapabilities: myAllowedCaps } };
+  }
+
+  // ==========================================
+  // ACTION AGENT CORE & TOOLS EXECUTION ENGINE
+  // ==========================================
+
+  /** POST /api/ai/agent/execute — Lập kế hoạch hành động và điều phối thực thi nghiệp vụ tự động */
+  @Post('agent/execute')
+  async executeAgentTask(
+    @Request() req: any,
+    @Body()
+    body: {
+      goal: string;
+      files?: Array<{ name: string; type: string; base64?: string; text?: string }>;
+      approvedSteps?: string[];
+      history?: Array<{ role: string; content: string }>;
+    },
+  ) {
+    const plan = await this.agentCore.planAndExecute(
+      body.goal,
+      {
+        userId: req?.user?.id || 'admin',
+        userRole: req?.user?.role || 'admin',
+        userEmail: req?.user?.email,
+        userName: req?.user?.fullName || req?.user?.username,
+      },
+      {
+        files: body.files,
+        approvedSteps: body.approvedSteps,
+        history: body.history,
+      },
+    );
+    return { ok: true, data: plan };
+  }
+
+  /** POST /api/ai/agent/confirm-step — Người dùng phê duyệt hoặc từ chối thực hiện hành động nhạy cảm */
+  @Post('agent/confirm-step')
+  async confirmAgentStep(
+    @Request() req: any,
+    @Body()
+    body: {
+      taskId: string;
+      stepId: string;
+      approved: boolean;
+    },
+  ) {
+    const plan = await this.agentCore.confirmStep(
+      body.taskId,
+      body.stepId,
+      body.approved,
+      {
+        userId: req?.user?.id || 'admin',
+        userRole: req?.user?.role || 'admin',
+        userEmail: req?.user?.email,
+        userName: req?.user?.fullName || req?.user?.username,
+        approved: body.approved,
+      },
+    );
+    return { ok: true, data: plan };
+  }
+
+  /** POST /api/ai/agent/retry-step — Thử lại bước bị lỗi trong quy trình liên hoàn */
+  @Post('agent/retry-step')
+  async retryAgentStep(
+    @Request() req: any,
+    @Body()
+    body: {
+      taskId: string;
+      stepId: string;
+      modifiedParams?: Record<string, any>;
+    },
+  ) {
+    const plan = await this.agentCore.retryStep(
+      body.taskId,
+      body.stepId,
+      body.modifiedParams,
+      {
+        userId: req?.user?.id || 'admin',
+        userRole: req?.user?.role || 'admin',
+        userEmail: req?.user?.email,
+        userName: req?.user?.fullName || req?.user?.username,
+      },
+    );
+    return { ok: true, data: plan };
+  }
+
+  /** POST /api/ai/agent/skip-step — Bỏ qua bước lỗi để tiếp tục các bước sau */
+  @Post('agent/skip-step')
+  async skipAgentStep(
+    @Request() req: any,
+    @Body()
+    body: {
+      taskId: string;
+      stepId: string;
+    },
+  ) {
+    const plan = await this.agentCore.skipStep(
+      body.taskId,
+      body.stepId,
+      {
+        userId: req?.user?.id || 'admin',
+        userRole: req?.user?.role || 'admin',
+        userEmail: req?.user?.email,
+        userName: req?.user?.fullName || req?.user?.username,
+      },
+    );
+    return { ok: true, data: plan };
+  }
+
+  /** POST /api/ai/agent/abort-task — Hủy bỏ toàn bộ các bước còn lại của nhiệm vụ */
+  @Post('agent/abort-task')
+  async abortAgentTask(
+    @Request() req: any,
+    @Body()
+    body: {
+      taskId: string;
+    },
+  ) {
+    const plan = await this.agentCore.abortTask(body.taskId);
+    return { ok: true, data: plan };
+  }
+
+  /** GET /api/ai/agent/task/:taskId — Lấy trạng thái kế hoạch và tiến trình thực thi nhiệm vụ */
+  @Get('agent/task/:taskId')
+  async getAgentTaskStatus(@Param('taskId') taskId: string) {
+    const plan = this.agentCore.getTask(taskId);
+    if (!plan) {
+      return { ok: false, error: 'Không tìm thấy nhiệm vụ' };
+    }
+    return { ok: true, data: plan };
+  }
+
+  /** GET /api/ai/agent/tools — Lấy danh mục tất cả công cụ nghiệp vụ sẵn có trong hệ thống */
+  @Get('agent/tools')
+  async getAvailableAgentTools() {
+    const tools = this.agentCore.getAvailableTools();
+    return { ok: true, data: tools };
   }
 }
