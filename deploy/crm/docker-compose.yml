@@ -41,6 +41,7 @@ services:
       ceohn10-network:
         aliases:
           - ceohn10-crm-backend
+          - ceohn10-crm-backend-prod
 
 volumes:
   ceohn10-uploads-data:

@@ -4,6 +4,7 @@ RUN apk add --no-cache openssl
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 
 COPY --chown=appuser:appgroup apps/ceohn10_app_fe/.output ./apps/ceohn10_app_fe/.output
+COPY --chown=appuser:appgroup apps/ceohn10_app_fe/public/. ./apps/ceohn10_app_fe/.output/public/
 COPY --chown=appuser:appgroup apps/ceohn10_app_fe/docker-entrypoint.sh ./apps/ceohn10_app_fe/
 
 RUN chmod +x ./apps/ceohn10_app_fe/docker-entrypoint.sh || true

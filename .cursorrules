@@ -1,6 +1,22 @@
 # ==============================================================================
 # BỘ LUẬT DỰ ÁN (PROJECT RULES & AI CODEGEN STANDARDS) - CEO HN10 PROJECT
 # Vai trò: Tech Lead | Định dạng: .cursorrules
+# 19/11/2026 (v12.36) — BẢO VỆ PHIÊN ĐĂNG NHẬP, TỰ ĐỘNG ĐỒNG BỘ COOKIE DOMAIN *.viconnect.vn, CHỐNG CRASH "Unauthorized: No token provided" & KHẮC PHỤC TRIỆT ĐỂ LỖI HTTP2 app-icon.png TRÊN DOMAIN CRM:
+#   * [TỰ ĐỘNG TÁI ĐỒNG BỘ COOKIE SESSION (ensureSessionCookiesSync)]:
+#     - Bất cứ khi nào gọi getAuthToken() hoặc trước khi gọi API, tự động nạp lại sb-access-token, vibe_token, access_token vào document.cookie với domain=.viconnect.vn.
+#     - Đảm bảo các Server Functions SSR (useServerFn) luôn có cookie xác thực, triệt tiêu lỗi Unauthorized: No token provided.
+#   * [CHỐNG XÓA PHIÊN OAN TRONG handleResponse (api-client.ts)]:
+#     - Miễn trừ hoàn toàn các API phụ trợ/background polling (/sidebar-labels, /active-call, /notifications, /permission-matrix, /funds-overview, /tasks, /activity-log) khỏi cơ chế xóa phiên và redirect.
+#     - Nếu token trong localStorage vẫn còn hạn sử dụng (JWT exp > Date.now()), tuyệt đối không xóa session, không redirect ra login, mà chỉ đồng bộ lại cookie.
+#   * [PHÒNG VỆ ZERO-CRASH CHO EXECUTIVE DASHBOARD (ExecutiveDashboard.tsx & StateKit.tsx)]:
+#     - Bọc an toàn cả statsQ và activityQ với try/catch và fallback dữ liệu an toàn.
+#     - ErrorState tự động gọi ensureSessionCookiesSync() khi người dùng click "Thử lại", khôi phục phiên kết nối ngay lập tức.
+#   * [KHẮC PHỤC LỖI HTTP2 VÀ ĐÓNG KẾT NỐI TRÊN NGINX/DOCKER]:
+#     - Bổ sung COPY apps/ceohn10_app_fe/public/. ./apps/ceohn10_app_fe/.output/public/ vào Dockerfile.frontend cả CRM và Mobile.
+#     - Thêm script postbuild trong package.json tự động copy public/ sang .output/public/.
+#     - Nginx Reverse Proxy bổ sung location phục vụ trực tiếp cho app-icon.png, favicon.ico, manifest.webmanifest.
+#     - docker-compose.yml và CI/CD workflow chuẩn hóa alias ceohn10-crm-backend-prod và image tags ceohn10-crm-frontend, ceohn10-crm-backend.
+#   * [TUÂN THỦ CSDL & GIT]: CSDL duy nhất 113.20.107.184:6432 (ceohn10_project). Tuyệt đối không git commit / git push. Type check đạt 0 lỗi (Exit code 0 trên cả BE và FE).
 # 19/11/2026 (v12.32) — TRIỂN KHAI HOÀN THIỆN PHASE 7: WORKFLOW & ACTION AGENT LIÊN HOÀN ĐA CÔNG CỤ (CHAINING MULTI-STEP PIPELINES, EXTENSIBLE CONTEXT CONTRACT & FAILURE RECOVERY):
 #   * [KIẾN TRÚC CONTEXT CONTRACT MỞ RỘNG (KHÔNG CẦN SỬA LẠI AGENT CORE)]:
 #     - Định nghĩa ToolContextContract trong tool.interface.ts (consumes, produces, transformParams, extractContext).

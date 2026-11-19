@@ -1,14 +1,49 @@
  import { KY_NIEM_4_NAM_BANNER_URL } from "@/assets/ky_niem_4_nam_banner";
 
+export function ensureSessionCookiesSync(token?: string | null): void {
+  if (typeof window === "undefined") return;
+  const t =
+    token ||
+    localStorage.getItem("vibe_token") ||
+    localStorage.getItem("access_token") ||
+    localStorage.getItem("token") ||
+    localStorage.getItem("sb-access-token") ||
+    null;
+  if (!t) return;
+  try {
+    const isHttps = window.location.protocol === "https:";
+    const secure = isHttps ? "; secure" : "";
+    const domainAttr = getCookieDomain();
+    const maxAge = 86400; // 24 giờ
+    const cookieStr = document.cookie || "";
+    if (!cookieStr.includes(`sb-access-token=${t}`)) {
+      document.cookie = `sb-access-token=${t}; path=/; max-age=${maxAge}; SameSite=Lax${secure}${domainAttr}`;
+      document.cookie = `vibe_token=${t}; path=/; max-age=${maxAge}; SameSite=Lax${secure}${domainAttr}`;
+      document.cookie = `access_token=${t}; path=/; max-age=${maxAge}; SameSite=Lax${secure}${domainAttr}`;
+      if (domainAttr) {
+        document.cookie = `sb-access-token=${t}; path=/; max-age=${maxAge}; SameSite=Lax${secure}`;
+        document.cookie = `vibe_token=${t}; path=/; max-age=${maxAge}; SameSite=Lax${secure}`;
+        document.cookie = `access_token=${t}; path=/; max-age=${maxAge}; SameSite=Lax${secure}`;
+      }
+    }
+  } catch {
+    /* ignore */
+  }
+}
+
 export function getAuthToken(): string | null {
   if (typeof window === "undefined") return null;
-  return (
+  const token = (
     localStorage.getItem("vibe_token") ||
     localStorage.getItem("access_token") ||
     localStorage.getItem("token") ||
     localStorage.getItem("sb-access-token") ||
     null
   );
+  if (token) {
+    ensureSessionCookiesSync(token);
+  }
+  return token;
 }
 
 export function getCookieDomain(): string {
@@ -502,6 +537,47 @@ async function handleResponse(response: Response, endpoint = "") {
       // TUYỆT ĐỐI KHÔNG REDIRECT, để khách quét QR không bị đẩy sang trang login!
       if (isAuthEndpoint || isLoginPage || isPublicRoute) {
         throw new Error(errMsg === "Unauthorized" ? "Thông tin đăng nhập hoặc quyền truy cập không hợp lệ." : errMsg);
+      }
+
+      // Các truy vấn nền phụ trợ (labels, active call, matrix, tasks, v.v.):
+      // TUYỆT ĐỐI KHÔNG XÓA PHIÊN hay chuyển hướng trang khi gặp sự cố mạng hoặc 401 tạm thời!
+      const isAuxiliaryEndpoint =
+        endpoint.includes("/sidebar-labels") ||
+        endpoint.includes("/active-call") ||
+        endpoint.includes("/permission-matrix") ||
+        endpoint.includes("/funds-overview") ||
+        endpoint.includes("/notifications") ||
+        endpoint.includes("/tasks") ||
+        endpoint.includes("/me/active-call") ||
+        endpoint.includes("/activity-log");
+
+      if (isAuxiliaryEndpoint) {
+        throw new Error(errMsg);
+      }
+
+      // Kiểm tra nếu token trong localStorage vẫn còn hạn sử dụng:
+      // Tuyệt đối không xóa phiên hay đẩy người dùng ra login! Thay vào đó tự động tái đồng bộ cookie!
+      const currentToken = getAuthToken();
+      if (currentToken) {
+        try {
+          const parts = currentToken.split(".");
+          if (parts.length === 3) {
+            const payload = JSON.parse(
+              decodeURIComponent(
+                atob(parts[1].replace(/-/g, "+").replace(/_/g, "/"))
+                  .split("")
+                  .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
+                  .join("")
+              )
+            );
+            if (payload?.exp && payload.exp * 1000 > Date.now()) {
+              ensureSessionCookiesSync(currentToken);
+              throw new Error(errMsg);
+            }
+          }
+        } catch (e: any) {
+          if (e?.message === errMsg) throw e;
+        }
       }
 
       // Xóa phiên đăng nhập hết hạn

@@ -1,5 +1,34 @@
 # System Memory & Architecture
 
+- **Bản cập nhật ngày 19/11/2026 (v12.36): Khắc Phục Triệt Để Sự Cố "Unauthorized: No token provided" & Lỗi Tải Tài Nguyên Trực Tuyến Trên Domain CRM Production (`crm.ceohn10.viconnect.vn`)**:
+  - **1. Phân Tích Nguyên Nhân Gốc Rễ Từ Ảnh Chụp Màn Hình Của Người Dùng**:
+    * **Root Cause 1 (Cơ chế xóa phiên quá tay trong `handleResponse`)**: Trong `apps/ceohn10_app_fe/src/lib/api-client.ts`, khi bất kỳ request nào gặp lỗi `401` (kể cả các truy vấn phụ trợ như `/admin/sidebar-labels`, `/me/active-call`), hàm `handleResponse` đã lập tức xóa sạch `localStorage` và `document.cookie`, khiến token bị mất và các Server Functions (TanStack Start RPC `useServerFn`) tiếp theo gửi `Cookie: ""` lên server dẫn tới lỗi `Unauthorized: No token provided`.
+    * **Root Cause 2 (Lệch pha giữa LocalStorage và Cookie)**: Client-side component lưu token trong `localStorage` và gửi `Authorization: Bearer <token>`, nhưng Server Functions SSR đọc token từ `document.cookie`. Khi cookie bị xóa hoặc hết hạn trong khi token trong `localStorage` vẫn còn hạn, Server Functions bị thiếu token và quăng lỗi.
+    * **Root Cause 3 (Lỗi HTTP2 và Connection Closed trên Static Assets & API)**:
+      - Tệp `app-icon.png` và các icon/manifest tĩnh nằm trong thư mục `apps/ceohn10_app_fe/public`, nhưng Dockerfile chỉ copy `.output` mà không copy `public/` vào `.output/public`, khiến server Nitro không tìm thấy file và gây lỗi `ERR_HTTP2_PROTOCOL_ERROR`.
+      - Trong `docker-compose.yml`, service backend thiếu alias `ceohn10-crm-backend-prod`, và CI/CD workflow build image tag thiếu tên chuẩn `ceohn10-crm-frontend` và `ceohn10-crm-backend`, khiến upstream trong Nginx proxy bị đóng kết nối `ERR_CONNECTION_CLOSED`.
+  - **2. Giải Pháp Khắc Phục Kỹ Thuật Toàn Diện**:
+    * **Bảo vệ phiên làm việc và Tự động Tái Đồng Bộ Cookie (`api-client.ts`)**:
+      - Xây dựng hàm `ensureSessionCookiesSync(token)`: Bất cứ khi nào gọi `getAuthToken()` hoặc trước khi gọi API, tự động kiểm tra và ghi lại `document.cookie` với đầy đủ domain `.viconnect.vn`, đảm bảo Server Functions luôn có cookie xác thực.
+      - Miễn trừ hoàn toàn các API phụ trợ/background polling (`/sidebar-labels`, `/active-call`, `/notifications`, `/permission-matrix`, `/funds-overview`, `/tasks`, `/activity-log`) khỏi cơ chế xóa phiên và redirect.
+      - Kiểm tra tính hợp lệ của JWT token trong `localStorage`: Nếu token chưa hết hạn (`exp > Date.now()`), tuyệt đối không xóa phiên hay redirect sang `/auth`, mà tự động nạp lại cookie và cho phép giao diện hoạt động bình thường.
+    * **Tăng Cường Phòng Vệ Zero-Crash Cho Executive Dashboard (`ExecutiveDashboard.tsx`)**:
+      - Gọi `ensureSessionCookiesSync()` trước khi thực hiện `getStats()` và `getActivity()`.
+      - Bọc an toàn `activityQ` với `try/catch` fallback mảng rỗng `[]`.
+      - Nâng cấp `ErrorState` trong `StateKit.tsx`: Tự động gọi `ensureSessionCookiesSync()` khi người dùng bấm "Thử lại", giúp kết nối lại ngay lập tức mà không cần đăng nhập lại.
+    * **Mở Rộng Bóc Tách Token Trong Server Middleware (`nest-auth-middleware.ts`)**:
+      - Nhận diện thêm các header tùy chỉnh `x-access-token`, `x-vibe-token` và query params `?token=...`.
+    * **Khắc Phục Tài Nguyên Tĩnh & Docker CI/CD**:
+      - Cập nhật cả `deploy/ceohn10/Dockerfile.frontend` và `deploy/crm/Dockerfile.frontend`: Bổ sung `COPY apps/ceohn10_app_fe/public/. ./apps/ceohn10_app_fe/.output/public/`, đảm bảo `app-icon.png` và toàn bộ static assets luôn có mặt.
+      - Bổ sung script `postbuild` trong `package.json` tự động đồng bộ `public/` sang `.output/public/`.
+      - Cập nhật `deploy/ssl/nginx.conf`: Thêm location block phục vụ trực tiếp cho `app-icon.png`, `favicon.ico`, `manifest.webmanifest`, `icons/`.
+      - Cập nhật `deploy/crm/docker-compose.yml` bổ sung alias `ceohn10-crm-backend-prod`.
+      - Cập nhật `.github/workflows/auto-deploy-subdomains.yml` build đầy đủ các image tag `ceohn10-crm-frontend` và `ceohn10-crm-backend`.
+  - **3. Kiểm Tra Chất Lượng Code Tuyệt Đối (Strict Zero-Error)**:
+    * Backend `apps/ceohn10_app_be` type-check: **Exit code 0 (0 errors)**.
+    * Frontend `apps/ceohn10_app_fe` type-check: **Exit code 0 (0 errors)**.
+    * Tuân thủ nghiêm ngặt Rule 0 (CSDL chuẩn `113.20.107.184:6432`) và Rule 1 (Tuyệt đối KHÔNG tự ý `git commit` / `git push`).
+
 - **Bản cập nhật ngày 19/11/2026 (v12.35): Khắc Phục Triệt Để Lỗi Chức Năng Giữa Domain Production & Localhost (SSR Network Isolation Trong Docker, Chia Sẻ Cookie Domain `.viconnect.vn`, Chấm Dứt Fallback Crash Supabase, Cung Cấp Client-Side Direct REST Fallback & Chuẩn Hóa Domain QR)**:
   - **1. Phân Tích Nguyên Nhân Gốc Rễ Tại Sao Localhost Chạy Tốt Còn Domain Lại Lỗi**:
     * **Root Cause 1 (Docker Container SSR Network Isolation)**: Phía frontend SSR (Nitro / Server Functions) chạy trong Docker container (`ceohn10-crm-frontend-prod`), hàm `getBaseApiUrl()` trước đây fallback về `http://127.0.0.1:4003`. Ở localhost dev thì cả frontend và backend cùng nằm trên máy chủ host nên `127.0.0.1:4003` chạy được, nhưng trong Docker container frontend thì `127.0.0.1:4003` là chính container frontend (không có backend nào chạy tại đó) -> gây lỗi `ECONNREFUSED` trên toàn bộ Server Functions SSR!
@@ -2418,6 +2447,35 @@
      - Tuân thủ nghiêm ngặt STRICT RULE 1: Tuyệt đối không tự động chạy `git push` hay `git commit`.
 
 # System Memory & Architecture
+
+- **Bản cập nhật ngày 19/11/2026 (v12.36): Khắc Phục Triệt Để Sự Cố "Unauthorized: No token provided" & Lỗi Tải Tài Nguyên Trực Tuyến Trên Domain CRM Production (`crm.ceohn10.viconnect.vn`)**:
+  - **1. Phân Tích Nguyên Nhân Gốc Rễ Từ Ảnh Chụp Màn Hình Của Người Dùng**:
+    * **Root Cause 1 (Cơ chế xóa phiên quá tay trong `handleResponse`)**: Trong `apps/ceohn10_app_fe/src/lib/api-client.ts`, khi bất kỳ request nào gặp lỗi `401` (kể cả các truy vấn phụ trợ như `/admin/sidebar-labels`, `/me/active-call`), hàm `handleResponse` đã lập tức xóa sạch `localStorage` và `document.cookie`, khiến token bị mất và các Server Functions (TanStack Start RPC `useServerFn`) tiếp theo gửi `Cookie: ""` lên server dẫn tới lỗi `Unauthorized: No token provided`.
+    * **Root Cause 2 (Lệch pha giữa LocalStorage và Cookie)**: Client-side component lưu token trong `localStorage` và gửi `Authorization: Bearer <token>`, nhưng Server Functions SSR đọc token từ `document.cookie`. Khi cookie bị xóa hoặc hết hạn trong khi token trong `localStorage` vẫn còn hạn, Server Functions bị thiếu token và quăng lỗi.
+    * **Root Cause 3 (Lỗi HTTP2 và Connection Closed trên Static Assets & API)**:
+      - Tệp `app-icon.png` và các icon/manifest tĩnh nằm trong thư mục `apps/ceohn10_app_fe/public`, nhưng Dockerfile chỉ copy `.output` mà không copy `public/` vào `.output/public`, khiến server Nitro không tìm thấy file và gây lỗi `ERR_HTTP2_PROTOCOL_ERROR`.
+      - Trong `docker-compose.yml`, service backend thiếu alias `ceohn10-crm-backend-prod`, và CI/CD workflow build image tag thiếu tên chuẩn `ceohn10-crm-frontend` và `ceohn10-crm-backend`, khiến upstream trong Nginx proxy bị đóng kết nối `ERR_CONNECTION_CLOSED`.
+  - **2. Giải Pháp Khắc Phục Kỹ Thuật Toàn Diện**:
+    * **Bảo vệ phiên làm việc và Tự động Tái Đồng Bộ Cookie (`api-client.ts`)**:
+      - Xây dựng hàm `ensureSessionCookiesSync(token)`: Bất cứ khi nào gọi `getAuthToken()` hoặc trước khi gọi API, tự động kiểm tra và ghi lại `document.cookie` với đầy đủ domain `.viconnect.vn`, đảm bảo Server Functions luôn có cookie xác thực.
+      - Miễn trừ hoàn toàn các API phụ trợ/background polling (`/sidebar-labels`, `/active-call`, `/notifications`, `/permission-matrix`, `/funds-overview`, `/tasks`, `/activity-log`) khỏi cơ chế xóa phiên và redirect.
+      - Kiểm tra tính hợp lệ của JWT token trong `localStorage`: Nếu token chưa hết hạn (`exp > Date.now()`), tuyệt đối không xóa phiên hay redirect sang `/auth`, mà tự động nạp lại cookie và cho phép giao diện hoạt động bình thường.
+    * **Tăng Cường Phòng Vệ Zero-Crash Cho Executive Dashboard (`ExecutiveDashboard.tsx`)**:
+      - Gọi `ensureSessionCookiesSync()` trước khi thực hiện `getStats()` và `getActivity()`.
+      - Bọc an toàn `activityQ` với `try/catch` fallback mảng rỗng `[]`.
+      - Nâng cấp `ErrorState` trong `StateKit.tsx`: Tự động gọi `ensureSessionCookiesSync()` khi người dùng bấm "Thử lại", giúp kết nối lại ngay lập tức mà không cần đăng nhập lại.
+    * **Mở Rộng Bóc Tách Token Trong Server Middleware (`nest-auth-middleware.ts`)**:
+      - Nhận diện thêm các header tùy chỉnh `x-access-token`, `x-vibe-token` và query params `?token=...`.
+    * **Khắc Phục Tài Nguyên Tĩnh & Docker CI/CD**:
+      - Cập nhật cả `deploy/ceohn10/Dockerfile.frontend` và `deploy/crm/Dockerfile.frontend`: Bổ sung `COPY apps/ceohn10_app_fe/public/. ./apps/ceohn10_app_fe/.output/public/`, đảm bảo `app-icon.png` và toàn bộ static assets luôn có mặt.
+      - Bổ sung script `postbuild` trong `package.json` tự động đồng bộ `public/` sang `.output/public/`.
+      - Cập nhật `deploy/ssl/nginx.conf`: Thêm location block phục vụ trực tiếp cho `app-icon.png`, `favicon.ico`, `manifest.webmanifest`, `icons/`.
+      - Cập nhật `deploy/crm/docker-compose.yml` bổ sung alias `ceohn10-crm-backend-prod`.
+      - Cập nhật `.github/workflows/auto-deploy-subdomains.yml` build đầy đủ các image tag `ceohn10-crm-frontend` và `ceohn10-crm-backend`.
+  - **3. Kiểm Tra Chất Lượng Code Tuyệt Đối (Strict Zero-Error)**:
+    * Backend `apps/ceohn10_app_be` type-check: **Exit code 0 (0 errors)**.
+    * Frontend `apps/ceohn10_app_fe` type-check: **Exit code 0 (0 errors)**.
+    * Tuân thủ nghiêm ngặt Rule 0 (CSDL chuẩn `113.20.107.184:6432`) và Rule 1 (Tuyệt đối KHÔNG tự ý `git commit` / `git push`).
 
 - **Bản cập nhật ngày 19/11/2026 (v12.35): Khắc Phục Triệt Để Lỗi Chức Năng Giữa Domain Production & Localhost (SSR Network Isolation Trong Docker, Chia Sẻ Cookie Domain `.viconnect.vn`, Chấm Dứt Fallback Crash Supabase, Cung Cấp Client-Side Direct REST Fallback & Chuẩn Hóa Domain QR)**:
   - **1. Phân Tích Nguyên Nhân Gốc Rễ Tại Sao Localhost Chạy Tốt Còn Domain Lại Lỗi**:
@@ -6001,6 +6059,35 @@
      - Tuân thủ nghiêm ngặt STRICT RULE 1: Tuyệt đối không tự động chạy `git push` hay `git commit`.
 
 # System Memory & Architecture
+
+- **Bản cập nhật ngày 19/11/2026 (v12.36): Khắc Phục Triệt Để Sự Cố "Unauthorized: No token provided" & Lỗi Tải Tài Nguyên Trực Tuyến Trên Domain CRM Production (`crm.ceohn10.viconnect.vn`)**:
+  - **1. Phân Tích Nguyên Nhân Gốc Rễ Từ Ảnh Chụp Màn Hình Của Người Dùng**:
+    * **Root Cause 1 (Cơ chế xóa phiên quá tay trong `handleResponse`)**: Trong `apps/ceohn10_app_fe/src/lib/api-client.ts`, khi bất kỳ request nào gặp lỗi `401` (kể cả các truy vấn phụ trợ như `/admin/sidebar-labels`, `/me/active-call`), hàm `handleResponse` đã lập tức xóa sạch `localStorage` và `document.cookie`, khiến token bị mất và các Server Functions (TanStack Start RPC `useServerFn`) tiếp theo gửi `Cookie: ""` lên server dẫn tới lỗi `Unauthorized: No token provided`.
+    * **Root Cause 2 (Lệch pha giữa LocalStorage và Cookie)**: Client-side component lưu token trong `localStorage` và gửi `Authorization: Bearer <token>`, nhưng Server Functions SSR đọc token từ `document.cookie`. Khi cookie bị xóa hoặc hết hạn trong khi token trong `localStorage` vẫn còn hạn, Server Functions bị thiếu token và quăng lỗi.
+    * **Root Cause 3 (Lỗi HTTP2 và Connection Closed trên Static Assets & API)**:
+      - Tệp `app-icon.png` và các icon/manifest tĩnh nằm trong thư mục `apps/ceohn10_app_fe/public`, nhưng Dockerfile chỉ copy `.output` mà không copy `public/` vào `.output/public`, khiến server Nitro không tìm thấy file và gây lỗi `ERR_HTTP2_PROTOCOL_ERROR`.
+      - Trong `docker-compose.yml`, service backend thiếu alias `ceohn10-crm-backend-prod`, và CI/CD workflow build image tag thiếu tên chuẩn `ceohn10-crm-frontend` và `ceohn10-crm-backend`, khiến upstream trong Nginx proxy bị đóng kết nối `ERR_CONNECTION_CLOSED`.
+  - **2. Giải Pháp Khắc Phục Kỹ Thuật Toàn Diện**:
+    * **Bảo vệ phiên làm việc và Tự động Tái Đồng Bộ Cookie (`api-client.ts`)**:
+      - Xây dựng hàm `ensureSessionCookiesSync(token)`: Bất cứ khi nào gọi `getAuthToken()` hoặc trước khi gọi API, tự động kiểm tra và ghi lại `document.cookie` với đầy đủ domain `.viconnect.vn`, đảm bảo Server Functions luôn có cookie xác thực.
+      - Miễn trừ hoàn toàn các API phụ trợ/background polling (`/sidebar-labels`, `/active-call`, `/notifications`, `/permission-matrix`, `/funds-overview`, `/tasks`, `/activity-log`) khỏi cơ chế xóa phiên và redirect.
+      - Kiểm tra tính hợp lệ của JWT token trong `localStorage`: Nếu token chưa hết hạn (`exp > Date.now()`), tuyệt đối không xóa phiên hay redirect sang `/auth`, mà tự động nạp lại cookie và cho phép giao diện hoạt động bình thường.
+    * **Tăng Cường Phòng Vệ Zero-Crash Cho Executive Dashboard (`ExecutiveDashboard.tsx`)**:
+      - Gọi `ensureSessionCookiesSync()` trước khi thực hiện `getStats()` và `getActivity()`.
+      - Bọc an toàn `activityQ` với `try/catch` fallback mảng rỗng `[]`.
+      - Nâng cấp `ErrorState` trong `StateKit.tsx`: Tự động gọi `ensureSessionCookiesSync()` khi người dùng bấm "Thử lại", giúp kết nối lại ngay lập tức mà không cần đăng nhập lại.
+    * **Mở Rộng Bóc Tách Token Trong Server Middleware (`nest-auth-middleware.ts`)**:
+      - Nhận diện thêm các header tùy chỉnh `x-access-token`, `x-vibe-token` và query params `?token=...`.
+    * **Khắc Phục Tài Nguyên Tĩnh & Docker CI/CD**:
+      - Cập nhật cả `deploy/ceohn10/Dockerfile.frontend` và `deploy/crm/Dockerfile.frontend`: Bổ sung `COPY apps/ceohn10_app_fe/public/. ./apps/ceohn10_app_fe/.output/public/`, đảm bảo `app-icon.png` và toàn bộ static assets luôn có mặt.
+      - Bổ sung script `postbuild` trong `package.json` tự động đồng bộ `public/` sang `.output/public/`.
+      - Cập nhật `deploy/ssl/nginx.conf`: Thêm location block phục vụ trực tiếp cho `app-icon.png`, `favicon.ico`, `manifest.webmanifest`, `icons/`.
+      - Cập nhật `deploy/crm/docker-compose.yml` bổ sung alias `ceohn10-crm-backend-prod`.
+      - Cập nhật `.github/workflows/auto-deploy-subdomains.yml` build đầy đủ các image tag `ceohn10-crm-frontend` và `ceohn10-crm-backend`.
+  - **3. Kiểm Tra Chất Lượng Code Tuyệt Đối (Strict Zero-Error)**:
+    * Backend `apps/ceohn10_app_be` type-check: **Exit code 0 (0 errors)**.
+    * Frontend `apps/ceohn10_app_fe` type-check: **Exit code 0 (0 errors)**.
+    * Tuân thủ nghiêm ngặt Rule 0 (CSDL chuẩn `113.20.107.184:6432`) và Rule 1 (Tuyệt đối KHÔNG tự ý `git commit` / `git push`).
 
 - **Bản cập nhật ngày 19/11/2026 (v12.35): Khắc Phục Triệt Để Lỗi Chức Năng Giữa Domain Production & Localhost (SSR Network Isolation Trong Docker, Chia Sẻ Cookie Domain `.viconnect.vn`, Chấm Dứt Fallback Crash Supabase, Cung Cấp Client-Side Direct REST Fallback & Chuẩn Hóa Domain QR)**:
   - **1. Phân Tích Nguyên Nhân Gốc Rễ Tại Sao Localhost Chạy Tốt Còn Domain Lại Lỗi**:

@@ -9,6 +9,7 @@ import {
   RefreshCw,
 } from "lucide-react";
 import { useT, type TKey } from "@/lib/i18n";
+import { ensureSessionCookiesSync } from "@/lib/api-client";
 
 /** Reusable loading skeleton block. */
 export function Skeleton({ className = "" }: { className?: string }) {
@@ -127,17 +128,28 @@ export function ErrorState({
 }) {
   const t = useT();
   const d = useDefaults("state.error.title", "state.error.desc", title, description);
+  const isAuthError =
+    d.description?.toLowerCase().includes("unauthorized") ||
+    d.description?.toLowerCase().includes("token");
+
+  const displayDesc = isAuthError
+    ? "Phiên làm việc tạm thời gián đoạn hoặc cần xác thực lại. Vui lòng bấm 'Thử lại' để tự động kết nối lại."
+    : d.description;
+
   return (
     <StateView
       tone="danger"
       icon={<AlertTriangle className="h-6 w-6" />}
       title={d.title}
-      description={d.description}
+      description={displayDesc}
       action={
         onRetry ? (
           <button
-            onClick={onRetry}
-            className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            onClick={() => {
+              ensureSessionCookiesSync();
+              onRetry();
+            }}
+            className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring cursor-pointer"
           >
             <RefreshCw className="h-4 w-4" />
             {t("state.error.retry")}
