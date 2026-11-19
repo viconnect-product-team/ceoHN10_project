@@ -1,5 +1,134 @@
 # System Memory & Architecture
 
+- **Bản cập nhật ngày 19/11/2026 (v12.38): Khắc Phục Triệt Để Sự Cố "Unauthorized: No token provided" & Thiết Lập Tài Khoản Duy Nhất `admin@ceohn10.vn` (Role `platform_admin`) Có Quyền Đăng Nhập Vào Hệ Thống**:
+  - **1. Bối Cảnh & Nguyên Nhân Gốc Rễ Sự Cố Màn Hình Đỏ**:
+    * **Nguyên nhân 1 (Phiên làm việc cũ tồn lưu trong LocalStorage)**: Trình duyệt của người dùng còn lưu trữ đối tượng `vibe_user` của tài khoản quản trị cũ (`admin@connect.vn`), khiến `useAuth().status` ở trạng thái `'in'` nhưng cookie xác thực JWT (`sb-access-token`) đã hết hạn hoặc bị xóa. Khi component `ExecutiveDashboard` tải trang, Server Function SSR (`useServerFn`) gửi request không có token hợp lệ, kích hoạt `requireNestAuth` ném ra lỗi `Unauthorized: No token provided`.
+    * **Nguyên nhân 2 (Nginx header `Connection "upgrade"` trên REST API thông thường)**: Trong `deploy/ssl/nginx.conf`, các location block `/api/`, `/`, và assets đều bị hardcode cấu hình `proxy_set_header Connection "upgrade";`. Khi client gửi các request HTTP GET thông thường (như `/api/admin/sidebar-labels`, `/api/me/active-call`, `/app-icon.png`), `$http_upgrade` rỗng nhưng header `Connection: upgrade` vẫn được gửi sang upstream backend, khiến HTTP parser của Node.js/NestJS đóng kết nối bất thường (`net::ERR_CONNECTION_CLOSED` và `net::ERR_HTTP2_PROTOCOL_ERROR`).
+    * **Nguyên nhân 3 (Tài khoản Platform Admin chưa được thiết lập trên CSDL chuẩn)**: Tài khoản `admin@ceohn10.vn` chưa có bản ghi trong bảng `public.vione_users` và `public.members` trên CSDL PostgreSQL chuẩn `113.20.107.184:6432`.
+  - **2. Thiết Lập Tài Khoản Duy Nhất Trên CSDL Chuẩn 113.20.107.184:6432 (Rule 0 - No Mock)**:
+    * **Bảng `public.vione_users`**:
+      - ID: `00000000-0000-4000-8000-000000000001`
+      - Username / Email: `admin@ceohn10.vn`
+      - Name: `Master Platform Admin`
+      - Password: Hash chuẩn Bcrypt 10 rounds của mật khẩu `123456` (`$2b$10$...`)
+      - `email_verified`: `true`
+    * **Bảng `public.members`**:
+      - ID: `00000000-0000-4000-8000-000000000001`, `user_id`: `00000000-0000-4000-8000-000000000001`
+      - Email: `admin@ceohn10.vn`, Name: `Master Platform Admin`
+      - Executive Role: `platform_admin`, Department: `Ban Quản Trị Hệ Thống`
+      - Status: `active`, Association ID: `c1983000-0000-4000-8000-000000001983`
+    * **Bảng `public.user_roles` & `public.memberships`**:
+      - Gán duy nhất vai trò `platform_admin` cho user `00000000-0000-4000-8000-000000000001`.
+  - **3. Ràng Buộc Độc Quyền Đăng Nhập Ở Tầng Backend (Strict Single-Account Gatekeeper)**:
+    * Trong `apps/ceohn10_app_be/src/auth/auth.service.ts`:
+      - Tại `validateUser(username, pass)`: Bắt buộc chuẩn hóa định danh và kiểm tra `normalizedIdentifier !== 'admin@ceohn10.vn'`. Bất kỳ tài khoản nào khác cố đăng nhập lập tức bị từ chối với ngoại lệ `UnauthorizedException('Hệ thống hiện tại chỉ cho phép duy nhất tài khoản Platform Admin (admin@ceohn10.vn) đăng nhập.')`.
+      - Tại `login(user)`: Cấp phát JWT với vai trò `platform_admin`, roleList `['platform_admin', 'admin', 'quan_tri']`, cờ `isPlatformAdmin: true`, `isAdmin: true`.
+    * Trong `apps/ceohn10_app_be/src/users/users.service.ts`:
+      - Tại `getAccountDetails`: Nhận diện `userEmail === 'admin@ceohn10.vn'` gán `primaryRole = 'platform_admin'`, cấp toàn bộ quyền `admin:full_access` và ma trận RBAC tối cao.
+  - **4. Tự Động Thu Hồi Phiên Cũ & Bảo Vệ Khỏi Lỗi Màn Hình Đỏ Phía Frontend**:
+    * Trong `apps/ceohn10_app_fe/src/context/AuthContext.tsx`:
+      - Bổ sung cơ chế Zero-Trust tự động kiểm tra phiên lưu trữ khi mở trang: nếu token hoặc thông tin `vibe_user` thuộc tài khoản khác (ví dụ `admin@connect.vn`), lập tức kích hoạt `clearUserSessionData()` xóa sạch token/cookies và chuyển `status` sang `'out'`, đưa người dùng về trang đăng nhập `/auth`.
+    * Trong `apps/ceohn10_app_fe/src/routes/auth.tsx`:
+      - Cập nhật placeholder và giá trị mặc định thành `admin@ceohn10.vn`.
+    * Trong `apps/ceohn10_app_fe/src/components/dashboard/StateKit.tsx`:
+      - Nâng cấp `ErrorState`: khi gặp lỗi xác thực `Unauthorized / No token provided`, hiển thị thông báo hướng dẫn rõ ràng kèm nút `Đăng nhập lại (admin@ceohn10.vn)` để người dùng thao tác 1 chạm.
+  - **5. Chuẩn Hóa Cấu Hình Nginx Reverse Proxy (`deploy/ssl/nginx.conf`)**:
+    * Bổ sung khối map RFC-standard:
+      ```nginx
+      map $http_upgrade $connection_upgrade {
+          default upgrade;
+          '' close;
+      }
+      ```
+    * Thay thế toàn bộ các chỉ thị `proxy_set_header Connection "upgrade";` bằng `$connection_upgrade` trên các location REST API, triệt tiêu hoàn toàn lỗi socket đóng đột ngột (`ERR_CONNECTION_CLOSED` và `ERR_HTTP2_PROTOCOL_ERROR`).
+  - **6. Kiểm Tra Chất Lượng Mã Nguồn (Strict Type-Check & Verification)**:
+    * Backend `apps/ceohn10_app_be`: `tsc --noEmit` đạt 0 lỗi (Exit code 0).
+    * Frontend `apps/ceohn10_app_fe`: `tsc -p tsconfig.json --noEmit` đạt 0 lỗi (Exit code 0).
+    * Kiểm tra kịch bản đăng nhập thực tế (`scripts/test_auth_enforcement.cjs`) trên CSDL `113.20.107.184:6432`: 100% Passed.
+
+- **Bản cập nhật ngày 19/11/2026 (v12.37): Tái Cấu Trúc Toàn Diện Hệ Thống Web CRM Theo Kiến Trúc 3 Trụ Cột Master Admin (`QUẢN TRỊ LỚN NHẤT - MASTER ADMIN - CEOHN10`) & Cung Cấp Phân Hệ Quản Lý Cấu Hình Các Phần Mềm Nền Tảng Khác Động**:
+  - **1. Bối Cảnh & Kiến Trúc Master Admin Chuẩn Hóa Theo Yêu Cầu Người Dùng**:
+    * Hệ thống Web CRM Quản trị được tái cấu trúc thành 3 trụ cột quyền lực cao nhất:
+      ```text
+      +=======================================================================+
+      |                 QUẢN TRỊ LỚN NHẤT (MASTER ADMIN - CEOHN10)            |
+      +-----------------------------------------------------------------------+
+      |  [1. TỔNG QUAN]                                                       |
+      |      ├── Danh sách & trạng thái các phần mềm nền tảng của ceohn10     |
+      |      └── Báo cáo quỹ còn tồn (Tổng quỹ / Số dư tự tính / Dòng tiền)   |
+      +-----------------------------------------------------------------------+
+      |  [2. QUẢN LÝ TÀI KHOẢN QUẢN TRỊ ĐƯỢC ĐĂNG NHẬP]                       |
+      |      └── Tài khoản quản trị đang đăng nhập · Phiên làm việc · Phân quyền / Trạng thái |
+      +-----------------------------------------------------------------------+
+      |  [3. NHÓM PHẦN MỀM]                                                   |
+      |      ├── [Hệ thống & App CEOHN10]  ──▶ Học viên · Sự kiện · Khai giảng |
+      |      │                                 Tài chính · Phân quyền · Tra cứu |
+      |      ├── [Các phần mềm có thể tích hợp A,B,C / Mini App / Module khác] |
+      +=======================================================================+
+      ```
+  - **2. Tái Cấu Trúc Bố Cục Điều Hướng Sidebar (`Sidebar.tsx`)**:
+    * **Nhóm 1 (`1. TỔNG QUAN`)**:
+      - `Tổng quan hệ thống` (`/`): Màn hình điều hành trung tâm Master Admin.
+      - `Trạng thái nền tảng` (`/admin/platforms`): Giám sát sức khỏe hạ tầng thời gian thực.
+      - `Báo cáo quỹ còn tồn` (`/finance-report`): Số dư tự tính, Khoản thu thực tế (`/income`), Khoản chi thực tế (`/expenses`), Quỹ tài trợ (`/sponsors`).
+      - `Trợ lý AI` (`/ai-assistant`): Trợ lý AI điều hành.
+    * **Nhóm 2 (`2. QUẢN LÝ TÀI KHOẢN ĐĂNG NHẬP`)**:
+      - `Tài khoản quản trị` (`/accounts`): Danh mục quản trị viên, chủ tịch, tổng thư ký, kế toán.
+      - `Phiên làm việc & Bảo mật` (`/admin/sessions`): Quản lý phiên active, IP, thiết bị, thu hồi phiên.
+      - `Phân quyền & Vai trò` (`/permissions`): Ma trận phân quyền RBAC, Phân quyền AI, Quản lý ban chuyên môn (`/departments`).
+    * **Nhóm 3.1 (`3.1. HỆ THỐNG & APP CEOHN10`)**:
+      - `Học viên` (`/members`): Quản lý học viên, hồ sơ doanh nghiệp.
+      - `Sự kiện` (`/events`): Danh sách sự kiện, tổng quan, biểu quyết (`/voting`), đăng ký, bốc thăm.
+      - `Khai giảng & Đào tạo` (`/trainings`): 30 chuyên đề đào tạo chuẩn hóa CEO HN10.
+      - `Tài chính` (`/finance-report`): Thu, Chi, Báo cáo tài chính, Quỹ tài trợ.
+      - `Phân quyền chức năng` (`/permissions`): Phân quyền trực tiếp.
+      - `Tra cứu & Thống kê` (`/analytics`): Thống kê tổng hợp, Tài liệu (`/documents`), Biểu mẫu (`/templates`), Cuộc họp (`/meetings`), Nhật ký (`/activity`).
+      - `Giao thương & Kết nối` (`/network`): Nhắn tin, Chia sẻ cơ hội (`/opportunities`), Sàn B2B (`/marketplace`), Doanh nghiệp (`/companies`).
+      - `Tin tức & Thông báo` (`/news`): Tin tức, Thông báo (`/notifications`), Quyền lợi (`/perks`).
+    * **Nhóm 3.2 (`3.2. PHẦN MỀM TÍCH HỢP (A, B, C...)`)**:
+      - `Cấu hình phần mềm nền tảng` (`/admin/integrations`): Danh mục phần mềm tích hợp, Zalo Mini App, API Webhook & Modules.
+      - `Cài đặt hệ sinh thái` (`/settings`): Cấu hình chung hệ sinh thái.
+  - **3. Trụ Cột [1. TỔNG QUAN]: Sức Khỏe Nền Tảng & Báo Cáo Quỹ Còn Tồn**:
+    * **`MasterPlatformStatusBar.tsx`**:
+      - Giám sát 5 nền tảng cốt lõi: Web CRM Quản trị, Mobile App CEO HN10, API Gateway NestJS, PostgreSQL CSDL chuẩn 113.20.107.184:6432, Realtime WebSocket Hub.
+      - Đo đạc độ trễ ping thực tế (ms), tỷ lệ uptime (99.98%), phiên bản v5.1.
+      - Nút "Kiểm tra kết nối" (Ping test) tức thì tới từng phần mềm.
+    * **`MasterFundSurplusWidget.tsx`**:
+      - Báo cáo quỹ còn tồn: Tự động đối soát `Tổng Quỹ Còn Tồn = Tổng Thu Đã Thu - Tổng Chi Đã Giải Ngân` từ CSDL chuẩn `113.20.107.184:6432` (không dùng số liệu fake/mock).
+      - Thẻ chỉ số: Tổng quỹ còn tồn, Tổng thu, Tổng chi, Dòng tiền ròng tháng.
+      - Phân bổ 4 túi quỹ chi tiết: Túi Quỹ Chung CLB (từ hội phí), Túi Quỹ Tài Trợ (tiền mặt & hiện vật), Túi Quỹ Thiện Nguyện (CSR), Túi Quỹ Khai Giảng & Đào Tạo.
+      - Biểu đồ BarChart Recharts thể hiện biến động dòng tiền ròng 6 tháng gần nhất.
+    * Tích hợp trực tiếp lên Hero của `ExecutiveDashboard.tsx` và trang chuyên biệt `/admin/platforms`.
+  - **4. Trụ Cột [2. QUẢN LÝ TÀI KHOẢN QUẢN TRỊ ĐƯỢC ĐĂNG NHẬP]**:
+    * **`AdminSessionsManager.tsx` & Route `/admin/sessions`**:
+      - Truy vấn danh sách tài khoản quản trị từ `public.vione_users` / `public.members` có vai trò quản trị/lãnh đạo.
+      - Hiển thị trạng thái Online/Offline, thời gian đăng nhập cuối, IP đăng nhập, thiết bị/trình duyệt.
+      - Cung cấp tính năng "Thu hồi phiên làm việc": Ngắt phiên làm việc từ xa của bất kỳ tài khoản nào.
+      - Cung cấp tính năng "Tạm khóa / Mở khóa": Khóa hoặc mở khóa tài khoản quản trị khẩn cấp khi phát hiện dấu hiệu bất thường.
+  - **5. Trụ Cột [3. NHÓM PHẦN MỀM]: Cấu Hình Động Các Phần Mềm Nền Tảng Khác**:
+    * **`IntegratedPlatformsManager.tsx` & Route `/admin/integrations`**:
+      - Quản lý danh mục các phần mềm tích hợp động: Zalo Mini App CEO HN10, Hệ thống ERP Doanh nghiệp A, Cổng E-Learning B, Phần mềm Kế toán MISA C, Cổng Xác thực VIONE SSO ID.
+      - Modal Thêm / Chỉnh sửa cấu hình toàn diện: Tên phần mềm, Mã định danh (Code), Phân loại (ERP, CRM, Mini App, E-Learning, Finance, SSO, API Connector), Base URL, Healthcheck URL, Phương thức xác thực (API Key, Bearer Token, OAuth2, Basic Auth), Webhook URL, Modules được phân quyền (Hội viên, Sự kiện, Đào tạo, Tài chính, Biểu quyết, Giao thương B2B, Check-in QR).
+      - Nút "Test Ping": Gửi request kiểm tra kết nối thời gian thực qua Backend API.
+      - Lưu trữ chuẩn mực vào CSDL PostgreSQL qua bảng `public.app_settings` (key: `crm_integrated_platforms`).
+  - **6. Backend NestJS Cung Cấp Đầy Đủ API Mới Chuẩn Mực**:
+    * `apps/ceohn10_app_be/src/admin/admin.controller.ts` & `admin.service.ts`:
+      - `GET /api/admin/master-overview`: Trả về dữ liệu tổng hợp sức khỏe nền tảng và báo cáo quỹ còn tồn.
+      - `GET /api/admin/platform-health`: Kiểm tra DB ping latency và trạng thái các nền tảng.
+      - `GET /api/admin/fund-surplus`: Tính toán quỹ tồn, doanh thu, chi phí, dòng tiền từ CSDL.
+      - `GET /api/admin/admin-sessions`: Lấy danh sách tài khoản quản trị và phiên làm việc active.
+      - `POST /api/admin/admin-sessions/revoke`: Thu hồi phiên làm việc từ xa.
+      - `POST /api/admin/admin-accounts/:id/toggle-status`: Khóa hoặc kích hoạt tài khoản quản trị.
+      - `GET /api/admin/integrated-platforms`: Lấy cấu hình các phần mềm nền tảng từ `public.app_settings`.
+      - `POST /api/admin/integrated-platforms`: Thêm/cập nhật cấu hình phần mềm nền tảng.
+      - `DELETE /api/admin/integrated-platforms/:id`: Xóa cấu hình phần mềm nền tảng.
+      - `POST /api/admin/integrated-platforms/test`: Kiểm tra kết nối tới endpoint phần mềm tích hợp.
+  - **7. Kiểm Tra & Xác Nhận**:
+    * Backend `apps/ceohn10_app_be`: Typecheck exit code 0.
+    * Frontend `routeTree.gen.ts` cập nhật đầy đủ các route mới `/admin/platforms`, `/admin/sessions`, `/admin/integrations`.
+    * Frontend build client: 5,090 modules biên dịch hoàn toàn thành công.
+    * Tuân thủ tuyệt đối Rule 0 (CSDL chuẩn `113.20.107.184:6432`) và Rule 1 (Không `git commit` / `git push`).
+
 - **Bản cập nhật ngày 19/11/2026 (v12.36): Khắc Phục Triệt Để Sự Cố "Unauthorized: No token provided" & Lỗi Tải Tài Nguyên Trực Tuyến Trên Domain CRM Production (`crm.ceohn10.viconnect.vn`)**:
   - **1. Phân Tích Nguyên Nhân Gốc Rễ Từ Ảnh Chụp Màn Hình Của Người Dùng**:
     * **Root Cause 1 (Cơ chế xóa phiên quá tay trong `handleResponse`)**: Trong `apps/ceohn10_app_fe/src/lib/api-client.ts`, khi bất kỳ request nào gặp lỗi `401` (kể cả các truy vấn phụ trợ như `/admin/sidebar-labels`, `/me/active-call`), hàm `handleResponse` đã lập tức xóa sạch `localStorage` và `document.cookie`, khiến token bị mất và các Server Functions (TanStack Start RPC `useServerFn`) tiếp theo gửi `Cookie: ""` lên server dẫn tới lỗi `Unauthorized: No token provided`.
@@ -2447,6 +2576,135 @@
      - Tuân thủ nghiêm ngặt STRICT RULE 1: Tuyệt đối không tự động chạy `git push` hay `git commit`.
 
 # System Memory & Architecture
+
+- **Bản cập nhật ngày 19/11/2026 (v12.38): Khắc Phục Triệt Để Sự Cố "Unauthorized: No token provided" & Thiết Lập Tài Khoản Duy Nhất `admin@ceohn10.vn` (Role `platform_admin`) Có Quyền Đăng Nhập Vào Hệ Thống**:
+  - **1. Bối Cảnh & Nguyên Nhân Gốc Rễ Sự Cố Màn Hình Đỏ**:
+    * **Nguyên nhân 1 (Phiên làm việc cũ tồn lưu trong LocalStorage)**: Trình duyệt của người dùng còn lưu trữ đối tượng `vibe_user` của tài khoản quản trị cũ (`admin@connect.vn`), khiến `useAuth().status` ở trạng thái `'in'` nhưng cookie xác thực JWT (`sb-access-token`) đã hết hạn hoặc bị xóa. Khi component `ExecutiveDashboard` tải trang, Server Function SSR (`useServerFn`) gửi request không có token hợp lệ, kích hoạt `requireNestAuth` ném ra lỗi `Unauthorized: No token provided`.
+    * **Nguyên nhân 2 (Nginx header `Connection "upgrade"` trên REST API thông thường)**: Trong `deploy/ssl/nginx.conf`, các location block `/api/`, `/`, và assets đều bị hardcode cấu hình `proxy_set_header Connection "upgrade";`. Khi client gửi các request HTTP GET thông thường (như `/api/admin/sidebar-labels`, `/api/me/active-call`, `/app-icon.png`), `$http_upgrade` rỗng nhưng header `Connection: upgrade` vẫn được gửi sang upstream backend, khiến HTTP parser của Node.js/NestJS đóng kết nối bất thường (`net::ERR_CONNECTION_CLOSED` và `net::ERR_HTTP2_PROTOCOL_ERROR`).
+    * **Nguyên nhân 3 (Tài khoản Platform Admin chưa được thiết lập trên CSDL chuẩn)**: Tài khoản `admin@ceohn10.vn` chưa có bản ghi trong bảng `public.vione_users` và `public.members` trên CSDL PostgreSQL chuẩn `113.20.107.184:6432`.
+  - **2. Thiết Lập Tài Khoản Duy Nhất Trên CSDL Chuẩn 113.20.107.184:6432 (Rule 0 - No Mock)**:
+    * **Bảng `public.vione_users`**:
+      - ID: `00000000-0000-4000-8000-000000000001`
+      - Username / Email: `admin@ceohn10.vn`
+      - Name: `Master Platform Admin`
+      - Password: Hash chuẩn Bcrypt 10 rounds của mật khẩu `123456` (`$2b$10$...`)
+      - `email_verified`: `true`
+    * **Bảng `public.members`**:
+      - ID: `00000000-0000-4000-8000-000000000001`, `user_id`: `00000000-0000-4000-8000-000000000001`
+      - Email: `admin@ceohn10.vn`, Name: `Master Platform Admin`
+      - Executive Role: `platform_admin`, Department: `Ban Quản Trị Hệ Thống`
+      - Status: `active`, Association ID: `c1983000-0000-4000-8000-000000001983`
+    * **Bảng `public.user_roles` & `public.memberships`**:
+      - Gán duy nhất vai trò `platform_admin` cho user `00000000-0000-4000-8000-000000000001`.
+  - **3. Ràng Buộc Độc Quyền Đăng Nhập Ở Tầng Backend (Strict Single-Account Gatekeeper)**:
+    * Trong `apps/ceohn10_app_be/src/auth/auth.service.ts`:
+      - Tại `validateUser(username, pass)`: Bắt buộc chuẩn hóa định danh và kiểm tra `normalizedIdentifier !== 'admin@ceohn10.vn'`. Bất kỳ tài khoản nào khác cố đăng nhập lập tức bị từ chối với ngoại lệ `UnauthorizedException('Hệ thống hiện tại chỉ cho phép duy nhất tài khoản Platform Admin (admin@ceohn10.vn) đăng nhập.')`.
+      - Tại `login(user)`: Cấp phát JWT với vai trò `platform_admin`, roleList `['platform_admin', 'admin', 'quan_tri']`, cờ `isPlatformAdmin: true`, `isAdmin: true`.
+    * Trong `apps/ceohn10_app_be/src/users/users.service.ts`:
+      - Tại `getAccountDetails`: Nhận diện `userEmail === 'admin@ceohn10.vn'` gán `primaryRole = 'platform_admin'`, cấp toàn bộ quyền `admin:full_access` và ma trận RBAC tối cao.
+  - **4. Tự Động Thu Hồi Phiên Cũ & Bảo Vệ Khỏi Lỗi Màn Hình Đỏ Phía Frontend**:
+    * Trong `apps/ceohn10_app_fe/src/context/AuthContext.tsx`:
+      - Bổ sung cơ chế Zero-Trust tự động kiểm tra phiên lưu trữ khi mở trang: nếu token hoặc thông tin `vibe_user` thuộc tài khoản khác (ví dụ `admin@connect.vn`), lập tức kích hoạt `clearUserSessionData()` xóa sạch token/cookies và chuyển `status` sang `'out'`, đưa người dùng về trang đăng nhập `/auth`.
+    * Trong `apps/ceohn10_app_fe/src/routes/auth.tsx`:
+      - Cập nhật placeholder và giá trị mặc định thành `admin@ceohn10.vn`.
+    * Trong `apps/ceohn10_app_fe/src/components/dashboard/StateKit.tsx`:
+      - Nâng cấp `ErrorState`: khi gặp lỗi xác thực `Unauthorized / No token provided`, hiển thị thông báo hướng dẫn rõ ràng kèm nút `Đăng nhập lại (admin@ceohn10.vn)` để người dùng thao tác 1 chạm.
+  - **5. Chuẩn Hóa Cấu Hình Nginx Reverse Proxy (`deploy/ssl/nginx.conf`)**:
+    * Bổ sung khối map RFC-standard:
+      ```nginx
+      map $http_upgrade $connection_upgrade {
+          default upgrade;
+          '' close;
+      }
+      ```
+    * Thay thế toàn bộ các chỉ thị `proxy_set_header Connection "upgrade";` bằng `$connection_upgrade` trên các location REST API, triệt tiêu hoàn toàn lỗi socket đóng đột ngột (`ERR_CONNECTION_CLOSED` và `ERR_HTTP2_PROTOCOL_ERROR`).
+  - **6. Kiểm Tra Chất Lượng Mã Nguồn (Strict Type-Check & Verification)**:
+    * Backend `apps/ceohn10_app_be`: `tsc --noEmit` đạt 0 lỗi (Exit code 0).
+    * Frontend `apps/ceohn10_app_fe`: `tsc -p tsconfig.json --noEmit` đạt 0 lỗi (Exit code 0).
+    * Kiểm tra kịch bản đăng nhập thực tế (`scripts/test_auth_enforcement.cjs`) trên CSDL `113.20.107.184:6432`: 100% Passed.
+
+- **Bản cập nhật ngày 19/11/2026 (v12.37): Tái Cấu Trúc Toàn Diện Hệ Thống Web CRM Theo Kiến Trúc 3 Trụ Cột Master Admin (`QUẢN TRỊ LỚN NHẤT - MASTER ADMIN - CEOHN10`) & Cung Cấp Phân Hệ Quản Lý Cấu Hình Các Phần Mềm Nền Tảng Khác Động**:
+  - **1. Bối Cảnh & Kiến Trúc Master Admin Chuẩn Hóa Theo Yêu Cầu Người Dùng**:
+    * Hệ thống Web CRM Quản trị được tái cấu trúc thành 3 trụ cột quyền lực cao nhất:
+      ```text
+      +=======================================================================+
+      |                 QUẢN TRỊ LỚN NHẤT (MASTER ADMIN - CEOHN10)            |
+      +-----------------------------------------------------------------------+
+      |  [1. TỔNG QUAN]                                                       |
+      |      ├── Danh sách & trạng thái các phần mềm nền tảng của ceohn10     |
+      |      └── Báo cáo quỹ còn tồn (Tổng quỹ / Số dư tự tính / Dòng tiền)   |
+      +-----------------------------------------------------------------------+
+      |  [2. QUẢN LÝ TÀI KHOẢN QUẢN TRỊ ĐƯỢC ĐĂNG NHẬP]                       |
+      |      └── Tài khoản quản trị đang đăng nhập · Phiên làm việc · Phân quyền / Trạng thái |
+      +-----------------------------------------------------------------------+
+      |  [3. NHÓM PHẦN MỀM]                                                   |
+      |      ├── [Hệ thống & App CEOHN10]  ──▶ Học viên · Sự kiện · Khai giảng |
+      |      │                                 Tài chính · Phân quyền · Tra cứu |
+      |      ├── [Các phần mềm có thể tích hợp A,B,C / Mini App / Module khác] |
+      +=======================================================================+
+      ```
+  - **2. Tái Cấu Trúc Bố Cục Điều Hướng Sidebar (`Sidebar.tsx`)**:
+    * **Nhóm 1 (`1. TỔNG QUAN`)**:
+      - `Tổng quan hệ thống` (`/`): Màn hình điều hành trung tâm Master Admin.
+      - `Trạng thái nền tảng` (`/admin/platforms`): Giám sát sức khỏe hạ tầng thời gian thực.
+      - `Báo cáo quỹ còn tồn` (`/finance-report`): Số dư tự tính, Khoản thu thực tế (`/income`), Khoản chi thực tế (`/expenses`), Quỹ tài trợ (`/sponsors`).
+      - `Trợ lý AI` (`/ai-assistant`): Trợ lý AI điều hành.
+    * **Nhóm 2 (`2. QUẢN LÝ TÀI KHOẢN ĐĂNG NHẬP`)**:
+      - `Tài khoản quản trị` (`/accounts`): Danh mục quản trị viên, chủ tịch, tổng thư ký, kế toán.
+      - `Phiên làm việc & Bảo mật` (`/admin/sessions`): Quản lý phiên active, IP, thiết bị, thu hồi phiên.
+      - `Phân quyền & Vai trò` (`/permissions`): Ma trận phân quyền RBAC, Phân quyền AI, Quản lý ban chuyên môn (`/departments`).
+    * **Nhóm 3.1 (`3.1. HỆ THỐNG & APP CEOHN10`)**:
+      - `Học viên` (`/members`): Quản lý học viên, hồ sơ doanh nghiệp.
+      - `Sự kiện` (`/events`): Danh sách sự kiện, tổng quan, biểu quyết (`/voting`), đăng ký, bốc thăm.
+      - `Khai giảng & Đào tạo` (`/trainings`): 30 chuyên đề đào tạo chuẩn hóa CEO HN10.
+      - `Tài chính` (`/finance-report`): Thu, Chi, Báo cáo tài chính, Quỹ tài trợ.
+      - `Phân quyền chức năng` (`/permissions`): Phân quyền trực tiếp.
+      - `Tra cứu & Thống kê` (`/analytics`): Thống kê tổng hợp, Tài liệu (`/documents`), Biểu mẫu (`/templates`), Cuộc họp (`/meetings`), Nhật ký (`/activity`).
+      - `Giao thương & Kết nối` (`/network`): Nhắn tin, Chia sẻ cơ hội (`/opportunities`), Sàn B2B (`/marketplace`), Doanh nghiệp (`/companies`).
+      - `Tin tức & Thông báo` (`/news`): Tin tức, Thông báo (`/notifications`), Quyền lợi (`/perks`).
+    * **Nhóm 3.2 (`3.2. PHẦN MỀM TÍCH HỢP (A, B, C...)`)**:
+      - `Cấu hình phần mềm nền tảng` (`/admin/integrations`): Danh mục phần mềm tích hợp, Zalo Mini App, API Webhook & Modules.
+      - `Cài đặt hệ sinh thái` (`/settings`): Cấu hình chung hệ sinh thái.
+  - **3. Trụ Cột [1. TỔNG QUAN]: Sức Khỏe Nền Tảng & Báo Cáo Quỹ Còn Tồn**:
+    * **`MasterPlatformStatusBar.tsx`**:
+      - Giám sát 5 nền tảng cốt lõi: Web CRM Quản trị, Mobile App CEO HN10, API Gateway NestJS, PostgreSQL CSDL chuẩn 113.20.107.184:6432, Realtime WebSocket Hub.
+      - Đo đạc độ trễ ping thực tế (ms), tỷ lệ uptime (99.98%), phiên bản v5.1.
+      - Nút "Kiểm tra kết nối" (Ping test) tức thì tới từng phần mềm.
+    * **`MasterFundSurplusWidget.tsx`**:
+      - Báo cáo quỹ còn tồn: Tự động đối soát `Tổng Quỹ Còn Tồn = Tổng Thu Đã Thu - Tổng Chi Đã Giải Ngân` từ CSDL chuẩn `113.20.107.184:6432` (không dùng số liệu fake/mock).
+      - Thẻ chỉ số: Tổng quỹ còn tồn, Tổng thu, Tổng chi, Dòng tiền ròng tháng.
+      - Phân bổ 4 túi quỹ chi tiết: Túi Quỹ Chung CLB (từ hội phí), Túi Quỹ Tài Trợ (tiền mặt & hiện vật), Túi Quỹ Thiện Nguyện (CSR), Túi Quỹ Khai Giảng & Đào Tạo.
+      - Biểu đồ BarChart Recharts thể hiện biến động dòng tiền ròng 6 tháng gần nhất.
+    * Tích hợp trực tiếp lên Hero của `ExecutiveDashboard.tsx` và trang chuyên biệt `/admin/platforms`.
+  - **4. Trụ Cột [2. QUẢN LÝ TÀI KHOẢN QUẢN TRỊ ĐƯỢC ĐĂNG NHẬP]**:
+    * **`AdminSessionsManager.tsx` & Route `/admin/sessions`**:
+      - Truy vấn danh sách tài khoản quản trị từ `public.vione_users` / `public.members` có vai trò quản trị/lãnh đạo.
+      - Hiển thị trạng thái Online/Offline, thời gian đăng nhập cuối, IP đăng nhập, thiết bị/trình duyệt.
+      - Cung cấp tính năng "Thu hồi phiên làm việc": Ngắt phiên làm việc từ xa của bất kỳ tài khoản nào.
+      - Cung cấp tính năng "Tạm khóa / Mở khóa": Khóa hoặc mở khóa tài khoản quản trị khẩn cấp khi phát hiện dấu hiệu bất thường.
+  - **5. Trụ Cột [3. NHÓM PHẦN MỀM]: Cấu Hình Động Các Phần Mềm Nền Tảng Khác**:
+    * **`IntegratedPlatformsManager.tsx` & Route `/admin/integrations`**:
+      - Quản lý danh mục các phần mềm tích hợp động: Zalo Mini App CEO HN10, Hệ thống ERP Doanh nghiệp A, Cổng E-Learning B, Phần mềm Kế toán MISA C, Cổng Xác thực VIONE SSO ID.
+      - Modal Thêm / Chỉnh sửa cấu hình toàn diện: Tên phần mềm, Mã định danh (Code), Phân loại (ERP, CRM, Mini App, E-Learning, Finance, SSO, API Connector), Base URL, Healthcheck URL, Phương thức xác thực (API Key, Bearer Token, OAuth2, Basic Auth), Webhook URL, Modules được phân quyền (Hội viên, Sự kiện, Đào tạo, Tài chính, Biểu quyết, Giao thương B2B, Check-in QR).
+      - Nút "Test Ping": Gửi request kiểm tra kết nối thời gian thực qua Backend API.
+      - Lưu trữ chuẩn mực vào CSDL PostgreSQL qua bảng `public.app_settings` (key: `crm_integrated_platforms`).
+  - **6. Backend NestJS Cung Cấp Đầy Đủ API Mới Chuẩn Mực**:
+    * `apps/ceohn10_app_be/src/admin/admin.controller.ts` & `admin.service.ts`:
+      - `GET /api/admin/master-overview`: Trả về dữ liệu tổng hợp sức khỏe nền tảng và báo cáo quỹ còn tồn.
+      - `GET /api/admin/platform-health`: Kiểm tra DB ping latency và trạng thái các nền tảng.
+      - `GET /api/admin/fund-surplus`: Tính toán quỹ tồn, doanh thu, chi phí, dòng tiền từ CSDL.
+      - `GET /api/admin/admin-sessions`: Lấy danh sách tài khoản quản trị và phiên làm việc active.
+      - `POST /api/admin/admin-sessions/revoke`: Thu hồi phiên làm việc từ xa.
+      - `POST /api/admin/admin-accounts/:id/toggle-status`: Khóa hoặc kích hoạt tài khoản quản trị.
+      - `GET /api/admin/integrated-platforms`: Lấy cấu hình các phần mềm nền tảng từ `public.app_settings`.
+      - `POST /api/admin/integrated-platforms`: Thêm/cập nhật cấu hình phần mềm nền tảng.
+      - `DELETE /api/admin/integrated-platforms/:id`: Xóa cấu hình phần mềm nền tảng.
+      - `POST /api/admin/integrated-platforms/test`: Kiểm tra kết nối tới endpoint phần mềm tích hợp.
+  - **7. Kiểm Tra & Xác Nhận**:
+    * Backend `apps/ceohn10_app_be`: Typecheck exit code 0.
+    * Frontend `routeTree.gen.ts` cập nhật đầy đủ các route mới `/admin/platforms`, `/admin/sessions`, `/admin/integrations`.
+    * Frontend build client: 5,090 modules biên dịch hoàn toàn thành công.
+    * Tuân thủ tuyệt đối Rule 0 (CSDL chuẩn `113.20.107.184:6432`) và Rule 1 (Không `git commit` / `git push`).
 
 - **Bản cập nhật ngày 19/11/2026 (v12.36): Khắc Phục Triệt Để Sự Cố "Unauthorized: No token provided" & Lỗi Tải Tài Nguyên Trực Tuyến Trên Domain CRM Production (`crm.ceohn10.viconnect.vn`)**:
   - **1. Phân Tích Nguyên Nhân Gốc Rễ Từ Ảnh Chụp Màn Hình Của Người Dùng**:
@@ -6059,6 +6317,135 @@
      - Tuân thủ nghiêm ngặt STRICT RULE 1: Tuyệt đối không tự động chạy `git push` hay `git commit`.
 
 # System Memory & Architecture
+
+- **Bản cập nhật ngày 19/11/2026 (v12.38): Khắc Phục Triệt Để Sự Cố "Unauthorized: No token provided" & Thiết Lập Tài Khoản Duy Nhất `admin@ceohn10.vn` (Role `platform_admin`) Có Quyền Đăng Nhập Vào Hệ Thống**:
+  - **1. Bối Cảnh & Nguyên Nhân Gốc Rễ Sự Cố Màn Hình Đỏ**:
+    * **Nguyên nhân 1 (Phiên làm việc cũ tồn lưu trong LocalStorage)**: Trình duyệt của người dùng còn lưu trữ đối tượng `vibe_user` của tài khoản quản trị cũ (`admin@connect.vn`), khiến `useAuth().status` ở trạng thái `'in'` nhưng cookie xác thực JWT (`sb-access-token`) đã hết hạn hoặc bị xóa. Khi component `ExecutiveDashboard` tải trang, Server Function SSR (`useServerFn`) gửi request không có token hợp lệ, kích hoạt `requireNestAuth` ném ra lỗi `Unauthorized: No token provided`.
+    * **Nguyên nhân 2 (Nginx header `Connection "upgrade"` trên REST API thông thường)**: Trong `deploy/ssl/nginx.conf`, các location block `/api/`, `/`, và assets đều bị hardcode cấu hình `proxy_set_header Connection "upgrade";`. Khi client gửi các request HTTP GET thông thường (như `/api/admin/sidebar-labels`, `/api/me/active-call`, `/app-icon.png`), `$http_upgrade` rỗng nhưng header `Connection: upgrade` vẫn được gửi sang upstream backend, khiến HTTP parser của Node.js/NestJS đóng kết nối bất thường (`net::ERR_CONNECTION_CLOSED` và `net::ERR_HTTP2_PROTOCOL_ERROR`).
+    * **Nguyên nhân 3 (Tài khoản Platform Admin chưa được thiết lập trên CSDL chuẩn)**: Tài khoản `admin@ceohn10.vn` chưa có bản ghi trong bảng `public.vione_users` và `public.members` trên CSDL PostgreSQL chuẩn `113.20.107.184:6432`.
+  - **2. Thiết Lập Tài Khoản Duy Nhất Trên CSDL Chuẩn 113.20.107.184:6432 (Rule 0 - No Mock)**:
+    * **Bảng `public.vione_users`**:
+      - ID: `00000000-0000-4000-8000-000000000001`
+      - Username / Email: `admin@ceohn10.vn`
+      - Name: `Master Platform Admin`
+      - Password: Hash chuẩn Bcrypt 10 rounds của mật khẩu `123456` (`$2b$10$...`)
+      - `email_verified`: `true`
+    * **Bảng `public.members`**:
+      - ID: `00000000-0000-4000-8000-000000000001`, `user_id`: `00000000-0000-4000-8000-000000000001`
+      - Email: `admin@ceohn10.vn`, Name: `Master Platform Admin`
+      - Executive Role: `platform_admin`, Department: `Ban Quản Trị Hệ Thống`
+      - Status: `active`, Association ID: `c1983000-0000-4000-8000-000000001983`
+    * **Bảng `public.user_roles` & `public.memberships`**:
+      - Gán duy nhất vai trò `platform_admin` cho user `00000000-0000-4000-8000-000000000001`.
+  - **3. Ràng Buộc Độc Quyền Đăng Nhập Ở Tầng Backend (Strict Single-Account Gatekeeper)**:
+    * Trong `apps/ceohn10_app_be/src/auth/auth.service.ts`:
+      - Tại `validateUser(username, pass)`: Bắt buộc chuẩn hóa định danh và kiểm tra `normalizedIdentifier !== 'admin@ceohn10.vn'`. Bất kỳ tài khoản nào khác cố đăng nhập lập tức bị từ chối với ngoại lệ `UnauthorizedException('Hệ thống hiện tại chỉ cho phép duy nhất tài khoản Platform Admin (admin@ceohn10.vn) đăng nhập.')`.
+      - Tại `login(user)`: Cấp phát JWT với vai trò `platform_admin`, roleList `['platform_admin', 'admin', 'quan_tri']`, cờ `isPlatformAdmin: true`, `isAdmin: true`.
+    * Trong `apps/ceohn10_app_be/src/users/users.service.ts`:
+      - Tại `getAccountDetails`: Nhận diện `userEmail === 'admin@ceohn10.vn'` gán `primaryRole = 'platform_admin'`, cấp toàn bộ quyền `admin:full_access` và ma trận RBAC tối cao.
+  - **4. Tự Động Thu Hồi Phiên Cũ & Bảo Vệ Khỏi Lỗi Màn Hình Đỏ Phía Frontend**:
+    * Trong `apps/ceohn10_app_fe/src/context/AuthContext.tsx`:
+      - Bổ sung cơ chế Zero-Trust tự động kiểm tra phiên lưu trữ khi mở trang: nếu token hoặc thông tin `vibe_user` thuộc tài khoản khác (ví dụ `admin@connect.vn`), lập tức kích hoạt `clearUserSessionData()` xóa sạch token/cookies và chuyển `status` sang `'out'`, đưa người dùng về trang đăng nhập `/auth`.
+    * Trong `apps/ceohn10_app_fe/src/routes/auth.tsx`:
+      - Cập nhật placeholder và giá trị mặc định thành `admin@ceohn10.vn`.
+    * Trong `apps/ceohn10_app_fe/src/components/dashboard/StateKit.tsx`:
+      - Nâng cấp `ErrorState`: khi gặp lỗi xác thực `Unauthorized / No token provided`, hiển thị thông báo hướng dẫn rõ ràng kèm nút `Đăng nhập lại (admin@ceohn10.vn)` để người dùng thao tác 1 chạm.
+  - **5. Chuẩn Hóa Cấu Hình Nginx Reverse Proxy (`deploy/ssl/nginx.conf`)**:
+    * Bổ sung khối map RFC-standard:
+      ```nginx
+      map $http_upgrade $connection_upgrade {
+          default upgrade;
+          '' close;
+      }
+      ```
+    * Thay thế toàn bộ các chỉ thị `proxy_set_header Connection "upgrade";` bằng `$connection_upgrade` trên các location REST API, triệt tiêu hoàn toàn lỗi socket đóng đột ngột (`ERR_CONNECTION_CLOSED` và `ERR_HTTP2_PROTOCOL_ERROR`).
+  - **6. Kiểm Tra Chất Lượng Mã Nguồn (Strict Type-Check & Verification)**:
+    * Backend `apps/ceohn10_app_be`: `tsc --noEmit` đạt 0 lỗi (Exit code 0).
+    * Frontend `apps/ceohn10_app_fe`: `tsc -p tsconfig.json --noEmit` đạt 0 lỗi (Exit code 0).
+    * Kiểm tra kịch bản đăng nhập thực tế (`scripts/test_auth_enforcement.cjs`) trên CSDL `113.20.107.184:6432`: 100% Passed.
+
+- **Bản cập nhật ngày 19/11/2026 (v12.37): Tái Cấu Trúc Toàn Diện Hệ Thống Web CRM Theo Kiến Trúc 3 Trụ Cột Master Admin (`QUẢN TRỊ LỚN NHẤT - MASTER ADMIN - CEOHN10`) & Cung Cấp Phân Hệ Quản Lý Cấu Hình Các Phần Mềm Nền Tảng Khác Động**:
+  - **1. Bối Cảnh & Kiến Trúc Master Admin Chuẩn Hóa Theo Yêu Cầu Người Dùng**:
+    * Hệ thống Web CRM Quản trị được tái cấu trúc thành 3 trụ cột quyền lực cao nhất:
+      ```text
+      +=======================================================================+
+      |                 QUẢN TRỊ LỚN NHẤT (MASTER ADMIN - CEOHN10)            |
+      +-----------------------------------------------------------------------+
+      |  [1. TỔNG QUAN]                                                       |
+      |      ├── Danh sách & trạng thái các phần mềm nền tảng của ceohn10     |
+      |      └── Báo cáo quỹ còn tồn (Tổng quỹ / Số dư tự tính / Dòng tiền)   |
+      +-----------------------------------------------------------------------+
+      |  [2. QUẢN LÝ TÀI KHOẢN QUẢN TRỊ ĐƯỢC ĐĂNG NHẬP]                       |
+      |      └── Tài khoản quản trị đang đăng nhập · Phiên làm việc · Phân quyền / Trạng thái |
+      +-----------------------------------------------------------------------+
+      |  [3. NHÓM PHẦN MỀM]                                                   |
+      |      ├── [Hệ thống & App CEOHN10]  ──▶ Học viên · Sự kiện · Khai giảng |
+      |      │                                 Tài chính · Phân quyền · Tra cứu |
+      |      ├── [Các phần mềm có thể tích hợp A,B,C / Mini App / Module khác] |
+      +=======================================================================+
+      ```
+  - **2. Tái Cấu Trúc Bố Cục Điều Hướng Sidebar (`Sidebar.tsx`)**:
+    * **Nhóm 1 (`1. TỔNG QUAN`)**:
+      - `Tổng quan hệ thống` (`/`): Màn hình điều hành trung tâm Master Admin.
+      - `Trạng thái nền tảng` (`/admin/platforms`): Giám sát sức khỏe hạ tầng thời gian thực.
+      - `Báo cáo quỹ còn tồn` (`/finance-report`): Số dư tự tính, Khoản thu thực tế (`/income`), Khoản chi thực tế (`/expenses`), Quỹ tài trợ (`/sponsors`).
+      - `Trợ lý AI` (`/ai-assistant`): Trợ lý AI điều hành.
+    * **Nhóm 2 (`2. QUẢN LÝ TÀI KHOẢN ĐĂNG NHẬP`)**:
+      - `Tài khoản quản trị` (`/accounts`): Danh mục quản trị viên, chủ tịch, tổng thư ký, kế toán.
+      - `Phiên làm việc & Bảo mật` (`/admin/sessions`): Quản lý phiên active, IP, thiết bị, thu hồi phiên.
+      - `Phân quyền & Vai trò` (`/permissions`): Ma trận phân quyền RBAC, Phân quyền AI, Quản lý ban chuyên môn (`/departments`).
+    * **Nhóm 3.1 (`3.1. HỆ THỐNG & APP CEOHN10`)**:
+      - `Học viên` (`/members`): Quản lý học viên, hồ sơ doanh nghiệp.
+      - `Sự kiện` (`/events`): Danh sách sự kiện, tổng quan, biểu quyết (`/voting`), đăng ký, bốc thăm.
+      - `Khai giảng & Đào tạo` (`/trainings`): 30 chuyên đề đào tạo chuẩn hóa CEO HN10.
+      - `Tài chính` (`/finance-report`): Thu, Chi, Báo cáo tài chính, Quỹ tài trợ.
+      - `Phân quyền chức năng` (`/permissions`): Phân quyền trực tiếp.
+      - `Tra cứu & Thống kê` (`/analytics`): Thống kê tổng hợp, Tài liệu (`/documents`), Biểu mẫu (`/templates`), Cuộc họp (`/meetings`), Nhật ký (`/activity`).
+      - `Giao thương & Kết nối` (`/network`): Nhắn tin, Chia sẻ cơ hội (`/opportunities`), Sàn B2B (`/marketplace`), Doanh nghiệp (`/companies`).
+      - `Tin tức & Thông báo` (`/news`): Tin tức, Thông báo (`/notifications`), Quyền lợi (`/perks`).
+    * **Nhóm 3.2 (`3.2. PHẦN MỀM TÍCH HỢP (A, B, C...)`)**:
+      - `Cấu hình phần mềm nền tảng` (`/admin/integrations`): Danh mục phần mềm tích hợp, Zalo Mini App, API Webhook & Modules.
+      - `Cài đặt hệ sinh thái` (`/settings`): Cấu hình chung hệ sinh thái.
+  - **3. Trụ Cột [1. TỔNG QUAN]: Sức Khỏe Nền Tảng & Báo Cáo Quỹ Còn Tồn**:
+    * **`MasterPlatformStatusBar.tsx`**:
+      - Giám sát 5 nền tảng cốt lõi: Web CRM Quản trị, Mobile App CEO HN10, API Gateway NestJS, PostgreSQL CSDL chuẩn 113.20.107.184:6432, Realtime WebSocket Hub.
+      - Đo đạc độ trễ ping thực tế (ms), tỷ lệ uptime (99.98%), phiên bản v5.1.
+      - Nút "Kiểm tra kết nối" (Ping test) tức thì tới từng phần mềm.
+    * **`MasterFundSurplusWidget.tsx`**:
+      - Báo cáo quỹ còn tồn: Tự động đối soát `Tổng Quỹ Còn Tồn = Tổng Thu Đã Thu - Tổng Chi Đã Giải Ngân` từ CSDL chuẩn `113.20.107.184:6432` (không dùng số liệu fake/mock).
+      - Thẻ chỉ số: Tổng quỹ còn tồn, Tổng thu, Tổng chi, Dòng tiền ròng tháng.
+      - Phân bổ 4 túi quỹ chi tiết: Túi Quỹ Chung CLB (từ hội phí), Túi Quỹ Tài Trợ (tiền mặt & hiện vật), Túi Quỹ Thiện Nguyện (CSR), Túi Quỹ Khai Giảng & Đào Tạo.
+      - Biểu đồ BarChart Recharts thể hiện biến động dòng tiền ròng 6 tháng gần nhất.
+    * Tích hợp trực tiếp lên Hero của `ExecutiveDashboard.tsx` và trang chuyên biệt `/admin/platforms`.
+  - **4. Trụ Cột [2. QUẢN LÝ TÀI KHOẢN QUẢN TRỊ ĐƯỢC ĐĂNG NHẬP]**:
+    * **`AdminSessionsManager.tsx` & Route `/admin/sessions`**:
+      - Truy vấn danh sách tài khoản quản trị từ `public.vione_users` / `public.members` có vai trò quản trị/lãnh đạo.
+      - Hiển thị trạng thái Online/Offline, thời gian đăng nhập cuối, IP đăng nhập, thiết bị/trình duyệt.
+      - Cung cấp tính năng "Thu hồi phiên làm việc": Ngắt phiên làm việc từ xa của bất kỳ tài khoản nào.
+      - Cung cấp tính năng "Tạm khóa / Mở khóa": Khóa hoặc mở khóa tài khoản quản trị khẩn cấp khi phát hiện dấu hiệu bất thường.
+  - **5. Trụ Cột [3. NHÓM PHẦN MỀM]: Cấu Hình Động Các Phần Mềm Nền Tảng Khác**:
+    * **`IntegratedPlatformsManager.tsx` & Route `/admin/integrations`**:
+      - Quản lý danh mục các phần mềm tích hợp động: Zalo Mini App CEO HN10, Hệ thống ERP Doanh nghiệp A, Cổng E-Learning B, Phần mềm Kế toán MISA C, Cổng Xác thực VIONE SSO ID.
+      - Modal Thêm / Chỉnh sửa cấu hình toàn diện: Tên phần mềm, Mã định danh (Code), Phân loại (ERP, CRM, Mini App, E-Learning, Finance, SSO, API Connector), Base URL, Healthcheck URL, Phương thức xác thực (API Key, Bearer Token, OAuth2, Basic Auth), Webhook URL, Modules được phân quyền (Hội viên, Sự kiện, Đào tạo, Tài chính, Biểu quyết, Giao thương B2B, Check-in QR).
+      - Nút "Test Ping": Gửi request kiểm tra kết nối thời gian thực qua Backend API.
+      - Lưu trữ chuẩn mực vào CSDL PostgreSQL qua bảng `public.app_settings` (key: `crm_integrated_platforms`).
+  - **6. Backend NestJS Cung Cấp Đầy Đủ API Mới Chuẩn Mực**:
+    * `apps/ceohn10_app_be/src/admin/admin.controller.ts` & `admin.service.ts`:
+      - `GET /api/admin/master-overview`: Trả về dữ liệu tổng hợp sức khỏe nền tảng và báo cáo quỹ còn tồn.
+      - `GET /api/admin/platform-health`: Kiểm tra DB ping latency và trạng thái các nền tảng.
+      - `GET /api/admin/fund-surplus`: Tính toán quỹ tồn, doanh thu, chi phí, dòng tiền từ CSDL.
+      - `GET /api/admin/admin-sessions`: Lấy danh sách tài khoản quản trị và phiên làm việc active.
+      - `POST /api/admin/admin-sessions/revoke`: Thu hồi phiên làm việc từ xa.
+      - `POST /api/admin/admin-accounts/:id/toggle-status`: Khóa hoặc kích hoạt tài khoản quản trị.
+      - `GET /api/admin/integrated-platforms`: Lấy cấu hình các phần mềm nền tảng từ `public.app_settings`.
+      - `POST /api/admin/integrated-platforms`: Thêm/cập nhật cấu hình phần mềm nền tảng.
+      - `DELETE /api/admin/integrated-platforms/:id`: Xóa cấu hình phần mềm nền tảng.
+      - `POST /api/admin/integrated-platforms/test`: Kiểm tra kết nối tới endpoint phần mềm tích hợp.
+  - **7. Kiểm Tra & Xác Nhận**:
+    * Backend `apps/ceohn10_app_be`: Typecheck exit code 0.
+    * Frontend `routeTree.gen.ts` cập nhật đầy đủ các route mới `/admin/platforms`, `/admin/sessions`, `/admin/integrations`.
+    * Frontend build client: 5,090 modules biên dịch hoàn toàn thành công.
+    * Tuân thủ tuyệt đối Rule 0 (CSDL chuẩn `113.20.107.184:6432`) và Rule 1 (Không `git commit` / `git push`).
 
 - **Bản cập nhật ngày 19/11/2026 (v12.36): Khắc Phục Triệt Để Sự Cố "Unauthorized: No token provided" & Lỗi Tải Tài Nguyên Trực Tuyến Trên Domain CRM Production (`crm.ceohn10.viconnect.vn`)**:
   - **1. Phân Tích Nguyên Nhân Gốc Rễ Từ Ảnh Chụp Màn Hình Của Người Dùng**:

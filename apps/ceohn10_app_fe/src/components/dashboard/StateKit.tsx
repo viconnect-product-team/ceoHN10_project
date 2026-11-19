@@ -130,10 +130,11 @@ export function ErrorState({
   const d = useDefaults("state.error.title", "state.error.desc", title, description);
   const isAuthError =
     d.description?.toLowerCase().includes("unauthorized") ||
-    d.description?.toLowerCase().includes("token");
+    d.description?.toLowerCase().includes("token") ||
+    d.description?.toLowerCase().includes("no token");
 
   const displayDesc = isAuthError
-    ? "Phiên làm việc tạm thời gián đoạn hoặc cần xác thực lại. Vui lòng bấm 'Thử lại' để tự động kết nối lại."
+    ? "Phiên làm việc đã gián đoạn hoặc chưa đăng nhập. Vui lòng đăng nhập bằng tài khoản Master Platform Admin (admin@ceohn10.vn / 123456)."
     : d.description;
 
   return (
@@ -143,18 +144,33 @@ export function ErrorState({
       title={d.title}
       description={displayDesc}
       action={
-        onRetry ? (
-          <button
-            onClick={() => {
-              ensureSessionCookiesSync();
-              onRetry();
-            }}
-            className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring cursor-pointer"
-          >
-            <RefreshCw className="h-4 w-4" />
-            {t("state.error.retry")}
-          </button>
-        ) : undefined
+        <div className="flex flex-wrap items-center justify-center gap-3">
+          {onRetry && (
+            <button
+              onClick={() => {
+                ensureSessionCookiesSync();
+                onRetry();
+              }}
+              className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring cursor-pointer"
+            >
+              <RefreshCw className="h-4 w-4" />
+              {t("state.error.retry")}
+            </button>
+          )}
+          {isAuthError && (
+            <button
+              type="button"
+              onClick={() => {
+                if (typeof window !== "undefined") {
+                  window.location.href = "/auth?portal=crm";
+                }
+              }}
+              className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring cursor-pointer"
+            >
+              Đăng nhập lại (admin@ceohn10.vn)
+            </button>
+          )}
+        </div>
       }
     />
   );

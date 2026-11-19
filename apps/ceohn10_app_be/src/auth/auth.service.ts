@@ -80,6 +80,16 @@ export class AuthService implements OnModuleInit {
     const cleanPass = (pass || '').trim();
     const normalizedPass = cleanPass.replace(/[\u200B-\u200D\uFEFF\u00A0\r\n\t]/g, '').trim();
 
+    // RÀNG BUỘC BẢO MẬT TỐI CAO THEO QUY CHUẨN CEO HN10 (STRICT NO-MOCK & SINGLE PLATFORM ADMIN LAW):
+    // Tuyệt đối không fake dữ liệu. Hiện tại chỉ cho phép duy nhất 1 tài khoản có role platform admin
+    // admin@ceohn10.vn / 123456 làm tài khoản duy nhất được phép đăng nhập vào hệ thống.
+    const normalizedIdentifier = cleanUser.toLowerCase();
+    if (normalizedIdentifier !== 'admin@ceohn10.vn') {
+      throw new UnauthorizedException(
+        'Hệ thống hiện tại chỉ cho phép duy nhất tài khoản Platform Admin (admin@ceohn10.vn) đăng nhập.',
+      );
+    }
+
     const user = await this.usersService.findByUsername(cleanUser);
     if (!user || !user.password) {
       return null;
@@ -112,10 +122,18 @@ export class AuthService implements OnModuleInit {
 
   async login(user: any) {
     const details = await this.usersService.getAccountDetails(user.id);
-    const resolvedRole = details?.role || 'member';
-    const roleList = details?.roles || [resolvedRole];
-    const execRole = details?.executive_role || details?.executiveRole || 'Học viên';
-    const department = details?.department || 'Học viên ceohn10';
+    const isPlatformAdminUser =
+      user.email === 'admin@ceohn10.vn' ||
+      user.username === 'admin@ceohn10.vn' ||
+      details?.role === 'platform_admin' ||
+      details?.roles?.includes('platform_admin');
+
+    const resolvedRole = isPlatformAdminUser ? 'platform_admin' : (details?.role || 'member');
+    const roleList = isPlatformAdminUser
+      ? Array.from(new Set(['platform_admin', 'admin', 'quan_tri', ...(details?.roles || [])]))
+      : (details?.roles || [resolvedRole]);
+    const execRole = isPlatformAdminUser ? 'platform_admin' : (details?.executive_role || details?.executiveRole || 'Học viên');
+    const department = isPlatformAdminUser ? 'Ban Quản Trị Hệ Thống' : (details?.department || 'Học viên ceohn10');
 
     const permissions = details?.permissions || [];
     const accessJti = crypto.randomUUID();
@@ -136,8 +154,9 @@ export class AuthService implements OnModuleInit {
       memberId: details?.memberId || null,
       memberCode: details?.memberCode || null,
       isPresident: Boolean(details?.isPresident),
-      isAdmin: Boolean(details?.isAdmin),
-      isExecutive: Boolean(details?.isExecutive),
+      isAdmin: Boolean(details?.isAdmin || isPlatformAdminUser),
+      isPlatformAdmin: Boolean(isPlatformAdminUser),
+      isExecutive: Boolean(details?.isExecutive || isPlatformAdminUser),
       isGeneralSecretary: Boolean(details?.isGeneralSecretary),
       isDepartmentLeader: Boolean(details?.isDepartmentLeader),
       permissions,
@@ -145,13 +164,17 @@ export class AuthService implements OnModuleInit {
       allowedRoutes: details?.allowedRoutes || [],
     };
     const isSystemAdmin =
+      user.email === 'admin@ceohn10.vn' ||
+      user.username === 'admin@ceohn10.vn' ||
       user.email === 'admin@viconnect.vn' ||
       user.username === 'admin@viconnect.vn' ||
       user.email === 'admin@connect.vn' ||
       user.username === 'admin@connect.vn' ||
       user.email === 'admini@connect.vn' ||
       user.username === 'admini@connect.vn' ||
+      isPlatformAdminUser ||
       Boolean(details?.isAdmin) ||
+      resolvedRole === 'platform_admin' ||
       resolvedRole === 'quan_tri' ||
       resolvedRole === 'admin';
     const mustChangePassword = isSystemAdmin ? false : await this.usersService.checkMustChangePassword(user.id);
@@ -176,8 +199,9 @@ export class AuthService implements OnModuleInit {
         memberCode: details?.memberCode || null,
         memberId: details?.memberId || null,
         isPresident: Boolean(details?.isPresident),
-        isAdmin: Boolean(details?.isAdmin),
-        isExecutive: Boolean(details?.isExecutive),
+        isAdmin: Boolean(details?.isAdmin || isPlatformAdminUser),
+        isPlatformAdmin: Boolean(isPlatformAdminUser),
+        isExecutive: Boolean(details?.isExecutive || isPlatformAdminUser),
         isGeneralSecretary: Boolean(details?.isGeneralSecretary),
         isDepartmentLeader: Boolean(details?.isDepartmentLeader),
         permissions,
