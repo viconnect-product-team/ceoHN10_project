@@ -107,6 +107,11 @@ export class MembersController {
     return this.membersService.geocodeAddress(address);
   }
 
+  @Get('by-code/:code')
+  async getMemberByCode(@Param('code') code: string) {
+    return this.membersService.findMemberByCode(code);
+  }
+
   @Get('reverse-geocode')
   async reverseGeocodeCoordinates(
     @Query('lat') lat: string,

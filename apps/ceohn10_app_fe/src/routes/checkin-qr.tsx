@@ -204,6 +204,15 @@ function EventQrCard({ event }: { event: CheckinQrEvent }) {
 
       <div className="flex flex-wrap gap-2 print:hidden">
         <a
+          href={`/event-checkin?eventId=${event.id}`}
+          target="_blank"
+          rel="noreferrer"
+          className="inline-flex min-h-9 items-center gap-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 px-3 text-xs font-semibold text-white transition-colors shadow-2xs"
+        >
+          <ShieldAlert aria-hidden="true" className="h-3.5 w-3.5" />
+          Cổng Check-in / Check-out Vé
+        </a>
+        <a
           href={registerUrl}
           target="_blank"
           rel="noreferrer"

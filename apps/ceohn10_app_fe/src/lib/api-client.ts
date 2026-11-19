@@ -555,34 +555,16 @@ async function handleResponse(response: Response, endpoint = "") {
         throw new Error(errMsg);
       }
 
-      // Kiểm tra nếu token trong localStorage vẫn còn hạn sử dụng:
-      // Tuyệt đối không xóa phiên hay đẩy người dùng ra login! Thay vào đó tự động tái đồng bộ cookie!
-      const currentToken = getAuthToken();
-      if (currentToken) {
-        try {
-          const parts = currentToken.split(".");
-          if (parts.length === 3) {
-            const payload = JSON.parse(
-              decodeURIComponent(
-                atob(parts[1].replace(/-/g, "+").replace(/_/g, "/"))
-                  .split("")
-                  .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
-                  .join("")
-              )
-            );
-            if (payload?.exp && payload.exp * 1000 > Date.now()) {
-              ensureSessionCookiesSync(currentToken);
-              throw new Error(errMsg);
-            }
-          }
-        } catch (e: any) {
-          if (e?.message === errMsg) throw e;
-        }
-      }
-
-      // Xóa phiên đăng nhập hết hạn
+      // Khi máy chủ trả về 401 và silent refresh đã thất bại:
+      // Token hiện tại không còn được máy chủ chấp nhận (chữ ký không khớp, tài khoản bị xóa, hoặc đã thu hồi).
+      // BẮT BUỘC phải dọn sạch phiên hỏng để người dùng không bị kẹt ở vòng lặp lỗi "No token provided / Unauthorized".
       localStorage.removeItem("vibe_token");
       localStorage.removeItem("vibe_refresh_token");
+      localStorage.removeItem("vibe_user");
+      localStorage.removeItem("token");
+      localStorage.removeItem("access_token");
+      localStorage.removeItem("sb-access-token");
+      
       const domainAttr = getCookieDomain();
       document.cookie = `sb-access-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT${domainAttr}`;
       document.cookie = `vibe_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT${domainAttr}`;
@@ -594,11 +576,13 @@ async function handleResponse(response: Response, endpoint = "") {
       document.cookie = `access_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT`;
       document.cookie = `sb-refresh-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT`;
 
-      // Nếu token hết hạn ở App Hiệp hội -> về /association/login
+      window.dispatchEvent(new Event("vba_auth_changed"));
+
+      // Điều hướng về trang đăng nhập tương ứng
       if (pathname.startsWith("/association")) {
         window.location.href = `/association/login?reason=expired&redirect=${encodeURIComponent(pathname + window.location.search)}`;
       } else {
-        window.location.href = `/auth?reason=expired&redirect=${encodeURIComponent(pathname + window.location.search)}`;
+        window.location.href = `/auth?portal=crm&reason=expired&redirect=${encodeURIComponent(pathname + window.location.search)}`;
       }
     }
     throw new Error(errMsg);

@@ -68,6 +68,11 @@ export const Route = createFileRoute("/guest-event-register/$eventId")({
 function StandaloneGuestEventRegistrationPage() {
   const { event } = Route.useLoaderData();
 
+  // Học viên mã tự khai báo (không bắt buộc, nếu nhập sẽ tự động tra cứu & điền)
+  const [memberCode, setMemberCode] = useState("");
+  const [isSearchingCode, setIsSearchingCode] = useState(false);
+  const [codeLookupSuccess, setCodeLookupSuccess] = useState<string | null>(null);
+
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
@@ -77,20 +82,105 @@ function StandaloneGuestEventRegistrationPage() {
   const [ticketCount, setTicketCount] = useState(1);
   const [note, setNote] = useState("");
 
+  // Danh sách người tham gia cùng (multi-attendees)
+  type AdditionalAttendee = {
+    id: string;
+    memberCode: string;
+    fullName: string;
+    phone: string;
+    email: string;
+    company: string;
+    position: string;
+  };
+  const [additionalAttendees, setAdditionalAttendees] = useState<AdditionalAttendee[]>([]);
+
   const [submitting, setSubmitting] = useState(false);
   const [result, setResult] = useState<any>(null);
 
   // Copy states
   const [copiedField, setCopiedField] = useState<string | null>(null);
 
+  const totalAttendeesCount = 1 + additionalAttendees.length;
   const ticketPrice = Number(event.ticket_price || event.ticketPrice || event.fee || 0);
   const isFree = ticketPrice === 0;
-  const totalAmount = ticketPrice * ticketCount;
+  const totalAmount = ticketPrice * totalAttendeesCount;
   const isFull = (() => {
     const cap = Number(event.capacity || event.maxAttendees || event.maxSeats || 0);
     const reg = Number(event.registered || event.registeredCount || event.attendeesCount || 0);
     return cap > 0 && reg >= cap;
   })();
+
+  const handleLookupMemberCode = async (codeToSearch: string, attendeeIndex?: number) => {
+    const trimmed = codeToSearch.trim().toUpperCase();
+    if (!trimmed) {
+      toast.error("Vui lòng nhập mã học viên để tra cứu (Ví dụ: HN10-0001)!");
+      return;
+    }
+    setIsSearchingCode(true);
+    try {
+      const member = await fetchNestApi<any>(`/members/by-code/${encodeURIComponent(trimmed)}`);
+      if (member && (member.fullName || member.name)) {
+        const foundName = member.fullName || member.name || "";
+        const foundPhone = member.phone || "";
+        const foundEmail = member.email || "";
+        const foundCompany = member.company || member.enterpriseName || member.companyName || "";
+        const foundPosition = member.position || member.title || "";
+
+        if (typeof attendeeIndex === "number" && attendeeIndex >= 0) {
+          setAdditionalAttendees((prev) =>
+            prev.map((a, idx) =>
+              idx === attendeeIndex
+                ? {
+                    ...a,
+                    memberCode: member.code || trimmed,
+                    fullName: foundName,
+                    phone: foundPhone,
+                    email: foundEmail,
+                    company: foundCompany,
+                    position: foundPosition,
+                  }
+                : a
+            )
+          );
+        } else {
+          setMemberCode(member.code || trimmed);
+          if (foundName) setFullName(foundName);
+          if (foundPhone) setPhone(foundPhone);
+          if (foundEmail) setEmail(foundEmail);
+          if (foundCompany) setCompany(foundCompany);
+          if (foundPosition) setPosition(foundPosition);
+          setCodeLookupSuccess(`Đã tìm thấy Học viên: ${foundName} (${member.code || trimmed}) - Thông tin đã được tự động điền.`);
+        }
+        toast.success(`Đã tự động điền thông tin Học viên ${foundName}!`);
+      } else {
+        toast.warning(`Không tìm thấy mã học viên "${trimmed}". Bạn có thể tự điền thông tin.`);
+      }
+    } catch {
+      toast.warning(`Không tìm thấy mã học viên "${trimmed}". Bạn có thể tự điền thông tin.`);
+    } finally {
+      setIsSearchingCode(false);
+    }
+  };
+
+  const addAttendee = () => {
+    setAdditionalAttendees((prev) => [
+      ...prev,
+      {
+        id: `att_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
+        memberCode: "",
+        fullName: "",
+        phone: "",
+        email: "",
+        company: company,
+        position: "",
+      },
+    ]);
+    toast.info("Đã thêm 1 người tham gia cùng vào danh sách.");
+  };
+
+  const removeAttendee = (index: number) => {
+    setAdditionalAttendees((prev) => prev.filter((_, idx) => idx !== index));
+  };
 
   const handleCopy = async (text: string, fieldName: string) => {
     try {
@@ -107,7 +197,7 @@ function StandaloneGuestEventRegistrationPage() {
     e.preventDefault();
 
     if (!fullName.trim() || !phone.trim() || !email.trim()) {
-      toast.error("Vui lòng nhập đầy đủ Họ tên, Số điện thoại và Email để nhận vé!");
+      toast.error("Vui lòng nhập đầy đủ Họ tên, Số điện thoại và Email của người đăng ký!");
       return;
     }
 
@@ -116,21 +206,50 @@ function StandaloneGuestEventRegistrationPage() {
       return;
     }
 
+    for (let i = 0; i < additionalAttendees.length; i++) {
+      const a = additionalAttendees[i];
+      if (!a.fullName.trim() || !a.phone.trim() || !a.email.trim()) {
+        toast.error(`Vui lòng nhập đủ Họ tên, SĐT và Email cho người tham gia số ${i + 2}!`);
+        return;
+      }
+    }
+
     setSubmitting(true);
     try {
+      const allAttendees = [
+        {
+          memberCode: memberCode.trim().toUpperCase() || undefined,
+          fullName: fullName.trim(),
+          phone: phone.trim(),
+          email: email.trim().toLowerCase(),
+          company: company.trim(),
+          position: position.trim(),
+        },
+        ...additionalAttendees.map((a) => ({
+          memberCode: a.memberCode.trim().toUpperCase() || undefined,
+          fullName: a.fullName.trim(),
+          phone: a.phone.trim(),
+          email: a.email.trim().toLowerCase(),
+          company: a.company.trim(),
+          position: a.position.trim(),
+        })),
+      ];
+
       // 1. Gửi dữ liệu tới API backend NestJS
       const res = await fetchNestApi<any>(`/events/${event.id}/guest-register`, {
         method: "POST",
         body: JSON.stringify({
+          memberCode: memberCode.trim().toUpperCase() || undefined,
           fullName: fullName.trim(),
           phone: phone.trim(),
           email: email.trim().toLowerCase(),
           company: company.trim(),
           position: position.trim(),
           ticketType,
-          ticketCount,
+          ticketCount: totalAttendeesCount,
           ticketPrice,
           note: note.trim(),
+          attendees: allAttendees,
         }),
       }).catch((err: any) => {
         return { ok: false, error: err };
@@ -580,6 +699,46 @@ function StandaloneGuestEventRegistrationPage() {
               </div>
             )}
 
+            {/* DANH SÁCH VÉ E-TICKET CHO TỪNG ĐẠI BIỂU (MULTI-ATTENDEE TICKETS) */}
+            {Array.isArray(result.createdTickets) && result.createdTickets.length > 0 && (
+              <div className="space-y-4">
+                <div className="text-sm font-bold text-slate-800 flex items-center justify-between">
+                  <span>Danh sách vé đã cấp ({result.createdTickets.length} vé):</span>
+                  <span className="text-xs text-[#003B95] font-semibold">Quét mã check-in qua Zalo hoặc App</span>
+                </div>
+                {result.createdTickets.map((t: any, idx: number) => (
+                  <div key={t.regId || idx} className="rounded-2xl border-2 border-emerald-500/30 bg-emerald-50/40 p-4 space-y-3">
+                    <div className="flex items-center justify-between border-b border-emerald-200/60 pb-2">
+                      <div className="font-bold text-xs text-emerald-950">
+                        Vé #{idx + 1}: <span className="text-blue-900">{t.fullName}</span> {t.memberCode && <span className="ml-1 text-[11px] bg-blue-100 text-[#003B95] px-1.5 py-0.5 rounded font-mono">[{t.memberCode}]</span>}
+                      </div>
+                      <span className="font-mono font-bold text-xs text-amber-700 bg-amber-100 px-2 py-0.5 rounded-full">
+                        Lucky #{t.luckyNumber}
+                      </span>
+                    </div>
+
+                    <div className="flex flex-col sm:flex-row items-center gap-4">
+                      <div className="w-36 h-36 bg-white p-2 rounded-xl border border-emerald-200 shadow-xs shrink-0 flex items-center justify-center">
+                        <img
+                          src={t.qrCodeUrl || getQrUrl(t.regId, 250)}
+                          alt={`QR Check-in ${t.fullName}`}
+                          className="w-full h-full object-contain"
+                        />
+                      </div>
+                      <div className="space-y-1.5 text-xs text-slate-600 flex-1 w-full">
+                        <div><span className="text-slate-400">Mã vé:</span> <code className="font-bold font-mono text-slate-900 bg-white px-1.5 py-0.5 rounded border border-slate-200">{t.regId}</code></div>
+                        <div><span className="text-slate-400">SĐT:</span> <span className="font-medium text-slate-800">{t.phone}</span></div>
+                        <div><span className="text-slate-400">Email:</span> <span className="font-medium text-slate-800">{t.email}</span></div>
+                        <div className="pt-1 text-[11px] text-emerald-800 font-medium">
+                          ✓ Vé chỉ được quét check-in 01 lần tại cổng (hỗ trợ quét qua Zalo & App CEO HN10).
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
             {/* THÔNG TIN CHI TIẾT ĐẠI BIỂU */}
             <div className="bg-slate-50 rounded-2xl p-4 border border-slate-200 text-xs space-y-2">
               <div className="font-bold text-slate-700 text-xs uppercase tracking-wider pb-1 border-b border-slate-200">
@@ -739,6 +898,57 @@ function StandaloneGuestEventRegistrationPage() {
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
+          {/* MÃ HỌC VIÊN CLB CEO HN10 (TÙY CHỌN - TỰ ĐỘNG ĐIỀN THÔNG TIN) */}
+          <div className="bg-gradient-to-r from-blue-50/80 via-white to-amber-50/60 rounded-3xl shadow-xs border-2 border-[#003B95]/20 p-6 sm:p-7 space-y-3">
+            <div className="flex items-center justify-between">
+              <label className="block text-sm sm:text-base font-bold text-[#003B95]">
+                ✦ Bạn là Học viên CLB CEO HN10?
+              </label>
+              <span className="text-[11px] font-semibold bg-blue-100 text-[#003B95] px-2.5 py-0.5 rounded-full">
+                Không bắt buộc
+              </span>
+            </div>
+            <p className="text-xs text-slate-500">
+              Nhập mã học viên (do bạn tự khai báo, VD: <code className="font-bold text-[#003B95]">HN10-0001</code>) để hệ thống tự động điền hồ sơ đại biểu mà không cần nhập lại.
+            </p>
+            <div className="flex gap-2 pt-1">
+              <div className="relative flex-1">
+                <Tag className="w-4 h-4 text-[#003B95] absolute left-3.5 top-3.5" />
+                <input
+                  type="text"
+                  placeholder="Nhập mã học viên (VD: HN10-0001)..."
+                  value={memberCode}
+                  onChange={(e) => setMemberCode(e.target.value.toUpperCase())}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      void handleLookupMemberCode(memberCode);
+                    }
+                  }}
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-blue-200 text-sm uppercase font-mono font-bold focus:outline-none focus:ring-2 focus:ring-[#003B95] bg-white transition"
+                />
+              </div>
+              <button
+                type="button"
+                disabled={isSearchingCode || !memberCode.trim()}
+                onClick={() => void handleLookupMemberCode(memberCode)}
+                className="px-4 py-2.5 rounded-xl bg-[#003B95] hover:bg-[#002B70] text-white text-xs font-bold transition flex items-center gap-1.5 shadow-sm disabled:opacity-50 cursor-pointer"
+              >
+                {isSearchingCode ? (
+                  <span className="animate-spin">↻</span>
+                ) : (
+                  <span>Tra cứu & Tự động điền</span>
+                )}
+              </button>
+            </div>
+            {codeLookupSuccess && (
+              <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-xs font-medium text-emerald-800 flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                <span>{codeLookupSuccess}</span>
+              </div>
+            )}
+          </div>
+
           {/* TRƯỜNG 1: HỌ VÀ TÊN */}
           <div className="bg-white rounded-3xl shadow-sm border border-slate-200 p-6 sm:p-7 space-y-3">
             <label className="block text-sm sm:text-base font-bold text-slate-800">
@@ -848,10 +1058,172 @@ function StandaloneGuestEventRegistrationPage() {
             </div>
           </div>
 
+          {/* ĐĂNG KÝ NHIỀU NGƯỜI (MULTI-ATTENDEE / ĐOÀN THAM DỰ) */}
+          <div className="bg-white rounded-3xl shadow-sm border border-slate-200 p-6 sm:p-7 space-y-4">
+            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
+              <div>
+                <label className="block text-sm sm:text-base font-bold text-slate-800">
+                  5. Danh sách người tham gia cùng (Tùy chọn)
+                </label>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Quý Anh/Chị có thể đăng ký thêm đồng nghiệp, đối tác hoặc người đi cùng trong 1 lần đăng ký.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={addAttendee}
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-blue-50 hover:bg-blue-100 text-[#003B95] border border-blue-200 text-xs font-bold transition shadow-2xs cursor-pointer"
+              >
+                <span>+ Thêm người tham gia cùng</span>
+              </button>
+            </div>
+
+            {additionalAttendees.length === 0 ? (
+              <div className="p-4 rounded-2xl bg-slate-50/70 border border-dashed border-slate-200 text-center text-xs text-slate-500">
+                Chưa có người tham gia cùng (Đăng ký 1 vé cho người đăng ký chính). Bấm nút <strong className="text-[#003B95]">+ Thêm người tham gia cùng</strong> nếu đi cùng đoàn.
+              </div>
+            ) : (
+              <div className="space-y-4 pt-1">
+                {additionalAttendees.map((att, idx) => (
+                  <div
+                    key={att.id}
+                    className="p-4 sm:p-5 rounded-2xl border-2 border-blue-100 bg-slate-50/50 space-y-3 relative group"
+                  >
+                    <div className="flex items-center justify-between border-b border-slate-200 pb-2">
+                      <span className="font-bold text-xs text-[#003B95] uppercase tracking-wide">
+                        ✦ Người tham gia #{idx + 2}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => removeAttendee(idx)}
+                        className="text-xs text-rose-500 hover:text-rose-700 font-bold hover:underline cursor-pointer"
+                      >
+                        ✕ Xóa người này
+                      </button>
+                    </div>
+
+                    {/* Tra cứu mã học viên cho người tham gia cùng */}
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        placeholder="Mã học viên (nếu có, VD: HN10-0002)..."
+                        value={att.memberCode}
+                        onChange={(e) => {
+                          const v = e.target.value.toUpperCase();
+                          setAdditionalAttendees((prev) =>
+                            prev.map((a, i) => (i === idx ? { ...a, memberCode: v } : a))
+                          );
+                        }}
+                        className="flex-1 px-3 py-2 rounded-xl border border-slate-200 text-xs uppercase font-mono font-bold focus:outline-none focus:ring-1 focus:ring-[#003B95] bg-white"
+                      />
+                      <button
+                        type="button"
+                        disabled={isSearchingCode || !att.memberCode.trim()}
+                        onClick={() => void handleLookupMemberCode(att.memberCode, idx)}
+                        className="px-3 py-2 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-800 text-xs font-semibold disabled:opacity-50 cursor-pointer"
+                      >
+                        Tra cứu
+                      </button>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-[11px] font-semibold text-slate-600 mb-1">
+                          Họ và tên <span className="text-rose-500">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          placeholder="Họ tên người đi cùng..."
+                          value={att.fullName}
+                          onChange={(e) => {
+                            const v = e.target.value;
+                            setAdditionalAttendees((prev) =>
+                              prev.map((a, i) => (i === idx ? { ...a, fullName: v } : a))
+                            );
+                          }}
+                          className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-1 focus:ring-[#003B95] bg-white"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[11px] font-semibold text-slate-600 mb-1">
+                          Số điện thoại (Zalo) <span className="text-rose-500">*</span>
+                        </label>
+                        <input
+                          type="tel"
+                          required
+                          placeholder="0983xxxxxx..."
+                          value={att.phone}
+                          onChange={(e) => {
+                            const v = e.target.value;
+                            setAdditionalAttendees((prev) =>
+                              prev.map((a, i) => (i === idx ? { ...a, phone: v } : a))
+                            );
+                          }}
+                          className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-1 focus:ring-[#003B95] bg-white"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[11px] font-semibold text-slate-600 mb-1">
+                          Email nhận vé <span className="text-rose-500">*</span>
+                        </label>
+                        <input
+                          type="email"
+                          required
+                          placeholder="email@congty.com..."
+                          value={att.email}
+                          onChange={(e) => {
+                            const v = e.target.value;
+                            setAdditionalAttendees((prev) =>
+                              prev.map((a, i) => (i === idx ? { ...a, email: v } : a))
+                            );
+                          }}
+                          className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-1 focus:ring-[#003B95] bg-white"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[11px] font-semibold text-slate-600 mb-1">
+                          Chức vụ
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="Phó GĐ, Trợ lý..."
+                          value={att.position}
+                          onChange={(e) => {
+                            const v = e.target.value;
+                            setAdditionalAttendees((prev) =>
+                              prev.map((a, i) => (i === idx ? { ...a, position: v } : a))
+                            );
+                          }}
+                          className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-1 focus:ring-[#003B95] bg-white"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Tóm tắt số vé & Tổng tiền */}
+            <div className="pt-2 flex flex-wrap items-center justify-between gap-2 text-xs font-semibold bg-blue-50/70 p-3 rounded-xl border border-blue-200/60 text-[#003B95]">
+              <span>
+                Tổng số lượng vé: <strong>{totalAttendeesCount} vé</strong> (1 chính + {additionalAttendees.length} cùng đoàn)
+              </span>
+              {!isFree && (
+                <span>
+                  Tổng thành tiền:{" "}
+                  <strong className="text-amber-700 font-black text-sm">
+                    {new Intl.NumberFormat("vi-VN").format(totalAmount)} đ
+                  </strong>
+                </span>
+              )}
+            </div>
+          </div>
+
           {/* TRƯỜNG 6: LOẠI VÉ */}
           <div className="bg-white rounded-3xl shadow-sm border border-slate-200 p-6 sm:p-7 space-y-3">
             <label className="block text-sm sm:text-base font-bold text-slate-800">
-              5. Loại vé tham dự
+              6. Loại vé tham dự
             </label>
             <p className="text-xs text-slate-500">
               Chọn hạng vé phù hợp với tư cách tham dự chương trình.
@@ -880,37 +1252,6 @@ function StandaloneGuestEventRegistrationPage() {
                   <span className="text-[11px] text-slate-500 block leading-tight">{t.desc}</span>
                 </button>
               ))}
-            </div>
-          </div>
-
-          {/* TRƯỜNG 7: SỐ LƯỢNG VÉ */}
-          <div className="bg-white rounded-3xl shadow-sm border border-slate-200 p-6 sm:p-7 space-y-3">
-            <label className="block text-sm sm:text-base font-bold text-slate-800">
-              6. Số lượng vé tham dự
-            </label>
-            <p className="text-xs text-slate-500">
-              Lựa chọn số lượng vé dành cho cá nhân hoặc đoàn doanh nghiệp tham dự.
-            </p>
-            <div className="flex flex-wrap items-center gap-3 pt-1">
-              <select
-                value={ticketCount}
-                onChange={(e) => setTicketCount(Number(e.target.value))}
-                className="px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#003B95] bg-slate-50/60 font-medium"
-              >
-                <option value={1}>1 Vé (Cá nhân tham dự)</option>
-                <option value={2}>2 Vé (Kèm đối tác / Đồng nghiệp)</option>
-                <option value={3}>3 Vé</option>
-                <option value={5}>5 Vé (Đoàn doanh nghiệp)</option>
-              </select>
-
-              {!isFree && (
-                <span className="text-xs text-slate-600 font-medium bg-amber-50 border border-amber-200 px-3 py-2 rounded-xl">
-                  Tổng chi phí:{" "}
-                  <strong className="text-amber-700 font-black text-sm">
-                    {new Intl.NumberFormat("vi-VN").format(totalAmount)} đ
-                  </strong>
-                </span>
-              )}
             </div>
           </div>
 

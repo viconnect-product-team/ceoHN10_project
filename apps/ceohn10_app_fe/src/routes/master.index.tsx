@@ -170,6 +170,7 @@ function MasterAdminPortal() {
     email: "",
     password: "",
     name: "",
+    code: "",
     role: "admin",
     department: "Ban Điều Hành",
   });
@@ -226,8 +227,13 @@ function MasterAdminPortal() {
     }
     const cleanEmail = newAccountData.email.trim();
     const cleanPass = newAccountData.password.trim();
+    const cleanCode = (newAccountData.code || "").trim();
     if (!cleanEmail || !cleanPass) {
       toast.error("Vui lòng nhập đầy đủ email và mật khẩu");
+      return;
+    }
+    if (!cleanCode) {
+      toast.error("Vui lòng nhập Mã tài khoản quản trị (tự khai báo, VD: ADM-01)");
       return;
     }
     if (!isValidEmail(cleanEmail)) {
@@ -251,6 +257,7 @@ function MasterAdminPortal() {
         email: "",
         password: "",
         name: "",
+        code: "",
         role: "admin",
         department: "Ban Điều Hành",
       });
@@ -520,6 +527,7 @@ function MasterAdminPortal() {
                 <thead className="bg-slate-950 text-slate-400 uppercase font-semibold border-b border-slate-800">
                   <tr>
                     <th className="px-4 py-3">Họ tên &amp; Email</th>
+                    <th className="px-4 py-3">Mã tài khoản</th>
                     <th className="px-4 py-3">Tên đăng nhập</th>
                     <th className="px-4 py-3">Vai trò phân quyền</th>
                     <th className="px-4 py-3">Ban chuyên môn</th>
@@ -538,6 +546,9 @@ function MasterAdminPortal() {
                         <td className="px-4 py-3">
                           <div className="font-bold text-white">{acc.name || "Quản trị viên"}</div>
                           <div className="font-mono text-slate-400">{acc.email}</div>
+                        </td>
+                        <td className="px-4 py-3 font-mono font-bold text-amber-400">
+                          {acc.code || acc.memberCode || (isSuper ? "CEO-HN10-ROOT" : "—")}
                         </td>
                         <td className="px-4 py-3 font-mono text-slate-300">
                           {acc.username || acc.email}
@@ -837,14 +848,26 @@ function MasterAdminPortal() {
           </DialogHeader>
 
           <div className="space-y-3 py-2">
-            <div className="space-y-1">
-              <Label className="text-xs text-slate-300">Họ và tên *</Label>
-              <Input
-                placeholder="VD: Nguyễn Văn A"
-                value={newAccountData.name}
-                onChange={(e) => setNewAccountData({ ...newAccountData, name: e.target.value })}
-                className="bg-slate-950 border-slate-800 text-xs h-8"
-              />
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1">
+                <Label className="text-xs text-slate-300">Họ và tên *</Label>
+                <Input
+                  placeholder="VD: Nguyễn Văn A"
+                  value={newAccountData.name}
+                  onChange={(e) => setNewAccountData({ ...newAccountData, name: e.target.value })}
+                  className="bg-slate-950 border-slate-800 text-xs h-8"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <Label className="text-xs text-slate-300">Mã tài khoản quản trị *</Label>
+                <Input
+                  placeholder="VD: ADM-01, BDH-01..."
+                  value={newAccountData.code}
+                  onChange={(e) => setNewAccountData({ ...newAccountData, code: e.target.value.toUpperCase() })}
+                  className="bg-slate-950 border-slate-800 text-xs h-8 font-mono"
+                />
+              </div>
             </div>
 
             <div className="grid grid-cols-2 gap-3">

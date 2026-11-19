@@ -3643,7 +3643,9 @@ export class EventsService implements OnModuleInit {
         ? (BigInt(lastReg[0].id) + 1n).toString()
         : `4${Math.floor(1000 + Math.random() * 9000)}`;
     const luckyNum = String(Math.floor(1000 + Math.random() * 9000));
-    const memberCode = `GUEST-${luckyNum}`;
+    const memberCode = (guestData?.memberCode && String(guestData.memberCode).trim())
+      ? String(guestData.memberCode).trim().toUpperCase()
+      : `GUEST-${luckyNum}`;
     const chosenTicketType = (guestData?.ticketType || '').trim();
     const ticketType =
       chosenTicketType || (isFree ? 'Vé Mời Miễn Phí' : 'Vé Tiêu Chuẩn');
@@ -3703,6 +3705,124 @@ export class EventsService implements OnModuleInit {
     await this.prisma.$executeRaw`
       UPDATE public.events SET registered = registered + ${ticketCount}, updated_at = now() WHERE id = ${resolvedEventId}
     `.catch(() => null);
+
+    const createdTickets: any[] = [{
+      id: regId,
+      fullName,
+      phone,
+      email,
+      company,
+      position,
+      memberCode,
+      luckyNumber: luckyNum,
+      ticketType,
+    }];
+
+    // Hỗ trợ đăng ký nhiều người tham gia cùng (Multi-Attendee)
+    if (guestData?.attendees && Array.isArray(guestData.attendees) && guestData.attendees.length > 1) {
+      let nextIdBig = lastReg.length > 0 ? BigInt(lastReg[0].id) + 2n : BigInt(regId) + 1n;
+      for (const att of guestData.attendees.slice(1)) {
+        const attName = (att.fullName || att.name || '').trim();
+        if (!attName) continue;
+        const attPhone = (att.phone || phone).trim();
+        const attEmail = (att.email || email).trim().toLowerCase();
+        const attComp = (att.company || company).trim();
+        const attPos = (att.position || position).trim();
+        const attLucky = String(Math.floor(1000 + Math.random() * 9000));
+        const attCode = (att.memberCode && String(att.memberCode).trim())
+          ? String(att.memberCode).trim().toUpperCase()
+          : `GUEST-${attLucky}`;
+        const attRegId = (nextIdBig++).toString();
+        const attTicketType = att.ticketType || ticketType;
+
+        const attQrPayload = JSON.stringify({
+          regId: attRegId,
+          eventId: resolvedEventId,
+          fullName: attName,
+          phone: attPhone,
+          email: attEmail,
+          company: attComp,
+          position: attPos,
+          ticketType: attTicketType,
+          luckyNum: attLucky,
+          isFree,
+        });
+
+        await this.prisma.$executeRaw`
+          INSERT INTO public.event_registrations (
+            id, event_id, member_code, member_name, email, phone, company, position, note, registered_at, status, ticket_type, ticket_count, association_id, payment_status, payment_amount, lucky_number, qr_payload, registered_by, created_at, updated_at
+          ) VALUES (
+            ${attRegId},
+            ${resolvedEventId},
+            ${attCode},
+            ${attName},
+            ${attEmail},
+            ${attPhone},
+            ${attComp},
+            ${attPos},
+            ${note},
+            now()::date,
+            ${initialGuestStatus},
+            ${attTicketType},
+            1,
+            ${targetAssociationId}::uuid,
+            ${guestPaymentStatus},
+            ${ticketPrice},
+            ${attLucky},
+            ${attQrPayload},
+            ${regId},
+            now(),
+            now()
+          )
+        `.catch(() => {});
+
+        createdTickets.push({
+          id: attRegId,
+          fullName: attName,
+          phone: attPhone,
+          email: attEmail,
+          company: attComp,
+          position: attPos,
+          memberCode: attCode,
+          luckyNumber: attLucky,
+          ticketType: attTicketType,
+        });
+
+        // Bắn email vé riêng cho người tham gia nếu có email
+        if (isFree && attEmail && attEmail.includes('@')) {
+          try {
+            await this.mailService.sendEventTicketEmail({
+              to: attEmail,
+              fullName: attName,
+              phone: attPhone,
+              company: attComp,
+              position: attPos,
+              eventTitle: event.title || event.name || 'Sự kiện CLB CEO HN10',
+              eventDate: event.date
+                ? event.date instanceof Date
+                  ? event.date.toLocaleDateString('vi-VN')
+                  : String(event.date).slice(0, 10)
+                : 'Sắp diễn ra',
+              eventTime: event.time || '08:30 - 12:00',
+              eventLocation: event.location || 'Hà Nội',
+              registrationId: attRegId,
+              ticketType: attTicketType,
+              ticketCount: 1,
+              luckyNumber: attLucky,
+              isFree: true,
+              totalAmount: 0,
+              qrCodeUrl: `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(attRegId)}`,
+              vietQrUrl: '',
+              bankAccount: '1010000000',
+              bankName: 'MB Bank (Quân Đội)',
+              bankOwner: 'CLB DOANH NHAN CEO HN10',
+            });
+          } catch (e) {
+            this.logger.warn(`Failed to dispatch ticket email to attendee ${attEmail}`);
+          }
+        }
+      }
+    }
 
     const qrCodeUrl = isFree
       ? `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(regId)}`
@@ -3838,6 +3958,9 @@ export class EventsService implements OnModuleInit {
       registered: true,
       registrationId: regId,
       luckyNumber: luckyNum,
+      memberCode,
+      createdTickets,
+      totalAttendees: createdTickets.length,
       isFree,
       totalAmount,
       vnpayQrUrl,
@@ -3850,8 +3973,8 @@ export class EventsService implements OnModuleInit {
       phone,
       qrCodeUrl,
       message: isFree
-        ? `Đăng ký vé miễn phí thành công! Mã quay thưởng của bạn là #${luckyNum}. Email vé đã được gửi tới ${email}.`
-        : `Đăng ký vé thành công! Mã quay thưởng là #${luckyNum}. Vui lòng thanh toán qua VietQR. Thông tin đã được gửi tới email ${email}.`,
+        ? `Đăng ký vé miễn phí thành công cho ${createdTickets.length} đại biểu! Mã vé chính: ${regId}. Email vé đã được gửi tới ${email}.`
+        : `Đăng ký vé thành công cho ${createdTickets.length} đại biểu! Vui lòng thanh toán qua VietQR. Thông tin đã được gửi tới email ${email}.`,
     };
   }
 
@@ -3968,6 +4091,319 @@ export class EventsService implements OnModuleInit {
       success: true,
       message: 'Đã đính kèm link tư liệu ảnh/media sự kiện và lưu trữ vào Kho Tài Liệu CLB!',
       mediaUrl: mediaUrl.trim(),
+    };
+  }
+
+  // ── 1-TIME CHECKIN & CHECKOUT ENFORCEMENT & PUBLIC TICKET LOOKUP ─────────────
+
+  async getTicketStatus(ticketCode: string) {
+    if (!ticketCode || !ticketCode.trim()) {
+      throw new BadRequestException('Mã vé không được để trống');
+    }
+    const clean = ticketCode.trim();
+    const rows = await this.prisma.$queryRaw<any[]>`
+      SELECT r.*, e.name as event_name, e.title as event_title, e.date as event_date, e.location as event_location, e.start_time, e.end_time
+      FROM public.event_registrations r
+      LEFT JOIN public.events e ON e.id = r.event_id
+      WHERE r.id = ${clean} 
+         OR UPPER(TRIM(r.member_code)) = UPPER(${clean})
+         OR r.lucky_number = ${clean}
+      ORDER BY r.created_at DESC
+      LIMIT 1
+    `.catch(() => []);
+
+    if (rows.length === 0) {
+      return { found: false, message: 'Không tìm thấy vé hoặc mã đăng ký trên hệ thống.' };
+    }
+
+    const reg = rows[0];
+    const isCheckedIn = Boolean(reg.checked_in_at);
+    const isCheckedOut = Boolean(reg.checked_out_at);
+
+    return {
+      found: true,
+      ticket: {
+        id: reg.id,
+        eventId: reg.event_id,
+        eventTitle: reg.event_name || reg.event_title || 'Sự kiện CEO HN10',
+        eventDate: reg.event_date ? new Date(reg.event_date).toLocaleDateString('vi-VN') : 'Sắp diễn ra',
+        eventTime: `${reg.start_time || '08:30'} - ${reg.end_time || '12:00'}`,
+        eventLocation: reg.event_location || 'Hà Nội',
+        memberName: reg.member_name,
+        memberCode: reg.member_code,
+        phone: reg.phone,
+        email: reg.email,
+        company: reg.company || 'Khách mời',
+        position: reg.position || 'Đại biểu',
+        ticketType: reg.ticket_type,
+        ticketCount: reg.ticket_count || 1,
+        paymentStatus: reg.payment_status,
+        paymentAmount: reg.payment_amount,
+        luckyNumber: reg.lucky_number,
+        seatAssignment: reg.seat_assignment,
+        isCheckedIn,
+        checkedInAt: reg.checked_in_at ? new Date(reg.checked_in_at).toLocaleString('vi-VN') : null,
+        isCheckedOut,
+        checkedOutAt: reg.checked_out_at ? new Date(reg.checked_out_at).toLocaleString('vi-VN') : null,
+      },
+    };
+  }
+
+  async performTicketCheckin(ticketCode: string, method: string = 'web') {
+    if (!ticketCode || !ticketCode.trim()) {
+      throw new BadRequestException('Mã vé không được để trống');
+    }
+    const clean = ticketCode.trim();
+    const rows = await this.prisma.$queryRaw<any[]>`
+      SELECT r.*, e.name as event_name, e.title as event_title, e.association_id as event_assoc_id
+      FROM public.event_registrations r
+      LEFT JOIN public.events e ON e.id = r.event_id
+      WHERE r.id = ${clean} 
+         OR UPPER(TRIM(r.member_code)) = UPPER(${clean})
+         OR r.lucky_number = ${clean}
+      ORDER BY r.created_at DESC
+      LIMIT 1
+    `.catch(() => []);
+
+    if (rows.length === 0) {
+      throw new NotFoundException('Không tìm thấy thông tin vé đăng ký với mã: ' + clean);
+    }
+
+    const reg = rows[0];
+
+    // Chặn check-in trùng lặp (Strict 1-Time Check-In Enforcement)
+    if (reg.checked_in_at) {
+      const formattedTime = new Date(reg.checked_in_at).toLocaleString('vi-VN');
+      return {
+        ok: false,
+        alreadyCheckedIn: true,
+        message: `Vé này ĐÃ ĐƯỢC CHECK-IN lúc ${formattedTime}! Không thể check-in lại.`,
+        checkedInAt: formattedTime,
+        ticket: {
+          id: reg.id,
+          memberName: reg.member_name,
+          eventTitle: reg.event_name || reg.event_title,
+          phone: reg.phone,
+          company: reg.company,
+        },
+      };
+    }
+
+    const now = new Date();
+    await this.prisma.$executeRawUnsafe(`
+      UPDATE public.event_registrations
+      SET checked_in_at = NOW(), status = 'attended', updated_at = NOW()
+      WHERE id = $1
+    `, reg.id);
+
+    // Ghi nhận vào member_checkins
+    const clientId = `chk:tkt:${reg.association_id || 'ceohn10'}:${reg.member_code}:${reg.event_id || 'any'}`;
+    await this.prisma.$executeRawUnsafe(`
+      INSERT INTO public.member_checkins (
+        id, client_id, member_code, event_id, event_title, status, method, checked_at, association_id
+      ) VALUES (
+        gen_random_uuid(), $1, $2, $3::uuid, $4, 'success', $5, NOW(), $6::uuid
+      ) ON CONFLICT (client_id) DO UPDATE SET checked_at = member_checkins.checked_at
+    `,
+      clientId,
+      reg.member_code,
+      reg.event_id && reg.event_id.match(/^[0-9a-f-]{36}$/i) ? reg.event_id : null,
+      reg.event_name || reg.event_title || 'Sự kiện CEO HN10',
+      method,
+      reg.association_id && String(reg.association_id).match(/^[0-9a-f-]{36}$/i) ? reg.association_id : null,
+    ).catch(() => {});
+
+    return {
+      ok: true,
+      message: 'Check-in thành công!',
+      checkedInAt: now.toLocaleString('vi-VN'),
+      ticket: {
+        id: reg.id,
+        memberName: reg.member_name,
+        memberCode: reg.member_code,
+        eventTitle: reg.event_name || reg.event_title,
+        phone: reg.phone,
+        company: reg.company,
+        position: reg.position,
+        seatAssignment: reg.seat_assignment,
+        luckyNumber: reg.lucky_number,
+      },
+    };
+  }
+
+  async performTicketCheckout(ticketCode: string) {
+    if (!ticketCode || !ticketCode.trim()) {
+      throw new BadRequestException('Mã vé không được để trống');
+    }
+    const clean = ticketCode.trim();
+    const rows = await this.prisma.$queryRaw<any[]>`
+      SELECT r.*, e.name as event_name, e.title as event_title
+      FROM public.event_registrations r
+      LEFT JOIN public.events e ON e.id = r.event_id
+      WHERE r.id = ${clean} 
+         OR UPPER(TRIM(r.member_code)) = UPPER(${clean})
+         OR r.lucky_number = ${clean}
+      ORDER BY r.created_at DESC
+      LIMIT 1
+    `.catch(() => []);
+
+    if (rows.length === 0) {
+      throw new NotFoundException('Không tìm thấy vé đăng ký với mã: ' + clean);
+    }
+
+    const reg = rows[0];
+
+    // Chưa check-in thì không được check-out
+    if (!reg.checked_in_at) {
+      return {
+        ok: false,
+        notCheckedIn: true,
+        message: 'Vé này chưa được thực hiện check-in vào cửa! Vui lòng check-in trước.',
+      };
+    }
+
+    // Đã check-out rồi
+    if (reg.checked_out_at) {
+      const formattedTime = new Date(reg.checked_out_at).toLocaleString('vi-VN');
+      return {
+        ok: false,
+        alreadyCheckedOut: true,
+        message: `Vé này ĐÃ THỰC HIỆN CHECK-OUT lúc ${formattedTime}!`,
+        checkedOutAt: formattedTime,
+      };
+    }
+
+    const now = new Date();
+    await this.prisma.$executeRawUnsafe(`
+      UPDATE public.event_registrations
+      SET checked_out_at = NOW(), status = 'checked_out', updated_at = NOW()
+      WHERE id = $1
+    `, reg.id);
+
+    return {
+      ok: true,
+      message: 'Check-out (ra về) thành công! Cảm ơn Quý đại biểu đã tham gia sự kiện.',
+      checkedOutAt: now.toLocaleString('vi-VN'),
+      ticket: {
+        id: reg.id,
+        memberName: reg.member_name,
+        eventTitle: reg.event_name || reg.event_title,
+      },
+    };
+  }
+
+  // ── DYNAMIC EVENT FEE CODES (TÍCH HỢP SEPAY DYNAMIC) ─────────────────────────
+
+  async listEventFeeItems(eventId: string) {
+    const rows = await this.prisma.$queryRaw<any[]>`
+      SELECT * FROM public.event_fee_items
+      WHERE event_id = ${eventId}
+      ORDER BY created_at ASC
+    `.catch(() => []);
+    return rows;
+  }
+
+  async createEventFeeItem(eventId: string, data: { feeCode: string; feeName: string; amount: number; description?: string }) {
+    if (!data.feeCode || !data.feeName) {
+      throw new BadRequestException('Mã phí và Tên phí là bắt buộc');
+    }
+    const cleanCode = data.feeCode.trim().toUpperCase().replace(/[^A-Z0-9_]/g, '_');
+    const cleanName = data.feeName.trim();
+    const amount = Math.max(0, Number(data.amount) || 0);
+    const id = `FEE-${eventId.slice(-6)}-${Date.now().toString(36).toUpperCase()}`;
+
+    await this.prisma.$executeRawUnsafe(`
+      INSERT INTO public.event_fee_items (id, event_id, fee_code, fee_name, amount, description, is_active, created_at, updated_at)
+      VALUES ($1, $2, $3, $4, $5, $6, true, NOW(), NOW())
+    `, id, eventId, cleanCode, cleanName, amount, data.description || '');
+
+    return { ok: true, id, feeCode: cleanCode, feeName: cleanName, amount };
+  }
+
+  async updateEventFeeItem(eventId: string, feeId: string, data: { feeName?: string; amount?: number; description?: string; isActive?: boolean }) {
+    const updates: string[] = ['updated_at = NOW()'];
+    const params: any[] = [feeId, eventId];
+
+    if (data.feeName) {
+      params.push(data.feeName.trim());
+      updates.push(`fee_name = $${params.length}`);
+    }
+    if (data.amount !== undefined) {
+      params.push(Math.max(0, Number(data.amount) || 0));
+      updates.push(`amount = $${params.length}`);
+    }
+    if (data.description !== undefined) {
+      params.push(data.description);
+      updates.push(`description = $${params.length}`);
+    }
+    if (data.isActive !== undefined) {
+      params.push(Boolean(data.isActive));
+      updates.push(`is_active = $${params.length}`);
+    }
+
+    await this.prisma.$executeRawUnsafe(`
+      UPDATE public.event_fee_items
+      SET ${updates.join(', ')}
+      WHERE id = $1 AND event_id = $2
+    `, ...params);
+
+    return { ok: true, message: 'Đã cập nhật mã phí thành công' };
+  }
+
+  async deleteEventFeeItem(eventId: string, feeId: string) {
+    await this.prisma.$executeRawUnsafe(`
+      DELETE FROM public.event_fee_items
+      WHERE id = $1 AND event_id = $2
+    `, feeId, eventId);
+    return { ok: true, message: 'Đã xóa mã phí thành công' };
+  }
+
+  async generateSepayFeeQr(eventId: string, feeId: string, ticketCode: string) {
+    const feeRows = await this.prisma.$queryRaw<any[]>`
+      SELECT * FROM public.event_fee_items WHERE id = ${feeId} AND event_id = ${eventId} LIMIT 1
+    `.catch(() => []);
+    if (feeRows.length === 0) {
+      throw new NotFoundException('Không tìm thấy mã phí chỉ định');
+    }
+    const fee = feeRows[0];
+
+    // Lấy cấu hình Sepay từ app_settings
+    const settings = await this.prisma.$queryRaw<any[]>`
+      SELECT value FROM public.app_settings WHERE key = 'sepay_config' LIMIT 1
+    `.catch(() => []);
+
+    let bankAccount = '1010000000';
+    let bankName = 'MB Bank (Quân Đội)';
+    let bankBin = '970422'; // MB Bank BIN
+    let bankOwner = 'CLB DOANH NHAN CEO HN10';
+    let prefix = 'CEOHN10_SK';
+
+    if (settings.length > 0 && settings[0]?.value) {
+      const cfg = typeof settings[0].value === 'string' ? JSON.parse(settings[0].value) : settings[0].value;
+      if (cfg.bankAccount) bankAccount = cfg.bankAccount;
+      if (cfg.bankName) bankName = cfg.bankName;
+      if (cfg.bankOwner) bankOwner = cfg.bankOwner;
+      if (cfg.bankBin) bankBin = cfg.bankBin;
+      if (cfg.prefixEvent) prefix = cfg.prefixEvent;
+    }
+
+    const cleanTicket = (ticketCode || 'TICKET').trim().replace(/[^a-zA-Z0-9]/g, '');
+    const cleanFeeCode = (fee.fee_code || 'FEE').trim().replace(/[^a-zA-Z0-9]/g, '');
+    const transferDescription = `${prefix}_${cleanTicket}_${cleanFeeCode}`;
+    const amount = Number(fee.amount || 0);
+
+    const vietQrUrl = `https://img.vietqr.io/image/${bankBin}-${bankAccount}-compact2.png?amount=${amount}&addInfo=${encodeURIComponent(transferDescription)}&accountName=${encodeURIComponent(bankOwner)}`;
+
+    return {
+      ok: true,
+      feeName: fee.fee_name,
+      feeCode: fee.fee_code,
+      amount,
+      transferDescription,
+      bankAccount,
+      bankName,
+      bankOwner,
+      vietQrUrl,
     };
   }
 }
