@@ -1410,38 +1410,24 @@ export class EventsService implements OnModuleInit {
     const note = attendeeData?.note || '';
     const confirmOverlap = Boolean(attendeeData?.confirmOverlap);
 
-    // Validate cảnh báo khi Học viên đăng ký 1 sự kiện cùng thời gian với sự kiện khác đã đăng ký
-    if (!confirmOverlap) {
-      const targetDate =
-        event.date instanceof Date
-          ? event.date.toISOString().slice(0, 10)
-          : String(event.date).slice(0, 10);
-      const existingRegs = await this.prisma
-        .$queryRawUnsafe<any[]>(
-          `SELECT r.id, e.id as event_id, e.name as event_name, e.date, e.location
-         FROM public.event_registrations r
-         JOIN public.events e ON e.id = r.event_id
-         WHERE (
-           r.member_code = $1
-           OR (LOWER(TRIM(r.email)) = LOWER(TRIM($2)) AND $2 != '')
-         )
-         AND e.date = $3::date
-         AND e.id != $4
-         AND r.status != 'cancelled'
+    // Kiểm tra đăng ký trùng lặp chính sự kiện này
+    const alreadyRegistered = await this.prisma
+      .$queryRawUnsafe<any[]>(
+        `SELECT id FROM public.event_registrations
+         WHERE event_id = $1
+         AND (member_code = $2 OR (LOWER(TRIM(email)) = LOWER(TRIM($3)) AND $3 != ''))
+         AND status != 'cancelled'
          LIMIT 1`,
-          memberCode,
-          email,
-          targetDate,
-          eventId,
-        )
-        .catch(() => []);
+        eventId,
+        memberCode,
+        email,
+      )
+      .catch(() => []);
 
-      if (existingRegs.length > 0) {
-        const conf = existingRegs[0];
-        throw new BadRequestException(
-          `OVERLAP_CONFIRM_REQUIRED: Bạn đang đăng ký sự kiện "${event.name}" cùng thời gian với sự kiện "${conf.event_name}". Bạn có chắc muốn đăng ký thêm không?`,
-        );
-      }
+    if (alreadyRegistered.length > 0 && !confirmOverlap) {
+      this.logger.log(
+        `Member ${memberCode} (${email}) already registered for event ${eventId}, updating registration info.`,
+      );
     }
 
     const ticketPrice =
@@ -1473,16 +1459,21 @@ export class EventsService implements OnModuleInit {
     const initialStatus = isFree ? 'confirmed' : 'pending';
     await this.prisma.$executeRaw`
       INSERT INTO public.event_registrations (
-        id, event_id, member_code, member_name, email, registered_at, status, ticket_type, association_id, payment_status, payment_amount, lucky_number, created_at, updated_at
+        id, event_id, member_code, member_name, email, phone, company, position, note, registered_at, status, ticket_type, ticket_count, association_id, payment_status, payment_amount, lucky_number, created_at, updated_at
       ) VALUES (
         ${regId},
         ${eventId},
         ${memberCode},
         ${memberName},
         ${email},
+        ${phone},
+        ${company},
+        ${position},
+        ${note},
         now()::date,
         ${initialStatus},
         ${ticketType},
+        ${ticketCount},
         ${targetAssociationId}::uuid,
         ${paymentStatus},
         ${totalAmount},
@@ -1492,12 +1483,10 @@ export class EventsService implements OnModuleInit {
       )
     `;
 
-    // Increment registered count only when event is free (paid events increment when payment is confirmed)
-    if (isFree) {
-      await this.prisma.$executeRaw`
-        UPDATE public.events SET registered = registered + 1, updated_at = now() WHERE id = ${eventId}
-      `.catch(() => null);
-    }
+    // Cập nhật số lượng người đăng ký vào bảng events
+    await this.prisma.$executeRaw`
+      UPDATE public.events SET registered = registered + ${ticketCount}, updated_at = now() WHERE id = ${eventId}
+    `.catch(() => null);
 
     const qrCodeUrl = isFree
       ? `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(regId)}`
@@ -3685,16 +3674,21 @@ export class EventsService implements OnModuleInit {
 
     await this.prisma.$executeRaw`
       INSERT INTO public.event_registrations (
-        id, event_id, member_code, member_name, email, registered_at, status, ticket_type, association_id, payment_status, payment_amount, lucky_number, qr_payload, created_at, updated_at
+        id, event_id, member_code, member_name, email, phone, company, position, note, registered_at, status, ticket_type, ticket_count, association_id, payment_status, payment_amount, lucky_number, qr_payload, created_at, updated_at
       ) VALUES (
         ${regId},
         ${resolvedEventId},
         ${memberCode},
         ${fullName},
         ${email},
+        ${phone},
+        ${company},
+        ${position},
+        ${note},
         now()::date,
         ${initialGuestStatus},
         ${ticketType},
+        ${ticketCount},
         ${targetAssociationId}::uuid,
         ${guestPaymentStatus},
         ${totalAmount},
@@ -3705,12 +3699,10 @@ export class EventsService implements OnModuleInit {
       )
     `;
 
-    // Cập nhật số lượng người đăng ký chỉ khi sự kiện miễn phí (sự kiện có phí sẽ tăng khi admin xác nhận thanh toán)
-    if (isFree) {
-      await this.prisma.$executeRaw`
-        UPDATE public.events SET registered = registered + ${ticketCount}, updated_at = now() WHERE id = ${resolvedEventId}
-      `.catch(() => null);
-    }
+    // Cập nhật số lượng người đăng ký vào bảng events
+    await this.prisma.$executeRaw`
+      UPDATE public.events SET registered = registered + ${ticketCount}, updated_at = now() WHERE id = ${resolvedEventId}
+    `.catch(() => null);
 
     const qrCodeUrl = isFree
       ? `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(regId)}`

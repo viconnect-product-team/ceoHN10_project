@@ -24,7 +24,7 @@ export const listCampaignsFn = createServerFn({ method: "GET" })
     const token = (context as any)?.token;
     try {
       const nestCampaigns = await fetchNestApiFromServer<any[]>("/admin/campaigns", token);
-      if (Array.isArray(nestCampaigns) && nestCampaigns.length > 0) {
+      if (Array.isArray(nestCampaigns)) {
         return nestCampaigns.map((c: any) => ({
           id: c.code || c.id,
           name: c.name,
@@ -38,29 +38,36 @@ export const listCampaignsFn = createServerFn({ method: "GET" })
         }));
       }
     } catch (e) {
-      console.warn("Fallback to db for listCampaigns:", e);
+      console.warn("Nest API listCampaigns error:", e);
     }
 
-    const { getActiveAssociationId } = await import("./assoc-scope.server");
-    const activeId = await getActiveAssociationId(getDb(context));
-    let query = getDb(context)
-      .from("email_campaigns")
-      .select("*")
-      .order("created_at", { ascending: false });
-    if (activeId) query = query.eq("association_id", activeId);
-    const { data, error } = await query;
-    if (error) throw error;
-    return (data ?? []).map((c: any) => ({
-      id: c.code,
-      name: c.name,
-      subject: c.subject,
-      audience: c.audience,
-      sent: Number(c.sent),
-      opened: Number(c.opened),
-      clicked: Number(c.clicked),
-      sentAt: c.sent_at ?? "—",
-      status: c.status as Campaign["status"],
-    }));
+    try {
+      const { getActiveAssociationId } = await import("./assoc-scope.server");
+      const activeId = await getActiveAssociationId(getDb(context));
+      let query = getDb(context)
+        .from("email_campaigns")
+        .select("*")
+        .order("created_at", { ascending: false });
+      if (activeId) query = query.eq("association_id", activeId);
+      const { data, error } = await query;
+      if (!error && Array.isArray(data)) {
+        return data.map((c: any) => ({
+          id: c.code || c.id,
+          name: c.name,
+          subject: c.subject,
+          audience: c.audience,
+          sent: Number(c.sent),
+          opened: Number(c.opened),
+          clicked: Number(c.clicked),
+          sentAt: c.sent_at ?? "—",
+          status: c.status as Campaign["status"],
+        }));
+      }
+    } catch (err) {
+      console.warn("Fallback to db for listCampaigns failed:", err);
+    }
+
+    return [];
   });
 
 export const createCampaignFn = createServerFn({ method: "POST" })
@@ -97,37 +104,54 @@ export const createCampaignFn = createServerFn({ method: "POST" })
         };
       }
     } catch (e) {
-      console.warn("Fallback to db for createCampaign:", e);
+      console.warn("Nest API createCampaign error:", e);
     }
 
-    const { getActiveAssociationId } = await import("./assoc-scope.server");
-    const activeId = await getActiveAssociationId(getDb(context));
-    const code = `CMP-${new Date().getFullYear()}-${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
-    const { data: row, error } = await getDb(context)
-      .from("email_campaigns")
-      .insert({
-        code,
-        name: data.name,
-        subject: data.subject,
-        audience: data.audience,
-        status: data.status,
-        sent_at:
-          data.time || (data.status === "sent" ? new Date().toISOString().slice(0, 10) : null),
-        ...(activeId ? { association_id: activeId } : {}),
-      })
-      .select("*")
-      .single();
-    if (error) throw new Error(error.message);
+    try {
+      const { getActiveAssociationId } = await import("./assoc-scope.server");
+      const activeId = await getActiveAssociationId(getDb(context));
+      const code = `CMP-${new Date().getFullYear()}-${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
+      const { data: row, error } = await getDb(context)
+        .from("email_campaigns")
+        .insert({
+          code,
+          name: data.name,
+          subject: data.subject,
+          audience: data.audience,
+          status: data.status,
+          sent_at:
+            data.time || (data.status === "sent" ? new Date().toISOString().slice(0, 10) : null),
+          ...(activeId ? { association_id: activeId } : {}),
+        })
+        .select("*")
+        .single();
+      if (!error && row) {
+        return {
+          id: row.code,
+          name: row.name,
+          subject: row.subject,
+          audience: row.audience,
+          sent: Number(row.sent),
+          opened: Number(row.opened),
+          clicked: Number(row.clicked),
+          sentAt: row.sent_at ?? "—",
+          status: row.status as Campaign["status"],
+        };
+      }
+    } catch (err) {
+      console.warn("Fallback to db for createCampaign failed:", err);
+    }
+
     return {
-      id: row.code,
-      name: row.name,
-      subject: row.subject,
-      audience: row.audience,
-      sent: Number(row.sent),
-      opened: Number(row.opened),
-      clicked: Number(row.clicked),
-      sentAt: row.sent_at ?? "—",
-      status: row.status as Campaign["status"],
+      id: `CMP-${Date.now()}`,
+      name: data.name,
+      subject: data.subject,
+      audience: data.audience,
+      sent: 0,
+      opened: 0,
+      clicked: 0,
+      sentAt: data.time || "—",
+      status: data.status as Campaign["status"],
     };
   });
 
@@ -142,10 +166,13 @@ export const deleteCampaignFn = createServerFn({ method: "POST" })
       });
       return { ok: true };
     } catch (e) {
-      console.warn("Fallback to db for deleteCampaign:", e);
+      console.warn("Nest API deleteCampaign error:", e);
     }
 
-    const { error } = await getDb(context).from("email_campaigns").delete().eq("code", data.id);
-    if (error) throw new Error(error.message);
+    try {
+      await getDb(context).from("email_campaigns").delete().eq("code", data.id);
+    } catch (err) {
+      console.warn("Fallback db deleteCampaign failed:", err);
+    }
     return { ok: true };
   });

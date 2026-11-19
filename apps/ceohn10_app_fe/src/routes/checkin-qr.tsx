@@ -56,9 +56,23 @@ function EventQrCard({ event }: { event: CheckinQrEvent }) {
   const [writing, setWriting] = useState(false);
   const [qrMode, setQrMode] = useState<"register" | "checkin">("register");
 
-  const registerUrl = typeof window !== "undefined"
-    ? `${window.location.origin}/guest-event-register/${event.id}`
-    : `/guest-event-register/${event.id}`;
+  const publicDomain = (
+    import.meta.env.VITE_PUBLIC_URL ||
+    import.meta.env.VITE_APP_URL ||
+    "https://ceohn10.viconnect.vn"
+  ).replace(/\/$/, "");
+
+  const isLocalHost = typeof window !== "undefined" && (
+    window.location.hostname === "localhost" ||
+    window.location.hostname === "127.0.0.1"
+  );
+
+  // Link form đăng ký sự kiện cho khách/Zalo quét QR luôn dùng domain công khai chính thức https://ceohn10.viconnect.vn
+  // Tránh dùng domain CRM nội bộ (crm.ceohn10.viconnect.vn) hoặc domain có gạch dưới (crm_ceohn10.viconnect.vn) gây lỗi chặn trên Zalo!
+  const publicAppOrigin = isLocalHost ? window.location.origin : "https://ceohn10.viconnect.vn";
+
+  const registerUrl = `${publicAppOrigin}/guest-event-register/${event.id}`;
+  const checkinUrl = `${publicAppOrigin}/event-checkin?eventId=${event.id}`;
 
   const copyId = async () => {
     try {
@@ -101,7 +115,8 @@ function EventQrCard({ event }: { event: CheckinQrEvent }) {
     }
   };
 
-  const qrValue = qrMode === "register" ? registerUrl : event.id;
+  // Đảm bảo mã QR luôn là URL chuẩn HTTPS để Zalo / Camera quét mở form trực tiếp
+  const qrValue = qrMode === "register" ? registerUrl : `${publicAppOrigin}/guest-event-register/${event.id}?action=checkin`;
 
   return (
     <article className="flex flex-col gap-4 rounded-2xl border border-border bg-card p-5 shadow-sm break-inside-avoid">

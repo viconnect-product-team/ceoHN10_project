@@ -1527,7 +1527,8 @@ export function MailTemplateManager() {
   };
 
   const handleSaveReminderTemplate = (newTemplate: MailTemplateItem) => {
-    const existsIdx = templates.findIndex((t) => t.id === newTemplate.id || t.code === newTemplate.code);
+    // Gỡ bỏ validate check trùng mã code, chỉ so sánh theo id
+    const existsIdx = templates.findIndex((t) => t.id === newTemplate.id);
     let updated: MailTemplateItem[];
     if (existsIdx >= 0) {
       updated = [...templates];
@@ -2050,14 +2051,13 @@ export function MailTemplateManager() {
   const handleSaveModal = (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingTemplate) return;
-    const code = editingTemplate.code.trim();
-    if (!/^[A-Za-z0-9][A-Za-z0-9_-]{0,99}$/.test(code)) {
-      toast.error("Mã mẫu chỉ gồm chữ, số, dấu gạch ngang hoặc gạch dưới, tối đa 100 ký tự.");
-      return;
+    let code = editingTemplate.code.trim();
+    if (!code) {
+      code = `TMPL_${Date.now().toString().slice(-6)}`;
     }
+    // Gỡ bỏ chặn trùng mẫu: Nếu mã code trùng với mẫu khác nhưng id khác thì tự động thêm suffix duy nhất
     if (templates.some((template) => template.id !== editingTemplate.id && template.code === code)) {
-      toast.error("Mã mẫu này đã được dùng. Mỗi trường hợp gửi cần một mã riêng để chọn đúng template ZBS.");
-      return;
+      code = `${code}_${Date.now().toString().slice(-4)}`;
     }
     const compiledHtml = modalEditorMode === "visual"
       ? buildHtmlFromVisualContent(visualContent, editingTemplate.category)

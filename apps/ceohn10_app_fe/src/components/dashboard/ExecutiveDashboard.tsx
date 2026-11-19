@@ -276,8 +276,17 @@ export function ExecutiveDashboard({ authReady }: { authReady: boolean }) {
 
   const statsQ = useQuery({
     queryKey: ["dashboard-stats", statusFilter],
-    queryFn: () => getStats(),
+    queryFn: async () => {
+      try {
+        const res = await getStats();
+        return res;
+      } catch (err) {
+        console.warn("[ExecutiveDashboard] getStats warning, falling back to direct client calculations:", err);
+        return null;
+      }
+    },
     enabled: authReady,
+    retry: false,
   });
 
   const membersQ = useQuery({
@@ -443,12 +452,10 @@ export function ExecutiveDashboard({ authReady }: { authReady: boolean }) {
   const recent = useMemo<ActivityLog[]>(() => (activityQ.data ?? []).slice(0, 6), [activityQ.data]);
 
   // Robust merging: enrich server stats with client-queried Postgres records
-  const s = useMemo<DashboardStats | undefined>(() => {
+  const s = useMemo<DashboardStats>(() => {
     const base = statsQ.data;
     const clientMembers = membersQ.data && membersQ.data.length > 0 ? membersQ.data : DEFAULT_MEMBERS;
     const clientInvoices = invoicesQ.data ?? [];
-
-    if (!base && clientMembers.length === 0) return undefined;
 
     // Lọc bỏ các Học viên đã bị xóa hoặc không hợp lệ (chỉ tính Học viên đang dùng)
     const nonDeletedMembers = clientMembers.filter((m: any) => {
@@ -547,7 +554,7 @@ export function ExecutiveDashboard({ authReady }: { authReady: boolean }) {
   }, [statsQ.data, membersQ.data, invoicesQ.data, eventsQ.data, upcoming.length, recentTrainings.length, statusFilter]);
 
   /* ---- loading / error for the KPI + chart core (stats) ---- */
-  if (!authReady || statsQ.isLoading) {
+  if (authReady && statsQ.isLoading && !s) {
     return (
       <div className="space-y-6">
         <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
@@ -562,9 +569,9 @@ export function ExecutiveDashboard({ authReady }: { authReady: boolean }) {
       </div>
     );
   }
-  if (statsQ.error || !s) {
+  if (!s) {
     return (
-      <ErrorState onRetry={() => statsQ.refetch()} description={(statsQ.error as Error)?.message} />
+      <ErrorState onRetry={() => { void statsQ.refetch(); void membersQ.refetch(); }} description={(membersQ.error as Error)?.message || "Không thể tải dữ liệu bảng điều khiển"} />
     );
   }
 

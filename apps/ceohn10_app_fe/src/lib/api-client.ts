@@ -11,6 +11,15 @@ export function getAuthToken(): string | null {
   );
 }
 
+export function getCookieDomain(): string {
+  if (typeof window === "undefined") return "";
+  const hostname = window.location.hostname.toLowerCase();
+  if (hostname.endsWith("viconnect.vn")) {
+    return "; domain=.viconnect.vn";
+  }
+  return "";
+}
+
 export function getBaseApiUrl(): string {
   if (typeof window !== "undefined") {
     // 0. Khi chạy trên môi trường Native Capacitor với local assets (localhost / capacitor://):
@@ -26,7 +35,7 @@ export function getBaseApiUrl(): string {
     }
 
     // 1. Khi chạy trên trình duyệt (Web / PWA) với HTTPS hoặc qua Reverse Proxy (5443, 5444, 5445)
-    // hoặc khi Capacitor mở trực tiếp server URL (hostname = 14.225.217.232 hoặc sslip.io):
+    // hoặc khi Capacitor mở trực tiếp server URL (hostname = 14.225.217.232 hoặc sslip.io / viconnect.vn):
     // Dùng chuỗi rỗng "" để mọi lệnh fetch đều là relative URL (/api/...) trên cùng Origin HTTPS.
     // Điều này TRÁNH TRIỆT ĐỂ lỗi Mixed Content (blocked:mixed-content) và lỗi CORS!
     if (
@@ -38,15 +47,34 @@ export function getBaseApiUrl(): string {
     ) {
       return "";
     }
-    // 2. Localhost phát triển (Vite Dev Server đã cấu hình proxy /api sang localhost:4000)
+    // 2. Localhost phát triển (Vite Dev Server đã cấu hình proxy /api sang localhost:4003)
     return "";
   }
+
   // 3. Phía Server-Side Rendering (SSR / Nitro server function chạy trong container)
-  return (
-    (typeof process !== "undefined" && (process.env?.NEST_API_URL || process.env?.VITE_API_URL)) ||
+  const envUrl = (
+    (typeof process !== "undefined" &&
+      (process.env?.NEST_API_URL || process.env?.VITE_API_URL || process.env?.VITE_PUBLIC_API_URL)) ||
     (import.meta.env?.VITE_API_URL as string) ||
-    "http://127.0.0.1:4003"
-  );
+    ""
+  ).trim();
+
+  if (envUrl && envUrl.startsWith("http")) {
+    return envUrl;
+  }
+
+  // Fallback thông minh theo Scope của container trong Docker network:
+  const isCrmScope =
+    (typeof process !== "undefined" &&
+      (process.env?.VITE_APP_SCOPE === "crm_platform" || process.env?.APP_SCOPE === "crm_platform")) ||
+    (import.meta.env?.VITE_APP_SCOPE as string) === "crm_platform";
+
+  const isProduction = typeof process !== "undefined" && process.env?.NODE_ENV === "production";
+  if (isProduction) {
+    return isCrmScope ? "http://ceohn10-crm-backend:4003" : "http://ceohn10-backend:4003";
+  }
+
+  return "http://127.0.0.1:4003";
 }
 
 export const NEST_API_URL = getBaseApiUrl();
@@ -411,11 +439,18 @@ async function trySilentRefresh(): Promise<string | null> {
       const maxAge = data.expires_in ?? 3600;
       const isHttps = window.location.protocol === "https:";
       const secure = isHttps ? "; secure" : "";
-      document.cookie = `sb-access-token=${data.access_token}; path=/; max-age=${maxAge}; SameSite=Lax${secure}`;
-      document.cookie = `vibe_token=${data.access_token}; path=/; max-age=${maxAge}; SameSite=Lax${secure}`;
-      document.cookie = `access_token=${data.access_token}; path=/; max-age=${maxAge}; SameSite=Lax${secure}`;
+      const domainAttr = getCookieDomain();
+      document.cookie = `sb-access-token=${data.access_token}; path=/; max-age=${maxAge}; SameSite=Lax${secure}${domainAttr}`;
+      document.cookie = `vibe_token=${data.access_token}; path=/; max-age=${maxAge}; SameSite=Lax${secure}${domainAttr}`;
+      document.cookie = `access_token=${data.access_token}; path=/; max-age=${maxAge}; SameSite=Lax${secure}${domainAttr}`;
       if (data.refresh_token) {
-        document.cookie = `sb-refresh-token=${data.refresh_token}; path=/; max-age=604800; SameSite=Lax${secure}`;
+        document.cookie = `sb-refresh-token=${data.refresh_token}; path=/; max-age=604800; SameSite=Lax${secure}${domainAttr}`;
+      }
+      if (domainAttr) {
+        // Đồng thời lưu host-only dự phòng
+        document.cookie = `sb-access-token=${data.access_token}; path=/; max-age=${maxAge}; SameSite=Lax${secure}`;
+        document.cookie = `vibe_token=${data.access_token}; path=/; max-age=${maxAge}; SameSite=Lax${secure}`;
+        document.cookie = `access_token=${data.access_token}; path=/; max-age=${maxAge}; SameSite=Lax${secure}`;
       }
       return data.access_token;
     } catch {
@@ -454,16 +489,33 @@ async function handleResponse(response: Response, endpoint = "") {
         pathname === "/association/login" ||
         pathname.startsWith("/association/login");
 
-      // NẾU LỖI XẢY RA KHI ĐANG Ở TRANG ĐĂNG NHẬP HOẶC KHI GỌI ENDPOINT ĐĂNG NHẬP:
-      // TUYỆT ĐỐI KHÔNG REDIRECT, để màn hình login hiển thị thông báo lỗi cho người dùng nhập lại!
-      if (isAuthEndpoint || isLoginPage) {
-        throw new Error(errMsg === "Unauthorized" ? "Thông tin đăng nhập hoặc mật khẩu không chính xác." : errMsg);
+      const isPublicRoute =
+        pathname.startsWith("/guest-event-register") ||
+        pathname.startsWith("/events/") && pathname.endsWith("/register") ||
+        pathname.startsWith("/guest-attendance") ||
+        pathname.startsWith("/guest-invite") ||
+        pathname.startsWith("/p/") ||
+        pathname.startsWith("/payment") ||
+        pathname.startsWith("/vnpay-return");
+
+      // NẾU LỖI XẢY RA KHI ĐANG Ở TRANG ĐĂNG NHẬP, PUBLIC FORM HOẶC KHI GỌI ENDPOINT ĐĂNG NHẬP:
+      // TUYỆT ĐỐI KHÔNG REDIRECT, để khách quét QR không bị đẩy sang trang login!
+      if (isAuthEndpoint || isLoginPage || isPublicRoute) {
+        throw new Error(errMsg === "Unauthorized" ? "Thông tin đăng nhập hoặc quyền truy cập không hợp lệ." : errMsg);
       }
 
       // Xóa phiên đăng nhập hết hạn
       localStorage.removeItem("vibe_token");
       localStorage.removeItem("vibe_refresh_token");
+      const domainAttr = getCookieDomain();
+      document.cookie = `sb-access-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT${domainAttr}`;
+      document.cookie = `vibe_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT${domainAttr}`;
+      document.cookie = `access_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT${domainAttr}`;
+      document.cookie = `sb-refresh-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT${domainAttr}`;
+
       document.cookie = `sb-access-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT`;
+      document.cookie = `vibe_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT`;
+      document.cookie = `access_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT`;
       document.cookie = `sb-refresh-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT`;
 
       // Nếu token hết hạn ở App Hiệp hội -> về /association/login

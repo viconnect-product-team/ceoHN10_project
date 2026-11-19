@@ -11,7 +11,9 @@ const emptyMock = path.resolve(__dirname, 'src/mock-empty.js');
 // @vercel/nft (nf3) dependency tracing, which fails with CommonJS
 // compatibility errors on certain packages during the self-hosted Docker
 // (node-server preset) build. Auto-loaded and merged by Nitro.
-const backendTarget = process.env.NEST_API_URL || 'http://backend:4000';
+const isCrm = process.env.VITE_APP_SCOPE === 'crm_platform' || process.env.APP_SCOPE === 'crm_platform';
+const defaultDockerBackend = isCrm ? 'http://ceohn10-crm-backend:4003' : 'http://ceohn10-backend:4003';
+const backendTarget = process.env.NEST_API_URL || (process.env.NODE_ENV === 'production' ? defaultDockerBackend : 'http://127.0.0.1:4003');
 
 export default defineConfig({
   noExternals: true,
