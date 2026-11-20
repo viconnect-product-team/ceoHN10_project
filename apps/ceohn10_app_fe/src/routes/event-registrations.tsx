@@ -23,6 +23,8 @@ import {
   XCircle,
   RefreshCw,
   Sparkles,
+  LogIn,
+  LogOut,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useServerFn } from "@tanstack/react-start";
@@ -691,6 +693,46 @@ function RegPage() {
     setQrModalOpen(true);
   };
 
+  const formatTimestamp = (iso?: string | null) => {
+    if (!iso) return "";
+    try {
+      const d = new Date(iso);
+      const hh = String(d.getHours()).padStart(2, "0");
+      const mm = String(d.getMinutes()).padStart(2, "0");
+      const dd = String(d.getDate()).padStart(2, "0");
+      const mo = String(d.getMonth() + 1).padStart(2, "0");
+      return `${hh}:${mm} - ${dd}/${mo}`;
+    } catch {
+      return iso;
+    }
+  };
+
+  const handleQuickCheckin = async (r: Registration) => {
+    try {
+      await fetchNestApi("/events/ticket-checkin", {
+        method: "POST",
+        body: { ticketCode: r.id, method: "crm_operator" },
+      });
+      toast.success(`Đã xác nhận Check-in cho đại biểu: ${r.memberName}`);
+      void fetchLiveRegistrations();
+    } catch (err: any) {
+      toast.error(err?.message || "Lỗi khi thực hiện check-in");
+    }
+  };
+
+  const handleQuickCheckout = async (r: Registration) => {
+    try {
+      await fetchNestApi("/events/ticket-checkout", {
+        method: "POST",
+        body: { ticketCode: r.id },
+      });
+      toast.success(`Đã xác nhận Check-out cho đại biểu: ${r.memberName}`);
+      void fetchLiveRegistrations();
+    } catch (err: any) {
+      toast.error(err?.message || "Lỗi khi thực hiện check-out");
+    }
+  };
+
   return (
     <AppShell>
       <PageHeader
@@ -1103,16 +1145,31 @@ function RegPage() {
                       </div>
                     </td>
 
-                    {/* Checkin status */}
+                    {/* Checkin / Checkout status */}
                     <td
                       style={{ width: colWidths.checkin, minWidth: colWidths.checkin }}
                       className="px-4 py-3 border-b border-border/50 whitespace-nowrap"
                     >
-                      {r.checkedInAt ? (
-                        <span className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-600">
-                          <CheckCircle2 className="h-3.5 w-3.5" />
-                          Đã check-in
-                        </span>
+                      {r.checkedOutAt ? (
+                        <div className="flex flex-col gap-0.5">
+                          <span className="inline-flex items-center gap-1 text-xs font-semibold text-blue-600 dark:text-blue-400">
+                            <LogOut className="h-3.5 w-3.5" />
+                            Đã check-out
+                          </span>
+                          <span className="text-[10px] text-muted-foreground font-mono">
+                            {formatTimestamp(r.checkedOutAt)}
+                          </span>
+                        </div>
+                      ) : r.checkedInAt ? (
+                        <div className="flex flex-col gap-0.5">
+                          <span className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+                            <CheckCircle2 className="h-3.5 w-3.5" />
+                            Đã check-in
+                          </span>
+                          <span className="text-[10px] text-muted-foreground font-mono">
+                            {formatTimestamp(r.checkedInAt)}
+                          </span>
+                        </div>
                       ) : (
                         <span className="text-xs text-muted-foreground">Chưa đến</span>
                       )}
@@ -1133,6 +1190,30 @@ function RegPage() {
                       className="sticky right-0 z-10 bg-card px-3 py-2.5 group-hover:bg-card border-b border-border/50 shadow-[-6px_0_12px_-4px_rgba(0,0,0,0.12)] whitespace-nowrap"
                     >
                       <div className="flex items-center justify-end gap-1.5 overflow-x-auto no-scrollbar scroll-smooth py-0.5 px-0.5">
+                        {/* Thao tác Check-in nhanh cho BTC */}
+                        {!r.checkedInAt && (
+                          <button
+                            onClick={() => handleQuickCheckin(r)}
+                            className="inline-flex items-center shrink-0 gap-1 rounded-lg border border-emerald-500/40 bg-emerald-500/10 px-2 py-1 text-xs font-semibold text-emerald-700 dark:text-emerald-300 hover:bg-emerald-500/20 cursor-pointer transition-colors"
+                            title="Xác nhận Check-in có mặt nhanh cho khách mời"
+                          >
+                            <LogIn className="h-3.5 w-3.5" />
+                            Check-in
+                          </button>
+                        )}
+
+                        {/* Thao tác Check-out nhanh cho BTC */}
+                        {r.checkedInAt && !r.checkedOutAt && (
+                          <button
+                            onClick={() => handleQuickCheckout(r)}
+                            className="inline-flex items-center shrink-0 gap-1 rounded-lg border border-blue-500/40 bg-blue-500/10 px-2 py-1 text-xs font-semibold text-blue-700 dark:text-blue-300 hover:bg-blue-500/20 cursor-pointer transition-colors"
+                            title="Xác nhận Check-out rời sự kiện cho khách mời"
+                          >
+                            <LogOut className="h-3.5 w-3.5" />
+                            Check-out
+                          </button>
+                        )}
+
                         {/* Xem QR checkin */}
                         <button
                           onClick={() => handleOpenQr(r)}

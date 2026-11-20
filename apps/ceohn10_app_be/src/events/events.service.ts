@@ -378,6 +378,11 @@ export class EventsService implements OnModuleInit {
           ? r.checked_in_at.toISOString()
           : String(r.checked_in_at)
         : null,
+      checkedOutAt: r.checked_out_at
+        ? r.checked_out_at instanceof Date
+          ? r.checked_out_at.toISOString()
+          : String(r.checked_out_at)
+        : null,
       luckyNumber: r.lucky_number ?? '',
     };
   }

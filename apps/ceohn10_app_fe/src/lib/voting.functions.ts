@@ -23,7 +23,7 @@ export type VoteSourceStats = {
 export type Vote = {
   id: string;
   title: string;
-  type: "policy" | "election" | "amendment";
+  type: "policy" | "election" | "amendment" | "rating";
   eventId?: string | null;
   eventName?: string | null;
   eventStatus?: string | null;

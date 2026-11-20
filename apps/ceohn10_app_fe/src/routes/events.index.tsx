@@ -20,6 +20,7 @@ import {
   MessageSquare,
   Camera,
   Heart,
+  Mail,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -33,6 +34,7 @@ import { SupplyDeclarationModal } from "@/components/dashboard/SupplyDeclaration
 import { EventFeedbackModal } from "@/components/events/EventFeedbackModal";
 import { EventMediaModal } from "@/components/events/EventMediaModal";
 import { EventQrStaffSelector } from "@/components/events/EventQrStaffSelector";
+import { OmnichannelBroadcastModal } from "@/components/templates/OmnichannelBroadcastModal";
 import { useRole, PERMISSIONS } from "@/hooks/use-role";
 import { useAuth } from "@/context/AuthContext";
 import { canScanEventQr } from "@/lib/checkin-gatekeeper-auth";
@@ -187,7 +189,29 @@ function EventsPage() {
   const [selectedSupplyEvent, setSelectedSupplyEvent] = useState<EventItem | null>(null);
   const [feedbackModalEvent, setFeedbackModalEvent] = useState<EventItem | null>(null);
   const [mediaModalEvent, setMediaModalEvent] = useState<EventItem | null>(null);
+  const [omnichannelModalOpen, setOmnichannelModalOpen] = useState(false);
+  const [omnichannelEventData, setOmnichannelEventData] = useState<any>({
+    title: "",
+    subtitle: "",
+    date: "",
+    time: "",
+    location: "",
+    posterUrl: "",
+  });
   const [submitting, setSubmitting] = useState(false);
+
+  const handleOpenBroadcastModal = (e?: EventItem) => {
+    const target = e || events[0];
+    setOmnichannelEventData({
+      title: target?.name || "Lễ Khai Giảng CEO HN10",
+      subtitle: target?.tagline || "CLB Doanh Nhân CEO HN10 (HanoiBA)",
+      date: target?.date ? formatDisplayDate(target.date) : "2026-11-28",
+      time: "08:30 - 12:00",
+      location: target?.location || "Trung tâm Hội nghị Quốc gia, Hà Nội",
+      posterUrl: target?.image || target?.banner || "/app-icon.png",
+    });
+    setOmnichannelModalOpen(true);
+  };
 
   useEffect(() => {
     setView(getEventView());
@@ -549,6 +573,14 @@ ${(e as any).description ? `📝 Chi tiết: ${(e as any).description}\n\n` : ""
             subtitle={t("events.subtitle")}
             actions={
               <>
+                <button
+                  type="button"
+                  onClick={() => handleOpenBroadcastModal()}
+                  className="inline-flex items-center gap-2 rounded-xl border border-amber-500/40 bg-amber-500/10 px-4 py-2 text-sm font-semibold text-amber-700 dark:text-amber-300 hover:bg-amber-500/20 shadow-xs cursor-pointer transition active:scale-95"
+                >
+                  <Mail className="h-4 w-4 text-amber-600" />
+                  Gửi Thư Mời Đa Kênh (Word/Excel/Zalo/Email)
+                </button>
                 {can("EVTO_EXPORT") && (
                   <button
                     onClick={handleExport}
@@ -999,6 +1031,18 @@ ${(e as any).description ? `📝 Chi tiết: ${(e as any).description}\n\n` : ""
                           <div className="inline-flex items-center gap-1">
                             <button
                               type="button"
+                              title="Gửi thư mời đa kênh (Word/Excel/Zalo/Email) cho sự kiện này"
+                              onClick={(evt) => {
+                                evt.stopPropagation();
+                                handleOpenBroadcastModal(e);
+                              }}
+                              className="inline-flex items-center gap-1 rounded-lg border border-amber-500/40 bg-amber-500/10 px-2 py-1.5 text-xs font-semibold text-amber-600 hover:bg-amber-500/20 transition cursor-pointer"
+                            >
+                              <Mail className="h-3.5 w-3.5" />
+                              <span className="hidden xl:inline text-[11px]">Thư mời</span>
+                            </button>
+                            <button
+                              type="button"
                               title="Bắn chi tiết sự kiện kèm Poster & QR xuống Mạng lưới"
                               onClick={(evt) => {
                                 evt.stopPropagation();
@@ -1216,6 +1260,13 @@ ${(e as any).description ? `📝 Chi tiết: ${(e as any).description}\n\n` : ""
             onUpdated={() => router.invalidate()}
           />
         )}
+
+        <OmnichannelBroadcastModal
+          open={omnichannelModalOpen}
+          onClose={() => setOmnichannelModalOpen(false)}
+          invitationData={omnichannelEventData}
+          onSuccess={() => router.invalidate()}
+        />
       </div>
     </AppShell>
   );

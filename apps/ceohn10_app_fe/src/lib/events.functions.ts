@@ -71,6 +71,7 @@ export type Registration = {
   reminderCount?: number;
   qrPayload?: string;
   checkedInAt?: string | null;
+  checkedOutAt?: string | null;
   phone?: string;
   company?: string;
   title?: string;

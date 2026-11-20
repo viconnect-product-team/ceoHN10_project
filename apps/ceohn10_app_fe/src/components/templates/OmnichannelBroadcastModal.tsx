@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import {
   X,
   Send,
@@ -14,9 +14,15 @@ import {
   Sparkles,
   Layers,
   Check,
+  Upload,
+  FileSpreadsheet,
+  FileText,
+  Trash2,
+  Plus,
 } from "lucide-react";
 import { toast } from "sonner";
 import { fetchNestApi } from "@/lib/api-client";
+import { parseMultipleFiles, type ParsedRecipientItem } from "@/lib/ai-excel-email-parser";
 
 export interface OmnichannelBroadcastModalProps {
   open?: boolean;
@@ -54,9 +60,22 @@ export function OmnichannelBroadcastModal({
 
   // Target audience selection
   const [targetAudience, setTargetAudience] = useState<
-    "all" | "executives" | "department" | "registered"
+    "all" | "executives" | "department" | "registered" | "custom_file"
   >("all");
   const [selectedDept, setSelectedDept] = useState<string>("Ban Xúc Tiến Thương Mại");
+
+  // Custom Recipients from Word / Excel file (.docx, .xlsx)
+  const [customRecipients, setCustomRecipients] = useState<ParsedRecipientItem[]>([]);
+  const [uploadedFileName, setUploadedFileName] = useState<string>("");
+  const [isParsingFile, setIsParsingFile] = useState<boolean>(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Manual Add Form states
+  const [showManualAdd, setShowManualAdd] = useState(false);
+  const [manualName, setManualName] = useState("");
+  const [manualEmail, setManualEmail] = useState("");
+  const [manualPhone, setManualPhone] = useState("");
+  const [manualCompany, setManualCompany] = useState("");
 
   const [isSending, setIsSending] = useState<boolean>(false);
   const [sendResults, setSendResults] = useState<{
@@ -82,9 +101,80 @@ export function OmnichannelBroadcastModal({
     setSendToEmail(false);
   };
 
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    setIsParsingFile(true);
+    try {
+      const results = await parseMultipleFiles(files);
+      const combinedRecipients: ParsedRecipientItem[] = [];
+      const fileNames: string[] = [];
+
+      for (const res of results) {
+        fileNames.push(res.fileName);
+        if (Array.isArray(res.recipients) && res.recipients.length > 0) {
+          combinedRecipients.push(...res.recipients);
+        }
+      }
+
+      if (combinedRecipients.length > 0) {
+        setCustomRecipients((prev) => {
+          const map = new Map<string, ParsedRecipientItem>();
+          [...prev, ...combinedRecipients].forEach((item) => {
+            const key = (item.email || item.phone || item.name).toLowerCase().trim();
+            if (key) map.set(key, item);
+          });
+          return Array.from(map.values());
+        });
+        setUploadedFileName(fileNames.join(", "));
+        toast.success(`Đã trích xuất thành công ${combinedRecipients.length} khách mời từ tệp!`);
+      } else {
+        toast.warning("Không tìm thấy email hoặc thông tin khách mời hợp lệ trong tệp.");
+      }
+    } catch (err: any) {
+      console.error("Lỗi khi đọc tệp Word/Excel:", err);
+      toast.error(err?.message || "Không thể xử lý tệp. Vui lòng kiểm tra lại định dạng.");
+    } finally {
+      setIsParsingFile(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
+
+  const handleAddManualRecipient = () => {
+    const cleanEmail = manualEmail.trim().toLowerCase();
+    const cleanPhone = manualPhone.trim();
+    const cleanName = manualName.trim();
+    if (!cleanEmail && !cleanPhone) {
+      toast.error("Vui lòng nhập Email hoặc Số điện thoại của khách mời!");
+      return;
+    }
+    const newRecipient: ParsedRecipientItem = {
+      name: cleanName || cleanEmail.split("@")[0] || cleanPhone,
+      email: cleanEmail,
+      phone: cleanPhone,
+      company: manualCompany.trim() || "Doanh nghiệp khách mời",
+    };
+    setCustomRecipients((prev) => [newRecipient, ...prev]);
+    setManualName("");
+    setManualEmail("");
+    setManualPhone("");
+    setManualCompany("");
+    setShowManualAdd(false);
+    toast.success("Đã thêm khách mời vào danh sách gửi!");
+  };
+
+  const handleRemoveRecipient = (indexToRemove: number) => {
+    setCustomRecipients((prev) => prev.filter((_, idx) => idx !== indexToRemove));
+  };
+
   const handleBroadcast = async () => {
     if (totalChannelsSelected === 0) {
       toast.error("Vui lòng tích chọn ít nhất 1 kênh để gửi thư mời!");
+      return;
+    }
+
+    if (targetAudience === "custom_file" && customRecipients.length === 0) {
+      toast.error("Vui lòng tải lên tệp Word/Excel hoặc thêm ít nhất 1 khách mời vào danh sách!");
       return;
     }
 
@@ -107,6 +197,7 @@ export function OmnichannelBroadcastModal({
         },
         targetAudience,
         departmentId: targetAudience === "department" ? selectedDept : undefined,
+        customRecipients: targetAudience === "custom_file" ? customRecipients : undefined,
       };
 
       const res = await fetchNestApi<any>("/admin/invitation-templates/broadcast", {
@@ -125,8 +216,9 @@ export function OmnichannelBroadcastModal({
       if (sendToZalo) channelNames.push("Zalo OA");
       if (sendToEmail) channelNames.push("Email");
 
+      const countStr = targetAudience === "custom_file" ? ` tới ${customRecipients.length} khách mời` : "";
       toast.success(
-        `Đã áp dụng và phát thư mời thành công qua ${channelNames.join(", ")}!`
+        `Đã áp dụng và phát thư mời thành công${countStr} qua ${channelNames.join(", ")}!`
       );
       if (onSuccess) onSuccess();
     } catch (err: any) {
@@ -392,7 +484,159 @@ export function OmnichannelBroadcastModal({
                 <div className="font-bold">Học viên Đã Đăng Ký</div>
                 <div className="text-[10px] text-slate-400">Gửi nhắc hẹn &amp; xác nhận</div>
               </button>
+
+              <button
+                type="button"
+                onClick={() => setTargetAudience("custom_file")}
+                className={`col-span-2 p-2.5 rounded-lg border text-left text-xs font-medium transition cursor-pointer ${targetAudience === "custom_file"
+                    ? "border-amber-500 bg-amber-950/40 text-amber-200 ring-1 ring-amber-500/50"
+                    : "border-slate-800 bg-slate-900/60 text-slate-400 hover:text-slate-200"
+                  }`}
+              >
+                <div className="font-bold flex items-center justify-between">
+                  <span className="flex items-center gap-1.5">
+                    <FileSpreadsheet className="size-4 text-emerald-400" />
+                    <span>Nhập Danh Sách từ tệp Word (.docx) / Excel (.xlsx) / Tùy chọn</span>
+                  </span>
+                  {customRecipients.length > 0 && (
+                    <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-bold text-[10px]">
+                      {customRecipients.length} khách mời
+                    </span>
+                  )}
+                </div>
+                <div className="text-[10px] text-slate-400 mt-0.5">
+                  Tải lên file danh sách khách mời cụ thể hoặc nhập trực tiếp SĐT, Email để gửi qua Zalo OA &amp; Email
+                </div>
+              </button>
             </div>
+
+            {/* KHỐI TẢI TỆP WORD / EXCEL & QUẢN LÝ KHÁCH MỜI CỤ THỂ */}
+            {targetAudience === "custom_file" && (
+              <div className="mt-3 p-3.5 rounded-xl border border-slate-800 bg-slate-950/80 space-y-3 animate-in fade-in duration-200">
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={handleFileUpload}
+                  accept=".xlsx,.xls,.docx,.doc,.csv"
+                  className="hidden"
+                />
+
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      disabled={isParsingFile}
+                      onClick={() => fileInputRef.current?.click()}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs transition cursor-pointer shadow-sm"
+                    >
+                      <Upload className="size-3.5" />
+                      <span>{isParsingFile ? "Đang đọc tệp..." : "Tải lên tệp Word / Excel"}</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setShowManualAdd(!showManualAdd)}
+                      className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-slate-700 bg-slate-900 hover:bg-slate-800 text-slate-300 text-xs transition cursor-pointer"
+                    >
+                      <Plus className="size-3.5" />
+                      <span>{showManualAdd ? "Đóng form" : "Thêm thủ công"}</span>
+                    </button>
+                  </div>
+                  {uploadedFileName && (
+                    <span className="text-[11px] text-emerald-400 truncate max-w-xs">
+                      📁 {uploadedFileName}
+                    </span>
+                  )}
+                </div>
+
+                {/* Form thêm thủ công nhanh */}
+                {showManualAdd && (
+                  <div className="p-2.5 rounded-lg border border-slate-700 bg-slate-900 space-y-2">
+                    <div className="text-[11px] font-semibold text-amber-300">Thêm khách mời cụ thể:</div>
+                    <div className="grid grid-cols-2 gap-2">
+                      <input
+                        type="text"
+                        placeholder="Họ và tên khách mời"
+                        value={manualName}
+                        onChange={(e) => setManualName(e.target.value)}
+                        className="bg-slate-950 border border-slate-700 rounded px-2.5 py-1 text-xs text-slate-200"
+                      />
+                      <input
+                        type="email"
+                        placeholder="Địa chỉ Email"
+                        value={manualEmail}
+                        onChange={(e) => setManualEmail(e.target.value)}
+                        className="bg-slate-950 border border-slate-700 rounded px-2.5 py-1 text-xs text-slate-200"
+                      />
+                      <input
+                        type="tel"
+                        placeholder="Số điện thoại (gửi Zalo OA)"
+                        value={manualPhone}
+                        onChange={(e) => setManualPhone(e.target.value)}
+                        className="bg-slate-950 border border-slate-700 rounded px-2.5 py-1 text-xs text-slate-200"
+                      />
+                      <input
+                        type="text"
+                        placeholder="Doanh nghiệp / Chức danh"
+                        value={manualCompany}
+                        onChange={(e) => setManualCompany(e.target.value)}
+                        className="bg-slate-950 border border-slate-700 rounded px-2.5 py-1 text-xs text-slate-200"
+                      />
+                    </div>
+                    <div className="flex justify-end pt-1">
+                      <button
+                        type="button"
+                        onClick={handleAddManualRecipient}
+                        className="px-3 py-1 rounded bg-amber-600 hover:bg-amber-700 text-slate-950 font-bold text-xs cursor-pointer"
+                      >
+                        Lưu vào danh sách
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Bảng danh sách khách mời đã nạp */}
+                {customRecipients.length > 0 ? (
+                  <div className="space-y-1.5 max-h-40 overflow-y-auto no-scrollbar">
+                    <div className="text-[11px] font-semibold text-slate-400 flex items-center justify-between">
+                      <span>Danh sách sẽ nhận thư ({customRecipients.length} người):</span>
+                      <button
+                        type="button"
+                        onClick={() => setCustomRecipients([])}
+                        className="text-rose-400 hover:underline text-[10px]"
+                      >
+                        Xóa tất cả
+                      </button>
+                    </div>
+                    <div className="divide-y divide-slate-800 border border-slate-800 rounded-lg overflow-hidden bg-slate-900/60 text-xs">
+                      {customRecipients.map((item, idx) => (
+                        <div key={idx} className="p-2 flex items-center justify-between gap-2 hover:bg-slate-800/40">
+                          <div className="min-w-0 flex-1">
+                            <div className="font-semibold text-white truncate">{item.name}</div>
+                            <div className="text-[11px] text-slate-400 flex flex-wrap gap-2">
+                              {item.email && <span className="text-amber-400 truncate">✉ {item.email}</span>}
+                              {item.phone && <span className="text-emerald-400">📞 {item.phone}</span>}
+                              {item.company && <span className="text-slate-500 truncate">🏢 {item.company}</span>}
+                            </div>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveRecipient(idx)}
+                            className="p-1 text-slate-500 hover:text-rose-400 rounded transition cursor-pointer"
+                            title="Xóa khách này"
+                          >
+                            <Trash2 className="size-3.5" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="p-4 border border-dashed border-slate-800 rounded-lg text-center text-xs text-slate-500">
+                    Chưa có khách mời nào trong danh sách. Quý BTC hãy tải lên file Excel (.xlsx), Word (.docx) hoặc bấm "Thêm thủ công".
+                  </div>
+                )}
+              </div>
+            )}
 
             {targetAudience === "department" && (
               <div className="mt-2">

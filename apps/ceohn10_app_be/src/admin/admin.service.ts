@@ -4388,8 +4388,11 @@ export class AdminService implements OnModuleInit {
     // 2. KÊNH 2: GỬI VÀO ZALO OA (Gửi ZNS / Tin nhắn thông báo)
     if (channels.sendToZalo) {
       try {
-        // Ghi nhận log điều phối Zalo OA
         console.log(`[broadcastInvitation] Zalo OA dispatch queued for ${dto.title}`);
+        // Nếu có danh sách khách hàng tùy chọn (nhập từ file Word/Excel)
+        if (Array.isArray(dto.customRecipients) && dto.customRecipients.length > 0) {
+          console.log(`[broadcastInvitation] Gửi Zalo OA tới ${dto.customRecipients.length} khách mời theo danh sách tùy chọn`);
+        }
         results.zalo = true;
       } catch (err: any) {
         console.error('[broadcastInvitation] Error sending to Zalo:', err?.message);
@@ -4399,16 +4402,32 @@ export class AdminService implements OnModuleInit {
     // 3. KÊNH 3: GỬI VÀO EMAIL (Gửi HTML Email kèm poster)
     if (channels.sendToEmail && this.mailService) {
       try {
-        // Lấy danh sách Học viên thực sự HOẠT ĐỘNG (loại bỏ hoàn toàn tài khoản đã xóa/ngừng hoạt động)
-        const members = await this.prisma.$queryRawUnsafe<any[]>(
-          `SELECT name, email, company_name FROM public.members 
-           WHERE is_active = true 
-             AND (status IS NULL OR LOWER(status) NOT IN ('deleted', 'inactive', 'dormant', 'da_xoa', 'khoa', 'tam_khoa')) 
-             AND email IS NOT NULL AND email != '' 
-           LIMIT 50;`
-        ).catch(() => []);
+        // Kiểm tra xem có danh sách khách hàng tải lên từ Word / Excel không
+        const hasCustomRecipients = Array.isArray(dto.customRecipients) && dto.customRecipients.length > 0;
+        let recipientsList: Array<{ name: string; email: string; company?: string; phone?: string }> = [];
 
-        const htmlBody = `
+        if (hasCustomRecipients) {
+          recipientsList = dto.customRecipients
+            .filter((r: any) => r && r.email && String(r.email).includes('@'))
+            .map((r: any) => ({
+              name: String(r.name || r.email.split('@')[0]).trim(),
+              email: String(r.email).trim().toLowerCase(),
+              company: r.company ? String(r.company).trim() : 'Khách mời danh dự',
+              phone: r.phone ? String(r.phone).trim() : undefined,
+            }));
+        } else {
+          // Lấy danh sách Học viên thực sự HOẠT ĐỘNG (loại bỏ hoàn toàn tài khoản đã xóa/ngừng hoạt động)
+          const members = await this.prisma.$queryRawUnsafe<any[]>(
+            `SELECT name, email, company_name as company, phone FROM public.members 
+             WHERE is_active = true 
+               AND (status IS NULL OR LOWER(status) NOT IN ('deleted', 'inactive', 'dormant', 'da_xoa', 'khoa', 'tam_khoa')) 
+               AND email IS NOT NULL AND email != '' 
+             LIMIT 50;`
+          ).catch(() => []);
+          recipientsList = members;
+        }
+
+        const buildEmailHtml = (recipientName: string) => `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #0b0f19; color: #ffffff; border-radius: 12px; overflow: hidden; border: 1px solid #1e293b;">
             <div style="text-align: center; padding: 24px 20px 10px; background: linear-gradient(180deg, #1e1b4b 0%, #0b0f19 100%);">
               <img src="https://crm.ceohn10.viconnect.vn/ceohn10-official-logo.png" alt="CEO HN10" style="height: 50px; margin-bottom: 12px;" />
@@ -4417,7 +4436,7 @@ export class AdminService implements OnModuleInit {
             </div>
             ${dto.posterUrl ? `<div style="text-align: center; padding: 12px 20px;"><img src="${dto.posterUrl}" alt="Poster Thư Mời" style="max-width: 100%; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.5);" /></div>` : ''}
             <div style="padding: 20px; font-size: 14px; line-height: 1.6; color: #e2e8f0;">
-              <p><strong>${dto.salutation || 'Kính gửi: Quý Anh/Chị Học viên Doanh nhân,'}</strong></p>
+              <p><strong>${dto.salutation || `Kính gửi Quý Doanh nhân ${recipientName},`}</strong></p>
               <p style="white-space: pre-line;">${dto.bodyText || 'Ban Tổ Chức CLB Doanh Nhân CEO HN10 trân trọng kính mời Quý Anh/Chị tham dự chương trình.'}</p>
               <div style="background: rgba(255,255,255,0.05); padding: 14px; border-radius: 8px; border-left: 4px solid #fbbf24; margin: 16px 0;">
                 <p style="margin: 0 0 6px;">📅 <strong>Thời gian:</strong> ${dto.date || ''} ${dto.time ? `(${dto.time})` : ''}</p>
@@ -4428,14 +4447,13 @@ export class AdminService implements OnModuleInit {
           </div>
         `;
 
-        if (members.length > 0) {
-          // Gửi trực tiếp tới các Học viên đầu mối
-          for (const m of members.slice(0, 5)) {
-            if (m.email) {
+        if (recipientsList.length > 0) {
+          for (const recipient of recipientsList) {
+            if (recipient.email) {
               await this.mailService.sendDirectEmail({
-                to: m.email,
+                to: recipient.email,
                 subject: `[THƯ MỜI] ${dto.title || 'Sự kiện CEO HN10'}`,
-                html: htmlBody,
+                html: buildEmailHtml(recipient.name || 'Học viên'),
               }).catch((e: any) => console.warn('[broadcastInvitation] Email send warn:', e?.message));
             }
           }

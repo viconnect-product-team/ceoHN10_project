@@ -13,6 +13,7 @@ import {
   Vote as VoteIcon,
   X,
   Ticket,
+  Star,
 } from "lucide-react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/dashboard/AppShell";
@@ -100,6 +101,7 @@ const TYPE_KEY: Record<Vote["type"], TKey> = {
   policy: "vote.type.policy",
   election: "vote.type.election",
   amendment: "vote.type.amendment",
+  rating: "vote.type.policy" as TKey,
 };
 
 type OpenMode = "same" | "new";
@@ -420,6 +422,88 @@ function VotingPage() {
                   <div className="mt-1 text-xs text-muted-foreground">
                     {fmt.date(v.startsAt)} → {fmt.date(v.endsAt)}
                   </div>
+
+                  {/* Rating 1 - 5 Sao Widget nếu là loại rating */}
+                  {v.type === "rating" && (
+                    <div className="mt-4 p-4 rounded-2xl border border-amber-500/30 bg-amber-500/5 max-w-xl">
+                      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-3 border-b border-amber-500/20">
+                        <div>
+                          <div className="text-xs font-bold text-amber-700 dark:text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
+                            <Star className="size-4 fill-amber-500 text-amber-500" />
+                            <span>Đánh giá xếp hạng sao (1 - 5 sao)</span>
+                          </div>
+                          <p className="text-[11px] text-muted-foreground mt-0.5">
+                            Click vào các ngôi sao bên dưới để trực tiếp gửi phiếu đánh giá
+                          </p>
+                        </div>
+                        {/* Điểm trung bình */}
+                        {(() => {
+                          const totalVotes = v.optionDetails?.reduce((sum, o) => sum + (o.votesCount || 0), 0) || 0;
+                          let weightedPoints = 0;
+                          v.optionDetails?.forEach((o) => {
+                            const stars = o.title.includes("5 sao") || o.title.includes("⭐⭐⭐⭐⭐") ? 5
+                              : o.title.includes("4 sao") || o.title.includes("⭐⭐⭐⭐") ? 4
+                              : o.title.includes("3 sao") || o.title.includes("⭐⭐⭐") ? 3
+                              : o.title.includes("2 sao") || o.title.includes("⭐⭐") ? 2
+                              : o.title.includes("1 sao") || o.title.includes("⭐") ? 1 : 0;
+                            weightedPoints += stars * (o.votesCount || 0);
+                          });
+                          const avgScore = totalVotes > 0 ? (weightedPoints / totalVotes).toFixed(1) : "5.0";
+                          return (
+                            <div className="flex items-center gap-2 bg-amber-500/10 px-3 py-1.5 rounded-xl border border-amber-500/30 shrink-0">
+                              <span className="text-lg font-black text-amber-600 dark:text-amber-400">{avgScore}</span>
+                              <div className="flex flex-col">
+                                <div className="flex items-center text-amber-500">
+                                  {[1, 2, 3, 4, 5].map((s) => (
+                                    <Star key={s} className={`size-3 ${Number(avgScore) >= s ? "fill-amber-500" : Number(avgScore) >= s - 0.5 ? "fill-amber-300" : "text-amber-300/40"}`} />
+                                  ))}
+                                </div>
+                                <span className="text-[9.5px] text-muted-foreground font-semibold">{totalVotes} lượt đánh giá</span>
+                              </div>
+                            </div>
+                          );
+                        })()}
+                      </div>
+
+                      {/* 5 Ngôi sao lớn tương tác */}
+                      {!isClosed && (
+                        <div className="pt-3 flex items-center justify-center gap-3 py-2">
+                          {[1, 2, 3, 4, 5].map((starIdx) => {
+                            const matchingOption = v.optionDetails?.find((o) =>
+                              starIdx === 5 ? o.title.includes("5") :
+                              starIdx === 4 ? o.title.includes("4") :
+                              starIdx === 3 ? o.title.includes("3") :
+                              starIdx === 2 ? o.title.includes("2") :
+                              o.title.includes("1")
+                            );
+                            const isMySelectedStar = matchingOption && v.myVote === matchingOption.id;
+                            return (
+                              <button
+                                key={starIdx}
+                                type="button"
+                                disabled={!matchingOption || votingOptionId === matchingOption?.id}
+                                onClick={() => matchingOption && handleVote(v.id, matchingOption.id)}
+                                className="group flex flex-col items-center gap-1 p-2 rounded-xl hover:bg-amber-500/15 transition transform hover:scale-110 active:scale-95 cursor-pointer"
+                                title={`Bình chọn ${starIdx} sao`}
+                              >
+                                <Star
+                                  className={`size-8 transition-colors ${
+                                    isMySelectedStar
+                                      ? "fill-amber-500 text-amber-500 drop-shadow-[0_0_8px_rgba(245,158,11,0.6)]"
+                                      : "text-amber-400/60 group-hover:fill-amber-400 group-hover:text-amber-400"
+                                  }`}
+                                />
+                                <span className={`text-[10px] font-bold ${isMySelectedStar ? "text-amber-600 dark:text-amber-400" : "text-muted-foreground"}`}>
+                                  {starIdx} Sao
+                                </span>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  )}
+
                   {/* Options breakdown with exact percentages & leading badges */}
                   {v.optionDetails && v.optionDetails.length > 0 ? (
                     <div className="mt-4 space-y-2 max-w-xl">
@@ -787,12 +871,25 @@ function VoteModal({ vote, onClose }: { vote?: Vote; onClose: () => void }) {
             <label className="mb-1 block text-sm font-medium text-foreground">Loại</label>
             <select
               value={type}
-              onChange={(e) => setType(e.target.value as Vote["type"])}
+              onChange={(e) => {
+                const newType = e.target.value as Vote["type"];
+                setType(newType);
+                if (newType === "rating") {
+                  setOptions([
+                    "⭐⭐⭐⭐⭐ (5 sao - Rất hài lòng / Xuất sắc)",
+                    "⭐⭐⭐⭐ (4 sao - Hài lòng / Tốt)",
+                    "⭐⭐⭐ (3 sao - Khá / Đạt yêu cầu)",
+                    "⭐⭐ (2 sao - Cần cải thiện)",
+                    "⭐ (1 sao - Chưa đạt)",
+                  ]);
+                }
+              }}
               className={inputCls}
             >
               <option value="policy">Chính sách</option>
               <option value="election">Bầu cử</option>
               <option value="amendment">Sửa đổi điều lệ</option>
+              <option value="rating">⭐ Đánh giá xếp hạng sao (Vote 1 - 5 sao)</option>
             </select>
           </div>
 

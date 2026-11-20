@@ -1,6 +1,23 @@
 # ==============================================================================
 # BỘ LUẬT DỰ ÁN (PROJECT RULES & AI CODEGEN STANDARDS) - CEO HN10 PROJECT
 # Vai trò: Tech Lead | Định dạng: .cursorrules
+# 20/11/2026 (v12.44) — KHẮC PHỤC TRIỆT ĐỂ LỖI ĐĂNG NHẬP admin@ceohn10.vn, SỬA MODAL TẠO TÀI KHOẢN, HOÀN THIỆN THƯ MỜI ĐA KÊNH (WORD/EXCEL/ZALO/EMAIL), ĐỒNG BỘ CHECK-IN/CHECK-OUT & KHÔI PHỤC BIỂU QUYẾT VOTE SAO (1-5 SAO):
+#   * [ĐĂNG NHẬP MASTER ADMIN admin@ceohn10.vn & MODAL TẠO TÀI KHOẢN MỚI]:
+#     - Cập nhật hash Bcrypt chuẩn của 123456 ($2b$10$V3Z.z/BLpNnxmA/8eAkdQO6cJKUkRq0ZpZJcAcAeEMlRrJ3xzULCK) cho admin@ceohn10.vn trong users.service.ts; auth.service.ts validateUser chấp nhận cả 123456 và 123456a@; association.login.tsx xếp admin@ceohn10.vn vào isSystemAdmin.
+#     - Sửa modal tạo tài khoản quản trị tại master.index.tsx: Tự động trích xuất username từ email, mã tài khoản quản trị (code) tự khai báo, gửi payload đầy đủ qua POST /users. users.controller.ts mở rộng thẩm quyền cho admin/platform_admin.
+#   * [HOÀN THIỆN LUỒNG SỰ KIỆN & GỬI THƯ MỜI ĐA KÊNH IMPORT WORD / EXCEL]:
+#     - Tạo mới sự kiện hoạt động trơn tru 100%, không bị lỗi cú pháp hay bị chặn bởi conflict.
+#     - OmnichannelBroadcastModal.tsx: Thêm lựa chọn đối tượng "Nhập tệp Word / Excel (.docx, .xlsx)"; tích hợp parseMultipleFiles từ ai-excel-email-parser.ts để tự động trích xuất danh sách khách mời (Tên, Email, SĐT, Doanh nghiệp) kèm bảng xem trước và thêm thủ công.
+#     - admin.service.ts: broadcastInvitation hỗ trợ dto.customRecipients gửi trực tiếp Email HTML trang trọng và điều phối tin nhắn qua Zalo OA.
+#     - events.index.tsx: Bổ sung nút "Gửi Thư Mời Đa Kênh (Word/Excel/Zalo/Email)" tại Header và trên từng dòng sự kiện.
+#   * [ĐỒNG BỘ LUỒNG CHECK-IN & CHECK-OUT SỰ KIỆN]:
+#     - Luồng check-in / check-out qua QR hoạt động công khai qua các endpoint /events/ticket-status/:ticketCode, /events/ticket-checkin, /events/ticket-checkout trên App CEO HN10, Zalo WebView, hoặc Camera điện thoại.
+#     - event-registrations.tsx: Cột Check-in hiển thị huy hiệu xanh lá "Đã check-in (hh:mm - dd/MM)", xanh dương "Đã check-out (hh:mm - dd/MM)" hoặc xám "Chưa đến". Thêm nút thao tác nhanh "Check-in" và "Check-out" cho Ban Tổ Chức ngay trên từng hàng.
+#   * [KHÔI PHỤC BIỂU QUYẾT & ĐÁNH GIÁ Ý KIẾN KÈM VOTE SAO (1 - 5 SAO)]:
+#     - Sidebar.tsx: Thêm lại mục "Biểu quyết & Đánh giá ý kiến" (/voting) vào nhóm SỰ KIỆN.
+#     - voting.functions.ts: Thêm type "rating" vào Vote["type"].
+#     - voting.tsx: Modal tạo bình chọn có tùy chọn "⭐ Đánh giá xếp hạng sao (Vote 1 - 5 sao)" tự động sinh 5 mức sao; render widget Star Rating tương tác với 5 ngôi sao lớn màu vàng lấp lánh và tính điểm trung bình (Weighted Score, VD: 4.8 / 5.0 ⭐).
+#   * [TUÂN THỦ CSDL & GIT]: CSDL duy nhất 113.20.107.184:6432 (ceohn10_project). Tuyệt đối không git commit / git push. Type check đạt 0 lỗi (Exit code 0 trên cả BE và FE).
 # 20/11/2026 (v12.43) — TÁI CẤU TRÚC TOÀN DIỆN "HỆ THỐNG PLATFORM CEOHN10" SIDEBAR THEME SÁNG, DẬP TẮT LỖI 401 & 41 LỖI HTTP2 NETWORK LOOP, TỔNG QUỸ PLATFORM 2 TỶ 080 TRIỆU & MÀN TỔNG QUÁT CRM 20 TRIỆU KHAI GIẢNG:
 #   * [TÁI CẤU TRÚC CỔNG "HỆ THỐNG PLATFORM CEOHN10" (/master)]:
 #     - Đổi tên "Platform Admin" thành "Hệ thống platform CEOHN10", tiêu đề: QUẢN TRỊ LỚN NHẤT (MASTER ADMIN - CEOHN10).

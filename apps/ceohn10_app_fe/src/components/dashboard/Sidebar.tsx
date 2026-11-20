@@ -88,6 +88,7 @@ const crmEvents: Item[] = [
   { key: "nav.eventRegistrations" as TKey, icon: ClipboardList, to: "/event-registrations", label: "Quản lý người đăng ký" },
   { key: "nav.checkinQr" as TKey, icon: QrCodeIcon, to: "/checkin-qr", label: "Quản lý cấu hình mã QR đăng ký, check in vào cửa" },
   { key: "nav.luckyDraw" as TKey, icon: Gift, to: "/lucky-draw", label: "Quản lý quay thưởng" },
+  { key: "nav.voting" as TKey, icon: Vote, to: "/voting", label: "Biểu quyết & Đánh giá ý kiến" },
 ];
 
 // 3. Nhóm Lớp CEOHN10
