@@ -420,6 +420,108 @@ export class UsersService implements OnModuleInit {
     try {
       const defaultPasswordHash = await bcrypt.hash('Admin@HN10', 10);
       const mediaPasswordHash = await bcrypt.hash('123456', 10);
+      const platformAdminPassHash = await bcrypt.hash('123456', 10);
+
+      // 0. KHỞI TẠO TÀI KHOẢN MASTER PLATFORM ADMIN: admin@ceohn10.vn (Mật khẩu: 123456)
+      const platformAdminRows = await this.prisma.$queryRaw<any[]>`
+        SELECT id, username, email FROM public.vione_users 
+        WHERE email = 'admin@ceohn10.vn' OR username = 'admin@ceohn10.vn'
+        LIMIT 1
+      `.catch(() => []);
+
+      let platformAdminId = 'c1000000-0000-4000-8000-000000000001';
+      if (platformAdminRows.length === 0) {
+        this.logger.log('Seeding Master Platform Admin (admin@ceohn10.vn) into database...');
+        await this.prisma.$executeRaw`
+          INSERT INTO public.vione_users (id, username, email, name, password, email_verified, created_at, updated_at)
+          VALUES (
+            ${platformAdminId}::uuid, 
+            'admin@ceohn10.vn', 
+            'admin@ceohn10.vn', 
+            'Hệ thống platform CEOHN10', 
+            ${platformAdminPassHash}, 
+            true, 
+            NOW(), 
+            NOW()
+          )
+          ON CONFLICT (id) DO UPDATE SET
+            username = EXCLUDED.username,
+            email = EXCLUDED.email,
+            name = EXCLUDED.name,
+            password = ${platformAdminPassHash},
+            updated_at = NOW()
+        `.catch((err) => {
+          this.logger.warn(`Could not seed admin@ceohn10.vn: ${err.message}`);
+        });
+      } else {
+        platformAdminId = String(platformAdminRows[0].id);
+        // Đảm bảo mật khẩu luôn khớp 123456
+        await this.prisma.$executeRaw`
+          UPDATE public.vione_users 
+          SET password = ${platformAdminPassHash}, updated_at = NOW()
+          WHERE id = ${platformAdminId}::uuid
+        `.catch(() => {});
+      }
+
+      // Gán role cao nhất platform_admin cho admin@ceohn10.vn
+      await this.prisma.$executeRaw`
+        INSERT INTO public.user_roles (user_id, role)
+        VALUES (${platformAdminId}::uuid, 'platform_admin'::public.app_role)
+        ON CONFLICT DO NOTHING
+      `.catch(() => { });
+      await this.prisma.$executeRaw`
+        INSERT INTO public.user_roles (user_id, role)
+        VALUES (${platformAdminId}::uuid, 'admin'::public.app_role)
+        ON CONFLICT DO NOTHING
+      `.catch(() => { });
+
+      // Profile cho Master Admin
+      await this.prisma.$executeRaw`
+        INSERT INTO public.user_profiles (user_id, display_name, company_name, professional_title)
+        VALUES (${platformAdminId}::uuid, 'Hệ thống platform CEOHN10', 'CLB Doanh Nhân CEO HN10', 'Master Platform Admin')
+        ON CONFLICT (user_id) DO UPDATE SET
+          display_name = EXCLUDED.display_name
+      `.catch(() => { });
+
+      // Record trong public.members cho Master Admin
+      await this.prisma.$executeRaw`
+        INSERT INTO public.members (
+          id, user_id, code, name, email, phone, company_name, department, executive_role, status,
+          association_id, type, level, industry, region, payment_status, fee_paid, created_at, updated_at
+        ) VALUES (
+          'CEOHN10-ADMIN',
+          ${platformAdminId}::uuid,
+          'CEOHN10-ADMIN',
+          'Hệ thống platform CEOHN10',
+          'admin@ceohn10.vn',
+          '0988888888',
+          'CLB Doanh Nhân CEO HN10',
+          'Ban Điều Hành',
+          'platform_admin',
+          'active',
+          'c1983000-0000-4000-8000-000000001983'::uuid,
+          'company',
+          'memberLevel.large',
+          'ind.trade',
+          'region.north',
+          'paid',
+          true,
+          NOW(),
+          NOW()
+        )
+        ON CONFLICT (id) DO UPDATE SET
+          name = EXCLUDED.name,
+          email = EXCLUDED.email,
+          phone = EXCLUDED.phone,
+          department = EXCLUDED.department,
+          executive_role = EXCLUDED.executive_role,
+          status = 'active',
+          payment_status = 'paid',
+          fee_paid = true,
+          updated_at = NOW()
+      `.catch((err) => {
+        this.logger.warn(`Could not seed CEOHN10-ADMIN into members: ${err.message}`);
+      });
 
       // 1. Kiểm tra tài khoản admin@connect.vn
       const adminRows = await this.prisma.$queryRaw<any[]>`

@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { fetchNestApi } from "@/lib/api-client";
+import { fetchNestApi, getAuthToken } from "@/lib/api-client";
 
 export const SIDEBAR_LABELS_STORAGE_KEY = "ceohn10_dynamic_sidebar_labels";
 
@@ -78,6 +78,8 @@ export function useSidebarLabels() {
   });
 
   const loadFromBackend = useCallback(async () => {
+    const token = getAuthToken();
+    if (!token) return;
     try {
       const res: any = await fetchNestApi("/admin/sidebar-labels");
       if (res && res.labels && typeof res.labels === "object") {

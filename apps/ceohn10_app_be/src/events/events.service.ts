@@ -616,9 +616,8 @@ export class EventsService implements OnModuleInit {
       const conf = conflicts[0];
       const dObj = new Date(date);
       const dayFormatted = `${String(dObj.getDate()).padStart(2, '0')}/${String(dObj.getMonth() + 1).padStart(2, '0')}/${dObj.getFullYear()}`;
-      const nextAvailableTime = `18:00 ngày ${dayFormatted}`;
-      throw new BadRequestException(
-        `Địa điểm này đang trùng với sự kiện "${conf.name}", sau thời gian ${nextAvailableTime} có thể đăng ký được.`,
+      this.logger.warn(
+        `[validateEventLocationConflict] Địa điểm "${cleanLocation}" có sự kiện "${conf.name}" vào ngày ${dayFormatted}. Cho phép ghi nhận để phục vụ đa phiên tổ chức.`,
       );
     }
   }

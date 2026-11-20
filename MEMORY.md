@@ -1,5 +1,34 @@
 # System Memory & Architecture
 
+- **Bản cập nhật ngày 20/11/2026 (v12.43): Tái Cấu Trúc Toàn Diện "Hệ Thống Platform CEOHN10" Chuẩn Giao Diện Sidebar Theme Sáng, Khắc Phục Triệt Để Lỗi 401 & 41 Lỗi Network Loop, Cập Nhật Quỹ 2 Tỷ 080 Triệu & Màn Tổng Quát CRM 20 Triệu Khai Giảng**:
+  - **1. Khắc Phục Triệt Để Sự Cố 401 & 41 Lỗi Console Network Loop (`ERR_HTTP2_PROTOCOL_ERROR`, `ERR_CONNECTION_CLOSED`)**:
+    * **Chặn Polling Ngầm Khi Chưa Xác Thực**:
+      - `GlobalIncomingCallModal.tsx`: Thêm token check guard (`getAuthToken()`) trước khi gọi `/me/active-call`, chặn polling vô tận khi chưa có phiên đăng nhập hợp lệ.
+      - `use-sidebar-labels.ts`: Thêm token check guard trước khi gọi `/admin/sidebar-labels`.
+    * **Chuẩn Hóa Reverse Proxy Nginx (`deploy/ssl/nginx.conf`)**:
+      - Sửa location `/api/` của cả CRM và Mobile proxy: Đổi từ `proxy_set_header Connection $connection_upgrade` thành `proxy_set_header Connection ""` chuẩn HTTP keep-alive. Chấm dứt tình trạng Nginx gửi header `Connection: close` làm ngắt kết nối HTTP/2 trên trình duyệt khi client gửi request API thông thường.
+      - Chuẩn hóa cấu hình proxy static assets `app-icon.png`, `favicon.ico` để tránh xung đột URI evaluation.
+  - **2. Tái Cấu Trúc Cổng "Hệ Thống Platform CEOHN10" (`/master`) Chuẩn Sidebar & Theme Sáng**:
+    * **Đổi Tên & Bố Cục**: Đổi từ "Platform Admin" thành **"Hệ thống platform CEOHN10"** (tiêu đề trang: `QUẢN TRỊ LỚN NHẤT (MASTER ADMIN - CEOHN10)`).
+    * **Theme Sáng Theo Quy Chuẩn Thương Hiệu**: Thiết kế lại toàn bộ giao diện theo cấu trúc **Sidebar dọc bên trái** với nền sáng (`#F8FAFC`), card trắng (`bg-white border-slate-200`), màu sắc thương hiệu Xanh Navy (`#002B70`), Vàng kim (`#D97706`).
+    * **Loại Bỏ Mọi Chú Thích Kỹ Thuật**: Xóa sạch toàn bộ các badge/text như "dữ liệu realtime", "Hoạt động ổn định", "Dữ liệu chuẩn 113.20.107.184:6432".
+    * **Báo Cáo Quỹ CEOHN10**: Hiển thị chính xác **Tổng Quỹ CEOHN10 Còn Tồn: 2.080.000.000 VNĐ (2 tỷ 080 triệu)** kèm giải trình rõ ràng đã trích 20.000.000 VNĐ cấp chi cho chương trình Khai giảng sắp tới từ quỹ tổng 2,1 tỷ đồng.
+    * **3 Tab Chức Năng Rõ Ràng**:
+      - `[1. TỔNG QUAN NỀN TẢNG]`: Báo cáo quỹ CEOHN10 (2 tỷ 080 triệu) & Danh sách các nền tảng (CRM, Mobile App, nền tảng tích hợp mở rộng khác kèm modal thêm mới).
+      - `[2. TÀI KHOẢN ĐƯỢC ĐĂNG NHẬP]`: Danh sách tài khoản quản trị được đăng nhập và phân quyền. Khóa bảo vệ chỉ duy nhất tài khoản `admin@ceohn10.vn` mới có quyền tạo tài khoản mới và gán quyền; modal tạo tài khoản có trường "Mã tài khoản quản trị" tự khai báo (không dùng mã tự sinh).
+      - `[3. CÀI ĐẶT HỆ THỐNG NGOÀI]`: Cấu hình tích hợp SePay dynamic (Token, Webhook, tiền tố chuyển khoản `CEOHN10_HP`, `CEOHN10_SK`, `CEOHN10_LH`).
+  - **3. Màn Hình Chức Năng Tổng Quát CRM (`/`)**:
+    * Xóa bỏ hoàn toàn: `MasterPlatformStatusBar` ([1. TỔNG QUAN] Danh Sách & Trạng Thái Nền Tảng), Biểu đồ `tăng trưởng hội viên`, Mục `hội phí` và `công việc của tôi`.
+    * Phần tài chính: **Chỉ hiển thị đúng số tiền 20.000.000 VNĐ (20 triệu)** được cấp từ quỹ tổng CEOHN10 chi cho chương trình Khai giảng sắp tới.
+    * Xóa toàn bộ các chú thích "dữ liệu realtime", "Dữ liệu chuẩn 113.20.107.184:6432".
+  - **4. Khắc Phục Lỗi Tạo Mới Sự Kiện & Chuẩn Hóa Quản Lý Mẫu Trang**:
+    * Sửa `events.service.ts` và `events.index.tsx`: Chuyển xung đột địa điểm sang dạng cảnh báo (warning log), không ném exception hay return chặn cứng việc tạo nhiều sự kiện cùng ngày/địa điểm.
+    * Chức năng "Quản lý mẫu trang" (`/templates`) chỉ xuất hiện duy nhất trong nhóm **Cài đặt hệ thống** trên `Sidebar.tsx`.
+  - **5. Kiểm Tra Chất Lượng Mã Nguồn (Verification)**:
+    * Backend NestJS `apps/ceohn10_app_be`: `tsc --noEmit` -> 0 errors (Exit code 0).
+    * Frontend CRM `apps/ceohn10_app_fe`: `tsc --noEmit` -> 0 errors (Exit code 0).
+    * Tuân thủ tuyệt đối Rule 0 (CSDL chuẩn 113.20.107.184:6432, cấm mock) và Rule 1 (Tuyệt đối không git commit / git push).
+
 - **Bản cập nhật ngày 20/11/2026 (v12.42): Khắc Phục Triệt Để Sự Cố "Unauthorized: No token provided" & Hoàn Thiện Toàn Diện 4 Cases Nghiệp Vụ Check-in Sự Kiện / Khai Giảng, Form Đăng Ký Đa Đại Biểu Kèm Tra Cứu Mã Học Viên & Cấu Hình Phí SePay Dynamic**:
   - **1. Khắc Phục Triệt Để Sự Cố "Unauthorized: No token provided" & Vòng Lặp Lỗi Giao Diện**:
     * **Nguyên nhân cốt lõi**: Trình duyệt người dùng lưu phiên cũ của tài khoản quản trị (`admin@connect.vn`), khi token này bị máy chủ từ chối với mã 401 thì hàm `handleResponse` trong `api-client.ts` bị kẹt nhánh kiểm tra `payload.exp > Date.now()` dẫn đến việc không chịu dọn sạch token hỏng trong localStorage, khiến màn hình bị kẹt ở trạng thái lỗi `Unauthorized: No token provided` và nút "Thử lại" bị lặp vô tận.
@@ -2704,6 +2733,35 @@
      - Tuân thủ nghiêm ngặt STRICT RULE 1: Tuyệt đối không tự động chạy `git push` hay `git commit`.
 
 # System Memory & Architecture
+
+- **Bản cập nhật ngày 20/11/2026 (v12.43): Tái Cấu Trúc Toàn Diện "Hệ Thống Platform CEOHN10" Chuẩn Giao Diện Sidebar Theme Sáng, Khắc Phục Triệt Để Lỗi 401 & 41 Lỗi Network Loop, Cập Nhật Quỹ 2 Tỷ 080 Triệu & Màn Tổng Quát CRM 20 Triệu Khai Giảng**:
+  - **1. Khắc Phục Triệt Để Sự Cố 401 & 41 Lỗi Console Network Loop (`ERR_HTTP2_PROTOCOL_ERROR`, `ERR_CONNECTION_CLOSED`)**:
+    * **Chặn Polling Ngầm Khi Chưa Xác Thực**:
+      - `GlobalIncomingCallModal.tsx`: Thêm token check guard (`getAuthToken()`) trước khi gọi `/me/active-call`, chặn polling vô tận khi chưa có phiên đăng nhập hợp lệ.
+      - `use-sidebar-labels.ts`: Thêm token check guard trước khi gọi `/admin/sidebar-labels`.
+    * **Chuẩn Hóa Reverse Proxy Nginx (`deploy/ssl/nginx.conf`)**:
+      - Sửa location `/api/` của cả CRM và Mobile proxy: Đổi từ `proxy_set_header Connection $connection_upgrade` thành `proxy_set_header Connection ""` chuẩn HTTP keep-alive. Chấm dứt tình trạng Nginx gửi header `Connection: close` làm ngắt kết nối HTTP/2 trên trình duyệt khi client gửi request API thông thường.
+      - Chuẩn hóa cấu hình proxy static assets `app-icon.png`, `favicon.ico` để tránh xung đột URI evaluation.
+  - **2. Tái Cấu Trúc Cổng "Hệ Thống Platform CEOHN10" (`/master`) Chuẩn Sidebar & Theme Sáng**:
+    * **Đổi Tên & Bố Cục**: Đổi từ "Platform Admin" thành **"Hệ thống platform CEOHN10"** (tiêu đề trang: `QUẢN TRỊ LỚN NHẤT (MASTER ADMIN - CEOHN10)`).
+    * **Theme Sáng Theo Quy Chuẩn Thương Hiệu**: Thiết kế lại toàn bộ giao diện theo cấu trúc **Sidebar dọc bên trái** với nền sáng (`#F8FAFC`), card trắng (`bg-white border-slate-200`), màu sắc thương hiệu Xanh Navy (`#002B70`), Vàng kim (`#D97706`).
+    * **Loại Bỏ Mọi Chú Thích Kỹ Thuật**: Xóa sạch toàn bộ các badge/text như "dữ liệu realtime", "Hoạt động ổn định", "Dữ liệu chuẩn 113.20.107.184:6432".
+    * **Báo Cáo Quỹ CEOHN10**: Hiển thị chính xác **Tổng Quỹ CEOHN10 Còn Tồn: 2.080.000.000 VNĐ (2 tỷ 080 triệu)** kèm giải trình rõ ràng đã trích 20.000.000 VNĐ cấp chi cho chương trình Khai giảng sắp tới từ quỹ tổng 2,1 tỷ đồng.
+    * **3 Tab Chức Năng Rõ Ràng**:
+      - `[1. TỔNG QUAN NỀN TẢNG]`: Báo cáo quỹ CEOHN10 (2 tỷ 080 triệu) & Danh sách các nền tảng (CRM, Mobile App, nền tảng tích hợp mở rộng khác kèm modal thêm mới).
+      - `[2. TÀI KHOẢN ĐƯỢC ĐĂNG NHẬP]`: Danh sách tài khoản quản trị được đăng nhập và phân quyền. Khóa bảo vệ chỉ duy nhất tài khoản `admin@ceohn10.vn` mới có quyền tạo tài khoản mới và gán quyền; modal tạo tài khoản có trường "Mã tài khoản quản trị" tự khai báo (không dùng mã tự sinh).
+      - `[3. CÀI ĐẶT HỆ THỐNG NGOÀI]`: Cấu hình tích hợp SePay dynamic (Token, Webhook, tiền tố chuyển khoản `CEOHN10_HP`, `CEOHN10_SK`, `CEOHN10_LH`).
+  - **3. Màn Hình Chức Năng Tổng Quát CRM (`/`)**:
+    * Xóa bỏ hoàn toàn: `MasterPlatformStatusBar` ([1. TỔNG QUAN] Danh Sách & Trạng Thái Nền Tảng), Biểu đồ `tăng trưởng hội viên`, Mục `hội phí` và `công việc của tôi`.
+    * Phần tài chính: **Chỉ hiển thị đúng số tiền 20.000.000 VNĐ (20 triệu)** được cấp từ quỹ tổng CEOHN10 chi cho chương trình Khai giảng sắp tới.
+    * Xóa toàn bộ các chú thích "dữ liệu realtime", "Dữ liệu chuẩn 113.20.107.184:6432".
+  - **4. Khắc Phục Lỗi Tạo Mới Sự Kiện & Chuẩn Hóa Quản Lý Mẫu Trang**:
+    * Sửa `events.service.ts` và `events.index.tsx`: Chuyển xung đột địa điểm sang dạng cảnh báo (warning log), không ném exception hay return chặn cứng việc tạo nhiều sự kiện cùng ngày/địa điểm.
+    * Chức năng "Quản lý mẫu trang" (`/templates`) chỉ xuất hiện duy nhất trong nhóm **Cài đặt hệ thống** trên `Sidebar.tsx`.
+  - **5. Kiểm Tra Chất Lượng Mã Nguồn (Verification)**:
+    * Backend NestJS `apps/ceohn10_app_be`: `tsc --noEmit` -> 0 errors (Exit code 0).
+    * Frontend CRM `apps/ceohn10_app_fe`: `tsc --noEmit` -> 0 errors (Exit code 0).
+    * Tuân thủ tuyệt đối Rule 0 (CSDL chuẩn 113.20.107.184:6432, cấm mock) và Rule 1 (Tuyệt đối không git commit / git push).
 
 - **Bản cập nhật ngày 20/11/2026 (v12.42): Khắc Phục Triệt Để Sự Cố "Unauthorized: No token provided" & Hoàn Thiện Toàn Diện 4 Cases Nghiệp Vụ Check-in Sự Kiện / Khai Giảng, Form Đăng Ký Đa Đại Biểu Kèm Tra Cứu Mã Học Viên & Cấu Hình Phí SePay Dynamic**:
   - **1. Khắc Phục Triệt Để Sự Cố "Unauthorized: No token provided" & Vòng Lặp Lỗi Giao Diện**:
@@ -6573,6 +6631,35 @@
      - Tuân thủ nghiêm ngặt STRICT RULE 1: Tuyệt đối không tự động chạy `git push` hay `git commit`.
 
 # System Memory & Architecture
+
+- **Bản cập nhật ngày 20/11/2026 (v12.43): Tái Cấu Trúc Toàn Diện "Hệ Thống Platform CEOHN10" Chuẩn Giao Diện Sidebar Theme Sáng, Khắc Phục Triệt Để Lỗi 401 & 41 Lỗi Network Loop, Cập Nhật Quỹ 2 Tỷ 080 Triệu & Màn Tổng Quát CRM 20 Triệu Khai Giảng**:
+  - **1. Khắc Phục Triệt Để Sự Cố 401 & 41 Lỗi Console Network Loop (`ERR_HTTP2_PROTOCOL_ERROR`, `ERR_CONNECTION_CLOSED`)**:
+    * **Chặn Polling Ngầm Khi Chưa Xác Thực**:
+      - `GlobalIncomingCallModal.tsx`: Thêm token check guard (`getAuthToken()`) trước khi gọi `/me/active-call`, chặn polling vô tận khi chưa có phiên đăng nhập hợp lệ.
+      - `use-sidebar-labels.ts`: Thêm token check guard trước khi gọi `/admin/sidebar-labels`.
+    * **Chuẩn Hóa Reverse Proxy Nginx (`deploy/ssl/nginx.conf`)**:
+      - Sửa location `/api/` của cả CRM và Mobile proxy: Đổi từ `proxy_set_header Connection $connection_upgrade` thành `proxy_set_header Connection ""` chuẩn HTTP keep-alive. Chấm dứt tình trạng Nginx gửi header `Connection: close` làm ngắt kết nối HTTP/2 trên trình duyệt khi client gửi request API thông thường.
+      - Chuẩn hóa cấu hình proxy static assets `app-icon.png`, `favicon.ico` để tránh xung đột URI evaluation.
+  - **2. Tái Cấu Trúc Cổng "Hệ Thống Platform CEOHN10" (`/master`) Chuẩn Sidebar & Theme Sáng**:
+    * **Đổi Tên & Bố Cục**: Đổi từ "Platform Admin" thành **"Hệ thống platform CEOHN10"** (tiêu đề trang: `QUẢN TRỊ LỚN NHẤT (MASTER ADMIN - CEOHN10)`).
+    * **Theme Sáng Theo Quy Chuẩn Thương Hiệu**: Thiết kế lại toàn bộ giao diện theo cấu trúc **Sidebar dọc bên trái** với nền sáng (`#F8FAFC`), card trắng (`bg-white border-slate-200`), màu sắc thương hiệu Xanh Navy (`#002B70`), Vàng kim (`#D97706`).
+    * **Loại Bỏ Mọi Chú Thích Kỹ Thuật**: Xóa sạch toàn bộ các badge/text như "dữ liệu realtime", "Hoạt động ổn định", "Dữ liệu chuẩn 113.20.107.184:6432".
+    * **Báo Cáo Quỹ CEOHN10**: Hiển thị chính xác **Tổng Quỹ CEOHN10 Còn Tồn: 2.080.000.000 VNĐ (2 tỷ 080 triệu)** kèm giải trình rõ ràng đã trích 20.000.000 VNĐ cấp chi cho chương trình Khai giảng sắp tới từ quỹ tổng 2,1 tỷ đồng.
+    * **3 Tab Chức Năng Rõ Ràng**:
+      - `[1. TỔNG QUAN NỀN TẢNG]`: Báo cáo quỹ CEOHN10 (2 tỷ 080 triệu) & Danh sách các nền tảng (CRM, Mobile App, nền tảng tích hợp mở rộng khác kèm modal thêm mới).
+      - `[2. TÀI KHOẢN ĐƯỢC ĐĂNG NHẬP]`: Danh sách tài khoản quản trị được đăng nhập và phân quyền. Khóa bảo vệ chỉ duy nhất tài khoản `admin@ceohn10.vn` mới có quyền tạo tài khoản mới và gán quyền; modal tạo tài khoản có trường "Mã tài khoản quản trị" tự khai báo (không dùng mã tự sinh).
+      - `[3. CÀI ĐẶT HỆ THỐNG NGOÀI]`: Cấu hình tích hợp SePay dynamic (Token, Webhook, tiền tố chuyển khoản `CEOHN10_HP`, `CEOHN10_SK`, `CEOHN10_LH`).
+  - **3. Màn Hình Chức Năng Tổng Quát CRM (`/`)**:
+    * Xóa bỏ hoàn toàn: `MasterPlatformStatusBar` ([1. TỔNG QUAN] Danh Sách & Trạng Thái Nền Tảng), Biểu đồ `tăng trưởng hội viên`, Mục `hội phí` và `công việc của tôi`.
+    * Phần tài chính: **Chỉ hiển thị đúng số tiền 20.000.000 VNĐ (20 triệu)** được cấp từ quỹ tổng CEOHN10 chi cho chương trình Khai giảng sắp tới.
+    * Xóa toàn bộ các chú thích "dữ liệu realtime", "Dữ liệu chuẩn 113.20.107.184:6432".
+  - **4. Khắc Phục Lỗi Tạo Mới Sự Kiện & Chuẩn Hóa Quản Lý Mẫu Trang**:
+    * Sửa `events.service.ts` và `events.index.tsx`: Chuyển xung đột địa điểm sang dạng cảnh báo (warning log), không ném exception hay return chặn cứng việc tạo nhiều sự kiện cùng ngày/địa điểm.
+    * Chức năng "Quản lý mẫu trang" (`/templates`) chỉ xuất hiện duy nhất trong nhóm **Cài đặt hệ thống** trên `Sidebar.tsx`.
+  - **5. Kiểm Tra Chất Lượng Mã Nguồn (Verification)**:
+    * Backend NestJS `apps/ceohn10_app_be`: `tsc --noEmit` -> 0 errors (Exit code 0).
+    * Frontend CRM `apps/ceohn10_app_fe`: `tsc --noEmit` -> 0 errors (Exit code 0).
+    * Tuân thủ tuyệt đối Rule 0 (CSDL chuẩn 113.20.107.184:6432, cấm mock) và Rule 1 (Tuyệt đối không git commit / git push).
 
 - **Bản cập nhật ngày 20/11/2026 (v12.42): Khắc Phục Triệt Để Sự Cố "Unauthorized: No token provided" & Hoàn Thiện Toàn Diện 4 Cases Nghiệp Vụ Check-in Sự Kiện / Khai Giảng, Form Đăng Ký Đa Đại Biểu Kèm Tra Cứu Mã Học Viên & Cấu Hình Phí SePay Dynamic**:
   - **1. Khắc Phục Triệt Để Sự Cố "Unauthorized: No token provided" & Vòng Lặp Lỗi Giao Diện**:

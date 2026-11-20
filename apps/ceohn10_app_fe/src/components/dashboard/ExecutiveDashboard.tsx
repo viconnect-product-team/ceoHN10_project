@@ -18,6 +18,7 @@ import {
   UserPlus,
   RefreshCw,
   FileWarning,
+  Calendar,
   CalendarClock,
   Handshake,
   Bell,
@@ -62,8 +63,6 @@ import { EmptyState, ErrorState, ListSkeleton, Skeleton } from "@/components/das
 import { useRole } from "@/hooks/use-role";
 import { useUnreadNotifications } from "@/hooks/use-unread-notifications";
 import { DEFAULT_MEMBERS } from "@/lib/members-data";
-import { MasterPlatformStatusBar } from "@/components/dashboard/MasterPlatformStatusBar";
-import { MasterFundSurplusWidget } from "@/components/dashboard/MasterFundSurplusWidget";
 import { fetchMasterOverview } from "@/lib/master-admin.functions";
 
 /* ----------------------------- helpers ----------------------------- */
@@ -158,9 +157,6 @@ function ExecKpi({
       <div className="text-slate-900 dark:text-slate-100 text-2xl font-bold font-['Inter'] leading-7">
         {value}
       </div>
-      <div className="text-slate-500 dark:text-slate-400 text-xs font-normal font-['Inter'] truncate w-full">
-        Dữ liệu theo dõi thời gian thực
-      </div>
     </div>
   );
   if (to) {
@@ -215,54 +211,6 @@ function ViewAll({ to, label }: { to: string; label: string }) {
     >
       {label} <ChevronRight className="h-3.5 w-3.5" />
     </Link>
-  );
-}
-
-/* ----------------------------- growth chart ----------------------------- */
-
-function GrowthArea({ data }: { data: DashboardStats["growth"] }) {
-  return (
-    <div className="h-[230px] w-full">
-      <ResponsiveContainer width="100%" height="100%">
-        <AreaChart data={data} margin={{ top: 8, right: 8, left: -14, bottom: 0 }}>
-          <defs>
-            <linearGradient id="exec-growth" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="var(--color-chart-1)" stopOpacity={0.35} />
-              <stop offset="100%" stopColor="var(--color-chart-1)" stopOpacity={0} />
-            </linearGradient>
-          </defs>
-          <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" vertical={false} />
-          <XAxis
-            dataKey="month"
-            tick={{ fill: "var(--color-muted-foreground)", fontSize: 11 }}
-            axisLine={false}
-            tickLine={false}
-          />
-          <YAxis
-            allowDecimals={false}
-            tick={{ fill: "var(--color-muted-foreground)", fontSize: 11 }}
-            axisLine={false}
-            tickLine={false}
-          />
-          <Tooltip
-            content={
-              <ChartAdaptiveTooltip
-                formatter={(val: number) => [`${val} Học viên`, "Quy mô"]}
-              />
-            }
-          />
-          <Area
-            type="monotone"
-            dataKey="count"
-            stroke="var(--color-chart-1)"
-            strokeWidth={2.5}
-            fill="url(#exec-growth)"
-            dot={{ r: 3, fill: "var(--color-chart-1)", strokeWidth: 0 }}
-            activeDot={{ r: 5 }}
-          />
-        </AreaChart>
-      </ResponsiveContainer>
-    </div>
   );
 }
 
@@ -591,9 +539,30 @@ export function ExecutiveDashboard({ authReady }: { authReady: boolean }) {
       </div>
     );
   }
+
+  // Tự động chuyển hướng nếu phiên làm việc chưa xác thực hoặc bị hết hạn
+  if (!authReady && typeof window !== "undefined") {
+    const token = localStorage.getItem("vibe_token") || localStorage.getItem("access_token") || localStorage.getItem("token");
+    if (!token) {
+      window.location.href = "/auth?portal=crm";
+      return null;
+    }
+  }
+
   if (!s) {
     return (
-      <ErrorState onRetry={() => { void statsQ.refetch(); void membersQ.refetch(); }} description={(membersQ.error as Error)?.message || "Không thể tải dữ liệu bảng điều khiển"} />
+      <ErrorState
+        onRetry={() => {
+          ensureSessionCookiesSync();
+          void statsQ.refetch();
+          void membersQ.refetch();
+        }}
+        description={
+          (membersQ.error as Error)?.message ||
+          (statsQ.error as Error)?.message ||
+          "Không thể tải dữ liệu bảng điều khiển"
+        }
+      />
     );
   }
 
@@ -612,20 +581,6 @@ export function ExecutiveDashboard({ authReady }: { authReady: boolean }) {
           <p className="mt-1 text-sm text-muted-foreground">{t("dash.subtitle")}</p>
         </div>
       </div>
-
-      {/* ── MASTER ADMIN: [1. TỔNG QUAN] TRẠNG THÁI NỀN TẢNG CEOHN10 ── */}
-      <MasterPlatformStatusBar
-        corePlatforms={masterOverviewQ.data?.platformStatus?.corePlatforms}
-        integratedPlatforms={masterOverviewQ.data?.platformStatus?.integratedPlatformsSummary?.items}
-        onRefresh={() => masterOverviewQ.refetch()}
-        isLoading={masterOverviewQ.isFetching}
-      />
-
-      {/* ── MASTER ADMIN: [1. TỔNG QUAN] BÁO CÁO QUỸ CÒN TỒN & DÒNG TIỀN RÒNG ── */}
-      <MasterFundSurplusWidget
-        data={masterOverviewQ.data?.fundSurplus}
-        isLoading={masterOverviewQ.isFetching}
-      />
 
       {/* Bộ lọc trạng thái trực tiếp theo cơ sở dữ liệu */}
       <div className="flex flex-wrap items-center justify-between gap-3 p-3.5 rounded-2xl border border-border bg-card shadow-xs">
@@ -753,145 +708,57 @@ export function ExecutiveDashboard({ authReady }: { authReady: boolean }) {
         />
       </div>
 
-      {/* ── 2 TÚI QUỸ TÀI CHÍNH CEO HN10 (QUỸ CHUNG & QUỸ TÀI TRỢ - UC-5 & UC-6) ── */}
+      {/* ── BÁO CÁO KINH PHÍ CHƯƠNG TRÌNH KHAI GIẢNG (QUỸ CEO HN10) ── */}
       <Panel
-        title="Quản Lý 2 Túi Quỹ CEO HN10 (Tài Chính & Quỹ Tài Trợ)"
-        sub="Túi Quỹ Chung từ Hội phí (phục vụ chi sự kiện/cuộc họp các ban & xuất báo cáo PDF) và Túi Quỹ Tài Trợ (Tiền mặt & Kho hiện vật)"
+        title="Báo Cáo Tài Chính Chương Trình Khai Giảng"
+        sub="Kinh phí được cấp từ Quỹ tổng CLB Doanh Nhân CEO HN10 chi cho chương trình Khai giảng sắp tới"
         action={
           <div className="flex items-center gap-2">
             <Link
-              to="/expenses"
+              to="/events"
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-primary/10 text-primary text-xs font-semibold hover:bg-primary/20 transition cursor-pointer"
             >
-              <FileText className="size-3.5" />
-              <span>Báo Cáo Chi &amp; Xuất PDF</span>
-            </Link>
-            <Link
-              to="/sponsors"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-500/10 text-purple-700 dark:text-purple-300 text-xs font-semibold hover:bg-purple-500/20 transition cursor-pointer"
-            >
-              <Gift className="size-3.5" />
-              <span>Nhà Tài Trợ</span>
+              <Calendar className="size-3.5" />
+              <span>Chương trình Khai giảng</span>
             </Link>
           </div>
         }
       >
-        <div className="grid gap-4 md:grid-cols-2">
-          {/* TÚI QUỸ 1: QUỸ CHUNG CLB */}
-          <div className="rounded-2xl border border-purple-200 dark:border-purple-900/50 bg-purple-50/40 dark:bg-purple-950/20 p-5 space-y-4 shadow-xs">
-            <div className="flex items-start justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-purple-600/10 text-purple-700 dark:text-purple-300 flex items-center justify-center">
-                  <Wallet className="size-5" />
+        <div className="rounded-2xl border border-border bg-card p-6 space-y-4 shadow-xs">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div className="flex items-center gap-3.5">
+              <div className="w-12 h-12 rounded-2xl bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center font-bold">
+                <Wallet className="size-6" />
+              </div>
+              <div>
+                <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  Kinh phí được cấp chi cho Khai giảng sắp tới
                 </div>
-                <div>
-                  <h4 className="text-sm font-bold text-foreground">Túi Quỹ Chung CEO HN10</h4>
-                  <p className="text-[11px] text-muted-foreground">Tổng hợp từ hội phí Học viên</p>
+                <div className="text-3xl font-black text-foreground tracking-tight mt-0.5">
+                  20.000.000 VNĐ
                 </div>
               </div>
-              <span className="px-2 py-0.5 rounded-full text-[10.5px] font-bold bg-purple-600/10 text-purple-700 dark:text-purple-300 border border-purple-600/20">
-                Quỹ Chung CLB
+            </div>
+
+            <div className="flex items-center gap-2">
+              <span className="px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-600 border border-emerald-500/20">
+                Đã cấp từ Quỹ tổng CEO HN10
               </span>
-            </div>
-
-            <div className="space-y-1">
-              <div className="text-[11px] font-medium text-muted-foreground">Số dư khả dụng quỹ chung:</div>
-              <div className="text-2xl font-black text-purple-700 dark:text-purple-300 tracking-tight">
-                {fmtMoney(fundsQ.data?.generalFund?.balance ?? s.revenue)} VNĐ
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-2 pt-2 border-t border-purple-100 dark:border-purple-900/30">
-              <div className="rounded-xl bg-background/80 p-2.5 border border-border/60">
-                <div className="text-[10.5px] text-muted-foreground">Tổng thu hội phí:</div>
-                <div className="text-sm font-bold text-emerald-600 dark:text-emerald-400 mt-0.5">
-                  {fmtMoney(fundsQ.data?.generalFund?.totalIncome ?? s.revenue)} VNĐ
-                </div>
-              </div>
-              <div className="rounded-xl bg-background/80 p-2.5 border border-border/60">
-                <div className="text-[10.5px] text-muted-foreground">Tổng chi các ban/sự kiện:</div>
-                <div className="text-sm font-bold text-rose-600 dark:text-rose-400 mt-0.5">
-                  {fmtMoney(fundsQ.data?.generalFund?.totalExpense ?? 0)} VNĐ
-                </div>
-              </div>
-            </div>
-
-            <div className="text-[11px] text-muted-foreground bg-purple-100/40 dark:bg-purple-950/40 p-2.5 rounded-xl border border-purple-200/50 dark:border-purple-900/30">
-              Phục vụ chi tiêu sự kiện, cuộc họp các ban (như hiếu hỷ Ban Đời Sống, dụng cụ Ban Hậu Cần). Có thể xuất báo cáo chi PDF theo từng ban và người thụ hưởng.
             </div>
           </div>
 
-          {/* TÚI QUỸ 2: QUỸ TÀI TRỢ */}
-          <div className="rounded-2xl border border-pink-200 dark:border-pink-900/50 bg-pink-50/40 dark:bg-pink-950/20 p-5 space-y-4 shadow-xs">
-            <div className="flex items-start justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-pink-600/10 text-pink-700 dark:text-pink-300 flex items-center justify-center">
-                  <Gift className="size-5" />
-                </div>
-                <div>
-                  <h4 className="text-sm font-bold text-foreground">Túi Quỹ Tài Trợ CEO HN10</h4>
-                  <p className="text-[11px] text-muted-foreground">Nguồn tài trợ từ các Doanh nghiệp &amp; Đối tác</p>
-                </div>
-              </div>
-              <span className="px-2 py-0.5 rounded-full text-[10.5px] font-bold bg-pink-600/10 text-pink-700 dark:text-pink-300 border border-pink-600/20">
-                2 Mục Rõ Ràng
-              </span>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-4 border-t border-border">
+            <div className="p-3.5 rounded-xl bg-muted/40 border border-border">
+              <div className="text-[11px] text-muted-foreground font-medium">Nguồn cấp kinh phí:</div>
+              <div className="text-sm font-bold text-foreground mt-0.5">Quỹ Tổng CLB CEO HN10</div>
             </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              {/* MỤC 1: TIỀN MẶT */}
-              <div className="rounded-xl bg-background/90 p-3 border border-border/60 space-y-1.5">
-                <div className="flex items-center gap-1.5 text-xs font-bold text-emerald-700 dark:text-emerald-300">
-                  <Coins className="size-3.5" />
-                  <span>1. Tiền Mặt Tài Trợ</span>
-                </div>
-                <div className="text-lg font-black text-emerald-600 dark:text-emerald-400">
-                  {fmtMoney(fundsQ.data?.sponsorshipFund?.cash?.availableAmount ?? 250000000)} VNĐ
-                </div>
-                <p className="text-[10px] text-muted-foreground">
-                  Chi cho sự kiện, buổi học khi ban sự kiện &amp; hậu cần xin cấp kinh phí
-                </p>
-              </div>
-
-              {/* MỤC 2: KHO HIỆN VẬT */}
-              <div className="rounded-xl bg-background/90 p-3 border border-border/60 space-y-1.5">
-                <div className="flex items-center gap-1.5 text-xs font-bold text-purple-700 dark:text-purple-300">
-                  <Package className="size-3.5" />
-                  <span>2. Kho Hiện Vật</span>
-                </div>
-                <div className="text-lg font-black text-purple-600 dark:text-purple-400">
-                  {fundsQ.data?.sponsorshipFund?.inKind?.inventory?.length ?? 3} vật phẩm
-                </div>
-                <div className="text-[10px] text-muted-foreground truncate">
-                  Tổng định giá: {fmtMoney(fundsQ.data?.sponsorshipFund?.inKind?.totalEstimatedValue ?? 45000000)} VNĐ
-                </div>
-              </div>
+            <div className="p-3.5 rounded-xl bg-muted/40 border border-border">
+              <div className="text-[11px] text-muted-foreground font-medium">Mục đích chi:</div>
+              <div className="text-sm font-bold text-foreground mt-0.5">Tổ chức Lễ Khai Giảng sắp tới</div>
             </div>
-
-            {/* Top hiện vật trong kho */}
-            <div className="rounded-xl border border-border/50 bg-background/60 p-2.5 space-y-1">
-              <div className="text-[10.5px] font-semibold text-foreground flex items-center justify-between">
-                <span>Vật phẩm hiện vật sẵn sàng cấp phát:</span>
-                <Link to="/sponsors" className="text-primary hover:underline text-[10px]">Xem tất cả</Link>
-              </div>
-              <div className="flex flex-wrap gap-1.5">
-                {((fundsQ.data?.sponsorshipFund?.inKind?.inventory && fundsQ.data.sponsorshipFund.inKind.inventory.length > 0)
-                  ? fundsQ.data.sponsorshipFund.inKind.inventory.slice(0, 3)
-                  : [
-                    { name: "Áo đồng phục sự kiện", quantity: 200, unit: "bộ" },
-                    { name: "Kỷ niệm chương mạ vàng", quantity: 50, unit: "chiếc" },
-                    { name: "Gói giải pháp phần mềm", quantity: 10, unit: "suất" },
-                  ]
-                ).map((it: any, i: number) => (
-                  <span
-                    key={i}
-                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[10px] font-medium bg-secondary text-secondary-foreground"
-                  >
-                    <span>{it.name}</span>
-                    <span className="font-bold text-primary">({it.quantity} {it.unit})</span>
-                  </span>
-                ))}
-              </div>
+            <div className="p-3.5 rounded-xl bg-muted/40 border border-border">
+              <div className="text-[11px] text-muted-foreground font-medium">Trạng thái giải ngân:</div>
+              <div className="text-sm font-bold text-emerald-600 mt-0.5">Đã phân bổ · Sẵn sàng chi</div>
             </div>
           </div>
         </div>
@@ -1079,46 +946,6 @@ export function ExecutiveDashboard({ authReady }: { authReady: boolean }) {
         </div>
       </Panel>
 
-
-      {/* Growth + Fee collection */}
-      <div className="grid gap-5 lg:grid-cols-3">
-        <Panel title={t("exec.growth.title")} sub={t("exec.growth.sub")} className="lg:col-span-2">
-          <GrowthArea data={s.growth} />
-        </Panel>
-
-        <Panel title={t("exec.fees.title")}>
-          <div className="text-[30px] font-bold leading-none tracking-tight text-foreground">
-            {fmtMoney(s.revenue)}
-          </div>
-          <p className="mt-1 text-[12px] text-muted-foreground">{t("exec.fees.collected")}</p>
-
-          <div className="mt-5">
-            <div className="mb-1.5 flex items-center justify-between text-[12px]">
-              <span className="font-medium text-foreground">{t("exec.fees.rate")}</span>
-              <span className="font-semibold text-foreground">{feeRate}%</span>
-            </div>
-            <div className="h-2.5 w-full overflow-hidden rounded-full bg-secondary">
-              <div
-                className="h-full rounded-full transition-all"
-                style={{ width: `${feeRate}%`, background: "var(--gradient-primary)" }}
-              />
-            </div>
-          </div>
-
-          <div className="mt-5 grid grid-cols-2 gap-3">
-            <div className="rounded-xl border border-border bg-background p-3">
-              <div className="text-[11px] text-muted-foreground">{t("exec.fees.paid")}</div>
-              <div className="mt-0.5 text-[18px] font-bold text-success">{s.paidInvoices}</div>
-            </div>
-            <div className="rounded-xl border border-border bg-background p-3">
-              <div className="text-[11px] text-muted-foreground">{t("exec.fees.unpaid")}</div>
-              <div className="mt-0.5 text-[18px] font-bold text-destructive">
-                {s.unpaidInvoices}
-              </div>
-            </div>
-          </div>
-        </Panel>
-      </div>
 
       {/* Events + Activity */}
       <div className="grid gap-5 lg:grid-cols-2">
@@ -1383,110 +1210,6 @@ export function ExecutiveDashboard({ authReady }: { authReady: boolean }) {
           </ul>
         </Panel>
       </div>
-
-      {/* Công việc của tôi (My Tasks) */}
-      <Panel
-        title="Công việc của tôi"
-        action={<ViewAll to="/tasks" label="Xem tất cả công việc" />}
-      >
-        {tasksQ.isLoading ? (
-          <ListSkeleton rows={3} />
-        ) : !tasksQ.data || tasksQ.data.length === 0 ? (
-          <div className="py-8 px-4 text-center border border-dashed border-border rounded-xl bg-muted/20 flex flex-col items-center justify-center gap-2">
-            <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center">
-              <ClipboardList className="size-5" />
-            </div>
-            <div className="text-sm font-semibold text-foreground">
-              Hiện tại bạn không có công việc nào cần xử lý
-            </div>
-            <p className="text-xs text-muted-foreground max-w-sm">
-              Mọi nhiệm vụ, công việc được Ban Điều Hành hoặc các Ban chuyên môn phân công sẽ hiển thị đầy đủ tại đây.
-            </p>
-            <Link
-              to="/tasks"
-              className="mt-2 inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-primary text-primary-foreground text-xs font-semibold hover:bg-primary/90 transition shadow-xs cursor-pointer"
-            >
-              <span>Xem danh sách việc chung</span>
-              <ChevronRight className="size-3.5" />
-            </Link>
-          </div>
-        ) : (
-          <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {tasksQ.data.slice(0, 6).map((task: any) => {
-              const priorityColor =
-                task.priority === "CRITICAL"
-                  ? "bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20"
-                  : task.priority === "HIGH"
-                    ? "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20"
-                    : "bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20";
-              const priorityText =
-                task.priority === "CRITICAL"
-                  ? "Khẩn cấp"
-                  : task.priority === "HIGH"
-                    ? "Ưu tiên cao"
-                    : task.priority === "MEDIUM"
-                      ? "Trung bình"
-                      : "Thấp";
-              const statusText =
-                task.status === "DONE"
-                  ? "Hoàn thành"
-                  : task.status === "REVIEW"
-                    ? "Chờ duyệt"
-                    : task.status === "IN_PROGRESS"
-                      ? "Đang làm"
-                      : "Chưa bắt đầu";
-              const statusColor =
-                task.status === "DONE"
-                  ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
-                  : task.status === "REVIEW"
-                    ? "bg-amber-500/10 text-amber-600 dark:text-amber-400"
-                    : task.status === "IN_PROGRESS"
-                      ? "bg-blue-500/10 text-blue-600 dark:text-blue-400"
-                      : "bg-slate-500/10 text-slate-600 dark:text-slate-400";
-
-              return (
-                <li key={task.id}>
-                  <Link
-                    to="/tasks"
-                    search={{ taskId: task.id } as any}
-                    className="flex flex-col justify-between h-full p-3.5 rounded-xl border border-border bg-background transition-all hover:border-primary/40 hover:bg-muted/40 hover:shadow-sm"
-                  >
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between gap-2">
-                        <span className={`px-2 py-0.5 rounded-md text-[10.5px] font-bold border ${priorityColor}`}>
-                          {priorityText}
-                        </span>
-                        <span className={`px-2 py-0.5 rounded-full text-[10.5px] font-semibold ${statusColor}`}>
-                          {statusText}
-                        </span>
-                      </div>
-                      <h4 className="text-[13px] font-bold text-foreground line-clamp-2 leading-snug">
-                        {task.title}
-                      </h4>
-                      {task.department && (
-                        <div className="text-[11px] text-muted-foreground flex items-center gap-1">
-                          <Building2 className="size-3 shrink-0" />
-                          <span className="truncate">{task.department}</span>
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="pt-3 mt-2 border-t border-border/60 flex items-center justify-between text-[11px] text-muted-foreground">
-                      <span className="flex items-center gap-1">
-                        <Clock className="size-3.5 text-orange-500" />
-                        <span>Hạn: {task.dueDate || "Chưa đặt"}</span>
-                      </span>
-                      {typeof task.progress === "number" && (
-                        <span className="font-bold text-primary">{task.progress}%</span>
-                      )}
-                    </div>
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
-        )}
-      </Panel>
 
       {/* Quick actions */}
       <Panel title={t("exec.quick.title")}>

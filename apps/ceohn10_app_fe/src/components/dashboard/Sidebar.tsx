@@ -87,7 +87,6 @@ const crmEvents: Item[] = [
   { key: "nav.events", icon: Calendar, to: "/events", label: "Khai giảng" },
   { key: "nav.eventRegistrations" as TKey, icon: ClipboardList, to: "/event-registrations", label: "Quản lý người đăng ký" },
   { key: "nav.checkinQr" as TKey, icon: QrCodeIcon, to: "/checkin-qr", label: "Quản lý cấu hình mã QR đăng ký, check in vào cửa" },
-  { key: "nav.templates" as TKey, icon: LayoutTemplate, to: "/templates", label: "Quản lý template (thư mời, set up form đăng ký)" },
   { key: "nav.luckyDraw" as TKey, icon: Gift, to: "/lucky-draw", label: "Quản lý quay thưởng" },
 ];
 
@@ -114,7 +113,7 @@ const crmNotifications: Item[] = [
 // 6. Nhóm Cài đặt hệ thống
 const crmSystemDocs: Item[] = [
   { key: "nav.documents" as TKey, icon: FolderOpen, to: "/documents", label: "Quản lý tài liệu" },
-  { key: "nav.templates" as TKey, icon: ClipboardList, to: "/templates", label: "Quản lý biểu mẫu" },
+  { key: "nav.templates" as TKey, icon: LayoutTemplate, to: "/templates", label: "Quản lý mẫu trang" },
 ];
 
 const COLLAPSE_KEY = "vba.sidebar.collapsed";
