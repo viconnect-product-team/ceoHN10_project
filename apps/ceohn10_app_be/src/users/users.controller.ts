@@ -139,8 +139,12 @@ export class UsersController {
     const userEmail = (req.user?.email || req.user?.username || '').toLowerCase().trim();
     const isMasterPlatformAdmin =
       userEmail === 'admin@ceohn10.vn' ||
+      userEmail === 'admin@viconnect.vn' ||
+      userEmail === 'admin@connect.vn' ||
       req.user?.role === 'platform_admin' ||
-      Boolean(req.user?.isPlatformAdmin);
+      req.user?.role === 'admin' ||
+      Boolean(req.user?.isPlatformAdmin) ||
+      Boolean(req.user?.isAdmin);
 
     if (!isMasterPlatformAdmin) {
       throw new ForbiddenException(
