@@ -391,4 +391,71 @@ export class EventsController {
   ) {
     return this.eventsService.attachEventMedia(id, mediaUrl, description);
   }
+
+  // ── 1-TIME CHECKIN, CHECKOUT & TICKET LOOKUP (WEB/ZALO/APP) ───────────────
+
+  @Get('ticket-status/:ticketCode')
+  async getTicketStatus(@Param('ticketCode') ticketCode: string) {
+    return this.eventsService.getTicketStatus(ticketCode);
+  }
+
+  @Post('ticket-checkin')
+  async performTicketCheckin(
+    @Body('ticketCode') ticketCode: string,
+    @Body('method') method?: string,
+  ) {
+    return this.eventsService.performTicketCheckin(ticketCode, method || 'web');
+  }
+
+  @Post('ticket-checkout')
+  async performTicketCheckout(@Body('ticketCode') ticketCode: string) {
+    return this.eventsService.performTicketCheckout(ticketCode);
+  }
+
+  // ── DYNAMIC EVENT FEE CODES (TÍCH HỢP SEPAY DYNAMIC) ─────────────────────────
+
+  @Get(':id/fee-items')
+  async listEventFeeItems(@Param('id') id: string) {
+    return this.eventsService.listEventFeeItems(id);
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('platform_admin', 'superadmin', 'adm', 'admin', 'bqt', 'btt')
+  @Post(':id/fee-items')
+  async createEventFeeItem(
+    @Param('id') id: string,
+    @Body() body: { feeCode: string; feeName: string; amount: number; description?: string },
+  ) {
+    return this.eventsService.createEventFeeItem(id, body);
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('platform_admin', 'superadmin', 'adm', 'admin', 'bqt', 'btt')
+  @Put(':id/fee-items/:feeId')
+  async updateEventFeeItem(
+    @Param('id') id: string,
+    @Param('feeId') feeId: string,
+    @Body() body: any,
+  ) {
+    return this.eventsService.updateEventFeeItem(id, feeId, body);
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('platform_admin', 'superadmin', 'adm', 'admin', 'bqt', 'btt')
+  @Delete(':id/fee-items/:feeId')
+  async deleteEventFeeItem(
+    @Param('id') id: string,
+    @Param('feeId') feeId: string,
+  ) {
+    return this.eventsService.deleteEventFeeItem(id, feeId);
+  }
+
+  @Post(':id/fee-items/:feeId/sepay-qr')
+  async generateSepayFeeQr(
+    @Param('id') id: string,
+    @Param('feeId') feeId: string,
+    @Body('ticketCode') ticketCode: string,
+  ) {
+    return this.eventsService.generateSepayFeeQr(id, feeId, ticketCode);
+  }
 }

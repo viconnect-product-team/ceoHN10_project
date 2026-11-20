@@ -4867,4 +4867,36 @@ Trân trọng cảm ơn Anh/Chị!`;
       message: `Đã nhập thành công ${created} Học viên mới, cập nhật ${updated} Học viên. Bỏ qua: ${skipped}.`,
     };
   }
+
+  async findMemberByCode(code: string) {
+    if (!code || !code.trim()) {
+      return { found: false, member: null };
+    }
+    const cleanCode = code.trim();
+    const rows = await this.prisma.$queryRaw<any[]>`
+      SELECT id, code, name, phone, email, company_name, executive_role, department, status, avatar_url
+      FROM public.members
+      WHERE UPPER(TRIM(code)) = UPPER(${cleanCode})
+         OR UPPER(TRIM(id::text)) = UPPER(${cleanCode})
+      LIMIT 1
+    `.catch(() => []);
+
+    if (rows.length === 0) {
+      return { found: false, member: null };
+    }
+    const m = rows[0];
+    return {
+      found: true,
+      member: {
+        id: m.id,
+        code: m.code,
+        name: m.name,
+        phone: m.phone,
+        email: m.email,
+        company: m.company_name || 'CLB Doanh Nhân CEO HN10',
+        position: m.executive_role || m.department || 'Học viên',
+        avatar: m.avatar_url,
+      },
+    };
+  }
 }

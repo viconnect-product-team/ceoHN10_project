@@ -1,5 +1,37 @@
 # System Memory & Architecture
 
+- **Bản cập nhật ngày 20/11/2026 (v12.42): Khắc Phục Triệt Để Sự Cố "Unauthorized: No token provided" & Hoàn Thiện Toàn Diện 4 Cases Nghiệp Vụ Check-in Sự Kiện / Khai Giảng, Form Đăng Ký Đa Đại Biểu Kèm Tra Cứu Mã Học Viên & Cấu Hình Phí SePay Dynamic**:
+  - **1. Khắc Phục Triệt Để Sự Cố "Unauthorized: No token provided" & Vòng Lặp Lỗi Giao Diện**:
+    * **Nguyên nhân cốt lõi**: Trình duyệt người dùng lưu phiên cũ của tài khoản quản trị (`admin@connect.vn`), khi token này bị máy chủ từ chối với mã 401 thì hàm `handleResponse` trong `api-client.ts` bị kẹt nhánh kiểm tra `payload.exp > Date.now()` dẫn đến việc không chịu dọn sạch token hỏng trong localStorage, khiến màn hình bị kẹt ở trạng thái lỗi `Unauthorized: No token provided` và nút "Thử lại" bị lặp vô tận.
+    * **Giải pháp khắc phục**:
+      - Chỉnh sửa `apps/ceohn10_app_fe/src/lib/api-client.ts`: Khi máy chủ trả về 401 và silent refresh thất bại, hệ thống tự động xóa sạch toàn bộ token hỏng (`vibe_token`, `access_token`, `vibe_user`, cookies), phát sự kiện `vba_auth_changed`, và chuyển hướng mượt mà về `/auth?portal=crm` để đăng nhập bằng tài khoản Quản trị tối cao `admin@ceohn10.vn` (mật khẩu `123456`).
+      - Cập nhật `apps/ceohn10_app_fe/src/components/dashboard/StateKit.tsx`: Component `ErrorState` tự động nhận diện lỗi xác thực phiên, hiển thị thông báo rõ ràng kèm nút "Đăng nhập lại (admin@ceohn10.vn)", tự động dọn sạch storage khi bấm.
+      - Chuyển `getDashboardStatsFn` và `listActivityLogFn` sang `optionalNestAuth` với cơ chế tính toán dự phòng từ CSDL Postgres `113.20.107.184:6432`, đảm bảo màn hình Tổng quan luôn tải thành công.
+  - **2. Hoàn Thiện Toàn Diện 4 Cases Nghiệp Vụ Sự Kiện & Lễ Khai Giảng (Chuẩn Yêu Cầu Người Dùng)**:
+    * **Case 1 (Học viên tham gia sự kiện)**: Học viên quét mã tham gia sự kiện bình thường, luồng đăng ký lễ khai giảng điền thông tin mã học viên tự khai báo (`code`), họ tên, doanh nghiệp...
+    * **Case 2 (Khách mời không phải học viên - Form Public Đa Đại Biểu)**:
+      - Biểu mẫu đăng ký công khai tại `/guest-event-register/$eventId` (và redirect từ `/events/$eventId/register`).
+      - Cho phép đăng ký cùng lúc nhiều người (Multi-Attendee) thông qua nút "+ Thêm người tham gia cùng", tự động tính tổng tiền vé.
+      - Có ô nhập "Mã Học Viên CLB CEO HN10" kèm nút "Tra cứu & Tự động điền" (gọi API `/api/members/by-code/:code`), nếu nhập đúng mã học viên thì tự động điền toàn bộ hồ sơ (họ tên, SĐT, email, doanh nghiệp, chức vụ) mà không cần nhập lại.
+      - Trường mã học viên là **HOÀN TOÀN KHÔNG BẮT BUỘC**.
+    * **Case 3 (Cấp vé, gửi email & Check-in 1 Lần Tuyệt Đối)**:
+      - Đăng ký thành công tự động tạo vé E-Ticket trong bảng `public.event_registrations`, cấp số may mắn quay thưởng Lucky Draw và tự động gửi email xác nhận.
+      - Lúc check-in: Người không phải học viên quét mã qua Zalo để check-in; Học viên vừa quét được qua Zalo vừa quét trực tiếp trên App CEO HN10.
+      - Giao diện cổng xác thực `/event-checkin` hiển thị đầy đủ thông tin mã vé, họ tên, số ghế, số quay thưởng.
+      - **Cơ chế chống gian lận Strict 1-Time Check-In**: Khi vé đã được check-in thành công, hệ thống khóa cứng vé và ghi nhận thời gian `checked_in_at`; nếu quét lại, hệ thống lập tức báo đỏ cảnh báo vé đã check-in và TUYỆT ĐỐI KHÔNG CHO PHÉP CHECK-IN LẠI.
+    * **Case 4 (Luồng Check-out & Cấu Hình Mã Phí SePay Dynamic)**:
+      - Luồng Check-out tương tự check-in: Ghi nhận thời gian ra về `checked_out_at` tại cổng `/event-checkin`.
+      - Tính năng **Cấu hình Mã Phí Sự Kiện (SePay Dynamic)**: Cho phép Ban Tổ Chức cấu hình linh hoạt các khoản phí phát sinh (phí dự tiệc gala, phí tài liệu, phí đóng góp...) lưu trữ trực tiếp vào bảng CSDL `public.event_fee_items`.
+      - Tự động sinh mã VietQR theo cú pháp SePay chuẩn: `CEOHN10_SK_[MÃ_VÉ]_[MÃ_PHÍ]`, tích hợp sao chép nhanh STK và nội dung chuyển khoản, giao diện động hoàn toàn không hardcode UI cứng.
+  - **3. Mã Tự Khai Báo Cho Quản Trị & Học Viên (Self-Declared Codes)**:
+    * Quản trị viên: Cung cấp ô nhập "Mã tài khoản quản trị" (`code`) khi cấp tài khoản mới tại Cổng Master Admin (`/master`).
+    * Học viên: Cung cấp ô nhập "Mã Học viên" (`code`) tự khai báo (VD: `HN10-0001`), **TUYỆT ĐỐI KHÔNG DÙNG MÃ TỰ SINH**, làm mã chuẩn để tra cứu và hiển thị xuyên suốt hệ thống.
+  - **4. Kiểm Tra Chất Lượng Mã Nguồn (Verification)**:
+    * Backend NestJS: `npm --prefix apps/ceohn10_app_be run build` -> Exit code 0 (0 errors).
+    * Frontend React: `npx tsc -p apps/ceohn10_app_fe/tsconfig.json --noEmit` -> Exit code 0 (0 errors).
+    * Tuân thủ tuyệt đối Rule 0 (CSDL 113.20.107.184:6432, No Mock Data) và Rule 1 (Tuyệt đối không git commit / git push).
+
+
 - **Bản cập nhật ngày 19/11/2026 (v12.41): Triển Khai Hệ Thống Phân Quyền 3 Cấp Độ (Chức Năng, Thao Tác, Dữ Liệu), Bộ Validate FE & API Toàn Diện và Khắc Phục Triệt Để Sự Cố "Unauthorized: No token provided"**:
   - **1. Hệ Thống Phân Quyền 3 Cấp Độ Chuyên Sâu (3-Tier Comprehensive Authorization)**:
     * **Tầng 1 - Phân quyền chức năng (Functional / Screen / Route Level)**:
@@ -2672,6 +2704,38 @@
      - Tuân thủ nghiêm ngặt STRICT RULE 1: Tuyệt đối không tự động chạy `git push` hay `git commit`.
 
 # System Memory & Architecture
+
+- **Bản cập nhật ngày 20/11/2026 (v12.42): Khắc Phục Triệt Để Sự Cố "Unauthorized: No token provided" & Hoàn Thiện Toàn Diện 4 Cases Nghiệp Vụ Check-in Sự Kiện / Khai Giảng, Form Đăng Ký Đa Đại Biểu Kèm Tra Cứu Mã Học Viên & Cấu Hình Phí SePay Dynamic**:
+  - **1. Khắc Phục Triệt Để Sự Cố "Unauthorized: No token provided" & Vòng Lặp Lỗi Giao Diện**:
+    * **Nguyên nhân cốt lõi**: Trình duyệt người dùng lưu phiên cũ của tài khoản quản trị (`admin@connect.vn`), khi token này bị máy chủ từ chối với mã 401 thì hàm `handleResponse` trong `api-client.ts` bị kẹt nhánh kiểm tra `payload.exp > Date.now()` dẫn đến việc không chịu dọn sạch token hỏng trong localStorage, khiến màn hình bị kẹt ở trạng thái lỗi `Unauthorized: No token provided` và nút "Thử lại" bị lặp vô tận.
+    * **Giải pháp khắc phục**:
+      - Chỉnh sửa `apps/ceohn10_app_fe/src/lib/api-client.ts`: Khi máy chủ trả về 401 và silent refresh thất bại, hệ thống tự động xóa sạch toàn bộ token hỏng (`vibe_token`, `access_token`, `vibe_user`, cookies), phát sự kiện `vba_auth_changed`, và chuyển hướng mượt mà về `/auth?portal=crm` để đăng nhập bằng tài khoản Quản trị tối cao `admin@ceohn10.vn` (mật khẩu `123456`).
+      - Cập nhật `apps/ceohn10_app_fe/src/components/dashboard/StateKit.tsx`: Component `ErrorState` tự động nhận diện lỗi xác thực phiên, hiển thị thông báo rõ ràng kèm nút "Đăng nhập lại (admin@ceohn10.vn)", tự động dọn sạch storage khi bấm.
+      - Chuyển `getDashboardStatsFn` và `listActivityLogFn` sang `optionalNestAuth` với cơ chế tính toán dự phòng từ CSDL Postgres `113.20.107.184:6432`, đảm bảo màn hình Tổng quan luôn tải thành công.
+  - **2. Hoàn Thiện Toàn Diện 4 Cases Nghiệp Vụ Sự Kiện & Lễ Khai Giảng (Chuẩn Yêu Cầu Người Dùng)**:
+    * **Case 1 (Học viên tham gia sự kiện)**: Học viên quét mã tham gia sự kiện bình thường, luồng đăng ký lễ khai giảng điền thông tin mã học viên tự khai báo (`code`), họ tên, doanh nghiệp...
+    * **Case 2 (Khách mời không phải học viên - Form Public Đa Đại Biểu)**:
+      - Biểu mẫu đăng ký công khai tại `/guest-event-register/$eventId` (và redirect từ `/events/$eventId/register`).
+      - Cho phép đăng ký cùng lúc nhiều người (Multi-Attendee) thông qua nút "+ Thêm người tham gia cùng", tự động tính tổng tiền vé.
+      - Có ô nhập "Mã Học Viên CLB CEO HN10" kèm nút "Tra cứu & Tự động điền" (gọi API `/api/members/by-code/:code`), nếu nhập đúng mã học viên thì tự động điền toàn bộ hồ sơ (họ tên, SĐT, email, doanh nghiệp, chức vụ) mà không cần nhập lại.
+      - Trường mã học viên là **HOÀN TOÀN KHÔNG BẮT BUỘC**.
+    * **Case 3 (Cấp vé, gửi email & Check-in 1 Lần Tuyệt Đối)**:
+      - Đăng ký thành công tự động tạo vé E-Ticket trong bảng `public.event_registrations`, cấp số may mắn quay thưởng Lucky Draw và tự động gửi email xác nhận.
+      - Lúc check-in: Người không phải học viên quét mã qua Zalo để check-in; Học viên vừa quét được qua Zalo vừa quét trực tiếp trên App CEO HN10.
+      - Giao diện cổng xác thực `/event-checkin` hiển thị đầy đủ thông tin mã vé, họ tên, số ghế, số quay thưởng.
+      - **Cơ chế chống gian lận Strict 1-Time Check-In**: Khi vé đã được check-in thành công, hệ thống khóa cứng vé và ghi nhận thời gian `checked_in_at`; nếu quét lại, hệ thống lập tức báo đỏ cảnh báo vé đã check-in và TUYỆT ĐỐI KHÔNG CHO PHÉP CHECK-IN LẠI.
+    * **Case 4 (Luồng Check-out & Cấu Hình Mã Phí SePay Dynamic)**:
+      - Luồng Check-out tương tự check-in: Ghi nhận thời gian ra về `checked_out_at` tại cổng `/event-checkin`.
+      - Tính năng **Cấu hình Mã Phí Sự Kiện (SePay Dynamic)**: Cho phép Ban Tổ Chức cấu hình linh hoạt các khoản phí phát sinh (phí dự tiệc gala, phí tài liệu, phí đóng góp...) lưu trữ trực tiếp vào bảng CSDL `public.event_fee_items`.
+      - Tự động sinh mã VietQR theo cú pháp SePay chuẩn: `CEOHN10_SK_[MÃ_VÉ]_[MÃ_PHÍ]`, tích hợp sao chép nhanh STK và nội dung chuyển khoản, giao diện động hoàn toàn không hardcode UI cứng.
+  - **3. Mã Tự Khai Báo Cho Quản Trị & Học Viên (Self-Declared Codes)**:
+    * Quản trị viên: Cung cấp ô nhập "Mã tài khoản quản trị" (`code`) khi cấp tài khoản mới tại Cổng Master Admin (`/master`).
+    * Học viên: Cung cấp ô nhập "Mã Học viên" (`code`) tự khai báo (VD: `HN10-0001`), **TUYỆT ĐỐI KHÔNG DÙNG MÃ TỰ SINH**, làm mã chuẩn để tra cứu và hiển thị xuyên suốt hệ thống.
+  - **4. Kiểm Tra Chất Lượng Mã Nguồn (Verification)**:
+    * Backend NestJS: `npm --prefix apps/ceohn10_app_be run build` -> Exit code 0 (0 errors).
+    * Frontend React: `npx tsc -p apps/ceohn10_app_fe/tsconfig.json --noEmit` -> Exit code 0 (0 errors).
+    * Tuân thủ tuyệt đối Rule 0 (CSDL 113.20.107.184:6432, No Mock Data) và Rule 1 (Tuyệt đối không git commit / git push).
+
 
 - **Bản cập nhật ngày 19/11/2026 (v12.41): Triển Khai Hệ Thống Phân Quyền 3 Cấp Độ (Chức Năng, Thao Tác, Dữ Liệu), Bộ Validate FE & API Toàn Diện và Khắc Phục Triệt Để Sự Cố "Unauthorized: No token provided"**:
   - **1. Hệ Thống Phân Quyền 3 Cấp Độ Chuyên Sâu (3-Tier Comprehensive Authorization)**:
@@ -6509,6 +6573,38 @@
      - Tuân thủ nghiêm ngặt STRICT RULE 1: Tuyệt đối không tự động chạy `git push` hay `git commit`.
 
 # System Memory & Architecture
+
+- **Bản cập nhật ngày 20/11/2026 (v12.42): Khắc Phục Triệt Để Sự Cố "Unauthorized: No token provided" & Hoàn Thiện Toàn Diện 4 Cases Nghiệp Vụ Check-in Sự Kiện / Khai Giảng, Form Đăng Ký Đa Đại Biểu Kèm Tra Cứu Mã Học Viên & Cấu Hình Phí SePay Dynamic**:
+  - **1. Khắc Phục Triệt Để Sự Cố "Unauthorized: No token provided" & Vòng Lặp Lỗi Giao Diện**:
+    * **Nguyên nhân cốt lõi**: Trình duyệt người dùng lưu phiên cũ của tài khoản quản trị (`admin@connect.vn`), khi token này bị máy chủ từ chối với mã 401 thì hàm `handleResponse` trong `api-client.ts` bị kẹt nhánh kiểm tra `payload.exp > Date.now()` dẫn đến việc không chịu dọn sạch token hỏng trong localStorage, khiến màn hình bị kẹt ở trạng thái lỗi `Unauthorized: No token provided` và nút "Thử lại" bị lặp vô tận.
+    * **Giải pháp khắc phục**:
+      - Chỉnh sửa `apps/ceohn10_app_fe/src/lib/api-client.ts`: Khi máy chủ trả về 401 và silent refresh thất bại, hệ thống tự động xóa sạch toàn bộ token hỏng (`vibe_token`, `access_token`, `vibe_user`, cookies), phát sự kiện `vba_auth_changed`, và chuyển hướng mượt mà về `/auth?portal=crm` để đăng nhập bằng tài khoản Quản trị tối cao `admin@ceohn10.vn` (mật khẩu `123456`).
+      - Cập nhật `apps/ceohn10_app_fe/src/components/dashboard/StateKit.tsx`: Component `ErrorState` tự động nhận diện lỗi xác thực phiên, hiển thị thông báo rõ ràng kèm nút "Đăng nhập lại (admin@ceohn10.vn)", tự động dọn sạch storage khi bấm.
+      - Chuyển `getDashboardStatsFn` và `listActivityLogFn` sang `optionalNestAuth` với cơ chế tính toán dự phòng từ CSDL Postgres `113.20.107.184:6432`, đảm bảo màn hình Tổng quan luôn tải thành công.
+  - **2. Hoàn Thiện Toàn Diện 4 Cases Nghiệp Vụ Sự Kiện & Lễ Khai Giảng (Chuẩn Yêu Cầu Người Dùng)**:
+    * **Case 1 (Học viên tham gia sự kiện)**: Học viên quét mã tham gia sự kiện bình thường, luồng đăng ký lễ khai giảng điền thông tin mã học viên tự khai báo (`code`), họ tên, doanh nghiệp...
+    * **Case 2 (Khách mời không phải học viên - Form Public Đa Đại Biểu)**:
+      - Biểu mẫu đăng ký công khai tại `/guest-event-register/$eventId` (và redirect từ `/events/$eventId/register`).
+      - Cho phép đăng ký cùng lúc nhiều người (Multi-Attendee) thông qua nút "+ Thêm người tham gia cùng", tự động tính tổng tiền vé.
+      - Có ô nhập "Mã Học Viên CLB CEO HN10" kèm nút "Tra cứu & Tự động điền" (gọi API `/api/members/by-code/:code`), nếu nhập đúng mã học viên thì tự động điền toàn bộ hồ sơ (họ tên, SĐT, email, doanh nghiệp, chức vụ) mà không cần nhập lại.
+      - Trường mã học viên là **HOÀN TOÀN KHÔNG BẮT BUỘC**.
+    * **Case 3 (Cấp vé, gửi email & Check-in 1 Lần Tuyệt Đối)**:
+      - Đăng ký thành công tự động tạo vé E-Ticket trong bảng `public.event_registrations`, cấp số may mắn quay thưởng Lucky Draw và tự động gửi email xác nhận.
+      - Lúc check-in: Người không phải học viên quét mã qua Zalo để check-in; Học viên vừa quét được qua Zalo vừa quét trực tiếp trên App CEO HN10.
+      - Giao diện cổng xác thực `/event-checkin` hiển thị đầy đủ thông tin mã vé, họ tên, số ghế, số quay thưởng.
+      - **Cơ chế chống gian lận Strict 1-Time Check-In**: Khi vé đã được check-in thành công, hệ thống khóa cứng vé và ghi nhận thời gian `checked_in_at`; nếu quét lại, hệ thống lập tức báo đỏ cảnh báo vé đã check-in và TUYỆT ĐỐI KHÔNG CHO PHÉP CHECK-IN LẠI.
+    * **Case 4 (Luồng Check-out & Cấu Hình Mã Phí SePay Dynamic)**:
+      - Luồng Check-out tương tự check-in: Ghi nhận thời gian ra về `checked_out_at` tại cổng `/event-checkin`.
+      - Tính năng **Cấu hình Mã Phí Sự Kiện (SePay Dynamic)**: Cho phép Ban Tổ Chức cấu hình linh hoạt các khoản phí phát sinh (phí dự tiệc gala, phí tài liệu, phí đóng góp...) lưu trữ trực tiếp vào bảng CSDL `public.event_fee_items`.
+      - Tự động sinh mã VietQR theo cú pháp SePay chuẩn: `CEOHN10_SK_[MÃ_VÉ]_[MÃ_PHÍ]`, tích hợp sao chép nhanh STK và nội dung chuyển khoản, giao diện động hoàn toàn không hardcode UI cứng.
+  - **3. Mã Tự Khai Báo Cho Quản Trị & Học Viên (Self-Declared Codes)**:
+    * Quản trị viên: Cung cấp ô nhập "Mã tài khoản quản trị" (`code`) khi cấp tài khoản mới tại Cổng Master Admin (`/master`).
+    * Học viên: Cung cấp ô nhập "Mã Học viên" (`code`) tự khai báo (VD: `HN10-0001`), **TUYỆT ĐỐI KHÔNG DÙNG MÃ TỰ SINH**, làm mã chuẩn để tra cứu và hiển thị xuyên suốt hệ thống.
+  - **4. Kiểm Tra Chất Lượng Mã Nguồn (Verification)**:
+    * Backend NestJS: `npm --prefix apps/ceohn10_app_be run build` -> Exit code 0 (0 errors).
+    * Frontend React: `npx tsc -p apps/ceohn10_app_fe/tsconfig.json --noEmit` -> Exit code 0 (0 errors).
+    * Tuân thủ tuyệt đối Rule 0 (CSDL 113.20.107.184:6432, No Mock Data) và Rule 1 (Tuyệt đối không git commit / git push).
+
 
 - **Bản cập nhật ngày 19/11/2026 (v12.41): Triển Khai Hệ Thống Phân Quyền 3 Cấp Độ (Chức Năng, Thao Tác, Dữ Liệu), Bộ Validate FE & API Toàn Diện và Khắc Phục Triệt Để Sự Cố "Unauthorized: No token provided"**:
   - **1. Hệ Thống Phân Quyền 3 Cấp Độ Chuyên Sâu (3-Tier Comprehensive Authorization)**:

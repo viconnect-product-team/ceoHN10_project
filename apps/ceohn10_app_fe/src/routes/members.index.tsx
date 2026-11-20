@@ -402,6 +402,7 @@ function MembersPage() {
   const dynamicFields: DynamicFieldDef[] = schemaQuery.data || [];
 
   const fields: CrudField[] = [
+    { name: "code", label: "Mã Học viên * (tự khai báo, VD: HN10-001)", type: "text", required: true },
     { name: "name", label: t("members.f.name"), type: "text", required: true },
     { name: "phone", label: t("members.f.phone"), type: "text" },
     { name: "email", label: t("members.f.email"), type: "text" },
@@ -505,6 +506,7 @@ function MembersPage() {
     try {
       const pStatus = (v.paymentStatus as string) || "unpaid";
       const payload = {
+        code: v.code ? String(v.code).trim().toUpperCase() : undefined,
         name: String(v.name || "").trim(),
         contact: v.contact ? String(v.contact).trim() : undefined,
         email: v.email ? String(v.email).trim() : undefined,

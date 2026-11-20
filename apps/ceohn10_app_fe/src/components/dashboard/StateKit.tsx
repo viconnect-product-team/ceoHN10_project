@@ -162,6 +162,14 @@ export function ErrorState({
               type="button"
               onClick={() => {
                 if (typeof window !== "undefined") {
+                  try {
+                    localStorage.removeItem("vibe_token");
+                    localStorage.removeItem("vibe_refresh_token");
+                    localStorage.removeItem("vibe_user");
+                    localStorage.removeItem("token");
+                    localStorage.removeItem("access_token");
+                    localStorage.removeItem("sb-access-token");
+                  } catch {}
                   window.location.href = "/auth?portal=crm";
                 }
               }}
