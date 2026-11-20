@@ -47,6 +47,196 @@ docker logs --tail 15 ceohn10-ssl-proxy 2>&1 || true
 # Tạm ngắt exit on error để các lệnh kiểm thử curl không làm fail script deploy
 set +e
 
+# 5.1. Cấu hình Reverse Proxy trực tiếp cho Nginx Host Ubuntu (Cổng 80 & 443)
+if [ -d "/etc/nginx" ]; then
+    echo "[Host Nginx] Cấu hình Reverse Proxy cho ceohn10.viconnect.vn & crm.ceohn10.viconnect.vn..."
+    mkdir -p /etc/nginx/ssl 2>/dev/null || true
+    if [ -f "/root/ssl-proxy/server.crt" ] && [ -f "/root/ssl-proxy/server.key" ]; then
+        cp -f /root/ssl-proxy/server.crt /etc/nginx/ssl/server.crt 2>/dev/null || true
+        cp -f /root/ssl-proxy/server.key /etc/nginx/ssl/server.key 2>/dev/null || true
+    fi
+
+    cat << 'EOF' > /etc/nginx/conf.d/ceohn10_subdomains.conf
+# ==============================================================================
+# NGINX HOST OS REVERSE PROXY CHO SUBDOMAINS CEO HN10
+# ==============================================================================
+
+# 1. HTTP 80 -> HTTPS 443 REDIRECT
+server {
+    listen 80;
+    server_name ceohn10.viconnect.vn ceoHN10.viconnect.vn crm_ceohn10.viconnect.vn crm.ceohn10.viconnect.vn crm.ceoHN10.viconnect.vn;
+
+    location /.well-known/acme-challenge/ {
+        root /var/www/certbot;
+    }
+
+    location / {
+        return 301 https://$host$request_uri;
+    }
+}
+
+# 2. SUBDOMAIN WEB CRM: https://crm.ceohn10.viconnect.vn & crm_ceohn10.viconnect.vn
+server {
+    listen 443 ssl http2;
+    server_name crm.ceohn10.viconnect.vn crm_ceohn10.viconnect.vn crm.ceoHN10.viconnect.vn;
+
+    ssl_certificate /etc/nginx/ssl/server.crt;
+    ssl_certificate_key /etc/nginx/ssl/server.key;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers HIGH:!aNULL:!MD5;
+    client_max_body_size 50M;
+
+    location = /sw.js {
+        proxy_pass http://127.0.0.1:5022;
+        add_header Cache-Control "no-cache, no-store, must-revalidate" always;
+    }
+
+    location /assets/ {
+        proxy_pass http://127.0.0.1:5022;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        add_header Cache-Control "public, max-age=31536000, immutable";
+    }
+
+    location / {
+        proxy_pass http://127.0.0.1:5022;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection $connection_upgrade;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto https;
+        add_header Cache-Control "no-cache, no-store, must-revalidate" always;
+    }
+
+    location /api/ {
+        proxy_pass http://127.0.0.1:5023;
+        proxy_http_version 1.1;
+        proxy_set_header Connection "";
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto https;
+    }
+
+    location /uploads/ {
+        proxy_pass http://127.0.0.1:5023;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto https;
+    }
+
+    location /upload/ {
+        rewrite ^/upload/(.*)$ /api/upload/$1 break;
+        proxy_pass http://127.0.0.1:5023;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto https;
+    }
+
+    location /socket.io/ {
+        proxy_pass http://127.0.0.1:5023;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto https;
+    }
+}
+
+# 3. SUBDOMAIN MOBILE APP: https://ceohn10.viconnect.vn
+server {
+    listen 443 ssl http2;
+    server_name ceohn10.viconnect.vn ceoHN10.viconnect.vn;
+
+    ssl_certificate /etc/nginx/ssl/server.crt;
+    ssl_certificate_key /etc/nginx/ssl/server.key;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers HIGH:!aNULL:!MD5;
+    client_max_body_size 50M;
+
+    location = /sw.js {
+        proxy_pass http://127.0.0.1:5020;
+        add_header Cache-Control "no-cache, no-store, must-revalidate" always;
+    }
+
+    location /assets/ {
+        proxy_pass http://127.0.0.1:5020;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        add_header Cache-Control "public, max-age=31536000, immutable";
+    }
+
+    location / {
+        proxy_pass http://127.0.0.1:5020;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection $connection_upgrade;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto https;
+        add_header Cache-Control "no-cache, no-store, must-revalidate" always;
+    }
+
+    location /api/ {
+        proxy_pass http://127.0.0.1:5021;
+        proxy_http_version 1.1;
+        proxy_set_header Connection "";
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto https;
+    }
+
+    location /uploads/ {
+        proxy_pass http://127.0.0.1:5021;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto https;
+    }
+
+    location /upload/ {
+        rewrite ^/upload/(.*)$ /api/upload/$1 break;
+        proxy_pass http://127.0.0.1:5021;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto https;
+    }
+
+    location /socket.io/ {
+        proxy_pass http://127.0.0.1:5021;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto https;
+    }
+}
+EOF
+
+    # Kiểm tra cú pháp nginx và reload
+    if nginx -t 2>/dev/null; then
+        echo "[Host Nginx] Cú pháp Nginx Host hợp lệ! Đang reload..."
+        systemctl reload nginx 2>/dev/null || true
+    else
+        echo "[Host Nginx] Cảnh báo cú pháp Nginx Host, bỏ qua để bảo vệ máy chủ."
+    fi
+fi
+
 # Reload host nginx nếu đang chạy trên VPS để cập nhật cấu hình nếu có
 if systemctl is-active --quiet nginx 2>/dev/null; then
     echo "[Host Nginx] Tải lại Nginx chính trên máy chủ chủ..."

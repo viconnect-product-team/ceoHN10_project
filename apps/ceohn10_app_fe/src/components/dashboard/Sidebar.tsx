@@ -107,7 +107,7 @@ const crmFinance: Item[] = [
 
 // 5. NHÓM THÔNG BÁO
 const crmNotifications: Item[] = [
-  { key: "nav.zaloOa" as TKey, icon: MessageSquare, to: "/admin/integrations?tab=miniapp", label: "Thông báo qua Zalo OA/ZBS" },
+  { key: "nav.zaloOa" as TKey, icon: MessageSquare, to: "/notifications?tab=templates&channel=zalo_oa", label: "Thông báo qua Zalo OA/ZBS" },
   { key: "nav.emailMarketing" as TKey, icon: Mail, to: "/email-marketing", label: "Thông báo đến email" },
 ];
 

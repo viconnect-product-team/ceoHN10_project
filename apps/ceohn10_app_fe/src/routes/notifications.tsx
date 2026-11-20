@@ -33,6 +33,7 @@ import { toast } from "sonner";
 import { useServerFn } from "@tanstack/react-start";
 import { AppShell } from "@/components/dashboard/AppShell";
 import { MailTemplateManager } from "@/components/documents/MailTemplateManager";
+import { DynamicNotificationTemplateManager } from "@/components/notifications/DynamicNotificationTemplateManager";
 import { PageHeader, Pill } from "@/components/dashboard/PageKit";
 import { EmptyState, NoNotifications, NoSearchResult } from "@/components/dashboard/StateKit";
 import type { Notification } from "@/lib/extra-data";
@@ -60,12 +61,16 @@ import {
 
 type NotificationSearchParams = {
   filter?: string;
+  tab?: string;
+  channel?: string;
 };
 
 export const Route = createFileRoute("/notifications")({
   ssr: false,
   validateSearch: (search: Record<string, unknown>): NotificationSearchParams => ({
     filter: typeof search.filter === "string" ? search.filter : undefined,
+    tab: typeof search.tab === "string" ? search.tab : undefined,
+    channel: typeof search.channel === "string" ? search.channel : undefined,
   }),
   loader: async () => {
     try {
@@ -298,7 +303,11 @@ function NotifyPage() {
     return () => window.removeEventListener("notifications-seen", onSeen);
   }, []);
 
-  const [mainTab, setMainTab] = useState<"notifications" | "auto_reminders" | "templates">("notifications");
+  const [mainTab, setMainTab] = useState<"notifications" | "auto_reminders" | "templates">(() => {
+    if (searchParams.tab === "templates" || searchParams.channel) return "templates";
+    return "notifications";
+  });
+  const [templateViewMode, setTemplateViewMode] = useState<"dynamic" | "classic">("dynamic");
 
   // Auto Reminder Configuration State (Yêu cầu 1: Thiết lập nhắc tự động)
   const [autoTaskReminderEnabled, setAutoTaskReminderEnabled] = useState(() => {
@@ -1248,7 +1257,38 @@ function NotifyPage() {
 
       {mainTab === "templates" ? (
         <div className="space-y-4">
-          <MailTemplateManager />
+          <div className="flex items-center justify-between pb-2 border-b border-slate-200">
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setTemplateViewMode("dynamic")}
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer ${
+                  templateViewMode === "dynamic"
+                    ? "bg-[#003B95] text-white shadow-xs"
+                    : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                }`}
+              >
+                ✨ Mẫu Chuẩn Danh Mục Dynamic &amp; Tree Menu (Mới)
+              </button>
+              <button
+                type="button"
+                onClick={() => setTemplateViewMode("classic")}
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer ${
+                  templateViewMode === "classic"
+                    ? "bg-[#003B95] text-white shadow-xs"
+                    : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                }`}
+              >
+                📋 Toàn Bộ Mẫu Thư &amp; Visual Blocks
+              </button>
+            </div>
+          </div>
+
+          {templateViewMode === "dynamic" ? (
+            <DynamicNotificationTemplateManager />
+          ) : (
+            <MailTemplateManager />
+          )}
         </div>
       ) : mainTab === "auto_reminders" ? (
         <div className="space-y-6">

@@ -1,5 +1,46 @@
 # System Memory & Architecture
 
+- **Bản cập nhật ngày 20/11/2026 (v12.45): Khắc Phục Triệt Để Form Cài Đặt Sepay Bị Rỗng Trắng, Bổ Sung Cấu Hình Zalo OA & Cài Đặt Từng Hệ Thống Con Tại Master Admin, Xây Dựng Bộ Quản Lý Template Thông Báo Chuẩn Danh Mục Dynamic Kèm Call API Tree Menu**:
+  - **1. Sửa Lỗi Rỗng Trắng & Tái Cấu Trúc Toàn Diện Tab [3. Cài Đặt Hệ Thống Bên Ngoài] Tại Master Admin (`/master`)**:
+    * **Khắc phục lỗi form SePay rỗng trắng (như ảnh người dùng phản ánh)**:
+      - Khởi tạo giá trị mặc định chuẩn `DEFAULT_SEPAY_CONFIG` cho `sepayFormData`, đảm bảo 100% form luôn hiển thị đầy đủ ngay cả khi backend chưa có cấu hình.
+      - Hiển thị trọn vẹn thông tin ngân hàng nhận tiền tự động: Tên Ngân Hàng (MBBank), Số Tài Khoản (`198300000000`), Chủ Tài Khoản (`CLB DOANH NHAN CEO HN10`), Sepay API Token, Webhook Secret Token, Webhook Callback URL, Cú pháp tiền tố nhận diện tự động (`CEOHN10_HP`, `CEOHN10_SK`, `CEOHN10_LH`), Tự động kích hoạt quyền lợi khi nhận tiền và Nút Lưu trực tiếp trong form.
+    * **Bổ sung Phân mục Cấu hình Tích hợp Zalo Official Account (Zalo OA / ZBS)**:
+      - Cung cấp giao diện cấu hình chuyên sâu: Zalo OA ID (`429182910284729182`), App ID (`4819284719284`), Secret Key bí mật, Access Token & Refresh Token, Webhook Callback Endpoint URL, Mẫu Template ZNS mặc định gửi sự kiện / lớp học / hội phí.
+      - Tích hợp 2 nút thao tác nhanh: **"Kiểm Tra Kết Nối"** (gọi `/zalo/check-token`) và **"Lưu Cấu Hình Zalo OA"**.
+    * **Bổ sung Phân mục Cài Đặt Hệ Thống Chi Tiết Cho Từng Hệ Thống Con (Per-Platform Settings)**:
+      - Bộ chọn hệ thống con dạng thẻ: Hệ thống CRM Quản trị (`plt-crm`), App Mobile Học viên (`plt-app`), hoặc các Mini App / Nền tảng tích hợp khác.
+      - Form cấu hình chi tiết cho từng hệ thống con: Tên hệ thống, Mã định danh (`code`), URL Domain truy cập, Endpoint API Healthcheck, API Key / Secret Key, Thời gian hết hạn phiên làm việc (Session Timeout: 30m, 1h, 2h, 8h, 24h), Chế độ bảo trì hệ thống (Maintenance Mode On/Off) và Bật/Tắt các phân hệ tính năng (Modules: Học viên, Sự kiện, Khai giảng, Tài chính, Phân quyền, Tra cứu, Điểm danh QR, v.v.).
+    * **Backend NestJS Master Settings**:
+      - `apps/ceohn10_app_be/src/admin/master-settings.controller.ts`: Bổ sung endpoint `GET /admin/master-settings/zalo` và `PUT /admin/master-settings/zalo` hỗ trợ lưu và đọc cấu hình Zalo OA.
+      - `apps/ceohn10_app_be/src/admin/master-settings.service.ts`: Cập nhật `getSepayConfig` trả về các trường phẳng thuận tiện, thêm phương thức `getZaloConfig` và `saveZaloConfig`.
+  - **2. Xây Dựng Bộ Quản Lý Template Thông Báo Chuẩn Danh Mục Dynamic & Call API Phân Cấp Dạng Tree Menu**:
+    * **Component mới: `DynamicNotificationTemplateManager.tsx` (`apps/ceohn10_app_fe/src/components/notifications/`)**:
+      - **Mẫu Template Chuẩn Theo 4 Danh Mục Trọng Tâm**:
+        1. `Sự kiện & Hội nghị`: Thư mời Lễ Khai Giảng & Sự kiện CLB CEO HN10 (chuẩn cao cấp đa kênh), Thông báo nhắc lịch sự kiện trước giờ khai mạc (Giờ G), Xác nhận vé & Thẻ Check-in vào cửa.
+        2. `Khóa Đào Tạo & Lớp Học CEO HN10`: Thông báo Khai giảng Khóa Đào tạo CEO HN10, Thông báo nhắc lịch học buổi tới & Giảng viên, Mã QR Điểm danh buổi học & Tài liệu bài giảng.
+        3. `Học Viên & Niên Liễm`: Thư Chào mừng Học viên mới gia nhập CLB CEO HN10, Thông báo Niên liễm & Đóng hội phí thường niên.
+        4. `Ban Quản Trị & Điều Hành`: Thư mời Họp Ban Điều Hành & Giao ban định kỳ, Thông báo Nghị quyết & Quyết định BĐH.
+      - **Trường Call API Lần Lượt Theo Dạng Tree Menu (Cascading Tree Menu Selector)**:
+        * Bộ chọn nguồn cấp dữ liệu: `Sự kiện CLB (Events)` vs `Khóa Học & Lớp Học (Classes / Trainings)`.
+        * Gọi API tự động: `/events` hoặc `/trainings`.
+        * Hiển thị giao diện **Tree Menu Phân Cấp (Hierarchical Tree View)** trực quan: Có các nhánh thư mục mở/đóng (Sự kiện đang diễn ra, Sự kiện sắp diễn ra, Khóa học -> Buổi học 1, Buổi học 2, Buổi học 3).
+        * Khi người dùng click chọn 1 node cụ thể trên Tree Menu, hệ thống **tự động cào và map dữ liệu** của Node đó vào các trường động của mẫu thông báo (`{{event_title}}`, `{{speaker_name}}`, `{{event_date}}`, `{{event_location}}`, `{{event_fee}}`, `{{event_summary}}`, `{{confirm_link}}`, `{{qr_code_url}}`, v.v.).
+      - **Hệ Thống Trường Dữ Liệu Động (Dynamic Field Builder)**:
+        * Cho phép người quản trị thêm tùy ý các trường dữ liệu mới (`+ Thêm Trường Mới`) với các kiểu: `text`, `textarea`, `datetime`, `price`, `qr`.
+        * Cho phép chỉnh sửa giá trị trực tiếp hoặc xóa trường bất kỳ khỏi template.
+      - **Xem Trước Đa Kênh Trực Quan (Live Omnichannel Preview)**:
+        * Hỗ trợ xem trước 3 chế độ: `Email HTML Trang Trọng`, `Tin Nhắn Zalo OA Tích Xanh & Nút Bấm Tương Tác`, `Thông Báo In-App App Mobile`.
+      - **Phát Sóng Đa Kênh (Omnichannel Broadcast)**:
+        * Hỗ trợ điều phối gửi thông báo tới: Toàn bộ học viên, Học viên theo lớp, hoặc Nhập tệp Word (.docx) / Excel (.xlsx) danh sách khách mời ngoài CLB (tự động bóc tách danh sách).
+    * **Đồng bộ Route & Sidebar**:
+      - `apps/ceohn10_app_fe/src/routes/notifications.tsx`: Tích hợp `DynamicNotificationTemplateManager` vào tab templates, hỗ trợ query params `tab=templates` và `channel=zalo_oa`.
+      - `apps/ceohn10_app_fe/src/components/dashboard/Sidebar.tsx`: Chỉnh sửa link "Thông báo qua Zalo OA/ZBS" trỏ thẳng vào `/notifications?tab=templates&channel=zalo_oa`.
+  - **3. Kiểm Tra Chất Lượng Mã Nguồn (Strict Verification)**:
+    * Backend NestJS: `npx tsc -p apps/ceohn10_app_be/tsconfig.json --noEmit` -> **Exit code 0 (0 errors)**.
+    * Frontend React: `npx tsc -p apps/ceohn10_app_fe/tsconfig.json --noEmit` -> **Exit code 0 (0 errors)**.
+    * Tuân thủ nghiêm ngặt Rule 0 (CSDL chuẩn `113.20.107.184:6432`, PgBouncer `app1`, không fake/mock data) và Rule 1 (Tuyệt đối không chạy `git commit` / `git push`).
+
 - **Bản cập nhật ngày 20/11/2026 (v12.44): Khắc Phục Triệt Để Lỗi Đăng Nhập `admin@ceohn10.vn`, Sửa Modal Tạo Tài Khoản Quản Trị, Hoàn Thiện Luồng Thư Mời Sự Kiện Đa Kênh (Word/Excel/Zalo/Email), Đồng Bộ Check-in/Check-out & Khôi Phục Biểu Quyết Vote Sao (1-5 Sao)**:
   - **1. Khắc Phục Triệt Để Lỗi Đăng Nhập Tài Khoản `admin@ceohn10.vn` & Modal Tạo Tài Khoản Quản Trị Mới**:
     * **Nguyên nhân cốt lõi**:
@@ -2767,6 +2808,47 @@
      - Tuân thủ nghiêm ngặt STRICT RULE 1: Tuyệt đối không tự động chạy `git push` hay `git commit`.
 
 # System Memory & Architecture
+
+- **Bản cập nhật ngày 20/11/2026 (v12.45): Khắc Phục Triệt Để Form Cài Đặt Sepay Bị Rỗng Trắng, Bổ Sung Cấu Hình Zalo OA & Cài Đặt Từng Hệ Thống Con Tại Master Admin, Xây Dựng Bộ Quản Lý Template Thông Báo Chuẩn Danh Mục Dynamic Kèm Call API Tree Menu**:
+  - **1. Sửa Lỗi Rỗng Trắng & Tái Cấu Trúc Toàn Diện Tab [3. Cài Đặt Hệ Thống Bên Ngoài] Tại Master Admin (`/master`)**:
+    * **Khắc phục lỗi form SePay rỗng trắng (như ảnh người dùng phản ánh)**:
+      - Khởi tạo giá trị mặc định chuẩn `DEFAULT_SEPAY_CONFIG` cho `sepayFormData`, đảm bảo 100% form luôn hiển thị đầy đủ ngay cả khi backend chưa có cấu hình.
+      - Hiển thị trọn vẹn thông tin ngân hàng nhận tiền tự động: Tên Ngân Hàng (MBBank), Số Tài Khoản (`198300000000`), Chủ Tài Khoản (`CLB DOANH NHAN CEO HN10`), Sepay API Token, Webhook Secret Token, Webhook Callback URL, Cú pháp tiền tố nhận diện tự động (`CEOHN10_HP`, `CEOHN10_SK`, `CEOHN10_LH`), Tự động kích hoạt quyền lợi khi nhận tiền và Nút Lưu trực tiếp trong form.
+    * **Bổ sung Phân mục Cấu hình Tích hợp Zalo Official Account (Zalo OA / ZBS)**:
+      - Cung cấp giao diện cấu hình chuyên sâu: Zalo OA ID (`429182910284729182`), App ID (`4819284719284`), Secret Key bí mật, Access Token & Refresh Token, Webhook Callback Endpoint URL, Mẫu Template ZNS mặc định gửi sự kiện / lớp học / hội phí.
+      - Tích hợp 2 nút thao tác nhanh: **"Kiểm Tra Kết Nối"** (gọi `/zalo/check-token`) và **"Lưu Cấu Hình Zalo OA"**.
+    * **Bổ sung Phân mục Cài Đặt Hệ Thống Chi Tiết Cho Từng Hệ Thống Con (Per-Platform Settings)**:
+      - Bộ chọn hệ thống con dạng thẻ: Hệ thống CRM Quản trị (`plt-crm`), App Mobile Học viên (`plt-app`), hoặc các Mini App / Nền tảng tích hợp khác.
+      - Form cấu hình chi tiết cho từng hệ thống con: Tên hệ thống, Mã định danh (`code`), URL Domain truy cập, Endpoint API Healthcheck, API Key / Secret Key, Thời gian hết hạn phiên làm việc (Session Timeout: 30m, 1h, 2h, 8h, 24h), Chế độ bảo trì hệ thống (Maintenance Mode On/Off) và Bật/Tắt các phân hệ tính năng (Modules: Học viên, Sự kiện, Khai giảng, Tài chính, Phân quyền, Tra cứu, Điểm danh QR, v.v.).
+    * **Backend NestJS Master Settings**:
+      - `apps/ceohn10_app_be/src/admin/master-settings.controller.ts`: Bổ sung endpoint `GET /admin/master-settings/zalo` và `PUT /admin/master-settings/zalo` hỗ trợ lưu và đọc cấu hình Zalo OA.
+      - `apps/ceohn10_app_be/src/admin/master-settings.service.ts`: Cập nhật `getSepayConfig` trả về các trường phẳng thuận tiện, thêm phương thức `getZaloConfig` và `saveZaloConfig`.
+  - **2. Xây Dựng Bộ Quản Lý Template Thông Báo Chuẩn Danh Mục Dynamic & Call API Phân Cấp Dạng Tree Menu**:
+    * **Component mới: `DynamicNotificationTemplateManager.tsx` (`apps/ceohn10_app_fe/src/components/notifications/`)**:
+      - **Mẫu Template Chuẩn Theo 4 Danh Mục Trọng Tâm**:
+        1. `Sự kiện & Hội nghị`: Thư mời Lễ Khai Giảng & Sự kiện CLB CEO HN10 (chuẩn cao cấp đa kênh), Thông báo nhắc lịch sự kiện trước giờ khai mạc (Giờ G), Xác nhận vé & Thẻ Check-in vào cửa.
+        2. `Khóa Đào Tạo & Lớp Học CEO HN10`: Thông báo Khai giảng Khóa Đào tạo CEO HN10, Thông báo nhắc lịch học buổi tới & Giảng viên, Mã QR Điểm danh buổi học & Tài liệu bài giảng.
+        3. `Học Viên & Niên Liễm`: Thư Chào mừng Học viên mới gia nhập CLB CEO HN10, Thông báo Niên liễm & Đóng hội phí thường niên.
+        4. `Ban Quản Trị & Điều Hành`: Thư mời Họp Ban Điều Hành & Giao ban định kỳ, Thông báo Nghị quyết & Quyết định BĐH.
+      - **Trường Call API Lần Lượt Theo Dạng Tree Menu (Cascading Tree Menu Selector)**:
+        * Bộ chọn nguồn cấp dữ liệu: `Sự kiện CLB (Events)` vs `Khóa Học & Lớp Học (Classes / Trainings)`.
+        * Gọi API tự động: `/events` hoặc `/trainings`.
+        * Hiển thị giao diện **Tree Menu Phân Cấp (Hierarchical Tree View)** trực quan: Có các nhánh thư mục mở/đóng (Sự kiện đang diễn ra, Sự kiện sắp diễn ra, Khóa học -> Buổi học 1, Buổi học 2, Buổi học 3).
+        * Khi người dùng click chọn 1 node cụ thể trên Tree Menu, hệ thống **tự động cào và map dữ liệu** của Node đó vào các trường động của mẫu thông báo (`{{event_title}}`, `{{speaker_name}}`, `{{event_date}}`, `{{event_location}}`, `{{event_fee}}`, `{{event_summary}}`, `{{confirm_link}}`, `{{qr_code_url}}`, v.v.).
+      - **Hệ Thống Trường Dữ Liệu Động (Dynamic Field Builder)**:
+        * Cho phép người quản trị thêm tùy ý các trường dữ liệu mới (`+ Thêm Trường Mới`) với các kiểu: `text`, `textarea`, `datetime`, `price`, `qr`.
+        * Cho phép chỉnh sửa giá trị trực tiếp hoặc xóa trường bất kỳ khỏi template.
+      - **Xem Trước Đa Kênh Trực Quan (Live Omnichannel Preview)**:
+        * Hỗ trợ xem trước 3 chế độ: `Email HTML Trang Trọng`, `Tin Nhắn Zalo OA Tích Xanh & Nút Bấm Tương Tác`, `Thông Báo In-App App Mobile`.
+      - **Phát Sóng Đa Kênh (Omnichannel Broadcast)**:
+        * Hỗ trợ điều phối gửi thông báo tới: Toàn bộ học viên, Học viên theo lớp, hoặc Nhập tệp Word (.docx) / Excel (.xlsx) danh sách khách mời ngoài CLB (tự động bóc tách danh sách).
+    * **Đồng bộ Route & Sidebar**:
+      - `apps/ceohn10_app_fe/src/routes/notifications.tsx`: Tích hợp `DynamicNotificationTemplateManager` vào tab templates, hỗ trợ query params `tab=templates` và `channel=zalo_oa`.
+      - `apps/ceohn10_app_fe/src/components/dashboard/Sidebar.tsx`: Chỉnh sửa link "Thông báo qua Zalo OA/ZBS" trỏ thẳng vào `/notifications?tab=templates&channel=zalo_oa`.
+  - **3. Kiểm Tra Chất Lượng Mã Nguồn (Strict Verification)**:
+    * Backend NestJS: `npx tsc -p apps/ceohn10_app_be/tsconfig.json --noEmit` -> **Exit code 0 (0 errors)**.
+    * Frontend React: `npx tsc -p apps/ceohn10_app_fe/tsconfig.json --noEmit` -> **Exit code 0 (0 errors)**.
+    * Tuân thủ nghiêm ngặt Rule 0 (CSDL chuẩn `113.20.107.184:6432`, PgBouncer `app1`, không fake/mock data) và Rule 1 (Tuyệt đối không chạy `git commit` / `git push`).
 
 - **Bản cập nhật ngày 20/11/2026 (v12.44): Khắc Phục Triệt Để Lỗi Đăng Nhập `admin@ceohn10.vn`, Sửa Modal Tạo Tài Khoản Quản Trị, Hoàn Thiện Luồng Thư Mời Sự Kiện Đa Kênh (Word/Excel/Zalo/Email), Đồng Bộ Check-in/Check-out & Khôi Phục Biểu Quyết Vote Sao (1-5 Sao)**:
   - **1. Khắc Phục Triệt Để Lỗi Đăng Nhập Tài Khoản `admin@ceohn10.vn` & Modal Tạo Tài Khoản Quản Trị Mới**:
@@ -6699,6 +6781,47 @@
      - Tuân thủ nghiêm ngặt STRICT RULE 1: Tuyệt đối không tự động chạy `git push` hay `git commit`.
 
 # System Memory & Architecture
+
+- **Bản cập nhật ngày 20/11/2026 (v12.45): Khắc Phục Triệt Để Form Cài Đặt Sepay Bị Rỗng Trắng, Bổ Sung Cấu Hình Zalo OA & Cài Đặt Từng Hệ Thống Con Tại Master Admin, Xây Dựng Bộ Quản Lý Template Thông Báo Chuẩn Danh Mục Dynamic Kèm Call API Tree Menu**:
+  - **1. Sửa Lỗi Rỗng Trắng & Tái Cấu Trúc Toàn Diện Tab [3. Cài Đặt Hệ Thống Bên Ngoài] Tại Master Admin (`/master`)**:
+    * **Khắc phục lỗi form SePay rỗng trắng (như ảnh người dùng phản ánh)**:
+      - Khởi tạo giá trị mặc định chuẩn `DEFAULT_SEPAY_CONFIG` cho `sepayFormData`, đảm bảo 100% form luôn hiển thị đầy đủ ngay cả khi backend chưa có cấu hình.
+      - Hiển thị trọn vẹn thông tin ngân hàng nhận tiền tự động: Tên Ngân Hàng (MBBank), Số Tài Khoản (`198300000000`), Chủ Tài Khoản (`CLB DOANH NHAN CEO HN10`), Sepay API Token, Webhook Secret Token, Webhook Callback URL, Cú pháp tiền tố nhận diện tự động (`CEOHN10_HP`, `CEOHN10_SK`, `CEOHN10_LH`), Tự động kích hoạt quyền lợi khi nhận tiền và Nút Lưu trực tiếp trong form.
+    * **Bổ sung Phân mục Cấu hình Tích hợp Zalo Official Account (Zalo OA / ZBS)**:
+      - Cung cấp giao diện cấu hình chuyên sâu: Zalo OA ID (`429182910284729182`), App ID (`4819284719284`), Secret Key bí mật, Access Token & Refresh Token, Webhook Callback Endpoint URL, Mẫu Template ZNS mặc định gửi sự kiện / lớp học / hội phí.
+      - Tích hợp 2 nút thao tác nhanh: **"Kiểm Tra Kết Nối"** (gọi `/zalo/check-token`) và **"Lưu Cấu Hình Zalo OA"**.
+    * **Bổ sung Phân mục Cài Đặt Hệ Thống Chi Tiết Cho Từng Hệ Thống Con (Per-Platform Settings)**:
+      - Bộ chọn hệ thống con dạng thẻ: Hệ thống CRM Quản trị (`plt-crm`), App Mobile Học viên (`plt-app`), hoặc các Mini App / Nền tảng tích hợp khác.
+      - Form cấu hình chi tiết cho từng hệ thống con: Tên hệ thống, Mã định danh (`code`), URL Domain truy cập, Endpoint API Healthcheck, API Key / Secret Key, Thời gian hết hạn phiên làm việc (Session Timeout: 30m, 1h, 2h, 8h, 24h), Chế độ bảo trì hệ thống (Maintenance Mode On/Off) và Bật/Tắt các phân hệ tính năng (Modules: Học viên, Sự kiện, Khai giảng, Tài chính, Phân quyền, Tra cứu, Điểm danh QR, v.v.).
+    * **Backend NestJS Master Settings**:
+      - `apps/ceohn10_app_be/src/admin/master-settings.controller.ts`: Bổ sung endpoint `GET /admin/master-settings/zalo` và `PUT /admin/master-settings/zalo` hỗ trợ lưu và đọc cấu hình Zalo OA.
+      - `apps/ceohn10_app_be/src/admin/master-settings.service.ts`: Cập nhật `getSepayConfig` trả về các trường phẳng thuận tiện, thêm phương thức `getZaloConfig` và `saveZaloConfig`.
+  - **2. Xây Dựng Bộ Quản Lý Template Thông Báo Chuẩn Danh Mục Dynamic & Call API Phân Cấp Dạng Tree Menu**:
+    * **Component mới: `DynamicNotificationTemplateManager.tsx` (`apps/ceohn10_app_fe/src/components/notifications/`)**:
+      - **Mẫu Template Chuẩn Theo 4 Danh Mục Trọng Tâm**:
+        1. `Sự kiện & Hội nghị`: Thư mời Lễ Khai Giảng & Sự kiện CLB CEO HN10 (chuẩn cao cấp đa kênh), Thông báo nhắc lịch sự kiện trước giờ khai mạc (Giờ G), Xác nhận vé & Thẻ Check-in vào cửa.
+        2. `Khóa Đào Tạo & Lớp Học CEO HN10`: Thông báo Khai giảng Khóa Đào tạo CEO HN10, Thông báo nhắc lịch học buổi tới & Giảng viên, Mã QR Điểm danh buổi học & Tài liệu bài giảng.
+        3. `Học Viên & Niên Liễm`: Thư Chào mừng Học viên mới gia nhập CLB CEO HN10, Thông báo Niên liễm & Đóng hội phí thường niên.
+        4. `Ban Quản Trị & Điều Hành`: Thư mời Họp Ban Điều Hành & Giao ban định kỳ, Thông báo Nghị quyết & Quyết định BĐH.
+      - **Trường Call API Lần Lượt Theo Dạng Tree Menu (Cascading Tree Menu Selector)**:
+        * Bộ chọn nguồn cấp dữ liệu: `Sự kiện CLB (Events)` vs `Khóa Học & Lớp Học (Classes / Trainings)`.
+        * Gọi API tự động: `/events` hoặc `/trainings`.
+        * Hiển thị giao diện **Tree Menu Phân Cấp (Hierarchical Tree View)** trực quan: Có các nhánh thư mục mở/đóng (Sự kiện đang diễn ra, Sự kiện sắp diễn ra, Khóa học -> Buổi học 1, Buổi học 2, Buổi học 3).
+        * Khi người dùng click chọn 1 node cụ thể trên Tree Menu, hệ thống **tự động cào và map dữ liệu** của Node đó vào các trường động của mẫu thông báo (`{{event_title}}`, `{{speaker_name}}`, `{{event_date}}`, `{{event_location}}`, `{{event_fee}}`, `{{event_summary}}`, `{{confirm_link}}`, `{{qr_code_url}}`, v.v.).
+      - **Hệ Thống Trường Dữ Liệu Động (Dynamic Field Builder)**:
+        * Cho phép người quản trị thêm tùy ý các trường dữ liệu mới (`+ Thêm Trường Mới`) với các kiểu: `text`, `textarea`, `datetime`, `price`, `qr`.
+        * Cho phép chỉnh sửa giá trị trực tiếp hoặc xóa trường bất kỳ khỏi template.
+      - **Xem Trước Đa Kênh Trực Quan (Live Omnichannel Preview)**:
+        * Hỗ trợ xem trước 3 chế độ: `Email HTML Trang Trọng`, `Tin Nhắn Zalo OA Tích Xanh & Nút Bấm Tương Tác`, `Thông Báo In-App App Mobile`.
+      - **Phát Sóng Đa Kênh (Omnichannel Broadcast)**:
+        * Hỗ trợ điều phối gửi thông báo tới: Toàn bộ học viên, Học viên theo lớp, hoặc Nhập tệp Word (.docx) / Excel (.xlsx) danh sách khách mời ngoài CLB (tự động bóc tách danh sách).
+    * **Đồng bộ Route & Sidebar**:
+      - `apps/ceohn10_app_fe/src/routes/notifications.tsx`: Tích hợp `DynamicNotificationTemplateManager` vào tab templates, hỗ trợ query params `tab=templates` và `channel=zalo_oa`.
+      - `apps/ceohn10_app_fe/src/components/dashboard/Sidebar.tsx`: Chỉnh sửa link "Thông báo qua Zalo OA/ZBS" trỏ thẳng vào `/notifications?tab=templates&channel=zalo_oa`.
+  - **3. Kiểm Tra Chất Lượng Mã Nguồn (Strict Verification)**:
+    * Backend NestJS: `npx tsc -p apps/ceohn10_app_be/tsconfig.json --noEmit` -> **Exit code 0 (0 errors)**.
+    * Frontend React: `npx tsc -p apps/ceohn10_app_fe/tsconfig.json --noEmit` -> **Exit code 0 (0 errors)**.
+    * Tuân thủ nghiêm ngặt Rule 0 (CSDL chuẩn `113.20.107.184:6432`, PgBouncer `app1`, không fake/mock data) và Rule 1 (Tuyệt đối không chạy `git commit` / `git push`).
 
 - **Bản cập nhật ngày 20/11/2026 (v12.44): Khắc Phục Triệt Để Lỗi Đăng Nhập `admin@ceohn10.vn`, Sửa Modal Tạo Tài Khoản Quản Trị, Hoàn Thiện Luồng Thư Mời Sự Kiện Đa Kênh (Word/Excel/Zalo/Email), Đồng Bộ Check-in/Check-out & Khôi Phục Biểu Quyết Vote Sao (1-5 Sao)**:
   - **1. Khắc Phục Triệt Để Lỗi Đăng Nhập Tài Khoản `admin@ceohn10.vn` & Modal Tạo Tài Khoản Quản Trị Mới**:
