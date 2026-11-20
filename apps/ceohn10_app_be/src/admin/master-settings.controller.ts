@@ -27,12 +27,29 @@ export class MasterSettingsController {
 
   @Put('sepay')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('platform_admin')
+  @Roles('platform_admin', 'admin')
   @RequireActions('SYS_SEPAY_CONFIG')
   @DataScopeLevel('ALL')
   async saveSepayConfig(@Request() req: any, @Body() body: any) {
     const userEmail = req.user?.email || req.user?.username || 'admin@ceohn10.vn';
     return this.masterSettingsService.saveSepayConfig(body, userEmail);
+  }
+
+  // ── ZALO OA INTEGRATION CONFIG ─────────────────────────────────────
+
+  @Get('zalo')
+  async getZaloConfig() {
+    return this.masterSettingsService.getZaloConfig();
+  }
+
+  @Put('zalo')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('platform_admin', 'admin')
+  @RequireActions('SYS_ZALO_CONFIG')
+  @DataScopeLevel('ALL')
+  async saveZaloConfig(@Request() req: any, @Body() body: any) {
+    const userEmail = req.user?.email || req.user?.username || 'admin@ceohn10.vn';
+    return this.masterSettingsService.saveZaloConfig(body, userEmail);
   }
 
   // ── PLATFORMS CATALOG ─────────────────────────────────────────────

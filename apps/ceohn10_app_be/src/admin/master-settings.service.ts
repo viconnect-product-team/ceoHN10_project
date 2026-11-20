@@ -17,9 +17,45 @@ export class MasterSettingsService {
       const val = typeof rows[0].setting_value === 'string'
         ? JSON.parse(rows[0].setting_value)
         : rows[0].setting_value;
+      
+      // Đảm bảo các trường ngân hàng phẳng dễ dùng
+      const bankAcc = (val.bank_accounts && val.bank_accounts[0]) || {};
+      const mergedConfig = {
+        is_enabled: val.is_enabled ?? true,
+        api_token: val.api_token || '',
+        webhook_token: val.webhook_token || '',
+        webhook_url: val.webhook_url || 'https://crm.ceohn10.viconnect.vn/api/webhooks/sepay',
+        bank_brand_name: val.bank_brand_name || bankAcc.bank_brand_name || 'MBBank',
+        account_number: val.account_number || bankAcc.account_number || '198300000000',
+        account_name: val.account_name || bankAcc.account_name || 'CLB DOANH NHAN CEO HN10',
+        bank_accounts: val.bank_accounts || [
+          {
+            bank_brand_name: val.bank_brand_name || 'MBBank',
+            account_number: val.account_number || '198300000000',
+            account_name: val.account_name || 'CLB DOANH NHAN CEO HN10',
+            is_default: true,
+          },
+        ],
+        auto_activation: val.auto_activation || {
+          membership_fee: true,
+          event_ticket: true,
+          course_fee: true,
+        },
+        prefix_syntax: val.prefix_syntax || {
+          membership: 'CEOHN10_HP',
+          event: 'CEOHN10_SK',
+          course: 'CEOHN10_LH',
+        },
+        notification: val.notification || {
+          notify_telegram: false,
+          notify_zalo_oa: true,
+          notify_email: true,
+        },
+      };
+
       return {
         setting_key: 'sepay_integration_config',
-        config: val,
+        config: mergedConfig,
         updated_at: rows[0].updated_at,
       };
     }
@@ -27,9 +63,12 @@ export class MasterSettingsService {
     // Default template nếu chưa có
     const defaultConfig = {
       is_enabled: true,
-      api_token: '',
-      webhook_token: '',
+      api_token: 'SPY_live_ceohn10_secret_token',
+      webhook_token: 'whsec_ceohn10_verify_token',
       webhook_url: 'https://crm.ceohn10.viconnect.vn/api/webhooks/sepay',
+      bank_brand_name: 'MBBank',
+      account_number: '198300000000',
+      account_name: 'CLB DOANH NHAN CEO HN10',
       bank_accounts: [
         {
           bank_brand_name: 'MBBank',
@@ -208,5 +247,72 @@ export class MasterSettingsService {
     const filtered = current.filter((p: any) => p.id !== id);
     await this.savePlatforms(filtered, updatedBy);
     return { success: true };
+  }
+
+  /**
+   * Lấy cấu hình tích hợp Zalo OA / ZBS
+   */
+  async getZaloConfig() {
+    const rows = await this.prisma.$queryRawUnsafe<any[]>(
+      `SELECT * FROM public.master_system_settings WHERE setting_key = 'zalo_oa_integration_config' LIMIT 1`,
+    );
+
+    if (rows[0]) {
+      const val = typeof rows[0].setting_value === 'string'
+        ? JSON.parse(rows[0].setting_value)
+        : rows[0].setting_value;
+      return {
+        setting_key: 'zalo_oa_integration_config',
+        config: val,
+        updated_at: rows[0].updated_at,
+      };
+    }
+
+    const defaultConfig = {
+      is_enabled: true,
+      oa_id: '429182910284729182',
+      app_id: '4819284719284',
+      secret_key: 'sk_live_ceohn10_zalo_oa_secret',
+      access_token: '',
+      refresh_token: '',
+      webhook_url: 'https://ceohn10.viconnect.vn/api/zalo/webhook',
+      default_zns_template: 'ZNS_THU_MOI_SU_KIEN_CEOHN10',
+      status: 'connected',
+    };
+
+    return {
+      setting_key: 'zalo_oa_integration_config',
+      config: defaultConfig,
+      updated_at: new Date().toISOString(),
+    };
+  }
+
+  /**
+   * Lưu cấu hình tích hợp Zalo OA / ZBS
+   */
+  async saveZaloConfig(config: any, updatedBy?: string) {
+    const configJson = JSON.stringify(config);
+
+    const rows = await this.prisma.$queryRawUnsafe<any[]>(
+      `INSERT INTO public.master_system_settings (
+        id, setting_key, setting_value, description, updated_by, updated_at
+      ) VALUES (
+        gen_random_uuid(), 'zalo_oa_integration_config', $1::jsonb,
+        'Cấu hình tích hợp Zalo Official Account & ZBS Master Admin', $2, NOW()
+      ) ON CONFLICT (setting_key) DO UPDATE SET
+        setting_value = EXCLUDED.setting_value,
+        updated_by = EXCLUDED.updated_by,
+        updated_at = NOW()
+      RETURNING *`,
+      configJson,
+      updatedBy || 'admin@ceohn10.vn',
+    );
+
+    return {
+      success: true,
+      setting_key: 'zalo_oa_integration_config',
+      config: typeof rows[0].setting_value === 'string' ? JSON.parse(rows[0].setting_value) : rows[0].setting_value,
+      updated_at: rows[0].updated_at,
+    };
   }
 }
