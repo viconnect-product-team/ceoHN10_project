@@ -265,37 +265,29 @@ function EventsPage() {
   ];
 
   const onSubmit = async (v: CrudValues) => {
-    const loc = String(v.location || "").trim().toLowerCase();
+    const loc = String(v.location || "").trim();
     const dt = String(v.date || "").trim();
-    if (loc && dt) {
-      const conflict = (events || []).find((e) => {
-        if (editing && e.id === editing.id) return false;
-        if (e.status === "cancelled") return false;
-        const eLoc = String(e.location || "").trim().toLowerCase();
-        const eDt = String(e.date || "").trim();
-        return eLoc === loc && eDt === dt;
-      });
-
-      if (conflict) {
-        const dObj = new Date(dt);
-        const dayFormatted = !isNaN(dObj.getTime())
-          ? `${String(dObj.getDate()).padStart(2, "0")}/${String(dObj.getMonth() + 1).padStart(2, "0")}/${dObj.getFullYear()}`
-          : dt;
-        toast.error(
-          `Địa điểm này đang trùng với sự kiện "${conflict.name}", sau thời gian 18:00 ngày ${dayFormatted} có thể đăng ký được.`
-        );
-        return;
-      }
-    }
 
     setSubmitting(true);
     try {
       const payload = {
-        ...v,
-        capacity: v.capacity ? Number(v.capacity) : 0,
-        ticketPrice: v.ticketPrice ? Number(v.ticketPrice) : 0,
+        name: String(v.name || "").trim(),
+        tagline: v.tagline ? String(v.tagline).trim() : "",
+        image: v.image || null,
+        banner: v.image || null,
+        date: dt || new Date().toISOString().slice(0, 10),
+        location: loc,
+        capacity: v.capacity ? Number(v.capacity) : 100,
+        description: v.description ? String(v.description).trim() : "",
+        photoGalleryUrl: v.photoGalleryUrl ? String(v.photoGalleryUrl).trim() : "",
+        department: v.department || "ban_su_kien",
+        ticketPrice: v.ticketPrice !== undefined && v.ticketPrice !== "" ? Number(v.ticketPrice) : 0,
+        fee: v.ticketPrice !== undefined && v.ticketPrice !== "" ? Number(v.ticketPrice) : 0,
+        type: v.type || "forum",
+        status: v.status || "upcoming",
         qrStaff: v.qrStaff || [],
         qrScanners: v.qrStaff || [],
+        associationId: (user as any)?.associationId || "c1983000-0000-4000-8000-000000001983",
       };
       if (editing) {
         await fetchNestApi(`/events/${editing.id}`, {
@@ -312,8 +304,8 @@ function EventsPage() {
         try {
           await createNotif({
             data: {
-              title: `[Sự kiện mới] ${(payload as any).name || "Sự kiện Hiệp hội CEO HN10"}`,
-              body: `Sự kiện "${(payload as any).name || ""}" diễn ra vào ${(payload as any).startDate || (payload as any).date || "sắp tới"} tại ${(payload as any).location || "Hội trường CLB CEO HN10"}. Kính mời toàn thể Quý Học viên đăng ký tham gia!`,
+              title: `[Sự kiện mới] ${payload.name || "Sự kiện Hiệp hội CEO HN10"}`,
+              body: `Sự kiện "${payload.name}" diễn ra vào ${payload.date} tại ${payload.location || "Hội trường CLB CEO HN10"}. Kính mời toàn thể Quý Học viên đăng ký tham gia!`,
               category: "event",
               audience: "all",
               channel: "inapp",
@@ -333,7 +325,7 @@ function EventsPage() {
       await router.invalidate();
     } catch (err: any) {
       console.error("[Events] Submit error:", err);
-      toast.error(err?.message || t("common.saveError"));
+      toast.error(err?.message || "Không thể lưu sự kiện. Vui lòng thử lại!");
     } finally {
       setSubmitting(false);
     }

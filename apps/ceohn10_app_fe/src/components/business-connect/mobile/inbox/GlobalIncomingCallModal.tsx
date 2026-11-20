@@ -4,7 +4,7 @@ import { getConnectAppSocket } from "@/hooks/use-connect-app-socket";
 import { useViewerUserId } from "@/hooks/use-viewer-user-id";
 import { sendExternalNotification } from "@/lib/notification-permissions";
 import { CeoWebRtcCallModal } from "@/components/common/CeoWebRtcCallModal";
-import { fetchNestApi } from "@/lib/api-client";
+import { fetchNestApi, getAuthToken } from "@/lib/api-client";
 
 export interface IncomingCallData {
   callId: string;
@@ -125,6 +125,8 @@ export function GlobalIncomingCallModal() {
 
     const checkActiveCall = async () => {
       if (!viewerUserId) return;
+      const token = getAuthToken();
+      if (!token) return;
       try {
         // 1. Socket check
         if (socket.connected) {

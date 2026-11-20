@@ -1,6 +1,24 @@
 # ==============================================================================
 # BỘ LUẬT DỰ ÁN (PROJECT RULES & AI CODEGEN STANDARDS) - CEO HN10 PROJECT
 # Vai trò: Tech Lead | Định dạng: .cursorrules
+# 20/11/2026 (v12.43) — TÁI CẤU TRÚC TOÀN DIỆN "HỆ THỐNG PLATFORM CEOHN10" SIDEBAR THEME SÁNG, DẬP TẮT LỖI 401 & 41 LỖI HTTP2 NETWORK LOOP, TỔNG QUỸ PLATFORM 2 TỶ 080 TRIỆU & MÀN TỔNG QUÁT CRM 20 TRIỆU KHAI GIẢNG:
+#   * [TÁI CẤU TRÚC CỔNG "HỆ THỐNG PLATFORM CEOHN10" (/master)]:
+#     - Đổi tên "Platform Admin" thành "Hệ thống platform CEOHN10", tiêu đề: QUẢN TRỊ LỚN NHẤT (MASTER ADMIN - CEOHN10).
+#     - Áp dụng cấu trúc Sidebar dọc bên trái với Theme sáng theo quy chuẩn nhận diện thương hiệu CLB (Xanh Navy #002B70, Vàng kim #D97706, nền sáng #F8FAFC, card trắng bg-white border-slate-200).
+#     - Xóa bỏ triệt để mọi chú thích kỹ thuật ("dữ liệu realtime", "Hoạt động ổn định", "Dữ liệu chuẩn 113.20.107.184:6432").
+#     - Màn hình tổng quan platform (/master): Tổng quỹ CEOHN10 còn tồn: 2.080.000.000 VNĐ (2 tỷ 080 triệu) kèm giải trình đã trích 20 triệu cho chương trình Khai giảng từ quỹ tổng 2,1 tỷ đồng.
+#     - 3 Menu quản trị: [1. TỔNG QUAN NỀN TẢNG], [2. TÀI KHOẢN ĐƯỢC ĐĂNG NHẬP] (chỉ duy nhất admin@ceohn10.vn được tạo tài khoản mới), [3. CÀI ĐẶT HỆ THỐNG NGOÀI] (Cấu hình SePay Dynamic).
+#   * [MÀN HÌNH CHỨC NĂNG TỔNG QUÁT CRM (/)]:
+#     - Xóa bỏ hoàn toàn MasterPlatformStatusBar, biểu đồ tăng trưởng hội viên, mục hội phí và công việc của tôi.
+#     - Bảng tài chính: Chỉ hiển thị duy nhất số tiền 20.000.000 VNĐ được cấp từ quỹ tổng CEOHN10 chi cho chương trình Khai giảng sắp tới.
+#     - Xóa toàn bộ chú thích kỹ thuật ("dữ liệu realtime", "Dữ liệu chuẩn...").
+#   * [KHẮC PHỤC TRIỆT ĐỂ LỖI 401 & 41 LỖI HTTP2 PROTOCOL ERROR]:
+#     - GlobalIncomingCallModal.tsx & use-sidebar-labels.ts: Chặn đứng mọi lệnh fetch ngầm (/me/active-call, /admin/sidebar-labels) khi chưa có token hợp lệ.
+#     - deploy/ssl/nginx.conf: Sửa location /api/ sang proxy_set_header Connection "" chuẩn keep-alive, xóa ép buộc Upgrade WebSocket gây đứt HTTP/2.
+#   * [SỬA LỖI TẠO MỚI SỰ KIỆN & QUẢN LÝ MẪU TRANG]:
+#     - Gỡ bỏ conflict check cứng trong events.service.ts và events.index.tsx, cho phép tạo sự kiện linh hoạt.
+#     - Chức năng "Quản lý mẫu trang" (/templates) chỉ hiển thị duy nhất thuộc nhóm Cài đặt hệ thống trên Sidebar.tsx.
+#   * [TUÂN THỦ CSDL & GIT]: CSDL duy nhất 113.20.107.184:6432 (ceohn10_project). Tuyệt đối không git commit / git push. Type check đạt 0 lỗi (Exit code 0 trên cả BE và FE).
 # 19/11/2026 (v12.39) — XÁC LẬP admin@ceohn10.vn LÀ TÀI KHOẢN QUẢN TRỊ TỐI CAO (MASTER/PLATFORM ADMIN), CHO PHÉP TẠO TÀI KHOẢN KHÁC, PHÂN QUYỀN LINH HOẠT & MỞ RỘNG ĐĂNG NHẬP CHO CÁC TÀI KHOẢN HỢP LỆ:
 #   * [VỊ THẾ TÀI KHOẢN QUẢN TRỊ LỚN NHẤT (MASTER ADMIN - admin@ceohn10.vn)]:
 #     - admin@ceohn10.vn là tài khoản Quản trị lớn nhất (Master Platform Admin), mật khẩu khởi tạo 123456 trên CSDL PostgreSQL chuẩn 113.20.107.184:6432.
