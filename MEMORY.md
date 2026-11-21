@@ -1,5 +1,57 @@
 # System Memory & Architecture
 
+- **Bản cập nhật ngày 21/11/2026 (v12.46): Nâng Cấp Toàn Diện Luồng Sự Kiện Import 3 Định Dạng (Word/Excel/PDF) Kèm Dynamic DDL Database & Hạch Toán Quỹ Thu Vé CRM, Check-in 2 Mã Riêng Biệt (Tại Cửa vs Đã Đăng Ký Kèm Tải Ảnh QR), Loại Bỏ Hoàn Toàn MoMo/VNPay & Setup SePay/Zalo Ngoài Platform, Phân Lập Database Test Và Product Độc Lập**:
+  - **1. Sửa Lại Luồng Sự Kiện & Chức Năng Import 3 Định Dạng File (Word `.docx`, Excel `.xlsx`, PDF `.pdf`)**:
+    * **Modal Import Mới: `EventAttendeesImportModal.tsx` (`apps/ceohn10_app_fe/src/components/events/`)**:
+      - Kéo thả hoặc duyệt chọn file danh sách tham dự hỗ trợ 3 định dạng: Microsoft Word (`.docx`, `.doc`), Excel (`.xlsx`, `.xls`, `.csv`), và Portable Document Format (`.pdf`).
+      - Nâng cấp bộ parser `ai-excel-email-parser.ts`: Tự động trích xuất Họ tên, Email, Số điện thoại, Đơn vị/Doanh nghiệp, Chức danh, Trạng thái thanh toán (đã thanh toán / chưa thanh toán), và Giá vé tham gia sự kiện.
+      - Tự động gom toàn bộ các cột tùy biến khác trong file thành trường `dynamicFields` (JSONB).
+      - Bảng xem trước dữ liệu sống động: Cho phép chỉnh sửa trực tiếp Họ tên, Email, SĐT, Trạng thái thanh toán, Giá vé; xóa hoặc thêm người tham dự mới ngay trên giao diện trước khi nạp vào hệ thống.
+    * **Cơ Chế Dynamic DDL Database Tự Động Thêm Cột (`public.event_registrations`)**:
+      - Backend NestJS `events.service.ts` hàm `importAttendeesFromFile`: Tự động kiểm tra và thực thi `ALTER TABLE public.event_registrations ADD COLUMN IF NOT EXISTS "<column>" text DEFAULT ''` cho bất kỳ cột tùy biến nào phát hiện trong file import.
+      - Dữ liệu được lưu trữ trực tiếp vào cột vật lý mới của bảng và đồng bộ vào trường `dynamic_data` JSONB.
+      - Frontend `event-registrations.tsx` gọi endpoint `/events/:id/dynamic-columns` để tự động render thêm các cột động này lên bảng danh sách đại biểu.
+    * **Tự Động Hạch Toán Quỹ Tài Chính CRM & Hiển Thị Doanh Thu Trên Dashboard**:
+      - Khi file import có trường giá vé và trạng thái đã thanh toán (`paid`), hệ thống tự động `INSERT INTO public.income_records` với `category = 'Vé sự kiện'`, `fund_type = 'general'`, `event_id = eventId`, và `payer = member_name`.
+      - Backend `admin.service.ts` hàm `getFundsOverview`: Thống kê mục `eventRevenueFund` tổng hợp doanh thu vé đã nạp vào quỹ phân bổ theo từng sự kiện.
+      - Frontend `ExecutiveDashboard.tsx`: Hiển thị Panel "Quỹ Thu Vé & Doanh Thu Từng Sự Kiện", cho biết chi tiết số tiền thêm vào quỹ thuộc sự kiện nào và số lượng vé tương ứng.
+    * **Tự Động Trả Vé QR & Nhắc Phí Tham Gia Sự Kiện**:
+      - Sau khi import, hệ thống tự động sinh mã vé duy nhất và mã QR check-in, gửi Email Vé Điện Tử (E-Ticket) trang trọng qua `mailService.sendEventTicketEmail` và gửi tin nhắn Zalo OA qua `zaloService.sendAutoNotification`.
+      - Bổ sung nút "Nhắc phí" tại bảng đại biểu gửi thông báo nhắc nhở thanh toán cho các khách chưa nộp phí vé.
+  - **2. Check-in Sự Kiện Với 2 Mã Riêng Biệt & Đối Soát Phân Loại Đại Biểu**:
+    * **MÃ 1: Dành cho người CHƯA đăng ký tham gia sự kiện từ trước (Walk-in Guest)**:
+      - Standee QR Link: `/guest-event-register/${event.id}?source=walkin`.
+      - Khi khách dùng Zalo / Camera quét mã sẽ mở ngay Form đăng ký:
+        + Nếu sự kiện có phí: Tự động hiển thị mã SePay VietQR (MBBank `198300000000`) thanh toán phí vé.
+        + Nếu sự kiện miễn phí: Form rút gọn tinh gọn gồm: Họ và tên, Email, Số điện thoại, Công ty/Doanh nghiệp, Chức danh.
+      - Khi đăng ký, backend đánh dấu cờ `is_walkin = true`, `registration_origin = 'walkin_at_door'`.
+    * **MÃ 2: Dành cho đại biểu ĐÃ đăng ký tham gia sự kiện từ trước (Check-in chính thức)**:
+      - Standee QR Link: `/event-checkin?eventId=${event.id}`.
+      - Mở Cổng Check-in sự kiện: Cung cấp ô nhập mã vé HOẶC nút "Tải ảnh QR" (tải ảnh mã QR vé từ thư viện ảnh điện thoại/máy tính và tự động giải mã qua `@zxing/library` / `decodeQrFromImage`) kèm nút bấm "Xác Nhận Check-in Vào Cửa".
+    * **Luôn Luôn So Sánh & Đối Soát Với Cơ Sở Dữ Liệu**:
+      - Cổng Check-in đối soát tự động với bảng `event_registrations` để hiển thị Huy hiệu phân loại trực quan:
+        + 🟢 **ĐẠI BIỂU ĐÃ ĐĂNG KÝ TỪ TRƯỚC (PRE-REGISTERED)**: Đại biểu có tên trong danh sách đăng ký chính thức trước sự kiện.
+        + 🔵 **KHÁCH MỚI ĐĂNG KÝ TẠI SỰ KIỆN (WALK-IN GUEST)**: Khách mới đăng ký tại cửa sự kiện.
+      - Hiển thị rõ tình trạng phí vé: "Đã thanh toán (Paid)" vs "Chưa thanh toán (Pending)".
+    * **Standee Soát Vé Kép (`EventCheckinGatekeeperModal.tsx`)**:
+      - Cung cấp tùy chọn in Standee A4/Roll-up hiển thị song song cả 2 Mã QR rõ ràng kèm hướng dẫn dành riêng cho 2 luồng khách tại bàn đón tiếp.
+  - **3. Bỏ Hoàn Toàn MoMo Và VNPay Khỏi Dự Án, Setup Sẵn Cấu Hình SePay Và Zalo OA Bên Ngoài Platform**:
+    * Loại bỏ hoàn toàn MoMoPaymentStrategy, VNPayPaymentStrategy, các modal và nút bấm VNPay/MoMo trên toàn bộ mã nguồn FE và BE.
+    * Thay thế 100% bằng SePayPaymentStrategy (VietQR động MBBank `198300000000`).
+    * Thiết lập sẵn cấu hình SePay (`SEPAY_BANK_NAME`, `SEPAY_ACCOUNT_NO`, `SEPAY_ACCOUNT_HOLDER`, `SEPAY_API_TOKEN`, `SEPAY_WEBHOOK_SECRET`) và Zalo OA (`ZALO_APP_ID`, `ZALO_APP_SECRET`, `ZALO_OA_ID`, `ZALO_OA_ACCESS_TOKEN`, `ZALO_REFRESH_TOKEN`) trong `.env` và Master Settings bên ngoài platform.
+    * Webhook SePay tự động bắt và khớp lệnh thanh toán vé sự kiện `CEOHN10_SK_[regId]` và niên liễm `CEOHN10_HP_[invoiceNo]`.
+  - **4. Xây Dựng Database Cho Server Test Riêng, Database Cho Server Product Riêng**:
+    * **CSDL Sản Phẩm (Production Server)**: Duy nhất **`113.20.107.184:6432/ceohn10_project`** (PgBouncer, user `app1`). Mọi dữ liệu thực của CRM và Mobile App đều bắt buộc trỏ về CSDL này theo RULE 0.
+    * **CSDL Thử Nghiệm (Test Server / Staging)**: Tên CSDL **`ceohn10_project_test`**.
+    * **Cơ chế chuyển mạch môi trường linh hoạt tại `PrismaService`**: Tự động nhận diện `APP_ENV=test` hoặc `NODE_ENV=test` để nạp `TEST_DATABASE_URL` từ file cấu hình riêng `apps/ceohn10_app_be/.env.test`.
+    * **Hạ tầng Docker Compose Test**: Cung cấp `deploy/docker-compose.test.yml` (Postgres test port 5433:5432, Backend port 3001:3000, Frontend port 3002:80) và script khởi tạo `scripts/init-test-database.sql`.
+    * **Tài liệu kỹ thuật đồng bộ**: Ban hành tài liệu `document/notebooklm/03_QUY_TRINH_PHAN_LAP_DATABASE_TEST_VA_PRODUCT.md`.
+  - **5. Kiểm Tra Chất Lượng Mã Nguồn Bắt Buộc (Strict Verification)**:
+    * Backend NestJS: `npm --prefix apps/ceohn10_app_be run build` -> **Exit code 0 (Build Passed cleanly)**.
+    * Frontend React: `npx tsc -p apps/ceohn10_app_fe/tsconfig.json --noEmit` -> **Exit code 0 (0 errors)**.
+    * Tuân thủ tuyệt đối Rule 0 (CSDL 113.20.107.184:6432, No Mock Data) và Rule 1 (Tuyệt đối không git commit / git push).
+
+
 - **Bản cập nhật ngày 20/11/2026 (v12.45): Khắc Phục Triệt Để Form Cài Đặt Sepay Bị Rỗng Trắng, Bổ Sung Cấu Hình Zalo OA & Cài Đặt Từng Hệ Thống Con Tại Master Admin, Xây Dựng Bộ Quản Lý Template Thông Báo Chuẩn Danh Mục Dynamic Kèm Call API Tree Menu**:
   - **1. Sửa Lỗi Rỗng Trắng & Tái Cấu Trúc Toàn Diện Tab [3. Cài Đặt Hệ Thống Bên Ngoài] Tại Master Admin (`/master`)**:
     * **Khắc phục lỗi form SePay rỗng trắng (như ảnh người dùng phản ánh)**:
@@ -2808,6 +2860,58 @@
      - Tuân thủ nghiêm ngặt STRICT RULE 1: Tuyệt đối không tự động chạy `git push` hay `git commit`.
 
 # System Memory & Architecture
+
+- **Bản cập nhật ngày 21/11/2026 (v12.46): Nâng Cấp Toàn Diện Luồng Sự Kiện Import 3 Định Dạng (Word/Excel/PDF) Kèm Dynamic DDL Database & Hạch Toán Quỹ Thu Vé CRM, Check-in 2 Mã Riêng Biệt (Tại Cửa vs Đã Đăng Ký Kèm Tải Ảnh QR), Loại Bỏ Hoàn Toàn MoMo/VNPay & Setup SePay/Zalo Ngoài Platform, Phân Lập Database Test Và Product Độc Lập**:
+  - **1. Sửa Lại Luồng Sự Kiện & Chức Năng Import 3 Định Dạng File (Word `.docx`, Excel `.xlsx`, PDF `.pdf`)**:
+    * **Modal Import Mới: `EventAttendeesImportModal.tsx` (`apps/ceohn10_app_fe/src/components/events/`)**:
+      - Kéo thả hoặc duyệt chọn file danh sách tham dự hỗ trợ 3 định dạng: Microsoft Word (`.docx`, `.doc`), Excel (`.xlsx`, `.xls`, `.csv`), và Portable Document Format (`.pdf`).
+      - Nâng cấp bộ parser `ai-excel-email-parser.ts`: Tự động trích xuất Họ tên, Email, Số điện thoại, Đơn vị/Doanh nghiệp, Chức danh, Trạng thái thanh toán (đã thanh toán / chưa thanh toán), và Giá vé tham gia sự kiện.
+      - Tự động gom toàn bộ các cột tùy biến khác trong file thành trường `dynamicFields` (JSONB).
+      - Bảng xem trước dữ liệu sống động: Cho phép chỉnh sửa trực tiếp Họ tên, Email, SĐT, Trạng thái thanh toán, Giá vé; xóa hoặc thêm người tham dự mới ngay trên giao diện trước khi nạp vào hệ thống.
+    * **Cơ Chế Dynamic DDL Database Tự Động Thêm Cột (`public.event_registrations`)**:
+      - Backend NestJS `events.service.ts` hàm `importAttendeesFromFile`: Tự động kiểm tra và thực thi `ALTER TABLE public.event_registrations ADD COLUMN IF NOT EXISTS "<column>" text DEFAULT ''` cho bất kỳ cột tùy biến nào phát hiện trong file import.
+      - Dữ liệu được lưu trữ trực tiếp vào cột vật lý mới của bảng và đồng bộ vào trường `dynamic_data` JSONB.
+      - Frontend `event-registrations.tsx` gọi endpoint `/events/:id/dynamic-columns` để tự động render thêm các cột động này lên bảng danh sách đại biểu.
+    * **Tự Động Hạch Toán Quỹ Tài Chính CRM & Hiển Thị Doanh Thu Trên Dashboard**:
+      - Khi file import có trường giá vé và trạng thái đã thanh toán (`paid`), hệ thống tự động `INSERT INTO public.income_records` với `category = 'Vé sự kiện'`, `fund_type = 'general'`, `event_id = eventId`, và `payer = member_name`.
+      - Backend `admin.service.ts` hàm `getFundsOverview`: Thống kê mục `eventRevenueFund` tổng hợp doanh thu vé đã nạp vào quỹ phân bổ theo từng sự kiện.
+      - Frontend `ExecutiveDashboard.tsx`: Hiển thị Panel "Quỹ Thu Vé & Doanh Thu Từng Sự Kiện", cho biết chi tiết số tiền thêm vào quỹ thuộc sự kiện nào và số lượng vé tương ứng.
+    * **Tự Động Trả Vé QR & Nhắc Phí Tham Gia Sự Kiện**:
+      - Sau khi import, hệ thống tự động sinh mã vé duy nhất và mã QR check-in, gửi Email Vé Điện Tử (E-Ticket) trang trọng qua `mailService.sendEventTicketEmail` và gửi tin nhắn Zalo OA qua `zaloService.sendAutoNotification`.
+      - Bổ sung nút "Nhắc phí" tại bảng đại biểu gửi thông báo nhắc nhở thanh toán cho các khách chưa nộp phí vé.
+  - **2. Check-in Sự Kiện Với 2 Mã Riêng Biệt & Đối Soát Phân Loại Đại Biểu**:
+    * **MÃ 1: Dành cho người CHƯA đăng ký tham gia sự kiện từ trước (Walk-in Guest)**:
+      - Standee QR Link: `/guest-event-register/${event.id}?source=walkin`.
+      - Khi khách dùng Zalo / Camera quét mã sẽ mở ngay Form đăng ký:
+        + Nếu sự kiện có phí: Tự động hiển thị mã SePay VietQR (MBBank `198300000000`) thanh toán phí vé.
+        + Nếu sự kiện miễn phí: Form rút gọn tinh gọn gồm: Họ và tên, Email, Số điện thoại, Công ty/Doanh nghiệp, Chức danh.
+      - Khi đăng ký, backend đánh dấu cờ `is_walkin = true`, `registration_origin = 'walkin_at_door'`.
+    * **MÃ 2: Dành cho đại biểu ĐÃ đăng ký tham gia sự kiện từ trước (Check-in chính thức)**:
+      - Standee QR Link: `/event-checkin?eventId=${event.id}`.
+      - Mở Cổng Check-in sự kiện: Cung cấp ô nhập mã vé HOẶC nút "Tải ảnh QR" (tải ảnh mã QR vé từ thư viện ảnh điện thoại/máy tính và tự động giải mã qua `@zxing/library` / `decodeQrFromImage`) kèm nút bấm "Xác Nhận Check-in Vào Cửa".
+    * **Luôn Luôn So Sánh & Đối Soát Với Cơ Sở Dữ Liệu**:
+      - Cổng Check-in đối soát tự động với bảng `event_registrations` để hiển thị Huy hiệu phân loại trực quan:
+        + 🟢 **ĐẠI BIỂU ĐÃ ĐĂNG KÝ TỪ TRƯỚC (PRE-REGISTERED)**: Đại biểu có tên trong danh sách đăng ký chính thức trước sự kiện.
+        + 🔵 **KHÁCH MỚI ĐĂNG KÝ TẠI SỰ KIỆN (WALK-IN GUEST)**: Khách mới đăng ký tại cửa sự kiện.
+      - Hiển thị rõ tình trạng phí vé: "Đã thanh toán (Paid)" vs "Chưa thanh toán (Pending)".
+    * **Standee Soát Vé Kép (`EventCheckinGatekeeperModal.tsx`)**:
+      - Cung cấp tùy chọn in Standee A4/Roll-up hiển thị song song cả 2 Mã QR rõ ràng kèm hướng dẫn dành riêng cho 2 luồng khách tại bàn đón tiếp.
+  - **3. Bỏ Hoàn Toàn MoMo Và VNPay Khỏi Dự Án, Setup Sẵn Cấu Hình SePay Và Zalo OA Bên Ngoài Platform**:
+    * Loại bỏ hoàn toàn MoMoPaymentStrategy, VNPayPaymentStrategy, các modal và nút bấm VNPay/MoMo trên toàn bộ mã nguồn FE và BE.
+    * Thay thế 100% bằng SePayPaymentStrategy (VietQR động MBBank `198300000000`).
+    * Thiết lập sẵn cấu hình SePay (`SEPAY_BANK_NAME`, `SEPAY_ACCOUNT_NO`, `SEPAY_ACCOUNT_HOLDER`, `SEPAY_API_TOKEN`, `SEPAY_WEBHOOK_SECRET`) và Zalo OA (`ZALO_APP_ID`, `ZALO_APP_SECRET`, `ZALO_OA_ID`, `ZALO_OA_ACCESS_TOKEN`, `ZALO_REFRESH_TOKEN`) trong `.env` và Master Settings bên ngoài platform.
+    * Webhook SePay tự động bắt và khớp lệnh thanh toán vé sự kiện `CEOHN10_SK_[regId]` và niên liễm `CEOHN10_HP_[invoiceNo]`.
+  - **4. Xây Dựng Database Cho Server Test Riêng, Database Cho Server Product Riêng**:
+    * **CSDL Sản Phẩm (Production Server)**: Duy nhất **`113.20.107.184:6432/ceohn10_project`** (PgBouncer, user `app1`). Mọi dữ liệu thực của CRM và Mobile App đều bắt buộc trỏ về CSDL này theo RULE 0.
+    * **CSDL Thử Nghiệm (Test Server / Staging)**: Tên CSDL **`ceohn10_project_test`**.
+    * **Cơ chế chuyển mạch môi trường linh hoạt tại `PrismaService`**: Tự động nhận diện `APP_ENV=test` hoặc `NODE_ENV=test` để nạp `TEST_DATABASE_URL` từ file cấu hình riêng `apps/ceohn10_app_be/.env.test`.
+    * **Hạ tầng Docker Compose Test**: Cung cấp `deploy/docker-compose.test.yml` (Postgres test port 5433:5432, Backend port 3001:3000, Frontend port 3002:80) và script khởi tạo `scripts/init-test-database.sql`.
+    * **Tài liệu kỹ thuật đồng bộ**: Ban hành tài liệu `document/notebooklm/03_QUY_TRINH_PHAN_LAP_DATABASE_TEST_VA_PRODUCT.md`.
+  - **5. Kiểm Tra Chất Lượng Mã Nguồn Bắt Buộc (Strict Verification)**:
+    * Backend NestJS: `npm --prefix apps/ceohn10_app_be run build` -> **Exit code 0 (Build Passed cleanly)**.
+    * Frontend React: `npx tsc -p apps/ceohn10_app_fe/tsconfig.json --noEmit` -> **Exit code 0 (0 errors)**.
+    * Tuân thủ tuyệt đối Rule 0 (CSDL 113.20.107.184:6432, No Mock Data) và Rule 1 (Tuyệt đối không git commit / git push).
+
 
 - **Bản cập nhật ngày 20/11/2026 (v12.45): Khắc Phục Triệt Để Form Cài Đặt Sepay Bị Rỗng Trắng, Bổ Sung Cấu Hình Zalo OA & Cài Đặt Từng Hệ Thống Con Tại Master Admin, Xây Dựng Bộ Quản Lý Template Thông Báo Chuẩn Danh Mục Dynamic Kèm Call API Tree Menu**:
   - **1. Sửa Lỗi Rỗng Trắng & Tái Cấu Trúc Toàn Diện Tab [3. Cài Đặt Hệ Thống Bên Ngoài] Tại Master Admin (`/master`)**:
@@ -6781,6 +6885,58 @@
      - Tuân thủ nghiêm ngặt STRICT RULE 1: Tuyệt đối không tự động chạy `git push` hay `git commit`.
 
 # System Memory & Architecture
+
+- **Bản cập nhật ngày 21/11/2026 (v12.46): Nâng Cấp Toàn Diện Luồng Sự Kiện Import 3 Định Dạng (Word/Excel/PDF) Kèm Dynamic DDL Database & Hạch Toán Quỹ Thu Vé CRM, Check-in 2 Mã Riêng Biệt (Tại Cửa vs Đã Đăng Ký Kèm Tải Ảnh QR), Loại Bỏ Hoàn Toàn MoMo/VNPay & Setup SePay/Zalo Ngoài Platform, Phân Lập Database Test Và Product Độc Lập**:
+  - **1. Sửa Lại Luồng Sự Kiện & Chức Năng Import 3 Định Dạng File (Word `.docx`, Excel `.xlsx`, PDF `.pdf`)**:
+    * **Modal Import Mới: `EventAttendeesImportModal.tsx` (`apps/ceohn10_app_fe/src/components/events/`)**:
+      - Kéo thả hoặc duyệt chọn file danh sách tham dự hỗ trợ 3 định dạng: Microsoft Word (`.docx`, `.doc`), Excel (`.xlsx`, `.xls`, `.csv`), và Portable Document Format (`.pdf`).
+      - Nâng cấp bộ parser `ai-excel-email-parser.ts`: Tự động trích xuất Họ tên, Email, Số điện thoại, Đơn vị/Doanh nghiệp, Chức danh, Trạng thái thanh toán (đã thanh toán / chưa thanh toán), và Giá vé tham gia sự kiện.
+      - Tự động gom toàn bộ các cột tùy biến khác trong file thành trường `dynamicFields` (JSONB).
+      - Bảng xem trước dữ liệu sống động: Cho phép chỉnh sửa trực tiếp Họ tên, Email, SĐT, Trạng thái thanh toán, Giá vé; xóa hoặc thêm người tham dự mới ngay trên giao diện trước khi nạp vào hệ thống.
+    * **Cơ Chế Dynamic DDL Database Tự Động Thêm Cột (`public.event_registrations`)**:
+      - Backend NestJS `events.service.ts` hàm `importAttendeesFromFile`: Tự động kiểm tra và thực thi `ALTER TABLE public.event_registrations ADD COLUMN IF NOT EXISTS "<column>" text DEFAULT ''` cho bất kỳ cột tùy biến nào phát hiện trong file import.
+      - Dữ liệu được lưu trữ trực tiếp vào cột vật lý mới của bảng và đồng bộ vào trường `dynamic_data` JSONB.
+      - Frontend `event-registrations.tsx` gọi endpoint `/events/:id/dynamic-columns` để tự động render thêm các cột động này lên bảng danh sách đại biểu.
+    * **Tự Động Hạch Toán Quỹ Tài Chính CRM & Hiển Thị Doanh Thu Trên Dashboard**:
+      - Khi file import có trường giá vé và trạng thái đã thanh toán (`paid`), hệ thống tự động `INSERT INTO public.income_records` với `category = 'Vé sự kiện'`, `fund_type = 'general'`, `event_id = eventId`, và `payer = member_name`.
+      - Backend `admin.service.ts` hàm `getFundsOverview`: Thống kê mục `eventRevenueFund` tổng hợp doanh thu vé đã nạp vào quỹ phân bổ theo từng sự kiện.
+      - Frontend `ExecutiveDashboard.tsx`: Hiển thị Panel "Quỹ Thu Vé & Doanh Thu Từng Sự Kiện", cho biết chi tiết số tiền thêm vào quỹ thuộc sự kiện nào và số lượng vé tương ứng.
+    * **Tự Động Trả Vé QR & Nhắc Phí Tham Gia Sự Kiện**:
+      - Sau khi import, hệ thống tự động sinh mã vé duy nhất và mã QR check-in, gửi Email Vé Điện Tử (E-Ticket) trang trọng qua `mailService.sendEventTicketEmail` và gửi tin nhắn Zalo OA qua `zaloService.sendAutoNotification`.
+      - Bổ sung nút "Nhắc phí" tại bảng đại biểu gửi thông báo nhắc nhở thanh toán cho các khách chưa nộp phí vé.
+  - **2. Check-in Sự Kiện Với 2 Mã Riêng Biệt & Đối Soát Phân Loại Đại Biểu**:
+    * **MÃ 1: Dành cho người CHƯA đăng ký tham gia sự kiện từ trước (Walk-in Guest)**:
+      - Standee QR Link: `/guest-event-register/${event.id}?source=walkin`.
+      - Khi khách dùng Zalo / Camera quét mã sẽ mở ngay Form đăng ký:
+        + Nếu sự kiện có phí: Tự động hiển thị mã SePay VietQR (MBBank `198300000000`) thanh toán phí vé.
+        + Nếu sự kiện miễn phí: Form rút gọn tinh gọn gồm: Họ và tên, Email, Số điện thoại, Công ty/Doanh nghiệp, Chức danh.
+      - Khi đăng ký, backend đánh dấu cờ `is_walkin = true`, `registration_origin = 'walkin_at_door'`.
+    * **MÃ 2: Dành cho đại biểu ĐÃ đăng ký tham gia sự kiện từ trước (Check-in chính thức)**:
+      - Standee QR Link: `/event-checkin?eventId=${event.id}`.
+      - Mở Cổng Check-in sự kiện: Cung cấp ô nhập mã vé HOẶC nút "Tải ảnh QR" (tải ảnh mã QR vé từ thư viện ảnh điện thoại/máy tính và tự động giải mã qua `@zxing/library` / `decodeQrFromImage`) kèm nút bấm "Xác Nhận Check-in Vào Cửa".
+    * **Luôn Luôn So Sánh & Đối Soát Với Cơ Sở Dữ Liệu**:
+      - Cổng Check-in đối soát tự động với bảng `event_registrations` để hiển thị Huy hiệu phân loại trực quan:
+        + 🟢 **ĐẠI BIỂU ĐÃ ĐĂNG KÝ TỪ TRƯỚC (PRE-REGISTERED)**: Đại biểu có tên trong danh sách đăng ký chính thức trước sự kiện.
+        + 🔵 **KHÁCH MỚI ĐĂNG KÝ TẠI SỰ KIỆN (WALK-IN GUEST)**: Khách mới đăng ký tại cửa sự kiện.
+      - Hiển thị rõ tình trạng phí vé: "Đã thanh toán (Paid)" vs "Chưa thanh toán (Pending)".
+    * **Standee Soát Vé Kép (`EventCheckinGatekeeperModal.tsx`)**:
+      - Cung cấp tùy chọn in Standee A4/Roll-up hiển thị song song cả 2 Mã QR rõ ràng kèm hướng dẫn dành riêng cho 2 luồng khách tại bàn đón tiếp.
+  - **3. Bỏ Hoàn Toàn MoMo Và VNPay Khỏi Dự Án, Setup Sẵn Cấu Hình SePay Và Zalo OA Bên Ngoài Platform**:
+    * Loại bỏ hoàn toàn MoMoPaymentStrategy, VNPayPaymentStrategy, các modal và nút bấm VNPay/MoMo trên toàn bộ mã nguồn FE và BE.
+    * Thay thế 100% bằng SePayPaymentStrategy (VietQR động MBBank `198300000000`).
+    * Thiết lập sẵn cấu hình SePay (`SEPAY_BANK_NAME`, `SEPAY_ACCOUNT_NO`, `SEPAY_ACCOUNT_HOLDER`, `SEPAY_API_TOKEN`, `SEPAY_WEBHOOK_SECRET`) và Zalo OA (`ZALO_APP_ID`, `ZALO_APP_SECRET`, `ZALO_OA_ID`, `ZALO_OA_ACCESS_TOKEN`, `ZALO_REFRESH_TOKEN`) trong `.env` và Master Settings bên ngoài platform.
+    * Webhook SePay tự động bắt và khớp lệnh thanh toán vé sự kiện `CEOHN10_SK_[regId]` và niên liễm `CEOHN10_HP_[invoiceNo]`.
+  - **4. Xây Dựng Database Cho Server Test Riêng, Database Cho Server Product Riêng**:
+    * **CSDL Sản Phẩm (Production Server)**: Duy nhất **`113.20.107.184:6432/ceohn10_project`** (PgBouncer, user `app1`). Mọi dữ liệu thực của CRM và Mobile App đều bắt buộc trỏ về CSDL này theo RULE 0.
+    * **CSDL Thử Nghiệm (Test Server / Staging)**: Tên CSDL **`ceohn10_project_test`**.
+    * **Cơ chế chuyển mạch môi trường linh hoạt tại `PrismaService`**: Tự động nhận diện `APP_ENV=test` hoặc `NODE_ENV=test` để nạp `TEST_DATABASE_URL` từ file cấu hình riêng `apps/ceohn10_app_be/.env.test`.
+    * **Hạ tầng Docker Compose Test**: Cung cấp `deploy/docker-compose.test.yml` (Postgres test port 5433:5432, Backend port 3001:3000, Frontend port 3002:80) và script khởi tạo `scripts/init-test-database.sql`.
+    * **Tài liệu kỹ thuật đồng bộ**: Ban hành tài liệu `document/notebooklm/03_QUY_TRINH_PHAN_LAP_DATABASE_TEST_VA_PRODUCT.md`.
+  - **5. Kiểm Tra Chất Lượng Mã Nguồn Bắt Buộc (Strict Verification)**:
+    * Backend NestJS: `npm --prefix apps/ceohn10_app_be run build` -> **Exit code 0 (Build Passed cleanly)**.
+    * Frontend React: `npx tsc -p apps/ceohn10_app_fe/tsconfig.json --noEmit` -> **Exit code 0 (0 errors)**.
+    * Tuân thủ tuyệt đối Rule 0 (CSDL 113.20.107.184:6432, No Mock Data) và Rule 1 (Tuyệt đối không git commit / git push).
+
 
 - **Bản cập nhật ngày 20/11/2026 (v12.45): Khắc Phục Triệt Để Form Cài Đặt Sepay Bị Rỗng Trắng, Bổ Sung Cấu Hình Zalo OA & Cài Đặt Từng Hệ Thống Con Tại Master Admin, Xây Dựng Bộ Quản Lý Template Thông Báo Chuẩn Danh Mục Dynamic Kèm Call API Tree Menu**:
   - **1. Sửa Lỗi Rỗng Trắng & Tái Cấu Trúc Toàn Diện Tab [3. Cài Đặt Hệ Thống Bên Ngoài] Tại Master Admin (`/master`)**:
@@ -16961,3 +17117,7 @@ px tsc --noEmit (apps/ceohn10_app_fe) exit code 0. Không git commit/git push.
 | **307** | **Đại Tu Toàn Diện Cổng Quản Trị Web CRM & CEO HN10 Mobile App: Thống Nhất Chuẩn Bảng CustomTable Viền Cột Hàng Co Giãn, Bảng Màu Tối Giản 5 Màu CRM & 3 Màu Trắng - Đen - Xanh App, Cấu Hình Landing Web Dynamic 100% (Tên Miền Tùy Chỉnh, Watermark Ảnh Chìm, Bố Cục Chữ & Tỷ Lệ Ảnh), API Avatar Thực Tế, Phân Quyền RBAC Real-time UI & API, Kiểm Tra Trùng Dữ Liệu Toàn Hệ Thống (Cho Phép Trùng Tên & Ngày Sinh), Sửa Biểu Đồ Thống Kê Học viên Top 1, Nút Check-in Laser MoMo Scanner & Triệt Tiêu Lỗi Contrast Text Đen Nền Xanh, Engine Đổi Màu Toàn Bộ App 100%** | Khách hàng chỉ đạo 11 yêu cầu kỹ thuật & thẩm mỹ: 1) CRM: Thống nhất dùng 1 bảng dữ liệu chuẩn accounts.tsx cho toàn bộ dashboard (viền cột dòng, co giãn cột, STT, toolbar, phân trang); 2) CRM: Tối giản hệ thống với 5 màu cốt lõi, xóa bỏ gradients; 3) CRM: Cấu hình landing page dynamic 100% (tự di chuyển text, tải ảnh chìm watermark, gắn tên miền hiển thị lên web, chọn tỷ lệ ảnh theo từng section); 4) CRM: Call API thực tế cho avatar; 5) CRM: Sửa lỗi phân quyền RBAC đồng bộ UI và API; 6) Toàn hệ thống: Check trùng validate email, sđt, cơ hội, cho phép trùng tên và ngày sinh; 7) App: Sửa biểu đồ thống kê bị mất đường timeline và không hiện Học viên top 1, xóa text rườm rà, sửa cắt xén thẻ KPI và căn chỉnh timeline nhiệm vụ; 8) App: Trang chủ, sự kiện tối giản màu chỉ dùng trắng, đen, xanh; 9) App: Nút check-in bỏ text và làm hiệu ứng quét laser từ trên xuống như MoMo; 10) App: Triệt tiêu vi phạm text đen trên background xanh; 11) App: Cài đặt chọn màu thay đổi 100% giao diện nút, border, tính năng. | 1) **Đồng Bộ Bảng Quản Trị & Bảng Màu Tối Giản CRM (CustomTable.tsx, accounts.tsx, members.index.tsx)**: Chuyển đổi các thẻ metric và bảng biểu từ dải gradient sang bảng phẳng tối giản 5 màu (#003B95, #F59E0B, #059669, #DC2626, #0F172A / #FFFFFF); Chuẩn hóa lưới bảng CustomTable với viền cột hàng rõ ràng, resize cột bằng chuột, thanh công cụ CrmToolbar và phân trang Pagination; 2) **API Avatar Thực Tế CRM (ProfileMenu.tsx, accounts.tsx, members.index.tsx, users.service.ts)**: Tích hợp gọi API GET /users/me khi load trang, POST /upload/avatar khi cập nhật ảnh đại diện quản trị viên và resolveMediaUrl(avatar) trên toàn bộ danh sách Học viên/tài khoản; 3) **Cấu Hình Landing Web Dynamic 100% (LandingWebManager.tsx, Ceo1983MemberRegistrationForm.tsx, AssociationLandingView.tsx)**: Bổ sung phân hệ gắn tên miền riêng (hiển thị banner định danh kèm chứng chỉ SSL), cấu hình ảnh chìm watermark (thanh trượt độ mờ 0-100% và chọn vị trí phủ), căn chỉnh văn bản (Trái - Giữa - Phải) và chọn tỷ lệ ảnh từng section (16:9, 4:3, 21:9, 1:1) lưu trữ và đồng bộ tức thì qua event ceohn10_landing_config_updated; 4) **Phân Quyền RBAC Real-time UI & API (AuthContext.tsx, Sidebar.tsx, roles.guard.ts, users.service.ts)**: Tự động đồng bộ ma trận phân quyền từ app_settings.crm_permission_matrix về localStorage khi đăng nhập; Sidebar ẩn hiện các phân hệ chính xác theo matrix; RolesGuard backend đánh giá trực tiếp quyền matrix động kết hợp quyền tĩnh; 5) **Kiểm Tra Chống Trùng Toàn Diện (auth.service.ts, users.service.ts, members.service.ts, opportunity.service.ts)**: Ngăn chặn trùng lặp email và số điện thoại trên toàn bộ hệ thống đăng ký và quản lý tài khoản; Ngăn chặn đăng trùng tiêu đề cơ hội kinh doanh trong 1 giờ cho cùng 1 tác giả; Giữ nguyên quyền trùng tên Học viên và ngày tháng năm sinh theo đúng thực tế doanh nhân; 6) **Tối Ưu Biểu Đồ Thống Kê & Top 1 Học viên Mobile App (association.analytics.tsx)**: Tích hợp renderTopAvatarDot vào Line chart với avatar có viền trắng và huy hiệu TOP 1 ngay tại đỉnh cao nhất; Bổ sung banner vinh danh Top 1 trên đầu biểu đồ; Xóa bỏ câu chữ rườm rà; Mở rộng ô chữ 4 thẻ KPI không còn bị cắt xén dấu chấm lửng (...); Căn chỉnh lại thanh tiến trình nhiệm vụ đi xuyên tâm 3 node tròn nhận thưởng mốc 1-2-3; 7) **Tối Giản Màu Sắc Trang Chủ & Sự Kiện (association.index.tsx, association.events.tsx)**: Loại bỏ toàn bộ dải màu vàng cam/cầu vồng lòe loẹt, đưa toàn bộ nút bấm, huy hiệu, viền thẻ về 3 màu chuẩn Trắng - Đen/Slate - Xanh Navy; 8) **Nút Check-in Laser MoMo Scanner (MemberShell.tsx, styles.css)**: Xóa bỏ chữ "Check-in", mở rộng nút tròn trung tâm và bổ sung tia sáng laser quét ngang liên tục từ trên xuống dưới theo keyframe momoLaserScan; 9) **Triệt Tiêu Hoàn Toàn Lỗi Text Đen Trên Nền Xanh (styles.css)**: Xóa bỏ dòng 2460 và 1216 ép .text-white thành #0F172A; Bổ sung quy tắc tương phản Zero-Tolerance bắt buộc text trên nền xanh luôn là #FFFFFF !important; 10) **Engine Đổi Màu Toàn Diện 100% Ứng Dụng (ceohn10-color-theme.ts)**: Nâng cấp injectGlobalThemeOverride cập nhật toàn bộ biến CSS root, button, border, ring, badge, tab bar và icon cho cả 4 bộ màu Brandbook; 11) **Kiểm Thử Nghiêm Ngặt**: Backend tsc đạt exit code 0; Frontend tsc đạt exit code 0 (EXACTLY 0 ERRORS).
 
 | **308** | **Khắc Phục Triệt Để Lỗi Cú Pháp TypeScript `ts(1005)` Tại `renewal-idempotency.e2e.test.ts`, Khắc Phục Lỗi Duplicate Property (TS1117) & Chuẩn Hóa 100% Bộ Test Suites Frontend/Backend** | Người dùng phản ánh ảnh chụp màn hình lỗi IDE: `'}' expected. ts(1005) renewal-idempotency.e2e.test.ts(256, 79): The parser expected to find a '}' to match the '{' token here`. | 1) **Khắc Phục Lỗi Cú Pháp TypeScript `renewal-idempotency.e2e.test.ts`**: Tách rạch ròi khối `it("handler contains today-based...")` và `it("handler accepts correlationId...")`, đóng đầy đủ ngoặc nhọn và dấu chấm phẩy; Sử dụng `existsSync` kiểm tra đường dẫn `src/lib/member-app/renewal.functions.ts` linh hoạt theo cả working directory root và frontend package; 2) **Khắc Phục Lỗi Duplicate Property `contact` (TS1117) trong `renewals-calc.ts`**: Loại bỏ dòng khai báo `contact: (r.contact as string) ?? rawName` bị lặp, giữ duy nhất `contact: (r.contact as string) ?? ""`; 3) **Sửa Lỗi Unreachable Code & Assertions trong `renewals-calc.ts` và `renewals-calc.test.ts`**: Xóa dòng return sớm trước `diff === 0 ? 0 : diff` để loại bỏ hiện tượng `-0`; Sửa test case `id: undefined` để kiểm tra đúng giá trị fallback `RNW-HV001`; 4) **Đồng Bộ Assertions trong `ai-context-builder.test.ts`**: Cập nhật văn phong phản hồi AI thực tế (văn phong trợ lý chuyên nghiệp); 5) **Nghiệm Thu Toàn Diện**: Chạy Vitest trên 5 file test FE liên quan đạt 100% PASS (30 passed, 7 skipped); Toàn bộ 18 test suites Backend Jest đạt 100% PASS (41/41 passed); Backend `tsc --noEmit` đạt Exit code 0 (0 errors); Tuân thủ nghiêm ngặt STRICT RULE 1 không commit hay push Git. |
+
+| **309** | **Xây Dựng Kịch Bản Tự Động Bóc Tách 5 Phân Hệ Độc Lập (`extract-ceohn10-features.ps1`) Sang Thư Mục Standalone Cô Lập (`ceohn10_features_standalone`) Nhằm Bảo Vệ 100% Tài Sản Trí Tuệ Phần Base Khỏi Bên Thứ Ba Trong Hợp Đồng Tài Trợ** | Người dùng yêu cầu tạo kịch bản script tự động bóc tách các file liên quan đến 5 module (Sự kiện, Quản lý tài chính, Quản lý tài trợ, Quản lý quỹ tài trợ, Soát vé QR & E-ticket) ra thư mục độc lập `ceohn10_features_standalone` để tạo Repo mới đẩy lên Git cho đối tác làm cùng mà không làm lộ phần Base cốt lõi. | 1) **Phân Tích & Xác Định Phạm Vi 5 Module Cốt Lõi**: (a) Module 1 - Luồng Sự Kiện (`events`, `events.index`, `events.$eventId`, `event-registrations`, `association.events`); (b) Module 2 - Quản Lý Tài Chính (`income`, `expenses`, `finance-report`, `FinanceChartsSection`, `FinanceExcelImportModal`, `InvoiceExportModal`); (c) Module 3 - Quản Lý Tài Trợ (`sponsors`, `sponsor-packages`, `sponsor-report`, `SponsorModal`, `SponsorPackageModal`); (d) Module 4 - Quản Lý Quỹ Tài Trợ (`MasterFundSurplusWidget`, `funds.controller.ts`, `funds.service.ts`, duyệt chi quỹ); (e) Module 5 - Soát Vé QR Gate & E-Ticket (`checkin`, `checkin-qr`, `association.checkin`, `event-checkin`, Scanner); 2) **Nguyên Tắc Bảo Mật & Bảo Vệ Tài Sản Trí Tuệ (IP Protection)**: Tuyệt đối KHÔNG xuất khẩu các phân hệ bí mật/Base cốt lõi: AI Assistant, Universal Document Viewer, Dynamic Landing Generator, Sàn B2B, Thẻ số 3D NFC, Zalo OA Secret, Master Admin Platforms, RBAC Matrix Core; Tuyệt đối KHÔNG chứa bất kỳ thông tin kết nối CSDL Thật (`113.20.107.184:6432`); 3) **Tạo Kịch Bản Tự Động Bóc Tách (`scripts/extract-ceohn10-features.ps1`)**: Tự động sinh toàn bộ cây thư mục `ceohn10_features_standalone` gồm Backend NestJS (`apps/be_features`) với MockAuthGuard và Prisma schema riêng; Frontend React/Vite (`apps/fe_features`) với AppShell Lite độc lập không phụ thuộc menu CRM cũ; Docker Compose PostgreSQL 15 local (`docker-compose.local-db.yml`) và script SQL khởi tạo schema (`database/init_5_modules_schema.sql`); 4) **Tài Liệu Bàn Giao & Hướng Dẫn Git (`README.md`, `GIT_SETUP_GUIDE.md`)**: Cung cấp đầy đủ hướng dẫn lệnh `git init`, gán remote mới và push lên repo độc lập để mời đối tác làm collaborator; 5) **Bảo Vệ Kho Lưu Trữ Gốc**: Thêm `ceohn10_features_standalone/` vào `.gitignore` của repo gốc; Tuân thủ nghiêm ngặt STRICT RULE 1 không tự ý commit hay push Git. |
+
+| **310** | **Phân Tách Độc Lập 2 Cổng Đăng Nhập (Màn Quản Trị Platform `/platform/login` vs Màn CRM `/auth`), Thiết Kế Kiến Trúc 2 CSDL Tách Biệt Tuyệt Đối (Production vs Test) & Hoàn Thiện Bộ Khung Repo Bàn Giao 5 Module Chạy Độc Lập 100% Out-Of-The-Box** | Người dùng yêu cầu: 1) Màn đăng nhập quản trị platform là màn khác, màn đăng nhập crm là màn khác; 2) Thiết kế CSDL cho product riêng và CSDL để test riêng biệt nhau; 3) Kiểm chứng cách bố trí repo bàn giao và đánh giá độ tự tin chạy được của repo độc lập. | 1) **Phân Tách 2 Màn Đăng Nhập Riêng Biệt**: (a) Tạo mới Cổng Đăng Nhập Quản Trị Nền Tảng tại `apps/ceohn10_app_fe/src/routes/platform.login.tsx` mang nhận diện Obsidian Dark, Titanium Gold, Cyber Grid, huy hiệu PLATFORM SUPERADMIN CONSOLE v5.1, kiểm tra đặc quyền `isPlatformAdmin: true` / role `platform_admin` / `admin@ceohn10.vn`, chặn tài khoản hội viên thông thường truy cập trái phép, điều hướng trực tiếp vào Bàn Quản Trị Master Platform `/master` hoặc `/admin/platforms`; (b) Cổng Đăng Nhập CRM `/auth?portal=crm` chuẩn thương hiệu CLB Doanh Nhân CEO HN10 (Đỏ - Vàng - Xanh HanoiBA) dành riêng cho Ban Điều Hành, Ban Thư Ký, Ban Tài Chính để vào làm việc nghiệp vụ CLB; bổ sung liên kết chuyển đổi qua lại giữa 2 cổng; 2) **Thiết Kế Kiến Trúc 2 CSDL Tách Biệt Tuyệt Đối (Production vs Test)**: (a) Database Production: `113.20.107.184:6432/ceohn10_project` (PgBouncer), tài khoản `app1`, firewall IP whitelist, lưu 100% dữ liệu sống của 500+ CEO thật, tuyệt đối không cấp quyền cho bên thứ ba; (b) Database Test / Local Dev: Cung cấp `docker-compose.local-db.yml` (Postgres 15 local 5432, `ceohn10_features_dev`) và file DDL `init_5_modules_schema.sql` với dữ liệu mẫu (dummy seeds) không chứa PII của hội viên thật; chuyển đổi qua biến môi trường `.env.production` vs `.env.test`; 3) **Tự Tin Khởi Chạy 100% Out-Of-The-Box Cho Repo Bàn Giao (`ceohn10_features_standalone`)**: Bổ sung toàn bộ mock stubs Backend (`auth` guards & decorators, `prisma` client module, `mail` service, `zalo` service) và toàn bộ helpers Frontend (`checkin-data.ts`, `events.functions.ts`, `use-qr-scanner.ts`, `use-nfc-scanner.ts`, `api-client.ts`, `AppShell.tsx` Lite), giải quyết triệt để lỗi thiếu relative imports; 4) **Kiểm Định Cú Pháp & Biên Dịch**: `npm run routes:gen` cập nhật `routeTree.gen.ts` thành công; Kiểm tra cú pháp AST toàn bộ tệp đạt 0 errors; Tuân thủ nghiêm ngặt STRICT RULE 1 không commit hay push Git. |

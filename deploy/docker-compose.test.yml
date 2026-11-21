@@ -1,0 +1,77 @@
+version: '3.8'
+
+# ═════════════════════════════════════════════════════════════════════════════════
+# CẤU HÌNH DOCKER COMPOSE MÔI TRƯỜNG TEST ĐỘC LẬP - CLB DOANH NHÂN CEO HN10
+# Tách biệt hoàn toàn khỏi Database Sản Phẩm (113.20.107.184:6432/ceohn10_project)
+# ═════════════════════════════════════════════════════════════════════════════════
+
+services:
+  # 1. Cơ sở dữ liệu Test PostgreSQL độc lập (Cổng 5433 tránh xung đột)
+  ceohn10_test_postgres:
+    image: postgres:16-alpine
+    container_name: ceohn10_test_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: app1
+      POSTGRES_PASSWORD: 5^S0CEpvYwC1(#YN1UoJ
+      POSTGRES_DB: ceohn10_project_test
+    ports:
+      - "5433:5432"
+    volumes:
+      - ceohn10_test_db_data:/var/lib/postgresql/data
+      - ../scripts/init-test-database.sql:/docker-entrypoint-initdb.d/init-test-database.sql
+    networks:
+      - ceohn10_test_network
+
+  # 2. Backend NestJS Server Test
+  ceohn10_test_backend:
+    build:
+      context: ..
+      dockerfile: apps/ceohn10_app_be/Dockerfile
+    container_name: ceohn10_test_backend
+    restart: unless-stopped
+    depends_on:
+      - ceohn10_test_postgres
+    environment:
+      APP_ENV: test
+      NODE_ENV: test
+      PORT: 3000
+      DATABASE_URL: "postgresql://app1:5^S0CEpvYwC1(#YN1UoJ@ceohn10_test_postgres:5432/ceohn10_project_test"
+      TEST_DATABASE_URL: "postgresql://app1:5^S0CEpvYwC1(#YN1UoJ@ceohn10_test_postgres:5432/ceohn10_project_test"
+      JWT_SECRET: "test-ceohn10-jwt-secret-key-at-least-32-chars-long"
+      SUPABASE_JWT_SECRET: "test-ceohn10-jwt-secret-key-at-least-32-chars-long"
+      SEPAY_BANK_NAME: "MBBank"
+      SEPAY_ACCOUNT_NO: "198300000000"
+      SEPAY_ACCOUNT_HOLDER: "CLB DOANH NHAN CEO HN10 - TEST"
+      SEPAY_API_TOKEN: "test_sepay_token"
+      SEPAY_WEBHOOK_SECRET: "test_sepay_secret"
+    ports:
+      - "3001:3000"
+    networks:
+      - ceohn10_test_network
+
+  # 3. Web CRM Frontend Server Test
+  ceohn10_test_frontend:
+    build:
+      context: ..
+      dockerfile: apps/ceohn10_app_fe/Dockerfile
+    container_name: ceohn10_test_frontend
+    restart: unless-stopped
+    depends_on:
+      - ceohn10_test_backend
+    environment:
+      VITE_API_URL: "http://localhost:3001"
+      VITE_APP_ENV: "test"
+    ports:
+      - "3002:80"
+    networks:
+      - ceohn10_test_network
+
+volumes:
+  ceohn10_test_db_data:
+    name: ceohn10_test_db_data
+
+networks:
+  ceohn10_test_network:
+    name: ceohn10_test_network
+    driver: bridge

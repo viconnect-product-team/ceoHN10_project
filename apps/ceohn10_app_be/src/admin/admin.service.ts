@@ -496,12 +496,12 @@ export class AdminService implements OnModuleInit {
     if (this.mailService) {
       const methodLabel =
         method === 'bank'
-          ? 'Chuyển khoản VNPAY'
+          ? 'Chuyển khoản SePay'
           : method === 'cash'
             ? 'Tiền mặt'
             : method === 'card'
               ? 'Thẻ ngân hàng'
-              : 'Ví điện tử';
+              : 'Chuyển khoản ngân hàng';
       const recipientEmail = (
         existing.invoice.member?.email ||
         process.env.ADMIN_NOTIFY_EMAIL ||
@@ -654,11 +654,11 @@ export class AdminService implements OnModuleInit {
               .catch(() => { });
           }
 
-          // 3. Đẩy template tin nhắn tương tác (Actionable template) kèm VNPAY-QR trực tiếp vào tin nhắn
+          // 3. Đẩy template tin nhắn tương tác (Actionable template) kèm SePay VietQR trực tiếp vào tin nhắn
           const invoiceAmount = Number(existing.invoice.amount || 0);
           const invoiceNo = existing.invoice.invoiceNo || id;
-          const vnpayQrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(`VNPAYQR|FEE|${invoiceNo}|${invoiceAmount}`)}`;
-          const actionMsg = `[action:payment|amount:${invoiceAmount}|invoice:${invoiceNo}|qr:${vnpayQrUrl}|due:${existing.invoice.dueDate || 'Hôm nay'}|desc:${encodeURIComponent(notifBody)}]`;
+          const sepayQrUrl = `https://img.vietqr.io/image/MB-198300000000-compact2.png?amount=${invoiceAmount}&addInfo=${encodeURIComponent(`CEOHN10_HP_${invoiceNo}`)}&accountName=${encodeURIComponent('CLB DOANH NHAN CEO HN10')}`;
+          const actionMsg = `[action:payment|amount:${invoiceAmount}|invoice:${invoiceNo}|qr:${sepayQrUrl}|due:${existing.invoice.dueDate || 'Hôm nay'}|desc:${encodeURIComponent(notifBody)}]`;
 
           if (memberCode) {
             await this.prisma.$executeRaw`
@@ -691,8 +691,8 @@ export class AdminService implements OnModuleInit {
                   year: existing.invoice.year || new Date().getFullYear(),
                   amount: invoiceAmount,
                   dueDate: existing.invoice.dueDate || 'Hôm nay',
-                  vietQrUrl: vnpayQrUrl,
-                  bankAccount: '0988888888',
+                  vietQrUrl: sepayQrUrl,
+                  bankAccount: '198300000000',
                   bankOwner: 'CLB DOANH NHAN CEO HN10',
                   bankName: 'MB Bank',
                   reminderCount:
@@ -743,7 +743,7 @@ export class AdminService implements OnModuleInit {
     if (this.mailService) {
       const invoiceAmount = Number(created.invoice.amount || 0);
       const invoiceNo = created.invoice.invoiceNo || id;
-      const vnpayQrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(`VNPAYQR|FEE|${invoiceNo}|${invoiceAmount}`)}`;
+      const sepayQrUrl = `https://img.vietqr.io/image/MB-198300000000-compact2.png?amount=${invoiceAmount}&addInfo=${encodeURIComponent(`CEOHN10_HP_${invoiceNo}`)}&accountName=${encodeURIComponent('CLB DOANH NHAN CEO HN10')}`;
       const memStatus = String(created.invoice.member?.status || '').toLowerCase().trim();
       const isMemInactive =
         created.invoice.member?.is_active === false ||
@@ -766,8 +766,8 @@ export class AdminService implements OnModuleInit {
             year: created.invoice.year || new Date().getFullYear(),
             amount: invoiceAmount,
             dueDate: created.invoice.dueDate || `${year}-12-31`,
-            vietQrUrl: vnpayQrUrl,
-            bankAccount: '0988888888',
+            vietQrUrl: sepayQrUrl,
+            bankAccount: '198300000000',
             bankOwner: 'CLB DOANH NHAN CEO HN10',
             bankName: 'MB Bank',
             reminderCount: 0,
@@ -2665,6 +2665,27 @@ export class AdminService implements OnModuleInit {
         }
       }
 
+      // 3. Quỹ Thu Vé & Phí Tham Gia Sự Kiện (Tổng hợp từ public.income_records với category Vé sự kiện)
+      const eventIncomeRows = await this.prisma.$queryRawUnsafe<any[]>(`
+        SELECT 
+          COALESCE(i.event_id, '') as event_id,
+          COALESCE(e.title, e.name, 'Vé sự kiện CLB') as event_name,
+          COALESCE(SUM(i.amount), 0) as total_amount,
+          COUNT(*) as ticket_count
+        FROM public.income_records i
+        LEFT JOIN public.events e ON e.id = i.event_id
+        WHERE i.category ILIKE '%vé sự kiện%' OR i.category ILIKE '%sự kiện%' OR i.event_id IS NOT NULL
+        GROUP BY i.event_id, e.title, e.name
+        ORDER BY total_amount DESC;
+      `).catch(() => []);
+
+      let totalEventRevenue = 0;
+      let totalTicketsSold = 0;
+      for (const r of (eventIncomeRows || [])) {
+        totalEventRevenue += Number(r?.total_amount || 0);
+        totalTicketsSold += Number(r?.ticket_count || 0);
+      }
+
       return {
         generalFund: {
           name: 'Quỹ Chung CLB CEO HN10',
@@ -2701,12 +2722,25 @@ export class AdminService implements OnModuleInit {
             inventory: inKindInventory,
           },
         },
+        eventRevenueFund: {
+          name: 'Quỹ Thu Vé & Phí Tham Gia Sự Kiện',
+          source: 'Doanh thu bán vé và phí đăng ký sự kiện',
+          totalAmount: totalEventRevenue,
+          totalTickets: totalTicketsSold,
+          byEvents: eventIncomeRows.map((r) => ({
+            eventId: r.event_id,
+            eventName: r.event_name,
+            amount: Number(r.total_amount || 0),
+            ticketCount: Number(r.ticket_count || 0),
+          })),
+        },
       };
     } catch (err) {
       console.error('[AdminService] getFundsOverview error:', err);
       return {
         generalFund: { totalIncome: 0, totalExpense: 0, balance: 0, recentExpenses: [] },
         sponsorshipFund: { cash: { totalAmount: 0, availableAmount: 0 }, inKind: { inventory: [] } },
+        eventRevenueFund: { name: 'Quỹ Thu Vé Sự Kiện', totalAmount: 0, totalTickets: 0, byEvents: [] },
       };
     }
   }

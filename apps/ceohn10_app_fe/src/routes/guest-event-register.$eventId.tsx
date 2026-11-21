@@ -292,7 +292,7 @@ function StandaloneGuestEventRegistrationPage() {
         toast.success(
           isFree
             ? `Đăng ký thành công! Vé và mã quay thưởng đã được gửi tới email ${email.trim()}`
-            : `Đăng ký thành công! Mã VNPAY-QR thanh toán đã được gửi về email ${email.trim()}`
+            : `Đăng ký thành công! Mã VietQR SePay thanh toán đã được gửi về email ${email.trim()}`
         );
         return;
       }
@@ -311,14 +311,13 @@ function StandaloneGuestEventRegistrationPage() {
         return;
       }
 
-      // 2. Client-side Fallback an toàn: Tự sinh mã vé và mã VNPAY-QR chuẩn xác
+      // 2. Client-side Fallback an toàn: Tự sinh mã vé và mã VietQR SePay chuẩn xác
       const fallbackRegId = `GUEST-${Date.now().toString(36).toUpperCase()}`;
       const fallbackLuckyNum = Math.floor(1000 + Math.random() * 9000);
-      const fallbackInvoice = `EV${fallbackRegId}`;
-      const fallbackVnpayPayload = `VNPAYQR|00020101021238540010A00000072701240006970422011010100000000208QRIBFTTA520460115303704540${totalAmount}5802VN62${encodeURIComponent(`${fallbackInvoice} ${phone.trim()}`)}6304`;
-      const fallbackVnpayQrUrl = isFree
+      const fallbackMemo = `CEOHN10_SK_${fallbackRegId}`;
+      const fallbackSepayQrUrl = isFree
         ? ""
-        : getQrUrl(fallbackVnpayPayload, 300);
+        : `https://img.vietqr.io/image/MB-198300000000-compact2.png?amount=${totalAmount}&addInfo=${encodeURIComponent(fallbackMemo)}&accountName=${encodeURIComponent("CLB DOANH NHAN CEO HN10")}`;
       const fallbackQrCodeUrl = getQrUrl(fallbackRegId, 300);
 
       const clientResult = {
@@ -328,7 +327,8 @@ function StandaloneGuestEventRegistrationPage() {
         luckyNumber: fallbackLuckyNum,
         isFree,
         totalAmount,
-        vnpayQrUrl: fallbackVnpayQrUrl,
+        sepayQrUrl: fallbackSepayQrUrl,
+        vnpayQrUrl: fallbackSepayQrUrl,
         qrCodeUrl: fallbackQrCodeUrl,
         fullName: fullName.trim(),
         phone: phone.trim(),
@@ -556,34 +556,34 @@ function StandaloneGuestEventRegistrationPage() {
               <div className="space-y-1">
                 <p className="font-bold text-emerald-900">
                   {isPaid
-                    ? "Hóa đơn & Mã VNPAY-QR đã được gửi tới email:"
+                    ? "Mã VietQR SePay thanh toán đã được gửi tới email:"
                     : "Vé điện tử E-Ticket đã được gửi tới email:"}{" "}
                   <span className="text-blue-700 underline font-mono">{result.email}</span>
                 </p>
                 <p className="text-emerald-800 text-xs leading-relaxed">
                   {isPaid
-                    ? "Quý khách có thể kiểm tra email để lưu giữ thông tin thanh toán hoặc quét mã VNPAY-QR trực tiếp bên dưới."
+                    ? "Quý khách có thể kiểm tra email để lưu giữ thông tin thanh toán hoặc quét mã VietQR SePay trực tiếp bên dưới."
                     : "Quý khách vui lòng lưu lại mã QR check-in bên dưới để xuất trình tại bàn lễ tân khi đến sự kiện."}
                 </p>
               </div>
             </div>
 
-            {/* SỰ KIỆN CÓ PHÍ -> VNPAY */}
+            {/* SỰ KIỆN CÓ PHÍ -> SEPAY VIETQR */}
             {isPaid ? (
               <div className="rounded-2xl border-2 border-[#003B95]/30 bg-slate-50/70 p-5 space-y-4">
                 <div className="flex items-center justify-between border-b border-slate-200 pb-3">
                   <div className="flex items-center gap-2 text-sm font-bold text-[#003B95]">
-                    <CreditCard className="w-4 h-4 text-amber-500" />
-                    CỔNG THANH TOÁN VNPAY & MÃ VNPAY-QR
+                    <CreditCard className="w-4 h-4 text-emerald-600" />
+                    THANH TOÁN TỰ ĐỘNG SEPAY VIETQR
                   </div>
-                  <span className="text-xs bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full font-bold">
-                    VNPAY Gateway / QR
+                  <span className="text-xs bg-emerald-100 text-emerald-800 px-2.5 py-0.5 rounded-full font-bold">
+                    Khớp Lệnh Tự Động 24/7
                   </span>
                 </div>
 
                 <div className="text-center">
                   <div className="text-xs text-slate-500 font-medium mb-1">Tổng số tiền cần thanh toán:</div>
-                  <div className="text-3xl font-black text-amber-600 tracking-tight">
+                  <div className="text-3xl font-black text-emerald-600 tracking-tight">
                     {new Intl.NumberFormat("vi-VN").format(result.totalAmount)} đ
                   </div>
                   <div className="text-xs text-slate-500 mt-1">
@@ -591,15 +591,15 @@ function StandaloneGuestEventRegistrationPage() {
                   </div>
                 </div>
 
-                {/* KHUNG HIỂN THỊ VNPAY-QR */}
+                {/* KHUNG HIỂN THỊ SEPAY VIETQR */}
                 <div className="w-64 h-64 mx-auto bg-white p-3 rounded-2xl border-2 border-slate-200 shadow-md flex items-center justify-center relative group">
                   <img
                     src={
+                      result.sepayQrUrl ||
                       result.vnpayQrUrl ||
-                      result.qrCodeUrl ||
-                      getQrUrl(`VNPAYQR|CEO HN10|EV${result.registrationId}|${result.totalAmount}|${result.phone}`, 300)
+                      `https://img.vietqr.io/image/MB-198300000000-compact2.png?amount=${result.totalAmount}&addInfo=${encodeURIComponent(`CEOHN10_SK_${result.registrationId}`)}&accountName=${encodeURIComponent("CLB DOANH NHAN CEO HN10")}`
                     }
-                    alt="VNPAY-QR Thanh Toán Phí Sự Kiện"
+                    alt="VietQR SePay Thanh Toán Phí Sự Kiện"
                     className="w-full h-full object-contain"
                   />
                 </div>
@@ -997,7 +997,7 @@ function StandaloneGuestEventRegistrationPage() {
               3. Địa chỉ Email chính thức nhận vé & mã QR <span className="text-rose-500">*</span>
             </label>
             <p className="text-xs text-slate-500">
-              Hệ thống sẽ gửi vé điện tử E-Ticket (hoặc hóa đơn VNPAY) qua địa chỉ email này.
+              Hệ thống sẽ gửi vé điện tử E-Ticket (kèm thông tin thanh toán SePay) qua địa chỉ email này.
             </p>
             <div className="relative pt-1">
               <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-4" />

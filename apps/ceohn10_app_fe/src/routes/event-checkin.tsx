@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   QrCode,
   CheckCircle2,
@@ -20,9 +20,12 @@ import {
   RefreshCw,
   Copy,
   Check,
+  Upload,
+  Users,
 } from "lucide-react";
 import { fetchNestApi } from "@/lib/api-client";
 import { toast } from "sonner";
+import { decodeQrFromImage } from "@/lib/qr-image-decoder";
 
 export const Route = createFileRoute("/event-checkin")({
   ssr: false,
@@ -34,6 +37,41 @@ function PublicEventCheckinGatePage() {
   const [currentTicket, setCurrentTicket] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isDecodingImage, setIsDecodingImage] = useState(false);
+
+  const handleQrImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setIsDecodingImage(true);
+    try {
+      const decoded = await decodeQrFromImage(file);
+      if (decoded) {
+        toast.success("Đã quét và giải mã mã QR từ ảnh thành công!");
+        let code = decoded.trim();
+        try {
+          if (code.includes("http://") || code.includes("https://")) {
+            const url = new URL(code);
+            code =
+              url.searchParams.get("ticket") ||
+              url.searchParams.get("ticketCode") ||
+              url.searchParams.get("code") ||
+              url.searchParams.get("regId") ||
+              code;
+          }
+        } catch { }
+        setTicketInput(code);
+        void lookupTicket(code);
+      } else {
+        toast.error("Không tìm thấy mã QR hợp lệ trong bức ảnh này. Vui lòng thử lại với ảnh rõ nét hơn.");
+      }
+    } catch (err: any) {
+      toast.error(err?.message || "Lỗi khi quét ảnh mã QR");
+    } finally {
+      setIsDecodingImage(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
 
   // Dynamic Fee Configuration states
   const [showFeeConfig, setShowFeeConfig] = useState(false);
@@ -255,16 +293,30 @@ function PublicEventCheckinGatePage() {
 
       {/* Main Content */}
       <main className="flex-1 max-w-4xl w-full mx-auto p-4 sm:p-6 space-y-6">
-        {/* Search / Scan Box */}
+        {/* Search / Scan Box & Upload QR Image */}
         <div className="p-4 sm:p-5 rounded-2xl border border-slate-800 bg-slate-900/80 shadow-lg space-y-3">
-          <label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
-            <Search className="w-4 h-4 text-blue-400" />
-            Quét mã QR hoặc Nhập Mã Vé / Mã Học Viên:
-          </label>
-          <div className="flex gap-2">
+          <div className="flex items-center justify-between">
+            <label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
+              <Search className="w-4 h-4 text-blue-400" />
+              <span>Quét mã QR hoặc Nhập Mã Vé / Tải ảnh QR vé:</span>
+            </label>
+            <span className="text-[11px] text-slate-400">
+              Đối soát tự động với danh sách sự kiện
+            </span>
+          </div>
+
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={handleQrImageUpload}
+          />
+
+          <div className="flex flex-col sm:flex-row gap-2">
             <input
               type="text"
-              placeholder="VD: 4001, HN10-0001, GUEST-1234..."
+              placeholder="VD: 4001, HN10-0001, EV-1234..."
               value={ticketInput}
               onChange={(e) => setTicketInput(e.target.value)}
               onKeyDown={(e) => {
@@ -274,12 +326,26 @@ function PublicEventCheckinGatePage() {
             />
             <button
               type="button"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={isDecodingImage || loading}
+              className="px-4 py-2.5 rounded-xl border border-slate-700 bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs sm:text-sm shadow-md transition disabled:opacity-60 flex items-center justify-center gap-1.5 cursor-pointer"
+              title="Tải ảnh mã QR vé từ thư viện ảnh hoặc ảnh chụp màn hình"
+            >
+              {isDecodingImage ? (
+                <RefreshCw className="w-4 h-4 animate-spin text-amber-400" />
+              ) : (
+                <Upload className="w-4 h-4 text-amber-400" />
+              )}
+              <span>Tải ảnh QR</span>
+            </button>
+            <button
+              type="button"
               onClick={() => lookupTicket(ticketInput)}
-              disabled={loading}
-              className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs sm:text-sm shadow-md transition disabled:opacity-60 flex items-center gap-1.5 cursor-pointer"
+              disabled={loading || isDecodingImage}
+              className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs sm:text-sm shadow-md transition disabled:opacity-60 flex items-center justify-center gap-1.5 cursor-pointer"
             >
               {loading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
-              Tra cứu
+              <span>Tra cứu</span>
             </button>
           </div>
         </div>
@@ -310,6 +376,49 @@ function PublicEventCheckinGatePage() {
                   </div>
                   <div className="text-2xl font-black text-white font-mono mt-0.5">
                     #{currentTicket.luckyNumber}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* ── BẢNG ĐỐI SOÁT & PHÂN BIỆT ĐẠI BIỂU (SO SÁNH VỚI DATABASE) ── */}
+            <div className="px-6">
+              {currentTicket.isWalkIn || currentTicket.attendeeType === "WALK_IN_NEW" ? (
+                <div className="rounded-2xl border-2 border-blue-500/60 bg-blue-950/40 p-4 sm:p-5 text-left flex items-start gap-3.5 shadow-lg shadow-blue-950/50">
+                  <div className="w-10 h-10 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center shrink-0 font-black">
+                    <Users className="w-5 h-5" />
+                  </div>
+                  <div className="flex-1 space-y-1">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="px-2.5 py-1 rounded-full text-xs font-black bg-blue-600 text-white shadow-xs uppercase tracking-wider">
+                        KHÁCH MỚI ĐĂNG KÝ TẠI SỰ KIỆN (WALK-IN)
+                      </span>
+                      <span className="text-xs text-blue-300 font-medium">
+                        (Mã 1: Khách quét mã đăng ký tại cửa)
+                      </span>
+                    </div>
+                    <p className="text-xs text-slate-300 leading-relaxed">
+                      Hệ thống đã đối soát danh sách: Khách mời này <strong>chưa đăng ký trước</strong>, đã mở biểu mẫu đăng ký tại cửa sự kiện.
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <div className="rounded-2xl border-2 border-emerald-500/60 bg-emerald-950/40 p-4 sm:p-5 text-left flex items-start gap-3.5 shadow-lg shadow-emerald-950/50">
+                  <div className="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0 font-black">
+                    <ShieldCheck className="w-5 h-5" />
+                  </div>
+                  <div className="flex-1 space-y-1">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="px-2.5 py-1 rounded-full text-xs font-black bg-emerald-600 text-white shadow-xs uppercase tracking-wider">
+                        ĐẠI BIỂU ĐÃ ĐĂNG KÝ TỪ TRƯỚC (PRE-REGISTERED)
+                      </span>
+                      <span className="text-xs text-emerald-300 font-medium">
+                        (Mã 2: Có trong danh sách đăng ký chính thức)
+                      </span>
+                    </div>
+                    <p className="text-xs text-slate-300 leading-relaxed">
+                      Hệ thống đã đối soát danh sách: Đại biểu này <strong>đã đăng ký tham gia từ trước</strong> và có mã vé chính thức hợp lệ.
+                    </p>
                   </div>
                 </div>
               )}
@@ -388,6 +497,20 @@ function PublicEventCheckinGatePage() {
                   <span className="text-slate-400">Vị Trí Chỗ Ngồi:</span>
                   <span className="font-semibold text-slate-200">
                     {currentTicket.seatAssignment || "Bàn VIP / Khu vực đại biểu"}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-400">Trạng Thái Phí Vé:</span>
+                  <span
+                    className={`font-bold px-2 py-0.5 rounded text-[11px] ${
+                      currentTicket.paymentStatus === "paid"
+                        ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"
+                        : "bg-amber-500/20 text-amber-300 border border-amber-500/30"
+                    }`}
+                  >
+                    {currentTicket.paymentStatus === "paid"
+                      ? "Đã thanh toán"
+                      : "Chưa thanh toán"}
                   </span>
                 </div>
               </div>

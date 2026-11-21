@@ -379,15 +379,26 @@ function CrmAdminAuthPage() {
           </form>
 
           {/* Member Registration Link -> /register */}
-          <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 text-center">
-            <Link
-              to="/register"
-              search={email.includes("@") ? { email: email.trim() } : undefined}
-              className="inline-flex items-center justify-center gap-1.5 text-xs font-semibold text-amber-600 hover:text-amber-700 dark:text-amber-400 hover:underline cursor-pointer"
-            >
-              <span>Quý Doanh nhân chưa có tài khoản?</span>
-              <span className="font-bold underline">Đăng ký mới tại đây</span>
-            </Link>
+          <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 text-center space-y-2">
+            <div>
+              <Link
+                to="/register"
+                search={email.includes("@") ? { email: email.trim() } : undefined}
+                className="inline-flex items-center justify-center gap-1.5 text-xs font-semibold text-amber-600 hover:text-amber-700 dark:text-amber-400 hover:underline cursor-pointer"
+              >
+                <span>Quý Doanh nhân chưa có tài khoản?</span>
+                <span className="font-bold underline">Đăng ký mới tại đây</span>
+              </Link>
+            </div>
+            <div>
+              <Link
+                to="/platform/login"
+                className="inline-flex items-center justify-center gap-1.5 text-[11px] font-medium text-slate-500 hover:text-amber-600 dark:text-slate-400 dark:hover:text-amber-400 transition-colors"
+              >
+                <Lock className="w-3 h-3 text-slate-400" />
+                <span>Cổng Quản Trị Nền Tảng (Platform Console) ➔</span>
+              </Link>
+            </div>
           </div>
         </div>
 

@@ -120,7 +120,7 @@ export class AdminRepository {
       )
       .catch(() => {});
 
-    // Chuẩn hóa bảng transactions tài chính cho VNPAY & Thu Chi
+    // Chuẩn hóa bảng transactions tài chính cho SePay & Thu Chi
     await this.prisma
       .$executeRawUnsafe(
         `
@@ -132,12 +132,12 @@ export class AdminRepository {
         category text NOT NULL,
         description text,
         amount numeric DEFAULT 0,
-        method text DEFAULT 'vnpay',
+        method text DEFAULT 'sepay',
         status text DEFAULT 'completed',
         association_id uuid,
         recipient text,
         invoice_url text,
-        provider text DEFAULT 'vnpay',
+        provider text DEFAULT 'sepay',
         provider_ref text,
         metadata jsonb DEFAULT '{}'::jsonb,
         created_at timestamptz DEFAULT now(),
@@ -149,7 +149,7 @@ export class AdminRepository {
     await this.prisma
       .$executeRawUnsafe(
         `
-      ALTER TABLE public.transactions ADD COLUMN IF NOT EXISTS provider text DEFAULT 'vnpay';
+      ALTER TABLE public.transactions ADD COLUMN IF NOT EXISTS provider text DEFAULT 'sepay';
     `,
       )
       .catch(() => {});
@@ -222,7 +222,7 @@ export class AdminRepository {
       )
       .catch(() => {});
 
-    // Chuẩn hóa cột thanh toán VNPAY trong event_registrations
+    // Chuẩn hóa cột thanh toán SePay trong event_registrations
     await this.prisma
       .$executeRawUnsafe(
         `
@@ -240,7 +240,7 @@ export class AdminRepository {
     await this.prisma
       .$executeRawUnsafe(
         `
-      ALTER TABLE public.event_registrations ADD COLUMN IF NOT EXISTS payment_method text DEFAULT 'vnpay';
+      ALTER TABLE public.event_registrations ADD COLUMN IF NOT EXISTS payment_method text DEFAULT 'sepay';
     `,
       )
       .catch(() => {});

@@ -38,6 +38,10 @@ dist-ssr
 # Archives & Docker images
 *.tar
 *.tar.gz
+
+# Standalone exported features
+ceohn10_features_standalone/
+
 *.zip
 *.rar
 backend.tar

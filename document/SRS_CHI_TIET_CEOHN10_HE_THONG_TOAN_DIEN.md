@@ -10,11 +10,11 @@
 * **Tên dự án:** Hệ Sinh Thái Số Hóa Toàn Diện CLB Doanh Nhân CEO HN10
 * **Cơ quan chủ quản:** Câu Lạc Bộ Doanh Nhân CEO HN10 — Trực thuộc Hội Doanh Nhân Trẻ Hà Nội (HanoiBA)
 * **Môi trường triển khai:** Cổng Thông Tin Điện Tử, Cổng Quản Trị Ban Chấp Hành & Ứng Dụng Doanh Nhân CEO HN10
-* **Mã tài liệu:** SRS-CEO HN10-ENTERPRISE-MASTER-V6.0
-* **Phiên bản:** 6.0 (Enterprise Dual-System Upgrade — Chuẩn Hóa Toàn Diện 147 Use Cases, Bổ Sung Trung Tâm Thông Báo Quản Trị Hệ Thống, Tự Động Quét Cảnh Báo Hội Phí & Hồ Sơ Mới, Quản Lý Nhân Sự Doanh Nghiệp, Phân Công Công Việc 5 Nhóm Chức Năng Con, Chuẩn Hóa CustomTable 3 Trạng Thái & Zalo OA API CSDL Thực Tế)
-* **Ngày phát hành:** 03/11/2026
+* **Mã tài liệu:** SRS-CEO HN10-ENTERPRISE-MASTER-V4.0
+* **Phiên bản:** 4.0 (Master Release — Đầy đủ 138 Use Cases toàn diện bao phủ 100% phân hệ)
+* **Ngày phát hành:** 01/10/2026
 * **Email đại diện đăng ký mẫu:** vupv090120@gmail.com (Doanh nhân Phạm Văn Vũ - CEO Công ty CP Công nghệ VIO CONNECT)
-* **Trạng thái tài liệu:** Đã thẩm định, kiểm thử thực tế, hoàn thành mã nguồn và nghiệm thu kỹ thuật 100%
+* **Trạng thái tài liệu:** Đã thẩm định, kiểm thử thực tế và nghiệm thu kỹ thuật 100%
 
 ---
 
@@ -22,14 +22,13 @@
 
 1. **Giới Thiệu Chung & Mục Đích Tài Liệu**
 2. **Kiến Trúc Tổng Thể & Bối Cảnh Hệ Thống**
-3. **Danh Mục 147 Use Cases Chi Tiết Theo 3 Khối Nghiệp Vụ:**
+3. **Danh Mục 138 Use Cases Chi Tiết Theo 3 Khối Nghiệp Vụ:**
    - **Phần I: Cổng Thông Tin Công Khai & Đăng Ký Học viên (10 Use Cases: UC-PUB-01 -> UC-PUB-10)**
-   - **Phần II: Cổng Điều Hành & Quản Trị Ban Chấp Hành (84 Use Cases: UC-CRM-01 -> UC-CRM-84)**
-   - **Phần III: Ứng Dụng Học viên Doanh Nhân CEO HN10 (53 Use Cases: UC-APP-01 -> UC-APP-53)**
+   - **Phần II: Cổng Điều Hành & Quản Trị Ban Chấp Hành (78 Use Cases: UC-CRM-01 -> UC-CRM-78)**
+   - **Phần III: Ứng Dụng Học viên Doanh Nhân CEO HN10 (50 Use Cases: UC-APP-01 -> UC-APP-50)**
 4. **Yêu Cầu Phi Chức Năng (Hiệu Năng, An Toàn Thông Tin, Sao Lưu Dữ Liệu)**
 5. **Yêu Cầu Giao Diện & Trải Nghiệm Người Dùng (UI/UX Design Tokens)**
 6. **Phụ Lục Minh Chứng Hình Ảnh Chụp Thực Tế Toàn Diện**
-7. **Quy Chuẩn Đặc Tả Vận Hành & Kiến Trúc Nâng Cấp Hệ Thống (Bổ sung V6.0)**
 
 ---
 
@@ -39,17 +38,17 @@
 Tài liệu Đặc tả Yêu cầu Kỹ thuật và Nghiệp vụ (SRS) này xác định đầy đủ, chi tiết và chuẩn hóa toàn bộ các quy trình nghiệp vụ, chức năng phần mềm, luồng dữ liệu và tiêu chuẩn vận hành cho **Hệ sinh thái Số hóa CLB Doanh Nhân CEO HN10 (HanoiBA)**. Tài liệu đóng vai trò là căn cứ nghiệp vụ duy nhất giữa Thường trực Ban Chấp Hành CLB Doanh Nhân CEO HN10, Hội Doanh Nhân Trẻ Hà Nội, các Ban chuyên môn và Đội ngũ Kiến trúc sư Chuyển đổi số trong quá trình vận hành, nâng cấp và nghiệm thu bàn giao hệ thống.
 
 ### 3.2. Phạm vi hệ thống (Project Scope)
-Hệ sinh thái Số hóa CLB Doanh Nhân CEO HN10 là nền tảng số hóa quản trị và giao thương nội bộ chuyên biệt dành riêng cho cộng đồng các nhà lãnh đạo, chủ tịch hội đồng quản trị, tổng giám đốc thuộc CLB Doanh Nhân CEO HN10. Hệ thống kết nối đồng bộ 3 cấu phần cốt lõi:
+Hệ sinh thái Số hóa CLB Doanh Nhân CEO HN10 là nền tảng số hóa quản trị và giao thương nội bộ chuyên biệt dành riêng cho cộng đồng các nhà lãnh đạo, chủ tịch hội đồng quản trị, tổng giám đốc sinh năm Quý Hợi 1983. Hệ thống kết nối đồng bộ 3 cấu phần cốt lõi:
 * **Cổng Thông Tin Công Khai & Tiếp Nhận Đơn Đăng Ký:** Giới thiệu tôn chỉ mục đích, cơ cấu 6 Ban điều hành, tiếp nhận hồ sơ gia nhập trực tuyến từ ứng viên đại diện (`vupv090120@gmail.com`) tại [Cổng Tiếp Nhận Hồ Sơ Gia Nhập CLB Doanh Nhân CEO HN10 Trực Tuyến](https://14.225.217.232:5444/landing?apply=%22true%22) (Bảo mật biểu mẫu điện tử chuẩn hóa, tự động gửi email thông báo tiếp nhận hồ sơ).
 * **Cổng Điều Hành & Quản Trị Ban Chấp Hành:** Nền tảng quản trị trung tâm hỗ trợ 6 Ban chuyên môn (Ban Quản Trị, Ban Thư Ký, Ban Thành Viên, Ban Thiện Nguyện, Ban Truyền Thông, Ban Xúc Tiến Thương Mại) với phân quyền RBAC nghiêm ngặt: thẩm định Học viên 360 độ, phát hành vé QR Pass sự kiện Gala, quản lý sơ đồ ghế Cinema Seating Map, điều hành cuộc họp, kiểm duyệt sàn B2B, quản lý sổ quỹ thu chi minh bạch và đối soát tài chính tự động.
-* **Ứng Dụng Doanh Nhân CEO HN10:** Ứng dụng số hóa cao cấp dành riêng cho Học viên chính thức với Thẻ Doanh Nhân Số Hoàng gia Navy & Amber Gold, Danh thiếp điện tử NFC chạm 1 giây, Danh bạ doanh nhân, Gian hàng B2B Doanh nhân CEO HN10, Kết nối Cung - Cầu realtime, Biểu quyết đại hội điện tử và Thanh toán gia hạn hội phí siêu tốc qua Mã QR Ngân Hàng Napas 24/7 tự động gạch nợ.
+* **Ứng Dụng Doanh Nhân CEO HN10:** Ứng dụng số hóa cao cấp dành riêng cho Học viên chính thức với Thẻ VIP Hoàng gia Navy & Amber Gold, Danh thiếp điện tử NFC chạm 1 giây, Danh bạ doanh nhân, Gian hàng B2B Doanh nhân CEO HN10, Kết nối Cung - Cầu realtime, Biểu quyết đại hội điện tử và Thanh toán gia hạn hội phí siêu tốc qua VietQR Napas 24/7 tự động gạch nợ.
 
 ### 3.3. Thuật ngữ và định nghĩa chuẩn hóa (Definitions & Terminology)
 * **HanoiBA:** Hội Doanh Nhân Trẻ Hà Nội.
-* **CLB Doanh Nhân CEO HN10:** Câu lạc bộ Doanh nhân CEO HN10 trực thuộc Hội Doanh Nhân Trẻ Hà Nội.
-* **Học viên Chính thức:** Doanh nhân CEO HN10, đại diện pháp nhân doanh nghiệp, được Ban Thành Viên thẩm định và Ban Chấp Hành ban hành quyết định kết nạp kèm cấp Mã Học viên độc bản (ví dụ: HN10-0007).
+* **CLB Doanh Nhân CEO HN10:** Câu lạc bộ Doanh nhân 1983 trực thuộc Hội Doanh Nhân Trẻ Hà Nội.
+* **Học viên Chính thức:** Doanh nhân sinh năm 1983, đại diện pháp nhân doanh nghiệp, được Ban Thành Viên thẩm định và Ban Chấp Hành ban hành quyết định kết nạp kèm cấp Mã Học viên độc bản (ví dụ: CEO-83007).
 * **Gian hàng B2B Doanh nhân CEO HN10:** Không gian giao thương và giới thiệu sản phẩm dịch vụ độc quyền giữa các doanh nghiệp thành viên với cam kết chiết khấu nội bộ ưu đãi.
-* **Mã QR Ngân Hàng:** Chuẩn thanh toán mã QR liên ngân hàng quốc gia Napas 24/7 tự động đối soát và gạch nợ tức thì.
+* **VietQR:** Chuẩn thanh toán mã QR liên ngân hàng quốc gia Napas 24/7 tự động đối soát và gạch nợ tức thì.
 
 ---
 
@@ -63,11 +62,11 @@ Hệ thống được thiết kế theo mô hình Client-Server hiện đại, p
 
 ### 4.2. Các trụ cột chức năng trọng yếu (Core Pillars)
 1. **Quản trị Học viên 360° & Tiếp nhận Onboarding:** Đăng ký trực tuyến, tự động gửi thư tiếp nhận, thẩm định hồ sơ doanh nghiệp và cấp mật khẩu an toàn gửi về hòm thư đại diện `vupv090120@gmail.com`.
-2. **thẻ Học viên điện tử & Danh Thiếp Số Độc Bản:** Thẻ nhận diện danh dự Navy & Amber Gold, công nghệ NFC 1 chạm truyền danh bạ kinh doanh.
+2. **Thẻ Học viên VIP & Danh Thiếp Số Độc Bản:** Thẻ nhận diện danh dự Navy & Amber Gold, công nghệ NFC 1 chạm truyền danh bạ kinh doanh.
 3. **Quản Trị Sự Kiện Gala & Soát Vé An Ninh QR:** Sơ đồ vị trí bàn tiệc Cinema Seating Map, đăng ký vé VIP, vé miễn phí, cấp vé điện tử E-Ticket QR và hệ thống camera quét vé chống gian lận tại cổng đón tiếp.
 4. **Điều Hành Cuộc Họp Ban Chấp Hành:** Lên lịch giao ban, tự động đồng bộ lịch vào ứng dụng đại biểu và quản lý biên bản họp điện tử.
 5. **Gian Hàng B2B Doanh Nhân CEO HN10 & Khớp Lệnh Giao Thương:** Quảng bá hàng hóa, thẩm định chất lượng sản phẩm nội bộ và hỗ trợ kết nối cung - cầu 1-1 giữa các CEO thành viên.
-6. **Tài Chính Minh Bạch & Thanh Toán Mã QR Ngân Hàng 24/7:** Sổ quỹ thu chi đa cấp, hóa đơn hội phí điện tử và tự động gạch nợ sau 1 giây.
+6. **Tài Chính Minh Bạch & Thanh Toán VietQR 24/7:** Sổ quỹ thu chi đa cấp, hóa đơn hội phí điện tử và tự động gạch nợ sau 1 giây.
 
 ---
 
@@ -82,9 +81,9 @@ Dưới đây là bảng đặc tả chi tiết toàn bộ 138 Use Cases bao ph�
 | **Mã Use Case (ID)** | **UC-PUB-01** |
 | **Phân Hệ / Nhóm** | Cổng Thông Tin Công Khai |
 | **Tên Chức Năng** | Khám Phá Cổng Thông Tin Điện Tử & Giới Thiệu Tôn Chỉ CLB Doanh Nhân CEO HN10 |
-| **Tác Nhân (Actor)** | Doanh nhân CEO HN10, Đối tác kinh doanh, Công chúng |
+| **Tác Nhân (Actor)** | Doanh nhân sinh năm 1983, Đối tác kinh doanh, Công chúng |
 | **Tiền Điều Kiện (Pre-conditions)** | Khách truy cập mở Cổng thông tin điện tử chính thức của CLB Doanh Nhân CEO HN10. |
-| **Luồng Xử Lý Chính (Main Flow)** | 1. Người dùng truy cập trang chủ Cổng thông tin điện tử CLB Doanh Nhân CEO HN10.<br>2. Hệ thống hiển thị giao diện Banner nhận diện thương hiệu trang trọng với thông điệp "Hội Tụ Doanh Nhân CEO HN10 — Kết Nối Sức Mạnh, Kiến Tạo Tương Lai".<br>3. Người dùng khám phá các khối nội dung: Tôn chỉ mục đích, Giá trị cốt lõi, Cơ cấu Ban Chấp Hành và Lịch sử hình thành CLB.<br>4. Người dùng cuộn trang xem các số liệu thống kê: Tổng số Học viên chính thức, Số lượng doanh nghiệp thành viên, Tổng giá trị giao thương nội bộ đã thực hiện.<br>5. Người dùng tìm hiểu về 6 Ban chuyên môn điều hành: Ban Quản Trị, Ban Thư Ký, Ban Thành Viên, Ban Thiện Nguyện, Ban Truyền Thông, Ban Xúc Tiến Thương Mại. |
+| **Luồng Xử Lý Chính (Main Flow)** | 1. Người dùng truy cập trang chủ Cổng thông tin điện tử CLB Doanh Nhân CEO HN10.<br>2. Hệ thống hiển thị giao diện Banner nhận diện thương hiệu trang trọng với thông điệp "Hội Tụ Doanh Nhân 1983 — Kết Nối Sức Mạnh, Kiến Tạo Tương Lai".<br>3. Người dùng khám phá các khối nội dung: Tôn chỉ mục đích, Giá trị cốt lõi, Cơ cấu Ban Chấp Hành và Lịch sử hình thành CLB.<br>4. Người dùng cuộn trang xem các số liệu thống kê: Tổng số Học viên chính thức, Số lượng doanh nghiệp thành viên, Tổng giá trị giao thương nội bộ đã thực hiện.<br>5. Người dùng tìm hiểu về 6 Ban chuyên môn điều hành: Ban Quản Trị, Ban Thư Ký, Ban Thành Viên, Ban Thiện Nguyện, Ban Truyền Thông, Ban Xúc Tiến Thương Mại. |
 | **Luồng Thay Thế / Ngoại Lệ (Alternative Flows)** | - Nếu thiết bị truy cập là điện thoại thông minh: Giao diện tự động tối ưu hóa hiển thị (Responsive Mobile Web) mượt mà. |
 | **Hậu Điều Kiện (Post-conditions)** | Người dùng nắm bắt toàn bộ bức tranh tôn chỉ hoạt động và uy tín của CLB Doanh Nhân CEO HN10. |
 | **Hình Ảnh Minh Chứng Thực Tế** | *Giao diện Cổng thông tin điện tử chính thức giới thiệu CLB Doanh Nhân CEO HN10* |
@@ -101,7 +100,7 @@ Dưới đây là bảng đặc tả chi tiết toàn bộ 138 Use Cases bao ph�
 | **Tên Chức Năng** | Xem Video Hoạt Động, Thư Viện Hình Ảnh Gala & Thông Điệp Từ Chủ Tịch CLB |
 | **Tác Nhân (Actor)** | Khách truy cập, Ứng viên gia nhập CLB |
 | **Tiền Điều Kiện (Pre-conditions)** | Khách đang truy cập Cổng thông tin điện tử CLB Doanh Nhân CEO HN10. |
-| **Luồng Xử Lý Chính (Main Flow)** | 1. Người dùng chọn mục "Hoạt Động & Sự Kiện Nổi Bật" trên Cổng thông tin.<br>2. Hệ thống hiển thị thư viện video và hình ảnh các chương trình thường niên: Đêm Gala Hội Ngộ HN10, Diễn đàn Kinh tế Doanh nhân Trẻ, Chương trình Thiện nguyện Xây cầu vùng cao.<br>3. Người dùng xem thông điệp chào mừng và định hướng chiến lược từ Chủ tịch CLB Doanh Nhân CEO HN10.<br>4. Người dùng có thể nhấn phóng to hình ảnh hoặc xem lại các thước phim tư liệu của CLB. |
+| **Luồng Xử Lý Chính (Main Flow)** | 1. Người dùng chọn mục "Hoạt Động & Sự Kiện Nổi Bật" trên Cổng thông tin.<br>2. Hệ thống hiển thị thư viện video và hình ảnh các chương trình thường niên: Đêm Gala Hội Ngộ 1983, Diễn đàn Kinh tế Doanh nhân Trẻ, Chương trình Thiện nguyện Xây cầu vùng cao.<br>3. Người dùng xem thông điệp chào mừng và định hướng chiến lược từ Chủ tịch CLB Doanh Nhân CEO HN10.<br>4. Người dùng có thể nhấn phóng to hình ảnh hoặc xem lại các thước phim tư liệu của CLB. |
 | **Luồng Thay Thế / Ngoại Lệ (Alternative Flows)** | - Nếu kết nối mạng chậm: Hệ thống hiển thị ảnh xem trước (Thumbnail) chất lượng cao trước khi tải video mượt mà. |
 | **Hậu Điều Kiện (Post-conditions)** | Người dùng cảm nhận được tinh thần gắn kết và các giá trị thực tế CLB mang lại cho cộng đồng doanh nhân. |
 | **Hình Ảnh Minh Chứng Thực Tế** | *Thư viện hình ảnh sự kiện Gala và thông điệp Ban Điều Hành trên Cổng thông tin* |
@@ -117,8 +116,8 @@ Dưới đây là bảng đặc tả chi tiết toàn bộ 138 Use Cases bao ph�
 | **Phân Hệ / Nhóm** | Cổng Thông Tin Công Khai |
 | **Tên Chức Năng** | Nộp Hồ Sơ Đăng Ký Gia Nhập Học viên Chính Thức CLB Doanh Nhân CEO HN10 Trực Tuyến |
 | **Tác Nhân (Actor)** | Doanh nhân ứng viên (Đại diện: Phạm Văn Vũ - vupv090120@gmail.com) |
-| **Tiền Điều Kiện (Pre-conditions)** | Doanh nhân CEO HN10 mong muốn gia nhập CLB, truy cập mẫu đăng ký trực tuyến. |
-| **Luồng Xử Lý Chính (Main Flow)** | 1. Ứng viên nhấn nút "Đăng Ký Gia Nhập CLB" trên thanh điều hướng Cổng thông tin.<br>2. Mẫu đăng ký điện tử hiển thị với các trường thông tin chuẩn mực:<br>   - Họ và tên ứng viên: Phạm Văn Vũ<br>   - Ngày sinh: 09/01/HN10 (Xác thực tiêu chí Doanh nhân thuộc CLB Doanh Nhân CEO HN10)<br>   - Số điện thoại liên hệ: 090120HN10<br>   - Hòm thư điện tử: vupv090120@gmail.com<br>   - Tên doanh nghiệp: Công ty Cổ phần Công nghệ VIO CONNECT<br>   - Mã số thuế doanh nghiệp: 010983HN10<br>   - Chức vụ điều hành: Tổng Giám đốc (CEO)<br>   - Lĩnh vực hoạt động: Công nghệ thông tin & Chuyển đổi số doanh nghiệp<br>   - Nguyện vọng chuyên ban sinh hoạt: Ban Thành Viên & Ban Xúc Tiến Thương Mại<br>3. Ứng viên kiểm tra kỹ các thông tin đã điền và nhấn nút "Gửi Hồ Sơ Đăng Ký Gia Nhập".<br>4. Hệ thống tiếp nhận hồ sơ, kiểm tra tính hợp lệ của dữ liệu và lưu trữ an toàn ở trạng thái "Chờ thẩm định". |
+| **Tiền Điều Kiện (Pre-conditions)** | Doanh nhân sinh năm 1983 mong muốn gia nhập CLB, truy cập mẫu đăng ký trực tuyến. |
+| **Luồng Xử Lý Chính (Main Flow)** | 1. Ứng viên nhấn nút "Đăng Ký Gia Nhập CLB" trên thanh điều hướng Cổng thông tin.<br>2. Mẫu đăng ký điện tử hiển thị với các trường thông tin chuẩn mực:<br>   - Họ và tên ứng viên: Phạm Văn Vũ<br>   - Ngày sinh: 09/01/1983 (Xác thực tiêu chí Doanh nhân sinh năm Quý Hợi 1983)<br>   - Số điện thoại liên hệ: 0901201983<br>   - Hòm thư điện tử: vupv090120@gmail.com<br>   - Tên doanh nghiệp: Công ty Cổ phần Công nghệ VIO CONNECT<br>   - Mã số thuế doanh nghiệp: 0109831983<br>   - Chức vụ điều hành: Tổng Giám đốc (CEO)<br>   - Lĩnh vực hoạt động: Công nghệ thông tin & Chuyển đổi số doanh nghiệp<br>   - Nguyện vọng chuyên ban sinh hoạt: Ban Thành Viên & Ban Xúc Tiến Thương Mại<br>3. Ứng viên kiểm tra kỹ các thông tin đã điền và nhấn nút "Gửi Hồ Sơ Đăng Ký Gia Nhập".<br>4. Hệ thống tiếp nhận hồ sơ, kiểm tra tính hợp lệ của dữ liệu và lưu trữ an toàn ở trạng thái "Chờ thẩm định". |
 | **Luồng Thay Thế / Ngoại Lệ (Alternative Flows)** | - Nếu thiếu trường thông tin bắt buộc hoặc email sai định dạng: Form hiển thị chỉ báo đỏ nhắc nhở ứng viên hoàn thiện.<br>- Nếu email hoặc số điện thoại đã tồn tại: Hệ thống thông báo hồ sơ đang trong quy trình xử lý và cung cấp thông tin liên hệ Ban Thành Viên. |
 | **Hậu Điều Kiện (Post-conditions)** | Hồ sơ đăng ký được ghi nhận thành công vào hệ sinh thái ở trạng thái Chờ thẩm định. |
 | **Hình Ảnh Minh Chứng Thực Tế** | *Mẫu hồ sơ đăng ký gia nhập Học viên CEO HN10 trực tuyến (Ứng viên: Phạm Văn Vũ - vupv090120@gmail.com)* |
@@ -152,7 +151,7 @@ Dưới đây là bảng đặc tả chi tiết toàn bộ 138 Use Cases bao ph�
 | **Tên Chức Năng** | Gửi Thành Công Đơn Đăng Ký Gia Nhập & Xác Nhận Tiếp Nhận Vào Hệ Thống Thẩm Định |
 | **Tác Nhân (Actor)** | Doanh nhân ứng viên (Đại diện: Doanh nhân Phạm Văn Vũ - vupv090120@gmail.com) |
 | **Tiền Điều Kiện (Pre-conditions)** | Ứng viên đã điền đầy đủ thông tin biểu mẫu tại Cổng Đăng Ký Gia Nhập Trực Tuyến và nhấn nút nộp hồ sơ. |
-| **Luồng Xử Lý Chính (Main Flow)** | 1. Ứng viên nhấn nút "Gửi Hồ Sơ Đăng Ký Gia Nhập" trên Cổng thông tin điện tử tiếp nhận hồ sơ.<br>2. Hệ thống kiểm tra tính hợp lệ của dữ liệu: Định dạng email, số điện thoại, ngày sinh HN10, tên doanh nghiệp và mã số thuế.<br>3. Hệ thống tạo bản ghi mới trong bảng dữ liệu thành viên với trạng thái Chờ thẩm định (pending).<br>4. Màn hình hiển thị thông điệp xác nhận trang trọng: "Đăng Ký Thành Công! Hồ sơ của Quý Doanh Nhân đã được chuyển trực tiếp tới Ban Thành Viên CLB Doanh Nhân CEO HN10 để thẩm định theo Quy chế kết nạp".<br>5. Dữ liệu hồ sơ tự động đồng bộ sang phân hệ Quản Trị Học viên (Tab Chờ thẩm định) trên Cổng Quản Trị CRM dành cho Ban Thành Viên và Ban Quản Trị. |
+| **Luồng Xử Lý Chính (Main Flow)** | 1. Ứng viên nhấn nút "Gửi Hồ Sơ Đăng Ký Gia Nhập" trên Cổng thông tin điện tử tiếp nhận hồ sơ.<br>2. Hệ thống kiểm tra tính hợp lệ của dữ liệu: Định dạng email, số điện thoại, ngày sinh 1983, tên doanh nghiệp và mã số thuế.<br>3. Hệ thống tạo bản ghi mới trong bảng dữ liệu thành viên với trạng thái Chờ thẩm định (pending).<br>4. Màn hình hiển thị thông điệp xác nhận trang trọng: "Đăng Ký Thành Công! Hồ sơ của Quý Doanh Nhân đã được chuyển trực tiếp tới Ban Thành Viên CLB Doanh Nhân CEO HN10 để thẩm định theo Quy chế kết nạp".<br>5. Dữ liệu hồ sơ tự động đồng bộ sang phân hệ Quản Trị Học viên (Tab Chờ thẩm định) trên Cổng Quản Trị CRM dành cho Ban Thành Viên và Ban Quản Trị. |
 | **Luồng Thay Thế / Ngoại Lệ (Alternative Flows)** | - Nếu phát hiện trùng lặp thông tin email hoặc số điện thoại: Hệ thống thông báo hồ sơ đang được tiếp nhận xử lý và cung cấp đường dây nóng Ban Thành Viên để hỗ trợ trực tiếp. |
 | **Hậu Điều Kiện (Post-conditions)** | Hồ sơ đăng ký gia nhập được lưu trữ an toàn trong cơ sở dữ liệu và sẵn sàng để Ban Thành Viên thẩm định trên Cổng CRM. |
 | **Hình Ảnh Minh Chứng Thực Tế** | *Màn hình thông báo tiếp nhận hồ sơ đăng ký gia nhập CLB Doanh Nhân CEO HN10 thành công* |
@@ -160,16 +159,16 @@ Dưới đây là bảng đặc tả chi tiết toàn bộ 138 Use Cases bao ph�
 ![Màn hình thông báo tiếp nhận hồ sơ đăng ký gia nhập CLB Doanh Nhân CEO HN10 thành công](images/evidence/sub_04_landing_status_polling.png)
 
 
-### 5.6. Bảng Use Case UC-PUB-06: Khám Phá Danh Thiếp Điện Tử Công Khai Của Doanh Nhân CEO HN10 Qua Chạm Thẻ NFC Hoặc Quét QR
+### 5.6. Bảng Use Case UC-PUB-06: Khám Phá Danh Thiếp Điện Tử Công Khai Của Doanh Nhân 1983 Qua Chạm Thẻ NFC Hoặc Quét QR
 
 | Thuộc Tính Nghiệp Vụ | Nội Dung Đặc Tả Chi Tiết |
 | :--- | :--- |
 | **Mã Use Case (ID)** | **UC-PUB-06** |
 | **Phân Hệ / Nhóm** | Cổng Thông Tin Công Khai |
-| **Tên Chức Năng** | Khám Phá Danh Thiếp Điện Tử Công Khai Của Doanh Nhân CEO HN10 Qua Chạm Thẻ NFC Hoặc Quét QR |
+| **Tên Chức Năng** | Khám Phá Danh Thiếp Điện Tử Công Khai Của Doanh Nhân 1983 Qua Chạm Thẻ NFC Hoặc Quét QR |
 | **Tác Nhân (Actor)** | Đối tác kinh doanh, Khách hàng, Học viên khác |
 | **Tiền Điều Kiện (Pre-conditions)** | Người dùng quét mã QR hoặc chạm thẻ vật lý VIP NFC của Doanh nhân Phạm Văn Vũ. |
-| **Luồng Xử Lý Chính (Main Flow)** | 1. Đối tác dùng điện thoại chạm vào thẻ doanh nhân số NFC hoặc quét mã QR in trên danh thiếp.<br>2. Trình duyệt tự động mở Trang Danh Thiếp Doanh Nhân Điện Tử chuyên nghiệp:<br>   - Ảnh chân dung lãnh đạo, Ảnh bìa doanh nghiệp<br>   - Họ tên: Doanh nhân Phạm Văn Vũ<br>   - Chức danh: Tổng Giám đốc • Thành viên Ban Điều Hành CLB CEO HN10<br>   - Doanh nghiệp: Công ty Cổ phần Công nghệ VIO CONNECT<br>   - Mã số Học viên chứng thực: HN10-0007 (Huy hiệu Tích Xanh Chứng Nhận Học viên Chính Thức)<br>   - Giới thiệu năng lực doanh nghiệp và danh mục sản phẩm/dịch vụ tiêu biểu.<br>3. Đối tác có thể nhấn các nút hành động nhanh: Gọi điện, Nhắn tin Zalo, Mở chỉ đường bản đồ văn phòng, Truy cập trang chủ công ty. |
+| **Luồng Xử Lý Chính (Main Flow)** | 1. Đối tác dùng điện thoại chạm vào thẻ VIP NFC hoặc quét mã QR in trên danh thiếp.<br>2. Trình duyệt tự động mở Trang Danh Thiếp Doanh Nhân Điện Tử chuyên nghiệp:<br>   - Ảnh chân dung lãnh đạo, Ảnh bìa doanh nghiệp<br>   - Họ tên: Doanh nhân Phạm Văn Vũ<br>   - Chức danh: Tổng Giám đốc • Thành viên Ban Điều Hành CLB CEO HN10<br>   - Doanh nghiệp: Công ty Cổ phần Công nghệ VIO CONNECT<br>   - Mã số Học viên chứng thực: CEO-83007 (Huy hiệu Tích Xanh Chứng Nhận Học viên Chính Thức)<br>   - Giới thiệu năng lực doanh nghiệp và danh mục sản phẩm/dịch vụ tiêu biểu.<br>3. Đối tác có thể nhấn các nút hành động nhanh: Gọi điện, Nhắn tin Zalo, Mở chỉ đường bản đồ văn phòng, Truy cập trang chủ công ty. |
 | **Luồng Thay Thế / Ngoại Lệ (Alternative Flows)** | - Nếu Học viên kích hoạt chế độ ẩn một số kênh liên hệ cá nhân: Trang danh thiếp chỉ hiển thị các kênh đã được cho phép công khai. |
 | **Hậu Điều Kiện (Post-conditions)** | Đối tác nắm bắt trọn vẹn thông tin doanh nhân và tăng cường uy tín kết nối kinh doanh tức thì. |
 | **Hình Ảnh Minh Chứng Thực Tế** | *Trang Danh thiếp Doanh nhân Điện tử công khai chứng thực thành viên CEO HN10* |
@@ -220,7 +219,7 @@ Dưới đây là bảng đặc tả chi tiết toàn bộ 138 Use Cases bao ph�
 | **Tên Chức Năng** | Đăng Ký Tham Dự Diễn Đàn Kinh Tế / Sự Kiện Gala Dành Cho Khách Mời Doanh Nghiệp |
 | **Tác Nhân (Actor)** | Khách mời Doanh nhân ngoài CLB (Đại diện: Doanh nhân Hoàng Thủy) |
 | **Tiền Điều Kiện (Pre-conditions)** | CLB Doanh Nhân CEO HN10 công bố sự kiện mở trên Cổng thông tin. |
-| **Luồng Xử Lý Chính (Main Flow)** | 1. Khách mời mở trang "Sự Kiện & Hội Thảo" trên Cổng thông tin điện tử.<br>2. Chọn sự kiện: "Gala Thường Niên & Diễn Đàn Kinh Tế Doanh Nhân CEO HN10".<br>3. Xem thông tin chương trình: Thời gian, Địa điểm tổ chức, Danh sách Diễn giả, Quyền lợi tham dự và Mức phí tham dự khách mời (1.500.000 VNĐ/đại biểu).<br>4. Điền form đăng ký vé: Họ tên, Số điện thoại, Email, Tên công ty, Chức vụ.<br>5. Chọn hình thức vé và nhấn nút "Xác Nhận Đăng Ký & Thanh Toán".<br>6. Màn hình hiển thị mã QR ngân hàng chuyển khoản thanh toán tự động với số tiền và nội dung định danh duy nhất. |
+| **Luồng Xử Lý Chính (Main Flow)** | 1. Khách mời mở trang "Sự Kiện & Hội Thảo" trên Cổng thông tin điện tử.<br>2. Chọn sự kiện: "Gala Thường Niên & Diễn Đàn Kinh Tế Doanh Nhân 1983".<br>3. Xem thông tin chương trình: Thời gian, Địa điểm tổ chức, Danh sách Diễn giả, Quyền lợi tham dự và Mức phí tham dự khách mời (1.500.000 VNĐ/đại biểu).<br>4. Điền form đăng ký vé: Họ tên, Số điện thoại, Email, Tên công ty, Chức vụ.<br>5. Chọn hình thức vé và nhấn nút "Xác Nhận Đăng Ký & Thanh Toán".<br>6. Màn hình hiển thị mã VietQR chuyển khoản thanh toán tự động với số tiền và nội dung định danh duy nhất. |
 | **Luồng Thay Thế / Ngoại Lệ (Alternative Flows)** | - Trường hợp sự kiện miễn phí: Hệ thống bỏ qua bước thanh toán và phát hành vé điện tử ngay lập tức. |
 | **Hậu Điều Kiện (Post-conditions)** | Hồ sơ đăng ký vé của khách mời được lưu vào hệ thống, chờ gạch nợ thanh toán. |
 | **Hình Ảnh Minh Chứng Thực Tế** | *Biểu mẫu đăng ký vé tham dự sự kiện Gala dành cho Khách mời Doanh nghiệp* |
@@ -254,7 +253,7 @@ Dưới đây là bảng đặc tả chi tiết toàn bộ 138 Use Cases bao ph�
 | **Tên Chức Năng** | Xem Bảng Điều Khiển Tổng Quan KPI Phát Triển Học viên & Tỷ Lệ Tăng Trưởng Tổ Chức |
 | **Tác Nhân (Actor)** | Ban Quản Trị, Ban Thành Viên, Thường Trực Ban Chấp Hành |
 | **Tiền Điều Kiện (Pre-conditions)** | Cán bộ lãnh đạo đăng nhập vào Cổng Quản trị & Điều hành Ban Chấp Hành. |
-| **Luồng Xử Lý Chính (Main Flow)** | 1. Người dùng truy cập Bảng điều khiển Tổng quan (Dashboard KPI) hoặc Trung Tâm Thống Kê Chuyên Sâu (/analytics).<br>2. Màn hình hiển thị toàn diện các chỉ số sống còn của tổ chức:<br>   - Tổng số lượng Học viên chính thức (Active) và Doanh nghiệp thành viên<br>   - Số lượng hồ sơ mới đang Chờ thẩm định (Pending)<br>   - Tỷ lệ hoàn thành Hội phí thường niên nhiệm kỳ<br>   - Tổng doanh số giao thương nội bộ B2B và giá trị các thương vụ đã kết nối thành công.<br>3. Tại Trung Tâm Thống Kê (/analytics), hỗ trợ 5 chế độ hiển thị linh hoạt: Dạng Lưới KPI, Dashboard tổng quan, Biểu đồ Treemap phân bố ngành nghề, Biểu đồ tròn Donut cơ cấu ban ngành và Cây đơn vị Org Tree.<br>4. Đặc biệt, hệ thống tích hợp Biểu Đồ Nến Candlestick Thời Gian Thực phản ánh nhịp độ giao thương theo các khung giờ trong ngày (Open, High, Low, Close, Volume), giúp Ban Lãnh đạo nắm bắt chính xác thời điểm tương tác sôi động nhất của cộng đồng doanh nhân.<br>5. Cán bộ quản lý có thể lọc dữ liệu theo thời gian, theo chuyên ban hoặc xuất/nhập báo cáo Excel chuẩn tiếng Việt. |
+| **Luồng Xử Lý Chính (Main Flow)** | 1. Người dùng truy cập Bảng điều khiển Tổng quan (Dashboard KPI).<br>2. Màn hình hiển thị toàn diện các chỉ số sống còn của tổ chức:<br>   - Tổng số lượng Học viên chính thức (Active)<br>   - Số lượng hồ sơ mới đang Chờ thẩm định (Pending)<br>   - Tỷ lệ hoàn thành Hội phí thường niên nhiệm kỳ<br>   - Tổng số doanh nghiệp thành viên phân theo quy mô và ngành nghề<br>   - Biểu đồ tăng trưởng Học viên qua các quý và tỷ lệ gắn kết hoạt động.<br>3. Người dùng lọc chỉ số theo khoảng thời gian hoặc theo chuyên ban sinh hoạt để đưa ra chỉ đạo kịp thời. |
 | **Luồng Thay Thế / Ngoại Lệ (Alternative Flows)** | - Nếu có biến động đột biến về hồ sơ chờ duyệt: Hệ thống hiển thị huy hiệu cảnh báo màu vàng trên thanh trạng thái. |
 | **Hậu Điều Kiện (Post-conditions)** | Ban Lãnh đạo nắm chắc dữ liệu thời gian thực để hoạch định chiến lược phát triển CLB. |
 | **Hình Ảnh Minh Chứng Thực Tế** | *Bảng điều khiển chỉ số KPI phát triển Học viên và quy mô Doanh nghiệp trên Cổng Quản trị* |
@@ -271,7 +270,7 @@ Dưới đây là bảng đặc tả chi tiết toàn bộ 138 Use Cases bao ph�
 | **Tên Chức Năng** | Tiếp Nhận & Rà Soát Danh Sách Đơn Đăng Ký Gia Nhập Mới (Tab Chờ Thẩm Định) |
 | **Tác Nhân (Actor)** | Cán bộ Ban Thành Viên (ceo.thanhvien@ceohn10.com) |
 | **Tiền Điều Kiện (Pre-conditions)** | Tài khoản Ban Thành Viên đăng nhập Cổng Quản trị; có hồ sơ mới từ Cổng thông tin. |
-| **Luồng Xử Lý Chính (Main Flow)** | 1. Cán bộ Ban Thành Viên truy cập phân hệ "Quản Trị Học viên".<br>2. Chọn tab "Chờ Thẩm Định" (Pending Applications).<br>3. Danh sách hiển thị các hồ sơ mới nộp, trong đó có hồ sơ:<br>   - Ứng viên: Phạm Văn Vũ<br>   - Doanh nghiệp: Công ty Cổ phần Công nghệ VIO CONNECT<br>   - Email: vupv090120@gmail.com<br>   - Số điện thoại: 090120HN10<br>   - Ngày nộp đơn: Thời gian thực ghi nhận.<br>4. Cán bộ BTV có thể sắp xếp danh sách theo ngày nộp hoặc tìm kiếm nhanh theo tên doanh nghiệp. |
+| **Luồng Xử Lý Chính (Main Flow)** | 1. Cán bộ Ban Thành Viên truy cập phân hệ "Quản Trị Học viên".<br>2. Chọn tab "Chờ Thẩm Định" (Pending Applications).<br>3. Danh sách hiển thị các hồ sơ mới nộp, trong đó có hồ sơ:<br>   - Ứng viên: Phạm Văn Vũ<br>   - Doanh nghiệp: Công ty Cổ phần Công nghệ VIO CONNECT<br>   - Email: vupv090120@gmail.com<br>   - Số điện thoại: 0901201983<br>   - Ngày nộp đơn: Thời gian thực ghi nhận.<br>4. Cán bộ BTV có thể sắp xếp danh sách theo ngày nộp hoặc tìm kiếm nhanh theo tên doanh nghiệp. |
 | **Luồng Thay Thế / Ngoại Lệ (Alternative Flows)** | - Nếu danh sách trống: Hệ thống hiển thị thông điệp "Hiện tại không có hồ sơ nào đang chờ thẩm định". |
 | **Hậu Điều Kiện (Post-conditions)** | Hồ sơ được rà soát đầy đủ, chuẩn bị bước vào quy trình thẩm định thực địa. |
 | **Hình Ảnh Minh Chứng Thực Tế** | *Danh sách hồ sơ ứng viên đăng ký gia nhập CLB CEO HN10 chờ thẩm định* |
@@ -288,7 +287,7 @@ Dưới đây là bảng đặc tả chi tiết toàn bộ 138 Use Cases bao ph�
 | **Tên Chức Năng** | Mở Ngăn Kéo Thẩm Định Chi Tiết Doanh Nghiệp 360 Độ & Đối Soát Tiêu Chuẩn Kết Nạp |
 | **Tác Nhân (Actor)** | Cán bộ Ban Thành Viên |
 | **Tiền Điều Kiện (Pre-conditions)** | Cán bộ BTV đang xem danh sách hồ sơ chờ thẩm định tại UC-CRM-02. |
-| **Luồng Xử Lý Chính (Main Flow)** | 1. Bấm vào dòng hồ sơ của ứng viên Phạm Văn Vũ trên bảng danh sách.<br>2. Ngăn kéo chi tiết (Member Detail Drawer) trượt ra từ bên phải màn hình hiển thị hồ sơ 360 độ:<br>   - Thông tin cá nhân, năm sinh CEO Hà Nội 10 (Đạt chuẩn tôn chỉ CLB)<br>   - Hồ sơ pháp lý doanh nghiệp: Mã số thuế 010983HN10, Giấy phép kinh doanh<br>   - Địa chỉ trụ sở, Ngành nghề đăng ký, Quy mô nhân sự và Website công ty<br>   - Báo cáo tài chính sơ bộ và năng lực cốt lõi<br>   - Ghi chú nguyện vọng sinh hoạt chuyên ban.<br>3. Cán bộ BTV thực hiện đối soát dữ liệu với Cổng thông tin quốc gia về đăng ký doanh nghiệp. |
+| **Luồng Xử Lý Chính (Main Flow)** | 1. Bấm vào dòng hồ sơ của ứng viên Phạm Văn Vũ trên bảng danh sách.<br>2. Ngăn kéo chi tiết (Member Detail Drawer) trượt ra từ bên phải màn hình hiển thị hồ sơ 360 độ:<br>   - Thông tin cá nhân, năm sinh Quý Hợi 1983 (Đạt chuẩn tôn chỉ CLB)<br>   - Hồ sơ pháp lý doanh nghiệp: Mã số thuế 0109831983, Giấy phép kinh doanh<br>   - Địa chỉ trụ sở, Ngành nghề đăng ký, Quy mô nhân sự và Website công ty<br>   - Báo cáo tài chính sơ bộ và năng lực cốt lõi<br>   - Ghi chú nguyện vọng sinh hoạt chuyên ban.<br>3. Cán bộ BTV thực hiện đối soát dữ liệu với Cổng thông tin quốc gia về đăng ký doanh nghiệp. |
 | **Luồng Thay Thế / Ngoại Lệ (Alternative Flows)** | - Nếu phát hiện thông tin chưa rõ: Cán bộ BTV điền ghi chú yêu cầu ứng viên bổ sung tài liệu pháp lý. |
 | **Hậu Điều Kiện (Post-conditions)** | Hồ sơ được xác minh tính chân thực và đủ điều kiện để Ban Thành Viên ra quyết định kết nạp. |
 | **Hình Ảnh Minh Chứng Thực Tế** | *Ngăn kéo thẩm định hồ sơ chi tiết 360 độ của ứng viên trên Cổng Quản trị* |
@@ -296,21 +295,21 @@ Dưới đây là bảng đặc tả chi tiết toàn bộ 138 Use Cases bao ph�
 ![Ngăn kéo thẩm định hồ sơ chi tiết 360 độ của ứng viên trên Cổng Quản trị](images/evidence/crm_04_member_detail_drawer.png)
 
 
-### 5.14. Bảng Use Case UC-CRM-04: Phê Duyệt Kết Nạp Chính Thức & Tự Động Sinh Mã Học viên Độc Quyền HN10-xxxx
+### 5.14. Bảng Use Case UC-CRM-04: Phê Duyệt Kết Nạp Chính Thức & Tự Động Sinh Mã Học viên Độc Quyền CEO-83xxx
 
 | Thuộc Tính Nghiệp Vụ | Nội Dung Đặc Tả Chi Tiết |
 | :--- | :--- |
 | **Mã Use Case (ID)** | **UC-CRM-04** |
 | **Phân Hệ / Nhóm** | Quản Trị Học viên & Thẩm Định |
-| **Tên Chức Năng** | Phê Duyệt Kết Nạp Chính Thức & Tự Động Sinh Mã Học viên Độc Quyền HN10-xxxx |
+| **Tên Chức Năng** | Phê Duyệt Kết Nạp Chính Thức & Tự Động Sinh Mã Học viên Độc Quyền CEO-83xxx |
 | **Tác Nhân (Actor)** | Trưởng Ban Thành Viên / Cán bộ BTV được ủy quyền (ĐỘC QUYỀN BAN THÀNH VIÊN) |
 | **Tiền Điều Kiện (Pre-conditions)** | Hồ sơ ứng viên Phạm Văn Vũ đã được thẩm định đạt tiêu chuẩn tại UC-CRM-03. |
-| **Luồng Xử Lý Chính (Main Flow)** | 1. Cán bộ Ban Thành Viên nhấn nút "Phê Duyệt Kết Nạp & Cấp Tài Khoản" trên ngăn kéo thẩm định.<br>2. Hộp thoại xác nhận hiển thị tóm tắt quyết định kết nạp.<br>3. Người dùng xác nhận "Đồng ý Phê duyệt".<br>4. Hệ thống kiểm tra thẩm quyền: Xác thực người thực hiện thuộc Ban Thành Viên hoặc Ban Quản Trị tối cao.<br>5. Hệ thống thực thi giao dịch an toàn tự động:<br>   - Chuyển trạng thái hồ sơ sang "Học viên Chính thức" (Active)<br>   - Tự động sinh Mã Học viên duy nhất định dạng: HN10-0007<br>   - Khởi tạo tài khoản định danh số trên hệ thống với mật khẩu khởi tạo an toàn<br>   - Cập nhật số lượng Học viên chính thức trên toàn hệ sinh thái.<br>6. Màn hình hiển thị thông báo thành công màu xanh lục và cập nhật trạng thái hồ sơ tức thì. |
+| **Luồng Xử Lý Chính (Main Flow)** | 1. Cán bộ Ban Thành Viên nhấn nút "Phê Duyệt Kết Nạp & Cấp Tài Khoản" trên ngăn kéo thẩm định.<br>2. Hộp thoại xác nhận hiển thị tóm tắt quyết định kết nạp.<br>3. Người dùng xác nhận "Đồng ý Phê duyệt".<br>4. Hệ thống kiểm tra thẩm quyền: Xác thực người thực hiện thuộc Ban Thành Viên hoặc Ban Quản Trị tối cao.<br>5. Hệ thống thực thi giao dịch an toàn tự động:<br>   - Chuyển trạng thái hồ sơ sang "Học viên Chính thức" (Active)<br>   - Tự động sinh Mã Học viên duy nhất định dạng: CEO-83007<br>   - Khởi tạo tài khoản định danh số trên hệ thống với mật khẩu khởi tạo an toàn<br>   - Cập nhật số lượng Học viên chính thức trên toàn hệ sinh thái.<br>6. Màn hình hiển thị thông báo thành công màu xanh lục và cập nhật trạng thái hồ sơ tức thì. |
 | **Luồng Thay Thế / Ngoại Lệ (Alternative Flows)** | - Trường hợp hồ sơ không đạt tiêu chuẩn: Cán bộ BTV nhấn nút "Từ Chối" kèm lý do cụ thể để gửi thông báo phản hồi lịch thiệp. |
-| **Hậu Điều Kiện (Post-conditions)** | Ứng viên chính thức trở thành Học viên CLB CEO HN10 với mã định danh số HN10-0007. |
-| **Hình Ảnh Minh Chứng Thực Tế** | *Quy trình phê duyệt kết nạp và cấp mã Học viên HN10-xxxx độc quyền của Ban Thành Viên* |
+| **Hậu Điều Kiện (Post-conditions)** | Ứng viên chính thức trở thành Học viên CLB CEO HN10 với mã định danh số CEO-83007. |
+| **Hình Ảnh Minh Chứng Thực Tế** | *Quy trình phê duyệt kết nạp và cấp mã Học viên CEO-83xxx độc quyền của Ban Thành Viên* |
 
-![Quy trình phê duyệt kết nạp và cấp mã Học viên HN10-xxxx độc quyền của Ban Thành Viên](images/evidence/live_08_crm_member_approved_credentials_toast.png)
+![Quy trình phê duyệt kết nạp và cấp mã Học viên CEO-83xxx độc quyền của Ban Thành Viên](images/evidence/live_08_crm_member_approved_credentials_toast.png)
 
 
 ### 5.15. Bảng Use Case UC-CRM-05: Tự Động Kích Hoạt Thư Điện Tử Chúc Mừng Kết Nạp & Cấp Thông Tin Đăng Nhập Đến vupv090120@gmail.com
@@ -322,7 +321,7 @@ Dưới đây là bảng đặc tả chi tiết toàn bộ 138 Use Cases bao ph�
 | **Tên Chức Năng** | Tự Động Kích Hoạt Thư Điện Tử Chúc Mừng Kết Nạp & Cấp Thông Tin Đăng Nhập Đến vupv090120@gmail.com |
 | **Tác Nhân (Actor)** | Hệ thống Máy chủ Thư tín Tự động (Mailer Service) |
 | **Tiền Điều Kiện (Pre-conditions)** | Hồ sơ vừa được Ban Thành Viên phê duyệt thành công tại UC-CRM-04. |
-| **Luồng Xử Lý Chính (Main Flow)** | 1. Ngay sau khi kích hoạt Học viên, hệ thống tự động soạn thảo thư điện tử chúc mừng chính thức từ Chủ tịch CLB Doanh Nhân CEO HN10.<br>2. Thư được gửi trực tiếp đến địa chỉ email: vupv090120@gmail.com.<br>3. Nội dung thư bao gồm:<br>   - Thư chúc mừng chính thức gia nhập ngôi nhà chung CLB Doanh Nhân CEO HN10<br>   - Mã số Học viên chính thức: HN10-0007<br>   - Tài khoản đăng nhập (vupv090120@gmail.com) và Mật khẩu khởi tạo an toàn<br>   - Đường dẫn truy cập Ứng dụng Doanh nhân trên điện thoại<br>   - Hướng dẫn đổi mật khẩu và thiết lập Danh thiếp điện tử VIP 3D NFC lần đầu.<br>4. Hệ thống lưu nhật ký gửi email thành công vào biên bản kiểm toán hệ thống. |
+| **Luồng Xử Lý Chính (Main Flow)** | 1. Ngay sau khi kích hoạt Học viên, hệ thống tự động soạn thảo thư điện tử chúc mừng chính thức từ Chủ tịch CLB Doanh Nhân CEO HN10.<br>2. Thư được gửi trực tiếp đến địa chỉ email: vupv090120@gmail.com.<br>3. Nội dung thư bao gồm:<br>   - Thư chúc mừng chính thức gia nhập ngôi nhà chung CLB Doanh Nhân CEO HN10<br>   - Mã số Học viên chính thức: CEO-83007<br>   - Tài khoản đăng nhập (vupv090120@gmail.com) và Mật khẩu khởi tạo an toàn<br>   - Đường dẫn truy cập Ứng dụng Doanh nhân trên điện thoại<br>   - Hướng dẫn đổi mật khẩu và thiết lập Danh thiếp điện tử VIP 3D NFC lần đầu.<br>4. Hệ thống lưu nhật ký gửi email thành công vào biên bản kiểm toán hệ thống. |
 | **Luồng Thay Thế / Ngoại Lệ (Alternative Flows)** | - Nếu hòm thư người nhận bị đầy: Hệ thống thông báo cho Ban Thư Ký để hỗ trợ gửi tin nhắn SMS dự phòng. |
 | **Hậu Điều Kiện (Post-conditions)** | Học viên mới nhận được đầy đủ thông tin đăng nhập và hướng dẫn bắt đầu trải nghiệm Ứng dụng. |
 | **Hình Ảnh Minh Chứng Thực Tế** | *Thư điện tử chúc mừng kết nạp chính thức kèm thông tin đăng nhập gửi tới vupv090120@gmail.com* |
@@ -373,7 +372,7 @@ Dưới đây là bảng đặc tả chi tiết toàn bộ 138 Use Cases bao ph�
 | **Tên Chức Năng** | Xem Hồ Sơ Chi Tiết Học viên 360 Độ, Lịch Sử Giao Thương & Đóng Góp Hoạt Động |
 | **Tác Nhân (Actor)** | Ban Lãnh Đạo CLB, Ban Thành Viên |
 | **Tiền Điều Kiện (Pre-conditions)** | Người dùng chọn xem chi tiết một Học viên chính thức trên danh bạ. |
-| **Luồng Xử Lý Chính (Main Flow)** | 1. Bấm vào tên Học viên Phạm Văn Vũ (HN10-0007) trên danh bạ.<br>2. Hệ thống chuyển vào giao diện Hồ Sơ Chi Tiết 360 Độ:<br>   - Tab 1 - Thông tin Lãnh đạo & Doanh nghiệp: Chức vụ, MST, Logo, Giới thiệu năng lực<br>   - Tab 2 - Lịch sử Tham dự Sự kiện: Danh sách các sự kiện đã tham gia, vị trí ghế ngồi danh dự, lịch sử quét mã điểm danh<br>   - Tab 3 - Hoạt động Giao thương B2B: Danh mục sản phẩm đã đăng trên Gian hàng Doanh nghiệp, các cơ hội Cung - Cầu đã trao đổi<br>   - Tab 4 - Tài chính & Hội phí: Lịch sử các kỳ đóng phí thường niên, hóa đơn Mã QR Ngân Hàng tương ứng<br>   - Tab 5 - Điểm gắn kết & Thi đua: Số giờ tham gia sinh hoạt, các đóng góp tài trợ cho CLB.<br>3. Người dùng có thể in phiếu tóm tắt hồ sơ phục vụ công tác quy hoạch Ban Chấp Hành. |
+| **Luồng Xử Lý Chính (Main Flow)** | 1. Bấm vào tên Học viên Phạm Văn Vũ (CEO-83007) trên danh bạ.<br>2. Hệ thống chuyển vào giao diện Hồ Sơ Chi Tiết 360 Độ:<br>   - Tab 1 - Thông tin Lãnh đạo & Doanh nghiệp: Chức vụ, MST, Logo, Giới thiệu năng lực<br>   - Tab 2 - Lịch sử Tham dự Sự kiện: Danh sách các sự kiện đã tham gia, vị trí ghế ngồi danh dự, lịch sử quét mã điểm danh<br>   - Tab 3 - Hoạt động Giao thương B2B: Danh mục sản phẩm đã đăng trên Gian hàng Doanh nghiệp, các cơ hội Cung - Cầu đã trao đổi<br>   - Tab 4 - Tài chính & Hội phí: Lịch sử các kỳ đóng phí thường niên, hóa đơn VietQR tương ứng<br>   - Tab 5 - Điểm gắn kết & Thi đua: Số giờ tham gia sinh hoạt, các đóng góp tài trợ cho CLB.<br>3. Người dùng có thể in phiếu tóm tắt hồ sơ phục vụ công tác quy hoạch Ban Chấp Hành. |
 | **Luồng Thay Thế / Ngoại Lệ (Alternative Flows)** | - Nếu Học viên mới chưa có lịch sử giao thương: Hệ thống hiển thị trạng thái chờ ghi nhận với gợi ý hỗ trợ từ Ban Xúc Tiến. |
 | **Hậu Điều Kiện (Post-conditions)** | Ban Lãnh đạo nắm trọn vẹn bức tranh cống hiến và mức độ gắn kết của từng Học viên. |
 | **Hình Ảnh Minh Chứng Thực Tế** | *Giao diện xem hồ sơ chi tiết Học viên 360 độ và lịch sử giao thương, đóng góp* |
@@ -458,7 +457,7 @@ Dưới đây là bảng đặc tả chi tiết toàn bộ 138 Use Cases bao ph�
 | **Tên Chức Năng** | Quản Lý Danh Mục Hệ Sinh Thái Doanh Nghiệp Học viên CEO HN10 |
 | **Tác Nhân (Actor)** | Ban Xúc Tiến Thương Mại, Ban Quản Trị |
 | **Tiền Điều Kiện (Pre-conditions)** | Người dùng truy cập phân hệ Quản lý Doanh nghiệp trên Cổng Quản trị. |
-| **Luồng Xử Lý Chính (Main Flow)** | 1. Người dùng chọn mục "Hệ Sinh Thái Doanh Nghiệp" trên thanh điều hướng.<br>2. Màn hình hiển thị danh sách toàn bộ các doanh nghiệp thành viên:<br>   - Tên doanh nghiệp: Công ty Cổ phần Công nghệ VIO CONNECT, v.v.<br>   - Logo thương hiệu, Mã số thuế, Năm thành lập<br>   - Người đại diện pháp luật / Chủ tịch / Tổng Giám đốc là Học viên HN10<br>   - Ngành nghề cốt lõi và Quy mô doanh nghiệp (Doanh thu, Nhân sự).<br>3. Người dùng có thể tìm kiếm nhanh theo Tên công ty hoặc Mã số thuế. |
+| **Luồng Xử Lý Chính (Main Flow)** | 1. Người dùng chọn mục "Hệ Sinh Thái Doanh Nghiệp" trên thanh điều hướng.<br>2. Màn hình hiển thị danh sách toàn bộ các doanh nghiệp thành viên:<br>   - Tên doanh nghiệp: Công ty Cổ phần Công nghệ VIO CONNECT, v.v.<br>   - Logo thương hiệu, Mã số thuế, Năm thành lập<br>   - Người đại diện pháp luật / Chủ tịch / Tổng Giám đốc là Học viên 1983<br>   - Ngành nghề cốt lõi và Quy mô doanh nghiệp (Doanh thu, Nhân sự).<br>3. Người dùng có thể tìm kiếm nhanh theo Tên công ty hoặc Mã số thuế. |
 | **Luồng Thay Thế / Ngoại Lệ (Alternative Flows)** | - Nếu doanh nghiệp có nhiều chi nhánh: Hệ thống hiển thị địa chỉ trụ sở chính và mạng lưới văn phòng. |
 | **Hậu Điều Kiện (Post-conditions)** | Hệ thống lưu trữ cơ sở dữ liệu doanh nghiệp tập trung, phục vụ xúc tiến thương mại nội bộ. |
 | **Hình Ảnh Minh Chứng Thực Tế** | *Danh mục Hệ sinh thái Doanh nghiệp Học viên CLB Doanh Nhân CEO HN10* |
@@ -497,7 +496,7 @@ Dưới đây là bảng đặc tả chi tiết toàn bộ 138 Use Cases bao ph�
 | **Hậu Điều Kiện (Post-conditions)** | Hồ sơ năng lực doanh nghiệp được công bố chuyên nghiệp, nâng cao uy tín trong cộng đồng. |
 | **Hình Ảnh Minh Chứng Thực Tế** | *Giao diện thẩm định và phê duyệt Hồ sơ năng lực Doanh nghiệp Học viên* |
 
-![Giao diện thẩm định và phê duyệt Hồ sơ năng lực Doanh nghiệp Học viên](images/evidence/crm_hn10_05_companies_management.png)
+![Giao diện thẩm định và phê duyệt Hồ sơ năng lực Doanh nghiệp Học viên](images/evidence/crm1983_05_companies_management.png)
 
 
 ### 5.26. Bảng Use Case UC-CRM-16: Khởi Tạo Sự Kiện, Đại Hội Toàn Thể & Diễn Đàn Doanh Nhân Mới
@@ -509,9 +508,9 @@ Dưới đây là bảng đặc tả chi tiết toàn bộ 138 Use Cases bao ph�
 | **Tên Chức Năng** | Khởi Tạo Sự Kiện, Đại Hội Toàn Thể & Diễn Đàn Doanh Nhân Mới |
 | **Tác Nhân (Actor)** | Ban Truyền Thông, Ban Thư Ký |
 | **Tiền Điều Kiện (Pre-conditions)** | Ban Chấp Hành có chủ trương tổ chức sự kiện hoặc hội nghị thường niên. |
-| **Luồng Xử Lý Chính (Main Flow)** | 1. Người dùng mở phân hệ "Quản Lý Sự Kiện", bấm nút "Tạo Sự Kiện Mới".<br>2. Điền các trường thông tin chuẩn mực:<br>   - Tên chương trình: "Gala Thường Niên & Diễn Đàn Kinh Tế Doanh Nhân CEO HN10"<br>   - Thời gian tổ chức: Ngày bắt đầu, Ngày kết thúc, Giờ đón tiếp đại biểu<br>   - Địa điểm tổ chức: Khách sạn 5 sao / Trung tâm Hội nghị Quốc tế<br>   - Tải lên Ảnh bìa Banner sự kiện sắc nét chuẩn nhận diện<br>   - Soạn thảo nội dung lịch trình chương trình (Agenda) chi tiết từng khung giờ<br>   - Cấu hình số lượng đại biểu tối đa của sự kiện (ví dụ: 500 khách).<br>3. Nhấn "Lưu & Tiếp Tục Thiết Lập Chính Sách Vé".<br>4. Sự kiện được tạo thành công ở trạng thái Bản nháp hoặc Đã phát hành.<br>5. **Tính Năng Bắn Mạng Lưới (Broadcast To Network Feed)**: Tại danh sách sự kiện (bảng và thẻ card), Ban Tổ Chức có thể bấm nút **"Bắn Mạng Lưới"** (Icon `Send` màu xanh ngọc/navy). Hệ thống tự động tạo một bài đăng truyền thông mới trên Bảng tin Mạng lưới App Mobile (`POST /feed`), đính kèm hình ảnh Poster sự kiện sắc nét cùng **Mã QR Điểm Danh (Check-in QR)** và thông tin khung giờ đón tiếp, giúp toàn thể Học viên nắm bắt và quét mã điểm danh tức thì khi đến tham dự. |
-| **Luồng Thay Thế / Ngoại Lệ (Alternative Flows)** | - Nếu sự kiện đã được bắn lên Mạng lưới trước đó, hệ thống hiển thị thông báo xác nhận cập nhật lại bài viết trên Feed để tránh trùng lặp nội dung. |
-| **Hậu Điều Kiện (Post-conditions)** | Sự kiện được thiết lập chuẩn mực trên Cổng Quản trị, đồng thời tự động truyền thông tức thời xuống Ứng dụng Di Động Học viên qua kênh Bảng tin Mạng lưới. |
+| **Luồng Xử Lý Chính (Main Flow)** | 1. Người dùng mở phân hệ "Quản Lý Sự Kiện", bấm nút "Tạo Sự Kiện Mới".<br>2. Điền các trường thông tin chuẩn mực:<br>   - Tên chương trình: "Gala Thường Niên & Diễn Đàn Kinh Tế Doanh Nhân 1983"<br>   - Thời gian tổ chức: Ngày bắt đầu, Ngày kết thúc, Giờ đón tiếp đại biểu<br>   - Địa điểm tổ chức: Khách sạn 5 sao / Trung tâm Hội nghị Quốc tế<br>   - Tải lên Ảnh bìa Banner sự kiện sắc nét chuẩn nhận diện<br>   - Soạn thảo nội dung lịch trình chương trình (Agenda) chi tiết từng khung giờ<br>   - Cấu hình số lượng đại biểu tối đa của sự kiện (ví dụ: 500 khách).<br>3. Nhấn "Lưu & Tiếp Tục Thiết Lập Chính Sách Vé".<br>4. Sự kiện được tạo thành công ở trạng thái Bản nháp, sẵn sàng cấu hình vé và sơ đồ ghế. |
+| **Luồng Thay Thế / Ngoại Lệ (Alternative Flows)** | - Nếu thời gian sự kiện bị trùng với lịch họp đã có của BCH: Hệ thống cảnh báo để cân nhắc điều chỉnh. |
+| **Hậu Điều Kiện (Post-conditions)** | Sự kiện được thiết lập trên hệ thống với đầy đủ thông tin chuẩn bị phát hành. |
 | **Hình Ảnh Minh Chứng Thực Tế** | *Giao diện biểu mẫu khởi tạo sự kiện và hội nghị mới trên Cổng Quản trị* |
 
 ![Giao diện biểu mẫu khởi tạo sự kiện và hội nghị mới trên Cổng Quản trị](images/evidence/03_crm_event_create_modal.png)
@@ -534,21 +533,21 @@ Dưới đây là bảng đặc tả chi tiết toàn bộ 138 Use Cases bao ph�
 ![Cấu hình chính sách vé mời miễn phí dành riêng cho Học viên đã hoàn thành hội phí](images/evidence/crm_05_events_list.png)
 
 
-### 5.28. Bảng Use Case UC-CRM-18: Cấu Hình Bán Vé Sự Kiện Có Phí Cho Khách Mời & Tích Hợp cổng thanh toán QR ngân hàng Napas 24/7 Tự Động
+### 5.28. Bảng Use Case UC-CRM-18: Cấu Hình Bán Vé Sự Kiện Có Phí Cho Khách Mời & Tích Hợp Cổng VietQR Napas 24/7 Tự Động
 
 | Thuộc Tính Nghiệp Vụ | Nội Dung Đặc Tả Chi Tiết |
 | :--- | :--- |
 | **Mã Use Case (ID)** | **UC-CRM-18** |
 | **Phân Hệ / Nhóm** | Quản Lý Sự Kiện & Ghế Ngồi |
-| **Tên Chức Năng** | Cấu Hình Bán Vé Sự Kiện Có Phí Cho Khách Mời & Tích Hợp cổng thanh toán QR ngân hàng Napas 24/7 Tự Động |
+| **Tên Chức Năng** | Cấu Hình Bán Vé Sự Kiện Có Phí Cho Khách Mời & Tích Hợp Cổng VietQR Napas 24/7 Tự Động |
 | **Tác Nhân (Actor)** | Ban Tổ Chức Sự Kiện & Ban Tài Chính |
 | **Tiền Điều Kiện (Pre-conditions)** | Sự kiện có mở bán vé dành cho khách mời ngoài CLB. |
-| **Luồng Xử Lý Chính (Main Flow)** | 1. Trong phần thiết lập vé, chọn thêm loại vé: "Vé Khách Mời Doanh Nghiệp (Có Thu Phí)".<br>2. Nhập đơn giá vé: 1.500.000 VNĐ / vé.<br>3. Kích hoạt cổng thanh toán tự động Mã QR Ngân Hàng Napas 24/7.<br>4. Cấu hình quy tắc sinh mã chuyển khoản định danh duy nhất cho từng đơn vé (định dạng: TIK-xxxxx).<br>5. Thiết lập thời gian tự động giữ chỗ trong 15 phút: Nếu khách quét mã chuyển khoản thành công trong thời gian này, hệ thống tự động gạch nợ trong 1 giây và phát hành vé điện tử.<br>6. Nhấn "Lưu & Xuất Bản Vé Khách Mời". |
+| **Luồng Xử Lý Chính (Main Flow)** | 1. Trong phần thiết lập vé, chọn thêm loại vé: "Vé Khách Mời Doanh Nghiệp (Có Thu Phí)".<br>2. Nhập đơn giá vé: 1.500.000 VNĐ / vé.<br>3. Kích hoạt cổng thanh toán tự động VietQR Napas 24/7.<br>4. Cấu hình quy tắc sinh mã chuyển khoản định danh duy nhất cho từng đơn vé (định dạng: TIK-xxxxx).<br>5. Thiết lập thời gian tự động giữ chỗ trong 15 phút: Nếu khách quét mã chuyển khoản thành công trong thời gian này, hệ thống tự động gạch nợ trong 1 giây và phát hành vé điện tử.<br>6. Nhấn "Lưu & Xuất Bản Vé Khách Mời". |
 | **Luồng Thay Thế / Ngoại Lệ (Alternative Flows)** | - Nếu quá 15 phút khách chưa chuyển khoản: Hệ thống tự động hủy đơn giữ chỗ và giải phóng ghế cho người khác. |
 | **Hậu Điều Kiện (Post-conditions)** | Hệ thống bán vé có phí vận hành tự động 100%, không cần đối soát chuyển khoản thủ công. |
-| **Hình Ảnh Minh Chứng Thực Tế** | *Thiết lập loại vé sự kiện có phí và tích hợp cổng thanh toán Mã QR Ngân Hàng tự động* |
+| **Hình Ảnh Minh Chứng Thực Tế** | *Thiết lập loại vé sự kiện có phí và tích hợp cổng thanh toán VietQR tự động* |
 
-![Thiết lập loại vé sự kiện có phí và tích hợp cổng thanh toán Mã QR Ngân Hàng tự động](images/evidence/crm_06b_event_create_paid_modal.png)
+![Thiết lập loại vé sự kiện có phí và tích hợp cổng thanh toán VietQR tự động](images/evidence/crm_06b_event_create_paid_modal.png)
 
 
 ### 5.29. Bảng Use Case UC-CRM-19: Thiết Lập Bản Đồ Chỗ Ngồi Trực Quan (Cinema Seating Map: Bàn Kim Cương, Vàng, Bạc)
@@ -594,7 +593,7 @@ Dưới đây là bảng đặc tả chi tiết toàn bộ 138 Use Cases bao ph�
 | **Tên Chức Năng** | Quản Lý Danh Sách Đăng Ký Tham Dự, Lọc Trạng Thái Đã Thanh Toán & Chưa Thanh Toán |
 | **Tác Nhân (Actor)** | Ban Thư Ký, Ban Tài Chính |
 | **Tiền Điều Kiện (Pre-conditions)** | Sự kiện đang trong giai đoạn tiếp nhận đăng ký tham dự. |
-| **Luồng Xử Lý Chính (Main Flow)** | 1. Người dùng truy cập phân hệ "Danh Sách Đăng Ký Sự Kiện".<br>2. Bảng dữ liệu hiển thị toàn bộ danh sách đại biểu đăng ký:<br>   - Tên đại biểu, Số điện thoại, Email, Doanh nghiệp<br>   - Loại vé (Học viên miễn phí / Khách mời có phí)<br>   - Trạng thái thanh toán (Đã thanh toán qua Mã QR Ngân Hàng, Chờ thanh toán, Miễn phí)<br>   - Vị trí bàn ghế đã phân bổ<br>   - Thời gian đăng ký.<br>3. Sử dụng bộ lọc nhanh để xem riêng danh sách đại biểu đã xác nhận tham dự để chuẩn bị thẻ đeo. |
+| **Luồng Xử Lý Chính (Main Flow)** | 1. Người dùng truy cập phân hệ "Danh Sách Đăng Ký Sự Kiện".<br>2. Bảng dữ liệu hiển thị toàn bộ danh sách đại biểu đăng ký:<br>   - Tên đại biểu, Số điện thoại, Email, Doanh nghiệp<br>   - Loại vé (Học viên miễn phí / Khách mời có phí)<br>   - Trạng thái thanh toán (Đã thanh toán qua VietQR, Chờ thanh toán, Miễn phí)<br>   - Vị trí bàn ghế đã phân bổ<br>   - Thời gian đăng ký.<br>3. Sử dụng bộ lọc nhanh để xem riêng danh sách đại biểu đã xác nhận tham dự để chuẩn bị thẻ đeo. |
 | **Luồng Thay Thế / Ngoại Lệ (Alternative Flows)** | - Với các đơn vé chờ thanh toán quá hạn: Người dùng có thể nhấn nút gửi email nhắc nhở hoặc giải phóng vé. |
 | **Hậu Điều Kiện (Post-conditions)** | Ban Tổ chức nắm chắc số lượng đại biểu chắc chắn tham dự để điều phối hậu cần tiệc chính xác. |
 | **Hình Ảnh Minh Chứng Thực Tế** | *Bảng quản lý danh sách đăng ký tham dự sự kiện và xác nhận thanh toán* |
@@ -633,7 +632,7 @@ Dưới đây là bảng đặc tả chi tiết toàn bộ 138 Use Cases bao ph�
 | **Hậu Điều Kiện (Post-conditions)** | Hệ thống thẻ đeo đại biểu được chuẩn bị chỉn chu, phục vụ đón tiếp sang trọng. |
 | **Hình Ảnh Minh Chứng Thực Tế** | *Mẫu vé mời và thẻ đeo đại biểu đính kèm mã QR điểm danh tự động* |
 
-![Mẫu vé mời và thẻ đeo đại biểu đính kèm mã QR điểm danh tự động](images/evidence/app_hn10_08_event_ticket_qr.png)
+![Mẫu vé mời và thẻ đeo đại biểu đính kèm mã QR điểm danh tự động](images/evidence/app1983_08_event_ticket_qr.png)
 
 
 ### 5.34. Bảng Use Case UC-CRM-24: Kích Hoạt Giao Diện Quét Mã QR Điểm Danh Tốc Độ Cao Tại Cổng An Ninh Sự Kiện
@@ -645,7 +644,7 @@ Dưới đây là bảng đặc tả chi tiết toàn bộ 138 Use Cases bao ph�
 | **Tên Chức Năng** | Kích Hoạt Giao Diện Quét Mã QR Điểm Danh Tốc Độ Cao Tại Cổng An Ninh Sự Kiện |
 | **Tác Nhân (Actor)** | Ban Lễ Tân, Ban Truyền Thông, An Ninh Cổng |
 | **Tiền Điều Kiện (Pre-conditions)** | Cán bộ lễ tân sử dụng máy tính bảng hoặc máy tính có đầu đọc camera/máy quét laser tại cửa đón tiếp. |
-| **Luồng Xử Lý Chính (Main Flow)** | 1. Cán bộ lễ tân đăng nhập vào phân hệ "Điểm Danh Cổng An Ninh" (Gate Check-in).<br>2. Chọn sự kiện đang diễn ra: "Gala Thường Niên & Diễn Đàn Kinh Tế HN10".<br>3. Màn hình kích hoạt chế độ quét toàn màn hình tốc độ cao (High-speed Scanner Mode).<br>4. Hệ thống sẵn sàng nhận diện luồng quét QR từ điện thoại của đại biểu hoặc thẻ đeo giấy. |
+| **Luồng Xử Lý Chính (Main Flow)** | 1. Cán bộ lễ tân đăng nhập vào phân hệ "Điểm Danh Cổng An Ninh" (Gate Check-in).<br>2. Chọn sự kiện đang diễn ra: "Gala Thường Niên & Diễn Đàn Kinh Tế 1983".<br>3. Màn hình kích hoạt chế độ quét toàn màn hình tốc độ cao (High-speed Scanner Mode).<br>4. Hệ thống sẵn sàng nhận diện luồng quét QR từ điện thoại của đại biểu hoặc thẻ đeo giấy. |
 | **Luồng Thay Thế / Ngoại Lệ (Alternative Flows)** | - Nếu camera bị mờ hoặc thiếu sáng: Giao diện hỗ trợ bật đèn flash trợ sáng hoặc chuyển sang nhập mã vé nhanh. |
 | **Hậu Điều Kiện (Post-conditions)** | Cổng an ninh sẵn sàng đón tiếp đại biểu với tốc độ xử lý dưới 1 giây/khách. |
 | **Hình Ảnh Minh Chứng Thực Tế** | *Giao diện Quét mã QR Điểm danh Cổng An ninh tốc độ cao tại sự kiện* |
@@ -713,7 +712,7 @@ Dưới đây là bảng đặc tả chi tiết toàn bộ 138 Use Cases bao ph�
 | **Tên Chức Năng** | Tìm Kiếm & Điểm Danh Thủ Công Bằng Họ Tên / Số Điện Thoại Khi Đại Biểu Quên Điện Thoại |
 | **Tác Nhân (Actor)** | Cán bộ Lễ tân & Đại biểu |
 | **Tiền Điều Kiện (Pre-conditions)** | Đại biểu là Học viên chính thức nhưng điện thoại hết pin hoặc không mang vé in. |
-| **Luồng Xử Lý Chính (Main Flow)** | 1. Đại biểu cung cấp Họ tên: "Phạm Văn Vũ" hoặc Số điện thoại: "090120HN10".<br>2. Lễ tân gõ vào ô tìm kiếm nhanh trên màn hình điểm danh.<br>3. Hệ thống trả về kết quả hồ sơ hợp lệ: Học viên chính thức HN10-0007, Bàn VIP 01.<br>4. Lễ tân bấm nút "Xác Nhận Check-in Thủ Công".<br>5. Hệ thống ghi nhận đại biểu đã có mặt và phát hành mã may mắn vào tài khoản Học viên.<br>6. Lễ tân trao thẻ đeo cho đại biểu vào dự tiệc. |
+| **Luồng Xử Lý Chính (Main Flow)** | 1. Đại biểu cung cấp Họ tên: "Phạm Văn Vũ" hoặc Số điện thoại: "0901201983".<br>2. Lễ tân gõ vào ô tìm kiếm nhanh trên màn hình điểm danh.<br>3. Hệ thống trả về kết quả hồ sơ hợp lệ: Học viên chính thức CEO-83007, Bàn VIP 01.<br>4. Lễ tân bấm nút "Xác Nhận Check-in Thủ Công".<br>5. Hệ thống ghi nhận đại biểu đã có mặt và phát hành mã may mắn vào tài khoản Học viên.<br>6. Lễ tân trao thẻ đeo cho đại biểu vào dự tiệc. |
 | **Luồng Thay Thế / Ngoại Lệ (Alternative Flows)** | - Nếu có nhiều người trùng tên: Lễ tân đối chiếu số điện thoại hoặc tên doanh nghiệp để chọn đúng đại biểu. |
 | **Hậu Điều Kiện (Post-conditions)** | Đại biểu được đón tiếp chu đáo, linh hoạt, tạo ấn tượng chuyên nghiệp. |
 | **Hình Ảnh Minh Chứng Thực Tế** | *Tính năng tìm kiếm và điểm danh thủ công linh hoạt tại bàn đón tiếp đại biểu* |
@@ -747,12 +746,12 @@ Dưới đây là bảng đặc tả chi tiết toàn bộ 138 Use Cases bao ph�
 | **Tên Chức Năng** | Lập Lịch Họp Ban Chấp Hành, Thường Trực & Lên Dự Thảo Chương Trình Nghị Sự |
 | **Tác Nhân (Actor)** | Ban Thư Ký (ceo.tongthuky@ceohn10.com) |
 | **Tiền Điều Kiện (Pre-conditions)** | Ban Thư Ký đăng nhập Cổng Quản trị; có kế hoạch họp định kỳ tháng/quý. |
-| **Luồng Xử Lý Chính (Main Flow)** | 1. Ban Thư Ký hoặc Ban Đào Tạo truy cập phân hệ "Cuộc Họp & Đào Tạo", chọn "Tạo Cuộc Họp Mới" hoặc "Thiết Lập Chuyên Đề Đào Tạo".<br>2. Điền thông tin chương trình:<br>   - Tiêu đề: "Hội Nghị Ban Chấp Hành CLB Doanh Nhân CEO HN10 Mở Rộng" hoặc Chuyên đề "Tái Cấu Trúc Vận Hành Doanh Nghiệp Thời Kỳ Số"<br>   - Thời gian họp/đào tạo: Ngày, Giờ bắt đầu, Giờ kết thúc<br>   - Hình thức: Họp trực tiếp tại Trụ sở CLB hoặc Phòng Họp Trực Tuyến Tích Hợp (Jitsi Meet)<br>   - Giảng viên / Chuyên gia điều phối: Tên diễn giả, học hàm học vị, ảnh đại diện chuyên gia<br>   - Thành phần triệu tập / Đối tượng tham gia: Toàn thể Học viên hoặc các Ủy viên theo chuyên ban<br>   - Chương trình nghị sự (Agenda) và nội dung đào tạo thực chiến.<br>3. Tải lên kho tài liệu giáo trình đính kèm: Slide bài giảng PDF, File tính dòng tiền Excel, Checklist mẫu biểu để người tham gia tải về nghiên cứu.<br>4. Bấm "Phát Hành Thông Tri & Kích Hoạt Phòng Họp".<br>5. Hệ thống tự động khởi tạo phòng họp video trực tuyến bảo mật, cấp mã phòng riêng biệt và phát thông báo đến ứng dụng của Học viên. |
-| **Luồng Thay Thế / Ngoại Lệ (Alternative Flows)** | - Đối với các phiên đào tạo hoặc hội nghị trực tuyến: Cán bộ quản lý có thể mở giao diện video call trực tiếp trong hệ thống với đầy đủ tính năng bật/tắt camera, micro, chia sẻ màn hình và điểm danh đại biểu tức thì. |
+| **Luồng Xử Lý Chính (Main Flow)** | 1. Ban Thư Ký truy cập phân hệ "Cuộc Họp & Nghị Quyết", chọn "Tạo Cuộc Họp Mới".<br>2. Điền thông tin cuộc họp:<br>   - Tiêu đề: "Hội Nghị Ban Chấp Hành CLB Doanh Nhân CEO HN10 Mở Rộng Quý IV"<br>   - Thời gian họp: Ngày, Giờ bắt đầu, Giờ kết thúc<br>   - Hình thức: Họp trực tiếp tại Trụ sở Hội Doanh Nhân Trẻ Hà Nội hoặc Họp kết hợp Trực tuyến<br>   - Thành phần triệu tập: Toàn thể Ủy viên Ban Chấp Hành và Trưởng 6 Ban chuyên môn<br>   - Chương trình nghị sự (Agenda): Đánh giá công tác quý III, Triển khai kế hoạch Gala thường niên, Phê duyệt ngân sách thiện nguyện.<br>3. Đính kèm các tài liệu dự thảo, tờ trình để các Ủy viên nghiên cứu trước.<br>4. Bấm "Phát Hành Thông Tri Mời Họp". |
+| **Luồng Thay Thế / Ngoại Lệ (Alternative Flows)** | - Nếu cuộc họp có phòng họp trực tuyến: Điền đường dẫn phòng họp bảo mật vào mục liên kết. |
 | **Hậu Điều Kiện (Post-conditions)** | Lịch họp được thiết lập trên hệ thống và hiển thị lên lịch công tác của các thành viên. |
 | **Hình Ảnh Minh Chứng Thực Tế** | *Lịch công tác và giao diện khởi tạo cuộc họp Ban Chấp Hành trên Cổng Quản trị* |
 
-![Lịch công tác và giao diện khởi tạo cuộc họp Ban Chấp Hành trên Cổng Quản trị](images/evidence/crm_hn10_09_meetings_calendar.png)
+![Lịch công tác và giao diện khởi tạo cuộc họp Ban Chấp Hành trên Cổng Quản trị](images/evidence/crm1983_09_meetings_calendar.png)
 
 
 ### 5.41. Bảng Use Case UC-CRM-31: Tự Động Gửi Giấy Mời Họp Kèm Tài Liệu Nghị Sự Đến Toàn Thể Ủy Viên Ban Chấp Hành
@@ -837,7 +836,7 @@ Dưới đây là bảng đặc tả chi tiết toàn bộ 138 Use Cases bao ph�
 | **Hậu Điều Kiện (Post-conditions)** | Toàn thể hội nghị chứng kiến kết quả khách quan, trung thực và hiện đại. |
 | **Hình Ảnh Minh Chứng Thực Tế** | *Màn hình theo dõi tiến độ biểu quyết thời gian thực dạng biểu đồ tỷ lệ trực quan* |
 
-![Màn hình theo dõi tiến độ biểu quyết thời gian thực dạng biểu đồ tỷ lệ trực quan](images/evidence/crm_hn10_10_voting_management.png)
+![Màn hình theo dõi tiến độ biểu quyết thời gian thực dạng biểu đồ tỷ lệ trực quan](images/evidence/crm1983_10_voting_management.png)
 
 
 ### 5.46. Bảng Use Case UC-CRM-36: Đóng Phiên Biểu Quyết & Tự Động Xuất Biên Bản Kiểm Phiếu Điện Tử Có Chứng Thực
@@ -908,21 +907,21 @@ Dưới đây là bảng đặc tả chi tiết toàn bộ 138 Use Cases bao ph�
 ![Bảng theo dõi trạng thái đóng hội phí thường niên của toàn thể Học viên CLB](images/evidence/crm_08_fees_management.png)
 
 
-### 5.50. Bảng Use Case UC-CRM-40: Tạo Thông Báo Thu Hội Phí Nhiệm Kỳ Mới Kèm mã QR ngân hàng Napas 24/7 Tự Động Gạch Nợ
+### 5.50. Bảng Use Case UC-CRM-40: Tạo Thông Báo Thu Hội Phí Nhiệm Kỳ Mới Kèm Mã VietQR Napas 24/7 Tự Động Gạch Nợ
 
 | Thuộc Tính Nghiệp Vụ | Nội Dung Đặc Tả Chi Tiết |
 | :--- | :--- |
 | **Mã Use Case (ID)** | **UC-CRM-40** |
 | **Phân Hệ / Nhóm** | Quản Lý Hội Phí Thường Niên |
-| **Tên Chức Năng** | Tạo Thông Báo Thu Hội Phí Nhiệm Kỳ Mới Kèm mã QR ngân hàng Napas 24/7 Tự Động Gạch Nợ |
+| **Tên Chức Năng** | Tạo Thông Báo Thu Hội Phí Nhiệm Kỳ Mới Kèm Mã VietQR Napas 24/7 Tự Động Gạch Nợ |
 | **Tác Nhân (Actor)** | Ban Tài Chính (ceo.thiennguyen@ceohn10.com / Thủ Quỹ) |
 | **Tiền Điều Kiện (Pre-conditions)** | Đến kỳ thu hội phí thường niên theo điều lệ CLB. |
-| **Luồng Xử Lý Chính (Main Flow)** | 1. Ban Tài Chính chọn chức năng "Phát Hành Thông Báo Thu Hội Phí Mới".<br>2. Thiết lập thông số:<br>   - Kỳ hội phí: Niên khóa 2026 - 2027<br>   - Mức hội phí tiêu chuẩn: 10.000.000 VNĐ / năm<br>   - Hạn chót nộp phí: 30 ngày kể từ ngày thông báo<br>3. Nhấn "Phát Hành Hàng Loạt".<br>4. Hệ thống tự động tạo hóa đơn điện tử cho từng Học viên.<br>5. Mỗi hóa đơn được tích hợp sẵn mã QR ngân hàng Napas 24/7 động chứa chính xác số tiền và nội dung chuyển khoản duy nhất (định dạng: FEE-CEO83xxx).<br>6. Khi Học viên quét mã chuyển khoản qua bất kỳ App ngân hàng nào, hệ thống máy chủ tự động đối soát và gạch nợ tức thì trong 1 giây mà không cần con người can thiệp. |
+| **Luồng Xử Lý Chính (Main Flow)** | 1. Ban Tài Chính chọn chức năng "Phát Hành Thông Báo Thu Hội Phí Mới".<br>2. Thiết lập thông số:<br>   - Kỳ hội phí: Niên khóa 2026 - 2027<br>   - Mức hội phí tiêu chuẩn: 10.000.000 VNĐ / năm<br>   - Hạn chót nộp phí: 30 ngày kể từ ngày thông báo<br>3. Nhấn "Phát Hành Hàng Loạt".<br>4. Hệ thống tự động tạo hóa đơn điện tử cho từng Học viên.<br>5. Mỗi hóa đơn được tích hợp sẵn Mã VietQR Napas 24/7 động chứa chính xác số tiền và nội dung chuyển khoản duy nhất (định dạng: FEE-CEO83xxx).<br>6. Khi Học viên quét mã chuyển khoản qua bất kỳ App ngân hàng nào, hệ thống máy chủ tự động đối soát và gạch nợ tức thì trong 1 giây mà không cần con người can thiệp. |
 | **Luồng Thay Thế / Ngoại Lệ (Alternative Flows)** | - Trường hợp Học viên nộp tiền mặt: Thủ quỹ chọn hóa đơn và nhấn xác nhận thu tiền mặt. |
 | **Hậu Điều Kiện (Post-conditions)** | Hóa đơn hội phí sẵn sàng trên Ứng dụng của từng Học viên, thanh toán tiện lợi 24/7. |
-| **Hình Ảnh Minh Chứng Thực Tế** | *Giao diện phát hành thông báo thu hội phí và cấu hình mã thanh toán Mã QR Ngân Hàng động* |
+| **Hình Ảnh Minh Chứng Thực Tế** | *Giao diện phát hành thông báo thu hội phí và cấu hình mã thanh toán VietQR động* |
 
-![Giao diện phát hành thông báo thu hội phí và cấu hình mã thanh toán Mã QR Ngân Hàng động](images/evidence/sub_50_crm_fees_management.png)
+![Giao diện phát hành thông báo thu hội phí và cấu hình mã thanh toán VietQR động](images/evidence/sub_50_crm_fees_management.png)
 
 
 ### 5.51. Bảng Use Case UC-CRM-41: Tự Động Gửi Email & Thông Báo Đẩy Nhắc Đóng Hội Phí Thường Niên Định Kỳ
@@ -934,12 +933,12 @@ Dưới đây là bảng đặc tả chi tiết toàn bộ 138 Use Cases bao ph�
 | **Tên Chức Năng** | Tự Động Gửi Email & Thông Báo Đẩy Nhắc Đóng Hội Phí Thường Niên Định Kỳ |
 | **Tác Nhân (Actor)** | Hệ thống Tự Động (Automation Service) & Ban Tài Chính |
 | **Tiền Điều Kiện (Pre-conditions)** | Hóa đơn hội phí đã phát hành và đến các mốc nhắc nợ (còn 15 ngày, còn 3 ngày, ngày hết hạn). |
-| **Luồng Xử Lý Chính (Main Flow)** | 1. Hệ thống tự động rà soát danh sách các Học viên chưa hoàn thành hội phí theo lịch trình.<br>2. Tự động kích hoạt gửi Email Nhắc Đóng Phí lịch sự, sang trọng đến hòm thư Học viên: vupv090120@gmail.com.<br>3. Gửi Thông Báo Đẩy trực tiếp lên màn hình điện thoại Học viên: "Kính mời Doanh nhân Phạm Văn Vũ hoàn tất Hội phí thường niên để duy trì đầy đủ đặc quyền kết nối giao thương".<br>4. Bấm vào thông báo sẽ mở ngay màn hình quét mã QR ngân hàng thanh toán 1 chạm. |
+| **Luồng Xử Lý Chính (Main Flow)** | 1. Hệ thống tự động rà soát danh sách các Học viên chưa hoàn thành hội phí theo lịch trình.<br>2. Tự động kích hoạt gửi Email Nhắc Đóng Phí lịch sự, sang trọng đến hòm thư Học viên: vupv090120@gmail.com.<br>3. Gửi Thông Báo Đẩy trực tiếp lên màn hình điện thoại Học viên: "Kính mời Doanh nhân Phạm Văn Vũ hoàn tất Hội phí thường niên để duy trì đầy đủ đặc quyền kết nối giao thương".<br>4. Bấm vào thông báo sẽ mở ngay màn hình quét mã VietQR thanh toán 1 chạm. |
 | **Luồng Thay Thế / Ngoại Lệ (Alternative Flows)** | - Khi Học viên hoàn tất thanh toán: Hệ thống tự động hủy toàn bộ các lịch nhắc nợ tiếp theo. |
 | **Hậu Điều Kiện (Post-conditions)** | Tỷ lệ thu hội phí đạt trên 95% mà Ban Thư Ký không phải gọi điện đòi nợ thủ công phiền hà. |
-| **Hình Ảnh Minh Chứng Thực Tế** | *Thông báo nhắc nhở đóng hội phí thường niên và nút thanh toán Mã QR Ngân Hàng trên ứng dụng* |
+| **Hình Ảnh Minh Chứng Thực Tế** | *Thông báo nhắc nhở đóng hội phí thường niên và nút thanh toán VietQR trên ứng dụng* |
 
-![Thông báo nhắc nhở đóng hội phí thường niên và nút thanh toán Mã QR Ngân Hàng trên ứng dụng](images/evidence/app_step_20_annual_fee_renewal.png)
+![Thông báo nhắc nhở đóng hội phí thường niên và nút thanh toán VietQR trên ứng dụng](images/evidence/app_step_20_annual_fee_renewal.png)
 
 
 ### 5.52. Bảng Use Case UC-CRM-42: Quản Lý Sổ Quỹ Thu: Ghi Nhận Toàn Bộ Các Nguồn Thu Hội Phí, Tài Trợ & Sự Kiện
@@ -951,12 +950,12 @@ Dưới đây là bảng đặc tả chi tiết toàn bộ 138 Use Cases bao ph�
 | **Tên Chức Năng** | Quản Lý Sổ Quỹ Thu: Ghi Nhận Toàn Bộ Các Nguồn Thu Hội Phí, Tài Trợ & Sự Kiện |
 | **Tác Nhân (Actor)** | Ban Tài Chính, Kế Toán CLB |
 | **Tiền Điều Kiện (Pre-conditions)** | Người dùng truy cập phân hệ Sổ Quỹ Thu trên Cổng Quản trị. |
-| **Luồng Xử Lý Chính (Main Flow)** | 1. Người dùng mở mục "Sổ Quỹ Thu" (Income Ledger).<br>2. Hệ thống hiển thị toàn bộ các phiếu thu được phân loại nguồn rõ ràng:<br>   - Thu Hội phí thường niên (Tự động gạch nợ từ Mã QR Ngân Hàng)<br>   - Thu Tài trợ từ các Doanh nghiệp Nhà Tài Trợ<br>   - Thu Tiền vé sự kiện Gala và các khóa đào tạo<br>   - Thu Đóng góp ủng hộ Quỹ Thiện nguyện.<br>3. Người dùng có thể lập phiếu thu thủ công cho các khoản đóng góp trực tiếp.<br>4. Mỗi phiếu thu đều có mã phiếu, ngày thu, người nộp, số tiền và đính kèm ủy nhiệm chi/chứng từ kế toán. |
+| **Luồng Xử Lý Chính (Main Flow)** | 1. Người dùng mở mục "Sổ Quỹ Thu" (Income Ledger).<br>2. Hệ thống hiển thị toàn bộ các phiếu thu được phân loại nguồn rõ ràng:<br>   - Thu Hội phí thường niên (Tự động gạch nợ từ VietQR)<br>   - Thu Tài trợ từ các Doanh nghiệp Nhà Tài Trợ<br>   - Thu Tiền vé sự kiện Gala và các khóa đào tạo<br>   - Thu Đóng góp ủng hộ Quỹ Thiện nguyện.<br>3. Người dùng có thể lập phiếu thu thủ công cho các khoản đóng góp trực tiếp.<br>4. Mỗi phiếu thu đều có mã phiếu, ngày thu, người nộp, số tiền và đính kèm ủy nhiệm chi/chứng từ kế toán. |
 | **Luồng Thay Thế / Ngoại Lệ (Alternative Flows)** | - Nếu cần hủy phiếu thu lập sai: Người dùng nhập lý do hủy và yêu cầu Trưởng Ban Tài Chính phê duyệt. |
 | **Hậu Điều Kiện (Post-conditions)** | Dòng tiền thu vào của tổ chức được ghi nhận chính xác, chống thất thoát tuyệt đối. |
 | **Hình Ảnh Minh Chứng Thực Tế** | *Sổ quỹ Thu ghi nhận toàn diện các nguồn thu hội phí, tài trợ và sự kiện CLB* |
 
-![Sổ quỹ Thu ghi nhận toàn diện các nguồn thu hội phí, tài trợ và sự kiện CLB](images/evidence/crm_hn10_12_income_management.png)
+![Sổ quỹ Thu ghi nhận toàn diện các nguồn thu hội phí, tài trợ và sự kiện CLB](images/evidence/crm1983_12_income_management.png)
 
 
 ### 5.53. Bảng Use Case UC-CRM-43: Quản Lý Sổ Quỹ Chi: Lập Phiếu Đề Nghị Thanh Toán & Quy Trình Duyệt Chi Minh Bạch
@@ -973,7 +972,7 @@ Dưới đây là bảng đặc tả chi tiết toàn bộ 138 Use Cases bao ph�
 | **Hậu Điều Kiện (Post-conditions)** | Mọi đồng tiền chi tiêu đều được kiểm soát qua quy trình 3 cấp chặt chẽ, đúng quy chế tài chính. |
 | **Hình Ảnh Minh Chứng Thực Tế** | *Sổ quỹ Chi và quy trình kiểm duyệt đề nghị thanh toán minh bạch của Ban Lãnh Đạo* |
 
-![Sổ quỹ Chi và quy trình kiểm duyệt đề nghị thanh toán minh bạch của Ban Lãnh Đạo](images/evidence/crm_hn10_13_expenses_management.png)
+![Sổ quỹ Chi và quy trình kiểm duyệt đề nghị thanh toán minh bạch của Ban Lãnh Đạo](images/evidence/crm1983_13_expenses_management.png)
 
 
 ### 5.54. Bảng Use Case UC-CRM-44: Quản Trị Riêng Biệt & Công Khai Quỹ An Sinh Xã Hội & Thiện Nguyện (Độc Quyền Ban Thiện Nguyện)
@@ -985,7 +984,7 @@ Dưới đây là bảng đặc tả chi tiết toàn bộ 138 Use Cases bao ph�
 | **Tên Chức Năng** | Quản Trị Riêng Biệt & Công Khai Quỹ An Sinh Xã Hội & Thiện Nguyện (Độc Quyền Ban Thiện Nguyện) |
 | **Tác Nhân (Actor)** | Ban Thiện Nguyện (ceo.thiennguyen@ceohn10.com) |
 | **Tiền Điều Kiện (Pre-conditions)** | Tài khoản Ban Thiện Nguyện đăng nhập Cổng Quản trị. |
-| **Luồng Xử Lý Chính (Main Flow)** | 1. Cán bộ Ban Thiện Nguyện mở phân hệ "Quỹ An Sinh Xã Hội & Thiện Nguyện".<br>2. Hệ thống tách biệt hoàn toàn dòng tiền Thiện nguyện với dòng tiền Quỹ vận hành hành chính.<br>3. Theo dõi danh sách các nhà hảo tâm, Học viên ủng hộ cho các chiến dịch:<br>   - Chiến dịch "Xây Cầu Dân Sinh Vùng Cao HN10"<br>   - Chiến dịch "Áo Ấm Mùa Đông Cho Em"<br>   - Hoạt động Thăm hỏi Học viên ốm đau, hiếu hỉ.<br>4. Lập kế hoạch giải ngân, cập nhật nhật ký chi tiêu thực tế đến từng đồng kèm hóa đơn, hình ảnh trao quà tại địa phương.<br>5. Xuất bản báo cáo sao kê thiện nguyện minh bạch lên Bảng tin CLB để toàn thể Học viên cùng theo dõi. |
+| **Luồng Xử Lý Chính (Main Flow)** | 1. Cán bộ Ban Thiện Nguyện mở phân hệ "Quỹ An Sinh Xã Hội & Thiện Nguyện".<br>2. Hệ thống tách biệt hoàn toàn dòng tiền Thiện nguyện với dòng tiền Quỹ vận hành hành chính.<br>3. Theo dõi danh sách các nhà hảo tâm, Học viên ủng hộ cho các chiến dịch:<br>   - Chiến dịch "Xây Cầu Dân Sinh Vùng Cao 1983"<br>   - Chiến dịch "Áo Ấm Mùa Đông Cho Em"<br>   - Hoạt động Thăm hỏi Học viên ốm đau, hiếu hỉ.<br>4. Lập kế hoạch giải ngân, cập nhật nhật ký chi tiêu thực tế đến từng đồng kèm hóa đơn, hình ảnh trao quà tại địa phương.<br>5. Xuất bản báo cáo sao kê thiện nguyện minh bạch lên Bảng tin CLB để toàn thể Học viên cùng theo dõi. |
 | **Luồng Thay Thế / Ngoại Lệ (Alternative Flows)** | - Bất kỳ ai cũng có thể tra cứu sao kê quỹ thiện nguyện để bảo đảm tính liêm chính cao nhất của tổ chức. |
 | **Hậu Điều Kiện (Post-conditions)** | Quỹ Thiện nguyện được vận hành mẫu mực, củng cố niềm tin yêu của cộng đồng đối với thương hiệu CEO HN10. |
 | **Hình Ảnh Minh Chứng Thực Tế** | *Giao diện quản lý Quỹ An Sinh Xã Hội và Thiện Nguyện độc quyền của Ban Thiện Nguyện* |
@@ -1007,7 +1006,7 @@ Dưới đây là bảng đặc tả chi tiết toàn bộ 138 Use Cases bao ph�
 | **Hậu Điều Kiện (Post-conditions)** | Ban Lãnh đạo nắm vững sức khỏe tài chính của tổ chức, phục vụ phát triển bền vững. |
 | **Hình Ảnh Minh Chứng Thực Tế** | *Báo cáo tài chính tổng hợp cân đối thu chi và số dư quỹ tiền mặt thời gian thực* |
 
-![Báo cáo tài chính tổng hợp cân đối thu chi và số dư quỹ tiền mặt thời gian thực](images/evidence/crm_hn10_14_finance_report.png)
+![Báo cáo tài chính tổng hợp cân đối thu chi và số dư quỹ tiền mặt thời gian thực](images/evidence/crm1983_14_finance_report.png)
 
 
 ### 5.56. Bảng Use Case UC-CRM-46: Thiết Lập Danh Mục Các Gói Tài Trợ Sự Kiện (Kim Cương, Vàng, Bạc, Đồng)
@@ -1024,7 +1023,7 @@ Dưới đây là bảng đặc tả chi tiết toàn bộ 138 Use Cases bao ph�
 | **Hậu Điều Kiện (Post-conditions)** | Hồ sơ mời tài trợ chuyên nghiệp sẵn sàng gửi đến các doanh nghiệp đối tác. |
 | **Hình Ảnh Minh Chứng Thực Tế** | *Giao diện thiết lập danh mục các gói tài trợ Kim Cương, Vàng, Bạc và quyền lợi* |
 
-![Giao diện thiết lập danh mục các gói tài trợ Kim Cương, Vàng, Bạc và quyền lợi](images/evidence/crm_hn10_15_sponsors_management.png)
+![Giao diện thiết lập danh mục các gói tài trợ Kim Cương, Vàng, Bạc và quyền lợi](images/evidence/crm1983_15_sponsors_management.png)
 
 
 ### 5.57. Bảng Use Case UC-CRM-47: Quản Lý Hồ Sơ Nhà Tài Trợ, Ký Kết Thỏa Thuận & Giám Sát Thực Hiện Quyền Lợi
@@ -1041,7 +1040,7 @@ Dưới đây là bảng đặc tả chi tiết toàn bộ 138 Use Cases bao ph�
 | **Hậu Điều Kiện (Post-conditions)** | Nhà tài trợ hài lòng tuyệt đối với sự chuyên nghiệp, uy tín của Ban Tổ Chức CLB CEO HN10. |
 | **Hình Ảnh Minh Chứng Thực Tế** | *Bảng theo dõi và giám sát thực hiện cam kết quyền lợi dành cho Nhà tài trợ* |
 
-![Bảng theo dõi và giám sát thực hiện cam kết quyền lợi dành cho Nhà tài trợ](images/evidence/crm_hn10_16_benefits_perks.png)
+![Bảng theo dõi và giám sát thực hiện cam kết quyền lợi dành cho Nhà tài trợ](images/evidence/crm1983_16_benefits_perks.png)
 
 
 ### 5.58. Bảng Use Case UC-CRM-48: Khởi Tạo Nhiệm Vụ Mới, Phân Công Ban Chuyên Môn & Gán Nhân Sự Chịu Trách Nhiệm
@@ -1053,7 +1052,7 @@ Dưới đây là bảng đặc tả chi tiết toàn bộ 138 Use Cases bao ph�
 | **Tên Chức Năng** | Khởi Tạo Nhiệm Vụ Mới, Phân Công Ban Chuyên Môn & Gán Nhân Sự Chịu Trách Nhiệm |
 | **Tác Nhân (Actor)** | Chủ Tịch CLB, Ban Thư Ký, Trưởng Các Ban |
 | **Tiền Điều Kiện (Pre-conditions)** | Có công việc phát sinh từ Nghị quyết Ban Chấp Hành cần phân công triển khai. |
-| **Luồng Xử Lý Chính (Main Flow)** | 1. Người dùng truy cập phân hệ "Quản Lý Nhiệm Vụ", chọn "Giao Việc Mới".<br>2. Điền thông tin nhiệm vụ:<br>   - Tên công việc: "Thiết kế Bộ nhận diện thương hiệu & In ấn kỷ yếu Gala HN10"<br>   - Ban chuyên môn phụ trách: Ban Truyền Thông<br>   - Nhân sự chịu trách nhiệm chính (Assignee)<br>   - Mức độ ưu tiên: Khẩn cấp / Cao / Bình thường<br>   - Hạn chót hoàn thành (Deadline)<br>   - Danh sách các công việc con cần làm (Subtasks checklist).<br>3. Đính kèm tài liệu yêu cầu chi tiết.<br>4. Bấm "Phát Lệnh Giao Việc".<br>5. Hệ thống lập tức bắn thông báo In-app và gửi email giao việc đến nhân sự được phân công. |
+| **Luồng Xử Lý Chính (Main Flow)** | 1. Người dùng truy cập phân hệ "Quản Lý Nhiệm Vụ", chọn "Giao Việc Mới".<br>2. Điền thông tin nhiệm vụ:<br>   - Tên công việc: "Thiết kế Bộ nhận diện thương hiệu & In ấn kỷ yếu Gala 1983"<br>   - Ban chuyên môn phụ trách: Ban Truyền Thông<br>   - Nhân sự chịu trách nhiệm chính (Assignee)<br>   - Mức độ ưu tiên: Khẩn cấp / Cao / Bình thường<br>   - Hạn chót hoàn thành (Deadline)<br>   - Danh sách các công việc con cần làm (Subtasks checklist).<br>3. Đính kèm tài liệu yêu cầu chi tiết.<br>4. Bấm "Phát Lệnh Giao Việc".<br>5. Hệ thống lập tức bắn thông báo In-app và gửi email giao việc đến nhân sự được phân công. |
 | **Luồng Thay Thế / Ngoại Lệ (Alternative Flows)** | - Có thể gán nhiều người cùng phối hợp thực hiện một nhiệm vụ lớn. |
 | **Hậu Điều Kiện (Post-conditions)** | Nhiệm vụ được phân công rõ người, rõ việc, rõ tiến độ, không đùn đẩy trách nhiệm. |
 | **Hình Ảnh Minh Chứng Thực Tế** | *Biểu mẫu khởi tạo và phân công nhiệm vụ chuyên môn cho các Ban trên Cổng Quản trị* |
@@ -1146,18 +1145,18 @@ Dưới đây là bảng đặc tả chi tiết toàn bộ 138 Use Cases bao ph�
 ![Hệ thống giám sát và điều phối luồng cơ hội kết nối Cung - Cầu doanh nghiệp](images/evidence/crm_11_opportunities_sync.png)
 
 
-### 5.64. Bảng Use Case UC-CRM-54: Trung Tâm Thống Kê Chuyên Sâu 5 Danh Mục, Biểu Đồ Cột Đường Đỉnh Top Avatar & Xuất Báo Cáo A4/Excel (CRM & Mobile Sync)
+### 5.64. Bảng Use Case UC-CRM-54: Thống Kê Doanh Số Giao Thương Nội Bộ & Đo Lường Giá Trị Trao Nhận Giữa Các Thành Viên
 
 | Thuộc Tính Nghiệp Vụ | Nội Dung Đặc Tả Chi Tiết |
 | :--- | :--- |
 | **Mã Use Case (ID)** | **UC-CRM-54** |
-| **Phân Hệ / Nhóm** | Thống Kê Báo Cáo & Vinh Danh |
-| **Tên Chức Năng** | Trung Tâm Thống Kê Chuyên Sâu 5 Danh Mục, Biểu Đồ Cột Đường Đỉnh Top Avatar & Xuất Báo Cáo A4/Excel |
-| **Tác Nhân (Actor)** | Chủ tịch Hiệp hội, Ban Điều Hành, Ban Xúc Tiến Thương Mại, Kế toán |
-| **Tiền Điều Kiện (Pre-conditions)** | Người dùng đăng nhập Cổng Quản Trị CRM và mở mục "Thống kê CLB" (`/analytics`). |
-| **Luồng Xử Lý Chính (Main Flow)** | 1. Người dùng truy cập phân hệ Thống Kê (/analytics). Giao diện được tinh gọn hoàn toàn, loại bỏ các chi tiết thừa thãi phía trên, thay thế bằng **4 ô Thẻ KPI cốt lõi**:<br>   - **Thẻ 1: Tổng Cơ Hội Kết Nối**: Số lượng cơ hội kinh doanh đã phát sinh và lưu chuyển trong hệ sinh thái.<br>   - **Thẻ 2: Tổng Chi Tiêu & Doanh Số Giao Dịch**: Giá trị quy đổi thực tế các deal đã chốt thành công giữa các thành viên.<br>   - **Thẻ 3: Lượt Tương Tác & Tần Suất Trong App**: Tổng số lượt bình luận, thả tim, gửi tin nhắn và mở app hàng ngày.<br>   - **Thẻ 4: Sự Kiện & Hoạt Động Đang Diễn Ra**: Số lượng đại hội, diễn đàn, cuộc họp ban và lớp đào tạo đang hoạt động.<br>2. **Chuyển Đổi Linh Hoạt 5 Phân Loại Thống Kê Chuyên Sâu**:<br>   - *Danh mục 1: Cơ hội kết nối kinh doanh* (Phân tích cơ cấu Bên mua vs Bên bán, tiến độ chuyển đổi cơ hội).<br>   - *Danh mục 2: Thống kê các giao dịch đã chi tiêu* (Doanh số B2B thực tế, dòng tiền lưu chuyển nội bộ).<br>   - *Danh mục 3: Thống kê lượt tương tác, tần suất trong app* (Đo lường mức độ gắn kết Học viên qua từng khung giờ).<br>   - *Danh mục 4: Thống kê sự kiện & hoạt động đang diễn ra* (Tỷ lệ tham dự, check-in thực tế so với chỉ tiêu).<br>   - *Danh mục 5: Thống kê thành viên hoạt động nhiều nhất* (Xếp hạng tổng hợp dựa trên số lượt bình luận và số lượt đăng cơ hội chia sẻ).<br>3. **Biểu Đồ Biến Động Composed Bar + Line Độc Đáo**:<br>   - Sử dụng bảng màu tối giản 3 màu chủ đạo: Xanh thương hiệu - Trắng sứ - Đen tuyền (Obsidian/Slate).<br>   - Cột Bar thể hiện khối lượng dữ liệu thực tế của từng chu kỳ thời gian.<br>   - Đường kẻ Line biểu thị xu hướng biến động: **Đường màu xanh lá (`#10B981`)** thể hiện xu hướng tăng trưởng tích cực, **Đường màu đỏ (`#EF4444`)** thể hiện xu hướng sụt giảm cần lưu ý.<br>   - **Avatar Ghim Đỉnh**: Tại điểm cao nhất của đường biến động hoặc đỉnh của cột số liệu cao nhất, hệ thống tự động ghim **Avatar tròn viền vàng rực rỡ** của Doanh nhân đang dẫn đầu Top 1.<br>4. **Bục Vinh Danh Giải Thưởng Top 3 Nằm Chung 1 Hàng (Podium Award)**:<br>   - Bố trí ngay bên dưới biểu đồ theo định dạng bục giải thưởng thể thao danh giá nằm trên một hàng ngang duy nhất:<br>     + **Top 1 (Quán Quân)**: Nằm ở vị trí trung tâm, cột bục cao nhất với huy hiệu Vương miện Vàng Hoàng Gia.<br>     + **Top 2 (Á Quân 1)**: Nằm ở bên cạnh trái người Top 1, chiều cao bục nhì với huy chương Bạc.<br>     + **Top 3 (Á Quân 2)**: Nằm ở bên cạnh phải người Top 1, chiều cao bục ba với huy chương Đồng.<br>   - Hiển thị đầy đủ ảnh đại diện, họ tên doanh nhân, tên công ty và chỉ số đóng góp xuất sắc.<br>5. **Xuất Báo Cáo Chuẩn Hóa Đa Định Dạng**:<br>   - Người dùng bấm nút "Xuất Báo Cáo" để mở hộp thoại tùy chọn chuẩn hóa.<br>   - **In Báo Cáo Khổ A4**: Tự động dàn trang in tiêu chuẩn A4 bao gồm biểu đồ, bảng chỉ số và chữ ký xác nhận của Ban Chấp Hành.<br>   - **Xuất Bảng Tính Excel (`.xlsx`)**: Tải về tệp bảng tính Excel chi tiết từng dòng dữ liệu, sẵn sàng tích hợp vào báo cáo tài chính và báo cáo Đại hội. |
-| **Luồng Thay Thế / Ngoại Lệ (Alternative Flows)** | - Khi chưa có dữ liệu trong khoảng thời gian được lọc: Biểu đồ hiển thị đường xu hướng ổn định và bục vinh danh hiển thị trạng thái chờ tích lũy số liệu. |
-| **Hậu Điều Kiện (Post-conditions)** | Ban Chấp Hành và Học viên nắm bắt toàn diện bức tranh tăng trưởng và động lực thi đua trong toàn hiệp hội. |
+| **Phân Hệ / Nhóm** | Sàn Giao Thương B2B & Cơ Hội |
+| **Tên Chức Năng** | Thống Kê Doanh Số Giao Thương Nội Bộ & Đo Lường Giá Trị Trao Nhận Giữa Các Thành Viên |
+| **Tác Nhân (Actor)** | Ban Xúc Tiến Thương Mại, Ban Lãnh Đạo CLB |
+| **Tiền Điều Kiện (Pre-conditions)** | Các hợp đồng kinh tế giữa các Học viên được ký kết thành công. |
+| **Luồng Xử Lý Chính (Main Flow)** | 1. Người dùng mở mục "Thống Kê Doanh Số Giao Thương".<br>2. Màn hình báo cáo tổng kết giá trị kết nối:<br>   - Tổng số lượt trao đổi cơ hội kinh doanh (Leads)<br>   - Tổng số hợp đồng đã ký kết thành công<br>   - Tổng giá trị doanh thu giao thương nội bộ được ghi nhận (ví dụ: Hơn 150 tỷ VNĐ)<br>   - Bảng vinh danh các Doanh nhân tiên phong trao nhiều cơ hội nhất cho cộng đồng.<br>3. Xuất báo cáo biểu dương tại các kỳ Đại hội định kỳ của CLB. |
+| **Luồng Thay Thế / Ngoại Lệ (Alternative Flows)** | - Hệ thống bảo mật tuyệt đối các chi tiết hợp đồng nhạy cảm, chỉ hiển thị giá trị quy đổi phục vụ thi đua. |
+| **Hậu Điều Kiện (Post-conditions)** | Chứng minh hiệu quả thực tế và sức mạnh tương trợ của mạng lưới Doanh nhân CEO HN10. |
 | **Hình Ảnh Minh Chứng Thực Tế** | *Báo cáo thống kê giá trị giao thương nội bộ và bảng vinh danh kết nối kinh doanh* |
 
 ![Báo cáo thống kê giá trị giao thương nội bộ và bảng vinh danh kết nối kinh doanh](images/evidence/crm_step_09_opportunities_sync.png)
@@ -1206,12 +1205,12 @@ Dưới đây là bảng đặc tả chi tiết toàn bộ 138 Use Cases bao ph�
 | **Tên Chức Năng** | Tạo Chiến Dịch Email Truyền Thông / Thư Mời Sự Kiện Gửi Đến Toàn Thể Học viên Hàng Loạt |
 | **Tác Nhân (Actor)** | Ban Truyền Thông, Ban Thư Ký |
 | **Tiền Điều Kiện (Pre-conditions)** | Cần thông báo một sự kiện trọng đại đến hàng trăm Học viên cùng một thời điểm. |
-| **Luồng Xử Lý Chính (Main Flow)** | 1. Người dùng mở phân hệ "Chiến Dịch Email Marketing".<br>2. Bấm "Tạo Chiến Dịch Mới".<br>3. Nhập tiêu đề email thu hút: "THƯ MỜI THAM DỰ ĐÊM GALA DOANH NHÂN HN10 — KẾT NỐI KHÁT VỌNG".<br>4. Chọn mẫu giao diện email sang trọng với màu cờ sắc áo thương hiệu CEO HN10.<br>5. Chọn nhóm người nhận: "Toàn Thể Học viên Chính Thức".<br>6. Kiểm tra bản xem trước trên giao diện máy tính và điện thoại.<br>7. Bấm "Gửi Chiến Dịch".<br>8. Máy chủ thư tín tự động phân phối email lần lượt, bảo đảm tỷ lệ vào hộp thư chính (Inbox) đạt trên 98%. |
+| **Luồng Xử Lý Chính (Main Flow)** | 1. Người dùng mở phân hệ "Chiến Dịch Email Marketing".<br>2. Bấm "Tạo Chiến Dịch Mới".<br>3. Nhập tiêu đề email thu hút: "THƯ MỜI THAM DỰ ĐÊM GALA DOANH NHÂN 1983 — KẾT NỐI KHÁT VỌNG".<br>4. Chọn mẫu giao diện email sang trọng với màu cờ sắc áo thương hiệu CEO HN10.<br>5. Chọn nhóm người nhận: "Toàn Thể Học viên Chính Thức".<br>6. Kiểm tra bản xem trước trên giao diện máy tính và điện thoại.<br>7. Bấm "Gửi Chiến Dịch".<br>8. Máy chủ thư tín tự động phân phối email lần lượt, bảo đảm tỷ lệ vào hộp thư chính (Inbox) đạt trên 98%. |
 | **Luồng Thay Thế / Ngoại Lệ (Alternative Flows)** | - Có thể gửi email thử nghiệm (Test Email) đến hộp thư cá nhân để rà soát trước khi gửi diện rộng. |
 | **Hậu Điều Kiện (Post-conditions)** | Thông điệp đến tận tay toàn thể Học viên nhanh chóng, đồng bộ và chuyên nghiệp. |
 | **Hình Ảnh Minh Chứng Thực Tế** | *Giao diện thiết lập chiến dịch Email truyền thông hàng loạt đến toàn thể Học viên* |
 
-![Giao diện thiết lập chiến dịch Email truyền thông hàng loạt đến toàn thể Học viên](images/evidence/crm_hn10_19_email_marketing.png)
+![Giao diện thiết lập chiến dịch Email truyền thông hàng loạt đến toàn thể Học viên](images/evidence/crm1983_19_email_marketing.png)
 
 
 ### 5.68. Bảng Use Case UC-CRM-58: Theo Dõi Báo Cáo Hiệu Quả Chiến Dịch Email: Tỷ Lệ Gửi Thành Công, Tỷ Lệ Mở & Nhấp Chuột
@@ -1265,21 +1264,21 @@ Dưới đây là bảng đặc tả chi tiết toàn bộ 138 Use Cases bao ph�
 ![Nhật ký kiểm toán hệ thống ghi nhận chi tiết mọi hành vi can thiệp dữ liệu](images/evidence/crm_audit_logs.png)
 
 
-### 5.71. Bảng Use Case UC-CRM-61: Theme Studio Quản Trị Giao Diện, Tùy Biến 5 VIP Presets, Icon Picker 14 Tính Năng & Đồng Bộ CSS Mùa Lễ Hội (CRM & Mobile Sync)
+### 5.71. Bảng Use Case UC-CRM-61: Cấu Hình Giao Diện, Màu Sắc Thương Hiệu & Bộ Nhận Diện CLB Doanh Nhân CEO HN10
 
 | Thuộc Tính Nghiệp Vụ | Nội Dung Đặc Tả Chi Tiết |
 | :--- | :--- |
 | **Mã Use Case (ID)** | **UC-CRM-61** |
-| **Phân Hệ / Nhóm** | Quản Trị Hệ Thống & Theme Studio |
-| **Tên Chức Năng** | Theme Studio Quản Trị Giao Diện, Tùy Biến 5 VIP Presets, Icon Picker 14 Tính Năng & Đồng Bộ CSS Mùa Lễ Hội |
-| **Tác Nhân (Actor)** | Ban Quản Trị Tối Cao (Admin), Ban Truyền Thông |
-| **Tiền Điều Kiện (Pre-conditions)** | Ban Quản Trị đăng nhập Cổng Quản Trị và mở trang "Quản Trị Mẫu Giao Diện / Theme Studio" (`/admin/landing-templates`). |
-| **Luồng Xử Lý Chính (Main Flow)** | 1. Người dùng mở phân hệ Theme Studio (/admin/landing-templates).<br>2. **Tùy Biến Hình Nền Chủ Đề (Background Theme)**:<br>   - Tùy chọn tải lên tệp ảnh hình nền sự kiện hoặc nhập đường dẫn ảnh chất lượng cao (URL Image).<br>   - Lựa chọn nhanh từ **5 VIP Presets Mùa Lễ Hội Chuẩn Hóa**: Tết Nguyên Đán (Đỏ Vàng Rực Rỡ), Hội Nghị Thường Niên (Navy Cobalt Sang Trọng), Dạ Tiệc Gala (Vàng Kim Luxury), Caravan Giao Thương (Xanh Emerald Khởi Nghiệp), Thể Thao & Golf (Xanh Biển Năng Động).<br>3. **Bộ Chọn Biểu Tượng Tùy Biến Cho Toàn Bộ 14 Tính Năng (14 Action Icons Picker)**:<br>   - Cung cấp danh mục biểu tượng icon trực quan cho từng tính năng: Trang chủ, Thẻ Học viên, Danh bạ, Cơ hội, Thống kê, Gian hàng B2B, Sự kiện, Biểu quyết, Mạng lưới, Tin nhắn, Cá nhân, Cài đặt, Đặc quyền ưu đãi, Đào tạo.<br>   - Quản trị viên dễ dàng nhấp chọn icon thay thế linh hoạt cho từng mùa chiến dịch mà không cần can thiệp mã nguồn.<br>4. **Khung Xem Trước Trực Quan Thời Gian Thực (Live Mobile Preview Frame)**:<br>   - Tích hợp khung mô phỏng màn hình điện thoại thông minh (iPhone/Android mockup) ngay bên phải màn hình quản trị.<br>   - Mọi thay đổi về màu sắc, hình nền, biểu tượng đều được phản ánh ngay lập tức trên màn hình mockup.<br>5. **Lưu & Phát Hành Đồng Bộ Toàn Hệ Thống (Publish Theme)**:<br>   - Bấm nút "Lưu Cấu Hình & Áp Dụng Theme". Hệ thống ghi nhận cấu hình và tự động kích hoạt biến CSS toàn cục `--festival-bg-image` trên toàn bộ ứng dụng di động.<br>   - Cả màn hình Trang Chủ (`/association`) và Mạng Lưới Feed (`/association/messages`) của App Mobile lập tức hiển thị lớp nền chủ đề rực rỡ và thẻ trạng thái đồng bộ thời gian thực. |
-| **Luồng Thay Thế / Ngoại Lệ (Alternative Flows)** | - Quản trị viên có thể bấm "Khôi Phục Chủ Đề Mặc Định" để trở về phong cách Deep Navy & Amber Gold nguyên bản bất cứ lúc nào. |
-| **Hậu Điều Kiện (Post-conditions)** | Toàn bộ giao diện Mobile App và Cổng Quản Trị được khoác lên diện mạo mới đồng bộ, sống động và đẳng cấp theo từng mùa sự kiện. |
-| **Hình Ảnh Minh Chứng Thực Tế** | *Giao diện Theme Studio quản trị chủ đề lễ hội, bộ chọn icon 14 tính năng và mô phỏng điện thoại trực tiếp* |
+| **Phân Hệ / Nhóm** | Phân Quyền RBAC & Kiểm Toán |
+| **Tên Chức Năng** | Cấu Hình Giao Diện, Màu Sắc Thương Hiệu & Bộ Nhận Diện CLB Doanh Nhân CEO HN10 |
+| **Tác Nhân (Actor)** | Ban Quản Trị Tối Cao |
+| **Tiền Điều Kiện (Pre-conditions)** | Ban Điều Hành quyết định thay đổi phong cách giao diện hoặc chủ đề kỷ niệm năm. |
+| **Luồng Xử Lý Chính (Main Flow)** | 1. Người dùng mở mục "Cấu Hình Nhận Diện Thương Hiệu" (Theme Settings).<br>2. Tùy chỉnh các thông số thiết kế:<br>   - Màu sắc chủ đạo: Xanh Hoàng Gia (Royal Navy), Vàng Kim (Luxury Gold)<br>   - Tải lên Logo chính thức CLB Doanh Nhân CEO HN10 và Logo Hội HanoiBA<br>   - Phông chữ tiêu đề và nội dung chuẩn văn phòng<br>   - Khẩu hiệu chính thức và thông tin bản quyền chân trang.<br>3. Bấm "Áp Dụng Toàn Hệ Thống".<br>4. Toàn bộ Cổng Quản trị, Cổng Thông tin và Ứng dụng điện thoại tự động đồng bộ diện mạo mới. |
+| **Luồng Thay Thế / Ngoại Lệ (Alternative Flows)** | - Có thể chọn các giao diện chủ đề có sẵn: Giao diện Hội nghị, Giao diện Tết Cổ Truyền, Giao diện Gala. |
+| **Hậu Điều Kiện (Post-conditions)** | Hình ảnh thương hiệu CLB Doanh Nhân CEO HN10 luôn nhất quán và đẳng cấp. |
+| **Hình Ảnh Minh Chứng Thực Tế** | *Giao diện cấu hình bộ nhận diện thương hiệu và phong cách giao diện hệ thống* |
 
-![Giao diện Theme Studio quản trị chủ đề lễ hội, bộ chọn icon 14 tính năng và mô phỏng điện thoại trực tiếp](images/evidence/crm_theme_management.png)
+![Giao diện cấu hình bộ nhận diện thương hiệu và phong cách giao diện hệ thống](images/evidence/crm_theme_management.png)
 
 
 ### 5.72. Bảng Use Case UC-CRM-62: Quản Lý Kho Tài Liệu Pháp Lý, Quy Chế Hiệp Hội & Văn Bản Điều Hành Điện Tử
@@ -1313,7 +1312,7 @@ Dưới đây là bảng đặc tả chi tiết toàn bộ 138 Use Cases bao ph�
 | **Hậu Điều Kiện (Post-conditions)** | Lịch họp Ban Chấp Hành được phát hành chính thức, đại biểu nhận thông báo tức thời. |
 | **Hình Ảnh Minh Chứng Thực Tế** | *Lịch họp Ban Chấp Hành và quản trị phiên họp điều hành tập trung* |
 
-![Lịch họp Ban Chấp Hành và quản trị phiên họp điều hành tập trung](images/evidence/crm_hn10_09_meetings_calendar.png)
+![Lịch họp Ban Chấp Hành và quản trị phiên họp điều hành tập trung](images/evidence/crm1983_09_meetings_calendar.png)
 
 
 ### 5.74. Bảng Use Case UC-CRM-64: Điểm Danh Đại Biểu Dự Họp Ban Chấp Hành & Xuất Biên Bản Biểu Quyết Tự Động
@@ -1359,12 +1358,12 @@ Dưới đây là bảng đặc tả chi tiết toàn bộ 138 Use Cases bao ph�
 | **Tên Chức Năng** | Minh Bạch Danh Sách Đóng Góp Quỹ Thiện Nguyện Thời Gian Thực & Tự Động Xuất Thư Tri Ân |
 | **Tác Nhân (Actor)** | Ban Thiện Nguyện, Ban Tài Chính |
 | **Tiền Điều Kiện (Pre-conditions)** | Các nhà hảo tâm và doanh nghiệp thành viên thực hiện chuyển khoản ủng hộ. |
-| **Luồng Xử Lý Chính (Main Flow)** | 1. Hệ thống tự động bắt tín hiệu giao dịch ngân hàng qua cổng thanh toán QR ngân hàng 24/7 đối với các khoản ủng hộ Quỹ Thiện Nguyện.<br>2. Danh sách ủng hộ tự động cập nhật tên doanh nhân/doanh nghiệp, số tiền và lời nhắn trên Bảng vàng nhân ái.<br>3. Ban Thiện Nguyện kiểm tra đối soát từng khoản đóng góp.<br>4. Nhấn nút "Gửi Thư Tri Ân Tấm Lòng Vàng".<br>5. Hệ thống tự động phát thư cảm ơn trang trọng kèm Giấy chứng nhận đóng góp an sinh xã hội điện tử gửi về email người ủng hộ. |
+| **Luồng Xử Lý Chính (Main Flow)** | 1. Hệ thống tự động bắt tín hiệu giao dịch ngân hàng qua cổng VietQR 24/7 đối với các khoản ủng hộ Quỹ Thiện Nguyện.<br>2. Danh sách ủng hộ tự động cập nhật tên doanh nhân/doanh nghiệp, số tiền và lời nhắn trên Bảng vàng nhân ái.<br>3. Ban Thiện Nguyện kiểm tra đối soát từng khoản đóng góp.<br>4. Nhấn nút "Gửi Thư Tri Ân Tấm Lòng Vàng".<br>5. Hệ thống tự động phát thư cảm ơn trang trọng kèm Giấy chứng nhận đóng góp an sinh xã hội điện tử gửi về email người ủng hộ. |
 | **Luồng Thay Thế / Ngoại Lệ (Alternative Flows)** | - Trường hợp nhà hảo tâm muốn ẩn danh: Hệ thống tự động ghi nhận là "Doanh nhân hảo tâm ẩn danh" trên bảng công khai nhưng vẫn lưu trữ mã đối soát trong sổ quỹ. |
 | **Hậu Điều Kiện (Post-conditions)** | Quỹ thiện nguyện đạt tính minh bạch 100%, tạo dựng niềm tin tuyệt đối trong cộng đồng. |
 | **Hình Ảnh Minh Chứng Thực Tế** | *Báo cáo minh bạch dòng tiền ủng hộ và sao kê tài chính Quỹ Thiện Nguyện* |
 
-![Báo cáo minh bạch dòng tiền ủng hộ và sao kê tài chính Quỹ Thiện Nguyện](images/evidence/crm_hn10_14_finance_report.png)
+![Báo cáo minh bạch dòng tiền ủng hộ và sao kê tài chính Quỹ Thiện Nguyện](images/evidence/crm1983_14_finance_report.png)
 
 
 ### 5.77. Bảng Use Case UC-CRM-67: Theo Dõi Đối Soát Giải Ngân Chi Tiết Cho Hoạt Động Thiện Nguyện Thực Tế Kèm Chứng Từ Hóa Đơn
@@ -1381,7 +1380,7 @@ Dưới đây là bảng đặc tả chi tiết toàn bộ 138 Use Cases bao ph�
 | **Hậu Điều Kiện (Post-conditions)** | Hồ sơ giải ngân thiện nguyện được số hóa đầy đủ chứng từ pháp lý và minh bạch tuyệt đối. |
 | **Hình Ảnh Minh Chứng Thực Tế** | *Quản lý phiếu chi, đối soát chứng từ và giải ngân các hoạt động thiện nguyện thực tế* |
 
-![Quản lý phiếu chi, đối soát chứng từ và giải ngân các hoạt động thiện nguyện thực tế](images/evidence/crm_hn10_13_expenses_management.png)
+![Quản lý phiếu chi, đối soát chứng từ và giải ngân các hoạt động thiện nguyện thực tế](images/evidence/crm1983_13_expenses_management.png)
 
 
 ### 5.78. Bảng Use Case UC-CRM-68: Phê Duyệt & Thẩm Định Gian Hàng B2B Doanh Nghiệp Thành Viên Trên Sàn Giao Thương CEO HN10
@@ -1410,7 +1409,7 @@ Dưới đây là bảng đặc tả chi tiết toàn bộ 138 Use Cases bao ph�
 | **Tên Chức Năng** | Thẩm Định Nhu Cầu Mua Hàng & Khớp Lệnh Giao Thương Nội Bộ B2B Tự Động Giữa Các Học viên |
 | **Tác Nhân (Actor)** | Ban Xúc Tiến Thương Mại |
 | **Tiền Điều Kiện (Pre-conditions)** | Có Học viên đăng tải nhu cầu tìm nhà cung cấp hoặc cơ hội hợp tác kinh doanh. |
-| **Luồng Xử Lý Chính (Main Flow)** | 1. Ban Xúc Tiến hoặc Học viên mở bảng điều khiển "Khớp Lệnh Cung - Cầu & Trao Cơ Hội".<br>2. Hệ thống hiển thị các tin đăng và cơ hội kinh doanh: Tìm đối tác thầu phụ, cung cấp trang thiết bị, giải pháp tài chính, hợp tác logistics.<br>3. Ban Xúc Tiến kiểm tra nhu cầu và hỗ trợ điều phối: Cho phép lựa chọn Trao cơ hội tới một đối tác đơn lẻ, hoặc Trao cơ hội đa đối tượng (chọn đồng thời nhiều Học viên cùng ngành), hoặc Trao cơ hội theo Ban chuyên môn để toàn bộ các thành viên trong ban cùng phối hợp nghiên cứu, xúc tiến.<br>4. Bấm nút "Chia Sẻ & Kết Nối Cơ Hội".<br>5. Hệ thống gửi thông điệp kết nối giao thương trực tiếp đến lãnh đạo của các doanh nghiệp được chỉ định qua thông báo ứng dụng.<br>6. Ban Xúc Tiến theo dõi tiến độ thương thảo và ghi nhận kết quả chốt deal thực tế. |
+| **Luồng Xử Lý Chính (Main Flow)** | 1. Ban Xúc Tiến mở bảng điều khiển "Khớp Lệnh Cung - Cầu".<br>2. Hệ thống hiển thị các tin đăng: Cần tìm nhà thầu xây dựng văn phòng, Cần nguồn cung cấp thiết bị công nghệ, Cần hợp tác logistics.<br>3. Chuyên viên Ban Xúc Tiến kiểm tra nhu cầu và sử dụng tính năng "Gợi Ý Đối Tác Phù Hợp" dựa trên danh bạ ngành nghề của các Học viên chính thức.<br>4. Bấm nút "Kết Nối Khớp Lệnh 1-1".<br>5. Hệ thống gửi thông điệp kết nối giao thương trực tiếp đến lãnh đạo của hai doanh nghiệp qua tin nhắn ứng dụng. |
 | **Luồng Thay Thế / Ngoại Lệ (Alternative Flows)** | - Ban Xúc Tiến có thể tổ chức buổi gặp gỡ trực tiếp (Business Matching Offline) tại văn phòng CLB để hỗ trợ hai bên ký kết hợp đồng. |
 | **Hậu Điều Kiện (Post-conditions)** | Cơ hội kinh doanh được kết nối chuẩn xác, gia tăng doanh số thực tế giữa các doanh nghiệp thành viên. |
 | **Hình Ảnh Minh Chứng Thực Tế** | *Điều phối cơ hội cung - cầu và hỗ trợ kết nối khớp lệnh giao thương nội bộ* |
@@ -1432,19 +1431,19 @@ Dưới đây là bảng đặc tả chi tiết toàn bộ 138 Use Cases bao ph�
 | **Hậu Điều Kiện (Post-conditions)** | Số liệu giao thương nội bộ được lượng hóa rõ ràng, khẳng định giá trị thực chất của CLB Doanh Nhân CEO HN10. |
 | **Hình Ảnh Minh Chứng Thực Tế** | *Báo cáo tổng hợp số liệu giao dịch và hiệu quả giao thương nội bộ B2B* |
 
-![Báo cáo tổng hợp số liệu giao dịch và hiệu quả giao thương nội bộ B2B](images/evidence/crm_hn10_17_marketplace_b2b.png)
+![Báo cáo tổng hợp số liệu giao dịch và hiệu quả giao thương nội bộ B2B](images/evidence/crm1983_17_marketplace_b2b.png)
 
 
-### 5.81. Bảng Use Case UC-CRM-71: Biên Tập Bản Tin Nội Bộ "Bản Tin Doanh Nhân CEO HN10" & Xuất Bản Lên Cổng Thông Tin
+### 5.81. Bảng Use Case UC-CRM-71: Biên Tập Bản Tin Nội Bộ "Tiếng Nói Doanh Nhân 1983" & Xuất Bản Lên Cổng Thông Tin
 
 | Thuộc Tính Nghiệp Vụ | Nội Dung Đặc Tả Chi Tiết |
 | :--- | :--- |
 | **Mã Use Case (ID)** | **UC-CRM-71** |
 | **Phân Hệ / Nhóm** | Ban Truyền Thông |
-| **Tên Chức Năng** | Biên Tập Bản Tin Nội Bộ "Bản Tin Doanh Nhân CEO HN10" & Xuất Bản Lên Cổng Thông Tin |
+| **Tên Chức Năng** | Biên Tập Bản Tin Nội Bộ "Tiếng Nói Doanh Nhân 1983" & Xuất Bản Lên Cổng Thông Tin |
 | **Tác Nhân (Actor)** | Ban Truyền Thông |
 | **Tiền Điều Kiện (Pre-conditions)** | Ban Truyền Thông chuẩn bị bài viết về doanh nhân tiêu biểu hoặc hoạt động của CLB. |
-| **Luồng Xử Lý Chính (Main Flow)** | 1. Ban Truyền Thông mở phân hệ "Quản Trị Tin Tức & Truyền Thông" trên Cổng Quản Trị.<br>2. Nhấn nút "Viết Bài Mới".<br>3. Trình soạn thảo văn bản đa phương tiện hiển thị: Nhập Tiêu đề, Tóm tắt bài viết, Nội dung chi tiết, Hình ảnh minh họa chất lượng cao và Video phóng sự đính kèm.<br>4. Chọn chuyên mục: "Gương Mặt Doanh Nhân CEO HN10" hoặc "Hoạt Động CLB & HanoiBA".<br>5. Nhấn nút "Xuất Bản Bản Tin".<br>6. Bài viết lập tức hiển thị trên Cổng thông tin điện tử và mục Tin Tức của Ứng dụng Học viên. |
+| **Luồng Xử Lý Chính (Main Flow)** | 1. Ban Truyền Thông mở phân hệ "Quản Trị Tin Tức & Truyền Thông" trên Cổng Quản Trị.<br>2. Nhấn nút "Viết Bài Mới".<br>3. Trình soạn thảo văn bản đa phương tiện hiển thị: Nhập Tiêu đề, Tóm tắt bài viết, Nội dung chi tiết, Hình ảnh minh họa chất lượng cao và Video phóng sự đính kèm.<br>4. Chọn chuyên mục: "Gương Mặt Doanh Nhân 1983" hoặc "Hoạt Động CLB & HanoiBA".<br>5. Nhấn nút "Xuất Bản Bản Tin".<br>6. Bài viết lập tức hiển thị trên Cổng thông tin điện tử và mục Tin Tức của Ứng dụng Học viên. |
 | **Luồng Thay Thế / Ngoại Lệ (Alternative Flows)** | - Bài viết có thể được lưu ở trạng thái "Bản nháp" để Trưởng Ban Truyền Thông kiểm duyệt trước khi phát hành. |
 | **Hậu Điều Kiện (Post-conditions)** | Thông tin hoạt động và hình ảnh doanh nhân thành viên được lan tỏa rộng rãi, nâng tầm thương hiệu CLB. |
 | **Hình Ảnh Minh Chứng Thực Tế** | *Phân hệ quản trị tin tức, sự kiện và xuất bản bản tin của Ban Truyền Thông* |
@@ -1466,7 +1465,7 @@ Dưới đây là bảng đặc tả chi tiết toàn bộ 138 Use Cases bao ph�
 | **Hậu Điều Kiện (Post-conditions)** | Quyền lợi truyền thông của các Nhà tài trợ được đảm bảo thực hiện chính xác, chuyên nghiệp. |
 | **Hình Ảnh Minh Chứng Thực Tế** | *Quản trị danh mục tin tức, thông báo và điều phối banner truyền thông tài trợ* |
 
-![Quản trị danh mục tin tức, thông báo và điều phối banner truyền thông tài trợ](images/evidence/crm_hn10_18_news_announcements.png)
+![Quản trị danh mục tin tức, thông báo và điều phối banner truyền thông tài trợ](images/evidence/crm1983_18_news_announcements.png)
 
 
 ### 5.83. Bảng Use Case UC-CRM-73: Bảng Điều Khiển Tài Chính Tổng Thể: Quỹ CLB, Quỹ Thiện Nguyện & Tồn Dư Khả Dụng
@@ -1483,7 +1482,7 @@ Dưới đây là bảng đặc tả chi tiết toàn bộ 138 Use Cases bao ph�
 | **Hậu Điều Kiện (Post-conditions)** | Lãnh đạo nắm chắc bức tranh tài chính toàn diện, minh bạch và an toàn của tổ chức. |
 | **Hình Ảnh Minh Chứng Thực Tế** | *Bảng điều khiển theo dõi tổng quan các nguồn thu và dòng tiền hoạt động của Hiệp hội* |
 
-![Bảng điều khiển theo dõi tổng quan các nguồn thu và dòng tiền hoạt động của Hiệp hội](images/evidence/crm_hn10_12_income_management.png)
+![Bảng điều khiển theo dõi tổng quan các nguồn thu và dòng tiền hoạt động của Hiệp hội](images/evidence/crm1983_12_income_management.png)
 
 
 ### 5.84. Bảng Use Case UC-CRM-74: Phê Duyệt Dự Toán & Ký Số Lệnh Chi Điện Tử Nội Bộ Trước Khi Giải Ngân Thực Tế
@@ -1517,7 +1516,7 @@ Dưới đây là bảng đặc tả chi tiết toàn bộ 138 Use Cases bao ph�
 | **Hậu Điều Kiện (Post-conditions)** | Hệ thống đối tác tài trợ được quản lý chuyên nghiệp, duy trì mối quan hệ hợp tác bền vững. |
 | **Hình Ảnh Minh Chứng Thực Tế** | *Quản lý danh sách nhà tài trợ, các gói quyền lợi và theo dõi cam kết tài trợ* |
 
-![Quản lý danh sách nhà tài trợ, các gói quyền lợi và theo dõi cam kết tài trợ](images/evidence/crm_hn10_15_sponsors_management.png)
+![Quản lý danh sách nhà tài trợ, các gói quyền lợi và theo dõi cam kết tài trợ](images/evidence/crm1983_15_sponsors_management.png)
 
 
 ### 5.86. Bảng Use Case UC-CRM-76: Thiết Lập Tự Động Hóa Vận Hành: Nhắc Đóng Phí, Chúc Mừng Sinh Nhật Tự Động
@@ -1529,12 +1528,12 @@ Dưới đây là bảng đặc tả chi tiết toàn bộ 138 Use Cases bao ph�
 | **Tên Chức Năng** | Thiết Lập Tự Động Hóa Vận Hành: Nhắc Đóng Phí, Chúc Mừng Sinh Nhật Tự Động |
 | **Tác Nhân (Actor)** | Ban Quản Trị, Ban Thư Ký |
 | **Tiền Điều Kiện (Pre-conditions)** | Người quản trị truy cập Trung Tâm Cấu Hình Vận Hành Tự Động. |
-| **Luồng Xử Lý Chính (Main Flow)** | 1. Mở mục "Quy Tắc Tự Động Hóa (Automation Rules)" trên Cổng Quản Trị.<br>2. Cấu hình kịch bản nhắc hội phí thường niên: Tự động gửi email và thông báo đẩy trước 30 ngày, 15 ngày và 3 ngày trước khi hết hạn Học viên kèm mã QR ngân hàng gạch nợ tự động.<br>3. Cấu hình kịch bản Chúc mừng sinh nhật: Đúng 08:00 sáng ngày sinh nhật của từng Học viên, hệ thống tự động gửi thiệp chúc mừng điện tử mang dấu ấn CEO HN10 kèm thông báo chúc mừng trên bảng tin chung.<br>4. Cấu hình nhắc lịch họp và nhắc giờ tham gia sự kiện Gala tự động.<br>5. Nhấn nút "Lưu & Kích Hoạt Kịch Bản Vận Hành Tự Động". |
+| **Luồng Xử Lý Chính (Main Flow)** | 1. Mở mục "Quy Tắc Tự Động Hóa (Automation Rules)" trên Cổng Quản Trị.<br>2. Cấu hình kịch bản nhắc hội phí thường niên: Tự động gửi email và thông báo đẩy trước 30 ngày, 15 ngày và 3 ngày trước khi hết hạn Học viên kèm mã VietQR gạch nợ tự động.<br>3. Cấu hình kịch bản Chúc mừng sinh nhật: Đúng 08:00 sáng ngày sinh nhật của từng Học viên, hệ thống tự động gửi thiệp chúc mừng điện tử mang dấu ấn CEO HN10 kèm thông báo chúc mừng trên bảng tin chung.<br>4. Cấu hình nhắc lịch họp và nhắc giờ tham gia sự kiện Gala tự động.<br>5. Nhấn nút "Lưu & Kích Hoạt Kịch Bản Vận Hành Tự Động". |
 | **Luồng Thay Thế / Ngoại Lệ (Alternative Flows)** | - Quản trị viên có thể tùy biến mẫu nội dung thư và hình ảnh thiệp chúc mừng theo từng mùa sự kiện. |
 | **Hậu Điều Kiện (Post-conditions)** | Bộ máy vận hành CLB hoạt động tự động 24/7, mang lại trải nghiệm ấm áp và chu đáo tối đa cho Học viên. |
 | **Hình Ảnh Minh Chứng Thực Tế** | *Thiết lập các chiến dịch thông điệp tự động, chăm sóc Học viên và marketing nội bộ* |
 
-![Thiết lập các chiến dịch thông điệp tự động, chăm sóc Học viên và marketing nội bộ](images/evidence/crm_hn10_19_email_marketing.png)
+![Thiết lập các chiến dịch thông điệp tự động, chăm sóc Học viên và marketing nội bộ](images/evidence/crm1983_19_email_marketing.png)
 
 
 ### 5.87. Bảng Use Case UC-CRM-77: Sao Lưu Cơ Sở Dữ Liệu Tự Động & Đảm Bảo Tính Toàn Vẹn An Toàn Thông Tin Mạng
@@ -1546,7 +1545,7 @@ Dưới đây là bảng đặc tả chi tiết toàn bộ 138 Use Cases bao ph�
 | **Tên Chức Năng** | Sao Lưu Cơ Sở Dữ Liệu Tự Động & Đảm Bảo Tính Toàn Vẹn An Toàn Thông Tin Mạng |
 | **Tác Nhân (Actor)** | Ban Quản Trị Hệ Thống |
 | **Tiền Điều Kiện (Pre-conditions)** | Hệ thống đang hoạt động ổn định trên môi trường sản xuất. |
-| **Luồng Xử Lý Chính (Main Flow)** | 1. Mở bảng điều khiển "Bảo Mật & Nhật Ký Kiểm Toán" (/activity-logs) trên Cổng Quản Trị.<br>2. Kiểm tra lịch sao lưu tự động định kỳ hàng ngày (Snapshot Database lúc 03:00 sáng) và tính toàn vẹn của các bản lưu trữ phân tán.<br>3. Truy cập phân hệ Nhật Ký Lịch Sử Thao Tác Toàn Hệ Thống (Audit Log):<br>   - Chủ tịch CLB, Ban Thường Trực và Quản trị viên theo dõi toàn bộ hành động phát sinh trong CLB theo thời gian thực.<br>   - Báo cáo chi tiết từng sự kiện: Thời gian chính xác, Họ tên & Chức vụ cán bộ thao tác, Hành động thực hiện (Đăng nhập, Phân quyền RBAC, Giao việc, Duyệt chi ngân sách, Phê duyệt cơ hội, Điểm danh họp/sự kiện).<br>   - Bộ lọc chuyên sâu theo phân hệ tác động (Học viên, Sự kiện, Cuộc họp, Thu chi, Tài khoản) và thanh tìm kiếm từ khóa thông minh.<br>4. Hệ thống kiểm soát tính toàn vẹn, ngăn chặn mọi hành vi can thiệp trái thẩm quyền và đảm bảo sự minh bạch tuyệt đối trong công tác điều hành.<br>5. Xác nhận hệ thống đạt tiêu chuẩn an toàn thông tin và quản trị kiểm toán cấp doanh nghiệp. |
+| **Luồng Xử Lý Chính (Main Flow)** | 1. Mở bảng điều khiển "Bảo Mật & Sao Lưu Dữ Liệu" trên Cổng Quản Trị.<br>2. Kiểm tra lịch sao lưu tự động định kỳ hàng ngày (Snapshot Database lúc 03:00 sáng).<br>3. Kiểm tra tính toàn vẹn của các bản sao lưu lưu trữ phân tán an toàn.<br>4. Thực hiện thử nghiệm tính năng "Tạo Bản Sao Lưu Tức Thì" trước khi tiến hành cập nhật phiên bản phần mềm lớn.<br>5. Xem nhật ký kiểm toán bảo mật (Security Audit Log) để phát hiện các truy cập bất thường.<br>6. Xác nhận hệ thống đạt tiêu chuẩn bảo mật dữ liệu cấp doanh nghiệp. |
 | **Luồng Thay Thế / Ngoại Lệ (Alternative Flows)** | - Trường hợp xảy ra sự cố phần cứng: Hệ thống hỗ trợ khôi phục dữ liệu nhanh (Disaster Recovery) với thời gian gián đoạn dưới 30 phút. |
 | **Hậu Điều Kiện (Post-conditions)** | Cơ sở dữ liệu Học viên và dữ liệu tài chính của CLB được bảo vệ an toàn tuyệt đối. |
 | **Hình Ảnh Minh Chứng Thực Tế** | *Màn hình kiểm soát an toàn thông tin, sao lưu dữ liệu và nhật ký kiểm toán hệ thống của Ban Quản Trị* |
@@ -1648,7 +1647,7 @@ Dưới đây là bảng đặc tả chi tiết toàn bộ 138 Use Cases bao ph�
 | **Tên Chức Năng** | Khám Phá Trang Chủ Ứng Dụng Doanh Nhân Với Banner Nhận Diện CEO HN10 |
 | **Tác Nhân (Actor)** | Học viên chính thức |
 | **Tiền Điều Kiện (Pre-conditions)** | Học viên mở Ứng dụng Doanh nhân CEO HN10. |
-| **Luồng Xử Lý Chính (Main Flow)** | 1. Màn hình Trang Chủ (Home Dashboard) hiển thị sang trọng với tông màu thương hiệu Xanh Hoàng Gia và Vàng Kim.<br>2. Lời chào cá nhân hóa: "Xin chào, Doanh nhân Phạm Văn Vũ — Chúc một ngày kết nối kinh doanh thành công!".<br>3. Huy hiệu số định danh: HN10-0007 • Học viên Chính thức • Ban Thành Viên.<br>4. Thanh lướt Banner Carousel hiển thị các chương trình trọng điểm đang diễn ra của CLB Doanh Nhân CEO HN10 và Hội HanoiBA.<br>5. Xem các tiện ích truy cập nhanh: Danh bạ, Sự kiện, Danh thiếp, Gian hàng B2B, Hộp thư. |
+| **Luồng Xử Lý Chính (Main Flow)** | 1. Màn hình Trang Chủ (Home Dashboard) hiển thị sang trọng với tông màu thương hiệu Xanh Hoàng Gia và Vàng Kim.<br>2. Lời chào cá nhân hóa: "Xin chào, Doanh nhân Phạm Văn Vũ — Chúc một ngày kết nối kinh doanh thành công!".<br>3. Huy hiệu số định danh: CEO-83007 • Học viên Chính thức • Ban Thành Viên.<br>4. Thanh lướt Banner Carousel hiển thị các chương trình trọng điểm đang diễn ra của CLB Doanh Nhân CEO HN10 và Hội HanoiBA.<br>5. Xem các tiện ích truy cập nhanh: Danh bạ, Sự kiện, Danh thiếp, Gian hàng B2B, Hộp thư. |
 | **Luồng Thay Thế / Ngoại Lệ (Alternative Flows)** | - Nếu có thông báo khẩn từ Chủ tịch CLB: Thanh thông báo nổi bật sẽ chạy chữ trên đầu màn hình. |
 | **Hậu Điều Kiện (Post-conditions)** | Học viên được truyền cảm hứng gắn kết và dễ dàng điều hướng đến mọi tính năng cần thiết. |
 | **Hình Ảnh Minh Chứng Thực Tế** | *Màn hình Trang chủ Ứng dụng Doanh nhân CEO HN10 giao diện máy tính* |
@@ -1656,35 +1655,35 @@ Dưới đây là bảng đặc tả chi tiết toàn bộ 138 Use Cases bao ph�
 ![Màn hình Trang chủ Ứng dụng Doanh nhân CEO HN10 giao diện máy tính](images/evidence/app_02_home_dashboard.png)
 
 
-### 5.94. Bảng Use Case UC-APP-06: Trải Nghiệm Trang Chủ Giao Diện Điện Thoại Thông Minh, Lối Tắt Tin Nhắn & Cửa Sổ Chào Mừng Học viên
+### 5.94. Bảng Use Case UC-APP-06: Trải Nghiệm Trang Chủ Giao Diện Điện Thoại Thông Minh (Mobile App View)
 
 | Thuộc Tính Nghiệp Vụ | Nội Dung Đặc Tả Chi Tiết |
 | :--- | :--- |
 | **Mã Use Case (ID)** | **UC-APP-06** |
-| **Phân Hệ / Nhóm** | Trang Chủ & Trải Nghiệm Di Động |
-| **Tên Chức Năng** | Trải Nghiệm Trang Chủ Giao Diện Điện Thoại Thông Minh, Lối Tắt Tin Nhắn & Cửa Sổ Chào Mừng Học viên |
+| **Phân Hệ / Nhóm** | Trang Chủ & Khoảnh Khắc Doanh Nhân |
+| **Tên Chức Năng** | Trải Nghiệm Trang Chủ Giao Diện Điện Thoại Thông Minh (Mobile App View) |
 | **Tác Nhân (Actor)** | Học viên sử dụng điện thoại di động |
 | **Tiền Điều Kiện (Pre-conditions)** | Học viên truy cập ứng dụng trên điện thoại thông minh (iPhone / Android). |
-| **Luồng Xử Lý Chính (Main Flow)** | 1. Ứng dụng tự động điều chỉnh bố cục sang định dạng Mobile mượt mà, tối ưu thao tác một tay cho doanh nhân.<br>2. **Đồng Bộ Hình Nền Chủ Đề Lễ Hội (Theme Background Sync)**: Màn hình trang chủ tự động nạp hình nền sự kiện từ biến CSS toàn cục `--festival-bg-image` do Theme Studio CRM phát hành, tạo không khí lễ hội trang trọng, rực rỡ.<br>3. **Cửa Sổ Chào Mừng Học viên Mới (Onboarding Welcome Modal)**: Gắn trực tiếp tại bộ khung vỏ `MemberShell`, tự động mở thông điệp chào đón nồng nhiệt khi Học viên đăng nhập, giới thiệu sứ mệnh kết nối của CLB CEO HN10, hỗ trợ chuyển đổi hoàn hảo cả 2 chế độ Sáng (Light) và Tối (Dark).<br>4. **Hàng Phím Tắt Nhanh Tiện Ích (Quick Shortcuts)**: Cho phép Học viên mở modal tùy biến chọn 4 chức năng yêu thích nhất; chuẩn hóa lối tắt **"Tin nhắn"** (`/association/messages?tab=messages`) thay thế cho lối tắt Thống kê cũ để mở nhanh hòm thư trao đổi kinh doanh.<br>5. **Dải Cơ Hội Kinh Doanh Full-Width & Khối Sàn B2B**: Tích hợp widget Biểu Đồ Nến Candlestick thời gian thực, bên dưới là Khối Sàn Giao Thương B2B bố trí dạng thẻ full-width card dễ quan sát.<br>6. **Cấu Trúc Điều Hướng Dưới Đáy (Bottom Navigation Bar 5 Mục)**:<br>   - Mục 1: **Trang chủ** (`/association`)<br>   - Mục 2: **Thống kê** (`/association/analytics`) với biểu tượng `FooterAnalyticsIcon`<br>   - Mục 3: **Danh bạ** (`/association/members`)<br>   - Mục 4: **Mạng lưới** (`/association/messages`) với biểu tượng mạng lưới cộng đồng `FooterSocialNetworkIcon`<br>   - Mục 5: **Cá nhân** (`/association/profile`). |
+| **Luồng Xử Lý Chính (Main Flow)** | 1. Ứng dụng tự động điều chỉnh bố cục sang định dạng Mobile mượt mà, tối ưu thao tác ngón cái.<br>2. Các khối thông tin sắp xếp trực quan:<br>   - Thẻ danh thiếp thu nhỏ với mã QR quét nhanh<br>   - Hàng nút chức năng nhanh (Quick Actions): Quét QR, Danh bạ, Đăng bán B2B, Hẹn gặp 1-1<br>   - Khối sự kiện sắp diễn ra kèm đồng hồ đếm ngược<br>   - Bảng tin khoảnh khắc giao thương mới nhất.<br>3. Thanh điều hướng dưới đáy (Bottom Navigation Bar) cho phép chuyển đổi tức thì giữa các phân hệ. |
 | **Luồng Thay Thế / Ngoại Lệ (Alternative Flows)** | - Hỗ trợ cài đặt biểu tượng Ứng dụng trực tiếp ra màn hình chính điện thoại (PWA / Add to Home Screen) mà không cần qua chợ ứng dụng phức tạp. |
 | **Hậu Điều Kiện (Post-conditions)** | Trải nghiệm mượt mà như một ứng dụng di động cao cấp, sử dụng mọi lúc mọi nơi. |
 | **Hình Ảnh Minh Chứng Thực Tế** | *Giao diện Trang chủ Ứng dụng Doanh nhân CEO HN10 trên điện thoại thông minh* |
 
-![Giao diện Trang chủ Ứng dụng Doanh nhân CEO HN10 trên điện thoại thông minh](images/evidence/app_hn10_02_home_feed.png)
+![Giao diện Trang chủ Ứng dụng Doanh nhân CEO HN10 trên điện thoại thông minh](images/evidence/app1983_02_home_feed.png)
 
 
-### 5.95. Bảng Use Case UC-APP-07: Bảng Tin Mạng Lưới B2B Feed, Thẻ Check-in Đại Biểu & Nhận Tin Tức / Đào Tạo Từ CRM
+### 5.95. Bảng Use Case UC-APP-07: Theo Dõi Bảng Tin Khoảnh Khắc Doanh Nhân (Moments), Thả Tim & Bình Luận Tương Tác
 
 | Thuộc Tính Nghiệp Vụ | Nội Dung Đặc Tả Chi Tiết |
 | :--- | :--- |
 | **Mã Use Case (ID)** | **UC-APP-07** |
-| **Phân Hệ / Nhóm** | Bảng Tin Mạng Lưới & Tương Tác Cộng Đồng |
-| **Tên Chức Năng** | Bảng Tin Mạng Lưới B2B Feed, Thẻ Check-in Đại Biểu & Nhận Tin Tức / Đào Tạo Từ CRM |
-| **Tác Nhân (Actor)** | Toàn thể Học viên Doanh nhân trong CLB |
-| **Tiền Điều Kiện (Pre-conditions)** | Học viên mở tab "Mạng lưới" (`/association/messages`) trên thanh điều hướng dưới đáy. |
-| **Luồng Xử Lý Chính (Main Flow)** | 1. **Tinh Gọn Giao Diện Bảng Tin (Unified Search Feed)**: Loại bỏ hoàn toàn thanh tìm kiếm bị trùng lặp bên trong component Feed; toàn bộ từ khóa tìm kiếm được đồng bộ xuyên suốt từ thanh tìm kiếm Header qua thuộc tính `searchQuery`.<br>2. **Tiếp Nhận Nội Dung Tự Động Từ Cổng Quản Trị CRM**:<br>   - Bài viết Sự Kiện được Ban Tổ Chức "Bắn Mạng Lưới": Hiển thị ảnh Poster sự kiện sắc nét đính kèm trực tiếp **Mã QR Điểm Danh (Check-in QR)** và thời gian khai mạc.<br>   - Khóa Đào Tạo Doanh Nhân: Hiển thị chuyên đề nâng cao năng lực lãnh đạo, danh tính chuyên gia, ảnh poster đào tạo kèm mã QR tham gia.<br>   - Tin tức điều hành và khoảnh khắc giao thương nội bộ.<br>3. **Gắn Thẻ Đại Biểu Tham Dự Cuộc Họp / Sự Kiện (Attendee Tags)**:<br>   - Dưới các bài đăng sự kiện hoặc cuộc họp Ban, hệ thống hiển thị danh sách Học viên tham dự dưới dạng các thẻ tag cá nhân hóa trang trọng dạng `@HọTên [✓ Đã Check-in]`, tạo sự minh bạch và biểu dương tinh thần tham gia nhiệt huyết.<br>4. **Thảo Luận & Tương Tác Đẳng Cấp**:<br>   - Dưới mỗi bài đăng luôn mở sẵn tối đa 5 bình luận mới nhất cùng ô nhập phản hồi trực tiếp, gửi lời chúc mừng hoặc mở lời hợp tác kinh doanh mà không cần mở nhiều lớp màn hình.<br>   - Hỗ trợ hiển thị Thẻ Xem Trước Liên Kết (Link Preview Card) dạng Facebook chuẩn mực khi chia sẻ bài báo kinh tế hoặc liên kết ngoài.<br>   - Nút thả tim, bình luận và chia sẻ cơ hội được bố trí cân xứng, dễ dàng thao tác bằng một tay. |
-| **Luồng Thay Thế / Ngoại Lệ (Alternative Flows)** | - Khi không có kết nối internet: Dữ liệu bài viết mới nhất được lưu trong bộ đệm máy để Học viên đọc ngoại tuyến. |
-| **Hậu Điều Kiện (Post-conditions)** | Tình cảm bằng hữu, tinh thần tương thân tương ái giữa các doanh nhân CEO HN10 ngày càng gắn kết keo sơn. |
+| **Phân Hệ / Nhóm** | Trang Chủ & Khoảnh Khắc Doanh Nhân |
+| **Tên Chức Năng** | Theo Dõi Bảng Tin Khoảnh Khắc Doanh Nhân (Moments), Thả Tim & Bình Luận Tương Tác |
+| **Tác Nhân (Actor)** | Học viên trong CLB |
+| **Tiền Điều Kiện (Pre-conditions)** | Học viên mở mục Khoảnh Khắc (Moments) trên ứng dụng. |
+| **Luồng Xử Lý Chính (Main Flow)** | 1. Học viên cuộn xem dòng thời gian hoạt động của cộng đồng:<br>   - Các bài đăng chia sẻ niềm vui ký kết hợp đồng của các doanh nghiệp thành viên<br>   - Hình ảnh giao lưu sinh hoạt cuối tuần của các Ban chuyên môn<br>   - Lời chúc mừng sinh nhật tự động gửi tới các Học viên có ngày sinh trong tháng.<br>2. Học viên nhấn nút "Thả Tim" ủng hộ bài đăng.<br>3. Để lại bình luận chúc mừng, chia sẻ niềm tự hào đồng hành cùng các bạn bè cùng niên khóa 1983.<br>4. Học viên có thể đăng tải khoảnh khắc hoạt động của công ty mình để lan tỏa năng lượng tích cực. |
+| **Luồng Thay Thế / Ngoại Lệ (Alternative Flows)** | - Các bài đăng vi phạm văn hóa ứng xử sẽ được Ban Kiểm Tra gỡ bỏ theo quy chế. |
+| **Hậu Điều Kiện (Post-conditions)** | Tình cảm bằng hữu, tinh thần tương thân tương ái giữa các doanh nhân 1983 ngày càng gắn kết keo sơn. |
 | **Hình Ảnh Minh Chứng Thực Tế** | *Bảng tin hoạt động và khoảnh khắc kết nối giao thương giữa các Học viên* |
 
 ![Bảng tin hoạt động và khoảnh khắc kết nối giao thương giữa các Học viên](images/evidence/app_step_22_news_screen.png)
@@ -1695,11 +1694,11 @@ Dưới đây là bảng đặc tả chi tiết toàn bộ 138 Use Cases bao ph�
 | Thuộc Tính Nghiệp Vụ | Nội Dung Đặc Tả Chi Tiết |
 | :--- | :--- |
 | **Mã Use Case (ID)** | **UC-APP-08** |
-| **Phân Hệ / Nhóm** | thẻ doanh nhân số 3D NFC & Danh Thiếp |
+| **Phân Hệ / Nhóm** | Thẻ VIP 3D NFC & Danh Thiếp |
 | **Tên Chức Năng** | Chiêm Ngưỡng Thẻ Học viên Điện Tử 3D VIP CEO HN10 Với Hiệu Ứng Ánh Kim Sang Trọng |
 | **Tác Nhân (Actor)** | Học viên chính thức (Doanh nhân Phạm Văn Vũ) |
 | **Tiền Điều Kiện (Pre-conditions)** | Học viên vào mục Thẻ Doanh Nhân trên Ứng dụng. |
-| **Luồng Xử Lý Chính (Main Flow)** | 1. Ứng dụng hiển thị mô hình Thẻ Doanh Nhân Điện Tử 3D tương tác sống động:<br>   - Tông màu Đen Nhám & Viền Vàng Ánh Kim sang trọng<br>   - Khắc nổi Logo CLB Doanh Nhân CEO HN10 và Huy hiệu HanoiBA<br>   - Họ và tên: PHẠM VĂN VŨ<br>   - Chức danh: TỔNG GIÁM ĐỐC<br>   - Doanh nghiệp: CÔNG TY CỔ PHẦN CÔNG NGHỆ VIO CONNECT<br>   - Mã định danh Học viên chính thức: HN10-0007.<br>2. Học viên dùng ngón tay vuốt nhẹ để xoay thẻ 360 độ trong không gian 3D với hiệu ứng phản chiếu ánh sáng chân thực. |
+| **Luồng Xử Lý Chính (Main Flow)** | 1. Ứng dụng hiển thị mô hình Thẻ Doanh Nhân Điện Tử 3D tương tác sống động:<br>   - Tông màu Đen Nhám & Viền Vàng Ánh Kim sang trọng<br>   - Khắc nổi Logo CLB Doanh Nhân CEO HN10 và Huy hiệu HanoiBA<br>   - Họ và tên: PHẠM VĂN VŨ<br>   - Chức danh: TỔNG GIÁM ĐỐC<br>   - Doanh nghiệp: CÔNG TY CỔ PHẦN CÔNG NGHỆ VIO CONNECT<br>   - Mã định danh Học viên chính thức: CEO-83007.<br>2. Học viên dùng ngón tay vuốt nhẹ để xoay thẻ 360 độ trong không gian 3D với hiệu ứng phản chiếu ánh sáng chân thực. |
 | **Luồng Thay Thế / Ngoại Lệ (Alternative Flows)** | - Nếu thiết bị không hỗ trợ đồ họa 3D nâng cao: Hệ thống tự động chuyển sang chế độ 2D phẳng mượt mà. |
 | **Hậu Điều Kiện (Post-conditions)** | Học viên tự hào về tấm thẻ định danh đẳng cấp, khẳng định vị thế doanh nhân trong cộng đồng. |
 | **Hình Ảnh Minh Chứng Thực Tế** | *Thẻ Học viên Doanh nhân 3D VIP CEO HN10 với hiệu ứng ánh kim sang trọng* |
@@ -1712,7 +1711,7 @@ Dưới đây là bảng đặc tả chi tiết toàn bộ 138 Use Cases bao ph�
 | Thuộc Tính Nghiệp Vụ | Nội Dung Đặc Tả Chi Tiết |
 | :--- | :--- |
 | **Mã Use Case (ID)** | **UC-APP-09** |
-| **Phân Hệ / Nhóm** | thẻ doanh nhân số 3D NFC & Danh Thiếp |
+| **Phân Hệ / Nhóm** | Thẻ VIP 3D NFC & Danh Thiếp |
 | **Tên Chức Năng** | Lật Mặt Sau Thẻ Để Hiển Thị Mã QR Động Cá Nhân Hóa Dùng Kết Nối Tức Thì |
 | **Tác Nhân (Actor)** | Học viên & Đối tác gặp mặt trực tiếp |
 | **Tiền Điều Kiện (Pre-conditions)** | Học viên đang mở Thẻ Doanh nhân trên ứng dụng và muốn chia sẻ thông tin cho đối tác. |
@@ -1729,11 +1728,11 @@ Dưới đây là bảng đặc tả chi tiết toàn bộ 138 Use Cases bao ph�
 | Thuộc Tính Nghiệp Vụ | Nội Dung Đặc Tả Chi Tiết |
 | :--- | :--- |
 | **Mã Use Case (ID)** | **UC-APP-10** |
-| **Phân Hệ / Nhóm** | thẻ doanh nhân số 3D NFC & Danh Thiếp |
+| **Phân Hệ / Nhóm** | Thẻ VIP 3D NFC & Danh Thiếp |
 | **Tên Chức Năng** | Kích Hoạt Chạm Thẻ Thông Minh Vật Lý NFC (NFC Tap) Để Chia Sẻ Danh Thiếp Không Chạm |
-| **Tác Nhân (Actor)** | Học viên sở hữu Thẻ Doanh Nhân Số vật lý đính chip NFC |
+| **Tác Nhân (Actor)** | Học viên sở hữu Thẻ VIP vật lý đính chip NFC |
 | **Tiền Điều Kiện (Pre-conditions)** | Học viên cầm thẻ cứng VIP NFC và chạm vào lưng điện thoại của đối tác. |
-| **Luồng Xử Lý Chính (Main Flow)** | 1. Học viên đưa thẻ doanh nhân số vật lý chạm nhẹ vào vùng cảm biến NFC phía sau điện thoại đối tác.<br>2. Không cần cài đặt bất kỳ phần mềm nào, điện thoại đối tác tự động bật thông báo nhận diện liên kết.<br>3. Đối tác nhấp vào thông báo, trang Danh thiếp điện tử của Doanh nhân Phạm Văn Vũ mở ra ngay lập tức.<br>4. Đối tác bấm lưu danh bạ hoặc gửi lời mời hợp tác kinh doanh. |
+| **Luồng Xử Lý Chính (Main Flow)** | 1. Học viên đưa thẻ VIP vật lý chạm nhẹ vào vùng cảm biến NFC phía sau điện thoại đối tác.<br>2. Không cần cài đặt bất kỳ phần mềm nào, điện thoại đối tác tự động bật thông báo nhận diện liên kết.<br>3. Đối tác nhấp vào thông báo, trang Danh thiếp điện tử của Doanh nhân Phạm Văn Vũ mở ra ngay lập tức.<br>4. Đối tác bấm lưu danh bạ hoặc gửi lời mời hợp tác kinh doanh. |
 | **Luồng Thay Thế / Ngoại Lệ (Alternative Flows)** | - Đối với điện thoại không có NFC: Đối tác quét mã QR ở mặt sau thẻ vật lý với hiệu quả tương đương. |
 | **Hậu Điều Kiện (Post-conditions)** | Tạo ấn tượng công nghệ vượt trội và sự chuyên nghiệp đỉnh cao trong mắt đối tác kinh doanh. |
 | **Hình Ảnh Minh Chứng Thực Tế** | *Tính năng chia sẻ danh thiếp không chạm bằng công nghệ thẻ thông minh VIP NFC* |
@@ -1741,21 +1740,21 @@ Dưới đây là bảng đặc tả chi tiết toàn bộ 138 Use Cases bao ph�
 ![Tính năng chia sẻ danh thiếp không chạm bằng công nghệ thẻ thông minh VIP NFC](images/evidence/app_step_05_vip_card_nfc.png)
 
 
-### 5.99. Bảng Use Case UC-APP-11: Tra Cứu Danh Bạ Học viên & Bản Đồ Số 2D Google Maps Đa Phạm Vi (Tổng Thể & Cá Nhân)
+### 5.99. Bảng Use Case UC-APP-11: Tra Cứu Danh Bạ Học viên Toàn CLB Theo Chuyên Ban, Lĩnh Vực Kinh Doanh & Tên Công Ty
 
 | Thuộc Tính Nghiệp Vụ | Nội Dung Đặc Tả Chi Tiết |
 | :--- | :--- |
 | **Mã Use Case (ID)** | **UC-APP-11** |
-| **Phân Hệ / Nhóm** | Danh Bạ & Bản Đồ Số Doanh Nhân |
-| **Tên Chức Năng** | Tra Cứu Danh Bạ Học viên & Bản Đồ Số 2D Google Maps Đa Phạm Vi (Tổng Thể & Cá Nhân) |
-| **Tác Nhân (Actor)** | Toàn thể Học viên Doanh nhân CEO HN10 |
-| **Tiền Điều Kiện (Pre-conditions)** | Học viên đăng nhập ứng dụng, mở phân hệ Danh Bạ Học viên (`/association/members`). |
-| **Luồng Xử Lý Chính (Main Flow)** | 1. Màn hình danh bạ hiển thị đầy đủ danh sách các doanh nhân trong đại gia đình CEO HN10.<br>2. Hỗ trợ chuyển đổi nhanh giữa 2 chế độ: Chế độ "Danh Sách" truyền thống và nút bấm "Bản Đồ" (Icon `MapPin` / `Compass`) trên thanh tiêu đề và thanh công cụ.<br>3. **Bản Đồ Số 2D Google Maps Tương Tác Chuẩn Hóa (`CeoInteractiveMapModal`)**:<br>   - Khắc phục triệt để lỗi màn hình đen (black screen) trên các dòng thiết bị di động bằng việc ứng dụng lớp bản đồ 2D Google Maps hiệu năng cao (`https://mt{s}.google.com/vt/lyrs=m`).<br>   - Tích hợp điều khiển cảm ứng đa điểm mượt mà (thu phóng pinch-to-zoom, kéo rê bản đồ không độ trễ).<br>4. **Phân Tách 2 Phạm Vi Hiển Thị Độc Lập Rõ Ràng (Scope Switcher)**:<br>   - **Phạm vi "Tổng Thể"**: Hiển thị toàn bộ các Học viên đang trực tuyến/hoạt động trong app trên bản đồ, các sự kiện sắp diễn ra của CLB, các cuộc họp ban chuyên môn và trụ sở doanh nghiệp Học viên.<br>   - **Phạm vi "Cá Nhân"**: Chỉ lọc và hiển thị các Học viên đã kết nối giao thương trực tiếp với tôi, các sự kiện mà tôi đã đăng ký tham gia thành công, và các cuộc họp 1-on-1 hoặc họp ban có liên quan trực tiếp đến ID tài khoản của tôi.<br>5. **Ghim Avatar Nổi Bật & Thao Tác 1 Chạm**:<br>   - Các Học viên kích hoạt chia sẻ vị trí sẽ hiển thị Avatar tròn nổi bật trên bản đồ; chạm vào Avatar lập tức mở Thẻ Tóm Tắt Doanh Nghiệp (Mini Card) hiển thị họ tên, chức danh, tên công ty, số hotline.<br>   - Cung cấp nút **"Gọi Điện"**, nút **"Đặt Lịch Hẹn 1-on-1"** và nút **"Chỉ Đường Google Maps"** mở ứng dụng bản đồ dẫn đường từng bước đến tận nơi.<br>6. **Công Cụ Định Vị GPS Thời Gian Thực**: Tích hợp nút la bàn định vị GPS tìm kiếm vị trí hiện tại của thiết bị và tự động căn giữa bản đồ theo tọa độ thực. |
-| **Luồng Thay Thế / Ngoại Lệ (Alternative Flows)** | - Nếu người dùng chưa cấp quyền truy cập vị trí: Bản đồ mặc định định vị tại trung tâm thủ đô Hà Nội và hướng dẫn cấp quyền GPS khi cần. |
-| **Hậu Điều Kiện (Post-conditions)** | Doanh nhân dễ dàng định vị các đối tác xung quanh vị trí của mình, thúc đẩy gặp gỡ trực tiếp và giao lưu kết nối địa phương. |
-| **Hình Ảnh Minh Chứng Thực Tế** | *Bản đồ số 2D Google Maps kết nối doanh nhân và định vị đối tác CEO HN10* |
+| **Phân Hệ / Nhóm** | Danh Bạ & Kết Nối Hẹn Gặp |
+| **Tên Chức Năng** | Tra Cứu Danh Bạ Học viên Toàn CLB Theo Chuyên Ban, Lĩnh Vực Kinh Doanh & Tên Công Ty |
+| **Tác Nhân (Actor)** | Học viên cần tìm đối tác trong CLB |
+| **Tiền Điều Kiện (Pre-conditions)** | Học viên đăng nhập ứng dụng, mở phân hệ Danh Bạ Học viên. |
+| **Luồng Xử Lý Chính (Main Flow)** | 1. Màn hình danh bạ hiển thị đầy đủ danh sách các doanh nhân trong đại gia đình CEO HN10.<br>2. Sử dụng thanh tìm kiếm thông minh: Gõ tên công ty, ngành nghề hoặc tên Học viên.<br>3. Lọc theo chuyên ban sinh hoạt để tìm những bạn bè cùng ban.<br>4. Mỗi thẻ Học viên hiển thị: Ảnh chân dung, Họ tên, Tên công ty, Chức vụ và huy hiệu xác nhận chính thức.<br>5. Nhấp vào thẻ để xem toàn bộ thông tin chi tiết. |
+| **Luồng Thay Thế / Ngoại Lệ (Alternative Flows)** | - Nếu danh bạ không có người phù hợp: Ứng dụng hiển thị gợi ý đăng nhu cầu tìm kiếm lên mục Cơ Hội Cung - Cầu. |
+| **Hậu Điều Kiện (Post-conditions)** | Học viên dễ dàng tìm thấy đồng đội cùng chí hướng trong mạng lưới doanh nhân tin cậy. |
+| **Hình Ảnh Minh Chứng Thực Tế** | *Danh bạ Học viên CLB CEO HN10 với công cụ tìm kiếm và lọc ngành nghề thông minh* |
 
-![Bản đồ số 2D Google Maps kết nối doanh nhân và định vị đối tác CEO HN10](images/evidence/app_step_07_members_directory.png)
+![Danh bạ Học viên CLB CEO HN10 với công cụ tìm kiếm và lọc ngành nghề thông minh](images/evidence/app_step_07_members_directory.png)
 
 
 ### 5.100. Bảng Use Case UC-APP-12: Xem Hồ Sơ Chi Tiết Của Học viên Khác & Khám Phá Năng Lực Cung Ứng Sản Phẩm
@@ -1784,7 +1783,7 @@ Dưới đây là bảng đặc tả chi tiết toàn bộ 138 Use Cases bao ph�
 | **Tên Chức Năng** | Gửi Lời Mời Kết Nối Doanh Nhân & Đặt Lịch Hẹn Gặp Kinh Doanh 1-on-1 (Business Matching) |
 | **Tác Nhân (Actor)** | Học viên khởi xướng cuộc hẹn (Doanh nhân Phạm Văn Vũ) |
 | **Tiền Điều Kiện (Pre-conditions)** | Học viên muốn gặp mặt trao đổi cơ hội hợp tác với một Học viên khác. |
-| **Luồng Xử Lý Chính (Main Flow)** | 1. Học viên mở phân hệ Gặp Gỡ & Kết Nối B2B Độc Lập (/association/connect) trên ứng dụng.<br>2. Giao diện quản lý tập trung với 3 Tab rõ ràng: Cuộc gặp đã xác nhận, Lời mời nhận và Lời mời đã gửi.<br>3. Khởi tạo cuộc hẹn mới: Bấm nút "Đặt Lịch Hẹn Gặp 1-1", chọn đối tác doanh nghiệp trong CLB, chọn ngày giờ, địa điểm gặp mặt trực tiếp hoặc chọn Gặp Trực Tuyến qua phòng họp Jitsi Meet bảo mật tích hợp sẵn.<br>4. Đối tác nhận được thông báo tức thì, có thể bấm "Chấp Nhận Cuộc Gặp", "Đổi Lịch Hẹn" hoặc "Từ Chối Kèm Lời Nhắn".<br>5. Đến giờ hẹn: Với cuộc gặp trực tuyến, hai bên bấm nút "Vào Phòng Họp Video" để trao đổi trực tiếp trên ứng dụng.<br>6. Đặc biệt, sau khi gặp gỡ trao đổi, hai bên có thể sử dụng tính năng "Ghi Nhận Deal Thành Công": Điền giá trị hợp đồng đã chốt (VNĐ), tiêu đề thương vụ và ghi chú; hệ thống tự động cập nhật trạng thái cuộc gặp và tích lũy doanh số vào bảng vàng thành tích giao thương của CLB. |
+| **Luồng Xử Lý Chính (Main Flow)** | 1. Bấm nút "Đặt Lịch Hẹn Gặp 1-1" trên hồ sơ của đối tác.<br>2. Chọn hình thức gặp: Gặp trực tiếp tại Văn phòng / Quán cà phê hoặc Gặp trực tuyến.<br>3. Chọn ngày, giờ đề xuất và nhập chủ đề trao đổi (ví dụ: "Bàn về cơ hội hợp tác triển khai phần mềm cho chuỗi cửa hàng").<br>4. Nhấn "Gửi Lời Mời Hẹn Gặp".<br>5. Đối tác nhận được thông báo đẩy trên điện thoại và có thể bấm "Đồng Ý", "Đổi Giờ" hoặc "Từ Chối Kèm Lời Nhắn".<br>6. Khi đối tác đồng ý: Cuộc hẹn tự động được ghi vào Lịch Công Tác của cả hai doanh nhân. |
 | **Luồng Thay Thế / Ngoại Lệ (Alternative Flows)** | - Nếu đối tác bận: Hai bên có thể trao đổi nhắn tin để thống nhất lại khung giờ phù hợp. |
 | **Hậu Điều Kiện (Post-conditions)** | Quy trình kết nối kinh doanh bài bản, hiệu quả, hiện thực hóa tôn chỉ tương trợ thiết thực. |
 | **Hình Ảnh Minh Chứng Thực Tế** | *Giao diện đặt lịch hẹn gặp kinh doanh 1-on-1 giữa hai doanh nhân trong CLB* |
@@ -1840,7 +1839,7 @@ Dưới đây là bảng đặc tả chi tiết toàn bộ 138 Use Cases bao ph�
 | **Hậu Điều Kiện (Post-conditions)** | Học viên luôn được đồng hành, chăm sóc chu đáo từ bộ máy thư ký chuyên nghiệp. |
 | **Hình Ảnh Minh Chứng Thực Tế** | *Kênh liên hệ trực tiếp hỗ trợ thủ tục Học viên với Ban Thư Ký CLB CEO HN10* |
 
-![Kênh liên hệ trực tiếp hỗ trợ thủ tục Học viên với Ban Thư Ký CLB CEO HN10](images/evidence/app_hn10_15_messages_secretary.png)
+![Kênh liên hệ trực tiếp hỗ trợ thủ tục Học viên với Ban Thư Ký CLB CEO HN10](images/evidence/app1983_15_messages_secretary.png)
 
 
 ### 5.105. Bảng Use Case UC-APP-17: Khám Phá Danh Sách Sự Kiện, Lịch Sinh Hoạt & Diễn Đàn Doanh Nhân Sắp Diễn Ra
@@ -1852,7 +1851,7 @@ Dưới đây là bảng đặc tả chi tiết toàn bộ 138 Use Cases bao ph�
 | **Tên Chức Năng** | Khám Phá Danh Sách Sự Kiện, Lịch Sinh Hoạt & Diễn Đàn Doanh Nhân Sắp Diễn Ra |
 | **Tác Nhân (Actor)** | Học viên CLB |
 | **Tiền Điều Kiện (Pre-conditions)** | Học viên mở phân hệ Sự Kiện trên Ứng dụng. |
-| **Luồng Xử Lý Chính (Main Flow)** | 1. **Cấu Trúc Điều Hướng Chuẩn Hóa**: Tab thứ 2 tại thanh điều hướng chân trang (Footer Bottom Nav) được chuyển đổi thành **"Thống kê"** (`/association/analytics`) nhằm nâng cao trải nghiệm theo dõi thi đua và cơ hội kinh doanh. Phân hệ Sự Kiện & Lịch Hoạt Động (`/association/events`) được kết nối truy cập thuận tiện trực tiếp từ Widget Sự Kiện Trang Chủ, Bài đăng phát hành trên Bảng Tin Mạng Lưới, hoặc menu Tiện ích nhanh.<br>2. Màn hình phân hệ Sự Kiện (/association/events) được thiết kế chuyên biệt theo chuẩn YBA với 2 Tab độc lập rõ rệt:<br>   - **Tab 1: Sự Kiện CLB**: Hiển thị các sự kiện lớn toàn thể (Đại Hội Thường Niên, Diễn Đàn Kinh Tế CEO HN10, Giải Golf Hữu Nghị, Gala Tôn Vinh). Mỗi sự kiện có ảnh bìa ấn tượng, thời gian, địa điểm, đếm ngược thời gian và nút nhận vé điện tử.<br>   - **Tab 2: Cuộc Họp & Gặp Mặt**: Hiển thị các buổi họp Ban chuyên môn, họp Ban Điều Hành, Cafe Doanh Nhân kết nối, chương trình Caravan Thăm Doanh Nghiệp thành viên. Hiển thị rõ danh sách triệu tập, địa điểm ghim bản đồ hoặc phòng họp video trực tuyến (Jitsi Meet) kèm nút vào phòng họp trực tiếp.<br>3. Học viên có thể chuyển đổi linh hoạt giữa 2 tab và xem trạng thái tham gia của bản thân (Đã đăng ký / Chưa đăng ký / Khách mời). |
+| **Luồng Xử Lý Chính (Main Flow)** | 1. Màn hình hiển thị danh sách các sự kiện sắp diễn ra của CLB Doanh Nhân CEO HN10:<br>   - Tên sự kiện: "Gala Thường Niên & Diễn Đàn Kinh Tế 1983", "Giải Golf Hữu Nghị 1983", v.v.<br>   - Ảnh bìa sự kiện ấn tượng<br>   - Thời gian, địa điểm tổ chức<br>   - Trạng thái đăng ký của Học viên (Chưa đăng ký / Đã có vé mời).<br>2. Học viên có thể lọc xem các sự kiện quá khứ để xem lại phóng sự hình ảnh kỷ niệm. |
 | **Luồng Thay Thế / Ngoại Lệ (Alternative Flows)** | - Bấm nút "Thêm vào lịch điện thoại" để hệ thống tự động đồng bộ sự kiện vào ứng dụng Calendar của điện thoại. |
 | **Hậu Điều Kiện (Post-conditions)** | Học viên không bao giờ bỏ lỡ các hoạt động sinh hoạt quan trọng của tổ chức. |
 | **Hình Ảnh Minh Chứng Thực Tế** | *Danh sách sự kiện, diễn đàn kinh tế và lịch sinh hoạt định kỳ trên Ứng dụng* |
@@ -1887,7 +1886,7 @@ Dưới đây là bảng đặc tả chi tiết toàn bộ 138 Use Cases bao ph�
 | **Tác Nhân (Actor)** | Học viên chính thức đã hoàn tất hội phí (Doanh nhân Phạm Văn Vũ) |
 | **Tiền Điều Kiện (Pre-conditions)** | Học viên chưa đăng ký vé sự kiện; hội phí thường niên đã được xác nhận hoàn thành. |
 | **Luồng Xử Lý Chính (Main Flow)** | 1. Tại trang chi tiết sự kiện, nút hành động hiển thị: "Nhận Vé Mời Miễn Phí (Đặc Quyền Học viên)".<br>2. Học viên bấm vào nút nhận vé.<br>3. Hệ thống kiểm tra hợp lệ: Xác nhận đúng trạng thái Học viên chính thức, tự động gán vị trí ghế ngồi danh dự tại Bàn VIP.<br>4. Màn hình chúc mừng hiện lên, đồng thời Vé Mời Điện Tử (E-Ticket) xuất hiện ngay trong mục "Vé Của Tôi".<br>5. Quy trình hoàn tất trong 1 giây mà không phát sinh bất kỳ khoản phí nào. |
-| **Luồng Thay Thế / Ngoại Lệ (Alternative Flows)** | - Nếu Học viên còn nợ phí thường niên: Hệ thống hướng dẫn đóng phí nhanh qua Mã QR Ngân Hàng để mở khóa vé miễn phí. |
+| **Luồng Thay Thế / Ngoại Lệ (Alternative Flows)** | - Nếu Học viên còn nợ phí thường niên: Hệ thống hướng dẫn đóng phí nhanh qua VietQR để mở khóa vé miễn phí. |
 | **Hậu Điều Kiện (Post-conditions)** | Học viên sở hữu vé mời tham dự sự kiện danh giá một cách tự hào và thuận tiện. |
 | **Hình Ảnh Minh Chứng Thực Tế** | *Thao tác nhận vé mời sự kiện miễn phí 1 chạm độc quyền dành cho Học viên chính thức* |
 
@@ -2056,7 +2055,7 @@ Dưới đây là bảng đặc tả chi tiết toàn bộ 138 Use Cases bao ph�
 | **Tên Chức Năng** | Xem Bảng Tin Cơ Hội Kinh Doanh Cung - Cầu Thời Gian Thực Của Cộng Đồng CEO HN10 |
 | **Tác Nhân (Actor)** | Học viên tìm kiếm cơ hội kinh doanh mới |
 | **Tiền Điều Kiện (Pre-conditions)** | Học viên mở phân hệ Cơ Hội Cung - Cầu trên ứng dụng. |
-| **Luồng Xử Lý Chính (Main Flow)** | 1. Bảng tin hiển thị luồng thông tin trao đổi Cung - Cầu kinh doanh liên tục với thanh 3 thẻ thống kê ngang tinh gọn ("Tổng chia sẻ", "Deal đã chốt", "Tôi share đi") giúp giao diện gọn gàng, giải phóng diện tích cuộn.<br>2. Nhấn nút điều hướng để mở Trung Tâm Thống Kê Chuyên Sâu (/association/analytics) với 2 Tab phân tích so sánh trực quan:<br>   - **Tab Toàn CLB**: Bức tranh tổng thể về tổng số cơ hội, tổng giá trị giao dịch, tỷ lệ chốt đơn theo 10 ngành nghề trọng điểm.<br>   - **Tab Cá Nhân Tôi**: Thống kê chi tiết những cơ hội bản thân đã trao đi, các cơ hội đã nhận về và các deal đã chuyển đổi thành công.<br>3. Đặc biệt, trên đỉnh cao nhất của đường timeline biểu đồ hoạt động được gắn trực tiếp **Avatar tròn viền vàng** vinh danh Doanh nhân Top 1 Giver (Người trao cơ hội nhiều nhất), khích lệ văn hóa cống hiến và phụng sự trong cộng đồng.<br>4. Lọc cơ hội theo trạng thái (Đang mở, Đã nhận, Đã chốt), theo phân loại Bên Mua / Bên Bán hoặc tìm kiếm realtime. |
+| **Luồng Xử Lý Chính (Main Flow)** | 1. Bảng tin hiển thị luồng thông tin trao đổi Cung - Cầu kinh doanh liên tục:<br>   - Thẻ MÀU XANH LỤC - CƠ HỘI CẦU: Doanh nghiệp cần mua, cần tìm đối tác thầu phụ<br>   - Thẻ MÀU XANH DƯƠNG - CƠ HỘI CUNG: Doanh nghiệp có năng lực cung ứng đặc biệt<br>   - Giá trị thương vụ ước tính (ví dụ: Hợp đồng 500 triệu VNĐ)<br>   - Doanh nghiệp đăng tải và người đại diện liên hệ<br>   - Thời hạn tiếp nhận cơ hội kết nối.<br>2. Lọc cơ hội theo ngành nghề hoặc theo giá trị thương vụ. |
 | **Luồng Thay Thế / Ngoại Lệ (Alternative Flows)** | - Học viên có thể cài đặt thông báo: Nhận tin nhắn ngay khi có cơ hội Cầu thuộc ngành của mình. |
 | **Hậu Điều Kiện (Post-conditions)** | Học viên luôn đón đầu các cơ hội làm ăn béo bở ngay trong mạng lưới bạn bè thân thiết. |
 | **Hình Ảnh Minh Chứng Thực Tế** | *Bảng tin Cơ hội Kinh doanh Cung - Cầu thời gian thực của cộng đồng CEO HN10* |
@@ -2075,7 +2074,7 @@ Dưới đây là bảng đặc tả chi tiết toàn bộ 138 Use Cases bao ph�
 | **Tiền Điều Kiện (Pre-conditions)** | Học viên cần triển khai dự án và muốn ưu tiên hợp tác với doanh nghiệp trong CLB. |
 | **Luồng Xử Lý Chính (Main Flow)** | 1. Bấm nút "Đăng Nhu Cầu Mới" (Tạo Cơ Hội Cầu).<br>2. Điền thông tin yêu cầu:<br>   - Tiêu đề: "Cần tìm đối tác cung cấp dịch vụ văn phòng trọn gói tại Cầu Giấy"<br>   - Chi tiết yêu cầu kỹ thuật và tiến độ cần bàn giao<br>   - Ngân sách dự kiến<br>   - Thời hạn nhận hồ sơ chào giá.<br>3. Nhấn "Đăng Tin Lên Mạng Lưới".<br>4. Tin tức được xuất bản ngay lập tức, thông báo tự động phát đến các doanh nghiệp Học viên cung cấp dịch vụ tương ứng. |
 | **Luồng Thay Thế / Ngoại Lệ (Alternative Flows)** | - Nếu muốn bảo mật tên công ty trong giai đoạn đầu: Có thể chọn đăng ẩn danh qua sự điều phối của Ban Xúc Tiến. |
-| **Hậu Điều Kiện (Post-conditions)** | Tìm được nhà thầu ruột trong CLB CEO HN10 với giá tốt và tinh thần trách nhiệm cao nhất. |
+| **Hậu Điều Kiện (Post-conditions)** | Tìm được nhà thầu ruột cùng niên khóa 1983 với giá tốt và tinh thần trách nhiệm cao nhất. |
 | **Hình Ảnh Minh Chứng Thực Tế** | *Biểu mẫu đăng tin nhu cầu mua sắm và tìm đối tác hợp tác kinh doanh trong CLB* |
 
 ![Biểu mẫu đăng tin nhu cầu mua sắm và tìm đối tác hợp tác kinh doanh trong CLB](images/evidence/app_step_19_opportunity_create_modal.png)
@@ -2129,24 +2128,24 @@ Dưới đây là bảng đặc tả chi tiết toàn bộ 138 Use Cases bao ph�
 | **Hậu Điều Kiện (Post-conditions)** | Học viên luôn nắm rõ nghĩa vụ tài chính và trạng thái hoạt động của mình trong tổ chức. |
 | **Hình Ảnh Minh Chứng Thực Tế** | *Màn hình kiểm tra trạng thái thời hạn Học viên và chi tiết hóa đơn hội phí thường niên* |
 
-![Màn hình kiểm tra trạng thái thời hạn Học viên và chi tiết hóa đơn hội phí thường niên](images/evidence/app_hn10_09_fees_mã QR ngân hàng.png)
+![Màn hình kiểm tra trạng thái thời hạn Học viên và chi tiết hóa đơn hội phí thường niên](images/evidence/app1983_09_fees_vietqr.png)
 
 
-### 5.122. Bảng Use Case UC-APP-34: Thanh Toán Gia Hạn Hội Phí Siêu Tốc Trong 1 Giây Bằng mã QR ngân hàng Napas 24/7 Tự Động Gạch Nợ
+### 5.122. Bảng Use Case UC-APP-34: Thanh Toán Gia Hạn Hội Phí Siêu Tốc Trong 1 Giây Bằng Mã VietQR Napas 24/7 Tự Động Gạch Nợ
 
 | Thuộc Tính Nghiệp Vụ | Nội Dung Đặc Tả Chi Tiết |
 | :--- | :--- |
 | **Mã Use Case (ID)** | **UC-APP-34** |
 | **Phân Hệ / Nhóm** | Hội Phí & Đặc Quyền Học viên |
-| **Tên Chức Năng** | Thanh Toán Gia Hạn Hội Phí Siêu Tốc Trong 1 Giây Bằng mã QR ngân hàng Napas 24/7 Tự Động Gạch Nợ |
+| **Tên Chức Năng** | Thanh Toán Gia Hạn Hội Phí Siêu Tốc Trong 1 Giây Bằng Mã VietQR Napas 24/7 Tự Động Gạch Nợ |
 | **Tác Nhân (Actor)** | Học viên thực hiện nghĩa vụ đóng hội phí thường niên (Doanh nhân Phạm Văn Vũ) |
 | **Tiền Điều Kiện (Pre-conditions)** | Học viên có hóa đơn hội phí cần thanh toán. |
-| **Luồng Xử Lý Chính (Main Flow)** | 1. Bấm nút "Thanh Toán Hội Phí / Gia Hạn Ngay".<br>2. Hộp thoại thanh toán thông minh hiện lên với mã QR ngân hàng Napas 24/7 chuẩn quốc gia:<br>   - Tên ngân hàng thụ hưởng: Ngân hàng TMCP Quân Đội (MB Bank)<br>   - Tên tài khoản: CLB DOANH NHAN CEO HN10 - HANOIBA<br>   - Số tiền chính xác: 10.000.000 VNĐ<br>   - Nội dung chuyển khoản duy nhất: FEE-CEO83007.<br>3. Học viên mở bất kỳ Ứng dụng Ngân hàng nào trên điện thoại, quét mã QR.<br>4. Mọi thông tin người nhận, số tiền và nội dung tự động điền chính xác 100%.<br>5. Học viên xác nhận chuyển tiền.<br>6. Máy chủ CLB tự động nhận tín hiệu gạch nợ trong 1 giây, màn hình ứng dụng chuyển sang thông báo XANH LỤC chúc mừng gia hạn thành công. |
+| **Luồng Xử Lý Chính (Main Flow)** | 1. Bấm nút "Thanh Toán Hội Phí / Gia Hạn Ngay".<br>2. Hộp thoại thanh toán thông minh hiện lên với Mã VietQR Napas 24/7 chuẩn quốc gia:<br>   - Tên ngân hàng thụ hưởng: Ngân hàng TMCP Quân Đội (MB Bank)<br>   - Tên tài khoản: CLB DOANH NHAN CEO HN10 - HANOIBA<br>   - Số tiền chính xác: 10.000.000 VNĐ<br>   - Nội dung chuyển khoản duy nhất: FEE-CEO83007.<br>3. Học viên mở bất kỳ Ứng dụng Ngân hàng nào trên điện thoại, quét mã QR.<br>4. Mọi thông tin người nhận, số tiền và nội dung tự động điền chính xác 100%.<br>5. Học viên xác nhận chuyển tiền.<br>6. Máy chủ CLB tự động nhận tín hiệu gạch nợ trong 1 giây, màn hình ứng dụng chuyển sang thông báo XANH LỤC chúc mừng gia hạn thành công. |
 | **Luồng Thay Thế / Ngoại Lệ (Alternative Flows)** | - Nếu thanh toán trên cùng một điện thoại: Học viên nhấn "Lưu ảnh QR" hoặc bấm nút mở thẳng App ngân hàng liên kết. |
 | **Hậu Điều Kiện (Post-conditions)** | Hội phí được gạch nợ tự động, thẻ Học viên được gia hạn thêm 1 năm hoạt động ngay lập tức. |
-| **Hình Ảnh Minh Chứng Thực Tế** | *Giao diện thanh toán gia hạn hội phí thường niên siêu tốc bằng mã QR ngân hàng tự động gạch nợ* |
+| **Hình Ảnh Minh Chứng Thực Tế** | *Giao diện thanh toán gia hạn hội phí thường niên siêu tốc bằng mã VietQR tự động gạch nợ* |
 
-![Giao diện thanh toán gia hạn hội phí thường niên siêu tốc bằng mã QR ngân hàng tự động gạch nợ](images/evidence/app_step_20_annual_fee_renewal.png)
+![Giao diện thanh toán gia hạn hội phí thường niên siêu tốc bằng mã VietQR tự động gạch nợ](images/evidence/app_step_20_annual_fee_renewal.png)
 
 
 ### 5.123. Bảng Use Case UC-APP-35: Khám Phá Danh Mục Đặc Quyền & Ưu Đãi VIP Dành Riêng Cho Học viên CEO HN10
@@ -2158,12 +2157,12 @@ Dưới đây là bảng đặc tả chi tiết toàn bộ 138 Use Cases bao ph�
 | **Tên Chức Năng** | Khám Phá Danh Mục Đặc Quyền & Ưu Đãi VIP Dành Riêng Cho Học viên CEO HN10 |
 | **Tác Nhân (Actor)** | Học viên chính thức |
 | **Tiền Điều Kiện (Pre-conditions)** | Học viên đã hoàn thành nghĩa vụ hội phí. |
-| **Luồng Xử Lý Chính (Main Flow)** | 1. Mở mục "Kho Đặc Quyền & Ưu Đãi VIP" (/association/perks) trên ứng dụng.<br>2. Danh sách các gói đặc quyền đẳng cấp dành riêng cho doanh nhân thành viên: Dịch vụ khách sạn, resort nghỉ dưỡng, ẩm thực sang trọng, dịch vụ golf và phòng chờ thương gia.<br>3. Mỗi thẻ ưu đãi hiển thị rõ ràng thông tin thực tế: Địa điểm cơ sở áp dụng, mức chiết khấu độc quyền dành cho CEO HN10.<br>4. Thao tác tiện ích thông minh trực tiếp trên thẻ:<br>   - Nút "Mã Ưu Đãi QR": Mở popup hiển thị Mã QR Động kèm chuỗi mã bảo mật để quét tại quầy lễ tân / thanh toán của đối tác<br>   - Nút "Chỉ Đường Google Map": Mở ứng dụng bản đồ dẫn đường trực tiếp đến địa điểm ưu đãi<br>   - Nút "Gọi Hotline": Kết nối điện thoại tức thì với tổng đài chăm sóc khách hàng VIP<br>   - Nút "Ghé Gian Hàng": Xem chi tiết các sản phẩm khác của doanh nghiệp ưu đãi trên Sàn B2B. |
+| **Luồng Xử Lý Chính (Main Flow)** | 1. Mở mục "Đặc Quyền Học viên" trên ứng dụng.<br>2. Danh sách các đặc quyền đẳng cấp dành riêng cho doanh nhân thành viên:<br>   - Miễn phí vé tham dự toàn bộ các sự kiện Gala và Diễn đàn kinh tế trong năm<br>   - Miễn phí gian hàng B2B tiêu chuẩn quảng bá doanh nghiệp<br>   - Đặc quyền giảm giá 15% - 30% tại chuỗi khách sạn, resort nghỉ dưỡng của các Học viên trong CLB<br>   - Ưu đãi dịch vụ hàng không, phòng chờ thương gia sân bay<br>   - Tham gia các giải Golf và các câu lạc bộ thể thao nội bộ.<br>3. Bấm vào từng đặc quyền để lấy mã Voucher ưu đãi hoặc xem hướng dẫn sử dụng. |
 | **Luồng Thay Thế / Ngoại Lệ (Alternative Flows)** | - Học viên có thể đề xuất đóng góp thêm gói ưu đãi của công ty mình vào kho đặc quyền chung của CLB. |
 | **Hậu Điều Kiện (Post-conditions)** | Học viên cảm nhận sâu sắc giá trị vượt trội khi là một mắt xích trong cộng đồng Doanh nhân CEO HN10. |
 | **Hình Ảnh Minh Chứng Thực Tế** | *Danh mục đặc quyền và chính sách ưu đãi VIP dành riêng cho Học viên CEO HN10* |
 
-![Danh mục đặc quyền và chính sách ưu đãi VIP dành riêng cho Học viên CEO HN10](images/evidence/app_hn10_11_perks_benefits.png)
+![Danh mục đặc quyền và chính sách ưu đãi VIP dành riêng cho Học viên CEO HN10](images/evidence/app1983_11_perks_benefits.png)
 
 
 ### 5.124. Bảng Use Case UC-APP-36: Trung Tâm Thông Báo Đẩy Cá Nhân Hóa (Notification Center): Lịch Họp, Sự Kiện & Giao Thương
@@ -2192,7 +2191,7 @@ Dưới đây là bảng đặc tả chi tiết toàn bộ 138 Use Cases bao ph�
 | **Tên Chức Năng** | Tra Cứu Sổ Tay Hướng Dẫn Sử Dụng Hệ Thống Trực Tuyến Tích Hợp Sẵn Trên Ứng Dụng |
 | **Tác Nhân (Actor)** | Học viên mới cần tìm hiểu cách dùng các tính năng |
 | **Tiền Điều Kiện (Pre-conditions)** | Học viên mở mục Trợ Giúp / Hướng Dẫn Sử Dụng trên menu ứng dụng. |
-| **Luồng Xử Lý Chính (Main Flow)** | 1. Màn hình phân hệ Đào Tạo & Hướng Dẫn (/association/training) mở ra với 3 khối nội dung hữu ích:<br>   - **Chuyên Đề Đào Tạo Doanh Nhân**: Danh sách các khóa đào tạo nâng tầm lãnh đạo, quản trị tài chính, pháp lý và AI chuyển đổi số; hiển thị rõ giảng viên, học hàm học vị, lịch phát sóng và số Học viên đăng ký.<br>   - **Phòng Họp Trực Tuyến Tích Hợp (Jitsi Meet)**: Học viên chỉ cần nhấn nút "Vào Phòng Họp Video" để tham gia trực tiếp lớp học hoặc buổi tọa đàm, có đầy đủ camera, micro, chat và cơ chế điểm danh tự động mà không cần cài đặt thêm ứng dụng thứ ba.<br>   - **Kho Giáo Trình & Tài Liệu Bài Giảng**: Tải xuống slide bài giảng PDF, bảng tính dòng tiền Excel, biểu mẫu quy trình để áp dụng ngay vào doanh nghiệp.<br>   - **Sổ Tay Hướng Dẫn Sử Dụng Số**: Cẩm nang lật sách trực quan hướng dẫn sử dụng toàn bộ tính năng ứng dụng CEO HN10.<br>2. Học viên có thể lọc theo chuyên đề hoặc nhấn "Đăng Ký Tham Gia" để nhận thông báo nhắc lịch học. |
+| **Luồng Xử Lý Chính (Main Flow)** | 1. Màn hình Sổ Tay Hướng Dẫn mở ra với định dạng lật sách trực quan.<br>2. Danh mục hướng dẫn chi tiết từng bước bằng hình ảnh minh họa thực tế:<br>   - Hướng dẫn thiết lập Danh thiếp điện tử và chạm thẻ NFC<br>   - Hướng dẫn nhận vé mời sự kiện và xuất trình mã QR tại cổng<br>   - Hướng dẫn đăng bài bán hàng lên Gian hàng B2B<br>   - Hướng dẫn đóng hội phí thường niên qua VietQR tự động.<br>3. Học viên có thể tìm kiếm theo từ khóa hoặc xem video hướng dẫn ngắn 1 phút. |
 | **Luồng Thay Thế / Ngoại Lệ (Alternative Flows)** | - Nếu đọc hướng dẫn vẫn chưa rõ: Học viên bấm nút "Chat Với Ban Thư Ký" để được hỗ trợ trực tiếp. |
 | **Hậu Điều Kiện (Post-conditions)** | Bất kỳ Học viên nào, dù không rành công nghệ, cũng sử dụng thành thạo ứng dụng trong 5 phút. |
 | **Hình Ảnh Minh Chứng Thực Tế** | *Sổ tay Hướng dẫn sử dụng hệ thống trực tuyến tích hợp trực tiếp trên ứng dụng* |
@@ -2260,12 +2259,12 @@ Dưới đây là bảng đặc tả chi tiết toàn bộ 138 Use Cases bao ph�
 | **Tên Chức Năng** | Đánh Giá Tín Nhiệm & Nhận Xét 5 Sao Cho Đối Tác Sau Khi Hoàn Thành Giao Thương |
 | **Tác Nhân (Actor)** | Học viên đã hoàn tất giao dịch mua sắm / hợp tác |
 | **Tiền Điều Kiện (Pre-conditions)** | Giao dịch B2B giữa hai doanh nghiệp được xác nhận hoàn tất thành công. |
-| **Luồng Xử Lý Chính (Main Flow)** | 1. Học viên mở mục "Lịch Sử Giao Dịch B2B" trên ứng dụng.<br>2. Chọn giao dịch đã hoàn tất và bấm nút "Đánh Giá Đối Tác".<br>3. Chọn số sao tín nhiệm (từ 1 đến 5 sao) theo các tiêu chí: Chất lượng sản phẩm, Tiến độ giao hàng và Thái độ phục vụ chuyên nghiệp.<br>4. Viết cảm nhận thực tế: "Sản phẩm công nghệ của VIO CONNECT rất chuẩn chỉ, hỗ trợ nhiệt tình, xứng tầm doanh nhân CEO HN10!".<br>5. Bấm "Gửi Đánh Giá".<br>6. Điểm tín nhiệm của doanh nghiệp đối tác được cập nhật trên Gian hàng B2B để toàn thể CLB cùng tham khảo. |
+| **Luồng Xử Lý Chính (Main Flow)** | 1. Học viên mở mục "Lịch Sử Giao Dịch B2B" trên ứng dụng.<br>2. Chọn giao dịch đã hoàn tất và bấm nút "Đánh Giá Đối Tác".<br>3. Chọn số sao tín nhiệm (từ 1 đến 5 sao) theo các tiêu chí: Chất lượng sản phẩm, Tiến độ giao hàng và Thái độ phục vụ chuyên nghiệp.<br>4. Viết cảm nhận thực tế: "Sản phẩm công nghệ của VIO CONNECT rất chuẩn chỉ, hỗ trợ nhiệt tình, xứng tầm doanh nhân 1983!".<br>5. Bấm "Gửi Đánh Giá".<br>6. Điểm tín nhiệm của doanh nghiệp đối tác được cập nhật trên Gian hàng B2B để toàn thể CLB cùng tham khảo. |
 | **Luồng Thay Thế / Ngoại Lệ (Alternative Flows)** | - Doanh nghiệp được đánh giá có thể viết phản hồi cảm ơn đối tác công khai dưới phần nhận xét. |
 | **Hậu Điều Kiện (Post-conditions)** | Xây dựng môi trường giao thương nội bộ trung thực, tôn vinh các doanh nghiệp uy tín hàng đầu trong CLB. |
 | **Hình Ảnh Minh Chứng Thực Tế** | *Hệ thống đánh giá tín nhiệm và chấm điểm uy tín đối tác giao thương nội bộ B2B* |
 
-![Hệ thống đánh giá tín nhiệm và chấm điểm uy tín đối tác giao thương nội bộ B2B](images/evidence/app_hn10_10_marketplace_shopee.png)
+![Hệ thống đánh giá tín nhiệm và chấm điểm uy tín đối tác giao thương nội bộ B2B](images/evidence/app1983_10_marketplace_shopee.png)
 
 
 ### 5.130. Bảng Use Case UC-APP-42: Đăng Ký Gian Hàng Triển Lãm Doanh Nghiệp Tại Sự Kiện Gala & Diễn Đàn Kinh Tế
@@ -2319,35 +2318,35 @@ Dưới đây là bảng đặc tả chi tiết toàn bộ 138 Use Cases bao ph�
 ![Hệ thống quay số may mắn trúng thưởng các phần quà giá trị từ Nhà tài trợ tại Gala](images/evidence/crm_12_voting_luckydraw.png)
 
 
-### 5.133. Bảng Use Case UC-APP-45: Đóng Góp Ủng Hộ Quỹ Thiện Nguyện Bằng mã QR ngân hàng Trực Tiếp Trên Ứng Dụng
+### 5.133. Bảng Use Case UC-APP-45: Đóng Góp Ủng Hộ Quỹ Thiện Nguyện Bằng Mã VietQR Trực Tiếp Trên Ứng Dụng
 
 | Thuộc Tính Nghiệp Vụ | Nội Dung Đặc Tả Chi Tiết |
 | :--- | :--- |
 | **Mã Use Case (ID)** | **UC-APP-45** |
 | **Phân Hệ / Nhóm** | Thiện Nguyện & An Sinh Xã Hội |
-| **Tên Chức Năng** | Đóng Góp Ủng Hộ Quỹ Thiện Nguyện Bằng mã QR ngân hàng Trực Tiếp Trên Ứng Dụng |
+| **Tên Chức Năng** | Đóng Góp Ủng Hộ Quỹ Thiện Nguyện Bằng Mã VietQR Trực Tiếp Trên Ứng Dụng |
 | **Tác Nhân (Actor)** | Học viên có tấm lòng hảo tâm (Doanh nhân Phạm Văn Vũ) |
 | **Tiền Điều Kiện (Pre-conditions)** | Học viên xem thông tin chương trình thiện nguyện "Áo Ấm Cho Em" trên app. |
-| **Luồng Xử Lý Chính (Main Flow)** | 1. Bấm nút "Ủng Hộ Chiến Dịch Ngay".<br>2. Chọn số tiền đóng góp (Ví dụ: 2.000.000 VNĐ, 5.000.000 VNĐ, 10.000.000 VNĐ hoặc nhập số tiền tùy tâm).<br>3. Nhập lời chúc gửi đến các em nhỏ vùng cao.<br>4. Bấm "Tạo mã QR ngân hàng Ủng Hộ".<br>5. mã QR ngân hàng hiện ra với đúng thông tin tài khoản Quỹ Thiện Nguyện CLB và cú pháp giao dịch duy nhất.<br>6. Học viên quét mã thanh toán trên ứng dụng ngân hàng.<br>7. Sau 1 giây, màn hình hiển thị Thư cảm ơn tấm lòng vàng và tên Học viên xuất hiện trang trọng trên Bảng vàng nhân ái. |
+| **Luồng Xử Lý Chính (Main Flow)** | 1. Bấm nút "Ủng Hộ Chiến Dịch Ngay".<br>2. Chọn số tiền đóng góp (Ví dụ: 2.000.000 VNĐ, 5.000.000 VNĐ, 10.000.000 VNĐ hoặc nhập số tiền tùy tâm).<br>3. Nhập lời chúc gửi đến các em nhỏ vùng cao.<br>4. Bấm "Tạo Mã VietQR Ủng Hộ".<br>5. Mã VietQR hiện ra với đúng thông tin tài khoản Quỹ Thiện Nguyện CLB và cú pháp giao dịch duy nhất.<br>6. Học viên quét mã thanh toán trên ứng dụng ngân hàng.<br>7. Sau 1 giây, màn hình hiển thị Thư cảm ơn tấm lòng vàng và tên Học viên xuất hiện trang trọng trên Bảng vàng nhân ái. |
 | **Luồng Thay Thế / Ngoại Lệ (Alternative Flows)** | - Học viên có thể bấm chia sẻ chứng nhận ủng hộ lên mạng xã hội để lan tỏa tinh thần nhân ái của CLB. |
 | **Hậu Điều Kiện (Post-conditions)** | Khoản đóng góp được chuyển thẳng vào Quỹ An Sinh Xã Hội của CLB một cách an toàn và minh bạch. |
-| **Hình Ảnh Minh Chứng Thực Tế** | *Thao tác đóng góp ủng hộ chương trình thiện nguyện an sinh xã hội siêu tốc qua Mã QR Ngân Hàng* |
+| **Hình Ảnh Minh Chứng Thực Tế** | *Thao tác đóng góp ủng hộ chương trình thiện nguyện an sinh xã hội siêu tốc qua VietQR* |
 
-![Thao tác đóng góp ủng hộ chương trình thiện nguyện an sinh xã hội siêu tốc qua Mã QR Ngân Hàng](images/evidence/app_step_20_annual_fee_renewal.png)
+![Thao tác đóng góp ủng hộ chương trình thiện nguyện an sinh xã hội siêu tốc qua VietQR](images/evidence/app_step_20_annual_fee_renewal.png)
 
 
-### 5.134. Bảng Use Case UC-APP-46: Đăng Ký Tham Gia Các Câu Lạc Bộ Thể Thao: Golf CEO HN10, Tennis, Chạy Bộ Phong Trào
+### 5.134. Bảng Use Case UC-APP-46: Đăng Ký Tham Gia Các Câu Lạc Bộ Thể Thao: Golf 1983, Tennis, Chạy Bộ Phong Trào
 
 | Thuộc Tính Nghiệp Vụ | Nội Dung Đặc Tả Chi Tiết |
 | :--- | :--- |
 | **Mã Use Case (ID)** | **UC-APP-46** |
 | **Phân Hệ / Nhóm** | Câu Lạc Bộ Thể Thao & Gắn Kết |
-| **Tên Chức Năng** | Đăng Ký Tham Gia Các Câu Lạc Bộ Thể Thao: Golf CEO HN10, Tennis, Chạy Bộ Phong Trào |
+| **Tên Chức Năng** | Đăng Ký Tham Gia Các Câu Lạc Bộ Thể Thao: Golf 1983, Tennis, Chạy Bộ Phong Trào |
 | **Tác Nhân (Actor)** | Học viên yêu thích hoạt động thể dục thể thao |
 | **Tiền Điều Kiện (Pre-conditions)** | Học viên mở mục "CLB Thể Thao & Sở Thích" trên ứng dụng. |
-| **Luồng Xử Lý Chính (Main Flow)** | 1. Xem danh sách các câu lạc bộ trực thuộc: CLB Golf Doanh Nhân CEO HN10, CLB Tennis CEO HN10, CLB Chạy Bộ Marathon.<br>2. Xem lịch sinh hoạt định kỳ, địa điểm tập luyện và ban điều hành của từng CLB thể thao.<br>3. Chọn câu lạc bộ phù hợp và bấm nút "Đăng Ký Gia Nhập CLB Thể Thao".<br>4. Điền trình độ / Handicap (đối với Golf) và kích cỡ áo thi đấu.<br>5. Bấm "Xác Nhận Gia Nhập".<br>6. Hệ thống tự động thêm Học viên vào nhóm sinh hoạt thể thao nội bộ và cập nhật lịch giao lưu thể thao vào lịch cá nhân. |
+| **Luồng Xử Lý Chính (Main Flow)** | 1. Xem danh sách các câu lạc bộ trực thuộc: CLB Golf Doanh Nhân 1983, CLB Tennis 1983, CLB Chạy Bộ Marathon.<br>2. Xem lịch sinh hoạt định kỳ, địa điểm tập luyện và ban điều hành của từng CLB thể thao.<br>3. Chọn câu lạc bộ phù hợp và bấm nút "Đăng Ký Gia Nhập CLB Thể Thao".<br>4. Điền trình độ / Handicap (đối với Golf) và kích cỡ áo thi đấu.<br>5. Bấm "Xác Nhận Gia Nhập".<br>6. Hệ thống tự động thêm Học viên vào nhóm sinh hoạt thể thao nội bộ và cập nhật lịch giao lưu thể thao vào lịch cá nhân. |
 | **Luồng Thay Thế / Ngoại Lệ (Alternative Flows)** | - Học viên có thể đăng ký tham gia các giải đấu giao hữu mở rộng do CLB phối hợp với HanoiBA tổ chức. |
-| **Hậu Điều Kiện (Post-conditions)** | Học viên nâng cao sức khỏe, tăng cường tình Học viên CLB qua các hoạt động thể thao văn minh. |
+| **Hậu Điều Kiện (Post-conditions)** | Học viên nâng cao sức khỏe, tăng cường tình bạn bè đồng niên qua các hoạt động thể thao văn minh. |
 | **Hình Ảnh Minh Chứng Thực Tế** | *Danh sách và lịch sinh hoạt các câu lạc bộ thể thao Golf, Tennis, Chạy bộ của CLB* |
 
 ![Danh sách và lịch sinh hoạt các câu lạc bộ thể thao Golf, Tennis, Chạy bộ của CLB](images/evidence/app_step_11_events_list.png)
@@ -2394,9 +2393,9 @@ Dưới đây là bảng đặc tả chi tiết toàn bộ 138 Use Cases bao ph�
 | **Mã Use Case (ID)** | **UC-APP-49** |
 | **Phân Hệ / Nhóm** | Chứng Nhận & Danh Dự Học viên |
 | **Tên Chức Năng** | Tải Xuống Giấy Chứng Nhận Học viên Điện Tử Kèm Chữ Ký Số Của Ban Chấp Hành |
-| **Tác Nhân (Actor)** | Học viên chính thức (Doanh nhân Phạm Văn Vũ - HN10-0007) |
+| **Tác Nhân (Actor)** | Học viên chính thức (Doanh nhân Phạm Văn Vũ - CEO-83007) |
 | **Tiền Điều Kiện (Pre-conditions)** | Học viên đã được kết nạp chính thức và hoàn tất nghĩa vụ hội phí. |
-| **Luồng Xử Lý Chính (Main Flow)** | 1. Mở mục "Chứng Nhận Học viên" trên màn hình Thẻ Doanh Nhân Số.<br>2. Hệ thống hiển thị bản xem trước của Giấy Chứng Nhận Học viên Chính Thức mang nhận diện Hoàng gia sang trọng:<br>   - Họ và tên: Phạm Văn Vũ<br>   - Chức danh: Tổng Giám Đốc - Công ty Cổ phần Công nghệ VIO CONNECT<br>   - Mã số Học viên: HN10-0007<br>   - Khóa sinh hoạt: Nhiệm kỳ Hội Doanh Nhân Trẻ Hà Nội<br>   - Chữ ký số và con dấu điện tử của Chủ tịch CLB Doanh Nhân CEO HN10<br>   - Mã QR xác thực nguồn gốc điện tử chống giả mạo.<br>3. Bấm nút "Tải File PDF Chất Lượng Cao".<br>4. Tệp chứng nhận được lưu về điện thoại, sẵn sàng in đóng khung treo tại phòng làm việc. |
+| **Luồng Xử Lý Chính (Main Flow)** | 1. Mở mục "Chứng Nhận Học viên" trên màn hình Thẻ VIP.<br>2. Hệ thống hiển thị bản xem trước của Giấy Chứng Nhận Học viên Chính Thức mang nhận diện Hoàng gia sang trọng:<br>   - Họ và tên: Phạm Văn Vũ<br>   - Chức danh: Tổng Giám Đốc - Công ty Cổ phần Công nghệ VIO CONNECT<br>   - Mã số Học viên: CEO-83007<br>   - Khóa sinh hoạt: Nhiệm kỳ Hội Doanh Nhân Trẻ Hà Nội<br>   - Chữ ký số và con dấu điện tử của Chủ tịch CLB Doanh Nhân CEO HN10<br>   - Mã QR xác thực nguồn gốc điện tử chống giả mạo.<br>3. Bấm nút "Tải File PDF Chất Lượng Cao".<br>4. Tệp chứng nhận được lưu về điện thoại, sẵn sàng in đóng khung treo tại phòng làm việc. |
 | **Luồng Thay Thế / Ngoại Lệ (Alternative Flows)** | - Bất kỳ ai khi quét mã QR trên bản in chứng nhận đều được dẫn tới trang xác thực công khai xác nhận Học viên thật 100%. |
 | **Hậu Điều Kiện (Post-conditions)** | Khẳng định niềm tự hào và vị thế doanh nhân chính thức trong đại gia đình CEO HN10. |
 | **Hình Ảnh Minh Chứng Thực Tế** | *Mẫu Giấy Chứng Nhận Học viên Chính Thức điện tử có mã QR xác thực và chữ ký số* |
@@ -2418,153 +2417,12 @@ Dưới đây là bảng đặc tả chi tiết toàn bộ 138 Use Cases bao ph�
 | **Hậu Điều Kiện (Post-conditions)** | Tài khoản doanh nhân được bảo vệ đa lớp, ngăn chặn 100% nguy cơ xâm nhập trái phép. |
 | **Hình Ảnh Minh Chứng Thực Tế** | *Màn hình quản lý thiết bị đăng nhập, cấu hình xác thực hai yếu tố và bảo mật tài khoản* |
 
-### 5.139. Bảng Use Case UC-CRM-79: Quản Trị Đào Tạo Doanh Nhân Đa Thức (Online/Offline/Hybrid), Khai Báo Sức Chứa, Hạng Vé, Form Đăng Ký Mở, Dynamic QR & Bắn Xuống Feed App Mobile (Tuyệt Đối Không Xếp Chỗ)
-
-| Thuộc Tính Nghiệp Vụ | Nội Dung Đặc Tả Chi Tiết |
-| :--- | :--- |
-| **Mã Use Case (ID)** | **UC-CRM-79** |
-| **Phân Hệ / Nhóm** | Ban Đào Tạo & Phát Triển Doanh Nhân |
-| **Tên Chức Năng** | Quản Trị Đào Tạo Doanh Nhân Đa Thức (Online/Offline/Hybrid), Khai Báo Sức Chứa, Hạng Vé, Form Đăng Ký Mở, Dynamic QR & Bắn Xuống Feed App Mobile (Tuyệt Đối Không Xếp Chỗ) |
-| **Tác Nhân (Actor)** | Trưởng Ban Đào Tạo, Ban Thư Ký, Chuyên gia Giảng viên |
-| **Tiền Điều Kiện (Pre-conditions)** | Ban Đào Tạo đăng nhập Cổng Quản Trị và mở phân hệ Đào Tạo (`/trainings`). |
-| **Luồng Xử Lý Chính (Main Flow)** | 1. Người dùng mở trang Quản Trị Đào Tạo (/trainings) với giao diện chuẩn `CustomTable`, 4 thẻ Metric Gradient và bấm "Thêm khóa đào tạo".<br>2. **Khai Báo Toàn Diện Thông Tin Đào Tạo**:<br>   - Tiêu đề khóa học, Tagline thông điệp, Giảng viên/Chuyên gia đào tạo (Họ tên, Học vị/Chức danh, Đơn vị công tác).<br>   - Thời gian bắt đầu - kết thúc rõ ràng.<br>   - **Khai Báo Sức Chứa Học Viên Tối Đa (`max_attendees`)**: Thiết lập giới hạn học viên tham gia để kiểm soát chất lượng đào tạo và sức chứa phòng.<br>   - **Khai Báo Danh Sách Các Hạng Vé Học Viên Kèm Số Lượng Vé Tối Đa (`ticket_tiers`)**: Cho phép khai báo nhiều hạng vé (Học viên chính thức [Miễn phí / 50 vé], Khách mời kết nối [Phí 500.000đ / 20 vé], VIP Mentor).<br>   - Tài liệu/Slide giáo trình đính kèm (`materials`) và Link ảnh bìa khóa học (`cover_image`).<br>3. **Thiết Lập Đa Thức Đào Tạo Linh Hoạt**:<br>   - *Hình thức Online*: Nhập liên kết phòng học trực tuyến (Jitsi Meet nhúng sẵn / Zoom), ID phòng họp và mật khẩu bảo mật.<br>   - *Hình thức Offline*: Nhập địa điểm phòng học, địa chỉ hội trường thực tế có bản đồ tương tác.<br>   - *Hình thức Hybrid*: Tích hợp đồng thời cả địa điểm offline và đường link phát sóng online đa nền tảng.<br>4. **QUY TẮC BẮT BUỘC: TUYỆT ĐỐI KHÔNG CÓ PHẦN XẾP CHỖ**:<br>   - Khác với sự kiện đại tiệc Gala, chức năng đào tạo loại bỏ hoàn toàn phần sơ đồ bàn tiệc/ghế ngồi Cinema, đảm bảo tính linh hoạt mở của lớp học doanh nhân.<br>5. **Đường Dẫn Đăng Ký Mở & Mã QR Động (Open Registration & Dynamic QR)**:<br>   - Hệ thống tự động sinh một đường link công khai duy nhất cho khóa học (Public Registration Form URL) kèm **Mã QR Động** có thể phóng to, tải về hoặc sao chép để chia sẻ tới ứng viên và doanh nhân.<br>6. **Tính Năng Bắn Xuống App CEO HN10 (Broadcast to Mobile App Feed)**:<br>   - Tại danh sách khóa học, người dùng bấm nút **"Bắn Xuống App CEO HN10"** (Icon `Send`). Hệ thống tự động tạo bài viết truyền thông trên Bảng tin Mạng lưới Mobile (`POST /feed` với category `TRAINING`), lấy CHÍNH XÁC dữ liệu thực từ CSDL (tuyệt đối không dùng dữ liệu giả lập), đính kèm ảnh Poster chuyên đề và **Mã QR Điểm Danh**. |
-| **Luồng Thay Thế / Ngoại Lệ (Alternative Flows)** | - Giảng viên có thể cập nhật tài liệu giáo trình (Slide PDF, bảng tính Excel) bất kỳ lúc nào trước giờ phát sóng; tài liệu tự động đồng bộ sang ứng dụng di động. |
-| **Hậu Điều Kiện (Post-conditions)** | Khóa đào tạo được tổ chức chuyên nghiệp, kết nối đồng bộ 2 chiều giữa Cổng Quản trị và Ứng dụng Di Động Học viên. |
-| **Hình Ảnh Minh Chứng Thực Tế** | *Giao diện quản trị khóa đào tạo đa thức, form đăng ký mở kèm mã QR và nút bắn xuống App di động* |
-
-![Giao diện quản trị khóa đào tạo đa thức, form đăng ký mở kèm mã QR và nút bắn xuống App di động](images/evidence/crm_trainings_management.png)
-
-
-### 5.140. Bảng Use Case UC-APP-51: Trung Tâm Thống Kê 5 Phân Loại Nghiệp Vụ, Bộ Lọc Biểu Đồ 3 Trạng Thái, Ghim Avatar Đỉnh Top 1, Bục Vinh Danh Top 3 Một Hàng & Xuất Báo Cáo A4/Excel
-
-| Thuộc Tính Nghiệp Vụ | Nội Dung Đặc Tả Chi Tiết |
-| :--- | :--- |
-| **Mã Use Case (ID)** | **UC-APP-51** |
-| **Phân Hệ / Nhóm** | Trung Tâm Thống Kê & Bảng Vinh Danh Doanh Nhân |
-| **Tên Chức Năng** | Trung Tâm Thống Kê 5 Phân Loại Nghiệp Vụ, Bộ Lọc Biểu Đồ 3 Trạng Thái, Ghim Avatar Đỉnh Top 1, Bục Vinh Danh Top 3 Một Hàng & Xuất Báo Cáo A4/Excel |
-| **Tác Nhân (Actor)** | Toàn thể Học viên Doanh nhân CEO HN10 |
-| **Tiền Điều Kiện (Pre-conditions)** | Học viên mở tab "Thống kê" (`/association/analytics`) tại vị trí nút thứ 2 trên thanh điều hướng chân trang. |
-| **Luồng Xử Lý Chính (Main Flow)** | 1. Màn hình Thống Kê Di Động (/association/analytics) mở ra với giao diện tinh gọn, tập trung hoàn toàn vào dữ liệu.<br>2. **Biểu Đồ Luôn Hiển Thị Đầu Tiên & Bộ Lọc Biểu Đồ 3 Trạng Thái**:<br>   - Biểu đồ ComposedChart kết hợp Cột và Đường luôn hiển thị ở vị trí trên cùng ngay dưới bộ chọn chu kỳ và danh mục.<br>   - **Chức năng lọc 3 trạng thái biểu đồ**:<br>     + *Trạng thái 1: "Vừa tăng vừa giảm"*: Hiển thị đầy đủ cả mốc tăng trưởng và mốc sụt giảm.<br>     + *Trạng thái 2: "Chỉ tăng"*: Biểu đồ lọc riêng các mốc tăng trưởng tích cực, đường xu hướng chuyển sang màu Xanh Ngọc Emerald (`#10B981`).<br>     + *Trạng thái 3: "Chỉ giảm"*: Biểu đồ lọc riêng các mốc sụt giảm hoặc cần cảnh báo, đường xu hướng chuyển sang màu Đỏ cờ (`#EF4444`).<br>3. **4 Ô Thẻ Chỉ Số KPI Cốt Lõi Phía Dưới Biểu Đồ**:<br>   - Ô 1: Tổng cơ hội kết nối kinh doanh đã trao đổi.<br>   - Ô 2: Tổng chi tiêu giao dịch và doanh số các deal chốt thành công.<br>   - Ô 3: Lượt tương tác, tần suất mở app và bình luận của cộng đồng.<br>   - Ô 4: Số lượng sự kiện, diễn đàn và cuộc họp đang diễn ra sôi nổi.<br>4. **Ghim Avatar Đỉnh Top 1**: Tại đỉnh của cột cao nhất hoặc điểm kết thúc của đường kẻ, hệ thống tự động ghim **Avatar tròn viền vàng** vinh danh Doanh nhân đang dẫn đầu bảng xếp hạng.<br>5. **Bục Vinh Danh Top 3 Nằm Chung 1 Hàng Ngang (Award Podium)**:<br>   - Bố trí trực tiếp bên dưới biểu đồ theo quy chuẩn bục giải thưởng thể thao:<br>     + **Top 1 ở giữa cao nhất**: Vinh danh Doanh nhân xuất sắc nhất kèm vương miện Vàng.<br>     + **Top 2 ở bên cạnh trái**: Chiều cao bục nhì kèm huy hiệu Bạc.<br>     + **Top 3 ở bên cạnh phải**: Chiều cao bục ba kèm huy hiệu Đồng.<br>   - Tất cả 3 bục cùng nằm trên 1 hàng ngang duy nhất (`grid-cols-3`), tối ưu diện tích hiển thị trên màn hình điện thoại.<br>6. **Phân Định Rõ Ràng 5 Danh Mục Thống Kê Chuyên Biệt**:<br>   - Thống kê cơ hội kết nối kinh doanh (Opportunities).<br>   - Thống kê các giao dịch đã chi tiêu (Spending & Transactions).<br>   - Thống kê lượt tương tác và tần suất hoạt động trong app (App Interaction Frequency).<br>   - Thống kê sự kiện và hoạt động đang diễn ra (Ongoing Events).<br>   - Thống kê thành viên hoạt động nhiều nhất (Top Active Members).<br>7. **Hộp Thoại Xuất Báo Cáo Chuẩn Hóa**: In ấn khổ giấy A4 chuẩn trang in di động hoặc tải tệp bảng tính Excel (`.xlsx`). |
-| **Luồng Thay Thế / Ngoại Lệ (Alternative Flows)** | - Khi đổi danh mục thống kê: Biểu đồ và bục vinh danh tự động chuyển động cập nhật số liệu tương ứng mượt mà. |
-| **Hậu Điều Kiện (Post-conditions)** | Học viên theo dõi trực quan hiệu quả giao thương của bản thân và toàn CLB, kích thích động lực thi đua kết nối kinh doanh. |
-| **Hình Ảnh Minh Chứng Thực Tế** | *Giao diện Trung tâm Thống kê di động với 4 thẻ KPI, biểu đồ cột đường ghim avatar và bục vinh danh Top 3 một hàng* |
-
-![Giao diện Trung tâm Thống kê di động với 4 thẻ KPI, biểu đồ cột đường ghim avatar và bục vinh danh Top 3 một hàng](images/evidence/app_analytics_dashboard_podium.png)
-
-
-### 5.141. Bảng Use Case UC-APP-52: Quản Lý Hồ Sơ Cá Nhân (Profile), Tối Giản Header & Đồng Bộ Trạng Thái Theme CRM Thời Gian Thực
-
-| Thuộc Tính Nghiệp Vụ | Nội Dung Đặc Tả Chi Tiết |
-| :--- | :--- |
-| **Mã Use Case (ID)** | **UC-APP-52** |
-| **Phân Hệ / Nhóm** | Cá Nhân & Định Danh Học viên |
-| **Tên Chức Năng** | Quản Lý Hồ Sơ Cá Nhân (Profile), Tối Giản Header & Đồng Bộ Trạng Thái Theme CRM Thời Gian Thực |
-| **Tác Nhân (Actor)** | Học viên chính thức CLB CEO HN10 |
-| **Tiền Điều Kiện (Pre-conditions)** | Học viên mở tab "Cá nhân" (`/association/profile`) trên thanh điều hướng dưới đáy. |
-| **Luồng Xử Lý Chính (Main Flow)** | 1. Học viên truy cập trang Cá Nhân (/association/profile).<br>2. **Tối Giản Hóa Thanh Tiêu Đề (Header Refactoring)**: Loại bỏ toàn bộ các icon chức năng rườm rà ở góc phải Header (`right={null}`), giúp màn hình thoáng đãng, tập trung tối đa vào danh vị và hình ảnh đại diện lãnh đạo.<br>3. **Thẻ Trạng Thái Chủ Đề Theme CRM Thời Gian Thực (CRM Theme Sync Card)**:<br>   - Hiển thị một thẻ thông tin sang trọng mang viền vàng hổ phách, thông báo tên chủ đề lễ hội đang được Ban Quản Trị kích hoạt từ CRM (Ví dụ: "Chủ đề Đang Áp Dụng: Tết Nguyên Đán / Dạ Tiệc Gala").<br>   - Báo hiệu trạng thái đồng bộ thời gian thực ("✓ Đã đồng bộ với Theme Studio CRM"), cho phép Học viên nắm bắt không khí sinh hoạt chung của toàn hiệp hội.<br>4. Quản lý thông tin hồ sơ doanh nhân: Ảnh chân dung, mã Học viên, chức vụ, công ty, điều lệ hiệp hội và hợp đồng Học viên điện tử.<br>5. Các tài khoản có vai trò Quản trị viên (BQT/Admin) được hiển thị nút truy cập nhanh "Phân quyền Học viên (BQT)" để điều hành nhân sự. |
-| **Luồng Thay Thế / Ngoại Lệ (Alternative Flows)** | - Khi Theme Studio CRM chuyển đổi chủ đề: Thẻ trạng thái tự động cập nhật tên chủ đề mới ngay lập tức mà không cần người dùng tải lại trang. |
-| **Hậu Điều Kiện (Post-conditions)** | Trang cá nhân giữ vững phong cách tối giản, sang trọng và thể hiện sự gắn kết nhất quán với hệ thống quản trị trung tâm. |
-| **Hình Ảnh Minh Chứng Thực Tế** | *Giao diện Hồ sơ cá nhân Học viên với header tối giản và thẻ trạng thái đồng bộ Theme CRM* |
-
-![Giao diện Hồ sơ cá nhân Học viên với header tối giản và thẻ trạng thái đồng bộ Theme CRM](images/evidence/app_profile_theme_sync.png)
-
-
-### 5.142. Bảng Use Case UC-APP-53: Cửa Sổ Chào Mừng Học viên Mới (Onboarding Welcome Modal) Hỗ Trợ Đa Chế Độ Sáng / Tối
-
-| Thuộc Tính Nghiệp Vụ | Nội Dung Đặc Tả Chi Tiết |
-| :--- | :--- |
-| **Mã Use Case (ID)** | **UC-APP-53** |
-| **Phân Hệ / Nhóm** | Chào Mừng & Hướng Dẫn Học viên Mới |
-| **Tên Chức Năng** | Cửa Sổ Chào Mừng Học viên Mới (Onboarding Welcome Modal) Hỗ Trợ Đa Chế Độ Sáng / Tối |
-| **Tác Nhân (Actor)** | Doanh nhân mới được kết nạp hoặc Học viên đăng nhập phiên mới |
-| **Tiền Điều Kiện (Pre-conditions)** | Học viên đăng nhập thành công vào ứng dụng di động CEO HN10. |
-| **Luồng Xử Lý Chính (Main Flow)** | 1. Ngay khi giao diện khung vỏ `MemberShell` được nạp, hệ thống kích hoạt **Cửa Sổ Chào Mừng Học viên (WelcomeMemberModal)** xuất hiện trang trọng giữa màn hình.<br>2. Nội dung chào mừng mang đậm bản sắc văn hóa CEO HN10:<br>   - Lời chào mừng nồng nhiệt: "Chào Mừng Quý Doanh Nhân Đến Với Hệ Sinh Thái CEO HN10 (HanoiBA)!".<br>   - Giới thiệu 4 trụ cột cốt lõi: Kết Nối B2B Đỉnh Cao, Danh Thiếp Thông Minh NFC 1 Chạm, Giao Thương Cung - Cầu Minh Bạch và Học Tập Đào Tạo Nâng Tầm Lãnh Đạo.<br>   - Lời chúc phát tài, thịnh vượng và gắn kết bền vững từ Ban Chấp Hành CLB.<br>3. **Thích Ứng Hoàn Hảo Đa Giao Diện (Light & Dark Mode)**:<br>   - Ở chế độ Sáng (Light Theme): Nền trắng ngọc trai, chữ xanh navy đậm, đường viền vàng ánh kim thanh lịch.<br>   - Ở chế độ Tối (Dark Theme): Nền đen Obsidian huyền bí, chữ trắng sáng, hiệu ứng phát sáng neon vàng sang trọng.<br>4. Học viên nhấn nút "Bắt Đầu Trải Nghiệm" (Icon `Sparkles` màu Amber Gold) để đóng cửa sổ và bước vào sử dụng các tiện ích của ứng dụng.<br>5. Hệ thống ghi nhớ trạng thái để không làm phiền ở các lần chuyển trang tiếp theo trong cùng phiên làm việc. |
-| **Luồng Thay Thế / Ngoại Lệ (Alternative Flows)** | - Học viên có thể bấm biểu tượng đóng (X) ở góc phải trên cùng để đóng nhanh cửa sổ chào mừng. |
-| **Hậu Điều Kiện (Post-conditions)** | Học viên cảm nhận được sự đón tiếp chu đáo, trọng thị và tinh thần đồng đội nồng ấm ngay từ giây phút đầu tiên gia nhập. |
-| **Hình Ảnh Minh Chứng Thực Tế** | *Cửa sổ chào mừng Học viên mới với thiết kế Hoàng gia hỗ trợ cả chế độ Sáng và Tối* |
-
-![Cửa sổ chào mừng Học viên mới với thiết kế Hoàng gia hỗ trợ cả chế độ Sáng và Tối](images/evidence/app_welcome_onboarding_modal.png)
-
-
-### 5.143. Bảng Use Case UC-CRM-80: Quản Trị Đội Ngũ Nhân Sự Trực Thuộc Doanh Nghiệp Thành Viên & Modal Thêm Cán Bộ Nhanh
-
-| Thuộc Tính Nghiệp Vụ | Nội Dung Đặc Tả Chi Tiết |
-| :--- | :--- |
-| **Mã Use Case (ID)** | **UC-CRM-80** |
-| **Phân Hệ / Nhóm** | Quản Trị Doanh Nghiệp Thành Viên (`[NODE-CRM-004]`) |
-| **Tên Chức Năng** | Quản Trị Đội Ngũ Nhân Sự Trực Thuộc Doanh Nghiệp Thành Viên & Modal Thêm Cán Bộ Nhanh |
-| **Tác Nhân (Actor)** | Ban Quản Trị, Ban Thành Viên, Ban Thư Ký, Chủ doanh nghiệp |
-| **Tiền Điều Kiện (Pre-conditions)** | Người dùng đăng nhập Cổng Quản Trị CRM và truy cập màn hình chi tiết doanh nghiệp (`/companies/$companyId`). |
-| **Luồng Xử Lý Chính (Main Flow)** | 1. Người dùng truy cập danh sách doanh nghiệp (/companies) và chọn một doanh nghiệp để xem chi tiết (/companies/$companyId).<br>2. **Tab "Đội Ngũ Nhân Sự"**: Hệ thống hiển thị Tab thứ 5 dành riêng cho việc quản lý các cán bộ, nhân sự trực thuộc công ty.<br>3. **Truy Vấn Tích Hợp Thông Minh**: Backend tự động tổng hợp danh sách nhân sự liên quan từ CSDL PostgreSQL qua API `GET /members/:id/personnel`, bao gồm người đại diện pháp luật, Học viên có cùng tên/mã công ty và bảng liên kết `public.company_members`.<br>4. **Thẻ Tóm Tắt & Danh Sách Nhân Sự**: Hiển thị bảng chi tiết các thành viên: Họ tên, Chức vụ trong công ty, Số điện thoại liên hệ, Email, Ngày tham gia và Trạng thái hoạt động.<br>5. **Modal Thêm Nhân Sự Nhanh (`AddPersonnelModal`)**: Bấm nút "Thêm nhân sự", nhập Họ tên, Chức vụ, Email, Số điện thoại và bấm "Lưu nhân sự" để hệ thống cập nhật tức thì vào CSDL qua `POST /members/:id/personnel`.<br>6. **Đồng Bộ Quy Mô Lao Động**: Số lượng nhân sự thực tế tự động được cập nhật vào trường quy mô doanh nghiệp trên toàn bộ danh bạ. |
-| **Luồng Thay Thế / Ngoại Lệ (Alternative Flows)** | - Nếu doanh nghiệp mới chưa có nhân sự trực thuộc: Hệ thống hiển thị trạng thái Empty State trang nhã kèm nút mời thêm nhân sự đầu tiên. |
-| **Hậu Điều Kiện (Post-conditions)** | Cơ cấu nhân sự của doanh nghiệp được lưu trữ đầy đủ, minh bạch, phục vụ kết nối giao thương B2B và phân quyền tác nghiệp. |
-| **Hình Ảnh Minh Chứng Thực Tế** | *Giao diện quản lý đội ngũ nhân sự trực thuộc doanh nghiệp và modal thêm mới cán bộ trên CRM* |
-
-
-### 5.144. Bảng Use Case UC-CRM-81: Trung Tâm Thông Báo Quản Trị Hệ Thống, Phân Loại Menu Tree Sidebar & Tự Động Quét Cảnh Báo Hội Phí / Hồ Sơ Chờ Duyệt
-
-| Thuộc Tính Nghiệp Vụ | Nội Dung Đặc Tả Chi Tiết |
-| :--- | :--- |
-| **Mã Use Case (ID)** | **UC-CRM-81** |
-| **Phân Hệ / Nhóm** | Trung Tâm Thông Báo & Cảnh Báo Quản Trị (`[NODE-CRM-022]`) |
-| **Tên Chức Năng** | Trung Tâm Thông Báo Quản Trị Hệ Thống, Phân Loại Menu Tree Sidebar & Tự Động Quét Cảnh Báo Hội Phí / Hồ Sơ Chờ Duyệt |
-| **Tác Nhân (Actor)** | Chủ tịch CLB, Ban Thường Trực, Ban Quản Trị, Ban Thư Ký, Kế toán |
-| **Tiền Điều Kiện (Pre-conditions)** | Quản trị viên đăng nhập Cổng Quản Trị CRM và mở phân hệ Thông Báo (`/notifications`). |
-| **Luồng Xử Lý Chính (Main Flow)** | 1. **Menu Tree Phân Nhánh Tại Sidebar CRM**:<br>   - Menu "Thông báo hệ thống" được tổ chức thành cấu trúc cây 5 nhánh nghiệp vụ chuyên biệt:<br>     + `🔔 Tất cả thông báo` (`/notifications`)<br>     + `👤 Học viên mới nộp hồ sơ` (`/notifications?filter=new_members`)<br>     + `⚠️ Cảnh báo & Quá hạn hội phí` (`/notifications?filter=fee_alerts`)<br>     + `🏢 BQT & Điều hành` (`/notifications?filter=admin_system`)<br>     + `📅 Sự kiện & Cuộc họp` (`/notifications?filter=events_meetings`)<br>2. **Cơ Chế Tự Động Quét & Sinh Cảnh Báo Hệ Thống (Auto-Sync Alerts)**:<br>   - Khi quản trị viên truy cập, Backend NestJS tự động rà soát CSDL PostgreSQL thời gian thực:<br>     + *Hồ sơ mới nộp*: Tự động phát hiện các ứng viên có `status = 'pending'` và sinh cảnh báo xét duyệt.<br>     + *Quá hạn hội phí*: Tự động phát hiện Học viên có `term_end < NOW()` và `fee_paid = false` để sinh cảnh báo đôn đốc thu phí.<br>     + *Cảnh báo sắp hết hạn*: Tự động nhắc nhở đối với Học viên có hạn niên liễm trong vòng **30 ngày tới**.<br>     + *Tự động dọn dẹp*: Khi hồ sơ được duyệt hoặc Học viên đã nộp phí, thông báo cảnh báo tương ứng tự động được gỡ bỏ.<br>3. **Giao Diện Chuẩn Hóa CustomTable & 4 Thẻ KPI Gradient Figma**:<br>   - 4 Thẻ KPI động: Tổng thông báo, Hồ sơ Học viên mới, Cảnh báo hội phí, Thông báo chưa đọc.<br>   - Dải Sub-filter Tabs đồng bộ trực tiếp với menu Sidebar với badge đếm số lượng thời gian thực.<br>   - Bảng dữ liệu chuẩn `CustomTable` với tính năng sắp xếp 3 trạng thái và bộ lọc đọc/chưa đọc.<br>4. **Các Phím Tắt Thao Tác Nhanh (Quick Actions)**:<br>   - Hồ sơ mới: Nút **[Duyệt hồ sơ]** chuyển ngay sang `/members?status=pending`.<br>   - Cảnh báo hội phí: Nút **[Thu phí / Gia hạn]** chuyển ngay sang `/renewal`.<br>   - Sự kiện / Cuộc họp: Nút **[Xem chi tiết]** mở trang `/events`.<br>   - Nút **[Đưa vào tin nhắn]**: Phát thanh thông báo vào kênh tin nhắn chỉ định trên App Mobile. |
-| **Luồng Thay Thế / Ngoại Lệ (Alternative Flows)** | - Người dùng có thể chuyển đổi giữa chế độ hiển thị Bảng (`table`) và chế độ Thẻ chi tiết (`cards`) tùy theo thói quen sử dụng. |
-| **Hậu Điều Kiện (Post-conditions)** | Ban Quản Trị không bao giờ bỏ sót hồ sơ kết nạp mới hay tình trạng quá hạn hội phí; mọi cảnh báo vận hành được kiểm soát chặt chẽ. |
-| **Hình Ảnh Minh Chứng Thực Tế** | *Giao diện Trung tâm Thông báo Quản trị chuẩn CustomTable với 4 thẻ KPI và dải Sub-filter tabs* |
-
-
-### 5.145. Bảng Use Case UC-CRM-82: Quản Lý Công Việc Điều Hành Theo 5 Nhóm Chức Năng Con Nghiệp Vụ Cụ Thể (Scope Tree vs View Mode Switcher)
-
-| Thuộc Tính Nghiệp Vụ | Nội Dung Đặc Tả Chi Tiết |
-| :--- | :--- |
-| **Mã Use Case (ID)** | **UC-CRM-82** |
-| **Phân Hệ / Nhóm** | Giao Việc & Quản Lý Công Việc Ban Chuyên Môn (`[NODE-CRM-012]`) |
-| **Tên Chức Năng** | Quản Lý Công Việc Điều Hành Theo 5 Nhóm Chức Năng Con Nghiệp Vụ Cụ Thể (Scope Tree vs View Mode Switcher) |
-| **Tác Nhân (Actor)** | Chủ tịch, Trưởng Ban, Phó Ban, Thành viên Ban Chuyên Môn |
-| **Tiền Điều Kiện (Pre-conditions)** | Người dùng đăng nhập Cổng Quản Trị CRM và truy cập phân hệ Quản Lý Công Việc (`/tasks`). |
-| **Luồng Xử Lý Chính (Main Flow)** | 1. **Tổ Chức Menu Con Sidebar Thành 5 Chức Năng Nghiệp Vụ Cụ Thể**:<br>   - Loại bỏ hoàn toàn menu con các dạng hiển thị (bảng, kanban, gantt) khỏi Sidebar.<br>   - Thay thế bằng **5 chức năng con nghiệp vụ cụ thể**:<br>     + `📋 Tất cả công việc` (`/tasks`): Tổng quan toàn bộ công việc toàn CLB.<br>     + `👤 Công việc của tôi` (`/tasks?filter=my_tasks`): Đầu việc được giao cho cá nhân phụ trách.<br>     + `📤 Công việc tôi giao đi` (`/tasks?filter=assigned_by_me`): Đầu việc do tài khoản tạo hoặc giám sát.<br>     + `🏢 Phân công theo Ban` (`/tasks?filter=by_department`): Theo dõi công việc theo 6 Ban chuyên môn.<br>     + `⚠️ Cần đôn đốc / Quá hạn` (`/tasks?filter=overdue`): Đầu việc trễ hạn hoặc ưu tiên khẩn cấp.<br>2. **Thanh Scope Filter Tabs Thời Gian Thực**: Ngay dưới tiêu đề trang, hiển thị dải tab tương ứng với số lượng đầu việc cập nhật động theo quyền hạn người dùng.<br>3. **Bộ Chuyển Đổi View Mode Nằm Nội Bộ Trang**: Thanh công cụ lọc phía trên danh sách trang bị các nút chuyển đổi góc nhìn linh hoạt: Dạng Bảng chuẩn, Lưới thẻ Kanban kéo thả, Lịch tháng, Dòng thời gian Gantt và Sơ đồ cây phân ban.<br>4. Thao tác tạo mới, cập nhật tiến độ, giao việc và đính kèm tệp tin tài liệu (Excel, PDF, ảnh) diễn ra liền mạch. |
-| **Luồng Thay Thế / Ngoại Lệ (Alternative Flows)** | - Khi nhấp vào "Phân công theo Ban", hệ thống tự động kích hoạt chế độ xem cây phân ban để người dùng quan sát cơ cấu công việc trực quan nhất. |
-| **Hậu Điều Kiện (Post-conditions)** | Tiến độ công việc của từng ban và từng cá nhân được giám sát rõ ràng, đúng người đúng việc, chống chồng chéo nhiệm vụ. |
-| **Hình Ảnh Minh Chứng Thực Tế** | *Giao diện quản lý công việc với 5 nhóm chức năng con nghiệp vụ và thanh chuyển đổi chế độ xem nội bộ* |
-
-
-### 5.146. Bảng Use Case UC-CRM-83: Cấu Hình Gửi Tin Zalo OA Liên Kết API Dữ Liệu CSDL Thực Tế & Sinh Mã QR Check-in Điện Tử
-
-| Thuộc Tính Nghiệp Vụ | Nội Dung Đặc Tả Chi Tiết |
-| :--- | :--- |
-| **Mã Use Case (ID)** | **UC-CRM-83** |
-| **Phân Hệ / Nhóm** | Cấu Hình Hệ Thống & Tích Hợp Zalo OA (`[NODE-CRM-020]`) |
-| **Tên Chức Năng** | Cấu Hình Gửi Tin Zalo OA Liên Kết API Dữ Liệu CSDL Thực Tế & Sinh Mã QR Check-in Điện Tử |
-| **Tác Nhân (Actor)** | Ban Quản Trị, Ban Truyền Thông, Quản trị viên hệ thống |
-| **Tiền Điều Kiện (Pre-conditions)** | Quản trị viên đăng nhập CRM, mở mục Cấu Hình Hệ Thống (`/settings`) và chọn tab Zalo OA. |
-| **Luồng Xử Lý Chính (Main Flow)** | 1. Người dùng mở giao diện Cấu Hình Zalo OA (`ZaloOaConfigSection.tsx`).<br>2. **Cân Đối Giao Diện Cấu Hình**: Chiều rộng cột sidebar cấu hình được tối ưu 250px, các nhãn được rút gọn cân đối, icon và chữ ngang hàng chuẩn xác.<br>3. **Tích Hợp Dropdown Gọi API Dữ Liệu Thực Tế CSDL**:<br>   - Triệt tiêu hoàn toàn dữ liệu giả lập (mock data) hoặc việc phải nhập tay thông tin.<br>   - Tích hợp các bộ chọn nạp dữ liệu động trực tiếp từ CSDL PostgreSQL:<br>     + Sự kiện CLB: Gọi API `/events`<br>     + Cuộc họp Ban: Gọi API `/business-connect/meetings`<br>     + Khóa đào tạo: Gọi API `/trainings`<br>     + Cơ hội B2B: Gọi API `/opportunities`<br>4. **Tự Động Điền Dữ Liệu & Sinh URL Mã QR Check-in Điện Tử**:<br>   - Khi người dùng chọn một mục trong dropdown, hệ thống tự động điền: Tiêu đề, Thời gian, Địa điểm/Link họp, Diễn giả/Chủ trì.<br>   - Tự động sinh mã vé và URL mã QR Check-in điện tử chuẩn xác dạng đường link (`https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=...`) để đại biểu lưu ảnh hoặc quét trực tiếp tại cổng đón tiếp.<br>5. Bấm "Gửi Thử Nghiệm Zalo OA" hoặc "Phát Hành Tin Nhắn Hàng Loạt" để phát tín hiệu thông báo đến Zalo Học viên. |
-| **Luồng Thay Thế / Ngoại Lệ (Alternative Flows)** | - Nếu không tìm thấy thông tin sự kiện trong CSDL, hệ thống hiển thị thông báo nhắc nhở kiểm tra lại phân hệ Sự kiện trước khi gửi tin. |
-| **Hậu Điều Kiện (Post-conditions)** | Thông báo Zalo OA được phát hành nhanh chóng, chính xác tuyệt đối với dữ liệu thực, nâng cao tính chuyên nghiệp của hiệp hội. |
-| **Hình Ảnh Minh Chứng Thực Tế** | *Giao diện cấu hình Zalo OA tích hợp dropdown gọi API dữ liệu thực tế và xem trước tin nhắn check-in điện tử* |
-
-
-### 5.147. Bảng Use Case UC-CRM-84: Chuẩn Hóa Bảng Dữ Liệu CustomTable Toàn Hệ Thống Với Cơ Chế Sắp Xếp 3 Trạng Thái & 4 Thẻ KPI Gradient Figma
-
-| Thuộc Tính Nghiệp Vụ | Nội Dung Đặc Tả Chi Tiết |
-| :--- | :--- |
-| **Mã Use Case (ID)** | **UC-CRM-84** |
-| **Phân Hệ / Nhóm** | Nền Tảng Giao Diện Dùng Chung (`[NODE-CRM-001]` -> `[NODE-CRM-022]`) |
-| **Tên Chức Năng** | Chuẩn Hóa Bảng Dữ Liệu CustomTable Toàn Hệ Thống Với Cơ Chế Sắp Xếp 3 Trạng Thái & 4 Thẻ KPI Gradient Figma |
-| **Tác Nhân (Actor)** | Toàn thể Ban Quản Trị, Ban Thư Ký và Người dùng Cổng Quản Trị CRM |
-| **Tiền Điều Kiện (Pre-conditions)** | Người dùng mở bất kỳ phân hệ quản trị nào trên Cổng Quản Trị CRM (Tài khoản, Sự kiện, Đào tạo, Thông báo, v.v.). |
-| **Luồng Xử Lý Chính (Main Flow)** | 1. **Thành Phần Bảng Dữ Liệu Dùng Chung (`CustomTable.tsx`)**:<br>   - Kế thừa trọn vẹn tiêu chuẩn thiết kế Figma từ phân hệ Quản lý tài khoản, được xuất bản thành component dùng chung tại `src/components/common/CustomTable.tsx`.<br>   - Trang bị 4 Thẻ Metric Gradient tinh tế (`CrmMetricCard`, `CrmMetricGrid`) với 4 tông màu: Sky, Violet, Orange, Green.<br>   - Thanh công cụ chuẩn hóa (`CrmToolbar`) kết hợp tìm kiếm tức thời và nút Thêm mới nổi bật.<br>2. **Quy Chuẩn Cơ Chế Sắp Xếp 3 Trạng Thái (3-State Sorting)**:<br>   - Mọi cột có thuộc tính `sortable` trên toàn hệ thống đều tuân thủ nghiêm ngặt chu trình xoay vòng 3 trạng thái qua hook `useCustomTableSort`:<br>     + *Lần nhấp 1*: Sắp xếp Tăng dần (Ascending - Icon `ChevronUp`).<br>     + *Lần nhấp 2*: Sắp xếp Giảm dần (Descending - Icon `ChevronDown`).<br>     + *Lần nhấp 3*: Hoàn trả trạng thái Mặc định không sắp xếp (Default/Null - Icon `ChevronsUpDown`, trả về thứ tự CSDL gốc).<br>3. **Tính Năng Bảng Nâng Cao**:<br>   - Cột STT tự động tính theo trang hiện tại.<br>   - Khả năng co giãn chiều rộng cột bằng chuột kiểu Excel (`ResizableTh`).<br>   - Rút gọn văn bản dài kèm Tooltip Ant Design nền đen chữ trắng khi di chuột.<br>   - Thanh phân trang đồng nhất cho phép tùy chọn 10, 15, 20, 50, 100 bản ghi trên mỗi trang. |
-| **Luồng Thay Thế / Ngoại Lệ (Alternative Flows)** | - Khi không có dữ liệu thỏa mãn bộ lọc: Bảng tự động hiển thị Empty State chuẩn mực với thông báo hướng dẫn rõ ràng. |
-| **Hậu Điều Kiện (Post-conditions)** | Trải nghiệm thao tác trên toàn bộ Cổng Quản Trị CRM đạt độ đồng bộ 100%, chuẩn chỉ, tiện lợi và đẳng cấp doanh nghiệp. |
-| **Hình Ảnh Minh Chứng Thực Tế** | *Giao diện bảng dữ liệu chuẩn CustomTable với sắp xếp 3 trạng thái và 4 thẻ Metric Gradient Figma* |
+![Màn hình quản lý thiết bị đăng nhập, cấu hình xác thực hai yếu tố và bảo mật tài khoản](images/evidence/sub_47_app_settings_password_security.png)
 
 
 ---
 
 ## 6. YÊU CẦU PHI CHỨC NĂNG (Non-Functional Requirements)
-
 
 | Tiêu Chí Kỹ Thuật | Yêu Cầu Chi Tiết & Chuẩn Mực Doanh Nghiệp | Chỉ Số Đo Lường (SLA) |
 | :--- | :--- | :--- |
@@ -2579,210 +2437,16 @@ Dưới đây là bảng đặc tả chi tiết toàn bộ 138 Use Cases bao ph�
 
 ### 7.1. Bảng màu nhận diện thương hiệu độc quyền CEO HN10
 * **Royal Navy (#0A2540):** Màu xanh biển sâu tượng trưng cho uy tín vững bền, tầm nhìn chiến lược của người lãnh đạo.
-* **Amber Gold (#D97706):** Màu vàng kim vinh danh thẻ doanh nhân số, kỷ niệm chương và các gói đối tác chiến lược.
+* **Amber Gold (#D97706):** Màu vàng kim vinh danh thẻ VIP, kỷ niệm chương và các gói đối tác chiến lược.
 * **Trắng Sứ & Xám Khói (#FFFFFF, #F8FAFC):** Nền tảng thanh lịch, thoáng đãng giúp hiển thị dữ liệu rõ ràng.
 
 ### 7.2. Chuẩn mực phần cứng & giao tiếp ngoại vi
 * **Camera Soát Vé Thông Minh:** Tự động điều chỉnh tiêu cự nhận diện mã QR trong 0.2 giây kể cả trong điều kiện ánh sáng yếu tại sảnh tiệc Gala.
 * **Công Nghệ NFC 1 Chạm:** Trao đổi thông tin danh thiếp điện tử không tiếp xúc tiêu chuẩn quốc tế ISO/IEC 14443.
-* **Máy Chủ Thư Tín Tự Động (SMTP Mailer):** Tự động phát hành email chào mừng, hóa đơn Mã QR Ngân Hàng và vé điện tử E-Ticket tức thời.
+* **Máy Chủ Thư Tín Tự Động (SMTP Mailer):** Tự động phát hành email chào mừng, hóa đơn VietQR và vé điện tử E-Ticket tức thời.
 
 ---
 
 ## 8. PHỤ LỤC: DANH MỤC 138 MINH CHỨNG HÌNH ẢNH CHỤP THỰC TẾ
 
 Toàn bộ 138 hình ảnh minh chứng thực tế trên hệ thống được lưu trữ trong thư mục tài liệu `document/images/evidence/` và được tích hợp trực tiếp dưới từng bảng Use Case chi tiết ở Mục 5 của tài liệu này.
-
----
-
-## 9. QUY CHUẨN ĐẶC TẢ VẬN HÀNH & KIẾN TRÚC MỚI BỔ SUNG (10/2026)
-
-### 9.1. Quy chuẩn Xác thực, Đăng nhập & Đổi Mật Khẩu Lần Đầu
-* **Xử lý Bảng Hồ Sơ Độc Lập:** Để tránh lỗi sập dịch vụ 500 khi bảng `user_profiles` không có trong Prisma Client schema, toàn bộ thao tác đọc/ghi hồ sơ tài khoản được thực thi qua Raw SQL an toàn (`$queryRawUnsafe` / `$executeRawUnsafe`).
-* **Làm Sạch Ký Tự Vô Hình & Đăng Nhập:** Tự động loại bỏ ký tự ẩn/khoảng trắng thừa (`[\u200B-\u200D\uFEFF\u00A0\r\n\t]`) trước khi xác thực mật khẩu. Hỗ trợ đối soát mật khẩu khởi tạo hệ thống từ ghi chú Học viên.
-* **Điều Hướng Đổi Mật Khẩu Bắt Buộc:** Tại màn hình `/association/settings?required=true`, cung cấp nút điều hướng "Quay lại màn hình đăng nhập" và thanh điều hướng `MemberHeader` cho phép hủy phiên làm việc hiện tại, xóa session an toàn và quay về `/association/login`.
-
-### 9.2. Chuẩn Hóa Danh Xưng Học viên & Doanh Nghiệp (CRM & Mobile)
-* **Tách Bạch Trường Dữ Liệu:** 
-  - `name` / `contact`: Bắt buộc lưu họ và tên thật của Học viên lãnh đạo (Ví dụ: "Phạm An Nam").
-  - `company_name`: Lưu tên doanh nghiệp/công ty đại diện (Ví dụ: "Vione").
-  - `company_size`: Lưu quy mô nhân sự được chọn khi đăng ký (Ví dụ: "10 - 50 nhân sự").
-* **Phân Giải Hồ Sơ JSON (`about`):** Khi hiển thị chi tiết hồ sơ Học viên tại CRM (`/members/:id`) hoặc Mobile (`/association/profile`), trường `about` được phân giải sang các mục thông tin rõ ràng (Người đại diện, Chức vụ, Năm sinh, Quy mô nhân sự, Nhu cầu kết nối, Năng lực cung ứng). Tuyệt đối không hiển thị chuỗi JSON thô dạng `{"representative":"...", "staffSize":"..."}`.
-
-### 9.3. Tối Ưu Mẫu Email Cảm Ơn Đăng Ký Học viên
-* **Việt Hóa Ngành Nghề:** Tự động chuyển đổi mã ngành nghề kỹ thuật (`ind.trade` -> "Thương mại & Bán lẻ", `ind.it` -> "Công nghệ thông tin & Viễn thông", `ind.fnb` -> "Ẩm thực & Nhà hàng F&B", v.v.) sang tiếng Việt trang trọng trong email gửi tới Học viên.
-* **Loại Bỏ Mục Không Phù Hợp:** Xóa bỏ trường "Ban nguyện vọng" khỏi nội dung thư cảm ơn xác nhận đăng ký.
-
-### 9.4. Tinh Gọn Ma Trận Phân Quyền CRM (Sub-system 1 RBAC Only)
-* **Loại Bỏ Phân Hệ Phụ:** CRM Quản trị phân quyền (`/permissions`) loại bỏ các tab con rườm rà (Phân hệ 2 & Phân hệ 3), chỉ giữ lại duy nhất Phân hệ 1: Ma trận phân quyền hệ thống (`RbacPermissionMatrix`).
-* **Đặc Tả 6 Vai Trò Ban Chuyên Trách:**
-  1. `thanh_vien_ban_su_kien` (Ban Sự kiện & Hội thảo)
-  2. `thanh_vien_ban_xuc_tien` (Ban Xúc tiến Thương mại & Đầu tư)
-  3. `thanh_vien_ban_thanh_vien` (Ban Phát triển Học viên)
-  4. `thanh_vien_ban_truyen_thong` (Ban Truyền thông & Thương hiệu)
-  5. `thanh_vien_ban_tai_chinh` (Ban Tài chính & Pháp lý)
-  6. `thanh_vien_ban_thien_nguyen` (Ban Thiện nguyện & Trách nhiệm Xã hội)
-  7. `member` (Học viên chính thức App CEO HN10)
-* **Tích Hợp Quyền Ứng Dụng Di Động (`cat_mobile_app`):** Quản trị toàn diện 10 quyền di động: xem bảng tin, đăng bài, nhắn tin trực tiếp, setup cuộc gặp 1-1, đăng ký sự kiện, xem ưu đãi, biểu quyết, chia sẻ danh thiếp, đọc thư viện tài liệu, tạo gia hạn Học viên.
-
-### 9.5. Đặc Tả Bảng Tin B2B Network Feed Chuẩn Doanh Nhân & Tương Tác Trực Tiếp
-* **Bố Cục Ảnh Ghép Chuẩn Mực:** Trình bày hình ảnh bài viết theo cấu trúc:
-  - 1 ảnh: Hiển thị tràn khung tỷ lệ 16:9 với lớp phủ sang trọng.
-  - 2 ảnh: Chia đôi 50/50 theo chiều dọc.
-  - 3 ảnh: 1 ảnh lớn bên trái, 2 ảnh nhỏ xếp dọc bên phải.
-  - 4 ảnh trở lên: Lưới 2x2 cân xứng, ảnh thứ 4 hiển thị huy hiệu `+N` khi có thêm ảnh ẩn.
-* **Tương Tác & Thảo Luận Thời Gian Thực:**
-  - Dưới mỗi bài đăng luôn mở sẵn tối đa 5 bình luận mới nhất cùng ô nhập phản hồi trực tiếp, giúp việc trao đổi, chúc mừng và kết nối giữa các doanh nhân diễn ra nhanh chóng, thuận tiện.
-  - Khi bài viết có chia sẻ đường dẫn liên kết ngoài (bài báo kinh tế, liên kết Facebook), hệ thống tự động nhận diện và hiển thị Thẻ Xem Trước (Link Preview Card) với ảnh đại diện khổ lớn, tiêu đề in đậm và trích đoạn mô tả tóm tắt chuẩn phong cách chuyên nghiệp.
-
-### 9.6. Cơ Chế Tắt Vĩnh Viễn Trợ Lý AI (Permanent AI Disablement)
-* **Quy Trình Tắt:** Khi người dùng bấm biểu tượng (X) trên widget trợ lý AI, hệ thống lập tức tắt hoàn toàn trợ lý (`setVoiceAiEnabled(false)`, ghi nhớ cờ vĩnh viễn `ceohn10_ai_disabled_permanently = true`), xóa bỏ nút thu gọn mini dock và chặn tuyệt đối không cho xuất hiện trên toàn bộ các trang CRM quản trị.
-* **Cơ Chế Bật Lại:** Trợ lý chỉ được phép hiển thị trở lại khi người dùng chủ động truy cập trang Cài đặt & Bảo mật (`/association/settings`) và gạt bật lại công tắc Trợ lý AI.
-
-### 9.7. Quy Chuẩn Màu Sắc Nút Bấm & Nhãn Điều Hướng Chân Trang (Strict UI Rules)
-* **Quy Tắc Tuyệt Đối Không Sử Dụng Nút Đỏ:** Toàn bộ hệ thống (Web CRM và Mobile App) loại bỏ hoàn toàn các nút bấm màu đỏ; thay thế bằng hệ màu thương hiệu chuẩn mực:
-  - Nút hành động chính: Deep Cobalt Navy (`#1F3864`) hoặc Xanh Ngọc Emerald (`bg-emerald-600`).
-  - Nút vinh danh, điểm nhấn, kêu gọi hành động: Vàng Hoàng Gia Amber Gold (`#B8860B`).
-  - Nút đóng, hủy, thao tác phụ: Xám Trung Tính Slate (`bg-slate-100 / bg-slate-800`).
-* **Chuẩn Hóa Nhãn Thanh Điều Hướng Dưới Đáy (Mobile Bottom Nav):** Nút thứ 4 chuyển đổi nhãn từ "Tin nhắn" thành **"Mạng lưới"** (Network), biểu tượng của kết nối kinh doanh và mạng lưới giao thương thân tình giữa các thành viên.
-
-### 9.8. Phân Hệ Đào Tạo Doanh Nhân & Phòng Họp Video Trực Tuyến (CRM & Mobile App)
-* **Quản Trị Khóa Đào Tạo (Web CRM):** Khởi tạo chương trình đào tạo, chuyên đề quản trị điều hành, cấu hình giảng viên/chuyên gia, tải lên kho tài liệu giáo trình (Slide PDF, file tính toán Excel).
-* **Trải Nghiệm Học Tập & Họp Trực Tuyến (Mobile App):** Học viên theo dõi danh sách chuyên đề đào tạo sắp diễn ra, tải tài liệu bài giảng về máy và tham gia phòng họp video call bảo mật tích hợp công nghệ Jitsi Meet trực tiếp trong ứng dụng, có tính năng điểm danh đại biểu tự động.
-
-### 9.9. Phân Hệ Gặp Gỡ & Kết Nối B2B 1-on-1 Độc Lập
-* **Quản Lý Lịch Hẹn Tập Trung:** Tách biệt thành phân hệ độc lập với 3 tab: Cuộc gặp đã xác nhận, Lời mời nhận và Lời mời gửi.
-* **Đa Dạng Hình Thức Gặp:** Hỗ trợ đặt lịch hẹn gặp mặt trực tiếp (Offline) tại trụ sở doanh nghiệp / quán cafe hoặc gặp trực tuyến (Online) qua phòng họp video tích hợp.
-* **Ghi Nhận Deal Thành Công:** Sau buổi gặp, hai bên có thể ghi nhận giá trị hợp đồng đã chốt thành công, tiêu đề thương vụ và ghi chú hợp tác; số liệu tự động được tích lũy vào trung tâm thống kê giao thương của CLB.
-
-### 9.10. Danh Bạ Học viên Định Vị Bản Đồ & Kho Đặc Quyền Ưu Đãi QR Động
-* **Bản Đồ Học viên Tương Tác:** Cung cấp 2 chế độ xem Danh sách và Bản đồ; ở chế độ Bản đồ, các Học viên kích hoạt chia sẻ vị trí sẽ hiển thị Avatar nổi bật, nhấp vào avatar hiển thị Mini Card tóm tắt doanh nghiệp kèm nút gọi điện thoại hoặc hẹn gặp 1-on-1 nhanh chóng.
-* **Kho Đặc Quyền Ưu Đãi QR Động:** Hỗ trợ hiển thị Mã QR Động (`QrCanvas`) quét tại điểm dịch vụ; hiển thị chi tiết địa chỉ cơ sở, nút bấm dẫn đường Google Maps, nút gọi hotline tư vấn và liên kết ghé thăm gian hàng B2B của chủ ưu đãi.
-
-### 9.11. Tái Cấu Trúc Toàn Diện Trung Tâm Thống Kê (Web CRM & Mobile App - V5.0)
-* **Bố Cục 4 Ô KPI Cốt Lõi Phía Trên Biểu Đồ**:
-  - Loại bỏ hoàn toàn các thành phần đồ thị và bảng thẻ rườm rà phía trên biểu đồ.
-  - Thay thế bằng **4 ô thẻ chỉ số KPI nổi bật**: (1) Tổng Cơ Hội Kết Nối, (2) Tổng Chi Tiêu & Doanh Số Giao Dịch, (3) Lượt Tương Tác & Tần Suất Trong App, (4) Sự Kiện & Hoạt Động Đang Diễn Ra.
-* **Biểu Đồ Composed Bar + Line Chuẩn Mực 3 Màu**:
-  - Sử dụng bảng màu tối giản: Xanh thương hiệu (`#10B981` / Navy) - Trắng sứ - Đen tuyền Obsidian (`#0F172A`).
-  - Cột Bar thể hiện số lượng/khối lượng của chu kỳ.
-  - Đường Line thể hiện biến động tăng giảm: **Đường màu xanh lá (`#10B981`)** thể hiện xu hướng tăng trưởng, **Đường màu đỏ (`#EF4444`)** thể hiện xu hướng giảm.
-  - **Avatar Ghim Đỉnh Cột / Đường**: Tại đỉnh cao nhất của cột số liệu hoặc điểm mốc cuối của đường biến động, hệ thống tự động ghim **Avatar tròn viền vàng** vinh danh Doanh nhân đang dẫn đầu Top 1.
-* **Bục Vinh Danh Giải Thưởng Top 3 Nằm Chung 1 Hàng Ngang (Award Podium)**:
-  - Thiết kế bục giải thưởng danh giá mô phỏng bục vinh danh thể thao nằm trên **1 hàng ngang duy nhất**:
-    + **Top 1 ở giữa cao nhất**: Doanh nhân dẫn đầu với vương miện Vàng Hoàng Gia.
-    + **Top 2 ở bên cạnh trái**: Chiều cao bục nhì với huy hiệu Bạc.
-    + **Top 3 ở bên cạnh phải**: Chiều cao bục ba với huy hiệu Đồng.
-  - Hiển thị đầy đủ ảnh đại diện, họ tên, doanh nghiệp và chỉ số đóng góp xuất sắc.
-* **5 Phân Loại Thống Kê Nghiệp Vụ Rõ Ràng**:
-  1. *Thống kê cơ hội kết nối kinh doanh* (Bên mua vs Bên bán, tỷ lệ chốt).
-  2. *Thống kê các giao dịch đã chi tiêu* (Dòng tiền doanh số B2B thực tế).
-  3. *Thống kê lượt tương tác, tần suất trong app* (Tần suất truy cập, bình luận, kết nối).
-  4. *Thống kê sự kiện và hoạt động đang diễn ra* (Số lượng đại hội, diễn đàn, lớp học, cuộc họp ban).
-  5. *Thống kê thành viên hoạt động nhiều nhất* (Xếp hạng tổng hợp dựa trên số lượt bình luận và số lượt đăng cơ hội chia sẻ).
-* **Xuất Báo Cáo Chuẩn Hóa**: Hỗ trợ đồng thời 2 định dạng: In báo cáo khổ giấy A4 chuẩn trang in di động (`window.print`) và Xuất bảng tính Excel `.xlsx` chi tiết.
-
-### 9.12. Bản Đồ Tương Tác Số 2D Google Maps Đa Phạm Vi (Tổng Thể vs Cá Nhân) & Định Vị GPS
-* **Khắc Phục Triệt Để Lỗi Màn Hình Đen (Black Screen)**:
-  - Thay thế toàn bộ engine bản đồ cũ bằng lớp bản đồ 2D Google Maps Leaflet (`https://mt{s}.google.com/vt/lyrs=m` với subdomains `['0','1','2','3']`), đảm bảo tốc độ tải mượt mà, phản hồi tức thời, không bị đen màn hình trên cả Android, iOS và Desktop.
-* **Tách Bạch 2 Phạm Vi Hiển Thị Độc Lập (Scope Switcher)**:
-  - **Phạm vi "Tổng Thể"**: Hiển thị toàn bộ các Học viên đang trực tuyến/hoạt động trong app trên bản đồ, các sự kiện sắp diễn ra của CLB, các cuộc họp ban chuyên môn và vị trí doanh nghiệp thành viên.
-  - **Phạm vi "Cá Nhân"**: Chỉ lọc và hiển thị các Học viên đã kết nối giao thương trực tiếp với tôi, các sự kiện mà tôi đã đăng ký tham gia thành công, và các cuộc họp 1-on-1 hoặc họp ban có liên quan trực tiếp đến ID tài khoản của tôi.
-* **Tương Tác Avatar 1 Chạm & Dẫn Đường Google Maps**:
-  - Chạm vào Avatar Học viên mở Thẻ Tóm Tắt (Mini Card) hiển thị họ tên, chức vụ, công ty, số hotline.
-  - Cung cấp nút Gọi điện thoại, nút Đặt lịch hẹn 1-on-1 và nút Dẫn đường mở ứng dụng Google Maps trực tiếp.
-* **Định Vị GPS Thời Gian Thực**: Nút la bàn GPS định vị vị trí hiện tại của thiết bị và tự động căn giữa bản đồ theo tọa độ thực.
-
-### 9.13. Chuẩn Hóa Điều Hướng Chân Trang Footer (Mobile Bottom Navigation)
-* **Chuyển Đổi Tab 2 Thành "Thống Kê"**: Thay thế tab Sự kiện cũ tại vị trí nút thứ 2 của Bottom Navigation bằng tab **"Thống kê"** (`/association/analytics`) với biểu tượng `FooterAnalyticsIcon`, giúp Học viên theo dõi thi đua và cơ hội kinh doanh dễ dàng.
-* **Biểu Tượng Mạng Lưới Chuẩn Nút Liên Kết Cộng Đồng**: Cập nhật biểu tượng của tab thứ 4 **"Mạng lưới"** (`/association/messages`) bằng biểu tượng mạng lưới kết nối cộng đồng chuẩn hóa (`FooterSocialNetworkIcon`), phản ánh đúng tinh thần mạng xã hội doanh nhân.
-* **Truy Cập Sự Kiện Đa Kênh**: Phân hệ Sự Kiện & Lịch Trình (`/association/events`) được kết nối truy cập thuận tiện từ Widget Sự kiện Trang chủ, Bài đăng phát hành trên Bảng tin Mạng lưới, hoặc từ menu phím tắt.
-
-### 9.14. Tinh Gọn Bảng Tin Mạng Lưới Feed & Cơ Chế Bắn Sự Kiện / Đào Tạo Từ CRM
-* **Loại Bỏ Thanh Tìm Kiếm Trùng Lặp**: Loại bỏ hoàn toàn ô tìm kiếm con nằm bên trong component Feed; toàn bộ luồng tìm kiếm bài viết được thống nhất thông qua thuộc tính `searchQuery` truyền từ Header của trang `/association/messages`.
-* **Gắn Thẻ Đại Biểu Tham Dự Cuộc Họp / Sự Kiện (Attendee Tags)**: Dưới các bài đăng sự kiện hoặc cuộc họp Ban, hiển thị danh sách Học viên tham dự dưới dạng thẻ tag trang trọng `@HọTên [✓ Đã Check-in]`.
-* **Hiển Thị Đầy Đủ Nội Dung Bắn Từ CRM**:
-  - Tiếp nhận sự kiện Ban Tổ Chức bắn xuống: Hiển thị ảnh Poster khổ lớn, khung giờ tổ chức và **Mã QR Điểm Danh (Check-in QR)** in sẵn để quét vào cửa.
-  - Tiếp nhận khóa đào tạo Ban Đào Tạo bắn xuống: Hiển thị huy hiệu chuyên đề `TRAINING`, chuyên gia giảng viên, poster khóa học và mã QR tham gia.
-
-### 9.15. Tối Giản Header Trang Cá Nhân & Thẻ Trạng Thái Đồng Bộ Theme CRM
-* **Tối Giản Header**: Loại bỏ hoàn toàn các biểu tượng icon chức năng rườm rà ở góc phải Header trang `/association/profile` (`right={null}`), giúp màn hình cá nhân thanh lịch, trang trọng và tập trung vào hồ sơ lãnh đạo.
-* **Thẻ Trạng Thái Chủ Đề Theme CRM (CRM Theme Sync Status Card)**:
-  - Hiển thị thẻ thông tin viền vàng hổ phách thông báo tên chủ đề lễ hội đang kích hoạt từ CRM (Ví dụ: "Chủ đề Đang Áp Dụng: Tết Nguyên Đán / Dạ Tiệc Gala").
-  - Đồng bộ thời gian thực trạng thái ("✓ Đã đồng bộ với Theme Studio CRM"), phản ánh sự kết nối xuyên suốt với Ban Quản Trị.
-
-### 9.16. Trang Chủ Di Động: Phím Tắt Tin Nhắn, Onboarding Welcome Modal & Đồng Bộ Hình Nền Festival
-* **Lối Tắt Nhanh Tin Nhắn**: Cập nhật danh mục phím tắt tùy biến tại `CustomHomeShortcutsModal`, thay thế lối tắt Thống kê cũ bằng lối tắt **"Tin nhắn"** (`/association/messages?tab=messages`) để Học viên truy cập hòm thư nhanh chóng.
-* **Cửa Sổ Chào Mừng Học viên Mới (Onboarding Welcome Member Modal)**:
-  - Gắn trực tiếp tại bộ khung vỏ `MemberShell`, tự động mở chào đón khi Học viên đăng nhập vào hệ sinh thái.
-  - Giới thiệu 4 giá trị cốt lõi: Kết nối B2B, Danh thiếp NFC, Sàn giao thương và Đào tạo nâng tầm.
-  - Hỗ trợ hoàn hảo cả 2 chế độ Sáng (Light) và Tối (Dark).
-* **Đồng Bộ Hình Nền Lễ Hội (`--festival-bg-image`)**: Tự động áp dụng lớp nền sự kiện rực rỡ lên cả Trang Chủ và Mạng Lưới Feed khi Ban Quản Trị phát hành chủ đề mới từ CRM.
-
-### 9.17. Phân Hệ Theme Studio CRM Quản Trị Giao Diện & Bộ Chọn Icon 14 Tính Năng
-* **Quản Trị Mẫu Giao Diện (`/admin/landing-templates`)**:
-  - Hỗ trợ tải lên ảnh nền tùy biến hoặc nhập đường dẫn ảnh chất lượng cao.
-  - Cung cấp **5 VIP Presets Mùa Lễ Hội**: Tết Nguyên Đán, Hội Nghị Thường Niên, Dạ Tiệc Gala, Caravan Giao Thương, Thể Thao & Golf.
-* **Bộ Chọn Biểu Tượng Tùy Biến 14 Tính Năng (Icon Picker)**: Cho phép Ban Quản Trị tùy chọn biểu tượng cho toàn bộ 14 tính năng của App Mobile theo từng mùa chiến dịch.
-* **Khung Xem Trước Trực Quan Thời Gian Thực (Live Mobile Preview Mockup)**: Mô phỏng chính xác giao diện điện thoại thông minh ngay bên cạnh màn hình cấu hình.
-* **Phát Hành Đồng Bộ Toàn Hệ Thống**: Bấm nút Lưu cấu hình sẽ kích hoạt biến CSS toàn cục `--festival-bg-image` đồng bộ xuống toàn bộ ứng dụng di động ngay lập tức.
-
-### 9.18. Quản Trị Đào Tạo Doanh Nhân CRM: Online / Offline / Hybrid & Đường Dẫn Đăng Ký Mở
-* **Đa Dạng Phương Thức Đào Tạo**: Thiết lập khóa học Online (Jitsi/Zoom link, room ID, password), Offline (hội trường, địa chỉ, sức chứa), hoặc Hybrid kết hợp cả hai.
-* **Đường Dẫn Đăng Ký Mở & Mã QR Động**: Tự động sinh link công khai (Public Registration URL) kèm mã QR động có thể phóng to, copy link để chia sẻ cho các ứng viên hoặc khách mời ngoài.
-* **Nút "Bắn Xuống App CEO HN10"**: Phát hành bài viết đào tạo truyền thông lên Bảng tin Mạng lưới Mobile kèm Poster và Mã QR Điểm Danh chỉ bằng 1 cú nhấp chuột.
-
-### 9.19. Quản Lý Đội Ngũ Nhân Sự Doanh Nghiệp Trực Thuộc (CRM & API Nested Personnel)
-* **Bối cảnh & Tầm quan trọng**: Doanh nghiệp Học viên CEO HN10 thường cử cán bộ quản lý cấp cao, trợ lý hoặc nhân sự chuyên trách phối hợp cùng hiệp hội trong các hoạt động xúc tiến, đào tạo và sự kiện. Do đó, hệ thống mở rộng tính năng quản lý đội ngũ nhân sự trực thuộc tại chi tiết doanh nghiệp Học viên (`/members/:id`).
-* **Đặc tả API & Dữ liệu**:
-  - `GET /members/:id/personnel`: Trả về danh sách nhân sự trực thuộc doanh nghiệp gồm: `id`, `name`, `position` (Chức vụ: Phó Giám Đốc, Trợ Lý, Kế Toán Trưởng,...), `phone`, `email`, `role_description`, `is_primary_contact` (Đầu mối liên hệ chính), `status` (`ACTIVE`, `INACTIVE`), `created_at`.
-  - `POST /members/:id/personnel`: Thêm mới nhân sự cho doanh nghiệp với validation hợp lệ về số điện thoại và email.
-  - `PUT /members/:id/personnel/:personnelId`: Cập nhật thông tin nhân sự hoặc trạng thái công tác.
-  - `DELETE /members/:id/personnel/:personnelId`: Thu hồi / xóa nhân sự khỏi danh sách quản lý.
-* **Giao diện Tab "Đội Ngũ Nhân Sự"**: Tích hợp trực tiếp dưới trang chi tiết Học viên/doanh nghiệp, hiển thị dạng danh sách thẻ Card hoặc bảng mini, có nút "Thêm nhân sự mới" mở Drawer/Modal thao tác nhanh, hỗ trợ gán cờ "Người liên hệ chính" để nhận thông báo từ Ban Thư Ký.
-
-### 9.20. Trung Tâm Thông Báo Quản Trị Hệ Thống, Menu Tree Sidebar & Quét Cảnh Báo Hội Phí Tự Động
-* **Tái cấu trúc Sidebar Menu Tree**:
-  - Tách menu "Thông báo" trên Sidebar CRM thành cấu trúc Menu Tree phân cấp rõ ràng gồm:
-    + **Tất cả thông báo**: Xem dòng thời gian toàn bộ thông báo hệ thống.
-    + **Cảnh báo hội phí & Tài chính**: Danh sách Học viên sắp đến hạn hội phí (trong vòng 15-30 ngày) và Học viên quá hạn cần đôn đốc.
-    + **Hồ sơ Học viên chờ duyệt**: Cảnh báo tức thì khi có doanh nhân nộp đơn gia nhập mới qua landing page.
-    + **Thông báo sự kiện & Đào tạo**: Cảnh báo về các lớp học hoặc sự kiện sắp diễn ra, danh sách đại biểu đăng ký mới.
-    + **Cấu hình & Tự động hóa**: Thiết lập chu kỳ quét cảnh báo và mẫu thông báo đẩy.
-* **Cơ chế Quét Tự Động Hội Phí & Cảnh Báo Role Admin**:
-  - Hệ thống tự động kích hoạt Service quét định kỳ (Cron / Schedule Check) trạng thái hạn hội phí của tất cả Học viên.
-  - Khi phát hiện Học viên sắp hết hạn (trước 30 ngày) hoặc quá hạn, hệ thống tự động sinh thông báo cảnh báo đẩy vào Notification Center cho các tài khoản mang vai trò Admin Quản Trị (`admin`, `chu_tich`, `pho_chu_tich`, `ban_tai_chinh`, `ban_thu_ky`).
-  - Khắc phục triệt để lỗi mạng Service Worker tại endpoint `/notifications`, tích hợp bộ đệm an toàn và tự động retry khi mất kết nối tạm thời.
-
-### 9.21. Tái Cấu Trúc Nhóm Quản Lý Công Việc Điều Hành: 5 Chức Năng Con Nghiệp Vụ Cụ Thể
-* **Chuyển đổi từ Menu Tree hiển thị sang 5 Chức Năng Con Nghiệp Vụ**:
-  - Trước đây: Nhóm công việc bị phân chia theo các dạng hiển thị (Bảng, Kanban, Lịch, Cây phòng ban) gây khó khăn trong phân công tác nghiệp.
-  - Chuẩn hóa mới: Nhóm Quản Lý Công Việc (`/tasks`) được tổ chức thành **5 chức năng con nghiệp vụ cụ thể**:
-    1. **Công việc của tôi (`my_tasks`)**: Chỉ hiển thị các đầu việc được giao trực tiếp cho tài khoản đang đăng nhập hoặc các việc do chính người dùng tạo.
-    2. **Việc Ban Điều Hành giao (`assigned_by_leadership`)**: Danh sách các nhiệm vụ, chỉ đạo trọng điểm từ Chủ tịch hoặc Ban Thường trực giao cho các Ban chuyên môn.
-    3. **Việc theo Ban chuyên môn (`by_department`)**: Phân nhóm công việc theo từng Ban (Sự kiện, Xúc tiến, Tài chính, Truyền thông, Học viên, Thiện nguyện) với cây thư mục (Tree View) rõ ràng.
-    4. **Công việc ưu tiên & Quá hạn (`urgent_overdue`)**: Bộ lọc tự động tập trung các đầu việc gắn cờ "Gấp", "Khẩn cấp" hoặc đã vượt quá Deadline cần xử lý ngay.
-    5. **Tất cả công việc hiệp hội (`all_tasks`)**: Toàn cảnh các chương trình hành động của CLB CEO HN10, cho phép lọc đa chiều theo tiến độ, người phụ trách và ngày hoàn thành.
-* **Tách bạch Bộ Chuyển Chế Độ Xem (View Mode Switcher)**:
-  - 4 Chế độ hiển thị (Dạng Thẻ Kanban, Dạng Bảng Danh Sách, Dạng Lịch Tuần/Tháng, Dạng Cây Phòng Ban) được đưa lên thanh công cụ phía trên (`ViewModeSwitch`), hoạt động độc lập và áp dụng linh hoạt cho cả 5 chức năng con nghiệp vụ nêu trên.
-
-### 9.22. Cấu Hình Gửi Tin Zalo OA Liên Kết API Dữ Liệu Thực Tế CSDL & Mã QR Check-in Điện Tử
-* **Liên kết API Dữ Liệu Thực Tế (Không Hardcode Mock Data)**:
-  - Khi cấu hình gửi thông báo Zalo OA (Zalo Official Account) cho các chiến dịch sự kiện hoặc đào tạo, hệ thống tự động gọi API nghiệp vụ tương ứng (`GET /events` hoặc `GET /trainings`) để nạp danh sách thực tế từ CSDL PostgreSQL.
-  - Người dùng chọn trực tiếp Sự kiện hoặc Khóa đào tạo từ danh sách thực tế; hệ thống tự động điền các tham số: Tên chương trình, Thời gian bắt đầu, Địa điểm tổ chức, Giảng viên / Chủ trì, Đường dẫn tham dự trực tuyến.
-* **Cơ Chế Sinh Đường Dẫn QR Check-in Điện Tử Trực Tiếp**:
-  - Trong nội dung tin nhắn Zalo gửi đến từng Học viên, hệ thống không chỉ gửi thông tin văn bản thuần túy mà tự động đính kèm đường dẫn mã QR Check-in cá nhân hóa:
-    `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=MÃ_HỘI_VIÊN%7CTICKET%3AMÃ_VÉ%7CPHONE%3ASĐT`
-  - Học viên chỉ cần mở tin nhắn Zalo tại bàn lễ tân sự kiện để ban tổ chức quét mã check-in tức thì và in thẻ đại biểu tự động.
-
-### 9.23. Chuẩn Hóa Bảng Dữ Liệu CustomTable Toàn Hệ Thống CRM: Sắp Xếp 3 Trạng Thái & 4 Thẻ KPI Gradient Figma
-* **Chuẩn Hóa Component Dùng Chung `CustomTable`**:
-  - Áp dụng chuẩn thiết kế Dashboard từ màn hình Quản lý Tài khoản (`/accounts`) thay thế đồng bộ cho toàn bộ các màn hình bảng biểu của CRM (Học viên, Doanh nghiệp, Đào tạo, Sự kiện, Giao dịch B2B, Lịch hẹn, Phân quyền).
-  - Tích hợp 4 Thẻ KPI Gradient Figma đặc trưng ở đầu bảng: Thẻ Xanh Navy Tổng số lượng, Thẻ Xanh Emerald Đang hoạt động, Thẻ Vàng Amber Chờ phê duyệt/Sắp diễn ra, Thẻ Xám/Đỏ Quá hạn/Cần xử lý.
-* **Cơ Chế Sắp Xếp 3 Trạng Thái Trên Toàn Bộ Các Cột (Tri-State Sorting)**:
-  - Mọi cột trong bảng dữ liệu đều hỗ trợ chu kỳ sắp xếp 3 bước tuần hoàn:
-    1. **Tăng dần (Ascending - `asc`)**: Mũi tên hướng lên ▲.
-    2. **Giảm dần (Descending - `desc`)**: Mũi tên hướng xuống ▼.
-    3. **Không sắp xếp / Mặc định (None / Default)**: Hai mũi tên xám nhạt ▲▼, khôi phục thứ tự mặc định của CSDL.
-  - Cơ chế này thay thế hoàn toàn tình trạng sắp xếp 2 trạng thái cũ, mang lại trải nghiệm chuẩn mực và nhất quán như phần mềm bảng tính cao cấp.
-

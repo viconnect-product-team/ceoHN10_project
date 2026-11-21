@@ -1,179 +1,101 @@
 import { Injectable, Logger, HttpException, HttpStatus } from '@nestjs/common';
-import * as crypto from 'crypto';
 import { PrismaService } from '../prisma/prisma.service';
 import { MailService } from '../mail/mail.service';
+import { ZaloService } from '../zalo/zalo.service';
 
-export class CreateVNPayUrlDto {
-  amount!: number; // Số tiền VNĐ
-  orderInfo!: string; // Nội dung đơn hàng
-  orderType?: string; // Loại đơn hàng (billpayment, topup, other)
-  returnUrl?: string; // URL quay về sau thanh toán
-  tmnCode?: string; // Dynamic TMN Code (nếu client gửi lên)
-  hashSecret?: string; // Dynamic Secret (nếu client gửi lên)
-  vnpUrl?: string; // Gateway URL (sandbox hoặc production)
-  ipAddr?: string; // IP người dùng
-  orderId?: string; // Mã đơn hàng tùy chỉnh
-}
-
-export class CreateMoMoUrlDto {
-  amount!: number;
-  orderInfo!: string;
-  orderId?: string;
-  returnUrl?: string;
-  ipnUrl?: string;
-  extraData?: string;
-  partnerCode?: string;
-  accessKey?: string;
-  secretKey?: string;
-  endpoint?: string;
-  ipAddr?: string;
-}
-
-export class VerifyVNPayReturnDto {
-  vnpParams!: Record<string, string>;
-  hashSecret?: string;
+export interface SePayConfig {
+  bankName: string;
+  accountNumber: string;
+  accountHolder: string;
+  apiToken?: string;
+  webhookSecret?: string;
+  prefixEvent: string;
+  prefixFee: string;
+  autoActivate: boolean;
 }
 
 @Injectable()
 export class PaymentService {
   private readonly logger = new Logger(PaymentService.name);
 
-  // Mặc định Sandbox VNPay
-  private readonly defaultTmnCode = process.env.VNPAY_TMN_CODE || 'CEOHN10V';
-  private readonly defaultHashSecret =
-    process.env.VNPAY_HASH_SECRET || 'A89F43BC9201EFA3B872190A812C4590';
-  private readonly defaultVnpUrl =
-    process.env.VNPAY_URL ||
-    'https://sandbox.vnpayment.vn/paymentv2/vpcpay.html';
-  private readonly defaultReturnUrl =
-    process.env.VNPAY_RETURN_URL || 'https://ceohn10.vn/payment/vnpay-return';
-  // Cấu hình Cổng Thanh Toán MoMo (Mặc định Sandbox Test của MoMo for Developers)
-  private readonly defaultMomoPartnerCode =
-    process.env.MOMO_PARTNER_CODE || 'MOMO';
-  private readonly defaultMomoAccessKey =
-    process.env.MOMO_ACCESS_KEY || 'F8BBA842ECF85';
-  private readonly defaultMomoSecretKey =
-    process.env.MOMO_SECRET_KEY || 'K951B6PE1waDMi640xX0huBt3C0/Pars';
-  private readonly defaultMomoEndpoint =
-    process.env.MOMO_ENDPOINT ||
-    'https://test-payment.momo.vn/v2/gateway/api/create';
-  private readonly defaultMomoReturnUrl =
-    process.env.MOMO_RETURN_URL || 'https://ceohn10.vn/payment/momo-return';
-  private readonly defaultMomoIpnUrl =
-    process.env.MOMO_IPN_URL || 'https://api.ceohn10.vn/payment/momo-ipn';
-
   constructor(
     private readonly prisma: PrismaService,
     private readonly mailService: MailService,
+    private readonly zaloService?: ZaloService,
   ) { }
 
   /**
-   * Định dạng thời gian theo chuẩn VNPay: YYYYMMDDHHmmss (Múi giờ GMT+7)
+   * Lấy cấu hình SePay từ database (app_settings) hoặc biến môi trường bên ngoài
    */
-  private formatVNPayDate(date: Date): string {
-    const pad = (n: number) => (n < 10 ? '0' + n : String(n));
-    // Cộng 7 tiếng cho múi giờ Việt Nam
-    const vnTime = new Date(date.getTime() + 7 * 60 * 60 * 1000);
-    return (
-      vnTime.getUTCFullYear() +
-      pad(vnTime.getUTCMonth() + 1) +
-      pad(vnTime.getUTCDate()) +
-      pad(vnTime.getUTCHours()) +
-      pad(vnTime.getUTCMinutes()) +
-      pad(vnTime.getUTCSeconds())
-    );
+  async getSepayConfig(): Promise<SePayConfig> {
+    try {
+      const row = await this.prisma.$queryRaw<any[]>`
+        SELECT value FROM public.app_settings WHERE key = 'crm_sepay_config' LIMIT 1
+      `.catch(() => []);
+
+      const dbConfig = row.length > 0 && row[0]?.value ? row[0].value : {};
+
+      return {
+        bankName: dbConfig.bankName || process.env.SEPAY_BANK_NAME || 'MBBank',
+        accountNumber: dbConfig.accountNumber || process.env.SEPAY_ACCOUNT_NO || '198300000000',
+        accountHolder: dbConfig.accountHolder || process.env.SEPAY_ACCOUNT_HOLDER || 'CLB DOANH NHAN CEO HN10',
+        apiToken: dbConfig.apiToken || process.env.SEPAY_API_TOKEN || '',
+        webhookSecret: dbConfig.webhookSecret || process.env.SEPAY_WEBHOOK_SECRET || '',
+        prefixEvent: dbConfig.prefixEvent || 'CEOHN10_SK',
+        prefixFee: dbConfig.prefixFee || 'CEOHN10_HP',
+        autoActivate: dbConfig.autoActivate !== false,
+      };
+    } catch {
+      return {
+        bankName: process.env.SEPAY_BANK_NAME || 'MBBank',
+        accountNumber: process.env.SEPAY_ACCOUNT_NO || '198300000000',
+        accountHolder: process.env.SEPAY_ACCOUNT_HOLDER || 'CLB DOANH NHAN CEO HN10',
+        apiToken: process.env.SEPAY_API_TOKEN || '',
+        webhookSecret: process.env.SEPAY_WEBHOOK_SECRET || '',
+        prefixEvent: 'CEOHN10_SK',
+        prefixFee: 'CEOHN10_HP',
+        autoActivate: true,
+      };
+    }
   }
 
   /**
-   * Sắp xếp object tham số theo chuẩn VNPay (A-Z)
+   * Tạo phiên thanh toán SePay VietQR động
    */
-  private sortObject(obj: Record<string, any>): Record<string, string> {
-    const sorted: Record<string, string> = {};
-    const keys = Object.keys(obj).sort();
-    for (const key of keys) {
-      if (obj[key] !== null && obj[key] !== undefined && obj[key] !== '') {
-        sorted[key] = String(obj[key]);
-      }
-    }
-    return sorted;
-  }
-
-  /**
-   * Tạo URL thanh toán VNPay chuẩn v2.1.0 kèm mã hóa HMAC-SHA512
-   */
-  createPaymentUrl(dto: CreateVNPayUrlDto, clientIp = '127.0.0.1') {
-    if (!dto.amount || dto.amount <= 0) {
-      throw new HttpException(
-        'Số tiền thanh toán không hợp lệ',
-        HttpStatus.BAD_REQUEST,
-      );
+  async createSepayCheckout(params: {
+    orderId: string;
+    amount: number;
+    description: string;
+    type?: 'event' | 'fee';
+  }) {
+    if (!params.amount || params.amount <= 0) {
+      throw new HttpException('Số tiền thanh toán không hợp lệ', HttpStatus.BAD_REQUEST);
     }
 
-    const tmnCode = dto.tmnCode?.trim() || this.defaultTmnCode;
-    const hashSecret =
-      process.env.VNP_HASH_SECRET?.trim() || this.defaultHashSecret;
-    const vnpUrl = dto.vnpUrl?.trim() || this.defaultVnpUrl;
-    const returnUrl = dto.returnUrl?.trim() || this.defaultReturnUrl;
+    const config = await this.getSepayConfig();
+    const memo = `${params.type === 'event' ? config.prefixEvent : config.prefixFee}_${params.orderId}`.replace(/[^A-Za-z0-9_]/g, '');
+    const bankShort = config.bankName.toUpperCase().includes('MB') ? 'MB' : config.bankName;
 
-    const date = new Date();
-    const createDate = this.formatVNPayDate(date);
-    const expireDate = this.formatVNPayDate(
-      new Date(date.getTime() + 15 * 60 * 1000),
-    ); // Hết hạn sau 15 phút
-    const orderId = dto.orderId?.trim() || `CEOHN10_${Date.now()}`;
-
-    const vnpParams: Record<string, string> = {
-      vnp_Version: '2.1.0',
-      vnp_Command: 'pay',
-      vnp_TmnCode: tmnCode,
-      vnp_Locale: 'vn',
-      vnp_CurrCode: 'VND',
-      vnp_TxnRef: orderId,
-      vnp_OrderInfo:
-        dto.orderInfo?.trim() ||
-        'CLB CEO HN10 - Thanh toan hoi phi / ve su kien',
-      vnp_OrderType: dto.orderType?.trim() || 'billpayment',
-      vnp_Amount: String(Math.round(dto.amount * 100)), // VNPay tính bằng đơn vị xu (nhân 100)
-      vnp_ReturnUrl: returnUrl,
-      vnp_IpAddr: dto.ipAddr || clientIp || '127.0.0.1',
-      vnp_CreateDate: createDate,
-      vnp_ExpireDate: expireDate,
-    };
-
-    const sortedParams = this.sortObject(vnpParams);
-
-    const signData = Object.keys(sortedParams)
-      .map(
-        (key) =>
-          `${encodeURIComponent(key)}=${encodeURIComponent(sortedParams[key]).replace(/%20/g, '+')}`,
-      )
-      .join('&');
-
-    const hmac = crypto.createHmac('sha512', hashSecret);
-    const secureHash = hmac
-      .update(Buffer.from(signData, 'utf-8'))
-      .digest('hex');
-
-    const paymentUrl = `${vnpUrl}?${signData}&vnp_SecureHash=${secureHash}`;
-    const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(paymentUrl)}`;
-
-    this.logger.log(
-      `Generated VNPay URL for order ${orderId} - Amount: ${dto.amount} VND`,
-    );
+    const qrImageUrl = `https://img.vietqr.io/image/${bankShort}-${config.accountNumber}-compact2.png?amount=${params.amount}&addInfo=${encodeURIComponent(memo)}&accountName=${encodeURIComponent(config.accountHolder)}`;
 
     return {
       success: true,
-      orderId,
-      amount: dto.amount,
-      paymentUrl,
+      method: 'SEPAY_VIETQR',
+      orderId: params.orderId,
+      amount: params.amount,
       qrImageUrl,
-      secureHash,
-      createDate,
+      paymentUrl: qrImageUrl,
+      bankAccount: {
+        bankName: config.bankName,
+        accountNumber: config.accountNumber,
+        accountHolder: config.accountHolder,
+        transferMemo: memo,
+      },
     };
   }
 
   /**
-   * Tạo phiên thanh toán VNPAY-QR chuyên biệt cho Đăng Ký Sự Kiện
+   * Tạo phiên thanh toán SePay VietQR cho Đăng ký sự kiện
    */
   async createEventCheckout(data: {
     registrationId: string;
@@ -183,31 +105,19 @@ export class PaymentService {
     memberCode?: string;
     clientIp?: string;
   }) {
-    const { registrationId, eventId, amount, memberName, clientIp } = data;
+    const { registrationId, amount, memberName } = data;
     const cleanRegId = String(registrationId || '').trim();
-    const orderId = `EVT_${cleanRegId}_${Date.now()}`;
-    const orderInfo = `CEO HN10 - Ve su kien #${cleanRegId}${memberName ? ` - ${memberName}` : ''}`;
 
-    // Lưu vnp_txn_ref vào event_registrations để đối soát
-    await this.prisma.$executeRaw`
-      UPDATE public.event_registrations
-      SET vnp_txn_ref = ${orderId}, payment_amount = ${amount}, payment_method = 'vnpay', updated_at = NOW()
-      WHERE id = ${cleanRegId} OR id::text = ${cleanRegId}
-    `.catch(() => { });
-
-    return this.createPaymentUrl(
-      {
-        orderId,
-        amount,
-        orderInfo,
-        orderType: 'billpayment',
-      },
-      clientIp || '127.0.0.1',
-    );
+    return this.createSepayCheckout({
+      orderId: cleanRegId,
+      amount,
+      description: `CEO HN10 - Ve su kien #${cleanRegId}${memberName ? ` - ${memberName}` : ''}`,
+      type: 'event',
+    });
   }
 
   /**
-   * Tạo phiên thanh toán VNPAY-QR chuyên biệt cho Hội Phí Thường Niên
+   * Tạo phiên thanh toán SePay VietQR cho Hội phí
    */
   async createFeeCheckout(data: {
     invoiceId: string;
@@ -217,588 +127,92 @@ export class PaymentService {
     memberName?: string;
     clientIp?: string;
   }) {
-    const { invoiceId, amount, year, memberName, clientIp } = data;
+    const { invoiceId, amount, year, memberName } = data;
     const cleanInvId = String(invoiceId || '').trim();
-    const orderId = `FEE_${cleanInvId}_${Date.now()}`;
-    const orderInfo = `CEO HN10 - Hoi phi nien liem ${year || new Date().getFullYear()} #${cleanInvId}${memberName ? ` - ${memberName}` : ''}`;
 
-    return this.createPaymentUrl(
-      {
-        orderId,
-        amount,
-        orderInfo,
-        orderType: 'billpayment',
-      },
-      clientIp || '127.0.0.1',
-    );
-  }
-
-  /**
-   * Kiểm tra chữ ký và THỰC THI TRANSACTION NGUYÊN TỬ CẬP NHẬT DATABASE TOÀN DIỆN
-   */
-  async verifyReturnUrl(dto: VerifyVNPayReturnDto) {
-    const vnpParams = { ...dto.vnpParams };
-    const secureHash = vnpParams['vnp_SecureHash'];
-    delete vnpParams['vnp_SecureHash'];
-    delete vnpParams['vnp_SecureHashType'];
-
-    const hashSecret =
-      process.env.VNP_HASH_SECRET?.trim() || this.defaultHashSecret;
-    const sortedParams = this.sortObject(vnpParams);
-
-    const signData = Object.keys(sortedParams)
-      .map(
-        (key) =>
-          `${encodeURIComponent(key)}=${encodeURIComponent(sortedParams[key]).replace(/%20/g, '+')}`,
-      )
-      .join('&');
-
-    const hmac = crypto.createHmac('sha512', hashSecret);
-    const checkHash = hmac.update(Buffer.from(signData, 'utf-8')).digest('hex');
-
-    const isMatch = secureHash?.toLowerCase() === checkHash?.toLowerCase();
-    const responseCode = vnpParams['vnp_ResponseCode'];
-    const isSuccess = isMatch && responseCode === '00';
-    const amount = vnpParams['vnp_Amount']
-      ? Number(vnpParams['vnp_Amount']) / 100
-      : 0;
-    const orderId = vnpParams['vnp_TxnRef'];
-    const bankCode = vnpParams['vnp_BankCode'];
-    const transactionNo = vnpParams['vnp_TransactionNo'];
-
-    // Nếu thanh toán thành công, thực thi Transaction cập nhật toàn diện
-    if (isSuccess && orderId) {
-      await this.executePaymentSuccessTransaction({
-        orderId,
-        amount,
-        bankCode,
-        transactionNo,
-        vnpParams,
-      });
-    }
-
-    return {
-      isValid: isMatch,
-      isSuccess,
-      responseCode,
-      orderId,
+    return this.createSepayCheckout({
+      orderId: cleanInvId,
       amount,
-      bankCode,
-      transactionNo,
-      message: isSuccess
-        ? 'Giao dịch thanh toán VNPAY thành công!'
-        : isMatch
-          ? `Giao dịch không thành công (Mã lỗi VNPay: ${responseCode})`
-          : 'Chữ ký phản hồi không hợp lệ!',
-    };
+      description: `CEO HN10 - Hoi phi ${year || new Date().getFullYear()} #${cleanInvId}${memberName ? ` - ${memberName}` : ''}`,
+      type: 'fee',
+    });
   }
 
   /**
-   * THỰC THI TRANSACTION ATOMIC:
-   * 1. Cập nhật trạng thái phiếu đăng ký / hóa đơn -> 'paid', 'confirmed'
-   * 2. Tăng số lượng người tham dự sự kiện
-   * 3. Ghi nhận tiền vào bảng public.transactions (Khoản Thu Doanh Thu Báo Cáo Tài Chính)
-   * 4. Tạo hoặc cập nhật bản ghi hóa đơn chính thức public.invoices
-   * 5. Gửi email vé điện tử / hóa đơn & bắn thông báo realtime cho Học viên
+   * Tiếp nhận Webhook SePay tự động khi có tiền về tài khoản ngân hàng
    */
-  async executePaymentSuccessTransaction(data: {
-    orderId: string;
-    amount: number;
-    bankCode?: string;
-    transactionNo?: string;
-    vnpParams?: Record<string, string>;
-  }) {
-    const { orderId, amount, bankCode, transactionNo } = data;
-    this.logger.log(
-      `Executing payment transaction for orderId: ${orderId}, amount: ${amount}`,
-    );
+  async handleSepayWebhook(payload: any) {
+    this.logger.log(`Received SePay Webhook: ${JSON.stringify(payload)}`);
+    if (!payload) return { success: false, message: 'Payload rỗng' };
 
-    try {
-      // ── TRƯỜNG HỢP A: THANH TOÁN VÉ SỰ KIỆN (EVT_...) ──
-      if (orderId.startsWith('EVT_') || orderId.includes('EV')) {
-        const rawRegId = orderId.replace('EVT_', '').split('_')[0];
-        const regRows = await this.prisma.$queryRaw<any[]>`
-          SELECT r.*, e.title as event_title, e.name as event_name, e.date as event_date, e.location as event_location
-          FROM public.event_registrations r
-          LEFT JOIN public.events e ON (e.id::text = r.event_id::text)
-          WHERE r.id = ${rawRegId} OR r.vnp_txn_ref = ${orderId} OR r.id::text = ${rawRegId}
-          LIMIT 1
-        `.catch(() => []);
+    const content = String(payload.content || payload.description || '').toUpperCase();
+    const transferAmount = Number(payload.transferAmount || payload.amount || 0);
+
+    const config = await this.getSepayConfig();
+
+    // 1. Khớp mã sự kiện: CEOHN10_SK_[REG_ID]
+    if (content.includes(config.prefixEvent)) {
+      const match = content.match(new RegExp(`${config.prefixEvent}_([A-Z0-9]+)`, 'i'));
+      if (match && match[1]) {
+        const regId = match[1];
+        await this.prisma.$executeRawUnsafe(`
+          UPDATE public.event_registrations 
+          SET payment_status = 'paid', payment_amount = $1, updated_at = NOW()
+          WHERE id = $2 OR UPPER(member_code) = UPPER($2)
+        `, transferAmount, regId).catch(() => {});
+
+        // Lấy thông tin vé để ghi nhận vào Quỹ tài chính CRM
+        const regRows = await this.prisma.$queryRawUnsafe<any[]>(`
+          SELECT r.*, e.name as event_name FROM public.event_registrations r
+          LEFT JOIN public.events e ON e.id = r.event_id
+          WHERE r.id = $1 LIMIT 1
+        `, regId).catch(() => []);
 
         if (regRows.length > 0) {
           const reg = regRows[0];
-          const actualRegId = reg.id;
-          const isAlreadyPaid = reg.payment_status === 'paid';
-          const finalAmount =
-            amount > 0 ? amount : Number(reg.payment_amount || 0);
-
-          // 1. Cập nhật event_registrations
-          await this.prisma.$executeRaw`
-            UPDATE public.event_registrations
-            SET payment_status = 'paid',
-                status = 'confirmed',
-                payment_method = 'vnpay',
-                paid_at = NOW(),
-                vnp_txn_ref = ${orderId},
-                updated_at = NOW()
-            WHERE id = ${actualRegId} OR id::text = ${actualRegId}::text
-          `;
-
-          // 2. Tăng số người đăng ký sự kiện
-          if (!isAlreadyPaid && reg.event_id) {
-            await this.prisma.$executeRaw`
-              UPDATE public.events
-              SET registered = COALESCE(registered, 0) + 1, updated_at = NOW()
-              WHERE id = ${reg.event_id}::uuid OR id::text = ${reg.event_id}::text
-            `.catch(() => { });
-          }
-
-          // 3. Ghi nhận tiền vào Khoản Thu (public.transactions)
-          const txCode = `THU-VNP-${actualRegId}`;
-          await this.prisma.$executeRaw`
-            INSERT INTO public.transactions (
-              id, code, date, type, category, description, amount, method, status, association_id, recipient, invoice_url, provider, provider_ref, metadata, created_at, updated_at
+          await this.prisma.$executeRawUnsafe(`
+            INSERT INTO public.income_records (
+              id, category, title, amount, date, payer_name, payment_method, status, event_id, notes, created_at, updated_at
             ) VALUES (
-              gen_random_uuid(),
-              ${txCode},
-              CURRENT_DATE,
-              'income',
-              'Vé sự kiện',
-              ${'Thanh toán VNPAY phí tham dự sự kiện: ' + (reg.member_name || 'Đại biểu') + ' - ' + (reg.event_name || reg.event_title || '')},
-              ${finalAmount},
-              'vnpay',
-              'completed',
-              ${reg.association_id ? reg.association_id : 'c1983000-0000-4000-8000-000000001983'}::uuid,
-              ${reg.member_name || 'Đại biểu'},
-              ${'/invoices/' + txCode + '.pdf'},
-              'vnpay',
-              ${transactionNo || orderId},
-              ${JSON.stringify({ bankCode, orderId, transactionNo })}::jsonb,
-              NOW(),
-              NOW()
-            )
-            ON CONFLICT (code) DO UPDATE
-            SET status = 'completed', amount = EXCLUDED.amount, updated_at = NOW()
-          `.catch((err) =>
-            console.error('[VNPAY] Error inserting event transaction:', err),
-          );
-
-          // 4. Tạo hóa đơn điện tử trong public.invoices
-          const invoiceNo = `INV-EVT-${actualRegId}`;
-          await this.prisma
-            .$executeRawUnsafe(
-              `
-            INSERT INTO public.invoices (
-              id, member_id, invoice_no, year, amount, due_date, paid_at, status, method, category, customer_name, customer_email, customer_phone, association_id, created_at, updated_at
-            ) VALUES (
-              $1, $2, $3, $4, $5, CURRENT_DATE, CURRENT_DATE, 'paid', 'vnpay', 'Vé sự kiện', $6, $7, $8, $9, NOW(), NOW()
-            )
-            ON CONFLICT (id) DO UPDATE
-            SET status = 'paid', paid_at = CURRENT_DATE, method = 'vnpay', updated_at = NOW()
-          `,
-              invoiceNo,
-              reg.member_code || actualRegId,
-              invoiceNo,
-              new Date().getFullYear(),
-              Math.round(finalAmount),
-              reg.member_name || 'Đại biểu',
-              reg.email || '',
-              reg.phone || '',
-              reg.association_id ? reg.association_id : null,
-            )
-            .catch(() => { });
-
-          // 5. Gửi Email vé điện tử kèm mã QR
-          const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(actualRegId)}`;
-          const recipientEmail = (reg.email || '').trim();
-          if (recipientEmail && recipientEmail.includes('@')) {
-            this.mailService
-              .sendEventTicketEmail({
-                to: recipientEmail,
-                fullName: reg.member_name || 'Quý Học viên',
-                eventTitle:
-                  reg.event_name || reg.event_title || 'Sự kiện CLB CEO HN10',
-                eventDate: reg.event_date
-                  ? new Date(reg.event_date).toLocaleDateString('vi-VN')
-                  : 'Sắp diễn ra',
-                eventLocation: reg.event_location || 'Hà Nội',
-                registrationId: actualRegId,
-                ticketType: reg.ticket_type || 'Vé tham dự sự kiện',
-                ticketCount: 1,
-                luckyNumber: reg.lucky_number
-                  ? String(reg.lucky_number)
-                  : undefined,
-                isFree: false,
-                paymentConfirmed: true,
-                totalAmount: finalAmount,
-                qrCodeUrl,
-                vietQrUrl: '',
-                bankAccount: '1010000000',
-                bankName: 'Cổng Thanh Toán Quốc Gia VNPAY (HanoiBA)',
-                bankOwner: 'CLB DOANH NHAN CEO HN10',
-              })
-              .catch((err) =>
-                console.warn('[VNPAY] Mail dispatch error:', err?.message),
-              );
-          }
-
-          // 6. Gửi tin nhắn và thông báo ứng dụng
-          const confirmMsg = `🎉 [VNPAY XÁC NHẬN] Thanh toán phí tham dự sự kiện "${reg.event_name || reg.event_title || 'Sự kiện'}" thành công!\n\n- Mã giao dịch VNPAY: #${transactionNo || orderId}\n- Số tiền: ${finalAmount.toLocaleString('vi-VN')} đ\n- Mã vé: #${actualRegId}\n\nHóa đơn điện tử số ${invoiceNo} và vé QR đã được kích hoạt. Trân trọng kính mời Quý Anh/Chị tham dự đúng giờ!`;
-          const ticketActionMsg = `[action:ticket|eventId:${reg.event_id}|eventTitle:${encodeURIComponent(reg.event_name || reg.event_title || '')}|ticketCode:${actualRegId}|lucky:${reg.lucky_number || ''}|time:${encodeURIComponent(reg.event_date || '')}|location:${encodeURIComponent(reg.event_location || '')}|attendee:${encodeURIComponent(reg.member_name || '')}|qr:${encodeURIComponent(qrCodeUrl)}|type:${encodeURIComponent(reg.ticket_type || 'Standard')}|count:1]`;
-
-          if (reg.member_code) {
-            await this.prisma.$executeRaw`
-              INSERT INTO public.messages (id, from_id, to_id, text, created_at)
-              VALUES (gen_random_uuid(), 'channel_media', ${String(reg.member_code).toLowerCase()}, ${confirmMsg}, NOW() - interval '1 second')
-            `.catch(() => { });
-            await this.prisma.$executeRaw`
-              INSERT INTO public.messages (id, from_id, to_id, text, created_at)
-              VALUES (gen_random_uuid(), 'channel_media', ${String(reg.member_code).toLowerCase()}, ${ticketActionMsg}, NOW())
-            `.catch(() => { });
-          }
-
-          const memberRecipientId = reg.member_code || actualRegId;
-          await this.prisma
-            .$executeRawUnsafe(
-              `
-            INSERT INTO public.member_notifications (
-              id, recipient_id, title, body, read, dismissed, ref_type, ref_id, created_at
-            ) VALUES (
-              gen_random_uuid(), $1, 'Thanh toán vé sự kiện VNPAY thành công', $2, false, false, 'event', $3, NOW()
+              gen_random_uuid(), 'Vé sự kiện', $1, $2, NOW(), $3, 'Chuyển khoản SePay', 'completed', $4, $5, NOW(), NOW()
             )
           `,
-              String(memberRecipientId),
-              confirmMsg,
-              reg.event_id,
-            )
-            .catch(() => { });
+            `Thu tiền vé sự kiện ${reg.event_name || ''} - ${reg.member_name || ''} (Mã vé: ${reg.id})`,
+            transferAmount,
+            reg.member_name || 'Khách tham dự',
+            reg.event_id || null,
+            `Thanh toán tự động qua SePay (GD: ${payload.id || ''})`,
+          ).catch(() => {});
         }
+
+        return { success: true, matched: 'event', regId };
       }
-
-      // ── TRƯỜNG HỢP B: THANH TOÁN HỘI PHÍ THƯỜNG NIÊN (FEE_...) ──
-      else if (orderId.startsWith('FEE_') || orderId.includes('INV')) {
-        const rawInvId = orderId.replace('FEE_', '').split('_')[0];
-        const invRows = await this.prisma.$queryRaw<any[]>`
-          SELECT i.*, m.name as member_name, m.email as member_email, m.phone as member_phone, m.code as member_code, m.user_id
-          FROM public.invoices i
-          LEFT JOIN public.members m ON (m.id::text = i.member_id::text OR m.code = i.member_id)
-          WHERE i.id = ${rawInvId} OR i.invoice_no = ${rawInvId} OR i.id::text = ${rawInvId}
-          LIMIT 1
-        `.catch(() => []);
-
-        if (invRows.length > 0) {
-          const inv = invRows[0];
-          const actualInvId = inv.id;
-          const finalAmount = amount > 0 ? amount : Number(inv.amount || 0);
-
-          // 1. Cập nhật invoices
-          await this.prisma.$executeRaw`
-            UPDATE public.invoices
-            SET status = 'paid', paid_at = CURRENT_DATE, method = 'vnpay', updated_at = NOW()
-            WHERE id = ${actualInvId}
-          `;
-
-          // 2. Kích hoạt trạng thái hội phí thành viên
-          if (inv.member_id) {
-            await this.prisma.$executeRaw`
-              UPDATE public.members
-              SET fee_paid = true, updated_at = NOW()
-              WHERE id = ${inv.member_id}::uuid OR code = ${inv.member_id} OR id::text = ${inv.member_id}
-            `.catch(() => { });
-          }
-
-          // 3. Ghi nhận tiền vào Khoản Thu (public.transactions)
-          const txCode = `THU-VNP-${actualInvId}`;
-          await this.prisma.$executeRaw`
-            INSERT INTO public.transactions (
-              id, code, date, type, category, description, amount, method, status, association_id, recipient, invoice_url, provider, provider_ref, metadata, created_at, updated_at
-            ) VALUES (
-              gen_random_uuid(),
-              ${txCode},
-              CURRENT_DATE,
-              'income',
-              'Hội phí Học viên',
-              ${'Thanh toán VNPAY hội phí thường niên: ' + (inv.member_name || 'Học viên') + ' (' + (inv.invoice_no || actualInvId) + ')'},
-              ${finalAmount},
-              'vnpay',
-              'completed',
-              ${inv.association_id ? inv.association_id : 'c1983000-0000-4000-8000-000000001983'}::uuid,
-              ${inv.member_name || 'Học viên'},
-              ${'/invoices/' + txCode + '.pdf'},
-              'vnpay',
-              ${transactionNo || orderId},
-              ${JSON.stringify({ bankCode, orderId, transactionNo })}::jsonb,
-              NOW(),
-              NOW()
-            )
-            ON CONFLICT (code) DO UPDATE
-            SET status = 'completed', amount = EXCLUDED.amount, updated_at = NOW()
-          `.catch((err) =>
-            console.error('[VNPAY] Error inserting fee transaction:', err),
-          );
-
-          // 4. Gửi email xác nhận
-          const recipientEmail = (inv.member_email || '').trim();
-          if (recipientEmail && recipientEmail.includes('@')) {
-            this.mailService
-              .sendMembershipFeeSuccessEmail({
-                to: recipientEmail,
-                memberName: inv.member_name || 'Quý Học viên',
-                invoiceNo: inv.invoice_no || actualInvId,
-                year: inv.year || new Date().getFullYear(),
-                amount: Number(finalAmount),
-                paidDate: new Date().toISOString().slice(0, 10),
-                paymentMethod:
-                  'Cổng thanh toán điện tử VNPAY Gateway (HMAC-SHA512)',
-              })
-              .catch(() => { });
-          }
-
-          // 5. Gửi thông báo ứng dụng
-          const notifTitle = 'Xác nhận thanh toán hội phí VNPAY thành công';
-          const notifBody = `Hóa đơn hội phí #${inv.invoice_no || actualInvId} trị giá ${finalAmount.toLocaleString('vi-VN')} đ đã được thanh toán thành công qua cổng VNPAY. Trạng thái Học viên VIP của Anh/Chị đã được kích hoạt!`;
-
-          if (inv.user_id) {
-            await this.prisma
-              .$executeRawUnsafe(
-                `
-              INSERT INTO public.member_notifications (
-                id, recipient_id, title, body, read, dismissed, ref_type, ref_id, created_at
-              ) VALUES (
-                gen_random_uuid(), $1, $2, $3, false, false, 'invoice', $4, NOW()
-              )
-            `,
-                String(inv.user_id),
-                notifTitle,
-                notifBody,
-                actualInvId,
-              )
-              .catch(() => { });
-          }
-
-          if (inv.member_code) {
-            await this.prisma.$executeRaw`
-              INSERT INTO public.messages (id, from_id, to_id, text, created_at)
-              VALUES (gen_random_uuid(), 'channel_membership', ${String(inv.member_code).toLowerCase()}, ${notifBody}, NOW())
-            `.catch(() => { });
-          }
-        }
-      }
-    } catch (err: any) {
-      this.logger.error(
-        `Failed executing payment success transaction: ${err?.message}`,
-        err?.stack,
-      );
     }
+
+    // 2. Khớp mã hội phí: CEOHN10_HP_[INV_ID]
+    if (content.includes(config.prefixFee)) {
+      const match = content.match(new RegExp(`${config.prefixFee}_([A-Z0-9]+)`, 'i'));
+      if (match && match[1]) {
+        const invId = match[1];
+        await this.prisma.$executeRawUnsafe(`
+          UPDATE public.invoices 
+          SET status = 'paid', paid_at = NOW(), updated_at = NOW()
+          WHERE id = $1
+        `, invId).catch(() => {});
+
+        return { success: true, matched: 'fee', invId };
+      }
+    }
+
+    return { success: true, matched: 'unmatched', content };
   }
 
-  /**
-   * Phương thức hỗ trợ kiểm thử thủ công: Giả lập xác nhận thanh toán VNPAY thành công
-   */
-  async simulateVnpayPaymentSuccess(orderId: string, amount: number) {
-    const fakeTxnNo = `VNP${Date.now()}`;
-    await this.executePaymentSuccessTransaction({
-      orderId,
-      amount,
-      bankCode: 'NCB',
-      transactionNo: fakeTxnNo,
+  // Tương thích ngược: giả lập thanh toán test
+  async simulatePaymentSuccess(orderId: string, amount: number) {
+    return this.handleSepayWebhook({
+      content: orderId,
+      transferAmount: amount,
+      id: `SIM_${Date.now()}`,
     });
-    return {
-      success: true,
-      message: `Đã xác nhận thanh toán VNPAY thành công cho đơn #${orderId}!`,
-      orderId,
-      transactionNo: fakeTxnNo,
-    };
-  }
-
-  /**
-   * Tạo URL thanh toán MoMo All-In-One (Capture Wallet)
-   * Hỗ trợ: Quét QR MoMo, Mở App MoMo, Thẻ ATM nội địa, Thẻ Quốc tế Visa/Mastercard
-   */
-  async createMoMoPaymentUrl(dto: CreateMoMoUrlDto, clientIp = '127.0.0.1') {
-    if (!dto.amount || dto.amount <= 0) {
-      throw new HttpException(
-        'Số tiền thanh toán không hợp lệ',
-        HttpStatus.BAD_REQUEST,
-      );
-    }
-
-    const partnerCode = dto.partnerCode?.trim() || this.defaultMomoPartnerCode;
-    const accessKey = dto.accessKey?.trim() || this.defaultMomoAccessKey;
-    const secretKey = dto.secretKey?.trim() || this.defaultMomoSecretKey;
-    const endpoint = dto.endpoint?.trim() || this.defaultMomoEndpoint;
-    const redirectUrl = dto.returnUrl?.trim() || this.defaultMomoReturnUrl;
-    const ipnUrl = dto.ipnUrl?.trim() || this.defaultMomoIpnUrl;
-
-    const orderId = dto.orderId?.trim() || `MOMO_${Date.now()}`;
-    const requestId = `REQ_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
-    const orderInfo = dto.orderInfo?.trim() || 'CLB CEO HN10 - Thanh toan MoMo';
-    const amount = Math.round(dto.amount);
-    const requestType = 'captureWallet';
-    const extraData = dto.extraData || '';
-
-    // Chuỗi ký tự thô để ký chữ ký số HMAC-SHA256 theo đúng chuẩn MoMo v2
-    const rawSignature = `accessKey=${accessKey}&amount=${amount}&extraData=${extraData}&ipnUrl=${ipnUrl}&orderId=${orderId}&orderInfo=${orderInfo}&partnerCode=${partnerCode}&redirectUrl=${redirectUrl}&requestId=${requestId}&requestType=${requestType}`;
-
-    const signature = crypto
-      .createHmac('sha256', secretKey)
-      .update(rawSignature)
-      .digest('hex');
-
-    const requestBody = {
-      partnerCode,
-      partnerName: 'CLB Doanh Nhan CEO HN10',
-      storeId: 'CEOHN10_MAIN',
-      requestId,
-      amount,
-      orderId,
-      orderInfo,
-      redirectUrl,
-      ipnUrl,
-      lang: 'vi',
-      requestType,
-      autoCapture: true,
-      extraData,
-      signature,
-    };
-
-    try {
-      const axios = require('axios');
-      const response = await axios.post(endpoint, requestBody, {
-        headers: { 'Content-Type': 'application/json' },
-        timeout: 10000,
-      });
-
-      if (response.data && response.data.resultCode === 0) {
-        return {
-          success: true,
-          method: 'MOMO',
-          orderId,
-          requestId,
-          amount,
-          payUrl: response.data.payUrl,
-          deeplink: response.data.deeplink,
-          qrCodeUrl: response.data.qrCodeUrl,
-          message: 'Khởi tạo giao dịch MoMo thành công',
-        };
-      } else {
-        const errorMsg = response.data?.message || 'Lỗi phản hồi từ cổng MoMo';
-        this.logger.warn(`MoMo create payment failed: ${errorMsg}`);
-        // Fallback: Tạo link giả lập MoMo thanh toán trong môi trường dev
-        const fallbackQr = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent('momo://pay?orderId=' + orderId + '&amount=' + amount)}`;
-        return {
-          success: true,
-          method: 'MOMO',
-          orderId,
-          requestId,
-          amount,
-          payUrl: `https://test-payment.momo.vn/v2/gateway/pay?orderId=${orderId}`,
-          deeplink: `momo://pay?orderId=${orderId}&amount=${amount}`,
-          qrCodeUrl: fallbackQr,
-          message: 'Khởi tạo MoMo Gateway (Môi trường Sandbox/Mô phỏng)',
-          warning: errorMsg,
-        };
-      }
-    } catch (err: any) {
-      this.logger.warn(`MoMo gateway connection warning: ${err?.message}`);
-      const fallbackQr = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent('momo://pay?orderId=' + orderId + '&amount=' + amount)}`;
-      return {
-        success: true,
-        method: 'MOMO',
-        orderId,
-        requestId,
-        amount,
-        payUrl: `https://test-payment.momo.vn/v2/gateway/pay?orderId=${orderId}`,
-        deeplink: `momo://pay?orderId=${orderId}&amount=${amount}`,
-        qrCodeUrl: fallbackQr,
-        message: 'Khởi tạo MoMo Gateway (Môi trường Sandbox Dự phòng)',
-      };
-    }
-  }
-
-  /**
-   * Tiếp nhận và xác thực Webhook IPN thời gian thực từ MoMo Server
-   */
-  async verifyMoMoIpn(body: any) {
-    this.logger.log(`Received MoMo IPN callback: ${JSON.stringify(body)}`);
-    const {
-      partnerCode,
-      orderId,
-      requestId,
-      amount,
-      orderInfo,
-      orderType,
-      transId,
-      resultCode,
-      message,
-      payType,
-      responseTime,
-      extraData,
-      signature,
-    } = body;
-
-    const secretKey = process.env.MOMO_SECRET_KEY || this.defaultMomoSecretKey;
-    const accessKey = process.env.MOMO_ACCESS_KEY || this.defaultMomoAccessKey;
-
-    // Chuỗi kiểm tra chữ ký IPN theo quy định MoMo
-    const rawSignature = `accessKey=${accessKey}&amount=${amount}&extraData=${extraData || ''}&message=${message}&orderId=${orderId}&orderInfo=${orderInfo}&orderType=${orderType}&partnerCode=${partnerCode}&payType=${payType}&requestId=${requestId}&responseTime=${responseTime}&resultCode=${resultCode}&transId=${transId}`;
-
-    const expectedSignature = crypto
-      .createHmac('sha256', secretKey)
-      .update(rawSignature)
-      .digest('hex');
-
-    const isMatch = signature === expectedSignature;
-    if (!isMatch) {
-      this.logger.warn(
-        `Invalid MoMo IPN signature! Expected: ${expectedSignature}, Received: ${signature}`,
-      );
-      // Vẫn xử lý nếu đang ở môi trường test/sandbox
-      if (process.env.NODE_ENV === 'production') {
-        throw new HttpException(
-          'Chữ ký MoMo IPN không hợp lệ',
-          HttpStatus.BAD_REQUEST,
-        );
-      }
-    }
-
-    const isSuccess = Number(resultCode) === 0;
-    if (isSuccess && orderId) {
-      await this.executePaymentSuccessTransaction({
-        orderId,
-        amount: Number(amount),
-        bankCode: payType || 'MOMO',
-        transactionNo: String(transId || orderId),
-        vnpParams: { provider: 'momo', payType, transId },
-      });
-    }
-
-    return {
-      resultCode: 0,
-      message: 'MoMo IPN processed successfully',
-      isSuccess,
-      orderId,
-      transId,
-    };
-  }
-
-  /**
-   * Phương thức hỗ trợ kiểm thử thủ công: Giả lập xác nhận thanh toán MoMo thành công
-   */
-  async simulateMomoPaymentSuccess(orderId: string, amount: number) {
-    const fakeTransId = `MOMO_TXN_${Date.now()}`;
-    await this.executePaymentSuccessTransaction({
-      orderId,
-      amount,
-      bankCode: 'MOMO_WALLET',
-      transactionNo: fakeTransId,
-      vnpParams: { provider: 'momo' },
-    });
-    return {
-      success: true,
-      message: `Đã xác nhận thanh toán MoMo thành công cho đơn #${orderId}!`,
-      orderId,
-      transactionNo: fakeTransId,
-    };
   }
 }

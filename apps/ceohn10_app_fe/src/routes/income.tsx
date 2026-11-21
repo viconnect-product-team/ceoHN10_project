@@ -1023,7 +1023,7 @@ function IncomePage() {
                     className="mt-1 w-full rounded-xl border border-input bg-background px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-primary"
                   >
                     <option value="cash">Tiền mặt (Thu tại bàn tiếp đón)</option>
-                    <option value="bank">Chuyển khoản (VNPAY-QR / Ngân hàng)</option>
+                    <option value="bank">Chuyển khoản (SePay VietQR / Ngân hàng)</option>
                     <option value="card">Quẹt thẻ POS</option>
                   </select>
                 </div>
