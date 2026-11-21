@@ -458,4 +458,24 @@ export class EventsController {
   ) {
     return this.eventsService.generateSepayFeeQr(id, feeId, ticketCode);
   }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('platform_admin', 'superadmin', 'adm', 'admin', 'bqt', 'btt', 'btk', 'bxt', 'member')
+  @Post(':id/import-attendees')
+  async importAttendees(
+    @Param('id') id: string,
+    @Body() body: { records: any[]; customColumns?: string[]; associationId?: string },
+  ) {
+    return this.eventsService.importAttendeesFromFile(
+      id,
+      body.records || [],
+      body.customColumns || [],
+      body.associationId,
+    );
+  }
+
+  @Get(':id/dynamic-columns')
+  async getDynamicColumns(@Param('id') id: string) {
+    return this.eventsService.getEventDynamicColumns(id);
+  }
 }

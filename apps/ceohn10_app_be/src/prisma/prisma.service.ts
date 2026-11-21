@@ -13,7 +13,38 @@ export class PrismaService
   private readonly logger = new Logger(PrismaService.name);
 
   constructor() {
-    super();
+    const isTestEnv =
+      process.env.APP_ENV === 'test' ||
+      process.env.NODE_ENV === 'test' ||
+      process.env.RUN_ENV === 'test';
+
+    const testDbUrl =
+      process.env.TEST_DATABASE_URL ||
+      'postgresql://app1:5^S0CEpvYwC1(#YN1UoJ@113.20.107.184:6432/ceohn10_project_test?pgbouncer=true';
+
+    const prodDbUrl =
+      process.env.DATABASE_URL ||
+      'postgresql://app1:5^S0CEpvYwC1(#YN1UoJ@113.20.107.184:6432/ceohn10_project?pgbouncer=true';
+
+    const activeDbUrl = isTestEnv ? testDbUrl : prodDbUrl;
+
+    super({
+      datasources: {
+        db: {
+          url: activeDbUrl,
+        },
+      },
+    });
+
+    if (isTestEnv) {
+      this.logger.warn(
+        `🧪 [PrismaService] Đang kích hoạt môi trường TEST với CSDL Test riêng biệt: ${activeDbUrl.replace(/:[^:@]+@/, ':***@')}`,
+      );
+    } else {
+      this.logger.log(
+        `🚀 [PrismaService] Đang kích hoạt môi trường PRODUCT với CSDL Sản phẩm chuẩn mực: 113.20.107.184:6432/ceohn10_project`,
+      );
+    }
   }
 
   async onModuleInit() {

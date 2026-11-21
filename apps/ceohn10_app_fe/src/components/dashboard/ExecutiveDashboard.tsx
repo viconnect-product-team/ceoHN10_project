@@ -48,6 +48,7 @@ import {
   FileText,
   Layers,
   Star,
+  Ticket,
   type LucideIcon,
 } from "lucide-react";
 import { TrainingFeedbackModal } from "@/components/trainings/TrainingFeedbackModal";
@@ -761,6 +762,81 @@ export function ExecutiveDashboard({ authReady }: { authReady: boolean }) {
               <div className="text-sm font-bold text-emerald-600 mt-0.5">Đã phân bổ · Sẵn sàng chi</div>
             </div>
           </div>
+        </div>
+      </Panel>
+
+      {/* ── BÁO CÁO DOANH THU & NGUỒN TIỀN VÉ SỰ KIỆN (QUỸ TÀI CHÍNH CEO HN10) ── */}
+      <Panel
+        title="Quỹ Thu Vé & Doanh Thu Từng Sự Kiện"
+        sub="Dòng tiền tự động nạp vào Quỹ CLB từ file import danh sách đăng ký và cổng thanh toán vé SePay VietQR"
+        action={
+          <div className="flex items-center gap-2">
+            <Link
+              to="/event-registrations"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-600 text-white text-xs font-semibold hover:bg-emerald-700 transition cursor-pointer"
+            >
+              <Ticket className="size-3.5" />
+              <span>Quản lý đăng ký & Nhập file vé</span>
+            </Link>
+          </div>
+        }
+      >
+        <div className="rounded-2xl border border-border bg-card p-6 space-y-4 shadow-xs">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div className="flex items-center gap-3.5">
+              <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold">
+                <Coins className="size-6" />
+              </div>
+              <div>
+                <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  Tổng Doanh Thu Vé Đã Nạp Vào Quỹ Tài Chính
+                </div>
+                <div className="text-3xl font-black text-foreground tracking-tight mt-0.5">
+                  {fmtMoney(Number(fundsQ.data?.eventRevenueFund?.totalAmount || 0))} VNĐ
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <span className="px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-600 border border-emerald-500/20">
+                {fundsQ.data?.eventRevenueFund?.totalTickets || 0} vé đã ghi nhận vào quỹ
+              </span>
+            </div>
+          </div>
+
+          {/* Danh sách phân bổ doanh thu theo từng sự kiện */}
+          {fundsQ.data?.eventRevenueFund?.byEvents && fundsQ.data.eventRevenueFund.byEvents.length > 0 ? (
+            <div className="pt-4 border-t border-border">
+              <div className="text-xs font-bold text-foreground mb-2 flex items-center justify-between">
+                <span>Chi tiết số tiền nạp quỹ theo từng sự kiện:</span>
+                <span className="text-[11px] text-muted-foreground">Tự động hạch toán vào Quản Lý Thu</span>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                {fundsQ.data.eventRevenueFund.byEvents.map((evItem: any, idx: number) => (
+                  <div key={idx} className="p-3.5 rounded-xl bg-muted/40 border border-border flex flex-col justify-between gap-2">
+                    <div>
+                      <div className="text-xs font-bold text-foreground line-clamp-1" title={evItem.eventName}>
+                        {evItem.eventName}
+                      </div>
+                      <div className="text-[11px] text-muted-foreground mt-0.5">
+                        Số lượng vé đã thanh toán: <span className="font-semibold text-foreground">{evItem.ticketCount} vé</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between pt-2 border-t border-border/60">
+                      <span className="text-[11px] text-muted-foreground">Khoản thu quỹ:</span>
+                      <span className="text-sm font-black text-emerald-600 dark:text-emerald-400">
+                        {fmtMoney(evItem.amount)} VNĐ
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div className="pt-3 border-t border-border text-center text-xs text-muted-foreground py-2">
+              Chưa có khoản thu vé sự kiện nào phát sinh hoặc dữ liệu đang đồng bộ.
+            </div>
+          )}
         </div>
       </Panel>
 

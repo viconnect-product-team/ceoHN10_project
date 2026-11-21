@@ -1,5 +1,6 @@
 export * from './strategy/fee-calculation.strategy';
 export * from './strategy/payment.strategy';
+export * from './adapter/sepay.adapter';
 export * from './adapter/vnpay.adapter';
 export * from './adapter/storage.adapter';
 export * from './adapter/mail.adapter';

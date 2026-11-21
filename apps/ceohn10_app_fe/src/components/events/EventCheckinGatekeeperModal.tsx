@@ -38,7 +38,7 @@ export function EventCheckinGatekeeperModal({
   onUpdateEvent,
 }: EventCheckinGatekeeperModalProps) {
   const [activeTab, setActiveTab] = useState<"qr_standee" | "gatekeepers" | "attendees">("qr_standee");
-  const [qrTarget, setQrTarget] = useState<"zalo" | "member_app" | "both">("zalo");
+  const [qrTarget, setQrTarget] = useState<"unregistered" | "registered" | "both">("both");
 
   // Gatekeepers & Ban Truyền Thông members from real DB
   const [bttMembers, setBttMembers] = useState<any[]>([]);
@@ -137,10 +137,10 @@ export function EventCheckinGatekeeperModal({
     ? window.location.origin
     : "https://crm.ceohn10.viconnect.vn";
 
-  // Zalo Guest Registration URL: non-members scan with Zalo / Phone Camera to register & check-in
-  const zaloGuestUrl = `${origin}/guest-event-register/${event.id}`;
-  // App internal event checkin payload for club members using CEO HN10 App scanner
-  const appCheckinPayload = `event_checkin:${event.id}`;
+  // MÃ 1: Dành cho người CHƯA đăng ký tham gia sự kiện từ trước (Walk-in Guest)
+  const walkinGuestUrl = `${origin}/guest-event-register/${event.id}?source=walkin`;
+  // MÃ 2: Dành cho đại biểu ĐÃ đăng ký tham gia sự kiện từ trước (Check-in chính thức)
+  const preRegisteredCheckinUrl = `${origin}/event-checkin?eventId=${event.id}`;
 
   const isMemberSelected = (m: any) => {
     return selectedScanners.some((s: any) => {
@@ -325,29 +325,29 @@ export function EventCheckinGatekeeperModal({
           {/* TAB 1: QR STANDEE */}
           {activeTab === "qr_standee" && (
             <div className="space-y-4">
-              {/* Mode Switcher */}
+              {/* Mode Switcher: 2 Mã Check-in Riêng Biệt */}
               <div className="flex items-center gap-2 p-1.5 rounded-2xl bg-secondary/50 border border-border">
                 <button
                   type="button"
-                  onClick={() => setQrTarget("zalo")}
-                  className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-xl text-xs font-bold transition cursor-pointer ${qrTarget === "zalo"
+                  onClick={() => setQrTarget("unregistered")}
+                  className={`flex-1 flex items-center justify-center gap-1.5 py-2 px-2.5 rounded-xl text-xs font-bold transition cursor-pointer ${qrTarget === "unregistered"
                       ? "bg-blue-600 text-white shadow-sm"
                       : "text-muted-foreground hover:text-foreground hover:bg-secondary"
                     }`}
                 >
                   <Globe className="h-3.5 w-3.5" />
-                  <span>Quét Qua ZALO (Khách Mời / Đại Biểu Ngoài)</span>
+                  <span>MÃ 1: Khách Chưa Đăng Ký (Tại Cửa)</span>
                 </button>
                 <button
                   type="button"
-                  onClick={() => setQrTarget("member_app")}
-                  className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-xl text-xs font-bold transition cursor-pointer ${qrTarget === "member_app"
-                      ? "bg-amber-500 text-slate-950 shadow-sm"
+                  onClick={() => setQrTarget("registered")}
+                  className={`flex-1 flex items-center justify-center gap-1.5 py-2 px-2.5 rounded-xl text-xs font-bold transition cursor-pointer ${qrTarget === "registered"
+                      ? "bg-emerald-600 text-white shadow-sm"
                       : "text-muted-foreground hover:text-foreground hover:bg-secondary"
                     }`}
                 >
                   <ShieldCheck className="h-3.5 w-3.5" />
-                  <span>Quét Qua App (Học viên CLB)</span>
+                  <span>MÃ 2: Đại Biểu Đã Đăng Ký (Check-in)</span>
                 </button>
                 <button
                   type="button"
@@ -357,40 +357,40 @@ export function EventCheckinGatekeeperModal({
                       : "text-muted-foreground hover:text-foreground hover:bg-secondary"
                     }`}
                 >
-                  <span>Xem Cả Hai</span>
+                  <span>Xem Cả 2 Mã</span>
                 </button>
               </div>
 
-              {/* VIEW 1: ZALO GUEST QR (RECOMMENDED FOR NON-MEMBERS) */}
-              {(qrTarget === "zalo" || qrTarget === "both") && (
+              {/* VIEW 1: MÃ 1 - DÀNH CHO KHÁCH CHƯA ĐĂNG KÝ (QUÉT MỞ FORM & KÈM SEPAY VIETQR) */}
+              {(qrTarget === "unregistered" || qrTarget === "both") && (
                 <div className="flex flex-col items-center text-center p-4 rounded-2xl bg-blue-50/60 dark:bg-blue-950/20 border-2 border-blue-400 dark:border-blue-800 shadow-xs relative">
                   <div className="absolute top-3 right-3">
                     <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-black bg-blue-600 text-white shadow-2xs">
-                      TƯƠNG THÍCH ZALO & CAMERA
+                      MÃ 1: CHƯA ĐĂNG KÝ
                     </span>
                   </div>
 
                   <div className="p-3 bg-white rounded-2xl shadow-md border border-slate-200 mt-2">
                     <QrCanvas
-                      value={zaloGuestUrl}
+                      value={walkinGuestUrl}
                       size={qrTarget === "both" ? 170 : 210}
                     />
                   </div>
 
                   <div className="mt-3 text-sm font-bold text-blue-950 dark:text-blue-200 flex items-center gap-1.5">
-                    <span>Mã QR Soát Vé & Đăng Ký Cho Khách Mời (Quét Qua ZALO)</span>
+                    <span>MÃ 1: Quét Đăng Ký Tại Cửa Sự Kiện (Chưa Đăng Ký Trước)</span>
                   </div>
                   <p className="mt-1 text-[11.5px] text-muted-foreground max-w-lg leading-relaxed">
-                    Khách mời, đối tác vãng lai chưa là Học viên chỉ cần dùng <strong>Zalo</strong> hoặc <strong>Camera điện thoại</strong> quét mã này để mở ngay biểu mẫu đăng ký, chọn loại vé và nhận vị trí bàn ghế tức thì không cần đăng nhập.
+                    Khách dùng <strong>Zalo</strong> hoặc <strong>Camera điện thoại</strong> quét mã này để mở ngay biểu mẫu đăng ký. Nếu sự kiện có phí sẽ kèm mã VietQR (SePay) thanh toán phí vé; nếu sự kiện miễn phí chỉ cần điền: Họ tên, Email, SĐT, Công ty/Doanh nghiệp, Chức danh.
                   </p>
 
                   <div className="mt-2.5 w-full max-w-md p-2 rounded-xl bg-white dark:bg-slate-800 border border-blue-200 dark:border-blue-900 text-[11px] font-mono text-slate-800 dark:text-slate-200 flex items-center justify-between gap-2 overflow-hidden">
-                    <span className="truncate">{zaloGuestUrl}</span>
+                    <span className="truncate">{walkinGuestUrl}</span>
                     <button
                       type="button"
                       onClick={() => {
-                        navigator.clipboard.writeText(zaloGuestUrl);
-                        toast.success("Đã sao chép link Zalo đăng ký sự kiện!");
+                        navigator.clipboard.writeText(walkinGuestUrl);
+                        toast.success("Đã sao chép link Mã 1 Đăng ký tại cửa!");
                       }}
                       className="p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-blue-600 transition shrink-0 cursor-pointer"
                       title="Sao chép link"
@@ -403,68 +403,60 @@ export function EventCheckinGatekeeperModal({
                     <button
                       type="button"
                       onClick={() => {
-                        navigator.clipboard.writeText(zaloGuestUrl);
-                        toast.success("Đã sao chép liên kết mở qua Zalo!");
+                        navigator.clipboard.writeText(walkinGuestUrl);
+                        toast.success("Đã sao chép liên kết Mã 1 mở qua Zalo!");
                       }}
-                      className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold text-slate-950 bg-amber-400 hover:bg-amber-500 border border-amber-500 shadow-sm transition cursor-pointer"
+                      className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-sm transition cursor-pointer"
                     >
                       <Copy className="h-3.5 w-3.5" />
-                      <span>Sao Chép Link Zalo</span>
+                      <span>Sao Chép Link Mã 1</span>
                     </button>
                     <a
-                      href={zaloGuestUrl}
+                      href={walkinGuestUrl}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold text-slate-900 bg-white border border-slate-300 hover:bg-slate-100 shadow-2xs transition cursor-pointer dark:bg-slate-800 dark:text-slate-100 dark:border-slate-700"
                     >
                       <ExternalLink className="h-3.5 w-3.5" />
-                      <span>Mở Thử Trang Khách Mời</span>
+                      <span>Mở Thử Form Đăng Ký</span>
                     </a>
-                    <button
-                      type="button"
-                      onClick={() => window.print()}
-                      className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold text-slate-900 bg-white border border-slate-300 hover:bg-slate-100 shadow-2xs transition cursor-pointer dark:bg-slate-800 dark:text-slate-100 dark:border-slate-700"
-                    >
-                      <Printer className="h-3.5 w-3.5" />
-                      <span>In Standee A4 / Roll-up</span>
-                    </button>
                   </div>
                 </div>
               )}
 
-              {/* VIEW 2: MEMBER APP CHECKIN QR */}
-              {(qrTarget === "member_app" || qrTarget === "both") && (
-                <div className="flex flex-col items-center text-center p-4 rounded-2xl bg-amber-50/50 dark:bg-amber-950/20 border-2 border-amber-400 dark:border-amber-700 shadow-xs relative">
+              {/* VIEW 2: MÃ 2 - DÀNH CHO ĐẠI BIỂU ĐÃ ĐĂNG KÝ TRƯỚC (CỔNG CHECK-IN NHẬP MÃ / TẢI ẢNH QR) */}
+              {(qrTarget === "registered" || qrTarget === "both") && (
+                <div className="flex flex-col items-center text-center p-4 rounded-2xl bg-emerald-50/60 dark:bg-emerald-950/20 border-2 border-emerald-500 dark:border-emerald-700 shadow-xs relative">
                   <div className="absolute top-3 right-3">
-                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-black bg-amber-500 text-slate-950 shadow-2xs">
-                      DÀNH CHO Học viên CÓ APP
+                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-black bg-emerald-600 text-white shadow-2xs">
+                      MÃ 2: ĐÃ ĐĂNG KÝ
                     </span>
                   </div>
 
                   <div className="p-3 bg-white rounded-2xl shadow-md border border-slate-200 mt-2">
                     <QrCanvas
-                      value={appCheckinPayload}
+                      value={preRegisteredCheckinUrl}
                       size={qrTarget === "both" ? 170 : 210}
                     />
                   </div>
 
-                  <div className="mt-3 text-sm font-bold text-amber-950 dark:text-amber-200 flex items-center gap-1.5">
-                    <span>Mã QR Check-in Nhanh Cho Học viên (Quét Bằng App CEO HN10)</span>
+                  <div className="mt-3 text-sm font-bold text-emerald-950 dark:text-emerald-200 flex items-center gap-1.5">
+                    <span>MÃ 2: Cổng Check-in Cho Đại Biểu Đã Đăng Ký Từ Trước</span>
                   </div>
                   <p className="mt-1 text-[11.5px] text-muted-foreground max-w-lg leading-relaxed">
-                    Học viên CLB đã cài đặt App CEO HN10 chỉ cần mở tính năng <strong>Quét mã QR</strong> tại bàn đón tiếp để hệ thống tự động xác nhận điểm danh trong 1 giây.
+                    Đại biểu đã có mã vé chỉ cần quét mã này bằng Zalo / Camera để mở cổng Check-in. Tại đây đại biểu có thể <strong>nhập mã vé</strong> hoặc <strong>tải ảnh mã QR lên</strong> và bấm nút xác nhận Check-in. Hệ thống sẽ tự động so sánh với dữ liệu để phân biệt khách đã đăng ký trước vs khách mới.
                   </p>
 
-                  <div className="mt-2.5 w-full max-w-md p-2 rounded-xl bg-white dark:bg-slate-800 border border-amber-300 dark:border-amber-800 text-[11px] font-mono text-slate-800 dark:text-slate-200 flex items-center justify-between gap-2 overflow-hidden">
-                    <span className="truncate">{appCheckinPayload}</span>
+                  <div className="mt-2.5 w-full max-w-md p-2 rounded-xl bg-white dark:bg-slate-800 border border-emerald-300 dark:border-emerald-800 text-[11px] font-mono text-slate-800 dark:text-slate-200 flex items-center justify-between gap-2 overflow-hidden">
+                    <span className="truncate">{preRegisteredCheckinUrl}</span>
                     <button
                       type="button"
                       onClick={() => {
-                        navigator.clipboard.writeText(appCheckinPayload);
-                        toast.success("Đã sao chép mã payload!");
+                        navigator.clipboard.writeText(preRegisteredCheckinUrl);
+                        toast.success("Đã sao chép link Mã 2 Check-in!");
                       }}
-                      className="p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-amber-600 transition shrink-0 cursor-pointer"
-                      title="Sao chép payload"
+                      className="p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-emerald-600 transition shrink-0 cursor-pointer"
+                      title="Sao chép link"
                     >
                       <Copy className="h-3.5 w-3.5" />
                     </button>
@@ -474,21 +466,30 @@ export function EventCheckinGatekeeperModal({
                     <button
                       type="button"
                       onClick={() => {
-                        navigator.clipboard.writeText(appCheckinPayload);
-                        toast.success("Đã sao chép mã check-in App!");
+                        navigator.clipboard.writeText(preRegisteredCheckinUrl);
+                        toast.success("Đã sao chép liên kết Mã 2 Check-in!");
                       }}
-                      className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold text-slate-950 bg-amber-400 hover:bg-amber-500 border border-amber-500 shadow-sm transition cursor-pointer"
+                      className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 shadow-sm transition cursor-pointer"
                     >
-                      <Download className="h-3.5 w-3.5" />
-                      <span>Sao Chép Mã Check-in App</span>
+                      <Copy className="h-3.5 w-3.5" />
+                      <span>Sao Chép Link Mã 2</span>
                     </button>
+                    <a
+                      href={preRegisteredCheckinUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold text-slate-900 bg-white border border-slate-300 hover:bg-slate-100 shadow-2xs transition cursor-pointer dark:bg-slate-800 dark:text-slate-100 dark:border-slate-700"
+                    >
+                      <ExternalLink className="h-3.5 w-3.5" />
+                      <span>Mở Cổng Check-in</span>
+                    </a>
                     <button
                       type="button"
                       onClick={() => window.print()}
                       className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold text-slate-900 bg-white border border-slate-300 hover:bg-slate-100 shadow-2xs transition cursor-pointer dark:bg-slate-800 dark:text-slate-100 dark:border-slate-700"
                     >
                       <Printer className="h-3.5 w-3.5" />
-                      <span>In Standee A4 / Roll-up</span>
+                      <span>In Standee A4 / Roll-up 2 Mã</span>
                     </button>
                   </div>
                 </div>

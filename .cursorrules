@@ -1,6 +1,28 @@
 # ==============================================================================
 # BỘ LUẬT DỰ ÁN (PROJECT RULES & AI CODEGEN STANDARDS) - CEO HN10 PROJECT
 # Vai trò: Tech Lead | Định dạng: .cursorrules
+# 21/11/2026 (v12.46) — NÂNG CẤP LUỒNG SỰ KIỆN IMPORT ĐA ĐỊNH DẠNG (WORD/EXCEL/PDF) KÈM DYNAMIC DDL CỘT CSDL & HẠCH TOÁN QUỸ DOANH THU VÉ, CHECK-IN 2 MÃ RIÊNG BIỆT (TẠI CỬA VS ĐÃ ĐĂNG KÝ KÈM TẢI ẢNH QR), LOẠI BỎ TRIỆT ĐỂ MOMO/VNPAY & CẤU HÌNH SEPAY/ZALO NGOÀI PLATFORM, PHÂN LẬP DATABASE TEST VÀ PRODUCT ĐỘC LẬP:
+#   * [LUỒNG SỰ KIỆN MỚI & IMPORT DANH SÁCH 3 ĐỊNH DẠNG (WORD, EXCEL, PDF)]:
+#     - Hỗ trợ import tệp .docx, .xlsx, .pdf qua EventAttendeesImportModal.tsx và ai-excel-email-parser.ts. Tự động nhận diện trường họ tên, email, SĐT, chức vụ, trạng thái thanh toán (đã thanh toán / chưa thanh toán), và giá vé tham gia.
+#     - Dynamic DDL Database: Cơ chế tự động chạy ALTER TABLE public.event_registrations ADD COLUMN IF NOT EXISTS "<col>" text DEFAULT '' khi file import có các cột tùy biến mới, lưu trữ dữ liệu động vào chính bảng và trường dynamic_data JSONB.
+#     - Hạch toán Quỹ Tài Chính CRM CEO HN10: Khi import vé đã thanh toán (paid) có giá vé, hệ thống tự động INSERT INTO public.income_records với category='Vé sự kiện'.
+#     - Báo cáo Dashboard: Hiển thị Panel "Quỹ Thu Vé & Doanh Thu Từng Sự Kiện" tại ExecutiveDashboard.tsx, thống kê rõ ràng số tiền thêm vào quỹ thuộc sự kiện nào, số lượng vé đã bán.
+#     - Tự động trả vé E-Ticket kèm mã QR check-in qua Email (sendEventTicketEmail) và Zalo OA (sendAutoNotification). Có nút "Nhắc phí" gửi thông báo đếm ngược thanh toán vé.
+#   * [CHECK-IN SỰ KIỆN VỚI 2 MÃ RIÊNG BIỆT (EventCheckinGatekeeperModal & /event-checkin)]:
+#     - MÃ 1: Dành cho người CHƯA đăng ký tham gia sự kiện từ trước (Walk-in Guest, link: /guest-event-register/$id?source=walkin). Quét qua Zalo / Camera mở Form đăng ký: có phí thì hiện kèm VietQR SePay MBBank thanh toán phí vé; miễn phí thì hiện form rút gọn gồm: Họ tên, Email, SĐT, Công ty/Doanh nghiệp, Chức danh.
+#     - MÃ 2: Dành cho đại biểu ĐÃ đăng ký tham gia sự kiện từ trước (link: /event-checkin?eventId=$id). Mở cổng Check-in có trường nhập mã vé HOẶC nút "Tải ảnh QR" (giải mã QR từ ảnh qua @zxing/library) và nút bấm Check-in xác nhận vào cửa.
+#     - Đối soát tự động phân loại đại biểu: Luôn so sánh với danh sách CSDL để hiển thị Huy hiệu phân biệt rõ ràng:
+#       + 🟢 "ĐẠI BIỂU ĐÃ ĐĂNG KÝ TỪ TRƯỚC (PRE-REGISTERED)" (isWalkIn: false)
+#       + 🔵 "KHÁCH MỚI ĐĂNG KÝ TẠI SỰ KIỆN (WALK-IN GUEST)" (isWalkIn: true)
+#   * [LOẠI BỎ HOÀN TOÀN MOMO VÀ VNPAY - THIẾT LẬP SEPAY VIETQR VÀ ZALO OA BÊN NGOÀI PLATFORM]:
+#     - Xóa bỏ triệt để mã nguồn, nút bấm, modal, cấu hình liên quan đến MoMo và VNPay; thay thế 100% bằng SePay VietQR (MBBank 198300000000) và Zalo OA bên ngoài platform.
+#     - Webhook SePay xử lý tự động khớp lệnh chuyển khoản tiền vé CEOHN10_SK_[regId] và niên liễm CEOHN10_HP_[invoiceNo].
+#   * [PHÂN LẬP DATABASE TEST VÀ PRODUCT ĐỘC LẬP]:
+#     - CSDL Sản Phẩm (Production): Duy nhất 113.20.107.184:6432/ceohn10_project (PgBouncer, user app1).
+#     - CSDL Thử Nghiệm (Test / Staging): ceohn10_project_test. File cấu hình apps/ceohn10_app_be/.env.test và .env.test.example.
+#     - PrismaService tự động chuyển mạch khi APP_ENV=test hoặc NODE_ENV=test sang TEST_DATABASE_URL.
+#     - Cung cấp deploy/docker-compose.test.yml (port 5433:5432, 3001:3000, 3002:80) và scripts/init-test-database.sql.
+#     - Tài liệu đồng bộ: document/notebooklm/03_QUY_TRINH_PHAN_LAP_DATABASE_TEST_VA_PRODUCT.md.
 # 20/11/2026 (v12.45) — SỬA LỖI RỖNG TRẮNG FORM SEPAY, BỔ SUNG CẤU HÌNH ZALO OA & CÀI ĐẶT TỪNG HỆ THỐNG CON TẠI MASTER ADMIN, XÂY DỰNG BỘ TEMPLATE THÔNG BÁO DYNAMIC KÈM CALL API TREE MENU:
 #   * [MASTER ADMIN - TAB 3 CÀI ĐẶT HỆ THỐNG BÊN NGOÀI (/master)]:
 #     - Khắc phục triệt để lỗi rỗng trắng form SePay: Khởi tạo sẵn DEFAULT_SEPAY_CONFIG, hiển thị đầy đủ 100% các ô nhập liệu: Số tài khoản, Ngân hàng (MBBank), Tên chủ tài khoản, API Token, Webhook Secret, Webhook URL, cú pháp tiền tố nhận diện tự động (CEOHN10_HP, CEOHN10_SK, CEOHN10_LH), tự động kích hoạt quyền lợi và nút lưu trực tiếp.

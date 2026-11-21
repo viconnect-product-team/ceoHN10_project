@@ -5,8 +5,11 @@ export interface ParsedRecipientItem {
   email: string;
   company?: string;
   phone?: string;
+  position?: string;
   amount?: number | string;
+  paymentStatus?: "paid" | "unpaid" | "free";
   notes?: string;
+  dynamicFields?: Record<string, any>;
 }
 
 export interface ParsedTableData {
@@ -116,7 +119,9 @@ async function parseExcelFile(file: File, isCsv = false): Promise<ParsedFileResu
     let nameColIdx = -1;
     let companyColIdx = -1;
     let phoneColIdx = -1;
+    let positionColIdx = -1;
     let amountColIdx = -1;
+    let paymentStatusColIdx = -1;
 
     for (let r = 0; r < Math.min(rawData.length, 10); r++) {
       const row = rawData[r] as any[];
@@ -151,6 +156,15 @@ async function parseExcelFile(file: File, isCsv = false): Promise<ParsedFileResu
         ) {
           companyColIdx = c;
         } else if (
+          val.includes("chức vụ") ||
+          val.includes("chức danh") ||
+          val.includes("vị trí") ||
+          val.includes("position") ||
+          val.includes("title") ||
+          val.includes("role")
+        ) {
+          positionColIdx = c;
+        } else if (
           val.includes("sđt") ||
           val.includes("điện thoại") ||
           val.includes("phone") ||
@@ -158,9 +172,20 @@ async function parseExcelFile(file: File, isCsv = false): Promise<ParsedFileResu
         ) {
           phoneColIdx = c;
         } else if (
+          val.includes("trạng thái") ||
+          val.includes("thanh toán") ||
+          val.includes("tình trạng") ||
+          val.includes("status") ||
+          val.includes("đã thanh toán") ||
+          val.includes("chưa thanh toán")
+        ) {
+          paymentStatusColIdx = c;
+        } else if (
           val.includes("số tiền") ||
           val.includes("tiền") ||
           val.includes("phí") ||
+          val.includes("giá vé") ||
+          val.includes("vé") ||
           val.includes("amount") ||
           val.includes("hội phí")
         ) {
@@ -178,7 +203,7 @@ async function parseExcelFile(file: File, isCsv = false): Promise<ParsedFileResu
         }
       }
 
-      if (emailColIdx !== -1) break;
+      if (emailColIdx !== -1 || (nameColIdx !== -1 && phoneColIdx !== -1)) break;
     }
 
     // Trích xuất cấu trúc bảng
@@ -203,27 +228,81 @@ async function parseExcelFile(file: File, isCsv = false): Promise<ParsedFileResu
       });
       tableRows.push(rowObj);
 
-      // Bóc tách Email
+      // Bóc tách Đại biểu & Email & Dynamic Fields
+      let extractedEmail = "";
       if (emailColIdx !== -1) {
         const rawEmail = String(row[emailColIdx] || "").trim();
         const match = rawEmail.match(EMAIL_REGEX);
         if (match) {
-          const email = match[0].toLowerCase();
-          if (!seenEmails.has(email)) {
-            seenEmails.add(email);
-            const name = nameColIdx !== -1 ? String(row[nameColIdx] || "").trim() : "";
-            const company = companyColIdx !== -1 ? String(row[companyColIdx] || "").trim() : "";
-            const phone = phoneColIdx !== -1 ? String(row[phoneColIdx] || "").trim() : "";
-            const amount = amountColIdx !== -1 ? row[amountColIdx] : undefined;
+          extractedEmail = match[0].toLowerCase();
+        }
+      }
 
-            recipients.push({
-              email,
-              name: name || email.split("@")[0],
-              company,
-              phone,
-              amount,
-            });
+      const name = nameColIdx !== -1 ? String(row[nameColIdx] || "").trim() : "";
+      const phone = phoneColIdx !== -1 ? String(row[phoneColIdx] || "").trim() : "";
+      const company = companyColIdx !== -1 ? String(row[companyColIdx] || "").trim() : "";
+      const position = positionColIdx !== -1 ? String(row[positionColIdx] || "").trim() : "";
+      const amount = amountColIdx !== -1 ? row[amountColIdx] : undefined;
+
+      // Trích xuất trạng thái thanh toán
+      let paymentStatus: "paid" | "unpaid" | "free" | undefined = undefined;
+      if (paymentStatusColIdx !== -1) {
+        const rawSt = String(row[paymentStatusColIdx] || "").toLowerCase().trim();
+        if (
+          rawSt.includes("đã thanh toán") ||
+          rawSt.includes("da thanh toan") ||
+          rawSt.includes("paid") ||
+          rawSt.includes("đã nộp") ||
+          rawSt.includes("đã đóng") ||
+          rawSt.includes("thành công") ||
+          rawSt.includes("hoàn thành")
+        ) {
+          paymentStatus = "paid";
+        } else if (
+          rawSt.includes("chưa") ||
+          rawSt.includes("chua") ||
+          rawSt.includes("unpaid") ||
+          rawSt.includes("pending") ||
+          rawSt.includes("nợ")
+        ) {
+          paymentStatus = "unpaid";
+        }
+      }
+
+      // Trích xuất toàn bộ các cột tùy biến (dynamic fields)
+      const dynamicFields: Record<string, any> = {};
+      headers.forEach((h, idx) => {
+        if (
+          idx !== emailColIdx &&
+          idx !== nameColIdx &&
+          idx !== companyColIdx &&
+          idx !== phoneColIdx &&
+          idx !== positionColIdx &&
+          idx !== amountColIdx &&
+          idx !== paymentStatusColIdx
+        ) {
+          const val = row[idx];
+          if (val !== undefined && String(val).trim() !== "") {
+            dynamicFields[h] = val;
           }
+        }
+      });
+
+      // Nếu có tên hoặc email hoặc phone
+      if (name || extractedEmail || phone) {
+        const finalEmail = extractedEmail || (phone ? `attendee_${phone.replace(/[^0-9]/g, "")}@ceohn10.vn` : `guest_${Date.now()}_${r}@ceohn10.vn`);
+        if (!seenEmails.has(finalEmail) || !extractedEmail) {
+          if (extractedEmail) seenEmails.add(finalEmail);
+          recipients.push({
+            email: finalEmail,
+            name: name || (extractedEmail ? extractedEmail.split("@")[0] : `Đại biểu ${r}`),
+            company,
+            position,
+            phone,
+            amount,
+            paymentStatus,
+            dynamicFields,
+          });
         }
       }
     }

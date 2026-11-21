@@ -1278,12 +1278,12 @@ function FeeCard({
             </button>
             <button
               onClick={() => onPayVnpay?.(r)}
-              title="Thanh toán VNPAY-QR"
-              aria-label="Thanh toán VNPAY-QR"
+              title="Thanh toán SePay VietQR"
+              aria-label="Thanh toán SePay VietQR"
               className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 px-3 text-xs font-semibold text-white shadow-xs transition-colors cursor-pointer"
             >
               <QrCode className="h-3.5 w-3.5" />
-              <span>VNPAY-QR</span>
+              <span>VietQR (SePay)</span>
             </button>
             <Link
               to="/fees/$invoiceId"
@@ -1530,11 +1530,11 @@ function FeeRow({
               </button>
               <button
                 onClick={() => onPayVnpay?.(r)}
-                title="Thanh toán VNPAY-QR"
+                title="Thanh toán SePay VietQR"
                 className="inline-flex items-center gap-1 rounded-md bg-emerald-600 hover:bg-emerald-700 px-2.5 py-1 text-[11px] font-semibold text-white shadow-xs transition-colors cursor-pointer"
               >
                 <QrCode className="h-3.5 w-3.5" />
-                <span>VNPAY</span>
+                <span>VietQR (SePay)</span>
               </button>
               <Link
                 to="/fees/$invoiceId"

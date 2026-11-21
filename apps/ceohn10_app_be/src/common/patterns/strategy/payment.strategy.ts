@@ -1,6 +1,8 @@
 /**
  * 46 — Design Pattern Pragmatism: STRATEGY PATTERN
- * Phục vụ Kịch bản 1: Đa thuật toán xử lý cổng thanh toán
+ * Phục vụ Kịch bản: Đa thuật toán xử lý cổng thanh toán
+ * ĐÃ LOẠI BỎ HOÀN TOÀN MOMO VÀ VNPAY THEO YÊU CẦU DỰ ÁN
+ * CHUYỂN TOÀN BỘ SANG SEPAY VIETQR TỰ ĐỘNG & CHUYỂN KHOẢN NGÂN HÀNG
  */
 
 export interface PaymentIntent {
@@ -9,6 +11,9 @@ export interface PaymentIntent {
   description: string;
   clientIp?: string;
   returnUrl?: string;
+  bankAccount?: string;
+  accountNumber?: string;
+  accountHolder?: string;
 }
 
 export interface PaymentProcessResult {
@@ -34,15 +39,15 @@ export class BankTransferPaymentStrategy implements IPaymentStrategy {
   readonly methodCode = 'BANK_TRANSFER';
 
   async processPayment(intent: PaymentIntent): Promise<PaymentProcessResult> {
-    const memo = `CEO HN10 ${intent.orderId}`;
+    const memo = `CEOHN10 ${intent.orderId}`;
     return {
       success: true,
       method: 'BANK_TRANSFER',
       transactionRef: intent.orderId,
       bankAccount: {
-        bankName: 'Ngân hàng Quân Đội (MB Bank)',
-        accountNumber: '198388889999',
-        accountHolder: 'CLB DOANH NHAN CEO HN10',
+        bankName: process.env.SEPAY_BANK_NAME || 'Ngân hàng Quân Đội (MB Bank)',
+        accountNumber: process.env.SEPAY_ACCOUNT_NO || '198300000000',
+        accountHolder: process.env.SEPAY_ACCOUNT_HOLDER || 'CLB DOANH NHAN CEO HN10',
         transferMemo: memo,
       },
     };
@@ -53,29 +58,46 @@ export class VietQRPaymentStrategy implements IPaymentStrategy {
   readonly methodCode = 'VIETQR';
 
   async processPayment(intent: PaymentIntent): Promise<PaymentProcessResult> {
-    const memo = `CEO HN10 ${intent.orderId}`;
-    const qrUrl = `https://img.vietqr.io/image/MB-198388889999-compact2.png?amount=${intent.amount}&addInfo=${encodeURIComponent(memo)}&accountName=${encodeURIComponent('CLB DOANH NHAN CEO HN10')}`;
+    const memo = `CEOHN10 ${intent.orderId}`;
+    const bankName = process.env.SEPAY_BANK_NAME || 'MB';
+    const accNo = process.env.SEPAY_ACCOUNT_NO || '198300000000';
+    const accHolder = process.env.SEPAY_ACCOUNT_HOLDER || 'CLB DOANH NHAN CEO HN10';
+    const qrUrl = `https://img.vietqr.io/image/${bankName}-${accNo}-compact2.png?amount=${intent.amount}&addInfo=${encodeURIComponent(memo)}&accountName=${encodeURIComponent(accHolder)}`;
     return {
       success: true,
       method: 'VIETQR',
       transactionRef: intent.orderId,
       qrCode: qrUrl,
+      bankAccount: {
+        bankName,
+        accountNumber: accNo,
+        accountHolder: accHolder,
+        transferMemo: memo,
+      },
     };
   }
 }
 
-export class MoMoPaymentStrategy implements IPaymentStrategy {
-  readonly methodCode = 'MOMO';
+export class SePayPaymentStrategy implements IPaymentStrategy {
+  readonly methodCode = 'SEPAY';
 
   async processPayment(intent: PaymentIntent): Promise<PaymentProcessResult> {
+    const memo = `CEOHN10 ${intent.orderId}`;
+    const bankName = process.env.SEPAY_BANK_NAME || 'MB';
+    const accNo = process.env.SEPAY_ACCOUNT_NO || '198300000000';
+    const accHolder = process.env.SEPAY_ACCOUNT_HOLDER || 'CLB DOANH NHAN CEO HN10';
+    const qrUrl = `https://img.vietqr.io/image/${bankName}-${accNo}-compact2.png?amount=${intent.amount}&addInfo=${encodeURIComponent(memo)}&accountName=${encodeURIComponent(accHolder)}`;
     return {
       success: true,
-      method: 'MOMO',
+      method: 'SEPAY',
       transactionRef: intent.orderId,
-      paymentUrl:
-        intent.returnUrl ||
-        `https://test-payment.momo.vn/v2/gateway/pay?orderId=${intent.orderId}`,
-      qrCode: `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=momo://pay?orderId=${intent.orderId}&amount=${intent.amount}`,
+      qrCode: qrUrl,
+      bankAccount: {
+        bankName,
+        accountNumber: accNo,
+        accountHolder: accHolder,
+        transferMemo: memo,
+      },
     };
   }
 }
@@ -84,7 +106,7 @@ export class PaymentStrategyFactory {
   private static registry = new Map<string, IPaymentStrategy>([
     ['BANK_TRANSFER', new BankTransferPaymentStrategy()],
     ['VIETQR', new VietQRPaymentStrategy()],
-    ['MOMO', new MoMoPaymentStrategy()],
+    ['SEPAY', new SePayPaymentStrategy()],
   ]);
 
   static register(strategy: IPaymentStrategy) {
@@ -92,7 +114,7 @@ export class PaymentStrategyFactory {
   }
 
   static getStrategy(method: string): IPaymentStrategy {
-    const strategy = this.registry.get((method || 'VIETQR').toUpperCase());
-    return strategy || this.registry.get('VIETQR')!;
+    const strategy = this.registry.get((method || 'SEPAY').toUpperCase());
+    return strategy || this.registry.get('SEPAY')!;
   }
 }

@@ -8,6 +8,7 @@ import {
   Coins,
   Crown,
   Download,
+  FileSpreadsheet,
   FileText,
   Layers,
   MapPin,
@@ -49,6 +50,7 @@ import { useRole } from "@/hooks/use-role";
 import { EventReminderPosterModal } from "@/components/dashboard/EventReminderPosterModal";
 import { EventPosterStudioModal } from "@/components/dashboard/EventPosterStudioModal";
 import { VnpayPaymentModal } from "@/components/common/VnpayPaymentModal";
+import { EventAttendeesImportModal } from "@/components/events/EventAttendeesImportModal";
 
 export const Route = createFileRoute("/event-registrations")({
   ssr: false,
@@ -165,6 +167,16 @@ function RegPage() {
   const [status, setStatus] = useState<Registration["status"] | "all">("all");
   const [paymentFilter, setPaymentFilter] = useState<"all" | "paid" | "pending">("all");
 
+  useEffect(() => {
+    if (eventId && eventId !== "all") {
+      fetchNestApi<string[]>(`/events/${eventId}/dynamic-columns`)
+        .then((cols) => setDynamicColumns(Array.isArray(cols) ? cols : []))
+        .catch(() => setDynamicColumns([]));
+    } else {
+      setDynamicColumns([]);
+    }
+  }, [eventId]);
+
   // Excel-like resizable columns state & handler
   const [colWidths, setColWidths] = useState<Record<string, number>>({
     stt: 56,
@@ -200,6 +212,8 @@ function RegPage() {
   };
 
   // Add Attendee / QR Checkin Modal state
+  const [importModalOpen, setImportModalOpen] = useState(false);
+  const [dynamicColumns, setDynamicColumns] = useState<string[]>([]);
   const [addAttendeeModalOpen, setAddAttendeeModalOpen] = useState(false);
   const [eventReminderModalOpen, setEventReminderModalOpen] = useState(false);
   const [posterStudioOpen, setPosterStudioOpen] = useState(false);
@@ -741,6 +755,14 @@ function RegPage() {
         actions={
           <div className="flex items-center gap-2">
             <button
+              onClick={() => setImportModalOpen(true)}
+              className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 px-3.5 py-2 text-xs font-bold text-white shadow-xs transition cursor-pointer"
+              title="Hỗ trợ import danh sách từ file Word (.docx), Excel (.xlsx), PDF (.pdf), tự động thêm cột và hạch toán quỹ"
+            >
+              <FileSpreadsheet className="h-4 w-4" />
+              <span>Nhập Danh Sách (Word/Excel/PDF)</span>
+            </button>
+            <button
               onClick={() => setPosterStudioOpen(true)}
               className="inline-flex items-center gap-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 px-3.5 py-2 text-xs font-bold text-slate-950 shadow-xs transition cursor-pointer"
             >
@@ -990,6 +1012,15 @@ function RegPage() {
                     title="Kéo sang trái/phải để co dãn cột"
                   />
                 </th>
+                {dynamicColumns.map((col) => (
+                  <th
+                    key={col}
+                    className="px-4 py-3 border-b border-border whitespace-nowrap text-xs font-bold text-primary capitalize bg-primary/5"
+                    title={`Cột dữ liệu tự động thêm từ file: ${col}`}
+                  >
+                    {col}
+                  </th>
+                ))}
                 <th
                   style={{ width: colWidths.actions, minWidth: colWidths.actions }}
                   className="sticky right-0 z-20 bg-secondary px-4 py-3 text-right text-xs font-bold border-b border-border shadow-[-6px_0_12px_-4px_rgba(0,0,0,0.12)] whitespace-nowrap relative group/th"
@@ -1044,6 +1075,15 @@ function RegPage() {
                             Khách ngoài
                           </span>
                         )}
+                        {r.isWalkIn || r.registrationOrigin === 'walkin_at_door' ? (
+                          <span className="text-[10px] font-bold px-1.5 py-0.2 rounded bg-purple-500/10 text-purple-700 dark:text-purple-300 border border-purple-500/20" title="Khách mới đăng ký tại cửa sự kiện">
+                            Tại cửa
+                          </span>
+                        ) : r.registrationOrigin === 'pre_registered_import' ? (
+                          <span className="text-[10px] font-bold px-1.5 py-0.2 rounded bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20" title="Đại biểu import từ file Word/Excel/PDF">
+                            File Import
+                          </span>
+                        ) : null}
                       </div>
                       <div className="text-[11px] text-muted-foreground truncate max-w-[200px]">
                         {r.email} {r.memberCode ? `· ${r.memberCode}` : ""}
@@ -1184,6 +1224,16 @@ function RegPage() {
                       </Pill>
                     </td>
 
+                    {/* Cột Dữ Liệu Tự Động Thêm Từ File Import */}
+                    {dynamicColumns.map((col) => {
+                      const val = r.dynamic_data?.[col] ?? (r as any)[col] ?? "—";
+                      return (
+                        <td key={col} className="px-4 py-3 border-b border-border/50 text-xs text-foreground whitespace-nowrap font-medium">
+                          {String(val)}
+                        </td>
+                      );
+                    })}
+
                     {/* Action Buttons - Khay trượt ngang mượt mà */}
                     <td
                       style={{ width: colWidths.actions, minWidth: colWidths.actions }}
@@ -1246,7 +1296,7 @@ function RegPage() {
                           </button>
                         )}
 
-                        {/* Thanh toán vé qua cổng VNPAY-QR */}
+                        {/* Thanh toán vé qua SePay VietQR */}
                         {!isPaid && !isCancelled && (
                           <button
                             onClick={() => {
@@ -1254,10 +1304,10 @@ function RegPage() {
                               setVnpayModalOpen(true);
                             }}
                             className="inline-flex items-center shrink-0 gap-1 rounded-lg border border-blue-500/30 bg-blue-500/10 px-2.5 py-1 text-xs font-bold text-blue-700 hover:bg-blue-500/20 dark:text-blue-300 cursor-pointer transition-colors"
-                            title="Thanh toán vé qua cổng VNPAY-QR"
+                            title="Thanh toán vé qua cổng SePay VietQR"
                           >
                             <QrCode className="h-3.5 w-3.5 text-blue-600" />
-                            VNPAY-QR
+                            VietQR (SePay)
                           </button>
                         )}
 
@@ -1273,15 +1323,15 @@ function RegPage() {
                           </button>
                         )}
 
-                        {/* Nhắc nhở thanh toán 3 ngày */}
+                        {/* Nhắc nhở nộp phí vé sự kiện qua Email & Zalo OA */}
                         {!isPaid && !isCancelled && (
                           <button
                             onClick={() => handleSendReminder(r)}
                             className="inline-flex items-center shrink-0 gap-1 rounded-lg border border-amber-500/30 bg-amber-500/10 px-2 py-1 text-xs font-semibold text-amber-700 hover:bg-amber-500/20 dark:text-amber-400 cursor-pointer transition-colors"
-                            title="Gửi thông báo nhắc nhở thanh toán theo luồng đếm ngược"
+                            title="Gửi email và thông báo Zalo OA nhắc nộp phí tham gia sự kiện"
                           >
                             <Bell className="h-3.5 w-3.5" />
-                            Nhắc
+                            Nhắc phí
                           </button>
                         )}
 
@@ -1846,6 +1896,22 @@ function RegPage() {
         memberCode={selectedVnpayReg?.memberCode}
         onSuccess={() => {
           fetchLiveRegistrations();
+          router.invalidate();
+        }}
+      />
+
+      {/* Event Attendees Import Modal (Word, Excel, PDF) */}
+      <EventAttendeesImportModal
+        open={importModalOpen}
+        onClose={() => setImportModalOpen(false)}
+        event={EVENTS.find((e: any) => String(e.id) === String(eventId)) || EVENTS[0]}
+        onSuccess={() => {
+          fetchLiveRegistrations();
+          if (eventId && eventId !== "all") {
+            fetchNestApi<string[]>(`/events/${eventId}/dynamic-columns`)
+              .then((cols) => setDynamicColumns(Array.isArray(cols) ? cols : []))
+              .catch(() => setDynamicColumns([]));
+          }
           router.invalidate();
         }}
       />
