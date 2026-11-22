@@ -544,6 +544,42 @@ export class AdminService implements OnModuleInit {
     return updated.invoice;
   }
 
+  private async getSepayBankConfig() {
+    try {
+      const masterRows = await this.prisma.$queryRawUnsafe<any[]>(`
+        SELECT setting_value FROM public.master_system_settings WHERE setting_key = 'sepay_integration_config' LIMIT 1
+      `).catch(() => []);
+      if (masterRows.length > 0 && masterRows[0]?.setting_value) {
+        const val = typeof masterRows[0].setting_value === 'string' ? JSON.parse(masterRows[0].setting_value) : masterRows[0].setting_value;
+        const bankAcc = (val.bank_accounts && val.bank_accounts[0]) || {};
+        return {
+          bankName: val.bank_brand_name || bankAcc.bank_brand_name || process.env.SEPAY_BANK_NAME || 'MBBank',
+          accountNumber: val.account_number || bankAcc.account_number || process.env.SEPAY_ACCOUNT_NO || '',
+          accountHolder: val.account_name || bankAcc.account_name || process.env.SEPAY_ACCOUNT_HOLDER || 'CLB DOANH NHAN CEO HN10',
+          prefixFee: val.prefix_syntax?.membership || 'CEOHN10_HP',
+        };
+      }
+      const appRows = await this.prisma.$queryRawUnsafe<any[]>(`
+        SELECT value FROM public.app_settings WHERE key = 'crm_sepay_config' LIMIT 1
+      `).catch(() => []);
+      if (appRows.length > 0 && appRows[0]?.value) {
+        const val = typeof appRows[0].value === 'string' ? JSON.parse(appRows[0].value) : appRows[0].value;
+        return {
+          bankName: val.bankName || process.env.SEPAY_BANK_NAME || 'MBBank',
+          accountNumber: val.accountNumber || process.env.SEPAY_ACCOUNT_NO || '',
+          accountHolder: val.accountHolder || process.env.SEPAY_ACCOUNT_HOLDER || 'CLB DOANH NHAN CEO HN10',
+          prefixFee: val.prefixFee || 'CEOHN10_HP',
+        };
+      }
+    } catch {}
+    return {
+      bankName: process.env.SEPAY_BANK_NAME || 'MBBank',
+      accountNumber: process.env.SEPAY_ACCOUNT_NO || '',
+      accountHolder: process.env.SEPAY_ACCOUNT_HOLDER || 'CLB DOANH NHAN CEO HN10',
+      prefixFee: 'CEOHN10_HP',
+    };
+  }
+
   async addInvoiceReminder(
     id: string,
     data: { channel: string; byName?: string; note?: string },
@@ -657,7 +693,12 @@ export class AdminService implements OnModuleInit {
           // 3. Đẩy template tin nhắn tương tác (Actionable template) kèm SePay VietQR trực tiếp vào tin nhắn
           const invoiceAmount = Number(existing.invoice.amount || 0);
           const invoiceNo = existing.invoice.invoiceNo || id;
-          const sepayQrUrl = `https://img.vietqr.io/image/MB-198300000000-compact2.png?amount=${invoiceAmount}&addInfo=${encodeURIComponent(`CEOHN10_HP_${invoiceNo}`)}&accountName=${encodeURIComponent('CLB DOANH NHAN CEO HN10')}`;
+          const sepayCfg = await this.getSepayBankConfig();
+          const bankShort = (sepayCfg.bankName || 'MB').toUpperCase().includes('MB') ? 'MB' : (sepayCfg.bankName || 'MB');
+          const memo = `${sepayCfg.prefixFee}_${invoiceNo}`;
+          const sepayQrUrl = sepayCfg.accountNumber
+            ? `https://img.vietqr.io/image/${bankShort}-${sepayCfg.accountNumber}-compact2.png?amount=${invoiceAmount}&addInfo=${encodeURIComponent(memo)}&accountName=${encodeURIComponent(sepayCfg.accountHolder)}`
+            : '';
           const actionMsg = `[action:payment|amount:${invoiceAmount}|invoice:${invoiceNo}|qr:${sepayQrUrl}|due:${existing.invoice.dueDate || 'Hôm nay'}|desc:${encodeURIComponent(notifBody)}]`;
 
           if (memberCode) {
@@ -692,9 +733,9 @@ export class AdminService implements OnModuleInit {
                   amount: invoiceAmount,
                   dueDate: existing.invoice.dueDate || 'Hôm nay',
                   vietQrUrl: sepayQrUrl,
-                  bankAccount: '198300000000',
-                  bankOwner: 'CLB DOANH NHAN CEO HN10',
-                  bankName: 'MB Bank',
+                  bankAccount: sepayCfg.accountNumber,
+                  bankOwner: sepayCfg.accountHolder,
+                  bankName: sepayCfg.bankName,
                   reminderCount:
                     (existing.invoice.member?.reminderCount || 0) + 1,
                 })
@@ -743,7 +784,12 @@ export class AdminService implements OnModuleInit {
     if (this.mailService) {
       const invoiceAmount = Number(created.invoice.amount || 0);
       const invoiceNo = created.invoice.invoiceNo || id;
-      const sepayQrUrl = `https://img.vietqr.io/image/MB-198300000000-compact2.png?amount=${invoiceAmount}&addInfo=${encodeURIComponent(`CEOHN10_HP_${invoiceNo}`)}&accountName=${encodeURIComponent('CLB DOANH NHAN CEO HN10')}`;
+      const sepayCfg = await this.getSepayBankConfig();
+      const bankShort = (sepayCfg.bankName || 'MB').toUpperCase().includes('MB') ? 'MB' : (sepayCfg.bankName || 'MB');
+      const memo = `${sepayCfg.prefixFee}_${invoiceNo}`;
+      const sepayQrUrl = sepayCfg.accountNumber
+        ? `https://img.vietqr.io/image/${bankShort}-${sepayCfg.accountNumber}-compact2.png?amount=${invoiceAmount}&addInfo=${encodeURIComponent(memo)}&accountName=${encodeURIComponent(sepayCfg.accountHolder)}`
+        : '';
       const memStatus = String(created.invoice.member?.status || '').toLowerCase().trim();
       const isMemInactive =
         created.invoice.member?.is_active === false ||
@@ -767,9 +813,9 @@ export class AdminService implements OnModuleInit {
             amount: invoiceAmount,
             dueDate: created.invoice.dueDate || `${year}-12-31`,
             vietQrUrl: sepayQrUrl,
-            bankAccount: '198300000000',
-            bankOwner: 'CLB DOANH NHAN CEO HN10',
-            bankName: 'MB Bank',
+            bankAccount: sepayCfg.accountNumber,
+            bankOwner: sepayCfg.accountHolder,
+            bankName: sepayCfg.bankName,
             reminderCount: 0,
           })
           .catch((err) =>

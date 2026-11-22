@@ -25,14 +25,14 @@ export class MasterSettingsService {
         api_token: val.api_token || '',
         webhook_token: val.webhook_token || '',
         webhook_url: val.webhook_url || 'https://crm.ceohn10.viconnect.vn/api/webhooks/sepay',
-        bank_brand_name: val.bank_brand_name || bankAcc.bank_brand_name || 'MBBank',
-        account_number: val.account_number || bankAcc.account_number || '198300000000',
-        account_name: val.account_name || bankAcc.account_name || 'CLB DOANH NHAN CEO HN10',
+        bank_brand_name: val.bank_brand_name || bankAcc.bank_brand_name || process.env.SEPAY_BANK_NAME || '',
+        account_number: val.account_number || bankAcc.account_number || process.env.SEPAY_ACCOUNT_NO || '',
+        account_name: val.account_name || bankAcc.account_name || process.env.SEPAY_ACCOUNT_HOLDER || '',
         bank_accounts: val.bank_accounts || [
           {
-            bank_brand_name: val.bank_brand_name || 'MBBank',
-            account_number: val.account_number || '198300000000',
-            account_name: val.account_name || 'CLB DOANH NHAN CEO HN10',
+            bank_brand_name: val.bank_brand_name || process.env.SEPAY_BANK_NAME || '',
+            account_number: val.account_number || process.env.SEPAY_ACCOUNT_NO || '',
+            account_name: val.account_name || process.env.SEPAY_ACCOUNT_HOLDER || '',
             is_default: true,
           },
         ],
@@ -60,20 +60,20 @@ export class MasterSettingsService {
       };
     }
 
-    // Default template nếu chưa có
+    // Default template nếu chưa có (dùng biến môi trường .env, không hardcode)
     const defaultConfig = {
-      is_enabled: true,
-      api_token: 'SPY_live_ceohn10_secret_token',
-      webhook_token: 'whsec_ceohn10_verify_token',
+      is_enabled: false,
+      api_token: process.env.SEPAY_API_TOKEN || '',
+      webhook_token: process.env.SEPAY_WEBHOOK_SECRET || '',
       webhook_url: 'https://crm.ceohn10.viconnect.vn/api/webhooks/sepay',
-      bank_brand_name: 'MBBank',
-      account_number: '198300000000',
-      account_name: 'CLB DOANH NHAN CEO HN10',
+      bank_brand_name: process.env.SEPAY_BANK_NAME || '',
+      account_number: process.env.SEPAY_ACCOUNT_NO || '',
+      account_name: process.env.SEPAY_ACCOUNT_HOLDER || '',
       bank_accounts: [
         {
-          bank_brand_name: 'MBBank',
-          account_number: '198300000000',
-          account_name: 'CLB DOANH NHAN CEO HN10',
+          bank_brand_name: process.env.SEPAY_BANK_NAME || '',
+          account_number: process.env.SEPAY_ACCOUNT_NO || '',
+          account_name: process.env.SEPAY_ACCOUNT_HOLDER || '',
           is_default: true,
           qr_template: 'compact2',
         },
@@ -269,15 +269,15 @@ export class MasterSettingsService {
     }
 
     const defaultConfig = {
-      is_enabled: true,
-      oa_id: '429182910284729182',
-      app_id: '4819284719284',
-      secret_key: 'sk_live_ceohn10_zalo_oa_secret',
-      access_token: '',
-      refresh_token: '',
+      is_enabled: false,
+      oa_id: process.env.ZALO_OA_ID || '',
+      app_id: process.env.ZALO_APP_ID || '',
+      secret_key: process.env.ZALO_APP_SECRET || '',
+      access_token: process.env.ZALO_OA_ACCESS_TOKEN || '',
+      refresh_token: process.env.ZALO_REFRESH_TOKEN || '',
       webhook_url: 'https://ceohn10.viconnect.vn/api/zalo/webhook',
       default_zns_template: 'ZNS_THU_MOI_SU_KIEN_CEOHN10',
-      status: 'connected',
+      status: 'disconnected',
     };
 
     return {

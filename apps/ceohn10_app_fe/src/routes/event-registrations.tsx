@@ -169,13 +169,36 @@ function RegPage() {
 
   useEffect(() => {
     if (eventId && eventId !== "all") {
-      fetchNestApi<string[]>(`/events/${eventId}/dynamic-columns`)
-        .then((cols) => setDynamicColumns(Array.isArray(cols) ? cols : []))
+      fetchNestApi<any>(`/events/${eventId}/dynamic-columns`)
+        .then((res) => {
+          const raw = Array.isArray(res) ? res : res?.dynamicColumns || [];
+          setDynamicColumns(raw.map((c: any) => (typeof c === "string" ? c : c.columnName || "")));
+        })
         .catch(() => setDynamicColumns([]));
     } else {
       setDynamicColumns([]);
     }
   }, [eventId]);
+
+  const handleTogglePaymentStatus = async (regId: string, currentStatus: string) => {
+    const nextStatus = currentStatus === "paid" ? "unpaid" : "paid";
+    try {
+      await fetchNestApi(`/events/registrations/${regId}/payment-status`, {
+        method: "PATCH",
+        body: JSON.stringify({ paymentStatus: nextStatus }),
+      });
+      setRegistrationsList((prev) =>
+        prev.map((it) => (it.id === regId ? { ...it, paymentStatus: nextStatus } : it))
+      );
+      toast.success(
+        nextStatus === "paid"
+          ? "Đã chuyển sang ĐÃ THANH TOÁN & tự động hạch toán Quỹ tài chính CRM!"
+          : "Đã chuyển sang trạng thái CHƯA THANH TOÁN!"
+      );
+    } catch (err: any) {
+      toast.error("Không thể cập nhật trạng thái thanh toán: " + (err?.message || ""));
+    }
+  };
 
   // Excel-like resizable columns state & handler
   const [colWidths, setColWidths] = useState<Record<string, number>>({
@@ -1158,21 +1181,26 @@ function RegPage() {
                       </span>
                     </td>
 
-                    {/* Thanh toán & Phí */}
+                    {/* Thanh toán & Phí (Inline Toggle) */}
                     <td
                       style={{ width: colWidths.payment, minWidth: colWidths.payment }}
                       className="px-4 py-3 border-b border-border/50 whitespace-nowrap"
                     >
                       <div className="flex flex-col gap-1">
                         <div className="flex items-center gap-1.5">
-                          <span
-                            className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-bold ${isPaid
-                              ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400"
-                              : "bg-amber-500/15 text-amber-700 dark:text-amber-400"
+                          <button
+                            type="button"
+                            onClick={() => handleTogglePaymentStatus(r.id, r.paymentStatus)}
+                            className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-bold cursor-pointer transition hover:opacity-80 active:scale-95 ${isPaid
+                              ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30"
+                              : "bg-amber-500/15 text-amber-700 dark:text-amber-400 border border-amber-500/30"
                               }`}
+                            title="Click để chuyển đổi trực tiếp trạng thái thanh toán trên hàng này"
                           >
-                            {isPaid ? "Đã nộp" : "Chờ thanh toán"}
-                          </span>
+                            <span className="w-1.5 h-1.5 rounded-full bg-current" />
+                            <span>{isPaid ? "Đã nộp" : "Chờ thanh toán"}</span>
+                            <span className="text-[9px] opacity-70 underline ml-0.5">(Đổi)</span>
+                          </button>
                           <span className="text-xs font-semibold text-foreground">
                             {fmt.money(r.paymentAmount || 500000)}
                           </span>

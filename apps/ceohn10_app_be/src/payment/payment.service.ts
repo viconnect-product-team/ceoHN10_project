@@ -25,31 +25,67 @@ export class PaymentService {
   ) { }
 
   /**
-   * Lấy cấu hình SePay từ database (app_settings) hoặc biến môi trường bên ngoài
+   * Lấy cấu hình SePay từ database (master_system_settings / app_settings) hoặc biến môi trường bên ngoài
    */
   async getSepayConfig(): Promise<SePayConfig> {
     try {
+      // 1. Ưu tiên đọc từ master_system_settings
+      const masterRows = await this.prisma.$queryRawUnsafe<any[]>(`
+        SELECT setting_value FROM public.master_system_settings 
+        WHERE setting_key = 'sepay_integration_config' LIMIT 1
+      `).catch(() => []);
+
+      if (masterRows.length > 0 && masterRows[0]?.setting_value) {
+        const val = typeof masterRows[0].setting_value === 'string'
+          ? JSON.parse(masterRows[0].setting_value)
+          : masterRows[0].setting_value;
+        const bankAcc = (val.bank_accounts && val.bank_accounts[0]) || {};
+        return {
+          bankName: val.bank_brand_name || bankAcc.bank_brand_name || process.env.SEPAY_BANK_NAME || '',
+          accountNumber: val.account_number || bankAcc.account_number || process.env.SEPAY_ACCOUNT_NO || '',
+          accountHolder: val.account_name || bankAcc.account_name || process.env.SEPAY_ACCOUNT_HOLDER || '',
+          apiToken: val.api_token || process.env.SEPAY_API_TOKEN || '',
+          webhookSecret: val.webhook_token || process.env.SEPAY_WEBHOOK_SECRET || '',
+          prefixEvent: val.prefix_syntax?.event || 'CEOHN10_SK',
+          prefixFee: val.prefix_syntax?.membership || 'CEOHN10_HP',
+          autoActivate: val.is_enabled ?? true,
+        };
+      }
+
+      // 2. Fallback sang app_settings (crm_sepay_config)
       const row = await this.prisma.$queryRaw<any[]>`
         SELECT value FROM public.app_settings WHERE key = 'crm_sepay_config' LIMIT 1
       `.catch(() => []);
 
-      const dbConfig = row.length > 0 && row[0]?.value ? row[0].value : {};
+      if (row.length > 0 && row[0]?.value) {
+        const dbConfig = typeof row[0].value === 'string' ? JSON.parse(row[0].value) : row[0].value;
+        return {
+          bankName: dbConfig.bankName || process.env.SEPAY_BANK_NAME || '',
+          accountNumber: dbConfig.accountNumber || process.env.SEPAY_ACCOUNT_NO || '',
+          accountHolder: dbConfig.accountHolder || process.env.SEPAY_ACCOUNT_HOLDER || '',
+          apiToken: dbConfig.apiToken || process.env.SEPAY_API_TOKEN || '',
+          webhookSecret: dbConfig.webhookSecret || process.env.SEPAY_WEBHOOK_SECRET || '',
+          prefixEvent: dbConfig.prefixEvent || 'CEOHN10_SK',
+          prefixFee: dbConfig.prefixFee || 'CEOHN10_HP',
+          autoActivate: dbConfig.autoActivate !== false,
+        };
+      }
 
       return {
-        bankName: dbConfig.bankName || process.env.SEPAY_BANK_NAME || 'MBBank',
-        accountNumber: dbConfig.accountNumber || process.env.SEPAY_ACCOUNT_NO || '198300000000',
-        accountHolder: dbConfig.accountHolder || process.env.SEPAY_ACCOUNT_HOLDER || 'CLB DOANH NHAN CEO HN10',
-        apiToken: dbConfig.apiToken || process.env.SEPAY_API_TOKEN || '',
-        webhookSecret: dbConfig.webhookSecret || process.env.SEPAY_WEBHOOK_SECRET || '',
-        prefixEvent: dbConfig.prefixEvent || 'CEOHN10_SK',
-        prefixFee: dbConfig.prefixFee || 'CEOHN10_HP',
-        autoActivate: dbConfig.autoActivate !== false,
+        bankName: process.env.SEPAY_BANK_NAME || '',
+        accountNumber: process.env.SEPAY_ACCOUNT_NO || '',
+        accountHolder: process.env.SEPAY_ACCOUNT_HOLDER || '',
+        apiToken: process.env.SEPAY_API_TOKEN || '',
+        webhookSecret: process.env.SEPAY_WEBHOOK_SECRET || '',
+        prefixEvent: 'CEOHN10_SK',
+        prefixFee: 'CEOHN10_HP',
+        autoActivate: true,
       };
     } catch {
       return {
-        bankName: process.env.SEPAY_BANK_NAME || 'MBBank',
-        accountNumber: process.env.SEPAY_ACCOUNT_NO || '198300000000',
-        accountHolder: process.env.SEPAY_ACCOUNT_HOLDER || 'CLB DOANH NHAN CEO HN10',
+        bankName: process.env.SEPAY_BANK_NAME || '',
+        accountNumber: process.env.SEPAY_ACCOUNT_NO || '',
+        accountHolder: process.env.SEPAY_ACCOUNT_HOLDER || '',
         apiToken: process.env.SEPAY_API_TOKEN || '',
         webhookSecret: process.env.SEPAY_WEBHOOK_SECRET || '',
         prefixEvent: 'CEOHN10_SK',
@@ -74,9 +110,11 @@ export class PaymentService {
 
     const config = await this.getSepayConfig();
     const memo = `${params.type === 'event' ? config.prefixEvent : config.prefixFee}_${params.orderId}`.replace(/[^A-Za-z0-9_]/g, '');
-    const bankShort = config.bankName.toUpperCase().includes('MB') ? 'MB' : config.bankName;
+    const bankShort = (config.bankName || 'MB').toUpperCase().includes('MB') ? 'MB' : (config.bankName || 'MB');
 
-    const qrImageUrl = `https://img.vietqr.io/image/${bankShort}-${config.accountNumber}-compact2.png?amount=${params.amount}&addInfo=${encodeURIComponent(memo)}&accountName=${encodeURIComponent(config.accountHolder)}`;
+    const qrImageUrl = (config.accountNumber && config.bankName)
+      ? `https://img.vietqr.io/image/${bankShort}-${config.accountNumber}-compact2.png?amount=${params.amount}&addInfo=${encodeURIComponent(memo)}&accountName=${encodeURIComponent(config.accountHolder)}`
+      : '';
 
     return {
       success: true,

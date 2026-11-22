@@ -118,15 +118,15 @@ function MasterAdminPortal() {
     },
   });
 
-  // Cấu hình mẫu mặc định luôn có sẵn để tránh form trắng
-  const DEFAULT_SEPAY_CONFIG = {
-    is_enabled: true,
-    api_token: "SPY_live_ceohn10_secret_token",
-    webhook_token: "whsec_ceohn10_verify_token",
-    webhook_url: "https://crm.ceohn10.viconnect.vn/api/webhooks/sepay",
-    bank_brand_name: "MBBank",
-    account_number: "198300000000",
-    account_name: "CLB DOANH NHAN CEO HN10",
+  // Cấu hình trắng sạch mặc định (không hardcode dữ liệu giả)
+  const EMPTY_SEPAY_CONFIG = {
+    is_enabled: false,
+    api_token: "",
+    webhook_token: "",
+    webhook_url: "",
+    bank_brand_name: "",
+    account_number: "",
+    account_name: "",
     auto_activation: {
       membership_fee: true,
       event_ticket: true,
@@ -139,16 +139,16 @@ function MasterAdminPortal() {
     },
   };
 
-  const DEFAULT_ZALO_CONFIG = {
-    is_enabled: true,
-    oa_id: "429182910284729182",
-    app_id: "4819284719284",
-    secret_key: "sk_live_ceohn10_zalo_oa_secret",
-    access_token: "zalooa_at_live_token_ceohn10_demo",
-    refresh_token: "zalooa_rt_live_token_ceohn10_demo",
-    webhook_url: "https://ceohn10.viconnect.vn/api/zalo/webhook",
-    default_zns_template: "ZNS_THU_MOI_SU_KIEN_CEOHN10",
-    status: "connected",
+  const EMPTY_ZALO_CONFIG = {
+    is_enabled: false,
+    oa_id: "",
+    app_id: "",
+    secret_key: "",
+    access_token: "",
+    refresh_token: "",
+    webhook_url: "",
+    default_zns_template: "",
+    status: "disconnected",
   };
 
   // Query Sepay Config
@@ -157,9 +157,9 @@ function MasterAdminPortal() {
     queryFn: async () => {
       try {
         const res = await fetchNestApi<any>("/admin/master-settings/sepay");
-        return res?.config || DEFAULT_SEPAY_CONFIG;
+        return res?.config || EMPTY_SEPAY_CONFIG;
       } catch {
-        return DEFAULT_SEPAY_CONFIG;
+        return EMPTY_SEPAY_CONFIG;
       }
     },
   });
@@ -170,9 +170,9 @@ function MasterAdminPortal() {
     queryFn: async () => {
       try {
         const res = await fetchNestApi<any>("/admin/master-settings/zalo");
-        return res?.config || DEFAULT_ZALO_CONFIG;
+        return res?.config || EMPTY_ZALO_CONFIG;
       } catch {
-        return DEFAULT_ZALO_CONFIG;
+        return EMPTY_ZALO_CONFIG;
       }
     },
   });
@@ -216,12 +216,12 @@ function MasterAdminPortal() {
   // State: Tab con của [3. CÀI ĐẶT HỆ THỐNG NGOÀI]
   const [settingsSubTab, setSettingsSubTab] = useState<"sepay" | "zalo" | "platforms">("sepay");
 
-  // State: Sepay Config Editor (Khởi tạo sẵn DEFAULT_SEPAY_CONFIG đảm bảo 100% không bao giờ rỗng trắng)
-  const [sepayFormData, setSepayFormData] = useState<any>(DEFAULT_SEPAY_CONFIG);
+  // State: Sepay Config Editor (Đọc từ API DB thật)
+  const [sepayFormData, setSepayFormData] = useState<any>(EMPTY_SEPAY_CONFIG);
   const [isSavingSepay, setIsSavingSepay] = useState(false);
 
-  // State: Zalo OA Config Editor
-  const [zaloFormData, setZaloFormData] = useState<any>(DEFAULT_ZALO_CONFIG);
+  // State: Zalo OA Config Editor (Đọc từ API DB thật)
+  const [zaloFormData, setZaloFormData] = useState<any>(EMPTY_ZALO_CONFIG);
   const [isSavingZalo, setIsSavingZalo] = useState(false);
 
   // State: Cài đặt cho từng hệ thống nhỏ
@@ -240,13 +240,13 @@ function MasterAdminPortal() {
 
   React.useEffect(() => {
     if (sepayQ.data) {
-      setSepayFormData((prev: any) => ({ ...DEFAULT_SEPAY_CONFIG, ...prev, ...sepayQ.data }));
+      setSepayFormData((prev: any) => ({ ...EMPTY_SEPAY_CONFIG, ...prev, ...sepayQ.data }));
     }
   }, [sepayQ.data]);
 
   React.useEffect(() => {
     if (zaloQ.data) {
-      setZaloFormData((prev: any) => ({ ...DEFAULT_ZALO_CONFIG, ...prev, ...zaloQ.data }));
+      setZaloFormData((prev: any) => ({ ...EMPTY_ZALO_CONFIG, ...prev, ...zaloQ.data }));
     }
   }, [zaloQ.data]);
 
@@ -1007,7 +1007,7 @@ function MasterAdminPortal() {
                         <Label className="text-[11px] text-slate-700 font-semibold">Tên Ngân Hàng</Label>
                         <Input
                           placeholder="VD: MBBank, Vietcombank..."
-                          value={sepayFormData.bank_brand_name || "MBBank"}
+                          value={sepayFormData.bank_brand_name || ""}
                           onChange={(e) =>
                             setSepayFormData({ ...sepayFormData, bank_brand_name: e.target.value })
                           }
@@ -1018,7 +1018,7 @@ function MasterAdminPortal() {
                         <Label className="text-[11px] text-slate-700 font-semibold">Số Tài Khoản</Label>
                         <Input
                           placeholder="VD: 198300000000"
-                          value={sepayFormData.account_number || "198300000000"}
+                          value={sepayFormData.account_number || ""}
                           onChange={(e) =>
                             setSepayFormData({ ...sepayFormData, account_number: e.target.value })
                           }
@@ -1029,7 +1029,7 @@ function MasterAdminPortal() {
                         <Label className="text-[11px] text-slate-700 font-semibold">Tên Chủ Tài Khoản</Label>
                         <Input
                           placeholder="VD: CLB DOANH NHAN CEO HN10"
-                          value={sepayFormData.account_name || "CLB DOANH NHAN CEO HN10"}
+                          value={sepayFormData.account_name || ""}
                           onChange={(e) =>
                             setSepayFormData({ ...sepayFormData, account_name: e.target.value })
                           }

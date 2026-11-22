@@ -2120,9 +2120,9 @@ export class AiService {
       q.includes('vietqr');
 
     const feePolicy = {
-      bankName: 'Ngân hàng Quân Đội (MB Bank)',
-      accountNo: '1010000000',
-      accountName: 'CLB DOANH NHAN CEO HN10',
+      bankName: process.env.SEPAY_BANK_NAME || 'Ngân hàng Quân Đội (MB Bank)',
+      accountNo: process.env.SEPAY_ACCOUNT_NO || '',
+      accountName: process.env.SEPAY_ACCOUNT_HOLDER || 'CLB DOANH NHAN CEO HN10',
       standardTier: '10.000.000 VNĐ / năm (Học viên Chính thức)',
       goldTier: '20.000.000 VNĐ / năm (Học viên VIP Gold)',
       diamondTier: '50.000.000 VNĐ / năm (Học viên Kim cương)',
@@ -2620,8 +2620,8 @@ QUY TẮC PHÂN TÍCH NGỮ CẢNH CÂU HỎI (BẮT BUỘC):
       const formattedOwed = new Intl.NumberFormat('vi-VN').format(
         dues.totalOutstanding || 0,
       );
-      const answer = `💳 **Quy định & Kênh đóng Hội phí CLB Doanh Nhân CEO HN10:**\n\n- 🏦 **Ngân hàng thụ hưởng:** MB Bank (Ngân hàng Quân Đội)\n- 🔢 **Số tài khoản:** \`1010000000\`\n- 👤 **Chủ tài khoản:** **CLB DOANH NHAN CEO HN10**\n- 💰 **Định mức niên liễm:**\n  + Tiêu chuẩn: **10.000.000 VNĐ / năm**\n  + VIP Gold: **20.000.000 VNĐ / năm**\n  + Kim cương: **50.000.000 VNĐ / năm**\n- 📝 **Cú pháp chuyển khoản:** \`${context.user.code} HP2026\` hoặc \`${context.user.name} HP2026\`\n\n*Trạng thái của Quý Anh/Chị:* ${dues.feePaid ? '✅ **ĐÃ HOÀN TẤT ĐẦY ĐỦ**' : `⚠️ **Còn nợ ${formattedOwed} VNĐ (Kỳ ${dues.feeYear || 2026})**`}\n\n👉 *Quý Anh/Chị có muốn tôi mở mục Hồ sơ để quét mã VietQR MB Bank thanh toán tự động trong 1 giây không?*`;
-      const speechText = `Hội phí CEO HN10 được tiếp nhận qua MB Bank, số tài khoản một chín tám ba không không không không không không, chủ tài khoản CLB Doanh Nhân CEO HN10. Quý anh chị có muốn tôi mở mã VietQR để thanh toán ngay không ạ?`;
+      const answer = `💳 **Quy định & Kênh đóng Hội phí CLB Doanh Nhân CEO HN10:**\n\n- 🏦 **Ngân hàng thụ hưởng:** ${process.env.SEPAY_BANK_NAME || 'MB Bank (Ngân hàng Quân Đội)'}\n- 🔢 **Số tài khoản:** \`${process.env.SEPAY_ACCOUNT_NO || 'Xem tại mục Hồ sơ'}\`\n- 👤 **Chủ tài khoản:** **${process.env.SEPAY_ACCOUNT_HOLDER || 'CLB DOANH NHAN CEO HN10'}**\n- 💰 **Định mức niên liễm:**\n  + Tiêu chuẩn: **10.000.000 VNĐ / năm**\n  + VIP Gold: **20.000.000 VNĐ / năm**\n  + Kim cương: **50.000.000 VNĐ / năm**\n- 📝 **Cú pháp chuyển khoản:** \`${context.user.code} HP2026\` hoặc \`${context.user.name} HP2026\`\n\n*Trạng thái của Quý Anh/Chị:* ${dues.feePaid ? '✅ **ĐÃ HOÀN TẤT ĐẦY ĐỦ**' : `⚠️ **Còn nợ ${formattedOwed} VNĐ (Kỳ ${dues.feeYear || 2026})**`}\n\n👉 *Quý Anh/Chị có muốn tôi mở mục Hồ sơ để quét mã VietQR MB Bank thanh toán tự động trong 1 giây không?*`;
+      const speechText = `Hội phí CEO HN10 được tiếp nhận qua cổng VietQR tự động. Quý anh chị có muốn tôi mở mã VietQR để thanh toán ngay không ạ?`;
       return {
         answer,
         speechText,
@@ -2940,7 +2940,7 @@ QUY TẮC PHÂN TÍCH NGỮ CẢNH CÂU HỎI (BẮT BUỘC):
           inv.amount || 0,
         );
 
-        const answer = `💳 **Thông tin Hội phí Hiệp hội CEO HN10:**\n\n- **Trạng thái:** ⚠️ **Chưa hoàn tất**\n- **Kỳ phí:** Năm ${inv.year || context.dues.feeYear || 2026}\n- **Số tiền cần thanh toán:** **${formattedAmount} VNĐ**\n- **Mã hóa đơn:** \`${inv.invoiceNo || 'INV-2026'}\`\n- **Hạn nộp:** ${inv.dueDate || '31/03/2026'}\n\n*Thông tin tài khoản tiếp nhận:*\n- **Ngân hàng:** MB Bank (Quân Đội)\n- **Số tài khoản:** \`1010000000\`\n- **Chủ tài khoản:** CLB DOANH NHAN CEO HN10\n- **Nội dung:** \`${inv.invoiceNo || context.user.code} HP2026\`\n\n👉 **Quý Anh/Chị có muốn tôi hướng dẫn thao tác trực tiếp đóng hội phí qua VietQR MB Bank không? Tôi sẽ lái màn hình và chỉ dẫn từng bước cho Quý Anh/Chị!**`;
+        const answer = `💳 **Thông tin Hội phí Hiệp hội CEO HN10:**\n\n- **Trạng thái:** ⚠️ **Chưa hoàn tất**\n- **Kỳ phí:** Năm ${inv.year || context.dues.feeYear || 2026}\n- **Số tiền cần thanh toán:** **${formattedAmount} VNĐ**\n- **Mã hóa đơn:** \`${inv.invoiceNo || 'INV-2026'}\`\n- **Hạn nộp:** ${inv.dueDate || '31/03/2026'}\n\n*Thông tin tài khoản tiếp nhận:*\n- **Ngân hàng:** ${process.env.SEPAY_BANK_NAME || 'MB Bank'}\n- **Số tài khoản:** \`${process.env.SEPAY_ACCOUNT_NO || 'Xem tại mục Hồ sơ'}\`\n- **Chủ tài khoản:** ${process.env.SEPAY_ACCOUNT_HOLDER || 'CLB DOANH NHAN CEO HN10'}\n- **Nội dung:** \`${inv.invoiceNo || context.user.code} HP2026\`\n\n👉 **Quý Anh/Chị có muốn tôi hướng dẫn thao tác trực tiếp đóng hội phí qua VietQR MB Bank không? Tôi sẽ lái màn hình và chỉ dẫn từng bước cho Quý Anh/Chị!**`;
 
         const speechText = `Quý anh chị hiện còn khoản hội phí kỳ ${inv.year || 2026} chưa đóng với số tiền ${formattedAmount} đồng. Quý anh chị có muốn tôi hướng dẫn thao tác trực tiếp quét mã VietQR để hoàn tất không? Hãy chọn Có để tôi dẫn đường nhé!`;
 
@@ -3373,11 +3373,11 @@ QUY TẮC PHÂN TÍCH NGỮ CẢNH CÂU HỎI (BẮT BUỘC):
             'Vào màn hình **Cá nhân** (Hồ sơ), chạm vào mục **"Hội phí & Hóa đơn"**.',
             'Kiểm tra số tiền niên liễm chưa đóng và hạn thanh toán.',
             'Bấm nút **"Quét mã VietQR"**.',
-            'Mở app ngân hàng bất kỳ (MB Bank, Vietcombank...) quét mã QR, hệ thống tự động điền STK 1010000000, số tiền và cú pháp.',
+            'Mở app ngân hàng bất kỳ (MB Bank, Vietcombank...) quét mã QR, hệ thống tự động điền STK, số tiền và cú pháp.',
             'Sau khi chuyển khoản, thẻ Học viên tự động cập nhật trạng thái Đã Hoàn Thành.',
           ],
           proTip:
-            'MB Bank là ngân hàng đối tác chiến lược của CEO HN10 với đầu số tài khoản VIP 1010000000.',
+            'Hệ thống tự động tích hợp cổng thanh toán VietQR kết nối tài khoản CLB CEO HN10.',
           speechSummary:
             'Để đóng hội phí: Vào mục Cá nhân, chọn Hội phí, bấm Quét mã VietQR và dùng app ngân hàng quét mã chuyển khoản tự động.',
         },
@@ -3930,7 +3930,7 @@ QUY TẮC PHÂN TÍCH NGỮ CẢNH CÂU HỎI (BẮT BUỘC):
       q.includes('hiệp hội ceo 1983') ||
       q.includes('giới thiệu clb')
     ) {
-      const answer = `🏛️ **Thông Tin Ban Lãnh Đạo, Lịch Sử & Tôn Chỉ CLB Doanh Nhân CEO HN10 (HanoiBA):**\n\nKính gửi Quý Anh/Chị **${userName}**, em xin gửi thông tin chuẩn mực và đầy đủ nhất về Hiệp hội:\n\n1. 👑 **Chủ Tịch Hiệp Hội:**\n   - **Anh Lê Phụng Thắng** — Chủ tịch HĐQT kiêm Tổng Giám đốc Tập đoàn Thép Citicom, Phó Chủ tịch Thường trực Hội Doanh nghiệp Trẻ Hà Nội (HanoiBA).\n   - Là người đặt nền móng kiến tạo, định hình tầm nhìn chiến lược và văn hóa đoàn kết, hào sảng, phụng sự cộng đồng doanh nhân.\n2. 🌟 **Tôn Chỉ Hoạt Động:**\n   - *"Gắn kết doanh nhân — Chia sẻ cơ hội — Phát triển bền vững"*.\n   - Nơi hội tụ các nhà lãnh đạo tài năng sinh năm 1983 (tuổi Quý Hợi) — thế hệ doanh nhân chín muồi về bản lĩnh, khát vọng và tinh thần đổi mới sáng tạo.\n3. 🏢 **Tổ Chức Chủ Quản & Trụ Sở:**\n   - Trực thuộc **Hội Doanh nghiệp Trẻ Hà Nội (HanoiBA)**.\n   - **Trụ sở:** Cung Trí Thức Hà Nội, Số 1 Tôn Thất Thuyết, Cầu Giấy, TP. Hà Nội.\n   - **Hotline Ban Thư Ký:** **0983 198 307** (Hỗ trợ 24/7).\n4. ⚙️ **Cơ Cấu 6 Ban Chuyên Môn:**\n   - **Ban Điều Hành & Ban Thư Ký:** Điều phối chung và vận hành nền tảng số.\n   - **Ban Thành Viên:** Kết nạp, thẩm định và chăm sóc quyền lợi Học viên.\n   - **Ban Xúc Tiến Thương Mại:** Điều phối giao thương B2B và chuỗi giá trị.\n   - **Ban Truyền Thông:** Xây dựng thương hiệu cá nhân CEO và kỷ yếu số.\n   - **Ban Tài Chính:** Quản lý quỹ, hội phí niên liễm MB Bank \`1010000000\`.\n   - **Ban Thiện Nguyện:** Các chương trình an sinh xã hội và CSR cộng đồng.\n\n👉 *Quý Anh/Chị có muốn em mở mục Danh Bạ Ban Điều Hành hoặc kết nối Ban Thư Ký ngay không ạ?*`;
+      const answer = `🏛️ **Thông Tin Ban Lãnh Đạo, Lịch Sử & Tôn Chỉ CLB Doanh Nhân CEO HN10 (HanoiBA):**\n\nKính gửi Quý Anh/Chị **${userName}**, em xin gửi thông tin chuẩn mực và đầy đủ nhất về Hiệp hội:\n\n1. 👑 **Chủ Tịch Hiệp Hội:**\n   - **Anh Lê Phụng Thắng** — Chủ tịch HĐQT kiêm Tổng Giám đốc Tập đoàn Thép Citicom, Phó Chủ tịch Thường trực Hội Doanh nghiệp Trẻ Hà Nội (HanoiBA).\n   - Là người đặt nền móng kiến tạo, định hình tầm nhìn chiến lược và văn hóa đoàn kết, hào sảng, phụng sự cộng đồng doanh nhân.\n2. 🌟 **Tôn Chỉ Hoạt Động:**\n   - *"Gắn kết doanh nhân — Chia sẻ cơ hội — Phát triển bền vững"*.\n   - Nơi hội tụ các nhà lãnh đạo tài năng sinh năm 1983 (tuổi Quý Hợi) — thế hệ doanh nhân chín muồi về bản lĩnh, khát vọng và tinh thần đổi mới sáng tạo.\n3. 🏢 **Tổ Chức Chủ Quản & Trụ Sở:**\n   - Trực thuộc **Hội Doanh nghiệp Trẻ Hà Nội (HanoiBA)**.\n   - **Trụ sở:** Cung Trí Thức Hà Nội, Số 1 Tôn Thất Thuyết, Cầu Giấy, TP. Hà Nội.\n   - **Hotline Ban Thư Ký:** **0983 198 307** (Hỗ trợ 24/7).\n4. ⚙️ **Cơ Cấu 6 Ban Chuyên Môn:**\n   - **Ban Điều Hành & Ban Thư Ký:** Điều phối chung và vận hành nền tảng số.\n   - **Ban Thành Viên:** Kết nạp, thẩm định và chăm sóc quyền lợi Học viên.\n   - **Ban Xúc Tiến Thương Mại:** Điều phối giao thương B2B và chuỗi giá trị.\n   - **Ban Truyền Thông:** Xây dựng thương hiệu cá nhân CEO và kỷ yếu số.\n   - **Ban Tài Chính:** Quản lý quỹ, hội phí niên liễm và đối soát tài chính tự động.\n   - **Ban Thiện Nguyện:** Các chương trình an sinh xã hội và CSR cộng đồng.\n\n👉 *Quý Anh/Chị có muốn em mở mục Danh Bạ Ban Điều Hành hoặc kết nối Ban Thư Ký ngay không ạ?*`;
       const speechText = `Chủ tịch CLB Doanh Nhân CEO HN10 là anh Lê Phụng Thắng, Chủ tịch HĐQT Citicom kiêm Phó Chủ tịch Thường trực HanoiBA. CLB hoạt động theo tôn chỉ Gắn kết doanh nhân, Chia sẻ cơ hội, Phát triển bền vững ạ!`;
 
       return {

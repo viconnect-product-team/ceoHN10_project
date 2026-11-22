@@ -41,15 +41,7 @@ export const Route = createFileRoute("/guest-event-register/$eventId")({
       }
     }
     if (!event) {
-      // Fallback an toàn giúp khách quét QR không bao giờ bị trang trắng 404
-      event = {
-        id: params.eventId,
-        name: "Hội Nghị Giao Thương & Kết Nối Doanh Nghiệp CLB CEO HN10",
-        date: "Sắp diễn ra",
-        time: "08:30 - 12:00",
-        location: "Khách Sạn Daewoo Hà Nội, 360 Kim Mã, Ba Đình, Hà Nội",
-        ticket_price: 0,
-      };
+      event = null;
     }
     return { event };
   },
@@ -68,6 +60,28 @@ export const Route = createFileRoute("/guest-event-register/$eventId")({
 function StandaloneGuestEventRegistrationPage() {
   const { event } = Route.useLoaderData();
 
+  if (!event) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
+        <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 text-center border border-slate-200">
+          <div className="w-16 h-16 mx-auto mb-4 bg-amber-50 text-amber-600 rounded-full flex items-center justify-center">
+            <AlertCircle className="w-8 h-8" />
+          </div>
+          <h2 className="text-xl font-black text-slate-800 mb-2">Không Tìm Thấy Sự Kiện</h2>
+          <p className="text-sm text-slate-600 mb-6">
+            Mã sự kiện không tồn tại trên hệ thống hoặc sự kiện đã kết thúc. Vui lòng kiểm tra lại liên kết hoặc liên hệ Ban Tổ Chức.
+          </p>
+          <a
+            href="/"
+            className="inline-flex items-center justify-center px-6 py-2.5 bg-[#003B95] text-white font-bold rounded-xl text-sm hover:bg-blue-900 transition"
+          >
+            Về Trang Chủ
+          </a>
+        </div>
+      </div>
+    );
+  }
+
   // Học viên mã tự khai báo (không bắt buộc, nếu nhập sẽ tự động tra cứu & điền)
   const [memberCode, setMemberCode] = useState("");
   const [isSearchingCode, setIsSearchingCode] = useState(false);
@@ -81,6 +95,12 @@ function StandaloneGuestEventRegistrationPage() {
   const [ticketType, setTicketType] = useState("Standard");
   const [ticketCount, setTicketCount] = useState(1);
   const [note, setNote] = useState("");
+
+  // Danh mục các phần tham gia sự kiện (Event Parts / Sessions)
+  const availableParts: string[] = (Array.isArray(event.parts) && event.parts.length > 0)
+    ? event.parts
+    : ["Tọa đàm / Hội nghị Chuyên Đề", "Tiệc Gala Dinner & Kết Nối Giao Thương"];
+  const [selectedParts, setSelectedParts] = useState<string[]>(availableParts);
 
   // Danh sách người tham gia cùng (multi-attendees)
   type AdditionalAttendee = {
@@ -250,6 +270,7 @@ function StandaloneGuestEventRegistrationPage() {
           ticketPrice,
           note: note.trim(),
           attendees: allAttendees,
+          attendedParts: selectedParts,
         }),
       }).catch((err: any) => {
         return { ok: false, error: err };
@@ -311,13 +332,10 @@ function StandaloneGuestEventRegistrationPage() {
         return;
       }
 
-      // 2. Client-side Fallback an toàn: Tự sinh mã vé và mã VietQR SePay chuẩn xác
+      // 2. Client-side Fallback an toàn: Tự sinh mã vé
       const fallbackRegId = `GUEST-${Date.now().toString(36).toUpperCase()}`;
       const fallbackLuckyNum = Math.floor(1000 + Math.random() * 9000);
       const fallbackMemo = `CEOHN10_SK_${fallbackRegId}`;
-      const fallbackSepayQrUrl = isFree
-        ? ""
-        : `https://img.vietqr.io/image/MB-198300000000-compact2.png?amount=${totalAmount}&addInfo=${encodeURIComponent(fallbackMemo)}&accountName=${encodeURIComponent("CLB DOANH NHAN CEO HN10")}`;
       const fallbackQrCodeUrl = getQrUrl(fallbackRegId, 300);
 
       const clientResult = {
@@ -327,8 +345,12 @@ function StandaloneGuestEventRegistrationPage() {
         luckyNumber: fallbackLuckyNum,
         isFree,
         totalAmount,
-        sepayQrUrl: fallbackSepayQrUrl,
-        vnpayQrUrl: fallbackSepayQrUrl,
+        sepayQrUrl: "",
+        vietQrUrl: "",
+        bankAccount: "",
+        bankName: "",
+        bankOwner: "",
+        transferMemo: fallbackMemo,
         qrCodeUrl: fallbackQrCodeUrl,
         fullName: fullName.trim(),
         phone: phone.trim(),
@@ -336,9 +358,9 @@ function StandaloneGuestEventRegistrationPage() {
         company: company.trim(),
         position: position.trim(),
         ticketType,
-        eventTitle: event.name || event.title,
-        eventDate: event.date,
-        eventLocation: event.location,
+        eventTitle: event?.name || event?.title,
+        eventDate: event?.date,
+        eventLocation: event?.location,
       };
 
       try {
@@ -593,58 +615,63 @@ function StandaloneGuestEventRegistrationPage() {
 
                 {/* KHUNG HIỂN THỊ SEPAY VIETQR */}
                 <div className="w-64 h-64 mx-auto bg-white p-3 rounded-2xl border-2 border-slate-200 shadow-md flex items-center justify-center relative group">
-                  <img
-                    src={
-                      result.sepayQrUrl ||
-                      result.vnpayQrUrl ||
-                      `https://img.vietqr.io/image/MB-198300000000-compact2.png?amount=${result.totalAmount}&addInfo=${encodeURIComponent(`CEOHN10_SK_${result.registrationId}`)}&accountName=${encodeURIComponent("CLB DOANH NHAN CEO HN10")}`
-                    }
-                    alt="VietQR SePay Thanh Toán Phí Sự Kiện"
-                    className="w-full h-full object-contain"
-                  />
+                  {(result.sepayQrUrl || result.vietQrUrl) ? (
+                    <img
+                      src={result.sepayQrUrl || result.vietQrUrl}
+                      alt="VietQR SePay Thanh Toán Phí Sự Kiện"
+                      className="w-full h-full object-contain"
+                    />
+                  ) : (
+                    <div className="text-center p-4 text-xs text-slate-500">
+                      <QrCode className="w-12 h-12 mx-auto text-slate-300 mb-2" />
+                      Vui lòng chuyển khoản theo thông tin số tài khoản bên dưới
+                    </div>
+                  )}
                 </div>
 
                 {/* THÔNG TIN CHUYỂN KHOẢN KÈM NÚT COPY */}
                 <div className="bg-white rounded-xl p-3.5 border border-slate-200 text-xs space-y-2.5">
                   <div className="flex items-center justify-between">
                     <span className="text-slate-500">Ngân hàng:</span>
-                    <span className="font-bold text-slate-800">MB Bank (Quân Đội)</span>
+                    <span className="font-bold text-slate-800">{result.bankName || "Ngân hàng Quân Đội (MB Bank)"}</span>
                   </div>
 
                   <div className="flex items-center justify-between">
                     <span className="text-slate-500">Số tài khoản:</span>
                     <div className="flex items-center gap-1.5">
-                      <span className="font-mono font-black text-[#003B95] text-sm">1010000000</span>
-                      <button
-                        type="button"
-                        onClick={() => handleCopy("1010000000", "Số tài khoản")}
-                        className="p-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 transition"
-                        title="Sao chép STK"
-                      >
-                        {copiedField === "Số tài khoản" ? (
-                          <Check className="w-3.5 h-3.5 text-emerald-600" />
-                        ) : (
-                          <Copy className="w-3.5 h-3.5" />
-                        )}
-                      </button>
+                      <span className="font-mono font-black text-[#003B95] text-sm">{result.bankAccount || "Liên hệ BTC"}</span>
+                      {result.bankAccount && (
+                        <button
+                          type="button"
+                          onClick={() => handleCopy(result.bankAccount, "Số tài khoản")}
+                          className="p-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 transition"
+                          title="Sao chép STK"
+                        >
+                          {copiedField === "Số tài khoản" ? (
+                            <Check className="w-3.5 h-3.5 text-emerald-600" />
+                          ) : (
+                            <Copy className="w-3.5 h-3.5" />
+                          )}
+                        </button>
+                      )}
                     </div>
                   </div>
 
                   <div className="flex items-center justify-between">
                     <span className="text-slate-500">Chủ tài khoản:</span>
-                    <span className="font-bold text-slate-800">CLB DOANH NHAN CEO HN10</span>
+                    <span className="font-bold text-slate-800">{result.bankOwner || "CLB DOANH NHÂN CEO HN10"}</span>
                   </div>
 
                   <div className="flex items-center justify-between">
                     <span className="text-slate-500">Nội dung CK:</span>
                     <div className="flex items-center gap-1.5">
                       <span className="font-mono font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
-                        EV{result.registrationId} {result.phone}
+                        {result.transferMemo || `CEOHN10_SK_${result.registrationId}`}
                       </span>
                       <button
                         type="button"
                         onClick={() =>
-                          handleCopy(`EV${result.registrationId} ${result.phone}`, "Nội dung chuyển khoản")
+                          handleCopy(result.transferMemo || `CEOHN10_SK_${result.registrationId}`, "Nội dung chuyển khoản")
                         }
                         className="p-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 transition"
                         title="Sao chép nội dung"
@@ -1058,12 +1085,56 @@ function StandaloneGuestEventRegistrationPage() {
             </div>
           </div>
 
+          {/* TRƯỜNG CHỌN PHẦN THAM GIA SỰ KIỆN (EVENT SESSIONS / PARTS) */}
+          <div className="bg-white rounded-3xl shadow-sm border border-slate-200 p-6 sm:p-7 space-y-3">
+            <div>
+              <label className="block text-sm sm:text-base font-bold text-slate-800">
+                5. Quý Đại Biểu Tham Dự Phần Nào Của Sự Kiện? <span className="text-rose-500">*</span>
+              </label>
+              <p className="text-xs text-slate-500 mt-0.5">
+                Quý Anh/Chị có thể tích chọn 1 hoặc nhiều phần theo nhu cầu tham dự thực tế.
+              </p>
+            </div>
+
+            <div className="space-y-2.5 pt-1">
+              {availableParts.map((part) => {
+                const isSelected = selectedParts.includes(part);
+                return (
+                  <div
+                    key={part}
+                    onClick={() => {
+                      setSelectedParts((prev) =>
+                        prev.includes(part)
+                          ? (prev.length > 1 ? prev.filter((p) => p !== part) : prev)
+                          : [...prev, part]
+                      );
+                    }}
+                    className={`flex items-center gap-3 p-3.5 rounded-2xl border transition cursor-pointer select-none ${
+                      isSelected
+                        ? "border-[#003B95] bg-blue-50/60 text-[#003B95] ring-1 ring-[#003B95]"
+                        : "border-slate-200 hover:bg-slate-50 text-slate-700"
+                    }`}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={isSelected}
+                      onChange={() => {}}
+                      className="w-4 h-4 rounded text-[#003B95] focus:ring-[#003B95] pointer-events-none"
+                    />
+                    <span className="text-xs sm:text-sm font-bold flex-1">{part}</span>
+                    {isSelected && <Check className="w-4 h-4 text-[#003B95]" />}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
           {/* ĐĂNG KÝ NHIỀU NGƯỜI (MULTI-ATTENDEE / ĐOÀN THAM DỰ) */}
           <div className="bg-white rounded-3xl shadow-sm border border-slate-200 p-6 sm:p-7 space-y-4">
             <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
               <div>
                 <label className="block text-sm sm:text-base font-bold text-slate-800">
-                  5. Danh sách người tham gia cùng (Tùy chọn)
+                  6. Danh sách người tham gia cùng (Tùy chọn)
                 </label>
                 <p className="text-xs text-slate-500 mt-0.5">
                   Quý Anh/Chị có thể đăng ký thêm đồng nghiệp, đối tác hoặc người đi cùng trong 1 lần đăng ký.

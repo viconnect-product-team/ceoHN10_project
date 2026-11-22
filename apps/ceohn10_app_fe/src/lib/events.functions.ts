@@ -64,7 +64,7 @@ export type Registration = {
   status: "confirmed" | "waitlist" | "cancelled";
   ticketType: string;
   seatAssignment?: string;
-  paymentStatus?: "paid" | "pending" | "cancelled";
+  paymentStatus?: "paid" | "pending" | "cancelled" | "unpaid";
   paymentMethod?: "transfer" | "bank" | "cash";
   paymentAmount?: number;
   paymentDeadline?: string;

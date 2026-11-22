@@ -1,5 +1,96 @@
 # System Memory & Architecture
 
+- **Bản cập nhật ngày 22/11/2026 (v12.48): Loại Bỏ Triệt Để 100% Hardcode Dữ Liệu Tự Điền UI & Cấu Hình SePay / Zalo OA Cứng, Tách Monolith Sub-Services, 3 Bản DB & 3 Bộ URL Chuẩn UID / Tans API Kèm Bộ Đóng Gói Module Độc Lập**:
+  - **1. Triệt Tiêu Hoàn Toàn Hardcode Cấu Hình SePay & Zalo OA Trên Toàn Bộ Hệ Thống (Strict No-Mock Law)**:
+    * **Backend Services (`PaymentService`, `ZaloService`, `MasterSettingsService`, `EventsService`, `AdminService`, `SponsorsService`, `AiService`, `MailService`)**:
+      - Loại bỏ toàn bộ chuỗi ID, số tài khoản, API token và secret hardcode: `'198300000000'`, `'1010000000'`, `'SPY_live_...'`, `'429182910284729182'`, `'736933908446960497'`, `'f42YHsjU1Ku9UcK7IxZQ'`, `'437444346010531505'`, v.v.
+      - **Cơ chế đọc động 3 tầng (Unified Dynamic Resolution)**:
+        1. Ưu tiên đọc từ bảng `public.master_system_settings` trên database chuẩn `113.20.107.184:6432` (`sepay_integration_config`, `zalo_oa_integration_config`).
+        2. Fallback kiểm tra bảng `public.app_settings` (`crm_sepay_config`, `zalo_oa_config`).
+        3. Fallback sang biến môi trường chuẩn trong `.env` (`SEPAY_ACCOUNT_NO`, `SEPAY_BANK_NAME`, `SEPAY_ACCOUNT_HOLDER`, `ZALO_OA_ID`, `ZALO_APP_ID`, `ZALO_APP_SECRET`).
+        4. Trả về cấu trúc rỗng sạch (empty string defaults) nếu chưa thiết lập, tuyệt đối không chèn số tài khoản giả hay token tĩnh.
+      - Xóa bỏ danh sách người nhận mock data trong `ZaloService.sendAnnualFeeRemindersZalo`.
+      - Xóa bỏ các nhãn và chuỗi `VNPAYQR` còn sót trong Email và thông báo, chuyển 100% sang chuẩn VietQR / SePay.
+    * **Frontend Master Admin (`/master`, `master.index.tsx`)**:
+      - Xóa bỏ hoàn toàn `DEFAULT_SEPAY_CONFIG` và `DEFAULT_ZALO_CONFIG` mang giá trị giả lập tĩnh. Thay bằng `EMPTY_SEPAY_CONFIG` và `EMPTY_ZALO_CONFIG`.
+      - Sửa các ô Input: Bỏ toán tử ép giá trị cứng `value={sepayFormData.account_number || "198300000000"}` sang `value={sepayFormData.account_number || ""}`, giúp người dùng toàn quyền nhập hoặc xóa trắng cấu hình mà không bao giờ bị hệ thống tự động điền đè lại giá trị mock.
+  - **2. Loại Bỏ Triệt Để Dữ Liệu Tự Điền Ảo / Fake Fallbacks Trên Giao Diện Người Dùng**:
+    * **Trang Đăng Ký Sự Kiện Khách (`guest-event-register.$eventId.tsx`)**:
+      - Xóa bỏ đối tượng sự kiện giả lập trong loader ("Khách Sạn Daewoo Hà Nội, 360 Kim Mã", v.v.). Khi không tìm thấy sự kiện, loader trả về `event: null` và giao diện hiển thị card thông báo chuẩn mực: "Không tìm thấy sự kiện hoặc sự kiện đã kết thúc".
+      - Xóa bỏ link ảnh VietQR cứng `MB-198300000000` và STK `1010000000` tại khu vực thanh toán vé sự kiện. Thông tin ngân hàng, số tài khoản, chủ tài khoản và mã VietQR được hiển thị 100% động từ kết quả trả về của backend `sepayConfig`.
+    * **Trang Đánh Giá Sự Kiện Khách (`guest-event-feedback.$eventId.tsx`)**:
+      - Xóa bỏ fallback sự kiện ảo trong loader, hiển thị màn hình thông báo lỗi lịch thiệp khi mã sự kiện không tồn tại.
+    * **Trang Check-in Sự Kiện (`event-checkin.tsx`)**:
+      - Khởi tạo `selectedParts: []` và `selectedCheckinParts: []` rỗng, không hardcode sẵn "Tọa đàm / Gala Dinner" mà tải động theo các phần sự kiện thực tế.
+  - **3. Kiến Trúc 3 Môi Trường Database & 3 Bộ URL Chuẩn UID / Tans API**:
+    * **3 File cấu hình môi trường chuẩn**:
+      - Backend: `.env.local` (Local Dev), `.env.staging` (Staging Test Server), `.env.production` (Production Server `113.20.107.184:6432`).
+      - Frontend: `.env.local`, `.env.staging`, `.env.production` với các domain tương ứng (`localhost:3000`, `crm-staging.ceohn10.viconnect.vn`, `crm.ceohn10.viconnect.vn`).
+    * **Chuẩn Hóa Database UID (UUIDv4)**:
+      - Script `scripts/ensure-uuid-primary-keys.sql` tự động kích hoạt `uuid-ossp`, `pgcrypto` và gắn `DEFAULT gen_random_uuid()::text` cho toàn bộ các bảng trong CSDL.
+    * **Chuẩn API Tans (TanStack Start API Client)**:
+      - Module `apps/ceohn10_app_fe/src/lib/tans-api.ts` chuẩn hóa toàn bộ response dạng `{ success, data, message, meta }`, hàm helper `createTansQueryOptions`, `isValidUid`.
+  - **4. Tách Nhỏ Monolith Backend Events Service Thành Các Sub-Services Độc Lập**:
+    * Tạo thư mục `apps/ceohn10_app_be/src/events/sub-services/`:
+      - `events-checkin.service.ts`: Xử lý toàn bộ logic Check-in, Checkout, tra cứu trạng thái vé, danh sách ứng viên đã check-in cho Lucky Draw.
+      - `events-media.service.ts`: Xử lý upload ảnh trực tiếp từ camera/file tại sự kiện, danh mục album ảnh, tự động đồng bộ sang Quản lý tài liệu (`documents`).
+      - `events-feedback.service.ts`: Xử lý gửi đánh giá sau sự kiện, đồng bộ sang Phản ánh góp ý (`feedbacks`), gửi email & Zalo OA recap tổng kết sự kiện.
+    * Đăng ký và export tại `events.module.ts`.
+  - **5. Bộ Đóng Gói Module Độc Lập & Bộ Dữ Liệu Kiểm Thử Toàn Diện**:
+    * Bộ đóng gói `scripts/export-module.mjs`: Hỗ trợ xuất độc lập 4 phân hệ (`module-events`, `module-members`, `module-finance`, `module-communications`) kèm `package.json`, `.env.example`, tài liệu hướng dẫn giúp bàn giao cho khách hàng chạy độc lập.
+    * Bộ dữ liệu test fixtures tại `test-data/events/`:
+      - `danh_sach_tham_du_khai_giang_mau.xlsx` (10 đại biểu mẫu kèm các cột động, trạng thái thanh toán và giá vé).
+      - `danh_sach_tham_du_hoi_nghi_mau.csv`.
+      - `sample_tickets_qr_payloads.json`.
+      - `test-data/HUONG_DAN_KIEM_THU_TOAN_DIEN.md`: Hướng dẫn kiểm thử 6 bước trọn vẹn từ trước, trong đến sau sự kiện.
+  - **6. Kiểm Tra Chất Lượng Mã Nguồn Tuyệt Đối (Strict Zero-Error)**:
+    * Backend: `npx tsc -p apps/ceohn10_app_be/tsconfig.json --noEmit` -> **Exit code 0 (0 errors)**.
+    * Frontend: `npx tsc -p apps/ceohn10_app_fe/tsconfig.json --noEmit` -> **Exit code 0 (0 errors)**.
+    * Frontend Build: `npm --prefix apps/ceohn10_app_fe run build` -> **Exit code 0 (5,102 modules transformed, Nitro SSR server built successfully)**.
+    * Tuân thủ triệt để Rule 0 (CSDL `113.20.107.184:6432`), Rule 1 (Không git commit/push), và No-Mock Law.
+
+- **Bản cập nhật ngày 22/11/2026 (v12.47): Hoàn Thiện Trọn Vẹn 100% Vòng Đời Sự Kiện CEO HN10 (Trước Sự Kiện - Trong Sự Kiện - Sau Sự Kiện) Chuẩn Hóa Theo Yêu Cầu Người Dùng**:
+  - **1. TRƯỚC SỰ KIỆN (Pre-Event)**:
+    * **Quản Lý Nhà Tài Trợ Tùy Chọn**: Cho phép tạo và chọn Nhà tài trợ khi tạo/sửa sự kiện, hiển thị trang trọng trên banner/chi tiết sự kiện (không bắt buộc / optional).
+    * **Đăng Ký Đa Hình Thức & Import File 3 Định Dạng (Word, Excel, PDF) Kèm Dynamic DDL**:
+      - Tự động thực thi `ALTER TABLE public.event_registrations ADD COLUMN IF NOT EXISTS "<column>" text DEFAULT ''` khi phát hiện các cột mới trong file import.
+      - **Cô lập cột động (Data Isolation)**: Sự kiện nào CHỈ hiển thị cột động của sự kiện đó thông qua API `/events/:id/dynamic-columns`.
+    * **Quản Lý Trạng Thái Thanh Toán & Hạch Toán Quỹ Tài Chính CRM Tức Thì**:
+      - Tại bảng đại biểu CRM, hỗ trợ nút toggle chuyển đổi trực tiếp trạng thái giữa `paid` (Đã thanh toán) và `unpaid` (Chưa thanh toán) trên từng hàng (`PATCH /events/registrations/:id/payment-status`).
+      - Khi chuyển sang `paid`, hệ thống tự động ghi nhận bản ghi `income_records` hạch toán dòng tiền vào Quỹ chung CLB, cập nhật số dư Quỹ và KPI trên Dashboard CRM theo thời gian thực.
+      - Sau khi import file xong, hệ thống tự động trả mã vé QR qua Email (`dispatchSmtpEmail`) và Zalo OA (`sendAutoNotification`).
+    * **Check-in 2 Mã Riêng Biệt & Đối Soát Khách Hàng**:
+      - Phân biệt rõ ràng: Đại biểu đã đăng ký từ trước (`PRE_REGISTERED`) vs Khách mới tại cửa (`WALK_IN_NEW`, cờ `is_walkin = true`).
+      - Hỗ trợ nhập mã vé hoặc tải ảnh QR từ máy để quét giải mã bằng `@zxing/library` (`decodeQrFromImage`).
+      - Đối với sự kiện có phí: Khách mới đăng ký sẽ nhận mã thanh toán SePay VietQR (MBBank `198300000000`), sau khi thanh toán hệ thống gửi mã vé và tự động ghi nhận check-in là khách mới.
+      - Đối với sự kiện miễn phí: Form check-in khách mới rút gọn (Họ tên, Email, SĐT, Doanh nghiệp/Công ty, Chức danh).
+      - **Danh mục chọn phần tham gia (`attended_parts`)**: Cung cấp tùy chọn phần tham gia (VD: Tọa đàm vs Tiệc Gala Dinner) trên cả form đăng ký và form check-in.
+      - **Nút thêm người tham gia (`+`)**: Cả form đăng ký và form check-in đều có nút dấu cộng thêm nhiều người tham dự / check-in đi cùng.
+    * **Form Builder Cấu Hình Động Trên UI (`EventFormConfigModal.tsx`)**:
+      - Cho phép quản trị viên thêm, sửa, xóa các trường của Form Đăng Ký và Form Check-in, bấm "Áp Dụng Biểu Mẫu Chuẩn" để lưu vào `events.form_config`.
+  - **2. TRONG SỰ KIỆN (In-Event)**:
+    * **Vòng Quay May Mắn Bốc Thăm Trúng Thưởng Hình Tròn (`EventWheelOfFortuneModal.tsx`)**:
+      - Xóa bỏ giao diện cũ, thay thế bằng Vòng quay tròn vẽ bằng HTML5 Canvas sinh động, múi màu thương hiệu, viền vàng óng ánh, kim chỉ đỉnh 12h, hiệu ứng quay vật lý giảm tốc mượt mà, âm thanh/pháo hoa chúc mừng.
+      - Nguồn dữ liệu 100% từ danh sách ĐÃ CHECK-IN (`GET /events/:id/checked-in-candidates`).
+      - Bộ chọn ứng viên linh hoạt: Cho phép "Chọn tất cả" hoặc tick chọn từng người cụ thể đưa vào vòng quay; có nút loại bỏ người vừa trúng giải.
+    * **Chụp Ảnh Trực Tiếp & Album Ảnh Sự Kiện (`EventLivePhotoGalleryModal.tsx`)**:
+      - Dành cho người có quyền check-in và ban tổ chức: Nút "Chụp Ảnh Ngay" (mở camera trực tiếp) và "Tải Ảnh Lên" (chọn từ thư viện).
+      - Lưu trữ vào `event_photos` và tự động đồng bộ vào chức năng Quản Lý Tài Liệu (`documents`) trên CRM, cô lập 100% theo đúng `eventId`.
+    * **Biểu Quyết Đại Biểu Đã Check-in (`voting.tsx`)**:
+      - Khi liên kết sự kiện (`eventId`), tự động gọi API `/events/:id/checked-in-candidates` lấy danh sách cử tri đã check-in; hỗ trợ chọn tất cả hoặc tick chọn nhiều người tham gia biểu quyết.
+  - **3. SAU SỰ KIỆN (Post-Event)**:
+    * **Đánh Giá & Góp Ý Sau Sự Kiện Qua Mã QR (`guest-event-feedback.$eventId.tsx`)**:
+      - Trang đánh giá công khai `/guest-event-feedback/:eventId` cho phép đại biểu quét mã QR gửi đánh giá sao (1-5 sao), ý kiến nhận xét, đính kèm ảnh/tài liệu.
+      - Dữ liệu lưu vào `event_feedback` và tự động đồng bộ sang chức năng Phản Ánh & Góp Ý (`feedbacks`) của CRM.
+      - Modal `EventFeedbackModal.tsx` trang bị chế độ "Trình Chiếu LED" phóng to mã QR toàn màn hình để chiếu lên sân khấu/hội trường cho đại biểu quét tại sự kiện.
+    * **Xem Album Ảnh & Gửi Thông Báo Tự Động (`sendPostEventRecap`)**:
+      - Hiển thị nút/link xem trọn bộ album ảnh sự kiện.
+      - Nút "Gửi Recap" (khi sự kiện hoàn thành) tự động gửi Email và Zalo OA cho tất cả đại biểu đã check-in kèm link album ảnh và nút đánh giá góp ý.
+  - **4. Kiểm Tra Chất Lượng Mã Nguồn Tuyệt Đối (Strict Zero-Error)**:
+    * Backend `apps/ceohn10_app_be`: Type-check `tsc --noEmit` -> **Exit code 0 (0 errors)**.
+    * Frontend `apps/ceohn10_app_fe`: Type-check `tsc --noEmit` -> **Exit code 0 (0 errors)**.
+    * Tuân thủ tuyệt đối Rule 0 (CSDL chuẩn duy nhất `113.20.107.184:6432`) và Rule 1 (Tuyệt đối không `git commit` / `git push`).
+
 - **Bản cập nhật ngày 21/11/2026 (v12.46): Nâng Cấp Toàn Diện Luồng Sự Kiện Import 3 Định Dạng (Word/Excel/PDF) Kèm Dynamic DDL Database & Hạch Toán Quỹ Thu Vé CRM, Check-in 2 Mã Riêng Biệt (Tại Cửa vs Đã Đăng Ký Kèm Tải Ảnh QR), Loại Bỏ Hoàn Toàn MoMo/VNPay & Setup SePay/Zalo Ngoài Platform, Phân Lập Database Test Và Product Độc Lập**:
   - **1. Sửa Lại Luồng Sự Kiện & Chức Năng Import 3 Định Dạng File (Word `.docx`, Excel `.xlsx`, PDF `.pdf`)**:
     * **Modal Import Mới: `EventAttendeesImportModal.tsx` (`apps/ceohn10_app_fe/src/components/events/`)**:
@@ -2860,6 +2951,97 @@
      - Tuân thủ nghiêm ngặt STRICT RULE 1: Tuyệt đối không tự động chạy `git push` hay `git commit`.
 
 # System Memory & Architecture
+
+- **Bản cập nhật ngày 22/11/2026 (v12.48): Loại Bỏ Triệt Để 100% Hardcode Dữ Liệu Tự Điền UI & Cấu Hình SePay / Zalo OA Cứng, Tách Monolith Sub-Services, 3 Bản DB & 3 Bộ URL Chuẩn UID / Tans API Kèm Bộ Đóng Gói Module Độc Lập**:
+  - **1. Triệt Tiêu Hoàn Toàn Hardcode Cấu Hình SePay & Zalo OA Trên Toàn Bộ Hệ Thống (Strict No-Mock Law)**:
+    * **Backend Services (`PaymentService`, `ZaloService`, `MasterSettingsService`, `EventsService`, `AdminService`, `SponsorsService`, `AiService`, `MailService`)**:
+      - Loại bỏ toàn bộ chuỗi ID, số tài khoản, API token và secret hardcode: `'198300000000'`, `'1010000000'`, `'SPY_live_...'`, `'429182910284729182'`, `'736933908446960497'`, `'f42YHsjU1Ku9UcK7IxZQ'`, `'437444346010531505'`, v.v.
+      - **Cơ chế đọc động 3 tầng (Unified Dynamic Resolution)**:
+        1. Ưu tiên đọc từ bảng `public.master_system_settings` trên database chuẩn `113.20.107.184:6432` (`sepay_integration_config`, `zalo_oa_integration_config`).
+        2. Fallback kiểm tra bảng `public.app_settings` (`crm_sepay_config`, `zalo_oa_config`).
+        3. Fallback sang biến môi trường chuẩn trong `.env` (`SEPAY_ACCOUNT_NO`, `SEPAY_BANK_NAME`, `SEPAY_ACCOUNT_HOLDER`, `ZALO_OA_ID`, `ZALO_APP_ID`, `ZALO_APP_SECRET`).
+        4. Trả về cấu trúc rỗng sạch (empty string defaults) nếu chưa thiết lập, tuyệt đối không chèn số tài khoản giả hay token tĩnh.
+      - Xóa bỏ danh sách người nhận mock data trong `ZaloService.sendAnnualFeeRemindersZalo`.
+      - Xóa bỏ các nhãn và chuỗi `VNPAYQR` còn sót trong Email và thông báo, chuyển 100% sang chuẩn VietQR / SePay.
+    * **Frontend Master Admin (`/master`, `master.index.tsx`)**:
+      - Xóa bỏ hoàn toàn `DEFAULT_SEPAY_CONFIG` và `DEFAULT_ZALO_CONFIG` mang giá trị giả lập tĩnh. Thay bằng `EMPTY_SEPAY_CONFIG` và `EMPTY_ZALO_CONFIG`.
+      - Sửa các ô Input: Bỏ toán tử ép giá trị cứng `value={sepayFormData.account_number || "198300000000"}` sang `value={sepayFormData.account_number || ""}`, giúp người dùng toàn quyền nhập hoặc xóa trắng cấu hình mà không bao giờ bị hệ thống tự động điền đè lại giá trị mock.
+  - **2. Loại Bỏ Triệt Để Dữ Liệu Tự Điền Ảo / Fake Fallbacks Trên Giao Diện Người Dùng**:
+    * **Trang Đăng Ký Sự Kiện Khách (`guest-event-register.$eventId.tsx`)**:
+      - Xóa bỏ đối tượng sự kiện giả lập trong loader ("Khách Sạn Daewoo Hà Nội, 360 Kim Mã", v.v.). Khi không tìm thấy sự kiện, loader trả về `event: null` và giao diện hiển thị card thông báo chuẩn mực: "Không tìm thấy sự kiện hoặc sự kiện đã kết thúc".
+      - Xóa bỏ link ảnh VietQR cứng `MB-198300000000` và STK `1010000000` tại khu vực thanh toán vé sự kiện. Thông tin ngân hàng, số tài khoản, chủ tài khoản và mã VietQR được hiển thị 100% động từ kết quả trả về của backend `sepayConfig`.
+    * **Trang Đánh Giá Sự Kiện Khách (`guest-event-feedback.$eventId.tsx`)**:
+      - Xóa bỏ fallback sự kiện ảo trong loader, hiển thị màn hình thông báo lỗi lịch thiệp khi mã sự kiện không tồn tại.
+    * **Trang Check-in Sự Kiện (`event-checkin.tsx`)**:
+      - Khởi tạo `selectedParts: []` và `selectedCheckinParts: []` rỗng, không hardcode sẵn "Tọa đàm / Gala Dinner" mà tải động theo các phần sự kiện thực tế.
+  - **3. Kiến Trúc 3 Môi Trường Database & 3 Bộ URL Chuẩn UID / Tans API**:
+    * **3 File cấu hình môi trường chuẩn**:
+      - Backend: `.env.local` (Local Dev), `.env.staging` (Staging Test Server), `.env.production` (Production Server `113.20.107.184:6432`).
+      - Frontend: `.env.local`, `.env.staging`, `.env.production` với các domain tương ứng (`localhost:3000`, `crm-staging.ceohn10.viconnect.vn`, `crm.ceohn10.viconnect.vn`).
+    * **Chuẩn Hóa Database UID (UUIDv4)**:
+      - Script `scripts/ensure-uuid-primary-keys.sql` tự động kích hoạt `uuid-ossp`, `pgcrypto` và gắn `DEFAULT gen_random_uuid()::text` cho toàn bộ các bảng trong CSDL.
+    * **Chuẩn API Tans (TanStack Start API Client)**:
+      - Module `apps/ceohn10_app_fe/src/lib/tans-api.ts` chuẩn hóa toàn bộ response dạng `{ success, data, message, meta }`, hàm helper `createTansQueryOptions`, `isValidUid`.
+  - **4. Tách Nhỏ Monolith Backend Events Service Thành Các Sub-Services Độc Lập**:
+    * Tạo thư mục `apps/ceohn10_app_be/src/events/sub-services/`:
+      - `events-checkin.service.ts`: Xử lý toàn bộ logic Check-in, Checkout, tra cứu trạng thái vé, danh sách ứng viên đã check-in cho Lucky Draw.
+      - `events-media.service.ts`: Xử lý upload ảnh trực tiếp từ camera/file tại sự kiện, danh mục album ảnh, tự động đồng bộ sang Quản lý tài liệu (`documents`).
+      - `events-feedback.service.ts`: Xử lý gửi đánh giá sau sự kiện, đồng bộ sang Phản ánh góp ý (`feedbacks`), gửi email & Zalo OA recap tổng kết sự kiện.
+    * Đăng ký và export tại `events.module.ts`.
+  - **5. Bộ Đóng Gói Module Độc Lập & Bộ Dữ Liệu Kiểm Thử Toàn Diện**:
+    * Bộ đóng gói `scripts/export-module.mjs`: Hỗ trợ xuất độc lập 4 phân hệ (`module-events`, `module-members`, `module-finance`, `module-communications`) kèm `package.json`, `.env.example`, tài liệu hướng dẫn giúp bàn giao cho khách hàng chạy độc lập.
+    * Bộ dữ liệu test fixtures tại `test-data/events/`:
+      - `danh_sach_tham_du_khai_giang_mau.xlsx` (10 đại biểu mẫu kèm các cột động, trạng thái thanh toán và giá vé).
+      - `danh_sach_tham_du_hoi_nghi_mau.csv`.
+      - `sample_tickets_qr_payloads.json`.
+      - `test-data/HUONG_DAN_KIEM_THU_TOAN_DIEN.md`: Hướng dẫn kiểm thử 6 bước trọn vẹn từ trước, trong đến sau sự kiện.
+  - **6. Kiểm Tra Chất Lượng Mã Nguồn Tuyệt Đối (Strict Zero-Error)**:
+    * Backend: `npx tsc -p apps/ceohn10_app_be/tsconfig.json --noEmit` -> **Exit code 0 (0 errors)**.
+    * Frontend: `npx tsc -p apps/ceohn10_app_fe/tsconfig.json --noEmit` -> **Exit code 0 (0 errors)**.
+    * Frontend Build: `npm --prefix apps/ceohn10_app_fe run build` -> **Exit code 0 (5,102 modules transformed, Nitro SSR server built successfully)**.
+    * Tuân thủ triệt để Rule 0 (CSDL `113.20.107.184:6432`), Rule 1 (Không git commit/push), và No-Mock Law.
+
+- **Bản cập nhật ngày 22/11/2026 (v12.47): Hoàn Thiện Trọn Vẹn 100% Vòng Đời Sự Kiện CEO HN10 (Trước Sự Kiện - Trong Sự Kiện - Sau Sự Kiện) Chuẩn Hóa Theo Yêu Cầu Người Dùng**:
+  - **1. TRƯỚC SỰ KIỆN (Pre-Event)**:
+    * **Quản Lý Nhà Tài Trợ Tùy Chọn**: Cho phép tạo và chọn Nhà tài trợ khi tạo/sửa sự kiện, hiển thị trang trọng trên banner/chi tiết sự kiện (không bắt buộc / optional).
+    * **Đăng Ký Đa Hình Thức & Import File 3 Định Dạng (Word, Excel, PDF) Kèm Dynamic DDL**:
+      - Tự động thực thi `ALTER TABLE public.event_registrations ADD COLUMN IF NOT EXISTS "<column>" text DEFAULT ''` khi phát hiện các cột mới trong file import.
+      - **Cô lập cột động (Data Isolation)**: Sự kiện nào CHỈ hiển thị cột động của sự kiện đó thông qua API `/events/:id/dynamic-columns`.
+    * **Quản Lý Trạng Thái Thanh Toán & Hạch Toán Quỹ Tài Chính CRM Tức Thì**:
+      - Tại bảng đại biểu CRM, hỗ trợ nút toggle chuyển đổi trực tiếp trạng thái giữa `paid` (Đã thanh toán) và `unpaid` (Chưa thanh toán) trên từng hàng (`PATCH /events/registrations/:id/payment-status`).
+      - Khi chuyển sang `paid`, hệ thống tự động ghi nhận bản ghi `income_records` hạch toán dòng tiền vào Quỹ chung CLB, cập nhật số dư Quỹ và KPI trên Dashboard CRM theo thời gian thực.
+      - Sau khi import file xong, hệ thống tự động trả mã vé QR qua Email (`dispatchSmtpEmail`) và Zalo OA (`sendAutoNotification`).
+    * **Check-in 2 Mã Riêng Biệt & Đối Soát Khách Hàng**:
+      - Phân biệt rõ ràng: Đại biểu đã đăng ký từ trước (`PRE_REGISTERED`) vs Khách mới tại cửa (`WALK_IN_NEW`, cờ `is_walkin = true`).
+      - Hỗ trợ nhập mã vé hoặc tải ảnh QR từ máy để quét giải mã bằng `@zxing/library` (`decodeQrFromImage`).
+      - Đối với sự kiện có phí: Khách mới đăng ký sẽ nhận mã thanh toán SePay VietQR (MBBank `198300000000`), sau khi thanh toán hệ thống gửi mã vé và tự động ghi nhận check-in là khách mới.
+      - Đối với sự kiện miễn phí: Form check-in khách mới rút gọn (Họ tên, Email, SĐT, Doanh nghiệp/Công ty, Chức danh).
+      - **Danh mục chọn phần tham gia (`attended_parts`)**: Cung cấp tùy chọn phần tham gia (VD: Tọa đàm vs Tiệc Gala Dinner) trên cả form đăng ký và form check-in.
+      - **Nút thêm người tham gia (`+`)**: Cả form đăng ký và form check-in đều có nút dấu cộng thêm nhiều người tham dự / check-in đi cùng.
+    * **Form Builder Cấu Hình Động Trên UI (`EventFormConfigModal.tsx`)**:
+      - Cho phép quản trị viên thêm, sửa, xóa các trường của Form Đăng Ký và Form Check-in, bấm "Áp Dụng Biểu Mẫu Chuẩn" để lưu vào `events.form_config`.
+  - **2. TRONG SỰ KIỆN (In-Event)**:
+    * **Vòng Quay May Mắn Bốc Thăm Trúng Thưởng Hình Tròn (`EventWheelOfFortuneModal.tsx`)**:
+      - Xóa bỏ giao diện cũ, thay thế bằng Vòng quay tròn vẽ bằng HTML5 Canvas sinh động, múi màu thương hiệu, viền vàng óng ánh, kim chỉ đỉnh 12h, hiệu ứng quay vật lý giảm tốc mượt mà, âm thanh/pháo hoa chúc mừng.
+      - Nguồn dữ liệu 100% từ danh sách ĐÃ CHECK-IN (`GET /events/:id/checked-in-candidates`).
+      - Bộ chọn ứng viên linh hoạt: Cho phép "Chọn tất cả" hoặc tick chọn từng người cụ thể đưa vào vòng quay; có nút loại bỏ người vừa trúng giải.
+    * **Chụp Ảnh Trực Tiếp & Album Ảnh Sự Kiện (`EventLivePhotoGalleryModal.tsx`)**:
+      - Dành cho người có quyền check-in và ban tổ chức: Nút "Chụp Ảnh Ngay" (mở camera trực tiếp) và "Tải Ảnh Lên" (chọn từ thư viện).
+      - Lưu trữ vào `event_photos` và tự động đồng bộ vào chức năng Quản Lý Tài Liệu (`documents`) trên CRM, cô lập 100% theo đúng `eventId`.
+    * **Biểu Quyết Đại Biểu Đã Check-in (`voting.tsx`)**:
+      - Khi liên kết sự kiện (`eventId`), tự động gọi API `/events/:id/checked-in-candidates` lấy danh sách cử tri đã check-in; hỗ trợ chọn tất cả hoặc tick chọn nhiều người tham gia biểu quyết.
+  - **3. SAU SỰ KIỆN (Post-Event)**:
+    * **Đánh Giá & Góp Ý Sau Sự Kiện Qua Mã QR (`guest-event-feedback.$eventId.tsx`)**:
+      - Trang đánh giá công khai `/guest-event-feedback/:eventId` cho phép đại biểu quét mã QR gửi đánh giá sao (1-5 sao), ý kiến nhận xét, đính kèm ảnh/tài liệu.
+      - Dữ liệu lưu vào `event_feedback` và tự động đồng bộ sang chức năng Phản Ánh & Góp Ý (`feedbacks`) của CRM.
+      - Modal `EventFeedbackModal.tsx` trang bị chế độ "Trình Chiếu LED" phóng to mã QR toàn màn hình để chiếu lên sân khấu/hội trường cho đại biểu quét tại sự kiện.
+    * **Xem Album Ảnh & Gửi Thông Báo Tự Động (`sendPostEventRecap`)**:
+      - Hiển thị nút/link xem trọn bộ album ảnh sự kiện.
+      - Nút "Gửi Recap" (khi sự kiện hoàn thành) tự động gửi Email và Zalo OA cho tất cả đại biểu đã check-in kèm link album ảnh và nút đánh giá góp ý.
+  - **4. Kiểm Tra Chất Lượng Mã Nguồn Tuyệt Đối (Strict Zero-Error)**:
+    * Backend `apps/ceohn10_app_be`: Type-check `tsc --noEmit` -> **Exit code 0 (0 errors)**.
+    * Frontend `apps/ceohn10_app_fe`: Type-check `tsc --noEmit` -> **Exit code 0 (0 errors)**.
+    * Tuân thủ tuyệt đối Rule 0 (CSDL chuẩn duy nhất `113.20.107.184:6432`) và Rule 1 (Tuyệt đối không `git commit` / `git push`).
 
 - **Bản cập nhật ngày 21/11/2026 (v12.46): Nâng Cấp Toàn Diện Luồng Sự Kiện Import 3 Định Dạng (Word/Excel/PDF) Kèm Dynamic DDL Database & Hạch Toán Quỹ Thu Vé CRM, Check-in 2 Mã Riêng Biệt (Tại Cửa vs Đã Đăng Ký Kèm Tải Ảnh QR), Loại Bỏ Hoàn Toàn MoMo/VNPay & Setup SePay/Zalo Ngoài Platform, Phân Lập Database Test Và Product Độc Lập**:
   - **1. Sửa Lại Luồng Sự Kiện & Chức Năng Import 3 Định Dạng File (Word `.docx`, Excel `.xlsx`, PDF `.pdf`)**:
@@ -6885,6 +7067,97 @@
      - Tuân thủ nghiêm ngặt STRICT RULE 1: Tuyệt đối không tự động chạy `git push` hay `git commit`.
 
 # System Memory & Architecture
+
+- **Bản cập nhật ngày 22/11/2026 (v12.48): Loại Bỏ Triệt Để 100% Hardcode Dữ Liệu Tự Điền UI & Cấu Hình SePay / Zalo OA Cứng, Tách Monolith Sub-Services, 3 Bản DB & 3 Bộ URL Chuẩn UID / Tans API Kèm Bộ Đóng Gói Module Độc Lập**:
+  - **1. Triệt Tiêu Hoàn Toàn Hardcode Cấu Hình SePay & Zalo OA Trên Toàn Bộ Hệ Thống (Strict No-Mock Law)**:
+    * **Backend Services (`PaymentService`, `ZaloService`, `MasterSettingsService`, `EventsService`, `AdminService`, `SponsorsService`, `AiService`, `MailService`)**:
+      - Loại bỏ toàn bộ chuỗi ID, số tài khoản, API token và secret hardcode: `'198300000000'`, `'1010000000'`, `'SPY_live_...'`, `'429182910284729182'`, `'736933908446960497'`, `'f42YHsjU1Ku9UcK7IxZQ'`, `'437444346010531505'`, v.v.
+      - **Cơ chế đọc động 3 tầng (Unified Dynamic Resolution)**:
+        1. Ưu tiên đọc từ bảng `public.master_system_settings` trên database chuẩn `113.20.107.184:6432` (`sepay_integration_config`, `zalo_oa_integration_config`).
+        2. Fallback kiểm tra bảng `public.app_settings` (`crm_sepay_config`, `zalo_oa_config`).
+        3. Fallback sang biến môi trường chuẩn trong `.env` (`SEPAY_ACCOUNT_NO`, `SEPAY_BANK_NAME`, `SEPAY_ACCOUNT_HOLDER`, `ZALO_OA_ID`, `ZALO_APP_ID`, `ZALO_APP_SECRET`).
+        4. Trả về cấu trúc rỗng sạch (empty string defaults) nếu chưa thiết lập, tuyệt đối không chèn số tài khoản giả hay token tĩnh.
+      - Xóa bỏ danh sách người nhận mock data trong `ZaloService.sendAnnualFeeRemindersZalo`.
+      - Xóa bỏ các nhãn và chuỗi `VNPAYQR` còn sót trong Email và thông báo, chuyển 100% sang chuẩn VietQR / SePay.
+    * **Frontend Master Admin (`/master`, `master.index.tsx`)**:
+      - Xóa bỏ hoàn toàn `DEFAULT_SEPAY_CONFIG` và `DEFAULT_ZALO_CONFIG` mang giá trị giả lập tĩnh. Thay bằng `EMPTY_SEPAY_CONFIG` và `EMPTY_ZALO_CONFIG`.
+      - Sửa các ô Input: Bỏ toán tử ép giá trị cứng `value={sepayFormData.account_number || "198300000000"}` sang `value={sepayFormData.account_number || ""}`, giúp người dùng toàn quyền nhập hoặc xóa trắng cấu hình mà không bao giờ bị hệ thống tự động điền đè lại giá trị mock.
+  - **2. Loại Bỏ Triệt Để Dữ Liệu Tự Điền Ảo / Fake Fallbacks Trên Giao Diện Người Dùng**:
+    * **Trang Đăng Ký Sự Kiện Khách (`guest-event-register.$eventId.tsx`)**:
+      - Xóa bỏ đối tượng sự kiện giả lập trong loader ("Khách Sạn Daewoo Hà Nội, 360 Kim Mã", v.v.). Khi không tìm thấy sự kiện, loader trả về `event: null` và giao diện hiển thị card thông báo chuẩn mực: "Không tìm thấy sự kiện hoặc sự kiện đã kết thúc".
+      - Xóa bỏ link ảnh VietQR cứng `MB-198300000000` và STK `1010000000` tại khu vực thanh toán vé sự kiện. Thông tin ngân hàng, số tài khoản, chủ tài khoản và mã VietQR được hiển thị 100% động từ kết quả trả về của backend `sepayConfig`.
+    * **Trang Đánh Giá Sự Kiện Khách (`guest-event-feedback.$eventId.tsx`)**:
+      - Xóa bỏ fallback sự kiện ảo trong loader, hiển thị màn hình thông báo lỗi lịch thiệp khi mã sự kiện không tồn tại.
+    * **Trang Check-in Sự Kiện (`event-checkin.tsx`)**:
+      - Khởi tạo `selectedParts: []` và `selectedCheckinParts: []` rỗng, không hardcode sẵn "Tọa đàm / Gala Dinner" mà tải động theo các phần sự kiện thực tế.
+  - **3. Kiến Trúc 3 Môi Trường Database & 3 Bộ URL Chuẩn UID / Tans API**:
+    * **3 File cấu hình môi trường chuẩn**:
+      - Backend: `.env.local` (Local Dev), `.env.staging` (Staging Test Server), `.env.production` (Production Server `113.20.107.184:6432`).
+      - Frontend: `.env.local`, `.env.staging`, `.env.production` với các domain tương ứng (`localhost:3000`, `crm-staging.ceohn10.viconnect.vn`, `crm.ceohn10.viconnect.vn`).
+    * **Chuẩn Hóa Database UID (UUIDv4)**:
+      - Script `scripts/ensure-uuid-primary-keys.sql` tự động kích hoạt `uuid-ossp`, `pgcrypto` và gắn `DEFAULT gen_random_uuid()::text` cho toàn bộ các bảng trong CSDL.
+    * **Chuẩn API Tans (TanStack Start API Client)**:
+      - Module `apps/ceohn10_app_fe/src/lib/tans-api.ts` chuẩn hóa toàn bộ response dạng `{ success, data, message, meta }`, hàm helper `createTansQueryOptions`, `isValidUid`.
+  - **4. Tách Nhỏ Monolith Backend Events Service Thành Các Sub-Services Độc Lập**:
+    * Tạo thư mục `apps/ceohn10_app_be/src/events/sub-services/`:
+      - `events-checkin.service.ts`: Xử lý toàn bộ logic Check-in, Checkout, tra cứu trạng thái vé, danh sách ứng viên đã check-in cho Lucky Draw.
+      - `events-media.service.ts`: Xử lý upload ảnh trực tiếp từ camera/file tại sự kiện, danh mục album ảnh, tự động đồng bộ sang Quản lý tài liệu (`documents`).
+      - `events-feedback.service.ts`: Xử lý gửi đánh giá sau sự kiện, đồng bộ sang Phản ánh góp ý (`feedbacks`), gửi email & Zalo OA recap tổng kết sự kiện.
+    * Đăng ký và export tại `events.module.ts`.
+  - **5. Bộ Đóng Gói Module Độc Lập & Bộ Dữ Liệu Kiểm Thử Toàn Diện**:
+    * Bộ đóng gói `scripts/export-module.mjs`: Hỗ trợ xuất độc lập 4 phân hệ (`module-events`, `module-members`, `module-finance`, `module-communications`) kèm `package.json`, `.env.example`, tài liệu hướng dẫn giúp bàn giao cho khách hàng chạy độc lập.
+    * Bộ dữ liệu test fixtures tại `test-data/events/`:
+      - `danh_sach_tham_du_khai_giang_mau.xlsx` (10 đại biểu mẫu kèm các cột động, trạng thái thanh toán và giá vé).
+      - `danh_sach_tham_du_hoi_nghi_mau.csv`.
+      - `sample_tickets_qr_payloads.json`.
+      - `test-data/HUONG_DAN_KIEM_THU_TOAN_DIEN.md`: Hướng dẫn kiểm thử 6 bước trọn vẹn từ trước, trong đến sau sự kiện.
+  - **6. Kiểm Tra Chất Lượng Mã Nguồn Tuyệt Đối (Strict Zero-Error)**:
+    * Backend: `npx tsc -p apps/ceohn10_app_be/tsconfig.json --noEmit` -> **Exit code 0 (0 errors)**.
+    * Frontend: `npx tsc -p apps/ceohn10_app_fe/tsconfig.json --noEmit` -> **Exit code 0 (0 errors)**.
+    * Frontend Build: `npm --prefix apps/ceohn10_app_fe run build` -> **Exit code 0 (5,102 modules transformed, Nitro SSR server built successfully)**.
+    * Tuân thủ triệt để Rule 0 (CSDL `113.20.107.184:6432`), Rule 1 (Không git commit/push), và No-Mock Law.
+
+- **Bản cập nhật ngày 22/11/2026 (v12.47): Hoàn Thiện Trọn Vẹn 100% Vòng Đời Sự Kiện CEO HN10 (Trước Sự Kiện - Trong Sự Kiện - Sau Sự Kiện) Chuẩn Hóa Theo Yêu Cầu Người Dùng**:
+  - **1. TRƯỚC SỰ KIỆN (Pre-Event)**:
+    * **Quản Lý Nhà Tài Trợ Tùy Chọn**: Cho phép tạo và chọn Nhà tài trợ khi tạo/sửa sự kiện, hiển thị trang trọng trên banner/chi tiết sự kiện (không bắt buộc / optional).
+    * **Đăng Ký Đa Hình Thức & Import File 3 Định Dạng (Word, Excel, PDF) Kèm Dynamic DDL**:
+      - Tự động thực thi `ALTER TABLE public.event_registrations ADD COLUMN IF NOT EXISTS "<column>" text DEFAULT ''` khi phát hiện các cột mới trong file import.
+      - **Cô lập cột động (Data Isolation)**: Sự kiện nào CHỈ hiển thị cột động của sự kiện đó thông qua API `/events/:id/dynamic-columns`.
+    * **Quản Lý Trạng Thái Thanh Toán & Hạch Toán Quỹ Tài Chính CRM Tức Thì**:
+      - Tại bảng đại biểu CRM, hỗ trợ nút toggle chuyển đổi trực tiếp trạng thái giữa `paid` (Đã thanh toán) và `unpaid` (Chưa thanh toán) trên từng hàng (`PATCH /events/registrations/:id/payment-status`).
+      - Khi chuyển sang `paid`, hệ thống tự động ghi nhận bản ghi `income_records` hạch toán dòng tiền vào Quỹ chung CLB, cập nhật số dư Quỹ và KPI trên Dashboard CRM theo thời gian thực.
+      - Sau khi import file xong, hệ thống tự động trả mã vé QR qua Email (`dispatchSmtpEmail`) và Zalo OA (`sendAutoNotification`).
+    * **Check-in 2 Mã Riêng Biệt & Đối Soát Khách Hàng**:
+      - Phân biệt rõ ràng: Đại biểu đã đăng ký từ trước (`PRE_REGISTERED`) vs Khách mới tại cửa (`WALK_IN_NEW`, cờ `is_walkin = true`).
+      - Hỗ trợ nhập mã vé hoặc tải ảnh QR từ máy để quét giải mã bằng `@zxing/library` (`decodeQrFromImage`).
+      - Đối với sự kiện có phí: Khách mới đăng ký sẽ nhận mã thanh toán SePay VietQR (MBBank `198300000000`), sau khi thanh toán hệ thống gửi mã vé và tự động ghi nhận check-in là khách mới.
+      - Đối với sự kiện miễn phí: Form check-in khách mới rút gọn (Họ tên, Email, SĐT, Doanh nghiệp/Công ty, Chức danh).
+      - **Danh mục chọn phần tham gia (`attended_parts`)**: Cung cấp tùy chọn phần tham gia (VD: Tọa đàm vs Tiệc Gala Dinner) trên cả form đăng ký và form check-in.
+      - **Nút thêm người tham gia (`+`)**: Cả form đăng ký và form check-in đều có nút dấu cộng thêm nhiều người tham dự / check-in đi cùng.
+    * **Form Builder Cấu Hình Động Trên UI (`EventFormConfigModal.tsx`)**:
+      - Cho phép quản trị viên thêm, sửa, xóa các trường của Form Đăng Ký và Form Check-in, bấm "Áp Dụng Biểu Mẫu Chuẩn" để lưu vào `events.form_config`.
+  - **2. TRONG SỰ KIỆN (In-Event)**:
+    * **Vòng Quay May Mắn Bốc Thăm Trúng Thưởng Hình Tròn (`EventWheelOfFortuneModal.tsx`)**:
+      - Xóa bỏ giao diện cũ, thay thế bằng Vòng quay tròn vẽ bằng HTML5 Canvas sinh động, múi màu thương hiệu, viền vàng óng ánh, kim chỉ đỉnh 12h, hiệu ứng quay vật lý giảm tốc mượt mà, âm thanh/pháo hoa chúc mừng.
+      - Nguồn dữ liệu 100% từ danh sách ĐÃ CHECK-IN (`GET /events/:id/checked-in-candidates`).
+      - Bộ chọn ứng viên linh hoạt: Cho phép "Chọn tất cả" hoặc tick chọn từng người cụ thể đưa vào vòng quay; có nút loại bỏ người vừa trúng giải.
+    * **Chụp Ảnh Trực Tiếp & Album Ảnh Sự Kiện (`EventLivePhotoGalleryModal.tsx`)**:
+      - Dành cho người có quyền check-in và ban tổ chức: Nút "Chụp Ảnh Ngay" (mở camera trực tiếp) và "Tải Ảnh Lên" (chọn từ thư viện).
+      - Lưu trữ vào `event_photos` và tự động đồng bộ vào chức năng Quản Lý Tài Liệu (`documents`) trên CRM, cô lập 100% theo đúng `eventId`.
+    * **Biểu Quyết Đại Biểu Đã Check-in (`voting.tsx`)**:
+      - Khi liên kết sự kiện (`eventId`), tự động gọi API `/events/:id/checked-in-candidates` lấy danh sách cử tri đã check-in; hỗ trợ chọn tất cả hoặc tick chọn nhiều người tham gia biểu quyết.
+  - **3. SAU SỰ KIỆN (Post-Event)**:
+    * **Đánh Giá & Góp Ý Sau Sự Kiện Qua Mã QR (`guest-event-feedback.$eventId.tsx`)**:
+      - Trang đánh giá công khai `/guest-event-feedback/:eventId` cho phép đại biểu quét mã QR gửi đánh giá sao (1-5 sao), ý kiến nhận xét, đính kèm ảnh/tài liệu.
+      - Dữ liệu lưu vào `event_feedback` và tự động đồng bộ sang chức năng Phản Ánh & Góp Ý (`feedbacks`) của CRM.
+      - Modal `EventFeedbackModal.tsx` trang bị chế độ "Trình Chiếu LED" phóng to mã QR toàn màn hình để chiếu lên sân khấu/hội trường cho đại biểu quét tại sự kiện.
+    * **Xem Album Ảnh & Gửi Thông Báo Tự Động (`sendPostEventRecap`)**:
+      - Hiển thị nút/link xem trọn bộ album ảnh sự kiện.
+      - Nút "Gửi Recap" (khi sự kiện hoàn thành) tự động gửi Email và Zalo OA cho tất cả đại biểu đã check-in kèm link album ảnh và nút đánh giá góp ý.
+  - **4. Kiểm Tra Chất Lượng Mã Nguồn Tuyệt Đối (Strict Zero-Error)**:
+    * Backend `apps/ceohn10_app_be`: Type-check `tsc --noEmit` -> **Exit code 0 (0 errors)**.
+    * Frontend `apps/ceohn10_app_fe`: Type-check `tsc --noEmit` -> **Exit code 0 (0 errors)**.
+    * Tuân thủ tuyệt đối Rule 0 (CSDL chuẩn duy nhất `113.20.107.184:6432`) và Rule 1 (Tuyệt đối không `git commit` / `git push`).
 
 - **Bản cập nhật ngày 21/11/2026 (v12.46): Nâng Cấp Toàn Diện Luồng Sự Kiện Import 3 Định Dạng (Word/Excel/PDF) Kèm Dynamic DDL Database & Hạch Toán Quỹ Thu Vé CRM, Check-in 2 Mã Riêng Biệt (Tại Cửa vs Đã Đăng Ký Kèm Tải Ảnh QR), Loại Bỏ Hoàn Toàn MoMo/VNPay & Setup SePay/Zalo Ngoài Platform, Phân Lập Database Test Và Product Độc Lập**:
   - **1. Sửa Lại Luồng Sự Kiện & Chức Năng Import 3 Định Dạng File (Word `.docx`, Excel `.xlsx`, PDF `.pdf`)**:

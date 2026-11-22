@@ -21,6 +21,7 @@ import {
   Camera,
   Heart,
   Mail,
+  Sliders,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -34,6 +35,8 @@ import { SupplyDeclarationModal } from "@/components/dashboard/SupplyDeclaration
 import { EventFeedbackModal } from "@/components/events/EventFeedbackModal";
 import { EventMediaModal } from "@/components/events/EventMediaModal";
 import { EventQrStaffSelector } from "@/components/events/EventQrStaffSelector";
+import { EventFormConfigModal } from "@/components/events/EventFormConfigModal";
+import { EventLivePhotoGalleryModal } from "@/components/events/EventLivePhotoGalleryModal";
 import { OmnichannelBroadcastModal } from "@/components/templates/OmnichannelBroadcastModal";
 import { useRole, PERMISSIONS } from "@/hooks/use-role";
 import { useAuth } from "@/context/AuthContext";
@@ -189,6 +192,31 @@ function EventsPage() {
   const [selectedSupplyEvent, setSelectedSupplyEvent] = useState<EventItem | null>(null);
   const [feedbackModalEvent, setFeedbackModalEvent] = useState<EventItem | null>(null);
   const [mediaModalEvent, setMediaModalEvent] = useState<EventItem | null>(null);
+  const [formConfigEvent, setFormConfigEvent] = useState<EventItem | null>(null);
+  const [livePhotoEvent, setLivePhotoEvent] = useState<EventItem | null>(null);
+
+  const handleSendPostEventRecap = async (eventId: string, eventName: string) => {
+    if (
+      !confirm(
+        `Xác nhận gửi email và Zalo OA thông báo tổng kết (kèm link Album ảnh và nút Đánh giá sự kiện) cho toàn bộ đại biểu ĐÃ CHECK-IN của sự kiện "${eventName}"?`
+      )
+    ) {
+      return;
+    }
+    try {
+      toast.info("Đang gửi thông báo tổng kết tới các đại biểu đã check-in...");
+      const res: any = await fetchNestApi(`/events/${eventId}/send-post-event-recap`, {
+        method: "POST",
+      });
+      if (res && res.ok) {
+        toast.success(res.message || "Đã gửi thông báo tổng kết thành công!");
+      } else {
+        toast.error(res?.message || "Không thể gửi thông báo lúc này");
+      }
+    } catch (err: any) {
+      toast.error("Lỗi khi gửi thông báo: " + (err?.message || ""));
+    }
+  };
   const [omnichannelModalOpen, setOmnichannelModalOpen] = useState(false);
   const [omnichannelEventData, setOmnichannelEventData] = useState<any>({
     title: "",
@@ -1081,6 +1109,44 @@ ${(e as any).description ? `📝 Chi tiết: ${(e as any).description}\n\n` : ""
                             </button>
                             <button
                               type="button"
+                              title="Cấu hình biểu mẫu đăng ký & check-in (Form Builder)"
+                              onClick={(evt) => {
+                                evt.stopPropagation();
+                                setFormConfigEvent(e);
+                              }}
+                              className="inline-flex items-center gap-1 rounded-lg border border-blue-500/40 bg-blue-500/10 px-2 py-1.5 text-xs font-semibold text-blue-600 hover:bg-blue-500/20 transition cursor-pointer"
+                            >
+                              <Sliders className="h-3.5 w-3.5" />
+                              <span className="hidden xl:inline text-[11px]">Form &amp; QR</span>
+                            </button>
+                            <button
+                              type="button"
+                              title="Chụp ảnh trực tiếp & Album ảnh sự kiện (Tự động đồng bộ Tài liệu)"
+                              onClick={(evt) => {
+                                evt.stopPropagation();
+                                setLivePhotoEvent(e);
+                              }}
+                              className="inline-flex items-center gap-1 rounded-lg border border-rose-500/40 bg-rose-500/10 px-2 py-1.5 text-xs font-semibold text-rose-600 hover:bg-rose-500/20 transition cursor-pointer"
+                            >
+                              <Camera className="h-3.5 w-3.5" />
+                              <span className="hidden xl:inline text-[11px]">Chụp ảnh</span>
+                            </button>
+                            {e.status === "completed" && (
+                              <button
+                                type="button"
+                                title="Gửi email và Zalo OA tổng kết kèm link album ảnh và nút đánh giá cho người đã check-in"
+                                onClick={(evt) => {
+                                  evt.stopPropagation();
+                                  handleSendPostEventRecap(e.id, e.name);
+                                }}
+                                className="inline-flex items-center gap-1 rounded-lg border border-purple-500/40 bg-purple-500/10 px-2 py-1.5 text-xs font-semibold text-purple-600 hover:bg-purple-500/20 transition cursor-pointer"
+                              >
+                                <Send className="h-3.5 w-3.5" />
+                                <span className="hidden xl:inline text-[11px]">Gửi Recap</span>
+                              </button>
+                            )}
+                            <button
+                              type="button"
                               title="Đánh giá & phản hồi sự kiện"
                               onClick={(evt) => {
                                 evt.stopPropagation();
@@ -1258,6 +1324,26 @@ ${(e as any).description ? `📝 Chi tiết: ${(e as any).description}\n\n` : ""
             existingGalleryUrl={(mediaModalEvent as any).photoGalleryUrl || (mediaModalEvent as any).photo_gallery_url}
             onClose={() => setMediaModalEvent(null)}
             onUpdated={() => router.invalidate()}
+          />
+        )}
+
+        {formConfigEvent && (
+          <EventFormConfigModal
+            open={!!formConfigEvent}
+            eventId={formConfigEvent.id}
+            eventName={formConfigEvent.name}
+            initialConfig={(formConfigEvent as any).form_config || (formConfigEvent as any).formConfig}
+            onClose={() => setFormConfigEvent(null)}
+            onSaved={() => router.invalidate()}
+          />
+        )}
+
+        {livePhotoEvent && (
+          <EventLivePhotoGalleryModal
+            open={!!livePhotoEvent}
+            eventId={livePhotoEvent.id}
+            eventName={livePhotoEvent.name}
+            onClose={() => setLivePhotoEvent(null)}
           />
         )}
 

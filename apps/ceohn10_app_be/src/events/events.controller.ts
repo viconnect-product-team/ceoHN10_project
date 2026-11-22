@@ -3,6 +3,7 @@ import {
   Get,
   Post,
   Put,
+  Patch,
   Delete,
   Body,
   Param,
@@ -403,8 +404,9 @@ export class EventsController {
   async performTicketCheckin(
     @Body('ticketCode') ticketCode: string,
     @Body('method') method?: string,
+    @Body('attendedParts') attendedParts?: string[],
   ) {
-    return this.eventsService.performTicketCheckin(ticketCode, method || 'web');
+    return this.eventsService.performTicketCheckin(ticketCode, method || 'web', attendedParts);
   }
 
   @Post('ticket-checkout')
@@ -477,5 +479,55 @@ export class EventsController {
   @Get(':id/dynamic-columns')
   async getDynamicColumns(@Param('id') id: string) {
     return this.eventsService.getEventDynamicColumns(id);
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('platform_admin', 'superadmin', 'adm', 'admin', 'bqt', 'btt', 'btk', 'bxt', 'member')
+  @Patch('registrations/:id/payment-status')
+  async updateRegistrationPaymentStatus(
+    @Param('id') id: string,
+    @Body('paymentStatus') paymentStatus: 'paid' | 'unpaid' | 'free',
+  ) {
+    return this.eventsService.updateRegistrationPaymentStatus(id, paymentStatus);
+  }
+
+  @Get(':id/checked-in-candidates')
+  async getCheckedInCandidates(@Param('id') id: string) {
+    return this.eventsService.getCheckedInCandidates(id);
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('platform_admin', 'superadmin', 'adm', 'admin', 'bqt', 'btt', 'btk', 'bxt', 'member')
+  @Post(':id/photos')
+  async addEventPhoto(
+    @Param('id') id: string,
+    @Body() body: { photoUrl: string; caption?: string; uploadedBy?: string; associationId?: string },
+  ) {
+    return this.eventsService.addEventPhoto(id, body);
+  }
+
+  @Get(':id/photos')
+  async getEventPhotos(@Param('id') id: string) {
+    return this.eventsService.getEventPhotos(id);
+  }
+
+  @Post(':id/feedback')
+  async saveEventFeedback(
+    @Param('id') id: string,
+    @Body() body: { memberName: string; memberPhone?: string; memberEmail?: string; rating: number; content: string },
+  ) {
+    return this.eventsService.saveEventFeedback(id, body);
+  }
+
+  @Get(':id/feedback')
+  async getEventFeedback(@Param('id') id: string) {
+    return this.eventsService.getEventFeedback(id);
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('platform_admin', 'superadmin', 'adm', 'admin', 'bqt', 'btt', 'btk', 'bxt', 'member')
+  @Post(':id/send-post-event-recap')
+  async sendPostEventRecap(@Param('id') id: string) {
+    return this.eventsService.sendPostEventRecap(id);
   }
 }

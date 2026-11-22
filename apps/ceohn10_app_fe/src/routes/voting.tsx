@@ -714,6 +714,28 @@ function VoteModal({ vote, onClose }: { vote?: Vote; onClose: () => void }) {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Danh sách đại biểu ĐÃ CHECK-IN sự kiện được chọn biểu quyết
+  const [checkedInVoters, setCheckedInVoters] = useState<Array<{ id: string; name: string; code: string; company: string }>>([]);
+  const [selectedVoterIds, setSelectedVoterIds] = useState<Set<string>>(new Set());
+  const [loadingVoters, setLoadingVoters] = useState(false);
+
+  useEffect(() => {
+    if (eventId) {
+      setLoadingVoters(true);
+      fetchNestApi<any>(`/events/${eventId}/checked-in-candidates`)
+        .then((res) => {
+          const list = res?.candidates || [];
+          setCheckedInVoters(list);
+          setSelectedVoterIds(new Set(list.map((c: any) => c.id)));
+        })
+        .catch(() => setCheckedInVoters([]))
+        .finally(() => setLoadingVoters(false));
+    } else {
+      setCheckedInVoters([]);
+      setSelectedVoterIds(new Set());
+    }
+  }, [eventId]);
+
   useEffect(() => {
     fetchNestApi<any>("/events?page=1&size=100")
       .then((res) => {
@@ -854,11 +876,74 @@ function VoteModal({ vote, onClose }: { vote?: Vote; onClose: () => void }) {
               const evName = selectedEvent.title || (selectedEvent as any).name;
               const evDate = selectedEvent.eventDate || (selectedEvent as any).date;
               return (
-                <div className="mt-1.5 flex items-start gap-1.5 rounded-lg border border-blue-200 dark:border-blue-900 bg-blue-50/60 dark:bg-blue-950/30 p-2 text-xs text-blue-900 dark:text-blue-200">
-                  <span className="font-semibold shrink-0">Đã chọn:</span>
-                  <span className="break-words font-medium">
-                    {evName} {evDate ? `(${new Date(evDate).toLocaleDateString("vi-VN")})` : ""}
-                  </span>
+                <div className="mt-1.5 space-y-2">
+                  <div className="flex items-start gap-1.5 rounded-lg border border-blue-200 dark:border-blue-900 bg-blue-50/60 dark:bg-blue-950/30 p-2 text-xs text-blue-900 dark:text-blue-200">
+                    <span className="font-semibold shrink-0">Đã chọn:</span>
+                    <span className="break-words font-medium">
+                      {evName} {evDate ? `(${new Date(evDate).toLocaleDateString("vi-VN")})` : ""}
+                    </span>
+                  </div>
+
+                  {/* BẢNG CHỌN CỬ TRI TỪ DANH SÁCH ĐÃ CHECK-IN */}
+                  <div className="rounded-xl border border-border bg-slate-50 dark:bg-muted/30 p-3 space-y-2 text-xs">
+                    <div className="flex items-center justify-between font-bold text-foreground">
+                      <span>Cử tri được quyền biểu quyết ({selectedVoterIds.size}/{checkedInVoters.length}):</span>
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setSelectedVoterIds(new Set(checkedInVoters.map((v) => v.id)))}
+                          className="text-[11px] text-[#003B95] font-bold hover:underline cursor-pointer"
+                        >
+                          Chọn tất cả
+                        </button>
+                        <span className="text-muted-foreground">|</span>
+                        <button
+                          type="button"
+                          onClick={() => setSelectedVoterIds(new Set())}
+                          className="text-[11px] text-muted-foreground font-semibold hover:underline cursor-pointer"
+                        >
+                          Bỏ chọn
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="max-h-36 overflow-y-auto rounded-lg border border-border bg-background divide-y divide-border/60">
+                      {loadingVoters ? (
+                        <div className="p-3 text-center text-muted-foreground">Đang tải danh sách đã check-in...</div>
+                      ) : checkedInVoters.length === 0 ? (
+                        <div className="p-3 text-center text-muted-foreground italic">Chưa có đại biểu nào check-in sự kiện này</div>
+                      ) : (
+                        checkedInVoters.map((voter) => {
+                          const isChecked = selectedVoterIds.has(voter.id);
+                          return (
+                            <label
+                              key={voter.id}
+                              className={`flex items-center gap-2 p-2 hover:bg-muted/40 cursor-pointer ${isChecked ? "bg-blue-50/40 dark:bg-blue-950/20" : ""}`}
+                            >
+                              <input
+                                type="checkbox"
+                                checked={isChecked}
+                                onChange={() => {
+                                  setSelectedVoterIds((prev) => {
+                                    const next = new Set(prev);
+                                    if (next.has(voter.id)) next.delete(voter.id);
+                                    else next.add(voter.id);
+                                    return next;
+                                  });
+                                }}
+                                className="rounded text-[#003B95]"
+                              />
+                              <span className="font-mono font-bold text-[10px] text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 px-1.5 py-0.2 rounded border border-amber-200 dark:border-amber-900">
+                                {voter.code}
+                              </span>
+                              <span className="font-semibold text-foreground truncate flex-1">{voter.name}</span>
+                              <span className="text-[10px] text-muted-foreground truncate max-w-[100px]">{voter.company}</span>
+                            </label>
+                          );
+                        })
+                      )}
+                    </div>
+                  </div>
                 </div>
               );
             })()}

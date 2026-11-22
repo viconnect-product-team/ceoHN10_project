@@ -28,6 +28,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { fetchNestApi } from "@/lib/api-client";
+import { EventWheelOfFortuneModal } from "@/components/events/EventWheelOfFortuneModal";
 import {
   ClickUpIcon,
   ClickUpBadgeIcon,
@@ -424,10 +425,13 @@ export function LuckyDrawLandingBanner({
         />
       )}
 
-      {/* INTERACTIVE SPIN WHEEL MODAL */}
+      {/* INTERACTIVE CIRCULAR WHEEL OF FORTUNE MODAL */}
       {spinModalOpen && (
-        <InteractiveLuckyDrawModal
-          event={currentEvent}
+        <EventWheelOfFortuneModal
+          open={spinModalOpen}
+          eventId={currentEvent.id}
+          eventName={currentEvent.name}
+          prizes={currentEvent.prizes as any}
           onClose={() => setSpinModalOpen(false)}
         />
       )}

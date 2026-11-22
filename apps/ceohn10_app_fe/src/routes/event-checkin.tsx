@@ -22,10 +22,14 @@ import {
   Check,
   Upload,
   Users,
+  Camera,
+  UserPlus,
+  X,
 } from "lucide-react";
 import { fetchNestApi } from "@/lib/api-client";
 import { toast } from "sonner";
 import { decodeQrFromImage } from "@/lib/qr-image-decoder";
+import { EventLivePhotoGalleryModal } from "@/components/events/EventLivePhotoGalleryModal";
 
 export const Route = createFileRoute("/event-checkin")({
   ssr: false,
@@ -39,6 +43,32 @@ function PublicEventCheckinGatePage() {
   const [actionLoading, setActionLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isDecodingImage, setIsDecodingImage] = useState(false);
+
+  // Live Photos Modal State
+  const [photoModalOpen, setPhotoModalOpen] = useState(false);
+
+  // Selected Parts during ticket scan
+  const [selectedCheckinParts, setSelectedCheckinParts] = useState<string[]>([]);
+
+  // Walk-in Registration Modal State
+  const [walkinModalOpen, setWalkinModalOpen] = useState(false);
+  const [walkinForm, setWalkinForm] = useState({
+    fullName: "",
+    phone: "",
+    email: "",
+    company: "",
+    position: "",
+    selectedParts: [] as string[],
+  });
+  const [additionalWalkins, setAdditionalWalkins] = useState<Array<{
+    id: string;
+    fullName: string;
+    phone: string;
+    email: string;
+    company: string;
+    position: string;
+  }>>([]);
+  const [submittingWalkin, setSubmittingWalkin] = useState(false);
 
   const handleQrImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -148,7 +178,11 @@ function PublicEventCheckinGatePage() {
     try {
       const res = await fetchNestApi<any>("/events/ticket-checkin", {
         method: "POST",
-        body: JSON.stringify({ ticketCode: currentTicket.id, method: "web_zalo" }),
+        body: JSON.stringify({
+          ticketCode: currentTicket.id,
+          method: "web_zalo",
+          attendedParts: selectedCheckinParts,
+        }),
       });
       if (res && res.ok) {
         toast.success(res.message || "Check-in thành công!");
@@ -156,6 +190,7 @@ function PublicEventCheckinGatePage() {
           ...currentTicket,
           isCheckedIn: true,
           checkedInAt: res.checkedInAt || new Date().toLocaleString("vi-VN"),
+          attendedParts: res.ticket?.attendedParts || selectedCheckinParts,
         });
       } else if (res && res.alreadyCheckedIn) {
         toast.error(res.message);
@@ -169,6 +204,74 @@ function PublicEventCheckinGatePage() {
       toast.error(err?.message || "Lỗi khi thực hiện check-in");
     } finally {
       setActionLoading(false);
+    }
+  };
+
+  const handleWalkinSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!walkinForm.fullName.trim() || !walkinForm.phone.trim() || !walkinForm.email.trim()) {
+      toast.error("Vui lòng điền đầy đủ Họ tên, Số điện thoại và Email!");
+      return;
+    }
+    const targetEventId = currentTicket?.eventId || "latest";
+    setSubmittingWalkin(true);
+    try {
+      const allWalkins = [
+        {
+          fullName: walkinForm.fullName.trim(),
+          phone: walkinForm.phone.trim(),
+          email: walkinForm.email.trim().toLowerCase(),
+          company: walkinForm.company.trim(),
+          position: walkinForm.position.trim(),
+        },
+        ...additionalWalkins.map((a) => ({
+          fullName: a.fullName.trim(),
+          phone: a.phone.trim(),
+          email: a.email.trim().toLowerCase(),
+          company: a.company.trim() || walkinForm.company.trim(),
+          position: a.position.trim(),
+        })),
+      ];
+
+      const res = await fetchNestApi<any>(`/events/${targetEventId}/guest-register`, {
+        method: "POST",
+        body: JSON.stringify({
+          fullName: walkinForm.fullName.trim(),
+          phone: walkinForm.phone.trim(),
+          email: walkinForm.email.trim().toLowerCase(),
+          company: walkinForm.company.trim(),
+          position: walkinForm.position.trim(),
+          ticketType: "Vé Khách Mới Tại Cửa",
+          ticketCount: allWalkins.length,
+          ticketPrice: 0,
+          isWalkIn: true,
+          attendees: allWalkins,
+          attendedParts: walkinForm.selectedParts,
+        }),
+      });
+
+      if (res && res.ok) {
+        toast.success(`Đã đăng ký và cấp vé check-in thành công cho ${allWalkins.length} đại biểu mới!`);
+        setWalkinModalOpen(false);
+        setWalkinForm({
+          fullName: "",
+          phone: "",
+          email: "",
+          company: "",
+          position: "",
+          selectedParts: ["Tọa đàm / Hội nghị Chuyên Đề", "Tiệc Gala Dinner & Kết Nối"],
+        });
+        setAdditionalWalkins([]);
+        if (res.registrationId) {
+          lookupTicket(res.registrationId);
+        }
+      } else {
+        toast.error(res?.message || "Không thể đăng ký lúc này");
+      }
+    } catch (err: any) {
+      toast.error(err?.message || "Lỗi khi đăng ký khách mới");
+    } finally {
+      setSubmittingWalkin(false);
     }
   };
 
@@ -282,12 +385,32 @@ function PublicEventCheckinGatePage() {
               </p>
             </div>
           </div>
-          <a
-            href="/"
-            className="text-xs text-slate-400 hover:text-white transition px-3 py-1.5 rounded-lg border border-slate-800 hover:bg-slate-800"
-          >
-            Về CRM
-          </a>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setPhotoModalOpen(true)}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold shadow-md transition cursor-pointer"
+              title="Chụp ảnh trực tiếp hoặc xem album ảnh sự kiện"
+            >
+              <Camera className="w-3.5 h-3.5" />
+              <span>Chụp &amp; Album Ảnh</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setWalkinModalOpen(true)}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold shadow-md transition cursor-pointer"
+              title="Mở form đăng ký check-in nhanh cho khách mới chưa có vé"
+            >
+              <UserPlus className="w-3.5 h-3.5" />
+              <span>+ Khách Mới Tại Cửa</span>
+            </button>
+            <a
+              href="/"
+              className="text-xs text-slate-400 hover:text-white transition px-3 py-1.5 rounded-xl border border-slate-800 hover:bg-slate-800"
+            >
+              Về CRM
+            </a>
+          </div>
         </div>
       </header>
 
@@ -515,6 +638,46 @@ function PublicEventCheckinGatePage() {
                 </div>
               </div>
             </div>
+
+            {/* CHỌN PHẦN THAM GIA SỰ KIỆN KHI SOÁT VÉ */}
+            {!currentTicket.isCheckedIn && (
+              <div className="px-6 py-2 space-y-2">
+                <div className="text-xs font-bold text-slate-300 flex items-center justify-between">
+                  <span>Xác nhận phần tham gia của đại biểu:</span>
+                  <span className="text-[11px] text-slate-400">Có thể tích 1 hoặc tất cả</span>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  {["Tọa đàm / Hội nghị Chuyên Đề", "Tiệc Gala Dinner & Kết Nối"].map((part) => {
+                    const isSelected = selectedCheckinParts.includes(part);
+                    return (
+                      <div
+                        key={part}
+                        onClick={() => {
+                          setSelectedCheckinParts((prev) =>
+                            prev.includes(part)
+                              ? (prev.length > 1 ? prev.filter((p) => p !== part) : prev)
+                              : [...prev, part]
+                          );
+                        }}
+                        className={`flex items-center gap-2 p-2.5 rounded-xl border text-xs font-semibold cursor-pointer select-none transition ${
+                          isSelected
+                            ? "border-blue-500 bg-blue-950/40 text-blue-300"
+                            : "border-slate-800 bg-slate-950/40 text-slate-400 hover:bg-slate-900"
+                        }`}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={isSelected}
+                          onChange={() => {}}
+                          className="rounded text-blue-600 pointer-events-none"
+                        />
+                        <span className="truncate">{part}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
 
             {/* Checkin / Checkout Action Buttons */}
             <div className="px-6 pb-6 pt-2 flex flex-col sm:flex-row gap-3">
@@ -744,6 +907,254 @@ function PublicEventCheckinGatePage() {
                   </div>
                 </div>
               )}
+            </div>
+          </div>
+        )}
+
+        {/* MODAL CHỤP & XEM ẢNH TRỰC TIẾP TRONG SỰ KIỆN */}
+        {photoModalOpen && (
+          <EventLivePhotoGalleryModal
+            open={photoModalOpen}
+            eventId={currentTicket?.eventId || "latest"}
+            eventName={currentTicket?.eventTitle || "Sự kiện CLB CEO HN10"}
+            onClose={() => setPhotoModalOpen(false)}
+          />
+        )}
+
+        {/* MODAL ĐĂNG KÝ CHECK-IN KHÁCH MỚI TẠI CỬA (WALK-IN) */}
+        {walkinModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md animate-in fade-in">
+            <div className="relative w-full max-w-xl max-h-[90vh] overflow-y-auto rounded-3xl border border-blue-500/40 bg-slate-900 shadow-2xl p-6 space-y-5 text-white">
+              <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-lg bg-blue-600 text-white flex items-center justify-center font-bold">
+                    <UserPlus className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm sm:text-base font-bold text-white">
+                      Đăng Ký Check-in Khách Mới Tại Cửa
+                    </h3>
+                    <p className="text-[11px] text-slate-400">
+                      Tự động cấp mã vé và đánh dấu là khách mới (Walk-in)
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setWalkinModalOpen(false)}
+                  className="p-1 rounded-full text-slate-400 hover:text-white"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <form onSubmit={handleWalkinSubmit} className="space-y-4 text-xs">
+                <div>
+                  <label className="block text-slate-300 font-semibold mb-1">
+                    Họ và tên khách mời *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="Nguyễn Văn A"
+                    value={walkinForm.fullName}
+                    onChange={(e) => setWalkinForm({ ...walkinForm, fullName: e.target.value })}
+                    className="w-full h-9 px-3 rounded-xl border border-slate-700 bg-slate-950 text-white outline-none focus:border-blue-500"
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-slate-300 font-semibold mb-1">
+                      Số điện thoại *
+                    </label>
+                    <input
+                      type="tel"
+                      required
+                      placeholder="0983..."
+                      value={walkinForm.phone}
+                      onChange={(e) => setWalkinForm({ ...walkinForm, phone: e.target.value })}
+                      className="w-full h-9 px-3 rounded-xl border border-slate-700 bg-slate-950 text-white outline-none focus:border-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-slate-300 font-semibold mb-1">
+                      Email *
+                    </label>
+                    <input
+                      type="email"
+                      required
+                      placeholder="email@congty.com"
+                      value={walkinForm.email}
+                      onChange={(e) => setWalkinForm({ ...walkinForm, email: e.target.value })}
+                      className="w-full h-9 px-3 rounded-xl border border-slate-700 bg-slate-950 text-white outline-none focus:border-blue-500"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-slate-300 font-semibold mb-1">
+                      Doanh nghiệp / Công ty
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="Tập đoàn..."
+                      value={walkinForm.company}
+                      onChange={(e) => setWalkinForm({ ...walkinForm, company: e.target.value })}
+                      className="w-full h-9 px-3 rounded-xl border border-slate-700 bg-slate-950 text-white outline-none focus:border-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-slate-300 font-semibold mb-1">
+                      Chức danh / Chức vụ
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="Giám đốc..."
+                      value={walkinForm.position}
+                      onChange={(e) => setWalkinForm({ ...walkinForm, position: e.target.value })}
+                      className="w-full h-9 px-3 rounded-xl border border-slate-700 bg-slate-950 text-white outline-none focus:border-blue-500"
+                    />
+                  </div>
+                </div>
+
+                {/* Chọn phần tham gia sự kiện */}
+                <div>
+                  <label className="block text-slate-300 font-semibold mb-1.5">
+                    Tham gia phần nào của sự kiện?
+                  </label>
+                  <div className="space-y-1.5">
+                    {["Tọa đàm / Hội nghị Chuyên Đề", "Tiệc Gala Dinner & Kết Nối"].map((part) => {
+                      const isChecked = walkinForm.selectedParts.includes(part);
+                      return (
+                        <label
+                          key={part}
+                          className="flex items-center gap-2 p-2 rounded-xl border border-slate-800 bg-slate-950/60 cursor-pointer text-xs"
+                        >
+                          <input
+                            type="checkbox"
+                            checked={isChecked}
+                            onChange={() => {
+                              setWalkinForm((prev) => ({
+                                ...prev,
+                                selectedParts: prev.selectedParts.includes(part)
+                                  ? prev.selectedParts.filter((p) => p !== part)
+                                  : [...prev.selectedParts, part],
+                              }));
+                            }}
+                            className="rounded text-blue-600"
+                          />
+                          <span>{part}</span>
+                        </label>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Nút thêm người đi cùng (+) */}
+                <div className="pt-2 border-t border-slate-800 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="font-semibold text-slate-300">
+                      Người đi cùng ({additionalWalkins.length}):
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setAdditionalWalkins((prev) => [
+                          ...prev,
+                          {
+                            id: `walk_${Date.now()}`,
+                            fullName: "",
+                            phone: "",
+                            email: "",
+                            company: walkinForm.company,
+                            position: "",
+                          },
+                        ])
+                      }
+                      className="px-2.5 py-1 rounded-lg bg-blue-600/30 hover:bg-blue-600/50 text-blue-300 text-[11px] font-bold border border-blue-500/40"
+                    >
+                      + Thêm người đi cùng
+                    </button>
+                  </div>
+
+                  {additionalWalkins.map((w, idx) => (
+                    <div key={w.id} className="p-3 rounded-xl border border-slate-800 bg-slate-950/80 space-y-2">
+                      <div className="flex items-center justify-between text-[11px] font-bold text-amber-400">
+                        <span>Đại biểu #{idx + 2}</span>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setAdditionalWalkins((prev) => prev.filter((_, i) => i !== idx))
+                          }
+                          className="text-rose-400 hover:underline"
+                        >
+                          Xóa
+                        </button>
+                      </div>
+                      <div className="grid grid-cols-3 gap-2">
+                        <input
+                          type="text"
+                          required
+                          placeholder="Họ tên *"
+                          value={w.fullName}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            setAdditionalWalkins((prev) =>
+                              prev.map((it, i) => (i === idx ? { ...it, fullName: val } : it))
+                            );
+                          }}
+                          className="h-8 px-2 rounded-lg border border-slate-700 bg-slate-900 text-xs text-white"
+                        />
+                        <input
+                          type="tel"
+                          required
+                          placeholder="SĐT *"
+                          value={w.phone}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            setAdditionalWalkins((prev) =>
+                              prev.map((it, i) => (i === idx ? { ...it, phone: val } : it))
+                            );
+                          }}
+                          className="h-8 px-2 rounded-lg border border-slate-700 bg-slate-900 text-xs text-white"
+                        />
+                        <input
+                          type="email"
+                          required
+                          placeholder="Email *"
+                          value={w.email}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            setAdditionalWalkins((prev) =>
+                              prev.map((it, i) => (i === idx ? { ...it, email: val } : it))
+                            );
+                          }}
+                          className="h-8 px-2 rounded-lg border border-slate-700 bg-slate-900 text-xs text-white"
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-800">
+                  <button
+                    type="button"
+                    onClick={() => setWalkinModalOpen(false)}
+                    className="px-4 py-2 rounded-xl border border-slate-700 text-slate-300 font-semibold"
+                  >
+                    Hủy
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={submittingWalkin}
+                    className="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold shadow-md disabled:opacity-50"
+                  >
+                    {submittingWalkin ? "Đang Đăng Ký..." : "Xác Nhận & Check-in"}
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
         )}

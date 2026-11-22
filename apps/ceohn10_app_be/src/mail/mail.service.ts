@@ -710,7 +710,7 @@ export class MailService {
         <div style="font-size: 12.5px; color: #334155; line-height: 1.5; margin-bottom: 12px;">
           Bấm nút bên dưới để Quan tâm (Follow) Zalo OA chính thức của CLB. Anh/Chị sẽ nhận ngay thông báo lịch sự kiện, nhắc hạn hội phí và cơ hội B2B tự động về Zalo cá nhân:
         </div>
-        <a href="https://zalo.me/437444346010531505" target="_blank" style="display: inline-block; background: #0068ff; color: #ffffff !important; font-weight: 800; font-size: 14px; text-decoration: none; padding: 12px 28px; border-radius: 9999px; box-shadow: 0 4px 14px rgba(0, 104, 255, 0.35);">
+        <a href="${process.env.ZALO_OA_ID ? `https://zalo.me/${process.env.ZALO_OA_ID}` : 'https://oa.zalo.me'}" target="_blank" style="display: inline-block; background: #0068ff; color: #ffffff !important; font-weight: 800; font-size: 14px; text-decoration: none; padding: 12px 28px; border-radius: 9999px; box-shadow: 0 4px 14px rgba(0, 104, 255, 0.35);">
           👉 Bấm Vào Đây Để Quan Tâm (Follow) Zalo OA CEO HN10
         </a>
       </div>
@@ -829,9 +829,9 @@ export class MailService {
       totalAmount = 0,
       qrCodeUrl,
       vietQrUrl,
-      bankAccount = '1010000000',
-      bankName = 'MB Bank (Quân Đội)',
-      bankOwner = 'CLB DOANH NHAN CEO HN10',
+      bankAccount = process.env.SEPAY_ACCOUNT_NO || '',
+      bankName = process.env.SEPAY_BANK_NAME || 'Ngân hàng thụ hưởng',
+      bankOwner = process.env.SEPAY_ACCOUNT_HOLDER || 'CLB DOANH NHAN CEO HN10',
     } = options;
 
     const isConfirmedTicket = isFree || paymentConfirmed;
@@ -878,9 +878,7 @@ export class MailService {
       }
     }
 
-    const vietQrUrlStr =
-      vietQrUrl ||
-      `https://img.vietqr.io/image/MB-1010000000-compact2.png?amount=${totalAmount}&addInfo=${encodeURIComponent('EV' + registrationId)}&accountName=${encodeURIComponent('CLB DOANH NHAN CEO HN10')}`;
+    const vietQrUrlStr = vietQrUrl || '';
     let vietQrAttachment: {
       filename: string;
       content: Buffer;
@@ -988,18 +986,18 @@ export class MailService {
 
         ${!isConfirmedTicket
         ? `
-        <!-- TEMPLATE MÃ VNPAY-QR THANH TOÁN DÀNH CHO SỰ KIỆN CÓ PHÍ CHỜ THANH TOÁN -->
+        <!-- TEMPLATE MÃ VIETQR THANH TOÁN DÀNH CHO SỰ KIỆN CÓ PHÍ CHỜ THANH TOÁN -->
         <div class="qr-container">
-          <div style="font-weight: 800; color: #003B95; font-size: 14px; text-transform: uppercase;">MÃ VNPAY-QR THANH TOÁN PHÍ THAM DỰ</div>
+          <div style="font-weight: 800; color: #003B95; font-size: 14px; text-transform: uppercase;">MÃ VIETQR (SEPAY) THANH TOÁN PHÍ THAM DỰ</div>
           <div class="price-tag">${new Intl.NumberFormat('vi-VN').format(totalAmount)} đ</div>
-          <img src="${vietQrSrc}" alt="Mã VNPAY-QR Thanh Toán" class="qr-img" />
+          ${vietQrSrc ? `<img src="${vietQrSrc}" alt="Mã VietQR Thanh Toán" class="qr-img" />` : ''}
           <div class="qr-caption">NỘI DUNG CK: EV${registrationId}</div>
           <div class="qr-hint">Mở ứng dụng Ngân hàng bất kỳ (MB, Vietcombank, Techcombank...) để quét mã chuyển khoản</div>
 
           <div class="bank-card">
-            <p><strong>Ngân hàng thụ hưởng:</strong> Ngân hàng Quân Đội (MB Bank)</p>
-            <p><strong>Số tài khoản:</strong> <span style="font-family: monospace; font-size: 15px; font-weight: 800; color: #003B95;">1010000000</span></p>
-            <p><strong>Chủ tài khoản:</strong> CLB DOANH NHÂN CEO HN10</p>
+            <p><strong>Ngân hàng thụ hưởng:</strong> ${bankName || 'Ngân hàng Quân Đội (MB Bank)'}</p>
+            <p><strong>Số tài khoản:</strong> <span style="font-family: monospace; font-size: 15px; font-weight: 800; color: #003B95;">${bankAccount || ''}</span></p>
+            <p><strong>Chủ tài khoản:</strong> ${bankOwner || 'CLB DOANH NHÂN CEO HN10'}</p>
             <p><strong>Số tiền:</strong> <strong style="color: #D97706;">${new Intl.NumberFormat('vi-VN').format(totalAmount)} đ</strong></p>
             <p><strong>Cú pháp chuyển khoản:</strong> <strong style="color: #003B95; font-family: monospace;">EV${registrationId} ${phone || ''}</strong></p>
           </div>
@@ -1061,7 +1059,7 @@ export class MailService {
         ? '<span class="badge-status">✓ ĐÃ THANH TOÁN (HỢP LỆ)</span>'
         : isFree
           ? '<span class="badge-status">✓ ĐÃ XÁC NHẬN (Miễn phí 0 đ)</span>'
-          : '<span class="badge-status-pending">⏳ CHỜ THANH TOÁN VNPAY-QR</span>'
+          : '<span class="badge-status-pending">⏳ CHỜ THANH TOÁN VIETQR</span>'
       }
             </div>
           </div>
@@ -1547,7 +1545,7 @@ export class MailService {
         <div style="font-size: 12.5px; color: #334155; line-height: 1.5; margin-bottom: 12px;">
           Bấm nút bên dưới để Quan tâm (Follow) Zalo OA chính thức của CLB. Anh/Chị sẽ nhận ngay thông báo lịch sự kiện, nhắc hạn hội phí và cơ hội B2B tự động về Zalo cá nhân:
         </div>
-        <a href="https://zalo.me/437444346010531505" target="_blank" style="display: inline-block; background: #0068ff; color: #ffffff !important; font-weight: 800; font-size: 14px; text-decoration: none; padding: 12px 28px; border-radius: 9999px; box-shadow: 0 4px 14px rgba(0, 104, 255, 0.35);">
+        <a href="${process.env.ZALO_OA_ID ? `https://zalo.me/${process.env.ZALO_OA_ID}` : 'https://oa.zalo.me'}" target="_blank" style="display: inline-block; background: #0068ff; color: #ffffff !important; font-weight: 800; font-size: 14px; text-decoration: none; padding: 12px 28px; border-radius: 9999px; box-shadow: 0 4px 14px rgba(0, 104, 255, 0.35);">
           👉 Bấm Vào Đây Để Quan Tâm (Follow) Zalo OA CEO HN10
         </a>
       </div>
@@ -1892,7 +1890,7 @@ export class MailService {
         <div style="font-size: 12.5px; color: #334155; line-height: 1.5; margin-bottom: 12px;">
           Bấm nút bên dưới để Quan tâm (Follow) Zalo OA chính thức của CLB. Anh/Chị sẽ nhận ngay thông báo lịch sự kiện, nhắc hạn hội phí và cơ hội B2B tự động về Zalo cá nhân:
         </div>
-        <a href="https://zalo.me/437444346010531505" target="_blank" style="display: inline-block; background: #0068ff; color: #ffffff !important; font-weight: 800; font-size: 14px; text-decoration: none; padding: 12px 28px; border-radius: 9999px; box-shadow: 0 4px 14px rgba(0, 104, 255, 0.35);">
+        <a href="${process.env.ZALO_OA_ID ? `https://zalo.me/${process.env.ZALO_OA_ID}` : 'https://oa.zalo.me'}" target="_blank" style="display: inline-block; background: #0068ff; color: #ffffff !important; font-weight: 800; font-size: 14px; text-decoration: none; padding: 12px 28px; border-radius: 9999px; box-shadow: 0 4px 14px rgba(0, 104, 255, 0.35);">
           👉 Bấm Vào Đây Để Quan Tâm (Follow) Zalo OA CEO HN10
         </a>
       </div>
@@ -2711,9 +2709,9 @@ export class MailService {
       year,
       amount,
       dueDate,
-      bankAccount = '1010000000',
-      bankName = 'MB Bank (Ngân hàng TMCP Quân Đội)',
-      bankOwner = 'CLB DOANH NHAN CEO HN10',
+      bankAccount = process.env.SEPAY_ACCOUNT_NO || '',
+      bankName = process.env.SEPAY_BANK_NAME || 'Ngân hàng thụ hưởng',
+      bankOwner = process.env.SEPAY_ACCOUNT_HOLDER || 'CLB DOANH NHAN CEO HN10',
       vietQrUrl,
       portalUrl,
       reminderCount,
@@ -2726,15 +2724,13 @@ export class MailService {
     ).trim();
     const isReminder = Boolean(reminderCount && reminderCount > 0);
     const appUrl = portalUrl || `${DEFAULT_APP_URL}/association/profile`;
-    const vietQrUrlStr =
-      vietQrUrl ||
-      `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(`VNPAYQR|CEO HN10|FEE|${invoiceNo}|${amount}|${memberCode || ''}`)}`;
-    const vietQrAttachment = await this.getVietQrAttachment(
+    const vietQrUrlStr = vietQrUrl || '';
+    const vietQrAttachment = vietQrUrlStr ? await this.getVietQrAttachment(
       vietQrUrlStr,
-      'vnpay_fee_qr',
-      `vnpay-fee-${invoiceNo}.png`,
-    );
-    const qrImg = vietQrAttachment ? 'cid:vnpay_fee_qr' : vietQrUrlStr;
+      'sepay_fee_qr',
+      `sepay-fee-${invoiceNo}.png`,
+    ) : null;
+    const qrImg = vietQrAttachment ? 'cid:sepay_fee_qr' : vietQrUrlStr;
 
     const subject = isReminder
       ? `[CLB CEO HN10] Nhắc Đóng Hội Phí Thường Niên Năm ${year} (Lần ${reminderCount}) — Học viên ${memberName}`
