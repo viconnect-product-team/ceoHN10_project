@@ -30,14 +30,24 @@ export class EventsController {
 
   @Get('qr')
   async getQrImage(
+    @Request() req: any,
     @Query('data') data: string,
     @Query('regId') regId: string,
     @Query('size') size: string,
     @Query('eventId') eventId: string,
+    @Query('baseUrl') customBaseUrl: string,
     @Res() res: any,
   ) {
     let rawData = data || regId || 'CEO HN10-EVENT-TICKET';
-    const baseUrl = process.env.APP_URL || 'https://ceohn10.viconnect.vn';
+    const reqOrigin = req?.headers?.origin || req?.headers?.referer;
+    let detectedOrigin = '';
+    if (reqOrigin) {
+      try {
+        const u = new URL(reqOrigin);
+        detectedOrigin = `${u.protocol}//${u.host}`;
+      } catch {}
+    }
+    const baseUrl = customBaseUrl || detectedOrigin || process.env.APP_URL || 'https://ceohn10.viconnect.vn';
     
     // Nếu rawData không phải là một liên kết Web (URL), chuyển đổi thành URL mở Form đăng ký công khai (Public) trên Web
     if (!rawData.startsWith('http://') && !rawData.startsWith('https://')) {
@@ -412,6 +422,21 @@ export class EventsController {
   @Post('ticket-checkout')
   async performTicketCheckout(@Body('ticketCode') ticketCode: string) {
     return this.eventsService.performTicketCheckout(ticketCode);
+  }
+
+  // ── OFFLINE CHECKIN ENGINE (HỖ TRỢ KHU VỰC MẤT SÓNG / KHÔNG CÓ MẠNG) ─────────
+
+  @Get(':id/offline-dataset')
+  async getEventOfflineDataset(@Param('id') eventId: string) {
+    return this.eventsService.getEventOfflineDataset(eventId);
+  }
+
+  @Post('batch-sync-checkin')
+  async batchSyncCheckin(
+    @Body('eventId') eventId: string,
+    @Body('items') items: Array<{ ticketCode: string; checkedInAt?: string; method?: string; attendedParts?: string[] }>,
+  ) {
+    return this.eventsService.batchSyncCheckin(eventId, items || []);
   }
 
   // ── DYNAMIC EVENT FEE CODES (TÍCH HỢP SEPAY DYNAMIC) ─────────────────────────

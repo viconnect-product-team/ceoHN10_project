@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, OnModuleInit } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 
 export interface FinancialColumn {
@@ -30,32 +30,76 @@ export interface FinancialRow {
 }
 
 @Injectable()
-export class FinancialReportService {
+export class FinancialReportService implements OnModuleInit {
   constructor(private readonly prisma: PrismaService) {}
+
+  async onModuleInit() {
+    try {
+      await this.prisma.$executeRawUnsafe(`
+        CREATE TABLE IF NOT EXISTS public.financial_report_columns (
+          id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+          column_key TEXT UNIQUE NOT NULL,
+          column_label TEXT NOT NULL,
+          column_type TEXT NOT NULL DEFAULT 'text',
+          is_custom BOOLEAN DEFAULT TRUE,
+          order_index INT DEFAULT 99,
+          options JSONB DEFAULT '[]'::jsonb,
+          width_px INT DEFAULT 160,
+          is_visible BOOLEAN DEFAULT TRUE,
+          created_at TIMESTAMPTZ DEFAULT NOW(),
+          updated_at TIMESTAMPTZ DEFAULT NOW()
+        );
+      `);
+      await this.prisma.$executeRawUnsafe(`
+        CREATE TABLE IF NOT EXISTS public.financial_report_rows (
+          id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+          transaction_date DATE NOT NULL,
+          voucher_no TEXT,
+          category TEXT NOT NULL,
+          description TEXT,
+          income_amount BIGINT DEFAULT 0,
+          expense_amount BIGINT DEFAULT 0,
+          balance_after BIGINT DEFAULT 0,
+          party_name TEXT,
+          status TEXT DEFAULT 'completed',
+          custom_data JSONB DEFAULT '{}'::jsonb,
+          created_at TIMESTAMPTZ DEFAULT NOW(),
+          updated_at TIMESTAMPTZ DEFAULT NOW()
+        );
+      `);
+    } catch (err) {
+      console.warn('[FinancialReportService] Error creating tables on init:', err);
+    }
+  }
 
   /**
    * Lấy danh sách cột động
    */
   async getColumns(): Promise<FinancialColumn[]> {
-    const rows = await this.prisma.$queryRawUnsafe<any[]>(
-      `SELECT * FROM public.financial_report_columns ORDER BY order_index ASC, created_at ASC`,
-    );
+    try {
+      const rows = await this.prisma.$queryRawUnsafe<any[]>(
+        `SELECT * FROM public.financial_report_columns ORDER BY order_index ASC, created_at ASC`,
+      );
 
-    return rows.map((r) => ({
-      id: r.id,
-      column_key: r.column_key,
-      column_label: r.column_label,
-      column_type: r.column_type || 'text',
-      is_custom: Boolean(r.is_custom),
-      order_index: Number(r.order_index || 0),
-      options: Array.isArray(r.options) ? r.options : typeof r.options === 'string' ? JSON.parse(r.options || '[]') : [],
-      width_px: Number(r.width_px || 150),
-      is_visible: r.is_visible !== undefined ? Boolean(r.is_visible) : true,
-    }));
+      return rows.map((r) => ({
+        id: r.id,
+        column_key: r.column_key,
+        column_label: r.column_label,
+        column_type: r.column_type || 'text',
+        is_custom: Boolean(r.is_custom),
+        order_index: Number(r.order_index || 0),
+        options: Array.isArray(r.options) ? r.options : typeof r.options === 'string' ? JSON.parse(r.options || '[]') : [],
+        width_px: Number(r.width_px || 150),
+        is_visible: r.is_visible !== undefined ? Boolean(r.is_visible) : true,
+      }));
+    } catch (e) {
+      console.warn('[FinancialReportService] getColumns fallback empty:', e);
+      return [];
+    }
   }
 
   /**
-   * Thêm cột mới trực tiếp từ giao diện -> Lưu ngay vào CSDL
+   * Thêm cột mới trực tiếp từ giao diện -> Lưu ngay vào CSDL và chạy ALTER TABLE
    */
   async addColumn(data: {
     column_key?: string;
@@ -66,10 +110,18 @@ export class FinancialReportService {
     width_px?: number;
   }): Promise<FinancialColumn> {
     const columnLabel = data.column_label.trim();
-    // Tạo column_key tự động nếu chưa có
-    const columnKey =
+    // Tạo column_key an toàn cho CSDL PostgreSQL (lowercase a-z, 0-9, _)
+    const baseSlug = columnLabel
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9_]/g, '_')
+      .replace(/_+/g, '_')
+      .slice(0, 30);
+    const rawKey =
       data.column_key ||
-      `col_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
+      `col_${baseSlug}_${Date.now().toString().slice(-4)}`;
+    const safeColKey = rawKey.replace(/[^a-z0-9_]/gi, '').toLowerCase();
     const columnType = data.column_type || 'text';
     const orderIndex = Number(data.order_index || 99);
     const optionsJson = JSON.stringify(data.options || []);
@@ -80,14 +132,35 @@ export class FinancialReportService {
         id, column_key, column_label, column_type, is_custom, order_index, options, width_px, is_visible, created_at, updated_at
       ) VALUES (
         gen_random_uuid(), $1, $2, $3, true, $4, $5::jsonb, $6, true, NOW(), NOW()
-      ) RETURNING *`,
-      columnKey,
+      ) ON CONFLICT (column_key) DO UPDATE SET
+        column_label = EXCLUDED.column_label,
+        column_type = EXCLUDED.column_type,
+        width_px = EXCLUDED.width_px,
+        updated_at = NOW()
+      RETURNING *`,
+      safeColKey,
       columnLabel,
       columnType,
       orderIndex,
       optionsJson,
       widthPx,
     );
+
+    // THỰC THI ALTER TABLE NGAY DƯỚI CSDL POSTGRESQL CHO CẢ 2 BẢNG
+    try {
+      await this.prisma.$executeRawUnsafe(
+        `ALTER TABLE public.financial_report_rows ADD COLUMN IF NOT EXISTS "${safeColKey}" TEXT;`,
+      );
+    } catch (alterErr) {
+      console.warn(`[FinancialReport] Alter financial_report_rows error:`, alterErr);
+    }
+    try {
+      await this.prisma.$executeRawUnsafe(
+        `ALTER TABLE public.transactions ADD COLUMN IF NOT EXISTS "${safeColKey}" TEXT;`,
+      );
+    } catch (alterErr2) {
+      console.warn(`[FinancialReport] Alter transactions error:`, alterErr2);
+    }
 
     const r = inserted[0];
     return {
@@ -145,9 +218,26 @@ export class FinancialReportService {
   }
 
   /**
-   * Xóa cột động
+   * Xóa cột động và xóa column tương ứng dưới CSDL
    */
   async deleteColumn(id: string) {
+    try {
+      const existing = await this.prisma.$queryRawUnsafe<any[]>(
+        `SELECT column_key, is_custom FROM public.financial_report_columns WHERE id = $1::uuid LIMIT 1`,
+        id,
+      );
+      if (existing[0]?.column_key && existing[0]?.is_custom) {
+        const safeColKey = existing[0].column_key.replace(/[^a-z0-9_]/gi, '').toLowerCase();
+        try {
+          await this.prisma.$executeRawUnsafe(
+            `ALTER TABLE public.financial_report_rows DROP COLUMN IF EXISTS "${safeColKey}";`,
+          );
+        } catch (dropErr) {
+          console.warn(`[FinancialReport] Drop column error:`, dropErr);
+        }
+      }
+    } catch (e) {}
+
     await this.prisma.$executeRawUnsafe(
       `DELETE FROM public.financial_report_columns WHERE id = $1::uuid`,
       id,
@@ -328,5 +418,92 @@ export class FinancialReportService {
       id,
     );
     return { success: true };
+  }
+
+  /**
+   * Lệnh điều chuyển ngân sách / cấp kinh phí quỹ ban chuyên môn (Ví dụ: Cấp tiền cho Ban Công Nghệ)
+   */
+  async transferDepartmentFund(data: {
+    fromDepartment?: string;
+    toDepartment: string;
+    amount: number;
+    description: string;
+    invoiceUrl?: string;
+    fundAccountLink?: string;
+    transactionDate?: string;
+  }) {
+    const fromDept = data.fromDepartment || 'Quỹ Tổng Hiệp Hội';
+    const toDept = data.toDepartment || 'Ban Công Nghệ';
+    const amount = Math.max(0, Number(data.amount) || 0);
+    const txDate = data.transactionDate || new Date().toISOString().split('T')[0];
+    const timestamp = Date.now().toString().slice(-6);
+
+    const voucherOut = `CK-OUT-${timestamp}`;
+    const voucherIn = `CK-IN-${timestamp}`;
+
+    const customDataOut = {
+      department: toDept,
+      sourceFund: fromDept,
+      targetFund: toDept,
+      type: 'OUT',
+      flowDirection: 'out',
+      invoiceUrl: data.invoiceUrl || '',
+      fundAccountLink: data.fundAccountLink || '',
+    };
+
+    const customDataIn = {
+      department: toDept,
+      sourceFund: fromDept,
+      targetFund: toDept,
+      type: 'IN',
+      flowDirection: 'in',
+      invoiceUrl: data.invoiceUrl || '',
+      fundAccountLink: data.fundAccountLink || '',
+    };
+
+    // 1. Ghi giao dịch xuất quỹ từ Quỹ Tổng
+    const outRow = await this.prisma.$queryRawUnsafe<any[]>(
+      `INSERT INTO public.financial_report_rows (
+        id, transaction_date, voucher_no, category, description,
+        income_amount, expense_amount, balance_after, party_name, status,
+        custom_data, created_at, updated_at
+      ) VALUES (
+        gen_random_uuid(), $1::date, $2, 'Điều chuyển ngân sách', $3,
+        0, $4, 0, $5, 'completed',
+        $6::jsonb, NOW(), NOW()
+      ) RETURNING *`,
+      txDate,
+      voucherOut,
+      `[CHI ĐIỀU CHUYỂN] ${data.description} -> Cấp cho ${toDept}`,
+      amount,
+      toDept,
+      JSON.stringify(customDataOut),
+    );
+
+    // 2. Ghi giao dịch nhập quỹ vào Ban Công Nghệ (type: 'IN')
+    const inRow = await this.prisma.$queryRawUnsafe<any[]>(
+      `INSERT INTO public.financial_report_rows (
+        id, transaction_date, voucher_no, category, description,
+        income_amount, expense_amount, balance_after, party_name, status,
+        custom_data, created_at, updated_at
+      ) VALUES (
+        gen_random_uuid(), $1::date, $2, 'Kinh phí cấp từ Quỹ Tổng', $3,
+        $4, 0, 0, $5, 'completed',
+        $6::jsonb, NOW(), NOW()
+      ) RETURNING *`,
+      txDate,
+      voucherIn,
+      `[THU TIẾP NHẬN] ${data.description} (Nhận từ ${fromDept})`,
+      amount,
+      fromDept,
+      JSON.stringify(customDataIn),
+    );
+
+    return {
+      success: true,
+      message: `Đã điều chuyển ${amount.toLocaleString('vi-VN')} đ từ ${fromDept} về quỹ của ${toDept} thành công!`,
+      outTransaction: outRow[0],
+      inTransaction: inRow[0],
+    };
   }
 }

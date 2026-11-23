@@ -13,38 +13,21 @@ export class PrismaService
   private readonly logger = new Logger(PrismaService.name);
 
   constructor() {
-    const isTestEnv =
-      process.env.APP_ENV === 'test' ||
-      process.env.NODE_ENV === 'test' ||
-      process.env.RUN_ENV === 'test';
-
-    const testDbUrl =
-      process.env.TEST_DATABASE_URL ||
-      'postgresql://app1:5^S0CEpvYwC1(#YN1UoJ@113.20.107.184:6432/ceohn10_project_test?pgbouncer=true';
-
-    const prodDbUrl =
+    const standardDbUrl =
       process.env.DATABASE_URL ||
-      'postgresql://app1:5^S0CEpvYwC1(#YN1UoJ@113.20.107.184:6432/ceohn10_project?pgbouncer=true';
-
-    const activeDbUrl = isTestEnv ? testDbUrl : prodDbUrl;
+      'postgresql://app1:5%5ES0CEpvYwC1%28%23YN1UoJ@127.0.0.1:5432/ceohn10_project';
 
     super({
       datasources: {
         db: {
-          url: activeDbUrl,
+          url: standardDbUrl,
         },
       },
     });
 
-    if (isTestEnv) {
-      this.logger.warn(
-        `🧪 [PrismaService] Đang kích hoạt môi trường TEST với CSDL Test riêng biệt: ${activeDbUrl.replace(/:[^:@]+@/, ':***@')}`,
-      );
-    } else {
-      this.logger.log(
-        `🚀 [PrismaService] Đang kích hoạt môi trường PRODUCT với CSDL Sản phẩm chuẩn mực: 113.20.107.184:6432/ceohn10_project`,
-      );
-    }
+    this.logger.log(
+      `🚀 [PrismaService] Đang kết nối CSDL: ${standardDbUrl.includes('127.0.0.1') || standardDbUrl.includes('localhost') ? 'Localhost 127.0.0.1:5432 (Local thuần)' : '113.20.107.184:6432/ceohn10_project'}`,
+    );
   }
 
   async onModuleInit() {

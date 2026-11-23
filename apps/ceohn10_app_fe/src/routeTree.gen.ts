@@ -119,6 +119,7 @@ import { Route as MCardRouteImport } from './routes/m.card'
 import { Route as MBusinessCardsRouteImport } from './routes/m.business-cards'
 import { Route as LandingSlugRouteImport } from './routes/landing.$slug'
 import { Route as HSlugRouteImport } from './routes/h.$slug'
+import { Route as GuestVotingPollIdRouteImport } from './routes/guest-voting.$pollId'
 import { Route as GuestEventRegisterEventIdRouteImport } from './routes/guest-event-register.$eventId'
 import { Route as GuestEventFeedbackEventIdRouteImport } from './routes/guest-event-feedback.$eventId'
 import { Route as FeesInvoiceIdRouteImport } from './routes/fees.$invoiceId'
@@ -189,6 +190,7 @@ import { Route as AdminDemoLeadsRouteImport } from './routes/admin.demo-leads'
 import { Route as AdminCtaAnalyticsRouteImport } from './routes/admin.cta-analytics'
 import { Route as AdminBusinessCardsRouteImport } from './routes/admin.business-cards'
 import { Route as AccountSettingsNotificationsRouteImport } from './routes/account-settings.notifications'
+import { Route as AssociationIndexLegacyRouteImport } from './routes/association.index.legacy'
 import { Route as MRenewIndexRouteImport } from './routes/m.renew.index'
 import { Route as MPerksIndexRouteImport } from './routes/m.perks.index'
 import { Route as ConnectNetworkIndexRouteImport } from './routes/connect.network.index'
@@ -818,6 +820,11 @@ const HSlugRoute = HSlugRouteImport.update({
   path: '/h/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const GuestVotingPollIdRoute = GuestVotingPollIdRouteImport.update({
+  id: '/guest-voting/$pollId',
+  path: '/guest-voting/$pollId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const GuestEventRegisterEventIdRoute =
   GuestEventRegisterEventIdRouteImport.update({
     id: '/guest-event-register/$eventId',
@@ -1178,6 +1185,11 @@ const AccountSettingsNotificationsRoute =
     path: '/notifications',
     getParentRoute: () => AccountSettingsRoute,
   } as any)
+const AssociationIndexLegacyRoute = AssociationIndexLegacyRouteImport.update({
+  id: '/index/legacy',
+  path: '/index/legacy',
+  getParentRoute: () => AssociationRoute,
+} as any)
 const MRenewIndexRoute = MRenewIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -1738,6 +1750,7 @@ export interface FileRoutesByFullPath {
   '/fees/$invoiceId': typeof FeesInvoiceIdRoute
   '/guest-event-feedback/$eventId': typeof GuestEventFeedbackEventIdRoute
   '/guest-event-register/$eventId': typeof GuestEventRegisterEventIdRoute
+  '/guest-voting/$pollId': typeof GuestVotingPollIdRoute
   '/h/$slug': typeof HSlugRoute
   '/landing/$slug': typeof LandingSlugRoute
   '/m/business-cards': typeof MBusinessCardsRoute
@@ -1840,6 +1853,7 @@ export interface FileRoutesByFullPath {
   '/connect/network/': typeof ConnectNetworkIndexRoute
   '/m/perks/': typeof MPerksIndexRoute
   '/m/renew/': typeof MRenewIndexRoute
+  '/association/index/legacy': typeof AssociationIndexLegacyRoute
   '/api/public/card/{$slug}.vcf': typeof ApiPublicCardChar123slugChar125DotvcfRoute
   '/api/public/hooks/notification-runtime': typeof ApiPublicHooksNotificationRuntimeRoute
   '/api/public/hooks/outcome-consumer': typeof ApiPublicHooksOutcomeConsumerRoute
@@ -1973,6 +1987,7 @@ export interface FileRoutesByTo {
   '/fees/$invoiceId': typeof FeesInvoiceIdRoute
   '/guest-event-feedback/$eventId': typeof GuestEventFeedbackEventIdRoute
   '/guest-event-register/$eventId': typeof GuestEventRegisterEventIdRoute
+  '/guest-voting/$pollId': typeof GuestVotingPollIdRoute
   '/h/$slug': typeof HSlugRoute
   '/landing/$slug': typeof LandingSlugRoute
   '/m/business-cards': typeof MBusinessCardsRoute
@@ -2072,6 +2087,7 @@ export interface FileRoutesByTo {
   '/connect/network': typeof ConnectNetworkIndexRoute
   '/m/perks': typeof MPerksIndexRoute
   '/m/renew': typeof MRenewIndexRoute
+  '/association/index/legacy': typeof AssociationIndexLegacyRoute
   '/api/public/card/{$slug}.vcf': typeof ApiPublicCardChar123slugChar125DotvcfRoute
   '/api/public/hooks/notification-runtime': typeof ApiPublicHooksNotificationRuntimeRoute
   '/api/public/hooks/outcome-consumer': typeof ApiPublicHooksOutcomeConsumerRoute
@@ -2226,6 +2242,7 @@ export interface FileRoutesById {
   '/fees/$invoiceId': typeof FeesInvoiceIdRoute
   '/guest-event-feedback/$eventId': typeof GuestEventFeedbackEventIdRoute
   '/guest-event-register/$eventId': typeof GuestEventRegisterEventIdRoute
+  '/guest-voting/$pollId': typeof GuestVotingPollIdRoute
   '/h/$slug': typeof HSlugRoute
   '/landing/$slug': typeof LandingSlugRoute
   '/m/business-cards': typeof MBusinessCardsRoute
@@ -2328,6 +2345,7 @@ export interface FileRoutesById {
   '/connect/network/': typeof ConnectNetworkIndexRoute
   '/m/perks/': typeof MPerksIndexRoute
   '/m/renew/': typeof MRenewIndexRoute
+  '/association/index/legacy': typeof AssociationIndexLegacyRoute
   '/api/public/card/{$slug}.vcf': typeof ApiPublicCardChar123slugChar125DotvcfRoute
   '/api/public/hooks/notification-runtime': typeof ApiPublicHooksNotificationRuntimeRoute
   '/api/public/hooks/outcome-consumer': typeof ApiPublicHooksOutcomeConsumerRoute
@@ -2487,6 +2505,7 @@ export interface FileRouteTypes {
     | '/fees/$invoiceId'
     | '/guest-event-feedback/$eventId'
     | '/guest-event-register/$eventId'
+    | '/guest-voting/$pollId'
     | '/h/$slug'
     | '/landing/$slug'
     | '/m/business-cards'
@@ -2589,6 +2608,7 @@ export interface FileRouteTypes {
     | '/connect/network/'
     | '/m/perks/'
     | '/m/renew/'
+    | '/association/index/legacy'
     | '/api/public/card/{$slug}.vcf'
     | '/api/public/hooks/notification-runtime'
     | '/api/public/hooks/outcome-consumer'
@@ -2722,6 +2742,7 @@ export interface FileRouteTypes {
     | '/fees/$invoiceId'
     | '/guest-event-feedback/$eventId'
     | '/guest-event-register/$eventId'
+    | '/guest-voting/$pollId'
     | '/h/$slug'
     | '/landing/$slug'
     | '/m/business-cards'
@@ -2821,6 +2842,7 @@ export interface FileRouteTypes {
     | '/connect/network'
     | '/m/perks'
     | '/m/renew'
+    | '/association/index/legacy'
     | '/api/public/card/{$slug}.vcf'
     | '/api/public/hooks/notification-runtime'
     | '/api/public/hooks/outcome-consumer'
@@ -2974,6 +2996,7 @@ export interface FileRouteTypes {
     | '/fees/$invoiceId'
     | '/guest-event-feedback/$eventId'
     | '/guest-event-register/$eventId'
+    | '/guest-voting/$pollId'
     | '/h/$slug'
     | '/landing/$slug'
     | '/m/business-cards'
@@ -3076,6 +3099,7 @@ export interface FileRouteTypes {
     | '/connect/network/'
     | '/m/perks/'
     | '/m/renew/'
+    | '/association/index/legacy'
     | '/api/public/card/{$slug}.vcf'
     | '/api/public/hooks/notification-runtime'
     | '/api/public/hooks/outcome-consumer'
@@ -3178,6 +3202,7 @@ export interface RootRouteChildren {
   CompanySlugRoute: typeof CompanySlugRoute
   GuestEventFeedbackEventIdRoute: typeof GuestEventFeedbackEventIdRoute
   GuestEventRegisterEventIdRoute: typeof GuestEventRegisterEventIdRoute
+  GuestVotingPollIdRoute: typeof GuestVotingPollIdRoute
   HSlugRoute: typeof HSlugRoute
   MembersMemberIdRoute: typeof MembersMemberIdRoute
   PlatformAdminsRoute: typeof PlatformAdminsRoute
@@ -3975,6 +4000,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/guest-voting/$pollId': {
+      id: '/guest-voting/$pollId'
+      path: '/guest-voting/$pollId'
+      fullPath: '/guest-voting/$pollId'
+      preLoaderRoute: typeof GuestVotingPollIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/guest-event-register/$eventId': {
       id: '/guest-event-register/$eventId'
       path: '/guest-event-register/$eventId'
@@ -4464,6 +4496,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/account-settings/notifications'
       preLoaderRoute: typeof AccountSettingsNotificationsRouteImport
       parentRoute: typeof AccountSettingsRoute
+    }
+    '/association/index/legacy': {
+      id: '/association/index/legacy'
+      path: '/index/legacy'
+      fullPath: '/association/index/legacy'
+      preLoaderRoute: typeof AssociationIndexLegacyRouteImport
+      parentRoute: typeof AssociationRoute
     }
     '/m/renew/': {
       id: '/m/renew/'
@@ -5096,6 +5135,7 @@ interface AssociationRouteChildren {
   AssociationTrainingsRoute: typeof AssociationTrainingsRoute
   AssociationVotingRoute: typeof AssociationVotingRoute
   AssociationIndexRoute: typeof AssociationIndexRoute
+  AssociationIndexLegacyRoute: typeof AssociationIndexLegacyRoute
 }
 
 const AssociationRouteChildren: AssociationRouteChildren = {
@@ -5129,6 +5169,7 @@ const AssociationRouteChildren: AssociationRouteChildren = {
   AssociationTrainingsRoute: AssociationTrainingsRoute,
   AssociationVotingRoute: AssociationVotingRoute,
   AssociationIndexRoute: AssociationIndexRoute,
+  AssociationIndexLegacyRoute: AssociationIndexLegacyRoute,
 }
 
 const AssociationRouteWithChildren = AssociationRoute._addFileChildren(
@@ -5772,6 +5813,7 @@ const rootRouteChildren: RootRouteChildren = {
   CompanySlugRoute: CompanySlugRoute,
   GuestEventFeedbackEventIdRoute: GuestEventFeedbackEventIdRoute,
   GuestEventRegisterEventIdRoute: GuestEventRegisterEventIdRoute,
+  GuestVotingPollIdRoute: GuestVotingPollIdRoute,
   HSlugRoute: HSlugRoute,
   MembersMemberIdRoute: MembersMemberIdRoute,
   PlatformAdminsRoute: PlatformAdminsRoute,

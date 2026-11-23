@@ -1021,68 +1021,40 @@ export function CinemaSeatingMap({
           <div>
             <h4 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white leading-tight">
               {mode === "dynamic"
-                ? "Sơ đồ Ghế Tự Do (Dynamic Drag & Drop)"
-                : mode === "cinema"
-                  ? "Sơ đồ Ghế Hội Trường (Hàng Ngang)"
-                  : mode === "zones"
-                    ? "Sơ đồ Chia Khu (Hình Vuông & Hình Chữ Nhật)"
-                    : "Sơ đồ Bàn Tiệc Gala (Banquet)"}
+                ? "Sơ đồ Ghế Di Chuyển Chỗ Tùy Thích (Movable Seats Studio)"
+                : "Sơ đồ Bàn Tròn Tiệc Di Chuyển Tùy Thích (Movable Banquet Round Tables)"}
             </h4>
             <p className="text-[11px] text-slate-500 dark:text-slate-400">
               {mode === "dynamic"
-                ? "Di chuyển ghế tự do như icon ứng dụng trên điện thoại · Hiện tên, chức danh, mã số, SĐT"
-                : mode === "cinema"
-                  ? "Hàng VIP & Ghế Tiêu Chuẩn · Di chuyển ghế & Hoán đổi linh hoạt"
-                  : mode === "zones"
-                    ? "Phân khu ma trận hình chữ nhật & vuông cụ thể · Tùy chỉnh hàng x cột"
-                    : "Bàn tiệc tròn, vuông & chữ nhật · Kéo thả sắp xếp đại biểu"}
+                ? "Kéo thả di chuyển ghế tùy ý như icon điện thoại · Hoán đổi chỗ ngồi & hiển thị tên, doanh nghiệp đại biểu"
+                : "Sắp xếp bàn tiệc tròn di chuyển tùy thích · Hoán đổi chỗ ngồi 8-10 khách/bàn thuận tiện"}
             </p>
           </div>
         </div>
 
         {/* Action buttons: Switcher 4 Tabs, + Thêm, Reset */}
         <div className="flex flex-wrap items-center gap-2">
-          {/* Mode Switcher 4 Tabs */}
+          {/* Mode Switcher: Chỉ giữ 2 bản di chuyển chỗ tùy thích */}
           <div className="inline-flex rounded-xl bg-slate-200/70 dark:bg-slate-800 p-0.5 text-xs font-semibold">
             <button
               type="button"
               onClick={() => setMode("dynamic")}
-              className={`px-2.5 sm:px-3 py-1.5 rounded-lg transition-all cursor-pointer ${mode === "dynamic"
+              className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${mode === "dynamic"
                   ? "bg-white dark:bg-slate-900 text-[#003B95] dark:text-amber-400 shadow-xs font-bold"
                   : "text-slate-600 dark:text-slate-400 hover:text-slate-900"
                 }`}
             >
-              Tự Do (Dynamic)
-            </button>
-            <button
-              type="button"
-              onClick={() => setMode("cinema")}
-              className={`px-2.5 sm:px-3 py-1.5 rounded-lg transition-all cursor-pointer ${mode === "cinema"
-                  ? "bg-white dark:bg-slate-900 text-[#003B95] dark:text-amber-400 shadow-xs font-bold"
-                  : "text-slate-600 dark:text-slate-400 hover:text-slate-900"
-                }`}
-            >
-              Hội Trường
-            </button>
-            <button
-              type="button"
-              onClick={() => setMode("zones")}
-              className={`px-2.5 sm:px-3 py-1.5 rounded-lg transition-all cursor-pointer ${mode === "zones"
-                  ? "bg-white dark:bg-slate-900 text-[#003B95] dark:text-amber-400 shadow-xs font-bold"
-                  : "text-slate-600 dark:text-slate-400 hover:text-slate-900"
-                }`}
-            >
-              Chia Khu (Vuông / Chữ Nhật)
+              Ghế Di Chuyển Tùy Thích
             </button>
             <button
               type="button"
               onClick={() => setMode("banquet")}
-              className={`px-2.5 sm:px-3 py-1.5 rounded-lg transition-all cursor-pointer ${mode === "banquet"
+              className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${mode === "banquet"
                   ? "bg-white dark:bg-slate-900 text-[#003B95] dark:text-amber-400 shadow-xs font-bold"
                   : "text-slate-600 dark:text-slate-400 hover:text-slate-900"
                 }`}
             >
-              Bàn Tiệc Gala
+              Sơ Đồ Bàn Tròn Tiệc Di Chuyển
             </button>
           </div>
 

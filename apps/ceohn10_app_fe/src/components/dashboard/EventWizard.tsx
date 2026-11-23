@@ -71,7 +71,7 @@ import { VndCurrencyInput, parseVndNumber } from "@/components/dashboard/VndCurr
 import { StandardDateInput, formatToDdmmyyyy } from "@/components/common/StandardDateInput";
 import { GoogleMapAddressPicker } from "@/components/common/GoogleMapAddressPicker";
 
-const TYPE_OPTS: EventType[] = ["forum", "workshop", "networking", "training", "charity"];
+const TYPE_OPTS: EventType[] = ["khai_giang", "year_end_party", "teambuilding", "be_giang", "charity"];
 const STATUS_OPTS: EventStatus[] = ["upcoming", "ongoing", "completed", "cancelled"];
 
 export function EventWizard({
@@ -112,7 +112,7 @@ function EventWizardDialog({
       document.body.style.overflow = prev;
     };
   }, []);
-  const defaultTpl = EVENT_TYPE_TEMPLATES[(initialType as EventTypeKey) || "forum"] || EVENT_TYPE_TEMPLATES.forum;
+  const defaultTpl = EVENT_TYPE_TEMPLATES[(initialType as EventTypeKey) || "khai_giang"] || EVENT_TYPE_TEMPLATES.khai_giang;
 
   const [step, setStep] = useState<0 | 1 | 2 | 3>(0);
   const [createdEvent, setCreatedEvent] = useState<EventItem | null>(null);
@@ -125,7 +125,7 @@ function EventWizardDialog({
     endTime: "11:30",
     location: initialType === "charity" ? defaultTpl.defaultLocation : "",
     capacity: initialType === "charity" ? defaultTpl.defaultCapacity : "",
-    type: initialType || "forum",
+    type: initialType || "khai_giang",
     status: "upcoming",
     imageUrl: defaultTpl.bgImage,
     description: initialType === "charity" ? defaultTpl.description : "",
@@ -149,7 +149,7 @@ function EventWizardDialog({
       endTime: "11:30",
       location: "",
       capacity: "",
-      type: "forum",
+      type: "khai_giang",
       status: "upcoming",
       imageUrl: defaultTpl.bgImage,
       description: "",
@@ -612,7 +612,7 @@ function InfoStep({
           Chọn loại sự kiện (Tự động áp dụng bố cục nội dung & banner đặc thù)
         </label>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-          {(["forum", "workshop", "networking", "training", "charity"] as EventTypeKey[]).map((key) => {
+          {(["khai_giang", "year_end_party", "teambuilding", "be_giang", "charity"] as EventTypeKey[]).map((key) => {
             const tpl = EVENT_TYPE_TEMPLATES[key];
             const isSelected = info.type === key;
             return (
@@ -1033,10 +1033,10 @@ function InfoStep({
         />
       </div>
 
-      {/* MULTISELECT 2: Chọn nhà tài trợ & Gói đồng hành đi kèm */}
+      {/* MULTISELECT 2: Chọn nhà tài trợ đồng hành */}
       <div className="pt-3 border-t border-border">
         <label className="mb-2 block text-xs font-semibold text-foreground">
-          Nhà tài trợ & Gói tài trợ đồng hành đi kèm
+          Nhà tài trợ đồng hành
         </label>
         <EventSponsorPackageSelector
           value={info.sponsors}

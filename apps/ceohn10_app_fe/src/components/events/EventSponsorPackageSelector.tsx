@@ -1,90 +1,22 @@
 import { useEffect, useState, useMemo } from "react";
 import {
   Award,
-  CalendarDays,
   Check,
   CheckSquare,
   Gift,
   Search,
-  Sparkles,
   Square,
   Trash2,
   Building2,
   DollarSign,
   Layers,
-  X,
+  Sparkles,
 } from "lucide-react";
 import { fetchNestApi } from "@/lib/api-client";
 import { type EventSponsorItem } from "@/lib/events.functions";
-import { type Sponsor, type SponsorPackage } from "@/lib/sponsors.functions";
+import { type Sponsor } from "@/lib/sponsors.functions";
 import { useFmt } from "@/lib/i18n";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-
-const TIER_META: Record<
-  string,
-  {
-    name: string;
-    icon: string;
-    bg: string;
-    text: string;
-    border: string;
-    badgeBg: string;
-    cardBorder: string;
-    gradient: string;
-  }
-> = {
-  platinum: {
-    name: "Kim Cương (Platinum)",
-    icon: "💎",
-    bg: "bg-sky-500/10",
-    text: "text-black font-bold",
-    border: "border-sky-500/30",
-    badgeBg: "bg-sky-500/15",
-    cardBorder: "border-sky-500/40",
-    gradient: "from-sky-500/10 via-indigo-500/5 to-transparent",
-  },
-  gold: {
-    name: "Vàng (Gold)",
-    icon: "🥇",
-    bg: "bg-amber-500/10",
-    text: "text-black font-bold",
-    border: "border-amber-500/30",
-    badgeBg: "bg-amber-500/15",
-    cardBorder: "border-amber-500/40",
-    gradient: "from-amber-500/10 via-yellow-500/5 to-transparent",
-  },
-  silver: {
-    name: "Bạc (Silver)",
-    icon: "🥈",
-    bg: "bg-zinc-500/10",
-    text: "text-black font-bold",
-    border: "border-zinc-500/30",
-    badgeBg: "bg-zinc-500/15",
-    cardBorder: "border-zinc-500/40",
-    gradient: "from-zinc-500/10 via-slate-500/5 to-transparent",
-  },
-  bronze: {
-    name: "Đồng (Bronze)",
-    icon: "🥉",
-    bg: "bg-orange-500/10",
-    text: "text-black font-bold",
-    border: "border-orange-500/30",
-    badgeBg: "bg-orange-500/15",
-    cardBorder: "border-orange-500/40",
-    gradient: "from-orange-500/10 via-amber-700/5 to-transparent",
-  },
-};
-
-const DEFAULT_TIER = {
-  name: "Đồng hành",
-  icon: "⭐",
-  bg: "bg-primary/10",
-  text: "text-black font-bold",
-  border: "border-primary/30",
-  badgeBg: "bg-primary/15",
-  cardBorder: "border-primary/40",
-  gradient: "from-primary/10 to-transparent",
-};
 
 export function EventSponsorPackageSelector({
   value = [],
@@ -96,31 +28,22 @@ export function EventSponsorPackageSelector({
 }) {
   const fmt = useFmt();
   const [sponsorsList, setSponsorsList] = useState<Sponsor[]>([]);
-  const [packagesList, setPackagesList] = useState<SponsorPackage[]>([]);
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState("");
-  const [filterTier, setFilterTier] = useState<string>("all");
+  const [filterType, setFilterType] = useState<string>("all");
 
   useEffect(() => {
     let active = true;
     async function loadData() {
       try {
-        const [sponsorsRes, packagesRes] = await Promise.all([
-          fetchNestApi<Sponsor[]>("/sponsors").catch(() => []),
-          fetchNestApi<SponsorPackage[]>("/sponsors/packages").catch(() => []),
-        ]);
+        const sponsorsRes = await fetchNestApi<Sponsor[]>("/sponsors").catch(() => []);
         if (active) {
           const validSponsors = Array.isArray(sponsorsRes) ? sponsorsRes : [];
-          const validPackages = Array.isArray(packagesRes) ? packagesRes : [];
           setSponsorsList(validSponsors);
-          setPackagesList(validPackages);
         }
       } catch (err) {
         console.error("[EventSponsorPackageSelector] Load error:", err);
-        if (active) {
-          setSponsorsList([]);
-          setPackagesList([]);
-        }
+        if (active) setSponsorsList([]);
       } finally {
         if (active) setLoading(false);
       }
@@ -137,25 +60,18 @@ export function EventSponsorPackageSelector({
   const filteredSponsors = useMemo(() => {
     const q = query.trim().toLowerCase();
     return sponsorsList.filter((s) => {
-      if (filterTier !== "all" && s.tier !== filterTier) return false;
+      const pType = s.packageType || "bank_transfer";
+      if (filterType !== "all" && pType !== filterType) return false;
       if (!q) return true;
       return (
         s.name.toLowerCase().includes(q) ||
         (s.contact && s.contact.toLowerCase().includes(q)) ||
         (s.email && s.email.toLowerCase().includes(q)) ||
+        (s.phone && s.phone.toLowerCase().includes(q)) ||
         (s.inKindDescription && s.inKindDescription.toLowerCase().includes(q))
       );
     });
-  }, [sponsorsList, query, filterTier]);
-
-  // Find the best matching package for a sponsor
-  const findMatchingPackage = (s: Sponsor) => {
-    const matched =
-      packagesList.find((p) => p.tier === s.tier && p.packageType === s.packageType) ||
-      packagesList.find((p) => p.tier === s.tier) ||
-      packagesList[0];
-    return matched;
-  };
+  }, [sponsorsList, query, filterType]);
 
   // Toggle selection for a sponsor (Multi-select)
   const handleToggleSponsor = (s: Sponsor) => {
@@ -167,59 +83,27 @@ export function EventSponsorPackageSelector({
       // Remove from selected list
       onChange(safeSelected.filter((_, idx) => idx !== existingIndex));
     } else {
-      // Add with their designated sponsorship package
-      const matchedPkg = findMatchingPackage(s);
-      const tierMeta = TIER_META[s.tier] || DEFAULT_TIER;
-
+      // Add sponsor directly without package tier constraints
       const newItem: EventSponsorItem = {
         sponsorId: s.id,
         sponsorName: s.name,
-        packageId: matchedPkg?.id,
-        packageName: matchedPkg
-          ? `${(TIER_META[matchedPkg.tier] || DEFAULT_TIER).name} - ${
-              matchedPkg.packageType === "in_kind"
-                ? "Hiện vật"
-                : matchedPkg.packageType === "cash"
-                ? "Tiền mặt"
-                : "Chuyển khoản"
-            }`
-          : tierMeta.name,
-        tier: (matchedPkg?.tier || s.tier) as any,
-        packageType: (matchedPkg?.packageType || s.packageType || "bank_transfer") as any,
-        amount: Number(matchedPkg?.price ?? s.amount ?? 0),
-        inKindDescription: s.inKindDescription || matchedPkg?.inKindDescription || "",
-        benefits: matchedPkg?.benefits || [],
+        packageType: (s.packageType || "bank_transfer") as any,
+        amount: Number(s.amount ?? 0),
+        inKindDescription: s.inKindDescription || "",
       };
       onChange([...safeSelected, newItem]);
     }
   };
 
-  // Change sponsorship package for a selected sponsor
-  const handleSwitchPackage = (sponsorId: string, packageId: string) => {
-    const pkg = packagesList.find((p) => p.id === packageId);
-    if (!pkg) return;
-
-    const tierMeta = TIER_META[pkg.tier] || DEFAULT_TIER;
-
+  // Update sponsor payment type (bank_transfer, cash, in_kind)
+  const handleUpdatePackageType = (
+    sponsorId: string,
+    pType: "bank_transfer" | "cash" | "in_kind"
+  ) => {
     onChange(
       safeSelected.map((item) => {
         if (item.sponsorId !== sponsorId) return item;
-        return {
-          ...item,
-          packageId: pkg.id,
-          packageName: `${tierMeta.name} - ${
-            pkg.packageType === "in_kind"
-              ? "Hiện vật"
-              : pkg.packageType === "cash"
-              ? "Tiền mặt"
-              : "Chuyển khoản"
-          }`,
-          tier: pkg.tier as any,
-          packageType: pkg.packageType,
-          amount: Number(pkg.price || 0),
-          inKindDescription: pkg.inKindDescription || item.inKindDescription || "",
-          benefits: pkg.benefits || [],
-        };
+        return { ...item, packageType: pType };
       })
     );
   };
@@ -234,7 +118,7 @@ export function EventSponsorPackageSelector({
     );
   };
 
-  // Update custom amount if negotiated
+  // Update custom amount
   const handleUpdateAmount = (sponsorId: string, amount: number) => {
     onChange(
       safeSelected.map((item) => {
@@ -252,33 +136,17 @@ export function EventSponsorPackageSelector({
   // Select all available sponsors
   const handleSelectAllAvailable = () => {
     const newItems: EventSponsorItem[] = [];
-
-    // Keep existing
     const existingIds = new Set(safeSelected.map((i) => i.sponsorId));
     newItems.push(...safeSelected);
 
     for (const s of filteredSponsors) {
       if (!existingIds.has(s.id)) {
-        const matchedPkg = findMatchingPackage(s);
-        const tierMeta = TIER_META[s.tier] || DEFAULT_TIER;
         newItems.push({
           sponsorId: s.id,
           sponsorName: s.name,
-          packageId: matchedPkg?.id,
-          packageName: matchedPkg
-            ? `${(TIER_META[matchedPkg.tier] || DEFAULT_TIER).name} - ${
-                matchedPkg.packageType === "in_kind"
-                  ? "Hiện vật"
-                  : matchedPkg.packageType === "cash"
-                  ? "Tiền mặt"
-                  : "Chuyển khoản"
-              }`
-            : tierMeta.name,
-          tier: (matchedPkg?.tier || s.tier) as any,
-          packageType: (matchedPkg?.packageType || s.packageType || "bank_transfer") as any,
-          amount: Number(matchedPkg?.price ?? s.amount ?? 0),
-          inKindDescription: s.inKindDescription || matchedPkg?.inKindDescription || "",
-          benefits: matchedPkg?.benefits || [],
+          packageType: (s.packageType || "bank_transfer") as any,
+          amount: Number(s.amount ?? 0),
+          inKindDescription: s.inKindDescription || "",
         });
       }
     }
@@ -314,14 +182,14 @@ export function EventSponsorPackageSelector({
             <div>
               <div className="flex items-center gap-2">
                 <h4 className="text-sm font-bold text-foreground">
-                  Nhà tài trợ & Gói đồng hành
+                  Nhà tài trợ đồng hành
                 </h4>
                 {safeSelected.length > 1 ? (
                   <TooltipProvider delayDuration={100}>
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary/15 text-primary border border-primary/30 text-xs font-bold cursor-help hover:bg-primary/25 transition">
-                          {safeSelected.length} nhà tài trợ (Rê chuột xem tất cả)
+                          {safeSelected.length} nhà tài trợ (Rê chuột xem danh sách)
                         </span>
                       </TooltipTrigger>
                       <TooltipContent side="top" className="z-[80] max-w-sm rounded-xl border border-border bg-popover p-3 text-popover-foreground shadow-2xl">
@@ -329,19 +197,16 @@ export function EventSponsorPackageSelector({
                           Danh sách {safeSelected.length} nhà tài trợ đã chọn:
                         </div>
                         <ul className="text-xs space-y-1.5 max-h-48 overflow-y-auto">
-                          {safeSelected.map((item, idx) => {
-                            const meta = TIER_META[item.tier || "bronze"] || DEFAULT_TIER;
-                            return (
-                              <li key={item.sponsorId} className="flex items-center justify-between gap-2">
-                                <span className="font-semibold text-foreground truncate">
-                                  {idx + 1}. {item.sponsorName}
-                                </span>
-                                <span className={`text-[10px] font-bold shrink-0 ${meta.text}`}>
-                                  {meta.name} ({fmt.money(item.amount || 0)})
-                                </span>
-                              </li>
-                            );
-                          })}
+                          {safeSelected.map((item, idx) => (
+                            <li key={item.sponsorId} className="flex items-center justify-between gap-2">
+                              <span className="font-semibold text-foreground truncate">
+                                {idx + 1}. {item.sponsorName}
+                              </span>
+                              <span className="text-[10px] font-bold text-primary shrink-0">
+                                {fmt.money(item.amount || 0)}
+                              </span>
+                            </li>
+                          ))}
                         </ul>
                       </TooltipContent>
                     </Tooltip>
@@ -353,7 +218,7 @@ export function EventSponsorPackageSelector({
                 )}
               </div>
               <p className="text-[11px] text-muted-foreground mt-0.5">
-                Chọn các nhà tài trợ bên dưới; gói tài trợ của từng nhà tài trợ sẽ xuất hiện ngay tại popup
+                Chọn các nhà tài trợ bên dưới để tham gia đồng hành cùng sự kiện
               </p>
             </div>
           </div>
@@ -376,12 +241,12 @@ export function EventSponsorPackageSelector({
         )}
       </div>
 
-      {/* 1. SECTION: GÓI TÀI TRỢ HIỂN THỊ TRỰC TIẾP TẠI POPUP (KHI ĐÃ CHỌN NHÀ TÀI TRỢ) */}
+      {/* 1. SECTION: DANH SÁCH NHÀ TÀI TRỢ ĐÃ CHỌN CHO SỰ KIỆN */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-foreground">
             <Sparkles className="h-3.5 w-3.5 text-amber-500" />
-            <span>Gói tài trợ đi kèm cho sự kiện này ({safeSelected.length})</span>
+            <span>Nhà tài trợ đã chọn cho sự kiện này ({safeSelected.length})</span>
           </div>
           {safeSelected.length > 0 && (
             <button
@@ -403,43 +268,35 @@ export function EventSponsorPackageSelector({
               Chưa chọn nhà tài trợ nào cho sự kiện
             </p>
             <p className="text-[11px] text-muted-foreground mt-0.5 max-w-md mx-auto">
-              Hãy tick chọn nhà tài trợ ở danh sách bên dưới. Gói tài trợ tương ứng sẽ được tự động hiển thị trực quan ngay tại đây.
+              Hãy tick chọn nhà tài trợ ở danh sách bên dưới để thêm vào sự kiện.
             </p>
           </div>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-2.5">
             {safeSelected.map((item) => {
-              const tierKey = item.tier || "bronze";
-              const meta = TIER_META[tierKey] || DEFAULT_TIER;
               const originalSponsor = sponsorsList.find((s) => s.id === item.sponsorId);
+              const pType = item.packageType || "bank_transfer";
 
               return (
                 <div
                   key={item.sponsorId}
-                  className={`rounded-xl border ${meta.cardBorder} bg-gradient-to-r ${meta.gradient} p-3.5 shadow-xs transition-all`}
+                  className="rounded-xl border border-blue-500/20 bg-blue-50/30 dark:bg-blue-950/20 p-3 shadow-xs transition-all space-y-2.5"
                 >
                   {/* Sponsor Header */}
-                  <div className="flex items-start justify-between gap-3 pb-2.5 border-b border-border/60">
+                  <div className="flex items-start justify-between gap-3 pb-2 border-b border-border/60">
                     <div className="flex items-center gap-2.5 min-w-0 flex-1">
-                      <div
-                        className={`grid h-9 w-9 place-items-center rounded-xl border text-sm font-bold shrink-0 ${meta.bg} ${meta.text} ${meta.border}`}
-                      >
-                        {meta.icon}
+                      <div className="grid h-8 w-8 place-items-center rounded-lg bg-[#003B95]/10 text-[#003B95] dark:text-blue-400 shrink-0 font-bold text-xs">
+                        <Building2 className="h-4 w-4" />
                       </div>
                       <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <h5 className="font-bold text-sm text-foreground truncate" title={item.sponsorName}>
-                            {item.sponsorName}
-                          </h5>
-                          <span
-                            className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wider border ${meta.badgeBg} ${meta.text} ${meta.border}`}
-                          >
-                            {meta.name}
-                          </span>
-                        </div>
+                        <h5 className="font-bold text-sm text-foreground truncate" title={item.sponsorName}>
+                          {item.sponsorName}
+                        </h5>
                         {originalSponsor?.contact && (
-                          <p className="text-[11px] text-muted-foreground truncate mt-0.5">
-                            {originalSponsor.contact} • {originalSponsor.phone || originalSponsor.email}
+                          <p className="text-[11px] text-muted-foreground truncate">
+                            Đại diện: {originalSponsor.contact}
+                            {originalSponsor.phone ? ` • ${originalSponsor.phone}` : ""}
+                            {originalSponsor.email ? ` • ${originalSponsor.email}` : ""}
                           </p>
                         )}
                       </div>
@@ -448,128 +305,78 @@ export function EventSponsorPackageSelector({
                     <button
                       type="button"
                       onClick={() => handleRemove(item.sponsorId)}
-                      className="grid h-8 w-8 place-items-center rounded-lg text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition cursor-pointer shrink-0"
+                      className="grid h-7 w-7 place-items-center rounded-lg text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition cursor-pointer shrink-0"
                       title="Gỡ nhà tài trợ này khỏi sự kiện"
                     >
                       <Trash2 className="h-4 w-4" />
                     </button>
                   </div>
 
-                  {/* Package Details Box (Hiển thị gói tài trợ trực tiếp tại popup) */}
-                  <div className="mt-3 space-y-2.5">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 bg-card/90 rounded-lg p-2.5 border border-border">
-                      <div className="space-y-1 min-w-0 flex-1">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <span className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">
-                            Gói tài trợ:
-                          </span>
-                          <span className="font-bold text-xs text-foreground">
-                            {item.packageName || meta.name}
-                          </span>
-                          <span
-                            className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold ${
-                              item.packageType === "in_kind"
-                                ? "bg-purple-500/15 text-purple-700 dark:text-purple-300"
-                                : item.packageType === "cash"
-                                ? "bg-amber-500/15 text-amber-700 dark:text-amber-300"
-                                : "bg-blue-500/15 text-[#003B95] dark:text-blue-300"
-                            }`}
-                          >
-                            {item.packageType === "in_kind" ? (
-                              <>
-                                <Gift className="h-3 w-3" /> Tài trợ Hiện vật
-                              </>
-                            ) : item.packageType === "cash" ? (
-                              <>
-                                <DollarSign className="h-3 w-3" /> Tài trợ Tiền mặt
-                              </>
-                            ) : (
-                              <>
-                                <DollarSign className="h-3 w-3" /> Chuyển khoản VietQR
-                              </>
-                            )}
-                          </span>
-                        </div>
-
-                        {/* Package benefits list */}
-                        {item.benefits && item.benefits.length > 0 && (
-                          <div className="flex flex-wrap gap-1 mt-1">
-                            {item.benefits.map((b, bIdx) => (
-                              <span
-                                key={bIdx}
-                                className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded bg-secondary/80 text-muted-foreground font-medium"
-                              >
-                                <Check className="h-2.5 w-2.5 text-primary shrink-0" />
-                                <span className="truncate max-w-[240px]">{b}</span>
-                              </span>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Package Switcher Dropdown */}
-                      <div className="shrink-0 flex items-center gap-2">
-                        <label className="text-[10px] font-semibold text-muted-foreground hidden sm:inline">
-                          Đổi gói:
-                        </label>
-                        <select
-                          value={item.packageId || ""}
-                          onChange={(e) => handleSwitchPackage(item.sponsorId, e.target.value)}
-                          className="h-8 rounded-lg border border-border bg-card px-2.5 text-xs font-semibold text-foreground focus:border-ring focus:outline-none cursor-pointer"
-                        >
-                          {packagesList.map((pkg) => {
-                            const pMeta = TIER_META[pkg.tier] || DEFAULT_TIER;
-                            return (
-                              <option key={pkg.id} value={pkg.id}>
-                                {pMeta.icon} {pMeta.name} ({fmt.money(pkg.price)}) -{" "}
-                                {pkg.packageType === "in_kind"
-                                  ? "Hiện vật"
-                                  : pkg.packageType === "cash"
-                                  ? "Tiền mặt"
-                                  : "Chuyển khoản"}
-                              </option>
-                            );
-                          })}
-                        </select>
-                      </div>
+                  {/* Sponsor Details Editor (Hình thức & Giá trị) */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                    {/* Hình thức tài trợ */}
+                    <div className="flex items-center gap-1.5 rounded-lg bg-card border border-border px-2.5 py-1.5">
+                      <span className="text-[11px] font-medium text-muted-foreground shrink-0">
+                        Hình thức:
+                      </span>
+                      <select
+                        value={pType}
+                        onChange={(e) =>
+                          handleUpdatePackageType(
+                            item.sponsorId,
+                            e.target.value as "bank_transfer" | "cash" | "in_kind"
+                          )
+                        }
+                        className="h-6 w-full rounded bg-transparent text-xs font-semibold text-foreground focus:outline-none cursor-pointer"
+                      >
+                        <option value="bank_transfer">Chuyển khoản</option>
+                        <option value="cash">Tiền mặt</option>
+                        <option value="in_kind">Hiện vật</option>
+                      </select>
                     </div>
 
-                    {/* Financial value or in-kind description */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                      <div className="flex items-center gap-2 rounded-lg bg-card/70 border border-border px-3 py-1.5">
-                        <span className="text-[11px] font-medium text-muted-foreground shrink-0">
-                          Giá trị tài trợ:
-                        </span>
+                    {/* Giá trị tài trợ */}
+                    <div className="flex items-center gap-1.5 rounded-lg bg-card border border-border px-2.5 py-1.5">
+                      <span className="text-[11px] font-medium text-muted-foreground shrink-0">
+                        Giá trị:
+                      </span>
+                      <input
+                        type="number"
+                        min={0}
+                        placeholder="0"
+                        value={item.amount || ""}
+                        onFocus={(e) => e.currentTarget.select()}
+                        onChange={(e) =>
+                          handleUpdateAmount(
+                            item.sponsorId,
+                            e.target.value === "" ? 0 : Number(e.target.value) || 0
+                          )
+                        }
+                        className="h-6 w-full rounded bg-transparent text-xs font-bold text-primary focus:outline-none"
+                      />
+                      <span className="text-[11px] font-bold text-primary shrink-0">₫</span>
+                    </div>
+
+                    {/* Mô tả hiện vật nếu có */}
+                    {pType === "in_kind" ? (
+                      <div className="flex items-center gap-1.5 rounded-lg bg-card border border-border px-2.5 py-1.5 sm:col-span-2 lg:col-span-1">
+                        <Gift className="h-3.5 w-3.5 text-purple-600 shrink-0" />
                         <input
-                          type="number"
-                          min={0}
-                          placeholder="0"
-                          value={item.amount || ""}
-                          onFocus={(e) => e.currentTarget.select()}
-                          onChange={(e) => handleUpdateAmount(item.sponsorId, e.target.value === "" ? 0 : Number(e.target.value) || 0)}
-                          className="h-6 w-full rounded bg-transparent text-xs font-bold text-primary focus:outline-none"
+                          type="text"
+                          placeholder="Mô tả hiện vật tài trợ..."
+                          value={item.inKindDescription || ""}
+                          onChange={(e) =>
+                            handleUpdateInKindDescription(item.sponsorId, e.target.value)
+                          }
+                          className="h-6 w-full rounded bg-transparent text-xs text-foreground placeholder:text-muted-foreground focus:outline-none"
                         />
-                        <span className="text-[11px] font-bold text-primary shrink-0">₫</span>
                       </div>
-
-                      {item.packageType === "in_kind" ? (
-                        <div className="flex items-center gap-2 rounded-lg bg-card/70 border border-border px-3 py-1.5">
-                          <Gift className="h-3.5 w-3.5 text-purple-600 shrink-0" />
-                          <input
-                            type="text"
-                            placeholder="Mô tả hiện vật tài trợ..."
-                            value={item.inKindDescription || ""}
-                            onChange={(e) => handleUpdateInKindDescription(item.sponsorId, e.target.value)}
-                            className="h-6 w-full rounded bg-transparent text-xs text-foreground placeholder:text-muted-foreground focus:outline-none"
-                          />
-                        </div>
-                      ) : (
-                        <div className="flex items-center gap-2 rounded-lg bg-card/70 border border-border px-3 py-1.5 text-xs text-muted-foreground">
-                          <DollarSign className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
-                          <span>Chuyển khoản trực tiếp vào quỹ sự kiện</span>
-                        </div>
-                      )}
-                    </div>
+                    ) : (
+                      <div className="hidden lg:flex items-center gap-1.5 rounded-lg bg-card/50 border border-border/50 px-2.5 py-1.5 text-[11px] text-muted-foreground">
+                        <DollarSign className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
+                        <span>Trực tiếp vào quỹ sự kiện</span>
+                      </div>
+                    )}
                   </div>
                 </div>
               );
@@ -605,7 +412,7 @@ export function EventSponsorPackageSelector({
           </div>
         </div>
 
-        {/* Search & Tier Filter */}
+        {/* Search & Type Filter */}
         <div className="flex flex-col sm:flex-row gap-2">
           <div className="relative flex-1">
             <Search className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
@@ -618,18 +425,23 @@ export function EventSponsorPackageSelector({
           </div>
 
           <div className="flex items-center gap-1 shrink-0 overflow-x-auto no-scrollbar">
-            {["all", "platinum", "gold", "silver", "bronze"].map((tier) => (
+            {[
+              { id: "all", label: "Tất cả" },
+              { id: "bank_transfer", label: "Chuyển khoản" },
+              { id: "cash", label: "Tiền mặt" },
+              { id: "in_kind", label: "Hiện vật" },
+            ].map((f) => (
               <button
-                key={tier}
+                key={f.id}
                 type="button"
-                onClick={() => setFilterTier(tier)}
+                onClick={() => setFilterType(f.id)}
                 className={`px-2.5 py-1 rounded-md text-[11px] font-semibold transition cursor-pointer shrink-0 ${
-                  filterTier === tier
+                  filterType === f.id
                     ? "bg-primary text-primary-foreground"
                     : "bg-muted text-muted-foreground hover:text-foreground"
                 }`}
               >
-                {tier === "all" ? "Tất cả" : (TIER_META[tier] || DEFAULT_TIER).name.split(" ")[0]}
+                {f.label}
               </button>
             ))}
           </div>
@@ -639,7 +451,7 @@ export function EventSponsorPackageSelector({
         <div className="max-h-64 overflow-y-auto space-y-1.5 rounded-xl border border-border bg-background/50 p-2">
           {loading ? (
             <div className="py-6 text-center text-xs text-muted-foreground">
-              Đang tải danh sách nhà tài trợ & gói đồng hành...
+              Đang tải danh sách nhà tài trợ...
             </div>
           ) : filteredSponsors.length === 0 ? (
             <div className="py-6 text-center text-xs text-muted-foreground italic">
@@ -650,7 +462,7 @@ export function EventSponsorPackageSelector({
               const isSelected = safeSelected.some(
                 (item) => item.sponsorId === s.id || item.sponsorName === s.name
               );
-              const meta = TIER_META[s.tier] || DEFAULT_TIER;
+              const pType = s.packageType || "bank_transfer";
 
               return (
                 <div
@@ -679,24 +491,29 @@ export function EventSponsorPackageSelector({
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2 flex-wrap">
                         <span className="font-semibold text-foreground truncate">{s.name}</span>
-                        <span
-                          className={`inline-flex items-center gap-1 px-1.5 py-0.2 rounded text-[10px] font-bold border ${meta.bg} !text-black text-black ${meta.border}`} style={{ color: "#000000" }}
-                        >
-                          {meta.icon} {meta.name}
-                        </span>
-                        {s.packageType === "in_kind" ? (
-                          <span className="inline-flex items-center gap-0.5 text-[10px] text-purple-600 dark:text-purple-400 font-medium">
+                        {pType === "in_kind" ? (
+                          <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-bold bg-purple-500/15 text-purple-700 dark:text-purple-300">
                             <Gift className="h-3 w-3" /> Hiện vật
                           </span>
-                        ) : (
-                          <span className="inline-flex items-center gap-0.5 text-[10px] text-emerald-600 dark:text-emerald-400 font-medium">
+                        ) : pType === "cash" ? (
+                          <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-500/15 text-amber-700 dark:text-amber-300">
                             <DollarSign className="h-3 w-3" /> Tiền mặt
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-bold bg-blue-500/15 text-[#003B95] dark:text-blue-300">
+                            <DollarSign className="h-3 w-3" /> Chuyển khoản
                           </span>
                         )}
                       </div>
 
                       <div className="flex items-center gap-2 text-[11px] text-muted-foreground truncate mt-0.5">
-                        <span>{s.contact}</span>
+                        {s.contact && <span>{s.contact}</span>}
+                        {s.phone && (
+                          <>
+                            <span>•</span>
+                            <span>{s.phone}</span>
+                          </>
+                        )}
                         <span>•</span>
                         <span className="font-semibold text-foreground">{fmt.money(s.amount)}</span>
                         {s.inKindDescription && (

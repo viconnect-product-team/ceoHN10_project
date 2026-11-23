@@ -58,6 +58,8 @@ function FeedbackManagementPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [ratingFilter, setRatingFilter] = useState("all");
+  const [eventFilter, setEventFilter] = useState("all");
+  const [eventsList, setEventsList] = useState<{ id: string; name: string }[]>([]);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [selectedFeedback, setSelectedFeedback] = useState<FeedbackRecord | null>(null);
@@ -65,7 +67,9 @@ function FeedbackManagementPage() {
   const loadFeedbacks = async () => {
     setLoading(true);
     try {
-      const res = await fetchNestApi<any>("/admin/feedbacks");
+      const qp = new URLSearchParams();
+      if (eventFilter !== "all") qp.set("eventId", eventFilter);
+      const res = await fetchNestApi<any>(`/admin/feedbacks?${qp.toString()}`);
       if (res && Array.isArray(res.items)) {
         setFeedbacks(res.items);
       } else if (Array.isArray(res)) {
@@ -80,12 +84,29 @@ function FeedbackManagementPage() {
     }
   };
 
+  const loadEventsList = async () => {
+    try {
+      const res = await fetchNestApi<any>("/events");
+      const list = Array.isArray(res) ? res : res?.items || [];
+      setEventsList(list.map((e: any) => ({ id: e.id, name: e.name || e.title || "Sự kiện CLB" })));
+    } catch {
+      // ignore
+    }
+  };
+
+  useEffect(() => {
+    void loadEventsList();
+  }, []);
+
   useEffect(() => {
     void loadFeedbacks();
-  }, []);
+  }, [eventFilter]);
 
   const filteredFeedbacks = useMemo(() => {
     let result = feedbacks;
+    if (eventFilter !== "all") {
+      result = result.filter((item) => item.targetId === eventFilter);
+    }
     if (categoryFilter !== "all") {
       result = result.filter((item) => item.targetType === categoryFilter);
     }
@@ -102,7 +123,7 @@ function FeedbackManagementPage() {
       );
     }
     return result;
-  }, [feedbacks, categoryFilter, ratingFilter, searchTerm]);
+  }, [feedbacks, eventFilter, categoryFilter, ratingFilter, searchTerm]);
 
   const { sortKey, sortDir, handleSort, sortData } = useCustomTableSort<FeedbackRecord>(
     "createdAt",
@@ -344,6 +365,23 @@ function FeedbackManagementPage() {
           searchQuery={searchTerm}
           onSearchChange={setSearchTerm}
         >
+          {/* Lọc theo sự kiện cụ thể (Yêu cầu 1) */}
+          <div className="flex items-center gap-1.5 rounded-xl border border-border bg-card px-3 py-1.5 text-xs shadow-xs">
+            <Calendar className="h-3.5 w-3.5 text-primary shrink-0" />
+            <select
+              value={eventFilter}
+              onChange={(e) => setEventFilter(e.target.value)}
+              className="bg-transparent text-xs font-semibold text-foreground outline-none cursor-pointer max-w-[220px] truncate"
+            >
+              <option value="all">Tất cả sự kiện cụ thể</option>
+              {eventsList.map((evt) => (
+                <option key={evt.id} value={evt.id}>
+                  {evt.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
           {/* Lọc theo phân loại */}
           <div className="flex items-center gap-1.5 rounded-xl border border-border bg-card px-3 py-1.5 text-xs">
             <Filter className="h-3.5 w-3.5 text-muted-foreground" />

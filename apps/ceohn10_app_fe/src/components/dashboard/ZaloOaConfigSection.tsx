@@ -34,11 +34,12 @@ import { toast } from "sonner";
 import { fetchNestApi } from "@/lib/api-client";
 
 export const ZaloOaConfigSection: React.FC = () => {
-  // 1. Cấu hình cốt lõi (Gộp chung tối đa - chỉ 3 trường chính)
-  const [appId, setAppId] = useState("736933908446960497");
-  const [secretKey, setSecretKey] = useState("f42YHsjU1Ku9UcK7IxZQ");
-  const [oaId, setOaId] = useState("437444346010531505");
+  // 1. Cấu hình cốt lõi Zalo OA (Dynamic CSDL 113.20.107.184:6432)
+  const [appId, setAppId] = useState("");
+  const [secretKey, setSecretKey] = useState("");
+  const [oaId, setOaId] = useState("");
   const [oaName, setOaName] = useState("CLB Doanh Nhân CEO HN10");
+  const [targetApp, setTargetApp] = useState("all");
   const [refreshToken, setRefreshToken] = useState("");
   const [accessToken, setAccessToken] = useState("");
   const [lastRefreshedAt, setLastRefreshedAt] = useState<string | null>(null);
@@ -57,15 +58,28 @@ export const ZaloOaConfigSection: React.FC = () => {
   const [authCodeInput, setAuthCodeInput] = useState("");
   const [isExchangingCode, setIsExchangingCode] = useState(false);
 
+  // Cấu hình Cổng Thanh Toán SePay Dynamic (Lưu CSDL)
+  const [sepayEnabled, setSepayEnabled] = useState(true);
+  const [sepayBankName, setSepayBankName] = useState("MBBank");
+  const [sepayAccountNumber, setSepayAccountNumber] = useState("");
+  const [sepayAccountHolder, setSepayAccountHolder] = useState("");
+  const [sepayPrefixFee, setSepayPrefixFee] = useState("CEOHN10_HP");
+  const [sepayApiToken, setSepayApiToken] = useState("");
+  const [sepayWebhookToken, setSepayWebhookToken] = useState("");
+  const [sepayTargetApp, setSepayTargetApp] = useState("all");
+  const [isSavingSepay, setIsSavingSepay] = useState(false);
+  const [isLoadingSepay, setIsLoadingSepay] = useState(false);
+
   // Khối kiểm thử gửi tin nhanh
-  const [testPhone, setTestPhone] = useState("0973924819");
-  const [testRecipientName, setTestRecipientName] = useState("Phạm Văn Vũ");
+  const [testPhone, setTestPhone] = useState("");
+  const [testRecipientName, setTestRecipientName] = useState("");
   const [testType, setTestType] = useState<"event" | "forum" | "meeting" | "fee" | "custom">("event");
   const [customMessage, setCustomMessage] = useState("");
   const [isSendingTest, setIsSendingTest] = useState(false);
 
   // Danh sách Học viên / người dùng đã quan tâm hoặc nhắn tin Zalo OA
   const [subscribers, setSubscribers] = useState<any[]>([]);
+  const [subSearchTerm, setSubSearchTerm] = useState("");
   const [loadingSubs, setLoadingSubs] = useState(false);
   const [isSyncingFollowers, setIsSyncingFollowers] = useState(false);
   const [directMsgModalOpen, setDirectMsgModalOpen] = useState(false);
@@ -85,15 +99,71 @@ export const ZaloOaConfigSection: React.FC = () => {
         if (c.oaName) setOaName(c.oaName);
         if (c.refreshToken) setRefreshToken(c.refreshToken);
         if (c.accessToken) setAccessToken(c.accessToken);
+        if (c.targetApp) setTargetApp(c.targetApp);
         if (c.lastRefreshedAt) setLastRefreshedAt(c.lastRefreshedAt);
         setAutoRefreshActive(true);
       }
     } catch {
-      // Fallback mặc định
-      setAppId("736933908446960497");
-      setSecretKey("f42YHsjU1Ku9UcK7IxZQ");
-      setOaId("437444346010531505");
-      setAutoRefreshActive(true);
+      // Giữ rỗng nếu chưa có cấu hình trong CSDL
+    }
+  };
+
+  const loadSepayConfig = async () => {
+    setIsLoadingSepay(true);
+    try {
+      const res = await fetchNestApi<any>("/admin/master-settings/sepay");
+      if (res && res.config) {
+        const c = res.config;
+        setSepayEnabled(c.is_enabled ?? true);
+        if (c.bank_brand_name) setSepayBankName(c.bank_brand_name);
+        if (c.account_number) setSepayAccountNumber(c.account_number);
+        if (c.account_name) setSepayAccountHolder(c.account_name);
+        if (c.prefix_syntax?.membership) setSepayPrefixFee(c.prefix_syntax.membership);
+        if (c.api_token) setSepayApiToken(c.api_token);
+        if (c.webhook_token) setSepayWebhookToken(c.webhook_token);
+        if (c.target_app) setSepayTargetApp(c.target_app);
+      }
+    } catch {
+      // Giữ rỗng nếu chưa có
+    } finally {
+      setIsLoadingSepay(false);
+    }
+  };
+
+  const handleSaveSepay = async () => {
+    setIsSavingSepay(true);
+    try {
+      const payload = {
+        is_enabled: sepayEnabled,
+        target_app: sepayTargetApp,
+        bank_brand_name: sepayBankName.trim(),
+        account_number: sepayAccountNumber.trim(),
+        account_name: sepayAccountHolder.trim(),
+        api_token: sepayApiToken.trim(),
+        webhook_token: sepayWebhookToken.trim(),
+        prefix_syntax: {
+          membership: sepayPrefixFee.trim() || "CEOHN10_HP",
+          event: "CEOHN10_SK",
+          course: "CEOHN10_LH",
+        },
+        bank_accounts: [
+          {
+            bank_brand_name: sepayBankName.trim(),
+            account_number: sepayAccountNumber.trim(),
+            account_name: sepayAccountHolder.trim(),
+            is_default: true,
+          },
+        ],
+      };
+      await fetchNestApi("/admin/master-settings/sepay", {
+        method: "PUT",
+        body: JSON.stringify(payload),
+      });
+      toast.success("Đã lưu cấu hình cổng thanh toán SePay động trực tiếp vào CSDL thành công!");
+    } catch (err: any) {
+      toast.error(err?.message || "Lỗi khi lưu cấu hình SePay");
+    } finally {
+      setIsSavingSepay(false);
     }
   };
 
@@ -170,10 +240,11 @@ export const ZaloOaConfigSection: React.FC = () => {
 
   useEffect(() => {
     loadConfig();
+    loadSepayConfig();
     loadSubscribers();
   }, []);
 
-  // Lưu cấu hình
+  // Lưu cấu hình Zalo OA
   const handleSaveConfig = async () => {
     setIsSaving(true);
     try {
@@ -184,6 +255,7 @@ export const ZaloOaConfigSection: React.FC = () => {
         oaName: oaName.trim(),
         refreshToken: refreshToken.trim(),
         accessToken: accessToken.trim(),
+        targetApp: targetApp,
         autoRefreshActive: true,
         updatedAt: new Date().toISOString(),
       };
@@ -509,6 +581,24 @@ ${qrImageUrl}
           </div>
         </div>
 
+        {/* Phân hệ / Hệ thống áp dụng */}
+        <div className="pt-1">
+          <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 block mb-1">
+            3. Phân Hệ / Hệ Thống Ứng Dụng Áp Dụng:
+          </label>
+          <select
+            value={targetApp}
+            onChange={(e) => setTargetApp(e.target.value)}
+            className="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-xs font-semibold text-slate-800 dark:bg-slate-950 dark:border-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-[#003B95]"
+          >
+            <option value="all">Toàn Nền Tảng (Tất cả Cổng Quản Trị CRM, Mobile App & Sự Kiện)</option>
+            <option value="ceohn10_mobile">CEO HN10 Mobile App (Dành riêng cho Hội viên Doanh nhân)</option>
+            <option value="crm_admin">Cổng Quản Trị Web CRM (Chủ tịch, Ban Điều Hành, Ban Thư Ký)</option>
+            <option value="events_checkin">Phân Hệ Sự Kiện, Điểm Danh &amp; QR Check-in</option>
+            <option value="b2b_network">Cổng Giao Thương B2B &amp; Xúc Tiến Thương Mại</option>
+          </select>
+        </div>
+
         {/* 3. Refresh Token */}
         <div>
           <div className="flex items-center justify-between mb-1">
@@ -605,6 +695,138 @@ ${qrImageUrl}
             </div>
           </div>
         )}
+      </div>
+
+      {/* ── THẺ MỚI: CẤU HÌNH CỔNG THANH TOÁN SEPAY DYNAMIC (LƯU DATABASE 113.20.107.184:6432) ── */}
+      <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-xs dark:border-slate-800 dark:bg-slate-900 space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100 dark:border-slate-800">
+          <div className="space-y-0.5">
+            <div className="flex items-center gap-2">
+              <span className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-xs font-bold bg-blue-50 text-[#003B95] dark:bg-blue-950/60 dark:text-blue-300 border border-blue-200 dark:border-blue-900">
+                <CreditCard className="size-3.5" />
+                Cổng Thanh Toán Tự Động SePay Dynamic
+              </span>
+              <span className="text-xs text-slate-400 font-medium hidden sm:inline">
+                (Tích hợp VietQR nạp tiền &amp; hội phí)
+              </span>
+            </div>
+            <h4 className="text-sm font-bold text-slate-900 dark:text-white pt-1">
+              Cấu Hình Ngân Hàng Nhận Tiền &amp; Đối Soát SePay
+            </h4>
+            <p className="text-xs text-slate-500 dark:text-slate-400">
+              Mọi thông số nạp hội phí, mua vé sự kiện qua SePay được lưu trực tiếp vào CSDL máy chủ, không hardcode.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              disabled={isSavingSepay || isLoadingSepay}
+              onClick={handleSaveSepay}
+              className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-[#003B95] hover:bg-[#002766] text-white text-xs font-bold transition cursor-pointer shadow-xs active:scale-95 disabled:opacity-50"
+            >
+              <Check className="size-3.5" />
+              <span>{isSavingSepay ? "Đang lưu SePay..." : "Lưu Cấu Hình SePay"}</span>
+            </button>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-1">
+          {/* 1. Ngân hàng */}
+          <div>
+            <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 block mb-1">
+              Ngân hàng thụ hưởng:
+            </label>
+            <select
+              value={sepayBankName}
+              onChange={(e) => setSepayBankName(e.target.value)}
+              className="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-xs font-semibold text-slate-800 dark:bg-slate-950 dark:border-slate-700 dark:text-slate-200"
+            >
+              <option value="MBBank">MBBank (Ngân hàng Quân Đội)</option>
+              <option value="Vietcombank">Vietcombank</option>
+              <option value="Techcombank">Techcombank</option>
+              <option value="BIDV">BIDV</option>
+              <option value="VPBank">VPBank</option>
+              <option value="ACB">ACB</option>
+              <option value="TPBank">TPBank</option>
+            </select>
+          </div>
+
+          {/* 2. Số tài khoản */}
+          <div>
+            <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 block mb-1">
+              Số tài khoản ngân hàng:
+            </label>
+            <input
+              type="text"
+              value={sepayAccountNumber}
+              onChange={(e) => setSepayAccountNumber(e.target.value)}
+              placeholder="VD: 0973924819..."
+              className="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-xs font-mono font-bold text-slate-900 dark:bg-slate-950 dark:border-slate-700 dark:text-slate-100"
+            />
+          </div>
+
+          {/* 3. Tên chủ tài khoản */}
+          <div>
+            <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 block mb-1">
+              Tên chủ tài khoản:
+            </label>
+            <input
+              type="text"
+              value={sepayAccountHolder}
+              onChange={(e) => setSepayAccountHolder(e.target.value)}
+              placeholder="VD: CLB DOANH NHAN CEO HN10"
+              className="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-xs uppercase font-bold text-slate-900 dark:bg-slate-950 dark:border-slate-700 dark:text-slate-100"
+            />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-1">
+          {/* 4. Cú pháp nạp */}
+          <div>
+            <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 block mb-1">
+              Tiền tố cú pháp chuyển khoản:
+            </label>
+            <input
+              type="text"
+              value={sepayPrefixFee}
+              onChange={(e) => setSepayPrefixFee(e.target.value)}
+              placeholder="VD: CEOHN10_HP"
+              className="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-xs font-mono font-bold text-blue-600 dark:bg-slate-950 dark:border-slate-700 dark:text-blue-400"
+            />
+          </div>
+
+          {/* 5. SePay API Token */}
+          <div>
+            <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 block mb-1">
+              SePay API Token:
+            </label>
+            <input
+              type="password"
+              value={sepayApiToken}
+              onChange={(e) => setSepayApiToken(e.target.value)}
+              placeholder="Dán API Token SePay vào đây"
+              className="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-xs font-mono text-slate-900 dark:bg-slate-950 dark:border-slate-700 dark:text-slate-100"
+            />
+          </div>
+
+          {/* 6. Phân hệ áp dụng */}
+          <div>
+            <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 block mb-1">
+              Phân hệ / Hệ thống áp dụng:
+            </label>
+            <select
+              value={sepayTargetApp}
+              onChange={(e) => setSepayTargetApp(e.target.value)}
+              className="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-xs font-semibold text-slate-800 dark:bg-slate-950 dark:border-slate-700 dark:text-slate-200"
+            >
+              <option value="all">Toàn Nền Tảng (Tất cả Cổng Web CRM &amp; App Mobile)</option>
+              <option value="ceohn10_mobile">CEO HN10 Mobile App (Thanh toán Hội phí &amp; Vé)</option>
+              <option value="crm_admin">Cổng Quản Trị Web CRM (Kế toán &amp; Thu chi)</option>
+              <option value="events_checkin">Hệ Thống Sự Kiện &amp; Điểm Danh QR</option>
+            </select>
+          </div>
+        </div>
       </div>
 
       {/* ── THẺ 3: KIỂM THỬ GỬI TIN NHANH QUA ZALO OA ── */}
@@ -726,6 +948,26 @@ ${qrImageUrl}
           </button>
         </div>
 
+        {/* Ô Tìm Kiếm Người Quan Tâm & Nhắn Tin Zalo OA */}
+        <div className="flex items-center gap-2">
+          <input
+            type="text"
+            value={subSearchTerm}
+            onChange={(e) => setSubSearchTerm(e.target.value)}
+            placeholder="🔍 Tìm kiếm theo tên Zalo, mã học viên, UID hoặc số điện thoại..."
+            className="w-full bg-slate-50 border border-slate-200 dark:bg-slate-950 dark:border-slate-800 rounded-xl px-3.5 py-2 text-xs text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#003B95]"
+          />
+          {subSearchTerm && (
+            <button
+              type="button"
+              onClick={() => setSubSearchTerm("")}
+              className="text-xs text-slate-500 hover:text-slate-800 px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shrink-0 cursor-pointer"
+            >
+              Xóa tìm
+            </button>
+          )}
+        </div>
+
         {loadingSubs ? (
           <div className="py-8 text-center text-xs text-slate-500">Đang tải danh sách người quan tâm Zalo OA...</div>
         ) : subscribers.length === 0 ? (
@@ -737,7 +979,19 @@ ${qrImageUrl}
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
-            {subscribers.map((sub) => (
+            {subscribers
+              .filter((sub) => {
+                if (!subSearchTerm.trim()) return true;
+                const q = subSearchTerm.trim().toLowerCase();
+                return (
+                  sub.displayName?.toLowerCase().includes(q) ||
+                  sub.userId?.includes(q) ||
+                  sub.phone?.includes(q) ||
+                  sub.company?.toLowerCase().includes(q) ||
+                  sub.memberCode?.toLowerCase().includes(q)
+                );
+              })
+              .map((sub) => (
               <div
                 key={sub.userId}
                 className="p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40 flex items-center justify-between gap-3 hover:border-blue-300 dark:hover:border-blue-700 transition"

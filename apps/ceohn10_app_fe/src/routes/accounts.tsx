@@ -41,6 +41,8 @@ import {
   getRolesForDepartment,
   DepartmentItem,
   isRouteAllowedByMatrix,
+  GRANULAR_PERMISSION_CATEGORIES,
+  getDefaultPermissionsForRole,
 } from "@/lib/rbac-permission-helpers";
 import { Pagination, SortHeader } from "@/components/dashboard/DataTablePagination";
 import { sanitizePhoneNumber, handleNumericKeyDown } from "@/lib/utils";
@@ -223,6 +225,8 @@ function AccountsPage() {
   const [formDepartment, setFormDepartment] = useState(DEPARTMENT_OPTIONS[0]);
   const [formRole, setFormRole] = useState("member");
   const [formStatus, setFormStatus] = useState<"active" | "inactive" | "locked">("active");
+  const [formPermissionMode, setFormPermissionMode] = useState<"role_preset" | "granular">("role_preset");
+  const [formCustomPermissions, setFormCustomPermissions] = useState<string[]>(() => getDefaultPermissionsForRole("member"));
 
   // Cascading role options for current selected department in form
   const availableRolesForForm = useMemo(() => {
@@ -235,8 +239,19 @@ function AccountsPage() {
     const roles = getRolesForDepartment(cleanDept, customDepts);
     if (roles.length > 0) {
       if (!roles.some((r) => r.value === formRole)) {
-        setFormRole(roles[0].value);
+        const nextRole = roles[0].value;
+        setFormRole(nextRole);
+        if (formPermissionMode === "role_preset") {
+          setFormCustomPermissions(getDefaultPermissionsForRole(nextRole));
+        }
       }
+    }
+  };
+
+  const handleRoleChange = (newRole: string) => {
+    setFormRole(newRole);
+    if (formPermissionMode === "role_preset") {
+      setFormCustomPermissions(getDefaultPermissionsForRole(newRole));
     }
   };
 
@@ -518,7 +533,10 @@ function AccountsPage() {
     const defaultDept = departmentList[0] || "Ban Điều Hành";
     setFormDepartment(defaultDept);
     const roles = getRolesForDepartment(defaultDept, customDepts);
-    setFormRole(roles[roles.length - 1]?.value || "member");
+    const initialRole = roles[roles.length - 1]?.value || "member";
+    setFormRole(initialRole);
+    setFormPermissionMode("role_preset");
+    setFormCustomPermissions(getDefaultPermissionsForRole(initialRole));
     setFormStatus("active");
     setIsAddOpen(true);
   };
@@ -534,8 +552,16 @@ function AccountsPage() {
     setFormDepartment(cleanDept);
     const validRoles = getRolesForDepartment(cleanDept, customDepts);
     const hasRole = validRoles.some((r) => r.value === acc.role);
-    setFormRole(hasRole ? (acc.role || validRoles[0].value) : (validRoles[0]?.value || "member"));
+    const targetRole = hasRole ? (acc.role || validRoles[0].value) : (validRoles[0]?.value || "member");
+    setFormRole(targetRole);
     setFormStatus(acc.status || "active");
+    if (acc.customPermissions && acc.customPermissions.length > 0) {
+      setFormCustomPermissions(acc.customPermissions);
+      setFormPermissionMode("granular");
+    } else {
+      setFormCustomPermissions(getDefaultPermissionsForRole(targetRole));
+      setFormPermissionMode("role_preset");
+    }
     setIsEditOpen(true);
   };
 
@@ -583,6 +609,7 @@ function AccountsPage() {
         companyName: formCompany.trim(),
         department: formDepartment,
         role: formRole,
+        customPermissions: formCustomPermissions,
         status: formStatus,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
@@ -650,6 +677,7 @@ function AccountsPage() {
       companyName: formCompany.trim(),
       department: formDepartment,
       role: formRole,
+      customPermissions: formCustomPermissions,
       status: formStatus,
       updatedAt: new Date().toISOString(),
     };
@@ -698,7 +726,9 @@ function AccountsPage() {
                 myMem.executive_role = formRole;
                 myMem.role = formRole;
                 myMem.department = formDepartment;
+                myMem.customPermissions = formCustomPermissions;
                 localStorage.setItem("vba_my_member", JSON.stringify(myMem));
+                localStorage.setItem("ceohn10_user_custom_permissions", JSON.stringify(formCustomPermissions));
               }
             }
             const rawCrmUser = localStorage.getItem("vba_crm_current_user");
@@ -707,7 +737,9 @@ function AccountsPage() {
               if (cu.id === targetId || cu.email === selectedAccount.email) {
                 cu.role = formRole;
                 cu.executiveRole = formRole;
+                cu.customPermissions = formCustomPermissions;
                 localStorage.setItem("vba_crm_current_user", JSON.stringify(cu));
+                localStorage.setItem("ceohn10_user_custom_permissions", JSON.stringify(formCustomPermissions));
               }
             }
           } catch { }
@@ -1718,7 +1750,7 @@ function AccountsPage() {
                   </label>
                   <select
                     value={formRole}
-                    onChange={(e) => setFormRole(e.target.value)}
+                    onChange={(e) => handleRoleChange(e.target.value)}
                     className="w-full rounded-xl border border-border bg-background px-3 py-2 text-xs font-bold outline-none focus:border-[#003B95]"
                   >
                     {availableRolesForForm.map((r) => (
@@ -1726,6 +1758,122 @@ function AccountsPage() {
                     ))}
                   </select>
                 </div>
+              </div>
+
+              {/* ── CẤU HÌNH PHÂN QUYỀN TRUY CẬP CHỨC NĂNG (GRANULAR PERMISSIONS) ── */}
+              <div className="p-3.5 rounded-xl border border-border bg-muted/20 space-y-3">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-border/60 pb-2.5">
+                  <div>
+                    <label className="font-bold text-foreground block text-xs flex items-center gap-1.5">
+                      <ShieldCheck className="size-4 text-[#003B95]" />
+                      <span>Cấu Hình Quyền Truy Cập Chức Năng</span>
+                    </label>
+                    <p className="text-[11px] text-muted-foreground mt-0.5">
+                      Tài khoản chỉ hiển thị đúng các chức năng đã được tích chọn hoặc theo vai trò
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-1 bg-background p-1 rounded-xl border border-border text-[11px]">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setFormPermissionMode("role_preset");
+                        setFormCustomPermissions(getDefaultPermissionsForRole(formRole));
+                      }}
+                      className={`px-2.5 py-1 rounded-lg font-bold transition cursor-pointer ${
+                        formPermissionMode === "role_preset"
+                          ? "bg-[#003B95] text-white"
+                          : "text-muted-foreground hover:text-foreground"
+                      }`}
+                    >
+                      Theo Vai Trò (Preset)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setFormPermissionMode("granular")}
+                      className={`px-2.5 py-1 rounded-lg font-bold transition cursor-pointer ${
+                        formPermissionMode === "granular"
+                          ? "bg-[#003B95] text-white"
+                          : "text-muted-foreground hover:text-foreground"
+                      }`}
+                    >
+                      Tích Chọn Cụ Thể ({formCustomPermissions.length})
+                    </button>
+                  </div>
+                </div>
+
+                {/* Khi ở chế độ Tích Chọn Cụ Thể */}
+                {formPermissionMode === "granular" && (
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between text-[11px]">
+                      <span className="font-semibold text-muted-foreground">
+                        Đang chọn <strong className="text-[#003B95] font-bold">{formCustomPermissions.length}</strong> chức năng
+                      </span>
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const all = GRANULAR_PERMISSION_CATEGORIES.flatMap((c) => c.items.map((i) => i.key));
+                            setFormCustomPermissions(all);
+                          }}
+                          className="text-[#003B95] hover:underline font-bold cursor-pointer"
+                        >
+                          Chọn tất cả
+                        </button>
+                        <span>•</span>
+                        <button
+                          type="button"
+                          onClick={() => setFormCustomPermissions(["/"])}
+                          className="text-rose-600 hover:underline font-bold cursor-pointer"
+                        >
+                          Bỏ chọn hết
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="max-h-60 overflow-y-auto space-y-3 pr-1 divide-y divide-border/60">
+                      {GRANULAR_PERMISSION_CATEGORIES.map((cat, idx) => (
+                        <div key={idx} className={idx > 0 ? "pt-2.5 space-y-1.5" : "space-y-1.5"}>
+                          <h5 className="font-bold text-[11px] text-[#003B95] uppercase tracking-wider">
+                            {cat.category}
+                          </h5>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+                            {cat.items.map((perm) => {
+                              const isChecked = formCustomPermissions.includes(perm.key);
+                              return (
+                                <label
+                                  key={perm.key}
+                                  className={`flex items-start gap-2 p-2 rounded-lg border transition cursor-pointer ${
+                                    isChecked
+                                      ? "bg-blue-50/70 dark:bg-blue-950/40 border-blue-300 dark:border-blue-700 text-foreground"
+                                      : "bg-background border-border text-muted-foreground hover:bg-muted/50"
+                                  }`}
+                                >
+                                  <input
+                                    type="checkbox"
+                                    checked={isChecked}
+                                    onChange={(e) => {
+                                      if (e.target.checked) {
+                                        setFormCustomPermissions([...formCustomPermissions, perm.key]);
+                                      } else {
+                                        setFormCustomPermissions(formCustomPermissions.filter((k) => k !== perm.key));
+                                      }
+                                    }}
+                                    className="mt-0.5 accent-[#003B95] rounded cursor-pointer"
+                                  />
+                                  <div className="text-[11px] leading-snug">
+                                    <div className="font-bold text-foreground">{perm.name}</div>
+                                    <div className="text-[10px] text-muted-foreground">{perm.desc}</div>
+                                  </div>
+                                </label>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div>

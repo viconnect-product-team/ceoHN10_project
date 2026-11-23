@@ -98,6 +98,7 @@ export function FinanceUnitTreeSection({
     const mediaTx = filterTx(["truyền thông", "sự kiện", "gala", "kỷ yếu", "báo chí", "vé", "ấn phẩm", "quà tặng"]);
     const financeTx = filterTx(["tài chính", "sổ quỹ", "ngân hàng", "lãi", "kiểm toán", "vận hành"]);
     const charityTx = filterTx(["thiện nguyện", "từ thiện", "xã hội", "ủng hộ", "cộng đồng", "xây trường"]);
+    const techTx = filterTx(["công nghệ", "kỹ thuật", "ban công nghệ", "hạ tầng", "phần mềm", "server", "khai giảng công nghệ"]);
     const sponsorTx = filterTx(["tài trợ", "kim cương", "vàng", "bạc", "đồng", "doanh nghiệp", "tập đoàn", "công ty"]);
 
     const calcSums = (txs: Transaction[]) => {
@@ -112,6 +113,7 @@ export function FinanceUnitTreeSection({
     const medSums = calcSums(mediaTx);
     const fSums = calcSums(financeTx);
     const cSums = calcSums(charityTx);
+    const techSums = calcSums(techTx);
     const sSums = calcSums(sponsorTx);
 
     // Fallback phân bổ thực tế nếu dữ liệu demo ít
@@ -207,6 +209,19 @@ export function FinanceUnitTreeSection({
           totalExpense: cSums.exp || 140000000,
           count: cSums.count || 4,
           budgetAllocated: 150000000,
+        },
+        {
+          id: "technology",
+          name: "Ban Công Nghệ & Chuyển Đổi Số",
+          code: "DEPT-BCN",
+          roleDesc: "Quản lý kinh phí phần mềm CRM, Mobile App, hạ tầng máy chủ và thiết bị kỹ thuật lễ khai giảng",
+          icon: Layers,
+          color: "text-indigo-600 dark:text-indigo-400",
+          bgColor: "bg-indigo-50 dark:bg-indigo-950/50 border-indigo-200 dark:border-indigo-900/50",
+          totalIncome: techSums.inc || 250000000,
+          totalExpense: techSums.exp || 120000000,
+          count: techSums.count || 5,
+          budgetAllocated: 350000000,
         },
         {
           id: "enterprises",

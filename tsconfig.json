@@ -17,5 +17,12 @@
       "@vibe/shared/*": ["./packages/shared/*"]
     }
   },
-  "include": ["apps/ceohn10_app_fe/src/**/*"]
+  "include": ["apps/ceohn10_app_fe/src/**/*"],
+  "exclude": [
+    "dist-modules",
+    "**/dist-modules/**",
+    "node_modules",
+    "dist",
+    "build"
+  ]
 }

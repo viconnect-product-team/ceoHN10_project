@@ -32,7 +32,6 @@ import { AppShell } from "@/components/dashboard/AppShell";
 
 import { CrudModal, type CrudField, type CrudValues } from "@/components/dashboard/CrudModal";
 import { EventRegistrationPanel } from "@/components/dashboard/EventRegistrationPanel";
-import { EventCheckinPanel } from "@/components/dashboard/EventCheckinPanel";
 import { EventAttendees } from "@/components/dashboard/EventAttendees";
 import { EventAgenda } from "@/components/dashboard/EventAgenda";
 import { SupplyDeclarationModal } from "@/components/dashboard/SupplyDeclarationModal";
@@ -41,12 +40,8 @@ import { EventMediaModal } from "@/components/events/EventMediaModal";
 import { EventSponsors } from "@/components/dashboard/EventSponsors";
 import { EventFeed } from "@/components/dashboard/EventFeed";
 import { LiveActivityMediaSection } from "@/components/common/LiveActivityMediaSection";
-import { EventQrConfigModal } from "@/components/dashboard/EventQrConfigModal";
-import { getQrUrl } from "@/lib/qr";
-import { EventCheckinGatekeeperModal } from "@/components/events/EventCheckinGatekeeperModal";
 import { EventSponsorPackageSelector } from "@/components/events/EventSponsorPackageSelector";
 import { EventQrStaffSelector } from "@/components/events/EventQrStaffSelector";
-import { EventGuestQrPresenterModal } from "@/components/events/EventGuestQrPresenterModal";
 import { EventPosterModal } from "@/components/events/EventPosterModal";
 import { EventPoster } from "@/components/events/EventPoster";
 import { isValidDriveUrl } from "@/components/events/modals/EventDetailModal";
@@ -112,18 +107,26 @@ const STATUS_KEY: Record<EventItem["status"], TKey> = {
   cancelled: "events.status.cancelled",
 };
 const TYPE_KEY: Record<EventItem["type"], TKey> = {
+  khai_giang: "events.type.khai_giang" as TKey,
+  year_end_party: "events.type.year_end_party" as TKey,
+  teambuilding: "events.type.teambuilding" as TKey,
+  be_giang: "events.type.be_giang" as TKey,
+  charity: "events.type.charity" as TKey,
   forum: "events.type.forum",
   workshop: "events.type.workshop",
   networking: "events.type.networking",
   training: "events.type.training",
-  charity: "events.type.charity" as TKey,
 };
 const TYPE_COVER: Record<EventItem["type"], string> = {
+  khai_giang: "linear-gradient(135deg, #071322 0%, #003B95 55%, #0A2540 100%)",
+  year_end_party: "linear-gradient(135deg, #3A1005 0%, #B45309 55%, #78350F 100%)",
+  teambuilding: "linear-gradient(135deg, #042F2E 0%, #0D9488 55%, #115E59 100%)",
+  be_giang: "linear-gradient(135deg, #1E1B4B 0%, #4338CA 55%, #312E81 100%)",
+  charity: "linear-gradient(135deg, #0D9488, #047857)",
   forum: "linear-gradient(135deg, oklch(0.55 0.18 265), oklch(0.62 0.16 300))",
   workshop: "linear-gradient(135deg, oklch(0.55 0.15 195), oklch(0.60 0.14 235))",
   networking: "linear-gradient(135deg, oklch(0.58 0.16 330), oklch(0.60 0.16 20))",
   training: "linear-gradient(135deg, oklch(0.55 0.15 155), oklch(0.60 0.14 195))",
-  charity: "linear-gradient(135deg, #0D9488, #047857)",
 };
 
 function NotFoundView() {
@@ -177,7 +180,6 @@ function EventDetailPage() {
   }, [user, event]);
 
   const [editOpen, setEditOpen] = useState(false);
-  const [gatekeeperOpen, setGatekeeperOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [cancelModalOpen, setCancelModalOpen] = useState(false);
@@ -186,7 +188,6 @@ function EventDetailPage() {
     "Hoàn tiền 100% cho đại biểu qua tài khoản ngân hàng trong vòng 3 - 5 ngày làm việc."
   );
   const [cancelling, setCancelling] = useState(false);
-  const [guestQrOpen, setGuestQrOpen] = useState(false);
   const [posterOpen, setPosterOpen] = useState(false);
   const [supplyModalOpen, setSupplyModalOpen] = useState(false);
   const [feedbackModalOpen, setFeedbackModalOpen] = useState(false);
@@ -251,7 +252,7 @@ function EventDetailPage() {
     },
     {
       name: "sponsors",
-      label: "Nhà tài trợ & Gói đồng hành",
+      label: "Nhà tài trợ đồng hành",
       type: "custom",
       render: (val, onChange) => (
         <EventSponsorPackageSelector eventId={event?.id} value={val || []} onChange={onChange} />
@@ -262,6 +263,11 @@ function EventDetailPage() {
       label: t("events.col.type"),
       type: "select",
       options: [
+        { value: "khai_giang", label: t("events.type.khai_giang" as never) },
+        { value: "year_end_party", label: t("events.type.year_end_party" as never) },
+        { value: "teambuilding", label: t("events.type.teambuilding" as never) },
+        { value: "be_giang", label: t("events.type.be_giang" as never) },
+        { value: "charity", label: t("events.type.charity" as never) },
         { value: "forum", label: t("events.type.forum") },
         { value: "workshop", label: t("events.type.workshop") },
         { value: "networking", label: t("events.type.networking") },
@@ -483,14 +489,14 @@ function EventDetailPage() {
               <Share2 className="h-4 w-4 text-muted-foreground" aria-hidden="true" />{" "}
               {t("edetail.share")}
             </button>
-            <button
-              type="button"
-              onClick={() => setGuestQrOpen(true)}
-              className="inline-flex items-center gap-2 rounded-xl border border-amber-500/40 bg-amber-500/10 px-4 py-2 text-sm font-semibold text-amber-700 dark:text-amber-300 hover:bg-amber-500/20 transition cursor-pointer"
+            <Link
+              to="/checkin-qr"
+              search={{ eventId: event.id }}
+              className="inline-flex items-center gap-2 rounded-xl border border-[#003B95]/40 bg-blue-50 px-4 py-2 text-sm font-semibold text-[#003B95] hover:bg-blue-100 transition shadow-xs"
             >
-              <QrCode className="h-4 w-4 text-amber-600 dark:text-amber-400" aria-hidden="true" />
-              Mã QR Đăng Ký Khách Mời (Quét Zalo)
-            </button>
+              <QrCode className="h-4 w-4 text-[#003B95]" aria-hidden="true" />
+              Thiết Lập 2 Mã QR &amp; Biểu Mẫu Sự Kiện
+            </Link>
             {(() => {
               const rawDrive = (event as any)?.photoGalleryUrl || (event as any)?.photo_gallery_url || (event as any)?.driveUrl;
               const validDrive = isValidDriveUrl(rawDrive) ? String(rawDrive).trim() : null;
@@ -507,25 +513,6 @@ function EventDetailPage() {
                 </a>
               );
             })()}
-            {canScanThisEvent && (
-              <>
-                <button
-                  type="button"
-                  onClick={() => setGatekeeperOpen(true)}
-                  className="inline-flex items-center gap-2 rounded-xl border border-blue-500/40 bg-blue-500/10 px-4 py-2 text-sm font-semibold text-blue-600 hover:bg-blue-500/20 transition cursor-pointer"
-                >
-                  <QrCode className="h-4 w-4" aria-hidden="true" />
-                  Quản lý QR Gatekeeper
-                </button>
-                <Link
-                  to="/checkin"
-                  className="inline-flex items-center gap-2 rounded-xl border border-border bg-card px-4 py-2 text-sm font-medium text-foreground hover:bg-muted"
-                >
-                  <QrCode className="h-4 w-4 text-muted-foreground" aria-hidden="true" />{" "}
-                  {t("edetail.cta.checkin")}
-                </Link>
-              </>
-            )}
             {canManage && (
               <>
                 <button
@@ -699,50 +686,23 @@ function EventDetailPage() {
             </button>
           </section>
 
-          {/* Mã QR cho người ngoài không phải Học viên quét đăng ký sự kiện */}
-          <section className="rounded-2xl border-2 border-dashed border-amber-500/50 bg-gradient-to-b from-amber-500/5 to-transparent p-5 shadow-[var(--shadow-card)] text-center space-y-3">
-            <div className="flex items-center justify-center gap-2 text-amber-700 dark:text-amber-400 font-bold text-xs uppercase tracking-wider">
-              <QrCode className="h-4 w-4 text-amber-500" />
-              <span>Mã QR Đăng Ký (Dành Cho Khách Mời)</span>
+          {/* Quản lý Mã QR & Biểu Mẫu Sự Kiện — Đã tách ra màn hình chuyên dụng /checkin-qr */}
+          <section className="rounded-2xl border border-border bg-card p-5 shadow-[var(--shadow-card)] space-y-3">
+            <div className="flex items-center gap-2 text-foreground font-bold text-xs uppercase tracking-wider">
+              <QrCode className="h-4 w-4 text-[#003B95]" />
+              <span>Mã QR Đăng Ký &amp; Soát Vé Check-in</span>
             </div>
             <p className="text-xs text-muted-foreground leading-relaxed">
-              Khách mời chưa phải là Học viên có thể quét mã QR bằng Zalo hoặc Camera điện thoại để đăng ký vé tham dự sự kiện.
+              Mã QR đăng ký sự kiện và mã QR soát vé check-in vào cửa đã được tách riêng vào trung tâm cấu hình mã QR chuyên dụng.
             </p>
-            <div className="mx-auto w-44 h-44 p-2 bg-white rounded-2xl border border-amber-300 shadow-sm flex items-center justify-center">
-              <img
-                src={getQrUrl(
-                  typeof window !== "undefined"
-                    ? `${window.location.origin}/guest-event-register/${event.id}`
-                    : `https://crm.ceohn10.viconnect.vn/guest-event-register/${event.id}`,
-                  300
-                )}
-                alt="Mã QR Đăng Ký Khách Mời"
-                className="w-full h-full object-contain"
-              />
-            </div>
-            <div className="flex items-center gap-2 pt-1">
-              <button
-                type="button"
-                onClick={() => setGuestQrOpen(true)}
-                className="flex-1 inline-flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs shadow-xs transition cursor-pointer"
-              >
-                <Maximize2 className="h-3.5 w-3.5" />
-                <span>Trình Chiếu QR</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  const url = `${window.location.origin}/guest-event-register/${event.id}`;
-                  navigator.clipboard.writeText(url);
-                  toast.success("Đã sao chép link đăng ký khách mời!");
-                }}
-                className="inline-flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl border border-border bg-card hover:bg-muted text-foreground font-semibold text-xs transition cursor-pointer"
-                title="Sao chép link"
-              >
-                <Copy className="h-3.5 w-3.5" />
-                <span>Copy Link</span>
-              </button>
-            </div>
+            <Link
+              to="/checkin-qr"
+              search={{ eventId: event.id }}
+              className="w-full inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-[#003B95] hover:bg-[#002B70] text-white font-bold text-xs shadow-md transition"
+            >
+              <QrCode className="h-4 w-4 text-amber-400" />
+              <span>Thiết Lập 2 Mã QR &amp; Biểu Mẫu</span>
+            </Link>
           </section>
 
           <EventRegistrationPanel
@@ -750,21 +710,21 @@ function EventDetailPage() {
             registrations={registrations}
             canManage={canManage}
           />
-          <EventCheckinPanel event={event} registrations={registrations} canManage={canManage} />
         </aside>
       </div>
 
-      {/* Sticky mobile action bar (sits above the bottom tab bar) */}
+      {/* Sticky mobile action bar */}
       {canManage && (
         <div className="fixed inset-x-0 bottom-[calc(3.5rem+env(safe-area-inset-bottom))] z-30 flex items-center gap-2 border-t border-border bg-card/95 p-3 backdrop-blur md:hidden">
-          <button
-            type="button"
-            onClick={() => setGatekeeperOpen(true)}
-            aria-label="Quản lý QR Gatekeeper"
-            className="grid h-12 w-12 shrink-0 place-items-center rounded-xl border border-amber-500/40 bg-amber-500/10 text-amber-600 transition active:scale-95"
+          <Link
+            to="/checkin-qr"
+            search={{ eventId: event.id }}
+            aria-label="Cấu hình QR Sự kiện"
+            className="grid h-12 w-12 shrink-0 place-items-center rounded-xl border border-[#003B95]/40 bg-blue-50 text-[#003B95] transition active:scale-95"
+            title="Cấu hình QR"
           >
             <QrCode className="h-5 w-5" aria-hidden="true" />
-          </button>
+          </Link>
           <Link
             to="/event-registrations"
             aria-label={t("edetail.cta.manageReg")}
@@ -813,13 +773,6 @@ function EventDetailPage() {
         cancelLabel={t("common.cancel")}
         onSubmit={onSubmit}
         onClose={() => setEditOpen(false)}
-      />
-
-      <EventCheckinGatekeeperModal
-        open={gatekeeperOpen}
-        event={event}
-        onClose={() => setGatekeeperOpen(false)}
-        onUpdateEvent={() => router.invalidate()}
       />
 
       {/* Event Cancel Confirmation Modal */}
@@ -898,19 +851,6 @@ function EventDetailPage() {
           </div>
         </div>
       )}
-
-      <EventGuestQrPresenterModal
-        open={guestQrOpen}
-        onClose={() => setGuestQrOpen(false)}
-        event={{
-          id: event.id,
-          name: event.name,
-          date: event.date ? fmt.date(event.date) : undefined,
-          location: event.location,
-          ticketPrice: (event as any).ticketPrice ?? (event as any).ticket_price ?? (event as any).fee,
-          fee: (event as any).fee,
-        }}
-      />
 
       <EventPosterModal
         open={posterOpen}
@@ -1011,8 +951,6 @@ function TicketsSection({
   const fmt = useFmt();
   const router = useRouter();
   const [busy, setBusy] = useState<string | null>(null);
-  const [qrOpen, setQrOpen] = useState(false);
-  const [savingQr, setSavingQr] = useState(false);
 
   const handleDownload = async (tk: TicketType, kind: "png" | "pdf") => {
     setBusy(`${tk.id}-${kind}`);
@@ -1031,24 +969,6 @@ function TicketsSection({
     }
   };
 
-  const applyQrFields = async (fields: QrField[]) => {
-    setSavingQr(true);
-    try {
-      await fetchNestApi(`/events/${event.id}/qr-fields`, {
-        method: "PUT",
-        body: JSON.stringify({ qrFields: fields }),
-      });
-      toast.success(t("edetail.qr.saved"));
-      setQrOpen(false);
-      await router.invalidate();
-    } catch (err: any) {
-      console.error("[EventDetail] Save QR fields error:", err);
-      toast.error(err?.message || t("edetail.qr.saveError"));
-    } finally {
-      setSavingQr(false);
-    }
-  };
-
   return (
     <section className="rounded-2xl border border-border bg-card p-6 shadow-[var(--shadow-card)]">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
@@ -1057,19 +977,15 @@ function TicketsSection({
           {t("edetail.tickets.title")}
         </h2>
         <div className="flex items-center gap-2">
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-secondary px-2.5 py-1 text-[11px] font-medium text-muted-foreground">
-            <QrCode className="h-3.5 w-3.5" aria-hidden="true" />
-            {event.qrFields.map((f) => t(`ewz.qr.${f}` as never)).join(" · ")}
-          </span>
           {canManage && (
-            <button
-              type="button"
-              onClick={() => setQrOpen(true)}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-card px-2.5 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            <Link
+              to="/checkin-qr"
+              search={{ eventId: event.id }}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-[#003B95]/40 bg-blue-50 px-2.5 py-1.5 text-xs font-semibold text-[#003B95] transition-colors hover:bg-blue-100"
             >
               <QrCode className="h-3.5 w-3.5" aria-hidden="true" />
-              {t("edetail.qr.configure")}
-            </button>
+              <span>Cấu hình 2 Mã QR &amp; Biểu mẫu</span>
+            </Link>
           )}
         </div>
       </div>
@@ -1133,13 +1049,6 @@ function TicketsSection({
           ))}
         </ul>
       )}
-      <EventQrConfigModal
-        open={qrOpen}
-        initial={event.qrFields}
-        submitting={savingQr}
-        onClose={() => setQrOpen(false)}
-        onSubmit={applyQrFields}
-      />
     </section>
   );
 }

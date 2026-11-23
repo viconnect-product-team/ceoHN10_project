@@ -288,7 +288,7 @@ export class UsersRepository {
       );
     const cleanEmail = (email || '').trim().toLowerCase();
     const rows = await this.prisma.$queryRaw<any[]>`
-      SELECT id, code, email, company_name, company_size, employees, executive_role, department, association_id, about, notes, name, contact, phone FROM public.members 
+      SELECT id, code, email, company_name, company_size, employees, executive_role, department, association_id, about, notes, name, contact, phone, card_visibility_settings FROM public.members 
       WHERE ( ${isUuid} AND user_id = ${userId}::uuid )
          OR id = ${userId}
          OR ( ${cleanEmail !== ''} AND LOWER(email) = ${cleanEmail} )

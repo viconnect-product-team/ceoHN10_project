@@ -39,7 +39,7 @@ if (!fs.existsSync(outDir)) {
 const moduleManifests = {
   events: {
     title: 'Phân Hệ Quản Lý Sự Kiện, Check-in & Vé Điện Tử - CEO HN10',
-    description: 'Bao gồm tạo sự kiện, import danh sách 3 định dạng (.docx, .xlsx, .pdf), dynamic DDL database, check-in 2 mã QR, vòng quay may mắn Canvas, live photo stream, và khảo sát đánh giá sau sự kiện.',
+    description: 'Bao gồm tạo sự kiện, import danh sách 3 định dạng (.docx, .xlsx, .pdf), dynamic DDL database, check-in 2 mã QR (hỗ trợ offline-first), vòng quay may mắn Canvas, live photo stream, và khảo sát đánh giá sau sự kiện.',
     backendFiles: [
       'apps/ceohn10_app_be/src/events',
     ],
@@ -53,6 +53,116 @@ const moduleManifests = {
     ],
     testFiles: [
       'test-data/events',
+    ],
+  },
+  members: {
+    title: 'Phân Hệ Quản Lý Hội Viên, Hồ Sơ Doanh Nghiệp & Thẻ Điện Tử - CEO HN10',
+    description: 'Bao gồm danh bạ hội viên, chi tiết doanh nghiệp, thẻ hội viên số tích hợp mã QR xác thực hội viên CLB.',
+    backendFiles: [
+      'apps/ceohn10_app_be/src/members',
+      'apps/ceohn10_app_be/src/business-card',
+    ],
+    frontendFiles: [
+      'apps/ceohn10_app_fe/src/routes/members.index.tsx',
+      'apps/ceohn10_app_fe/src/routes/members.$memberId.tsx',
+    ],
+    testFiles: [
+      'test-data/events',
+    ],
+  },
+  finance: {
+    title: 'Phân Hệ Quản Lý Tài Chính Quỹ & Thu Phí SePay VietQR - CEO HN10',
+    description: 'Bao gồm quản lý thu chi, quỹ hội viên, hạch toán tự động từ SePay VietQR Webhook, tự động phân bổ thu phí sự kiện và hội phí.',
+    backendFiles: [
+      'apps/ceohn10_app_be/src/payment',
+    ],
+    frontendFiles: [
+      'apps/ceohn10_app_fe/src/routes/finance-report.tsx',
+    ],
+    testFiles: [
+      'test-data/events',
+    ],
+  },
+  b2b: {
+    title: 'Phân Hệ B2B Kết Nối Giao Thương & Gian Hàng Số - CEO HN10',
+    description: 'Bao gồm sàn kết nối cung cầu, bảng tin cơ hội kinh doanh giữa các chủ doanh nghiệp trong CLB.',
+    backendFiles: [
+      'apps/ceohn10_app_be/src/connect-app',
+      'apps/ceohn10_app_be/src/supplies',
+    ],
+    frontendFiles: [
+      'apps/ceohn10_app_fe/src/routes/opportunities.index.tsx',
+      'apps/ceohn10_app_fe/src/routes/opportunities.$id.tsx',
+    ],
+    testFiles: [
+      'test-data/events',
+    ],
+  },
+  communications: {
+    title: 'Phân Hệ Truyền Thông, Tin Tức & Zalo OA / Email - CEO HN10',
+    description: 'Bao gồm bản tin nội bộ, gửi thông báo tự động qua Zalo OA Template và Email SMTP (vé mời, nhắc lịch, xác nhận thanh toán).',
+    backendFiles: [
+      'apps/ceohn10_app_be/src/zalo',
+      'apps/ceohn10_app_be/src/mail',
+    ],
+    frontendFiles: [
+      'apps/ceohn10_app_fe/src/routes/news.tsx',
+      'apps/ceohn10_app_fe/src/routes/notifications.tsx',
+    ],
+    testFiles: [
+      'test-data/events',
+    ],
+  },
+  '5-modules': {
+    title: 'Trọn Bộ 5 Module Nghiệp Vụ Chuyển Giao Khách Hàng - CEO HN10',
+    description: 'Gói tổng hợp độc lập 5 module: Events & Check-in, Members & Cards, Finance & SePay, B2B Connect, Communications & Zalo OA. Tách rời hoàn toàn khỏi Core Engine bảo mật của công ty.',
+    backendFiles: [
+      'apps/ceohn10_app_be/package.json',
+      'apps/ceohn10_app_be/nest-cli.json',
+      'apps/ceohn10_app_be/tsconfig.json',
+      'apps/ceohn10_app_be/src/main.ts',
+      'apps/ceohn10_app_be/src/app.controller.ts',
+      'apps/ceohn10_app_be/src/app.service.ts',
+      'apps/ceohn10_app_be/src/common',
+      'apps/ceohn10_app_be/src/prisma',
+      'apps/ceohn10_app_be/src/auth',
+      'apps/ceohn10_app_be/src/users',
+      'apps/ceohn10_app_be/src/upload',
+      'apps/ceohn10_app_be/src/events',
+      'apps/ceohn10_app_be/src/members',
+      'apps/ceohn10_app_be/src/business-card',
+      'apps/ceohn10_app_be/src/payment',
+      'apps/ceohn10_app_be/src/connect-app',
+      'apps/ceohn10_app_be/src/supplies',
+      'apps/ceohn10_app_be/src/zalo',
+      'apps/ceohn10_app_be/src/mail',
+    ],
+    frontendFiles: [
+      'apps/ceohn10_app_fe/package.json',
+      'apps/ceohn10_app_fe/vite.config.ts',
+      'apps/ceohn10_app_fe/tsconfig.json',
+      'apps/ceohn10_app_fe/src/styles.css',
+      'apps/ceohn10_app_fe/src/lib',
+      'apps/ceohn10_app_fe/src/components/ui',
+      'apps/ceohn10_app_fe/src/routes/__root.tsx',
+      'apps/ceohn10_app_fe/src/router.tsx',
+      'apps/ceohn10_app_fe/src/routes/events.index.tsx',
+      'apps/ceohn10_app_fe/src/routes/event-registrations.tsx',
+      'apps/ceohn10_app_fe/src/routes/event-checkin.tsx',
+      'apps/ceohn10_app_fe/src/routes/guest-event-register.$eventId.tsx',
+      'apps/ceohn10_app_fe/src/routes/guest-event-feedback.$eventId.tsx',
+      'apps/ceohn10_app_fe/src/components/events',
+      'apps/ceohn10_app_fe/src/routes/members.index.tsx',
+      'apps/ceohn10_app_fe/src/routes/members.$memberId.tsx',
+      'apps/ceohn10_app_fe/src/routes/finance-report.tsx',
+      'apps/ceohn10_app_fe/src/routes/opportunities.index.tsx',
+      'apps/ceohn10_app_fe/src/routes/opportunities.$id.tsx',
+      'apps/ceohn10_app_fe/src/routes/news.tsx',
+      'apps/ceohn10_app_fe/src/routes/notifications.tsx',
+    ],
+    testFiles: [
+      'test-data/events',
+      'deploy/init-prod-server.sh',
     ],
   },
 };
@@ -119,17 +229,109 @@ DATABASE_URL="postgresql://app1:5^S0CEpvYwC1(#YN1UoJ@113.20.107.184:6432/ceohn10
 
 # SePay VietQR (Tự động hạch toán)
 SEPAY_BANK_NAME="MBBank"
-SEPAY_ACCOUNT_NO="198300000000"
-SEPAY_ACCOUNT_HOLDER="CLB DOANH NHAN CEO HN10"
+SEPAY_ACCOUNT_NO=""
+SEPAY_ACCOUNT_HOLDER=""
+SEPAY_API_TOKEN=""
+SEPAY_WEBHOOK_SECRET=""
 
 # Zalo OA Thông báo
-ZALO_OA_ID="mock-oa-id"
-ZALO_APP_ID="mock-app-id"
+ZALO_OA_ID=""
+ZALO_APP_ID=""
+ZALO_APP_SECRET=""
+ZALO_REFRESH_TOKEN=""
 `;
 
 fs.writeFileSync(path.join(outDir, '.env.example'), standaloneEnvExample, 'utf-8');
 
+// Tạo .gitignore chuẩn
+const standaloneGitIgnore = `# Dependencies
+node_modules/
+**/node_modules/**
+
+# Build outputs
+dist/
+dist-ssr/
+.output/
+.tanstack/
+.nitro/
+build/
+
+# Environment files
+.env
+.env.production
+.env.staging
+.env.local
+*.local
+
+# System & Editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# Uploads
+uploads/*
+!uploads/.gitkeep
+`;
+
+fs.writeFileSync(path.join(outDir, '.gitignore'), standaloneGitIgnore, 'utf-8');
+
 // Tạo README hướng dẫn chạy module cho khách hàng
+if (moduleName === '5-modules') {
+  // Sinh app.module.ts độc lập chỉ chứa 5 module
+  const standaloneAppModule = `import { Module } from '@nestjs/common';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
+import { AuthModule } from './auth/auth.module';
+import { UsersModule } from './users/users.module';
+import { PrismaModule } from './prisma/prisma.module';
+import { BusinessCardModule } from './business-card/business-card.module';
+import { UploadModule } from './upload/upload.module';
+import { MailModule } from './mail/mail.module';
+import { ConnectAppModule } from './connect-app/connect-app.module';
+import { EventsModule } from './events/events.module';
+import { MembersModule } from './members/members.module';
+import { ZaloModule } from './zalo/zalo.module';
+import { PaymentModule } from './payment/payment.module';
+import { SuppliesModule } from './supplies/supplies.module';
+
+@Module({
+  imports: [
+    ServeStaticModule.forRoot({
+      rootPath: join(process.cwd(), 'uploads'),
+      serveRoot: '/uploads',
+    }),
+    AuthModule,
+    UsersModule,
+    PrismaModule,
+    BusinessCardModule,
+    UploadModule,
+    MailModule,
+    ConnectAppModule,
+    EventsModule,
+    MembersModule,
+    ZaloModule,
+    PaymentModule,
+    SuppliesModule,
+  ],
+  controllers: [AppController],
+  providers: [AppService],
+})
+export class AppModule {}
+`;
+  fs.writeFileSync(
+    path.join(outDir, 'apps/ceohn10_app_be/src/app.module.ts'),
+    standaloneAppModule,
+    'utf-8'
+  );
+}
+
 const standaloneReadme = `# ${manifest.title}
 *Gói Module Độc Lập Chuyển Giao Khách Hàng - CEO HN10 Ecosystem*
 

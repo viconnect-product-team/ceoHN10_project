@@ -144,9 +144,20 @@ export class ZaloService implements OnModuleInit, OnModuleDestroy {
       const secretKey = cfg?.secretKey || cfg?.secret_key || process.env.ZALO_APP_SECRET || '';
       const refreshToken = cfg?.refreshToken || cfg?.refresh_token || process.env.ZALO_REFRESH_TOKEN;
 
-      if (!refreshToken || !appId || !secretKey) {
+      const cleanAppId = String(appId).trim();
+      const cleanSecret = String(secretKey).trim();
+      const cleanRefresh = String(refreshToken).trim();
+
+      const isConfigured =
+        Boolean(cleanAppId && cleanSecret && cleanRefresh) &&
+        !cleanAppId.includes('mock') &&
+        !cleanSecret.includes('mock') &&
+        !cleanRefresh.includes('mock') &&
+        /^\d+$/.test(cleanAppId);
+
+      if (!isConfigured) {
         this.logger.log(
-          '[Zalo Auto-Refresh] Chưa có cấu hình Refresh Token Zalo OA trong CSDL hoặc .env để tự động gia hạn.',
+          '[Zalo Auto-Refresh] Chưa có cấu hình App ID số hợp lệ & Refresh Token Zalo OA thật trong CSDL hoặc .env để tự động gia hạn (Bỏ qua làm mới token).',
         );
         return;
       }
@@ -191,6 +202,7 @@ export class ZaloService implements OnModuleInit, OnModuleDestroy {
       refreshToken: process.env.ZALO_REFRESH_TOKEN || '',
       autoRefreshActive: true,
       refreshIntervalHours: 4,
+      targetApp: 'all',
       webhookUrl: 'https://crm.ceohn10.viconnect.vn/api/zalo/webhook',
     };
 
@@ -214,6 +226,7 @@ export class ZaloService implements OnModuleInit, OnModuleDestroy {
           accessToken: parsed.access_token || parsed.accessToken || defaultConfig.accessToken,
           refreshToken: parsed.refresh_token || parsed.refreshToken || defaultConfig.refreshToken,
           webhookUrl: parsed.webhook_url || parsed.webhookUrl || defaultConfig.webhookUrl,
+          targetApp: parsed.target_app || parsed.targetApp || 'all',
           autoRefreshActive: true,
         };
       }
@@ -231,6 +244,7 @@ export class ZaloService implements OnModuleInit, OnModuleDestroy {
           ...parsed,
           accessToken: parsed.accessToken || defaultConfig.accessToken,
           refreshToken: parsed.refreshToken || defaultConfig.refreshToken,
+          targetApp: parsed.target_app || parsed.targetApp || 'all',
           autoRefreshActive: true,
         };
       }
@@ -308,6 +322,10 @@ export class ZaloService implements OnModuleInit, OnModuleDestroy {
           typeof config.oaId === 'string' && config.oaId.trim()
             ? config.oaId.trim()
             : current.oaId,
+        targetApp:
+          typeof config.targetApp === 'string' && config.targetApp.trim()
+            ? config.targetApp.trim()
+            : (current.targetApp || 'all'),
       };
 
       const persistedConfig = { ...mergedConfig };
@@ -323,6 +341,14 @@ export class ZaloService implements OnModuleInit, OnModuleDestroy {
         JSON.stringify(persistedConfig),
         validUserId,
       );
+
+      // Đồng bộ sang master_system_settings
+      await this.prisma.$executeRawUnsafe(
+        `INSERT INTO public.master_system_settings (id, setting_key, setting_value, updated_at)
+         VALUES (gen_random_uuid(), 'zalo_oa_integration_config', $1::jsonb, NOW())
+         ON CONFLICT (setting_key) DO UPDATE SET setting_value = EXCLUDED.setting_value, updated_at = NOW()`,
+        JSON.stringify(persistedConfig),
+      ).catch(() => {});
       return {
         ok: true,
         message: 'Đã lưu cấu hình Zalo OA vào CSDL thành công',
@@ -352,14 +378,25 @@ export class ZaloService implements OnModuleInit, OnModuleDestroy {
         '[Zalo Auto-Refresh 6h] Bắt đầu kiểm tra và làm mới token Zalo OA...',
       );
       const cfg = await this.getOaConfig();
-      if (!cfg || !cfg.refreshToken || !cfg.appId || !cfg.secretKey) {
-        this.logger.warn(
-          '[Zalo Auto-Refresh 6h] Bỏ qua: Chưa cấu hình đủ appId, secretKey hoặc refreshToken trong CSDL',
+      const appId = String(cfg?.appId || '').trim();
+      const secretKey = String(cfg?.secretKey || '').trim();
+      const refreshToken = String(cfg?.refreshToken || '').trim();
+
+      const isConfigured =
+        Boolean(appId && secretKey && refreshToken) &&
+        !appId.includes('mock') &&
+        !secretKey.includes('mock') &&
+        !refreshToken.includes('mock') &&
+        /^\d+$/.test(appId);
+
+      if (!isConfigured) {
+        this.logger.log(
+          '[Zalo Auto-Refresh 6h] Bỏ qua: Chưa có App ID số hợp lệ và Refresh Token thật từ Zalo Developers.',
         );
         return {
           ok: false,
           message:
-            'Chưa cấu hình đủ thông tin Zalo OA (AppId, SecretKey, RefreshToken) trong CSDL',
+            'Chưa cấu hình thông số Zalo OA hợp lệ (AppId phải là số hợp lệ từ Zalo Developers)',
         };
       }
 

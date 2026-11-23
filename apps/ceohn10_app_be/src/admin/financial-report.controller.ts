@@ -88,4 +88,23 @@ export class FinancialReportController {
   async deleteRow(@Param('id') id: string) {
     return this.financialReportService.deleteRow(id);
   }
+
+  // ── LỆNH ĐIỀU CHUYỂN NGÂN SÁCH QUỸ BAN CHUYÊN MÔN (BAN CÔNG NGHỆ) ───────────
+
+  @Post('fund-transfer')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @RequireActions('FIN_ROW_ADD')
+  async transferDepartmentFund(
+    @Body() body: {
+      fromDepartment?: string;
+      toDepartment: string;
+      amount: number;
+      description: string;
+      invoiceUrl?: string;
+      fundAccountLink?: string;
+      transactionDate?: string;
+    },
+  ) {
+    return this.financialReportService.transferDepartmentFund(body);
+  }
 }

@@ -5,29 +5,127 @@
 
 export const RBAC_MATRIX_STORAGE_KEY = "ceohn10_rbac_tree_matrix_v7_sidebar_menu";
 
+export interface SystemTenantDef {
+  key: string;
+  name: string;
+  shortName: string;
+  code: string;
+  brandName: string;
+  brandLogo: string;
+  description: string;
+  enabledModules: string[];
+}
+
+export const SYSTEM_TENANTS: SystemTenantDef[] = [
+  {
+    key: "ceohn10",
+    name: "CLB Doanh Nhân CEO HN10 (HanoiBA)",
+    shortName: "CEO HN10",
+    code: "CEOHN10",
+    brandName: "Hiệp hội Doanh nhân CEO HN10",
+    brandLogo: "/app-icon.png",
+    description: "Cổng Quản trị Doanh Trí, Lớp học 30 chuyên đề, Sự kiện & Hội viên CEO HN10",
+    enabledModules: [
+      "classes",
+      "events",
+      "members",
+      "finance",
+      "b2b",
+      "zalo_oa",
+      "ai_assistant",
+      "voting",
+      "lucky_draw",
+      "documents",
+      "templates",
+    ],
+  },
+  {
+    key: "ceo1983",
+    name: "CLB Doanh Nhân CEO 1983",
+    shortName: "CEO 1983",
+    code: "CEO1983",
+    brandName: "CLB Doanh Nhân CEO 1983",
+    brandLogo: "/app-icon.png",
+    description: "Cổng Quản trị Kết nối Giao thương, Sự kiện & Hội viên CLB CEO 1983",
+    enabledModules: [
+      "events",
+      "members",
+      "finance",
+      "b2b",
+      "zalo_oa",
+      "ai_assistant",
+      "voting",
+      "lucky_draw",
+      "documents",
+      "templates",
+    ],
+  },
+];
+
+export const TENANT_STORAGE_KEY = "viconnect_active_tenant";
+
+export function getActiveSystemTenant(): string {
+  if (typeof window === "undefined") return "ceohn10";
+  try {
+    const rawUser = localStorage.getItem("vibe_user");
+    if (rawUser) {
+      const u = JSON.parse(rawUser);
+      if (u.targetSystem && u.targetSystem !== "all") {
+        return u.targetSystem;
+      }
+    }
+    const saved = localStorage.getItem(TENANT_STORAGE_KEY);
+    if (saved && (saved === "ceohn10" || saved === "ceo1983")) {
+      return saved;
+    }
+  } catch {}
+  return "ceohn10";
+}
+
+export function setActiveSystemTenant(tenantKey: string): void {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.setItem(TENANT_STORAGE_KEY, tenantKey);
+    const tenant = SYSTEM_TENANTS.find((t) => t.key === tenantKey) || SYSTEM_TENANTS[0];
+    localStorage.setItem("vba_active_assoc_name", tenant.brandName);
+    localStorage.setItem("crm_system_name", tenant.brandName);
+    window.dispatchEvent(new CustomEvent("association-changed", { detail: { name: tenant.brandName } }));
+    window.dispatchEvent(new CustomEvent("tenant-changed", { detail: { tenantKey, tenant } }));
+  } catch {}
+}
+
+export function isModuleEnabledForTenant(moduleKey: string, tenantKey?: string): boolean {
+  const activeKey = tenantKey || getActiveSystemTenant();
+  if (typeof window !== "undefined") {
+    try {
+      const rawMatrix = localStorage.getItem("viconnect_system_modules_matrix");
+      if (rawMatrix) {
+        const matrix = JSON.parse(rawMatrix);
+        if (matrix[activeKey] && Array.isArray(matrix[activeKey])) {
+          return matrix[activeKey].includes(moduleKey);
+        }
+      }
+    } catch {}
+  }
+  const tenant = SYSTEM_TENANTS.find((t) => t.key === activeKey) || SYSTEM_TENANTS[0];
+  return tenant.enabledModules.includes(moduleKey);
+}
+
 export type SystemRoleKey =
+  | "admin_platform"
+  | "lop_truong"
+  | "admin"
+  | "lop_pho"
+  | "truong_team"
+  | "pho_team"
+  | "truong_ban_chuyen_trach"
+  | "member"
+  // Aliases tương thích ngược
   | "quan_tri"
   | "chu_tich"
   | "pho_chu_tich"
-  | "admin"
   | "tong_thu_ky"
-  | "truong_ban_dieu_hanh"
-  | "thanh_vien_ban_dieu_hanh"
-  | "truong_ban_su_kien"
-  | "thanh_vien_ban_su_kien"
-  | "truong_ban_dao_tao"
-  | "thanh_vien_ban_dao_tao"
-  | "truong_ban_truyen_thong"
-  | "thanh_vien_ban_truyen_thong"
-  | "truong_ban_thanh_vien"
-  | "thanh_vien_ban_thanh_vien"
-  | "truong_ban_xuc_tien"
-  | "thanh_vien_ban_xuc_tien"
-  | "truong_ban_tai_chinh"
-  | "thanh_vien_ban_tai_chinh"
-  | "truong_ban_thien_nguyen"
-  | "thanh_vien_ban_thien_nguyen"
-  | "member";
+  | "truong_ban_dieu_hanh";
 
 export interface SystemRoleDef {
   key: SystemRoleKey;
@@ -39,200 +137,71 @@ export interface SystemRoleDef {
 
 export const SYSTEM_5_ROLES: SystemRoleDef[] = [
   {
-    key: "quan_tri",
-    name: "Quản trị",
-    shortName: "Quản trị",
+    key: "admin_platform",
+    name: "Admin Platform",
+    shortName: "Admin Platform",
     color: "text-indigo-700 bg-indigo-50 border-indigo-200 dark:bg-indigo-950/50 dark:text-indigo-300 dark:border-indigo-800",
-    desc: "Toàn quyền hệ thống & phân quyền cao nhất",
+    desc: "Quản trị viên nền tảng tối cao, toàn quyền hệ thống & phân quyền cao nhất",
   },
   {
-    key: "chu_tich",
-    name: "Lớp Trưởng Lâm thời",
-    shortName: "Lớp Trưởng Lâm thời",
+    key: "lop_truong",
+    name: "Lớp trưởng",
+    shortName: "Lớp trưởng",
     color: "text-amber-800 bg-amber-100 border-amber-300 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-700",
-    desc: "Lớp Trưởng Lâm thời CEO HN10 - Điều hành và phê duyệt tối cao toàn lớp",
-  },
-  {
-    key: "pho_chu_tich",
-    name: "Lớp Phó Lâm thời",
-    shortName: "Lớp Phó Lâm thời",
-    color: "text-blue-800 bg-blue-100 border-blue-300",
-    desc: "Lớp Phó Lâm thời CEO HN10 - Phụ trách các ban chuyên môn và điều hành lớp",
+    desc: "Lớp trưởng CEO HN10 - Điều hành và phê duyệt tối cao toàn lớp",
   },
   {
     key: "admin",
     name: "Admin",
     shortName: "Admin",
     color: "text-purple-700 bg-purple-50 border-purple-200 dark:bg-purple-950/50 dark:text-purple-300 dark:border-purple-800",
-    desc: "Quản trị viên vận hành nghiệp vụ CRM",
+    desc: "Quản trị viên vận hành hệ thống CRM & CSDL",
   },
   {
-    key: "tong_thu_ky",
-    name: "Tổng thư ký",
-    shortName: "Tổng thư ký",
-    color: "text-amber-700 bg-amber-50 border-amber-200 dark:bg-amber-950/50 dark:text-amber-300 dark:border-amber-800",
-    desc: "Điều phối thư ký, sự kiện, cuộc họp & công văn",
+    key: "lop_pho",
+    name: "Lớp phó",
+    shortName: "Lớp phó",
+    color: "text-blue-800 bg-blue-100 border-blue-300 dark:bg-blue-950/60 dark:text-blue-300 dark:border-blue-700",
+    desc: "Lớp phó điều hành, phụ trách các ban chuyên môn và hoạt động lớp",
   },
   {
-    key: "truong_ban_dieu_hanh",
-    name: "Trưởng ban Điều hành",
-    shortName: "TB Điều Hành",
-    color: "text-blue-700 bg-blue-50 border-blue-200 dark:bg-blue-950/50 dark:text-blue-300 dark:border-blue-800",
-    desc: "Điều hành quản lý nội bộ, quy chế & điều phối các ban",
+    key: "truong_team",
+    name: "Trưởng team",
+    shortName: "Trưởng team",
+    color: "text-purple-700 bg-purple-50 border-purple-200 dark:bg-purple-950/50 dark:text-purple-300 dark:border-purple-800",
+    desc: "Trưởng các team/nhóm học viên trong lớp",
   },
   {
-    key: "thanh_vien_ban_dieu_hanh",
-    name: "Thành viên Ban Điều Hành",
-    shortName: "TV Ban Điều Hành",
-    color: "text-blue-700 bg-blue-50 border-blue-200 dark:bg-blue-950/50 dark:text-blue-300 dark:border-blue-800",
-    desc: "Thành viên trực thuộc Ban Điều Hành Hiệp Hội",
+    key: "pho_team",
+    name: "Phó team",
+    shortName: "Phó team",
+    color: "text-cyan-700 bg-cyan-50 border-cyan-200 dark:bg-cyan-950/50 dark:text-cyan-300 dark:border-cyan-800",
+    desc: "Phó các team/nhóm học viên hỗ trợ trưởng team",
   },
   {
-    key: "truong_ban_su_kien",
-    name: "Trưởng ban Sự kiện & Hậu cần",
-    shortName: "TB Sự Kiện",
-    color: "text-rose-700 bg-rose-50 border-rose-200 dark:bg-rose-950/50 dark:text-rose-300 dark:border-rose-800",
-    desc: "Tổ chức sự kiện, khai báo vật dụng hỗ trợ, e-ticket & check-in",
-  },
-  {
-    key: "truong_ban_dao_tao",
-    name: "Trưởng ban Đào tạo & Phát triển",
-    shortName: "TB Đào Tạo",
-    color: "text-blue-700 bg-blue-50 border-blue-200 dark:bg-blue-950/50 dark:text-blue-300 dark:border-blue-800",
-    desc: "Quản lý khóa đào tạo doanh nhân, lớp học thứ 7 và học liệu",
-  },
-  {
-    key: "thanh_vien_ban_dao_tao",
-    name: "Thành viên Ban Đào Tạo",
-    shortName: "TV Đào Tạo",
-    color: "text-blue-600 bg-blue-50 border-blue-200 dark:bg-blue-950/50 dark:text-blue-300 dark:border-blue-800",
-    desc: "Hỗ trợ tổ chức lớp học, điểm danh và quản lý học viên",
-  },
-  {
-    key: "truong_ban_truyen_thong",
-    name: "Trưởng ban Truyền thông",
-    shortName: "TB Truyền thông",
-    color: "text-rose-700 bg-rose-50 border-rose-200 dark:bg-rose-950/50 dark:text-rose-300 dark:border-rose-800",
-    desc: "Quản lý truyền thông, tin tức, nội dung & thương hiệu",
-  },
-  {
-    key: "truong_ban_thanh_vien",
-    name: "Trưởng ban Thành viên",
-    shortName: "TB Thành viên",
+    key: "truong_ban_chuyen_trach",
+    name: "Trưởng ban chuyên trách",
+    shortName: "Trưởng ban",
     color: "text-emerald-700 bg-emerald-50 border-emerald-200 dark:bg-emerald-950/50 dark:text-emerald-300 dark:border-emerald-800",
-    desc: "Quản lý phát triển & thẩm định hồ sơ Học viên",
-  },
-  {
-    key: "truong_ban_xuc_tien",
-    name: "Trưởng ban Xúc tiến thương mại",
-    shortName: "TB Xúc tiến",
-    color: "text-amber-700 bg-amber-50 border-amber-200 dark:bg-amber-950/50 dark:text-amber-300 dark:border-amber-800",
-    desc: "Quản lý kết nối giao thương & cơ hội kinh doanh",
-  },
-  {
-    key: "truong_ban_tai_chinh",
-    name: "Trưởng ban Tài chính",
-    shortName: "TB Tài chính",
-    color: "text-yellow-700 bg-yellow-50 border-yellow-200 dark:bg-yellow-950/50 dark:text-yellow-300 dark:border-yellow-800",
-    desc: "Quản lý quỹ, hội phí, thu chi & tài chính CLB",
-  },
-  {
-    key: "truong_ban_thien_nguyen",
-    name: "Trưởng ban Thiện nguyện",
-    shortName: "TB Thiện nguyện",
-    color: "text-teal-700 bg-teal-50 border-teal-200 dark:bg-teal-950/50 dark:text-teal-300 dark:border-teal-800",
-    desc: "Quản lý hoạt động từ thiện & an sinh xã hội",
-  },
-  {
-    key: "thanh_vien_ban_su_kien",
-    name: "Thành viên Ban Sự Kiện",
-    shortName: "TV Sự Kiện",
-    color: "text-rose-600 bg-rose-50 border-rose-200 dark:bg-rose-950/50 dark:text-rose-300 dark:border-rose-800",
-    desc: "Thành viên chuyên trách Ban Sự Kiện",
-  },
-  {
-    key: "thanh_vien_ban_xuc_tien",
-    name: "Thành viên Ban Xúc Tiến TM",
-    shortName: "TV Xúc Tiến TM",
-    color: "text-amber-600 bg-amber-50 border-amber-200 dark:bg-amber-950/50 dark:text-amber-300 dark:border-amber-800",
-    desc: "Thành viên chuyên trách Ban Xúc Tiến Thương Mại",
-  },
-  {
-    key: "thanh_vien_ban_thanh_vien",
-    name: "Thành viên Ban Thành Viên",
-    shortName: "TV Thành Viên",
-    color: "text-emerald-600 bg-emerald-50 border-emerald-200 dark:bg-emerald-950/50 dark:text-emerald-300 dark:border-emerald-800",
-    desc: "Thành viên chuyên trách Ban Thành Viên",
-  },
-  {
-    key: "thanh_vien_ban_truyen_thong",
-    name: "Thành viên Ban Truyền Thông",
-    shortName: "TV Truyền Thông",
-    color: "text-blue-600 bg-blue-50 border-blue-200 dark:bg-blue-950/50 dark:text-blue-300 dark:border-blue-800",
-    desc: "Thành viên chuyên trách Ban Truyền Thông",
-  },
-  {
-    key: "thanh_vien_ban_tai_chinh",
-    name: "Thành viên Ban Tài Chính",
-    shortName: "TV Tài Chính",
-    color: "text-yellow-600 bg-yellow-50 border-yellow-200 dark:bg-yellow-950/50 dark:text-yellow-300 dark:border-yellow-800",
-    desc: "Thành viên chuyên trách Ban Tài Chính",
-  },
-  {
-    key: "thanh_vien_ban_thien_nguyen",
-    name: "Thành viên Ban Thiện Nguyện",
-    shortName: "TV Thiện Nguyện",
-    color: "text-teal-600 bg-teal-50 border-teal-200 dark:bg-teal-950/50 dark:text-teal-300 dark:border-teal-800",
-    desc: "Thành viên chuyên trách Ban Thiện Nguyện",
+    desc: "Các Trưởng ban chuyên trách: Đào tạo, Sự kiện, Tài chính, Truyền thông, B2B, Gắn kết",
   },
   {
     key: "member",
     name: "Học viên",
     shortName: "Học viên",
     color: "text-slate-700 bg-slate-50 border-slate-200 dark:bg-slate-900/50 dark:text-slate-300 dark:border-slate-800",
-    desc: "Học viên chính thức tham gia sinh hoạt & giao thương của hiệp hội",
+    desc: "Học viên sinh hoạt chính thức của lớp",
   },
 ];
 
 export const ROLE_OPTIONS = [
-  { value: "quan_tri", label: "Quản trị viên cấp cao" },
-  { value: "chu_tich", label: "Lớp Trưởng Lâm thời" },
-  { value: "pho_chu_tich", label: "Lớp Phó Lâm thời" },
-  { value: "lop_pho_hoc_tap", label: "Lớp Phó Học Tập Lâm Thời" },
-  { value: "lop_pho_su_kien", label: "Lớp Phó Sự Kiện & Hậu Cần Lâm Thời" },
-  { value: "lop_pho_tai_chinh", label: "Lớp Phó Tài Chính Tài Trợ Lâm Thời" },
-  { value: "lop_pho_truyen_thong", label: "Lớp Phó Truyền Thông Lâm Thời" },
-  { value: "lop_pho_cong_nghe", label: "Lớp Phó Công Nghệ Lâm Thời" },
-  { value: "lop_pho_doi_ngoai", label: "Lớp Phó Đối Ngoại & Giao Thương Lâm Thời" },
-  { value: "lop_pho_doi_song", label: "Lớp Phó Đời Sống & Gắn Kết Thành Viên Lâm Thời" },
-  { value: "truong_team_lt", label: "Trưởng Team LT" },
-  { value: "pho_team_lt", label: "2 Phó Team LT" },
-  { value: "pho_team_tap_su", label: "3 Phó Team Tập sự" },
-  { value: "tb_hoc_tap_tap_su", label: "Trưởng Ban Học Tập Tập sự" },
-  { value: "tb_su_kien_tap_su", label: "Trưởng Ban Sự Kiện & Hậu Cần Tập sự" },
-  { value: "tb_tai_chinh_tap_su", label: "Trưởng Ban Tài Chính Tài Trợ Tập sự" },
-  { value: "tb_truyen_thong_tap_su", label: "Trưởng Ban Truyền Thông Tập sự" },
-  { value: "tb_cong_nghe_tap_su", label: "Trưởng Ban Công Nghệ Tập sự" },
-  { value: "tb_doi_ngoai_tap_su", label: "Trưởng Ban Đối Ngoại & Giao Thương Tập sự" },
-  { value: "tb_doi_song_tap_su", label: "Trưởng Ban Đời Sống & Gắn Kết Thành Viên Tập sự" },
-  { value: "admin", label: "Admin" },
-  { value: "tong_thu_ky", label: "Tổng thư ký" },
-  { value: "truong_ban_hoc_tap", label: "Trưởng ban Học tập" },
-  { value: "truong_ban_su_kien", label: "Trưởng ban Sự kiện & Hậu cần" },
-  { value: "truong_ban_tai_chinh", label: "Trưởng ban Tài chính & Tài trợ" },
-  { value: "truong_ban_truyen_thong", label: "Trưởng ban Truyền thông" },
-  { value: "truong_ban_cong_nghe", label: "Trưởng ban Công nghệ" },
-  { value: "truong_ban_doi_ngoai", label: "Trưởng ban Đối ngoại & Giao thương" },
-  { value: "truong_ban_doi_song", label: "Trưởng ban Đời sống & Gắn kết thành viên" },
-  { value: "truong_ban_thien_nguyen", label: "Trưởng ban Thiện nguyện" },
-  { value: "thanh_vien_ban_hoc_tap", label: "Thành viên Ban Học Tập" },
-  { value: "thanh_vien_ban_su_kien", label: "Thành viên Ban Sự Kiện & Hậu Cần" },
-  { value: "thanh_vien_ban_tai_chinh", label: "Thành viên Ban Tài Chính & Tài Trợ" },
-  { value: "thanh_vien_ban_truyen_thong", label: "Thành viên Ban Truyền Thông" },
-  { value: "thanh_vien_ban_cong_nghe", label: "Thành viên Ban Công Nghệ" },
-  { value: "thanh_vien_ban_doi_ngoai", label: "Thành viên Ban Đối Ngoại & Giao Thương" },
-  { value: "thanh_vien_ban_doi_song", label: "Thành viên Ban Đời Sống & Gắn Kết Thành Viên" },
-  { value: "thanh_vien_ban_thien_nguyen", label: "Thành viên Ban Thiện Nguyện" },
+  { value: "admin_platform", label: "Admin Platform (Quản trị nền tảng)" },
+  { value: "lop_truong", label: "Lớp trưởng" },
+  { value: "admin", label: "Admin (Quản trị viên)" },
+  { value: "lop_pho", label: "Lớp phó" },
+  { value: "truong_team", label: "Trưởng team" },
+  { value: "pho_team", label: "Phó team" },
+  { value: "truong_ban_chuyen_trach", label: "Trưởng ban chuyên trách" },
   { value: "member", label: "Học viên" },
 ];
 
@@ -297,38 +266,30 @@ export function normalizeRole(r?: string): SystemRoleKey {
   if (!r) return "member";
   const s = r.toLowerCase().trim();
 
-  // 1. Exact system/admin keys
-  if (s === "quan_tri" || s === "platform_admin" || s === "superadmin" || s.includes("hệ thống") || s === "quản trị") return "quan_tri";
-  if (s === "chu_tich" || s === "president" || s.includes("chủ tịch") || s.includes("lớp trưởng")) return "chu_tich";
-  if (s === "pho_chu_tich" || s.includes("phó chủ tịch") || s.includes("lớp phó")) return "pho_chu_tich";
+  // 1. Quản trị nền tảng, Lớp trưởng, Lớp phó, Trưởng/Phó team, Admin
+  if (s === "admin_platform" || s === "platform_admin" || s === "superadmin" || s.includes("hệ thống") || s === "quản trị" || s === "quan_tri") return "admin_platform";
+  if (s === "lop_truong" || s === "chu_tich" || s === "president" || s.includes("chủ tịch") || s.includes("lớp trưởng")) return "lop_truong";
+  if (s === "lop_pho" || s === "pho_chu_tich" || s.includes("phó chủ tịch") || s.includes("lớp phó")) return "lop_pho";
+  if (s === "truong_team" || s.startsWith("truong_team_") || s.includes("trưởng team") || s.includes("trưởng nhóm")) return "truong_team";
+  if (s === "pho_team" || s.startsWith("pho_team_") || s.includes("phó team") || s.includes("phó nhóm")) return "pho_team";
   if (s === "admin" || s === "adm") return "admin";
-  if (s === "tong_thu_ky" || s === "ttk" || s.includes("tổng thư ký")) return "tong_thu_ky";
-  if (s === "ban_thu_ky" || s === "thu_ky" || s === "btk") return "tong_thu_ky";
+  if (s === "tong_thu_ky" || s === "ttk" || s.includes("tổng thư ký") || s === "ban_thu_ky" || s === "thu_ky" || s === "btk") return "admin";
 
-  // 2. Specific committee members (BEFORE Trưởng ban to prevent false match)
-  if (s === "thanh_vien_ban_dieu_hanh" || s.includes("thành viên ban điều hành") || s.includes("tv điều hành") || s.includes("thành viên bđh")) return "thanh_vien_ban_dieu_hanh";
-  if (s === "thanh_vien_ban_su_kien" || s.includes("thành viên ban sự kiện") || s.includes("tv sự kiện")) return "thanh_vien_ban_su_kien";
-  if (s === "thanh_vien_ban_xuc_tien" || s.includes("thành viên ban xúc tiến") || s.includes("tv xúc tiến")) return "thanh_vien_ban_xuc_tien";
-  if (s === "thanh_vien_ban_thanh_vien" || s.includes("thành viên ban thành viên") || s.includes("tv thành viên")) return "thanh_vien_ban_thanh_vien";
-  if (s === "thanh_vien_ban_truyen_thong" || s.includes("thành viên ban truyền thông") || s.includes("tv truyền thông")) return "thanh_vien_ban_truyen_thong";
-  if (s === "thanh_vien_ban_tai_chinh" || s.includes("thành viên ban tài chính") || s.includes("tv tài chính")) return "thanh_vien_ban_tai_chinh";
-  if (s === "thanh_vien_ban_thien_nguyen" || s.includes("thành viên ban thiện nguyện") || s.includes("tv thiện nguyện")) return "thanh_vien_ban_thien_nguyen";
-
-  // 3. Committee Heads (Trưởng ban)
-  if (s === "truong_ban_dieu_hanh" || s.includes("tbdh") || (s.includes("điều hành") && (s.includes("trưởng") || s.includes("truong") || s.includes("tb")))) return "truong_ban_dieu_hanh";
-  if (s === "truong_ban_truyen_thong" || s.includes("btt") || (s.includes("truyền thông") && (s.includes("trưởng") || s.includes("truong") || s.includes("tb")))) return "truong_ban_truyen_thong";
-  if (s === "truong_ban_thanh_vien" || s.includes("btv") || (s.includes("thành viên") && (s.includes("trưởng") || s.includes("truong") || s.includes("tb")))) return "truong_ban_thanh_vien";
-  if (s === "truong_ban_xuc_tien" || s.includes("bxt") || ((s.includes("xúc tiến") || s.includes("thương mại")) && (s.includes("trưởng") || s.includes("truong") || s.includes("tb")))) return "truong_ban_xuc_tien";
-  if (s === "truong_ban_tai_chinh" || s.includes("btc") || (s.includes("tài chính") && (s.includes("trưởng") || s.includes("truong") || s.includes("tb")))) return "truong_ban_tai_chinh";
-  if (s === "truong_ban_thien_nguyen" || s.includes("btn") || (s.includes("thiện nguyện") && (s.includes("trưởng") || s.includes("truong") || s.includes("tb")))) return "truong_ban_thien_nguyen";
-
-  // 4. Fallback for general committee keywords
-  if (s.includes("sự kiện")) return "thanh_vien_ban_su_kien";
-  if (s.includes("xúc tiến") || s.includes("thương mại")) return "thanh_vien_ban_xuc_tien";
-  if (s.includes("truyền thông")) return "thanh_vien_ban_truyen_thong";
-  if (s.includes("tài chính")) return "thanh_vien_ban_tai_chinh";
-  if (s.includes("thiện nguyện")) return "thanh_vien_ban_thien_nguyen";
-  if (s.includes("thành viên ban")) return "thanh_vien_ban_thanh_vien";
+  // 2. Trưởng ban chuyên trách (Tất cả các ban chuyên môn)
+  if (
+    s === "truong_ban_chuyen_trach" ||
+    s.startsWith("truong_ban_") ||
+    s.startsWith("tb_") ||
+    s.includes("trưởng ban") ||
+    s.includes("tbdh") ||
+    s.includes("btt") ||
+    s.includes("btv") ||
+    s.includes("bxt") ||
+    s.includes("btc") ||
+    s.includes("btn")
+  ) {
+    return "truong_ban_chuyen_trach";
+  }
 
   return "member";
 }
@@ -530,16 +491,18 @@ export function normalizeActionRoles(action: {
 
   const res: Record<string, boolean> = {
     ...current,
-    quan_tri: current.quan_tri ?? true,
+    admin_platform: current.admin_platform ?? current.quan_tri ?? true,
+    lop_truong: current.lop_truong ?? current.chu_tich ?? true,
     admin: current.admin ?? true,
-    tong_thu_ky: current.tong_thu_ky ?? (isSecretary ? true : false),
-    truong_ban_dieu_hanh: current.truong_ban_dieu_hanh ?? (Boolean(current.dieu_hanh || current.bqt) || isLeader ? true : false),
-    truong_ban_truyen_thong: current.truong_ban_truyen_thong ?? (code.startsWith("NWS_") || code.startsWith("EVT_") || isLeader ? true : false),
-    truong_ban_thanh_vien: current.truong_ban_thanh_vien ?? (code.startsWith("MEM_") || isLeader ? true : false),
-    truong_ban_xuc_tien: current.truong_ban_xuc_tien ?? (code.startsWith("OPP_") || code.startsWith("MKT_") || isLeader ? true : false),
-    truong_ban_tai_chinh: current.truong_ban_tai_chinh ?? (isFinance ? true : false),
-    truong_ban_thien_nguyen: current.truong_ban_thien_nguyen ?? (code.startsWith("CHA_") || isLeader ? true : false),
+    lop_pho: current.lop_pho ?? current.pho_chu_tich ?? true,
+    truong_team: current.truong_team ?? (isLeader ? true : false),
+    pho_team: current.pho_team ?? (isLeader ? true : false),
+    truong_ban_chuyen_trach: current.truong_ban_chuyen_trach ?? (isLeader || isSecretary ? true : false),
     member: current.member ?? (isPublicMemberAction && !isFinance ? true : false),
+    // Aliases
+    quan_tri: current.quan_tri ?? current.admin_platform ?? true,
+    chu_tich: current.chu_tich ?? current.lop_truong ?? true,
+    pho_chu_tich: current.pho_chu_tich ?? current.lop_pho ?? true,
   };
   delete res.ban_thu_ky;
   delete res.truong_ban_quan_tri;
@@ -564,10 +527,14 @@ export function isActionAllowedForRole(
   if (actionRoles[roleKey] === true) return true;
   if (actionRoles[roleKey] === false) return false;
 
-  // Quản trị viên tối cao
-  if (roleKey === "quan_tri" || roleKey === "platform_admin") return true;
-  if (roleKey === "chu_tich" && (actionRoles.chu_tich === true || actionRoles.bqt === true || actionRoles.admin === true)) return true;
-  if (roleKey === "admin" && (actionRoles.admin === true || actionRoles.bqt === true)) return true;
+  // Quản trị viên tối cao & Lớp trưởng
+  if (roleKey === "admin_platform" || roleKey === "quan_tri" || roleKey === "platform_admin") return true;
+  if ((roleKey === "lop_truong" || roleKey === "chu_tich") && (actionRoles.lop_truong === true || actionRoles.chu_tich === true || actionRoles.admin_platform === true || actionRoles.admin === true)) return true;
+  if (roleKey === "admin" && (actionRoles.admin === true || actionRoles.admin_platform === true)) return true;
+  if ((roleKey === "lop_pho" || roleKey === "pho_chu_tich") && (actionRoles.lop_pho === true || actionRoles.pho_chu_tich === true || actionRoles.lop_truong === true)) return true;
+  if (roleKey === "truong_team" && (actionRoles.truong_team === true || actionRoles.lop_pho === true)) return true;
+  if (roleKey === "pho_team" && (actionRoles.pho_team === true || actionRoles.truong_team === true)) return true;
+  if (roleKey === "truong_ban_chuyen_trach" && (actionRoles.truong_ban_chuyen_trach === true || actionRoles.lop_pho === true)) return true;
 
   // Ánh xạ thành viên ban & trưởng ban sang các key ban tương ứng trong ma trận
   if (roleKey === "thanh_vien_ban_su_kien" || roleKey === "truong_ban_su_kien") {
@@ -619,6 +586,160 @@ export function getDynamicDepartmentOptions(): string[] {
   return list;
 }
 
+// ── BẢNG PHÂN QUYỀN THAO TÁC CỤ THỂ (GRANULAR PERMISSIONS) ─────────────────────
+export interface GranularPermItem {
+  key: string;
+  name: string;
+  desc: string;
+}
+
+export interface GranularPermCategory {
+  category: string;
+  items: GranularPermItem[];
+}
+
+export const GRANULAR_PERMISSION_CATEGORIES: GranularPermCategory[] = [
+  {
+    category: "1. Tổng quan & Trợ lý AI",
+    items: [
+      { key: "/", name: "Tổng quan Dashboard", desc: "Xem trang điều hành tổng quan hệ thống" },
+      { key: "/ai-assistant", name: "Trợ lý AI Điều Hành", desc: "Sử dụng AI phân tích CRM và xuất hóa đơn điện tử" },
+    ],
+  },
+  {
+    category: "2. Quản lý Học viên",
+    items: [
+      { key: "/members", name: "Quản lý Học viên & Doanh nghiệp", desc: "Xem, thêm sửa và duyệt hồ sơ học viên" },
+    ],
+  },
+  {
+    category: "3. Quản lý Sự kiện & Khai giảng",
+    items: [
+      { key: "/events", name: "Quản lý Sự kiện & Khai giảng", desc: "Tạo và điều hành sự kiện" },
+      { key: "/event-registrations", name: "Quản lý Người đăng ký vé", desc: "Quản lý danh sách đăng ký và vé sự kiện" },
+      { key: "/event-checkin", name: "Cổng Check-in & Soát vé (Online/Offline)", desc: "Quét mã QR và soát vé sự kiện" },
+      { key: "/checkin-qr", name: "Cấu hình Mã QR Sự kiện", desc: "Cấu hình mã QR đăng ký và check-in" },
+      { key: "/lucky-draw", name: "Quản lý Quay thưởng", desc: "Tổ chức bốc thăm trúng thưởng" },
+      { key: "/voting", name: "Biểu quyết & Đánh giá ý kiến", desc: "Tạo và thu thập ý kiến biểu quyết" },
+      { key: "/feedback", name: "Phản hồi & Góp ý", desc: "Khảo sát và phản hồi sau sự kiện" },
+    ],
+  },
+  {
+    category: "4. Phân hệ Lớp học CEO HN10",
+    items: [
+      { key: "/classes?tab=courses", name: "Quản lý Lớp & Lịch học 30 buổi", desc: "Xem và quản lý các chuyên đề học thứ 7" },
+      { key: "/classes?tab=teachers", name: "Quản lý Giảng viên & Chuyên gia", desc: "Quản lý danh sách giảng viên" },
+      { key: "/classes?tab=students", name: "Dashboard Học viên (Đa chỉ số)", desc: "Quản lý điểm danh, quỹ phạt, tín nhiệm" },
+      { key: "/classes?tab=finance", name: "Quỹ Tài Chính Lớp (20tr & Thu/Chi)", desc: "Quản lý quỹ lớp khởi tạo 20tr và các nguồn thu chi" },
+      { key: "/classes?tab=attendance-qr", name: "Mã QR Điểm danh theo buổi", desc: "Chiếu và quản lý mã QR điểm danh" },
+    ],
+  },
+  {
+    category: "5. Tài chính & Ngân sách",
+    items: [
+      { key: "/finance-report", name: "Báo cáo Tài chính Tổng CLB", desc: "Xem báo cáo thu chi ngân sách toàn CLB" },
+    ],
+  },
+  {
+    category: "6. Thông báo & Truyền thông",
+    items: [
+      { key: "/notifications", name: "Thông báo Zalo OA / ZBS", desc: "Tạo và gửi thông báo qua Zalo OA" },
+      { key: "/email-marketing", name: "Thông báo đến Email", desc: "Gửi email marketing cho học viên" },
+    ],
+  },
+  {
+    category: "7. Quản trị & Cài đặt hệ thống",
+    items: [
+      { key: "/documents", name: "Quản lý Tài liệu & Học liệu", desc: "Quản lý tài liệu lớp học và hiệp hội" },
+      { key: "/accounts", name: "Quản trị Người dùng & Phân quyền", desc: "Thêm mới và gán quyền tài khoản" },
+      { key: "/permissions", name: "Ma Trận Phân Quyền RBAC", desc: "Cấu hình phân quyền hệ thống" },
+      { key: "/settings", name: "Cài đặt Cấu hình SePay / Zalo OA", desc: "Cấu hình tích hợp thanh toán và Zalo" },
+    ],
+  },
+];
+
+export function getDefaultPermissionsForRole(role: string): string[] {
+  const allRoutes = GRANULAR_PERMISSION_CATEGORIES.flatMap((c) => c.items.map((i) => i.key));
+
+  if (role === "admin" || role === "quan_tri" || role === "ADM") {
+    return allRoutes;
+  }
+  if (role === "chu_tich" || role === "president") {
+    // Lớp Trưởng Lâm Thời: Quyền điều hành tối cao toàn lớp và sự kiện
+    return allRoutes.filter((r) => r !== "/settings" && r !== "/permissions");
+  }
+  if (role === "pho_chu_tich" || role === "lop_pho_hoc_tap") {
+    return [
+      "/",
+      "/ai-assistant",
+      "/classes?tab=courses",
+      "/classes?tab=teachers",
+      "/classes?tab=students",
+      "/classes?tab=attendance-qr",
+      "/documents",
+    ];
+  }
+  if (role === "lop_pho_tai_chinh" || role === "truong_ban_tai_chinh") {
+    return [
+      "/",
+      "/classes?tab=courses",
+      "/classes?tab=students",
+      "/classes?tab=finance",
+      "/finance-report",
+      "/documents",
+    ];
+  }
+  if (role === "lop_pho_su_kien" || role === "truong_ban_su_kien") {
+    return [
+      "/",
+      "/events",
+      "/event-registrations",
+      "/event-checkin",
+      "/checkin-qr",
+      "/lucky-draw",
+      "/voting",
+      "/feedback",
+      "/classes?tab=courses",
+      "/classes?tab=students",
+    ];
+  }
+  if (role === "lop_pho_truyen_thong" || role === "truong_ban_truyen_thong") {
+    return [
+      "/",
+      "/classes?tab=courses",
+      "/classes?tab=students",
+      "/notifications",
+      "/email-marketing",
+      "/documents",
+    ];
+  }
+  if (role === "giang_vien" || role === "instructor") {
+    return [
+      "/",
+      "/classes?tab=courses",
+      "/classes?tab=teachers",
+      "/classes?tab=attendance-qr",
+      "/documents",
+    ];
+  }
+  if (role.startsWith("truong_ban_")) {
+    return [
+      "/",
+      "/members",
+      "/classes?tab=courses",
+      "/classes?tab=students",
+      "/documents",
+    ];
+  }
+  // Học viên mặc định
+  return [
+    "/",
+    "/classes?tab=courses",
+    "/classes?tab=students",
+    "/documents",
+  ];
+}
+
 /**
  * Kiểm tra 1 route có được phép hiển thị trên Sidebar/CRM theo ma trận phân quyền RBAC CSDL hay không
  */
@@ -626,9 +747,83 @@ export function isRouteAllowedByMatrix(route: string, roleKey: SystemRoleKey, us
   // Làm sạch route (bỏ query parameters & hash fragment: ví dụ /permissions?tab=matrix -> /permissions)
   const cleanRoute = (route || "").split("?")[0].split("#")[0];
 
-  // Trang Tổng quan và Trợ lý AI luôn mở cho toàn bộ tài khoản đăng nhập
-  if (cleanRoute === "/" || cleanRoute === "/ai-assistant") {
+  // Trang Tổng quan luôn mở cho toàn bộ tài khoản đăng nhập
+  if (cleanRoute === "/") {
     return true;
+  }
+
+  // 1. Phân hệ Phân Quyền & Quản Trị Người Dùng (/accounts & /permissions):
+  // Yêu cầu bắt buộc: "phân quyền phải đưa vào màn quản trị platform crm không đưa vào màn crm hệ thống thường ceohn10"
+  // Do đó, trên Sidebar CRM thường, 2 route này KHÔNG xuất hiện (chỉ nằm trong Cổng Quản Trị Nền Tảng /master)
+  if (cleanRoute === "/accounts" || cleanRoute === "/permissions") {
+    return false;
+  }
+
+  // ĐẶC QUYỀN QUẢN TRỊ TỐI CAO (PLATFORM ADMIN / ADMIN / LỚP TRƯỞNG / BAN ĐIỀU HÀNH / TRƯỞNG BAN)
+  // Đảm bảo các tài khoản quản trị và điều hành luôn luôn thấy đầy đủ toàn bộ các chức năng của CEO HN10
+  const isTopAdmin =
+    (roleKey as string) === "quan_tri" ||
+    (roleKey as string) === "admin" ||
+    (roleKey as string) === "chu_tich" ||
+    (roleKey as string) === "pho_chu_tich" ||
+    String(roleKey).startsWith("lop_pho_") ||
+    String(roleKey).startsWith("truong_team_") ||
+    String(roleKey).startsWith("pho_team_") ||
+    String(roleKey).startsWith("tb_") ||
+    String(roleKey).startsWith("truong_ban_") ||
+    (roleKey as string) === "tong_thu_ky" ||
+    (roleKey as string) === "ban_dieu_hanh" ||
+    (roleKey as string) === "truong_ban_dieu_hanh" ||
+    user?.isPlatformAdmin === true ||
+    user?.isAdmin === true ||
+    user?.isPresident === true ||
+    user?.role === "admin" ||
+    user?.role === "quan_tri" ||
+    user?.role === "ADM" ||
+    user?.role === "chu_tich" ||
+    user?.role === "president" ||
+    user?.role === "lop_truong" ||
+    user?.role === "pho_chu_tich" ||
+    String(user?.role).startsWith("lop_pho_") ||
+    String(user?.role).startsWith("truong_ban_") ||
+    user?.email === "admin@ceohn10.vn" ||
+    user?.email === "admin@viconnect.vn" ||
+    user?.email === "infor@viconnect.vn" ||
+    user?.email === "admin.hn10@ceohn10.vn" ||
+    user?.email === "loptruong.hn10@ceohn10.vn" ||
+    user?.email === "btt.hn10@ceohn10.vn" ||
+    user?.email === "btc.hn10@ceohn10.vn" ||
+    user?.email?.toLowerCase().includes("admin") ||
+    user?.email?.toLowerCase().includes("loptruong");
+
+  if (isTopAdmin) {
+    // Nếu là module lớp học, tôn trọng cấu hình tenant (chỉ ẩn trên tenant không bật classes)
+    if (cleanRoute === "/classes" || cleanRoute.startsWith("/classes")) {
+      return isModuleEnabledForTenant("classes");
+    }
+    return true;
+  }
+
+  // 2. Phân hệ Lớp Học Doanh Trí: Kiểm tra module "classes" cho hệ thống hiện tại
+  if (cleanRoute === "/classes" || cleanRoute.startsWith("/classes")) {
+    return isModuleEnabledForTenant("classes");
+  }
+
+  // 3. Phân hệ Tài Chính: Kiểm tra module "finance"
+  if (cleanRoute === "/finance-report" || cleanRoute.startsWith("/finance")) {
+    return isModuleEnabledForTenant("finance");
+  }
+
+  // 0. Luồng tùy biến: Kiểm tra customPermissions cụ thể của tài khoản (nếu được admin tích chọn khi tạo tài khoản)
+  if (user?.customPermissions && Array.isArray(user.customPermissions) && user.customPermissions.length > 0) {
+    if (user.customPermissions.includes(route) || user.customPermissions.includes(cleanRoute)) {
+      return true;
+    }
+    const hasMatch = user.customPermissions.some(
+      (p: string) => (p !== "/" && cleanRoute.startsWith(p.split("?")[0])) || (p !== "/" && p.startsWith(cleanRoute))
+    );
+    if (hasMatch) return true;
+    return false;
   }
 
   // 1. Luồng chuẩn API: Ưu tiên kiểm tra trực tiếp allowedRoutes do Backend tính từ CSDL
@@ -790,6 +985,7 @@ export function isRouteAllowedByMatrix(route: string, roleKey: SystemRoleKey, us
     cleanRoute === "/events" ||
     cleanRoute === "/events-overview" ||
     cleanRoute === "/voting" ||
+    cleanRoute === "/feedback" ||
     cleanRoute === "/event-registrations" ||
     cleanRoute === "/checkin-qr" ||
     cleanRoute === "/templates" ||
@@ -813,9 +1009,9 @@ export function isRouteAllowedByMatrix(route: string, roleKey: SystemRoleKey, us
   // 6. Quyền truy cập Master Admin (chỉ admin / chủ tịch / platform admin)
   if (cleanRoute === "/master") {
     return (
-      roleKey === "quan_tri" ||
-      roleKey === "admin" ||
-      roleKey === "chu_tich" ||
+      (roleKey as string) === "quan_tri" ||
+      (roleKey as string) === "admin" ||
+      (roleKey as string) === "chu_tich" ||
       (roleKey as string) === "platform_admin" ||
       user?.email === "admin@ceohn10.vn"
     );
@@ -992,26 +1188,31 @@ export function isActionAllowedByMatrix(
     // Chuẩn hóa roleKey sang key trong ma trận (vai trò hệ thống)
     const targetNormRole = (roleKey || "member").toLowerCase().trim();
     let targetRole: SystemRoleKey = "member";
-    if (targetNormRole === "quan_tri" || targetNormRole === "adm" || targetNormRole === "platform_admin" || targetNormRole === "superadmin" || targetNormRole.includes("quản trị")) {
-      targetRole = "quan_tri";
-    } else if (targetNormRole.includes("chủ tịch") || targetNormRole === "chu_tich" || targetNormRole === "president") {
-      targetRole = "chu_tich";
+    if (targetNormRole === "admin_platform" || targetNormRole === "quan_tri" || targetNormRole === "adm" || targetNormRole === "platform_admin" || targetNormRole === "superadmin" || targetNormRole.includes("quản trị")) {
+      targetRole = "admin_platform";
+    } else if (targetNormRole === "lop_truong" || targetNormRole.includes("lớp trưởng") || targetNormRole.includes("chủ tịch") || targetNormRole === "chu_tich" || targetNormRole === "president") {
+      targetRole = "lop_truong";
+    } else if (targetNormRole === "lop_pho" || targetNormRole.includes("lớp phó") || targetNormRole === "pho_chu_tich" || targetNormRole.startsWith("lop_pho_")) {
+      targetRole = "lop_pho";
+    } else if (targetNormRole === "truong_team" || targetNormRole.includes("trưởng team") || targetNormRole.startsWith("truong_team_")) {
+      targetRole = "truong_team";
+    } else if (targetNormRole === "pho_team" || targetNormRole.includes("phó team") || targetNormRole.startsWith("pho_team_")) {
+      targetRole = "pho_team";
     } else if (targetNormRole === "admin" || targetNormRole === "bqt") {
       targetRole = "admin";
-    } else if (targetNormRole === "tong_thu_ky" || (targetNormRole.includes("thư ký") && targetNormRole.includes("tổng"))) {
-      targetRole = "tong_thu_ky";
-    } else if (targetNormRole === "ban_thu_ky" || targetNormRole === "thu_ky" || targetNormRole === "btk" || targetNormRole.includes("thư ký")) {
-      targetRole = "tong_thu_ky";
-    } else if (targetNormRole === "truong_ban_truyen_thong" || targetNormRole === "btt" || (targetNormRole.includes("truyền thông") && (targetNormRole.includes("trưởng") || targetNormRole.includes("truong")))) {
-      targetRole = "truong_ban_truyen_thong";
-    } else if (targetNormRole === "truong_ban_thanh_vien" || targetNormRole === "btv" || (targetNormRole.includes("thành viên") && (targetNormRole.includes("trưởng") || targetNormRole.includes("truong")))) {
-      targetRole = "truong_ban_thanh_vien";
-    } else if (targetNormRole === "truong_ban_xuc_tien" || targetNormRole === "bxt" || ((targetNormRole.includes("xúc tiến") || targetNormRole.includes("thương mại")) && (targetNormRole.includes("trưởng") || targetNormRole.includes("truong")))) {
-      targetRole = "truong_ban_xuc_tien";
-    } else if (targetNormRole === "truong_ban_tai_chinh" || targetNormRole === "btc" || (targetNormRole.includes("tài chính") && (targetNormRole.includes("trưởng") || targetNormRole.includes("truong")))) {
-      targetRole = "truong_ban_tai_chinh";
-    } else if (targetNormRole === "truong_ban_thien_nguyen" || targetNormRole === "btn" || (targetNormRole.includes("thiện nguyện") && (targetNormRole.includes("trưởng") || targetNormRole.includes("truong")))) {
-      targetRole = "truong_ban_thien_nguyen";
+    } else if (
+      targetNormRole === "truong_ban_chuyen_trach" ||
+      targetNormRole.includes("trưởng ban") ||
+      targetNormRole.includes("truong ban") ||
+      targetNormRole === "truong_ban_truyen_thong" || targetNormRole === "btt" ||
+      targetNormRole === "truong_ban_thanh_vien" || targetNormRole === "btv" ||
+      targetNormRole === "truong_ban_xuc_tien" || targetNormRole === "bxt" ||
+      targetNormRole === "truong_ban_tai_chinh" || targetNormRole === "btc" ||
+      targetNormRole === "truong_ban_thien_nguyen" || targetNormRole === "btn" ||
+      targetNormRole === "tong_thu_ky" || targetNormRole === "ban_thu_ky" ||
+      targetNormRole.startsWith("tb_")
+    ) {
+      targetRole = "truong_ban_chuyen_trach";
     }
 
     // Chuẩn hóa ban chuyên môn nếu có
@@ -1058,7 +1259,8 @@ export function isActionAllowedByMatrix(
             if (
               act.roles[targetRole] === true ||
               (committeeKey && act.roles[committeeKey] === true) ||
-              (targetRole === "quan_tri" && act.roles["quan_tri"] !== false)
+              (targetRole === "admin_platform" && act.roles["admin_platform"] !== false) ||
+              ((targetRole as string) === "quan_tri" && act.roles["quan_tri"] !== false)
             ) {
               return true;
             }

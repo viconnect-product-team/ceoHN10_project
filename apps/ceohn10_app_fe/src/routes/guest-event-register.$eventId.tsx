@@ -95,6 +95,13 @@ function StandaloneGuestEventRegistrationPage() {
   const [ticketType, setTicketType] = useState("Standard");
   const [ticketCount, setTicketCount] = useState(1);
   const [note, setNote] = useState("");
+  const [isCheckinNow, setIsCheckinNow] = useState(() => {
+    if (typeof window !== "undefined") {
+      const sp = new URLSearchParams(window.location.search);
+      return sp.get("action") === "checkin" || sp.get("checkin") === "true";
+    }
+    return false;
+  });
 
   // Danh mục các phần tham gia sự kiện (Event Parts / Sessions)
   const availableParts: string[] = (Array.isArray(event.parts) && event.parts.length > 0)
@@ -271,6 +278,7 @@ function StandaloneGuestEventRegistrationPage() {
           note: note.trim(),
           attendees: allAttendees,
           attendedParts: selectedParts,
+          isCheckinNow: isCheckinNow,
         }),
       }).catch((err: any) => {
         return { ok: false, error: err };
@@ -400,6 +408,12 @@ function StandaloneGuestEventRegistrationPage() {
           </div>
 
           <div className="p-6 sm:p-8 space-y-6">
+            {(result.status === "attended" || result.checkedInAt || isCheckinNow) && (
+              <div className="bg-gradient-to-r from-emerald-600 to-teal-700 text-white font-bold px-4 py-3 rounded-2xl text-center text-sm shadow-md flex items-center justify-center gap-2 border border-emerald-400">
+                <CheckCircle2 className="w-5 h-5 text-amber-300 shrink-0" />
+                <span>XÁC NHẬN: QUÝ ĐẠI BIỂU ĐÃ ĐƯỢC CHECK-IN VÀO CỬA SỰ KIỆN THÀNH CÔNG!</span>
+              </div>
+            )}
             <div className="bg-amber-50/80 border border-amber-200 rounded-2xl p-5 text-left space-y-3">
               <div className="font-bold text-amber-950 text-sm sm:text-base">
                 Kính gửi Quý Anh/Chị {result.fullName || "Đại biểu"},
@@ -478,6 +492,12 @@ function StandaloneGuestEventRegistrationPage() {
           </div>
 
           <div className="p-6 sm:p-8 space-y-6">
+            {(result.status === "attended" || result.checkedInAt || isCheckinNow) && (
+              <div className="bg-gradient-to-r from-emerald-600 to-teal-700 text-white font-bold px-4 py-3 rounded-2xl text-center text-sm shadow-md flex items-center justify-center gap-2 border border-emerald-400">
+                <CheckCircle2 className="w-5 h-5 text-amber-300 shrink-0" />
+                <span>XÁC NHẬN: QUÝ ĐẠI BIỂU ĐÃ ĐƯỢC CHECK-IN VÀO CỬA SỰ KIỆN THÀNH CÔNG!</span>
+              </div>
+            )}
             <div className="bg-amber-50/90 border border-amber-200 rounded-2xl p-5 text-left space-y-3">
               <div className="font-bold text-amber-950 text-sm sm:text-base">
                 Kính gửi Quý Anh/Chị {result.fullName || "Đại biểu"},
@@ -547,7 +567,9 @@ function StandaloneGuestEventRegistrationPage() {
             <div className="absolute -top-10 -right-10 w-32 h-32 bg-amber-400/20 rounded-full blur-2xl pointer-events-none" />
             <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-400 text-[#001D4A] rounded-full text-xs font-black uppercase tracking-wider mb-2 shadow-sm">
               <Sparkles className="w-3.5 h-3.5" />
-              ĐĂNG KÝ THAM DỰ THÀNH CÔNG
+              {result.status === "attended" || result.checkedInAt || isCheckinNow
+                ? "ĐÃ CHECK-IN VÀO CỬA THÀNH CÔNG"
+                : "ĐĂNG KÝ THAM DỰ THÀNH CÔNG"}
             </div>
             <h1 className="text-xl sm:text-2xl font-black text-white px-2 leading-snug">
               {result.eventTitle || event.name}
@@ -559,6 +581,12 @@ function StandaloneGuestEventRegistrationPage() {
           </div>
 
           <div className="p-6 sm:p-8 space-y-6">
+            {(result.status === "attended" || result.checkedInAt || isCheckinNow) && (
+              <div className="bg-gradient-to-r from-emerald-600 to-teal-700 text-white font-bold px-4 py-3 rounded-2xl text-center text-sm shadow-md flex items-center justify-center gap-2 border border-emerald-400">
+                <CheckCircle2 className="w-5 h-5 text-amber-300 shrink-0" />
+                <span>XÁC NHẬN: QUÝ ĐẠI BIỂU ĐÃ ĐƯỢC CHECK-IN VÀO CỬA SỰ KIỆN THÀNH CÔNG!</span>
+              </div>
+            )}
             {/* THẺ SỐ QUAY THƯỞNG LUCKY DRAW */}
             <div className="bg-gradient-to-br from-amber-500/10 via-amber-400/5 to-orange-500/10 border-2 border-amber-400/60 rounded-2xl p-5 text-center shadow-sm relative">
               <span className="text-[11px] font-black text-amber-700 uppercase tracking-widest block mb-1">
@@ -1343,6 +1371,27 @@ function StandaloneGuestEventRegistrationPage() {
             />
           </div>
 
+          {/* Tùy chọn Check-in ngay tại bàn tiếp đón */}
+          <div className="p-4 bg-emerald-50/80 rounded-2xl border-2 border-emerald-300 shadow-xs">
+            <label className="flex items-start gap-3 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={isCheckinNow}
+                onChange={(e) => setIsCheckinNow(e.target.checked)}
+                className="mt-1 w-5 h-5 text-emerald-600 rounded border-emerald-400 focus:ring-emerald-500 cursor-pointer"
+              />
+              <div className="flex-1">
+                <span className="text-sm font-bold text-emerald-950 flex items-center gap-1.5">
+                  <QrCode className="w-4 h-4 text-emerald-600" />
+                  Điểm danh Check-in vào cửa sự kiện ngay lúc này
+                </span>
+                <p className="text-xs text-emerald-800 mt-1 leading-relaxed">
+                  Tích chọn mục này nếu Quý Anh/Chị đang có mặt tại bàn lễ tân của sự kiện để hệ thống lập tức điểm danh <strong>Đã tham dự (Attended)</strong> và cấp mã quay thưởng may mắn.
+                </p>
+              </div>
+            </label>
+          </div>
+
           {/* Submit Button */}
           <div className="pt-2">
             <button
@@ -1350,13 +1399,15 @@ function StandaloneGuestEventRegistrationPage() {
               disabled={submitting || isFull}
               className={`w-full py-4 px-6 rounded-2xl font-black text-sm sm:text-base text-white shadow-lg transition flex items-center justify-center gap-2 cursor-pointer ${isFull
                   ? "bg-slate-400 cursor-not-allowed"
+                  : isCheckinNow
+                  ? "bg-emerald-600 hover:bg-emerald-700 shadow-emerald-700/30 ring-2 ring-emerald-400"
                   : "bg-[#003B95] hover:bg-[#002B70] shadow-blue-900/30"
                 }`}
             >
               {submitting ? (
                 <>
                   <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  <span>Đang xử lý đăng ký & gửi email...</span>
+                  <span>{isCheckinNow ? "Đang xử lý Check-in & cấp số may mắn..." : "Đang xử lý đăng ký & gửi email..."}</span>
                 </>
               ) : isFull ? (
                 <>
@@ -1365,9 +1416,17 @@ function StandaloneGuestEventRegistrationPage() {
                 </>
               ) : (
                 <>
-                  <Send className="w-5 h-5 text-amber-400" />
+                  {isCheckinNow ? (
+                    <CheckCircle2 className="w-5 h-5 text-amber-300" />
+                  ) : (
+                    <Send className="w-5 h-5 text-amber-400" />
+                  )}
                   <span>
-                    {isFree
+                    {isCheckinNow
+                      ? isFree
+                        ? "⚡ Xác Nhận Điểm Danh & Check-in Vào Cửa Ngay"
+                        : `⚡ Điểm Danh & Thanh Toán (${new Intl.NumberFormat("vi-VN").format(totalAmount)} đ)`
+                      : isFree
                       ? "Xác Nhận Đăng Ký & Nhận Vé Ngay"
                       : `Xác Nhận Đăng Ký (${new Intl.NumberFormat("vi-VN").format(totalAmount)} đ)`}
                   </span>

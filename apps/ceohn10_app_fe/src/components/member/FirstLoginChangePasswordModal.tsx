@@ -38,11 +38,21 @@ export function FirstLoginChangePasswordModal({
       onSuccess();
     }
 
-    // Luôn bắt buộc đăng nhập lại sau khi đổi mật khẩu lần đầu
+    // Luôn bắt buộc đăng xuất và yêu cầu đăng nhập lại sau khi đổi mật khẩu lần đầu để chính thức kích hoạt
     setTimeout(() => {
+      let savedEmail = "";
+      try {
+        const uStr = localStorage.getItem("auth_user") || localStorage.getItem("vibe_user") || localStorage.getItem("ceohn10_user");
+        if (uStr) {
+          const u = JSON.parse(uStr);
+          savedEmail = u.email || u.username || "";
+        }
+      } catch {}
+
       clearUserSessionData();
       if (typeof window !== "undefined") {
-        window.location.replace("/association/login?reason=password_changed");
+        const emailParam = savedEmail ? `&email=${encodeURIComponent(savedEmail)}` : "";
+        window.location.replace(`/association/login?reason=password_changed${emailParam}`);
       }
     }, 1200);
   };

@@ -8,6 +8,7 @@ import * as crypto from 'crypto';
 import { VotingRepository } from './voting.repository';
 import { CreatePollDto, CastVoteDto } from './dto';
 import { MailService } from '../mail/mail.service';
+import { PrismaService } from '../prisma/prisma.service';
 
 export { CreatePollDto, CastVoteDto };
 
@@ -15,6 +16,7 @@ export { CreatePollDto, CastVoteDto };
 export class VotingService {
   constructor(
     private readonly votingRepo: VotingRepository,
+    private readonly prisma: PrismaService,
     @Optional() private readonly mailService?: MailService,
   ) { }
 
@@ -367,6 +369,99 @@ export class VotingService {
     return { ok: true, id };
   }
 
+  async castPublicVote(
+    pollId: string,
+    optionId: string,
+    voterData: { voterName?: string; voterEmail?: string; voterPhone?: string; memberCode?: string },
+  ) {
+    if (!pollId || !optionId) {
+      throw new BadRequestException('pollId và optionId không được để trống');
+    }
+    const voterId = (voterData.voterEmail || voterData.voterPhone || voterData.voterName || `GUEST-${Date.now()}`).trim();
+    const voteId = crypto.randomUUID();
+    await this.votingRepo.insertVote(
+      voteId,
+      pollId,
+      optionId,
+      voterId,
+      'guest_public_link',
+    );
+    return {
+      ok: true,
+      success: true,
+      pollId,
+      optionId,
+      message: 'Ghi nhận kết quả biểu quyết thành công! Cảm ơn Quý Doanh nhân đã tham gia biểu quyết.',
+    };
+  }
+
+  async broadcastPollInvitation(
+    pollId: string,
+    data: { emails?: string[]; eventId?: string; appUrl?: string },
+  ) {
+    const poll = await this.getPollById('system', pollId);
+    const baseUrl = data.appUrl || process.env.APP_URL || 'https://ceohn10.viconnect.vn';
+    const votingLink = `${baseUrl}/guest-voting/${pollId}`;
+
+    let recipientsList: Array<{ email: string; name?: string }> = [];
+    if (Array.isArray(data.emails) && data.emails.length > 0) {
+      recipientsList = data.emails.map(e => ({ email: e.trim(), name: 'Đại biểu' }));
+    } else if (data.eventId || poll.eventId) {
+      const evId = data.eventId || poll.eventId;
+      const attendees = await this.prisma.$queryRaw<any[]>`
+        SELECT email, member_name as name FROM public.event_registrations
+        WHERE event_id = ${evId} AND (status = 'attended' OR checked_in_at IS NOT NULL)
+          AND email IS NOT NULL AND email LIKE '%@%'
+      `.catch(() => []);
+      recipientsList = attendees.map(a => ({ email: a.email.trim(), name: a.name || 'Đại biểu' }));
+    }
+
+    let sentCount = 0;
+    for (const r of recipientsList) {
+      if (!r.email || !r.email.includes('@')) continue;
+      if (this.mailService) {
+        await this.mailService.sendDirectEmail({
+          to: r.email,
+          subject: `[BIỂU QUYẾT CEO HN10] Mời tham gia biểu quyết: ${poll.title}`,
+          html: `
+            <div style="font-family: Arial, sans-serif; padding: 24px; color: #1e293b; max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 16px; border: 1px solid #e2e8f0;">
+              <div style="background: linear-gradient(135deg, #001A4D, #003B95); padding: 20px; border-radius: 12px; text-align: center; color: #ffffff; margin-bottom: 20px;">
+                <h2 style="margin: 0; font-size: 20px;">PHIẾU BIỂU QUYẾT & LẤY Ý KIẾN ĐẠI BIỂU</h2>
+                <p style="margin: 6px 0 0 0; font-size: 13px; opacity: 0.9;">CLB Doanh Nhân CEO HN10 (HanoiBA)</p>
+              </div>
+              <p>Kính gửi Anh/Chị <strong>${r.name || 'Đại biểu'}</strong>,</p>
+              <p>Ban Tổ Chức trân trọng kính mời Anh/Chị tham gia đóng góp ý kiến biểu quyết nội dung:</p>
+              <div style="background: #eff6ff; border-left: 4px solid #003B95; padding: 16px; border-radius: 8px; margin: 18px 0;">
+                <h3 style="margin: 0 0 8px 0; color: #003B95; font-size: 16px;">${poll.title}</h3>
+                ${poll.description ? `<p style="margin: 0; font-size: 13.5px; color: #475569;">${poll.description}</p>` : ''}
+              </div>
+              <p style="font-size: 13.5px;">Quý Anh/Chị vui lòng bấm vào liên kết bên dưới để mở phiếu biểu quyết và xác nhận kết quả:</p>
+              <div style="text-align: center; margin: 28px 0;">
+                <a href="${votingLink}" target="_blank" style="display: inline-block; background: #003B95; color: #ffffff; font-weight: bold; font-size: 14px; text-decoration: none; padding: 14px 32px; border-radius: 9999px; box-shadow: 0 4px 12px rgba(0, 59, 149, 0.3);">
+                  👉 BẤM VÀO ĐÂY ĐỂ BIỂU QUYẾT NGAY
+                </a>
+              </div>
+              <p style="font-size: 12px; color: #64748b; text-align: center;">Hoặc truy cập trực tiếp: <a href="${votingLink}" style="color: #003B95;">${votingLink}</a></p>
+              <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 24px 0;" />
+              <p style="font-size: 12px; color: #94a3b8; text-align: center; margin: 0;">Ban Điều Hành & Ban Sự Kiện CLB Doanh Nhân CEO HN10</p>
+            </div>
+          `,
+          fromName: 'CLB Doanh Nhân CEO HN10',
+        }).catch(() => {});
+        sentCount++;
+      }
+    }
+
+    return {
+      ok: true,
+      pollId,
+      votingLink,
+      sentCount,
+      recipients: recipientsList.map(r => r.email),
+      message: `Đã gửi liên kết biểu quyết tới ${sentCount} đại biểu qua Email & Zalo OA thành công!`,
+    };
+  }
+
   async notifyLuckyDrawWinner(
     userId: string,
     data: {
@@ -378,6 +473,9 @@ export class VotingService {
       prizeName?: string;
       eventName?: string;
       eventId?: string;
+      winnerEmail?: string;
+      email?: string;
+      winnerPhone?: string;
     },
   ) {
     const effectivePrize = data.prize || data.prizeName || 'Phần quà may mắn từ Ban Tổ Chức';
@@ -402,8 +500,25 @@ export class VotingService {
     });
 
     const targetUserId = recipients[0]?.id || userId;
-    const targetMemberCode = recipients[0]?.code || data.winnerCode;
-    const recipientEmail = recipients[0]?.email;
+    const targetMemberCode = recipients[0]?.code || data.winnerCode || targetCode;
+    
+    // Tìm email của người trúng giải: ưu tiên từ client truyền lên, nếu không tìm từ registrations, sau đó từ members
+    let recipientEmail = (data.winnerEmail || data.email || '').trim();
+    if (!recipientEmail && data.eventId) {
+      const regMatches = await this.prisma.$queryRaw<any[]>`
+        SELECT email FROM public.event_registrations
+        WHERE event_id = ${data.eventId}
+          AND (lucky_number = ${data.luckyNumber || ''} OR member_name ILIKE ${data.winnerName || ''} OR member_code = ${targetCode || ''})
+          AND email IS NOT NULL AND email != ''
+        LIMIT 1
+      `.catch(() => []);
+      if (regMatches.length > 0 && regMatches[0]?.email) {
+        recipientEmail = regMatches[0].email;
+      }
+    }
+    if (!recipientEmail) {
+      recipientEmail = recipients[0]?.email || '';
+    }
 
     await this.votingRepo.sendLuckyDrawNotification(
       targetUserId,
@@ -417,8 +532,8 @@ export class VotingService {
     );
 
     // Bắn email chúc mừng trúng thưởng tới người trúng giải
-    if (this.mailService && recipientEmail) {
-      this.mailService
+    if (this.mailService && recipientEmail && recipientEmail.includes('@')) {
+      await this.mailService
         .sendLuckyDrawWinnerEmail({
           to: recipientEmail,
           winnerName: data.winnerName,
@@ -441,7 +556,7 @@ export class VotingService {
       ok: true,
       recipient: data.winnerName,
       recipientEmail: recipientEmail || null,
-      prize: data.prize,
+      prize: effectivePrize,
       targetRoute: '/association/perks',
     };
   }

@@ -2,13 +2,32 @@ import {
   Injectable,
   NotFoundException,
   BadRequestException,
+  OnModuleInit,
 } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import * as crypto from 'crypto';
 
 @Injectable()
-export class ConnectNfcService {
+export class ConnectNfcService implements OnModuleInit {
   constructor(private prisma: PrismaService) {}
+
+  async onModuleInit() {
+    await this.prisma.$executeRawUnsafe(`
+      CREATE TABLE IF NOT EXISTS public.user_device_sessions (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        user_id UUID,
+        device_key VARCHAR(255),
+        device_label VARCHAR(255),
+        platform VARCHAR(100),
+        browser VARCHAR(100),
+        is_standalone BOOLEAN DEFAULT false,
+        first_seen_at TIMESTAMPTZ DEFAULT NOW(),
+        last_seen_at TIMESTAMPTZ DEFAULT NOW(),
+        revoked_at TIMESTAMPTZ
+      );
+      CREATE INDEX IF NOT EXISTS idx_user_device_sessions_user_dev ON public.user_device_sessions(user_id, device_key);
+    `).catch(() => {});
+  }
 
   async listMyDeviceSessions(userId: string, currentKey: string | null) {
     const rows = await this.prisma.$queryRaw<any[]>`
@@ -52,7 +71,7 @@ export class ConnectNfcService {
         UPDATE public.user_device_sessions
         SET last_seen_at = ${now}
         WHERE id = ${first.id}::uuid
-      `;
+      `.catch(() => {});
       return { revoked: false };
     }
 
@@ -63,7 +82,7 @@ export class ConnectNfcService {
         ${userId}::uuid, ${input.deviceKey}, ${input.label || null}, ${input.platform || null},
         ${input.browser || null}, ${input.isStandalone || false}, ${now}, ${now}
       )
-    `;
+    `.catch(() => {});
     return { revoked: false };
   }
 
@@ -77,7 +96,7 @@ export class ConnectNfcService {
       UPDATE public.user_device_sessions
       SET revoked_at = ${now}
       WHERE id = ${sessionId}::uuid AND user_id = ${userId}::uuid
-    `;
+    `.catch(() => {});
 
     const updated = await this.prisma.$queryRaw<any[]>`
       SELECT id, device_key, device_label, platform, browser, is_standalone, first_seen_at, last_seen_at, revoked_at

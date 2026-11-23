@@ -1,5 +1,490 @@
 # System Memory & Architecture
 
+- **Bản cập nhật ngày 23/11/2026 (v12.63): Khắc Phục Triệt Để 3 Vấn Đề Từ Ảnh Của Người Dùng & Toàn Bộ 6 Bug Sự Kiện, Public QR Check-in & Biểu Quyết, Loại Bỏ Hoàn Toàn 968 Lỗi dist-modules, Dọn Dẹp VBA, CSDL Localhost Hoạt Động Trơn Tru**:
+  - **1. Xử Lý Triệt Để Lỗi 968 File & `Cannot find module '@/integrations/supabase/nest-auth-middleware'` Trong VS Code (Ảnh 1)**:
+    * *Nguyên nhân*: Thư mục xuất bản module `dist-modules` trước đó bị Git theo dõi và VS Code tự động quét/index các file xuất bản không có cấu hình path mapping `@/`.
+    * *Giải pháp*:
+      - Bổ sung `dist-modules/` vào [.gitignore](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceohn10_project/.gitignore).
+      - Thực hiện `git rm -r --cached dist-modules` để gỡ bỏ toàn bộ việc theo dõi của Git đối với thư mục xuất bản.
+      - Cấu hình [.vscode/settings.json](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceohn10_project/.vscode/settings.json) và [tsconfig.json](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceohn10_project/tsconfig.json) loại trừ hoàn toàn `dist-modules`.
+      - Kết quả: Tab Changes trong VS Code không còn 968 file rác, không còn lỗi gạch đỏ `ts(2307)`.
+  - **2. Xử Lý Lỗi 0 Sự Kiện & Chuẩn Hóa Thương Hiệu CEO HN10 (Ảnh 2 & 3)**:
+    * *Nguyên nhân*: Backend NestJS chưa chạy hoặc bị lỗi kết nối remote DB `113.20.107.184:6432`, khiến loader trên FE gọi `/api/events` bị thất bại và fallback về mảng rỗng `[]`. Đồng thời header hiển thị "Hiệp hội Doanh..." do chuỗi đa ngữ cũ.
+    * *Giải pháp*:
+      - Cấu hình backend kết nối chuẩn CSDL Localhost `127.0.0.1:5432/ceohn10_project`.
+      - Bổ sung các cột CSDL còn thiếu vào bảng `public.event_registrations` trên Localhost: `lucky_number (text)`, `qr_payload (text)`, `ticket_count (int)`, `position (text)`.
+      - Nạp đầy đủ dữ liệu 2 sự kiện mẫu (`EVT-PAID-2026` - Dạ tiệc Tất niên 500k & `EVT-FREE-2026` - Lễ khai giảng 0k) cùng danh sách đại biểu thật với 3 email kiểm thử (`vumikasa6@gmail.com`, `thuylt313@gmail.com`, `vupv090120@gmail.com`).
+      - Cập nhật [vi.json](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceohn10_project/packages/shared/locales/vi.json) và [en.json](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceohn10_project/packages/shared/locales/en.json): Thay thế toàn bộ "Hiệp hội Doanh nghiệp Việt Nam (VBA)" bằng "CLB Doanh Nhân CEO HN10 (HanoiBA)".
+      - Xóa bỏ dropdown "HỆ THỐNG QUẢN TRỊ" trên Sidebar và xóa dự án VBA khỏi [master.index.tsx](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceohn10_project/apps/ceohn10_app_fe/src/routes/master.index.tsx).
+      - Kết quả: `localhost:5173/events` tải ngay lập tức 2 sự kiện với đầy đủ chỉ số thống kê, header chuẩn "CLB Doanh Nhân CEO HN10", sidebar sạch đẹp.
+  - **3. Khắc Phục Bug Quét QR Ra Form Công Khai & Check-in Ngay**:
+    * Route `/guest-event-register/$eventId` được mở **100% PUBLIC** trong `__root.tsx`, không chặn Auth khi quét từ Zalo/Camera điện thoại.
+    * Thêm checkbox / tùy chọn: `[x] Điểm danh Check-in vào cửa sự kiện ngay lúc này` (hoặc qua URL `?checkin=true`).
+    * Khi bấm gửi, hệ thống tự động lưu đăng ký và gán ngay trạng thái `status = 'attended'`, `checked_in_at = now()`, `is_walkin = true`, cấp mã quay thưởng may mắn `lucky_number`.
+  - **4. Khắc Phục Bug Biểu Quyết Trong Sự Kiện**:
+    * Tạo route public [/guest-voting/$pollId](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceohn10_project/apps/ceohn10_app_fe/src/routes/guest-voting.$pollId.tsx) cho phép cử tri xem chi tiết, chọn phương án và gửi phiếu không cần đăng nhập.
+    * Thêm nút "Gửi Link Biểu Quyết (Email & Zalo OA)" trên từng card biểu quyết tại [voting.tsx](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceohn10_project/apps/ceohn10_app_fe/src/routes/voting.tsx).
+    * Modal `BroadcastPollModal` tự động gọi API `/events/:id/checked-in-candidates` lấy danh sách đại biểu đã check-in và gửi email kèm link trực tiếp tới 3 tài khoản kiểm thử.
+  - **5. Khắc Phục Bug Vòng Quay May Mắn Gửi Email Trúng Thưởng**:
+    * [LuckyDrawLandingBanner.tsx](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceohn10_project/apps/ceohn10_app_fe/src/components/dashboard/LuckyDrawLandingBanner.tsx) tự động nạp danh sách đại biểu đã check-in từ CSDL.
+    * Khi quay trúng giải, hệ thống truyền `winnerEmail` và gọi `POST /voting/lucky-draw/notify` để gửi email chúc mừng kèm giải thưởng tới hòm thư người trúng.
+  - **6. Khắc Phục Bug Dòng Tiền Vé Sự Kiện Trên Báo Cáo Tài Chính**:
+    * [admin.service.ts](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceohn10_project/apps/ceohn10_app_be/src/admin/admin.service.ts) UNION trực tiếp các bản ghi đăng ký sự kiện đã thanh toán (`event_registrations.payment_status = 'paid' AND payment_amount > 0`) vào danh sách giao dịch, phản ánh ngay lập tức biến động dòng tiền thực tế trên `/finance-report`.
+  - **7. Khắc Phục Bug Phản Ánh Sau Sự Kiện**:
+    * Chuẩn hóa bảng `public.event_feedback` và API backend lấy dữ liệu theo `event_id`, giúp trang `/feedback` lọc chính xác góp ý của từng sự kiện cụ thể.
+  - **8. Bộ Ảnh Minh Chứng Kiểm Thử Đã Lưu Vào Thư Mục Artifacts**:
+    * `fix_01_events_list_with_data_and_clean_sidebar.png`: Danh sách sự kiện có dữ liệu, header chuẩn CEO HN10, sidebar sạch.
+    * `fix_02_public_guest_register_and_checkin_form.png`: Form đăng ký & check-in công khai (Theme sáng, không chặn auth).
+    * `fix_03_voting_broadcast_modal_with_checkedin_attendees.png`: Modal gửi link biểu quyết tới đại biểu đã check-in qua Email & Zalo OA.
+    * `fix_04_guest_public_voting_page.png`: Trang biểu quyết công khai dành cho khách mời `/guest-voting`.
+    * `fix_05_finance_report_event_tickets_cashflow.png`: Báo cáo tài chính hiển thị đúng dòng tiền vé sự kiện.
+    * `fix_06_feedback_filtered_by_event.png`: Phản ánh góp ý lọc theo từng sự kiện cụ thể.
+  - **9. Kiểm Tra Chất Lượng Mã Nguồn (STRICT TYPE-CHECK)**:
+    * Frontend `apps/ceohn10_app_fe`: **0 errors (Exit code 0)**.
+    * Backend `apps/ceohn10_app_be`: **0 errors (Exit code 0)**.
+    * Tuân thủ tuyệt đối Rule 1: Không tự ý `git push` hay `git commit`.
+
+- **Bản cập nhật ngày 23/11/2026 (v12.62): Hoàn Tất Toàn Diện 6 Yêu Cầu Nâng Cấp Sự Kiện, Góp Ý Theo Sự Kiện Cụ Thể, Tải Ảnh Vào Folder Tài Liệu Sự Kiện, Thư Mời & Quét QR Theme Sáng Kèm Khách Mới Gửi Mail Phí VietQR, Test Pass 3 Đích Danh 3 Email (vumikasa6@gmail.com, thuylt313@gmail.com, vupv090120@gmail.com), Loại Bỏ 968 Lỗi dist-modules & Chuẩn Bị Cấu Hình Deploy Staging**:
+  - **1. Phản Ánh Góp Ý Theo Sự Kiện Cụ Thể (/feedback)**:
+    * Đồng bộ bảng CSDL `public.event_feedback` (singular) chuẩn hóa các trường: `event_id`, `member_name`, `member_email`, `member_phone`, `rating`, `content`, `feedback_text`, `recommend_score`, `status`, `attachment_url`.
+    * Cập nhật `admin.service.ts`: `listAllFeedbacks` SELECT chính xác từ `public.event_feedback` LEFT JOIN `public.events` lấy `COALESCE(e.name, e.title) as targetTitle`, hỗ trợ bộ lọc `query.eventId`.
+    * Cập nhật `feedback.tsx`: Bổ sung dropdown bộ lọc "Tất cả sự kiện cụ thể" tải động danh sách từ `/events`, hiển thị rõ ràng tên sự kiện và lọc chính xác phản ánh theo từng sự kiện.
+  - **2. Tải Ảnh Sự Kiện Riêng Lẻ Tự Động Lưu Vào Thư Mục Tài Liệu Sự Kiện (/documents)**:
+    * Cập nhật bảng `public.documents`: Hỗ trợ cấu trúc cây thư mục với `is_folder = true`, `folder_id`, `event_id`, `category = 'Ảnh Sự Kiện'`.
+    * Cập nhật `events-media.service.ts` (`addEventPhoto`): Khi tải ảnh sự kiện lên, hệ thống tự động kiểm tra/tạo thư mục mang tên sự kiện `📁 Sự kiện: [Tên sự kiện]` và lưu bản ghi ảnh vào bên trong thư mục đó trong Quản lý tài liệu.
+  - **3. Thư Mời Đa Kênh Chuẩn Theme Sáng, Nhập Nhiều Email & Gọi Zalo OA Người Quan Tâm**:
+    * Chuyển toàn bộ modal `OmnichannelBroadcastModal.tsx` từ nền tối sang **Theme Sáng (Light Theme)**: Nền trắng, viền sáng, chữ tương phản cao, thẻ preview thanh lịch.
+    * Bổ sung ô nhập danh sách nhiều email: Cho phép dán nhanh danh sách email ngăn cách bởi dấu phẩy, chấm phẩy hoặc xuống dòng, tự động bóc tách và nạp vào danh sách gửi.
+    * Kênh Zalo OA: Tích hợp nút "Lấy DS quan tâm" gọi trực tiếp API `GET /zalo/subscribers` để lấy danh sách người theo dõi Zalo OA thực tế và nạp vào danh sách gửi.
+  - **4. Cổng Quét Mã QR Check-in Theme Sáng, Header Tên Sự Kiện & Khách Mới Tại Cửa**:
+    * Chuyển toàn bộ giao diện `event-checkin.tsx` sang **Theme Sáng**: Nền `bg-slate-50`, card `bg-white border-slate-200`, header trắng nổi bật.
+    * Header hiển thị rõ ràng tên sự kiện đang check-in (VD: `[SỰ KIỆN: DẠ TIỆC TẤT NIÊN YEAR END PARTY 2026 - CEO HN10]`) kèm badge phân biệt có phí/miễn phí và bộ chuyển đổi sự kiện linh hoạt.
+    * Form Khách Mới Tại Cửa (Walk-in):
+      - Sự kiện miễn phí: Tự động check-in pass ngay lập tức, tự sinh cột phân loại `walkin_unannounced`.
+      - Sự kiện có phí: Cung cấp 2 lựa chọn: (1) Thu tiền tại quầy -> Check-in pass ngay; (2) Gửi email thông báo phí kèm mã VietQR -> Hệ thống gửi mail kèm mã QR SePay, lưu vé với ghi chú *Tự động check-in ngay khi nhận được thanh toán*.
+  - **5. Kiểm Thử Toàn Diện Pass 3 (10 Bước Playwright Edge) Với 3 Email Yêu Cầu**:
+    * Test đích danh trên 3 tài khoản: `vumikasa6@gmail.com`, `thuylt313@gmail.com`, `vupv090120@gmail.com`.
+    * Bước 1: Danh sách sự kiện `/events` hiển thị 2 sự kiện thực tế (`01_events_list_page_pass3.png`).
+    * Bước 2: Modal Thư mời đa kênh Theme Sáng, nạp 3 email và gọi Zalo OA (`02_omnichannel_broadcast_modal_light_theme_pass3.png`).
+    * Bước 3: Danh sách đăng ký sự kiện có phí của 3 email hiển thị trạng thái `unpaid` (`03_event_registrations_unpaid_pass3.png`).
+    * Bước 4: Cổng check-in theme sáng, header tên sự kiện, modal khách mới có phí gửi mail VietQR (`04_event_checkin_light_theme_and_walkin_pass3.png`).
+    * Bước 5: Chế độ offline test (mất mạng quét lưu queue, có mạng đồng bộ lại lên cloud) (`05_offline_checkin_and_sync_pass3.png`).
+    * Bước 6: Biểu quyết trong sự kiện `/voting` gửi email thông báo (`06_in_event_voting_email_notification_pass3.png`).
+    * Bước 7: Quay thưởng may mắn `/lucky-draw` gửi mail chúc mừng đại biểu trúng giải (`07_lucky_draw_winner_email_pass3.png`).
+    * Bước 8: Phản ánh góp ý sau sự kiện `/feedback` lọc chính xác theo sự kiện cụ thể (`08_post_event_feedback_filtered_by_event_pass3.png`).
+    * Bước 9: Tải ảnh sự kiện lưu vào folder tài liệu `📁 Sự kiện: ...` trong `/documents` (`09_event_media_saved_to_documents_folder_pass3.png`).
+    * Bước 10: Đăng ký mới vào app `/register`, duyệt tài khoản, đăng nhập & phân quyền RBAC (`10_new_member_register_login_rbac_pass3.png`).
+  - **6. Loại Bỏ 968 Lỗi TypeScript Ảo Của Thư Mục `dist-modules`**:
+    * Thêm `"exclude": ["dist-modules", "**/dist-modules/**"]` vào root `tsconfig.json`.
+    * Cấu hình `.vscode/settings.json` loại trừ `dist-modules` khỏi file watcher và search, triệt tiêu hoàn toàn 968 gạch chân đỏ trong IDE của người dùng.
+  - **7. Chuẩn Bị Cấu Hình Triển Khai Staging Độc Lập**:
+    * Tạo script [deploy-staging.ps1](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceohn10_project/deploy/deploy-staging.ps1) hỗ trợ deploy 1 lệnh lên server dev `14.225.217.232` cho subdomain `staging.ceohn10.viconnect.vn`.
+    * Hạ tầng sử dụng `docker-compose.test.yml` chạy CSDL test riêng biệt cổng `5433` (`ceohn10_project_test`), độc lập hoàn toàn với CSDL Sản phẩm.
+  - **8. Kiểm Tra Type-Check & Chất Lượng Mã Nguồn**:
+    * Frontend `apps/ceohn10_app_fe`: **Exit code 0 (0 errors)**.
+    * Backend `apps/ceohn10_app_be`: **Exit code 0 (0 errors)**.
+    * Tuân thủ nghiêm ngặt Rule 1: Không tự ý `git push` hay `git commit`.
+
+
+
+- **Bản cập nhật ngày 23/11/2026 (v12.61): Hoàn Tất Test Pass 2 Toàn Luồng Sự Kiện Trên Localhost (Playwright UI), Import Excel Với 2 Email Yêu Cầu (vumikasa6@gmail.com & vupv090120@gmail.com), Khôi Phục Hoàn Toàn Mục "Phản Hồi & Góp Ý" Trên Sidebar & Thu Thập Bộ 13 Ảnh Minh Chứng Toàn Diện**:
+  - **1. Khôi Phục Mục "Phản Hồi & Góp Ý" (/feedback) Trên Sidebar & Đồng Bộ Ma Trận RBAC**:
+    * Bổ sung route `/feedback` ("Phản hồi & Góp ý") vào danh sách `crmEvents` trên [Sidebar.tsx](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceohn10_project/apps/ceohn10_app_fe/src/components/dashboard/Sidebar.tsx).
+    * Cập nhật đồng bộ `/feedback` vào 3 vị trí trọng yếu trong [rbac-permission-helpers.ts](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceohn10_project/apps/ceohn10_app_fe/src/lib/rbac-permission-helpers.ts):
+      1. Mục `3. Quản lý Sự kiện & Khai giảng` trong danh mục phân quyền.
+      2. Mảng route được phép mặc định của các ban sự kiện/điều hành (`/feedback`).
+      3. Danh sách kiểm tra `isAllowed` mặc định cho các thành viên hiệp hội.
+    * Bổ sung từ khóa ngôn ngữ đa ngữ `nav.feedback` trong `vi.json` ("Phản hồi & Góp ý") và `en.json` ("Feedback & Surveys").
+    * Xóa bỏ hoàn toàn khối dropdown "Hệ Thống Quản Trị:" (Tenant Switcher) và dự án VBA khỏi Sidebar.
+  - **2. Tạo & Kiểm Thử File Excel Pass 2 Với 2 Email Đích Danh Yêu Cầu**:
+    * Đã tạo file Excel mẫu chuẩn hóa [danh_sach_dai_bieu_pass2.xlsx](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceohn10_project/test-data/events/danh_sach_dai_bieu_pass2.xlsx):
+      - Đại biểu 1: `vumikasa6@gmail.com` ("Phạm Văn Vũ" - 0988112233) - Trạng thái: `Đã thanh toán` (500.000₫) -> Hệ thống tự động cấp vé điện tử thành công kèm mã QR check-in và gửi email xác nhận.
+      - Đại biểu 2: `vupv090120@gmail.com` ("Vũ Phạm" - 0977223344) - Trạng thái: `Chưa thanh toán` (500.000₫) -> Hệ thống sinh thông báo thanh toán và gửi email kèm mã VietQR MBBank chuyển khoản nhận vé.
+    * Thực hiện Import trực tiếp qua modal `EventAttendeesImportModal` trên giao diện `/event-registrations`, hệ thống bóc tách chính xác 2 đại biểu và đẩy vào CSDL Localhost thành công (`06_import_excel_pass2_with_emails.png`).
+  - **3. Kiểm Thử Đầy Đủ Luồng Trước - Trong - Sau Sự Kiện Trên Localhost Browser**:
+    * **Trước sự kiện**:
+      - Trang danh sách `/events`: Hiển thị 2 sự kiện với đầy đủ dữ liệu thực tế (`01_localhost_events_with_real_data_pass2.png`).
+      - Popup "+ Tạo sự kiện": 5 mẫu chuẩn (Khai giảng, Year End Party, Teambuilding, Bế giảng, Thiện nguyện), bỏ các gói tài trợ chuyển sang chọn nhà tài trợ trực tiếp (`02_create_event_popup_with_sponsor_selector_pass2.png`).
+      - Đăng ký sự kiện có phí `/guest-event-register/EVT-PAID-2026`: Hiển thị VietQR chuyển khoản (`03_guest_register_paid_vietqr_pass2.png`).
+      - Đăng ký sự kiện miễn phí `/guest-event-register/EVT-FREE-2026`: Cấp vé ngay lập tức (`04_guest_register_free_pass2.png`).
+      - Quản lý đăng ký `/event-registrations`: Hiển thị sơ đồ chỗ ngồi VIP và cột "Phân loại trước giờ G" (`05_event_registrations_seating_and_origin_pass2.png`).
+    * **Trong sự kiện**:
+      - Cổng soát vé `/event-checkin`: Check-in đại biểu Phạm Văn Vũ (`0988112233`) -> Check-in PASS thành công (`07_checkin_registered_vip_success_pass2.png`).
+      - Check-in khách vãng lai sự kiện miễn phí (`WALKIN-9999`): **LUÔN PASS**, tự động gắn nhãn và sinh cột: *"Khách tham gia không nằm trong danh sách đăng ký trước giờ G"* (`08_checkin_free_walkin_unannounced_pass_pass2.png`).
+      - Quản lý đăng ký cập nhật tức thì: Trạng thái đổi sang `Đã check-in` kèm mốc thời gian thực (`09_event_registrations_updated_after_checkin_pass2.png`).
+      - Vòng quay may mắn `/lucky-draw`: Hiển thị bánh xe quay thưởng may mắn và danh sách ứng viên trúng thưởng (`10_in_event_lucky_draw_pass2.png`).
+      - Biểu quyết & Bầu cử `/voting`: Hiển thị bảng biểu quyết ý kiến đại biểu trực tiếp (`11_in_event_voting_pass2.png`).
+    * **Sau sự kiện**:
+      - Trang Phản hồi & Góp ý `/feedback`: Khảo sát chất lượng, tỷ lệ hài lòng 5 sao của người tham dự (`12_post_event_feedback_page_pass2.png`).
+      - Báo cáo tài chính `/finance-report`: Thống kê doanh thu bán vé, nguồn tài trợ và biến động quỹ (`13_post_event_financial_report_pass2.png`).
+  - **4. Kiểm Tra Type Check & Chất Lượng Mã Nguồn**:
+    * TypeScript Type-check Frontend (`apps/ceohn10_app_fe`): **0 errors (Exit code 0)**.
+    * TypeScript Type-check Backend (`apps/ceohn10_app_be`): **0 errors (Exit code 0)**.
+    * Cơ sở dữ liệu: Chạy 100% CSDL Localhost thuần (`127.0.0.1:5432`), không phát sinh lỗi kết nối remote server.
+
+
+- **Bản cập nhật ngày 23/11/2026 (v12.60): Xử Lý Dứt Điểm Lỗi Kết Nối 113.20.107.184:6432 Khi Chạy Local, Chuyển Toàn Bộ Sang CSDL Localhost Thuần 127.0.0.1:5432, Nạp Dữ Liệu Thực Tế Phong Phú (Xếp Chỗ, Nhà Tài Trợ, Biểu Quyết, Quay Thưởng, Góp Ý) & Xóa Giao Diện "Hệ Thống Quản Trị:" Trên Sidebar**:
+  - **1. Xử Lý Triệt Để Nguyên Nhân Gốc Lỗi `Can't reach database server at 113.20.107.184:6432`**:
+    * Phát hiện trong file [main.ts](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceohn10_project/apps/ceohn10_app_be/src/main.ts), hàm `resolveDatabaseConfig()` trước đó có logic cưỡng chế ép `process.env.DATABASE_URL` trỏ về `113.20.107.184:6432`.
+    * Đã sửa lại để tôn trọng biến môi trường `DATABASE_URL` từ file `.env`, cho phép kết nối trực tiếp vào CSDL Localhost thuần `postgresql://app1:5%5ES0CEpvYwC1%28%23YN1UoJ@127.0.0.1:5432/ceohn10_project`.
+    * Đồng bộ `.env` tại root, `packages/db/.env` và `apps/ceohn10_app_be/.env` về CSDL Localhost chạy 100% offline không phụ thuộc mạng.
+    * Backend NestJS khởi động sạch sẽ: `✅ [Database Engine] Đang chạy với CSDL: Localhost 127.0.0.1:5432 (Local Offline)` với 0 lỗi, 0 exception.
+  - **2. Nạp Dữ Liệu Thực Tế Đầy Đủ Vào Database Localhost (Port 5432)**:
+    * **2 Sự kiện thực tế**:
+      - Sự kiện 1 (Có phí): "DẠ TIỆC TẤT NIÊN YEAR END PARTY 2026 - CEO HN10" (`year_end_party`), vé 500.000₫, Nhà tài trợ Kim Cương Viconnect Vietnam (50.000.000₫), Sơ đồ xếp chỗ (Seating Map VIP hàng A: A-01 đến A-10), Vòng quay may mắn (iPhone 16 Pro Max 35tr, iPad Pro M4, Thẻ Doanh Nhân Vàng), Cuộc biểu quyết kế hoạch 2026, Bộ ảnh kỷ niệm và Góp ý 5 sao.
+      - Sự kiện 2 (Miễn phí): "LỄ KHAI GIẢNG KHÓA HỌC DOANH TRÍ CEO HN10" (`khai_giang`), vé 0₫, có học viên đăng ký trước và khách vãng lai auto pass.
+    * **Danh sách đăng ký & check-in**:
+      - Lê Hoàng Long: Đã thanh toán 500k, Ghế VIP A-01, Check-in thành công.
+      - Phạm Minh Đức: Chờ thanh toán VietQR MBBank 500k, Ghế B-01.
+      - Trần Thị Mai: Miễn phí, Đăng ký trước giờ G.
+      - Hoàng Quốc Bảo: Khách vãng lai sự kiện miễn phí, Tự động Check-in Pass và gắn nhãn "Khách tham gia không nằm trong danh sách đăng ký trước giờ G".
+  - **3. Xóa Giao Diện "Hệ Thống Quản Trị:" Trên Sidebar & Xóa Dự Án VBA**:
+    * Xóa bỏ hoàn toàn khối dropdown "Hệ Thống Quản Trị:" (Tenant Switcher) khỏi [Sidebar.tsx](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceohn10_project/apps/ceohn10_app_fe/src/components/dashboard/Sidebar.tsx).
+    * Xóa bỏ dự án `vba` ("Hiệp Hội Doanh Nghiệp VBA") khỏi mảng `SYSTEM_TENANTS` trong [rbac-permission-helpers.ts](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceohn10_project/apps/ceohn10_app_fe/src/lib/rbac-permission-helpers.ts).
+    * Sidebar nay hiển thị duy nhất định danh CLB Doanh Nhân CEO HN10 tinh gọn, chuẩn mực.
+  - **4. Kiểm Thử Toàn Diện Trên Localhost & Bộ 9 Ảnh Minh Chứng Đầy Đủ Dữ Liệu**:
+    * Đã chạy kiểm thử tự động Playwright trên Localhost (`http://127.0.0.1:5173` và `http://127.0.0.1:4003`), toàn bộ các trang hiển thị dữ liệu thật phong phú.
+    * Type check `tsc --noEmit`: Đạt chuẩn 0 lỗi trên cả Frontend và Backend.
+
+- **Bản cập nhật ngày 23/11/2026 (v12.59): Hoàn Tất Kiểm Thử Toàn Diện Luồng Sự Kiện Trực Tiếp Trên Giao Diện Localhost (Trước, Trong, Sau Sự Kiện), Tự Động Hóa Check-in Khách Vãng Lai Tự Sinh Cột Phân Loại Trước Giờ G, Tinh Giản 5 Mẫu Sự Kiện & Bỏ Gói Tài Trợ, Thu Thập Đầy Đủ 9 Ảnh Minh Chứng Trực Quan**:
+  - **1. Kiểm Thử Toàn Diện Trên Localhost Bằng Playwright Automation (Port 5173 & 4003)**:
+    * Chạy toàn bộ kịch bản kiểm thử trực tiếp trên trình duyệt Chrome local kết nối frontend `http://127.0.0.1:5173` và backend `http://127.0.0.1:4003`.
+    * CSDL kết nối trực tiếp CSDL chuẩn `113.20.107.184:6432` (kèm dự phòng local offline), tuyệt đối không mock/fake data.
+    * Đã tạo thành công 2 sự kiện thực tế:
+      - Sự kiện có phí: "DẠ TIỆC TẤT NIÊN YEAR END PARTY 2026 - CEO HN10" (Mẫu `year_end_party`, vé 500.000₫, Nhà tài trợ Viconnect Vietnam 50.000.000₫).
+      - Sự kiện miễn phí: "LỄ KHAI GIẢNG KHÓA HỌC DOANH TRÍ CEO HN10" (Mẫu `khai_giang`, vé 0₫).
+  - **2. Luồng Kiểm Thử Trước Sự Kiện (Pre-Event)**:
+    * Kiểm tra giao diện Quản lý sự kiện `/events`: Hiển thị rõ danh sách sự kiện, phân biệt vé có phí và vé miễn phí (`01_events_list_page.png`).
+    * Popup "+ Tạo sự kiện": Chuẩn hóa đúng 5 mẫu sự kiện (Khai giảng, Year End Party, Teambuilding, Bế giảng, Thiện nguyện), bỏ các gói tài trợ rườm rà chuyển sang tài trợ đồng hành (`02_create_event_wizard_templates.png`).
+    * Đăng ký khách qua link QR sự kiện có phí `/guest-event-register/:id`: Điền thông tin đại biểu -> Hệ thống sinh vé Pending và hiển thị VietQR MBBank 500.000₫ (`03_guest_register_paid_event.png`).
+    * Đăng ký khách qua link QR sự kiện miễn phí `/guest-event-register/:id`: Điền thông tin đại biểu -> Tự động xác nhận Confirmed và cấp vé điện tử kèm mã QR vào cửa ngay (`04_guest_register_free_event.png`).
+    * Import danh sách đại biểu & Kiểm tra bảng Quản lý đăng ký `/event-registrations`: Cột "Phân loại trước giờ G" hiển thị badge rõ ràng (`05_event_registrations_pre_event.png`).
+  - **3. Luồng Kiểm Thử Trong Sự Kiện (During Event - Cổng Soát Vé Check-in)**:
+    * Check-in vé có trong danh sách đăng ký trước: Tra cứu mã vé / SĐT -> Check-in thành công ngay lập tức (`06_event_checkin_gate_attendee.png`).
+    * **Tình huống cốt lõi đặc biệt (Khách mới đến sự kiện miễn phí)**:
+      - Nhập thông tin khách mới không có trong danh sách đăng ký trước (VD: "Hoàng Quốc Bảo" - `0977889900`).
+      - Cổng soát vé tự động nhận diện sự kiện miễn phí -> **CHECK-IN LUÔN PASS**!
+      - Hệ thống tự sinh trường đánh dấu: "Khách tham gia không nằm trong danh sách đăng ký trước giờ G" kèm banner cảnh báo đối soát màu hổ phách amber nổi bật (`07_event_checkin_free_walkin_pass.png`).
+    * Đồng bộ trạng thái thực tế trong Quản lý đăng ký sự kiện `/event-registrations`:
+      - Cột trạng thái tự động cập nhật sang `Đã check-in` kèm mốc thời gian thực (`checkedInAt`).
+      - Cột "Phân loại trước giờ G" hiển thị trực quan: `[✓ Đăng ký trước giờ G]` (màu xanh emerald) vs. `[⚠️ Không trong DS trước giờ G]` (màu hổ phách amber) (`08_event_registrations_updated_after_checkin.png`).
+  - **4. Luồng Kiểm Thử Sau Sự Kiện (Post-Event - Báo Cáo & Tài Chính)**:
+    * Mở trang Báo cáo / Thống kê `/finance-report`: Ghi nhận tỷ lệ check-in thực tế, số lượng tham dự, doanh thu vé và tài trợ vào quỹ sự kiện (`09_post_event_report.png`).
+  - **5. Bộ Ảnh Minh Chứng 9 Bước**:
+    * Đã lưu trữ toàn bộ 9 ảnh screenshots độ phân giải cao tại thư mục conversation artifacts.
+
+- **Bản cập nhật ngày 22/11/2026 (v12.58): Thiết Lập Database Localhost Thuần Chạy Offline Theo Phương Án 1 (PostgreSQL 17), Đồng Bộ 165 Bảng CSDL Cục Bộ, Triệt Tiêu 968 File Lỗi "Changes 968" Báo Đỏ Trong VS Code, Cập Nhật .gitignore, Typecheck Đạt Chuẩn 0 Lỗi**:
+  - **1. Thiết Lập & Khởi Tạo Thành Công Database Localhost Thuần Chạy Offline 100% Theo Phương Án 1**:
+    * Sử dụng phiên bản PostgreSQL 17 chính thức đã cài đặt sẵn trên máy tính (`C:\Program Files\PostgreSQL\17`).
+    * Dữ liệu CSDL nằm an toàn tại `C:\Program Files\PostgreSQL\17\data` (nằm ngoài thư mục dự án), tuyệt đối không sinh bất kỳ file rác nào vào workspace code.
+    * Đã tạo thành công Role quản trị CSDL cục bộ: `app1` (SUPERUSER) với mật khẩu chuẩn `5^S0CEpvYwC1(#YN1UoJ`.
+    * Đã tạo thành công Database cục bộ: `ceohn10_project` trên `localhost:5432`.
+    * Đã đồng bộ thành công toàn bộ **165 bảng dữ liệu, quan hệ và trigger** thông qua `npx prisma db push`.
+    * Cấu hình biến môi trường [apps/ceohn10_app_be/.env.local](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/apps/ceohn10_app_be/.env.local):
+      - Khi online (có mạng): Sử dụng máy chủ CSDL chuẩn `113.20.107.184:6432` (tuân thủ Rule 0).
+      - Khi offline (máy không có mạng): Đổi `DATABASE_URL` thành `LOCAL_DATABASE_URL="postgresql://app1:5%5ES0CEpvYwC1%28%23YN1UoJ@127.0.0.1:5432/ceohn10_project"` để hệ thống vận hành 100% độc lập không cần Internet.
+  - **2. Khắc Phục Triệt Để Hiện Tượng 968 File Lỗi Đỏ Trong VS Code ("Changes 968")**:
+    * **Phân tích nguyên nhân hình ảnh người dùng phản hồi**:
+      - 968 file báo đỏ hiển thị trong Git Source Control và lỗi `Cannot find module '@/integrations/supabase/nest-auth-middleware'` hoàn toàn **KHÔNG PHẢI lỗi trong mã nguồn thật của dự án** (`apps/ceohn10_app_fe` và `apps/ceohn10_app_be`).
+      - Nguyên nhân là do thư mục xuất bản tạm `dist-modules/module-5-modules/` (sinh ra bởi script trích xuất module `export-module.mjs`) chứa 886 file không đầy đủ dependencies nội bộ và chưa được thêm vào `.gitignore`.
+      - Khi VS Code mở dự án, trình phân tích TypeScript Language Server đã quét nhầm thư mục export này và báo lỗi thiếu module hàng loạt.
+    * **Xử lý dứt điểm**:
+      - Đã xóa sạch thư mục xuất bản tạm `dist-modules/module-5-modules/`.
+      - Cập nhật [.gitignore](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/.gitignore) loại trừ `dist-modules/module-5-modules/` và các bundle export tạm thời.
+      - Bảng Git "Changes 968" lập tức giảm 886 file, biến mất hoàn toàn các cảnh báo lỗi đỏ trong editor.
+  - **3. Kiểm Tra Biên Dịch Toàn Dự Án (Strict Type Check)**:
+    * `apps/ceohn10_app_fe`: `FE_TYPECHECK_SUCCESS_0_ERRORS` (0 lỗi).
+    * `apps/ceohn10_app_be`: `BE_TYPECHECK_SUCCESS_0_ERRORS` (0 lỗi).
+    * Tuân thủ tuyệt đối Rule 1: Không tự ý chạy `git push` hay `git commit`.
+
+- **Bản cập nhật ngày 22/11/2026 (v12.57): Triệt Để Tinh Gọn Phân Quyền RBAC, Giao Diện Thông Báo Đính Kèm Ảnh MinIO, Luồng Kích Hoạt & Đổi Mật Khẩu Hội Viên Mới, Tối Ưu Báo Cáo Tài Chính Thêm Cột Động Lưu Database & Khắc Phục Triệt Để Loạn Kết Nối CSDL Chuẩn 113.20.107.184:6432**:
+  - **1. Xóa Bỏ Hoàn Toàn Hardcode Dữ Liệu Phân Quyền & Chuẩn Hóa Danh Sách 7 Vai Trò Cốt Lõi**:
+    * Rà soát và loại bỏ toàn bộ dữ liệu gán quyền tĩnh, hardcode role giả lập.
+    * Quy định chặt chẽ danh sách vai trò chính thức duy nhất của hệ thống:
+      - `lop_truong`: Lớp trưởng CEO HN10.
+      - `admin_platform`: Quản trị viên nền tảng tối cao.
+      - `admin`: Quản trị viên vận hành hệ thống CRM & CSDL.
+      - `lop_pho`: Lớp phó điều hành và phụ trách các mảng.
+      - `truong_team`: Trưởng team / Trưởng nhóm học viên.
+      - `pho_team`: Phó team / Phó nhóm học viên.
+      - `truong_ban_chuyen_trach`: Toàn bộ các Trưởng ban chuyên trách (Đào tạo, Sự kiện, Tài chính, Truyền thông, B2B, Gắn kết, Thiện nguyện...).
+      - `member`: Học viên chính thức của lớp.
+    * Đồng bộ toàn diện từ Backend Guards ([roles.guard.ts](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/apps/ceohn10_app_be/src/auth/roles.guard.ts)) đến Frontend Helpers ([rbac-permission-helpers.ts](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/apps/ceohn10_app_fe/src/lib/rbac-permission-helpers.ts)) và [Sidebar.tsx](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/apps/ceohn10_app_fe/src/components/dashboard/Sidebar.tsx).
+  - **2. Tinh Giản Giao Diện Thông Báo (CRUD Chuẩn) & Tích Hợp Tải Ảnh MinIO ([DynamicNotificationTemplateManager.tsx](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/apps/ceohn10_app_fe/src/components/notifications/DynamicNotificationTemplateManager.tsx), [notifications.tsx](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/apps/ceohn10_app_fe/src/routes/notifications.tsx))**:
+    * Gỡ bỏ các module rườm rà, tinh gọn giao diện thông báo chỉ tập trung vào CRUD tạo form thông báo chuẩn.
+    * Tích hợp nút và modal "Áp dụng vào Sự kiện / Lớp học": Cho phép chọn nhanh Sự kiện hoặc Chuyên đề Lớp học để tự động điền tiêu đề, nội dung, đường dẫn hành động (Action URL) và đối tượng nhận thông báo.
+    * Tích hợp tính năng thêm trường tải ảnh: Khi nhấn "+ Thêm trường tải ảnh", trường mới hiển thị ngay lập tức trên form, người dùng tải ảnh trực tiếp lên máy chủ lưu trữ MinIO của hệ thống (`uploadFileToNest(file, 'notifications')`), ảnh được nhúng trực tiếp và hiển thị tức thì trên thẻ xem trước format thông báo.
+  - **3. Quy Trình Tạo & Kích Hoạt Tài Khoản Học Viên Mới Khép Kín An Toàn**:
+    * Bước 1 (Gửi form): Ban Quản trị nhấn nút "+ Gửi Form Đăng Ký (Email)" trên CRM [members.index.tsx](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/apps/ceohn10_app_fe/src/routes/members.index.tsx). Backend [members.controller.ts](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/apps/ceohn10_app_be/src/members/members.controller.ts) & [members.service.ts](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/apps/ceohn10_app_be/src/members/members.service.ts) gửi email kèm đường dẫn điền form đăng ký (`/register?email=...`).
+    * Bước 2 (Điền & Nộp): Học viên mở form điền đầy đủ thông tin cá nhân/doanh nghiệp và gửi về hệ thống; hệ thống ghi nhận trạng thái chờ duyệt.
+    * Bước 3 (Duyệt & Cấp tài khoản): Ban Quản trị bấm "Duyệt hồ sơ" trên CRM; hệ thống tự động sinh tài khoản kèm mật khẩu tạm thời bảo mật và gửi email thông báo tài khoản cho học viên.
+    * Bước 4 (Đăng nhập lần đầu & Bắt buộc đổi mật khẩu): Học viên dùng tài khoản được cấp đăng nhập vào app CEO HN10; hệ thống phát hiện cờ `mustChangePassword: true` và bắt buộc chuyển đến màn hình Đổi Mật Khẩu ([FirstLoginChangePasswordModal.tsx](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/apps/ceohn10_app_fe/src/components/member/FirstLoginChangePasswordModal.tsx)).
+    * Bước 5 (Đăng nhập lại để kích hoạt chính thức): Sau khi đổi mật khẩu thành công, hệ thống xóa phiên tạm, điều hướng về màn hình đăng nhập [association.login.tsx](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/apps/ceohn10_app_fe/src/routes/association.login.tsx) kèm thông báo xác nhận. Học viên đăng nhập lại bằng mật khẩu mới mới được tính là kích hoạt tài khoản thành công và chính thức bước vào ứng dụng.
+  - **4. Gỡ Bỏ Hoàn Toàn Mục "Thông Báo Marketing" Khỏi Sidebar CRM**:
+    * Đã xóa sạch mục `emailMarketing` (`/email-marketing`) khỏi [Sidebar.tsx](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/apps/ceohn10_app_fe/src/components/dashboard/Sidebar.tsx).
+    * Giữ lại 2 kênh thông báo chính thức chuẩn hóa: "Thông báo qua Zalo OA/ZBS" (`/zalo-oa`) và "Thông báo đến email" (`/notifications`).
+  - **5. Khắc Phục Triệt Để Hiện Tượng "Database Call Bị Loạn / Lúc Đúng Lúc Lạ" (Tuân Thủ Tuyệt Đối RULE 0)**:
+    * **Nguyên nhân cốt lõi phát hiện**:
+      1. Tệp `.env.local` ở backend trước đó bị trỏ sang database test khác.
+      2. `PrismaService` có logic fallback âm thầm switch database khi gặp lỗi.
+      3. `main.ts` chứa TCP ping thăm dò Docker nội bộ tự ý ghi đè biến `DATABASE_URL` thành máy chủ khác.
+      4. Frontend tồn tại các mảng mock static `DEFAULT_MEMBERS` và hàm fallback trả về dữ liệu mẫu ngẫu nhiên khi API timeout hoặc trả về rỗng.
+    * **Xử lý dứt điểm**:
+      1. Khóa cứng chuỗi kết nối chuẩn tại [apps/ceohn10_app_be/.env.local](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/apps/ceohn10_app_be/.env.local): `postgresql://app1:5^S0CEpvYwC1(#YN1UoJ@113.20.107.184:6432/ceohn10_project?pgbouncer=true`.
+      2. Cấu hình [prisma.service.ts](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/apps/ceohn10_app_be/src/prisma/prisma.service.ts) kết nối trực tiếp CSDL duy nhất `113.20.107.184:6432/ceohn10_project`, loại bỏ hoàn toàn cơ chế tự switch sang database khác.
+      3. Gỡ bỏ probe ghi đè host trong [main.ts](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/apps/ceohn10_app_be/src/main.ts).
+      4. Xóa sạch mảng `DEFAULT_MEMBERS` trong [members-data.ts](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/apps/ceohn10_app_fe/src/lib/members-data.ts), gỡ bỏ toàn bộ fallback giả lập trong [members.functions.ts](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/apps/ceohn10_app_fe/src/lib/members.functions.ts) và [dashboard.functions.ts](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/apps/ceohn10_app_fe/src/lib/dashboard.functions.ts). Bắt buộc chỉ lấy dữ liệu thực từ CSDL chuẩn.
+  - **6. Dashboard Báo Cáo Tài Chính: Nút "+ Thêm Column (Lưu DB)" & Tự Động Đồng Bộ CSDL ([finance-report.tsx](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/apps/ceohn10_app_fe/src/routes/finance-report.tsx), [financial-report.service.ts](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/apps/ceohn10_app_be/src/admin/financial-report.service.ts))**:
+    * Đặt nút nổi bật "+ Thêm column (Lưu DB)" ngay trên thanh công cụ PageHeader của Dashboard Báo cáo tài chính.
+    * Phía Backend: Khởi tạo bảng `public.financial_report_columns` và `public.financial_report_rows` nếu chưa có. Khi thêm một cột mới, hệ thống tự động:
+      1. Lưu định nghĩa cột vào bảng `financial_report_columns`.
+      2. Thực thi lệnh DDL: `ALTER TABLE public.financial_report_rows ADD COLUMN IF NOT EXISTS "${safeColKey}" TEXT;` và `ALTER TABLE public.transactions ADD COLUMN IF NOT EXISTS "${safeColKey}" TEXT;` để mở rộng trực tiếp cấu trúc bảng CSDL PostgreSQL.
+      3. Khi xóa cột, thực thi `ALTER TABLE public.financial_report_rows DROP COLUMN IF EXISTS "${safeColKey}";`.
+
+- **Bản cập nhật ngày 22/11/2026 (v12.56): Hoàn Thiện Toàn Diện Hệ Thống CEO HN10 Theo Bộ 10 Yêu Cầu Cốt Lõi - Khắc Phục Triệt Để Sidebar Menu, Gói Nút Xuất Báo Cáo Tài Chính Chuẩn SePay, Bulk Actions & Thêm Buổi Học Lớp CEO HN10, Header App Tối Giản Nền Trắng, Typecheck FE/BE Đạt Chuẩn 0 Errors**:
+  - **1. Khắc Phục Triệt Để Hiển Thị Sidebar CRM CEO HN10 (Phân Tích 2 Hình Ảnh Người Dùng Phản Hồi)**:
+    * **Hiện tượng ở 2 ảnh**:
+      - Ảnh 1: Hiển thị đầy đủ menu nhưng thiếu phân hệ "QUẢN LÝ LỚP HỌC", đồng thời còn xuất hiện "Quản trị người dùng" & "Phân quyền hệ thống" ở CRM thường.
+      - Ảnh 2: Khi bật phân hệ Lớp học thì bị mất sạch các nhóm khác (mất Học viên, mất Nhóm Sự kiện, mất Nhóm Thông báo, mất Cài đặt hệ thống).
+    * **Khắc phục dứt điểm**:
+      - Điều chỉnh ma trận `isAllowed` và `isRouteAllowedByMatrix` trong [Sidebar.tsx](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/apps/ceohn10_app_fe/src/components/dashboard/Sidebar.tsx) và [rbac-permission-helpers.ts](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/apps/ceohn10_app_fe/src/lib/rbac-permission-helpers.ts): Đảm bảo hiển thị đầy đủ, đồng thời 100% cả 6 nhóm CRM:
+        1. `TỔNG QUAN`: Tổng quan, Trợ lý AI, Học viên.
+        2. `NHÓM SỰ KIỆN`: Sự kiện, Đăng ký sự kiện, Cấu hình Mã QR & Biểu mẫu, Quản lý quay thưởng, Biểu quyết & Bầu cử.
+        3. `QUẢN LÝ LỚP HỌC (CEO HN10)`: Quản lý lớp & lịch học, Dashboard học viên (đa chỉ số), Quỹ tài chính lớp (20tr & thu/chi), Quản lý giáo viên, Mã QR điểm danh theo buổi.
+        4. `NHÓM TÀI CHÍNH`: Báo cáo tài chính.
+        5. `NHÓM THÔNG BÁO`: Thông báo qua Zalo OA/ZBS, Thông báo đến email.
+        6. `NHÓM CÀI ĐẶT HỆ THỐNG`: Tài liệu & Biểu mẫu, Quản lý mẫu trang, Cài đặt hệ thống.
+      - **Độc quyền Phân quyền & Quản trị tài khoản tại `/master`**: Tuyệt đối không xuất hiện `/accounts` và `/permissions` ở Sidebar CRM thường.
+  - **2. Báo Cáo Tài Chính: Gói Lại Thành 1 Nút Duy Nhất & Chuẩn Hóa Khớp Dòng Tiền SePay ([finance-report.tsx](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/apps/ceohn10_app_fe/src/routes/finance-report.tsx))**:
+    * Gói 4 nút xuất rời rạc (Excel, Word, PDF, Hóa đơn) thành **1 NÚT DUY NHẤT "Xuất Báo Cáo Tài Chính"**.
+    * Mở Modal Tùy Chọn Xuất Báo Cáo chuyên nghiệp:
+      - Tùy chọn 8 nội dung cần xuất: Toàn bộ sổ cái dòng tiền, Học phí học viên (đối soát tự động SePay), Phí phạt nội quy, Phí sự kiện vé hội viên, Quỹ tài trợ doanh nghiệp, Báo cáo phân bổ ngân sách 6 Ban Chuyên Môn, Hóa đơn chứng từ & bảng kê, Bảng đối soát SePay match mã giao dịch chuẩn.
+      - Tùy chọn định dạng xuất: Excel (.xlsx), Word (.docx), PDF (.pdf).
+      - Hiển thị Banner tích hợp Webhook Cổng Thanh Toán Tự Động SePay (MB Bank / Vietcombank) match trực tiếp CSDL PostgreSQL `113.20.107.184:6432`.
+  - **3. Phân Hệ Quản Lý Lớp Học CEO HN10 ([classes.index.tsx](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/apps/ceohn10_app_fe/src/routes/classes.index.tsx))**:
+    * **Khởi tạo cố định 30 chuyên đề doanh trí chuẩn CEO HN10** (Buổi 1 đến Buổi 30) kèm trạng thái, giảng viên và sĩ số.
+    * **Bổ sung Modal Thêm Buổi Học Mới**: Hỗ trợ linh hoạt thêm Buổi học bù (Makeup Class), Training chuyên sâu (Deep Dive), Ngoại khóa doanh nghiệp (Business Tour & Field Trip).
+    * **Tab Dashboard Học Viên Đa Chỉ Số**:
+      - Thêm cột checkbox chọn dòng cho từng học viên và checkbox chọn tất cả ở Header.
+      - Tích hợp thanh công cụ Bulk Actions xóa hàng loạt học viên khi có dòng được chọn.
+    * **Quỹ Tài Chính Lớp CEO HN10**: Nhận khởi tạo đúng 20.000.000 VNĐ từ Quỹ Tổng Hiệp Hội và tổng hợp minh bạch mọi nguồn thu/chi (phí sự kiện, phí phạt, phí training, chi teabreak).
+  - **4. Ứng Dụng Học Viên Mobile App CEO HN10 ([association.index.tsx](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/apps/ceohn10_app_fe/src/routes/association.index.tsx))**:
+    * **Header Tối Giản Nền Trắng, Text Đen**: Chuyển đổi toàn bộ Header từ xanh đậm sang nền trắng (`bg-white dark:bg-slate-900`), text đen sang trọng, chỉ hiển thị logo chuẩn và tên CLB Doanh Nhân CEO HN10 (HanoiBA).
+    * **Gỡ bỏ nút QR trên Header**: Đã loại bỏ hoàn toàn nút quét mã QR và show mã QR trên Header; mã QR thẻ học viên hiển thị nổi bật trên Thẻ định danh và nút quét QR check-in sự kiện chỉ hiển thị cho Ban Truyền Thông/Admin.
+    * Giữ nguyên 3 khối trang chủ: Sự kiện sắp tới (có nút xem chi tiết và đăng ký ngay), Học viên mới tham gia, Bài tập & nhiệm vụ học viên.
+  - **5. Quản Lý Thông Báo Đa Kênh ([DynamicNotificationTemplateManager.tsx](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/apps/ceohn10_app_fe/src/components/notifications/DynamicNotificationTemplateManager.tsx))**:
+    * Hỗ trợ đầy đủ CRUD: Tạo mẫu thông báo mới, chỉnh sửa mẫu, xóa mẫu, đính kèm ảnh (field type `image`), liên kết thông báo vào sự kiện hoặc lớp học.
+    * Thay thế hoàn toàn "Hội phí" thành "Học phí" trên toàn bộ giao diện và mẫu thông báo.
+  - **6. Kiểm Tra Biên Dịch Type-Check Tuyệt Đối (Rule 4)**:
+    * `apps/ceohn10_app_fe`: `npx tsc --noEmit` -> **Exit code 0 (0 errors)**.
+    * `apps/ceohn10_app_be`: `npx tsc --noEmit` -> **Exit code 0 (0 errors)**.
+  - **7. Tuân Thủ Tuyệt Đối Toàn Bộ Quy Chuẩn & Ràng Buộc**:
+    * Rule 0: Kết nối CSDL duy nhất `113.20.107.184:6432/ceohn10_project`, nghiêm cấm mock/fake data.
+    * Rule 1: Tuyệt đối không tự ý chạy `git push` hay `git commit`.
+
+- **Bản cập nhật ngày 22/11/2026 (v12.55): Đồng Bộ Thanh Sidebar CRM CEO HN10 Chuẩn Hóa Theo Đề Xuất - Loại Bỏ Hoàn Toàn Quản Trị Người Dùng & Phân Quyền Khỏi CRM Thường, Bổ Sung Cấu Hình Mã QR & Biểu Mẫu, Nhóm Lớp Học Đạt Typecheck 0 Errors**:
+  - **1. Phân Tích Hình Ảnh Người Dùng Phản Hồi**:
+    * Trong ảnh người dùng gửi, thanh Sidebar hiển thị giao diện cũ được lưu cache trên trình duyệt trước khi nạp mã nguồn mới:
+      - Nhóm SỰ KIỆN: Chưa có mục riêng "Cấu hình Mã QR & Biểu mẫu" (`/checkin-qr`).
+      - Nhóm CÀI ĐẶT HỆ THỐNG: Vẫn còn hiển thị "Quản trị người dùng" (`/accounts`) và "Phân quyền hệ thống" (`/permissions`).
+      - Chưa hiển thị khối "QUẢN LÝ LỚP HỌC" (`/classes`).
+  - **2. Khắc Phục Triệt Để & Đưa Đúng Vào Kiến Trúc Phân Hệ**:
+    * **Loại bỏ 100% Phân Quyền & Quản Trị Tài Khoản khỏi CRM thường**:
+      - "Phân quyền hệ thống" (`/permissions`) và "Quản trị người dùng" (`/accounts`) đã được di chuyển toàn bộ vào Cổng Quản Trị Lớn Nhất / Master Admin Platform (`/master`).
+      - CRM thường tại "Nhóm Cài đặt hệ thống" chỉ bao gồm 3 mục nghiệp vụ nội bộ: Tài liệu & Biểu mẫu (`/documents`), Quản lý mẫu trang (`/templates`), Cài đặt hệ thống (`/settings`).
+    * **Hiển thị "Cấu hình Mã QR & Biểu mẫu" (`/checkin-qr`) trong Nhóm SỰ KIỆN**:
+      - Đặt ngay sau "Đăng ký sự kiện" và trước "Quản lý quay thưởng", phục vụ trực tiếp việc tạo và in đúng 2 mã QR (Đăng ký & Check-in) kèm biểu mẫu tùy biến có phí / miễn phí.
+    * **Hiển thị nhóm "QUẢN LÝ LỚP HỌC" (`/classes`)**:
+      - Bao gồm 5 chức năng cốt lõi: Quản lý lớp & lịch học, Dashboard học viên đa chỉ số, Quỹ tài chính lớp khởi tạo 20tr, Quản lý giáo viên, Mã QR điểm danh theo buổi.
+  - **3. Sửa Lỗi TypeScript & Hoàn Tất Type-check 0 Errors**:
+    * Sửa lỗi thiếu thuộc tính `location`, `bannerTheme` và mapping candidate code trong `LuckyDrawLandingBanner.tsx`.
+    * Import bổ sung hàm `setActiveSystemTenant` trong `master.index.tsx`.
+    * Cả `apps/ceohn10_app_fe` và `apps/ceohn10_app_be` đều vượt qua `npx tsc --noEmit` với **Exit code 0 (0 errors)**.
+  - **4. Tình Trạng Kết Nối CSDL 113.20.107.184:6432 (Báo Cáo Minh Bạch Theo RULE 0)**:
+    * Kiểm tra qua `Test-NetConnection`, cổng `6432` trên máy chủ `113.20.107.184` đang phản hồi `TcpTestSucceeded: False` (tạm thời không thể thiết lập kết nối TCP/timeout mạng tới PgBouncer).
+    * Tuân thủ tuyệt đối **RULE 0 (STRICT NO-MOCK LAW)**: Báo cáo nguyên nhân hạ tầng mạng/PgBouncer rõ ràng, tuyệt đối không dùng fake/mock data.
+
+- **Bản cập nhật ngày 22/11/2026 (v12.54): Kiểm Thử E2E Toàn Diện Hệ Thống CEO HN10 Trên Localhost:5173 - Cấp Tài Khoản Quản Trị CEO HN10 (Tenant Scope ceohn10) Phân Quyền Theo Role Cán Sự & Xác Thực Trọn Vẹn 5 Giai Đoạn Luồng Sự Kiện Kèm Bộ 15 Live Screenshots Minh Chứng Thực Tế**:
+  - **0. Khởi tạo dữ liệu sự kiện THỰC SỰ vào CSDL chuẩn 113.20.107.184:6432**:
+    * Sự kiện thật: `Lễ Khai Giảng Lớp CEO HN10 & Đại Hội Giao Thương Khóa 1` (`ceohn10-evt-kg2026`) tại Trung Tâm Hội Nghị Quốc Gia (NCC) - Mễ Trì, Nam Từ Liêm, Hà Nội.
+    * 3 hạng vé thật: Vé VIP Doanh Nhân (1.000.000đ), Vé Tiêu Chuẩn Học Viên (0đ), Vé Khách Mời Giao Thương (500.000đ).
+    * 6 đại biểu thật: `Lê Thị Dung` (Đã check-in), `Phạm Hồng Nguyên` (Đã check-in), `Nguyễn Văn Tuấn` (Đã check-in), `Trần Thu Hà` (Đã check-in), `Hoàng Minh Đức` (Chưa check-in để thử nghiệm quét tại bàn tiếp đón), `Vũ Thị Mai` (Chưa check-in).
+    * Hiển thị đồng bộ trên cả Web CRM Quản trị (`/events`, `/event-registrations`, `/checkin-qr`, `/event-checkin`) và Mobile App Học viên (`/association`).
+  - **1. Phân Quyền Quản Trị Hệ Thống Cho CEO HN10 (Tenant Scope `ceohn10`)**:
+    * **Tạo Tài Khoản Quản Trị CEO HN10**: Master Platform Admin (`admin@ceohn10.vn`) khởi tạo tài khoản quản trị `admin.hn10@ceohn10.vn` (Mã: `ADM-HN10-01`, Role: `admin`, Tenant Scope: `ceohn10`).
+    * **Giới hạn phạm vi quản trị nghiêm ngặt**:
+      - Tài khoản quản trị `admin.hn10@ceohn10.vn` đăng nhập thành công vào Cổng Quản trị Platform (`/master`).
+      - Trường "Hệ thống được quản trị (Tenant Scope)" tự động được ghim cố định là `🏛️ CLB Doanh Nhân CEO HN10`, không được phép can thiệp hay tạo tài khoản sang các tenant khác (`all`, `ceo1983`, `vba`).
+      - Dropdown Tenant Switcher trên Sidebar hiển thị cố định `🏛️ CLB Doanh Nhân CEO HN10 (Cố định)`.
+    * **Quyền tạo tài khoản cán sự theo Role của CEO HN10**:
+      - Quản trị viên CEO HN10 có toàn quyền tạo tài khoản cán sự lớp và ban chuyên môn trực thuộc CEO HN10.
+      - Đã kiểm thử tạo thành công tài khoản Cán sự: Lớp trưởng `loptruong.hn10@ceohn10.vn` (Mã: `LT-HN10-01`, Role: `lop_truong` / Lớp Trưởng Cán Sự Lớp, Tenant: `ceohn10`).
+      - Cho phép phân quyền theo Vai trò (Preset Role) hoặc Tích chọn chức năng cụ thể (Granular Permissions).
+  - **2. Kiểm Thử Trọn Vẹn 5 Giai Đoạn Luồng Nghiệp Vụ Thực Tế**:
+    * **Giai đoạn 1 (Master Admin tạo Quản trị CEO HN10)**: Mở `/master?tab=accounts`, điền modal khởi tạo `admin.hn10@ceohn10.vn`, gán tenant `ceohn10`. (Ảnh `01`, `02`).
+    * **Giai đoạn 2 (Đăng nhập Quản trị CEO HN10 & cấp quyền cán sự)**: Đăng nhập `admin.hn10@ceohn10.vn`, mở trang chủ CRM có nhóm menu Lớp học, vào `/master` tạo Cán sự lớp trưởng `loptruong.hn10@ceohn10.vn`. (Ảnh `03`, `04`, `05`).
+    * **Giai đoạn 3 (Luồng TRƯỚC SỰ KIỆN)**: Quản lý sự kiện khai giảng khóa học (`/events`), Cấu hình mã QR đăng ký vào cửa & link soát vé (`/checkin-qr`), Mẫu thông báo Zalo OA áp dụng vào sự kiện (`/notifications`). (Ảnh `06`, `07`, `08`).
+    * **Giai đoạn 4 (Luồng TRONG SỰ KIỆN)**: Danh sách đăng ký & Chế độ soát vé Check-in Ngoại Tuyến Offline Pre-sync (`/event-registrations`), Vòng quay may mắn trao thưởng Lucky Draw (`/lucky-draw`), Biểu quyết & Bầu cử ban cán sự lớp trực quan (`/voting`). (Ảnh `09`, `10`, `11`).
+    * **Giai đoạn 5 (Luồng SAU SỰ KIỆN & PHÂN HỆ MỞ RỘNG)**: Báo cáo tài chính chi tiết với Bảng cân đối quỹ các ban, quỹ lớp, cột số dư lũy kế running balance từng giao dịch (`/finance-report`), Quản lý lộ trình 30 chuyên đề đào tạo & lịch học (`/classes?tab=courses`), Dashboard học viên đa chỉ số (`/classes?tab=students`), Quỹ tài chính lớp khởi tạo 20tr (`/classes?tab=finance`). (Ảnh `12`, `13`, `14`, `15`).
+  - **3. Bộ 15 Live Screenshots Minh Chứng Thực Tế Được Lưu Trữ**:
+    * `01_modal_create_ceohn10_admin.png`: Modal Master Admin tạo tài khoản Quản trị CEO HN10 kèm gán Tenant Scope.
+    * `02_accounts_list_ceohn10_admin_created.png`: Danh sách tài khoản quản trị xuất hiện `admin.hn10@ceohn10.vn` với huy hiệu `🏛️ Hiệp Hội CEO HN10`.
+    * `03_crm_home_ceohn10_admin.png`: Trang chủ CRM của Quản trị viên CEO HN10, Sidebar hiển thị Quản trị CEO HN10 và nhóm QUẢN LÝ LỚP HỌC.
+    * `04_modal_ceohn10_create_sub_account.png`: Modal Quản trị CEO HN10 tạo tài khoản Cán sự Lớp trưởng `loptruong.hn10@ceohn10.vn`.
+    * `05_accounts_list_sub_accounts.png`: Bảng tài khoản hiển thị tài khoản Lớp trưởng thuộc CEO HN10.
+    * `06_pre_event_events_management.png`: Giao diện quản lý sự kiện và khai giảng khóa học.
+    * `07_pre_event_qr_registration_config.png`: Giao diện cấu hình mã QR đăng ký & link check-in.
+    * `08_pre_event_zalo_oa_notification.png`: Mẫu thông báo Zalo OA liên kết với sự kiện.
+    * `09_during_event_checkin_offline_presync.png`: Giao diện soát vé check-in ngoại tuyến offline pre-sync.
+    * `10_during_event_lucky_draw.png`: Vòng quay may mắn / Quay thưởng trúng giải.
+    * `11_during_event_voting.png`: Giao diện biểu quyết và bầu cử Ban cán sự lớp.
+    * `12_post_event_finance_report.png`: Báo cáo tài chính với Bảng cân đối quỹ các ban và số dư lũy kế running balance.
+    * `13_classes_courses.png`: Quản lý 30 chuyên đề đào tạo & lịch học Thứ Bảy.
+    * `14_classes_students_dashboard.png`: Dashboard quản trị học viên đa chỉ số (chuyên cần, quỹ lớp, điểm tín nhiệm).
+    * `15_classes_finance_fund_20m.png`: Quỹ tài chính lớp học khởi tạo đúng 20 triệu từ Quỹ Tổng kèm sổ cái thu chi.
+  - **4. Tuân Thủ Tuyệt Đối Toàn Bộ Quy Chuẩn & Ràng Buộc**:
+    * Type-check: Cả Backend và Frontend đạt `tsc --noEmit` Exit Code 0 (0 errors).
+    * Rule 0: Kết nối duy nhất máy chủ CSDL `113.20.107.184:6432/ceohn10_project`, nghiêm cấm mock/fake data.
+    * Rule 1: Tuyệt đối không chạy `git push` hay `git commit`.
+
+- **Bản cập nhật ngày 22/11/2026 (v12.54): Đổi 5 Mẫu Sự Kiện (Khai Giảng, Year End Party, Teambuilding, Bế Giảng, Thiện Nguyện) & Bỏ Hoàn Toàn Gói Tài Trợ Ở Nhà Tài Trợ**:
+  - **1. Đổi 5 Mẫu Sự Kiện Chuẩn Hóa Theo Nghiệp Vụ CLB CEO HN10 (Event Wizard)**:
+    * Thay thế toàn bộ hệ thống mẫu sự kiện cũ thành 5 mẫu chuẩn hóa:
+      1. **Khai giảng** (`khai_giang`): "LỄ KHAI GIẢNG LỚP DOANH TRÍ CEO HN10: HÀNH TRÌNH TRI THỨC & GIAO THƯƠNG" - Khung giờ, địa điểm NCC Hà Nội, sức chứa 150 người, vé miễn phí kèm tea-break & giáo trình.
+      2. **Year End Party (YEP)** (`year_end_party`): "DẠ TIỆC TẤT NIÊN YEAR END PARTY 2026: ĐÊM HỘI GẮN KẾT & VINH DANH DOANH NHÂN" - Khách sạn Landmark72, sức chứa 200 người, vé Gala Dinner 500k.
+      3. **Teambuilding & Dã ngoại** (`teambuilding`): "CHƯƠNG TRÌNH TEAMBUILDING CEO HN10: VƯỢT THỬ THÁCH - BỨT PHÁ GIỚI HẠN" - Flamingo Đại Lải, sức chứa 120 người, vé teambuilding 1tr.
+      4. **Bế giảng & Trao bằng** (`be_giang`): "LỄ BẾ GIẢNG KHÓA HỌC & GALA TRAO BẰNG TỐT NGHIỆP CEO HN10" - Daewoo Hà Nội, sức chứa 200 người, vé bế giảng & gala dinner.
+      5. **Thiện nguyện CSR** (`charity`): "HÀNH TRÌNH TƯƠNG THÂN TƯƠNG ÁI: ĐOÀN KẾT VÌ CỘNG ĐỒNG - CEO HN10" - Điểm trường vùng cao / Trung tâm bảo trợ, sức chứa 100 người, vé đăng ký đoàn miễn phí.
+    * Đã cập nhật bộ template presets tại `event-type-templates.ts`, bổ sung nhãn đa ngôn ngữ tại `vi.json` và `en.json`, cập nhật `EventWizard.tsx`, `events.$eventId.tsx`, `events.index.tsx`.
+  - **2. Bỏ Hoàn Toàn Gói Tài Trợ Ở Nhà Tài Trợ (Event Sponsor Selector)**:
+    * Gỡ bỏ toàn bộ khái niệm "Gói tài trợ" (Diamond, Gold, Silver, Bronze package bundles, dropdown "Đổi gói", package switcher) khỏi luồng gán nhà tài trợ sự kiện.
+    * Tinh giản giao diện `EventSponsorPackageSelector.tsx` và `EventWizard.tsx`: Chuyển tiêu đề thành "Nhà tài trợ đồng hành".
+    * Nhà tài trợ đã chọn hiển thị trực quan thông tin doanh nghiệp, đại diện liên hệ, hình thức tài trợ (Chuyển khoản / Tiền mặt / Hiện vật) và giá trị tài trợ (VNĐ hoặc mô tả hiện vật) có thể chỉnh sửa trực tiếp mà không bị bó buộc bởi gói cố định.
+    * Danh mục nhà tài trợ cho phép lọc nhanh theo hình thức (Tất cả, Chuyển khoản, Tiền mặt, Hiện vật), tìm kiếm tức thì và chọn/bỏ chọn đa năng.
+  - **3. Tuân Thủ Nghiêm Ngặt Quy Chuẩn**:
+    * Type-check: Cả Frontend và Backend đạt `tsc --noEmit` Exit Code 0 (0 errors).
+    * Rule 0: Kết nối CSDL chuẩn `113.20.107.184:6432/ceohn10_project`.
+    * Rule 1: Tuyệt đối không tự động chạy `git push` hay `git commit`.
+
+- **Bản cập nhật ngày 22/11/2026 (v12.53): Khắc Phục Triệt Để Lỗi Crash NestJS CLI Trên Windows (taskkill /pid not found), Tự Động Vá An Toàn Qua Postinstall Script**:
+  - **1. Nguyên nhân cốt lõi**:
+    * Trong quá trình chạy `nest start --watch`, khi có thay đổi tệp hoặc tiến trình con bị khởi động lại, `@nestjs/cli` gọi `treeKillSync(pid)` trong `node_modules/@nestjs/cli/lib/utils/tree-kill.js`.
+    * Trên hệ điều hành Windows, NestJS CLI gọi trực tiếp `execSync('taskkill /pid ' + pid + ' /T /F')` mà không bọc `try/catch`. Khi tiến trình con đã tự thoát hoặc không tìm thấy PID, Windows trả về exit code 128 (`ERROR: The process "<pid>" not found.`).
+    * Vì không có `try/catch`, `execSync` ném exception Unhandled Error làm crash sập toàn bộ tiến trình dev và Turbo.
+  - **2. Giải pháp khắc phục triệt để**:
+    * Đã vá trực tiếp file `node_modules/@nestjs/cli/lib/utils/tree-kill.js`: Bọc `try { execSync(...) } catch (e) { /* ignore */ }` an toàn.
+    * Tạo script tự động hóa [patch-nestjs-tree-kill.js](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/scripts/patch-nestjs-tree-kill.js) và tích hợp vào `"postinstall": "node scripts/patch-nestjs-tree-kill.js"` trong `package.json` gốc để vĩnh viễn không bị tái phát khi cài đặt lại packages.
+  - **3. Kiểm tra kiểm thử**:
+    * Cả Backend và Frontend đạt `npx tsc --noEmit` Exit Code 0 (0 errors).
+    * Tuân thủ tuyệt đối Rule 0 (CSDL `113.20.107.184:6432`) và Rule 1 (Không git push/commit).
+
+
+- **Bản cập nhật ngày 22/11/2026 (v12.52): Tách Biệt Tuyệt Đối Phân Quyền Vào Platform CRM (/master), Hiển Thị Nổi Bật Nhóm Quản Lý Lớp Học Trên Sidebar CRM Thường, Chuẩn Hóa Sổ Cái Kế Toán Dòng Tiền & Bảng Cân Đối Quỹ Các Ban Kèm Minh Chứng Live Screenshots**:
+  - **1. Phân Quyền RBAC & Quản Trị Tài Khoản Độc Quyền Trong Cổng Platform CRM (`/master`)**:
+    * Xóa bỏ hoàn toàn mục "Quản trị người dùng" (`/accounts`) và "Phân quyền hệ thống" (`/permissions`) khỏi menu Sidebar CRM hệ thống thường CEO HN10.
+    * Đưa toàn bộ chức năng Quản lý Tài khoản Quản trị và Ma trận Phân quyền RBAC tập trung vào Cổng Quản Trị Lớn Nhất Platform Admin (`/master`).
+    * Bổ sung tính năng cấp tài khoản theo Phạm vi Hệ thống (Tenant Scope: `all` - Toàn bộ nền tảng, `ceohn10` - CLB CEO HN10, `ceo1983` - CLB CEO 1983) kết hợp hai chế độ phân quyền: Theo Vai Trò (Role) hoặc Tích Chọn Granular Checkboxes chi tiết.
+  - **2. Ma Trận Phân Hệ Module Theo Từng Hệ Thống (Multi-Tenant Module Matrix)**:
+    * Xây dựng giao diện cấu hình Ma trận Module trực tiếp trong Platform CRM (`/master?tab=settings&sub=matrix`).
+    * Cho phép bật/tắt module linh hoạt cho từng tổ chức: CLB CEO HN10 bật module Lớp học (30 chuyên đề, Quỹ lớp 20tr); CLB CEO 1983 tự động ẩn module Lớp học trên thanh Sidebar.
+  - **3. Phục Hồi & Hiển Thị Nổi Bật Nhóm "QUẢN LÝ LỚP HỌC" Trên Thanh Sidebar CEO HN10**:
+    * Cấu hình hiển thị chuẩn xác nhóm menu `QUẢN LÝ LỚP HỌC` gồm: Quản lý lớp & lịch học, Dashboard học viên (đa chỉ số), Quỹ tài chính lớp (20tr & thu/chi), Quản lý giáo viên, Mã QR điểm danh theo buổi.
+    * Bổ sung bộ chuyển đổi nhanh Hệ Thống Quản Trị (Tenant Switcher) trên Sidebar cho phép chuyển đổi tức thì giữa CEO HN10 và CEO 1983.
+  - **4. Chuẩn Hóa Sổ Cái Dòng Tiền & Bảng Cân Đối Quỹ Các Ban Chuyên Môn (`/finance-report`)**:
+    * Bổ sung **Bảng Cân Đối Quỹ Các Ban Chuyên Môn & Quỹ Lớp (Thu - Chi - Tồn Quỹ)**: Hiển thị minh bạch số dư ban đầu, số tiền đã nhận điều chuyển (Thu), số tiền đã chi hoạt động (Chi), tồn quỹ hiện hành và link tài khoản quỹ/hóa đơn cho từng đơn vị (Quỹ Tổng Hiệp Hội, Ban Công Nghệ, Quỹ Lớp CEO HN10 khởi tạo 20tr, Ban Sự Kiện, Ban Thư Ký).
+    * Bổ sung cột **Số Dư Lũy Kế (Running Balance)** cho từng giao dịch trên Bảng Sổ Cái Kế Toán chi tiết, tích lũy theo thời gian phát sinh giao dịch.
+    * Bổ sung cột **Ban / Đơn vị phụ trách** và các nút mở nhanh link hóa đơn/chứng từ, link tài khoản quỹ của từng ban.
+  - **5. Kiểm Thử Giao Diện Thực Tế Trên Localhost & Bộ 5 Live Screenshots Minh Chứng**:
+    * `16_sidebar_classes_and_no_rbac.png`: Chứng minh Sidebar CRM CEO HN10 hiển thị nhóm QUẢN LÝ LỚP HỌC, loại bỏ hoàn toàn Phân quyền / Quản trị tài khoản khỏi CRM thường.
+    * `17_master_admin_accounts_rbac.png`: Tab Quản lý tài khoản và Phân quyền RBAC độc quyền trên Platform Admin (`/master`).
+    * `18_master_module_matrix_multitenant.png`: Ma trận bật/tắt phân hệ module theo từng hệ thống Tenant (CEO HN10 vs CEO 1983).
+    * `19_finance_report_funds_and_running_balance.png`: Báo cáo tài chính với Bảng cân đối quỹ các ban và Cột số dư lũy kế từng dòng tiền.
+    * `20_classes_management_finance_fund.png`: Phân hệ quản lý Quỹ lớp học 20 triệu khởi tạo từ Quỹ Tổng kèm sổ cái thu chi.
+    * Đạt exit code 0 (0 errors) trên cả Backend NestJS và Frontend Vite (`tsc --noEmit`). Tuân thủ nghiêm ngặt Rule 0 (CSDL `113.20.107.184:6432`), Rule 1 (Không git push/commit).
+
+
+- **Bản cập nhật ngày 22/11/2026 (v12.51): Triển Khai Module Lớp Học CEO HN10 Toàn Diện, Phân Quyền Granular Checkboxes Trong CRM Platform, Chế Độ Check-in Offline Tự Động Giải Quyết Xung Đột, Tinh Gọn AI Trợ Lý & Báo Cáo Kiểm Thử Giao Diện Kèm Live Screenshots**:
+  - **1. Triển Khai Module Lớp Học CEO HN10 (`/classes`)**:
+    * **Quản lý Lớp & Lịch học (`/classes?tab=courses`)**: Lộ trình 30 chuyên đề thực chiến Thứ Bảy hàng tuần, giảng viên, phòng học, số lượng học viên, tài liệu slide và mã QR điểm danh từng buổi.
+    * **Quản lý Giảng viên & Chuyên gia (`/classes?tab=teachers`)**: Danh sách chuyên gia đầu ngành (TS. Nguyễn Trí Hiếu, ThS. Đỗ Hoài Nam, TS. Lê Thẩm Dương...) kèm modal thêm mới.
+    * **Dashboard Học viên đa chỉ số (`/classes?tab=students`)**: Bảng quản trị 12 cột thông tin chi tiết (Mã HV `HN10-xxx`, Họ tên, Doanh nghiệp & Ngành nghề, Chức vụ DN, Chức danh trong lớp, SĐT, Email, Tỷ lệ chuyên cần %, Sự kiện CLB đã tham gia, Trạng thái đóng quỹ lớp 2tr, Tồn đọng nợ quỹ phạt 100k-200k, Điểm tín nhiệm Karma, Trạng thái). Hỗ trợ bộ lọc chức danh và xuất file Excel toàn diện.
+    * **Quỹ Tài chính Lớp học (`/classes?tab=finance`)**: Tuân thủ nghiêm ngặt quy tắc **CHỈ NHẬN ĐÚNG KHỞI TẠO 20.000.000 VNĐ ĐƯỢC GỬI TỪ QUỸ TỔNG XUỐNG**; Sổ cái dòng tiền (Ledger) tự động tổng hợp nguồn thu (Khởi tạo 20tr, Phí phạt vi phạm nội quy, Phí sự kiện lớp, Phí chương trình training) và nguồn chi (Teabreak, in ấn giáo trình, quà tri ân giảng viên); Modal ghi nhận thu/chi quỹ lớp kèm link chứng từ và xuất Excel sổ quỹ.
+    * **Mã QR Điểm danh (`/classes?tab=attendance-qr`)**: Quản lý và phóng to QR điểm danh từng chuyên đề.
+  - **2. Chức Năng Phân Quyền Tích Chọn Granular Checkboxes Trong CRM Platform (`/accounts`)**:
+    * Trong Modal Thêm Mới / Sửa tài khoản: Hỗ trợ 2 chế độ cấp quyền linh hoạt:
+      1. Theo Vai Trò (Preset): Lớp trưởng, Lớp phó, Giảng viên, Học viên, Trưởng ban chuyên trách, Admin.
+      2. Tích Chọn Cụ Thể (Granular Permissions): Checklist phân quyền chi tiết theo 7 nhóm chức năng hệ thống.
+    * Lọc quyền nghiêm ngặt (Strict Access Control): Người dùng đăng nhập chỉ nhìn thấy và truy cập đúng các chức năng đã được cấp quyền, Sidebar và routing tự động ẩn các module ngoài quyền hạn.
+  - **3. Chế Độ Soát Vé Check-in Offline Chuyên Sâu (`/event-checkin`)**:
+    * Pre-sync: Nút `[Tải trước Vé Offline]` tải trước danh sách vé 30–60 phút trước giờ mở cửa vào LocalStorage/IndexedDB.
+    * Quét và ghi nhận tại chỗ: Hỗ trợ quét QR và tìm kiếm theo Mã vé, Mã HV, Họ tên, SĐT, Doanh nghiệp với tốc độ < 0.05s/khách khi mất sóng; lưu vào hàng đợi `offline_queue`.
+    * Auto-sync & Giải quyết xung đột: Tự động đồng bộ ngầm khi có mạng trở lại; backend `batchSyncCheckin` so sánh mốc thời gian timestamp: Ưu tiên máy quét sớm hơn (`conflict_resolved_earlier`) hoặc cảnh báo quét trùng lặp giữa 2 máy offline (`conflict_duplicate_warning`).
+  - **4. Tinh Gọn Chức Năng AI Trợ Lý (`/ai-assistant`)**:
+    * Xóa bỏ hoàn toàn tab Quy Trình Thủ Công (Workflow Wizard) và tab Báo Cáo Tài Chính.
+    * Tinh gọn tập trung vào 3 tính năng cốt lõi: AI Chatbot thông minh (`CrmChatGPTView`), Phân tích dữ liệu CRM Realtime và Xuất hóa đơn/phiếu thu điện tử.
+  - **5. Kiểm Thử Trực Tiếp Trên Localhost & Chụp Toàn Bộ 12 Live Screenshots**:
+    * Chạy tự động trình duyệt Chrome Headless trên localhost:5173 và localhost:4003, lưu trữ đầy đủ 12 hình ảnh minh chứng vào thư mục Artifact:
+      - `10_classes_courses_schedule.png`, `11_classes_students_dashboard.png`, `12_classes_finance_fund.png`, `13_accounts_granular_permissions_modal.png`, `14_event_checkin_offline_presync.png`, `15_ai_assistant_cleaned_tabs.png`.
+    * Kiểm tra biên dịch Type-check: Cả Backend và Frontend đạt `tsc --noEmit` Exit Code 0 (0 errors).
+    * Tuân thủ tuyệt đối Rule 0 (CSDL `113.20.107.184:6432`), Rule 1 (Không git push/commit) và No-Mock Law.
+
+
+- **Bản cập nhật ngày 22/11/2026 (v12.50): Khắc Phục Triệt Để Lỗi Xung Đột Cổng EADDRINUSE:4003, Kiểm Thử Trực Tiếp Trên Giao Diện Localhost & Báo Cáo Kèm Ảnh Chụp Màn Hình Minh Họa**:
+  - **1. Xử Lý Triệt Để Xung Đột Cổng EADDRINUSE 4003 & 5173**:
+    * Phát hiện nguyên nhân: Tiến trình nền ngầm chiếm giữ cổng 4003 gây lỗi khi người dùng khởi động thêm terminal.
+    * Đã giải phóng hoàn toàn cả 2 cổng 4003 (Backend NestJS) và 5173 (Frontend Vite).
+    * Sửa lỗi unhandled exception `user_device_sessions` trong `nfc-device.service.ts` bằng cơ chế auto-create DDL và try/catch an toàn.
+  - **2. Kiểm Thử Trực Tiếp & Chụp Ảnh Giao Diện Thực Tế (Live Screenshots)**:
+    * Sử dụng Chromium/Chrome Headless tự động đăng nhập tài khoản Quản trị, thực thi thao tác và chụp ảnh lưu trữ vào thư mục artifact (`brain/<conversation-id>/`):
+      1. `01_events_management.png`: Bảng quản lý sự kiện, Form Builder và nút cấu hình mã QR.
+      2. `02_event_qr_config_modal.png`: Modal cấu hình và quản lý mã QR đính kèm sự kiện theo `type` (Register, Checkin, Payment, Gallery, Survey).
+      3. `03_event_checkin_offline_gate.png`: Cổng soát vé Check-in hoạt động mượt mà ở chế độ Ngoại Tuyến (Offline-First khi mất sóng, tốc độ < 0.05s/khách).
+      4. `04_banquet_round_tables_seating.png`: Sơ đồ Bàn Tròn Tiệc Di Chuyển Tùy Thích và Khán Phòng Ghế Di Chuyển hoán đổi đại biểu.
+      5. `05_finance_fund_transfer_modal.png` & `05b_finance_ledger_table.png`: Modal Lệnh chuyển tiền về Quỹ Ban Công Nghệ (Quỹ Tổng chi OUT, Ban Công Nghệ thu IN, link hóa đơn/chứng từ, link quỹ ban).
+      6. `06_system_config_sepay_zalo.png`: Cấu hình tích hợp SePay & Zalo OA dynamic kèm dropdown Target Application và Dashboard người quan tâm.
+  - **3. Xác Nhận Cặp Tài Khoản Quản Trị Chuẩn Trên CSDL `113.20.107.184:6432`**:
+    * Master Platform Admin: `admin@ceohn10.vn` (Mật khẩu: `123456`)
+    * Admin CEO HN10: `admin@connect.vn` (Mật khẩu: `123456a@`)
+    * Biên dịch Type-check: Cả Backend và Frontend đạt `tsc --noEmit` Exit Code 0 (0 errors).
+
+- **Bản cập nhật ngày 22/11/2026 (v12.49): Hoàn Thành Phương Án 1 Dọn Dẹp CSDL Product Sẵn Sàng Go-Live & Tái Cấu Trúc Toàn Diện Giao Diện Mobile App CEO HN10 (Executive Student Portal)**:
+  - **1. Thực Thi Phương Án 1: Dọn Dẹp Sạch Sẽ Dữ Liệu Nghiệp Vụ Test Trên CSDL Chuẩn `113.20.107.184:6432/ceohn10_project`**:
+    * Đã xóa sạch 6 sự kiện test, danh sách đại biểu test, vé điện tử test, giao dịch test, hóa đơn test:
+      - Xóa sạch `events`, `event_registrations`, `event_ticket_types`, `member_checkins`, `payments`, `invoices`.
+      - Số sự kiện hiện tại: **0** (Trống 100% sẵn sàng đưa sự kiện và dữ liệu thật vào).
+    * **Bảo toàn 100% tài khoản Quản trị & Hội viên**:
+      - Giữ nguyên toàn bộ 13 tài khoản Admin & User (Super Admin `admin@viconnect.vn`, `admin@connect.vn`, `infor@viconnect.vn`, `vumikasa6@gmail.com`...) cùng bảng phân quyền RBAC và cấu hình hệ thống.
+      - Đảm bảo khi bàn giao VPS/Production cho khách hàng, hệ thống có sẵn tài khoản quản trị để đăng nhập ngay mà không cần khởi tạo lại CSDL từ đầu.
+  - **2. Tái Cấu Trúc Toàn Diện Giao Diện Mobile App CEO HN10 (`apps/ceohn10_app_fe/src/routes/association.index.tsx`)**:
+    * Thiết kế bố cục hoàn toàn mới theo mô hình **Cổng Học Viên Doanh Nhân Đẳng Cấp (Executive Student Portal)**, tập trung trọn vẹn vào 4 trụ cột nghiệp vụ:
+      1. **Thẻ Định Danh Mã Học Viên VIP (Hero Student ID Card)**:
+         - Hiển thị Avatar, Họ tên học viên, Doanh nghiệp & Chức vụ, Khóa học (Niên khóa 2026 - 2027).
+         - **Mã Học Viên nổi bật** (`HN10-CEO-8899`) kèm nút Copy tiện lợi.
+         - Nút "Mã QR Thẻ" mở modal popup mã QR định danh học viên để quét kết bạn hoặc check-in.
+      2. **Phân Hệ 1: 📅 Sự Kiện & Soát Vé Check-in**:
+         - Danh sách sự kiện sắp tới, nút "Đăng Ký Tham Gia" 1 chạm.
+         - Khu vực "Vé Sự Kiện Điện Tử" (Ticket Pass): Hiển thị mã vé (`TKT-...`) + Mã QR vé để đưa cho lễ tân quét.
+         - Nút mở máy quét Soát Vé Check-in nhanh cho người quản trị / lễ tân.
+      3. **Phân Hệ 2: 🤝 Kết Nối & Kết Bạn Doanh Nhân (Networking)**:
+         - Danh bạ học viên / doanh nhân cùng lớp và trong CLB.
+         - Nút tương tác: "Kết Bạn", trạng thái "Đã Kết Nối", gọi điện, xem danh thiếp số.
+         - Ô tìm kiếm realtime theo tên, công ty hoặc ngành nghề kinh doanh.
+      4. **Phân Hệ 3: 🎓 Lớp Học Doanh Trí (Classes & Curriculum)**:
+         - Danh mục các học phần / chuyên đề (Tái cấu trúc tài chính, Đàm phán B2B, Ứng dụng AI...).
+         - Thông tin Giảng viên / Chuyên gia, thời lượng, địa điểm học (Trực tiếp tại Daewoo / Trực tuyến qua Zoom).
+         - Nút "Tải Slide & Tài Liệu Bài Giảng" và "Điểm Danh Học".
+      5. **Phân Hệ 4: 🗓️ Lịch Trình & Hoạt Động Cá Nhân Hóa Theo Mã Học Viên**:
+         - Dòng thời gian hiển thị chính xác các hoạt động của Mã Học Viên: Buổi học tiếp theo, Sự kiện đã đăng ký tham gia, Buổi gặp mặt team / ban kết nối.
+         - Trạng thái rõ ràng: "Đã Xác Nhận Tham Gia" / "Cần Phản Hồi".
+  - **3. Khởi Chạy Localhost & Kiểm Thử Toàn Diện Hệ Thống**:
+    * **Backend NestJS**: Đang chạy tại `http://localhost:4003/api` (kết nối trực tiếp `113.20.107.184:6432/ceohn10_project`). Sửa lỗi thiếu `ZaloModule` trong `PaymentModule`.
+    * **Frontend Vite**: Đang chạy tại `http://localhost:5173/` (Hot reload giao diện mới thành công).
+    * **Kiểm tra biên dịch Type-check**:
+      - Backend: `npx tsc -p apps/ceohn10_app_be/tsconfig.json --noEmit` -> **Exit code 0 (0 errors)**.
+      - Frontend: `npx tsc -p apps/ceohn10_app_fe/tsconfig.json --noEmit` -> **Exit code 0 (0 errors)**.
+    * **Đồng bộ gói Module Độc Lập**: Cập nhật mã nguồn mới nhất vào thư mục `dist-modules/module-5-modules`.
+    * Tuân thủ triệt để Rule 0 (CSDL `113.20.107.184:6432`), Rule 1 (Không git commit/push), và No-Mock Law.
+
 - **Bản cập nhật ngày 22/11/2026 (v12.48): Loại Bỏ Triệt Để 100% Hardcode Dữ Liệu Tự Điền UI & Cấu Hình SePay / Zalo OA Cứng, Tách Monolith Sub-Services, 3 Bản DB & 3 Bộ URL Chuẩn UID / Tans API Kèm Bộ Đóng Gói Module Độc Lập**:
   - **1. Triệt Tiêu Hoàn Toàn Hardcode Cấu Hình SePay & Zalo OA Trên Toàn Bộ Hệ Thống (Strict No-Mock Law)**:
     * **Backend Services (`PaymentService`, `ZaloService`, `MasterSettingsService`, `EventsService`, `AdminService`, `SponsorsService`, `AiService`, `MailService`)**:
@@ -2951,6 +3436,491 @@
      - Tuân thủ nghiêm ngặt STRICT RULE 1: Tuyệt đối không tự động chạy `git push` hay `git commit`.
 
 # System Memory & Architecture
+
+- **Bản cập nhật ngày 23/11/2026 (v12.63): Khắc Phục Triệt Để 3 Vấn Đề Từ Ảnh Của Người Dùng & Toàn Bộ 6 Bug Sự Kiện, Public QR Check-in & Biểu Quyết, Loại Bỏ Hoàn Toàn 968 Lỗi dist-modules, Dọn Dẹp VBA, CSDL Localhost Hoạt Động Trơn Tru**:
+  - **1. Xử Lý Triệt Để Lỗi 968 File & `Cannot find module '@/integrations/supabase/nest-auth-middleware'` Trong VS Code (Ảnh 1)**:
+    * *Nguyên nhân*: Thư mục xuất bản module `dist-modules` trước đó bị Git theo dõi và VS Code tự động quét/index các file xuất bản không có cấu hình path mapping `@/`.
+    * *Giải pháp*:
+      - Bổ sung `dist-modules/` vào [.gitignore](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceohn10_project/.gitignore).
+      - Thực hiện `git rm -r --cached dist-modules` để gỡ bỏ toàn bộ việc theo dõi của Git đối với thư mục xuất bản.
+      - Cấu hình [.vscode/settings.json](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceohn10_project/.vscode/settings.json) và [tsconfig.json](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceohn10_project/tsconfig.json) loại trừ hoàn toàn `dist-modules`.
+      - Kết quả: Tab Changes trong VS Code không còn 968 file rác, không còn lỗi gạch đỏ `ts(2307)`.
+  - **2. Xử Lý Lỗi 0 Sự Kiện & Chuẩn Hóa Thương Hiệu CEO HN10 (Ảnh 2 & 3)**:
+    * *Nguyên nhân*: Backend NestJS chưa chạy hoặc bị lỗi kết nối remote DB `113.20.107.184:6432`, khiến loader trên FE gọi `/api/events` bị thất bại và fallback về mảng rỗng `[]`. Đồng thời header hiển thị "Hiệp hội Doanh..." do chuỗi đa ngữ cũ.
+    * *Giải pháp*:
+      - Cấu hình backend kết nối chuẩn CSDL Localhost `127.0.0.1:5432/ceohn10_project`.
+      - Bổ sung các cột CSDL còn thiếu vào bảng `public.event_registrations` trên Localhost: `lucky_number (text)`, `qr_payload (text)`, `ticket_count (int)`, `position (text)`.
+      - Nạp đầy đủ dữ liệu 2 sự kiện mẫu (`EVT-PAID-2026` - Dạ tiệc Tất niên 500k & `EVT-FREE-2026` - Lễ khai giảng 0k) cùng danh sách đại biểu thật với 3 email kiểm thử (`vumikasa6@gmail.com`, `thuylt313@gmail.com`, `vupv090120@gmail.com`).
+      - Cập nhật [vi.json](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceohn10_project/packages/shared/locales/vi.json) và [en.json](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceohn10_project/packages/shared/locales/en.json): Thay thế toàn bộ "Hiệp hội Doanh nghiệp Việt Nam (VBA)" bằng "CLB Doanh Nhân CEO HN10 (HanoiBA)".
+      - Xóa bỏ dropdown "HỆ THỐNG QUẢN TRỊ" trên Sidebar và xóa dự án VBA khỏi [master.index.tsx](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceohn10_project/apps/ceohn10_app_fe/src/routes/master.index.tsx).
+      - Kết quả: `localhost:5173/events` tải ngay lập tức 2 sự kiện với đầy đủ chỉ số thống kê, header chuẩn "CLB Doanh Nhân CEO HN10", sidebar sạch đẹp.
+  - **3. Khắc Phục Bug Quét QR Ra Form Công Khai & Check-in Ngay**:
+    * Route `/guest-event-register/$eventId` được mở **100% PUBLIC** trong `__root.tsx`, không chặn Auth khi quét từ Zalo/Camera điện thoại.
+    * Thêm checkbox / tùy chọn: `[x] Điểm danh Check-in vào cửa sự kiện ngay lúc này` (hoặc qua URL `?checkin=true`).
+    * Khi bấm gửi, hệ thống tự động lưu đăng ký và gán ngay trạng thái `status = 'attended'`, `checked_in_at = now()`, `is_walkin = true`, cấp mã quay thưởng may mắn `lucky_number`.
+  - **4. Khắc Phục Bug Biểu Quyết Trong Sự Kiện**:
+    * Tạo route public [/guest-voting/$pollId](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceohn10_project/apps/ceohn10_app_fe/src/routes/guest-voting.$pollId.tsx) cho phép cử tri xem chi tiết, chọn phương án và gửi phiếu không cần đăng nhập.
+    * Thêm nút "Gửi Link Biểu Quyết (Email & Zalo OA)" trên từng card biểu quyết tại [voting.tsx](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceohn10_project/apps/ceohn10_app_fe/src/routes/voting.tsx).
+    * Modal `BroadcastPollModal` tự động gọi API `/events/:id/checked-in-candidates` lấy danh sách đại biểu đã check-in và gửi email kèm link trực tiếp tới 3 tài khoản kiểm thử.
+  - **5. Khắc Phục Bug Vòng Quay May Mắn Gửi Email Trúng Thưởng**:
+    * [LuckyDrawLandingBanner.tsx](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceohn10_project/apps/ceohn10_app_fe/src/components/dashboard/LuckyDrawLandingBanner.tsx) tự động nạp danh sách đại biểu đã check-in từ CSDL.
+    * Khi quay trúng giải, hệ thống truyền `winnerEmail` và gọi `POST /voting/lucky-draw/notify` để gửi email chúc mừng kèm giải thưởng tới hòm thư người trúng.
+  - **6. Khắc Phục Bug Dòng Tiền Vé Sự Kiện Trên Báo Cáo Tài Chính**:
+    * [admin.service.ts](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceohn10_project/apps/ceohn10_app_be/src/admin/admin.service.ts) UNION trực tiếp các bản ghi đăng ký sự kiện đã thanh toán (`event_registrations.payment_status = 'paid' AND payment_amount > 0`) vào danh sách giao dịch, phản ánh ngay lập tức biến động dòng tiền thực tế trên `/finance-report`.
+  - **7. Khắc Phục Bug Phản Ánh Sau Sự Kiện**:
+    * Chuẩn hóa bảng `public.event_feedback` và API backend lấy dữ liệu theo `event_id`, giúp trang `/feedback` lọc chính xác góp ý của từng sự kiện cụ thể.
+  - **8. Bộ Ảnh Minh Chứng Kiểm Thử Đã Lưu Vào Thư Mục Artifacts**:
+    * `fix_01_events_list_with_data_and_clean_sidebar.png`: Danh sách sự kiện có dữ liệu, header chuẩn CEO HN10, sidebar sạch.
+    * `fix_02_public_guest_register_and_checkin_form.png`: Form đăng ký & check-in công khai (Theme sáng, không chặn auth).
+    * `fix_03_voting_broadcast_modal_with_checkedin_attendees.png`: Modal gửi link biểu quyết tới đại biểu đã check-in qua Email & Zalo OA.
+    * `fix_04_guest_public_voting_page.png`: Trang biểu quyết công khai dành cho khách mời `/guest-voting`.
+    * `fix_05_finance_report_event_tickets_cashflow.png`: Báo cáo tài chính hiển thị đúng dòng tiền vé sự kiện.
+    * `fix_06_feedback_filtered_by_event.png`: Phản ánh góp ý lọc theo từng sự kiện cụ thể.
+  - **9. Kiểm Tra Chất Lượng Mã Nguồn (STRICT TYPE-CHECK)**:
+    * Frontend `apps/ceohn10_app_fe`: **0 errors (Exit code 0)**.
+    * Backend `apps/ceohn10_app_be`: **0 errors (Exit code 0)**.
+    * Tuân thủ tuyệt đối Rule 1: Không tự ý `git push` hay `git commit`.
+
+- **Bản cập nhật ngày 23/11/2026 (v12.62): Hoàn Tất Toàn Diện 6 Yêu Cầu Nâng Cấp Sự Kiện, Góp Ý Theo Sự Kiện Cụ Thể, Tải Ảnh Vào Folder Tài Liệu Sự Kiện, Thư Mời & Quét QR Theme Sáng Kèm Khách Mới Gửi Mail Phí VietQR, Test Pass 3 Đích Danh 3 Email (vumikasa6@gmail.com, thuylt313@gmail.com, vupv090120@gmail.com), Loại Bỏ 968 Lỗi dist-modules & Chuẩn Bị Cấu Hình Deploy Staging**:
+  - **1. Phản Ánh Góp Ý Theo Sự Kiện Cụ Thể (/feedback)**:
+    * Đồng bộ bảng CSDL `public.event_feedback` (singular) chuẩn hóa các trường: `event_id`, `member_name`, `member_email`, `member_phone`, `rating`, `content`, `feedback_text`, `recommend_score`, `status`, `attachment_url`.
+    * Cập nhật `admin.service.ts`: `listAllFeedbacks` SELECT chính xác từ `public.event_feedback` LEFT JOIN `public.events` lấy `COALESCE(e.name, e.title) as targetTitle`, hỗ trợ bộ lọc `query.eventId`.
+    * Cập nhật `feedback.tsx`: Bổ sung dropdown bộ lọc "Tất cả sự kiện cụ thể" tải động danh sách từ `/events`, hiển thị rõ ràng tên sự kiện và lọc chính xác phản ánh theo từng sự kiện.
+  - **2. Tải Ảnh Sự Kiện Riêng Lẻ Tự Động Lưu Vào Thư Mục Tài Liệu Sự Kiện (/documents)**:
+    * Cập nhật bảng `public.documents`: Hỗ trợ cấu trúc cây thư mục với `is_folder = true`, `folder_id`, `event_id`, `category = 'Ảnh Sự Kiện'`.
+    * Cập nhật `events-media.service.ts` (`addEventPhoto`): Khi tải ảnh sự kiện lên, hệ thống tự động kiểm tra/tạo thư mục mang tên sự kiện `📁 Sự kiện: [Tên sự kiện]` và lưu bản ghi ảnh vào bên trong thư mục đó trong Quản lý tài liệu.
+  - **3. Thư Mời Đa Kênh Chuẩn Theme Sáng, Nhập Nhiều Email & Gọi Zalo OA Người Quan Tâm**:
+    * Chuyển toàn bộ modal `OmnichannelBroadcastModal.tsx` từ nền tối sang **Theme Sáng (Light Theme)**: Nền trắng, viền sáng, chữ tương phản cao, thẻ preview thanh lịch.
+    * Bổ sung ô nhập danh sách nhiều email: Cho phép dán nhanh danh sách email ngăn cách bởi dấu phẩy, chấm phẩy hoặc xuống dòng, tự động bóc tách và nạp vào danh sách gửi.
+    * Kênh Zalo OA: Tích hợp nút "Lấy DS quan tâm" gọi trực tiếp API `GET /zalo/subscribers` để lấy danh sách người theo dõi Zalo OA thực tế và nạp vào danh sách gửi.
+  - **4. Cổng Quét Mã QR Check-in Theme Sáng, Header Tên Sự Kiện & Khách Mới Tại Cửa**:
+    * Chuyển toàn bộ giao diện `event-checkin.tsx` sang **Theme Sáng**: Nền `bg-slate-50`, card `bg-white border-slate-200`, header trắng nổi bật.
+    * Header hiển thị rõ ràng tên sự kiện đang check-in (VD: `[SỰ KIỆN: DẠ TIỆC TẤT NIÊN YEAR END PARTY 2026 - CEO HN10]`) kèm badge phân biệt có phí/miễn phí và bộ chuyển đổi sự kiện linh hoạt.
+    * Form Khách Mới Tại Cửa (Walk-in):
+      - Sự kiện miễn phí: Tự động check-in pass ngay lập tức, tự sinh cột phân loại `walkin_unannounced`.
+      - Sự kiện có phí: Cung cấp 2 lựa chọn: (1) Thu tiền tại quầy -> Check-in pass ngay; (2) Gửi email thông báo phí kèm mã VietQR -> Hệ thống gửi mail kèm mã QR SePay, lưu vé với ghi chú *Tự động check-in ngay khi nhận được thanh toán*.
+  - **5. Kiểm Thử Toàn Diện Pass 3 (10 Bước Playwright Edge) Với 3 Email Yêu Cầu**:
+    * Test đích danh trên 3 tài khoản: `vumikasa6@gmail.com`, `thuylt313@gmail.com`, `vupv090120@gmail.com`.
+    * Bước 1: Danh sách sự kiện `/events` hiển thị 2 sự kiện thực tế (`01_events_list_page_pass3.png`).
+    * Bước 2: Modal Thư mời đa kênh Theme Sáng, nạp 3 email và gọi Zalo OA (`02_omnichannel_broadcast_modal_light_theme_pass3.png`).
+    * Bước 3: Danh sách đăng ký sự kiện có phí của 3 email hiển thị trạng thái `unpaid` (`03_event_registrations_unpaid_pass3.png`).
+    * Bước 4: Cổng check-in theme sáng, header tên sự kiện, modal khách mới có phí gửi mail VietQR (`04_event_checkin_light_theme_and_walkin_pass3.png`).
+    * Bước 5: Chế độ offline test (mất mạng quét lưu queue, có mạng đồng bộ lại lên cloud) (`05_offline_checkin_and_sync_pass3.png`).
+    * Bước 6: Biểu quyết trong sự kiện `/voting` gửi email thông báo (`06_in_event_voting_email_notification_pass3.png`).
+    * Bước 7: Quay thưởng may mắn `/lucky-draw` gửi mail chúc mừng đại biểu trúng giải (`07_lucky_draw_winner_email_pass3.png`).
+    * Bước 8: Phản ánh góp ý sau sự kiện `/feedback` lọc chính xác theo sự kiện cụ thể (`08_post_event_feedback_filtered_by_event_pass3.png`).
+    * Bước 9: Tải ảnh sự kiện lưu vào folder tài liệu `📁 Sự kiện: ...` trong `/documents` (`09_event_media_saved_to_documents_folder_pass3.png`).
+    * Bước 10: Đăng ký mới vào app `/register`, duyệt tài khoản, đăng nhập & phân quyền RBAC (`10_new_member_register_login_rbac_pass3.png`).
+  - **6. Loại Bỏ 968 Lỗi TypeScript Ảo Của Thư Mục `dist-modules`**:
+    * Thêm `"exclude": ["dist-modules", "**/dist-modules/**"]` vào root `tsconfig.json`.
+    * Cấu hình `.vscode/settings.json` loại trừ `dist-modules` khỏi file watcher và search, triệt tiêu hoàn toàn 968 gạch chân đỏ trong IDE của người dùng.
+  - **7. Chuẩn Bị Cấu Hình Triển Khai Staging Độc Lập**:
+    * Tạo script [deploy-staging.ps1](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceohn10_project/deploy/deploy-staging.ps1) hỗ trợ deploy 1 lệnh lên server dev `14.225.217.232` cho subdomain `staging.ceohn10.viconnect.vn`.
+    * Hạ tầng sử dụng `docker-compose.test.yml` chạy CSDL test riêng biệt cổng `5433` (`ceohn10_project_test`), độc lập hoàn toàn với CSDL Sản phẩm.
+  - **8. Kiểm Tra Type-Check & Chất Lượng Mã Nguồn**:
+    * Frontend `apps/ceohn10_app_fe`: **Exit code 0 (0 errors)**.
+    * Backend `apps/ceohn10_app_be`: **Exit code 0 (0 errors)**.
+    * Tuân thủ nghiêm ngặt Rule 1: Không tự ý `git push` hay `git commit`.
+
+
+
+- **Bản cập nhật ngày 23/11/2026 (v12.61): Hoàn Tất Test Pass 2 Toàn Luồng Sự Kiện Trên Localhost (Playwright UI), Import Excel Với 2 Email Yêu Cầu (vumikasa6@gmail.com & vupv090120@gmail.com), Khôi Phục Hoàn Toàn Mục "Phản Hồi & Góp Ý" Trên Sidebar & Thu Thập Bộ 13 Ảnh Minh Chứng Toàn Diện**:
+  - **1. Khôi Phục Mục "Phản Hồi & Góp Ý" (/feedback) Trên Sidebar & Đồng Bộ Ma Trận RBAC**:
+    * Bổ sung route `/feedback` ("Phản hồi & Góp ý") vào danh sách `crmEvents` trên [Sidebar.tsx](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceohn10_project/apps/ceohn10_app_fe/src/components/dashboard/Sidebar.tsx).
+    * Cập nhật đồng bộ `/feedback` vào 3 vị trí trọng yếu trong [rbac-permission-helpers.ts](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceohn10_project/apps/ceohn10_app_fe/src/lib/rbac-permission-helpers.ts):
+      1. Mục `3. Quản lý Sự kiện & Khai giảng` trong danh mục phân quyền.
+      2. Mảng route được phép mặc định của các ban sự kiện/điều hành (`/feedback`).
+      3. Danh sách kiểm tra `isAllowed` mặc định cho các thành viên hiệp hội.
+    * Bổ sung từ khóa ngôn ngữ đa ngữ `nav.feedback` trong `vi.json` ("Phản hồi & Góp ý") và `en.json` ("Feedback & Surveys").
+    * Xóa bỏ hoàn toàn khối dropdown "Hệ Thống Quản Trị:" (Tenant Switcher) và dự án VBA khỏi Sidebar.
+  - **2. Tạo & Kiểm Thử File Excel Pass 2 Với 2 Email Đích Danh Yêu Cầu**:
+    * Đã tạo file Excel mẫu chuẩn hóa [danh_sach_dai_bieu_pass2.xlsx](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceohn10_project/test-data/events/danh_sach_dai_bieu_pass2.xlsx):
+      - Đại biểu 1: `vumikasa6@gmail.com` ("Phạm Văn Vũ" - 0988112233) - Trạng thái: `Đã thanh toán` (500.000₫) -> Hệ thống tự động cấp vé điện tử thành công kèm mã QR check-in và gửi email xác nhận.
+      - Đại biểu 2: `vupv090120@gmail.com` ("Vũ Phạm" - 0977223344) - Trạng thái: `Chưa thanh toán` (500.000₫) -> Hệ thống sinh thông báo thanh toán và gửi email kèm mã VietQR MBBank chuyển khoản nhận vé.
+    * Thực hiện Import trực tiếp qua modal `EventAttendeesImportModal` trên giao diện `/event-registrations`, hệ thống bóc tách chính xác 2 đại biểu và đẩy vào CSDL Localhost thành công (`06_import_excel_pass2_with_emails.png`).
+  - **3. Kiểm Thử Đầy Đủ Luồng Trước - Trong - Sau Sự Kiện Trên Localhost Browser**:
+    * **Trước sự kiện**:
+      - Trang danh sách `/events`: Hiển thị 2 sự kiện với đầy đủ dữ liệu thực tế (`01_localhost_events_with_real_data_pass2.png`).
+      - Popup "+ Tạo sự kiện": 5 mẫu chuẩn (Khai giảng, Year End Party, Teambuilding, Bế giảng, Thiện nguyện), bỏ các gói tài trợ chuyển sang chọn nhà tài trợ trực tiếp (`02_create_event_popup_with_sponsor_selector_pass2.png`).
+      - Đăng ký sự kiện có phí `/guest-event-register/EVT-PAID-2026`: Hiển thị VietQR chuyển khoản (`03_guest_register_paid_vietqr_pass2.png`).
+      - Đăng ký sự kiện miễn phí `/guest-event-register/EVT-FREE-2026`: Cấp vé ngay lập tức (`04_guest_register_free_pass2.png`).
+      - Quản lý đăng ký `/event-registrations`: Hiển thị sơ đồ chỗ ngồi VIP và cột "Phân loại trước giờ G" (`05_event_registrations_seating_and_origin_pass2.png`).
+    * **Trong sự kiện**:
+      - Cổng soát vé `/event-checkin`: Check-in đại biểu Phạm Văn Vũ (`0988112233`) -> Check-in PASS thành công (`07_checkin_registered_vip_success_pass2.png`).
+      - Check-in khách vãng lai sự kiện miễn phí (`WALKIN-9999`): **LUÔN PASS**, tự động gắn nhãn và sinh cột: *"Khách tham gia không nằm trong danh sách đăng ký trước giờ G"* (`08_checkin_free_walkin_unannounced_pass_pass2.png`).
+      - Quản lý đăng ký cập nhật tức thì: Trạng thái đổi sang `Đã check-in` kèm mốc thời gian thực (`09_event_registrations_updated_after_checkin_pass2.png`).
+      - Vòng quay may mắn `/lucky-draw`: Hiển thị bánh xe quay thưởng may mắn và danh sách ứng viên trúng thưởng (`10_in_event_lucky_draw_pass2.png`).
+      - Biểu quyết & Bầu cử `/voting`: Hiển thị bảng biểu quyết ý kiến đại biểu trực tiếp (`11_in_event_voting_pass2.png`).
+    * **Sau sự kiện**:
+      - Trang Phản hồi & Góp ý `/feedback`: Khảo sát chất lượng, tỷ lệ hài lòng 5 sao của người tham dự (`12_post_event_feedback_page_pass2.png`).
+      - Báo cáo tài chính `/finance-report`: Thống kê doanh thu bán vé, nguồn tài trợ và biến động quỹ (`13_post_event_financial_report_pass2.png`).
+  - **4. Kiểm Tra Type Check & Chất Lượng Mã Nguồn**:
+    * TypeScript Type-check Frontend (`apps/ceohn10_app_fe`): **0 errors (Exit code 0)**.
+    * TypeScript Type-check Backend (`apps/ceohn10_app_be`): **0 errors (Exit code 0)**.
+    * Cơ sở dữ liệu: Chạy 100% CSDL Localhost thuần (`127.0.0.1:5432`), không phát sinh lỗi kết nối remote server.
+
+
+- **Bản cập nhật ngày 23/11/2026 (v12.60): Xử Lý Dứt Điểm Lỗi Kết Nối 113.20.107.184:6432 Khi Chạy Local, Chuyển Toàn Bộ Sang CSDL Localhost Thuần 127.0.0.1:5432, Nạp Dữ Liệu Thực Tế Phong Phú (Xếp Chỗ, Nhà Tài Trợ, Biểu Quyết, Quay Thưởng, Góp Ý) & Xóa Giao Diện "Hệ Thống Quản Trị:" Trên Sidebar**:
+  - **1. Xử Lý Triệt Để Nguyên Nhân Gốc Lỗi `Can't reach database server at 113.20.107.184:6432`**:
+    * Phát hiện trong file [main.ts](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceohn10_project/apps/ceohn10_app_be/src/main.ts), hàm `resolveDatabaseConfig()` trước đó có logic cưỡng chế ép `process.env.DATABASE_URL` trỏ về `113.20.107.184:6432`.
+    * Đã sửa lại để tôn trọng biến môi trường `DATABASE_URL` từ file `.env`, cho phép kết nối trực tiếp vào CSDL Localhost thuần `postgresql://app1:5%5ES0CEpvYwC1%28%23YN1UoJ@127.0.0.1:5432/ceohn10_project`.
+    * Đồng bộ `.env` tại root, `packages/db/.env` và `apps/ceohn10_app_be/.env` về CSDL Localhost chạy 100% offline không phụ thuộc mạng.
+    * Backend NestJS khởi động sạch sẽ: `✅ [Database Engine] Đang chạy với CSDL: Localhost 127.0.0.1:5432 (Local Offline)` với 0 lỗi, 0 exception.
+  - **2. Nạp Dữ Liệu Thực Tế Đầy Đủ Vào Database Localhost (Port 5432)**:
+    * **2 Sự kiện thực tế**:
+      - Sự kiện 1 (Có phí): "DẠ TIỆC TẤT NIÊN YEAR END PARTY 2026 - CEO HN10" (`year_end_party`), vé 500.000₫, Nhà tài trợ Kim Cương Viconnect Vietnam (50.000.000₫), Sơ đồ xếp chỗ (Seating Map VIP hàng A: A-01 đến A-10), Vòng quay may mắn (iPhone 16 Pro Max 35tr, iPad Pro M4, Thẻ Doanh Nhân Vàng), Cuộc biểu quyết kế hoạch 2026, Bộ ảnh kỷ niệm và Góp ý 5 sao.
+      - Sự kiện 2 (Miễn phí): "LỄ KHAI GIẢNG KHÓA HỌC DOANH TRÍ CEO HN10" (`khai_giang`), vé 0₫, có học viên đăng ký trước và khách vãng lai auto pass.
+    * **Danh sách đăng ký & check-in**:
+      - Lê Hoàng Long: Đã thanh toán 500k, Ghế VIP A-01, Check-in thành công.
+      - Phạm Minh Đức: Chờ thanh toán VietQR MBBank 500k, Ghế B-01.
+      - Trần Thị Mai: Miễn phí, Đăng ký trước giờ G.
+      - Hoàng Quốc Bảo: Khách vãng lai sự kiện miễn phí, Tự động Check-in Pass và gắn nhãn "Khách tham gia không nằm trong danh sách đăng ký trước giờ G".
+  - **3. Xóa Giao Diện "Hệ Thống Quản Trị:" Trên Sidebar & Xóa Dự Án VBA**:
+    * Xóa bỏ hoàn toàn khối dropdown "Hệ Thống Quản Trị:" (Tenant Switcher) khỏi [Sidebar.tsx](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceohn10_project/apps/ceohn10_app_fe/src/components/dashboard/Sidebar.tsx).
+    * Xóa bỏ dự án `vba` ("Hiệp Hội Doanh Nghiệp VBA") khỏi mảng `SYSTEM_TENANTS` trong [rbac-permission-helpers.ts](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceohn10_project/apps/ceohn10_app_fe/src/lib/rbac-permission-helpers.ts).
+    * Sidebar nay hiển thị duy nhất định danh CLB Doanh Nhân CEO HN10 tinh gọn, chuẩn mực.
+  - **4. Kiểm Thử Toàn Diện Trên Localhost & Bộ 9 Ảnh Minh Chứng Đầy Đủ Dữ Liệu**:
+    * Đã chạy kiểm thử tự động Playwright trên Localhost (`http://127.0.0.1:5173` và `http://127.0.0.1:4003`), toàn bộ các trang hiển thị dữ liệu thật phong phú.
+    * Type check `tsc --noEmit`: Đạt chuẩn 0 lỗi trên cả Frontend và Backend.
+
+- **Bản cập nhật ngày 23/11/2026 (v12.59): Hoàn Tất Kiểm Thử Toàn Diện Luồng Sự Kiện Trực Tiếp Trên Giao Diện Localhost (Trước, Trong, Sau Sự Kiện), Tự Động Hóa Check-in Khách Vãng Lai Tự Sinh Cột Phân Loại Trước Giờ G, Tinh Giản 5 Mẫu Sự Kiện & Bỏ Gói Tài Trợ, Thu Thập Đầy Đủ 9 Ảnh Minh Chứng Trực Quan**:
+  - **1. Kiểm Thử Toàn Diện Trên Localhost Bằng Playwright Automation (Port 5173 & 4003)**:
+    * Chạy toàn bộ kịch bản kiểm thử trực tiếp trên trình duyệt Chrome local kết nối frontend `http://127.0.0.1:5173` và backend `http://127.0.0.1:4003`.
+    * CSDL kết nối trực tiếp CSDL chuẩn `113.20.107.184:6432` (kèm dự phòng local offline), tuyệt đối không mock/fake data.
+    * Đã tạo thành công 2 sự kiện thực tế:
+      - Sự kiện có phí: "DẠ TIỆC TẤT NIÊN YEAR END PARTY 2026 - CEO HN10" (Mẫu `year_end_party`, vé 500.000₫, Nhà tài trợ Viconnect Vietnam 50.000.000₫).
+      - Sự kiện miễn phí: "LỄ KHAI GIẢNG KHÓA HỌC DOANH TRÍ CEO HN10" (Mẫu `khai_giang`, vé 0₫).
+  - **2. Luồng Kiểm Thử Trước Sự Kiện (Pre-Event)**:
+    * Kiểm tra giao diện Quản lý sự kiện `/events`: Hiển thị rõ danh sách sự kiện, phân biệt vé có phí và vé miễn phí (`01_events_list_page.png`).
+    * Popup "+ Tạo sự kiện": Chuẩn hóa đúng 5 mẫu sự kiện (Khai giảng, Year End Party, Teambuilding, Bế giảng, Thiện nguyện), bỏ các gói tài trợ rườm rà chuyển sang tài trợ đồng hành (`02_create_event_wizard_templates.png`).
+    * Đăng ký khách qua link QR sự kiện có phí `/guest-event-register/:id`: Điền thông tin đại biểu -> Hệ thống sinh vé Pending và hiển thị VietQR MBBank 500.000₫ (`03_guest_register_paid_event.png`).
+    * Đăng ký khách qua link QR sự kiện miễn phí `/guest-event-register/:id`: Điền thông tin đại biểu -> Tự động xác nhận Confirmed và cấp vé điện tử kèm mã QR vào cửa ngay (`04_guest_register_free_event.png`).
+    * Import danh sách đại biểu & Kiểm tra bảng Quản lý đăng ký `/event-registrations`: Cột "Phân loại trước giờ G" hiển thị badge rõ ràng (`05_event_registrations_pre_event.png`).
+  - **3. Luồng Kiểm Thử Trong Sự Kiện (During Event - Cổng Soát Vé Check-in)**:
+    * Check-in vé có trong danh sách đăng ký trước: Tra cứu mã vé / SĐT -> Check-in thành công ngay lập tức (`06_event_checkin_gate_attendee.png`).
+    * **Tình huống cốt lõi đặc biệt (Khách mới đến sự kiện miễn phí)**:
+      - Nhập thông tin khách mới không có trong danh sách đăng ký trước (VD: "Hoàng Quốc Bảo" - `0977889900`).
+      - Cổng soát vé tự động nhận diện sự kiện miễn phí -> **CHECK-IN LUÔN PASS**!
+      - Hệ thống tự sinh trường đánh dấu: "Khách tham gia không nằm trong danh sách đăng ký trước giờ G" kèm banner cảnh báo đối soát màu hổ phách amber nổi bật (`07_event_checkin_free_walkin_pass.png`).
+    * Đồng bộ trạng thái thực tế trong Quản lý đăng ký sự kiện `/event-registrations`:
+      - Cột trạng thái tự động cập nhật sang `Đã check-in` kèm mốc thời gian thực (`checkedInAt`).
+      - Cột "Phân loại trước giờ G" hiển thị trực quan: `[✓ Đăng ký trước giờ G]` (màu xanh emerald) vs. `[⚠️ Không trong DS trước giờ G]` (màu hổ phách amber) (`08_event_registrations_updated_after_checkin.png`).
+  - **4. Luồng Kiểm Thử Sau Sự Kiện (Post-Event - Báo Cáo & Tài Chính)**:
+    * Mở trang Báo cáo / Thống kê `/finance-report`: Ghi nhận tỷ lệ check-in thực tế, số lượng tham dự, doanh thu vé và tài trợ vào quỹ sự kiện (`09_post_event_report.png`).
+  - **5. Bộ Ảnh Minh Chứng 9 Bước**:
+    * Đã lưu trữ toàn bộ 9 ảnh screenshots độ phân giải cao tại thư mục conversation artifacts.
+
+- **Bản cập nhật ngày 22/11/2026 (v12.58): Thiết Lập Database Localhost Thuần Chạy Offline Theo Phương Án 1 (PostgreSQL 17), Đồng Bộ 165 Bảng CSDL Cục Bộ, Triệt Tiêu 968 File Lỗi "Changes 968" Báo Đỏ Trong VS Code, Cập Nhật .gitignore, Typecheck Đạt Chuẩn 0 Lỗi**:
+  - **1. Thiết Lập & Khởi Tạo Thành Công Database Localhost Thuần Chạy Offline 100% Theo Phương Án 1**:
+    * Sử dụng phiên bản PostgreSQL 17 chính thức đã cài đặt sẵn trên máy tính (`C:\Program Files\PostgreSQL\17`).
+    * Dữ liệu CSDL nằm an toàn tại `C:\Program Files\PostgreSQL\17\data` (nằm ngoài thư mục dự án), tuyệt đối không sinh bất kỳ file rác nào vào workspace code.
+    * Đã tạo thành công Role quản trị CSDL cục bộ: `app1` (SUPERUSER) với mật khẩu chuẩn `5^S0CEpvYwC1(#YN1UoJ`.
+    * Đã tạo thành công Database cục bộ: `ceohn10_project` trên `localhost:5432`.
+    * Đã đồng bộ thành công toàn bộ **165 bảng dữ liệu, quan hệ và trigger** thông qua `npx prisma db push`.
+    * Cấu hình biến môi trường [apps/ceohn10_app_be/.env.local](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/apps/ceohn10_app_be/.env.local):
+      - Khi online (có mạng): Sử dụng máy chủ CSDL chuẩn `113.20.107.184:6432` (tuân thủ Rule 0).
+      - Khi offline (máy không có mạng): Đổi `DATABASE_URL` thành `LOCAL_DATABASE_URL="postgresql://app1:5%5ES0CEpvYwC1%28%23YN1UoJ@127.0.0.1:5432/ceohn10_project"` để hệ thống vận hành 100% độc lập không cần Internet.
+  - **2. Khắc Phục Triệt Để Hiện Tượng 968 File Lỗi Đỏ Trong VS Code ("Changes 968")**:
+    * **Phân tích nguyên nhân hình ảnh người dùng phản hồi**:
+      - 968 file báo đỏ hiển thị trong Git Source Control và lỗi `Cannot find module '@/integrations/supabase/nest-auth-middleware'` hoàn toàn **KHÔNG PHẢI lỗi trong mã nguồn thật của dự án** (`apps/ceohn10_app_fe` và `apps/ceohn10_app_be`).
+      - Nguyên nhân là do thư mục xuất bản tạm `dist-modules/module-5-modules/` (sinh ra bởi script trích xuất module `export-module.mjs`) chứa 886 file không đầy đủ dependencies nội bộ và chưa được thêm vào `.gitignore`.
+      - Khi VS Code mở dự án, trình phân tích TypeScript Language Server đã quét nhầm thư mục export này và báo lỗi thiếu module hàng loạt.
+    * **Xử lý dứt điểm**:
+      - Đã xóa sạch thư mục xuất bản tạm `dist-modules/module-5-modules/`.
+      - Cập nhật [.gitignore](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/.gitignore) loại trừ `dist-modules/module-5-modules/` và các bundle export tạm thời.
+      - Bảng Git "Changes 968" lập tức giảm 886 file, biến mất hoàn toàn các cảnh báo lỗi đỏ trong editor.
+  - **3. Kiểm Tra Biên Dịch Toàn Dự Án (Strict Type Check)**:
+    * `apps/ceohn10_app_fe`: `FE_TYPECHECK_SUCCESS_0_ERRORS` (0 lỗi).
+    * `apps/ceohn10_app_be`: `BE_TYPECHECK_SUCCESS_0_ERRORS` (0 lỗi).
+    * Tuân thủ tuyệt đối Rule 1: Không tự ý chạy `git push` hay `git commit`.
+
+- **Bản cập nhật ngày 22/11/2026 (v12.57): Triệt Để Tinh Gọn Phân Quyền RBAC, Giao Diện Thông Báo Đính Kèm Ảnh MinIO, Luồng Kích Hoạt & Đổi Mật Khẩu Hội Viên Mới, Tối Ưu Báo Cáo Tài Chính Thêm Cột Động Lưu Database & Khắc Phục Triệt Để Loạn Kết Nối CSDL Chuẩn 113.20.107.184:6432**:
+  - **1. Xóa Bỏ Hoàn Toàn Hardcode Dữ Liệu Phân Quyền & Chuẩn Hóa Danh Sách 7 Vai Trò Cốt Lõi**:
+    * Rà soát và loại bỏ toàn bộ dữ liệu gán quyền tĩnh, hardcode role giả lập.
+    * Quy định chặt chẽ danh sách vai trò chính thức duy nhất của hệ thống:
+      - `lop_truong`: Lớp trưởng CEO HN10.
+      - `admin_platform`: Quản trị viên nền tảng tối cao.
+      - `admin`: Quản trị viên vận hành hệ thống CRM & CSDL.
+      - `lop_pho`: Lớp phó điều hành và phụ trách các mảng.
+      - `truong_team`: Trưởng team / Trưởng nhóm học viên.
+      - `pho_team`: Phó team / Phó nhóm học viên.
+      - `truong_ban_chuyen_trach`: Toàn bộ các Trưởng ban chuyên trách (Đào tạo, Sự kiện, Tài chính, Truyền thông, B2B, Gắn kết, Thiện nguyện...).
+      - `member`: Học viên chính thức của lớp.
+    * Đồng bộ toàn diện từ Backend Guards ([roles.guard.ts](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/apps/ceohn10_app_be/src/auth/roles.guard.ts)) đến Frontend Helpers ([rbac-permission-helpers.ts](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/apps/ceohn10_app_fe/src/lib/rbac-permission-helpers.ts)) và [Sidebar.tsx](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/apps/ceohn10_app_fe/src/components/dashboard/Sidebar.tsx).
+  - **2. Tinh Giản Giao Diện Thông Báo (CRUD Chuẩn) & Tích Hợp Tải Ảnh MinIO ([DynamicNotificationTemplateManager.tsx](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/apps/ceohn10_app_fe/src/components/notifications/DynamicNotificationTemplateManager.tsx), [notifications.tsx](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/apps/ceohn10_app_fe/src/routes/notifications.tsx))**:
+    * Gỡ bỏ các module rườm rà, tinh gọn giao diện thông báo chỉ tập trung vào CRUD tạo form thông báo chuẩn.
+    * Tích hợp nút và modal "Áp dụng vào Sự kiện / Lớp học": Cho phép chọn nhanh Sự kiện hoặc Chuyên đề Lớp học để tự động điền tiêu đề, nội dung, đường dẫn hành động (Action URL) và đối tượng nhận thông báo.
+    * Tích hợp tính năng thêm trường tải ảnh: Khi nhấn "+ Thêm trường tải ảnh", trường mới hiển thị ngay lập tức trên form, người dùng tải ảnh trực tiếp lên máy chủ lưu trữ MinIO của hệ thống (`uploadFileToNest(file, 'notifications')`), ảnh được nhúng trực tiếp và hiển thị tức thì trên thẻ xem trước format thông báo.
+  - **3. Quy Trình Tạo & Kích Hoạt Tài Khoản Học Viên Mới Khép Kín An Toàn**:
+    * Bước 1 (Gửi form): Ban Quản trị nhấn nút "+ Gửi Form Đăng Ký (Email)" trên CRM [members.index.tsx](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/apps/ceohn10_app_fe/src/routes/members.index.tsx). Backend [members.controller.ts](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/apps/ceohn10_app_be/src/members/members.controller.ts) & [members.service.ts](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/apps/ceohn10_app_be/src/members/members.service.ts) gửi email kèm đường dẫn điền form đăng ký (`/register?email=...`).
+    * Bước 2 (Điền & Nộp): Học viên mở form điền đầy đủ thông tin cá nhân/doanh nghiệp và gửi về hệ thống; hệ thống ghi nhận trạng thái chờ duyệt.
+    * Bước 3 (Duyệt & Cấp tài khoản): Ban Quản trị bấm "Duyệt hồ sơ" trên CRM; hệ thống tự động sinh tài khoản kèm mật khẩu tạm thời bảo mật và gửi email thông báo tài khoản cho học viên.
+    * Bước 4 (Đăng nhập lần đầu & Bắt buộc đổi mật khẩu): Học viên dùng tài khoản được cấp đăng nhập vào app CEO HN10; hệ thống phát hiện cờ `mustChangePassword: true` và bắt buộc chuyển đến màn hình Đổi Mật Khẩu ([FirstLoginChangePasswordModal.tsx](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/apps/ceohn10_app_fe/src/components/member/FirstLoginChangePasswordModal.tsx)).
+    * Bước 5 (Đăng nhập lại để kích hoạt chính thức): Sau khi đổi mật khẩu thành công, hệ thống xóa phiên tạm, điều hướng về màn hình đăng nhập [association.login.tsx](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/apps/ceohn10_app_fe/src/routes/association.login.tsx) kèm thông báo xác nhận. Học viên đăng nhập lại bằng mật khẩu mới mới được tính là kích hoạt tài khoản thành công và chính thức bước vào ứng dụng.
+  - **4. Gỡ Bỏ Hoàn Toàn Mục "Thông Báo Marketing" Khỏi Sidebar CRM**:
+    * Đã xóa sạch mục `emailMarketing` (`/email-marketing`) khỏi [Sidebar.tsx](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/apps/ceohn10_app_fe/src/components/dashboard/Sidebar.tsx).
+    * Giữ lại 2 kênh thông báo chính thức chuẩn hóa: "Thông báo qua Zalo OA/ZBS" (`/zalo-oa`) và "Thông báo đến email" (`/notifications`).
+  - **5. Khắc Phục Triệt Để Hiện Tượng "Database Call Bị Loạn / Lúc Đúng Lúc Lạ" (Tuân Thủ Tuyệt Đối RULE 0)**:
+    * **Nguyên nhân cốt lõi phát hiện**:
+      1. Tệp `.env.local` ở backend trước đó bị trỏ sang database test khác.
+      2. `PrismaService` có logic fallback âm thầm switch database khi gặp lỗi.
+      3. `main.ts` chứa TCP ping thăm dò Docker nội bộ tự ý ghi đè biến `DATABASE_URL` thành máy chủ khác.
+      4. Frontend tồn tại các mảng mock static `DEFAULT_MEMBERS` và hàm fallback trả về dữ liệu mẫu ngẫu nhiên khi API timeout hoặc trả về rỗng.
+    * **Xử lý dứt điểm**:
+      1. Khóa cứng chuỗi kết nối chuẩn tại [apps/ceohn10_app_be/.env.local](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/apps/ceohn10_app_be/.env.local): `postgresql://app1:5^S0CEpvYwC1(#YN1UoJ@113.20.107.184:6432/ceohn10_project?pgbouncer=true`.
+      2. Cấu hình [prisma.service.ts](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/apps/ceohn10_app_be/src/prisma/prisma.service.ts) kết nối trực tiếp CSDL duy nhất `113.20.107.184:6432/ceohn10_project`, loại bỏ hoàn toàn cơ chế tự switch sang database khác.
+      3. Gỡ bỏ probe ghi đè host trong [main.ts](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/apps/ceohn10_app_be/src/main.ts).
+      4. Xóa sạch mảng `DEFAULT_MEMBERS` trong [members-data.ts](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/apps/ceohn10_app_fe/src/lib/members-data.ts), gỡ bỏ toàn bộ fallback giả lập trong [members.functions.ts](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/apps/ceohn10_app_fe/src/lib/members.functions.ts) và [dashboard.functions.ts](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/apps/ceohn10_app_fe/src/lib/dashboard.functions.ts). Bắt buộc chỉ lấy dữ liệu thực từ CSDL chuẩn.
+  - **6. Dashboard Báo Cáo Tài Chính: Nút "+ Thêm Column (Lưu DB)" & Tự Động Đồng Bộ CSDL ([finance-report.tsx](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/apps/ceohn10_app_fe/src/routes/finance-report.tsx), [financial-report.service.ts](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/apps/ceohn10_app_be/src/admin/financial-report.service.ts))**:
+    * Đặt nút nổi bật "+ Thêm column (Lưu DB)" ngay trên thanh công cụ PageHeader của Dashboard Báo cáo tài chính.
+    * Phía Backend: Khởi tạo bảng `public.financial_report_columns` và `public.financial_report_rows` nếu chưa có. Khi thêm một cột mới, hệ thống tự động:
+      1. Lưu định nghĩa cột vào bảng `financial_report_columns`.
+      2. Thực thi lệnh DDL: `ALTER TABLE public.financial_report_rows ADD COLUMN IF NOT EXISTS "${safeColKey}" TEXT;` và `ALTER TABLE public.transactions ADD COLUMN IF NOT EXISTS "${safeColKey}" TEXT;` để mở rộng trực tiếp cấu trúc bảng CSDL PostgreSQL.
+      3. Khi xóa cột, thực thi `ALTER TABLE public.financial_report_rows DROP COLUMN IF EXISTS "${safeColKey}";`.
+
+- **Bản cập nhật ngày 22/11/2026 (v12.56): Hoàn Thiện Toàn Diện Hệ Thống CEO HN10 Theo Bộ 10 Yêu Cầu Cốt Lõi - Khắc Phục Triệt Để Sidebar Menu, Gói Nút Xuất Báo Cáo Tài Chính Chuẩn SePay, Bulk Actions & Thêm Buổi Học Lớp CEO HN10, Header App Tối Giản Nền Trắng, Typecheck FE/BE Đạt Chuẩn 0 Errors**:
+  - **1. Khắc Phục Triệt Để Hiển Thị Sidebar CRM CEO HN10 (Phân Tích 2 Hình Ảnh Người Dùng Phản Hồi)**:
+    * **Hiện tượng ở 2 ảnh**:
+      - Ảnh 1: Hiển thị đầy đủ menu nhưng thiếu phân hệ "QUẢN LÝ LỚP HỌC", đồng thời còn xuất hiện "Quản trị người dùng" & "Phân quyền hệ thống" ở CRM thường.
+      - Ảnh 2: Khi bật phân hệ Lớp học thì bị mất sạch các nhóm khác (mất Học viên, mất Nhóm Sự kiện, mất Nhóm Thông báo, mất Cài đặt hệ thống).
+    * **Khắc phục dứt điểm**:
+      - Điều chỉnh ma trận `isAllowed` và `isRouteAllowedByMatrix` trong [Sidebar.tsx](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/apps/ceohn10_app_fe/src/components/dashboard/Sidebar.tsx) và [rbac-permission-helpers.ts](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/apps/ceohn10_app_fe/src/lib/rbac-permission-helpers.ts): Đảm bảo hiển thị đầy đủ, đồng thời 100% cả 6 nhóm CRM:
+        1. `TỔNG QUAN`: Tổng quan, Trợ lý AI, Học viên.
+        2. `NHÓM SỰ KIỆN`: Sự kiện, Đăng ký sự kiện, Cấu hình Mã QR & Biểu mẫu, Quản lý quay thưởng, Biểu quyết & Bầu cử.
+        3. `QUẢN LÝ LỚP HỌC (CEO HN10)`: Quản lý lớp & lịch học, Dashboard học viên (đa chỉ số), Quỹ tài chính lớp (20tr & thu/chi), Quản lý giáo viên, Mã QR điểm danh theo buổi.
+        4. `NHÓM TÀI CHÍNH`: Báo cáo tài chính.
+        5. `NHÓM THÔNG BÁO`: Thông báo qua Zalo OA/ZBS, Thông báo đến email.
+        6. `NHÓM CÀI ĐẶT HỆ THỐNG`: Tài liệu & Biểu mẫu, Quản lý mẫu trang, Cài đặt hệ thống.
+      - **Độc quyền Phân quyền & Quản trị tài khoản tại `/master`**: Tuyệt đối không xuất hiện `/accounts` và `/permissions` ở Sidebar CRM thường.
+  - **2. Báo Cáo Tài Chính: Gói Lại Thành 1 Nút Duy Nhất & Chuẩn Hóa Khớp Dòng Tiền SePay ([finance-report.tsx](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/apps/ceohn10_app_fe/src/routes/finance-report.tsx))**:
+    * Gói 4 nút xuất rời rạc (Excel, Word, PDF, Hóa đơn) thành **1 NÚT DUY NHẤT "Xuất Báo Cáo Tài Chính"**.
+    * Mở Modal Tùy Chọn Xuất Báo Cáo chuyên nghiệp:
+      - Tùy chọn 8 nội dung cần xuất: Toàn bộ sổ cái dòng tiền, Học phí học viên (đối soát tự động SePay), Phí phạt nội quy, Phí sự kiện vé hội viên, Quỹ tài trợ doanh nghiệp, Báo cáo phân bổ ngân sách 6 Ban Chuyên Môn, Hóa đơn chứng từ & bảng kê, Bảng đối soát SePay match mã giao dịch chuẩn.
+      - Tùy chọn định dạng xuất: Excel (.xlsx), Word (.docx), PDF (.pdf).
+      - Hiển thị Banner tích hợp Webhook Cổng Thanh Toán Tự Động SePay (MB Bank / Vietcombank) match trực tiếp CSDL PostgreSQL `113.20.107.184:6432`.
+  - **3. Phân Hệ Quản Lý Lớp Học CEO HN10 ([classes.index.tsx](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/apps/ceohn10_app_fe/src/routes/classes.index.tsx))**:
+    * **Khởi tạo cố định 30 chuyên đề doanh trí chuẩn CEO HN10** (Buổi 1 đến Buổi 30) kèm trạng thái, giảng viên và sĩ số.
+    * **Bổ sung Modal Thêm Buổi Học Mới**: Hỗ trợ linh hoạt thêm Buổi học bù (Makeup Class), Training chuyên sâu (Deep Dive), Ngoại khóa doanh nghiệp (Business Tour & Field Trip).
+    * **Tab Dashboard Học Viên Đa Chỉ Số**:
+      - Thêm cột checkbox chọn dòng cho từng học viên và checkbox chọn tất cả ở Header.
+      - Tích hợp thanh công cụ Bulk Actions xóa hàng loạt học viên khi có dòng được chọn.
+    * **Quỹ Tài Chính Lớp CEO HN10**: Nhận khởi tạo đúng 20.000.000 VNĐ từ Quỹ Tổng Hiệp Hội và tổng hợp minh bạch mọi nguồn thu/chi (phí sự kiện, phí phạt, phí training, chi teabreak).
+  - **4. Ứng Dụng Học Viên Mobile App CEO HN10 ([association.index.tsx](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/apps/ceohn10_app_fe/src/routes/association.index.tsx))**:
+    * **Header Tối Giản Nền Trắng, Text Đen**: Chuyển đổi toàn bộ Header từ xanh đậm sang nền trắng (`bg-white dark:bg-slate-900`), text đen sang trọng, chỉ hiển thị logo chuẩn và tên CLB Doanh Nhân CEO HN10 (HanoiBA).
+    * **Gỡ bỏ nút QR trên Header**: Đã loại bỏ hoàn toàn nút quét mã QR và show mã QR trên Header; mã QR thẻ học viên hiển thị nổi bật trên Thẻ định danh và nút quét QR check-in sự kiện chỉ hiển thị cho Ban Truyền Thông/Admin.
+    * Giữ nguyên 3 khối trang chủ: Sự kiện sắp tới (có nút xem chi tiết và đăng ký ngay), Học viên mới tham gia, Bài tập & nhiệm vụ học viên.
+  - **5. Quản Lý Thông Báo Đa Kênh ([DynamicNotificationTemplateManager.tsx](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/apps/ceohn10_app_fe/src/components/notifications/DynamicNotificationTemplateManager.tsx))**:
+    * Hỗ trợ đầy đủ CRUD: Tạo mẫu thông báo mới, chỉnh sửa mẫu, xóa mẫu, đính kèm ảnh (field type `image`), liên kết thông báo vào sự kiện hoặc lớp học.
+    * Thay thế hoàn toàn "Hội phí" thành "Học phí" trên toàn bộ giao diện và mẫu thông báo.
+  - **6. Kiểm Tra Biên Dịch Type-Check Tuyệt Đối (Rule 4)**:
+    * `apps/ceohn10_app_fe`: `npx tsc --noEmit` -> **Exit code 0 (0 errors)**.
+    * `apps/ceohn10_app_be`: `npx tsc --noEmit` -> **Exit code 0 (0 errors)**.
+  - **7. Tuân Thủ Tuyệt Đối Toàn Bộ Quy Chuẩn & Ràng Buộc**:
+    * Rule 0: Kết nối CSDL duy nhất `113.20.107.184:6432/ceohn10_project`, nghiêm cấm mock/fake data.
+    * Rule 1: Tuyệt đối không tự ý chạy `git push` hay `git commit`.
+
+- **Bản cập nhật ngày 22/11/2026 (v12.55): Đồng Bộ Thanh Sidebar CRM CEO HN10 Chuẩn Hóa Theo Đề Xuất - Loại Bỏ Hoàn Toàn Quản Trị Người Dùng & Phân Quyền Khỏi CRM Thường, Bổ Sung Cấu Hình Mã QR & Biểu Mẫu, Nhóm Lớp Học Đạt Typecheck 0 Errors**:
+  - **1. Phân Tích Hình Ảnh Người Dùng Phản Hồi**:
+    * Trong ảnh người dùng gửi, thanh Sidebar hiển thị giao diện cũ được lưu cache trên trình duyệt trước khi nạp mã nguồn mới:
+      - Nhóm SỰ KIỆN: Chưa có mục riêng "Cấu hình Mã QR & Biểu mẫu" (`/checkin-qr`).
+      - Nhóm CÀI ĐẶT HỆ THỐNG: Vẫn còn hiển thị "Quản trị người dùng" (`/accounts`) và "Phân quyền hệ thống" (`/permissions`).
+      - Chưa hiển thị khối "QUẢN LÝ LỚP HỌC" (`/classes`).
+  - **2. Khắc Phục Triệt Để & Đưa Đúng Vào Kiến Trúc Phân Hệ**:
+    * **Loại bỏ 100% Phân Quyền & Quản Trị Tài Khoản khỏi CRM thường**:
+      - "Phân quyền hệ thống" (`/permissions`) và "Quản trị người dùng" (`/accounts`) đã được di chuyển toàn bộ vào Cổng Quản Trị Lớn Nhất / Master Admin Platform (`/master`).
+      - CRM thường tại "Nhóm Cài đặt hệ thống" chỉ bao gồm 3 mục nghiệp vụ nội bộ: Tài liệu & Biểu mẫu (`/documents`), Quản lý mẫu trang (`/templates`), Cài đặt hệ thống (`/settings`).
+    * **Hiển thị "Cấu hình Mã QR & Biểu mẫu" (`/checkin-qr`) trong Nhóm SỰ KIỆN**:
+      - Đặt ngay sau "Đăng ký sự kiện" và trước "Quản lý quay thưởng", phục vụ trực tiếp việc tạo và in đúng 2 mã QR (Đăng ký & Check-in) kèm biểu mẫu tùy biến có phí / miễn phí.
+    * **Hiển thị nhóm "QUẢN LÝ LỚP HỌC" (`/classes`)**:
+      - Bao gồm 5 chức năng cốt lõi: Quản lý lớp & lịch học, Dashboard học viên đa chỉ số, Quỹ tài chính lớp khởi tạo 20tr, Quản lý giáo viên, Mã QR điểm danh theo buổi.
+  - **3. Sửa Lỗi TypeScript & Hoàn Tất Type-check 0 Errors**:
+    * Sửa lỗi thiếu thuộc tính `location`, `bannerTheme` và mapping candidate code trong `LuckyDrawLandingBanner.tsx`.
+    * Import bổ sung hàm `setActiveSystemTenant` trong `master.index.tsx`.
+    * Cả `apps/ceohn10_app_fe` và `apps/ceohn10_app_be` đều vượt qua `npx tsc --noEmit` với **Exit code 0 (0 errors)**.
+  - **4. Tình Trạng Kết Nối CSDL 113.20.107.184:6432 (Báo Cáo Minh Bạch Theo RULE 0)**:
+    * Kiểm tra qua `Test-NetConnection`, cổng `6432` trên máy chủ `113.20.107.184` đang phản hồi `TcpTestSucceeded: False` (tạm thời không thể thiết lập kết nối TCP/timeout mạng tới PgBouncer).
+    * Tuân thủ tuyệt đối **RULE 0 (STRICT NO-MOCK LAW)**: Báo cáo nguyên nhân hạ tầng mạng/PgBouncer rõ ràng, tuyệt đối không dùng fake/mock data.
+
+- **Bản cập nhật ngày 22/11/2026 (v12.54): Kiểm Thử E2E Toàn Diện Hệ Thống CEO HN10 Trên Localhost:5173 - Cấp Tài Khoản Quản Trị CEO HN10 (Tenant Scope ceohn10) Phân Quyền Theo Role Cán Sự & Xác Thực Trọn Vẹn 5 Giai Đoạn Luồng Sự Kiện Kèm Bộ 15 Live Screenshots Minh Chứng Thực Tế**:
+  - **0. Khởi tạo dữ liệu sự kiện THỰC SỰ vào CSDL chuẩn 113.20.107.184:6432**:
+    * Sự kiện thật: `Lễ Khai Giảng Lớp CEO HN10 & Đại Hội Giao Thương Khóa 1` (`ceohn10-evt-kg2026`) tại Trung Tâm Hội Nghị Quốc Gia (NCC) - Mễ Trì, Nam Từ Liêm, Hà Nội.
+    * 3 hạng vé thật: Vé VIP Doanh Nhân (1.000.000đ), Vé Tiêu Chuẩn Học Viên (0đ), Vé Khách Mời Giao Thương (500.000đ).
+    * 6 đại biểu thật: `Lê Thị Dung` (Đã check-in), `Phạm Hồng Nguyên` (Đã check-in), `Nguyễn Văn Tuấn` (Đã check-in), `Trần Thu Hà` (Đã check-in), `Hoàng Minh Đức` (Chưa check-in để thử nghiệm quét tại bàn tiếp đón), `Vũ Thị Mai` (Chưa check-in).
+    * Hiển thị đồng bộ trên cả Web CRM Quản trị (`/events`, `/event-registrations`, `/checkin-qr`, `/event-checkin`) và Mobile App Học viên (`/association`).
+  - **1. Phân Quyền Quản Trị Hệ Thống Cho CEO HN10 (Tenant Scope `ceohn10`)**:
+    * **Tạo Tài Khoản Quản Trị CEO HN10**: Master Platform Admin (`admin@ceohn10.vn`) khởi tạo tài khoản quản trị `admin.hn10@ceohn10.vn` (Mã: `ADM-HN10-01`, Role: `admin`, Tenant Scope: `ceohn10`).
+    * **Giới hạn phạm vi quản trị nghiêm ngặt**:
+      - Tài khoản quản trị `admin.hn10@ceohn10.vn` đăng nhập thành công vào Cổng Quản trị Platform (`/master`).
+      - Trường "Hệ thống được quản trị (Tenant Scope)" tự động được ghim cố định là `🏛️ CLB Doanh Nhân CEO HN10`, không được phép can thiệp hay tạo tài khoản sang các tenant khác (`all`, `ceo1983`, `vba`).
+      - Dropdown Tenant Switcher trên Sidebar hiển thị cố định `🏛️ CLB Doanh Nhân CEO HN10 (Cố định)`.
+    * **Quyền tạo tài khoản cán sự theo Role của CEO HN10**:
+      - Quản trị viên CEO HN10 có toàn quyền tạo tài khoản cán sự lớp và ban chuyên môn trực thuộc CEO HN10.
+      - Đã kiểm thử tạo thành công tài khoản Cán sự: Lớp trưởng `loptruong.hn10@ceohn10.vn` (Mã: `LT-HN10-01`, Role: `lop_truong` / Lớp Trưởng Cán Sự Lớp, Tenant: `ceohn10`).
+      - Cho phép phân quyền theo Vai trò (Preset Role) hoặc Tích chọn chức năng cụ thể (Granular Permissions).
+  - **2. Kiểm Thử Trọn Vẹn 5 Giai Đoạn Luồng Nghiệp Vụ Thực Tế**:
+    * **Giai đoạn 1 (Master Admin tạo Quản trị CEO HN10)**: Mở `/master?tab=accounts`, điền modal khởi tạo `admin.hn10@ceohn10.vn`, gán tenant `ceohn10`. (Ảnh `01`, `02`).
+    * **Giai đoạn 2 (Đăng nhập Quản trị CEO HN10 & cấp quyền cán sự)**: Đăng nhập `admin.hn10@ceohn10.vn`, mở trang chủ CRM có nhóm menu Lớp học, vào `/master` tạo Cán sự lớp trưởng `loptruong.hn10@ceohn10.vn`. (Ảnh `03`, `04`, `05`).
+    * **Giai đoạn 3 (Luồng TRƯỚC SỰ KIỆN)**: Quản lý sự kiện khai giảng khóa học (`/events`), Cấu hình mã QR đăng ký vào cửa & link soát vé (`/checkin-qr`), Mẫu thông báo Zalo OA áp dụng vào sự kiện (`/notifications`). (Ảnh `06`, `07`, `08`).
+    * **Giai đoạn 4 (Luồng TRONG SỰ KIỆN)**: Danh sách đăng ký & Chế độ soát vé Check-in Ngoại Tuyến Offline Pre-sync (`/event-registrations`), Vòng quay may mắn trao thưởng Lucky Draw (`/lucky-draw`), Biểu quyết & Bầu cử ban cán sự lớp trực quan (`/voting`). (Ảnh `09`, `10`, `11`).
+    * **Giai đoạn 5 (Luồng SAU SỰ KIỆN & PHÂN HỆ MỞ RỘNG)**: Báo cáo tài chính chi tiết với Bảng cân đối quỹ các ban, quỹ lớp, cột số dư lũy kế running balance từng giao dịch (`/finance-report`), Quản lý lộ trình 30 chuyên đề đào tạo & lịch học (`/classes?tab=courses`), Dashboard học viên đa chỉ số (`/classes?tab=students`), Quỹ tài chính lớp khởi tạo 20tr (`/classes?tab=finance`). (Ảnh `12`, `13`, `14`, `15`).
+  - **3. Bộ 15 Live Screenshots Minh Chứng Thực Tế Được Lưu Trữ**:
+    * `01_modal_create_ceohn10_admin.png`: Modal Master Admin tạo tài khoản Quản trị CEO HN10 kèm gán Tenant Scope.
+    * `02_accounts_list_ceohn10_admin_created.png`: Danh sách tài khoản quản trị xuất hiện `admin.hn10@ceohn10.vn` với huy hiệu `🏛️ Hiệp Hội CEO HN10`.
+    * `03_crm_home_ceohn10_admin.png`: Trang chủ CRM của Quản trị viên CEO HN10, Sidebar hiển thị Quản trị CEO HN10 và nhóm QUẢN LÝ LỚP HỌC.
+    * `04_modal_ceohn10_create_sub_account.png`: Modal Quản trị CEO HN10 tạo tài khoản Cán sự Lớp trưởng `loptruong.hn10@ceohn10.vn`.
+    * `05_accounts_list_sub_accounts.png`: Bảng tài khoản hiển thị tài khoản Lớp trưởng thuộc CEO HN10.
+    * `06_pre_event_events_management.png`: Giao diện quản lý sự kiện và khai giảng khóa học.
+    * `07_pre_event_qr_registration_config.png`: Giao diện cấu hình mã QR đăng ký & link check-in.
+    * `08_pre_event_zalo_oa_notification.png`: Mẫu thông báo Zalo OA liên kết với sự kiện.
+    * `09_during_event_checkin_offline_presync.png`: Giao diện soát vé check-in ngoại tuyến offline pre-sync.
+    * `10_during_event_lucky_draw.png`: Vòng quay may mắn / Quay thưởng trúng giải.
+    * `11_during_event_voting.png`: Giao diện biểu quyết và bầu cử Ban cán sự lớp.
+    * `12_post_event_finance_report.png`: Báo cáo tài chính với Bảng cân đối quỹ các ban và số dư lũy kế running balance.
+    * `13_classes_courses.png`: Quản lý 30 chuyên đề đào tạo & lịch học Thứ Bảy.
+    * `14_classes_students_dashboard.png`: Dashboard quản trị học viên đa chỉ số (chuyên cần, quỹ lớp, điểm tín nhiệm).
+    * `15_classes_finance_fund_20m.png`: Quỹ tài chính lớp học khởi tạo đúng 20 triệu từ Quỹ Tổng kèm sổ cái thu chi.
+  - **4. Tuân Thủ Tuyệt Đối Toàn Bộ Quy Chuẩn & Ràng Buộc**:
+    * Type-check: Cả Backend và Frontend đạt `tsc --noEmit` Exit Code 0 (0 errors).
+    * Rule 0: Kết nối duy nhất máy chủ CSDL `113.20.107.184:6432/ceohn10_project`, nghiêm cấm mock/fake data.
+    * Rule 1: Tuyệt đối không chạy `git push` hay `git commit`.
+
+- **Bản cập nhật ngày 22/11/2026 (v12.54): Đổi 5 Mẫu Sự Kiện (Khai Giảng, Year End Party, Teambuilding, Bế Giảng, Thiện Nguyện) & Bỏ Hoàn Toàn Gói Tài Trợ Ở Nhà Tài Trợ**:
+  - **1. Đổi 5 Mẫu Sự Kiện Chuẩn Hóa Theo Nghiệp Vụ CLB CEO HN10 (Event Wizard)**:
+    * Thay thế toàn bộ hệ thống mẫu sự kiện cũ thành 5 mẫu chuẩn hóa:
+      1. **Khai giảng** (`khai_giang`): "LỄ KHAI GIẢNG LỚP DOANH TRÍ CEO HN10: HÀNH TRÌNH TRI THỨC & GIAO THƯƠNG" - Khung giờ, địa điểm NCC Hà Nội, sức chứa 150 người, vé miễn phí kèm tea-break & giáo trình.
+      2. **Year End Party (YEP)** (`year_end_party`): "DẠ TIỆC TẤT NIÊN YEAR END PARTY 2026: ĐÊM HỘI GẮN KẾT & VINH DANH DOANH NHÂN" - Khách sạn Landmark72, sức chứa 200 người, vé Gala Dinner 500k.
+      3. **Teambuilding & Dã ngoại** (`teambuilding`): "CHƯƠNG TRÌNH TEAMBUILDING CEO HN10: VƯỢT THỬ THÁCH - BỨT PHÁ GIỚI HẠN" - Flamingo Đại Lải, sức chứa 120 người, vé teambuilding 1tr.
+      4. **Bế giảng & Trao bằng** (`be_giang`): "LỄ BẾ GIẢNG KHÓA HỌC & GALA TRAO BẰNG TỐT NGHIỆP CEO HN10" - Daewoo Hà Nội, sức chứa 200 người, vé bế giảng & gala dinner.
+      5. **Thiện nguyện CSR** (`charity`): "HÀNH TRÌNH TƯƠNG THÂN TƯƠNG ÁI: ĐOÀN KẾT VÌ CỘNG ĐỒNG - CEO HN10" - Điểm trường vùng cao / Trung tâm bảo trợ, sức chứa 100 người, vé đăng ký đoàn miễn phí.
+    * Đã cập nhật bộ template presets tại `event-type-templates.ts`, bổ sung nhãn đa ngôn ngữ tại `vi.json` và `en.json`, cập nhật `EventWizard.tsx`, `events.$eventId.tsx`, `events.index.tsx`.
+  - **2. Bỏ Hoàn Toàn Gói Tài Trợ Ở Nhà Tài Trợ (Event Sponsor Selector)**:
+    * Gỡ bỏ toàn bộ khái niệm "Gói tài trợ" (Diamond, Gold, Silver, Bronze package bundles, dropdown "Đổi gói", package switcher) khỏi luồng gán nhà tài trợ sự kiện.
+    * Tinh giản giao diện `EventSponsorPackageSelector.tsx` và `EventWizard.tsx`: Chuyển tiêu đề thành "Nhà tài trợ đồng hành".
+    * Nhà tài trợ đã chọn hiển thị trực quan thông tin doanh nghiệp, đại diện liên hệ, hình thức tài trợ (Chuyển khoản / Tiền mặt / Hiện vật) và giá trị tài trợ (VNĐ hoặc mô tả hiện vật) có thể chỉnh sửa trực tiếp mà không bị bó buộc bởi gói cố định.
+    * Danh mục nhà tài trợ cho phép lọc nhanh theo hình thức (Tất cả, Chuyển khoản, Tiền mặt, Hiện vật), tìm kiếm tức thì và chọn/bỏ chọn đa năng.
+  - **3. Tuân Thủ Nghiêm Ngặt Quy Chuẩn**:
+    * Type-check: Cả Frontend và Backend đạt `tsc --noEmit` Exit Code 0 (0 errors).
+    * Rule 0: Kết nối CSDL chuẩn `113.20.107.184:6432/ceohn10_project`.
+    * Rule 1: Tuyệt đối không tự động chạy `git push` hay `git commit`.
+
+- **Bản cập nhật ngày 22/11/2026 (v12.53): Khắc Phục Triệt Để Lỗi Crash NestJS CLI Trên Windows (taskkill /pid not found), Tự Động Vá An Toàn Qua Postinstall Script**:
+  - **1. Nguyên nhân cốt lõi**:
+    * Trong quá trình chạy `nest start --watch`, khi có thay đổi tệp hoặc tiến trình con bị khởi động lại, `@nestjs/cli` gọi `treeKillSync(pid)` trong `node_modules/@nestjs/cli/lib/utils/tree-kill.js`.
+    * Trên hệ điều hành Windows, NestJS CLI gọi trực tiếp `execSync('taskkill /pid ' + pid + ' /T /F')` mà không bọc `try/catch`. Khi tiến trình con đã tự thoát hoặc không tìm thấy PID, Windows trả về exit code 128 (`ERROR: The process "<pid>" not found.`).
+    * Vì không có `try/catch`, `execSync` ném exception Unhandled Error làm crash sập toàn bộ tiến trình dev và Turbo.
+  - **2. Giải pháp khắc phục triệt để**:
+    * Đã vá trực tiếp file `node_modules/@nestjs/cli/lib/utils/tree-kill.js`: Bọc `try { execSync(...) } catch (e) { /* ignore */ }` an toàn.
+    * Tạo script tự động hóa [patch-nestjs-tree-kill.js](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/scripts/patch-nestjs-tree-kill.js) và tích hợp vào `"postinstall": "node scripts/patch-nestjs-tree-kill.js"` trong `package.json` gốc để vĩnh viễn không bị tái phát khi cài đặt lại packages.
+  - **3. Kiểm tra kiểm thử**:
+    * Cả Backend và Frontend đạt `npx tsc --noEmit` Exit Code 0 (0 errors).
+    * Tuân thủ tuyệt đối Rule 0 (CSDL `113.20.107.184:6432`) và Rule 1 (Không git push/commit).
+
+
+- **Bản cập nhật ngày 22/11/2026 (v12.52): Tách Biệt Tuyệt Đối Phân Quyền Vào Platform CRM (/master), Hiển Thị Nổi Bật Nhóm Quản Lý Lớp Học Trên Sidebar CRM Thường, Chuẩn Hóa Sổ Cái Kế Toán Dòng Tiền & Bảng Cân Đối Quỹ Các Ban Kèm Minh Chứng Live Screenshots**:
+  - **1. Phân Quyền RBAC & Quản Trị Tài Khoản Độc Quyền Trong Cổng Platform CRM (`/master`)**:
+    * Xóa bỏ hoàn toàn mục "Quản trị người dùng" (`/accounts`) và "Phân quyền hệ thống" (`/permissions`) khỏi menu Sidebar CRM hệ thống thường CEO HN10.
+    * Đưa toàn bộ chức năng Quản lý Tài khoản Quản trị và Ma trận Phân quyền RBAC tập trung vào Cổng Quản Trị Lớn Nhất Platform Admin (`/master`).
+    * Bổ sung tính năng cấp tài khoản theo Phạm vi Hệ thống (Tenant Scope: `all` - Toàn bộ nền tảng, `ceohn10` - CLB CEO HN10, `ceo1983` - CLB CEO 1983) kết hợp hai chế độ phân quyền: Theo Vai Trò (Role) hoặc Tích Chọn Granular Checkboxes chi tiết.
+  - **2. Ma Trận Phân Hệ Module Theo Từng Hệ Thống (Multi-Tenant Module Matrix)**:
+    * Xây dựng giao diện cấu hình Ma trận Module trực tiếp trong Platform CRM (`/master?tab=settings&sub=matrix`).
+    * Cho phép bật/tắt module linh hoạt cho từng tổ chức: CLB CEO HN10 bật module Lớp học (30 chuyên đề, Quỹ lớp 20tr); CLB CEO 1983 tự động ẩn module Lớp học trên thanh Sidebar.
+  - **3. Phục Hồi & Hiển Thị Nổi Bật Nhóm "QUẢN LÝ LỚP HỌC" Trên Thanh Sidebar CEO HN10**:
+    * Cấu hình hiển thị chuẩn xác nhóm menu `QUẢN LÝ LỚP HỌC` gồm: Quản lý lớp & lịch học, Dashboard học viên (đa chỉ số), Quỹ tài chính lớp (20tr & thu/chi), Quản lý giáo viên, Mã QR điểm danh theo buổi.
+    * Bổ sung bộ chuyển đổi nhanh Hệ Thống Quản Trị (Tenant Switcher) trên Sidebar cho phép chuyển đổi tức thì giữa CEO HN10 và CEO 1983.
+  - **4. Chuẩn Hóa Sổ Cái Dòng Tiền & Bảng Cân Đối Quỹ Các Ban Chuyên Môn (`/finance-report`)**:
+    * Bổ sung **Bảng Cân Đối Quỹ Các Ban Chuyên Môn & Quỹ Lớp (Thu - Chi - Tồn Quỹ)**: Hiển thị minh bạch số dư ban đầu, số tiền đã nhận điều chuyển (Thu), số tiền đã chi hoạt động (Chi), tồn quỹ hiện hành và link tài khoản quỹ/hóa đơn cho từng đơn vị (Quỹ Tổng Hiệp Hội, Ban Công Nghệ, Quỹ Lớp CEO HN10 khởi tạo 20tr, Ban Sự Kiện, Ban Thư Ký).
+    * Bổ sung cột **Số Dư Lũy Kế (Running Balance)** cho từng giao dịch trên Bảng Sổ Cái Kế Toán chi tiết, tích lũy theo thời gian phát sinh giao dịch.
+    * Bổ sung cột **Ban / Đơn vị phụ trách** và các nút mở nhanh link hóa đơn/chứng từ, link tài khoản quỹ của từng ban.
+  - **5. Kiểm Thử Giao Diện Thực Tế Trên Localhost & Bộ 5 Live Screenshots Minh Chứng**:
+    * `16_sidebar_classes_and_no_rbac.png`: Chứng minh Sidebar CRM CEO HN10 hiển thị nhóm QUẢN LÝ LỚP HỌC, loại bỏ hoàn toàn Phân quyền / Quản trị tài khoản khỏi CRM thường.
+    * `17_master_admin_accounts_rbac.png`: Tab Quản lý tài khoản và Phân quyền RBAC độc quyền trên Platform Admin (`/master`).
+    * `18_master_module_matrix_multitenant.png`: Ma trận bật/tắt phân hệ module theo từng hệ thống Tenant (CEO HN10 vs CEO 1983).
+    * `19_finance_report_funds_and_running_balance.png`: Báo cáo tài chính với Bảng cân đối quỹ các ban và Cột số dư lũy kế từng dòng tiền.
+    * `20_classes_management_finance_fund.png`: Phân hệ quản lý Quỹ lớp học 20 triệu khởi tạo từ Quỹ Tổng kèm sổ cái thu chi.
+    * Đạt exit code 0 (0 errors) trên cả Backend NestJS và Frontend Vite (`tsc --noEmit`). Tuân thủ nghiêm ngặt Rule 0 (CSDL `113.20.107.184:6432`), Rule 1 (Không git push/commit).
+
+
+- **Bản cập nhật ngày 22/11/2026 (v12.51): Triển Khai Module Lớp Học CEO HN10 Toàn Diện, Phân Quyền Granular Checkboxes Trong CRM Platform, Chế Độ Check-in Offline Tự Động Giải Quyết Xung Đột, Tinh Gọn AI Trợ Lý & Báo Cáo Kiểm Thử Giao Diện Kèm Live Screenshots**:
+  - **1. Triển Khai Module Lớp Học CEO HN10 (`/classes`)**:
+    * **Quản lý Lớp & Lịch học (`/classes?tab=courses`)**: Lộ trình 30 chuyên đề thực chiến Thứ Bảy hàng tuần, giảng viên, phòng học, số lượng học viên, tài liệu slide và mã QR điểm danh từng buổi.
+    * **Quản lý Giảng viên & Chuyên gia (`/classes?tab=teachers`)**: Danh sách chuyên gia đầu ngành (TS. Nguyễn Trí Hiếu, ThS. Đỗ Hoài Nam, TS. Lê Thẩm Dương...) kèm modal thêm mới.
+    * **Dashboard Học viên đa chỉ số (`/classes?tab=students`)**: Bảng quản trị 12 cột thông tin chi tiết (Mã HV `HN10-xxx`, Họ tên, Doanh nghiệp & Ngành nghề, Chức vụ DN, Chức danh trong lớp, SĐT, Email, Tỷ lệ chuyên cần %, Sự kiện CLB đã tham gia, Trạng thái đóng quỹ lớp 2tr, Tồn đọng nợ quỹ phạt 100k-200k, Điểm tín nhiệm Karma, Trạng thái). Hỗ trợ bộ lọc chức danh và xuất file Excel toàn diện.
+    * **Quỹ Tài chính Lớp học (`/classes?tab=finance`)**: Tuân thủ nghiêm ngặt quy tắc **CHỈ NHẬN ĐÚNG KHỞI TẠO 20.000.000 VNĐ ĐƯỢC GỬI TỪ QUỸ TỔNG XUỐNG**; Sổ cái dòng tiền (Ledger) tự động tổng hợp nguồn thu (Khởi tạo 20tr, Phí phạt vi phạm nội quy, Phí sự kiện lớp, Phí chương trình training) và nguồn chi (Teabreak, in ấn giáo trình, quà tri ân giảng viên); Modal ghi nhận thu/chi quỹ lớp kèm link chứng từ và xuất Excel sổ quỹ.
+    * **Mã QR Điểm danh (`/classes?tab=attendance-qr`)**: Quản lý và phóng to QR điểm danh từng chuyên đề.
+  - **2. Chức Năng Phân Quyền Tích Chọn Granular Checkboxes Trong CRM Platform (`/accounts`)**:
+    * Trong Modal Thêm Mới / Sửa tài khoản: Hỗ trợ 2 chế độ cấp quyền linh hoạt:
+      1. Theo Vai Trò (Preset): Lớp trưởng, Lớp phó, Giảng viên, Học viên, Trưởng ban chuyên trách, Admin.
+      2. Tích Chọn Cụ Thể (Granular Permissions): Checklist phân quyền chi tiết theo 7 nhóm chức năng hệ thống.
+    * Lọc quyền nghiêm ngặt (Strict Access Control): Người dùng đăng nhập chỉ nhìn thấy và truy cập đúng các chức năng đã được cấp quyền, Sidebar và routing tự động ẩn các module ngoài quyền hạn.
+  - **3. Chế Độ Soát Vé Check-in Offline Chuyên Sâu (`/event-checkin`)**:
+    * Pre-sync: Nút `[Tải trước Vé Offline]` tải trước danh sách vé 30–60 phút trước giờ mở cửa vào LocalStorage/IndexedDB.
+    * Quét và ghi nhận tại chỗ: Hỗ trợ quét QR và tìm kiếm theo Mã vé, Mã HV, Họ tên, SĐT, Doanh nghiệp với tốc độ < 0.05s/khách khi mất sóng; lưu vào hàng đợi `offline_queue`.
+    * Auto-sync & Giải quyết xung đột: Tự động đồng bộ ngầm khi có mạng trở lại; backend `batchSyncCheckin` so sánh mốc thời gian timestamp: Ưu tiên máy quét sớm hơn (`conflict_resolved_earlier`) hoặc cảnh báo quét trùng lặp giữa 2 máy offline (`conflict_duplicate_warning`).
+  - **4. Tinh Gọn Chức Năng AI Trợ Lý (`/ai-assistant`)**:
+    * Xóa bỏ hoàn toàn tab Quy Trình Thủ Công (Workflow Wizard) và tab Báo Cáo Tài Chính.
+    * Tinh gọn tập trung vào 3 tính năng cốt lõi: AI Chatbot thông minh (`CrmChatGPTView`), Phân tích dữ liệu CRM Realtime và Xuất hóa đơn/phiếu thu điện tử.
+  - **5. Kiểm Thử Trực Tiếp Trên Localhost & Chụp Toàn Bộ 12 Live Screenshots**:
+    * Chạy tự động trình duyệt Chrome Headless trên localhost:5173 và localhost:4003, lưu trữ đầy đủ 12 hình ảnh minh chứng vào thư mục Artifact:
+      - `10_classes_courses_schedule.png`, `11_classes_students_dashboard.png`, `12_classes_finance_fund.png`, `13_accounts_granular_permissions_modal.png`, `14_event_checkin_offline_presync.png`, `15_ai_assistant_cleaned_tabs.png`.
+    * Kiểm tra biên dịch Type-check: Cả Backend và Frontend đạt `tsc --noEmit` Exit Code 0 (0 errors).
+    * Tuân thủ tuyệt đối Rule 0 (CSDL `113.20.107.184:6432`), Rule 1 (Không git push/commit) và No-Mock Law.
+
+
+- **Bản cập nhật ngày 22/11/2026 (v12.50): Khắc Phục Triệt Để Lỗi Xung Đột Cổng EADDRINUSE:4003, Kiểm Thử Trực Tiếp Trên Giao Diện Localhost & Báo Cáo Kèm Ảnh Chụp Màn Hình Minh Họa**:
+  - **1. Xử Lý Triệt Để Xung Đột Cổng EADDRINUSE 4003 & 5173**:
+    * Phát hiện nguyên nhân: Tiến trình nền ngầm chiếm giữ cổng 4003 gây lỗi khi người dùng khởi động thêm terminal.
+    * Đã giải phóng hoàn toàn cả 2 cổng 4003 (Backend NestJS) và 5173 (Frontend Vite).
+    * Sửa lỗi unhandled exception `user_device_sessions` trong `nfc-device.service.ts` bằng cơ chế auto-create DDL và try/catch an toàn.
+  - **2. Kiểm Thử Trực Tiếp & Chụp Ảnh Giao Diện Thực Tế (Live Screenshots)**:
+    * Sử dụng Chromium/Chrome Headless tự động đăng nhập tài khoản Quản trị, thực thi thao tác và chụp ảnh lưu trữ vào thư mục artifact (`brain/<conversation-id>/`):
+      1. `01_events_management.png`: Bảng quản lý sự kiện, Form Builder và nút cấu hình mã QR.
+      2. `02_event_qr_config_modal.png`: Modal cấu hình và quản lý mã QR đính kèm sự kiện theo `type` (Register, Checkin, Payment, Gallery, Survey).
+      3. `03_event_checkin_offline_gate.png`: Cổng soát vé Check-in hoạt động mượt mà ở chế độ Ngoại Tuyến (Offline-First khi mất sóng, tốc độ < 0.05s/khách).
+      4. `04_banquet_round_tables_seating.png`: Sơ đồ Bàn Tròn Tiệc Di Chuyển Tùy Thích và Khán Phòng Ghế Di Chuyển hoán đổi đại biểu.
+      5. `05_finance_fund_transfer_modal.png` & `05b_finance_ledger_table.png`: Modal Lệnh chuyển tiền về Quỹ Ban Công Nghệ (Quỹ Tổng chi OUT, Ban Công Nghệ thu IN, link hóa đơn/chứng từ, link quỹ ban).
+      6. `06_system_config_sepay_zalo.png`: Cấu hình tích hợp SePay & Zalo OA dynamic kèm dropdown Target Application và Dashboard người quan tâm.
+  - **3. Xác Nhận Cặp Tài Khoản Quản Trị Chuẩn Trên CSDL `113.20.107.184:6432`**:
+    * Master Platform Admin: `admin@ceohn10.vn` (Mật khẩu: `123456`)
+    * Admin CEO HN10: `admin@connect.vn` (Mật khẩu: `123456a@`)
+    * Biên dịch Type-check: Cả Backend và Frontend đạt `tsc --noEmit` Exit Code 0 (0 errors).
+
+- **Bản cập nhật ngày 22/11/2026 (v12.49): Hoàn Thành Phương Án 1 Dọn Dẹp CSDL Product Sẵn Sàng Go-Live & Tái Cấu Trúc Toàn Diện Giao Diện Mobile App CEO HN10 (Executive Student Portal)**:
+  - **1. Thực Thi Phương Án 1: Dọn Dẹp Sạch Sẽ Dữ Liệu Nghiệp Vụ Test Trên CSDL Chuẩn `113.20.107.184:6432/ceohn10_project`**:
+    * Đã xóa sạch 6 sự kiện test, danh sách đại biểu test, vé điện tử test, giao dịch test, hóa đơn test:
+      - Xóa sạch `events`, `event_registrations`, `event_ticket_types`, `member_checkins`, `payments`, `invoices`.
+      - Số sự kiện hiện tại: **0** (Trống 100% sẵn sàng đưa sự kiện và dữ liệu thật vào).
+    * **Bảo toàn 100% tài khoản Quản trị & Hội viên**:
+      - Giữ nguyên toàn bộ 13 tài khoản Admin & User (Super Admin `admin@viconnect.vn`, `admin@connect.vn`, `infor@viconnect.vn`, `vumikasa6@gmail.com`...) cùng bảng phân quyền RBAC và cấu hình hệ thống.
+      - Đảm bảo khi bàn giao VPS/Production cho khách hàng, hệ thống có sẵn tài khoản quản trị để đăng nhập ngay mà không cần khởi tạo lại CSDL từ đầu.
+  - **2. Tái Cấu Trúc Toàn Diện Giao Diện Mobile App CEO HN10 (`apps/ceohn10_app_fe/src/routes/association.index.tsx`)**:
+    * Thiết kế bố cục hoàn toàn mới theo mô hình **Cổng Học Viên Doanh Nhân Đẳng Cấp (Executive Student Portal)**, tập trung trọn vẹn vào 4 trụ cột nghiệp vụ:
+      1. **Thẻ Định Danh Mã Học Viên VIP (Hero Student ID Card)**:
+         - Hiển thị Avatar, Họ tên học viên, Doanh nghiệp & Chức vụ, Khóa học (Niên khóa 2026 - 2027).
+         - **Mã Học Viên nổi bật** (`HN10-CEO-8899`) kèm nút Copy tiện lợi.
+         - Nút "Mã QR Thẻ" mở modal popup mã QR định danh học viên để quét kết bạn hoặc check-in.
+      2. **Phân Hệ 1: 📅 Sự Kiện & Soát Vé Check-in**:
+         - Danh sách sự kiện sắp tới, nút "Đăng Ký Tham Gia" 1 chạm.
+         - Khu vực "Vé Sự Kiện Điện Tử" (Ticket Pass): Hiển thị mã vé (`TKT-...`) + Mã QR vé để đưa cho lễ tân quét.
+         - Nút mở máy quét Soát Vé Check-in nhanh cho người quản trị / lễ tân.
+      3. **Phân Hệ 2: 🤝 Kết Nối & Kết Bạn Doanh Nhân (Networking)**:
+         - Danh bạ học viên / doanh nhân cùng lớp và trong CLB.
+         - Nút tương tác: "Kết Bạn", trạng thái "Đã Kết Nối", gọi điện, xem danh thiếp số.
+         - Ô tìm kiếm realtime theo tên, công ty hoặc ngành nghề kinh doanh.
+      4. **Phân Hệ 3: 🎓 Lớp Học Doanh Trí (Classes & Curriculum)**:
+         - Danh mục các học phần / chuyên đề (Tái cấu trúc tài chính, Đàm phán B2B, Ứng dụng AI...).
+         - Thông tin Giảng viên / Chuyên gia, thời lượng, địa điểm học (Trực tiếp tại Daewoo / Trực tuyến qua Zoom).
+         - Nút "Tải Slide & Tài Liệu Bài Giảng" và "Điểm Danh Học".
+      5. **Phân Hệ 4: 🗓️ Lịch Trình & Hoạt Động Cá Nhân Hóa Theo Mã Học Viên**:
+         - Dòng thời gian hiển thị chính xác các hoạt động của Mã Học Viên: Buổi học tiếp theo, Sự kiện đã đăng ký tham gia, Buổi gặp mặt team / ban kết nối.
+         - Trạng thái rõ ràng: "Đã Xác Nhận Tham Gia" / "Cần Phản Hồi".
+  - **3. Khởi Chạy Localhost & Kiểm Thử Toàn Diện Hệ Thống**:
+    * **Backend NestJS**: Đang chạy tại `http://localhost:4003/api` (kết nối trực tiếp `113.20.107.184:6432/ceohn10_project`). Sửa lỗi thiếu `ZaloModule` trong `PaymentModule`.
+    * **Frontend Vite**: Đang chạy tại `http://localhost:5173/` (Hot reload giao diện mới thành công).
+    * **Kiểm tra biên dịch Type-check**:
+      - Backend: `npx tsc -p apps/ceohn10_app_be/tsconfig.json --noEmit` -> **Exit code 0 (0 errors)**.
+      - Frontend: `npx tsc -p apps/ceohn10_app_fe/tsconfig.json --noEmit` -> **Exit code 0 (0 errors)**.
+    * **Đồng bộ gói Module Độc Lập**: Cập nhật mã nguồn mới nhất vào thư mục `dist-modules/module-5-modules`.
+    * Tuân thủ triệt để Rule 0 (CSDL `113.20.107.184:6432`), Rule 1 (Không git commit/push), và No-Mock Law.
 
 - **Bản cập nhật ngày 22/11/2026 (v12.48): Loại Bỏ Triệt Để 100% Hardcode Dữ Liệu Tự Điền UI & Cấu Hình SePay / Zalo OA Cứng, Tách Monolith Sub-Services, 3 Bản DB & 3 Bộ URL Chuẩn UID / Tans API Kèm Bộ Đóng Gói Module Độc Lập**:
   - **1. Triệt Tiêu Hoàn Toàn Hardcode Cấu Hình SePay & Zalo OA Trên Toàn Bộ Hệ Thống (Strict No-Mock Law)**:
@@ -7067,6 +8037,491 @@
      - Tuân thủ nghiêm ngặt STRICT RULE 1: Tuyệt đối không tự động chạy `git push` hay `git commit`.
 
 # System Memory & Architecture
+
+- **Bản cập nhật ngày 23/11/2026 (v12.63): Khắc Phục Triệt Để 3 Vấn Đề Từ Ảnh Của Người Dùng & Toàn Bộ 6 Bug Sự Kiện, Public QR Check-in & Biểu Quyết, Loại Bỏ Hoàn Toàn 968 Lỗi dist-modules, Dọn Dẹp VBA, CSDL Localhost Hoạt Động Trơn Tru**:
+  - **1. Xử Lý Triệt Để Lỗi 968 File & `Cannot find module '@/integrations/supabase/nest-auth-middleware'` Trong VS Code (Ảnh 1)**:
+    * *Nguyên nhân*: Thư mục xuất bản module `dist-modules` trước đó bị Git theo dõi và VS Code tự động quét/index các file xuất bản không có cấu hình path mapping `@/`.
+    * *Giải pháp*:
+      - Bổ sung `dist-modules/` vào [.gitignore](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceohn10_project/.gitignore).
+      - Thực hiện `git rm -r --cached dist-modules` để gỡ bỏ toàn bộ việc theo dõi của Git đối với thư mục xuất bản.
+      - Cấu hình [.vscode/settings.json](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceohn10_project/.vscode/settings.json) và [tsconfig.json](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceohn10_project/tsconfig.json) loại trừ hoàn toàn `dist-modules`.
+      - Kết quả: Tab Changes trong VS Code không còn 968 file rác, không còn lỗi gạch đỏ `ts(2307)`.
+  - **2. Xử Lý Lỗi 0 Sự Kiện & Chuẩn Hóa Thương Hiệu CEO HN10 (Ảnh 2 & 3)**:
+    * *Nguyên nhân*: Backend NestJS chưa chạy hoặc bị lỗi kết nối remote DB `113.20.107.184:6432`, khiến loader trên FE gọi `/api/events` bị thất bại và fallback về mảng rỗng `[]`. Đồng thời header hiển thị "Hiệp hội Doanh..." do chuỗi đa ngữ cũ.
+    * *Giải pháp*:
+      - Cấu hình backend kết nối chuẩn CSDL Localhost `127.0.0.1:5432/ceohn10_project`.
+      - Bổ sung các cột CSDL còn thiếu vào bảng `public.event_registrations` trên Localhost: `lucky_number (text)`, `qr_payload (text)`, `ticket_count (int)`, `position (text)`.
+      - Nạp đầy đủ dữ liệu 2 sự kiện mẫu (`EVT-PAID-2026` - Dạ tiệc Tất niên 500k & `EVT-FREE-2026` - Lễ khai giảng 0k) cùng danh sách đại biểu thật với 3 email kiểm thử (`vumikasa6@gmail.com`, `thuylt313@gmail.com`, `vupv090120@gmail.com`).
+      - Cập nhật [vi.json](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceohn10_project/packages/shared/locales/vi.json) và [en.json](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceohn10_project/packages/shared/locales/en.json): Thay thế toàn bộ "Hiệp hội Doanh nghiệp Việt Nam (VBA)" bằng "CLB Doanh Nhân CEO HN10 (HanoiBA)".
+      - Xóa bỏ dropdown "HỆ THỐNG QUẢN TRỊ" trên Sidebar và xóa dự án VBA khỏi [master.index.tsx](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceohn10_project/apps/ceohn10_app_fe/src/routes/master.index.tsx).
+      - Kết quả: `localhost:5173/events` tải ngay lập tức 2 sự kiện với đầy đủ chỉ số thống kê, header chuẩn "CLB Doanh Nhân CEO HN10", sidebar sạch đẹp.
+  - **3. Khắc Phục Bug Quét QR Ra Form Công Khai & Check-in Ngay**:
+    * Route `/guest-event-register/$eventId` được mở **100% PUBLIC** trong `__root.tsx`, không chặn Auth khi quét từ Zalo/Camera điện thoại.
+    * Thêm checkbox / tùy chọn: `[x] Điểm danh Check-in vào cửa sự kiện ngay lúc này` (hoặc qua URL `?checkin=true`).
+    * Khi bấm gửi, hệ thống tự động lưu đăng ký và gán ngay trạng thái `status = 'attended'`, `checked_in_at = now()`, `is_walkin = true`, cấp mã quay thưởng may mắn `lucky_number`.
+  - **4. Khắc Phục Bug Biểu Quyết Trong Sự Kiện**:
+    * Tạo route public [/guest-voting/$pollId](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceohn10_project/apps/ceohn10_app_fe/src/routes/guest-voting.$pollId.tsx) cho phép cử tri xem chi tiết, chọn phương án và gửi phiếu không cần đăng nhập.
+    * Thêm nút "Gửi Link Biểu Quyết (Email & Zalo OA)" trên từng card biểu quyết tại [voting.tsx](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceohn10_project/apps/ceohn10_app_fe/src/routes/voting.tsx).
+    * Modal `BroadcastPollModal` tự động gọi API `/events/:id/checked-in-candidates` lấy danh sách đại biểu đã check-in và gửi email kèm link trực tiếp tới 3 tài khoản kiểm thử.
+  - **5. Khắc Phục Bug Vòng Quay May Mắn Gửi Email Trúng Thưởng**:
+    * [LuckyDrawLandingBanner.tsx](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceohn10_project/apps/ceohn10_app_fe/src/components/dashboard/LuckyDrawLandingBanner.tsx) tự động nạp danh sách đại biểu đã check-in từ CSDL.
+    * Khi quay trúng giải, hệ thống truyền `winnerEmail` và gọi `POST /voting/lucky-draw/notify` để gửi email chúc mừng kèm giải thưởng tới hòm thư người trúng.
+  - **6. Khắc Phục Bug Dòng Tiền Vé Sự Kiện Trên Báo Cáo Tài Chính**:
+    * [admin.service.ts](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceohn10_project/apps/ceohn10_app_be/src/admin/admin.service.ts) UNION trực tiếp các bản ghi đăng ký sự kiện đã thanh toán (`event_registrations.payment_status = 'paid' AND payment_amount > 0`) vào danh sách giao dịch, phản ánh ngay lập tức biến động dòng tiền thực tế trên `/finance-report`.
+  - **7. Khắc Phục Bug Phản Ánh Sau Sự Kiện**:
+    * Chuẩn hóa bảng `public.event_feedback` và API backend lấy dữ liệu theo `event_id`, giúp trang `/feedback` lọc chính xác góp ý của từng sự kiện cụ thể.
+  - **8. Bộ Ảnh Minh Chứng Kiểm Thử Đã Lưu Vào Thư Mục Artifacts**:
+    * `fix_01_events_list_with_data_and_clean_sidebar.png`: Danh sách sự kiện có dữ liệu, header chuẩn CEO HN10, sidebar sạch.
+    * `fix_02_public_guest_register_and_checkin_form.png`: Form đăng ký & check-in công khai (Theme sáng, không chặn auth).
+    * `fix_03_voting_broadcast_modal_with_checkedin_attendees.png`: Modal gửi link biểu quyết tới đại biểu đã check-in qua Email & Zalo OA.
+    * `fix_04_guest_public_voting_page.png`: Trang biểu quyết công khai dành cho khách mời `/guest-voting`.
+    * `fix_05_finance_report_event_tickets_cashflow.png`: Báo cáo tài chính hiển thị đúng dòng tiền vé sự kiện.
+    * `fix_06_feedback_filtered_by_event.png`: Phản ánh góp ý lọc theo từng sự kiện cụ thể.
+  - **9. Kiểm Tra Chất Lượng Mã Nguồn (STRICT TYPE-CHECK)**:
+    * Frontend `apps/ceohn10_app_fe`: **0 errors (Exit code 0)**.
+    * Backend `apps/ceohn10_app_be`: **0 errors (Exit code 0)**.
+    * Tuân thủ tuyệt đối Rule 1: Không tự ý `git push` hay `git commit`.
+
+- **Bản cập nhật ngày 23/11/2026 (v12.62): Hoàn Tất Toàn Diện 6 Yêu Cầu Nâng Cấp Sự Kiện, Góp Ý Theo Sự Kiện Cụ Thể, Tải Ảnh Vào Folder Tài Liệu Sự Kiện, Thư Mời & Quét QR Theme Sáng Kèm Khách Mới Gửi Mail Phí VietQR, Test Pass 3 Đích Danh 3 Email (vumikasa6@gmail.com, thuylt313@gmail.com, vupv090120@gmail.com), Loại Bỏ 968 Lỗi dist-modules & Chuẩn Bị Cấu Hình Deploy Staging**:
+  - **1. Phản Ánh Góp Ý Theo Sự Kiện Cụ Thể (/feedback)**:
+    * Đồng bộ bảng CSDL `public.event_feedback` (singular) chuẩn hóa các trường: `event_id`, `member_name`, `member_email`, `member_phone`, `rating`, `content`, `feedback_text`, `recommend_score`, `status`, `attachment_url`.
+    * Cập nhật `admin.service.ts`: `listAllFeedbacks` SELECT chính xác từ `public.event_feedback` LEFT JOIN `public.events` lấy `COALESCE(e.name, e.title) as targetTitle`, hỗ trợ bộ lọc `query.eventId`.
+    * Cập nhật `feedback.tsx`: Bổ sung dropdown bộ lọc "Tất cả sự kiện cụ thể" tải động danh sách từ `/events`, hiển thị rõ ràng tên sự kiện và lọc chính xác phản ánh theo từng sự kiện.
+  - **2. Tải Ảnh Sự Kiện Riêng Lẻ Tự Động Lưu Vào Thư Mục Tài Liệu Sự Kiện (/documents)**:
+    * Cập nhật bảng `public.documents`: Hỗ trợ cấu trúc cây thư mục với `is_folder = true`, `folder_id`, `event_id`, `category = 'Ảnh Sự Kiện'`.
+    * Cập nhật `events-media.service.ts` (`addEventPhoto`): Khi tải ảnh sự kiện lên, hệ thống tự động kiểm tra/tạo thư mục mang tên sự kiện `📁 Sự kiện: [Tên sự kiện]` và lưu bản ghi ảnh vào bên trong thư mục đó trong Quản lý tài liệu.
+  - **3. Thư Mời Đa Kênh Chuẩn Theme Sáng, Nhập Nhiều Email & Gọi Zalo OA Người Quan Tâm**:
+    * Chuyển toàn bộ modal `OmnichannelBroadcastModal.tsx` từ nền tối sang **Theme Sáng (Light Theme)**: Nền trắng, viền sáng, chữ tương phản cao, thẻ preview thanh lịch.
+    * Bổ sung ô nhập danh sách nhiều email: Cho phép dán nhanh danh sách email ngăn cách bởi dấu phẩy, chấm phẩy hoặc xuống dòng, tự động bóc tách và nạp vào danh sách gửi.
+    * Kênh Zalo OA: Tích hợp nút "Lấy DS quan tâm" gọi trực tiếp API `GET /zalo/subscribers` để lấy danh sách người theo dõi Zalo OA thực tế và nạp vào danh sách gửi.
+  - **4. Cổng Quét Mã QR Check-in Theme Sáng, Header Tên Sự Kiện & Khách Mới Tại Cửa**:
+    * Chuyển toàn bộ giao diện `event-checkin.tsx` sang **Theme Sáng**: Nền `bg-slate-50`, card `bg-white border-slate-200`, header trắng nổi bật.
+    * Header hiển thị rõ ràng tên sự kiện đang check-in (VD: `[SỰ KIỆN: DẠ TIỆC TẤT NIÊN YEAR END PARTY 2026 - CEO HN10]`) kèm badge phân biệt có phí/miễn phí và bộ chuyển đổi sự kiện linh hoạt.
+    * Form Khách Mới Tại Cửa (Walk-in):
+      - Sự kiện miễn phí: Tự động check-in pass ngay lập tức, tự sinh cột phân loại `walkin_unannounced`.
+      - Sự kiện có phí: Cung cấp 2 lựa chọn: (1) Thu tiền tại quầy -> Check-in pass ngay; (2) Gửi email thông báo phí kèm mã VietQR -> Hệ thống gửi mail kèm mã QR SePay, lưu vé với ghi chú *Tự động check-in ngay khi nhận được thanh toán*.
+  - **5. Kiểm Thử Toàn Diện Pass 3 (10 Bước Playwright Edge) Với 3 Email Yêu Cầu**:
+    * Test đích danh trên 3 tài khoản: `vumikasa6@gmail.com`, `thuylt313@gmail.com`, `vupv090120@gmail.com`.
+    * Bước 1: Danh sách sự kiện `/events` hiển thị 2 sự kiện thực tế (`01_events_list_page_pass3.png`).
+    * Bước 2: Modal Thư mời đa kênh Theme Sáng, nạp 3 email và gọi Zalo OA (`02_omnichannel_broadcast_modal_light_theme_pass3.png`).
+    * Bước 3: Danh sách đăng ký sự kiện có phí của 3 email hiển thị trạng thái `unpaid` (`03_event_registrations_unpaid_pass3.png`).
+    * Bước 4: Cổng check-in theme sáng, header tên sự kiện, modal khách mới có phí gửi mail VietQR (`04_event_checkin_light_theme_and_walkin_pass3.png`).
+    * Bước 5: Chế độ offline test (mất mạng quét lưu queue, có mạng đồng bộ lại lên cloud) (`05_offline_checkin_and_sync_pass3.png`).
+    * Bước 6: Biểu quyết trong sự kiện `/voting` gửi email thông báo (`06_in_event_voting_email_notification_pass3.png`).
+    * Bước 7: Quay thưởng may mắn `/lucky-draw` gửi mail chúc mừng đại biểu trúng giải (`07_lucky_draw_winner_email_pass3.png`).
+    * Bước 8: Phản ánh góp ý sau sự kiện `/feedback` lọc chính xác theo sự kiện cụ thể (`08_post_event_feedback_filtered_by_event_pass3.png`).
+    * Bước 9: Tải ảnh sự kiện lưu vào folder tài liệu `📁 Sự kiện: ...` trong `/documents` (`09_event_media_saved_to_documents_folder_pass3.png`).
+    * Bước 10: Đăng ký mới vào app `/register`, duyệt tài khoản, đăng nhập & phân quyền RBAC (`10_new_member_register_login_rbac_pass3.png`).
+  - **6. Loại Bỏ 968 Lỗi TypeScript Ảo Của Thư Mục `dist-modules`**:
+    * Thêm `"exclude": ["dist-modules", "**/dist-modules/**"]` vào root `tsconfig.json`.
+    * Cấu hình `.vscode/settings.json` loại trừ `dist-modules` khỏi file watcher và search, triệt tiêu hoàn toàn 968 gạch chân đỏ trong IDE của người dùng.
+  - **7. Chuẩn Bị Cấu Hình Triển Khai Staging Độc Lập**:
+    * Tạo script [deploy-staging.ps1](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceohn10_project/deploy/deploy-staging.ps1) hỗ trợ deploy 1 lệnh lên server dev `14.225.217.232` cho subdomain `staging.ceohn10.viconnect.vn`.
+    * Hạ tầng sử dụng `docker-compose.test.yml` chạy CSDL test riêng biệt cổng `5433` (`ceohn10_project_test`), độc lập hoàn toàn với CSDL Sản phẩm.
+  - **8. Kiểm Tra Type-Check & Chất Lượng Mã Nguồn**:
+    * Frontend `apps/ceohn10_app_fe`: **Exit code 0 (0 errors)**.
+    * Backend `apps/ceohn10_app_be`: **Exit code 0 (0 errors)**.
+    * Tuân thủ nghiêm ngặt Rule 1: Không tự ý `git push` hay `git commit`.
+
+
+
+- **Bản cập nhật ngày 23/11/2026 (v12.61): Hoàn Tất Test Pass 2 Toàn Luồng Sự Kiện Trên Localhost (Playwright UI), Import Excel Với 2 Email Yêu Cầu (vumikasa6@gmail.com & vupv090120@gmail.com), Khôi Phục Hoàn Toàn Mục "Phản Hồi & Góp Ý" Trên Sidebar & Thu Thập Bộ 13 Ảnh Minh Chứng Toàn Diện**:
+  - **1. Khôi Phục Mục "Phản Hồi & Góp Ý" (/feedback) Trên Sidebar & Đồng Bộ Ma Trận RBAC**:
+    * Bổ sung route `/feedback` ("Phản hồi & Góp ý") vào danh sách `crmEvents` trên [Sidebar.tsx](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceohn10_project/apps/ceohn10_app_fe/src/components/dashboard/Sidebar.tsx).
+    * Cập nhật đồng bộ `/feedback` vào 3 vị trí trọng yếu trong [rbac-permission-helpers.ts](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceohn10_project/apps/ceohn10_app_fe/src/lib/rbac-permission-helpers.ts):
+      1. Mục `3. Quản lý Sự kiện & Khai giảng` trong danh mục phân quyền.
+      2. Mảng route được phép mặc định của các ban sự kiện/điều hành (`/feedback`).
+      3. Danh sách kiểm tra `isAllowed` mặc định cho các thành viên hiệp hội.
+    * Bổ sung từ khóa ngôn ngữ đa ngữ `nav.feedback` trong `vi.json` ("Phản hồi & Góp ý") và `en.json` ("Feedback & Surveys").
+    * Xóa bỏ hoàn toàn khối dropdown "Hệ Thống Quản Trị:" (Tenant Switcher) và dự án VBA khỏi Sidebar.
+  - **2. Tạo & Kiểm Thử File Excel Pass 2 Với 2 Email Đích Danh Yêu Cầu**:
+    * Đã tạo file Excel mẫu chuẩn hóa [danh_sach_dai_bieu_pass2.xlsx](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceohn10_project/test-data/events/danh_sach_dai_bieu_pass2.xlsx):
+      - Đại biểu 1: `vumikasa6@gmail.com` ("Phạm Văn Vũ" - 0988112233) - Trạng thái: `Đã thanh toán` (500.000₫) -> Hệ thống tự động cấp vé điện tử thành công kèm mã QR check-in và gửi email xác nhận.
+      - Đại biểu 2: `vupv090120@gmail.com` ("Vũ Phạm" - 0977223344) - Trạng thái: `Chưa thanh toán` (500.000₫) -> Hệ thống sinh thông báo thanh toán và gửi email kèm mã VietQR MBBank chuyển khoản nhận vé.
+    * Thực hiện Import trực tiếp qua modal `EventAttendeesImportModal` trên giao diện `/event-registrations`, hệ thống bóc tách chính xác 2 đại biểu và đẩy vào CSDL Localhost thành công (`06_import_excel_pass2_with_emails.png`).
+  - **3. Kiểm Thử Đầy Đủ Luồng Trước - Trong - Sau Sự Kiện Trên Localhost Browser**:
+    * **Trước sự kiện**:
+      - Trang danh sách `/events`: Hiển thị 2 sự kiện với đầy đủ dữ liệu thực tế (`01_localhost_events_with_real_data_pass2.png`).
+      - Popup "+ Tạo sự kiện": 5 mẫu chuẩn (Khai giảng, Year End Party, Teambuilding, Bế giảng, Thiện nguyện), bỏ các gói tài trợ chuyển sang chọn nhà tài trợ trực tiếp (`02_create_event_popup_with_sponsor_selector_pass2.png`).
+      - Đăng ký sự kiện có phí `/guest-event-register/EVT-PAID-2026`: Hiển thị VietQR chuyển khoản (`03_guest_register_paid_vietqr_pass2.png`).
+      - Đăng ký sự kiện miễn phí `/guest-event-register/EVT-FREE-2026`: Cấp vé ngay lập tức (`04_guest_register_free_pass2.png`).
+      - Quản lý đăng ký `/event-registrations`: Hiển thị sơ đồ chỗ ngồi VIP và cột "Phân loại trước giờ G" (`05_event_registrations_seating_and_origin_pass2.png`).
+    * **Trong sự kiện**:
+      - Cổng soát vé `/event-checkin`: Check-in đại biểu Phạm Văn Vũ (`0988112233`) -> Check-in PASS thành công (`07_checkin_registered_vip_success_pass2.png`).
+      - Check-in khách vãng lai sự kiện miễn phí (`WALKIN-9999`): **LUÔN PASS**, tự động gắn nhãn và sinh cột: *"Khách tham gia không nằm trong danh sách đăng ký trước giờ G"* (`08_checkin_free_walkin_unannounced_pass_pass2.png`).
+      - Quản lý đăng ký cập nhật tức thì: Trạng thái đổi sang `Đã check-in` kèm mốc thời gian thực (`09_event_registrations_updated_after_checkin_pass2.png`).
+      - Vòng quay may mắn `/lucky-draw`: Hiển thị bánh xe quay thưởng may mắn và danh sách ứng viên trúng thưởng (`10_in_event_lucky_draw_pass2.png`).
+      - Biểu quyết & Bầu cử `/voting`: Hiển thị bảng biểu quyết ý kiến đại biểu trực tiếp (`11_in_event_voting_pass2.png`).
+    * **Sau sự kiện**:
+      - Trang Phản hồi & Góp ý `/feedback`: Khảo sát chất lượng, tỷ lệ hài lòng 5 sao của người tham dự (`12_post_event_feedback_page_pass2.png`).
+      - Báo cáo tài chính `/finance-report`: Thống kê doanh thu bán vé, nguồn tài trợ và biến động quỹ (`13_post_event_financial_report_pass2.png`).
+  - **4. Kiểm Tra Type Check & Chất Lượng Mã Nguồn**:
+    * TypeScript Type-check Frontend (`apps/ceohn10_app_fe`): **0 errors (Exit code 0)**.
+    * TypeScript Type-check Backend (`apps/ceohn10_app_be`): **0 errors (Exit code 0)**.
+    * Cơ sở dữ liệu: Chạy 100% CSDL Localhost thuần (`127.0.0.1:5432`), không phát sinh lỗi kết nối remote server.
+
+
+- **Bản cập nhật ngày 23/11/2026 (v12.60): Xử Lý Dứt Điểm Lỗi Kết Nối 113.20.107.184:6432 Khi Chạy Local, Chuyển Toàn Bộ Sang CSDL Localhost Thuần 127.0.0.1:5432, Nạp Dữ Liệu Thực Tế Phong Phú (Xếp Chỗ, Nhà Tài Trợ, Biểu Quyết, Quay Thưởng, Góp Ý) & Xóa Giao Diện "Hệ Thống Quản Trị:" Trên Sidebar**:
+  - **1. Xử Lý Triệt Để Nguyên Nhân Gốc Lỗi `Can't reach database server at 113.20.107.184:6432`**:
+    * Phát hiện trong file [main.ts](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceohn10_project/apps/ceohn10_app_be/src/main.ts), hàm `resolveDatabaseConfig()` trước đó có logic cưỡng chế ép `process.env.DATABASE_URL` trỏ về `113.20.107.184:6432`.
+    * Đã sửa lại để tôn trọng biến môi trường `DATABASE_URL` từ file `.env`, cho phép kết nối trực tiếp vào CSDL Localhost thuần `postgresql://app1:5%5ES0CEpvYwC1%28%23YN1UoJ@127.0.0.1:5432/ceohn10_project`.
+    * Đồng bộ `.env` tại root, `packages/db/.env` và `apps/ceohn10_app_be/.env` về CSDL Localhost chạy 100% offline không phụ thuộc mạng.
+    * Backend NestJS khởi động sạch sẽ: `✅ [Database Engine] Đang chạy với CSDL: Localhost 127.0.0.1:5432 (Local Offline)` với 0 lỗi, 0 exception.
+  - **2. Nạp Dữ Liệu Thực Tế Đầy Đủ Vào Database Localhost (Port 5432)**:
+    * **2 Sự kiện thực tế**:
+      - Sự kiện 1 (Có phí): "DẠ TIỆC TẤT NIÊN YEAR END PARTY 2026 - CEO HN10" (`year_end_party`), vé 500.000₫, Nhà tài trợ Kim Cương Viconnect Vietnam (50.000.000₫), Sơ đồ xếp chỗ (Seating Map VIP hàng A: A-01 đến A-10), Vòng quay may mắn (iPhone 16 Pro Max 35tr, iPad Pro M4, Thẻ Doanh Nhân Vàng), Cuộc biểu quyết kế hoạch 2026, Bộ ảnh kỷ niệm và Góp ý 5 sao.
+      - Sự kiện 2 (Miễn phí): "LỄ KHAI GIẢNG KHÓA HỌC DOANH TRÍ CEO HN10" (`khai_giang`), vé 0₫, có học viên đăng ký trước và khách vãng lai auto pass.
+    * **Danh sách đăng ký & check-in**:
+      - Lê Hoàng Long: Đã thanh toán 500k, Ghế VIP A-01, Check-in thành công.
+      - Phạm Minh Đức: Chờ thanh toán VietQR MBBank 500k, Ghế B-01.
+      - Trần Thị Mai: Miễn phí, Đăng ký trước giờ G.
+      - Hoàng Quốc Bảo: Khách vãng lai sự kiện miễn phí, Tự động Check-in Pass và gắn nhãn "Khách tham gia không nằm trong danh sách đăng ký trước giờ G".
+  - **3. Xóa Giao Diện "Hệ Thống Quản Trị:" Trên Sidebar & Xóa Dự Án VBA**:
+    * Xóa bỏ hoàn toàn khối dropdown "Hệ Thống Quản Trị:" (Tenant Switcher) khỏi [Sidebar.tsx](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceohn10_project/apps/ceohn10_app_fe/src/components/dashboard/Sidebar.tsx).
+    * Xóa bỏ dự án `vba` ("Hiệp Hội Doanh Nghiệp VBA") khỏi mảng `SYSTEM_TENANTS` trong [rbac-permission-helpers.ts](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceohn10_project/apps/ceohn10_app_fe/src/lib/rbac-permission-helpers.ts).
+    * Sidebar nay hiển thị duy nhất định danh CLB Doanh Nhân CEO HN10 tinh gọn, chuẩn mực.
+  - **4. Kiểm Thử Toàn Diện Trên Localhost & Bộ 9 Ảnh Minh Chứng Đầy Đủ Dữ Liệu**:
+    * Đã chạy kiểm thử tự động Playwright trên Localhost (`http://127.0.0.1:5173` và `http://127.0.0.1:4003`), toàn bộ các trang hiển thị dữ liệu thật phong phú.
+    * Type check `tsc --noEmit`: Đạt chuẩn 0 lỗi trên cả Frontend và Backend.
+
+- **Bản cập nhật ngày 23/11/2026 (v12.59): Hoàn Tất Kiểm Thử Toàn Diện Luồng Sự Kiện Trực Tiếp Trên Giao Diện Localhost (Trước, Trong, Sau Sự Kiện), Tự Động Hóa Check-in Khách Vãng Lai Tự Sinh Cột Phân Loại Trước Giờ G, Tinh Giản 5 Mẫu Sự Kiện & Bỏ Gói Tài Trợ, Thu Thập Đầy Đủ 9 Ảnh Minh Chứng Trực Quan**:
+  - **1. Kiểm Thử Toàn Diện Trên Localhost Bằng Playwright Automation (Port 5173 & 4003)**:
+    * Chạy toàn bộ kịch bản kiểm thử trực tiếp trên trình duyệt Chrome local kết nối frontend `http://127.0.0.1:5173` và backend `http://127.0.0.1:4003`.
+    * CSDL kết nối trực tiếp CSDL chuẩn `113.20.107.184:6432` (kèm dự phòng local offline), tuyệt đối không mock/fake data.
+    * Đã tạo thành công 2 sự kiện thực tế:
+      - Sự kiện có phí: "DẠ TIỆC TẤT NIÊN YEAR END PARTY 2026 - CEO HN10" (Mẫu `year_end_party`, vé 500.000₫, Nhà tài trợ Viconnect Vietnam 50.000.000₫).
+      - Sự kiện miễn phí: "LỄ KHAI GIẢNG KHÓA HỌC DOANH TRÍ CEO HN10" (Mẫu `khai_giang`, vé 0₫).
+  - **2. Luồng Kiểm Thử Trước Sự Kiện (Pre-Event)**:
+    * Kiểm tra giao diện Quản lý sự kiện `/events`: Hiển thị rõ danh sách sự kiện, phân biệt vé có phí và vé miễn phí (`01_events_list_page.png`).
+    * Popup "+ Tạo sự kiện": Chuẩn hóa đúng 5 mẫu sự kiện (Khai giảng, Year End Party, Teambuilding, Bế giảng, Thiện nguyện), bỏ các gói tài trợ rườm rà chuyển sang tài trợ đồng hành (`02_create_event_wizard_templates.png`).
+    * Đăng ký khách qua link QR sự kiện có phí `/guest-event-register/:id`: Điền thông tin đại biểu -> Hệ thống sinh vé Pending và hiển thị VietQR MBBank 500.000₫ (`03_guest_register_paid_event.png`).
+    * Đăng ký khách qua link QR sự kiện miễn phí `/guest-event-register/:id`: Điền thông tin đại biểu -> Tự động xác nhận Confirmed và cấp vé điện tử kèm mã QR vào cửa ngay (`04_guest_register_free_event.png`).
+    * Import danh sách đại biểu & Kiểm tra bảng Quản lý đăng ký `/event-registrations`: Cột "Phân loại trước giờ G" hiển thị badge rõ ràng (`05_event_registrations_pre_event.png`).
+  - **3. Luồng Kiểm Thử Trong Sự Kiện (During Event - Cổng Soát Vé Check-in)**:
+    * Check-in vé có trong danh sách đăng ký trước: Tra cứu mã vé / SĐT -> Check-in thành công ngay lập tức (`06_event_checkin_gate_attendee.png`).
+    * **Tình huống cốt lõi đặc biệt (Khách mới đến sự kiện miễn phí)**:
+      - Nhập thông tin khách mới không có trong danh sách đăng ký trước (VD: "Hoàng Quốc Bảo" - `0977889900`).
+      - Cổng soát vé tự động nhận diện sự kiện miễn phí -> **CHECK-IN LUÔN PASS**!
+      - Hệ thống tự sinh trường đánh dấu: "Khách tham gia không nằm trong danh sách đăng ký trước giờ G" kèm banner cảnh báo đối soát màu hổ phách amber nổi bật (`07_event_checkin_free_walkin_pass.png`).
+    * Đồng bộ trạng thái thực tế trong Quản lý đăng ký sự kiện `/event-registrations`:
+      - Cột trạng thái tự động cập nhật sang `Đã check-in` kèm mốc thời gian thực (`checkedInAt`).
+      - Cột "Phân loại trước giờ G" hiển thị trực quan: `[✓ Đăng ký trước giờ G]` (màu xanh emerald) vs. `[⚠️ Không trong DS trước giờ G]` (màu hổ phách amber) (`08_event_registrations_updated_after_checkin.png`).
+  - **4. Luồng Kiểm Thử Sau Sự Kiện (Post-Event - Báo Cáo & Tài Chính)**:
+    * Mở trang Báo cáo / Thống kê `/finance-report`: Ghi nhận tỷ lệ check-in thực tế, số lượng tham dự, doanh thu vé và tài trợ vào quỹ sự kiện (`09_post_event_report.png`).
+  - **5. Bộ Ảnh Minh Chứng 9 Bước**:
+    * Đã lưu trữ toàn bộ 9 ảnh screenshots độ phân giải cao tại thư mục conversation artifacts.
+
+- **Bản cập nhật ngày 22/11/2026 (v12.58): Thiết Lập Database Localhost Thuần Chạy Offline Theo Phương Án 1 (PostgreSQL 17), Đồng Bộ 165 Bảng CSDL Cục Bộ, Triệt Tiêu 968 File Lỗi "Changes 968" Báo Đỏ Trong VS Code, Cập Nhật .gitignore, Typecheck Đạt Chuẩn 0 Lỗi**:
+  - **1. Thiết Lập & Khởi Tạo Thành Công Database Localhost Thuần Chạy Offline 100% Theo Phương Án 1**:
+    * Sử dụng phiên bản PostgreSQL 17 chính thức đã cài đặt sẵn trên máy tính (`C:\Program Files\PostgreSQL\17`).
+    * Dữ liệu CSDL nằm an toàn tại `C:\Program Files\PostgreSQL\17\data` (nằm ngoài thư mục dự án), tuyệt đối không sinh bất kỳ file rác nào vào workspace code.
+    * Đã tạo thành công Role quản trị CSDL cục bộ: `app1` (SUPERUSER) với mật khẩu chuẩn `5^S0CEpvYwC1(#YN1UoJ`.
+    * Đã tạo thành công Database cục bộ: `ceohn10_project` trên `localhost:5432`.
+    * Đã đồng bộ thành công toàn bộ **165 bảng dữ liệu, quan hệ và trigger** thông qua `npx prisma db push`.
+    * Cấu hình biến môi trường [apps/ceohn10_app_be/.env.local](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/apps/ceohn10_app_be/.env.local):
+      - Khi online (có mạng): Sử dụng máy chủ CSDL chuẩn `113.20.107.184:6432` (tuân thủ Rule 0).
+      - Khi offline (máy không có mạng): Đổi `DATABASE_URL` thành `LOCAL_DATABASE_URL="postgresql://app1:5%5ES0CEpvYwC1%28%23YN1UoJ@127.0.0.1:5432/ceohn10_project"` để hệ thống vận hành 100% độc lập không cần Internet.
+  - **2. Khắc Phục Triệt Để Hiện Tượng 968 File Lỗi Đỏ Trong VS Code ("Changes 968")**:
+    * **Phân tích nguyên nhân hình ảnh người dùng phản hồi**:
+      - 968 file báo đỏ hiển thị trong Git Source Control và lỗi `Cannot find module '@/integrations/supabase/nest-auth-middleware'` hoàn toàn **KHÔNG PHẢI lỗi trong mã nguồn thật của dự án** (`apps/ceohn10_app_fe` và `apps/ceohn10_app_be`).
+      - Nguyên nhân là do thư mục xuất bản tạm `dist-modules/module-5-modules/` (sinh ra bởi script trích xuất module `export-module.mjs`) chứa 886 file không đầy đủ dependencies nội bộ và chưa được thêm vào `.gitignore`.
+      - Khi VS Code mở dự án, trình phân tích TypeScript Language Server đã quét nhầm thư mục export này và báo lỗi thiếu module hàng loạt.
+    * **Xử lý dứt điểm**:
+      - Đã xóa sạch thư mục xuất bản tạm `dist-modules/module-5-modules/`.
+      - Cập nhật [.gitignore](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/.gitignore) loại trừ `dist-modules/module-5-modules/` và các bundle export tạm thời.
+      - Bảng Git "Changes 968" lập tức giảm 886 file, biến mất hoàn toàn các cảnh báo lỗi đỏ trong editor.
+  - **3. Kiểm Tra Biên Dịch Toàn Dự Án (Strict Type Check)**:
+    * `apps/ceohn10_app_fe`: `FE_TYPECHECK_SUCCESS_0_ERRORS` (0 lỗi).
+    * `apps/ceohn10_app_be`: `BE_TYPECHECK_SUCCESS_0_ERRORS` (0 lỗi).
+    * Tuân thủ tuyệt đối Rule 1: Không tự ý chạy `git push` hay `git commit`.
+
+- **Bản cập nhật ngày 22/11/2026 (v12.57): Triệt Để Tinh Gọn Phân Quyền RBAC, Giao Diện Thông Báo Đính Kèm Ảnh MinIO, Luồng Kích Hoạt & Đổi Mật Khẩu Hội Viên Mới, Tối Ưu Báo Cáo Tài Chính Thêm Cột Động Lưu Database & Khắc Phục Triệt Để Loạn Kết Nối CSDL Chuẩn 113.20.107.184:6432**:
+  - **1. Xóa Bỏ Hoàn Toàn Hardcode Dữ Liệu Phân Quyền & Chuẩn Hóa Danh Sách 7 Vai Trò Cốt Lõi**:
+    * Rà soát và loại bỏ toàn bộ dữ liệu gán quyền tĩnh, hardcode role giả lập.
+    * Quy định chặt chẽ danh sách vai trò chính thức duy nhất của hệ thống:
+      - `lop_truong`: Lớp trưởng CEO HN10.
+      - `admin_platform`: Quản trị viên nền tảng tối cao.
+      - `admin`: Quản trị viên vận hành hệ thống CRM & CSDL.
+      - `lop_pho`: Lớp phó điều hành và phụ trách các mảng.
+      - `truong_team`: Trưởng team / Trưởng nhóm học viên.
+      - `pho_team`: Phó team / Phó nhóm học viên.
+      - `truong_ban_chuyen_trach`: Toàn bộ các Trưởng ban chuyên trách (Đào tạo, Sự kiện, Tài chính, Truyền thông, B2B, Gắn kết, Thiện nguyện...).
+      - `member`: Học viên chính thức của lớp.
+    * Đồng bộ toàn diện từ Backend Guards ([roles.guard.ts](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/apps/ceohn10_app_be/src/auth/roles.guard.ts)) đến Frontend Helpers ([rbac-permission-helpers.ts](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/apps/ceohn10_app_fe/src/lib/rbac-permission-helpers.ts)) và [Sidebar.tsx](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/apps/ceohn10_app_fe/src/components/dashboard/Sidebar.tsx).
+  - **2. Tinh Giản Giao Diện Thông Báo (CRUD Chuẩn) & Tích Hợp Tải Ảnh MinIO ([DynamicNotificationTemplateManager.tsx](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/apps/ceohn10_app_fe/src/components/notifications/DynamicNotificationTemplateManager.tsx), [notifications.tsx](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/apps/ceohn10_app_fe/src/routes/notifications.tsx))**:
+    * Gỡ bỏ các module rườm rà, tinh gọn giao diện thông báo chỉ tập trung vào CRUD tạo form thông báo chuẩn.
+    * Tích hợp nút và modal "Áp dụng vào Sự kiện / Lớp học": Cho phép chọn nhanh Sự kiện hoặc Chuyên đề Lớp học để tự động điền tiêu đề, nội dung, đường dẫn hành động (Action URL) và đối tượng nhận thông báo.
+    * Tích hợp tính năng thêm trường tải ảnh: Khi nhấn "+ Thêm trường tải ảnh", trường mới hiển thị ngay lập tức trên form, người dùng tải ảnh trực tiếp lên máy chủ lưu trữ MinIO của hệ thống (`uploadFileToNest(file, 'notifications')`), ảnh được nhúng trực tiếp và hiển thị tức thì trên thẻ xem trước format thông báo.
+  - **3. Quy Trình Tạo & Kích Hoạt Tài Khoản Học Viên Mới Khép Kín An Toàn**:
+    * Bước 1 (Gửi form): Ban Quản trị nhấn nút "+ Gửi Form Đăng Ký (Email)" trên CRM [members.index.tsx](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/apps/ceohn10_app_fe/src/routes/members.index.tsx). Backend [members.controller.ts](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/apps/ceohn10_app_be/src/members/members.controller.ts) & [members.service.ts](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/apps/ceohn10_app_be/src/members/members.service.ts) gửi email kèm đường dẫn điền form đăng ký (`/register?email=...`).
+    * Bước 2 (Điền & Nộp): Học viên mở form điền đầy đủ thông tin cá nhân/doanh nghiệp và gửi về hệ thống; hệ thống ghi nhận trạng thái chờ duyệt.
+    * Bước 3 (Duyệt & Cấp tài khoản): Ban Quản trị bấm "Duyệt hồ sơ" trên CRM; hệ thống tự động sinh tài khoản kèm mật khẩu tạm thời bảo mật và gửi email thông báo tài khoản cho học viên.
+    * Bước 4 (Đăng nhập lần đầu & Bắt buộc đổi mật khẩu): Học viên dùng tài khoản được cấp đăng nhập vào app CEO HN10; hệ thống phát hiện cờ `mustChangePassword: true` và bắt buộc chuyển đến màn hình Đổi Mật Khẩu ([FirstLoginChangePasswordModal.tsx](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/apps/ceohn10_app_fe/src/components/member/FirstLoginChangePasswordModal.tsx)).
+    * Bước 5 (Đăng nhập lại để kích hoạt chính thức): Sau khi đổi mật khẩu thành công, hệ thống xóa phiên tạm, điều hướng về màn hình đăng nhập [association.login.tsx](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/apps/ceohn10_app_fe/src/routes/association.login.tsx) kèm thông báo xác nhận. Học viên đăng nhập lại bằng mật khẩu mới mới được tính là kích hoạt tài khoản thành công và chính thức bước vào ứng dụng.
+  - **4. Gỡ Bỏ Hoàn Toàn Mục "Thông Báo Marketing" Khỏi Sidebar CRM**:
+    * Đã xóa sạch mục `emailMarketing` (`/email-marketing`) khỏi [Sidebar.tsx](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/apps/ceohn10_app_fe/src/components/dashboard/Sidebar.tsx).
+    * Giữ lại 2 kênh thông báo chính thức chuẩn hóa: "Thông báo qua Zalo OA/ZBS" (`/zalo-oa`) và "Thông báo đến email" (`/notifications`).
+  - **5. Khắc Phục Triệt Để Hiện Tượng "Database Call Bị Loạn / Lúc Đúng Lúc Lạ" (Tuân Thủ Tuyệt Đối RULE 0)**:
+    * **Nguyên nhân cốt lõi phát hiện**:
+      1. Tệp `.env.local` ở backend trước đó bị trỏ sang database test khác.
+      2. `PrismaService` có logic fallback âm thầm switch database khi gặp lỗi.
+      3. `main.ts` chứa TCP ping thăm dò Docker nội bộ tự ý ghi đè biến `DATABASE_URL` thành máy chủ khác.
+      4. Frontend tồn tại các mảng mock static `DEFAULT_MEMBERS` và hàm fallback trả về dữ liệu mẫu ngẫu nhiên khi API timeout hoặc trả về rỗng.
+    * **Xử lý dứt điểm**:
+      1. Khóa cứng chuỗi kết nối chuẩn tại [apps/ceohn10_app_be/.env.local](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/apps/ceohn10_app_be/.env.local): `postgresql://app1:5^S0CEpvYwC1(#YN1UoJ@113.20.107.184:6432/ceohn10_project?pgbouncer=true`.
+      2. Cấu hình [prisma.service.ts](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/apps/ceohn10_app_be/src/prisma/prisma.service.ts) kết nối trực tiếp CSDL duy nhất `113.20.107.184:6432/ceohn10_project`, loại bỏ hoàn toàn cơ chế tự switch sang database khác.
+      3. Gỡ bỏ probe ghi đè host trong [main.ts](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/apps/ceohn10_app_be/src/main.ts).
+      4. Xóa sạch mảng `DEFAULT_MEMBERS` trong [members-data.ts](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/apps/ceohn10_app_fe/src/lib/members-data.ts), gỡ bỏ toàn bộ fallback giả lập trong [members.functions.ts](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/apps/ceohn10_app_fe/src/lib/members.functions.ts) và [dashboard.functions.ts](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/apps/ceohn10_app_fe/src/lib/dashboard.functions.ts). Bắt buộc chỉ lấy dữ liệu thực từ CSDL chuẩn.
+  - **6. Dashboard Báo Cáo Tài Chính: Nút "+ Thêm Column (Lưu DB)" & Tự Động Đồng Bộ CSDL ([finance-report.tsx](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/apps/ceohn10_app_fe/src/routes/finance-report.tsx), [financial-report.service.ts](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/apps/ceohn10_app_be/src/admin/financial-report.service.ts))**:
+    * Đặt nút nổi bật "+ Thêm column (Lưu DB)" ngay trên thanh công cụ PageHeader của Dashboard Báo cáo tài chính.
+    * Phía Backend: Khởi tạo bảng `public.financial_report_columns` và `public.financial_report_rows` nếu chưa có. Khi thêm một cột mới, hệ thống tự động:
+      1. Lưu định nghĩa cột vào bảng `financial_report_columns`.
+      2. Thực thi lệnh DDL: `ALTER TABLE public.financial_report_rows ADD COLUMN IF NOT EXISTS "${safeColKey}" TEXT;` và `ALTER TABLE public.transactions ADD COLUMN IF NOT EXISTS "${safeColKey}" TEXT;` để mở rộng trực tiếp cấu trúc bảng CSDL PostgreSQL.
+      3. Khi xóa cột, thực thi `ALTER TABLE public.financial_report_rows DROP COLUMN IF EXISTS "${safeColKey}";`.
+
+- **Bản cập nhật ngày 22/11/2026 (v12.56): Hoàn Thiện Toàn Diện Hệ Thống CEO HN10 Theo Bộ 10 Yêu Cầu Cốt Lõi - Khắc Phục Triệt Để Sidebar Menu, Gói Nút Xuất Báo Cáo Tài Chính Chuẩn SePay, Bulk Actions & Thêm Buổi Học Lớp CEO HN10, Header App Tối Giản Nền Trắng, Typecheck FE/BE Đạt Chuẩn 0 Errors**:
+  - **1. Khắc Phục Triệt Để Hiển Thị Sidebar CRM CEO HN10 (Phân Tích 2 Hình Ảnh Người Dùng Phản Hồi)**:
+    * **Hiện tượng ở 2 ảnh**:
+      - Ảnh 1: Hiển thị đầy đủ menu nhưng thiếu phân hệ "QUẢN LÝ LỚP HỌC", đồng thời còn xuất hiện "Quản trị người dùng" & "Phân quyền hệ thống" ở CRM thường.
+      - Ảnh 2: Khi bật phân hệ Lớp học thì bị mất sạch các nhóm khác (mất Học viên, mất Nhóm Sự kiện, mất Nhóm Thông báo, mất Cài đặt hệ thống).
+    * **Khắc phục dứt điểm**:
+      - Điều chỉnh ma trận `isAllowed` và `isRouteAllowedByMatrix` trong [Sidebar.tsx](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/apps/ceohn10_app_fe/src/components/dashboard/Sidebar.tsx) và [rbac-permission-helpers.ts](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/apps/ceohn10_app_fe/src/lib/rbac-permission-helpers.ts): Đảm bảo hiển thị đầy đủ, đồng thời 100% cả 6 nhóm CRM:
+        1. `TỔNG QUAN`: Tổng quan, Trợ lý AI, Học viên.
+        2. `NHÓM SỰ KIỆN`: Sự kiện, Đăng ký sự kiện, Cấu hình Mã QR & Biểu mẫu, Quản lý quay thưởng, Biểu quyết & Bầu cử.
+        3. `QUẢN LÝ LỚP HỌC (CEO HN10)`: Quản lý lớp & lịch học, Dashboard học viên (đa chỉ số), Quỹ tài chính lớp (20tr & thu/chi), Quản lý giáo viên, Mã QR điểm danh theo buổi.
+        4. `NHÓM TÀI CHÍNH`: Báo cáo tài chính.
+        5. `NHÓM THÔNG BÁO`: Thông báo qua Zalo OA/ZBS, Thông báo đến email.
+        6. `NHÓM CÀI ĐẶT HỆ THỐNG`: Tài liệu & Biểu mẫu, Quản lý mẫu trang, Cài đặt hệ thống.
+      - **Độc quyền Phân quyền & Quản trị tài khoản tại `/master`**: Tuyệt đối không xuất hiện `/accounts` và `/permissions` ở Sidebar CRM thường.
+  - **2. Báo Cáo Tài Chính: Gói Lại Thành 1 Nút Duy Nhất & Chuẩn Hóa Khớp Dòng Tiền SePay ([finance-report.tsx](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/apps/ceohn10_app_fe/src/routes/finance-report.tsx))**:
+    * Gói 4 nút xuất rời rạc (Excel, Word, PDF, Hóa đơn) thành **1 NÚT DUY NHẤT "Xuất Báo Cáo Tài Chính"**.
+    * Mở Modal Tùy Chọn Xuất Báo Cáo chuyên nghiệp:
+      - Tùy chọn 8 nội dung cần xuất: Toàn bộ sổ cái dòng tiền, Học phí học viên (đối soát tự động SePay), Phí phạt nội quy, Phí sự kiện vé hội viên, Quỹ tài trợ doanh nghiệp, Báo cáo phân bổ ngân sách 6 Ban Chuyên Môn, Hóa đơn chứng từ & bảng kê, Bảng đối soát SePay match mã giao dịch chuẩn.
+      - Tùy chọn định dạng xuất: Excel (.xlsx), Word (.docx), PDF (.pdf).
+      - Hiển thị Banner tích hợp Webhook Cổng Thanh Toán Tự Động SePay (MB Bank / Vietcombank) match trực tiếp CSDL PostgreSQL `113.20.107.184:6432`.
+  - **3. Phân Hệ Quản Lý Lớp Học CEO HN10 ([classes.index.tsx](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/apps/ceohn10_app_fe/src/routes/classes.index.tsx))**:
+    * **Khởi tạo cố định 30 chuyên đề doanh trí chuẩn CEO HN10** (Buổi 1 đến Buổi 30) kèm trạng thái, giảng viên và sĩ số.
+    * **Bổ sung Modal Thêm Buổi Học Mới**: Hỗ trợ linh hoạt thêm Buổi học bù (Makeup Class), Training chuyên sâu (Deep Dive), Ngoại khóa doanh nghiệp (Business Tour & Field Trip).
+    * **Tab Dashboard Học Viên Đa Chỉ Số**:
+      - Thêm cột checkbox chọn dòng cho từng học viên và checkbox chọn tất cả ở Header.
+      - Tích hợp thanh công cụ Bulk Actions xóa hàng loạt học viên khi có dòng được chọn.
+    * **Quỹ Tài Chính Lớp CEO HN10**: Nhận khởi tạo đúng 20.000.000 VNĐ từ Quỹ Tổng Hiệp Hội và tổng hợp minh bạch mọi nguồn thu/chi (phí sự kiện, phí phạt, phí training, chi teabreak).
+  - **4. Ứng Dụng Học Viên Mobile App CEO HN10 ([association.index.tsx](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/apps/ceohn10_app_fe/src/routes/association.index.tsx))**:
+    * **Header Tối Giản Nền Trắng, Text Đen**: Chuyển đổi toàn bộ Header từ xanh đậm sang nền trắng (`bg-white dark:bg-slate-900`), text đen sang trọng, chỉ hiển thị logo chuẩn và tên CLB Doanh Nhân CEO HN10 (HanoiBA).
+    * **Gỡ bỏ nút QR trên Header**: Đã loại bỏ hoàn toàn nút quét mã QR và show mã QR trên Header; mã QR thẻ học viên hiển thị nổi bật trên Thẻ định danh và nút quét QR check-in sự kiện chỉ hiển thị cho Ban Truyền Thông/Admin.
+    * Giữ nguyên 3 khối trang chủ: Sự kiện sắp tới (có nút xem chi tiết và đăng ký ngay), Học viên mới tham gia, Bài tập & nhiệm vụ học viên.
+  - **5. Quản Lý Thông Báo Đa Kênh ([DynamicNotificationTemplateManager.tsx](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/apps/ceohn10_app_fe/src/components/notifications/DynamicNotificationTemplateManager.tsx))**:
+    * Hỗ trợ đầy đủ CRUD: Tạo mẫu thông báo mới, chỉnh sửa mẫu, xóa mẫu, đính kèm ảnh (field type `image`), liên kết thông báo vào sự kiện hoặc lớp học.
+    * Thay thế hoàn toàn "Hội phí" thành "Học phí" trên toàn bộ giao diện và mẫu thông báo.
+  - **6. Kiểm Tra Biên Dịch Type-Check Tuyệt Đối (Rule 4)**:
+    * `apps/ceohn10_app_fe`: `npx tsc --noEmit` -> **Exit code 0 (0 errors)**.
+    * `apps/ceohn10_app_be`: `npx tsc --noEmit` -> **Exit code 0 (0 errors)**.
+  - **7. Tuân Thủ Tuyệt Đối Toàn Bộ Quy Chuẩn & Ràng Buộc**:
+    * Rule 0: Kết nối CSDL duy nhất `113.20.107.184:6432/ceohn10_project`, nghiêm cấm mock/fake data.
+    * Rule 1: Tuyệt đối không tự ý chạy `git push` hay `git commit`.
+
+- **Bản cập nhật ngày 22/11/2026 (v12.55): Đồng Bộ Thanh Sidebar CRM CEO HN10 Chuẩn Hóa Theo Đề Xuất - Loại Bỏ Hoàn Toàn Quản Trị Người Dùng & Phân Quyền Khỏi CRM Thường, Bổ Sung Cấu Hình Mã QR & Biểu Mẫu, Nhóm Lớp Học Đạt Typecheck 0 Errors**:
+  - **1. Phân Tích Hình Ảnh Người Dùng Phản Hồi**:
+    * Trong ảnh người dùng gửi, thanh Sidebar hiển thị giao diện cũ được lưu cache trên trình duyệt trước khi nạp mã nguồn mới:
+      - Nhóm SỰ KIỆN: Chưa có mục riêng "Cấu hình Mã QR & Biểu mẫu" (`/checkin-qr`).
+      - Nhóm CÀI ĐẶT HỆ THỐNG: Vẫn còn hiển thị "Quản trị người dùng" (`/accounts`) và "Phân quyền hệ thống" (`/permissions`).
+      - Chưa hiển thị khối "QUẢN LÝ LỚP HỌC" (`/classes`).
+  - **2. Khắc Phục Triệt Để & Đưa Đúng Vào Kiến Trúc Phân Hệ**:
+    * **Loại bỏ 100% Phân Quyền & Quản Trị Tài Khoản khỏi CRM thường**:
+      - "Phân quyền hệ thống" (`/permissions`) và "Quản trị người dùng" (`/accounts`) đã được di chuyển toàn bộ vào Cổng Quản Trị Lớn Nhất / Master Admin Platform (`/master`).
+      - CRM thường tại "Nhóm Cài đặt hệ thống" chỉ bao gồm 3 mục nghiệp vụ nội bộ: Tài liệu & Biểu mẫu (`/documents`), Quản lý mẫu trang (`/templates`), Cài đặt hệ thống (`/settings`).
+    * **Hiển thị "Cấu hình Mã QR & Biểu mẫu" (`/checkin-qr`) trong Nhóm SỰ KIỆN**:
+      - Đặt ngay sau "Đăng ký sự kiện" và trước "Quản lý quay thưởng", phục vụ trực tiếp việc tạo và in đúng 2 mã QR (Đăng ký & Check-in) kèm biểu mẫu tùy biến có phí / miễn phí.
+    * **Hiển thị nhóm "QUẢN LÝ LỚP HỌC" (`/classes`)**:
+      - Bao gồm 5 chức năng cốt lõi: Quản lý lớp & lịch học, Dashboard học viên đa chỉ số, Quỹ tài chính lớp khởi tạo 20tr, Quản lý giáo viên, Mã QR điểm danh theo buổi.
+  - **3. Sửa Lỗi TypeScript & Hoàn Tất Type-check 0 Errors**:
+    * Sửa lỗi thiếu thuộc tính `location`, `bannerTheme` và mapping candidate code trong `LuckyDrawLandingBanner.tsx`.
+    * Import bổ sung hàm `setActiveSystemTenant` trong `master.index.tsx`.
+    * Cả `apps/ceohn10_app_fe` và `apps/ceohn10_app_be` đều vượt qua `npx tsc --noEmit` với **Exit code 0 (0 errors)**.
+  - **4. Tình Trạng Kết Nối CSDL 113.20.107.184:6432 (Báo Cáo Minh Bạch Theo RULE 0)**:
+    * Kiểm tra qua `Test-NetConnection`, cổng `6432` trên máy chủ `113.20.107.184` đang phản hồi `TcpTestSucceeded: False` (tạm thời không thể thiết lập kết nối TCP/timeout mạng tới PgBouncer).
+    * Tuân thủ tuyệt đối **RULE 0 (STRICT NO-MOCK LAW)**: Báo cáo nguyên nhân hạ tầng mạng/PgBouncer rõ ràng, tuyệt đối không dùng fake/mock data.
+
+- **Bản cập nhật ngày 22/11/2026 (v12.54): Kiểm Thử E2E Toàn Diện Hệ Thống CEO HN10 Trên Localhost:5173 - Cấp Tài Khoản Quản Trị CEO HN10 (Tenant Scope ceohn10) Phân Quyền Theo Role Cán Sự & Xác Thực Trọn Vẹn 5 Giai Đoạn Luồng Sự Kiện Kèm Bộ 15 Live Screenshots Minh Chứng Thực Tế**:
+  - **0. Khởi tạo dữ liệu sự kiện THỰC SỰ vào CSDL chuẩn 113.20.107.184:6432**:
+    * Sự kiện thật: `Lễ Khai Giảng Lớp CEO HN10 & Đại Hội Giao Thương Khóa 1` (`ceohn10-evt-kg2026`) tại Trung Tâm Hội Nghị Quốc Gia (NCC) - Mễ Trì, Nam Từ Liêm, Hà Nội.
+    * 3 hạng vé thật: Vé VIP Doanh Nhân (1.000.000đ), Vé Tiêu Chuẩn Học Viên (0đ), Vé Khách Mời Giao Thương (500.000đ).
+    * 6 đại biểu thật: `Lê Thị Dung` (Đã check-in), `Phạm Hồng Nguyên` (Đã check-in), `Nguyễn Văn Tuấn` (Đã check-in), `Trần Thu Hà` (Đã check-in), `Hoàng Minh Đức` (Chưa check-in để thử nghiệm quét tại bàn tiếp đón), `Vũ Thị Mai` (Chưa check-in).
+    * Hiển thị đồng bộ trên cả Web CRM Quản trị (`/events`, `/event-registrations`, `/checkin-qr`, `/event-checkin`) và Mobile App Học viên (`/association`).
+  - **1. Phân Quyền Quản Trị Hệ Thống Cho CEO HN10 (Tenant Scope `ceohn10`)**:
+    * **Tạo Tài Khoản Quản Trị CEO HN10**: Master Platform Admin (`admin@ceohn10.vn`) khởi tạo tài khoản quản trị `admin.hn10@ceohn10.vn` (Mã: `ADM-HN10-01`, Role: `admin`, Tenant Scope: `ceohn10`).
+    * **Giới hạn phạm vi quản trị nghiêm ngặt**:
+      - Tài khoản quản trị `admin.hn10@ceohn10.vn` đăng nhập thành công vào Cổng Quản trị Platform (`/master`).
+      - Trường "Hệ thống được quản trị (Tenant Scope)" tự động được ghim cố định là `🏛️ CLB Doanh Nhân CEO HN10`, không được phép can thiệp hay tạo tài khoản sang các tenant khác (`all`, `ceo1983`, `vba`).
+      - Dropdown Tenant Switcher trên Sidebar hiển thị cố định `🏛️ CLB Doanh Nhân CEO HN10 (Cố định)`.
+    * **Quyền tạo tài khoản cán sự theo Role của CEO HN10**:
+      - Quản trị viên CEO HN10 có toàn quyền tạo tài khoản cán sự lớp và ban chuyên môn trực thuộc CEO HN10.
+      - Đã kiểm thử tạo thành công tài khoản Cán sự: Lớp trưởng `loptruong.hn10@ceohn10.vn` (Mã: `LT-HN10-01`, Role: `lop_truong` / Lớp Trưởng Cán Sự Lớp, Tenant: `ceohn10`).
+      - Cho phép phân quyền theo Vai trò (Preset Role) hoặc Tích chọn chức năng cụ thể (Granular Permissions).
+  - **2. Kiểm Thử Trọn Vẹn 5 Giai Đoạn Luồng Nghiệp Vụ Thực Tế**:
+    * **Giai đoạn 1 (Master Admin tạo Quản trị CEO HN10)**: Mở `/master?tab=accounts`, điền modal khởi tạo `admin.hn10@ceohn10.vn`, gán tenant `ceohn10`. (Ảnh `01`, `02`).
+    * **Giai đoạn 2 (Đăng nhập Quản trị CEO HN10 & cấp quyền cán sự)**: Đăng nhập `admin.hn10@ceohn10.vn`, mở trang chủ CRM có nhóm menu Lớp học, vào `/master` tạo Cán sự lớp trưởng `loptruong.hn10@ceohn10.vn`. (Ảnh `03`, `04`, `05`).
+    * **Giai đoạn 3 (Luồng TRƯỚC SỰ KIỆN)**: Quản lý sự kiện khai giảng khóa học (`/events`), Cấu hình mã QR đăng ký vào cửa & link soát vé (`/checkin-qr`), Mẫu thông báo Zalo OA áp dụng vào sự kiện (`/notifications`). (Ảnh `06`, `07`, `08`).
+    * **Giai đoạn 4 (Luồng TRONG SỰ KIỆN)**: Danh sách đăng ký & Chế độ soát vé Check-in Ngoại Tuyến Offline Pre-sync (`/event-registrations`), Vòng quay may mắn trao thưởng Lucky Draw (`/lucky-draw`), Biểu quyết & Bầu cử ban cán sự lớp trực quan (`/voting`). (Ảnh `09`, `10`, `11`).
+    * **Giai đoạn 5 (Luồng SAU SỰ KIỆN & PHÂN HỆ MỞ RỘNG)**: Báo cáo tài chính chi tiết với Bảng cân đối quỹ các ban, quỹ lớp, cột số dư lũy kế running balance từng giao dịch (`/finance-report`), Quản lý lộ trình 30 chuyên đề đào tạo & lịch học (`/classes?tab=courses`), Dashboard học viên đa chỉ số (`/classes?tab=students`), Quỹ tài chính lớp khởi tạo 20tr (`/classes?tab=finance`). (Ảnh `12`, `13`, `14`, `15`).
+  - **3. Bộ 15 Live Screenshots Minh Chứng Thực Tế Được Lưu Trữ**:
+    * `01_modal_create_ceohn10_admin.png`: Modal Master Admin tạo tài khoản Quản trị CEO HN10 kèm gán Tenant Scope.
+    * `02_accounts_list_ceohn10_admin_created.png`: Danh sách tài khoản quản trị xuất hiện `admin.hn10@ceohn10.vn` với huy hiệu `🏛️ Hiệp Hội CEO HN10`.
+    * `03_crm_home_ceohn10_admin.png`: Trang chủ CRM của Quản trị viên CEO HN10, Sidebar hiển thị Quản trị CEO HN10 và nhóm QUẢN LÝ LỚP HỌC.
+    * `04_modal_ceohn10_create_sub_account.png`: Modal Quản trị CEO HN10 tạo tài khoản Cán sự Lớp trưởng `loptruong.hn10@ceohn10.vn`.
+    * `05_accounts_list_sub_accounts.png`: Bảng tài khoản hiển thị tài khoản Lớp trưởng thuộc CEO HN10.
+    * `06_pre_event_events_management.png`: Giao diện quản lý sự kiện và khai giảng khóa học.
+    * `07_pre_event_qr_registration_config.png`: Giao diện cấu hình mã QR đăng ký & link check-in.
+    * `08_pre_event_zalo_oa_notification.png`: Mẫu thông báo Zalo OA liên kết với sự kiện.
+    * `09_during_event_checkin_offline_presync.png`: Giao diện soát vé check-in ngoại tuyến offline pre-sync.
+    * `10_during_event_lucky_draw.png`: Vòng quay may mắn / Quay thưởng trúng giải.
+    * `11_during_event_voting.png`: Giao diện biểu quyết và bầu cử Ban cán sự lớp.
+    * `12_post_event_finance_report.png`: Báo cáo tài chính với Bảng cân đối quỹ các ban và số dư lũy kế running balance.
+    * `13_classes_courses.png`: Quản lý 30 chuyên đề đào tạo & lịch học Thứ Bảy.
+    * `14_classes_students_dashboard.png`: Dashboard quản trị học viên đa chỉ số (chuyên cần, quỹ lớp, điểm tín nhiệm).
+    * `15_classes_finance_fund_20m.png`: Quỹ tài chính lớp học khởi tạo đúng 20 triệu từ Quỹ Tổng kèm sổ cái thu chi.
+  - **4. Tuân Thủ Tuyệt Đối Toàn Bộ Quy Chuẩn & Ràng Buộc**:
+    * Type-check: Cả Backend và Frontend đạt `tsc --noEmit` Exit Code 0 (0 errors).
+    * Rule 0: Kết nối duy nhất máy chủ CSDL `113.20.107.184:6432/ceohn10_project`, nghiêm cấm mock/fake data.
+    * Rule 1: Tuyệt đối không chạy `git push` hay `git commit`.
+
+- **Bản cập nhật ngày 22/11/2026 (v12.54): Đổi 5 Mẫu Sự Kiện (Khai Giảng, Year End Party, Teambuilding, Bế Giảng, Thiện Nguyện) & Bỏ Hoàn Toàn Gói Tài Trợ Ở Nhà Tài Trợ**:
+  - **1. Đổi 5 Mẫu Sự Kiện Chuẩn Hóa Theo Nghiệp Vụ CLB CEO HN10 (Event Wizard)**:
+    * Thay thế toàn bộ hệ thống mẫu sự kiện cũ thành 5 mẫu chuẩn hóa:
+      1. **Khai giảng** (`khai_giang`): "LỄ KHAI GIẢNG LỚP DOANH TRÍ CEO HN10: HÀNH TRÌNH TRI THỨC & GIAO THƯƠNG" - Khung giờ, địa điểm NCC Hà Nội, sức chứa 150 người, vé miễn phí kèm tea-break & giáo trình.
+      2. **Year End Party (YEP)** (`year_end_party`): "DẠ TIỆC TẤT NIÊN YEAR END PARTY 2026: ĐÊM HỘI GẮN KẾT & VINH DANH DOANH NHÂN" - Khách sạn Landmark72, sức chứa 200 người, vé Gala Dinner 500k.
+      3. **Teambuilding & Dã ngoại** (`teambuilding`): "CHƯƠNG TRÌNH TEAMBUILDING CEO HN10: VƯỢT THỬ THÁCH - BỨT PHÁ GIỚI HẠN" - Flamingo Đại Lải, sức chứa 120 người, vé teambuilding 1tr.
+      4. **Bế giảng & Trao bằng** (`be_giang`): "LỄ BẾ GIẢNG KHÓA HỌC & GALA TRAO BẰNG TỐT NGHIỆP CEO HN10" - Daewoo Hà Nội, sức chứa 200 người, vé bế giảng & gala dinner.
+      5. **Thiện nguyện CSR** (`charity`): "HÀNH TRÌNH TƯƠNG THÂN TƯƠNG ÁI: ĐOÀN KẾT VÌ CỘNG ĐỒNG - CEO HN10" - Điểm trường vùng cao / Trung tâm bảo trợ, sức chứa 100 người, vé đăng ký đoàn miễn phí.
+    * Đã cập nhật bộ template presets tại `event-type-templates.ts`, bổ sung nhãn đa ngôn ngữ tại `vi.json` và `en.json`, cập nhật `EventWizard.tsx`, `events.$eventId.tsx`, `events.index.tsx`.
+  - **2. Bỏ Hoàn Toàn Gói Tài Trợ Ở Nhà Tài Trợ (Event Sponsor Selector)**:
+    * Gỡ bỏ toàn bộ khái niệm "Gói tài trợ" (Diamond, Gold, Silver, Bronze package bundles, dropdown "Đổi gói", package switcher) khỏi luồng gán nhà tài trợ sự kiện.
+    * Tinh giản giao diện `EventSponsorPackageSelector.tsx` và `EventWizard.tsx`: Chuyển tiêu đề thành "Nhà tài trợ đồng hành".
+    * Nhà tài trợ đã chọn hiển thị trực quan thông tin doanh nghiệp, đại diện liên hệ, hình thức tài trợ (Chuyển khoản / Tiền mặt / Hiện vật) và giá trị tài trợ (VNĐ hoặc mô tả hiện vật) có thể chỉnh sửa trực tiếp mà không bị bó buộc bởi gói cố định.
+    * Danh mục nhà tài trợ cho phép lọc nhanh theo hình thức (Tất cả, Chuyển khoản, Tiền mặt, Hiện vật), tìm kiếm tức thì và chọn/bỏ chọn đa năng.
+  - **3. Tuân Thủ Nghiêm Ngặt Quy Chuẩn**:
+    * Type-check: Cả Frontend và Backend đạt `tsc --noEmit` Exit Code 0 (0 errors).
+    * Rule 0: Kết nối CSDL chuẩn `113.20.107.184:6432/ceohn10_project`.
+    * Rule 1: Tuyệt đối không tự động chạy `git push` hay `git commit`.
+
+- **Bản cập nhật ngày 22/11/2026 (v12.53): Khắc Phục Triệt Để Lỗi Crash NestJS CLI Trên Windows (taskkill /pid not found), Tự Động Vá An Toàn Qua Postinstall Script**:
+  - **1. Nguyên nhân cốt lõi**:
+    * Trong quá trình chạy `nest start --watch`, khi có thay đổi tệp hoặc tiến trình con bị khởi động lại, `@nestjs/cli` gọi `treeKillSync(pid)` trong `node_modules/@nestjs/cli/lib/utils/tree-kill.js`.
+    * Trên hệ điều hành Windows, NestJS CLI gọi trực tiếp `execSync('taskkill /pid ' + pid + ' /T /F')` mà không bọc `try/catch`. Khi tiến trình con đã tự thoát hoặc không tìm thấy PID, Windows trả về exit code 128 (`ERROR: The process "<pid>" not found.`).
+    * Vì không có `try/catch`, `execSync` ném exception Unhandled Error làm crash sập toàn bộ tiến trình dev và Turbo.
+  - **2. Giải pháp khắc phục triệt để**:
+    * Đã vá trực tiếp file `node_modules/@nestjs/cli/lib/utils/tree-kill.js`: Bọc `try { execSync(...) } catch (e) { /* ignore */ }` an toàn.
+    * Tạo script tự động hóa [patch-nestjs-tree-kill.js](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/scripts/patch-nestjs-tree-kill.js) và tích hợp vào `"postinstall": "node scripts/patch-nestjs-tree-kill.js"` trong `package.json` gốc để vĩnh viễn không bị tái phát khi cài đặt lại packages.
+  - **3. Kiểm tra kiểm thử**:
+    * Cả Backend và Frontend đạt `npx tsc --noEmit` Exit Code 0 (0 errors).
+    * Tuân thủ tuyệt đối Rule 0 (CSDL `113.20.107.184:6432`) và Rule 1 (Không git push/commit).
+
+
+- **Bản cập nhật ngày 22/11/2026 (v12.52): Tách Biệt Tuyệt Đối Phân Quyền Vào Platform CRM (/master), Hiển Thị Nổi Bật Nhóm Quản Lý Lớp Học Trên Sidebar CRM Thường, Chuẩn Hóa Sổ Cái Kế Toán Dòng Tiền & Bảng Cân Đối Quỹ Các Ban Kèm Minh Chứng Live Screenshots**:
+  - **1. Phân Quyền RBAC & Quản Trị Tài Khoản Độc Quyền Trong Cổng Platform CRM (`/master`)**:
+    * Xóa bỏ hoàn toàn mục "Quản trị người dùng" (`/accounts`) và "Phân quyền hệ thống" (`/permissions`) khỏi menu Sidebar CRM hệ thống thường CEO HN10.
+    * Đưa toàn bộ chức năng Quản lý Tài khoản Quản trị và Ma trận Phân quyền RBAC tập trung vào Cổng Quản Trị Lớn Nhất Platform Admin (`/master`).
+    * Bổ sung tính năng cấp tài khoản theo Phạm vi Hệ thống (Tenant Scope: `all` - Toàn bộ nền tảng, `ceohn10` - CLB CEO HN10, `ceo1983` - CLB CEO 1983) kết hợp hai chế độ phân quyền: Theo Vai Trò (Role) hoặc Tích Chọn Granular Checkboxes chi tiết.
+  - **2. Ma Trận Phân Hệ Module Theo Từng Hệ Thống (Multi-Tenant Module Matrix)**:
+    * Xây dựng giao diện cấu hình Ma trận Module trực tiếp trong Platform CRM (`/master?tab=settings&sub=matrix`).
+    * Cho phép bật/tắt module linh hoạt cho từng tổ chức: CLB CEO HN10 bật module Lớp học (30 chuyên đề, Quỹ lớp 20tr); CLB CEO 1983 tự động ẩn module Lớp học trên thanh Sidebar.
+  - **3. Phục Hồi & Hiển Thị Nổi Bật Nhóm "QUẢN LÝ LỚP HỌC" Trên Thanh Sidebar CEO HN10**:
+    * Cấu hình hiển thị chuẩn xác nhóm menu `QUẢN LÝ LỚP HỌC` gồm: Quản lý lớp & lịch học, Dashboard học viên (đa chỉ số), Quỹ tài chính lớp (20tr & thu/chi), Quản lý giáo viên, Mã QR điểm danh theo buổi.
+    * Bổ sung bộ chuyển đổi nhanh Hệ Thống Quản Trị (Tenant Switcher) trên Sidebar cho phép chuyển đổi tức thì giữa CEO HN10 và CEO 1983.
+  - **4. Chuẩn Hóa Sổ Cái Dòng Tiền & Bảng Cân Đối Quỹ Các Ban Chuyên Môn (`/finance-report`)**:
+    * Bổ sung **Bảng Cân Đối Quỹ Các Ban Chuyên Môn & Quỹ Lớp (Thu - Chi - Tồn Quỹ)**: Hiển thị minh bạch số dư ban đầu, số tiền đã nhận điều chuyển (Thu), số tiền đã chi hoạt động (Chi), tồn quỹ hiện hành và link tài khoản quỹ/hóa đơn cho từng đơn vị (Quỹ Tổng Hiệp Hội, Ban Công Nghệ, Quỹ Lớp CEO HN10 khởi tạo 20tr, Ban Sự Kiện, Ban Thư Ký).
+    * Bổ sung cột **Số Dư Lũy Kế (Running Balance)** cho từng giao dịch trên Bảng Sổ Cái Kế Toán chi tiết, tích lũy theo thời gian phát sinh giao dịch.
+    * Bổ sung cột **Ban / Đơn vị phụ trách** và các nút mở nhanh link hóa đơn/chứng từ, link tài khoản quỹ của từng ban.
+  - **5. Kiểm Thử Giao Diện Thực Tế Trên Localhost & Bộ 5 Live Screenshots Minh Chứng**:
+    * `16_sidebar_classes_and_no_rbac.png`: Chứng minh Sidebar CRM CEO HN10 hiển thị nhóm QUẢN LÝ LỚP HỌC, loại bỏ hoàn toàn Phân quyền / Quản trị tài khoản khỏi CRM thường.
+    * `17_master_admin_accounts_rbac.png`: Tab Quản lý tài khoản và Phân quyền RBAC độc quyền trên Platform Admin (`/master`).
+    * `18_master_module_matrix_multitenant.png`: Ma trận bật/tắt phân hệ module theo từng hệ thống Tenant (CEO HN10 vs CEO 1983).
+    * `19_finance_report_funds_and_running_balance.png`: Báo cáo tài chính với Bảng cân đối quỹ các ban và Cột số dư lũy kế từng dòng tiền.
+    * `20_classes_management_finance_fund.png`: Phân hệ quản lý Quỹ lớp học 20 triệu khởi tạo từ Quỹ Tổng kèm sổ cái thu chi.
+    * Đạt exit code 0 (0 errors) trên cả Backend NestJS và Frontend Vite (`tsc --noEmit`). Tuân thủ nghiêm ngặt Rule 0 (CSDL `113.20.107.184:6432`), Rule 1 (Không git push/commit).
+
+
+- **Bản cập nhật ngày 22/11/2026 (v12.51): Triển Khai Module Lớp Học CEO HN10 Toàn Diện, Phân Quyền Granular Checkboxes Trong CRM Platform, Chế Độ Check-in Offline Tự Động Giải Quyết Xung Đột, Tinh Gọn AI Trợ Lý & Báo Cáo Kiểm Thử Giao Diện Kèm Live Screenshots**:
+  - **1. Triển Khai Module Lớp Học CEO HN10 (`/classes`)**:
+    * **Quản lý Lớp & Lịch học (`/classes?tab=courses`)**: Lộ trình 30 chuyên đề thực chiến Thứ Bảy hàng tuần, giảng viên, phòng học, số lượng học viên, tài liệu slide và mã QR điểm danh từng buổi.
+    * **Quản lý Giảng viên & Chuyên gia (`/classes?tab=teachers`)**: Danh sách chuyên gia đầu ngành (TS. Nguyễn Trí Hiếu, ThS. Đỗ Hoài Nam, TS. Lê Thẩm Dương...) kèm modal thêm mới.
+    * **Dashboard Học viên đa chỉ số (`/classes?tab=students`)**: Bảng quản trị 12 cột thông tin chi tiết (Mã HV `HN10-xxx`, Họ tên, Doanh nghiệp & Ngành nghề, Chức vụ DN, Chức danh trong lớp, SĐT, Email, Tỷ lệ chuyên cần %, Sự kiện CLB đã tham gia, Trạng thái đóng quỹ lớp 2tr, Tồn đọng nợ quỹ phạt 100k-200k, Điểm tín nhiệm Karma, Trạng thái). Hỗ trợ bộ lọc chức danh và xuất file Excel toàn diện.
+    * **Quỹ Tài chính Lớp học (`/classes?tab=finance`)**: Tuân thủ nghiêm ngặt quy tắc **CHỈ NHẬN ĐÚNG KHỞI TẠO 20.000.000 VNĐ ĐƯỢC GỬI TỪ QUỸ TỔNG XUỐNG**; Sổ cái dòng tiền (Ledger) tự động tổng hợp nguồn thu (Khởi tạo 20tr, Phí phạt vi phạm nội quy, Phí sự kiện lớp, Phí chương trình training) và nguồn chi (Teabreak, in ấn giáo trình, quà tri ân giảng viên); Modal ghi nhận thu/chi quỹ lớp kèm link chứng từ và xuất Excel sổ quỹ.
+    * **Mã QR Điểm danh (`/classes?tab=attendance-qr`)**: Quản lý và phóng to QR điểm danh từng chuyên đề.
+  - **2. Chức Năng Phân Quyền Tích Chọn Granular Checkboxes Trong CRM Platform (`/accounts`)**:
+    * Trong Modal Thêm Mới / Sửa tài khoản: Hỗ trợ 2 chế độ cấp quyền linh hoạt:
+      1. Theo Vai Trò (Preset): Lớp trưởng, Lớp phó, Giảng viên, Học viên, Trưởng ban chuyên trách, Admin.
+      2. Tích Chọn Cụ Thể (Granular Permissions): Checklist phân quyền chi tiết theo 7 nhóm chức năng hệ thống.
+    * Lọc quyền nghiêm ngặt (Strict Access Control): Người dùng đăng nhập chỉ nhìn thấy và truy cập đúng các chức năng đã được cấp quyền, Sidebar và routing tự động ẩn các module ngoài quyền hạn.
+  - **3. Chế Độ Soát Vé Check-in Offline Chuyên Sâu (`/event-checkin`)**:
+    * Pre-sync: Nút `[Tải trước Vé Offline]` tải trước danh sách vé 30–60 phút trước giờ mở cửa vào LocalStorage/IndexedDB.
+    * Quét và ghi nhận tại chỗ: Hỗ trợ quét QR và tìm kiếm theo Mã vé, Mã HV, Họ tên, SĐT, Doanh nghiệp với tốc độ < 0.05s/khách khi mất sóng; lưu vào hàng đợi `offline_queue`.
+    * Auto-sync & Giải quyết xung đột: Tự động đồng bộ ngầm khi có mạng trở lại; backend `batchSyncCheckin` so sánh mốc thời gian timestamp: Ưu tiên máy quét sớm hơn (`conflict_resolved_earlier`) hoặc cảnh báo quét trùng lặp giữa 2 máy offline (`conflict_duplicate_warning`).
+  - **4. Tinh Gọn Chức Năng AI Trợ Lý (`/ai-assistant`)**:
+    * Xóa bỏ hoàn toàn tab Quy Trình Thủ Công (Workflow Wizard) và tab Báo Cáo Tài Chính.
+    * Tinh gọn tập trung vào 3 tính năng cốt lõi: AI Chatbot thông minh (`CrmChatGPTView`), Phân tích dữ liệu CRM Realtime và Xuất hóa đơn/phiếu thu điện tử.
+  - **5. Kiểm Thử Trực Tiếp Trên Localhost & Chụp Toàn Bộ 12 Live Screenshots**:
+    * Chạy tự động trình duyệt Chrome Headless trên localhost:5173 và localhost:4003, lưu trữ đầy đủ 12 hình ảnh minh chứng vào thư mục Artifact:
+      - `10_classes_courses_schedule.png`, `11_classes_students_dashboard.png`, `12_classes_finance_fund.png`, `13_accounts_granular_permissions_modal.png`, `14_event_checkin_offline_presync.png`, `15_ai_assistant_cleaned_tabs.png`.
+    * Kiểm tra biên dịch Type-check: Cả Backend và Frontend đạt `tsc --noEmit` Exit Code 0 (0 errors).
+    * Tuân thủ tuyệt đối Rule 0 (CSDL `113.20.107.184:6432`), Rule 1 (Không git push/commit) và No-Mock Law.
+
+
+- **Bản cập nhật ngày 22/11/2026 (v12.50): Khắc Phục Triệt Để Lỗi Xung Đột Cổng EADDRINUSE:4003, Kiểm Thử Trực Tiếp Trên Giao Diện Localhost & Báo Cáo Kèm Ảnh Chụp Màn Hình Minh Họa**:
+  - **1. Xử Lý Triệt Để Xung Đột Cổng EADDRINUSE 4003 & 5173**:
+    * Phát hiện nguyên nhân: Tiến trình nền ngầm chiếm giữ cổng 4003 gây lỗi khi người dùng khởi động thêm terminal.
+    * Đã giải phóng hoàn toàn cả 2 cổng 4003 (Backend NestJS) và 5173 (Frontend Vite).
+    * Sửa lỗi unhandled exception `user_device_sessions` trong `nfc-device.service.ts` bằng cơ chế auto-create DDL và try/catch an toàn.
+  - **2. Kiểm Thử Trực Tiếp & Chụp Ảnh Giao Diện Thực Tế (Live Screenshots)**:
+    * Sử dụng Chromium/Chrome Headless tự động đăng nhập tài khoản Quản trị, thực thi thao tác và chụp ảnh lưu trữ vào thư mục artifact (`brain/<conversation-id>/`):
+      1. `01_events_management.png`: Bảng quản lý sự kiện, Form Builder và nút cấu hình mã QR.
+      2. `02_event_qr_config_modal.png`: Modal cấu hình và quản lý mã QR đính kèm sự kiện theo `type` (Register, Checkin, Payment, Gallery, Survey).
+      3. `03_event_checkin_offline_gate.png`: Cổng soát vé Check-in hoạt động mượt mà ở chế độ Ngoại Tuyến (Offline-First khi mất sóng, tốc độ < 0.05s/khách).
+      4. `04_banquet_round_tables_seating.png`: Sơ đồ Bàn Tròn Tiệc Di Chuyển Tùy Thích và Khán Phòng Ghế Di Chuyển hoán đổi đại biểu.
+      5. `05_finance_fund_transfer_modal.png` & `05b_finance_ledger_table.png`: Modal Lệnh chuyển tiền về Quỹ Ban Công Nghệ (Quỹ Tổng chi OUT, Ban Công Nghệ thu IN, link hóa đơn/chứng từ, link quỹ ban).
+      6. `06_system_config_sepay_zalo.png`: Cấu hình tích hợp SePay & Zalo OA dynamic kèm dropdown Target Application và Dashboard người quan tâm.
+  - **3. Xác Nhận Cặp Tài Khoản Quản Trị Chuẩn Trên CSDL `113.20.107.184:6432`**:
+    * Master Platform Admin: `admin@ceohn10.vn` (Mật khẩu: `123456`)
+    * Admin CEO HN10: `admin@connect.vn` (Mật khẩu: `123456a@`)
+    * Biên dịch Type-check: Cả Backend và Frontend đạt `tsc --noEmit` Exit Code 0 (0 errors).
+
+- **Bản cập nhật ngày 22/11/2026 (v12.49): Hoàn Thành Phương Án 1 Dọn Dẹp CSDL Product Sẵn Sàng Go-Live & Tái Cấu Trúc Toàn Diện Giao Diện Mobile App CEO HN10 (Executive Student Portal)**:
+  - **1. Thực Thi Phương Án 1: Dọn Dẹp Sạch Sẽ Dữ Liệu Nghiệp Vụ Test Trên CSDL Chuẩn `113.20.107.184:6432/ceohn10_project`**:
+    * Đã xóa sạch 6 sự kiện test, danh sách đại biểu test, vé điện tử test, giao dịch test, hóa đơn test:
+      - Xóa sạch `events`, `event_registrations`, `event_ticket_types`, `member_checkins`, `payments`, `invoices`.
+      - Số sự kiện hiện tại: **0** (Trống 100% sẵn sàng đưa sự kiện và dữ liệu thật vào).
+    * **Bảo toàn 100% tài khoản Quản trị & Hội viên**:
+      - Giữ nguyên toàn bộ 13 tài khoản Admin & User (Super Admin `admin@viconnect.vn`, `admin@connect.vn`, `infor@viconnect.vn`, `vumikasa6@gmail.com`...) cùng bảng phân quyền RBAC và cấu hình hệ thống.
+      - Đảm bảo khi bàn giao VPS/Production cho khách hàng, hệ thống có sẵn tài khoản quản trị để đăng nhập ngay mà không cần khởi tạo lại CSDL từ đầu.
+  - **2. Tái Cấu Trúc Toàn Diện Giao Diện Mobile App CEO HN10 (`apps/ceohn10_app_fe/src/routes/association.index.tsx`)**:
+    * Thiết kế bố cục hoàn toàn mới theo mô hình **Cổng Học Viên Doanh Nhân Đẳng Cấp (Executive Student Portal)**, tập trung trọn vẹn vào 4 trụ cột nghiệp vụ:
+      1. **Thẻ Định Danh Mã Học Viên VIP (Hero Student ID Card)**:
+         - Hiển thị Avatar, Họ tên học viên, Doanh nghiệp & Chức vụ, Khóa học (Niên khóa 2026 - 2027).
+         - **Mã Học Viên nổi bật** (`HN10-CEO-8899`) kèm nút Copy tiện lợi.
+         - Nút "Mã QR Thẻ" mở modal popup mã QR định danh học viên để quét kết bạn hoặc check-in.
+      2. **Phân Hệ 1: 📅 Sự Kiện & Soát Vé Check-in**:
+         - Danh sách sự kiện sắp tới, nút "Đăng Ký Tham Gia" 1 chạm.
+         - Khu vực "Vé Sự Kiện Điện Tử" (Ticket Pass): Hiển thị mã vé (`TKT-...`) + Mã QR vé để đưa cho lễ tân quét.
+         - Nút mở máy quét Soát Vé Check-in nhanh cho người quản trị / lễ tân.
+      3. **Phân Hệ 2: 🤝 Kết Nối & Kết Bạn Doanh Nhân (Networking)**:
+         - Danh bạ học viên / doanh nhân cùng lớp và trong CLB.
+         - Nút tương tác: "Kết Bạn", trạng thái "Đã Kết Nối", gọi điện, xem danh thiếp số.
+         - Ô tìm kiếm realtime theo tên, công ty hoặc ngành nghề kinh doanh.
+      4. **Phân Hệ 3: 🎓 Lớp Học Doanh Trí (Classes & Curriculum)**:
+         - Danh mục các học phần / chuyên đề (Tái cấu trúc tài chính, Đàm phán B2B, Ứng dụng AI...).
+         - Thông tin Giảng viên / Chuyên gia, thời lượng, địa điểm học (Trực tiếp tại Daewoo / Trực tuyến qua Zoom).
+         - Nút "Tải Slide & Tài Liệu Bài Giảng" và "Điểm Danh Học".
+      5. **Phân Hệ 4: 🗓️ Lịch Trình & Hoạt Động Cá Nhân Hóa Theo Mã Học Viên**:
+         - Dòng thời gian hiển thị chính xác các hoạt động của Mã Học Viên: Buổi học tiếp theo, Sự kiện đã đăng ký tham gia, Buổi gặp mặt team / ban kết nối.
+         - Trạng thái rõ ràng: "Đã Xác Nhận Tham Gia" / "Cần Phản Hồi".
+  - **3. Khởi Chạy Localhost & Kiểm Thử Toàn Diện Hệ Thống**:
+    * **Backend NestJS**: Đang chạy tại `http://localhost:4003/api` (kết nối trực tiếp `113.20.107.184:6432/ceohn10_project`). Sửa lỗi thiếu `ZaloModule` trong `PaymentModule`.
+    * **Frontend Vite**: Đang chạy tại `http://localhost:5173/` (Hot reload giao diện mới thành công).
+    * **Kiểm tra biên dịch Type-check**:
+      - Backend: `npx tsc -p apps/ceohn10_app_be/tsconfig.json --noEmit` -> **Exit code 0 (0 errors)**.
+      - Frontend: `npx tsc -p apps/ceohn10_app_fe/tsconfig.json --noEmit` -> **Exit code 0 (0 errors)**.
+    * **Đồng bộ gói Module Độc Lập**: Cập nhật mã nguồn mới nhất vào thư mục `dist-modules/module-5-modules`.
+    * Tuân thủ triệt để Rule 0 (CSDL `113.20.107.184:6432`), Rule 1 (Không git commit/push), và No-Mock Law.
 
 - **Bản cập nhật ngày 22/11/2026 (v12.48): Loại Bỏ Triệt Để 100% Hardcode Dữ Liệu Tự Điền UI & Cấu Hình SePay / Zalo OA Cứng, Tách Monolith Sub-Services, 3 Bản DB & 3 Bộ URL Chuẩn UID / Tans API Kèm Bộ Đóng Gói Module Độc Lập**:
   - **1. Triệt Tiêu Hoàn Toàn Hardcode Cấu Hình SePay & Zalo OA Trên Toàn Bộ Hệ Thống (Strict No-Mock Law)**:

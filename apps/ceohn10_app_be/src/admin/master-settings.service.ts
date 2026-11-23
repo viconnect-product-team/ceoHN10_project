@@ -22,6 +22,8 @@ export class MasterSettingsService {
       const bankAcc = (val.bank_accounts && val.bank_accounts[0]) || {};
       const mergedConfig = {
         is_enabled: val.is_enabled ?? true,
+        target_app: val.target_app || val.targetApp || 'all',
+        target_app_label: val.target_app_label || 'Toàn nền tảng (Áp dụng tất cả phân hệ)',
         api_token: val.api_token || '',
         webhook_token: val.webhook_token || '',
         webhook_url: val.webhook_url || 'https://crm.ceohn10.viconnect.vn/api/webhooks/sepay',
@@ -122,6 +124,14 @@ export class MasterSettingsService {
       configJson,
       updatedBy || 'admin@ceohn10.vn',
     );
+
+    // Đồng bộ sang app_settings (crm_sepay_config)
+    await this.prisma.$executeRawUnsafe(
+      `INSERT INTO public.app_settings (key, value, updated_at)
+       VALUES ('crm_sepay_config', $1::jsonb, NOW())
+       ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, updated_at = NOW()`,
+      configJson,
+    ).catch(() => {});
 
     return {
       success: true,

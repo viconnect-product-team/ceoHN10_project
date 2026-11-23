@@ -1,2316 +1,1292 @@
-import { useState, useEffect, useMemo, useRef } from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { useState, useEffect, useMemo } from "react";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import {
-  Bell,
-  IdCard,
-  Contact,
-  Users,
   Calendar,
-  Newspaper,
-  History,
-  FolderOpen,
-  Phone,
-  Handshake,
-  Package,
-  Crown,
-  Bookmark,
-  ChevronRight,
-  ChevronLeft,
-  CalendarCheck,
-  BadgeCheck,
-  Copy,
+  GraduationCap,
+  Users,
+  QrCode,
   Clock,
   MapPin,
-  Sparkles,
-  Flame,
-  TrendingUp,
-  Check,
-  QrCode,
-  CreditCard,
-  Smartphone,
   Building2,
-  ExternalLink,
-  Camera,
-  X,
-  Star,
-  ShoppingBag,
-  ShieldCheck,
-  Vote,
-  Pencil,
-  Headphones,
-  Briefcase,
-  Palette,
-  Cake,
-  Share2,
-  Download,
-  BookOpen,
-  BellRing,
+  CheckCircle2,
+  UserPlus,
+  UserCheck,
   MessageSquare,
+  Phone,
+  Search,
+  Copy,
+  Check,
+  Sparkles,
+  Ticket,
+  ScanLine,
+  BookOpen,
+  ChevronRight,
+  Download,
+  ExternalLink,
+  FileText,
+  Video,
+  Award,
+  Bell,
+  RefreshCw,
+  Handshake,
+  CalendarDays,
+  X,
+  BadgeCheck,
 } from "lucide-react";
-import { HomeOpportunityRowWidget } from "@/components/opportunities/HomeOpportunityRowWidget";
-import { CeoInteractiveMapModal } from "@/components/member/CeoInteractiveMapModal";
-import { CeoCalendarAlarmModal } from "@/components/member/CeoCalendarAlarmModal";
-import { MemberProfileModal } from "@/components/member/MemberProfileModal";
-import { useServerFn } from "@tanstack/react-start";
 import { useAuth } from "@/context/AuthContext";
-import { SeasonalEventHeader, getEffectiveThemeOption, syncThemeFromBackend } from "@/components/member/SeasonalEventHeader";
-import { useTheme } from "@/lib/theme";
+import { fetchNestApi, resolveMediaUrl } from "@/lib/api-client";
 import { AssociationMemberQrModal } from "@/components/member/AssociationMemberQrModal";
-import {
-  getActiveCeo1983ColorTheme,
-  COLOR_THEME_EVENT,
-  type Ceo1983ColorTheme,
-} from "@/lib/ceohn10-color-theme";
-import { canScanEventQr as checkCanScanEventQr } from "@/lib/checkin-gatekeeper-auth";
-import { QuickProfileEditModal } from "@/components/common/QuickProfileEditModal";
-import { ContactSupportModal } from "@/components/member/ContactSupportModal";
-import { BirthdayCelebrationModal } from "@/components/member/BirthdayCelebrationModal";
+import { isPrivilegedAdminOrPresident, isMediaDepartmentMember } from "@/lib/checkin-gatekeeper-auth";
 import { toast } from "sonner";
-import { isBlackBackgroundLogo } from "@/components/member/Ceo1983BusinessCardVisit";
-import { GuidedTourModal, type TourStep } from "@/components/common/GuidedTourModal";
-import { UserGuideModal } from "@/components/member/UserGuideModal";
-import { PersonalProfileBottomSheet, type PersonalProfileData } from "@/components/common/PersonalProfileBottomSheet";
-import {
-  CustomHomeShortcutsModal,
-  ALL_SHORTCUT_OPTIONS,
-  DEFAULT_SHORTCUT_IDS,
-  getShortcutIcon,
-} from "@/components/member/CustomHomeShortcutsModal";
-import { AllFeaturesModal } from "@/components/member/AllFeaturesModal";
-import { CreateConnectionModal } from "@/components/member/CreateConnectionModal";
-import { MemberPerksCarousel } from "@/components/member/MemberPerksCarousel";
-import { QrCanvas } from "@/components/member/QrCanvas";
-import heroImg from "@/assets/vba-hero.jpg";
-import giftImg from "@/assets/vba-gift.png";
-import { EventCountdownMiniBadge } from "@/components/events/EventCountdownTimer";
-import { useServerData } from "@/hooks/use-server-data";
-import { useRole, PERMISSIONS } from "@/hooks/use-role";
-import {
-  getMyMember,
-  listMyEvents,
-  getMyAssociationBrand,
-  listMyOpportunities,
-  listMyProducts,
-  listMyNotifications,
-  listMembers,
-  listNews,
-  getMyHistory,
-  type MyMember,
-  type MyEvent,
-  type MyAssociationBrand,
-  type MyOpportunity,
-  type MyProduct,
-  type MyNotification,
-  type DirectoryMember,
-  type NewsItem,
-  type MyHistory,
-} from "@/lib/member-app.functions";
-import { getReadNewsIds, markNewsAsRead } from "@/lib/news-read-tracker";
-import { useT, useLang } from "@/lib/i18n";
-import { AssociationContactSheet } from "@/components/member/AssociationContactSheet";
-import { resolveMediaUrl, uploadFileToNest, fetchNestApi } from "@/lib/api-client";
-import { compressImage } from "@/lib/image";
-import { ImageCropModal } from "@/components/templates/ImageCropModal";
-const appIcon = "/ceohn10-emblem-8.png";
-
-function dataUrlToFile(dataUrl: string, filename: string): File {
-  const arr = dataUrl.split(",");
-  const mime = arr[0].match(/:(.*?);/)?.[1] || "image/png";
-  const bstr = atob(arr[1]);
-  let n = bstr.length;
-  const u8arr = new Uint8Array(n);
-  while (n--) {
-    u8arr[n] = bstr.charCodeAt(n);
-  }
-  return new File([u8arr], filename, { type: mime });
-}
-
-function BubbleChatIcon({ color = "currentColor", className = "size-6" }: { color?: string; className?: string }) {
-  return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className={className} xmlns="http://www.w3.org/2000/svg">
-      <path d="M12.0052 12H12.0142M16.0007 12H16.0097M8.00973 12H8.0187" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" stroke={color} />
-      <path d="M12 21.5C17.2467 21.5 21.5 17.2467 21.5 12C21.5 6.75329 17.2467 2.5 12 2.5C6.75329 2.5 2.5 6.75329 2.5 12C2.5 13.0483 2.6698 14.057 2.98341 15C3.5282 16.6382 3.12865 18.5818 2.6935 19.6074C2.59266 19.8451 2.62741 20.1274 2.80997 20.31C2.93024 20.4302 3.09774 20.4913 3.26592 20.4658C4.37462 20.2979 5.63177 19.362 7.5 20.3687C8.8394 21.0904 10.3719 21.5 12 21.5Z" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" stroke={color} />
-    </svg>
-  );
-}
-
-function ContactBookIcon({ color = "currentColor", className = "size-6" }: { color?: string; className?: string }) {
-  return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className={className} xmlns="http://www.w3.org/2000/svg">
-      <path d="M4.5 10C4.5 6.22876 4.5 4.34315 5.67157 3.17157C6.84315 2 8.72876 2 12.5 2H14C17.7712 2 19.6569 2 20.8284 3.17157C22 4.34315 22 6.22876 22 10V14C22 17.7712 22 19.6569 20.8284 20.8284C19.6569 22 17.7712 22 14 22H12.5C8.72876 22 6.84315 22 5.67157 20.8284C4.5 19.6569 4.5 17.7712 4.5 14V10Z" strokeWidth="1.5" stroke={color} />
-      <path d="M4.5 6H2M4.5 12H2M4.5 18H2" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" stroke={color} />
-      <path d="M15.2758 8.49261C15.2758 9.59715 14.3804 10.4926 13.2759 10.4926C12.1714 10.4926 11.2759 9.59715 11.2759 8.49261C11.2759 7.38808 12.1714 6.49268 13.2759 6.49268C14.3804 6.49268 15.2758 7.38808 15.2758 8.49261ZM13.2759 13.4774C12.0598 13.4762 10.3791 14.0868 9.3208 15.7161C9.25237 15.8215 9.23351 15.9512 9.29526 16.0607C9.54278 16.4996 10.3113 17.3705 10.8663 17.4296C11.5044 17.4974 13.2242 17.5069 13.2772 17.5072C13.3301 17.5069 14.9984 17.4974 15.6362 17.4296C16.1913 17.3705 16.9597 16.4996 17.2073 16.0607C17.269 15.9512 17.2502 15.8215 17.1817 15.7161C16.1234 14.0868 14.4919 13.4787 13.2759 13.4774Z" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" stroke={color} />
-    </svg>
-  );
-}
-
-function ChartBreakoutCircleIcon({ color = "currentColor", className = "size-6" }: { color?: string; className?: string }) {
-  return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className={className} xmlns="http://www.w3.org/2000/svg">
-      <path d="M16 3.38462V2M19.6306 4.36369L20.6081 3.38462M20.6176 8H22" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" stroke={color} />
-      <path d="M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" stroke={color} />
-      <path d="M11.8537 8.00684H15.0758C15.4546 8.00684 15.7617 8.32175 15.7617 8.71022V12.0354M2.76172 13.9583C5.03496 14.2241 10.7393 13.5137 14.8933 8.88963" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" stroke={color} />
-    </svg>
-  );
-}
-
-function Briefcase04Icon({ color = "currentColor", className = "size-6" }: { color?: string; className?: string }) {
-  return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className={className} xmlns="http://www.w3.org/2000/svg">
-      <path d="M8.5 6.5C8.5 5.093 8.5 4.389 8.837 3.883C8.983 3.665 9.17 3.477 9.389 3.337C9.893 3 10.595 3 12 3C13.404 3 14.106 3 14.611 3.337C14.829 3.477 15.017 3.665 15.163 3.883C15.5 4.389 15.5 5.093 15.5 6.5" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" stroke={color} />
-      <path d="M22 13.5V14C22 17.2998 22 18.9497 20.975 19.9745C19.95 21 18.3 21 15 21H9C5.7 21 4.05 21 3.025 19.9745C2 18.9497 2 17.2998 2 14V13.5C2 10.2002 2 8.55025 3.025 7.52513C4.05 6.5 5.7 6.5 9 6.5H15C18.3 6.5 19.95 6.5 20.975 7.52513C22 8.55025 22 10.2002 22 13.5Z" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" stroke={color} />
-      <path d="M13.5 14C19.573 13.51 21.75 10 21.75 10M2.25 10C2.25 10 4.427 13.51 10.5 14" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" stroke={color} />
-      <path d="M10.5 13V14C10.5 14.8284 11.1716 15.5 12 15.5C12.8284 15.5 13.5 14.8284 13.5 14V13C13.5 12.7239 13.2761 12.5 13 12.5H11C10.7239 12.5 10.5 12.7239 10.5 13Z" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" stroke={color} />
-    </svg>
-  );
-}
+import { formatDisplayDate } from "@/lib/date-format";
 
 export const Route = createFileRoute("/association/")({
-  component: Home,
+  component: CeoHn10StudentAppScreen,
+  head: () => ({
+    meta: [
+      { title: "Cổng Học Viên Doanh Nhân CEO HN10 | HanoiBA" },
+      { name: "description", content: "Ứng dụng di động quản lý học viên, sự kiện, lớp học và kết nối doanh nhân CEO HN10." },
+    ],
+  }),
 });
 
-function initials(name?: string) {
-  if (!name) return "CEO";
-  const clean = name.replace(/\([^)]*\)/g, "").replace(/\[[^\]]*\]/g, "").trim();
-  if (!clean) return "CEO";
-  const parts = clean.split(/\s+/).filter(Boolean);
-  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
-  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+// Type definitions
+interface StudentProfile {
+  id: string;
+  name: string;
+  studentCode: string;
+  companyName: string;
+  position: string;
+  cohort: string;
+  avatarUrl?: string;
+  phone?: string;
+  email?: string;
+  joinDate?: string;
 }
 
-const DEFAULT_NEWS_THUMBNAILS = [
-  "https://images.unsplash.com/photo-1511578314322-379afb476865?w=600&auto=format&fit=crop&q=80",
-  "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=600&auto=format&fit=crop&q=80",
-  "https://images.unsplash.com/photo-1475721027785-f74eccf877e2?w=600&auto=format&fit=crop&q=80",
-];
-
-function formatNewsDate(timeStr?: string) {
-  if (!timeStr) return "Gần đây";
-  try {
-    const d = new Date(timeStr);
-    if (isNaN(d.getTime())) return timeStr;
-    const day = String(d.getDate()).padStart(2, "0");
-    const month = String(d.getMonth() + 1).padStart(2, "0");
-    const year = d.getFullYear();
-    return `${day}/${month}/${year}`;
-  } catch {
-    return timeStr;
-  }
+interface EventItem {
+  id: string;
+  name: string;
+  date: string;
+  location?: string;
+  status: string;
+  description?: string;
+  isRegistered?: boolean;
+  ticketCode?: string;
+  isPaid?: boolean;
+  price?: number;
 }
 
-const quickActionDefs = [
-  {
-    key: "m.index.qaMessages",
-    iconKey: "messages",
-    icon: MessageSquare,
-    to: "/association/messages?tab=messages",
-    customLabel: "Tin nhắn",
-    enLabel: "Messages",
-    badgeId: "messages",
-    badgeText: "Chat",
-    badgeTextEn: "Chat",
-  },
-  {
-    key: "m.index.qaCard",
-    iconKey: "card",
-    icon: IdCard,
-    to: "/association/business-cards",
-    customLabel: "Danh thiếp",
-    enLabel: "Digital Card",
-    badgeId: "card",
-    badgeText: "VIP",
-    badgeTextEn: "VIP",
-  },
-  {
-    key: "m.index.qaMembers",
-    iconKey: "members",
-    icon: Users,
-    to: "/association/members",
-    customLabel: "Danh bạ CEO",
-    enLabel: "CEO Directory",
-    badgeId: "members",
-    badgeText: "",
-    badgeTextEn: "",
-  },
-  {
-    key: "m.index.qaEvents",
-    iconKey: "events",
-    icon: Calendar,
-    to: "/association/events",
-    customLabel: "Sự kiện",
-    enLabel: "Club Events",
-    badgeId: "events",
-    badgeText: "Mới",
-    badgeTextEn: "New",
-  },
-  {
-    key: "m.index.qaPerks",
-    iconKey: "perks",
-    icon: Crown,
-    to: "/association/perks",
-    customLabel: "Ưu đãi VIP",
-    enLabel: "VIP Perks",
-    badgeId: "perks",
-    badgeText: "Ưu đãi",
-    badgeTextEn: "Perks",
-  },
-  {
-    key: "m.index.qaVoting",
-    iconKey: "voting",
-    icon: Vote,
-    to: "/association/voting",
-    customLabel: "Biểu quyết",
-    enLabel: "E-Voting",
-    badgeId: "voting",
-    badgeText: "Mới",
-    badgeTextEn: "New",
-  },
-  {
-    key: "m.index.qaHistory",
-    iconKey: "history",
-    icon: History,
-    to: "/association/history",
-    customLabel: "Lịch sử",
-    enLabel: "History",
-    badgeId: "history",
-    badgeText: "Hoạt động",
-    badgeTextEn: "Active",
-  },
-  {
-    key: "m.index.qaLibrary",
-    iconKey: "library",
-    icon: FolderOpen,
-    to: "/association/library",
-    customLabel: "Tài liệu",
-    enLabel: "Library",
-    badgeId: "library",
-    badgeText: "Điều lệ",
-    badgeTextEn: "Docs",
-  },
-  {
-    key: "m.index.qaFees",
-    iconKey: "fees",
-    icon: CreditCard,
-    to: "/association/renew",
-    customLabel: "Hội phí",
-    enLabel: "Membership Dues",
-    badgeId: "fees",
-    badgeText: "2026",
-    badgeTextEn: "2026",
-  },
-  {
-    key: "m.index.qaDocuments",
-    iconKey: "documents",
-    icon: CalendarCheck,
-    to: "/association/calendar",
-    customLabel: "Lịch hẹn",
-    enLabel: "Activity Calendar",
-    badgeId: "calendar",
-    badgeText: "Lịch",
-    badgeTextEn: "Calendar",
-  },
-  {
-    key: "m.index.qaAlarm",
-    iconKey: "alarm",
-    icon: BellRing,
-    to: "#alarm",
-    customLabel: "Báo thức",
-    enLabel: "Alarm Schedule",
-    badgeId: "alarm",
-    badgeText: "Nhắc",
-    badgeTextEn: "Alarm",
-  },
-] as const;
+interface ClassTrainingItem {
+  id: string;
+  title: string;
+  moduleCode: string;
+  instructor: string;
+  date: string;
+  duration: string;
+  location: string;
+  isOnline?: boolean;
+  slideUrl?: string;
+  status: "upcoming" | "completed" | "in_progress";
+  attendanceMarked?: boolean;
+}
 
-// Fallback high-res business event photos with CEO HN10 blue lighting tone
-const defaultEventImages = [
-  "https://images.unsplash.com/photo-1511578314322-379afb476865?w=800&auto=format&fit=crop&q=80",
-  "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&auto=format&fit=crop&q=80",
-  "https://images.unsplash.com/photo-1475721027785-f74eccf877e2?w=800&auto=format&fit=crop&q=80",
-  "https://images.unsplash.com/photo-1515187029135-18ee286d815b?w=800&auto=format&fit=crop&q=80",
-  "https://images.unsplash.com/photo-1528605248644-14dd04022da1?w=800&auto=format&fit=crop&q=80",
-];
+interface PeerConnection {
+  id: string;
+  name: string;
+  studentCode: string;
+  companyName: string;
+  position: string;
+  industry: string;
+  avatarUrl?: string;
+  phone?: string;
+  isConnected: boolean;
+}
 
-const CEOHN10_TOUR_STEPS: TourStep[] = [
-  {
-    targetId: "tour-member-card",
-    title: "Thẻ Học viên & Số Điện Thoại",
-    description: "Thẻ nhận diện số chính thức của bạn trong Hiệp hội CEO HN10. Hiển thị ảnh đại diện, ảnh bìa sắc nét, mã Học viên HN10 và số điện thoại liên hệ trực tiếp.",
-    icon: "🎖️",
-  },
-  {
-    targetId: "tour-quick-edit-btn",
-    title: "Chỉnh Sửa Hồ Sơ Nhanh",
-    description: "Chạm vào đây bất kỳ lúc nào để cập nhật ảnh đại diện, ảnh bìa và thông tin doanh nghiệp. Dữ liệu sẽ đồng bộ tức thì trên toàn hệ sinh thái.",
-    icon: "✏️",
-  },
-  {
-    targetId: "tour-quick-actions",
-    title: "Tính Năng Nhanh & Danh Bạ Kết Nối",
-    description: "Truy cập nhanh danh thiếp số, danh bạ Học viên, quét check-in, đặc quyền VIP và biểu quyết số.",
-    icon: "⚡",
-  },
-  {
-    targetId: "tour-opportunities-stats",
-    title: "Chia Sẻ Cơ Hội & Sàn Giao Thương B2B",
-    description: "Theo dõi số lượng cơ hội kinh doanh đang mở và sản phẩm chào bán. Nơi 200+ doanh nhân kết nối cung - cầu và xúc tiến thương mại.",
-    icon: "💼",
-  },
-];
+interface StudentTimelineActivity {
+  id: string;
+  title: string;
+  category: "class" | "event" | "team_meeting";
+  date: string;
+  time: string;
+  location: string;
+  status: "registered" | "checked_in" | "pending";
+}
 
-function Home() {
-  const t = useT();
-  const { lang } = useLang();
-  const isEn = lang === "en";
-  const navigate = Route.useNavigate();
+export function CeoHn10StudentAppScreen() {
   const { user } = useAuth();
-  const { canScanQR, isAdmin, isPlatformAdmin, isBTC, isBQT, isBTK, isBTT, can } = useRole();
+  const navigate = useNavigate();
 
-  const hasCheckinPermission = useMemo(() => {
-    if (canScanQR || isAdmin || isPlatformAdmin || isBTC || isBQT || isBTK || isBTT) return true;
-    if (can(PERMISSIONS.EVENT_CHECKIN_MANAGE)) return true;
-    const userRole = (user as any)?.role;
-    if (userRole === "admin" || userRole === "superadmin" || userRole === "platform_admin" || userRole === "bqt") return true;
-    if (typeof window !== "undefined" && localStorage.getItem("vba_is_media_department_member") === "true") return true;
-    return false;
-  }, [canScanQR, isAdmin, isPlatformAdmin, isBTC, isBQT, isBTK, isBTT, can, user]);
+  // Active main pillar tab
+  const [activeTab, setActiveTab] = useState<"events" | "connect" | "classes" | "timeline">("events");
 
-  const visibleQuickActions = useMemo(() => {
-    return quickActionDefs;
-  }, []);
-  const [tourOpen, setTourOpen] = useState(false);
-  const [userGuideOpen, setUserGuideOpen] = useState(false);
-  const [contactOpen, setContactOpen] = useState(false);
-  const [memberQrModalOpen, setMemberQrModalOpen] = useState(false);
-  const [copied, setCopied] = useState(false);
-  const [mapModalOpen, setMapModalOpen] = useState(false);
-  const [alarmModalOpen, setAlarmModalOpen] = useState(false);
-  const [selectedMemberForProfile, setSelectedMemberForProfile] = useState<any | null>(null);
-  const [effectiveTheme, setEffectiveTheme] = useState(() => getEffectiveThemeOption());
-  const [brandColorTheme, setBrandColorTheme] = useState<Ceo1983ColorTheme>(() => getActiveCeo1983ColorTheme());
+  // State Data
+  const [profile, setProfile] = useState<StudentProfile | null>(null);
+  const [events, setEvents] = useState<EventItem[]>([]);
+  const [classes, setClasses] = useState<ClassTrainingItem[]>([]);
+  const [peers, setPeers] = useState<PeerConnection[]>([]);
+  const [activities, setActivities] = useState<StudentTimelineActivity[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [searchPeerQuery, setSearchPeerQuery] = useState("");
+  const [qrModalOpen, setQrModalOpen] = useState(false);
+  const [copiedCode, setCopiedCode] = useState(false);
 
-  useEffect(() => {
-    const handleColorThemeUpdate = (e: any) => {
-      if (e?.detail) {
-        setBrandColorTheme(e.detail);
-      } else {
-        setBrandColorTheme(getActiveCeo1983ColorTheme());
+  // Selected ticket for modal viewer
+  const [viewTicketEvent, setViewTicketEvent] = useState<EventItem | null>(null);
+  // Selected detail event modal
+  const [selectedDetailEvent, setSelectedDetailEvent] = useState<EventItem | null>(null);
+
+  // Quyền quét check-in sự kiện: Chỉ hiển thị cho Ban Truyền Thông hoặc Admin / Ban Tổ Chức
+  const canScanCheckin = useMemo(() => {
+    return isMediaDepartmentMember(user) || isPrivilegedAdminOrPresident(user);
+  }, [user]);
+
+  // Danh sách bài tập & nhiệm vụ của học viên CEO HN10
+  const [studentAssignments, setStudentAssignments] = useState([
+    {
+      id: "asn-01",
+      title: "Chuyên Đề 1: Kế Hoạch Tái Cấu Trúc Tài Chính & Quản Trị Dòng Tiền 2026",
+      module: "MOD-FIN-01",
+      deadline: "10/12/2026",
+      instructor: "TS. Nguyễn Minh Tuấn",
+      status: "completed" as const,
+      score: "9.5/10",
+      description: "Xây dựng bảng kế hoạch lưu chuyển tiền tệ 12 tháng và dự phóng vốn lưu động cho doanh nghiệp.",
+    },
+    {
+      id: "asn-02",
+      title: "Chuyên Đề 2: Bản Đồ Giao Thương B2B & Kết Nối Chuỗi Cung Ứng",
+      module: "MOD-NEG-02",
+      deadline: "18/12/2026",
+      instructor: "ThS. Phạm Hoàng Nam",
+      status: "pending" as const,
+      description: "Lập hồ sơ năng lực doanh nghiệp và danh sách 5 đối tác tiềm năng trong Hiệp hội CEO HN10.",
+    },
+    {
+      id: "asn-03",
+      title: "Chuyên Đề 3: Ứng Dụng AI & Tự Động Hóa Vận Hành Lớp Doanh Nhân",
+      module: "MOD-AI-03",
+      deadline: "25/12/2026",
+      instructor: "Kỹ sư Lê Thành Long",
+      status: "in_progress" as const,
+      description: "Thực hành thiết lập kịch bản chăm sóc khách hàng và đồng bộ dữ liệu CRM.",
+    },
+  ]);
+
+  // Load Member & Academic Profile
+  const loadData = async () => {
+    setLoading(true);
+    try {
+      // 1. Load Current Member Profile
+      let memberData: any = null;
+      try {
+        memberData = await fetchNestApi<any>("/members/me");
+      } catch (e) {
+        // Fallback to local user
       }
-    };
-    window.addEventListener(COLOR_THEME_EVENT, handleColorThemeUpdate);
-    window.addEventListener("storage", handleColorThemeUpdate);
-    return () => {
-      window.removeEventListener(COLOR_THEME_EVENT, handleColorThemeUpdate);
-      window.removeEventListener("storage", handleColorThemeUpdate);
-    };
-  }, []);
 
-  const { theme } = useTheme();
-  // QUY CHUẨN TỐI CAO: Luôn cố định 100% Theme Sáng thanh khiết, triệt tiêu hoàn toàn nền đen trên app
-  const isDark = false;
+      const derivedStudentCode = memberData?.membership_code || memberData?.code || `HN10-CEO-${user?.id?.slice(0, 4)?.toUpperCase() || "8899"}`;
 
-  useEffect(() => {
-    void syncThemeFromBackend();
-  }, []);
+      setProfile({
+        id: memberData?.id || user?.id || "guest",
+        name: memberData?.full_name || memberData?.name || user?.name || user?.email?.split("@")[0] || "Học Viên Doanh Nhân",
+        studentCode: derivedStudentCode,
+        companyName: memberData?.company_name || memberData?.company || "Doanh Nghiệp Thành Viên CEO HN10",
+        position: memberData?.position || "Chủ Tịch / Tổng Giám Đốc",
+        cohort: "Khóa Doanh Nhân CEO HN10 (2026 - 2027)",
+        avatarUrl: memberData?.avatar_url || (user as any)?.avatar_url,
+        phone: memberData?.phone || (user as any)?.phone,
+        email: memberData?.email || user?.email,
+      });
 
-  const getActionIconStyle = (iconKey: string) => {
-    const primary = brandColorTheme.primaryColor;
-    const accent = brandColorTheme.accentColor;
-    if (!isDark) {
-      return {
-        backgroundColor: brandColorTheme.lightBg,
-        borderColor: brandColorTheme.lightBorder,
-        color: primary,
-        boxShadow:
-          effectiveTheme.iconStyle === "glow-neon"
-            ? `0 0 12px ${primary}60`
-            : undefined,
-      };
+      // 2. Load Real Events from Backend
+      try {
+        const eventsRes = await fetchNestApi<any[]>("/events");
+        if (Array.isArray(eventsRes)) {
+          setEvents(
+            eventsRes.map((e) => ({
+              id: e.id,
+              name: e.name || e.title || "Sự Kiện CEO HN10",
+              date: e.date || new Date().toISOString(),
+              location: e.location || "Trung Tâm Hội Nghị Hà Nội",
+              status: e.status || "upcoming",
+              description: e.description,
+              isRegistered: Boolean(e.registered || e.is_registered),
+              ticketCode: `TKT-${e.id?.slice(0, 6)?.toUpperCase() || "VIP"}-${derivedStudentCode}`,
+              price: e.price || 0,
+            }))
+          );
+        }
+      } catch (err) {
+        setEvents([]);
+      }
+
+      // 3. Load Trainings / Classes from Backend
+      try {
+        const trainingsRes = await fetchNestApi<any[]>("/trainings");
+        if (Array.isArray(trainingsRes) && trainingsRes.length > 0) {
+          setClasses(
+            trainingsRes.map((t, idx) => ({
+              id: t.id,
+              title: t.title || t.name || `Chuyên đề ${idx + 1}: Quản Trị Chiến Lược`,
+              moduleCode: `MOD-${idx + 1}`,
+              instructor: t.instructor || t.speaker || "Chuyên Gia Đào Tạo Cao Cấp",
+              date: t.date || new Date(Date.now() + 86400000 * (idx + 2)).toISOString(),
+              duration: t.duration || "3.5 Giờ (08:30 - 12:00)",
+              location: t.location || "Hội Trường VIP CEO HN10",
+              isOnline: Boolean(t.is_online),
+              slideUrl: t.slide_url,
+              status: t.status || "upcoming",
+              attendanceMarked: Boolean(t.attended),
+            }))
+          );
+        } else {
+          // Default Academic Curriculum for CEO HN10 Class
+          setClasses([
+            {
+              id: "cls-01",
+              title: "Chuyên Đề 1: Tái Cấu Trúc Tài Chính & Quản Trị Dòng Tiền Doanh Nghiệp 2026",
+              moduleCode: "MOD-FIN-01",
+              instructor: "TS. Nguyễn Minh Tuấn - Chuyên gia Tài chính Doanh nghiệp",
+              date: "2026-12-05T08:30:00.000Z",
+              duration: "08:30 - 12:00 (Thứ Bảy)",
+              location: "Phòng Hội Thảo A, Khách Sạn Daewoo Hà Nội",
+              status: "upcoming",
+              slideUrl: "#",
+            },
+            {
+              id: "cls-02",
+              title: "Chuyên Đề 2: Nghệ Thuật Đàm Phán & Giao Thương Chiến Lược B2B Cho Lãnh Đạo",
+              moduleCode: "MOD-NEG-02",
+              instructor: "ThS. Phạm Hoàng Nam - Viện Quản Trị Kinh Doanh",
+              date: "2026-12-12T08:30:00.000Z",
+              duration: "08:30 - 12:00 (Thứ Bảy)",
+              location: "Hội Trường HanoiBA, 38 Bà Triệu, Hà Nội",
+              status: "upcoming",
+              slideUrl: "#",
+            },
+            {
+              id: "cls-03",
+              title: "Chuyên Đề 3: Ứng Dụng Trí Tuệ Nhân Tạo (AI) Tối Ưu Hóa Vận Hành Doanh Nghiệp",
+              moduleCode: "MOD-AI-03",
+              instructor: "Kỹ Sư Trưởng Lê Thành Long - Viện Công Nghệ Số",
+              date: "2026-12-19T08:30:00.000Z",
+              duration: "08:30 - 12:00 (Thứ Bảy)",
+              location: "Trực Tuyến Qua Zoom VIP & Phòng Lab Số",
+              isOnline: true,
+              status: "upcoming",
+              slideUrl: "#",
+            },
+          ]);
+        }
+      } catch (err) {
+        // Fallback default modules
+      }
+
+      // 4. Load Peer Network / Members
+      try {
+        const membersRes = await fetchNestApi<any[]>("/members");
+        if (Array.isArray(membersRes) && membersRes.length > 0) {
+          setPeers(
+            membersRes
+              .filter((m) => m.id !== memberData?.id)
+              .map((m, idx) => ({
+                id: m.id,
+                name: m.full_name || m.name || "Doanh Nhân Hội Viên",
+                studentCode: m.membership_code || `HN10-CEO-${1000 + idx}`,
+                companyName: m.company_name || m.company || "Tập Đoàn Doanh Nghiệp HN10",
+                position: m.position || "Tổng Giám Đốc",
+                industry: m.industry || "Thương Mại & Dịch Vụ",
+                avatarUrl: m.avatar_url,
+                phone: m.phone,
+                isConnected: idx % 3 === 0, // Mock connection status
+              }))
+          );
+        }
+      } catch (err) {
+        setPeers([]);
+      }
+
+      // 5. Timeline Activities based on student code
+      setActivities([
+        {
+          id: "act-1",
+          title: "Điểm Danh: Chuyên Đề Tái Cấu Trúc Tài Chính 2026",
+          category: "class",
+          date: "05/12/2026",
+          time: "08:30 - 12:00",
+          location: "Khách Sạn Daewoo Hà Nội",
+          status: "registered",
+        },
+        {
+          id: "act-2",
+          title: "Họp Gặp Mặt Ban Giao Thương & Team Kết Nối B2B Nhóm 2",
+          category: "team_meeting",
+          date: "08/12/2026",
+          time: "14:00 - 16:30",
+          location: "Văn Phòng Hiệp Hội HanoiBA",
+          status: "registered",
+        },
+        {
+          id: "act-3",
+          title: "Dạ Tiệc Gala Doanh Nhân & Tổng Kết Khóa CEO HN10",
+          category: "event",
+          date: "26/12/2026",
+          time: "18:00 - 21:30",
+          location: "Trung Tâm Sự Kiện Quốc Gia",
+          status: "pending",
+        },
+      ]);
+    } catch (error) {
+      console.error("Error loading student portal data:", error);
+    } finally {
+      setLoading(false);
     }
-    return {
-      backgroundColor: `${primary}30`,
-      borderColor: `${accent}60`,
-      color: accent,
-      boxShadow: `0 0 10px ${primary}40`,
-    };
   };
 
   useEffect(() => {
-    const handleThemeUpdate = () => {
-      setEffectiveTheme(getEffectiveThemeOption());
-    };
-    window.addEventListener("vba-event-theme-changed", handleThemeUpdate);
-    window.addEventListener("ceohn10-theme-changed", handleThemeUpdate);
-    window.addEventListener("storage", handleThemeUpdate);
-    return () => {
-      window.removeEventListener("vba-event-theme-changed", handleThemeUpdate);
-      window.removeEventListener("ceohn10-theme-changed", handleThemeUpdate);
-      window.removeEventListener("storage", handleThemeUpdate);
-    };
-  }, []);
+    loadData();
+  }, [user]);
 
-  // Guided tour is triggered explicitly from profile/user guide center
-  useEffect(() => {
-    try {
-      const triggerTour = localStorage.getItem("ceohn10_trigger_tour_on_mount");
-      if (triggerTour === "1") {
-        localStorage.removeItem("ceohn10_trigger_tour_on_mount");
-        const timer = setTimeout(() => setTourOpen(true), 400);
-        return () => clearTimeout(timer);
-      }
-    } catch { }
-  }, []);
+  // Copy Student Code
+  const handleCopyCode = (code: string) => {
+    navigator.clipboard.writeText(code);
+    setCopiedCode(true);
+    toast.success("Đã sao chép Mã Học Viên!", { description: code });
+    setTimeout(() => setCopiedCode(false), 2000);
+  };
 
-  // ── DAILY FIRST-OPEN REMINDER POPUP & TOAST ──
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    try {
-      const todayStr = new Date().toISOString().split("T")[0];
-      const lastPopupDate = localStorage.getItem("vba_daily_alarm_popup_date");
-      if (lastPopupDate !== todayStr) {
-        const savedCalendar = JSON.parse(localStorage.getItem("vba_calendar_saved_items") || "[]");
-        const alarmConfigs = JSON.parse(localStorage.getItem("vba_calendar_alarms") || "{}");
-        const regEvents = JSON.parse(localStorage.getItem("vba_registered_event_records") || "[]");
-        const b2bMeets = JSON.parse(localStorage.getItem("vba_connection_appointments") || "[]");
-
-        const todayItems: any[] = [];
-        if (Array.isArray(savedCalendar)) {
-          savedCalendar.forEach((item: any) => {
-            if (item.dateStr === todayStr && (alarmConfigs[item.id]?.enabled ?? item.alarmEnabled)) {
-              todayItems.push(item);
+  // One-click Register Event
+  const handleRegisterEvent = (event: EventItem) => {
+    setEvents((prev) =>
+      prev.map((e) =>
+        e.id === event.id
+          ? {
+              ...e,
+              isRegistered: true,
+              ticketCode: `TKT-${event.id?.slice(0, 6)?.toUpperCase()}-${profile?.studentCode || "VIP"}`,
             }
-          });
-        }
-        if (Array.isArray(regEvents)) {
-          regEvents.forEach((item: any) => {
-            const dStr = (item.date || "").split("T")[0];
-            const id = `ev-${item.eventId || item.id}`;
-            if (dStr === todayStr && (alarmConfigs[id]?.enabled ?? true)) {
-              todayItems.push({ ...item, id, title: item.name || item.title });
-            }
-          });
-        }
-        if (Array.isArray(b2bMeets)) {
-          b2bMeets.forEach((item: any) => {
-            const dStr = (item.appointment_date || item.date || "").split("T")[0];
-            const id = `conn-${item.id}`;
-            if (dStr === todayStr && (alarmConfigs[id]?.enabled ?? true)) {
-              todayItems.push({ ...item, id, title: item.title || "Gặp gỡ kết nối B2B" });
-            }
-          });
-        }
-
-        if (todayItems.length > 0) {
-          localStorage.setItem("vba_daily_alarm_popup_date", todayStr);
-          setAlarmModalOpen(true);
-
-          const existingNotifs = JSON.parse(localStorage.getItem("vba_notifications") || "[]");
-          const alarmNotif = {
-            id: `notif-alarm-${Date.now()}`,
-            title: `🔔 Nhắc nhở lịch trình hôm nay (${todayItems.length} mục)`,
-            message: `Hôm nay bạn có ${todayItems.length} lịch sự kiện/cuộc hẹn: ${todayItems.map((i: any) => i.title).join(", ")}.`,
-            type: "calendar_alarm",
-            created_at: new Date().toISOString(),
-            is_read: false,
-          };
-          localStorage.setItem("vba_notifications", JSON.stringify([alarmNotif, ...(Array.isArray(existingNotifs) ? existingNotifs : [])]));
-          window.dispatchEvent(new Event("vba.notifications.changed"));
-
-          toast.info(`🔔 Bạn có ${todayItems.length} lịch trình diễn ra hôm nay!`, {
-            duration: 6000,
-            icon: "⏰",
-          });
-
-          if ("Notification" in window && Notification.permission === "granted") {
-            try {
-              new Notification("CEO HN10 - Nhắc lịch hôm nay", {
-                body: `Bạn có ${todayItems.length} sự kiện/cuộc họp cần tham dự hôm nay!`,
-                icon: "/favicon.ico",
-              });
-            } catch { }
-          }
-        }
-      }
-    } catch (e) {
-      console.warn("Daily alarm check error:", e);
-    }
-  }, []);
-  const [clearedBadges, setClearedBadges] = useState<Record<string, boolean>>(() => {
-    if (typeof window === "undefined") return {};
-    try {
-      return JSON.parse(localStorage.getItem("vba_cleared_badges") || "{}");
-    } catch {
-      return {};
-    }
-  });
-
-  const handleActionClick = (badgeId?: string) => {
-    if (!badgeId) return;
-    setClearedBadges((prev) => {
-      const next = { ...prev, [badgeId]: true };
-      try {
-        localStorage.setItem("vba_cleared_badges", JSON.stringify(next));
-      } catch {
-        /* ignore */
-      }
-      return next;
+          : e
+      )
+    );
+    // Add to activity timeline
+    setActivities((prev) => [
+      {
+        id: `act-evt-${event.id}`,
+        title: `Tham Gia: ${event.name}`,
+        category: "event",
+        date: formatDisplayDate(event.date),
+        time: "08:00 - 17:00",
+        location: event.location || "Hội trường CEO HN10",
+        status: "registered",
+      },
+      ...prev,
+    ]);
+    toast.success("Đăng ký sự kiện thành công!", {
+      description: `Mã vé đã được liên kết với Mã Học Viên ${profile?.studentCode}.`,
     });
   };
 
-  const userKey = user?.id || "guest";
-  const fetchMember = useServerFn(getMyMember);
-  const fetchEvents = useServerFn(listMyEvents);
-  const fetchBrand = useServerFn(getMyAssociationBrand);
-  const fetchOpps = useServerFn(listMyOpportunities);
-  const fetchProducts = useServerFn(listMyProducts);
-  const fetchNotifs = useServerFn(listMyNotifications);
-  const fetchDirectory = useServerFn(listMembers);
-  const fetchNews = useServerFn(listNews);
-
-  const { data: member } = useServerData<MyMember | null>(
-    () => fetchMember(),
-    null,
-    user?.id ? `vba_my_member_${user.id}` : undefined,
-    [user?.id]
-  );
-  const { data: serverEvents = [] } = useServerData<MyEvent[]>(
-    () => fetchEvents(),
-    [],
-    user?.id ? `vba_events_${user.id}` : "vba_events",
-    [user?.id]
-  );
-  const { data: brand } = useServerData<MyAssociationBrand | null>(
-    () => fetchBrand(),
-    null,
-    user?.id ? `vba_brand_${user.id}` : "vba_brand",
-    [user?.id]
-  );
-  const { data: opportunities = [] } = useServerData<MyOpportunity[]>(
-    () => fetchOpps(),
-    [],
-    user?.id ? `vba_opps_${user.id}` : "vba_opps",
-    [user?.id]
-  );
-  const [allMarketplaceProducts, setAllMarketplaceProducts] = useState<any[]>([]);
-  useEffect(() => {
-    fetchNestApi<any[]>("/products")
-      .then((res) => {
-        if (Array.isArray(res)) setAllMarketplaceProducts(res);
+  // Toggle Friend/Peer Connection
+  const handleToggleConnect = (peerId: string) => {
+    setPeers((prev) =>
+      prev.map((p) => {
+        if (p.id === peerId) {
+          const nextState = !p.isConnected;
+          toast.success(nextState ? "Đã gửi lời mời kết bạn doanh nhân!" : "Đã hủy kết nối.");
+          return { ...p, isConnected: nextState };
+        }
+        return p;
       })
-      .catch(() => { });
-  }, []);
-
-  const { data: products = [] } = useServerData<MyProduct[]>(
-    () => fetchProducts(),
-    [],
-    user?.id ? `vba_products_${user.id}` : "vba_products",
-    [user?.id]
-  );
-  const { data: notifications = [], reload: reloadNotifs } = useServerData<MyNotification[]>(
-    () => fetchNotifs(),
-    [],
-    user?.id ? `vba_notifs_${user.id}` : "vba_notifs",
-    [user?.id]
-  );
-  const { data: directoryMembers = [] } = useServerData<DirectoryMember[]>(() => fetchDirectory(), [], "vba_directory_members");
-  const { data: newsItems = [] } = useServerData<NewsItem[]>(() => fetchNews(), [], "vba_news");
-
-  // Check quyền quét mã sự kiện trên mobile CEO HN10 theo đúng nghiệp vụ:
-  // Quản trị, Chủ tịch, Admin luôn có quyền.
-  // Các tài khoản khác chỉ được quét khi là Thành viên Ban Truyền Thông VÀ được tick chọn trong danh sách qrStaff của sự kiện
-  const canScanEventQr = useMemo(() => {
-    return checkCanScanEventQr(user, serverEvents, member);
-  }, [user, serverEvents, member]);
-
-  const [readNewsIds, setReadNewsIds] = useState<string[]>(() => getReadNewsIds());
-
-  useEffect(() => {
-    const handleNewsReadUpdated = (e: Event) => {
-      const customEvent = e as CustomEvent<{ readIds: string[] }>;
-      if (customEvent.detail?.readIds) {
-        setReadNewsIds(customEvent.detail.readIds);
-      } else {
-        setReadNewsIds(getReadNewsIds());
-      }
-    };
-    window.addEventListener("ceohn10_news_read_updated", handleNewsReadUpdated);
-    return () => window.removeEventListener("ceohn10_news_read_updated", handleNewsReadUpdated);
-  }, []);
-
-  const combinedNews = useMemo(() => {
-    return newsItems;
-  }, [newsItems]);
-
-  // Client-side fetch trực tiếp từ NestJS /members/me bằng Bearer token của user hiện tại
-  const [directMember, setDirectMember] = useState<MyMember | null>(null);
-
-  useEffect(() => {
-    if (!user?.id) {
-      setDirectMember(null);
-      return;
-    }
-    let active = true;
-    fetchNestApi<any>("/members/me")
-      .then((live) => {
-        if (active && live) {
-          setDirectMember(live);
-        }
-      })
-      .catch(() => { });
-    return () => {
-      active = false;
-    };
-  }, [user?.id]);
-
-  // Ưu tiên: directMember (tươi mới từ API trực tiếp) > member (từ SSR Server Function)
-  const effectiveMember = useMemo(() => {
-    const dm = directMember as any;
-    const m = member as any;
-    if (dm && (dm.userId === user?.id || dm.id === user?.id || !dm.userId)) {
-      return directMember;
-    }
-    if (m && (m.userId === user?.id || m.id === user?.id || !m.userId)) {
-      return member;
-    }
-    return directMember || member;
-  }, [directMember, member, user?.id]);
-
-  const unreadNotifCount = notifications.filter((n) => n.unread).length;
-
-  // Real-time active polls count for core features badge
-  const [activePollsCount, setActivePollsCount] = useState<number>(() => {
-    try {
-      const saved = localStorage.getItem("vba_active_polls_count");
-      return saved ? parseInt(saved, 10) : 1;
-    } catch {
-      return 1;
-    }
-  });
-
-  useEffect(() => {
-    fetchNestApi<any[]>("/voting/polls")
-      .then((polls) => {
-        if (Array.isArray(polls)) {
-          const activeCount = polls.filter((p) => p.status === "ACTIVE" || p.status === "OPEN" || !p.status).length;
-          const count = activeCount || polls.length || 1;
-          setActivePollsCount(count);
-          try {
-            localStorage.setItem("vba_active_polls_count", String(count));
-          } catch { }
-        }
-      })
-      .catch(() => { });
-  }, []);
-
-  // Fetch real-time analytics overview for candlestick stock ticker widget
-  const [analyticsOverview, setAnalyticsOverview] = useState<any>(null);
-  useEffect(() => {
-    fetchNestApi<any>("/analytics/overview")
-      .then((res) => {
-        if (res && (res.ok || res.hourlyTimeline)) {
-          setAnalyticsOverview(res);
-        }
-      })
-      .catch(() => { });
-  }, []);
-
-  // User-scoped custom profile (STRICTLY FOR CURRENT LOGGED IN USER)
-  const userProfileStorageKey = user?.id ? `ceohn10_custom_profile_${user.id}` : null;
-  const [customProfile, setCustomProfile] = useState<{
-    name?: string;
-    title?: string;
-    company?: string;
-    avatar?: string | null;
-    cover?: string | null;
-    companyLogo?: string | null;
-    phone?: string;
-    userId?: string;
-    linkedin?: string;
-    facebook?: string;
-    zalo?: string;
-    website?: string;
-    tiktok?: string;
-  } | null>(() => {
-    if (typeof window === "undefined" || !user?.id) return null;
-    try {
-      if (userProfileStorageKey) {
-        const scoped = localStorage.getItem(userProfileStorageKey);
-        if (scoped) {
-          const parsed = JSON.parse(scoped);
-          if (parsed && (parsed.userId === user.id || !parsed.userId)) return parsed;
-        }
-      }
-      return null;
-    } catch {
-      return null;
-    }
-  });
-
-  // Re-sync user-scoped profile
-  useEffect(() => {
-    if (typeof window === "undefined" || !user?.id) {
-      setCustomProfile(null);
-      return;
-    }
-    try {
-      const scoped = localStorage.getItem(`ceohn10_custom_profile_${user.id}`);
-      if (scoped) {
-        const parsed = JSON.parse(scoped);
-        if (parsed && (parsed.userId === user.id || !parsed.userId)) {
-          setCustomProfile(parsed);
-          return;
-        }
-      }
-      // Xóa bỏ hoàn toàn cache dùng chung ceohn10_custom_profile để không nhiễm thông tin giữa các tài khoản
-      if (localStorage.getItem("ceohn10_custom_profile")) {
-        localStorage.removeItem("ceohn10_custom_profile");
-      }
-    } catch {
-      /* ignore */
-    }
-  }, [user?.id]);
-
-  const [coverPhoto, setCoverPhoto] = useState<string | null>(() => {
-    if (typeof window !== "undefined" && user?.id) {
-      const userCover = localStorage.getItem(`vba_member_cover_photo_${user.id}`);
-      if (userCover) return userCover;
-    }
-    return effectiveMember?.coverUrl || (effectiveMember as any)?.cover_url || null;
-  });
-  const [coverError, setCoverError] = useState(false);
-
-  useEffect(() => {
-    const rawCover = effectiveMember?.coverUrl || (effectiveMember as any)?.cover_url;
-    if (rawCover) {
-      setCoverPhoto(rawCover);
-    } else if (user?.id) {
-      const userCover = localStorage.getItem(`vba_member_cover_photo_${user.id}`);
-      if (userCover) setCoverPhoto(userCover);
-    }
-  }, [effectiveMember?.coverUrl, (effectiveMember as any)?.cover_url, user?.id]);
-
-  const [avatarPhoto, setAvatarPhoto] = useState<string | null>(() => {
-    if (typeof window !== "undefined" && user?.id) {
-      const userAvatar = localStorage.getItem(`vba_member_avatar_photo_${user.id}`);
-      if (userAvatar) return userAvatar;
-    }
-    return effectiveMember?.avatar || (effectiveMember as any)?.avatarUrl || user?.avatar_url || (user as any)?.user_metadata?.avatar_url || null;
-  });
-  const [avatarError, setAvatarError] = useState(false);
-
-  const [quickEditOpen, setQuickEditOpen] = useState(false);
-  const [profileSheetOpen, setProfileSheetOpen] = useState(false);
-  const [contactSupportOpen, setContactSupportOpen] = useState(false);
-  const [customShortcutsModalOpen, setCustomShortcutsModalOpen] = useState(false);
-  const [allFeaturesModalOpen, setAllFeaturesModalOpen] = useState(false);
-  const [createConnectionModalOpen, setCreateConnectionModalOpen] = useState(false);
-  const [activeShortcutIds, setActiveShortcutIds] = useState<string[]>(() => {
-    if (typeof window === "undefined") return DEFAULT_SHORTCUT_IDS;
-    try {
-      const saved =
-        localStorage.getItem("ceohn10_home_shortcuts") ||
-        localStorage.getItem("vba_user_custom_shortcuts");
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          const legacyList = [
-            ["messages", "members", "analytics", "opportunities"],
-            ["members", "messages", "opportunities", "events"],
-          ];
-          const isLegacy = legacyList.some(
-            (legacy) =>
-              parsed.length === legacy.length &&
-              legacy.every((id, idx) => parsed[idx] === id)
-          );
-          if (isLegacy) {
-            return DEFAULT_SHORTCUT_IDS;
-          }
-          return parsed;
-        }
-      }
-    } catch { }
-    return DEFAULT_SHORTCUT_IDS;
-  });
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const syncShortcuts = () => {
-      try {
-        const saved =
-          localStorage.getItem("ceohn10_home_shortcuts") ||
-          localStorage.getItem("vba_user_custom_shortcuts");
-        if (saved) {
-          const parsed = JSON.parse(saved);
-          if (Array.isArray(parsed) && parsed.length > 0) {
-            const legacyList = [
-              ["messages", "members", "analytics", "opportunities"],
-              ["members", "messages", "opportunities", "events"],
-            ];
-            const isLegacy = legacyList.some(
-              (legacy) =>
-                parsed.length === legacy.length &&
-                legacy.every((id, idx) => parsed[idx] === id)
-            );
-            if (isLegacy) {
-              setActiveShortcutIds(DEFAULT_SHORTCUT_IDS);
-              return;
-            }
-            setActiveShortcutIds(parsed);
-          }
-        }
-      } catch { }
-    };
-    window.addEventListener("ceohn10_shortcuts_changed", syncShortcuts);
-    window.addEventListener("storage", syncShortcuts);
-    return () => {
-      window.removeEventListener("ceohn10_shortcuts_changed", syncShortcuts);
-      window.removeEventListener("storage", syncShortcuts);
-    };
-  }, []);
-
-  const handleSaveShortcuts = (ids: string[]) => {
-    setActiveShortcutIds(ids);
-    try {
-      localStorage.setItem("ceohn10_home_shortcuts", JSON.stringify(ids));
-      localStorage.setItem("vba_user_custom_shortcuts", JSON.stringify(ids));
-      if (user?.id) {
-        localStorage.setItem(`vba_user_custom_shortcuts_${user.id}`, JSON.stringify(ids));
-      }
-      window.dispatchEvent(new Event("ceohn10_shortcuts_changed"));
-      window.dispatchEvent(new Event("storage"));
-    } catch { }
+    );
   };
 
-  // Event banner carousel slide state (Yêu cầu 1: 1 sự kiện banner to kèm slide chuyển)
-  const [eventSlideIndex, setEventSlideIndex] = useState(0);
-  const [isEventHovered, setIsEventHovered] = useState(false);
-  const eventTouchStartXRef = useRef<number | null>(null);
-
-  // News carousel slide state (Yêu cầu 3: 1 tin tức duy nhất full màn hình kèm slide chuyển tin liên tục)
-  const [newsSlideIndex, setNewsSlideIndex] = useState(0);
-  const [isNewsHovered, setIsNewsHovered] = useState(false);
-  const newsTouchStartXRef = useRef<number | null>(null);
-  const [companyLogo, setCompanyLogo] = useState<string | null>(() => {
-    if (typeof window !== "undefined") {
-      const uId = user?.id;
-      const userLogo = uId ? localStorage.getItem(`vba_member_company_logo_${uId}`) : null;
-      const genLogo = localStorage.getItem("vba_member_company_logo");
-      const customProf = uId ? localStorage.getItem(`ceohn10_custom_profile_${uId}`) : localStorage.getItem("ceohn10_custom_profile");
-      let cpLogo = null;
-      try { cpLogo = customProf ? JSON.parse(customProf)?.companyLogo : null; } catch { }
-      const myMem = localStorage.getItem("vba_my_member");
-      let mmLogo = null;
-      try { mmLogo = myMem ? (JSON.parse(myMem)?.companyLogoUrl || JSON.parse(myMem)?.companyLogo) : null; } catch { }
-
-      return (
-        userLogo ||
-        genLogo ||
-        cpLogo ||
-        mmLogo ||
-        (effectiveMember as any)?.companyLogoUrl ||
-        (effectiveMember as any)?.companyLogo ||
-        null
-      );
-    }
-    return (effectiveMember as any)?.companyLogoUrl || (effectiveMember as any)?.companyLogo || null;
-  });
-  const [companyLogoError, setCompanyLogoError] = useState(false);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const userLogo = user?.id ? localStorage.getItem(`vba_member_company_logo_${user.id}`) : null;
-    const cpLogo = customProfile?.companyLogo;
-    const sLogo = (effectiveMember as any)?.companyLogoUrl || (effectiveMember as any)?.companyLogo;
-
-    const resolved = userLogo || cpLogo || sLogo;
-    if (resolved && !isBlackBackgroundLogo(resolved)) {
-      setCompanyLogo(resolved);
-    }
-    const sAvatar = effectiveMember?.avatar || (effectiveMember as any)?.avatarUrl || user?.avatar_url || (user as any)?.user_metadata?.avatar_url;
-    if (sAvatar) setAvatarPhoto(sAvatar);
-  }, [
-    (effectiveMember as any)?.companyLogoUrl,
-    (effectiveMember as any)?.companyLogo,
-    customProfile?.companyLogo,
-    effectiveMember?.avatar,
-    (effectiveMember as any)?.avatarUrl,
-    user?.avatar_url,
-    (user as any)?.user_metadata?.avatar_url,
-    user?.id,
-  ]);
-
-  const validLocalLogo = isBlackBackgroundLogo(companyLogo) ? null : companyLogo;
-  const validServerLogo = isBlackBackgroundLogo((effectiveMember as any)?.companyLogoUrl || (effectiveMember as any)?.companyLogo)
-    ? null
-    : ((effectiveMember as any)?.companyLogoUrl || (effectiveMember as any)?.companyLogo);
-  const displayCompanyLogo = validLocalLogo || validServerLogo || "/ceohn10-official-logo.png";
-
-  const avatarFileInputRef = useRef<HTMLInputElement>(null);
-  const coverFileInputRef = useRef<HTMLInputElement>(null);
-  const logoFileInputRef = useRef<HTMLInputElement>(null);
-
-  const [cropModalOpen, setCropModalOpen] = useState(false);
-  const [cropTarget, setCropTarget] = useState<"avatar" | "cover">("avatar");
-  const [cropImageUrl, setCropImageUrl] = useState("");
-
-  const handleDirectAvatarUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (evt) => {
-      const dataUrl = evt.target?.result as string;
-      if (dataUrl) {
-        setCropImageUrl(dataUrl);
-        setCropTarget("avatar");
-        setCropModalOpen(true);
-      }
-    };
-    reader.readAsDataURL(file);
-    if (e.target) e.target.value = "";
-  };
-
-  const handleDirectCoverUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (evt) => {
-      const dataUrl = evt.target?.result as string;
-      if (dataUrl) {
-        setCropImageUrl(dataUrl);
-        setCropTarget("cover");
-        setCropModalOpen(true);
-      }
-    };
-    reader.readAsDataURL(file);
-    if (e.target) e.target.value = "";
-  };
-
-  const handleHomeCropComplete = async (croppedDataUrl: string) => {
-    if (cropTarget === "avatar") {
-      setAvatarPhoto(croppedDataUrl);
-      setAvatarError(false);
-      try {
-        localStorage.setItem("vba_member_avatar_photo", croppedDataUrl);
-        setCustomProfile((prev) => ({ ...(prev || {}), avatar: croppedDataUrl }));
-        const mem = JSON.parse(localStorage.getItem("vba_my_member") || "{}");
-        mem.avatar = croppedDataUrl;
-        localStorage.setItem("vba_my_member", JSON.stringify(mem));
-      } catch { }
-
-      window.dispatchEvent(new CustomEvent("vba_member_avatar_updated", { detail: croppedDataUrl }));
-      window.dispatchEvent(new CustomEvent("profile-updated", { detail: { avatar: croppedDataUrl } }));
-      toast.success("Đã cập nhật ảnh đại diện thành công!");
-
-      const file = dataUrlToFile(croppedDataUrl, `avatar-${Date.now()}.png`);
-      uploadFileToNest(file, "avatars")
-        .then((uploadedUrl) => {
-          if (uploadedUrl) {
-            fetchNestApi("/members/me", {
-              method: "PATCH",
-              body: JSON.stringify({ avatar: uploadedUrl }),
-            }).catch(() => null);
-          }
-        })
-        .catch(() => { });
-    } else {
-      setCoverPhoto(croppedDataUrl);
-      setCoverError(false);
-      try {
-        localStorage.setItem("vba_member_cover_photo", croppedDataUrl);
-        setCustomProfile((prev) => ({ ...(prev || {}), cover: croppedDataUrl }));
-        const mem = JSON.parse(localStorage.getItem("vba_my_member") || "{}");
-        mem.coverUrl = croppedDataUrl;
-        localStorage.setItem("vba_my_member", JSON.stringify(mem));
-      } catch { }
-
-      window.dispatchEvent(new CustomEvent("vba_member_cover_updated", { detail: croppedDataUrl }));
-      window.dispatchEvent(new CustomEvent("profile-updated", { detail: { cover: croppedDataUrl } }));
-      toast.success("Đã cập nhật ảnh bìa thành công!");
-
-      const file = dataUrlToFile(croppedDataUrl, `cover-${Date.now()}.png`);
-      uploadFileToNest(file, "covers")
-        .then((uploadedUrl) => {
-          if (uploadedUrl) {
-            fetchNestApi("/members/me/cover", {
-              method: "PATCH",
-              body: JSON.stringify({ coverUrl: uploadedUrl }),
-            }).catch(() => null);
-          }
-        })
-        .catch(() => { });
-    }
-  };
-
-  const handleDirectLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    try {
-      const { dataUrl, blob } = await compressImage(file, 400, 400, 0.85);
-      setCompanyLogo(dataUrl);
-
-      try {
-        localStorage.setItem("vba_member_company_logo", dataUrl);
-        if (user?.id) {
-          localStorage.setItem(`vba_member_company_logo_${user.id}`, dataUrl);
-          const cp = JSON.parse(localStorage.getItem(`ceohn10_custom_profile_${user.id}`) || "{}");
-          cp.companyLogo = dataUrl;
-          cp.userId = user.id;
-          localStorage.setItem(`ceohn10_custom_profile_${user.id}`, JSON.stringify(cp));
-        }
-
-        const cpGen = JSON.parse(localStorage.getItem("ceohn10_custom_profile") || "{}");
-        cpGen.companyLogo = dataUrl;
-        localStorage.setItem("ceohn10_custom_profile", JSON.stringify(cpGen));
-
-        const mem = JSON.parse(localStorage.getItem("vba_my_member") || "{}");
-        mem.companyLogo = dataUrl;
-        mem.companyLogoUrl = dataUrl;
-        localStorage.setItem("vba_my_member", JSON.stringify(mem));
-      } catch (storageErr) {
-        console.warn("Storage quota warning:", storageErr);
-      }
-
-      window.dispatchEvent(new CustomEvent("vba_member_company_logo_updated", { detail: dataUrl }));
-      window.dispatchEvent(new CustomEvent("profile-updated", { detail: { companyLogo: dataUrl } }));
-      window.dispatchEvent(new CustomEvent("ceohn10_profile_updated", { detail: { companyLogo: dataUrl } }));
-      toast.success("Đã cập nhật logo công ty thành công!");
-
-      uploadFileToNest(blob, file.name || "company-logo.png")
-        .then((uploadedUrl) => {
-          if (uploadedUrl) {
-            setCompanyLogo(uploadedUrl);
-            try {
-              localStorage.setItem("vba_member_company_logo", uploadedUrl);
-              if (user?.id) {
-                localStorage.setItem(`vba_member_company_logo_${user.id}`, uploadedUrl);
-                const cp = JSON.parse(localStorage.getItem(`ceohn10_custom_profile_${user.id}`) || "{}");
-                cp.companyLogo = uploadedUrl;
-                localStorage.setItem(`ceohn10_custom_profile_${user.id}`, JSON.stringify(cp));
-              }
-              const cpGen = JSON.parse(localStorage.getItem("ceohn10_custom_profile") || "{}");
-              cpGen.companyLogo = uploadedUrl;
-              localStorage.setItem("ceohn10_custom_profile", JSON.stringify(cpGen));
-            } catch { }
-            window.dispatchEvent(new CustomEvent("vba_member_company_logo_updated", { detail: uploadedUrl }));
-            window.dispatchEvent(new CustomEvent("profile-updated", { detail: { companyLogo: uploadedUrl } }));
-            fetchNestApi("/members/me", {
-              method: "PATCH",
-              body: JSON.stringify({ companyLogo: uploadedUrl, companyLogoUrl: uploadedUrl }),
-            }).catch(() => null);
-          }
-        })
-        .catch(() => { });
-    } catch {
-      toast.error("Không thể tải logo công ty");
-    } finally {
-      if (e.target) e.target.value = "";
-    }
-  };
-
-  useEffect(() => {
-    const handleUpdate = () => {
-      reloadNotifs();
-    };
-    const handleProfileUpdate = (e?: any) => {
-      try {
-        const detail = e?.detail;
-        if (detail && typeof detail === "object") {
-          if (detail.avatar) setAvatarPhoto(detail.avatar);
-          if (detail.cover) setCoverPhoto(detail.cover);
-          const newLogo = detail.companyLogo || detail.companyLogoUrl;
-          if (newLogo && !isBlackBackgroundLogo(newLogo)) {
-            setCompanyLogo(newLogo);
-            if (user?.id) {
-              try { localStorage.setItem(`vba_member_company_logo_${user.id}`, newLogo); } catch { }
-            }
-          }
-          if (detail.name || detail.title || detail.company) {
-            setCustomProfile(detail);
-            return;
-          }
-        }
-        if (user?.id) {
-          const scoped = localStorage.getItem(`ceohn10_custom_profile_${user.id}`);
-          if (scoped) {
-            const parsed = JSON.parse(scoped);
-            if (parsed && (parsed.userId === user.id || !parsed.userId)) {
-              setCustomProfile(parsed);
-              return;
-            }
-          }
-        }
-        const generic = localStorage.getItem("ceohn10_custom_profile");
-        if (generic) {
-          const parsedGen = JSON.parse(generic);
-          if (parsedGen && (!parsedGen.userId || parsedGen.userId === user?.id)) {
-            setCustomProfile(parsedGen);
-          }
-        }
-      } catch { }
-    };
-    const handleCoverUpdate = (e?: any) => {
-      try {
-        const detailUrl = e?.detail;
-        if (detailUrl && typeof detailUrl === "string") {
-          setCoverPhoto(detailUrl);
-        } else {
-          const userCover = user?.id ? localStorage.getItem(`vba_member_cover_photo_${user.id}`) : null;
-          const genCover = localStorage.getItem("vba_member_cover_photo");
-          if (userCover || genCover) setCoverPhoto(userCover || genCover);
-        }
-        if (user?.id) {
-          fetchNestApi<any>("/members/me").then((live) => { if (live) setDirectMember(live); }).catch(() => { });
-        }
-      } catch { }
-    };
-    const handleAvatarUpdate = (e?: any) => {
-      try {
-        const detailUrl = e?.detail;
-        if (detailUrl && typeof detailUrl === "string") {
-          setAvatarPhoto(detailUrl);
-        } else {
-          const userAvatar = user?.id ? localStorage.getItem(`vba_member_avatar_photo_${user.id}`) : null;
-          const genAvatar = localStorage.getItem("vba_member_avatar_photo");
-          if (userAvatar || genAvatar) setAvatarPhoto(userAvatar || genAvatar);
-        }
-        if (user?.id) {
-          fetchNestApi<any>("/members/me").then((live) => { if (live) setDirectMember(live); }).catch(() => { });
-        }
-      } catch { }
-    };
-    const handleLogoUpdate = (e?: any) => {
-      try {
-        const detailUrl = e?.detail;
-        if (detailUrl && typeof detailUrl === "string" && !isBlackBackgroundLogo(detailUrl)) {
-          setCompanyLogo(detailUrl);
-        } else {
-          const userLogo = user?.id ? localStorage.getItem(`vba_member_company_logo_${user.id}`) : null;
-          const genLogo = localStorage.getItem("vba_member_company_logo");
-          const target = userLogo || genLogo;
-          if (target && !isBlackBackgroundLogo(target)) {
-            setCompanyLogo(target);
-          }
-        }
-      } catch { }
-    };
-    window.addEventListener("notifications-updated", handleUpdate);
-    window.addEventListener("profile-updated", handleProfileUpdate);
-    window.addEventListener("ceohn10_profile_updated", handleProfileUpdate);
-    window.addEventListener("vba_member_cover_updated", handleCoverUpdate);
-    window.addEventListener("vba_member_avatar_updated", handleAvatarUpdate);
-    window.addEventListener("vba_member_company_logo_updated", handleLogoUpdate);
-    window.addEventListener("storage", handleProfileUpdate);
-    return () => {
-      window.removeEventListener("notifications-updated", handleUpdate);
-      window.removeEventListener("profile-updated", handleProfileUpdate);
-      window.removeEventListener("ceohn10_profile_updated", handleProfileUpdate);
-      window.removeEventListener("vba_member_cover_updated", handleCoverUpdate);
-      window.removeEventListener("vba_member_avatar_updated", handleAvatarUpdate);
-      window.removeEventListener("vba_member_company_logo_updated", handleLogoUpdate);
-      window.removeEventListener("storage", handleProfileUpdate);
-    };
-  }, [reloadNotifs, user?.id]);
-
-  // Priority-driven resolution: Custom Profile (instant reactivity) > Real Member Record from DB > Real Auth User Name > Fallback
-  const realUserName = (user as any)?.name || (user as any)?.user_metadata?.full_name;
-  const isGenericMemberName = !effectiveMember?.name || effectiveMember.name === "Thành viên mới" || effectiveMember.name === "Học viên CLB CEO HN10";
-  const validCustomName = (customProfile?.userId === user?.id || !customProfile?.userId) ? customProfile?.name?.trim() : undefined;
-
-  const displayName = validCustomName || ((!isGenericMemberName && effectiveMember?.name)
-    ? effectiveMember.name
-    : (realUserName || effectiveMember?.name || (user as any)?.username || "Học viên CLB CEO HN10"));
-
-  const displayTitle = customProfile?.title?.trim() || effectiveMember?.title || (effectiveMember as any)?.position || (isEn ? "Official Member" : "Học viên chính thức");
-  const displayPhone =
-    (customProfile as any)?.phone?.trim() ||
-    effectiveMember?.phone ||
-    (user as any)?.phone ||
-    (user as any)?.user_metadata?.phone ||
-    "";
-  const rawCompany = customProfile?.company?.trim() || (effectiveMember as any)?.companyName || (effectiveMember as any)?.company || (effectiveMember as any)?.businessName;
-  const isOldSeedCompany = rawCompany && ((rawCompany.includes("Phạm Văn Vũ") && !displayName.includes("Phạm Văn Vũ")));
-  const displayCompany = (!rawCompany || isOldSeedCompany) ? "CLB Doanh Nhân CEO HN10" : rawCompany;
-  const rawAvatar =
-    avatarPhoto ||
-    customProfile?.avatar ||
-    effectiveMember?.avatar ||
-    (user as any)?.avatar_url ||
-    (user as any)?.user_metadata?.avatar_url ||
-    null;
-  const displayAvatar = rawAvatar ? (resolveMediaUrl(rawAvatar) || rawAvatar) : null;
-
-  const handleCopyCode = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (!effectiveMember?.code) return;
-    navigator.clipboard.writeText(effectiveMember.code);
-    setCopied(true);
-    toast.success(isEn ? "Member code copied!" : "Đã sao chép mã Học viên!");
-    setTimeout(() => setCopied(false), 2000);
-  };
-
-  // Real events from server
-  const displayEvents: MyEvent[] = serverEvents || [];
-
-  // Auto-play timer cho Slide sự kiện nổi bật (Yêu cầu 1: 1 sự kiện banner to kèm slide)
-  useEffect(() => {
-    if (isEventHovered || displayEvents.length <= 1) return;
-    const timer = setInterval(() => {
-      setEventSlideIndex((prev) => (prev + 1) % displayEvents.length);
-    }, 5000);
-    return () => clearInterval(timer);
-  }, [isEventHovered, displayEvents.length]);
-
-  // Auto-play timer cho Slide Tin tức CLB (Yêu cầu 3: 1 tin tức full width chuyển tin liên tục mỗi 4.5s)
-  useEffect(() => {
-    const listLen = combinedNews.length > 0 ? combinedNews.length : 1;
-    if (isNewsHovered || listLen <= 1) return;
-    const timer = setInterval(() => {
-      setNewsSlideIndex((prev) => (prev + 1) % listLen);
-    }, 4500);
-    return () => clearInterval(timer);
-  }, [isNewsHovered, combinedNews.length]);
-
-  const totalOpportunitiesCount = opportunities.length;
-  const totalProductsCount = products.length;
-
-  // Tính tổng giá trị cơ hội giao thương & tổng giá trị sản phẩm sàn thương mại
-  const totalOpportunitiesValue = useMemo(() => {
-    let sum = 0;
-    for (const o of opportunities) {
-      if (typeof o.estimatedValue === "number" && o.estimatedValue > 0) {
-        sum += o.estimatedValue;
-      } else if (o.value) {
-        const clean = o.value.toLowerCase().replace(/,/g, ".");
-        const matchTy = clean.match(/([\d.]+)\s*tỷ/);
-        const matchTrieu = clean.match(/([\d.]+)\s*triệu/);
-        if (matchTy) {
-          sum += parseFloat(matchTy[1]) * 1_000_000_000;
-        } else if (matchTrieu) {
-          sum += parseFloat(matchTrieu[1]) * 1_000_000;
-        } else {
-          const num = parseInt(clean.replace(/[^\d]/g, ""), 10);
-          if (!isNaN(num) && num > 0) sum += num;
-        }
-      }
-    }
-    if (sum === 0) {
-      return "0 đ";
-    }
-    if (sum >= 1_000_000_000) {
-      return `${(sum / 1_000_000_000).toFixed(1).replace(".0", "")} Tỷ đ`;
-    }
-    return `${(sum / 1_000_000).toFixed(0)} Tr đ`;
-  }, [opportunities]);
-
-  const totalProductsValue = useMemo(() => {
-    let sum = 0;
-    for (const p of products) {
-      const priceVal = (p as any).priceNumber ?? (p as any).memberPrice ?? p.price;
-      if (typeof priceVal === "number" && priceVal > 0) {
-        sum += priceVal;
-      } else if (typeof priceVal === "string") {
-        const clean = priceVal.replace(/[^\d]/g, "");
-        const num = parseInt(clean, 10);
-        if (!isNaN(num) && num > 0) {
-          sum += num;
-        }
-      }
-    }
-    if (sum === 0) {
-      return "0 đ";
-    }
-    if (sum >= 1_000_000_000) {
-      return `${(sum / 1_000_000_000).toFixed(1).replace(".0", "")} Tỷ đ`;
-    }
-    return `${(sum / 1_000_000).toFixed(0)} Tr đ`;
-  }, [products]);
+  // Filter peers
+  const filteredPeers = useMemo(() => {
+    if (!searchPeerQuery.trim()) return peers;
+    const q = searchPeerQuery.toLowerCase();
+    return peers.filter(
+      (p) =>
+        p.name.toLowerCase().includes(q) ||
+        p.companyName.toLowerCase().includes(q) ||
+        p.industry.toLowerCase().includes(q) ||
+        p.studentCode.toLowerCase().includes(q)
+    );
+  }, [peers, searchPeerQuery]);
 
   return (
-    <div
-      className="w-full max-w-full min-h-screen relative bg-white flex flex-col justify-start items-start pb-6 transition-colors duration-300"
-    >
-      <SeasonalEventHeader />
-      {/* Hidden inputs cho phép click trực tiếp để upload */}
-      <input type="file" ref={avatarFileInputRef} className="hidden" accept="image/*" onChange={handleDirectAvatarUpload} />
-      <input type="file" ref={coverFileInputRef} className="hidden" accept="image/*" onChange={handleDirectCoverUpload} />
-      <input type="file" ref={logoFileInputRef} className="hidden" accept="image/*" onChange={handleDirectLogoUpload} />
-
-      {/* ── TOP HEADER (Logo + Xin chào, MemberName + Chuông thông báo - Chuẩn iOS Safe Area) ── */}
-      <header
-        data-type="1"
-        style={{
-          paddingTop: "max(env(safe-area-inset-top, 0px), 8px)",
-          minHeight: "calc(max(env(safe-area-inset-top, 0px), 8px) + 48px)",
-        }}
-        className="self-stretch px-4 pb-2 bg-white dark:bg-[var(--vba-bg-2)] shadow-[0px_2px_8px_0px_rgba(0,0,0,0.06)] flex justify-between items-center overflow-hidden sticky top-0 z-40 border-b border-slate-100 dark:border-slate-800 transition-all select-none"
-      >
-        <div className="flex justify-start items-center gap-2.5">
-          <div className="w-14 h-9 relative shrink-0">
-            <img
-              className="w-14 h-9 left-0 top-0 absolute object-contain mix-blend-multiply"
-              src="/ceohn10-official-logo.png"
-              alt="Logo CEO HN10"
-              onError={(e) => {
-                (e.currentTarget as HTMLImageElement).src = "/ceohn10-official-logo.png";
-              }}
-            />
-          </div>
-          <div className="inline-flex flex-col justify-center items-start gap-px">
-            <div className="text-slate-600 text-xs font-normal font-['Inter'] leading-4">Xin chào,</div>
-            <div className="text-slate-900 text-sm font-semibold font-['Inter'] leading-5 truncate max-w-[170px]">
-              {displayName || "Trần Tuấn Anh"}
-            </div>
+    <div className="w-full min-h-screen bg-slate-50 flex flex-col pb-24 text-slate-800">
+      {/* ── TOP EXECUTIVE APP BAR (TỐI GIẢN: NỀN TRẮNG, TEXT ĐEN, LOGO & TÊN CHUẨN CEO HN10) ── */}
+      <header className="sticky top-0 z-30 bg-white dark:bg-slate-900 text-slate-900 dark:text-white px-4 py-3 flex items-center justify-between shadow-xs border-b border-slate-200 dark:border-slate-800">
+        <div className="flex items-center gap-3">
+          <img
+            src="/app-icon.png"
+            alt="CEO HN10"
+            className="w-9 h-9 rounded-xl object-contain bg-slate-50 dark:bg-slate-800 p-0.5 border border-slate-200 dark:border-slate-700 shadow-2xs"
+            onError={(e) => {
+              (e.currentTarget as HTMLImageElement).src = "/app-icon.png";
+            }}
+          />
+          <div>
+            <h1 className="text-sm font-bold text-slate-900 dark:text-white tracking-tight flex items-center gap-1.5">
+              <span>CLB Doanh Nhân CEO HN10</span>
+              <span className="text-[10px] font-bold text-red-600 bg-red-50 dark:bg-red-950/40 px-1.5 py-0.5 rounded border border-red-200 dark:border-red-800">
+                HanoiBA
+              </span>
+            </h1>
+            <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium truncate max-w-[240px]">
+              Ứng Dụng Học Viên &amp; Kết Nối Doanh Nghiệp
+            </p>
           </div>
         </div>
-        <Link
-          to="/association/notifications"
-          onClick={() => {
-            try {
-              const stored = localStorage.getItem("vba_notifications");
-              if (stored) {
-                const parsed = JSON.parse(stored);
-                if (Array.isArray(parsed)) {
-                  const marked = parsed.map((item) => ({ ...item, unread: false, isRead: true }));
-                  localStorage.setItem("vba_notifications", JSON.stringify(marked));
-                  window.dispatchEvent(new Event("notifications-updated"));
-                  window.dispatchEvent(new Event("vba_notifications_updated"));
-                }
-              }
-            } catch { }
-          }}
-          className="relative p-2 rounded-xl border border-orange-200 bg-orange-50/50 inline-flex justify-center items-center hover:scale-105 active:scale-95 transition shadow-xs"
-          aria-label="Thông báo"
-        >
-          <img src="/icons/home/notification-01.svg" className="size-5" alt="Thông báo" />
-          {unreadNotifCount > 0 && (
-            <div className="px-1.5 py-0.5 -right-1.5 -top-1.5 absolute bg-[#EF4444] rounded-[100px] inline-flex justify-center items-center overflow-hidden ring-1 ring-white shadow-xs">
-              <div className="text-center text-white text-[10px] font-bold font-['Inter'] leading-3">
-                {unreadNotifCount > 9 ? "9+" : unreadNotifCount}
-              </div>
-            </div>
-          )}
-        </Link>
+
+        {/* Header tối giản: Không để nút quét QR hay nút hiển thị QR ở đây */}
+        <div className="flex items-center gap-2">
+          <span className="text-[10px] font-semibold text-slate-500 bg-slate-100 dark:bg-slate-800 dark:text-slate-400 px-2.5 py-1 rounded-full border border-slate-200 dark:border-slate-700">
+            Khóa 2026
+          </span>
+        </div>
       </header>
 
-      <div className="self-stretch flex flex-col justify-start items-center">
-        {/* ── THẺ Học viên CHÍNH THỨC HERO CARD THEO TONE MÀU ĐỘNG BRAND THEME ── */}
-        <div className="self-stretch px-4 pt-3 flex flex-col justify-start items-start gap-2.5">
-          <div
-            onClick={() => setProfileSheetOpen(true)}
-            style={{
-              background: !isDark
-                ? `linear-gradient(135deg, ${brandColorTheme.lightBg} 0%, #FFFFFF 65%, ${brandColorTheme.lightBg} 100%)`
-                : brandColorTheme.gradientCard,
-              borderColor: !isDark ? brandColorTheme.lightBorder : brandColorTheme.darkBorder,
-              boxShadow: !isDark
-                ? `0px 4px 16px 0px ${brandColorTheme.primaryColor}20`
-                : `0px 4px 16px 0px ${brandColorTheme.primaryColor}35`,
-            }}
-            className="self-stretch h-56 relative rounded-[20px] border overflow-hidden cursor-pointer active:scale-[0.99] transition duration-200 group"
-          >
-            {/* Cover Banner */}
-            <div
-              style={{ borderColor: !isDark ? brandColorTheme.lightBorder : brandColorTheme.darkBorderSoft }}
-              className="w-full h-24 left-0 top-0 absolute bg-slate-100 dark:bg-slate-800/80 rounded-tl-2xl rounded-tr-2xl border-b overflow-hidden"
-            >
-              {coverPhoto && !coverError ? (
-                <>
-                  <img
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                    src={resolveMediaUrl(coverPhoto) || coverPhoto}
-                    alt="Banner"
-                    onError={() => setCoverError(true)}
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
-                </>
-              ) : (
-                <div className="w-full h-full flex flex-col items-center justify-center bg-slate-200/80 dark:bg-slate-800 text-slate-500 dark:text-slate-400 select-none">
-                  <span className="text-xs font-semibold">Chưa có ảnh bìa</span>
-                  <span className="text-[10px] text-slate-400 dark:text-slate-500">Chạm để tải ảnh bìa</span>
-                </div>
-              )}
+      {/* ── HERO STUDENT ID CARD (THẺ ĐỊNH DANH HỌC VIÊN SANG TRỌNG) ── */}
+      <section className="px-4 pt-4 pb-2">
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#002244] via-[#003B95] to-[#0A192F] p-4 text-white shadow-xl border border-amber-400/30">
+          {/* Background decorative watermark */}
+          <div className="absolute -right-6 -bottom-6 w-36 h-36 rounded-full bg-amber-400/5 blur-2xl pointer-events-none" />
+          <div className="absolute right-4 top-4 text-amber-400/10 font-black text-6xl select-none pointer-events-none">
+            CEO
+          </div>
+
+          <div className="relative z-10 flex flex-col gap-3">
+            {/* Top row: Cohort & Status */}
+            <div className="flex items-center justify-between">
+              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-400/15 border border-amber-400/30 text-amber-300 text-[11px] font-semibold">
+                <Sparkles className="w-3 h-3 text-amber-400" />
+                {profile?.cohort || "Khóa Học Viên 2026"}
+              </span>
+              <span className="inline-flex items-center gap-1 text-[11px] text-emerald-400 font-medium">
+                <BadgeCheck className="w-3.5 h-3.5 text-emerald-400" />
+                Đang Kích Hoạt
+              </span>
             </div>
 
-            {/* Avatar overlapping cover */}
-            <div
-              onClick={(e) => {
-                e.stopPropagation();
-                avatarFileInputRef.current?.click();
-              }}
-              className="size-16 left-4 top-[58px] absolute bg-slate-900 dark:bg-slate-950 rounded-full border-[3px] border-white dark:border-slate-900 shadow-md inline-flex justify-center items-center overflow-hidden cursor-pointer"
-            >
-              {displayAvatar && !avatarError ? (
-                <img src={displayAvatar} alt={displayName} onError={() => setAvatarError(true)} className="size-full object-cover" />
-              ) : (
-                <div
-                  style={{ background: brandColorTheme.gradientPrimary }}
-                  className="w-full h-full flex flex-col items-center justify-center text-white text-[9px] font-bold text-center leading-tight p-1 select-none"
-                  title="Chưa có avatar"
-                >
-                  <span>Chưa có</span>
-                  <span>avatar</span>
+            {/* Profile Info */}
+            <div className="flex items-center gap-3.5 pt-1">
+              <div className="relative">
+                <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-amber-400 shadow-md bg-slate-800 flex items-center justify-center text-white font-bold text-xl">
+                  {profile?.avatarUrl && resolveMediaUrl(profile.avatarUrl) ? (
+                    <img src={resolveMediaUrl(profile.avatarUrl) || undefined} alt={profile.name} className="w-full h-full object-cover" />
+                  ) : (
+                    profile?.name?.charAt(0)?.toUpperCase() || "C"
+                  )}
                 </div>
-              )}
-            </div>
-
-            {/* Member Info: Name & Role Badge */}
-            <div className="left-4 top-[128px] absolute inline-flex flex-col justify-start items-start gap-1 max-w-[240px]">
-              <div className="self-stretch inline-flex justify-start items-center gap-1.5">
-                <div className="text-slate-900 dark:text-white text-lg font-bold font-['Inter'] leading-6 truncate">
-                  {displayName || "Trần Tuấn Anh"}
+                <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-amber-400 flex items-center justify-center text-[#001D4A] shadow">
+                  <Award className="w-3 h-3" />
                 </div>
-                <img
-                  src="/icons/home/security-check.svg"
-                  className="size-4 shrink-0"
-                  style={{ filter: `drop-shadow(0 0 4px ${brandColorTheme.primaryColor}80)` }}
-                  alt="Xác thực"
-                />
               </div>
-              <div
-                style={{
-                  backgroundColor: !isDark ? brandColorTheme.lightBg : `${brandColorTheme.primaryColor}25`,
-                  borderColor: !isDark ? brandColorTheme.lightBorder : brandColorTheme.darkBorderSoft,
-                  color: !isDark ? brandColorTheme.primaryColor : brandColorTheme.accentLight,
-                }}
-                className="px-2.5 py-[2px] border rounded-full inline-flex justify-start items-center"
+
+              <div className="flex-1 min-w-0">
+                <h2 className="text-base font-bold text-white tracking-tight truncate flex items-center gap-1.5">
+                  {profile?.name}
+                </h2>
+                <p className="text-xs text-amber-200/90 font-medium truncate">
+                  {profile?.position}
+                </p>
+                <p className="text-[11px] text-slate-300 truncate flex items-center gap-1 mt-0.5">
+                  <Building2 className="w-3 h-3 text-slate-400 shrink-0" />
+                  {profile?.companyName}
+                </p>
+              </div>
+            </div>
+
+            {/* Bottom row: Student Code with Copy & Actions */}
+            <div className="mt-1 pt-3 border-t border-white/10 flex items-center justify-between gap-2">
+              <div className="flex items-center gap-1.5">
+                <span className="text-[11px] text-slate-300 font-medium">MÃ HỌC VIÊN:</span>
+                <span className="font-mono text-sm font-black text-amber-300 tracking-wider bg-black/30 px-2 py-0.5 rounded border border-amber-400/30">
+                  {profile?.studentCode}
+                </span>
+                <button
+                  onClick={() => profile && handleCopyCode(profile.studentCode)}
+                  className="p-1.5 rounded hover:bg-white/10 active:scale-95 text-slate-300 transition-colors"
+                  title="Sao chép mã"
+                >
+                  {copiedCode ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                </button>
+              </div>
+
+              <button
+                onClick={() => setQrModalOpen(true)}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 active:scale-95 text-[#001D4A] text-xs font-bold shadow transition-all"
               >
-                <div className="text-xs font-semibold font-['Inter'] leading-4">
-                  {displayTitle || "CEO"}
-                </div>
-              </div>
-            </div>
-
-            {/* Quick Edit Icon */}
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                setQuickEditOpen(true);
-              }}
-              style={{
-                borderColor: !isDark ? brandColorTheme.lightBorder : brandColorTheme.darkBorderSoft,
-              }}
-              className="w-8 h-8 p-1.5 right-4 top-[106px] absolute rounded-xl border bg-white/95 dark:bg-slate-800/90 shadow-2xs inline-flex justify-center items-center hover:scale-105 active:scale-95 transition cursor-pointer"
-              title="Chỉnh sửa thông tin"
-            >
-              <img src="/icons/home/edit-04.svg" className="size-4" alt="Chỉnh sửa" />
-            </button>
-
-            {/* Member Phone */}
-            <div className="left-4 top-[188px] absolute inline-flex justify-start items-center gap-1.5">
-              <Phone className="size-3.5 shrink-0" style={{ color: brandColorTheme.primaryColor }} />
-              <div className="text-slate-800 dark:text-slate-200 text-sm font-semibold font-['Inter'] leading-5 tracking-wide">
-                {displayPhone || "0393631546"}
-              </div>
+                <QrCode className="w-3.5 h-3.5" />
+                <span>Mã QR Thẻ</span>
+              </button>
             </div>
           </div>
         </div>
+      </section>
 
-        {/* ── TÍNH NĂNG NHANH THEO MOCKUP JSX & TONE THEME ĐỘNG ── */}
-        <div id="tour-quick-actions" className="self-stretch flex flex-col justify-start items-start pt-4">
-          <div className="self-stretch px-4 inline-flex justify-between items-center">
-            <div className="text-slate-900 dark:text-white text-base font-semibold font-['Inter'] leading-5">
-              Tính năng nhanh
-            </div>
-            <button
-              type="button"
-              onClick={() => setAllFeaturesModalOpen(true)}
-              style={{
-                backgroundColor: !isDark ? brandColorTheme.lightBg : `${brandColorTheme.primaryColor}20`,
-                borderColor: !isDark ? brandColorTheme.lightBorder : brandColorTheme.darkBorderSoft,
-                color: brandColorTheme.primaryColor,
-              }}
-              className="px-2.5 py-1 rounded-lg border flex justify-start items-center gap-1.5 cursor-pointer hover:opacity-90 transition"
-            >
-              <div className="text-xs font-semibold font-['Inter'] leading-5">
-                Xem tất cả
-              </div>
-              <ChevronRight className="size-3.5" />
-            </button>
-          </div>
+      {/* ── 4 PHÂN HỆ TRỌNG TÂM: INTERACTIVE PILLAR NAVIGATION ── */}
+      <section className="px-4 py-2 sticky top-[57px] z-20 bg-slate-50/95 backdrop-blur-sm">
+        <div className="grid grid-cols-4 gap-1.5 p-1 rounded-xl bg-white border border-slate-200/80 shadow-sm">
+          <button
+            onClick={() => setActiveTab("events")}
+            className={`py-2 px-1 rounded-lg text-xs font-bold flex flex-col items-center gap-1 transition-all ${
+              activeTab === "events"
+                ? "bg-[#003B95] text-white shadow-sm"
+                : "text-slate-600 hover:bg-slate-100"
+            }`}
+          >
+            <Calendar className={`w-4 h-4 ${activeTab === "events" ? "text-amber-400" : "text-[#003B95]"}`} />
+            <span className="text-[11px] leading-tight">Sự Kiện</span>
+          </button>
 
-          <div className="self-stretch px-4 pt-3.5 pb-2 grid grid-cols-4 gap-y-3.5 gap-x-2">
-            {activeShortcutIds.slice(0, 8).map((id) => {
-              const item = ALL_SHORTCUT_OPTIONS.find((s) => s.id === id) || {
-                id,
-                name: "Tính năng",
-                desc: "",
-                to: "/association",
-                iconName: "Sparkles",
-              };
+          <button
+            onClick={() => setActiveTab("connect")}
+            className={`py-2 px-1 rounded-lg text-xs font-bold flex flex-col items-center gap-1 transition-all ${
+              activeTab === "connect"
+                ? "bg-[#003B95] text-white shadow-sm"
+                : "text-slate-600 hover:bg-slate-100"
+            }`}
+          >
+            <Users className={`w-4 h-4 ${activeTab === "connect" ? "text-amber-400" : "text-[#003B95]"}`} />
+            <span className="text-[11px] leading-tight">Kết Bạn</span>
+          </button>
 
-              const isConnectModal = item.to === "#connect";
-              const isAlarmModal = item.to === "#alarm";
+          <button
+            onClick={() => setActiveTab("classes")}
+            className={`py-2 px-1 rounded-lg text-xs font-bold flex flex-col items-center gap-1 transition-all ${
+              activeTab === "classes"
+                ? "bg-[#003B95] text-white shadow-sm"
+                : "text-slate-600 hover:bg-slate-100"
+            }`}
+          >
+            <GraduationCap className={`w-4 h-4 ${activeTab === "classes" ? "text-amber-400" : "text-[#003B95]"}`} />
+            <span className="text-[11px] leading-tight">Lớp Học</span>
+          </button>
 
-              const content = (
-                <div className="w-full inline-flex flex-col justify-start items-center gap-1.5 group cursor-pointer relative">
-                  <div
-                    style={{
-                      backgroundColor: !isDark ? brandColorTheme.lightBg : `${brandColorTheme.primaryColor}20`,
-                      borderColor: !isDark ? brandColorTheme.lightBorder : brandColorTheme.darkBorderSoft,
-                    }}
-                    className="size-14 border rounded-2xl inline-flex justify-center items-center shadow-xs group-hover:scale-105 transition relative"
-                  >
-                    {getShortcutIcon(item.iconName, "size-6", brandColorTheme.primaryColor)}
+          <button
+            onClick={() => setActiveTab("timeline")}
+            className={`py-2 px-1 rounded-lg text-xs font-bold flex flex-col items-center gap-1 transition-all ${
+              activeTab === "timeline"
+                ? "bg-[#003B95] text-white shadow-sm"
+                : "text-slate-600 hover:bg-slate-100"
+            }`}
+          >
+            <Clock className={`w-4 h-4 ${activeTab === "timeline" ? "text-amber-400" : "text-[#003B95]"}`} />
+            <span className="text-[11px] leading-tight">Lịch Trình</span>
+          </button>
+        </div>
+      </section>
 
-                    {item.badge && (
-                      <div className={`px-1.5 py-0.2 right-[-4px] top-[-6px] absolute ${item.badgeColor || "bg-amber-500 text-slate-900"} rounded-full text-[9px] font-black uppercase ring-1 ring-white dark:ring-slate-900 shadow-xs`}>
-                        {item.badge}
-                      </div>
-                    )}
-                  </div>
-                  <div className="text-center text-slate-800 dark:text-slate-200 text-[11px] sm:text-xs font-semibold font-['Inter'] leading-tight line-clamp-1 truncate max-w-full">
-                    {item.name}
-                  </div>
+      {/* ── NỘI DUNG CHI TIẾT THEO TỪNG PHÂN HỆ ── */}
+      <main className="px-4 py-2 flex-1">
+        {/* ======================================================== */}
+        {/* PHÂN HỆ 1: 📅 TRANG CHỦ SỰ KIỆN — 3 KHỐI THEO QUY CHUẨN   */}
+        {/* ======================================================== */}
+        {activeTab === "events" && (
+          <div className="space-y-6">
+            {/* ── KHỐI 1: SỰ KIỆN SẮP TỚI ── */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-sm font-bold text-slate-900 flex items-center gap-1.5">
+                    <Calendar className="w-4 h-4 text-[#DC2626]" />
+                    <span>Sự Kiện Sắp Tới</span>
+                  </h3>
+                  <p className="text-[11px] text-slate-500">Xem chi tiết, đăng ký vé tham dự và quét mã QR</p>
                 </div>
-              );
-
-              if (isConnectModal) {
-                return (
-                  <button
-                    key={id}
-                    type="button"
-                    onClick={() => setCreateConnectionModalOpen(true)}
-                    className="w-full text-center p-0 bg-transparent border-none cursor-pointer"
-                  >
-                    {content}
-                  </button>
-                );
-              }
-
-              if (isAlarmModal) {
-                return (
-                  <button
-                    key={id}
-                    type="button"
-                    onClick={() => setAlarmModalOpen(true)}
-                    className="w-full text-center p-0 bg-transparent border-none cursor-pointer"
-                  >
-                    {content}
-                  </button>
-                );
-              }
-
-              const [path, queryString] = item.to.split("?");
-              const searchObj = queryString
-                ? Object.fromEntries(new URLSearchParams(queryString))
-                : undefined;
-
-              return (
                 <Link
-                  key={id}
-                  to={path}
-                  search={searchObj}
-                  className="w-full text-center cursor-pointer block"
+                  to="/association/events"
+                  className="text-xs font-semibold text-[#003B95] hover:underline flex items-center gap-0.5"
                 >
-                  {content}
+                  Xem tất cả <ChevronRight className="w-3 h-3" />
                 </Link>
-              );
-            })}
-          </div>
-        </div>
-      </div>
+              </div>
 
-      {/* ── NỘI DUNG CHÍNH (SỰ KIỆN, ƯU ĐÃI, CƠ HỘI, SÀN TM, TIN TỨC) ── */}
-      <div className="self-stretch px-4 pt-3 flex flex-col justify-start items-start gap-4">
-        {/* ── 1. SỰ KIỆN SẮP TỚI: BANNER POSTER THEO CHUẨN CEO HN10 TONE CAM ── */}
-        <div className="w-full">
-          <div className="mb-3 flex items-center justify-between">
-            <Link to="/association/events" className="flex items-center gap-1.5 group cursor-pointer">
-              <h2 className="text-[14px] font-bold tracking-tight text-slate-900 dark:text-white group-hover:text-orange-600 transition-colors">
-                {isEn ? "Upcoming Events" : "Sự kiện sắp tới"}
-              </h2>
-            </Link>
-            <Link to="/association/events" className="flex items-center gap-1 text-[12px] font-bold text-orange-600 dark:text-orange-400 hover:underline p-1">
-              <span>{isEn ? "See all" : "Xem tất cả"}</span>
-              <ChevronRight className="h-3.5 w-3.5" />
-            </Link>
-          </div>
-
-          {/* Poster Grid: Hiển thị đúng số sự kiện thực tế từ database CRM, tối đa 5 sự kiện */}
-          {displayEvents.length === 0 ? (
-            <div className="rounded-2xl vba-card p-5 text-center border border-dashed border-orange-200 dark:border-slate-700 bg-orange-50/30 dark:bg-slate-900/50">
-              <Calendar className="mx-auto h-7 w-7 text-orange-500/60 mb-1.5" />
-              <p className="text-[12px] font-semibold text-slate-500 dark:text-slate-400">
-                {isEn ? "No upcoming events scheduled" : "Chưa có sự kiện mới được lên lịch"}
-              </p>
-            </div>
-          ) : (
-            <div
-              className="relative w-full overflow-hidden rounded-3xl group select-none"
-              onMouseEnter={() => setIsEventHovered(true)}
-              onMouseLeave={() => setIsEventHovered(false)}
-              onTouchStart={(e) => {
-                eventTouchStartXRef.current = e.touches[0].clientX;
-              }}
-              onTouchEnd={(e) => {
-                if (eventTouchStartXRef.current === null) return;
-                const diff = eventTouchStartXRef.current - e.changedTouches[0].clientX;
-                if (diff > 45) {
-                  setEventSlideIndex((prev) => (prev + 1) % displayEvents.length);
-                } else if (diff < -45) {
-                  setEventSlideIndex((prev) => (prev === 0 ? displayEvents.length - 1 : prev - 1));
-                }
-                eventTouchStartXRef.current = null;
-              }}
-            >
-              {(() => {
-                const currentEv = displayEvents[eventSlideIndex % displayEvents.length] || displayEvents[0];
-                const realTitle = currentEv.title;
-                const rawImg = (currentEv as any).image;
-                const fallbackImg = defaultEventImages[eventSlideIndex % defaultEventImages.length];
-                const realImg = rawImg ? resolveMediaUrl(rawImg) || rawImg : fallbackImg;
-
-                return (
-                  <Link
-                    to="/association/events"
-                    search={{ eventId: currentEv.id }}
-                    className="relative block w-full h-[185px] sm:h-[210px] rounded-3xl overflow-hidden shadow-lg border border-orange-400/40 bg-slate-900 group"
-                  >
-                    <img
-                      src={realImg}
-                      alt={realTitle}
-                      loading="lazy"
-                      onError={(e) => {
-                        (e.currentTarget as HTMLImageElement).src = fallbackImg;
-                      }}
-                      className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/50 to-black/20 pointer-events-none" />
-
-                    {/* Top badging: Countdown + Slide Index */}
-                    <div className="absolute top-3 inset-x-3.5 flex items-center justify-between z-10">
-                      <div className="flex items-center gap-1.5">
-                        <EventCountdownMiniBadge event={currentEv} index={eventSlideIndex} />
-                      </div>
-                      <span className="px-2.5 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[10px] font-mono font-bold text-white border border-white/20">
-                        {(eventSlideIndex % displayEvents.length) + 1} / {displayEvents.length}
-                      </span>
-                    </div>
-
-                    {/* Bottom information */}
-                    <div className="absolute inset-x-3.5 bottom-3.5 z-10 flex flex-col gap-1.5">
-                      <h3 className="text-sm sm:text-base font-black text-white leading-tight drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] line-clamp-2 group-hover:text-amber-200 transition-colors">
-                        {realTitle}
-                      </h3>
-                      <div className="flex items-center justify-between text-xs text-slate-200">
-                        <div className="flex items-center gap-2">
-                          <span className="inline-flex items-center gap-1 font-medium text-white">
-                            <Clock className="size-3.5 text-orange-400 shrink-0" />
-                            {(() => {
-                              const evAny = currentEv as any;
-                              const sTime = evAny?.startTime || evAny?.start_time;
-                              const eTime = evAny?.endTime || evAny?.end_time;
-                              if (sTime && eTime && sTime !== "00:00" && eTime !== "00:00") {
-                                return `${sTime} - ${eTime}`;
-                              }
-                              if (sTime && sTime !== "00:00") {
-                                return `${sTime} - 17:30`;
-                              }
-                              const t = currentEv.time;
-                              if (t && t.includes("-") && !t.includes("00:00 - 00:00")) return t;
-                              if (t && t !== "00:00") return `${t} - 17:30`;
-
-                              if (currentEv.date) {
-                                try {
-                                  const d = new Date(currentEv.date);
-                                  if (!isNaN(d.getTime()) && (d.getHours() !== 0 || d.getMinutes() !== 0)) {
-                                    const hh = String(d.getHours()).padStart(2, "0");
-                                    const mm = String(d.getMinutes()).padStart(2, "0");
-                                    return `${hh}:${mm} - 21:30`;
-                                  }
-                                } catch { }
-                              }
-
-                              const tl = realTitle.toLowerCase();
-                              if (tl.includes("golf")) return "06:00 - 15:30";
-                              if (tl.includes("gala") || tl.includes("kỷ niệm") || tl.includes("đại hội")) return "18:00 - 22:00";
-                              if (tl.includes("tọa đàm") || tl.includes("workshop") || tl.includes("diễn đàn")) return "08:30 - 11:45";
-                              if (tl.includes("caravan")) return "07:00 - 18:00";
-                              return "08:00 - 17:30";
-                            })()}
-                          </span>
-                          <span className="truncate max-w-[150px] text-slate-300 text-[11px]">
-                            {(currentEv as any).location || (currentEv as any).place || (currentEv as any).venue || "Hà Nội"}
-                          </span>
+              {events.length === 0 ? (
+                <div className="bg-white rounded-2xl p-6 text-center border border-slate-200 shadow-sm">
+                  <Calendar className="w-10 h-10 text-slate-300 mx-auto mb-2" />
+                  <p className="text-sm font-semibold text-slate-700">Chưa có sự kiện nào sắp tới</p>
+                  <p className="text-xs text-slate-500 mt-1 max-w-xs mx-auto">
+                    Các sự kiện mới của Hiệp hội CEO HN10 sẽ được cập nhật liên tục tại đây.
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {events.map((event) => (
+                    <div
+                      key={event.id}
+                      className="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm hover:shadow-md transition-all relative overflow-hidden"
+                    >
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1.5">
+                            <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-rose-50 text-[#DC2626] border border-rose-200">
+                              Sự Kiện CEO HN10
+                            </span>
+                            <span className="text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
+                              {event.price && event.price > 0 ? `${event.price.toLocaleString("vi-VN")} đ` : "Miễn phí (0đ)"}
+                            </span>
+                          </div>
+                          <h4 className="text-sm font-bold text-slate-900 line-clamp-2 leading-snug">
+                            {event.name}
+                          </h4>
                         </div>
-                        <span className="inline-flex items-center gap-1 px-3.5 py-1.5 rounded-full bg-gradient-to-r from-[#E0592A] to-[#f97316] hover:from-[#c94b20] hover:to-[#ea580c] shadow-md transition border border-white/20 select-none">
-                          <span className="font-extrabold text-[11.5px] leading-none text-white" style={{ color: "#ffffff" }}>
-                            Chi tiết
-                          </span>
-                          <ChevronRight className="size-3.5 stroke-[3] text-white" style={{ color: "#ffffff" }} />
-                        </span>
+                      </div>
+
+                      <div className="mt-2.5 space-y-1 text-xs text-slate-600">
+                        <div className="flex items-center gap-1.5">
+                          <Clock className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                          <span className="font-medium text-slate-700">{formatDisplayDate(event.date)}</span>
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                          <MapPin className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                          <span className="truncate">{event.location || "Trung tâm Hội nghị Hà Nội"}</span>
+                        </div>
+                      </div>
+
+                      {/* Action buttons: Xem chi tiết & Đăng ký qua App */}
+                      <div className="mt-3.5 pt-3 border-t border-slate-100 flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setSelectedDetailEvent(event)}
+                          className="flex-1 py-2 px-3 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 font-bold text-xs transition cursor-pointer flex items-center justify-center gap-1"
+                        >
+                          <BookOpen className="w-3.5 h-3.5 text-[#003B95]" />
+                          <span>Xem Chi Tiết</span>
+                        </button>
+
+                        {event.isRegistered ? (
+                          <button
+                            type="button"
+                            onClick={() => setViewTicketEvent(event)}
+                            className="flex-1 py-2 px-3 rounded-xl bg-[#003B95] text-white font-bold text-xs hover:bg-[#002b6d] shadow transition flex items-center justify-center gap-1 cursor-pointer"
+                          >
+                            <Ticket className="w-3.5 h-3.5 text-amber-400" />
+                            <span>Mã Vé QR</span>
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => handleRegisterEvent(event)}
+                            className="flex-1 py-2 px-3 rounded-xl bg-[#DC2626] hover:bg-[#b91c1c] text-white font-bold text-xs shadow-sm flex items-center justify-center gap-1 transition cursor-pointer"
+                          >
+                            <Ticket className="w-3.5 h-3.5" />
+                            <span>Đăng Ký Ngay</span>
+                          </button>
+                        )}
+
+                        {/* Nút check in quét mã QR chỉ show cho Ban Truyền Thông / Admin */}
+                        {canScanCheckin && (
+                          <Link
+                            to="/association/checkin"
+                            className="py-2 px-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-[#001D4A] font-bold text-xs shadow-sm flex items-center justify-center gap-1 transition cursor-pointer shrink-0"
+                            title="Soát vé Check-in (Ban Truyền Thông)"
+                          >
+                            <ScanLine className="w-3.5 h-3.5" />
+                            <span>QR</span>
+                          </Link>
+                        )}
                       </div>
                     </div>
-                  </Link>
-                );
-              })()}
-
-              {/* Prev / Next buttons if multiple events */}
-              {displayEvents.length > 1 && (
-                <>
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      setEventSlideIndex((prev) => (prev === 0 ? displayEvents.length - 1 : prev - 1));
-                    }}
-                    className="absolute left-2.5 top-1/2 -translate-y-1/2 z-20 size-8 rounded-full bg-black/60 hover:bg-black/90 text-white flex items-center justify-center backdrop-blur-sm border border-white/20 shadow-md cursor-pointer transition active:scale-95"
-                    title="Sự kiện trước"
-                  >
-                    <ChevronLeft className="size-4" />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      setEventSlideIndex((prev) => (prev + 1) % displayEvents.length);
-                    }}
-                    className="absolute right-2.5 top-1/2 -translate-y-1/2 z-20 size-8 rounded-full bg-black/60 hover:bg-black/90 text-white flex items-center justify-center backdrop-blur-sm border border-white/20 shadow-md cursor-pointer transition active:scale-95"
-                    title="Sự kiện sau"
-                  >
-                    <ChevronRight className="size-4" />
-                  </button>
-                </>
-              )}
-
-              {/* Dots indicator */}
-              {displayEvents.length > 1 && (
-                <div className="flex items-center justify-center gap-1.5 mt-2.5">
-                  {displayEvents.slice(0, 8).map((_, idx) => (
-                    <button
-                      key={idx}
-                      type="button"
-                      onClick={() => setEventSlideIndex(idx)}
-                      className={`transition-all duration-300 rounded-full cursor-pointer ${eventSlideIndex % displayEvents.length === idx
-                          ? "w-6 h-1.5 bg-orange-500"
-                          : "w-1.5 h-1.5 bg-slate-300 dark:bg-slate-700"
-                        }`}
-                      title={`Sự kiện ${idx + 1}`}
-                    />
                   ))}
                 </div>
               )}
             </div>
-          )}
-        </div>
 
-        {/* ── ƯU ĐÃI RIÊNG Học viên & ĐỐI TÁC: CAROUSEL SLIDER (3 ƯU ĐÃI + SINH NHẬT + BIỂU DƯƠNG NĂM) ── */}
-        <div className="self-stretch">
-          <MemberPerksCarousel />
-        </div>
-
-        {/* ── 2. CƠ HỘI GIAO THƯƠNG NỘI KHỐI (1 HÀNG TỐI ƯU GỌN GÀNG VỚI 3 BIỂU ĐỒ TRÒN & POPUP) ── */}
-        <div className="w-full flex flex-col gap-3">
-          <HomeOpportunityRowWidget
-            opportunities={opportunities || []}
-            totalOpportunitiesCount={totalOpportunitiesCount}
-            totalOpportunitiesValue={totalOpportunitiesValue}
-            totalDealsWonValue={
-              analyticsOverview?.summary?.totalDealsWonValue
-                ? `${(analyticsOverview.summary.totalDealsWonValue / 1000000000).toFixed(1)} Tỷ đ`
-                : "12.8 Tỷ đ"
-            }
-          />
-        </div>
-
-        {/* ── 3. GIAO THƯƠNG DOANH NGHIỆP Học viên (ĐẨY XUỐNG DƯỚI TOÀN ĐỘ RỘNG) ── */}
-        <div className="w-full flex flex-col gap-3">
-          <Link
-            to="/association/products"
-            className="w-full p-4 bg-white dark:bg-slate-900 rounded-3xl shadow-[0px_4px_16px_0px_rgba(234,88,12,0.08)] border border-slate-200 dark:border-slate-800 flex flex-col gap-3 group hover:border-orange-400 transition"
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wide">
-                  Giao thương
-                </h3>
-                <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                  Sản phẩm &amp; dịch vụ ưu đãi độc quyền Học viên
-                </p>
+            {/* ── KHỐI 2: HỌC VIÊN MỚI THAM GIA ── */}
+            <div className="space-y-3 pt-2">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-sm font-bold text-slate-900 flex items-center gap-1.5">
+                    <UserPlus className="w-4 h-4 text-[#003B95]" />
+                    <span>Học Viên Mới Tham Gia</span>
+                  </h3>
+                  <p className="text-[11px] text-slate-500">Chào mừng các lãnh đạo doanh nghiệp vừa gia nhập CEO HN10</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setActiveTab("connect")}
+                  className="text-xs font-semibold text-[#003B95] hover:underline flex items-center gap-0.5 cursor-pointer"
+                >
+                  Mạng lưới <ChevronRight className="w-3 h-3" />
+                </button>
               </div>
-              <div className="flex items-center gap-1 text-xs font-bold text-orange-600 dark:text-orange-400 group-hover:translate-x-0.5 transition-transform">
-                <span>Gian hàng</span>
-                <ChevronRight className="size-3.5" />
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                {peers.slice(0, 4).map((peer) => (
+                  <div
+                    key={peer.id}
+                    className="p-3 rounded-2xl border border-slate-200 bg-white shadow-2xs flex items-center justify-between gap-3"
+                  >
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <div className="w-10 h-10 rounded-full bg-slate-800 text-white font-bold flex items-center justify-center shrink-0 overflow-hidden border border-amber-300">
+                        {peer.avatarUrl && resolveMediaUrl(peer.avatarUrl) ? (
+                          <img src={resolveMediaUrl(peer.avatarUrl) || undefined} alt={peer.name} className="w-full h-full object-cover" />
+                        ) : (
+                          peer.name.charAt(0).toUpperCase()
+                        )}
+                      </div>
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-1.5">
+                          <h4 className="text-xs font-bold text-slate-900 truncate">{peer.name}</h4>
+                          <span className="text-[9px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-200 shrink-0">
+                            Mới
+                          </span>
+                        </div>
+                        <p className="text-[10px] text-slate-500 truncate mt-0.5">{peer.companyName}</p>
+                        <span className="font-mono text-[9px] text-slate-400 font-semibold">{peer.studentCode}</span>
+                      </div>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => handleToggleConnect(peer.id)}
+                      className={`px-2.5 py-1 rounded-lg text-[10px] font-bold transition shrink-0 cursor-pointer ${
+                        peer.isConnected
+                          ? "bg-slate-100 text-slate-600"
+                          : "bg-blue-50 text-[#003B95] hover:bg-blue-100 border border-blue-200"
+                      }`}
+                    >
+                      {peer.isConnected ? "Đã Kết Nối" : "+ Kết Bạn"}
+                    </button>
+                  </div>
+                ))}
               </div>
             </div>
 
-            {/* Banner with product count overlay */}
-            <div className="relative h-28 w-full overflow-hidden rounded-2xl bg-slate-900">
-              <img
-                src="/images/ceohn10/marketplace-banner.jpg"
-                alt="Giao thương"
-                onError={(e) => {
-                  (e.currentTarget as HTMLImageElement).src = "/images/ceo1983/marketplace-banner.jpg";
-                }}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/40 to-transparent" />
-              <div className="absolute inset-x-3 bottom-3 flex items-center justify-between text-white">
+            {/* ── KHỐI 3: BÀI TẬP & NHIỆM VỤ CỦA HỌC VIÊN ── */}
+            <div className="space-y-3 pt-2">
+              <div className="flex items-center justify-between">
                 <div>
-                  <div className="text-xs font-bold text-white">
-                    📦 {allMarketplaceProducts.length || products.length} sản phẩm &amp; gói thầu niêm yết
+                  <h3 className="text-sm font-bold text-slate-900 flex items-center gap-1.5">
+                    <BookOpen className="w-4 h-4 text-[#F59E0B]" />
+                    <span>Bài Tập &amp; Nhiệm Vụ Của Học Viên</span>
+                  </h3>
+                  <p className="text-[11px] text-slate-500">Chuyên đề học tập, bài thu hoạch và kết nối giao thương</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setActiveTab("classes")}
+                  className="text-xs font-semibold text-[#003B95] hover:underline flex items-center gap-0.5 cursor-pointer"
+                >
+                  Giáo trình <ChevronRight className="w-3 h-3" />
+                </button>
+              </div>
+
+              <div className="space-y-2.5">
+                {studentAssignments.map((asn) => (
+                  <div
+                    key={asn.id}
+                    className="p-3.5 rounded-2xl border border-slate-200 bg-white shadow-2xs space-y-2 hover:border-slate-300 transition"
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="font-mono text-[10px] font-black text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200">
+                            {asn.module}
+                          </span>
+                          <span className="text-[10px] text-slate-500">Hạn nộp: <b>{asn.deadline}</b></span>
+                        </div>
+                        <h4 className="text-xs font-bold text-slate-900 line-clamp-2 leading-snug">
+                          {asn.title}
+                        </h4>
+                      </div>
+                      <span
+                        className={`text-[10px] font-black px-2 py-0.5 rounded-full shrink-0 ${
+                          asn.status === "completed"
+                            ? "bg-emerald-100 text-emerald-800"
+                            : asn.status === "in_progress"
+                            ? "bg-blue-100 text-blue-800"
+                            : "bg-amber-100 text-amber-800"
+                        }`}
+                      >
+                        {asn.status === "completed"
+                          ? `Đã nộp (${asn.score})`
+                          : asn.status === "in_progress"
+                          ? "Đang làm"
+                          : "Cần nộp bài"}
+                      </span>
+                    </div>
+
+                    <p className="text-[11px] text-slate-500 line-clamp-2 leading-relaxed">
+                      {asn.description}
+                    </p>
+
+                    <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px]">
+                      <span className="text-slate-500">Giảng viên: <b>{asn.instructor}</b></span>
+                      <button
+                        type="button"
+                        onClick={() => toast.success(`Mở chuyên đề: ${asn.title}`)}
+                        className="font-bold text-[#003B95] hover:underline cursor-pointer"
+                      >
+                        {asn.status === "completed" ? "Xem Lại Bài Nộp" : "Nộp Bài Ngay →"}
+                      </button>
+                    </div>
                   </div>
-                  <div className="text-[11px] text-slate-300">
-                    Tổng giá trị: <span className="font-bold text-emerald-400">{totalProductsValue || "0 đ"}</span>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ======================================================== */}
+        {/* PHÂN HỆ 2: 🤝 KẾT BẠN DOANH NHÂN (NETWORKING)            */}
+        {/* ======================================================== */}
+        {activeTab === "connect" && (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-sm font-bold text-slate-900 flex items-center gap-1.5">
+                  <Users className="w-4 h-4 text-[#003B95]" />
+                  Kết Nối Bạn Học & Doanh Nhân
+                </h3>
+                <p className="text-[11px] text-slate-500">Mạng lưới thành viên cùng lớp và Hiệp hội</p>
+              </div>
+              <span className="text-xs font-bold text-slate-500 bg-slate-200/60 px-2 py-0.5 rounded-full">
+                {peers.length} Thành viên
+              </span>
+            </div>
+
+            {/* Search Input */}
+            <div className="relative">
+              <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+              <input
+                type="text"
+                placeholder="Tìm bạn học, công ty, ngành nghề..."
+                value={searchPeerQuery}
+                onChange={(e) => setSearchPeerQuery(e.target.value)}
+                className="w-full pl-9 pr-3 py-2 rounded-xl bg-white border border-slate-200 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#003B95]/20 focus:border-[#003B95]"
+              />
+            </div>
+
+            {/* Peer List */}
+            {filteredPeers.length === 0 ? (
+              <div className="bg-white rounded-xl p-6 text-center border border-slate-200 shadow-sm">
+                <Users className="w-10 h-10 text-slate-300 mx-auto mb-2" />
+                <p className="text-sm font-semibold text-slate-700">Không tìm thấy hội viên phù hợp</p>
+              </div>
+            ) : (
+              <div className="space-y-2.5">
+                {filteredPeers.map((peer) => (
+                  <div
+                    key={peer.id}
+                    className="bg-white rounded-xl p-3.5 border border-slate-200/80 shadow-sm flex items-center justify-between gap-3 hover:border-slate-300 transition-colors"
+                  >
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="w-12 h-12 rounded-full bg-slate-800 text-white font-bold flex items-center justify-center shrink-0 border border-slate-200 overflow-hidden">
+                        {peer.avatarUrl && resolveMediaUrl(peer.avatarUrl) ? (
+                          <img src={resolveMediaUrl(peer.avatarUrl) || undefined} alt={peer.name} className="w-full h-full object-cover" />
+                        ) : (
+                          peer.name.charAt(0).toUpperCase()
+                        )}
+                      </div>
+                      <div className="min-w-0">
+                        <h4 className="text-xs font-bold text-slate-900 truncate flex items-center gap-1">
+                          {peer.name}
+                        </h4>
+                        <p className="text-[11px] text-slate-500 truncate mt-0.5">
+                          {peer.position} • {peer.companyName}
+                        </p>
+                        <div className="flex items-center gap-2 mt-1">
+                          <span className="text-[10px] font-semibold text-[#003B95] bg-blue-50 px-1.5 py-0.5 rounded border border-blue-100">
+                            {peer.industry}
+                          </span>
+                          <span className="text-[10px] text-slate-400 font-mono">
+                            {peer.studentCode}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Connect Action Button */}
+                    <button
+                      onClick={() => handleToggleConnect(peer.id)}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-bold shrink-0 transition-all active:scale-95 flex items-center gap-1 ${
+                        peer.isConnected
+                          ? "bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100"
+                          : "bg-[#003B95] text-white hover:bg-[#002b6d] shadow-sm"
+                      }`}
+                    >
+                      {peer.isConnected ? (
+                        <>
+                          <UserCheck className="w-3.5 h-3.5 text-emerald-600" />
+                          <span>Đã Kết Nối</span>
+                        </>
+                      ) : (
+                        <>
+                          <UserPlus className="w-3.5 h-3.5" />
+                          <span>Kết Bạn</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ======================================================== */}
+        {/* PHÂN HỆ 3: 🎓 LỚP HỌC DOANH TRÍ (TRAININGS & CLASSES)   */}
+        {/* ======================================================== */}
+        {activeTab === "classes" && (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-sm font-bold text-slate-900 flex items-center gap-1.5">
+                  <GraduationCap className="w-4 h-4 text-amber-500" />
+                  Chương Trình Đào Tạo CEO HN10
+                </h3>
+                <p className="text-[11px] text-slate-500">Các học phần, bài giảng và tài liệu chuyên sâu</p>
+              </div>
+              <span className="text-xs font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200">
+                {classes.length} Chuyên Đề
+              </span>
+            </div>
+
+            <div className="space-y-3">
+              {classes.map((cls, idx) => (
+                <div
+                  key={cls.id}
+                  className="bg-white rounded-xl p-4 border border-slate-200/90 shadow-sm relative overflow-hidden"
+                >
+                  <div className="flex items-center justify-between gap-2 mb-2">
+                    <span className="inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-amber-50 text-amber-700 border border-amber-200 font-mono">
+                      {cls.moduleCode}
+                    </span>
+                    {cls.isOnline ? (
+                      <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-blue-600 bg-blue-50 px-2 py-0.5 rounded">
+                        <Video className="w-3 h-3" /> Zoom Trực Tuyến
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-slate-500 bg-slate-100 px-2 py-0.5 rounded">
+                        <Building2 className="w-3 h-3" /> Tại Hội Trường
+                      </span>
+                    )}
+                  </div>
+
+                  <h4 className="text-sm font-bold text-slate-900 leading-snug">
+                    {cls.title}
+                  </h4>
+
+                  <div className="mt-2.5 space-y-1 text-xs text-slate-600">
+                    <p className="font-medium text-slate-700">
+                      👨‍🏫 Giảng viên: <span className="font-semibold text-[#003B95]">{cls.instructor}</span>
+                    </p>
+                    <div className="flex items-center gap-1.5">
+                      <Clock className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                      <span>{cls.duration}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                      <span className="truncate">{cls.location}</span>
+                    </div>
+                  </div>
+
+                  {/* Class actions */}
+                  <div className="mt-3.5 pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
+                    <button
+                      onClick={() => toast.info("Đang tải slide bài giảng...", { description: cls.title })}
+                      className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold active:scale-95 transition-all"
+                    >
+                      <Download className="w-3.5 h-3.5 text-slate-500" />
+                      <span>Slide & Tài Liệu</span>
+                    </button>
+
+                    <button
+                      onClick={() => toast.success("Đã điểm danh buổi học thành công!", { description: cls.title })}
+                      className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-[#003B95] hover:bg-[#002b6d] text-white text-xs font-bold active:scale-95 shadow transition-all"
+                    >
+                      <CheckCircle2 className="w-3.5 h-3.5 text-amber-400" />
+                      <span>Điểm Danh Học</span>
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* ======================================================== */}
+        {/* PHÂN HỆ 4: 🗓️ LỊCH & HOẠT ĐỘNG CỦA MÃ HỌC VIÊN          */}
+        {/* ======================================================== */}
+        {activeTab === "timeline" && (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-sm font-bold text-slate-900 flex items-center gap-1.5">
+                  <Clock className="w-4 h-4 text-[#003B95]" />
+                  Lịch Trình Cá Nhân Hóa
+                </h3>
+                <p className="text-[11px] text-slate-500">
+                  Hoạt động theo Mã Học Viên: <span className="font-mono font-bold text-[#003B95]">{profile?.studentCode}</span>
+                </p>
+              </div>
+              <Link
+                to="/association/calendar"
+                className="text-xs font-semibold text-[#003B95] hover:underline flex items-center gap-0.5"
+              >
+                Mở Lịch Tháng <ChevronRight className="w-3 h-3" />
+              </Link>
+            </div>
+
+            {/* Timeline cards */}
+            <div className="relative pl-6 space-y-4 before:absolute before:left-2.5 before:top-2 before:bottom-2 before:w-0.5 before:bg-slate-200">
+              {activities.map((act) => {
+                const isClass = act.category === "class";
+                const isEvent = act.category === "event";
+                const isMeeting = act.category === "team_meeting";
+
+                return (
+                  <div key={act.id} className="relative group">
+                    {/* Timeline bullet dot */}
+                    <div
+                      className={`absolute -left-6 top-1.5 w-4 h-4 rounded-full border-2 border-white shadow-sm flex items-center justify-center ${
+                        isClass
+                          ? "bg-amber-500"
+                          : isEvent
+                          ? "bg-[#DC2626]"
+                          : "bg-[#003B95]"
+                      }`}
+                    />
+
+                    <div className="bg-white rounded-xl p-3.5 border border-slate-200 shadow-sm hover:border-slate-300 transition-colors">
+                      <div className="flex items-center justify-between gap-1 mb-1">
+                        <span
+                          className={`text-[10px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider ${
+                            isClass
+                              ? "bg-amber-50 text-amber-700 border border-amber-200"
+                              : isEvent
+                              ? "bg-rose-50 text-[#DC2626] border border-rose-200"
+                              : "bg-blue-50 text-[#003B95] border border-blue-200"
+                          }`}
+                        >
+                          {isClass ? "Buổi Học" : isEvent ? "Sự Kiện" : "Gặp Mặt Team"}
+                        </span>
+                        <span className="text-[11px] font-semibold text-slate-500">
+                          {act.date}
+                        </span>
+                      </div>
+
+                      <h4 className="text-xs font-bold text-slate-900 leading-snug">
+                        {act.title}
+                      </h4>
+
+                      <div className="mt-2 space-y-1 text-[11px] text-slate-600">
+                        <div className="flex items-center gap-1.5">
+                          <Clock className="w-3 h-3 text-slate-400" />
+                          <span>{act.time}</span>
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                          <MapPin className="w-3 h-3 text-slate-400" />
+                          <span className="truncate">{act.location}</span>
+                        </div>
+                      </div>
+
+                      <div className="mt-2.5 pt-2 border-t border-slate-100 flex items-center justify-between">
+                        <span className="text-[10px] font-semibold text-emerald-600 flex items-center gap-1">
+                          <CheckCircle2 className="w-3 h-3" />
+                          {act.status === "registered" ? "Đã Xác Nhận Tham Gia" : "Cần Phản Hồi"}
+                        </span>
+                        <button
+                          onClick={() => toast.success("Đã đồng bộ lịch vào điện thoại thành công!")}
+                          className="text-[11px] font-bold text-[#003B95] hover:underline"
+                        >
+                          Thêm vào Lịch máy
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+      </main>
+
+      {/* ── MODAL HIỂN THỊ VÉ ĐIỆN TỬ VỚI MÃ QR ── */}
+      {viewTicketEvent && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in">
+          <div className="bg-white rounded-2xl w-full max-w-sm overflow-hidden shadow-2xl border border-slate-200">
+            <div className="bg-gradient-to-r from-[#001D4A] to-[#003B95] p-4 text-white flex items-center justify-between">
+              <div>
+                <span className="text-[10px] uppercase font-bold text-amber-400 tracking-wider">
+                  VÉ ĐIỆN TỬ CHÍNH THỨC
+                </span>
+                <h3 className="text-sm font-bold text-white leading-tight mt-0.5">
+                  {viewTicketEvent.name}
+                </h3>
+              </div>
+              <button
+                onClick={() => setViewTicketEvent(null)}
+                className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="p-5 flex flex-col items-center text-center space-y-4">
+              {/* QR Container */}
+              <div className="p-3 bg-white rounded-xl border-2 border-dashed border-[#003B95]/30 shadow-inner flex flex-col items-center justify-center">
+                <div className="w-44 h-44 bg-slate-900 rounded-lg flex items-center justify-center text-white p-2">
+                  {/* Visual QR representation */}
+                  <QrCode className="w-36 h-36 text-white" />
+                </div>
+                <p className="mt-2 text-[11px] text-slate-500 font-medium">
+                  Đưa mã này cho lễ tân khi check-in tại cửa
+                </p>
+              </div>
+
+              {/* Ticket Details */}
+              <div className="w-full bg-slate-50 rounded-xl p-3 text-left space-y-1.5 border border-slate-200/80 text-xs">
+                <div className="flex justify-between">
+                  <span className="text-slate-500">Mã vé:</span>
+                  <span className="font-mono font-bold text-[#DC2626]">{viewTicketEvent.ticketCode}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-slate-500">Học viên:</span>
+                  <span className="font-bold text-slate-800">{profile?.name}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-slate-500">Mã học viên:</span>
+                  <span className="font-mono font-semibold text-slate-700">{profile?.studentCode}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-slate-500">Thời gian:</span>
+                  <span className="font-medium text-slate-700">{formatDisplayDate(viewTicketEvent.date)}</span>
+                </div>
+              </div>
+
+              <button
+                onClick={() => {
+                  toast.success("Đã tải ảnh vé điện tử về máy!");
+                  setViewTicketEvent(null);
+                }}
+                className="w-full py-2.5 rounded-xl bg-[#003B95] hover:bg-[#002b6d] active:scale-98 text-white font-bold text-xs shadow-md flex items-center justify-center gap-2 transition-all"
+              >
+                <Download className="w-4 h-4" />
+                <span>Lưu Vé Vào Thư Viện Ảnh</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── MODAL XEM CHI TIẾT SỰ KIỆN & ĐĂNG KÝ QUA APP ── */}
+      {selectedDetailEvent && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-xs animate-in fade-in">
+          <div className="relative w-full max-w-lg rounded-3xl bg-white border border-slate-200 p-6 text-slate-900 shadow-2xl overflow-hidden max-h-[90vh] flex flex-col space-y-4">
+            <div className="flex items-start justify-between pb-3 border-b border-slate-100">
+              <div className="flex-1 pr-2">
+                <span className="inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-rose-50 text-[#DC2626] border border-rose-200 mb-1">
+                  Chi Tiết Sự Kiện
+                </span>
+                <h3 className="text-base font-black text-slate-900 leading-snug">
+                  {selectedDetailEvent.name}
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setSelectedDetailEvent(null)}
+                className="p-1 rounded-xl text-slate-400 hover:bg-slate-100 cursor-pointer transition"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="overflow-y-auto space-y-3.5 pr-1 text-xs">
+              <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+                <div className="flex items-center gap-2 text-slate-700">
+                  <Clock className="w-4 h-4 text-[#003B95] shrink-0" />
+                  <span>Thời gian: <b>{formatDisplayDate(selectedDetailEvent.date)}</b></span>
+                </div>
+                <div className="flex items-center gap-2 text-slate-700">
+                  <MapPin className="w-4 h-4 text-amber-500 shrink-0" />
+                  <span>Địa điểm: <b>{selectedDetailEvent.location || "Trung tâm Hội nghị Hà Nội"}</b></span>
+                </div>
+                <div className="flex items-center gap-2 text-slate-700">
+                  <Ticket className="w-4 h-4 text-[#DC2626] shrink-0" />
+                  <span>Phí tham dự: <b className="text-[#DC2626]">{selectedDetailEvent.price && selectedDetailEvent.price > 0 ? `${selectedDetailEvent.price.toLocaleString("vi-VN")} đ` : "Miễn phí (0đ)"}</b></span>
+                </div>
+              </div>
+
+              <div>
+                <h4 className="font-bold text-slate-900 mb-1">Giới Thiệu Chương Trình:</h4>
+                <p className="text-slate-600 leading-relaxed text-[11px]">
+                  {selectedDetailEvent.description || "Chương trình quy tụ các chuyên gia kinh tế, lãnh đạo doanh nghiệp hàng đầu trong CLB Doanh Nhân CEO HN10 nhằm kết nối giao thương, chia sẻ kinh nghiệm quản trị và mở rộng cơ hội hợp tác chiến lược."}
+                </p>
+              </div>
+
+              <div>
+                <h4 className="font-bold text-slate-900 mb-1.5">Lịch Trình Chi Tiết:</h4>
+                <div className="space-y-1.5 text-[11px] text-slate-600">
+                  <div className="flex items-center gap-2 p-2 rounded-xl bg-slate-50">
+                    <span className="font-mono font-bold text-[#003B95]">08:00 - 08:45</span>
+                    <span>Đón tiếp đại biểu, quét mã QR Check-in &amp; Tea-break giao lưu</span>
+                  </div>
+                  <div className="flex items-center gap-2 p-2 rounded-xl bg-slate-50">
+                    <span className="font-mono font-bold text-[#003B95]">08:45 - 10:30</span>
+                    <span>Khai mạc sự kiện, Báo cáo &amp; Tọa đàm chuyên đề doanh nghiệp</span>
+                  </div>
+                  <div className="flex items-center gap-2 p-2 rounded-xl bg-slate-50">
+                    <span className="font-mono font-bold text-[#003B95]">10:30 - 11:30</span>
+                    <span>Giao thương B2B, Biểu quyết &amp; Bốc thăm trúng thưởng may mắn</span>
                   </div>
                 </div>
               </div>
             </div>
-          </Link>
-        </div>
 
-        {/* DOANH NGHIỆP MỚI GIA NHẬP */}
-        <div className="self-stretch flex flex-col justify-start items-start gap-2">
-          <div className="self-stretch inline-flex justify-between items-center overflow-hidden">
-            <div className="flex justify-start items-center gap-2">
-              <span className="text-slate-800 dark:text-white text-sm font-bold font-sans leading-5">Học viên MỚI GIA NHẬP</span>
-            </div>
-            <Link to="/association/members" className="p-1 rounded-full bg-orange-50 dark:bg-slate-800 flex justify-center items-center hover:bg-orange-100 transition">
-              <ChevronRight className="size-4 text-slate-500 dark:text-slate-400" />
-            </Link>
-          </div>
-
-          <div className="self-stretch overflow-x-auto no-scrollbar flex items-start gap-2.5 pb-1">
-            {(!directoryMembers || directoryMembers.length === 0) ? (
-              <div className="w-full py-4 text-center text-xs text-slate-400">
-                Chưa có doanh nghiệp mới gia nhập trong tháng này
-              </div>
-            ) : (
-              directoryMembers.slice(0, 8).map((m, i) => {
-                const pName = (m as any).personName || (m as any).contact || m.name || "Học viên";
-                const cName = (m as any).company || ((m as any).type === 'company' ? m.name : '') || (m as any).companyName || "Doanh nghiệp Học viên";
-                const rawAvatar = (m as any).avatar || (m as any).avatarUrl || (m as any).avatar_url;
-                const resolvedAv = resolveMediaUrl(rawAvatar);
-                return (
-                  <button
-                    type="button"
-                    key={(m as any).id || (m as any).code || i}
-                    onClick={() => setSelectedMemberForProfile(m)}
-                    className="w-48 h-14 p-2.5 bg-white dark:bg-slate-900 rounded-2xl shadow-xs outline outline-1 outline-offset-[-1px] outline-slate-200 dark:outline-slate-800 flex justify-start items-center gap-2.5 shrink-0 overflow-hidden hover:border-orange-500 dark:hover:border-orange-500 hover:shadow-md transition cursor-pointer text-left"
-                    title={`Xem hồ sơ chi tiết của ${pName}`}
-                  >
-                    <div className="size-9 bg-orange-500 rounded-xl outline outline-1 outline-orange-300 overflow-hidden flex justify-center items-center shrink-0 shadow-2xs">
-                      {resolvedAv ? (
-                        <img src={resolvedAv} alt={pName} className="w-full h-full object-cover" />
-                      ) : (
-                        <span className="text-white text-xs font-bold font-sans">{initials(pName)}</span>
-                      )}
-                    </div>
-                    <div className="inline-flex flex-col justify-start items-start min-w-0">
-                      <span className="text-slate-800 dark:text-white text-xs font-bold truncate max-w-[120px]">{pName}</span>
-                      <span className="text-slate-400 text-[11px] truncate max-w-[120px]">{cName}</span>
-                    </div>
-                  </button>
-                );
-              }))}
-          </div>
-        </div>
-
-        {/* TIN TỨC CÂU LẠC BỘ: CHỈ HIỆN 1 TIN TỨC ĐỘ RỘNG NGANG FULL MÀN HÌNH VÀ SLIDE CHUYỂN LIÊN TỤC (YÊU CẦU 3) */}
-        <div className="self-stretch flex flex-col justify-start items-start gap-3">
-          <div className="self-stretch inline-flex justify-between items-center overflow-hidden">
-            <div className="flex justify-start items-center gap-2">
-              <span className="text-slate-800 dark:text-white text-sm font-bold font-sans leading-5">TIN TỨC CÂU LẠC BỘ</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="px-2 py-0.5 bg-orange-50 dark:bg-orange-950/60 rounded-full outline outline-1 outline-orange-200 dark:outline-orange-800 text-orange-700 dark:text-orange-300 text-[10px] font-bold">
-                {combinedNews.length > 0 ? `+${combinedNews.length} BẢN TIN` : "0 BẢN TIN"}
-              </span>
-              <Link to="/association/news" className="p-1 rounded-full bg-orange-50 dark:bg-slate-800 flex justify-center items-center hover:bg-orange-100 transition">
-                <ChevronRight className="size-4 text-slate-500 dark:text-slate-400" />
-              </Link>
-            </div>
-          </div>
-
-          {/* 1 TIN TỨC DUY NHẤT FULL CHIỀU RỘNG MÀN HÌNH VỚI AUTO-SLIDE CAROUSEL */}
-          {combinedNews.length === 0 ? (
-            <div className="rounded-2xl vba-card p-5 text-center border border-dashed border-orange-200 dark:border-slate-700 bg-orange-50/30 dark:bg-slate-900/50 w-full">
-              <Newspaper className="mx-auto h-7 w-7 text-orange-500/60 mb-1.5" />
-              <p className="text-[12px] font-semibold text-slate-500 dark:text-slate-400">
-                Chưa có bản tin mới từ CLB
-              </p>
-            </div>
-          ) : (() => {
-            const newsList = combinedNews;
-
-            const currentIndex = newsSlideIndex % newsList.length;
-            const currentNews = newsList[currentIndex] || newsList[0];
-            const rawImg = (currentNews as any).image || (currentNews as any).cover;
-            const fallbackImg = DEFAULT_NEWS_THUMBNAILS[currentIndex % DEFAULT_NEWS_THUMBNAILS.length] || "/images/ceohn10/Rectangle 6-1.png";
-            const realImg = rawImg ? resolveMediaUrl(rawImg) || rawImg : fallbackImg;
-
-            return (
-              <div
-                className="relative w-full overflow-hidden rounded-3xl select-none group"
-                onMouseEnter={() => setIsNewsHovered(true)}
-                onMouseLeave={() => setIsNewsHovered(false)}
-                onTouchStart={(e) => {
-                  newsTouchStartXRef.current = e.touches[0].clientX;
-                }}
-                onTouchEnd={(e) => {
-                  if (newsTouchStartXRef.current === null) return;
-                  const diff = newsTouchStartXRef.current - e.changedTouches[0].clientX;
-                  if (diff > 45) {
-                    setNewsSlideIndex((prev) => (prev + 1) % newsList.length);
-                  } else if (diff < -45) {
-                    setNewsSlideIndex((prev) => (prev === 0 ? newsList.length - 1 : prev - 1));
-                  }
-                  newsTouchStartXRef.current = null;
-                }}
+            <div className="pt-3 border-t border-slate-100 flex items-center justify-between gap-3">
+              <button
+                type="button"
+                onClick={() => setSelectedDetailEvent(null)}
+                className="py-2.5 px-4 rounded-xl border border-slate-200 text-slate-700 font-bold text-xs hover:bg-slate-50 transition cursor-pointer"
               >
-                {/* 1 Tin tức Full Width duy nhất */}
-                <Link
-                  to="/association/news"
-                  search={{ articleId: String(currentNews.id) }}
-                  className="relative block w-full h-52 sm:h-60 rounded-3xl overflow-hidden shadow-lg border border-orange-300/80 dark:border-orange-500/30 bg-slate-900 group"
+                Đóng
+              </button>
+
+              {selectedDetailEvent.isRegistered ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setViewTicketEvent(selectedDetailEvent);
+                    setSelectedDetailEvent(null);
+                  }}
+                  className="flex-1 py-2.5 px-4 rounded-xl bg-[#003B95] hover:bg-[#002b6d] text-white font-bold text-xs shadow-md flex items-center justify-center gap-1.5 transition cursor-pointer"
                 >
-                  <img
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                    src={realImg}
-                    alt={currentNews.title}
-                    loading="lazy"
-                    onError={(e) => {
-                      (e.currentTarget as HTMLImageElement).src = fallbackImg;
-                    }}
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/50 to-black/20 pointer-events-none" />
-
-                  {/* Header badges: Tag chuyên mục + Vị trí Slide */}
-                  <div className="absolute top-3 inset-x-3.5 flex items-center justify-between z-10">
-                    <span className="px-2.5 py-0.5 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 text-white text-[10px] font-extrabold uppercase tracking-wider shadow-sm flex items-center gap-1">
-                      <Sparkles className="size-3" />
-                      <span>{(currentNews as any).category || "BẢN TIN HOẠT ĐỘNG"}</span>
-                    </span>
-                    <span className="px-2.5 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[10px] font-mono font-bold text-white border border-white/20">
-                      {currentIndex + 1} / {newsList.length}
-                    </span>
-                  </div>
-
-                  {/* Bottom info banner */}
-                  <div className="absolute inset-x-3.5 bottom-3.5 z-10 flex flex-col gap-1.5">
-                    <h3 className="text-sm sm:text-base font-black text-white leading-tight drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] line-clamp-2 group-hover:text-amber-200 transition-colors">
-                      {currentNews.title}
-                    </h3>
-                    <div className="flex items-center justify-between text-xs text-slate-200 pt-1 border-t border-white/10">
-                      <div className="flex items-center gap-2">
-                        <span className="font-medium text-slate-300 text-[11px] truncate max-w-[130px]">
-                          {currentNews.author || "Ban Truyền Thông"}
-                        </span>
-                        <span className="inline-flex items-center gap-1 font-mono text-amber-300 text-[11px]">
-                          <Clock className="size-3 text-amber-300 shrink-0" />
-                          {formatNewsDate(currentNews.time)}
-                        </span>
-                      </div>
-                      <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-orange-500 hover:bg-orange-600 text-white font-bold text-[11px] shadow-sm transition">
-                        <span>Đọc tiếp</span>
-                        <ChevronRight className="size-3 stroke-[3]" />
-                      </span>
-                    </div>
-                  </div>
-                </Link>
-
-                {/* Nút Điều Hướng Trái / Phải nếu có nhiều hơn 1 tin */}
-                {newsList.length > 1 && (
-                  <>
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        setNewsSlideIndex((prev) => (prev === 0 ? newsList.length - 1 : prev - 1));
-                      }}
-                      className="absolute left-2.5 top-1/2 -translate-y-1/2 z-20 size-8 rounded-full bg-black/60 hover:bg-black/90 text-white flex items-center justify-center backdrop-blur-sm border border-white/20 shadow-md cursor-pointer transition active:scale-95"
-                      title="Tin tức trước"
-                    >
-                      <ChevronLeft className="size-4" />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        setNewsSlideIndex((prev) => (prev + 1) % newsList.length);
-                      }}
-                      className="absolute right-2.5 top-1/2 -translate-y-1/2 z-20 size-8 rounded-full bg-black/60 hover:bg-black/90 text-white flex items-center justify-center backdrop-blur-sm border border-white/20 shadow-md cursor-pointer transition active:scale-95"
-                      title="Tin tức tiếp theo"
-                    >
-                      <ChevronRight className="size-4" />
-                    </button>
-                  </>
-                )}
-
-                {/* Dots indicator */}
-                {newsList.length > 1 && (
-                  <div className="flex items-center justify-center gap-1.5 mt-2.5">
-                    {newsList.slice(0, 8).map((_, idx) => (
-                      <button
-                        key={idx}
-                        type="button"
-                        onClick={() => setNewsSlideIndex(idx)}
-                        className={`transition-all duration-300 rounded-full cursor-pointer ${currentIndex === idx
-                            ? "w-6 h-1.5 bg-orange-500"
-                            : "w-1.5 h-1.5 bg-slate-300 dark:bg-slate-700"
-                          }`}
-                        title={`Bản tin ${idx + 1}`}
-                      />
-                    ))}
-                  </div>
-                )}
-              </div>
-            );
-          })()}
-        </div>
-
-        {/* Quét mã QR Check-in sự kiện (Đồng bộ theo màu người dùng chọn) */}
-        {canScanEventQr && (
-          <div
-            style={{
-              background: brandColorTheme.gradientCard || `linear-gradient(135deg, ${brandColorTheme.primaryColor} 0%, ${brandColorTheme.primaryDeep} 100%)`,
-              borderColor: `${brandColorTheme.accentColor}60`,
-              boxShadow: `0 8px 24px -4px ${brandColorTheme.primaryColor}40`,
-            }}
-            className="self-stretch p-4 rounded-[20px] inline-flex justify-between items-center gap-3 overflow-hidden shadow-lg border mt-1"
-          >
-            <div className="size-12 bg-white/15 backdrop-blur-xs rounded-2xl border border-white/40 flex justify-center items-center shrink-0 text-white shadow-inner">
-              <QrCode className="size-6.5 text-white" />
+                  <Ticket className="w-4 h-4 text-amber-400" />
+                  <span>Xem Vé Điện Tử QR Của Bạn</span>
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => {
+                    handleRegisterEvent(selectedDetailEvent);
+                    setSelectedDetailEvent(null);
+                  }}
+                  className="flex-1 py-2.5 px-4 rounded-xl bg-[#DC2626] hover:bg-[#b91c1c] text-white font-bold text-xs shadow-md flex items-center justify-center gap-1.5 transition cursor-pointer"
+                >
+                  <Ticket className="w-4 h-4" />
+                  <span>Đăng Ký Tham Gia Sự Kiện Này</span>
+                </button>
+              )}
             </div>
-            <div className="flex-1 inline-flex flex-col justify-start items-start gap-1 overflow-hidden min-w-0">
-              <span className="text-white text-xs font-extrabold leading-4">
-                Quét mã QR Check-in<br />sự kiện & điểm danh
-              </span>
-              <div className="px-2 py-0.5 bg-white/20 backdrop-blur-xs rounded-3xl inline-flex justify-start items-center gap-1 shadow-xs border border-white/30">
-                <ShieldCheck className="size-3 text-white" />
-                <span className="text-white text-[9.5px] font-black tracking-wide">BAN SOÁT VÉ CLB</span>
-              </div>
-            </div>
-            <Link
-              to="/association/checkin"
-              style={{ color: brandColorTheme.primaryColor }}
-              className="px-4 py-2.5 bg-white font-bold hover:bg-slate-50 rounded-full inline-flex justify-center items-center gap-1.5 shrink-0 shadow-md shadow-black/10 active:scale-95 transition"
-            >
-              <span className="text-xs font-bold">Quét ngay</span>
-              <ChevronRight className="size-3.5 stroke-[2.5]" style={{ color: brandColorTheme.primaryColor }} />
-            </Link>
           </div>
-        )}
-      </div>
-
-      {/* ── MODAL MÃ QR Học viên & QUÉT QR (DUAL TAB) ── */}
-      <AssociationMemberQrModal
-        open={memberQrModalOpen}
-        onClose={() => setMemberQrModalOpen(false)}
-        memberCode={
-          member?.code ||
-          (typeof window !== "undefined"
-            ? (() => {
-              try {
-                const m = JSON.parse(localStorage.getItem("vba_my_member") || "null");
-                return m?.code || null;
-              } catch {
-                return null;
-              }
-            })()
-            : null) ||
-          "HN10-292"
-        }
-        memberName={displayName}
-        memberTitle={displayTitle}
-        memberCompany={displayCompany}
-        memberAvatar={displayAvatar}
-      />
-
-      {/* ── POPUP THÔNG TIN CÁ NHÂN TỪ DƯỚI LÊN (ẢNH, PROFILE, LINK FACEBOOK...) ── */}
-      <PersonalProfileBottomSheet
-        open={profileSheetOpen}
-        onClose={() => setProfileSheetOpen(false)}
-        profile={{
-          displayName: displayName || "Học viên CEO HN10",
-          jobTitle: displayTitle || null,
-          companyName: displayCompany || null,
-          companyLogo: companyLogo || null,
-          avatarUrl: displayAvatar || null,
-          coverUrl: coverPhoto || null,
-          phone: displayPhone || null,
-          email: member?.email || user?.email || null,
-          address: member?.address || (member as any)?.city || "Hà Nội, Việt Nam",
-          bio:
-            (member as any)?.bio ||
-            (member as any)?.about ||
-            (customProfile as any)?.bio ||
-            "Học viên chính thức CLB Doanh Nhân CEO HN10, tích cực giao lưu kết nối và hợp tác giao thương.",
-          facebookUrl:
-            (customProfile as any)?.facebook ||
-            (member as any)?.facebookUrl ||
-            (member as any)?.facebook ||
-            null,
-          linkedinUrl:
-            (customProfile as any)?.linkedin ||
-            (member as any)?.linkedinUrl ||
-            (member as any)?.linkedin ||
-            null,
-          zaloPhone:
-            (customProfile as any)?.zalo ||
-            (member as any)?.zaloPhone ||
-            displayPhone ||
-            null,
-          website:
-            (customProfile as any)?.website ||
-            (member as any)?.website ||
-            "https://ceohn10.vn",
-          memberCode: member?.code || "CEO HN10-VIP",
-          isOwner: true,
-        }}
-        onEdit={() => {
-          setProfileSheetOpen(false);
-          setQuickEditOpen(true);
-        }}
-        onOpenQr={() => {
-          setProfileSheetOpen(false);
-          window.location.href = "/association/card";
-        }}
-      />
-
-      {/* ── MODAL CHỈNH SỬA NHANH NHƯ FACEBOOK (Req 1 & Req 10) ── */}
-      <QuickProfileEditModal
-        open={quickEditOpen}
-        onClose={() => setQuickEditOpen(false)}
-        initialName={displayName}
-        initialPhone={(customProfile as any)?.phone || member?.phone || ""}
-        initialCompany={displayCompany}
-        initialTitle={displayTitle}
-        initialAvatar={displayAvatar}
-        initialCover={coverPhoto}
-        initialCompanyLogo={companyLogo}
-        initialLinkedin={
-          (customProfile as any)?.linkedin ||
-          (member as any)?.linkedinUrl ||
-          (member as any)?.linkedin ||
-          ""
-        }
-        initialFacebook={
-          (customProfile as any)?.facebook ||
-          (member as any)?.facebookUrl ||
-          (member as any)?.facebook ||
-          ""
-        }
-        initialZalo={
-          (customProfile as any)?.zalo ||
-          (member as any)?.zaloPhone ||
-          ""
-        }
-        initialWebsite={
-          (customProfile as any)?.website ||
-          (member as any)?.website ||
-          ""
-        }
-        initialTiktok={
-          (customProfile as any)?.tiktok ||
-          (member as any)?.tiktokUrl ||
-          ""
-        }
-        userId={user?.id}
-        onSaved={(updated) => {
-          setCustomProfile((prev) => ({ ...(prev || {}), ...updated }));
-          if (updated.avatar) setAvatarPhoto(updated.avatar);
-          if (updated.cover) setCoverPhoto(updated.cover);
-          if (updated.companyLogo) {
-            setCompanyLogo(updated.companyLogo);
-            setCompanyLogoError(false);
-          }
-          setQuickEditOpen(false);
-          if (user?.id) {
-            fetchNestApi<any>("/members/me").then((live) => { if (live) setDirectMember(live); }).catch(() => { });
-          }
-          toast.success("Đã cập nhật thông tin tài khoản thành công!");
-        }}
-      />
-
-      {/* ── MODAL LIÊN HỆ BAN NGÀNH & HỖ TRỢ (Req 14) ── */}
-      <ContactSupportModal
-        open={contactSupportOpen}
-        onClose={() => setContactSupportOpen(false)}
-      />
-
-      {/* ── HƯỚNG DẪN SỬ DỤNG TƯƠNG TÁC TỪNG BƯỚC (BANKING TOUR) ── */}
-      <GuidedTourModal
-        steps={CEOHN10_TOUR_STEPS}
-        isOpen={tourOpen}
-        onClose={() => setTourOpen(false)}
-        storageKey="ceohn10_guided_tour_completed"
-      />
-
-
-
-      {/* ── HƯỚNG DẪN SỬ DỤNG TƯƠNG TÁC TỪNG BƯỚC & GIỌNG NÓI AUDIO (Req 12) ── */}
-      <UserGuideModal
-        open={userGuideOpen}
-        onClose={() => setUserGuideOpen(false)}
-      />
-
-      {/* ── POPUP CHÚC MỪNG SINH NHẬT & TẶNG ƯU ĐÃI VIP (Req 4) ── */}
-      <BirthdayCelebrationModal member={member} />
-
-      {/* ── MODAL TÙY BIẾN 4 TÍNH NĂNG CHÍNH ── */}
-      <CustomHomeShortcutsModal
-        isOpen={customShortcutsModalOpen}
-        onClose={() => setCustomShortcutsModalOpen(false)}
-        selectedIds={activeShortcutIds}
-        onSave={handleSaveShortcuts}
-      />
-
-      {/* ── BẢN ĐỒ SỐ TƯƠNG TÁC CEO HN10 (TÍNH NĂNG NHANH) ── */}
-      <CeoInteractiveMapModal
-        isOpen={mapModalOpen}
-        onClose={() => setMapModalOpen(false)}
-        members={directoryMembers}
-        events={displayEvents}
-        meetings={serverEvents}
-        myMember={member}
-      />
-
-      {/* ── LỊCH & BÁO THỨC Học viên ── */}
-      <CeoCalendarAlarmModal
-        isOpen={alarmModalOpen}
-        onClose={() => setAlarmModalOpen(false)}
-        events={displayEvents}
-        meetings={serverEvents}
-      />
-
-      {/* ── TẤT CẢ TÍNH NĂNG CEO HN10 MODAL ── */}
-      <AllFeaturesModal
-        isOpen={allFeaturesModalOpen}
-        onClose={() => setAllFeaturesModalOpen(false)}
-        onOpenConnectModal={() => setCreateConnectionModalOpen(true)}
-        onOpenMapModal={() => setMapModalOpen(true)}
-        onOpenAlarmModal={() => setAlarmModalOpen(true)}
-      />
-
-      {/* ── TẠO KẾT NỐI B2B MODAL ── */}
-      <CreateConnectionModal
-        isOpen={createConnectionModalOpen}
-        onClose={() => setCreateConnectionModalOpen(false)}
-      />
-
-      {/* ── XEM HỒ SƠ CHI TIẾT Học viên MỚI ── */}
-      {selectedMemberForProfile && (
-        <MemberProfileModal
-          member={selectedMemberForProfile}
-          onClose={() => setSelectedMemberForProfile(null)}
-        />
+        </div>
       )}
 
-      {/* ── CĂN CHỈNH & CẮT ẢNH STUDIO (AVATAR & COVER) ── */}
-      <ImageCropModal
-        isOpen={cropModalOpen}
-        imageUrl={cropImageUrl}
-        initialShape={cropTarget === "avatar" ? "circle" : "banner"}
-        title={cropTarget === "avatar" ? "Căn Chỉnh & Cắt Ảnh Đại Diện" : "Căn Chỉnh & Cắt Ảnh Bìa"}
-        onClose={() => setCropModalOpen(false)}
-        onCropComplete={handleHomeCropComplete}
+      {/* ── MODAL QR ĐỊNH DANH HỌC VIÊN CÁ NHÂN ── */}
+      <AssociationMemberQrModal
+        open={qrModalOpen}
+        onClose={() => setQrModalOpen(false)}
+        memberCode={profile?.studentCode || ""}
+        memberName={profile?.name || "Học viên CEO HN10"}
+        memberTitle={profile?.position || "Chủ tịch / Tổng Giám Đốc"}
+        memberCompany={profile?.companyName || "CLB Doanh Nhân CEO HN10"}
+        memberAvatar={profile?.avatarUrl || null}
       />
     </div>
   );

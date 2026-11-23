@@ -16,8 +16,25 @@ import {
   Filter,
   Download,
   Share2,
-  Sliders,
   ExternalLink,
+  Wallet,
+  ArrowDownCircle,
+  ArrowUpCircle,
+  Receipt,
+  FileSpreadsheet,
+  AlertTriangle,
+  Award,
+  ShieldCheck,
+  Building2,
+  Phone,
+  Mail,
+  Bookmark,
+  Layers,
+  Sparkles,
+  X,
+  Check,
+  Copy,
+  Trash2,
 } from "lucide-react";
 import { AppShell } from "@/components/dashboard/AppShell";
 import { fetchNestApi } from "@/lib/api-client";
@@ -29,8 +46,10 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
+import { exportToExcel } from "@/lib/excel-export";
 
 export const Route = createFileRoute("/classes/")({
   ssr: false,
@@ -40,27 +59,501 @@ export const Route = createFileRoute("/classes/")({
   component: ClassesManagementPage,
 });
 
+// ── DỮ LIỆU ĐÀO TẠO & BUỔI HỌC ──
+interface CourseSession {
+  id: string;
+  sessionNumber: number;
+  sessionType?: "standard" | "makeup" | "training" | "field_trip";
+  sessionTypeName?: string;
+  title: string;
+  instructorName: string;
+  date: string;
+  time: string;
+  location: string;
+  status: "completed" | "ongoing" | "upcoming";
+  attendees: number;
+  maxAttendees: number;
+  qrCode: string;
+}
+
+// ── 30 BUỔI HỌC CỐ ĐỊNH CHUẨN DOANH TRÍ CEO HN10 (HANOIBA) ──
+const CEOHN10_TOPICS = [
+  "Định Vị Chiến Lược Doanh Nghiệp & Tầm Nhìn Doanh Nhân Thời Đại Mới",
+  "Tối Ưu Hóa Dòng Tiền, Quản Trị Chi Phí & Tái Cấu Trúc Nguồn Vốn",
+  "Nghệ Thuật Đàm Phán Thương Mại B2B & Thu Hút Đầu Tư Chiến Lược",
+  "Chuyển Đổi Số Thực Chiến & Ứng Dụng AI Trong Vận Hành Doanh Nghiệp",
+  "Xây Dựng Văn Hóa Doanh Nghiệp Đột Phá & Giữ Chân Nhân Tài Cấp Cao",
+  "Quản Trị Rủi Ro Pháp Lý Doanh Nghiệp & Bảo Vệ Tài Sản Cổ Đông",
+  "Chiến Lược Marketing B2B Đa Kênh & Tối Ưu Phễu Khách Hàng Doanh Nghiệp",
+  "Nghệ Thuật Lãnh Đạo Tinh Gọn & Quản Trị Mục Tiêu OKRs/KPIs",
+  "Tái Cấu Trúc Doanh Nghiệp & Mô Hình Kinh Doanh Tinh Gọn Lean Startup",
+  "Quản Trị Chuỗi Cung Ứng & Tối Ưu Hóa Logistics Quốc Tế",
+  "Xây Dựng Hệ Thống Kiểm Soát Nội Bộ & Kiểm Toán Doanh Nghiệp",
+  "Chiến Lược M&A, Mua Bán Sáp Nhập & Định Giá Doanh Nghiệp",
+  "Quản Trị Khủng Hoảng Truyền Thông & Bảo Vệ Danh Tiếng Thương Hiệu",
+  "Pháp Luật Thuế Chuyên Sâu & Tối Ưu Nghĩa Vụ Tài Chính Hợp Pháp",
+  "Kỹ Năng Pitching Gọi Vốn Đỉnh Cao Trước Các Quỹ Đầu Tư Mạo Hiểm",
+  "Xây Dựng Hệ Sinh Thái Đối Tác & Liên Minh Doanh Nghiệp B2B",
+  "Tự Động Hóa Quy Trình Vận Hành Doanh Nghiệp (ERP / CRM)",
+  "Tâm Lý Học Lãnh Đạo & Trí Tuệ Cảm Xúc (EQ) Trong Quản Trị Đỉnh Cao",
+  "Chiến Lược Sở Hữu Trí Tuệ & Đăng Ký Bản Quyền Sáng Chế Toàn Cầu",
+  "Quản Trị Đổi Mới Sáng Tạo & Phát Triển Sản Phẩm Mới R&D",
+  "Khai Thác Dữ Liệu Lớn (Big Data) & Ra Quyết Định Kinh Doanh Dựa Trên Dữ Liệu",
+  "Xây Dựng Thương Hiệu Cá Nhân Cho Lãnh Đạo C-Level & CEO",
+  "Văn Hóa Đấu Thầu & Thắng Thầu Dự Án Quy Mô Lớn",
+  "Quản Lý Dự Án Theo Chuẩn PMI & Agile/Scrum Cho Doanh Nghiệp Vừa & Lớn",
+  "Trách Nhiệm Xã Hội Của Doanh Nghiệp (CSR / ESG) & Phát Triển Bền Vững",
+  "Chiến Lược Thương Mại Điện Tử Xuyên Biên Giới (Cross-Border E-Commerce)",
+  "Nghệ Thuật Đọc Báo Cáo Tài Chính & Phát Hiện Gian Lận Kế Toán",
+  "Quản Trị Trải Nghiệm Khách Hàng (CX) & Giữ Chân Khách Hàng Trọn Đời",
+  "Kỹ Năng Thuyết Trình Trước Hội Đồng Quản Trị & Cổ Đông Lớn",
+  "Bế Giảng Khóa Học, Lễ Trao Bằng Doanh Trí & Gala Vinh Danh Doanh Nhân CEO HN10",
+];
+
+const DEFAULT_SESSIONS: CourseSession[] = CEOHN10_TOPICS.map((topic, idx) => {
+  const num = idx + 1;
+  const isCompleted = num <= 2;
+  const isOngoing = num === 3;
+  const status: "completed" | "ongoing" | "upcoming" = isCompleted
+    ? "completed"
+    : isOngoing
+    ? "ongoing"
+    : "upcoming";
+
+  const instructors = [
+    "TS. Nguyễn Trí Hiếu",
+    "ThS. Đỗ Hoài Nam",
+    "Bà Phạm Thanh Hưng",
+    "TS. Lê Thẩm Dương",
+    "Chuyên Gia Công Nghệ ViConnect",
+    "Luật Sư Trương Thanh Đức",
+    "Chuyên Gia Chiến Lược HanoiBA",
+  ];
+
+  return {
+    id: `sess-${num}`,
+    sessionNumber: num,
+    sessionType: "standard",
+    sessionTypeName: "Chuyên Đề Chính Khóa",
+    title: `Buổi ${num}: ${topic}`,
+    instructorName: instructors[idx % instructors.length],
+    date: `${String(14 + ((num - 1) * 7) % 28).padStart(2, "0")}/${String(3 + Math.floor((num - 1) / 4)).padStart(2, "0")}/2026`,
+    time: "08:30 - 11:30",
+    location: "Hội trường Tầng 3 - Trụ sở CLB CEO HN10 & Hybrid Zoom",
+    status,
+    attendees: isCompleted ? 92 + (num % 3) : isOngoing ? 88 : 0,
+    maxAttendees: 95,
+    qrCode: `QR-CLASS-SESS-${String(num).padStart(2, "0")}`,
+  };
+});
+
+// ── DỮ LIỆU HỌC VIÊN DASHBOARD (ĐA CHỈ SỐ) ──
+interface StudentItem {
+  id: string;
+  code: string;
+  fullName: string;
+  company: string;
+  industry: string;
+  position: string;
+  classRole: string;
+  phone: string;
+  email: string;
+  attendanceRate: string; // VD: 28/30 (93%)
+  eventsJoined: number;
+  classFundStatus: "Đã nộp (2.000.000đ)" | "Chưa nộp" | "Miễn giảm";
+  penaltyDebt: number; // Phí phạt đi muộn/vắng
+  karmaPoints: number;
+  status: "Đang theo học" | "Bảo lưu" | "Tốt nghiệp";
+}
+
+const DEFAULT_STUDENTS: StudentItem[] = [
+  {
+    id: "std-1",
+    code: "HN10-001",
+    fullName: "Nguyễn Văn Hùng",
+    company: "Tập Đoàn Công Nghệ & Đầu Tư Alpha",
+    industry: "Công nghệ & Viễn thông",
+    position: "Chủ tịch HĐQT",
+    classRole: "Lớp Trưởng Lâm Thời",
+    phone: "0903112233",
+    email: "hung.nguyen@alphagroup.vn",
+    attendanceRate: "3/3 buổi (100%)",
+    eventsJoined: 14,
+    classFundStatus: "Đã nộp (2.000.000đ)",
+    penaltyDebt: 0,
+    karmaPoints: 100,
+    status: "Đang theo học",
+  },
+  {
+    id: "std-2",
+    code: "HN10-002",
+    fullName: "Trần Thị Mai Phương",
+    company: "Chuỗi Bán Lẻ & Dược Phẩm An Khang",
+    industry: "Dược phẩm & Y tế",
+    position: "Tổng Giám Đốc (CEO)",
+    classRole: "Lớp Phó Học Tập",
+    phone: "0912334455",
+    email: "phuong.tran@ankhangpharma.vn",
+    attendanceRate: "3/3 buổi (100%)",
+    eventsJoined: 11,
+    classFundStatus: "Đã nộp (2.000.000đ)",
+    penaltyDebt: 0,
+    karmaPoints: 98,
+    status: "Đang theo học",
+  },
+  {
+    id: "std-3",
+    code: "HN10-003",
+    fullName: "Lê Hoàng Nam",
+    company: "Tổng Công Ty Tiếp Vận Logistics Toàn Cầu HN",
+    industry: "Logistics & Kho bãi",
+    position: "Chủ tịch & CEO",
+    classRole: "Lớp Phó Tài Chính",
+    phone: "0988556677",
+    email: "nam.le@globallogistics.vn",
+    attendanceRate: "2/3 buổi (67%)",
+    eventsJoined: 8,
+    classFundStatus: "Đã nộp (2.000.000đ)",
+    penaltyDebt: 200000,
+    karmaPoints: 92,
+    status: "Đang theo học",
+  },
+  {
+    id: "std-4",
+    code: "HN10-004",
+    fullName: "Phạm Quốc Tuấn",
+    company: "Công Ty Cổ Phần Xây Dựng & Bất Động Sản Hòa Bình",
+    industry: "Xây dựng & Kiến trúc",
+    position: "Phó Tổng Giám Đốc",
+    classRole: "Lớp Phó Sự Kiện",
+    phone: "0904889900",
+    email: "tuan.pham@hoabinhcon.vn",
+    attendanceRate: "3/3 buổi (100%)",
+    eventsJoined: 15,
+    classFundStatus: "Đã nộp (2.000.000đ)",
+    penaltyDebt: 0,
+    karmaPoints: 99,
+    status: "Đang theo học",
+  },
+  {
+    id: "std-5",
+    code: "HN10-005",
+    fullName: "Vũ Hải Đăng",
+    company: "Tập Đoàn Năng Lượng Tái Tạo Xanh",
+    industry: "Năng lượng & Môi trường",
+    position: "Giám Đốc Điều Hành",
+    classRole: "Học Viên Chính Thức",
+    phone: "0977443322",
+    email: "dang.vu@greenenergy.vn",
+    attendanceRate: "2/3 buổi (67%)",
+    eventsJoined: 6,
+    classFundStatus: "Chưa nộp",
+    penaltyDebt: 100000,
+    karmaPoints: 88,
+    status: "Đang theo học",
+  },
+  {
+    id: "std-6",
+    code: "HN10-006",
+    fullName: "Hoàng Thùy Linh",
+    company: "Hệ Thống Thời Trang Thiết Kế Vivian",
+    industry: "Thời trang & May mặc",
+    position: "Sáng Lập Viên & CEO",
+    classRole: "Học Viên Chính Thức",
+    phone: "0933221100",
+    email: "linh.hoang@vivianfashion.vn",
+    attendanceRate: "3/3 buổi (100%)",
+    eventsJoined: 9,
+    classFundStatus: "Đã nộp (2.000.000đ)",
+    penaltyDebt: 0,
+    karmaPoints: 95,
+    status: "Đang theo học",
+  },
+  {
+    id: "std-7",
+    code: "HN10-007",
+    fullName: "Đỗ Thành Long",
+    company: "Công Ty Thiết Bị Điện & Tự Động Hóa Công Nghiệp",
+    industry: "Cơ khí & Tự động hóa",
+    position: "Tổng Giám Đốc",
+    classRole: "Học Viên Dự Thính",
+    phone: "0915778899",
+    email: "long.do@automationvn.com",
+    attendanceRate: "1/3 buổi (33%)",
+    eventsJoined: 4,
+    classFundStatus: "Miễn giảm",
+    penaltyDebt: 0,
+    karmaPoints: 85,
+    status: "Đang theo học",
+  },
+];
+
+// ── DỮ LIỆU SỔ CÁI TÀI CHÍNH LỚP HỌC (QUỸ 20TR & CÁC NGUỒN VÀO/RA) ──
+interface ClassLedgerEntry {
+  id: string;
+  code: string;
+  date: string;
+  description: string;
+  sourceType: "general_fund_init" | "penalty_fee" | "event_fee" | "training_fee" | "member_fee" | "expense_teabreak" | "expense_gift" | "expense_materials" | "expense_event";
+  sourceTypeName: string;
+  direction: "IN" | "OUT";
+  amount: number;
+  personInCharge: string;
+  status: "Đã xác nhận" | "Chờ duyệt";
+  documentLink?: string;
+}
+
+const DEFAULT_LEDGER: ClassLedgerEntry[] = [
+  {
+    id: "tx-init",
+    code: "GD-FUND-INIT",
+    date: "10/03/2026",
+    description: "Khởi tạo quỹ lớp CEO HN10 rót từ Quỹ Tổng Hiệp Hội HN10 (Đúng mức quy chuẩn 20tr)",
+    sourceType: "general_fund_init",
+    sourceTypeName: "Khởi tạo từ Quỹ Tổng HN10",
+    direction: "IN",
+    amount: 20000000,
+    personInCharge: "Ban Thư Ký Quỹ Tổng",
+    status: "Đã xác nhận",
+    documentLink: "https://ceohn10.viconnect.vn/docs/qd-khoi-tao-quy-lop-20tr.pdf",
+  },
+  {
+    id: "tx-pen-01",
+    code: "GD-PENALTY-01",
+    date: "14/03/2026",
+    description: "Thu phí phạt học viên đi muộn & vắng mặt không phép Buổi 1 (100k - 200k/HV)",
+    sourceType: "penalty_fee",
+    sourceTypeName: "Phí Phạt Nội Quy Lớp",
+    direction: "IN",
+    amount: 1200000,
+    personInCharge: "Ban Cán Sự & Kỷ Luật Lớp",
+    status: "Đã xác nhận",
+    documentLink: "https://ceohn10.viconnect.vn/docs/bien-ban-ky-luat-buoi1.pdf",
+  },
+  {
+    id: "tx-mem-01",
+    code: "GD-MEMBER-FEE-01",
+    date: "15/03/2026",
+    description: "Thu đóng góp Quỹ Sinh Hoạt Học Viên Đợt 1 (15 học viên nộp đủ 2.000.000đ)",
+    sourceType: "member_fee",
+    sourceTypeName: "Quỹ Học Viên Chính Khóa",
+    direction: "IN",
+    amount: 30000000,
+    personInCharge: "Lê Hoàng Nam (Lớp Phó Tài Chính)",
+    status: "Đã xác nhận",
+    documentLink: "https://ceohn10.viconnect.vn/docs/danh-sach-nop-quy-dot1.pdf",
+  },
+  {
+    id: "tx-train-01",
+    code: "GD-TRAINING-01",
+    date: "18/03/2026",
+    description: "Thu phí tài liệu & chuyên đề Training Thực Chiến Buổi 3 (Đàm phán thương mại B2B)",
+    sourceType: "training_fee",
+    sourceTypeName: "Phí Chương Trình Training",
+    direction: "IN",
+    amount: 8500000,
+    personInCharge: "Trần Thị Mai Phương (Lớp Phó Học Tập)",
+    status: "Đã xác nhận",
+    documentLink: "https://ceohn10.viconnect.vn/docs/phieu-thu-training-b3.pdf",
+  },
+  {
+    id: "tx-evt-01",
+    code: "GD-EVENT-FEE-01",
+    date: "20/03/2026",
+    description: "Thu tài trợ & đóng góp tổ chức hoạt động Teambuilding kết nối mini của lớp",
+    sourceType: "event_fee",
+    sourceTypeName: "Phí Sự Kiện Lớp",
+    direction: "IN",
+    amount: 5000000,
+    personInCharge: "Phạm Quốc Tuấn (Lớp Phó Sự Kiện)",
+    status: "Đã xác nhận",
+    documentLink: "https://ceohn10.viconnect.vn/docs/hop-dong-tai-tro-mini-gala.pdf",
+  },
+  {
+    id: "tx-exp-01",
+    code: "GD-EXP-TEABREAK",
+    date: "14/03/2026",
+    description: "Chi phục vụ tiệc Teabreak, trà cà phê & hoa quả tươi phục vụ Buổi 1 & Buổi 2",
+    sourceType: "expense_teabreak",
+    sourceTypeName: "Chi Teabreak Buổi Học",
+    direction: "OUT",
+    amount: 2400000,
+    personInCharge: "Ban Hậu Cần Lớp",
+    status: "Đã xác nhận",
+    documentLink: "https://ceohn10.viconnect.vn/docs/hoa-don-teabreak-b1-b2.pdf",
+  },
+  {
+    id: "tx-exp-02",
+    code: "GD-EXP-GIFT-01",
+    date: "14/03/2026",
+    description: "Chi hoa tươi & quà tặng kỷ niệm tri ân TS. Nguyễn Trí Hiếu giảng dạy Buổi 1",
+    sourceType: "expense_gift",
+    sourceTypeName: "Chi Tri Ân Giảng Viên",
+    direction: "OUT",
+    amount: 1800000,
+    personInCharge: "Nguyễn Văn Hùng (Lớp Trưởng)",
+    status: "Đã xác nhận",
+    documentLink: "https://ceohn10.viconnect.vn/docs/hoa-don-qua-giang-vien.pdf",
+  },
+  {
+    id: "tx-exp-03",
+    code: "GD-EXP-BOOKS",
+    date: "20/03/2026",
+    description: "Chi in ấn và phát hành 95 bộ giáo trình, cẩm nang chiến lược doanh nghiệp cho cả lớp",
+    sourceType: "expense_materials",
+    sourceTypeName: "Chi Ấn Phẩm & Học Liệu",
+    direction: "OUT",
+    amount: 6000000,
+    personInCharge: "Trần Thị Mai Phương (Lớp Phó Học Tập)",
+    status: "Đã xác nhận",
+    documentLink: "https://ceohn10.viconnect.vn/docs/hoa-don-in-giao-trinh.pdf",
+  },
+  {
+    id: "tx-exp-04",
+    code: "GD-EXP-GALA-01",
+    date: "22/03/2026",
+    description: "Chi đặt cọc hội trường & âm thanh ánh sáng cho đêm Gala kết nối mini của lớp",
+    sourceType: "expense_event",
+    sourceTypeName: "Chi Tổ Chức Sự Kiện Lớp",
+    direction: "OUT",
+    amount: 8000000,
+    personInCharge: "Phạm Quốc Tuấn (Lớp Phó Sự Kiện)",
+    status: "Đã xác nhận",
+    documentLink: "https://ceohn10.viconnect.vn/docs/phieu-chi-dat-coc-gala.pdf",
+  },
+];
+
 function ClassesManagementPage() {
   const search = Route.useSearch();
   const [activeTab, setActiveTab] = useState<string>(search.tab || "courses");
 
-  // Query classes / trainings
+  // Query classes / trainings from backend
   const classesQ = useQuery({
     queryKey: ["classes-list"],
     queryFn: async () => {
       try {
         const res = await fetchNestApi<any[]>("/trainings");
-        if (Array.isArray(res)) return res;
+        if (Array.isArray(res) && res.length > 0) return res;
       } catch {}
       return [];
     },
   });
 
-  // State: modal QR điểm danh
-  const [selectedSessionForQr, setSelectedSessionForQr] = useState<any | null>(null);
+  // State: Sessions & Classes
+  const [sessions, setSessions] = useState<CourseSession[]>(DEFAULT_SESSIONS);
+  const [selectedSessionForQr, setSelectedSessionForQr] = useState<CourseSession | null>(null);
 
-  // Danh sách giáo viên mẫu / từ CSDL
-  const teachers = [
+  // Modal Thêm Buổi Học (Học bù / Training chuyên sâu / Ngoại khóa)
+  const [isAddSessionOpen, setIsAddSessionOpen] = useState(false);
+  const [sessionForm, setSessionForm] = useState({
+    sessionType: "makeup" as "standard" | "makeup" | "training" | "field_trip",
+    title: "",
+    instructorName: "",
+    date: "",
+    time: "08:30 - 11:30",
+    location: "Hội trường Tầng 3 - Trụ sở CLB CEO HN10 & Hybrid Zoom",
+    maxAttendees: 95,
+  });
+
+  // State: Students & Dashboard
+  const [students, setStudents] = useState<StudentItem[]>(DEFAULT_STUDENTS);
+  const [studentSearch, setStudentSearch] = useState("");
+  const [studentRoleFilter, setStudentRoleFilter] = useState("all");
+  const [selectedStudentIds, setSelectedStudentIds] = useState<string[]>([]);
+
+  const handleToggleSelectAllStudents = () => {
+    if (selectedStudentIds.length === filteredStudents.length) {
+      setSelectedStudentIds([]);
+    } else {
+      setSelectedStudentIds(filteredStudents.map((s) => s.id));
+    }
+  };
+
+  const handleToggleSelectStudent = (id: string) => {
+    setSelectedStudentIds((prev) =>
+      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+    );
+  };
+
+  const handleBulkDeleteStudents = () => {
+    if (selectedStudentIds.length === 0) return;
+    if (!window.confirm(`Bạn có chắc chắn muốn xóa ${selectedStudentIds.length} học viên đã chọn khỏi danh sách?`)) {
+      return;
+    }
+    setStudents((prev) => prev.filter((s) => !selectedStudentIds.includes(s.id)));
+    toast.success(`Đã xóa thành công ${selectedStudentIds.length} học viên khỏi lớp!`);
+    setSelectedStudentIds([]);
+  };
+
+  const handleAddSession = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!sessionForm.title.trim()) {
+      toast.error("Vui lòng nhập tên buổi học");
+      return;
+    }
+    let typeName = "Buổi Học Bù";
+    if (sessionForm.sessionType === "training") typeName = "Training Chuyên Sâu";
+    else if (sessionForm.sessionType === "field_trip") typeName = "Ngoại Khóa Doanh Nghiệp";
+
+    const nextNum = sessions.length + 1;
+    const newSess: CourseSession = {
+      id: `sess-custom-${Date.now()}`,
+      sessionNumber: nextNum,
+      sessionType: sessionForm.sessionType,
+      sessionTypeName: typeName,
+      title: sessionForm.title.trim(),
+      instructorName: sessionForm.instructorName.trim() || "Chuyên gia thỉnh giảng",
+      date: sessionForm.date.trim() || new Date().toLocaleDateString("vi-VN"),
+      time: sessionForm.time.trim() || "08:30 - 11:30",
+      location: sessionForm.location.trim() || "Hội trường CLB CEO HN10",
+      status: "upcoming",
+      attendees: 0,
+      maxAttendees: Number(sessionForm.maxAttendees) || 95,
+      qrCode: `QR-CLASS-CUSTOM-${Date.now().toString().slice(-4)}`,
+    };
+
+    setSessions((prev) => [...prev, newSess]);
+    setIsAddSessionOpen(false);
+    setSessionForm({
+      sessionType: "makeup",
+      title: "",
+      instructorName: "",
+      date: "",
+      time: "08:30 - 11:30",
+      location: "Hội trường Tầng 3 - Trụ sở CLB CEO HN10 & Hybrid Zoom",
+      maxAttendees: 95,
+    });
+    toast.success(`Đã thêm ${typeName} thành công!`);
+  };
+
+  // State: Finance & Ledger
+  const [ledgerEntries, setLedgerEntries] = useState<ClassLedgerEntry[]>(DEFAULT_LEDGER);
+  const [financeTypeFilter, setFinanceTypeFilter] = useState("all");
+
+  // Modal Thêm giao dịch thu chi lớp học
+  const [isAddTxOpen, setIsAddTxOpen] = useState(false);
+  const [newTxForm, setNewTxForm] = useState({
+    description: "",
+    sourceType: "penalty_fee",
+    direction: "IN" as "IN" | "OUT",
+    amount: 500000,
+    personInCharge: "Ban Cán Sự Lớp",
+    documentLink: "",
+  });
+
+  // Modal Thêm Giáo Viên
+  const [isAddTeacherOpen, setIsAddTeacherOpen] = useState(false);
+  const [teacherForm, setTeacherForm] = useState({
+    name: "",
+    title: "",
+    phone: "",
+    email: "",
+    coursesCount: 1,
+    rating: 5.0,
+  });
+
+  // Danh sách giáo viên
+  const [teachers, setTeachers] = useState([
     {
       id: "tc-1",
       name: "TS. Nguyễn Trí Hiếu",
@@ -91,7 +584,176 @@ function ClassesManagementPage() {
       email: "hung.pham@ceohn10.vn",
       rating: 5.0,
     },
-  ];
+    {
+      id: "tc-4",
+      name: "TS. Lê Thẩm Dương",
+      title: "Cố vấn Văn hóa Doanh nghiệp & Nghệ thuật Lãnh đạo",
+      coursesCount: 6,
+      studentsCount: 310,
+      phone: "0915667788",
+      email: "duong.le@ceohn10.vn",
+      rating: 4.9,
+    },
+  ]);
+
+  // Thống kê tài chính quỹ lớp
+  const financeStats = React.useMemo(() => {
+    const initFund = 20000000; // Khởi tạo đúng 20 triệu từ quỹ tổng
+    let totalIn = 0;
+    let totalOut = 0;
+    let penaltyIn = 0;
+    let eventIn = 0;
+    let trainingIn = 0;
+    let memberIn = 0;
+
+    ledgerEntries.forEach((tx) => {
+      if (tx.direction === "IN") {
+        totalIn += tx.amount;
+        if (tx.sourceType === "penalty_fee") penaltyIn += tx.amount;
+        if (tx.sourceType === "event_fee") eventIn += tx.amount;
+        if (tx.sourceType === "training_fee") trainingIn += tx.amount;
+        if (tx.sourceType === "member_fee") memberIn += tx.amount;
+      } else {
+        totalOut += tx.amount;
+      }
+    });
+
+    const balance = totalIn - totalOut;
+
+    return {
+      initFund,
+      totalIn,
+      totalOut,
+      balance,
+      penaltyIn,
+      eventIn,
+      trainingIn,
+      memberIn,
+    };
+  }, [ledgerEntries]);
+
+  // Lọc học viên
+  const filteredStudents = React.useMemo(() => {
+    return students.filter((s) => {
+      const matchSearch =
+        !studentSearch.trim() ||
+        s.fullName.toLowerCase().includes(studentSearch.toLowerCase()) ||
+        s.company.toLowerCase().includes(studentSearch.toLowerCase()) ||
+        s.code.toLowerCase().includes(studentSearch.toLowerCase()) ||
+        s.phone.includes(studentSearch);
+
+      const matchRole =
+        studentRoleFilter === "all" ||
+        (studentRoleFilter === "leader" && s.classRole.includes("Lớp Trưởng")) ||
+        (studentRoleFilter === "vice" && s.classRole.includes("Lớp Phó")) ||
+        (studentRoleFilter === "official" && s.classRole.includes("Chính Thức")) ||
+        (studentRoleFilter === "auditor" && s.classRole.includes("Dự Thính"));
+
+      return matchSearch && matchRole;
+    });
+  }, [students, studentSearch, studentRoleFilter]);
+
+  // Lọc sổ cái thu chi
+  const filteredLedger = React.useMemo(() => {
+    return ledgerEntries.filter((tx) => {
+      if (financeTypeFilter === "all") return true;
+      if (financeTypeFilter === "IN") return tx.direction === "IN";
+      if (financeTypeFilter === "OUT") return tx.direction === "OUT";
+      return tx.sourceType === financeTypeFilter;
+    });
+  }, [ledgerEntries, financeTypeFilter]);
+
+  // Thêm giao dịch thu chi mới
+  const handleAddTx = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newTxForm.description.trim() || newTxForm.amount <= 0) {
+      toast.error("Vui lòng điền nội dung và số tiền hợp lệ!");
+      return;
+    }
+
+    let typeName = "Khoản thu";
+    if (newTxForm.sourceType === "penalty_fee") typeName = "Phí Phạt Nội Quy Lớp";
+    else if (newTxForm.sourceType === "event_fee") typeName = "Phí Sự Kiện Lớp";
+    else if (newTxForm.sourceType === "training_fee") typeName = "Phí Chương Trình Training";
+    else if (newTxForm.sourceType === "member_fee") typeName = "Quỹ Học Viên Chính Khóa";
+    else if (newTxForm.sourceType.startsWith("expense_")) typeName = "Chi Hoạt Động Lớp";
+
+    const newTx: ClassLedgerEntry = {
+      id: `tx-${Date.now()}`,
+      code: `GD-${newTxForm.direction}-${Date.now().toString().slice(-4)}`,
+      date: new Date().toLocaleDateString("vi-VN"),
+      description: newTxForm.description.trim(),
+      sourceType: newTxForm.sourceType as any,
+      sourceTypeName: typeName,
+      direction: newTxForm.direction,
+      amount: Number(newTxForm.amount),
+      personInCharge: newTxForm.personInCharge.trim() || "Ban Cán Sự Lớp",
+      status: "Đã xác nhận",
+      documentLink: newTxForm.documentLink.trim() || undefined,
+    };
+
+    setLedgerEntries([newTx, ...ledgerEntries]);
+    setIsAddTxOpen(false);
+    setNewTxForm({
+      description: "",
+      sourceType: "penalty_fee",
+      direction: "IN",
+      amount: 500000,
+      personInCharge: "Ban Cán Sự Lớp",
+      documentLink: "",
+    });
+    toast.success("Đã ghi nhận giao dịch vào Sổ Cái Quỹ Lớp CEO HN10 thành công!");
+  };
+
+  // Xuất Excel danh sách học viên đa cột
+  const handleExportStudentsExcel = () => {
+    exportToExcel({
+      filename: `Danh_Sach_Hoc_Vien_CEOHN10_${Date.now()}`,
+      sheetName: "HocVien",
+      title: "BẢNG QUẢN TRỊ HỌC VIÊN LỚP DOANH NHÂN CEO HN10 (HANOIBA)",
+      subtitle: `Khóa học: CEOHN10-2026 · Tổng số: ${filteredStudents.length} Học viên`,
+      columns: [
+        { header: "Mã Học Viên", key: "code", value: (r: StudentItem) => r.code },
+        { header: "Họ và Tên", key: "fullName", value: (r: StudentItem) => r.fullName },
+        { header: "Doanh Nghiệp", key: "company", value: (r: StudentItem) => r.company },
+        { header: "Ngành Nghề", key: "industry", value: (r: StudentItem) => r.industry },
+        { header: "Chức Vụ DN", key: "position", value: (r: StudentItem) => r.position },
+        { header: "Chức Danh Lớp", key: "classRole", value: (r: StudentItem) => r.classRole },
+        { header: "Số Điện Thoại", key: "phone", value: (r: StudentItem) => r.phone },
+        { header: "Email", key: "email", value: (r: StudentItem) => r.email },
+        { header: "Điểm Danh / Chuyên Cần", key: "attendanceRate", value: (r: StudentItem) => r.attendanceRate },
+        { header: "Sự Kiện Đã Tham Gia", key: "eventsJoined", value: (r: StudentItem) => r.eventsJoined },
+        { header: "Đóng Quỹ Lớp (2tr)", key: "classFundStatus", value: (r: StudentItem) => r.classFundStatus },
+        { header: "Nợ Quỹ Phạt (VNĐ)", key: "penaltyDebt", value: (r: StudentItem) => r.penaltyDebt },
+        { header: "Điểm Tín Nhiệm (Karma)", key: "karmaPoints", value: (r: StudentItem) => r.karmaPoints },
+        { header: "Trạng Thái", key: "status", value: (r: StudentItem) => r.status },
+      ],
+      data: filteredStudents,
+    });
+    toast.success("Đã xuất danh sách Học viên ra file Excel thành công!");
+  };
+
+  // Xuất Excel sổ cái tài chính lớp học
+  const handleExportFinanceExcel = () => {
+    exportToExcel({
+      filename: `So_Cai_Tai_Chinh_Lop_CEOHN10_${Date.now()}`,
+      sheetName: "SoCaiQuyLop",
+      title: "BÁO CÁO TỔNG HỢP THU CHI & SỔ CÁI DÒNG TIỀN QUỸ LỚP CEO HN10",
+      subtitle: "Vốn khởi tạo đúng chuẩn 20.000.000đ từ Quỹ Tổng HN10 kèm tổng hợp phí phạt, phí sự kiện, phí đào tạo",
+      columns: [
+        { header: "Mã Giao Dịch", key: "code", value: (r: ClassLedgerEntry) => r.code },
+        { header: "Ngày Thực Hiện", key: "date", value: (r: ClassLedgerEntry) => r.date },
+        { header: "Nội Dung Diễn Giải", key: "description", value: (r: ClassLedgerEntry) => r.description },
+        { header: "Phân Loại Nguồn Tiền", key: "sourceTypeName", value: (r: ClassLedgerEntry) => r.sourceTypeName },
+        { header: "Luồng Tiền", key: "direction", value: (r: ClassLedgerEntry) => (r.direction === "IN" ? "THU (VÀO)" : "CHI (RA)") },
+        { header: "Số Tiền (VNĐ)", key: "amount", value: (r: ClassLedgerEntry) => r.amount },
+        { header: "Người Phụ Trách", key: "personInCharge", value: (r: ClassLedgerEntry) => r.personInCharge },
+        { header: "Trạng Thái", key: "status", value: (r: ClassLedgerEntry) => r.status },
+      ],
+      data: filteredLedger,
+    });
+    toast.success("Đã xuất Báo cáo tài chính Quỹ lớp ra file Excel thành công!");
+  };
 
   return (
     <AppShell>
@@ -104,31 +766,33 @@ function ClassesManagementPage() {
                 <GraduationCap className="h-5 w-5" />
               </div>
               <h2 className="text-xl font-bold tracking-tight text-foreground">
-                Nhóm Lớp CEOHN10
+                Phân Hệ Lớp Học &amp; Đào Tạo CEO HN10
               </h2>
             </div>
             <p className="text-xs text-muted-foreground mt-1">
-              Quản trị giáo viên, lớp học, học viên đăng ký, học viên trợ thính và mã QR điểm danh theo buổi học
+              Quản lý khóa học, lịch học 30 buổi, giảng viên, dashboard học viên đa chỉ số và Quỹ tài chính lớp (20tr khởi tạo &amp; tổng hợp thu/chi)
             </p>
           </div>
 
-          <Link
-            to="/trainings"
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-border bg-card text-xs font-semibold hover:bg-muted transition"
-          >
-            <span>Mở giao diện Đào tạo nâng cao</span>
-            <ExternalLink className="h-3.5 w-3.5" />
-          </Link>
+          <div className="flex items-center gap-2">
+            <Link
+              to="/trainings"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-border bg-card text-xs font-semibold hover:bg-muted transition"
+            >
+              <span>Giao diện Đào tạo nâng cao</span>
+              <ExternalLink className="h-3.5 w-3.5" />
+            </Link>
+          </div>
         </div>
 
         {/* Navigation Tabs */}
         <div className="flex flex-wrap gap-2 border-b border-border">
           {[
-            { key: "teachers", label: "Quản lý Giáo viên", icon: Users },
-            { key: "courses", label: "Quản lý Lớp học", icon: BookOpen },
-            { key: "enrollments", label: "Học viên đăng ký", icon: UserCheck },
-            { key: "auditors", label: "Học viên trợ thính", icon: GraduationCap },
-            { key: "attendance-qr", label: "Mã QR điểm danh theo buổi", icon: QrCode },
+            { key: "courses", label: "Quản lý Lớp & Lịch học", icon: BookOpen },
+            { key: "teachers", label: "Quản lý Giảng viên", icon: Users },
+            { key: "students", label: "Dashboard Học viên (Đa chỉ số)", icon: UserCheck },
+            { key: "finance", label: "Quỹ Tài Chính Lớp (20tr & Thu/Chi)", icon: Wallet },
+            { key: "attendance-qr", label: "Mã QR Điểm Danh Theo Buổi", icon: QrCode },
           ].map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.key;
@@ -150,14 +814,170 @@ function ClassesManagementPage() {
           })}
         </div>
 
-        {/* TAB: Quản lý Giáo viên */}
+        {/* ═══════════════════════════════════════════════════════════════ */}
+        {/* TAB 1: QUẢN LÝ LỚP HỌC & LỊCH HỌC                               */}
+        {/* ═══════════════════════════════════════════════════════════════ */}
+        {activeTab === "courses" && (
+          <div className="space-y-6">
+            {/* Banner Lớp Học Trọng Điểm */}
+            <div className="p-6 rounded-2xl border border-primary/20 bg-linear-to-r from-primary/5 via-background to-amber-500/5 shadow-xs space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <div className="size-12 rounded-2xl bg-primary/10 grid place-items-center text-primary font-black text-xl shadow-2xs">
+                    30
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-primary/10 text-primary border border-primary/20 uppercase font-mono">
+                        CLASS-CEOHN10-2026
+                      </span>
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-600">
+                        Đang diễn ra
+                      </span>
+                    </div>
+                    <h3 className="text-base font-black text-foreground mt-1">
+                      Lớp Doanh Nhân CEO HN10 - Chương Trình Đào Tạo 30 Buổi Thứ Bảy Hàng Tuần
+                    </h3>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <Button
+                    size="sm"
+                    onClick={() => setActiveTab("attendance-qr")}
+                    className="h-8 gap-1.5 text-xs font-bold"
+                  >
+                    <QrCode className="h-3.5 w-3.5" /> Chiếu QR Điểm Danh
+                  </Button>
+                </div>
+              </div>
+
+              <p className="text-xs text-muted-foreground leading-relaxed bg-background/80 p-3.5 rounded-xl border border-border/60">
+                Chương trình đào tạo thực chiến 30 chuyên đề quản trị, tài chính, đàm phán và công nghệ dành riêng cho các Chủ tịch, CEO và Lãnh đạo doanh nghiệp thành viên CLB CEO HN10 (HanoiBA). Học trực tiếp vào sáng Thứ Bảy hàng tuần kết hợp Online Hybrid.
+              </p>
+
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+                <div className="p-3 rounded-xl bg-card border border-border">
+                  <div className="text-muted-foreground text-[11px]">Tổng số buổi học:</div>
+                  <div className="text-base font-bold text-foreground">30 Chuyên đề</div>
+                </div>
+                <div className="p-3 rounded-xl bg-card border border-border">
+                  <div className="text-muted-foreground text-[11px]">Đã hoàn thành:</div>
+                  <div className="text-base font-bold text-emerald-600">2 / 30 buổi</div>
+                </div>
+                <div className="p-3 rounded-xl bg-card border border-border">
+                  <div className="text-muted-foreground text-[11px]">Sĩ số học viên:</div>
+                  <div className="text-base font-bold text-primary">95 Học viên</div>
+                </div>
+                <div className="p-3 rounded-xl bg-card border border-border">
+                  <div className="text-muted-foreground text-[11px]">Ban Cán Sự Phụ Trách:</div>
+                  <div className="text-xs font-bold text-foreground truncate">Nguyễn Văn Hùng &amp; BQT</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Danh Sách Lịch Học Chi Tiết Các Buổi */}
+            <div className="p-5 rounded-2xl border border-border bg-card space-y-4">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div>
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                    Lịch Trình Chi Tiết Các Buổi Học ({sessions.length} Buổi)
+                  </h3>
+                  <p className="text-[11px] text-muted-foreground mt-0.5">
+                    Gồm 30 chuyên đề doanh trí chính khóa cố định và các buổi học bù, training chuyên sâu
+                  </p>
+                </div>
+
+                <Button
+                  size="sm"
+                  onClick={() => setIsAddSessionOpen(true)}
+                  className="h-8 gap-1.5 text-xs font-semibold bg-[#002B70] hover:bg-[#003B95] text-white"
+                >
+                  <Plus className="h-3.5 w-3.5" />
+                  <span>+ Thêm Buổi Học (Bù / Training / Ngoại Khóa)</span>
+                </Button>
+              </div>
+
+              <div className="divide-y divide-border rounded-xl border border-border overflow-hidden">
+                {sessions.map((sess) => (
+                  <div
+                    key={sess.id}
+                    className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-muted/30 transition"
+                  >
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2">
+                        <span className="font-mono font-bold text-xs text-primary">
+                          #{sess.sessionNumber}
+                        </span>
+                        <span
+                          className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                            sess.status === "completed"
+                              ? "bg-emerald-500/10 text-emerald-600"
+                              : sess.status === "ongoing"
+                              ? "bg-amber-500/10 text-amber-600 animate-pulse"
+                              : "bg-blue-500/10 text-blue-600"
+                          }`}
+                        >
+                          {sess.status === "completed"
+                            ? "Đã hoàn thành"
+                            : sess.status === "ongoing"
+                            ? "Đang diễn ra"
+                            : "Sắp tới"}
+                        </span>
+                        <span className="text-xs font-bold text-foreground">{sess.title}</span>
+                      </div>
+
+                      <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground">
+                        <span className="flex items-center gap-1 text-foreground font-medium">
+                          <Users className="size-3.5 text-primary" /> {sess.instructorName}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Calendar className="size-3.5" /> {sess.date} ({sess.time})
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <MapPin className="size-3.5" /> {sess.location}
+                        </span>
+                        <span className="flex items-center gap-1 font-semibold text-foreground">
+                          <UserCheck className="size-3.5 text-emerald-500" /> Điểm danh: {sess.attendees}/{sess.maxAttendees} HV
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2 shrink-0">
+                      <button
+                        type="button"
+                        onClick={() => setSelectedSessionForQr(sess)}
+                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl border border-primary/30 bg-primary/5 hover:bg-primary/10 text-primary text-xs font-semibold transition cursor-pointer"
+                      >
+                        <QrCode className="size-3.5" /> Điểm Danh QR
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ═══════════════════════════════════════════════════════════════ */}
+        {/* TAB 2: QUẢN LÝ GIÁO VIÊN & GIẢNG VIÊN                           */}
+        {/* ═══════════════════════════════════════════════════════════════ */}
         {activeTab === "teachers" && (
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                Danh sách giảng viên &amp; chuyên gia đào tạo ({teachers.length})
-              </span>
-              <Button size="sm" className="h-8 gap-1.5 text-xs font-semibold">
+              <div>
+                <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                  Danh Sách Giảng Viên &amp; Chuyên Gia Đào Tạo ({teachers.length})
+                </span>
+                <p className="text-[11px] text-muted-foreground mt-0.5">
+                  Đội ngũ chuyên gia kinh tế, tài chính và quản trị thực chiến đồng hành cùng CEO HN10
+                </p>
+              </div>
+              <Button
+                size="sm"
+                onClick={() => setIsAddTeacherOpen(true)}
+                className="h-8 gap-1.5 text-xs font-semibold"
+              >
                 <Plus className="h-3.5 w-3.5" /> Thêm Giáo Viên
               </Button>
             </div>
@@ -184,8 +1004,15 @@ function ClassesManagementPage() {
                     </div>
                   </div>
 
-                  <div className="text-[11px] text-muted-foreground font-mono">
-                    ĐT: {tc.phone} · {tc.email}
+                  <div className="text-[11px] text-muted-foreground font-mono space-y-0.5">
+                    <div className="flex items-center gap-1.5">
+                      <Phone className="size-3 text-muted-foreground" />
+                      <span>{tc.phone}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <Mail className="size-3 text-muted-foreground" />
+                      <span>{tc.email}</span>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -193,219 +1020,469 @@ function ClassesManagementPage() {
           </div>
         )}
 
-        {/* TAB: Quản lý Lớp học */}
-        {activeTab === "courses" && (
+        {/* ═══════════════════════════════════════════════════════════════ */}
+        {/* TAB 3: DASHBOARD HỌC VIÊN ĐA CHỈ SỐ (NHIỀU CỘT CHI TIẾT)         */}
+        {/* ═══════════════════════════════════════════════════════════════ */}
+        {activeTab === "students" && (
           <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                Danh sách khóa học &amp; lớp học CEO HN10 ({classesQ.data?.length || 0})
-              </span>
-              <Button size="sm" className="h-8 gap-1.5 text-xs font-semibold">
-                <Plus className="h-3.5 w-3.5" /> Mở Lớp Học Mới
-              </Button>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {(classesQ.data || []).map((c: any) => (
-                <div key={c.id} className="p-5 rounded-2xl border border-border bg-card shadow-xs space-y-3 flex flex-col justify-between">
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/10 text-blue-600 border border-blue-500/20 uppercase font-mono">
-                        {c.code || "CEO-LHP"}
-                      </span>
-                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-600">
-                        {c.status === "completed" ? "Đã kết thúc" : "Đang mở"}
-                      </span>
-                    </div>
-
-                    <h4 className="text-sm font-bold text-foreground line-clamp-2">
-                      {c.title}
-                    </h4>
-                    <p className="text-xs text-muted-foreground line-clamp-2">
-                      {c.description || "Chương trình đào tạo chuyên sâu dành riêng cho CEO và nhà quản trị cấp cao."}
-                    </p>
-
-                    <div className="pt-2 flex items-center gap-3 text-xs text-muted-foreground">
-                      <div className="flex items-center gap-1">
-                        <Clock className="h-3.5 w-3.5" />
-                        <span>{c.duration || "8 buổi"}</span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <Users className="h-3.5 w-3.5" />
-                        <span>{c.registered || 25} học viên</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="pt-3 border-t border-border/60 flex items-center justify-between">
-                    <button
-                      type="button"
-                      onClick={() => setSelectedSessionForQr(c)}
-                      className="inline-flex items-center gap-1 text-xs font-semibold text-primary hover:underline cursor-pointer"
-                    >
-                      <QrCode className="h-3.5 w-3.5" /> Điểm danh QR
-                    </button>
-                    <Link
-                      to={`/trainings`}
-                      className="text-xs font-semibold text-muted-foreground hover:text-foreground"
-                    >
-                      Chi tiết →
-                    </Link>
-                  </div>
+            {/* Header & Thao tác tìm kiếm, lọc, xuất file */}
+            <div className="p-5 rounded-2xl border border-border bg-card shadow-xs space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                  <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
+                    <UserCheck className="size-4 text-primary" />
+                    <span>Dashboard Quản Trị Học Viên CEO HN10 Toàn Diện</span>
+                  </h3>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    Tổng hợp đa chỉ số: Điểm danh chuyên cần, sự kiện CLB đã tham gia, đóng quỹ lớp, nợ quỹ phạt và điểm tín nhiệm
+                  </p>
                 </div>
-              ))}
-            </div>
-          </div>
-        )}
 
-        {/* TAB: Học viên đăng ký */}
-        {activeTab === "enrollments" && (
-          <div className="p-5 rounded-2xl border border-border bg-card space-y-4">
-            <div className="flex items-center justify-between">
-              <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                Danh sách học viên đăng ký chính thức
-              </h3>
-              <Button size="sm" variant="outline" className="h-8 gap-1.5 text-xs">
-                <Download className="h-3.5 w-3.5" /> Xuất Excel
-              </Button>
+                <div className="flex items-center gap-2">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={handleExportStudentsExcel}
+                    className="h-8 gap-1.5 text-xs font-semibold cursor-pointer"
+                  >
+                    <Download className="h-3.5 w-3.5" /> Xuất Danh Sách Excel
+                  </Button>
+                </div>
+              </div>
+
+              {/* Bộ lọc và tìm kiếm */}
+              <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 pt-2">
+                <div className="sm:col-span-8 relative">
+                  <Search className="size-4 absolute left-3 top-2.5 text-muted-foreground" />
+                  <input
+                    type="text"
+                    value={studentSearch}
+                    onChange={(e) => setStudentSearch(e.target.value)}
+                    placeholder="Tìm theo Mã HV, Họ tên học viên, Tên doanh nghiệp hoặc Số điện thoại..."
+                    className="w-full pl-9 pr-3 py-2 rounded-xl border border-border bg-background text-xs outline-none focus:border-primary"
+                  />
+                </div>
+
+                <div className="sm:col-span-4">
+                  <select
+                    value={studentRoleFilter}
+                    onChange={(e) => setStudentRoleFilter(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl border border-border bg-background text-xs font-semibold outline-none focus:border-primary"
+                  >
+                    <option value="all">Tất cả chức danh trong lớp</option>
+                    <option value="leader">Lớp Trưởng</option>
+                    <option value="vice">Lớp Phó các ban</option>
+                    <option value="official">Học Viên Chính Thức</option>
+                    <option value="auditor">Học Viên Dự Thính</option>
+                  </select>
+                </div>
+              </div>
             </div>
 
-            <div className="overflow-x-auto rounded-xl border border-border">
-              <table className="w-full text-left text-xs">
-                <thead className="bg-muted/40 font-semibold text-muted-foreground border-b border-border">
-                  <tr>
-                    <th className="px-4 py-3">Mã HV</th>
-                    <th className="px-4 py-3">Học viên</th>
-                    <th className="px-4 py-3">Lớp đăng ký</th>
-                    <th className="px-4 py-3">Ngày đăng ký</th>
-                    <th className="px-4 py-3 text-center">Học phí</th>
-                    <th className="px-4 py-3 text-center">Điểm danh</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border">
-                  {[
-                    { id: "HV-101", name: "Nguyễn Văn Hùng", comp: "Công ty Cổ phần TechVibe", course: "CEO Chiến Lược 2026", date: "12/03/2026", fee: "Đã nộp", attend: "8/8 buổi" },
-                    { id: "HV-102", name: "Trần Thị Mai", comp: "Tập đoàn Đầu tư An Phát", course: "Tài Chính Quản Trị Cấp Cao", date: "15/03/2026", fee: "Đã nộp", attend: "7/8 buổi" },
-                    { id: "HV-103", name: "Lê Hoàng Nam", comp: "Logistics Toàn Cầu HN", course: "CEO Chiến Lược 2026", date: "18/03/2026", fee: "Chờ duyệt", attend: "0/8 buổi" },
-                  ].map((row) => (
-                    <tr key={row.id} className="hover:bg-muted/20">
-                      <td className="px-4 py-3 font-mono font-bold">{row.id}</td>
-                      <td className="px-4 py-3">
-                        <div className="font-semibold text-foreground">{row.name}</div>
-                        <div className="text-[11px] text-muted-foreground">{row.comp}</div>
-                      </td>
-                      <td className="px-4 py-3 font-medium text-foreground">{row.course}</td>
-                      <td className="px-4 py-3 text-muted-foreground">{row.date}</td>
-                      <td className="px-4 py-3 text-center">
-                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-600">
-                          {row.fee}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3 text-center font-bold text-foreground">{row.attend}</td>
+            {/* Thanh công cụ Bulk Action chọn nhiều học viên */}
+            {selectedStudentIds.length > 0 && (
+              <div className="flex items-center justify-between p-3 rounded-xl bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-800 text-xs text-rose-800 dark:text-rose-300 animate-in fade-in-50">
+                <div className="flex items-center gap-2">
+                  <span className="font-bold">Đang chọn {selectedStudentIds.length} học viên</span>
+                  <span className="text-[11px] opacity-75">(trên tổng số {filteredStudents.length} học viên)</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setSelectedStudentIds([])}
+                    className="px-2.5 py-1 rounded-lg border border-rose-300 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 font-semibold hover:bg-slate-50 transition cursor-pointer"
+                  >
+                    Bỏ chọn
+                  </button>
+                  <Button
+                    size="sm"
+                    variant="destructive"
+                    onClick={handleBulkDeleteStudents}
+                    className="h-7 text-xs font-bold gap-1 cursor-pointer bg-red-600 hover:bg-red-700"
+                  >
+                    <Trash2 className="size-3.5" />
+                    <span>Xóa {selectedStudentIds.length} Học Viên Đã Chọn</span>
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {/* Bảng Dữ Liệu Học Viên Rất Nhiều Cột */}
+            <div className="rounded-2xl border border-border bg-card overflow-hidden shadow-xs">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs whitespace-nowrap">
+                  <thead className="bg-muted/50 font-bold text-muted-foreground border-b border-border">
+                    <tr>
+                      <th className="px-3 py-3 text-center w-10">
+                        <input
+                          type="checkbox"
+                          checked={filteredStudents.length > 0 && selectedStudentIds.length === filteredStudents.length}
+                          onChange={handleToggleSelectAllStudents}
+                          className="rounded border-slate-300 text-primary focus:ring-primary size-4 cursor-pointer"
+                          title="Chọn tất cả học viên"
+                        />
+                      </th>
+                      <th className="px-3.5 py-3">Mã HV</th>
+                      <th className="px-3.5 py-3">Học Viên</th>
+                      <th className="px-3.5 py-3">Doanh Nghiệp &amp; Ngành Nghề</th>
+                      <th className="px-3.5 py-3">Chức Vụ DN</th>
+                      <th className="px-3.5 py-3">Chức Danh Lớp</th>
+                      <th className="px-3.5 py-3">Liên Hệ</th>
+                      <th className="px-3.5 py-3 text-center">Chuyên Cần</th>
+                      <th className="px-3.5 py-3 text-center">Sự Kiện Đã Dự</th>
+                      <th className="px-3.5 py-3 text-center">Quỹ Lớp (2tr)</th>
+                      <th className="px-3.5 py-3 text-right">Nợ Quỹ Phạt</th>
+                      <th className="px-3.5 py-3 text-center">Điểm Tín Nhiệm</th>
+                      <th className="px-3.5 py-3 text-center">Trạng Thái</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody className="divide-y divide-border">
+                    {filteredStudents.map((s) => (
+                      <tr key={s.id} className={`hover:bg-muted/20 transition ${selectedStudentIds.includes(s.id) ? "bg-rose-500/5" : ""}`}>
+                        <td className="px-3 py-3 text-center">
+                          <input
+                            type="checkbox"
+                            checked={selectedStudentIds.includes(s.id)}
+                            onChange={() => handleToggleSelectStudent(s.id)}
+                            className="rounded border-slate-300 text-primary focus:ring-primary size-4 cursor-pointer"
+                            title={`Chọn học viên ${s.fullName}`}
+                          />
+                        </td>
+                        <td className="px-3.5 py-3 font-mono font-bold text-primary">
+                          {s.code}
+                        </td>
+                        <td className="px-3.5 py-3 font-bold text-foreground">
+                          {s.fullName}
+                        </td>
+                        <td className="px-3.5 py-3">
+                          <div className="font-semibold text-foreground max-w-xs truncate">{s.company}</div>
+                          <div className="text-[11px] text-muted-foreground">{s.industry}</div>
+                        </td>
+                        <td className="px-3.5 py-3 font-medium text-foreground">
+                          {s.position}
+                        </td>
+                        <td className="px-3.5 py-3">
+                          <span
+                            className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                              s.classRole.includes("Lớp Trưởng")
+                                ? "bg-amber-500/15 text-amber-700 dark:text-amber-400 border border-amber-500/30"
+                                : s.classRole.includes("Lớp Phó")
+                                ? "bg-blue-500/15 text-blue-700 dark:text-blue-400 border border-blue-500/30"
+                                : "bg-muted text-muted-foreground"
+                            }`}
+                          >
+                            {s.classRole}
+                          </span>
+                        </td>
+                        <td className="px-3.5 py-3 text-[11px] text-muted-foreground font-mono">
+                          <div>{s.phone}</div>
+                          <div>{s.email}</div>
+                        </td>
+                        <td className="px-3.5 py-3 text-center">
+                          <span className="font-bold text-emerald-600 bg-emerald-500/10 px-2 py-0.5 rounded-md">
+                            {s.attendanceRate}
+                          </span>
+                        </td>
+                        <td className="px-3.5 py-3 text-center font-bold text-foreground">
+                          {s.eventsJoined} sự kiện
+                        </td>
+                        <td className="px-3.5 py-3 text-center">
+                          <span
+                            className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                              s.classFundStatus.includes("Đã nộp")
+                                ? "bg-emerald-500/10 text-emerald-600"
+                                : s.classFundStatus === "Chưa nộp"
+                                ? "bg-rose-500/10 text-rose-600"
+                                : "bg-muted text-muted-foreground"
+                            }`}
+                          >
+                            {s.classFundStatus}
+                          </span>
+                        </td>
+                        <td className="px-3.5 py-3 text-right font-mono font-bold">
+                          {s.penaltyDebt > 0 ? (
+                            <span className="text-rose-600">
+                              {new Intl.NumberFormat("vi-VN").format(s.penaltyDebt)} đ
+                            </span>
+                          ) : (
+                            <span className="text-emerald-600">0 đ</span>
+                          )}
+                        </td>
+                        <td className="px-3.5 py-3 text-center font-bold">
+                          <span className="text-amber-600">★ {s.karmaPoints}</span>
+                        </td>
+                        <td className="px-3.5 py-3 text-center">
+                          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-600">
+                            {s.status}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         )}
 
-        {/* TAB: Học viên trợ thính */}
-        {activeTab === "auditors" && (
-          <div className="p-5 rounded-2xl border border-border bg-card space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                  Danh sách học viên trợ thính (Dự thính / Khách mời chuyên môn)
-                </h3>
-                <p className="text-[11px] text-muted-foreground mt-0.5">
-                  Dành cho hội viên tham gia học bổ trợ, không tính chỉ số tốt nghiệp chính khóa
+        {/* ═══════════════════════════════════════════════════════════════ */}
+        {/* TAB 4: QUỸ TÀI CHÍNH LỚP HỌC (20TR KHỞI TẠO & CÁC NGUỒN THU/CHI) */}
+        {/* ═══════════════════════════════════════════════════════════════ */}
+        {activeTab === "finance" && (
+          <div className="space-y-6">
+            {/* THẺ TỔNG HỢP CHỈ SỐ QUỸ LỚP */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {/* Thẻ 1: Khởi tạo 20tr từ Quỹ Tổng */}
+              <div className="p-5 rounded-2xl border border-primary/30 bg-primary/5 space-y-2 shadow-xs">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-primary">VỐN KHỞI TẠO TỪ QUỸ TỔNG</span>
+                  <Award className="size-4 text-primary" />
+                </div>
+                <div className="text-2xl font-black text-primary">
+                  {new Intl.NumberFormat("vi-VN").format(financeStats.initFund)} VNĐ
+                </div>
+                <p className="text-[11px] text-muted-foreground leading-snug">
+                  Đúng mức chuẩn 20.000.000đ được phê duyệt và rót từ Quỹ Tổng Hiệp Hội HN10.
                 </p>
               </div>
-              <Button size="sm" className="h-8 gap-1.5 text-xs font-semibold">
-                <Plus className="h-3.5 w-3.5" /> Tiếp nhận Học viên trợ thính
-              </Button>
+
+              {/* Thẻ 2: Tổng Thu Lớp Học */}
+              <div className="p-5 rounded-2xl border border-emerald-500/30 bg-emerald-500/5 space-y-2 shadow-xs">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-emerald-700 dark:text-emerald-400">TỔNG THU CÁC NGUỒN</span>
+                  <ArrowDownCircle className="size-4 text-emerald-600" />
+                </div>
+                <div className="text-2xl font-black text-emerald-600 dark:text-emerald-400">
+                  {new Intl.NumberFormat("vi-VN").format(financeStats.totalIn)} VNĐ
+                </div>
+                <p className="text-[11px] text-muted-foreground leading-snug">
+                  Gồm Phí phạt ({new Intl.NumberFormat("vi-VN").format(financeStats.penaltyIn)}đ), Phí sự kiện ({new Intl.NumberFormat("vi-VN").format(financeStats.eventIn)}đ), Phí training ({new Intl.NumberFormat("vi-VN").format(financeStats.trainingIn)}đ).
+                </p>
+              </div>
+
+              {/* Thẻ 3: Tổng Chi Lớp Học */}
+              <div className="p-5 rounded-2xl border border-rose-500/30 bg-rose-500/5 space-y-2 shadow-xs">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-rose-700 dark:text-rose-400">TỔNG CHI HOẠT ĐỘNG</span>
+                  <ArrowUpCircle className="size-4 text-rose-600" />
+                </div>
+                <div className="text-2xl font-black text-rose-600 dark:text-rose-400">
+                  {new Intl.NumberFormat("vi-VN").format(financeStats.totalOut)} VNĐ
+                </div>
+                <p className="text-[11px] text-muted-foreground leading-snug">
+                  Chi teabreak các buổi học, quà tặng tri ân giảng viên, in ấn giáo trình và tổ chức Gala mini.
+                </p>
+              </div>
+
+              {/* Thẻ 4: Số Dư Quỹ Thực Tế */}
+              <div className="p-5 rounded-2xl border border-blue-500/30 bg-blue-500/5 space-y-2 shadow-xs">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-blue-700 dark:text-blue-400">SỐ DƯ QUỸ HIỆN HỮU</span>
+                  <Wallet className="size-4 text-blue-600" />
+                </div>
+                <div className="text-2xl font-black text-blue-600 dark:text-blue-400">
+                  {new Intl.NumberFormat("vi-VN").format(financeStats.balance)} VNĐ
+                </div>
+                <p className="text-[11px] text-muted-foreground leading-snug">
+                  Số dư an toàn, sẵn sàng phục vụ cho các buổi học tiếp theo và lễ bế giảng trao bằng.
+                </p>
+              </div>
             </div>
 
-            <div className="overflow-x-auto rounded-xl border border-border">
-              <table className="w-full text-left text-xs">
-                <thead className="bg-muted/40 font-semibold text-muted-foreground border-b border-border">
-                  <tr>
-                    <th className="px-4 py-3">Mã</th>
-                    <th className="px-4 py-3">Học viên trợ thính</th>
-                    <th className="px-4 py-3">Lớp trợ thính</th>
-                    <th className="px-4 py-3">Buổi tham dự</th>
-                    <th className="px-4 py-3">Người giới thiệu</th>
-                    <th className="px-4 py-3 text-center">Trạng thái</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border">
-                  {[
-                    { id: "TT-01", name: "Đặng Quang Huy", comp: "Công ty Cơ khí Chính xác", course: "CEO Chiến Lược 2026", session: "Buổi 3 & 4 (Đàm phán B2B)", ref: "CT. Nguyễn Văn A", status: "Đã duyệt" },
-                    { id: "TT-02", name: "Vũ Hải Yến", comp: "Chuỗi Thực phẩm Sạch HN", course: "Tài Chính Quản Trị Cấp Cao", session: "Buổi 1 (Dòng tiền doanh nghiệp)", ref: "Phó CT. Trần B", status: "Đã duyệt" },
-                  ].map((row) => (
-                    <tr key={row.id} className="hover:bg-muted/20">
-                      <td className="px-4 py-3 font-mono font-bold">{row.id}</td>
-                      <td className="px-4 py-3">
-                        <div className="font-semibold text-foreground">{row.name}</div>
-                        <div className="text-[11px] text-muted-foreground">{row.comp}</div>
-                      </td>
-                      <td className="px-4 py-3 font-medium text-foreground">{row.course}</td>
-                      <td className="px-4 py-3 text-muted-foreground">{row.session}</td>
-                      <td className="px-4 py-3 text-muted-foreground">{row.ref}</td>
-                      <td className="px-4 py-3 text-center">
-                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/10 text-blue-600">
-                          {row.status}
-                        </span>
-                      </td>
+            {/* BẢNG SỔ CÁI DÒNG TIỀN QUỸ LỚP */}
+            <div className="p-5 rounded-2xl border border-border bg-card space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-border/60">
+                <div>
+                  <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
+                    <FileSpreadsheet className="size-4 text-primary" />
+                    <span>Sổ Cái Dòng Tiền &amp; Báo Cáo Tài Chính Lớp CEO HN10</span>
+                  </h3>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    Ghi nhận minh bạch mọi nguồn vào/ra: Khởi tạo 20tr từ quỹ tổng, Phí phạt, Phí sự kiện, Phí chương trình training
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={handleExportFinanceExcel}
+                    className="h-8 gap-1.5 text-xs font-semibold cursor-pointer"
+                  >
+                    <Download className="h-3.5 w-3.5" /> Xuất Sổ Cái Excel
+                  </Button>
+                  <Button
+                    size="sm"
+                    onClick={() => setIsAddTxOpen(true)}
+                    className="h-8 gap-1.5 text-xs font-bold cursor-pointer"
+                  >
+                    <Plus className="h-3.5 w-3.5" /> Ghi Nhận Thu / Chi
+                  </Button>
+                </div>
+              </div>
+
+              {/* Bộ lọc loại nguồn tiền */}
+              <div className="flex flex-wrap items-center gap-2 text-xs">
+                <span className="text-muted-foreground font-semibold">Lọc nguồn tiền:</span>
+                {[
+                  { key: "all", label: "Tất cả giao dịch" },
+                  { key: "IN", label: "Chỉ nguồn Thu (+)" },
+                  { key: "OUT", label: "Chỉ nguồn Chi (-)" },
+                  { key: "penalty_fee", label: "Phí phạt nội quy" },
+                  { key: "event_fee", label: "Phí sự kiện lớp" },
+                  { key: "training_fee", label: "Phí chương trình training" },
+                  { key: "general_fund_init", label: "Khởi tạo Quỹ Tổng (20tr)" },
+                ].map((f) => (
+                  <button
+                    key={f.key}
+                    type="button"
+                    onClick={() => setFinanceTypeFilter(f.key)}
+                    className={`px-3 py-1 rounded-xl font-bold transition cursor-pointer ${
+                      financeTypeFilter === f.key
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-muted text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    {f.label}
+                  </button>
+                ))}
+              </div>
+
+              {/* Bảng sổ cái */}
+              <div className="rounded-xl border border-border overflow-x-auto">
+                <table className="w-full text-left text-xs whitespace-nowrap">
+                  <thead className="bg-muted/50 font-bold text-muted-foreground border-b border-border">
+                    <tr>
+                      <th className="px-4 py-3">Mã GD</th>
+                      <th className="px-4 py-3">Ngày</th>
+                      <th className="px-4 py-3">Nội Dung Diễn Giải</th>
+                      <th className="px-4 py-3">Phân Loại Nguồn Tiền</th>
+                      <th className="px-4 py-3 text-right">Số Tiền (VNĐ)</th>
+                      <th className="px-4 py-3">Người Phụ Trách</th>
+                      <th className="px-4 py-3 text-center">Chứng Từ</th>
+                      <th className="px-4 py-3 text-center">Trạng Thái</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody className="divide-y divide-border">
+                    {filteredLedger.map((tx) => (
+                      <tr key={tx.id} className="hover:bg-muted/20 transition">
+                        <td className="px-4 py-3 font-mono font-bold text-foreground">
+                          {tx.code}
+                        </td>
+                        <td className="px-4 py-3 text-muted-foreground">{tx.date}</td>
+                        <td className="px-4 py-3 font-medium text-foreground max-w-sm truncate">
+                          {tx.description}
+                        </td>
+                        <td className="px-4 py-3">
+                          <span
+                            className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                              tx.sourceType === "general_fund_init"
+                                ? "bg-primary/10 text-primary border border-primary/20"
+                                : tx.sourceType === "penalty_fee"
+                                ? "bg-amber-500/10 text-amber-700 dark:text-amber-400"
+                                : tx.sourceType === "event_fee"
+                                ? "bg-purple-500/10 text-purple-600"
+                                : tx.sourceType === "training_fee"
+                                ? "bg-blue-500/10 text-blue-600"
+                                : "bg-slate-500/10 text-slate-600"
+                            }`}
+                          >
+                            {tx.sourceTypeName}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3 text-right font-mono font-black text-sm">
+                          {tx.direction === "IN" ? (
+                            <span className="text-emerald-600">
+                              +{new Intl.NumberFormat("vi-VN").format(tx.amount)} đ
+                            </span>
+                          ) : (
+                            <span className="text-rose-600">
+                              -{new Intl.NumberFormat("vi-VN").format(tx.amount)} đ
+                            </span>
+                          )}
+                        </td>
+                        <td className="px-4 py-3 text-muted-foreground">{tx.personInCharge}</td>
+                        <td className="px-4 py-3 text-center">
+                          {tx.documentLink ? (
+                            <a
+                              href={tx.documentLink}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="inline-flex items-center gap-1 text-[11px] font-bold text-primary hover:underline"
+                            >
+                              <Receipt className="size-3" /> Xem File
+                            </a>
+                          ) : (
+                            <span className="text-muted-foreground italic text-[11px]">Phiếu thu nội bộ</span>
+                          )}
+                        </td>
+                        <td className="px-4 py-3 text-center">
+                          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-600">
+                            {tx.status}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         )}
 
-        {/* TAB: Mã QR điểm danh theo buổi */}
+        {/* ═══════════════════════════════════════════════════════════════ */}
+        {/* TAB 5: MÃ QR ĐIỂM DANH THEO BUỔI                                 */}
+        {/* ═══════════════════════════════════════════════════════════════ */}
         {activeTab === "attendance-qr" && (
           <div className="p-6 rounded-2xl border border-border bg-card space-y-5">
             <div>
               <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
                 <QrCode className="h-4 w-4 text-primary" />
-                <span>Quản Lý Cấu Hình Mã QR Điểm Danh Theo Buổi Học</span>
+                <span>Quản Lý Cấu Hình Mã QR Điểm Danh Theo Buổi Học Thứ 7</span>
               </h3>
               <p className="text-xs text-muted-foreground mt-0.5">
-                Mỗi buổi học có 1 mã QR bảo mật riêng biệt. Học viên quét mã bằng App Mobile CEOHN10 để tự động ghi nhận vào sổ điểm danh điện tử.
+                Mỗi buổi học có 1 mã QR bảo mật riêng biệt. Học viên quét mã bằng App Mobile CEO HN10 để tự động ghi nhận vào sổ điểm danh điện tử.
               </p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {[
-                { session: "Buổi 1: Định Vị Chiến Lược & Mô Hình Kinh Doanh", course: "CEO Chiến Lược 2026", date: "10/04/2026 · 18:30 - 21:00", attendees: "32/35 HV" },
-                { session: "Buổi 2: Tối Ưu Hóa Dòng Tiền & Cấu Trúc Vốn", course: "Tài Chính Quản Trị Cấp Cao", date: "12/04/2026 · 18:30 - 21:00", attendees: "28/30 HV" },
-                { session: "Buổi 3: Đàm Phán Hợp Đồng B2B Quốc Tế", course: "CEO Chiến Lược 2026", date: "17/04/2026 · 18:30 - 21:00", attendees: "Chưa diễn ra" },
-              ].map((s, idx) => (
-                <div key={idx} className="p-5 rounded-2xl border border-border bg-muted/20 space-y-3">
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-primary/10 text-primary">
-                    {s.course}
-                  </span>
-                  <h4 className="text-xs font-bold text-foreground leading-snug">{s.session}</h4>
+              {sessions.map((s) => (
+                <div key={s.id} className="p-5 rounded-2xl border border-border bg-muted/20 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-primary/10 text-primary">
+                      Buổi #{s.sessionNumber}
+                    </span>
+                    <span
+                      className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                        s.status === "completed"
+                          ? "bg-emerald-500/10 text-emerald-600"
+                          : s.status === "ongoing"
+                          ? "bg-amber-500/10 text-amber-600"
+                          : "bg-blue-500/10 text-blue-600"
+                      }`}
+                    >
+                      {s.status === "completed" ? "Đã xong" : s.status === "ongoing" ? "Đang diễn ra" : "Sắp tới"}
+                    </span>
+                  </div>
+
+                  <h4 className="text-xs font-bold text-foreground leading-snug">{s.title}</h4>
                   <div className="text-[11px] text-muted-foreground flex items-center gap-1.5">
                     <Calendar className="h-3.5 w-3.5" />
-                    <span>{s.date}</span>
+                    <span>{s.date} · {s.time}</span>
                   </div>
+                  <div className="text-[11px] text-muted-foreground flex items-center gap-1.5">
+                    <Users className="h-3.5 w-3.5 text-primary" />
+                    <span>{s.instructorName}</span>
+                  </div>
+
                   <div className="pt-2 border-t border-border/60 flex items-center justify-between">
-                    <span className="text-[11px] font-semibold text-foreground">Điểm danh: {s.attendees}</span>
+                    <span className="text-[11px] font-semibold text-foreground">
+                      Đã điểm danh: <strong className="text-primary">{s.attendees}/{s.maxAttendees} HV</strong>
+                    </span>
                     <Button
                       size="sm"
-                      variant="outline"
-                      onClick={() =>
-                        setSelectedSessionForQr({
-                          title: s.session,
-                          code: `QR-SESS-${idx + 1}`,
-                        })
-                      }
-                      className="h-7 gap-1 text-xs font-semibold"
+                      onClick={() => setSelectedSessionForQr(s)}
+                      className="h-7 gap-1 text-xs font-semibold cursor-pointer"
                     >
                       <QrCode className="h-3 w-3" /> Chiếu QR
                     </Button>
@@ -429,19 +1506,371 @@ function ClassesManagementPage() {
             </DialogHeader>
             {selectedSessionForQr && (
               <div className="space-y-4 py-2">
-                <p className="text-xs text-muted-foreground">{selectedSessionForQr.title}</p>
+                <p className="text-xs font-bold text-foreground">{selectedSessionForQr.title}</p>
+                <div className="text-[11px] text-muted-foreground">
+                  {selectedSessionForQr.date} · {selectedSessionForQr.time} · {selectedSessionForQr.instructorName}
+                </div>
                 <div className="w-56 h-56 mx-auto bg-white p-3 rounded-2xl border-2 border-primary/40 shadow-md flex items-center justify-center">
                   <img
-                    src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://ceohn10.viconnect.vn/classes/checkin?code=${selectedSessionForQr.code || "CEO-QR"}`}
+                    src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://ceohn10.viconnect.vn/classes/checkin?code=${selectedSessionForQr.qrCode}`}
                     alt="QR Code"
                     className="w-full h-full object-contain"
                   />
                 </div>
+                <div className="p-2.5 rounded-xl bg-muted text-[11px] font-mono text-foreground flex items-center justify-between">
+                  <span>Mã QR: {selectedSessionForQr.qrCode}</span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      navigator.clipboard.writeText(`https://ceohn10.viconnect.vn/classes/checkin?code=${selectedSessionForQr.qrCode}`);
+                      toast.success("Đã sao chép link điểm danh!");
+                    }}
+                    className="text-primary hover:underline font-sans cursor-pointer"
+                  >
+                    Copy Link
+                  </button>
+                </div>
                 <p className="text-[11px] text-muted-foreground">
-                  Học viên dùng Camera hoặc App CEO HN10 quét mã này tại lớp để xác nhận điểm danh.
+                  Học viên dùng Camera điện thoại hoặc App CEO HN10 quét mã này tại lớp để tự động ghi nhận vào sổ điểm danh.
                 </p>
               </div>
             )}
+          </DialogContent>
+        </Dialog>
+
+        {/* MODAL GHI NHẬN GIAO DỊCH THU / CHI QUỸ LỚP */}
+        <Dialog open={isAddTxOpen} onOpenChange={setIsAddTxOpen}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle className="text-base font-bold flex items-center gap-2">
+                <Wallet className="size-5 text-primary" />
+                <span>Ghi Nhận Giao Dịch Thu / Chi Quỹ Lớp</span>
+              </DialogTitle>
+            </DialogHeader>
+
+            <form onSubmit={handleAddTx} className="space-y-3.5 text-xs">
+              <div>
+                <Label className="text-xs font-semibold block mb-1">Loại Dòng Tiền:</Label>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setNewTxForm({ ...newTxForm, direction: "IN" })}
+                    className={`py-2 rounded-xl font-bold border transition cursor-pointer ${
+                      newTxForm.direction === "IN"
+                        ? "bg-emerald-500 text-white border-emerald-600"
+                        : "bg-background text-muted-foreground border-border hover:bg-muted"
+                    }`}
+                  >
+                    + Thu Vào Quỹ
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setNewTxForm({ ...newTxForm, direction: "OUT" })}
+                    className={`py-2 rounded-xl font-bold border transition cursor-pointer ${
+                      newTxForm.direction === "OUT"
+                        ? "bg-rose-500 text-white border-rose-600"
+                        : "bg-background text-muted-foreground border-border hover:bg-muted"
+                    }`}
+                  >
+                    - Chi Ra Khỏi Quỹ
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <Label className="text-xs font-semibold block mb-1">Phân Loại Nguồn Tiền:</Label>
+                <select
+                  value={newTxForm.sourceType}
+                  onChange={(e) => setNewTxForm({ ...newTxForm, sourceType: e.target.value })}
+                  className="w-full px-3 py-2 rounded-xl border border-border bg-background text-xs font-semibold outline-none"
+                >
+                  {newTxForm.direction === "IN" ? (
+                    <>
+                      <option value="penalty_fee">Phí phạt nội quy (Đi muộn / Vắng mặt)</option>
+                      <option value="event_fee">Phí sự kiện lớp (Gala / Dã ngoại)</option>
+                      <option value="training_fee">Phí chương trình đào tạo &amp; tài liệu</option>
+                      <option value="member_fee">Quỹ học viên chính khóa</option>
+                    </>
+                  ) : (
+                    <>
+                      <option value="expense_teabreak">Chi teabreak &amp; đồ uống các buổi học</option>
+                      <option value="expense_gift">Chi hoa tươi &amp; quà tặng tri ân giảng viên</option>
+                      <option value="expense_materials">Chi in ấn giáo trình &amp; học liệu</option>
+                      <option value="expense_event">Chi tổ chức sự kiện &amp; Gala của lớp</option>
+                    </>
+                  )}
+                </select>
+              </div>
+
+              <div>
+                <Label className="text-xs font-semibold block mb-1">Nội Dung Diễn Giải (*):</Label>
+                <Input
+                  type="text"
+                  required
+                  value={newTxForm.description}
+                  onChange={(e) => setNewTxForm({ ...newTxForm, description: e.target.value })}
+                  placeholder="VD: Thu phí phạt đi muộn Buổi 3 / Chi mua hoa tri ân..."
+                  className="text-xs"
+                />
+              </div>
+
+              <div>
+                <Label className="text-xs font-semibold block mb-1">Số Tiền (VNĐ) (*):</Label>
+                <Input
+                  type="number"
+                  required
+                  min={1000}
+                  step={10000}
+                  value={newTxForm.amount}
+                  onChange={(e) => setNewTxForm({ ...newTxForm, amount: Number(e.target.value) })}
+                  className="text-xs font-bold"
+                />
+              </div>
+
+              <div>
+                <Label className="text-xs font-semibold block mb-1">Người Phụ Trách / Kế Toán Lớp:</Label>
+                <Input
+                  type="text"
+                  value={newTxForm.personInCharge}
+                  onChange={(e) => setNewTxForm({ ...newTxForm, personInCharge: e.target.value })}
+                  placeholder="Lê Hoàng Nam (Lớp Phó Tài Chính)"
+                  className="text-xs"
+                />
+              </div>
+
+              <div>
+                <Label className="text-xs font-semibold block mb-1">Link Hóa Đơn / Chứng Từ (Nếu có):</Label>
+                <Input
+                  type="url"
+                  value={newTxForm.documentLink}
+                  onChange={(e) => setNewTxForm({ ...newTxForm, documentLink: e.target.value })}
+                  placeholder="https://..."
+                  className="text-xs font-mono"
+                />
+              </div>
+
+              <div className="flex justify-end gap-2 pt-3 border-t border-border">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setIsAddTxOpen(false)}
+                  className="text-xs"
+                >
+                  Hủy
+                </Button>
+                <Button type="submit" className="text-xs font-bold">
+                  Ghi Nhận Giao Dịch
+                </Button>
+              </div>
+            </form>
+          </DialogContent>
+        </Dialog>
+
+        {/* MODAL THÊM GIÁO VIÊN */}
+        <Dialog open={isAddTeacherOpen} onOpenChange={setIsAddTeacherOpen}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle className="text-base font-bold flex items-center gap-2">
+                <GraduationCap className="size-5 text-primary" />
+                <span>Thêm Giáo Viên / Chuyên Gia Mới</span>
+              </DialogTitle>
+            </DialogHeader>
+
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (!teacherForm.name.trim()) return;
+                setTeachers([
+                  ...teachers,
+                  {
+                    id: `tc-${Date.now()}`,
+                    name: teacherForm.name.trim(),
+                    title: teacherForm.title.trim() || "Chuyên gia Đào tạo",
+                    coursesCount: teacherForm.coursesCount || 1,
+                    studentsCount: 95,
+                    phone: teacherForm.phone.trim() || "0988000000",
+                    email: teacherForm.email.trim() || "giangvien@ceohn10.vn",
+                    rating: teacherForm.rating || 5.0,
+                  },
+                ]);
+                setIsAddTeacherOpen(false);
+                setTeacherForm({ name: "", title: "", phone: "", email: "", coursesCount: 1, rating: 5.0 });
+                toast.success("Đã thêm giảng viên thành công!");
+              }}
+              className="space-y-3 text-xs"
+            >
+              <div>
+                <Label className="text-xs font-semibold block mb-1">Họ Và Tên Giảng Viên (*):</Label>
+                <Input
+                  type="text"
+                  required
+                  value={teacherForm.name}
+                  onChange={(e) => setTeacherForm({ ...teacherForm, name: e.target.value })}
+                  placeholder="VD: TS. Nguyễn Trí Hiếu"
+                  className="text-xs"
+                />
+              </div>
+
+              <div>
+                <Label className="text-xs font-semibold block mb-1">Danh Hiệu / Chuyên Môn:</Label>
+                <Input
+                  type="text"
+                  value={teacherForm.title}
+                  onChange={(e) => setTeacherForm({ ...teacherForm, title: e.target.value })}
+                  placeholder="VD: Chuyên gia Tài chính & Ngân hàng quốc tế"
+                  className="text-xs"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <Label className="text-xs font-semibold block mb-1">Số Điện Thoại:</Label>
+                  <Input
+                    type="tel"
+                    value={teacherForm.phone}
+                    onChange={(e) => setTeacherForm({ ...teacherForm, phone: e.target.value })}
+                    placeholder="0903 xxx xxx"
+                    className="text-xs"
+                  />
+                </div>
+                <div>
+                  <Label className="text-xs font-semibold block mb-1">Email:</Label>
+                  <Input
+                    type="email"
+                    value={teacherForm.email}
+                    onChange={(e) => setTeacherForm({ ...teacherForm, email: e.target.value })}
+                    placeholder="giangvien@ceohn10.vn"
+                    className="text-xs"
+                  />
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-2 pt-3 border-t border-border">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setIsAddTeacherOpen(false)}
+                  className="text-xs"
+                >
+                  Hủy
+                </Button>
+                <Button type="submit" className="text-xs font-bold">
+                  Lưu Giảng Viên
+                </Button>
+              </div>
+            </form>
+          </DialogContent>
+        </Dialog>
+
+        {/* MODAL THÊM BUỔI HỌC (BÙ / TRAINING CHUYÊN SÂU / NGOẠI KHÓA DOANH NGHIỆP) */}
+        <Dialog open={isAddSessionOpen} onOpenChange={setIsAddSessionOpen}>
+          <DialogContent className="max-w-lg">
+            <DialogHeader>
+              <DialogTitle className="text-base font-bold flex items-center gap-2">
+                <Plus className="size-4 text-primary" />
+                <span>Thêm Buổi Học (Học Bù / Training / Ngoại Khóa)</span>
+              </DialogTitle>
+              <DialogDescription className="text-xs text-muted-foreground">
+                Tạo buổi học bổ sung ngoài 30 chuyên đề chuẩn CEO HN10 cho học viên
+              </DialogDescription>
+            </DialogHeader>
+
+            <form onSubmit={handleAddSession} className="space-y-3.5 text-xs">
+              <div>
+                <Label className="text-xs font-semibold block mb-1">Loại Buổi Học (*):</Label>
+                <select
+                  value={sessionForm.sessionType}
+                  onChange={(e) => setSessionForm({ ...sessionForm, sessionType: e.target.value as any })}
+                  className="w-full px-3 py-2 rounded-xl border border-border bg-background text-xs font-semibold outline-none focus:border-primary"
+                >
+                  <option value="makeup">Buổi Học Bù (Makeup Class)</option>
+                  <option value="training">Training Chuyên Sâu (Deep Dive Training)</option>
+                  <option value="field_trip">Ngoại Khóa Doanh Nghiệp (Business Tour & Field Trip)</option>
+                </select>
+              </div>
+
+              <div>
+                <Label className="text-xs font-semibold block mb-1">Tiêu Đề Buổi Học (*):</Label>
+                <Input
+                  type="text"
+                  required
+                  value={sessionForm.title}
+                  onChange={(e) => setSessionForm({ ...sessionForm, title: e.target.value })}
+                  placeholder="VD: Workshop: Tối ưu chi phí thuế & Bảo vệ tài sản chủ doanh nghiệp 2026"
+                  className="text-xs"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <Label className="text-xs font-semibold block mb-1">Giảng Viên / Chuyên Gia:</Label>
+                  <Input
+                    type="text"
+                    value={sessionForm.instructorName}
+                    onChange={(e) => setSessionForm({ ...sessionForm, instructorName: e.target.value })}
+                    placeholder="VD: Chuyên gia Trần Đình Triều"
+                    className="text-xs"
+                  />
+                </div>
+                <div>
+                  <Label className="text-xs font-semibold block mb-1">Ngày Diễn Ra (*):</Label>
+                  <Input
+                    type="text"
+                    value={sessionForm.date}
+                    onChange={(e) => setSessionForm({ ...sessionForm, date: e.target.value })}
+                    placeholder="VD: Thứ 7, 28/11/2026"
+                    className="text-xs"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <Label className="text-xs font-semibold block mb-1">Khung Giờ:</Label>
+                  <Input
+                    type="text"
+                    value={sessionForm.time}
+                    onChange={(e) => setSessionForm({ ...sessionForm, time: e.target.value })}
+                    placeholder="VD: 08:30 - 11:30"
+                    className="text-xs"
+                  />
+                </div>
+                <div>
+                  <Label className="text-xs font-semibold block mb-1">Sức Chứa Tối Đa:</Label>
+                  <Input
+                    type="number"
+                    value={sessionForm.maxAttendees}
+                    onChange={(e) => setSessionForm({ ...sessionForm, maxAttendees: Number(e.target.value) || 95 })}
+                    className="text-xs"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <Label className="text-xs font-semibold block mb-1">Địa Điểm Học:</Label>
+                <Input
+                  type="text"
+                  value={sessionForm.location}
+                  onChange={(e) => setSessionForm({ ...sessionForm, location: e.target.value })}
+                  placeholder="VD: Hội trường Tầng 3 - Trụ sở CLB CEO HN10 & Hybrid Zoom"
+                  className="text-xs"
+                />
+              </div>
+
+              <div className="flex justify-end gap-2 pt-3 border-t border-border">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setIsAddSessionOpen(false)}
+                  className="text-xs cursor-pointer"
+                >
+                  Hủy
+                </Button>
+                <Button type="submit" className="text-xs font-bold cursor-pointer bg-primary text-primary-foreground">
+                  Lưu Buổi Học Mới
+                </Button>
+              </div>
+            </form>
           </DialogContent>
         </Dialog>
       </div>

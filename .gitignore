@@ -41,6 +41,7 @@ dist-ssr
 
 # Standalone exported features
 ceohn10_features_standalone/
+dist-modules/
 
 *.zip
 *.rar

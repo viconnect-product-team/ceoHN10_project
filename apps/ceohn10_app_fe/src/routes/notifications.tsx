@@ -28,6 +28,10 @@ import {
   CreditCard,
   KeyRound,
   Users,
+  Upload,
+  X,
+  Image as ImageIcon,
+  BookOpen,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useServerFn } from "@tanstack/react-start";
@@ -40,7 +44,7 @@ import type { Notification } from "@/lib/extra-data";
 import { CrudModal, type CrudField, type CrudValues } from "@/components/dashboard/CrudModal";
 import { EventReminderPosterModal } from "@/components/dashboard/EventReminderPosterModal";
 import { getLastSeen, markNotificationsSeen } from "@/hooks/use-unread-notifications";
-import { fetchNestApi } from "@/lib/api-client";
+import { fetchNestApi, uploadFileToNest } from "@/lib/api-client";
 import {
   createNotificationFn,
   deleteNotificationFn,
@@ -405,6 +409,145 @@ function NotifyPage() {
   const [busyId, setBusyId] = useState<string | null>(null);
   const [pushingId, setPushingId] = useState<string | null>(null);
   const [eventReminderModalOpen, setEventReminderModalOpen] = useState(false);
+
+  // Dedicated Notification Form Modal State (Requirement 2)
+  const [formTitle, setFormTitle] = useState("");
+  const [formBody, setFormBody] = useState("");
+  const [formAudience, setFormAudience] = useState<Notification["audience"]>("all");
+  const [formChannel, setFormChannel] = useState<Notification["channel"]>("inapp");
+  const [formScope, setFormScope] = useState<string>("all");
+  const [formStatus, setFormStatus] = useState<Notification["status"]>("draft");
+  const [formActionUrl, setFormActionUrl] = useState<string>("");
+  const [formImageUrl, setFormImageUrl] = useState<string>("");
+  const [showImageField, setShowImageField] = useState(false);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
+
+  // Entities for "Áp dụng vào Sự kiện / Lớp học"
+  const [systemEvents, setSystemEvents] = useState<any[]>([]);
+  const [systemClasses, setSystemClasses] = useState<any[]>([]);
+  const [loadingEntities, setLoadingEntities] = useState(false);
+  const [selectedEntityId, setSelectedEntityId] = useState("");
+
+  useEffect(() => {
+    if (open) {
+      if (editing) {
+        setFormTitle(editing.title || "");
+        setFormBody(editing.body || "");
+        setFormAudience(editing.audience || "all");
+        setFormChannel(editing.channel || "inapp");
+        setFormScope((editing as any).appScope || (editing as any).scope || "all");
+        setFormStatus(editing.status || "draft");
+        setFormActionUrl((editing as any).actionUrl || (editing as any).target_url || "");
+        const existingImg = (editing as any).imageUrl || (editing as any).image_url || (editing as any).image || "";
+        setFormImageUrl(existingImg);
+        setShowImageField(Boolean(existingImg));
+      } else {
+        setFormTitle("");
+        setFormBody("");
+        setFormAudience("all");
+        setFormChannel("inapp");
+        setFormScope("all");
+        setFormStatus("draft");
+        setFormActionUrl("");
+        setFormImageUrl("");
+        setShowImageField(false);
+      }
+      setSelectedEntityId("");
+
+      if (systemEvents.length === 0) {
+        setLoadingEntities(true);
+        Promise.all([
+          fetchNestApi<any[]>("/events").catch(() => []),
+          fetchNestApi<any[]>("/admin/training-courses").catch(() => []),
+        ])
+          .then(([evRes, clsRes]) => {
+            if (Array.isArray(evRes)) setSystemEvents(evRes);
+            if (Array.isArray(clsRes)) setSystemClasses(clsRes);
+          })
+          .finally(() => setLoadingEntities(false));
+      }
+    }
+  }, [open, editing]);
+
+  const handleApplyEvent = (eventId: string) => {
+    const ev = systemEvents.find((e) => String(e.id) === String(eventId));
+    if (!ev) return;
+    setSelectedEntityId(`event_${ev.id}`);
+    setFormTitle(`[THƯ MỜI SỰ KIỆN] ${ev.title || ev.name}`);
+    const timeStr = ev.startDate || ev.date || "Theo thông báo của BTC";
+    const locStr = ev.location || "Trụ sở CLB Doanh Nhân CEO HN10";
+    const speakerStr = ev.speaker || ev.speaker_name || "Ban Điều Hành & Khách mời danh dự";
+    const feeStr = ev.fee || ev.ticketPrice ? `${Number(ev.fee || ev.ticketPrice).toLocaleString("vi-VN")} đ` : "Miễn phí tham dự";
+
+    setFormBody(
+      `Kính gửi Quý Doanh Nhân & Học viên CLB CEO HN10!\n\nBan Tổ Chức trân trọng kính mời Quý Anh/Chị tham dự sự kiện:\n📌 Tên sự kiện: ${ev.title || ev.name}\n⏰ Thời gian: ${timeStr}\n📍 Địa điểm: ${locStr}\n🎤 Diễn giả: ${speakerStr}\n💰 Chi phí: ${feeStr}\n\nQuý Anh/Chị vui lòng nhấn vào nút bên dưới để xem chi tiết và xác nhận tham dự.`
+    );
+    setFormActionUrl(`/events/${ev.id}`);
+    const evImg = ev.banner_url || ev.image_url || ev.poster_url || ev.image;
+    if (evImg) {
+      setFormImageUrl(evImg);
+      setShowImageField(true);
+    }
+    toast.success(`Đã áp dụng thông tin từ sự kiện "${ev.title || ev.name}"!`);
+  };
+
+  const handleApplyClass = (classId: string) => {
+    const cls = systemClasses.find((c) => String(c.id) === String(classId));
+    if (!cls) return;
+    setSelectedEntityId(`class_${cls.id}`);
+    setFormTitle(`[LỚP HỌC / ĐÀO TẠO] ${cls.name || cls.title}`);
+    const scheduleStr = cls.schedule || cls.time || "Theo lịch đào tạo CLB";
+    const locStr = cls.location || "Phòng đào tạo CEO HN10 / Online";
+    const instStr = cls.instructor || cls.teacher || "Chuyên gia cố vấn CLB";
+
+    setFormBody(
+      `Thông báo từ Ban Đào Tạo & Ban Cố Vấn CLB Doanh Nhân CEO HN10:\n\nThông báo lịch học lớp đào tạo:\n📚 Khóa học: ${cls.name || cls.title}\n📅 Lịch học: ${scheduleStr}\n📍 Địa điểm: ${locStr}\n👨‍🏫 Giảng viên: ${instStr}\n\nKính mời Quý Học viên tham gia đầy đủ và đúng giờ để đảm bảo chất lượng học tập.`
+    );
+    setFormActionUrl(`/classes/${cls.id || cls.code || ""}`);
+    if (cls.cover_url || cls.image_url || cls.image) {
+      setFormImageUrl(cls.cover_url || cls.image_url || cls.image);
+      setShowImageField(true);
+    }
+    toast.success(`Đã áp dụng thông tin từ lớp học "${cls.name || cls.title}"!`);
+  };
+
+  const handleSaveNotification = async (targetStatus?: Notification["status"]) => {
+    if (!formTitle.trim()) {
+      toast.error("Vui lòng nhập tiêu đề thông báo!");
+      return;
+    }
+    setSubmitting(true);
+    try {
+      const payload: any = {
+        title: formTitle.trim(),
+        body: formBody.trim(),
+        audience: formAudience,
+        channel: formChannel,
+        scope: formScope,
+        appScope: formScope,
+        status: targetStatus || formStatus,
+        actionUrl: formActionUrl.trim() || undefined,
+        imageUrl: formImageUrl.trim() || undefined,
+        image_url: formImageUrl.trim() || undefined,
+      };
+
+      if (editing?.id) {
+        await updateFn({ data: { id: editing.id, ...payload } as never });
+        toast.success("Cập nhật thông báo thành công!");
+      } else {
+        await createFn({ data: payload as never });
+        toast.success("Tạo thông báo mới thành công!");
+      }
+
+      setOpen(false);
+      setEditing(null);
+      await router.invalidate();
+    } catch (err: any) {
+      toast.error("Lỗi lưu thông báo: " + (err?.message || ""));
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   const [pushedMessageIds, setPushedMessageIds] = useState<Set<string>>(() => {
     if (typeof window === "undefined") return new Set();
@@ -1221,26 +1364,12 @@ function NotifyPage() {
             }`}
         >
           <Bell className="size-4" />
-          <span>Quản Lý Thông Báo</span>
+          <span>Quản Lý Thông Báo (CRUD)</span>
           {unreadCount > 0 && (
             <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-amber-400 text-slate-900 font-extrabold">
               {unreadCount}
             </span>
           )}
-        </button>
-        <button
-          type="button"
-          onClick={() => setMainTab("auto_reminders")}
-          className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 cursor-pointer ${mainTab === "auto_reminders"
-              ? "bg-[#003B95] text-white shadow-xs"
-              : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200"
-            }`}
-        >
-          <Clock className="size-4" />
-          <span>Thiết Lập Nhắc Tự Động</span>
-          <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-emerald-500 text-white font-extrabold shadow-2xs">
-            Auto
-          </span>
         </button>
         <button
           type="button"
@@ -1251,7 +1380,7 @@ function NotifyPage() {
             }`}
         >
           <Mail className="size-4" />
-          <span>Mẫu Thông Báo (Email / Zalo / App)</span>
+          <span>Mẫu Thông Báo Đa Kênh</span>
         </button>
       </div>
 
@@ -1903,7 +2032,383 @@ function NotifyPage() {
         </>
       )}
 
-      {/* Đã chuyển việc tạo thông báo sang Mẫu thông báo (đa kênh App, Email, Zalo OA) */}
+      {/* ── MODAL: TẠO MỚI / CHỈNH SỬA THÔNG BÁO (CRUD & MINIO IMAGE & ÁP DỤNG SỰ KIỆN / LỚP HỌC) ── */}
+      {open && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/70 backdrop-blur-sm animate-in fade-in duration-200 overflow-y-auto"
+          onClick={() => {
+            if (!submitting) {
+              setOpen(false);
+              setEditing(null);
+            }
+          }}
+        >
+          <div
+            className="relative w-full max-w-2xl rounded-3xl border border-border bg-card p-6 shadow-2xl my-auto text-card-foreground space-y-4 max-h-[92vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className="flex items-center justify-between pb-3 border-b border-border">
+              <div className="flex items-center gap-2.5">
+                <div className="p-2 rounded-xl bg-blue-500/15 text-[#003B95] dark:text-blue-400">
+                  <Megaphone className="h-5 w-5" />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-foreground">
+                    {editing ? "Chỉnh Sửa Thông Báo Hệ Thống" : "Tạo Mới Thông Báo (CRUD)"}
+                  </h3>
+                  <p className="text-[11px] text-muted-foreground">
+                    Tạo form thông báo, áp dụng nhanh từ sự kiện/lớp học, tải ảnh MinIO và phát sóng đa kênh
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setOpen(false);
+                  setEditing(null);
+                }}
+                className="p-1.5 rounded-lg text-muted-foreground hover:bg-muted cursor-pointer"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+
+            {/* Section 1: Áp dụng nhanh vào Sự kiện hoặc Lớp học */}
+            <div className="p-3.5 rounded-2xl bg-gradient-to-r from-blue-50/70 via-indigo-50/50 to-blue-50/70 dark:from-blue-950/20 dark:to-indigo-950/20 border border-blue-200/80 dark:border-blue-900/40 space-y-2.5">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-1.5 text-xs font-black text-[#003B95] dark:text-blue-300 uppercase tracking-wider">
+                  <Sparkles className="h-3.5 w-3.5 text-amber-500" />
+                  <span>Áp dụng thông tin từ Sự kiện hoặc Lớp học</span>
+                </div>
+                {selectedEntityId && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSelectedEntityId("");
+                      setFormTitle("");
+                      setFormBody("");
+                      setFormActionUrl("");
+                      setFormImageUrl("");
+                    }}
+                    className="text-[11px] font-bold text-slate-500 hover:text-rose-600 underline cursor-pointer"
+                  >
+                    Xóa áp dụng
+                  </button>
+                )}
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                {/* Chọn Sự kiện */}
+                <div className="space-y-1">
+                  <label className="text-[11px] font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1">
+                    <Calendar className="h-3 w-3 text-blue-600" />
+                    <span>Áp dụng từ Sự kiện:</span>
+                  </label>
+                  <select
+                    value={selectedEntityId.startsWith("event_") ? selectedEntityId.replace("event_", "") : ""}
+                    onChange={(e) => {
+                      if (e.target.value) handleApplyEvent(e.target.value);
+                    }}
+                    disabled={loadingEntities}
+                    className="w-full px-2.5 py-1.5 rounded-xl border border-blue-200 dark:border-blue-800 bg-white dark:bg-slate-900 text-xs font-semibold outline-none focus:ring-2 focus:ring-blue-500/30 cursor-pointer"
+                  >
+                    <option value="">-- Chọn sự kiện của Hiệp hội --</option>
+                    {systemEvents.map((ev) => (
+                      <option key={ev.id} value={ev.id}>
+                        📅 {ev.title || ev.name} ({ev.startDate || ev.date || "Sắp diễn ra"})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Chọn Lớp học */}
+                <div className="space-y-1">
+                  <label className="text-[11px] font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1">
+                    <BookOpen className="h-3 w-3 text-indigo-600" />
+                    <span>Áp dụng từ Lớp học / Khóa đào tạo:</span>
+                  </label>
+                  <select
+                    value={selectedEntityId.startsWith("class_") ? selectedEntityId.replace("class_", "") : ""}
+                    onChange={(e) => {
+                      if (e.target.value) handleApplyClass(e.target.value);
+                    }}
+                    disabled={loadingEntities}
+                    className="w-full px-2.5 py-1.5 rounded-xl border border-indigo-200 dark:border-indigo-800 bg-white dark:bg-slate-900 text-xs font-semibold outline-none focus:ring-2 focus:ring-indigo-500/30 cursor-pointer"
+                  >
+                    <option value="">-- Chọn khóa học / lớp CEO --</option>
+                    {systemClasses.map((cls) => (
+                      <option key={cls.id} value={cls.id}>
+                        🎓 {cls.name || cls.title}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            {/* Form Inputs */}
+            <div className="space-y-3.5">
+              {/* Tiêu đề */}
+              <div>
+                <label className="block text-xs font-bold text-foreground mb-1">
+                  Tiêu đề thông báo <span className="text-rose-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="Ví dụ: [THƯ MỜI] Lễ Khai Giảng Khóa Đào Tạo CEO HN10..."
+                  value={formTitle}
+                  onChange={(e) => setFormTitle(e.target.value)}
+                  className="w-full px-3.5 py-2 rounded-xl border border-input bg-background text-sm font-semibold outline-none focus:ring-2 focus:ring-blue-500/30"
+                />
+              </div>
+
+              {/* Nội dung thông báo */}
+              <div>
+                <label className="block text-xs font-bold text-foreground mb-1">
+                  Nội dung thông báo chi tiết
+                </label>
+                <textarea
+                  rows={4}
+                  placeholder="Nhập nội dung chi tiết thông báo..."
+                  value={formBody}
+                  onChange={(e) => setFormBody(e.target.value)}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-input bg-background text-xs sm:text-sm outline-none focus:ring-2 focus:ring-blue-500/30 leading-relaxed font-sans"
+                />
+              </div>
+
+              {/* Hệ thống & Đối tượng */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-foreground mb-1">
+                    Nền tảng / Hệ thống hiển thị
+                  </label>
+                  <select
+                    value={formScope}
+                    onChange={(e) => setFormScope(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl border border-input bg-background text-xs outline-none focus:ring-2 focus:ring-blue-500/30"
+                  >
+                    <option value="all">Toàn bộ hệ thống (CRM & App)</option>
+                    <option value="association_app">Chỉ hiển thị trên App Hiệp Hội CEO HN10</option>
+                    <option value="crm">Chỉ hiển thị trên Cổng Quản Trị CRM</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-foreground mb-1">
+                    Đối tượng nhận thông báo
+                  </label>
+                  <select
+                    value={formAudience}
+                    onChange={(e) => setFormAudience(e.target.value as any)}
+                    className="w-full px-3 py-2 rounded-xl border border-input bg-background text-xs outline-none focus:ring-2 focus:ring-blue-500/30"
+                  >
+                    <option value="all">Tất cả hội viên & người dùng (All)</option>
+                    <option value="members">Chỉ hội viên chính thức (Members)</option>
+                    <option value="staff">Ban Điều Hành / Ban Quản Trị (Staff)</option>
+                    <option value="sponsors">Đơn vị tài trợ / Khách mời (Sponsors)</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Kênh phát & Deep Link */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-foreground mb-1">
+                    Kênh phát thông báo chính
+                  </label>
+                  <select
+                    value={formChannel}
+                    onChange={(e) => setFormChannel(e.target.value as any)}
+                    className="w-full px-3 py-2 rounded-xl border border-input bg-background text-xs outline-none focus:ring-2 focus:ring-blue-500/30"
+                  >
+                    <option value="inapp">🔔 Chuông In-App (Trong ứng dụng)</option>
+                    <option value="email">✉️ Thư điện tử (Email)</option>
+                    <option value="zalo_oa">💬 Zalo OA (ZNS Broadcast)</option>
+                    <option value="sms">📱 Tin nhắn SMS Brandname</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-foreground mb-1">
+                    Đường dẫn liên kết (Action URL / Deep Link)
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="vd: /events/abc-123 hoặc /classes/it-01"
+                    value={formActionUrl}
+                    onChange={(e) => setFormActionUrl(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl border border-input bg-background text-xs font-mono outline-none focus:ring-2 focus:ring-blue-500/30"
+                  />
+                </div>
+              </div>
+
+              {/* ── TRƯỜNG TẢI ẢNH ĐỘNG (LƯU TRỮ MINIO & HIỆN TRÊN FORMAT THÔNG BÁO) ── */}
+              <div className="pt-2 border-t border-border">
+                {!showImageField ? (
+                  <button
+                    type="button"
+                    onClick={() => setShowImageField(true)}
+                    className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl border-2 border-dashed border-emerald-500/40 hover:border-emerald-600 bg-emerald-50/50 dark:bg-emerald-950/20 text-emerald-800 dark:text-emerald-300 text-xs font-bold cursor-pointer transition w-full justify-center"
+                  >
+                    <Upload className="h-4 w-4 text-emerald-600" />
+                    <span>+ Thêm trường tải ảnh (Lưu MinIO & nhúng vào format thông báo)</span>
+                  </button>
+                ) : (
+                  <div className="p-3.5 rounded-2xl border border-emerald-300/80 dark:border-emerald-800 bg-emerald-50/30 dark:bg-emerald-950/20 space-y-2.5">
+                    <div className="flex items-center justify-between">
+                      <label className="text-xs font-bold text-emerald-900 dark:text-emerald-200 flex items-center gap-1.5">
+                        <ImageIcon className="h-4 w-4 text-emerald-600" />
+                        <span>Trường tải ảnh đính kèm (Lưu trữ máy chủ MinIO)</span>
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setShowImageField(false);
+                          setFormImageUrl("");
+                        }}
+                        className="text-[11px] font-semibold text-rose-500 hover:underline cursor-pointer"
+                      >
+                        Gỡ trường ảnh
+                      </button>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="text"
+                        placeholder="Đường dẫn ảnh MinIO (https://... hoặc tải từ máy)"
+                        value={formImageUrl}
+                        onChange={(e) => setFormImageUrl(e.target.value)}
+                        className="flex-1 px-3 py-1.5 rounded-xl border border-input bg-background text-xs font-mono outline-none focus:ring-2 focus:ring-emerald-500/30"
+                      />
+                      <label className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold cursor-pointer transition shrink-0 shadow-xs">
+                        <Upload className="h-3.5 w-3.5" />
+                        <span>{isUploadingImage ? "Đang tải..." : "Chọn ảnh tải lên MinIO"}</span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          disabled={isUploadingImage}
+                          className="hidden"
+                          onChange={async (e) => {
+                            const file = e.target.files?.[0];
+                            if (!file) return;
+                            try {
+                              setIsUploadingImage(true);
+                              toast.info("Đang tải ảnh lên máy chủ MinIO...");
+                              const url = await uploadFileToNest(file, "notifications");
+                              setFormImageUrl(url);
+                              toast.success("Tải ảnh lên MinIO thành công & cập nhật format thông báo!");
+                            } catch (err: any) {
+                              toast.error("Lỗi tải ảnh lên MinIO: " + (err?.message || ""));
+                            } finally {
+                              setIsUploadingImage(false);
+                            }
+                          }}
+                        />
+                      </label>
+                    </div>
+
+                    {formImageUrl && (
+                      <div className="flex items-center gap-3 pt-1">
+                        <div className="relative w-40 h-24 rounded-xl overflow-hidden border-2 border-emerald-500/40 bg-slate-100 shadow-sm shrink-0">
+                          <img
+                            src={formImageUrl}
+                            alt="MinIO Preview"
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                        <div className="text-xs text-muted-foreground space-y-1">
+                          <p className="font-bold text-emerald-800 dark:text-emerald-300">✓ Đã nhúng ảnh vào format thông báo</p>
+                          <p className="text-[11px] truncate max-w-xs font-mono text-slate-500">{formImageUrl}</p>
+                          <button
+                            type="button"
+                            onClick={() => setFormImageUrl("")}
+                            className="text-[11px] text-rose-500 hover:underline cursor-pointer font-bold"
+                          >
+                            Xóa ảnh này
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* ── XEM TRƯỚC FORMAT THÔNG BÁO (LIVE FORMAT PREVIEW) ── */}
+              <div className="p-3.5 rounded-2xl border border-border bg-muted/30 space-y-2">
+                <div className="flex items-center justify-between text-xs font-bold text-muted-foreground uppercase tracking-wider">
+                  <span>Format thông báo xem trước (Live Preview)</span>
+                  <span className="text-[10px] lowercase font-normal">Kênh: {formChannel}</span>
+                </div>
+
+                <div className="p-4 rounded-2xl border border-border bg-card shadow-sm space-y-2.5">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-500/10 text-[#003B95] dark:text-blue-400">
+                      Đối tượng: {formAudience === "all" ? "Toàn thể hội viên" : formAudience}
+                    </span>
+                    <span className="text-[10px] text-muted-foreground">Vừa xong</span>
+                  </div>
+
+                  <h4 className="text-sm font-bold text-foreground">
+                    {formTitle || "Tiêu đề thông báo sẽ hiển thị ở đây"}
+                  </h4>
+
+                  {formImageUrl && (
+                    <div className="rounded-xl overflow-hidden max-h-48 border border-border bg-slate-100">
+                      <img src={formImageUrl} alt="Format preview" className="w-full h-full object-cover" />
+                    </div>
+                  )}
+
+                  <p className="text-xs text-muted-foreground whitespace-pre-line leading-relaxed">
+                    {formBody || "Nội dung chi tiết thông báo sẽ được định dạng hiển thị ở đây..."}
+                  </p>
+
+                  {formActionUrl && (
+                    <div className="pt-1">
+                      <span className="inline-flex items-center gap-1 text-xs font-bold text-[#003B95] dark:text-blue-400 bg-blue-500/10 px-3 py-1.5 rounded-xl">
+                        <span>Chi tiết liên kết &rarr;</span>
+                        <code className="text-[10px] font-mono">{formActionUrl}</code>
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Modal Actions */}
+            <div className="pt-3 flex items-center justify-end gap-2 border-t border-border">
+              <button
+                type="button"
+                onClick={() => {
+                  setOpen(false);
+                  setEditing(null);
+                }}
+                className="px-4 py-2 rounded-xl border border-border bg-muted/40 text-xs font-bold text-foreground hover:bg-muted cursor-pointer"
+              >
+                Hủy
+              </button>
+              <button
+                type="button"
+                disabled={submitting}
+                onClick={() => handleSaveNotification("draft")}
+                className="px-4 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-bold text-foreground hover:bg-slate-50 cursor-pointer disabled:opacity-50"
+              >
+                Lưu Bản Nháp
+              </button>
+              <button
+                type="button"
+                disabled={submitting}
+                onClick={() => handleSaveNotification("sent")}
+                className="px-5 py-2 rounded-xl bg-[#003B95] hover:bg-[#002f78] text-xs font-bold text-white shadow-sm cursor-pointer disabled:opacity-50 flex items-center gap-1.5"
+              >
+                <Send className="h-3.5 w-3.5" />
+                <span>{submitting ? "Đang xử lý..." : "Lưu & Phát Sóng Ngay"}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ── MODAL BẮN TIN NHẮC SỰ KIỆN KÈM POSTER ── */}
       <EventReminderPosterModal

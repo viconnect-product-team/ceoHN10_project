@@ -188,9 +188,11 @@ export function computeUserRbacEvaluation(
     'AI_VIEW': true,
     'profile:view': true,
     'profile:manage_own': true,
+    '/classes': true,
+    '/finance-report': true,
   };
 
-  const allowedRoutes = new Set<string>(['/', '/ai-assistant']);
+  const allowedRoutes = new Set<string>(['/', '/ai-assistant', '/classes', '/finance-report']);
 
   // Map department sang committeeKey
   let committeeKey = '';
@@ -1415,6 +1417,14 @@ export class UsersService implements OnModuleInit {
         department: normalizedDept,
         memberCode: memberRow?.code || null,
         memberId: memberRow?.id || null,
+        targetSystem:
+          (memberRow?.card_visibility_settings && typeof memberRow.card_visibility_settings === 'object' && (memberRow.card_visibility_settings as any).targetSystem)
+            ? (memberRow.card_visibility_settings as any).targetSystem
+            : (userEmail === 'admin@ceohn10.vn' || userEmail === 'admin@viconnect.vn' ? 'all' : 'ceohn10'),
+        customPermissions:
+          (memberRow?.card_visibility_settings && typeof memberRow.card_visibility_settings === 'object' && Array.isArray((memberRow.card_visibility_settings as any).customPermissions))
+            ? (memberRow.card_visibility_settings as any).customPermissions
+            : [],
         companyName: memberRow?.company_name || profile?.company_name || '',
         companySize: memberRow?.company_size || (memberRow?.employees ? `${memberRow.employees} nhân sự` : ''),
         employees: memberRow?.employees || 0,
@@ -2016,7 +2026,7 @@ export class UsersService implements OnModuleInit {
       this.usersRepo.findProfilesByUserIds(userIds),
       this.usersRepo.findRolesByUserIds(userIds),
       this.prisma.$queryRaw<any[]>`
-        SELECT id, user_id, email, code, department, executive_role 
+        SELECT id, user_id, email, code, department, executive_role, card_visibility_settings 
         FROM public.members 
         WHERE user_id = ANY(${userIds}::uuid[]) OR email = ANY(${userEmails}::text[])
       `.catch(() => []),
@@ -2084,6 +2094,20 @@ export class UsersService implements OnModuleInit {
           ? 'Ban Truyền Thông'
           : 'Học viên ceohn10');
 
+      const isSuper =
+        u.email === 'admin@ceohn10.vn' ||
+        u.email === 'admin@viconnect.vn' ||
+        userRoles.includes('platform_admin');
+      const mSettings =
+        m?.card_visibility_settings && typeof m.card_visibility_settings === 'object'
+          ? m.card_visibility_settings
+          : {};
+      const targetSystem =
+        mSettings.targetSystem || (isSuper ? 'all' : 'ceohn10');
+      const customPermissions = Array.isArray(mSettings.customPermissions)
+        ? mSettings.customPermissions
+        : [];
+
       return {
         id: u.id,
         username: u.username,
@@ -2097,6 +2121,8 @@ export class UsersService implements OnModuleInit {
         roles: userRoles,
         executiveRole,
         department,
+        targetSystem,
+        customPermissions,
         memberCode: m?.code || null,
         created_at: u.created_at,
         updated_at: u.updated_at,
@@ -2149,6 +2175,8 @@ export class UsersService implements OnModuleInit {
           primaryRole: isLTD ? 'admin' : 'staff',
           department: isLTD ? 'Ban Điều Hành' : (m.department || 'Ban Truyền Thông'),
           executiveRole: isLTD ? 'admin' : (m.executive_role || 'truong_ban_truyen_thong'),
+          targetSystem: isLTD ? 'all' : 'ceohn10',
+          customPermissions: [],
           memberCode: m.code || `HN10-00${idx + 1}`,
           created_at: m.created_at || m.joined_at || new Date(),
           updated_at: m.updated_at || new Date(),
@@ -2209,6 +2237,8 @@ export class UsersService implements OnModuleInit {
     executiveRole?: string;
     department?: string;
     account_status?: string;
+    targetSystem?: string;
+    customPermissions?: string[];
   }) {
     const rawUsername = (data.username || data.email || '').trim();
     if (!rawUsername) {
@@ -2351,6 +2381,11 @@ export class UsersService implements OnModuleInit {
       (data.code && data.code.trim()) ||
       `HN10-${Math.floor(100 + Math.random() * 900)}`;
 
+    const metaSettingsStr = JSON.stringify({
+      targetSystem: data.targetSystem || 'ceohn10',
+      customPermissions: Array.isArray(data.customPermissions) ? data.customPermissions : [],
+    });
+
     if (memRows.length > 0) {
       await this.prisma.$executeRaw`
         UPDATE public.members
@@ -2360,6 +2395,7 @@ export class UsersService implements OnModuleInit {
             company_name = COALESCE(NULLIF(${data.companyName || ''}, ''), company_name),
             department = COALESCE(NULLIF(${rawDept}, ''), department),
             executive_role = COALESCE(NULLIF(${rawRole}, ''), executive_role),
+            card_visibility_settings = ${metaSettingsStr}::jsonb,
             status = 'active',
             updated_at = NOW()
         WHERE id = ${memRows[0].id}
@@ -2368,7 +2404,7 @@ export class UsersService implements OnModuleInit {
       await this.prisma.$executeRaw`
         INSERT INTO public.members (
           id, user_id, code, name, email, phone, company_name, department, executive_role, status,
-          association_id, type, level, industry, region, payment_status, fee_paid, created_at, updated_at
+          association_id, type, level, industry, region, payment_status, fee_paid, card_visibility_settings, created_at, updated_at
         ) VALUES (
           ${memberCode},
           ${newUser.id}::uuid,
@@ -2387,6 +2423,7 @@ export class UsersService implements OnModuleInit {
           'region.north',
           'paid',
           true,
+          ${metaSettingsStr}::jsonb,
           NOW(),
           NOW()
         )
@@ -2394,6 +2431,7 @@ export class UsersService implements OnModuleInit {
           user_id = ${newUser.id}::uuid,
           department = EXCLUDED.department,
           executive_role = EXCLUDED.executive_role,
+          card_visibility_settings = EXCLUDED.card_visibility_settings,
           name = EXCLUDED.name,
           updated_at = NOW()
       `.catch(() => {});

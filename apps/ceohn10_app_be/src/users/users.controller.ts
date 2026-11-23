@@ -137,20 +137,30 @@ export class UsersController {
   @Post()
   async createUser(@Request() req: any, @Body() body: AdminCreateUserDto) {
     const userEmail = (req.user?.email || req.user?.username || '').toLowerCase().trim();
-    const isMasterPlatformAdmin =
+    const isSuperMasterAdmin =
       userEmail === 'admin@ceohn10.vn' ||
       userEmail === 'admin@viconnect.vn' ||
       userEmail === 'admin@connect.vn' ||
       req.user?.role === 'platform_admin' ||
-      req.user?.role === 'admin' ||
-      Boolean(req.user?.isPlatformAdmin) ||
-      Boolean(req.user?.isAdmin);
+      Boolean(req.user?.isPlatformAdmin);
 
-    if (!isMasterPlatformAdmin) {
+    const isCeoHn10Admin =
+      isSuperMasterAdmin ||
+      req.user?.role === 'admin' ||
+      Boolean(req.user?.isAdmin) ||
+      userEmail.includes('hn10');
+
+    if (!isCeoHn10Admin) {
       throw new ForbiddenException(
-        'Chỉ duy nhất tài khoản Quản trị Nền tảng (admin@ceohn10.vn) có quyền tạo tài khoản quản trị mới và phân quyền',
+        'Bạn không có quyền quản trị để tạo tài khoản mới và phân quyền',
       );
     }
+
+    // Nếu là quản trị viên CEO HN10 thông thường (không phải Super Master Admin), chỉ được tạo tài khoản thuộc phạm vi ceohn10
+    if (!isSuperMasterAdmin) {
+      body.targetSystem = 'ceohn10';
+    }
+
     return this.usersService.adminCreateUser(body);
   }
 
