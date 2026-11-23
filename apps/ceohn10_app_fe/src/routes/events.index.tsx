@@ -170,7 +170,30 @@ function EventsPage() {
   const fmt = useFmt();
   const router = useRouter();
   const createNotif = useServerFn(createNotificationFn);
-  const events = Route.useLoaderData() as EventItem[];
+  const loaderEvents = Route.useLoaderData() as EventItem[];
+  const [events, setEvents] = useState<EventItem[]>(loaderEvents || []);
+
+  useEffect(() => {
+    if (Array.isArray(loaderEvents) && loaderEvents.length > 0) {
+      setEvents(loaderEvents);
+    }
+  }, [loaderEvents]);
+
+  // Eager client-side fetch để luôn lấy danh sách sự kiện live từ CSDL 113.20.107.184:6432
+  const reloadEvents = async () => {
+    try {
+      const res = await fetchNestApi<EventItem[]>("/events");
+      if (Array.isArray(res)) {
+        setEvents(res);
+      }
+    } catch (err) {
+      console.warn("[EventsPage] Eager fetch error:", err);
+    }
+  };
+
+  useEffect(() => {
+    reloadEvents();
+  }, []);
   const { can } = useRole();
   const { user } = useAuth();
 
@@ -353,7 +376,7 @@ function EventsPage() {
         status: v.status || "upcoming",
         qrStaff: v.qrStaff || [],
         qrScanners: v.qrStaff || [],
-        associationId: (user as any)?.associationId || "c1983000-0000-4000-8000-000000001983",
+        associationId: (user as any)?.associationId || "a0000000-0000-4000-8000-000000000010",
       };
       if (editing) {
         await fetchNestApi(`/events/${editing.id}`, {
@@ -388,6 +411,7 @@ function EventsPage() {
       }
       setOpen(false);
       setEditing(null);
+      await reloadEvents();
       await router.invalidate();
     } catch (err: any) {
       console.error("[Events] Submit error:", err);
@@ -403,6 +427,7 @@ function EventsPage() {
     try {
       await fetchNestApi(`/events/${e.id}`, { method: "DELETE" });
       toast.success(t("events.deleted"));
+      await reloadEvents();
       await router.invalidate();
     } catch (err: any) {
       console.error("[Events] Delete error:", err);

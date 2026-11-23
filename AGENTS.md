@@ -27,6 +27,22 @@
 
 ---
 
+## 0.1. Quy Chuẩn Bất Di Bất Dịch Về Nginx & An Toàn Máy Chủ (STRICT NGINX & SERVER SAFETY LAW)
+- **NGINX VALIDATION GATE (BẮT BUỘC NGINX SUCCESS TRƯỚC KHI ĐƯA VÀO SERVER)**:
+  - Khi push code hoặc chạy kịch bản deploy liên quan tới Nginx Reverse Proxy (`nginx.conf`, file reverse proxy, Docker proxy): **BẮT BUỘC kiểm tra cú pháp Nginx (`nginx -t`) đạt trạng thái `syntax is ok` & `test is successful` thì MỚI ĐƯỢC PHÉP nạp vào server hoặc reload dịch vụ Nginx**.
+  - **TUYỆT ĐỐI KHÔNG RELOAD / RESTART NGINX KHI CHƯA PASS `nginx -t`**: Tuyệt đối không được thực thi lệnh reload (`systemctl reload nginx`), restart, hay đưa cấu hình mới vào hoạt động nếu lệnh kiểm tra `nginx -t` chưa trả về exit code 0.
+- **TUYỆT ĐỐI BẢO VỆ CẤU HÌNH NGINX HOST OS DO DEVOPS QUẢN LÝ**:
+  - Dịch vụ Nginx chính trên hệ điều hành máy chủ VPS (`/etc/nginx`) là tài nguyên dùng chung của nhiều hệ thống và do bộ phận DevOps trực tiếp quản trị.
+  - Tuyệt đối KHÔNG tự ý ghi đè hoặc can thiệp bừa bãi vào `/etc/nginx/nginx.conf` hay `/etc/nginx/conf.d/` làm hỏng cấu hình Nginx mà DevOps đã xử lý ổn định.
+  - Mọi thao tác cập nhật cấu hình Nginx Host (nếu có) BẮT BUỘC phải tuân thủ cơ chế Atomic Backup & Rollback:
+    1. Tạo bản sao lưu dự phòng (`.bak`) trước khi cập nhật.
+    2. Ghi cấu hình mới vào tệp thử nghiệm và kiểm tra bằng `nginx -t`.
+    3. Nếu `nginx -t` phát hiện bất kỳ cảnh báo hoặc lỗi cú pháp nào: **BẮT BUỘC HỦY BỎ NGAY LẬP TỨC, KHÔI PHỤC LẠI FILE GỐC CỦA DEVOPS VÀ DỪNG LẠI**, tuyệt đối không reload để đảm bảo máy chủ không bao giờ bị sập.
+- **NGĂN CHẶN XUNG ĐỘT CỔNG TRÊN CONTAINER NGINX**:
+  - Container proxy `ceohn10-ssl-proxy` chỉ bind các cổng phụ trợ đã quy hoạch (`10443`, `10444`, `10445`), TUYỆT ĐỐI KHÔNG bind cổng `80:80` hay `443:443` trên host vì sẽ gây xung đột chiếm dụng cổng làm sập dịch vụ Nginx chính của máy chủ.
+
+---
+
 ## 1. Git Push & Commit Rule (STRICT)
 - **TUYỆT ĐỐI KHÔNG TỰ ĐỘNG CHẠY `git push` HAY `git commit`**:
   - Không được tự ý thực thi các lệnh `git push` hoặc `git commit` trong terminal dưới bất kỳ hình thức nào.

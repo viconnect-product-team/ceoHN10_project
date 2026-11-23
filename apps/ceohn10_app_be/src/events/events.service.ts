@@ -5401,8 +5401,30 @@ export class EventsService implements OnModuleInit {
         rawStatus.includes('da dong') ||
         rawStatus.includes('đã nộp') ||
         rawStatus.includes('da nop') ||
+        rawStatus.includes('đã ck') ||
+        rawStatus.includes('da ck') ||
+        rawStatus.includes('chuyển khoản') ||
+        rawStatus.includes('chuyen khoan') ||
+        rawStatus.includes('ck') ||
+        rawStatus.includes('tiền mặt') ||
+        rawStatus.includes('tien mat') ||
+        rawStatus.includes('đã trả') ||
+        rawStatus.includes('rồi') ||
+        rawStatus.includes('roi') ||
+        rawStatus.includes('xong') ||
         rawStatus.includes('thành công') ||
-        rawStatus.includes('hoàn thành')
+        rawStatus.includes('thanh cong') ||
+        rawStatus.includes('hoàn thành') ||
+        rawStatus.includes('hoan thanh') ||
+        rawStatus.includes('yes') ||
+        rawStatus.includes('pass') ||
+        rawStatus.includes('ok') ||
+        rawStatus.includes('done') ||
+        rawStatus === '1' ||
+        rawStatus === 'x' ||
+        rawStatus === 'v' ||
+        rawStatus === 'true' ||
+        rawStatus.includes('đã thu')
       ) {
         isPaid = true;
       } else if (
@@ -5411,7 +5433,11 @@ export class EventsService implements OnModuleInit {
         rawStatus.includes('unpaid') ||
         rawStatus.includes('pending') ||
         rawStatus.includes('nợ') ||
-        rawStatus.includes('no')
+        rawStatus.includes('no') ||
+        rawStatus === '0' ||
+        rawStatus === 'false' ||
+        rawStatus.includes('chờ') ||
+        rawStatus.includes('thiếu')
       ) {
         isPaid = false;
       } else {

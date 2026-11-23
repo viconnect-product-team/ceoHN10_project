@@ -1,5 +1,58 @@
 # System Memory & Architecture
 
+- **Bản cập nhật ngày 23/11/2026 (v12.65): Khắc Phục Lỗi Build Docker Images Trên GitHub Actions, Nâng Cấp Luồng Check-Out, Import File Sinh Cột Động & Cấp Quyền Đăng Nhập Bằng Email/Mã Học Viên**:
+  - **1. Xử Lý Triệt Để Lỗi Build Docker Trên GitHub Actions (`exit code 1: patch-nestjs-tree-kill.js`)**:
+    * *Hiện tượng trong ảnh GitHub Actions*: Job "Đóng Gói Docker & Triển Khai Lên Subdomains" thất bại tại bước `Build Docker Images cục bộ trên runner` -> `[installer 7/10] RUN npm ci --ignore-scripts=false && npm rebuild bcrypt` với lỗi: `npm error command sh -c node scripts/patch-nestjs-tree-kill.js`.
+    * *Nguyên nhân cốt lõi*:
+      - Docker multi-stage build trong `Dockerfile.backend` dùng `turbo prune @ceohn10/app_be --docker` để cô lập mã nguồn. Đầu ra của `turbo prune` chỉ bao gồm `package.json` và file lock đưa vào thư mục `/app/out/json/`, không chứa thư mục `scripts/`.
+      - Lệnh `npm ci --ignore-scripts=false` trong `Dockerfile.backend` kích hoạt lifecycle script `postinstall` của `package.json` gốc (`node scripts/patch-nestjs-tree-kill.js`). Vì script này không tồn tại trong context của subworkspace cô lập, npm báo lỗi `exit code 1` và làm dừng toàn bộ tiến trình Docker build.
+    * *Giải pháp khắc phục triệt để*:
+      - Trong [Dockerfile.backend](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceohn10_project/Dockerfile.backend): Cập nhật thành `RUN npm ci --ignore-scripts && npm rebuild bcrypt`. Trong môi trường container Linux Alpine, không cần chạy lifecycle scripts (đặc biệt là script patch taskkill của Windows) mà chỉ cần compile native module `bcrypt` và sinh Prisma Client ở bước tiếp theo.
+      - Trong [package.json](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceohn10_project/package.json): Nâng cấp `postinstall` với cơ chế kiểm tra an toàn:
+        `"postinstall": "node -e \"const fs=require('fs');if(fs.existsSync('./scripts/patch-nestjs-tree-kill.js')){try{require('./scripts/patch-nestjs-tree-kill.js')}catch(e){}}\""`
+        Nếu tệp script tồn tại thì mới thực thi; nếu không tồn tại (như trong Docker runner) thì bỏ qua an toàn với exit code 0.
+  - **2. Luồng Điểm Danh Ra Về (Check-Out) Tại Sự Kiện**:
+    * Trong [event-checkin.tsx](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceohn10_project/apps/ceohn10_app_fe/src/routes/event-checkin.tsx):
+      - Cung cấp song song 2 hành động tác nghiệp trực tiếp: "XÁC NHẬN CHECK-IN VÀO CỬA" và "XÁC NHẬN CHECK-OUT (RA VỀ)".
+      - Hàm `handleCheckout()` gọi API `POST /events/ticket-checkout` để lưu vết `checked_out_at = NOW()`, đổi trạng thái vé sang `checked_out`.
+  - **3. Nâng Cấp Bóc Tách File & Giao Diện Table Tự Động Sinh Cột Động**:
+    * Trong [ai-excel-email-parser.ts](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceohn10_project/apps/ceohn10_app_fe/src/lib/ai-excel-email-parser.ts): Nhận diện đa dạng định dạng cột tùy biến: Mã học viên, Ban chuyên môn, Giảng viên, Lớp học, Ngày tháng, Danh mục, Ghi chú và giữ nguyên các trường động `dynamicFields`.
+    * Trong [EventAttendeesImportModal.tsx](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceohn10_project/apps/ceohn10_app_fe/src/components/events/EventAttendeesImportModal.tsx): Bảng dữ liệu tự động sinh cột theo `detectedColumns` cho cả header `<thead>` và body `<tbody>`, hỗ trợ batch actions Đã/Chưa thanh toán và toggle 1 chạm.
+  - **4. Chuẩn Hóa Phân Quyền & Hỗ Trợ Đăng Nhập Bằng Email Hoặc Mã Học Viên**:
+    * Backend:
+      - Trong [users.repository.ts](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceohn10_project/apps/ceohn10_app_be/src/users/users.repository.ts): Hàm `findByUsername` bổ sung tra cứu theo `code` và `member_code` trong `public.members`. Hàm `autoLinkMember` tự động liên kết tài khoản mới với học viên theo SĐT, Email hoặc Mã học viên.
+      - Trong [users.service.ts](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceohn10_project/apps/ceohn10_app_be/src/users/users.service.ts): Tự động truyền mã định danh học viên để kích hoạt liên kết tự động.
+    * Frontend:
+      - Trong [account-settings.index.tsx](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceohn10_project/apps/ceohn10_app_fe/src/routes/account-settings.index.tsx): Giao diện thêm tài khoản ghi rõ "Tên đăng nhập vào App (Email hoặc Mã học viên) *" với chú thích hướng dẫn trực quan. Nếu nhập Email, hệ thống tự động điền vào trường Email; nếu nhập Mã học viên (VD: `HN10-001`), học viên có thể dùng chính mã này để đăng nhập App.
+  - **5. Kiểm Tra Chất Lượng Mã Nguồn (STRICT TYPE-CHECK)**:
+    * Chạy kiểm tra TypeScript (`tsc --noEmit`) trên toàn bộ Backend và Frontend: **0 errors (Exit code 0)**.
+    * Tuân thủ triệt để Rule 1: Không tự ý chạy `git push` hay `git commit`. Người dùng toàn quyền chủ động kiểm tra và push lên GitHub.
+
+
+- **Bản cập nhật ngày 23/11/2026 (v12.64): Nâng Cấp Toàn Diện Modal Import Đại Biểu Sự Kiện - Dynamic Columns, Call API Danh Sách Sự Kiện Đang Có, Nhận Diện Thông Minh Đã/Chưa Thanh Toán & Đồng Bộ Giao Diện**:
+  - **1. Call API Lấy Danh Sách Sự Kiện Đang Có & Dropdown Chọn Sự Kiện Tiếp Nhận**:
+    * Trong [EventAttendeesImportModal.tsx](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceohn10_project/apps/ceohn10_app_fe/src/components/events/EventAttendeesImportModal.tsx), thêm cơ chế `useEffect` gọi trực tiếp `GET /events` để nạp toàn bộ sự kiện hiện có từ CSDL chuẩn `113.20.107.184:6432`.
+    * Thêm Dropdown `<select>` lựa chọn sự kiện đích với thông tin chi tiết: Tên sự kiện, Ngày tổ chức, Địa điểm, Phí vé (Miễn phí vs Có phí cụ thể).
+    * Khi người dùng chọn sự kiện từ dropdown, hệ thống tự động đồng bộ giá vé mặc định và cập nhật trạng thái thanh toán tương ứng cho danh sách đại biểu.
+    * Gửi danh sách qua API `/events/:id/import-attendees` gắn đích danh vào sự kiện được chọn, đảm bảo thông báo gửi qua Email & Zalo OA luôn mang đúng thông tin sự kiện.
+  - **2. Bóc Tách & Hiển Thị Các Cột Tùy Biến Động (Dynamic Columns)**:
+    * Bóc tách thông minh mọi tiêu đề cột tùy biến từ bảng file Word/Excel/PDF/CSV vào `detectedColumns`.
+    * Bổ sung hiển thị các cột tùy biến này trực tiếp vào `<thead>` và `<tbody>` của bảng Preview Table trên modal import với giao diện làm nổi bật rõ ràng (`bg-indigo-50/70 text-indigo-950 font-bold`).
+    * Dữ liệu các cột động được truyền qua `customColumns` và `recordsPayload` để Backend tự động chạy Dynamic DDL (`ALTER TABLE public.event_registrations ADD COLUMN IF NOT EXISTS ...`) và lưu vào `dynamic_data`.
+  - **3. Nhận Diện Trạng Thái Thanh Toán Thông Minh (Paid vs Unpaid vs Free)**:
+    * Mở rộng bộ từ khóa nhận diện trong cả parser frontend và backend:
+      - Đã thanh toán (PAID): `đã ck`, `ck`, `chuyển khoản`, `tiền mặt`, `đã trả`, `rồi`, `xong`, `thành công`, `yes`, `true`, `1`, `x`, `v`, `pass`, `ok`, `done`, `đã thu`, v.v.
+      - Chưa thanh toán (UNPAID): `chưa`, `unpaid`, `pending`, `nợ`, `no`, `0`, `chờ`, `thiếu`.
+      - Miễn phí (FREE): Sự kiện 0đ hoặc từ khóa `miễn phí`, `free`, `khách mời`.
+    * Thêm **Bộ nút thao tác hàng loạt (Batch Actions)**: "Tất cả Đã thanh toán", "Tất cả Chưa thanh toán", "Đảo trạng thái".
+    * Badge trạng thái thanh toán trên từng dòng có màu sắc trực quan (Xanh lá - Đã thanh toán, Vàng cam - Chưa thanh toán, Xanh dương - Miễn phí) và cho phép click 1 chạm để đảo trạng thái tức thì.
+  - **4. Đồng Bộ Eager Fetch Trên Màn Hình Quản Lý Sự Kiện**:
+    * Trong [events.index.tsx](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceohn10_project/apps/ceohn10_app_fe/src/routes/events.index.tsx), bổ sung `useEffect` eager fetch gọi `GET /events` để nạp ngay danh sách sự kiện live từ CSDL `113.20.107.184:6432` lên giao diện, khắc phục triệt để tình trạng hiển thị 0 sự kiện khi SSR loader chạy trước khi backend sẵn sàng.
+    * Trong [event-registrations.tsx](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceohn10_project/apps/ceohn10_app_fe/src/routes/event-registrations.tsx), truyền đầy đủ `eventsList={eventsList}` và `initialEventId` sang modal import.
+  - **5. Kiểm Tra Chất Lượng Mã Nguồn (STRICT TYPE-CHECK)**:
+    * Chạy kiểm tra TypeScript (`tsc --noEmit`) trên toàn bộ dự án: **0 errors (Exit code 0)**.
+    * Tuân thủ triệt để Rule 1: Không tự ý `git push` hay `git commit`.
+
 - **Bản cập nhật ngày 23/11/2026 (v12.63): Khắc Phục Triệt Để 3 Vấn Đề Từ Ảnh Của Người Dùng & Toàn Bộ 6 Bug Sự Kiện, Public QR Check-in & Biểu Quyết, Loại Bỏ Hoàn Toàn 968 Lỗi dist-modules, Dọn Dẹp VBA, CSDL Localhost Hoạt Động Trơn Tru**:
   - **1. Xử Lý Triệt Để Lỗi 968 File & `Cannot find module '@/integrations/supabase/nest-auth-middleware'` Trong VS Code (Ảnh 1)**:
     * *Nguyên nhân*: Thư mục xuất bản module `dist-modules` trước đó bị Git theo dõi và VS Code tự động quét/index các file xuất bản không có cấu hình path mapping `@/`.
@@ -196,6 +249,42 @@
     * `apps/ceohn10_app_fe`: `FE_TYPECHECK_SUCCESS_0_ERRORS` (0 lỗi).
     * `apps/ceohn10_app_be`: `BE_TYPECHECK_SUCCESS_0_ERRORS` (0 lỗi).
     * Tuân thủ tuyệt đối Rule 1: Không tự ý chạy `git push` hay `git commit`.
+
+- **Bản cập nhật ngày 23/11/2026 (v12.60): Thiết Lập Luật Tối Cao STRICT NGINX LAW - Bắt Buộc Nginx Success Trước Khi Đưa Code Vào Server**:
+  - **1. Bối cảnh & Bài học sự cố**:
+    * Sáng ngày 23/11/2026, quá trình deploy có ghi đè tệp cấu hình Nginx Host (`/etc/nginx/conf.d/ceohn10_subdomains.conf`) kèm lệnh reload không an toàn, gây lỗi cú pháp Nginx và làm sập máy chủ VPS tạm thời. Bộ phận DevOps đã phải can thiệp để khôi phục dịch vụ.
+  - **2. Thiết lập quy chuẩn tối cao (STRICT NGINX & SERVER SAFETY LAW)**:
+    * **NGINX VALIDATION GATE**: Mọi cập nhật cấu hình Nginx (cho cả Docker Container và Host OS) **BẮT BUỘC phải kiểm tra cú pháp `nginx -t` đạt trạng thái `syntax is ok` & `test is successful` (Exit code 0)** thì MỚI ĐƯỢC PHÉP đưa vào hoạt động hoặc reload Nginx.
+    * **TUYỆT ĐỐI KHÔNG RELOAD / RESTART KHI TEST THẤT BẠI**: Tuyệt đối không gọi `systemctl reload nginx` khi chưa vượt qua `nginx -t`.
+    * **BẢO VỆ CẤU HÌNH HOST CỦA DEVOPS (ATOMIC BACKUP & ROLLBACK)**:
+      - Tệp [setup-ssl.sh](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/deploy/ssl/setup-ssl.sh): Tạo bản sao lưu dự phòng `.bak` trước khi cập nhật. Ghi file mới vào `.new` và kiểm tra `nginx -t`. Nếu có lỗi cú pháp -> lập tức rollback về file của DevOps và dừng lại, tuyệt đối không reload.
+      - Xóa bỏ triệt để lệnh reload Nginx vô điều kiện ngoài luồng kiểm tra.
+      - Container Nginx Docker `ceohn10-ssl-proxy`: Kiểm tra syntax `nginx.conf` bằng `docker run --rm nginx:alpine nginx -t` trước khi recreate container.
+  - **3. Đồng bộ tài liệu**:
+    * Đã ghi nhận Điều khoản 0.1 vào [AGENTS.md](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/AGENTS.md), [.cursorrules](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/.cursorrules) và [.agents/rules/deployment-rules.md](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/.agents/rules/deployment-rules.md).
+
+- **Bản cập nhật ngày 23/11/2026 (v12.59): Gỡ Bỏ Hoàn Toàn CLB Doanh Nhân CEO 1983 Khỏi Cổng Quản Trị Platform CRM**:
+  - **1. Mục tiêu**: Tinh gọn hệ sinh thái quản trị nền tảng, loại bỏ hoàn toàn tenant `ceo1983` (CLB Doanh Nhân CEO 1983) khỏi màn Platform Admin Master, chỉ tập trung vào một hệ thống duy nhất là CLB Doanh Nhân CEO HN10 (HanoiBA).
+  - **2. Chi tiết thực hiện**:
+    * [rbac-permission-helpers.ts](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/apps/ceohn10_app_fe/src/lib/rbac-permission-helpers.ts): Loại bỏ tenant `ceo1983` khỏi danh sách `SYSTEM_TENANTS`. Hàm `getActiveSystemTenant()` luôn trả về giá trị chuẩn `"ceohn10"`.
+    * [master.index.tsx](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/apps/ceohn10_app_fe/src/routes/master.index.tsx):
+      - Gỡ bỏ khối logic mock platform `if (selectedTenantKey === "ceo1983")`.
+      - Gỡ bỏ tag hiển thị `tSys === "ceo1983"` và badge `🏢 CLB CEO 1983` trong bảng tài khoản quản trị.
+      - Gỡ bỏ tùy chọn `<SelectItem value="ceo1983">🏢 CLB Doanh Nhân CEO 1983</SelectItem>` trong popup cấp tài khoản quản trị mới.
+      - Cập nhật toàn bộ các tiêu đề mô tả và ma trận phân hệ module chỉ phục vụ riêng CLB CEO HN10.
+  - **3. Kiểm tra kiểm thử**:
+    * Chạy TypeScript type-checking: cả 2 phân hệ FE và BE đạt chuẩn 0 lỗi (Exit code 0).
+
+- **Bản cập nhật ngày 23/11/2026 (v12.58): Khắc Phục Lỗi Build Docker Backend Trên GitHub Actions CI/CD (Lỗi postinstall patch-nestjs-tree-kill)**:
+  - **1. Nguyên nhân gốc rễ**:
+    * Trong quá trình build Docker Image Backend `Dockerfile.backend` tại runner GitHub Actions, giai đoạn `installer` sử dụng `turbo prune` chỉ sao chép các tệp `package.json` vào thư mục `/app/out/json/`.
+    * Thư mục `scripts/` (chứa `patch-nestjs-tree-kill.js`) không nằm trong `/app/out/json/`.
+    * Lệnh `npm ci --ignore-scripts=false && npm rebuild bcrypt` trong Dockerfile kích hoạt lifecycle `postinstall: "node scripts/patch-nestjs-tree-kill.js"`. Vì script không tồn tại trong ngữ cảnh cô lập của subworkspace, npm báo lỗi `code 1: command sh -c node scripts/patch-nestjs-tree-kill.js failed` và làm dừng toàn bộ tiến trình Docker build.
+  - **2. Xử lý triệt để**:
+    * Cập nhật [package.json](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/package.json): Bọc lệnh postinstall trong cú pháp safe inline execution: `"node -e \"try{require('./scripts/patch-nestjs-tree-kill.js')}catch(e){}\""`. Đảm bảo nếu tệp không tồn tại (trong Docker container Alpine hoặc trên các môi trường CI không phải Windows), lệnh tự động bỏ qua với exit code 0.
+    * Cập nhật [Dockerfile.backend](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/Dockerfile.backend): Đổi `npm ci --ignore-scripts=false` thành `npm ci --ignore-scripts && npm rebuild bcrypt`. Tiến trình cài đặt trong Docker Alpine sẽ bỏ qua các lifecycle scripts không cần thiết và chỉ tập trung build native module `bcrypt` cùng Prisma Client ở bước sau.
+  - **3. Kiểm chứng**:
+    * Lệnh `npm run postinstall` chạy hoàn hảo với exit code 0 cả khi có tệp lẫn khi tệp bị thiếu.
 
 - **Bản cập nhật ngày 22/11/2026 (v12.57): Triệt Để Tinh Gọn Phân Quyền RBAC, Giao Diện Thông Báo Đính Kèm Ảnh MinIO, Luồng Kích Hoạt & Đổi Mật Khẩu Hội Viên Mới, Tối Ưu Báo Cáo Tài Chính Thêm Cột Động Lưu Database & Khắc Phục Triệt Để Loạn Kết Nối CSDL Chuẩn 113.20.107.184:6432**:
   - **1. Xóa Bỏ Hoàn Toàn Hardcode Dữ Liệu Phân Quyền & Chuẩn Hóa Danh Sách 7 Vai Trò Cốt Lõi**:
@@ -3437,6 +3526,59 @@
 
 # System Memory & Architecture
 
+- **Bản cập nhật ngày 23/11/2026 (v12.65): Khắc Phục Lỗi Build Docker Images Trên GitHub Actions, Nâng Cấp Luồng Check-Out, Import File Sinh Cột Động & Cấp Quyền Đăng Nhập Bằng Email/Mã Học Viên**:
+  - **1. Xử Lý Triệt Để Lỗi Build Docker Trên GitHub Actions (`exit code 1: patch-nestjs-tree-kill.js`)**:
+    * *Hiện tượng trong ảnh GitHub Actions*: Job "Đóng Gói Docker & Triển Khai Lên Subdomains" thất bại tại bước `Build Docker Images cục bộ trên runner` -> `[installer 7/10] RUN npm ci --ignore-scripts=false && npm rebuild bcrypt` với lỗi: `npm error command sh -c node scripts/patch-nestjs-tree-kill.js`.
+    * *Nguyên nhân cốt lõi*:
+      - Docker multi-stage build trong `Dockerfile.backend` dùng `turbo prune @ceohn10/app_be --docker` để cô lập mã nguồn. Đầu ra của `turbo prune` chỉ bao gồm `package.json` và file lock đưa vào thư mục `/app/out/json/`, không chứa thư mục `scripts/`.
+      - Lệnh `npm ci --ignore-scripts=false` trong `Dockerfile.backend` kích hoạt lifecycle script `postinstall` của `package.json` gốc (`node scripts/patch-nestjs-tree-kill.js`). Vì script này không tồn tại trong context của subworkspace cô lập, npm báo lỗi `exit code 1` và làm dừng toàn bộ tiến trình Docker build.
+    * *Giải pháp khắc phục triệt để*:
+      - Trong [Dockerfile.backend](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceohn10_project/Dockerfile.backend): Cập nhật thành `RUN npm ci --ignore-scripts && npm rebuild bcrypt`. Trong môi trường container Linux Alpine, không cần chạy lifecycle scripts (đặc biệt là script patch taskkill của Windows) mà chỉ cần compile native module `bcrypt` và sinh Prisma Client ở bước tiếp theo.
+      - Trong [package.json](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceohn10_project/package.json): Nâng cấp `postinstall` với cơ chế kiểm tra an toàn:
+        `"postinstall": "node -e \"const fs=require('fs');if(fs.existsSync('./scripts/patch-nestjs-tree-kill.js')){try{require('./scripts/patch-nestjs-tree-kill.js')}catch(e){}}\""`
+        Nếu tệp script tồn tại thì mới thực thi; nếu không tồn tại (như trong Docker runner) thì bỏ qua an toàn với exit code 0.
+  - **2. Luồng Điểm Danh Ra Về (Check-Out) Tại Sự Kiện**:
+    * Trong [event-checkin.tsx](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceohn10_project/apps/ceohn10_app_fe/src/routes/event-checkin.tsx):
+      - Cung cấp song song 2 hành động tác nghiệp trực tiếp: "XÁC NHẬN CHECK-IN VÀO CỬA" và "XÁC NHẬN CHECK-OUT (RA VỀ)".
+      - Hàm `handleCheckout()` gọi API `POST /events/ticket-checkout` để lưu vết `checked_out_at = NOW()`, đổi trạng thái vé sang `checked_out`.
+  - **3. Nâng Cấp Bóc Tách File & Giao Diện Table Tự Động Sinh Cột Động**:
+    * Trong [ai-excel-email-parser.ts](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceohn10_project/apps/ceohn10_app_fe/src/lib/ai-excel-email-parser.ts): Nhận diện đa dạng định dạng cột tùy biến: Mã học viên, Ban chuyên môn, Giảng viên, Lớp học, Ngày tháng, Danh mục, Ghi chú và giữ nguyên các trường động `dynamicFields`.
+    * Trong [EventAttendeesImportModal.tsx](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceohn10_project/apps/ceohn10_app_fe/src/components/events/EventAttendeesImportModal.tsx): Bảng dữ liệu tự động sinh cột theo `detectedColumns` cho cả header `<thead>` và body `<tbody>`, hỗ trợ batch actions Đã/Chưa thanh toán và toggle 1 chạm.
+  - **4. Chuẩn Hóa Phân Quyền & Hỗ Trợ Đăng Nhập Bằng Email Hoặc Mã Học Viên**:
+    * Backend:
+      - Trong [users.repository.ts](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceohn10_project/apps/ceohn10_app_be/src/users/users.repository.ts): Hàm `findByUsername` bổ sung tra cứu theo `code` và `member_code` trong `public.members`. Hàm `autoLinkMember` tự động liên kết tài khoản mới với học viên theo SĐT, Email hoặc Mã học viên.
+      - Trong [users.service.ts](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceohn10_project/apps/ceohn10_app_be/src/users/users.service.ts): Tự động truyền mã định danh học viên để kích hoạt liên kết tự động.
+    * Frontend:
+      - Trong [account-settings.index.tsx](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceohn10_project/apps/ceohn10_app_fe/src/routes/account-settings.index.tsx): Giao diện thêm tài khoản ghi rõ "Tên đăng nhập vào App (Email hoặc Mã học viên) *" với chú thích hướng dẫn trực quan. Nếu nhập Email, hệ thống tự động điền vào trường Email; nếu nhập Mã học viên (VD: `HN10-001`), học viên có thể dùng chính mã này để đăng nhập App.
+  - **5. Kiểm Tra Chất Lượng Mã Nguồn (STRICT TYPE-CHECK)**:
+    * Chạy kiểm tra TypeScript (`tsc --noEmit`) trên toàn bộ Backend và Frontend: **0 errors (Exit code 0)**.
+    * Tuân thủ triệt để Rule 1: Không tự ý chạy `git push` hay `git commit`. Người dùng toàn quyền chủ động kiểm tra và push lên GitHub.
+
+
+- **Bản cập nhật ngày 23/11/2026 (v12.64): Nâng Cấp Toàn Diện Modal Import Đại Biểu Sự Kiện - Dynamic Columns, Call API Danh Sách Sự Kiện Đang Có, Nhận Diện Thông Minh Đã/Chưa Thanh Toán & Đồng Bộ Giao Diện**:
+  - **1. Call API Lấy Danh Sách Sự Kiện Đang Có & Dropdown Chọn Sự Kiện Tiếp Nhận**:
+    * Trong [EventAttendeesImportModal.tsx](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceohn10_project/apps/ceohn10_app_fe/src/components/events/EventAttendeesImportModal.tsx), thêm cơ chế `useEffect` gọi trực tiếp `GET /events` để nạp toàn bộ sự kiện hiện có từ CSDL chuẩn `113.20.107.184:6432`.
+    * Thêm Dropdown `<select>` lựa chọn sự kiện đích với thông tin chi tiết: Tên sự kiện, Ngày tổ chức, Địa điểm, Phí vé (Miễn phí vs Có phí cụ thể).
+    * Khi người dùng chọn sự kiện từ dropdown, hệ thống tự động đồng bộ giá vé mặc định và cập nhật trạng thái thanh toán tương ứng cho danh sách đại biểu.
+    * Gửi danh sách qua API `/events/:id/import-attendees` gắn đích danh vào sự kiện được chọn, đảm bảo thông báo gửi qua Email & Zalo OA luôn mang đúng thông tin sự kiện.
+  - **2. Bóc Tách & Hiển Thị Các Cột Tùy Biến Động (Dynamic Columns)**:
+    * Bóc tách thông minh mọi tiêu đề cột tùy biến từ bảng file Word/Excel/PDF/CSV vào `detectedColumns`.
+    * Bổ sung hiển thị các cột tùy biến này trực tiếp vào `<thead>` và `<tbody>` của bảng Preview Table trên modal import với giao diện làm nổi bật rõ ràng (`bg-indigo-50/70 text-indigo-950 font-bold`).
+    * Dữ liệu các cột động được truyền qua `customColumns` và `recordsPayload` để Backend tự động chạy Dynamic DDL (`ALTER TABLE public.event_registrations ADD COLUMN IF NOT EXISTS ...`) và lưu vào `dynamic_data`.
+  - **3. Nhận Diện Trạng Thái Thanh Toán Thông Minh (Paid vs Unpaid vs Free)**:
+    * Mở rộng bộ từ khóa nhận diện trong cả parser frontend và backend:
+      - Đã thanh toán (PAID): `đã ck`, `ck`, `chuyển khoản`, `tiền mặt`, `đã trả`, `rồi`, `xong`, `thành công`, `yes`, `true`, `1`, `x`, `v`, `pass`, `ok`, `done`, `đã thu`, v.v.
+      - Chưa thanh toán (UNPAID): `chưa`, `unpaid`, `pending`, `nợ`, `no`, `0`, `chờ`, `thiếu`.
+      - Miễn phí (FREE): Sự kiện 0đ hoặc từ khóa `miễn phí`, `free`, `khách mời`.
+    * Thêm **Bộ nút thao tác hàng loạt (Batch Actions)**: "Tất cả Đã thanh toán", "Tất cả Chưa thanh toán", "Đảo trạng thái".
+    * Badge trạng thái thanh toán trên từng dòng có màu sắc trực quan (Xanh lá - Đã thanh toán, Vàng cam - Chưa thanh toán, Xanh dương - Miễn phí) và cho phép click 1 chạm để đảo trạng thái tức thì.
+  - **4. Đồng Bộ Eager Fetch Trên Màn Hình Quản Lý Sự Kiện**:
+    * Trong [events.index.tsx](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceohn10_project/apps/ceohn10_app_fe/src/routes/events.index.tsx), bổ sung `useEffect` eager fetch gọi `GET /events` để nạp ngay danh sách sự kiện live từ CSDL `113.20.107.184:6432` lên giao diện, khắc phục triệt để tình trạng hiển thị 0 sự kiện khi SSR loader chạy trước khi backend sẵn sàng.
+    * Trong [event-registrations.tsx](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceohn10_project/apps/ceohn10_app_fe/src/routes/event-registrations.tsx), truyền đầy đủ `eventsList={eventsList}` và `initialEventId` sang modal import.
+  - **5. Kiểm Tra Chất Lượng Mã Nguồn (STRICT TYPE-CHECK)**:
+    * Chạy kiểm tra TypeScript (`tsc --noEmit`) trên toàn bộ dự án: **0 errors (Exit code 0)**.
+    * Tuân thủ triệt để Rule 1: Không tự ý `git push` hay `git commit`.
+
 - **Bản cập nhật ngày 23/11/2026 (v12.63): Khắc Phục Triệt Để 3 Vấn Đề Từ Ảnh Của Người Dùng & Toàn Bộ 6 Bug Sự Kiện, Public QR Check-in & Biểu Quyết, Loại Bỏ Hoàn Toàn 968 Lỗi dist-modules, Dọn Dẹp VBA, CSDL Localhost Hoạt Động Trơn Tru**:
   - **1. Xử Lý Triệt Để Lỗi 968 File & `Cannot find module '@/integrations/supabase/nest-auth-middleware'` Trong VS Code (Ảnh 1)**:
     * *Nguyên nhân*: Thư mục xuất bản module `dist-modules` trước đó bị Git theo dõi và VS Code tự động quét/index các file xuất bản không có cấu hình path mapping `@/`.
@@ -3633,6 +3775,42 @@
     * `apps/ceohn10_app_fe`: `FE_TYPECHECK_SUCCESS_0_ERRORS` (0 lỗi).
     * `apps/ceohn10_app_be`: `BE_TYPECHECK_SUCCESS_0_ERRORS` (0 lỗi).
     * Tuân thủ tuyệt đối Rule 1: Không tự ý chạy `git push` hay `git commit`.
+
+- **Bản cập nhật ngày 23/11/2026 (v12.60): Thiết Lập Luật Tối Cao STRICT NGINX LAW - Bắt Buộc Nginx Success Trước Khi Đưa Code Vào Server**:
+  - **1. Bối cảnh & Bài học sự cố**:
+    * Sáng ngày 23/11/2026, quá trình deploy có ghi đè tệp cấu hình Nginx Host (`/etc/nginx/conf.d/ceohn10_subdomains.conf`) kèm lệnh reload không an toàn, gây lỗi cú pháp Nginx và làm sập máy chủ VPS tạm thời. Bộ phận DevOps đã phải can thiệp để khôi phục dịch vụ.
+  - **2. Thiết lập quy chuẩn tối cao (STRICT NGINX & SERVER SAFETY LAW)**:
+    * **NGINX VALIDATION GATE**: Mọi cập nhật cấu hình Nginx (cho cả Docker Container và Host OS) **BẮT BUỘC phải kiểm tra cú pháp `nginx -t` đạt trạng thái `syntax is ok` & `test is successful` (Exit code 0)** thì MỚI ĐƯỢC PHÉP đưa vào hoạt động hoặc reload Nginx.
+    * **TUYỆT ĐỐI KHÔNG RELOAD / RESTART KHI TEST THẤT BẠI**: Tuyệt đối không gọi `systemctl reload nginx` khi chưa vượt qua `nginx -t`.
+    * **BẢO VỆ CẤU HÌNH HOST CỦA DEVOPS (ATOMIC BACKUP & ROLLBACK)**:
+      - Tệp [setup-ssl.sh](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/deploy/ssl/setup-ssl.sh): Tạo bản sao lưu dự phòng `.bak` trước khi cập nhật. Ghi file mới vào `.new` và kiểm tra `nginx -t`. Nếu có lỗi cú pháp -> lập tức rollback về file của DevOps và dừng lại, tuyệt đối không reload.
+      - Xóa bỏ triệt để lệnh reload Nginx vô điều kiện ngoài luồng kiểm tra.
+      - Container Nginx Docker `ceohn10-ssl-proxy`: Kiểm tra syntax `nginx.conf` bằng `docker run --rm nginx:alpine nginx -t` trước khi recreate container.
+  - **3. Đồng bộ tài liệu**:
+    * Đã ghi nhận Điều khoản 0.1 vào [AGENTS.md](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/AGENTS.md), [.cursorrules](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/.cursorrules) và [.agents/rules/deployment-rules.md](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/.agents/rules/deployment-rules.md).
+
+- **Bản cập nhật ngày 23/11/2026 (v12.59): Gỡ Bỏ Hoàn Toàn CLB Doanh Nhân CEO 1983 Khỏi Cổng Quản Trị Platform CRM**:
+  - **1. Mục tiêu**: Tinh gọn hệ sinh thái quản trị nền tảng, loại bỏ hoàn toàn tenant `ceo1983` (CLB Doanh Nhân CEO 1983) khỏi màn Platform Admin Master, chỉ tập trung vào một hệ thống duy nhất là CLB Doanh Nhân CEO HN10 (HanoiBA).
+  - **2. Chi tiết thực hiện**:
+    * [rbac-permission-helpers.ts](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/apps/ceohn10_app_fe/src/lib/rbac-permission-helpers.ts): Loại bỏ tenant `ceo1983` khỏi danh sách `SYSTEM_TENANTS`. Hàm `getActiveSystemTenant()` luôn trả về giá trị chuẩn `"ceohn10"`.
+    * [master.index.tsx](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/apps/ceohn10_app_fe/src/routes/master.index.tsx):
+      - Gỡ bỏ khối logic mock platform `if (selectedTenantKey === "ceo1983")`.
+      - Gỡ bỏ tag hiển thị `tSys === "ceo1983"` và badge `🏢 CLB CEO 1983` trong bảng tài khoản quản trị.
+      - Gỡ bỏ tùy chọn `<SelectItem value="ceo1983">🏢 CLB Doanh Nhân CEO 1983</SelectItem>` trong popup cấp tài khoản quản trị mới.
+      - Cập nhật toàn bộ các tiêu đề mô tả và ma trận phân hệ module chỉ phục vụ riêng CLB CEO HN10.
+  - **3. Kiểm tra kiểm thử**:
+    * Chạy TypeScript type-checking: cả 2 phân hệ FE và BE đạt chuẩn 0 lỗi (Exit code 0).
+
+- **Bản cập nhật ngày 23/11/2026 (v12.58): Khắc Phục Lỗi Build Docker Backend Trên GitHub Actions CI/CD (Lỗi postinstall patch-nestjs-tree-kill)**:
+  - **1. Nguyên nhân gốc rễ**:
+    * Trong quá trình build Docker Image Backend `Dockerfile.backend` tại runner GitHub Actions, giai đoạn `installer` sử dụng `turbo prune` chỉ sao chép các tệp `package.json` vào thư mục `/app/out/json/`.
+    * Thư mục `scripts/` (chứa `patch-nestjs-tree-kill.js`) không nằm trong `/app/out/json/`.
+    * Lệnh `npm ci --ignore-scripts=false && npm rebuild bcrypt` trong Dockerfile kích hoạt lifecycle `postinstall: "node scripts/patch-nestjs-tree-kill.js"`. Vì script không tồn tại trong ngữ cảnh cô lập của subworkspace, npm báo lỗi `code 1: command sh -c node scripts/patch-nestjs-tree-kill.js failed` và làm dừng toàn bộ tiến trình Docker build.
+  - **2. Xử lý triệt để**:
+    * Cập nhật [package.json](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/package.json): Bọc lệnh postinstall trong cú pháp safe inline execution: `"node -e \"try{require('./scripts/patch-nestjs-tree-kill.js')}catch(e){}\""`. Đảm bảo nếu tệp không tồn tại (trong Docker container Alpine hoặc trên các môi trường CI không phải Windows), lệnh tự động bỏ qua với exit code 0.
+    * Cập nhật [Dockerfile.backend](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/Dockerfile.backend): Đổi `npm ci --ignore-scripts=false` thành `npm ci --ignore-scripts && npm rebuild bcrypt`. Tiến trình cài đặt trong Docker Alpine sẽ bỏ qua các lifecycle scripts không cần thiết và chỉ tập trung build native module `bcrypt` cùng Prisma Client ở bước sau.
+  - **3. Kiểm chứng**:
+    * Lệnh `npm run postinstall` chạy hoàn hảo với exit code 0 cả khi có tệp lẫn khi tệp bị thiếu.
 
 - **Bản cập nhật ngày 22/11/2026 (v12.57): Triệt Để Tinh Gọn Phân Quyền RBAC, Giao Diện Thông Báo Đính Kèm Ảnh MinIO, Luồng Kích Hoạt & Đổi Mật Khẩu Hội Viên Mới, Tối Ưu Báo Cáo Tài Chính Thêm Cột Động Lưu Database & Khắc Phục Triệt Để Loạn Kết Nối CSDL Chuẩn 113.20.107.184:6432**:
   - **1. Xóa Bỏ Hoàn Toàn Hardcode Dữ Liệu Phân Quyền & Chuẩn Hóa Danh Sách 7 Vai Trò Cốt Lõi**:
@@ -8038,6 +8216,59 @@
 
 # System Memory & Architecture
 
+- **Bản cập nhật ngày 23/11/2026 (v12.65): Khắc Phục Lỗi Build Docker Images Trên GitHub Actions, Nâng Cấp Luồng Check-Out, Import File Sinh Cột Động & Cấp Quyền Đăng Nhập Bằng Email/Mã Học Viên**:
+  - **1. Xử Lý Triệt Để Lỗi Build Docker Trên GitHub Actions (`exit code 1: patch-nestjs-tree-kill.js`)**:
+    * *Hiện tượng trong ảnh GitHub Actions*: Job "Đóng Gói Docker & Triển Khai Lên Subdomains" thất bại tại bước `Build Docker Images cục bộ trên runner` -> `[installer 7/10] RUN npm ci --ignore-scripts=false && npm rebuild bcrypt` với lỗi: `npm error command sh -c node scripts/patch-nestjs-tree-kill.js`.
+    * *Nguyên nhân cốt lõi*:
+      - Docker multi-stage build trong `Dockerfile.backend` dùng `turbo prune @ceohn10/app_be --docker` để cô lập mã nguồn. Đầu ra của `turbo prune` chỉ bao gồm `package.json` và file lock đưa vào thư mục `/app/out/json/`, không chứa thư mục `scripts/`.
+      - Lệnh `npm ci --ignore-scripts=false` trong `Dockerfile.backend` kích hoạt lifecycle script `postinstall` của `package.json` gốc (`node scripts/patch-nestjs-tree-kill.js`). Vì script này không tồn tại trong context của subworkspace cô lập, npm báo lỗi `exit code 1` và làm dừng toàn bộ tiến trình Docker build.
+    * *Giải pháp khắc phục triệt để*:
+      - Trong [Dockerfile.backend](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceohn10_project/Dockerfile.backend): Cập nhật thành `RUN npm ci --ignore-scripts && npm rebuild bcrypt`. Trong môi trường container Linux Alpine, không cần chạy lifecycle scripts (đặc biệt là script patch taskkill của Windows) mà chỉ cần compile native module `bcrypt` và sinh Prisma Client ở bước tiếp theo.
+      - Trong [package.json](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceohn10_project/package.json): Nâng cấp `postinstall` với cơ chế kiểm tra an toàn:
+        `"postinstall": "node -e \"const fs=require('fs');if(fs.existsSync('./scripts/patch-nestjs-tree-kill.js')){try{require('./scripts/patch-nestjs-tree-kill.js')}catch(e){}}\""`
+        Nếu tệp script tồn tại thì mới thực thi; nếu không tồn tại (như trong Docker runner) thì bỏ qua an toàn với exit code 0.
+  - **2. Luồng Điểm Danh Ra Về (Check-Out) Tại Sự Kiện**:
+    * Trong [event-checkin.tsx](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceohn10_project/apps/ceohn10_app_fe/src/routes/event-checkin.tsx):
+      - Cung cấp song song 2 hành động tác nghiệp trực tiếp: "XÁC NHẬN CHECK-IN VÀO CỬA" và "XÁC NHẬN CHECK-OUT (RA VỀ)".
+      - Hàm `handleCheckout()` gọi API `POST /events/ticket-checkout` để lưu vết `checked_out_at = NOW()`, đổi trạng thái vé sang `checked_out`.
+  - **3. Nâng Cấp Bóc Tách File & Giao Diện Table Tự Động Sinh Cột Động**:
+    * Trong [ai-excel-email-parser.ts](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceohn10_project/apps/ceohn10_app_fe/src/lib/ai-excel-email-parser.ts): Nhận diện đa dạng định dạng cột tùy biến: Mã học viên, Ban chuyên môn, Giảng viên, Lớp học, Ngày tháng, Danh mục, Ghi chú và giữ nguyên các trường động `dynamicFields`.
+    * Trong [EventAttendeesImportModal.tsx](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceohn10_project/apps/ceohn10_app_fe/src/components/events/EventAttendeesImportModal.tsx): Bảng dữ liệu tự động sinh cột theo `detectedColumns` cho cả header `<thead>` và body `<tbody>`, hỗ trợ batch actions Đã/Chưa thanh toán và toggle 1 chạm.
+  - **4. Chuẩn Hóa Phân Quyền & Hỗ Trợ Đăng Nhập Bằng Email Hoặc Mã Học Viên**:
+    * Backend:
+      - Trong [users.repository.ts](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceohn10_project/apps/ceohn10_app_be/src/users/users.repository.ts): Hàm `findByUsername` bổ sung tra cứu theo `code` và `member_code` trong `public.members`. Hàm `autoLinkMember` tự động liên kết tài khoản mới với học viên theo SĐT, Email hoặc Mã học viên.
+      - Trong [users.service.ts](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceohn10_project/apps/ceohn10_app_be/src/users/users.service.ts): Tự động truyền mã định danh học viên để kích hoạt liên kết tự động.
+    * Frontend:
+      - Trong [account-settings.index.tsx](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceohn10_project/apps/ceohn10_app_fe/src/routes/account-settings.index.tsx): Giao diện thêm tài khoản ghi rõ "Tên đăng nhập vào App (Email hoặc Mã học viên) *" với chú thích hướng dẫn trực quan. Nếu nhập Email, hệ thống tự động điền vào trường Email; nếu nhập Mã học viên (VD: `HN10-001`), học viên có thể dùng chính mã này để đăng nhập App.
+  - **5. Kiểm Tra Chất Lượng Mã Nguồn (STRICT TYPE-CHECK)**:
+    * Chạy kiểm tra TypeScript (`tsc --noEmit`) trên toàn bộ Backend và Frontend: **0 errors (Exit code 0)**.
+    * Tuân thủ triệt để Rule 1: Không tự ý chạy `git push` hay `git commit`. Người dùng toàn quyền chủ động kiểm tra và push lên GitHub.
+
+
+- **Bản cập nhật ngày 23/11/2026 (v12.64): Nâng Cấp Toàn Diện Modal Import Đại Biểu Sự Kiện - Dynamic Columns, Call API Danh Sách Sự Kiện Đang Có, Nhận Diện Thông Minh Đã/Chưa Thanh Toán & Đồng Bộ Giao Diện**:
+  - **1. Call API Lấy Danh Sách Sự Kiện Đang Có & Dropdown Chọn Sự Kiện Tiếp Nhận**:
+    * Trong [EventAttendeesImportModal.tsx](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceohn10_project/apps/ceohn10_app_fe/src/components/events/EventAttendeesImportModal.tsx), thêm cơ chế `useEffect` gọi trực tiếp `GET /events` để nạp toàn bộ sự kiện hiện có từ CSDL chuẩn `113.20.107.184:6432`.
+    * Thêm Dropdown `<select>` lựa chọn sự kiện đích với thông tin chi tiết: Tên sự kiện, Ngày tổ chức, Địa điểm, Phí vé (Miễn phí vs Có phí cụ thể).
+    * Khi người dùng chọn sự kiện từ dropdown, hệ thống tự động đồng bộ giá vé mặc định và cập nhật trạng thái thanh toán tương ứng cho danh sách đại biểu.
+    * Gửi danh sách qua API `/events/:id/import-attendees` gắn đích danh vào sự kiện được chọn, đảm bảo thông báo gửi qua Email & Zalo OA luôn mang đúng thông tin sự kiện.
+  - **2. Bóc Tách & Hiển Thị Các Cột Tùy Biến Động (Dynamic Columns)**:
+    * Bóc tách thông minh mọi tiêu đề cột tùy biến từ bảng file Word/Excel/PDF/CSV vào `detectedColumns`.
+    * Bổ sung hiển thị các cột tùy biến này trực tiếp vào `<thead>` và `<tbody>` của bảng Preview Table trên modal import với giao diện làm nổi bật rõ ràng (`bg-indigo-50/70 text-indigo-950 font-bold`).
+    * Dữ liệu các cột động được truyền qua `customColumns` và `recordsPayload` để Backend tự động chạy Dynamic DDL (`ALTER TABLE public.event_registrations ADD COLUMN IF NOT EXISTS ...`) và lưu vào `dynamic_data`.
+  - **3. Nhận Diện Trạng Thái Thanh Toán Thông Minh (Paid vs Unpaid vs Free)**:
+    * Mở rộng bộ từ khóa nhận diện trong cả parser frontend và backend:
+      - Đã thanh toán (PAID): `đã ck`, `ck`, `chuyển khoản`, `tiền mặt`, `đã trả`, `rồi`, `xong`, `thành công`, `yes`, `true`, `1`, `x`, `v`, `pass`, `ok`, `done`, `đã thu`, v.v.
+      - Chưa thanh toán (UNPAID): `chưa`, `unpaid`, `pending`, `nợ`, `no`, `0`, `chờ`, `thiếu`.
+      - Miễn phí (FREE): Sự kiện 0đ hoặc từ khóa `miễn phí`, `free`, `khách mời`.
+    * Thêm **Bộ nút thao tác hàng loạt (Batch Actions)**: "Tất cả Đã thanh toán", "Tất cả Chưa thanh toán", "Đảo trạng thái".
+    * Badge trạng thái thanh toán trên từng dòng có màu sắc trực quan (Xanh lá - Đã thanh toán, Vàng cam - Chưa thanh toán, Xanh dương - Miễn phí) và cho phép click 1 chạm để đảo trạng thái tức thì.
+  - **4. Đồng Bộ Eager Fetch Trên Màn Hình Quản Lý Sự Kiện**:
+    * Trong [events.index.tsx](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceohn10_project/apps/ceohn10_app_fe/src/routes/events.index.tsx), bổ sung `useEffect` eager fetch gọi `GET /events` để nạp ngay danh sách sự kiện live từ CSDL `113.20.107.184:6432` lên giao diện, khắc phục triệt để tình trạng hiển thị 0 sự kiện khi SSR loader chạy trước khi backend sẵn sàng.
+    * Trong [event-registrations.tsx](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceohn10_project/apps/ceohn10_app_fe/src/routes/event-registrations.tsx), truyền đầy đủ `eventsList={eventsList}` và `initialEventId` sang modal import.
+  - **5. Kiểm Tra Chất Lượng Mã Nguồn (STRICT TYPE-CHECK)**:
+    * Chạy kiểm tra TypeScript (`tsc --noEmit`) trên toàn bộ dự án: **0 errors (Exit code 0)**.
+    * Tuân thủ triệt để Rule 1: Không tự ý `git push` hay `git commit`.
+
 - **Bản cập nhật ngày 23/11/2026 (v12.63): Khắc Phục Triệt Để 3 Vấn Đề Từ Ảnh Của Người Dùng & Toàn Bộ 6 Bug Sự Kiện, Public QR Check-in & Biểu Quyết, Loại Bỏ Hoàn Toàn 968 Lỗi dist-modules, Dọn Dẹp VBA, CSDL Localhost Hoạt Động Trơn Tru**:
   - **1. Xử Lý Triệt Để Lỗi 968 File & `Cannot find module '@/integrations/supabase/nest-auth-middleware'` Trong VS Code (Ảnh 1)**:
     * *Nguyên nhân*: Thư mục xuất bản module `dist-modules` trước đó bị Git theo dõi và VS Code tự động quét/index các file xuất bản không có cấu hình path mapping `@/`.
@@ -8234,6 +8465,42 @@
     * `apps/ceohn10_app_fe`: `FE_TYPECHECK_SUCCESS_0_ERRORS` (0 lỗi).
     * `apps/ceohn10_app_be`: `BE_TYPECHECK_SUCCESS_0_ERRORS` (0 lỗi).
     * Tuân thủ tuyệt đối Rule 1: Không tự ý chạy `git push` hay `git commit`.
+
+- **Bản cập nhật ngày 23/11/2026 (v12.60): Thiết Lập Luật Tối Cao STRICT NGINX LAW - Bắt Buộc Nginx Success Trước Khi Đưa Code Vào Server**:
+  - **1. Bối cảnh & Bài học sự cố**:
+    * Sáng ngày 23/11/2026, quá trình deploy có ghi đè tệp cấu hình Nginx Host (`/etc/nginx/conf.d/ceohn10_subdomains.conf`) kèm lệnh reload không an toàn, gây lỗi cú pháp Nginx và làm sập máy chủ VPS tạm thời. Bộ phận DevOps đã phải can thiệp để khôi phục dịch vụ.
+  - **2. Thiết lập quy chuẩn tối cao (STRICT NGINX & SERVER SAFETY LAW)**:
+    * **NGINX VALIDATION GATE**: Mọi cập nhật cấu hình Nginx (cho cả Docker Container và Host OS) **BẮT BUỘC phải kiểm tra cú pháp `nginx -t` đạt trạng thái `syntax is ok` & `test is successful` (Exit code 0)** thì MỚI ĐƯỢC PHÉP đưa vào hoạt động hoặc reload Nginx.
+    * **TUYỆT ĐỐI KHÔNG RELOAD / RESTART KHI TEST THẤT BẠI**: Tuyệt đối không gọi `systemctl reload nginx` khi chưa vượt qua `nginx -t`.
+    * **BẢO VỆ CẤU HÌNH HOST CỦA DEVOPS (ATOMIC BACKUP & ROLLBACK)**:
+      - Tệp [setup-ssl.sh](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/deploy/ssl/setup-ssl.sh): Tạo bản sao lưu dự phòng `.bak` trước khi cập nhật. Ghi file mới vào `.new` và kiểm tra `nginx -t`. Nếu có lỗi cú pháp -> lập tức rollback về file của DevOps và dừng lại, tuyệt đối không reload.
+      - Xóa bỏ triệt để lệnh reload Nginx vô điều kiện ngoài luồng kiểm tra.
+      - Container Nginx Docker `ceohn10-ssl-proxy`: Kiểm tra syntax `nginx.conf` bằng `docker run --rm nginx:alpine nginx -t` trước khi recreate container.
+  - **3. Đồng bộ tài liệu**:
+    * Đã ghi nhận Điều khoản 0.1 vào [AGENTS.md](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/AGENTS.md), [.cursorrules](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/.cursorrules) và [.agents/rules/deployment-rules.md](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/.agents/rules/deployment-rules.md).
+
+- **Bản cập nhật ngày 23/11/2026 (v12.59): Gỡ Bỏ Hoàn Toàn CLB Doanh Nhân CEO 1983 Khỏi Cổng Quản Trị Platform CRM**:
+  - **1. Mục tiêu**: Tinh gọn hệ sinh thái quản trị nền tảng, loại bỏ hoàn toàn tenant `ceo1983` (CLB Doanh Nhân CEO 1983) khỏi màn Platform Admin Master, chỉ tập trung vào một hệ thống duy nhất là CLB Doanh Nhân CEO HN10 (HanoiBA).
+  - **2. Chi tiết thực hiện**:
+    * [rbac-permission-helpers.ts](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/apps/ceohn10_app_fe/src/lib/rbac-permission-helpers.ts): Loại bỏ tenant `ceo1983` khỏi danh sách `SYSTEM_TENANTS`. Hàm `getActiveSystemTenant()` luôn trả về giá trị chuẩn `"ceohn10"`.
+    * [master.index.tsx](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/apps/ceohn10_app_fe/src/routes/master.index.tsx):
+      - Gỡ bỏ khối logic mock platform `if (selectedTenantKey === "ceo1983")`.
+      - Gỡ bỏ tag hiển thị `tSys === "ceo1983"` và badge `🏢 CLB CEO 1983` trong bảng tài khoản quản trị.
+      - Gỡ bỏ tùy chọn `<SelectItem value="ceo1983">🏢 CLB Doanh Nhân CEO 1983</SelectItem>` trong popup cấp tài khoản quản trị mới.
+      - Cập nhật toàn bộ các tiêu đề mô tả và ma trận phân hệ module chỉ phục vụ riêng CLB CEO HN10.
+  - **3. Kiểm tra kiểm thử**:
+    * Chạy TypeScript type-checking: cả 2 phân hệ FE và BE đạt chuẩn 0 lỗi (Exit code 0).
+
+- **Bản cập nhật ngày 23/11/2026 (v12.58): Khắc Phục Lỗi Build Docker Backend Trên GitHub Actions CI/CD (Lỗi postinstall patch-nestjs-tree-kill)**:
+  - **1. Nguyên nhân gốc rễ**:
+    * Trong quá trình build Docker Image Backend `Dockerfile.backend` tại runner GitHub Actions, giai đoạn `installer` sử dụng `turbo prune` chỉ sao chép các tệp `package.json` vào thư mục `/app/out/json/`.
+    * Thư mục `scripts/` (chứa `patch-nestjs-tree-kill.js`) không nằm trong `/app/out/json/`.
+    * Lệnh `npm ci --ignore-scripts=false && npm rebuild bcrypt` trong Dockerfile kích hoạt lifecycle `postinstall: "node scripts/patch-nestjs-tree-kill.js"`. Vì script không tồn tại trong ngữ cảnh cô lập của subworkspace, npm báo lỗi `code 1: command sh -c node scripts/patch-nestjs-tree-kill.js failed` và làm dừng toàn bộ tiến trình Docker build.
+  - **2. Xử lý triệt để**:
+    * Cập nhật [package.json](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/package.json): Bọc lệnh postinstall trong cú pháp safe inline execution: `"node -e \"try{require('./scripts/patch-nestjs-tree-kill.js')}catch(e){}\""`. Đảm bảo nếu tệp không tồn tại (trong Docker container Alpine hoặc trên các môi trường CI không phải Windows), lệnh tự động bỏ qua với exit code 0.
+    * Cập nhật [Dockerfile.backend](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceoHN10_project/Dockerfile.backend): Đổi `npm ci --ignore-scripts=false` thành `npm ci --ignore-scripts && npm rebuild bcrypt`. Tiến trình cài đặt trong Docker Alpine sẽ bỏ qua các lifecycle scripts không cần thiết và chỉ tập trung build native module `bcrypt` cùng Prisma Client ở bước sau.
+  - **3. Kiểm chứng**:
+    * Lệnh `npm run postinstall` chạy hoàn hảo với exit code 0 cả khi có tệp lẫn khi tệp bị thiếu.
 
 - **Bản cập nhật ngày 22/11/2026 (v12.57): Triệt Để Tinh Gọn Phân Quyền RBAC, Giao Diện Thông Báo Đính Kèm Ảnh MinIO, Luồng Kích Hoạt & Đổi Mật Khẩu Hội Viên Mới, Tối Ưu Báo Cáo Tài Chính Thêm Cột Động Lưu Database & Khắc Phục Triệt Để Loạn Kết Nối CSDL Chuẩn 113.20.107.184:6432**:
   - **1. Xóa Bỏ Hoàn Toàn Hardcode Dữ Liệu Phân Quyền & Chuẩn Hóa Danh Sách 7 Vai Trò Cốt Lõi**:

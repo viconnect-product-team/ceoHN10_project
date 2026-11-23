@@ -1121,15 +1121,31 @@ function AccountManagementPage() {
 
             <form onSubmit={handleAdminCreateUser} className="space-y-4 text-xs">
               <div>
-                <label className="mb-1 block font-semibold text-foreground">Tên đăng nhập (Username) *</label>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="font-semibold text-foreground">
+                    Tên đăng nhập vào App (Email hoặc Mã học viên) *
+                  </label>
+                  <span className="text-[11px] text-muted-foreground font-medium">
+                    Hỗ trợ Email hoặc Mã học viên (VD: HN10-001)
+                  </span>
+                </div>
                 <input
                   type="text"
                   required
                   value={createUsername}
-                  onChange={(e) => setCreateUsername(e.target.value)}
-                  placeholder="VD: nguyenvana hoặc email@domain.com"
-                  className="h-10 w-full rounded-xl border border-border bg-background px-3.5 text-sm text-foreground focus:border-ring outline-none"
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setCreateUsername(val);
+                    if (val.includes("@") && !createEmail) {
+                      setCreateEmail(val.toLowerCase());
+                    }
+                  }}
+                  placeholder="VD: hocvien@gmail.com hoặc HN10-001"
+                  className="h-10 w-full rounded-xl border border-border bg-background px-3.5 text-sm text-foreground focus:border-ring outline-none font-medium"
                 />
+                <p className="mt-1 text-[11px] text-muted-foreground">
+                  Học viên có thể sử dụng chính <strong>Email</strong> hoặc <strong>Mã học viên</strong> này để đăng nhập vào ứng dụng Mobile CEO HN10.
+                </p>
               </div>
 
               <div>

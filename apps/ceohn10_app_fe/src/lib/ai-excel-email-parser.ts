@@ -8,6 +8,12 @@ export interface ParsedRecipientItem {
   position?: string;
   amount?: number | string;
   paymentStatus?: "paid" | "unpaid" | "free";
+  memberCode?: string;
+  department?: string;
+  lecturer?: string;
+  className?: string;
+  category?: string;
+  date?: string;
   notes?: string;
   dynamicFields?: Record<string, any>;
 }
@@ -122,6 +128,13 @@ async function parseExcelFile(file: File, isCsv = false): Promise<ParsedFileResu
     let positionColIdx = -1;
     let amountColIdx = -1;
     let paymentStatusColIdx = -1;
+    let memberCodeColIdx = -1;
+    let departmentColIdx = -1;
+    let lecturerColIdx = -1;
+    let classColIdx = -1;
+    let dateColIdx = -1;
+    let categoryColIdx = -1;
+    let noteColIdx = -1;
 
     for (let r = 0; r < Math.min(rawData.length, 10); r++) {
       const row = rawData[r] as any[];
@@ -149,6 +162,21 @@ async function parseExcelFile(file: File, isCsv = false): Promise<ParsedFileResu
         ) {
           nameColIdx = c;
         } else if (
+          val.includes("mã học viên") ||
+          val.includes("mã_hv") ||
+          val.includes("mã hv") ||
+          val.includes("mã số") ||
+          val.includes("mã sv") ||
+          val.includes("mã tv") ||
+          val.includes("mã thành viên") ||
+          val.includes("member code") ||
+          val === "code" ||
+          val === "mã" ||
+          val.includes("mã thẻ") ||
+          val.includes("số thẻ")
+        ) {
+          memberCodeColIdx = c;
+        } else if (
           val.includes("công ty") ||
           val.includes("doanh nghiệp") ||
           val.includes("đơn vị") ||
@@ -168,16 +196,84 @@ async function parseExcelFile(file: File, isCsv = false): Promise<ParsedFileResu
           val.includes("sđt") ||
           val.includes("điện thoại") ||
           val.includes("phone") ||
-          val.includes("mobile")
+          val.includes("mobile") ||
+          val.includes("tel")
         ) {
           phoneColIdx = c;
+        } else if (
+          val.includes("ban chuyên môn") ||
+          val.includes("phòng ban") ||
+          val.includes("ban") ||
+          val.includes("bộ phận") ||
+          val.includes("department")
+        ) {
+          departmentColIdx = c;
+        } else if (
+          val.includes("giảng viên") ||
+          val.includes("diễn giả") ||
+          val.includes("chuyên gia") ||
+          val.includes("người hướng dẫn") ||
+          val.includes("thầy") ||
+          val.includes("cô") ||
+          val.includes("speaker") ||
+          val.includes("lecturer") ||
+          val.includes("instructor")
+        ) {
+          lecturerColIdx = c;
+        } else if (
+          val.includes("lớp") ||
+          val.includes("chuyên đề") ||
+          val.includes("khóa học") ||
+          val.includes("môn học") ||
+          val.includes("buổi học") ||
+          val.includes("class") ||
+          val.includes("course") ||
+          val.includes("session")
+        ) {
+          classColIdx = c;
+        } else if (
+          val.includes("ngày sinh") ||
+          val.includes("ngày học") ||
+          val.includes("ngày tham gia") ||
+          val.includes("ngày giao dịch") ||
+          val === "ngày" ||
+          val === "date" ||
+          val === "thời gian"
+        ) {
+          dateColIdx = c;
+        } else if (
+          val.includes("danh mục") ||
+          val.includes("khoản thu") ||
+          val.includes("khoản chi") ||
+          val.includes("ngành nghề") ||
+          val.includes("lĩnh vực") ||
+          val.includes("category")
+        ) {
+          categoryColIdx = c;
+        } else if (
+          val.includes("ghi chú") ||
+          val.includes("note") ||
+          val.includes("nội dung") ||
+          val.includes("diễn giải") ||
+          val.includes("mô tả") ||
+          val.includes("description")
+        ) {
+          noteColIdx = c;
         } else if (
           val.includes("trạng thái") ||
           val.includes("thanh toán") ||
           val.includes("tình trạng") ||
           val.includes("status") ||
+          val.includes("payment") ||
           val.includes("đã thanh toán") ||
-          val.includes("chưa thanh toán")
+          val.includes("chưa thanh toán") ||
+          val.includes("nộp tiền") ||
+          val.includes("đóng tiền") ||
+          val.includes("đóng phí") ||
+          val.includes("tiền vé") ||
+          val.includes("thu phí") ||
+          val === "tt" ||
+          val === "paid"
         ) {
           paymentStatusColIdx = c;
         } else if (
@@ -203,7 +299,7 @@ async function parseExcelFile(file: File, isCsv = false): Promise<ParsedFileResu
         }
       }
 
-      if (emailColIdx !== -1 || (nameColIdx !== -1 && phoneColIdx !== -1)) break;
+      if (emailColIdx !== -1 || (nameColIdx !== -1 && phoneColIdx !== -1) || memberCodeColIdx !== -1) break;
     }
 
     // Trích xuất cấu trúc bảng
@@ -253,9 +349,33 @@ async function parseExcelFile(file: File, isCsv = false): Promise<ParsedFileResu
           rawSt.includes("da thanh toan") ||
           rawSt.includes("paid") ||
           rawSt.includes("đã nộp") ||
+          rawSt.includes("da nop") ||
           rawSt.includes("đã đóng") ||
+          rawSt.includes("da dong") ||
+          rawSt.includes("đã ck") ||
+          rawSt.includes("da ck") ||
+          rawSt.includes("chuyển khoản") ||
+          rawSt.includes("chuyen khoan") ||
+          rawSt.includes("ck") ||
+          rawSt.includes("tiền mặt") ||
+          rawSt.includes("tien mat") ||
+          rawSt.includes("đã trả") ||
+          rawSt.includes("rồi") ||
+          rawSt.includes("roi") ||
+          rawSt.includes("xong") ||
           rawSt.includes("thành công") ||
-          rawSt.includes("hoàn thành")
+          rawSt.includes("thanh cong") ||
+          rawSt.includes("hoàn thành") ||
+          rawSt.includes("hoan thanh") ||
+          rawSt.includes("yes") ||
+          rawSt.includes("pass") ||
+          rawSt.includes("ok") ||
+          rawSt.includes("done") ||
+          rawSt === "1" ||
+          rawSt === "x" ||
+          rawSt === "v" ||
+          rawSt === "true" ||
+          rawSt.includes("đã thu")
         ) {
           paymentStatus = "paid";
         } else if (
@@ -263,9 +383,44 @@ async function parseExcelFile(file: File, isCsv = false): Promise<ParsedFileResu
           rawSt.includes("chua") ||
           rawSt.includes("unpaid") ||
           rawSt.includes("pending") ||
-          rawSt.includes("nợ")
+          rawSt.includes("nợ") ||
+          rawSt.includes("no") ||
+          rawSt === "0" ||
+          rawSt === "false" ||
+          rawSt.includes("chờ") ||
+          rawSt.includes("thiếu")
         ) {
           paymentStatus = "unpaid";
+        } else if (
+          rawSt.includes("miễn phí") ||
+          rawSt.includes("free") ||
+          rawSt.includes("khách mời") ||
+          rawSt.includes("0đ")
+        ) {
+          paymentStatus = "free";
+        }
+      } else {
+        // Nếu không có cột riêng, tìm kiếm thông minh trên toàn bộ hàng
+        for (let cellIdx = 0; cellIdx < row.length; cellIdx++) {
+          const cellStr = String(row[cellIdx] || "").toLowerCase().trim();
+          if (
+            cellStr.includes("đã thanh toán") ||
+            cellStr.includes("da thanh toan") ||
+            cellStr.includes("đã đóng") ||
+            cellStr.includes("đã nộp") ||
+            cellStr.includes("đã ck")
+          ) {
+            paymentStatus = "paid";
+            break;
+          } else if (
+            cellStr.includes("chưa thanh toán") ||
+            cellStr.includes("chua thanh toan") ||
+            cellStr.includes("chưa đóng") ||
+            cellStr.includes("chưa nộp")
+          ) {
+            paymentStatus = "unpaid";
+            break;
+          }
         }
       }
 
@@ -288,19 +443,34 @@ async function parseExcelFile(file: File, isCsv = false): Promise<ParsedFileResu
         }
       });
 
-      // Nếu có tên hoặc email hoặc phone
-      if (name || extractedEmail || phone) {
-        const finalEmail = extractedEmail || (phone ? `attendee_${phone.replace(/[^0-9]/g, "")}@ceohn10.vn` : `guest_${Date.now()}_${r}@ceohn10.vn`);
+      const memberCode = memberCodeColIdx !== -1 ? String(row[memberCodeColIdx] || "").trim() : "";
+      const department = departmentColIdx !== -1 ? String(row[departmentColIdx] || "").trim() : "";
+      const lecturer = lecturerColIdx !== -1 ? String(row[lecturerColIdx] || "").trim() : "";
+      const className = classColIdx !== -1 ? String(row[classColIdx] || "").trim() : "";
+      const category = categoryColIdx !== -1 ? String(row[categoryColIdx] || "").trim() : "";
+      const date = dateColIdx !== -1 ? String(row[dateColIdx] || "").trim() : "";
+      const notes = noteColIdx !== -1 ? String(row[noteColIdx] || "").trim() : "";
+
+      // Nếu có tên hoặc email hoặc phone hoặc mã học viên
+      if (name || extractedEmail || phone || memberCode) {
+        const finalEmail = extractedEmail || (phone ? `attendee_${phone.replace(/[^0-9]/g, "")}@ceohn10.vn` : (memberCode ? `${memberCode.toLowerCase()}@ceohn10.vn` : `guest_${Date.now()}_${r}@ceohn10.vn`));
         if (!seenEmails.has(finalEmail) || !extractedEmail) {
           if (extractedEmail) seenEmails.add(finalEmail);
           recipients.push({
             email: finalEmail,
-            name: name || (extractedEmail ? extractedEmail.split("@")[0] : `Đại biểu ${r}`),
+            name: name || (extractedEmail ? extractedEmail.split("@")[0] : (memberCode ? `Học viên ${memberCode}` : `Đại biểu ${r}`)),
             company,
             position,
             phone,
             amount,
             paymentStatus,
+            memberCode: memberCode || undefined,
+            department: department || undefined,
+            lecturer: lecturer || undefined,
+            className: className || undefined,
+            category: category || undefined,
+            date: date || undefined,
+            notes: notes || undefined,
             dynamicFields,
           });
         }

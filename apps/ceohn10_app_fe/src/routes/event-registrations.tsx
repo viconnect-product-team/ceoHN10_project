@@ -1647,7 +1647,9 @@ function RegPage() {
       <EventAttendeesImportModal
         open={importModalOpen}
         onClose={() => setImportModalOpen(false)}
-        event={EVENTS.find((e: any) => String(e.id) === String(eventId)) || EVENTS[0]}
+        event={eventsList.find((e: any) => String(e.id) === String(eventId)) || eventsList[0]}
+        eventsList={eventsList}
+        initialEventId={eventId !== "all" ? eventId : undefined}
         onSuccess={() => {
           fetchLiveRegistrations();
           if (eventId && eventId !== "all") {

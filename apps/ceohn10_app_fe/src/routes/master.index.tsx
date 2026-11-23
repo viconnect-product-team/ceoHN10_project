@@ -106,7 +106,7 @@ function MasterAdminPortal() {
     return "overview";
   });
 
-  // State dự án đang quản trị Multi-Tenant (ceohn10, ceo1983, vba)
+  // State dự án đang quản trị (ceohn10)
   const [selectedTenantKey, setSelectedTenantKey] = useState<string>(() => {
     return getActiveSystemTenant() || "ceohn10";
   });
@@ -130,35 +130,6 @@ function MasterAdminPortal() {
         const res = await fetchNestApi<any[]>(`/admin/master-settings/platforms?tenant=${selectedTenantKey}`);
         if (Array.isArray(res) && res.length > 0) return res;
       } catch {}
-
-      if (selectedTenantKey === "ceo1983") {
-        return [
-          {
-            id: "plt-crm-1983",
-            name: "Hệ thống CRM CEO 1983",
-            code: "CEO1983_CRM_WEB",
-            category: "crm",
-            categoryLabel: "CRM Hiệp hội",
-            description: "Cổng Quản trị CRM Hội viên, Sự kiện, Quỹ tài chính, B2B Connect CLB Doanh Nhân CEO 1983",
-            endpointUrl: "/",
-            isCore: true,
-            status: "active",
-            modules: ["Hội viên", "Sự kiện", "Tài chính", "Giao thương", "Phân quyền"],
-          },
-          {
-            id: "plt-app-1983",
-            name: "App Mobile CEO 1983",
-            code: "CEO1983_MOBILE_APP",
-            category: "miniapp",
-            categoryLabel: "Mobile App Hội viên",
-            description: "Ứng dụng di động dành riêng cho Hội viên Doanh nhân CEO 1983",
-            endpointUrl: "/association",
-            isCore: true,
-            status: "active",
-            modules: ["Thẻ hội viên số", "B2B Connect", "Điểm danh QR", "Bình chọn", "Nhật ký"],
-          },
-        ];
-      }
 
       // Mặc định: CEOHN10
       return [
@@ -360,7 +331,7 @@ function MasterAdminPortal() {
   // State: Tab con của [3. CÀI ĐẶT HỆ THỐNG NGOÀI & PHÂN HỆ]
   const [settingsSubTab, setSettingsSubTab] = useState<"sepay" | "zalo" | "platforms" | "matrix">("sepay");
 
-  // State: Ma trận module theo từng hệ thống (ceohn10, ceo1983, vba)
+  // State: Ma trận module theo từng hệ thống (ceohn10)
   const [modulesMatrix, setModulesMatrix] = useState<Record<string, string[]>>(() => {
     if (typeof window !== "undefined") {
       try {
@@ -1089,7 +1060,7 @@ function MasterAdminPortal() {
                   <span>[2. QUẢN LÝ TÀI KHOẢN & PHÂN QUYỀN NỀN TẢNG]</span>
                 </h3>
                 <p className="text-xs text-slate-500 mt-0.5">
-                  Phân quyền tập trung toàn bộ hệ thống nền tảng Viconnect. Cấp quyền theo từng hệ thống (CEO HN10, CEO 1983...).
+                  Phân quyền tập trung toàn bộ hệ thống nền tảng CLB Doanh Nhân CEO HN10.
                 </p>
               </div>
 
@@ -1156,11 +1127,7 @@ function MasterAdminPortal() {
                           {acc.username || acc.email}
                         </td>
                         <td className="px-4 py-3">
-                          {tSys === "ceo1983" ? (
-                            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-200">
-                              🏢 CLB CEO 1983
-                            </span>
-                          ) : tSys === "ceohn10" ? (
+                          {tSys === "ceohn10" ? (
                             <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-800 border border-blue-200">
                               🏛️ Hiệp Hội CEO HN10
                             </span>
@@ -1292,7 +1259,7 @@ function MasterAdminPortal() {
                         Ma Trận Phân Hệ Module Theo Hệ Thống Quản Trị
                       </h3>
                       <p className="text-xs text-slate-500">
-                        Tùy biến bật/tắt module tính năng độc lập cho từng Hệ thống (CEO HN10, CEO 1983, VBA...)
+                        Tùy biến bật/tắt module tính năng độc lập cho hệ thống CLB CEO HN10
                       </p>
                     </div>
                   </div>
@@ -1319,7 +1286,7 @@ function MasterAdminPortal() {
                         <div className="p-4 bg-white border-b border-slate-200 flex flex-wrap items-center justify-between gap-2">
                           <div className="flex items-center gap-2.5">
                             <span className="text-lg">
-                              {tenant.key === "ceohn10" ? "🏛️" : tenant.key === "ceo1983" ? "🏢" : "🌐"}
+                              {tenant.key === "ceohn10" ? "🏛️" : "🌐"}
                             </span>
                             <div>
                               <div className="text-xs font-bold text-slate-900">{tenant.name}</div>
@@ -1445,7 +1412,7 @@ function MasterAdminPortal() {
                       <div className="space-y-1">
                         <Label className="text-[11px] text-slate-700 font-semibold">Số Tài Khoản</Label>
                         <Input
-                          placeholder="VD: 198300000000"
+                          placeholder="VD: 100000000000"
                           value={sepayFormData.account_number || ""}
                           onChange={(e) =>
                             setSepayFormData({ ...sepayFormData, account_number: e.target.value })
@@ -2152,7 +2119,6 @@ function MasterAdminPortal() {
                     <SelectContent className="bg-white border-slate-200 text-slate-800">
                       <SelectItem value="all">🌐 Toàn Bộ Nền Tảng (Master Platform)</SelectItem>
                       <SelectItem value="ceohn10">🏛️ CLB Doanh Nhân CEO HN10 (Có Lớp học)</SelectItem>
-                      <SelectItem value="ceo1983">🏢 CLB Doanh Nhân CEO 1983</SelectItem>
                     </SelectContent>
                   </Select>
                 ) : (

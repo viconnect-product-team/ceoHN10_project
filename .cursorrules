@@ -1,6 +1,15 @@
 # ==============================================================================
 # BỘ LUẬT DỰ ÁN (PROJECT RULES & AI CODEGEN STANDARDS) - CEO HN10 PROJECT
 # Vai trò: Tech Lead | Định dạng: .cursorrules
+# 23/11/2026 (v12.63) — QUY CHUẨN BẮT BUỘC NGINX SUCCESS TRƯỚC KHI PUSH CODE VÀ NẠP VÀO SERVER & GỠ BỎ HOÀN TOÀN CEO 1983 KHỎI MASTER PLATFORM CRM:
+#   * [QUY ĐỊNH TỐI CAO NGINX SUCCESS (NGINX VALIDATION GATE)]:
+#     - Mọi kịch bản push code, CI/CD và deploy cập nhật cấu hình Nginx Reverse Proxy BẮT BUỘC phải chạy kiểm tra cú pháp `nginx -t` đạt SUCCESS (exit code 0) thì MỚI ĐƯỢC PHÉP nạp vào server hoặc reload Nginx.
+#     - Tuyệt đối KHÔNG reload (`systemctl reload nginx`) hoặc restart dịch vụ Nginx nếu `nginx -t` chưa thành công.
+#     - Tuyệt đối bảo vệ cấu hình Nginx Host OS (`/etc/nginx`) do DevOps quản lý; mọi thao tác phải có cơ chế Atomic Backup & Rollback tức thì nếu cú pháp lỗi, không bao giờ được làm sập máy chủ.
+#   * [GỠ BỎ HOÀN TOÀN CEO 1983 KHỎI PLATFORM CRM]:
+#     - Xóa bỏ hoàn toàn tenant `ceo1983` khỏi `SYSTEM_TENANTS` (`rbac-permission-helpers.ts`) và màn hình Master Admin (`master.index.tsx`), chỉ phục vụ duy nhất CLB Doanh Nhân CEO HN10 (HanoiBA).
+#   * [FIX BUILD DOCKER BACKEND CI/CD]:
+#     - Bọc postinstall an toàn trong `package.json` và cấu hình `npm ci --ignore-scripts && npm rebuild bcrypt` trong `Dockerfile.backend`.
 # 23/11/2026 (v12.62) — PHẢN ÁNH SỰ KIỆN CỤ THỂ, LƯU ẢNH VÀO FOLDER TÀI LIỆU, THƯ MỜI & CHECK-IN THEME SÁNG, KHÁCH MỚI GỬI MAIL VIETQR, TEST PASS 3 ĐÍCH DANH 3 EMAIL, FIX 968 LỖI DIST-MODULES & DEPLOY STAGING:
 #   * [PHẢN ÁNH THEO SỰ KIỆN CỤ THỂ (/feedback)]:
 #     - Bảng `event_feedback`: lưu `event_id`, hiển thị tên sự kiện cụ thể; bộ lọc dropdown chọn sự kiện trên CRM.

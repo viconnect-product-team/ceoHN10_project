@@ -10,7 +10,7 @@
     "packages/*"
   ],
   "scripts": {
-    "postinstall": "node scripts/patch-nestjs-tree-kill.js",
+    "postinstall": "node -e \"const fs=require('fs');if(fs.existsSync('./scripts/patch-nestjs-tree-kill.js')){try{require('./scripts/patch-nestjs-tree-kill.js')}catch(e){}}\"",
     "build": "turbo run build",
     "dev": "turbo run dev",
     "dev:fe": "npm run dev --prefix apps/ceohn10_app_fe",
