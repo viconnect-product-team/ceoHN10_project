@@ -14,6 +14,8 @@ import {
   X,
   Ticket,
   Star,
+  Send,
+  Check,
 } from "lucide-react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/dashboard/AppShell";
@@ -177,6 +179,7 @@ function VotingPage() {
   const [luckyDrawOpen, setLuckyDrawOpen] = useState(false);
   const [showLuckyDrawBanner, setShowLuckyDrawBanner] = useState(true);
   const [editing, setEditing] = useState<Vote | null>(null);
+  const [broadcastPoll, setBroadcastPoll] = useState<Vote | null>(null);
   const [deleting, setDeleting] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [remotePref, setRemotePref] = useState<OpenMode | null>(null);
@@ -645,6 +648,15 @@ function VotingPage() {
                 </div>
 
                 <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setBroadcastPoll(v)}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold cursor-pointer transition-all shadow-xs"
+                    title="Gửi link biểu quyết tới đại biểu đã check-in qua Email & Zalo OA"
+                  >
+                    <Send className="size-3.5" />
+                    <span>Gửi Link Biểu Quyết (Email & Zalo OA)</span>
+                  </button>
                   {!isClosed ? (
                     <button
                       type="button"
@@ -684,7 +696,241 @@ function VotingPage() {
       {open && <VoteModal onClose={() => setOpen(false)} />}
       {editing && <VoteModal vote={editing} onClose={() => setEditing(null)} />}
       {luckyDrawOpen && <LuckyDrawModal onClose={() => setLuckyDrawOpen(false)} />}
+      {broadcastPoll && <BroadcastPollModal poll={broadcastPoll} onClose={() => setBroadcastPoll(null)} />}
     </AppShell>
+  );
+}
+
+function BroadcastPollModal({
+  poll,
+  onClose,
+}: {
+  poll: Vote;
+  onClose: () => void;
+}) {
+  const [candidates, setCandidates] = useState<any[]>([]);
+  const [loadingCandidates, setLoadingCandidates] = useState(true);
+  const [targetEmails, setTargetEmails] = useState(
+    "vumikasa6@gmail.com, thuylt313@gmail.com, vupv090120@gmail.com"
+  );
+  const [sendEmail, setSendEmail] = useState(true);
+  const [sendZalo, setSendZalo] = useState(true);
+  const [broadcasting, setBroadcasting] = useState(false);
+  const [copiedLink, setCopiedLink] = useState(false);
+
+  const publicLink = typeof window !== "undefined"
+    ? `${window.location.origin}/guest-voting/${poll.id}`
+    : `/guest-voting/${poll.id}`;
+
+  useEffect(() => {
+    fetchNestApi<any>(`/events/${poll.eventId || "active"}/checked-in-candidates`)
+      .then((res) => {
+        const list = res?.candidates || [];
+        setCandidates(list);
+        if (list.length > 0) {
+          const emails = list
+            .map((c: any) => c.email)
+            .filter((e: string) => e && e.includes("@"));
+          if (emails.length > 0) {
+            setTargetEmails((prev) => {
+              const set = new Set([...prev.split(",").map((s) => s.trim()), ...emails]);
+              return Array.from(set).filter(Boolean).join(", ");
+            });
+          }
+        }
+      })
+      .catch(() => {})
+      .finally(() => setLoadingCandidates(false));
+  }, [poll.id, poll.eventId]);
+
+  const handleCopyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(publicLink);
+      setCopiedLink(true);
+      toast.success("Đã sao chép liên kết biểu quyết công khai!");
+      setTimeout(() => setCopiedLink(false), 2000);
+    } catch {
+      toast.error("Không thể sao chép tự động");
+    }
+  };
+
+  const handleBroadcast = async () => {
+    setBroadcasting(true);
+    try {
+      const emailList = targetEmails
+        .split(",")
+        .map((s) => s.trim().toLowerCase())
+        .filter((e) => e && e.includes("@"));
+
+      const channels: string[] = [];
+      if (sendEmail) channels.push("email");
+      if (sendZalo) channels.push("zalo_oa");
+
+      const res = await fetchNestApi<any>(`/voting/polls/${poll.id}/broadcast`, {
+        method: "POST",
+        body: JSON.stringify({
+          eventId: poll.eventId,
+          targetEmails: emailList,
+          channels,
+        }),
+      });
+
+      toast.success(
+        res?.message ||
+          `🎉 Đã phát link biểu quyết thành công tới ${emailList.length} đại biểu qua ${channels.join(" & ")}!`
+      );
+      onClose();
+    } catch (err: any) {
+      toast.error(err?.message || "Không thể phát thông báo biểu quyết");
+    } finally {
+      setBroadcasting(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-in fade-in duration-200">
+      <div className="bg-card border border-border w-full max-w-xl rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+        <div className="bg-gradient-to-r from-blue-700 via-blue-600 to-indigo-700 px-6 py-5 text-white flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            <Send className="size-5 text-amber-300" />
+            <div>
+              <h3 className="font-black text-base sm:text-lg leading-tight">
+                Gửi Link Biểu Quyết Tới Đại Biểu Check-in
+              </h3>
+              <p className="text-blue-100 text-xs mt-0.5">
+                Kênh Email &amp; Zalo OA Trực Tuyến
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={onClose}
+            className="p-1.5 rounded-full hover:bg-white/20 text-white transition cursor-pointer"
+          >
+            <X className="size-5" />
+          </button>
+        </div>
+
+        <div className="p-6 space-y-4 overflow-y-auto flex-1 text-sm">
+          <div className="p-3.5 bg-blue-50/70 dark:bg-blue-950/30 rounded-2xl border border-blue-200 dark:border-blue-900/40">
+            <div className="text-xs font-bold text-blue-900 dark:text-blue-300 uppercase tracking-wider mb-1">
+              Nội dung biểu quyết
+            </div>
+            <div className="font-bold text-foreground text-sm">
+              {poll.title}
+            </div>
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider flex items-center justify-between">
+              <span>Liên kết biểu quyết công khai (Public Link)</span>
+              <span className="text-[10px] text-emerald-600 font-semibold">100% Không chặn Auth</span>
+            </label>
+            <div className="flex items-center gap-2">
+              <input
+                type="text"
+                readOnly
+                value={publicLink}
+                className="flex-1 bg-secondary border border-border px-3 py-2 rounded-xl text-xs font-mono text-foreground focus:outline-none select-all"
+              />
+              <button
+                type="button"
+                onClick={handleCopyLink}
+                className="px-3 py-2 bg-secondary hover:bg-secondary/80 border border-border text-foreground rounded-xl text-xs font-bold flex items-center gap-1.5 cursor-pointer shrink-0"
+              >
+                {copiedLink ? <Check className="size-3.5 text-emerald-500" /> : <Ticket className="size-3.5 text-blue-500" />}
+                <span>{copiedLink ? "Đã chép" : "Sao chép"}</span>
+              </button>
+            </div>
+          </div>
+
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
+                Đại biểu đã check-in sự kiện
+              </label>
+              <span className="text-xs font-bold text-blue-600">
+                {loadingCandidates ? "Đang tải..." : `${candidates.length} đại biểu có mặt`}
+              </span>
+            </div>
+            {candidates.length > 0 && (
+              <div className="max-h-24 overflow-y-auto p-2 bg-secondary/50 rounded-xl border border-border/60 text-xs space-y-1">
+                {candidates.map((c, i) => (
+                  <div key={i} className="flex items-center justify-between text-[11px] text-muted-foreground">
+                    <span className="font-semibold text-foreground">{c.name || c.memberName}</span>
+                    <span className="font-mono">{c.email || c.phone || "Chưa có email"}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
+              Danh sách Email gửi link (ngăn cách bằng dấu phẩy)
+            </label>
+            <textarea
+              rows={3}
+              value={targetEmails}
+              onChange={(e) => setTargetEmails(e.target.value)}
+              placeholder="nhap.email1@example.com, nhap.email2@example.com"
+              className="w-full p-3 rounded-xl border border-border bg-background text-xs font-mono focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            <p className="text-[11px] text-muted-foreground">
+              Mặc định bao gồm 3 tài khoản kiểm thử: vumikasa6@gmail.com, thuylt313@gmail.com, vupv090120@gmail.com
+            </p>
+          </div>
+
+          <div className="pt-2 flex flex-wrap gap-4 border-t border-border/60">
+            <label className="flex items-center gap-2 cursor-pointer text-xs font-semibold">
+              <input
+                type="checkbox"
+                checked={sendEmail}
+                onChange={(e) => setSendEmail(e.target.checked)}
+                className="w-4 h-4 text-blue-600 rounded border-border"
+              />
+              <span>Gửi qua Email Marketing (SMTP)</span>
+            </label>
+            <label className="flex items-center gap-2 cursor-pointer text-xs font-semibold">
+              <input
+                type="checkbox"
+                checked={sendZalo}
+                onChange={(e) => setSendZalo(e.target.checked)}
+                className="w-4 h-4 text-blue-600 rounded border-border"
+              />
+              <span>Gửi qua Zalo OA (ZBS Broadcast)</span>
+            </label>
+          </div>
+        </div>
+
+        <div className="p-4 bg-secondary/30 border-t border-border flex items-center justify-end gap-3">
+          <button
+            type="button"
+            onClick={onClose}
+            className="px-4 py-2 rounded-xl border border-border text-xs font-semibold text-muted-foreground hover:bg-secondary cursor-pointer"
+          >
+            Hủy bỏ
+          </button>
+          <button
+            type="button"
+            disabled={broadcasting}
+            onClick={handleBroadcast}
+            className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold flex items-center gap-2 cursor-pointer shadow-md disabled:opacity-50"
+          >
+            {broadcasting ? (
+              <>
+                <div className="size-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                <span>Đang gửi thông báo...</span>
+              </>
+            ) : (
+              <>
+                <Send className="size-3.5" />
+                <span>Phát Link Biểu Quyết Ngay</span>
+              </>
+            )}
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -713,6 +959,28 @@ function VoteModal({ vote, onClose }: { vote?: Vote; onClose: () => void }) {
   );
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Danh sách đại biểu ĐÃ CHECK-IN sự kiện được chọn biểu quyết
+  const [checkedInVoters, setCheckedInVoters] = useState<Array<{ id: string; name: string; code: string; company: string }>>([]);
+  const [selectedVoterIds, setSelectedVoterIds] = useState<Set<string>>(new Set());
+  const [loadingVoters, setLoadingVoters] = useState(false);
+
+  useEffect(() => {
+    if (eventId) {
+      setLoadingVoters(true);
+      fetchNestApi<any>(`/events/${eventId}/checked-in-candidates`)
+        .then((res) => {
+          const list = res?.candidates || [];
+          setCheckedInVoters(list);
+          setSelectedVoterIds(new Set(list.map((c: any) => c.id)));
+        })
+        .catch(() => setCheckedInVoters([]))
+        .finally(() => setLoadingVoters(false));
+    } else {
+      setCheckedInVoters([]);
+      setSelectedVoterIds(new Set());
+    }
+  }, [eventId]);
 
   useEffect(() => {
     fetchNestApi<any>("/events?page=1&size=100")
@@ -854,11 +1122,74 @@ function VoteModal({ vote, onClose }: { vote?: Vote; onClose: () => void }) {
               const evName = selectedEvent.title || (selectedEvent as any).name;
               const evDate = selectedEvent.eventDate || (selectedEvent as any).date;
               return (
-                <div className="mt-1.5 flex items-start gap-1.5 rounded-lg border border-blue-200 dark:border-blue-900 bg-blue-50/60 dark:bg-blue-950/30 p-2 text-xs text-blue-900 dark:text-blue-200">
-                  <span className="font-semibold shrink-0">Đã chọn:</span>
-                  <span className="break-words font-medium">
-                    {evName} {evDate ? `(${new Date(evDate).toLocaleDateString("vi-VN")})` : ""}
-                  </span>
+                <div className="mt-1.5 space-y-2">
+                  <div className="flex items-start gap-1.5 rounded-lg border border-blue-200 dark:border-blue-900 bg-blue-50/60 dark:bg-blue-950/30 p-2 text-xs text-blue-900 dark:text-blue-200">
+                    <span className="font-semibold shrink-0">Đã chọn:</span>
+                    <span className="break-words font-medium">
+                      {evName} {evDate ? `(${new Date(evDate).toLocaleDateString("vi-VN")})` : ""}
+                    </span>
+                  </div>
+
+                  {/* BẢNG CHỌN CỬ TRI TỪ DANH SÁCH ĐÃ CHECK-IN */}
+                  <div className="rounded-xl border border-border bg-slate-50 dark:bg-muted/30 p-3 space-y-2 text-xs">
+                    <div className="flex items-center justify-between font-bold text-foreground">
+                      <span>Cử tri được quyền biểu quyết ({selectedVoterIds.size}/{checkedInVoters.length}):</span>
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setSelectedVoterIds(new Set(checkedInVoters.map((v) => v.id)))}
+                          className="text-[11px] text-[#003B95] font-bold hover:underline cursor-pointer"
+                        >
+                          Chọn tất cả
+                        </button>
+                        <span className="text-muted-foreground">|</span>
+                        <button
+                          type="button"
+                          onClick={() => setSelectedVoterIds(new Set())}
+                          className="text-[11px] text-muted-foreground font-semibold hover:underline cursor-pointer"
+                        >
+                          Bỏ chọn
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="max-h-36 overflow-y-auto rounded-lg border border-border bg-background divide-y divide-border/60">
+                      {loadingVoters ? (
+                        <div className="p-3 text-center text-muted-foreground">Đang tải danh sách đã check-in...</div>
+                      ) : checkedInVoters.length === 0 ? (
+                        <div className="p-3 text-center text-muted-foreground italic">Chưa có đại biểu nào check-in sự kiện này</div>
+                      ) : (
+                        checkedInVoters.map((voter) => {
+                          const isChecked = selectedVoterIds.has(voter.id);
+                          return (
+                            <label
+                              key={voter.id}
+                              className={`flex items-center gap-2 p-2 hover:bg-muted/40 cursor-pointer ${isChecked ? "bg-blue-50/40 dark:bg-blue-950/20" : ""}`}
+                            >
+                              <input
+                                type="checkbox"
+                                checked={isChecked}
+                                onChange={() => {
+                                  setSelectedVoterIds((prev) => {
+                                    const next = new Set(prev);
+                                    if (next.has(voter.id)) next.delete(voter.id);
+                                    else next.add(voter.id);
+                                    return next;
+                                  });
+                                }}
+                                className="rounded text-[#003B95]"
+                              />
+                              <span className="font-mono font-bold text-[10px] text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 px-1.5 py-0.2 rounded border border-amber-200 dark:border-amber-900">
+                                {voter.code}
+                              </span>
+                              <span className="font-semibold text-foreground truncate flex-1">{voter.name}</span>
+                              <span className="text-[10px] text-muted-foreground truncate max-w-[100px]">{voter.company}</span>
+                            </label>
+                          );
+                        })
+                      )}
+                    </div>
+                  </div>
                 </div>
               );
             })()}

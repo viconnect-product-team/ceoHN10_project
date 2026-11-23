@@ -18,6 +18,7 @@ export interface UserAccountItem {
   role: string;
   avatar?: string;
   status: "active" | "inactive" | "locked";
+  customPermissions?: string[];
   createdAt?: string;
   updatedAt?: string;
   dbMemberId?: string;

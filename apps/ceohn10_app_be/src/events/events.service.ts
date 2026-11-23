@@ -11,6 +11,7 @@ import * as crypto from 'crypto';
 import { PrismaService } from '../prisma/prisma.service';
 import { MailService } from '../mail/mail.service';
 import { ZaloService } from '../zalo/zalo.service';
+import { PaymentService } from '../payment/payment.service';
 import { EventsRepository } from './events.repository';
 import { CreateEventDto, UpdateEventDto } from './dto';
 
@@ -56,6 +57,7 @@ export class EventsService implements OnModuleInit {
     private mailService: MailService,
     private readonly eventsRepo: EventsRepository,
     @Optional() private readonly zaloService?: ZaloService,
+    @Optional() private readonly paymentService?: PaymentService,
   ) { }
 
   async onModuleInit() {
@@ -71,12 +73,35 @@ export class EventsService implements OnModuleInit {
       ALTER TABLE public.events ADD COLUMN IF NOT EXISTS expected_attendees integer DEFAULT 1;
       ALTER TABLE public.events ADD COLUMN IF NOT EXISTS ticket_fee numeric DEFAULT 0;
       ALTER TABLE public.events ADD COLUMN IF NOT EXISTS fund_type text DEFAULT 'general';
+      ALTER TABLE public.events ADD COLUMN IF NOT EXISTS parts jsonb DEFAULT '["Tọa đàm", "Tiệc Gala Dinner"]'::jsonb;
+      ALTER TABLE public.events ADD COLUMN IF NOT EXISTS form_config jsonb DEFAULT '{}'::jsonb;
 
       ALTER TABLE public.event_registrations ADD COLUMN IF NOT EXISTS is_walkin boolean DEFAULT false;
       ALTER TABLE public.event_registrations ADD COLUMN IF NOT EXISTS registration_origin text DEFAULT 'pre_registered';
       ALTER TABLE public.event_registrations ADD COLUMN IF NOT EXISTS payment_status text DEFAULT 'free';
       ALTER TABLE public.event_registrations ADD COLUMN IF NOT EXISTS payment_amount numeric DEFAULT 0;
       ALTER TABLE public.event_registrations ADD COLUMN IF NOT EXISTS dynamic_data jsonb DEFAULT '{}'::jsonb;
+      ALTER TABLE public.event_registrations ADD COLUMN IF NOT EXISTS attended_parts jsonb DEFAULT '[]'::jsonb;
+
+      CREATE TABLE IF NOT EXISTS public.event_photos (
+        id text PRIMARY KEY,
+        event_id text NOT NULL,
+        photo_url text NOT NULL,
+        caption text DEFAULT '',
+        uploaded_by text DEFAULT '',
+        created_at timestamp with time zone DEFAULT now()
+      );
+
+      CREATE TABLE IF NOT EXISTS public.event_feedback (
+        id text PRIMARY KEY,
+        event_id text NOT NULL,
+        member_name text DEFAULT '',
+        member_phone text DEFAULT '',
+        member_email text DEFAULT '',
+        rating integer DEFAULT 5,
+        content text DEFAULT '',
+        created_at timestamp with time zone DEFAULT now()
+      );
     `,
       )
       .catch(() => { });
@@ -1502,9 +1527,20 @@ export class EventsService implements OnModuleInit {
       ? `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(regId)}`
       : '';
     const invoiceNo = `EV${regId}`;
-    const vietQrUrl = isFree
+
+    const sepayCfg = this.paymentService
+      ? await this.paymentService.getSepayConfig()
+      : {
+          bankName: process.env.SEPAY_BANK_NAME || 'MBBank',
+          accountNumber: process.env.SEPAY_ACCOUNT_NO || '',
+          accountHolder: process.env.SEPAY_ACCOUNT_HOLDER || '',
+          prefixEvent: 'CEOHN10_SK',
+        };
+    const bankShort = (sepayCfg.bankName || 'MB').toUpperCase().includes('MB') ? 'MB' : (sepayCfg.bankName || 'MB');
+    const memo = `${sepayCfg.prefixEvent || 'CEOHN10_SK'}_${regId}`;
+    const vietQrUrl = isFree || !sepayCfg.accountNumber
       ? ''
-      : `https://img.vietqr.io/image/MB-1010000000-compact2.png?amount=${totalAmount}&addInfo=${encodeURIComponent(`${invoiceNo} ${phone || ''}`.trim())}&accountName=${encodeURIComponent('CLB DOANH NHAN CEO HN10')}`;
+      : `https://img.vietqr.io/image/${bankShort}-${sepayCfg.accountNumber}-compact2.png?amount=${totalAmount}&addInfo=${encodeURIComponent(memo)}&accountName=${encodeURIComponent(sepayCfg.accountHolder)}`;
 
     const driveInfo = event.photo_gallery_url
       ? `\n- Link kho ảnh sự kiện (Google Drive): ${event.photo_gallery_url}`
@@ -1619,9 +1655,9 @@ export class EventsService implements OnModuleInit {
             totalAmount: 0,
             qrCodeUrl,
             vietQrUrl: '',
-            bankAccount: '1010000000',
-            bankName: 'MB Bank (Quân Đội)',
-            bankOwner: 'CLB DOANH NHAN CEO HN10',
+            bankAccount: process.env.SEPAY_ACCOUNT_NO || '',
+            bankName: process.env.SEPAY_BANK_NAME || 'MB Bank',
+            bankOwner: process.env.SEPAY_ACCOUNT_HOLDER || 'CLB DOANH NHAN CEO HN10',
           });
           this.logger.log(
             `Member free event ticket email dispatched to ${email} (Registration: ${regId}, Lucky #${luckyNum})`,
@@ -1659,10 +1695,10 @@ export class EventsService implements OnModuleInit {
         paymentConfirmed: false,
         totalAmount,
         qrCodeUrl: '',
-        vietQrUrl: vnpayQrUrl,
-        bankAccount: '1010000000',
-        bankName: 'Cổng Thanh Toán Quốc Gia VNPAY (HanoiBA)',
-        bankOwner: 'CLB DOANH NHAN CEO HN10',
+        vietQrUrl: vietQrUrl,
+        bankAccount: sepayCfg.accountNumber,
+        bankName: sepayCfg.bankName || 'Ngân hàng thụ hưởng',
+        bankOwner: sepayCfg.accountHolder,
       };
 
       void (async () => {
@@ -2442,9 +2478,9 @@ export class EventsService implements OnModuleInit {
             totalAmount: amount,
             qrCodeUrl,
             vietQrUrl: '',
-            bankAccount: '1010000000',
-            bankName: 'MB Bank (Quân Đội)',
-            bankOwner: 'CLB DOANH NHAN CEO HN10',
+            bankAccount: process.env.SEPAY_ACCOUNT_NO || '',
+            bankName: process.env.SEPAY_BANK_NAME || 'MB Bank',
+            bankOwner: process.env.SEPAY_ACCOUNT_HOLDER || 'CLB DOANH NHAN CEO HN10',
           });
           this.logger.log(
             `Confirmed event ticket email dispatched to ${recipientEmail} (Registration: ${actualRegId})`,
@@ -3681,12 +3717,13 @@ export class EventsService implements OnModuleInit {
         ? event.association_id
         : 'c1983000-0000-4000-8000-000000001983';
 
-    const initialGuestStatus = isFree ? 'confirmed' : 'pending';
-    const guestPaymentStatus = isFree ? 'free' : 'pending';
+    const checkinNow = guestData?.isCheckinNow === true || guestData?.status === 'attended';
+    const initialGuestStatus = checkinNow ? 'attended' : (isFree ? 'confirmed' : 'pending');
+    const guestPaymentStatus = isFree ? 'free' : (guestData?.paymentStatus || 'pending');
 
     await this.prisma.$executeRaw`
       INSERT INTO public.event_registrations (
-        id, event_id, member_code, member_name, email, phone, company, position, note, registered_at, status, ticket_type, ticket_count, association_id, payment_status, payment_amount, lucky_number, qr_payload, is_walkin, registration_origin, created_at, updated_at
+        id, event_id, member_code, member_name, email, phone, company, position, note, registered_at, status, ticket_type, ticket_count, association_id, payment_status, payment_amount, lucky_number, qr_payload, is_walkin, registration_origin, checked_in_at, created_at, updated_at
       ) VALUES (
         ${regId},
         ${resolvedEventId},
@@ -3708,10 +3745,59 @@ export class EventsService implements OnModuleInit {
         ${qrPayload},
         true,
         'walkin_at_door',
+        ${checkinNow ? new Date() : null},
         now(),
         now()
       )
     `;
+
+    // Nếu đã thanh toán và có số tiền > 0, ghi nhận ngay vào dòng tiền transactions và income_records
+    if (guestPaymentStatus === 'paid' && totalAmount > 0) {
+      const txCode = `THU-EV${regId}`;
+      await this.prisma.$executeRaw`
+        INSERT INTO public.transactions (
+          id, code, date, type, category, description, amount, method, status, association_id, recipient, created_at, updated_at
+        ) VALUES (
+          gen_random_uuid(),
+          ${txCode},
+          now()::date,
+          'income',
+          'Vé sự kiện',
+          ${`Thu tiền vé sự kiện ${event.title || event.name} - ${fullName} (Mã vé: #${regId})`},
+          ${totalAmount},
+          'cash',
+          'completed',
+          ${targetAssociationId}::uuid,
+          ${fullName},
+          now(),
+          now()
+        )
+      `.catch(() => {});
+      await this.prisma.$executeRawUnsafe(`
+        INSERT INTO public.income_records (
+          id, category, title, amount, date, payer_name, payment_method, status, event_id, notes, created_at, updated_at
+        ) VALUES (
+          gen_random_uuid(),
+          'Vé sự kiện',
+          $1,
+          $2,
+          now()::date,
+          $3,
+          'Tiền mặt tại sự kiện',
+          'completed',
+          $4,
+          $5,
+          now(),
+          now()
+        )
+      `,
+        `Thu tiền vé sự kiện ${event.title || event.name} - ${fullName} (Mã vé: #${regId})`,
+        totalAmount,
+        fullName,
+        resolvedEventId,
+        `Ghi nhận trực tiếp khi khách đăng ký check-in tại cổng sự kiện`,
+      ).catch(() => {});
+    }
 
     // Cập nhật số lượng người đăng ký vào bảng events
     await this.prisma.$executeRaw`
@@ -3729,6 +3815,20 @@ export class EventsService implements OnModuleInit {
       luckyNumber: luckyNum,
       ticketType,
     }];
+
+    const sepayCfg = this.paymentService
+      ? await this.paymentService.getSepayConfig()
+      : {
+          bankName: process.env.SEPAY_BANK_NAME || 'MBBank',
+          accountNumber: process.env.SEPAY_ACCOUNT_NO || '',
+          accountHolder: process.env.SEPAY_ACCOUNT_HOLDER || '',
+          prefixEvent: 'CEOHN10_SK',
+        };
+    const bankShort = (sepayCfg.bankName || 'MB').toUpperCase().includes('MB') ? 'MB' : (sepayCfg.bankName || 'MB');
+    const memo = `${sepayCfg.prefixEvent || 'CEOHN10_SK'}_${regId}`;
+    const dynamicVietQrUrl = isFree || !sepayCfg.accountNumber
+      ? ''
+      : `https://img.vietqr.io/image/${bankShort}-${sepayCfg.accountNumber}-compact2.png?amount=${totalAmount}&addInfo=${encodeURIComponent(memo)}&accountName=${encodeURIComponent(sepayCfg.accountHolder)}`;
 
     // Hỗ trợ đăng ký nhiều người tham gia cùng (Multi-Attendee)
     if (guestData?.attendees && Array.isArray(guestData.attendees) && guestData.attendees.length > 1) {
@@ -3825,9 +3925,9 @@ export class EventsService implements OnModuleInit {
               totalAmount: 0,
               qrCodeUrl: `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(attRegId)}`,
               vietQrUrl: '',
-              bankAccount: '1010000000',
-              bankName: 'MB Bank (Quân Đội)',
-              bankOwner: 'CLB DOANH NHAN CEO HN10',
+              bankAccount: sepayCfg.accountNumber,
+              bankName: sepayCfg.bankName,
+              bankOwner: sepayCfg.accountHolder,
             });
           } catch (e) {
             this.logger.warn(`Failed to dispatch ticket email to attendee ${attEmail}`);
@@ -3839,10 +3939,6 @@ export class EventsService implements OnModuleInit {
     const qrCodeUrl = isFree
       ? `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(regId)}`
       : '';
-    const invoiceNo = `EV${regId}`;
-    const vnpayQrUrl = isFree
-      ? ''
-      : `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(`https://ceohn10.vn/payment/checkout?regId=${regId}&amount=${totalAmount}`)}`;
 
     // Gửi email vé điện tử E-Ticket CHỈ DÀNH CHO SỰ KIỆN MIỄN PHÍ (0đ)
     // Sự kiện có phí phải chờ Ban Truyền Thông / Tài Chính kiểm tra và bấm "Đã thanh toán" mới gửi vé kèm QR check-in!
@@ -3870,9 +3966,9 @@ export class EventsService implements OnModuleInit {
           totalAmount: 0,
           qrCodeUrl,
           vietQrUrl: '',
-          bankAccount: '1010000000',
-          bankName: 'MB Bank (Quân Đội)',
-          bankOwner: 'CLB DOANH NHAN CEO HN10',
+          bankAccount: sepayCfg.accountNumber,
+          bankName: sepayCfg.bankName,
+          bankOwner: sepayCfg.accountHolder,
         });
         this.logger.log(
           `Guest registration free ticket email dispatched to ${email} (Lucky #${luckyNum})`,
@@ -3907,10 +4003,10 @@ export class EventsService implements OnModuleInit {
         paymentConfirmed: false,
         totalAmount,
         qrCodeUrl: '',
-        vietQrUrl: vnpayQrUrl,
-        bankAccount: '1010000000',
-        bankName: 'Cổng Thanh Toán Quốc Gia VNPAY (HanoiBA)',
-        bankOwner: 'CLB DOANH NHAN CEO HN10',
+        vietQrUrl: dynamicVietQrUrl,
+        bankAccount: sepayCfg.accountNumber,
+        bankName: sepayCfg.bankName || 'Ngân hàng thụ hưởng',
+        bankOwner: sepayCfg.accountHolder,
       };
 
       if (email && email.includes('@')) {
@@ -3975,8 +4071,12 @@ export class EventsService implements OnModuleInit {
       totalAttendees: createdTickets.length,
       isFree,
       totalAmount,
-      vnpayQrUrl,
-      vietQrUrl: vnpayQrUrl,
+      sepayQrUrl: dynamicVietQrUrl,
+      vietQrUrl: dynamicVietQrUrl,
+      bankAccount: sepayCfg.accountNumber,
+      bankName: sepayCfg.bankName,
+      bankOwner: sepayCfg.accountHolder,
+      transferMemo: memo,
       eventTitle: event.title || event.name,
       eventDate: event.date,
       eventLocation: event.location,
@@ -4019,7 +4119,10 @@ export class EventsService implements OnModuleInit {
 
   async listEventFeedbacks(eventId: string) {
     const rows = await this.prisma.$queryRawUnsafe<any[]>(`
-      SELECT * FROM public.event_feedbacks
+      SELECT id, event_id, member_name, member_phone, member_email, rating,
+             COALESCE(NULLIF(content, ''), NULLIF(comment, ''), NULLIF(feedback_text, ''), '') as comment,
+             status, attachment_url, created_at
+      FROM public.event_feedback
       WHERE event_id = $1
       ORDER BY created_at DESC;
     `, eventId).catch(() => []);
@@ -4027,10 +4130,10 @@ export class EventsService implements OnModuleInit {
     return rows.map((r) => ({
       id: r.id,
       eventId: r.event_id,
-      memberId: r.member_id,
-      userName: r.user_name,
-      userEmail: r.user_email || '',
-      userPhone: r.user_phone || '',
+      memberId: r.member_id || null,
+      userName: r.member_name || 'Đại biểu',
+      userEmail: r.member_email || '',
+      userPhone: r.member_phone || '',
       rating: Number(r.rating || 5),
       comment: r.comment || '',
       createdAt: r.created_at,
@@ -4038,26 +4141,50 @@ export class EventsService implements OnModuleInit {
   }
 
   async submitEventFeedback(eventId: string, data: any) {
-    if (!data.comment?.trim()) {
+    const rawComment = (data.comment || data.content || data.feedback_text || '').trim();
+    if (!rawComment) {
       throw new BadRequestException('Vui lòng nhập nội dung đánh giá / phản hồi cho sự kiện');
     }
 
-    const userName = (data.userName || data.name || 'Đại biểu CEO HN10').trim();
-    const userEmail = (data.userEmail || data.email || '').trim().toLowerCase();
-    const userPhone = (data.userPhone || data.phone || '').trim();
+    const feedbackId = `fb_ev_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
+    const userName = (data.userName || data.memberName || data.name || 'Đại biểu CEO HN10').trim();
+    const userEmail = (data.userEmail || data.memberEmail || data.email || '').trim().toLowerCase();
+    const userPhone = (data.userPhone || data.memberPhone || data.phone || '').trim();
     const rating = Math.min(5, Math.max(1, Number(data.rating) || 5));
-    const memberId = data.memberId && data.memberId.length === 36 ? `'${data.memberId}'::uuid` : 'NULL';
 
-    await this.prisma.$executeRawUnsafe(`
-      INSERT INTO public.event_feedbacks (
-        event_id, member_id, user_name, user_email, user_phone, rating, comment, created_at
+    await this.prisma.$executeRaw`
+      INSERT INTO public.event_feedback (
+        id, event_id, member_name, member_phone, member_email, rating, comment, content, feedback_text, status, created_at
       ) VALUES (
-        $1, ${memberId}, $2, $3, $4, $5, $6, now()
-      );
-    `, eventId, userName, userEmail, userPhone, rating, data.comment.trim());
+        ${feedbackId}, ${eventId}, ${userName}, ${userPhone}, ${userEmail}, ${rating}, ${rawComment}, ${rawComment}, ${rawComment}, 'received', now()
+      )
+    `;
+
+    // Đồng bộ vào feedbacks CRM
+    const evRows = await this.prisma.$queryRaw<any[]>`SELECT name, title, association_id FROM public.events WHERE id = ${eventId} LIMIT 1`.catch(() => []);
+    const evTitle = evRows[0]?.name || evRows[0]?.title || 'Sự kiện CLB CEO HN10';
+    const assocId = evRows[0]?.association_id || 'c1983000-0000-4000-8000-000000001983';
+
+    await this.prisma.$executeRaw`
+      INSERT INTO public.feedbacks (
+        id, title, content, rating, type, status, association_id, created_at, user_id
+      ) VALUES (
+        ${feedbackId},
+        ${`Đánh giá sự kiện: ${evTitle}`},
+        ${`[${rating} Sao] ${rawComment} - Người gửi: ${userName} (${userPhone || userEmail || 'Khách'})`},
+        ${rating},
+        'event_feedback',
+        'pending',
+        ${assocId}::uuid,
+        now(),
+        NULL
+      )
+    `.catch(() => {});
 
     return {
       success: true,
+      ok: true,
+      feedbackId,
       message: 'Cảm ơn Anh/Chị đã gửi đánh giá phản hồi về sự kiện!',
     };
   }
@@ -4125,15 +4252,101 @@ export class EventsService implements OnModuleInit {
     `.catch(() => []);
 
     if (rows.length === 0) {
+      // KIỂM TRA SỰ KIỆN MIỄN PHÍ: Nếu không tìm thấy vé nhưng có sự kiện miễn phí,
+      // cho phép tự động cấp vé & CHECK-IN PASS cho khách mới không nằm trong danh sách đăng ký trước giờ G
+      const freeEventRows = await this.prisma.$queryRaw<any[]>`
+        SELECT * FROM public.events
+        WHERE (ticket_price = 0 OR fee = 0 OR type = 'charity' OR type = 'khai_giang')
+        ORDER BY created_at DESC
+        LIMIT 1
+      `.catch(() => []);
+
+      if (freeEventRows.length > 0) {
+        const freeEvt = freeEventRows[0];
+        const lastReg = await this.prisma.$queryRaw<any[]>`
+          SELECT id FROM public.event_registrations WHERE id ~ '^[0-9]+$' ORDER BY CAST(id AS BIGINT) DESC LIMIT 1
+        `.catch(() => []);
+        const nextId = lastReg.length > 0 ? (BigInt(lastReg[0].id) + 1n).toString() : `8${Math.floor(1000 + Math.random() * 9000)}`;
+        const luckyNum = String(Math.floor(1000 + Math.random() * 9000));
+        const memberCode = clean.startsWith('GUEST-') || clean.startsWith('HN10-') || clean.startsWith('WALKIN-') ? clean.toUpperCase() : `WALKIN-${luckyNum}`;
+        const memberName = clean.startsWith('WALKIN-') || clean.match(/^[0-9]+$/) ? `Khách Mới Giờ G #${luckyNum}` : clean;
+
+        await this.prisma.$executeRaw`
+          INSERT INTO public.event_registrations (
+            id, event_id, member_code, member_name, email, phone, company, position, note,
+            registered_at, status, ticket_type, ticket_count, association_id, payment_status,
+            payment_amount, lucky_number, is_walkin, registration_origin, created_at, updated_at
+          ) VALUES (
+            ${nextId},
+            ${freeEvt.id},
+            ${memberCode},
+            ${memberName},
+            ${clean.includes('@') ? clean.toLowerCase() : `walkin.${nextId}@ceohn10.vn`},
+            ${clean.match(/^[0-9]{9,11}$/) ? clean : ''},
+            'Khách vãng lai giờ G',
+            'Đại biểu mới',
+            'Khách tham gia không nằm trong danh sách đăng ký trước giờ G',
+            now()::date,
+            'confirmed',
+            'Vé Miễn Phí (Tại Cửa)',
+            1,
+            ${freeEvt.association_id || 'c1983000-0000-4000-8000-000000001983'}::uuid,
+            'free',
+            0,
+            ${luckyNum},
+            true,
+            'walkin_unannounced',
+            now(),
+            now()
+          )
+        `.catch(() => {});
+
+        return {
+          found: true,
+          autoPassWalkIn: true,
+          message: 'Sự kiện miễn phí: Tự động cấp vé & Cho phép Check-in Pass cho khách mới không nằm trong danh sách trước giờ G!',
+          ticket: {
+            id: nextId,
+            eventId: freeEvt.id,
+            eventTitle: freeEvt.name || freeEvt.title || 'Sự kiện CEO HN10',
+            eventDate: freeEvt.date ? new Date(freeEvt.date).toLocaleDateString('vi-VN') : 'Hôm nay',
+            eventTime: `${freeEvt.start_time || '08:30'} - ${freeEvt.end_time || '12:00'}`,
+            eventLocation: freeEvt.location || 'Hà Nội',
+            memberName,
+            memberCode,
+            phone: clean.match(/^[0-9]{9,11}$/) ? clean : '',
+            email: clean.includes('@') ? clean.toLowerCase() : `walkin.${nextId}@ceohn10.vn`,
+            company: 'Khách vãng lai giờ G',
+            position: 'Đại biểu mới',
+            ticketType: 'Vé Miễn Phí (Tại Cửa)',
+            ticketCount: 1,
+            paymentStatus: 'free',
+            paymentAmount: 0,
+            luckyNumber: luckyNum,
+            seatAssignment: 'Khu vực tự do',
+            isWalkIn: true,
+            isWalkInAfterGHour: true,
+            attendeeType: 'WALK_IN_UNANNOUNCED',
+            attendeeTypeLabel: 'Khách không nằm trong danh sách đăng ký trước giờ G',
+            registrationOrigin: 'walkin_unannounced',
+            isCheckedIn: false,
+            checkedInAt: null,
+            isCheckedOut: false,
+            checkedOutAt: null,
+          },
+        };
+      }
+
       return { found: false, message: 'Không tìm thấy vé hoặc mã đăng ký trên hệ thống.' };
     }
 
     const reg = rows[0];
     const isCheckedIn = Boolean(reg.checked_in_at);
     const isCheckedOut = Boolean(reg.checked_out_at);
-    const isWalkIn = reg.is_walkin === true || reg.registration_origin === 'walkin_at_door';
-    const attendeeType = isWalkIn ? 'WALK_IN_NEW' : 'PRE_REGISTERED';
-    const attendeeTypeLabel = isWalkIn ? 'Khách mới đăng ký tại sự kiện' : 'Đại biểu đã đăng ký từ trước';
+    const isWalkIn = reg.is_walkin === true || reg.registration_origin === 'walkin_at_door' || reg.registration_origin === 'walkin_unannounced';
+    const isWalkInAfterGHour = reg.registration_origin === 'walkin_unannounced' || (reg.note && reg.note.includes('trước giờ G'));
+    const attendeeType = isWalkInAfterGHour ? 'WALK_IN_UNANNOUNCED' : (isWalkIn ? 'WALK_IN_NEW' : 'PRE_REGISTERED');
+    const attendeeTypeLabel = isWalkInAfterGHour ? 'Khách không nằm trong danh sách đăng ký trước giờ G' : (isWalkIn ? 'Khách mới đăng ký tại sự kiện' : 'Đại biểu đã đăng ký từ trước');
 
     return {
       found: true,
@@ -4157,6 +4370,7 @@ export class EventsService implements OnModuleInit {
         luckyNumber: reg.lucky_number,
         seatAssignment: reg.seat_assignment,
         isWalkIn,
+        isWalkInAfterGHour,
         attendeeType,
         attendeeTypeLabel,
         registrationOrigin: reg.registration_origin || 'pre_registered',
@@ -4168,7 +4382,7 @@ export class EventsService implements OnModuleInit {
     };
   }
 
-  async performTicketCheckin(ticketCode: string, method: string = 'web') {
+  async performTicketCheckin(ticketCode: string, method: string = 'web', attendedParts?: string[]) {
     if (!ticketCode || !ticketCode.trim()) {
       throw new BadRequestException('Mã vé không được để trống');
     }
@@ -4204,16 +4418,22 @@ export class EventsService implements OnModuleInit {
           eventTitle: reg.event_name || reg.event_title,
           phone: reg.phone,
           company: reg.company,
+          attendedParts: parseJsonArraySafe(reg.attended_parts),
         },
       };
     }
 
     const now = new Date();
+    const partsArray = Array.isArray(attendedParts) && attendedParts.length > 0 
+      ? attendedParts 
+      : parseJsonArraySafe(reg.attended_parts);
+    const partsJson = JSON.stringify(partsArray);
+
     await this.prisma.$executeRawUnsafe(`
       UPDATE public.event_registrations
-      SET checked_in_at = NOW(), status = 'attended', updated_at = NOW()
-      WHERE id = $1
-    `, reg.id);
+      SET checked_in_at = NOW(), status = 'attended', attended_parts = $1::jsonb, updated_at = NOW()
+      WHERE id = $2
+    `, partsJson, reg.id);
 
     // Ghi nhận vào member_checkins
     const clientId = `chk:tkt:${reg.association_id || 'ceohn10'}:${reg.member_code}:${reg.event_id || 'any'}`;
@@ -4256,6 +4476,7 @@ export class EventsService implements OnModuleInit {
         registrationOrigin: reg.registration_origin || 'pre_registered',
         paymentStatus: reg.payment_status || 'free',
         paymentAmount: Number(reg.payment_amount || 0),
+        attendedParts: partsArray,
       },
     };
   }
@@ -4318,6 +4539,195 @@ export class EventsService implements OnModuleInit {
         memberName: reg.member_name,
         eventTitle: reg.event_name || reg.event_title,
       },
+    };
+  }
+
+  // ── OFFLINE CHECKIN ENGINE (HỖ TRỢ KHU VỰC MẤT SÓNG / KHÔNG CÓ MẠNG) ─────────
+
+  async getEventOfflineDataset(eventId: string) {
+    let resolvedEventId = eventId;
+    if (!eventId || eventId === 'latest') {
+      const latestEvents = await this.prisma.$queryRaw<any[]>`
+        SELECT id, name, title FROM public.events
+        ORDER BY start_date DESC NULLS LAST, created_at DESC LIMIT 1
+      `.catch(() => []);
+      if (latestEvents.length > 0) {
+        resolvedEventId = latestEvents[0].id;
+      }
+    }
+
+    const eventRows = await this.prisma.$queryRaw<any[]>`
+      SELECT id, name, title, start_date, location FROM public.events
+      WHERE id = ${resolvedEventId} LIMIT 1
+    `.catch(() => []);
+    const event = eventRows.length > 0 ? eventRows[0] : null;
+
+    const tickets = await this.prisma.$queryRaw<any[]>`
+      SELECT 
+        r.id,
+        r.member_code,
+        r.lucky_number,
+        r.member_name,
+        r.phone,
+        r.company,
+        r.position,
+        r.ticket_type,
+        r.seat_assignment,
+        r.checked_in_at,
+        r.status,
+        r.attended_parts,
+        r.event_id
+      FROM public.event_registrations r
+      WHERE r.event_id = ${resolvedEventId}
+      ORDER BY r.created_at ASC
+    `.catch(() => []);
+
+    return {
+      ok: true,
+      eventId: resolvedEventId,
+      eventName: event?.name || event?.title || 'Sự kiện CEO HN10',
+      totalTickets: tickets.length,
+      downloadedAt: new Date().toISOString(),
+      tickets: tickets.map((t) => ({
+        id: t.id,
+        memberCode: t.member_code,
+        luckyNumber: t.lucky_number,
+        memberName: t.member_name,
+        phone: t.phone,
+        company: t.company,
+        position: t.position,
+        ticketType: t.ticket_type || 'Vé Tiêu Chuẩn',
+        seatAssignment: t.seat_assignment || 'Khu A',
+        isCheckedIn: !!t.checked_in_at,
+        checkedInAt: t.checked_in_at ? new Date(t.checked_in_at).toLocaleString('vi-VN') : null,
+        status: t.status || 'pending',
+        attendedParts: parseJsonArraySafe(t.attended_parts),
+      })),
+    };
+  }
+
+  async batchSyncCheckin(
+    eventId: string,
+    items: Array<{ ticketCode: string; checkedInAt?: string; method?: string; attendedParts?: string[] }>,
+  ) {
+    if (!Array.isArray(items) || items.length === 0) {
+      return { ok: true, syncedCount: 0, conflictCount: 0, skippedCount: 0, details: [] };
+    }
+
+    let syncedCount = 0;
+    let conflictCount = 0;
+    let skippedCount = 0;
+    const details: any[] = [];
+
+    for (const item of items) {
+      if (!item.ticketCode) continue;
+      const clean = item.ticketCode.trim();
+
+      const rows = await this.prisma.$queryRaw<any[]>`
+        SELECT r.*, e.name as event_name, e.title as event_title, e.association_id as event_assoc_id
+        FROM public.event_registrations r
+        LEFT JOIN public.events e ON e.id = r.event_id
+        WHERE r.id = ${clean} 
+           OR UPPER(TRIM(r.member_code)) = UPPER(${clean})
+           OR r.lucky_number = ${clean}
+        ORDER BY r.created_at DESC
+        LIMIT 1
+      `.catch(() => []);
+
+      if (rows.length === 0) {
+        skippedCount++;
+        details.push({ ticketCode: clean, status: 'not_found', message: 'Không tìm thấy vé trên hệ thống' });
+        continue;
+      }
+
+      const reg = rows[0];
+
+      if (reg.checked_in_at) {
+        const incomingTime = item.checkedInAt ? new Date(item.checkedInAt).getTime() : Date.now();
+        const existingTime = new Date(reg.checked_in_at).getTime();
+
+        if (incomingTime < existingTime) {
+          // Xử lý xung đột: Thiết bị offline này quét sớm hơn mốc đã ghi nhận -> Ưu tiên mốc thời gian sớm hơn
+          const earlierDate = new Date(incomingTime);
+          const partsArray = Array.isArray(item.attendedParts) && item.attendedParts.length > 0
+            ? item.attendedParts
+            : parseJsonArraySafe(reg.attended_parts);
+
+          await this.prisma.$executeRawUnsafe(`
+            UPDATE public.event_registrations
+            SET checked_in_at = $1, status = 'attended', attended_parts = $2::jsonb, updated_at = NOW()
+            WHERE id = $3
+          `, earlierDate, JSON.stringify(partsArray), reg.id).catch(() => {});
+
+          syncedCount++;
+          details.push({
+            ticketCode: clean,
+            status: 'conflict_resolved_earlier',
+            memberName: reg.member_name,
+            seatAssignment: reg.seat_assignment,
+            checkedInAt: earlierDate.toLocaleString('vi-VN'),
+            note: `Ưu tiên thời gian quét sớm hơn: ${earlierDate.toLocaleTimeString('vi-VN')} (máy quét sau: ${new Date(existingTime).toLocaleTimeString('vi-VN')})`,
+          });
+        } else {
+          // Cảnh báo trùng lặp: Vé đã được check-in tại máy khác trước đó
+          conflictCount++;
+          details.push({
+            ticketCode: clean,
+            status: 'conflict_duplicate_warning',
+            memberName: reg.member_name,
+            seatAssignment: reg.seat_assignment,
+            checkedInAt: new Date(existingTime).toLocaleString('vi-VN'),
+            warning: `Vé đã được check-in tại thiết bị khác lúc ${new Date(existingTime).toLocaleTimeString('vi-VN')}. Không ghi đè.`,
+          });
+        }
+        continue;
+      }
+
+      const checkinDate = item.checkedInAt ? new Date(item.checkedInAt) : new Date();
+      const partsArray = Array.isArray(item.attendedParts) && item.attendedParts.length > 0
+        ? item.attendedParts
+        : parseJsonArraySafe(reg.attended_parts);
+
+      await this.prisma.$executeRawUnsafe(`
+        UPDATE public.event_registrations
+        SET checked_in_at = $1, status = 'attended', attended_parts = $2::jsonb, updated_at = NOW()
+        WHERE id = $3
+      `, checkinDate, JSON.stringify(partsArray), reg.id).catch(() => {});
+
+      const clientId = `offline-sync-${reg.id}-${Date.now()}`;
+      await this.prisma.$executeRawUnsafe(`
+        INSERT INTO public.member_checkins (
+          id, client_id, member_code, event_id, event_name, status, checkin_method, checked_at, association_id
+        ) VALUES (
+          gen_random_uuid(), $1, $2, $3::uuid, $4, 'success', $5, $6, $7::uuid
+        ) ON CONFLICT (client_id) DO UPDATE SET checked_at = member_checkins.checked_at
+      `,
+        clientId,
+        reg.member_code,
+        reg.event_id && reg.event_id.match(/^[0-9a-f-]{36}$/i) ? reg.event_id : null,
+        reg.event_name || reg.event_title || 'Sự kiện CEO HN10',
+        item.method || 'offline_sync',
+        checkinDate,
+        reg.association_id && String(reg.association_id).match(/^[0-9a-f-]{36}$/i) ? reg.association_id : null,
+      ).catch(() => {});
+
+      syncedCount++;
+      details.push({
+        ticketCode: clean,
+        status: 'synced_success',
+        memberName: reg.member_name,
+        seatAssignment: reg.seat_assignment,
+        checkedInAt: checkinDate.toLocaleString('vi-VN'),
+      });
+    }
+
+    return {
+      ok: true,
+      message: `Đồng bộ hoàn tất: ${syncedCount} lượt thành công, ${conflictCount} xung đột trùng lặp được phát hiện, ${skippedCount} bỏ qua.`,
+      syncedCount,
+      conflictCount,
+      skippedCount,
+      details,
     };
   }
 
@@ -4396,25 +4806,21 @@ export class EventsService implements OnModuleInit {
     }
     const fee = feeRows[0];
 
-    // Lấy cấu hình Sepay từ app_settings
-    const settings = await this.prisma.$queryRaw<any[]>`
-      SELECT value FROM public.app_settings WHERE key = 'sepay_config' LIMIT 1
-    `.catch(() => []);
+    // Lấy cấu hình Sepay từ paymentService hoặc biến môi trường
+    const sepayCfg = this.paymentService
+      ? await this.paymentService.getSepayConfig()
+      : {
+          bankName: process.env.SEPAY_BANK_NAME || 'MBBank',
+          accountNumber: process.env.SEPAY_ACCOUNT_NO || '',
+          accountHolder: process.env.SEPAY_ACCOUNT_HOLDER || '',
+          prefixEvent: 'CEOHN10_SK',
+        };
 
-    let bankAccount = '1010000000';
-    let bankName = 'MB Bank (Quân Đội)';
-    let bankBin = '970422'; // MB Bank BIN
-    let bankOwner = 'CLB DOANH NHAN CEO HN10';
-    let prefix = 'CEOHN10_SK';
-
-    if (settings.length > 0 && settings[0]?.value) {
-      const cfg = typeof settings[0].value === 'string' ? JSON.parse(settings[0].value) : settings[0].value;
-      if (cfg.bankAccount) bankAccount = cfg.bankAccount;
-      if (cfg.bankName) bankName = cfg.bankName;
-      if (cfg.bankOwner) bankOwner = cfg.bankOwner;
-      if (cfg.bankBin) bankBin = cfg.bankBin;
-      if (cfg.prefixEvent) prefix = cfg.prefixEvent;
-    }
+    let bankAccount = sepayCfg.accountNumber;
+    let bankName = sepayCfg.bankName || 'MB Bank (Quân Đội)';
+    let bankBin = (sepayCfg.bankName || 'MB').toUpperCase().includes('MB') ? 'MB' : (sepayCfg.bankName || 'MB');
+    let bankOwner = sepayCfg.accountHolder;
+    let prefix = sepayCfg.prefixEvent || 'CEOHN10_SK';
 
     const cleanTicket = (ticketCode || 'TICKET').trim().replace(/[^a-zA-Z0-9]/g, '');
     const cleanFeeCode = (fee.fee_code || 'FEE').trim().replace(/[^a-zA-Z0-9]/g, '');
@@ -4438,9 +4844,29 @@ export class EventsService implements OnModuleInit {
 
   /**
    * Lấy danh sách các cột động hiện có của bảng event_registrations
+   * - Nếu truyền eventId: Chỉ lấy các cột động thuộc về riêng sự kiện đó (cô lập dữ liệu theo từng sự kiện)
+   * - Nếu không truyền hoặc 'all': Lấy tất cả các cột động phát sinh
    */
   async getEventDynamicColumns(eventId?: string) {
     try {
+      if (eventId && eventId !== 'all') {
+        const keysResult = await this.prisma.$queryRaw<any[]>`
+          SELECT DISTINCT jsonb_object_keys(dynamic_data) AS col_name 
+          FROM public.event_registrations 
+          WHERE event_id = ${eventId} 
+            AND dynamic_data IS NOT NULL 
+            AND dynamic_data::text != '{}'
+        `.catch(() => []);
+
+        const eventDynamicCols = keysResult.map((k: any) => ({
+          columnName: k.col_name,
+          dataType: 'text',
+          label: k.col_name.replace(/_/g, ' ').toUpperCase(),
+        }));
+
+        return { ok: true, dynamicColumns: eventDynamicCols };
+      }
+
       const cols = await this.prisma.$queryRaw<any[]>`
         SELECT column_name, data_type 
         FROM information_schema.columns 
@@ -4453,7 +4879,7 @@ export class EventsService implements OnModuleInit {
         'association_id', 'payment_status', 'payment_amount', 'lucky_number', 'qr_payload',
         'created_at', 'updated_at', 'checked_in_at', 'checked_out_at', 'checkin_method',
         'checked_in_by', 'table_name', 'seat_assignment', 'vnp_txn_ref', 'payment_method',
-        'paid_at', 'is_walkin', 'registration_origin', 'dynamic_data'
+        'paid_at', 'is_walkin', 'registration_origin', 'dynamic_data', 'attended_parts'
       ]);
 
       const dynamicCols = cols
@@ -4468,6 +4894,397 @@ export class EventsService implements OnModuleInit {
     } catch (err: any) {
       return { ok: false, dynamicColumns: [], message: err?.message };
     }
+  }
+
+  /**
+   * Cập nhật trạng thái thanh toán trực tiếp trên từng row vé đăng ký
+   * - Đồng bộ hạch toán Quỹ tài chính CRM khi chuyển sang Đã thanh toán (paid)
+   */
+  async updateRegistrationPaymentStatus(regId: string, paymentStatus: 'paid' | 'unpaid' | 'free') {
+    if (!regId) throw new BadRequestException('Mã vé không được để trống');
+    const regRows = await this.prisma.$queryRaw<any[]>`
+      SELECT * FROM public.event_registrations WHERE id = ${regId} LIMIT 1
+    `.catch(() => []);
+    if (regRows.length === 0) {
+      throw new NotFoundException(`Không tìm thấy vé đăng ký ID ${regId}`);
+    }
+    const reg = regRows[0];
+    const oldStatus = reg.payment_status;
+    const paymentAmount = Number(reg.payment_amount || 0);
+
+    await this.prisma.$executeRaw`
+      UPDATE public.event_registrations
+      SET payment_status = ${paymentStatus},
+          updated_at = now()
+      WHERE id = ${regId}
+    `;
+
+    // Nếu chuyển sang paid và có số tiền > 0 -> tự động hạch toán Quỹ thu vé
+    if (paymentStatus === 'paid' && paymentAmount > 0 && oldStatus !== 'paid') {
+      const incId = `inc_reg_${regId}_${Date.now()}`;
+      const desc = `Thu phí tham dự sự kiện (Đổi trạng thái CRM): ${reg.member_name} - Vé ${regId}`;
+      const txCode = `THU-EV${regId}`;
+      await this.prisma.$executeRaw`
+        INSERT INTO public.transactions (
+          id, code, date, type, category, description, amount, method, status, association_id, recipient, created_at, updated_at
+        ) VALUES (
+          gen_random_uuid(),
+          ${txCode},
+          now()::date,
+          'income',
+          'Vé sự kiện',
+          ${desc},
+          ${paymentAmount},
+          'bank',
+          'completed',
+          ${reg.association_id}::uuid,
+          ${reg.member_name || ''},
+          now(),
+          now()
+        )
+      `.catch(() => {});
+      await this.prisma.$executeRaw`
+        INSERT INTO public.income_records (
+          id, association_id, category, amount, description, source, transaction_date, created_at, status
+        ) VALUES (
+          ${incId},
+          ${reg.association_id}::uuid,
+          'Thu phí sự kiện',
+          ${paymentAmount},
+          ${desc},
+          'crm_inline_toggle',
+          now()::date,
+          now(),
+          'completed'
+        )
+      `.catch((err) => {
+        this.logger.warn(`[updateRegistrationPaymentStatus] Lỗi ghi nhận quỹ: ${err?.message}`);
+      });
+    }
+
+    return {
+      ok: true,
+      regId,
+      paymentStatus,
+      message: `Đã cập nhật trạng thái thanh toán thành: ${paymentStatus === 'paid' ? 'Đã thanh toán' : paymentStatus === 'unpaid' ? 'Chưa thanh toán' : 'Miễn phí'}`,
+    };
+  }
+
+  /**
+   * Lấy danh sách các đại biểu ĐÃ CHECK-IN của sự kiện phục vụ Vòng Quay Bốc Thăm (Lucky Draw) & Biểu Quyết
+   */
+  async getCheckedInCandidates(eventId: string) {
+    if (!eventId) throw new BadRequestException('Mã sự kiện không được để trống');
+    const rows = await this.prisma.$queryRaw<any[]>`
+      SELECT id, member_code, member_name, phone, email, company, position, lucky_number, checked_in_at, is_walkin, attended_parts
+      FROM public.event_registrations
+      WHERE event_id = ${eventId}
+        AND (
+          checked_in_at IS NOT NULL 
+          OR status = 'attended'
+          OR status = 'checked_in'
+        )
+      ORDER BY checked_in_at DESC NULLS LAST, id ASC
+    `.catch(() => []);
+
+    const candidates = rows.map((r: any) => ({
+      id: r.id,
+      code: r.lucky_number || r.member_code || `MB-${r.id}`,
+      name: r.member_name || 'Đại biểu',
+      company: r.company || 'Doanh nghiệp CEO HN10',
+      position: r.position || '',
+      phone: r.phone || '',
+      email: r.email || '',
+      isWalkIn: Boolean(r.is_walkin),
+      attendedParts: parseJsonArraySafe(r.attended_parts),
+      checkedInAt: r.checked_in_at ? new Date(r.checked_in_at).toLocaleString('vi-VN') : '',
+    }));
+
+    return { ok: true, eventId, total: candidates.length, candidates };
+  }
+
+  /**
+   * Chụp / Tải ảnh tư liệu trong quá trình diễn ra sự kiện
+   * - Lưu vào bảng event_photos
+   * - Đồng thời tự động đồng bộ vào chức năng Quản Lý Tài Liệu (documents)
+   */
+  async addEventPhoto(
+    eventId: string,
+    data: { photoUrl: string; caption?: string; uploadedBy?: string; associationId?: string }
+  ) {
+    if (!eventId) throw new BadRequestException('Mã sự kiện không được để trống');
+    if (!data.photoUrl || !data.photoUrl.trim()) {
+      throw new BadRequestException('Đường link ảnh không được để trống');
+    }
+
+    const eventRows = await this.prisma.$queryRaw<any[]>`
+      SELECT name, title, association_id FROM public.events WHERE id = ${eventId} LIMIT 1
+    `.catch(() => []);
+    const eventName = eventRows[0]?.name || eventRows[0]?.title || 'Sự kiện CEO HN10';
+    const assocId = data.associationId || eventRows[0]?.association_id || 'c1983000-0000-4000-8000-000000001983';
+
+    const photoId = `photo_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
+    const caption = data.caption || `Ảnh chụp trực tiếp sự kiện: ${eventName}`;
+    const uploadedBy = data.uploadedBy || 'Ban Tổ Chức';
+
+    // 1. Lưu vào event_photos
+    await this.prisma.$executeRaw`
+      INSERT INTO public.event_photos (
+        id, event_id, photo_url, caption, uploaded_by, created_at
+      ) VALUES (
+        ${photoId},
+        ${eventId},
+        ${data.photoUrl.trim()},
+        ${caption},
+        ${uploadedBy},
+        now()
+      )
+    `;
+
+    // 2. Đồng bộ vào Quản lý tài liệu (documents)
+    const docId = `doc_event_photo_${photoId}`;
+    await this.prisma.$executeRaw`
+      INSERT INTO public.documents (
+        id, title, file_url, category, description, association_id, created_at
+      ) VALUES (
+        ${docId},
+        ${caption},
+        ${data.photoUrl.trim()},
+        'Ảnh Sự Kiện',
+        ${`Ảnh chụp tư liệu chính thức thuộc sự kiện: ${eventName}`},
+        ${assocId}::uuid,
+        now()
+      )
+    `.catch((err) => {
+      this.logger.warn(`[addEventPhoto] Lỗi đồng bộ tài liệu: ${err?.message}`);
+    });
+
+    return {
+      ok: true,
+      photoId,
+      photoUrl: data.photoUrl.trim(),
+      caption,
+      message: 'Đã lưu ảnh sự kiện và đồng bộ vào Quản Lý Tài Liệu thành công',
+    };
+  }
+
+  /**
+   * Lấy danh sách ảnh trực tiếp của một sự kiện
+   */
+  async getEventPhotos(eventId: string) {
+    if (!eventId) throw new BadRequestException('Mã sự kiện không được để trống');
+    const photos = await this.prisma.$queryRaw<any[]>`
+      SELECT id, event_id, photo_url, caption, uploaded_by, created_at
+      FROM public.event_photos
+      WHERE event_id = ${eventId}
+      ORDER BY created_at DESC
+    `.catch(() => []);
+
+    return {
+      ok: true,
+      eventId,
+      total: photos.length,
+      photos: photos.map((p) => ({
+        id: p.id,
+        photoUrl: p.photo_url,
+        caption: p.caption,
+        uploadedBy: p.uploaded_by,
+        createdAt: p.created_at,
+      })),
+    };
+  }
+
+  /**
+   * Gửi đánh giá / góp ý sau sự kiện qua mã QR
+   * - Lưu vào event_feedback
+   * - Đồng thời lưu vào feedbacks của CRM
+   */
+  async saveEventFeedback(
+    eventId: string,
+    data: { memberName: string; memberPhone?: string; memberEmail?: string; rating: number; content: string }
+  ) {
+    if (!eventId) throw new BadRequestException('Mã sự kiện không được để trống');
+    if (!data.content || !data.content.trim()) {
+      throw new BadRequestException('Nội dung đánh giá, góp ý không được để trống');
+    }
+
+    const eventRows = await this.prisma.$queryRaw<any[]>`
+      SELECT name, title, association_id FROM public.events WHERE id = ${eventId} LIMIT 1
+    `.catch(() => []);
+    const eventName = eventRows[0]?.name || eventRows[0]?.title || 'Sự kiện CEO HN10';
+    const assocId = eventRows[0]?.association_id || 'c1983000-0000-4000-8000-000000001983';
+
+    const feedbackId = `fb_ev_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
+    const rating = Math.min(Math.max(Number(data.rating || 5), 1), 5);
+    const memberName = data.memberName?.trim() || 'Đại biểu ẩn danh';
+    const memberPhone = data.memberPhone?.trim() || '';
+    const memberEmail = data.memberEmail?.trim() || '';
+    const content = data.content.trim();
+
+    // 1. Lưu vào event_feedback
+    await this.prisma.$executeRaw`
+      INSERT INTO public.event_feedback (
+        id, event_id, member_name, member_phone, member_email, rating, content, created_at
+      ) VALUES (
+        ${feedbackId},
+        ${eventId},
+        ${memberName},
+        ${memberPhone},
+        ${memberEmail},
+        ${rating},
+        ${content},
+        now()
+      )
+    `;
+
+    // 2. Lưu vào feedbacks của CRM
+    await this.prisma.$executeRaw`
+      INSERT INTO public.feedbacks (
+        id, title, content, rating, type, status, association_id, created_at, user_id
+      ) VALUES (
+        ${feedbackId},
+        ${`Đánh giá sự kiện: ${eventName}`},
+        ${`[${rating} Sao] ${content} - Người gửi: ${memberName} (${memberPhone || memberEmail || 'Không để lại thông tin'})`},
+        ${rating},
+        'event_feedback',
+        'pending',
+        ${assocId}::uuid,
+        now(),
+        NULL
+      )
+    `.catch((err) => {
+      this.logger.warn(`[saveEventFeedback] Lỗi đồng bộ feedback CRM: ${err?.message}`);
+    });
+
+    return {
+      ok: true,
+      feedbackId,
+      message: 'Cảm ơn bạn đã gửi đánh giá, góp ý cho sự kiện CLB CEO HN10!',
+    };
+  }
+
+  /**
+   * Lấy danh sách đánh giá của sự kiện
+   */
+  async getEventFeedback(eventId: string) {
+    if (!eventId) throw new BadRequestException('Mã sự kiện không được để trống');
+    const list = await this.prisma.$queryRaw<any[]>`
+      SELECT id, event_id, member_name, member_phone, member_email, rating, content, created_at
+      FROM public.event_feedback
+      WHERE event_id = ${eventId}
+      ORDER BY created_at DESC
+    `.catch(() => []);
+
+    return {
+      ok: true,
+      eventId,
+      total: list.length,
+      feedbacks: list,
+    };
+  }
+
+  /**
+   * Gửi Email & Zalo OA thông báo sau sự kiện (Kèm link ảnh và nút đánh giá góp ý)
+   * - Chỉ gửi cho những người ĐÃ CHECK-IN sự kiện
+   */
+  async sendPostEventRecap(eventId: string) {
+    if (!eventId) throw new BadRequestException('Mã sự kiện không được để trống');
+
+    const eventRows = await this.prisma.$queryRaw<any[]>`
+      SELECT id, name, title, photo_gallery_url FROM public.events WHERE id = ${eventId} LIMIT 1
+    `.catch(() => []);
+    if (eventRows.length === 0) {
+      throw new NotFoundException(`Không tìm thấy sự kiện ${eventId}`);
+    }
+    const event = eventRows[0];
+    const eventName = event.name || event.title || 'Sự kiện CLB CEO HN10';
+    const galleryUrl = sanitizeGalleryUrl(event.photo_gallery_url) || `https://ceohn10.viconnect.vn/events/${eventId}`;
+    const feedbackUrl = `https://ceohn10.viconnect.vn/events/${eventId}/feedback`;
+
+    // Lấy tất cả người đã check-in
+    const checkedInAttendees = await this.prisma.$queryRaw<any[]>`
+      SELECT id, member_name, email, phone 
+      FROM public.event_registrations 
+      WHERE event_id = ${eventId}
+        AND (checked_in_at IS NOT NULL OR status = 'attended' OR status = 'checked_in')
+    `.catch(() => []);
+
+    let sentEmailCount = 0;
+    let sentZaloCount = 0;
+
+    for (const att of checkedInAttendees) {
+      const email = (att.email || '').trim().toLowerCase();
+      const phone = (att.phone || '').trim();
+      const memberName = att.member_name || 'Quý Hội Viên / Đại Biểu';
+
+      // 1. Gửi Email Recap & Link Ảnh & Nút Đánh Giá
+      if (email && email.includes('@')) {
+        const emailHtml = `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 16px; background-color: #ffffff;">
+            <div style="text-align: center; border-bottom: 2px solid #003B95; padding-bottom: 16px;">
+              <h2 style="color: #003B95; margin: 0;">CLB DOANH NHÂN CEO HN10 (HANOIBA)</h2>
+              <p style="color: #64748b; font-size: 14px; margin-top: 4px;">Cảm Ơn Quý Đại Biểu Đã Tham Dự Sự Kiện</p>
+            </div>
+            <div style="padding: 20px 0; color: #1e293b; line-height: 1.6;">
+              <p>Kính gửi: <strong>${memberName}</strong>,</p>
+              <p>Ban Điều Hành CLB Doanh Nhân CEO HN10 xin gửi lời cảm ơn chân thành và sâu sắc nhất tới Quý Đại Biểu đã dành thời gian quý báu đến tham dự chương trình <strong>"${eventName}"</strong>.</p>
+              <p>Sự hiện diện và đồng hành của Quý Đại Biểu đã góp phần to lớn tạo nên thành công rực rỡ và những khoảnh khắc đáng nhớ của sự kiện.</p>
+              
+              <div style="margin: 24px 0; text-align: center;">
+                <a href="${galleryUrl}" style="display: inline-block; background-color: #003B95; color: #ffffff; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 14px; margin-right: 8px;">
+                  📸 Xem Trọn Bộ Album Ảnh Sự Kiện
+                </a>
+                <a href="${feedbackUrl}" style="display: inline-block; background-color: #F59E0B; color: #000000; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 14px;">
+                  ⭐ Đánh Giá &amp; Góp Ý Sự Kiện
+                </a>
+              </div>
+
+              <p style="font-size: 13px; color: #64748b;">Mọi ý kiến đóng góp quý báu của Quý Đại Biểu sẽ là cơ sở quan trọng giúp Ban Tổ Chức hoàn thiện và nâng cao chất lượng các sự kiện tiếp theo của CLB.</p>
+            </div>
+            <div style="border-top: 1px solid #e2e8f0; padding-top: 16px; text-align: center; font-size: 12px; color: #94a3b8;">
+              <p>Hệ Thống Quản Trị &amp; Kết Nối Doanh Nghiệp CEO HN10</p>
+            </div>
+          </div>
+        `;
+
+        try {
+          await this.mailService.dispatchSmtpEmail({
+            to: email,
+            subject: `[CEO HN10] Cảm ơn Quý Đại Biểu & Album Ảnh Sự Kiện "${eventName}"`,
+            html: emailHtml,
+          });
+          sentEmailCount++;
+        } catch (err: any) {
+          this.logger.warn(`[sendPostEventRecap] Lỗi gửi email cho ${email}: ${err?.message}`);
+        }
+      }
+
+      // 2. Gửi Zalo OA
+      if (this.zaloService && phone) {
+        try {
+          await this.zaloService.sendAutoNotification({
+            recipientPhone: phone,
+            recipientName: memberName,
+            title: `Cảm ơn đã tham dự sự kiện ${eventName}`,
+            content: `Trân trọng cảm ơn ${memberName} đã tham dự sự kiện "${eventName}".\n📸 Xem Album ảnh sự kiện: ${galleryUrl}\n⭐ Gửi góp ý đánh giá: ${feedbackUrl}`,
+          });
+          sentZaloCount++;
+        } catch (err: any) {
+          this.logger.warn(`[sendPostEventRecap] Lỗi gửi Zalo cho ${phone}: ${err?.message}`);
+        }
+      }
+    }
+
+    return {
+      ok: true,
+      eventName,
+      totalCheckedIn: checkedInAttendees.length,
+      sentEmailCount,
+      sentZaloCount,
+      galleryUrl,
+      feedbackUrl,
+      message: `Đã gửi thông báo cảm ơn, link album ảnh và nút đánh giá tới ${sentEmailCount} email và ${sentZaloCount} Zalo OA của đại biểu đã check-in.`,
+    };
   }
 
   /**
@@ -4685,6 +5502,26 @@ export class EventsService implements OnModuleInit {
       // 6. GHI NHẬN VÀO QUỸ TÀI CHÍNH CRM CEO HN10 NẾU ĐÃ THANH TOÁN
       if (isPaid && ticketFee > 0) {
         totalFundAdded += ticketFee;
+        const txCode = `THU-EV${regId}`;
+        await this.prisma.$executeRaw`
+          INSERT INTO public.transactions (
+            id, code, date, type, category, description, amount, method, status, association_id, recipient, created_at, updated_at
+          ) VALUES (
+            gen_random_uuid(),
+            ${txCode},
+            now()::date,
+            'income',
+            'Vé sự kiện',
+            ${`Thu tiền vé sự kiện ${eventTitle} - ${fullName} (Mã vé: #${regId})`},
+            ${ticketFee},
+            'bank',
+            'completed',
+            ${targetAssocId}::uuid,
+            ${fullName},
+            now(),
+            now()
+          )
+        `.catch(() => {});
         await this.prisma.$executeRawUnsafe(`
           INSERT INTO public.income_records (
             id, category, title, amount, date, payer_name, payment_method, status, event_id, notes, created_at, updated_at
@@ -4711,9 +5548,14 @@ export class EventsService implements OnModuleInit {
         ).catch(() => {});
       }
 
-      // 7. GỬI MÃ VÉ ĐÃ ĐĂNG KÝ QUA EMAIL HOẶC ZALO OA ĐỂ CHECK-IN
+      // 7. GỬI MÃ VÉ HOẶC THÔNG BÁO THANH TOÁN QUA EMAIL / ZALO OA
       const baseUrl = process.env.APP_URL || 'https://ceohn10.viconnect.vn';
       const checkinQrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(regId)}`;
+      const sepayAcc = process.env.SEPAY_ACCOUNT_NO || '0983111222';
+      const sepayBank = process.env.SEPAY_BANK_NAME || 'MBBank (Ngân hàng Quân Đội)';
+      const sepayHolder = process.env.SEPAY_ACCOUNT_HOLDER || 'CLB DOANH NHAN CEO HN10';
+      const transferContent = `EV${regId}`;
+      const vietQrUrl = `https://img.vietqr.io/image/MB-${sepayAcc}-compact2.png?amount=${ticketFee}&addInfo=${encodeURIComponent(transferContent)}&accountName=${encodeURIComponent(sepayHolder)}`;
 
       if (email && email.includes('@')) {
         this.mailService.sendEventTicketEmail({
@@ -4733,17 +5575,24 @@ export class EventsService implements OnModuleInit {
           paymentConfirmed: isPaid,
           totalAmount: ticketFee,
           qrCodeUrl: checkinQrUrl,
+          vietQrUrl: (!isPaid && ticketFee > 0) ? vietQrUrl : undefined,
+          bankAccount: sepayAcc,
+          bankName: sepayBank,
+          bankOwner: sepayHolder,
         }).catch((err) => {
-          this.logger.warn(`[importAttendeesFromFile] Lỗi gửi email vé cho ${email}: ${err?.message}`);
+          this.logger.warn(`[importAttendeesFromFile] Lỗi gửi email cho ${email}: ${err?.message}`);
         });
       }
 
       if (phone && this.zaloService) {
+        const isActuallyPaid = isPaid || ticketFee === 0;
         this.zaloService.sendAutoNotification({
           recipientPhone: phone,
           recipientName: fullName,
-          title: `Xác nhận vé tham dự: ${eventTitle}`,
-          content: `Kính gửi Anh/Chị ${fullName},\nBan Tổ Chức CLB Doanh Nhân CEO HN10 xác nhận Anh/Chị đã đăng ký tham dự sự kiện "${eventTitle}".\n- Mã vé vào cửa: ${regId}\n- Số may mắn Lucky Draw: #${luckyNum}\n- Trạng thái: ${isPaid ? 'Đã thanh toán' : 'Chưa thanh toán'}\nQuý Anh/Chị vui lòng xuất trình mã vé này tại bàn lễ tân để check-in vào cửa. Trân trọng!`,
+          title: isActuallyPaid ? `Xác nhận vé tham dự: ${eventTitle}` : `[Cần Thanh Toán] Phí tham dự sự kiện: ${eventTitle}`,
+          content: isActuallyPaid
+            ? `Kính gửi Anh/Chị ${fullName},\nBan Tổ Chức CLB Doanh Nhân CEO HN10 xác nhận Anh/Chị đã có vé tham dự sự kiện "${eventTitle}".\n- Mã vé vào cửa: ${regId}\n- Số may mắn Lucky Draw: #${luckyNum}\n- Trạng thái: ${ticketFee === 0 ? 'Miễn phí' : 'Đã thanh toán'}\nQuý Anh/Chị vui lòng xuất trình mã vé này tại bàn lễ tân để check-in vào cửa. Trân trọng!`
+            : `Kính gửi Anh/Chị ${fullName},\nBan Tổ Chức CLB Doanh Nhân CEO HN10 thông báo vé tham dự sự kiện "${eventTitle}" của Anh/Chị đang ở trạng thái CHƯA THANH TOÁN.\n- Mã đăng ký: ${regId}\n- Số tiền cần thanh toán: ${ticketFee.toLocaleString('vi-VN')} VNĐ\n- Chuyển khoản đến STK MBBank: ${sepayAcc} (Chủ TK: ${sepayHolder})\n- Cú pháp CK: EV${regId} ${phone}\nVé check-in sẽ được kích hoạt ngay khi nhận được thanh toán. Trân trọng!`,
         }).catch(() => {});
       }
 

@@ -169,13 +169,36 @@ function RegPage() {
 
   useEffect(() => {
     if (eventId && eventId !== "all") {
-      fetchNestApi<string[]>(`/events/${eventId}/dynamic-columns`)
-        .then((cols) => setDynamicColumns(Array.isArray(cols) ? cols : []))
+      fetchNestApi<any>(`/events/${eventId}/dynamic-columns`)
+        .then((res) => {
+          const raw = Array.isArray(res) ? res : res?.dynamicColumns || [];
+          setDynamicColumns(raw.map((c: any) => (typeof c === "string" ? c : c.columnName || "")));
+        })
         .catch(() => setDynamicColumns([]));
     } else {
       setDynamicColumns([]);
     }
   }, [eventId]);
+
+  const handleTogglePaymentStatus = async (regId: string, currentStatus: string) => {
+    const nextStatus = currentStatus === "paid" ? "unpaid" : "paid";
+    try {
+      await fetchNestApi(`/events/registrations/${regId}/payment-status`, {
+        method: "PATCH",
+        body: JSON.stringify({ paymentStatus: nextStatus }),
+      });
+      setRegistrationsList((prev) =>
+        prev.map((it) => (it.id === regId ? { ...it, paymentStatus: nextStatus } : it))
+      );
+      toast.success(
+        nextStatus === "paid"
+          ? "Đã chuyển sang ĐÃ THANH TOÁN & tự động hạch toán Quỹ tài chính CRM!"
+          : "Đã chuyển sang trạng thái CHƯA THANH TOÁN!"
+      );
+    } catch (err: any) {
+      toast.error("Không thể cập nhật trạng thái thanh toán: " + (err?.message || ""));
+    }
+  };
 
   // Excel-like resizable columns state & handler
   const [colWidths, setColWidths] = useState<Record<string, number>>({
@@ -188,6 +211,7 @@ function RegPage() {
     payment: 190,
     checkin: 130,
     status: 110,
+    origin: 210,
     actions: 360,
   });
 
@@ -214,26 +238,26 @@ function RegPage() {
   // Add Attendee / QR Checkin Modal state
   const [importModalOpen, setImportModalOpen] = useState(false);
   const [dynamicColumns, setDynamicColumns] = useState<string[]>([]);
-  const [addAttendeeModalOpen, setAddAttendeeModalOpen] = useState(false);
+  const [selectedRegIds, setSelectedRegIds] = useState<Set<string>>(new Set());
   const [eventReminderModalOpen, setEventReminderModalOpen] = useState(false);
-  const [posterStudioOpen, setPosterStudioOpen] = useState(false);
   const [vnpayModalOpen, setVnpayModalOpen] = useState(false);
   const [selectedVnpayReg, setSelectedVnpayReg] = useState<Registration | null>(null);
-  const [attendeeMode, setAttendeeMode] = useState<"qr" | "manual">("qr");
-  const [qrCodeInput, setQrCodeInput] = useState("");
-  const [isScanningCamera, setIsScanningCamera] = useState(false);
-  const [newAttendee, setNewAttendee] = useState({
-    eventId: EVENTS[0]?.id || "",
-    memberName: "",
-    memberCode: "",
-    email: "",
-    phone: "",
-    company: "",
-    ticketType: "VIP",
-    seatAssignment: "Bàn VIP 01",
-    paymentStatus: "paid" as "paid" | "pending",
-    checkedIn: true,
-  });
+
+  const handleBulkDelete = async () => {
+    if (selectedRegIds.size === 0) return;
+    if (!confirm(`Xác nhận xóa ${selectedRegIds.size} đại biểu đã chọn khỏi danh sách đăng ký sự kiện?`)) return;
+    try {
+      const ids = Array.from(selectedRegIds);
+      for (const id of ids) {
+        fetchNestApi(`/events/registrations/${id}`, { method: "DELETE" }).catch(() => {});
+      }
+      setRegistrationsList((prev) => prev.filter((r) => !selectedRegIds.has(r.id)));
+      setSelectedRegIds(new Set());
+      toast.success(`Đã xóa thành công ${ids.length} đại biểu đã chọn!`);
+    } catch (err: any) {
+      toast.error("Lỗi khi xóa đại biểu: " + (err?.message || ""));
+    }
+  };
 
   // Seating Modal state
   const [seatingModalOpen, setSeatingModalOpen] = useState(false);
@@ -602,106 +626,6 @@ function RegPage() {
     }
   };
 
-  const handleProcessQrCode = async (codeToProcess?: string) => {
-    const code = (codeToProcess || qrCodeInput).trim();
-    if (!code) {
-      toast.error("Vui lòng nhập hoặc quét mã QR");
-      return;
-    }
-
-    setSubmitting(true);
-    try {
-      // Find if attendee already exists in registrations
-      const matched = REGISTRATIONS.find(
-        (r) =>
-          r.id.toLowerCase() === code.toLowerCase() ||
-          r.memberCode.toLowerCase() === code.toLowerCase() ||
-          r.email.toLowerCase() === code.toLowerCase() ||
-          r.memberName.toLowerCase().includes(code.toLowerCase()),
-      );
-
-      const targetEvtId = matched ? matched.eventId : newAttendee.eventId || EVENTS[0]?.id || "evt-1";
-      const memberName = matched ? matched.memberName : `Đại biểu ${code}`;
-      const memberCode = matched ? matched.memberCode : code;
-
-      await addAttendee({
-        data: {
-          eventId: targetEvtId,
-          memberName,
-          memberCode,
-          email: matched?.email || "",
-          phone: matched?.phone || "",
-          company: matched?.company || "",
-          ticketType: matched?.ticketType || "VIP",
-          seatAssignment: matched?.seatAssignment || "Bàn VIP 01",
-          paymentStatus: "paid",
-          checkedIn: true,
-        },
-      });
-
-      toast.success(`Đã quét QR & Check-in thành công: ${memberName} (${memberCode})`);
-      setQrCodeInput("");
-      setAddAttendeeModalOpen(false);
-      await router.invalidate();
-    } catch (err: any) {
-      toast.error(err?.message || "Lỗi khi xử lý mã QR điểm danh");
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  const handleSubmitNewAttendee = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newAttendee.memberName.trim()) {
-      toast.error("Vui lòng nhập họ và tên đại biểu");
-      return;
-    }
-    if (!newAttendee.eventId) {
-      toast.error("Vui lòng chọn sự kiện");
-      return;
-    }
-
-    setSubmitting(true);
-    try {
-      await addAttendee({
-        data: {
-          eventId: newAttendee.eventId,
-          memberName: newAttendee.memberName.trim(),
-          memberCode: newAttendee.memberCode.trim() || undefined,
-          email: newAttendee.email.trim() || undefined,
-          phone: newAttendee.phone.trim() || undefined,
-          company: newAttendee.company.trim() || undefined,
-          ticketType: newAttendee.ticketType,
-          seatAssignment: newAttendee.seatAssignment,
-          paymentStatus: newAttendee.paymentStatus,
-          checkedIn: newAttendee.checkedIn,
-        },
-      });
-
-      toast.success(
-        `Đã thêm người tham gia: ${newAttendee.memberName}${newAttendee.checkedIn ? " (Đã Check-in có mặt)" : ""}`,
-      );
-      setNewAttendee({
-        eventId: EVENTS[0]?.id || "",
-        memberName: "",
-        memberCode: "",
-        email: "",
-        phone: "",
-        company: "",
-        ticketType: "VIP",
-        seatAssignment: "Bàn VIP 01",
-        paymentStatus: "paid",
-        checkedIn: true,
-      });
-      setAddAttendeeModalOpen(false);
-      await router.invalidate();
-    } catch (err: any) {
-      toast.error(err?.message || "Lỗi khi thêm người tham gia sự kiện");
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
   const handleOpenQr = (r: Registration) => {
     setQrReg(r);
     setQrModalOpen(true);
@@ -763,12 +687,6 @@ function RegPage() {
               <span>Nhập Danh Sách (Word/Excel/PDF)</span>
             </button>
             <button
-              onClick={() => setPosterStudioOpen(true)}
-              className="inline-flex items-center gap-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 px-3.5 py-2 text-xs font-bold text-slate-950 shadow-xs transition cursor-pointer"
-            >
-              <span>Tạo Poster Thư Mời</span>
-            </button>
-            <button
               onClick={() => setEventReminderModalOpen(true)}
               className="inline-flex items-center gap-1.5 rounded-xl bg-[#003B95] hover:bg-[#002B70] px-3.5 py-2 text-xs font-bold text-white shadow-xs transition cursor-pointer"
             >
@@ -783,15 +701,6 @@ function RegPage() {
               className="inline-flex items-center gap-1.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 px-3.5 py-2 text-xs font-bold text-slate-800 dark:text-slate-200 transition cursor-pointer"
             >
               <span>Sơ Đồ Chỗ Ngồi</span>
-            </button>
-            <button
-              onClick={() => {
-                setAttendeeMode("qr");
-                setAddAttendeeModalOpen(true);
-              }}
-              className="inline-flex items-center gap-1.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 px-3.5 py-2 text-xs font-bold text-slate-800 dark:text-slate-200 transition cursor-pointer"
-            >
-              <span>Thêm Người Tham Dự</span>
             </button>
             <button className="inline-flex items-center gap-1.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 px-3.5 py-2 text-xs font-bold text-slate-800 dark:text-slate-200 transition cursor-pointer">
               <Download className="h-4 w-4 text-slate-500" />
@@ -907,15 +816,57 @@ function RegPage() {
         </select>
       </div>
 
+      {/* Bulk Delete Toolbar */}
+      {selectedRegIds.size > 0 && (
+        <div className="mb-4 p-3 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900 rounded-2xl flex items-center justify-between shadow-xs animate-in fade-in">
+          <div className="flex items-center gap-2 text-xs font-bold text-rose-900 dark:text-rose-200">
+            <CheckCircle2 className="h-4 w-4 text-rose-600" />
+            <span>Đã chọn {selectedRegIds.size} đại biểu trong danh sách</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setSelectedRegIds(new Set())}
+              className="px-3 py-1.5 rounded-xl border border-slate-200 bg-white dark:bg-slate-800 hover:bg-slate-50 text-xs font-semibold text-slate-700 dark:text-slate-200 transition cursor-pointer"
+            >
+              Bỏ chọn tất cả
+            </button>
+            <button
+              type="button"
+              onClick={handleBulkDelete}
+              className="px-4 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-xs font-bold text-white shadow-xs transition flex items-center gap-1.5 cursor-pointer"
+            >
+              <Trash2 className="h-3.5 w-3.5" />
+              <span>Xóa {selectedRegIds.size} dòng đã chọn</span>
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Main Table */}
       <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-[var(--shadow-card)]">
         <div className="relative overflow-x-auto">
           <table className="w-full min-w-[1550px] border-separate border-spacing-0 text-sm">
             <thead>
               <tr className="border-b border-border bg-secondary text-left text-[11px] font-bold uppercase tracking-wider text-muted-foreground select-none">
+                <th className="sticky left-0 z-30 bg-secondary px-2.5 py-3 text-center border-b border-border w-10">
+                  <input
+                    type="checkbox"
+                    checked={tc.pageRows.length > 0 && tc.pageRows.every((r: any) => selectedRegIds.has(r.id))}
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        setSelectedRegIds(new Set(tc.pageRows.map((r: any) => r.id)));
+                      } else {
+                        setSelectedRegIds(new Set());
+                      }
+                    }}
+                    className="rounded border-slate-300 text-[#003B95] focus:ring-[#003B95] cursor-pointer"
+                    title="Chọn tất cả các dòng trên trang này"
+                  />
+                </th>
                 <th
-                  style={{ width: colWidths.stt, minWidth: colWidths.stt, maxWidth: colWidths.stt }}
-                  className="sticky left-0 z-20 bg-secondary px-3 py-3 text-center text-xs font-bold border-b border-border whitespace-nowrap relative group/th"
+                  style={{ width: colWidths.stt, minWidth: colWidths.stt, maxWidth: colWidths.stt, left: 40 }}
+                  className="sticky z-20 bg-secondary px-3 py-3 text-center text-xs font-bold border-b border-border whitespace-nowrap relative group/th"
                 >
                   STT
                   <div
@@ -925,7 +876,7 @@ function RegPage() {
                   />
                 </th>
                 <th
-                  style={{ width: colWidths.code, minWidth: colWidths.code, maxWidth: colWidths.code, left: colWidths.stt }}
+                  style={{ width: colWidths.code, minWidth: colWidths.code, maxWidth: colWidths.code, left: 40 + colWidths.stt }}
                   className="sticky z-20 bg-secondary px-4 py-3 text-xs font-bold border-b border-border whitespace-nowrap relative group/th"
                 >
                   Mã ĐK
@@ -1012,6 +963,17 @@ function RegPage() {
                     title="Kéo sang trái/phải để co dãn cột"
                   />
                 </th>
+                <th
+                  style={{ width: colWidths.origin, minWidth: colWidths.origin }}
+                  className="px-4 py-3 border-b border-border whitespace-nowrap relative group/th"
+                >
+                  Phân loại trước giờ G
+                  <div
+                    onMouseDown={(e) => handleMouseDownResize("origin", e)}
+                    className="absolute right-0 top-0 bottom-0 w-2 cursor-col-resize hover:bg-primary/50 active:bg-primary z-30 transition-colors"
+                    title="Kéo sang trái/phải để co dãn cột"
+                  />
+                </th>
                 {dynamicColumns.map((col) => (
                   <th
                     key={col}
@@ -1048,14 +1010,29 @@ function RegPage() {
 
                 return (
                   <tr key={r.id} className="group border-b border-border/50 transition hover:bg-secondary/40">
+                    <td className="sticky left-0 z-20 bg-card px-2.5 py-3 text-center border-b border-border/50 group-hover:bg-muted w-10">
+                      <input
+                        type="checkbox"
+                        checked={selectedRegIds.has(r.id)}
+                        onChange={() => {
+                          setSelectedRegIds((prev) => {
+                            const next = new Set(prev);
+                            if (next.has(r.id)) next.delete(r.id);
+                            else next.add(r.id);
+                            return next;
+                          });
+                        }}
+                        className="rounded border-slate-300 text-[#003B95] focus:ring-[#003B95] cursor-pointer"
+                      />
+                    </td>
                     <td
-                      style={{ width: colWidths.stt, minWidth: colWidths.stt, maxWidth: colWidths.stt }}
-                      className="sticky left-0 z-10 bg-card px-3 py-3 text-center font-mono text-xs font-semibold text-muted-foreground group-hover:bg-muted border-b border-border/50 whitespace-nowrap"
+                      style={{ width: colWidths.stt, minWidth: colWidths.stt, maxWidth: colWidths.stt, left: 40 }}
+                      className="sticky z-10 bg-card px-3 py-3 text-center font-mono text-xs font-semibold text-muted-foreground group-hover:bg-muted border-b border-border/50 whitespace-nowrap"
                     >
                       {(tc.page - 1) * tc.pageSize + idx + 1}
                     </td>
                     <td
-                      style={{ width: colWidths.code, minWidth: colWidths.code, maxWidth: colWidths.code, left: colWidths.stt }}
+                      style={{ width: colWidths.code, minWidth: colWidths.code, maxWidth: colWidths.code, left: 40 + colWidths.stt }}
                       className="sticky z-10 bg-card px-4 py-3 font-mono text-[12px] font-bold text-primary group-hover:bg-muted border-b border-border/50 whitespace-nowrap"
                     >
                       {r.id}
@@ -1158,21 +1135,26 @@ function RegPage() {
                       </span>
                     </td>
 
-                    {/* Thanh toán & Phí */}
+                    {/* Thanh toán & Phí (Inline Toggle) */}
                     <td
                       style={{ width: colWidths.payment, minWidth: colWidths.payment }}
                       className="px-4 py-3 border-b border-border/50 whitespace-nowrap"
                     >
                       <div className="flex flex-col gap-1">
                         <div className="flex items-center gap-1.5">
-                          <span
-                            className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-bold ${isPaid
-                              ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400"
-                              : "bg-amber-500/15 text-amber-700 dark:text-amber-400"
+                          <button
+                            type="button"
+                            onClick={() => handleTogglePaymentStatus(r.id, r.paymentStatus)}
+                            className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-bold cursor-pointer transition hover:opacity-80 active:scale-95 ${isPaid
+                              ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30"
+                              : "bg-amber-500/15 text-amber-700 dark:text-amber-400 border border-amber-500/30"
                               }`}
+                            title="Click để chuyển đổi trực tiếp trạng thái thanh toán trên hàng này"
                           >
-                            {isPaid ? "Đã nộp" : "Chờ thanh toán"}
-                          </span>
+                            <span className="w-1.5 h-1.5 rounded-full bg-current" />
+                            <span>{isPaid ? "Đã nộp" : "Chờ thanh toán"}</span>
+                            <span className="text-[9px] opacity-70 underline ml-0.5">(Đổi)</span>
+                          </button>
                           <span className="text-xs font-semibold text-foreground">
                             {fmt.money(r.paymentAmount || 500000)}
                           </span>
@@ -1222,6 +1204,24 @@ function RegPage() {
                       <Pill color={isPaid ? "success" : isCancelled ? "danger" : "warning"}>
                         {isCancelled ? "Đã hủy" : isPaid ? "Hợp lệ" : "Chờ phí"}
                       </Pill>
+                    </td>
+
+                    {/* Cột Phân loại trước giờ G */}
+                    <td
+                      style={{ width: colWidths.origin, minWidth: colWidths.origin }}
+                      className="px-4 py-3 border-b border-border/50 whitespace-nowrap"
+                    >
+                      {r.isWalkIn || r.registrationOrigin === "walkin_unannounced" || r.registrationOrigin === "walkin_at_door" || (r.note && r.note.includes("trước giờ G")) ? (
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30">
+                          <AlertCircle className="h-3.5 w-3.5 text-amber-500 shrink-0" />
+                          <span>Không trong DS trước giờ G</span>
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30">
+                          <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500 shrink-0" />
+                          <span>Đăng ký trước giờ G</span>
+                        </span>
+                      )}
                     </td>
 
                     {/* Cột Dữ Liệu Tự Động Thêm Từ File Import */}
@@ -1612,252 +1612,7 @@ function RegPage() {
         </div>
       )}
 
-      {/* Add Attendee & QR Check-in Modal */}
-      {addAttendeeModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-150">
-          <div className="relative w-full max-w-lg rounded-2xl border border-border bg-card p-6 shadow-2xl space-y-5">
-            <div className="flex items-center justify-between border-b border-border pb-3">
-              <div className="flex items-center gap-2 text-amber-500 font-bold">
-                <QrCode className="h-5 w-5" />
-                <h3 className="text-base font-bold text-foreground">
-                  Thêm Người & Điểm Danh Sự Kiện (QR Code)
-                </h3>
-              </div>
-              <button
-                onClick={() => setAddAttendeeModalOpen(false)}
-                className="rounded-lg p-1 text-muted-foreground hover:bg-secondary"
-              >
-                <X className="h-4 w-4" />
-              </button>
-            </div>
-
-            {/* Mode Tabs */}
-            <div className="grid grid-cols-2 rounded-xl bg-muted p-1 text-xs font-semibold">
-              <button
-                type="button"
-                onClick={() => setAttendeeMode("qr")}
-                className={`py-2 rounded-lg transition ${attendeeMode === "qr"
-                  ? "bg-card text-foreground shadow-sm font-bold"
-                  : "text-muted-foreground hover:text-foreground"
-                  }`}
-              >
-                Quét QR / Điểm danh nhanh
-              </button>
-              <button
-                type="button"
-                onClick={() => setAttendeeMode("manual")}
-                className={`py-2 rounded-lg transition ${attendeeMode === "manual"
-                  ? "bg-card text-foreground shadow-sm font-bold"
-                  : "text-muted-foreground hover:text-foreground"
-                  }`}
-              >
-                Thêm thông tin người mới
-              </button>
-            </div>
-
-            {attendeeMode === "qr" ? (
-              <div className="space-y-4">
-                <div className="rounded-xl bg-amber-500/10 border border-amber-500/20 p-4 text-center">
-                  <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-amber-500/20 text-amber-600 mb-2">
-                    <QrCode className="h-8 w-8 animate-pulse" />
-                  </div>
-                  <p className="text-sm font-bold text-foreground">Quét mã QR từ Thẻ Học viên / Vé điện tử</p>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Hướng camera máy quét vào mã QR hoặc nhập trực tiếp mã đại biểu/số điện thoại bên dưới.
-                  </p>
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-xs font-semibold text-foreground">
-                    Mã QR / Mã Học viên / Email / Tên đại biểu:
-                  </label>
-                  <div className="flex gap-2">
-                    <input
-                      type="text"
-                      autoFocus
-                      value={qrCodeInput}
-                      onChange={(e) => setQrCodeInput(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter") {
-                          e.preventDefault();
-                          handleProcessQrCode();
-                        }
-                      }}
-                      placeholder="VD: HN10-MB-001 hoặc nhập tên..."
-                      className="h-10 flex-1 rounded-xl border border-border bg-background px-3 text-sm focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20"
-                    />
-                    <button
-                      type="button"
-                      disabled={submitting}
-                      onClick={() => handleProcessQrCode()}
-                      className="inline-flex items-center gap-1.5 rounded-xl bg-[#003B95] hover:bg-[#002B70] px-4 py-2 text-sm font-semibold text-white shadow-sm transition disabled:opacity-50"
-                    >
-                      {submitting ? "Đang xử lý..." : "Điểm danh"}
-                    </button>
-                  </div>
-                </div>
-
-                {/* Quick suggestions from existing list */}
-                <div className="pt-2">
-                  <span className="text-[11px] font-semibold text-muted-foreground block mb-2">
-                    Chọn nhanh người tham gia để điểm danh:
-                  </span>
-                  <div className="flex flex-wrap gap-1.5 max-h-32 overflow-y-auto pr-1">
-                    {REGISTRATIONS.slice(0, 8).map((r) => (
-                      <button
-                        key={r.id}
-                        type="button"
-                        onClick={() => handleProcessQrCode(r.memberCode || r.id)}
-                        className="inline-flex items-center gap-1 rounded-lg border border-border bg-secondary/50 px-2 py-1 text-[11px] text-foreground hover:bg-amber-500/10 hover:border-amber-500/30 transition"
-                      >
-                        <CheckCircle2 className="h-3 w-3 text-amber-500" />
-                        <span>{r.memberName}</span>
-                        <span className="text-muted-foreground font-mono">({r.memberCode})</span>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <form onSubmit={handleSubmitNewAttendee} className="space-y-3.5 text-xs">
-                <div>
-                  <label className="font-semibold text-foreground block mb-1">Thuộc Sự kiện:</label>
-                  <select
-                    value={newAttendee.eventId}
-                    onChange={(e) => setNewAttendee({ ...newAttendee, eventId: e.target.value })}
-                    className="h-9 w-full rounded-xl border border-border bg-background px-3 text-xs focus:border-amber-500 focus:outline-none"
-                  >
-                    {EVENTS.map((ev) => (
-                      <option key={ev.id} value={ev.id}>
-                        {ev.name} ({ev.date})
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="font-semibold text-foreground block mb-1">
-                      Họ và tên đại biểu <span className="text-destructive">*</span>:
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      value={newAttendee.memberName}
-                      onChange={(e) => setNewAttendee({ ...newAttendee, memberName: e.target.value })}
-                      placeholder="Nguyễn Văn A"
-                      className="h-9 w-full rounded-xl border border-border bg-background px-3 text-xs focus:border-amber-500 focus:outline-none"
-                    />
-                  </div>
-                  <div>
-                    <label className="font-semibold text-foreground block mb-1">Mã Học viên:</label>
-                    <input
-                      type="text"
-                      value={newAttendee.memberCode}
-                      onChange={(e) => setNewAttendee({ ...newAttendee, memberCode: e.target.value })}
-                      placeholder="HN10-MB-..."
-                      className="h-9 w-full rounded-xl border border-border bg-background px-3 text-xs focus:border-amber-500 focus:outline-none"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="font-semibold text-foreground block mb-1">Số điện thoại:</label>
-                    <input
-                      type="tel"
-                      value={newAttendee.phone}
-                      onChange={(e) => setNewAttendee({ ...newAttendee, phone: e.target.value })}
-                      placeholder="0912 345 678"
-                      className="h-9 w-full rounded-xl border border-border bg-background px-3 text-xs focus:border-amber-500 focus:outline-none"
-                    />
-                  </div>
-                  <div>
-                    <label className="font-semibold text-foreground block mb-1">Email:</label>
-                    <input
-                      type="email"
-                      value={newAttendee.email}
-                      onChange={(e) => setNewAttendee({ ...newAttendee, email: e.target.value })}
-                      placeholder="ceo@company.com"
-                      className="h-9 w-full rounded-xl border border-border bg-background px-3 text-xs focus:border-amber-500 focus:outline-none"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="font-semibold text-foreground block mb-1">Doanh nghiệp / Công ty:</label>
-                  <input
-                    type="text"
-                    value={newAttendee.company}
-                    onChange={(e) => setNewAttendee({ ...newAttendee, company: e.target.value })}
-                    placeholder="Tập đoàn Alpha / Công ty Cổ phần..."
-                    className="h-9 w-full rounded-xl border border-border bg-background px-3 text-xs focus:border-amber-500 focus:outline-none"
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="font-semibold text-foreground block mb-1">Hạng vé:</label>
-                    <select
-                      value={newAttendee.ticketType}
-                      onChange={(e) => setNewAttendee({ ...newAttendee, ticketType: e.target.value })}
-                      className="h-9 w-full rounded-xl border border-border bg-background px-3 text-xs focus:border-amber-500 focus:outline-none"
-                    >
-                      <option value="VIP">Hạng VIP Đặc Biệt</option>
-                      <option value="Tiêu chuẩn">Hạng Tiêu Chuẩn</option>
-                      <option value="Khách mời">Khách Mời Danh Dự</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="font-semibold text-foreground block mb-1">Xếp chỗ ngồi / Bàn tiệc:</label>
-                    <input
-                      type="text"
-                      value={newAttendee.seatAssignment}
-                      onChange={(e) => setNewAttendee({ ...newAttendee, seatAssignment: e.target.value })}
-                      placeholder="Bàn VIP 01 - Ghế 05"
-                      className="h-9 w-full rounded-xl border border-border bg-background px-3 text-xs focus:border-amber-500 focus:outline-none"
-                    />
-                  </div>
-                </div>
-
-                <div className="flex items-center justify-between rounded-xl bg-muted/60 p-3">
-                  <label className="flex items-center gap-2 cursor-pointer font-medium text-foreground">
-                    <input
-                      type="checkbox"
-                      checked={newAttendee.checkedIn}
-                      onChange={(e) => setNewAttendee({ ...newAttendee, checkedIn: e.target.checked })}
-                      className="rounded border-border text-amber-500 focus:ring-amber-500"
-                    />
-                    <span>Xác nhận đã có mặt tại sự kiện (Check-in ngay)</span>
-                  </label>
-                  <span className="text-[11px] font-bold text-amber-600 bg-amber-500/10 px-2 py-0.5 rounded">
-                    {newAttendee.paymentStatus === "paid" ? "Đã thu phí" : "Chưa thu"}
-                  </span>
-                </div>
-
-                <div className="flex justify-end gap-2 pt-3 border-t border-border">
-                  <button
-                    type="button"
-                    onClick={() => setAddAttendeeModalOpen(false)}
-                    className="rounded-xl border border-border bg-card px-4 py-2 font-semibold text-foreground hover:bg-muted"
-                  >
-                    Hủy
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={submitting}
-                    className="rounded-xl bg-[#003B95] hover:bg-[#002B70] px-5 py-2 font-semibold text-white shadow-sm transition disabled:opacity-50"
-                  >
-                    {submitting ? "Đang lưu..." : "Xác nhận thêm & Điểm danh"}
-                  </button>
-                </div>
-              </form>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Event Reminder With Poster Modal */}
+      {/* Event Reminder Modal */}
       <EventReminderPosterModal
         open={eventReminderModalOpen}
         initialEventId={eventId !== "all" ? eventId : undefined}
@@ -1865,18 +1620,6 @@ function RegPage() {
         onSuccess={() => {
           fetchLiveRegistrations();
           router.invalidate();
-        }}
-      />
-
-      {/* Event Poster Studio Modal */}
-      <EventPosterStudioModal
-        open={posterStudioOpen}
-        onClose={() => setPosterStudioOpen(false)}
-        event={EVENTS.find((e: any) => String(e.id) === String(eventId)) || EVENTS[0]}
-        onSavePoster={() => router.invalidate()}
-        onBroadcastReminder={() => {
-          setPosterStudioOpen(false);
-          setEventReminderModalOpen(true);
         }}
       />
 

@@ -3,6 +3,7 @@ import {
   Get,
   Post,
   Put,
+  Patch,
   Delete,
   Body,
   Param,
@@ -29,14 +30,24 @@ export class EventsController {
 
   @Get('qr')
   async getQrImage(
+    @Request() req: any,
     @Query('data') data: string,
     @Query('regId') regId: string,
     @Query('size') size: string,
     @Query('eventId') eventId: string,
+    @Query('baseUrl') customBaseUrl: string,
     @Res() res: any,
   ) {
     let rawData = data || regId || 'CEO HN10-EVENT-TICKET';
-    const baseUrl = process.env.APP_URL || 'https://ceohn10.viconnect.vn';
+    const reqOrigin = req?.headers?.origin || req?.headers?.referer;
+    let detectedOrigin = '';
+    if (reqOrigin) {
+      try {
+        const u = new URL(reqOrigin);
+        detectedOrigin = `${u.protocol}//${u.host}`;
+      } catch {}
+    }
+    const baseUrl = customBaseUrl || detectedOrigin || process.env.APP_URL || 'https://ceohn10.viconnect.vn';
     
     // Nếu rawData không phải là một liên kết Web (URL), chuyển đổi thành URL mở Form đăng ký công khai (Public) trên Web
     if (!rawData.startsWith('http://') && !rawData.startsWith('https://')) {
@@ -403,13 +414,29 @@ export class EventsController {
   async performTicketCheckin(
     @Body('ticketCode') ticketCode: string,
     @Body('method') method?: string,
+    @Body('attendedParts') attendedParts?: string[],
   ) {
-    return this.eventsService.performTicketCheckin(ticketCode, method || 'web');
+    return this.eventsService.performTicketCheckin(ticketCode, method || 'web', attendedParts);
   }
 
   @Post('ticket-checkout')
   async performTicketCheckout(@Body('ticketCode') ticketCode: string) {
     return this.eventsService.performTicketCheckout(ticketCode);
+  }
+
+  // ── OFFLINE CHECKIN ENGINE (HỖ TRỢ KHU VỰC MẤT SÓNG / KHÔNG CÓ MẠNG) ─────────
+
+  @Get(':id/offline-dataset')
+  async getEventOfflineDataset(@Param('id') eventId: string) {
+    return this.eventsService.getEventOfflineDataset(eventId);
+  }
+
+  @Post('batch-sync-checkin')
+  async batchSyncCheckin(
+    @Body('eventId') eventId: string,
+    @Body('items') items: Array<{ ticketCode: string; checkedInAt?: string; method?: string; attendedParts?: string[] }>,
+  ) {
+    return this.eventsService.batchSyncCheckin(eventId, items || []);
   }
 
   // ── DYNAMIC EVENT FEE CODES (TÍCH HỢP SEPAY DYNAMIC) ─────────────────────────
@@ -477,5 +504,55 @@ export class EventsController {
   @Get(':id/dynamic-columns')
   async getDynamicColumns(@Param('id') id: string) {
     return this.eventsService.getEventDynamicColumns(id);
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('platform_admin', 'superadmin', 'adm', 'admin', 'bqt', 'btt', 'btk', 'bxt', 'member')
+  @Patch('registrations/:id/payment-status')
+  async updateRegistrationPaymentStatus(
+    @Param('id') id: string,
+    @Body('paymentStatus') paymentStatus: 'paid' | 'unpaid' | 'free',
+  ) {
+    return this.eventsService.updateRegistrationPaymentStatus(id, paymentStatus);
+  }
+
+  @Get(':id/checked-in-candidates')
+  async getCheckedInCandidates(@Param('id') id: string) {
+    return this.eventsService.getCheckedInCandidates(id);
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('platform_admin', 'superadmin', 'adm', 'admin', 'bqt', 'btt', 'btk', 'bxt', 'member')
+  @Post(':id/photos')
+  async addEventPhoto(
+    @Param('id') id: string,
+    @Body() body: { photoUrl: string; caption?: string; uploadedBy?: string; associationId?: string },
+  ) {
+    return this.eventsService.addEventPhoto(id, body);
+  }
+
+  @Get(':id/photos')
+  async getEventPhotos(@Param('id') id: string) {
+    return this.eventsService.getEventPhotos(id);
+  }
+
+  @Post(':id/feedback')
+  async saveEventFeedback(
+    @Param('id') id: string,
+    @Body() body: { memberName: string; memberPhone?: string; memberEmail?: string; rating: number; content: string },
+  ) {
+    return this.eventsService.saveEventFeedback(id, body);
+  }
+
+  @Get(':id/feedback')
+  async getEventFeedback(@Param('id') id: string) {
+    return this.eventsService.getEventFeedback(id);
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('platform_admin', 'superadmin', 'adm', 'admin', 'bqt', 'btt', 'btk', 'bxt', 'member')
+  @Post(':id/send-post-event-recap')
+  async sendPostEventRecap(@Param('id') id: string) {
+    return this.eventsService.sendPostEventRecap(id);
   }
 }

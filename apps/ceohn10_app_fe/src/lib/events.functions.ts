@@ -30,7 +30,16 @@ export type EventItem = {
   capacity: number;
   registered: number;
   status: "upcoming" | "ongoing" | "completed" | "cancelled";
-  type: "forum" | "workshop" | "networking" | "training" | "charity";
+  type:
+    | "khai_giang"
+    | "year_end_party"
+    | "teambuilding"
+    | "be_giang"
+    | "charity"
+    | "forum"
+    | "workshop"
+    | "networking"
+    | "training";
   qrFields: QrField[];
   image?: string | null;
   banner?: string | null;
@@ -61,10 +70,10 @@ export type Registration = {
   memberName: string;
   email: string;
   registeredAt: string;
-  status: "confirmed" | "waitlist" | "cancelled";
+  status: "confirmed" | "waitlist" | "cancelled" | "attended";
   ticketType: string;
   seatAssignment?: string;
-  paymentStatus?: "paid" | "pending" | "cancelled";
+  paymentStatus?: "paid" | "pending" | "cancelled" | "unpaid" | "free";
   paymentMethod?: "transfer" | "bank" | "cash";
   paymentAmount?: number;
   paymentDeadline?: string;
@@ -75,6 +84,10 @@ export type Registration = {
   phone?: string;
   company?: string;
   title?: string;
+  isWalkIn?: boolean;
+  registrationOrigin?: string;
+  note?: string;
+  dynamic_data?: Record<string, any>;
 };
 
 type Row = Record<string, unknown>;
@@ -94,7 +107,7 @@ function mapEvent(r: Row): EventItem {
     capacity: Number(r.capacity ?? 0),
     registered: Number(r.registered ?? 0),
     status: (r.status as EventItem["status"]) || "upcoming",
-    type: (r.type as EventItem["type"]) || "networking",
+    type: (r.type as EventItem["type"]) || "khai_giang",
     qrFields: normalizeQrFields(r.qr_fields || r.qrFields),
     image: ((r.image || r.imageUrl || r.cover_image) as string) ?? null,
     banner: (r.banner as string) ?? null,
@@ -131,9 +144,15 @@ function mapReg(r: Row): Registration {
     seatAssignment: (r.seat_assignment as string) || (r.seatAssignment as string) || "",
     paymentStatus: (r.payment_status as any) || (r.paymentStatus as any) || "pending",
     paymentAmount: Number(r.payment_amount ?? r.paymentAmount ?? 0),
+    checkedInAt: (r.checked_in_at as string) || (r.checkedInAt as string) || null,
+    checkedOutAt: (r.checked_out_at as string) || (r.checkedOutAt as string) || null,
     phone: (r.phone as string) || (r.member_phone as string) || "",
     company: (r.company as string) || (r.member_company as string) || "",
     title: (r.title as string) || (r.member_title as string) || (r.position as string) || "Học viên",
+    isWalkIn: Boolean(r.is_walkin ?? r.isWalkIn ?? false),
+    registrationOrigin: (r.registration_origin as string) || (r.registrationOrigin as string) || "",
+    note: (r.note as string) || "",
+    dynamic_data: (r.dynamic_data as any) || {},
   };
 }
 

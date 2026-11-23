@@ -4899,4 +4899,69 @@ Trân trọng cảm ơn Anh/Chị!`;
       },
     };
   }
+
+  /**
+   * Gửi thư mời và liên kết form đăng ký tới email của ứng viên Học viên mới
+   */
+  async sendRegistrationInvite(adminUserId: string, data: { email: string; name?: string }) {
+    const cleanEmail = (data.email || '').toLowerCase().trim();
+    if (!cleanEmail || !cleanEmail.includes('@')) {
+      throw new BadRequestException('Vui lòng cung cấp địa chỉ email hợp lệ');
+    }
+
+    const appUrl = process.env.APP_URL || process.env.FRONTEND_URL || 'http://localhost:5173';
+    const registerUrl = `${appUrl}/register?email=${encodeURIComponent(cleanEmail)}&ref=invite_${encodeURIComponent(adminUserId)}`;
+
+    const subject = `[CLB CEO HN10 - HanoiBA] Thư Mời Đăng Ký Gia Nhập Hiệp Hội Doanh Nhân`;
+    const recipientName = data.name?.trim() || 'Quý Doanh Nhân';
+    const html = `
+      <div style="font-family: Arial, sans-serif; max-width: 620px; margin: 0 auto; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.06);">
+        <div style="background: linear-gradient(135deg, #001D4A 0%, #003B95 100%); padding: 32px 24px; text-align: center; color: #ffffff;">
+          <div style="display: inline-block; padding: 4px 14px; background: rgba(234, 179, 8, 0.25); border: 1px solid rgba(234, 179, 8, 0.5); border-radius: 9999px; font-size: 11px; font-weight: 800; color: #fde047; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px;">
+            CLB DOANH NHÂN CEO HN10 (HANOIBA)
+          </div>
+          <h1 style="margin: 0; font-size: 21px; font-weight: 900; color: #ffffff; text-transform: uppercase;">THƯ MỜI GIA NHẬP HIỆP HỘI</h1>
+          <p style="margin: 8px 0 0; font-size: 13px; color: #93c5fd;">Kính gửi Quý Doanh Nhân: <strong>${recipientName}</strong></p>
+        </div>
+        <div style="padding: 26px 24px; color: #1e293b; line-height: 1.6; font-size: 14px;">
+          <p>Kính gửi <strong>${recipientName}</strong>,</p>
+          <p>Ban Điều Hành CLB Doanh Nhân CEO HN10 (trực thuộc Hội Doanh Nghiệp Trẻ Hà Nội - HanoiBA) trân trọng gửi tới Anh/Chị thư mời tham gia đăng ký thông tin hội viên của Hiệp hội.</p>
+          <p>Để hoàn tất thủ tục gia nhập và nhận tài khoản định danh chính thức trên App CEO HN10, kính mời Anh/Chị nhấn vào nút đăng ký dưới đây để điền hồ sơ doanh nghiệp:</p>
+          
+          <div style="text-align: center; margin: 28px 0;">
+            <a href="${registerUrl}" style="display: inline-block; background: #003B95; color: #ffffff; font-weight: bold; font-size: 15px; padding: 14px 28px; border-radius: 10px; text-decoration: none; box-shadow: 0 4px 14px rgba(0, 59, 149, 0.35);">
+              👉 Điền Form Đăng Ký Tài Khoản Học Viên
+            </a>
+          </div>
+
+          <p style="font-size: 13px; color: #64748b;">
+            Hoặc sao chép liên kết sau vào trình duyệt:<br/>
+            <a href="${registerUrl}" style="color: #003B95; word-break: break-all;">${registerUrl}</a>
+          </p>
+          
+          <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid #e2e8f0; font-size: 12px; color: #64748b;">
+            <p style="margin: 0;"><strong>Quy trình tiếp nhận:</strong> Sau khi gửi form, Ban Thư Ký & Ban Thành Viên sẽ xét duyệt hồ sơ và gửi thông tin tài khoản đăng nhập kích hoạt về email này.</p>
+            <p style="margin: 6px 0 0;">CLB Doanh Nhân CEO HN10 · Hotline: 0983 1010 10</p>
+          </div>
+        </div>
+      </div>
+    `;
+
+    try {
+      await this.mailService.sendDirectEmail({
+        to: cleanEmail,
+        subject,
+        html,
+        fromName: 'CLB Doanh Nhân CEO HN10',
+      });
+    } catch (mailErr: any) {
+      this.logger.warn(`Lỗi gửi mail thư mời: ${mailErr?.message}`);
+    }
+
+    return {
+      success: true,
+      message: `Đã gửi liên kết form đăng ký tới ${cleanEmail}`,
+      registerUrl,
+    };
+  }
 }

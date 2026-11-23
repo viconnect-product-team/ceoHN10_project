@@ -140,13 +140,24 @@ export class ZaloService implements OnModuleInit, OnModuleDestroy {
   private async checkAndAutoRefreshTokenOnStartup() {
     try {
       const cfg = await this.getOaConfig();
-      const appId = cfg?.appId || process.env.ZALO_APP_ID || '736933908446960497';
-      const secretKey = cfg?.secretKey || process.env.ZALO_APP_SECRET || 'f42YHsjU1Ku9UcK7IxZQ';
-      const refreshToken = cfg?.refreshToken || process.env.ZALO_REFRESH_TOKEN;
+      const appId = cfg?.appId || cfg?.app_id || process.env.ZALO_APP_ID || '';
+      const secretKey = cfg?.secretKey || cfg?.secret_key || process.env.ZALO_APP_SECRET || '';
+      const refreshToken = cfg?.refreshToken || cfg?.refresh_token || process.env.ZALO_REFRESH_TOKEN;
 
-      if (!refreshToken || !appId || !secretKey) {
+      const cleanAppId = String(appId).trim();
+      const cleanSecret = String(secretKey).trim();
+      const cleanRefresh = String(refreshToken).trim();
+
+      const isConfigured =
+        Boolean(cleanAppId && cleanSecret && cleanRefresh) &&
+        !cleanAppId.includes('mock') &&
+        !cleanSecret.includes('mock') &&
+        !cleanRefresh.includes('mock') &&
+        /^\d+$/.test(cleanAppId);
+
+      if (!isConfigured) {
         this.logger.log(
-          '[Zalo Auto-Refresh] Chưa có cấu hình Refresh Token Zalo OA trong CSDL hoặc .env để tự động gia hạn.',
+          '[Zalo Auto-Refresh] Chưa có cấu hình App ID số hợp lệ & Refresh Token Zalo OA thật trong CSDL hoặc .env để tự động gia hạn (Bỏ qua làm mới token).',
         );
         return;
       }
@@ -179,26 +190,51 @@ export class ZaloService implements OnModuleInit, OnModuleDestroy {
   }
 
   /**
-   * Đọc cấu hình Zalo OA từ bảng public.app_settings
+   * Đọc cấu hình Zalo OA từ master_system_settings hoặc app_settings hoặc .env
    */
   async getOaConfig(): Promise<any> {
     const defaultConfig = {
-      appId: process.env.ZALO_APP_ID || '736933908446960497',
-      secretKey: process.env.ZALO_APP_SECRET || 'f42YHsjU1Ku9UcK7IxZQ',
-      oaId: process.env.ZALO_OA_ID || '437444346010531505',
-      oaName: 'CLB Doanh Nhân CEO HN10',
+      appId: process.env.ZALO_APP_ID || '',
+      secretKey: process.env.ZALO_APP_SECRET || '',
+      oaId: process.env.ZALO_OA_ID || '',
+      oaName: process.env.ZALO_OA_NAME || 'CLB Doanh Nhân CEO HN10',
       accessToken: process.env.ZALO_OA_ACCESS_TOKEN || process.env.ZALO_ACCESS_TOKEN || '',
       refreshToken: process.env.ZALO_REFRESH_TOKEN || '',
       autoRefreshActive: true,
       refreshIntervalHours: 4,
+      targetApp: 'all',
       webhookUrl: 'https://crm.ceohn10.viconnect.vn/api/zalo/webhook',
     };
 
     if (!this.prisma) return defaultConfig;
     try {
+      // 1. Ưu tiên đọc từ master_system_settings
+      const masterRow = await this.prisma.$queryRawUnsafe<any[]>(`
+        SELECT setting_value FROM public.master_system_settings WHERE setting_key = 'zalo_oa_integration_config' LIMIT 1
+      `).catch(() => []);
+
+      if (masterRow.length > 0 && masterRow[0]?.setting_value) {
+        const parsed = typeof masterRow[0].setting_value === 'string'
+          ? JSON.parse(masterRow[0].setting_value)
+          : masterRow[0].setting_value;
+        return {
+          ...defaultConfig,
+          appId: parsed.app_id || parsed.appId || defaultConfig.appId,
+          secretKey: parsed.secret_key || parsed.secretKey || defaultConfig.secretKey,
+          oaId: parsed.oa_id || parsed.oaId || defaultConfig.oaId,
+          oaName: parsed.oa_name || parsed.oaName || defaultConfig.oaName,
+          accessToken: parsed.access_token || parsed.accessToken || defaultConfig.accessToken,
+          refreshToken: parsed.refresh_token || parsed.refreshToken || defaultConfig.refreshToken,
+          webhookUrl: parsed.webhook_url || parsed.webhookUrl || defaultConfig.webhookUrl,
+          targetApp: parsed.target_app || parsed.targetApp || 'all',
+          autoRefreshActive: true,
+        };
+      }
+
+      // 2. Fallback sang app_settings (zalo_oa_config)
       const row = await this.prisma.$queryRawUnsafe<any[]>(`
         SELECT value FROM public.app_settings WHERE key = 'zalo_oa_config' LIMIT 1
-      `);
+      `).catch(() => []);
       if (row.length > 0 && row[0]?.value) {
         const parsed = typeof row[0].value === 'string'
           ? JSON.parse(row[0].value)
@@ -208,6 +244,7 @@ export class ZaloService implements OnModuleInit, OnModuleDestroy {
           ...parsed,
           accessToken: parsed.accessToken || defaultConfig.accessToken,
           refreshToken: parsed.refreshToken || defaultConfig.refreshToken,
+          targetApp: parsed.target_app || parsed.targetApp || 'all',
           autoRefreshActive: true,
         };
       }
@@ -285,6 +322,10 @@ export class ZaloService implements OnModuleInit, OnModuleDestroy {
           typeof config.oaId === 'string' && config.oaId.trim()
             ? config.oaId.trim()
             : current.oaId,
+        targetApp:
+          typeof config.targetApp === 'string' && config.targetApp.trim()
+            ? config.targetApp.trim()
+            : (current.targetApp || 'all'),
       };
 
       const persistedConfig = { ...mergedConfig };
@@ -300,6 +341,14 @@ export class ZaloService implements OnModuleInit, OnModuleDestroy {
         JSON.stringify(persistedConfig),
         validUserId,
       );
+
+      // Đồng bộ sang master_system_settings
+      await this.prisma.$executeRawUnsafe(
+        `INSERT INTO public.master_system_settings (id, setting_key, setting_value, updated_at)
+         VALUES (gen_random_uuid(), 'zalo_oa_integration_config', $1::jsonb, NOW())
+         ON CONFLICT (setting_key) DO UPDATE SET setting_value = EXCLUDED.setting_value, updated_at = NOW()`,
+        JSON.stringify(persistedConfig),
+      ).catch(() => {});
       return {
         ok: true,
         message: 'Đã lưu cấu hình Zalo OA vào CSDL thành công',
@@ -329,14 +378,25 @@ export class ZaloService implements OnModuleInit, OnModuleDestroy {
         '[Zalo Auto-Refresh 6h] Bắt đầu kiểm tra và làm mới token Zalo OA...',
       );
       const cfg = await this.getOaConfig();
-      if (!cfg || !cfg.refreshToken || !cfg.appId || !cfg.secretKey) {
-        this.logger.warn(
-          '[Zalo Auto-Refresh 6h] Bỏ qua: Chưa cấu hình đủ appId, secretKey hoặc refreshToken trong CSDL',
+      const appId = String(cfg?.appId || '').trim();
+      const secretKey = String(cfg?.secretKey || '').trim();
+      const refreshToken = String(cfg?.refreshToken || '').trim();
+
+      const isConfigured =
+        Boolean(appId && secretKey && refreshToken) &&
+        !appId.includes('mock') &&
+        !secretKey.includes('mock') &&
+        !refreshToken.includes('mock') &&
+        /^\d+$/.test(appId);
+
+      if (!isConfigured) {
+        this.logger.log(
+          '[Zalo Auto-Refresh 6h] Bỏ qua: Chưa có App ID số hợp lệ và Refresh Token thật từ Zalo Developers.',
         );
         return {
           ok: false,
           message:
-            'Chưa cấu hình đủ thông tin Zalo OA (AppId, SecretKey, RefreshToken) trong CSDL',
+            'Chưa cấu hình thông số Zalo OA hợp lệ (AppId phải là số hợp lệ từ Zalo Developers)',
         };
       }
 
@@ -1490,31 +1550,18 @@ export class ZaloService implements OnModuleInit, OnModuleDestroy {
     }
 
     if (recipients.length === 0) {
-      recipients = [
-        {
-          phone: '0973924819',
-          name: 'Phạm Văn Vũ',
-          memberCode: 'CEO HN10-001',
-          company: 'ViConnect Tech',
-          feeAmount: 10000000,
-        },
-        {
-          phone: '0973205683',
-          name: 'Lê Thị Thùy Dung',
-          memberCode: 'CEO HN10-002',
-          company: 'Phó Chánh VP CEO HN10',
-          feeAmount: 10000000,
-        },
-      ];
+      return {
+        success: true,
+        count: 0,
+        message: 'Không có hội viên nào cần gửi thông báo nhắc phí qua Zalo OA',
+      };
     }
 
     const template =
       dto.messageTemplate ||
       `📢 [CLB DOANH NHÂN CEO HN10 - THÔNG BÁO TỰ ĐỘNG ĐỊNH KỲ]
 Kính gửi Học viên: {ho_ten} ({ma_hoi_vien}) - {ten_doanh_nghiep}
-Hệ thống tự động thông báo kỳ hoàn tất hội phí niên liễm thường niên 2026.
-💰 Số tiền: 10.000.000 VNĐ.
-🏦 MB Bank: 1010000000 - CLB DOANH NHAN CEO HN10
+Hệ thống tự động thông báo kỳ hoàn tất hội phí niên liễm thường niên.
 Trân trọng cảm ơn Anh/Chị!`;
 
     return this.sendBulkMessages({
@@ -2017,10 +2064,10 @@ Trân trọng cảm ơn Anh/Chị!`;
    */
   async getMiniAppConfig() {
     const DEFAULT_CONFIG = {
-      appId: '241837190038472910',
-      secretKey: 'zmp_secret_ceohn10_secure',
+      appId: process.env.ZALO_MINIAPP_APP_ID || '',
+      secretKey: process.env.ZALO_MINIAPP_SECRET || '',
       appName: 'CLB Doanh Nhân CEO HN10 - HanoiBA',
-      linkedOaId: '437444346010531505',
+      linkedOaId: process.env.ZALO_OA_ID || '',
       headerTitle: 'CEO HN10',
       primaryColor: '#003B95',
       environment: 'production',

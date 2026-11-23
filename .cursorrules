@@ -1,6 +1,137 @@
 # ==============================================================================
 # BỘ LUẬT DỰ ÁN (PROJECT RULES & AI CODEGEN STANDARDS) - CEO HN10 PROJECT
 # Vai trò: Tech Lead | Định dạng: .cursorrules
+# 23/11/2026 (v12.62) — PHẢN ÁNH SỰ KIỆN CỤ THỂ, LƯU ẢNH VÀO FOLDER TÀI LIỆU, THƯ MỜI & CHECK-IN THEME SÁNG, KHÁCH MỚI GỬI MAIL VIETQR, TEST PASS 3 ĐÍCH DANH 3 EMAIL, FIX 968 LỖI DIST-MODULES & DEPLOY STAGING:
+#   * [PHẢN ÁNH THEO SỰ KIỆN CỤ THỂ (/feedback)]:
+#     - Bảng `event_feedback`: lưu `event_id`, hiển thị tên sự kiện cụ thể; bộ lọc dropdown chọn sự kiện trên CRM.
+#   * [TẢI ẢNH SỰ KIỆN LƯU VÀO FOLDER TÀI LIỆU (/documents)]:
+#     - Tự động tạo và lưu ảnh vào thư mục `📁 Sự kiện: [Tên sự kiện]` trong bảng `public.documents`.
+#   * [THƯ MỜI ĐA KÊNH THEME SÁNG, NHẬP NHIỀU EMAIL & GỌI ZALO OA]:
+#     - Chuẩn Theme Sáng; cho phép dán nhiều email; gọi API `/zalo/subscribers` lấy danh sách người quan tâm Zalo OA.
+#   * [CỔNG CHECK-IN THEME SÁNG, HEADER TÊN SỰ KIỆN & KHÁCH MỚI]:
+#     - Theme Sáng; header hiển thị rõ tên sự kiện; khách mới có phí có tùy chọn gửi mail kèm VietQR + ghi chú tự động check-in khi nhận thanh toán.
+#   * [LOẠI BỎ 968 LỖI DIST-MODULES]:
+#     - Exclude `dist-modules` khỏi `tsconfig.json` và `.vscode/settings.json`.
+#   * [CẤU HÌNH DEPLOY STAGING]:
+#     - Tạo `deploy/deploy-staging.ps1` tích hợp chạy subdomain staging `staging.ceohn10.viconnect.vn` với CSDL test riêng cổng 5433.
+#   * [TUÂN THỦ CƠ SỞ DỮ LIỆU & TYPE CHECK]: 0 errors trên cả FE và BE. Tuyệt đối không git push/commit.
+# 23/11/2026 (v12.61) — TEST PASS 2 LUỒNG SỰ KIỆN TOÀN DIỆN TRÊN LOCALHOST, IMPORT FILE EXCEL 2 EMAIL ĐÍCH DANH, KHÔI PHỤC PHẢN HỒI GÓP Ý TRÊN SIDEBAR & XÓA BỎ HOÀN TOÀN DROPDOWN HỆ THỐNG QUẢN TRỊ / DỰ ÁN VBA:
+#   * [KHÔI PHỤC "PHẢN HỒI & GÓP Ý" TRÊN SIDEBAR]:
+#     - Bổ sung `/feedback` vào mảng `crmEvents` trên Sidebar.tsx và cập nhật đồng bộ vào Ma trận Phân quyền RBAC (`rbac-permission-helpers.ts`).
+#   * [XÓA BỎ DROPDOWN HỆ THỐNG QUẢN TRỊ & DỰ ÁN VBA]:
+#     - Xóa hoàn toàn khối dropdown "Hệ Thống Quản Trị:" trên Sidebar.tsx; xóa vba khỏi `SYSTEM_TENANTS`.
+#   * [TEST PASS 2 TOÀN DIỆN CÁC LUỒNG SỰ KIỆN LOCALHOST]:
+#     - Import file Excel: Đại biểu đã thanh toán (vumikasa6@gmail.com) -> Cấp vé điện tử thành công kèm QR; Đại biểu chưa thanh toán (vupv090120@gmail.com) -> Thông báo thanh toán nhận vé kèm VietQR. Sự kiện miễn phí -> Tất cả trả vé.
+#     - Check-in đại biểu hợp lệ: Cập nhật trạng thái sang "Đã check-in" trên Quản lý đăng ký sự kiện.
+#     - Khách mới không có trong danh sách đến sự kiện miễn phí: Check-in LUÔN PASS, tự sinh cột/nhãn "Khách tham gia không nằm trong danh sách đăng ký trước giờ G".
+#     - Đầy đủ luồng: Vòng quay may mắn (/lucky-draw), Biểu quyết & Bầu cử (/voting), Phản hồi sau sự kiện (/feedback), Báo cáo tài chính (/finance-report).
+# 22/11/2026 (v12.58) — ĐỔI 5 MẪU SỰ KIỆN (KHAI GIẢNG, YEAR END PARTY, TEAMBUILDING, BẾ GIẢNG, THIỆN NGUYỆN) & BỎ HOÀN TOÀN GÓI TÀI TRỢ Ở NHÀ TÀI TRỢ:
+#   * [5 MẪU SỰ KIỆN CHUẨN HÓA CLB CEO HN10 (EVENT WIZARD)]:
+#     - Khai giảng (`khai_giang`): "LỄ KHAI GIẢNG LỚP DOANH TRÍ CEO HN10: HÀNH TRÌNH TRI THỨC & GIAO THƯƠNG" - NCC Hà Nội, 150 người.
+#     - Year End Party (`year_end_party`): "DẠ TIỆC TẤT NIÊN YEAR END PARTY 2026: ĐÊM HỘI GẮN KẾT & VINH DANH DOANH NHÂN" - Landmark72, 200 người.
+#     - Teambuilding (`teambuilding`): "CHƯƠNG TRÌNH TEAMBUILDING CEO HN10: VƯỢT THỬ THÁCH - BỨT PHÁ GIỚI HẠN" - Flamingo Đại Lải, 120 người.
+#     - Bế giảng (`be_giang`): "LỄ BẾ GIẢNG KHÓA HỌC & GALA TRAO BẰNG TỐT NGHIỆP CEO HN10" - Daewoo Hà Nội, 200 người.
+#     - Thiện nguyện (`charity`): "HÀNH TRÌNH TƯƠNG THÂN TƯƠNG ÁI: ĐOÀN KẾT VÌ CỘNG ĐỒNG - CEO HN10" - Điểm trường vùng cao / Trung tâm bảo trợ, 100 người.
+#   * [BỎ HOÀN TOÀN GÓI TÀI TRỢ Ở NHÀ TÀI TRỢ (EVENT SPONSOR SELECTOR)]:
+#     - Gỡ bỏ toàn bộ khái niệm "Gói tài trợ" (Diamond, Gold, Silver, Bronze package bundles, dropdown "Đổi gói", package switcher) khỏi popup tạo sự kiện và chi tiết sự kiện.
+#     - Tinh giản giao diện `EventSponsorPackageSelector.tsx` và `EventWizard.tsx`: Chuyển tiêu đề thành "Nhà tài trợ đồng hành".
+#     - Nhà tài trợ đồng hành hiển thị trực quan thông tin doanh nghiệp, đại diện liên hệ, hình thức tài trợ (Chuyển khoản / Tiền mặt / Hiện vật) và giá trị tài trợ (VNĐ hoặc mô tả hiện vật) có thể chỉnh sửa trực tiếp.
+# 22/11/2026 (v12.57) — QUY CHUẨN 7 VAI TRÒ RBAC CHÍNH THỨC, TINH GIẢN THÔNG BÁO TẢI ẢNH MINIO, LUỒNG TẠO & KÍCH HOẠT TÀI KHOẢN HỌC VIÊN QUA EMAIL, THÊM CỘT ĐỘNG BÁO CÁO TÀI CHÍNH LƯU DATABASE & KHẮC PHỤC TRIỆT ĐỂ LOẠN KẾT NỐI CSDL:
+#   * [DANH SÁCH 7 VAI TRÒ RBAC CHÍNH THỨC (LOẠI BỎ TOÀN BỘ HARDCODE)]:
+#     - 7 vai trò chuẩn hóa duy nhất:
+#       1. `lop_truong`: Lớp trưởng CEO HN10.
+#       2. `admin_platform`: Quản trị viên nền tảng tối cao.
+#       3. `admin`: Quản trị viên CRM & CSDL.
+#       4. `lop_pho`: Lớp phó điều hành.
+#       5. `truong_team`: Trưởng team học viên.
+#       6. `pho_team`: Phó team học viên.
+#       7. `truong_ban_chuyen_trach`: Toàn bộ các Trưởng ban chuyên trách (Đào tạo, Sự kiện, Tài chính, Truyền thông, B2B...).
+#       + `member`: Học viên chính thức.
+#     - Mọi vai trò cũ (chu_tich, pho_chu_tich, truong_ban_xxx) được chuẩn hóa tự động sang 7 vai trò trên.
+#   * [TINH GIẢN GIAO DIỆN THÔNG BÁO & TẢI ẢNH MINIO (/notifications)]:
+#     - Giao diện CRUD tạo form thông báo chuẩn; nút áp dụng nhanh vào Sự kiện hoặc Lớp học.
+#     - Nút "+ Thêm trường tải ảnh": Hiển thị ngay trường tải ảnh lên giao diện, nạp trực tiếp lên MinIO (/notifications) và render xem trước format thông báo.
+#   * [LUỒNG TẠO & KÍCH HOẠT TÀI KHOẢN HỌC VIÊN QUA EMAIL]:
+#     - Gửi link form đăng ký (/register?email=...) vào email học viên mới.
+#     - Học viên nộp thông tin -> Admin duyệt trên CRM -> Trả thông tin tài khoản qua email.
+#     - Đăng nhập lần đầu vào App CEO HN10 bắt buộc đổi mật khẩu -> Đổi xong phải đăng nhập lại mới chính thức kích hoạt tài khoản.
+#   * [GỠ BỎ "THÔNG BÁO MARKETING" TRÊN SIDEBAR]:
+#     - Chỉ giữ lại "Thông báo qua Zalo OA/ZBS" và "Thông báo đến email".
+#   * [KHẮC PHỤC TRIỆT ĐỂ LOẠN KẾT NỐI CSDL (RULE 0)]:
+#     - Khóa cứng chuỗi kết nối chuẩn 113.20.107.184:6432/ceohn10_project trong .env.local và PrismaService.
+#     - Gỡ bỏ probe host nội bộ trong main.ts; xóa sạch fake mock fallbacks trong members-data.ts, members.functions.ts, dashboard.functions.ts.
+#   * [BÁO CÁO TÀI CHÍNH - THÊM CỘT ĐỘNG LƯU DATABASE]:
+#     - Nút "+ Thêm column (Lưu DB)" trên PageHeader tự động lưu vào financial_report_columns và thực thi DDL ALTER TABLE financial_report_rows ADD COLUMN IF NOT EXISTS.
+# 22/11/2026 (v12.52) — TÁCH BIỆT PHÂN QUYỀN VÀO PLATFORM CRM (/master), HIỂN THỊ NỔI BẬT QUẢN LÝ LỚP HỌC TRÊN SIDEBAR CRM THƯỜNG, CHUẨN HÓA SỔ CÁI DÒNG TIỀN & BẢNG CÂN ĐỐI QUỸ CÁC BAN KÈM LIVE SCREENSHOTS:
+#   * [PHÂN QUYỀN RBAC & TÀI KHOẢN ĐỘC QUYỀN TRÊN PLATFORM CRM (/master)]:
+#     - Loại bỏ 100% mục "Quản trị người dùng" (/accounts) và "Phân quyền hệ thống" (/permissions) khỏi thanh Sidebar CRM thường.
+#     - Cổng Platform Master Admin (/master) là nơi duy nhất quản lý tài khoản và phân quyền cho toàn bộ hệ thống nền tảng Viconnect.
+#     - Hỗ trợ cấp tài khoản theo Phạm vi Hệ thống (Tenant Scope: all, ceohn10, ceo1983) và 2 chế độ cấp quyền: Theo Vai Trò (Role) hoặc Tích chọn Granular Permissions Checklist.
+#   * [MA TRẬN PHÂN HỆ MODULE THEO TỪNG HỆ THỐNG (MULTI-TENANT)]:
+#     - Giao diện Ma trận Module (/master?tab=settings&sub=matrix) cho phép bật/tắt module linh hoạt cho từng tổ chức: CLB CEO HN10 bật module Lớp học; CLB CEO 1983 tự động ẩn Lớp học trên thanh Sidebar.
+#   * [PHỤC HỒI NHÓM "QUẢN LÝ LỚP HỌC" TRÊN THANH SIDEBAR CEO HN10]:
+#     - Hiển thị đầy đủ 5 mục cốt lõi: Quản lý lớp & lịch học, Dashboard học viên (đa chỉ số), Quỹ tài chính lớp (20tr & thu/chi), Quản lý giáo viên, Mã QR điểm danh theo buổi.
+#     - Tích hợp bộ chuyển đổi nhanh Hệ Thống Quản Trị (Tenant Switcher) trực tiếp trên Sidebar.
+#   * [CHUẨN HÓA SỔ CÁI DÒNG TIỀN & BẢNG CÂN ĐỐI QUỸ CÁC BAN (/finance-report)]:
+#     - Bảng Cân Đối Quỹ Các Ban Chuyên Môn & Quỹ Lớp (Thu - Chi - Tồn Quỹ): Quỹ Tổng Hiệp Hội, Ban Công Nghệ, Quỹ Lớp CEO HN10 (20tr khởi tạo), Ban Sự Kiện, Ban Thư Ký kèm link tài khoản quỹ & hóa đơn chứng từ.
+#     - Bổ sung cột Số Dư Lũy Kế (Running Balance) sau mỗi giao dịch và cột Ban / Đơn vị phụ trách trên Sổ cái kế toán.
+#   * [TUÂN THỦ CSDL & TYPE CHECK]: CSDL duy nhất 113.20.107.184:6432 (ceohn10_project). Tuyệt đối không git commit / git push. Type check 0 lỗi (Exit code 0 trên cả BE và FE).
+# 22/11/2026 (v12.51) — MODULE LỚP HỌC CEO HN10 TOÀN DIỆN, PHÂN QUYỀN GRANULAR CHECKBOXES CRM PLATFORM, CHECK-IN OFFLINE AUTO-SYNC VÀ GIẢI QUYẾT XUNG ĐỘT, TINH GỌN AI TRỢ LÝ:
+#   * [MODULE LỚP HỌC DOANH TRÍ (/classes)]:
+#     - Quản lý Lớp & Lịch học 30 chuyên đề thực chiến Thứ 7 hàng tuần, giảng viên, phòng học, tài liệu slide, QR điểm danh.
+#     - Quản lý Giảng viên & Chuyên gia đào tạo đầu ngành.
+#     - Dashboard Học viên đa chỉ số (12 cột): Mã HV HN10-xxx, Họ tên, Doanh nghiệp & Ngành nghề, Chức vụ DN, Chức danh trong lớp, SĐT, Email, Chuyên cần %, Dự sự kiện CLB, Quỹ lớp 2tr, Nợ quỹ phạt, Điểm Karma, Trạng thái.
+#     - Quỹ tài chính lớp: CHỈ NHẬN ĐÚNG KHỞI TẠO 20.000.000 VNĐ ĐƯỢC GỬI TỪ QUỸ TỔNG XUỐNG. Sổ cái dòng tiền (Ledger) tổng hợp: Khởi tạo 20tr, Phí phạt vi phạm nội quy, Phí sự kiện lớp, Phí chương trình đào tạo, và các khoản chi lớp học.
+#   * [PHÂN QUYỀN GRANULAR CHECKBOXES TÍCH CHỌN (/accounts)]:
+#     - Hỗ trợ 2 chế độ cấp quyền: Theo Vai trò (Preset) hoặc Tích chọn cụ thể theo 7 nhóm chức năng (Granular Permissions Checklist).
+#     - Kiểm soát truy cập nghiêm ngặt: Người đăng nhập chỉ hiển thị đúng các chức năng đã được cấp quyền, menu Sidebar và điều hướng tự động lọc theo quyền hạn.
+#   * [CHECK-IN OFFLINE PRE-SYNC, AUTO-SYNC & GIẢI QUYẾT XUNG ĐỘT (/event-checkin)]:
+#     - Pre-sync: Nút Tải trước Vé Offline lưu toàn bộ danh sách vé vào LocalStorage trước giờ mở cửa 30-60 phút.
+#     - Quét offline không cần mạng với tốc độ < 0.05s/khách, ghi nhận vào queue.
+#     - Auto-sync ngầm khi có mạng trở lại; backend so sánh mốc thời gian timestamp để ưu tiên máy quét sớm hơn (conflict_resolved_earlier) hoặc cảnh báo quét trùng lặp (conflict_duplicate_warning).
+#   * [TINH GỌN AI TRỢ LÝ (/ai-assistant)]:
+#     - Đã loại bỏ hoàn toàn tab quy trình thủ công và tab báo cáo tài chính, tinh gọn tập trung vào AI Chatbot & Xuất hóa đơn điện tử.
+#   * [TUÂN THỦ CSDL & TYPE CHECK]: CSDL duy nhất 113.20.107.184:6432 (ceohn10_project). Tuyệt đối không git commit / git push. Type check 0 lỗi (Exit code 0 trên cả BE và FE).
+# 22/11/2026 (v12.48) — LOẠI BỎ TRIỆT ĐỂ HARDCODE DỮ LIỆU TỰ ĐIỀN UI & CẤU HÌNH SEPAY/ZALO CỨNG, TÁCH MONOLITH SUB-SERVICES, 3 BẢN DB & 3 BỘ URL CHUẨN UID / TANS API:
+#   * [TRIỆT TIÊU 100% HARDCODE CẤU HÌNH SEPAY & ZALO OA - STRICT NO-MOCK LAW]:
+#     - Xóa bỏ toàn bộ chuỗi hardcode: '198300000000', '1010000000', 'SPY_live...', '429182910284729182', '736933908446960497', 'f42YHsjU1Ku9UcK7IxZQ', '437444346010531505'.
+#     - Cơ chế đọc động 3 tầng (Unified Dynamic Resolution): master_system_settings -> app_settings -> .env -> empty string defaults.
+#     - Master Admin (/master): Xóa bỏ DEFAULT_SEPAY_CONFIG và DEFAULT_ZALO_CONFIG mock. Thay bằng EMPTY_SEPAY_CONFIG và EMPTY_ZALO_CONFIG; các ô input dùng value={sepayFormData.account_number || ""} không ép đè giá trị mock lên người dùng.
+#   * [LOẠI BỎ FAKE FALLBACKS & DỮ LIỆU TỰ ĐIỀN ẢO TRÊN GIAO DIỆN]:
+#     - /guest-event-register/$eventId: Xóa bỏ fake fallback event object (Khách Sạn Daewoo Hà Nội...). Nếu không tìm thấy sự kiện, loader trả về null và hiển thị card thông báo chuẩn mực "Không tìm thấy sự kiện". Thông tin ngân hàng/VietQR lấy 100% động từ sepayConfig của API.
+#     - /guest-event-feedback/$eventId: Xóa bỏ fake event trong loader, hiển thị card thông báo lỗi rõ ràng khi sự kiện không tồn tại.
+#     - /event-checkin: selectedParts và selectedCheckinParts khởi tạo rỗng [], nạp động theo sự kiện thực tế.
+#   * [3 MÔI TRƯỜNG DB & 3 BỘ URL CHUẨN UID / TANS API]:
+#     - Local -> Staging -> Production (.env.local, .env.staging, .env.production).
+#     - Database chuẩn hóa UID (UUIDv4) với DEFAULT gen_random_uuid()::text qua scripts/ensure-uuid-primary-keys.sql.
+#     - Chuẩn Tans API Client (apps/ceohn10_app_fe/src/lib/tans-api.ts) với { success, data, message, meta } và createTansQueryOptions.
+#   * [TÁCH MONOLITH EVENTS SERVICE & BỘ ĐÓNG GÓI MODULE ĐỘC LẬP]:
+#     - Tách nhỏ events.service.ts thành các sub-services độc lập: events-checkin.service.ts, events-media.service.ts, events-feedback.service.ts.
+#     - Bộ đóng gói scripts/export-module.mjs hỗ trợ xuất module độc lập (module-events, module-members, module-finance, module-communications) kèm test data và README.
+#     - Dữ liệu kiểm thử test fixtures tại test-data/events/ (Excel .xlsx, CSV .csv, JSON .json) và hướng dẫn chi tiết test-data/HUONG_DAN_KIEM_THU_TOAN_DIEN.md.
+#   * [TUÂN THỦ CSDL & TYPE CHECK]: CSDL duy nhất 113.20.107.184:6432 (ceohn10_project). Tuyệt đối không git commit / git push. Type check 0 lỗi (Exit code 0 trên cả BE và FE). Build production đạt exit code 0.
+# 22/11/2026 (v12.47) — HOÀN THIỆN TRỌN VẸN 100% VÒNG ĐỜI SỰ KIỆN CEO HN10 (TRƯỚC SỰ KIỆN - TRONG SỰ KIỆN - SAU SỰ KIỆN):
+#   * [TRƯỚC SỰ KIỆN]:
+#     - Tạo và chọn Nhà tài trợ khi tạo/sửa sự kiện (optional), hiển thị trang trọng trên banner/chi tiết.
+#     - Đăng ký đa hình thức & Import file 3 định dạng (Word, Excel, PDF) kèm Dynamic DDL Database tự động ALTER TABLE thêm cột mới.
+#     - CÔ LẬP CỘT ĐỘNG (Data Isolation): Sự kiện nào CHỈ hiển thị cột động của sự kiện đó thông qua /events/:id/dynamic-columns.
+#     - Quản lý trạng thái thanh toán trực tiếp trên từng hàng (inline toggle paid/unpaid); tự động hạch toán Quỹ tài chính CRM (income_records) cập nhật tức thì Dashboard.
+#     - Tự động trả vé E-Ticket qua Email (dispatchSmtpEmail) và Zalo OA (sendAutoNotification).
+#     - Check-in 2 mã riêng biệt: Khách mới (Walk-in, kèm VietQR SePay MBBank 198300000000 nếu có phí, hoặc form rút gọn) vs Khách đã đăng ký (Check-in chính thức kèm nhập mã vé hoặc tải ảnh QR qua @zxing/library).
+#     - Phân loại đối soát trực quan: PRE_REGISTERED (Đã đăng ký trước) vs WALK_IN_NEW (Khách mới tại cửa).
+#     - Tùy chọn phần tham gia sự kiện (attended_parts, VD: Tọa đàm vs Tiệc Gala Dinner) trên cả form đăng ký và form check-in.
+#     - Nút dấu cộng (+) thêm nhiều người tham gia cùng trên cả form đăng ký và form check-in.
+#     - Form Builder (EventFormConfigModal.tsx) cấu hình động các trường biểu mẫu Đăng ký và Check-in.
+#   * [TRONG SỰ KIỆN]:
+#     - Vòng quay may mắn bốc thăm trúng thưởng hình tròn (EventWheelOfFortuneModal.tsx) bằng HTML5 Canvas sinh động, múi màu thương hiệu, viền vàng óng, kim chỉ 12h, hiệu ứng vật lý giảm tốc mượt mà.
+#     - Nguồn dữ liệu bốc thăm 100% từ danh sách ĐÃ CHECK-IN (/events/:id/checked-in-candidates). Có chọn tất cả hoặc chọn nhiều người cụ thể; nút loại bỏ người vừa trúng giải.
+#     - Chụp ảnh trực tiếp & tải ảnh trong sự kiện (EventLivePhotoGalleryModal.tsx): Lưu vào event_photos và tự động đồng bộ vào Tài Liệu CLB, cô lập theo eventId.
+#     - Biểu quyết (/voting): Liên kết sự kiện tự động lấy danh sách đại biểu đã check-in, chọn tất cả hoặc chọn nhiều người tham gia.
+#   * [SAU SỰ KIỆN]:
+#     - Đánh giá & góp ý sau sự kiện qua mã QR (/guest-event-feedback/$eventId): Form nhận xét, sao (1-5), đính kèm tệp/ảnh. Dữ liệu lưu về event_feedback và đồng bộ vào Phản Ánh & Góp Ý (feedbacks) CRM.
+#     - Chế độ "Trình Chiếu LED" tại EventFeedbackModal.tsx phóng to mã QR toàn màn hình để chiếu lên sân khấu/hội trường cho đại biểu quét.
+#     - Xem album ảnh & Gửi thông báo tự động (sendPostEventRecap): Gửi Email và Zalo OA kèm link album ảnh và nút đánh giá cho toàn bộ người đã check-in.
+#   * [TUÂN THỦ CSDL & GIT]: CSDL duy nhất 113.20.107.184:6432 (ceohn10_project). Tuyệt đối không git commit / git push. Type check đạt 0 lỗi (Exit code 0 trên cả BE và FE).
 # 21/11/2026 (v12.46) — NÂNG CẤP LUỒNG SỰ KIỆN IMPORT ĐA ĐỊNH DẠNG (WORD/EXCEL/PDF) KÈM DYNAMIC DDL CỘT CSDL & HẠCH TOÁN QUỸ DOANH THU VÉ, CHECK-IN 2 MÃ RIÊNG BIỆT (TẠI CỬA VS ĐÃ ĐĂNG KÝ KÈM TẢI ẢNH QR), LOẠI BỎ TRIỆT ĐỂ MOMO/VNPAY & CẤU HÌNH SEPAY/ZALO NGOÀI PLATFORM, PHÂN LẬP DATABASE TEST VÀ PRODUCT ĐỘC LẬP:
 #   * [LUỒNG SỰ KIỆN MỚI & IMPORT DANH SÁCH 3 ĐỊNH DẠNG (WORD, EXCEL, PDF)]:
 #     - Hỗ trợ import tệp .docx, .xlsx, .pdf qua EventAttendeesImportModal.tsx và ai-excel-email-parser.ts. Tự động nhận diện trường họ tên, email, SĐT, chức vụ, trạng thái thanh toán (đã thanh toán / chưa thanh toán), và giá vé tham gia.

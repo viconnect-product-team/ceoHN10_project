@@ -26,6 +26,7 @@ import {
   SlidersHorizontal,
   UserPlus,
   ShieldCheck,
+  Mail,
 } from "lucide-react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/dashboard/AppShell";
@@ -371,6 +372,35 @@ function MembersPage() {
   const [favOnly, setFavOnly] = useState(false);
   const [sort, setSort] = useState<"name" | "newest" | "code" | "renewal">("newest");
   const [sel, setSel] = useState<Set<string>>(new Set());
+
+  // State: Gửi thư mời đăng ký Học viên mới qua Email
+  const [showInviteModal, setShowInviteModal] = useState(false);
+  const [inviteEmail, setInviteEmail] = useState("");
+  const [inviteName, setInviteName] = useState("");
+  const [isSendingInvite, setIsSendingInvite] = useState(false);
+
+  const handleSendInvite = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!inviteEmail || !inviteEmail.includes("@")) {
+      toast.error("Vui lòng nhập địa chỉ email hợp lệ!");
+      return;
+    }
+    setIsSendingInvite(true);
+    try {
+      const res = await fetchNestApi<any>("/members/send-registration-invite", {
+        method: "POST",
+        body: JSON.stringify({ email: inviteEmail, name: inviteName }),
+      });
+      toast.success(res?.message || `Đã gửi liên kết form đăng ký tới ${inviteEmail}!`);
+      setShowInviteModal(false);
+      setInviteEmail("");
+      setInviteName("");
+    } catch (err: any) {
+      toast.error(err?.message || "Lỗi gửi thư mời đăng ký");
+    } finally {
+      setIsSendingInvite(false);
+    }
+  };
 
   const paidCount = useMemo(() => {
     return members.filter((m) => {
@@ -967,6 +997,15 @@ function MembersPage() {
           </div>
 
           <PermissionGuard action="MEM_ADD">
+            <button
+              type="button"
+              onClick={() => setShowInviteModal(true)}
+              className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-blue-700 to-indigo-700 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:from-blue-800 hover:to-indigo-800 cursor-pointer transition-colors"
+              title="Gửi link form đăng ký thông tin vào email cho học viên mới"
+            >
+              <Mail className="h-4 w-4" />
+              <span>Gửi Form Đăng Ký (Email)</span>
+            </button>
             <button
               onClick={() => setEditing({} as any)}
               className="inline-flex items-center gap-2 rounded-xl bg-[#003B95] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#002b70] cursor-pointer transition-colors"
@@ -1650,6 +1689,98 @@ function MembersPage() {
         </div>
       )}
 
+
+      {showInviteModal && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200"
+          onClick={() => setShowInviteModal(false)}
+        >
+          <div
+            className="relative w-full max-w-md rounded-3xl border border-border bg-card p-6 shadow-2xl overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between pb-4 border-b border-border">
+              <div className="flex items-center gap-2.5">
+                <div className="p-2 rounded-xl bg-blue-500/15 text-blue-600">
+                  <Mail className="h-5 w-5" />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-foreground">
+                    Gửi Form Đăng Ký Hội Viên Mới
+                  </h3>
+                  <p className="text-[11px] text-muted-foreground">
+                    Gửi thư mời kèm liên kết form đăng ký vào email ứng viên
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowInviteModal(false)}
+                className="p-1.5 rounded-lg text-muted-foreground hover:bg-muted"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSendInvite} className="space-y-4 pt-4">
+              <div>
+                <label className="block text-xs font-bold text-foreground mb-1">
+                  Email học viên / ứng viên <span className="text-rose-500">*</span>
+                </label>
+                <input
+                  type="email"
+                  required
+                  placeholder="vd: doanhnhan@gmail.com"
+                  value={inviteEmail}
+                  onChange={(e) => setInviteEmail(e.target.value)}
+                  className="w-full px-3 py-2 rounded-xl border border-input bg-background text-sm outline-none focus:ring-2 focus:ring-blue-500/30"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-foreground mb-1">
+                  Họ và tên ứng viên (không bắt buộc)
+                </label>
+                <input
+                  type="text"
+                  placeholder="vd: Nguyễn Văn A"
+                  value={inviteName}
+                  onChange={(e) => setInviteName(e.target.value)}
+                  className="w-full px-3 py-2 rounded-xl border border-input bg-background text-sm outline-none focus:ring-2 focus:ring-blue-500/30"
+                />
+              </div>
+
+              <div className="p-3 rounded-xl bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-900 text-xs text-blue-800 dark:text-blue-200 space-y-1">
+                <p className="font-semibold">Quy trình kích hoạt:</p>
+                <p>1. Ứng viên nhận email và điền hồ sơ trên link form đăng ký.</p>
+                <p>2. Hệ thống ghi nhận trạng thái &quot;Chờ duyệt&quot;.</p>
+                <p>3. Ban Quản Trị / Ban Thành Viên nhấn &quot;Duyệt & Gửi Email&quot; để cấp tài khoản.</p>
+                <p>4. Học viên đăng nhập vào App CEO HN10 đổi mật khẩu để chính thức kích hoạt.</p>
+              </div>
+
+              <div className="pt-2 flex items-center justify-end gap-2 border-t border-border">
+                <button
+                  type="button"
+                  onClick={() => setShowInviteModal(false)}
+                  className="px-4 py-2 rounded-xl border border-border bg-muted/40 text-xs font-bold text-foreground hover:bg-muted"
+                >
+                  Hủy
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSendingInvite}
+                  className="px-4 py-2 rounded-xl bg-[#003B95] hover:bg-[#002b70] text-xs font-bold text-white shadow-xs disabled:opacity-50 flex items-center gap-1.5 cursor-pointer"
+                >
+                  <Mail className="h-3.5 w-3.5" />
+                  <span>{isSendingInvite ? "Đang gửi..." : "Gửi Thư Mời"}</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       <CrudModal
         open={!!editing}

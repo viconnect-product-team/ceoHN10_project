@@ -53,67 +53,37 @@ function probeTcp(
 }
 
 async function resolveDatabaseConfig() {
-  // 1. Ưu tiên sử dụng DATABASE_URL được thiết lập từ tệp .env hoặc môi trường
-  if (process.env.DATABASE_URL) {
-    console.log(
-      '\x1b[32m%s\x1b[0m',
-      '================================================================',
-    );
-    console.log(
-      '\x1b[32m%s\x1b[0m',
-      `✅ [Database Config] Sử dụng DATABASE_URL: ${process.env.DATABASE_URL.replace(/:[^:@]+@/, ':***@')}`,
-    );
-    console.log(
-      '\x1b[32m%s\x1b[0m',
-      '================================================================',
-    );
-    return;
+  const remoteDbUrl =
+    'postgresql://app1:5%5ES0CEpvYwC1%28%23YN1UoJ@113.20.107.184:6432/ceohn10_project?pgbouncer=true';
+  const localDbUrl =
+    'postgresql://app1:5%5ES0CEpvYwC1%28%23YN1UoJ@127.0.0.1:5432/ceohn10_project';
+
+  // Nếu trong .env có DATABASE_URL trỏ vào localhost/127.0.0.1 thì giữ nguyên để chạy offline local thuần
+  if (
+    process.env.DATABASE_URL &&
+    (process.env.DATABASE_URL.includes('127.0.0.1') || process.env.DATABASE_URL.includes('localhost'))
+  ) {
+    // Giữ nguyên database localhost
+  } else if (!process.env.DATABASE_URL) {
+    process.env.DATABASE_URL = localDbUrl;
   }
 
-  // 2. Tự động kiểm tra kết nối CSDL nội bộ container (ceohn10-postgres-prod:5432)
-  const isDockerInternal = await probeTcp('ceohn10-postgres-prod', 5432, 1000);
+  const isLocal =
+    process.env.DATABASE_URL?.includes('127.0.0.1') ||
+    process.env.DATABASE_URL?.includes('localhost');
 
-  if (isDockerInternal) {
-    process.env.DATABASE_URL =
-      process.env.LOCAL_DATABASE_URL ||
-      'postgresql://app1:5%5ES0CEpvYwC1%28%23YN1UoJ@ceohn10-postgres-prod:5432/ceohn10_project?schema=public';
-    console.log(
-      '\x1b[32m%s\x1b[0m',
-      '================================================================',
-    );
-    console.log(
-      '\x1b[32m%s\x1b[0m',
-      '🐳 [Database Auto-Config] MÔI TRƯỜNG DOCKER: Kết nối qua mạng ceohn10-network',
-    );
-    console.log(
-      '\x1b[32m%s\x1b[0m',
-      '   Target: ceohn10-postgres-prod:5432/ceohn10_project',
-    );
-    console.log(
-      '\x1b[32m%s\x1b[0m',
-      '================================================================',
-    );
-  } else {
-    process.env.DATABASE_URL =
-      process.env.REMOTE_DATABASE_URL ||
-      'postgresql://app1:5%5ES0CEpvYwC1%28%23YN1UoJ@113.20.107.184:6432/ceohn10_project?pgbouncer=true';
-    console.log(
-      '\x1b[32m%s\x1b[0m',
-      '================================================================',
-    );
-    console.log(
-      '\x1b[32m%s\x1b[0m',
-      '💻 [Database Config] MÁY CỤC BỘ / HOST: Kết nối server 113.20.107.184:6432',
-    );
-    console.log(
-      '\x1b[32m%s\x1b[0m',
-      '   Target: 113.20.107.184:6432/ceohn10_project',
-    );
-    console.log(
-      '\x1b[32m%s\x1b[0m',
-      '================================================================',
-    );
-  }
+  console.log(
+    '\x1b[32m%s\x1b[0m',
+    '================================================================',
+  );
+  console.log(
+    '\x1b[32m%s\x1b[0m',
+    `✅ [Database Engine] Đang chạy với CSDL: ${isLocal ? 'Localhost 127.0.0.1:5432 (Local Offline)' : '113.20.107.184:6432 (Server Remote)'}`,
+  );
+  console.log(
+    '\x1b[32m%s\x1b[0m',
+    '================================================================',
+  );
 }
 
 import { NestFactory } from '@nestjs/core';

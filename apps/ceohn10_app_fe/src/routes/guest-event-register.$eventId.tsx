@@ -41,15 +41,7 @@ export const Route = createFileRoute("/guest-event-register/$eventId")({
       }
     }
     if (!event) {
-      // Fallback an toàn giúp khách quét QR không bao giờ bị trang trắng 404
-      event = {
-        id: params.eventId,
-        name: "Hội Nghị Giao Thương & Kết Nối Doanh Nghiệp CLB CEO HN10",
-        date: "Sắp diễn ra",
-        time: "08:30 - 12:00",
-        location: "Khách Sạn Daewoo Hà Nội, 360 Kim Mã, Ba Đình, Hà Nội",
-        ticket_price: 0,
-      };
+      event = null;
     }
     return { event };
   },
@@ -68,6 +60,28 @@ export const Route = createFileRoute("/guest-event-register/$eventId")({
 function StandaloneGuestEventRegistrationPage() {
   const { event } = Route.useLoaderData();
 
+  if (!event) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
+        <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 text-center border border-slate-200">
+          <div className="w-16 h-16 mx-auto mb-4 bg-amber-50 text-amber-600 rounded-full flex items-center justify-center">
+            <AlertCircle className="w-8 h-8" />
+          </div>
+          <h2 className="text-xl font-black text-slate-800 mb-2">Không Tìm Thấy Sự Kiện</h2>
+          <p className="text-sm text-slate-600 mb-6">
+            Mã sự kiện không tồn tại trên hệ thống hoặc sự kiện đã kết thúc. Vui lòng kiểm tra lại liên kết hoặc liên hệ Ban Tổ Chức.
+          </p>
+          <a
+            href="/"
+            className="inline-flex items-center justify-center px-6 py-2.5 bg-[#003B95] text-white font-bold rounded-xl text-sm hover:bg-blue-900 transition"
+          >
+            Về Trang Chủ
+          </a>
+        </div>
+      </div>
+    );
+  }
+
   // Học viên mã tự khai báo (không bắt buộc, nếu nhập sẽ tự động tra cứu & điền)
   const [memberCode, setMemberCode] = useState("");
   const [isSearchingCode, setIsSearchingCode] = useState(false);
@@ -81,6 +95,19 @@ function StandaloneGuestEventRegistrationPage() {
   const [ticketType, setTicketType] = useState("Standard");
   const [ticketCount, setTicketCount] = useState(1);
   const [note, setNote] = useState("");
+  const [isCheckinNow, setIsCheckinNow] = useState(() => {
+    if (typeof window !== "undefined") {
+      const sp = new URLSearchParams(window.location.search);
+      return sp.get("action") === "checkin" || sp.get("checkin") === "true";
+    }
+    return false;
+  });
+
+  // Danh mục các phần tham gia sự kiện (Event Parts / Sessions)
+  const availableParts: string[] = (Array.isArray(event.parts) && event.parts.length > 0)
+    ? event.parts
+    : ["Tọa đàm / Hội nghị Chuyên Đề", "Tiệc Gala Dinner & Kết Nối Giao Thương"];
+  const [selectedParts, setSelectedParts] = useState<string[]>(availableParts);
 
   // Danh sách người tham gia cùng (multi-attendees)
   type AdditionalAttendee = {
@@ -250,6 +277,8 @@ function StandaloneGuestEventRegistrationPage() {
           ticketPrice,
           note: note.trim(),
           attendees: allAttendees,
+          attendedParts: selectedParts,
+          isCheckinNow: isCheckinNow,
         }),
       }).catch((err: any) => {
         return { ok: false, error: err };
@@ -311,13 +340,10 @@ function StandaloneGuestEventRegistrationPage() {
         return;
       }
 
-      // 2. Client-side Fallback an toàn: Tự sinh mã vé và mã VietQR SePay chuẩn xác
+      // 2. Client-side Fallback an toàn: Tự sinh mã vé
       const fallbackRegId = `GUEST-${Date.now().toString(36).toUpperCase()}`;
       const fallbackLuckyNum = Math.floor(1000 + Math.random() * 9000);
       const fallbackMemo = `CEOHN10_SK_${fallbackRegId}`;
-      const fallbackSepayQrUrl = isFree
-        ? ""
-        : `https://img.vietqr.io/image/MB-198300000000-compact2.png?amount=${totalAmount}&addInfo=${encodeURIComponent(fallbackMemo)}&accountName=${encodeURIComponent("CLB DOANH NHAN CEO HN10")}`;
       const fallbackQrCodeUrl = getQrUrl(fallbackRegId, 300);
 
       const clientResult = {
@@ -327,8 +353,12 @@ function StandaloneGuestEventRegistrationPage() {
         luckyNumber: fallbackLuckyNum,
         isFree,
         totalAmount,
-        sepayQrUrl: fallbackSepayQrUrl,
-        vnpayQrUrl: fallbackSepayQrUrl,
+        sepayQrUrl: "",
+        vietQrUrl: "",
+        bankAccount: "",
+        bankName: "",
+        bankOwner: "",
+        transferMemo: fallbackMemo,
         qrCodeUrl: fallbackQrCodeUrl,
         fullName: fullName.trim(),
         phone: phone.trim(),
@@ -336,9 +366,9 @@ function StandaloneGuestEventRegistrationPage() {
         company: company.trim(),
         position: position.trim(),
         ticketType,
-        eventTitle: event.name || event.title,
-        eventDate: event.date,
-        eventLocation: event.location,
+        eventTitle: event?.name || event?.title,
+        eventDate: event?.date,
+        eventLocation: event?.location,
       };
 
       try {
@@ -378,6 +408,12 @@ function StandaloneGuestEventRegistrationPage() {
           </div>
 
           <div className="p-6 sm:p-8 space-y-6">
+            {(result.status === "attended" || result.checkedInAt || isCheckinNow) && (
+              <div className="bg-gradient-to-r from-emerald-600 to-teal-700 text-white font-bold px-4 py-3 rounded-2xl text-center text-sm shadow-md flex items-center justify-center gap-2 border border-emerald-400">
+                <CheckCircle2 className="w-5 h-5 text-amber-300 shrink-0" />
+                <span>XÁC NHẬN: QUÝ ĐẠI BIỂU ĐÃ ĐƯỢC CHECK-IN VÀO CỬA SỰ KIỆN THÀNH CÔNG!</span>
+              </div>
+            )}
             <div className="bg-amber-50/80 border border-amber-200 rounded-2xl p-5 text-left space-y-3">
               <div className="font-bold text-amber-950 text-sm sm:text-base">
                 Kính gửi Quý Anh/Chị {result.fullName || "Đại biểu"},
@@ -456,6 +492,12 @@ function StandaloneGuestEventRegistrationPage() {
           </div>
 
           <div className="p-6 sm:p-8 space-y-6">
+            {(result.status === "attended" || result.checkedInAt || isCheckinNow) && (
+              <div className="bg-gradient-to-r from-emerald-600 to-teal-700 text-white font-bold px-4 py-3 rounded-2xl text-center text-sm shadow-md flex items-center justify-center gap-2 border border-emerald-400">
+                <CheckCircle2 className="w-5 h-5 text-amber-300 shrink-0" />
+                <span>XÁC NHẬN: QUÝ ĐẠI BIỂU ĐÃ ĐƯỢC CHECK-IN VÀO CỬA SỰ KIỆN THÀNH CÔNG!</span>
+              </div>
+            )}
             <div className="bg-amber-50/90 border border-amber-200 rounded-2xl p-5 text-left space-y-3">
               <div className="font-bold text-amber-950 text-sm sm:text-base">
                 Kính gửi Quý Anh/Chị {result.fullName || "Đại biểu"},
@@ -525,7 +567,9 @@ function StandaloneGuestEventRegistrationPage() {
             <div className="absolute -top-10 -right-10 w-32 h-32 bg-amber-400/20 rounded-full blur-2xl pointer-events-none" />
             <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-400 text-[#001D4A] rounded-full text-xs font-black uppercase tracking-wider mb-2 shadow-sm">
               <Sparkles className="w-3.5 h-3.5" />
-              ĐĂNG KÝ THAM DỰ THÀNH CÔNG
+              {result.status === "attended" || result.checkedInAt || isCheckinNow
+                ? "ĐÃ CHECK-IN VÀO CỬA THÀNH CÔNG"
+                : "ĐĂNG KÝ THAM DỰ THÀNH CÔNG"}
             </div>
             <h1 className="text-xl sm:text-2xl font-black text-white px-2 leading-snug">
               {result.eventTitle || event.name}
@@ -537,6 +581,12 @@ function StandaloneGuestEventRegistrationPage() {
           </div>
 
           <div className="p-6 sm:p-8 space-y-6">
+            {(result.status === "attended" || result.checkedInAt || isCheckinNow) && (
+              <div className="bg-gradient-to-r from-emerald-600 to-teal-700 text-white font-bold px-4 py-3 rounded-2xl text-center text-sm shadow-md flex items-center justify-center gap-2 border border-emerald-400">
+                <CheckCircle2 className="w-5 h-5 text-amber-300 shrink-0" />
+                <span>XÁC NHẬN: QUÝ ĐẠI BIỂU ĐÃ ĐƯỢC CHECK-IN VÀO CỬA SỰ KIỆN THÀNH CÔNG!</span>
+              </div>
+            )}
             {/* THẺ SỐ QUAY THƯỞNG LUCKY DRAW */}
             <div className="bg-gradient-to-br from-amber-500/10 via-amber-400/5 to-orange-500/10 border-2 border-amber-400/60 rounded-2xl p-5 text-center shadow-sm relative">
               <span className="text-[11px] font-black text-amber-700 uppercase tracking-widest block mb-1">
@@ -593,58 +643,63 @@ function StandaloneGuestEventRegistrationPage() {
 
                 {/* KHUNG HIỂN THỊ SEPAY VIETQR */}
                 <div className="w-64 h-64 mx-auto bg-white p-3 rounded-2xl border-2 border-slate-200 shadow-md flex items-center justify-center relative group">
-                  <img
-                    src={
-                      result.sepayQrUrl ||
-                      result.vnpayQrUrl ||
-                      `https://img.vietqr.io/image/MB-198300000000-compact2.png?amount=${result.totalAmount}&addInfo=${encodeURIComponent(`CEOHN10_SK_${result.registrationId}`)}&accountName=${encodeURIComponent("CLB DOANH NHAN CEO HN10")}`
-                    }
-                    alt="VietQR SePay Thanh Toán Phí Sự Kiện"
-                    className="w-full h-full object-contain"
-                  />
+                  {(result.sepayQrUrl || result.vietQrUrl) ? (
+                    <img
+                      src={result.sepayQrUrl || result.vietQrUrl}
+                      alt="VietQR SePay Thanh Toán Phí Sự Kiện"
+                      className="w-full h-full object-contain"
+                    />
+                  ) : (
+                    <div className="text-center p-4 text-xs text-slate-500">
+                      <QrCode className="w-12 h-12 mx-auto text-slate-300 mb-2" />
+                      Vui lòng chuyển khoản theo thông tin số tài khoản bên dưới
+                    </div>
+                  )}
                 </div>
 
                 {/* THÔNG TIN CHUYỂN KHOẢN KÈM NÚT COPY */}
                 <div className="bg-white rounded-xl p-3.5 border border-slate-200 text-xs space-y-2.5">
                   <div className="flex items-center justify-between">
                     <span className="text-slate-500">Ngân hàng:</span>
-                    <span className="font-bold text-slate-800">MB Bank (Quân Đội)</span>
+                    <span className="font-bold text-slate-800">{result.bankName || "Ngân hàng Quân Đội (MB Bank)"}</span>
                   </div>
 
                   <div className="flex items-center justify-between">
                     <span className="text-slate-500">Số tài khoản:</span>
                     <div className="flex items-center gap-1.5">
-                      <span className="font-mono font-black text-[#003B95] text-sm">1010000000</span>
-                      <button
-                        type="button"
-                        onClick={() => handleCopy("1010000000", "Số tài khoản")}
-                        className="p-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 transition"
-                        title="Sao chép STK"
-                      >
-                        {copiedField === "Số tài khoản" ? (
-                          <Check className="w-3.5 h-3.5 text-emerald-600" />
-                        ) : (
-                          <Copy className="w-3.5 h-3.5" />
-                        )}
-                      </button>
+                      <span className="font-mono font-black text-[#003B95] text-sm">{result.bankAccount || "Liên hệ BTC"}</span>
+                      {result.bankAccount && (
+                        <button
+                          type="button"
+                          onClick={() => handleCopy(result.bankAccount, "Số tài khoản")}
+                          className="p-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 transition"
+                          title="Sao chép STK"
+                        >
+                          {copiedField === "Số tài khoản" ? (
+                            <Check className="w-3.5 h-3.5 text-emerald-600" />
+                          ) : (
+                            <Copy className="w-3.5 h-3.5" />
+                          )}
+                        </button>
+                      )}
                     </div>
                   </div>
 
                   <div className="flex items-center justify-between">
                     <span className="text-slate-500">Chủ tài khoản:</span>
-                    <span className="font-bold text-slate-800">CLB DOANH NHAN CEO HN10</span>
+                    <span className="font-bold text-slate-800">{result.bankOwner || "CLB DOANH NHÂN CEO HN10"}</span>
                   </div>
 
                   <div className="flex items-center justify-between">
                     <span className="text-slate-500">Nội dung CK:</span>
                     <div className="flex items-center gap-1.5">
                       <span className="font-mono font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
-                        EV{result.registrationId} {result.phone}
+                        {result.transferMemo || `CEOHN10_SK_${result.registrationId}`}
                       </span>
                       <button
                         type="button"
                         onClick={() =>
-                          handleCopy(`EV${result.registrationId} ${result.phone}`, "Nội dung chuyển khoản")
+                          handleCopy(result.transferMemo || `CEOHN10_SK_${result.registrationId}`, "Nội dung chuyển khoản")
                         }
                         className="p-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 transition"
                         title="Sao chép nội dung"
@@ -1058,12 +1113,56 @@ function StandaloneGuestEventRegistrationPage() {
             </div>
           </div>
 
+          {/* TRƯỜNG CHỌN PHẦN THAM GIA SỰ KIỆN (EVENT SESSIONS / PARTS) */}
+          <div className="bg-white rounded-3xl shadow-sm border border-slate-200 p-6 sm:p-7 space-y-3">
+            <div>
+              <label className="block text-sm sm:text-base font-bold text-slate-800">
+                5. Quý Đại Biểu Tham Dự Phần Nào Của Sự Kiện? <span className="text-rose-500">*</span>
+              </label>
+              <p className="text-xs text-slate-500 mt-0.5">
+                Quý Anh/Chị có thể tích chọn 1 hoặc nhiều phần theo nhu cầu tham dự thực tế.
+              </p>
+            </div>
+
+            <div className="space-y-2.5 pt-1">
+              {availableParts.map((part) => {
+                const isSelected = selectedParts.includes(part);
+                return (
+                  <div
+                    key={part}
+                    onClick={() => {
+                      setSelectedParts((prev) =>
+                        prev.includes(part)
+                          ? (prev.length > 1 ? prev.filter((p) => p !== part) : prev)
+                          : [...prev, part]
+                      );
+                    }}
+                    className={`flex items-center gap-3 p-3.5 rounded-2xl border transition cursor-pointer select-none ${
+                      isSelected
+                        ? "border-[#003B95] bg-blue-50/60 text-[#003B95] ring-1 ring-[#003B95]"
+                        : "border-slate-200 hover:bg-slate-50 text-slate-700"
+                    }`}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={isSelected}
+                      onChange={() => {}}
+                      className="w-4 h-4 rounded text-[#003B95] focus:ring-[#003B95] pointer-events-none"
+                    />
+                    <span className="text-xs sm:text-sm font-bold flex-1">{part}</span>
+                    {isSelected && <Check className="w-4 h-4 text-[#003B95]" />}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
           {/* ĐĂNG KÝ NHIỀU NGƯỜI (MULTI-ATTENDEE / ĐOÀN THAM DỰ) */}
           <div className="bg-white rounded-3xl shadow-sm border border-slate-200 p-6 sm:p-7 space-y-4">
             <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
               <div>
                 <label className="block text-sm sm:text-base font-bold text-slate-800">
-                  5. Danh sách người tham gia cùng (Tùy chọn)
+                  6. Danh sách người tham gia cùng (Tùy chọn)
                 </label>
                 <p className="text-xs text-slate-500 mt-0.5">
                   Quý Anh/Chị có thể đăng ký thêm đồng nghiệp, đối tác hoặc người đi cùng trong 1 lần đăng ký.
@@ -1272,6 +1371,27 @@ function StandaloneGuestEventRegistrationPage() {
             />
           </div>
 
+          {/* Tùy chọn Check-in ngay tại bàn tiếp đón */}
+          <div className="p-4 bg-emerald-50/80 rounded-2xl border-2 border-emerald-300 shadow-xs">
+            <label className="flex items-start gap-3 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={isCheckinNow}
+                onChange={(e) => setIsCheckinNow(e.target.checked)}
+                className="mt-1 w-5 h-5 text-emerald-600 rounded border-emerald-400 focus:ring-emerald-500 cursor-pointer"
+              />
+              <div className="flex-1">
+                <span className="text-sm font-bold text-emerald-950 flex items-center gap-1.5">
+                  <QrCode className="w-4 h-4 text-emerald-600" />
+                  Điểm danh Check-in vào cửa sự kiện ngay lúc này
+                </span>
+                <p className="text-xs text-emerald-800 mt-1 leading-relaxed">
+                  Tích chọn mục này nếu Quý Anh/Chị đang có mặt tại bàn lễ tân của sự kiện để hệ thống lập tức điểm danh <strong>Đã tham dự (Attended)</strong> và cấp mã quay thưởng may mắn.
+                </p>
+              </div>
+            </label>
+          </div>
+
           {/* Submit Button */}
           <div className="pt-2">
             <button
@@ -1279,13 +1399,15 @@ function StandaloneGuestEventRegistrationPage() {
               disabled={submitting || isFull}
               className={`w-full py-4 px-6 rounded-2xl font-black text-sm sm:text-base text-white shadow-lg transition flex items-center justify-center gap-2 cursor-pointer ${isFull
                   ? "bg-slate-400 cursor-not-allowed"
+                  : isCheckinNow
+                  ? "bg-emerald-600 hover:bg-emerald-700 shadow-emerald-700/30 ring-2 ring-emerald-400"
                   : "bg-[#003B95] hover:bg-[#002B70] shadow-blue-900/30"
                 }`}
             >
               {submitting ? (
                 <>
                   <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  <span>Đang xử lý đăng ký & gửi email...</span>
+                  <span>{isCheckinNow ? "Đang xử lý Check-in & cấp số may mắn..." : "Đang xử lý đăng ký & gửi email..."}</span>
                 </>
               ) : isFull ? (
                 <>
@@ -1294,9 +1416,17 @@ function StandaloneGuestEventRegistrationPage() {
                 </>
               ) : (
                 <>
-                  <Send className="w-5 h-5 text-amber-400" />
+                  {isCheckinNow ? (
+                    <CheckCircle2 className="w-5 h-5 text-amber-300" />
+                  ) : (
+                    <Send className="w-5 h-5 text-amber-400" />
+                  )}
                   <span>
-                    {isFree
+                    {isCheckinNow
+                      ? isFree
+                        ? "⚡ Xác Nhận Điểm Danh & Check-in Vào Cửa Ngay"
+                        : `⚡ Điểm Danh & Thanh Toán (${new Intl.NumberFormat("vi-VN").format(totalAmount)} đ)`
+                      : isFree
                       ? "Xác Nhận Đăng Ký & Nhận Vé Ngay"
                       : `Xác Nhận Đăng Ký (${new Intl.NumberFormat("vi-VN").format(totalAmount)} đ)`}
                   </span>

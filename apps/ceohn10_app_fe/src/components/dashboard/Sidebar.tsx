@@ -1,5 +1,12 @@
 import { useEffect, useRef, useState, useMemo, useCallback } from "react";
-import { isRouteAllowedByMatrix, type SystemRoleKey } from "@/lib/rbac-permission-helpers";
+import {
+  isRouteAllowedByMatrix,
+  type SystemRoleKey,
+  isModuleEnabledForTenant,
+  getActiveSystemTenant,
+  setActiveSystemTenant,
+  SYSTEM_TENANTS,
+} from "@/lib/rbac-permission-helpers";
 import { useAuth } from "@/context/AuthContext";
 import { isPrivilegedAdminOrPresident, isMediaDepartmentMember } from "@/lib/checkin-gatekeeper-auth";
 import { useT } from "@/lib/i18n";
@@ -14,7 +21,6 @@ import { resolveMediaUrl } from "@/lib/api-client";
 import {
   LayoutDashboard,
   Users,
-  Building2,
   Tags,
   RefreshCw,
   Calendar,
@@ -84,20 +90,21 @@ const crmOverview: Item[] = [
 
 // 2. Nhóm SỰ KIỆN
 const crmEvents: Item[] = [
-  { key: "nav.events", icon: Calendar, to: "/events", label: "Khai giảng" },
-  { key: "nav.eventRegistrations" as TKey, icon: ClipboardList, to: "/event-registrations", label: "Quản lý người đăng ký" },
-  { key: "nav.checkinQr" as TKey, icon: QrCodeIcon, to: "/checkin-qr", label: "Quản lý cấu hình mã QR đăng ký, check in vào cửa" },
+  { key: "nav.events", icon: Calendar, to: "/events", label: "Sự kiện" },
+  { key: "nav.eventRegistrations" as TKey, icon: ClipboardList, to: "/event-registrations", label: "Đăng ký sự kiện" },
+  { key: "nav.checkinQr" as TKey, icon: QrCodeIcon, to: "/checkin-qr", label: "Cấu hình Mã QR & Biểu mẫu" },
   { key: "nav.luckyDraw" as TKey, icon: Gift, to: "/lucky-draw", label: "Quản lý quay thưởng" },
-  { key: "nav.voting" as TKey, icon: Vote, to: "/voting", label: "Biểu quyết & Đánh giá ý kiến" },
+  { key: "nav.voting" as TKey, icon: Vote, to: "/voting", label: "Biểu quyết & Bầu cử" },
+  { key: "nav.feedback" as TKey, icon: MessageSquare, to: "/feedback", label: "Phản hồi & Góp ý" },
 ];
 
 // 3. Nhóm Lớp CEOHN10
 const crmClasses: Item[] = [
+  { key: "nav.classCourses" as TKey, icon: Layers, to: "/classes?tab=courses", label: "Quản lý lớp & lịch học" },
+  { key: "nav.classEnrollments" as TKey, icon: Users2, to: "/classes?tab=students", label: "Dashboard học viên (đa chỉ số)" },
+  { key: "nav.classFund" as TKey, icon: Wallet, to: "/classes?tab=finance", label: "Quỹ tài chính lớp (20tr & thu/chi)" },
   { key: "nav.classTeachers" as TKey, icon: GraduationCap, to: "/classes?tab=teachers", label: "Quản lý giáo viên" },
-  { key: "nav.classCourses" as TKey, icon: Layers, to: "/classes?tab=courses", label: "Quản lý lớp học" },
-  { key: "nav.classEnrollments" as TKey, icon: Users2, to: "/classes?tab=enrollments", label: "Quản lý học viên đăng ký" },
-  { key: "nav.classAuditors" as TKey, icon: Bookmark, to: "/classes?tab=auditors", label: "Quản lý học viên trợ thính" },
-  { key: "nav.classAttendanceQr" as TKey, icon: ScanLine, to: "/classes?tab=attendance-qr", label: "Quản lý mã QR điểm danh theo buổi học" },
+  { key: "nav.classAttendanceQr" as TKey, icon: ScanLine, to: "/classes?tab=attendance-qr", label: "Mã QR điểm danh theo buổi" },
 ];
 
 // 4. NHÓM TÀI CHÍNH
@@ -107,14 +114,14 @@ const crmFinance: Item[] = [
 
 // 5. NHÓM THÔNG BÁO
 const crmNotifications: Item[] = [
-  { key: "nav.zaloOa" as TKey, icon: MessageSquare, to: "/notifications?tab=templates&channel=zalo_oa", label: "Thông báo qua Zalo OA/ZBS" },
-  { key: "nav.emailMarketing" as TKey, icon: Mail, to: "/email-marketing", label: "Thông báo đến email" },
+  { key: "nav.notifications" as TKey, icon: Bell, to: "/notifications", label: "Quản lý thông báo" },
 ];
 
-// 6. Nhóm Cài đặt hệ thống
+// 6. Nhóm Cài đặt hệ thống (Dành cho CRM thường - Phân quyền & Quản trị tài khoản đã đưa vào Platform CRM /master)
 const crmSystemDocs: Item[] = [
-  { key: "nav.documents" as TKey, icon: FolderOpen, to: "/documents", label: "Quản lý tài liệu" },
+  { key: "nav.documents" as TKey, icon: FolderOpen, to: "/documents", label: "Tài liệu & Biểu mẫu" },
   { key: "nav.templates" as TKey, icon: LayoutTemplate, to: "/templates", label: "Quản lý mẫu trang" },
+  { key: "nav.settings" as TKey, icon: Settings, to: "/settings", label: "Cài đặt hệ thống" },
 ];
 
 const COLLAPSE_KEY = "vba.sidebar.collapsed";
@@ -410,31 +417,27 @@ export function Sidebar({
   const currentRoleKey: SystemRoleKey = useMemo(() => {
     const rawRole = (srsRole as string) || "";
 
-    // 1. Vai trò Lãnh đạo cấp cao: Lớp Trưởng & Lớp Phó Lâm Thời, Quản trị hệ thống
-    if (rawRole === "chu_tich" || rawRole === "president" || isChuTich) return "chu_tich";
-    if (rawRole === "pho_chu_tich" || rawRole.startsWith("lop_pho_")) return "chu_tich";
-    if (rawRole.startsWith("truong_team_") || rawRole.startsWith("pho_team_") || rawRole.startsWith("tb_")) return "admin";
-    if (rawRole === "quan_tri" || rawRole === "ADM" || isPlatformAdmin) return "quan_tri";
+    // 1. Vai trò Lãnh đạo cấp cao & Quản trị hệ thống
+    if (rawRole === "admin_platform" || rawRole === "quan_tri" || rawRole === "ADM" || isPlatformAdmin) return "admin_platform";
+    if (rawRole === "lop_truong" || rawRole === "chu_tich" || rawRole === "president" || isChuTich) return "lop_truong";
+    if (rawRole === "lop_pho" || rawRole === "pho_chu_tich" || rawRole.startsWith("lop_pho_")) return "lop_pho";
+    if (rawRole.startsWith("truong_team_") || rawRole === "truong_team") return "truong_team";
+    if (rawRole.startsWith("pho_team_") || rawRole === "pho_team") return "pho_team";
     if (rawRole === "admin" || (isAdmin && !rawRole.startsWith("thanh_vien_ban_") && rawRole !== "member" && rawRole !== "HVT") || isBQT) return "admin";
 
-    // 2. Trưởng ban các Ban Chuyên Môn
-    if (rawRole === "truong_ban_truyen_thong" || rawRole === "BTT" || isTruongBanTruyenThong) return "truong_ban_truyen_thong";
-    if (rawRole === "truong_ban_thanh_vien" || rawRole === "BTV" || isTruongBanThanhVien) return "truong_ban_thanh_vien";
-    if (rawRole === "truong_ban_xuc_tien" || rawRole === "BXT" || isTruongBanXucTien) return "truong_ban_xuc_tien";
-    if (rawRole === "truong_ban_tai_chinh" || rawRole === "BTC" || isTruongBanTaiChinh) return "truong_ban_tai_chinh";
-    if (rawRole === "truong_ban_thien_nguyen" || rawRole === "BTN" || isTruongBanThienNguyen) return "truong_ban_thien_nguyen";
-    if (rawRole === "tong_thu_ky" || isTongThuKy) return "tong_thu_ky";
-    if (rawRole === "ban_thu_ky" || isBanThuKy) return "tong_thu_ky";
-    if (rawRole === "ban_dieu_hanh" || rawRole === "truong_ban_dieu_hanh" || rawRole === "BQT") return "truong_ban_dieu_hanh";
-
-    // 3. Vai trò chuyên môn của Ban (Thành viên ban chuyên trách)
-    if (rawRole === "thanh_vien_ban_su_kien") return "thanh_vien_ban_su_kien";
-    if (rawRole === "thanh_vien_ban_xuc_tien") return "thanh_vien_ban_xuc_tien";
-    if (rawRole === "thanh_vien_ban_thanh_vien") return "thanh_vien_ban_thanh_vien";
-    if (rawRole === "thanh_vien_ban_truyen_thong") return "thanh_vien_ban_truyen_thong";
-    if (rawRole === "thanh_vien_ban_tai_chinh") return "thanh_vien_ban_tai_chinh";
-    if (rawRole === "thanh_vien_ban_thien_nguyen") return "thanh_vien_ban_thien_nguyen";
-    if (rawRole === "thanh_vien_ban_dieu_hanh") return "thanh_vien_ban_dieu_hanh";
+    // 2. Trưởng ban chuyên trách
+    if (
+      rawRole === "truong_ban_chuyen_trach" ||
+      rawRole === "truong_ban_truyen_thong" || rawRole === "BTT" || isTruongBanTruyenThong ||
+      rawRole === "truong_ban_thanh_vien" || rawRole === "BTV" || isTruongBanThanhVien ||
+      rawRole === "truong_ban_xuc_tien" || rawRole === "BXT" || isTruongBanXucTien ||
+      rawRole === "truong_ban_tai_chinh" || rawRole === "BTC" || isTruongBanTaiChinh ||
+      rawRole === "truong_ban_thien_nguyen" || rawRole === "BTN" || isTruongBanThienNguyen ||
+      rawRole === "tong_thu_ky" || isTongThuKy ||
+      rawRole === "ban_thu_ky" || isBanThuKy ||
+      rawRole === "ban_dieu_hanh" || rawRole === "truong_ban_dieu_hanh" ||
+      rawRole.startsWith("tb_")
+    ) return "truong_ban_chuyen_trach";
 
     return "member";
   }, [
@@ -465,12 +468,70 @@ export function Sidebar({
     };
   }, []);
 
+  const [activeTenantKey, setActiveTenantKey] = useState<string>(() => getActiveSystemTenant());
+  useEffect(() => {
+    const onTenantChange = (e: any) => {
+      const key = e?.detail?.tenantKey || getActiveSystemTenant();
+      setActiveTenantKey(key);
+      setMatrixRevision((v) => v + 1);
+    };
+    window.addEventListener("tenant-changed", onTenantChange);
+    return () => window.removeEventListener("tenant-changed", onTenantChange);
+  }, []);
+
+  const handleTenantChange = (key: string) => {
+    setActiveSystemTenant(key);
+    setActiveTenantKey(key);
+    setMatrixRevision((v) => v + 1);
+  };
+
   const isAllowed = useCallback(
     (route?: string): boolean => {
       if (!route) return true;
+      if (
+        isPlatformAdmin ||
+        isAdmin ||
+        isChuTich ||
+        (currentRoleKey as string) === "quan_tri" ||
+        (currentRoleKey as string) === "admin" ||
+        (currentRoleKey as string) === "chu_tich" ||
+        (currentRoleKey as string) === "pho_chu_tich" ||
+        String(currentRoleKey).startsWith("lop_pho_") ||
+        String(currentRoleKey).startsWith("truong_team_") ||
+        String(currentRoleKey).startsWith("pho_team_") ||
+        String(currentRoleKey).startsWith("tb_") ||
+        String(currentRoleKey).startsWith("truong_ban_") ||
+        (currentRoleKey as string) === "tong_thu_ky" ||
+        (currentRoleKey as string) === "ban_dieu_hanh" ||
+        (currentRoleKey as string) === "truong_ban_dieu_hanh" ||
+        user?.isPlatformAdmin === true ||
+        user?.isAdmin === true ||
+        user?.isPresident === true ||
+        user?.role === "admin" ||
+        user?.role === "quan_tri" ||
+        user?.role === "ADM" ||
+        user?.role === "chu_tich" ||
+        user?.role === "president" ||
+        user?.role === "lop_truong" ||
+        user?.role === "pho_chu_tich" ||
+        String(user?.role).startsWith("lop_pho_") ||
+        String(user?.role).startsWith("truong_ban_") ||
+        user?.email === "admin@ceohn10.vn" ||
+        user?.email === "admin@viconnect.vn" ||
+        user?.email === "infor@viconnect.vn" ||
+        user?.email === "admin.hn10@ceohn10.vn" ||
+        user?.email === "loptruong.hn10@ceohn10.vn" ||
+        user?.email === "btt.hn10@ceohn10.vn" ||
+        user?.email === "btc.hn10@ceohn10.vn" ||
+        user?.email?.toLowerCase().includes("admin") ||
+        user?.email?.toLowerCase().includes("loptruong")
+      ) {
+        if (route === "/accounts" || route === "/permissions") return false;
+        return true;
+      }
       return isRouteAllowedByMatrix(route, currentRoleKey, user);
     },
-    [currentRoleKey, matrixRevision, user]
+    [currentRoleKey, isPlatformAdmin, isAdmin, isChuTich, matrixRevision, user]
   );
 
   // Scoped permissions according to the SRS RBAC matrix:
@@ -728,9 +789,9 @@ export function Sidebar({
         onScroll={handleScroll}
         className="sidebar-scroll flex-1 space-y-5 overflow-y-auto py-4"
       >
-        {/* Nút Master Admin Portal (Quản trị lớn nhất nền tảng) */}
-        {(isPrivilegedAdmin || user?.email === "admin@ceohn10.vn") && (
-          <div className={isCollapsed ? "px-2 pb-2" : "px-3 pb-2"}>
+        {/* Nút Master Admin Portal (Quản trị lớn nhất nền tảng) & Tenant Switcher */}
+        {(isPrivilegedAdmin || isPlatformAdmin || isAdmin || isChuTich || user?.email === "admin@ceohn10.vn" || user?.email === "admin@viconnect.vn" || user?.email === "admin.hn10@ceohn10.vn" || user?.role === "admin" || user?.role === "quan_tri" || user?.role === "platform_admin") && (
+          <div className={isCollapsed ? "px-2 pb-2" : "px-3 pb-2 space-y-2"}>
             <Link
               to="/master"
               className={`flex items-center gap-2 rounded-xl p-2.5 transition-all cursor-pointer ${
@@ -738,7 +799,7 @@ export function Sidebar({
                   ? "bg-gradient-to-r from-red-600 to-amber-600 text-white font-bold shadow-md ring-2 ring-amber-300"
                   : "bg-red-50 text-red-800 hover:bg-red-100 border border-red-200/80 shadow-xs"
               } ${isCollapsed ? "justify-center" : ""}`}
-              title="Cổng Quản Trị Lớn Nhất (Master Admin - CEOHN10)"
+              title="Cổng Quản Trị Lớn Nhất (Platform Master Admin - Viconnect)"
             >
               <ShieldCheck className="h-5 w-5 shrink-0 text-red-600" />
               {!isCollapsed && (
@@ -747,7 +808,7 @@ export function Sidebar({
                     Quản Trị Lớn Nhất
                   </div>
                   <div className="text-[10px] text-red-700/80 truncate">
-                    Master Admin · Nền tảng & Sepay
+                    Platform Master Admin · Nền tảng
                   </div>
                 </div>
               )}
@@ -769,10 +830,10 @@ export function Sidebar({
           />
         )}
 
-        {/* 2. Nhóm SỰ KIỆN */}
+        {/* 2. NHÓM SỰ KIỆN */}
         {filteredCrmEvents.length > 0 && (
           <Group
-            customGroupLabel="Nhóm SỰ KIỆN"
+            customGroupLabel="NHÓM SỰ KIỆN"
             items={filteredCrmEvents}
             pathname={pathname}
             searchStr={searchStr}
@@ -783,11 +844,11 @@ export function Sidebar({
           />
         )}
 
-        {/* 3. Nhóm Lớp CEOHN10 */}
-        {filteredCrmClasses.length > 0 && (
+        {/* 3. QUẢN LÝ LỚP HỌC (Hiển thị khi hệ thống có module classes, ví dụ CEO HN10) */}
+        {isModuleEnabledForTenant("classes", activeTenantKey) && filteredCrmClasses.length > 0 && (
           <Group
-            customGroupLabel="Nhóm Lớp CEOHN10"
-            items={crmClasses}
+            customGroupLabel="QUẢN LÝ LỚP HỌC"
+            items={filteredCrmClasses}
             pathname={pathname}
             searchStr={searchStr}
             collapsed={isCollapsed}
@@ -825,10 +886,10 @@ export function Sidebar({
           />
         )}
 
-        {/* 6. Nhóm Cài đặt hệ thống */}
+        {/* 6. NHÓM CÀI ĐẶT HỆ THỐNG */}
         {filteredCrmSystemDocs.length > 0 && (
           <Group
-            customGroupLabel="Nhóm Cài đặt hệ thống"
+            customGroupLabel="NHÓM CÀI ĐẶT HỆ THỐNG"
             items={filteredCrmSystemDocs}
             pathname={pathname}
             searchStr={searchStr}

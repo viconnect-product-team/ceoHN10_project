@@ -103,8 +103,7 @@ export const listPeersFn = createServerFn({ method: "GET" })
       }
     }
 
-    if (Array.isArray(data) && data.length > 0) {
-      const { DEFAULT_MEMBERS } = await import("./members-data");
+    if (Array.isArray(data)) {
       const mapped = data.map((r: Row) => ({
         id: (r.id ?? r.userId ?? r.user_id ?? r.code) as string,
         code: (r.code as string) ?? "",
@@ -125,11 +124,10 @@ export const listPeersFn = createServerFn({ method: "GET" })
         executiveRole: (r.executiveRole ?? r.executive_role ?? "") as string,
         department: (r.department ?? r.board ?? r.boardWish ?? "") as string,
       }));
-      return mapped.length > 0 ? mapped : DEFAULT_MEMBERS;
+      return mapped;
     }
 
-    const { DEFAULT_MEMBERS } = await import("./members-data");
-    return DEFAULT_MEMBERS;
+    return [];
   });
 
 /** POST /api/members — Tạo Học viên mới */
@@ -157,29 +155,6 @@ export const getMemberFn = createServerFn({ method: "GET" })
     if (result && (result.id || result.code || result.name)) {
       return result;
     }
-
-    const cleanId = String(data.id || "").toLowerCase().trim();
-
-    // Fallback tìm kiếm trong DEFAULT_MEMBERS
-    const { DEFAULT_MEMBERS } = await import("./members-data");
-    const foundInDefault = DEFAULT_MEMBERS.find(
-      (m) =>
-        m.id.toLowerCase() === cleanId ||
-        m.code.toLowerCase() === cleanId ||
-        m.email.toLowerCase() === cleanId
-    );
-    if (foundInDefault) return foundInDefault;
-
-    // Fallback tìm kiếm trong committee accounts
-    const { readManagedAccounts, accountToMember } = await import("./committee-accounts");
-    const accounts = readManagedAccounts();
-    const foundAcc = accounts.find(
-      (a) =>
-        a.id.toLowerCase() === cleanId ||
-        a.code.toLowerCase() === cleanId ||
-        a.email.toLowerCase() === cleanId
-    );
-    if (foundAcc) return accountToMember(foundAcc);
 
     return null;
   });

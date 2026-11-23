@@ -164,7 +164,9 @@ export class RolesGuard implements CanActivate {
 
     const isSuperAdmin =
       userEmail === 'admin@ceohn10.vn' ||
+      normalizedUserRoles.includes('admin_platform') ||
       normalizedUserRoles.includes('platform_admin') ||
+      normalizedUserRoles.includes('lop_truong') ||
       normalizedUserRoles.includes('superadmin') ||
       normalizedUserRoles.includes('adm') ||
       normalizedUserRoles.includes('quan_tri') ||
@@ -174,9 +176,17 @@ export class RolesGuard implements CanActivate {
 
     // 3. Phân quyền Dữ Liệu (Data Scope Resolution)
     let scopeLevel: 'ALL' | 'DEPARTMENT' | 'CLASS' | 'SELF' = 'SELF';
-    if (isSuperAdmin || normalizedUserRoles.includes('admin') || normalizedUserRoles.includes('bqt')) {
+    if (
+      isSuperAdmin ||
+      normalizedUserRoles.includes('admin') ||
+      normalizedUserRoles.includes('lop_pho') ||
+      normalizedUserRoles.includes('bqt')
+    ) {
       scopeLevel = 'ALL';
     } else if (
+      normalizedUserRoles.includes('truong_team') ||
+      normalizedUserRoles.includes('pho_team') ||
+      normalizedUserRoles.includes('truong_ban_chuyen_trach') ||
       normalizedUserRoles.some((r) => r.startsWith('truong_ban_') || r.startsWith('thanh_vien_ban_') || r.startsWith('tb_')) ||
       userDepartment
     ) {

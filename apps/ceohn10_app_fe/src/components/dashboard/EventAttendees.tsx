@@ -24,11 +24,13 @@ const STATUS_TONE: Record<Registration["status"], string> = {
   confirmed: "bg-success/12 text-success",
   waitlist: "bg-warning/15 text-[oklch(0.48_0.16_65)]",
   cancelled: "bg-secondary text-muted-foreground",
+  attended: "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400",
 };
 const STATUS_KEY: Record<Registration["status"], TKey> = {
   confirmed: "edetail.attendees.confirmed",
   waitlist: "edetail.attendees.waitlist",
   cancelled: "edetail.attendees.cancelledLabel",
+  attended: "events.status.completed" as TKey,
 };
 
 type Filter = "confirmed" | "waitlist" | "cancelled";

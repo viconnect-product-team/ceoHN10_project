@@ -174,8 +174,9 @@ export class AdminController {
     @Query('category') category?: string,
     @Query('search') search?: string,
     @Query('minRating') minRating?: number,
+    @Query('eventId') eventId?: string,
   ) {
-    return this.adminService.listAllFeedbacks({ category, search, minRating });
+    return this.adminService.listAllFeedbacks({ category, search, minRating, eventId });
   }
 
   @Post('notifications/:id/push-messages')

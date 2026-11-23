@@ -34,7 +34,7 @@ import {
   Search,
 } from "lucide-react";
 import { toast } from "sonner";
-import { fetchNestApi } from "@/lib/api-client";
+import { fetchNestApi, uploadFileToNest } from "@/lib/api-client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -58,7 +58,7 @@ import { parseMultipleFiles } from "@/lib/ai-excel-email-parser";
 // ── TYPES ───────────────────────────────────────────────────────────────────────
 
 export type TemplateCategory = "events" | "classes" | "members" | "management";
-export type FieldType = "text" | "textarea" | "datetime" | "price" | "select" | "qr";
+export type FieldType = "text" | "textarea" | "datetime" | "price" | "select" | "qr" | "image";
 
 export interface DynamicField {
   id: string;
@@ -327,24 +327,24 @@ export const INITIAL_DYNAMIC_TEMPLATES: DynamicTemplate[] = [
     id: "tmpl-fee-reminder",
     code: "FEE_RENEWAL_REMINDER",
     category: "members",
-    name: "Thông Báo Niên Liễm & Đóng Hội Phí Thường Niên",
-    description: "Mẫu thông báo hội phí niên liễm, cung cấp mã QR chuyển khoản Sepay tự động kích hoạt.",
+    name: "Thông Báo Đóng Học Phí Thường Niên",
+    description: "Mẫu thông báo học phí, cung cấp mã QR chuyển khoản Sepay tự động kích hoạt.",
     channels: ["email", "zalo_oa", "in_app"],
-    subject: "[THÔNG BÁO HỘI PHÍ] Niên liễm CLB CEO HN10 — Học viên: {{full_name}}",
-    inAppTitle: "Thông báo nộp niên liễm CLB CEO HN10",
-    inAppBody: "Kính gửi Anh/Chị {{full_name}}, kỳ đóng hội phí niên liễm CLB CEO HN10 với số tiền {{fee_amount}} đã đến hạn. Quý Anh/Chị quét mã QR để chuyển khoản nhanh chóng.",
+    subject: "[THÔNG BÁO HỌC PHÍ] Học phí CLB CEO HN10 — Học viên: {{full_name}}",
+    inAppTitle: "Thông báo nộp học phí CLB CEO HN10",
+    inAppBody: "Kính gửi Anh/Chị {{full_name}}, kỳ đóng học phí CLB CEO HN10 với số tiền {{fee_amount}} đã đến hạn. Quý Anh/Chị quét mã QR để chuyển khoản nhanh chóng.",
     htmlBody: `
 <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; overflow: hidden;">
   <div style="background: #7C2D12; padding: 24px; text-align: center; color: #ffffff;">
-    <h2 style="margin: 0; font-size: 19px; font-weight: 800;">THÔNG BÁO NIÊN LIỄM CLB CEO HN10</h2>
+    <h2 style="margin: 0; font-size: 19px; font-weight: 800;">THÔNG BÁO HỌC PHÍ CLB CEO HN10</h2>
     <p style="margin: 6px 0 0; font-size: 13px; color: #fed7aa;">Học viên: {{full_name}} (Mã: {{member_code}})</p>
   </div>
   <div style="padding: 24px; font-size: 14px; color: #334155;">
-    <p>Kính gửi Anh/Chị <strong>{{full_name}}</strong>,<br>Ban Tài Chính CLB CEO HN10 xin gửi thông báo niên liễm thường niên:</p>
+    <p>Kính gửi Anh/Chị <strong>{{full_name}}</strong>,<br>Ban Tài Chính CLB CEO HN10 xin gửi thông báo học phí thường niên:</p>
     <div style="background: #fff7ed; padding: 14px; border-radius: 10px; margin: 12px 0;">
       <p style="margin: 0 0 6px;">💰 <strong>Số tiền:</strong> {{fee_amount}}</p>
       <p style="margin: 0 0 6px;">💳 <strong>Số tài khoản:</strong> 198300000000 (MBBank - CLB DOANH NHAN CEO HN10)</p>
-      <p style="margin: 0;">📝 <strong>Cú pháp chuyển khoản:</strong> CEOHN10_HP_{{member_code}}</p>
+      <p style="margin: 0;">📝 <strong>Cú pháp chuyển khoản:</strong> CEOHN10_HOCPHI_{{member_code}}</p>
     </div>
   </div>
 </div>
@@ -352,7 +352,7 @@ export const INITIAL_DYNAMIC_TEMPLATES: DynamicTemplate[] = [
     fields: [
       { id: "f_fname", key: "full_name", label: "Tên Học Viên", type: "text", value: "Dương Thị Huệ" },
       { id: "f_fcode", key: "member_code", label: "Mã Học Viên", type: "text", value: "CEO10-016" },
-      { id: "f_famt", key: "fee_amount", label: "Số Tiền Hội Phí", type: "price", value: "5000000" },
+      { id: "f_famt", key: "fee_amount", label: "Số Tiền Học Phí", type: "price", value: "5000000" },
     ],
   },
 ];
@@ -387,11 +387,101 @@ export function DynamicNotificationTemplateManager() {
   const [newFieldType, setNewFieldType] = useState<FieldType>("text");
   const [newFieldPlaceholder, setNewFieldPlaceholder] = useState("");
 
+  // State: Modal Tạo Mới Mẫu Thông Báo
+  const [showCreateTemplateModal, setShowCreateTemplateModal] = useState(false);
+  const [newTemplateForm, setNewTemplateForm] = useState({
+    name: "",
+    code: "",
+    category: "events" as TemplateCategory,
+    description: "",
+    subject: "",
+    inAppTitle: "",
+    inAppBody: "",
+    imageUrl: "",
+  });
+
+  // State: Modal Sửa Mẫu Thông Báo
+  const [showEditTemplateModal, setShowEditTemplateModal] = useState(false);
+  const [editingTemplate, setEditingTemplate] = useState<DynamicTemplate | null>(null);
+
   // State: Modal Phát Sóng Đa Kênh
   const [showBroadcastModal, setShowBroadcastModal] = useState(false);
   const [broadcastTarget, setBroadcastTarget] = useState<"all" | "class" | "file">("all");
   const [customRecipients, setCustomRecipients] = useState<any[]>([]);
   const [isSendingBroadcast, setIsSendingBroadcast] = useState(false);
+
+  const handleCreateTemplate = () => {
+    if (!newTemplateForm.name.trim() || !newTemplateForm.subject.trim()) {
+      toast.error("Vui lòng nhập tên mẫu và tiêu đề thông báo");
+      return;
+    }
+    const newId = `tmpl-custom-${Date.now()}`;
+    const newTmpl: DynamicTemplate = {
+      id: newId,
+      code: newTemplateForm.code.trim() || `CUSTOM_${Date.now()}`,
+      category: newTemplateForm.category,
+      name: newTemplateForm.name.trim(),
+      description: newTemplateForm.description.trim() || "Mẫu thông báo tùy biến CEO HN10",
+      channels: ["email", "zalo_oa", "in_app"],
+      subject: newTemplateForm.subject.trim(),
+      inAppTitle: newTemplateForm.inAppTitle.trim() || newTemplateForm.name.trim(),
+      inAppBody: newTemplateForm.inAppBody.trim() || newTemplateForm.subject.trim(),
+      htmlBody: `<div style="font-family: Arial, sans-serif; padding: 20px; color: #1e293b; max-width: 600px; margin: 0 auto; border: 1px solid #e2e8f0; border-radius: 12px;">
+        <h2 style="color: #002B70; margin-top: 0;">${newTemplateForm.name.trim()}</h2>
+        <p style="font-size: 14px; line-height: 1.6;">${newTemplateForm.inAppBody.trim() || newTemplateForm.subject.trim()}</p>
+        ${newTemplateForm.imageUrl ? `<div style="margin: 16px 0; text-align: center;"><img src="${newTemplateForm.imageUrl}" alt="Banner" style="max-width: 100%; border-radius: 8px;" /></div>` : ''}
+        <div style="background: #f8fafc; padding: 12px; border-radius: 8px; font-size: 12px; color: #64748b; margin-top: 16px;">
+          CLB Doanh Nhân CEO HN10 (HanoiBA) · Hotline: 0983 1010 10
+        </div>
+      </div>`,
+      fields: [
+        { id: `f_name_${Date.now()}`, key: "full_name", label: "Tên Học Viên / Khách Mời", type: "text", value: "Quý Doanh Nhân" },
+        ...(newTemplateForm.imageUrl ? [{ id: `f_img_${Date.now()}`, key: "image_url", label: "Ảnh Đính Kèm", type: "image" as FieldType, value: newTemplateForm.imageUrl }] : [])
+      ],
+    };
+
+    setTemplates((prev) => [newTmpl, ...prev]);
+    setSelectedTemplateId(newId);
+    setShowCreateTemplateModal(false);
+    setNewTemplateForm({
+      name: "",
+      code: "",
+      category: "events",
+      description: "",
+      subject: "",
+      inAppTitle: "",
+      inAppBody: "",
+      imageUrl: "",
+    });
+    toast.success("Đã tạo mẫu thông báo mới thành công!");
+  };
+
+  const handleOpenEditTemplate = (t: DynamicTemplate) => {
+    setEditingTemplate({ ...t });
+    setShowEditTemplateModal(true);
+  };
+
+  const handleSaveEditedTemplate = () => {
+    if (!editingTemplate) return;
+    setTemplates((prev) =>
+      prev.map((t) => (t.id === editingTemplate.id ? { ...editingTemplate } : t))
+    );
+    setShowEditTemplateModal(false);
+    toast.success("Đã cập nhật mẫu thông báo thành công!");
+  };
+
+  const handleDeleteTemplate = (id: string) => {
+    if (templates.length <= 1) {
+      toast.error("Không thể xóa mẫu thông báo cuối cùng");
+      return;
+    }
+    setTemplates((prev) => prev.filter((t) => t.id !== id));
+    if (selectedTemplateId === id) {
+      const remaining = templates.filter((t) => t.id !== id);
+      if (remaining.length > 0) setSelectedTemplateId(remaining[0].id);
+    }
+    toast.success("Đã xóa mẫu thông báo thành công!");
+  };
 
   // Template đang chọn
   const activeTemplate = useMemo(() => {
@@ -630,14 +720,35 @@ export function DynamicNotificationTemplateManager() {
     let inApp = activeTemplate.inAppBody;
     let html = activeTemplate.htmlBody;
 
+    let hasImageInHtml = false;
+    const customImageUrls: string[] = [];
+
     // Thay thế các biến động {{key}}
     activeTemplate.fields.forEach((f) => {
       const reg = new RegExp(`{{${f.key}}}`, "g");
       const val = f.value || f.placeholder || "";
+      if (f.type === "image" && f.value) {
+        customImageUrls.push(f.value);
+        if (activeTemplate.htmlBody.includes(`{{${f.key}}}`)) {
+          hasImageInHtml = true;
+        }
+      }
       subj = subj.replace(reg, val);
       inApp = inApp.replace(reg, val);
       html = html.replace(reg, val);
     });
+
+    // Nếu có trường ảnh động mới được thêm mà chưa có trong HTML format, tự động nhúng ảnh vào format thông báo
+    if (customImageUrls.length > 0 && !hasImageInHtml) {
+      const imageBlocks = customImageUrls
+        .map((imgUrl) => `<div style="margin: 16px 0; text-align: center;"><img src="${imgUrl}" alt="Ảnh đính kèm" style="max-width: 100%; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" /></div>`)
+        .join("\n");
+      if (html.includes("padding: 26px")) {
+        html = html.replace("<div style=\"padding: 26px", `${imageBlocks}\n<div style=\"padding: 26px`);
+      } else {
+        html = `${imageBlocks}\n` + html;
+      }
+    }
 
     // Thay thế biến mặc định {{full_name}} nếu chưa có
     subj = subj.replace(/{{full_name}}/g, "Dương Thị Huệ");
@@ -766,7 +877,7 @@ export function DynamicNotificationTemplateManager() {
             }`}
           >
             <UserCheck className="w-4 h-4" />
-            <span>3. Học Viên &amp; Hội Phí</span>
+            <span>3. Học Viên &amp; Học Phí</span>
           </button>
 
           <button
@@ -788,30 +899,60 @@ export function DynamicNotificationTemplateManager() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* CỘT 1: DANH SÁCH MẪU THUỘC DANH MỤC ĐANG CHỌN (3 COLUMNS) */}
         <div className="lg:col-span-3 space-y-3">
-          <div className="text-xs font-bold uppercase tracking-wider text-slate-500 px-1">
-            Mẫu Chuẩn Trong Danh Mục ({filteredTemplates.length})
+          <div className="flex items-center justify-between px-1">
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
+              Mẫu Chuẩn ({filteredTemplates.length})
+            </span>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => setShowCreateTemplateModal(true)}
+              className="h-7 text-[11px] font-bold border-blue-200 text-[#002B70] hover:bg-blue-50 gap-1 px-2"
+            >
+              <Plus className="w-3 h-3" />
+              <span>Tạo Mẫu</span>
+            </Button>
           </div>
 
-          <div className="space-y-2">
+          <div className="space-y-2 max-h-[600px] overflow-y-auto pr-1">
             {filteredTemplates.map((t) => {
               const isSelected = selectedTemplateId === t.id;
               return (
                 <div
                   key={t.id}
                   onClick={() => setSelectedTemplateId(t.id)}
-                  className={`p-3.5 rounded-2xl border transition-all cursor-pointer ${
+                  className={`p-3.5 rounded-2xl border transition-all cursor-pointer relative group ${
                     isSelected
                       ? "border-[#002B70] bg-blue-50/70 ring-2 ring-[#002B70]/20 shadow-sm"
                       : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50/50"
                   }`}
                 >
                   <div className="flex items-start justify-between gap-2">
-                    <h4 className="text-xs font-bold text-slate-900 leading-snug">{t.name}</h4>
-                    {isSelected && (
-                      <span className="w-4 h-4 rounded-full bg-[#002B70] text-white flex items-center justify-center text-[10px] font-bold shrink-0">
-                        ✓
-                      </span>
-                    )}
+                    <h4 className="text-xs font-bold text-slate-900 leading-snug flex-1">{t.name}</h4>
+                    <div className="flex items-center gap-1 shrink-0">
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleOpenEditTemplate(t);
+                        }}
+                        className="p-1 text-slate-400 hover:text-blue-600 rounded transition opacity-80 hover:opacity-100"
+                        title="Chỉnh sửa mẫu này"
+                      >
+                        <Edit3 className="w-3 h-3" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeleteTemplate(t.id);
+                        }}
+                        className="p-1 text-slate-400 hover:text-red-600 rounded transition opacity-80 hover:opacity-100"
+                        title="Xóa mẫu này"
+                      >
+                        <Trash2 className="w-3 h-3" />
+                      </button>
+                    </div>
                   </div>
                   <p className="text-[11px] text-slate-500 line-clamp-2 mt-1">{t.description}</p>
                   <div className="flex items-center gap-1.5 mt-2.5">
@@ -1102,6 +1243,44 @@ export function DynamicNotificationTemplateManager() {
                       onChange={(e) => handleUpdateFieldValue(f.id, e.target.value)}
                       className="bg-white border-slate-300 text-xs text-slate-800"
                     />
+                  ) : f.type === "image" ? (
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        <Input
+                          type="text"
+                          value={f.value}
+                          placeholder={f.placeholder || "Đường dẫn URL ảnh MinIO..."}
+                          onChange={(e) => handleUpdateFieldValue(f.id, e.target.value)}
+                          className="bg-white border-slate-300 text-xs h-8 text-slate-800 font-medium"
+                        />
+                        <label className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold cursor-pointer transition shrink-0 shadow-xs">
+                          <Upload className="w-3.5 h-3.5" />
+                          <span>Tải ảnh lên MinIO</span>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={async (e) => {
+                              const file = e.target.files?.[0];
+                              if (!file) return;
+                              try {
+                                toast.info("Đang tải ảnh lên máy chủ MinIO...");
+                                const url = await uploadFileToNest(file, "notifications");
+                                handleUpdateFieldValue(f.id, url);
+                                toast.success("Đã tải ảnh lên MinIO và cập nhật format thông báo!");
+                              } catch (err: any) {
+                                toast.error("Lỗi tải ảnh lên MinIO: " + (err?.message || ""));
+                              }
+                            }}
+                          />
+                        </label>
+                      </div>
+                      {f.value && (
+                        <div className="relative w-40 h-24 rounded-xl overflow-hidden border-2 border-emerald-500/30 bg-slate-100 shadow-xs">
+                          <img src={f.value} alt="Preview" className="w-full h-full object-cover" />
+                        </div>
+                      )}
+                    </div>
                   ) : (
                     <Input
                       type={f.type === "datetime" ? "datetime-local" : "text"}
@@ -1263,6 +1442,7 @@ export function DynamicNotificationTemplateManager() {
                   <SelectItem value="textarea">Văn bản nhiều dòng (textarea)</SelectItem>
                   <SelectItem value="datetime">Ngày &amp; Giờ (datetime)</SelectItem>
                   <SelectItem value="price">Số tiền VNĐ (price)</SelectItem>
+                  <SelectItem value="image">Hình ảnh / Banner đính kèm (image)</SelectItem>
                   <SelectItem value="qr">Mã QR Check-in / Link (qr)</SelectItem>
                 </SelectContent>
               </Select>
@@ -1390,6 +1570,189 @@ export function DynamicNotificationTemplateManager() {
               </Button>
             </div>
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* ── MODAL: TẠO MẪU THÔNG BÁO MỚI ── */}
+      <Dialog open={showCreateTemplateModal} onOpenChange={setShowCreateTemplateModal}>
+        <DialogContent className="bg-white border-slate-200 text-slate-800 max-w-lg shadow-lg">
+          <DialogHeader>
+            <DialogTitle className="text-base font-bold text-slate-900">
+              Tạo Mẫu Thông Báo Mới (CEO HN10)
+            </DialogTitle>
+            <DialogDescription className="text-xs text-slate-500">
+              Thiết lập mẫu thông báo mới kèm đính kèm ảnh và tùy biến các trường động
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-3.5 pt-2 max-h-[70vh] overflow-y-auto pr-1">
+            <div className="space-y-1">
+              <Label className="text-xs font-semibold text-slate-700">Tên Mẫu Thông Báo *</Label>
+              <Input
+                placeholder="VD: Thư Mời Sự Kiện VIP, Thông Báo Lịch Học Bù..."
+                value={newTemplateForm.name}
+                onChange={(e) => setNewTemplateForm({ ...newTemplateForm, name: e.target.value })}
+                className="bg-white border-slate-300 text-xs h-9"
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1">
+                <Label className="text-xs font-semibold text-slate-700">Mã Mẫu (Code)</Label>
+                <Input
+                  placeholder="VD: EVENT_VIP_INVITE"
+                  value={newTemplateForm.code}
+                  onChange={(e) => setNewTemplateForm({ ...newTemplateForm, code: e.target.value })}
+                  className="bg-white border-slate-300 text-xs h-9 font-mono uppercase"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <Label className="text-xs font-semibold text-slate-700">Danh Mục</Label>
+                <Select
+                  value={newTemplateForm.category}
+                  onValueChange={(val: any) => setNewTemplateForm({ ...newTemplateForm, category: val })}
+                >
+                  <SelectTrigger className="bg-white border-slate-300 text-xs h-9">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white border-slate-200 text-xs">
+                    <SelectItem value="events">1. Sự Kiện &amp; Hội Nghị</SelectItem>
+                    <SelectItem value="classes">2. Khóa Học &amp; Lớp CEO</SelectItem>
+                    <SelectItem value="members">3. Học Viên &amp; Học Phí</SelectItem>
+                    <SelectItem value="management">4. BQT &amp; Điều Hành</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div className="space-y-1">
+              <Label className="text-xs font-semibold text-slate-700">Tiêu Đề Thông Báo (Subject) *</Label>
+              <Input
+                placeholder="VD: [THÔNG BÁO] {{event_title}} — Kính gửi {{full_name}}"
+                value={newTemplateForm.subject}
+                onChange={(e) => setNewTemplateForm({ ...newTemplateForm, subject: e.target.value })}
+                className="bg-white border-slate-300 text-xs h-9"
+              />
+            </div>
+
+            <div className="space-y-1">
+              <Label className="text-xs font-semibold text-slate-700">Đường Dẫn Ảnh Đính Kèm (Poster / Banner URL)</Label>
+              <Input
+                placeholder="https://... hoặc tải ảnh lên"
+                value={newTemplateForm.imageUrl}
+                onChange={(e) => setNewTemplateForm({ ...newTemplateForm, imageUrl: e.target.value })}
+                className="bg-white border-slate-300 text-xs h-9"
+              />
+              {newTemplateForm.imageUrl && (
+                <div className="mt-1 relative w-32 h-20 rounded-lg overflow-hidden border border-slate-200 bg-slate-100">
+                  <img src={newTemplateForm.imageUrl} alt="Banner" className="w-full h-full object-cover" />
+                </div>
+              )}
+            </div>
+
+            <div className="space-y-1">
+              <Label className="text-xs font-semibold text-slate-700">Nội Dung Tóm Tắt (Zalo / In-App)</Label>
+              <Textarea
+                rows={3}
+                placeholder="Nhập nội dung ngắn gửi qua Zalo OA và App di động..."
+                value={newTemplateForm.inAppBody}
+                onChange={(e) => setNewTemplateForm({ ...newTemplateForm, inAppBody: e.target.value })}
+                className="bg-white border-slate-300 text-xs"
+              />
+            </div>
+
+            <div className="flex justify-end gap-2 pt-3 border-t border-slate-100">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowCreateTemplateModal(false)}
+                className="text-xs h-9"
+              >
+                Hủy
+              </Button>
+              <Button
+                size="sm"
+                onClick={handleCreateTemplate}
+                className="bg-[#002B70] hover:bg-[#003B95] text-white font-bold text-xs h-9 px-4"
+              >
+                Lưu Mẫu Mới
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* ── MODAL: SỬA MẪU THÔNG BÁO ── */}
+      <Dialog open={showEditTemplateModal} onOpenChange={setShowEditTemplateModal}>
+        <DialogContent className="bg-white border-slate-200 text-slate-800 max-w-lg shadow-lg">
+          <DialogHeader>
+            <DialogTitle className="text-base font-bold text-slate-900">
+              Chỉnh Sửa Mẫu Thông Báo
+            </DialogTitle>
+            <DialogDescription className="text-xs text-slate-500">
+              Cập nhật thông tin chi tiết và nội dung của mẫu thông báo
+            </DialogDescription>
+          </DialogHeader>
+
+          {editingTemplate && (
+            <div className="space-y-3.5 pt-2 max-h-[70vh] overflow-y-auto pr-1">
+              <div className="space-y-1">
+                <Label className="text-xs font-semibold text-slate-700">Tên Mẫu</Label>
+                <Input
+                  value={editingTemplate.name}
+                  onChange={(e) => setEditingTemplate({ ...editingTemplate, name: e.target.value })}
+                  className="bg-white border-slate-300 text-xs h-9"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <Label className="text-xs font-semibold text-slate-700">Tiêu Đề Thư</Label>
+                <Input
+                  value={editingTemplate.subject}
+                  onChange={(e) => setEditingTemplate({ ...editingTemplate, subject: e.target.value })}
+                  className="bg-white border-slate-300 text-xs h-9"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <Label className="text-xs font-semibold text-slate-700">Mô Tả</Label>
+                <Input
+                  value={editingTemplate.description}
+                  onChange={(e) => setEditingTemplate({ ...editingTemplate, description: e.target.value })}
+                  className="bg-white border-slate-300 text-xs h-9"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <Label className="text-xs font-semibold text-slate-700">Nội Dung In-App / Zalo OA</Label>
+                <Textarea
+                  rows={4}
+                  value={editingTemplate.inAppBody}
+                  onChange={(e) => setEditingTemplate({ ...editingTemplate, inAppBody: e.target.value })}
+                  className="bg-white border-slate-300 text-xs"
+                />
+              </div>
+
+              <div className="flex justify-end gap-2 pt-3 border-t border-slate-100">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowEditTemplateModal(false)}
+                  className="text-xs h-9"
+                >
+                  Hủy
+                </Button>
+                <Button
+                  size="sm"
+                  onClick={handleSaveEditedTemplate}
+                  className="bg-[#002B70] hover:bg-[#003B95] text-white font-bold text-xs h-9 px-4"
+                >
+                  Lưu Thay Đổi
+                </Button>
+              </div>
+            </div>
+          )}
         </DialogContent>
       </Dialog>
     </div>

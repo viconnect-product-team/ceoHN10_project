@@ -17,14 +17,14 @@ export const Route = createFileRoute("/association/login")({
   ssr: false,
   validateSearch: (search: Record<string, unknown>): {
     redirect?: string;
-    reason?: "expired";
+    reason?: "expired" | "password_changed";
     username?: string;
     email?: string;
     registered?: string;
     reset?: string;
   } => ({
     ...(typeof search.redirect === "string" ? { redirect: search.redirect } : {}),
-    ...(search.reason === "expired" ? { reason: "expired" as const } : {}),
+    ...(search.reason === "expired" || search.reason === "password_changed" ? { reason: search.reason as any } : {}),
     ...(typeof search.username === "string" ? { username: search.username } : {}),
     ...(typeof search.email === "string" ? { email: search.email } : {}),
     ...(typeof search.registered === "string" ? { registered: search.registered } : {}),
@@ -98,12 +98,12 @@ function AssociationLoginPage() {
   }, [registered]);
 
   useEffect(() => {
-    if (reset === "success") {
-      toast.success("✓ Đổi mật khẩu thành công! Quý CEO vui lòng đăng nhập lại bằng mật khẩu mới vừa tạo.", {
-        duration: 7000,
+    if (reset === "success" || reason === "password_changed") {
+      toast.success("✓ Đổi mật khẩu thành công! Quý CEO vui lòng đăng nhập lại bằng mật khẩu mới vừa tạo để chính thức kích hoạt tài khoản.", {
+        duration: 8000,
       });
     }
-  }, [reset]);
+  }, [reset, reason]);
 
   const justLoggedInRef = useRef(false);
 
@@ -191,11 +191,12 @@ function AssociationLoginPage() {
           toast.warning("Học viên mới bắt buộc phải thay đổi mật khẩu khởi tạo trước khi sử dụng ứng dụng.", {
             duration: 6000,
           });
-          navigate({
-            to: "/association/settings" as any,
-            search: { action: "change_password", required: "true" } as any,
-            replace: true,
-          });
+          // Chuyển trực tiếp vào App để Modal Bắt Buộc Đổi Mật Khẩu (FirstLoginChangePasswordModal) chặn màn hình ngay lập tức
+          if (typeof window !== "undefined") {
+            window.location.replace("/association");
+          } else {
+            navigate({ to: "/association" as any, replace: true });
+          }
           return;
         } else {
           try {

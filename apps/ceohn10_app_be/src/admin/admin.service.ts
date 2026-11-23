@@ -544,6 +544,42 @@ export class AdminService implements OnModuleInit {
     return updated.invoice;
   }
 
+  private async getSepayBankConfig() {
+    try {
+      const masterRows = await this.prisma.$queryRawUnsafe<any[]>(`
+        SELECT setting_value FROM public.master_system_settings WHERE setting_key = 'sepay_integration_config' LIMIT 1
+      `).catch(() => []);
+      if (masterRows.length > 0 && masterRows[0]?.setting_value) {
+        const val = typeof masterRows[0].setting_value === 'string' ? JSON.parse(masterRows[0].setting_value) : masterRows[0].setting_value;
+        const bankAcc = (val.bank_accounts && val.bank_accounts[0]) || {};
+        return {
+          bankName: val.bank_brand_name || bankAcc.bank_brand_name || process.env.SEPAY_BANK_NAME || 'MBBank',
+          accountNumber: val.account_number || bankAcc.account_number || process.env.SEPAY_ACCOUNT_NO || '',
+          accountHolder: val.account_name || bankAcc.account_name || process.env.SEPAY_ACCOUNT_HOLDER || 'CLB DOANH NHAN CEO HN10',
+          prefixFee: val.prefix_syntax?.membership || 'CEOHN10_HP',
+        };
+      }
+      const appRows = await this.prisma.$queryRawUnsafe<any[]>(`
+        SELECT value FROM public.app_settings WHERE key = 'crm_sepay_config' LIMIT 1
+      `).catch(() => []);
+      if (appRows.length > 0 && appRows[0]?.value) {
+        const val = typeof appRows[0].value === 'string' ? JSON.parse(appRows[0].value) : appRows[0].value;
+        return {
+          bankName: val.bankName || process.env.SEPAY_BANK_NAME || 'MBBank',
+          accountNumber: val.accountNumber || process.env.SEPAY_ACCOUNT_NO || '',
+          accountHolder: val.accountHolder || process.env.SEPAY_ACCOUNT_HOLDER || 'CLB DOANH NHAN CEO HN10',
+          prefixFee: val.prefixFee || 'CEOHN10_HP',
+        };
+      }
+    } catch {}
+    return {
+      bankName: process.env.SEPAY_BANK_NAME || 'MBBank',
+      accountNumber: process.env.SEPAY_ACCOUNT_NO || '',
+      accountHolder: process.env.SEPAY_ACCOUNT_HOLDER || 'CLB DOANH NHAN CEO HN10',
+      prefixFee: 'CEOHN10_HP',
+    };
+  }
+
   async addInvoiceReminder(
     id: string,
     data: { channel: string; byName?: string; note?: string },
@@ -657,7 +693,12 @@ export class AdminService implements OnModuleInit {
           // 3. Đẩy template tin nhắn tương tác (Actionable template) kèm SePay VietQR trực tiếp vào tin nhắn
           const invoiceAmount = Number(existing.invoice.amount || 0);
           const invoiceNo = existing.invoice.invoiceNo || id;
-          const sepayQrUrl = `https://img.vietqr.io/image/MB-198300000000-compact2.png?amount=${invoiceAmount}&addInfo=${encodeURIComponent(`CEOHN10_HP_${invoiceNo}`)}&accountName=${encodeURIComponent('CLB DOANH NHAN CEO HN10')}`;
+          const sepayCfg = await this.getSepayBankConfig();
+          const bankShort = (sepayCfg.bankName || 'MB').toUpperCase().includes('MB') ? 'MB' : (sepayCfg.bankName || 'MB');
+          const memo = `${sepayCfg.prefixFee}_${invoiceNo}`;
+          const sepayQrUrl = sepayCfg.accountNumber
+            ? `https://img.vietqr.io/image/${bankShort}-${sepayCfg.accountNumber}-compact2.png?amount=${invoiceAmount}&addInfo=${encodeURIComponent(memo)}&accountName=${encodeURIComponent(sepayCfg.accountHolder)}`
+            : '';
           const actionMsg = `[action:payment|amount:${invoiceAmount}|invoice:${invoiceNo}|qr:${sepayQrUrl}|due:${existing.invoice.dueDate || 'Hôm nay'}|desc:${encodeURIComponent(notifBody)}]`;
 
           if (memberCode) {
@@ -692,9 +733,9 @@ export class AdminService implements OnModuleInit {
                   amount: invoiceAmount,
                   dueDate: existing.invoice.dueDate || 'Hôm nay',
                   vietQrUrl: sepayQrUrl,
-                  bankAccount: '198300000000',
-                  bankOwner: 'CLB DOANH NHAN CEO HN10',
-                  bankName: 'MB Bank',
+                  bankAccount: sepayCfg.accountNumber,
+                  bankOwner: sepayCfg.accountHolder,
+                  bankName: sepayCfg.bankName,
                   reminderCount:
                     (existing.invoice.member?.reminderCount || 0) + 1,
                 })
@@ -743,7 +784,12 @@ export class AdminService implements OnModuleInit {
     if (this.mailService) {
       const invoiceAmount = Number(created.invoice.amount || 0);
       const invoiceNo = created.invoice.invoiceNo || id;
-      const sepayQrUrl = `https://img.vietqr.io/image/MB-198300000000-compact2.png?amount=${invoiceAmount}&addInfo=${encodeURIComponent(`CEOHN10_HP_${invoiceNo}`)}&accountName=${encodeURIComponent('CLB DOANH NHAN CEO HN10')}`;
+      const sepayCfg = await this.getSepayBankConfig();
+      const bankShort = (sepayCfg.bankName || 'MB').toUpperCase().includes('MB') ? 'MB' : (sepayCfg.bankName || 'MB');
+      const memo = `${sepayCfg.prefixFee}_${invoiceNo}`;
+      const sepayQrUrl = sepayCfg.accountNumber
+        ? `https://img.vietqr.io/image/${bankShort}-${sepayCfg.accountNumber}-compact2.png?amount=${invoiceAmount}&addInfo=${encodeURIComponent(memo)}&accountName=${encodeURIComponent(sepayCfg.accountHolder)}`
+        : '';
       const memStatus = String(created.invoice.member?.status || '').toLowerCase().trim();
       const isMemInactive =
         created.invoice.member?.is_active === false ||
@@ -767,9 +813,9 @@ export class AdminService implements OnModuleInit {
             amount: invoiceAmount,
             dueDate: created.invoice.dueDate || `${year}-12-31`,
             vietQrUrl: sepayQrUrl,
-            bankAccount: '198300000000',
-            bankOwner: 'CLB DOANH NHAN CEO HN10',
-            bankName: 'MB Bank',
+            bankAccount: sepayCfg.accountNumber,
+            bankOwner: sepayCfg.accountHolder,
+            bankName: sepayCfg.bankName,
             reminderCount: 0,
           })
           .catch((err) =>
@@ -2483,6 +2529,50 @@ export class AdminService implements OnModuleInit {
         invoiceUrl: tx.invoice_url ?? '',
         recipient: tx.recipient ?? '',
       }));
+
+      // Đồng bộ trực tiếp từ đăng ký sự kiện có phí đã thanh toán (payment_status = 'paid')
+      try {
+        const eventRegRows = await this.prisma.$queryRaw<any[]>`
+          SELECT er.id, er.member_name, er.payment_amount, er.payment_method, er.created_at, er.registered_at,
+                 COALESCE(ev.name, ev.title, 'Sự kiện CLB') as event_title
+          FROM public.event_registrations er
+          LEFT JOIN public.events ev ON er.event_id = ev.id
+          WHERE (er.payment_status = 'paid' OR er.payment_status = 'completed') AND er.payment_amount > 0
+        `.catch(() => []);
+
+        const existingCodes = new Set(res.map((r) => r.id));
+        for (const reg of eventRegRows) {
+          const code = `THU-EV${reg.id}`;
+          if (!existingCodes.has(code)) {
+            const regDate = reg.registered_at || reg.created_at;
+            const dateStr = regDate
+              ? regDate instanceof Date
+                ? `${regDate.getFullYear()}-${String(regDate.getMonth() + 1).padStart(2, '0')}-${String(regDate.getDate()).padStart(2, '0')}`
+                : String(regDate).slice(0, 10)
+              : new Date().toISOString().slice(0, 10);
+            res.push({
+              id: code,
+              date: dateStr,
+              type: 'income',
+              category: 'Vé sự kiện',
+              description: `Thu tiền vé sự kiện ${reg.event_title} - ${reg.member_name} (Mã vé: #${reg.id})`,
+              amount: Number(reg.payment_amount || 0),
+              method: reg.payment_method || 'bank',
+              status: 'completed',
+              advanceAmount: 0,
+              refundAmount: 0,
+              invoiceUrl: '',
+              recipient: reg.member_name || '',
+            });
+            existingCodes.add(code);
+          }
+        }
+      } catch (evErr) {
+        console.warn('[AdminService] listTransactions sync event_registrations warn:', evErr);
+      }
+
+      res.sort((a, b) => (b.date > a.date ? 1 : b.date < a.date ? -1 : 0));
+
       if (type) {
         res = res.filter((t) => t.type === type);
       }
@@ -3018,56 +3108,44 @@ export class AdminService implements OnModuleInit {
 
   private getDefaultTreeCategories(): any[] {
     const allRolesGranted = {
+      admin_platform: true,
+      lop_truong: true,
+      admin: true,
+      lop_pho: true,
+      truong_team: true,
+      pho_team: true,
+      truong_ban_chuyen_trach: true,
+      member: true,
+      // Aliases
       quan_tri: true,
       chu_tich: true,
-      admin: true,
-      truong_ban_dieu_hanh: true,
-      tong_thu_ky: true,
-      ban_thu_ky: true,
-      truong_ban_truyen_thong: true,
-      truong_ban_thanh_vien: true,
-      truong_ban_xuc_tien: true,
-      truong_ban_tai_chinh: true,
-      truong_ban_thien_nguyen: true,
-      thanh_vien_ban_su_kien: true,
-      thanh_vien_ban_xuc_tien: true,
-      thanh_vien_ban_thanh_vien: true,
-      thanh_vien_ban_truyen_thong: true,
-      thanh_vien_ban_tai_chinh: true,
-      thanh_vien_ban_thien_nguyen: true,
-      thanh_vien_ban_dieu_hanh: true,
-      member: true,
+      pho_chu_tich: true,
     };
 
     const allDisabled = {
-      quan_tri: false,
-      chu_tich: false,
+      admin_platform: false,
+      lop_truong: false,
       admin: false,
-      truong_ban_dieu_hanh: false,
-      tong_thu_ky: false,
-      ban_thu_ky: false,
-      truong_ban_truyen_thong: false,
-      truong_ban_thanh_vien: false,
-      truong_ban_xuc_tien: false,
-      truong_ban_tai_chinh: false,
-      truong_ban_thien_nguyen: false,
-      thanh_vien_ban_su_kien: false,
-      thanh_vien_ban_xuc_tien: false,
-      thanh_vien_ban_thanh_vien: false,
-      thanh_vien_ban_truyen_thong: false,
-      thanh_vien_ban_tai_chinh: false,
-      thanh_vien_ban_thien_nguyen: false,
-      thanh_vien_ban_dieu_hanh: false,
+      lop_pho: false,
+      truong_team: false,
+      pho_team: false,
+      truong_ban_chuyen_trach: false,
       member: false,
     };
 
     const adminOnly = {
+      admin_platform: true,
+      lop_truong: true,
+      admin: true,
+      lop_pho: true,
+      truong_team: false,
+      pho_team: false,
+      truong_ban_chuyen_trach: true,
+      member: false,
+      // Aliases
       quan_tri: true,
       chu_tich: true,
-      admin: true,
-      truong_ban_dieu_hanh: true,
-      tong_thu_ky: true,
-      ban_thu_ky: true,
+      pho_chu_tich: true,
     };
 
     return [
@@ -4657,22 +4735,23 @@ export class AdminService implements OnModuleInit {
     };
   }
 
-  // ── TỔNG HỢP PHẢN ÁNH & GÓP Ý TỪ Học viên (YÊU CẦU 4) ──────────────────────────
-  async listAllFeedbacks(query?: { category?: string; search?: string; minRating?: number }) {
+  // ── TỔNG HỢP PHẢN ÁNH & GÓP Ý TỪ Học viên (YÊU CẦU 4 & SỰ KIỆN CỤ THỂ) ─────────
+  async listAllFeedbacks(query?: { category?: string; search?: string; minRating?: number; eventId?: string }) {
     const list: any[] = [];
 
-    // 1. Lấy phản ánh từ Sự Kiện (public.event_feedbacks)
+    // 1. Lấy phản ánh từ Sự Kiện (public.event_feedbacks hoặc public.event_feedback)
     try {
       const eventFeedbacks = await this.prisma.$queryRaw<any[]>`
         SELECT ef.id, ef.event_id as "targetId", ef.member_name as "respondentName",
-               ef.member_code as "respondentCode", ef.rating, ef.feedback_text as "comment",
+               ef.member_code as "respondentCode", ef.rating,
+               COALESCE(NULLIF(ef.content, ''), NULLIF(ef.comment, ''), NULLIF(ef.feedback_text, ''), '') as "comment",
                ef.recommend_score as "recommendScore", ef.topic_suggestions as "topicSuggestions",
-               ef.created_at as "createdAt", e.title as "targetTitle",
+               ef.created_at as "createdAt", COALESCE(e.name, e.title, 'Sự kiện CLB') as "targetTitle",
                ef.status, ef.attachment_url as "attachmentUrl"
-        FROM public.event_feedbacks ef
+        FROM public.event_feedback ef
         LEFT JOIN public.events e ON ef.event_id = e.id
         ORDER BY ef.created_at DESC
-        LIMIT 100
+        LIMIT 200
       `.catch(() => []);
 
       for (const ef of eventFeedbacks) {
@@ -4727,6 +4806,9 @@ export class AdminService implements OnModuleInit {
     list.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
     let result = list;
+    if (query?.eventId && query.eventId !== 'all') {
+      result = result.filter(item => item.targetId === query.eventId);
+    }
     if (query?.category && query.category !== 'all') {
       result = result.filter(item => item.targetType === query.category);
     }

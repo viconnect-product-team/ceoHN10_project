@@ -39,6 +39,20 @@ export class MembersController {
   }
 
   /**
+   * Endpoint gửi thư mời và form đăng ký vào email cho ứng viên Học viên mới
+   */
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @RequireActions('MEM_ADD')
+  @Post('send-registration-invite')
+  async sendRegistrationInvite(
+    @Request() req: any,
+    @Body() body: { email: string; name?: string },
+  ) {
+    const adminUserId = req.user?.id || req.user?.sub || 'system';
+    return this.membersService.sendRegistrationInvite(adminUserId, body);
+  }
+
+  /**
    * Endpoint duyệt Học viên mới và gửi email tài khoản ngẫu nhiên
    */
   @UseGuards(JwtAuthGuard, RolesGuard)

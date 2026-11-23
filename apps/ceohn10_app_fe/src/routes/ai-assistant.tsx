@@ -4,7 +4,6 @@ import {
   Sparkles,
   Bot,
   Activity,
-  FileSpreadsheet,
   Receipt,
   Download,
   Printer,
@@ -23,22 +22,20 @@ import {
   ArrowRight,
   Eye,
   FileText,
+  MessageSquare,
 } from "lucide-react";
 import { AppShell } from "@/components/dashboard/AppShell";
 import { Card, PageHeader } from "@/components/dashboard/PageKit";
 import { fetchNestApi } from "@/lib/api-client";
 import { toast } from "sonner";
-import { exportToExcel } from "@/lib/excel-export";
 import { CrmChatGPTView } from "@/components/ai/CrmChatGPTView";
-import { AiTaskWorkflowWizard } from "@/components/ai/AiTaskWorkflowWizard";
-import { MessageSquare, Layers } from "lucide-react";
 
 export const Route = createFileRoute("/ai-assistant")({
   component: AiAssistantPage,
 });
 
 export function AiAssistantPage() {
-  const [activeTab, setActiveTab] = useState<"chat" | "workflow" | "analysis" | "finance_report" | "invoice" | "activity">("chat");
+  const [activeTab, setActiveTab] = useState<"chat" | "analysis" | "invoice">("chat");
   const [analyzing, setAnalyzing] = useState(false);
   const [analysisData, setAnalysisData] = useState<any>(null);
 
@@ -54,9 +51,6 @@ export function AiAssistantPage() {
   });
   const [invoicePreview, setInvoicePreview] = useState<any>(null);
 
-  // Báo cáo thu chi tổng hợp
-  const [financeReport, setFinanceReport] = useState<any>(null);
-
   // Load phân tích ban đầu
   const runAnalysis = async () => {
     setAnalyzing(true);
@@ -71,19 +65,6 @@ export function AiAssistantPage() {
     } finally {
       setAnalyzing(false);
     }
-  };
-
-  // Load báo cáo thu chi
-  const loadFinanceReport = async () => {
-    try {
-      const res = await fetchNestApi<any>("/api/ai/crm/export-report", {
-        method: "POST",
-        body: JSON.stringify({ type: "financial_summary" }),
-      });
-      if (res?.ok) {
-        setFinanceReport(res);
-      }
-    } catch { }
   };
 
   // Tạo hóa đơn / phiếu thu
@@ -107,40 +88,8 @@ export function AiAssistantPage() {
 
   useEffect(() => {
     runAnalysis();
-    loadFinanceReport();
     generateInvoice();
   }, []);
-
-  const handleExportExcelFinance = () => {
-    if (!financeReport) return;
-    const dataRows = [
-      ...(financeReport.incomeBreakdown || []).map((i: any) => ({
-        type: "KHOẢN THU",
-        category: i.category,
-        amount: i.amount,
-        percentage: `${i.percentage}%`,
-      })),
-      ...(financeReport.expenseBreakdown || []).map((e: any) => ({
-        type: "KHOẢN CHI",
-        category: e.category,
-        amount: e.amount,
-        percentage: `${e.percentage}%`,
-      })),
-    ];
-    exportToExcel({
-      filename: `Bao_Cao_Thu_Chi_CEOHN10_${Date.now()}`,
-      sheetName: "Thu Chi",
-      title: "BÁO CÁO THU CHI & QUỸ NGÂN SÁCH CLB CEO HN10",
-      columns: [
-        { header: "Loại Giao Dịch", key: "type", value: (r: any) => r.type },
-        { header: "Danh Mục", key: "category", value: (r: any) => r.category },
-        { header: "Số Tiền (VNĐ)", key: "amount", value: (r: any) => r.amount },
-        { header: "Tỷ Trọng", key: "percentage", value: (r: any) => r.percentage },
-      ],
-      data: dataRows,
-    });
-    toast.success("Đã xuất báo cáo Excel thu chi thành công!");
-  };
 
   const handlePrintInvoice = () => {
     window.print();
@@ -185,20 +134,6 @@ export function AiAssistantPage() {
           </button>
           <button
             type="button"
-            onClick={() => setActiveTab("workflow")}
-            className={`pb-3 px-4 text-xs font-bold transition flex items-center gap-2 border-b-2 cursor-pointer whitespace-nowrap ${activeTab === "workflow"
-                ? "border-primary text-primary"
-                : "border-transparent text-muted-foreground hover:text-foreground"
-              }`}
-          >
-            <Layers className="size-4 text-slate-500" />
-            <span>Quy Trình Thủ Công (Từng Bước)</span>
-            <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 font-bold">
-              5 Bước
-            </span>
-          </button>
-          <button
-            type="button"
             onClick={() => setActiveTab("analysis")}
             className={`pb-3 px-4 text-xs font-bold transition flex items-center gap-2 border-b-2 cursor-pointer whitespace-nowrap ${activeTab === "analysis"
                 ? "border-primary text-primary"
@@ -207,17 +142,6 @@ export function AiAssistantPage() {
           >
             <Sparkles className="size-4" />
             <span>Phân Tích Thông Minh CRM</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveTab("finance_report")}
-            className={`pb-3 px-4 text-xs font-bold transition flex items-center gap-2 border-b-2 cursor-pointer whitespace-nowrap ${activeTab === "finance_report"
-                ? "border-primary text-primary"
-                : "border-transparent text-muted-foreground hover:text-foreground"
-              }`}
-          >
-            <FileSpreadsheet className="size-4" />
-            <span>Báo Cáo Thu Chi & Ngân Sách</span>
           </button>
           <button
             type="button"
@@ -231,13 +155,6 @@ export function AiAssistantPage() {
             <span>Xuất Hóa Đơn / Phiếu Thu Điện Tử</span>
           </button>
         </div>
-
-        {/* ── NỘI DUNG TÁC VỤ AI ── */}
-        {activeTab === "workflow" && (
-          <div className="space-y-4">
-            <AiTaskWorkflowWizard />
-          </div>
-        )}
 
         {/* ── NỘI DUNG TAB 1: PHÂN TÍCH TOÀN BỘ CRM ── */}
         {activeTab === "chat" && (
@@ -425,124 +342,7 @@ export function AiAssistantPage() {
           </div>
         )}
 
-        {/* ── NỘI DUNG TAB 2: BÁO CÁO THU CHI & NGÂN SÁCH ── */}
-        {activeTab === "finance_report" && (
-          <div className="space-y-6">
-            <div className="p-5 rounded-2xl border border-border bg-card shadow-xs space-y-4">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-border/60">
-                <div>
-                  <h3 className="text-sm font-black text-foreground">Báo Cáo Thu Chi & Cân Đối Ngân Sách Quỹ</h3>
-                  <p className="text-xs text-muted-foreground">
-                    Tổng hợp chi tiết các khoản thu hội phí, tài trợ và các khoản chi hoạt động CLB CEO HN10
-                  </p>
-                </div>
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={handleExportExcelFinance}
-                    className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-600 text-white font-bold text-xs shadow-xs hover:bg-emerald-700 active:scale-95 transition cursor-pointer"
-                  >
-                    <Download className="size-3.5" />
-                    <span>Xuất File Excel</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => window.print()}
-                    className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-border bg-background text-foreground font-bold text-xs hover:bg-muted active:scale-95 transition cursor-pointer"
-                  >
-                    <Printer className="size-3.5" />
-                    <span>In Báo Cáo</span>
-                  </button>
-                </div>
-              </div>
-
-              {/* Thẻ tổng hợp số liệu thu chi */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div className="p-4 rounded-xl border border-emerald-500/20 bg-emerald-500/5 space-y-1">
-                  <span className="text-xs font-bold text-emerald-700 dark:text-emerald-400">TỔNG THU NGÂN SÁCH</span>
-                  <div className="text-xl font-black text-emerald-600 dark:text-emerald-400">
-                    {new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(
-                      financeReport?.summary?.totalIncome ?? 0
-                    )}
-                  </div>
-                </div>
-                <div className="p-4 rounded-xl border border-red-500/20 bg-red-500/5 space-y-1">
-                  <span className="text-xs font-bold text-red-700 dark:text-red-400">TỔNG CHI HOẠT ĐỘNG</span>
-                  <div className="text-xl font-black text-red-600 dark:text-red-400">
-                    {new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(
-                      financeReport?.summary?.totalExpense ?? 0
-                    )}
-                  </div>
-                </div>
-                <div className="p-4 rounded-xl border border-blue-500/20 bg-blue-500/5 space-y-1">
-                  <span className="text-xs font-bold text-blue-700 dark:text-blue-400">SỐ DƯ QUỸ HIỆN HỮU</span>
-                  <div className="text-xl font-black text-blue-600 dark:text-blue-400">
-                    {new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(
-                      financeReport?.summary?.balance ?? 0
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              {/* Bảng phân bổ thu & chi */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
-                <div className="space-y-2">
-                  <h4 className="text-xs font-bold text-foreground uppercase tracking-wider">Cơ Cấu Nguồn Thu</h4>
-                  <div className="rounded-xl border border-border overflow-hidden">
-                    <table className="w-full text-xs text-left">
-                      <thead className="bg-muted/50 text-muted-foreground font-bold">
-                        <tr>
-                          <th className="py-2 px-3">Danh mục thu</th>
-                          <th className="py-2 px-3 text-right">Số tiền</th>
-                          <th className="py-2 px-3 text-right">Tỷ lệ</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-border/60 font-medium">
-                        {(financeReport?.incomeBreakdown || []).map((i: any, idx: number) => (
-                          <tr key={idx}>
-                            <td className="py-2 px-3">{i.category}</td>
-                            <td className="py-2 px-3 text-right font-bold text-emerald-600">
-                              {new Intl.NumberFormat("vi-VN").format(i.amount)} đ
-                            </td>
-                            <td className="py-2 px-3 text-right text-muted-foreground">{i.percentage}%</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <h4 className="text-xs font-bold text-foreground uppercase tracking-wider">Cơ Cấu Khoản Chi</h4>
-                  <div className="rounded-xl border border-border overflow-hidden">
-                    <table className="w-full text-xs text-left">
-                      <thead className="bg-muted/50 text-muted-foreground font-bold">
-                        <tr>
-                          <th className="py-2 px-3">Danh mục chi</th>
-                          <th className="py-2 px-3 text-right">Số tiền</th>
-                          <th className="py-2 px-3 text-right">Tỷ lệ</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-border/60 font-medium">
-                        {(financeReport?.expenseBreakdown || []).map((e: any, idx: number) => (
-                          <tr key={idx}>
-                            <td className="py-2 px-3">{e.category}</td>
-                            <td className="py-2 px-3 text-right font-bold text-red-600">
-                              {new Intl.NumberFormat("vi-VN").format(e.amount)} đ
-                            </td>
-                            <td className="py-2 px-3 text-right text-muted-foreground">{e.percentage}%</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* ── NỘI DUNG TAB 3: XUẤT HÓA ĐƠN / PHIẾU THU ĐIỆN TỬ ── */}
+        {/* ── NỘI DUNG TAB 2: XUẤT HÓA ĐƠN / PHIẾU THU ĐIỆN TỬ ── */}
         {activeTab === "invoice" && (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
             {/* Form nhập thông tin */}

@@ -1,8 +1,24 @@
 import React, { useState, useEffect } from "react";
-import { Star, MessageSquare, X, Send, User, ThumbsUp, Paperclip, FileText } from "lucide-react";
+import {
+  Star,
+  MessageSquare,
+  X,
+  Send,
+  User,
+  ThumbsUp,
+  Paperclip,
+  FileText,
+  QrCode,
+  Copy,
+  ExternalLink,
+  Download,
+  Maximize2,
+  Check,
+} from "lucide-react";
 import { toast } from "sonner";
 import { fetchNestApi, uploadFileToNest } from "@/lib/api-client";
 import { useAuth } from "@/context/AuthContext";
+import { getQrUrl } from "@/lib/qr";
 
 export interface EventFeedback {
   id: string;
@@ -39,6 +55,22 @@ export function EventFeedbackModal({
   const [uploadingFile, setUploadingFile] = useState(false);
   const [userName, setUserName] = useState(user?.name || user?.fullName || "");
   const [email, setEmail] = useState(user?.email || "");
+
+  const [copiedLink, setCopiedLink] = useState(false);
+  const [showFullscreenQr, setShowFullscreenQr] = useState(false);
+
+  const feedbackUrl =
+    typeof window !== "undefined"
+      ? `${window.location.origin}/guest-event-feedback/${eventId}`
+      : `https://ceohn10.viconnect.vn/guest-event-feedback/${eventId}`;
+  const qrImageUrl = getQrUrl(feedbackUrl, 360);
+
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText(feedbackUrl);
+    setCopiedLink(true);
+    toast.success("Đã sao chép liên kết đánh giá sự kiện!");
+    setTimeout(() => setCopiedLink(false), 2000);
+  };
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -160,6 +192,72 @@ export function EventFeedbackModal({
             </div>
           </div>
 
+          {/* QR Code Presentation Box (Dành cho quét đánh giá sau sự kiện) */}
+          <div className="p-4 rounded-2xl border border-sky-200 dark:border-sky-900/60 bg-sky-50/50 dark:bg-sky-950/20 space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="w-7 h-7 rounded-lg bg-sky-500/20 text-sky-600 dark:text-sky-400 flex items-center justify-center font-bold">
+                  <QrCode className="h-4 w-4" />
+                </div>
+                <div>
+                  <h4 className="font-bold text-slate-900 dark:text-white text-xs">
+                    Mã QR Quét Đánh Giá Sau Sự Kiện
+                  </h4>
+                  <p className="text-[10px] text-slate-500">
+                    Chiếu lên màn hình LED hoặc in để đại biểu quét nhận xét
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => setShowFullscreenQr(true)}
+                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#003B95] text-white font-semibold text-[11px] hover:bg-[#002f78] transition cursor-pointer"
+                  title="Chiếu toàn màn hình lên sân khấu / LED"
+                >
+                  <Maximize2 className="h-3 w-3" />
+                  <span>Trình Chiếu LED</span>
+                </button>
+              </div>
+            </div>
+
+            <div className="flex flex-col sm:flex-row items-center gap-4 bg-white dark:bg-slate-900/80 p-3 rounded-xl border border-slate-200 dark:border-slate-800">
+              <div className="shrink-0 p-2 rounded-xl bg-white border border-slate-200 shadow-xs">
+                <img
+                  src={qrImageUrl}
+                  alt="QR Feedback"
+                  className="w-24 h-24 object-contain"
+                />
+              </div>
+
+              <div className="flex-1 space-y-2 min-w-0 w-full">
+                <div className="text-[11px] text-slate-600 dark:text-slate-400 truncate font-mono bg-slate-100 dark:bg-slate-800/80 p-1.5 rounded-lg border border-slate-200 dark:border-slate-700">
+                  {feedbackUrl}
+                </div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={handleCopyLink}
+                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border border-slate-300 dark:border-slate-700 bg-background text-[11px] font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+                  >
+                    {copiedLink ? <Check className="h-3 w-3 text-emerald-500" /> : <Copy className="h-3 w-3" />}
+                    <span>{copiedLink ? "Đã sao chép!" : "Sao chép link"}</span>
+                  </button>
+                  <a
+                    href={feedbackUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border border-slate-300 dark:border-slate-700 bg-background text-[11px] font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+                  >
+                    <ExternalLink className="h-3 w-3 text-sky-500" />
+                    <span>Mở trang đánh giá</span>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+
           {/* Form đánh giá mới */}
           <form onSubmit={handleSubmit} className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/40 space-y-3">
             <h4 className="font-bold text-slate-900 dark:text-white flex items-center gap-1.5 text-xs">
@@ -276,6 +374,54 @@ export function EventFeedbackModal({
           </button>
         </div>
       </div>
+
+      {/* Fullscreen LED Projection Modal */}
+      {showFullscreenQr && (
+        <div className="fixed inset-0 z-60 bg-slate-950/95 backdrop-blur-xl flex flex-col items-center justify-center p-6 text-center animate-in fade-in">
+          <button
+            type="button"
+            onClick={() => setShowFullscreenQr(false)}
+            className="absolute top-6 right-6 p-3 rounded-full bg-slate-800 text-white hover:bg-slate-700 transition cursor-pointer"
+          >
+            <X className="w-6 h-6" />
+          </button>
+
+          <div className="max-w-md w-full space-y-6">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-500/20 border border-amber-500/40 text-amber-400 text-xs font-bold uppercase tracking-wider">
+              ⭐ CLB DOANH NHÂN CEO HN10 (HANOIBA)
+            </div>
+
+            <div className="space-y-2">
+              <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+                QUÉT MÃ ĐÁNH GIÁ SỰ KIỆN
+              </h2>
+              <p className="text-sm font-semibold text-amber-300 line-clamp-2">
+                {eventName}
+              </p>
+            </div>
+
+            <div className="p-5 bg-white rounded-3xl shadow-2xl mx-auto w-fit border-4 border-amber-400">
+              <img
+                src={getQrUrl(feedbackUrl, 400)}
+                alt="QR Feedback Stage"
+                className="w-64 h-64 sm:w-80 sm:h-80 object-contain mx-auto"
+              />
+            </div>
+
+            <p className="text-xs text-slate-400">
+              Quý Đại biểu mở Camera hoặc Zalo để quét mã và gửi ý kiến đóng góp trực tiếp.
+            </p>
+
+            <button
+              type="button"
+              onClick={() => setShowFullscreenQr(false)}
+              className="px-6 py-2.5 rounded-xl bg-slate-800 text-slate-300 font-semibold text-xs hover:bg-slate-700 transition"
+            >
+              Thoát Chế Độ Trình Chiếu
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

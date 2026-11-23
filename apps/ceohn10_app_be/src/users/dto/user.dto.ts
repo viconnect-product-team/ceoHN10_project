@@ -77,6 +77,8 @@ export class AdminCreateUserDto {
     executiveRole: z.string().optional(),
     department: z.string().optional(),
     account_status: z.string().optional(),
+    targetSystem: z.string().optional(),
+    customPermissions: z.array(z.string()).optional(),
   });
 
   username!: string;
@@ -90,6 +92,8 @@ export class AdminCreateUserDto {
   executiveRole?: string;
   department?: string;
   account_status?: string;
+  targetSystem?: string;
+  customPermissions?: string[];
 }
 
 export class AdminUpdateUserDto {
@@ -103,6 +107,8 @@ export class AdminUpdateUserDto {
     executiveRole: z.string().optional(),
     department: z.string().optional(),
     account_status: z.string().optional(),
+    targetSystem: z.string().optional(),
+    customPermissions: z.array(z.string()).optional(),
   });
 
   name?: string;
@@ -114,6 +120,8 @@ export class AdminUpdateUserDto {
   executiveRole?: string;
   department?: string;
   account_status?: string;
+  targetSystem?: string;
+  customPermissions?: string[];
 }
 
 export class AdminResetPasswordDto {

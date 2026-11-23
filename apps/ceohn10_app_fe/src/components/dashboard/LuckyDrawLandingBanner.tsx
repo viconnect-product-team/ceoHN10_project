@@ -28,6 +28,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { fetchNestApi } from "@/lib/api-client";
+import { EventWheelOfFortuneModal } from "@/components/events/EventWheelOfFortuneModal";
 import {
   ClickUpIcon,
   ClickUpBadgeIcon,
@@ -55,11 +56,13 @@ export interface LuckyPrize {
 }
 
 export interface LuckyDrawCandidate {
+  id?: string;
   name: string;
   company: string;
   code: string;
   seat?: string;
   phone?: string;
+  email?: string;
 }
 
 export interface LuckyDrawEventConfig {
@@ -111,15 +114,75 @@ export function LuckyDrawLandingBanner({
   const [setupModalOpen, setSetupModalOpen] = useState(false);
   const [spinModalOpen, setSpinModalOpen] = useState(false);
 
-  // Sync strictly from backend REST API database
+  // Sync strictly from backend REST API database (tự động call danh sách sự kiện từ /events và config)
   const loadDatabaseConfig = async () => {
     try {
       setLoading(true);
-      const res: any = await fetchNestApi("/admin/lucky-draw-config");
-      const incoming = res?.events || (Array.isArray(res) ? res : []);
-      if (Array.isArray(incoming) && incoming.length > 0) {
-        setEvents(incoming);
-        setSelectedEventId((prev) => (prev && incoming.some((e: any) => e.id === prev) ? prev : incoming[0].id));
+      const [resConfig, rawEvents]: [any, any] = await Promise.all([
+        fetchNestApi("/admin/lucky-draw-config").catch(() => null),
+        fetchNestApi<any[]>("/events").catch(() => []),
+      ]);
+
+      const savedEvents: LuckyDrawEventConfig[] = resConfig?.events || (Array.isArray(resConfig) ? resConfig : []);
+      const realEvents = Array.isArray(rawEvents) ? rawEvents : (rawEvents?.items || []);
+
+      // Ghép các sự kiện thực tế trong CSDL vào danh sách lucky draw
+      const combinedEvents: LuckyDrawEventConfig[] = [];
+      const seenIds = new Set<string>();
+
+      for (const ev of realEvents) {
+        seenIds.add(ev.id);
+        const existing = savedEvents.find((s) => s.id === ev.id);
+        if (existing) {
+          combinedEvents.push({
+            ...existing,
+            name: ev.name || existing.name,
+            date: ev.date ? new Date(ev.date).toLocaleDateString("vi-VN") : existing.date,
+          });
+        } else {
+          combinedEvents.push({
+            id: ev.id,
+            name: ev.name || "Sự kiện CLB CEO HN10",
+            subtitle: "Chương Trình Bốc Thăm May Mắn & Giao Thương",
+            date: ev.date ? new Date(ev.date).toLocaleDateString("vi-VN") : "Hôm nay",
+            time: "19:00 - 21:30",
+            location: ev.location || "Trung tâm Hội nghị Quốc tế, Hà Nội",
+            bannerTheme: "gala_luxury",
+            totalPrizeValue: "50.000.000 VNĐ",
+            prizes: [
+              {
+                id: `prz-${ev.id}-1`,
+                title: "Giải Đặc Biệt: Gói Quảng Bá Thương Hiệu VIP",
+                rankName: "Giải Đặc Biệt",
+                value: "25.000.000 đ",
+                amount: 25000000,
+                sponsor: "Ban Tổ Chức CLB CEO HN10",
+                description: "Hiển thị Banner Top 1 trên Cổng Quản Trị & App Mobile CEO HN10",
+              },
+              {
+                id: `prz-${ev.id}-2`,
+                title: "Giải Nhất: Bộ Quà Tặng Doanh Nhân Cao Cấp",
+                rankName: "Giải Nhất",
+                value: "15.000.000 đ",
+                amount: 15000000,
+                sponsor: "Hội Viên Vàng CEO HN10",
+                description: "Kỷ niệm chương mạ vàng & Bộ quà tặng đối tác",
+              },
+            ],
+            candidates: [],
+          });
+        }
+      }
+
+      for (const s of savedEvents) {
+        if (!seenIds.has(s.id)) {
+          combinedEvents.push(s);
+        }
+      }
+
+      if (combinedEvents.length > 0) {
+        setEvents(combinedEvents);
+        setSelectedEventId((prev) => (prev && combinedEvents.some((e) => e.id === prev) ? prev : combinedEvents[0].id));
       }
     } catch (err) {
       console.error("[LuckyDrawLandingBanner] Failed to fetch database config:", err);
@@ -131,6 +194,37 @@ export function LuckyDrawLandingBanner({
   useEffect(() => {
     loadDatabaseConfig();
   }, []);
+
+  // Tự động tải danh sách đại biểu đã check-in cho sự kiện đang chọn từ API CSDL
+  useEffect(() => {
+    if (selectedEventId) {
+      fetchNestApi<any>(`/events/${selectedEventId}/checked-in-candidates`)
+        .then((res) => {
+          const cands = res?.candidates || [];
+          if (Array.isArray(cands) && cands.length > 0) {
+            setEvents((prev) =>
+              prev.map((ev) =>
+                ev.id === selectedEventId
+                  ? {
+                      ...ev,
+                      candidates: cands.map((c: any) => ({
+                        id: c.id,
+                        name: c.name || c.memberName,
+                        code: c.code || c.luckyNumber || `LK-${c.id?.slice(0, 4)}`,
+                        company: c.company || "Học viên CEO HN10",
+                        seat: c.seatAssignment || "Khu vực VIP",
+                        phone: c.phone || "",
+                        email: c.email || "",
+                      })),
+                    }
+                  : ev
+              )
+            );
+          }
+        })
+        .catch(() => {});
+    }
+  }, [selectedEventId]);
 
   const currentEvent = useMemo(() => {
     return events.find((e) => e.id === selectedEventId) || events[0] || null;
@@ -424,10 +518,13 @@ export function LuckyDrawLandingBanner({
         />
       )}
 
-      {/* INTERACTIVE SPIN WHEEL MODAL */}
+      {/* INTERACTIVE CIRCULAR WHEEL OF FORTUNE MODAL */}
       {spinModalOpen && (
-        <InteractiveLuckyDrawModal
-          event={currentEvent}
+        <EventWheelOfFortuneModal
+          open={spinModalOpen}
+          eventId={currentEvent.id}
+          eventName={currentEvent.name}
+          prizes={currentEvent.prizes as any}
           onClose={() => setSpinModalOpen(false)}
         />
       )}
@@ -473,6 +570,46 @@ function LuckyDrawSetupModal({
   const [savingPrize, setSavingPrize] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
   const prizeFileInputRef = useRef<HTMLInputElement>(null);
+
+  // State danh sách toàn bộ đại biểu đã check-in của sự kiện
+  const [allCheckedInCandidates, setAllCheckedInCandidates] = useState<LuckyDrawCandidate[]>([]);
+  const [loadingCandidates, setLoadingCandidates] = useState(false);
+
+  // Tải danh sách đại biểu đã check-in thực tế từ Database
+  useEffect(() => {
+    if (initialEvent.id) {
+      setLoadingCandidates(true);
+      fetchNestApi<any>(`/events/${initialEvent.id}/checked-in-candidates`)
+        .then((res) => {
+          const list = res?.candidates || [];
+          if (Array.isArray(list) && list.length > 0) {
+            const mapped: LuckyDrawCandidate[] = list.map((c: any) => ({
+              id: c.id,
+              name: c.name || c.memberName,
+              code: c.code || c.luckyNumber || `LK-${c.id?.slice(0, 4)}`,
+              company: c.company || "Học viên CEO HN10",
+              seat: c.seatAssignment || "Khu vực VIP",
+              phone: c.phone,
+              email: c.email || "",
+            }));
+            setAllCheckedInCandidates(mapped);
+            // Nếu ban đầu danh sách candidates rỗng thì mặc định chọn tất cả đại biểu đã check-in
+            setFormData((prev) => {
+              if (!prev.candidates || prev.candidates.length === 0) {
+                return { ...prev, candidates: mapped };
+              }
+              return prev;
+            });
+          } else {
+            setAllCheckedInCandidates(formData.candidates || []);
+          }
+        })
+        .catch(() => {
+          setAllCheckedInCandidates(formData.candidates || []);
+        })
+        .finally(() => setLoadingCandidates(false));
+    }
+  }, [initialEvent.id]);
 
   // Fetch real products & packages from database
   useEffect(() => {
@@ -1075,28 +1212,83 @@ function LuckyDrawSetupModal({
 
           {activeTab === "candidates" && (
             <div className="space-y-4 text-xs">
-              <div className="flex items-center justify-between text-slate-800 font-bold">
-                <span>Danh Sách Mã Bốc Thăm &amp; Đại Biểu Đã Check-in ({formData.candidates?.length || 0}):</span>
+              <div className="flex flex-wrap items-center justify-between gap-2 text-slate-800 font-bold bg-amber-50/60 p-3 rounded-2xl border border-amber-200">
+                <div className="flex items-center gap-2">
+                  <Users className="w-4 h-4 text-amber-600" />
+                  <span>
+                    Người được quyền tham gia quay thưởng ({formData.candidates?.length || 0} / {allCheckedInCandidates.length}):
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setFormData((prev) => ({ ...prev, candidates: [...allCheckedInCandidates] }));
+                      toast.success(`Đã chọn tất cả ${allCheckedInCandidates.length} đại biểu tham gia quay thưởng!`);
+                    }}
+                    className="px-2.5 py-1 rounded-lg bg-[#003B95] text-white text-[11px] font-bold hover:bg-[#002B70] transition cursor-pointer"
+                  >
+                    Chọn Tất Cả ({allCheckedInCandidates.length})
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setFormData((prev) => ({ ...prev, candidates: [] }));
+                      toast.info("Đã bỏ chọn tất cả đại biểu.");
+                    }}
+                    className="px-2.5 py-1 rounded-lg bg-slate-200 text-slate-700 text-[11px] font-semibold hover:bg-slate-300 transition cursor-pointer"
+                  >
+                    Bỏ Chọn Tất Cả
+                  </button>
+                </div>
               </div>
 
               <div className="max-h-72 overflow-y-auto rounded-xl border border-slate-200 bg-white divide-y divide-slate-100">
-                {formData.candidates?.length === 0 ? (
-                  <div className="p-6 text-center text-slate-400">Chưa có đại biểu nào check-in</div>
+                {loadingCandidates ? (
+                  <div className="p-6 text-center text-slate-500 animate-pulse">
+                    Đang tải danh sách đại biểu đã check-in từ Database...
+                  </div>
+                ) : allCheckedInCandidates.length === 0 ? (
+                  <div className="p-6 text-center text-slate-400 italic">
+                    Chưa có đại biểu nào check-in sự kiện này
+                  </div>
                 ) : (
-                  formData.candidates?.map((cand, idx) => (
-                    <div key={idx} className="flex items-center justify-between p-2.5">
-                      <div className="flex items-center gap-2">
-                        <span className="font-mono font-bold text-amber-700 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-md">
-                          {cand.code}
-                        </span>
-                        <span className="font-bold text-slate-900">{cand.name}</span>
-                        <span className="text-slate-500">· {cand.company}</span>
-                      </div>
-                      {cand.seat && (
-                        <span className="text-[11px] text-slate-500">{cand.seat}</span>
-                      )}
-                    </div>
-                  ))
+                  allCheckedInCandidates.map((cand) => {
+                    const isSelected = formData.candidates?.some((c) => c.code === cand.code);
+                    return (
+                      <label
+                        key={cand.code}
+                        className={`flex items-center justify-between p-2.5 hover:bg-slate-50 cursor-pointer transition ${
+                          isSelected ? "bg-amber-50/40" : ""
+                        }`}
+                      >
+                        <div className="flex items-center gap-2.5 min-w-0">
+                          <input
+                            type="checkbox"
+                            checked={isSelected}
+                            onChange={() => {
+                              setFormData((prev) => {
+                                const exists = prev.candidates?.some((c) => c.code === cand.code);
+                                const nextCands = exists
+                                  ? (prev.candidates || []).filter((c) => c.code !== cand.code)
+                                  : [...(prev.candidates || []), cand];
+                                return { ...prev, candidates: nextCands };
+                              });
+                            }}
+                            className="rounded text-amber-600 focus:ring-amber-500 cursor-pointer"
+                          />
+                          <span className="font-mono font-bold text-amber-700 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-md text-[11px]">
+                            {cand.code}
+                          </span>
+                          <span className="font-bold text-slate-900 truncate">{cand.name}</span>
+                          <span className="text-slate-500 text-[11px] truncate">· {cand.company}</span>
+                        </div>
+                        {cand.seat && (
+                          <span className="text-[11px] font-medium text-slate-400 shrink-0">{cand.seat}</span>
+                        )}
+                      </label>
+                    );
+                  })
                 )}
               </div>
             </div>
@@ -1214,6 +1406,8 @@ function InteractiveLuckyDrawModal({
             luckyNumber: chosen.code,
             prizeName: prizeTitle,
             eventName: event.name,
+            winnerEmail: chosen.email,
+            eventId: event.id,
           }),
         })
           .then(() => {
@@ -1241,6 +1435,8 @@ function InteractiveLuckyDrawModal({
           luckyNumber: winner.code,
           prizeName: `${currentPrize.rankName}: ${currentPrize.title}`,
           eventName: event.name,
+          winnerEmail: winner.email,
+          eventId: event.id,
         }),
       });
       toast.success(`Đã phát thông báo trúng thưởng và tự động đẩy phần thưởng vào mục Ưu Đãi của đại biểu ${winner.name}!`);
