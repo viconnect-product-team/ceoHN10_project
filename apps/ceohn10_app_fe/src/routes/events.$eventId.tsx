@@ -31,7 +31,6 @@ import { toast } from "sonner";
 import { AppShell } from "@/components/dashboard/AppShell";
 
 import { CrudModal, type CrudField, type CrudValues } from "@/components/dashboard/CrudModal";
-import { EventRegistrationPanel } from "@/components/dashboard/EventRegistrationPanel";
 import { EventAttendees } from "@/components/dashboard/EventAttendees";
 import { EventAgenda } from "@/components/dashboard/EventAgenda";
 import { SupplyDeclarationModal } from "@/components/dashboard/SupplyDeclarationModal";
@@ -44,6 +43,7 @@ import { EventSponsorPackageSelector } from "@/components/events/EventSponsorPac
 import { EventQrStaffSelector } from "@/components/events/EventQrStaffSelector";
 import { EventPosterModal } from "@/components/events/EventPosterModal";
 import { EventPoster } from "@/components/events/EventPoster";
+import { EventQrSetupModal } from "@/components/events/EventQrSetupModal";
 import { isValidDriveUrl } from "@/components/events/modals/EventDetailModal";
 import {
   type EventItem,
@@ -192,6 +192,7 @@ function EventDetailPage() {
   const [supplyModalOpen, setSupplyModalOpen] = useState(false);
   const [feedbackModalOpen, setFeedbackModalOpen] = useState(false);
   const [mediaModalOpen, setMediaModalOpen] = useState(false);
+  const [isQrSetupOpen, setIsQrSetupOpen] = useState(false);
 
   const countdown = useCountdown(event.date, event.status);
   const s = STATUS_TONE[event.status] ?? STATUS_TONE.upcoming;
@@ -489,14 +490,14 @@ function EventDetailPage() {
               <Share2 className="h-4 w-4 text-muted-foreground" aria-hidden="true" />{" "}
               {t("edetail.share")}
             </button>
-            <Link
-              to="/checkin-qr"
-              search={{ eventId: event.id }}
-              className="inline-flex items-center gap-2 rounded-xl border border-[#003B95]/40 bg-blue-50 px-4 py-2 text-sm font-semibold text-[#003B95] hover:bg-blue-100 transition shadow-xs"
+            <button
+              type="button"
+              onClick={() => setIsQrSetupOpen(true)}
+              className="inline-flex items-center gap-2 rounded-xl border border-border bg-card px-4 py-2 text-sm font-semibold text-foreground hover:bg-muted transition shadow-xs cursor-pointer"
             >
-              <QrCode className="h-4 w-4 text-[#003B95]" aria-hidden="true" />
-              Thiết Lập 2 Mã QR &amp; Biểu Mẫu Sự Kiện
-            </Link>
+              <QrCode className="h-4 w-4 text-amber-500" aria-hidden="true" />
+              Cấu Hình &amp; Tải 2 Mã QR Check-in
+            </button>
             {(() => {
               const rawDrive = (event as any)?.photoGalleryUrl || (event as any)?.photo_gallery_url || (event as any)?.driveUrl;
               const validDrive = isValidDriveUrl(rawDrive) ? String(rawDrive).trim() : null;
@@ -686,45 +687,39 @@ function EventDetailPage() {
             </button>
           </section>
 
-          {/* Quản lý Mã QR & Biểu Mẫu Sự Kiện — Đã tách ra màn hình chuyên dụng /checkin-qr */}
+          {/* Quản lý Mã QR & Biểu Mẫu Sự Kiện — Tích hợp trực tiếp trong Chi Tiết Sự Kiện */}
           <section className="rounded-2xl border border-border bg-card p-5 shadow-[var(--shadow-card)] space-y-3">
             <div className="flex items-center gap-2 text-foreground font-bold text-xs uppercase tracking-wider">
-              <QrCode className="h-4 w-4 text-[#003B95]" />
-              <span>Mã QR Đăng Ký &amp; Soát Vé Check-in</span>
+              <QrCode className="h-4 w-4 text-amber-500" />
+              <span>Mã QR Đăng Ký &amp; Check-in</span>
             </div>
             <p className="text-xs text-muted-foreground leading-relaxed">
-              Mã QR đăng ký sự kiện và mã QR soát vé check-in vào cửa đã được tách riêng vào trung tâm cấu hình mã QR chuyên dụng.
+              Mã QR đăng ký sự kiện và mã QR check-in soát vé tại cửa được thiết lập và quản lý trực tiếp tại đây.
             </p>
-            <Link
-              to="/checkin-qr"
-              search={{ eventId: event.id }}
-              className="w-full inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-[#003B95] hover:bg-[#002B70] text-white font-bold text-xs shadow-md transition"
+            <button
+              type="button"
+              onClick={() => setIsQrSetupOpen(true)}
+              className="w-full inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-slate-900 text-white dark:bg-white dark:text-slate-900 hover:bg-slate-800 font-bold text-xs shadow-md transition cursor-pointer"
             >
               <QrCode className="h-4 w-4 text-amber-400" />
-              <span>Thiết Lập 2 Mã QR &amp; Biểu Mẫu</span>
-            </Link>
+              <span>Cấu Hình &amp; Lấy Mã QR Check-in</span>
+            </button>
           </section>
-
-          <EventRegistrationPanel
-            event={event}
-            registrations={registrations}
-            canManage={canManage}
-          />
         </aside>
       </div>
 
       {/* Sticky mobile action bar */}
       {canManage && (
         <div className="fixed inset-x-0 bottom-[calc(3.5rem+env(safe-area-inset-bottom))] z-30 flex items-center gap-2 border-t border-border bg-card/95 p-3 backdrop-blur md:hidden">
-          <Link
-            to="/checkin-qr"
-            search={{ eventId: event.id }}
+          <button
+            type="button"
+            onClick={() => setIsQrSetupOpen(true)}
             aria-label="Cấu hình QR Sự kiện"
-            className="grid h-12 w-12 shrink-0 place-items-center rounded-xl border border-[#003B95]/40 bg-blue-50 text-[#003B95] transition active:scale-95"
+            className="grid h-12 w-12 shrink-0 place-items-center rounded-xl border border-border bg-muted/30 text-amber-500 transition active:scale-95 cursor-pointer"
             title="Cấu hình QR"
           >
             <QrCode className="h-5 w-5" aria-hidden="true" />
-          </Link>
+          </button>
           <Link
             to="/event-registrations"
             aria-label={t("edetail.cta.manageReg")}
@@ -901,6 +896,13 @@ function EventDetailPage() {
           onUpdated={() => router.invalidate()}
         />
       )}
+
+      <EventQrSetupModal
+        event={event}
+        isOpen={isQrSetupOpen}
+        onClose={() => setIsQrSetupOpen(false)}
+        onUpdated={() => router.invalidate()}
+      />
     </AppShell>
   );
 }

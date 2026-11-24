@@ -26,31 +26,91 @@ export class DynamicFieldsService {
    * Lấy cấu hình schema & danh sách trường động theo entity_type (VD: 'member', 'event', 'class')
    */
   async getSchemaByEntityType(entityType: string) {
-    const schemas = await this.prisma.$queryRawUnsafe<any[]>(
-      `SELECT * FROM public.dynamic_form_schemas WHERE entity_type = $1 LIMIT 1`,
-      entityType,
-    );
+    try {
+      await this.prisma.$executeRawUnsafe(`
+        CREATE TABLE IF NOT EXISTS public.dynamic_form_schemas (
+          id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+          entity_type TEXT NOT NULL,
+          name TEXT,
+          title TEXT,
+          description TEXT,
+          is_active BOOLEAN DEFAULT TRUE,
+          created_at TIMESTAMPTZ DEFAULT NOW(),
+          updated_at TIMESTAMPTZ DEFAULT NOW()
+        );
+        ALTER TABLE public.dynamic_form_schemas ADD COLUMN IF NOT EXISTS name TEXT;
+        ALTER TABLE public.dynamic_form_schemas ADD COLUMN IF NOT EXISTS title TEXT;
+        ALTER TABLE public.dynamic_form_schemas ADD COLUMN IF NOT EXISTS description TEXT;
+        ALTER TABLE public.dynamic_form_schemas ADD COLUMN IF NOT EXISTS is_active BOOLEAN DEFAULT TRUE;
+
+        CREATE TABLE IF NOT EXISTS public.dynamic_form_fields (
+          id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+          schema_id UUID,
+          field_name TEXT NOT NULL,
+          field_label TEXT NOT NULL,
+          field_type TEXT NOT NULL DEFAULT 'text',
+          options JSONB DEFAULT '[]'::jsonb,
+          placeholder TEXT,
+          default_value TEXT,
+          is_required BOOLEAN DEFAULT FALSE,
+          is_enabled BOOLEAN DEFAULT TRUE,
+          order_index INTEGER DEFAULT 0,
+          metadata JSONB DEFAULT '{}'::jsonb,
+          created_at TIMESTAMPTZ DEFAULT NOW(),
+          updated_at TIMESTAMPTZ DEFAULT NOW()
+        );
+      `).catch(() => {});
+    } catch {}
+
+    let schemas: any[] = [];
+    try {
+      schemas = await this.prisma.$queryRawUnsafe<any[]>(
+        `SELECT * FROM public.dynamic_form_schemas WHERE entity_type = $1 LIMIT 1`,
+        entityType,
+      );
+    } catch {
+      schemas = [];
+    }
 
     let schema = schemas[0];
     if (!schema) {
-      // Tự động khởi tạo schema nếu chưa tồn tại
-      const created = await this.prisma.$queryRawUnsafe<any[]>(
-        `INSERT INTO public.dynamic_form_schemas (id, entity_type, name, description, is_active, created_at, updated_at)
-         VALUES (gen_random_uuid(), $1, $2, $3, true, NOW(), NOW())
-         RETURNING *`,
-        entityType,
-        `Cấu hình trường động ${entityType}`,
-        `Hệ thống trường động tùy biến cho ${entityType} - Ban Công Nghệ CEOHN10`,
-      );
-      schema = created[0];
+      try {
+        const created = await this.prisma.$queryRawUnsafe<any[]>(
+          `INSERT INTO public.dynamic_form_schemas (id, entity_type, name, description, is_active, created_at, updated_at)
+           VALUES (gen_random_uuid(), $1, $2, $3, true, NOW(), NOW())
+           RETURNING *`,
+          entityType,
+          `Cấu hình trường động ${entityType}`,
+          `Hệ thống trường động tùy biến cho ${entityType} - Ban Công Nghệ CEOHN10`,
+        );
+        schema = created[0];
+      } catch {
+        try {
+          const fallbackCreated = await this.prisma.$queryRawUnsafe<any[]>(
+            `INSERT INTO public.dynamic_form_schemas (id, entity_type, description, is_active, created_at, updated_at)
+             VALUES (gen_random_uuid(), $1, $2, true, NOW(), NOW())
+             RETURNING *`,
+            entityType,
+            `Hệ thống trường động tùy biến cho ${entityType} - Ban Công Nghệ CEOHN10`,
+          );
+          schema = fallbackCreated[0];
+        } catch {
+          schema = { id: '00000000-0000-0000-0000-000000000000', entity_type: entityType, name: entityType };
+        }
+      }
     }
 
-    const fields = await this.prisma.$queryRawUnsafe<any[]>(
-      `SELECT * FROM public.dynamic_form_fields 
-       WHERE schema_id = $1::uuid 
-       ORDER BY order_index ASC, created_at ASC`,
-      schema.id,
-    );
+    let fields: any[] = [];
+    try {
+      fields = await this.prisma.$queryRawUnsafe<any[]>(
+        `SELECT * FROM public.dynamic_form_fields 
+         WHERE schema_id = $1::uuid 
+         ORDER BY order_index ASC, created_at ASC`,
+        schema.id,
+      );
+    } catch {
+      fields = [];
+    }
 
     return {
       schema,

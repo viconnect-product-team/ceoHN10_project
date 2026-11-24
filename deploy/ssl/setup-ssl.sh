@@ -28,11 +28,16 @@ iptables -I INPUT -p tcp -m multiport --dports 80,443,10443,10444,10445,5020,502
 tr -d '\r' < nginx.conf > nginx.conf.clean && mv -f nginx.conf.clean nginx.conf 2>/dev/null || true
 tr -d '\r' < docker-compose.ssl.yml > docker-compose.ssl.yml.clean && mv -f docker-compose.ssl.yml.clean docker-compose.ssl.yml 2>/dev/null || true
 
-# 4. Khởi động lại container Nginx Proxy
-echo "[Docker] Đảm bảo mạng ceohn10-network và khởi tạo container ceohn10-ssl-proxy..."
-docker network create ceohn10-network 2>/dev/null || true
-docker compose -f docker-compose.ssl.yml down 2>/dev/null || true
-docker compose -f docker-compose.ssl.yml up -d --force-recreate
+# 4. Kiểm tra cú pháp nginx.conf trước khi khởi động container Nginx Proxy
+echo "[Docker Nginx] Kiểm tra cú pháp nginx.conf của container ceohn10-ssl-proxy..."
+if docker run --rm -v "$(pwd)/nginx.conf:/etc/nginx/nginx.conf:ro" nginx:alpine nginx -t 2>/dev/null; then
+    echo "[Docker Nginx] Cú pháp nginx.conf hợp lệ! Khởi động lại container ceohn10-ssl-proxy..."
+    docker network create ceohn10-network 2>/dev/null || true
+    docker compose -f docker-compose.ssl.yml down 2>/dev/null || true
+    docker compose -f docker-compose.ssl.yml up -d --force-recreate
+else
+    echo "[Docker Nginx CẢNH BÁO] Cú pháp nginx.conf container không hợp lệ hoặc docker daemon chưa sẵn sàng! Bỏ qua để không làm gián đoạn proxy cũ."
+fi
 
 # 5. Đợi 2s để Nginx worker process ổn định
 sleep 2
@@ -47,16 +52,22 @@ docker logs --tail 15 ceohn10-ssl-proxy 2>&1 || true
 # Tạm ngắt exit on error để các lệnh kiểm thử curl không làm fail script deploy
 set +e
 
-# 5.1. Cấu hình Reverse Proxy trực tiếp cho Nginx Host Ubuntu (Cổng 80 & 443)
-if [ -d "/etc/nginx" ]; then
-    echo "[Host Nginx] Cấu hình Reverse Proxy cho ceohn10.viconnect.vn & crm.ceohn10.viconnect.vn..."
+# 5.1. Cấu hình Reverse Proxy an toàn cho Nginx Host Ubuntu (Cổng 80 & 443)
+if [ -d "/etc/nginx" ] && [ -d "/etc/nginx/conf.d" ]; then
+    echo "[Host Nginx] Kiểm tra an toàn trước khi cập nhật cấu hình Host..."
     mkdir -p /etc/nginx/ssl 2>/dev/null || true
     if [ -f "/root/ssl-proxy/server.crt" ] && [ -f "/root/ssl-proxy/server.key" ]; then
         cp -f /root/ssl-proxy/server.crt /etc/nginx/ssl/server.crt 2>/dev/null || true
         cp -f /root/ssl-proxy/server.key /etc/nginx/ssl/server.key 2>/dev/null || true
     fi
 
-    cat << 'EOF' > /etc/nginx/conf.d/ceohn10_subdomains.conf
+    # 1. Sao lưu dự phòng file cấu hình hiện tại của DevOps
+    if [ -f /etc/nginx/conf.d/ceohn10_subdomains.conf ]; then
+        cp -f /etc/nginx/conf.d/ceohn10_subdomains.conf /etc/nginx/conf.d/ceohn10_subdomains.conf.bak 2>/dev/null || true
+    fi
+
+    # 2. Ghi cấu hình mới vào tệp thử nghiệm .new
+    cat << 'EOF' > /etc/nginx/conf.d/ceohn10_subdomains.conf.new
 # ==============================================================================
 # NGINX HOST OS REVERSE PROXY CHO SUBDOMAINS CEO HN10
 # ==============================================================================
@@ -228,19 +239,22 @@ server {
 }
 EOF
 
-    # Kiểm tra cú pháp nginx và reload
-    if nginx -t 2>/dev/null; then
-        echo "[Host Nginx] Cú pháp Nginx Host hợp lệ! Đang reload..."
-        systemctl reload nginx 2>/dev/null || true
-    else
-        echo "[Host Nginx] Cảnh báo cú pháp Nginx Host, bỏ qua để bảo vệ máy chủ."
-    fi
-fi
+    # 3. Đưa file mới vào và kiểm tra nghiêm ngặt nginx -t
+    mv -f /etc/nginx/conf.d/ceohn10_subdomains.conf.new /etc/nginx/conf.d/ceohn10_subdomains.conf
 
-# Reload host nginx nếu đang chạy trên VPS để cập nhật cấu hình nếu có
-if systemctl is-active --quiet nginx 2>/dev/null; then
-    echo "[Host Nginx] Tải lại Nginx chính trên máy chủ chủ..."
-    systemctl reload nginx 2>/dev/null || true
+    if nginx -t 2>/dev/null; then
+        echo "[Host Nginx] Cú pháp Nginx Host ĐẠT CHUẨN (nginx -t SUCCESS)! Đang reload an toàn..."
+        systemctl reload nginx 2>/dev/null || true
+        rm -f /etc/nginx/conf.d/ceohn10_subdomains.conf.bak 2>/dev/null || true
+    else
+        echo "[Host Nginx NGUY HIỂM] Cú pháp Nginx Host BỊ LỖI (nginx -t FAILED)! Đang ROLLBACK khôi phục cấu hình cũ của DevOps..."
+        if [ -f /etc/nginx/conf.d/ceohn10_subdomains.conf.bak ]; then
+            mv -f /etc/nginx/conf.d/ceohn10_subdomains.conf.bak /etc/nginx/conf.d/ceohn10_subdomains.conf
+        else
+            rm -f /etc/nginx/conf.d/ceohn10_subdomains.conf
+        fi
+        echo "[Host Nginx] ĐÃ ROLLBACK HOÀN TẤT. TUYỆT ĐỐI KHÔNG RELOAD ĐỂ BẢO VỆ MÁY CHỦ KHÔNG BỊ SẬP!"
+    fi
 fi
 
 echo "--- TEST NỘI BỘ HTTPS 443 (SUBDOMAINS) ---"

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
+import { BRAND_ASSETS } from "@/config/branding";
 import { getConnectAppSocket } from "@/hooks/use-connect-app-socket";
 import {
   ChevronLeft,
@@ -2098,7 +2099,7 @@ export function AssociationAnalyticsScreen() {
                               alt={performer.name}
                               className="w-full h-full rounded-full object-cover"
                               onError={(e) => {
-                                e.currentTarget.src = "/ceohn10-logo.png";
+                                e.currentTarget.src = BRAND_ASSETS.logoSquare;
                               }}
                             />
                           </div>
@@ -2205,7 +2206,7 @@ export function AssociationAnalyticsScreen() {
                               alt={member.name}
                               className="size-full object-cover"
                               onError={(e) => {
-                                e.currentTarget.src = "/ceohn10-logo.png";
+                                e.currentTarget.src = BRAND_ASSETS.logoSquare;
                               }}
                             />
                           </div>

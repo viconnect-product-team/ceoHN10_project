@@ -26,9 +26,10 @@ import { CompanyProfileTwoPages } from "@/components/member/CompanyProfileTwoPag
 import { CompanyProfile3DTemplate } from "@/components/member/CompanyProfile3DTemplate";
 import { CompanyProfileTemplateModal } from "@/components/member/CompanyProfileTemplateModal";
 import { getPublicCard, type PublicCard } from "@/lib/card.functions";
+import { BRAND_ASSETS } from "@/config/branding";
 import { toast } from "sonner";
 
-const appIcon = "/ceohn10-logo.png";
+const appIcon = BRAND_ASSETS.logoSquare;
 
 export const Route = createFileRoute("/card/$code")({
   loader: ({ params }) => getPublicCard({ data: { code: params.code } }),

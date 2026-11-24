@@ -89,12 +89,127 @@ export class PrismaService
         ALTER TABLE public.documents ADD COLUMN IF NOT EXISTS description TEXT;
         ALTER TABLE public.documents ADD COLUMN IF NOT EXISTS doc_scope TEXT DEFAULT 'association';
         ALTER TABLE public.documents ADD COLUMN IF NOT EXISTS enterprise_name TEXT;
+
+        -- Safe Migration cho Marketplace Products (Ngăn lỗi column p.seller_id does not exist)
+        ALTER TABLE public.products ADD COLUMN IF NOT EXISTS seller_id TEXT;
+        ALTER TABLE public.products ADD COLUMN IF NOT EXISTS title TEXT;
+        ALTER TABLE public.products ADD COLUMN IF NOT EXISTS company TEXT;
+        ALTER TABLE public.products ADD COLUMN IF NOT EXISTS image_urls TEXT[];
+        ALTER TABLE public.products ADD COLUMN IF NOT EXISTS custom_id TEXT;
+        ALTER TABLE public.products ADD COLUMN IF NOT EXISTS views INTEGER DEFAULT 0;
+        ALTER TABLE public.products ADD COLUMN IF NOT EXISTS status TEXT DEFAULT 'active';
+        ALTER TABLE public.products ADD COLUMN IF NOT EXISTS original_price NUMERIC;
+        ALTER TABLE public.products ADD COLUMN IF NOT EXISTS member_price NUMERIC;
+        ALTER TABLE public.products ADD COLUMN IF NOT EXISTS emoji TEXT;
+        ALTER TABLE public.products ADD COLUMN IF NOT EXISTS pdf_url TEXT;
+        ALTER TABLE public.products ADD COLUMN IF NOT EXISTS video_url TEXT;
+        ALTER TABLE public.products ADD COLUMN IF NOT EXISTS website_url TEXT;
+        ALTER TABLE public.products ADD COLUMN IF NOT EXISTS facebook_url TEXT;
+
+        -- Safe Migration cho Dynamic Form Schemas & Fields (Ngăn lỗi column name does not exist)
+        CREATE TABLE IF NOT EXISTS public.dynamic_form_schemas (
+          id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+          entity_type TEXT NOT NULL,
+          name TEXT,
+          title TEXT,
+          description TEXT,
+          is_active BOOLEAN DEFAULT TRUE,
+          created_at TIMESTAMPTZ DEFAULT NOW(),
+          updated_at TIMESTAMPTZ DEFAULT NOW()
+        );
+        ALTER TABLE public.dynamic_form_schemas ADD COLUMN IF NOT EXISTS name TEXT;
+        ALTER TABLE public.dynamic_form_schemas ADD COLUMN IF NOT EXISTS title TEXT;
+        ALTER TABLE public.dynamic_form_schemas ADD COLUMN IF NOT EXISTS description TEXT;
+        ALTER TABLE public.dynamic_form_schemas ADD COLUMN IF NOT EXISTS is_active BOOLEAN DEFAULT TRUE;
+
+        CREATE TABLE IF NOT EXISTS public.dynamic_form_fields (
+          id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+          schema_id UUID,
+          field_name TEXT NOT NULL,
+          field_label TEXT NOT NULL,
+          field_type TEXT NOT NULL DEFAULT 'text',
+          options JSONB DEFAULT '[]'::jsonb,
+          placeholder TEXT,
+          default_value TEXT,
+          is_required BOOLEAN DEFAULT FALSE,
+          is_enabled BOOLEAN DEFAULT TRUE,
+          order_index INTEGER DEFAULT 0,
+          metadata JSONB DEFAULT '{}'::jsonb,
+          created_at TIMESTAMPTZ DEFAULT NOW(),
+          updated_at TIMESTAMPTZ DEFAULT NOW()
+        );
       `,
       ).catch(() => { });
+
+      // Tự động kiểm tra và khởi tạo RBAC 15 Roles & Tài chính 2.1 Tỷ (Localhost & Subdomain self-healing)
+      await this.ensureRbacAndFinanceSeeded().catch((e) => {
+        this.logger.warn(`Lưu ý khởi tạo RBAC/Tài chính: ${e?.message || e}`);
+      });
     } catch (err: any) {
       this.logger.warn(
         `⚠️ [PrismaService] Chưa thể kết nối cơ sở dữ liệu khi khởi động (${err?.message || err}). Tiến trình sẽ tiếp tục chạy và tự động tái kết nối khi CSDL sẵn sàng.`,
       );
+    }
+  }
+
+  private async ensureRbacAndFinanceSeeded() {
+    try {
+      // 1. Kiểm tra roles
+      const roleCount = await this.roles.count().catch(() => 0);
+      if (roleCount === 0) {
+        this.logger.log('🌱 [PrismaService] Khởi tạo 15 Roles chuẩn RBAC...');
+        await this.$executeRawUnsafe(`
+          INSERT INTO public.roles (code, name, scope_level, description) VALUES
+          ('ADMIN_PLATFORM', 'Quản trị viên nền tảng', 'PLATFORM', 'Quản trị toàn bộ nền tảng'),
+          ('ADMIN', 'Quản trị viên tổ chức', 'ORGANIZATION', 'Quản lý toàn bộ tổ chức'),
+          ('LOP_TRUONG', 'Lớp trưởng', 'CLASS', 'Quản lý toàn bộ lớp học'),
+          ('LOP_PHO', 'Lớp phó', 'CLASS', 'Hỗ trợ lớp trưởng'),
+          ('TRUONG_TEAM', 'Trưởng team', 'TEAM', 'Quản lý thành viên trong team'),
+          ('PHO_TEAM', 'Phó team', 'TEAM', 'Hỗ trợ trưởng team'),
+          ('TRUONG_BAN_HOC_TAP', 'Trưởng ban Học tập', 'COMMITTEE', 'Điều phối học tập'),
+          ('TRUONG_BAN_TRUYEN_THONG', 'Trưởng ban Truyền thông', 'COMMITTEE', 'Điều phối truyền thông'),
+          ('TRUONG_BAN_SU_KIEN_HAU_CAN', 'Trưởng ban Sự kiện & Hậu cần', 'COMMITTEE', 'Tổ chức sự kiện'),
+          ('TRUONG_BAN_TAI_CHINH', 'Trưởng ban Tài chính', 'COMMITTEE', 'Quản lý ngân sách'),
+          ('TRUONG_BAN_THIEN_NGUYEN', 'Trưởng ban Thiện nguyện', 'COMMITTEE', 'Hoạt động xã hội'),
+          ('TRUONG_BAN_DOI_NOI', 'Trưởng ban Đối nội', 'COMMITTEE', 'Gắn kết thành viên'),
+          ('TRUONG_BAN_DOI_SONG_XA_HOI', 'Trưởng ban Đời sống & Xã hội', 'COMMITTEE', 'Đời sống hội viên'),
+          ('GIANG_VIEN', 'Giảng viên', 'CLASS', 'Giảng dạy lớp học'),
+          ('HOC_VIEN', 'Học viên', 'SELF', 'Thành viên lớp học')
+          ON CONFLICT (code) DO NOTHING;
+        `);
+      }
+
+      // 2. Kiểm tra financial_funds
+      const fundCount = await this.financial_funds.count().catch(() => 0);
+      if (fundCount < 8) {
+        this.logger.log('🌱 [PrismaService] Khởi tạo 8 Quỹ tài chính CEO HN10 (Quỹ Tổng 2.08 tỷ & Quỹ Ban CN 20M)...');
+        await this.$executeRawUnsafe(`
+          INSERT INTO public.financial_funds (code, name, fund_type, description, current_balance) VALUES
+          ('FUND_GENERAL', 'Quỹ Tổng CLB Doanh Nhân CEO HN10', 'GENERAL', 'Quỹ tài chính tổng hợp trung tâm toàn bộ hoạt động CLB Doanh Nhân CEO HN10 (2 tỷ 080 triệu)', 2080000000),
+          ('FUND_BAN_CONG_NGHE', 'Quỹ Ban Công Nghệ', 'COMMITTEE', 'Quỹ chuyên trách công nghệ và chuyển đổi số (Đã nhận 20 triệu cấp kinh phí từ Quỹ Tổng)', 20000000),
+          ('FUND_BAN_HOC_TAP', 'Quỹ Ban Học Tập', 'COMMITTEE', 'Quỹ chuyên trách học tập, đào tạo, học liệu và giảng huấn doanh nhân', 0),
+          ('FUND_BAN_SU_KIEN_HAU_CAN', 'Quỹ Ban Sự Kiện & Hậu Cần', 'COMMITTEE', 'Quỹ chuyên trách tổ chức sự kiện, hội thảo và gala hiệp hội', 0),
+          ('FUND_BAN_TRUYEN_THONG', 'Quỹ Ban Truyền Thông', 'COMMITTEE', 'Quỹ chuyên trách truyền thông, nhận diện thương hiệu và báo chí', 0),
+          ('FUND_BAN_TAI_CHINH', 'Quỹ Ban Tài Chính', 'COMMITTEE', 'Quỹ chuyên trách ngân sách, kiểm soát tài chính và hội phí', 0),
+          ('FUND_BAN_THIEN_NGUYEN', 'Quỹ Ban Thiện Nguyện', 'COMMITTEE', 'Quỹ chuyên trách công tác xã hội và thiện nguyện cộng đồng', 0),
+          ('FUND_BAN_AN_SINH_XA_HOI', 'Quỹ Ban An Sinh & Xã Hội', 'COMMITTEE', 'Quỹ chăm lo đời sống, an sinh, phúc lợi và gắn kết thành viên', 0)
+          ON CONFLICT (code) DO UPDATE SET
+            name = EXCLUDED.name,
+            current_balance = EXCLUDED.current_balance;
+
+          INSERT INTO public.bank_accounts (bank_name, account_number, account_holder, fund_id)
+          SELECT 'Vietcombank', '101010202688', 'CLB DOANH NHAN CEO HN10 - QUY TONG', id
+          FROM public.financial_funds WHERE code = 'FUND_GENERAL'
+          ON CONFLICT (account_number) DO NOTHING;
+
+          INSERT INTO public.bank_accounts (bank_name, account_number, account_holder, fund_id)
+          SELECT 'MBBank', '888809012026', 'CLB DOANH NHAN CEO HN10 - BAN CONG NGHE', id
+          FROM public.financial_funds WHERE code = 'FUND_BAN_CONG_NGHE'
+          ON CONFLICT (account_number) DO NOTHING;
+        `);
+      }
+    } catch (err: any) {
+      this.logger.warn(`[PrismaService] Tự động khởi tạo dữ liệu: ${err?.message || err}`);
     }
   }
 

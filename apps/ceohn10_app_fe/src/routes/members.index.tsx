@@ -1531,7 +1531,7 @@ function MembersPage() {
                         <span className="font-medium text-muted-foreground text-xs">{(tc.page - 1) * tc.pageSize + idx + 1}</span>
                       </div>
                     </td>
-                    <td className="sticky left-[72px] z-10 min-w-[110px] bg-card group-hover:bg-muted/70 px-4 py-3.5 font-mono text-[12px] font-semibold text-primary border-r border-b border-slate-200 dark:border-slate-800 shadow-[4px_0_6px_-2px_rgba(0,0,0,0.05)] transition-colors whitespace-nowrap">
+                    <td className="sticky left-[72px] z-10 min-w-[110px] bg-card group-hover:bg-muted/70 px-4 py-3.5 font-mono text-[12px] font-semibold text-slate-700 dark:text-slate-300 border-r border-b border-slate-200 dark:border-slate-800 shadow-[4px_0_6px_-2px_rgba(0,0,0,0.05)] transition-colors whitespace-nowrap">
                       {m.code}
                     </td>
                     <td className="px-4 py-3.5 border-r border-b border-slate-200 dark:border-slate-800 whitespace-nowrap">
@@ -1543,8 +1543,8 @@ function MembersPage() {
                       </div>
                     </td>
                     <td className="px-4 py-3.5 border-r border-b border-slate-200 dark:border-slate-800 whitespace-nowrap">
-                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold bg-blue-50 dark:bg-blue-950/40 text-[#003B95] dark:text-blue-300 border border-blue-200/60 dark:border-blue-800/40 shadow-2xs">
-                        <Shield className="h-3.5 w-3.5 text-amber-500 shrink-0" />
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium bg-secondary text-foreground border border-border">
+                        <Shield className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
                         <span>{getMemberDepartment(m)}</span>
                       </span>
                     </td>
@@ -2018,15 +2018,13 @@ function MemberCard({
 
       {/* identity */}
       <button onClick={onOpen} className="flex items-center gap-3 text-left">
-        <Avatar m={m} className="h-14 w-14 text-[16px]" />
+        <Avatar m={m} className="h-12 w-12 text-[14px]" />
         <div className="min-w-0">
-          <div className="truncate text-[15px] font-bold text-foreground group-hover:text-primary">
+          <div className="truncate text-sm font-bold text-foreground">
             {m.name}
           </div>
-          <div className="mt-0.5 flex items-center gap-1.5 text-[11px] text-muted-foreground">
-            <span className="font-mono font-semibold text-primary">{m.code}</span>
-            <span aria-hidden>·</span>
-            <span className="truncate">{t(m.level as TKey)}</span>
+          <div className="mt-0.5 flex items-center gap-1.5 text-xs text-muted-foreground font-mono">
+            <span>{m.code}</span>
           </div>
         </div>
       </button>

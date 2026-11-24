@@ -11,6 +11,8 @@ import { PassportModule } from '@nestjs/passport';
 import { PrismaModule } from '../prisma/prisma.module';
 import { RolesGuard } from './roles.guard';
 import { DataScopeInterceptor } from './data-scope.interceptor';
+import { AuthorizationService } from './authorization.service';
+import { AuthorizationController } from './authorization.controller';
 
 @Module({
   imports: [
@@ -30,8 +32,9 @@ import { DataScopeInterceptor } from './data-scope.interceptor';
     JwtStrategy,
     RolesGuard,
     DataScopeInterceptor,
+    AuthorizationService,
   ],
-  controllers: [AuthController],
-  exports: [AuthService, JwtModule, RolesGuard, DataScopeInterceptor],
+  controllers: [AuthController, AuthorizationController],
+  exports: [AuthService, JwtModule, RolesGuard, DataScopeInterceptor, AuthorizationService],
 })
 export class AuthModule {}

@@ -1,2578 +1,390 @@
-import { useState, useMemo, useEffect, useRef } from "react";
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useState, useMemo, useEffect } from "react";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import {
-  Settings,
-  MoreVertical,
-  Edit3,
-  Trash2,
-  Plus,
-  Heart,
-  MessageCircle,
-  MessageSquare,
-  X,
-  Lock,
-  ChevronRight,
   User,
   Building2,
-  Users,
-  FileText,
-  Package,
-  Sparkles,
-  Bell,
-  Settings as Cog,
-  LogOut,
-  Share2,
-  QrCode,
+  Mail,
+  Phone,
+  MapPin,
+  Briefcase,
   Copy,
   Check,
   ShieldCheck,
-  LayoutDashboard,
-  TrendingUp,
-  Camera,
-  MapPin,
-  Mail,
-  Phone,
-  Globe,
-  Briefcase,
-  ExternalLink,
+  QrCode,
+  LogOut,
   Pencil,
-  BookOpen,
+  Lock,
   Headphones,
-  Bot,
-  CreditCard,
-  Smartphone,
-  Download,
-  HelpCircle,
-  BadgeCheck,
-  Calendar,
-  Handshake,
-  RotateCcw,
-  ChevronDown,
-  Clock,
-  Video,
-  History,
+  LayoutDashboard,
+  ExternalLink,
+  ChevronRight,
+  Sparkles,
+  Award,
 } from "lucide-react";
-import { useServerFn } from "@tanstack/react-start";
-import {
-  getActiveCeo1983ColorTheme,
-  COLOR_THEME_EVENT,
-  type Ceo1983ColorTheme,
-} from "@/lib/ceohn10-color-theme";
-import { MemberHeader } from "@/components/member/MemberShell";
-import { CardPreviewModal } from "@/components/member/CardPreviewModal";
-import { CreatePostModal } from "@/components/feed/CreatePostModal";
-import { AssociationMemberQrModal } from "@/components/member/AssociationMemberQrModal";
-import { UserGuideModal } from "@/components/member/UserGuideModal";
-import { ContactSupportModal } from "@/components/member/ContactSupportModal";
-import { QuickProfileEditModal } from "@/components/common/QuickProfileEditModal";
-import { CeoBusinessLocationPicker } from "@/components/member/CeoBusinessLocationPicker";
-import { AccountSecuritySettingsForm } from "@/components/member/AccountSecuritySettingsForm";
-import {
-  CustomHomeShortcutsModal,
-  DEFAULT_SHORTCUT_IDS,
-  ALL_SHORTCUT_OPTIONS,
-  getShortcutIcon,
-} from "@/components/member/CustomHomeShortcutsModal";
-import {
-  getEffectiveThemeOption,
-  syncThemeFromBackend,
-  isEventThemeEnabled,
-  type FestivalThemeOption,
-} from "@/components/member/SeasonalEventHeader";
-import {
-  isVoiceAiEnabled,
-  setVoiceAiEnabled,
-  VOICE_AI_EVENT_NAME,
-} from "@/components/ai/Ceo1983ChatAssistant";
-import {
-  getUserActivityHistory,
-  recordUserActivity,
-  type UserActivityItem,
-} from "@/lib/user-activity-logger";
-import { useServerData } from "@/hooks/use-server-data";
-import {
-  getMyMember,
-  listMyEvents,
-  listMyOpportunities,
-  type MyMember,
-  type MyEvent,
-  type MyOpportunity,
-} from "@/lib/member-app.functions";
-import { useLang } from "@/lib/i18n";
-import { useTheme } from "@/lib/theme";
 import { useAuth } from "@/context/AuthContext";
 import { useRole } from "@/hooks/use-role";
 import { signOutSession } from "@/lib/business-connect/mobile/auth-session";
-import { resolveMediaUrl, uploadFileToNest, fetchNestApi, isDeadAvatarUrl } from "@/lib/api-client";
-import { requestNotificationPermission } from "@/lib/notification-permissions";
-import { Ceo1983ColorThemeSelector } from "@/components/member/Ceo1983ColorThemeSelector";
-import { ImageCropModal, type CropShape } from "@/components/templates/ImageCropModal";
+import { resolveMediaUrl, fetchNestApi } from "@/lib/api-client";
+import { AssociationMemberQrModal } from "@/components/member/AssociationMemberQrModal";
+import { QuickProfileEditModal } from "@/components/common/QuickProfileEditModal";
+import { ContactSupportModal } from "@/components/member/ContactSupportModal";
+import { AccountSecuritySettingsForm } from "@/components/member/AccountSecuritySettingsForm";
 import { toast } from "sonner";
-// @ts-ignore
-import heroImg from "@/assets/vba-hero.jpg";
 
 export const Route = createFileRoute("/association/profile")({
   component: ProfileScreen,
 });
 
-function initials(name?: string) {
-  if (!name) return "VIP";
-  const clean = name.replace(/\([^)]*\)/g, "").replace(/\[[^\]]*\]/g, "").trim();
-  if (!clean) return "VIP";
-  const parts = clean.split(/\s+/).filter(Boolean);
-  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
-  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
-}
-
-function isDeadAvatar(url?: string | null): boolean {
-  if (!url || typeof url !== "string") return true;
-  return isDeadAvatarUrl(url);
-}
-
-function isDeadCover(url?: string | null): boolean {
-  if (!url || typeof url !== "string") return true;
-  return isDeadAvatarUrl(url);
-}
-
-function dataUrlToFile(dataUrl: string, filename: string): File {
-  const arr = dataUrl.split(",");
-  const mime = arr[0].match(/:(.*?);/)?.[1] || "image/png";
-  const bstr = atob(arr[1]);
-  let n = bstr.length;
-  const u8arr = new Uint8Array(n);
-  while (n--) {
-    u8arr[n] = bstr.charCodeAt(n);
-  }
-  return new File([u8arr], filename, { type: mime });
-}
-
 export default function ProfileScreen() {
-  const { lang, setLang } = useLang();
-  const isEn = lang === "en";
-  const { theme, setTheme } = useTheme();
   const navigate = useNavigate();
   const { user, logout: authLogout } = useAuth();
-  const { isSuperAdmin } = useRole();
-  const fetchMember = useServerFn(getMyMember);
+  const { isSuperAdmin, isAdmin, isBQT, isChuTich } = useRole();
 
-  // Đọc ngay thông tin Học viên đã lưu từ localStorage để render tức thời, triệt tiêu hoàn toàn nháy giao diện cũ
-  const initialCachedMember = useMemo<MyMember | null>(() => {
-    if (typeof window === "undefined") return null;
-    try {
-      const raw = localStorage.getItem("vba_my_member");
-      if (raw) return JSON.parse(raw);
-      const rawUser = localStorage.getItem("vba_auth_user") || localStorage.getItem("auth_user");
-      if (rawUser) {
-        const u = JSON.parse(rawUser);
-        return {
-          id: u.id || u.sub,
-          name: u.name || u.full_name || u.user_metadata?.full_name,
-          title: u.title || u.user_metadata?.title || "Học viên chính thức",
-          companyName: u.company || u.company_name || u.user_metadata?.company,
-          avatar: u.avatar || u.avatar_url,
-          phone: u.phone,
-          email: u.email,
-        } as any;
-      }
-    } catch { }
-    return null;
-  }, []);
-
-  const { data: member, reload: reloadMember } = useServerData<MyMember | null>(
-    () => fetchMember(),
-    initialCachedMember,
-    "vba_my_member"
-  );
-
-  const fetchEvents = useServerFn(listMyEvents);
-  const fetchOpps = useServerFn(listMyOpportunities);
-  const { data: myEventsList = [] } = useServerData<MyEvent[]>(() => fetchEvents(), []);
-  const { data: myOppsList = [] } = useServerData<MyOpportunity[]>(() => fetchOpps(), []);
-
-  // Lịch sử hoạt động Học viên (Ý kiến cuộc họp - Item 15)
-  const participatedEvents = useMemo(() => {
-    return (myEventsList || []).filter((e) => e.registered);
-  }, [myEventsList]);
-
-  const connectedOpportunities = useMemo(() => {
-    return (myOppsList || []).filter((o) => o.interested || (o as any).isOwner);
-  }, [myOppsList]);
-
-  const hasAdminPrivilege = isSuperAdmin;
-
-  // Active tab state: Hồ sơ (about), Giao thương (friends), Cài đặt (posts)
-  // 2 Nhóm chức năng chính (Yêu cầu 1): Tổng quan & Bài viết (overview) | Hoạt động & Giao thương (activities)
-  const [activeTab, setActiveTab] = useState<"overview" | "activities">("overview");
-  const [subTab, setSubTab] = useState<"business" | "posts">("business");
-  const [showLocationEditor, setShowLocationEditor] = useState(false);
-  const [systemSettingsOpen, setSystemSettingsOpen] = useState(false);
-
-  // Bài viết mạng lưới của Học viên (Yêu cầu 1, 3)
-  const [myPosts, setMyPosts] = useState<any[]>([]);
-  const [loadingPosts, setLoadingPosts] = useState(false);
-  const [createPostOpen, setCreatePostOpen] = useState(false);
-  const [activeMenuPostId, setActiveMenuPostId] = useState<string | null>(null);
-
-  // Edit post states
-  const [editingPost, setEditingPost] = useState<any | null>(null);
-  const [editTitle, setEditTitle] = useState("");
-  const [editContent, setEditContent] = useState("");
-  const [editPrivacy, setEditPrivacy] = useState<"public" | "friends" | "only_me">("public");
-  const [savingEdit, setSavingEdit] = useState(false);
+  const [member, setMember] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
   // Modals state
-  const [cardPreviewOpen, setCardPreviewOpen] = useState(false);
   const [editProfileOpen, setEditProfileOpen] = useState(false);
   const [qrModalOpen, setQrModalOpen] = useState(false);
-  const [userGuideOpen, setUserGuideOpen] = useState(false);
   const [contactSupportOpen, setContactSupportOpen] = useState(false);
+  const [securityModalOpen, setSecurityModalOpen] = useState(false);
+  const [copiedCode, setCopiedCode] = useState(false);
   const [copiedPhone, setCopiedPhone] = useState(false);
   const [copiedEmail, setCopiedEmail] = useState(false);
 
-  // Setup 4 tính năng nhanh trang chủ (Yêu cầu 2)
-
-  const fetchMyPosts = async () => {
-    if (!user) return;
-    setLoadingPosts(true);
+  // Load Member Profile
+  const loadProfile = async () => {
+    setLoading(true);
     try {
-      const res = await fetchNestApi<any[]>("/feed?limit=60").catch(() => []);
-      const allPosts = Array.isArray(res) ? res : (res as any)?.items || [];
-      const currentUserId = String(user.id || (member as any)?.userId || "").toLowerCase();
-      const currentName = String(member?.name || user?.fullName || "").toLowerCase();
-      const currentCode = String(member?.code || "").toLowerCase();
-      const mine = allPosts.filter((p: any) => {
-        const aId = String(p.author?.id || p.authorId || "").toLowerCase();
-        const aName = String(p.author?.name || p.authorName || "").toLowerCase();
-        return (currentUserId && aId === currentUserId) ||
-          (currentCode && aId === currentCode) ||
-          (currentName && aName === currentName);
-      });
-      setMyPosts(mine);
+      let data = await fetchNestApi<any>("/members/me").catch(() => null);
+      if (!data) {
+        data = await fetchNestApi<any>("/users/me").catch(() => null);
+      }
+      setMember(data);
     } catch {
-      /* ignore */
+      //
     } finally {
-      setLoadingPosts(false);
+      setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchMyPosts();
-  }, [user, member]);
+    loadProfile();
+  }, [user]);
 
-  const handleOpenEditPost = (post: any) => {
-    setEditingPost(post);
-    setEditTitle(post.title || "");
-    setEditContent(post.content || "");
-    setEditPrivacy(post.privacy || "public");
-    setActiveMenuPostId(null);
-  };
-
-  const handleSaveEditPost = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!editingPost) return;
-    setSavingEdit(true);
-    try {
-      await fetchNestApi(`/feed/${editingPost.id}`, {
-        method: "PATCH",
-        body: JSON.stringify({
-          title: editTitle,
-          content: editContent,
-          privacy: editPrivacy,
-        }),
-      });
-
-      setMyPosts((prev) =>
-        prev.map((p) =>
-          p.id === editingPost.id
-            ? { ...p, title: editTitle, content: editContent, privacy: editPrivacy }
-            : p
-        )
-      );
-      toast.success("Đã cập nhật bài viết thành công!");
-      setEditingPost(null);
-    } catch {
-      toast.error("Không thể cập nhật bài viết");
-    } finally {
-      setSavingEdit(false);
-    }
-  };
-
-  const handleDeletePost = async (postId: string) => {
-    if (!window.confirm("Bạn có chắc chắn muốn xóa bài viết này khỏi mạng lưới?")) return;
-    try {
-      await fetchNestApi(`/feed/${postId}`, {
-        method: "DELETE",
-      });
-
-      setMyPosts((prev) => prev.filter((p) => p.id !== postId));
-      setActiveMenuPostId(null);
-      toast.success("Đã xóa bài viết thành công!");
-    } catch {
-      toast.error("Không thể xóa bài viết");
-    }
-  };
-
-  const [customShortcutsOpen, setCustomShortcutsOpen] = useState(false);
-  const [selectedShortcuts, setSelectedShortcuts] = useState<string[]>(() => {
-    if (typeof window === "undefined") return DEFAULT_SHORTCUT_IDS;
-    try {
-      const saved = localStorage.getItem("ceohn10_home_shortcuts");
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
-      }
-    } catch { }
-    return DEFAULT_SHORTCUT_IDS;
-  });
-
-  const handleSaveShortcuts = (ids: string[]) => {
-    setSelectedShortcuts(ids);
-    try {
-      localStorage.setItem("ceohn10_home_shortcuts", JSON.stringify(ids));
-      localStorage.setItem("vba_user_custom_shortcuts", JSON.stringify(ids));
-      window.dispatchEvent(new Event("ceohn10_shortcuts_changed"));
-      window.dispatchEvent(new Event("storage"));
-    } catch { }
-    setCustomShortcutsOpen(false);
-    toast.success("Đã lưu thiết lập 4 tính năng nhanh trang chủ!");
-  };
-
-  // Trạng thái thu gọn/mở rộng từng đầu mục chức năng (Yêu cầu 2: bấm vào mới mở ra)
-  const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({});
-  const toggleSection = (id: string) => {
-    setExpandedSections((prev) => ({
-      ...prev,
-      [id]: !prev[id],
-    }));
-  };
-
-  // Cuộc họp ban (Ban Điều Hành, Ban Thư Ký, Ban Xúc Tiến, Ban Truyền Thông...)
-  const committeeMeetings = useMemo<any[]>(() => [], []);
-
-  // Cuộc gặp 1-on-1 (Giao lưu, hợp tác kinh doanh)
-  const meetings1on1 = useMemo<any[]>(() => [], []);
-
-  // Lịch sử thao tác Học viên (Audit Log sống động - Yêu cầu 3)
-  const [auditHistory, setAuditHistory] = useState<UserActivityItem[]>(() =>
-    getUserActivityHistory(user?.id)
-  );
-
-  useEffect(() => {
-    const handleActivityUpdate = () => {
-      setAuditHistory(getUserActivityHistory(user?.id));
-    };
-    window.addEventListener("vba:user_activity_recorded", handleActivityUpdate);
-    window.addEventListener("storage", handleActivityUpdate);
-    return () => {
-      window.removeEventListener("vba:user_activity_recorded", handleActivityUpdate);
-      window.removeEventListener("storage", handleActivityUpdate);
-    };
-  }, [user?.id]);
-
-  // AI Assistant Toggle state
-  const [voiceAiEnabled, setVoiceAiState] = useState(() => isVoiceAiEnabled());
-
-  // Active CRM theme state & listener (Yêu cầu 4)
-  const [activeTheme, setActiveTheme] = useState<FestivalThemeOption>(() => getEffectiveThemeOption());
-  const [themeSyncing, setThemeSyncing] = useState(false);
-
-  useEffect(() => {
-    const handleThemeChange = () => {
-      setActiveTheme(getEffectiveThemeOption());
-    };
-    window.addEventListener("vba-event-theme-changed", handleThemeChange);
-    window.addEventListener("ceohn10-theme-changed", handleThemeChange);
-    window.addEventListener("storage", handleThemeChange);
-    return () => {
-      window.removeEventListener("vba-event-theme-changed", handleThemeChange);
-      window.removeEventListener("ceohn10-theme-changed", handleThemeChange);
-      window.removeEventListener("storage", handleThemeChange);
-    };
-  }, []);
-
-  useEffect(() => {
-    const handleSyncAi = () => {
-      setVoiceAiState(isVoiceAiEnabled());
-    };
-    window.addEventListener(VOICE_AI_EVENT_NAME, handleSyncAi);
-    window.addEventListener("ceohn10_ai_toggle", handleSyncAi);
-    window.addEventListener("storage", handleSyncAi);
-    return () => {
-      window.removeEventListener(VOICE_AI_EVENT_NAME, handleSyncAi);
-      window.removeEventListener("ceohn10_ai_toggle", handleSyncAi);
-      window.removeEventListener("storage", handleSyncAi);
-    };
-  }, []);
-
-  const handleToggleVoiceAi = () => {
-    const nextVal = !voiceAiEnabled;
-    setVoiceAiState(nextVal);
-    setVoiceAiEnabled(nextVal);
-    toast.success(nextVal ? "Đã bật Trợ lý AI CEO HN10" : "Đã tắt Trợ lý AI CEO HN10");
-  };
-
-  // Push notifications state
-  const [isNotificationEnabled, setIsNotificationEnabled] = useState<boolean>(() => {
-    if (typeof window === "undefined") return false;
-    const pref = localStorage.getItem("vba_push_notifications_enabled");
-    if (pref === "false") return false;
-    if (typeof Notification !== "undefined" && Notification.permission === "granted") return true;
-    return pref === "true";
-  });
-
-  const handleToggleNotification = async () => {
-    if (!isNotificationEnabled) {
-      const res = await requestNotificationPermission();
-      if (res === "granted" || (typeof Notification !== "undefined" && Notification.permission === "granted")) {
-        setIsNotificationEnabled(true);
-        localStorage.setItem("vba_push_notifications_enabled", "true");
-        toast.success(isEn ? "Push notifications enabled!" : "Đã bật thông báo đẩy thành công!");
-      } else {
-        setIsNotificationEnabled(true);
-        localStorage.setItem("vba_push_notifications_enabled", "true");
-        toast.success(isEn ? "Notification preference saved!" : "Đã lưu cài đặt thông báo!");
-      }
-    } else {
-      setIsNotificationEnabled(false);
-      localStorage.setItem("vba_push_notifications_enabled", "false");
-      toast.info(isEn ? "Push notifications disabled." : "Đã tắt thông báo đẩy.");
-    }
-  };
-
-  // Cài đặt ứng dụng nhanh 1 chạm (PWA Native Prompt / Hướng dẫn iOS Safari & Android Chrome)
-  const handleFastInstallApp = async () => {
-    // 1. Kiểm tra nếu đã cài đặt chạy dạng App độc lập (Standalone PWA hoặc Capacitor)
-    const isStandalone =
-      typeof window !== "undefined" &&
-      (window.matchMedia("(display-mode: standalone)").matches ||
-        (window.navigator as any).standalone === true);
-
-    if (isStandalone) {
-      toast.success("Ứng dụng CEO HN10 đã được cài đặt và đang chạy sẵn sàng trên thiết bị của bạn!");
-      return;
-    }
-
-    // 2. Nếu có prompt PWA từ trình duyệt (Android Chrome/Edge/Samsung Internet): Kích hoạt hộp thoại cài đặt ngay lập tức!
-    const p = (window as any).__pwaInstallPrompt;
-    if (p && typeof p.prompt === "function") {
-      try {
-        await p.prompt();
-        const choice = await p.userChoice;
-        if (choice?.outcome === "accepted") {
-          toast.success("Ứng dụng đang được tự động cài đặt lên màn hình chính!");
-          (window as any).__pwaInstallPrompt = null;
-          return;
-        }
-      } catch (err) {
-        console.warn("Fast install prompt error:", err);
-      }
-    }
-
-    // 3. Mở bảng điều khiển cài đặt ứng dụng chuyên biệt hỗ trợ cả iPhone (iOS) và Android
-    window.dispatchEvent(new CustomEvent("open-install-prompt"));
-    window.dispatchEvent(new CustomEvent("open-ios-install-guide"));
-  };
-
-  // Đăng xuất phiên an toàn
-  const handleLogout = async () => {
-    try {
-      await signOutSession();
-    } catch (e) {
-      console.error("Sign out error:", e);
-    }
-    authLogout?.();
-    navigate({ to: "/association/login" as any, replace: true });
-  };
-
-  // Avatar & Cover upload refs & states
-  const coverInputRef = useRef<HTMLInputElement>(null);
-  const avatarInputRef = useRef<HTMLInputElement>(null);
-  const [coverPhoto, setCoverPhoto] = useState<string | null>(() => {
-    if (typeof window !== "undefined" && user?.id) {
-      return localStorage.getItem(`vba_member_cover_photo_${user.id}`);
-    }
-    return null;
-  });
-  const [uploadingCover, setUploadingCover] = useState(false);
-  const [customAvatar, setCustomAvatar] = useState<string | null>(() => {
-    if (typeof window !== "undefined" && user?.id) {
-      return localStorage.getItem(`vba_member_avatar_photo_${user.id}`);
-    }
-    return null;
-  });
-  const [avatarError, setAvatarError] = useState(false);
-  const [uploadingAvatar, setUploadingAvatar] = useState(false);
-  const [cropModalOpen, setCropModalOpen] = useState(false);
-  const [cropTarget, setCropTarget] = useState<"avatar" | "cover">("avatar");
-  const [cropImageUrl, setCropImageUrl] = useState("");
-
-  // Local responsive profile state (STRICTLY SCOPED TO CURRENT USER - No stale cross-contamination)
-  const [localProfile, setLocalProfile] = useState<any>(() => {
-    if (typeof window === "undefined") return {};
-    try {
-      const currentAuth = localStorage.getItem("vba_auth_user") || localStorage.getItem("auth_user");
-      const parsedAuth = currentAuth ? JSON.parse(currentAuth) : null;
-      const effectiveId = user?.id || parsedAuth?.id;
-      if (effectiveId) {
-        const userCp = localStorage.getItem(`ceohn10_custom_profile_${effectiveId}`);
-        if (userCp) return JSON.parse(userCp);
-      }
-      const genericCp = localStorage.getItem("ceohn10_custom_profile");
-      if (genericCp) return JSON.parse(genericCp);
-      const myMem = localStorage.getItem("vba_my_member");
-      if (myMem) return JSON.parse(myMem);
-    } catch { }
-    return {};
-  });
-
-  const [brandColorTheme, setBrandColorTheme] = useState<Ceo1983ColorTheme>(() =>
-    getActiveCeo1983ColorTheme()
-  );
-  useEffect(() => {
-    const handleThemeChange = (e: any) => {
-      if (e?.detail) setBrandColorTheme(e.detail);
-      else setBrandColorTheme(getActiveCeo1983ColorTheme());
-    };
-    window.addEventListener(COLOR_THEME_EVENT, handleThemeChange);
-    window.addEventListener("storage", handleThemeChange);
-    return () => {
-      window.removeEventListener(COLOR_THEME_EVENT, handleThemeChange);
-      window.removeEventListener("storage", handleThemeChange);
-    };
-  }, []);
-
-  // Re-sync when user ID changes
-  useEffect(() => {
-    if (typeof window === "undefined" || !user?.id) return;
-    try {
-      const userCp = localStorage.getItem(`ceohn10_custom_profile_${user.id}`);
-      if (userCp) {
-        setLocalProfile(JSON.parse(userCp));
-      } else {
-        const myMem = localStorage.getItem("vba_my_member");
-        if (myMem) {
-          setLocalProfile(JSON.parse(myMem));
-        }
-      }
-      const uCover = localStorage.getItem(`vba_member_cover_photo_${user.id}`);
-      if (uCover) setCoverPhoto(uCover);
-      const uAvatar = localStorage.getItem(`vba_member_avatar_photo_${user.id}`);
-      if (uAvatar) setCustomAvatar(uAvatar);
-    } catch { }
-  }, [user?.id]);
-
-  useEffect(() => {
-    const handleProfileUpdated = (e: any) => {
-      const detail = e?.detail;
-      if (detail) {
-        setLocalProfile((prev: any) => ({ ...prev, ...detail }));
-        if (detail.avatar) {
-          setCustomAvatar(detail.avatar);
-          setAvatarError(false);
-        }
-        if (detail.cover) {
-          setCoverPhoto(detail.cover);
-        }
-        reloadMember?.();
-      }
-    };
-    window.addEventListener("profile-updated", handleProfileUpdated);
-    window.addEventListener("ceohn10_profile_updated", handleProfileUpdated);
-    return () => {
-      window.removeEventListener("profile-updated", handleProfileUpdated);
-      window.removeEventListener("ceohn10_profile_updated", handleProfileUpdated);
-    };
-  }, [reloadMember]);
-
-  useEffect(() => {
-    const syncLocalMedia = () => {
-      if (typeof window === "undefined") return;
-      const savedCover = localStorage.getItem("vba_member_cover_photo");
-      if (savedCover) {
-        if (isDeadCover(savedCover)) {
-          localStorage.removeItem("vba_member_cover_photo");
-          setCoverPhoto(null);
-        } else {
-          setCoverPhoto(savedCover);
-        }
-      }
-      const savedAvatar = localStorage.getItem("vba_member_avatar_photo");
-      if (savedAvatar) {
-        if (isDeadAvatar(savedAvatar)) {
-          localStorage.removeItem("vba_member_avatar_photo");
-          setCustomAvatar(null);
-        } else {
-          setCustomAvatar(savedAvatar);
-        }
-      }
-    };
-    syncLocalMedia();
-
-    const handleCoverUpdate = (e: any) => {
-      const detailUrl = e?.detail;
-      if (detailUrl && typeof detailUrl === "string") {
-        setCoverPhoto(detailUrl);
-      }
-    };
-
-    const handleAvatarUpdate = (e: any) => {
-      const detailUrl = e?.detail;
-      if (detailUrl && typeof detailUrl === "string") {
-        setCustomAvatar(detailUrl);
-        setAvatarError(false);
-      }
-    };
-
-    window.addEventListener("vba_member_cover_updated", handleCoverUpdate);
-    window.addEventListener("vba_member_avatar_updated", handleAvatarUpdate);
-    window.addEventListener("storage", syncLocalMedia);
-    return () => {
-      window.removeEventListener("vba_member_cover_updated", handleCoverUpdate);
-      window.removeEventListener("vba_member_avatar_updated", handleAvatarUpdate);
-      window.removeEventListener("storage", syncLocalMedia);
-    };
-  }, []);
-
-  const handleCoverChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    if (!file.type.startsWith("image/")) {
-      toast.error(isEn ? "Only image files allowed" : "Chỉ chấp nhận tệp hình ảnh (JPG, PNG, WEBP)");
-      return;
-    }
-    const reader = new FileReader();
-    reader.onload = (evt) => {
-      const dataUrl = evt.target?.result as string;
-      if (dataUrl) {
-        setCropImageUrl(dataUrl);
-        setCropTarget("cover");
-        setCropModalOpen(true);
-      }
-    };
-    reader.readAsDataURL(file);
-    if (e.target) e.target.value = "";
-  };
-
-  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    if (!file.type.startsWith("image/")) {
-      toast.error(isEn ? "Only image files allowed" : "Chỉ chấp nhận tệp hình ảnh");
-      return;
-    }
-    const reader = new FileReader();
-    reader.onload = (evt) => {
-      const dataUrl = evt.target?.result as string;
-      if (dataUrl) {
-        setCropImageUrl(dataUrl);
-        setCropTarget("avatar");
-        setCropModalOpen(true);
-      }
-    };
-    reader.readAsDataURL(file);
-    if (e.target) e.target.value = "";
-  };
-
-  const processCoverUpload = async (croppedDataUrl: string) => {
-    setUploadingCover(true);
-    const tid = toast.loading(isEn ? "Uploading cover..." : "Đang tải ảnh bìa lên...");
-    try {
-      const file = dataUrlToFile(croppedDataUrl, `cover-${Date.now()}.png`);
-      const uploadUrl = await uploadFileToNest(file, "covers");
-      if (!uploadUrl) throw new Error("Không nhận được URL ảnh từ máy chủ");
-
-      setCoverPhoto(uploadUrl);
-      try {
-        localStorage.setItem("vba_member_cover_photo", uploadUrl);
-        if (user?.id) {
-          localStorage.setItem(`vba_member_cover_photo_${user.id}`, uploadUrl);
-          const cp = JSON.parse(localStorage.getItem(`ceohn10_custom_profile_${user.id}`) || "{}");
-          cp.cover = uploadUrl;
-          cp.userId = user.id;
-          localStorage.setItem(`ceohn10_custom_profile_${user.id}`, JSON.stringify(cp));
-        }
-        const mem = JSON.parse(localStorage.getItem("vba_my_member") || "{}");
-        mem.coverUrl = uploadUrl;
-        localStorage.setItem("vba_my_member", JSON.stringify(mem));
-      } catch { }
-
-      window.dispatchEvent(new CustomEvent("vba_member_cover_updated", { detail: uploadUrl }));
-      window.dispatchEvent(new CustomEvent("profile-updated", { detail: { cover: uploadUrl } }));
-      window.dispatchEvent(new CustomEvent("ceohn10_profile_updated", { detail: { cover: uploadUrl } }));
-
-      await fetchNestApi("/members/me/cover", {
-        method: "PATCH",
-        body: JSON.stringify({ coverUrl: uploadUrl }),
-      }).catch((apiErr) => {
-        console.warn("API /members/me/cover PATCH error:", apiErr);
-      });
-
-      toast.success(isEn ? "Cover photo updated successfully!" : "Cập nhật ảnh bìa thành công!", { id: tid });
-    } catch (err: any) {
-      console.error("Error updating cover photo:", err);
-      toast.error(err?.message || (isEn ? "Failed to update cover photo" : "Không thể cập nhật ảnh bìa"), { id: tid });
-    } finally {
-      setUploadingCover(false);
-    }
-  };
-
-  const processAvatarUpload = async (croppedDataUrl: string) => {
-    setUploadingAvatar(true);
-    const tid = toast.loading(isEn ? "Uploading avatar..." : "Đang tải ảnh đại diện lên...");
-    try {
-      const file = dataUrlToFile(croppedDataUrl, `avatar-${Date.now()}.png`);
-      const uploadUrl = await uploadFileToNest(file, "avatars");
-      if (!uploadUrl) throw new Error("Không nhận được URL ảnh từ máy chủ");
-
-      setCustomAvatar(uploadUrl);
-      setAvatarError(false);
-      try {
-        localStorage.setItem("vba_member_avatar_photo", uploadUrl);
-        if (user?.id) {
-          localStorage.setItem(`vba_member_avatar_photo_${user.id}`, uploadUrl);
-          const cp = JSON.parse(localStorage.getItem(`ceohn10_custom_profile_${user.id}`) || "{}");
-          cp.avatar = uploadUrl;
-          cp.userId = user.id;
-          localStorage.setItem(`ceohn10_custom_profile_${user.id}`, JSON.stringify(cp));
-        }
-        const mem = JSON.parse(localStorage.getItem("vba_my_member") || "{}");
-        mem.avatar = uploadUrl;
-        localStorage.setItem("vba_my_member", JSON.stringify(mem));
-      } catch { }
-
-      window.dispatchEvent(new CustomEvent("vba_member_avatar_updated", { detail: uploadUrl }));
-      window.dispatchEvent(new CustomEvent("profile-updated", { detail: { avatar: uploadUrl } }));
-      window.dispatchEvent(new CustomEvent("ceohn10_profile_updated", { detail: { avatar: uploadUrl } }));
-
-      await fetchNestApi("/members/me", {
-        method: "PATCH",
-        body: JSON.stringify({ avatar: uploadUrl }),
-      }).catch((apiErr) => {
-        console.warn("API /members/me avatar PATCH error:", apiErr);
-      });
-
-      toast.success(isEn ? "Avatar updated successfully!" : "Cập nhật ảnh đại diện thành công!", { id: tid });
-    } catch (err: any) {
-      console.error("Error updating avatar:", err);
-      toast.error(err?.message || (isEn ? "Failed to update avatar" : "Không thể cập nhật ảnh đại diện"), { id: tid });
-    } finally {
-      setUploadingAvatar(false);
-    }
-  };
-
-  const handleCropComplete = async (croppedDataUrl: string) => {
-    if (cropTarget === "cover") {
-      await processCoverUpload(croppedDataUrl);
-    } else {
-      await processAvatarUpload(croppedDataUrl);
-    }
-  };
-
-  // Resolved dynamic fields with localProfile priority (instant reactivity - No fake mock placeholders)
   const memberCode =
-    localProfile?.code ||
+    member?.membership_code ||
     member?.code ||
-    (user as any)?.user_metadata?.member_code ||
-    (user as any)?.member_code ||
-    "";
+    (user as any)?.memberCode ||
+    `HN10-CEO-${user?.id?.slice(0, 4)?.toUpperCase() || "8899"}`;
+
   const displayName =
-    localProfile?.name?.trim() ||
+    member?.full_name ||
     member?.name ||
     user?.name ||
-    (user as any)?.user_metadata?.full_name ||
-    user?.username ||
-    (user?.email ? user.email.split("@")[0] : "");
-  const displayTitle =
-    localProfile?.title?.trim() ||
+    user?.email?.split("@")[0] ||
+    "Doanh Nhân CEO HN10";
+
+  const companyName =
+    member?.company_name ||
+    member?.company ||
+    "Tập Đoàn Doanh Nghiệp Thành Viên";
+
+  const position =
+    member?.position ||
     member?.title ||
-    (member as any)?.position ||
-    "";
-  const displayCompany =
-    localProfile?.company?.trim() ||
-    (member as any)?.companyName ||
-    (member as any)?.company ||
-    "";
-  const displayPhone =
-    localProfile?.phone?.trim() ||
-    member?.phone ||
-    (user as any)?.phone ||
-    "";
-  const displayEmail = member?.email || user?.email || "";
-  const displayWebsite =
-    localProfile?.website?.trim() ||
-    (member as any)?.website ||
-    "";
-  const displayAddress =
-    localProfile?.address?.trim() ||
-    (member as any)?.address ||
-    (member as any)?.officeAddress ||
-    "";
-  const displayLat = Number(
-    localProfile?.lat ||
-    localProfile?.latitude ||
-    (member as any)?.latitude ||
-    (member as any)?.lat ||
-    (user as any)?.latitude ||
-    21.0175
-  );
-  const displayLng = Number(
-    localProfile?.lng ||
-    localProfile?.longitude ||
-    (member as any)?.longitude ||
-    (member as any)?.lng ||
-    (user as any)?.longitude ||
-    105.7838
-  );
-  let rawBio = (member as any)?.bio || (member as any)?.about || "";
-  let extractedStaffSize = (member as any)?.companySize || (member as any)?.company_size || (member as any)?.staffSize || "";
-  if (typeof rawBio === "string" && rawBio.trim().startsWith("{")) {
-    try {
-      const parsed = JSON.parse(rawBio);
-      rawBio = parsed.notes || parsed.intro || "";
-      if (parsed.staffSize && !extractedStaffSize) {
-        extractedStaffSize = parsed.staffSize;
-      }
-    } catch { }
-  }
+    "Chủ Tịch HĐQT / Tổng Giám Đốc";
 
-  const displayBio =
-    localProfile?.bio?.trim() ||
-    rawBio ||
-    "Học viên tích cực CLB Doanh Nhân CEO HN10 (HanoiBA). Sẵn sàng giao lưu kết nối, hợp tác kinh doanh và mở rộng chuỗi cung ứng B2B bền vững.";
+  const phone = member?.phone || (user as any)?.phone || "Chưa cập nhật";
+  const email = member?.email || user?.email || "Chưa cập nhật";
+  const industry = member?.industry || "Thương Mại & Dịch Vụ";
+  const address = member?.address || "Hà Nội, Việt Nam";
 
-  const displayCompanySize =
-    localProfile?.companySize?.trim() ||
-    extractedStaffSize ||
-    "20 - 50 nhân sự";
-
-  const displayIndustry =
-    localProfile?.industry?.trim() ||
-    (member as any)?.industry ||
-    (member as any)?.businessField ||
-    (member as any)?.business_field ||
-    "Sản xuất, Thương mại & Dịch vụ";
-
-  const rawCurrentAvatar =
-    localProfile?.avatar ||
-    customAvatar ||
-    member?.avatar ||
-    (member as any)?.avatarUrl ||
-    (user as any)?.avatar_url ||
-    (user as any)?.user_metadata?.avatar_url ||
-    null;
-  const resolvedAvatar =
-    rawCurrentAvatar && !isDeadAvatar(rawCurrentAvatar)
-      ? resolveMediaUrl(rawCurrentAvatar) || rawCurrentAvatar
-      : null;
-
-  const rawCover = coverPhoto || member?.coverUrl || (member as any)?.cover_url || heroImg;
-  const displayCover = rawCover && !isDeadCover(rawCover) ? resolveMediaUrl(rawCover) || rawCover : heroImg;
-
-  const cleanPhone = displayPhone ? displayPhone.replace(/\D/g, "") : "";
-
-  // Share profile handler
-  const handleShare = async () => {
-    const origin = typeof window !== "undefined" ? window.location.origin : "https://ceohn10.viconnect.vn";
-    const shareUrl = `${origin}/card/${memberCode}`;
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: `Hồ sơ Học viên: ${displayName}`,
-          text: `${displayName} — ${displayTitle} tại ${displayCompany} (CLB Doanh Nhân CEO HN10)`,
-          url: shareUrl,
-        });
-        return;
-      } catch { }
-    }
-    try {
-      await navigator.clipboard.writeText(shareUrl);
-      toast.success("Đã sao chép liên kết danh thiếp & hồ sơ cá nhân!");
-    } catch {
-      toast.error("Không thể sao chép liên kết");
+  const handleCopy = (text: string, type: "code" | "phone" | "email") => {
+    navigator.clipboard.writeText(text);
+    if (type === "code") {
+      setCopiedCode(true);
+      toast.success("Đã sao chép Mã Học Viên!");
+      setTimeout(() => setCopiedCode(false), 2000);
+    } else if (type === "phone") {
+      setCopiedPhone(true);
+      toast.success("Đã sao chép Số điện thoại!");
+      setTimeout(() => setCopiedPhone(false), 2000);
+    } else {
+      setCopiedEmail(true);
+      toast.success("Đã sao chép Địa chỉ Email!");
+      setTimeout(() => setCopiedEmail(false), 2000);
     }
   };
 
-  const handleCopyPhone = () => {
-    if (!displayPhone) return;
-    navigator.clipboard.writeText(displayPhone);
-    setCopiedPhone(true);
-    toast.success("Đã sao chép số điện thoại!");
-    setTimeout(() => setCopiedPhone(false), 2000);
+  const handleLogout = async () => {
+    try {
+      await authLogout();
+    } catch {}
+    signOutSession();
+    toast.success("Đã đăng xuất tài khoản an toàn.");
+    navigate({ to: "/association/login" });
   };
 
-  const handleCopyEmail = () => {
-    if (!displayEmail) return;
-    navigator.clipboard.writeText(displayEmail);
-    setCopiedEmail(true);
-    toast.success("Đã sao chép email liên hệ!");
-    setTimeout(() => setCopiedEmail(false), 2000);
-  };
-
-  async function logout() {
-    await signOutSession();
-    authLogout?.();
-    navigate({ to: "/association/login" as any, replace: true });
-  }
+  const canAccessCrm = isSuperAdmin || isAdmin || isBQT || isChuTich;
 
   return (
-    <div className="w-full min-h-screen pb-6 bg-[#F4F6F9] dark:bg-[#0B1120] text-slate-900 dark:text-white flex flex-col justify-start items-center font-sans transition-colors duration-300">
-      {/* ── 1. HEADER CHUẨN MOCKUP CEO HN10 TONE CAM ── */}
-      <div
-        data-type="2"
-        className="w-full max-w-lg px-4 pb-2 bg-white dark:bg-[#070D1A] shadow-[0px_2px_4px_0px_rgba(0,0,0,0.06)] flex justify-between items-center sticky top-0 z-30"
-        style={{
-          paddingTop: "max(env(safe-area-inset-top, 0px), 8px)",
-          minHeight: "calc(max(env(safe-area-inset-top, 0px), 8px) + 42px)",
-        }}
-      >
-        <button
-          type="button"
-          onClick={() => navigate({ to: "/association" })}
-          className="size-9 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-orange-50 dark:hover:bg-slate-800 flex items-center justify-center transition cursor-pointer"
-          title="Quay lại"
-        >
-          <img src="/icons/profile/arrow-left-02.svg" className="size-5" alt="back" />
-        </button>
-        <div className="text-center font-semibold text-base text-slate-900 dark:text-white font-['Inter']">
-          {isEn ? "Profile" : "Hồ sơ cá nhân"}
-        </div>
-        <button
-          type="button"
-          onClick={() => navigate({ to: "/association/system-config" })}
-          className="size-9 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-orange-50 dark:hover:bg-slate-800 flex items-center justify-center transition cursor-pointer"
-          title="Cài đặt"
-        >
-          <img src="/icons/profile/setting-07.svg" className="size-5" alt="settings" />
-        </button>
-      </div>
-
-      <div className="w-full max-w-lg flex flex-col justify-start items-stretch gap-4 px-3 sm:px-4 pt-3">
-        {/* Hidden inputs upload ảnh */}
-        <input
-          type="file"
-          ref={coverInputRef}
-          accept="image/*"
-          className="hidden"
-          onChange={handleCoverChange}
-        />
-        <input
-          type="file"
-          ref={avatarInputRef}
-          accept="image/*"
-          className="hidden"
-          onChange={handleAvatarChange}
-        />
-
-        {/* ── 2. CARD PROFILE TONE MÀU CAM NỔI BẬT THEO MOCKUP (H-80 CHUẨN FIGMA) ── */}
-        <div className="self-stretch h-80 relative bg-white dark:bg-[#0F172A] rounded-[20px] outline outline-1 outline-offset-[-1px] outline-orange-200 dark:outline-orange-500/30 inline-flex flex-col justify-between items-start overflow-hidden shadow-xs">
-          {/* Ảnh Bìa */}
-          <div className="w-full h-36 relative bg-gradient-to-r from-orange-100 via-amber-50 to-orange-100 dark:from-slate-800 dark:to-slate-900 overflow-hidden shrink-0">
-            {displayCover && !isDeadCover(displayCover) && !displayCover.includes("Image-2.svg") ? (
-              <img
-                src={displayCover}
-                alt="Cover Photo"
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <div className="w-full h-full flex flex-col items-center justify-center gap-1.5 bg-gradient-to-br from-[#003B95]/15 via-amber-500/10 to-orange-500/15 dark:from-slate-900 dark:via-blue-950/40 dark:to-slate-900 border-b border-orange-200/50 dark:border-slate-800">
-                <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/70 dark:bg-slate-800/70 backdrop-blur-xs border border-orange-200/60 dark:border-slate-700 text-slate-500 dark:text-slate-400 text-[11px] font-medium">
-                  <Camera className="size-3.5 text-orange-500" />
-                  <span>Chưa có ảnh bìa</span>
-                </div>
-              </div>
-            )}
-            {/* Nút Đổi ảnh bìa */}
-            <button
-              type="button"
-              disabled={uploadingCover}
-              onClick={() => coverInputRef.current?.click()}
-              className="absolute top-3 right-3 p-1.5 bg-white/80 dark:bg-slate-800/80 backdrop-blur-xs rounded-full border border-orange-200 dark:border-slate-700 inline-flex items-center justify-center hover:scale-105 active:scale-95 transition cursor-pointer shadow-xs disabled:opacity-50"
-              title="Đổi ảnh bìa"
-            >
-              <img src="/icons/profile/edit-04.svg" className="size-4" alt="edit cover" />
-            </button>
+    <div className="w-full min-h-screen bg-[#F8FAFC] flex flex-col pb-24 text-slate-800 font-sans">
+      {/* ── TOP HEADER (TỐI GIẢN & TRANG TRỌNG) ── */}
+      <header className="sticky top-0 z-30 bg-[#0F172A] text-white px-4 py-3 flex items-center justify-between shadow-md border-b border-amber-500/20">
+        <div className="flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-lg bg-amber-500 flex items-center justify-center font-bold text-slate-950 text-xs">
+            HN10
           </div>
+          <div>
+            <h1 className="text-sm font-black text-white tracking-tight">HỒ SƠ CÁ NHÂN</h1>
+            <p className="text-[10px] text-amber-300 font-mono">Khóa Doanh Nhân CEO HN10</p>
+          </div>
+        </div>
 
-          {/* Avatar & Thông tin Học viên đè lên ảnh bìa */}
-          <div className="w-full px-4 -mt-10 flex flex-col justify-start items-center z-10">
-            <div className="size-20 relative flex flex-col justify-start items-start mb-1">
-              <div className="size-20 rounded-full outline outline-4 outline-offset-[-4px] outline-white dark:outline-[#0F172A] inline-flex justify-center items-center overflow-hidden bg-slate-900 shadow-md">
-                {resolvedAvatar && !avatarError ? (
+        <button
+          onClick={() => setEditProfileOpen(true)}
+          className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 active:scale-95 text-xs font-bold text-amber-300 transition-all cursor-pointer border border-amber-400/30"
+        >
+          <Pencil className="w-3.5 h-3.5" />
+          <span>Sửa Hồ Sơ</span>
+        </button>
+      </header>
+
+      <main className="px-4 py-4 space-y-4 max-w-lg mx-auto w-full">
+        {/* ── 1. THẺ ĐỊNH DANH DOANH NHÂN CỐT LÕI (EXECUTIVE PROFILE CARD) ── */}
+        <div className="bg-gradient-to-br from-[#0F172A] via-[#1E293B] to-[#0F172A] rounded-3xl p-5 text-white shadow-xl border border-amber-400/30 relative overflow-hidden">
+          <div className="flex items-center gap-4">
+            <div className="relative shrink-0">
+              <div className="w-18 h-18 rounded-full bg-slate-800 border-2 border-amber-400 overflow-hidden flex items-center justify-center text-white text-2xl font-black shadow-md">
+                {member?.avatar_url || (user as any)?.avatarUrl ? (
                   <img
-                    src={resolvedAvatar}
+                    src={resolveMediaUrl(member?.avatar_url || (user as any)?.avatarUrl) || undefined}
                     alt={displayName}
-                    onError={() => setAvatarError(true)}
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <div className="w-full h-full bg-gradient-to-tr from-orange-600 to-amber-500 flex flex-col items-center justify-center text-white">
-                    <span className="text-base font-black font-sans leading-none">{initials(displayName)}</span>
-                    <span className="text-[8px] font-medium opacity-90 mt-0.5">Chưa có ảnh</span>
-                  </div>
+                  displayName.charAt(0).toUpperCase()
                 )}
               </div>
-              <button
-                type="button"
-                disabled={uploadingAvatar}
-                onClick={() => avatarInputRef.current?.click()}
-                className="size-6 right-0 bottom-0 absolute bg-white dark:bg-slate-800 rounded-full outline outline-1 outline-offset-[-1px] outline-orange-200 dark:outline-orange-500/30 inline-flex justify-center items-center shadow-xs hover:scale-110 active:scale-95 transition cursor-pointer"
-                title="Đổi ảnh đại diện"
-              >
-                <img src="/icons/profile/user-edit-01.svg" className="size-3" alt="edit avatar" />
-              </button>
+              <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-amber-400 text-slate-950 flex items-center justify-center shadow">
+                <Award className="w-3.5 h-3.5" />
+              </div>
             </div>
 
-            {/* Tên Học viên kèm Tích xác thực */}
-            <div className="inline-flex items-center gap-1.5">
-              <h1 className="text-lg font-semibold text-slate-900 dark:text-white font-['Inter'] leading-5">
-                {displayName}
-              </h1>
-              <img src="/icons/profile/check-verified-02.svg" className="size-4 text-orange-500" alt="verified" />
-            </div>
-
-            {/* Chức vụ & Doanh nghiệp */}
-            <div className="pt-0.5 flex flex-col justify-center items-center gap-0.5">
-              <div
-                style={{
-                  backgroundColor: `${brandColorTheme.primaryColor}15`,
-                  borderColor: `${brandColorTheme.primaryColor}30`,
-                }}
-                className="px-2.5 py-[2px] rounded-full inline-flex justify-start items-center border"
-              >
-                <span
-                  style={{ color: brandColorTheme.primaryColor }}
-                  className="text-[11px] font-semibold font-['Inter'] leading-4"
-                >
-                  {displayTitle}
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-1.5">
+                <h2 className="text-base font-black text-white truncate tracking-tight">{displayName}</h2>
+                <span className="p-0.5 rounded-full bg-amber-400 text-slate-950 shrink-0" title="Đã xác thực">
+                  <ShieldCheck className="w-3.5 h-3.5" />
                 </span>
               </div>
-              <p className="text-center text-slate-700 dark:text-slate-300 text-xs font-normal font-['Inter'] leading-4">
-                {displayCompany}
+              <p className="text-xs text-amber-300 font-semibold truncate mt-0.5">{position}</p>
+              <p className="text-[11px] text-slate-300 truncate flex items-center gap-1 mt-0.5">
+                <Building2 className="w-3 h-3 text-slate-400 shrink-0" />
+                <span className="truncate">{companyName}</span>
               </p>
             </div>
           </div>
 
-          {/* 3 Nút Hành Động Dưới Card: Danh thiếp, Chia sẻ, Sửa hồ sơ (Đồng bộ theo màu người dùng chọn) */}
-          <div className="w-full self-stretch h-14 px-2 pt-1 border-t border-slate-100 dark:border-slate-800 grid grid-cols-3 gap-2 items-center shrink-0">
+          {/* Dải thông tin mã học viên & QR */}
+          <div className="mt-4 pt-3 border-t border-white/10 flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <span className="text-[11px] text-slate-300 font-medium">MÃ HỌC VIÊN:</span>
+              <span className="font-mono text-xs font-black text-amber-300 bg-black/40 px-2 py-0.5 rounded border border-amber-400/30">
+                {memberCode}
+              </span>
+              <button
+                onClick={() => handleCopy(memberCode, "code")}
+                className="p-1 rounded hover:bg-white/10 active:scale-95 text-slate-300 transition cursor-pointer"
+                title="Sao chép"
+              >
+                {copiedCode ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+              </button>
+            </div>
+
             <button
-              type="button"
-              onClick={() => setCardPreviewOpen(true)}
-              className="w-full self-stretch bg-transparent hover:bg-slate-50 active:bg-slate-100 dark:hover:bg-slate-800/40 rounded-xl flex flex-col justify-center items-center gap-1 transition cursor-pointer border-0 outline-none"
+              onClick={() => setQrModalOpen(true)}
+              className="px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 active:scale-95 text-slate-950 font-black text-xs shadow flex items-center gap-1.5 transition cursor-pointer"
             >
-              <CreditCard className="size-5" style={{ color: brandColorTheme.primaryColor }} strokeWidth={2.2} />
-              <div className="text-center justify-start text-xs font-bold font-['Inter'] leading-4" style={{ color: brandColorTheme.primaryColor }}>
-                Danh thiếp
-              </div>
-            </button>
-            <button
-              type="button"
-              onClick={handleShare}
-              className="w-full self-stretch bg-transparent hover:bg-slate-50 active:bg-slate-100 dark:hover:bg-slate-800/40 rounded-xl flex flex-col justify-center items-center gap-1 transition cursor-pointer border-0 outline-none"
-            >
-              <Share2 className="size-5" style={{ color: brandColorTheme.primaryColor }} strokeWidth={2.2} />
-              <div className="text-center justify-start text-xs font-bold font-['Inter'] leading-4" style={{ color: brandColorTheme.primaryColor }}>
-                Chia sẻ
-              </div>
-            </button>
-            <button
-              type="button"
-              onClick={() => setEditProfileOpen(true)}
-              className="w-full self-stretch bg-transparent hover:bg-slate-50 active:bg-slate-100 dark:hover:bg-slate-800/40 rounded-xl flex flex-col justify-center items-center gap-1 transition cursor-pointer border-0 outline-none"
-            >
-              <Edit3 className="size-5" style={{ color: brandColorTheme.primaryColor }} strokeWidth={2.2} />
-              <div className="text-center justify-start text-xs font-bold font-['Inter'] leading-4" style={{ color: brandColorTheme.primaryColor }}>
-                Sửa hồ sơ
-              </div>
+              <QrCode className="w-3.5 h-3.5" />
+              <span>QR Thẻ</span>
             </button>
           </div>
         </div>
 
-        {/* ── 3. THANH SEGMENTED TABS THEO MOCKUP (ĐỒNG BỘ MÀU THEME) ── */}
-        <div className="self-stretch flex flex-col justify-start items-start">
-          <div className="self-stretch relative flex flex-col justify-start items-start">
-            <div className="w-full h-0 border-b border-Border-default absolute bottom-0 left-0" />
-            <div className="self-stretch inline-flex justify-start items-end gap-2 overflow-hidden">
+        {/* ── 2. THÔNG TIN LIÊN HỆ & DOANH NGHIỆP CẦN THIẾT NHẤT ── */}
+        <div className="bg-white rounded-3xl p-4 border border-slate-200 shadow-xs space-y-3">
+          <h3 className="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
+            <Briefcase className="w-3.5 h-3.5 text-[#D97706]" />
+            <span>Thông Tin Doanh Nghiệp &amp; Liên Hệ</span>
+          </h3>
+
+          <div className="space-y-2.5 text-xs">
+            <div className="flex items-center justify-between p-2.5 rounded-2xl bg-slate-50 border border-slate-100">
+              <div className="flex items-center gap-2.5 min-w-0">
+                <Phone className="w-4 h-4 text-emerald-600 shrink-0" />
+                <span className="text-slate-600 truncate">{phone}</span>
+              </div>
               <button
-                type="button"
-                onClick={() => setActiveTab("overview")}
-                className={`flex-1 py-3 relative flex flex-col justify-center items-center gap-2 cursor-pointer transition ${activeTab === "overview"
-                  ? "font-semibold"
-                  : "text-slate-600 dark:text-slate-400 font-normal hover:text-slate-900 dark:hover:text-white"
-                  }`}
-                style={activeTab === "overview" ? { color: brandColorTheme.primaryColor } : undefined}
+                onClick={() => handleCopy(phone, "phone")}
+                className="p-1 text-slate-400 hover:text-slate-700 active:scale-95 transition cursor-pointer"
+                title="Sao chép"
               >
-                <span className="text-sm font-['Inter'] leading-5">Tổng quan bài viết</span>
-                {activeTab === "overview" && (
-                  <div className="w-full h-0.5 absolute bottom-0 left-0" style={{ backgroundColor: brandColorTheme.primaryColor }} />
-                )}
+                {copiedPhone ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
               </button>
+            </div>
+
+            <div className="flex items-center justify-between p-2.5 rounded-2xl bg-slate-50 border border-slate-100">
+              <div className="flex items-center gap-2.5 min-w-0">
+                <Mail className="w-4 h-4 text-amber-600 shrink-0" />
+                <span className="text-slate-600 truncate">{email}</span>
+              </div>
               <button
-                type="button"
-                onClick={() => setActiveTab("activities")}
-                className={`flex-1 py-3 relative flex flex-col justify-center items-center gap-2 cursor-pointer transition ${activeTab === "activities"
-                  ? "font-semibold"
-                  : "text-slate-600 dark:text-slate-400 font-normal hover:text-slate-900 dark:hover:text-white"
-                  }`}
-                style={activeTab === "activities" ? { color: brandColorTheme.primaryColor } : undefined}
+                onClick={() => handleCopy(email, "email")}
+                className="p-1 text-slate-400 hover:text-slate-700 active:scale-95 transition cursor-pointer"
+                title="Sao chép"
               >
-                <span className="text-sm font-['Inter'] leading-5">Giao thương &amp; Sự kiện</span>
-                {activeTab === "activities" && (
-                  <div className="w-full h-0.5 absolute bottom-0 left-0" style={{ backgroundColor: brandColorTheme.primaryColor }} />
-                )}
+                {copiedEmail ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
               </button>
+            </div>
+
+            <div className="p-2.5 rounded-2xl bg-slate-50 border border-slate-100 flex items-center gap-2.5">
+              <Briefcase className="w-4 h-4 text-[#DC2626] shrink-0" />
+              <div className="min-w-0">
+                <span className="text-[10px] text-slate-400 uppercase font-semibold block">Ngành nghề:</span>
+                <span className="text-slate-700 font-bold truncate block">{industry}</span>
+              </div>
+            </div>
+
+            <div className="p-2.5 rounded-2xl bg-slate-50 border border-slate-100 flex items-center gap-2.5">
+              <MapPin className="w-4 h-4 text-blue-600 shrink-0" />
+              <div className="min-w-0">
+                <span className="text-[10px] text-slate-400 uppercase font-semibold block">Địa chỉ:</span>
+                <span className="text-slate-700 font-medium truncate block">{address}</span>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* ── 4. NỘI DUNG THEO TỪNG TAB ── */}
-        {activeTab === "overview" && (
-          <div className="w-full flex flex-col justify-start items-stretch gap-3 animate-in fade-in duration-150">
-            {/* Sub-pills: Hồ sơ doanh nghiệp / Bài viết của bạn */}
-            <div className="self-stretch inline-flex justify-start items-start gap-2.5">
-              <button
-                type="button"
-                onClick={() => setSubTab("business")}
-                className={`flex-1 px-1 py-2 rounded-[99px] outline outline-1 outline-offset-[-1px] flex justify-center items-center gap-1.5 transition cursor-pointer ${subTab === "business"
-                  ? "font-semibold shadow-2xs"
-                  : "bg-white dark:bg-slate-800/60 outline-Border-default text-Text-default font-normal hover:bg-slate-50"
-                  }`}
-                style={
-                  subTab === "business"
-                    ? {
-                      backgroundColor: `${brandColorTheme.primaryColor}15`,
-                      outlineColor: brandColorTheme.primaryColor,
-                      color: brandColorTheme.primaryColor,
-                    }
-                    : undefined
-                }
-              >
-                <span className="text-sm font-['Inter'] leading-5">Hồ sơ doanh nghiệp</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setSubTab("posts")}
-                className={`flex-1 px-1 py-2 rounded-[99px] outline outline-1 outline-offset-[-1px] flex justify-center items-center gap-1.5 transition cursor-pointer ${subTab === "posts"
-                  ? "font-semibold shadow-2xs"
-                  : "bg-white dark:bg-slate-800/60 outline-Border-default text-Text-default font-normal hover:bg-slate-50"
-                  }`}
-                style={
-                  subTab === "posts"
-                    ? {
-                      backgroundColor: `${brandColorTheme.primaryColor}15`,
-                      outlineColor: brandColorTheme.primaryColor,
-                      color: brandColorTheme.primaryColor,
-                    }
-                    : undefined
-                }
-              >
-                <span className="text-sm font-['Inter'] leading-5">Bài viết của bạn</span>
-              </button>
-            </div>
-
-            {/* ── KHI CHỌN SUB-TAB: HỒ SƠ DOANH NGHIỆP ── */}
-            {subTab === "business" && (
-              <div className="w-full flex flex-col justify-start items-stretch gap-4">
-                {/* Khối Hồ sơ doanh nghiệp (dòng 545-587) */}
-                <div className="self-stretch bg-white dark:bg-[#0F172A] rounded-[20px] outline outline-1 outline-offset-[-1px] outline-Border-default flex flex-col justify-start items-start overflow-hidden shadow-2xs">
-                  <div className="self-stretch px-4 pt-4 pb-2 inline-flex justify-between items-center">
-                    <div className="flex-1 flex justify-start items-center">
-                      <div className="text-Text-default text-base font-semibold font-['Inter'] leading-5">
-                        Hồ sơ doanh nghiệp
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="self-stretch px-4 pt-3 pb-4 border-t border-slate-100 dark:border-slate-800 flex flex-col justify-start items-start gap-4">
-                    {/* Giới thiệu năng lực */}
-                    <div className="self-stretch flex flex-col justify-start items-start">
-                      <div className="text-Text-default text-sm font-semibold font-['Inter'] leading-5">
-                        Giới thiệu năng lực doanh nhân &amp; doanh nghiệp
-                      </div>
-                      <div className="pt-1 text-Text-description text-sm font-normal font-['Inter'] leading-5 whitespace-pre-line">
-                        {displayBio || "Học viên tích cực CLB Doanh Nhân CEO HN10 (HanoiBA). Sẵn sàng giao lưu kết nối, hợp tác kinh doanh và mở rộng chuỗi cung ứng B2B bền vững."}
-                      </div>
-                    </div>
-
-                    {/* Chi tiết thông số doanh nghiệp */}
-                    <div className="self-stretch flex flex-col justify-start items-start gap-2 pt-1 border-t border-slate-100 dark:border-slate-800/60">
-                      <div className="self-stretch inline-flex justify-between items-start">
-                        <span className="text-Text-default text-sm font-semibold font-['Inter'] leading-5">
-                          Quy mô nhân sự:
-                        </span>
-                        <span className="text-Text-default text-sm font-normal font-['Inter'] leading-5">
-                          {displayCompanySize}
-                        </span>
-                      </div>
-                      <div className="self-stretch inline-flex justify-between items-start">
-                        <span className="text-Text-default text-sm font-semibold font-['Inter'] leading-5">
-                          Lĩnh vực kinh doanh:
-                        </span>
-                        <span className="text-Text-default text-sm font-normal font-['Inter'] leading-5">
-                          {displayIndustry}
-                        </span>
-                      </div>
-                      <div className="self-stretch inline-flex justify-between items-start gap-2">
-                        <span className="text-Text-default text-sm font-semibold font-['Inter'] leading-5 shrink-0">
-                          Doanh nghiệp trực thuộc:
-                        </span>
-                        <span className="text-right text-slate-900 dark:text-white text-sm font-normal font-['Inter'] leading-5 truncate">
-                          {displayCompany}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Khối Địa chỉ doanh nghiệp & Bản đồ 2D Google (dòng 589-656) */}
-                <div className="self-stretch p-4 bg-white dark:bg-[#0F172A] rounded-[20px] outline outline-1 outline-offset-[-1px] outline-Border-default flex flex-col justify-start items-start gap-3 shadow-2xs">
-                  <div className="self-stretch inline-flex justify-between items-center">
-                    <div className="flex-1 flex justify-start items-center">
-                      <div className="text-Text-default text-base font-semibold font-['Inter'] leading-5">
-                        Địa chỉ doanh nghiệp
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Thanh hiển thị địa chỉ với icon search */}
-                  <div className="self-stretch h-9 px-2.5 py-1.5 rounded-lg outline outline-1 outline-offset-[-1px] outline-Border-default inline-flex justify-start items-center gap-2 bg-slate-50 dark:bg-slate-800/50">
-                    <img src="/icons/profile/search-01.svg" className="size-4 shrink-0" alt="search" />
-                    <div className="flex-1 text-slate-900 dark:text-white text-sm font-normal font-['Inter'] leading-5 truncate">
-                      {displayAddress}
-                    </div>
-                  </div>
-
-                  {/* Bản đồ 2D Google chuẩn xác 100% hiển thị trực tiếp với overlay Pin Marker tone cam */}
-                  <div className="self-stretch h-56 relative rounded-xl outline outline-1 outline-offset-[-1px] outline-Border-default flex flex-col justify-start items-start overflow-hidden bg-slate-100 dark:bg-slate-900">
-                    <iframe
-                      title="Google Map 2D Doanh nghiệp"
-                      src={
-                        displayLat && displayLng && !isNaN(displayLat) && !isNaN(displayLng)
-                          ? `https://maps.google.com/maps?q=${displayLat},${displayLng}&t=m&z=16&output=embed`
-                          : `https://maps.google.com/maps?q=${encodeURIComponent(displayAddress || "Keangnam Landmark 72, Hà Nội")}&t=m&z=16&output=embed`
-                      }
-                      className="w-full h-full border-0"
-                      loading="lazy"
-                    />
-
-                    {/* Center Pin Marker theo chuẩn Figma snippet (tone màu cam) */}
-                    <div className="pointer-events-none absolute inset-0 flex items-center justify-center -mt-3 z-10">
-                      <div className="size-9 bg-orange-100/90 rounded-2xl flex items-center justify-center shadow-md border border-white/60">
-                        <div className="size-7 bg-orange-600 rounded-xl outline outline-2 outline-white flex items-center justify-center shadow-xs">
-                          <MapPin className="size-3.5 text-white fill-white" />
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Nút hành động nổi trên bản đồ */}
-                    <div className="absolute right-2 bottom-2 z-10 flex items-center gap-1.5">
-                      <button
-                        type="button"
-                        onClick={() => setShowLocationEditor(!showLocationEditor)}
-                        className="px-2.5 py-1.5 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xs rounded-xl border border-orange-200 dark:border-slate-700 shadow-sm text-xs font-semibold text-slate-800 dark:text-slate-200 hover:bg-orange-50 transition flex items-center gap-1 cursor-pointer"
-                      >
-                        <MapPin className="size-3 text-orange-600" />
-                        <span>{showLocationEditor ? "Đóng sửa vị trí" : "Dời ghim / Sửa địa chỉ"}</span>
-                      </button>
-                      <a
-                        href={
-                          displayLat && displayLng && !isNaN(displayLat) && !isNaN(displayLng)
-                            ? `https://www.google.com/maps/search/?api=1&query=${displayLat},${displayLng}`
-                            : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(displayAddress || "Keangnam Landmark 72, Hà Nội")}`
-                        }
-                        target="_blank"
-                        rel="noreferrer"
-                        className="p-1.5 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xs rounded-xl border border-orange-200 dark:border-slate-700 shadow-sm text-xs font-semibold text-slate-800 dark:text-slate-200 hover:bg-orange-50 transition flex items-center gap-1"
-                        title="Mở ứng dụng Google Maps"
-                      >
-                        <ExternalLink className="size-3.5 text-orange-600" />
-                      </a>
-                    </div>
-                  </div>
-
-                  {/* Panel Sửa Vị Trí / Dời Ghim khi bấm mở */}
-                  {showLocationEditor && (
-                    <div className="self-stretch pt-2 animate-in fade-in duration-150">
-                      <CeoBusinessLocationPicker
-                        initialAddress={displayAddress}
-                        initialLat={displayLat}
-                        initialLng={displayLng}
-                        companyName={displayCompany}
-                        userId={user?.id}
-                        onAddressSaved={(newAddress, lat, lng) => {
-                          setLocalProfile((prev: any) => ({
-                            ...prev,
-                            address: newAddress,
-                            officeAddress: newAddress,
-                            lat,
-                            latitude: lat,
-                            lng,
-                            longitude: lng,
-                          }));
-                          reloadMember?.();
-                          setShowLocationEditor(false);
-                        }}
-                      />
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {/* ── KHI CHỌN SUB-TAB: BÀI VIẾT CỦA BẠN ── */}
-            {subTab === "posts" && (
-              <div className="rounded-2xl bg-white dark:bg-[#0F172A] border border-slate-200/80 dark:border-slate-800 p-4 space-y-3 shadow-2xs">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <div className="size-8 rounded-xl bg-orange-50 dark:bg-orange-950/60 text-orange-600 dark:text-orange-400 grid place-items-center shrink-0">
-                      <FileText className="size-4" />
-                    </div>
-                    <div>
-                      <h3 className="text-xs font-extrabold uppercase tracking-wider text-slate-900 dark:text-white">
-                        Bài viết đã đăng vào mạng lưới
-                      </h3>
-                      <p className="text-[10px] text-slate-500 dark:text-slate-400">
-                        {myPosts.length} bài viết chia sẻ trên bảng tin CLB
-                      </p>
-                    </div>
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={() => setCreatePostOpen(true)}
-                    className="px-3 py-1.5 rounded-xl bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold flex items-center gap-1 shadow-xs transition active:scale-95 cursor-pointer"
-                  >
-                    <Plus className="size-3.5" />
-                    <span>Đăng bài</span>
-                  </button>
-                </div>
-
-                {/* Danh sách bài viết */}
-                {loadingPosts ? (
-                  <div className="py-8 flex justify-center text-slate-400">
-                    <span className="text-xs">Đang tải bài viết...</span>
-                  </div>
-                ) : myPosts.length === 0 ? (
-                  <div className="py-8 text-center bg-slate-50 dark:bg-slate-800/40 rounded-2xl border border-dashed border-slate-200 dark:border-slate-800 space-y-2">
-                    <FileText className="size-8 mx-auto text-slate-300 dark:text-slate-600" />
-                    <p className="text-xs text-slate-500 dark:text-slate-400">
-                      Bạn chưa đăng bài viết nào vào mạng lưới CEO HN10.
-                    </p>
-                    <button
-                      type="button"
-                      onClick={() => setCreatePostOpen(true)}
-                      className="inline-flex items-center gap-1 text-xs font-bold text-orange-600 dark:text-orange-400 hover:underline cursor-pointer"
-                    >
-                      <Plus className="size-3.5" />
-                      <span>Đăng bài viết đầu tiên</span>
-                    </button>
-                  </div>
-                ) : (
-                  <div className="space-y-3 pt-1">
-                    {myPosts.map((post) => (
-                      <div
-                        key={post.id}
-                        className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-800 space-y-2 relative"
-                      >
-                        {/* Post Header */}
-                        <div className="flex items-start justify-between gap-2">
-                          <div className="flex items-center gap-2.5 min-w-0">
-                            <div className="size-9 rounded-full bg-gradient-to-tr from-orange-600 to-amber-500 overflow-hidden shrink-0">
-                              {post.author?.avatar ? (
-                                <img
-                                  src={resolveMediaUrl(post.author.avatar) || post.author.avatar}
-                                  alt={post.author.name}
-                                  className="size-full object-cover"
-                                />
-                              ) : (
-                                <div className="size-full flex items-center justify-center text-white text-xs font-bold">
-                                  {initials(post.author?.name || displayName)}
-                                </div>
-                              )}
-                            </div>
-                            <div className="min-w-0">
-                              <span className="text-xs font-bold text-slate-900 dark:text-white block truncate">
-                                {post.author?.name || displayName}
-                              </span>
-                              <div className="flex items-center gap-1.5 text-[10px] text-slate-400">
-                                <span>
-                                  {new Date(post.createdAt).toLocaleDateString("vi-VN", {
-                                    day: "2-digit",
-                                    month: "2-digit",
-                                    year: "numeric",
-                                  })}
-                                </span>
-                                <span>•</span>
-                                {/* Privacy Badge (như Facebook - Yêu cầu 1) */}
-                                <span className="inline-flex items-center gap-0.5 text-slate-500 dark:text-slate-400 font-semibold">
-                                  {post.privacy === "friends" ? (
-                                    <>
-                                      <Users className="size-3 text-orange-500" />
-                                      <span>Bạn bè kết nối</span>
-                                    </>
-                                  ) : post.privacy === "only_me" ? (
-                                    <>
-                                      <Lock className="size-3 text-amber-500" />
-                                      <span>Chỉ mình tôi</span>
-                                    </>
-                                  ) : (
-                                    <>
-                                      <Globe className="size-3 text-emerald-500" />
-                                      <span>Công khai</span>
-                                    </>
-                                  )}
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* Menu ... có Chỉnh sửa và Xóa (Yêu cầu 1) */}
-                          <div className="relative">
-                            <button
-                              type="button"
-                              onClick={() =>
-                                setActiveMenuPostId(activeMenuPostId === post.id ? null : post.id)
-                              }
-                              className="size-7 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 flex items-center justify-center text-slate-500 cursor-pointer transition"
-                              title="Tùy chọn bài viết"
-                            >
-                              <MoreVertical className="size-4" />
-                            </button>
-
-                            {activeMenuPostId === post.id && (
-                              <div
-                                className="absolute right-0 top-8 z-20 w-36 py-1 bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-slate-200 dark:border-slate-700 animate-in fade-in zoom-in-95 duration-100"
-                                onClick={(e) => e.stopPropagation()}
-                              >
-                                <button
-                                  type="button"
-                                  onClick={() => handleOpenEditPost(post)}
-                                  className="w-full px-3 py-1.5 text-left text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-2 cursor-pointer"
-                                >
-                                  <Edit3 className="size-3.5 text-orange-600" />
-                                  <span>Chỉnh sửa</span>
-                                </button>
-                                <button
-                                  type="button"
-                                  onClick={() => handleDeletePost(post.id)}
-                                  className="w-full px-3 py-1.5 text-left text-xs font-bold text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 flex items-center gap-2 cursor-pointer"
-                                >
-                                  <Trash2 className="size-3.5" />
-                                  <span>Xóa bài viết</span>
-                                </button>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-
-                        {/* Title & Content */}
-                        {post.title && (
-                          <h4 className="text-xs font-bold text-slate-900 dark:text-white leading-snug">
-                            {post.title}
-                          </h4>
-                        )}
-                        <p className="text-xs text-slate-700 dark:text-slate-300 leading-relaxed whitespace-pre-line font-normal">
-                          {post.content}
-                        </p>
-
-                        {/* Images */}
-                        {Array.isArray(post.images) && post.images.length > 0 && (
-                          <div className={`grid gap-1.5 pt-1 ${post.images.length === 1 ? "grid-cols-1" : post.images.length === 2 ? "grid-cols-2" : "grid-cols-3"}`}>
-                            {post.images.slice(0, 3).map((imgUrl: string, i: number) => (
-                              <img
-                                key={i}
-                                src={resolveMediaUrl(imgUrl) || imgUrl}
-                                alt="Post attach"
-                                className="rounded-xl w-full h-28 object-cover border border-slate-200/80 dark:border-slate-700"
-                              />
-                            ))}
-                          </div>
-                        )}
-
-                        {/* Footer Stats */}
-                        <div className="flex items-center gap-4 pt-1.5 text-[11px] text-slate-400 font-medium border-t border-slate-200/60 dark:border-slate-700/60">
-                          <span className="flex items-center gap-1">
-                            <Heart className="size-3 text-rose-500 fill-rose-500" />
-                            <span>{post.likesCount || 0}</span>
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <MessageSquare className="size-3 text-orange-500" />
-                            <span>{post.commentsCount || 0}</span>
-                          </span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* ── NHÓM 2: GIAO THƯƠNG & SỰ KIỆN TONE CAM ── */}
-        {activeTab === "activities" && (
-          <div className="w-full space-y-2.5 animate-in fade-in duration-200">
-            {/* 2.1. Đầu mục: Sự kiện đã tham gia */}
-            <div className="rounded-2xl bg-white dark:bg-[#0F172A] border border-slate-100 dark:border-slate-800/60 overflow-hidden shadow-2xs">
-              <button
-                type="button"
-                onClick={() => toggleSection("events")}
-                className="w-full p-3.5 flex items-center justify-between text-left hover:bg-orange-50/40 dark:hover:bg-slate-800/40 transition cursor-pointer"
-              >
-                <div className="flex items-center gap-2.5 min-w-0">
-                  <div className="size-8.5 rounded-xl bg-orange-50 dark:bg-orange-950/60 text-orange-600 dark:text-orange-400 grid place-items-center shrink-0">
-                    <Calendar className="size-4" />
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <h4 className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white">
-                      Sự kiện đã tham gia
-                    </h4>
-                    <span className="px-2 py-0.5 rounded-full bg-orange-50 dark:bg-orange-950/60 text-orange-600 dark:text-orange-300 text-[10px] font-black border border-orange-200 dark:border-orange-900">
-                      {participatedEvents.length}
-                    </span>
-                  </div>
-                </div>
-                <ChevronDown
-                  className={`size-4 text-slate-400 transition-transform duration-200 shrink-0 ${expandedSections["events"] ? "rotate-180 text-orange-600 dark:text-amber-400" : ""
-                    }`}
-                />
-              </button>
-
-              {expandedSections["events"] && (
-                <div className="px-4 pb-4 pt-1 border-t border-slate-100 dark:border-slate-800/80 space-y-2 animate-in fade-in duration-150">
-                  {participatedEvents.length === 0 ? (
-                    <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800 text-center">
-                      <p className="text-xs text-slate-500 dark:text-slate-400">
-                        Bạn chưa đăng ký tham gia sự kiện nào.
-                      </p>
-                      <Link
-                        to="/association/events"
-                        className="mt-2 inline-flex items-center gap-1 text-xs font-bold text-orange-600 dark:text-orange-400 hover:underline"
-                      >
-                        <span>Khám phá lịch sự kiện CLB</span>
-                        <ChevronRight className="size-3.5" />
-                      </Link>
-                    </div>
-                  ) : (
-                    <div className="space-y-2">
-                      {participatedEvents.map((ev) => (
-                        <Link
-                          key={ev.id}
-                          to="/events/$eventId"
-                          params={{ eventId: ev.id } as any}
-                          className="p-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800 hover:border-orange-400/60 transition flex items-center justify-between gap-3 group cursor-pointer"
-                        >
-                          <div className="flex items-center gap-2.5 min-w-0">
-                            <div className="size-10 rounded-xl bg-gradient-to-tr from-orange-600 to-amber-500 text-white flex flex-col items-center justify-center shrink-0 leading-tight">
-                              <span className="text-[10px] font-black">{ev.day || "EV"}</span>
-                              <span className="text-[8px] font-bold uppercase">{ev.month || "CEO"}</span>
-                            </div>
-                            <div className="min-w-0">
-                              <h5 className="text-xs font-bold text-slate-900 dark:text-white truncate group-hover:text-orange-600 transition">
-                                {ev.title}
-                              </h5>
-                              <p className="text-[10.5px] text-slate-500 dark:text-slate-400 truncate">
-                                {ev.time || "Theo lịch"} • {ev.place || "Hà Nội"}
-                              </p>
-                            </div>
-                          </div>
-                          <span className="px-2 py-0.5 rounded-full bg-orange-50 dark:bg-orange-950/60 text-orange-600 dark:text-orange-300 text-[10px] font-extrabold shrink-0 border border-orange-200">
-                            Đã đăng ký
-                          </span>
-                        </Link>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-
-            {/* 2.2. Đầu mục: Cuộc họp ban */}
-            <div className="rounded-2xl bg-white dark:bg-[#0F172A] border border-slate-100 dark:border-slate-800/60 overflow-hidden shadow-2xs">
-              <button
-                type="button"
-                onClick={() => toggleSection("committee_meetings")}
-                className="w-full p-3.5 flex items-center justify-between text-left hover:bg-orange-50/40 dark:hover:bg-slate-800/40 transition cursor-pointer"
-              >
-                <div className="flex items-center gap-2.5 min-w-0">
-                  <div className="size-8.5 rounded-xl bg-orange-50 dark:bg-orange-950/60 text-orange-600 dark:text-orange-400 grid place-items-center shrink-0">
-                    <Building2 className="size-4" />
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <h4 className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white">
-                      Cuộc họp ban
-                    </h4>
-                    <span className="px-2 py-0.5 rounded-full bg-orange-50 dark:bg-orange-950/60 text-orange-600 dark:text-orange-300 text-[10px] font-black border border-orange-200 dark:border-orange-900">
-                      {committeeMeetings.length}
-                    </span>
-                  </div>
-                </div>
-                <ChevronDown
-                  className={`size-4 text-slate-400 transition-transform duration-200 shrink-0 ${expandedSections["committee_meetings"] ? "rotate-180 text-orange-600 dark:text-orange-400" : ""
-                    }`}
-                />
-              </button>
-
-              {expandedSections["committee_meetings"] && (
-                <div className="px-4 pb-4 pt-1 border-t border-slate-100 dark:border-slate-800/80 space-y-2.5 animate-in fade-in duration-150">
-                  {committeeMeetings.length === 0 ? (
-                    <div className="py-6 text-center text-xs text-slate-500 dark:text-slate-400">
-                      Chưa có cuộc họp ban nào được lên lịch
-                    </div>
-                  ) : (
-                    committeeMeetings.map((m) => (
-                      <div
-                        key={m.id}
-                        className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800 space-y-2"
-                      >
-                        <div className="flex items-center justify-between gap-2">
-                          <span className="px-2 py-0.5 rounded-full bg-orange-100 dark:bg-orange-950 text-orange-700 dark:text-orange-300 text-[9.5px] font-extrabold uppercase">
-                            {m.department}
-                          </span>
-                          <span className="px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300 text-[9.5px] font-extrabold">
-                            {m.status}
-                          </span>
-                        </div>
-                        <h5 className="text-xs font-bold text-slate-900 dark:text-white leading-snug">
-                          {m.title}
-                        </h5>
-                        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[10.5px] text-slate-500 dark:text-slate-400">
-                          <span className="flex items-center gap-1">
-                            <Clock className="size-3 text-slate-400" />
-                            <span>{m.time}, {m.date}</span>
-                          </span>
-                          <span className="flex items-center gap-1 truncate max-w-full">
-                            <MapPin className="size-3 text-slate-400 shrink-0" />
-                            <span className="truncate">{m.location}</span>
-                          </span>
-                        </div>
-                        {m.zoomUrl && (
-                          <div className="pt-1 flex items-center justify-between">
-                            <a
-                              href={m.zoomUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1 px-3 py-1 rounded-xl bg-orange-500 text-white text-[11px] font-bold shadow-2xs hover:bg-orange-600 transition cursor-pointer"
-                            >
-                              <Video className="size-3 text-amber-200" />
-                              <span>Vào phòng họp</span>
-                            </a>
-                            <span className="text-[10px] text-slate-400 italic">Được cấp bởi Ban Thư Ký</span>
-                          </div>
-                        )}
-                      </div>
-                    ))
-                  )}
-                </div>
-              )}
-            </div>
-
-            {/* 2.3. Đầu mục: Cuộc gặp giao thương 1-on-1 */}
-            <div className="rounded-2xl bg-white dark:bg-[#0F172A] border border-slate-100 dark:border-slate-800/60 overflow-hidden shadow-2xs">
-              <button
-                type="button"
-                onClick={() => toggleSection("meetings_1on1")}
-                className="w-full p-3.5 flex items-center justify-between text-left hover:bg-orange-50/40 dark:hover:bg-slate-800/40 transition cursor-pointer"
-              >
-                <div className="flex items-center gap-2.5 min-w-0">
-                  <div className="size-8.5 rounded-xl bg-orange-50 dark:bg-orange-950/60 text-orange-600 dark:text-orange-400 grid place-items-center shrink-0">
-                    <Handshake className="size-4" />
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <h4 className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white">
-                      Cuộc gặp giao thương 1-on-1
-                    </h4>
-                    <span className="px-2 py-0.5 rounded-full bg-orange-50 dark:bg-orange-950/60 text-orange-600 dark:text-orange-300 text-[10px] font-black border border-orange-200 dark:border-orange-900">
-                      {meetings1on1.length}
-                    </span>
-                  </div>
-                </div>
-                <ChevronDown
-                  className={`size-4 text-slate-400 transition-transform duration-200 shrink-0 ${expandedSections["meetings_1on1"] ? "rotate-180 text-orange-600 dark:text-orange-400" : ""
-                    }`}
-                />
-              </button>
-
-              {expandedSections["meetings_1on1"] && (
-                <div className="px-4 pb-4 pt-1 border-t border-slate-100 dark:border-slate-800/80 space-y-2.5 animate-in fade-in duration-150">
-                  {meetings1on1.length === 0 ? (
-                    <div className="py-6 text-center text-xs text-slate-500 dark:text-slate-400">
-                      Chưa có cuộc gặp 1-on-1 nào
-                    </div>
-                  ) : (
-                    meetings1on1.map((meet) => (
-                      <div
-                        key={meet.id}
-                        className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800 space-y-2"
-                      >
-                        <div className="flex items-center justify-between gap-2">
-                          <span className="font-bold text-xs text-orange-600 dark:text-orange-400">
-                            {meet.partnerName}
-                          </span>
-                          <span className="px-2 py-0.5 rounded-full bg-orange-50 dark:bg-orange-950/60 text-orange-600 dark:text-orange-300 text-[9.5px] font-extrabold border border-orange-200">
-                            {meet.status}
-                          </span>
-                        </div>
-                        <div className="text-[11px] font-semibold text-slate-800 dark:text-slate-200">
-                          {meet.title}
-                        </div>
-                        <div className="text-[10px] text-slate-500 dark:text-slate-400">
-                          Doanh nghiệp: {meet.partnerCompany}
-                        </div>
-                        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[10px] text-slate-500 dark:text-slate-400 pt-1">
-                          <span className="flex items-center gap-1 font-semibold text-slate-700 dark:text-slate-300">
-                            <Clock className="size-3 text-orange-500" />
-                            <span>{meet.time} ngày {meet.date}</span>
-                          </span>
-                          <span className="flex items-center gap-1 truncate max-w-full">
-                            <MapPin className="size-3 text-slate-400 shrink-0" />
-                            <span className="truncate">{meet.location}</span>
-                          </span>
-                        </div>
-                        <div className="pt-1 flex items-center justify-between">
-                          <a
-                            href={`https://zalo.me/${meet.phone}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-orange-50 dark:bg-orange-950 border border-orange-200 dark:border-orange-800 text-orange-700 dark:text-orange-300 text-[10.5px] font-bold hover:bg-orange-100 transition cursor-pointer"
-                          >
-                            <span>Nhắn Zalo đối tác</span>
-                          </a>
-                          <a
-                            href={`tel:${meet.phone}`}
-                            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-orange-50 dark:bg-orange-950 border border-orange-200 dark:border-orange-800 text-orange-700 dark:text-orange-300 text-[10.5px] font-bold hover:bg-orange-100 transition cursor-pointer"
-                          >
-                            <Phone className="size-3 text-orange-600" />
-                            <span>Gọi điện</span>
-                          </a>
-                        </div>
-                      </div>
-                    ))
-                  )}
-                </div>
-              )}
-            </div>
-
-            {/* 2.4. Đầu mục: Cơ hội giao thương B2B */}
-            <div className="rounded-2xl bg-white dark:bg-[#0F172A] border border-slate-100 dark:border-slate-800/60 overflow-hidden shadow-2xs">
-              <button
-                type="button"
-                onClick={() => toggleSection("opportunities")}
-                className="w-full p-3.5 flex items-center justify-between text-left hover:bg-orange-50/40 dark:hover:bg-slate-800/40 transition cursor-pointer"
-              >
-                <div className="flex items-center gap-2.5 min-w-0">
-                  <div className="size-8.5 rounded-xl bg-orange-50 dark:bg-orange-950/60 text-orange-600 dark:text-orange-400 grid place-items-center shrink-0">
-                    <TrendingUp className="size-4" />
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <h4 className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white">
-                      Cơ hội giao thương B2B
-                    </h4>
-                    <span className="px-2 py-0.5 rounded-full bg-orange-50 dark:bg-orange-950/60 text-orange-600 dark:text-orange-300 text-[10px] font-black border border-orange-200 dark:border-orange-900">
-                      {connectedOpportunities.length}
-                    </span>
-                  </div>
-                </div>
-                <ChevronDown
-                  className={`size-4 text-slate-400 transition-transform duration-200 shrink-0 ${expandedSections["opportunities"] ? "rotate-180 text-orange-600 dark:text-orange-400" : ""
-                    }`}
-                />
-              </button>
-
-              {expandedSections["opportunities"] && (
-                <div className="px-4 pb-4 pt-1 border-t border-slate-100 dark:border-slate-800/80 space-y-2 animate-in fade-in duration-150">
-                  {connectedOpportunities.length === 0 ? (
-                    <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800 text-center">
-                      <p className="text-xs text-slate-500 dark:text-slate-400">
-                        Bạn chưa gửi quan tâm hoặc kết nối cơ hội giao thương nào.
-                      </p>
-                      <Link
-                        to="/association/opportunities"
-                        className="mt-2 inline-flex items-center gap-1 text-xs font-bold text-orange-600 dark:text-orange-400 hover:underline"
-                      >
-                        <span>Khám phá cơ hội hợp tác B2B</span>
-                        <ChevronRight className="size-3.5" />
-                      </Link>
-                    </div>
-                  ) : (
-                    <div className="space-y-2">
-                      {connectedOpportunities.map((opp) => (
-                        <Link
-                          key={opp.id}
-                          to="/association/opportunities"
-                          className="p-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800 hover:border-orange-400/60 transition flex items-center justify-between gap-3 group cursor-pointer"
-                        >
-                          <div className="min-w-0">
-                            <h5 className="text-xs font-bold text-slate-900 dark:text-white truncate group-hover:text-orange-600 transition">
-                              {opp.title}
-                            </h5>
-                            <p className="text-[10.5px] text-slate-500 dark:text-slate-400 truncate">
-                              {opp.company || "Học viên CLB"} • {opp.value || "Thỏa thuận B2B"}
-                            </p>
-                          </div>
-                          <span className="px-2 py-0.5 rounded-full bg-orange-50 dark:bg-orange-950/60 text-orange-600 dark:text-orange-300 text-[10px] font-extrabold shrink-0 border border-orange-200">
-                            {opp.interested ? "Đã quan tâm" : "Đã đăng"}
-                          </span>
-                        </Link>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-
-            {/* 2.5. Đầu mục: Khám phá Marketplace & Danh bạ CEO */}
-            <div className="rounded-2xl bg-white dark:bg-[#0F172A] border border-slate-100 dark:border-slate-800/60 overflow-hidden shadow-2xs">
-              <button
-                type="button"
-                onClick={() => toggleSection("marketplace")}
-                className="w-full p-3.5 flex items-center justify-between text-left hover:bg-orange-50/40 dark:hover:bg-slate-800/40 transition cursor-pointer"
-              >
-                <div className="flex items-center gap-2.5 min-w-0">
-                  <div className="size-8.5 rounded-xl bg-orange-50 dark:bg-orange-950/60 text-orange-600 dark:text-orange-400 grid place-items-center shrink-0">
-                    <Package className="size-4" />
-                  </div>
-                  <div>
-                    <h4 className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white">
-                      Khám phá Marketplace &amp; Danh bạ CEO
-                    </h4>
-                  </div>
-                </div>
-                <ChevronDown
-                  className={`size-4 text-slate-400 transition-transform duration-200 shrink-0 ${expandedSections["marketplace"] ? "rotate-180 text-orange-600 dark:text-orange-400" : ""
-                    }`}
-                />
-              </button>
-
-              {expandedSections["marketplace"] && (
-                <div className="px-4 pb-4 pt-1 border-t border-slate-100 dark:border-slate-800/80 space-y-2 animate-in fade-in duration-150">
-                  <Link
-                    to="/association/products"
-                    search={undefined as any}
-                    className="p-3 bg-slate-50 dark:bg-slate-800/40 rounded-2xl border border-slate-100 dark:border-slate-800 flex items-center justify-between hover:border-orange-400 transition cursor-pointer"
-                  >
-                    <div className="flex items-center gap-2.5 min-w-0">
-                      <div className="size-8.5 rounded-xl bg-orange-50 dark:bg-orange-950/60 text-orange-600 dark:text-orange-400 grid place-items-center shrink-0">
-                        <Package className="size-4" />
-                      </div>
-                      <div className="min-w-0">
-                        <h5 className="text-xs font-bold text-slate-900 dark:text-white">Gian hàng sản phẩm &amp; dịch vụ</h5>
-                        <p className="text-[10px] text-slate-500 dark:text-slate-400">Ưu đãi độc quyền giữa các doanh nghiệp CLB</p>
-                      </div>
-                    </div>
-                    <ChevronRight className="size-4 text-slate-400 shrink-0" />
-                  </Link>
-
-                  <Link
-                    to="/association/members"
-                    className="p-3 bg-slate-50 dark:bg-slate-800/40 rounded-2xl border border-slate-100 dark:border-slate-800 flex items-center justify-between hover:border-orange-400 transition cursor-pointer"
-                  >
-                    <div className="flex items-center gap-2.5 min-w-0">
-                      <div className="size-8.5 rounded-xl bg-orange-50 dark:bg-orange-950/60 text-orange-600 dark:text-orange-400 grid place-items-center shrink-0">
-                        <Users className="size-4" />
-                      </div>
-                      <div className="min-w-0">
-                        <h5 className="text-xs font-bold text-slate-900 dark:text-white">Danh bạ CEO HN10</h5>
-                        <p className="text-[10px] text-slate-500 dark:text-slate-400">Tra cứu thông tin và kết nối lãnh đạo</p>
-                      </div>
-                    </div>
-                    <ChevronRight className="size-4 text-slate-400 shrink-0" />
-                  </Link>
-
-                  <Link
-                    to="/association/calendar"
-                    className="p-3 bg-slate-50 dark:bg-slate-800/40 rounded-2xl border border-slate-100 dark:border-slate-800 flex items-center justify-between hover:border-orange-400 transition cursor-pointer"
-                  >
-                    <div className="flex items-center gap-2.5 min-w-0">
-                      <div className="size-8.5 rounded-xl bg-orange-50 dark:bg-orange-950/60 text-orange-600 dark:text-orange-400 grid place-items-center shrink-0">
-                        <Calendar className="size-4" />
-                      </div>
-                      <div className="min-w-0">
-                        <div className="flex items-center gap-1.5">
-                          <h5 className="text-xs font-bold text-slate-900 dark:text-white">Lịch hoạt động &amp; Nhắc hẹn</h5>
-                          <span className="px-1.5 py-0.2 rounded-md bg-orange-500 text-white text-[8.5px] font-bold uppercase">
-                            Nhắc lịch
-                          </span>
-                        </div>
-                        <p className="text-[10px] text-slate-500 dark:text-slate-400">Xem sự kiện, họp ban, cuộc gặp &amp; cài thông báo nhắc</p>
-                      </div>
-                    </div>
-                    <ChevronRight className="size-4 text-orange-500 shrink-0" />
-                  </Link>
-                </div>
-              )}
-            </div>
-
-            {/* 2.6. Đầu mục: Lịch sử thao tác */}
-            <div className="rounded-2xl bg-white dark:bg-[#0F172A] border border-slate-100 dark:border-slate-800/60 overflow-hidden shadow-2xs">
-              <button
-                type="button"
-                onClick={() => toggleSection("audit_history")}
-                className="w-full p-3.5 flex items-center justify-between text-left hover:bg-orange-50/40 dark:hover:bg-slate-800/40 transition cursor-pointer"
-              >
-                <div className="flex items-center gap-2.5 min-w-0">
-                  <div className="size-8.5 rounded-xl bg-orange-50 dark:bg-orange-950/60 text-orange-600 dark:text-orange-400 grid place-items-center shrink-0">
-                    <History className="size-4" />
-                  </div>
-                  <div>
-                    <h4 className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white">
-                      Lịch sử thao tác
-                    </h4>
-                  </div>
-                </div>
-                <ChevronDown
-                  className={`size-4 text-slate-400 transition-transform duration-200 shrink-0 ${expandedSections["audit_history"] ? "rotate-180 text-orange-600 dark:text-orange-400" : ""
-                    }`}
-                />
-              </button>
-
-              {expandedSections["audit_history"] && (
-                <div className="px-4 pb-4 pt-1 border-t border-slate-100 dark:border-slate-800/80 space-y-2 animate-in fade-in duration-150">
-                  {auditHistory.map((act) => (
-                    <div
-                      key={act.id}
-                      className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800/60 flex items-center justify-between gap-3 text-xs"
-                    >
-                      <div className="min-w-0 flex items-center gap-2">
-                        <span className="size-2 rounded-full bg-orange-500 dark:bg-amber-400 shrink-0" />
-                        <span className="text-slate-800 dark:text-slate-200 font-medium truncate">
-                          {act.title}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-1.5 shrink-0">
-                        <span className="px-1.5 py-0.2 rounded-md bg-slate-200/70 dark:bg-slate-700 text-[9.5px] font-bold text-slate-600 dark:text-slate-300">
-                          {act.badge}
-                        </span>
-                        <span className="text-[10px] text-slate-400 whitespace-nowrap">
-                          {act.time}
-                        </span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* ── NÚT ĐĂNG XUẤT CỐ ĐỊNH Ở FOOTER MÀN HÌNH CÁ NHÂN (YÊU CẦU 6) ── */}
-        <div className="pt-4 pb-8 w-full">
+        {/* ── 3. TIỆN ÍCH THIẾT YẾU NHẤT (CHỈ CÁC NÚT CẦN THIẾT) ── */}
+        <div className="bg-white rounded-3xl p-3 border border-slate-200 shadow-xs space-y-1">
+          {/* Đổi mật khẩu & Bảo mật */}
           <button
-            type="button"
-            onClick={handleLogout}
-            className="w-full py-3.5 px-4 rounded-2xl bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/40 text-rose-600 dark:text-rose-400 border border-rose-200/80 dark:border-rose-900/60 font-bold text-xs flex items-center justify-center gap-2 transition active:scale-98 cursor-pointer shadow-xs"
+            onClick={() => setSecurityModalOpen(true)}
+            className="w-full flex items-center justify-between p-3 rounded-2xl hover:bg-slate-50 transition active:scale-98 cursor-pointer"
           >
-            <LogOut className="size-4 text-rose-500" />
-            <span>Đăng xuất khỏi ứng dụng</span>
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center shrink-0 border border-amber-200">
+                <Lock className="w-4 h-4" />
+              </div>
+              <div className="text-left">
+                <span className="text-xs font-bold text-slate-900 block">Đổi Mật Khẩu &amp; Bảo Mật</span>
+                <span className="text-[11px] text-slate-500 block">Quản lý mật khẩu và an toàn tài khoản</span>
+              </div>
+            </div>
+            <ChevronRight className="w-4 h-4 text-slate-400" />
+          </button>
+
+          {/* Hỗ trợ Ban Thư Ký */}
+          <button
+            onClick={() => setContactSupportOpen(true)}
+            className="w-full flex items-center justify-between p-3 rounded-2xl hover:bg-slate-50 transition active:scale-98 cursor-pointer"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center shrink-0 border border-blue-200">
+                <Headphones className="w-4 h-4" />
+              </div>
+              <div className="text-left">
+                <span className="text-xs font-bold text-slate-900 block">Hỗ Trợ Ban Thư Ký 24/7</span>
+                <span className="text-[11px] text-slate-500 block">Hotline, giải đáp thắc mắc và hỗ trợ kỹ thuật</span>
+              </div>
+            </div>
+            <ChevronRight className="w-4 h-4 text-slate-400" />
+          </button>
+
+          {/* Cổng Quản Trị CRM (Chỉ hiển thị cho Admin / Ban Điều Hành) */}
+          {canAccessCrm && (
+            <a
+              href="/"
+              className="w-full flex items-center justify-between p-3 rounded-2xl hover:bg-slate-50 transition active:scale-98 cursor-pointer"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl bg-red-50 text-red-600 flex items-center justify-center shrink-0 border border-red-200">
+                  <LayoutDashboard className="w-4 h-4" />
+                </div>
+                <div className="text-left">
+                  <span className="text-xs font-bold text-slate-900 block">Cổng Quản Trị Web CRM</span>
+                  <span className="text-[11px] text-slate-500 block">Dành riêng cho Ban Điều Hành &amp; Admin</span>
+                </div>
+              </div>
+              <ExternalLink className="w-4 h-4 text-slate-400" />
+            </a>
+          )}
+        </div>
+
+        {/* ── 4. NÚT ĐĂNG XUẤT TÀI KHOẢN (AN TOÀN) ── */}
+        <div className="pt-2">
+          <button
+            onClick={handleLogout}
+            className="w-full py-3.5 px-4 rounded-2xl border border-red-200 bg-rose-50/70 hover:bg-rose-100 text-[#DC2626] font-bold text-xs flex items-center justify-center gap-2 transition active:scale-98 cursor-pointer shadow-2xs"
+          >
+            <LogOut className="w-4 h-4" />
+            <span>Đăng Xuất Tài Khoản</span>
           </button>
         </div>
-      </div>
+      </main>
 
-      {/* ── MODAL CHỈNH SỬA BÀI VIẾT (YÊU CẦU 1) ── */}
-      {editingPost && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-150"
-          onClick={() => setEditingPost(null)}
-        >
-          <div
-            className="w-full max-w-md bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 p-5 space-y-4"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
-              <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase">
-                Chỉnh sửa bài viết
-              </h3>
-              <button
-                type="button"
-                onClick={() => setEditingPost(null)}
-                className="p-1 rounded-full text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
-              >
-                <X className="size-4" />
-              </button>
-            </div>
-
-            <form onSubmit={handleSaveEditPost} className="space-y-3">
-              <div>
-                <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">
-                  Tiêu đề (tùy chọn)
-                </label>
-                <input
-                  type="text"
-                  value={editTitle}
-                  onChange={(e) => setEditTitle(e.target.value)}
-                  placeholder="Tiêu đề bài viết..."
-                  className="w-full px-3 py-2 text-xs rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white outline-none focus:border-[#003B95]"
-                />
-              </div>
-
-              <div>
-                <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">
-                  Nội dung bài viết (*)
-                </label>
-                <textarea
-                  rows={4}
-                  value={editContent}
-                  onChange={(e) => setEditContent(e.target.value)}
-                  placeholder="Nội dung bài viết..."
-                  required
-                  className="w-full px-3 py-2 text-xs rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white outline-none focus:border-[#003B95] resize-none"
-                />
-              </div>
-
-              {/* Phạm vi hiển thị (Facebook-style) */}
-              <div>
-                <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1.5">
-                  Phạm vi hiển thị (như Facebook)
-                </label>
-                <div className="grid grid-cols-3 gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setEditPrivacy("public")}
-                    className={`p-2 rounded-xl border text-center flex flex-col items-center gap-1 transition cursor-pointer ${editPrivacy === "public"
-                      ? "border-[#003B95] bg-blue-50/80 dark:bg-blue-950/40 text-[#003B95] dark:text-blue-300 font-bold"
-                      : "border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400"
-                      }`}
-                  >
-                    <Globe className="size-3.5" />
-                    <span className="text-[10.5px]">Công khai</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setEditPrivacy("friends")}
-                    className={`p-2 rounded-xl border text-center flex flex-col items-center gap-1 transition cursor-pointer ${editPrivacy === "friends"
-                      ? "border-[#003B95] bg-blue-50/80 dark:bg-blue-950/40 text-[#003B95] dark:text-blue-300 font-bold"
-                      : "border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400"
-                      }`}
-                  >
-                    <Users className="size-3.5" />
-                    <span className="text-[10.5px]">Bạn bè</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setEditPrivacy("only_me")}
-                    className={`p-2 rounded-xl border text-center flex flex-col items-center gap-1 transition cursor-pointer ${editPrivacy === "only_me"
-                      ? "border-[#003B95] bg-blue-50/80 dark:bg-blue-950/40 text-[#003B95] dark:text-blue-300 font-bold"
-                      : "border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400"
-                      }`}
-                  >
-                    <Lock className="size-3.5" />
-                    <span className="text-[10.5px]">Chỉ mình tôi</span>
-                  </button>
-                </div>
-              </div>
-
-              <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-800">
-                <button
-                  type="button"
-                  onClick={() => setEditingPost(null)}
-                  className="px-3.5 py-2 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-100 cursor-pointer"
-                >
-                  Hủy
-                </button>
-                <button
-                  type="submit"
-                  disabled={savingEdit}
-                  className="px-4 py-2 rounded-xl bg-[#003B95] hover:bg-[#002B70] text-white text-xs font-bold shadow-xs cursor-pointer disabled:opacity-50"
-                >
-                  {savingEdit ? "Đang lưu..." : "Lưu thay đổi"}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* ── MODAL ĐĂNG BÀI VIẾT VÀO MẠNG LƯỚI (YÊU CẦU 1, 3) ── */}
-      <CreatePostModal
-        isOpen={createPostOpen}
-        onClose={() => setCreatePostOpen(false)}
-        onSuccess={(newPost) => {
-          setMyPosts((prev) => [newPost, ...prev]);
-        }}
-      />
-
-      {/* ── MODAL CÀI ĐẶT HỆ THỐNG (ĐƯA VÀO ICON CÀI ĐẶT DƯỚI AVATAR - YÊU CẦU 2) ── */}
-      {systemSettingsOpen && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/70 backdrop-blur-xs animate-in fade-in duration-150 overflow-hidden"
-          onClick={() => setSystemSettingsOpen(false)}
-        >
-          <div
-            className="w-full max-w-md max-h-[90vh] bg-white dark:bg-[#0F172A] rounded-3xl shadow-2xl border border-slate-200/80 dark:border-slate-800 flex flex-col overflow-hidden animate-in zoom-in-95 duration-150"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Header */}
-            <div className="px-5 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between shrink-0 bg-gradient-to-r from-blue-50/60 to-indigo-50/60 dark:from-slate-900 dark:to-slate-800">
-              <div className="flex items-center gap-2.5">
-                <div className="size-8 rounded-xl bg-[#003B95] text-white grid place-items-center shadow-xs">
-                  <Cog className="size-4.5" />
-                </div>
-                <div>
-                  <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase">
-                    Cài đặt ứng dụng &amp; Nhận diện
-                  </h3>
-                  <p className="text-[10.5px] text-slate-500 dark:text-slate-400">
-                    Tùy biến màu sắc, trợ lý AI, ngôn ngữ và an toàn tài khoản
-                  </p>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={() => setSystemSettingsOpen(false)}
-                className="p-1.5 rounded-full text-slate-400 hover:text-slate-600 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
-              >
-                <X className="size-5" />
-              </button>
-            </div>
-
-            {/* Scrollable Settings Content - Tách riêng từng chức năng độc lập (Yêu cầu 6) */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-3 [scrollbar-width:none]">
-
-              {/* ── CHỨC NĂNG 1: CHỌN MÀU GIAO DIỆN & CHỦ ĐỀ CLB ── */}
-              <div className="rounded-2xl bg-white dark:bg-[#0F172A] border border-slate-200/80 dark:border-slate-800 p-4 shadow-2xs space-y-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2.5">
-                    <div className="size-8 rounded-xl bg-amber-50 dark:bg-amber-950 text-amber-500 grid place-items-center shrink-0 border border-amber-500/20">
-                      <Sparkles className="size-4" />
-                    </div>
-                    <div>
-                      <h4 className="text-xs font-extrabold uppercase tracking-wider text-slate-900 dark:text-white">
-                        Chọn màu giao diện &amp; Chủ đề
-                      </h4>
-                      <p className="text-[10px] text-slate-500 dark:text-slate-400">
-                        3 Dạng màu nhận diện thương hiệu CEO HN10
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* 3 Dạng Màu Tiêu Chuẩn CEO HN10 Swatches */}
-                <div className="pt-2 border-t border-slate-100 dark:border-slate-800">
-                  <div className="text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1.5">
-                    Bảng màu chủ đạo CLB (Xanh Doanh Nhân • Cam Tiên Phong • Đỏ Nhiệt Huyết):
-                  </div>
-                  <Ceo1983ColorThemeSelector />
-                </div>
-
-                {/* Thông tin Chủ đề Lễ hội đồng bộ CRM */}
-                <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60 flex items-center justify-between gap-2 mt-2">
-                  <div className="flex items-center gap-2 min-w-0">
-                    <span className="text-base shrink-0">{activeTheme.iconEmoji || "👑"}</span>
-                    <div className="min-w-0">
-                      <span className="text-[11px] font-bold text-slate-800 dark:text-white block truncate">
-                        {activeTheme.name}
-                      </span>
-                      <span className="text-[9.5px] text-slate-500 dark:text-slate-400 block truncate">
-                        {activeTheme.tagline}
-                      </span>
-                    </div>
-                  </div>
-                  <button
-                    type="button"
-                    disabled={themeSyncing}
-                    onClick={async () => {
-                      setThemeSyncing(true);
-                      try {
-                        await syncThemeFromBackend();
-                        setActiveTheme(getEffectiveThemeOption());
-                        toast.success("Đã đồng bộ chủ đề giao diện mới nhất từ CRM!");
-                      } catch {
-                        toast.error("Không thể đồng bộ chủ đề lúc này");
-                      } finally {
-                        setThemeSyncing(false);
-                      }
-                    }}
-                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-[10.5px] shadow-2xs transition cursor-pointer disabled:opacity-50 shrink-0"
-                  >
-                    <RotateCcw className={`size-3 ${themeSyncing ? "animate-spin" : ""}`} />
-                    <span>{themeSyncing ? "Đang tải..." : "Đồng bộ CRM"}</span>
-                  </button>
-                </div>
-              </div>
-
-              {/* ── CHỨC NĂNG 2: BẬT / TẮT TRỢ LÝ AI CEO HN10 ── */}
-              <div className="rounded-2xl bg-white dark:bg-[#0F172A] border border-slate-200/80 dark:border-slate-800 p-4 shadow-2xs">
-                <div className="flex items-center justify-between gap-3">
-                  <div className="flex items-center gap-2.5 min-w-0 pr-2">
-                    <div className="size-8 rounded-xl bg-sky-50 dark:bg-sky-950 text-sky-500 grid place-items-center shrink-0 border border-sky-500/20">
-                      <Bot className="size-4" />
-                    </div>
-                    <div className="min-w-0">
-                      <h4 className="text-xs font-extrabold uppercase tracking-wider text-slate-900 dark:text-white">
-                        Trợ lý AI CEO HN10
-                      </h4>
-                      <p className="text-[10px] text-slate-500 dark:text-slate-400">
-                        {voiceAiEnabled ? "Đang bật nút trợ lý AI nổi trên màn hình" : "Đang tắt trợ lý AI"}
-                      </p>
-                    </div>
-                  </div>
-                  <button
-                    type="button"
-                    role="switch"
-                    aria-checked={voiceAiEnabled}
-                    onClick={handleToggleVoiceAi}
-                    className={`w-12 h-6.5 p-0.5 rounded-full flex items-center transition-colors duration-200 ease-in-out cursor-pointer focus:outline-hidden shrink-0 ${voiceAiEnabled ? "bg-[#00A86B]" : "bg-slate-300 dark:bg-slate-700"
-                      }`}
-                  >
-                    <div
-                      className={`size-5.5 bg-white rounded-full shadow-md transform transition duration-200 ease-in-out ${voiceAiEnabled ? "translate-x-5.5" : "translate-x-0"
-                        }`}
-                    />
-                  </button>
-                </div>
-                <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-2 bg-slate-50 dark:bg-slate-800/40 p-2 rounded-xl">
-                  💡 Hỗ trợ tra cứu quy chế CLB, kết nối B2B và nhắc nhở lịch họp sự kiện thông minh 24/7.
-                </p>
-              </div>
-
-              {/* ── CHỨC NĂNG 3: CHỌN NGÔN NGỮ HIỂN THỊ ── */}
-              <div className="rounded-2xl bg-white dark:bg-[#0F172A] border border-slate-200/80 dark:border-slate-800 p-4 shadow-2xs space-y-2.5">
-                <div className="flex items-center gap-2.5">
-                  <div className="size-8 rounded-xl bg-blue-50 dark:bg-blue-950 text-[#003B95] dark:text-blue-400 grid place-items-center shrink-0 border border-blue-500/20">
-                    <Globe className="size-4" />
-                  </div>
-                  <div>
-                    <h4 className="text-xs font-extrabold uppercase tracking-wider text-slate-900 dark:text-white">
-                      Ngôn ngữ hiển thị
-                    </h4>
-                    <p className="text-[10px] text-slate-500 dark:text-slate-400">
-                      Chọn ngôn ngữ làm việc mặc định trên ứng dụng
-                    </p>
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-2 pt-1">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setLang("vi");
-                      toast.success("Đã chuyển sang Tiếng Việt");
-                    }}
-                    className={`py-2 px-3 rounded-xl border text-xs font-bold flex items-center justify-center gap-2 transition cursor-pointer ${lang === "vi"
-                      ? "border-[#003B95] dark:border-amber-400 bg-blue-50 dark:bg-amber-950/40 text-[#003B95] dark:text-amber-400 shadow-2xs font-extrabold"
-                      : "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400"
-                      }`}
-                  >
-                    <span>🇻🇳 Tiếng Việt</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setLang("en");
-                      toast.success("Switched to English");
-                    }}
-                    className={`py-2 px-3 rounded-xl border text-xs font-bold flex items-center justify-center gap-2 transition cursor-pointer ${lang === "en"
-                      ? "border-[#003B95] dark:border-amber-400 bg-blue-50 dark:bg-amber-950/40 text-[#003B95] dark:text-amber-400 shadow-2xs font-extrabold"
-                      : "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400"
-                      }`}
-                  >
-                    <span>🇬🇧 English</span>
-                  </button>
-                </div>
-              </div>
-
-              {/* ── CHỨC NĂNG 4: THÔNG BÁO ĐẨY CLB ── */}
-              <div className="rounded-2xl bg-white dark:bg-[#0F172A] border border-slate-200/80 dark:border-slate-800 p-4 shadow-2xs">
-                <div className="flex items-center justify-between gap-3">
-                  <div className="flex items-center gap-2.5 min-w-0 pr-2">
-                    <div className="size-8 rounded-xl bg-rose-50 dark:bg-rose-950 text-rose-500 grid place-items-center shrink-0 border border-rose-500/20">
-                      <Bell className="size-4" />
-                    </div>
-                    <div className="min-w-0">
-                      <h4 className="text-xs font-extrabold uppercase tracking-wider text-slate-900 dark:text-white">
-                        Thông báo đẩy &amp; Tin tức
-                      </h4>
-                      <p className="text-[10px] text-slate-500 dark:text-slate-400">
-                        {isNotificationEnabled ? "Đang bật nhận chuông thông báo" : "Đang tắt thông báo"}
-                      </p>
-                    </div>
-                  </div>
-                  <button
-                    type="button"
-                    role="switch"
-                    aria-checked={isNotificationEnabled}
-                    onClick={handleToggleNotification}
-                    className={`w-12 h-6.5 p-0.5 rounded-full flex items-center transition-colors duration-200 ease-in-out cursor-pointer focus:outline-hidden shrink-0 ${isNotificationEnabled ? "bg-[#00A86B]" : "bg-slate-300 dark:bg-slate-700"
-                      }`}
-                  >
-                    <div
-                      className={`size-5.5 bg-white rounded-full shadow-md transform transition duration-200 ease-in-out ${isNotificationEnabled ? "translate-x-5.5" : "translate-x-0"
-                        }`}
-                    />
-                  </button>
-                </div>
-              </div>
-
-              {/* 3.4. Đầu mục: Cài đặt ứng dụng PWA / Mobile App */}
-              <div className="rounded-2xl bg-white dark:bg-[#0F172A] border border-slate-200/80 dark:border-slate-800 overflow-hidden shadow-2xs">
-                <button
-                  type="button"
-                  onClick={() => toggleSection("install_app")}
-                  className="w-full p-4 flex items-center justify-between text-left hover:bg-slate-50/60 dark:hover:bg-slate-800/40 transition cursor-pointer"
-                >
-                  <div className="flex items-center gap-2.5 min-w-0">
-                    <div className="size-8 rounded-xl bg-blue-50 dark:bg-blue-950 text-[#003B95] dark:text-blue-400 grid place-items-center shrink-0">
-                      <Smartphone className="size-4" />
-                    </div>
-                    <div>
-                      <h4 className="text-xs font-extrabold uppercase tracking-wider text-slate-900 dark:text-white">
-                        Cài đặt ứng dụng PWA / Mobile App
-                      </h4>
-                      <p className="text-[10px] text-slate-700 dark:text-slate-200 font-medium line-clamp-1">
-                        Cài ứng dụng lên màn hình chính điện thoại
-                      </p>
-                    </div>
-                  </div>
-                  <ChevronDown
-                    className={`size-4 text-slate-400 transition-transform duration-200 shrink-0 ${expandedSections["install_app"] ? "rotate-180 text-[#003B95] dark:text-blue-400" : ""
-                      }`}
-                  />
-                </button>
-
-                {expandedSections["install_app"] && (
-                  <div className="px-4 pb-4 pt-1 border-t border-slate-100 dark:border-slate-800/80 space-y-2.5 animate-in fade-in duration-150">
-                    <button
-                      type="button"
-                      onClick={handleFastInstallApp}
-                      className="w-full p-3 rounded-2xl bg-blue-50 dark:bg-blue-950/60 border border-blue-200/80 dark:border-blue-800/60 flex items-center justify-between hover:brightness-105 transition cursor-pointer text-left"
-                    >
-                      <div className="flex items-center gap-2.5 min-w-0">
-                        <div className="size-8 rounded-xl bg-[#003B95] text-white grid place-items-center shrink-0 shadow-xs">
-                          <Smartphone className="size-4" />
-                        </div>
-                        <div className="min-w-0">
-                          <span className="text-xs font-bold text-blue-950 dark:text-blue-200 block truncate">
-                            Cài đặt ứng dụng lên màn hình chính
-                          </span>
-                          <span className="text-[10.5px] text-blue-700 dark:text-blue-300/80 block line-clamp-1">
-                            Tải file APK Android hoặc ghim Icon App lên iOS Safari
-                          </span>
-                        </div>
-                      </div>
-                      <ChevronRight className="size-4 text-blue-600 dark:text-blue-400 shrink-0" />
-                    </button>
-                  </div>
-                )}
-              </div>
-
-              {/* 3.5. Đầu mục: Hỗ trợ Ban Thư Ký & Hướng dẫn sử dụng App */}
-              <div className="rounded-2xl bg-white dark:bg-[#0F172A] border border-slate-200/80 dark:border-slate-800 overflow-hidden shadow-2xs">
-                <button
-                  type="button"
-                  onClick={() => toggleSection("support_guide")}
-                  className="w-full p-4 flex items-center justify-between text-left hover:bg-slate-50/60 dark:hover:bg-slate-800/40 transition cursor-pointer"
-                >
-                  <div className="flex items-center gap-2.5 min-w-0">
-                    <div className="size-8 rounded-xl bg-rose-50 dark:bg-rose-950 text-rose-500 grid place-items-center shrink-0">
-                      <Headphones className="size-4" />
-                    </div>
-                    <div>
-                      <h4 className="text-xs font-extrabold uppercase tracking-wider text-slate-900 dark:text-white">
-                        Hỗ trợ Ban Thư Ký &amp; Cẩm nang App
-                      </h4>
-                      <p className="text-[10px] text-slate-700 dark:text-slate-200 font-medium line-clamp-1">
-                        Hotline: 098.333.1983 • banthuky@ceohn10.vn
-                      </p>
-                    </div>
-                  </div>
-                  <ChevronDown
-                    className={`size-4 text-slate-400 transition-transform duration-200 shrink-0 ${expandedSections["support_guide"] ? "rotate-180 text-rose-500" : ""
-                      }`}
-                  />
-                </button>
-
-                {expandedSections["support_guide"] && (
-                  <div className="px-4 pb-4 pt-1 border-t border-slate-100 dark:border-slate-800/80 space-y-2.5 animate-in fade-in duration-150">
-                    <div className="space-y-2 text-xs">
-                      {/* Hotline Ban Thư Ký */}
-                      <div className="flex items-center justify-between p-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-700/50">
-                        <div className="flex items-center gap-2 min-w-0">
-                          <Phone className="size-4 text-emerald-600 shrink-0" />
-                          <span className="font-bold text-slate-800 dark:text-white text-xs truncate">098.333.1983</span>
-                        </div>
-                        <a
-                          href="tel:0983331983"
-                          className="px-2.5 py-1 rounded-xl bg-[#00A86B] text-white font-bold text-xs"
-                        >
-                          Gọi ngay
-                        </a>
-                      </div>
-                      {/* Email */}
-                      <div className="flex items-center justify-between p-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-700/50">
-                        <div className="flex items-center gap-2 min-w-0">
-                          <Mail className="size-4 text-blue-600 shrink-0" />
-                          <span className="font-bold text-slate-800 dark:text-white text-xs truncate">banthuky@ceohn10.vn</span>
-                        </div>
-                        <a
-                          href="mailto:banthuky@ceohn10.vn"
-                          className="px-2.5 py-1 rounded-xl border border-blue-600 text-[#003B95] dark:text-blue-400 font-bold text-xs"
-                        >
-                          Gửi thư
-                        </a>
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-2 pt-1">
-                      <button
-                        type="button"
-                        onClick={() => setContactSupportOpen(true)}
-                        className="p-2.5 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 text-rose-700 dark:text-rose-300 font-bold text-xs flex items-center justify-center gap-1.5 cursor-pointer"
-                      >
-                        <Headphones className="size-3.5" />
-                        <span>Gửi phản ánh</span>
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setUserGuideOpen(true)}
-                        className="p-2.5 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900/60 text-amber-700 dark:text-amber-300 font-bold text-xs flex items-center justify-center gap-1.5 cursor-pointer"
-                      >
-                        <BookOpen className="size-3.5" />
-                        <span>Xem cẩm nang</span>
-                      </button>
-                    </div>
-
-                    {hasAdminPrivilege && (
-                      <Link
-                        to="/association/permissions"
-                        className="w-full p-2.5 rounded-xl bg-indigo-50/80 dark:bg-indigo-950/30 border border-indigo-200 dark:border-indigo-900/60 flex items-center justify-between text-xs font-bold text-indigo-900 dark:text-indigo-200 cursor-pointer"
-                      >
-                        <div className="flex items-center gap-2">
-                          <ShieldCheck className="size-4 text-indigo-600" />
-                          <span>Phân quyền Ban Quản Trị &amp; RBAC</span>
-                        </div>
-                        <ChevronRight className="size-3.5 text-indigo-500" />
-                      </Link>
-                    )}
-                  </div>
-                )}
-              </div>
-
-              {/* 3.6. Đầu mục: Bảo mật tài khoản & Đổi mật khẩu */}
-              <div className="rounded-2xl bg-white dark:bg-[#0F172A] border border-slate-200/80 dark:border-slate-800 overflow-hidden shadow-2xs">
-                <button
-                  type="button"
-                  onClick={() => toggleSection("account_security")}
-                  className="w-full p-4 flex items-center justify-between text-left hover:bg-slate-50/60 dark:hover:bg-slate-800/40 transition cursor-pointer"
-                >
-                  <div className="flex items-center gap-2.5 min-w-0">
-                    <div className="size-8 rounded-xl bg-emerald-50 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 grid place-items-center shrink-0">
-                      <ShieldCheck className="size-4" />
-                    </div>
-                    <div>
-                      <h4 className="text-xs font-extrabold uppercase tracking-wider text-slate-900 dark:text-white">
-                        Bảo mật tài khoản &amp; Đổi mật khẩu
-                      </h4>
-                      <p className="text-[10px] text-slate-700 dark:text-slate-200 font-medium line-clamp-1">
-                        Quản lý mật khẩu, email và an toàn thông tin
-                      </p>
-                    </div>
-                  </div>
-                  <ChevronDown
-                    className={`size-4 text-slate-400 transition-transform duration-200 shrink-0 ${expandedSections["account_security"] ? "rotate-180 text-emerald-500" : ""
-                      }`}
-                  />
-                </button>
-
-                {expandedSections["account_security"] && (
-                  <div className="px-4 pb-4 pt-1 border-t border-slate-100 dark:border-slate-800/80 space-y-2 animate-in fade-in duration-150">
-                    <AccountSecuritySettingsForm />
-                  </div>
-                )}
-              </div>
-
-              {/* Nút Đăng xuất tài khoản */}
-              <div className="pt-2">
-                <button
-                  type="button"
-                  onClick={handleLogout}
-                  className="w-full py-3 px-4 rounded-2xl bg-rose-50 hover:bg-rose-100/80 dark:bg-rose-950/40 dark:hover:bg-rose-900/40 text-rose-600 dark:text-rose-400 border border-rose-200/80 dark:border-rose-900/60 font-bold text-xs flex items-center justify-center gap-2 transition active:scale-98 cursor-pointer shadow-xs"
-                >
-                  <LogOut className="size-4 text-rose-500" />
-                  <span>Đăng xuất khỏi ứng dụng</span>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ── 5. MODALS (DANH THIẾP, SỬA HỒ SƠ, QR CODE, HƯỚNG DẪN SỬ DỤNG) ── */}
-
-      {/* Modal 1: Xem trước Danh thiếp số VIP */}
-      {cardPreviewOpen && (
-        <CardPreviewModal
-          slug={memberCode}
-          name={displayName}
-          title={displayTitle}
-          company={displayCompany}
-          avatarUrl={resolvedAvatar}
-          onClose={() => setCardPreviewOpen(false)}
-        />
-      )}
-
-      {/* Modal 2: Chỉnh sửa nhanh hồ sơ cá nhân / doanh nghiệp */}
+      {/* ── MODALS ── */}
       <QuickProfileEditModal
         open={editProfileOpen}
-        onClose={() => setEditProfileOpen(false)}
-        initialName={displayName}
-        initialPhone={displayPhone}
-        initialAvatar={resolvedAvatar}
-        initialCover={displayCover}
-        initialCompany={displayCompany}
-        initialTitle={displayTitle}
-        initialAddress={displayAddress}
-        initialWebsite={displayWebsite}
-        initialCompanySize={displayCompanySize}
-        initialIndustry={displayIndustry}
-        initialBio={displayBio}
-        userId={user?.id}
-        onSaved={(updated) => {
-          setLocalProfile((prev: any) => ({ ...prev, ...updated }));
-          if (updated.avatar) {
-            setCustomAvatar(updated.avatar);
-            setAvatarError(false);
-          }
-          if (updated.cover) {
-            setCoverPhoto(updated.cover);
-          }
+        onClose={() => {
           setEditProfileOpen(false);
-          toast.success("Đã lưu cập nhật hồ sơ doanh nghiệp thành công!");
-          reloadMember?.();
+          loadProfile();
         }}
+        initialName={displayName}
+        initialPhone={phone}
+        initialCompany={companyName}
+        initialTitle={position}
+        initialIndustry={industry}
+        initialAddress={address}
+        initialAvatar={member?.avatar_url || (user as any)?.avatarUrl || null}
       />
 
-      {/* Modal 3: Mã QR Học viên CEO HN10 */}
-      {qrModalOpen && (
-        <AssociationMemberQrModal
-          open={qrModalOpen}
-          onClose={() => setQrModalOpen(false)}
-          memberCode={memberCode}
-          memberName={displayName}
-          memberTitle={displayTitle}
-          memberCompany={displayCompany}
-          memberAvatar={resolvedAvatar}
-        />
-      )}
-
-      {/* Modal 4: Hướng dẫn sử dụng App CEO HN10 (CHỈ DÀNH CHO APP) */}
-      <UserGuideModal
-        open={userGuideOpen}
-        onClose={() => setUserGuideOpen(false)}
+      <AssociationMemberQrModal
+        open={qrModalOpen}
+        onClose={() => setQrModalOpen(false)}
+        memberCode={memberCode}
+        memberName={displayName}
+        memberTitle={position}
+        memberCompany={companyName}
+        memberAvatar={member?.avatar_url || (user as any)?.avatarUrl || null}
       />
 
-      {/* Modal 5: Liên hệ hỗ trợ Ban Thư Ký */}
       <ContactSupportModal
         open={contactSupportOpen}
         onClose={() => setContactSupportOpen(false)}
       />
 
-      {/* Modal Căn Chỉnh & Cắt Ảnh Studio (Zoom, Di chuyển, Xoay, Cắt ảnh) */}
-      <ImageCropModal
-        isOpen={cropModalOpen}
-        imageUrl={cropImageUrl}
-        initialShape={cropTarget === "avatar" ? "circle" : "banner"}
-        title={cropTarget === "avatar" ? "Căn Chỉnh & Cắt Ảnh Đại Diện" : "Căn Chỉnh & Cắt Ảnh Bìa"}
-        onClose={() => setCropModalOpen(false)}
-        onCropComplete={handleCropComplete}
-      />
+      {securityModalOpen && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in">
+          <div className="w-full max-w-md bg-white rounded-3xl p-5 shadow-2xl border border-slate-200 space-y-4">
+            <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+              <h3 className="text-sm font-black text-slate-900 flex items-center gap-1.5">
+                <Lock className="w-4 h-4 text-[#D97706]" />
+                <span>Đổi Mật Khẩu &amp; An Toàn Tài Khoản</span>
+              </h3>
+              <button
+                onClick={() => setSecurityModalOpen(false)}
+                className="text-slate-400 hover:text-slate-600 font-bold p-1 cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+            <AccountSecuritySettingsForm />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

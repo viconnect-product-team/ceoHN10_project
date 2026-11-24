@@ -22,32 +22,11 @@ export const SYSTEM_TENANTS: SystemTenantDef[] = [
     name: "CLB Doanh Nhân CEO HN10 (HanoiBA)",
     shortName: "CEO HN10",
     code: "CEOHN10",
-    brandName: "Hiệp hội Doanh nhân CEO HN10",
+    brandName: "CLB Doanh Nhân CEO HN10 (HanoiBA)",
     brandLogo: "/app-icon.png",
     description: "Cổng Quản trị Doanh Trí, Lớp học 30 chuyên đề, Sự kiện & Hội viên CEO HN10",
     enabledModules: [
       "classes",
-      "events",
-      "members",
-      "finance",
-      "b2b",
-      "zalo_oa",
-      "ai_assistant",
-      "voting",
-      "lucky_draw",
-      "documents",
-      "templates",
-    ],
-  },
-  {
-    key: "ceo1983",
-    name: "CLB Doanh Nhân CEO 1983",
-    shortName: "CEO 1983",
-    code: "CEO1983",
-    brandName: "CLB Doanh Nhân CEO 1983",
-    brandLogo: "/app-icon.png",
-    description: "Cổng Quản trị Kết nối Giao thương, Sự kiện & Hội viên CLB CEO 1983",
-    enabledModules: [
       "events",
       "members",
       "finance",
@@ -65,20 +44,6 @@ export const SYSTEM_TENANTS: SystemTenantDef[] = [
 export const TENANT_STORAGE_KEY = "viconnect_active_tenant";
 
 export function getActiveSystemTenant(): string {
-  if (typeof window === "undefined") return "ceohn10";
-  try {
-    const rawUser = localStorage.getItem("vibe_user");
-    if (rawUser) {
-      const u = JSON.parse(rawUser);
-      if (u.targetSystem && u.targetSystem !== "all") {
-        return u.targetSystem;
-      }
-    }
-    const saved = localStorage.getItem(TENANT_STORAGE_KEY);
-    if (saved && (saved === "ceohn10" || saved === "ceo1983")) {
-      return saved;
-    }
-  } catch {}
   return "ceohn10";
 }
 
@@ -753,11 +718,7 @@ export function isRouteAllowedByMatrix(route: string, roleKey: SystemRoleKey, us
   }
 
   // 1. Phân hệ Phân Quyền & Quản Trị Người Dùng (/accounts & /permissions):
-  // Yêu cầu bắt buộc: "phân quyền phải đưa vào màn quản trị platform crm không đưa vào màn crm hệ thống thường ceohn10"
-  // Do đó, trên Sidebar CRM thường, 2 route này KHÔNG xuất hiện (chỉ nằm trong Cổng Quản Trị Nền Tảng /master)
-  if (cleanRoute === "/accounts" || cleanRoute === "/permissions") {
-    return false;
-  }
+  // Chỉ mở quyền truy cập cho Quản trị viên và Ban Điều Hành (xử lý tiếp ở isTopAdmin)
 
   // ĐẶC QUYỀN QUẢN TRỊ TỐI CAO (PLATFORM ADMIN / ADMIN / LỚP TRƯỞNG / BAN ĐIỀU HÀNH / TRƯỞNG BAN)
   // Đảm bảo các tài khoản quản trị và điều hành luôn luôn thấy đầy đủ toàn bộ các chức năng của CEO HN10

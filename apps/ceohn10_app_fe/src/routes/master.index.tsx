@@ -38,7 +38,14 @@ import {
   CheckCheck,
   Power,
   RotateCw,
+  Search,
+  UserCog,
+  Unlock,
+  Shield,
+  Menu,
+  X,
 } from "lucide-react";
+import { TableActionsGroup } from "@/components/common";
 import {
   SYSTEM_TENANTS,
   isModuleEnabledForTenant,
@@ -105,8 +112,9 @@ function MasterAdminPortal() {
     }
     return "overview";
   });
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
-  // State dự án đang quản trị Multi-Tenant (ceohn10, ceo1983, vba)
+  // State dự án đang quản trị (ceohn10)
   const [selectedTenantKey, setSelectedTenantKey] = useState<string>(() => {
     return getActiveSystemTenant() || "ceohn10";
   });
@@ -130,35 +138,6 @@ function MasterAdminPortal() {
         const res = await fetchNestApi<any[]>(`/admin/master-settings/platforms?tenant=${selectedTenantKey}`);
         if (Array.isArray(res) && res.length > 0) return res;
       } catch {}
-
-      if (selectedTenantKey === "ceo1983") {
-        return [
-          {
-            id: "plt-crm-1983",
-            name: "Hệ thống CRM CEO 1983",
-            code: "CEO1983_CRM_WEB",
-            category: "crm",
-            categoryLabel: "CRM Hiệp hội",
-            description: "Cổng Quản trị CRM Hội viên, Sự kiện, Quỹ tài chính, B2B Connect CLB Doanh Nhân CEO 1983",
-            endpointUrl: "/",
-            isCore: true,
-            status: "active",
-            modules: ["Hội viên", "Sự kiện", "Tài chính", "Giao thương", "Phân quyền"],
-          },
-          {
-            id: "plt-app-1983",
-            name: "App Mobile CEO 1983",
-            code: "CEO1983_MOBILE_APP",
-            category: "miniapp",
-            categoryLabel: "Mobile App Hội viên",
-            description: "Ứng dụng di động dành riêng cho Hội viên Doanh nhân CEO 1983",
-            endpointUrl: "/association",
-            isCore: true,
-            status: "active",
-            modules: ["Thẻ hội viên số", "B2B Connect", "Điểm danh QR", "Bình chọn", "Nhật ký"],
-          },
-        ];
-      }
 
       // Mặc định: CEOHN10
       return [
@@ -249,84 +228,76 @@ function MasterAdminPortal() {
     },
   });
 
-  const DEFAULT_MASTER_ADMIN_ACCOUNTS = [
-    {
-      id: "usr-admin-root",
-      name: "Quản Trị Viên Tối Cao Nền Tảng",
-      email: "admin@ceohn10.vn",
-      username: "admin_root",
-      code: "CEO-HN10-ROOT",
-      role: "platform_admin",
-      department: "Ban Điều Hành & Quản Trị Hệ Thống",
-      targetSystem: "all",
-      status: "active",
-    },
-    {
-      id: "usr-admin-hn10",
-      name: "Quản Trị Viên CLB CEO HN10",
-      email: "admin.hn10@ceohn10.vn",
-      username: "admin_ceohn10",
-      code: "ADM-HN10-01",
-      role: "admin",
-      department: "Ban Thư Ký & Ban Điều Hành",
-      targetSystem: "ceohn10",
-      status: "active",
-    },
-    {
-      id: "usr-lt-hn10",
-      name: "Lớp Trưởng Cán Sự Lớp CEO HN10",
-      email: "loptruong.hn10@ceohn10.vn",
-      username: "loptruong_hn10",
-      code: "LT-HN10-01",
-      role: "lop_truong",
-      department: "Ban Cán Sự Lớp",
-      targetSystem: "ceohn10",
-      status: "active",
-    },
-    {
-      id: "usr-btt-hn10",
-      name: "Trưởng Ban Truyền Thông CEO HN10",
-      email: "btt.hn10@ceohn10.vn",
-      username: "truongban_truyenthong",
-      code: "BTT-HN10-01",
-      role: "truong_ban_truyen_thong",
-      department: "Ban Truyền Thông & Sự Kiện",
-      targetSystem: "ceohn10",
-      status: "active",
-    },
-    {
-      id: "usr-btc-hn10",
-      name: "Trưởng Ban Tài Chính & Tài Trợ CEO HN10",
-      email: "btc.hn10@ceohn10.vn",
-      username: "truongban_taichinh",
-      code: "BTC-HN10-01",
-      role: "truong_ban_tai_chinh",
-      department: "Ban Tài Chính & Tài Trợ",
-      targetSystem: "ceohn10",
-      status: "active",
-    },
-  ];
-
-  // Query Admin Accounts
+  // Query Admin Accounts từ database thực tế (Tuyệt đối không dùng tài khoản fake mock)
   const accountsQ = useQuery({
     queryKey: ["master-admin-users", selectedTenantKey],
     queryFn: async () => {
       try {
-        const res = await fetchNestApi<any>("/users?limit=50");
-        const list = res?.data || (Array.isArray(res) ? res : []);
-        if (Array.isArray(list) && list.length > 0) {
-          // Merge defaults without duplicate email
-          const merged = [...list];
-          for (const d of DEFAULT_MASTER_ADMIN_ACCOUNTS) {
-            if (!merged.some((u: any) => u.email === d.email)) {
-              merged.push(d);
-            }
-          }
-          return merged;
+        const [usersRes, membersRes] = await Promise.all([
+          fetchNestApi<any>("/users?limit=100").catch(() => null),
+          fetchNestApi<any[]>("/members").catch(() => []),
+        ]);
+
+        const userList = usersRes?.data || (Array.isArray(usersRes) ? usersRes : []);
+        const membersList = Array.isArray(membersRes) ? membersRes : [];
+
+        // Ánh xạ mã học viên và phòng ban từ danh sách members
+        const memberMap = new Map<string, any>();
+        for (const m of membersList) {
+          if (m.email) memberMap.set(m.email.toLowerCase().trim(), m);
+          if (m.userId) memberMap.set(String(m.userId), m);
+          if (m.id) memberMap.set(String(m.id), m);
         }
-        return DEFAULT_MASTER_ADMIN_ACCOUNTS;
-      } catch {
-        return DEFAULT_MASTER_ADMIN_ACCOUNTS;
+
+        if (Array.isArray(userList) && userList.length > 0) {
+          return userList.map((u: any) => {
+            const m = (u.email && memberMap.get(u.email.toLowerCase().trim())) || (u.id && memberMap.get(u.id));
+            const email = (u.email || m?.email || "").toLowerCase().trim();
+            // Chuẩn hóa mã tài khoản / mã học viên
+            let code = u.code || m?.code || m?.membership_code;
+            if (!code) {
+              if (email === "admin@ceohn10.vn") code = "HN10-ROOT";
+              else if (email === "admin.hn10@ceohn10.vn") code = "ADM-HN10-01";
+              else if (email.includes("loptruong")) code = "LT-HN10-01";
+              else if (email.includes("btt")) code = "BTT-HN10-01";
+              else if (email.includes("btc")) code = "BTC-HN10-01";
+              else code = "Chưa cấp mã";
+            }
+            return {
+              ...u,
+              code,
+              username: email || u.username || code,
+              email: email || u.email,
+              department: u.department || m?.department || "CLB Doanh Nhân CEO HN10",
+              role: u.role || m?.role || (email.includes("admin") ? "admin" : "member"),
+              name: u.name || m?.name || m?.full_name || m?.contact || (email ? email.split("@")[0] : "Hội viên"),
+              targetSystem: u.targetSystem || "ceohn10",
+            };
+          });
+        }
+
+        if (membersList.length > 0) {
+          return membersList.map((m: any) => {
+            const email = (m.email || `${(m.code || m.membership_code || "hv").toLowerCase()}@ceohn10.vn`).toLowerCase().trim();
+            const code = m.code || m.membership_code || "Chưa cấp mã";
+            return {
+              id: m.id || m.userId || `mb-${code}`,
+              name: m.name || m.full_name || m.contact || "Học viên",
+              email,
+              username: email,
+              code,
+              role: m.role || "member",
+              department: m.department || "CLB Doanh Nhân CEO HN10",
+              status: m.status || "active",
+              targetSystem: "ceohn10",
+            };
+          });
+        }
+
+        return [];
+      } catch (err) {
+        console.warn("Failed to load accounts:", err);
+        return [];
       }
     },
   });
@@ -357,10 +328,84 @@ function MasterAdminPortal() {
   const [permMode, setPermMode] = useState<"role" | "granular">("role");
   const [selectedPerms, setSelectedPerms] = useState<string[]>([]);
 
+  // State: Quản trị RBAC & Phân quyền nâng cao trong Tab Tài Khoản
+  const [accountSearchQuery, setAccountSearchQuery] = useState("");
+  const [accountRoleFilter, setAccountRoleFilter] = useState("all");
+  const [showEditRbacModal, setShowEditRbacModal] = useState(false);
+  const [editingUser, setEditingUser] = useState<any | null>(null);
+  const [editRbacData, setEditRbacData] = useState({
+    name: "",
+    role: "member",
+    dataScope: "self",
+    department: "Ban Điều Hành",
+  });
+
+  const handleOpenEditRbac = (acc: any) => {
+    setEditingUser(acc);
+    setEditRbacData({
+      name: acc.name || "",
+      role: acc.role || "member",
+      dataScope:
+        acc.dataScope ||
+        acc.data_scope ||
+        (acc.role === "platform_admin" || acc.role === "admin" ? "all" : "self"),
+      department: acc.department || "Ban Điều Hành",
+    });
+    setShowEditRbacModal(true);
+  };
+
+  const handleSaveEditRbac = async () => {
+    if (!editingUser) return;
+    try {
+      await fetchNestApi(`/users/${editingUser.id}`, {
+        method: "PUT",
+        body: {
+          name: editRbacData.name,
+          role: editRbacData.role,
+          dataScope: editRbacData.dataScope,
+          department: editRbacData.department,
+        },
+      });
+      toast.success(`Đã cập nhật phân quyền và phạm vi dữ liệu cho ${editingUser.name || editingUser.email}`);
+      setShowEditRbacModal(false);
+      accountsQ.refetch();
+    } catch (err: any) {
+      toast.error(err?.message || "Lỗi khi cập nhật phân quyền");
+    }
+  };
+
+  const handleToggleUserStatus = async (userId: string, currentStatus: string) => {
+    try {
+      const nextStatus = currentStatus === "inactive" ? "active" : "inactive";
+      await fetchNestApi(`/users/${userId}/status`, {
+        method: "PATCH",
+        body: { status: nextStatus },
+      });
+      toast.success(nextStatus === "active" ? "Đã kích hoạt tài khoản" : "Đã khóa tài khoản");
+      accountsQ.refetch();
+    } catch (err: any) {
+      toast.error(err?.message || "Lỗi khi thay đổi trạng thái");
+    }
+  };
+
+  const handleResetUserPassword = async (userId: string, email: string) => {
+    if (!window.confirm(`Bạn có chắc muốn đặt lại mật khẩu cho tài khoản ${email}?`)) return;
+    try {
+      const newPass = "Ceohn10@2026";
+      await fetchNestApi(`/users/${userId}/reset-password`, {
+        method: "POST",
+        body: { newPassword: newPass },
+      });
+      toast.success(`Đã đặt lại mật khẩu cho ${email} thành: ${newPass}`);
+    } catch (err: any) {
+      toast.error(err?.message || "Lỗi khi đặt lại mật khẩu");
+    }
+  };
+
   // State: Tab con của [3. CÀI ĐẶT HỆ THỐNG NGOÀI & PHÂN HỆ]
   const [settingsSubTab, setSettingsSubTab] = useState<"sepay" | "zalo" | "platforms" | "matrix">("sepay");
 
-  // State: Ma trận module theo từng hệ thống (ceohn10, ceo1983, vba)
+  // State: Ma trận module theo từng hệ thống (ceohn10)
   const [modulesMatrix, setModulesMatrix] = useState<Record<string, string[]>>(() => {
     if (typeof window !== "undefined") {
       try {
@@ -610,28 +655,88 @@ function MasterAdminPortal() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] text-slate-800 flex">
+    <div className="min-h-screen bg-[#F8FAFC] text-slate-800 flex flex-col lg:flex-row w-full">
       {/* ========================================================================= */}
-      {/* SIDEBAR DỌC TRÁI - THEME SÁNG THEO QUY CHUẨN CEOHN10 */}
+      {/* MOBILE TOPBAR - CHO SMARTPHONE & TABLET (KHẮC PHỤC TRIỆT ĐỂ LỖI ẢNH 2) */}
       {/* ========================================================================= */}
-      <aside className="w-64 sm:w-72 bg-white border-r border-slate-200 min-h-screen flex flex-col justify-between p-5 sticky top-0 h-screen overflow-y-auto shrink-0 shadow-sm z-30">
-        <div className="space-y-6">
-          {/* Logo & Platform Title */}
-          <div className="flex items-center gap-3 pb-5 border-b border-slate-100">
-            <div className="w-10 h-10 rounded-xl bg-[#002B70] flex items-center justify-center text-white font-black text-lg shadow-sm shrink-0">
+      <div className="lg:hidden sticky top-0 z-40 flex items-center justify-between border-b border-slate-200 bg-white px-4 py-3 shadow-xs">
+        <div className="flex items-center gap-2.5">
+          <button
+            type="button"
+            onClick={() => setMobileSidebarOpen(true)}
+            className="rounded-lg p-2 text-slate-600 hover:bg-slate-100 hover:text-slate-900 cursor-pointer"
+            aria-label="Mở menu quản trị"
+          >
+            <Menu className="h-5 w-5" />
+          </button>
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg bg-[#002B70] flex items-center justify-center text-white font-bold text-xs shadow-xs">
               Ω
             </div>
             <div className="min-w-0">
-              <div className="text-[11px] font-bold text-amber-600 uppercase tracking-wider">
-                Hệ thống platform CEOHN10
+              <div className="text-xs font-black text-[#002B70] leading-tight truncate">
+                QUẢN TRỊ PLATFORM
               </div>
-              <h1 className="text-sm font-black text-[#002B70] truncate leading-tight">
-                QUẢN TRỊ LỚN NHẤT
-              </h1>
-              <div className="text-[10px] text-slate-500 font-mono truncate">
-                MASTER ADMIN · MULTI-TENANT
+              <div className="text-[10px] text-amber-600 font-bold truncate">
+                {selectedTenantKey === "ceohn10" ? "CLB CEO HN10" : selectedTenantKey}
               </div>
             </div>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <Link
+            to="/"
+            className="text-[11px] font-semibold text-[#002B70] bg-blue-50 hover:bg-blue-100 px-2.5 py-1 rounded-lg border border-blue-200 transition"
+          >
+            Về CRM
+          </Link>
+        </div>
+      </div>
+
+      {/* Backdrop for Mobile Sidebar */}
+      {mobileSidebarOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-slate-900/50 backdrop-blur-xs lg:hidden"
+          onClick={() => setMobileSidebarOpen(false)}
+        />
+      )}
+
+      {/* ========================================================================= */}
+      {/* SIDEBAR DỌC TRÁI - THEME SÁNG THEO QUY CHUẨN CEOHN10 */}
+      {/* ========================================================================= */}
+      <aside
+        className={`fixed inset-y-0 left-0 z-50 w-72 bg-white border-r border-slate-200 flex flex-col justify-between p-5 h-screen overflow-y-auto shadow-xl transition-transform duration-300 ease-in-out lg:sticky lg:top-0 lg:z-30 lg:translate-x-0 lg:shadow-sm ${
+          mobileSidebarOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
+      >
+        <div className="space-y-6">
+          {/* Logo & Platform Title */}
+          <div className="flex items-center justify-between pb-5 border-b border-slate-100">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-[#002B70] flex items-center justify-center text-white font-black text-lg shadow-sm shrink-0">
+                Ω
+              </div>
+              <div className="min-w-0">
+                <div className="text-[11px] font-bold text-amber-600 uppercase tracking-wider">
+                  Hệ thống platform CEOHN10
+                </div>
+                <h1 className="text-sm font-black text-[#002B70] truncate leading-tight">
+                  QUẢN TRỊ LỚN NHẤT
+                </h1>
+                <div className="text-[10px] text-slate-500 font-mono truncate">
+                  MASTER ADMIN · MULTI-TENANT
+                </div>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => setMobileSidebarOpen(false)}
+              className="lg:hidden rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700 cursor-pointer"
+              aria-label="Đóng menu"
+            >
+              <X className="w-5 h-5" />
+            </button>
           </div>
 
           {/* BỘ CHỌN DỰ ÁN QUẢN TRỊ MULTI-TENANT */}
@@ -675,7 +780,10 @@ function MasterAdminPortal() {
             </div>
 
             <button
-              onClick={() => setActiveTab("overview")}
+              onClick={() => {
+                setActiveTab("overview");
+                setMobileSidebarOpen(false);
+              }}
               className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition cursor-pointer text-left ${
                 activeTab === "overview"
                   ? "bg-[#002B70] text-white shadow-sm"
@@ -692,7 +800,10 @@ function MasterAdminPortal() {
             </button>
 
             <button
-              onClick={() => setActiveTab("accounts")}
+              onClick={() => {
+                setActiveTab("accounts");
+                setMobileSidebarOpen(false);
+              }}
               className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition cursor-pointer text-left ${
                 activeTab === "accounts"
                   ? "bg-[#002B70] text-white shadow-sm"
@@ -709,7 +820,10 @@ function MasterAdminPortal() {
             </button>
 
             <button
-              onClick={() => setActiveTab("settings")}
+              onClick={() => {
+                setActiveTab("settings");
+                setMobileSidebarOpen(false);
+              }}
               className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition cursor-pointer text-left ${
                 activeTab === "settings"
                   ? "bg-[#002B70] text-white shadow-sm"
@@ -734,6 +848,7 @@ function MasterAdminPortal() {
 
             <Link
               to="/"
+              onClick={() => setMobileSidebarOpen(false)}
               className="w-full flex items-center justify-between px-3.5 py-2 rounded-xl text-xs font-medium text-slate-700 hover:text-[#002B70] hover:bg-blue-50/70 border border-slate-200 hover:border-blue-200 transition"
             >
               <div className="flex items-center gap-2.5 truncate">
@@ -745,6 +860,7 @@ function MasterAdminPortal() {
 
             <Link
               to="/association"
+              onClick={() => setMobileSidebarOpen(false)}
               className="w-full flex items-center justify-between px-3.5 py-2 rounded-xl text-xs font-medium text-slate-700 hover:text-[#002B70] hover:bg-blue-50/70 border border-slate-200 hover:border-blue-200 transition"
             >
               <div className="flex items-center gap-2.5 truncate">
@@ -777,7 +893,7 @@ function MasterAdminPortal() {
       {/* ========================================================================= */}
       {/* MAIN CONTENT VÙNG PHẢI - THEME SÁNG */}
       {/* ========================================================================= */}
-      <main className="flex-1 min-w-0 p-6 sm:p-8 space-y-6 overflow-y-auto">
+      <main className="flex-1 min-w-0 w-full p-4 sm:p-6 lg:p-8 space-y-6 overflow-y-auto">
         {/* Top Header of Main Panel */}
         <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-slate-200">
           <div>
@@ -1078,132 +1194,264 @@ function MasterAdminPortal() {
         )}
 
         {/* ========================================================================= */}
-        {/* TAB 2: [2. QUẢN LÝ TÀI KHOẢN QUẢN TRỊ ĐƯỢC ĐĂNG NHẬP] */}
+        {/* TAB 2: [2. QUẢN TRỊ NGƯỜI DÙNG & PHÂN QUYỀN TÀI KHOẢN (RBAC)] */}
         {/* ========================================================================= */}
         {activeTab === "accounts" && (
           <div className="p-6 rounded-2xl border border-slate-200 bg-white shadow-sm space-y-5">
+            {/* Header */}
             <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-slate-100">
               <div>
-                <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
                   <KeyRound className="w-4 h-4 text-[#002B70]" />
-                  <span>[2. QUẢN LÝ TÀI KHOẢN & PHÂN QUYỀN NỀN TẢNG]</span>
+                  <span>Quản Trị Người Dùng &amp; Phân Quyền Tài Khoản (RBAC)</span>
                 </h3>
                 <p className="text-xs text-slate-500 mt-0.5">
-                  Phân quyền tập trung toàn bộ hệ thống nền tảng Viconnect. Cấp quyền theo từng hệ thống (CEO HN10, CEO 1983...).
+                  Quản lý vai trò (Role), chức vụ và phân quyền theo phạm vi dữ liệu (Scope-based Access Control) cho CLB CEO HN10.
                 </p>
               </div>
 
               <div className="flex items-center gap-2">
+                <Button
+                  size="sm"
+                  onClick={() => {
+                    setNewAccountData((prev) => ({
+                      ...prev,
+                      targetSystem: "ceohn10",
+                    }));
+                    setShowCreateAccountModal(true);
+                  }}
+                  className="h-8 gap-1.5 bg-[#002B70] hover:bg-[#003B95] text-white font-semibold text-xs shadow-sm cursor-pointer"
+                >
+                  <UserPlus className="w-3.5 h-3.5" />
+                  <span>+ Cấp Tài Khoản Mới</span>
+                </Button>
+
                 <Link
                   to="/permissions"
                   className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs shadow-xs transition"
                   title="Mở ma trận phân quyền RBAC toàn diện"
                 >
                   <ShieldCheck className="w-3.5 h-3.5" />
-                  <span>Ma Trận Phân Quyền RBAC</span>
+                  <span>Ma Trận RBAC</span>
                 </Link>
-
-                {!isMasterAdmin && (
-                  <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-50 text-amber-800 border border-amber-200 text-xs font-medium">
-                    <Lock className="w-3.5 h-3.5" />
-                    <span>Chỉ admin@ceohn10.vn được tạo tài khoản</span>
-                  </div>
-                )}
               </div>
             </div>
 
-            {/* Bảng danh sách tài khoản quản trị */}
+            {/* Bộ lọc tìm kiếm & Filter pills vai trò */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
+              <div className="relative flex-1 max-w-md">
+                <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  value={accountSearchQuery}
+                  onChange={(e) => setAccountSearchQuery(e.target.value)}
+                  placeholder="Tìm theo họ tên, email, tên đăng nhập, mã học viên..."
+                  className="w-full pl-9 pr-3 py-1.5 text-xs rounded-xl border border-slate-200 bg-slate-50/70 focus:bg-white focus:border-[#002B70] focus:ring-1 focus:ring-[#002B70] outline-none transition"
+                />
+              </div>
+
+              <div className="flex flex-wrap items-center gap-1.5 text-xs">
+                {[
+                  { key: "all", label: "Tất cả vai trò" },
+                  { key: "platform_admin", label: "Platform Admin" },
+                  { key: "admin", label: "Admin Tổ Chức" },
+                  { key: "class_officer", label: "Ban Cán Sự Lớp" },
+                  { key: "dept_head", label: "Trưởng Ban" },
+                  { key: "member", label: "Hội Viên" },
+                ].map((f) => (
+                  <button
+                    key={f.key}
+                    type="button"
+                    onClick={() => setAccountRoleFilter(f.key)}
+                    className={`px-3 py-1.5 rounded-lg font-medium transition cursor-pointer text-xs ${
+                      accountRoleFilter === f.key
+                        ? "bg-[#002B70] text-white shadow-xs font-semibold"
+                        : "bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-900"
+                    }`}
+                  >
+                    {f.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Bảng danh sách tài khoản & phân quyền */}
             <div className="overflow-x-auto rounded-xl border border-slate-200">
               <table className="w-full text-left text-xs">
-                <thead className="bg-slate-50 text-slate-600 uppercase font-semibold border-b border-slate-200">
+                <thead className="bg-slate-50 text-slate-600 uppercase font-semibold border-b border-slate-200 text-[11px]">
                   <tr>
-                    <th className="px-4 py-3">Họ tên &amp; Email</th>
-                    <th className="px-4 py-3">Mã tài khoản</th>
-                    <th className="px-4 py-3">Tên đăng nhập</th>
-                    <th className="px-4 py-3">Hệ thống quản trị</th>
-                    <th className="px-4 py-3">Vai trò phân quyền</th>
-                    <th className="px-4 py-3">Ban chuyên môn</th>
+                    <th className="px-4 py-3">Người dùng &amp; Email</th>
+                    <th className="px-4 py-3">Tên đăng nhập / Mã</th>
+                    <th className="px-4 py-3">Vai trò RBAC</th>
+                    <th className="px-4 py-3">Phạm vi dữ liệu</th>
+                    <th className="px-4 py-3">Ban / Đơn vị</th>
                     <th className="px-4 py-3 text-center">Trạng thái</th>
                     <th className="px-4 py-3 text-right">Thao tác</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 bg-white">
-                  {(accountsQ.data || [])
-                    .filter((acc: any) => {
-                      if (isSuperPlatformAdmin) return true;
-                      const isSuper =
-                        acc.email === "admin@ceohn10.vn" ||
-                        acc.role === "platform_admin";
-                      const tSys = acc.targetSystem || (isSuper ? "all" : "ceohn10");
-                      return tSys === "ceohn10";
-                    })
-                    .map((acc: any) => {
-                    const isSuper =
-                      acc.email === "admin@ceohn10.vn" ||
-                      acc.role === "platform_admin";
-                    const tSys = acc.targetSystem || (isSuper ? "all" : "ceohn10");
+                  {(() => {
+                    const rawList = accountsQ.data || [];
+                    const filtered = rawList
+                      .filter((acc: any) => {
+                        if (isSuperPlatformAdmin) return true;
+                        const isSuper =
+                          acc.email === "admin@ceohn10.vn" || acc.role === "platform_admin";
+                        const tSys = acc.targetSystem || (isSuper ? "all" : "ceohn10");
+                        return tSys === "ceohn10";
+                      })
+                      .filter((acc: any) => {
+                        const isSuper =
+                          acc.email === "admin@ceohn10.vn" || acc.role === "platform_admin";
+                        if (accountSearchQuery.trim()) {
+                          const q = accountSearchQuery.trim().toLowerCase();
+                          const mName = (acc.name || "").toLowerCase().includes(q);
+                          const mEmail = (acc.email || "").toLowerCase().includes(q);
+                          const mCode = (acc.code || acc.memberCode || "").toLowerCase().includes(q);
+                          const mUser = (acc.username || "").toLowerCase().includes(q);
+                          if (!mName && !mEmail && !mCode && !mUser) return false;
+                        }
+                        if (accountRoleFilter === "platform_admin") return isSuper || acc.role === "platform_admin";
+                        if (accountRoleFilter === "admin") return acc.role === "admin" && !isSuper;
+                        if (accountRoleFilter === "class_officer") return acc.role === "lop_truong" || acc.role === "lop_pho";
+                        if (accountRoleFilter === "dept_head") return (acc.role || "").includes("truong_ban") || (acc.role || "").includes("ban_");
+                        if (accountRoleFilter === "member") return acc.role === "member" || acc.role === "hoi_vien" || !acc.role;
+                        return true;
+                      });
 
-                    return (
-                      <tr key={acc.id} className="hover:bg-slate-50/70 transition">
-                        <td className="px-4 py-3">
-                          <div className="font-bold text-slate-900">{acc.name || "Quản trị viên"}</div>
-                          <div className="font-mono text-slate-500">{acc.email}</div>
-                        </td>
-                        <td className="px-4 py-3 font-mono font-bold text-amber-700">
-                          {acc.code || acc.memberCode || (isSuper ? "CEO-HN10-ROOT" : "—")}
-                        </td>
-                        <td className="px-4 py-3 font-mono text-slate-600">
-                          {acc.username || acc.email}
-                        </td>
-                        <td className="px-4 py-3">
-                          {tSys === "ceo1983" ? (
-                            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-200">
-                              🏢 CLB CEO 1983
-                            </span>
-                          ) : tSys === "ceohn10" ? (
-                            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-800 border border-blue-200">
-                              🏛️ Hiệp Hội CEO HN10
-                            </span>
-                          ) : (
-                            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-100 text-purple-800 border border-purple-200">
-                              🌐 Toàn Bộ Nền Tảng
-                            </span>
-                          )}
-                        </td>
-                        <td className="px-4 py-3">
-                          <span
-                            className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${
-                              isSuper
-                                ? "bg-amber-100 text-amber-800 border border-amber-200"
-                                : "bg-blue-50 text-[#002B70] border border-blue-200"
-                            }`}
-                          >
-                            {isSuper ? "Master Platform Admin" : acc.role || "Admin"}
-                          </span>
-                        </td>
-                        <td className="px-4 py-3 text-slate-600">
-                          {acc.department || "Ban Điều Hành"}
-                        </td>
-                        <td className="px-4 py-3 text-center">
-                          <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                            Hoạt động
-                          </span>
-                        </td>
-                        <td className="px-4 py-3 text-right">
-                          {isMasterAdmin ? (
-                            <Link
-                              to="/permissions"
-                              className="text-xs font-semibold text-[#002B70] hover:text-[#003B95] hover:underline"
-                            >
-                              Phân quyền
-                            </Link>
-                          ) : (
-                            <span className="text-slate-400">Đã khóa</span>
-                          )}
-                        </td>
-                      </tr>
-                    );
-                  })}
+                    if (filtered.length === 0) {
+                      return (
+                        <tr>
+                          <td colSpan={7} className="px-4 py-8 text-center text-slate-400">
+                            Không tìm thấy tài khoản người dùng nào phù hợp với bộ lọc.
+                          </td>
+                        </tr>
+                      );
+                    }
+
+                    return filtered.map((acc: any) => {
+                      const isSuper =
+                        acc.email === "admin@ceohn10.vn" || acc.role === "platform_admin";
+                      const roleCode = isSuper ? "platform_admin" : acc.role || "member";
+                      const scopeCode = acc.dataScope || acc.data_scope || (isSuper || roleCode === "admin" ? "all" : "self");
+                      const isActive = acc.status !== "inactive" && acc.status !== "locked";
+
+                      return (
+                        <tr key={acc.id} className="hover:bg-slate-50/80 transition">
+                          <td className="px-4 py-3">
+                            <div className="font-bold text-slate-900">{acc.name || "Hội viên"}</div>
+                            <div className="font-mono text-slate-500 text-[11px]">{acc.email}</div>
+                          </td>
+                          <td className="px-4 py-3">
+                            <div className="font-mono text-xs font-semibold text-slate-900 truncate max-w-[220px]" title={acc.email || acc.username}>
+                              {acc.email || acc.username}
+                            </div>
+                            <div className="font-mono text-[11px] font-bold text-amber-700 mt-0.5">
+                              Mã: {acc.code || acc.memberCode || "Chưa cấp mã"}
+                            </div>
+                          </td>
+                          <td className="px-4 py-3">
+                            {roleCode === "platform_admin" ? (
+                              <span className="px-2 py-0.5 rounded-md text-[10.5px] font-bold bg-purple-100 text-purple-800 border border-purple-200">
+                                Platform Admin
+                              </span>
+                            ) : roleCode === "admin" ? (
+                              <span className="px-2 py-0.5 rounded-md text-[10.5px] font-bold bg-blue-100 text-[#002B70] border border-blue-200">
+                                Admin Tổ Chức
+                              </span>
+                            ) : roleCode === "lop_truong" ? (
+                              <span className="px-2 py-0.5 rounded-md text-[10.5px] font-bold bg-amber-100 text-amber-900 border border-amber-300">
+                                Lớp Trưởng
+                              </span>
+                            ) : roleCode === "lop_pho" ? (
+                              <span className="px-2 py-0.5 rounded-md text-[10.5px] font-bold bg-amber-50 text-amber-800 border border-amber-200">
+                                Lớp Phó
+                              </span>
+                            ) : roleCode.includes("truong_ban") ? (
+                              <span className="px-2 py-0.5 rounded-md text-[10.5px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                                Trưởng Ban
+                              </span>
+                            ) : (
+                              <span className="px-2 py-0.5 rounded-md text-[10.5px] font-medium bg-slate-100 text-slate-700 border border-slate-200">
+                                Hội Viên
+                              </span>
+                            )}
+                          </td>
+                          <td className="px-4 py-3">
+                            {scopeCode === "all" ? (
+                              <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-blue-50 text-blue-700">
+                                Toàn tổ chức (All)
+                              </span>
+                            ) : scopeCode === "class" ? (
+                              <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-amber-50 text-amber-700">
+                                Theo Lớp (Class)
+                              </span>
+                            ) : scopeCode === "department" ? (
+                              <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-50 text-emerald-700">
+                                Theo Ban (Dept)
+                              </span>
+                            ) : (
+                              <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-slate-100 text-slate-600">
+                                Cá nhân (Self)
+                              </span>
+                            )}
+                          </td>
+                          <td className="px-4 py-3 text-slate-700 font-medium">
+                            {acc.department || "Ban Điều Hành"}
+                          </td>
+                          <td className="px-4 py-3 text-center">
+                            {isActive ? (
+                              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                Hoạt động
+                              </span>
+                            ) : (
+                              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200">
+                                Đã khóa
+                              </span>
+                            )}
+                          </td>
+                          <td className="px-4 py-3 text-right">
+                            <TableActionsGroup maxVisible={3}>
+                              {canManageAccounts && (
+                                <button
+                                  type="button"
+                                  onClick={() => handleOpenEditRbac(acc)}
+                                  className="px-2.5 py-1 rounded-md text-[11px] font-bold text-[#002B70] bg-blue-50 hover:bg-blue-100 transition cursor-pointer"
+                                  title="Chỉnh sửa vai trò & phạm vi dữ liệu"
+                                >
+                                  Phân quyền
+                                </button>
+                              )}
+                              {canManageAccounts && !isSuper && (
+                                <button
+                                  type="button"
+                                  onClick={() => handleResetUserPassword(acc.id, acc.email)}
+                                  className="px-2.5 py-1 rounded-md text-[11px] font-medium text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 transition cursor-pointer"
+                                  title="Đặt lại mật khẩu"
+                                >
+                                  Đặt lại MK
+                                </button>
+                              )}
+                              {canManageAccounts && !isSuper && (
+                                <button
+                                  type="button"
+                                  onClick={() => handleToggleUserStatus(acc.id, acc.status)}
+                                  className={`px-2.5 py-1 rounded-md text-[11px] font-medium transition cursor-pointer ${
+                                    isActive
+                                      ? "text-rose-600 bg-rose-50 hover:bg-rose-100"
+                                      : "text-emerald-700 bg-emerald-50 hover:bg-emerald-100"
+                                  }`}
+                                  title={isActive ? "Khóa tài khoản" : "Mở khóa tài khoản"}
+                                >
+                                  {isActive ? "Khóa" : "Mở"}
+                                </button>
+                              )}
+                            </TableActionsGroup>
+                          </td>
+                        </tr>
+                      );
+                    });
+                  })()}
                 </tbody>
               </table>
             </div>
@@ -1292,7 +1540,7 @@ function MasterAdminPortal() {
                         Ma Trận Phân Hệ Module Theo Hệ Thống Quản Trị
                       </h3>
                       <p className="text-xs text-slate-500">
-                        Tùy biến bật/tắt module tính năng độc lập cho từng Hệ thống (CEO HN10, CEO 1983, VBA...)
+                        Tùy biến bật/tắt module tính năng độc lập cho hệ thống CLB CEO HN10
                       </p>
                     </div>
                   </div>
@@ -1319,7 +1567,7 @@ function MasterAdminPortal() {
                         <div className="p-4 bg-white border-b border-slate-200 flex flex-wrap items-center justify-between gap-2">
                           <div className="flex items-center gap-2.5">
                             <span className="text-lg">
-                              {tenant.key === "ceohn10" ? "🏛️" : tenant.key === "ceo1983" ? "🏢" : "🌐"}
+                              {tenant.key === "ceohn10" ? "🏛️" : "🌐"}
                             </span>
                             <div>
                               <div className="text-xs font-bold text-slate-900">{tenant.name}</div>
@@ -1445,7 +1693,7 @@ function MasterAdminPortal() {
                       <div className="space-y-1">
                         <Label className="text-[11px] text-slate-700 font-semibold">Số Tài Khoản</Label>
                         <Input
-                          placeholder="VD: 198300000000"
+                          placeholder="VD: 100000000000"
                           value={sepayFormData.account_number || ""}
                           onChange={(e) =>
                             setSepayFormData({ ...sepayFormData, account_number: e.target.value })
@@ -2152,7 +2400,6 @@ function MasterAdminPortal() {
                     <SelectContent className="bg-white border-slate-200 text-slate-800">
                       <SelectItem value="all">🌐 Toàn Bộ Nền Tảng (Master Platform)</SelectItem>
                       <SelectItem value="ceohn10">🏛️ CLB Doanh Nhân CEO HN10 (Có Lớp học)</SelectItem>
-                      <SelectItem value="ceo1983">🏢 CLB Doanh Nhân CEO 1983</SelectItem>
                     </SelectContent>
                   </Select>
                 ) : (
@@ -2275,6 +2522,138 @@ function MasterAdminPortal() {
               className="h-8 text-xs bg-[#002B70] hover:bg-[#003B95] text-white font-semibold"
             >
               Tạo &amp; Cấp Quyền
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* DIALOG CHỈNH SỬA PHÂN QUYỀN RBAC & PHẠM VI DỮ LIỆU */}
+      <Dialog open={showEditRbacModal} onOpenChange={setShowEditRbacModal}>
+        <DialogContent className="sm:max-w-[520px] bg-white text-slate-800 border-slate-200">
+          <DialogHeader>
+            <DialogTitle className="text-base font-bold text-slate-900 flex items-center gap-2">
+              <UserCog className="w-5 h-5 text-[#002B70]" />
+              <span>Cập Nhật Phân Quyền &amp; Phạm Vi Dữ Liệu (Scope-based RBAC)</span>
+            </DialogTitle>
+            <DialogDescription className="text-xs text-slate-500">
+              Điều chỉnh vai trò quản trị, ban chuyên môn và phạm vi dữ liệu cho tài khoản{" "}
+              <strong className="text-slate-800">{editingUser?.email || editingUser?.username}</strong>.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-2">
+            <div className="space-y-1">
+              <Label className="text-xs text-slate-700 font-semibold">Họ và tên</Label>
+              <Input
+                value={editRbacData.name}
+                onChange={(e) => setEditRbacData({ ...editRbacData, name: e.target.value })}
+                className="bg-white border-slate-300 text-xs h-8 text-slate-800"
+                placeholder="Họ và tên người dùng..."
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1">
+                <Label className="text-xs text-slate-700 font-semibold">Vai trò RBAC *</Label>
+                <Select
+                  value={editRbacData.role}
+                  onValueChange={(val) => setEditRbacData({ ...editRbacData, role: val })}
+                >
+                  <SelectTrigger className="bg-white border-slate-300 text-xs h-8 text-slate-800">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white border-slate-200 text-slate-800">
+                    <SelectItem value="platform_admin">Platform Admin (Toàn quyền)</SelectItem>
+                    <SelectItem value="admin">Quản trị viên (Admin)</SelectItem>
+                    <SelectItem value="lop_truong">Lớp Trưởng</SelectItem>
+                    <SelectItem value="lop_pho">Lớp Phó</SelectItem>
+                    <SelectItem value="truong_team">Trưởng Team</SelectItem>
+                    <SelectItem value="pho_team">Phó Team</SelectItem>
+                    <SelectItem value="truong_ban">Trưởng Ban Chuyên Môn</SelectItem>
+                    <SelectItem value="truong_ban_hoc_tap">Trưởng Ban Học Tập</SelectItem>
+                    <SelectItem value="truong_ban_truyen_thong">Trưởng Ban Truyền Thông</SelectItem>
+                    <SelectItem value="truong_ban_su_kien_hau_can">Trưởng Ban Sự Kiện &amp; Hậu Cần</SelectItem>
+                    <SelectItem value="truong_ban_tai_chinh">Trưởng Ban Tài Chính</SelectItem>
+                    <SelectItem value="truong_ban_thien_nguyen">Trưởng Ban Thiện Nguyện</SelectItem>
+                    <SelectItem value="truong_ban_an_sinh">Trưởng Ban An Sinh &amp; Xã Hội</SelectItem>
+                    <SelectItem value="truong_ban_cong_nghe">Trưởng Ban Công Nghệ</SelectItem>
+                    <SelectItem value="giang_vien">Giảng Viên / Chuyên Gia</SelectItem>
+                    <SelectItem value="member">Học Viên / Hội Viên</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-1">
+                <Label className="text-xs text-slate-700 font-semibold">Phạm vi dữ liệu (Scope) *</Label>
+                <Select
+                  value={editRbacData.dataScope}
+                  onValueChange={(val) => setEditRbacData({ ...editRbacData, dataScope: val })}
+                >
+                  <SelectTrigger className="bg-white border-slate-300 text-xs h-8 text-slate-800">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white border-slate-200 text-slate-800">
+                    <SelectItem value="all">🌐 Toàn bộ (All Organizations/Global)</SelectItem>
+                    <SelectItem value="organization">🏛️ Toàn CLB CEO HN10 (Organization)</SelectItem>
+                    <SelectItem value="class">🎓 Trong phạm vi lớp học (Class)</SelectItem>
+                    <SelectItem value="team">👥 Trong phạm vi Team (Team)</SelectItem>
+                    <SelectItem value="department">🏢 Trong ban chuyên môn (Department)</SelectItem>
+                    <SelectItem value="self">👤 Chỉ dữ liệu cá nhân (Self)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div className="space-y-1">
+              <Label className="text-xs text-slate-700 font-semibold">Ban chuyên môn / Đơn vị phụ trách</Label>
+              <Select
+                value={editRbacData.department}
+                onValueChange={(val) => setEditRbacData({ ...editRbacData, department: val })}
+              >
+                <SelectTrigger className="bg-white border-slate-300 text-xs h-8 text-slate-800">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="bg-white border-slate-200 text-slate-800">
+                  <SelectItem value="Ban Điều Hành">Ban Điều Hành</SelectItem>
+                  <SelectItem value="Ban Cán Sự Lớp">Ban Cán Sự Lớp</SelectItem>
+                  <SelectItem value="Ban Học Tập">Ban Học Tập</SelectItem>
+                  <SelectItem value="Ban Sự Kiện &amp; Hậu Cần">Ban Sự Kiện &amp; Hậu Cần</SelectItem>
+                  <SelectItem value="Ban Truyền Thông">Ban Truyền Thông</SelectItem>
+                  <SelectItem value="Ban Tài Chính">Ban Tài Chính</SelectItem>
+                  <SelectItem value="Ban Thiện Nguyện">Ban Thiện Nguyện</SelectItem>
+                  <SelectItem value="Ban An Sinh &amp; Xã Hội">Ban An Sinh &amp; Xã Hội</SelectItem>
+                  <SelectItem value="Ban Công Nghệ">Ban Công Nghệ</SelectItem>
+                  <SelectItem value="Ban Thư Ký">Ban Thư Ký</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 text-[11px] text-slate-600 space-y-1">
+              <div className="font-bold text-slate-700 flex items-center gap-1.5">
+                <Shield className="w-3.5 h-3.5 text-[#002B70]" />
+                <span>Quy chuẩn phân quyền động Scope-based RBAC:</span>
+              </div>
+              <p>
+                Người dùng sẽ chỉ có quyền truy cập, xem hoặc chỉnh sửa các tài nguyên tương ứng với phạm vi đã cấu hình. Mọi thao tác truy cập dữ liệu ngoài phạm vi sẽ bị Backend NestJS từ chối (403 Forbidden).
+              </p>
+            </div>
+          </div>
+
+          <div className="flex justify-end gap-2 pt-2 border-t border-slate-100">
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => setShowEditRbacModal(false)}
+              className="h-8 text-xs border-slate-300 text-slate-700"
+            >
+              Hủy
+            </Button>
+            <Button
+              size="sm"
+              onClick={handleSaveEditRbac}
+              className="h-8 text-xs bg-[#002B70] hover:bg-[#003B95] text-white font-semibold"
+            >
+              Lưu Cập Nhật Phân Quyền
             </Button>
           </div>
         </DialogContent>

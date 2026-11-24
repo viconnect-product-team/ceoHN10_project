@@ -35,6 +35,12 @@ import {
   Check,
   Copy,
   Trash2,
+  LayoutDashboard,
+  LayoutGrid,
+  Pencil,
+  ChevronLeft,
+  ChevronRight,
+  UserPlus,
 } from "lucide-react";
 import { AppShell } from "@/components/dashboard/AppShell";
 import { fetchNestApi } from "@/lib/api-client";
@@ -423,6 +429,131 @@ const DEFAULT_LEDGER: ClassLedgerEntry[] = [
   },
 ];
 
+// ── BỘ CHUYỂN ĐỔI CHẾ ĐỘ XEM: DASHBOARD / LƯỚI / BẢNG ──
+function ViewModeSwitcher({
+  value,
+  onChange,
+}: {
+  value: "dashboard" | "grid" | "table";
+  onChange: (v: "dashboard" | "grid" | "table") => void;
+}) {
+  return (
+    <div className="inline-flex items-center gap-1 p-1 rounded-xl bg-muted/70 border border-border">
+      <button
+        type="button"
+        onClick={() => onChange("dashboard")}
+        className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer ${
+          value === "dashboard"
+            ? "bg-background text-foreground shadow-2xs font-bold"
+            : "text-muted-foreground hover:text-foreground"
+        }`}
+      >
+        <LayoutDashboard className="size-3.5" />
+        <span>Dashboard</span>
+      </button>
+      <button
+        type="button"
+        onClick={() => onChange("grid")}
+        className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer ${
+          value === "grid"
+            ? "bg-background text-foreground shadow-2xs font-bold"
+            : "text-muted-foreground hover:text-foreground"
+        }`}
+      >
+        <LayoutGrid className="size-3.5" />
+        <span>Lưới (Grid)</span>
+      </button>
+      <button
+        type="button"
+        onClick={() => onChange("table")}
+        className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer ${
+          value === "table"
+            ? "bg-background text-foreground shadow-2xs font-bold"
+            : "text-muted-foreground hover:text-foreground"
+        }`}
+      >
+        <FileSpreadsheet className="size-3.5" />
+        <span>Bảng</span>
+      </button>
+    </div>
+  );
+}
+
+// ── PHÂN TRANG GIAO DIỆN CHUẨN ──
+function SimplePagination({
+  currentPage,
+  totalPages,
+  onPageChange,
+  totalItems,
+  pageSize,
+}: {
+  currentPage: number;
+  totalPages: number;
+  onPageChange: (p: number) => void;
+  totalItems: number;
+  pageSize: number;
+}) {
+  if (totalPages <= 1) return null;
+  const start = (currentPage - 1) * pageSize + 1;
+  const end = Math.min(currentPage * pageSize, totalItems);
+  return (
+    <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-border text-xs text-muted-foreground">
+      <div>
+        Hiển thị <span className="font-semibold text-foreground">{start}</span> -{" "}
+        <span className="font-semibold text-foreground">{end}</span> trên tổng số{" "}
+        <span className="font-semibold text-foreground">{totalItems}</span> mục
+      </div>
+      <div className="flex items-center gap-1">
+        <button
+          type="button"
+          disabled={currentPage <= 1}
+          onClick={() => onPageChange(currentPage - 1)}
+          className="p-1.5 rounded-lg border border-border bg-card hover:bg-muted disabled:opacity-40 disabled:cursor-not-allowed transition cursor-pointer"
+          title="Trang trước"
+        >
+          <ChevronLeft className="size-3.5" />
+        </button>
+        {Array.from({ length: totalPages }).map((_, i) => {
+          const p = i + 1;
+          if (p === 1 || p === totalPages || (p >= currentPage - 1 && p <= currentPage + 1)) {
+            return (
+              <button
+                key={p}
+                type="button"
+                onClick={() => onPageChange(p)}
+                className={`min-w-7 h-7 rounded-lg text-xs font-semibold transition cursor-pointer ${
+                  currentPage === p
+                    ? "bg-primary text-primary-foreground font-bold"
+                    : "border border-border bg-card hover:bg-muted text-foreground"
+                }`}
+              >
+                {p}
+              </button>
+            );
+          }
+          if (p === currentPage - 2 || p === currentPage + 2) {
+            return (
+              <span key={p} className="px-1 text-muted-foreground">
+                ...
+              </span>
+            );
+          }
+          return null;
+        })}
+        <button
+          type="button"
+          disabled={currentPage >= totalPages}
+          onClick={() => onPageChange(currentPage + 1)}
+          className="p-1.5 rounded-lg border border-border bg-card hover:bg-muted disabled:opacity-40 disabled:cursor-not-allowed transition cursor-pointer"
+          title="Trang kế tiếp"
+        >
+          <ChevronRight className="size-3.5" />
+        </button>
+      </div>
+    </div>
+  );
+}
+
 function ClassesManagementPage() {
   const search = Route.useSearch();
   const [activeTab, setActiveTab] = useState<string>(search.tab || "courses");
@@ -442,6 +573,45 @@ function ClassesManagementPage() {
   // State: Sessions & Classes
   const [sessions, setSessions] = useState<CourseSession[]>(DEFAULT_SESSIONS);
   const [selectedSessionForQr, setSelectedSessionForQr] = useState<CourseSession | null>(null);
+
+  // View modes: Courses
+  const [coursesViewMode, setCoursesViewMode] = useState<"dashboard" | "grid" | "table">("dashboard");
+  const [courseSearch, setCourseSearch] = useState("");
+  const [courseStatusFilter, setCourseStatusFilter] = useState("all");
+  const [courseTypeFilter, setCourseTypeFilter] = useState("all");
+  const [coursePage, setCoursePage] = useState(1);
+  const coursePageSize = 10;
+  const [isEditSessionOpen, setIsEditSessionOpen] = useState(false);
+  const [editingSession, setEditingSession] = useState<CourseSession | null>(null);
+
+  // View modes: Teachers
+  const [teachersViewMode, setTeachersViewMode] = useState<"dashboard" | "grid" | "table">("dashboard");
+  const [teacherSearch, setTeacherSearch] = useState("");
+  const [teacherRatingFilter, setTeacherRatingFilter] = useState("all");
+  const [teacherPage, setTeacherPage] = useState(1);
+  const teacherPageSize = 6;
+  const [isEditTeacherOpen, setIsEditTeacherOpen] = useState(false);
+  const [editingTeacher, setEditingTeacher] = useState<any | null>(null);
+
+  // View modes: Students
+  const [studentsViewMode, setStudentsViewMode] = useState<"dashboard" | "grid" | "table">("dashboard");
+  const [studentFundFilter, setStudentFundFilter] = useState("all");
+  const [studentPage, setStudentPage] = useState(1);
+  const studentPageSize = 10;
+  const [isAddStudentOpen, setIsAddStudentOpen] = useState(false);
+  const [isEditStudentOpen, setIsEditStudentOpen] = useState(false);
+  const [editingStudent, setEditingStudent] = useState<StudentItem | null>(null);
+  const [newStudentForm, setNewStudentForm] = useState({
+    fullName: "",
+    code: "",
+    company: "",
+    industry: "",
+    position: "",
+    classRole: "Học Viên Chính Thức",
+    phone: "",
+    email: "",
+    classFundStatus: "Đã nộp (2.000.000đ)" as any,
+  });
 
   // Modal Thêm Buổi Học (Học bù / Training chuyên sâu / Ngoại khóa)
   const [isAddSessionOpen, setIsAddSessionOpen] = useState(false);
@@ -485,6 +655,28 @@ function ClassesManagementPage() {
     setSelectedStudentIds([]);
   };
 
+  // Courses CRUD
+  const handleDeleteSession = (id: string) => {
+    if (!window.confirm("Bạn có chắc chắn muốn xóa buổi học này?")) return;
+    setSessions((prev) => prev.filter((s) => s.id !== id));
+    toast.success("Đã xóa buổi học thành công!");
+  };
+
+  const handleOpenEditSession = (sess: CourseSession) => {
+    setEditingSession({ ...sess });
+    setIsEditSessionOpen(true);
+  };
+
+  const handleSaveEditSession = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingSession || !editingSession.title.trim()) return;
+    setSessions((prev) =>
+      prev.map((s) => (s.id === editingSession.id ? editingSession : s))
+    );
+    setIsEditSessionOpen(false);
+    toast.success("Đã cập nhật thông tin buổi học!");
+  };
+
   const handleAddSession = (e: React.FormEvent) => {
     e.preventDefault();
     if (!sessionForm.title.trim()) {
@@ -524,6 +716,90 @@ function ClassesManagementPage() {
       maxAttendees: 95,
     });
     toast.success(`Đã thêm ${typeName} thành công!`);
+  };
+
+  // Teachers CRUD
+  const handleDeleteTeacher = (id: string) => {
+    if (!window.confirm("Bạn có chắc chắn muốn xóa giảng viên này khỏi danh sách?")) return;
+    setTeachers((prev) => prev.filter((t) => t.id !== id));
+    toast.success("Đã xóa giảng viên thành công!");
+  };
+
+  const handleOpenEditTeacher = (tc: any) => {
+    setEditingTeacher({ ...tc });
+    setIsEditTeacherOpen(true);
+  };
+
+  const handleSaveEditTeacher = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingTeacher || !editingTeacher.name.trim()) return;
+    setTeachers((prev) =>
+      prev.map((t) => (t.id === editingTeacher.id ? editingTeacher : t))
+    );
+    setIsEditTeacherOpen(false);
+    toast.success("Đã cập nhật thông tin giảng viên!");
+  };
+
+  // Students CRUD
+  const handleDeleteStudent = (id: string) => {
+    if (!window.confirm("Bạn có chắc chắn muốn xóa học viên này khỏi danh sách lớp?")) return;
+    setStudents((prev) => prev.filter((s) => s.id !== id));
+    toast.success("Đã xóa học viên thành công!");
+  };
+
+  const handleOpenEditStudent = (st: StudentItem) => {
+    setEditingStudent({ ...st });
+    setIsEditStudentOpen(true);
+  };
+
+  const handleSaveEditStudent = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingStudent || !editingStudent.fullName.trim()) return;
+    setStudents((prev) =>
+      prev.map((s) => (s.id === editingStudent.id ? editingStudent : s))
+    );
+    setIsEditStudentOpen(false);
+    toast.success("Đã cập nhật thông tin học viên!");
+  };
+
+  const handleAddStudent = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newStudentForm.fullName.trim()) {
+      toast.error("Vui lòng nhập họ và tên học viên!");
+      return;
+    }
+    const nextCode = `HN10-${String(students.length + 1).padStart(3, "0")}`;
+    const newStd: StudentItem = {
+      id: `std-${Date.now()}`,
+      code: newStudentForm.code.trim() || nextCode,
+      fullName: newStudentForm.fullName.trim(),
+      company: newStudentForm.company.trim() || "Doanh nghiệp CEO HN10",
+      industry: newStudentForm.industry.trim() || "Thương mại & Dịch vụ",
+      position: newStudentForm.position.trim() || "Tổng Giám Đốc (CEO)",
+      classRole: newStudentForm.classRole || "Học Viên Chính Thức",
+      phone: newStudentForm.phone.trim() || "0988000000",
+      email: newStudentForm.email.trim() || "hocvien@ceohn10.vn",
+      attendanceRate: "3/3 buổi (100%)",
+      eventsJoined: 5,
+      classFundStatus: newStudentForm.classFundStatus || "Đã nộp (2.000.000đ)",
+      penaltyDebt: 0,
+      karmaPoints: 95,
+      status: "Đang theo học",
+    };
+    setStudents((prev) => [newStd, ...prev]);
+    setIsAddStudentOpen(false);
+    setNewStudentForm({
+      fullName: "",
+      code: "",
+      company: "",
+      industry: "",
+      position: "",
+      classRole: "Học Viên Chính Thức",
+      phone: "",
+      email: "",
+      classFundStatus: "Đã nộp (2.000.000đ)",
+    });
+    toast.success("Đã thêm học viên mới vào lớp thành công!");
   };
 
   // State: Finance & Ledger
@@ -632,7 +908,53 @@ function ClassesManagementPage() {
     };
   }, [ledgerEntries]);
 
-  // Lọc học viên
+  // ── LỌC & PHÂN TRANG: BUỔI HỌC (COURSES) ──
+  const filteredSessions = React.useMemo(() => {
+    return sessions.filter((s) => {
+      const matchSearch =
+        !courseSearch.trim() ||
+        s.title.toLowerCase().includes(courseSearch.toLowerCase()) ||
+        s.instructorName.toLowerCase().includes(courseSearch.toLowerCase()) ||
+        s.location.toLowerCase().includes(courseSearch.toLowerCase()) ||
+        `buổi ${s.sessionNumber}`.includes(courseSearch.toLowerCase());
+      const matchStatus =
+        courseStatusFilter === "all" || s.status === courseStatusFilter;
+      const matchType =
+        courseTypeFilter === "all" || s.sessionType === courseTypeFilter;
+      return matchSearch && matchStatus && matchType;
+    });
+  }, [sessions, courseSearch, courseStatusFilter, courseTypeFilter]);
+
+  const totalCoursePages = Math.ceil(filteredSessions.length / coursePageSize) || 1;
+  const pagedSessions = React.useMemo(() => {
+    const start = (coursePage - 1) * coursePageSize;
+    return filteredSessions.slice(start, start + coursePageSize);
+  }, [filteredSessions, coursePage, coursePageSize]);
+
+  // ── LỌC & PHÂN TRANG: GIẢNG VIÊN (TEACHERS) ──
+  const filteredTeachers = React.useMemo(() => {
+    return teachers.filter((t) => {
+      const matchSearch =
+        !teacherSearch.trim() ||
+        t.name.toLowerCase().includes(teacherSearch.toLowerCase()) ||
+        t.title.toLowerCase().includes(teacherSearch.toLowerCase()) ||
+        t.email.toLowerCase().includes(teacherSearch.toLowerCase()) ||
+        t.phone.includes(teacherSearch);
+      const matchRating =
+        teacherRatingFilter === "all" ||
+        (teacherRatingFilter === "5.0" && t.rating >= 5.0) ||
+        (teacherRatingFilter === "4.8" && t.rating >= 4.8);
+      return matchSearch && matchRating;
+    });
+  }, [teachers, teacherSearch, teacherRatingFilter]);
+
+  const totalTeacherPages = Math.ceil(filteredTeachers.length / teacherPageSize) || 1;
+  const pagedTeachers = React.useMemo(() => {
+    const start = (teacherPage - 1) * teacherPageSize;
+    return filteredTeachers.slice(start, start + teacherPageSize);
+  }, [filteredTeachers, teacherPage, teacherPageSize]);
+
+  // ── LỌC & PHÂN TRANG: HỌC VIÊN (STUDENTS) ──
   const filteredStudents = React.useMemo(() => {
     return students.filter((s) => {
       const matchSearch =
@@ -649,9 +971,21 @@ function ClassesManagementPage() {
         (studentRoleFilter === "official" && s.classRole.includes("Chính Thức")) ||
         (studentRoleFilter === "auditor" && s.classRole.includes("Dự Thính"));
 
-      return matchSearch && matchRole;
+      const matchFund =
+        studentFundFilter === "all" ||
+        (studentFundFilter === "paid" && s.classFundStatus.includes("Đã nộp")) ||
+        (studentFundFilter === "unpaid" && s.classFundStatus.includes("Chưa nộp")) ||
+        (studentFundFilter === "exempt" && s.classFundStatus.includes("Miễn giảm"));
+
+      return matchSearch && matchRole && matchFund;
     });
-  }, [students, studentSearch, studentRoleFilter]);
+  }, [students, studentSearch, studentRoleFilter, studentFundFilter]);
+
+  const totalStudentPages = Math.ceil(filteredStudents.length / studentPageSize) || 1;
+  const pagedStudents = React.useMemo(() => {
+    const start = (studentPage - 1) * studentPageSize;
+    return filteredStudents.slice(start, start + studentPageSize);
+  }, [filteredStudents, studentPage, studentPageSize]);
 
   // Lọc sổ cái thu chi
   const filteredLedger = React.useMemo(() => {
@@ -863,11 +1197,13 @@ function ClassesManagementPage() {
                 </div>
                 <div className="p-3 rounded-xl bg-card border border-border">
                   <div className="text-muted-foreground text-[11px]">Đã hoàn thành:</div>
-                  <div className="text-base font-bold text-emerald-600">2 / 30 buổi</div>
+                  <div className="text-base font-bold text-emerald-600">
+                    {sessions.filter((s) => s.status === "completed").length} / {sessions.length} buổi
+                  </div>
                 </div>
                 <div className="p-3 rounded-xl bg-card border border-border">
                   <div className="text-muted-foreground text-[11px]">Sĩ số học viên:</div>
-                  <div className="text-base font-bold text-primary">95 Học viên</div>
+                  <div className="text-base font-bold text-primary">{students.length} Học viên</div>
                 </div>
                 <div className="p-3 rounded-xl bg-card border border-border">
                   <div className="text-muted-foreground text-[11px]">Ban Cán Sự Phụ Trách:</div>
@@ -876,86 +1212,445 @@ function ClassesManagementPage() {
               </div>
             </div>
 
-            {/* Danh Sách Lịch Học Chi Tiết Các Buổi */}
-            <div className="p-5 rounded-2xl border border-border bg-card space-y-4">
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <div>
-                  <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                    Lịch Trình Chi Tiết Các Buổi Học ({sessions.length} Buổi)
-                  </h3>
-                  <p className="text-[11px] text-muted-foreground mt-0.5">
-                    Gồm 30 chuyên đề doanh trí chính khóa cố định và các buổi học bù, training chuyên sâu
-                  </p>
+            {/* Thanh công cụ tìm kiếm, bộ lọc và chuyển đổi View Mode */}
+            <div className="p-4 rounded-2xl border border-border bg-card shadow-xs space-y-3">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+                <div className="flex flex-wrap items-center gap-2 flex-1">
+                  <div className="relative min-w-[220px] flex-1 max-w-sm">
+                    <Search className="size-3.5 absolute left-3 top-2.5 text-muted-foreground" />
+                    <input
+                      type="text"
+                      value={courseSearch}
+                      onChange={(e) => {
+                        setCourseSearch(e.target.value);
+                        setCoursePage(1);
+                      }}
+                      placeholder="Tìm theo tên buổi, giảng viên, địa điểm..."
+                      className="w-full pl-9 pr-3 py-1.5 rounded-xl border border-border bg-background text-xs outline-none focus:border-primary"
+                    />
+                  </div>
+
+                  <select
+                    value={courseStatusFilter}
+                    onChange={(e) => {
+                      setCourseStatusFilter(e.target.value);
+                      setCoursePage(1);
+                    }}
+                    className="px-3 py-1.5 rounded-xl border border-border bg-background text-xs font-semibold outline-none focus:border-primary"
+                  >
+                    <option value="all">Tất cả trạng thái</option>
+                    <option value="completed">Đã hoàn thành</option>
+                    <option value="ongoing">Đang diễn ra</option>
+                    <option value="upcoming">Sắp tới</option>
+                  </select>
+
+                  <select
+                    value={courseTypeFilter}
+                    onChange={(e) => {
+                      setCourseTypeFilter(e.target.value);
+                      setCoursePage(1);
+                    }}
+                    className="px-3 py-1.5 rounded-xl border border-border bg-background text-xs font-semibold outline-none focus:border-primary"
+                  >
+                    <option value="all">Tất cả phân loại</option>
+                    <option value="standard">Chuyên Đề Chính Khóa</option>
+                    <option value="makeup">Buổi Học Bù</option>
+                    <option value="training">Training Chuyên Sâu</option>
+                    <option value="field_trip">Ngoại Khóa Doanh Nghiệp</option>
+                  </select>
                 </div>
 
-                <Button
-                  size="sm"
-                  onClick={() => setIsAddSessionOpen(true)}
-                  className="h-8 gap-1.5 text-xs font-semibold bg-[#002B70] hover:bg-[#003B95] text-white"
-                >
-                  <Plus className="h-3.5 w-3.5" />
-                  <span>+ Thêm Buổi Học (Bù / Training / Ngoại Khóa)</span>
-                </Button>
-              </div>
-
-              <div className="divide-y divide-border rounded-xl border border-border overflow-hidden">
-                {sessions.map((sess) => (
-                  <div
-                    key={sess.id}
-                    className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-muted/30 transition"
+                <div className="flex items-center gap-2">
+                  <ViewModeSwitcher value={coursesViewMode} onChange={setCoursesViewMode} />
+                  <Button
+                    size="sm"
+                    onClick={() => setIsAddSessionOpen(true)}
+                    className="h-8 gap-1.5 text-xs font-semibold bg-[#002B70] hover:bg-[#003B95] text-white cursor-pointer"
                   >
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-2">
-                        <span className="font-mono font-bold text-xs text-primary">
-                          #{sess.sessionNumber}
-                        </span>
-                        <span
-                          className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                            sess.status === "completed"
-                              ? "bg-emerald-500/10 text-emerald-600"
-                              : sess.status === "ongoing"
-                              ? "bg-amber-500/10 text-amber-600 animate-pulse"
-                              : "bg-blue-500/10 text-blue-600"
-                          }`}
-                        >
-                          {sess.status === "completed"
-                            ? "Đã hoàn thành"
-                            : sess.status === "ongoing"
-                            ? "Đang diễn ra"
-                            : "Sắp tới"}
-                        </span>
-                        <span className="text-xs font-bold text-foreground">{sess.title}</span>
-                      </div>
-
-                      <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground">
-                        <span className="flex items-center gap-1 text-foreground font-medium">
-                          <Users className="size-3.5 text-primary" /> {sess.instructorName}
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <Calendar className="size-3.5" /> {sess.date} ({sess.time})
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <MapPin className="size-3.5" /> {sess.location}
-                        </span>
-                        <span className="flex items-center gap-1 font-semibold text-foreground">
-                          <UserCheck className="size-3.5 text-emerald-500" /> Điểm danh: {sess.attendees}/{sess.maxAttendees} HV
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-2 shrink-0">
-                      <button
-                        type="button"
-                        onClick={() => setSelectedSessionForQr(sess)}
-                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl border border-primary/30 bg-primary/5 hover:bg-primary/10 text-primary text-xs font-semibold transition cursor-pointer"
-                      >
-                        <QrCode className="size-3.5" /> Điểm Danh QR
-                      </button>
-                    </div>
-                  </div>
-                ))}
+                    <Plus className="h-3.5 w-3.5" />
+                    <span>Thêm Buổi Học</span>
+                  </Button>
+                </div>
               </div>
             </div>
+
+            {/* ── CHẾ ĐỘ 1: DASHBOARD BUỔI HỌC ── */}
+            {coursesViewMode === "dashboard" && (
+              <div className="space-y-4">
+                {/* KPI Metrics */}
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                  <div className="p-4 rounded-xl border border-border bg-card shadow-xs">
+                    <div className="text-[11px] text-muted-foreground font-semibold">TỔNG BUỔI HỌC</div>
+                    <div className="text-xl font-bold text-foreground mt-1">{sessions.length} Buổi</div>
+                    <div className="text-[11px] text-muted-foreground mt-0.5">30 buổi chuẩn + ngoại khóa</div>
+                  </div>
+                  <div className="p-4 rounded-xl border border-border bg-card shadow-xs">
+                    <div className="text-[11px] text-muted-foreground font-semibold">ĐÃ HOÀN THÀNH</div>
+                    <div className="text-xl font-bold text-emerald-600 mt-1">
+                      {sessions.filter((s) => s.status === "completed").length} Buổi
+                    </div>
+                    <div className="text-[11px] text-muted-foreground mt-0.5">
+                      Đạt {((sessions.filter((s) => s.status === "completed").length / (sessions.length || 1)) * 100).toFixed(0)}% lộ trình
+                    </div>
+                  </div>
+                  <div className="p-4 rounded-xl border border-border bg-card shadow-xs">
+                    <div className="text-[11px] text-muted-foreground font-semibold">ĐIỂM DANH TRUNG BÌNH</div>
+                    <div className="text-xl font-bold text-primary mt-1">94.8%</div>
+                    <div className="text-[11px] text-muted-foreground mt-0.5">90/95 HV mỗi buổi</div>
+                  </div>
+                  <div className="p-4 rounded-xl border border-border bg-card shadow-xs">
+                    <div className="text-[11px] text-muted-foreground font-semibold">BUỔI TIẾP THEO</div>
+                    <div className="text-sm font-bold text-amber-600 truncate mt-1">
+                      {sessions.find((s) => s.status === "ongoing" || s.status === "upcoming")?.title || "Chưa có lịch"}
+                    </div>
+                    <div className="text-[11px] text-muted-foreground mt-0.5 truncate">
+                      {sessions.find((s) => s.status === "ongoing" || s.status === "upcoming")?.date}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Progress Bar */}
+                <div className="p-4 rounded-xl border border-border bg-card shadow-xs space-y-2">
+                  <div className="flex items-center justify-between text-xs font-semibold">
+                    <span>Tiến độ hoàn thành khóa học Doanh Trí CEO HN10:</span>
+                    <span className="text-primary font-bold">
+                      {sessions.filter((s) => s.status === "completed").length} / {sessions.length} Buổi
+                    </span>
+                  </div>
+                  <div className="w-full h-2.5 rounded-full bg-muted overflow-hidden">
+                    <div
+                      className="h-full bg-linear-to-r from-primary to-emerald-500 rounded-full transition-all duration-500"
+                      style={{
+                        width: `${Math.min(
+                          100,
+                          (sessions.filter((s) => s.status === "completed").length / (sessions.length || 1)) * 100
+                        )}%`,
+                      }}
+                    />
+                  </div>
+                </div>
+
+                {/* Bảng danh sách buổi học */}
+                <div className="rounded-xl border border-border bg-card overflow-hidden shadow-xs">
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left text-xs whitespace-nowrap">
+                      <thead className="bg-muted/50 font-bold text-muted-foreground border-b border-border">
+                        <tr>
+                          <th className="px-3 py-3 w-12 text-center">#</th>
+                          <th className="px-3.5 py-3">Buổi Học / Chuyên Đề</th>
+                          <th className="px-3.5 py-3">Phân Loại</th>
+                          <th className="px-3.5 py-3">Giảng Viên</th>
+                          <th className="px-3.5 py-3">Thời Gian &amp; Địa Điểm</th>
+                          <th className="px-3.5 py-3 text-center">Điểm Danh</th>
+                          <th className="px-3.5 py-3 text-center">Trạng Thái</th>
+                          <th className="px-3.5 py-3 text-right">Thao Tác</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-border">
+                        {pagedSessions.map((sess) => (
+                          <tr key={sess.id} className="hover:bg-muted/20 transition">
+                            <td className="px-3 py-3 text-center font-mono font-bold text-primary">
+                              #{sess.sessionNumber}
+                            </td>
+                            <td className="px-3.5 py-3 font-semibold text-foreground max-w-sm truncate">
+                              {sess.title}
+                            </td>
+                            <td className="px-3.5 py-3">
+                              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-primary/10 text-primary">
+                                {sess.sessionTypeName || "Chính Khóa"}
+                              </span>
+                            </td>
+                            <td className="px-3.5 py-3 font-medium text-foreground">
+                              {sess.instructorName}
+                            </td>
+                            <td className="px-3.5 py-3 text-muted-foreground text-[11px]">
+                              <div>{sess.date} ({sess.time})</div>
+                              <div className="truncate max-w-xs">{sess.location}</div>
+                            </td>
+                            <td className="px-3.5 py-3 text-center font-bold text-emerald-600">
+                              {sess.attendees} / {sess.maxAttendees} HV
+                            </td>
+                            <td className="px-3.5 py-3 text-center">
+                              <span
+                                className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                                  sess.status === "completed"
+                                    ? "bg-emerald-500/10 text-emerald-600"
+                                    : sess.status === "ongoing"
+                                    ? "bg-amber-500/10 text-amber-600 animate-pulse"
+                                    : "bg-blue-500/10 text-blue-600"
+                                }`}
+                              >
+                                {sess.status === "completed"
+                                  ? "Đã hoàn thành"
+                                  : sess.status === "ongoing"
+                                  ? "Đang diễn ra"
+                                  : "Sắp tới"}
+                              </span>
+                            </td>
+                            <td className="px-3.5 py-3 text-right">
+                              <div className="flex items-center justify-end gap-1.5">
+                                <button
+                                  type="button"
+                                  onClick={() => setSelectedSessionForQr(sess)}
+                                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border border-primary/30 bg-primary/5 hover:bg-primary/10 text-primary text-[11px] font-semibold transition cursor-pointer"
+                                  title="Chiếu mã QR điểm danh"
+                                >
+                                  <QrCode className="size-3" /> QR
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => handleOpenEditSession(sess)}
+                                  className="p-1 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition cursor-pointer"
+                                  title="Chỉnh sửa buổi học"
+                                >
+                                  <Pencil className="size-3.5" />
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => handleDeleteSession(sess.id)}
+                                  className="p-1 rounded-lg hover:bg-rose-50 text-rose-500 transition cursor-pointer"
+                                  title="Xóa buổi học"
+                                >
+                                  <Trash2 className="size-3.5" />
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+                <SimplePagination
+                  currentPage={coursePage}
+                  totalPages={totalCoursePages}
+                  onPageChange={setCoursePage}
+                  totalItems={filteredSessions.length}
+                  pageSize={coursePageSize}
+                />
+              </div>
+            )}
+
+            {/* ── CHẾ ĐỘ 2: LƯỚI (GRID) BUỔI HỌC ── */}
+            {coursesViewMode === "grid" && (
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {pagedSessions.map((sess) => (
+                    <div
+                      key={sess.id}
+                      className="p-5 rounded-2xl border border-border bg-card shadow-xs hover:border-primary/40 transition space-y-3 flex flex-col justify-between"
+                    >
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <span className="font-mono font-bold text-xs text-primary px-2 py-0.5 rounded-md bg-primary/10">
+                            Buổi #{sess.sessionNumber}
+                          </span>
+                          <span
+                            className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                              sess.status === "completed"
+                                ? "bg-emerald-500/10 text-emerald-600"
+                                : sess.status === "ongoing"
+                                ? "bg-amber-500/10 text-amber-600 animate-pulse"
+                                : "bg-blue-500/10 text-blue-600"
+                            }`}
+                          >
+                            {sess.status === "completed"
+                              ? "Đã hoàn thành"
+                              : sess.status === "ongoing"
+                              ? "Đang diễn ra"
+                              : "Sắp tới"}
+                          </span>
+                        </div>
+
+                        <h4 className="text-sm font-bold text-foreground leading-snug line-clamp-2">
+                          {sess.title}
+                        </h4>
+
+                        <div className="space-y-1 text-xs text-muted-foreground pt-1">
+                          <div className="flex items-center gap-1.5 font-medium text-foreground">
+                            <Users className="size-3.5 text-primary shrink-0" />
+                            <span className="truncate">{sess.instructorName}</span>
+                          </div>
+                          <div className="flex items-center gap-1.5 text-[11px]">
+                            <Calendar className="size-3.5 shrink-0" />
+                            <span>{sess.date} ({sess.time})</span>
+                          </div>
+                          <div className="flex items-center gap-1.5 text-[11px] truncate">
+                            <MapPin className="size-3.5 shrink-0" />
+                            <span className="truncate">{sess.location}</span>
+                          </div>
+                        </div>
+
+                        {/* Điểm danh Bar */}
+                        <div className="pt-2 border-t border-border/60 space-y-1">
+                          <div className="flex items-center justify-between text-[11px]">
+                            <span className="text-muted-foreground">Điểm danh:</span>
+                            <span className="font-bold text-emerald-600">
+                              {sess.attendees} / {sess.maxAttendees} HV
+                            </span>
+                          </div>
+                          <div className="w-full h-1.5 rounded-full bg-muted overflow-hidden">
+                            <div
+                              className="h-full bg-emerald-500 rounded-full"
+                              style={{
+                                width: `${Math.min(
+                                  100,
+                                  (sess.attendees / (sess.maxAttendees || 1)) * 100
+                                )}%`,
+                              }}
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-between gap-2 pt-2 border-t border-border/60">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => setSelectedSessionForQr(sess)}
+                          className="h-7 text-xs gap-1 font-semibold text-primary cursor-pointer"
+                        >
+                          <QrCode className="size-3" /> QR Điểm Danh
+                        </Button>
+                        <div className="flex items-center gap-1">
+                          <button
+                            type="button"
+                            onClick={() => handleOpenEditSession(sess)}
+                            className="p-1.5 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition cursor-pointer"
+                            title="Chỉnh sửa"
+                          >
+                            <Pencil className="size-3.5" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteSession(sess.id)}
+                            className="p-1.5 rounded-lg hover:bg-rose-50 text-rose-500 transition cursor-pointer"
+                            title="Xóa buổi học"
+                          >
+                            <Trash2 className="size-3.5" />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <SimplePagination
+                  currentPage={coursePage}
+                  totalPages={totalCoursePages}
+                  onPageChange={setCoursePage}
+                  totalItems={filteredSessions.length}
+                  pageSize={coursePageSize}
+                />
+              </div>
+            )}
+
+            {/* ── CHẾ ĐỘ 3: BẢNG (TABLE) BUỔI HỌC ── */}
+            {coursesViewMode === "table" && (
+              <div className="space-y-4">
+                <div className="rounded-xl border border-border bg-card overflow-hidden shadow-xs">
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left text-xs whitespace-nowrap">
+                      <thead className="bg-muted/50 font-bold text-muted-foreground border-b border-border">
+                        <tr>
+                          <th className="px-3.5 py-3">Buổi</th>
+                          <th className="px-3.5 py-3">Mã Chuyên Đề</th>
+                          <th className="px-3.5 py-3">Tiêu Đề Khóa Học</th>
+                          <th className="px-3.5 py-3">Phân Loại</th>
+                          <th className="px-3.5 py-3">Giảng Viên</th>
+                          <th className="px-3.5 py-3">Ngày &amp; Giờ</th>
+                          <th className="px-3.5 py-3">Địa Điểm</th>
+                          <th className="px-3.5 py-3 text-center">Sĩ Số Đã Đến</th>
+                          <th className="px-3.5 py-3 text-center">Trạng Thái</th>
+                          <th className="px-3.5 py-3 text-right">Hành Động</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-border">
+                        {pagedSessions.map((sess) => (
+                          <tr key={sess.id} className="hover:bg-muted/20 transition">
+                            <td className="px-3.5 py-3 font-mono font-bold text-primary">
+                              #{sess.sessionNumber}
+                            </td>
+                            <td className="px-3.5 py-3 font-mono text-muted-foreground text-[11px]">
+                              {sess.id}
+                            </td>
+                            <td className="px-3.5 py-3 font-bold text-foreground max-w-sm truncate">
+                              {sess.title}
+                            </td>
+                            <td className="px-3.5 py-3 text-muted-foreground">
+                              {sess.sessionTypeName || "Chính Khóa"}
+                            </td>
+                            <td className="px-3.5 py-3 font-medium text-foreground">
+                              {sess.instructorName}
+                            </td>
+                            <td className="px-3.5 py-3 text-muted-foreground text-[11px]">
+                              {sess.date} ({sess.time})
+                            </td>
+                            <td className="px-3.5 py-3 text-muted-foreground text-[11px] truncate max-w-xs">
+                              {sess.location}
+                            </td>
+                            <td className="px-3.5 py-3 text-center font-bold text-emerald-600">
+                              {sess.attendees}/{sess.maxAttendees}
+                            </td>
+                            <td className="px-3.5 py-3 text-center">
+                              <span
+                                className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                                  sess.status === "completed"
+                                    ? "bg-emerald-500/10 text-emerald-600"
+                                    : sess.status === "ongoing"
+                                    ? "bg-amber-500/10 text-amber-600"
+                                    : "bg-blue-500/10 text-blue-600"
+                                }`}
+                              >
+                                {sess.status === "completed"
+                                  ? "Đã hoàn thành"
+                                  : sess.status === "ongoing"
+                                  ? "Đang diễn ra"
+                                  : "Sắp tới"}
+                              </span>
+                            </td>
+                            <td className="px-3.5 py-3 text-right">
+                              <div className="flex items-center justify-end gap-1.5">
+                                <button
+                                  type="button"
+                                  onClick={() => setSelectedSessionForQr(sess)}
+                                  className="p-1 rounded-lg hover:bg-primary/10 text-primary transition cursor-pointer"
+                                  title="QR"
+                                >
+                                  <QrCode className="size-3.5" />
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => handleOpenEditSession(sess)}
+                                  className="p-1 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition cursor-pointer"
+                                  title="Sửa"
+                                >
+                                  <Pencil className="size-3.5" />
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => handleDeleteSession(sess.id)}
+                                  className="p-1 rounded-lg hover:bg-rose-50 text-rose-500 transition cursor-pointer"
+                                  title="Xóa"
+                                >
+                                  <Trash2 className="size-3.5" />
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+                <SimplePagination
+                  currentPage={coursePage}
+                  totalPages={totalCoursePages}
+                  onPageChange={setCoursePage}
+                  totalItems={filteredSessions.length}
+                  pageSize={coursePageSize}
+                />
+              </div>
+            )}
           </div>
         )}
 
@@ -963,60 +1658,313 @@ function ClassesManagementPage() {
         {/* TAB 2: QUẢN LÝ GIÁO VIÊN & GIẢNG VIÊN                           */}
         {/* ═══════════════════════════════════════════════════════════════ */}
         {activeTab === "teachers" && (
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                  Danh Sách Giảng Viên &amp; Chuyên Gia Đào Tạo ({teachers.length})
-                </span>
-                <p className="text-[11px] text-muted-foreground mt-0.5">
-                  Đội ngũ chuyên gia kinh tế, tài chính và quản trị thực chiến đồng hành cùng CEO HN10
-                </p>
+          <div className="space-y-6">
+            {/* Header & Thanh công cụ lọc, tìm kiếm và chuyển chế độ xem */}
+            <div className="p-4 rounded-2xl border border-border bg-card shadow-xs space-y-3">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+                <div className="flex flex-wrap items-center gap-2 flex-1">
+                  <div className="relative min-w-[220px] flex-1 max-w-sm">
+                    <Search className="size-3.5 absolute left-3 top-2.5 text-muted-foreground" />
+                    <input
+                      type="text"
+                      value={teacherSearch}
+                      onChange={(e) => {
+                        setTeacherSearch(e.target.value);
+                        setTeacherPage(1);
+                      }}
+                      placeholder="Tìm theo tên giảng viên, chuyên môn, email..."
+                      className="w-full pl-9 pr-3 py-1.5 rounded-xl border border-border bg-background text-xs outline-none focus:border-primary"
+                    />
+                  </div>
+
+                  <select
+                    value={teacherRatingFilter}
+                    onChange={(e) => {
+                      setTeacherRatingFilter(e.target.value);
+                      setTeacherPage(1);
+                    }}
+                    className="px-3 py-1.5 rounded-xl border border-border bg-background text-xs font-semibold outline-none focus:border-primary"
+                  >
+                    <option value="all">Tất cả đánh giá</option>
+                    <option value="5.0">5.0 ★ Tuyệt đối</option>
+                    <option value="4.8">Từ 4.8 ★ trở lên</option>
+                  </select>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <ViewModeSwitcher value={teachersViewMode} onChange={setTeachersViewMode} />
+                  <Button
+                    size="sm"
+                    onClick={() => setIsAddTeacherOpen(true)}
+                    className="h-8 gap-1.5 text-xs font-semibold cursor-pointer bg-primary text-primary-foreground"
+                  >
+                    <Plus className="h-3.5 w-3.5" /> Thêm Giáo Viên
+                  </Button>
+                </div>
               </div>
-              <Button
-                size="sm"
-                onClick={() => setIsAddTeacherOpen(true)}
-                className="h-8 gap-1.5 text-xs font-semibold"
-              >
-                <Plus className="h-3.5 w-3.5" /> Thêm Giáo Viên
-              </Button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {teachers.map((tc) => (
-                <div key={tc.id} className="p-5 rounded-2xl border border-border bg-card shadow-xs space-y-3">
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <h4 className="text-sm font-bold text-foreground">{tc.name}</h4>
-                      <p className="text-xs text-muted-foreground mt-0.5">{tc.title}</p>
-                    </div>
-                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/10 text-amber-600 border border-amber-500/20">
-                      ★ {tc.rating}
-                    </span>
+            {/* ── CHẾ ĐỘ 1: DASHBOARD GIẢNG VIÊN ── */}
+            {teachersViewMode === "dashboard" && (
+              <div className="space-y-4">
+                {/* KPI Metrics */}
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                  <div className="p-4 rounded-xl border border-border bg-card shadow-xs">
+                    <div className="text-[11px] text-muted-foreground font-semibold">TỔNG GIẢNG VIÊN</div>
+                    <div className="text-xl font-bold text-foreground mt-1">{teachers.length} Chuyên Gia</div>
+                    <div className="text-[11px] text-muted-foreground mt-0.5">Giảng viên &amp; Cố vấn cao cấp</div>
                   </div>
-
-                  <div className="grid grid-cols-2 gap-2 pt-2 border-t border-border/60 text-xs text-muted-foreground">
-                    <div>
-                      <span className="font-semibold text-foreground">{tc.coursesCount}</span> lớp phụ trách
-                    </div>
-                    <div>
-                      <span className="font-semibold text-foreground">{tc.studentsCount}</span> học viên
-                    </div>
+                  <div className="p-4 rounded-xl border border-border bg-card shadow-xs">
+                    <div className="text-[11px] text-muted-foreground font-semibold">ĐÁNH GIÁ TRUNG BÌNH</div>
+                    <div className="text-xl font-bold text-amber-500 mt-1">★ 4.9 / 5.0</div>
+                    <div className="text-[11px] text-muted-foreground mt-0.5">Đánh giá thực tế từ học viên</div>
                   </div>
-
-                  <div className="text-[11px] text-muted-foreground font-mono space-y-0.5">
-                    <div className="flex items-center gap-1.5">
-                      <Phone className="size-3 text-muted-foreground" />
-                      <span>{tc.phone}</span>
+                  <div className="p-4 rounded-xl border border-border bg-card shadow-xs">
+                    <div className="text-[11px] text-muted-foreground font-semibold">TỔNG LỚP PHỤ TRÁCH</div>
+                    <div className="text-xl font-bold text-primary mt-1">
+                      {teachers.reduce((sum, t) => sum + (t.coursesCount || 0), 0)} Lớp
                     </div>
-                    <div className="flex items-center gap-1.5">
-                      <Mail className="size-3 text-muted-foreground" />
-                      <span>{tc.email}</span>
+                    <div className="text-[11px] text-muted-foreground mt-0.5">Các lớp thuộc CEO HN10</div>
+                  </div>
+                  <div className="p-4 rounded-xl border border-border bg-card shadow-xs">
+                    <div className="text-[11px] text-muted-foreground font-semibold">LƯỢT HỌC VIÊN ĐÀO TẠO</div>
+                    <div className="text-xl font-bold text-emerald-600 mt-1">
+                      {teachers.reduce((sum, t) => sum + (t.studentsCount || 0), 0)} HV
                     </div>
+                    <div className="text-[11px] text-muted-foreground mt-0.5">Học viên tham gia các buổi</div>
                   </div>
                 </div>
-              ))}
-            </div>
+
+                {/* Bảng danh sách giảng viên */}
+                <div className="rounded-xl border border-border bg-card overflow-hidden shadow-xs">
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left text-xs whitespace-nowrap">
+                      <thead className="bg-muted/50 font-bold text-muted-foreground border-b border-border">
+                        <tr>
+                          <th className="px-3.5 py-3">Giảng Viên / Chuyên Gia</th>
+                          <th className="px-3.5 py-3">Danh Hiệu &amp; Chuyên Môn</th>
+                          <th className="px-3.5 py-3 text-center">Đánh Giá</th>
+                          <th className="px-3.5 py-3 text-center">Lớp Phụ Trách</th>
+                          <th className="px-3.5 py-3 text-center">Lượt Học Viên</th>
+                          <th className="px-3.5 py-3">Liên Hệ</th>
+                          <th className="px-3.5 py-3 text-right">Thao Tác</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-border">
+                        {pagedTeachers.map((tc) => (
+                          <tr key={tc.id} className="hover:bg-muted/20 transition">
+                            <td className="px-3.5 py-3 font-bold text-foreground">
+                              {tc.name}
+                            </td>
+                            <td className="px-3.5 py-3 text-muted-foreground max-w-xs truncate">
+                              {tc.title}
+                            </td>
+                            <td className="px-3.5 py-3 text-center">
+                              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/10 text-amber-600 border border-amber-500/20">
+                                ★ {tc.rating}
+                              </span>
+                            </td>
+                            <td className="px-3.5 py-3 text-center font-semibold text-foreground">
+                              {tc.coursesCount} lớp
+                            </td>
+                            <td className="px-3.5 py-3 text-center font-bold text-primary">
+                              {tc.studentsCount} HV
+                            </td>
+                            <td className="px-3.5 py-3 text-muted-foreground text-[11px] font-mono">
+                              <div>{tc.phone}</div>
+                              <div>{tc.email}</div>
+                            </td>
+                            <td className="px-3.5 py-3 text-right">
+                              <div className="flex items-center justify-end gap-1.5">
+                                <button
+                                  type="button"
+                                  onClick={() => handleOpenEditTeacher(tc)}
+                                  className="p-1 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition cursor-pointer"
+                                  title="Chỉnh sửa thông tin giảng viên"
+                                >
+                                  <Pencil className="size-3.5" />
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => handleDeleteTeacher(tc.id)}
+                                  className="p-1 rounded-lg hover:bg-rose-50 text-rose-500 transition cursor-pointer"
+                                  title="Xóa giảng viên"
+                                >
+                                  <Trash2 className="size-3.5" />
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+                <SimplePagination
+                  currentPage={teacherPage}
+                  totalPages={totalTeacherPages}
+                  onPageChange={setTeacherPage}
+                  totalItems={filteredTeachers.length}
+                  pageSize={teacherPageSize}
+                />
+              </div>
+            )}
+
+            {/* ── CHẾ ĐỘ 2: LƯỚI (GRID) GIẢNG VIÊN ── */}
+            {teachersViewMode === "grid" && (
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {pagedTeachers.map((tc) => (
+                    <div key={tc.id} className="p-5 rounded-2xl border border-border bg-card shadow-xs space-y-3 flex flex-col justify-between">
+                      <div className="space-y-3">
+                        <div className="flex items-start justify-between">
+                          <div className="flex items-center gap-3">
+                            <div className="size-10 rounded-xl bg-primary/10 text-primary font-bold grid place-items-center text-sm">
+                              {tc.name.split(" ").slice(-1)[0]?.[0] || "GV"}
+                            </div>
+                            <div>
+                              <h4 className="text-sm font-bold text-foreground">{tc.name}</h4>
+                              <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">{tc.title}</p>
+                            </div>
+                          </div>
+                          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/10 text-amber-600 border border-amber-500/20 shrink-0">
+                            ★ {tc.rating}
+                          </span>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-2 pt-2 border-t border-border/60 text-xs text-muted-foreground">
+                          <div>
+                            <span className="font-semibold text-foreground">{tc.coursesCount}</span> lớp phụ trách
+                          </div>
+                          <div>
+                            <span className="font-semibold text-foreground">{tc.studentsCount}</span> học viên
+                          </div>
+                        </div>
+
+                        <div className="text-[11px] text-muted-foreground font-mono space-y-0.5">
+                          <div className="flex items-center gap-1.5">
+                            <Phone className="size-3 text-muted-foreground" />
+                            <span>{tc.phone}</span>
+                          </div>
+                          <div className="flex items-center gap-1.5">
+                            <Mail className="size-3 text-muted-foreground" />
+                            <span>{tc.email}</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-end gap-1.5 pt-2 border-t border-border/60">
+                        <button
+                          type="button"
+                          onClick={() => handleOpenEditTeacher(tc)}
+                          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border border-border hover:bg-muted text-xs font-semibold text-foreground transition cursor-pointer"
+                        >
+                          <Pencil className="size-3" /> Sửa
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteTeacher(tc.id)}
+                          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border border-rose-200 dark:border-rose-900/50 hover:bg-rose-50 dark:hover:bg-rose-950/30 text-xs font-semibold text-rose-600 transition cursor-pointer"
+                        >
+                          <Trash2 className="size-3" /> Xóa
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <SimplePagination
+                  currentPage={teacherPage}
+                  totalPages={totalTeacherPages}
+                  onPageChange={setTeacherPage}
+                  totalItems={filteredTeachers.length}
+                  pageSize={teacherPageSize}
+                />
+              </div>
+            )}
+
+            {/* ── CHẾ ĐỘ 3: BẢNG (TABLE) GIẢNG VIÊN ── */}
+            {teachersViewMode === "table" && (
+              <div className="space-y-4">
+                <div className="rounded-xl border border-border bg-card overflow-hidden shadow-xs">
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left text-xs whitespace-nowrap">
+                      <thead className="bg-muted/50 font-bold text-muted-foreground border-b border-border">
+                        <tr>
+                          <th className="px-3.5 py-3">Mã GV</th>
+                          <th className="px-3.5 py-3">Họ Và Tên</th>
+                          <th className="px-3.5 py-3">Học Hàm / Chuyên Môn</th>
+                          <th className="px-3.5 py-3 text-center">Đánh Giá</th>
+                          <th className="px-3.5 py-3 text-center">Lớp Giảng Dạy</th>
+                          <th className="px-3.5 py-3 text-center">Lượt Học Viên</th>
+                          <th className="px-3.5 py-3">Số Điện Thoại</th>
+                          <th className="px-3.5 py-3">Email</th>
+                          <th className="px-3.5 py-3 text-right">Thao Tác</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-border">
+                        {pagedTeachers.map((tc) => (
+                          <tr key={tc.id} className="hover:bg-muted/20 transition">
+                            <td className="px-3.5 py-3 font-mono font-bold text-primary">
+                              {tc.id}
+                            </td>
+                            <td className="px-3.5 py-3 font-bold text-foreground">
+                              {tc.name}
+                            </td>
+                            <td className="px-3.5 py-3 text-muted-foreground">
+                              {tc.title}
+                            </td>
+                            <td className="px-3.5 py-3 text-center">
+                              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/10 text-amber-600">
+                                ★ {tc.rating}
+                              </span>
+                            </td>
+                            <td className="px-3.5 py-3 text-center font-semibold text-foreground">
+                              {tc.coursesCount}
+                            </td>
+                            <td className="px-3.5 py-3 text-center font-bold text-primary">
+                              {tc.studentsCount}
+                            </td>
+                            <td className="px-3.5 py-3 font-mono text-[11px] text-muted-foreground">
+                              {tc.phone}
+                            </td>
+                            <td className="px-3.5 py-3 font-mono text-[11px] text-muted-foreground">
+                              {tc.email}
+                            </td>
+                            <td className="px-3.5 py-3 text-right">
+                              <div className="flex items-center justify-end gap-1.5">
+                                <button
+                                  type="button"
+                                  onClick={() => handleOpenEditTeacher(tc)}
+                                  className="p-1 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition cursor-pointer"
+                                  title="Sửa"
+                                >
+                                  <Pencil className="size-3.5" />
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => handleDeleteTeacher(tc.id)}
+                                  className="p-1 rounded-lg hover:bg-rose-50 text-rose-500 transition cursor-pointer"
+                                  title="Xóa"
+                                >
+                                  <Trash2 className="size-3.5" />
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+                <SimplePagination
+                  currentPage={teacherPage}
+                  totalPages={totalTeacherPages}
+                  onPageChange={setTeacherPage}
+                  totalItems={filteredTeachers.length}
+                  pageSize={teacherPageSize}
+                />
+              </div>
+            )}
           </div>
         )}
 
@@ -1024,50 +1972,32 @@ function ClassesManagementPage() {
         {/* TAB 3: DASHBOARD HỌC VIÊN ĐA CHỈ SỐ (NHIỀU CỘT CHI TIẾT)         */}
         {/* ═══════════════════════════════════════════════════════════════ */}
         {activeTab === "students" && (
-          <div className="space-y-4">
-            {/* Header & Thao tác tìm kiếm, lọc, xuất file */}
-            <div className="p-5 rounded-2xl border border-border bg-card shadow-xs space-y-4">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                <div>
-                  <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
-                    <UserCheck className="size-4 text-primary" />
-                    <span>Dashboard Quản Trị Học Viên CEO HN10 Toàn Diện</span>
-                  </h3>
-                  <p className="text-xs text-muted-foreground mt-0.5">
-                    Tổng hợp đa chỉ số: Điểm danh chuyên cần, sự kiện CLB đã tham gia, đóng quỹ lớp, nợ quỹ phạt và điểm tín nhiệm
-                  </p>
-                </div>
+          <div className="space-y-6">
+            {/* Header & Thao tác tìm kiếm, lọc, view mode, xuất file */}
+            <div className="p-4 rounded-2xl border border-border bg-card shadow-xs space-y-3">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+                <div className="flex flex-wrap items-center gap-2 flex-1">
+                  <div className="relative min-w-[220px] flex-1 max-w-sm">
+                    <Search className="size-3.5 absolute left-3 top-2.5 text-muted-foreground" />
+                    <input
+                      type="text"
+                      value={studentSearch}
+                      onChange={(e) => {
+                        setStudentSearch(e.target.value);
+                        setStudentPage(1);
+                      }}
+                      placeholder="Tìm theo Mã HV, Họ tên, Doanh nghiệp hoặc SĐT..."
+                      className="w-full pl-9 pr-3 py-1.5 rounded-xl border border-border bg-background text-xs outline-none focus:border-primary"
+                    />
+                  </div>
 
-                <div className="flex items-center gap-2">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={handleExportStudentsExcel}
-                    className="h-8 gap-1.5 text-xs font-semibold cursor-pointer"
-                  >
-                    <Download className="h-3.5 w-3.5" /> Xuất Danh Sách Excel
-                  </Button>
-                </div>
-              </div>
-
-              {/* Bộ lọc và tìm kiếm */}
-              <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 pt-2">
-                <div className="sm:col-span-8 relative">
-                  <Search className="size-4 absolute left-3 top-2.5 text-muted-foreground" />
-                  <input
-                    type="text"
-                    value={studentSearch}
-                    onChange={(e) => setStudentSearch(e.target.value)}
-                    placeholder="Tìm theo Mã HV, Họ tên học viên, Tên doanh nghiệp hoặc Số điện thoại..."
-                    className="w-full pl-9 pr-3 py-2 rounded-xl border border-border bg-background text-xs outline-none focus:border-primary"
-                  />
-                </div>
-
-                <div className="sm:col-span-4">
                   <select
                     value={studentRoleFilter}
-                    onChange={(e) => setStudentRoleFilter(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl border border-border bg-background text-xs font-semibold outline-none focus:border-primary"
+                    onChange={(e) => {
+                      setStudentRoleFilter(e.target.value);
+                      setStudentPage(1);
+                    }}
+                    className="px-3 py-1.5 rounded-xl border border-border bg-background text-xs font-semibold outline-none focus:border-primary"
                   >
                     <option value="all">Tất cả chức danh trong lớp</option>
                     <option value="leader">Lớp Trưởng</option>
@@ -1075,6 +2005,39 @@ function ClassesManagementPage() {
                     <option value="official">Học Viên Chính Thức</option>
                     <option value="auditor">Học Viên Dự Thính</option>
                   </select>
+
+                  <select
+                    value={studentFundFilter}
+                    onChange={(e) => {
+                      setStudentFundFilter(e.target.value);
+                      setStudentPage(1);
+                    }}
+                    className="px-3 py-1.5 rounded-xl border border-border bg-background text-xs font-semibold outline-none focus:border-primary"
+                  >
+                    <option value="all">Tất cả trạng thái quỹ</option>
+                    <option value="paid">Đã nộp quỹ (2tr)</option>
+                    <option value="unpaid">Chưa nộp quỹ</option>
+                    <option value="exempt">Miễn giảm quỹ</option>
+                  </select>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <ViewModeSwitcher value={studentsViewMode} onChange={setStudentsViewMode} />
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={handleExportStudentsExcel}
+                    className="h-8 gap-1.5 text-xs font-semibold cursor-pointer"
+                  >
+                    <Download className="h-3.5 w-3.5" /> Xuất Excel
+                  </Button>
+                  <Button
+                    size="sm"
+                    onClick={() => setIsAddStudentOpen(true)}
+                    className="h-8 gap-1.5 text-xs font-semibold cursor-pointer bg-primary text-primary-foreground"
+                  >
+                    <UserPlus className="h-3.5 w-3.5" /> Thêm Học Viên
+                  </Button>
                 </div>
               </div>
             </div>
@@ -1107,61 +2070,199 @@ function ClassesManagementPage() {
               </div>
             )}
 
-            {/* Bảng Dữ Liệu Học Viên Rất Nhiều Cột */}
-            <div className="rounded-2xl border border-border bg-card overflow-hidden shadow-xs">
-              <div className="overflow-x-auto">
-                <table className="w-full text-left text-xs whitespace-nowrap">
-                  <thead className="bg-muted/50 font-bold text-muted-foreground border-b border-border">
-                    <tr>
-                      <th className="px-3 py-3 text-center w-10">
-                        <input
-                          type="checkbox"
-                          checked={filteredStudents.length > 0 && selectedStudentIds.length === filteredStudents.length}
-                          onChange={handleToggleSelectAllStudents}
-                          className="rounded border-slate-300 text-primary focus:ring-primary size-4 cursor-pointer"
-                          title="Chọn tất cả học viên"
-                        />
-                      </th>
-                      <th className="px-3.5 py-3">Mã HV</th>
-                      <th className="px-3.5 py-3">Học Viên</th>
-                      <th className="px-3.5 py-3">Doanh Nghiệp &amp; Ngành Nghề</th>
-                      <th className="px-3.5 py-3">Chức Vụ DN</th>
-                      <th className="px-3.5 py-3">Chức Danh Lớp</th>
-                      <th className="px-3.5 py-3">Liên Hệ</th>
-                      <th className="px-3.5 py-3 text-center">Chuyên Cần</th>
-                      <th className="px-3.5 py-3 text-center">Sự Kiện Đã Dự</th>
-                      <th className="px-3.5 py-3 text-center">Quỹ Lớp (2tr)</th>
-                      <th className="px-3.5 py-3 text-right">Nợ Quỹ Phạt</th>
-                      <th className="px-3.5 py-3 text-center">Điểm Tín Nhiệm</th>
-                      <th className="px-3.5 py-3 text-center">Trạng Thái</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-border">
-                    {filteredStudents.map((s) => (
-                      <tr key={s.id} className={`hover:bg-muted/20 transition ${selectedStudentIds.includes(s.id) ? "bg-rose-500/5" : ""}`}>
-                        <td className="px-3 py-3 text-center">
-                          <input
-                            type="checkbox"
-                            checked={selectedStudentIds.includes(s.id)}
-                            onChange={() => handleToggleSelectStudent(s.id)}
-                            className="rounded border-slate-300 text-primary focus:ring-primary size-4 cursor-pointer"
-                            title={`Chọn học viên ${s.fullName}`}
-                          />
-                        </td>
-                        <td className="px-3.5 py-3 font-mono font-bold text-primary">
-                          {s.code}
-                        </td>
-                        <td className="px-3.5 py-3 font-bold text-foreground">
-                          {s.fullName}
-                        </td>
-                        <td className="px-3.5 py-3">
-                          <div className="font-semibold text-foreground max-w-xs truncate">{s.company}</div>
-                          <div className="text-[11px] text-muted-foreground">{s.industry}</div>
-                        </td>
-                        <td className="px-3.5 py-3 font-medium text-foreground">
-                          {s.position}
-                        </td>
-                        <td className="px-3.5 py-3">
+            {/* ── CHẾ ĐỘ 1: DASHBOARD HỌC VIÊN ĐA CHỈ SỐ ── */}
+            {studentsViewMode === "dashboard" && (
+              <div className="space-y-4">
+                {/* KPI Metrics */}
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                  <div className="p-4 rounded-xl border border-border bg-card shadow-xs">
+                    <div className="text-[11px] text-muted-foreground font-semibold">TỔNG SĨ SỐ HỌC VIÊN</div>
+                    <div className="text-xl font-bold text-foreground mt-1">{students.length} Doanh Nhân</div>
+                    <div className="text-[11px] text-muted-foreground mt-0.5">Thành viên lớp CEO HN10</div>
+                  </div>
+                  <div className="p-4 rounded-xl border border-border bg-card shadow-xs">
+                    <div className="text-[11px] text-muted-foreground font-semibold">CHUYÊN CẦN TRUNG BÌNH</div>
+                    <div className="text-xl font-bold text-emerald-600 mt-1">94.2%</div>
+                    <div className="text-[11px] text-muted-foreground mt-0.5">Tỉ lệ tham dự 3 buổi qua</div>
+                  </div>
+                  <div className="p-4 rounded-xl border border-border bg-card shadow-xs">
+                    <div className="text-[11px] text-muted-foreground font-semibold">HOÀN TẤT QUỸ LỚP (2TR)</div>
+                    <div className="text-xl font-bold text-primary mt-1">
+                      {students.filter((s) => s.classFundStatus.includes("Đã nộp")).length} / {students.length} HV
+                    </div>
+                    <div className="text-[11px] text-muted-foreground mt-0.5">
+                      Đạt {((students.filter((s) => s.classFundStatus.includes("Đã nộp")).length / (students.length || 1)) * 100).toFixed(0)}% hoàn thành
+                    </div>
+                  </div>
+                  <div className="p-4 rounded-xl border border-border bg-card shadow-xs">
+                    <div className="text-[11px] text-muted-foreground font-semibold">TỔNG NỢ QUỸ PHẠT</div>
+                    <div className="text-xl font-bold text-rose-600 mt-1">
+                      {new Intl.NumberFormat("vi-VN").format(students.reduce((acc, s) => acc + (s.penaltyDebt || 0), 0))} đ
+                    </div>
+                    <div className="text-[11px] text-muted-foreground mt-0.5">Phí phạt đi muộn / vắng học</div>
+                  </div>
+                </div>
+
+                {/* Bảng Dữ Liệu Học Viên Đa Chỉ Số */}
+                <div className="rounded-2xl border border-border bg-card overflow-hidden shadow-xs">
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left text-xs whitespace-nowrap">
+                      <thead className="bg-muted/50 font-bold text-muted-foreground border-b border-border">
+                        <tr>
+                          <th className="px-3 py-3 text-center w-10">
+                            <input
+                              type="checkbox"
+                              checked={filteredStudents.length > 0 && selectedStudentIds.length === filteredStudents.length}
+                              onChange={handleToggleSelectAllStudents}
+                              className="rounded border-slate-300 text-primary focus:ring-primary size-4 cursor-pointer"
+                              title="Chọn tất cả học viên"
+                            />
+                          </th>
+                          <th className="px-3.5 py-3">Mã HV</th>
+                          <th className="px-3.5 py-3">Học Viên</th>
+                          <th className="px-3.5 py-3">Doanh Nghiệp &amp; Ngành Nghề</th>
+                          <th className="px-3.5 py-3">Chức Vụ DN</th>
+                          <th className="px-3.5 py-3">Chức Danh Lớp</th>
+                          <th className="px-3.5 py-3">Liên Hệ</th>
+                          <th className="px-3.5 py-3 text-center">Chuyên Cần</th>
+                          <th className="px-3.5 py-3 text-center">Sự Kiện Đã Dự</th>
+                          <th className="px-3.5 py-3 text-center">Quỹ Lớp (2tr)</th>
+                          <th className="px-3.5 py-3 text-right">Nợ Quỹ Phạt</th>
+                          <th className="px-3.5 py-3 text-center">Điểm Tín Nhiệm</th>
+                          <th className="px-3.5 py-3 text-right">Thao Tác</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-border">
+                        {pagedStudents.map((s) => (
+                          <tr key={s.id} className={`hover:bg-muted/20 transition ${selectedStudentIds.includes(s.id) ? "bg-rose-500/5" : ""}`}>
+                            <td className="px-3 py-3 text-center">
+                              <input
+                                type="checkbox"
+                                checked={selectedStudentIds.includes(s.id)}
+                                onChange={() => handleToggleSelectStudent(s.id)}
+                                className="rounded border-slate-300 text-primary focus:ring-primary size-4 cursor-pointer"
+                                title={`Chọn học viên ${s.fullName}`}
+                              />
+                            </td>
+                            <td className="px-3.5 py-3 font-mono font-bold text-primary">
+                              {s.code}
+                            </td>
+                            <td className="px-3.5 py-3 font-bold text-foreground">
+                              {s.fullName}
+                            </td>
+                            <td className="px-3.5 py-3">
+                              <div className="font-semibold text-foreground max-w-xs truncate">{s.company}</div>
+                              <div className="text-[11px] text-muted-foreground">{s.industry}</div>
+                            </td>
+                            <td className="px-3.5 py-3 font-medium text-foreground">
+                              {s.position}
+                            </td>
+                            <td className="px-3.5 py-3">
+                              <span
+                                className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                                  s.classRole.includes("Lớp Trưởng")
+                                    ? "bg-amber-500/15 text-amber-700 dark:text-amber-400 border border-amber-500/30"
+                                    : s.classRole.includes("Lớp Phó")
+                                    ? "bg-blue-500/15 text-blue-700 dark:text-blue-400 border border-blue-500/30"
+                                    : "bg-muted text-muted-foreground"
+                                }`}
+                              >
+                                {s.classRole}
+                              </span>
+                            </td>
+                            <td className="px-3.5 py-3 text-[11px] text-muted-foreground font-mono">
+                              <div>{s.phone}</div>
+                              <div>{s.email}</div>
+                            </td>
+                            <td className="px-3.5 py-3 text-center">
+                              <span className="font-bold text-emerald-600 bg-emerald-500/10 px-2 py-0.5 rounded-md">
+                                {s.attendanceRate}
+                              </span>
+                            </td>
+                            <td className="px-3.5 py-3 text-center font-bold text-foreground">
+                              {s.eventsJoined} sự kiện
+                            </td>
+                            <td className="px-3.5 py-3 text-center">
+                              <span
+                                className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                                  s.classFundStatus.includes("Đã nộp")
+                                    ? "bg-emerald-500/10 text-emerald-600"
+                                    : s.classFundStatus === "Chưa nộp"
+                                    ? "bg-rose-500/10 text-rose-600"
+                                    : "bg-muted text-muted-foreground"
+                                }`}
+                              >
+                                {s.classFundStatus}
+                              </span>
+                            </td>
+                            <td className="px-3.5 py-3 text-right font-mono font-bold">
+                              {s.penaltyDebt > 0 ? (
+                                <span className="text-rose-600">
+                                  {new Intl.NumberFormat("vi-VN").format(s.penaltyDebt)} đ
+                                </span>
+                              ) : (
+                                <span className="text-emerald-600">0 đ</span>
+                              )}
+                            </td>
+                            <td className="px-3.5 py-3 text-center font-bold">
+                              <span className="text-amber-600">★ {s.karmaPoints}</span>
+                            </td>
+                            <td className="px-3.5 py-3 text-right">
+                              <div className="flex items-center justify-end gap-1.5">
+                                <button
+                                  type="button"
+                                  onClick={() => handleOpenEditStudent(s)}
+                                  className="p-1 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition cursor-pointer"
+                                  title="Chỉnh sửa học viên"
+                                >
+                                  <Pencil className="size-3.5" />
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => handleDeleteStudent(s.id)}
+                                  className="p-1 rounded-lg hover:bg-rose-50 text-rose-500 transition cursor-pointer"
+                                  title="Xóa học viên"
+                                >
+                                  <Trash2 className="size-3.5" />
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+                <SimplePagination
+                  currentPage={studentPage}
+                  totalPages={totalStudentPages}
+                  onPageChange={setStudentPage}
+                  totalItems={filteredStudents.length}
+                  pageSize={studentPageSize}
+                />
+              </div>
+            )}
+
+            {/* ── CHẾ ĐỘ 2: LƯỚI (GRID) THẺ HỌC VIÊN ── */}
+            {studentsViewMode === "grid" && (
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {pagedStudents.map((s) => (
+                    <div
+                      key={s.id}
+                      className="p-5 rounded-2xl border border-border bg-card shadow-xs space-y-3 flex flex-col justify-between hover:border-primary/40 transition"
+                    >
+                      <div className="space-y-2.5">
+                        <div className="flex items-start justify-between">
+                          <div className="flex items-center gap-3">
+                            <div className="size-10 rounded-xl bg-primary/10 text-primary font-bold grid place-items-center text-sm">
+                              {s.fullName.split(" ").slice(-1)[0]?.[0] || "HV"}
+                            </div>
+                            <div>
+                              <h4 className="text-sm font-bold text-foreground">{s.fullName}</h4>
+                              <p className="font-mono text-[11px] text-primary font-semibold">{s.code}</p>
+                            </div>
+                          </div>
                           <span
                             className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
                               s.classRole.includes("Lớp Trưởng")
@@ -1173,55 +2274,165 @@ function ClassesManagementPage() {
                           >
                             {s.classRole}
                           </span>
-                        </td>
-                        <td className="px-3.5 py-3 text-[11px] text-muted-foreground font-mono">
-                          <div>{s.phone}</div>
-                          <div>{s.email}</div>
-                        </td>
-                        <td className="px-3.5 py-3 text-center">
-                          <span className="font-bold text-emerald-600 bg-emerald-500/10 px-2 py-0.5 rounded-md">
-                            {s.attendanceRate}
-                          </span>
-                        </td>
-                        <td className="px-3.5 py-3 text-center font-bold text-foreground">
-                          {s.eventsJoined} sự kiện
-                        </td>
-                        <td className="px-3.5 py-3 text-center">
-                          <span
-                            className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                              s.classFundStatus.includes("Đã nộp")
-                                ? "bg-emerald-500/10 text-emerald-600"
-                                : s.classFundStatus === "Chưa nộp"
-                                ? "bg-rose-500/10 text-rose-600"
-                                : "bg-muted text-muted-foreground"
-                            }`}
-                          >
-                            {s.classFundStatus}
-                          </span>
-                        </td>
-                        <td className="px-3.5 py-3 text-right font-mono font-bold">
-                          {s.penaltyDebt > 0 ? (
-                            <span className="text-rose-600">
-                              {new Intl.NumberFormat("vi-VN").format(s.penaltyDebt)} đ
+                        </div>
+
+                        <div className="p-2.5 rounded-xl bg-muted/30 border border-border/50 text-xs space-y-1">
+                          <div className="font-semibold text-foreground truncate">{s.company}</div>
+                          <div className="text-muted-foreground text-[11px] truncate">{s.position} · {s.industry}</div>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-2 text-xs text-muted-foreground pt-1">
+                          <div>
+                            Chuyên cần: <span className="font-bold text-emerald-600">{s.attendanceRate}</span>
+                          </div>
+                          <div>
+                            Sự kiện: <span className="font-bold text-foreground">{s.eventsJoined} sự kiện</span>
+                          </div>
+                          <div>
+                            Quỹ lớp:{" "}
+                            <span
+                              className={`font-semibold ${
+                                s.classFundStatus.includes("Đã nộp")
+                                  ? "text-emerald-600"
+                                  : "text-rose-600"
+                              }`}
+                            >
+                              {s.classFundStatus}
                             </span>
-                          ) : (
-                            <span className="text-emerald-600">0 đ</span>
-                          )}
-                        </td>
-                        <td className="px-3.5 py-3 text-center font-bold">
-                          <span className="text-amber-600">★ {s.karmaPoints}</span>
-                        </td>
-                        <td className="px-3.5 py-3 text-center">
-                          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-600">
-                            {s.status}
-                          </span>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                          </div>
+                          <div>
+                            Điểm tín nhiệm: <span className="font-bold text-amber-600">★ {s.karmaPoints}</span>
+                          </div>
+                        </div>
+
+                        <div className="text-[11px] text-muted-foreground font-mono space-y-0.5 pt-1 border-t border-border/50">
+                          <div className="flex items-center gap-1.5">
+                            <Phone className="size-3 text-muted-foreground" />
+                            <span>{s.phone}</span>
+                          </div>
+                          <div className="flex items-center gap-1.5 truncate">
+                            <Mail className="size-3 text-muted-foreground" />
+                            <span className="truncate">{s.email}</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-end gap-1.5 pt-2 border-t border-border/60">
+                        <button
+                          type="button"
+                          onClick={() => handleOpenEditStudent(s)}
+                          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border border-border hover:bg-muted text-xs font-semibold text-foreground transition cursor-pointer"
+                        >
+                          <Pencil className="size-3" /> Sửa
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteStudent(s.id)}
+                          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border border-rose-200 dark:border-rose-900/50 hover:bg-rose-50 dark:hover:bg-rose-950/30 text-xs font-semibold text-rose-600 transition cursor-pointer"
+                        >
+                          <Trash2 className="size-3" /> Xóa
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <SimplePagination
+                  currentPage={studentPage}
+                  totalPages={totalStudentPages}
+                  onPageChange={setStudentPage}
+                  totalItems={filteredStudents.length}
+                  pageSize={studentPageSize}
+                />
               </div>
-            </div>
+            )}
+
+            {/* ── CHẾ ĐỘ 3: BẢNG (TABLE) HỌC VIÊN ── */}
+            {studentsViewMode === "table" && (
+              <div className="space-y-4">
+                <div className="rounded-xl border border-border bg-card overflow-hidden shadow-xs">
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left text-xs whitespace-nowrap">
+                      <thead className="bg-muted/50 font-bold text-muted-foreground border-b border-border">
+                        <tr>
+                          <th className="px-3.5 py-3">Mã HV</th>
+                          <th className="px-3.5 py-3">Họ Và Tên</th>
+                          <th className="px-3.5 py-3">Doanh Nghiệp</th>
+                          <th className="px-3.5 py-3">Chức Vụ</th>
+                          <th className="px-3.5 py-3">Chức Danh Lớp</th>
+                          <th className="px-3.5 py-3">Chuyên Cần</th>
+                          <th className="px-3.5 py-3">Quỹ Lớp (2tr)</th>
+                          <th className="px-3.5 py-3">Nợ Phạt</th>
+                          <th className="px-3.5 py-3">Điện Thoại</th>
+                          <th className="px-3.5 py-3 text-right">Thao Tác</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-border">
+                        {pagedStudents.map((s) => (
+                          <tr key={s.id} className="hover:bg-muted/20 transition">
+                            <td className="px-3.5 py-3 font-mono font-bold text-primary">
+                              {s.code}
+                            </td>
+                            <td className="px-3.5 py-3 font-bold text-foreground">
+                              {s.fullName}
+                            </td>
+                            <td className="px-3.5 py-3 text-muted-foreground truncate max-w-xs">
+                              {s.company}
+                            </td>
+                            <td className="px-3.5 py-3 text-foreground font-medium">
+                              {s.position}
+                            </td>
+                            <td className="px-3.5 py-3">
+                              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-muted text-foreground">
+                                {s.classRole}
+                              </span>
+                            </td>
+                            <td className="px-3.5 py-3 font-semibold text-emerald-600">
+                              {s.attendanceRate}
+                            </td>
+                            <td className="px-3.5 py-3">
+                              {s.classFundStatus}
+                            </td>
+                            <td className="px-3.5 py-3 font-mono">
+                              {s.penaltyDebt > 0 ? `${new Intl.NumberFormat("vi-VN").format(s.penaltyDebt)} đ` : "0 đ"}
+                            </td>
+                            <td className="px-3.5 py-3 font-mono text-[11px] text-muted-foreground">
+                              {s.phone}
+                            </td>
+                            <td className="px-3.5 py-3 text-right">
+                              <div className="flex items-center justify-end gap-1.5">
+                                <button
+                                  type="button"
+                                  onClick={() => handleOpenEditStudent(s)}
+                                  className="p-1 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition cursor-pointer"
+                                  title="Sửa"
+                                >
+                                  <Pencil className="size-3.5" />
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => handleDeleteStudent(s.id)}
+                                  className="p-1 rounded-lg hover:bg-rose-50 text-rose-500 transition cursor-pointer"
+                                  title="Xóa"
+                                >
+                                  <Trash2 className="size-3.5" />
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+                <SimplePagination
+                  currentPage={studentPage}
+                  totalPages={totalStudentPages}
+                  onPageChange={setStudentPage}
+                  totalItems={filteredStudents.length}
+                  pageSize={studentPageSize}
+                />
+              </div>
+            )}
           </div>
         )}
 
@@ -1871,6 +3082,463 @@ function ClassesManagementPage() {
                 </Button>
               </div>
             </form>
+          </DialogContent>
+        </Dialog>
+
+        {/* MODAL CHỈNH SỬA BUỔI HỌC */}
+        <Dialog open={isEditSessionOpen} onOpenChange={setIsEditSessionOpen}>
+          <DialogContent className="max-w-lg">
+            <DialogHeader>
+              <DialogTitle className="text-base font-bold flex items-center gap-2">
+                <Pencil className="size-4 text-primary" />
+                <span>Chỉnh Sửa Buổi Học #{editingSession?.sessionNumber}</span>
+              </DialogTitle>
+            </DialogHeader>
+
+            {editingSession && (
+              <form onSubmit={handleSaveEditSession} className="space-y-3.5 text-xs">
+                <div>
+                  <Label className="text-xs font-semibold block mb-1">Tiêu Đề Buổi Học (*):</Label>
+                  <Input
+                    type="text"
+                    required
+                    value={editingSession.title}
+                    onChange={(e) => setEditingSession({ ...editingSession, title: e.target.value })}
+                    className="text-xs"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <Label className="text-xs font-semibold block mb-1">Giảng Viên / Chuyên Gia:</Label>
+                    <Input
+                      type="text"
+                      value={editingSession.instructorName}
+                      onChange={(e) => setEditingSession({ ...editingSession, instructorName: e.target.value })}
+                      className="text-xs"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-xs font-semibold block mb-1">Trạng Thái:</Label>
+                    <select
+                      value={editingSession.status}
+                      onChange={(e) => setEditingSession({ ...editingSession, status: e.target.value as any })}
+                      className="w-full px-3 py-2 rounded-xl border border-border bg-background text-xs font-semibold outline-none"
+                    >
+                      <option value="upcoming">Sắp tới</option>
+                      <option value="ongoing">Đang diễn ra</option>
+                      <option value="completed">Đã hoàn thành</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <Label className="text-xs font-semibold block mb-1">Ngày Diễn Ra:</Label>
+                    <Input
+                      type="text"
+                      value={editingSession.date}
+                      onChange={(e) => setEditingSession({ ...editingSession, date: e.target.value })}
+                      className="text-xs"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-xs font-semibold block mb-1">Khung Giờ:</Label>
+                    <Input
+                      type="text"
+                      value={editingSession.time}
+                      onChange={(e) => setEditingSession({ ...editingSession, time: e.target.value })}
+                      className="text-xs"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <Label className="text-xs font-semibold block mb-1">Sĩ Số Đã Đến:</Label>
+                    <Input
+                      type="number"
+                      value={editingSession.attendees}
+                      onChange={(e) => setEditingSession({ ...editingSession, attendees: Number(e.target.value) || 0 })}
+                      className="text-xs"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-xs font-semibold block mb-1">Sức Chứa Tối Đa:</Label>
+                    <Input
+                      type="number"
+                      value={editingSession.maxAttendees}
+                      onChange={(e) => setEditingSession({ ...editingSession, maxAttendees: Number(e.target.value) || 95 })}
+                      className="text-xs"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <Label className="text-xs font-semibold block mb-1">Địa Điểm Học:</Label>
+                  <Input
+                    type="text"
+                    value={editingSession.location}
+                    onChange={(e) => setEditingSession({ ...editingSession, location: e.target.value })}
+                    className="text-xs"
+                  />
+                </div>
+
+                <div className="flex justify-end gap-2 pt-3 border-t border-border">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setIsEditSessionOpen(false)}
+                    className="text-xs cursor-pointer"
+                  >
+                    Hủy
+                  </Button>
+                  <Button type="submit" className="text-xs font-bold cursor-pointer bg-primary text-primary-foreground">
+                    Cập Nhật Buổi Học
+                  </Button>
+                </div>
+              </form>
+            )}
+          </DialogContent>
+        </Dialog>
+
+        {/* MODAL CHỈNH SỬA GIẢNG VIÊN */}
+        <Dialog open={isEditTeacherOpen} onOpenChange={setIsEditTeacherOpen}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle className="text-base font-bold flex items-center gap-2">
+                <Pencil className="size-4 text-primary" />
+                <span>Chỉnh Sửa Giảng Viên / Chuyên Gia</span>
+              </DialogTitle>
+            </DialogHeader>
+
+            {editingTeacher && (
+              <form onSubmit={handleSaveEditTeacher} className="space-y-3 text-xs">
+                <div>
+                  <Label className="text-xs font-semibold block mb-1">Họ Và Tên Giảng Viên (*):</Label>
+                  <Input
+                    type="text"
+                    required
+                    value={editingTeacher.name}
+                    onChange={(e) => setEditingTeacher({ ...editingTeacher, name: e.target.value })}
+                    className="text-xs"
+                  />
+                </div>
+
+                <div>
+                  <Label className="text-xs font-semibold block mb-1">Danh Hiệu / Chuyên Môn:</Label>
+                  <Input
+                    type="text"
+                    value={editingTeacher.title}
+                    onChange={(e) => setEditingTeacher({ ...editingTeacher, title: e.target.value })}
+                    className="text-xs"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <Label className="text-xs font-semibold block mb-1">Số Điện Thoại:</Label>
+                    <Input
+                      type="tel"
+                      value={editingTeacher.phone}
+                      onChange={(e) => setEditingTeacher({ ...editingTeacher, phone: e.target.value })}
+                      className="text-xs"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-xs font-semibold block mb-1">Email:</Label>
+                    <Input
+                      type="email"
+                      value={editingTeacher.email}
+                      onChange={(e) => setEditingTeacher({ ...editingTeacher, email: e.target.value })}
+                      className="text-xs"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <Label className="text-xs font-semibold block mb-1">Số Lớp Phụ Trách:</Label>
+                    <Input
+                      type="number"
+                      value={editingTeacher.coursesCount}
+                      onChange={(e) => setEditingTeacher({ ...editingTeacher, coursesCount: Number(e.target.value) || 1 })}
+                      className="text-xs"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-xs font-semibold block mb-1">Đánh Giá (Sao):</Label>
+                    <Input
+                      type="number"
+                      step={0.1}
+                      min={1}
+                      max={5}
+                      value={editingTeacher.rating}
+                      onChange={(e) => setEditingTeacher({ ...editingTeacher, rating: Number(e.target.value) || 5.0 })}
+                      className="text-xs"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex justify-end gap-2 pt-3 border-t border-border">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setIsEditTeacherOpen(false)}
+                    className="text-xs"
+                  >
+                    Hủy
+                  </Button>
+                  <Button type="submit" className="text-xs font-bold bg-primary text-primary-foreground">
+                    Cập Nhật Giảng Viên
+                  </Button>
+                </div>
+              </form>
+            )}
+          </DialogContent>
+        </Dialog>
+
+        {/* MODAL THÊM HỌC VIÊN VÀO LỚP */}
+        <Dialog open={isAddStudentOpen} onOpenChange={setIsAddStudentOpen}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle className="text-base font-bold flex items-center gap-2">
+                <UserPlus className="size-4 text-primary" />
+                <span>Thêm Học Viên Mới Vào Lớp CEO HN10</span>
+              </DialogTitle>
+            </DialogHeader>
+
+            <form onSubmit={handleAddStudent} className="space-y-3 text-xs">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <Label className="text-xs font-semibold block mb-1">Mã Học Viên:</Label>
+                  <Input
+                    type="text"
+                    value={newStudentForm.code}
+                    onChange={(e) => setNewStudentForm({ ...newStudentForm, code: e.target.value })}
+                    placeholder="VD: HN10-098"
+                    className="text-xs font-mono"
+                  />
+                </div>
+                <div>
+                  <Label className="text-xs font-semibold block mb-1">Họ Và Tên (*):</Label>
+                  <Input
+                    type="text"
+                    required
+                    value={newStudentForm.fullName}
+                    onChange={(e) => setNewStudentForm({ ...newStudentForm, fullName: e.target.value })}
+                    placeholder="VD: Phạm Hoàng Sơn"
+                    className="text-xs"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <Label className="text-xs font-semibold block mb-1">Tên Doanh Nghiệp:</Label>
+                <Input
+                  type="text"
+                  value={newStudentForm.company}
+                  onChange={(e) => setNewStudentForm({ ...newStudentForm, company: e.target.value })}
+                  placeholder="VD: Công Ty CP Công Nghệ & Thương Mại Sơn Hà"
+                  className="text-xs"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <Label className="text-xs font-semibold block mb-1">Chức Vụ Doanh Nghiệp:</Label>
+                  <Input
+                    type="text"
+                    value={newStudentForm.position}
+                    onChange={(e) => setNewStudentForm({ ...newStudentForm, position: e.target.value })}
+                    placeholder="Chủ tịch HĐQT / CEO"
+                    className="text-xs"
+                  />
+                </div>
+                <div>
+                  <Label className="text-xs font-semibold block mb-1">Chức Danh Trong Lớp:</Label>
+                  <select
+                    value={newStudentForm.classRole}
+                    onChange={(e) => setNewStudentForm({ ...newStudentForm, classRole: e.target.value })}
+                    className="w-full px-3 py-2 rounded-xl border border-border bg-background text-xs font-semibold outline-none"
+                  >
+                    <option value="Học Viên Chính Thức">Học Viên Chính Thức</option>
+                    <option value="Lớp Trưởng">Lớp Trưởng</option>
+                    <option value="Lớp Phó Học Tập">Lớp Phó Học Tập</option>
+                    <option value="Lớp Phó Tài Chính">Lớp Phó Tài Chính</option>
+                    <option value="Lớp Phó Sự Kiện">Lớp Phó Sự Kiện</option>
+                    <option value="Học Viên Dự Thính">Học Viên Dự Thính</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <Label className="text-xs font-semibold block mb-1">Số Điện Thoại:</Label>
+                  <Input
+                    type="tel"
+                    value={newStudentForm.phone}
+                    onChange={(e) => setNewStudentForm({ ...newStudentForm, phone: e.target.value })}
+                    placeholder="0988 xxx xxx"
+                    className="text-xs"
+                  />
+                </div>
+                <div>
+                  <Label className="text-xs font-semibold block mb-1">Email:</Label>
+                  <Input
+                    type="email"
+                    value={newStudentForm.email}
+                    onChange={(e) => setNewStudentForm({ ...newStudentForm, email: e.target.value })}
+                    placeholder="son.pham@sonha.vn"
+                    className="text-xs"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <Label className="text-xs font-semibold block mb-1">Trạng Thái Đóng Quỹ Lớp (2tr):</Label>
+                <select
+                  value={newStudentForm.classFundStatus}
+                  onChange={(e) => setNewStudentForm({ ...newStudentForm, classFundStatus: e.target.value as any })}
+                  className="w-full px-3 py-2 rounded-xl border border-border bg-background text-xs font-semibold outline-none"
+                >
+                  <option value="Đã nộp (2.000.000đ)">Đã nộp (2.000.000đ)</option>
+                  <option value="Chưa nộp">Chưa nộp</option>
+                  <option value="Miễn giảm">Miễn giảm</option>
+                </select>
+              </div>
+
+              <div className="flex justify-end gap-2 pt-3 border-t border-border">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setIsAddStudentOpen(false)}
+                  className="text-xs cursor-pointer"
+                >
+                  Hủy
+                </Button>
+                <Button type="submit" className="text-xs font-bold cursor-pointer bg-primary text-primary-foreground">
+                  Lưu Học Viên
+                </Button>
+              </div>
+            </form>
+          </DialogContent>
+        </Dialog>
+
+        {/* MODAL CHỈNH SỬA HỌC VIÊN */}
+        <Dialog open={isEditStudentOpen} onOpenChange={setIsEditStudentOpen}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle className="text-base font-bold flex items-center gap-2">
+                <Pencil className="size-4 text-primary" />
+                <span>Chỉnh Sửa Học Viên ({editingStudent?.code})</span>
+              </DialogTitle>
+            </DialogHeader>
+
+            {editingStudent && (
+              <form onSubmit={handleSaveEditStudent} className="space-y-3 text-xs">
+                <div>
+                  <Label className="text-xs font-semibold block mb-1">Họ Và Tên (*):</Label>
+                  <Input
+                    type="text"
+                    required
+                    value={editingStudent.fullName}
+                    onChange={(e) => setEditingStudent({ ...editingStudent, fullName: e.target.value })}
+                    className="text-xs font-bold"
+                  />
+                </div>
+
+                <div>
+                  <Label className="text-xs font-semibold block mb-1">Tên Doanh Nghiệp:</Label>
+                  <Input
+                    type="text"
+                    value={editingStudent.company}
+                    onChange={(e) => setEditingStudent({ ...editingStudent, company: e.target.value })}
+                    className="text-xs"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <Label className="text-xs font-semibold block mb-1">Chức Vụ DN:</Label>
+                    <Input
+                      type="text"
+                      value={editingStudent.position}
+                      onChange={(e) => setEditingStudent({ ...editingStudent, position: e.target.value })}
+                      className="text-xs"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-xs font-semibold block mb-1">Chức Danh Lớp:</Label>
+                    <Input
+                      type="text"
+                      value={editingStudent.classRole}
+                      onChange={(e) => setEditingStudent({ ...editingStudent, classRole: e.target.value })}
+                      className="text-xs"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <Label className="text-xs font-semibold block mb-1">Số Điện Thoại:</Label>
+                    <Input
+                      type="tel"
+                      value={editingStudent.phone}
+                      onChange={(e) => setEditingStudent({ ...editingStudent, phone: e.target.value })}
+                      className="text-xs font-mono"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-xs font-semibold block mb-1">Email:</Label>
+                    <Input
+                      type="email"
+                      value={editingStudent.email}
+                      onChange={(e) => setEditingStudent({ ...editingStudent, email: e.target.value })}
+                      className="text-xs font-mono"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <Label className="text-xs font-semibold block mb-1">Quỹ Lớp (2tr):</Label>
+                    <select
+                      value={editingStudent.classFundStatus}
+                      onChange={(e) => setEditingStudent({ ...editingStudent, classFundStatus: e.target.value as any })}
+                      className="w-full px-3 py-2 rounded-xl border border-border bg-background text-xs font-semibold outline-none"
+                    >
+                      <option value="Đã nộp (2.000.000đ)">Đã nộp (2.000.000đ)</option>
+                      <option value="Chưa nộp">Chưa nộp</option>
+                      <option value="Miễn giảm">Miễn giảm</option>
+                    </select>
+                  </div>
+                  <div>
+                    <Label className="text-xs font-semibold block mb-1">Nợ Quỹ Phạt (VNĐ):</Label>
+                    <Input
+                      type="number"
+                      value={editingStudent.penaltyDebt}
+                      onChange={(e) => setEditingStudent({ ...editingStudent, penaltyDebt: Number(e.target.value) || 0 })}
+                      className="text-xs font-bold"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex justify-end gap-2 pt-3 border-t border-border">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setIsEditStudentOpen(false)}
+                    className="text-xs cursor-pointer"
+                  >
+                    Hủy
+                  </Button>
+                  <Button type="submit" className="text-xs font-bold cursor-pointer bg-primary text-primary-foreground">
+                    Cập Nhật Học Viên
+                  </Button>
+                </div>
+              </form>
+            )}
           </DialogContent>
         </Dialog>
       </div>

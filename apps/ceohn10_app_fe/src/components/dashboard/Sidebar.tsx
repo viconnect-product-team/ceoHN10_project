@@ -92,23 +92,32 @@ const crmOverview: Item[] = [
 const crmEvents: Item[] = [
   { key: "nav.events", icon: Calendar, to: "/events", label: "Sự kiện" },
   { key: "nav.eventRegistrations" as TKey, icon: ClipboardList, to: "/event-registrations", label: "Đăng ký sự kiện" },
-  { key: "nav.checkinQr" as TKey, icon: QrCodeIcon, to: "/checkin-qr", label: "Cấu hình Mã QR & Biểu mẫu" },
   { key: "nav.luckyDraw" as TKey, icon: Gift, to: "/lucky-draw", label: "Quản lý quay thưởng" },
   { key: "nav.voting" as TKey, icon: Vote, to: "/voting", label: "Biểu quyết & Bầu cử" },
   { key: "nav.feedback" as TKey, icon: MessageSquare, to: "/feedback", label: "Phản hồi & Góp ý" },
 ];
 
-// 3. Nhóm Lớp CEOHN10
+// 3. Nhóm Lớp CEOHN10 (Dạng Tree Menu Đầy Đủ Theo Yêu Cầu)
 const crmClasses: Item[] = [
-  { key: "nav.classCourses" as TKey, icon: Layers, to: "/classes?tab=courses", label: "Quản lý lớp & lịch học" },
-  { key: "nav.classEnrollments" as TKey, icon: Users2, to: "/classes?tab=students", label: "Dashboard học viên (đa chỉ số)" },
-  { key: "nav.classFund" as TKey, icon: Wallet, to: "/classes?tab=finance", label: "Quỹ tài chính lớp (20tr & thu/chi)" },
-  { key: "nav.classTeachers" as TKey, icon: GraduationCap, to: "/classes?tab=teachers", label: "Quản lý giáo viên" },
-  { key: "nav.classAttendanceQr" as TKey, icon: ScanLine, to: "/classes?tab=attendance-qr", label: "Mã QR điểm danh theo buổi" },
+  {
+    key: "nav.classCourses" as TKey,
+    icon: GraduationCap,
+    to: "/classes",
+    label: "Quản lý lớp học",
+    children: [
+      { to: "/classes?tab=courses", label: "Quản lý Lớp & Buổi học", icon: Layers },
+      { to: "/classes?tab=teachers", label: "Quản lý Giảng viên", icon: GraduationCap },
+      { to: "/classes?tab=students", label: "Quản lý Học viên", icon: Users2 },
+      { to: "/classes?tab=finance", label: "Quỹ tài chính lớp", icon: Wallet },
+      { to: "/classes?tab=attendance-qr", label: "Mã QR điểm danh", icon: ScanLine },
+    ],
+  },
 ];
 
 // 4. NHÓM TÀI CHÍNH
 const crmFinance: Item[] = [
+  { key: "nav.fee" as TKey, icon: Wallet, to: "/fees", label: "Phí tham gia CLB" },
+  { key: "nav.sponsors" as TKey, icon: Award, to: "/sponsors", label: "Nhà tài trợ & Quỹ tài trợ" },
   { key: "nav.financeReport" as TKey, icon: PieChart, to: "/finance-report", label: "Báo cáo tài chính" },
 ];
 
@@ -138,7 +147,7 @@ function isActive(pathname: string | undefined, to?: string, searchStr?: string)
     const [queryKey, queryVal] = queryPart.split("=");
     if (queryKey && queryVal) {
       const actualVal = sp.get(queryKey);
-      if (!actualVal && queryKey === "tab" && (queryVal === "matrix" || queryVal === "users" || queryVal === "all")) {
+      if (!actualVal && queryKey === "tab" && (queryVal === "matrix" || queryVal === "users" || queryVal === "all" || queryVal === "courses")) {
         return true;
       }
       return actualVal === queryVal;
@@ -739,7 +748,7 @@ export function Sidebar({
     >
       {/* Logo */}
       <div
-        className={`flex h-[72px] items-center gap-3 border-b border-sidebar-border ${isCollapsed ? "justify-center px-2" : "px-5"
+        className={`flex h-[72px] items-center gap-3 border-b border-sidebar-border ${isCollapsed ? "justify-center px-2" : mobile ? "pl-4 pr-14" : "px-5"
           }`}
       >
         <img

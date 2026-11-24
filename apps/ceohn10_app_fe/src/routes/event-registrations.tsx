@@ -51,6 +51,8 @@ import { EventReminderPosterModal } from "@/components/dashboard/EventReminderPo
 import { EventPosterStudioModal } from "@/components/dashboard/EventPosterStudioModal";
 import { VnpayPaymentModal } from "@/components/common/VnpayPaymentModal";
 import { EventAttendeesImportModal } from "@/components/events/EventAttendeesImportModal";
+import { EventRegistrationsExportModal } from "@/components/events/EventRegistrationsExportModal";
+import { TableActionsGroup } from "@/components/common";
 
 export const Route = createFileRoute("/event-registrations")({
   ssr: false,
@@ -237,6 +239,7 @@ function RegPage() {
 
   // Add Attendee / QR Checkin Modal state
   const [importModalOpen, setImportModalOpen] = useState(false);
+  const [exportModalOpen, setExportModalOpen] = useState(false);
   const [dynamicColumns, setDynamicColumns] = useState<string[]>([]);
   const [selectedRegIds, setSelectedRegIds] = useState<Set<string>>(new Set());
   const [eventReminderModalOpen, setEventReminderModalOpen] = useState(false);
@@ -702,7 +705,11 @@ function RegPage() {
             >
               <span>Sơ Đồ Chỗ Ngồi</span>
             </button>
-            <button className="inline-flex items-center gap-1.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 px-3.5 py-2 text-xs font-bold text-slate-800 dark:text-slate-200 transition cursor-pointer">
+            <button
+              onClick={() => setExportModalOpen(true)}
+              className="inline-flex items-center gap-1.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 px-3.5 py-2 text-xs font-bold text-slate-800 dark:text-slate-200 transition cursor-pointer shadow-2xs"
+              title="Xuất báo cáo theo danh mục (Check-in, đi muộn, chưa đến...) đủ 3 định dạng: Excel, CSV, PDF"
+            >
               <Download className="h-4 w-4 text-slate-500" />
               <span>Xuất Báo Cáo</span>
             </button>
@@ -1041,26 +1048,8 @@ function RegPage() {
                       style={{ width: colWidths.member, minWidth: colWidths.member }}
                       className="px-4 py-3 border-b border-border/50"
                     >
-                      <div className="flex items-center gap-1.5">
-                        <span className="font-semibold text-foreground text-xs">{r.memberName}</span>
-                        {isMember ? (
-                          <span className="text-[10px] font-bold px-1.5 py-0.2 rounded bg-blue-500/10 text-blue-700 dark:text-blue-400 border border-blue-500/20">
-                            Học viên
-                          </span>
-                        ) : (
-                          <span className="text-[10px] font-medium px-1.5 py-0.2 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700">
-                            Khách ngoài
-                          </span>
-                        )}
-                        {r.isWalkIn || r.registrationOrigin === 'walkin_at_door' ? (
-                          <span className="text-[10px] font-bold px-1.5 py-0.2 rounded bg-purple-500/10 text-purple-700 dark:text-purple-300 border border-purple-500/20" title="Khách mới đăng ký tại cửa sự kiện">
-                            Tại cửa
-                          </span>
-                        ) : r.registrationOrigin === 'pre_registered_import' ? (
-                          <span className="text-[10px] font-bold px-1.5 py-0.2 rounded bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20" title="Đại biểu import từ file Word/Excel/PDF">
-                            File Import
-                          </span>
-                        ) : null}
+                      <div className="font-semibold text-foreground text-xs">
+                        {r.memberName}
                       </div>
                       <div className="text-[11px] text-muted-foreground truncate max-w-[200px]">
                         {r.email} {r.memberCode ? `· ${r.memberCode}` : ""}
@@ -1234,12 +1223,12 @@ function RegPage() {
                       );
                     })}
 
-                    {/* Action Buttons - Khay trượt ngang mượt mà */}
+                    {/* Action Buttons - Giới hạn tối đa 3 thao tác, > 3 thao tác gom vào menu 3 chấm */}
                     <td
                       style={{ width: colWidths.actions, minWidth: colWidths.actions }}
-                      className="sticky right-0 z-10 bg-card px-3 py-2.5 group-hover:bg-card border-b border-border/50 shadow-[-6px_0_12px_-4px_rgba(0,0,0,0.12)] whitespace-nowrap"
+                      className="sticky right-0 z-10 bg-card px-3 py-2.5 group-hover:bg-card border-b border-border/50 shadow-[-6px_0_12px_-4px_rgba(0,0,0,0.12)] whitespace-nowrap text-right"
                     >
-                      <div className="flex items-center justify-end gap-1.5 overflow-x-auto no-scrollbar scroll-smooth py-0.5 px-0.5">
+                      <TableActionsGroup maxVisible={3}>
                         {/* Thao tác Check-in nhanh cho BTC */}
                         {!r.checkedInAt && (
                           <button
@@ -1344,7 +1333,7 @@ function RegPage() {
                           <Trash2 className="h-3.5 w-3.5" />
                           Xóa
                         </button>
-                      </div>
+                      </TableActionsGroup>
                     </td>
                   </tr>
                 );
@@ -1647,7 +1636,9 @@ function RegPage() {
       <EventAttendeesImportModal
         open={importModalOpen}
         onClose={() => setImportModalOpen(false)}
-        event={EVENTS.find((e: any) => String(e.id) === String(eventId)) || EVENTS[0]}
+        event={eventsList.find((e: any) => String(e.id) === String(eventId)) || eventsList[0]}
+        eventsList={eventsList}
+        initialEventId={eventId !== "all" ? eventId : undefined}
         onSuccess={() => {
           fetchLiveRegistrations();
           if (eventId && eventId !== "all") {
@@ -1657,6 +1648,16 @@ function RegPage() {
           }
           router.invalidate();
         }}
+      />
+
+      {/* Event Registrations Export Modal (3 formats: Excel, CSV, PDF) */}
+      <EventRegistrationsExportModal
+        open={exportModalOpen}
+        onClose={() => setExportModalOpen(false)}
+        registrations={REGISTRATIONS}
+        eventsList={eventsList}
+        selectedEventId={eventId}
+        currentEvent={eventsList.find((e: any) => String(e.id) === String(eventId)) || eventsList[0]}
       />
     </AppShell>
   );

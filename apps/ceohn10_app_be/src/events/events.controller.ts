@@ -195,6 +195,34 @@ export class EventsController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(
     'platform_admin', 'superadmin', 'adm', 'admin', 'bqt', 'btt',
+    'chu_tich', 'lop_truong', 'lop_pho', 'ban_su_kien', 'truong_ban'
+  )
+  @Put(':id/tickets')
+  async updateEventTickets(
+    @Request() req: any,
+    @Param('id') id: string,
+    @Body() body: { tickets: Array<{ id?: string; name: string; price: number; quantity?: number; description?: string }> },
+  ) {
+    return this.eventsService.saveEventTickets(req.user?.id || 'admin', id, body.tickets || []);
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(
+    'platform_admin', 'superadmin', 'adm', 'admin', 'bqt', 'btt',
+    'chu_tich', 'lop_truong', 'lop_pho', 'ban_su_kien', 'truong_ban'
+  )
+  @Post(':id/tickets')
+  async saveEventTicketsPost(
+    @Request() req: any,
+    @Param('id') id: string,
+    @Body() body: { tickets: Array<{ id?: string; name: string; price: number; quantity?: number; description?: string }> },
+  ) {
+    return this.eventsService.saveEventTickets(req.user?.id || 'admin', id, body.tickets || []);
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(
+    'platform_admin', 'superadmin', 'adm', 'admin', 'bqt', 'btt',
     'chu_tich', 'lop_truong', 'lop_pho', 'ban_su_kien', 'ban_thien_nguyen', 'truong_ban', 'quan_tri',
     'member', 'hoi_vien'
   )

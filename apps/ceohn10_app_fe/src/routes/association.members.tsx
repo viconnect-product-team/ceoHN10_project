@@ -1,5 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState, useEffect, useRef } from "react";
+import { BRAND_ASSETS } from "@/config/branding";
 import {
   BadgeCheck,
   Briefcase,
@@ -1458,7 +1459,7 @@ function MembersScreen() {
                             alt={personDisplayName}
                             className="h-12 w-12 rounded-full object-cover ring-2 ring-[#003B95]/20"
                             onError={(e) => {
-                              e.currentTarget.src = "/ceohn10-logo.png";
+                              e.currentTarget.src = BRAND_ASSETS.logoSquare;
                             }}
                           />
                         ) : (
@@ -1795,7 +1796,7 @@ function MembersScreen() {
                               alt={personDisplayName}
                               className="h-12 w-12 rounded-full object-cover ring-2 ring-[#003B95]"
                               onError={(e) => {
-                                e.currentTarget.src = "/ceohn10-logo.png";
+                                e.currentTarget.src = BRAND_ASSETS.logoSquare;
                               }}
                             />
                           ) : (
@@ -1980,7 +1981,7 @@ function MembersScreen() {
                                       alt={personDisplayName}
                                       className="h-12 w-12 rounded-full object-cover ring-2 ring-[#003B95]/20 dark:ring-amber-400/30"
                                       onError={(e) => {
-                                        e.currentTarget.src = "/ceohn10-logo.png";
+                                        e.currentTarget.src = BRAND_ASSETS.logoSquare;
                                       }}
                                     />
                                   ) : (
@@ -2197,7 +2198,7 @@ function MembersScreen() {
                               alt={card.name}
                               className="size-12 rounded-full object-cover ring-2 ring-[#003B95]/20"
                               onError={(e) => {
-                                e.currentTarget.src = "/ceohn10-logo.png";
+                                e.currentTarget.src = BRAND_ASSETS.logoSquare;
                               }}
                             />
                           ) : (

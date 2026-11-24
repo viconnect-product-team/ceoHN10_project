@@ -1,29 +1,46 @@
 # AGENTS RULES & CONSTRAINTS - HỆ THỐNG CEO HN10 (HANOIBA)
-*Phiên bản: 5.1 - Quy chuẩn Tối cao về CSDL Chuẩn 113.20.107.184:6432, Kiến trúc tách biệt Web CRM & Mobile App kèm Functional Node Indexing*
+*Phiên bản: 6.0 - Quy chuẩn Tối cao về Phân Định CSDL Local/Server & Hệ Thống UI Specs cho AI Agent*
 
 ---
 
-## 0. Quy Chuẩn Bất Di Bất Dịch Về Cơ Sở Dữ Liệu: 113.20.107.184:6432 (STRICT DATABASE LAW)
-- **CƠ SỞ DỮ LIỆU DUY NHẤT & CHUẨN MỰC CỦA TOÀN DỰ ÁN**:
-  - Địa chỉ máy chủ CSDL chính thức của dự án `ceohn10_project`: **`113.20.107.184:6432`** (kết nối qua PgBouncer).
+## 0. Quy Chuẩn Cơ Sở Dữ Liệu Theo Môi Trường (STRICT DATABASE POLICY)
+- **MÔI TRƯỜNG TEST & PHÁT TRIỂN CỤC BỘ (LOCALHOST DEVELOPMENT)**:
+  - Địa chỉ máy chủ CSDL: **`127.0.0.1:5432`** (PostgreSQL cục bộ máy phát triển).
+  - Tên CSDL (Database Name): **`ceohn10_project`**.
+  - Chuỗi kết nối chuẩn: `postgresql://postgres:postgres@127.0.0.1:5432/ceohn10_project`.
+- **MÔI TRƯỜNG SERVER DEV / STAGING / PRODUCTION (MÁY CHỦ CHÍNH THỨC)**:
+  - Địa chỉ máy chủ CSDL: **`113.20.107.184:6432`** (kết nối qua PgBouncer).
   - Tên CSDL (Database Name): **`ceohn10_project`**.
   - Tài khoản / Mật khẩu: `app1` / `5^S0CEpvYwC1(#YN1UoJ`.
-  - Chuỗi kết nối chuẩn hóa (Connection String):
+  - Chuỗi kết nối chuẩn:
     ```text
     postgresql://app1:5^S0CEpvYwC1(#YN1UoJ@113.20.107.184:6432/ceohn10_project?pgbouncer=true
     jdbc:postgresql://113.20.107.184:6432/ceohn10_project
     ```
-- **QUY TẮC LƯU DỮ LIỆU BẮT BUỘC (WRITE RULE)**:
-  - Khi sửa, viết mới hoặc kiểm tra bất kỳ chức năng lưu dữ liệu nào (INSERT, UPDATE, DELETE, RPC) từ hệ thống Backend NestJS, Web CRM Quản trị, hay Mobile App CEO HN10: **TUYỆT ĐỐI PHẢI LƯU ĐÚNG VÀO DATABASE `113.20.107.184:6432`**, KHÔNG LƯU VÀO DATABASE KHÁC.
-- **QUY TẮC LẤY DỮ LIỆU HIỂN THỊ GIAO DIỆN (READ RULE)**:
-  - Mọi dữ liệu hiển thị về giao diện Web CRM và Mobile App (Học viên, Sự kiện, B2B Connect, Lịch, Nhật ký, Cuộc họp, Tin tức bài viết, Quyền hạn RBAC, Tài chính): **TUYỆT ĐỐI PHẢI LẤY TỪ `113.20.107.184:6432` RA ĐỂ HIỆN VỀ GIAO DIỆN**.
-- **TUYỆT ĐỐI NGHIÊM CẤM LƯU / TRỎ SANG DATABASE KHÁC**:
-  - Máy chủ `14.225.217.232:5436` KHÔNG PHẢI là database chuẩn của dự án.
-  - Tuyệt đối không cấu hình biến môi trường, không viết script, không redirect dữ liệu sang bất kỳ database nào khác ngoài `113.20.107.184:6432`.
+- **QUY TẮC LƯU VÀ ĐỌC DỮ LIỆU BẮT BUỘC (WRITE & READ RULE)**:
+  - Khi chạy trên Localhost: Đọc và ghi đúng vào CSDL Localhost `127.0.0.1:5432`.
+  - Khi chạy trên Server Dev / Staging / Production: Đọc và ghi đúng vào CSDL `113.20.107.184:6432`.
+  - **TUYỆT ĐỐI NGHIÊM CẤM TRỎ SANG DATABASE KHÁC**: Máy chủ `14.225.217.232:5436` KHÔNG PHẢI là database chuẩn của dự án.
 - **TUYỆT ĐỐI CẤM HARDCODE, MOCK, FAKE DỮ LIỆU ĐỂ CHE GIẤU LỖI (STRICT NO-MOCK LAW)**:
   - Tuyệt đối KHÔNG ĐƯỢC PHÉP hardcode, mock, fake dữ liệu tĩnh hoặc gán mảng giả lập để che giấu tình trạng lỗi cơ sở dữ liệu.
-  - Khi cơ sở dữ liệu `113.20.107.184:6432` gặp lỗi kết nối hoặc không phản hồi (VD: PgBouncer lỗi login retry, database down): **BẮT BUỘC PHẢI BÁO RÕ RÀNG VÀ CHÍNH XÁC NGUYÊN NHÂN LỖI CHO NGƯỜI DÙNG**, không được âm thầm nuốt lỗi hay dùng dữ liệu fake.
+  - Khi cơ sở dữ liệu gặp lỗi kết nối hoặc không phản hồi: **BẮT BUỘC PHẢI BÁO RÕ RÀNG VÀ CHÍNH XÁC NGUYÊN NHÂN LỖI CHO NGƯỜI DÙNG**, không được âm thầm nuốt lỗi hay dùng dữ liệu fake.
   - Quy định này có giá trị tối cao tương đương lệnh cấm `git push / git commit`.
+
+---
+
+## 0.1. Quy Chuẩn Bất Di Bất Dịch Về Nginx & An Toàn Máy Chủ (STRICT NGINX & SERVER SAFETY LAW)
+- **NGINX VALIDATION GATE (BẮT BUỘC NGINX SUCCESS TRƯỚC KHI ĐƯA VÀO SERVER)**:
+  - Khi push code hoặc chạy kịch bản deploy liên quan tới Nginx Reverse Proxy (`nginx.conf`, file reverse proxy, Docker proxy): **BẮT BUỘC kiểm tra cú pháp Nginx (`nginx -t`) đạt trạng thái `syntax is ok` & `test is successful` thì MỚI ĐƯỢC PHÉP nạp vào server hoặc reload dịch vụ Nginx**.
+  - **TUYỆT ĐỐI KHÔNG RELOAD / RESTART NGINX KHI CHƯA PASS `nginx -t`**: Tuyệt đối không được thực thi lệnh reload (`systemctl reload nginx`), restart, hay đưa cấu hình mới vào hoạt động nếu lệnh kiểm tra `nginx -t` chưa trả về exit code 0.
+- **TUYỆT ĐỐI BẢO VỆ CẤU HÌNH NGINX HOST OS DO DEVOPS QUẢN LÝ**:
+  - Dịch vụ Nginx chính trên hệ điều hành máy chủ VPS (`/etc/nginx`) là tài nguyên dùng chung của nhiều hệ thống và do bộ phận DevOps trực tiếp quản trị.
+  - Tuyệt đối KHÔNG tự ý ghi đè hoặc can thiệp bừa bãi vào `/etc/nginx/nginx.conf` hay `/etc/nginx/conf.d/` làm hỏng cấu hình Nginx mà DevOps đã xử lý ổn định.
+  - Mọi thao tác cập nhật cấu hình Nginx Host (nếu có) BẮT BUỘC phải tuân thủ cơ chế Atomic Backup & Rollback:
+    1. Tạo bản sao lưu dự phòng (`.bak`) trước khi cập nhật.
+    2. Ghi cấu hình mới vào tệp thử nghiệm và kiểm tra bằng `nginx -t`.
+    3. Nếu `nginx -t` phát hiện bất kỳ cảnh báo hoặc lỗi cú pháp nào: **BẮT BUỘC HỦY BỎ NGAY LẬP TỨC, KHÔI PHỤC LẠI FILE GỐC CỦA DEVOPS VÀ DỪNG LẠI**, tuyệt đối không reload để đảm bảo máy chủ không bao giờ bị sập.
+- **NGĂN CHẶN XUNG ĐỘT CỔNG TRÊN CONTAINER NGINX**:
+  - Container proxy `ceohn10-ssl-proxy` chỉ bind các cổng phụ trợ đã quy hoạch (`10443`, `10444`, `10445`), TUYỆT ĐỐI KHÔNG bind cổng `80:80` hay `443:443` trên host vì sẽ gây xung đột chiếm dụng cổng làm sập dịch vụ Nginx chính của máy chủ.
 
 ---
 
@@ -54,10 +71,14 @@ Mỗi khi nhận bất kỳ câu lệnh (prompt), yêu cầu tính năng mới, 
   - Nhóm Hạ Tầng: `[NODE-CORE-001]` đến `[NODE-CORE-006]`
 - Xác định chính xác danh sách file: Route, Component, API Client, Controller, Service, CSDL Table liên quan đến Node đó.
 
-### 📖 BƯỚC 3: ĐỌC TÀI LIỆU QUY CHUẨN TRƯỚC KHI CHẠM VÀO CODE
-- **Nếu là CRM**: Bắt buộc đọc [.agents/rules/crm-rules.md](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceohn10_project/.agents/rules/crm-rules.md) và tài liệu đặc tả [02_DAC_TA_KY_THUAT_WEB_CRM_QUAN_TRI.md](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceohn10_project/document/notebooklm/02_DAC_TA_KY_THUAT_WEB_CRM_QUAN_TRI.md).
-- **Nếu là Mobile App**: Bắt buộc đọc [.agents/rules/mobile-rules.md](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceohn10_project/.agents/rules/mobile-rules.md) và tài liệu đặc tả [01_DAC_TA_KY_THUAT_CEO HN10_MOBILE_APP.md](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceohn10_project/document/notebooklm/01_DAC_TA_KY_THUAT_CEO HN10_MOBILE_APP.md).
-- **Nếu là Triển khai / Deploy**: Bắt buộc đọc [.agents/rules/deployment-rules.md](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceohn10_project/.agents/rules/deployment-rules.md).
+### 📖 BƯỚC 3: ĐỌC TÀI LIỆU QUY CHUẨN & UI SPECS TRƯỚC KHI CHẠM VÀO CODE
+- **Đặc tả giao diện (UI Specs Bắt Buộc Đọc)**:
+  - Nếu sửa/viết giao diện **Mobile App**: Bắt buộc đọc [.agents/ui-specs/UI_SPEC_MOBILE_APP_CEOHN10.md](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceohn10_project/.agents/ui-specs/UI_SPEC_MOBILE_APP_CEOHN10.md).
+  - Nếu sửa/viết giao diện **Web CRM / Master Platform**: Bắt buộc đọc [.agents/ui-specs/UI_SPEC_CRM_QUAN_TRI.md](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceohn10_project/.agents/ui-specs/UI_SPEC_CRM_QUAN_TRI.md).
+- **Quy chuẩn nghiệp vụ & kỹ thuật**:
+  - **Nếu là CRM**: Bắt buộc đọc [.agents/rules/crm-rules.md](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceohn10_project/.agents/rules/crm-rules.md) và tài liệu đặc tả [02_DAC_TA_KY_THUAT_WEB_CRM_QUAN_TRI.md](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceohn10_project/document/notebooklm/02_DAC_TA_KY_THUAT_WEB_CRM_QUAN_TRI.md).
+  - **Nếu là Mobile App**: Bắt buộc đọc [.agents/rules/mobile-rules.md](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceohn10_project/.agents/rules/mobile-rules.md) và tài liệu đặc tả [01_DAC_TA_KY_THUAT_CEO HN10_MOBILE_APP.md](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceohn10_project/document/notebooklm/01_DAC_TA_KY_THUAT_CEO HN10_MOBILE_APP.md).
+  - **Nếu là Triển khai / Deploy**: Bắt buộc đọc [.agents/rules/deployment-rules.md](file:///d:/download/VICONNECT/CEO_VIONE_PROJECT/ceohn10_project/.agents/rules/deployment-rules.md).
 - Đọc nội dung thực tế của các tệp nguồn cần sửa bằng `view_file` để nắm trọn vẹn logic hiện hữu.
 
 ### 🛠️ BƯỚC 4: THỰC THI SỬA ĐỔI CHUẨN XÁC THEO NODE

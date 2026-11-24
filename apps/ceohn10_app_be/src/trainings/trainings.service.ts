@@ -5,10 +5,13 @@ import {
   OnModuleInit,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { BaseService } from '../common';
 
 @Injectable()
-export class TrainingsService implements OnModuleInit {
-  constructor(private readonly prisma: PrismaService) {}
+export class TrainingsService extends BaseService implements OnModuleInit {
+  constructor(private readonly prisma: PrismaService) {
+    super('TrainingsService');
+  }
 
   async onModuleInit() {
     await this.ensureSchema();

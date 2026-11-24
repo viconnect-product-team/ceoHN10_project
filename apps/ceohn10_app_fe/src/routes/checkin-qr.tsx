@@ -22,6 +22,8 @@ import {
   CreditCard,
   Layers,
   Sparkles,
+  Plus,
+  Trash2,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { isPrivilegedAdminOrPresident, isMediaDepartmentMember } from "@/lib/checkin-gatekeeper-auth";
@@ -77,6 +79,8 @@ function CheckinQrSetupPage() {
   const [refreshing, setRefreshing] = useState(false);
   const [savingConfig, setSavingConfig] = useState(false);
   const [copiedRegLink, setCopiedRegLink] = useState(false);
+  const [copiedVipLink, setCopiedVipLink] = useState(false);
+  const [copiedStdLink, setCopiedStdLink] = useState(false);
   const [copiedCheckinLink, setCopiedCheckinLink] = useState(false);
 
   // Tìm sự kiện đang được chọn
@@ -89,6 +93,54 @@ function CheckinQrSetupPage() {
   const [ticketFee, setTicketFee] = useState<number>(0);
   const [paymentNote, setPaymentNote] = useState<string>("Chuyển khoản theo cú pháp: [Họ Tên] [SĐT] [Tên Sự Kiện]");
   const [bankAccount, setBankAccount] = useState<string>("8888202610 - MB Bank (Quỹ Sự Kiện CEO HN10)");
+
+  // Cấu hình danh sách hạng vé (Loại vé)
+  type TicketConfig = {
+    id?: string;
+    name: string;
+    price: number;
+    quantity: number;
+    description: string;
+  };
+  const [configuredTickets, setConfiguredTickets] = useState<TicketConfig[]>([]);
+
+  // Tải danh sách hạng vé của sự kiện đang chọn
+  useEffect(() => {
+    if (!activeEvent) return;
+    let cancelled = false;
+    fetchNestApi<any[]>(`/events/${activeEvent.id}/tickets`)
+      .then((res) => {
+        if (cancelled) return;
+        const list = Array.isArray(res) ? res : [];
+        if (list.length > 0) {
+          setConfiguredTickets(
+            list.map((t: any) => ({
+              id: t.id,
+              name: t.name || "",
+              price: Number(t.price || 0),
+              quantity: Number(t.quantity || 0),
+              description: t.description || "",
+            }))
+          );
+        } else {
+          const defaultPrice = Number(activeEvent.ticketPrice || 0);
+          if (defaultPrice > 0) {
+            setConfiguredTickets([
+              { name: "Vé VIP", price: defaultPrice * 2 || 500000, quantity: 50, description: "Bàn tiệc VIP, tài liệu cao cấp" },
+              { name: "Vé Tiêu Chuẩn", price: defaultPrice, quantity: 100, description: "Tham dự toàn bộ chương trình" },
+            ]);
+          } else {
+            setConfiguredTickets([
+              { name: "Vé Tiêu Chuẩn", price: 0, quantity: 0, description: "Miễn phí tham dự sự kiện" },
+            ]);
+          }
+        }
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [activeEvent?.id]);
 
   // Cấu hình các trường trong Form Đăng Ký
   const [formFields, setFormFields] = useState({
@@ -114,33 +166,46 @@ function CheckinQrSetupPage() {
     }
   }, [activeEvent]);
 
-  // Xử lý lưu cấu hình
+  // Xử lý lưu cấu hình (Bao gồm đồng bộ Loại vé về Chi tiết sự kiện)
   const handleSaveSetup = async () => {
     if (!activeEvent) return;
     setSavingConfig(true);
     try {
-      const currentPrice = isPaidEvent ? Number(ticketFee) : 0;
+      const maxPrice = isPaidEvent && configuredTickets.length > 0
+        ? Math.max(0, ...configuredTickets.map((t) => Number(t.price) || 0))
+        : 0;
+
+      // 1. Lưu danh sách Loại vé vào /events/:id/tickets (phản ánh trực tiếp ở Chi tiết sự kiện)
+      await fetchNestApi(`/events/${activeEvent.id}/tickets`, {
+        method: "PUT",
+        body: JSON.stringify({
+          tickets: configuredTickets.map((t) => ({
+            ...t,
+            price: isPaidEvent ? Number(t.price) || 0 : 0,
+          })),
+        }),
+      }).catch(() => {});
+
+      // 2. Cập nhật thông số sự kiện & trường biểu mẫu
       await fetchNestApi(`/events/${activeEvent.id}`, {
         method: "PATCH",
         body: JSON.stringify({
-          ticketPrice: currentPrice,
+          ticketPrice: maxPrice,
+          fee: maxPrice,
           isPaid: isPaidEvent,
           paymentNote: paymentNote,
           bankAccount: bankAccount,
           formFieldsConfig: formFields,
         }),
       }).catch(async () => {
-        // Fallback update ticket price endpoint
         await fetchNestApi(`/events/${activeEvent.id}/ticket-price`, {
           method: "PATCH",
-          body: JSON.stringify({ ticketPrice: currentPrice }),
+          body: JSON.stringify({ ticketPrice: maxPrice }),
         }).catch(() => {});
       });
 
       toast.success(
-        `Đã lưu cấu hình thành công! Sự kiện "${activeEvent.name}" hiện là ${
-          isPaidEvent ? `Có phí (${ticketFee.toLocaleString("vi-VN")} đ)` : "Miễn phí (0đ)"
-        }.`
+        `Đã lưu cấu hình thành công! Sự kiện "${activeEvent.name}" đã cập nhật ${configuredTickets.length} loại vé và đồng bộ vào Loại vé chi tiết sự kiện.`
       );
       await router.invalidate();
     } catch (err: any) {
@@ -302,11 +367,16 @@ function CheckinQrSetupPage() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
             {/* CỘT TRÁI: BẢNG SET UP FORM & VÉ CÓ PHÍ / MIỄN PHÍ */}
             <div className="lg:col-span-5 space-y-5">
-              {/* Box 1: Cấu hình Phí vé / Miễn phí */}
+              {/* Box 1: Cấu hình Phí vé & Các Hạng Vé */}
               <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm space-y-4">
-                <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
-                  <CreditCard className="h-5 w-5 text-[#003B95]" />
-                  <h3 className="text-sm font-bold text-slate-900">1. Cấu Hình Phí Vé &amp; Tài Khoản Thu</h3>
+                <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+                  <div className="flex items-center gap-2">
+                    <CreditCard className="h-5 w-5 text-[#003B95]" />
+                    <h3 className="text-sm font-bold text-slate-900">1. Cấu Hình Hạng Vé &amp; Tài Khoản Thu</h3>
+                  </div>
+                  <span className="text-[11px] font-semibold text-slate-500">
+                    {configuredTickets.length} loại vé
+                  </span>
                 </div>
 
                 {/* Chọn Có Phí hoặc Miễn Phí */}
@@ -316,6 +386,9 @@ function CheckinQrSetupPage() {
                     onClick={() => {
                       setIsPaidEvent(false);
                       setTicketFee(0);
+                      setConfiguredTickets((prev) =>
+                        prev.map((t) => ({ ...t, price: 0 }))
+                      );
                       setFormFields((prev) => ({ ...prev, requirePayment: false }));
                     }}
                     className={`p-3 rounded-2xl border text-left transition-all cursor-pointer ${
@@ -336,6 +409,15 @@ function CheckinQrSetupPage() {
                     onClick={() => {
                       setIsPaidEvent(true);
                       if (ticketFee === 0) setTicketFee(500000);
+                      setConfiguredTickets((prev) => {
+                        if (prev.length === 0 || prev.every((t) => t.price === 0)) {
+                          return [
+                            { name: "Vé VIP", price: 500000, quantity: 50, description: "Bàn tiệc VIP, tài liệu cao cấp" },
+                            { name: "Vé Tiêu Chuẩn", price: 200000, quantity: 100, description: "Tham dự toàn bộ chương trình" },
+                          ];
+                        }
+                        return prev;
+                      });
                       setFormFields((prev) => ({ ...prev, requirePayment: true }));
                     }}
                     className={`p-3 rounded-2xl border text-left transition-all cursor-pointer ${
@@ -352,26 +434,127 @@ function CheckinQrSetupPage() {
                   </button>
                 </div>
 
-                {/* Nếu có phí -> Nhập số tiền & thông tin chuyển khoản */}
-                {isPaidEvent && (
-                  <div className="space-y-3 pt-2 animate-in fade-in">
-                    <div>
-                      <label className="text-xs font-bold text-slate-700">Mức Phí Vé Tham Dự (VNĐ):</label>
-                      <div className="mt-1 relative">
-                        <DollarSign className="h-4 w-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                {/* Danh sách các loại vé (Lưu vào phần Loại vé ở chi tiết sự kiện) */}
+                <div className="space-y-3 pt-2">
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+                      <Ticket className="h-3.5 w-3.5 text-[#003B95]" />
+                      <span>Danh Sách Hạng Vé Sự Kiện:</span>
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setConfiguredTickets([
+                          ...configuredTickets,
+                          {
+                            name: isPaidEvent ? "Vé VIP" : "Vé Mời",
+                            price: isPaidEvent ? 500000 : 0,
+                            quantity: 50,
+                            description: "",
+                          },
+                        ])
+                      }
+                      className="inline-flex items-center gap-1 text-[11px] font-bold text-[#003B95] hover:underline cursor-pointer"
+                    >
+                      <Plus className="h-3 w-3" />
+                      <span>Thêm Hạng Vé</span>
+                    </button>
+                  </div>
+
+                  <div className="space-y-2.5 max-h-60 overflow-y-auto pr-1">
+                    {configuredTickets.map((t, idx) => (
+                      <div
+                        key={idx}
+                        className="p-3 rounded-xl border border-slate-200 bg-slate-50/70 space-y-2 text-xs"
+                      >
+                        <div className="flex items-center justify-between gap-2">
+                          <input
+                            type="text"
+                            value={t.name}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              setConfiguredTickets((prev) =>
+                                prev.map((item, i) => (i === idx ? { ...item, name: val } : item))
+                              );
+                            }}
+                            placeholder="Tên hạng vé (VD: Vé VIP, Vé Tiêu Chuẩn)..."
+                            className="flex-1 px-2.5 py-1.5 rounded-lg border border-slate-300 bg-white font-bold text-slate-900 outline-none focus:ring-1 focus:ring-[#003B95]"
+                          />
+                          {configuredTickets.length > 1 && (
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setConfiguredTickets((prev) => prev.filter((_, i) => i !== idx))
+                              }
+                              className="text-slate-400 hover:text-rose-600 p-1"
+                              title="Xóa hạng vé này"
+                            >
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </button>
+                          )}
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-2">
+                          <div>
+                            <span className="text-[10px] text-slate-500 font-semibold block mb-0.5">
+                              Giá vé (VNĐ):
+                            </span>
+                            <input
+                              type="number"
+                              disabled={!isPaidEvent}
+                              value={isPaidEvent ? t.price : 0}
+                              onChange={(e) => {
+                                const val = Math.max(0, Number(e.target.value));
+                                setConfiguredTickets((prev) =>
+                                  prev.map((item, i) => (i === idx ? { ...item, price: val } : item))
+                                );
+                              }}
+                              className={`w-full px-2 py-1 rounded-lg border font-mono font-bold ${
+                                !isPaidEvent
+                                  ? "bg-slate-100 text-slate-400 border-slate-200"
+                                  : "bg-white text-slate-900 border-slate-300"
+                              }`}
+                            />
+                          </div>
+                          <div>
+                            <span className="text-[10px] text-slate-500 font-semibold block mb-0.5">
+                              Số lượng vé (suất):
+                            </span>
+                            <input
+                              type="number"
+                              value={t.quantity || 0}
+                              onChange={(e) => {
+                                const val = Math.max(0, Number(e.target.value));
+                                setConfiguredTickets((prev) =>
+                                  prev.map((item, i) => (i === idx ? { ...item, quantity: val } : item))
+                                );
+                              }}
+                              placeholder="0: Không giới hạn"
+                              className="w-full px-2 py-1 rounded-lg border border-slate-300 bg-white font-mono text-slate-900"
+                            />
+                          </div>
+                        </div>
+
                         <input
-                          type="number"
-                          value={ticketFee}
-                          onChange={(e) => setTicketFee(Number(e.target.value))}
-                          placeholder="VD: 500000"
-                          className="w-full pl-9 pr-3 py-2 rounded-xl border border-slate-300 bg-white font-mono font-bold text-sm text-slate-900 outline-none focus:ring-2 focus:ring-[#003B95]/20"
+                          type="text"
+                          value={t.description || ""}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            setConfiguredTickets((prev) =>
+                              prev.map((item, i) => (i === idx ? { ...item, description: val } : item))
+                            );
+                          }}
+                          placeholder="Mô tả quyền lợi vé..."
+                          className="w-full px-2 py-1 rounded-lg border border-slate-200 bg-white text-[11px] text-slate-600 outline-none"
                         />
                       </div>
-                      <p className="text-[11px] text-slate-500 mt-1">
-                        Bằng chữ: <span className="font-bold text-[#DC2626]">{ticketFee.toLocaleString("vi-VN")} VNĐ / vé</span>
-                      </p>
-                    </div>
+                    ))}
+                  </div>
+                </div>
 
+                {/* Nếu có phí -> Nhập thông tin chuyển khoản */}
+                {isPaidEvent && (
+                  <div className="space-y-3 pt-2 border-t border-slate-100 animate-in fade-in">
                     <div>
                       <label className="text-xs font-bold text-slate-700">Tài Khoản Nhận Tiền / Ngân Hàng:</label>
                       <input
@@ -399,16 +582,16 @@ function CheckinQrSetupPage() {
               <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm space-y-4">
                 <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
                   <Settings2 className="h-5 w-5 text-[#DC2626]" />
-                  <h3 className="text-sm font-bold text-slate-900">2. Thiết Lập Trường Biểu Mẫu Đăng Ký</h3>
+                  <h3 className="text-sm font-bold text-slate-900">2. Tùy Chỉnh Trường Biểu Mẫu Đăng Ký &amp; Check-In</h3>
                 </div>
 
                 <div className="space-y-2 text-xs">
                   <label className="flex items-center justify-between p-2 rounded-xl bg-slate-50 hover:bg-slate-100 cursor-pointer">
-                    <span className="font-semibold text-slate-800">Họ và tên đại biểu</span>
+                    <span className="font-semibold text-slate-800">Họ và tên đại biểu (Bắt buộc)</span>
                     <input type="checkbox" checked={formFields.fullName} disabled className="rounded text-[#003B95]" />
                   </label>
                   <label className="flex items-center justify-between p-2 rounded-xl bg-slate-50 hover:bg-slate-100 cursor-pointer">
-                    <span className="font-semibold text-slate-800">Số điện thoại (Nhận vé Zalo/SMS)</span>
+                    <span className="font-semibold text-slate-800">Số điện thoại (Nhận vé Zalo/SMS - Bắt buộc)</span>
                     <input type="checkbox" checked={formFields.phone} disabled className="rounded text-[#003B95]" />
                   </label>
                   <label className="flex items-center justify-between p-2 rounded-xl bg-slate-50 hover:bg-slate-100 cursor-pointer">
@@ -463,141 +646,298 @@ function CheckinQrSetupPage() {
                   ) : (
                     <>
                       <Save className="h-4 w-4" />
-                      <span>Lưu Cấu Hình Sự Kiện &amp; Biểu Mẫu</span>
+                      <span>Lưu Cấu Hình Loại Vé &amp; Biểu Mẫu Sự Kiện</span>
                     </>
                   )}
                 </button>
               </div>
             </div>
 
-            {/* CỘT PHẢI: HIỂN THỊ CHUẨN XÁC ĐÚNG 2 MÃ QR (Mỗi sự kiện tối đa 2 mã) */}
+            {/* CỘT PHẢI: HIỂN THỊ MÃ QR THEO TỪNG LOẠI VÉ (VD: Vé VIP & Vé Tiêu Chuẩn) */}
             <div className="lg:col-span-7 space-y-6">
-              <div className="bg-gradient-to-r from-blue-50 to-amber-50 p-3.5 rounded-2xl border border-blue-200 text-xs text-slate-700 flex items-center gap-2.5">
-                <Sparkles className="h-5 w-5 text-amber-500 shrink-0" />
-                <span>
-                  <strong>Quy chuẩn tối cao:</strong> Mỗi sự kiện được cấp tối đa <strong>2 mã QR duy nhất</strong>. Khi quét mã Đăng ký, biểu mẫu sẽ tự động hiển thị theo chế độ Có phí hoặc Miễn phí bạn đã cấu hình bên cạnh.
-                </span>
-              </div>
+              {(() => {
+                const vipTicket = configuredTickets.find((t) => t.name.toUpperCase().includes("VIP"));
+                const stdTicket =
+                  configuredTickets.find((t) => !t.name.toUpperCase().includes("VIP")) || configuredTickets[0];
+                const has2Tiers = configuredTickets.length >= 2;
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                {/* ── MÃ QR 1: ĐĂNG KÝ THAM GIA SỰ KIỆN ── */}
-                <div className="rounded-3xl border-2 border-[#003B95]/30 bg-white p-5 shadow-lg flex flex-col justify-between relative overflow-hidden">
-                  <div className="absolute top-0 right-0 bg-[#003B95] text-white text-[10px] font-black uppercase px-3 py-1 rounded-bl-xl tracking-wider">
-                    MÃ QR SỐ 1
-                  </div>
+                const vipUrl =
+                  activeEvent && vipTicket
+                    ? `${publicAppOrigin}/guest-event-register/${activeEvent.id}?ticketType=${encodeURIComponent(vipTicket.name)}`
+                    : registerUrl;
+                const stdUrl =
+                  activeEvent && stdTicket
+                    ? `${publicAppOrigin}/guest-event-register/${activeEvent.id}?ticketType=${encodeURIComponent(stdTicket.name)}`
+                    : registerUrl;
 
-                  <div className="space-y-3">
-                    <div>
-                      <span className="inline-block px-2 py-0.5 rounded-md bg-blue-100 text-[#003B95] text-[10px] font-bold uppercase mb-1">
-                        Standee Đón Tiếp / Banner Online
+                return (
+                  <>
+                    <div className="bg-gradient-to-r from-blue-50 to-amber-50 p-3.5 rounded-2xl border border-blue-200 text-xs text-slate-700 flex items-center gap-2.5">
+                      <Sparkles className="h-5 w-5 text-amber-500 shrink-0" />
+                      <span>
+                        {has2Tiers ? (
+                          <>
+                            Sự kiện có <strong>2 loại vé riêng biệt ({vipTicket?.name || "VIP"} &amp; {stdTicket?.name || "Tiêu Chuẩn"})</strong>. Hệ thống tự động phân tách 2 mã QR độc lập để khách mời quét đúng biểu mẫu của từng loại vé.
+                          </>
+                        ) : (
+                          <>
+                            Hệ thống hiển thị chuẩn xác <strong>Mã QR Đăng ký</strong> và <strong>Mã QR Check-in</strong> cho sự kiện.
+                          </>
+                        )}
                       </span>
-                      <h4 className="text-base font-black text-slate-900 leading-snug">
-                        Mã QR Đăng Ký Tham Gia
-                      </h4>
-                      <p className="text-xs text-slate-500 mt-0.5">
-                        Khách mời hoặc Học viên dùng Camera / Zalo quét mã này để mở biểu mẫu đăng ký.
-                      </p>
                     </div>
 
-                    <div className="flex justify-center p-3 bg-white rounded-2xl border border-slate-200 shadow-inner">
-                      <QrCanvas value={registerUrl} size={168} />
-                    </div>
+                    <div className={`grid grid-cols-1 ${has2Tiers ? "md:grid-cols-2" : "md:grid-cols-2"} gap-5`}>
+                      {/* NẾU CÓ 2 LOẠI VÉ: SHOW 1 QR CHO VÉ VIP, 1 QR CHO VÉ THƯỜNG */}
+                      {has2Tiers ? (
+                        <>
+                          {/* ── MÃ QR ĐĂNG KÝ VÉ VIP ── */}
+                          <div className="rounded-3xl border-2 border-amber-500/40 bg-white p-5 shadow-lg flex flex-col justify-between relative overflow-hidden">
+                            <div className="absolute top-0 right-0 bg-amber-600 text-white text-[10px] font-black uppercase px-3 py-1 rounded-bl-xl tracking-wider">
+                              QR VÉ VIP
+                            </div>
 
-                    <div className="space-y-1.5 text-xs">
-                      <div className="flex items-center justify-between">
-                        <span className="text-slate-500">Chế độ biểu mẫu:</span>
-                        <span className={`font-bold px-2 py-0.5 rounded ${isPaidEvent ? "bg-amber-100 text-amber-800" : "bg-emerald-100 text-emerald-800"}`}>
-                          {isPaidEvent ? `Có Phí (${ticketFee.toLocaleString("vi-VN")} đ)` : "Miễn Phí (0đ)"}
-                        </span>
+                            <div className="space-y-3">
+                              <div>
+                                <span className="inline-block px-2 py-0.5 rounded-md bg-amber-100 text-amber-800 text-[10px] font-bold uppercase mb-1">
+                                  {vipTicket?.name || "Vé VIP Doanh Nhân"}
+                                </span>
+                                <h4 className="text-base font-black text-slate-900 leading-snug">
+                                  Mã QR Đăng Ký Vé VIP
+                                </h4>
+                                <p className="text-xs text-slate-500 mt-0.5">
+                                  Quét mã này sẽ mở trực tiếp form đăng ký dành riêng cho hạng vé VIP.
+                                </p>
+                              </div>
+
+                              <div className="flex justify-center p-3 bg-white rounded-2xl border border-amber-200 shadow-inner">
+                                <QrCanvas value={vipUrl} size={150} />
+                              </div>
+
+                              <div className="space-y-1 text-xs">
+                                <div className="flex items-center justify-between">
+                                  <span className="text-slate-500">Mức phí vé:</span>
+                                  <span className="font-bold px-2 py-0.5 rounded bg-amber-100 text-amber-900">
+                                    {vipTicket?.price ? `${vipTicket.price.toLocaleString("vi-VN")} đ` : "Miễn phí"}
+                                  </span>
+                                </div>
+                                <code className="block truncate rounded-lg bg-slate-100 px-2 py-1 font-mono text-[10.5px] text-amber-700">
+                                  {vipUrl}
+                                </code>
+                              </div>
+                            </div>
+
+                            <div className="mt-4 pt-3 border-t border-slate-100 flex gap-2">
+                              <a
+                                href={vipUrl}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="flex-1 min-h-9 inline-flex items-center justify-center gap-1.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold shadow-xs transition"
+                              >
+                                <ExternalLink className="h-3.5 w-3.5" />
+                                <span>Mở Form VIP</span>
+                              </a>
+                              <button
+                                type="button"
+                                onClick={async () => {
+                                  await navigator.clipboard.writeText(vipUrl);
+                                  setCopiedVipLink(true);
+                                  setTimeout(() => setCopiedVipLink(false), 2000);
+                                  toast.success("Đã sao chép link QR Đăng Ký Vé VIP!");
+                                }}
+                                className="min-h-9 px-3 inline-flex items-center gap-1.5 rounded-xl border border-slate-200 hover:bg-slate-100 text-slate-700 text-xs font-semibold transition cursor-pointer"
+                              >
+                                {copiedVipLink ? <Check className="h-3.5 w-3.5 text-emerald-600" /> : <Copy className="h-3.5 w-3.5" />}
+                                <span>{copiedVipLink ? "Đã Chép" : "Chép"}</span>
+                              </button>
+                            </div>
+                          </div>
+
+                          {/* ── MÃ QR ĐĂNG KÝ VÉ THƯỜNG / TIÊU CHUẨN ── */}
+                          <div className="rounded-3xl border-2 border-[#003B95]/30 bg-white p-5 shadow-lg flex flex-col justify-between relative overflow-hidden">
+                            <div className="absolute top-0 right-0 bg-[#003B95] text-white text-[10px] font-black uppercase px-3 py-1 rounded-bl-xl tracking-wider">
+                              QR VÉ TIÊU CHUẨN
+                            </div>
+
+                            <div className="space-y-3">
+                              <div>
+                                <span className="inline-block px-2 py-0.5 rounded-md bg-blue-100 text-[#003B95] text-[10px] font-bold uppercase mb-1">
+                                  {stdTicket?.name || "Vé Tiêu Chuẩn"}
+                                </span>
+                                <h4 className="text-base font-black text-slate-900 leading-snug">
+                                  Mã QR Đăng Ký Vé Thường
+                                </h4>
+                                <p className="text-xs text-slate-500 mt-0.5">
+                                  Quét mã này sẽ mở trực tiếp form đăng ký dành riêng cho hạng vé tiêu chuẩn.
+                                </p>
+                              </div>
+
+                              <div className="flex justify-center p-3 bg-white rounded-2xl border border-slate-200 shadow-inner">
+                                <QrCanvas value={stdUrl} size={150} />
+                              </div>
+
+                              <div className="space-y-1 text-xs">
+                                <div className="flex items-center justify-between">
+                                  <span className="text-slate-500">Mức phí vé:</span>
+                                  <span className="font-bold px-2 py-0.5 rounded bg-blue-100 text-[#003B95]">
+                                    {stdTicket?.price ? `${stdTicket.price.toLocaleString("vi-VN")} đ` : "Miễn phí"}
+                                  </span>
+                                </div>
+                                <code className="block truncate rounded-lg bg-slate-100 px-2 py-1 font-mono text-[10.5px] text-[#003B95]">
+                                  {stdUrl}
+                                </code>
+                              </div>
+                            </div>
+
+                            <div className="mt-4 pt-3 border-t border-slate-100 flex gap-2">
+                              <a
+                                href={stdUrl}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="flex-1 min-h-9 inline-flex items-center justify-center gap-1.5 rounded-xl bg-[#003B95] hover:bg-[#002B70] text-white text-xs font-bold shadow-xs transition"
+                              >
+                                <ExternalLink className="h-3.5 w-3.5" />
+                                <span>Mở Form Thường</span>
+                              </a>
+                              <button
+                                type="button"
+                                onClick={async () => {
+                                  await navigator.clipboard.writeText(stdUrl);
+                                  setCopiedStdLink(true);
+                                  setTimeout(() => setCopiedStdLink(false), 2000);
+                                  toast.success("Đã sao chép link QR Đăng Ký Vé Thường!");
+                                }}
+                                className="min-h-9 px-3 inline-flex items-center gap-1.5 rounded-xl border border-slate-200 hover:bg-slate-100 text-slate-700 text-xs font-semibold transition cursor-pointer"
+                              >
+                                {copiedStdLink ? <Check className="h-3.5 w-3.5 text-emerald-600" /> : <Copy className="h-3.5 w-3.5" />}
+                                <span>{copiedStdLink ? "Đã Chép" : "Chép"}</span>
+                              </button>
+                            </div>
+                          </div>
+                        </>
+                      ) : (
+                        /* ── MÃ QR ĐĂNG KÝ DUY NHẤT KHI CHỈ CÓ 1 HẠNG VÉ ── */
+                        <div className="rounded-3xl border-2 border-[#003B95]/30 bg-white p-5 shadow-lg flex flex-col justify-between relative overflow-hidden">
+                          <div className="absolute top-0 right-0 bg-[#003B95] text-white text-[10px] font-black uppercase px-3 py-1 rounded-bl-xl tracking-wider">
+                            MÃ QR SỐ 1
+                          </div>
+
+                          <div className="space-y-3">
+                            <div>
+                              <span className="inline-block px-2 py-0.5 rounded-md bg-blue-100 text-[#003B95] text-[10px] font-bold uppercase mb-1">
+                                Standee Đón Tiếp / Banner Online
+                              </span>
+                              <h4 className="text-base font-black text-slate-900 leading-snug">
+                                Mã QR Đăng Ký Tham Gia
+                              </h4>
+                              <p className="text-xs text-slate-500 mt-0.5">
+                                Khách mời hoặc Học viên dùng Camera / Zalo quét mã này để mở biểu mẫu đăng ký.
+                              </p>
+                            </div>
+
+                            <div className="flex justify-center p-3 bg-white rounded-2xl border border-slate-200 shadow-inner">
+                              <QrCanvas value={registerUrl} size={150} />
+                            </div>
+
+                            <div className="space-y-1.5 text-xs">
+                              <div className="flex items-center justify-between">
+                                <span className="text-slate-500">Chế độ biểu mẫu:</span>
+                                <span className={`font-bold px-2 py-0.5 rounded ${isPaidEvent ? "bg-amber-100 text-amber-800" : "bg-emerald-100 text-emerald-800"}`}>
+                                  {isPaidEvent ? `Có Phí (${ticketFee.toLocaleString("vi-VN")} đ)` : "Miễn Phí (0đ)"}
+                                </span>
+                              </div>
+                              <code className="block truncate rounded-lg bg-slate-100 px-2 py-1 font-mono text-[11px] text-[#003B95]">
+                                {registerUrl}
+                              </code>
+                            </div>
+                          </div>
+
+                          <div className="mt-4 pt-3 border-t border-slate-100 space-y-2">
+                            <div className="flex gap-2">
+                              <a
+                                href={registerUrl}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="flex-1 min-h-9 inline-flex items-center justify-center gap-1.5 rounded-xl bg-[#003B95] hover:bg-[#002B70] text-white text-xs font-bold shadow-xs transition"
+                              >
+                                <ExternalLink className="h-3.5 w-3.5" />
+                                <span>Xem Thử Form</span>
+                              </a>
+                              <button
+                                type="button"
+                                onClick={copyRegister}
+                                className="min-h-9 px-3 inline-flex items-center gap-1.5 rounded-xl border border-slate-200 hover:bg-slate-100 text-slate-700 text-xs font-semibold transition cursor-pointer"
+                              >
+                                {copiedRegLink ? <Check className="h-3.5 w-3.5 text-emerald-600" /> : <Copy className="h-3.5 w-3.5" />}
+                                <span>{copiedRegLink ? "Đã Chép" : "Chép Link"}</span>
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* ── MÃ QR SOÁT VÉ CHECK-IN VÀO CỬA (BẮT BUỘC CÓ CHO MỌI SỰ KIỆN) ── */}
+                      <div className="rounded-3xl border-2 border-[#DC2626]/30 bg-white p-5 shadow-lg flex flex-col justify-between relative overflow-hidden">
+                        <div className="absolute top-0 right-0 bg-[#DC2626] text-white text-[10px] font-black uppercase px-3 py-1 rounded-bl-xl tracking-wider">
+                          MÃ QR CHECK-IN
+                        </div>
+
+                        <div className="space-y-3">
+                          <div>
+                            <span className="inline-block px-2 py-0.5 rounded-md bg-rose-100 text-[#DC2626] text-[10px] font-bold uppercase mb-1">
+                              Bàn Lễ Tân / Quầy Soát Vé
+                            </span>
+                            <h4 className="text-base font-black text-slate-900 leading-snug">
+                              Mã QR Check-in Vào Cửa
+                            </h4>
+                            <p className="text-xs text-slate-500 mt-0.5">
+                              Quét mã này để mở ngay Cổng Soát Vé / Điểm Danh đại biểu vào hội trường.
+                            </p>
+                          </div>
+
+                          <div className="flex justify-center p-3 bg-white rounded-2xl border border-slate-200 shadow-inner">
+                            <QrCanvas value={checkinUrl} size={150} />
+                          </div>
+
+                          <div className="space-y-1.5 text-xs">
+                            <div className="flex items-center justify-between">
+                              <span className="text-slate-500">Chức năng cổng:</span>
+                              <span className="font-bold text-slate-800 bg-slate-100 px-2 py-0.5 rounded">
+                                Soát Vé &amp; Điểm Danh
+                              </span>
+                            </div>
+                            <code className="block truncate rounded-lg bg-slate-100 px-2 py-1 font-mono text-[11px] text-[#DC2626]">
+                              {checkinUrl}
+                            </code>
+                          </div>
+                        </div>
+
+                        <div className="mt-4 pt-3 border-t border-slate-100 space-y-2">
+                          <div className="flex gap-2">
+                            <a
+                              href={checkinUrl}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="flex-1 min-h-9 inline-flex items-center justify-center gap-1.5 rounded-xl bg-[#DC2626] hover:bg-[#b91c1c] text-white text-xs font-bold shadow-xs transition"
+                            >
+                              <UserCheck className="h-3.5 w-3.5" />
+                              <span>Mở Cổng Check-in</span>
+                            </a>
+                            <button
+                              type="button"
+                              onClick={copyCheckin}
+                              className="min-h-9 px-3 inline-flex items-center gap-1.5 rounded-xl border border-slate-200 hover:bg-slate-100 text-slate-700 text-xs font-semibold transition cursor-pointer"
+                            >
+                              {copiedCheckinLink ? <Check className="h-3.5 w-3.5 text-emerald-600" /> : <Copy className="h-3.5 w-3.5" />}
+                              <span>{copiedCheckinLink ? "Đã Chép" : "Chép Link"}</span>
+                            </button>
+                          </div>
+                        </div>
                       </div>
-                      <code className="block truncate rounded-lg bg-slate-100 px-2 py-1 font-mono text-[11px] text-[#003B95]">
-                        {registerUrl}
-                      </code>
                     </div>
-                  </div>
-
-                  <div className="mt-4 pt-3 border-t border-slate-100 space-y-2">
-                    <div className="flex gap-2">
-                      <a
-                        href={registerUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="flex-1 min-h-9 inline-flex items-center justify-center gap-1.5 rounded-xl bg-[#003B95] hover:bg-[#002B70] text-white text-xs font-bold shadow-xs transition"
-                      >
-                        <ExternalLink className="h-3.5 w-3.5" />
-                        <span>Xem Thử Form</span>
-                      </a>
-                      <button
-                        type="button"
-                        onClick={copyRegister}
-                        className="min-h-9 px-3 inline-flex items-center gap-1.5 rounded-xl border border-slate-200 hover:bg-slate-100 text-slate-700 text-xs font-semibold transition cursor-pointer"
-                      >
-                        {copiedRegLink ? <Check className="h-3.5 w-3.5 text-emerald-600" /> : <Copy className="h-3.5 w-3.5" />}
-                        <span>{copiedRegLink ? "Đã Chép" : "Chép Link"}</span>
-                      </button>
-                    </div>
-                  </div>
-                </div>
-
-                {/* ── MÃ QR 2: CHECK-IN / SOÁT VÉ VÀO CỬA ── */}
-                <div className="rounded-3xl border-2 border-[#DC2626]/30 bg-white p-5 shadow-lg flex flex-col justify-between relative overflow-hidden">
-                  <div className="absolute top-0 right-0 bg-[#DC2626] text-white text-[10px] font-black uppercase px-3 py-1 rounded-bl-xl tracking-wider">
-                    MÃ QR SỐ 2
-                  </div>
-
-                  <div className="space-y-3">
-                    <div>
-                      <span className="inline-block px-2 py-0.5 rounded-md bg-rose-100 text-[#DC2626] text-[10px] font-bold uppercase mb-1">
-                        Bàn Lễ Tân / Quầy Soát Vé
-                      </span>
-                      <h4 className="text-base font-black text-slate-900 leading-snug">
-                        Mã QR Check-in Vào Cửa
-                      </h4>
-                      <p className="text-xs text-slate-500 mt-0.5">
-                        Quét mã này để mở ngay Cổng Soát Vé / Điểm Danh đại biểu vào hội trường.
-                      </p>
-                    </div>
-
-                    <div className="flex justify-center p-3 bg-white rounded-2xl border border-slate-200 shadow-inner">
-                      <QrCanvas value={checkinUrl} size={168} />
-                    </div>
-
-                    <div className="space-y-1.5 text-xs">
-                      <div className="flex items-center justify-between">
-                        <span className="text-slate-500">Chức năng cổng:</span>
-                        <span className="font-bold text-slate-800 bg-slate-100 px-2 py-0.5 rounded">
-                          Soát Vé &amp; Điểm Danh
-                        </span>
-                      </div>
-                      <code className="block truncate rounded-lg bg-slate-100 px-2 py-1 font-mono text-[11px] text-[#DC2626]">
-                        {checkinUrl}
-                      </code>
-                    </div>
-                  </div>
-
-                  <div className="mt-4 pt-3 border-t border-slate-100 space-y-2">
-                    <div className="flex gap-2">
-                      <a
-                        href={checkinUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="flex-1 min-h-9 inline-flex items-center justify-center gap-1.5 rounded-xl bg-[#DC2626] hover:bg-[#b91c1c] text-white text-xs font-bold shadow-xs transition"
-                      >
-                        <UserCheck className="h-3.5 w-3.5" />
-                        <span>Mở Cổng Check-in</span>
-                      </a>
-                      <button
-                        type="button"
-                        onClick={copyCheckin}
-                        className="min-h-9 px-3 inline-flex items-center gap-1.5 rounded-xl border border-slate-200 hover:bg-slate-100 text-slate-700 text-xs font-semibold transition cursor-pointer"
-                      >
-                        {copiedCheckinLink ? <Check className="h-3.5 w-3.5 text-emerald-600" /> : <Copy className="h-3.5 w-3.5" />}
-                        <span>{copiedCheckinLink ? "Đã Chép" : "Chép Link"}</span>
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
+                  </>
+                );
+              })()}
             </div>
           </div>
         ) : (

@@ -52,11 +52,17 @@ export class PaymentController {
   }
 
   /**
-   * Endpoint Webhook chính thức của SePay
+   * Endpoint Webhook tương thích ngược của SePay: POST /payment/sepay-webhook
    */
   @Post('sepay-webhook')
-  handleSepayWebhook(@Body() payload: any) {
-    return this.paymentService.handleSepayWebhook(payload);
+  handleSepayWebhook(
+    @Body() payload: any,
+    @Req() req: any,
+  ) {
+    return this.paymentService.handleSepayWebhook(payload, {
+      headers: req.headers,
+      rawBody: req.rawBody,
+    });
   }
 
   @Get('sepay-config')
@@ -70,5 +76,22 @@ export class PaymentController {
       dto.orderId,
       dto.amount,
     );
+  }
+
+  /**
+   * Endpoint giả lập Webhook SePay trên Localhost: POST /payment/simulate-sepay
+   */
+  @Post('simulate-sepay')
+  simulateSepay(
+    @Body()
+    dto: {
+      type?: 'event_ticket' | 'membership_fee' | 'transfer' | 'general';
+      amount?: number;
+      accountNumber?: string;
+      content?: string;
+      referenceCode?: string;
+    },
+  ) {
+    return this.paymentService.simulateLocalWebhook(dto);
   }
 }

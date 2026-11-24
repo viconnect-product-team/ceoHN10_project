@@ -93,6 +93,28 @@ export class UsersRepository {
       }
     }
 
+    // 3. Member Code lookup: Cho phép đăng nhập app bằng Mã học viên (VD: HN10-001, CEO-01)
+    const memberCodeRows: any[] = (await this.prisma
+      .$queryRawUnsafe<any[]>(
+        `SELECT user_id, email FROM public.members 
+         WHERE (LOWER(TRIM(COALESCE(code, ''))) = LOWER(TRIM($1)) 
+            OR LOWER(TRIM(COALESCE(member_code, ''))) = LOWER(TRIM($1)))
+         LIMIT 1`,
+        input,
+      )
+      .catch(() => [])) as any[];
+
+    if (memberCodeRows.length > 0) {
+      if (memberCodeRows[0].user_id) {
+        const u = await this.findById(memberCodeRows[0].user_id);
+        if (u) return u;
+      }
+      if (memberCodeRows[0].email) {
+        const u = await this.findByEmail(memberCodeRows[0].email);
+        if (u) return u;
+      }
+    }
+
     return null;
   }
 
@@ -228,8 +250,10 @@ export class UsersRepository {
     userId: string,
     cleanPhone: string,
     userEmail: string,
+    memberCode?: string,
   ): Promise<void> {
-    if (cleanPhone || userEmail) {
+    const code = (memberCode || '').trim();
+    if (cleanPhone || userEmail || code) {
       await this.prisma.$executeRaw`
         UPDATE public.members
         SET user_id = ${userId}::uuid, updated_at = now()
@@ -237,6 +261,7 @@ export class UsersRepository {
           AND (
             (${cleanPhone} != '' AND regexp_replace(phone, '\\D', '', 'g') = ${cleanPhone})
             OR (${userEmail} != '' AND LOWER(email) = ${userEmail})
+            OR (${code} != '' AND (LOWER(TRIM(COALESCE(code, ''))) = LOWER(${code}) OR LOWER(TRIM(COALESCE(member_code, ''))) = LOWER(${code})))
           )
       `.catch((e) => console.warn('Could not auto-link member:', e));
     }

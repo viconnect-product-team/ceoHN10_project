@@ -1,7 +1,20 @@
 import React from "react";
-import { LayoutDashboard, BarChart3, FolderTree } from "lucide-react";
+import {
+  LayoutDashboard,
+  BarChart3,
+  FolderTree,
+  Coins,
+  ArrowLeftRight,
+  CreditCard,
+} from "lucide-react";
 
-export type FinanceViewMode = "dashboard" | "charts" | "unit_tree";
+export type FinanceViewMode =
+  | "dashboard"
+  | "charts"
+  | "unit_tree"
+  | "opening_balance"
+  | "transfers"
+  | "banking_sepay";
 
 interface FinanceViewModeTabsProps {
   viewMode: FinanceViewMode;
@@ -19,24 +32,38 @@ export function FinanceViewModeTabs({
       id: "dashboard" as const,
       label: "Dashboard Tổng Hợp",
       icon: LayoutDashboard,
-      desc: "Bảng số liệu KPI & Bảng Excel giao dịch chi tiết",
+    },
+    {
+      id: "opening_balance" as const,
+      label: "Số Dư Đầu Kỳ",
+      icon: Coins,
+    },
+    {
+      id: "transfers" as const,
+      label: "Điều Chuyển Nội Bộ",
+      icon: ArrowLeftRight,
+    },
+    {
+      id: "banking_sepay" as const,
+      label: "Ngân Hàng & SePay",
+      icon: CreditCard,
     },
     {
       id: "charts" as const,
-      label: "Biểu Đồ Cột & Tròn",
+      label: "Biểu Đồ & Dòng Tiền",
       icon: BarChart3,
-      desc: "Phân tích xu hướng dòng tiền & Tỷ trọng cơ cấu",
     },
     {
       id: "unit_tree" as const,
-      label: "Cây Đơn Vị",
+      label: "Cây Đơn Vị (6 Ban)",
       icon: FolderTree,
-      desc: "Phân cấp ngân sách theo 6 Ban & Khối Doanh nghiệp",
     },
   ];
 
   return (
-    <div className={`p-1.5 rounded-2xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex flex-wrap sm:flex-nowrap gap-1.5 shadow-2xs ${className}`}>
+    <div
+      className={`p-1 rounded-xl bg-card border border-border/80 flex flex-wrap items-center gap-1 shadow-xs ${className}`}
+    >
       {tabs.map((tab) => {
         const active = viewMode === tab.id;
         const Icon = tab.icon;
@@ -45,18 +72,23 @@ export function FinanceViewModeTabs({
             key={tab.id}
             type="button"
             onClick={() => onChange(tab.id)}
-            className={`flex-1 py-2 px-3.5 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 cursor-pointer ${
+            className={`flex-1 min-w-[150px] py-2 px-3.5 rounded-lg text-xs font-semibold transition-all flex items-center justify-center gap-2 cursor-pointer ${
               active
-                ? "bg-slate-900 dark:bg-slate-800 text-white shadow-sm ring-1 ring-slate-800"
-                : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white/60 dark:hover:bg-slate-800/60"
+                ? "bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-sm"
+                : "text-muted-foreground hover:text-foreground hover:bg-muted/80"
             }`}
           >
-            <Icon className={`size-4 shrink-0 ${active ? "text-amber-400" : "text-slate-400"}`} />
-            <span>{tab.label}</span>
+            <Icon
+              className={`size-4 shrink-0 transition-colors ${
+                active
+                  ? "text-amber-400 dark:text-amber-600"
+                  : "text-muted-foreground"
+              }`}
+            />
+            <span className="whitespace-nowrap tracking-tight">{tab.label}</span>
           </button>
         );
       })}
     </div>
   );
 }
-

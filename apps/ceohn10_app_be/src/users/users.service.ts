@@ -991,10 +991,11 @@ export class UsersService implements OnModuleInit {
       newUser.email || newUser.username,
     );
 
-    // Auto-link to approved member in public.members if matching phone or email
+    // Auto-link to approved member in public.members if matching phone, email or member code
     const cleanPhone = (newUser.username || '').replace(/\D/g, '');
     const userEmail = (newUser.email || '').toLowerCase().trim();
-    await this.usersRepo.autoLinkMember(newUser.id, cleanPhone, userEmail);
+    const potentialCode = (newUser.username || '').trim();
+    await this.usersRepo.autoLinkMember(newUser.id, cleanPhone, userEmail, potentialCode);
 
     return newUser;
   }

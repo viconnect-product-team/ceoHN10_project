@@ -18,7 +18,7 @@ export const DEFAULT_SIDEBAR_LABELS: Record<string, string> = {
   "/sponsors": "Nhà tài trợ",
   "/sponsor-packages": "Gói tài trợ",
   "/sponsor-report": "Báo cáo tài trợ",
-  "/fees": "Hội phí",
+  "/fees": "Phí tham gia CLB",
   "/income": "Khoản thu",
   "/expenses": "Khoản chi",
   "/finance-report": "Báo cáo tài chính",
@@ -61,6 +61,8 @@ export function dispatchSidebarLabelsSyncEvent() {
   }
 }
 
+let inFlightSidebarLabelsPromise: Promise<any> | null = null;
+
 export function useSidebarLabels() {
   const [labels, setLabels] = useState<Record<string, string>>(() => {
     if (typeof window !== "undefined") {
@@ -81,7 +83,12 @@ export function useSidebarLabels() {
     const token = getAuthToken();
     if (!token) return;
     try {
-      const res: any = await fetchNestApi("/admin/sidebar-labels");
+      if (!inFlightSidebarLabelsPromise) {
+        inFlightSidebarLabelsPromise = fetchNestApi("/admin/sidebar-labels").finally(() => {
+          inFlightSidebarLabelsPromise = null;
+        });
+      }
+      const res: any = await inFlightSidebarLabelsPromise;
       if (res && res.labels && typeof res.labels === "object") {
         const merged = { ...DEFAULT_SIDEBAR_LABELS, ...res.labels };
         setLabels(merged);

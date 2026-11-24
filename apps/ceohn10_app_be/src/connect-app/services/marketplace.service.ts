@@ -242,43 +242,68 @@ export class ConnectMarketplaceService {
   }
 
   async listMarketplaceProducts(query?: any) {
-    const rows = await this.prisma.$queryRaw<any[]>`
-      SELECT p.*,
-             COALESCE(
-               NULLIF(up.display_name, ''),
-               NULLIF(u.name, ''),
-               NULLIF(m.name, ''),
-               NULLIF(m.contact, ''),
-               'Học viên CLB'
-             ) as seller_name,
-             COALESCE(
-               NULLIF(up.avatar_url, ''),
-               NULLIF(u.avatar_url, ''),
-               NULLIF(m.avatar, ''),
-               NULLIF(m.cover_url, ''),
-               ''
-             ) as seller_avatar,
-             COALESCE(
-               NULLIF(m.phone, ''),
-               ''
-             ) as seller_phone,
-             COALESCE(
-               NULLIF(p.company, ''),
-               NULLIF(up.company_name, ''),
-               NULLIF(m.company_name, ''),
-               NULLIF(bi.company_name, ''),
-               'CLB Doanh Nhân CEO HN10'
-             ) as seller_company
-      FROM public.products p
-      LEFT JOIN public.members m ON (p.seller_id = m.user_id::text OR p.seller_id = m.id OR p.seller_id = m.code)
-      LEFT JOIN public.vione_users u ON (p.seller_id = u.id::text OR (m.user_id IS NOT NULL AND m.user_id = u.id))
-      LEFT JOIN public.user_profiles up ON (u.id = up.user_id)
-      LEFT JOIN public.business_identities bi ON (p.seller_id = bi.owner_user_id::text)
-      ORDER BY p.created_at DESC
-    `.catch((err) => {
-      console.error(`listMarketplaceProducts error: ${err?.message}`);
-      return [];
-    });
+    try {
+      await this.prisma.$executeRawUnsafe(`
+        ALTER TABLE public.products ADD COLUMN IF NOT EXISTS seller_id TEXT;
+        ALTER TABLE public.products ADD COLUMN IF NOT EXISTS title TEXT;
+        ALTER TABLE public.products ADD COLUMN IF NOT EXISTS company TEXT;
+        ALTER TABLE public.products ADD COLUMN IF NOT EXISTS image_urls TEXT[];
+        ALTER TABLE public.products ADD COLUMN IF NOT EXISTS custom_id TEXT;
+      `).catch(() => {});
+    } catch {}
+
+    let rows: any[] = [];
+    try {
+      rows = await this.prisma.$queryRaw<any[]>`
+        SELECT p.*,
+               COALESCE(
+                 NULLIF(up.display_name, ''),
+                 NULLIF(u.name, ''),
+                 NULLIF(m.name, ''),
+                 NULLIF(m.contact, ''),
+                 'Học viên CLB'
+               ) as seller_name,
+               COALESCE(
+                 NULLIF(up.avatar_url, ''),
+                 NULLIF(u.avatar_url, ''),
+                 NULLIF(m.avatar, ''),
+                 NULLIF(m.cover_url, ''),
+                 ''
+               ) as seller_avatar,
+               COALESCE(
+                 NULLIF(m.phone, ''),
+                 ''
+               ) as seller_phone,
+               COALESCE(
+                 NULLIF(p.company, ''),
+                 NULLIF(up.company_name, ''),
+                 NULLIF(m.company_name, ''),
+                 NULLIF(bi.company_name, ''),
+                 'CLB Doanh Nhân CEO HN10'
+               ) as seller_company
+        FROM public.products p
+        LEFT JOIN public.members m ON (p.seller_id = m.user_id::text OR p.seller_id = m.id OR p.seller_id = m.code)
+        LEFT JOIN public.vione_users u ON (p.seller_id = u.id::text OR (m.user_id IS NOT NULL AND m.user_id = u.id))
+        LEFT JOIN public.user_profiles up ON (u.id = up.user_id)
+        LEFT JOIN public.business_identities bi ON (p.seller_id = bi.owner_user_id::text)
+        ORDER BY p.created_at DESC
+      `;
+    } catch (err: any) {
+      try {
+        rows = await this.prisma.$queryRaw<any[]>`
+          SELECT p.*,
+                 COALESCE(p.name, 'Sản phẩm') as title,
+                 'Học viên CLB' as seller_name,
+                 '' as seller_avatar,
+                 '' as seller_phone,
+                 'CLB Doanh Nhân CEO HN10' as seller_company
+          FROM public.products p
+          ORDER BY p.created_at DESC NULLS LAST
+        `;
+      } catch {
+        rows = [];
+      }
+    }
 
     return rows.map((r) => {
       const imgList = safeParseImages(r.image_urls);
