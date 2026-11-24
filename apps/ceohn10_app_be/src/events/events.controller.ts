@@ -85,10 +85,11 @@ export class EventsController {
     }
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(OptionalJwtAuthGuard)
   @Get('my-events')
   async listMyEvents(@Request() req: any) {
-    return this.eventsService.listMyEvents(req.user.id);
+    const userId = req.user?.id || 'guest';
+    return this.eventsService.listMyEvents(userId);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -582,5 +583,42 @@ export class EventsController {
   @Post(':id/send-post-event-recap')
   async sendPostEventRecap(@Param('id') id: string) {
     return this.eventsService.sendPostEventRecap(id);
+  }
+
+  // UC-EVT-08: Gửi link kho ảnh Live Gallery qua Email & Zalo OA cho đại biểu
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('platform_admin', 'superadmin', 'adm', 'admin', 'bqt', 'btt', 'btk', 'bxt', 'member')
+  @Post(':id/share-gallery')
+  async shareEventLiveGallery(
+    @Param('id') id: string,
+    @Body('customMessage') customMessage?: string,
+  ) {
+    return this.eventsService.shareEventLiveGallery(id, customMessage);
+  }
+
+  // UC-EVT-10: Gửi báo cáo sự kiện qua Email / Zalo OA cho nhiều tài khoản
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('platform_admin', 'superadmin', 'adm', 'admin', 'bqt', 'btt', 'btk', 'bxt', 'member')
+  @Post(':id/send-report')
+  async sendEventReport(
+    @Param('id') id: string,
+    @Body() body: {
+      recipients: string[];
+      category?: string;
+      format?: string;
+      reportSummary?: any;
+    },
+  ) {
+    return this.eventsService.sendEventReport(id, body);
+  }
+
+  // UC-EVT-05-1: Đại biểu tự check-in bằng mã vé hoặc ảnh QR (Công khai, không cần đăng nhập)
+  @Post(':id/guest-self-checkin')
+  async guestSelfCheckin(
+    @Param('id') id: string,
+    @Body('ticketCode') ticketCode: string,
+    @Body('method') method?: string,
+  ) {
+    return this.eventsService.performTicketCheckin(ticketCode, method || 'guest_self_scan');
   }
 }

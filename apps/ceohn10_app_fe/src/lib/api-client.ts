@@ -104,8 +104,11 @@ export function getBaseApiUrl(): string {
       (process.env?.VITE_APP_SCOPE === "crm_platform" || process.env?.APP_SCOPE === "crm_platform")) ||
     (import.meta.env?.VITE_APP_SCOPE as string) === "crm_platform";
 
-  const isProduction = typeof process !== "undefined" && process.env?.NODE_ENV === "production";
-  if (isProduction) {
+  const isDocker =
+    typeof process !== "undefined" &&
+    (process.env?.IS_DOCKER === "true" || process.env?.DOCKER === "true");
+
+  if (isDocker) {
     return isCrmScope ? "http://ceohn10-crm-backend:4003" : "http://ceohn10-backend:4003";
   }
 

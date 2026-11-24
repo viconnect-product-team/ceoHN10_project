@@ -67,18 +67,22 @@ async function resolveDatabaseConfig() {
     'postgresql://app1:5%5ES0CEpvYwC1%28%23YN1UoJ@127.0.0.1:5432/ceohn10_project';
 
   // Nhận diện môi trường triển khai thực tế:
-  // 1. Khi chạy trên Server Dev / Production Container (NODE_ENV=production, Docker): Dùng CSDL Remote 113.20.107.184:6432
-  // 2. Khi chạy trên Localhost máy cá nhân: Luôn dùng CSDL Localhost 127.0.0.1:5432
-  const isServer =
-    process.env.NODE_ENV === 'production' ||
-    process.env.IS_DOCKER === 'true' ||
+  // 1. Khi chạy trong Docker container trên máy chủ Dev/Prod: Dùng CSDL Remote 113.20.107.184:6432
+  // 2. Khi chạy trên Localhost máy cá nhân: Kiểm tra 127.0.0.1:5432, nếu đang chạy thì dùng Local, nếu không probe được thì fallback Remote
+  const isDocker =
     fs.existsSync('/.dockerenv') ||
+    process.env.IS_DOCKER === 'true' ||
     Boolean(process.env.REMOTE_SERVER);
 
-  if (isServer) {
+  if (isDocker) {
     process.env.DATABASE_URL = process.env.REMOTE_DATABASE_URL || remoteDbUrl;
   } else {
-    process.env.DATABASE_URL = process.env.LOCAL_DATABASE_URL || localDbUrl;
+    const isLocalAlive = await probeTcp('127.0.0.1', 5432, 1200);
+    if (isLocalAlive) {
+      process.env.DATABASE_URL = process.env.LOCAL_DATABASE_URL || localDbUrl;
+    } else {
+      process.env.DATABASE_URL = process.env.REMOTE_DATABASE_URL || remoteDbUrl;
+    }
   }
 
   const isLocal =

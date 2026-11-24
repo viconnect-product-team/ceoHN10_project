@@ -10,7 +10,7 @@ import { useTheme } from "@/lib/theme";
 import { fetchNestApi } from "@/lib/api-client";
 import authBg from "@/assets/connect-auth-bg.jpg";
 
-const NAVY = "#003B95";
+const CHARCOAL = "#0F172A";
 const emblem83 = "/ceohn10-emblem-8.png";
 
 import { PullToRefresh } from "@/components/member/PullToRefresh";
@@ -452,7 +452,7 @@ function PwaInstallBanner() {
   if (!showBanner) return null;
 
   return (
-    <div className="relative z-30 flex items-center justify-between gap-2.5 bg-gradient-to-r from-[#001D4A] via-[#003B95] to-[#001D4A] px-3.5 py-2 text-white shadow-md border-b border-amber-400/30 shrink-0 select-none">
+    <div className="relative z-30 flex items-center justify-between gap-2.5 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 px-3.5 py-2 text-white shadow-md border-b border-amber-400/30 shrink-0 select-none">
       <div className="flex items-center gap-2 min-w-0">
         <div className="grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-amber-500/20 text-amber-400 border border-amber-400/40">
           <Smartphone className="h-4 w-4" />
@@ -541,7 +541,7 @@ export function MemberHeader({
           <button
             onClick={handleBack}
             aria-label={t("m.shell.back")}
-            className="grid h-9 w-9 place-items-center rounded-full text-[#003B95] dark:text-blue-400 hover:text-[#002B70] transition hover:bg-black/5 dark:hover:bg-white/5 active:scale-90 cursor-pointer"
+            className="grid h-9 w-9 place-items-center rounded-full text-slate-800 dark:text-slate-200 hover:text-slate-950 transition hover:bg-black/5 dark:hover:bg-white/5 active:scale-90 cursor-pointer"
           >
             <ChevronLeft className="h-5 w-5" />
           </button>
@@ -559,7 +559,7 @@ export function MemberHeader({
 }
 
 function FooterHomeIcon({ active, brandColor }: { active: boolean; brandColor?: string }) {
-  const activeColor = brandColor || "var(--vba-navy)";
+  const activeColor = brandColor || "var(--vba-charcoal, #0F172A)";
   return (
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="size-6 transition-all duration-200">
       <path d="M10 18L14 18" stroke={active ? activeColor : "#8F8F8F"} strokeWidth={active ? "2" : "1.5"} strokeLinecap="round" strokeLinejoin="round" />
@@ -569,7 +569,7 @@ function FooterHomeIcon({ active, brandColor }: { active: boolean; brandColor?: 
 }
 
 function FooterEventsIcon({ active, brandColor }: { active: boolean; brandColor?: string }) {
-  const activeColor = brandColor || "var(--vba-navy)";
+  const activeColor = brandColor || "var(--vba-charcoal, #0F172A)";
   return (
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="size-6 transition-all duration-200">
       <rect x="3" y="4" width="18" height="18" rx="3" stroke={active ? activeColor : "#8F8F8F"} strokeWidth={active ? "2" : "1.5"} />
@@ -587,7 +587,7 @@ function FooterEventsIcon({ active, brandColor }: { active: boolean; brandColor?
 }
 
 function FooterConnectIcon({ active, brandColor }: { active: boolean; brandColor?: string }) {
-  const activeColor = brandColor || "var(--vba-navy)";
+  const activeColor = brandColor || "var(--vba-charcoal, #0F172A)";
   return (
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="size-6 transition-all duration-200">
       <circle cx="9" cy="7" r="4" stroke={active ? activeColor : "#8F8F8F"} strokeWidth={active ? "2" : "1.5"} />
@@ -598,7 +598,7 @@ function FooterConnectIcon({ active, brandColor }: { active: boolean; brandColor
 }
 
 function FooterUserIcon({ active, brandColor }: { active: boolean; brandColor?: string }) {
-  const activeColor = brandColor || "var(--vba-navy)";
+  const activeColor = brandColor || "var(--vba-charcoal, #0F172A)";
   return (
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="size-6 transition-all duration-200">
       <path d="M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12Z" stroke={active ? activeColor : "#8F8F8F"} strokeWidth={active ? "2.2" : "1.75"} />
@@ -738,8 +738,8 @@ function MemberTabBar() {
     "/association": { vi: "Trang chủ", en: "Home" },
     "/association/events": { vi: "Hoạt động", en: "Activities" },
     "/association/card": { vi: "Quét QR", en: "Scan QR" },
-    "/association/connect": { vi: "Kết nối", en: "Connect" },
-    "/association/messages": { vi: "Kết nối", en: "Connect" },
+    "/association/connect": { vi: "Gắn kết", en: "Connect" },
+    "/association/messages": { vi: "Gắn kết", en: "Connect" },
     "/association/profile": { vi: "Cá nhân", en: "Profile" },
   };
 
@@ -929,26 +929,19 @@ function MemberTabBar() {
   const isMustChangePassword = typeof window !== "undefined" && localStorage.getItem("vba_must_change_password") === "true";
   // Bottom tab bar remains persistent so search/input focus never causes footer loss.
   if (isMustChangePassword) return null;
-  // Trang chủ Học viên CEO HN10 (/association) đã tích hợp thanh Floating Luxury Footer Mẫu 1 độc quyền
-  if (pathname === "/association" || pathname === "/association/") return null;
 
   return (
     <>
       <nav
-        className="vba-bottom-bar sticky bottom-0 z-40 mx-auto w-full max-w-[480px] shrink-0 select-none transition-all duration-200 bg-white dark:bg-[var(--vba-bg-2)] border-t border-slate-200/80 dark:border-slate-800/80 shadow-[0_-4px_20px_rgba(0,0,0,0.06)]"
-        style={{
-          bottom: 0,
-          marginBottom: 0,
-          paddingBottom: "max(env(safe-area-inset-bottom, 0px), 6px)",
-        }}
+        className="vba-bottom-bar sticky bottom-0 z-40 mx-auto w-full max-w-[480px] shrink-0 select-none transition-all duration-200 px-3 pb-[max(env(safe-area-inset-bottom,0px),10px)] pt-1.5 bg-gradient-to-t from-slate-100/90 via-slate-50/70 to-transparent dark:from-slate-950/90 dark:via-slate-900/70 pointer-events-none"
       >
         <div
-          className="relative flex items-end justify-around px-2 pt-1.5 backdrop-blur-xl transition-all"
+          className="pointer-events-auto relative flex items-center justify-between gap-1.5 p-1.5 rounded-[26px] bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border border-slate-200/90 dark:border-slate-800 shadow-[0_8px_30px_rgba(15,23,42,0.12)] transition-all"
         >
           {/* Festive Mid-Autumn Corner Dangling Lantern */}
           {isMidAutumn && (
             <div
-              className="pointer-events-none absolute left-2 -top-3.5 flex flex-col items-center select-none"
+              className="pointer-events-none absolute left-3 -top-3.5 flex flex-col items-center select-none"
               aria-hidden="true"
             >
               <span
@@ -963,7 +956,7 @@ function MemberTabBar() {
           {/* Festive Mid-Autumn Corner Moon Rabbit */}
           {isMidAutumn && (
             <div
-              className="pointer-events-none absolute right-2.5 -top-3.5 flex flex-col items-center select-none"
+              className="pointer-events-none absolute right-3.5 -top-3.5 flex flex-col items-center select-none"
               aria-hidden="true"
             >
               <span className="text-[13px] animate-pulse filter drop-shadow-[0_2px_6px_rgba(251,191,36,0.8)]">
@@ -993,13 +986,8 @@ function MemberTabBar() {
             };
 
             if (tab.center) {
-              const primaryColor = brandColorTheme?.primaryColor || "#334155";
-              const primaryDeep = brandColorTheme?.primaryDeep || "#1E293B";
-              const accentLight = brandColorTheme?.accentLight || "#94A3B8";
-              const accentColor = brandColorTheme?.accentColor || "#64748B";
-
               return (
-                <div key={tab.to} className="relative flex flex-1 flex-col items-center justify-center">
+                <div key={tab.to} className="relative flex flex-col items-center justify-center shrink-0 px-0.5">
                   <button
                     type="button"
                     onClick={() => {
@@ -1008,68 +996,46 @@ function MemberTabBar() {
                       setQrModalOpen(true);
                     }}
                     aria-label="Quét mã QR Check-in"
-                    className="-mt-6 relative flex flex-col items-center group active:scale-95 transition-transform cursor-pointer border-0 bg-transparent p-0 outline-none"
+                    className="-mt-5 relative size-12 rounded-full bg-slate-900 text-white border-2 border-white dark:border-slate-800 shadow-[0_6px_20px_rgba(15,23,42,0.35)] flex flex-col items-center justify-center active:scale-90 transition-transform cursor-pointer outline-none group"
                   >
-                    {/* Nút tròn Quét mã QR: Nền gradient Executive Slate sang trọng */}
-                    <span
-                      className="relative grid h-14 w-14 place-items-center rounded-full shadow-lg group-hover:scale-105 group-active:scale-95 transition-all overflow-hidden p-2.5"
-                      style={{
-                        background: `linear-gradient(135deg, ${primaryColor} 0%, ${primaryDeep} 100%)`,
-                        border: `2.5px solid #FFFFFF`,
-                        boxShadow: `0 4px 14px rgba(51, 65, 85, 0.4)`,
-                      }}
-                    >
-                      {/* Icon Quét Scan khi đang quét -> Icon Mã QR tĩnh 2s khi quét xong (Yêu cầu 1) */}
-                      {isScanningPhase ? (
-                        <Scan className="size-7 text-white stroke-[2.3] relative z-10 animate-pulse shrink-0" />
-                      ) : (
-                        <QrCode className="size-7 text-white stroke-[2.3] relative z-10 animate-in fade-in zoom-in-95 duration-200 shrink-0" />
-                      )}
+                    {isScanningPhase ? (
+                      <Scan className="size-6 text-white stroke-[2.3] animate-pulse" />
+                    ) : (
+                      <QrCode className="size-6 text-white stroke-[2.3] animate-in fade-in zoom-in-95 duration-200" />
+                    )}
 
-                      {/* MoMo-style Scanning Laser Beam: Chỉ hiện và quét từ trên xuống khi trong chu kỳ quét */}
-                      {isScanningPhase && (
-                        <>
-                          <div
-                            className="absolute inset-x-1.5 h-[3px] bg-gradient-to-r from-transparent via-cyan-300 to-transparent shadow-[0_0_10px_#38bdf8] pointer-events-none z-20"
-                            style={{
-                              animation: "momoLaserScan 2s cubic-bezier(0.4, 0, 0.2, 1) infinite",
-                            }}
-                          />
-                          <div
-                            className="absolute inset-0 bg-cyan-400/15 pointer-events-none z-10"
-                            style={{
-                              animation: "momoLaserPulse 2s ease-in-out infinite",
-                            }}
-                          />
-                        </>
-                      )}
+                    {/* MoMo-style Scanning Laser Beam: Chỉ hiện và quét từ trên xuống khi trong chu kỳ quét */}
+                    {isScanningPhase && (
+                      <div
+                        className="absolute inset-x-1.5 h-[2.5px] bg-gradient-to-r from-transparent via-cyan-300 to-transparent shadow-[0_0_8px_#38bdf8] pointer-events-none"
+                        style={{
+                          animation: "momoLaserScan 2s cubic-bezier(0.4, 0, 0.2, 1) infinite",
+                        }}
+                      />
+                    )}
 
-                      {isThemeActive && (
-                        <span
-                          className="absolute -top-1 -right-1 text-[11px] select-none z-30 filter drop-shadow-sm animate-bounce"
-                          aria-hidden="true"
-                        >
-                          {activeThemeOption.id === "tet"
-                            ? "🧧"
-                            : activeThemeOption.id === "christmas"
-                              ? "🔔"
-                              : activeThemeOption.id === "national-day"
-                                ? "🇻🇳"
-                                : activeThemeOption.id === "mid-autumn"
-                                  ? "🌕"
-                                  : activeThemeOption.id === "ceohn10-birthday"
-                                    ? "🎂"
-                                    : activeThemeOption.iconEmoji || "✨"}
-                        </span>
-                      )}
-                    </span>
-                    <span
-                      className="self-stretch text-center justify-start text-xs font-semibold font-['Inter'] leading-4 mt-1 transition-colors"
-                      style={{ color: primaryColor }}
-                    >
-                      Quét QR
-                    </span>
+                    {isThemeActive && (
+                      <span
+                        className="absolute -top-1 -right-1 text-[11px] select-none z-30 filter drop-shadow-sm animate-bounce"
+                        aria-hidden="true"
+                      >
+                        {activeThemeOption.id === "tet"
+                          ? "🧧"
+                          : activeThemeOption.id === "christmas"
+                            ? "🔔"
+                            : activeThemeOption.id === "national-day"
+                              ? "🇻🇳"
+                              : activeThemeOption.id === "mid-autumn"
+                                ? "🌕"
+                                : activeThemeOption.id === "ceohn10-birthday"
+                                  ? "🎂"
+                                  : activeThemeOption.iconEmoji || "✨"}
+                      </span>
+                    )}
                   </button>
+                  <span className="text-[9.5px] font-bold text-slate-800 dark:text-slate-200 mt-0.5 leading-3">
+                    Quét QR
+                  </span>
                 </div>
               );
             }
@@ -1163,28 +1129,27 @@ function MemberTabBar() {
                 to={tab.to}
                 search={linkSearch as any}
                 onClick={handleTabClick}
-                className="relative flex flex-1 flex-col items-center justify-end gap-1 py-1 transition-all touch-press select-none-touch active:scale-92 cursor-pointer"
+                className={`relative flex-1 py-1.5 px-1 rounded-2xl flex flex-col items-center justify-center gap-0.5 transition-all duration-200 active:scale-95 cursor-pointer border ${
+                  active
+                    ? "bg-slate-900 text-white border-slate-900 shadow-sm"
+                    : "bg-slate-50/80 dark:bg-slate-800/40 border-slate-200/70 dark:border-slate-700/60 text-slate-600 dark:text-slate-400 hover:bg-slate-100/90 dark:hover:bg-slate-800/80"
+                }`}
               >
                 <div className="relative">
-                  {Icon && <Icon active={active} brandColor={brandColorTheme?.primaryColor} />}
+                  {Icon && <Icon active={active} brandColor={active ? "#FFFFFF" : undefined} />}
                   {notificationBadge || seasonalBadge}
                 </div>
                 <span
-                  className={`text-xs transition-colors select-none font-['Inter'] leading-4 ${active ? "font-semibold" : "font-normal text-slate-500 dark:text-slate-400"
-                    }`}
-                  style={active ? { color: brandColorTheme?.primaryColor || "var(--vba-navy)" } : undefined}
+                  className={`text-[10px] tracking-tight leading-3 select-none font-['Inter'] ${
+                    active
+                      ? "font-bold text-white"
+                      : "font-medium text-slate-600 dark:text-slate-400"
+                  }`}
                 >
                   {lang === "en"
                     ? tabLabels[tab.to]?.en || t(tab.label)
                     : tabLabels[tab.to]?.vi || t(tab.label)}
                 </span>
-                {/* Dot indicator khi tab active */}
-                {active && (
-                  <span
-                    className="h-1.5 w-1.5 rounded-full shadow-sm -mt-0.5 animate-in fade-in zoom-in duration-200"
-                    style={{ backgroundColor: brandColorTheme?.primaryColor || "var(--vba-navy)" }}
-                  />
-                )}
               </Link>
             );
           })}
@@ -1194,9 +1159,8 @@ function MemberTabBar() {
         open={qrModalOpen}
         onClose={() => {
           setQrModalOpen(false);
-          navigate({ to: "/association/card" as any });
         }}
-        defaultTab="my_qr"
+        defaultTab="scan_qr"
         memberCode={memberCode}
         memberName={memberName}
         memberTitle={memberTitle}

@@ -70,6 +70,32 @@ export function EventWheelOfFortuneModal({
   const [allCandidates, setAllCandidates] = useState<CandidateItem[]>([]);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedPosition, setSelectedPosition] = useState<string>("");
+
+  // UC-EVT-07: Trích xuất danh mục chức danh duy nhất của những người đã check-in
+  const uniquePositions = useMemo(() => {
+    const set = new Set<string>();
+    for (const c of allCandidates) {
+      if (c.position && c.position.trim()) {
+        set.add(c.position.trim());
+      }
+    }
+    return Array.from(set).sort();
+  }, [allCandidates]);
+
+  const handleFilterByPosition = (pos: string) => {
+    setSelectedPosition(pos);
+    if (!pos) {
+      setSelectedIds(new Set(allCandidates.map((c) => c.id)));
+      toast.info(`Đã chọn lại tất cả ${allCandidates.length} đại biểu đã check-in vào vòng quay.`);
+      return;
+    }
+    const matching = allCandidates.filter(
+      (c) => c.position && c.position.trim().toLowerCase() === pos.trim().toLowerCase()
+    );
+    setSelectedIds(new Set(matching.map((c) => c.id)));
+    toast.success(`Đã tự động chọn ${matching.length} đại biểu có chức danh "${pos}" vào vòng quay may mắn!`);
+  };
 
   const [availablePrizes, setAvailablePrizes] = useState<PrizeItem[]>(() => {
     return prizes.length > 0
@@ -480,6 +506,40 @@ export function EventWheelOfFortuneModal({
                   </button>
                 </div>
               </div>
+
+              {/* UC-EVT-07: Chọn điều kiện Chức Danh để tự động add người đã check-in vào vòng quay */}
+              {uniquePositions.length > 0 && (
+                <div className="space-y-1 bg-amber-50/50 dark:bg-amber-950/20 p-2.5 rounded-xl border border-amber-200 dark:border-amber-900/60">
+                  <div className="flex items-center justify-between text-[11px] font-bold text-amber-900 dark:text-amber-300">
+                    <span>Lọc theo chức danh tham gia:</span>
+                    {selectedPosition && (
+                      <button
+                        type="button"
+                        onClick={() => handleFilterByPosition("")}
+                        className="text-amber-700 dark:text-amber-400 hover:underline cursor-pointer text-[10px]"
+                      >
+                        Hủy lọc (Lấy tất cả)
+                      </button>
+                    )}
+                  </div>
+                  <select
+                    value={selectedPosition}
+                    onChange={(e) => handleFilterByPosition(e.target.value)}
+                    disabled={isSpinning}
+                    className="w-full px-2.5 py-1.5 text-xs rounded-lg border border-amber-300 dark:border-amber-800 bg-white dark:bg-card font-semibold text-foreground outline-none cursor-pointer"
+                  >
+                    <option value="">-- Tất cả chức danh đã check-in (Mặc định: {allCandidates.length} người) --</option>
+                    {uniquePositions.map((pos) => {
+                      const count = allCandidates.filter((c) => c.position && c.position.trim().toLowerCase() === pos.toLowerCase()).length;
+                      return (
+                        <option key={pos} value={pos}>
+                          {pos} ({count} đại biểu)
+                        </option>
+                      );
+                    })}
+                  </select>
+                </div>
+              )}
 
               {/* Tìm kiếm nhanh */}
               <input

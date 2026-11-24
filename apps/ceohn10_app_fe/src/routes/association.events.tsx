@@ -37,7 +37,6 @@ import {
   AlertTriangle,
   Share2,
   Headphones,
-  ScanLine,
 } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
@@ -465,12 +464,12 @@ function EventPosterCard({
           className={`px-2.5 py-1 right-[48px] top-[12.64px] absolute rounded-3xl inline-flex justify-start items-center gap-1.5 shadow-md z-10 ${isPast
             ? "bg-slate-700 text-slate-200"
             : registered
-              ? "bg-blue-600 text-white"
+              ? "bg-slate-900 text-white"
               : isFull
                 ? "bg-rose-600 text-white"
                 : isFree
                   ? "bg-sky-500 text-white"
-                  : "bg-[#003B95] text-white font-bold"
+                  : "bg-slate-900 text-white font-bold"
             }`}
         >
           <div className="size-1.5 bg-white rounded-full" />
@@ -496,7 +495,7 @@ function EventPosterCard({
             toast.success(isBookmarked ? "Đã bỏ lưu sự kiện" : "Đã lưu sự kiện vào danh sách quan tâm");
           }}
           className={`size-8 right-[12.64px] top-[12.64px] absolute rounded-full outline outline-1 outline-offset-[-1.05px] outline-white/20 inline-flex justify-center items-center overflow-hidden transition cursor-pointer shadow-md z-10 ${isBookmarked
-            ? "bg-[#003B95] text-white font-bold"
+            ? "bg-slate-900 text-white font-bold"
             : "bg-stone-900/80 hover:bg-stone-800 text-white"
             }`}
           title={isBookmarked ? "Bỏ lưu sự kiện" : "Lưu sự kiện"}
@@ -529,19 +528,19 @@ function EventPosterCard({
         </div>
 
         {/* Title */}
-        <div className="self-stretch text-slate-800 dark:text-white text-sm font-bold font-sans leading-5 group-hover:text-[#003B95] dark:group-hover:text-blue-400 transition-colors line-clamp-2">
+        <div className="self-stretch text-slate-800 dark:text-white text-sm font-bold font-sans leading-5 group-hover:text-slate-900 dark:group-hover:text-blue-400 transition-colors line-clamp-2">
           {event.title}
         </div>
 
         {/* Date row */}
         <div className="inline-flex justify-start items-center gap-1.5 text-slate-500 dark:text-slate-400">
-          <Calendar className="size-3.5 text-[#003B95]" />
+          <Calendar className="size-3.5 text-slate-900" />
           <span className="text-xs font-sans leading-4">{eventDateStr}</span>
         </div>
 
         {/* Location row */}
         <div className="self-stretch inline-flex justify-start items-center gap-1.5 text-slate-500 dark:text-slate-400">
-          <MapPin className="size-3.5 text-[#003B95] shrink-0" />
+          <MapPin className="size-3.5 text-slate-900 shrink-0" />
           <span className="flex-1 text-xs font-normal font-sans line-clamp-1">
             {event.place || "Hà Nội"}
           </span>
@@ -576,8 +575,8 @@ function EventPosterCard({
                 className="px-2 py-[3.16px] bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 rounded-[31.61px] outline outline-[0.74px] outline-offset-[-0.74px] outline-slate-200 dark:outline-slate-700 flex justify-start items-center gap-1 transition cursor-pointer"
                 title="Chia sẻ sự kiện"
               >
-                <Share2 className="size-3 text-[#003B95] dark:text-blue-400" />
-                <span className="text-[#003B95] dark:text-blue-400 text-[9.48px] font-bold font-sans leading-3">Chia sẻ</span>
+                <Share2 className="size-3 text-slate-900 dark:text-slate-400" />
+                <span className="text-slate-900 dark:text-slate-400 text-[9.48px] font-bold font-sans leading-3">Chia sẻ</span>
               </button>
             )}
             {!isPast && (
@@ -589,8 +588,8 @@ function EventPosterCard({
                 }}
                 className="px-2 py-[3.16px] bg-slate-100 dark:bg-slate-800 rounded-[31.61px] outline outline-[0.74px] outline-offset-[-0.74px] outline-slate-200 dark:outline-slate-700 flex justify-start items-center gap-1 hover:bg-slate-200 transition cursor-pointer"
               >
-                <Calendar className="size-3 text-[#003B95] dark:text-[#003B95]" />
-                <span className="text-[#003B95] dark:text-[#003B95] text-[9.48px] font-normal font-sans leading-3">Lịch</span>
+                <Calendar className="size-3 text-slate-900 dark:text-slate-900" />
+                <span className="text-slate-900 dark:text-slate-900 text-[9.48px] font-normal font-sans leading-3">Lịch</span>
               </button>
             )}
           </div>
@@ -615,14 +614,14 @@ function EventPosterCard({
                   if (onOpenRecap) onOpenRecap(event);
                   else onSelect(event);
                 }}
-                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-[#003B95] hover:bg-[#002B70] text-white text-[11px] font-bold shadow-xs transition active:scale-95 cursor-pointer"
+                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-[11px] font-bold shadow-xs transition active:scale-95 cursor-pointer"
                 title="Xem biên bản, nhà tài trợ, biểu quyết, giải thưởng, chỗ ngồi & ảnh drive"
               >
                 <Trophy className="size-3 text-amber-300" />
                 <span>Biên bản & Kỷ niệm</span>
               </button>
             ) : (
-              <div className="flex justify-start items-center gap-1 text-[#003B95] hover:text-amber-700 dark:text-[#003B95] font-bold text-xs font-sans group cursor-pointer">
+              <div className="flex justify-start items-center gap-1 text-slate-900 hover:text-amber-700 dark:text-slate-900 font-bold text-xs font-sans group cursor-pointer">
                 <span>{registered ? "Xem vé" : isFull ? "Xem chi tiết" : "Đăng ký vé"}</span>
                 <ArrowRight className="size-3 group-hover:translate-x-0.5 transition-transform" />
               </div>
@@ -1125,7 +1124,7 @@ function FeaturedUpcomingEventHero({
                 {dateStr}
               </span>
             </div>
-            <div className="px-2 py-0.5 bg-blue-50/90 dark:bg-blue-950/90 text-[#003B95] dark:text-blue-300 border border-blue-200 dark:border-blue-800 rounded-full text-xs font-semibold backdrop-blur-md">
+            <div className="px-2 py-0.5 bg-slate-100/90 dark:bg-slate-800/90 text-slate-900 dark:text-slate-300 border border-slate-300 dark:border-blue-800 rounded-full text-xs font-semibold backdrop-blur-md">
               {categoryStr}
             </div>
           </div>
@@ -1148,7 +1147,7 @@ function FeaturedUpcomingEventHero({
                   e.stopPropagation();
                   onSelectEvent(activeEvent);
                 }}
-                className="px-3 py-1.5 bg-white text-[#003B95] rounded-lg border border-slate-200 flex justify-start items-center gap-1.5 text-xs font-semibold shadow-xs hover:bg-slate-50 active:scale-95 transition cursor-pointer shrink-0"
+                className="px-3 py-1.5 bg-white text-slate-900 rounded-lg border border-slate-200 flex justify-start items-center gap-1.5 text-xs font-semibold shadow-xs hover:bg-slate-50 active:scale-95 transition cursor-pointer shrink-0"
               >
                 <span>Xem ngay</span>
                 <img src="/icons/events/arrow-right-02.svg" className="size-4" alt="arrow" />
@@ -1166,7 +1165,7 @@ function FeaturedUpcomingEventHero({
             type="button"
             onClick={() => setActiveIdx(i)}
             className={`transition-all duration-300 cursor-pointer ${i === activeIdx
-              ? "w-2.5 h-1 bg-[#003B95] rounded-[99px]"
+              ? "w-2.5 h-1 bg-slate-900 rounded-[99px]"
               : "size-1 bg-slate-300 dark:bg-slate-700 rounded-[99px] hover:bg-slate-400"
               }`}
           />
@@ -1189,6 +1188,43 @@ function EventsScreen() {
   const doCancel = useServerFn(cancelEventRegistration);
   const { data: serverEvents, loading, reload } = useServerData<MyEvent[]>(() => fetchEvents(), [], "vba_events");
   const { data: member } = useServerData<MyMember | null>(() => fetchMember(), null, "vba_my_member");
+  const [clientEvents, setClientEvents] = useState<MyEvent[]>([]);
+
+  useEffect(() => {
+    let isMounted = true;
+    fetchNestApi<any[]>("/events/my-events")
+      .then((data) => {
+        if (!isMounted) return;
+        if (Array.isArray(data) && data.length > 0) {
+          setClientEvents(data);
+        } else {
+          fetchNestApi<any[]>("/events").then((evList) => {
+            if (!isMounted) return;
+            if (Array.isArray(evList) && evList.length > 0) {
+              const mapped: MyEvent[] = evList.map((e: any) => ({
+                id: e.id,
+                day: e.day || (e.date ? new Date(e.date).getDate().toString() : "20"),
+                month: e.month || (e.date ? `TH${new Date(e.date).getMonth() + 1}` : "TH10"),
+                title: e.name || e.title || "Sự kiện CLB CEO HN10",
+                time: e.time || `${e.start_time || "08:00"} - ${e.end_time || "11:30"}`,
+                place: e.location || "CLB Doanh Nhân CEO HN10",
+                registered: Boolean(e.registered),
+                date: e.date,
+                description: e.description,
+                image: e.image || e.banner,
+                banner: e.banner || e.image,
+                ticketPrice: Number(e.ticket_price || e.fee || 0),
+                fee: Number(e.fee || e.ticket_price || 0),
+                capacity: Number(e.capacity || 0),
+              }));
+              setClientEvents(mapped);
+            }
+          }).catch(() => {});
+        }
+      })
+      .catch(() => {});
+    return () => { isMounted = false; };
+  }, []);
 
   const [busy, setBusy] = useState<string | null>(null);
   const [localRegistered, setLocalRegistered] = useState<Record<string, boolean>>(() => {
@@ -1520,7 +1556,7 @@ function EventsScreen() {
     return !!e.registered;
   };
 
-  const events = serverEvents || [];
+  const events = (serverEvents && serverEvents.length > 0) ? serverEvents : clientEvents;
   const upcomingEvents = events.filter((e) => !isEventPast(e));
   const pastEvents = events.filter((e) => isEventPast(e));
 
@@ -1675,20 +1711,29 @@ function EventsScreen() {
     }
 
     try {
-      const res = await doRegister({
-        data: {
-          eventId,
-          fullName: formName.trim(),
-          phone: formPhone.trim(),
-          email: formEmail.trim(),
-          company: formCompany.trim(),
-          position: formPosition.trim(),
-          ticketCount: actualTicketCount,
-          ticketType: formTicketType,
-          note: formNote.trim(),
-          confirmOverlap,
-        },
-      });
+      const regPayload = {
+        eventId,
+        fullName: formName.trim(),
+        phone: formPhone.trim(),
+        email: formEmail.trim(),
+        company: formCompany.trim(),
+        position: formPosition.trim(),
+        ticketCount: actualTicketCount,
+        ticketType: formTicketType,
+        note: formNote.trim(),
+        confirmOverlap,
+      };
+
+      let res: any = null;
+      try {
+        res = await doRegister({ data: regPayload });
+      } catch (fnErr) {
+        // Fallback trực tiếp bằng client fetchNestApi mang token localStorage
+        res = await fetchNestApi(`/events/${encodeURIComponent(eventId)}/register`, {
+          method: "POST",
+          body: JSON.stringify(regPayload),
+        }).catch(() => null);
+      }
 
       if (isFree) {
         setLocalRegistered((prev) => ({ ...prev, [eventId]: true }));
@@ -2058,13 +2103,13 @@ function EventsScreen() {
               >
                 <div className="self-stretch py-3 relative flex flex-col justify-center items-center gap-2.5 overflow-hidden">
                   <div className={`text-base font-['Inter'] leading-5 transition-colors ${mainTab === "events"
-                    ? "text-[#003B95] dark:text-blue-400 font-semibold"
+                    ? "text-slate-900 dark:text-slate-400 font-semibold"
                     : "text-slate-600 dark:text-slate-400 font-normal hover:text-slate-900 dark:hover:text-white"
                     }`}>
                     Sự kiện
                   </div>
                   {mainTab === "events" && (
-                    <div className="w-full h-0 left-0 top-[44px] absolute border-b-2 border-[#003B95] dark:border-blue-400"></div>
+                    <div className="w-full h-0 left-0 top-[44px] absolute border-b-2 border-slate-800 dark:border-blue-400"></div>
                   )}
                 </div>
               </button>
@@ -2077,13 +2122,13 @@ function EventsScreen() {
               >
                 <div className="self-stretch py-3 relative flex flex-col justify-center items-center gap-2.5 overflow-hidden">
                   <div className={`text-base font-['Inter'] leading-5 transition-colors ${mainTab === "meetings"
-                    ? "text-[#003B95] dark:text-blue-400 font-semibold"
+                    ? "text-slate-900 dark:text-slate-400 font-semibold"
                     : "text-slate-600 dark:text-slate-400 font-normal hover:text-slate-900 dark:hover:text-white"
                     }`}>
                     Hoạt động
                   </div>
                   {mainTab === "meetings" && (
-                    <div className="w-full h-0 left-0 top-[44px] absolute border-b-2 border-[#003B95] dark:border-blue-400"></div>
+                    <div className="w-full h-0 left-0 top-[44px] absolute border-b-2 border-slate-800 dark:border-blue-400"></div>
                   )}
                 </div>
               </button>
@@ -2110,7 +2155,7 @@ function EventsScreen() {
                     const el = document.getElementById("all-events-section");
                     if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
                   }}
-                  className="text-xs font-semibold text-[#003B95] dark:text-blue-400 hover:underline inline-flex items-center gap-1 cursor-pointer transition active:scale-95"
+                  className="text-xs font-semibold text-slate-900 dark:text-slate-400 hover:underline inline-flex items-center gap-1 cursor-pointer transition active:scale-95"
                 >
                   <span>Xem tất cả ({allEventsCount})</span>
                   <img src="/icons/events/arrow-right-02.svg" className="size-3.5" alt="all" />
@@ -2133,36 +2178,13 @@ function EventsScreen() {
                 </div>
               </div>
 
-              {/* NÚT CHECK-IN SỰ KIỆN QUAN TRỌNG (YÊU CẦU 5) */}
-              <div className="w-full flex items-center gap-2">
-                <Link
-                  to="/association/checkin"
-                  className="flex-1 py-3 px-4 rounded-2xl bg-gradient-to-r from-red-600 to-rose-700 text-white font-black text-xs shadow-md flex items-center justify-center gap-2 transition active:scale-98 cursor-pointer hover:from-red-700 hover:to-rose-800"
-                >
-                  <ScanLine className="size-4 text-amber-300" />
-                  <span>Check-in Sự Kiện Ngay (Quét Mã QR)</span>
-                </Link>
-
-                {registeredEvents.length > 0 && (
-                  <button
-                    type="button"
-                    onClick={() => setAllTicketsModalOpen(true)}
-                    className="py-3 px-3.5 rounded-2xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-black text-xs shadow-md flex items-center justify-center gap-1.5 transition active:scale-98 cursor-pointer"
-                    title="Mở Thẻ Vé QR của tôi"
-                  >
-                    <Ticket className="size-4" />
-                    <span>Vé ({registeredEvents.length})</span>
-                  </button>
-                )}
-              </div>
-
               {/* Shortcut Danh Mục Lịch Hoạt Động CLB */}
               <Link
                 to="/association/calendar"
-                className="w-full p-3 rounded-2xl bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-slate-900 dark:to-blue-950/40 border border-blue-200 dark:border-blue-800/60 shadow-xs flex items-center justify-between group hover:border-[#003B95] transition"
+                className="w-full p-3 rounded-2xl bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-slate-900 dark:to-blue-950/40 border border-slate-300 dark:border-blue-800/60 shadow-xs flex items-center justify-between group hover:border-slate-800 transition"
               >
                 <div className="flex items-center gap-2.5">
-                  <div className="size-9 rounded-xl bg-[#003B95] text-white flex items-center justify-center font-bold shadow-xs">
+                  <div className="size-9 rounded-xl bg-slate-900 text-white flex items-center justify-center font-bold shadow-xs">
                     <Calendar className="size-5" />
                   </div>
                   <div>
@@ -2175,7 +2197,7 @@ function EventsScreen() {
                     </p>
                   </div>
                 </div>
-                <div className="flex items-center gap-1 text-xs font-bold text-[#003B95] dark:text-blue-400 group-hover:translate-x-0.5 transition-transform shrink-0">
+                <div className="flex items-center gap-1 text-xs font-bold text-slate-900 dark:text-slate-400 group-hover:translate-x-0.5 transition-transform shrink-0">
                   <span>Mở lịch</span>
                   <ChevronRight className="size-4" />
                 </div>
@@ -2197,7 +2219,7 @@ function EventsScreen() {
                   type="button"
                   onClick={() => setEventCategory("all")}
                   className={`px-3 py-1.5 rounded-full border flex justify-center items-center gap-1.5 text-xs font-semibold cursor-pointer transition shrink-0 ${eventCategory === "all"
-                    ? "bg-[#003B95] border-[#003B95] text-white shadow-xs"
+                    ? "bg-slate-900 border-slate-800 text-white shadow-xs"
                     : "border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50"
                     }`}
                 >
@@ -2213,7 +2235,7 @@ function EventsScreen() {
                   type="button"
                   onClick={() => setEventCategory("upcoming")}
                   className={`px-3 py-1.5 rounded-full border flex justify-center items-center gap-1.5 text-xs font-medium cursor-pointer transition shrink-0 ${eventCategory === "upcoming"
-                    ? "bg-[#003B95] border-[#003B95] text-white shadow-xs font-semibold"
+                    ? "bg-slate-900 border-slate-800 text-white shadow-xs font-semibold"
                     : "border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50"
                     }`}
                 >
@@ -2231,7 +2253,7 @@ function EventsScreen() {
                   type="button"
                   onClick={() => setEventCategory("registered")}
                   className={`px-3 py-1.5 rounded-full border flex justify-center items-center gap-1.5 text-xs font-medium cursor-pointer transition shrink-0 ${eventCategory === "registered"
-                    ? "bg-[#003B95] border-[#003B95] text-white shadow-xs font-semibold"
+                    ? "bg-slate-900 border-slate-800 text-white shadow-xs font-semibold"
                     : "border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50"
                     }`}
                 >
@@ -2247,7 +2269,7 @@ function EventsScreen() {
                   type="button"
                   onClick={() => setEventCategory("free")}
                   className={`px-3 py-1.5 rounded-full border flex justify-center items-center gap-1.5 text-xs font-medium cursor-pointer transition shrink-0 ${eventCategory === "free"
-                    ? "bg-[#003B95] border-[#003B95] text-white shadow-xs font-semibold"
+                    ? "bg-slate-900 border-slate-800 text-white shadow-xs font-semibold"
                     : "border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50"
                     }`}
                 >
@@ -2263,7 +2285,7 @@ function EventsScreen() {
                   type="button"
                   onClick={() => setEventCategory("paid")}
                   className={`px-3 py-1.5 rounded-full border flex justify-center items-center gap-1.5 text-xs font-medium cursor-pointer transition shrink-0 ${eventCategory === "paid"
-                    ? "bg-[#003B95] border-[#003B95] text-white shadow-xs font-semibold"
+                    ? "bg-slate-900 border-slate-800 text-white shadow-xs font-semibold"
                     : "border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50"
                     }`}
                 >
@@ -2279,7 +2301,7 @@ function EventsScreen() {
                   type="button"
                   onClick={() => setEventCategory("history")}
                   className={`px-3 py-1.5 rounded-full border flex justify-center items-center gap-1.5 text-xs font-medium cursor-pointer transition shrink-0 ${eventCategory === "history"
-                    ? "bg-[#003B95] border-[#003B95] text-white shadow-xs font-semibold"
+                    ? "bg-slate-900 border-slate-800 text-white shadow-xs font-semibold"
                     : "border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50"
                     }`}
                 >
@@ -2319,8 +2341,8 @@ function EventsScreen() {
                   type="button"
                   onClick={() => setEventCategory("ban_dao_tao")}
                   className={`px-3 py-1.5 rounded-full border flex justify-center items-center gap-1.5 text-xs font-medium cursor-pointer transition shrink-0 ${eventCategory === "ban_dao_tao"
-                    ? "bg-blue-700 border-blue-700 text-white shadow-xs font-semibold"
-                    : "border-blue-200 dark:border-blue-800 text-blue-800 dark:text-blue-300 bg-blue-50/50 hover:bg-blue-100/50"
+                    ? "bg-slate-900 border-blue-700 text-white shadow-xs font-semibold"
+                    : "border-slate-300 dark:border-blue-800 text-slate-900 dark:text-slate-300 bg-slate-100/50 hover:bg-blue-100/50"
                     }`}
                 >
                   <span>🎓 Ban Đào Tạo</span>
@@ -2361,7 +2383,7 @@ function EventsScreen() {
             <div className="self-stretch pt-4 pb-3 flex flex-col justify-start items-start gap-2">
               {displayEventsList.length === 0 ? (
                 <div className="self-stretch py-10 px-4 bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-dashed border-slate-300 dark:border-slate-700 flex flex-col items-center justify-center text-center gap-3">
-                  <div className="w-12 h-12 rounded-full bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center text-[#003B95] dark:text-blue-400">
+                  <div className="w-12 h-12 rounded-full bg-slate-100 dark:bg-blue-900/30 flex items-center justify-center text-slate-900 dark:text-slate-400">
                     <Calendar className="size-6" />
                   </div>
                   <div className="text-sm font-semibold text-slate-800 dark:text-slate-200">
@@ -2380,7 +2402,7 @@ function EventsScreen() {
                         setEventCategory("all");
                         toast.success(`Đang hiển thị toàn bộ ${allEventsCount} sự kiện ở tất cả danh mục CLB CEO HN10`);
                       }}
-                      className="mt-1 px-4 py-2 rounded-lg bg-[#003B95] text-white text-xs font-semibold hover:bg-[#002B70] transition cursor-pointer"
+                      className="mt-1 px-4 py-2 rounded-lg bg-slate-900 text-white text-xs font-semibold hover:bg-slate-800 transition cursor-pointer"
                     >
                       Xem tất cả ({allEventsCount}) sự kiện
                     </button>
@@ -2421,7 +2443,7 @@ function EventsScreen() {
                                   {(e as any).category || (e as any).event_type || "SỰ KIỆN CLB CEO HN10"}
                                 </span>
                               </div>
-                              <div className="self-stretch text-blue-950 dark:text-blue-200 text-sm font-semibold font-['Inter'] leading-5 line-clamp-2">
+                              <div className="self-stretch text-slate-900 dark:text-slate-200 text-sm font-semibold font-['Inter'] leading-5 line-clamp-2">
                                 {e.title}
                               </div>
                             </div>
@@ -2476,49 +2498,19 @@ function EventsScreen() {
                           </span>
                         </div>
 
-                        <div className="flex items-center gap-1.5">
-                          {registered && (
-                            <button
-                              type="button"
-                              onClick={(evt) => {
-                                evt.stopPropagation();
-                                const targetReg = registeredEvents.find((r) => r.id === e.id) || (e as any);
-                                setTicketPassModal({
-                                  eventTitle: e.title || "Sự Kiện CLB Doanh Nhân CEO HN10",
-                                  ticketCode: targetReg?.ticketCode || targetReg?.invoiceNo || `TICKET-${e.id}`,
-                                  luckyNumber: targetReg?.luckyNumber || "#1983",
-                                  ticketType: targetReg?.ticketType || "Hội Viên Chính Thức",
-                                  ticketCount: 1,
-                                  isFree: targetReg?.isFree ?? Boolean((e as any).price === 0),
-                                  date: e.date || `${e.day}/${e.month}`,
-                                  time: e.time || "",
-                                  location: e.place || "",
-                                  attendeeName: (user as any)?.name || "Hội Viên CEO HN10",
-                                  qrUrl: getQrUrl(targetReg?.ticketCode || `TICKET-${e.id}`, 280),
-                                });
-                              }}
-                              className="px-2.5 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs flex items-center gap-1 active:scale-95 transition cursor-pointer shadow-xs"
-                              title="Mở mã QR Check-in điểm danh"
-                            >
-                              <QrCode className="size-3.5" />
-                              <span>Mã Check-in</span>
-                            </button>
-                          )}
-
-                          <button
-                            type="button"
-                            onClick={(evt) => {
-                              evt.stopPropagation();
-                              handleSelectEvent(e);
-                            }}
-                            className={`px-3 py-1.5 rounded-lg border flex justify-start items-center gap-1.5 text-sm font-semibold font-['Inter'] leading-5 active:scale-95 transition cursor-pointer shadow-xs ${registered
-                              ? "bg-emerald-600 border-emerald-600 text-white"
-                              : "bg-[#003B95] hover:bg-[#002B70] border-[#003B95] text-white"
-                              }`}
-                          >
-                            <span>{registered ? "Chi tiết" : "Xem chi tiết"}</span>
-                          </button>
-                        </div>
+                        <button
+                          type="button"
+                          onClick={(evt) => {
+                            evt.stopPropagation();
+                            handleSelectEvent(e);
+                          }}
+                          className={`px-3 py-1.5 rounded-lg border flex justify-start items-center gap-1.5 text-sm font-semibold font-['Inter'] leading-5 active:scale-95 transition cursor-pointer shadow-xs ${registered
+                            ? "bg-emerald-600 border-emerald-600 text-white"
+                            : "bg-slate-900 hover:bg-slate-800 border-slate-800 text-white"
+                            }`}
+                        >
+                          <span>{registered ? "Đã đăng ký (Xem chi tiết)" : "Xem chi tiết"}</span>
+                        </button>
                       </div>
                     </div>
                   );
@@ -2536,9 +2528,9 @@ function EventsScreen() {
                     const el = document.getElementById("all-events-section");
                     if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
                   }}
-                  className="px-4 py-2 rounded-xl bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800/60 inline-flex justify-center items-center gap-2 active:scale-95 transition cursor-pointer hover:bg-blue-100 dark:hover:bg-blue-900/40 shadow-2xs"
+                  className="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-blue-800/60 inline-flex justify-center items-center gap-2 active:scale-95 transition cursor-pointer hover:bg-blue-100 dark:hover:bg-blue-900/40 shadow-2xs"
                 >
-                  <span className="text-[#003B95] dark:text-blue-400 text-sm font-semibold font-['Inter'] leading-5">
+                  <span className="text-slate-900 dark:text-slate-400 text-sm font-semibold font-['Inter'] leading-5">
                     Xem tất cả ({allEventsCount}) sự kiện
                   </span>
                   <img src="/icons/events/arrow-right-02.svg" className="size-4" alt="arrow" />
@@ -2579,7 +2571,7 @@ function EventsScreen() {
                 ))}
               </div>
               <div className="inline-flex justify-start items-center gap-[3px]">
-                <div className="w-2.5 h-1 bg-[#003B95] rounded-[99px]" />
+                <div className="w-2.5 h-1 bg-slate-900 rounded-[99px]" />
                 <div className="size-1 bg-slate-300 dark:bg-slate-700 rounded-[99px]" />
                 <div className="size-1 bg-slate-300 dark:bg-slate-700 rounded-[99px]" />
                 <div className="size-1 bg-slate-300 dark:bg-slate-700 rounded-[99px]" />
@@ -2591,9 +2583,9 @@ function EventsScreen() {
           <div className="self-stretch px-4 pt-4 pb-2 flex justify-center">
             <Link
               to="/association/messages"
-              className="w-full max-w-sm py-3 px-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-100 hover:border-[#003B95] hover:text-[#003B95] dark:hover:text-sky-400 font-bold text-xs flex items-center justify-center gap-2 shadow-xs transition active:scale-98 cursor-pointer"
+              className="w-full max-w-sm py-3 px-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-100 hover:border-slate-800 hover:text-slate-900 dark:hover:text-sky-400 font-bold text-xs flex items-center justify-center gap-2 shadow-xs transition active:scale-98 cursor-pointer"
             >
-              <Headphones className="size-4 text-[#003B95] dark:text-sky-400" />
+              <Headphones className="size-4 text-slate-900 dark:text-sky-400" />
               <span>Liên hệ Ban Truyền Thông</span>
             </Link>
           </div>
@@ -2620,7 +2612,7 @@ function EventsScreen() {
                 type="button"
                 onClick={() => setActivityFilter("all")}
                 className={`px-3 py-1.5 rounded-full border flex justify-center items-center gap-1.5 text-xs font-semibold cursor-pointer transition shrink-0 ${activityFilter === "all"
-                  ? "bg-[#003B95] border-[#003B95] text-white shadow-xs"
+                  ? "bg-slate-900 border-slate-800 text-white shadow-xs"
                   : "border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50"
                   }`}
               >
@@ -2636,7 +2628,7 @@ function EventsScreen() {
                 type="button"
                 onClick={() => setActivityFilter("b2b_connect")}
                 className={`px-3 py-1.5 rounded-full border flex justify-center items-center gap-1.5 text-xs font-medium cursor-pointer transition shrink-0 ${activityFilter === "b2b_connect"
-                  ? "bg-[#003B95] border-[#003B95] text-white shadow-xs font-semibold"
+                  ? "bg-slate-900 border-slate-800 text-white shadow-xs font-semibold"
                   : "border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50"
                   }`}
               >
@@ -2653,7 +2645,7 @@ function EventsScreen() {
                 type="button"
                 onClick={() => setActivityFilter("trainings")}
                 className={`px-3 py-1.5 rounded-full border flex justify-center items-center gap-1.5 text-xs font-medium cursor-pointer transition shrink-0 ${activityFilter === "trainings"
-                  ? "bg-[#003B95] border-[#003B95] text-white shadow-xs font-semibold"
+                  ? "bg-slate-900 border-slate-800 text-white shadow-xs font-semibold"
                   : "border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50"
                   }`}
               >
@@ -2670,7 +2662,7 @@ function EventsScreen() {
                 type="button"
                 onClick={() => setActivityFilter("fixed_committee")}
                 className={`px-3 py-1.5 rounded-full border flex justify-center items-center gap-1.5 text-xs font-medium cursor-pointer transition shrink-0 ${activityFilter === "fixed_committee"
-                  ? "bg-[#003B95] border-[#003B95] text-white shadow-xs font-semibold"
+                  ? "bg-slate-900 border-slate-800 text-white shadow-xs font-semibold"
                   : "border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50"
                   }`}
               >
@@ -2686,7 +2678,7 @@ function EventsScreen() {
                 type="button"
                 onClick={() => setActivityFilter("extraordinary")}
                 className={`px-3 py-1.5 rounded-full border flex justify-center items-center gap-1.5 text-xs font-medium cursor-pointer transition shrink-0 ${activityFilter === "extraordinary"
-                  ? "bg-[#003B95] border-[#003B95] text-white shadow-xs font-semibold"
+                  ? "bg-slate-900 border-slate-800 text-white shadow-xs font-semibold"
                   : "border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50"
                   }`}
               >
@@ -2703,7 +2695,7 @@ function EventsScreen() {
           <div className="self-stretch px-3 flex flex-col justify-start items-start gap-2">
             {displayMeetingsList.length === 0 ? (
               <div className="self-stretch py-10 px-4 bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-dashed border-slate-300 dark:border-slate-700 flex flex-col items-center justify-center text-center gap-3">
-                <div className="w-12 h-12 rounded-full bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center text-[#003B95] dark:text-blue-400">
+                <div className="w-12 h-12 rounded-full bg-slate-100 dark:bg-blue-900/30 flex items-center justify-center text-slate-900 dark:text-slate-400">
                   <Calendar className="size-6" />
                 </div>
                 <div className="text-sm font-semibold text-slate-800 dark:text-slate-200">
@@ -2730,7 +2722,7 @@ function EventsScreen() {
                   >
                     {/* Left time column */}
                     <div className="self-stretch pr-3 border-r border-slate-200 dark:border-slate-700 flex flex-col justify-start items-center gap-0.5 min-w-[52px] shrink-0">
-                      <div className="text-[#001B54] dark:text-blue-300 text-xs font-bold font-['Inter'] leading-4">
+                      <div className="text-[#001B54] dark:text-slate-300 text-xs font-bold font-['Inter'] leading-4">
                         {startTime}
                       </div>
                       {endTime && (
@@ -2750,9 +2742,9 @@ function EventsScreen() {
                           <div className={`px-2 py-0.5 rounded-full flex justify-start items-center gap-1 ${isB2bConnect
                             ? "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60"
                             : isTrainingCourse
-                              ? "bg-blue-50 text-[#003B95] border border-blue-200"
+                              ? "bg-slate-100 text-slate-900 border border-slate-300"
                               : isOnline
-                                ? "bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300"
+                                ? "bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-300"
                                 : "bg-orange-50 dark:bg-orange-950/40 text-orange-700 dark:text-orange-300"
                             }`}>
                             {isB2bConnect ? (
@@ -2790,7 +2782,7 @@ function EventsScreen() {
 
                       {isB2bConnect && m.partnerName && (
                         <div className="self-stretch text-xs text-slate-600 dark:text-slate-300 flex items-center gap-1.5 font-medium">
-                          <Users className="size-3.5 text-[#003B95] shrink-0" />
+                          <Users className="size-3.5 text-slate-900 shrink-0" />
                           <span className="truncate">Đối tác: <strong className="text-slate-900 dark:text-white">{m.partnerName}</strong> ({m.partnerCompany || "Doanh nghiệp CEO HN10"})</span>
                         </div>
                       )}
@@ -2817,7 +2809,7 @@ function EventsScreen() {
                         {isTrainingCourse ? (
                           <Link
                             to="/association/training"
-                            className="flex-1 px-3 py-1.5 bg-[#003B95] hover:bg-[#002B70] text-white rounded-lg border border-[#003B95] flex justify-center items-center gap-1.5 text-xs font-semibold font-['Inter'] leading-5 shadow-xs active:scale-95 transition cursor-pointer"
+                            className="flex-1 px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-white rounded-lg border border-slate-800 flex justify-center items-center gap-1.5 text-xs font-semibold font-['Inter'] leading-5 shadow-xs active:scale-95 transition cursor-pointer"
                           >
                             <GraduationCap className="size-3.5" />
                             <span>Chi tiết &amp; Đăng ký khóa học</span>
@@ -2847,7 +2839,7 @@ function EventsScreen() {
                                 toast.success(`Đã xác nhận tham dự cuộc họp: ${m.title}`);
                               }
                             }}
-                            className="flex-1 px-3 py-1.5 bg-[#003B95] hover:bg-[#002B70] text-white rounded-lg border border-[#003B95] flex justify-center items-center gap-1.5 text-xs font-semibold font-['Inter'] leading-5 shadow-xs active:scale-95 transition cursor-pointer"
+                            className="flex-1 px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-white rounded-lg border border-slate-800 flex justify-center items-center gap-1.5 text-xs font-semibold font-['Inter'] leading-5 shadow-xs active:scale-95 transition cursor-pointer"
                           >
                             <span>{isOnline ? "Vào phòng họp ngay" : "Xác nhận tham dự"}</span>
                           </button>
@@ -2875,7 +2867,7 @@ function EventsScreen() {
           <div className="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-4xl h-[85vh] flex flex-col overflow-hidden shadow-2xl animate-in zoom-in-95 duration-150">
             <div className="p-3.5 bg-[#1F3864] text-white flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Users className="size-5 text-[#003B95]" />
+                <Users className="size-5 text-slate-900" />
                 <div>
                   <h4 className="font-bold text-xs truncate max-w-xs sm:max-w-md">{activeMeetingRoom?.title}</h4>
                   <span className="text-[10px] text-slate-300">Phòng họp trực tuyến Jitsi Meet CLB CEO HN10</span>
@@ -3051,7 +3043,7 @@ function EventsScreen() {
           <div className="bg-[#1F3864] p-5 text-white">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center shrink-0">
-                <AlertTriangle className="w-5 h-5 text-[#003B95]" />
+                <AlertTriangle className="w-5 h-5 text-slate-900" />
               </div>
               <div>
                 <DialogTitle className="text-lg font-bold text-white">
@@ -3066,7 +3058,7 @@ function EventsScreen() {
 
           <div className="p-5 space-y-4">
             <div className="p-3 bg-amber-50 border border-amber-200/70 rounded-xl flex items-start gap-2.5">
-              <Info className="w-4 h-4 text-[#003B95] shrink-0 mt-0.5" />
+              <Info className="w-4 h-4 text-slate-900 shrink-0 mt-0.5" />
               <p className="text-xs text-amber-800 leading-relaxed">
                 {isEn
                   ? "Releasing your ticket will open this seat for other members. Are you sure you want to cancel?"

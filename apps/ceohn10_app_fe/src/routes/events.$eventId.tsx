@@ -236,6 +236,11 @@ function EventDetailPage() {
     { name: "startTime", label: "Giờ bắt đầu (VD: 08:30)", type: "text" },
     { name: "endTime", label: "Giờ kết thúc (VD: 11:30)", type: "text" },
     { name: "location", label: t("events.col.location"), type: "text" },
+    {
+      name: "changeReason",
+      label: "Lý do thay đổi thời gian / địa điểm / hủy (Hệ thống sẽ gửi email tự động tới các đại biểu)",
+      type: "textarea",
+    },
     { name: "capacity", label: t("events.kpi.capacity"), type: "number" },
     {
       name: "qrStaff",
@@ -304,6 +309,8 @@ function EventDetailPage() {
         qrStaff: v.qrStaff || [],
         qrScanners: v.qrStaff || [],
         description: v.description || (v as any).description,
+        changeReason: (v as any).changeReason ? String((v as any).changeReason).trim() : undefined,
+        reason: (v as any).changeReason ? String((v as any).changeReason).trim() : undefined,
       };
       await fetchNestApi(`/events/${event.id}`, {
         method: "PUT",

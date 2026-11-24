@@ -388,30 +388,41 @@ export function AssociationConnectScreen() {
     <div className="vba-animate pb-6 min-h-screen bg-stone-50 dark:bg-slate-950 font-sans">
       <MemberHeader title="Gặp Gỡ &amp; Kết Nối B2B" back />
 
-      {/* ── TOP SECTION TOGGLE: BẢNG TIN MẠNG XÃ HỘI B2B / HẸN GẶP 1-1 ── */}
+      {/* ── TOP SECTION TOGGLE: BẢNG TIN / HẸN GẶP 1-1 / DANH BẠ KẾT NỐI ── */}
       <div className="px-4 pt-2.5 max-w-2xl mx-auto">
-        <div className="p-1 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs flex items-center gap-1">
+        <div className="p-1 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs flex items-center gap-1.5">
           <button
             type="button"
             onClick={() => setMainSection("feed")}
-            className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer ${mainSection === "feed"
-                ? "bg-[#003B95] text-white shadow-xs"
-                : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
-              }`}
+            className={`flex-1 py-2 px-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1 cursor-pointer ${
+              mainSection === "feed"
+                ? "bg-red-600 text-white shadow-sm border border-red-600"
+                : "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700/80 border border-slate-200/60 dark:border-slate-700/60"
+            }`}
           >
-            <MessageSquare className="size-3.5" />
-            <span>📢 Bảng Tin Kết Nối B2B</span>
+            <MessageSquare className="size-3.5 shrink-0" />
+            <span className="font-bold whitespace-nowrap">📢 Bảng Tin</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => navigate({ to: "/association/members" as any })}
+            className="flex-1 py-2 px-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1 cursor-pointer bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700/80 border border-slate-200/60 dark:border-slate-700/60"
+            title="Mở danh bạ hội viên để kết nối, kết bạn, nhắn tin và gọi điện"
+          >
+            <Users className="size-3.5 text-blue-600 shrink-0" />
+            <span className="font-bold whitespace-nowrap">👥 Danh Bạ</span>
           </button>
           <button
             type="button"
             onClick={() => setMainSection("meetings")}
-            className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer ${mainSection === "meetings"
-                ? "bg-[#003B95] text-white shadow-xs"
-                : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
-              }`}
+            className={`flex-1 py-2 px-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1 cursor-pointer ${
+              mainSection === "meetings"
+                ? "bg-red-600 text-white shadow-sm border border-red-600"
+                : "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700/80 border border-slate-200/60 dark:border-slate-700/60"
+            }`}
           >
-            <Handshake className="size-3.5" />
-            <span>🤝 Hẹn Gặp 1-1 ({myMeetingsList.length})</span>
+            <Handshake className="size-3.5 shrink-0" />
+            <span className="font-bold whitespace-nowrap">🤝 Hẹn Gặp ({myMeetingsList.length})</span>
           </button>
         </div>
       </div>
@@ -450,7 +461,7 @@ export function AssociationConnectScreen() {
             <div className="grid grid-cols-3 gap-2 text-center">
               <div className="p-3 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs">
                 <span className="text-[10px] font-bold text-slate-400 uppercase">Cuộc gặp của tôi</span>
-                <div className="text-base font-black text-[#003B95] dark:text-blue-400 mt-0.5">
+                <div className="text-base font-black text-slate-900 dark:text-slate-400 mt-0.5">
                   {myMeetingsList.length}
                 </div>
               </div>
@@ -475,7 +486,7 @@ export function AssociationConnectScreen() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Tìm theo tên đối tác, doanh nghiệp, nội dung gặp..."
-                className="w-full pl-8 pr-3 py-2 text-xs rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 outline-none focus:border-[#003B95] text-slate-800 dark:text-slate-100 shadow-2xs"
+                className="w-full pl-8 pr-3 py-2 text-xs rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 outline-none focus:border-slate-800 text-slate-800 dark:text-slate-100 shadow-2xs"
               />
             </div>
 
@@ -485,7 +496,7 @@ export function AssociationConnectScreen() {
                 type="button"
                 onClick={() => setActiveTab("my_meetings")}
                 className={`flex-1 py-2 px-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${activeTab === "my_meetings"
-                    ? "bg-[#003B95] text-white shadow-md shadow-blue-900/20"
+                    ? "bg-slate-900 text-white shadow-md shadow-blue-900/20"
                     : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
                   }`}
               >
@@ -522,7 +533,7 @@ export function AssociationConnectScreen() {
             <div className="space-y-3 pt-1">
               {loading ? (
                 <div className="py-12 flex flex-col items-center justify-center gap-2 text-slate-400">
-                  <Loader2 className="size-6 animate-spin text-[#003B95]" />
+                  <Loader2 className="size-6 animate-spin text-slate-900" />
                   <span className="text-xs">Đang tải danh sách gặp gỡ...</span>
                 </div>
               ) : filteredCurrentList.length === 0 ? (
@@ -532,7 +543,7 @@ export function AssociationConnectScreen() {
                   <button
                     type="button"
                     onClick={() => setCreateModalOpen(true)}
-                    className="px-4 py-2 rounded-xl bg-[#003B95] text-white font-bold text-xs inline-flex items-center gap-1.5 shadow-xs"
+                    className="px-4 py-2 rounded-xl bg-slate-900 text-white font-bold text-xs inline-flex items-center gap-1.5 shadow-xs"
                   >
                     <Plus className="size-3.5" />
                     <span>Thiết lập cuộc hẹn đầu tiên</span>
@@ -547,7 +558,7 @@ export function AssociationConnectScreen() {
                     {/* Header: Partner Info & Status */}
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-3">
-                        <div className="size-12 rounded-2xl bg-[#003B95] text-amber-300 font-black flex items-center justify-center text-sm shadow-xs shrink-0 ring-1 ring-amber-400/40">
+                        <div className="size-12 rounded-2xl bg-slate-900 text-amber-300 font-black flex items-center justify-center text-sm shadow-xs shrink-0 ring-1 ring-amber-400/40">
                           {m.partnerAvatar ? (
                             <img
                               src={resolveMediaUrl(m.partnerAvatar) || m.partnerAvatar}
@@ -572,7 +583,7 @@ export function AssociationConnectScreen() {
                         className={`px-2.5 py-0.5 rounded-full text-[10.5px] font-bold ${m.status === "completed"
                             ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-300"
                             : m.status === "confirmed"
-                              ? "bg-blue-50 text-[#003B95] dark:bg-blue-950/60 dark:text-blue-300 border border-blue-200"
+                              ? "bg-slate-100 text-slate-900 dark:bg-slate-800 dark:text-slate-300 border border-slate-300"
                               : "bg-amber-50 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-300"
                           }`}
                       >
@@ -595,7 +606,7 @@ export function AssociationConnectScreen() {
                       {/* Time & Venue */}
                       <div className="flex flex-wrap items-center gap-3 pt-1 text-[11px] text-slate-600 dark:text-slate-300 font-semibold border-t border-slate-200/60 dark:border-slate-700">
                         <span className="flex items-center gap-1">
-                          <Calendar className="size-3 text-[#003B95] dark:text-blue-400" />
+                          <Calendar className="size-3 text-slate-900 dark:text-slate-400" />
                           <span>{m.date}</span>
                         </span>
                         <span className="flex items-center gap-1">
@@ -626,7 +637,7 @@ export function AssociationConnectScreen() {
                           <button
                             type="button"
                             onClick={() => setVideoCallMeeting(m)}
-                            className="py-2 px-3 rounded-xl bg-[#003B95] hover:bg-[#002f77] text-white text-xs font-bold inline-flex items-center gap-1.5 shadow-xs transition cursor-pointer"
+                            className="py-2 px-3 rounded-xl bg-slate-900 hover:bg-[#002f77] text-white text-xs font-bold inline-flex items-center gap-1.5 shadow-xs transition cursor-pointer"
                           >
                             <Video className="size-3.5 text-amber-300" />
                             <span>Vào phòng họp</span>
@@ -685,7 +696,7 @@ export function AssociationConnectScreen() {
                         <button
                           type="button"
                           onClick={() => handleRespond(m.id, "accept")}
-                          className="flex-1 py-2 px-3 rounded-xl bg-[#003B95] hover:bg-[#002f77] text-white text-xs font-bold shadow-xs transition cursor-pointer flex items-center justify-center gap-1.5"
+                          className="flex-1 py-2 px-3 rounded-xl bg-slate-900 hover:bg-[#002f77] text-white text-xs font-bold shadow-xs transition cursor-pointer flex items-center justify-center gap-1.5"
                         >
                           <CheckCircle2 className="size-3.5 text-emerald-400" />
                           <span>Đồng ý lịch hẹn</span>
@@ -778,7 +789,7 @@ export function AssociationConnectScreen() {
                   value={formPartnerName}
                   onChange={(e) => setFormPartnerName(e.target.value)}
                   placeholder="Ví dụ: Nguyễn Văn Tuấn"
-                  className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white outline-none focus:border-[#003B95]"
+                  className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white outline-none focus:border-slate-800"
                 />
               </div>
 
@@ -791,7 +802,7 @@ export function AssociationConnectScreen() {
                     value={formPartnerCompany}
                     onChange={(e) => setFormPartnerCompany(e.target.value)}
                     placeholder="Tên công ty đối tác"
-                    className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white outline-none focus:border-[#003B95]"
+                    className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white outline-none focus:border-slate-800"
                   />
                 </div>
                 <div>
@@ -802,7 +813,7 @@ export function AssociationConnectScreen() {
                     value={formPartnerPhone}
                     onChange={(e) => setFormPartnerPhone(e.target.value)}
                     placeholder="0901..."
-                    className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white outline-none focus:border-[#003B95]"
+                    className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white outline-none focus:border-slate-800"
                   />
                 </div>
               </div>
@@ -843,7 +854,7 @@ export function AssociationConnectScreen() {
                     type="button"
                     onClick={() => setFormVenueType("online")}
                     className={`py-2 px-3 rounded-xl font-bold flex items-center justify-center gap-1.5 border transition cursor-pointer ${formVenueType === "online"
-                        ? "bg-[#003B95] text-white border-[#003B95]"
+                        ? "bg-slate-900 text-white border-slate-800"
                         : "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-transparent"
                       }`}
                   >
@@ -854,7 +865,7 @@ export function AssociationConnectScreen() {
                     type="button"
                     onClick={() => setFormVenueType("offline")}
                     className={`py-2 px-3 rounded-xl font-bold flex items-center justify-center gap-1.5 border transition cursor-pointer ${formVenueType === "offline"
-                        ? "bg-[#003B95] text-white border-[#003B95]"
+                        ? "bg-slate-900 text-white border-slate-800"
                         : "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-transparent"
                       }`}
                   >
@@ -1019,7 +1030,7 @@ export function AssociationConnectScreen() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-2 sm:p-4 backdrop-blur-md animate-in fade-in duration-200">
           <div className="w-full max-w-4xl h-[90vh] bg-slate-950 rounded-3xl overflow-hidden border-2 border-amber-400 flex flex-col shadow-2xl">
             {/* Call Header */}
-            <div className="px-4 py-3 bg-[#003B95] text-white flex items-center justify-between border-b border-amber-400/40">
+            <div className="px-4 py-3 bg-slate-900 text-white flex items-center justify-between border-b border-amber-400/40">
               <div className="flex items-center gap-2">
                 <span className="size-3 rounded-full bg-emerald-500 animate-ping" />
                 <h3 className="text-sm font-black truncate">
@@ -1193,7 +1204,7 @@ export function AssociationConnectScreen() {
             {/* Partner Info Details */}
             <div className="p-4 rounded-2xl bg-gradient-to-br from-emerald-50/50 via-slate-50 to-blue-50/40 dark:from-slate-800/80 dark:to-slate-900 border border-emerald-500/20 space-y-3">
               <div className="flex items-center gap-3">
-                <div className="size-12 rounded-2xl bg-[#003B95] text-white flex items-center justify-center font-bold text-base shadow-sm shrink-0 overflow-hidden">
+                <div className="size-12 rounded-2xl bg-slate-900 text-white flex items-center justify-center font-bold text-base shadow-sm shrink-0 overflow-hidden">
                   {acceptedSuccessMeeting.partnerAvatar ? (
                     <img
                       src={resolveMediaUrl(acceptedSuccessMeeting.partnerAvatar) || acceptedSuccessMeeting.partnerAvatar}
@@ -1211,7 +1222,7 @@ export function AssociationConnectScreen() {
                   <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
                     {acceptedSuccessMeeting.partnerCompany || "Doanh nghiệp CLB CEO HN10"}
                   </p>
-                  <span className="inline-flex items-center gap-1 mt-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/10 text-blue-600 dark:text-blue-400">
+                  <span className="inline-flex items-center gap-1 mt-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-800/10 text-slate-800 dark:text-slate-400">
                     <Handshake className="size-3" /> Đối tác kết nối 1-on-1
                   </span>
                 </div>
@@ -1274,7 +1285,7 @@ export function AssociationConnectScreen() {
                       setVideoCallMeeting(acceptedSuccessMeeting);
                       setAcceptedSuccessMeeting(null);
                     }}
-                    className="w-full py-2 rounded-xl bg-[#003B95] text-white text-xs font-bold flex items-center justify-center gap-1.5 shadow-xs"
+                    className="w-full py-2 rounded-xl bg-slate-900 text-white text-xs font-bold flex items-center justify-center gap-1.5 shadow-xs"
                   >
                     <Video className="size-3.5" />
                     <span>Vào phòng họp trực tuyến ngay</span>
@@ -1310,7 +1321,7 @@ export function AssociationConnectScreen() {
               <Link
                 to="/association/calendar"
                 onClick={() => setAcceptedSuccessMeeting(null)}
-                className="py-2.5 px-3 rounded-xl bg-[#003B95] hover:bg-[#002b70] text-white text-xs font-bold text-center flex items-center justify-center gap-1.5 shadow-xs transition"
+                className="py-2.5 px-3 rounded-xl bg-slate-900 hover:bg-[#002b70] text-white text-xs font-bold text-center flex items-center justify-center gap-1.5 shadow-xs transition"
               >
                 <Calendar className="size-3.5" />
                 <span>Xem trên Lịch</span>

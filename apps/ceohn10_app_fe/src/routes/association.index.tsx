@@ -9,6 +9,7 @@ import {
   MapPin,
   Building2,
   CheckCircle2,
+  User,
   UserPlus,
   UserCheck,
   MessageSquare,
@@ -637,7 +638,7 @@ export function CeoHn10StudentAppScreen() {
       <header className="sticky top-0 z-30 bg-white border-b border-slate-200 px-4 py-3 flex items-center justify-between shadow-xs">
         {/* Bên trái: Logo CEO HN10 */}
         <div className="flex items-center gap-2.5">
-          <div className="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center text-white font-black text-xs shadow-xs tracking-wider">
+          <div className="w-9 h-9 rounded-xl bg-slate-900 flex items-center justify-center text-white font-black text-xs shadow-xs tracking-wider">
             HN10
           </div>
           <div>
@@ -650,8 +651,8 @@ export function CeoHn10StudentAppScreen() {
           </div>
         </div>
 
-        {/* Bên phải: CHỈ 2 icon Thông báo & Tin nhắn */}
-        <div className="flex items-center gap-1.5">
+        {/* Bên phải: Icon Thông báo, Tin nhắn & Avatar Cá Nhân */}
+        <div className="flex items-center gap-2">
           <Link
             to="/association/notifications"
             className="relative p-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition cursor-pointer"
@@ -667,7 +668,24 @@ export function CeoHn10StudentAppScreen() {
             title="Tin nhắn"
           >
             <MessageSquare className="w-5 h-5" />
-            <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-blue-600 ring-2 ring-white" />
+          </Link>
+
+          {/* Avatar dẫn trực tiếp vào màn Cá Nhân */}
+          <Link
+            to="/association/profile"
+            className="flex items-center gap-1 pl-1 border-l border-slate-200 cursor-pointer group"
+            title="Hồ sơ cá nhân & Thẻ hội viên"
+          >
+            <div className="w-8 h-8 rounded-full overflow-hidden border border-slate-300 ring-2 ring-slate-100 group-hover:ring-slate-900 transition">
+              <img
+                src={profile?.avatarUrl || "/Vietnamese Young Male CEO Avatar.png"}
+                alt={profile?.name || "Hội viên"}
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = "/Vietnamese Young Male CEO Avatar.png";
+                }}
+              />
+            </div>
           </Link>
         </div>
       </header>
@@ -678,135 +696,172 @@ export function CeoHn10StudentAppScreen() {
         {/* TAB 1: 🌟 TRANG CHỦ BENTO GRID & EDITORIAL SLIDER        */}
         {/* ======================================================== */}
         {activeTab === "home" && (
-          <div className="space-y-6">
-            {/* ── BENTO GRID MẪU 2 (TỐI GIẢN: TRẮNG, XÁM NHẠT, TEXT ĐEN, ĐIỂM NHẤN ĐỎ & XANH) ── */}
-            <section className="space-y-3">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h2 className="text-xs font-bold text-slate-500 uppercase tracking-wider">
-                    Trung Tâm Vận Hành Doanh Nhân
-                  </h2>
-                  <p className="text-xs font-bold text-slate-900">Bento Grid Điều Hành VIP</p>
-                </div>
-                <span className="px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 text-[10px] font-bold border border-blue-200">
-                  ● Trạng Thái Sẵn Sàng
-                </span>
-              </div>
-
-              {/* Lưới Bento 4 Khối Đa Năng */}
-              <div className="grid grid-cols-2 gap-3">
-                {/* Bento 1: THẺ QR 1 CHẠM (Điểm nhấn Xanh) */}
-                <div
-                  onClick={() => setQrModalOpen(true)}
-                  className="rounded-3xl p-4 bg-white border border-slate-200 shadow-2xs hover:border-blue-300 hover:shadow-sm transition-all cursor-pointer flex flex-col justify-between group active:scale-98"
-                >
+          <div className="space-y-5">
+            {/* ── HERO VISUAL BANNER (HÌNH ẢNH TRÁNG LỆ SKYLINE & ÍT CHỮ) ── */}
+            <section className="relative rounded-3xl overflow-hidden shadow-sm border border-slate-200">
+              <div className="relative h-44 w-full">
+                <img
+                  src="/ceohn10_hero_daylight_skyline.jpg"
+                  alt="CEO HN10 Skyline"
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-slate-950/20" />
+                <div className="absolute inset-0 p-4 flex flex-col justify-between text-white">
                   <div className="flex items-center justify-between">
-                    <span className="p-2.5 rounded-2xl bg-blue-50 text-blue-600 border border-blue-100">
-                      <QrCode className="w-5 h-5" />
+                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-white/20 backdrop-blur-md border border-white/30 tracking-wider uppercase text-amber-300">
+                      ★ CLB DOANH NHÂN CEO HN10
                     </span>
-                    <span className="text-[10px] font-bold uppercase tracking-wider bg-blue-50 px-2 py-0.5 rounded-full text-blue-700 border border-blue-100">
-                      1 Chạm
-                    </span>
-                  </div>
-                  <div className="mt-4">
-                    <h3 className="text-sm font-bold text-slate-900 leading-tight">Thẻ QR Danh Thiếp</h3>
-                    <p className="text-[11px] text-slate-500 font-mono mt-0.5">{profile?.studentCode}</p>
-                    <div className="mt-2 text-[10px] font-bold text-blue-600 flex items-center gap-1 group-hover:translate-x-1 transition-transform">
-                      Mở thẻ quét <ArrowRight className="w-3 h-3" />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Bento 2: RADAR B2B CONNECT (Điểm nhấn Đỏ) */}
-                <div
-                  onClick={() => setActiveTab("connect")}
-                  className="rounded-3xl p-4 bg-white border border-slate-200 shadow-2xs hover:border-red-300 hover:shadow-sm transition-all cursor-pointer flex flex-col justify-between group active:scale-98"
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="p-2.5 rounded-2xl bg-red-50 text-red-600 border border-red-100">
-                      <Users className="w-5 h-5" />
-                    </span>
-                    <span className="text-[10px] font-bold text-red-700 bg-red-50 px-2 py-0.5 rounded-full border border-red-100">
-                      14 Đối tác
+                    <span className="text-[10px] text-slate-300 font-mono">
+                      {profile?.studentCode || "CEOHN10_VIP"}
                     </span>
                   </div>
-                  <div className="mt-4">
-                    <h3 className="text-sm font-bold text-slate-900 leading-tight">Radar B2B Connect</h3>
-                    <p className="text-[11px] text-slate-500 mt-0.5">Kết nối cùng ngành nghề</p>
-                    <div className="mt-2 text-[10px] font-bold text-red-600 flex items-center gap-1 group-hover:translate-x-1 transition-transform">
-                      Khám phá mạng lưới <ArrowRight className="w-3 h-3" />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Bento 3: KHO TÀI LIỆU ĐÀO TẠO VIP (Điểm nhấn Xanh) */}
-                <div
-                  onClick={() => {
-                    if (classes[0]) handleOpenClassDetail(classes[0]);
-                    setClassDetailActiveTab("materials");
-                  }}
-                  className="rounded-3xl p-4 bg-white border border-slate-200 shadow-2xs hover:border-blue-300 hover:shadow-sm transition-all cursor-pointer flex flex-col justify-between group active:scale-98"
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="p-2.5 rounded-2xl bg-blue-50 text-blue-600 border border-blue-100">
-                      <FileText className="w-5 h-5" />
-                    </span>
-                    <span className="text-[10px] font-bold uppercase bg-blue-50 px-2 py-0.5 rounded-full text-blue-700 border border-blue-100">
-                      28 Files
-                    </span>
-                  </div>
-                  <div className="mt-4">
-                    <h3 className="text-sm font-bold text-slate-900 leading-tight">Kho Tài Liệu VIP</h3>
-                    <p className="text-[11px] text-slate-500 mt-0.5">Slide &amp; Mẫu Biểu Excel</p>
-                    <div className="mt-2 text-[10px] font-bold text-blue-600 flex items-center gap-1 group-hover:translate-x-1 transition-transform">
-                      Tải giáo trình <ArrowRight className="w-3 h-3" />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Bento 4: DIỄN ĐÀN LỚP HỌC (Điểm nhấn Đỏ) */}
-                <div
-                  onClick={() => {
-                    if (classes[0]) handleOpenClassDetail(classes[0]);
-                    setClassDetailActiveTab("discussion");
-                  }}
-                  className="rounded-3xl p-4 bg-white border border-slate-200 shadow-2xs hover:border-red-300 hover:shadow-sm transition-all cursor-pointer flex flex-col justify-between group active:scale-98"
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="p-2.5 rounded-2xl bg-red-50 text-red-600 border border-red-100">
-                      <MessageSquare className="w-5 h-5" />
-                    </span>
-                    <span className="text-[10px] font-bold text-red-700 bg-red-50 px-2 py-0.5 rounded-full border border-red-100">
-                      12 Bài mới
-                    </span>
-                  </div>
-                  <div className="mt-4">
-                    <h3 className="text-sm font-bold text-slate-900 leading-tight">Diễn Đàn Lớp Học</h3>
-                    <p className="text-[11px] text-slate-500 mt-0.5">Hỏi đáp case study thực tế</p>
-                    <div className="mt-2 text-[10px] font-bold text-red-600 flex items-center gap-1 group-hover:translate-x-1 transition-transform">
-                      Tham gia thảo luận <ArrowRight className="w-3 h-3" />
+                  <div>
+                    <h2 className="text-base font-black text-white tracking-tight leading-tight">
+                      Hội Tụ Doanh Trí · Khẳng Định Vị Thế
+                    </h2>
+                    <p className="text-[11px] text-slate-300 mt-1 line-clamp-1">
+                      {profile?.name ? `Chào mừng Doanh nhân ${profile.name}` : "Chào mừng Doanh nhân đến với CEO HN10"}
+                    </p>
+                    <div className="flex items-center gap-2 mt-2.5">
+                      <Link
+                        to="/association/events"
+                        className="px-3 py-1.5 rounded-xl bg-white text-slate-900 text-xs font-bold shadow-xs hover:bg-slate-100 transition flex items-center gap-1 active:scale-95"
+                      >
+                        <Calendar className="w-3.5 h-3.5 text-slate-900" />
+                        <span>Lịch Hoạt Động</span>
+                      </Link>
+                      <button
+                        type="button"
+                        onClick={() => setQrModalOpen(true)}
+                        className="px-3 py-1.5 rounded-xl bg-white/20 backdrop-blur-md hover:bg-white/30 text-white text-xs font-bold border border-white/30 transition flex items-center gap-1 active:scale-95 cursor-pointer"
+                      >
+                        <ScanLine className="w-3.5 h-3.5" />
+                        <span>Quét QR Kết Nối</span>
+                      </button>
                     </div>
                   </div>
                 </div>
               </div>
             </section>
 
-            {/* ── SỰ KIỆN DẠNG SLIDE LƯỚT NGANG (CONCEPT 3 - TỐI GIẢN TRẮNG XÁM ĐỎ XANH) ── */}
+            {/* ── BENTO GRID 4 KHỐI ĐIỀU HÀNH (ÍT CHỮ, HÌNH ẢNH & ĐIỀU HƯỚNG MƯỢT) ── */}
+            <section className="space-y-2.5">
+              <div className="flex items-center justify-between">
+                <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                  Tính Năng Cốt Lõi
+                </h3>
+                <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 text-[10px] font-bold border border-slate-200">
+                  ● 4 Phân Hệ
+                </span>
+              </div>
+
+              {/* Lưới Bento 4 Khối */}
+              <div className="grid grid-cols-2 gap-3">
+                {/* Bento 1: HOẠT ĐỘNG (Sự kiện, Lớp học, Cuộc họp) */}
+                <Link
+                  to="/association/events"
+                  className="rounded-3xl p-3.5 bg-white border border-slate-200 shadow-2xs hover:border-slate-400 hover:shadow-xs transition-all flex flex-col justify-between group active:scale-98"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="p-2 rounded-2xl bg-slate-100 text-slate-900 border border-slate-200">
+                      <Calendar className="w-4 h-4" />
+                    </span>
+                    <span className="text-[10px] font-bold bg-slate-100 px-2 py-0.5 rounded-full text-slate-800 border border-slate-200">
+                      Hoạt Động
+                    </span>
+                  </div>
+                  <div className="mt-3">
+                    <h4 className="text-xs font-bold text-slate-900 leading-tight">Sự Kiện &amp; Lớp Học</h4>
+                    <p className="text-[10px] text-slate-500 mt-0.5">Lớp 30 chuyên đề &amp; họp</p>
+                    <div className="mt-1.5 text-[10px] font-bold text-slate-800 flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+                      Khám phá <ArrowRight className="w-3 h-3" />
+                    </div>
+                  </div>
+                </Link>
+
+                {/* Bento 2: GẮN KẾT (Đăng bài cơ hội & Nhắn tin B2B) */}
+                <Link
+                  to="/association/connect"
+                  className="rounded-3xl p-3.5 bg-white border border-slate-200 shadow-2xs hover:border-slate-400 hover:shadow-xs transition-all flex flex-col justify-between group active:scale-98"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="p-2 rounded-2xl bg-slate-100 text-slate-900 border border-slate-200">
+                      <Users className="w-4 h-4" />
+                    </span>
+                    <span className="text-[10px] font-bold text-slate-800 bg-slate-100 px-2 py-0.5 rounded-full border border-slate-200">
+                      Giao Thương
+                    </span>
+                  </div>
+                  <div className="mt-3">
+                    <h4 className="text-xs font-bold text-slate-900 leading-tight">Gắn Kết &amp; Cơ Hội</h4>
+                    <p className="text-[10px] text-slate-500 mt-0.5">Đăng bài &amp; kết nối 1-on-1</p>
+                    <div className="mt-1.5 text-[10px] font-bold text-slate-800 flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+                      Trao đổi <ArrowRight className="w-3 h-3" />
+                    </div>
+                  </div>
+                </Link>
+
+                {/* Bento 3: QUÉT QR KẾT NỐI (Camera 1 Chạm) */}
+                <div
+                  onClick={() => setQrModalOpen(true)}
+                  className="rounded-3xl p-3.5 bg-white border border-slate-200 shadow-2xs hover:border-slate-400 hover:shadow-xs transition-all cursor-pointer flex flex-col justify-between group active:scale-98"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="p-2 rounded-2xl bg-slate-100 text-slate-900 border border-slate-200">
+                      <QrCode className="w-4 h-4" />
+                    </span>
+                    <span className="text-[10px] font-bold bg-slate-100 px-2 py-0.5 rounded-full text-slate-800 border border-slate-200">
+                      1 Chạm
+                    </span>
+                  </div>
+                  <div className="mt-3">
+                    <h4 className="text-xs font-bold text-slate-900 leading-tight">Quét QR Kết Nối</h4>
+                    <p className="text-[10px] text-slate-500 mt-0.5">Quét thẻ nhận diện đối tác</p>
+                    <div className="mt-1.5 text-[10px] font-bold text-slate-800 flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+                      Mở camera quét <ArrowRight className="w-3 h-3" />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Bento 4: MÀN CÁ NHÂN & DANH THIẾP SỐ */}
+                <Link
+                  to="/association/profile"
+                  className="rounded-3xl p-3.5 bg-white border border-slate-200 shadow-2xs hover:border-slate-400 hover:shadow-xs transition-all flex flex-col justify-between group active:scale-98"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="p-2 rounded-2xl bg-slate-100 text-slate-900 border border-slate-200">
+                      <User className="w-4 h-4" />
+                    </span>
+                    <span className="text-[10px] font-bold bg-slate-100 px-2 py-0.5 rounded-full text-slate-800 border border-slate-200">
+                      Hồ Sơ
+                    </span>
+                  </div>
+                  <div className="mt-3">
+                    <h4 className="text-xs font-bold text-slate-900 leading-tight">Hồ Sơ Cá Nhân</h4>
+                    <p className="text-[10px] text-slate-500 mt-0.5">Thẻ số VIP &amp; Cài đặt</p>
+                    <div className="mt-1.5 text-[10px] font-bold text-slate-800 flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+                      Xem hồ sơ <ArrowRight className="w-3 h-3" />
+                    </div>
+                  </div>
+                </Link>
+              </div>
+            </section>
+
+            {/* ── SỰ KIỆN DẠNG SLIDE LƯỚT NGANG (CONCEPT 3 - TỐI GIẢN, HÌNH ẢNH ĐẸP, ÍT CHỮ) ── */}
             <section className="space-y-3">
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="text-sm font-bold text-slate-900">
-                    Sự Kiện Tiêu Điểm
+                    Sự Kiện &amp; Hoạt Động Tiêu Điểm
                   </h3>
-                  <p className="text-[11px] text-slate-500">Lướt ngang để chọn sự kiện &amp; xem sơ đồ VIP</p>
+                  <p className="text-[11px] text-slate-500">Lớp học, sự kiện &amp; cuộc họp sắp diễn ra</p>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => setActiveTab("events")}
-                  className="text-xs font-bold text-blue-600 hover:underline flex items-center gap-0.5 cursor-pointer"
+                <Link
+                  to="/association/events"
+                  className="text-xs font-bold text-slate-800 hover:underline flex items-center gap-0.5 cursor-pointer"
                 >
-                  Tất cả ({events.length}) <ChevronRight className="w-3 h-3" />
-                </button>
+                  Xem tất cả ({events.length}) <ChevronRight className="w-3 h-3" />
+                </Link>
               </div>
 
               {/* Slider Horizontal Carousel */}
@@ -814,31 +869,34 @@ export function CeoHn10StudentAppScreen() {
                 {events.map((evt, idx) => (
                   <div
                     key={evt.id}
-                    className="min-w-[310px] max-w-[325px] snap-center rounded-3xl p-5 bg-white text-slate-900 border border-slate-200 shadow-sm flex flex-col justify-between shrink-0 hover:border-slate-300 transition-colors"
+                    className="min-w-[290px] max-w-[310px] snap-center rounded-3xl p-4 bg-white text-slate-900 border border-slate-200 shadow-sm flex flex-col justify-between shrink-0 hover:border-slate-300 transition-colors"
                   >
                     <div>
-                      {/* Top Badges */}
-                      <div className="flex items-center justify-between gap-2 mb-3">
-                        <span className="px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wider uppercase bg-red-50 text-red-600 border border-red-200">
-                          {idx === 0 ? "★ Dạ Khúc Thượng Đỉnh" : "Sự Kiện Đặc Quyền"}
-                        </span>
-                        <span className="text-[11px] font-bold text-blue-700 bg-blue-50 px-2.5 py-0.5 rounded-full border border-blue-200">
-                          {evt.price && evt.price > 0 ? `${evt.price.toLocaleString("vi-VN")} đ` : "Miễn Phí Hội Viên"}
-                        </span>
+                      {/* Event Cover Photo */}
+                      <div className="relative h-32 w-full rounded-2xl overflow-hidden mb-3 bg-slate-100">
+                        <img
+                          src={idx % 2 === 0 ? "/ceohn10_hero_cosmos_skyline.jpg" : "/business_connect_light.jpg"}
+                          alt={evt.name}
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-transparent" />
+                        <div className="absolute bottom-2 left-2 right-2 flex items-center justify-between">
+                          <span className="px-2 py-0.5 rounded-full text-[9px] font-bold tracking-wider uppercase bg-red-600 text-white shadow-xs">
+                            {idx === 0 ? "★ Tiêu Điểm" : "Sự Kiện CLB"}
+                          </span>
+                          <span className="text-[10px] font-bold text-white bg-slate-900/80 backdrop-blur-xs px-2 py-0.5 rounded-full border border-white/20">
+                            {evt.price && evt.price > 0 ? `${evt.price.toLocaleString("vi-VN")} đ` : "Miễn Phí"}
+                          </span>
+                        </div>
                       </div>
 
                       {/* Event Title */}
-                      <h4 className="text-sm font-bold text-slate-900 leading-snug line-clamp-2">
+                      <h4 className="text-xs font-bold text-slate-900 leading-snug line-clamp-2">
                         {evt.name}
                       </h4>
 
-                      {/* Highlight Quote */}
-                      <p className="mt-2 text-[11px] italic text-slate-600 bg-slate-50 p-2.5 rounded-xl border border-slate-100 line-clamp-2">
-                        {evt.highlightQuote || "“Giao thương bền vững bắt đầu từ sự thấu hiểu và sẻ chia giá trị.”"}
-                      </p>
-
                       {/* Date & Location */}
-                      <div className="mt-3 space-y-1.5 text-xs text-slate-600">
+                      <div className="mt-2.5 space-y-1 text-[11px] text-slate-600">
                         <div className="flex items-center gap-2">
                           <Clock className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                           <span className="font-semibold text-slate-800">{formatDisplayDate(evt.date)}</span>
@@ -850,45 +908,34 @@ export function CeoHn10StudentAppScreen() {
                       </div>
                     </div>
 
-                    {/* Social proof & Action Buttons */}
-                    <div className="mt-4 pt-3 border-t border-slate-100 space-y-3">
-                      <div className="flex items-center justify-between text-[11px]">
-                        <span className="text-slate-600 font-medium">
-                          👥 {evt.confirmedCount || 48} CEO đã xác nhận
-                        </span>
-                        <span className="text-slate-400">Formal VIP</span>
-                      </div>
+                    {/* Action Buttons */}
+                    <div className="mt-3 pt-2.5 border-t border-slate-100 flex items-center gap-2">
+                      <Link
+                        to="/association/events"
+                        className="flex-1 py-1.5 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-700 font-bold text-xs border border-slate-200 transition cursor-pointer flex items-center justify-center gap-1"
+                      >
+                        <BookOpen className="w-3.5 h-3.5 text-slate-600" />
+                        <span>Chi Tiết</span>
+                      </Link>
 
-                      <div className="flex items-center gap-2">
+                      {evt.isRegistered ? (
                         <button
                           type="button"
-                          onClick={() => setSelectedDetailEvent(evt)}
-                          className="flex-1 py-2 px-3 rounded-2xl bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-700 font-bold text-xs border border-slate-200 transition cursor-pointer flex items-center justify-center gap-1"
+                          onClick={() => setViewTicketEvent(evt)}
+                          className="flex-1 py-1.5 px-3 rounded-xl bg-slate-900 hover:bg-slate-800 active:scale-95 text-white font-bold text-xs shadow-xs transition flex items-center justify-center gap-1 cursor-pointer"
                         >
-                          <BookOpen className="w-3.5 h-3.5 text-slate-600" />
-                          <span>Chi Tiết</span>
+                          <Ticket className="w-3.5 h-3.5 text-white" />
+                          <span>Vé QR</span>
                         </button>
-
-                        {evt.isRegistered ? (
-                          <button
-                            type="button"
-                            onClick={() => setViewTicketEvent(evt)}
-                            className="flex-1 py-2 px-3 rounded-2xl bg-blue-600 hover:bg-blue-700 active:scale-95 text-white font-bold text-xs shadow-xs transition flex items-center justify-center gap-1 cursor-pointer"
-                          >
-                            <Ticket className="w-3.5 h-3.5 text-white" />
-                            <span>Mở Vé QR</span>
-                          </button>
-                        ) : (
-                          <button
-                            type="button"
-                            onClick={() => handleRegisterEvent(evt)}
-                            className="flex-1 py-2 px-3 rounded-2xl bg-red-600 hover:bg-red-700 active:scale-95 text-white font-bold text-xs shadow-xs transition flex items-center justify-center gap-1 cursor-pointer"
-                          >
-                            <Ticket className="w-3.5 h-3.5 text-white" />
-                            <span>Đăng Ký</span>
-                          </button>
-                        )}
-                      </div>
+                      ) : (
+                        <Link
+                          to="/association/events"
+                          className="flex-1 py-1.5 px-3 rounded-xl bg-red-600 hover:bg-red-700 active:scale-95 text-white font-bold text-xs shadow-xs transition flex items-center justify-center gap-1 cursor-pointer"
+                        >
+                          <Ticket className="w-3.5 h-3.5 text-white" />
+                          <span>Đăng Ký</span>
+                        </Link>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -904,7 +951,7 @@ export function CeoHn10StudentAppScreen() {
                   </h3>
                   <p className="text-[11px] text-slate-500">Chỉ số hoàn thành và chuỗi trạm phát triển doanh nhân</p>
                 </div>
-                <span className="text-xs font-bold text-blue-700 bg-blue-50 px-2.5 py-0.5 rounded-full border border-blue-200">
+                <span className="text-xs font-bold text-blue-700 bg-slate-100 px-2.5 py-0.5 rounded-full border border-slate-300">
                   Khóa 2026 - 2027
                 </span>
               </div>
@@ -987,7 +1034,7 @@ export function CeoHn10StudentAppScreen() {
                         <div
                           className={`absolute -left-6 top-1 w-5 h-5 rounded-full border-2 flex items-center justify-center text-[9px] font-bold transition-transform group-hover:scale-110 ${
                             isDone
-                              ? "bg-blue-600 border-white text-white shadow-xs"
+                              ? "bg-slate-900 border-white text-white shadow-xs"
                               : isDoing
                               ? "bg-red-600 border-white text-white shadow-xs ring-2 ring-red-200"
                               : "bg-slate-200 border-white text-slate-600"
@@ -1002,7 +1049,7 @@ export function CeoHn10StudentAppScreen() {
                             isDoing
                               ? "bg-white border-red-200 shadow-xs"
                               : isDone
-                              ? "bg-blue-50/30 border-blue-100 text-slate-800"
+                              ? "bg-slate-100/30 border-slate-200 text-slate-800"
                               : "bg-slate-50 border-slate-200 text-slate-700"
                           }`}
                         >
@@ -1012,7 +1059,7 @@ export function CeoHn10StudentAppScreen() {
                                 isDoing
                                   ? "bg-red-50 text-red-700 border border-red-200"
                                   : isDone
-                                  ? "bg-blue-50 text-blue-700 border border-blue-200"
+                                  ? "bg-slate-100 text-blue-700 border border-slate-300"
                                   : "bg-slate-200 text-slate-600"
                               }`}
                             >
@@ -1035,7 +1082,7 @@ export function CeoHn10StudentAppScreen() {
                             <span>📅 {m.date} ({m.time})</span>
                             <span
                               className={`font-semibold flex items-center gap-0.5 group-hover:underline ${
-                                isDoing ? "text-red-600" : "text-blue-600"
+                                isDoing ? "text-red-600" : "text-slate-800"
                               }`}
                             >
                               Chi tiết <ChevronRight className="w-3 h-3" />
@@ -1063,7 +1110,7 @@ export function CeoHn10StudentAppScreen() {
                 </h3>
                 <p className="text-[11px] text-slate-500">Giáo trình, tài liệu slide và thảo luận nhóm lớp học</p>
               </div>
-              <span className="text-xs font-bold text-blue-700 bg-blue-50 px-2.5 py-0.5 rounded-full border border-blue-200">
+              <span className="text-xs font-bold text-blue-700 bg-slate-100 px-2.5 py-0.5 rounded-full border border-slate-300">
                 {classes.length} Chuyên Đề
               </span>
             </div>
@@ -1075,7 +1122,7 @@ export function CeoHn10StudentAppScreen() {
                   className="bg-white rounded-3xl p-4 border border-slate-200 shadow-2xs relative overflow-hidden"
                 >
                   <div className="flex items-center justify-between gap-2 mb-2">
-                    <span className="inline-block px-2.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-blue-50 text-blue-700 border border-blue-200 font-mono">
+                    <span className="inline-block px-2.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-blue-700 border border-slate-300 font-mono">
                       {cls.moduleCode}
                     </span>
                     {cls.isOnline ? (
@@ -1112,7 +1159,7 @@ export function CeoHn10StudentAppScreen() {
                     <button
                       type="button"
                       onClick={() => handleOpenClassDetail(cls)}
-                      className="flex-1 inline-flex items-center justify-center gap-1.5 py-2 px-3 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold active:scale-95 transition-all cursor-pointer shadow-2xs"
+                      className="flex-1 inline-flex items-center justify-center gap-1.5 py-2 px-3 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold active:scale-95 transition-all cursor-pointer shadow-2xs"
                     >
                       <BookOpen className="w-3.5 h-3.5 text-white" />
                       <span>Xem Chi Tiết Lớp</span>
@@ -1150,7 +1197,7 @@ export function CeoHn10StudentAppScreen() {
               </div>
               <Link
                 to="/association/events"
-                className="text-xs font-bold text-blue-600 hover:underline flex items-center gap-0.5"
+                className="text-xs font-bold text-slate-800 hover:underline flex items-center gap-0.5"
               >
                 Mở trung tâm vé <ChevronRight className="w-3 h-3" />
               </Link>
@@ -1166,7 +1213,7 @@ export function CeoHn10StudentAppScreen() {
                     <span className="px-2.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-red-50 text-red-600 border border-red-200">
                       Sự Kiện CEO HN10
                     </span>
-                    <span className="text-[10px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
+                    <span className="text-[10px] font-bold text-blue-700 bg-slate-100 px-2 py-0.5 rounded border border-slate-300">
                       {event.price && event.price > 0 ? `${event.price.toLocaleString("vi-VN")} đ` : "Miễn phí (0đ)"}
                     </span>
                   </div>
@@ -1200,7 +1247,7 @@ export function CeoHn10StudentAppScreen() {
                       <button
                         type="button"
                         onClick={() => setViewTicketEvent(event)}
-                        className="flex-1 py-2 px-3 rounded-2xl bg-blue-600 text-white font-bold text-xs hover:bg-blue-700 shadow-2xs transition flex items-center justify-center gap-1 cursor-pointer"
+                        className="flex-1 py-2 px-3 rounded-2xl bg-slate-900 text-white font-bold text-xs hover:bg-slate-800 shadow-2xs transition flex items-center justify-center gap-1 cursor-pointer"
                       >
                         <Ticket className="w-3.5 h-3.5 text-white" />
                         <span>Mã Vé QR</span>
@@ -1270,7 +1317,7 @@ export function CeoHn10StudentAppScreen() {
                   className="bg-white rounded-2xl p-3.5 border border-slate-200 shadow-2xs flex items-center justify-between gap-3 hover:border-slate-300 transition-colors"
                 >
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className="w-12 h-12 rounded-full bg-slate-100 text-blue-600 font-bold flex items-center justify-center shrink-0 border border-slate-200 overflow-hidden">
+                    <div className="w-12 h-12 rounded-full bg-slate-100 text-slate-800 font-bold flex items-center justify-center shrink-0 border border-slate-200 overflow-hidden">
                       {peer.avatarUrl && resolveMediaUrl(peer.avatarUrl) ? (
                         <img src={resolveMediaUrl(peer.avatarUrl) || undefined} alt={peer.name} className="w-full h-full object-cover" />
                       ) : (
@@ -1298,7 +1345,7 @@ export function CeoHn10StudentAppScreen() {
                     className={`px-3 py-1.5 rounded-xl text-xs font-bold shrink-0 transition-all active:scale-95 flex items-center gap-1 cursor-pointer ${
                       peer.isConnected
                         ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
-                        : "bg-blue-600 text-white hover:bg-blue-700 shadow-2xs"
+                        : "bg-slate-900 text-white hover:bg-slate-800 shadow-2xs"
                     }`}
                   >
                     {peer.isConnected ? (
@@ -1320,71 +1367,7 @@ export function CeoHn10StudentAppScreen() {
         )}
       </main>
 
-      {/* ── 4. FOOTER (BOTTOM NAV) THEO MẪU 1 (FLOATING LUXURY ROUNDED BAR - TỐI GIẢN) ── */}
-      <footer className="fixed bottom-4 left-4 right-4 max-w-md mx-auto z-40">
-        <div className="bg-white/95 backdrop-blur-md border border-slate-200 shadow-lg rounded-3xl px-3 py-2 flex items-center justify-around text-slate-600">
-          {/* Tab 1: Trang Chủ */}
-          <button
-            onClick={() => setActiveTab("home")}
-            className={`flex flex-col items-center gap-1 py-1 px-3 rounded-2xl transition-all cursor-pointer ${
-              activeTab === "home"
-                ? "bg-blue-50 text-blue-600 font-bold"
-                : "text-slate-500 hover:text-slate-900"
-            }`}
-          >
-            <Compass className="w-5 h-5" />
-            <span className="text-[10px] tracking-tight">Trang Chủ</span>
-          </button>
 
-          {/* Tab 2: Lớp Học */}
-          <button
-            onClick={() => setActiveTab("classes")}
-            className={`flex flex-col items-center gap-1 py-1 px-3 rounded-2xl transition-all cursor-pointer ${
-              activeTab === "classes"
-                ? "bg-blue-50 text-blue-600 font-bold"
-                : "text-slate-500 hover:text-slate-900"
-            }`}
-          >
-            <GraduationCap className="w-5 h-5" />
-            <span className="text-[10px] tracking-tight">Lớp Học</span>
-          </button>
-
-          {/* Nút Giữa Floating: Thẻ QR Cá Nhân */}
-          <button
-            onClick={() => setQrModalOpen(true)}
-            className="w-12 h-12 -mt-5 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-black p-0.5 shadow-md shadow-blue-500/20 flex items-center justify-center active:scale-95 transition-transform cursor-pointer"
-            title="Thẻ QR Doanh Nhân"
-          >
-            <QrCode className="w-6 h-6" />
-          </button>
-
-          {/* Tab 3: Sự Kiện */}
-          <button
-            onClick={() => setActiveTab("events")}
-            className={`flex flex-col items-center gap-1 py-1 px-3 rounded-2xl transition-all cursor-pointer ${
-              activeTab === "events"
-                ? "bg-blue-50 text-blue-600 font-bold"
-                : "text-slate-500 hover:text-slate-900"
-            }`}
-          >
-            <Calendar className="w-5 h-5" />
-            <span className="text-[10px] tracking-tight">Sự Kiện</span>
-          </button>
-
-          {/* Tab 4: B2B Hub */}
-          <button
-            onClick={() => setActiveTab("connect")}
-            className={`flex flex-col items-center gap-1 py-1 px-3 rounded-2xl transition-all cursor-pointer ${
-              activeTab === "connect"
-                ? "bg-blue-50 text-blue-600 font-bold"
-                : "text-slate-500 hover:text-slate-900"
-            }`}
-          >
-            <Users className="w-5 h-5" />
-            <span className="text-[10px] tracking-tight">B2B Hub</span>
-          </button>
-        </div>
-      </footer>
 
       {/* ── MODAL CHI TIẾT LỚP HỌC & THẢO LUẬN ── */}
       {selectedDetailClass && (

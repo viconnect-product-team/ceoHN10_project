@@ -56,6 +56,8 @@ export class UpdateEventDto {
   time?: string;
   agenda?: any;
   checkinQr?: string;
+  reason?: string;
+  changeReason?: string;
 }
 
 export class RegisterEventDto {

@@ -1124,6 +1124,20 @@ function PublicEventCheckinGatePage() {
                       : "Chưa thanh toán"}
                   </span>
                 </div>
+                {currentTicket.isCheckedIn && (
+                  <div className="flex items-center justify-between pt-1 border-t border-slate-800/60">
+                    <span className="text-slate-400">Tiến Độ Điểm Danh:</span>
+                    <span
+                      className={`font-bold px-2 py-0.5 rounded text-[11px] ${
+                        currentTicket.isLate
+                          ? "bg-amber-500/20 text-amber-300 border border-amber-500/30"
+                          : "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"
+                      }`}
+                    >
+                      {currentTicket.isLate ? "Đi muộn" : "Đúng giờ"}
+                    </span>
+                  </div>
+                )}
               </div>
             </div>
 

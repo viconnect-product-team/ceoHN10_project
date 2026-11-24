@@ -187,16 +187,24 @@ export function AssociationMemberQrModal({
     if (!raw) return;
     setErrorMsg(null);
 
-    // 1. Kiểm tra nếu là Mã Vé Sự Kiện / Check-in QR (TKT-, REG-, event_ticket:, JSON vé, hoặc checkin scan-ticket)
+    // 1. Kiểm tra nếu là Mã Vé Sự Kiện / Check-in QR (TKT-, REG-, EV-, số nguyên, event_ticket:, JSON vé, hoặc checkin scan-ticket)
     const isTicketCode =
       raw.startsWith("TKT-") ||
       raw.startsWith("REG-") ||
+      raw.startsWith("EV-") ||
+      raw.startsWith("EVT-") ||
       raw.startsWith("event_ticket:") ||
       raw.startsWith("EVENT_TICKET:") ||
+      raw.startsWith("ticket:") ||
+      raw.startsWith("TICKET:") ||
       raw.includes("ticketCode") ||
       raw.includes("/api/events/qr") ||
+      raw.includes("registrationId") ||
+      /^[0-9]{4,10}$/.test(raw.trim()) ||
       /^TKT-[A-Za-z0-9_-]+/i.test(raw.trim()) ||
-      /^REG-[A-Za-z0-9_-]+/i.test(raw.trim());
+      /^REG-[A-Za-z0-9_-]+/i.test(raw.trim()) ||
+      /^EV-[A-Za-z0-9_-]+/i.test(raw.trim()) ||
+      /^EVT-[A-Za-z0-9_-]+/i.test(raw.trim());
 
     if (isTicketCode) {
       try {
@@ -231,6 +239,40 @@ export function AssociationMemberQrModal({
           });
           return;
         }
+
+        // Local fallback: kiểm tra trong danh sách vé đã đăng ký
+        try {
+          const localRecords = JSON.parse(localStorage.getItem("vba_registered_event_records") || "[]");
+          const matched = localRecords.find(
+            (r: any) =>
+              String(r.id || "").toLowerCase() === raw.trim().toLowerCase() ||
+              String(r.ticketCode || "").toLowerCase() === raw.trim().toLowerCase() ||
+              String(r.eventId || "").toLowerCase() === raw.trim().toLowerCase()
+          );
+          if (matched) {
+            setScannedTicket({
+              ticketCode: matched.ticketCode || matched.id || raw.trim(),
+              attendeeName: memberName || user?.fullName || "Học viên CEO HN10",
+              attendeePhone: user?.phone || "",
+              attendeeCompany: memberCompany || "CLB Doanh Nhân CEO HN10",
+              attendeePosition: memberTitle || "Học viên chính thức",
+              attendeeAvatar: memberAvatar || null,
+              memberCode: memberCode || "",
+              eventId: matched.eventId || "",
+              eventTitle: matched.name || "Sự kiện CLB CEO HN10",
+              eventDate: matched.date || "",
+              eventLocation: matched.place || "Hà Nội",
+              ticketType: matched.ticketType || "Vé Tham Dự",
+              seatAssignment: matched.seatAssignment || "Ghế tiêu chuẩn",
+              luckyNumber: matched.luckyNumber || "#8888",
+              ticketCount: matched.ticketCount || 1,
+              isCheckedIn: Boolean(matched.checkedIn),
+              checkedInAt: matched.checkedInAt || null,
+              scannedBy: "Ban Soát Vé CEO HN10",
+            });
+            return;
+          }
+        } catch { }
       } catch (err) {
         console.warn("Scan ticket error:", err);
       }
@@ -1026,7 +1068,25 @@ export function AssociationMemberQrModal({
                 currentEventId: t.eventId,
                 confirm: true,
               }),
-            });
+            }).catch(() => null);
+
+            // Cập nhật trạng thái điểm danh trong localStorage
+            try {
+              const localRecords = JSON.parse(localStorage.getItem("vba_registered_event_records") || "[]");
+              const updated = localRecords.map((r: any) => {
+                if (
+                  String(r.id || "").toLowerCase() === t.ticketCode.toLowerCase() ||
+                  String(r.ticketCode || "").toLowerCase() === t.ticketCode.toLowerCase() ||
+                  String(r.eventId || "").toLowerCase() === String(t.eventId || "").toLowerCase()
+                ) {
+                  return { ...r, checkedIn: true, checkedInAt: new Date().toISOString() };
+                }
+                return r;
+              });
+              localStorage.setItem("vba_registered_event_records", JSON.stringify(updated));
+              window.dispatchEvent(new Event("vba.events.changed"));
+            } catch { }
+
             const nowStr = new Date().toLocaleString("vi-VN", {
               hour: "2-digit",
               minute: "2-digit",

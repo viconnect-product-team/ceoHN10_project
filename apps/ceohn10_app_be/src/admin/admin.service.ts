@@ -547,10 +547,10 @@ export class AdminService implements OnModuleInit {
   private async getSepayBankConfig() {
     try {
       const masterRows = await this.prisma.$queryRawUnsafe<any[]>(`
-        SELECT setting_value FROM public.master_system_settings WHERE setting_key = 'sepay_integration_config' LIMIT 1
+        SELECT value FROM public.master_system_settings WHERE key = 'sepay_integration_config' LIMIT 1
       `).catch(() => []);
-      if (masterRows.length > 0 && masterRows[0]?.setting_value) {
-        const val = typeof masterRows[0].setting_value === 'string' ? JSON.parse(masterRows[0].setting_value) : masterRows[0].setting_value;
+      if (masterRows.length > 0 && masterRows[0]?.value) {
+        const val = typeof masterRows[0].value === 'string' ? JSON.parse(masterRows[0].value) : masterRows[0].value;
         const bankAcc = (val.bank_accounts && val.bank_accounts[0]) || {};
         return {
           bankName: val.bank_brand_name || bankAcc.bank_brand_name || process.env.SEPAY_BANK_NAME || 'MBBank',

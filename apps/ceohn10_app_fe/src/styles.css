@@ -866,19 +866,18 @@ button.ceo-login-submit svg {
   color: #0F172A !important;
 }
 
-.dark .vba-app .bg-slate-950,
-.vba-app .bg-slate-950 {
-  background-color: #FFFFFF !important;
-}
-
-.dark .vba-app .bg-slate-900,
+/* Đảm bảo các nút và capsule tone Slate 900 luôn giữ nền tối và chữ trắng tương phản cao */
+.vba-app button.bg-slate-900,
+.vba-app a.bg-slate-900,
 .vba-app .bg-slate-900 {
-  background-color: #FFFFFF !important;
+  background-color: #0F172A !important;
+  color: #FFFFFF !important;
 }
 
-.dark .vba-app .bg-slate-800,
-.vba-app .bg-slate-800 {
-  background-color: #F8FAFC !important;
+.vba-app button.bg-slate-900 *,
+.vba-app a.bg-slate-900 *,
+.vba-app .bg-slate-900 * {
+  color: #FFFFFF !important;
 }
 
 .dark .vba-app .border-slate-800,
